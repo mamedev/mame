@@ -1252,6 +1252,16 @@ uint64_t netlist_mame_cpu_device::execute_cycles_to_clocks(uint64_t cycles) cons
 	return cycles;
 }
 
+netlist::netlist_time_ext netlist_mame_cpu_device::nltime_ext_from_clocks(unsigned c) const noexcept
+{
+	return (m_div * c).shr(MDIV_SHIFT);
+}
+
+netlist::netlist_time netlist_mame_cpu_device::nltime_from_clocks(unsigned c) const noexcept
+{
+	return static_cast<netlist::netlist_time>((m_div * c).shr(MDIV_SHIFT));
+}
+
 void netlist_mame_cpu_device::execute_run()
 {
 	//m_ppc = m_pc; // copy PC to previous PC

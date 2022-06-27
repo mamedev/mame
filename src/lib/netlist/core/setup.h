@@ -179,11 +179,11 @@ namespace netlist
 		models_t &models() noexcept { return m_models; }
 		const models_t &models() const noexcept { return m_models; }
 
-		netlist_state_t &nlstate() { return m_nlstate; }
-		const netlist_state_t &nlstate() const { return m_nlstate; }
+		netlist_state_t &nlstate() noexcept { return m_nlstate; }
+		const netlist_state_t &nlstate() const noexcept { return m_nlstate; }
 
-		nlparse_t &parser() { return m_parser; }
-		const nlparse_t &parser() const { return m_parser; }
+		nlparse_t &parser() noexcept { return m_parser; }
+		const nlparse_t &parser() const noexcept { return m_parser; }
 
 		log_type &log() noexcept;
 		const log_type &log() const noexcept;
@@ -196,10 +196,10 @@ namespace netlist
 		void merge_nets(detail::net_t &this_net, detail::net_t &other_net);
 
 		void connect_terminals(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
-		void connect_input_output(detail::core_terminal_t &in, detail::core_terminal_t &out);
-		void connect_terminal_output(terminal_t &in, detail::core_terminal_t &out);
-		void connect_terminal_input(terminal_t &term, detail::core_terminal_t &inp);
-		bool connect_input_input(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
+		void connect_input_output(detail::core_terminal_t &input, detail::core_terminal_t &output);
+		void connect_terminal_output(detail::core_terminal_t &terminal, detail::core_terminal_t &output);
+		void connect_terminal_input(detail::core_terminal_t &terminal, detail::core_terminal_t &input);
+		bool connect_input_input(detail::core_terminal_t &input1, detail::core_terminal_t &input2);
 
 		bool connect(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
 

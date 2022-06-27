@@ -20,7 +20,7 @@ namespace plib {
 	// terminate
 	//============================================================
 
-	void terminate(const char *msg) noexcept
+	[[noreturn]] void terminate(const char *msg) noexcept
 	{
 		try
 		{

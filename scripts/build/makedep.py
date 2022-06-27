@@ -392,10 +392,136 @@ class DriverFilter:
             [chr(x) for x in range(ord('a'), ord('z') + 1)] +
             ['_'])
 
+    def parse_filter(self, path, sourcefile, inclusion, exclusion):
+        def line_hook(text):
+            text = text.strip()
+            if text.startswith('#'):
+                do_parse(os.path.join(os.path.dirname(n), text[1:].lstrip()))
+            elif text.startswith('+'):
+                text = text[1:].lstrip()
+                if not text:
+                    sys.stderr.write('%s:%s: Empty driver name\n' % (path, parser.input_line))
+                    sys.exit(1)
+                elif not all(x in self.DRIVER_CHARS for x in text):
+                    sys.stderr.write('%s:%s: Invalid character in driver name "%s"\n' % (path, parser.input_line, text))
+                    sys.exit(1)
+                inclusion(text)
+            elif text.startswith('-'):
+                text = text[1:].lstrip()
+                if not text:
+                    sys.stderr.write('%s:%s: Empty driver name\n' % (path, parser.input_line))
+                    sys.exit(1)
+                elif not all(x in self.DRIVER_CHARS for x in text):
+                    sys.stderr.write('%s:%s: Invalid character in driver name "%s"\n' % (path, parser.input_line, text))
+                    sys.exit(1)
+                exclusion(text)
+            elif text:
+                sourcefile(text)
+
+        try:
+            filterfile = io.open(path, 'r', encoding='utf-8')
+        except IOError:
+            sys.stderr.write('Unable to open filter file "%s"\n' % (path, ))
+            sys.exit(1)
+        with filterfile:
+            handler = CppParser.Handler()
+            handler.line = line_hook
+            parser = CppParser(handler)
+            try:
+                parser.parse(filterfile)
+            except IOError:
+                sys.stderr.write('Error reading filter file "%s"\n' % (path, ))
+                sys.exit(1)
+            except Exception as e:
+                sys.stderr.write('Error parsing filter file "%s": %s\n' % (path, e))
+                sys.exit(1)
+
+    def parse_list(self, path, sourcefile, driver):
+        def line_hook(text):
+            text = text.strip()
+            if text.startswith('#'):
+                do_parse(os.path.join(os.path.dirname(n), text[1:].lstrip()))
+            elif text.startswith('@'):
+                parts = text[1:].lstrip().split(':', 1)
+                parts[0] = parts[0].strip()
+                if (parts[0] == 'source') and (len(parts) == 2):
+                    parts[1] = parts[1].strip()
+                    if not parts[1]:
+                        sys.stderr.write('%s:%s: Empty source file name "%s"\n' % (path, parser.input_line, text))
+                        sys.exit(1)
+                    else:
+                        sourcefile(parts[1])
+                else:
+                    sys.stderr.write('%s:%s: Unsupported directive "%s"\n' % (path, parser.input_line, text))
+                    sys.exit(1)
+            elif text:
+                if not all(x in self.DRIVER_CHARS for x in text):
+                    sys.stderr.write('%s:%s: Invalid character in driver name "%s"\n' % (path, parser.input_line, text))
+                    sys.exit(1)
+                else:
+                    driver(text)
+
+        try:
+            listfile = io.open(path, 'r', encoding='utf-8')
+        except IOError:
+            sys.stderr.write('Unable to open list file "%s"\n' % (path, ))
+            sys.exit(1)
+        with listfile:
+            handler = CppParser.Handler()
+            handler.line = line_hook
+            parser = CppParser(handler)
+            try:
+                parser.parse(listfile)
+            except IOError:
+                sys.stderr.write('Error reading list file "%s"\n' % (path, ))
+                sys.exit(1)
+            except Exception as e:
+                sys.stderr.write('Error parsing list file "%s": %s\n' % (path, e))
+                sys.exit(1)
+
+
+class DriverLister(DriverFilter):
     def __init__(self, options, **kwargs):
         super().__init__(**kwargs)
-        self.parse_filter(options.filter)
-        self.parse_list(options.list)
+
+        def includesource(filename):
+            sources.add(filename)
+
+        def includedriver(shortname):
+            includes.add(shortname)
+            excludes.discard(shortname)
+
+        def excludedriver(shortname):
+            includes.discard(shortname)
+            excludes.add(shortname)
+
+        def sourcefile(filename):
+            if self.sources:
+                state['includesrc'] = filename in self.sources
+
+        def driver(shortname):
+            if state['includesrc'] and (shortname not in self.excludes):
+                drivers.add(shortname)
+
+        sources = set()
+        includes = set()
+        excludes = set()
+        if options.filter is not None:
+            self.parse_filter(options.filter, includesource, includedriver, excludedriver)
+            sys.stderr.write('%d source file(s) found\n' % (len(sources), ))
+        self.sources = frozenset(sources)
+        self.includes = frozenset(includes)
+        self.excludes = frozenset(excludes)
+
+        drivers = set()
+        state = { 'includesrc': True }
+        self.parse_list(options.list, sourcefile, driver)
+
+        for driver in self.includes:
+            drivers.add(driver)
+        sys.stderr.write('%d driver(s) found\n' % (len(drivers), ))
+        drivers.add('___empty')
+        self.drivers = sorted(drivers)
 
     def write_source(self, f):
         f.write(
@@ -416,124 +542,34 @@ class DriverFilter:
                 '\n' \
                 'std::size_t const driver_list::s_driver_count = %d;\n' % (len(self.drivers), ))
 
-    def parse_filter(self, path):
-        def do_parse(p):
-            def line_hook(text):
-                text = text.strip()
-                if text.startswith('#'):
-                    do_parse(os.path.join(os.path.dirname(n), text[1:].lstrip()))
-                elif text.startswith('+'):
-                    text = text[1:].lstrip()
-                    if not text:
-                        sys.stderr.write('%s:%s: Empty driver name\n' % (p, parser.input_line))
-                        sys.exit(1)
-                    elif not all(x in self.DRIVER_CHARS for x in text):
-                        sys.stderr.write('%s:%s: Invalid character in driver name "%s"\n' % (p, parser.input_line, text))
-                        sys.exit(1)
-                    includes.add(text)
-                    excludes.discard(text)
-                elif text.startswith('-'):
-                    text = text[1:].lstrip()
-                    if not text:
-                        sys.stderr.write('%s:%s: Empty driver name\n' % (p, parser.input_line))
-                        sys.exit(1)
-                    elif not all(x in self.DRIVER_CHARS for x in text):
-                        sys.stderr.write('%s:%s: Invalid character in driver name "%s"\n' % (p, parser.input_line, text))
-                        sys.exit(1)
-                    includes.discard(text)
-                    excludes.add(text)
-                elif text:
-                    sources.add(text)
 
-            n = os.path.normpath(p)
-            if n not in filters:
-                filters.add(n)
-                try:
-                    filterfile = io.open(n, 'r', encoding='utf-8')
-                except IOError:
-                    sys.stderr.write('Unable to open filter file "%s"\n' % (p, ))
-                    sys.exit(1)
-                with filterfile:
-                    handler = CppParser.Handler()
-                    handler.line = line_hook
-                    parser = CppParser(handler)
-                    try:
-                        parser.parse(filterfile)
-                    except IOError:
-                        sys.stderr.write('Error reading filter file "%s"\n' % (p, ))
-                        sys.exit(1)
-                    except Exception as e:
-                        sys.stderr.write('Error parsing filter file "%s": %s\n' % (p, e))
-                        sys.exit(1)
+class DriverCollector(DriverFilter):
+    def __init__(self, options, **kwargs):
+        super().__init__(**kwargs)
+
+        def includesource(filename):
+            sources.add(filename)
+
+        def includedriver(shortname):
+            includes.add(shortname)
+
+        def excludedriver(shortname):
+            includes.discard(shortname)
+
+        def sourcefile(filename):
+            state['prevsource'] = filename
+
+        def driver(shortname):
+            if shortname in includes:
+                sources.add(state['prevsource'])
 
         sources = set()
         includes = set()
-        excludes = set()
-        filters = set()
-        if path is not None:
-            do_parse(path)
-            sys.stderr.write('%d source file(s) found\n' % (len(sources), ))
-        self.sources = frozenset(sources)
-        self.includes = frozenset(includes)
-        self.excludes = frozenset(excludes)
-
-    def parse_list(self, path):
-        def do_parse(p):
-            def line_hook(text):
-                text = text.strip()
-                if text.startswith('#'):
-                    do_parse(os.path.join(os.path.dirname(n), text[1:].lstrip()))
-                elif text.startswith('@'):
-                    parts = text[1:].lstrip().split(':', 1)
-                    parts[0] = parts[0].strip()
-                    if (parts[0] == 'source') and (len(parts) == 2):
-                        parts[1] = parts[1].strip()
-                        if not parts[1]:
-                            sys.stderr.write('%s:%s: Empty source file name "%s"\n' % (p, parser.input_line, text))
-                            sys.exit(1)
-                        elif self.sources:
-                            state['includesrc'] = parts[1] in self.sources
-                    else:
-                        sys.stderr.write('%s:%s: Unsupported directive "%s"\n' % (p, parser.input_line, text))
-                        sys.exit(1)
-                elif text:
-                    if not all(x in self.DRIVER_CHARS for x in text):
-                        sys.stderr.write('%s:%s: Invalid character in driver name "%s"\n' % (p, parser.input_line, text))
-                        sys.exit(1)
-                    elif state['includesrc'] and (text not in self.excludes):
-                        drivers.add(text)
-
-            n = os.path.normpath(p)
-            if n not in lists:
-                lists.add(n)
-                try:
-                    listfile = io.open(n, 'r', encoding='utf-8')
-                except IOError:
-                    sys.stderr.write('Unable to open list file "%s"\n' % (p, ))
-                    sys.exit(1)
-                with listfile:
-                    handler = CppParser.Handler()
-                    handler.line = line_hook
-                    parser = CppParser(handler)
-                    try:
-                        parser.parse(listfile)
-                    except IOError:
-                        sys.stderr.write('Error reading list file "%s"\n' % (p, ))
-                        sys.exit(1)
-                    except Exception as e:
-                        sys.stderr.write('Error parsing list file "%s": %s\n' % (p, e))
-                        sys.exit(1)
-
-        lists = set()
-        drivers = set()
-        state = object()
-        state = { 'includesrc': True }
-        do_parse(path)
-        for driver in self.includes:
-            drivers.add(driver)
-        sys.stderr.write('%d driver(s) found\n' % (len(drivers), ))
-        drivers.add('___empty')
-        self.drivers = sorted(drivers)
+        state = { 'prevsource': None }
+        self.parse_filter(options.filter, includesource, includedriver, excludedriver)
+        self.parse_list(options.list, sourcefile, driver)
+        sys.stderr.write('%d source file(s) found\n' % (len(sources), ))
+        self.sources = sorted(sources)
 
 
 def split_path(path):
@@ -561,7 +597,14 @@ def parse_command_line():
     subparser.add_argument('-t', '--target', metavar='<target>', required=True, help='generated emulator target name')
     subparser.add_argument('sources', metavar='<srcfile>', nargs='+', help='source files to include')
 
+    subparser = subparsers.add_parser('filterproject', help='generate project directives using filter file')
+    subparser.add_argument('-r', '--root', metavar='<srcroot>', default='.', help='path to emulator source root (defaults to working directory)')
+    subparser.add_argument('-t', '--target', metavar='<target>', required=True, help='generated emulator target name')
+    subparser.add_argument('-f', '--filter', metavar='<fltfile>', required=True, help='input filter file')
+    subparser.add_argument('list', metavar='<lstfile>', help='input list file')
+
     subparser = subparsers.add_parser('sourcesfilter', help='generate driver filter for source files')
+    subparser.add_argument('-l', '--list', metavar='<lstfile>', required=True, help='master driver list file')
     subparser.add_argument('sources', metavar='<srcfile>', nargs='+', help='source files to include')
 
     subparser = subparsers.add_parser('driverlist', help='generate driver list source')
@@ -603,7 +646,7 @@ def collect_lua_directives(options):
     return result
 
 
-def scan_source_dependencies(options):
+def scan_source_dependencies(root, sources):
     def locate_include(path):
         split = [ ]
         forward = 0
@@ -630,13 +673,13 @@ def scan_source_dependencies(options):
             else:
                 components = incdir[:-depth] + split[depth:]
                 depth = forward - 1
-            if os.path.isfile(os.path.join(options.root, *components)):
+            if os.path.isfile(os.path.join(root, *components)):
                 return components, depth
         return None, 0
 
     def test_siblings(relative, basename, depth):
         pathbase = '/'.join(relative) + '/'
-        dirname = os.path.join(options.root, *relative)
+        dirname = os.path.join(root, *relative)
         for ext in ('.cpp', '.ipp', '.hxx'):
             path = pathbase + basename + ext
             if (path not in seen) and os.path.isfile(os.path.join(dirname, basename + ext)):
@@ -662,22 +705,22 @@ def scan_source_dependencies(options):
                                 if ext.lower().startswith('.h'):
                                     components = components[:-1]
                                     test_siblings(components, base, depth)
-                                    if components == ('src', 'mame', 'includes'):
-                                        for aspect in ('audio', 'drivers', 'video', 'machine'):
-                                            test_siblings(('src', 'mame', aspect), base, depth)
+                                    if components[:2] == ('src', 'mame'):
+                                        for aspect in ('_a', '_v', '_m'):
+                                            test_siblings(components, base + aspect, depth)
 
     handler = CppParser.Handler()
     handler.line = line_hook
     parser = CppParser(handler)
-    seen = set('/'.join(x for x in split_path(source) if x) for source in options.sources)
+    seen = set('/'.join(x for x in split_path(source) if x) for source in sources)
     remaining = list([(x, 0) for x in seen])
-    default_roots = ((('src', 'devices'), 0), (('src', 'mame'), 0), (('src', 'lib'), 0))
+    default_roots = ((('src', 'devices'), 0), (('src', 'mame', 'shared'), 0), (('src', 'mame', 'messshared'), 0), (('src', 'lib'), 0))
     while remaining:
         source, depth = remaining.pop()
         components = tuple(source.split('/'))
         roots = ((components[:-1], depth), ) + default_roots
         try:
-            f = io.open(os.path.join(options.root, *components), 'r', encoding='utf-8')
+            f = io.open(os.path.join(root, *components), 'r', encoding='utf-8')
         except IOError:
             sys.stderr.write('Unable to open source file "%s"\n' % (source, ))
             sys.exit(1)
@@ -693,61 +736,135 @@ def scan_source_dependencies(options):
     return seen
 
 
-def write_project(options, projectfile, mappings, sources):
-    targetsrc = ''
-    for source in sorted(sources):
-        action = mappings.get(source)
-        if action:
-            for line in action:
-                projectfile.write(line + '\n')
-        if source.startswith('src/mame/'):
-            targetsrc += '        MAME_DIR .. "%s",\n' % (source, )
-    projectfile.write(
-            '\n' \
-            'function createProjects_mame_%s(_target, _subtarget)\n' \
-            '    project ("mame_%s")\n' \
-            '    targetsubdir(_target .."_" .. _subtarget)\n' \
-            '    kind (LIBTYPE)\n' \
-            '    uuid (os.uuid("drv-mame-%s"))\n' \
-            '    addprojectflags()\n' \
-            '    \n' \
-            '    includedirs {\n' \
-            '        MAME_DIR .. "src/osd",\n' \
-            '        MAME_DIR .. "src/emu",\n' \
-            '        MAME_DIR .. "src/devices",\n' \
-            '        MAME_DIR .. "src/mame",\n' \
-            '        MAME_DIR .. "src/lib",\n' \
-            '        MAME_DIR .. "src/lib/util",\n' \
-            '        MAME_DIR .. "src/lib/netlist",\n' \
-            '        MAME_DIR .. "3rdparty",\n' \
-            '        GEN_DIR  .. "mame/layout",\n' \
-            '        ext_includedir("asio"),\n' \
-            '        ext_includedir("flac"),\n' \
-            '        ext_includedir("glm"),\n' \
-            '        ext_includedir("jpeg"),\n' \
-            '        ext_includedir("rapidjson"),\n' \
-            '        ext_includedir("zlib"),\n' \
-            '    }\n' \
-            '\n' \
-            '    files{\n%s' \
-            '    }\n' \
-            'end\n' \
-            '\n' \
-            'function linkProjects_mame_%s(_target, _subtarget)\n' \
-            '    links {\n' \
-            '        "mame_%s",\n' \
-            '    }\n' \
-            'end\n' % (options.target, options.target, options.target, targetsrc, options.target, options.target))
+def write_project(options, projectfile, mappings, sources, single):
+    if single:
+        targetsrc = ''
+        for source in sorted(sources):
+            action = mappings.get(source)
+            if action:
+                for line in action:
+                    projectfile.write(line + '\n')
+            if source.startswith('src/mame/'):
+                targetsrc += '        MAME_DIR .. "%s",\n' % (source, )
+        projectfile.write(
+                '\n' \
+                'function createProjects_mame_%s(_target, _subtarget)\n' \
+                '    project ("mame_%s")\n' \
+                '    targetsubdir(_target .."_" .. _subtarget)\n' \
+                '    kind (LIBTYPE)\n' \
+                '    uuid (os.uuid("drv-mame-%s"))\n' \
+                '    addprojectflags()\n' \
+                '    \n' \
+                '    includedirs {\n' \
+                '        MAME_DIR .. "src/osd",\n' \
+                '        MAME_DIR .. "src/emu",\n' \
+                '        MAME_DIR .. "src/devices",\n' \
+                '        MAME_DIR .. "src/mame/shared",\n' \
+                '        MAME_DIR .. "src/mame/messshared",\n' \
+                '        MAME_DIR .. "src/lib",\n' \
+                '        MAME_DIR .. "src/lib/util",\n' \
+                '        MAME_DIR .. "src/lib/netlist",\n' \
+                '        MAME_DIR .. "3rdparty",\n' \
+                '        GEN_DIR  .. "mame/layout",\n' \
+                '        ext_includedir("asio"),\n' \
+                '        ext_includedir("flac"),\n' \
+                '        ext_includedir("glm"),\n' \
+                '        ext_includedir("jpeg"),\n' \
+                '        ext_includedir("rapidjson"),\n' \
+                '        ext_includedir("zlib"),\n' \
+                '    }\n' \
+                '\n' \
+                '    files{\n%s' \
+                '    }\n' \
+                'end\n' \
+                '\n' \
+                'function linkProjects_mame_%s(_target, _subtarget)\n' \
+                '    links {\n' \
+                '        "mame_%s",\n' \
+                '    }\n' \
+                'end\n' % (options.target, options.target, options.target, targetsrc, options.target, options.target))
+    else:
+        libraries = { }
+        for source in sorted(sources):
+            components = source.split('/')
+            if (len(components) > 3) and (components[:2] == ['src', 'mame']):
+                line = '        MAME_DIR .. "%s",\n' % (source, )
+                liblines = libraries.get(components[2])
+                if liblines is not None:
+                    liblines.append(line)
+                else:
+                    libraries[components[2]] = [line]
+            action = mappings.get(source)
+            if action:
+                for line in action:
+                    projectfile.write(line + '\n')
+        libnames = sorted(libraries.keys())
+        projectfile.write(
+                '\n' \
+                'function createMAMEProjects(_target, _subtarget, _name)\n' \
+                '    project (_name)\n' \
+                '    targetsubdir(_target .."_" .. _subtarget)\n' \
+                '    kind (LIBTYPE)\n' \
+                '    uuid (os.uuid("drv-" .. _target .. "_" .. _subtarget .. "-" .. _name))\n' \
+                '    addprojectflags()\n' \
+                '    \n' \
+                '    includedirs {\n' \
+                '        MAME_DIR .. "src/osd",\n' \
+                '        MAME_DIR .. "src/emu",\n' \
+                '        MAME_DIR .. "src/devices",\n' \
+                '        MAME_DIR .. "src/mame/shared",\n' \
+                '        MAME_DIR .. "src/mame/messshared",\n' \
+                '        MAME_DIR .. "src/lib",\n' \
+                '        MAME_DIR .. "src/lib/util",\n' \
+                '        MAME_DIR .. "src/lib/netlist",\n' \
+                '        MAME_DIR .. "3rdparty",\n' \
+                '        GEN_DIR  .. "mame/layout",\n' \
+                '        ext_includedir("asio"),\n' \
+                '        ext_includedir("flac"),\n' \
+                '        ext_includedir("glm"),\n' \
+                '        ext_includedir("jpeg"),\n' \
+                '        ext_includedir("rapidjson"),\n' \
+                '        ext_includedir("zlib"),\n' \
+                '    }\n' \
+                'end\n' \
+                '\n' \
+                'function linkProjects_mame_%s(_target, _subtarget)\n' \
+                '    links {\n' % (options.target, ))
+        for lib in libnames:
+            if (lib != 'shared') and (lib != 'messshared'):
+                projectfile.write('        "%s",\n' % (lib, ))
+        if 'shared' in libraries:
+            projectfile.write('        "shared",\n')
+        if 'messshared' in libraries:
+            projectfile.write('        "messshared",\n')
+        projectfile.write(
+                '    }\n' \
+                'end\n' \
+                '\n' \
+                'function createProjects_mame_%s(_target, _subtarget)\n' \
+                '\n' % (options.target, ))
+        for lib in libnames:
+            projectfile.write(
+                    'createMAMEProjects(_target, _subtarget, "%s")\n' \
+                    'files {\n' % (lib, ))
+            for line in libraries[lib]:
+                projectfile.write(line)
+            projectfile.write('}\n\n')
+        projectfile.write('end\n')
 
 
 def write_filter(options, filterfile):
+    sources = set()
+    DriverFilter().parse_list(options.list, lambda n: sources.add(n), lambda n: None)
+
     drivers = set()
     for source in options.sources:
         components = tuple(x for x in split_path(source) if x)
-        if (len(components) > 3) and (components[:3] == ('src', 'mame', 'drivers')):
+        if (len(components) > 3) and (components[:2] == ('src', 'mame')):
             ext = os.path.splitext(components[-1])[1].lower()
             if ext.startswith('.c'):
-                drivers.add('/'.join(components[3:]))
+                if '/'.join(components[2:]) in sources:
+                    drivers.add('/'.join(components[2:]))
     for driver in sorted(drivers):
         filterfile.write(driver + '\n')
 
@@ -756,9 +873,14 @@ if __name__ == '__main__':
     options = parse_command_line()
     if options.command == 'sourcesproject':
         header_to_optional = collect_lua_directives(options)
-        source_dependencies = scan_source_dependencies(options)
-        write_project(options, sys.stdout, header_to_optional, source_dependencies)
+        source_dependencies = scan_source_dependencies(options.root, options.sources)
+        write_project(options, sys.stdout, header_to_optional, source_dependencies, True)
+    elif options.command == 'filterproject':
+        header_to_optional = collect_lua_directives(options)
+        sources = DriverCollector(options).sources
+        source_dependencies = scan_source_dependencies(options.root, (os.path.join('src', 'mame', *n.split('/')) for n in sources))
+        write_project(options, sys.stdout, header_to_optional, source_dependencies, False)
     elif options.command == 'sourcesfilter':
         write_filter(options, sys.stdout)
     elif options.command == 'driverlist':
-        DriverFilter(options).write_source(sys.stdout)
+        DriverLister(options).write_source(sys.stdout)

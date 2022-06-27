@@ -53,6 +53,7 @@ plugin can also show high scores from non-volatile memory or saved by the
 Note that you can only use a single file of each type at a time.  You cannot,
 for example, use the English and Japanese **mameinfo.dat** files simultaneously.
 
-The data plugin creates a **history.db** file in the first configured DATs
-folder.  This file stores the information from the support files in a format
-suitable for rapid loading.  It uses the SQLite3 database format.
+The data plugin creates a **history.db** file in the **data** folder in the
+plugin data folder (see the :ref:`homepath option <mame-commandline-homepath>`).
+This file stores the information from the support files in a format suitable for
+rapid loading.  It uses the SQLite3 database format.

@@ -37,10 +37,6 @@
           CB2 ==> S_MOSI (Din)
            0V ==> S_SEL  (Select)
 
-    TODO:
-    - implement SR Mode 0 in via6522_device.
-    - implement SPI Mode 0 in spi_sdcard_device.
-
 **********************************************************************/
 
 
@@ -120,21 +116,23 @@ void bbc_sdcardt_device::device_start()
 void bbc_sdcard_device::write_cb1(int state)
 {
 	m_sdcard->spi_ss_w(1);
-	m_sdcard->spi_clock_w(!state);
+	m_sdcard->spi_clock_w(state);
 }
 
 void bbc_sdcard_device::pb_w(uint8_t data)
 {
 	m_sdcard->spi_ss_w(1);
 	m_sdcard->spi_mosi_w(BIT(data, 0));
-	m_sdcard->spi_clock_w(!BIT(data, 1));
+	m_sdcard->spi_clock_w(BIT(data, 1));
+
+	m_slot->cb1_w(BIT(data, 1));
 }
 
 
 void bbc_sdcardt_device::write_cb1(int state)
 {
 	m_sdcard->spi_ss_w(1);
-	m_sdcard->spi_clock_w(!state);
+	m_sdcard->spi_clock_w(state);
 }
 
 void bbc_sdcardt_device::write_cb2(int state)
@@ -151,5 +149,8 @@ void bbc_sdcardt_device::pb_w(uint8_t data)
 	m_turbo = (data & 0x1c) == 0x14;
 
 	m_sdcard->spi_ss_w(1);
-	m_sdcard->spi_clock_w(!BIT(data, 1));
+	m_sdcard->spi_mosi_w(BIT(data, 0));
+	m_sdcard->spi_clock_w(BIT(data, 1));
+
+	m_slot->cb1_w(BIT(data, 1));
 }

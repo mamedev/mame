@@ -10541,6 +10541,25 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="bchessw">
+		<description>Battle Chess (Windows 3.x release)</description>
+		<year>1991</year>
+		<publisher>Interplay</publisher>
+		<info name="developer" value="Interplay" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Startup Disk" />
+			<dataarea name="flop" size = "737280">
+				<rom name="Battle Chess (win 3.x) [Interplay] [1991] [3.5DD] [Disk 1 of 2].img" size="737280" crc="17d20a89" sha1="9d2babbfbd8c62556a30f4f21665ccd826e94496"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Data Disk" />
+			<dataarea name="flop" size = "737280">
+				<rom name="Battle Chess (win 3.x) [Interplay] [1991] [3.5DD] [Disk 2 of 2].img" size="737280" crc="f9883a21" sha1="dcf04cf8ca446322c3ac1f531a41851ad6181489"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="steelsky">
 		<description>Beneath a Steel Sky (Euro)</description>
 		<year>1994</year>
@@ -15012,7 +15031,7 @@ license:CC0
 	</software>
 
 	<software name="kilo1">
-		<description>Kiloblaster: Death of a Starship (Shareware, B&amp;N)</description>
+		<description>Kiloblaster: Death of a Starship (shareware)</description>
 		<year>1994</year>
 		<publisher>Epic MegaGames/The B&amp;N Companies</publisher>
 		<info name="version" value="1.0" />
@@ -15081,7 +15100,7 @@ license:CC0
 	</software>
 
 	<software name="kingqst5_525" cloneof="kingqst5">
-		<description>King's Quest V: Absence Makes the Heart Go Yonder! (5.25", v0.000.062, VGA Re-release)</description>
+		<description>King's Quest V: Absence Makes the Heart Go Yonder! (5.25", v0.000.062, VGA re-release)</description>
 		<year>1991</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Sierra On-Line" />
@@ -15148,7 +15167,7 @@ license:CC0
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Sierra On-Line" />
 		<info name="version" value="0.000.051" />
-		<part name="flop10" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Startup Disk" />
 			<dataarea name="flop" size = "1228800">
 				<rom name="King's Quest V (v0.000.051) [Sierra] [1990] [5.25HD] [Disk 1 of 9] [Startup Disk].img" size="1228800" crc="787f1fd8" sha1="f67e26a15501d104db11e336700b7c3164f8bcaa"/>
@@ -15210,7 +15229,7 @@ license:CC0
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Sierra On-Line" />
 		<info name="version" value="0.000.062" />
-		<part name="flop10" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Startup Disk" />
 			<dataarea name="flop" size = "1228800">
 				<rom name="King's Quest V (v0.000.062) [Sierra] [1991] [5.25HD] [Disk 1 of 5] [Startup Disk].img" size="1228800" crc="b084311c" sha1="5bfdfb0a947ab2e6d0f95db4f5f32bdfc461ea62"/>
@@ -15306,6 +15325,211 @@ license:CC0
 			<feature name="part_id" value="Disk 9" />
 			<dataarea name="flop" size = "737280">
 				<rom name="King's Quest V (v0.000.055) [Sierra] [1990] [3.5DD] [Disk 10 of 10] [Disk 9].img" size="737280" crc="04348571" sha1="587da91db4c4301641ded6152bcbc7f5354039a0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kingqst6">
+		<description>King's Quest VI: Heir Today, Gone Tomorrow (3.5")</description>
+		<year>1992</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="1.000" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="King's Quest 6 [Sierra] [1992] [3.5HD] [Disk 1 of 9].img" size="1474560" crc="dfa4d474" sha1="35c60cf9bcb203e60015c0ebad3e39d337c61e87"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="King's Quest 6 [Sierra] [1992] [3.5HD] [Disk 2 of 9].img" size="1474560" crc="9fa789b5" sha1="bfbd087acd7311501d98d0808bc8a1ed777830a2"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="King's Quest 6 [Sierra] [1992] [3.5HD] [Disk 3 of 9].img" size="1474560" crc="526c4b25" sha1="b02bbfc1529520f5f23ce0aa90d659fb1cdf008d"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="King's Quest 6 [Sierra] [1992] [3.5HD] [Disk 4 of 9].img" size="1474560" crc="d498f02c" sha1="07aba2ac1096aaad717c063ca16ba2d5129d061f"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="King's Quest 6 [Sierra] [1992] [3.5HD] [Disk 5 of 9].img" size="1474560" crc="31dcaee7" sha1="9c1fa9db6b6d807e71c200ad63db0d1310dcf594"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="King's Quest 6 [Sierra] [1992] [3.5HD] [Disk 6 of 9].img" size="1474560" crc="ab914a93" sha1="9d1767b44ad3a34c884105097d039428a0e6de8c"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 7" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="King's Quest 6 [Sierra] [1992] [3.5HD] [Disk 7 of 9].img" size="1474560" crc="af7a099f" sha1="2bca73ee55c79690c36a0c0c549d8550f6e281fc"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 9" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="King's Quest 6 [Sierra] [1992] [3.5HD] [Disk 8 of 9].img" size="1474560" crc="f75b801c" sha1="f7d5e25f932dfbfd37e02d271a262f55a28f7c54"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 9" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="King's Quest 6 [Sierra] [1992] [3.5HD] [Disk 9 of 9].img" size="1474560" crc="6d3ff90f" sha1="cec5b24537d6e739d9dd2d089796fc0cd8a6b673"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kingqst6de" cloneof="kingqst6">
+		<description>King's Quest VI: Heir Today, Gone Tomorrow (3.5", Germany)</description>
+		<year>1992</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="alt_title" value="King's Quest VI: Heute Geerbt und Morgen Verschwunden" />
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="1.000" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="King's Quest 6 (Germany) [Sierra] [1992] [3.5HD] [Disk 01 of 10].img" size="1474560" crc="cec72235" sha1="569a1e934cb99d0a9719952fb31b9612b760dd1f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="King's Quest 6 (Germany) [Sierra] [1992] [3.5HD] [Disk 02 of 10].img" size="1474560" crc="93444366" sha1="10ea96e0d93b18c22e47564e775295b57011f20b"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="King's Quest 6 (Germany) [Sierra] [1992] [3.5HD] [Disk 03 of 10].img" size="1474560" crc="c3ae8c3f" sha1="be8db254548f744f0fc6feebe48a62d272941758"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="King's Quest 6 (Germany) [Sierra] [1992] [3.5HD] [Disk 04 of 10].img" size="1474560" crc="11e825b3" sha1="ce27f84cc16edef8e6b1090670dd958845f1f1e2"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="King's Quest 6 (Germany) [Sierra] [1992] [3.5HD] [Disk 05 of 10].img" size="1474560" crc="b72691ad" sha1="d1affa97261ad22f7dda4a6c977742c5d0f5d6c5"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="King's Quest 6 (Germany) [Sierra] [1992] [3.5HD] [Disk 06 of 10].img" size="1474560" crc="7cd65454" sha1="91eb951fbae4dcb80643ef57110a000e1d1bed77"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 7" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="King's Quest 6 (Germany) [Sierra] [1992] [3.5HD] [Disk 07 of 10].img" size="1474560" crc="5717b084" sha1="b6bb81ae25684f818ac8759bc82c16ceff2d248f"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 9" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="King's Quest 6 (Germany) [Sierra] [1992] [3.5HD] [Disk 08 of 10].img" size="1474560" crc="081b00e1" sha1="bca6a5548b80fe10218c6412e59aa119200f284b"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 9" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="King's Quest 6 (Germany) [Sierra] [1992] [3.5HD] [Disk 09 of 10].img" size="1474560" crc="5799e3df" sha1="0659f3626f836bb1ccf3787ec0f7e73199ffa605"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Message Disk" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="King's Quest 6 (Germany) [Sierra] [1992] [3.5HD] [Disk 10 of 10].img" size="1474560" crc="1b9eb8d3" sha1="2f819b41ed5b31da2a68e9b049a1710ee45dc203"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kingqst6_525" cloneof="kingqst6">
+		<description>King's Quest VI: Heir Today, Gone Tomorrow (5.25")</description>
+		<year>1991</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="1.000" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="King's Quest 6 [Sierra] [1992] [3.5HD] [Disk 01 of 11].img" size="1228800" crc="06278eac" sha1="8de576ba74478dbdc4ba5e7bdde24c66b4cfe66d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="King's Quest 6 [Sierra] [1992] [3.5HD] [Disk 02 of 11].img" size="1228800" crc="117988f3" sha1="3bc3218105ca96bc91e362accf784f194f2ccd89"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="King's Quest 6 [Sierra] [1992] [3.5HD] [Disk 03 of 11].img" size="1228800" crc="b6d9cf5e" sha1="33ae03abf652fcaddc93949e9877fcdb255b1e2c"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="King's Quest 6 [Sierra] [1992] [3.5HD] [Disk 04 of 11].img" size="1228800" crc="76dd6b1d" sha1="870c37dfe0c1cb40c15c171c6376964ae671b303"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="King's Quest 6 [Sierra] [1992] [3.5HD] [Disk 05 of 11].img" size="1228800" crc="195143ab" sha1="be670ab81a3ce232509262acfc6099d105708984"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="King's Quest 6 [Sierra] [1992] [3.5HD] [Disk 06 of 11].img" size="1228800" crc="6499200d" sha1="81a4ba64689fba5c55d8cc12e56869c4a92a74aa"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 7" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="King's Quest 6 [Sierra] [1992] [3.5HD] [Disk 07 of 11].img" size="1228800" crc="a5eadf81" sha1="f4a77409bbf77a9bfb9e8b0b792918c02fa9c87a"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 8" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="King's Quest 6 [Sierra] [1992] [3.5HD] [Disk 08 of 11].img" size="1228800" crc="7c02bcf4" sha1="1a17351df68c61f1cc2e8851eaa9916e9fec6f1c"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 9" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="King's Quest 6 [Sierra] [1992] [3.5HD] [Disk 09 of 11].img" size="1228800" crc="c4eb069c" sha1="e67f2ac786ea48549743519d41e15cb532564c3d"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 10" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="King's Quest 6 [Sierra] [1992] [3.5HD] [Disk 10 of 11].img" size="1228800" crc="1bc89e8f" sha1="623eb1eaec77d2e16c72373d8fa9bb250945112b"/>
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 11" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="King's Quest 6 [Sierra] [1992] [3.5HD] [Disk 11 of 11].img" size="1228800" crc="feb8537b" sha1="c5f56d65554c8da381a55b2120b85d76071b8fc5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15865,6 +16089,44 @@ license:CC0
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Bountiful Golf Club Championship Course [Access Software] [1994] [3.5DD] [Disk 2 of 2].img" size="737280" crc="57f590be" sha1="88fec38908f18ddd4d42f87d0e7a49d08de9fe32"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="litdivil">
+		<description>Litil Divil</description>
+		<year>1993</year>
+		<publisher>Gremlin</publisher>
+		<info name="developer" value="Gremlin Ireland" />
+		<info name="version" value="29_11" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Litil Divil [Gremlin] [1993] [3.5HD] [Disk 1 of 6].img" size="1474560" crc="12e081f3" sha1="632058d7d1a0c877e0796ec3faae89772aca7ff4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Litil Divil [Gremlin] [1993] [3.5HD] [Disk 2 of 6].img" size="1474560" crc="4a2ff8a1" sha1="40e03d00833f593b8c130a92fdbe0b51748cb089"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Litil Divil [Gremlin] [1993] [3.5HD] [Disk 3 of 6].img" size="1474560" crc="f7a0d8d0" sha1="51e6e1fcf10985a560ff91bd3c6ba9309fb79d88"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Litil Divil [Gremlin] [1993] [3.5HD] [Disk 4 of 6].img" size="1474560" crc="2c9d0954" sha1="d768addae74498f028915cfb758c5e126604e575"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Litil Divil [Gremlin] [1993] [3.5HD] [Disk 5 of 6].img" size="1474560" crc="a7b8582d" sha1="f914179f18880bcd61d1c708e387cfc85259e3b6"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Litil Divil [Gremlin] [1993] [3.5HD] [Disk 6 of 6].img" size="1474560" crc="339083d7" sha1="8175714f3ae200e7a653a9b6739232e53550f004"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18274,6 +18536,50 @@ license:CC0
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Laura Bow in The Dagger of Amon Ra [Sierra] [1992] [3.5HD] [Disk 5 of 5] (Message - Audio).img" size="1474560" crc="4492d76b" sha1="f3c6aa180d1e6bc1c34faa3c96be58e83fadc3f9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="laurabw2de" cloneof="laurabw2">
+		<description>Roberta Williams' Laura Bow in "The Dagger of Amon Ra" (Germany)</description>
+		<year>1992</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="1.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Laura Bow in The Dagger of Amon Ra (Germany) [Sierra] [1992] [3.5HD] [Disk 1 of 6].img" size="1474560" crc="44dc41cc" sha1="af77d93432bffa11c571ef2cb491f10ff9065e7c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Laura Bow in The Dagger of Amon Ra (Germany) [Sierra] [1992] [3.5HD] [Disk 2 of 6].img" size="1474560" crc="946bd696" sha1="e9a050e1ba37e48be24dbaa281d2719eaf3b0977"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Laura Bow in The Dagger of Amon Ra (Germany) [Sierra] [1992] [3.5HD] [Disk 3 of 6].img" size="1474560" crc="734d9c98" sha1="c64f5ab3d0b21750d9dc9da21d611dca46a712b2"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Laura Bow in The Dagger of Amon Ra (Germany) [Sierra] [1992] [3.5HD] [Disk 4 of 6].img" size="1474560" crc="1c6da0a9" sha1="d3252f10bc3af6667bbe732540193e9c1f9c82a4"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Audio Disk" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Laura Bow in The Dagger of Amon Ra (Germany) [Sierra] [1992] [3.5HD] [Disk 5 of 6].img" size="1474560" crc="34371ab3" sha1="a2138489bed99a14330584b907bf0811c8483c80"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Message Disk" />
+			<dataarea name="flop" size = "737280">
+				<rom name="Laura Bow in The Dagger of Amon Ra (Germany) [Sierra] [1992] [3.5HD] [Disk 6 of 6].img" size="737280" crc="7d884c9a" sha1="6dd0caa64b7b533a80a54f8585ef9769a502e031"/>
 			</dataarea>
 		</part>
 	</software>

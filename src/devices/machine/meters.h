@@ -2,7 +2,7 @@
 // copyright-holders:James Wallace
 /**********************************************************************
 
-	Electromechanical Meter device
+    Electromechanical Meter device
 
 **********************************************************************/
 

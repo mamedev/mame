@@ -134,11 +134,7 @@ namespace netlist::devices {
 		nld_power_pins m_power_pins;
 	};
 
-	NETLIB_OBJECT_DERIVED(74113A, 74113)
-	{
-		NETLIB_CONSTRUCTOR(74113A) { }
-
-	};
+	using NETLIB_NAME(74113A) = NETLIB_NAME(74113);
 
 	NETLIB_DEVICE_IMPL(74113, "TTL_74113", "+CLK,+J,+K,+CLRQ,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(74113A, "TTL_74113A", "+CLK,+J,+K,+CLRQ,@VCC,@GND")

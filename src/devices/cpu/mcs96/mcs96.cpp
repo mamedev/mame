@@ -35,6 +35,7 @@ void mcs96_device::device_start()
 
 	set_icountptr(icount);
 
+	auto register_file_bytes = util::little_endian_cast<u8>(register_file.target());
 	state_add(STATE_GENPC,     "GENPC",     PC).noshow();
 	state_add(STATE_GENPCBASE, "CURPC",     PPC).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  PSW).formatstr("%16s").noshow();
@@ -46,14 +47,14 @@ void mcs96_device::device_start()
 	state_add(MCS96_DX,        "DX",        register_file[3]);
 	state_add(MCS96_BX,        "BX",        register_file[4]);
 	state_add(MCS96_CX,        "CX",        register_file[5]);
-	state_add(MCS96_AL,        "AL",        reinterpret_cast<u8 *>(&register_file[2])[BYTE_XOR_LE(0)]).noshow();
-	state_add(MCS96_AH,        "AH",        reinterpret_cast<u8 *>(&register_file[2])[BYTE_XOR_LE(1)]).noshow();
-	state_add(MCS96_DL,        "DL",        reinterpret_cast<u8 *>(&register_file[3])[BYTE_XOR_LE(0)]).noshow();
-	state_add(MCS96_DH,        "DH",        reinterpret_cast<u8 *>(&register_file[3])[BYTE_XOR_LE(1)]).noshow();
-	state_add(MCS96_BL,        "BL",        reinterpret_cast<u8 *>(&register_file[4])[BYTE_XOR_LE(0)]).noshow();
-	state_add(MCS96_BH,        "BH",        reinterpret_cast<u8 *>(&register_file[4])[BYTE_XOR_LE(1)]).noshow();
-	state_add(MCS96_CL,        "CL",        reinterpret_cast<u8 *>(&register_file[5])[BYTE_XOR_LE(0)]).noshow();
-	state_add(MCS96_CH,        "CH",        reinterpret_cast<u8 *>(&register_file[5])[BYTE_XOR_LE(1)]).noshow();
+	state_add(MCS96_AL,        "AL",        register_file_bytes[4]).noshow();
+	state_add(MCS96_AH,        "AH",        register_file_bytes[5]).noshow();
+	state_add(MCS96_DL,        "DL",        register_file_bytes[6]).noshow();
+	state_add(MCS96_DH,        "DH",        register_file_bytes[7]).noshow();
+	state_add(MCS96_BL,        "BL",        register_file_bytes[8]).noshow();
+	state_add(MCS96_BH,        "BH",        register_file_bytes[9]).noshow();
+	state_add(MCS96_CL,        "CL",        register_file_bytes[10]).noshow();
+	state_add(MCS96_CH,        "CH",        register_file_bytes[11]).noshow();
 
 	save_item(NAME(inst_state));
 	save_item(NAME(pending_irq));

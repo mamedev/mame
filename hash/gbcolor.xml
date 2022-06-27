@@ -1116,6 +1116,7 @@ license:CC0
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-AAYP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
 				<rom name="azure dreams (europe) (en,fr,de).bin" size="2097152" crc="f9ccab09" sha1="81d9acd0e27639f90e38e918a4b0a96fa565d1d9"/>
@@ -1131,6 +1132,7 @@ license:CC0
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-AAZE-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="azure dreams (usa).bin" size="1048576" crc="71d52876" sha1="1ebc365058dbb4d4f7ccad6185f4364d584bf250"/>
@@ -1281,6 +1283,7 @@ license:CC0
 		<info name="release" value="20000324"/>
 		<info name="alt_title" value="爆球連発!!スーパービーダマン 激誕!ライジングヴァルキリー!!"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="bakukyuu renpatsu super b-daman - gekitan rising valkyrie (japan).bin" size="1048576" crc="5c95d5a2" sha1="952933a658f0b4182619e7184f49aa4a47fc5f84"/>
@@ -1835,6 +1838,7 @@ license:CC0
 		<publisher>Disney Interactive</publisher>
 		<info name="serial" value="DMG-AVUP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-A06-01" />
 			<feature name="u1" value="U1 2M/4M/8M MROM" />
 			<feature name="u2" value="U2 MBC-5" />
@@ -1856,6 +1860,7 @@ license:CC0
 		<publisher>Disney Interactive</publisher>
 		<info name="serial" value="DMG-AVUE-USA, DMG-AVUU-AUS"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="beauty and the beast - a board game adventure (usa).bin" size="1048576" crc="6de1d581" sha1="6d389c7aff887d7ffe3739e78753cf81cc71d04c"/>
@@ -2054,6 +2059,7 @@ license:CC0
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="DMG-AEHE-USA, DMG-AEHP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="blaster master - enemy below (usa, europe).bin" size="1048576" crc="2f91e17c" sha1="8b2e83d7f2b7d72d5cc1ac81c28c2173ad2fc9ba"/>
@@ -2340,6 +2346,7 @@ license:CC0
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="DMG-AQVP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
 				<rom name="bomberman quest (europe) (en,fr,de).bin" size="2097152" crc="5a9b9ae6" sha1="088ace0cfd6b3aa637b96c01106f6b1d88ba53fa"/>
@@ -2376,6 +2383,7 @@ license:CC0
 		<publisher>Electro Brain</publisher>
 		<info name="serial" value="DMG-AVQE-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="bomberman quest (usa).bin" size="1048576" crc="a089c656" sha1="4436f6ee03f7a8b2f235b64e26400c0e951d8a3a"/>
@@ -2462,6 +2470,7 @@ license:CC0
 		<publisher>Activision</publisher>
 		<info name="serial" value="DMG-APXP-EUU"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="bug's life, a (europe).bin" size="1048576" crc="db93e0f6" sha1="dfc7b45c8f2d45cbf5c7578294ca569d2cf22dcd"/>
@@ -2475,6 +2484,7 @@ license:CC0
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-APXE-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="bug's life, a (usa).bin" size="1048576" crc="8360047a" sha1="4c689ce3b99a5b585a452b095d72a688391ea0eb"/>
@@ -3098,6 +3108,7 @@ license:CC0
 		<publisher>Gaga</publisher>
 		<info name="serial" value="DMG-AH9P-EUR"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="chase h.q. - secret police (europe).bin" size="1048576" crc="cfdf816b" sha1="e8770aeb76042fe5001dd48f55379350fa092a6f"/>
@@ -3111,6 +3122,7 @@ license:CC0
 		<publisher>Metro3D</publisher>
 		<info name="serial" value="DMG-AH9E-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="chase h.q. - secret police (usa).bin" size="1048576" crc="7c7fdefc" sha1="030b45eb8929c1512826f288e4ba035e0083505c"/>
@@ -3280,6 +3292,7 @@ license:CC0
 		<publisher>Metro3D</publisher>
 		<info name="serial" value="DMG-AVWE-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="classic bubble bobble (usa).bin" size="1048576" crc="c1b22246" sha1="6e3739c0538467c220750f2e8d474433692bac09"/>
@@ -3365,6 +3378,7 @@ license:CC0
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ACRE-USA, DMG-ACRP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-A08-01" />
 			<feature name="u1" value="U1 16M/32M/64M MROM" />
 			<feature name="u2" value="U2 MBC-5" />
@@ -3460,6 +3474,7 @@ license:CC0
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-ARLP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="cross country racing (europe) (en,fr,de).bin" size="1048576" crc="b7b91fe9" sha1="67bcac922b14a6fde311ca693f297248ceebbea6"/>
@@ -4985,6 +5000,7 @@ license:CC0
 		<publisher>Crave Entertainment</publisher>
 		<info name="serial" value="DMG-BDAE-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="262144">
 				<rom name="dragon dance (usa).bin" size="262144" crc="0602dbe1" sha1="a28bfabc4db62ad5aa6bfe29114b0878429586cc"/>
@@ -5088,6 +5104,7 @@ license:CC0
 		<publisher>Eidos</publisher>
 		<info name="serial" value="DMG-AWQD-NOE"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
 				<rom name="dragon quest monsters (germany).bin" size="2097152" crc="2a82b63b" sha1="ae8a05d616785391ba4bbdca4c408d4a641c6683"/>
@@ -5212,6 +5229,7 @@ license:CC0
 		<publisher>Enix</publisher>
 		<info name="serial" value="DMG-AEDE-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
 				<rom name="dragon warrior i &amp; ii (usa).bin" size="2097152" crc="71d693da" sha1="01c4e2145365a12560d162116378f1991807ef95"/>
@@ -5243,6 +5261,7 @@ license:CC0
 		<publisher>Eidos</publisher>
 		<info name="serial" value="DMG-AWQE-USA, DMG-AWQP-UKV"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-A08-01" />
 			<feature name="u1" value="U1 16M/32M/64M MROM" />
 			<feature name="u2" value="U2 MBC-5" />
@@ -5264,6 +5283,7 @@ license:CC0
 		<publisher>Enix</publisher>
 		<info name="serial" value="DMG-BQLE-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
 				<rom name="dragon warrior monsters 2 - cobi's journey (usa).bin" size="4194304" crc="ab7bfdd5" sha1="76901b7e5cadf9611dd4fac52e8501155c1e33a2"/>
@@ -5279,6 +5299,7 @@ license:CC0
 		<publisher>Enix</publisher>
 		<info name="serial" value="DMG-BQIE-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
 				<rom name="dragon warrior monsters 2 - tara's adventure (usa).bin" size="4194304" crc="35ec5fb2" sha1="a68451e7d3accd81b240c4b60a1f552e39211ede"/>
@@ -6162,6 +6183,7 @@ license:CC0
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-AFOE-USA, DMG-AFOP-UKV"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-A07-01" />
 			<feature name="u1" value="U1 2M/4M/8M MROM" />
 			<feature name="u2" value="U2 MBC5" />
@@ -6628,6 +6650,7 @@ license:CC0
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AGLE-USA, DMG-AGLP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="game &amp; watch gallery 2 (usa, europe).bin" size="1048576" crc="969c8961" sha1="ce81d3260e8c5e1dd241caf6de315eb3e63dbc15"/>
@@ -6643,6 +6666,7 @@ license:CC0
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AGQE-USA, DMG-AGQP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="game &amp; watch gallery 3 (usa, europe).bin" size="1048576" crc="1ac625da" sha1="64ccb3b41715080a9aa13970678aa9047fc7a9fd"/>
@@ -6671,6 +6695,7 @@ license:CC0
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AGLU-AUS"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="game boy gallery 3 (australia).bin" size="1048576" crc="6935fea1" sha1="fde6a70e7ad6a3a116d918435f7efbc1fd95b4cc"/>
@@ -6707,6 +6732,7 @@ license:CC0
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AGQU-AUS"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-A06-01" />
 			<feature name="u1" value="U1 2M/4M/8M MROM" />
 			<feature name="u2" value="U2 MBC-5" />
@@ -8093,6 +8119,7 @@ license:CC0
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AYXP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc3" />
 			<feature name="rtc" value="yes" />
 			<dataarea name="rom" size="1048576">
@@ -8109,6 +8136,7 @@ license:CC0
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AYXD-NOE"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-KFCN-01" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC3A [MBC3A]" />
@@ -8131,6 +8159,7 @@ license:CC0
 		<publisher>Natsume</publisher>
 		<info name="serial" value="DMG-AYXE-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc3" />
 			<feature name="rtc" value="yes" />
 			<dataarea name="rom" size="1048576">
@@ -8346,6 +8375,7 @@ license:CC0
 		<info name="serial" value="DMG-AICE-USA, DMG-AICP-EUR"/>
 		<info name="alt_title" value="Hexcite - The Shapes of Victory (Box)"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-A02-01" />
 			<feature name="u1" value="U1 2M/4M/8M MROM" />
 			<feature name="u2" value="U2 MBC-5" />
@@ -8451,6 +8481,7 @@ license:CC0
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="DMG-AQTP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="holy magic century (europe) (en,fr,de).bin" size="1048576" crc="abd8ceae" sha1="01ad2928e923c415671e6306d6d73016a1ca7bb9"/>
@@ -8801,6 +8832,7 @@ license:CC0
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-ARLE-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-A07-01" />
 			<feature name="u1" value="U1 2M/4M/8M MROM" />
 			<feature name="u2" value="U2 MBC5" />
@@ -8887,6 +8919,7 @@ license:CC0
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-AHDP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="international track &amp; field (europe) (en,fr,de,it).bin" size="1048576" crc="327ec81f" sha1="3aecac0876dac69e9e1fb6f6c311d0af050f1f48"/>
@@ -8902,6 +8935,7 @@ license:CC0
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-AHDE-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="international track &amp; field (usa).bin" size="1048576" crc="803d5d57" sha1="80b7591470d0a26fe7cf5c80c8bff5d34f79f569"/>
@@ -9283,6 +9317,7 @@ license:CC0
 		<info name="alt_title" value="銃鋼戦記バレットバトラー"/>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
 				<rom name="juukou senki bullet battlers (japan).bin" size="2097152" crc="4039c187" sha1="a89304600330a62800751f16e231924fa9cf6e4d"/>
@@ -9485,6 +9520,7 @@ license:CC0
 		<info name="release" value="19990528"/>
 		<info name="alt_title" value="カンヅメモンスター パフェ"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="kanzume monsters parfait (japan).bin" size="1048576" crc="6d5b59c0" sha1="62f431d8e1efdc93a36751ce5f4740d05d999348"/>
@@ -10052,6 +10088,7 @@ license:CC0
 		<info name="release" value="20010701"/>
 		<info name="alt_title" value="こぐるぐるぐる〜ぐるぐるとなかよし〜"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="koguru guruguru - guruguru to nakayoshi (japan) (np).bin" size="1048576" crc="d6050f64" sha1="6bf1d7517c762a8b692e149529d826504b8f483e"/>
@@ -10383,6 +10420,7 @@ license:CC0
 		<publisher>Victor Interactive Software</publisher>
 		<info name="serial" value="DMG-ARKP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="legend of the river king gb (europe).bin" size="1048576" crc="87ef9530" sha1="31a5a32625532ded19d6eccfc283c4f049ae31b5"/>
@@ -10398,6 +10436,7 @@ license:CC0
 		<publisher>Victor Interactive Software</publisher>
 		<info name="serial" value="??"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="legend of the river king gb (germany).bin" size="1048576" crc="1241f3f5" sha1="e0e0522ba283df632adbf2fe6f9aba85e1a7efec"/>
@@ -10413,6 +10452,7 @@ license:CC0
 		<publisher>Natsume</publisher>
 		<info name="serial" value="DMG-ARKE-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="legend of the river king gb (usa).bin" size="1048576" crc="7e821f47" sha1="1773c4719c3134845a91fef3a897034d5a70825e"/>
@@ -10428,6 +10468,7 @@ license:CC0
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AZLE-USA, DMG-AZLP-(EUR/AUS)"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="legend of zelda, the - link's awakening dx (usa, europe) (rev 2).bin" size="1048576" crc="06887a34" sha1="1c091225688d966928cc74336dbef2e07d12a47c"/>
@@ -10443,6 +10484,7 @@ license:CC0
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AZLE-USA, DMG-AZLP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="legend of zelda, the - link's awakening dx (usa, europe) (rev 1).bin" size="1048576" crc="b38eb9de" sha1="363d184d9b1e9faa5a2facd80897b7e118446164"/>
@@ -10480,6 +10522,7 @@ license:CC0
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AZLF-FRA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-A02-01" />
 			<feature name="u1" value="U1 2M/4M/8M MROM" />
 			<feature name="u2" value="U2 MBC-5" />
@@ -10522,6 +10565,7 @@ license:CC0
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AZLD-NOE"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-A02-01" />
 			<feature name="u1" value="U1 2M/4M/8M MROM" />
 			<feature name="u2" value="U2 MBC-5" />
@@ -10542,6 +10586,7 @@ license:CC0
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AZLD-NOE"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="legend of zelda, the - link's awakening dx (germany).bin" size="1048576" crc="fed5959b" sha1="8cd9d786547bfb3ddbe16ad2a84a36cf895ac16e"/>
@@ -10795,6 +10840,7 @@ license:CC0
 		<publisher>Agetec</publisher>
 		<info name="serial" value="DMG-AJYE-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="lil' monster (usa).bin" size="1048576" crc="c6859b34" sha1="cb812599f23f8812ff756e269a621de39b1b1def"/>
@@ -11648,6 +11694,7 @@ license:CC0
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-AEME-USA, DMG-AEMP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-A07-01" />
 			<feature name="u1" value="U1 2M/4M/8M MROM" />
 			<feature name="u2" value="U2 MBC5" />
@@ -12637,6 +12684,7 @@ license:CC0
 		<publisher>Crave Entertainment</publisher>
 		<info name="serial" value="DMG-AMNE-USA, DMG-AMNP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-A07-01" />
 			<feature name="u1" value="U1 2M/4M/8M MROM" />
 			<feature name="u2" value="U2 MBC5" />
@@ -13264,6 +13312,7 @@ license:CC0
 		<info name="serial" value="DMG-BSPP-EUR"/>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
 				<rom name="monkey puncher (europe).bin" size="2097152" crc="bc1809ce" sha1="87f08f8adc8db96ce396bd21f33a804f63826bf3"/>
@@ -13596,6 +13645,7 @@ license:CC0
 		<publisher>Midway</publisher>
 		<info name="serial" value="DMG-A4KE-USA, DMG-A4KP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mortal kombat 4 (usa, europe).bin" size="1048576" crc="4eb71448" sha1="ea54fb35cd8c4d4cea234423a81f8f953b1d33e4"/>
@@ -13609,6 +13659,7 @@ license:CC0
 		<publisher>Midway</publisher>
 		<info name="serial" value="DMG-A4KD-NOE"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-A07-01" />
 			<feature name="u1" value="U1 2M/4M/8M MROM" />
 			<feature name="u2" value="U2 MBC5" />
@@ -14261,6 +14312,7 @@ license:CC0
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ACVE-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="nba 3 on 3 featuring kobe bryant (usa).bin" size="1048576" crc="001f4754" sha1="8f8d1a33a71b22c9359ddc1aae0bd9cad4cc7456"/>
@@ -14290,6 +14342,7 @@ license:CC0
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-ANZE-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="nba in the zone (usa) (rev 1).bin" size="1048576" crc="be949f74" sha1="f4ba926ad640d7b3e9d175fb58c90347dafcbef4"/>
@@ -14386,6 +14439,7 @@ license:CC0
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-ANZP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="nba pro '99 (europe).bin" size="1048576" crc="748564ae" sha1="6eb56b61b8a77ce1060343f2c99f18c3271fa5f5"/>
@@ -14602,6 +14656,7 @@ license:CC0
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-ANRE-USA, DMG-ANRP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="nhl 2000 (usa).bin" size="1048576" crc="bb625129" sha1="8f7cb463a1438c70310f319e602df4b13530d96f"/>
@@ -14713,6 +14768,7 @@ license:CC0
 		<info name="release" value="19990409"/>
 		<info name="alt_title" value="信長の野望 ゲームボーイ版2"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="nobunaga no yabou - game boy ban 2 (japan).bin" size="1048576" crc="233862d0" sha1="a61e35306405e41c03b98b162ee14442e77c0da1"/>
@@ -15319,6 +15375,7 @@ license:CC0
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AKQE-USA, DMG-AKQP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-A07-01" />
 			<feature name="u1" value="U1 2M/4M/8M MROM" />
 			<feature name="u2" value="U2 MBC5" />
@@ -16277,6 +16334,7 @@ license:CC0
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-VPHP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-Z04-01" />
 			<feature name="u1" value="U1 16M/32M/64M MROM [MX23C1603-12A]" />
 			<feature name="u2" value="U2 MBC5 [MBC5]" />
@@ -16320,6 +16378,7 @@ license:CC0
 		<info name="serial" value="DMG-VPHE-USA, DMG-VPHU-AUS"/>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<feature name="rumble" value="yes" />
 			<dataarea name="rom" size="1048576">
@@ -16671,6 +16730,7 @@ license:CC0
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="DMG-APQP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="power quest (europe) (en,fr,de,es,it).bin" size="1048576" crc="30e1e567" sha1="b9b41a90baba13888ac8f3788b96935f4d394c2c"/>
@@ -16684,6 +16744,7 @@ license:CC0
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="DMG-APQE-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-A07-01" />
 			<feature name="u1" value="U1 2M/4M/8M MROM" />
 			<feature name="u2" value="U2 MBC5" />
@@ -17303,6 +17364,7 @@ license:CC0
 		<publisher>Event Horizon Software</publisher>
 		<info name="serial" value="DMG-AIQP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="puchi carat (europe).bin" size="1048576" crc="a9a89dda" sha1="f703796e5551e12924c070cd8a0e77c6d82073af"/>
@@ -17538,6 +17600,7 @@ license:CC0
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="DMG-AQTE-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="quest - fantasy challenge (usa).bin" size="1048576" crc="98285775" sha1="86812b2cd4304dc7ee2dd3faf16737b0414aaffb"/>
@@ -17551,6 +17614,7 @@ license:CC0
 		<publisher>Titus</publisher>
 		<info name="serial" value="DMG-ACNP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="quest for camelot (europe) (en,fr,de,es,it,nl).bin" size="1048576" crc="ce55a4de" sha1="27b1839deb7fbf384539b3686ba029ca54637196"/>
@@ -17566,6 +17630,7 @@ license:CC0
 		<publisher>Titus</publisher>
 		<info name="serial" value="DMG-ACNE-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="quest for camelot (usa) (en,fr,es).bin" size="1048576" crc="d903db7d" sha1="aac9d4d1869fd1374ec7b7a9de47575f7e5f54b6"/>
@@ -18109,6 +18174,7 @@ license:CC0
 		<publisher>Atlus</publisher>
 		<info name="serial" value="DMG-ALBE-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="revelations - the demon slayer (usa).bin" size="1048576" crc="d1a65d74" sha1="bd684074944ccc02b5f997e7ab95d0b03327773d"/>
@@ -18184,6 +18250,7 @@ license:CC0
 		<year>1998</year>
 		<publisher>Titus</publisher>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="roadsters '98 (usa) (proto).bin" size="131072" crc="fe2995a1" sha1="30a28cd5e020e98b0e7016b5ccda5bc0972a0ac9"/>
@@ -18254,6 +18321,7 @@ license:CC0
 		<publisher>Atlus</publisher>
 		<info name="serial" value="DMG-HREE-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-UFDT-20" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 HuC3 [HuC-3]" />
@@ -18283,6 +18351,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
 			<!-- PCB documentation incomplete, based on bad pics or written docs -->
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-UFDT-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 HuC3 [HuC-3]" />
@@ -18743,6 +18812,7 @@ license:CC0
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-ARZP-(NOE/UKV)"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-A07-01" />
 			<feature name="u1" value="U1 2M/4M/8M MROM" />
 			<feature name="u2" value="U2 MBC5" />
@@ -18759,6 +18829,7 @@ license:CC0
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-ARQE-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="the rugrats movie (usa).bin" size="1048576" crc="febe2606" sha1="c64ddf11c12d34f13d86e4a468b1eedacb698081"/>
@@ -19340,6 +19411,7 @@ license:CC0
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="DMG-AHPP-(EUR/EUU)?"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="shanghai pocket (europe) (rev 1).bin" size="1048576" crc="d8fac36c" sha1="adbf1a18dea69e46c3dbccec03e09668912f12a7"/>
@@ -19353,6 +19425,7 @@ license:CC0
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="DMG-AHPP-(EUR/EUU)?"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="shanghai pocket (europe).bin" size="1048576" crc="9401ba47" sha1="6436b152924a8612d7cd28fef09f10a81ec91ad7"/>
@@ -20197,6 +20270,7 @@ license:CC0
 		<info name="release" value="20010628"/>
 		<info name="alt_title" value="スターオーシャン ブルースフィア"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
 				<rom name="star ocean - blue sphere (japan).bin" size="4194304" crc="8c7ddbda" sha1="3d07ae53ba21eda4923bf4da6c938e2a407c990c"/>
@@ -20264,6 +20338,7 @@ license:CC0
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-AVKP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="stranded kids (europe) (en,fr,de).bin" size="1048576" crc="816a4d94" sha1="5c1d738f23a68cce8d2561f91f06c9998e0fe5a9"/>
@@ -20715,6 +20790,7 @@ license:CC0
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-AVKE-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="survival kids (usa).bin" size="1048576" crc="c46aba56" sha1="0e3d3821710b07f68628edda071b928df0c6a2f2"/>
@@ -21519,6 +21595,7 @@ license:CC0
 		<publisher>ASC Games</publisher>
 		<info name="serial" value="DMG-AFCE-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="tnn outdoors fishing champ (usa).bin" size="1048576" crc="00a14d18" sha1="acfe7c9edd20f7d6b155deebc9428703edf28978"/>
@@ -22225,6 +22302,7 @@ license:CC0
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-AOQE-USA, DMG-AOQP-(FRA/UKV)"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-A07-01" />
 			<feature name="u1" value="U1 2M/4M/8M MROM" />
 			<feature name="u2" value="U2 MBC5" />
@@ -23101,6 +23179,7 @@ license:CC0
 		<info name="serial" value="DMG-AWLE-USA, DMG-AWLP-EUR"/>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-A03-01" />
 			<feature name="u1" value="U1 16M/32M/64M MROM" />
 			<feature name="u2" value="U2 MBC-5" />

@@ -12,7 +12,7 @@
 #include "vp550.h"
 #include "speaker.h"
 
-#define VERBOSE	(0)
+#define VERBOSE (0)
 #include "logmacro.h"
 
 
