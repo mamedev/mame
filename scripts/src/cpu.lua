@@ -553,6 +553,7 @@ end
 --------------------------------------------------
 -- DEC PDP-8
 --@src/devices/cpu/pdp8/pdp8.h,CPUS["PDP8"] = true
+--@src/devices/cpu/pdp8/hd6120.h,CPUS["PDP8"] = true
 --------------------------------------------------
 
 if CPUS["PDP8"] then

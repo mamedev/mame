@@ -930,16 +930,12 @@ SCRIPTS = scripts/genie.lua \
 	$(wildcard src/osd/$(OSD)/$(OSD).mak) \
 	$(wildcard src/$(TARGET)/$(SUBTARGET_FULL).mak)
 
-ifeq ($(SUBTARGET_FULL),mame)
-SCRIPTS += scripts/target/$(TARGET)/arcade.lua
-SCRIPTS += scripts/target/$(TARGET)/mess.lua
-endif
-
 ifndef SOURCES
 ifdef PROJECT
 SCRIPTS += projects/$(PROJECT)/scripts/target/$(TARGET)/$(SUBTARGET_FULL).lua
 else
-SCRIPTS += scripts/target/$(TARGET)/$(SUBTARGET_FULL).lua
+# A filter file can be used as an alternative
+#SCRIPTS += scripts/target/$(TARGET)/$(SUBTARGET_FULL).lua
 endif
 endif
 
