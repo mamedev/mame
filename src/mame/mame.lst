@@ -24501,8 +24501,6 @@ m4jungja                        //
 m4jungjb                        //
 m4jungjc                        //
 m4kqclub                        // Kings & Queens Club (Newby)
-m4lineup                        // Line Up (BWB - Barcrest)
-m4lineupa                       //
 m4luck7                         // Lucky 7 (Barcrest)
 m4luckdv                        // Lucky Devil (Barcrest) [Czech]
 m4luckdvd                       //
@@ -24513,7 +24511,6 @@ m4luckwbc                       //
 m4luckwbd                       //
 m4luckwbe                       //
 m4luckwbf                       //
-m4magdrg                        // Magic Dragon (Barcrest)
 m4maglin                        // Magic Liner (Barcrest)
 m4magrep                        // Magic Replay DeLuxe (Barcrest)
 m4matdr                         // Matador (unknown)
@@ -24543,7 +24540,6 @@ m4sbxe                          //
 m4sctagt                        // Secret Agent (Nova)
 m4showtm                        // Show Timer (Barcrest)
 m4snookr                        // Snooker (Eurocoin)
-m4specu                         // Speculator Club (BWB)
 m4spotln                        // Spotlight (Nova)
 m4stakex                        // Stake X (Leisurama)
 m4stakexa                       // Stake X (Leisurama)
@@ -26144,6 +26140,8 @@ m4joltavb                       //
 m4jpjmp                         // Jackpot Jump (Barcrest)
 m4jpjmpa                        //
 m4libty                         // Liberty (Barcrest)
+m4lineup                        // Line Up (BWB - Barcrest)
+m4lineupa                       //
 m4loadmn                        // Loads A Money (Barcrest)
 m4loadmna                       //
 m4loadmnb                       //
@@ -26218,6 +26216,7 @@ m4silshda                       //
 m4silshdb                       //
 m4solsil                        // Solid Silver Club (Barcrest)
 m4solsila                       //
+m4specu                         // Speculator Club (BWB)
 m4spnwin                        // Spin A Win (Cotswold Microsystems)
 m4spnwina                       //
 m4spton                         // Spot On (Pcp)
@@ -29684,6 +29683,7 @@ m4hypclb__a                     //
 m4hypclb__b                     //
 m4hypclb__c                     //
 m4joljokd                       //
+m4magdrg                        // Magic Dragon (Barcrest)
 m4monte                         // Monte Carlo (Barcrest)
 m4monte__a                      //
 m4monte__b                      //
