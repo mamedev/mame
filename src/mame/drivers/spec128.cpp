@@ -298,10 +298,11 @@ void spectrum_128_state::machine_start()
 	memory_region *rom = memregion("maincpu");
 	m_bank_rom[0]->configure_entries(0, 2, rom->base() + 0x10000, 0x4000);
 
+	auto ram_entries = m_ram->size() / 0x4000;
 	for (auto i = 1; i < 4; i++)
-		m_bank_ram[i]->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
+		m_bank_ram[i]->configure_entries(0, ram_entries, m_ram->pointer(), 0x4000);
 
-	m_bank_ram[1]->set_entry(5); /* Bank 5 is always in 0x4000 - 0x7fff */
+	m_bank_ram[1]->set_entry(ram_entries > 5 ? 5 : (ram_entries - 1)); /* Bank 5 is always in 0x4000 - 0x7fff */
 	m_bank_ram[2]->set_entry(2); /* Bank 2 is always in 0x8000 - 0xbfff */
 }
 
