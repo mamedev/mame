@@ -519,10 +519,13 @@ void mpu4_state::pia_ic3_porta_w(uint8_t data)
 			// As a consequence, the lamp column data can change before the input strobe without
 			// causing the relevant lamps to black out.
 
-			if (m_overcurrent_detect){
+			if (m_overcurrent_detect)
+			{
 				m_overcurrent = true;
-
-			if (m_undercurrent_detect) {
+			}
+			
+			if (m_undercurrent_detect) 
+			{
 				m_undercurrent = true;
 			}
 
@@ -544,10 +547,13 @@ void mpu4_state::pia_ic3_portb_w(uint8_t data)
 	{
 		if (m_lamp_strobe2 != m_input_strobe)
 		{
-			if (m_overcurrent_detect){
+			if (m_overcurrent_detect)
+			{
 				m_overcurrent = true;
-
-			if (m_undercurrent_detect) {
+			}
+			
+			if (m_undercurrent_detect) 
+			{
 				m_undercurrent = true;
 			}
 
