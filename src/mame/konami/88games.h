@@ -12,7 +12,7 @@
 
 #include "cpu/m6809/konami.h"
 #include "sound/upd7759.h"
-#include "k051316.h"
+#include "video/k051316.h"
 #include "k051960.h"
 #include "k052109.h"
 #include "konami_helper.h"

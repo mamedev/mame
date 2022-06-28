@@ -262,37 +262,36 @@ void mpu4_state::lamp_extend_small(int data)
 		}
 	}
 	m_lamp_strobe_ext_persistence ++;
-	if ((m_lamp_strobe_ext_persistence == 3)||(m_lamp_strobe_ext!=column))
+	if ((m_lamp_strobe_ext_persistence == 3)||(m_lamp_strobe_ext[0] != column))
 	{
 		m_lamp_strobe_ext_persistence = 0;
-		m_lamp_strobe_ext=column;
+		m_lamp_strobe_ext[0] = column;
 	}
 }
 
 void mpu4_state::lamp_extend_large(int data,int column,int active)
 {
-	int lampbase,i,bit7;
-
 	m_lamp_sense = 0;
-	bit7 = data & 0x80;
+	int bit7 = BIT(data, 7);
 	if ( bit7 != m_last_b7 )
 	{
 		m_card_live = 1;
 		//depending on bit 7, we can access one of two 'blocks' of 64 lamps
-		lampbase = bit7 ? 64 : 0;
+		int lampbase = bit7 ? 0 : 64;
 		if ( data & 0x3f )
 		{
 			m_lamp_sense = 1;
 		}
 		if ( active )
 		{
-			if (m_lamp_strobe_ext != column)
+			if (m_lamp_strobe_ext[bit7] != column)
 			{
-				for (i = 0; i < 8; i++)
-				{//CHECK, this includes bit 7, which seems wrong
+				for (int i = 0; i < 8; i++)
+				{
+					// this includes bit 7, so you don't get a true 128 extra lamps as the last row is always 0 or 1 depending on which set of 64 we're dealing with 
 					m_lamps[(8*column)+i+128+lampbase] = BIT(data, i);
 				}
-				m_lamp_strobe_ext = column;
+				m_lamp_strobe_ext[bit7] = column;
 			}
 		}
 		m_last_b7 = bit7;
@@ -842,9 +841,9 @@ void mpu4_state::pia_ic5_porta_w(uint8_t data)
 		{
 			for(i=0; i<8; i++)
 			{
-				m_mpu4leds[((m_last_b7 >> 7) << 6) | (m_input_strobe << 3) | i] = BIT(~data, i);
+				m_mpu4leds[(m_last_b7 << 6) | (m_input_strobe << 3) | i] = BIT(~data, i);
 			}
-			m_digits[((m_last_b7 >> 7) << 3) | m_input_strobe] = ~data;
+			m_digits[(m_last_b7 << 3) | m_input_strobe] = ~data;
 		}
 		break;
 
@@ -1548,7 +1547,7 @@ INPUT_PORTS_START( mpu4jackpot8tkn )
 	PORT_INCLUDE( mpu4 )
 
 	PORT_MODIFY("ORANGE2")
-	PORT_CONFNAME( 0x0F, 0x06, "Jackpot / Prize Key" )
+	PORT_CONFNAME( 0x0f, 0x06, "Jackpot / Prize Key" )
 	PORT_CONFSETTING(    0x00, "Not fitted"  )
 	PORT_CONFSETTING(    0x01, "3 GBP"  )
 	PORT_CONFSETTING(    0x02, "4 GBP"  )
@@ -1559,13 +1558,14 @@ INPUT_PORTS_START( mpu4jackpot8tkn )
 	PORT_CONFSETTING(    0x06, "8 GBP Token"  )
 	PORT_CONFSETTING(    0x07, "10 GBP"  )
 	PORT_CONFSETTING(    0x09, "15 GBP"  )
-	PORT_CONFSETTING(    0x0A, "25 GBP"  )
-	PORT_CONFSETTING(    0x0B, "25 GBP (Licensed Betting Office Profile)"  )
-	PORT_CONFSETTING(    0x0C, "35 GBP"  )
-	PORT_CONFSETTING(    0x0D, "70 GBP"  )
-	PORT_CONFSETTING(    0x0E, "Reserved"  )
-	PORT_CONFSETTING(    0x0F, "Reserved"  )
+	PORT_CONFSETTING(    0x0a, "25 GBP"  )
+	PORT_CONFSETTING(    0x0b, "25 GBP (Licensed Betting Office Profile)"  )
+	PORT_CONFSETTING(    0x0c, "35 GBP"  )
+	PORT_CONFSETTING(    0x0d, "70 GBP"  )
+	PORT_CONFSETTING(    0x0e, "Reserved"  )
+	PORT_CONFSETTING(    0x0f, "Reserved"  )
 INPUT_PORTS_END
+
 
 INPUT_PORTS_START( mpu4jackpot8tkn20p )
 	PORT_INCLUDE( mpu4jackpot8tkn )
@@ -1670,6 +1670,43 @@ INPUT_PORTS_START( mpu4_70pc )
 	PORT_CONFSETTING(    0xf0, "98" )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( mpu4jackpot10 )
+	PORT_INCLUDE( mpu4 )
+
+	PORT_MODIFY("ORANGE2")
+	PORT_CONFNAME( 0x0f, 0x07, "Jackpot / Prize Key" )
+	PORT_CONFSETTING(    0x00, "Not fitted"  )
+	PORT_CONFSETTING(    0x01, "3 GBP"  )
+	PORT_CONFSETTING(    0x02, "4 GBP"  )
+	PORT_CONFSETTING(    0x08, "5 GBP"  )
+	PORT_CONFSETTING(    0x03, "6 GBP"  )
+	PORT_CONFSETTING(    0x04, "6 GBP Token"  )
+	PORT_CONFSETTING(    0x05, "8 GBP"  )
+	PORT_CONFSETTING(    0x06, "8 GBP Token"  )
+	PORT_CONFSETTING(    0x07, "10 GBP"  )
+	PORT_CONFSETTING(    0x09, "15 GBP"  )
+	PORT_CONFSETTING(    0x0a, "25 GBP"  )
+	PORT_CONFSETTING(    0x0b, "25 GBP (Licensed Betting Office Profile)"  )
+	PORT_CONFSETTING(    0x0c, "35 GBP"  )
+	PORT_CONFSETTING(    0x0d, "70 GBP"  )
+	PORT_CONFSETTING(    0x0e, "Reserved"  )
+	PORT_CONFSETTING(    0x0f, "Reserved"  )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( mpu4jackpot10_20p )
+	PORT_INCLUDE( mpu4jackpot10 )
+
+	PORT_MODIFY("ORANGE1")
+	PORT_CONFNAME( 0xe0, 0x40, "Stake Key" )
+	PORT_CONFSETTING(    0x00, "Not fitted / 5p" )
+	PORT_CONFSETTING(    0x20, "10p" )
+	PORT_CONFSETTING(    0x40, "20p" )
+	PORT_CONFSETTING(    0x60, "25p" )
+	PORT_CONFSETTING(    0x80, "30p" )
+	PORT_CONFSETTING(    0xa0, "40p" )
+	PORT_CONFSETTING(    0xc0, "50p" )
+	PORT_CONFSETTING(    0xe0, "1 GBP" )
+INPUT_PORTS_END
 
 INPUT_PORTS_START( grtecp )
 	PORT_START("ORANGE1")
@@ -1911,7 +1948,7 @@ void mpu4_state::init_m4altreels_big()
 }
 
 
-void mpu4_state::init_m4_andycp10c()
+void mpu4_state::init_m4default_sextender()
 {
 	init_m4default();
 	use_m4_small_extender();
@@ -1929,10 +1966,22 @@ void mpu4_state::init_m4default_big_five_rev()
 	use_m4_five_reel_rev();
 }
 
+void mpu4_state::init_m4default_big_five_rev_lextender()
+{
+	init_m4default_big_five_rev();
+	use_m4_large_extender_b();
+}
+
 void mpu4_state::init_m4default_big_six()
 {
 	init_m4default_big();
 	use_m4_six_reel_std();
+}
+
+void mpu4_state::init_m4default_big_six_lextender()
+{
+	init_m4default_big_six();
+	use_m4_large_extender_b();
 }
 
 void mpu4_state::init_m4default_big_six_alt()
@@ -1948,10 +1997,28 @@ void mpu4_state::init_m4default_five_std()
 	use_m4_five_reel_std();
 }
 
+void mpu4_state::init_m4default_five_std_sextender()
+{
+	init_m4default_five_std();
+	use_m4_small_extender();
+}
+
 void mpu4_state::init_m4default_five_rev()
 {
 	init_m4default();
 	use_m4_five_reel_rev();
+}
+
+void mpu4_state::init_m4default_five_rev_lextender()
+{
+	init_m4default_five_rev();
+	use_m4_large_extender_b();
+}
+
+void mpu4_state::init_m4default_five_rev_sextender()
+{
+	init_m4default_five_rev();
+	use_m4_small_extender();
 }
 
 void mpu4_state::init_m4default_five_alt()
@@ -1965,6 +2032,12 @@ void mpu4_state::init_m4default_six()
 {
 	init_m4default();
 	use_m4_six_reel_std();
+}
+
+void mpu4_state::init_m4default_six_sextender()
+{
+	init_m4default_six();
+	use_m4_small_extender();
 }
 
 void mpu4_state::init_m4default_six_alt()
@@ -2009,6 +2082,12 @@ void mpu4_state::init_m4default()
 	setup_rom_banks();
 }
 
+void mpu4_state::init_m4default_lextender()
+{
+	init_m4default();
+	use_m4_large_extender_b();
+}
+
 
 void mpu4_state::init_m4default_big()
 {
@@ -2036,7 +2115,12 @@ void mpu4_state::init_m4default_big()
 	// some Bwb games don't work anyway tho, they seem to dislike something else
 	// about the way the regular banking behaves, not related to the CB2 stuff
 	m_bank1->set_entry(m_numbanks);
+}
 
+void mpu4_state::init_m4default_big_lextender()
+{
+	init_m4default_big();
+	use_m4_large_extender_b();
 }
 
 
@@ -2491,6 +2575,17 @@ void mpu4_state::mod4yam_alt(machine_config &config)
 	m_ym2413->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
 
+void mpu4_state::mod4yam_7reel(machine_config &config)
+{
+	mpu4base(config);
+	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4yam)
+
+	mpu4_reels<0, 7>(config);
+
+	YM2413(config, m_ym2413, MPU4_MASTER_CLOCK/4);
+	m_ym2413->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_ym2413->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
 /***********************************************************************************************
 
@@ -2650,6 +2745,6 @@ uint8_t mpu4_state::bootleg806_r(address_space &space, offs_t offset)
 
 void mpu4_state::init_m4default_806prot()
 {
-	init_m4default();
+	init_m4default_sextender();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0806, 0x0806, read8m_delegate(*this, FUNC(mpu4_state::bootleg806_r)));
 }

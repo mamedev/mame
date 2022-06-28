@@ -6,12 +6,12 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_MC8123
-#define MAME_MACHINE_MC8123
+#ifndef MAME_CPU_Z80_MC8123_H
+#define MAME_CPU_Z80_MC8123_H
 
 #pragma once
 
-#include "cpu/z80/z80.h"
+#include "z80.h"
 
 class mc8123_device : public z80_device
 {
@@ -40,4 +40,4 @@ private:
 
 DECLARE_DEVICE_TYPE(MC8123, mc8123_device)
 
-#endif // MAME_MACHINE_MC8123
+#endif // MAME_CPU_Z80_MC8123_H

@@ -5,11 +5,10 @@
 #include "mpu4_characteriser_pal.h"
 #include "mpu4_characteriser_pal_bwb.h"
 
-#include "bacta_datalogger.h"
-
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
+#include "machine/bacta_datalogger.h"
 #include "machine/mc68681.h"
 #include "machine/meters.h"
 #include "machine/nvram.h"
@@ -92,6 +91,7 @@ INPUT_PORTS_EXTERN( mpu420p );
 INPUT_PORTS_EXTERN( mpu4jackpot8per );
 INPUT_PORTS_EXTERN( mpu4jackpot8tkn );
 INPUT_PORTS_EXTERN( mpu4jackpot8tkn20p );
+INPUT_PORTS_EXTERN( mpu4jackpot10_20p );
 INPUT_PORTS_EXTERN( mpu4jackpot8tkn20p90pc );
 INPUT_PORTS_EXTERN( mpu4_70pc );
 
@@ -137,17 +137,27 @@ public:
 	 { }
 
 	void init_m4default_alt();
+
 	void init_m4default();
+	void init_m4default_lextender();
+	void init_m4default_sextender();
+
 	void init_m4default_big();
+	void init_m4default_big_lextender();
+
 	void init_m4default_big_low();
 	void init_m4default_big_aux2inv();
 	void init_m4default_806prot();
 	void init_m4tst2();
-	void init_m4_andycp10c();
+
 	void init_m4default_big_five_std();
+
 	void init_m4default_big_five_rev();
+	void init_m4default_big_five_rev_lextender();
 
 	void init_m4default_big_six();
+	void init_m4default_big_six_lextender();
+
 	void init_m4default_big_six_alt();
 
 	void init_m4tst();
@@ -155,9 +165,16 @@ public:
 	void init_m4altreels();
 	void init_m4altreels_big();
 	void init_m4default_five_std();
+	void init_m4default_five_std_sextender();
+
 	void init_m4default_five_rev();
+	void init_m4default_five_rev_lextender();
+	void init_m4default_five_rev_sextender();
+
 	void init_m4default_five_alt();
 	void init_m4default_six();
+	void init_m4default_six_sextender();
+
 	void init_m4default_six_alt();
 	void init_m4default_seven();
 
@@ -293,6 +310,19 @@ public:
 		m_characteriser->set_lamp_table(Table);
 	}
 
+	template<const uint8_t* Table> void mod4yam_7reel_cheatchr_pal(machine_config &config)
+	{
+		mod4yam_7reel(config);
+
+		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
+		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+		m_characteriser->set_cpu_tag("maincpu");
+		m_characteriser->set_allow_6809_cheat(true);
+		m_characteriser->set_lamp_table(Table);
+	}
+
+
 	template<const uint8_t* Table> void mod4oki_5r_cheatchr_pal(machine_config &config)
 	{
 		mod4oki_5r(config);
@@ -392,6 +422,7 @@ public:
 	void mod4oki_chr(machine_config &config);
 
 	void mod4yam(machine_config &config);
+	void mod4yam_7reel(machine_config &config);
 	void mod4yam_cheatchr(machine_config &config);
 	void mod4yam_cheatchr_table(machine_config& config, const uint8_t* table);
 	void mod4yam_chr(machine_config &config);
@@ -588,7 +619,7 @@ protected:
 	int m_input_strobe = 0;
 	uint8_t m_lamp_strobe = 0;
 	uint8_t m_lamp_strobe2 = 0;
-	uint8_t m_lamp_strobe_ext = 0;
+	uint8_t m_lamp_strobe_ext[2] = { 0, 0 };
 	uint8_t m_lamp_strobe_ext_persistence = 0;
 	uint8_t m_led_strobe = 0;
 	uint8_t m_ay_data = 0;

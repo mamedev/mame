@@ -10,9 +10,8 @@
 
 #pragma once
 
-#include "bacta_datalogger.h"
-
 #include "cpu/tms34010/tms34010.h"
+#include "machine/bacta_datalogger.h"
 #include "machine/i8255.h"
 #include "machine/mc68681.h"
 #include "machine/meters.h"
