@@ -842,9 +842,9 @@ void mpu4_state::pia_ic5_porta_w(uint8_t data)
 		{
 			for(i=0; i<8; i++)
 			{
-				m_mpu4leds[((m_last_b7 >> 7) << 6) | (m_input_strobe << 3) | i] = BIT(~data, i);
+				m_mpu4leds[((m_last_b7) << 6) | (m_input_strobe << 3) | i] = BIT(~data, i);
 			}
-			m_digits[((m_last_b7 >> 7) << 3) | m_input_strobe] = ~data;
+			m_digits[((m_last_b7) << 3) | m_input_strobe] = ~data;
 		}
 		break;
 
