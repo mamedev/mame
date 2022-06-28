@@ -11,7 +11,6 @@
 #include "machine/eepromser.h"
 #include "315-6154.h"
 #include "machine/idectrl.h"
-#include "bus/ata/gdrom.h"
 
 // For ide gdrom controller
 
