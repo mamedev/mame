@@ -354,6 +354,9 @@ private:
 	void execute_exception(uint32_t addr);
 	void execute_software();
 
+	template <reg_bank DST_GLOBAL> uint64_t get_double_word(uint8_t dst_code, uint8_t dstf_code) const;
+	template <reg_bank DST_GLOBAL> void set_double_word(uint8_t dst_code, uint8_t dstf_code, uint64_t val);
+
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_chk();
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_movd();
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL, sign_mode SIGNED> void hyperstone_divsu();

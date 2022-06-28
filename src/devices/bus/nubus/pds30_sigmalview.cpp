@@ -10,6 +10,9 @@
 #include "pds30_sigmalview.h"
 #include "screen.h"
 
+#include <algorithm>
+
+
 #define LVIEW_SCREEN_NAME "lview_screen"
 #define LVIEW_ROM_REGION  "lview_rom"
 
@@ -68,7 +71,7 @@ nubus_lview_device::nubus_lview_device(const machine_config &mconfig, device_typ
 	device_t(mconfig, type, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	device_nubus_card_interface(mconfig, *this),
-	m_vram32(nullptr), m_vbl_disable(0), m_toggle(0), m_timer(nullptr), m_protstate(0)
+	m_vbl_disable(0), m_toggle(0), m_timer(nullptr), m_protstate(0)
 {
 	set_screen(*this, LVIEW_SCREEN_NAME);
 }
@@ -81,14 +84,13 @@ void nubus_lview_device::device_start()
 {
 	uint32_t slotspace;
 
-	install_declaration_rom(this, LVIEW_ROM_REGION);
+	install_declaration_rom(LVIEW_ROM_REGION);
 
 	slotspace = get_slotspace();
 
 //  printf("[lview %p] slotspace = %x\n", this, slotspace);
 
-	m_vram.resize(VRAM_SIZE);
-	m_vram32 = (uint32_t *)&m_vram[0];
+	m_vram.resize(VRAM_SIZE / sizeof(uint32_t));
 
 	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32s_delegate(*this, FUNC(nubus_lview_device::vram_r)), write32s_delegate(*this, FUNC(nubus_lview_device::vram_w)));
 	nubus().install_device(slotspace+0x900000, slotspace+VRAM_SIZE-1+0x900000, read32s_delegate(*this, FUNC(nubus_lview_device::vram_r)), write32s_delegate(*this, FUNC(nubus_lview_device::vram_w)));
@@ -106,7 +108,7 @@ void nubus_lview_device::device_reset()
 {
 	m_vbl_disable = 1;
 	m_protstate = 0;
-	memset(&m_vram[0], 0, VRAM_SIZE);
+	std::fill(m_vram.begin(), m_vram.end(), 0);
 	memset(m_palette, 0, sizeof(m_palette));
 
 	m_palette[0] = rgb_t(255, 255, 255);
@@ -132,14 +134,14 @@ TIMER_CALLBACK_MEMBER(nubus_lview_device::vbl_tick)
 
 uint32_t nubus_lview_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t const *const vram = &m_vram[0x20];
+	auto const vram8 = util::big_endian_cast<uint8_t const>(&m_vram[0]) + 0x20;
 
 	for (int y = 0; y < 600; y++)
 	{
 		uint32_t *scanline = &bitmap.pix(y);
 		for (int x = 0; x < 832/8; x++)
 		{
-			uint8_t const pixels = vram[(y * (832/8)) + (BYTE4_XOR_BE(x))];
+			uint8_t const pixels = vram8[(y * (832/8)) + x];
 
 			*scanline++ = m_palette[(pixels&0x80)];
 			*scanline++ = m_palette[((pixels<<1)&0x80)];
@@ -195,10 +197,10 @@ void nubus_lview_device::lview_w(offs_t offset, uint32_t data, uint32_t mem_mask
 
 void nubus_lview_device::vram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	COMBINE_DATA(&m_vram32[offset]);
+	COMBINE_DATA(&m_vram[offset]);
 }
 
 uint32_t nubus_lview_device::vram_r(offs_t offset, uint32_t mem_mask)
 {
-	return m_vram32[offset];
+	return m_vram[offset];
 }

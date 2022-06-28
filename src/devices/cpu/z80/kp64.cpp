@@ -190,7 +190,13 @@ void kp64_device::reload_count()
 {
 	m_count = BIT(m_status, 5) ? 0xffff : m_cr;
 	if (BIT(m_status, 0))
-		m_count_timer->adjust(clocks_to_attotime(u32(m_count) + 1));
+	{
+		// hng64 network MCU configures this supposedly invalid value and thrashes the scheduler if the timer is enabled
+		if (m_count == 0)
+			logerror("%s: Zero reload value specified for timer\n", machine().describe_context());
+		else
+			m_count_timer->adjust(clocks_to_attotime(u32(m_count) + 1));
+	}
 
 	// Count is now started whether or not it was before
 	m_reload = false;

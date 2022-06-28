@@ -89,10 +89,10 @@ namespace plib {
 		constexpr std::size_t capacity() const noexcept { return m_list.capacity() - 1; }
 		constexpr bool empty() const noexcept { return (m_end == &m_list[1]); }
 
-		template<bool KEEPSTAT, typename... Args>
+		template <bool KEEPSTAT, typename... Args>
 		constexpr void emplace (Args&&... args) noexcept;
 
-		template<bool KEEPSTAT>
+		template <bool KEEPSTAT>
 		constexpr void push(T && e) noexcept;
 
 		constexpr void pop() noexcept       { --m_end; }
@@ -138,7 +138,7 @@ namespace plib {
 	};
 
 	template <class A, class T>
-	template<bool KEEPSTAT, typename... Args>
+	template <bool KEEPSTAT, typename... Args>
 	inline constexpr void timed_queue_linear<A, T>::emplace (Args&&... args) noexcept
 	{
 		T * i(m_end);
@@ -165,7 +165,7 @@ namespace plib {
 	}
 
 	template <class A, class T>
-	template<bool KEEPSTAT>
+	template <bool KEEPSTAT>
 	inline constexpr void timed_queue_linear<A, T>::push(T && e) noexcept
 	{
 #if 0
@@ -270,7 +270,7 @@ namespace plib {
 		std::size_t capacity() const noexcept { return m_list.capacity(); }
 		bool empty() const noexcept { return &m_list[0] == m_end; }
 
-		template<bool KEEPSTAT, typename... Args>
+		template <bool KEEPSTAT, typename... Args>
 		void emplace(Args&&... args) noexcept
 		{
 			*m_end++ = T(std::forward<Args>(args)...);

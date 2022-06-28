@@ -71,14 +71,10 @@ using s64 = std::int64_t;
 
 } // namespace OSD
 
+
 /***************************************************************************
     FUNDAMENTAL MACROS
 ***************************************************************************/
-
-// Concatenate/extract 32-bit halves of 64-bit values
-constexpr uint64_t concat_64(uint32_t hi, uint32_t lo) { return (uint64_t(hi) << 32) | uint32_t(lo); }
-constexpr uint32_t extract_64hi(uint64_t val) { return uint32_t(val >> 32); }
-constexpr uint32_t extract_64lo(uint64_t val) { return uint32_t(val); }
 
 // Macros for normalizing data into big or little endian formats
 constexpr uint16_t swapendian_int16(uint16_t val) { return (val << 8) | (val >> 8); }
@@ -115,5 +111,26 @@ using ssize_t = std::make_signed_t<size_t>;
 #define alloca(size)  __builtin_alloca(size)
 #endif
 #endif
+
+
+// macro for defining a copy constructor and assignment operator to prevent copying
+#define DISABLE_COPYING(TYPE) \
+	TYPE(const TYPE &) = delete; \
+	TYPE &operator=(const TYPE &) = delete
+
+// macro for declaring enumeration operators that increment/decrement like plain old C
+#define DECLARE_ENUM_INCDEC_OPERATORS(TYPE) \
+inline TYPE &operator++(TYPE &value) { return value = TYPE(std::underlying_type_t<TYPE>(value) + 1); } \
+inline TYPE &operator--(TYPE &value) { return value = TYPE(std::underlying_type_t<TYPE>(value) - 1); } \
+inline TYPE operator++(TYPE &value, int) { TYPE const old(value); ++value; return old; } \
+inline TYPE operator--(TYPE &value, int) { TYPE const old(value); --value; return old; }
+
+// macro for declaring bitwise operators for an enumerated type
+#define DECLARE_ENUM_BITWISE_OPERATORS(TYPE) \
+constexpr TYPE operator~(TYPE value) { return TYPE(~std::underlying_type_t<TYPE>(value)); } \
+constexpr TYPE operator&(TYPE a, TYPE b) { return TYPE(std::underlying_type_t<TYPE>(a) & std::underlying_type_t<TYPE>(b)); } \
+constexpr TYPE operator|(TYPE a, TYPE b) { return TYPE(std::underlying_type_t<TYPE>(a) | std::underlying_type_t<TYPE>(b)); } \
+inline TYPE &operator&=(TYPE &a, TYPE b) { return a = a & b; } \
+inline TYPE &operator|=(TYPE &a, TYPE b) { return a = a | b; }
 
 #endif // MAME_OSD_OSDCOMM_H

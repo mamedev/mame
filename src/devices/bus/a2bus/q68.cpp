@@ -30,7 +30,7 @@
     68008 0x12000-0x1ffff -> Onboard RAM, ~1MB
 
     Todo:
-    Implement Watchdog timer. Only relevant to Q-68 and bus errors for non existant memory access
+    Implement Watchdog timer. Only relevant to Q-68 and bus errors for nonexistent memory access
     Speed of 6502 should be slower when 68008 is enabled and accessing AppleII memory space
     Speed of 68008 should be slower when access the Apple II memory space
 

@@ -103,7 +103,7 @@ void nubus_mac8390_device::device_start()
 	memcpy(m_prom, mac, 6);
 	m_dp83902->set_mac(mac);
 
-	install_declaration_rom(this, MAC8390_ROM_REGION, true);
+	install_declaration_rom(MAC8390_ROM_REGION, true);
 
 	slotspace = get_slotspace();
 

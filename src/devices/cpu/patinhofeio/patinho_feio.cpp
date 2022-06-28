@@ -7,7 +7,6 @@
 #include "emu.h"
 #include "patinhofeio_cpu.h"
 #include "patinho_feio_dasm.h"
-#include "includes/patinhofeio.h" // FIXME: this is a dependency from devices on MAME
 
 #define PC       m_pc //The program counter is called "contador de instrucoes" (IC) in portuguese
 #define ACC      m_acc
@@ -60,6 +59,7 @@ void patinho_feio_cpu_device::prog_8bit(address_map &map)
 patinho_feio_cpu_device::patinho_feio_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, PATO_FEIO_CPU, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 12, 0, address_map_constructor(FUNC(patinho_feio_cpu_device::prog_8bit), this))
+	, m_update_panel_cb(*this)
 	, m_icount(0)
 	, m_rc_read_cb(*this)
 	, m_buttons_read_cb(*this)
@@ -94,6 +94,7 @@ void patinho_feio_cpu_device::transfer_byte_from_external_device(uint8_t channel
 void patinho_feio_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
+	m_update_panel_cb.resolve();
 
 //TODO: implement handling of these special purpose registers
 //      which are also mapped to the first few main memory positions:
@@ -158,7 +159,8 @@ void patinho_feio_cpu_device::device_reset()
 	m_addr = 0;
 	m_opcode = 0;
 	m_mode = ADDRESSING_MODE;
-	((patinho_feio_state*) owner())->update_panel(ACC, m_opcode, READ_BYTE_PATINHO(m_addr), m_addr, PC, FLAGS, RC, m_mode);
+	if (!m_update_panel_cb.isnull())
+		m_update_panel_cb(ACC, m_opcode, READ_BYTE_PATINHO(m_addr), m_addr, PC, FLAGS, RC, m_mode);
 }
 
 /* execute instructions on this CPU until icount expires */
@@ -167,7 +169,8 @@ void patinho_feio_cpu_device::execute_run() {
 		read_panel_keys_register();
 		m_ext = READ_ACC_EXTENSION_REG();
 		m_idx = READ_INDEX_REG();
-		((patinho_feio_state*) owner())->update_panel(ACC, READ_BYTE_PATINHO(PC), READ_BYTE_PATINHO(m_addr), m_addr, PC, FLAGS, RC, m_mode);
+		if (!m_update_panel_cb.isnull())
+			m_update_panel_cb(ACC, READ_BYTE_PATINHO(PC), READ_BYTE_PATINHO(m_addr), m_addr, PC, FLAGS, RC, m_mode);
 		debugger_instruction_hook(PC);
 
 		if (!m_run){

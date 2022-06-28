@@ -257,7 +257,7 @@ std::error_condition osd_file::open(std::string const &path, std::uint32_t openf
 	for (auto it = dst.begin(); it != dst.end(); ++it)
 		*it = (INVPATHSEPCH == *it) ? PATHSEPCH : *it;
 #endif
-	try { osd_subst_env(dst, dst); }
+	try { dst = osd_subst_env(dst); }
 	catch (...) { return std::errc::not_enough_memory; }
 
 	// attempt to open the file

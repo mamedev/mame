@@ -18,7 +18,7 @@
 #define LOG_DMA             (1U << 5)
 #define LOG_DMA_HIFREQ      (1U << 6)
 
-#define VERBOSE	(0)
+#define VERBOSE (0)
 #include "logmacro.h"
 
 /* external int priority masks */

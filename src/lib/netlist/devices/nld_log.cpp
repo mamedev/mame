@@ -117,6 +117,7 @@ namespace netlist::devices {
 		static constexpr std::size_t BUF_SIZE=16384;
 		static constexpr std::size_t BUFFERS=4;
 		analog_input_t m_I;
+	private:
 		plib::ofstream m_strm;
 		plib::putf8_writer m_writer;
 		bool m_reset;
@@ -129,14 +130,17 @@ namespace netlist::devices {
 		std::thread m_write_thread;
 	};
 
-	NETLIB_OBJECT_DERIVED(logD, log)
+	class NETLIB_NAME(logD) : public NETLIB_NAME(log)
 	{
-		NETLIB_CONSTRUCTOR(logD)
+	public:
+		NETLIB_NAME(logD)(constructor_param_t data)
+		: NETLIB_NAME(log)(data)
 		, m_I2(*this, "I2", nl_delegate(&NETLIB_NAME(logD)::input, this))
 		{
 			m_I.set_delegate(nl_delegate(&NETLIB_NAME(logD)::input, this));
 		}
 
+	private:
 		NETLIB_HANDLERI(input)
 		{
 			log_value(static_cast<nl_fptype>(m_I() - m_I2()));

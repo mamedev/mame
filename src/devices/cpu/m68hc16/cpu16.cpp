@@ -181,9 +181,6 @@ enum class cpu16_device::seq : u16
 ALLOW_SAVE_TYPE(cpu16_device::seq)
 
 
-// device type definition
-DEFINE_DEVICE_TYPE(MC68HC16Z1, mc68hc16z1_device, "mc68hc16z1", "Motorola MC68HC16Z1")
-
 cpu16_device::cpu16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 20, 0, map)
@@ -208,16 +205,6 @@ cpu16_device::cpu16_device(const machine_config &mconfig, device_type type, cons
 	, m_start(false)
 	, m_icount(0)
 {
-}
-
-mc68hc16z1_device::mc68hc16z1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: cpu16_device(mconfig, MC68HC16Z1, tag, owner, clock, address_map_constructor(FUNC(mc68hc16z1_device::internal_map), this))
-{
-}
-
-void mc68hc16z1_device::internal_map(address_map &map)
-{
-	map(0xfe000, 0xfe3ff).ram(); // FIXME: this is relocatable
 }
 
 std::unique_ptr<util::disasm_interface> cpu16_device::create_disassembler()

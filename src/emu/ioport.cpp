@@ -3468,8 +3468,8 @@ analog_field::analog_field(ioport_field &field)
 		m_accum(0),
 		m_previous(0),
 		m_previousanalog(0),
-		m_minimum(INPUT_ABSOLUTE_MIN),
-		m_maximum(INPUT_ABSOLUTE_MAX),
+		m_minimum(osd::INPUT_ABSOLUTE_MIN),
+		m_maximum(osd::INPUT_ABSOLUTE_MAX),
 		m_center(0),
 		m_reverse_val(0),
 		m_scalepos(0),
@@ -3512,7 +3512,7 @@ analog_field::analog_field(ioport_field &field)
 		case IPT_PEDAL:
 		case IPT_PEDAL2:
 		case IPT_PEDAL3:
-			m_center = INPUT_ABSOLUTE_MIN;
+			m_center = osd::INPUT_ABSOLUTE_MIN;
 			m_accum = apply_inverse_sensitivity(m_center);
 			m_absolute = true;
 			m_autocenter = true;
@@ -3531,7 +3531,7 @@ analog_field::analog_field(ioport_field &field)
 		// set each position to be 512 units
 		case IPT_POSITIONAL:
 		case IPT_POSITIONAL_V:
-			m_positionalscale = compute_scale(field.maxval(), INPUT_ABSOLUTE_MAX - INPUT_ABSOLUTE_MIN);
+			m_positionalscale = compute_scale(field.maxval(), osd::INPUT_ABSOLUTE_MAX - osd::INPUT_ABSOLUTE_MIN);
 			m_adjmin = 0;
 			m_adjmax = field.maxval() - 1;
 			m_wraps = field.analog_wraps();
@@ -3567,8 +3567,8 @@ analog_field::analog_field(ioport_field &field)
 		if (!m_single_scale)
 		{
 			// unsigned
-			m_scalepos = compute_scale(m_adjmax - m_adjdefvalue, INPUT_ABSOLUTE_MAX - 0);
-			m_scaleneg = compute_scale(m_adjdefvalue - m_adjmin, 0 - INPUT_ABSOLUTE_MIN);
+			m_scalepos = compute_scale(m_adjmax - m_adjdefvalue, osd::INPUT_ABSOLUTE_MAX - 0);
+			m_scaleneg = compute_scale(m_adjdefvalue - m_adjmin, 0 - osd::INPUT_ABSOLUTE_MIN);
 
 			if (m_adjmin > m_adjmax)
 				m_scaleneg = -m_scaleneg;
@@ -3579,7 +3579,7 @@ analog_field::analog_field(ioport_field &field)
 		else
 		{
 			// single axis that increases from default
-			m_scalepos = compute_scale(m_adjmax - m_adjmin, INPUT_ABSOLUTE_MAX - INPUT_ABSOLUTE_MIN);
+			m_scalepos = compute_scale(m_adjmax - m_adjmin, osd::INPUT_ABSOLUTE_MAX - osd::INPUT_ABSOLUTE_MIN);
 
 			// make the scaling the same for easier coding when we need to scale
 			m_scaleneg = m_scalepos;
@@ -3603,11 +3603,11 @@ analog_field::analog_field(ioport_field &field)
 		if (m_wraps)
 			m_adjmax++;
 
-		m_minimum = (m_adjmin - m_adjdefvalue) * INPUT_RELATIVE_PER_PIXEL;
-		m_maximum = (m_adjmax - m_adjdefvalue) * INPUT_RELATIVE_PER_PIXEL;
+		m_minimum = (m_adjmin - m_adjdefvalue) * osd::INPUT_RELATIVE_PER_PIXEL;
+		m_maximum = (m_adjmax - m_adjdefvalue) * osd::INPUT_RELATIVE_PER_PIXEL;
 
 		// make the scaling the same for easier coding when we need to scale
-		m_scaleneg = m_scalepos = compute_scale(1, INPUT_RELATIVE_PER_PIXEL);
+		m_scaleneg = m_scalepos = compute_scale(1, osd::INPUT_RELATIVE_PER_PIXEL);
 
 		if (m_field.analog_reset())
 			// delta values reverse from center
@@ -3620,11 +3620,11 @@ analog_field::analog_field(ioport_field &field)
 			// relative controls reverse from 1 past their max range
 			if (m_wraps)
 			{
-				// FIXME: positional needs -1, using INPUT_RELATIVE_PER_PIXEL skips a position (and reads outside the table array)
+				// FIXME: positional needs -1, using osd::INPUT_RELATIVE_PER_PIXEL skips a position (and reads outside the table array)
 				if(field.type() == IPT_POSITIONAL || field.type() == IPT_POSITIONAL_V)
 					m_reverse_val --;
 				else
-					m_reverse_val -= INPUT_RELATIVE_PER_PIXEL;
+					m_reverse_val -= osd::INPUT_RELATIVE_PER_PIXEL;
 			}
 		}
 	}
@@ -3697,7 +3697,7 @@ s32 analog_field::apply_settings(s32 value) const
 	else if (m_single_scale)
 		// it's a pedal or the default value is equal to min/max
 		// so we need to adjust the center to the minimum
-		value -= INPUT_ABSOLUTE_MIN;
+		value -= osd::INPUT_ABSOLUTE_MIN;
 
 	// map differently for positive and negative values
 	if (value >= 0)
@@ -3802,7 +3802,7 @@ void analog_field::frame_update(running_machine &machine)
 				// if port is positional, we will take the full analog control and divide it
 				// into positions, that way as the control is moved full scale,
 				// it moves through all the positions
-				rawvalue = apply_scale(rawvalue - INPUT_ABSOLUTE_MIN, m_positionalscale) * INPUT_RELATIVE_PER_PIXEL + m_minimum;
+				rawvalue = apply_scale(rawvalue - osd::INPUT_ABSOLUTE_MIN, m_positionalscale) * osd::INPUT_RELATIVE_PER_PIXEL + m_minimum;
 
 				// clamp the high value so it does not roll over
 				rawvalue = std::min(rawvalue, m_maximum);

@@ -165,10 +165,6 @@ from the :ref:`main menu <menus-main>`.  The items shown on this menu depend on
 available emulated inputs for the running system.  Available emulated inputs may
 depend on slot options, machine configuration settings and DIP switch settings.
 
-Input Assignments (general)
-    Lets you select assign user interface controls, or assign default controls
-    for all emulated systems.  See the section on :ref:`configuring inputs
-    <ui-inptcfg>` for more details.
 Input Assignments (this system)
     Lets you select assign controls to emulated inputs for the running system.
     See the section on :ref:`configuring inputs <ui-inptcfg>` for more details.
@@ -190,6 +186,10 @@ Toggle Inputs
     Shows the :ref:`Toggle Inputs menu <menus-inputtoggle>`, where you can view
     and adjust the state of multi-position or toggle inputs.  This item is not
     shown if the running system has no enabled toggle inputs.
+Input Assignments (general)
+    Lets you select assign user interface controls, or assign default controls
+    for all emulated systems.  See the section on :ref:`configuring inputs
+    <ui-inptcfg>` for more details.
 Input Devices
     Shows the :ref:`Input Devices menu <menus-inputdevices>`, which lists the
     input devices recognised by MAME.

@@ -30354,7 +30354,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Wipeout XL (USA) (Beta) (Track 11).bin" size="66091200" crc="104ad63a" sha1="9685cac56bb7cee6bfd6139cb9946c4e7a3ade56"/>
 		<rom name="Wipeout XL (USA) (Beta) (Track 12).bin" size="55885872" crc="280d423e" sha1="601507f68eeae7df49384b7d968c5651a0f984d8"/>
 		-->
-		<description>Wipeout XL (USA, Prototype)</description>
+		<description>Wipeout XL (USA, prototype)</description>
 		<year>1996</year>
 		<publisher>Psygnosis</publisher>
 		<info name="serial" value="SCUS-94351"/>
@@ -33046,7 +33046,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Thousand Arms (USA) (Demo).cue" size="92" crc="0143e7f9" sha1="988067267b460098323702d3b010e5189c534bc7"/>
 		<rom name="Thousand Arms (USA) (Demo).bin" size="235089456" crc="be868278" sha1="62b1f853a09578f1e9e33068f355b0b76d69908d"/>
 		-->
-		<description>Thousand Arms (USA, Demo)</description>
+		<description>Thousand Arms (USA, demo)</description>
 		<year>1999</year>
 		<publisher>Atlus U.S.A.</publisher>
 		<info name="serial" value="SLUS-90059"/>
@@ -33063,7 +33063,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Oddworld - Abe's Oddysee (USA) (Demo).cue" size="103" crc="a213da4b" sha1="b2c599d7f9341cffd9facc4ee567788875fbd264"/>
 		<rom name="Oddworld - Abe's Oddysee (USA) (Demo).bin" size="44401056" crc="15e38fa1" sha1="4c24bdc94d2771313b7e3db6036cb85f7eea315d"/>
 		-->
-		<description>Oddworld - Abe's Oddysee (USA, Demo)</description>
+		<description>Oddworld - Abe's Oddysee (USA, demo)</description>
 		<year>1997</year>
 		<publisher>GT Interactive Software</publisher>
 		<info name="serial" value="SLUS-90004"/>
@@ -33081,7 +33081,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Ape Escape (USA) (Demo) (Track 1).bin" size="125573280" crc="b77099da" sha1="07a1cf017e1546985c431a6e8c884faa40706281"/>
 		<rom name="Ape Escape (USA) (Demo) (Track 2).bin" size="1401792" crc="780b1fc7" sha1="d11089e8cd3f7d9fc4dfd1156e1a02f2f992897a"/>
 		-->
-		<description>Ape Escape (USA, Demo)</description>
+		<description>Ape Escape (USA, demo)</description>
 		<year>1999</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<info name="serial" value="SCUS-94489"/>
@@ -33098,7 +33098,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Bust A Groove (USA) (Demo).cue" size="92" crc="b2f7b662" sha1="e28952131f8a5d3c152c5884a647f2697dfe1730"/>
 		<rom name="Bust A Groove (USA) (Demo).bin" size="433798176" crc="d687a8b3" sha1="97dfea5b93d2d5d275b50efbad5d4ec8c8667563"/>
 		-->
-		<description>Bust A Groove (USA, Demo)</description>
+		<description>Bust A Groove (USA, demo)</description>
 		<year>1998</year>
 		<publisher>989 Studios</publisher>
 		<info name="serial" value="SCUS-94376"/>
@@ -33146,7 +33146,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Burning Road (USA) (Demo) (Track 31).bin" size="27525456" crc="02c27366" sha1="656bb3fb8ecff4b045ee39be408bff5bf7884493"/>
 		<rom name="Burning Road (USA) (Demo) (Track 32).bin" size="27525456" crc="02c27366" sha1="656bb3fb8ecff4b045ee39be408bff5bf7884493"/>
 		-->
-		<description>Burning Road (USA, Demo)</description>
+		<description>Burning Road (USA, demo)</description>
 		<year>1996</year>
 		<publisher>Playmates Interactive Entertainment</publisher>
 		<info name="serial" value="SLUS-90002"/>
@@ -33164,7 +33164,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Crash Bash &amp; Spyro - Year of the Dragon (USA) (Demo) (Track 1).bin" size="149321424" crc="1e28b12f" sha1="131bdcd9520dda427e85701cc990c9d02c9affe7"/>
 		<rom name="Crash Bash &amp; Spyro - Year of the Dragon (USA) (Demo) (Track 2).bin" size="1401792" crc="780b1fc7" sha1="d11089e8cd3f7d9fc4dfd1156e1a02f2f992897a"/>
 		-->
-		<description>Crash Bash &amp; Spyro - Year of the Dragon (USA, Demo)</description>
+		<description>Crash Bash &amp; Spyro - Year of the Dragon (USA, demo)</description>
 		<year>2001</year>
 		<publisher>Universal Interactive</publisher>
 		<info name="serial" value="SCUS-94654"/>
@@ -33185,7 +33185,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Contender (USA) (Demo) (Track 4).bin" size="1667568" crc="9cd75aa3" sha1="aba2f37bbf17638c8df90a9e8a51282f1a846c22"/>
 		<rom name="Contender (USA) (Demo) (Track 5).bin" size="32354112" crc="e49b3127" sha1="01de730b1e7a8f18f9effe9341266681c2145db8"/>
 		-->
-		<description>Contender (USA, Demo)</description>
+		<description>Contender (USA, demo)</description>
 		<year>1999</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<info name="serial" value="SCUS-94380"/>
@@ -33202,7 +33202,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Cool Boarders 2001 (USA) (Demo).cue" size="97" crc="363d80c1" sha1="071db7da2f531614854fc342171b3eb1a3848e97"/>
 		<rom name="Cool Boarders 2001 (USA) (Demo).bin" size="99804768" crc="fdc70f6e" sha1="86ace60872cd133c37af1bcaf5dd8017863137d8"/>
 		-->
-		<description>Cool Boarders 2001 (USA, Demo)</description>
+		<description>Cool Boarders 2001 (USA, demo)</description>
 		<year>2000</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<info name="serial" value="SCUS-94625"/>
@@ -33219,7 +33219,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Cool Boarders 4 (USA) (Demo).cue" size="94" crc="1c9a897b" sha1="aea14fd65155c0ee591c13b935bf9c6bcaef2241"/>
 		<rom name="Cool Boarders 4 (USA) (Demo).bin" size="233146704" crc="07ea6292" sha1="e3177665d71d9f9575f3c06df3cc4f4cf32a507d"/>
 		-->
-		<description>Cool Boarders 4 (USA, Demo)</description>
+		<description>Cool Boarders 4 (USA, demo)</description>
 		<year>1999</year>
 		<publisher>989 Studios</publisher>
 		<info name="serial" value="SCUS-94388"/>
@@ -33237,7 +33237,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Crime Killer (USA) (Demo) (Track 1).bin" size="17195472" crc="50c0772b" sha1="4650797d3b3aff2bdcd3761dbb76bf80bc8e75b8"/>
 		<rom name="Crime Killer (USA) (Demo) (Track 2).bin" size="42594720" crc="e8496b14" sha1="186deef4825d89419e56884aad5570a7e6ddba82"/>
 		-->
-		<description>Crime Killer (USA, Demo)</description>
+		<description>Crime Killer (USA, demo)</description>
 		<year>1998</year>
 		<publisher>Interplay Entertainment</publisher>
 		<info name="serial" value="SLUS-90020"/>
@@ -33254,7 +33254,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Croc 2 (USA) (Demo).cue" size="85" crc="8d64e758" sha1="125289124d85428150ac8f8dfd12da1abe255f86"/>
 		<rom name="Croc 2 (USA) (Demo).bin" size="70769328" crc="9a5f1c52" sha1="a03b375c9da59ea752f2a1e6900b25107fd60722"/>
 		-->
-		<description>Croc 2 (USA, Demo)</description>
+		<description>Croc 2 (USA, demo)</description>
 		<year>1999</year>
 		<publisher>Fox Interactive</publisher>
 		<info name="serial" value="SLUS-90056"/>
@@ -33275,7 +33275,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Colony Wars - Vengeance (USA) (Demo) (Track 4).bin" size="17896368" crc="b0b7fc09" sha1="e45f08e2b6a34157133af25def21efa3d9d078a9"/>
 		<rom name="Colony Wars - Vengeance (USA) (Demo) (Track 5).bin" size="17896368" crc="b0b7fc09" sha1="e45f08e2b6a34157133af25def21efa3d9d078a9"/>
 		-->
-		<description>Colony Wars - Vengeance (USA, Demo)</description>
+		<description>Colony Wars - Vengeance (USA, demo)</description>
 		<year>1998</year>
 		<publisher>Psygnosis</publisher>
 		<info name="serial" value="SLUS-90037A"/>
@@ -33292,7 +33292,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Dino Crisis (USA) (Demo).cue" size="90" crc="af5ede50" sha1="8cdfd5c04e7b71edf8383a10528e5c292442b34b"/>
 		<rom name="Dino Crisis (USA) (Demo).bin" size="27638352" crc="a247c98b" sha1="c426d1edd161b328bce63de77e2a5176b4023e10"/>
 		-->
-		<description>Dino Crisis (USA, Demo)</description>
+		<description>Dino Crisis (USA, demo)</description>
 		<year>1999</year>
 		<publisher>Capcom Entertainment</publisher>
 		<info name="serial" value="SLUS-90066"/>
@@ -33309,7 +33309,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Driver 2 (USA) (Demo).cue" size="87" crc="469e7dc3" sha1="3bae84f9cda154bfe5c0dccbe18cb6f890279796"/>
 		<rom name="Driver 2 (USA) (Demo).bin" size="83063232" crc="291ce1d7" sha1="17c63ce45ffb7a4f20fe163f3515f220a19e32fd"/>
 		-->
-		<description>Driver 2 (USA, Demo)</description>
+		<description>Driver 2 (USA, demo)</description>
 		<year>2000</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="SLUS 90094"/>
@@ -33326,7 +33326,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Driver - You Are the Wheelman (USA) (Demo).cue" size="108" crc="7323b33c" sha1="4be74dcdd19335fbbddb232cc6112c50ec0e3337"/>
 		<rom name="Driver - You Are the Wheelman (USA) (Demo).bin" size="47482176" crc="4250d693" sha1="faed020439def8287993c8d38ca0bbbd0060f980"/>
 		-->
-		<description>Driver - You Are the Wheelman (USA, Demo)</description>
+		<description>Driver - You Are the Wheelman (USA, demo)</description>
 		<year>1999</year>
 		<publisher>GT Interactive Software</publisher>
 		<info name="serial" value="SLUS-90053"/>
@@ -33343,7 +33343,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Duke Nukem - Time to Kill (USA) (Demo).cue" size="104" crc="aa45b70c" sha1="4a2d18dcd9e989e7aa993562eb25058e19fb5f5a"/>
 		<rom name="Duke Nukem - Time to Kill (USA) (Demo).bin" size="139252512" crc="be052dcf" sha1="7be0248928539529667b99691917b95ea918ef38"/>
 		-->
-		<description>Duke Nukem - Time to Kill (USA, Demo)</description>
+		<description>Duke Nukem - Time to Kill (USA, demo)</description>
 		<year>1998</year>
 		<publisher>GT Interactive Software</publisher>
 		<info name="serial" value="SLUS-90036"/>
@@ -33377,7 +33377,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Future Cop - L.A.P.D. (USA) (Demo).cue" size="100" crc="5d3e4714" sha1="cc99ec57fef57e90afbd9bf3ea915127f65baa32"/>
 		<rom name="Future Cop - L.A.P.D. (USA) (Demo).bin" size="85457568" crc="de0b5b5f" sha1="47dd7d16d4247cc5f34051fc50b04433a243c4e2"/>
 		-->
-		<description>Future Cop - L.A.P.D. (USA, Demo)</description>
+		<description>Future Cop - L.A.P.D. (USA, demo)</description>
 		<year>1998</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="SLUS-90034"/>
@@ -33394,7 +33394,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Grind Session (USA) (Demo).cue" size="92" crc="deba2585" sha1="c19adb9ce04d16c967e7773881e6e2e6147ff26d"/>
 		<rom name="Grind Session (USA) (Demo).bin" size="94764432" crc="581a4f4f" sha1="70ee799a91d94dc6078800375c6ec28e8fedfa1a"/>
 		-->
-		<description>Grind Session (USA, Demo)</description>
+		<description>Grind Session (USA, demo)</description>
 		<year>2000</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<info name="serial" value="SCUS-94598"/>
@@ -33411,7 +33411,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Gran Turismo (USA) (Demo).cue" size="91" crc="dbe9eb9c" sha1="b0e46e8c44bae1ba7baa4dc58b26eb22d72d22fc"/>
 		<rom name="Gran Turismo (USA) (Demo).bin" size="615365520" crc="9d5454d8" sha1="edb9076dadc372c150e17559a6b1b5ea58f9c1fa"/>
 		-->
-		<description>Gran Turismo (USA, Demo)</description>
+		<description>Gran Turismo (USA, demo)</description>
 		<year>1998</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<info name="serial" value="SCUS-94257"/>
@@ -33428,7 +33428,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Hot Shots Golf 2 (USA) (Demo).cue" size="95" crc="e781caf4" sha1="e98a6dc0e1ca77c6cdb031a4e697ec47ed21bb9a"/>
 		<rom name="Hot Shots Golf 2 (USA) (Demo).bin" size="70691712" crc="8e864d2e" sha1="3a90864d607aede257090ede2de2cd73019fb310"/>
 		-->
-		<description>Hot Shots Golf 2 (USA, Demo)</description>
+		<description>Hot Shots Golf 2 (USA, demo)</description>
 		<year>2000</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<info name="serial" value="SCUS-94495"/>
@@ -33445,7 +33445,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Advanced Dungeons &amp; Dragons - Iron &amp; Blood - Warriors of Ravenloft (USA) (Demo) (Track 1).bin" size="62683152" crc="28e0137e" sha1="4890dae42b32d2f6951e16e7c8bdd2591bfd04be"/>
 		<rom name="Advanced Dungeons &amp; Dragons - Iron &amp; Blood - Warriors of Ravenloft (USA) (Demo) (Track 2).bin" size="32163600" crc="9eb22530" sha1="bea344b803475b463195df6fd60834069afe246e"/>
 		-->
-		<description>Advanced Dungeons &amp; Dragons - Iron &amp; Blood - Warriors of Ravenloft (USA, Demo)</description>
+		<description>Advanced Dungeons &amp; Dragons - Iron &amp; Blood - Warriors of Ravenloft (USA, demo)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="SLUS-00212"/>
@@ -33462,7 +33462,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Jade Cocoon - Story of the Tamamayu (USA) (Demo).cue" size="114" crc="1e57cead" sha1="14162042a1881e5d2ab8632192417d08284c6648"/>
 		<rom name="Jade Cocoon - Story of the Tamamayu (USA) (Demo).bin" size="432690384" crc="06c3dae4" sha1="717ad6ab1e98601ee30540af5e9b57053f036f9a"/>
 		-->
-		<description>Jade Cocoon - Story of the Tamamayu (USA, Demo)</description>
+		<description>Jade Cocoon - Story of the Tamamayu (USA, demo)</description>
 		<year>1999</year>
 		<publisher>Crave Entertainment</publisher>
 		<info name="serial" value="SLUS-90054"/>
@@ -33479,7 +33479,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Um Jammer Lammy (USA) (Demo).cue" size="94" crc="dd04eacf" sha1="75ab9620667ace28aab920de971a549d2ea9f355"/>
 		<rom name="Um Jammer Lammy (USA) (Demo).bin" size="741122256" crc="8090ade2" sha1="119d543d206a5fe6667fda203b91443888d0fac8"/>
 		-->
-		<description>Um Jammer Lammy (USA, Demo)</description>
+		<description>Um Jammer Lammy (USA, demo)</description>
 		<year>1999</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<info name="serial" value="SCUS-94398"/>
@@ -33496,7 +33496,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Jet Moto 3 (USA) (Demo).cue" size="89" crc="e1b1767f" sha1="5042f1d7ea924d141aac86ed84b2e21b6493239c"/>
 		<rom name="Jet Moto 3 (USA) (Demo).bin" size="348517008" crc="a697e172" sha1="c6ba7ec4347d407ee4cf96f9cc7ea1e91db88ddd"/>
 		-->
-		<description>Jet Moto 3 (USA, Demo)</description>
+		<description>Jet Moto 3 (USA, demo)</description>
 		<year>1999</year>
 		<publisher>989 Studios</publisher>
 		<info name="serial" value="SCUS-94384"/>
@@ -33514,7 +33514,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Kagero - Deception II (USA) (Demo) (Track 1).bin" size="354319392" crc="bb8cef52" sha1="0388e208eba8a42a8c7ec75a6b16d002f9916d63"/>
 		<rom name="Kagero - Deception II (USA) (Demo) (Track 2).bin" size="34868400" crc="6ffc200e" sha1="48408f40661816d60d4d490ece0b449b3ee3b4a2"/>
 		-->
-		<description>Kagero - Deception II (USA, Demo)</description>
+		<description>Kagero - Deception II (USA, demo)</description>
 		<year>1998</year>
 		<publisher>Tecmo</publisher>
 		<info name="serial" value="SLUS-90041"/>
@@ -33531,7 +33531,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Legend of Legaia (USA) (Demo).cue" size="95" crc="d2f4eaf1" sha1="44b6a69589ecb43b5d63bf312e7d8212522ef1db"/>
 		<rom name="Legend of Legaia (USA) (Demo).bin" size="132281184" crc="27f39fef" sha1="1480376fbbdfaaec2d3e7bbd9ee2dc3de8f85b81"/>
 		-->
-		<description>Legend of Legaia (USA, Demo)</description>
+		<description>Legend of Legaia (USA, demo)</description>
 		<year>1999</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<info name="serial" value="SCUS-94366"/>
@@ -33548,7 +33548,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Lunar 2 - Eternal Blue Complete (USA) (Demo).cue" size="110" crc="4dd7f116" sha1="99ec8dc23eb2c6ef3282f3a157024762ea2db3d7"/>
 		<rom name="Lunar 2 - Eternal Blue Complete (USA) (Demo).bin" size="622654368" crc="f63c79e0" sha1="0426d5bb260d467625beb2b07db3c00d747df377"/>
 		-->
-		<description>Lunar 2 - Eternal Blue Complete (USA, Demo)</description>
+		<description>Lunar 2 - Eternal Blue Complete (USA, demo)</description>
 		<year>2000</year>
 		<publisher>Working Designs</publisher>
 		<info name="serial" value="SLUS-90083"/>
@@ -33567,7 +33567,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Lunar - Silver Star Story Complete (USA) (Demo) (Track 2).bin" size="26570544" crc="242e16cb" sha1="733c9ae32570590e2dff34e483792b7325f16dd7"/>
 		<rom name="Lunar - Silver Star Story Complete (USA) (Demo) (Track 3).bin" size="8041488" crc="c3d61aa5" sha1="4aa2fa14f8cee60cccb308f2380e35d83bc49c7b"/>
 		-->
-		<description>Lunar - Silver Star Story Complete (USA, Demo)</description>
+		<description>Lunar - Silver Star Story Complete (USA, demo)</description>
 		<year>1999</year>
 		<publisher>Working Designs</publisher>
 		<info name="serial" value="SLUS-90055"/>
@@ -33584,7 +33584,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="MediEvil (USA) (Demo).cue" size="87" crc="edcd03a7" sha1="cf73ef87b2070691722a01918183f8a3b7c4cd09"/>
 		<rom name="MediEvil (USA) (Demo).bin" size="98892192" crc="e3bac2ec" sha1="dcf663adc28c719b3d2b0136f8597f219e4a8141"/>
 		-->
-		<description>MediEvil (USA, Demo)</description>
+		<description>MediEvil (USA, demo)</description>
 		<year>1998</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<info name="serial" value="SCUS-94291"/>
@@ -33601,7 +33601,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="MLB 2001 (USA) (Demo).cue" size="87" crc="c676a9c7" sha1="4a1f5bf654ace29cd0927bb9fa82072c2c2fc9a7"/>
 		<rom name="MLB 2001 (USA) (Demo).bin" size="584526096" crc="43ff2b40" sha1="5e6e091058c070aa1432eaaf540e7a965ba5edb6"/>
 		-->
-		<description>MLB 2001 (USA, Demo)</description>
+		<description>MLB 2001 (USA, demo)</description>
 		<year>2000</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<info name="serial" value="SCUS-94479"/>
@@ -33618,7 +33618,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="MLB 2002 (USA) (Demo).cue" size="87" crc="34d78c6b" sha1="ca44c53ca5ec7770e63d3ec09a03af9d165a6162"/>
 		<rom name="MLB 2002 (USA) (Demo).bin" size="634501392" crc="1f815d7e" sha1="ce8697022c979e0ca393e13801048f860ada0e55"/>
 		-->
-		<description>MLB 2002 (USA, Demo)</description>
+		<description>MLB 2002 (USA, demo)</description>
 		<year>2001</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<info name="serial" value="SCUS-94648"/>
@@ -33636,7 +33636,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Mega Man Legends 2 (USA) (Demo) (Track 1).bin" size="97822032" crc="b6bed1bf" sha1="c5707558c13e2f27f892b28ebb5728a3a4095f51"/>
 		<rom name="Mega Man Legends 2 (USA) (Demo) (Track 2).bin" size="37396800" crc="7976083e" sha1="d9f92af296360772e62caa4cb276de3fa74f5538"/>
 		-->
-		<description>Mega Man Legends 2 (USA, Demo)</description>
+		<description>Mega Man Legends 2 (USA, demo)</description>
 		<year>2000</year>
 		<publisher>Capcom Entertainment</publisher>
 		<info name="serial" value="SLUS-90078"/>
@@ -33653,7 +33653,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Metal Gear Solid (USA) (Demo).cue" size="95" crc="2c5cd004" sha1="1561b0f1bc13e39a2bf99fa493d701d8b71c5ef8"/>
 		<rom name="Metal Gear Solid (USA) (Demo).bin" size="93101568" crc="d8b049de" sha1="6ecbc0109e44e23bf8214e5c3b2cd80067f8a16a"/>
 		-->
-		<description>Metal Gear Solid (USA, Demo)</description>
+		<description>Metal Gear Solid (USA, demo)</description>
 		<year>1998</year>
 		<publisher>Konami of America</publisher>
 		<info name="serial" value="SLUS-90035"/>
@@ -33670,7 +33670,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Metal Gear Solid - VR Missions (USA) (Demo).cue" size="109" crc="5d4f18d6" sha1="7df494e9e1576a312f3152710473b115d2a90cc7"/>
 		<rom name="Metal Gear Solid - VR Missions (USA) (Demo).bin" size="123924528" crc="74160611" sha1="fffe5ba2f6183f295822f18b578b5d68b5103bf7"/>
 		-->
-		<description>Metal Gear Solid - VR Missions (USA, Demo)</description>
+		<description>Metal Gear Solid - VR Missions (USA, demo)</description>
 		<year>1999</year>
 		<publisher>Konami of America</publisher>
 		<info name="serial" value="SLUS-90062"/>
@@ -33687,7 +33687,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Monster Rancher 2 (USA) (Demo).cue" size="96" crc="309666c0" sha1="ffdab990c595d662c914aa0efdd3b19c5d1fda80"/>
 		<rom name="Monster Rancher 2 (USA) (Demo).bin" size="451280592" crc="5224ffa3" sha1="94db63a03aed73b97241273a2d7fe531c45efb6c"/>
 		-->
-		<description>Monster Rancher 2 (USA, Demo)</description>
+		<description>Monster Rancher 2 (USA, demo)</description>
 		<year>1999</year>
 		<publisher>Tecmo</publisher>
 		<info name="serial" value="SLUS-90071"/>
@@ -33710,7 +33710,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Ms. Pac-Man Maze Madness (USA) (Demo) (Track 6).bin" size="21252672" crc="fc47ad70" sha1="2e96e52e70a4aa40b20d37a12e0936b5e4cfd101"/>
 		<rom name="Ms. Pac-Man Maze Madness (USA) (Demo) (Track 7).bin" size="28002912" crc="53138a3e" sha1="53bf773f2fd1e9ac3bf219555bf61a36c93a19a9"/>
 		-->
-		<description>Ms. Pac-Man Maze Madness (USA, Demo)</description>
+		<description>Ms. Pac-Man Maze Madness (USA, demo)</description>
 		<year>2000</year>
 		<publisher>Namco Hometek</publisher>
 		<info name="serial" value="SLUS-90080"/>
@@ -33728,7 +33728,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="NBA ShootOut 2001 (USA) (Demo) (Track 1).bin" size="294021168" crc="ee049800" sha1="23a3fa47325add5bc014e96524429dc8ea09c686"/>
 		<rom name="NBA ShootOut 2001 (USA) (Demo) (Track 2).bin" size="43678992" crc="8fb5bc0d" sha1="7fd700a8db314aaa74bd5f261f6fd9e6fa953d11"/>
 		-->
-		<description>NBA ShootOut 2001 (USA, Demo)</description>
+		<description>NBA ShootOut 2001 (USA, demo)</description>
 		<year>2000</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<info name="serial" value="SCUS-94582"/>
@@ -33746,7 +33746,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="NBA ShootOut 2002 (USA) (Demo) (Track 1).bin" size="261568272" crc="e0e6c0c5" sha1="fb099c8611b1618f03cee08ff043ab60a9eb825e"/>
 		<rom name="NBA ShootOut 2002 (USA) (Demo) (Track 2).bin" size="52106208" crc="09a8b170" sha1="1f762b7237ec674f5a5f8e6be77a51bc4624f000"/>
 		-->
-		<description>NBA ShootOut 2002 (USA, Demo)</description>
+		<description>NBA ShootOut 2002 (USA, demo)</description>
 		<year>2001</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<info name="serial" value="SCUS-94660"/>
@@ -33764,7 +33764,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="NCAA GameBreaker 2001 (USA) (Demo) (Track 1).bin" size="556946544" crc="2b263a75" sha1="b79a68a5dc35e066fc41ef87673ee13639040f06"/>
 		<rom name="NCAA GameBreaker 2001 (USA) (Demo) (Track 2).bin" size="13361712" crc="b0ef8b04" sha1="8ff5d315ca7b0b9ffd9865e9ca8720db35b2db16"/>
 		-->
-		<description>NCAA GameBreaker 2001 (USA, Demo)</description>
+		<description>NCAA GameBreaker 2001 (USA, demo)</description>
 		<year>2000</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<info name="serial" value="SCUS-94574"/>
@@ -33782,7 +33782,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="NFL GameDay 99 (USA) (Demo) (Track 1).bin" size="626422272" crc="d78bee54" sha1="cb48070a3017727474961e8ca585ea766572e5c2"/>
 		<rom name="NFL GameDay 99 (USA) (Demo) (Track 2).bin" size="13361712" crc="b0ef8b04" sha1="8ff5d315ca7b0b9ffd9865e9ca8720db35b2db16"/>
 		-->
-		<description>NFL GameDay 99 (USA, Demo)</description>
+		<description>NFL GameDay 99 (USA, demo)</description>
 		<year>1998</year>
 		<publisher>989 Sports</publisher>
 		<info name="serial" value="SCUS-94285"/>
@@ -33799,7 +33799,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="NFL Xtreme (USA) (Demo).cue" size="89" crc="53a73c54" sha1="dade8e46c723ccc597dd7365c46619bb201ed1d0"/>
 		<rom name="NFL Xtreme (USA) (Demo).bin" size="88063584" crc="e5898ed4" sha1="9c0d004125576f2c49880d76cd8bc431dde4f012"/>
 		-->
-		<description>NFL Xtreme (USA, Demo)</description>
+		<description>NFL Xtreme (USA, demo)</description>
 		<year>1998</year>
 		<publisher>989 Sports</publisher>
 		<info name="serial" value="SCUS-94271"/>
@@ -33816,7 +33816,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="NHL Faceoff 2001 (USA) (Demo).cue" size="95" crc="6e2cc0d6" sha1="cd97b9f9000dd1b18f1f06681fc4685f873bc326"/>
 		<rom name="NHL Faceoff 2001 (USA) (Demo).bin" size="465256176" crc="50417a67" sha1="fab02afa8313511deb991b63412598d63fad813b"/>
 		-->
-		<description>NHL FaceOff 2001 (USA, Demo)</description>
+		<description>NHL FaceOff 2001 (USA, demo)</description>
 		<year>2000</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<info name="serial" value="SCUS-94578"/>
@@ -33833,7 +33833,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="NHL FaceOff 99 (USA) (Demo).cue" size="93" crc="7f8813b8" sha1="e3af74efe23ee713e07229e22232905da054824c"/>
 		<rom name="NHL FaceOff 99 (USA) (Demo).bin" size="441404544" crc="c4adf9f2" sha1="c3ec8ccf76fc061bcdeac23f4a9493c97d8243c0"/>
 		-->
-		<description>NHL FaceOff 99 (USA, Demo)</description>
+		<description>NHL FaceOff 99 (USA, demo)</description>
 		<year>1998</year>
 		<publisher>989 Sports</publisher>
 		<info name="serial" value="SCUS-94372"/>
@@ -33850,7 +33850,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Nuclear Strike - The Lost Missions (USA) (Demo).cue" size="113" crc="280cee08" sha1="079b5f007e5dc06ece8d9f46b21c905f57603dfe"/>
 		<rom name="Nuclear Strike - The Lost Missions (USA) (Demo).bin" size="165449088" crc="2118b7e9" sha1="063e8ed5f8c65520057641e2438672c87fe34ad5"/>
 		-->
-		<description>Nuclear Strike - The Lost Missions (USA, Demo)</description>
+		<description>Nuclear Strike - The Lost Missions (USA, demo)</description>
 		<year>1997</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="SLUS 90006"/>
@@ -33867,7 +33867,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="O.D.T. (USA) (Demo).cue" size="85" crc="be61b0ca" sha1="5bfba467fb8d5944446f2aa190d4c7162a3b20ca"/>
 		<rom name="O.D.T. (USA) (Demo).bin" size="158755296" crc="c3fe7e0c" sha1="1d8267703f72b2979dcf09e780bb8bb9a8d49f50"/>
 		-->
-		<description>O.D.T. (USA, Demo)</description>
+		<description>O.D.T. (USA, demo)</description>
 		<year>1997</year>
 		<publisher>Psygnosis</publisher>
 		<info name="serial" value="SLUS-90043"/>
@@ -33895,7 +33895,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Pac-Man World (USA) (Demo) (v1.1) (Track 11).bin" size="8979936" crc="e3f637dc" sha1="62cba665e8e678c44d3b8285d07702a282fc6d24"/>
 		<rom name="Pac-Man World (USA) (Demo) (v1.1) (Track 12).bin" size="28002912" crc="53138a3e" sha1="53bf773f2fd1e9ac3bf219555bf61a36c93a19a9"/>
 		-->
-		<description>Pac-Man World (USA, Demo, v1.1)</description>
+		<description>Pac-Man World (USA, demo, v1.1)</description>
 		<year>1999</year>
 		<publisher>Namco Hometek</publisher>
 		<info name="serial" value="SLUS-90057"/>
@@ -33912,7 +33912,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="PaRappa the Rapper (USA) (Demo).cue" size="97" crc="83dad869" sha1="60eb46b05e8dfc32e864b9e38f6fc28c806c190f"/>
 		<rom name="PaRappa the Rapper (USA) (Demo).bin" size="59985408" crc="b358f4ea" sha1="7628db1f549cfd6c175b18edba7b919d4b0b80df"/>
 		-->
-		<description>PaRappa the Rapper (USA, Demo)</description>
+		<description>PaRappa the Rapper (USA, demo)</description>
 		<year>1997</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<info name="serial" value="SCUS 94195"/>
@@ -33931,7 +33931,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Pitfall 3D - Beyond the Jungle (USA) (Demo) (Track 2).bin" size="59268048" crc="4fbb5bc9" sha1="b543306a2d16fd3eec51249764607a3a2b220e96"/>
 		<rom name="Pitfall 3D - Beyond the Jungle (USA) (Demo) (Track 3).bin" size="20394192" crc="6cef6e00" sha1="3d05c413d13fb5d54c6aa455fe8c34de7c6b1ff1"/>
 		-->
-		<description>Pitfall 3D - Beyond the Jungle (USA, Demo)</description>
+		<description>Pitfall 3D - Beyond the Jungle (USA, demo)</description>
 		<year>1998</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="SLUS-90017"/>
@@ -33951,7 +33951,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Rascal (USA) (Demo) (Track 3).bin" size="2288496" crc="6b9cbab0" sha1="bf6e420f757814c722578def2130d3bed2a521cd"/>
 		<rom name="Rascal (USA) (Demo) (Track 4).bin" size="33908784" crc="857edda8" sha1="28a06c34d53442f736fed283c086340d7c56321e"/>
 		-->
-		<description>Rascal (USA, Demo)</description>
+		<description>Rascal (USA, demo)</description>
 		<year>1998</year>
 		<publisher>Psygnosis</publisher>
 		<info name="serial" value="SLUS-90015"/>
@@ -33989,7 +33989,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Rayman (USA) (Playable Game Preview) (Track 21).bin" size="7646352" crc="0697df82" sha1="d3e4cd67d199d817f5795978e68160177900cf3d"/>
 		<rom name="Rayman (USA) (Playable Game Preview) (Track 22).bin" size="6225744" crc="324846b9" sha1="5589a012c00cee6e49b9ce79563b050053ff71ce"/>
 		-->
-		<description>Rayman (USA, Playable Game Preview)</description>
+		<description>Rayman (USA, playable game preview)</description>
 		<year>1995</year>
 		<publisher>Ubi Soft Entertainment Software</publisher>
 		<info name="serial" value="SLUS-90001"/>
@@ -34006,7 +34006,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Resident Evil 2 (USA) (Demo).cue" size="94" crc="837c32a7" sha1="afbd447342cebe377b73592e4f3d46ee4174b118"/>
 		<rom name="Resident Evil 2 (USA) (Demo).bin" size="162836016" crc="b3b611d5" sha1="48ede47de5d1e10ed0ed09d385a09c914d663f1a"/>
 		-->
-		<description>Resident Evil 2 (USA, Demo)</description>
+		<description>Resident Evil 2 (USA, demo)</description>
 		<year>1997</year>
 		<publisher>Capcom Entertainment</publisher>
 		<info name="serial" value="SLUS-90009"/>
@@ -34023,7 +34023,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Resident Evil 3 - Nemesis (USA) (Demo).cue" size="104" crc="f1064a7b" sha1="db0e3408215579b81e96f85b302a5ef8383ccc39"/>
 		<rom name="Resident Evil 3 - Nemesis (USA) (Demo).bin" size="247446864" crc="7b70af82" sha1="709e347add5f311081a2f399bbe32d5234ad5d02"/>
 		-->
-		<description>Resident Evil 3 - Nemesis (USA, Demo)</description>
+		<description>Resident Evil 3 - Nemesis (USA, demo)</description>
 		<year>1999</year>
 		<publisher>Capcom Entertainment</publisher>
 		<info name="serial" value="SLUS-90064"/>
@@ -34041,7 +34041,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Rollcage (USA) (Demo) (Track 1).bin" size="3650304" crc="2d49ca5b" sha1="0e3587340d5a4ecdba8e44578c1a8cc1796d97e4"/>
 		<rom name="Rollcage (USA) (Demo) (Track 2).bin" size="36439536" crc="49d92b4b" sha1="daec33c31013f1dc4f3a1c1b7aad22291aa34bd4"/>
 		-->
-		<description>Rollcage (USA, Demo)</description>
+		<description>Rollcage (USA, demo)</description>
 		<year>1999</year>
 		<publisher>Psygnosis</publisher>
 		<info name="serial" value="SLUS-90052"/>
@@ -34098,7 +34098,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Running Wild (USA) (Demo) (Track 40).bin" size="973728" crc="62eae1f5" sha1="2f91b30e6a1ed6f8de3d561b4be67f79d80331d1"/>
 		<rom name="Running Wild (USA) (Demo) (Track 41).bin" size="983136" crc="c8e05f9a" sha1="47e4608314b746cffc2ca8b635baef0b5eccb5b5"/>
 		-->
-		<description>Running Wild (USA, Demo)</description>
+		<description>Running Wild (USA, demo)</description>
 		<year>1998</year>
 		<publisher>989 Studios</publisher>
 		<info name="serial" value="SCUS-94373"/>
@@ -34124,7 +34124,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="SuperCross Circuit (USA) (Demo) (Track 09).bin" size="27396096" crc="4b8488da" sha1="bb421a61504d69f7ed6df1915616357360f33244"/>
 		<rom name="SuperCross Circuit (USA) (Demo) (Track 10).bin" size="21539616" crc="cee2bbd1" sha1="367724c7f0241448856c16a816e18fdba87a575c"/>
 		-->
-		<description>SuperCross Circuit (USA, Demo)</description>
+		<description>SuperCross Circuit (USA, demo)</description>
 		<year>1999</year>
 		<publisher>989 Sports</publisher>
 		<info name="serial" value="SCUS-94396"/>
@@ -34143,7 +34143,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Shadow Madness (USA) (Demo) (Track 2).bin" size="8603616" crc="759c43f5" sha1="938f593b06411e6f5d68f8be77ffc28f0c2efbc0"/>
 		<rom name="Shadow Madness (USA) (Demo) (Track 3).bin" size="1401792" crc="780b1fc7" sha1="d11089e8cd3f7d9fc4dfd1156e1a02f2f992897a"/>
 		-->
-		<description>Shadow Madness (USA, Demo)</description>
+		<description>Shadow Madness (USA, demo)</description>
 		<year>1999</year>
 		<publisher>Crave Entertainment</publisher>
 		<info name="serial" value="SLUS-90031"/>
@@ -34160,7 +34160,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Shipwreckers! (USA) (Demo).cue" size="92" crc="37c95992" sha1="174e6e1e74f7c2af0464d3efc166c83af930a6cd"/>
 		<rom name="Shipwreckers! (USA) (Demo).bin" size="44937312" crc="6af9ce38" sha1="22bb814f2b7b118b7e471dce46078125ead480b9"/>
 		-->
-		<description>Shipwreckers! (USA, Demo)</description>
+		<description>Shipwreckers! (USA, demo)</description>
 		<year>1997</year>
 		<publisher>Psygnosis</publisher>
 		<info name="serial" value="SLUS-90013"/>
@@ -34177,7 +34177,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Speed Punks (USA) (Demo).cue" size="90" crc="01c912a5" sha1="f8aef610ce24cd417369d0917ea24914d5302cf3"/>
 		<rom name="Speed Punks (USA) (Demo).bin" size="119352240" crc="d9f60418" sha1="aa1288cf5c8c974caf823a37f242d8ad18c70c96"/>
 		-->
-		<description>Speed Punks (USA, Demo)</description>
+		<description>Speed Punks (USA, demo)</description>
 		<year>2000</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<info name="serial" value="SCUS-94572"/>
@@ -34195,7 +34195,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Spyro 2 - Ripto's Rage! (USA) (Demo) (Track 1).bin" size="110341728" crc="d4685fa2" sha1="4e8b7cd677c4e73ea87f0e439af15afed83a98ca"/>
 		<rom name="Spyro 2 - Ripto's Rage! (USA) (Demo) (Track 2).bin" size="1401792" crc="780b1fc7" sha1="d11089e8cd3f7d9fc4dfd1156e1a02f2f992897a"/>
 		-->
-		<description>Spyro 2 - Ripto's Rage! (USA, Demo)</description>
+		<description>Spyro 2 - Ripto's Rage! (USA, demo)</description>
 		<year>1999</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<info name="serial" value="SCUS-94460"/>
@@ -34212,7 +34212,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Spyro the Dragon (USA) (Demo 1).cue" size="97" crc="b7cbca0e" sha1="e2f505a39df3586e214c89ac6895dda3da96a916"/>
 		<rom name="Spyro the Dragon (USA) (Demo 1).bin" size="106286880" crc="ed3e533a" sha1="32e7a2efc0a946294466ef32ae7ec3d52895d624"/>
 		-->
-		<description>Spyro the Dragon (USA, Demo 1)</description>
+		<description>Spyro the Dragon (USA, demo 1)</description>
 		<year>1998</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<info name="serial" value="SCUS-94290"/>
@@ -34229,7 +34229,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Spyro the Dragon (USA) (Demo 2).cue" size="97" crc="b696ecdf" sha1="a2c5fc46f531441dc56b9cb577afd60c553b6b04"/>
 		<rom name="Spyro the Dragon (USA) (Demo 2).bin" size="132062448" crc="d4bba3d5" sha1="b3d03bcc3ad71145eafb5e473c4f93a62899950a"/>
 		-->
-		<description>Spyro the Dragon (USA, Demo 2)</description>
+		<description>Spyro the Dragon (USA, demo 2)</description>
 		<year>1999</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<info name="serial" value="SCUS-94439"/>
@@ -34267,7 +34267,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Tail Concerto (USA) (Demo) (Track 1).bin" size="548077152" crc="eec9708f" sha1="f882452b26f204fdc501f4aa172ca5f7f67911e1"/>
 		<rom name="Tail Concerto (USA) (Demo) (Track 2).bin" size="32104800" crc="9b94ea54" sha1="bd1fde88c2b79e3cf8821c969373460d51f3155a"/>
 		-->
-		<description>Tail Concerto (USA, Demo)</description>
+		<description>Tail Concerto (USA, demo)</description>
 		<year>1999</year>
 		<publisher>Atlus U.S.A.</publisher>
 		<info name="serial" value="SLUS-90060"/>
@@ -34284,7 +34284,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Thrasher - Skate and Destroy (USA) (Demo).cue" size="107" crc="1e477ff9" sha1="e643df934de5b34507156fe238e9a361a745ff0f"/>
 		<rom name="Thrasher - Skate and Destroy (USA) (Demo).bin" size="35254128" crc="032dc4c0" sha1="6181ca097180c0e8a135ffb8ac04a43a66541e69"/>
 		-->
-		<description>Thrasher - Skate and Destroy (USA, Demo)</description>
+		<description>Thrasher - Skate and Destroy (USA, demo)</description>
 		<year>1999</year>
 		<publisher>Rockstar Games</publisher>
 		<info name="serial" value="SLUS-90067"/>
@@ -34301,7 +34301,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Titan A.E. (USA) (Demo).cue" size="89" crc="8aebad86" sha1="b98ce70f9d49808d19ccf2c0d3cd736b1c5b53ab"/>
 		<rom name="Titan A.E. (USA) (Demo).bin" size="421835904" crc="c025c351" sha1="ae164c823569b34ebdd027dcae143622d5a78bca"/>
 		-->
-		<description>Titan A.E. (USA, Demo)</description>
+		<description>Titan A.E. (USA, demo)</description>
 		<year>2000</year>
 		<publisher>Fox Interactive</publisher>
 		<info name="serial" value="SLUS-90082"/>
@@ -34318,7 +34318,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Tomba! (USA) (Demo).cue" size="85" crc="f3408f1a" sha1="e666ca5778f7c5070b8f991001e6e2347a1e9e15"/>
 		<rom name="Tomba! (USA) (Demo).bin" size="116708592" crc="b9a33432" sha1="7f8cc551eece9cd6e0f5008549e477b4b3ba4f65"/>
 		-->
-		<description>Tomba! (USA, Demo)</description>
+		<description>Tomba! (USA, demo)</description>
 		<year>1998</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<info name="serial" value="SCUS-94255"/>
@@ -34336,7 +34336,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Tomba! 2 - The Evil Swine Return (USA) (Demo) (Track 1).bin" size="65486736" crc="a52a0566" sha1="79e583d00eba4d280c2cf89384e1cba5023b6fc2"/>
 		<rom name="Tomba! 2 - The Evil Swine Return (USA) (Demo) (Track 2).bin" size="1401792" crc="780b1fc7" sha1="d11089e8cd3f7d9fc4dfd1156e1a02f2f992897a"/>
 		-->
-		<description>Tomba! 2 - The Evil Swine Return (USA, Demo)</description>
+		<description>Tomba! 2 - The Evil Swine Return (USA, demo)</description>
 		<year>1999</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<info name="serial" value="SCUS-94464"/>
@@ -34353,7 +34353,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Tyco R-C - Assault with a Battery (USA) (Demo).cue" size="112" crc="7f2351e0" sha1="a424f3d09970ef5738ead698e88a7346cfaf581d"/>
 		<rom name="Tyco R-C - Assault with a Battery (USA) (Demo).bin" size="12169248" crc="fb6ec55b" sha1="5b16aa056dee14eff92891c24ca7cf71d263077d"/>
 		-->
-		<description>Tyco R/C - Assault with a Battery (USA, Demo)</description>
+		<description>Tyco R/C - Assault with a Battery (USA, demo)</description>
 		<year>2000</year>
 		<publisher>Mattel Interactive</publisher>
 		<info name="serial" value="SLUS-90085"/>
@@ -34380,7 +34380,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Vigilante 8 (USA) (Demo) (Track 10).bin" size="1599360" crc="567e0b81" sha1="b09de860cc29f4dd8cfce04b335fc6cdcfbf5320"/>
 		<rom name="Vigilante 8 (USA) (Demo) (Track 11).bin" size="34075776" crc="752febcc" sha1="4afb205363be53b60de8e223f277e38f9a076a4e"/>
 		-->
-		<description>Vigilante 8 (USA, Demo)</description>
+		<description>Vigilante 8 (USA, demo)</description>
 		<year>1998</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="SLUS-90022"/>
@@ -34397,7 +34397,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="Wild Arms 2 (USA) (Demo).cue" size="90" crc="065985d5" sha1="52224ae14dc72549c027ad70aad1a2f01b29fc8c"/>
 		<rom name="Wild Arms 2 (USA) (Demo).bin" size="212338560" crc="26e97cd6" sha1="771142196075e9680de8955a7571b0b8b2fb66f8"/>
 		-->
-		<description>Wild Arms 2 (USA, Demo)</description>
+		<description>Wild Arms 2 (USA, demo)</description>
 		<year>2000</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<info name="serial" value="SCUS-94592"/>
@@ -34415,7 +34415,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="WipEout 3 (USA) (Demo) (Track 1).bin" size="42495936" crc="ec4f77a4" sha1="0ed595bc1e9b1dfeae7f8e446d2d42ed7bcb83f5"/>
 		<rom name="WipEout 3 (USA) (Demo) (Track 2).bin" size="39179616" crc="98fd1501" sha1="1ff406e9976fa09e220991477b029364f1f7b2c3"/>
 		-->
-		<description>WipEout 3 (USA, Demo)</description>
+		<description>WipEout 3 (USA, demo)</description>
 		<year>1999</year>
 		<publisher>Psygnosis</publisher>
 		<info name="serial" value="SLUS-90063"/>
@@ -34432,7 +34432,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="You Don't Know Jack (USA) (Demo).cue" size="98" crc="c28ab357" sha1="aa7f2564fb79672a49618bc9053366186162cea3"/>
 		<rom name="You Don't Know Jack (USA) (Demo).bin" size="347402160" crc="e2917810" sha1="63d80b59b853c01d66fa1b162a6b00646143e151"/>
 		-->
-		<description>You Don't Know Jack (USA, Demo)</description>
+		<description>You Don't Know Jack (USA, demo)</description>
 		<year>1999</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="serial" value="SLUS-90061"/>
@@ -59990,7 +59990,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 
 	<!-- http://redump.org/disc/61313/ -->
 	<software name="frontms3e" cloneof="frontms3">
-		<description>Front Mission 3 (Euro, Prototype 20000616)</description>
+		<description>Front Mission 3 (Euro, prototype 20000616)</description>
 		<year>2000</year>
 		<publisher>Square Europe</publisher>
 		<info name="release" value="20000616" />
@@ -60823,7 +60823,7 @@ A few comments on these:
 		<rom name="bb2.bin" size="62620864" crc="1c2c9f63" sha1="2d9cf9e34057c93fe1d40940428c463a7224444e"/>
 		<rom name="bb2.cue" size="69" crc="096e5077" sha1="a56c5425f32b5ead296ecd4d3b1ac909d8144972"/>
 		-->
-		<description>Bubble Bobble II (Euro, Prototype)</description>
+		<description>Bubble Bobble II (Euro, prototype)</description>
 		<year>1995</year>
 		<publisher>Taito</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -60842,7 +60842,7 @@ A few comments on these:
 		<rom name="baldur's gate - disc 3.bin" size="772415616" crc="18558807" sha1="133829649e2311e1656e77b4610129c3ebbbe90d"/>
 		<rom name="baldur's gate - disc 3.cue" size="88" crc="d7c114f1" sha1="f6f14f0239789b62cfe5499899b20fde5e273673"/>
 		-->
-		<description>Baldur's Gate (USA, Prototype)</description>
+		<description>Baldur's Gate (USA, prototype)</description>
 		<year>19??</year>
 		<publisher>Interplay</publisher>
 		<info name="serial" value="SLUS-01037" />
@@ -60870,7 +60870,7 @@ A few comments on these:
 		<rom name="biohazard - 1995 - 08 - 04 - sample.bin" size="20057856" crc="a64e5922" sha1="c1a293f0183c3fb912794dc4cbbca3ca71d7ef31"/>
 		<rom name="biohazard - 1995 - 08 - 04 - sample.cue" size="101" crc="389803a9" sha1="be53c93c21aefa9e2fcdedc6eec7be381b2032b6"/>
 		-->
-		<description>BioHazard (Jpn, Prototype 19950804)</description>
+		<description>BioHazard (Jpn, prototype 19950804)</description>
 		<year>1995</year>
 		<publisher>Capcom</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -60885,7 +60885,7 @@ A few comments on these:
 		<rom name="biohazard - 1995 - 10 - 04 - sample.bin" size="100420992" crc="e417d9a6" sha1="f9f8afac9b08fd1a79d9ecfd93027defaac7fc7e"/>
 		<rom name="biohazard - 1995 - 10 - 04 - sample.cue" size="101" crc="39e8977b" sha1="24a10fe354a45a87b6cf08b49a8741e4c3f3de95"/>
 		-->
-		<description>BioHazard (Jpn, Prototype 19951004)</description>
+		<description>BioHazard (Jpn, prototype 19951004)</description>
 		<year>1995</year>
 		<publisher>Capcom</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -60900,7 +60900,7 @@ A few comments on these:
 		<rom name="bio hazard (j) (sample 1996.01.31) [slps-00222].bin" size="735818496" crc="af067e3c" sha1="35a718d090bbedcb40974f2f07d33e255dc57529"/>
 		<rom name="bio hazard (j) (sample 1996.01.31) [slps-00222].cue" size="115" crc="bf382b9a" sha1="6d918de5f48d78546c569e374c2aa45f340e80c9"/>
 		-->
-		<description>BioHazard (Jpn, Prototype 19960131)</description>
+		<description>BioHazard (Jpn, prototype 19960131)</description>
 		<year>1996</year>
 		<publisher>Capcom</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -60916,7 +60916,7 @@ A few comments on these:
 		<rom name="biohazard-2-beta.ccd" size="743" crc="7c549fd8" sha1="442760fd3c8e080b4860b17951f85f77a04c56e9"/>
 		<rom name="biohazard-2-beta.sub" size="28164096" crc="9af638a3" sha1="e89a6ea0dee1a217d2faedbb2d6769992b2b4aeb"/>
 		-->
-		<description>BioHazard 2 (Jpn, Prototype)</description>
+		<description>BioHazard 2 (Jpn, prototype)</description>
 		<year>1998</year>
 		<publisher>Capcom</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -60931,7 +60931,7 @@ A few comments on these:
 		<rom name="biohazard 2 (beta 2).bin" size="780788736" crc="b7e5b1b9" sha1="354cd30e1c570e85accaf3af716d0843614dfc40"/>
 		<rom name="biohazard 2 (beta 2).cue" size="86" crc="1fd0def1" sha1="00bb06023a89a3ef11b9fcd58593eaef813f8e2a"/>
 		-->
-		<description>BioHazard 2 (Jpn, Prototype, Alt)</description>
+		<description>BioHazard 2 (Jpn, prototype, alt)</description>
 		<year>1998</year>
 		<publisher>Capcom</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -60945,7 +60945,7 @@ A few comments on these:
 		<!-- Original images (unknown source)
 		<rom name="BH2P_PVB.ISO" size="124300848" crc="598a6bfd" sha1="ecac141d16ee0c8cfa946fb3860cf9dae75b6752"/>
 		-->
-		<description>BioHazard 2 (Jpn, Early Prototype)</description>
+		<description>BioHazard 2 (Jpn, early prototype)</description>
 		<year>1998</year>
 		<publisher>Capcom</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -60961,7 +60961,7 @@ A few comments on these:
 		<rom name="breakneck.ccd" size="788" crc="2662a57c" sha1="176e43ccfe1eb79941cc2e9b69f0376a0a6a1748"/>
 		<rom name="breakneck.sub" size="5769120" crc="d7034ad8" sha1="fd2ab53f8d0ebb72a8cedae7b5768ff9a6ed8ffd"/>
 		-->
-		<description>Breakneck (Prototype)</description>
+		<description>Breakneck (prototype)</description>
 		<year>19??</year>
 		<publisher>Radical</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -60976,7 +60976,7 @@ A few comments on these:
 		<rom name="COMMANDO.BIN" size="3370416" crc="7b9442ef" sha1="aed79c2859e8949c7f3303f9de2e7a188e07d8c9"/>
 		<rom name="COMMANDO.CUE" size="74" crc="7f9d7a10" sha1="f91833587f7ca34b1d53868f47169db040dfa493"/>
 		-->
-		<description>Command &amp; Conquerer - Commando (Tech Demo, 19970714)</description>
+		<description>Command &amp; Conquerer - Commando (tech demo, 19970714)</description>
 		<year>19??</year>
 		<publisher>POV</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -60992,7 +60992,7 @@ A few comments on these:
 		<rom name="CRASHBANDICOOT.img" size="183627696" crc="e0cb00ae" sha1="bdebf6ec7a7f4732daa2e0cb570d962b34de565d"/>
 		<rom name="CRASHBANDICOOT.sub" size="7495008" crc="2fb45167" sha1="0596388a74c6e5486f64f6806f9776ed8cce9a38"/>
 		-->
-		<description>Crash Bandicoot (USA, Prototype, 19960511)</description>
+		<description>Crash Bandicoot (USA, prototype, 19960511)</description>
 		<year>1996</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61008,7 +61008,7 @@ A few comments on these:
 		<rom name="crash.img" size="167431824" crc="79827883" sha1="837c7a9c1af9262fbe1842e798cd341ed221bc83"/>
 		<rom name="crash.sub" size="6833952" crc="86466038" sha1="3b57d344c4c813f8436c4c7acf3369591293ecaa"/>
 		-->
-		<description>Crash Bandicoot (USA, Prototype, 19960408)</description>
+		<description>Crash Bandicoot (USA, prototype, 19960408)</description>
 		<year>1996</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61022,7 +61022,7 @@ A few comments on these:
 		<!-- Original images (unknown source)
 		<rom name="Crash Bandicoot 2 - Cortex Strikes Back (BETA_08-09-1997).bin" size="249636576" crc="9bb04050" sha1="895fd4b675adbdcc8c395a8031cb6105767c90f5"/>
 		-->
-		<description>Crash Bandicoot 2 - Cortex Strikes Back (USA, Prototype 19970908)</description>
+		<description>Crash Bandicoot 2 - Cortex Strikes Back (USA, prototype 19970908)</description>
 		<year>1997</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61037,7 +61037,7 @@ A few comments on these:
 		<rom name="CROC_0_12.BIN" size="513862608" crc="f9c683f1" sha1="69c4e514243f5c326190d8a36539dca0cdf11ca2"/>
 		<rom name="CROC_0_12.cue" size="138" crc="b3487209" sha1="5e3a0bb57d33c9b8f5e60631c3b588e7051382e1"/>
 		-->
-		<description>Croc - Legend of the Gobbos (Prototype)</description>
+		<description>Croc - Legend of the Gobbos (prototype)</description>
 		<year>1997</year>
 		<publisher>Fox Interactive</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61052,7 +61052,7 @@ A few comments on these:
 		<rom name="CROC_DEMO.BIN" size="323106000" crc="c7f47362" sha1="1feb55ba93b28ebadfbf429df1f7009b7eebe8ce"/>
 		<rom name="CROC_DEMO.cue" size="1194" crc="0af47fd2" sha1="46ca82b29d4425aa2d8ab933f545e946ffd46c06"/>
 		-->
-		<description>Croc (Earlier Prototype)</description>
+		<description>Croc (earlier prototype)</description>
 		<year>1997</year>
 		<publisher>Fox Interactive</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61066,7 +61066,7 @@ A few comments on these:
 		<!-- Original images (unknown source)
 		<rom name="CTR - Review.bin" size="514189536" crc="16a14528" sha1="b7ac1d239edff79ea8c3b1c1a8abeed79fe11c9e"/>
 		-->
-		<description>CTR - Crash Team Racing (USA, Prototype)</description>
+		<description>CTR - Crash Team Racing (USA, prototype)</description>
 		<year>1999</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61081,7 +61081,7 @@ A few comments on these:
 		<rom name="deuce.bin" size="28336896" crc="db149c5e" sha1="e25c80c45e9443476fb4425c7753c96ac4737793"/>
 		<rom name="deuce.cue" size="337" crc="1ae16327" sha1="6473fe8ce38bb175153b8210138bf507757bbd67"/>
 		-->
-		<description>Deuce (USA, Prototype)</description>
+		<description>Deuce (USA, prototype)</description>
 		<year>2000</year>
 		<publisher>Midway</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61096,7 +61096,7 @@ A few comments on these:
 		<rom name="diablo.iso" size="783745200" crc="3a0268cd" sha1="c29775b8eadca5be2ba35ec2a76f956d18416edc"/>
 		<rom name="diablo.cue" size="327" crc="4ba55415" sha1="af32c37875d28eb30e6e841fe3ba35d943576e5f"/>
 		-->
-		<description>Diablo (Prototype)</description>
+		<description>Diablo (prototype)</description>
 		<year>1997</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61110,7 +61110,7 @@ A few comments on these:
 		<!-- Original images (unknown source)
 		<rom name="driver_you_are_the_wheelman_demo.iso" size="47482176" crc="8c11918d" sha1="64b75114d91cbd8fbfb62af595e000f3b4339727"/>
 		-->
-		<description>Driver (Prototype Demo)</description>
+		<description>Driver (prototype demo)</description>
 		<year>19??</year>
 		<publisher>GT Interactive</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61125,7 +61125,7 @@ A few comments on these:
 		<rom name="ttk.mdf" size="287174880" crc="66ce93d8" sha1="17dc62d346b705fbf1fa657f6075075f11e7929e"/>
 		<rom name="ttk.mds" size="494" crc="a068816f" sha1="66a69f81ed0d7d7b6967ce855364714f85f34792"/>
 		-->
-		<description>Duke Nukem Time to Kill (USA, Prototype)</description>
+		<description>Duke Nukem Time to Kill (USA, prototype)</description>
 		<year>1998</year>
 		<publisher>GT Interactive</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61140,7 +61140,7 @@ A few comments on these:
 		<rom name="global domination [ntsc-u][slus-01419].bin" size="611564688" crc="f5e70299" sha1="35b457af1241c333d82a5f606f68818f28ea4403"/>
 		<rom name="global domination [ntsc-u][slus-01419].cue" size="105" crc="8a9e7192" sha1="3eef0d1ebe2ffc2b54e07d68dcf059a2093517cd"/>
 		-->
-		<description>Global Domination (USA, Prototype)</description>
+		<description>Global Domination (USA, prototype)</description>
 		<year>1998?</year>
 		<publisher>Psygnosis</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61155,7 +61155,7 @@ A few comments on these:
 		<rom name="IMSA.bin" size="61283712" crc="7941f9b8" sha1="260d958310382073f756a447c6749c6de4dab64e"/>
 		<rom name="IMSA.cue" size="126" crc="f42a8822" sha1="479cfc179893836701069643ec56bdb76eb1911a"/>
 		-->
-		<description>IMSA Racing (Tech Demo, 19970715)</description>
+		<description>IMSA Racing (tech demo, 19970715)</description>
 		<year>19??</year>
 		<publisher>POV</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61172,7 +61172,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<rom name="Jetmoto 2124.bin" size="188084736" crc="1c041492" sha1="c9404c1af14b52dc37c70b23efdb3f9b6f7098b9"/>
 		<rom name="Jetmoto 2124.cue" size="78" crc="e71df0dd" sha1="94d5c9980391b630d9c62b6a28f85d8bde992d0f"/>
 		-->
-		<description>Jetmoto 2124 (USA, Prototype)</description>
+		<description>Jetmoto 2124 (USA, prototype)</description>
 		<year>1999?</year>
 		<publisher>989 Studios</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61186,7 +61186,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<!-- Original images (unknown source)
 		<rom name="legacy of kain - soul reaver [beta 6-28-99][ntsc-u] [slus-00708].iso" size="687872976" crc="6df2681d" sha1="6c97af43e5c7d78ac7afdc7443ce8440033a0cf1"/>
 		-->
-		<description>Legacy of Kain - Soul Reaver (USA, Prototype 19990628)</description>
+		<description>Legacy of Kain - Soul Reaver (USA, prototype 19990628)</description>
 		<year>1999</year>
 		<publisher>Eidos</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61202,7 +61202,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<rom name="sr1-psx-beta.img" size="635820864" crc="22f06bfd" sha1="a2f1833f63e934f35f09c48c6bf5f6dc58661e9a"/>
 		<rom name="sr1-psx-beta.sub" size="25951872" crc="4183f8c3" sha1="acb107be9144e873757624f7dcad11e5bcff088c"/>
 		-->
-		<description>Legacy of Kain - Soul Reaver (USA, Prototype 19990512)</description>
+		<description>Legacy of Kain - Soul Reaver (USA, prototype 19990512)</description>
 		<year>1999</year>
 		<publisher>Eidos</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61217,7 +61217,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<rom name="madden96.bin" size="189646464" crc="4d9f6048" sha1="d8d9ea110e26138eaf9a14ce02e635cd8af836a1"/>
 		<rom name="madden96.cue" size="78" crc="243f16c7" sha1="f1f6613572bf62cf62c4eb0e8d5dbdd9e8190685"/>
 		-->
-		<description>Madden NFL 96 (USA, Prototype)</description>
+		<description>Madden NFL 96 (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61234,7 +61234,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<rom name="medievil beta [sces_033.11] (pal).bin" size="525436800" crc="94d7c8f7" sha1="65c8474c8e18d599d090cacfc1d68d8428cea290"/>
 		<rom name="medievil beta [sces_033.11] (pal).cue" size="200" crc="eb01c924" sha1="f749eecc4d196b3bff03b773d4592396f0af5d05"/>
 		-->
-		<description>MediEvil (Euro, Prototype)</description>
+		<description>MediEvil (Euro, prototype)</description>
 		<year>1998</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
 		<info name="serial" value="SCES-03311?"/>
@@ -61250,7 +61250,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<rom name="slpm.mdf" size="79669296" crc="f32426af" sha1="61099819f6623cf46bab78b14df6333ad13c7f40"/>
 		<rom name="slpm.mds" size="486" crc="d5ae5351" sha1="58b07e384070a58092417ac0942bd1bca934d8d3"/>
 		-->
-		<description>Metal Gear Solid (Pilot Disk)</description>
+		<description>Metal Gear Solid (pilot disk)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="SLPM-80254" />
@@ -61266,7 +61266,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<rom name="MISSILECOMMAND.BIN" size="328602624" crc="7eeabdc7" sha1="cf2a4916c103eff856046a44f7b6e134a812180f"/>
 		<rom name="MISSILECOMMAND.CUE" size="121" crc="1af0a4f5" sha1="e173bf59f5a6f612ac7d45cac9b331a92bab5448"/>
 		-->
-		<description>Missile Command (USA, Prototype 19990812)</description>
+		<description>Missile Command (USA, prototype 19990812)</description>
 		<year>1999</year>
 		<publisher>Atari Interactive</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61282,7 +61282,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<rom name="persona2xus.bin" size="724992240" crc="9eb5619d" sha1="8dfb6d2e08257525566c80d8e17c141928290d47"/>
 		<rom name="persona2xus.cue" size="77" crc="9d8dc4db" sha1="8977b08c99e52e3b1acf8c40b131faba2f9acb5a"/>
 		-->
-		<description>Persona 2 - Eternal Punishment (Prototype? Debug)</description>
+		<description>Persona 2 - Eternal Punishment (prototype? debug)</description>
 		<year>2000</year>
 		<publisher>Atlus</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61297,7 +61297,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<rom name="SLUS_00904.BIN" size="289194864" crc="774c1174" sha1="3edb5222987ff95f30bf680e6b4b8771736520fe"/>
 		<rom name="SLUS_00904.CUE" size="101" crc="2d0364af" sha1="e9726433173434a1b9653550ef797dc10935b88e"/>
 		-->
-		<description>Q*bert (Euro?, Prototype 19990928)</description>
+		<description>Q*bert (Euro?, prototype 19990928)</description>
 		<year>1999</year>
 		<publisher>Atari Interactive</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61312,7 +61312,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<rom name="rockman 8 beta v1.bin" size="53352768" crc="bb8df0ca" sha1="69ed6c03831f9dae6bcf8c2e54a92935261a9cd3"/>
 		<rom name="rockman 8 beta v1.cue" size="80" crc="5ff4ae72" sha1="34e8a485039859d2d54e1fb75097da4651a08f31"/>
 		-->
-		<description>Rockman 8 (Jpn, Prototype v1)</description>
+		<description>Rockman 8 (Jpn, prototype v1)</description>
 		<year>1996</year>
 		<publisher>Capcom</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61327,7 +61327,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<rom name="rockman 8 beta 1.bin" size="53352768" crc="67c78d88" sha1="ee9fbb2157a983d11ac4aa71684292294678f1a7"/>
 		<rom name="rockman 8 beta 1.cue" size="79" crc="bae58743" sha1="9b3e6a0bb19b89e2079f12b157381ccc678a4dce"/>
 		-->
-		<description>Rockman 8 (Jpn, Prototype 1)</description>
+		<description>Rockman 8 (Jpn, prototype 1)</description>
 		<year>1996</year>
 		<publisher>Capcom</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61342,7 +61342,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<rom name="rockman 8 beta 2.bin" size="58710624" crc="1c8b620a" sha1="b9ca669a9d45359d10e2e419a278b84413041919"/>
 		<rom name="rockman 8 beta 2.cue" size="79" crc="65ac97f6" sha1="3d7f8fd05f0e5f5f38877a786df676c6c2c9a810"/>
 		-->
-		<description>Rockman 8 (Jpn, Prototype 2)</description>
+		<description>Rockman 8 (Jpn, prototype 2)</description>
 		<year>1996</year>
 		<publisher>Capcom</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61356,7 +61356,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<!-- Original images (unknown source)
 		<rom name="[rpm] rockman dash beta 'capcom friendly club' (j).iso" size="155017968" crc="b18f4d41" sha1="0327559875a3825c82337aa931c56a3478151e66"/>
 		-->
-		<description>Rockman Dash (Capcom Friendly Club Demo)</description>
+		<description>Rockman Dash (Capcom Friendly Club demo)</description>
 		<year>1997</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="SLPM-80158" />
@@ -61372,7 +61372,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<rom name="rockman_x6.bin" size="396577776" crc="b1442c95" sha1="51ec61dbb32c8144a48649309e9464a44672d654"/>
 		<rom name="rockman_x6.cue" size="73" crc="5c05610d" sha1="3968ac1969c9bbcc9b2d3fa04682cc5efb98e23f"/>
 		-->
-		<description>Rockman X6 (Jpn, Prototype 20010928)</description>
+		<description>Rockman X6 (Jpn, prototype 20010928)</description>
 		<year>2001</year>
 		<publisher>Capcom</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61387,7 +61387,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<rom name="silent1.bin" size="616518000" crc="8326dd8f" sha1="97c7d476c9e821b3d932139a0644c0c7593e1955"/>
 		<rom name="silent1.cue" size="68" crc="670aa37f" sha1="14fc981dd80051cbec08aec18afa8e5679be959f"/>
 		-->
-		<description>Silent Hill (USA, Prototype)</description>
+		<description>Silent Hill (USA, prototype)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61402,7 +61402,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<rom name="spirit master (u) (prototype).bin" size="13547520" crc="92bf9773" sha1="98d5b62fed0ec04ba09577654f4366529bc0cab4"/>
 		<rom name="spirit master (u) (prototype).cue" size="95" crc="9fdd687b" sha1="4184f28f49f29bb14387f9a364ce21b448da8147"/>
 		-->
-		<description>Spirit Master (USA, Prototype)</description>
+		<description>Spirit Master (USA, prototype)</description>
 		<year>19??</year>
 		<publisher>Acclaim</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61418,7 +61418,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<rom name="starcon_t02.wav" size="44763308" crc="14cd232a" sha1="c5095ba5eb1eb3b4757f6d86764a6d1ccd4971b4"/>
 		<rom name="starcon.cue" size="168" crc="cedd64ed" sha1="bcef7f0f691f3a266c8aa040d32e9ffcde28a7c8"/>
 		-->
-		<description>StarCon (Prototype)</description>
+		<description>StarCon (prototype)</description>
 		<year>1998</year>
 		<publisher>Accolade</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61433,7 +61433,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<rom name="thrill kill [sles-01337].bin" size="543892944" crc="ecee0c8e" sha1="b31ded0a99acc51a98c8fdbf7ef353d3d27b8aba"/>
 		<rom name="thrill kill [sles-01337].cue" size="603" crc="ab9afb6e" sha1="e8a40c6456dac23e120c2d1dd9f1b0e7c5010d6f"/>
 		-->
-		<description>Thrill Kill (Euro, Prototype)</description>
+		<description>Thrill Kill (Euro, prototype)</description>
 		<year>1998</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="SLES-01337?"/>
@@ -61449,7 +61449,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<rom name="thrill kill.bin" size="625629648" crc="ab7aa9a2" sha1="8a0a68c4fa1d5d6e68acd878ea4e22c1cbcf5d24"/>
 		<rom name="thrill kill.cue" size="601" crc="b10890b1"/>
 		-->
-		<description>Thrill Kill (USA, Prototype)</description>
+		<description>Thrill Kill (USA, prototype)</description>
 		<year>1998</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="SLUS-00752?"/>
@@ -61465,7 +61465,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<rom name="thrill kill (usa) beta [slus-12345].bin" size="164430672" crc="f72ccb2a" sha1="ec359a95b0bfe153b46f6ecf1e160030a13f62e9"/>
 		<rom name="thrill kill (usa) beta [slus-12345].cue" size="467" crc="86f88cef" sha1="979aeab2cf4e59e595b9f1ecbc8fb64ad947ab24"/>
 		-->
-		<description>Thrill Kill (USA, Prototype Earlier?)</description>
+		<description>Thrill Kill (USA, prototype Earlier?)</description>
 		<year>1998</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61480,7 +61480,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<rom name="tombraider.bin" size="615734784" crc="63999513" sha1="672efcd03a8342b0e54904adc606c5d140610c9b"/>
 		<rom name="tombraider.cue" size="2238" crc="a1d37c30" sha1="fa46b66a3346a226817a6f1b5c5b843994854d64"/>
 		-->
-		<description>Tomb Raider (Prototype, 19960722)</description>
+		<description>Tomb Raider (prototype, 19960722)</description>
 		<year>1996</year>
 		<publisher>Core Design</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61497,7 +61497,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<rom name="tomb raider 2 [beta] [ntsc] [psx].img" size="755624688" crc="c3330f3c" sha1="8d4f6409c9b70c460686ea4a709ce9e22651afaf"/>
 		<rom name="tomb raider 2 [beta] [ntsc] [psx].sub" size="30841824" crc="19143fb6" sha1="9eeeb08b6b697ec1689904213a5375c2639b4976"/>
 		-->
-		<description>Tomb Raider II (USA, Prototype)</description>
+		<description>Tomb Raider II (USA, prototype)</description>
 		<year>1997</year>
 		<publisher>Core Design</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61512,7 +61512,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<rom name="tony hawk's pro skater (usa) [beta].bin" size="36764112" crc="4dc94772" sha1="662f7aa67e1b9ac67cb479f80b55c0cf44305a34"/>
 		<rom name="tony hawk's pro skater (usa) [beta].cue" size="110" crc="d4a2b89d" sha1="05c43fcd61f10a50e6594e4c2a92eadf3d76bb44"/>
 		-->
-		<description>Tony Hawk's Pro Skater (USA, Prototype)</description>
+		<description>Tony Hawk's Pro Skater (USA, prototype)</description>
 		<year>1999</year>
 		<publisher>Activision</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61526,7 +61526,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<!-- Original images (unknown source)
 		<rom name="killwheel.nrg" size="379698268" crc="4bb001c3" sha1="99be78ad2b3df1f18c826c64382983543b749b08"/>
 		-->
-		<description>Torc - Legend of the Ogre Crown (Prototype)</description>
+		<description>Torc - Legend of the Ogre Crown (prototype)</description>
 		<year>19??</year>
 		<publisher>Head Games</publisher>   <!-- Head Games were actually the developer, but I was unable to dig any info about actual publishing deals -->
 		<part name="cdrom" interface="psx_cdrom">
@@ -61543,7 +61543,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<rom name="virtuoso (japan) (prototype 1996-05-14) (track 3).bin" size="40045152" crc="209896a4" sha1="37d11c227eb6ffcd28ecb94414689d9ecb3e99bc"/>
 		<rom name="virtuoso (japan) (prototype 1996-05-14).cue" size="381" crc="76ce14e0" sha1="86be87af128d63f164147ccc1081cf76bb6f7985"/>
 		-->
-		<description>Virtuoso (Prototype, 19960514)</description>
+		<description>Virtuoso (prototype, 19960514)</description>
 		<year>1996</year>
 		<publisher>Data East?</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61558,7 +61558,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<rom name="virtuoso (japan) (prototype 1995-12-19).bin" size="4287696" crc="8163083d" sha1="0c032fbe9d0bf2d719b87e1c35d28cdc7cffdead"/>
 		<rom name="virtuoso (japan) (prototype 1995-12-19).cue" size="105" crc="0de27535" sha1="3034741d5e5cccb81782038583d7f506b0090651"/>
 		-->
-		<description>Virtuoso (Prototype, 19951219)</description>
+		<description>Virtuoso (prototype, 19951219)</description>
 		<year>1995</year>
 		<publisher>Data East?</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61573,7 +61573,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<rom name="wwf smackdown! (usa) [beta].bin" size="588961968" crc="4ac3a9b7" sha1="f650a04c7ca155b7776deb72d98cfc526b03734d"/>
 		<rom name="wwf smackdown! (usa) [beta].cue" size="105" crc="21a5c146" sha1="dbe108e9816e01a6c6750a1c0f3ea73d53eb2fcf"/>
 		-->
-		<description>WWF Smackdown! (USA, Prototype 20000106)</description>
+		<description>WWF Smackdown! (USA, prototype 20000106)</description>
 		<year>2000</year>
 		<publisher>THQ</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61591,7 +61591,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<rom name="(PSX) Resident Evil 2 (Preview) (SLED-00977).bin" size="170583504" crc="acbf1ead" sha1="2d5aa8554dfd7bbe54ff6c981788570117d7f16e"/>
 		<rom name="(PSX) Resident Evil 2 (Preview) (SLED-00977).cue" size="113" crc="4f074fd1" sha1="4cecd78cc2fa8bcbfe069b9ecb7e7c8821225c08"/>
 		-->
-		<description>Resident Evil 2 Preview (Euro, CD Consoles No.38)</description>
+		<description>Resident Evil 2 (Euro, preview, CD Consoles No.38)</description>
 		<year>1997</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="SLED-00977" />
@@ -61607,7 +61607,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<rom name="sled_02541.bin" size="239762880" crc="fb7fb080" sha1="b50b4d6f18ca33534f9d5632e031d30372675d7a"/>
 		<rom name="sled_02541.cue" size="76" crc="b18c113c" sha1="be6fd57ea5f29c09c44af8e026282772559be495"/>
 		-->
-		<description>Resident Evil 3 (Euro, Demo)</description>
+		<description>Resident Evil 3 (Euro, demo)</description>
 		<year>1999</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="SLED-02541" />
@@ -61641,7 +61641,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<rom name="castlevania - symphony of the night e3 demo.ccd" size="964" crc="d6a03944" sha1="b1a1e08e3837d3d39949097fb1c5f12b648aa5ce"/>
 		<rom name="castlevania - symphony of the night e3 demo.cue" size="163" crc="919c7241" sha1="09413093892a1cb79b5bf99e0424000ace0eeae8"/>
 		-->
-		<description>Castlevania - Symphony of the Night (E3 Demo, 1997)</description>
+		<description>Castlevania - Symphony of the Night (E3 demo, 1997)</description>
 		<year>1997</year>
 		<publisher>Konami</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61656,7 +61656,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<rom name="gen13.bin" size="1251264" crc="006d49c5" sha1="abf73cebb7e65d928409b654855d3b057222f79d"/>
 		<rom name="gen13.cue" size="68" crc="21ae2764" sha1="b254dcb574a62724609d2c9b3cb17c7d1a3bab5f"/>
 		-->
-		<description>Gen13 (Tech Demo)</description>
+		<description>Gen13 (tech demo)</description>
 		<year>199?</year>
 		<publisher>Realtime Associates</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61673,7 +61673,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<rom name="robocop.bin" size="1502928" crc="2de33042" sha1="88cb83a706eaa65b49eeeccbdac53d2fa17acf1c"/>
 		<rom name="robocop.cue" size="73" crc="a72d02f6" sha1="bee10d96b71bf372a0de2607240fa88513953193"/>
 		-->
-		<description>Robocop (Tech Demo)</description>
+		<description>Robocop (tech demo)</description>
 		<year>199?</year>
 		<publisher>Realtime Associates</publisher>
 		<part name="cdrom" interface="psx_cdrom">
@@ -61688,7 +61688,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<rom name="Silent Hill (Trade Demo) [NTSC-U] [SLUS-80707].bin" size="615045648" crc="4f60c3ec" sha1="49695af2c2b8b19a31b01da4cd4dbc758445ccef"/>
 		<rom name="Silent Hill (Trade Demo) [NTSC-U] [SLUS-80707].cue" size="112" crc="1ca1d493" sha1="a4cf762ddbcf24809296d0d9e28c0a1c076db484"/>
 		-->
-		<description>Silent Hill (USA, Trade Demo)</description>
+		<description>Silent Hill (USA, trade demo)</description>
 		<year>1999</year>
 		<publisher>Konami of America</publisher>
 		<info name="serial" value="SLUS-80707" />
@@ -61705,7 +61705,7 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<rom name="tr1.img" size="2293200" crc="9905010d" sha1="6a43d5840e1cb49c0522d8546219f1cc2c467438"/>
 		<rom name="tr1.sub" size="93600" crc="97ae0bfa" sha1="72016fcb74997ae12c8cca271d2c14622b3a8599"/>
 		-->
-		<description>Tomb Raider (E3 Demo, 19960520)</description>
+		<description>Tomb Raider (E3 demo, 19960520)</description>
 		<year>1996</year>
 		<publisher>SCEI</publisher>
 		<part name="cdrom" interface="psx_cdrom">

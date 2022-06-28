@@ -55,6 +55,7 @@ TIDY_FLAGSX += -modernize-use-auto,
 #TIDY_FLAGSX += -modernize-use-transparent-functors,
 TIDY_FLAGSX += -readability-function-cognitive-complexity,
 TIDY_FLAGSX += -readability-uppercase-literal-suffix
+TIDY_FLAGSX += -cert-err58-cpp
 
 
 #TIDY_FLAGSX += -cppcoreguidelines-avoid-non-const-global-variables
@@ -113,7 +114,7 @@ TIDY_DB = $(OBJ)/compile_commands.json
 #LTO decreases performance :-(
 #LTO = -flto=4  -fuse-linker-plugin -Wodr
 
-CCOREFLAGS = -g -O3 -std=c++17 -I$(SRC) -I$(SRC)/.. 
+CCOREFLAGS = -g -O3 -std=c++17 -I$(SRC) -I$(SRC)/.. -I$(SRC)/../..
 
 CFLAGS =  $(LTO) $(CCOREFLAGS) $(CEXTRAFLAGS)
 LDFLAGS = $(LTO) -g -O3 -std=c++17 $(LDEXTRAFLAGS)
@@ -289,22 +290,20 @@ native:
 	$(MAKE) CEXTRAFLAGS="-march=native -msse4.2 -Wall -Wpedantic -Wsign-compare -Wextra"
 
 gcc9:
-	$(MAKE) CC=g++-9 LD=g++-9 CEXTRAFLAGS="-march=native -Wall -pedantic -Wpedantic -fext-numeric-literals -Wsign-compare -Wextra" EXTRALIBS="-lquadmath" OBJ=obj/gcc9
+	$(MAKE) CC=g++-9 LD=g++-9 CEXTRAFLAGS="-march=native -Wall -Wextra -pedantic -Wpedantic -pedantic-errors -fext-numeric-literals -Wsign-compare" EXTRALIBS="-lquadmath" OBJ=obj/gcc9
 
 clang:
 	#$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native -msse4.2 -Weverything -Wall -pedantic -Wpedantic -Wunused-private-field -Wno-padded -Wno-unused-template -Wno-missing-variable-declarations -Wno-float-equal -Wconversion -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral  -Wno-exit-time-destructors"
 	$(MAKE) CC=clang++-13 LD=clang++-13 OBJ=obj/clang CEXTRAFLAGS="-march=native \
-		-mllvm -inline-threshold=2000 \
+		-mllvm  -inline-threshold=2000 \
 		-Wunknown-warning-option \
-		-Weverything -Wall -pedantic -Wpedantic -Wunused-private-field  \
+		-Weverything -Wall -pedantic -Wpedantic \
 		-Werror -Wno-padded -Wno-weak-vtables -Wno-weak-template-vtables -Wunused-template \
-		-Wmissing-variable-declarations -Wno-float-equal -Wconversion \
-		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wformat-nonliteral \
-		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override \
-		-Wno-embedded-directive \
+		-Wno-float-equal \
+		-Wno-c++98-compat -Wno-c++98-compat-pedantic \
+		-Wno-exit-time-destructors \
 		-Wno-undefined-reinterpret-cast -Wno-error=unused-macros \
-		-Wunreachable-code \
-		-Wmissing-prototypes -Wno-error=deprecated"
+		-Wno-error=deprecated"
 
 clang-libc:
 	#clang-11 currently broken

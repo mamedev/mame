@@ -525,8 +525,7 @@ void tms340x0_device::dint(uint16_t op)
 			int64_t dividend = ((uint64_t)*rd1 << 32) | (uint32_t)*rd2; \
 			int64_t quotient = dividend / *rs;                \
 			int32_t remainder = dividend % *rs;               \
-			uint32_t signbits = (int32_t)quotient >> 31;        \
-			if (extract_64hi(quotient) != signbits)         \
+			if ((int64_t)(int32_t)quotient != quotient)     \
 			{                                               \
 				SET_V_LOG(1);                              \
 			}                                               \
@@ -573,7 +572,7 @@ void tms340x0_device::divs_b(uint16_t op) { DIVS(B); }
 			uint64_t dividend  = ((uint64_t)*rd1 << 32) | (uint32_t)*rd2; \
 			uint64_t quotient  = dividend / (uint32_t)*rs;      \
 			uint32_t remainder = dividend % (uint32_t)*rs;      \
-			if (extract_64hi(quotient) != 0)                \
+			if (quotient > 0xffffffff)                      \
 			{                                               \
 				SET_V_LOG(1);                              \
 			}                                               \
@@ -740,8 +739,8 @@ void tms340x0_device::modu_b(uint16_t op) { MODU(B); }
 	SET_Z_LOG(product == 0);                                   \
 	SET_N_BIT(product >> 32, 31);                              \
 																\
-	*rd1             = extract_64hi(product);                       \
-	R##REG(DSTREG(op)|1) = extract_64lo(product);                       \
+	*rd1             = (int32_t)(product >> 32);                \
+	R##REG(DSTREG(op)|1) = product & 0xffffffff;                \
 																\
 	COUNT_CYCLES(20);                                           \
 }
@@ -759,8 +758,8 @@ void tms340x0_device::mpys_b(uint16_t op) { MPYS(B); }
 	product = mulu_32x32(m1, *rd1);                     \
 	SET_Z_LOG(product == 0);                                   \
 																\
-	*rd1             = extract_64hi(product);                       \
-	R##REG(DSTREG(op)|1) = extract_64lo(product);                       \
+	*rd1             = (int32_t)(product >> 32);                \
+	R##REG(DSTREG(op)|1) = product & 0xffffffff;                \
 																\
 	COUNT_CYCLES(21);                                           \
 }

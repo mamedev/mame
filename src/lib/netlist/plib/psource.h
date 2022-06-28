@@ -140,10 +140,9 @@ namespace plib
 		{
 			for (auto &s : m_collection)
 			{
-				auto *source(dynamic_cast<S *>(s.get()));
-				if (source)
+				if (auto source = plib::dynamic_downcast<S *>(s.get()))
 				{
-					auto strm = source->stream(name);
+					auto strm = (*source)->stream(name);
 					if (!strm.empty())
 						return strm;
 				}
@@ -156,10 +155,9 @@ namespace plib
 		{
 			for (auto &s : m_collection)
 			{
-				auto *source(dynamic_cast<S *>(s.get()));
-				if (source)
+				if (auto source = plib::dynamic_downcast<S *>(s.get()))
 				{
-					if (lambda(source))
+					if (lambda(*source))
 						return true;
 				}
 			}

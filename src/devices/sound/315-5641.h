@@ -13,25 +13,32 @@
 #include "upd7759.h"
 
 
-class sega_315_5641_pcm_device : public upd7756_device
+class sega_315_5641_pcm_device : public upd7759_device
 {
 public:
 	sega_315_5641_pcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto fifo_cb() { return m_fifocallback.bind(); }
 	virtual void port_w(u8 data) override;
+	void fifo_reset_w(u8 data);
 
 	uint8_t get_fifo_space();
 
 protected:
 	// device-level overrides
+	virtual void internal_start_w(int state) override;
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	virtual void advance_state() override;
 
+	devcb_write_line m_fifocallback;
 	uint8_t       m_fifo_data[0x40];
 	uint8_t       m_fifo_read;    // last read offset (will read in m_fifo_read+1)
 	uint8_t       m_fifo_write;   // write offset
+	bool          m_fifo_reset;
+	bool          m_fifo_empty;
 };
 
 DECLARE_DEVICE_TYPE(SEGA_315_5641_PCM, sega_315_5641_pcm_device)

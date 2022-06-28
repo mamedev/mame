@@ -91,7 +91,7 @@ void sis950_lpc_device::device_reset()
 	m_flash_control = 0x40;
 	m_keybc_reg = 0x51;
 	m_dma_channel = -1;
-//	m_cur_eop = false;
+//  m_cur_eop = false;
 	m_dma_high_byte = 0;
 	m_init_reg = 0;
 	m_rtc_reg = 0x10;

@@ -84,7 +84,7 @@ namespace netlist::devices {
 				for (std::uint64_t i=0; i < m_N(); i++)
 				{
 					pstring input_name = plib::pfmt("A{1}")(i);
-					m_I.push_back(owner.template make_pool_object<analog_input_t>(*this, input_name, NETLIB_DELEGATE(fb)));
+					m_I.push_back(state().make_pool_object<analog_input_t>(*this, input_name, NETLIB_DELEGATE(fb)));
 					inputs.push_back(input_name);
 					m_vals.push_back(nlconst::zero());
 				}
@@ -303,7 +303,7 @@ namespace netlist::devices {
 			for (uint64_t i=0; i < m_N(); i++)
 			{
 				pstring input_name = plib::pfmt("A{1}")(i);
-				m_I.push_back(owner.template make_pool_object<analog_input_t>(*this, input_name, NETLIB_DELEGATE(inputs)));
+				m_I.push_back(state().make_pool_object<analog_input_t>(*this, input_name, NETLIB_DELEGATE(inputs)));
 				inputs.push_back(input_name);
 				m_values.push_back(nlconst::zero());
 			}
@@ -364,15 +364,15 @@ namespace netlist::devices {
 		NETLIB_RESETI()
 		{
 			m_last_state = 0;
-			m_R.set_R(m_ROFF());
+			m_R().set_R(m_ROFF());
 		}
 
 		//NETLIB_UPDATE_PARAMI();
 
 		//FIXME: used by 74123
 
-		const terminal_t &P() const noexcept { return m_R.P(); }
-		const terminal_t &N() const noexcept { return m_R.N(); }
+		const terminal_t &P() const noexcept { return m_R().P(); }
+		const terminal_t &N() const noexcept { return m_R().N(); }
 		const logic_input_t &I() const noexcept { return m_I; }
 
 		param_fp_t m_RON;
@@ -387,14 +387,14 @@ namespace netlist::devices {
 				m_last_state = state;
 				const nl_fptype R = (state != 0) ? m_RON() : m_ROFF();
 
-				m_R.change_state([this, &R]()
+				m_R().change_state([this, &R]()
 				{
-					m_R.set_R(R);
+					m_R().set_R(R);
 				});
 			}
 		}
 
-		analog::NETLIB_SUB(R_base) m_R;
+		NETLIB_SUB_NS(analog, R_base) m_R;
 		logic_input_t m_I;
 
 		state_var<netlist_sig_t> m_last_state;
@@ -424,8 +424,8 @@ namespace netlist::devices {
 	private:
 		NETLIB_RESETI()
 		{
-			m_R1.set_G(m_GOFF());
-			m_R2.set_G(m_GON());
+			m_R1().set_G(m_GOFF());
+			m_R2().set_G(m_GON());
 		}
 
 		//NETLIB_UPDATE_PARAMI();
@@ -437,29 +437,29 @@ namespace netlist::devices {
 			//printf("Here %d\n", state);
 			const nl_fptype G1 = (state != 0) ? m_GON() : m_GOFF();
 			const nl_fptype G2 = (state != 0) ? m_GOFF() : m_GON();
-			if (m_R1.solver() == m_R2.solver())
+			if (m_R1().solver() == m_R2().solver())
 			{
-				m_R1.change_state([this, &G1, &G2]()
+				m_R1().change_state([this, &G1, &G2]()
 				{
-					m_R1.set_G(G1);
-					m_R2.set_G(G2);
+					m_R1().set_G(G1);
+					m_R2().set_G(G2);
 				});
 			}
 			else
 			{
-				m_R1.change_state([this, &G1]()
+				m_R1().change_state([this, &G1]()
 				{
-					m_R1.set_G(G1);
+					m_R1().set_G(G1);
 				});
-				m_R2.change_state([this, &G2]()
+				m_R2().change_state([this, &G2]()
 				{
-					m_R2.set_G(G2);
+					m_R2().set_G(G2);
 				});
 			}
 		}
 
-		analog::NETLIB_SUB(R_base) m_R1;
-		analog::NETLIB_SUB(R_base) m_R2;
+		NETLIB_SUB_NS(analog, R_base) m_R1;
+		NETLIB_SUB_NS(analog, R_base) m_R2;
 		logic_input_t m_I;
 		param_fp_t m_GON;
 		param_fp_t m_GOFF;
@@ -570,18 +570,18 @@ namespace netlist::devices {
 		NETLIB_HANDLERI(input)
 		{
 			nl_fptype val = m_dis()(m_mt());
-			m_T.change_state([this, val]()
+			m_T().change_state([this, val]()
 			{
-				m_T.set_G_V_I(plib::reciprocal(m_RI()), val, nlconst::zero());
+				m_T().set_G_V_I(plib::reciprocal(m_RI()), val, nlconst::zero());
 			});
 		}
 
 		NETLIB_RESETI()
 		{
-			m_T.set_G_V_I(plib::reciprocal(m_RI()), nlconst::zero(), nlconst::zero());
+			m_T().set_G_V_I(plib::reciprocal(m_RI()), nlconst::zero(), nlconst::zero());
 		}
 
-		analog::NETLIB_SUB(two_terminal) m_T;
+		NETLIB_SUB_NS(analog, two_terminal) m_T;
 		logic_input_t m_I;
 		param_fp_t m_RI;
 		param_fp_t m_sigma;

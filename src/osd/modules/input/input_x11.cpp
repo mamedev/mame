@@ -479,7 +479,7 @@ public:
 	{
 		osd_printf_verbose("Lightgun: Begin initialization\n");
 
-		devmap_init(machine, &m_lightgun_map, SDLOPTION_LIGHTGUNINDEX, 8, "Lightgun mapping");
+		m_lightgun_map.init(machine, SDLOPTION_LIGHTGUNINDEX, 8, "Lightgun mapping");
 
 		x11_event_manager::instance().initialize();
 		m_display = x11_event_manager::instance().display();

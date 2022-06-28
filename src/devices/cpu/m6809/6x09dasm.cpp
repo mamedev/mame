@@ -124,6 +124,7 @@ offs_t m6x09_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 	int numoperands = (p - pc == 1)
 		? op->length() - 1
 		: op->length() - 2;
+	offs_t flags = op->flags();
 
 	offs_t ppc = p;
 	p += numoperands;
@@ -179,7 +180,10 @@ offs_t m6x09_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		if (pb & 0x40)
 			util::stream_format(stream, "%s%s", (pb&0x3f)?",":"", (op->mode() == PULS)?"U":"S");
 		if (pb & 0x80)
+		{
 			util::stream_format(stream, "%sPC", (pb&0x7f)?",":"");
+			flags |= STEP_OUT;
+		}
 		break;
 
 	case DIR:
@@ -279,7 +283,7 @@ offs_t m6x09_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		throw false;
 	}
 
-	return (p - pc) | op->flags() | SUPPORTED;
+	return (p - pc) | flags | SUPPORTED;
 }
 
 
@@ -346,9 +350,9 @@ const m6x09_base_disassembler::opcodeinfo m6x09_disassembler::m6x09_opcodes[] =
 	{ 0x35, 2, "PULS",  PULS,   M6x09_GENERAL },
 	{ 0x36, 2, "PSHU",  PSHU,   M6x09_GENERAL },
 	{ 0x37, 2, "PULU",  PULU,   M6x09_GENERAL },
-	{ 0x39, 1, "RTS",   INH ,   M6x09_GENERAL },
+	{ 0x39, 1, "RTS",   INH ,   M6x09_GENERAL, STEP_OUT },
 	{ 0x3A, 1, "ABX",   INH,    M6x09_GENERAL },
-	{ 0x3B, 1, "RTI",   INH,    M6x09_GENERAL },
+	{ 0x3B, 1, "RTI",   INH,    M6x09_GENERAL, STEP_OUT },
 	{ 0x3C, 2, "CWAI",  IMM,    M6x09_GENERAL },
 	{ 0x3D, 1, "MUL",   INH,    M6x09_GENERAL },
 	{ 0x3F, 1, "SWI",   INH,    M6x09_GENERAL },
@@ -1162,7 +1166,7 @@ const m6x09_base_disassembler::opcodeinfo konami_disassembler::konami_opcodes[] 
 	{ 0x8C, 1, "DECA",  INH,    M6x09_GENERAL },
 	{ 0x8D, 1, "DECB",  INH,    M6x09_GENERAL },
 	{ 0x8E, 2, "DEC",   IND,    M6x09_GENERAL },
-	{ 0x8F, 1, "RTS",   INH ,   M6x09_GENERAL },
+	{ 0x8F, 1, "RTS",   INH ,   M6x09_GENERAL, STEP_OUT },
 
 	{ 0x90, 1, "TSTA",  INH,    M6x09_GENERAL },
 	{ 0x91, 1, "TSTB",  INH,    M6x09_GENERAL },
@@ -1179,7 +1183,7 @@ const m6x09_base_disassembler::opcodeinfo konami_disassembler::konami_opcodes[] 
 	{ 0x9C, 1, "ASLA",  INH,    M6x09_GENERAL },
 	{ 0x9D, 1, "ASLB",  INH,    M6x09_GENERAL },
 	{ 0x9E, 2, "ASL",   IND,    M6x09_GENERAL },
-	{ 0x9F, 1, "RTI",   INH ,   M6x09_GENERAL },
+	{ 0x9F, 1, "RTI",   INH ,   M6x09_GENERAL, STEP_OUT },
 
 	{ 0xA0, 1, "ROLA",  INH,    M6x09_GENERAL },
 	{ 0xA1, 1, "ROLB",  INH,    M6x09_GENERAL },
