@@ -265,7 +265,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="dmg-rye-0.u1" size="131072" crc="362c841c" sha1="0ce98889e5d9d6167338e91119394537318810da"/>
+				<rom name="dmg-rye-0.u1" size="131072" crc="362c841c" sha1="0ce98889e5d9d6167338e91119394537318810da" />
 			</dataarea>
 		</part>
 	</software>
@@ -457,6 +457,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="aladdins" cloneof="aladdin">
+		<!-- only last three bytes differ from Euro release -->
+		<description>Aladdin (Europe, sample)</description>
+		<year>1994</year>
+		<publisher>Virgin Interactive</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="262144">
+				<rom name="aladdin sample (re135).bin" size="262144" crc="28827ea5" sha1="6d925762a46e1996cf3702dfb85be09f546b2137" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aladdinu" cloneof="aladdin">
 		<description>Disney's Aladdin (USA)</description>
 		<year>1995</year>
@@ -510,7 +523,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="alfred chicken (prototype).bin" size="131072" crc="2e19f638" sha1="a9aa7cf61ffa42a4097f0c900ad4463d6fd89a19"/>
+				<rom name="alfred chicken (prototype).bin" size="131072" crc="2e19f638" sha1="a9aa7cf61ffa42a4097f0c900ad4463d6fd89a19" />
 			</dataarea>
 		</part>
 	</software>
@@ -746,7 +759,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="spider-man 3 - invasion of the spider-slayers (apr 11, 1993 prototype).bin" size="131072" crc="bf2d1f10" sha1="34740dc60663ef33c42573a26e7b207f2cfe4a16"/>
+				<rom name="spider-man 3 - invasion of the spider-slayers (apr 11, 1993 prototype).bin" size="131072" crc="bf2d1f10" sha1="34740dc60663ef33c42573a26e7b207f2cfe4a16" />
 			</dataarea>
 		</part>
 	</software>
@@ -791,7 +804,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="dmg-auj-1.u1" size="262144" crc="739c26fc" sha1="cb3ed70f4d095405df2c322c528cab2a00d56557"/>
+				<rom name="dmg-auj-1.u1" size="262144" crc="739c26fc" sha1="cb3ed70f4d095405df2c322c528cab2a00d56557" />
 			</dataarea>
 		</part>
 	</software>
@@ -1186,7 +1199,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="obelix.bin" size="262144" crc="bfa1d7be" sha1="70472cbe59cfd426b0969150085cc97d31bd6470"/>
+				<rom name="obelix.bin" size="262144" crc="bfa1d7be" sha1="70472cbe59cfd426b0969150085cc97d31bd6470" />
 			</dataarea>
 		</part>
 	</software>
@@ -1213,7 +1226,7 @@ license:CC0
 		<publisher>Infogrames</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="asterix (prototype b).bin" size="32768" crc="0050b16f" sha1="5e2423d1d4a1239af2ccafdd6c0a3f2316ae6b51"/>
+				<rom name="asterix (prototype b).bin" size="32768" crc="0050b16f" sha1="5e2423d1d4a1239af2ccafdd6c0a3f2316ae6b51" />
 			</dataarea>
 		</part>
 	</software>
@@ -1224,7 +1237,7 @@ license:CC0
 		<publisher>Infogrames</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="asterix (prototype a).bin" size="32768" crc="6ccfee1f" sha1="5077f422e513877e9c4e3497111f853376748826"/>
+				<rom name="asterix (prototype a).bin" size="32768" crc="6ccfee1f" sha1="5077f422e513877e9c4e3497111f853376748826" />
 			</dataarea>
 		</part>
 	</software>
@@ -1249,7 +1262,7 @@ license:CC0
 		<publisher>Accolade</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="asteroids (prototype).bin" size="32768" crc="eb31e472" sha1="28f4e2a076bfe5f7a77f695332705ea0085fccfb"/>
+				<rom name="asteroids (prototype).bin" size="32768" crc="eb31e472" sha1="28f4e2a076bfe5f7a77f695332705ea0085fccfb" />
 			</dataarea>
 		</part>
 	</software>
@@ -1569,7 +1582,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="barbie - game girl (prototype).bin" size="131072" crc="4660e0ab" sha1="24886a5f26f1969e595f420bf963439ba6a693bd"/>
+				<rom name="barbie - game girl (prototype).bin" size="131072" crc="4660e0ab" sha1="24886a5f26f1969e595f420bf963439ba6a693bd" />
 			</dataarea>
 		</part>
 	</software>
@@ -1926,7 +1939,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="battle ships (prototype).bin" size="131072" crc="1f8ccb71" sha1="4c04f79c670661fa46b17f7f980e6e7e88e886e7"/>
+				<rom name="battle ships (prototype).bin" size="131072" crc="1f8ccb71" sha1="4c04f79c670661fa46b17f7f980e6e7e88e886e7" />
 			</dataarea>
 		</part>
 	</software>
@@ -2417,7 +2430,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="blaster master boy (prototype).bin" size="131072" crc="4ea70173" sha1="f568f9c7fe9ef9726d602727beca13d6978cd770"/>
+				<rom name="blaster master boy (prototype).bin" size="131072" crc="4ea70173" sha1="f568f9c7fe9ef9726d602727beca13d6978cd770" />
 			</dataarea>
 		</part>
 	</software>
@@ -2494,7 +2507,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="bluesbrothers.bin" size="131072" crc="1f90d12a" sha1="f7139bb55c3cc7bae672ade9022fb548b72f6f2f"/>
+				<rom name="bluesbrothers.bin" size="131072" crc="1f90d12a" sha1="f7139bb55c3cc7bae672ade9022fb548b72f6f2f" />
 			</dataarea>
 		</part>
 	</software>
@@ -2606,7 +2619,7 @@ license:CC0
 			<feature name="slot" value="rom_mbc3" />
 			<feature name="rtc" value="yes" />
 			<dataarea name="rom" size="524288">
-				<rom name="dmg-bywj-0.u1" size="524288" crc="0424df85" sha1="551df2021d0e433e7f07cf881c7b1d534f54f6ad"/>
+				<rom name="dmg-bywj-0.u1" size="524288" crc="0424df85" sha1="551df2021d0e433e7f07cf881c7b1d534f54f6ad" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -2631,7 +2644,7 @@ license:CC0
 		<publisher>Infogrames</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="bomb jack (prototype a).bin" size="32768" crc="7ca8e543" sha1="6fc3794149f5e75ad82b4a7d47ad5497e1ee4e6a"/>
+				<rom name="bomb jack (prototype a).bin" size="32768" crc="7ca8e543" sha1="6fc3794149f5e75ad82b4a7d47ad5497e1ee4e6a" />
 			</dataarea>
 		</part>
 	</software>
@@ -2642,7 +2655,7 @@ license:CC0
 		<publisher>Infogrames</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="bomb jack (prototype b).bin" size="32768" crc="ffa0e67a" sha1="a4c25218b2c35d6bd4fcf93ebdf81dfe22d4259a"/>
+				<rom name="bomb jack (prototype b).bin" size="32768" crc="ffa0e67a" sha1="a4c25218b2c35d6bd4fcf93ebdf81dfe22d4259a" />
 			</dataarea>
 		</part>
 	</software>
@@ -2799,7 +2812,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="bonk's adventure (prototype).bin" size="262144" crc="8d706dbc" sha1="a26006158d90a61d22abf130f05297fd09a09b7c"/>
+				<rom name="bonk's adventure (prototype).bin" size="262144" crc="8d706dbc" sha1="a26006158d90a61d22abf130f05297fd09a09b7c" />
 			</dataarea>
 		</part>
 	</software>
@@ -2931,7 +2944,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="32768">
-				<rom name="dmg-soe-0.u1" size="32768" crc="24843867" sha1="3e169f1db16cc1c3ffbc8645aa7ce28194033d26"/>
+				<rom name="dmg-soe-0.u1" size="32768" crc="24843867" sha1="3e169f1db16cc1c3ffbc8645aa7ce28194033d26" />
 			</dataarea>
 		</part>
 	</software>
@@ -3175,7 +3188,7 @@ license:CC0
 		<publisher>FCI</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="bubble ghost (prototype).bin" size="32768" crc="4a083f6f" sha1="f5d063c70cecadda43d27d0c24f561a8f32b10f2"/>
+				<rom name="bubble ghost (prototype).bin" size="32768" crc="4a083f6f" sha1="f5d063c70cecadda43d27d0c24f561a8f32b10f2" />
 			</dataarea>
 		</part>
 	</software>
@@ -3717,7 +3730,7 @@ license:CC0
 		<publisher>Asmik</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="catrap-gb-prototype.bin" size="32768" crc="ca3bc888" sha1="928b9b3cb2ed5e6d6fc754679b3c994f7ed803c3"/>
+				<rom name="catrap-gb-prototype.bin" size="32768" crc="ca3bc888" sha1="928b9b3cb2ed5e6d6fc754679b3c994f7ed803c3" />
 			</dataarea>
 		</part>
 	</software>
@@ -3894,7 +3907,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
-				<rom name="the chessmaster (prototype).bin" size="65536" crc="80ac42ce" sha1="4f750f3f650b197c48188afbce154d0d98c89b52"/>
+				<rom name="the chessmaster (prototype).bin" size="65536" crc="80ac42ce" sha1="4f750f3f650b197c48188afbce154d0d98c89b52" />
 			</dataarea>
 		</part>
 	</software>
@@ -4429,7 +4442,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="cosmo tank (us prototype).bin" size="131072" crc="1c6770f0" sha1="863bf21877b5f5993b9e64710f304b8db194d2e7"/>
+				<rom name="cosmo tank (us prototype).bin" size="131072" crc="1c6770f0" sha1="863bf21877b5f5993b9e64710f304b8db194d2e7" />
 			</dataarea>
 		</part>
 	</software>
@@ -4798,7 +4811,7 @@ license:CC0
 	<software name="darkwing">
 		<description>Disney's Darkwing Duck (Australia, Europe)</description>
 		<year>1993</year>
-		<publisher>Sunsoft</publisher>
+		<publisher>Capcom</publisher>
 		<info name="serial" value="DMG-DC-AUS, DMG-DC-UKV" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" /> <!-- Also found with DMG-BEAN-10 -->
@@ -4814,7 +4827,7 @@ license:CC0
 	<software name="darkwingg" cloneof="darkwing">
 		<description>Disney's Darkwing Duck (Germany)</description>
 		<year>1993</year>
-		<publisher>Sunsoft</publisher>
+		<publisher>Capcom</publisher>
 		<info name="serial" value="DMG-DC-NOE" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />
@@ -4830,7 +4843,7 @@ license:CC0
 	<software name="darkwings" cloneof="darkwing">
 		<description>Disney's Darkwing Duck (Spain)</description>
 		<year>1993</year>
-		<publisher>Sunsoft</publisher>
+		<publisher>Capcom</publisher>
 		<info name="serial" value="DMG-DC-ESP" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
@@ -4840,10 +4853,22 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="darkwingp" cloneof="darkwing">
+		<description>Disney's Darkwing Duck (prototype)</description>
+		<year>1993</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="131072">
+				<rom name="dwd-24.u1" size="131072" crc="311ade03" sha1="2883b8854529369cce4d473e71fa0193c7df02b6" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="darkwingu" cloneof="darkwing">
 		<description>Disney's Darkwing Duck (USA)</description>
 		<year>1993</year>
-		<publisher>Sunsoft</publisher>
+		<publisher>Capcom</publisher> <!-- A Sunsoft version exists with serial DMG-DC-USA-1. TODO: check if the dump differs. -->
 		<info name="serial" value="DMG-DC-USA" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />
@@ -4909,6 +4934,18 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="deathtrk" supported="no">
+		<description>Death Track (prototype)</description>
+		<year>1992</year>
+		<publisher>Argonaut Software</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="131072">
+				<rom name="death track (prototype).bin" size="131072" crc="6ca1c78e" sha1="2b5547522d34bc1c63d853fcf6e833c720bae80a" /> <!-- Trimmed from 512K overdump that repeats 4x -->
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dennis">
 		<description>Dennis (Europe)</description>
 		<year>1994</year>
@@ -4918,6 +4955,18 @@ license:CC0
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="dennis (europe).bin" size="131072" crc="896a30a8" sha1="9b5c289f25829534020951f84732177036837aea" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennisp" cloneof="dennis">
+		<description>Dennis (Europe, prototype)</description>
+		<year>1993</year>
+		<publisher>Ocean</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="131072">
+				<rom name="dennis.bin" size="131072" crc="807d34a4" sha1="fab382a28f9d7fefae7dc9a16bf86f309d89e037" />
 			</dataarea>
 		</part>
 	</software>
@@ -5641,6 +5690,18 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="drfranknp" cloneof="drfrankn">
+		<description>Dr. Franken (Europe, prototype)</description>
+		<year>1992</year>
+		<publisher>Elite</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="262144">
+				<rom name="dr. franken.bin" size="262144" crc="a65adc31" sha1="440eb30e54bf257246923149d44bab3dfafed2aa" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="drfranknj" cloneof="drfrankn">
 		<description>Dr. Franken (Japan)</description>
 		<year>1992</year>
@@ -5943,7 +6004,7 @@ license:CC0
 		<publisher>Mindscape</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="dropzone (prototype).bin" size="131072" crc="374f80b0" sha1="ac64c854dfea6387f262a2870f85c369d2cd14f5"/> <!-- Is this an overdump or was this really on a 0xFF-padded 128K ROM? -->
+				<rom name="dropzone (prototype).bin" size="131072" crc="374f80b0" sha1="ac64c854dfea6387f262a2870f85c369d2cd14f5" /> <!-- Is this an overdump or was this really on a 0xFF-padded 128K ROM? -->
 			</dataarea>
 		</part>
 	</software>
@@ -6161,6 +6222,18 @@ license:CC0
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="earthworm jim (usa).bin" size="262144" crc="259ff267" sha1="f5d3085de17a5181c07739e49be7637faa5ff932" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eddiespt">
+		<description>Eddie's Puzzle Time (prototype)</description>
+		<year>1994</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="65536">
+				<rom name="eddies.bin" size="65536" crc="f2600f02" sha1="cd2695295831737d0f8a7eb825bbfe870b9c0bfd" />
 			</dataarea>
 		</part>
 	</software>
@@ -6516,7 +6589,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="dmg-f2e-0.u1" size="131072" crc="a9ba7875" sha1="25bf89b112c9b134b2e4d07354d1a762ab0d4e92"/>
+				<rom name="dmg-f2e-0.u1" size="131072" crc="a9ba7875" sha1="25bf89b112c9b134b2e4d07354d1a762ab0d4e92" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -6543,7 +6616,7 @@ license:CC0
 	<software name="felix">
 		<description>Felix the Cat (Europe, USA)</description>
 		<year>1993</year>
-		<publisher>Electro Brain</publisher>
+		<publisher>Hudson Soft / Electro Brain</publisher>
 		<info name="serial" value="DMG-C6-USA, DMG-C6-NOE" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
@@ -6552,6 +6625,18 @@ license:CC0
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="dmg-c6e-0.u1" size="131072" crc="f53f7f00" sha1="c4a0d02d5964335a18839c7c30ac05b6f40c33b3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="felixp" cloneof="felix">
+		<description>Felix the Cat (prototype)</description>
+		<year>1993</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="131072">
+				<rom name="felix.bin" size="131072" crc="b1734088" sha1="66fe01233643fb63e758d1f2e9932f63d545e288" />
 			</dataarea>
 		</part>
 	</software>
@@ -7567,7 +7652,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="dmg-rae-1.u1" size="131072" crc="b86ef7a5" sha1="21fbe39014ffed80d0de2092517522d3cb9b03f9"/>
+				<rom name="dmg-rae-1.u1" size="131072" crc="b86ef7a5" sha1="21fbe39014ffed80d0de2092517522d3cb9b03f9" />
 			</dataarea>
 		</part>
 	</software>
@@ -7621,7 +7706,7 @@ license:CC0
 			<feature name="battery" value="Batt CR2035" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="gauntlet2.bin" size="262144" crc="965bbe1f" sha1="53e6162e9276318f357a1e2e5bd706d4e4fd47d2"/>
+				<rom name="gauntlet2.bin" size="262144" crc="965bbe1f" sha1="53e6162e9276318f357a1e2e5bd706d4e4fd47d2" />
 			</dataarea>
 		</part>
 	</software>
@@ -7935,7 +8020,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="ghostbusters ii (prototype).bin" size="131072" crc="41423376" sha1="c96b152f5351eeec19e1b020c9e0d51d582e2e8c"/>
+				<rom name="ghostbusters ii (prototype).bin" size="131072" crc="41423376" sha1="c96b152f5351eeec19e1b020c9e0d51d582e2e8c" />
 			</dataarea>
 		</part>
 	</software>
@@ -8268,7 +8353,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="dmg-bq2j-0.u1" size="1048576" crc="180d54a7" sha1="7dce0adcbac61f0caae33646847fd06ced8c8b67"/>
+				<rom name="dmg-bq2j-0.u1" size="1048576" crc="180d54a7" sha1="7dce0adcbac61f0caae33646847fd06ced8c8b67" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -8307,7 +8392,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="dmg-bc6j-0.u1" size="1048576" crc="04214f92" sha1="6b8726c69a31e674a4c5ab02631de073d42e7d52"/>
+				<rom name="dmg-bc6j-0.u1" size="1048576" crc="04214f92" sha1="6b8726c69a31e674a4c5ab02631de073d42e7d52" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -9459,6 +9544,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="hookup" cloneof="hook">
+		<!-- Identical to the release ROM save for its two-byte checksum, which is swapped (and hence bad) -->
+		<description>Hook (USA, prototype)</description>
+		<year>1992</year>
+		<publisher>Sony Imagesoft</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="131072">
+				<rom name="hook.u1" size="131072" crc="c091abc8" sha1="0299d84e5f722e9298c1ce190b8e4a785849b868" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kirbyj" cloneof="kirby">
 		<!-- Also released via the Nintendo Power service in 2000-03 -->
 		<description>Hoshi no Kirby (Japan, Rev 1)</description>
@@ -9718,7 +9816,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="32768">
-				<rom name="dmg-hla-0.u1" size="32768" crc="3fc21b74" sha1="37d0f2cbac0f95af8b22dea0c882612681ec5cc8"/>
+				<rom name="dmg-hla-0.u1" size="32768" crc="3fc21b74" sha1="37d0f2cbac0f95af8b22dea0c882612681ec5cc8" />
 			</dataarea>
 		</part>
 	</software>
@@ -10515,7 +10613,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="jimmy connors tennis (prototype).bin" size="131072" crc="eb50caf2" sha1="4ca04a3270e217d54d8c5fa7a254fdbcb48c5b87"/>
+				<rom name="jimmy connors tennis (prototype).bin" size="131072" crc="eb50caf2" sha1="4ca04a3270e217d54d8c5fa7a254fdbcb48c5b87" />
 			</dataarea>
 		</part>
 	</software>
@@ -10566,6 +10664,18 @@ license:CC0
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="dmg-jmx-0.u1" size="262144" crc="9bd7f196" sha1="88ae07382560825b7cf9307d224938d3a0a89f8d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="joemacp" cloneof="joemac">
+		<description>Joe &amp; Mac - Caveman Ninja (Europe, prototype)</description>
+		<year>1992</year>
+		<publisher>Elite</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="262144">
+				<rom name="caveman ninja.bin" size="262144" crc="381c62ee" sha1="979e36765291153b82025b1f036c08fe9c23cfa5" status="baddump" /> <!-- Trimmed from an 8MB overdump. Needs confirmed. -->
 			</dataarea>
 		</part>
 	</software>
@@ -10732,7 +10842,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="dmg-ajge-0.u1" size="262144" crc="7a8cdbe8" sha1="ea8b7a5d8d16b4448a3d758fff1f91f27db60292"/>
+				<rom name="dmg-ajge-0.u1" size="262144" crc="7a8cdbe8" sha1="ea8b7a5d8d16b4448a3d758fff1f91f27db60292" />
 			</dataarea>
 		</part>
 	</software>
@@ -11001,7 +11111,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="dmg-akrj-1.u1" size="524288" crc="7c94197c" sha1="5759394e2e8bfd68ccf5519362572daaba003573"/>
+				<rom name="dmg-akrj-1.u1" size="524288" crc="7c94197c" sha1="5759394e2e8bfd68ccf5519362572daaba003573" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -11387,7 +11497,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size = "131072">
-				<rom name="dmg-onj-1.u1" size="131072" crc="aaf6366c" sha1="298965bc2b99e49339618914114abfd0962560c1" offset="0"/>
+				<rom name="dmg-onj-1.u1" size="131072" crc="aaf6366c" sha1="298965bc2b99e49339618914114abfd0962560c1" offset="0" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -11677,7 +11787,7 @@ license:CC0
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="klustar (early prototype).bin" size="32768" crc="279dd6cc" sha1="6a5e51bfb4d989fb31f5ed6572d08e5a8b703a8d"/>
+				<rom name="klustar (early prototype).bin" size="32768" crc="279dd6cc" sha1="6a5e51bfb4d989fb31f5ed6572d08e5a8b703a8d" />
 			</dataarea>
 		</part>
 	</software>
@@ -12015,7 +12125,7 @@ license:CC0
   DMG  C9EA
   V.NO. 0.0   9/18
 -->
-				<rom name="kung-fu master.bin" size="65536" crc="e0c33c1a" sha1="1ce6301d56294b71068514c666ad2157551134e7"/>
+				<rom name="kung-fu master.bin" size="65536" crc="e0c33c1a" sha1="1ce6301d56294b71068514c666ad2157551134e7" />
 			</dataarea>
 		</part>
 	</software>
@@ -12131,7 +12241,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="the lawnmower man (prototype).bin" size="131072" crc="1cac0775" sha1="589eedd3919dd29cbdf6fd9c2fa6b4f1c258fc97"/>
+				<rom name="the lawnmower man (prototype).bin" size="131072" crc="1cac0775" sha1="589eedd3919dd29cbdf6fd9c2fa6b4f1c258fc97" />
 			</dataarea>
 		</part>
 	</software>
@@ -12391,6 +12501,18 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="lemmingsp" cloneof="lemmings">
+		<description>Lemmings (prototype)</description>
+		<year>1993</year>
+		<publisher>Ocean</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="131072">
+				<rom name="lemmings dmg 19.5.93 1b9b.u1" size="131072" crc="e2a65174" sha1="4f23d9dcc315f5dbd5ef2350f6623b6cd077b393" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lemmingsu" cloneof="lemmings">
 		<description>Lemmings (USA)</description>
 		<year>1993</year>
@@ -12441,7 +12563,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="lethal weapon (prototype).bin" size="131072" crc="d585ab23" sha1="2221ba322acffc9d7ae5400752e16d0455fda3ef"/>
+				<rom name="lethal weapon (prototype).bin" size="131072" crc="d585ab23" sha1="2221ba322acffc9d7ae5400752e16d0455fda3ef" />
 			</dataarea>
 		</part>
 	</software>
@@ -12664,7 +12786,7 @@ license:CC0
 		<publisher>Mindscape</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="loopz (prototype).bin" size="32768" crc="15e28642" sha1="01f87439294a2a06604ae0fd41df203713460510"/>
+				<rom name="loopz (prototype).bin" size="32768" crc="15e28642" sha1="01f87439294a2a06604ae0fd41df203713460510" />
 			</dataarea>
 		</part>
 	</software>
@@ -13586,6 +13708,18 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="megaman3us" cloneof="megaman3">
+		<description>Mega Man III (USA, sample)</description>
+		<year>1992</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="262144">
+				<rom name="mm3 35sample.u1" size="262144" crc="82f4c095" sha1="7eea8a96bf64537b041b96ce2cb5dd13cdebb789" /> <!-- original label: MM3 35サンプル -->
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="megaman4">
 		<description>Mega Man IV (Europe)</description>
 		<year>1994</year>
@@ -13748,7 +13882,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="metal masters (prototype).bin" size="131072" crc="3378064b" sha1="572c820f7ec7a3c96df9af441da244befa5223b9"/>
+				<rom name="metal masters (prototype).bin" size="131072" crc="3378064b" sha1="572c820f7ec7a3c96df9af441da244befa5223b9" />
 			</dataarea>
 		</part>
 	</software>
@@ -13888,7 +14022,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="dmg-i5j-1.u1" size="131072" crc="464eaa5d" sha1="095285ec078124e3a4cbbfa3ac0d7680ee491e2b"/>
+				<rom name="dmg-i5j-1.u1" size="131072" crc="464eaa5d" sha1="095285ec078124e3a4cbbfa3ac0d7680ee491e2b" />
 			</dataarea>
 		</part>
 	</software>
@@ -13962,7 +14096,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="mickey's ultimate challenge (nov 12, 1993 prototype).bin" size="131072" crc="3fac2661" sha1="e6809004a3af32235e55a300f53b421a00c57b98"/>
+				<rom name="mickey's ultimate challenge (nov 12, 1993 prototype).bin" size="131072" crc="3fac2661" sha1="e6809004a3af32235e55a300f53b421a00c57b98" />
 			</dataarea>
 		</part>
 	</software>
@@ -14040,7 +14174,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="mighty morphin power rangers (prototype).bin" size="262144" crc="caab9ac9" sha1="be42f45d8038ce28461ed36ba9164854632aebe0"/>
+				<rom name="mighty morphin power rangers (prototype).bin" size="262144" crc="caab9ac9" sha1="be42f45d8038ce28461ed36ba9164854632aebe0" />
 			</dataarea>
 		</part>
 	</software>
@@ -14128,7 +14262,7 @@ license:CC0
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="mind bender (mar 4, 1991 prototype).bin" size="32768" crc="984ec5d6" sha1="235f61e7ccc6f9cffe6c30a0abc778f6745d3a5a"/>
+				<rom name="mind bender (mar 4, 1991 prototype).bin" size="32768" crc="984ec5d6" sha1="235f61e7ccc6f9cffe6c30a0abc778f6745d3a5a" />
 			</dataarea>
 		</part>
 	</software>
@@ -14684,7 +14818,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="monster max (apr 1, 1993 prototype).bin" size="131072" crc="e7723a39" sha1="8279a071d6871a38c644381fb1ecfc198e4e263d"/>
+				<rom name="monster max (apr 1, 1993 prototype).bin" size="131072" crc="e7723a39" sha1="8279a071d6871a38c644381fb1ecfc198e4e263d" />
 			</dataarea>
 		</part>
 	</software>
@@ -14808,6 +14942,18 @@ license:CC0
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="dmg-c9e-0.u1" size="262144" crc="90eb0929" sha1="59752879efaf2f271ce4b8a9d4a455056a2985d0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mkp" cloneof="mk">
+		<description>Mortal Kombat (prototype)</description>
+		<year>199?</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="262144">
+				<rom name="arhartle.bin" size="262144" crc="f22346a4" sha1="49f2ffe347758b6a34bfb149a94a867d77b2263e" status="baddump" /> <!-- bin comes from a trimmed overdump -->
 			</dataarea>
 		</part>
 	</software>
@@ -15112,7 +15258,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="dmg-amle-0.u1" size="524288" crc="bfcf71a1" sha1="7832fcc373ff752e757550079519b39583665c82"/>
+				<rom name="dmg-amle-0.u1" size="524288" crc="bfcf71a1" sha1="7832fcc373ff752e757550079519b39583665c82" />
 			</dataarea>
 		</part>
 	</software>
@@ -15158,7 +15304,7 @@ license:CC0
 			<feature name="u2" value="U2 [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="u1" size="131072" crc="004c1af7" sha1="82e058a7608a04a2837d0d8fe810270f804b43f3"/>
+				<rom name="u1" size="131072" crc="004c1af7" sha1="82e058a7608a04a2837d0d8fe810270f804b43f3" />
 			</dataarea>
 		</part>
 	</software>
@@ -15926,7 +16072,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="dmg-awjj-1.u1" size="524288" crc="7c5ffe52" sha1="14bc507f479e814b0131febfab19f2ef30eb23a5"/>
+				<rom name="dmg-awjj-1.u1" size="524288" crc="7c5ffe52" sha1="14bc507f479e814b0131febfab19f2ef30eb23a5" />
 			</dataarea>
 		</part>
 	</software>
@@ -16279,7 +16425,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="131072">
-				<rom name="ninja taro (prototype b).bin" size="131072" crc="f15b708a" sha1="602ba627007d37f7a2eb456102b3afa79d50ce2f"/>
+				<rom name="ninja taro (prototype b).bin" size="131072" crc="f15b708a" sha1="602ba627007d37f7a2eb456102b3afa79d50ce2f" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -16713,7 +16859,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="otto's ottifanten (prototype).bin" size="262144" crc="f23e5f91" sha1="22a18f5eb589347fa596432d249b0abca69aa93b"/>
+				<rom name="otto's ottifanten (prototype).bin" size="262144" crc="f23e5f91" sha1="22a18f5eb589347fa596432d249b0abca69aa93b" />
 			</dataarea>
 		</part>
 	</software>
@@ -16738,7 +16884,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="out of gas.bin" size="131072" crc="c3e365b4" sha1="ff90b89b413437b5e3360e28b6a62573619b4558"/>
+				<rom name="out of gas.bin" size="131072" crc="c3e365b4" sha1="ff90b89b413437b5e3360e28b6a62573619b4558" />
 			</dataarea>
 		</part>
 	</software>
@@ -16821,7 +16967,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="dmg-aptp-1.u1" size="262144" crc="7ff79df9" sha1="f30108b8e422c4b9776c90c884710194508545ea"/>
+				<rom name="dmg-aptp-1.u1" size="262144" crc="7ff79df9" sha1="f30108b8e422c4b9776c90c884710194508545ea" />
 			</dataarea>
 		</part>
 	</software>
@@ -17321,7 +17467,7 @@ license:CC0
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="dmg-agx-0.u1" size="131072" crc="ea9615b4" sha1="7ca64a45ea6a68770658ae39ef21c41f806988c5"/>
+				<rom name="dmg-agx-0.u1" size="131072" crc="ea9615b4" sha1="7ca64a45ea6a68770658ae39ef21c41f806988c5" />
 			</dataarea>
 		</part>
 	</software>
@@ -17333,7 +17479,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="pang.bin" size="131072" crc="54d2754a" sha1="b57d436d8a83f2fb1e42bad3150893ef8ffab0d4"/>
+				<rom name="pang.bin" size="131072" crc="54d2754a" sha1="b57d436d8a83f2fb1e42bad3150893ef8ffab0d4" />
 			</dataarea>
 		</part>
 	</software>
@@ -17683,7 +17829,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
-				<rom name="pinball - revenge of the 'gator (prototype).bin" size="65536" crc="048d3ab0" sha1="7f25663b3c1c15a3ee4f1bb719741823eea71ebb"/>
+				<rom name="pinball - revenge of the 'gator (prototype).bin" size="65536" crc="048d3ab0" sha1="7f25663b3c1c15a3ee4f1bb719741823eea71ebb" />
 			</dataarea>
 		</part>
 	</software>
@@ -18339,7 +18485,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="dmg-apyj-1.u1" size="262144" crc="cae8a317" sha1="36b677b76af12287cdbdec9ae06ca3f9dbfc1e67"/>
+				<rom name="dmg-apyj-1.u1" size="262144" crc="cae8a317" sha1="36b677b76af12287cdbdec9ae06ca3f9dbfc1e67" />
 			</dataarea>
 		</part>
 	</software>
@@ -18834,7 +18980,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="dmg-pgj-1.u1" size="131072" crc="8cd93719" sha1="7c4ac88e7a9f034da08ee84f299d9093e40213fd"/>
+				<rom name="dmg-pgj-1.u1" size="131072" crc="8cd93719" sha1="7c4ac88e7a9f034da08ee84f299d9093e40213fd" />
 			</dataarea>
 		</part>
 	</software>
@@ -18890,7 +19036,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="populous.bin" size="131072" crc="ecf2dd6f" sha1="76a08b4a0448641a263ce4dc65a2181192a0a621"/>
+				<rom name="populous.bin" size="131072" crc="ecf2dd6f" sha1="76a08b4a0448641a263ce4dc65a2181192a0a621" />
 			</dataarea>
 		</part>
 	</software>
@@ -19089,7 +19235,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="pop gb c811" size="131072" crc="c81ca14b" sha1="355709bd9d4b19be5ee57bd62a0b58b73b25e0bf"/>
+				<rom name="pop gb c811" size="131072" crc="c81ca14b" sha1="355709bd9d4b19be5ee57bd62a0b58b73b25e0bf" />
 			</dataarea>
 		</part>
 	</software>
@@ -19101,7 +19247,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="prince of persia.bin" size="131072" crc="e0aaad99" sha1="42b6dfbf283946998caa6c383fa70bf1b646217e"/>
+				<rom name="prince of persia.bin" size="131072" crc="e0aaad99" sha1="42b6dfbf283946998caa6c383fa70bf1b646217e" />
 			</dataarea>
 		</part>
 	</software>
@@ -19302,7 +19448,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
-				<rom name="dmg-appj-1.u1" size="524288" crc="57e9c17d" sha1="90929296b16d89130969041271327bcaa2b6a73e"/>
+				<rom name="dmg-appj-1.u1" size="524288" crc="57e9c17d" sha1="90929296b16d89130969041271327bcaa2b6a73e" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -19681,6 +19827,21 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="rtype2p" cloneof="rtype2">
+		<description>R-Type II (prototype)</description>
+		<year>1992</year>
+		<publisher>Irem</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMGC-MBC1-2M-EPROM1-01" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [DMG MBC1B]" />
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="131072">
+				<rom name="u1" size="131072" crc="e99fec8d" sha1="da727e9541c9885365651fc6eece3f0075a59fe4" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rtype2j" cloneof="rtype2">
 		<description>R-Type II (China, Japan)</description>
 		<year>1992</year>
@@ -19751,7 +19912,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="race drivin' (prototype).bin" size="131072" crc="8c217639" sha1="e1e7dce263d4a99ef04a7803f0e9bdc5d5dce2ed"/>
+				<rom name="race drivin' (prototype).bin" size="131072" crc="8c217639" sha1="e1e7dce263d4a99ef04a7803f0e9bdc5d5dce2ed" />
 			</dataarea>
 		</part>
 	</software>
@@ -20101,7 +20262,7 @@ license:CC0
 			<feature name="u2" value="U2 [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="bowe dmg.u1" size="131072" crc="a07512a6" sha1="69685eaffa523bf199be0c540d9eb561bb27d584"/>
+				<rom name="bowe dmg.u1" size="131072" crc="a07512a6" sha1="69685eaffa523bf199be0c540d9eb561bb27d584" />
 			</dataarea>
 		</part>
 	</software>
@@ -20512,7 +20673,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="dmg-vme-1.u1" size="262144" crc="fa955b39" sha1="678ea6ec765c467862be861d2c61fbb3a582c1f2"/>
+				<rom name="dmg-vme-1.u1" size="262144" crc="fa955b39" sha1="678ea6ec765c467862be861d2c61fbb3a582c1f2" />
 			</dataarea>
 		</part>
 	</software>
@@ -22611,7 +22772,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="star trek - the next generation (prototype).bin" size="131072" crc="89e73128" sha1="8366108fcf9e5cb0f95d221b5e9800e801cd9634"/>
+				<rom name="star trek - the next generation (prototype).bin" size="131072" crc="89e73128" sha1="8366108fcf9e5cb0f95d221b5e9800e801cd9634" />
 			</dataarea>
 		</part>
 	</software>
@@ -23653,7 +23814,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="dmg-fqj-0.u1" size="262144" crc="7fe42a7f" sha1="40f1280c87918307ebc2a3f2ec1ce9b66ff9a67b"/>
+				<rom name="dmg-fqj-0.u1" size="262144" crc="7fe42a7f" sha1="40f1280c87918307ebc2a3f2ec1ce9b66ff9a67b" />
 			</dataarea>
 		</part>
 	</software>
@@ -24086,7 +24247,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="tazmania.bin" size="131072" crc="c3d85ef6" sha1="b31f8ec2a330d57ec7736e405833508ca8a98700"/>
+				<rom name="tazmania.bin" size="131072" crc="c3d85ef6" sha1="b31f8ec2a330d57ec7736e405833508ca8a98700" />
 			</dataarea>
 		</part>
 	</software>
@@ -24185,7 +24346,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="dmg-k8x-1.u1" size="131072" crc="5b7c9a54" sha1="5f01016c06c7d52bb434540b9ca327abe5039936"/>
+				<rom name="dmg-k8x-1.u1" size="131072" crc="5b7c9a54" sha1="5f01016c06c7d52bb434540b9ca327abe5039936" />
 			</dataarea>
 		</part>
 	</software>
@@ -24240,7 +24401,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="teenage mutant ninja turtles ii - back from the sewers (may 20, 1991 prototype).bin" size="262144" crc="64a667a3" sha1="864a686f74a22ff8d27da511b08bbfbef1bd563d"/>
+				<rom name="teenage mutant ninja turtles ii - back from the sewers (may 20, 1991 prototype).bin" size="262144" crc="64a667a3" sha1="864a686f74a22ff8d27da511b08bbfbef1bd563d" />
 			</dataarea>
 		</part>
 	</software>
@@ -24280,7 +24441,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="teenage mutant ninja turtles ii - back from the sewers (prototype b).bin" size="262144" crc="ee25b752" sha1="7fd1df99ed3bc088c737f0ef8b7f0caa95d73b65"/>
+				<rom name="teenage mutant ninja turtles ii - back from the sewers (prototype b).bin" size="262144" crc="ee25b752" sha1="7fd1df99ed3bc088c737f0ef8b7f0caa95d73b65" />
 			</dataarea>
 		</part>
 	</software>
@@ -24433,7 +24594,7 @@ license:CC0
 		<publisher>GameTek</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="tesserae (prototype).bin" size="32768" crc="ca2a5bfa" sha1="46af203ac1b5b6690d85931845e3f0d9e8d47774"/>
+				<rom name="tesserae (prototype).bin" size="32768" crc="ca2a5bfa" sha1="46af203ac1b5b6690d85931845e3f0d9e8d47774" />
 			</dataarea>
 		</part>
 	</software>
@@ -24492,7 +24653,7 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="dmg-ehx-1.u1" size="131072" crc="25c3100a" sha1="51bdceed8fc384b593444a5306b6a46a4672c96b"/>
+				<rom name="dmg-ehx-1.u1" size="131072" crc="25c3100a" sha1="51bdceed8fc384b593444a5306b6a46a4672c96b" />
 			</dataarea>
 		</part>
 	</software>
@@ -24645,7 +24806,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tintinx">
+	<software name="tintina" cloneof="tintin">
 		<description>Tintin in Tibet (Europe, En / Es / It / Sv)</description>
 		<year>1994</year>
 		<publisher>Infogrames</publisher>
@@ -24654,12 +24815,25 @@ license:CC0
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="dmg-at6x-0.u1" size="262144" crc="7a7d820f" sha1="a69bee8c26a520b648a780c67e4a73d54e1bf812"/>
+				<rom name="dmg-at6x-0.u1" size="262144" crc="7a7d820f" sha1="a69bee8c26a520b648a780c67e4a73d54e1bf812" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="tintin" cloneof="tintinx">
+	<software name="tintinap" cloneof="tintin">
+		<description>Tintin in Tibet (Europe, En / Es / It / Sv, prototype)</description>
+		<year>1994</year>
+		<publisher>Infogrames</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="262144">
+				<rom name="tintin au tibet.bin" size="262144" crc="68b7fcf2" sha1="63070514f0a692cef70e9344ca0a973f6af510c9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tintin">
 		<description>Tintin in Tibet (Europe, En / Fr / De / Nl)</description>
 		<year>1994</year>
 		<publisher>Infogrames</publisher>
@@ -24708,7 +24882,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="tiny toon adventures - babs' big break (sep 6, 1991 prototype).bin" size="131072" crc="7bf96ca9" sha1="2d15917713d9f7ba62b6b54b4bd845617515e847"/>
+				<rom name="tiny toon adventures - babs' big break (sep 6, 1991 prototype).bin" size="131072" crc="7bf96ca9" sha1="2d15917713d9f7ba62b6b54b4bd845617515e847" />
 			</dataarea>
 		</part>
 	</software>
@@ -24720,7 +24894,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="tiny toon adventures - babs' big break (jul 16, 1991 prototype).bin" size="131072" crc="4e4a17b5" sha1="cb9753abd9f5ba69f310d7309a2a824caafa7f54"/>
+				<rom name="tiny toon adventures - babs' big break (jul 16, 1991 prototype).bin" size="131072" crc="4e4a17b5" sha1="cb9753abd9f5ba69f310d7309a2a824caafa7f54" />
 			</dataarea>
 		</part>
 	</software>
@@ -24932,7 +25106,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="tom and jerry - frantic antics (prototype).bin" size="131072" crc="4415cc6b" sha1="56dd5f7346ea60e6d5e081462c4fa73389777494"/>
+				<rom name="tom and jerry - frantic antics (prototype).bin" size="131072" crc="4415cc6b" sha1="56dd5f7346ea60e6d5e081462c4fa73389777494" />
 			</dataarea>
 		</part>
 	</software>
@@ -25271,7 +25445,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="triumph.bin" size="131072" crc="746159b2" sha1="90a40fc94709a3ec6945281bde2644d91bef28b5"/>
+				<rom name="triumph.bin" size="131072" crc="746159b2" sha1="90a40fc94709a3ec6945281bde2644d91bef28b5" />
 			</dataarea>
 		</part>
 	</software>
@@ -25684,7 +25858,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="131072">
-				<rom name="ultra golf (nov 20, 1991 prototype).bin" size="131072" crc="d9ddb091" sha1="b29e5da6f794a010d858f4398da85145f20d8c55"/>
+				<rom name="ultra golf (nov 20, 1991 prototype).bin" size="131072" crc="d9ddb091" sha1="b29e5da6f794a010d858f4398da85145f20d8c55" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -26408,7 +26582,7 @@ license:CC0
 			<feature name="u2" value="U2 [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="wordtris v6.bin" size="131072" crc="c2d7d11b" sha1="97544a78925f6bb095c7b2f14878b2e1467dc7d1"/>
+				<rom name="wordtris v6.bin" size="131072" crc="c2d7d11b" sha1="97544a78925f6bb095c7b2f14878b2e1467dc7d1" />
 			</dataarea>
 		</part>
 	</software>
@@ -26464,7 +26638,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="world beach volley - 1992 gb cup (prototype).bin" size="131072" crc="d654cbcd" sha1="011555cecb84616eb32f25c7db203bb82874292a"/>
+				<rom name="world beach volley - 1992 gb cup (prototype).bin" size="131072" crc="d654cbcd" sha1="011555cecb84616eb32f25c7db203bb82874292a" />
 			</dataarea>
 		</part>
 	</software>
@@ -27318,7 +27492,7 @@ license:CC0
 			<feature name="u2" value="U2 [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
-				<rom name="zoop.u1" size="65536" crc="7b440074" sha1="97a6ea993bf5b64e38e3bc0adaf5965b442c9cee"/>
+				<rom name="zoop.u1" size="65536" crc="7b440074" sha1="97a6ea993bf5b64e38e3bc0adaf5965b442c9cee" />
 			</dataarea>
 		</part>
 	</software>
