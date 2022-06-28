@@ -6353,13 +6353,6 @@ static INPUT_PORTS_START( thunderl )
 	PORT_DIPSETTING(      0xc000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x4000, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-
-	/* These are needed due to the memory map shared with Wit's */
-	PORT_START("P3")
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("P4") //Player 4
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( thunderlbl )
