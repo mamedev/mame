@@ -295,7 +295,7 @@ if (STANDALONE~=true) then
 				{ MAME_DIR .. "scripts/build/makedep.py", driverlist },
 				{
 					"@echo Building driver list...",
-					PYTHON .. " $(1) driverlist $(2) -f $(<) > $(@)"
+					PYTHON .. " $(1) -r " .. MAME_DIR .. " driverlist $(2) -f $(<) > $(@)"
 				}
 			},
 		}
@@ -310,7 +310,7 @@ if (STANDALONE~=true) then
 				{ MAME_DIR .. "scripts/build/makedep.py", driverlist },
 				{
 					"@echo Building driver list...",
-					PYTHON .. " $(1) driverlist $(2) -f $(<) > $(@)"
+					PYTHON .. " $(1) -r " .. MAME_DIR .. " driverlist $(2) -f $(<) > $(@)"
 				}
 			},
 		}
@@ -325,7 +325,7 @@ if (STANDALONE~=true) then
 				{ MAME_DIR .. "scripts/build/makedep.py", driverlist },
 				{
 					"@echo Building driver list...",
-					PYTHON .. " $(1) driverlist $(2) -f $(<) > $(@)"
+					PYTHON .. " $(1) -r " .. MAME_DIR .. " driverlist $(2) -f $(<) > $(@)"
 				}
 			},
 		}
@@ -337,7 +337,7 @@ if (STANDALONE~=true) then
 				{ MAME_DIR .. "scripts/build/makedep.py" },
 				{
 					"@echo Building driver list...",
-					PYTHON .. " $(1) driverlist $(<) > $(@)"
+					PYTHON .. " $(1) -r " .. MAME_DIR .. " driverlist $(<) > $(@)"
 				}
 			},
 		}
@@ -352,7 +352,7 @@ if (STANDALONE~=true) then
 				{ MAME_DIR .. "scripts/build/makedep.py" },
 				{
 					"@echo Building driver list...",
-					PYTHON .. " $(1) driverlist $(<) > $(@)"
+					PYTHON .. " $(1) -r " .. MAME_DIR .. " driverlist $(<) > $(@)"
 				}
 			},
 		}

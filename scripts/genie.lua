@@ -567,7 +567,7 @@ elseif (_OPTIONS["SOURCES"] == nil) and (_OPTIONS["SOURCEFILTER"] == nil) then
 		local driverlist = path.join(MAME_DIR, "src", _OPTIONS["target"], _OPTIONS["target"] .. ".lst")
 		local OUT_STR = os.outputof(
 			string.format(
-				"%s %s filterproject -r %s -t %s -f %s %s",
+				"%s %s -r %s filterproject -t %s -f %s %s",
 				PYTHON, makedep, MAME_DIR, _OPTIONS["subtarget"], subtargetfilter, driverlist))
 		load(OUT_STR)()
 	else
@@ -1442,7 +1442,7 @@ if _OPTIONS["SOURCES"] ~= nil then
 
 	local OUT_STR = os.outputof(
 		string.format(
-			"%s %s sourcesproject -r %s -t %s %s",
+			"%s %s -r %s sourcesproject -t %s %s",
 			PYTHON, makedep, MAME_DIR, _OPTIONS["subtarget"], sourceargs))
 	load(OUT_STR)()
 
@@ -1450,8 +1450,8 @@ if _OPTIONS["SOURCES"] ~= nil then
 	local driverfilter = path.join(GEN_DIR, _OPTIONS["target"], _OPTIONS["subtarget"] .. ".flt")
 	os.outputof(
 		string.format(
-			"%s %s sourcesfilter -l %s %s > %s",
-			PYTHON, makedep, driverlist, sourceargs, driverfilter))
+			"%s %s -r %s sourcesfilter -l %s %s > %s",
+			PYTHON, makedep, MAME_DIR, driverlist, sourceargs, driverfilter))
 elseif _OPTIONS["SOURCEFILTER"] ~= nil then
 	local driverfilter = path.join(MAME_DIR, _OPTIONS["SOURCEFILTER"])
 	if not os.isfile(driverfilter) then
@@ -1462,7 +1462,7 @@ elseif _OPTIONS["SOURCEFILTER"] ~= nil then
 	local driverlist = path.join(MAME_DIR, "src", _OPTIONS["target"], _OPTIONS["target"] .. ".lst")
 	local OUT_STR = os.outputof(
 		string.format(
-			"%s %s filterproject -r %s -t %s -f %s %s",
+			"%s %s -r %s filterproject -t %s -f %s %s",
 			PYTHON, makedep, MAME_DIR, _OPTIONS["subtarget"], driverfilter, driverlist))
 	load(OUT_STR)()
 end
