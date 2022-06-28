@@ -773,7 +773,7 @@ uint8_t mpu4_state::pia_ic5_porta_r()
 {
 	if (m_lamp_extender == LARGE_CARD_A)
 	{
-		if {m_overcurrent_detect)
+		if (m_overcurrent_detect)
 		{
 			if (m_lamp_sense && m_ic23_active)
 			{
