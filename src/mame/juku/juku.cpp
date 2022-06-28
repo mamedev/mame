@@ -155,7 +155,7 @@ void juku_state::bank_map(address_map &map)
 	map(0x1d800, 0x1ffff).bankr("rom_d800");
 	// memory mode 2
 	map(0x20000, 0x23fff).bankrw("ram_0000");
-	map(0x24000, 0x2bfff).rom().region("basic", 0);
+	map(0x24000, 0x2bfff).rom().region("extension", 0);
 	map(0x2c000, 0x2ffff).bankrw("ram_c000");
 	map(0x2d800, 0x2ffff).bankr("rom_d800");
 	// memory mode 3
@@ -464,7 +464,7 @@ void juku_state::fdc_data_w(uint8_t data)
 
 void juku_state::update_speaker()
 {
-	m_speaker->level_w(m_beep_state == 0 ? 0 : BIT(m_prev_porta, 4)+1);
+	m_speaker->level_w(m_beep_state << BIT(m_prev_porta, 4));
 }
 
 WRITE_LINE_MEMBER(juku_state::speaker_w)
@@ -575,8 +575,7 @@ void juku_state::machine_reset()
 	m_prev_porta = 0;
 	m_beep_state = 0;
 	m_fdc_cur_cmd = 0;
-	m_screen_x = 320;
-	m_screen_y = 240;
+	m_screen_x = 320, m_screen_y = 240;
 	for (int i=0; i<5; i++)
 		m_screen_cur_seq[i]=-1;
 }
@@ -688,15 +687,24 @@ void juku_state::juku(machine_config &config)
 //**************************************************************************
 
 ROM_START( juku )
-	ROM_REGION(0x4000, "maincpu", 0)
-	ROM_LOAD("jukurom0.bin", 0x0000, 0x2000, CRC(b26f5080) SHA1(db8bab6ff7143be890d6aaa25d10386dfdac3fc7))
-	ROM_LOAD("jukurom1.bin", 0x2000, 0x2000, CRC(b184e253) SHA1(d169acde61f643d7d0780cca0eeaf33ebdf75b92))
+	ROM_DEFAULT_BIOS("3.43m")
+	ROM_SYSTEM_BIOS(0, "3.43m", "RomBios 3.43m")
 
-	ROM_REGION(0x8000, "basic", 0)
-	ROM_LOAD("bas0.bin", 0x0000, 0x0800, CRC(c03996cd) SHA1(3c45537c2a1879998e5315b79eb44dcf7c007d69))
-	ROM_LOAD("bas1.bin", 0x0800, 0x0800, CRC(d8016869) SHA1(baef9e9c55171a9192bc13d48e3b45394c7780d9))
-	ROM_LOAD("bas2.bin", 0x1000, 0x0800, CRC(9a958621) SHA1(08baca27e1ccdb0a441706df267c1f82b82d56ab))
-	ROM_LOAD("bas3.bin", 0x1800, 0x0800, CRC(d4ffbf67) SHA1(bced7ff2420f630dbd4cd1c0c83481ed874869f1))
+	ROM_REGION(0x4000, "maincpu", 0)
+	// This is RomBios 3.43m from widespread Baltijets E5104 batch with
+	// identification: "EktaSoft '88  Serial #0037"
+	ROMX_LOAD("jukurom0.bin", 0x0000, 0x2000, CRC(b26f5080) SHA1(db8bab6ff7143be890d6aaa25d10386dfdac3fc7), ROM_BIOS(0))
+	ROMX_LOAD("jukurom1.bin", 0x2000, 0x2000, CRC(b184e253) SHA1(d169acde61f643d7d0780cca0eeaf33ebdf75b92), ROM_BIOS(0))
+
+	ROM_REGION(0x8000, "extension", 0)
+	// This is EKTA JBASIC cartridge from 1990, probably version 1.1
+	// from 14.09.1987, there is also version with HEX$ directive
+	// publised for running from EKDOS. E5101 test batch probably had
+	// JBASIC onboard with earlier RomBios 2.4/3.4 from 6.12.1987.
+	ROMX_LOAD("bas0.bin", 0x0000, 0x0800, CRC(c03996cd) SHA1(3c45537c2a1879998e5315b79eb44dcf7c007d69), ROM_BIOS(0))
+	ROMX_LOAD("bas1.bin", 0x0800, 0x0800, CRC(d8016869) SHA1(baef9e9c55171a9192bc13d48e3b45394c7780d9), ROM_BIOS(0))
+	ROMX_LOAD("bas2.bin", 0x1000, 0x0800, CRC(9a958621) SHA1(08baca27e1ccdb0a441706df267c1f82b82d56ab), ROM_BIOS(0))
+	ROMX_LOAD("bas3.bin", 0x1800, 0x0800, CRC(d4ffbf67) SHA1(bced7ff2420f630dbd4cd1c0c83481ed874869f1), ROM_BIOS(0))
 ROM_END
 
 } // Anonymous namespace

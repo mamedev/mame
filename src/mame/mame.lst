@@ -19393,7 +19393,7 @@ jubileep                        //
 @source:mattel/juicebox.cpp
 juicebox                        //
 
-@source:skeleton/juku.cpp
+@source:juku/juku.cpp
 juku                            //
 
 @source:misc/jungleyo.cpp
