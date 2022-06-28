@@ -5,11 +5,10 @@
 #include "mpu4_characteriser_pal.h"
 #include "mpu4_characteriser_pal_bwb.h"
 
-#include "bacta_datalogger.h"
-
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
+#include "machine/bacta_datalogger.h"
 #include "machine/mc68681.h"
 #include "machine/meters.h"
 #include "machine/nvram.h"

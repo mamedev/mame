@@ -6,7 +6,6 @@
 #pragma once
 
 #include "dc.h"
-#include "gdrom.h"
 
 #include "bus/ata/ataintf.h"
 #include "imagedev/chd_cd.h"

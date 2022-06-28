@@ -36,11 +36,10 @@
 
 #include "emu.h"
 
-#include "bacta_datalogger.h"
-
 #include "cpu/m68000/m68000.h"
 #include "formats/guab_dsk.h"
 #include "imagedev/floppy.h"
+#include "machine/bacta_datalogger.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"

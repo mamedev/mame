@@ -11,16 +11,14 @@
 
 ***************************************************************************/
 
-#include "tmap038.h"
-
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/okim6295.h"
+#include "video/tmap038.h"
 
 #include "emupal.h"
 #include "screen.h"
-#include "tilemap.h"
 
 class cave_state : public driver_device
 {

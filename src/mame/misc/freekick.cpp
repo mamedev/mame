@@ -109,8 +109,7 @@ TODO:
 #include "emu.h"
 #include "freekick.h"
 
-#include "mc8123.h"
-
+#include "cpu/z80/mc8123.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "sound/sn76496.h"

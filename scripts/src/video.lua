@@ -593,6 +593,30 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/k051316.h,VIDEOS["K051316"] = true
+--------------------------------------------------
+
+if (VIDEOS["K051316"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/k051316.cpp",
+		MAME_DIR .. "src/devices/video/k051316.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/k053936.h,VIDEOS["K053936"] = true
+--------------------------------------------------
+
+if (VIDEOS["K053936"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/k053936.cpp",
+		MAME_DIR .. "src/devices/video/k053936.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/lc7582.h,VIDEOS["LC7582"] = true
 --------------------------------------------------
 
@@ -997,6 +1021,18 @@ if (VIDEOS["TLC34076"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/tlc34076.cpp",
 		MAME_DIR .. "src/devices/video/tlc34076.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/tmap038.h,VIDEOS["TMAP038"] = true
+--------------------------------------------------
+
+if (VIDEOS["TMAP038"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/tmap038.cpp",
+		MAME_DIR .. "src/devices/video/tmap038.h",
 	}
 end
 
