@@ -272,7 +272,7 @@ void mpu4_state::lamp_extend_small(int data)
 void mpu4_state::lamp_extend_large(int data,int column,int active)
 {
 	m_lamp_sense = 0;
-	int bit7 = (data & 0x80)>>7;
+	int bit7 = BIT(data, 7);
 	if ( bit7 != m_last_b7 )
 	{
 		m_card_live = 1;
@@ -842,9 +842,9 @@ void mpu4_state::pia_ic5_porta_w(uint8_t data)
 		{
 			for(i=0; i<8; i++)
 			{
-				m_mpu4leds[((m_last_b7) << 6) | (m_input_strobe << 3) | i] = BIT(~data, i);
+				m_mpu4leds[(m_last_b7 << 6) | (m_input_strobe << 3) | i] = BIT(~data, i);
 			}
-			m_digits[((m_last_b7) << 3) | m_input_strobe] = ~data;
+			m_digits[(m_last_b7 << 3) | m_input_strobe] = ~data;
 		}
 		break;
 
