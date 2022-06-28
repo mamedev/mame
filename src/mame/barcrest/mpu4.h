@@ -652,7 +652,7 @@ protected:
 	bool m_overcurrent = false;
 	bool m_undercurrent = false;
 
-	bool m_overcurrent_detect = false;
+	bool m_overcurrent_detect = true;
 	bool m_undercurrent_detect = false;
 	bool m_dataport_loopback = false;
 
