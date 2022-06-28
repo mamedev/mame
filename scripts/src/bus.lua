@@ -3087,6 +3087,7 @@ end
 ---------------------------------------------------
 --
 --@src/devices/bus/nes_ctrl/ctrl.h,BUSES["NES_CTRL"] = true
+--@src/devices/bus/nes_ctrl/zapper_sensor.h,BUSES["NES_CTRL"] = true
 ---------------------------------------------------
 
 if (BUSES["NES_CTRL"]~=null) then
