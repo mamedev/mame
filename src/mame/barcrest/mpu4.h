@@ -547,7 +547,7 @@ protected:
 	// 0-63 are on PIA IC3 port A (always present)
 	// 64-127 are on PIA IC3 port B (always present)
 	// 128-132 136-140 144-148 152-156 160-164 168-172 176-180 184-188 are on small lamp extender
-	// 128-255 are on large lamp externders
+	// 128-255 are on large lamp extenders
 	output_finder<256> m_lamps;
 
 	// 0-63 are on PIA IC4 port A (always present)
@@ -581,10 +581,7 @@ protected:
 	int m_IC23GA = 0;
 
 	int m_reel_flag = 0;
-	int m_ic23_active = 0;
-	int m_led_lamp = 0;
-	int m_link7a_connected = 0;
-	int m_low_volt_detect_disable = 0;
+	bool m_ic23_active = false;
 	emu_timer *m_ic24_timer = nullptr;
 	int m_expansion_latch = 0;
 	int m_global_volume = 0;
@@ -618,6 +615,18 @@ protected:
 	int m_t3l = 0;
 	int m_t3h = 0;
 	uint8_t m_numbanks = 0;
+
+	bool m_link7a_connected = false;
+
+	bool m_overcurrent = false;
+	bool m_undercurrent = false;
+
+	bool m_overcurrent_detect = false;
+	bool m_undercurrent_detect = false;
+	bool m_dataport_loopback = false;
+
+	bool m_low_volt_detect = true;
+
 
 	static constexpr uint8_t reel_mux_table[8]= {0,4,2,6,1,5,3,7};//include 7, although I don't think it's used, this is basically a wire swap
 	static constexpr uint8_t reel_mux_table7[8]= {3,1,5,6,4,2,0,7};
