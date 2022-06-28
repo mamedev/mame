@@ -6691,7 +6691,8 @@ GAME_CUSTOM( 199?, m4typcl__d,  m4typcl,    "ntp02.p1",     0x0000, 0x020000, CR
 /*****************************************************************************************************************************************************************************
 *
 * Andy's Big Time Club
-* - large extender
+* - large extender (also needs additional segment displays hooking up?)
+* - coinlocks also different?
 *
 *****************************************************************************************************************************************************************************/
 
@@ -6699,21 +6700,33 @@ INPUT_PORTS_START( m4andybt )
 	PORT_INCLUDE( mpu4 )
 
 	PORT_MODIFY("BLACK1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Hi")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Lo")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER)   PORT_NAME("18")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER)   PORT_NAME("19")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER)   PORT_NAME("20")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON8) PORT_NAME("Take Beer Money")
+	// unclear if more buttons are used
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON9) PORT_NAME("B1:02")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_NAME("B1:04")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_NAME("B1:08")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_NAME("B1:10")
 
-	PORT_START("BLACK2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("24")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("25")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Cancel")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Hold 1")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Hold 2")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_NAME("Hold 3")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_NAME("Hold 4")
+	PORT_MODIFY("BLACK2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Cancel / Clear Hold")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Nudge 1 / Hold 1")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Nudge 2 / Hold 2")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Nudge 3 / Hold 3 / Hi")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Nudge 4 / Hold 4 / Lo")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_NAME("Exchange Feature")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_NAME("Collect")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_START1)
+
+	PORT_MODIFY("DIL2") // do all club machines have this here instead of the 'keys' ?
+	PORT_DIPNAME( 0x07, 0x05, "Stake / Jackpot (Club)" ) PORT_DIPLOCATION("DIL2:01,02,03") // layout is for 250, so use that
+	PORT_DIPSETTING(    0x00, "5p / 75 FBP" )
+	PORT_DIPSETTING(    0x01, "10p / 100 GBP" )
+	PORT_DIPSETTING(    0x02, "20p / 200 GBP" )
+	PORT_DIPSETTING(    0x03, "Dual" )
+	PORT_DIPSETTING(    0x04, "20p / 250 GBP" )
+	PORT_DIPSETTING(    0x05, "25p / 250 GBP" )
+	PORT_DIPSETTING(    0x06, "25p / 250 GBP (duplicate 1)" )
+	PORT_DIPSETTING(    0x07, "25p / 250 GBP (duplicate 2)" )	
 INPUT_PORTS_END
 
 void mpu4mod4oki_machines_state::init_m4andybt()
