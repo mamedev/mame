@@ -17549,6 +17549,7 @@ isld_vortex                     //
 
 @source:misc/istellar.cpp
 istellar                        // (c) 1983 Funai / Gakken
+istellar2                       // (c) 1984 Funai / Gakken
 
 @source:terminal/istrebiteli.cpp
 istreb                          //
