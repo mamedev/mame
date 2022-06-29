@@ -200,12 +200,11 @@ Reference of music tempo:
 
 #include "nmk004.h"
 
-#include "nmk112.h"
-
 #include "cpu/m68000/m68000.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "cpu/tlcs90/tlcs90.h"
 #include "cpu/z80/z80.h"
+#include "machine/nmk112.h"
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
 #include "sound/ymopn.h"

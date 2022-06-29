@@ -103,26 +103,10 @@ char manager_t::directory_separator() const
 	return 0; // Subdirectories not supported by default
 }
 
-void filesystem_t::format(const meta_data &meta)
-{
-	throw std::logic_error("format called on a filesystem not supporting it");
-}
-
-filesystem_t::dir_t filesystem_t::root()
-{
-	throw std::logic_error("root called on a filesystem not supporting it");
-}
-
-meta_data filesystem_t::metadata()
-{
-	throw std::logic_error("filesystem_t::metadata called on a filesystem not supporting it");
-}
-
 void fsblk_t::set_block_size(u32 block_size)
 {
 	m_block_size = block_size;
 }
-
 
 u8 *fsblk_t::iblock_t::offset(const char *function, u32 off, u32 size)
 {
@@ -374,45 +358,75 @@ std::string filesystem_t::trim_end_spaces(const std::string &str)
 	return str.substr(0, (std::string::npos != i) ? (i + 1) : 0);
 }
 
-filesystem_t::file_t filesystem_t::idir_t::file_create(const meta_data &info)
+meta_data filesystem_t::volume_metadata()
 {
-	throw std::logic_error("file_create called on a filesystem not supporting write");
+	return meta_data();
 }
 
-void filesystem_t::idir_t::file_delete(uint64_t key)
+err_t filesystem_t::volume_metadata_change(const meta_data &meta)
 {
-	throw std::logic_error("file_delete called on a filesystem not supporting write");
+	return ERR_UNSUPPORTED;
 }
 
-
-void filesystem_t::ifile_t::replace(const std::vector<u8> &data)
+std::pair<err_t, meta_data> filesystem_t::metadata(const std::vector<std::string> &path)
 {
-	throw std::logic_error("replace called on a filesystem not supporting write");
+	return std::make_pair(ERR_UNSUPPORTED, meta_data());
 }
 
-void filesystem_t::ifile_t::rsrc_replace(const std::vector<u8> &data)
+err_t filesystem_t::metadata_change(const std::vector<std::string> &path, const meta_data &meta)
 {
-	throw std::logic_error("rsrc_replace called on a filesystem not supporting write or resource forks");
+	return ERR_UNSUPPORTED;
 }
 
-void filesystem_t::ifile_t::metadata_change(const meta_data &info)
+std::pair<err_t, std::vector<dir_entry>> filesystem_t::directory_contents(const std::vector<std::string> &path)
 {
-	throw std::logic_error("metadata_change called on a filesystem not supporting write");
+	return std::make_pair(ERR_UNSUPPORTED, std::vector<dir_entry>());
 }
 
-void filesystem_t::idir_t::metadata_change(const meta_data &info)
+err_t filesystem_t::rename(const std::vector<std::string> &opath, const std::vector<std::string> &npath)
 {
-	throw std::logic_error("metadata_change called on a filesystem not supporting write");
+	return ERR_UNSUPPORTED;
 }
 
-void filesystem_t::metadata_change(const meta_data &info)
+err_t filesystem_t::remove(const std::vector<std::string> &path)
 {
-	throw std::logic_error("metadata_change called on a filesystem not supporting write");
+	return ERR_UNSUPPORTED;
 }
 
-std::vector<u8> filesystem_t::ifile_t::rsrc_read_all()
+err_t filesystem_t::dir_create(const std::vector<std::string> &path, const meta_data &meta)
 {
-	throw std::logic_error("rsrc_read_all called on a filesystem without resource forks");
+	return ERR_UNSUPPORTED;
 }
+
+err_t filesystem_t::file_create(const std::vector<std::string> &path, const meta_data &meta)
+{
+	return ERR_UNSUPPORTED;
+}
+
+std::pair<err_t, std::vector<u8>> filesystem_t::file_read(const std::vector<std::string> &path)
+{
+	return std::make_pair(ERR_UNSUPPORTED, std::vector<u8>());
+}
+
+err_t filesystem_t::file_write(const std::vector<std::string> &path, const std::vector<u8> &data)
+{
+	return ERR_UNSUPPORTED;
+}
+
+std::pair<err_t, std::vector<u8>> filesystem_t::file_rsrc_read(const std::vector<std::string> &path)
+{
+	return std::make_pair(ERR_UNSUPPORTED, std::vector<u8>());
+}
+
+err_t filesystem_t::file_rsrc_write(const std::vector<std::string> &path, const std::vector<u8> &data)
+{
+	return ERR_UNSUPPORTED;
+}
+
+err_t filesystem_t::format(const meta_data &meta)
+{
+	return ERR_UNSUPPORTED;
+}
+
 
 } // namespace fs

@@ -10,8 +10,7 @@ Many thanks to Olivier Galibert for the CPU identify effort ;-)
 TODO:
 - CPU core bugs?
 - Protection controls inputs;
-- Understand & fix EEPROM emulation;
-- Hangs during attract mode, eeprom or protection?
+- Hangs during attract mode due to unemulated PIC protection;
 - complete video HW (unknown bits and hblank);
 - 24Khz monitor isn't supported, it changes the resolution to 648 x 480 and
   changes the register 9 (raster lines x character lines) from 7 to 0xf.
@@ -61,8 +60,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_eeprom(*this, "eeprom")
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -71,8 +69,6 @@ public:
 	void init_hitpoker();
 
 private:
-	uint8_t m_sys_regs = 0;
-
 	uint8_t m_pic_data = 0;
 	std::unique_ptr<uint8_t[]> m_videoram;
 	std::unique_ptr<uint8_t[]> m_paletteram;
@@ -84,14 +80,13 @@ private:
 	void hitpoker_cram_w(offs_t offset, uint8_t data);
 	uint8_t hitpoker_paletteram_r(offs_t offset);
 	void hitpoker_paletteram_w(offs_t offset, uint8_t data);
-	uint8_t hitpoker_pic_r(offs_t offset);
-	void hitpoker_pic_w(offs_t offset, uint8_t data);
+	uint8_t hitpoker_pic_r();
+	void hitpoker_pic_w(uint8_t data);
 	virtual void video_start() override;
 	uint32_t screen_update_hitpoker(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<mc68hc11_cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<uint8_t> m_eeprom;
 	void hitpoker_map(address_map &map);
 };
 
@@ -190,30 +185,23 @@ void hitpoker_state::hitpoker_paletteram_w(offs_t offset, uint8_t data)
 }
 
 
-uint8_t hitpoker_state::hitpoker_pic_r(offs_t offset)
+uint8_t hitpoker_state::hitpoker_pic_r()
 {
 //  logerror("R\n");
 
-	if(offset == 0)
-	{
-		if(m_maincpu->pc() == 0x3143 ||
-			m_maincpu->pc() == 0x314e ||
-			m_maincpu->pc() == 0x3164 ||
-			m_maincpu->pc() == 0x3179)
-			return m_pic_data;
+	if(m_maincpu->pc() == 0x3143 ||
+		m_maincpu->pc() == 0x314e ||
+		m_maincpu->pc() == 0x3164 ||
+		m_maincpu->pc() == 0x3179)
+		return m_pic_data;
 
-		return (m_pic_data & 0x7f) | (m_pic_data & 0x40 ? 0x80 : 0x00);
-	}
-
-	return m_sys_regs;
+	return (m_pic_data & 0x7f) | (m_pic_data & 0x40 ? 0x80 : 0x00);
 }
 
-void hitpoker_state::hitpoker_pic_w(offs_t offset, uint8_t data)
+void hitpoker_state::hitpoker_pic_w(uint8_t data)
 {
-	if(offset == 0)
-		m_pic_data = (data & 0xff);// | (data & 0x40) ? 0x80 : 0x00;
+	m_pic_data = (data & 0xff);// | (data & 0x40) ? 0x80 : 0x00;
 //  logerror("%02x W\n",data);
-	m_sys_regs = data;
 }
 
 #if 0
@@ -230,7 +218,7 @@ void hitpoker_state::hitpoker_map(address_map &map)
 	map(0xbf00, 0xffff).rom();
 
 	map(0x8000, 0xb5ff).rw(FUNC(hitpoker_state::hitpoker_vram_r), FUNC(hitpoker_state::hitpoker_vram_w));
-	map(0xb600, 0xbdff).ram().share("eeprom");
+	map(0xb800, 0xbdff).ram();
 	map(0xbe00, 0xbe7f).rw("rtc", FUNC(ds17x85_device::read_direct), FUNC(ds17x85_device::write_direct));
 	map(0xbe80, 0xbe80).w("crtc", FUNC(mc6845_device::address_w));
 	map(0xbe81, 0xbe81).w("crtc", FUNC(mc6845_device::register_w));
@@ -395,15 +383,18 @@ void hitpoker_state::init_hitpoker()
 	ROM[0x10c7] = 0x01; //patch the checksum routine
 
 	// must match RTC serial number
-	m_eeprom[3] = 'M';
-	m_eeprom[2] = 'A';
-	m_eeprom[1] = 'M';
-	m_eeprom[0] = 'E';
 }
 
 ROM_START( hitpoker )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u4.bin",         0x00000, 0x10000, CRC(0016497a) SHA1(017320bfe05fea8a48e26a66c0412415846cee7c) )
+
+	ROM_REGION( 0x200, "maincpu:eeprom", ROMREGION_ERASEFF )
+	// must match RTC serial number
+	ROM_FILL( 0x003, 1, 0x4d )
+	ROM_FILL( 0x002, 1, 0x41 )
+	ROM_FILL( 0x001, 1, 0x4d )
+	ROM_FILL( 0x000, 1, 0x45 )
 
 	ROM_REGION( 0x10000, "pic", 0 )
 	ROM_LOAD( "pic",            0x00000, 0x1000, NO_DUMP ) // unknown type

@@ -593,7 +593,7 @@ uint32_t powerpc_disassembler::Mask(unsigned const mb, unsigned const me)
  * otherwise false to indicate disassembly should carry on as normal.
  */
 
-bool powerpc_disassembler::Simplified(uint32_t op, uint32_t vpc, std::string &signed16, std::string &mnem, std::string &oprs)
+bool powerpc_disassembler::Simplified(uint32_t op, uint32_t vpc, std::string &signed16, std::string &mnem, std::string &oprs, offs_t &flags)
 {
 	uint32_t  value, disp;
 
@@ -680,16 +680,20 @@ bool powerpc_disassembler::Simplified(uint32_t op, uint32_t vpc, std::string &si
 			case 0x04:  case 0x05:  case 0x06:  case 0x07:
 				mnem += "b";
 				mnem += crnbit[G_BI(op) & 3];
+				flags |= STEP_COND;
 				break;
 			case 0x0c:  case 0x0d:  case 0x0e:  case 0x0f:
 				mnem += "b";
 				mnem += crbit[G_BI(op) & 3];
+				flags |= STEP_COND;
 				break;
 			case 0x10:  case 0x11:  case 0x18:  case 0x19:
 				mnem += "bdnz";
+				flags |= STEP_COND;
 				break;
 			case 0x12:  case 0x13:  case 0x1a:  case 0x1b:
 				mnem += "bdz";
+				flags |= STEP_COND;
 				break;
 			case 0x14:  case 0x15:  case 0x16:  case 0x17:
 			case 0x1c:  case 0x1d:  case 0x1e:  case 0x1f:
@@ -699,7 +703,11 @@ bool powerpc_disassembler::Simplified(uint32_t op, uint32_t vpc, std::string &si
 				return false;
 		}
 
-		if (op & M_LK)  mnem += "l";
+		if (op & M_LK)
+		{
+			mnem += "l";
+			flags |= STEP_OVER;
+		}
 		if (op & M_AA)  mnem += "a";
 
 		if (!(G_BO(op) & 0x10) && G_BI(op) / 4 != 0)
@@ -714,16 +722,20 @@ bool powerpc_disassembler::Simplified(uint32_t op, uint32_t vpc, std::string &si
 			case 0x04:  case 0x05:  case 0x06:  case 0x07:
 				mnem += "b";
 				mnem += crnbit[G_BI(op) & 3];
+				flags |= STEP_COND;
 				break;
 			case 0x0c:  case 0x0d:  case 0x0e:  case 0x0f:
 				mnem += "b";
 				mnem += crbit[G_BI(op) & 3];
+				flags |= STEP_COND;
 				break;
 			case 0x10:  case 0x11:  case 0x18:  case 0x19:
 				mnem += "bdnz";
+				flags |= STEP_COND;
 				break;
 			case 0x12:  case 0x13:  case 0x1a:  case 0x1b:
 				mnem += "bdz";
+				flags |= STEP_COND;
 				break;
 			case 0x14:  case 0x15:  case 0x16:  case 0x17:
 			case 0x1c:  case 0x1d:  case 0x1e:  case 0x1f:
@@ -733,8 +745,19 @@ bool powerpc_disassembler::Simplified(uint32_t op, uint32_t vpc, std::string &si
 				return false;
 		}
 
-		mnem += (G_XO(op) == 528) ? "ctr" : "lr";
-		if (op & M_LK)  mnem += "l";
+		if (G_XO(op) == 528)
+			mnem += "ctr";
+		else
+		{
+			mnem += "lr";
+			if (!(op & M_LK))
+				flags |= STEP_OUT;
+		}
+		if (op & M_LK)
+		{
+			mnem += "l";
+			flags |= STEP_OVER;
+		}
 		if (op & M_AA)  mnem += "a";
 
 		if (!(G_BO(op) & 0x10) && G_BI(op) / 4 != 0)
@@ -777,7 +800,7 @@ offs_t powerpc_disassembler::dasm_one(std::ostream &stream, uint32_t pc, uint32_
 	 * Try simplified forms first, then real instructions
 	 */
 
-	if( Simplified(op, pc, signed16, mnem, oprs) ) {
+	if( Simplified(op, pc, signed16, mnem, oprs, flags) ) {
 		util::stream_format(stream, "%s", mnem);
 		for( j = mnem.size(); j < 10; j++ ) {
 			util::stream_format(stream, " ");

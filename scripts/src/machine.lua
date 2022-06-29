@@ -5020,6 +5020,28 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/bacta_datalogger.h,MACHINES["BACTA_DATALOGGER"] = true
+---------------------------------------------------
+if (MACHINES["BACTA_DATALOGGER"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/bacta_datalogger.cpp",
+		MAME_DIR .. "src/devices/machine/bacta_datalogger.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/nmk112.h,MACHINES["NMK112"] = true
+---------------------------------------------------
+if (MACHINES["NMK112"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/nmk112.cpp",
+		MAME_DIR .. "src/devices/machine/nmk112.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/saa7191.h,MACHINES["SAA7191"] = true
 ---------------------------------------------------
 if (MACHINES["SAA7191"]~=null) then

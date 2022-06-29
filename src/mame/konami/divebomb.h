@@ -15,7 +15,7 @@
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
 #include "sound/sn76496.h"
-#include "k051316.h"
+#include "video/k051316.h"
 #include "emupal.h"
 #include "tilemap.h"
 

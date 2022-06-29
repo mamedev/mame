@@ -748,11 +748,13 @@ void output_one(std::ostream &out, driver_enumerator &drivlist, const game_drive
 	util::stream_format(out, "\t<%s name=\"%s\"", XML_TOP, normalize_string(driver.name));
 
 	// strip away any path information from the source_file and output it
-	const char *start = strrchr(driver.type.source(), '/');
-	if (!start)
-		start = strrchr(driver.type.source(), '\\');
-	start = start ? (start + 1) : driver.type.source();
-	util::stream_format(out, " sourcefile=\"%s\"", normalize_string(start));
+	std::string_view src(driver.type.source());
+	auto prefix(src.find("src/mame/"));
+	if (std::string_view::npos == prefix)
+		prefix = src.find("src\\mame\\");
+	if (std::string_view::npos != prefix)
+		src.remove_prefix(prefix + 9);
+	util::stream_format(out, " sourcefile=\"%s\"", normalize_string(src));
 
 	// append bios and runnable flags
 	if (driver.flags & machine_flags::IS_BIOS_ROOT)
@@ -844,8 +846,12 @@ void output_one_device(std::ostream &out, machine_config &config, device_t &devi
 
 	// start to output info
 	util::stream_format(out, "\t<%s name=\"%s\"", XML_TOP, normalize_string(device.shortname()));
-	std::string src(device.source());
-	strreplace(src,"../", "");
+	std::string_view src(device.source());
+	auto prefix(src.find("src/"));
+	if (std::string_view::npos == prefix)
+		prefix = src.find("src\\");
+	if (std::string_view::npos != prefix)
+		src.remove_prefix(prefix + 4);
 	util::stream_format(out, " sourcefile=\"%s\" isdevice=\"yes\" runnable=\"no\"", normalize_string(src));
 	auto const parent(device.type().parent_rom_device_type());
 	if (parent)

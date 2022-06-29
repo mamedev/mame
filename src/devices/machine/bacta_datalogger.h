@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:James Wallace
-#ifndef MAME_BACTA_DATALOGGER_H
-#define MAME_BACTA_DATALOGGER_H
+#ifndef MAME_MACHINE_BACTA_DATALOGGER_H
+#define MAME_MACHINE_BACTA_DATALOGGER_H
 
 #include "diserial.h"
 
@@ -36,4 +36,4 @@ private:
 
 DECLARE_DEVICE_TYPE(BACTA_DATALOGGER, bacta_datalogger_device)
 
-#endif // MAME_BACTA_DATALOGGER_H
+#endif // MAME_MACHINE_BACTA_DATALOGGER_H

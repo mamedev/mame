@@ -14,7 +14,7 @@
 #include "k052109.h"
 #include "k051960.h"
 #include "k053251.h"
-#include "k053936.h"
+#include "video/k053936.h"
 #include "k054000.h"
 #include "konami_helper.h"
 #include "emupal.h"

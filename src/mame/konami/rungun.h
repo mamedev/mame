@@ -13,7 +13,7 @@
 #include "sound/k054539.h"
 #include "machine/k053252.h"
 #include "k053246_k053247_k055673.h"
-#include "k053936.h"
+#include "video/k053936.h"
 #include "machine/k054321.h"
 #include "konami_helper.h"
 #include "emupal.h"

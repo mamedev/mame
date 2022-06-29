@@ -4,6 +4,7 @@
 ## copyright-holders:Vas Crabb
 
 import argparse
+import glob
 import io
 import os.path
 import sys
@@ -392,7 +393,7 @@ class DriverFilter:
             [chr(x) for x in range(ord('a'), ord('z') + 1)] +
             ['_'])
 
-    def parse_filter(self, path, sourcefile, inclusion, exclusion):
+    def parse_filter(self, root, path, sourcefile, inclusion, exclusion):
         def line_hook(text):
             text = text.strip()
             if text.startswith('#'):
@@ -416,7 +417,14 @@ class DriverFilter:
                     sys.exit(1)
                 exclusion(text)
             elif text:
-                sourcefile(text)
+                if (len(text) >= 2) and ((text[0] == '"') or (text[0] == "'")) and (text[0] == text[-1]):
+                    text = text[1:-1]
+                paths = glob.glob(os.path.join(basepath, *text.split('/')))
+                if not paths:
+                    sys.stderr.write('%s:%s: Pattern "%s" did not match any source files\n' % (path, parser.input_line, text))
+                    sys.exit(1)
+                for source in paths:
+                    sourcefile('/'.join(os.path.split(os.path.relpath(source, basepath))))
 
         try:
             filterfile = io.open(path, 'r', encoding='utf-8')
@@ -424,6 +432,7 @@ class DriverFilter:
             sys.stderr.write('Unable to open filter file "%s"\n' % (path, ))
             sys.exit(1)
         with filterfile:
+            basepath = os.path.join(root, 'src', 'mame')
             handler = CppParser.Handler()
             handler.line = line_hook
             parser = CppParser(handler)
@@ -507,7 +516,7 @@ class DriverLister(DriverFilter):
         includes = set()
         excludes = set()
         if options.filter is not None:
-            self.parse_filter(options.filter, includesource, includedriver, excludedriver)
+            self.parse_filter(options.root, options.filter, includesource, includedriver, excludedriver)
             sys.stderr.write('%d source file(s) found\n' % (len(sources), ))
         self.sources = frozenset(sources)
         self.includes = frozenset(includes)
@@ -566,7 +575,7 @@ class DriverCollector(DriverFilter):
         sources = set()
         includes = set()
         state = { 'prevsource': None }
-        self.parse_filter(options.filter, includesource, includedriver, excludedriver)
+        self.parse_filter(options.root, options.filter, includesource, includedriver, excludedriver)
         self.parse_list(options.list, sourcefile, driver)
         sys.stderr.write('%d source file(s) found\n' % (len(sources), ))
         self.sources = sorted(sources)
@@ -590,15 +599,14 @@ def split_path(path):
 
 def parse_command_line():
     parser = argparse.ArgumentParser()
+    parser.add_argument('-r', '--root', metavar='<srcroot>', default='.', help='path to emulator source root (defaults to working directory)')
     subparsers = parser.add_subparsers(title='commands', dest='command', metavar='<command>')
 
     subparser = subparsers.add_parser('sourcesproject', help='generate project directives for source files')
-    subparser.add_argument('-r', '--root', metavar='<srcroot>', default='.', help='path to emulator source root (defaults to working directory)')
     subparser.add_argument('-t', '--target', metavar='<target>', required=True, help='generated emulator target name')
     subparser.add_argument('sources', metavar='<srcfile>', nargs='+', help='source files to include')
 
     subparser = subparsers.add_parser('filterproject', help='generate project directives using filter file')
-    subparser.add_argument('-r', '--root', metavar='<srcroot>', default='.', help='path to emulator source root (defaults to working directory)')
     subparser.add_argument('-t', '--target', metavar='<target>', required=True, help='generated emulator target name')
     subparser.add_argument('-f', '--filter', metavar='<fltfile>', required=True, help='input filter file')
     subparser.add_argument('list', metavar='<lstfile>', help='input list file')
