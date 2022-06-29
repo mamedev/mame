@@ -1603,7 +1603,6 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"zpa",
 		"zvt",
 		"shared", -- must stay near the end
-		"messshared", -- must stay near the end
 	}
 end
 
@@ -1621,7 +1620,6 @@ function createMAMEProjects(_target, _subtarget, _name)
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/devices",
 		MAME_DIR .. "src/mame/shared",
-		MAME_DIR .. "src/mame/messshared",
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
@@ -1651,12 +1649,6 @@ createMAMEProjects(_target, _subtarget, "shared")
 files {
 	MAME_DIR .. "src/mame/shared/*.h",
 	MAME_DIR .. "src/mame/shared/*.cpp",
-}
-
-createMAMEProjects(_target, _subtarget, "messshared")
-files {
-	MAME_DIR .. "src/mame/messshared/*.h",
-	MAME_DIR .. "src/mame/messshared/*.cpp",
 }
 
 --------------------------------------------------

@@ -722,7 +722,7 @@ def scan_source_dependencies(root, sources):
     parser = CppParser(handler)
     seen = set('/'.join(x for x in split_path(source) if x) for source in sources)
     remaining = list([(x, 0) for x in seen])
-    default_roots = ((('src', 'devices'), 0), (('src', 'mame', 'shared'), 0), (('src', 'mame', 'messshared'), 0), (('src', 'lib'), 0))
+    default_roots = ((('src', 'devices'), 0), (('src', 'mame', 'shared'), 0), (('src', 'lib'), 0))
     while remaining:
         source, depth = remaining.pop()
         components = tuple(source.split('/'))
@@ -768,7 +768,6 @@ def write_project(options, projectfile, mappings, sources, single):
                 '        MAME_DIR .. "src/emu",\n' \
                 '        MAME_DIR .. "src/devices",\n' \
                 '        MAME_DIR .. "src/mame/shared",\n' \
-                '        MAME_DIR .. "src/mame/messshared",\n' \
                 '        MAME_DIR .. "src/lib",\n' \
                 '        MAME_DIR .. "src/lib/util",\n' \
                 '        MAME_DIR .. "src/lib/netlist",\n' \
@@ -821,7 +820,6 @@ def write_project(options, projectfile, mappings, sources, single):
                 '        MAME_DIR .. "src/emu",\n' \
                 '        MAME_DIR .. "src/devices",\n' \
                 '        MAME_DIR .. "src/mame/shared",\n' \
-                '        MAME_DIR .. "src/mame/messshared",\n' \
                 '        MAME_DIR .. "src/lib",\n' \
                 '        MAME_DIR .. "src/lib/util",\n' \
                 '        MAME_DIR .. "src/lib/netlist",\n' \
@@ -839,12 +837,10 @@ def write_project(options, projectfile, mappings, sources, single):
                 'function linkProjects_mame_%s(_target, _subtarget)\n' \
                 '    links {\n' % (options.target, ))
         for lib in libnames:
-            if (lib != 'shared') and (lib != 'messshared'):
+            if lib != 'shared':
                 projectfile.write('        "%s",\n' % (lib, ))
         if 'shared' in libraries:
             projectfile.write('        "shared",\n')
-        if 'messshared' in libraries:
-            projectfile.write('        "messshared",\n')
         projectfile.write(
                 '    }\n' \
                 'end\n' \
@@ -861,12 +857,29 @@ def write_project(options, projectfile, mappings, sources, single):
         projectfile.write('end\n')
 
 
+def collect_sources(root, sources):
+    result = [ ]
+    for source in sources:
+        fullpath = os.path.join(root, source)
+        if os.path.isdir(fullpath):
+            for subdir, dirs, files in os.walk(fullpath):
+                for candidate in files:
+                    if os.path.splitext(candidate)[1] == '.cpp':
+                        if subdir != fullpath:
+                            result.append(os.path.join(source, os.path.relpath(subdir, fullpath), candidate))
+                        else:
+                            result.append(os.path.join(source, candidate))
+        else:
+            result.append(source)
+    return result
+
+
 def write_filter(options, filterfile):
     sources = set()
     DriverFilter().parse_list(options.list, lambda n: sources.add(n), lambda n: None)
 
     drivers = set()
-    for source in options.sources:
+    for source in collect_sources(options.root, options.sources):
         components = tuple(x for x in split_path(source) if x)
         if (len(components) > 3) and (components[:2] == ('src', 'mame')):
             ext = os.path.splitext(components[-1])[1].lower()
@@ -881,7 +894,7 @@ if __name__ == '__main__':
     options = parse_command_line()
     if options.command == 'sourcesproject':
         header_to_optional = collect_lua_directives(options)
-        source_dependencies = scan_source_dependencies(options.root, options.sources)
+        source_dependencies = scan_source_dependencies(options.root, collect_sources(options.root, options.sources))
         write_project(options, sys.stdout, header_to_optional, source_dependencies, True)
     elif options.command == 'filterproject':
         header_to_optional = collect_lua_directives(options)

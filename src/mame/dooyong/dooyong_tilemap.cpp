@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
 #include "emu.h"
-#include "dooyong_v.h"
+#include "dooyong_tilemap.h"
 
 #include "screen.h"
 

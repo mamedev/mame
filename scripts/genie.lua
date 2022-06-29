@@ -1434,8 +1434,9 @@ if _OPTIONS["SOURCES"] ~= nil then
 	local str = _OPTIONS["SOURCES"]
 	local sourceargs = ""
 	for word in string.gmatch(str, '([^,]+)') do
-		if not os.isfile(path.join(MAME_DIR, word)) then
-			error("File " .. word .. " does not exist")
+		local fullpath = path.join(MAME_DIR, word)
+		if (not os.isfile(fullpath)) and (not os.isdir(fullpath)) then
+			error("File/directory " .. word .. " does not exist")
 		end
 		sourceargs = sourceargs .. " " .. word
 	end

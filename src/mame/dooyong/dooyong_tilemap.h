@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
-#ifndef MAME_VIDEO_DOOYONG_H
-#define MAME_VIDEO_DOOYONG_H
+#ifndef MAME_DOOYONG_DOOYONG_TILEMAP_H
+#define MAME_DOOYONG_DOOYONG_TILEMAP_H
 
 #pragma once
 
@@ -153,4 +153,4 @@ private:
 	std::unique_ptr<u16[]> m_tileram;
 };
 
-#endif // MAME_VIDEO_DOOYONG_H
+#endif // MAME_DOOYONG_DOOYONG_TILEMAP_H
