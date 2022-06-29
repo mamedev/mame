@@ -1365,7 +1365,6 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"gridcomp",
 		"grundy",
 		"h01x",
-		"handheld",
 		"hartung",
 		"hds",
 		"heathkit",
@@ -1432,6 +1431,7 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"midway",
 		"mips",
 		"misc",
+		"misc_handheld",
 		"mit",
 		"mits",
 		"mitsubishi",
@@ -1474,7 +1474,6 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"pacific",
 		"pacman",
 		"palm",
-		"parker",
 		"pc",
 		"pce",
 		"pdp1",
@@ -1497,7 +1496,6 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"rare",
 		"rca",
 		"regnecentralen",
-		"ritam",
 		"rm",
 		"robotron",
 		"rockwell",
@@ -1514,7 +1512,6 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"sega",
 		"segacons",
 		"seibu",
-		"selchow",
 		"sequential",
 		"seta",
 		"sgi",
@@ -2331,12 +2328,6 @@ files {
 	MAME_DIR .. "src/mame/h01x/*.cpp",
 }
 
-createMAMEProjects(_target, _subtarget, "handheld")
-files {
-	MAME_DIR .. "src/mame/handheld/*.cpp",
-	MAME_DIR .. "src/mame/handheld/*.h",
-}
-
 createMAMEProjects(_target, _subtarget, "hartung")
 files {
 	MAME_DIR .. "src/mame/hartung/*.cpp",
@@ -2932,11 +2923,6 @@ files {
 	MAME_DIR .. "src/mame/palm/*.ipp",
 }
 
-createMAMEProjects(_target, _subtarget, "parker")
-files {
-	MAME_DIR .. "src/mame/parker/*.cpp",
-}
-
 createMAMEProjects(_target, _subtarget, "pc")
 files {
 	MAME_DIR .. "src/mame/pc/*.cpp",
@@ -3057,11 +3043,6 @@ files {
 	MAME_DIR .. "src/mame/regnecentralen/*.h",
 }
 
-createMAMEProjects(_target, _subtarget, "ritam")
-files {
-	MAME_DIR .. "src/mame/ritam/*.cpp",
-}
-
 createMAMEProjects(_target, _subtarget, "rm")
 files {
 	MAME_DIR .. "src/mame/rm/*.cpp",
@@ -3153,11 +3134,6 @@ files {
 	MAME_DIR .. "src/mame/seibu/*.cpp",
 	MAME_DIR .. "src/mame/seibu/*.h",
 	MAME_DIR .. "src/mame/seibu/*.ipp",
-}
-
-createMAMEProjects(_target, _subtarget, "selchow")
-files {
-	MAME_DIR .. "src/mame/selchow/*.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "sequential")
@@ -3667,6 +3643,12 @@ createMAMEProjects(_target, _subtarget, "misc")
 files {
 	MAME_DIR .. "src/mame/misc/*.cpp",
 	MAME_DIR .. "src/mame/misc/*.h",
+}
+
+createMAMEProjects(_target, _subtarget, "misc_handheld")
+files {
+	MAME_DIR .. "src/mame/misc_handheld/*.cpp",
+	MAME_DIR .. "src/mame/misc_handheld/*.h",
 }
 
 createMAMEProjects(_target, _subtarget, "skeleton")
