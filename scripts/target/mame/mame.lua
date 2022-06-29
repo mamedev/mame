@@ -1333,7 +1333,6 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"einis",
 		"elektor",
 		"elektron",
-		"elektronika",
 		"emusys",
 		"ensoniq",
 		"enterprise",
@@ -2155,12 +2154,6 @@ files {
 createMAMEProjects(_target, _subtarget, "elektron")
 files {
 	MAME_DIR .. "src/mame/elektron/*.cpp",
-}
-
-createMAMEProjects(_target, _subtarget, "elektronika")
-files {
-	MAME_DIR .. "src/mame/elektronika/*.cpp",
-	MAME_DIR .. "src/mame/elektronika/*.h",
 }
 
 createMAMEProjects(_target, _subtarget, "emusys")

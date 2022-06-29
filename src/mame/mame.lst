@@ -9444,7 +9444,7 @@ t3210                           //
 bitgrpha                        //
 bitgrphb                        //
 
-@source:elektronika/bk.cpp
+@source:cccp/bk.cpp
 bk0010                          //
 bk001001                        //
 bk0010fd                        //
@@ -12798,10 +12798,10 @@ duet16                          //
 @source:igs/dunhuang.cpp
 dunhuang                        // (c) 1995
 
-@source:elektronika/dvk_kcgd.cpp
+@source:cccp/dvk_kcgd.cpp
 dvk_kcgd                        //
 
-@source:elektronika/dvk_ksm.cpp
+@source:cccp/dvk_ksm.cpp
 dvk_ksm                         //
 
 @source:misc/dwarfd.cpp
@@ -17371,7 +17371,7 @@ ikki                            // TVG17 (c) 1985 Sun Electronics (Japan)
 @source:skeleton/ikt5a.cpp
 ikt5a                           //
 
-@source:elektronika/im01.cpp
+@source:cccp/im01.cpp
 im01
 im01t
 im05
@@ -24050,13 +24050,13 @@ mk1forth                        // (c) 2003 Andrew Holme
 @source:trainer/mk14.cpp
 mk14                            //
 
-@source:elektronika/mk85.cpp
+@source:cccp/mk85.cpp
 mk85                            //
 
-@source:elektronika/mk90.cpp
+@source:cccp/mk90.cpp
 mk90                            //
 
-@source:elektronika/mk98.cpp
+@source:cccp/mk98.cpp
 mk98                            //
 
 @source:multitch/mkit09.cpp
@@ -31118,7 +31118,7 @@ mrjong                          // (c) 1983 Kiwako
 @source:skeleton/ms0515.cpp
 ms0515                          //
 
-@source:elektronika/ms6102.cpp
+@source:cccp/ms6102.cpp
 ms6102                          //
 
 @source:jaleco/ms32.cpp
