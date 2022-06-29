@@ -10400,7 +10400,7 @@ changela                        // ??? (c) 1983 Taito Corporation
 changyu
 changyu2
 
-@source:fairch/channelf.cpp
+@source:fairchild/channelf.cpp
 channelf                        // Fairchild Channel F VES - 1976
 channlf2                        // Fairchild Channel F II - 1978
 ingtelma                        // Ingelen Tele-Match Processor (PAL)
@@ -13852,7 +13852,7 @@ f1gpb                           // bootleg
 mosaicf2                        // (c) 1999 F2 System
 royalpk2                        //
 
-@source:fairch/f387x.cpp
+@source:fairchild/f387x.cpp
 f387x                           // (c) 1979 Fairchild
 
 @source:skeleton/facit4440.cpp

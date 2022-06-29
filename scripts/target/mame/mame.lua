@@ -1345,7 +1345,7 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"exidy",
 		"exorterm",
 		"f32",
-		"fairch",
+		"fairchild",
 		"fairlight",
 		"falco",
 		"fidelity",
@@ -2211,10 +2211,10 @@ files {
 	MAME_DIR .. "src/mame/f32/*.h",
 }
 
-createMAMEProjects(_target, _subtarget, "fairch")
+createMAMEProjects(_target, _subtarget, "fairchild")
 files {
-	MAME_DIR .. "src/mame/fairch/*.cpp",
-	MAME_DIR .. "src/mame/fairch/*.h",
+	MAME_DIR .. "src/mame/fairchild/*.cpp",
+	MAME_DIR .. "src/mame/fairchild/*.h",
 }
 
 createMAMEProjects(_target, _subtarget, "fairlight")

@@ -256,8 +256,8 @@ ericsson/e9161.cpp
 ericsson/eispc.cpp
 exidy/sorcerer.cpp
 exorterm/exorterm.cpp
-fairch/channelf.cpp
-fairch/f387x.cpp
+fairchild/channelf.cpp
+fairchild/f387x.cpp
 fairlight/cmi.cpp
 falco/falco500.cpp
 falco/falcots.cpp
