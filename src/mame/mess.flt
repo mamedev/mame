@@ -439,7 +439,6 @@ luxor/abc1600.cpp
 luxor/abc80.cpp
 luxor/abc80x.cpp
 luxor/ds90.cpp
-magnavox/odyssey2.cpp
 makerbot/replicator.cpp
 matsushi/duet16.cpp
 matsushi/jr100.cpp
@@ -588,6 +587,7 @@ pc/tosh1000.cpp
 pdp1/pdp1.cpp
 pel/galeb.cpp
 pel/orao.cpp
+philips/odyssey2.cpp
 philips/p2000t.cpp
 philips/vg5k.cpp
 philips/yes.cpp

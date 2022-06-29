@@ -33871,7 +33871,7 @@ octopus                         //
 @source:misc/odyssey.cpp
 odyssey                         // (c) Silicon Gaming.
 
-@source:magnavox/odyssey2.cpp
+@source:philips/odyssey2.cpp
 jopac                           // 1983 Jopac JO7400
 odyssey2                        // Magnavox Odyssey 2 - 1978-1983
 odyssey3                        // Magnavox Odyssey 3 / Command Center (prototype)

@@ -1410,7 +1410,6 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"learsiegler",
 		"lsi",
 		"luxor",
-		"magnavox",
 		"makerbot",
 		"matic",
 		"matsushi",
@@ -2589,11 +2588,6 @@ createMAMEProjects(_target, _subtarget, "luxor")
 files {
 	MAME_DIR .. "src/mame/luxor/*.cpp",
 	MAME_DIR .. "src/mame/luxor/*.h",
-}
-
-createMAMEProjects(_target, _subtarget, "magnavox")
-files {
-	MAME_DIR .. "src/mame/magnavox/*.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "makerbot")
