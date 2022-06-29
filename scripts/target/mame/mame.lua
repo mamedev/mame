@@ -1246,7 +1246,6 @@ FORMATS["ZX81_P"] = true
 function linkProjects_mame_mame(_target, _subtarget)
 	links {
 		"access",
-		"aci",
 		"acorn",
 		"act",
 		"adc",
@@ -1265,7 +1264,8 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"apf",
 		"apollo",
 		"apple",
-		"applied",
+		"appliedconcepts",
+		"appliedtech",
 		"arcadia",
 		"aristocr",
 		"ascii",
@@ -1363,7 +1363,7 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"hds",
 		"heathkit",
 		"hec2hrp",
-		"hegener",
+		"hegenerglaser",
 		"heurikon",
 		"hitachi",
 		"homebrew",
@@ -1650,11 +1650,6 @@ files {
 	MAME_DIR .. "src/mame/access/*.cpp",
 }
 
-createMAMEProjects(_target, _subtarget, "aci")
-files {
-	MAME_DIR .. "src/mame/aci/*.cpp",
-}
-
 createMAMEProjects(_target, _subtarget, "acorn")
 files {
 	MAME_DIR .. "src/mame/acorn/*.cpp",
@@ -1756,10 +1751,15 @@ files {
 	MAME_DIR .. "src/mame/apple/*.h",
 }
 
-createMAMEProjects(_target, _subtarget, "applied")
+createMAMEProjects(_target, _subtarget, "appliedconcepts")
 files {
-	MAME_DIR .. "src/mame/applied/*.cpp",
-	MAME_DIR .. "src/mame/applied/*.h",
+	MAME_DIR .. "src/mame/appliedconcepts/*.cpp",
+}
+
+createMAMEProjects(_target, _subtarget, "appliedtech")
+files {
+	MAME_DIR .. "src/mame/appliedtech/*.cpp",
+	MAME_DIR .. "src/mame/appliedtech/*.h",
 }
 
 createMAMEProjects(_target, _subtarget, "arcadia")
@@ -2313,10 +2313,10 @@ files {
 	MAME_DIR .. "src/mame/hec2hrp/*.h",
 }
 
-createMAMEProjects(_target, _subtarget, "hegener")
+createMAMEProjects(_target, _subtarget, "hegenerglaser")
 files {
-	MAME_DIR .. "src/mame/hegener/*.cpp",
-	MAME_DIR .. "src/mame/hegener/*.h",
+	MAME_DIR .. "src/mame/hegenerglaser/*.cpp",
+	MAME_DIR .. "src/mame/hegenerglaser/*.h",
 }
 
 createMAMEProjects(_target, _subtarget, "heurikon")

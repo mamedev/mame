@@ -911,17 +911,17 @@ sp_zigzgk                       //
 sp_zigzgl                       //
 sp_zigzgm                       //
 
-@source:aci/boris.cpp
+@source:appliedconcepts/boris.cpp
 boris                           //
 borisa                          //
 
-@source:aci/borisdpl.cpp
+@source:appliedconcepts/borisdpl.cpp
 borisdpl                        //
 
-@source:aci/ggm.cpp
+@source:appliedconcepts/ggm.cpp
 ggm
 
-@source:aci/prodigy.cpp
+@source:appliedconcepts/prodigy.cpp
 prodigy
 
 @source:jaleco/acommand.cpp
@@ -22909,7 +22909,7 @@ mbc200                          //
 @source:sanyo/mbc55x.cpp
 mbc55x                          // Sanyo MBC-550, MBC-555
 
-@source:applied/mbee.cpp
+@source:appliedtech/mbee.cpp
 mbee                            // Microbee 16 Standard or Plus
 mbee128                         // Microbee 128K standard (CP/M)
 mbee128p                        // Microbee 128K premium (CP/M)
@@ -23271,26 +23271,26 @@ mekd5                           // 1980 Motorola Evaluation Kit
 crzyddz2                        // 2006 Sealy
 menghong                        // 2004? Sealy
 
-@source:hegener/academy.cpp
+@source:hegenerglaser/academy.cpp
 academy
 academyg
 academyga
 
-@source:hegener/amsterdam.cpp
+@source:hegenerglaser/amsterdam.cpp
 amsterd                         // Amsterdam
 dallas16                        // Dallas
 dallas32                        // Dallas
 roma16                          // Roma
 roma32                          // Roma
 
-@source:hegener/berlin.cpp
+@source:hegenerglaser/berlin.cpp
 berl16                          // 1992 Mephisto Berlin 68000
 berl16a                         // 1992 Mephisto Berlin 68000
 berlinp                         // 1994 Mephisto Berlin Pro 68020
 berl16l                         // 1996 Mephisto Berlin 68000 London Upgrade
 berlinpl                        // 1996 Mephisto Berlin Pro London Upgrade
 
-@source:hegener/brikett.cpp
+@source:hegenerglaser/brikett.cpp
 mephisto
 mephisto1x
 mephisto2
@@ -23302,23 +23302,23 @@ mephisto3b
 mephisto3c
 mephistoj
 
-@source:hegener/glasgow.cpp
+@source:hegenerglaser/glasgow.cpp
 amsterda                        // Amsterdam
 dallas16a                       // Dallas
 glasgow                         // Glasgow
 roma16a                         // Roma
 
-@source:hegener/milano.cpp
+@source:hegenerglaser/milano.cpp
 milano                          // 1991 Mephisto Milano
 milanoa                         // 1991 Mephisto Milano
 nshort                          // 1993 Mephisto Nigel Short
 
-@source:hegener/mm1.cpp
+@source:hegenerglaser/mm1.cpp
 mm1
 mm1b
 mmirage
 
-@source:hegener/mm2.cpp
+@source:hegenerglaser/mm2.cpp
 mm2                             // Mephisto MM II
 mm2a                            // Mephisto MM II
 mm2b                            // Mephisto MM II
@@ -23337,12 +23337,12 @@ mm5p
 rebel5                          // Mephisto Rebell 5.0
 rebel5a                         // Mephisto Rebell 5.0
 
-@source:hegener/modena.cpp
+@source:hegenerglaser/modena.cpp
 modena                          // 1992 Mephisto Modena
 modenaa                         // 1992 Mephisto Modena
 modenab                         // 1992 Mephisto Modena
 
-@source:hegener/modular.cpp
+@source:hegenerglaser/modular.cpp
 alm16                           // 1988 Mephisto Almeria 16 Bit
 alm32                           // 1988 Mephisto Almeria 32 Bit
 port16                          // 1989 Mephisto Portorose 16 Bit
@@ -23359,7 +23359,7 @@ gen32l                          // 1996 Mephisto Genius 68030 London Upgrade
 lond16                          // 1996 Mephisto London 16 Bit
 lond32                          // 1996 Mephisto London 32 Bit
 
-@source:hegener/modular_tm.cpp
+@source:hegenerglaser/modular_tm.cpp
 port32t
 lyon32t
 lyon32t8
@@ -23369,32 +23369,32 @@ berl32t8p
 lond32t
 lond32t8
 
-@source:hegener/mondial.cpp
+@source:hegenerglaser/mondial.cpp
 mondial                         // 1985 Mephisto Mondial
 
-@source:hegener/mondial2.cpp
+@source:hegenerglaser/mondial2.cpp
 mondial2                        // 1987 Mephisto Mondial II
 
-@source:hegener/mondial68k.cpp
+@source:hegenerglaser/mondial68k.cpp
 mondl68k                        // 1988 Mephisto Mondial 68000XL
 
-@source:hegener/montec.cpp
+@source:hegenerglaser/montec.cpp
 montec                          // 1987 Mephisto Monte Carlo
 monteca                         // 1987 Mephisto Monte Carlo
 montec4                         // 1989 Mephisto Monte Carlo IV
 montec4le                       // 1990 Mephisto Monte Carlo IV LE
 
-@source:hegener/polgar.cpp
+@source:hegenerglaser/polgar.cpp
 polgar                          // 1990 Mephisto Polgar
 polgara                         // 1989 Mephisto Polgar
 polgar10                        // 1990 Mephisto Polgar 10MHz
 polgar101                       // 1990 Mephisto Polgar 10MHz
 
-@source:hegener/risc.cpp
+@source:hegenerglaser/risc.cpp
 mrisc                           // 1992 Mephisto RISC 1MB
 mrisc2                          // 1994 Mephisto RISC II
 
-@source:hegener/smondial.cpp
+@source:hegenerglaser/smondial.cpp
 mega4                           // 1989 Mephisto Mega IV
 mega4a                          // 1989 Mephisto Mega IV
 smondial                        // 1986 Mephisto Super Mondial (Ver A)
