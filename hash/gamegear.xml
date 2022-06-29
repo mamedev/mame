@@ -232,6 +232,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 		</part>
 	</software>
 
+	<!-- "Disney's Aladdin (prototype, 19940124)" shares the same hashes as release version -->
 	<software name="aladdin">
 		<description>Disney's Aladdin (Euro, USA, Bra)</description>
 		<year>1994</year>
@@ -247,7 +248,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 		</part>
 	</software>
 
-	<software name="aladdinp4" cloneof="aladdin">
+	<software name="aladdinp3" cloneof="aladdin">
 		<description>Disney's Aladdin (prototype, 19931229)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -258,7 +259,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 		</part>
 	</software>
 
-	<software name="aladdinp3" cloneof="aladdin">
+	<software name="aladdinp2" cloneof="aladdin">
 		<description>Disney's Aladdin (prototype, 19940111)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -269,24 +270,13 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 		</part>
 	</software>
 
-	<software name="aladdinp2" cloneof="aladdin">
+	<software name="aladdinp1" cloneof="aladdin">
 		<description>Disney's Aladdin (prototype, 19940113)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="aladdin (prototype - jan 13,  1994).bin" size="524288" crc="75a7f142" sha1="a968ee77938233a4ff94c73266c7fb36fa25657d"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="aladdinp1" cloneof="aladdin">
-		<description>Disney's Aladdin (prototype, 19940124)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="aladdin (prototype with - jan 24,  1994).bin" size="524288" crc="7a41c1dc" sha1="20ba7f5e5c801fbe48a537d2551a3d4525eb63e7"/>
 			</dataarea>
 		</part>
 	</software>
