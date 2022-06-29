@@ -17551,7 +17551,7 @@ isld_vortex                     //
 istellar                        // (c) 1983 Funai / Gakken
 istellar2                       // (c) 1984 Funai / Gakken
 
-@source:terminal/istrebiteli.cpp
+@source:cccp/istrebiteli.cpp
 istreb                          //
 motogonki                       //
 
@@ -41612,7 +41612,7 @@ ti990_10                        // 1975 TI 990/10
 ti990_4                         // 1976 TI 990/4
 ti990_4v                        // 1976 TI 990/4 with video display terminal
 
-@source:terminal/tiamc1.cpp
+@source:cccp/tiamc1.cpp
 bilyard                         // (c) 1988 Terminal
 konek                           // (c) 1988 Terminal
 koroleva                        // (c) 1988 Terminal

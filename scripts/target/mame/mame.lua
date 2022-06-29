@@ -1557,7 +1557,6 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"telenova",
 		"telercas",
 		"televideo",
-		"terminal",
 		"tesla",
 		"thepit",
 		"thomson",
@@ -3402,12 +3401,6 @@ createMAMEProjects(_target, _subtarget, "televideo")
 files {
 	MAME_DIR .. "src/mame/televideo/*.cpp",
 	MAME_DIR .. "src/mame/televideo/*.h",
-}
-
-createMAMEProjects(_target, _subtarget, "terminal")
-files {
-	MAME_DIR .. "src/mame/terminal/*.cpp",
-	MAME_DIR .. "src/mame/terminal/*.h",
 }
 
 createMAMEProjects(_target, _subtarget, "tesla")

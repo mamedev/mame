@@ -191,6 +191,8 @@ capcom/supduck.cpp
 capcom/tigeroad.cpp
 capcom/tvcapcom.cpp
 capcom/vulgus.cpp
+cccp/istrebiteli.cpp
+cccp/tiamc1.cpp
 ces/cesclass.cpp
 ces/galgames.cpp
 cinemat/cchasm.cpp
@@ -1468,8 +1470,6 @@ tehkan/tecmosys.cpp
 tehkan/tehkanwc.cpp
 tehkan/wc90.cpp
 tehkan/wc90b.cpp
-terminal/istrebiteli.cpp
-terminal/tiamc1.cpp
 thepit/thepit.cpp
 thepit/timelimt.cpp
 toaplan/mjsister.cpp
