@@ -1290,7 +1290,7 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"cantab",
 		"capcom",
 		"casio",
-		"cbm",
+		"commodore",
 		"cccp",
 		"cce",
 		"ccs",
@@ -1897,10 +1897,10 @@ files {
 	MAME_DIR .. "src/mame/casio/*.h",
 }
 
-createMAMEProjects(_target, _subtarget, "cbm")
+createMAMEProjects(_target, _subtarget, "commodore")
 files {
-	MAME_DIR .. "src/mame/cbm/*.cpp",
-	MAME_DIR .. "src/mame/cbm/*.h",
+	MAME_DIR .. "src/mame/commodore/*.cpp",
+	MAME_DIR .. "src/mame/commodore/*.h",
 }
 
 createMAMEProjects(_target, _subtarget, "cccp")

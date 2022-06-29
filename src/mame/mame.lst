@@ -9884,7 +9884,7 @@ redbarona                       // 036995-037007    (c) 1980
 @source:cromemco/c10.cpp
 c10                             //
 
-@source:cbm/c128.cpp
+@source:commodore/c128.cpp
 c128                            //
 c128_de                         //
 c128_se                         //
@@ -9901,7 +9901,7 @@ c128p                           //
 @source:skeleton/c2color.cpp
 c2color
 
-@source:cbm/c64.cpp
+@source:commodore/c64.cpp
 c64                             //
 c64_jp                          // Commodore 64 (Japan)
 c64_se                          // Commodore 64 (Sweden)
@@ -9921,17 +9921,17 @@ sx64p                           //
 tesa6240                        //
 vip64                           // Commodore VIP64 (SX64, PAL, Swedish)
 
-@source:cbm/c64dtv.cpp
+@source:commodore/c64dtv.cpp
 c64dtv                          // Commodore 64 Direct-to-TV
 
-@source:cbm/c65.cpp
+@source:commodore/c65.cpp
 c64dx                           // 1991 C65 / C64DX (Prototype, German PAL)
 c65                             // 1991 C65 / C64DX (Prototype, NTSC)
 
 @source:ddr/c80.cpp
 c80                             //
 
-@source:cbm/c900.cpp
+@source:commodore/c900.cpp
 c900                            //
 
 @source:seibu/cabal.cpp
@@ -10178,7 +10178,7 @@ cball                           // ?????? prototype 1976/?? [6800]
 @source:capcom/cbasebal.cpp
 cbasebal                        // 10/1989 (c) 1989 Capcom (Japan) (different hardware)
 
-@source:cbm/cbm2.cpp
+@source:commodore/cbm2.cpp
 b128                            // Commodore B128
 b128hp                          // Commodore B128HP
 b256                            // Commodore B256
@@ -10416,7 +10416,7 @@ chaos                           //
 @source:univers/cheekyms.cpp
 cheekyms                        // 8004 (c) [1980?]
 
-@source:cbm/chessmate.cpp
+@source:commodore/chessmate.cpp
 ccmk2                           // Chess Champion MK II
 ccmk2a                          //
 chmate                          //
@@ -10601,7 +10601,7 @@ ckmaster                        //
 @source:alliedl/clayshoo.cpp
 clayshoo                        // [1979 Allied Leisure]
 
-@source:cbm/clcd.cpp
+@source:commodore/clcd.cpp
 clcd                            // Commodore LCD
 
 @source:vtech/clickstart.cpp
@@ -24314,7 +24314,7 @@ mpf1                            // 1979 Multitech Micro Professor 1
 mpf1b                           // 1979 Multitech Micro Professor 1B
 mpf1p                           //
 
-@source:cbm/mps1230.cpp
+@source:commodore/mps1230.cpp
 mps1000                         // 1986 Commodore MPS-1000 (dot matrix printer)
 mps1230                         // 1988 Commodore MPS-1230 near-letter-quality dot matrix printer
 
@@ -35157,7 +35157,7 @@ perq                            //
 @source:skeleton/pes.cpp
 pes                             //
 
-@source:cbm/pet.cpp
+@source:commodore/pet.cpp
 cbm3008                         //
 cbm3016                         //
 cbm3032                         //
@@ -35686,7 +35686,7 @@ wbeachvla                       // (c) 1995
 @source:misc/plsonic4.cpp
 plsonic4                        //
 
-@source:cbm/plus4.cpp
+@source:commodore/plus4.cpp
 c116                            //
 c16                             //
 c16_hu                          //
@@ -42702,10 +42702,10 @@ topgunnr                        // (c) 1986
 @source:philips/vg5k.cpp
 vg5k                            // 1984 VG-5000
 
-@source:cbm/vic10.cpp
+@source:commodore/vic10.cpp
 vic10                           // Commodore Max Machine (Japan)
 
-@source:cbm/vic20.cpp
+@source:commodore/vic20.cpp
 vic1001                         // Commodore VIC-1001 (Japan)
 vic20                           // Commodore VIC 20 (NTSC)
 vic20_se                        // Commodore VIC 20 (Swedish Expanson Kit)
