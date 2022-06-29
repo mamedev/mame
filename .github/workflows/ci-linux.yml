@@ -20,6 +20,9 @@ on:
     - 'COPYING'
     - 'makefile'
 
+permissions:
+  contents: read
+
 jobs:
   build-linux:
     runs-on: ubuntu-latest
