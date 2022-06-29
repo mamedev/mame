@@ -2021,8 +2021,8 @@ msgid ""
 msgstr ""
 "Не знайдено системних ROM'ів. Перевір указане налаштування шляху ROM'ів у %1$s.ini.\n"
 "\n"
-"При першому використанні %2$s переглянь %2$s.pdf у теці документів для отримання відомостей налаштування та "
-"використання %2$s."
+"При першому використанні %2$s переглянь %2$s.pdf у теці \"docs\" для отримання "
+"відомостей налаштування та використання %2$s."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:316
 #, c-format
@@ -2031,7 +2031,7 @@ msgstr "Укажи ім'я чи вибери: %1$s_."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:318
 msgid "Type name or select: (random)"
-msgstr "Укажи ім'я чи вибери: (випадково)."
+msgstr "Укажи ім'я чи вибери: (випадково)"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:332
 #, c-format
@@ -2419,7 +2419,7 @@ msgstr ""
 #, c-format
 msgctxt "gfxview"
 msgid " %1$d×%2$d origin (%3$d %4$d)"
-msgstr "%1$d * %2$d; джерело (%3$d %4$d)"
+msgstr "%1$d * %2$d; XY-початок (%3$d %4$d)"
 
 #: src/frontend/mame/ui/selgame.cpp:442
 msgid "System Settings"

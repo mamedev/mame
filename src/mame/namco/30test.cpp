@@ -176,7 +176,6 @@ void namco_30test_state::okibank_w(u8 data)
 
 void namco_30test_state::main_map(address_map &map)
 {
-	map(0x0d80, 0x0dbf).ram(); // EEPROM read-back data goes there
 	map(0x2000, 0x2000).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x4000, 0x401f).w(FUNC(namco_30test_state::led_w));
 	map(0x6000, 0x6003).w(FUNC(namco_30test_state::led_rank_w));

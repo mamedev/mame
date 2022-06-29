@@ -463,6 +463,8 @@ if (BUSES["ATA"]~=null) then
 		MAME_DIR .. "src/devices/bus/ata/atapihle.h",
 		MAME_DIR .. "src/devices/bus/ata/cr589.cpp",
 		MAME_DIR .. "src/devices/bus/ata/cr589.h",
+		MAME_DIR .. "src/devices/bus/ata/gdrom.cpp",
+		MAME_DIR .. "src/devices/bus/ata/gdrom.h",
 		MAME_DIR .. "src/devices/bus/ata/idehd.cpp",
 		MAME_DIR .. "src/devices/bus/ata/idehd.h",
 		MAME_DIR .. "src/devices/bus/ata/px320a.cpp",
@@ -3087,6 +3089,7 @@ end
 ---------------------------------------------------
 --
 --@src/devices/bus/nes_ctrl/ctrl.h,BUSES["NES_CTRL"] = true
+--@src/devices/bus/nes_ctrl/zapper_sensor.h,BUSES["NES_CTRL"] = true
 ---------------------------------------------------
 
 if (BUSES["NES_CTRL"]~=null) then

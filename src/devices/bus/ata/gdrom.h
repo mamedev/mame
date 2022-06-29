@@ -6,12 +6,12 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_GDROM_H
-#define MAME_MACHINE_GDROM_H
+#ifndef MAME_BUS_ATA_GDROM_H
+#define MAME_BUS_ATA_GDROM_H
 
 #pragma once
 
-#include "bus/ata/atapicdr.h"
+#include "atapicdr.h"
 
 class gdrom_device : public atapi_cdrom_device
 {
@@ -43,4 +43,4 @@ private:
 
 DECLARE_DEVICE_TYPE(GDROM, gdrom_device)
 
-#endif // MAME_MACHINE_GDROM_H
+#endif // MAME_BUS_ATA_GDROM_H

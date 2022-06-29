@@ -50,8 +50,8 @@
 #include "dccons.h"
 
 #include "dc-ctrl.h"
-#include "gdrom.h"
 
+#include "bus/ata/gdrom.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "cpu/sh/sh4.h"
