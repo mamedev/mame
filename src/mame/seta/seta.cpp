@@ -13,7 +13,7 @@ Custom :    X1-001A, X1-002A (SDIP64)   Sprites
             X1-002
             X1-003 or X1-007 (SDIP42)   Video blanking (feeds RGB DACs)
             X1-004           (SDIP52)   Inputs
-            X1-005
+            X1-005 or X1-009 (DIP48)    NVRAM/simple protection
             X1-006           (SDIP64)   Palette
             X1-010           (QFP80)    Sound: 16 Bit PCM
             X1-011           (QFP80)    Graphics mixing
@@ -12464,6 +12464,8 @@ u16 downtown_state::metafox_protection_r(offs_t offset)
 	// 21c000-21c3ff, 21d000-21d3ff, and 21e000-21e3ff are tested as 8 bit reads/writes
 	// the first address in each range is special and returns data written elsewhere in that range
 	// 21fde0-21fdff appears to be control bytes?
+
+	// Protection device is a surface-scratched SDIP64 on the P1-049-A sub PCB
 
 	switch (offset)
 	{
