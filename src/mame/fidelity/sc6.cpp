@@ -37,8 +37,8 @@ MSC hardware notes:
 
 MCU ports I/O is identical to SC6.
 
-It accepts the same modules as the 1st MSC version. See fidel_msc.cpp for known
-modules. The module overrides the internal ROM, by asserting the EA pin.
+It accepts the same modules as the 1st MSC version. See msc.cpp for known modules.
+The module overrides the internal ROM, by asserting the EA pin.
 
 -------------------------------------------------------------------------------
 

@@ -3,7 +3,7 @@
 // thanks-to:Achim, bataais, Berger
 /***************************************************************************
 
-Saitek Simultano, it is related to Saitek Stratos, see saitek_stratos.cpp
+Saitek Simultano, it is related to Saitek Stratos, see stratos.cpp
 But it's not similar enough to be a subdriver of it.
 
 Two versions are known: "B" from 1988/1989, and "C" from 1989.

@@ -4,7 +4,7 @@
 /******************************************************************************
 
 Fidelity Designer Display series, 6502 and 68000
-(6502-based displayless Designer is in fidel_excel.cpp)
+(6502-based displayless Designer is in excel.cpp)
 
 *******************************************************************************
 

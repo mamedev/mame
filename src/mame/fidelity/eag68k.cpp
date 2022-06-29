@@ -4,7 +4,7 @@
 /******************************************************************************
 
 Fidelity 68000-based Elite Avant Garde driver
-For 6502-based EAG, see fidel_elite.cpp
+For 6502-based EAG, see elite.cpp
 
 Excel 68000 I/O is very similar to EAG, so it's handled in this driver as well
 

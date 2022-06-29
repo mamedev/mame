@@ -11,12 +11,12 @@ Hardware notes:
 - PCB label 510-1084B01
 
 This is on the SC12B board, with enough modifications to support more leds and
-magnetic chess board sensors. See fidel_sc12.cpp for a more technical description.
+magnetic chess board sensors. See sc12.cpp for a more technical description.
 
 ******************************************************************************/
 
 #include "emu.h"
-#include "fidel_clockdiv.h"
+#include "clockdiv.h"
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
@@ -35,7 +35,7 @@ magnetic chess board sensors. See fidel_sc12.cpp for a more technical descriptio
 
 namespace {
 
-// note: sub-class of fidel_clockdiv_state (see mame/machine/fidel_clockdiv.*)
+// note: sub-class of fidel_clockdiv_state (see clockdiv.*)
 
 class as12_state : public fidel_clockdiv_state
 {

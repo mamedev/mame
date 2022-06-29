@@ -3,7 +3,7 @@
 // thanks-to:Berger
 /***************************************************************************
 
-Saitek Corona. Please refer to saitek_stratos.cpp for driver notes.
+Saitek Corona. Please refer to stratos.cpp for driver notes.
 
 To be brief, Saitek Corona has two "HELIOS" chips, I/O addressing is completely
 different compared to Stratos/Turbo King.
@@ -11,7 +11,7 @@ different compared to Stratos/Turbo King.
 ***************************************************************************/
 
 #include "emu.h"
-#include "saitek_stratos.h"
+#include "stratos.h"
 
 #include "cpu/m6502/m65c02.h"
 #include "machine/nvram.h"
@@ -29,7 +29,7 @@ different compared to Stratos/Turbo King.
 
 namespace {
 
-// note: sub-class of saitek_stratos_state (see mame/includes/saitek_stratos.h, mame/drivers/saitek_stratos.cpp)
+// note: sub-class of saitek_stratos_state (see stratos.h, stratos.cpp)
 
 class corona_state : public saitek_stratos_state
 {

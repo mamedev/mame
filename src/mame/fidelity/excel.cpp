@@ -4,7 +4,7 @@
 /******************************************************************************
 
 Fidelity Excellence series hardware
-(for Excel 68000, see fidel_eag68k.cpp)
+(for Excel 68000, see eag68k.cpp)
 
 TODO:
 - granits gives error beeps at start, need to press clear to play.
@@ -126,7 +126,7 @@ basically same as (Par) Excellence hardware, reskinned board
 
 Designer 2100 (model 6103): exactly same, but running at 5MHz
 
-(Designer 1500 is on 80C50 hardware, same ROM as The Gambit, see fidel_sc6.cpp)
+(Designer 1500 is on 80C50 hardware, same ROM as The Gambit, see sc6.cpp)
 
 ******************************************************************************/
 

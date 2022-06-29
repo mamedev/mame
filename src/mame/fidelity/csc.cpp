@@ -37,7 +37,7 @@ C000-DFFF: 101-1025A02 ROM
 E000-FDFF: 101-1025A01 ROM
 FE00-FFFF: 512 byte 74S474 or N82S141N PROM
 
-*: 101-64019 is also used on the VSC(fidel_vsc.cpp). It contains the opening book
+*: 101-64019 is also used on the VSC(vsc.cpp). It contains the opening book
 and "64 greatest games", as well as some Z80 code. Obviously the latter is unused
 on the CSC. Also seen with 101-1025A04 label, same ROM contents.
 

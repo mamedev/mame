@@ -7,8 +7,8 @@ Fidelity Mini Sensory Chess Challenger (model MSC, 1981 version)
 
 Two versions exist, both of them are model MSC. The 1981 version has a Z8 MCU,
 the 1982 version has an I8049. They can also be distinguished from the button
-panel design, the 2nd version has rectangular buttons. See fidel_sc6.cpp for
-the 2nd version.
+panel design, the 2nd version has rectangular buttons. See sc6.cpp for the
+2nd version.
 
 Hardware notes:
 - Zilog Z8 MCU(custom label, probably Z8601), 8MHz XTAL

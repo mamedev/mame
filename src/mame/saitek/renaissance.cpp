@@ -25,7 +25,7 @@ pushed in to hide the chessboard display.
 TODO:
 - fart noise at boot if maestroa module is inserted
 - weird beep at boot if sparc module is inserted (related to above?)
-- make it a subdriver of saitek_leonardo.cpp? or too many differences
+- make it a subdriver of leonardo.cpp? or too many differences
 - same TODO list as saitek_leonardo.cpp
 
 ******************************************************************************/

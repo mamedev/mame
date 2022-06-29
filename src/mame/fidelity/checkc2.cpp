@@ -6,7 +6,7 @@
 Fidelity Checker Challenger (CR)
 
 Even though it has fewer levels and presumedly a weaker program, this one
-is a couple of months newer than model ACR (see fidel_cc10.cpp).
+is a couple of months newer than model ACR (see cc10.cpp).
 
 Hardware notes:
 - PCB label: P261A

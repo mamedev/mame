@@ -36,7 +36,7 @@ Display Modul:
 - 8KB RAM (TC5565APL-15L), battery
 - piezo speaker
 
-For the dedicated tournament machines, see mephisto_modular_tm.cpp
+For the dedicated tournament machines, see modular_tm.cpp
 
 Undocumented buttons:
 - holding ENTER and LEFT cursor on boot runs diagnostics

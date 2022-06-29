@@ -45,7 +45,7 @@ If control Q4 is set, printer data can be read from I0.
 ******************************************************************************/
 
 #include "emu.h"
-#include "fidel_clockdiv.h"
+#include "clockdiv.h"
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
@@ -64,7 +64,7 @@ If control Q4 is set, printer data can be read from I0.
 
 namespace {
 
-// note: sub-class of fidel_clockdiv_state (see mame/machine/fidel_clockdiv.*)
+// note: sub-class of fidel_clockdiv_state (see clockdiv.*)
 
 class sc12_state : public fidel_clockdiv_state
 {

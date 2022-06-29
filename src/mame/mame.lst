@@ -911,17 +911,17 @@ sp_zigzgk                       //
 sp_zigzgl                       //
 sp_zigzgm                       //
 
-@source:aci/aci_boris.cpp
+@source:aci/boris.cpp
 boris                           //
 borisa                          //
 
-@source:aci/aci_borisdpl.cpp
+@source:aci/borisdpl.cpp
 borisdpl                        //
 
-@source:aci/aci_ggm.cpp
+@source:aci/ggm.cpp
 ggm
 
-@source:aci/aci_prodigy.cpp
+@source:aci/prodigy.cpp
 prodigy
 
 @source:jaleco/acommand.cpp
@@ -11748,18 +11748,18 @@ wallst                          // (c) 1982 Century
 @source:misc/cwheel.cpp
 cwheel                          // (c) 19?? Gamebar
 
-@source:cxg/cxg_ch2001.cpp
+@source:cxg/ch2001.cpp
 ch2001
 
-@source:cxg/cxg_dominator.cpp
+@source:cxg/dominator.cpp
 scmder
 sdtor
 
-@source:cxg/cxg_scptchess.cpp
+@source:cxg/scptchess.cpp
 prtchess
 scptchess
 
-@source:cxg/cxg_sphinx40.cpp
+@source:cxg/sphinx40.cpp
 sphinx40
 
 @source:skeleton/cxhumax.cpp
@@ -13973,59 +13973,59 @@ ffantasym                       //
 fgoal                           // TF  (c) 1979 Taito Corporation
 fgoala                          // MF  (c) 1979 Taito Corporation
 
-@source:fidelity/fidel_as12.cpp
+@source:fidelity/as12.cpp
 feleg
 felega
 
-@source:fidelity/fidel_card.cpp
+@source:fidelity/card.cpp
 bridgec
 bridgec3
 bridgeca
 gincribc
 vbrc
 
-@source:fidelity/fidel_cc1.cpp
+@source:fidelity/cc1.cpp
 cc1                             //
 cc3                             //
 cc10c
 
-@source:fidelity/fidel_cc10.cpp
+@source:fidelity/cc10.cpp
 cc10                            //
 cc10a                           //
 checkc4                         //
 
-@source:fidelity/fidel_cc7.cpp
+@source:fidelity/cc7.cpp
 backgamc                        //
 cc7                             //
 cc7a                            //
 
-@source:fidelity/fidel_checkc2.cpp
+@source:fidelity/checkc2.cpp
 checkc2
 
-@source:fidelity/fidel_chesster.cpp
+@source:fidelity/chesster.cpp
 chesster                        //
 chesstera                       //
 kishon                          //
 kishona                         //
 
-@source:fidelity/fidel_csc.cpp
+@source:fidelity/csc.cpp
 csc                             //
 csce                            //
 cscet                           //
 reversic                        //
 super9cc                        //
 
-@source:fidelity/fidel_dames.cpp
+@source:fidelity/dames.cpp
 damesc                          //
 
-@source:fidelity/fidel_desdis.cpp
+@source:fidelity/desdis.cpp
 fdes2000d                       //
 fdes2100d                       //
 fdes2265                        //
 fdes2265a                       //
 fdes2325                        //
 
-@source:fidelity/fidel_eag68k.cpp
+@source:fidelity/eag68k.cpp
 feagv10                         //
 feagv11                         //
 feagv2                          //
@@ -14042,10 +14042,10 @@ fex68km2a                       //
 fex68km3                        //
 fex68km4                        //
 
-@source:fidelity/fidel_eldorado.cpp
+@source:fidelity/eldorado.cpp
 feldo
 
-@source:fidelity/fidel_elite.cpp
+@source:fidelity/elite.cpp
 feas                            //
 feasbu                          //
 feasbua                         //
@@ -14059,7 +14059,7 @@ fpres                           //
 fpresbu                         //
 fpresgla                        //
 
-@source:fidelity/fidel_excel.cpp
+@source:fidelity/excel.cpp
 fdes2000                        //
 fdes2100                        //
 fexcel                          //
@@ -14072,36 +14072,36 @@ fexcelpb                        //
 fexcelv                         //
 granits                         // RCS
 
-@source:fidelity/fidel_msc.cpp
+@source:fidelity/msc.cpp
 miniscco
 
-@source:fidelity/fidel_phantom.cpp
+@source:fidelity/phantom.cpp
 cphantom                        //
 fphantom                        //
 
-@source:fidelity/fidel_sc12.cpp
+@source:fidelity/sc12.cpp
 fscc12                          //
 fscc12b                         //
 
-@source:fidelity/fidel_sc6.cpp
+@source:fidelity/sc6.cpp
 fscc6                           //
 gambit
 miniscc
 
-@source:fidelity/fidel_sc8.cpp
+@source:fidelity/sc8.cpp
 fscc8                           //
 
-@source:fidelity/fidel_sc9.cpp
+@source:fidelity/sc9.cpp
 fscc9                           //
 fscc9b                          //
 fscc9c                          //
 fscc9ps                         //
 
-@source:fidelity/fidel_vcc.cpp
+@source:fidelity/vcc.cpp
 uvc                             //
 vcc                             //
 
-@source:fidelity/fidel_vsc.cpp
+@source:fidelity/vsc.cpp
 vsc                             //
 
 @source:konami/finalizr.cpp
@@ -23271,26 +23271,26 @@ mekd5                           // 1980 Motorola Evaluation Kit
 crzyddz2                        // 2006 Sealy
 menghong                        // 2004? Sealy
 
-@source:hegener/mephisto_academy.cpp
+@source:hegener/academy.cpp
 academy
 academyg
 academyga
 
-@source:hegener/mephisto_amsterdam.cpp
+@source:hegener/amsterdam.cpp
 amsterd                         // Amsterdam
 dallas16                        // Dallas
 dallas32                        // Dallas
 roma16                          // Roma
 roma32                          // Roma
 
-@source:hegener/mephisto_berlin.cpp
+@source:hegener/berlin.cpp
 berl16                          // 1992 Mephisto Berlin 68000
 berl16a                         // 1992 Mephisto Berlin 68000
 berlinp                         // 1994 Mephisto Berlin Pro 68020
 berl16l                         // 1996 Mephisto Berlin 68000 London Upgrade
 berlinpl                        // 1996 Mephisto Berlin Pro London Upgrade
 
-@source:hegener/mephisto_brikett.cpp
+@source:hegener/brikett.cpp
 mephisto
 mephisto1x
 mephisto2
@@ -23302,23 +23302,23 @@ mephisto3b
 mephisto3c
 mephistoj
 
-@source:hegener/mephisto_glasgow.cpp
+@source:hegener/glasgow.cpp
 amsterda                        // Amsterdam
 dallas16a                       // Dallas
 glasgow                         // Glasgow
 roma16a                         // Roma
 
-@source:hegener/mephisto_milano.cpp
+@source:hegener/milano.cpp
 milano                          // 1991 Mephisto Milano
 milanoa                         // 1991 Mephisto Milano
 nshort                          // 1993 Mephisto Nigel Short
 
-@source:hegener/mephisto_mm1.cpp
+@source:hegener/mm1.cpp
 mm1
 mm1b
 mmirage
 
-@source:hegener/mephisto_mm2.cpp
+@source:hegener/mm2.cpp
 mm2                             // Mephisto MM II
 mm2a                            // Mephisto MM II
 mm2b                            // Mephisto MM II
@@ -23337,12 +23337,12 @@ mm5p
 rebel5                          // Mephisto Rebell 5.0
 rebel5a                         // Mephisto Rebell 5.0
 
-@source:hegener/mephisto_modena.cpp
+@source:hegener/modena.cpp
 modena                          // 1992 Mephisto Modena
 modenaa                         // 1992 Mephisto Modena
 modenab                         // 1992 Mephisto Modena
 
-@source:hegener/mephisto_modular.cpp
+@source:hegener/modular.cpp
 alm16                           // 1988 Mephisto Almeria 16 Bit
 alm32                           // 1988 Mephisto Almeria 32 Bit
 port16                          // 1989 Mephisto Portorose 16 Bit
@@ -23359,7 +23359,7 @@ gen32l                          // 1996 Mephisto Genius 68030 London Upgrade
 lond16                          // 1996 Mephisto London 16 Bit
 lond32                          // 1996 Mephisto London 32 Bit
 
-@source:hegener/mephisto_modular_tm.cpp
+@source:hegener/modular_tm.cpp
 port32t
 lyon32t
 lyon32t8
@@ -23369,32 +23369,32 @@ berl32t8p
 lond32t
 lond32t8
 
-@source:hegener/mephisto_mondial.cpp
+@source:hegener/mondial.cpp
 mondial                         // 1985 Mephisto Mondial
 
-@source:hegener/mephisto_mondial2.cpp
+@source:hegener/mondial2.cpp
 mondial2                        // 1987 Mephisto Mondial II
 
-@source:hegener/mephisto_mondial68k.cpp
+@source:hegener/mondial68k.cpp
 mondl68k                        // 1988 Mephisto Mondial 68000XL
 
-@source:hegener/mephisto_montec.cpp
+@source:hegener/montec.cpp
 montec                          // 1987 Mephisto Monte Carlo
 monteca                         // 1987 Mephisto Monte Carlo
 montec4                         // 1989 Mephisto Monte Carlo IV
 montec4le                       // 1990 Mephisto Monte Carlo IV LE
 
-@source:hegener/mephisto_polgar.cpp
+@source:hegener/polgar.cpp
 polgar                          // 1990 Mephisto Polgar
 polgara                         // 1989 Mephisto Polgar
 polgar10                        // 1990 Mephisto Polgar 10MHz
 polgar101                       // 1990 Mephisto Polgar 10MHz
 
-@source:hegener/mephisto_risc.cpp
+@source:hegener/risc.cpp
 mrisc                           // 1992 Mephisto RISC 1MB
 mrisc2                          // 1994 Mephisto RISC II
 
-@source:hegener/mephisto_smondial.cpp
+@source:hegener/smondial.cpp
 mega4                           // 1989 Mephisto Mega IV
 mega4a                          // 1989 Mephisto Mega IV
 smondial                        // 1986 Mephisto Super Mondial (Ver A)
@@ -33755,14 +33755,14 @@ unkfr004c
 @source:novadesitec/novadesitec_fr009.cpp
 unkfr009
 
-@source:novag/novag_cexpert.cpp
+@source:novag/cexpert.cpp
 cexpert
 
-@source:novag/novag_cforte.cpp
+@source:novag/cforte.cpp
 cfortea
 cforteb
 
-@source:novag/novag_const.cpp
+@source:novag/const.cpp
 const
 const36
 const36a
@@ -33770,22 +33770,22 @@ constq
 ssensor4
 supercon
 
-@source:novag/novag_diablo.cpp
+@source:novag/diablo.cpp
 diablo68
 diablo68a
 scorpio68
 
-@source:novag/novag_micro.cpp
+@source:novag/micro.cpp
 nmicro
 
-@source:novag/novag_micro2.cpp
+@source:novag/micro2.cpp
 nmicro2
 
-@source:novag/novag_savant.cpp
+@source:novag/savant.cpp
 savant                          //
 savant2                         //
 
-@source:novag/novag_sexpert.cpp
+@source:novag/sexpert.cpp
 sexperta                        //
 sexperta1                       //
 sexperta2                       //
@@ -33800,7 +33800,7 @@ sforteb                         //
 sfortec                         //
 sfortec1                        //
 
-@source:novag/novag_snova.cpp
+@source:novag/snova.cpp
 nsnova
 supremo
 
@@ -37237,75 +37237,75 @@ sag
 @source:sage/sage2.cpp
 sage2
 
-@source:saitek/saitek_ccompan.cpp
+@source:saitek/ccompan.cpp
 ccompan
 
-@source:saitek/saitek_chesstrv.cpp
+@source:saitek/chesstrv.cpp
 chesstrv
 chesstrvi
 
-@source:saitek/saitek_corona.cpp
+@source:saitek/corona.cpp
 corona
 coronaa
 coronab
 
-@source:saitek/saitek_cp2000.cpp
+@source:saitek/cp2000.cpp
 cp2000
 
-@source:saitek/saitek_delta1.cpp
+@source:saitek/delta1.cpp
 ccdelta1
 
-@source:saitek/saitek_exchess.cpp
+@source:saitek/exchess.cpp
 exchess
 
-@source:saitek/saitek_intchess.cpp
+@source:saitek/intchess.cpp
 intchess
 
-@source:saitek/saitek_leonardo.cpp
+@source:saitek/leonardo.cpp
 galileo
 leonardo
 leonardoa
 leonardob
 
-@source:saitek/saitek_mark5.cpp
+@source:saitek/mark5.cpp
 ccmk5
 ccmk6
 
-@source:saitek/saitek_minichess.cpp
+@source:saitek/minichess.cpp
 smchess
 
-@source:saitek/saitek_prschess.cpp
+@source:saitek/prschess.cpp
 prschess
 
-@source:saitek/saitek_renaissance.cpp
+@source:saitek/renaissance.cpp
 renaissa
 renaissaa
 
-@source:saitek/saitek_risc2500.cpp
+@source:saitek/risc2500.cpp
 montreux
 risc2500
 risc2500a
 
-@source:saitek/saitek_schess.cpp
+@source:saitek/schess.cpp
 schess
 
-@source:saitek/saitek_simultano.cpp
+@source:saitek/simultano.cpp
 cc2150
 simultano
 simultanoa
 
-@source:saitek/saitek_ssystem3.cpp
+@source:saitek/ssystem3.cpp
 ssystem3
 ssystem4
 
-@source:saitek/saitek_stratos.cpp
+@source:saitek/stratos.cpp
 stratos
 stratosa
 tking
 tkinga
 tkingb
 
-@source:saitek/saitek_superstar.cpp
+@source:saitek/superstar.cpp
 sstar28k
 sstar36k
 tstar432

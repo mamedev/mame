@@ -4,7 +4,7 @@
 /******************************************************************************
 
 Fidelity Elite A/S series hardware (EAS, EAG, PC)
-see fidel_eag68k.cpp for 68000-based EAG hardware
+see eag68k.cpp for 68000-based EAG hardware
 
 TODO:
 - verify fpres/feas irq active time
@@ -59,7 +59,7 @@ uninteresting to emulate as separate drivers.
 ******************************************************************************/
 
 #include "emu.h"
-#include "fidel_clockdiv.h"
+#include "clockdiv.h"
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
@@ -84,7 +84,7 @@ uninteresting to emulate as separate drivers.
 
 namespace {
 
-// note: sub-class of fidel_clockdiv_state (see mame/machine/fidel_clockdiv.*)
+// note: sub-class of fidel_clockdiv_state (see clockdiv.*)
 
 // EAS / shared
 
