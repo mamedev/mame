@@ -3242,7 +3242,7 @@ avalnche                        // 030574           1978/04 [6502]
 cascade                         // bootleg
 catchp                          // 008837 prototype 1977/?? [6502]
 
-@source:ave/ave_arb.cpp
+@source:misc_chess/ave_arb.cpp
 arb                             //
 arbv2                           //
 
@@ -10595,7 +10595,7 @@ citycon                         // (c) 1985 Jaleco
 citycona                        // (c) 1985 Jaleco
 cruisin                         // (c) 1985 Jaleco/Kitkorp
 
-@source:chessking/cking_master.cpp
+@source:misc_chess/cking_master.cpp
 ckmaster                        //
 
 @source:alliedl/clayshoo.cpp
@@ -10783,7 +10783,7 @@ compgolfo                       // (c) 1985 Data East Corporation (Japan)
 compis                          // 1985 Telenova Compis
 compis2                         // 1985 Telenova Compis
 
-@source:dcs/compuchess.cpp
+@source:misc_chess/compuchess.cpp
 ccmk1                           // Chess Champion MK I
 cmpchess
 cmpchess2
@@ -10806,7 +10806,7 @@ comquest                        // Comquest Plus German
 comx35n                         //
 comx35p                         //
 
-@source:consumenta/conchess.cpp
+@source:misc_chess/conchess.cpp
 concply5
 concply8
 concplyv
@@ -10815,10 +10815,10 @@ concstd
 @source:concept/concept.cpp
 concept                         // 1982 Corvus Concept
 
-@source:conic/conic_cchess2.cpp
+@source:misc_chess/conic_cchess2.cpp
 cncchess2
 
-@source:conic/conic_cchess3.cpp
+@source:misc_chess/conic_cchess3.cpp
 cncchess3
 
 @source:skeleton/consola_emt.cpp
@@ -36677,7 +36677,7 @@ zerohour                        // 8011 (c) Universal
 zerohoura                       // 8011 (c) Universal
 zerohouri                       //
 
-@source:francedr/regence.cpp
+@source:misc_chess/regence.cpp
 regence
 
 @source:atari/relief.cpp
@@ -41251,7 +41251,7 @@ targeth                         // (c) 1994 - Ref 940531
 targetha                        // (c) 1994 - Ref 940531
 targeth10                       // (c) 1994 - Ref 940531
 
-@source:tasc/tasc.cpp
+@source:misc_chess/tasc.cpp
 tascr30
 tascr30a
 tascr30b

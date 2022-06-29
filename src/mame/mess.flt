@@ -79,7 +79,6 @@ att/att4425.cpp
 att/att610.cpp
 att/att630.cpp
 att/unixpc.cpp
-ave/ave_arb.cpp
 aviion/aviion88k.cpp
 banctec/banctec.cpp
 bandai/bandai_design_master.cpp
@@ -157,7 +156,6 @@ cccp/vta2000.cpp
 cce/mc1000.cpp
 ccs/ccs2810.cpp
 ceres/ceres.cpp
-chessking/cking_master.cpp
 chromatics/cgc7900.cpp
 chrysler/eva.cpp
 citoh/cit101.cpp
@@ -169,11 +167,8 @@ coleco/wrinkles.cpp
 compugraphic/pwrview.cpp
 comx/comx35.cpp
 concept/concept.cpp
-conic/conic_cchess2.cpp
-conic/conic_cchess3.cpp
 conitec/prof180x.cpp
 conitec/prof80.cpp
-consumenta/conchess.cpp
 cromemco/c10.cpp
 cromemco/mcb216.cpp
 cxg/ch2001.cpp
@@ -182,7 +177,6 @@ cxg/scptchess.cpp
 cxg/sphinx40.cpp
 cybiko/cybiko.cpp
 dai/dai.cpp
-dcs/compuchess.cpp
 ddr/ac1.cpp
 ddr/bcs3.cpp
 ddr/c80.cpp
@@ -288,7 +282,6 @@ force/fccpu20.cpp
 force/fccpu30.cpp
 force/force68k.cpp
 force/miniforce.cpp
-francedr/regence.cpp
 fujitsu/fm7.cpp
 fujitsu/fmtowns.cpp
 funtech/supracan.cpp
@@ -462,6 +455,14 @@ midway/astrohome.cpp
 mips/mips.cpp
 misc/3do.cpp
 misc/vectrex.cpp
+misc_chess/ave_arb.cpp
+misc_chess/cking_master.cpp
+misc_chess/compuchess.cpp
+misc_chess/conic_cchess2.cpp
+misc_chess/conic_cchess3.cpp
+misc_chess/conchess.cpp
+misc_chess/regence.cpp
+misc_chess/tasc.cpp
 misc_handheld/hh_cop400.cpp
 misc_handheld/hh_cops1.cpp
 misc_handheld/hh_hmcs40.cpp
@@ -1038,7 +1039,6 @@ tangerin/alphatan.cpp
 tangerin/hhtiger.cpp
 tangerin/microtan.cpp
 tangerin/oric.cpp
-tasc/tasc.cpp
 tatung/einstein.cpp
 teamconc/comquest.cpp
 tectoy/pensebem.cpp

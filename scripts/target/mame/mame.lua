@@ -1273,7 +1273,6 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"atari",
 		"atlus",
 		"att",
-		"ave",
 		"aviion",
 		"banctec",
 		"bandai",
@@ -1297,7 +1296,6 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"ccs",
 		"ceres",
 		"ces",
-		"chessking",
 		"chromatics",
 		"chrysler",
 		"cinemat",
@@ -1308,16 +1306,13 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"compugraphic",
 		"comx",
 		"concept",
-		"conic",
 		"conitec",
-		"consumenta",
 		"cromemco",
 		"cvs",
 		"cxg",
 		"cybiko",
 		"dai",
 		"dataeast",
-		"dcs",
 		"ddr",
 		"dec",
 		"dgrm",
@@ -1350,7 +1345,6 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"falco",
 		"fidelity",
 		"force",
-		"francedr",
 		"fujitsu",
 		"funtech",
 		"funworld",
@@ -1430,6 +1424,7 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"midway",
 		"mips",
 		"misc",
+		"misc_chess",
 		"misc_handheld",
 		"mit",
 		"mits",
@@ -1540,7 +1535,6 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"taito",
 		"tandberg",
 		"tangerin",
-		"tasc",
 		"tatsumi",
 		"tatung",
 		"tch",
@@ -1807,11 +1801,6 @@ files {
 	MAME_DIR .. "src/mame/att/*.cpp",
 }
 
-createMAMEProjects(_target, _subtarget, "ave")
-files {
-	MAME_DIR .. "src/mame/ave/*.cpp",
-}
-
 createMAMEProjects(_target, _subtarget, "aviion")
 files {
 	MAME_DIR .. "src/mame/aviion/*.cpp",
@@ -1940,11 +1929,6 @@ files {
 	MAME_DIR .. "src/mame/ces/*.cpp",
 }
 
-createMAMEProjects(_target, _subtarget, "chessking")
-files {
-	MAME_DIR .. "src/mame/chessking/*.cpp",
-}
-
 createMAMEProjects(_target, _subtarget, "chromatics")
 files {
 	MAME_DIR .. "src/mame/chromatics/*.cpp",
@@ -1988,16 +1972,6 @@ files {
 createMAMEProjects(_target, _subtarget, "compugraphic")
 files {
 	MAME_DIR .. "src/mame/compugraphic/*.cpp",
-}
-
-createMAMEProjects(_target, _subtarget, "conic")
-files {
-	MAME_DIR .. "src/mame/conic/*.cpp",
-}
-
-createMAMEProjects(_target, _subtarget, "consumenta")
-files {
-	MAME_DIR .. "src/mame/consumenta/*.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "cromemco")
@@ -2050,11 +2024,6 @@ createMAMEProjects(_target, _subtarget, "dataeast")
 files {
 	MAME_DIR .. "src/mame/dataeast/*.cpp",
 	MAME_DIR .. "src/mame/dataeast/*.h",
-}
-
-createMAMEProjects(_target, _subtarget, "dcs")
-files {
-	MAME_DIR .. "src/mame/dcs/*.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "ddr")
@@ -2237,11 +2206,6 @@ files {
 createMAMEProjects(_target, _subtarget, "force")
 files {
 	MAME_DIR .. "src/mame/force/*.cpp",
-}
-
-createMAMEProjects(_target, _subtarget, "francedr")
-files {
-	MAME_DIR .. "src/mame/francedr/*.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "fujitsu")
@@ -3290,11 +3254,6 @@ files {
 	MAME_DIR .. "src/mame/tangerin/*.h",
 }
 
-createMAMEProjects(_target, _subtarget, "tasc")
-files {
-	MAME_DIR .. "src/mame/tasc/*.cpp",
-}
-
 createMAMEProjects(_target, _subtarget, "tatsumi")
 files {
 	MAME_DIR .. "src/mame/tatsumi/*.cpp",
@@ -3636,6 +3595,11 @@ createMAMEProjects(_target, _subtarget, "misc")
 files {
 	MAME_DIR .. "src/mame/misc/*.cpp",
 	MAME_DIR .. "src/mame/misc/*.h",
+}
+
+createMAMEProjects(_target, _subtarget, "misc_chess")
+files {
+	MAME_DIR .. "src/mame/misc_chess/*.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "misc_handheld")
