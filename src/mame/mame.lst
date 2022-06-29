@@ -9355,7 +9355,7 @@ bg_ddb                          //
 bg_max                          //
 bg_maxa                         //
 
-@source:ascii/big10.cpp
+@source:msx/big10.cpp
 big10                           // (c) 198? Unknown
 
 @source:xerox/bigbord2.cpp
@@ -14225,7 +14225,7 @@ foodfc                          // 136020           (c) 1982        // made by G
 @source:force/force68k.cpp
 fccpu1                          //
 
-@source:ascii/forte2.cpp
+@source:msx/forte2.cpp
 pesadelo                        // (c) 1989 Forte II Games
 
 @source:misc/fortecar.cpp
@@ -31154,7 +31154,7 @@ msisaac                         // A34 (c) 1985 Taito Corporation
 @source:skeleton/mstation.cpp
 mstation                        //
 
-@source:ascii/msx.cpp
+@source:msx/msx.cpp
 ax150                           //
 ax170                           //
 ax350                           //
@@ -34534,7 +34534,7 @@ pegasusm                        //
 @source:skeleton/pencil2.cpp
 pencil2                         //
 
-@source:ascii/pengadvb.cpp
+@source:msx/pengadvb.cpp
 pengadvb                        // (c) 1988 Screen
 pengadvb2                       // (c) 1988 Comet
 
@@ -37519,7 +37519,7 @@ sandscrp                        // (c) 1992 Face
 sandscrpa                       // (c) 1992 Face
 sandscrpb                       // (c) 1992 Face
 
-@source:ascii/sangho.cpp
+@source:msx/sangho.cpp
 pzlestar                        // (c) 1991 Sang Ho Soft
 sexyboom                        // (c) 1992 Sang Ho Soft
 sprpuzzle                       // (c) 1991 Sang Ho Soft
@@ -38850,7 +38850,7 @@ pss63                           // 199? Nintendo / BPS
 pss64                           // 199? Nintendo / Hudson Soft
 sfcbox                          //
 
-@source:ascii/sfkick.cpp
+@source:msx/sfkick.cpp
 sfkick                          // (c) 1988 Haesung/HJ Corp
 sfkicka                         // (c) 198? Haesung
 spinkick                        // (c) 1988 Haesung/Seojin

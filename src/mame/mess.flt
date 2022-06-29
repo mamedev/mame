@@ -62,7 +62,6 @@ appliedconcepts/ggm.cpp
 appliedconcepts/prodigy.cpp
 appliedtech/mbee.cpp
 arcadia/arcadia.cpp
-ascii/msx.cpp
 at/at.cpp
 at/atpci.cpp
 at/ct486.cpp
@@ -503,6 +502,7 @@ motorola/mvme147.cpp
 motorola/mvme162.cpp
 motorola/sys1121.cpp
 motorola/uchroma68.cpp
+msx/msx.cpp
 multitch/mkit09.cpp
 multitch/mpf1.cpp
 mupid/mdisk.cpp

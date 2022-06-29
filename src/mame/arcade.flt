@@ -25,11 +25,6 @@ amiga/upscope.cpp
 aristocr/aristmk4.cpp
 aristocr/aristmk6.cpp
 aristocr/caswin.cpp
-ascii/big10.cpp
-ascii/forte2.cpp
-ascii/pengadvb.cpp
-ascii/sangho.cpp
-ascii/sfkick.cpp
 atari/akkaarrh.cpp
 atari/arcadecl.cpp
 atari/asteroid.cpp
@@ -945,6 +940,11 @@ misc/yuvomz80.cpp
 mr/dribling.cpp
 mr/sshot.cpp
 mr/subhuntr.cpp
+msx/big10.cpp
+msx/forte2.cpp
+msx/pengadvb.cpp
+msx/sangho.cpp
+msx/sfkick.cpp
 namco/20pacgal.cpp
 namco/30test.cpp
 namco/baraduke.cpp

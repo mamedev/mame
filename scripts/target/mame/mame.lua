@@ -1268,7 +1268,6 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"appliedtech",
 		"arcadia",
 		"aristocr",
-		"ascii",
 		"at",
 		"atari",
 		"atlus",
@@ -1434,6 +1433,7 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"mos",
 		"motorola",
 		"mr",
+		"msx",
 		"multitch",
 		"mupid",
 		"nakajima",
@@ -1771,12 +1771,6 @@ files {
 createMAMEProjects(_target, _subtarget, "aristocr")
 files {
 	MAME_DIR .. "src/mame/aristocr/*.cpp",
-}
-
-createMAMEProjects(_target, _subtarget, "ascii")
-files {
-	MAME_DIR .. "src/mame/ascii/*.cpp",
-	MAME_DIR .. "src/mame/ascii/*.h",
 }
 
 createMAMEProjects(_target, _subtarget, "at")
@@ -2555,12 +2549,6 @@ files {
 	MAME_DIR .. "src/mame/maygay/*.h",
 }
 
-createMAMEProjects(_target, _subtarget, "miltonbradley")
-files {
-	MAME_DIR .. "src/mame/miltonbradley/*.cpp",
-	MAME_DIR .. "src/mame/miltonbradley/*.h",
-}
-
 createMAMEProjects(_target, _subtarget, "mchester")
 files {
 	MAME_DIR .. "src/mame/mchester/*.cpp",
@@ -2638,6 +2626,12 @@ files {
 	MAME_DIR .. "src/mame/midway/*.ipp",
 }
 
+createMAMEProjects(_target, _subtarget, "miltonbradley")
+files {
+	MAME_DIR .. "src/mame/miltonbradley/*.cpp",
+	MAME_DIR .. "src/mame/miltonbradley/*.h",
+}
+
 createMAMEProjects(_target, _subtarget, "mips")
 files {
 	MAME_DIR .. "src/mame/mips/*.cpp",
@@ -2684,6 +2678,12 @@ createMAMEProjects(_target, _subtarget, "mr")
 files {
 	MAME_DIR .. "src/mame/mr/*.cpp",
 	MAME_DIR .. "src/mame/mr/*.h",
+}
+
+createMAMEProjects(_target, _subtarget, "msx")
+files {
+	MAME_DIR .. "src/mame/msx/*.cpp",
+	MAME_DIR .. "src/mame/msx/*.h",
 }
 
 createMAMEProjects(_target, _subtarget, "multitch")
