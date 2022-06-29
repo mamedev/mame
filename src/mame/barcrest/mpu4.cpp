@@ -654,8 +654,8 @@ TIMER_CALLBACK_MEMBER(mpu4_state::update_ic24)
 
 WRITE_LINE_MEMBER(mpu4_state::dataport_rxd)
 {
-	m_serial_data = state;
 	m_pia4->cb1_w(state);
+	m_serial_detect=state;
 	LOG_IC3(("Dataport RX %x\n",state));
 }
 
@@ -701,7 +701,8 @@ uint8_t mpu4_state::pia_ic4_portb_r()
 {
 	m_ic4_input_b = 0x00;
 
-	if ( m_serial_data )
+    // Serial data is tied to CB1, and this pin to ensure the CPU can read it, hence the detect variable
+	if ( m_serial_detect )
 	{
 		m_ic4_input_b |=  0x80;
 	}
@@ -931,8 +932,8 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic5_ca2_w)
 	LOG(("%s: IC5 PIA Write CA2 (Serial Tx) %2x\n",machine().describe_context(),state));
 	if (m_dataport_loopback)
 	{
-		m_serial_data = state;
 		m_pia4->cb1_w(state);
+		m_serial_detect=state;
 	}
 	else
 	{
@@ -2434,6 +2435,12 @@ void mpu4_state::mod2(machine_config &config)
 	mpu4_reels<0, 6>(config);
 }
 
+void mpu4_state::mod2_no_bacta(machine_config &config)
+{
+	mod2(config);
+	config.device_remove("dataport");
+}
+
 void mpu4_state::mod2_7reel(machine_config &config)
 {
 	mpu4base(config);
@@ -2543,6 +2550,12 @@ void mpu4_state::mod4yam(machine_config &config)
 	m_ym2413->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
 
+void mpu4_state::mod4yam_no_bacta(machine_config &config)
+{
+	mod4yam(config);
+	config.device_remove("dataport");
+}
+
 void mpu4_state::mod4yam_chr(machine_config &config)
 {
 	mod4yam(config);
@@ -2614,6 +2627,12 @@ void mpu4_state::mod4oki(machine_config &config)
 	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
 	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
+
+void mpu4_state::mod4oki_no_bacta(machine_config &config)
+{
+	mod4oki(config);
+	config.device_remove("dataport");
 }
 
 void mpu4_state::mod4oki_7reel(machine_config &config)

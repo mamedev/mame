@@ -1538,7 +1538,7 @@ ROM_START( m4magdrg )
 ROM_END
 
 
-GAME(198?, m4tst, 0, mod4yam, mpu4, mpu4mod4yam_machines_state, init_m4test4, ROT0,"Barcrest","MPU4 Unit Test (Program 4)",MACHINE_MECHANICAL )
+GAME(198?, m4tst, 0, mod4yam_no_bacta, mpu4, mpu4mod4yam_machines_state, init_m4test4, ROT0,"Barcrest","MPU4 Unit Test (Program 4)",MACHINE_MECHANICAL )
 
 GAME(199?, m4joljokd, 0,       mod4yam_cheatchr_pal<mpu4_characteriser_pal::celclb_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","Jolly Joker (Barcrest) (Dutch) (MPU4) (DJJ 1.5)",GAME_FLAGS) // Geen Tubes
 

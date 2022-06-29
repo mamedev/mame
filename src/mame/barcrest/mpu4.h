@@ -179,6 +179,7 @@ public:
 	void init_m4default_seven();
 
 	void mod2(machine_config &config);
+	void mod2_no_bacta(machine_config &config);
 	void mod2_7reel(machine_config &config);
 
 	void mod2_cheatchr(machine_config &config);
@@ -416,12 +417,14 @@ public:
 	void mod4oki_alt_cheatchr_table(machine_config& config, const uint8_t* table);
 
 	void mod4oki(machine_config &config);
+	void mod4oki_no_bacta(machine_config &config);
 	void mod4oki_7reel(machine_config &config);
 	void mod4oki_cheatchr(machine_config &config);
 	void mod4oki_cheatchr_table(machine_config &config, const uint8_t* table);
 	void mod4oki_chr(machine_config &config);
 
 	void mod4yam(machine_config &config);
+	void mod4yam_no_bacta(machine_config &config);
 	void mod4yam_7reel(machine_config &config);
 	void mod4yam_cheatchr(machine_config &config);
 	void mod4yam_cheatchr_table(machine_config& config, const uint8_t* table);
@@ -434,6 +437,7 @@ public:
 	void mpu4_common(machine_config &config);
 	void mpu4_common2(machine_config &config);
 	void mpu4base(machine_config &config);
+	void mpu4_bacta(machine_config &config);
 
 protected:
 
@@ -598,8 +602,8 @@ protected:
 
 	int m_mod_number = 0;
 	int m_mmtr_data = 0;
+	int m_serial_detect = 0;
 	int m_ay8913_address = 0;
-	int m_serial_data = 0;
 	int m_signal_50hz = 0;
 	int m_ic4_input_b = 0;
 	int m_aux1_input = 0;
