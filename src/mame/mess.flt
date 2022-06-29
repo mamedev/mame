@@ -393,7 +393,6 @@ intel/sdk85.cpp
 intel/sdk86.cpp
 interpro/interpro.cpp
 interton/vc4000.cpp
-intv/intv.cpp
 isc/compucolor.cpp
 jazz/jazz.cpp
 kawai/kawai_acr20.cpp
@@ -440,8 +439,9 @@ matsushi/jr100.cpp
 matsushi/jr200.cpp
 matsushi/myb3k.cpp
 mattel/aquarius.cpp
+mattel/chess.cpp
+mattel/intv.cpp
 mattel/juicebox.cpp
-mattel/mattelchess.cpp
 mb/microvsn.cpp
 mb/milton6805.cpp
 mchester/ssem.cpp

@@ -17465,7 +17465,7 @@ ip6800                          // Intergraph InterPro/InterServe 68x0
 @source:misc/intrscti.cpp
 intrscti                        // ????
 
-@source:intv/intv.cpp
+@source:mattel/intv.cpp
 intv                            // Mattel Intellivision - 1979 AKA INTV
 intv2                           // Mattel Intellivision II- 1982?
 intvecs                         // 1983 - Mattel Intellivision w/ECS and IntelliVoice expansions
@@ -20966,7 +20966,7 @@ matmania                        // TA-0015 (c) 1985 + Taito America license
 @source:misc/matrix.cpp
 matrix                          //
 
-@source:mattel/mattelchess.cpp
+@source:mattel/chess.cpp
 mchess
 
 @source:trs/max80.cpp

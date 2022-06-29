@@ -1386,7 +1386,6 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"intel",
 		"interpro",
 		"interton",
-		"intv",
 		"irem",
 		"isc",
 		"itech",
@@ -2441,12 +2440,6 @@ createMAMEProjects(_target, _subtarget, "interton")
 files {
 	MAME_DIR .. "src/mame/interton/*.cpp",
 	MAME_DIR .. "src/mame/interton/*.h",
-}
-
-createMAMEProjects(_target, _subtarget, "intv")
-files {
-	MAME_DIR .. "src/mame/intv/*.cpp",
-	MAME_DIR .. "src/mame/intv/*.h",
 }
 
 createMAMEProjects(_target, _subtarget, "irem")
