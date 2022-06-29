@@ -203,7 +203,7 @@ ROM_END
 // TODO: find a better place for this table to live
 struct mac_monitor_info { bool mono; unsigned sense[4]; };
 mac_monitor_info const f_monitors[] = {
-									//                          512×385     640×480     640×870     832×624     1024×768    1152×870
+									//                          512×385     640×480     640×870     832×624     1024×768    1152×870                            640×480
 									//                          60.15 Hz    66.67 Hz    75.08 Hz    74.55 Hz    74.93 Hz    75.08 Hz    59.94 Hz    55.98 Hz    59.94 Hz    50.00 Hz
 									//                                                  portrait                                                                interlaced  interlaced
 	{ false, { 0, 0, 0, 0 } },      //  0: RGB 21"                                                                          yes
@@ -214,7 +214,7 @@ mac_monitor_info const f_monitors[] = {
 	{ false, { 5, 1, 5, 4 } },      //  5: RGB 15"                                      yes
 	{ false, { 6, 2, 4, 6 } },      //  6: Hi-Res (12-14")                  yes
 	{ false, { 6, 0, 0, 6 } },      //  7: Multiple Scan 14"                yes                     yes
-	{ false, { 6, 0, 4, 6 } },      //  8: Multiple Scan 16"                yes                     yes         yes         yes
+	{ false, { 6, 0, 4, 6 } },      //  8: Multiple Scan 16"                yes                     yes         yes
 	{ false, { 6, 2, 0, 6 } },      //  9: Multiple Scan 21"                yes                     yes         yes         yes
 	{ false, { 7, 0, 0, 0 } },      // 10: PAL Encoder                                                                                                                      yes
 	{ false, { 7, 1, 1, 0 } },      // 11: NTSC Encoder                                                                                                         yes
