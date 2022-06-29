@@ -11648,6 +11648,9 @@ cswat                           // (c) 1984
 @source:at/ct486.cpp
 ct486                           // 1993? 486 with CS4031
 
+@source:skeleton/ct909e_segadvd.cpp
+megatrix
+
 @source:casio/ctk551.cpp
 ctk551                          //
 
