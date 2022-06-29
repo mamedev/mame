@@ -613,6 +613,7 @@ midway/vegas.cpp
 midway/williams.cpp
 midway/wmg.cpp
 midway/zwackery.cpp
+miltonbradley/vectrex.cpp
 misc/39in1.cpp
 misc/3do.cpp
 misc/4enlinea.cpp
@@ -927,7 +928,6 @@ misc/usgames.cpp
 misc/v0bowl.cpp
 misc/vamphalf.cpp
 misc/vcombat.cpp
-misc/vectrex.cpp
 misc/video21.cpp
 misc/videosaa.cpp
 misc/vlc.cpp
@@ -1573,5 +1573,5 @@ zaccaria/zaccaria.cpp
 //ibmpc/sis630.cpp
 -shutms11
 
-//misc/vectrex.cpp
+//miltonbradley/vectrex.cpp
 -vectrex

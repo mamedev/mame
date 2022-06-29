@@ -2,7 +2,8 @@
 // copyright-holders:Mathis Rosenhauer
 /*****************************************************************
 
-GCE Vectrex
+Vectrex, conceived by Smith Engineering, manufactured by GCE.
+GCE was acquired by Milton Bradley half a year later.
 
 Mathis Rosenhauer
 Christopher Salomon (technical advice)

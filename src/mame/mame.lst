@@ -23708,7 +23708,7 @@ mt6809                          // 1984 Microtan 65 (6809 CPU)
 @source:microterm/microterm_f8.cpp
 act5a                           //
 
-@source:mb/microvsn.cpp
+@source:miltonbradley/microvsn.cpp
 microvsn                        // Milton Bradley
 
 @source:neogeo/midas.cpp
@@ -23907,7 +23907,7 @@ mil4000b                        // (c) 2000 Sure Milano
 mil4000c                        // (c) 2000 Sure Milano
 top21                           // (c) 200? Assogiochi Assago (Mi)
 
-@source:mb/milton6805.cpp
+@source:miltonbradley/milton6805.cpp
 milton                          // 1980 Milton Bradley
 
 @source:skeleton/milwaukee.cpp
@@ -42647,7 +42647,7 @@ vector06                        //
 @source:skeleton/vector4.cpp
 vector4                         //
 
-@source:misc/vectrex.cpp
+@source:miltonbradley/vectrex.cpp
 raaspec                         // (c) Roy Abel & Associates 1984
 vectrex                         // General Consumer Electric Vectrex - 1982-1984
 

@@ -1407,7 +1407,6 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"matsushi",
 		"mattel",
 		"maygay",
-		"mb",
 		"mchester",
 		"meadows",
 		"memotech",
@@ -1422,6 +1421,7 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"midcoin",
 		"midw8080",
 		"midway",
+		"miltonbradley",
 		"mips",
 		"misc",
 		"misc_chess",
@@ -2555,9 +2555,10 @@ files {
 	MAME_DIR .. "src/mame/maygay/*.h",
 }
 
-createMAMEProjects(_target, _subtarget, "mb")
+createMAMEProjects(_target, _subtarget, "miltonbradley")
 files {
-	MAME_DIR .. "src/mame/mb/*.cpp",
+	MAME_DIR .. "src/mame/miltonbradley/*.cpp",
+	MAME_DIR .. "src/mame/miltonbradley/*.h",
 }
 
 createMAMEProjects(_target, _subtarget, "mchester")

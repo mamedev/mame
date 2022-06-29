@@ -435,8 +435,6 @@ mattel/aquarius.cpp
 mattel/chess.cpp
 mattel/intv.cpp
 mattel/juicebox.cpp
-mb/microvsn.cpp
-mb/milton6805.cpp
 mchester/ssem.cpp
 memotech/mtx.cpp
 mera/ec7915.cpp
@@ -452,9 +450,11 @@ microterm/microterm_f8.cpp
 microterm/mt420.cpp
 microterm/mt5510.cpp
 midway/astrohome.cpp
+miltonbradley/microvsn.cpp
+miltonbradley/milton6805.cpp
+miltonbradley/vectrex.cpp
 mips/mips.cpp
 misc/3do.cpp
-misc/vectrex.cpp
 misc_chess/ave_arb.cpp
 misc_chess/cking_master.cpp
 misc_chess/compuchess.cpp
@@ -1292,5 +1292,5 @@ zvt/pp01.cpp
 -gamecst2
 -gamecstl
 
-//misc/vectrex.cpp
+//miltonbradley/vectrex.cpp
 -raaspec
