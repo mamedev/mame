@@ -31,7 +31,6 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "kr1601rr1.h"
 
 #include "vt100_kbd.h"
 
@@ -42,6 +41,7 @@
 #include "machine/i8214.h"
 #include "machine/i8251.h"
 #include "machine/i8257.h"
+#include "machine/kr1601rr1.h"
 #include "machine/pit8253.h"
 #include "machine/ripple_counter.h"
 #include "video/i8275.h"
