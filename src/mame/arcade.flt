@@ -265,6 +265,7 @@ dataeast/thedeep.cpp
 dataeast/tryout.cpp
 dataeast/tumbleb.cpp
 dataeast/vaportra.cpp
+ddr/polyplay.cpp
 dgrm/blackt96.cpp
 dgrm/pokechmp.cpp
 dooyong/dooyong.cpp
@@ -843,7 +844,6 @@ misc/pntnpuzl.cpp
 misc/poker72.cpp
 misc/pokerout.cpp
 misc/policetr.cpp
-misc/polyplay.cpp
 misc/potgoldu.cpp
 misc/proconn.cpp
 misc/psattack.cpp

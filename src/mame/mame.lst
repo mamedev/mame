@@ -10421,11 +10421,11 @@ ccmk2                           // Chess Champion MK II
 ccmk2a                          //
 chmate                          //
 
-@source:veb/chessmst.cpp
+@source:ddr/chessmst.cpp
 chessmst
 chessmsta
 
-@source:veb/chessmstdm.cpp
+@source:ddr/chessmstdm.cpp
 chessmstdm
 
 @source:misc/chexx.cpp
@@ -19541,7 +19541,7 @@ omni2                           // Omni II
 omni4                           // Omni 4
 robie                           // Kaypro Robie
 
-@source:veb/kc.cpp
+@source:ddr/kc.cpp
 kc85_2                          // VEB KC 85/2
 kc85_3                          // VEB KC 85/3
 kc85_4                          // VEB KC 85/4
@@ -20122,7 +20122,7 @@ speedrs
 @source:ampro/lbpc.cpp
 lbpc                            // Ampro Little Board/PC
 
-@source:veb/lc80.cpp
+@source:ddr/lc80.cpp
 lc80                            //
 lc80a                           //
 lc80e                           //
@@ -22937,10 +22937,10 @@ mc1000                          //
 mc1502                          //
 pk88                            //
 
-@source:veb/mc8020.cpp
+@source:ddr/mc8020.cpp
 mc8020                          // MC 80.2x
 
-@source:veb/mc8030.cpp
+@source:ddr/mc8030.cpp
 mc8030                          // MC 80.3x
 
 @source:misc/mcatadv.cpp
@@ -35906,11 +35906,11 @@ poly800                         //
 poly800ii                       //
 poly800mdk                      //
 
-@source:veb/poly880.cpp
+@source:ddr/poly880.cpp
 poly880                         //
 poly880s                        //
 
-@source:misc/polyplay.cpp
+@source:ddr/polyplay.cpp
 polyplay                        //
 polyplay2                       //
 polyplay2c                      //
@@ -37608,7 +37608,7 @@ sbrkoutct                       // 034555-034559 proto ???? [6502]
 sbugger                         // (c) 1981 Game-A-Tron
 sbuggera                        // (c) 1981 Game-A-Tron
 
-@source:veb/sc2.cpp
+@source:ddr/sc2.cpp
 sc2                             //
 sc2a                            //
 
@@ -39153,7 +39153,7 @@ opwolf3u                        // D74 (c) 1994 Taito America Corporation
 slapshot                        // D71 (c) 1994 Taito Corporation Japan (Ver 3.0 O)
 slapshotj                       // D71 (c) 1994 Taito Corporation (Ver 2.2 J)
 
-@source:homebrew/slc1.cpp
+@source:ddr/slc1.cpp
 slc1                            //
 
 @source:pinball/sleic.cpp

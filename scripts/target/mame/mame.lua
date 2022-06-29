@@ -1581,7 +1581,6 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"upl",
 		"usp",
 		"valadon",
-		"veb",
 		"venture",
 		"verifone",
 		"vidbrain",
@@ -3541,12 +3540,6 @@ createMAMEProjects(_target, _subtarget, "valadon")
 files {
 	MAME_DIR .. "src/mame/valadon/*.cpp",
 	MAME_DIR .. "src/mame/valadon/*.h",
-}
-
-createMAMEProjects(_target, _subtarget, "veb")
-files {
-	MAME_DIR .. "src/mame/veb/*.cpp",
-	MAME_DIR .. "src/mame/veb/*.h",
 }
 
 createMAMEProjects(_target, _subtarget, "venture")
