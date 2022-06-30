@@ -186,8 +186,6 @@ capcom/supduck.cpp
 capcom/tigeroad.cpp
 capcom/tvcapcom.cpp
 capcom/vulgus.cpp
-cccp/istrebiteli.cpp
-cccp/tiamc1.cpp
 ces/cesclass.cpp
 ces/galgames.cpp
 cinemat/cchasm.cpp
@@ -1317,6 +1315,8 @@ snk/snk6502.cpp
 snk/snk68.cpp
 sony/taitogn.cpp
 sony/zn.cpp
+sssr/istrebiteli.cpp
+sssr/tiamc1.cpp
 stern/astinvad.cpp
 stern/berzerk.cpp
 stern/cliffhgr.cpp

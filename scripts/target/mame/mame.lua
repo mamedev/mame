@@ -1291,7 +1291,6 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"capcom",
 		"casio",
 		"commodore",
-		"cccp",
 		"cce",
 		"ccs",
 		"ceres",
@@ -1517,6 +1516,7 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"sony_news",
 		"sord",
 		"special",
+		"sssr",
 		"stern",
 		"stm",
 		"subsino",
@@ -1894,10 +1894,10 @@ files {
 	MAME_DIR .. "src/mame/commodore/*.h",
 }
 
-createMAMEProjects(_target, _subtarget, "cccp")
+createMAMEProjects(_target, _subtarget, "sssr")
 files {
-	MAME_DIR .. "src/mame/cccp/*.cpp",
-	MAME_DIR .. "src/mame/cccp/*.h",
+	MAME_DIR .. "src/mame/sssr/*.cpp",
+	MAME_DIR .. "src/mame/sssr/*.h",
 }
 
 createMAMEProjects(_target, _subtarget, "cce")
