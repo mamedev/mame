@@ -78,7 +78,6 @@ void mpu4mod4yam_machines_state::init_m4addr()
 void mpu4mod4yam_machines_state::init_m4test4()
 {
 	init_m4default();
-	m_dataport_loopback = true;	
 	m_overcurrent_detect = true;
 }
 

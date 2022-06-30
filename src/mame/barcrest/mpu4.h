@@ -518,7 +518,6 @@ protected:
 	void pia_ic5_porta_w(uint8_t data);
 	void pia_ic5_portb_w(uint8_t data);
 	uint8_t pia_ic5_portb_r();
-	DECLARE_WRITE_LINE_MEMBER(pia_ic5_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia_ic5_cb2_w);
 	void pia_ic6_portb_w(uint8_t data);
 	void pia_ic6_porta_w(uint8_t data);
@@ -602,7 +601,6 @@ protected:
 
 	int m_mod_number = 0;
 	int m_mmtr_data = 0;
-	int m_serial_detect = 0;
 	int m_ay8913_address = 0;
 	int m_signal_50hz = 0;
 	int m_ic4_input_b = 0;
@@ -658,7 +656,6 @@ protected:
 
 	bool m_overcurrent_detect = true;
 	bool m_undercurrent_detect = false;
-	bool m_dataport_loopback = false;
 
 	bool m_low_volt_detect = true;
 

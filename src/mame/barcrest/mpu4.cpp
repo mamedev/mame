@@ -655,7 +655,6 @@ TIMER_CALLBACK_MEMBER(mpu4_state::update_ic24)
 WRITE_LINE_MEMBER(mpu4_state::dataport_rxd)
 {
 	m_pia4->cb1_w(state);
-	m_serial_detect=state;
 	LOG_IC3(("Dataport RX %x\n",state));
 }
 
@@ -701,8 +700,7 @@ uint8_t mpu4_state::pia_ic4_portb_r()
 {
 	m_ic4_input_b = 0x00;
 
-    // Serial data is tied to CB1, and this pin to ensure the CPU can read it, hence the detect variable
-	if ( m_serial_detect )
+	if (m_pia5->ca2_output())
 	{
 		m_ic4_input_b |=  0x80;
 	}
@@ -924,21 +922,6 @@ uint8_t mpu4_state::pia_ic5_portb_r()
 
 	uint8_t tempinput = m_aux2_port->read() | m_aux2_input;
 	return tempinput;
-}
-
-
-WRITE_LINE_MEMBER(mpu4_state::pia_ic5_ca2_w)
-{
-	LOG(("%s: IC5 PIA Write CA2 (Serial Tx) %2x\n",machine().describe_context(),state));
-	if (m_dataport_loopback)
-	{
-		m_pia4->cb1_w(state);
-		m_serial_detect=state;
-	}
-	else
-	{
-		m_dataport->write_txd(state);		
-	}
 }
 
 
@@ -2339,7 +2322,7 @@ void mpu4_state::mpu4_common(machine_config &config)
 	m_pia5->readpb_handler().set(FUNC(mpu4_state::pia_ic5_portb_r));
 	m_pia5->writepa_handler().set(FUNC(mpu4_state::pia_ic5_porta_w));
 	m_pia5->writepb_handler().set(FUNC(mpu4_state::pia_ic5_portb_w));
-	m_pia5->ca2_handler().set(FUNC(mpu4_state::pia_ic5_ca2_w));
+	m_pia5->ca2_handler().set(m_dataport, FUNC(bacta_datalogger_device::write_txd));
 	m_pia5->cb2_handler().set(FUNC(mpu4_state::pia_ic5_cb2_w));
 	m_pia5->irqa_handler().set(FUNC(mpu4_state::cpu0_irq));
 	m_pia5->irqb_handler().set(FUNC(mpu4_state::cpu0_irq));
@@ -2439,6 +2422,7 @@ void mpu4_state::mod2_no_bacta(machine_config &config)
 {
 	mod2(config);
 	config.device_remove("dataport");
+	m_pia5->ca2_handler().set(m_pia4, FUNC(pia6821_device::cb1_w));
 }
 
 void mpu4_state::mod2_7reel(machine_config &config)
@@ -2554,6 +2538,7 @@ void mpu4_state::mod4yam_no_bacta(machine_config &config)
 {
 	mod4yam(config);
 	config.device_remove("dataport");
+	m_pia5->ca2_handler().set(m_pia4, FUNC(pia6821_device::cb1_w));
 }
 
 void mpu4_state::mod4yam_chr(machine_config &config)
@@ -2633,6 +2618,7 @@ void mpu4_state::mod4oki_no_bacta(machine_config &config)
 {
 	mod4oki(config);
 	config.device_remove("dataport");
+	m_pia5->ca2_handler().set(m_pia4, FUNC(pia6821_device::cb1_w));
 }
 
 void mpu4_state::mod4oki_7reel(machine_config &config)

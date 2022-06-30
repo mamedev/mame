@@ -36,7 +36,6 @@ public:
 void mpu4unsorted_state::init_m4test()
 {
 	init_m4default();
-	m_dataport_loopback = true;	
 	m_overcurrent_detect = true;
 }
 
