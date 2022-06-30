@@ -36,12 +36,13 @@ public:
 	unsigned int width();
 	unsigned int height();
 	unsigned int total_height();
+	//void vblank_update();
+	void map(address_map &map);
+	void set_vectors(uint16_t *src);
 	int dram_dtack_cycles();
 	void dram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t dram_r(offs_t offset, uint16_t mem_mask = ~0);
 
-	void map(address_map &map);
-	void set_vectors(uint16_t *src);
 
 protected:
 	virtual void device_start() override;
@@ -50,7 +51,7 @@ protected:
 	devcb_write_line m_irqcallback;
 
 	uint8_t m_line_data[768];
-	uint32_t m_working_dcp;
+	uint32_t m_working_dcp ;
 
 	std::unique_ptr<uint16_t[]> m_dram;
 
