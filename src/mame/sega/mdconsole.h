@@ -75,6 +75,7 @@ public:
 
 	void ms_megadpal(machine_config &config);
 	void ms_megadriv(machine_config &config);
+	void ms_megadrivj(machine_config &config);
 	void ms_megadriv2(machine_config &config);
 
 	void genesis_tmss(machine_config &config);
