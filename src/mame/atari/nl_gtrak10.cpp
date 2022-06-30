@@ -238,8 +238,8 @@ NETLIST_START(gtrak10)
 
 	// 1STOP_Q Signal:
 	//       name,         CLK,      D,   CLRQ, PREQ
-	TTL_7474(B2_A, SPEED_PULSE, P, A2_D.Q,    P)  // set it to P
-	TTL_7474(B2_B,        VLd1, B2_A.Q,     P,    P)
+	TTL_7474(B2_A, SPEED_PULSE, ATRC_Q, A2_D.Q,    P)
+	TTL_7474(B2_B,        VLd1, B2_A.Q,      P,    P)
 	TTL_7400_NAND(A2_D, 1STOP_Q, VLd1)
 	ALIAS(1STOP_Q, B2_B.Q)
 
@@ -404,7 +404,7 @@ NETLIST_START(gtrak10)
 
 	// ------------ Horizontal positioning of the car ----------------------
 	//     name,   CLK,   ENP,   ENT,      CLRQ, LOADQ,        A,      B,      C,      D
-	TTL_9316(D7, CLOCK, E7.RC,     P,  RESET1_Q,  D5_B.Q,      P,      P,      P, GROUND)  // bits 7-4 of hpos
+	TTL_9316(D7, CLOCK, E7.RC,     P,  RESET1_Q,  D5_B.Q,      P,      P,      P, GROUND)  // bits 4-7 of hpos
 	TTL_9316(E7, CLOCK,     P,     P,  RESET1_Q,  D5_B.Q, F7_A.Q, F7_D.Q, F7_C.Q, D3_C.Q)  // bits 0-3 of hpos
 
 	TTL_7400_NAND(D5_B, E7.RC, B6_D.Q)
@@ -567,7 +567,7 @@ NETLIST_START(gtrak10)
 	// ---------- Checkpoint Scoring Counter -------------
 	// TTL_9314(name, EQ, MRQ, S0Q, S1Q, S2Q, S3Q, D0, D1, D2, D3)
 	TTL_9314(F3, CAR1VIDEO_Q, START_Q, CHECK1, CHECK2, CHECK3, CHECK4, C2_F.Q, F3.Q0, F3.Q1, F3.Q2 )
-	// lemans says CAR1VIDEO_Q, gran trak 10 says CAR1VIDEO   oh for goodness sake, had S0 and D0 switched
+	// lemans says CAR1VIDEO_Q, gran trak 10 says CAR1VIDEO
 
 	NET_C(E4_A.VCC, P)
 	NET_C(E4_A.GND, GROUND)
@@ -597,10 +597,9 @@ NETLIST_START(gtrak10)
 	TTL_7408_AND(A6_C, 4V, B3_D.Q)
 	ALIAS(FINISH_LINE, A6_C.Q)
 
-	// usage : TTL_7493(name, CLKA, CLKB, R1, R2)
+	// TTL_7493(name, CLKA, CLKB, R1, R2)
 	TTL_7493(K5, 1SEC, 2SEC, GROUND, GROUND)
 
-	ALIAS(1SEC, P) // FIX NEEDS 555 TIMER
 	ALIAS(2SEC, K5.QA)
 	ALIAS(4SEC, K5.QB)
 
@@ -610,8 +609,8 @@ NETLIST_START(gtrak10)
 	ALIAS(1F, F4.QB)
 	ALIAS(1G, F4.QC)
 
-	// usage : TTL_74193(name, A, B, C, D, CLEAR, LOADQ, CU, CD)
-	TTL_74193(J5_LEMANS, 1E, 1F, 1G, F4.QD, P, ATRC, 4SEC, P)
+	// TTL_74193(name,   A,  B,  C,  D,     CLEAR, LOADQ, CU,   CD)
+	TTL_74193(J5_LEMANS, 1E, 1F, 1G, F4.QD, P,     ATRC,  4SEC, P)
 	// SHOULD BE CALLED J5 in lemans, rename it to J5_LEMANS to avoid name conflict
 	ALIAS(TSA, J5_LEMANS.QA)
 	ALIAS(TSB, J5_LEMANS.QB)
@@ -708,7 +707,8 @@ NETLIST_START(gtrak10)
 
 
 	//  74192(name, A, B, C, D,                   CLEAR, LOADQ, CU, CD)
-	TTL_74192(C4, GROUND, GROUND, GROUND, P,      ATRC, START_Q , P,  1SEC)        // LOAD WITH 8
+//  TTL_74192(C4, GROUND, GROUND, GROUND, P,      ATRC, START_Q , P,  1SEC)        // LOAD WITH 8  // lemans connected to 1SEC
+	TTL_74192(C4, GROUND, GROUND, GROUND, P,      ATRC, START_Q , P,  D7_D.Q)      // LOAD WITH 8  // gran trak has a 7402 NOR gate
 	TTL_74192(B4, P,      P,      P,      GROUND, ATRC, START_Q , P,  C4.BORROWQ)  // LOAD WITH 7
 
 	ALIAS(ENDGAME, B4.BORROWQ)
@@ -721,12 +721,13 @@ NETLIST_START(gtrak10)
 	ALIAS(2G, B4.QC)
 
 
-	//       name,   CLK,      D, CLRQ, PREQ
+	//  7474 name,   CLK,      D, CLRQ, PREQ
 	TTL_7474(C7_B, 512V, A6_D.Q, C6_D.Q, P)
 
 	ALIAS(START,   C7_B.Q)
 	ALIAS(START_Q, C7_B.QQ)
 
+	//  7474 name, CLK,      D, CLRQ, PREQ
 	TTL_7474(C7_A, ENDGAME, P, START_Q, Q) // should be Q, TODO FIX Q
 
 	ALIAS(Q, P) // TODO FIX Q
@@ -748,6 +749,45 @@ NETLIST_START(gtrak10)
 
 	ALIAS(CRASH_SEQUENCE_Q, P) // FIX
 	ALIAS(EXTPLAY_Q, P)
+
+
+	// 1SEC COUNTER 555
+	// ================
+
+	NE555_DIP(B8)
+	RES(R72, RES_K(10))  // should be a potentiometer 1M // lemans calls it R40  // Less resistance, faster count
+	RES(R71, RES_K(20))  // lemans calls it R39  // should be 220K , we'll set to less because we want to see it count
+	//RES(R71, RES_K(220))  // lemans calls it R39  // should be 220K
+	RES(R70, RES_K(6.8))  // lemans calls it R35
+	RES(1SEC_PULLDOWN, RES_K(1))  // lemans calls it R29, gran trak has it unlabeled
+	CAP(C42, CAP_U(0.1)) // assume uF  // lemans calls it C22
+	CAP(C43, CAP_U(4.7))  // lemans calls it C23
+
+	ALIAS(1SEC, B8.3)
+
+	NET_C(B8.5, C42.1)
+	NET_C(C42.2, GND)
+
+	NET_C(B8.2, B8.6, R70.2, C43.1)
+	NET_C(C43.2, GND)  // polarized, is this correct direction?
+
+	NET_C(B8.7, R70.1, R71.2)
+	NET_C(R72.2, R71.1)
+	NET_C(R72.1, VCC)
+	NET_C(B8.1, GND)
+
+	NET_C(B8.8, VCC)
+	NET_C(B8.4, START_Q)  // lemans has it connected to START_Q, gran trak 10 connected to S1A
+
+	NET_C(B8.3, 1SEC_PULLDOWN.1)
+	NET_C(1SEC_PULLDOWN.2, GND)
+
+	CAP(C5, CAP_U(.01))  // lemans calls it as C52 .001 uF and directly connected to 1SEC
+
+	NET_C(D7_D.Q, C5.1)
+	NET_C(C5.2, GND)
+
+	TTL_7402_NOR(D7_D, 1SEC, 1SEC)  // only on gran trak 10, lemans directly connected to 1SEC
 
 
 // MINI PIN REFERENCE to assign consistent sub letters to DIP
