@@ -179,6 +179,7 @@ public:
 	void init_m4default_seven();
 
 	void mod2(machine_config &config);
+	void mod2_no_bacta(machine_config &config);
 	void mod2_7reel(machine_config &config);
 
 	void mod2_cheatchr(machine_config &config);
@@ -416,12 +417,14 @@ public:
 	void mod4oki_alt_cheatchr_table(machine_config& config, const uint8_t* table);
 
 	void mod4oki(machine_config &config);
+	void mod4oki_no_bacta(machine_config &config);
 	void mod4oki_7reel(machine_config &config);
 	void mod4oki_cheatchr(machine_config &config);
 	void mod4oki_cheatchr_table(machine_config &config, const uint8_t* table);
 	void mod4oki_chr(machine_config &config);
 
 	void mod4yam(machine_config &config);
+	void mod4yam_no_bacta(machine_config &config);
 	void mod4yam_7reel(machine_config &config);
 	void mod4yam_cheatchr(machine_config &config);
 	void mod4yam_cheatchr_table(machine_config& config, const uint8_t* table);
@@ -434,6 +437,7 @@ public:
 	void mpu4_common(machine_config &config);
 	void mpu4_common2(machine_config &config);
 	void mpu4base(machine_config &config);
+	void mpu4_bacta(machine_config &config);
 
 protected:
 
@@ -514,7 +518,6 @@ protected:
 	void pia_ic5_porta_w(uint8_t data);
 	void pia_ic5_portb_w(uint8_t data);
 	uint8_t pia_ic5_portb_r();
-	DECLARE_WRITE_LINE_MEMBER(pia_ic5_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia_ic5_cb2_w);
 	void pia_ic6_portb_w(uint8_t data);
 	void pia_ic6_porta_w(uint8_t data);
@@ -578,7 +581,7 @@ protected:
 	// 0-63 are on PIA IC3 port A (always present)
 	// 64-127 are on PIA IC3 port B (always present)
 	// 128-132 136-140 144-148 152-156 160-164 168-172 176-180 184-188 are on small lamp extender
-	// 128-255 are on large lamp externders
+	// 128-255 are on large lamp extenders
 	output_finder<256> m_lamps;
 
 	// 0-63 are on PIA IC4 port A (always present)
@@ -599,7 +602,6 @@ protected:
 	int m_mod_number = 0;
 	int m_mmtr_data = 0;
 	int m_ay8913_address = 0;
-	int m_serial_data = 0;
 	int m_signal_50hz = 0;
 	int m_ic4_input_b = 0;
 	int m_aux1_input = 0;
@@ -612,10 +614,7 @@ protected:
 	int m_IC23GA = 0;
 
 	int m_reel_flag = 0;
-	int m_ic23_active = 0;
-	int m_led_lamp = 0;
-	int m_link7a_connected = 0;
-	int m_low_volt_detect_disable = 0;
+	bool m_ic23_active = false;
 	emu_timer *m_ic24_timer = nullptr;
 	int m_expansion_latch = 0;
 	int m_global_volume = 0;
@@ -649,6 +648,17 @@ protected:
 	int m_t3l = 0;
 	int m_t3h = 0;
 	uint8_t m_numbanks = 0;
+
+	bool m_link7a_connected = false;
+
+	bool m_overcurrent = false;
+	bool m_undercurrent = false;
+
+	bool m_overcurrent_detect = true;
+	bool m_undercurrent_detect = false;
+
+	bool m_low_volt_detect = true;
+
 
 	static constexpr uint8_t reel_mux_table[8]= {0,4,2,6,1,5,3,7};//include 7, although I don't think it's used, this is basically a wire swap
 	static constexpr uint8_t reel_mux_table7[8]= {3,1,5,6,4,2,0,7};

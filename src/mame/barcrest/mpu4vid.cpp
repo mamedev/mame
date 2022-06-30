@@ -1867,7 +1867,7 @@ void mpu4vid_state::machine_start()
 
 	m_mod_number=2;
 	/* setup communications */
-	m_link7a_connected = 1;
+	m_link7a_connected = true;
 }
 
 void mpu4vid_state::machine_reset()
@@ -2117,7 +2117,6 @@ void mpu4vid_state::mpu4_vid(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);               /* confirm */
 
 	mpu4_common(config);
-
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -8701,7 +8700,7 @@ ROM_END
 
 
 /* Complete sets */
-/* Standard sets are the most common setups, while Datapak releases use a BACTA datalogger (not emulated) to record more information about the game operation, for security etc.
+/* Standard sets are the most common setups, while Datapak releases use a BACTA datalogger to record more information about the game operation, for security etc.
 AMLD versions do not pay out, and instead just feature highscore tables. These were mainly intended for locations unwilling to pay for gaming licenses.
 The AMLD Crystal Maze versions appear to be a mixture of the original game modules and Team Challenge's scoring system. This would suggest they were all made ~1994, despite
 the copyright dates recorded.
