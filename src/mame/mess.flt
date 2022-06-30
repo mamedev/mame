@@ -114,6 +114,7 @@ casio/pv2000.cpp
 casio/rz1.cpp
 casio/sk1.cpp
 casio/sx1000.cpp
+cccp/apogee.cpp
 cccp/argo.cpp
 cccp/bk.cpp
 cccp/cm1800.cpp
@@ -124,14 +125,18 @@ cccp/im01.cpp
 cccp/intellect02.cpp
 cccp/lviv.cpp
 cccp/mikro80.cpp
+cccp/mikrosha.cpp
 cccp/mk85.cpp
 cccp/mk90.cpp
 cccp/mk98.cpp
 cccp/ms6102.cpp
 cccp/okean240.cpp
+cccp/orion.cpp
+cccp/partner.cpp
 cccp/pk8000.cpp
 cccp/pk8020.cpp
 cccp/pyl601.cpp
+cccp/radio86.cpp
 cccp/sm1800.cpp
 cccp/sm7238.cpp
 cccp/uknc.cpp
@@ -220,7 +225,6 @@ dms/zsbc3.cpp
 drc/zrt80.cpp
 dulmont/magnum.cpp
 eaca/cgenie.cpp
-einis/pecom.cpp
 elektor/avrmax.cpp
 elektor/ec65.cpp
 elektor/elekscmp.cpp
@@ -284,7 +288,6 @@ force/miniforce.cpp
 fujitsu/fm7.cpp
 fujitsu/fmtowns.cpp
 funtech/supracan.cpp
-galaxy/galaxy.cpp
 gamepark/gp2x.cpp
 gamepark/gp32.cpp
 gridcomp/gridcomp.cpp
@@ -363,8 +366,6 @@ husky/husky.cpp
 ibm6580/ibm6580.cpp
 ibmpc/sis630.cpp
 ie15/ie15.cpp
-imp/tim011.cpp
-imp/tim100.cpp
 informer/informer_207_100.cpp
 informer/informer_207_376.cpp
 informer/informer_213.cpp
@@ -596,8 +597,6 @@ pc/pcipc.cpp
 pc/tandy1t.cpp
 pc/tosh1000.cpp
 pdp1/pdp1.cpp
-pel/galeb.cpp
-pel/orao.cpp
 philips/odyssey2.cpp
 philips/p2000t.cpp
 philips/vg5k.cpp
@@ -616,11 +615,6 @@ qume/qvt103.cpp
 qume/qvt190.cpp
 qume/qvt201.cpp
 qume/qvt70.cpp
-radio/apogee.cpp
-radio/mikrosha.cpp
-radio/orion.cpp
-radio/partner.cpp
-radio/radio86.cpp
 rca/microkit.cpp
 rca/studio2.cpp
 rca/vip.cpp
@@ -709,6 +703,13 @@ segacons/segapm.cpp
 segacons/sg1000.cpp
 segacons/svmu.cpp
 sequential/prophet600.cpp
+sfrj/galaxy.cpp
+sfrj/galeb.cpp
+sfrj/lola8a.cpp
+sfrj/orao.cpp
+sfrj/pecom.cpp
+sfrj/tim011.cpp
+sfrj/tim100.cpp
 sgi/4dpi.cpp
 sgi/crimson.cpp
 sgi/indigo.cpp
@@ -883,7 +884,6 @@ skeleton/lg-dvd.cpp
 skeleton/lilith.cpp
 skeleton/lk3000.cpp
 skeleton/lms46.cpp
-skeleton/lola8a.cpp
 skeleton/mccpm.cpp
 skeleton/mes.cpp
 skeleton/mfabfz.cpp

@@ -1424,7 +1424,7 @@ apexc                           // 1955(?) APEXC: All-Purpose Electronic X-ray C
 apfimag                         //
 apfm1000                        //
 
-@source:radio/apogee.cpp
+@source:cccp/apogee.cpp
 apogee                          //
 
 @source:apollo/apollo.cpp
@@ -14905,11 +14905,11 @@ tazzmang2                       // bootleg
 trvchlng                        // [1985] Joyland (Senko license)
 vpool                           // bootleg
 
-@source:galaxy/galaxy.cpp
+@source:sfrj/galaxy.cpp
 galaxy                          //
 galaxyp                         //
 
-@source:pel/galeb.cpp
+@source:sfrj/galeb.cpp
 galeb                           //
 
 @source:misc/galgame.cpp
@@ -20380,7 +20380,7 @@ lnw80                           // LNW Research LNW-80
 lockon                          // (c) 1986 Tatsumi
 lockonc                         // (c) 1986 Tatsumi
 
-@source:skeleton/lola8a.cpp
+@source:sfrj/lola8a.cpp
 lola8a                          //
 
 @source:venture/looping.cpp
@@ -23898,7 +23898,7 @@ radio99                         //
 mm1m6                           //
 mm1m7                           //
 
-@source:radio/mikrosha.cpp
+@source:cccp/mikrosha.cpp
 m86rk                           //
 mikrosha                        //
 
@@ -33961,7 +33961,7 @@ opwolfjsc                       // B20 (c) 1987 Taito Corporation (Japan)
 opwolfu                         // B20 (c) 1987 Taito America Corporation (US)
 opwolfp                         // prototype?
 
-@source:pel/orao.cpp
+@source:sfrj/orao.cpp
 orao                            //
 orao103                         //
 
@@ -33975,7 +33975,7 @@ prav8d                          // 1985 Pravetz 8D
 prav8dd                         // 1989 Pravetz 8D (Disk ROM)
 telstrat                        // ??? Oric Telestrat/Stratos
 
-@source:radio/orion.cpp
+@source:cccp/orion.cpp
 orion128                        //
 orionide                        //
 orionidm                        //
@@ -34232,7 +34232,7 @@ parodiusa                       // GX955 (c) 1990 (Asia)
 parodiuse                       // GX955 (c) 1990 (World)
 parodiusj                       // GX955 (c) 1990 (Japan)
 
-@source:radio/partner.cpp
+@source:cccp/partner.cpp
 partner                         //
 
 @source:misc/pasha2.cpp
@@ -34532,7 +34532,7 @@ sms1000                         //
 @source:skeleton/pdt3100.cpp
 pdt3100                         //
 
-@source:einis/pecom.cpp
+@source:sfrj/pecom.cpp
 pecom32                         //
 pecom64                         //
 
@@ -36470,7 +36470,7 @@ rabbitjt                        // (c) 1996 Electronic Arts
 @source:misc/radikaldarts.cpp
 radikaldrt                      // (c) 2011? Gaelco Darts
 
-@source:radio/radio86.cpp
+@source:cccp/radio86.cpp
 impuls03                        //
 kr03                            //
 mikron2                         //
@@ -41658,10 +41658,10 @@ toramich                        // 11/1987 (c) 1987 (Japan
 kontiki                         //
 tiki100                         //
 
-@source:imp/tim011.cpp
+@source:sfrj/tim011.cpp
 tim011                          //
 
-@source:imp/tim100.cpp
+@source:sfrj/tim100.cpp
 tim100                          //
 
 @source:thepit/timelimt.cpp

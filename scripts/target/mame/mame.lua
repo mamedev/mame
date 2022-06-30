@@ -1325,7 +1325,6 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"eaca",
 		"edevices",
 		"efo",
-		"einis",
 		"elektor",
 		"elektron",
 		"emusys",
@@ -1351,7 +1350,6 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"fuuki",
 		"gaelco",
 		"galaxian",
-		"galaxy",
 		"gamepark",
 		"gameplan",
 		"gametron",
@@ -1375,7 +1373,6 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"ie15",
 		"igs",
 		"igt",
-		"imp",
 		"informer",
 		"intel",
 		"interpro",
@@ -1472,7 +1469,6 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"pc",
 		"pce",
 		"pdp1",
-		"pel",
 		"philips",
 		"phoenix",
 		"pinball",
@@ -1486,7 +1482,6 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"psion",
 		"quantel",
 		"qume",
-		"radio",
 		"ramtek",
 		"rare",
 		"rca",
@@ -1508,6 +1503,7 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"segacons",
 		"seibu",
 		"sequential",
+		"sfrj",
 		"seta",
 		"sgi",
 		"sharp",
@@ -2089,12 +2085,6 @@ files {
 	MAME_DIR .. "src/mame/efo/*.h",
 }
 
-createMAMEProjects(_target, _subtarget, "einis")
-files {
-	MAME_DIR .. "src/mame/einis/*.cpp",
-	MAME_DIR .. "src/mame/einis/*.h",
-}
-
 createMAMEProjects(_target, _subtarget, "elektor")
 files {
 	MAME_DIR .. "src/mame/elektor/*.cpp",
@@ -2239,12 +2229,6 @@ files {
 	MAME_DIR .. "src/mame/galaxian/*.h",
 }
 
-createMAMEProjects(_target, _subtarget, "galaxy")
-files {
-	MAME_DIR .. "src/mame/galaxy/*.cpp",
-	MAME_DIR .. "src/mame/galaxy/*.h",
-}
-
 createMAMEProjects(_target, _subtarget, "gamepark")
 files {
 	MAME_DIR .. "src/mame/gamepark/*.cpp",
@@ -2382,11 +2366,6 @@ createMAMEProjects(_target, _subtarget, "intel")
 files {
 	MAME_DIR .. "src/mame/intel/*.cpp",
 	MAME_DIR .. "src/mame/intel/*.h",
-}
-
-createMAMEProjects(_target, _subtarget, "imp")
-files {
-	MAME_DIR .. "src/mame/imp/*.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "interpro")
@@ -2900,11 +2879,6 @@ files {
 	MAME_DIR .. "src/mame/pdp1/*.h",
 }
 
-createMAMEProjects(_target, _subtarget, "pel")
-files {
-	MAME_DIR .. "src/mame/pel/*.cpp",
-}
-
 createMAMEProjects(_target, _subtarget, "philips")
 files {
 	MAME_DIR .. "src/mame/philips/*.cpp",
@@ -2970,12 +2944,6 @@ files {
 createMAMEProjects(_target, _subtarget, "qume")
 files {
 	MAME_DIR .. "src/mame/qume/*.cpp",
-}
-
-createMAMEProjects(_target, _subtarget, "radio")
-files {
-	MAME_DIR .. "src/mame/radio/*.cpp",
-	MAME_DIR .. "src/mame/radio/*.h",
 }
 
 createMAMEProjects(_target, _subtarget, "ramtek")
@@ -3098,6 +3066,12 @@ files {
 createMAMEProjects(_target, _subtarget, "sequential")
 files {
 	MAME_DIR .. "src/mame/sequential/*.cpp",
+}
+
+createMAMEProjects(_target, _subtarget, "sfrj")
+files {
+	MAME_DIR .. "src/mame/sfrj/*.cpp",
+	MAME_DIR .. "src/mame/sfrj/*.h",
 }
 
 createMAMEProjects(_target, _subtarget, "seta")
