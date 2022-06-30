@@ -5,12 +5,10 @@
 
 #pragma once
 
-#include "tmap038.h"
-
 #include "machine/watchdog.h"
+#include "video/tmap038.h"
 
 #include "emupal.h"
-#include "tilemap.h"
 
 class mcatadv_state : public driver_device
 {

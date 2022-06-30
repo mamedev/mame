@@ -4,6 +4,7 @@
 ## copyright-holders:Vas Crabb
 
 import argparse
+import glob
 import io
 import os.path
 import sys
@@ -392,7 +393,7 @@ class DriverFilter:
             [chr(x) for x in range(ord('a'), ord('z') + 1)] +
             ['_'])
 
-    def parse_filter(self, path, sourcefile, inclusion, exclusion):
+    def parse_filter(self, root, path, sourcefile, inclusion, exclusion):
         def line_hook(text):
             text = text.strip()
             if text.startswith('#'):
@@ -416,7 +417,14 @@ class DriverFilter:
                     sys.exit(1)
                 exclusion(text)
             elif text:
-                sourcefile(text)
+                if (len(text) >= 2) and ((text[0] == '"') or (text[0] == "'")) and (text[0] == text[-1]):
+                    text = text[1:-1]
+                paths = glob.glob(os.path.join(basepath, *text.split('/')))
+                if not paths:
+                    sys.stderr.write('%s:%s: Pattern "%s" did not match any source files\n' % (path, parser.input_line, text))
+                    sys.exit(1)
+                for source in paths:
+                    sourcefile('/'.join(os.path.split(os.path.relpath(source, basepath))))
 
         try:
             filterfile = io.open(path, 'r', encoding='utf-8')
@@ -424,6 +432,7 @@ class DriverFilter:
             sys.stderr.write('Unable to open filter file "%s"\n' % (path, ))
             sys.exit(1)
         with filterfile:
+            basepath = os.path.join(root, 'src', 'mame')
             handler = CppParser.Handler()
             handler.line = line_hook
             parser = CppParser(handler)
@@ -507,7 +516,7 @@ class DriverLister(DriverFilter):
         includes = set()
         excludes = set()
         if options.filter is not None:
-            self.parse_filter(options.filter, includesource, includedriver, excludedriver)
+            self.parse_filter(options.root, options.filter, includesource, includedriver, excludedriver)
             sys.stderr.write('%d source file(s) found\n' % (len(sources), ))
         self.sources = frozenset(sources)
         self.includes = frozenset(includes)
@@ -566,7 +575,7 @@ class DriverCollector(DriverFilter):
         sources = set()
         includes = set()
         state = { 'prevsource': None }
-        self.parse_filter(options.filter, includesource, includedriver, excludedriver)
+        self.parse_filter(options.root, options.filter, includesource, includedriver, excludedriver)
         self.parse_list(options.list, sourcefile, driver)
         sys.stderr.write('%d source file(s) found\n' % (len(sources), ))
         self.sources = sorted(sources)
@@ -590,15 +599,14 @@ def split_path(path):
 
 def parse_command_line():
     parser = argparse.ArgumentParser()
+    parser.add_argument('-r', '--root', metavar='<srcroot>', default='.', help='path to emulator source root (defaults to working directory)')
     subparsers = parser.add_subparsers(title='commands', dest='command', metavar='<command>')
 
     subparser = subparsers.add_parser('sourcesproject', help='generate project directives for source files')
-    subparser.add_argument('-r', '--root', metavar='<srcroot>', default='.', help='path to emulator source root (defaults to working directory)')
     subparser.add_argument('-t', '--target', metavar='<target>', required=True, help='generated emulator target name')
     subparser.add_argument('sources', metavar='<srcfile>', nargs='+', help='source files to include')
 
     subparser = subparsers.add_parser('filterproject', help='generate project directives using filter file')
-    subparser.add_argument('-r', '--root', metavar='<srcroot>', default='.', help='path to emulator source root (defaults to working directory)')
     subparser.add_argument('-t', '--target', metavar='<target>', required=True, help='generated emulator target name')
     subparser.add_argument('-f', '--filter', metavar='<fltfile>', required=True, help='input filter file')
     subparser.add_argument('list', metavar='<lstfile>', help='input list file')
@@ -714,7 +722,7 @@ def scan_source_dependencies(root, sources):
     parser = CppParser(handler)
     seen = set('/'.join(x for x in split_path(source) if x) for source in sources)
     remaining = list([(x, 0) for x in seen])
-    default_roots = ((('src', 'devices'), 0), (('src', 'mame', 'shared'), 0), (('src', 'mame', 'messshared'), 0), (('src', 'lib'), 0))
+    default_roots = ((('src', 'devices'), 0), (('src', 'mame', 'shared'), 0), (('src', 'lib'), 0))
     while remaining:
         source, depth = remaining.pop()
         components = tuple(source.split('/'))
@@ -760,7 +768,6 @@ def write_project(options, projectfile, mappings, sources, single):
                 '        MAME_DIR .. "src/emu",\n' \
                 '        MAME_DIR .. "src/devices",\n' \
                 '        MAME_DIR .. "src/mame/shared",\n' \
-                '        MAME_DIR .. "src/mame/messshared",\n' \
                 '        MAME_DIR .. "src/lib",\n' \
                 '        MAME_DIR .. "src/lib/util",\n' \
                 '        MAME_DIR .. "src/lib/netlist",\n' \
@@ -813,7 +820,6 @@ def write_project(options, projectfile, mappings, sources, single):
                 '        MAME_DIR .. "src/emu",\n' \
                 '        MAME_DIR .. "src/devices",\n' \
                 '        MAME_DIR .. "src/mame/shared",\n' \
-                '        MAME_DIR .. "src/mame/messshared",\n' \
                 '        MAME_DIR .. "src/lib",\n' \
                 '        MAME_DIR .. "src/lib/util",\n' \
                 '        MAME_DIR .. "src/lib/netlist",\n' \
@@ -831,12 +837,10 @@ def write_project(options, projectfile, mappings, sources, single):
                 'function linkProjects_mame_%s(_target, _subtarget)\n' \
                 '    links {\n' % (options.target, ))
         for lib in libnames:
-            if (lib != 'shared') and (lib != 'messshared'):
+            if lib != 'shared':
                 projectfile.write('        "%s",\n' % (lib, ))
         if 'shared' in libraries:
             projectfile.write('        "shared",\n')
-        if 'messshared' in libraries:
-            projectfile.write('        "messshared",\n')
         projectfile.write(
                 '    }\n' \
                 'end\n' \
@@ -853,12 +857,29 @@ def write_project(options, projectfile, mappings, sources, single):
         projectfile.write('end\n')
 
 
+def collect_sources(root, sources):
+    result = [ ]
+    for source in sources:
+        fullpath = os.path.join(root, source)
+        if os.path.isdir(fullpath):
+            for subdir, dirs, files in os.walk(fullpath):
+                for candidate in files:
+                    if os.path.splitext(candidate)[1] == '.cpp':
+                        if subdir != fullpath:
+                            result.append(os.path.join(source, os.path.relpath(subdir, fullpath), candidate))
+                        else:
+                            result.append(os.path.join(source, candidate))
+        else:
+            result.append(source)
+    return result
+
+
 def write_filter(options, filterfile):
     sources = set()
     DriverFilter().parse_list(options.list, lambda n: sources.add(n), lambda n: None)
 
     drivers = set()
-    for source in options.sources:
+    for source in collect_sources(options.root, options.sources):
         components = tuple(x for x in split_path(source) if x)
         if (len(components) > 3) and (components[:2] == ('src', 'mame')):
             ext = os.path.splitext(components[-1])[1].lower()
@@ -873,7 +894,7 @@ if __name__ == '__main__':
     options = parse_command_line()
     if options.command == 'sourcesproject':
         header_to_optional = collect_lua_directives(options)
-        source_dependencies = scan_source_dependencies(options.root, options.sources)
+        source_dependencies = scan_source_dependencies(options.root, collect_sources(options.root, options.sources))
         write_project(options, sys.stdout, header_to_optional, source_dependencies, True)
     elif options.command == 'filterproject':
         header_to_optional = collect_lua_directives(options)

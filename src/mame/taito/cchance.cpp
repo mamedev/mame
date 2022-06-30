@@ -12,6 +12,7 @@ TODO:
 -imperfect hopper emulation makes this game to not coin up and gives "hopper time out errors" when you win (put dsw 1
 (0x01) and 8 (0x80) to enable hopper full-mode);
 -Wrong colors,caused by missing color proms;
+-Verify clock dividers for Z80 and YM2149
 
 ============================================================================================================================
 
@@ -219,11 +220,11 @@ void cchance_state::machine_reset()
 
 void cchance_state::cchance(machine_config &config)
 {
-	Z80(config, m_maincpu, 4000000);         /* ? MHz */
+	Z80(config, m_maincpu, 12_MHz_XTAL / 2); // LH0080B
 	m_maincpu->set_addrmap(AS_PROGRAM, &cchance_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cchance_state::irq0_line_hold));
 
-	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_cchance);
+	SETA001_SPRITE(config, m_seta001, 12_MHz_XTAL, m_palette, gfx_cchance);
 	m_seta001->set_fg_yoffsets( -0x12, 0x0e );
 	m_seta001->set_bg_yoffsets( 0x1, -0x1 );
 
@@ -241,7 +242,7 @@ void cchance_state::cchance(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	ym2149_device &aysnd(YM2149(config, "aysnd", 1500000/2));
+	ym2149_device &aysnd(YM2149(config, "aysnd", 12_MHz_XTAL / 8));
 	aysnd.port_a_read_callback().set_ioport("DSW1");
 	aysnd.port_b_read_callback().set_ioport("DSW2");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.25);

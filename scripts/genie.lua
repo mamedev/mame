@@ -393,6 +393,11 @@ newoption {
 }
 
 newoption {
+	trigger = "SOURCEFILTER",
+	description = "Filter list specifying sources to compile.",
+}
+
+newoption {
 	trigger = "PLATFORM",
 	description = "Target machine platform (x86,arm,...)",
 }
@@ -552,21 +557,21 @@ if (_OPTIONS["PROJECT"] ~= nil) then
 		error("File definition for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
 	end
 	dofile (path.join(".." ,"projects", _OPTIONS["PROJECT"], "scripts", "target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))
-end
-if (_OPTIONS["SOURCES"] == nil) and (_OPTIONS["PROJECT"] == nil) then
+elseif (_OPTIONS["SOURCES"] == nil) and (_OPTIONS["SOURCEFILTER"] == nil) then
 	local subtargetscript = path.join("target", _OPTIONS["target"], _OPTIONS["subtarget"] .. ".lua")
 	local subtargetfilter = path.join(MAME_DIR, "src", _OPTIONS["target"], _OPTIONS["subtarget"] .. ".flt")
 	if os.isfile(subtargetscript) then
 		dofile(subtargetscript)
 	elseif os.isfile(subtargetfilter) then
-		local cmd = string.format(
-			"%s %s filterproject -r %s -t %s -f %s %s",
-			PYTHON, path.join(MAME_DIR, "scripts", "build", "makedep.py"),
-			MAME_DIR, _OPTIONS["subtarget"], subtargetfilter, path.join(MAME_DIR, "src", _OPTIONS["target"] , _OPTIONS["target"] .. ".lst"))
-		local OUT_STR = os.outputof(cmd)
+		local makedep = path.join(MAME_DIR, "scripts", "build", "makedep.py")
+		local driverlist = path.join(MAME_DIR, "src", _OPTIONS["target"], _OPTIONS["target"] .. ".lst")
+		local OUT_STR = os.outputof(
+			string.format(
+				"%s %s -r %s filterproject -t %s -f %s %s",
+				PYTHON, makedep, MAME_DIR, _OPTIONS["subtarget"], subtargetfilter, driverlist))
 		load(OUT_STR)()
 	else
-		error("File definition for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
+		error("Definition file for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
 	end
 end
 
@@ -1420,19 +1425,47 @@ end
 
 configuration { }
 
-if (_OPTIONS["SOURCES"] ~= nil) then
+if _OPTIONS["SOURCES"] ~= nil then
+	if _OPTIONS["SOURCEFILTER"] ~= nil then
+		error("SOURCES and SOURCEFILTER cannot be combined")
+	end
+
+	local makedep = path.join(MAME_DIR, "scripts", "build", "makedep.py")
 	local str = _OPTIONS["SOURCES"]
 	local sourceargs = ""
 	for word in string.gmatch(str, '([^,]+)') do
-		if (not os.isfile(path.join(MAME_DIR, word))) then
-			print("File " .. word .. " does not exist")
-			os.exit()
+		local fullpath = path.join(MAME_DIR, word)
+		if (not os.isfile(fullpath)) and (not os.isdir(fullpath)) then
+			error("File/directory " .. word .. " does not exist")
 		end
 		sourceargs = sourceargs .. " " .. word
 	end
-	local OUT_STR = os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py sourcesproject -r " .. MAME_DIR .. " -t " .. _OPTIONS["subtarget"] .. sourceargs )
+
+	local OUT_STR = os.outputof(
+		string.format(
+			"%s %s -r %s sourcesproject -t %s %s",
+			PYTHON, makedep, MAME_DIR, _OPTIONS["subtarget"], sourceargs))
 	load(OUT_STR)()
-	os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py sourcesfilter -l " .. MAME_DIR .. "src/" .. _OPTIONS["target"] .. "/" .. _OPTIONS["target"] .. ".lst" .. sourceargs .. " > ".. GEN_DIR  .. _OPTIONS["target"] .. "/" .. _OPTIONS["subtarget"] .. ".flt" )
+
+	local driverlist = path.join(MAME_DIR, "src", _OPTIONS["target"], _OPTIONS["target"] .. ".lst")
+	local driverfilter = path.join(GEN_DIR, _OPTIONS["target"], _OPTIONS["subtarget"] .. ".flt")
+	os.outputof(
+		string.format(
+			"%s %s -r %s sourcesfilter -l %s %s > %s",
+			PYTHON, makedep, MAME_DIR, driverlist, sourceargs, driverfilter))
+elseif _OPTIONS["SOURCEFILTER"] ~= nil then
+	local driverfilter = path.join(MAME_DIR, _OPTIONS["SOURCEFILTER"])
+	if not os.isfile(driverfilter) then
+		error("File " .. _OPTIONS["SOURCEFILTER"] .. " does not exist")
+	end
+
+	local makedep = path.join(MAME_DIR, "scripts", "build", "makedep.py")
+	local driverlist = path.join(MAME_DIR, "src", _OPTIONS["target"], _OPTIONS["target"] .. ".lst")
+	local OUT_STR = os.outputof(
+		string.format(
+			"%s %s -r %s filterproject -t %s -f %s %s",
+			PYTHON, makedep, MAME_DIR, _OPTIONS["subtarget"], driverfilter, driverlist))
+	load(OUT_STR)()
 end
 
 group "libs"
@@ -1473,7 +1506,7 @@ end
 
 group "emulator"
 dofile(path.join("src", "main.lua"))
-if (_OPTIONS["SOURCES"] == nil) then
+if (_OPTIONS["SOURCES"] == nil) and (_OPTIONS["SOURCEFILTER"] == nil) then
 	if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then
 		startproject (_OPTIONS["target"])
 	else

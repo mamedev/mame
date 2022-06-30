@@ -8,10 +8,9 @@
 #include "vsystem_spr.h"
 #include "vsystem_spr2.h"
 
-#include "k053936.h"
-
 #include "machine/6850acia.h"
 #include "machine/gen_latch.h"
+#include "video/k053936.h"
 
 #include "emupal.h"
 #include "tilemap.h"

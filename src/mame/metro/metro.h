@@ -10,8 +10,6 @@
 
 #pragma once
 
-#include "k053936.h"
-
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
@@ -19,6 +17,7 @@
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
 #include "video/imagetek_i4100.h"
+#include "video/k053936.h"
 
 #include "screen.h"
 #include "tilemap.h"

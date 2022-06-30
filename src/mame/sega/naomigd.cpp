@@ -3,8 +3,10 @@
 
 #include "emu.h"
 #include "naomigd.h"
+
+#include "bus/ata/gdrom.h"
+
 #include "romload.h"
-#include "imagedev/chd_cd.h"
 
 /*
 

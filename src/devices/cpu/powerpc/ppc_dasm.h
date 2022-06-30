@@ -147,7 +147,7 @@ private:
 	static std::string DCR(int dcr_field);
 	static std::string DecodeSigned16(uint32_t op, int do_unsigned);
 	static uint32_t Mask(unsigned const mb, unsigned const me);
-	bool Simplified(uint32_t op, uint32_t vpc, std::string &signed16, std::string &mnem, std::string &oprs);
+	bool Simplified(uint32_t op, uint32_t vpc, std::string &signed16, std::string &mnem, std::string &oprs, offs_t &flags);
 
 	implementation const m_implementation;
 };

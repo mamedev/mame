@@ -34,8 +34,8 @@ u32 fsblk_vec_base_t::block_count() const
 fsblk_t::block_t fsblk_vec_base_t::get(u32 id)
 {
 	if(id >= block_count())
-		throw std::out_of_range(util::string_format("Block number overflow: requiring block %d on device of size %d (%d bytes, block size %d)", id, block_count(), vec().size(), m_block_size));
-	return block_t(new blk_t(vec().data() + m_block_size * id, m_block_size));
+		throw std::out_of_range(util::string_format("Block number overflow: requiring block %d on device of size %d (%d bytes, block size %d)\n", id, block_count(), vec().size(), m_block_size));
+	return block_t(new blk_t(vec().data() + m_block_size*id, m_block_size));
 }
 
 void fsblk_vec_base_t::fill(u8 data)

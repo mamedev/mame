@@ -18,13 +18,12 @@
 
 #include "vsystem_gga.h"
 
-#include "k051316.h"
-
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/6850acia.h"
 #include "machine/gen_latch.h"
 #include "sound/ymopn.h"
+#include "video/k051316.h"
 
 #include "emupal.h"
 #include "screen.h"

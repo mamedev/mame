@@ -472,6 +472,10 @@
 #include "fs_oric_jasmin.h"
 #endif
 
+#ifdef HAS_FORMATS_FS_CBMDOS
+#include "fs_cbmdos.h"
+#endif
+
 #ifdef HAS_FORMATS_IBMXDF_DSK
 #include "ibmxdf_dsk.h"
 #endif
@@ -897,6 +901,9 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #endif
 #ifdef HAS_FORMATS_G64_DSK
 	en.add(FLOPPY_G64_FORMAT); // g64_dsk.h
+#endif
+#ifdef HAS_FORMATS_FS_CBMDOS
+	en.add(fs::CBMDOS); // fs_cbmdos.h
 #endif
 
 	en.category("Camputers");

@@ -117,7 +117,7 @@ void dangbar_state::dangbar(machine_config &config)
   Additional I/O PCB named "Namco M98 Drive PCB / Hi-Pric P1 B" with three Oki M82C55A-2 and four Fujitsu MB86520. */
 ROM_START( bellybmbr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "da_2_mp_0.2c", 0x00000, 0x08000, CRC(7e141f1f) SHA1(69e13d4d1d68486b16f5527138605f29b599e57d) ) // 27C256
+	ROM_LOAD( "da_2_mp_0.2c", 0x08000, 0x08000, CRC(7e141f1f) SHA1(69e13d4d1d68486b16f5527138605f29b599e57d) ) // 27C256
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "da_2_sn_0.8a", 0x00000, 0x20000, CRC(f98bb7ef) SHA1(d6124ee630a8759ae010062432598f06442c81f1) )

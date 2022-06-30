@@ -564,6 +564,47 @@ void lua_engine::attach_notifiers()
 }
 
 //-------------------------------------------------
+//  handle_fs_error - report FS errors to LUA
+//-------------------------------------------------
+
+static void handle_fs_error(lua_State *L, fs::err_t err)
+{
+	std::string message;
+	switch (err)
+	{
+	case fs::ERR_OK:
+		break;
+
+	case fs::ERR_UNSUPPORTED:
+		message = "Unsupported action";
+		break;
+
+	case fs::ERR_INVALID:
+		message = "Invalid action";
+		break;
+
+	case fs::ERR_NOT_FOUND:
+		message = "File not found";
+		break;
+
+	case fs::ERR_NOT_EMPTY:
+		message = "Not empty";
+		break;
+
+	case fs::ERR_NO_SPACE:
+		message = "Not enough space on image";
+		break;
+
+	default:
+		message = util::string_format("Unknown error (%d)", (int)err);
+		break;
+	}
+	if (!message.empty())
+		luaL_error(L, message.c_str());
+}
+
+
+//-------------------------------------------------
 //  initialize - initialize lua hookup to emu engine
 //-------------------------------------------------
 
@@ -596,8 +637,7 @@ void lua_engine::initialize()
 	static const enum_parser<fs::dir_entry_type, 3> s_dir_entry_type_parser =
 	{
 		{ "dir", fs::dir_entry_type::dir},
-		{ "file", fs::dir_entry_type::file},
-		{ "system_file", fs::dir_entry_type::system_file}
+		{ "file", fs::dir_entry_type::file}
 	};
 
 
@@ -1309,7 +1349,7 @@ void lua_engine::initialize()
 	game_driver_type["manufacturer"] = sol::readonly(&game_driver::manufacturer);
 	game_driver_type["parent"] = sol::readonly(&game_driver::parent);
 	game_driver_type["compatible_with"] = sol::property([] (game_driver const &driver) { return strcmp(driver.compatible_with, "0") ? driver.compatible_with : nullptr; });
-	game_driver_type["source_file"] = sol::property([] (game_driver const &driver) { return &driver.type.source()[0]; });
+	game_driver_type["source_file"] = sol::property([] (game_driver const &driver) { return driver.type.source(); });
 	game_driver_type["orientation"] = sol::property(
 			[] (game_driver const &driver)
 			{
@@ -1741,21 +1781,34 @@ void lua_engine::initialize()
 		};
 
 	auto fs_filesystem_type = sol().registry().new_usertype<fs::filesystem_t>("filesystem_t", sol::no_constructor);
-	fs_filesystem_type["root"] = sol::property(&fs::filesystem_t::root);
+	fs_filesystem_type["volume_metadata"] = sol::property(&fs::filesystem_t::volume_metadata);
+	fs_filesystem_type["volume_metadata_change"] = [](lua_State *L, fs::filesystem_t &fs, const fs::meta_data &meta)
+		{
+			fs::err_t err = fs.volume_metadata_change(meta);
+			handle_fs_error(L, err);
+		};
+	fs_filesystem_type["metadata"] = [](lua_State *L, fs::filesystem_t &fs, const std::vector<std::string> &path)
+		{
+			std::pair<fs::err_t, fs::meta_data> result = fs.metadata(path);
+			handle_fs_error(L, result.first);
+			return std::move(result.second);
+		};
+	fs_filesystem_type["metadata_change"] = [](lua_State *L, fs::filesystem_t &fs, const std::vector<std::string> &path, const fs::meta_data &meta)
+		{
+			fs::err_t err = fs.metadata_change(path, meta);
+			handle_fs_error(L, err);
+		};
+	fs_filesystem_type["directory_contents"] = [](lua_State *L, fs::filesystem_t &fs, const std::vector<std::string> &path)
+		{
+			std::pair<fs::err_t, std::vector<fs::dir_entry>> result = fs.directory_contents(path);
+			handle_fs_error(L, result.first);
+			return std::move(result.second);
+		};
 
 	auto fs_dir_entry_type = sol().registry().new_usertype<fs::dir_entry>("dir_entry", sol::no_constructor);
 	fs_dir_entry_type["name"] = sol::property([](const fs::dir_entry &ent) { return std::string_view(ent.m_name); });
 	fs_dir_entry_type["type"] = sol::property([](const fs::dir_entry &ent) { return s_dir_entry_type_parser(ent.m_type); });
-	fs_dir_entry_type["key"] = sol::property([](const fs::dir_entry &ent) { return ent.m_key; });
-
-	auto fs_filesystem_dir_type = sol().registry().new_usertype<fs::filesystem_t::dir_t>("dir_t", sol::no_constructor);
-	fs_filesystem_dir_type["contents"] = &fs::filesystem_t::dir_t::contents;
-	fs_filesystem_dir_type["metadata"] = sol::property(&fs::filesystem_t::dir_t::metadata);
-	fs_filesystem_dir_type["file_get"] = &fs::filesystem_t::dir_t::file_get;
-	fs_filesystem_dir_type["dir_get"] = &fs::filesystem_t::dir_t::dir_get;
-
-	auto fs_filesystem_file_type = sol().registry().new_usertype<fs::filesystem_t::file_t>("file_t", sol::no_constructor);
-	fs_filesystem_file_type["metadata"] = sol::property(&fs::filesystem_t::file_t::metadata);
+	fs_dir_entry_type["meta"] = sol::property([](const fs::dir_entry &ent) { return ent.m_meta; });
 
 	auto floppy_fs_type = sol().registry().new_usertype<floppy_image_device::fs_info>("floppy_fs_info", sol::no_constructor);
 	floppy_fs_type["manager"] = sol::property(&floppy_image_device::fs_info::manager);
