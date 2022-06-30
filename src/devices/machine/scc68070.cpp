@@ -1186,10 +1186,10 @@ void scc68070_device::i2c_next_state()
 void scc68070_device::set_i2c_timer()
 {
 	// divider offset 0 entry is illegal
-	const int divider[]={    1,   78,   90,  102,  126,  150,  174,    198,
-						   246,  294,  342,  390,  486,  582,  678,    774,
-						   996, 1158, 1350, 1542, 1926, 2310, 2694,   3078,
-						  3846, 4614, 5382, 6150, 7686, 9222, 10758, 12294 } ;
+	static constexpr int divider[]={    1,   78,   90,  102,  126,  150,  174,    198,
+									  246,  294,  342,  390,  486,  582,  678,    774,
+									  996, 1158, 1350, 1542, 1926, 2310, 2694,   3078,
+									 3846, 4614, 5382, 6150, 7686, 9222, 10758, 12294 };
 	m_i2c.timer->adjust(cycles_to_attotime(divider[m_i2c.clock_control_register]));
 }
 
