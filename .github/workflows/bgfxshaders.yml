@@ -1,4 +1,4 @@
-name: Rebuild bgfx shaders
+name: Rebuild BGFX shaders
 
 on:
   push:
@@ -24,7 +24,7 @@ jobs:
       with:
         install: git make mingw-w64-x86_64-gcc mingw-w64-x86_64-python mingw-w64-x86_64-libc++
     - uses: actions/checkout@master
-    - name: Prevent make from attempting to rebuild GLCL parser source
+    - name: Prevent make from rebuilding GLSL parser source
       run: |
         touch 3rdparty/bgfx/3rdparty/glsl-optimizer/src/glsl/glcpp/glcpp-lex.c
         touch 3rdparty/bgfx/3rdparty/glsl-optimizer/src/glsl/glcpp/glcpp-parse.c
