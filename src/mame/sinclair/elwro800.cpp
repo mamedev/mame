@@ -520,6 +520,8 @@ INPUT_PORTS_END
 
 void elwro800_state::machine_reset()
 {
+	spectrum_state::machine_reset();
+
 	uint8_t *messram = m_ram->pointer();
 
 	memset(messram, 0, 64*1024);
@@ -575,7 +577,9 @@ void elwro800_state::elwro800(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(14_MHz_XTAL / 2, 448, 0, SPEC_SCREEN_WIDTH, 312, 0, SPEC_SCREEN_HEIGHT);
+	rectangle visarea = { get_screen_area().left() - SPEC_LEFT_BORDER, get_screen_area().right() + SPEC_RIGHT_BORDER,
+		get_screen_area().top() - SPEC_TOP_BORDER, get_screen_area().bottom() + SPEC_BOTTOM_BORDER };
+	screen.set_raw(14_MHz_XTAL / 2, SPEC_CYCLES_PER_LINE * 2, SPEC_UNSEEN_LINES + SPEC_SCREEN_HEIGHT, visarea);
 	// Sync and interrupt timings determined by 2716 EPROM
 	screen.set_screen_update(FUNC(elwro800_state::screen_update_spectrum));
 	screen.set_palette("palette");

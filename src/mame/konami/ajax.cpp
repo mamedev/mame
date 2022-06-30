@@ -15,7 +15,6 @@
 #include "emu.h"
 
 #include "konamipt.h"
-#include "k051316.h"
 #include "k051960.h"
 #include "k052109.h"
 #include "konami_helper.h"
@@ -27,6 +26,7 @@
 #include "machine/watchdog.h"
 #include "sound/k007232.h"
 #include "sound/ymopm.h"
+#include "video/k051316.h"
 
 #include "emupal.h"
 #include "speaker.h"

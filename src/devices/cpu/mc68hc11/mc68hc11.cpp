@@ -55,6 +55,7 @@ DEFINE_DEVICE_TYPE(MC68HC11M0, mc68hc11m0_device, "mc68hc11m0", "Motorola MC68HC
 
 mc68hc11_cpu_device::mc68hc11_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint16_t ram_size, uint16_t reg_block_size, uint16_t rom_size, uint16_t eeprom_size, uint8_t init_value, uint8_t config_mask, uint8_t option_mask)
 	: cpu_device(mconfig, type, tag, owner, clock)
+	, device_nvram_interface(mconfig, *this)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, address_map_constructor(FUNC(mc68hc11_cpu_device::internal_map), this))
 	, m_port_input_cb(*this)
 	, m_port_output_cb(*this)
@@ -63,6 +64,8 @@ mc68hc11_cpu_device::mc68hc11_cpu_device(const machine_config &mconfig, device_t
 	, m_spi2_data_output_cb(*this)
 	, m_ram_view(*this, "ram")
 	, m_reg_view(*this, "regs")
+	, m_eeprom_view(*this, "eeprom")
+	, m_eeprom_data(*this, "eeprom")
 	, m_internal_ram_size(ram_size)
 	, m_reg_block_size(reg_block_size)
 	, m_internal_rom_size(rom_size)
@@ -70,17 +73,13 @@ mc68hc11_cpu_device::mc68hc11_cpu_device(const machine_config &mconfig, device_t
 	, m_init_value(init_value)
 	, m_config_mask(config_mask)
 	, m_option_mask(option_mask)
-	, m_config(config_mask)
+	, m_config(config_mask & (m_internal_rom_size == 0 ? 0xfd : 0xff) & (m_internal_eeprom_size == 0 ? 0xfe : 0xff))
 {
-	if (m_internal_rom_size == 0)
-		m_config &= 0xfd;
-	if (m_internal_eeprom_size == 0)
-		m_config &= 0xfe;
 }
 
 void mc68hc11_cpu_device::internal_map(address_map &map)
 {
-	// TODO: internal ROM & EEPROM
+	// TODO: internal ROM
 
 	map(0x0000, 0xffff).view(m_ram_view);
 	for (int pos = 0; pos < 16; pos++)
@@ -88,6 +87,17 @@ void mc68hc11_cpu_device::internal_map(address_map &map)
 	if (m_init_value == 0x00)
 		for (int pos = 0; pos < 16; pos++)
 			m_ram_view[pos + 16]((pos << 12) + m_reg_block_size, (pos << 12) + m_reg_block_size + m_internal_ram_size - 1).ram().share("ram");
+
+	if (m_internal_eeprom_size != 0)
+	{
+		// TODO: allow EEPROM writes in programming mode only, latching address and data
+		map(0x0000, 0xffff).view(m_eeprom_view);
+		if ((m_config_mask & 0xf0) == 0)
+			m_eeprom_view[0](0xb600, 0xb7ff).ram().share(m_eeprom_data);
+		else
+			for (int pos = 0; pos < 16; pos++)
+				m_eeprom_view[pos](((pos + 1) << 12) - m_internal_eeprom_size, ((pos + 1) << 12) - 1).ram().share(m_eeprom_data);
+	}
 
 	map(0x0000, 0xffff).view(m_reg_view);
 	for (int pos = 0; pos < 16; pos++)
@@ -120,6 +130,7 @@ mc68hc811e2_device::mc68hc811e2_device(const machine_config &mconfig, const char
 mc68hc11f1_device::mc68hc11f1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc68hc11_cpu_device(mconfig, MC68HC11F1, tag, owner, clock, 1024, 96, 0, 512, 0x01, 0xf5, 0xff)
 {
+	m_config &= 0x0f;
 }
 
 mc68hc11k1_device::mc68hc11k1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -151,6 +162,54 @@ void mc68hc11_cpu_device::device_resolve_objects()
 std::unique_ptr<util::disasm_interface> mc68hc11_cpu_device::create_disassembler()
 {
 	return std::make_unique<hc11_disassembler>();
+}
+
+
+bool mc68hc11_cpu_device::nvram_can_write()
+{
+	return (m_config_mask & 0xf9) != 0;
+}
+
+bool mc68hc11_cpu_device::nvram_read(util::read_stream &file)
+{
+	size_t actual;
+
+	if (file.read(&m_eeprom_data[0], m_internal_eeprom_size, actual) || actual != m_internal_eeprom_size)
+		return false;
+
+	if (file.read(&m_config, 1, actual) || actual != 1)
+		return false;
+
+	return true;
+}
+
+bool mc68hc11_cpu_device::nvram_write(util::write_stream &file)
+{
+	size_t actual;
+
+	if (file.write(&m_eeprom_data[0], m_internal_eeprom_size, actual) || actual != m_internal_eeprom_size)
+		return false;
+
+	if (file.write(&m_config, 1, actual) || actual != 1)
+		return false;
+
+	return true;
+}
+
+void mc68hc11_cpu_device::nvram_default()
+{
+	if ((m_config_mask & 0xf9) == 0)
+		return;
+
+	if (m_internal_eeprom_size != 0)
+	{
+		// use region if it exists
+		memory_region *region = memregion("eeprom");
+		if (region != nullptr)
+			std::copy_n(&region->as_u8(), m_internal_eeprom_size, &m_eeprom_data[0]);
+		else
+			std::fill_n(&m_eeprom_data[0], m_internal_eeprom_size, 0xff);
+	}
 }
 
 
@@ -374,7 +433,15 @@ uint8_t mc68hc11_cpu_device::config_1s_r()
 
 void mc68hc11_cpu_device::config_w(uint8_t data)
 {
+	// TODO: CONFIG also has EEPROM protection
 	m_config = data & m_config_mask;
+	if (m_internal_eeprom_size != 0)
+	{
+		if (BIT(m_config, 0))
+			m_eeprom_view.select(((m_config_mask & 0xf0) == 0xb0 ? m_init2 : m_config) >> 4);
+		else
+			m_eeprom_view.disable();
+	}
 }
 
 uint8_t mc68hc11_cpu_device::init_r()
@@ -400,6 +467,19 @@ void mc68hc11_cpu_device::init_w(uint8_t data)
 		m_reg_view.select(reg_page);
 		m_ram_view.select(ram_page);
 	}
+}
+
+uint8_t mc68hc11_cpu_device::init2_r()
+{
+	return m_init2;
+}
+
+void mc68hc11_cpu_device::init2_w(uint8_t data)
+{
+	m_init2 = data & 0xf0;
+	assert(m_internal_eeprom_size != 0);
+	if (BIT(m_config, 0))
+		m_eeprom_view.select(data >> 4);
 }
 
 uint8_t mc68hc11_cpu_device::option_r()
@@ -665,6 +745,7 @@ void mc68hc11k1_device::mc68hc11_reg_map(memory_view::memory_view_entry &block, 
 	block(base + 0x2a, base + 0x2a).rw(FUNC(mc68hc11k1_device::spdr_r<0>), FUNC(mc68hc11k1_device::spdr_w<0>)); // SPDR
 	block(base + 0x30, base + 0x30).rw(FUNC(mc68hc11k1_device::adctl_r), FUNC(mc68hc11k1_device::adctl_w)); // ADCTL
 	block(base + 0x31, base + 0x34).r(FUNC(mc68hc11k1_device::adr_r)); // ADR1-ADR4
+	block(base + 0x37, base + 0x37).rw(FUNC(mc68hc11k1_device::init2_r), FUNC(mc68hc11k1_device::init2_w)); // INIT2
 	block(base + 0x38, base + 0x38).r(FUNC(mc68hc11k1_device::opt2_r)).nopw(); // OPT2
 	block(base + 0x39, base + 0x39).rw(FUNC(mc68hc11k1_device::option_r), FUNC(mc68hc11k1_device::option_w)); // OPTION
 	block(base + 0x3a, base + 0x3a).nopw(); // COPRST (watchdog)
@@ -835,6 +916,8 @@ void mc68hc11_cpu_device::device_start()
 	save_item(NAME(m_port_dir));
 	save_item(NAME(m_config));
 	save_item(NAME(m_option));
+	if ((m_config_mask & 0xf0) == 0xb0)
+		save_item(NAME(m_init2));
 
 	m_pc = 0;
 	m_d.d16 = 0;
@@ -846,6 +929,7 @@ void mc68hc11_cpu_device::device_start()
 	m_ad_channel = 0;
 	std::fill(std::begin(m_irq_state), std::end(m_irq_state), CLEAR_LINE);
 	m_init = 0;
+	m_init2 = 0;
 	m_option = 0;
 	m_tflg1 = 0;
 	m_tmsk1 = 0;
@@ -894,6 +978,25 @@ void mc68hc11_cpu_device::state_string_export(const device_state_entry &entry, s
 
 void mc68hc11_cpu_device::device_reset()
 {
+	if ((m_config_mask & 0xf9) == 0)
+	{
+		m_config = m_config_mask;
+		if (m_internal_rom_size == 0)
+			m_config &= 0xfd;
+	}
+	else
+	{
+		if ((m_config_mask & 0xf0) == 0xb0)
+			m_init2 = 0;
+		if (m_internal_eeprom_size != 0)
+		{
+			if (BIT(m_config, 0))
+				m_eeprom_view.select(m_config_mask < 0xf0 ? 0 : m_config >> 4);
+			else
+				m_eeprom_view.disable();
+		}
+	}
+
 	m_pc = READ16(0xfffe); // TODO: vectors differ in bootstrap and special test modes
 	m_wait_state = 0;
 	m_stop_state = 0;
@@ -929,7 +1032,6 @@ void mc68hc11d0_device::device_reset()
 
 	m_port_data[0] &= 0x8f;
 	ddr_w<0>(0x70);
-	m_config = 0x00;
 }
 
 void mc68hc11e1_device::device_reset()
@@ -957,13 +1059,6 @@ void mc68hc11f1_device::device_reset()
 	mc68hc11_cpu_device::device_reset();
 
 	m_option = 0x00;
-}
-
-void mc68hc11m0_device::device_reset()
-{
-	mc68hc11_cpu_device::device_reset();
-
-	m_config = 0x04;
 }
 
 /*

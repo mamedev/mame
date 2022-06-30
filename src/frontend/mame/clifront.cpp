@@ -400,7 +400,25 @@ void cli_frontend::listsource(const std::vector<std::string> &args)
 {
 	auto const list_system_source = [] (device_type type)
 	{
-		osd_printf_info("%-16s %s\n", type.shortname(), core_filename_extract_base(type.source()));
+		std::string_view src(type.source());
+		auto prefix(src.find("src/mame/"));
+		if (std::string_view::npos == prefix)
+			prefix = src.find("src\\mame\\");
+		if (std::string_view::npos != prefix)
+		{
+			src.remove_prefix(prefix + 9);
+		}
+		else
+		{
+			auto prefix(src.find("src/"));
+			if (std::string_view::npos == prefix)
+				prefix = src.find("src\\");
+			if (std::string_view::npos != prefix)
+			{
+				src.remove_prefix(prefix + 4);
+			}
+		}
+		osd_printf_info("%-16s %s\n", type.shortname(), src);
 	};
 	apply_action(
 			args,
@@ -499,11 +517,17 @@ void cli_frontend::listbrothers(const std::vector<std::string> &args)
 	drivlist.reset();
 	while (drivlist.next())
 	{
-		int clone_of = drivlist.clone();
+		std::string_view src(drivlist.driver().type.source());
+		auto prefix(src.find("src/mame/"));
+		if (std::string_view::npos == prefix)
+			prefix = src.find("src\\mame\\");
+		if (std::string_view::npos != prefix)
+			src.remove_prefix(prefix + 9);
+		int const clone_of = drivlist.clone();
 		if (clone_of != -1)
-			osd_printf_info("%-20s %-16s %s\n", core_filename_extract_base(drivlist.driver().type.source()), drivlist.driver().name, (clone_of == -1 ? "" : drivlist.driver(clone_of).name));
+			osd_printf_info("%-20s %-16s %s\n", src, drivlist.driver().name, (clone_of == -1 ? "" : drivlist.driver(clone_of).name));
 		else
-			osd_printf_info("%-20s %s\n", core_filename_extract_base(drivlist.driver().type.source()), drivlist.driver().name);
+			osd_printf_info("%-20s %s\n", src, drivlist.driver().name);
 	}
 }
 

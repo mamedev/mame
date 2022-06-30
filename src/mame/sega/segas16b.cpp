@@ -873,7 +873,7 @@ S11 S13 S15 S17  |EPR12194 -        -        -        EPR12195 -        -       
 #include "segas16b.h"
 #include "segaipt.h"
 
-#include "mc8123.h"
+#include "cpu/z80/mc8123.h"
 #include "sound/okim6295.h"
 #include "speaker.h"
 

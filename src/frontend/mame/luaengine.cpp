@@ -1284,7 +1284,7 @@ void lua_engine::initialize()
 	game_driver_type["manufacturer"] = sol::readonly(&game_driver::manufacturer);
 	game_driver_type["parent"] = sol::readonly(&game_driver::parent);
 	game_driver_type["compatible_with"] = sol::property([] (game_driver const &driver) { return strcmp(driver.compatible_with, "0") ? driver.compatible_with : nullptr; });
-	game_driver_type["source_file"] = sol::property([] (game_driver const &driver) { return &driver.type.source()[0]; });
+	game_driver_type["source_file"] = sol::property([] (game_driver const &driver) { return driver.type.source(); });
 	game_driver_type["orientation"] = sol::property(
 			[] (game_driver const &driver)
 			{

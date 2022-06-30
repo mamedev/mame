@@ -102,13 +102,15 @@ M85 - Pound for Pound uses this, possibly just M84 with
                                    Year Board                Protected?
 R-Type                             1987  M72                 N
 Battle Chopper / Mr. Heli          1987  M72                 Y
-Ninja Spirit                       1988  M72                 Y
-Image Fight                        1988  M72                 Y
+Ninja Spirit / Saigo no Nindou     1988  M72                 Y
+Image Fight (World)                1988  M72                 Y
+Image Fight (Japan)                1988  M72                 Y
 Legend of Hero Tonma               1989  M72                 Y
 X Multiply (World)                 1989  M81-A-B + M81-B-B   N
 X Multiply (Japan)                 1989  M72                 Y
 Dragon Breed                       1989  M81-A-B + M81-B-B   N
-Dragon Breed (Japan?)              1989  M72                 Y
+Dragon Breed (World)               1989  M72                 Y
+Dragon Breed (Japan)               1989  M72                 Y
 R-Type II                          1989  M84-A-A + M84-B-A   N
 Major Title                        1990  M82-A-A + M82-B-A   N
 Hammerin' Harry (World ver)        1990  M81-A-B + M81-B-B   N
@@ -117,6 +119,7 @@ Hammerin' H..(US)/ Daiku no Gensan 1990  M84-A-A + M84-C-A   N
                    Daiku no Gensan 1990  M82-A-A + M82-B-A   N
 Pound for Pound                    1990  M85-A-B + M85-B     N
 Air Duel (World)                   1990  M82-A-A + M82-B-A   N
+Air Duel (World)                   1990  M72                 Y
 Air Duel (Japan)                   1990  M72                 Y
 Cosmic Cop /                       1991  M84-D-B + M84-B-B   N
   Gallop - Armed Police Unit       1991  M72                 Y (sample playback only)
@@ -465,14 +468,6 @@ void m72_state::dbreedm72_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask
 	if (ACCESSING_BITS_0_7 && (data & 0xff) < 9) m_audio->set_sample_start(a[data & 0xff]);
 }
 
-void m72_state::airduelm72_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	static const int a[16] = {
-		0x00000, 0x00020, 0x03ec0, 0x05640, 0x06dc0, 0x083a0, 0x0c000, 0x0eb60,
-		0x112e0, 0x13dc0, 0x16520, 0x16d60, 0x18ae0, 0x1a5a0, 0x1bf00, 0x1c340 };
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 16) m_audio->set_sample_start(a[data & 0xff]);
-}
-
 void m72_state::dkgenm72_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	static const int a[28] = {
@@ -584,30 +579,6 @@ static const u8 dbreedm72_code[CODE_LEN] =
 static const u8 dbreedm72_crc[CRC_LEN] =   { 0xa4,0x96,0x5f,0xc0, 0xab,0x49,0x9f,0x19,
 												0x84,0xe6,0xd6,0xca, 0x00,0x00 };
 
-/* Air Duel (World, M72 hardware) */
-static const u8 airduelm72_code[CODE_LEN] =
-{
-	0xea,0x4d,0x0b,0x00,0x00    // jmp  0000:$0b4d
-};
-static const u8 airduelm72_crc[CRC_LEN] =     { 0x54,0x81,0xe6,0x8a, 0xc9,0x12,0xcc,0xea,
-												0x00,0x00 };
-
-/*
-// Actual MCU is dumped, information for Air Duel (Japan, M72 hardware) for reference:
-static const u8 airduelm72_code[CODE_LEN] =
-{
-    0x68,0x00,0xd0,             // push 0d000h
-    0x1f,                       // pop ds
-    // the game checks for
-    // "This game can only be played in Japan..." message in the video text buffer
-    // the message is nowhere to be found in the ROMs, so has to be displayed by the mcu
-    0xc6,0x06,0xc0,0x1c,0x57,   // mov [1cc0h], byte 057h
-    0xea,0x69,0x0b,0x00,0x00    // jmp  0000:$0b69
-};
-static const u8 airduelm72j_crc[CRC_LEN] =     { 0x72,0x9c,0xca,0x85, 0xc9,0x12,0xcc,0xea,
-                                                0x00,0x00 };
-*/
-
 /* Daiku no Gensan */
 static const u8 dkgenm72_code[CODE_LEN] =
 {
@@ -671,12 +642,6 @@ void m72_state::init_dbreedm72()
 {
 	install_protection_handler(dbreedm72_code,dbreedm72_crc);
 	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16s_delegate(*this, FUNC(m72_state::dbreedm72_sample_trigger_w)));
-}
-
-void m72_state::init_airduelm72()
-{
-	install_protection_handler(airduelm72_code,airduelm72_crc);
-	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16s_delegate(*this, FUNC(m72_state::airduelm72_sample_trigger_w)));
 }
 
 void m72_state::init_dkgenm72()
@@ -3507,7 +3472,7 @@ ROM_START( airduelm72 )
 	ROM_RELOAD(                        0xc0000, 0x20000 )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  // i8751 microcontroller
-	ROM_LOAD( "ad_c-pr-c.ic1", 0x00000, 0x01000, NO_DUMP ) // i8751 MCU labeled  AD C-PR-C
+	ROM_LOAD( "ad_c-pr-c.ic1", 0x00000, 0x01000, CRC(8785e4e2) SHA1(491f5646e1c5d68453086f05b9d79722eb5282ea) ) // i8751 MCU labeled  AD C-PR-C
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "ad-00.ic53", 0x00000, 0x20000, CRC(2f0d599b) SHA1(a966f806b5e25bb98cc63c46c49e0e676a62afcf) )
@@ -4368,10 +4333,9 @@ ROM_START( poundforu )
 	ROM_LOAD( "ppa-v0.bin",   0x00000, 0x40000, CRC(03321664) SHA1(51f2b2b712385c1cd55fd069829efac01838d603) )
 ROM_END
 
-// in the case of the i8751 protected games the World and Japan sets should be using different MCU roms.
-// the MCU roms provide checksum information needed for the sets, so using the wrong ROM will result in
-// the program roms failing their tests.  This is why we still have simulation code for many games
-// despite having Japanese version MCU roms for several of them.  See notes next to the sets
+// For i8751 protected games, each region uses unique internal MCU code. The MCU code provides checksum information
+// needed for each specific set. Using the wrong MCU code will result in the program ROMs failing the checksum tests.
+// Simulation code is used for the few remaining games without a corresponding MCU dump.  See notes next to the sets
 
 /* M72 */
 GAME( 1987, rtype,       0,        rtype,        rtype,        m72_state, empty_init,      ROT0,   "Irem", "R-Type (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
@@ -4402,7 +4366,7 @@ GAME( 1989, dbreedjm72,  dbreed,   m72_dbreed,   dbreed,       m72_state, init_m
 
 GAME( 1991, gallop,      cosmccop, m72,          gallop,       m72_state, init_gallop,     ROT0,   "Irem", "Gallop - Armed Police Unit (Japan, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // missing i8751 MCU code
 
-GAME( 1990, airduelm72,  airduel,  m72,          airduel,      m72_state, init_airduelm72, ROT270, "Irem", "Air Duel (World, M72 hardware)", MACHINE_SUPPORTS_SAVE ) // missing i8751 MCU code
+GAME( 1990, airduelm72,  airduel,  m72_airduel,  airduel,      m72_state, init_m72_8751,   ROT270, "Irem", "Air Duel (World, M72 hardware)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, airdueljm72, airduel,  m72_airduel,  airduel,      m72_state, init_m72_8751,   ROT270, "Irem", "Air Duel (Japan, M72 hardware)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, dkgensanm72, hharry,   m72,          hharry,       m72_state, init_dkgenm72,   ROT0,   "Irem", "Daiku no Gensan (Japan, M72 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // missing i8751 MCU code
