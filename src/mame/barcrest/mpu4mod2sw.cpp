@@ -1519,6 +1519,17 @@ ROM_START( m4thehit )
 	ROM_LOAD( "dth17.bin", 0x0000, 0x010000, CRC(93947de4) SHA1(e04c34edf39d264e3fa91bf6dfd757088e1c08e4) )
 ROM_END
 
+ROM_START( m4gldgat )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dgg22.bin", 0x0000, 0x010000, CRC(ef8498df) SHA1(6bf164ef18445e83e4510a000bc924cbe916ad99) )
+ROM_END
+
+ROM_START( m4toma )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dtk23.bin", 0x0000, 0x010000, CRC(ffba2b96) SHA1(c7635023ac5181e661e808c6b44ac1add58f4f56) )
+ROM_END
+
+
 ROM_START( m4jpjmp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "vjcs.p1", 0x0000, 0x010000, CRC(90280752) SHA1(bc2fcefc00adbae9ca2e116108b53ab932ab57b2) )
@@ -2077,6 +2088,12 @@ GAME(199?, m4classa,  m4class,    mod2_7reel_cheatchr_pal<mpu4_characteriser_pal
 
 // GEEN TUBES
 GAME(199?, m4thehit,  0,          mod2_7reel_cheatchr_pal<mpu4_characteriser_pal::toptake_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default_seven,     ROT0,   "Barcrest","The Hit (Barcrest) (MPU4) (DTH 1.7)",GAME_FLAGS )
+
+// GEEN TUBES
+GAME(199?, m4gldgat,  0,          mod2_7reel_cheatchr_pal<mpu4_characteriser_pal::m450_characteriser_prot>,   mpu4,    mpu4mod2_machines_state, init_m4default_seven, ROT0,   "Barcrest","Golden Gate (Barcrest) (Dutch) (MPU4) (DGG 2.2)",GAME_FLAGS )
+
+// GEEN TUBES
+GAME(199?, m4toma,    0,          mod2_7reel_cheatchr_pal<mpu4_characteriser_pal::m400_characteriser_prot>,   mpu4,    mpu4mod2_machines_state, init_m4default_seven, ROT0,   "Barcrest","Tomahawk (Barcrest) (Dutch) (MPU4) (DTK 2.3)",GAME_FLAGS )
 
 // boots but no coins?
 GAME(199?, m4bigchd,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::clbveg_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Big Chief (Barcrest) (Dutch) (MPU4) (BCH 1.5)",GAME_FLAGS ) // why code BCH on a dutch?

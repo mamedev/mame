@@ -161,9 +161,6 @@ public:
 	void init_m4andyfh();
 	void init_m4actbnk();
 	void init_m4andybt();
-
-
-
 };
 
 
@@ -3690,7 +3687,7 @@ GAME_CUSTOM( 199?, m4cashat__0,    m4cashat,   "casattack8.bin",   0x0000, 0x020
 
 #define M4RHR_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
-	ROM_LOAD( "rhrsnd1.hex", 0x0000, 0x080000, CRC(3e80f8bd) SHA1(2e3a195b49448da11cc0c089a8a9b462894c766b) )
+	ROM_LOAD( "generic_redhotroll_sound1.bin", 0x0000, 0x080000, CRC(3e80f8bd) SHA1(2e3a195b49448da11cc0c089a8a9b462894c766b) )
 
 
 #undef GAME_CUSTOM
@@ -5317,7 +5314,7 @@ GAME_CUSTOM( 199?, m4bdash__a,  m4bdash,    "bdvarg.bin",   0x0000, 0x020000, CR
 *
 * Prize Money
 * - no extender?
-* - has reel issues?
+* - uses reel mapping like a 6 reel game, but with only 5 mapped
 *
 *****************************************************************************************************************************************************************************/
 
@@ -5331,7 +5328,7 @@ GAME_CUSTOM( 199?, m4bdash__a,  m4bdash,    "bdvarg.bin",   0x0000, 0x020000, CR
 		ROM_LOAD( name, offset, length, hash ) \
 		M4PRZMON_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::pzmoney_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_pal<mpu4_characteriser_pal::pzmoney_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4default_six_alt, ROT0, company, title, GAME_FLAGS )
 
 // "(C)1991 BARCREST" and "FP8 0.1"
 GAME_CUSTOM( 199?, m4przmon,       0,          "fp8s.p1",      0x0000, 0x010000, CRC(b43eef89) SHA1(15991ad9223ddce77277f5451b5557ff59e2647c), "Barcrest","Prize Money (Barcrest) (MPU4) (FP8 0.1)" )
@@ -5357,7 +5354,7 @@ GAME_CUSTOM( 199?, m4przmon__p,    m4przmon,   "fpmy.p1",      0x0000, 0x010000,
 *
 * Prize Money Showcase
 * - no extender?
-* - has reel issues?
+* - uses reel mapping like a 6 reel game, but with only 5 mapped
 *
 *****************************************************************************************************************************************************************************/
 
@@ -5372,7 +5369,7 @@ GAME_CUSTOM( 199?, m4przmon__p,    m4przmon,   "fpmy.p1",      0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4PRZMNS_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::pzmoney_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_pal<mpu4_characteriser_pal::pzmoney_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4default_six_alt, ROT0, company, title, GAME_FLAGS )
 
 // "(C)1991 BARCREST" and "SPM 0.2"
 GAME_CUSTOM( 199?, m4przmns,       0,          "spms.p1",  0x0000, 0x010000, CRC(7d684358) SHA1(b07b13d6827e5ea4127eb763f4233a3d35ea99e6), "Barcrest","Prize Money Showcase (Barcrest) (MPU4) (SPM 0.2)" )
@@ -6732,35 +6729,17 @@ INPUT_PORTS_END
 void mpu4mod4oki_machines_state::init_m4andybt()
 {
 	init_m4default_big();
-	//Derived from Andy's_Big_Time_(Barcrest)_[C03_800_250jp]_[c].gam
 	use_m4_hopper_tubes();
 	use_m4_large_extender_b();
 	use_m4_five_reel_rev();
-	//PCKEY =0
-	//STKEY =0
-	//JPKEY =0
-	//JPSET =0
-	//DIP1_0=true
-	//DIP1_1=true
-	//DIP1_2=true
-	//DIP1_3=true
-	//DIP1_4=true
-	//DIP1_5=true
-	//DIP1_6=true
-	//DIP1_7=true
-	//DIP2_0=false
-	//DIP2_1=true
-	//DIP2_2=true
-	//DIP2_3=false
-	//DIP2_4=false
-	//DIP2_5=false
-	//DIP2_6=false
-	//DIP2_7=false
-	//Sound barcrest1
-	//Standard
-	//Volume 0 Stereo= 1
-	//Sample rate 16000
-	//Front door code 0 Cash door code 0
+
+	m_use_simplecard_leds = true;
+	m_simplecard_leds_base = 0;
+	m_simplecard_leds_invert = true;
+
+	m_use_pia4_porta_leds = true;
+	m_pia4_porta_leds_base = 8;
+	m_pia4_porta_leds_invert = true;
 }
 
 
@@ -7668,7 +7647,7 @@ ROM_START( m4brook )
 	ROM_LOAD( "brkl10.epr", 0x0000, 0x010000, CRC(857255b3) SHA1(cfd77918a19b2532a02b8bb3fa8e2716db31fb0e) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "brkl_snd.epr", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
+	ROM_LOAD( "generic_dutch_sound2.bin", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
 ROM_END
 
 // has (c)1998 BARCREST Development BV4 in the ROM
@@ -7977,7 +7956,7 @@ ROM_START( m4magtbo )
 	ROM_LOAD( "crmtb14.epr", 0x0000, 0x010000, CRC(79e1746c) SHA1(794317f3aba7b1a7994cde89d81abc2b687d0821) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "scrmtb.snd", 0x000000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
+	ROM_LOAD( "generic_dutch_sound2.bin", 0x000000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
 ROM_END
 
 INPUT_PORTS_START( m4magtbo )
@@ -8046,3 +8025,145 @@ ROM_END
 GAME(199?, m4brnze,   0,          mod4oki,    mpu4,    mpu4mod4oki_machines_state, init_m4default, ROT0,   "bootleg?","Bronze Voyage (BWB) (bootleg?) (MPU4) (BV5 2.1, set 1)",GAME_FLAGS )
 GAME(199?, m4brnzea,  m4brnze,    mod4oki,    mpu4,    mpu4mod4oki_machines_state, init_m4default, ROT0,   "bootleg?","Bronze Voyage (BWB) (bootleg?) (MPU4) (BV5 2.1, set 2)",GAME_FLAGS )
 GAME(199?, m4brnzeb,  m4brnze,    mod4oki,    mpu4,    mpu4mod4oki_machines_state, init_m4default, ROT0,   "bootleg?","Bronze Voyage (BWB) (bootleg?) (MPU4) (BV5 2.1, set 3)",GAME_FLAGS )
+
+/*****************************************************************************************************************************************************************************
+*
+* Premier (Dutch game)
+*
+*****************************************************************************************************************************************************************************/
+
+ROM_START( m4prem )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dpm14.bin", 0x0000, 0x010000, CRC(de344759) SHA1(d3e7514da83bbf1eba63661fb0675a6230af93cd) )
+
+	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_LOAD( "dpms.bin", 0x0000, 0x080000, CRC(93fd4253) SHA1(69feda7ffc56defd515c9cd1ce204af3d9731a3f) )
+ROM_END
+
+// GEEN TUBES
+GAME(199?, m4prem,    0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::premier_characteriser_prot> ,mpu4,    mpu4mod4oki_machines_state, init_m4default_six_alt, ROT0,   "Barcrest","Premier (Barcrest) (Dutch) (MPU4) (DPM 1.4)",GAME_FLAGS )
+
+/*****************************************************************************************************************************************************************************
+*
+* Red Heat (Dutch game)
+*
+*****************************************************************************************************************************************************************************/
+
+ROM_START( m4rdht )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "drh12", 0x0000, 0x010000, CRC(b26cd308) SHA1(4e29f6cce773232a1c43cd2fb3ce9b844c446bb8) ) // aka gdjb
+
+	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_LOAD( "drh_1.snd", 0x0000, 0x080000, CRC(f652cd0c) SHA1(9ce986bc12bcf22a57e065329e82671d19cc96d7) ) // aka gn.snd
+ROM_END
+
+// GEEN TUBES
+GAME(199?, m4rdht,    0,          mod4oki_7reel_cheatchr_pal<mpu4_characteriser_pal::redheat_characteriser_prot>,mpu4,    mpu4mod4oki_machines_state, init_m4default_seven, ROT0,   "Barcrest","Red Heat (Barcrest) (Dutch) (MPU4) (DRH 1.2)",GAME_FLAGS )
+
+/*****************************************************************************************************************************************************************************
+*
+* Red White & Blue (Dutch game)
+*
+*****************************************************************************************************************************************************************************/
+
+ROM_START( m4rwb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "drw14.bin", 0x0000, 0x010000, CRC(22c30ebe) SHA1(479f66732aac56dae60c80d11f05c084865f9389) )
+
+	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_LOAD( "rwb_1.snd", 0x000000, 0x080000, CRC(e0a6def5) SHA1(e3867b83e588fd6a9039b8d45186480a9d0433ea) )
+	ROM_LOAD( "rwb_2.snd", 0x080000, 0x080000, CRC(54a2b2fd) SHA1(25875ff873bf22df510e7a4c56c336fbabcbdedb) )
+ROM_END
+
+// GEEN TUBES
+GAME(199?, m4rwb,     0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::redwhite_characteriser_prot>,mpu4,    mpu4mod4oki_machines_state, init_m4default_six_alt, ROT0,   "Barcrest","Red White & Blue (Barcrest) (Dutch) (MPU4) (DRW 1.4)",GAME_FLAGS )
+
+/*****************************************************************************************************************************************************************************
+*
+* American Highway (Dutch game)
+*
+*****************************************************************************************************************************************************************************/
+
+ROM_START( m4amhiwy )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dah20", 0x0000, 0x010000, CRC(e3f92f00) SHA1(122c8a429a1f75dac80b90c4f218bd311813daf5) )
+
+	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_LOAD( "sdr6_1.snd", 0x000000, 0x080000, CRC(63ad952d) SHA1(acc0ac3898fcc281e2d7ba19ada52d727885fe06) )
+	ROM_LOAD( "sdr6_2.snd", 0x080000, 0x080000, CRC(48d2ace5) SHA1(ada0180cc60266c0a6d981a019d66bbedbced21a) )
+ROM_END
+
+// GEEN TUBES
+GAME(199?, m4amhiwy,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m462_characteriser_prot>,mpu4,    mpu4mod4oki_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","American Highway (Barcrest) (Dutch) (MPU4) (DAH 2.0)",GAME_FLAGS )
+
+/*****************************************************************************************************************************************************************************
+*
+* Road Runner (Dutch game)
+*  - similar SFX to Road Hog / Hot Rod
+*
+*****************************************************************************************************************************************************************************/
+
+ROM_START( m4roadrn )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dro19", 0x0000, 0x010000, CRC(8b591766) SHA1(df156390b427e31cdda64826a6c1d2457c915f25) )
+
+	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_LOAD( "dro_1.snd", 0x000000, 0x080000, CRC(895cfe63) SHA1(02134e149cef3526bbdb6cb93ef3efa283b9d6a2) )
+	ROM_LOAD( "dro_2.snd", 0x080000, 0x080000, CRC(1d5c8d4f) SHA1(15c18ae7286807cdc0feb825b958eae808445690) )
+ROM_END
+
+// GEEN TUBES
+GAME(199?, m4roadrn,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::age_characteriser_prot>,mpu4,    mpu4mod4oki_machines_state, init_m4altreels, ROT0,   "Barcrest","Road Runner (Barcrest) (Dutch) (MPU4) (DRO 1.9)",GAME_FLAGS )
+
+/*****************************************************************************************************************************************************************************
+*
+* Salsa (Dutch game)
+*
+*****************************************************************************************************************************************************************************/
+
+ROM_START( m4salsa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dsa15.epr", 0x0000, 0x010000, CRC(22b60b0b) SHA1(4ad184d1557bfd01650684ea9d8ad794fded65f7) )
+
+	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_LOAD( "dsa_1@97c2.snd", 0x0000, 0x080000, CRC(0281a6dd) SHA1(a35a8cd0da32c51f77856ea3eeff7c58fd032333) )
+ROM_END
+
+// GEEN TUBES
+GAME(199?, m4salsa,   0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::salsa_characteriser_prot>,mpu4,    mpu4mod4oki_machines_state, init_m4default_six_alt, ROT0,   "Barcrest","Salsa (Barcrest) (Dutch) (MPU4) (DSA 1.5)",GAME_FLAGS )
+
+/*****************************************************************************************************************************************************************************
+*
+* Ceptor (Dutch game)
+*  - wrong sample ROMs?
+*
+*****************************************************************************************************************************************************************************/
+
+ROM_START( m4ceptr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dce10.bin", 0x0000, 0x010000, CRC(c94d41ef) SHA1(58fdff2de8dd3ead3980f6f34362183d084ce917) )
+
+	ROM_REGION( 0x100000, "msm6376", 0 ) // These are from Place Your Bets (incorrect?)
+	ROM_LOAD( "cepsnd.p1", 0x000000, 0x080000, BAD_DUMP CRC(3a91784a) SHA1(7297ccec3264aa9f1e7b3a2841f5f8a1e4ca6c54) )
+	ROM_LOAD( "cepsnd.p2", 0x080000, 0x080000, BAD_DUMP CRC(a82f0096) SHA1(45b6b5a2ae06b45add9cdbb9f5e6f834687b4902) )
+ROM_END
+
+// GEEN TUBES
+GAME(199?, m4ceptr,   0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::salsa_characteriser_prot>,    mpu4,    mpu4mod4oki_machines_state, init_m4default, ROT0,   "Barcrest","Ceptor (Barcrest) (Dutch) (MPU4) (DCE 1.0)",GAME_FLAGS )
+
+/*****************************************************************************************************************************************************************************
+*
+* Black & White (Dutch game)
+*
+*****************************************************************************************************************************************************************************/
+
+ROM_START( m4blkwhd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dbw11.bin", 0x0000, 0x010000, CRC(337aaa2c) SHA1(26b12ea3ada9668293c6b44d62458590e5b4ac8f) )
+
+	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_LOAD( "generic_dutch_sound1.bin", 0x0000, 0x080000, CRC(f247ba83) SHA1(9b173503e63a4a861d1380b2ab1fe14af1a189bd) )
+ROM_END
+
+// GEEN TUBES
+GAME(199?, m4blkwhd,  0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::blackwhite_characteriser_prot>,    mpu4,    mpu4mod4oki_machines_state, init_m4default_six, ROT0,   "Barcrest","Black & White (Barcrest) (Dutch) (MPU4) (DBW 1.1)",GAME_FLAGS ) // Reel Error

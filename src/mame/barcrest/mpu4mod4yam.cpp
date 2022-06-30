@@ -48,6 +48,10 @@ void mpu4mod4yam_machines_state::init_m4addr()
 	use_m4_hopper_tubes();
 	use_m4_standard_reels();
 
+	m_use_pia4_porta_leds = true;
+    m_pia4_porta_leds_base = 0;
+   // uint8_t m_pia4_porta_leds_strobe = 0;
+
 	//PCKEY =0
 	//STKEY =0
 	//JPKEY =0
@@ -1536,6 +1540,16 @@ ROM_START( m4magdrg )
 	ROM_LOAD( "dmd10.bin", 0x0000, 0x010000, CRC(9cc4f2f8) SHA1(46a90ffa18d35ad2b06542f91120c02bc34f0c40) )
 ROM_END
 
+ROM_START( m4hslo )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "hot30", 0x0000, 0x010000, CRC(62f2c420) SHA1(5ae89a1b585738255e8d9ae153c3c63b4a2893e4) )
+ROM_END
+
+ROM_START( m4addrd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dal12.bin", 0x0000, 0x010000, CRC(4affa79a) SHA1(68bceab42b3616641a34a64a83306175ffc1ce32) )
+ROM_END
+
 
 GAME(198?, m4tst, 0, mod4yam_no_bacta, mpu4, mpu4mod4yam_machines_state, init_m4test4, ROT0,"Barcrest","MPU4 Unit Test (Program 4)",MACHINE_MECHANICAL )
 
@@ -1549,10 +1563,8 @@ GAME(199?, m4voodoo,  0,        mod4yam_cheatchr_pal<mpu4_characteriser_pal::m43
 // GEEN TUBES
 GAME(199?, m4magdrg,  0,          mod4yam_7reel_cheatchr_pal<mpu4_characteriser_pal::magicdragon_characteriser_prot>, mpu4,    mpu4mod4yam_machines_state, init_m4default_seven, ROT0,   "Barcrest","Magic Dragon (Barcrest) (MPU4) (DMD1.0)",GAME_FLAGS )
 
-ROM_START( m4hslo )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "hot30", 0x0000, 0x010000, CRC(62f2c420) SHA1(5ae89a1b585738255e8d9ae153c3c63b4a2893e4) )
-ROM_END
-
 // non-standard protection
 GAME(199?, m4hslo,    0,          mod4yam_bootleg_fixedret<0x56>,       mpu4_70pc,    mpu4mod4yam_machines_state, init_m4default, ROT0,   "(bootleg)","Hot Slot (bootleg) (MPU4) (HOT 3.0)",GAME_FLAGS )
+
+// GEEN TUBES
+GAME(199?, m4addrd,   0,          mod4yam_cheatchr_pal<mpu4_characteriser_pal::m470_characteriser_prot>,   mpu4,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Adders & Ladders (Barcrest) (Dutch) (MPU4) (DAL 1.2)",GAME_FLAGS )
