@@ -129,6 +129,7 @@ cccp/mikrosha.cpp
 cccp/mk85.cpp
 cccp/mk90.cpp
 cccp/mk98.cpp
+cccp/ms0515.cpp
 cccp/ms6102.cpp
 cccp/okean240.cpp
 cccp/orion.cpp
@@ -324,7 +325,13 @@ hitachi/bmjr.cpp
 hitachi/bml3.cpp
 homebrew/4004clk.cpp
 homebrew/68ksbc.cpp
+homebrew/d6809.cpp
 homebrew/dcebridge.cpp
+homebrew/gigatron.cpp
+homebrew/gs6502.cpp
+homebrew/gs6809.cpp
+homebrew/gscpm.cpp
+homebrew/gsz80.cpp
 homebrew/homez80.cpp
 homebrew/lft_chiptune.cpp
 homebrew/lft_craft.cpp
@@ -334,9 +341,11 @@ homebrew/p112.cpp
 homebrew/phunsy.cpp
 homebrew/pimps.cpp
 homebrew/ravens.cpp
+homebrew/rc2014.cpp
 homebrew/sbc6510.cpp
 homebrew/sitcom.cpp
 homebrew/test_t400.cpp
+homebrew/ultim809.cpp
 homebrew/uzebox.cpp
 homebrew/z80clock.cpp
 homebrew/z80dev.cpp
@@ -802,7 +811,6 @@ skeleton/ct909e_segadvd.cpp
 skeleton/cxhumax.cpp
 skeleton/d400.cpp
 skeleton/d6800.cpp
-skeleton/d6809.cpp
 skeleton/daruma.cpp
 skeleton/datacast.cpp
 skeleton/design.cpp
@@ -840,16 +848,11 @@ skeleton/fs3216.cpp
 skeleton/ft68m.cpp
 skeleton/gameking.cpp
 skeleton/gem_rp.cpp
-skeleton/gigatron.cpp
 skeleton/gimix.cpp
 skeleton/gm1000.cpp
 skeleton/gnat10.cpp
 skeleton/goupil.cpp
 skeleton/grfd2301.cpp
-skeleton/gs6502.cpp
-skeleton/gs6809.cpp
-skeleton/gscpm.cpp
-skeleton/gsz80.cpp
 skeleton/hazeltin.cpp
 skeleton/hazl1420.cpp
 skeleton/hohnadam.cpp
@@ -906,7 +909,6 @@ skeleton/mod8.cpp
 skeleton/modellot.cpp
 skeleton/molecular.cpp
 skeleton/monon_color.cpp
-skeleton/ms0515.cpp
 skeleton/ms9540.cpp
 skeleton/mstation.cpp
 skeleton/mt735.cpp
@@ -940,7 +942,6 @@ skeleton/pulsar.cpp
 skeleton/pv9234.cpp
 skeleton/pwp14.cpp
 skeleton/qtsbc.cpp
-skeleton/rc2014.cpp
 skeleton/rd100.cpp
 skeleton/rvoice.cpp
 skeleton/sacstate.cpp
@@ -983,7 +984,6 @@ skeleton/tr175.cpp
 skeleton/trs80dt1.cpp
 skeleton/tsispch.cpp
 skeleton/tulip1.cpp
-skeleton/ultim809.cpp
 skeleton/unistar.cpp
 skeleton/v6809.cpp
 skeleton/vanguardmk1.cpp

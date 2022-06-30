@@ -10410,7 +10410,7 @@ luxorves                        // Luxor Video Entertainment System (PAL)
 sabavdpl                        // SABA Videoplay - 1977 (PAL)
 sabavpl2                        // SABA Videoplay 2 (PAL)
 
-@source:skeleton/chaos.cpp
+@source:homebrew/chaos.cpp
 chaos                           //
 
 @source:univers/cheekyms.cpp
@@ -11807,7 +11807,7 @@ d461                            //
 @source:skeleton/d6800.cpp
 d6800                           // Dream 6800
 
-@source:skeleton/d6809.cpp
+@source:homebrew/d6809.cpp
 d6809                           //
 
 @source:excelent/d9final.cpp
@@ -15460,7 +15460,7 @@ touryuu                         // (c) 200? Yuki Enterprise
 giclasex
 giclassvr
 
-@source:skeleton/gigatron.cpp
+@source:homebrew/gigatron.cpp
 gigatron                        // (c) 2018 Marcel van Kervinck
 
 @source:konami/gijoe.cpp
@@ -31118,7 +31118,7 @@ blkbustr                        // (c) 1983 Kiwako + ECI license
 crazyblk                        // (c) 1983 Kiwako + ECI license
 mrjong                          // (c) 1983 Kiwako
 
-@source:skeleton/ms0515.cpp
+@source:cccp/ms0515.cpp
 ms0515                          //
 
 @source:cccp/ms6102.cpp
@@ -44660,22 +44660,22 @@ wavesynth
 simldv1000                      // Pioneer LD-V1000
 simpr8210                       // Pioneer PR-8210
 
-@source:skeleton/gsz80.cpp
+@source:homebrew/gsz80.cpp
 gsz80                           // Grant Searle's Simple Z-80 Machine
 
-@source:skeleton/gscpm.cpp
+@source:homebrew/gscpm.cpp
 gscpm                           // Grant Searle's Simple CP/M Machine
 
-@source:skeleton/gs6502.cpp
+@source:homebrew/gs6502.cpp
 gs6502                          // Grant Searle's Simple 6502 Machine
 
-@source:skeleton/gs6809.cpp
+@source:homebrew/gs6809.cpp
 gs6809                          // Grant Searle's Simple 6809 Machine
 
-@source:skeleton/ultim809.cpp
+@source:homebrew/ultim809.cpp
 ultim809
 
-@source:skeleton/rc2014.cpp
+@source:homebrew/rc2014.cpp
 rc2014                          // RC2014 Classic
 rc2014bp5                       // RC2014 Backplane-5
 rc2014bp8                       // RC2014 Backplane-8
