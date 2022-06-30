@@ -1611,6 +1611,11 @@ void ddr_state::machine_start()
 	m_stage_mask = 0xffffffff;
 
 	save_item(NAME(m_stage_mask));
+	save_item(STRUCT_MEMBER(m_stage_state, D0));
+	save_item(STRUCT_MEMBER(m_stage_state, clk));
+	save_item(STRUCT_MEMBER(m_stage_state, shift));
+	save_item(STRUCT_MEMBER(m_stage_state, state));
+	save_item(STRUCT_MEMBER(m_stage_state, bit));
 }
 
 void ddr_state::init_ddr()
