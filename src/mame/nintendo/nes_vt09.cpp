@@ -20,6 +20,11 @@
 #include "emu.h"
 #include "nes_vt09_soc.h"
 
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+
+#include "softlist_dev.h"
+
 class nes_vt09_common_base_state : public driver_device
 {
 public:
@@ -105,6 +110,58 @@ public:
 private:
 };
 
+class nes_vt09_cart_state : public nes_vt09_state
+{
+public:
+	nes_vt09_cart_state(const machine_config& mconfig, device_type type, const char* tag) :
+		nes_vt09_state(mconfig, type, tag),
+		m_bank(*this, "cartbank"),
+		m_cart(*this, "cartslot"),
+		m_cart_region(nullptr)
+	{ }
+
+	void nes_vt09_cart(machine_config& config);
+
+protected:
+	void machine_start() override;
+
+private:
+	void vt_external_space_map_cart(address_map& map);
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+
+	required_memory_bank m_bank;
+	required_device<generic_slot_device> m_cart;
+	memory_region *m_cart_region;
+};
+
+void nes_vt09_cart_state::machine_start()
+{
+	nes_vt09_state::machine_start();
+
+	m_bank->configure_entries(0, 1, memregion("mainrom")->base(), 0x200000);
+	m_bank->set_entry(0);
+
+	// if there's a cart, override the standard banking
+	if (m_cart && m_cart->exists())
+	{
+		m_cart_region = memregion(std::string(m_cart->tag()) + GENERIC_ROM_REGION_TAG);
+		m_bank->configure_entries(0, 1, m_cart_region->base(), 0x200000);
+		m_bank->set_entry(0);
+	}
+}
+
+DEVICE_IMAGE_LOAD_MEMBER(nes_vt09_cart_state::cart_load)
+{
+	uint32_t size = m_cart->common_get_size("rom");
+
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	return image_init_result::PASS;
+}
+
+
 uint8_t nes_vt09_common_base_state::vt_rom_r(offs_t offset)
 {
 	return m_prgrom[offset];
@@ -150,6 +207,12 @@ void nes_vt09_common_state::vt_external_space_map_512kbyte(address_map &map)
 {
 	map(0x0000000, 0x007ffff).mirror(0x1f80000).r(FUNC(nes_vt09_common_state::vt_rom_r));
 }
+
+void nes_vt09_cart_state::vt_external_space_map_cart(address_map &map)
+{
+	map(0x0000000, 0x01fffff).mirror(0x1e00000).bankr("cartbank");
+}
+
 
 template <uint8_t NUM> uint8_t nes_vt09_common_base_state::extrain_r()
 {
@@ -296,7 +359,17 @@ void nes_vt09_state::nes_vt09_4mb_rasterhack(machine_config& config)
 	m_soc->force_raster_timing_hack();
 }
 
+void nes_vt09_cart_state::nes_vt09_cart(machine_config& config)
+{
+	nes_vt09(config);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_cart_state::vt_external_space_map_cart);
 
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "nes_vt_cart");
+	m_cart->set_width(GENERIC_ROM8_WIDTH);
+	m_cart->set_device_load(FUNC(nes_vt09_cart_state::cart_load));
+
+	SOFTWARE_LIST(config, "cart_list").set_original("nes_vt_cart");
+}
 
 static INPUT_PORTS_START( nes_vt09 )
 	PORT_START("IO0")
@@ -505,4 +578,4 @@ CONS( 200?, jl2050,  0,  0,  nes_vt09_16mb,nes_vt09, nes_vt09_state, empty_init,
 // might be VT369 based, if so, move
 CONS( 2018, rbbrite,    0,  0,  nes_vt09_1mb, nes_vt09, nes_vt09_state, empty_init, "Coleco", "Rainbow Brite (mini-arcade)", MACHINE_NOT_WORKING )
 
-CONS( 200?, timetp25, 0,  0,  nes_vt09_2mb, nes_vt09, nes_vt09_state, empty_init, "Timetop", "Super Game 25-in-1 (GM-228)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, timetp25, 0,  0,  nes_vt09_cart, nes_vt09, nes_vt09_cart_state, empty_init, "Timetop", "Super Game 25-in-1 (GM-228)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

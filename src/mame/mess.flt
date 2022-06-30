@@ -797,6 +797,7 @@ skeleton/controlid.cpp
 skeleton/cortex.cpp
 skeleton/cosmicos.cpp
 skeleton/cp1.cpp
+skeleton/ct909e_segadvd.cpp
 skeleton/cxhumax.cpp
 skeleton/d400.cpp
 skeleton/d6800.cpp
