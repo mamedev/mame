@@ -1178,21 +1178,24 @@ void sparc_base_device::state_string_export(const device_state_entry &entry, std
 std::unique_ptr<util::disasm_interface> sparc_base_device::create_disassembler()
 {
 	auto dasm = std::make_unique<sparc_disassembler>(static_cast<sparc_disassembler::config const *>(this), sparc_disassembler::v7);
-	m_asi_desc_adder(dasm.get());
+	if (m_asi_desc_adder)
+		m_asi_desc_adder(dasm.get());
 	return std::move(dasm);
 }
 
 std::unique_ptr<util::disasm_interface> sparcv8_device::create_disassembler()
 {
 	auto dasm = std::make_unique<sparc_disassembler>(static_cast<sparc_disassembler::config const *>(this), sparc_disassembler::v8);
-	m_asi_desc_adder(dasm.get());
+	if (m_asi_desc_adder)
+		m_asi_desc_adder(dasm.get());
 	return std::move(dasm);
 }
 
 std::unique_ptr<util::disasm_interface> mb86930_device::create_disassembler()
 {
 	auto dasm = std::make_unique<sparc_disassembler>(static_cast<sparc_disassembler::config const *>(this), sparc_disassembler::sparclite);
-	m_asi_desc_adder(dasm.get());
+	if (m_asi_desc_adder)
+		m_asi_desc_adder(dasm.get());
 	return std::move(dasm);
 }
 

@@ -26060,8 +26060,21 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="nuwang2k" supported="no"> <!-- requires protection emulation -->
+		<description>Nǚwáng Gédòu 2000 (Taiwan)</description>
+		<year>200?</year>
+		<publisher>Vast Fame</publisher>
+		<info name="alt_title" value="女王格鬥2000"/> <!-- translates to "Queen Fight 2000" -->
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" /> <!-- TODO: set properly when protection is emulated -->
+			<dataarea name="rom" size="2097152">
+				<rom name="Nv Wang Ge Dou 2000 (Unl) [C] [Raw].gbc" size="2097152" crc="e1668b49" sha1="37516139aa317a16440379c1dc00bdfc4c1e607a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="emodao">
-		<description>E Mo Dao (China, Ripped from 8 in 1 multicart)</description>
+		<description>E Mo Dao (China, ripped from 8 in 1 multicart)</description>
 		<year>200?</year>
 		<publisher>Vast Fame</publisher>
 		<info name="alt_title" value="惡魔島"/>
