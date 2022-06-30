@@ -184,6 +184,7 @@ public:
 	bool is_subdirectory() const		{ return (attributes() & 0x10) != 0x00; }
 	bool is_archive() const				{ return (attributes() & 0x20) != 0x00; }
 
+	std::string name() const;
 	meta_data metadata() const;
 
 private:
@@ -192,11 +193,27 @@ private:
 };
 
 
+// ======================> directory_span
+
+class directory_span
+{
+public:
+	typedef std::unique_ptr<directory_span> ptr;
+
+	directory_span() = default;
+	virtual ~directory_span() = default;
+
+	virtual std::vector<u32> get_directory_sectors() const = 0;
+};
+
+
+// ======================> directory_entry
+
 class impl : public filesystem_t
 {
 public:
 	// ctor/dtor
-	impl(fsblk_t &blockdev, fsblk_t::block_t &&boot_sector_block, std::vector<fsblk_t::block_t> &&fat_sectors, u32 starting_sector, u32 sector_count, u16 reserved_sector_count, u8 bits_per_fat_entry);
+	impl(fsblk_t &blockdev, fsblk_t::block_t &&boot_sector_block, std::vector<u8> &&file_allocation_table, u32 starting_sector, u32 sector_count, u16 reserved_sector_count, u8 bits_per_fat_entry);
 	virtual ~impl() = default;
 
 	// accessors
@@ -205,95 +222,59 @@ public:
 	u32 dirents_per_sector() const { return bytes_per_sector() / directory_entry::SIZE; }
 
 	// virtuals
-	virtual meta_data metadata() override;
-	virtual dir_t root() override;
+	virtual meta_data volume_metadata() override;
+	virtual std::pair<err_t, meta_data> metadata(const std::vector<std::string> &path) override;
+	virtual std::pair<err_t, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path) override;
+	virtual std::pair<err_t, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
 
 	// methods
 	std::vector<u32> get_sectors_from_fat(const directory_entry &dirent) const;
-	directory_entry dirent_from_key(u64 key);
 
 private:
 	fsblk_t::block_t				m_boot_sector_block;
-	std::vector<fsblk_t::block_t>	m_fat_sectors;
+	std::vector<u8>					m_file_allocation_table;
 	u32								m_starting_sector;
 	u32								m_sector_count;
 	u16								m_reserved_sector_count;
 	u16								m_bytes_per_sector;
 	u8								m_bits_per_fat_entry;
 
-	// ======================> file
+	// methods
+	std::optional<directory_entry> find_entity(const std::vector<std::string> &path) const;
+	directory_span::ptr find_directory(std::vector<std::string>::const_iterator path_begin, std::vector<std::string>::const_iterator path_end) const;
+	std::optional<directory_entry> find_child(const directory_span &current_dir, std::string_view target) const;
+	void iterate_directory_entries(const directory_span &dir, const std::function<bool(const directory_entry &dirent)> &callback) const;
+};
 
-	class file : public ifile_t
-	{
-	public:
-		file(impl &fs, u64 key);
 
-		virtual void drop_weak_references() override;
-		virtual meta_data metadata() override;
-		virtual std::vector<u8> read_all() override;
+// ======================> root_directory_span
 
-	private:
-		impl &			m_fs;
-		directory_entry	m_dirent;
-	};
+class root_directory_span : public directory_span
+{
+public:
+	root_directory_span(const impl &fs, u32 first_sector, u16 directory_entry_count);
 
-	// ======================> directory_base
+	virtual std::vector<u32> get_directory_sectors() const override;
 
-	class directory_base : public idir_t
-	{
-	public:
-		// ctor/dtor
-		directory_base(impl &fs);
-		virtual ~directory_base() = default;
+private:
+	const impl &	m_fs;
+	u32				m_first_sector;
+	u16				m_directory_entry_count;
+};
 
-		// virtuals
-		virtual void drop_weak_references() override;
-		virtual std::vector<dir_entry> contents() override;
-		virtual file_t file_get(u64 key) override;
-		virtual dir_t dir_get(u64 key) override;
 
-	protected:
-		virtual std::vector<u32> find_directory_entries() = 0;
+// ======================> subdirectory_span
 
-		impl &	m_fs;
-	};
+class subdirectory_span : public directory_span
+{
+public:
+	subdirectory_span(const impl &fs, directory_entry &&dirent);
 
-	// ======================> root_directory
+	virtual std::vector<u32> get_directory_sectors() const override;
 
-	class root_directory : public directory_base
-	{
-	public:
-		// ctor/dtor
-		root_directory(impl &fs, u32 first_sector, u16 directory_entry_count);
-		virtual ~root_directory() = default;
-
-		// virtual
-		virtual meta_data metadata() override;
-
-	protected:
-		virtual std::vector<u32> find_directory_entries() override;
-
-	private:
-		u32		m_first_sector;
-		u32		m_directory_entry_count;
-	};
-
-	// ======================> subdirectory
-
-	class subdirectory : public directory_base
-	{
-	public:
-		subdirectory(impl &fs, u64 key);
-
-		// virtual
-		virtual meta_data metadata() override;
-
-	protected:
-		virtual std::vector<u32> find_directory_entries() override;
-
-	private:
-		directory_entry	m_dirent;
-	};
+private:
+	const impl &	m_fs;
+	directory_entry	m_dirent;
 };
 
 
@@ -447,17 +428,32 @@ std::unique_ptr<filesystem_t> fs::fat_image::mount_partition(fsblk_t &blockdev, 
 	// load all file allocation table sectors
 	u32 fat_count = boot_sector_block.r8(16);
 	u32 sectors_per_fat = boot_sector_block.r16l(22);
-	std::vector<fsblk_t::block_t> fat_sectors;
-	fat_sectors.reserve(fat_count * sectors_per_fat);
+	u16 bytes_per_sector = boot_sector_block.r16l(11);
+	std::vector<u8> file_allocation_table;
+	file_allocation_table.reserve(fat_count * sectors_per_fat * bytes_per_sector);
 	for (auto i = 0; i < fat_count * sectors_per_fat; i++)
 	{
 		fsblk_t::block_t fatblk = blockdev.get(starting_sector + reserved_sector_count + i);
-		fat_sectors.push_back(std::move(fatblk));
+		file_allocation_table.insert(file_allocation_table.end(), fatblk.rodata(), fatblk.rodata() + bytes_per_sector);
 	}
 
 	// and return the implementation
-	return std::make_unique<impl>(blockdev, std::move(boot_sector_block), std::move(fat_sectors),
+	return std::make_unique<impl>(blockdev, std::move(boot_sector_block), std::move(file_allocation_table),
 		starting_sector, sector_count, reserved_sector_count, bits_per_fat_entry);
+}
+
+
+//-------------------------------------------------
+//	directory_entry::name
+//-------------------------------------------------
+
+std::string directory_entry::name() const
+{
+	std::string_view stem = strtrimrightspace(raw_stem());
+	std::string_view ext = strtrimrightspace(raw_ext());
+	return !ext.empty()
+		? util::string_format("%s.%s", stem, ext)
+		: std::string(stem);
 }
 
 
@@ -468,6 +464,7 @@ std::unique_ptr<filesystem_t> fs::fat_image::mount_partition(fsblk_t &blockdev, 
 meta_data directory_entry::metadata() const
 {
 	meta_data result;
+	result.set(meta_name::name,					name());
 	result.set(meta_name::creation_date,		decode_fat_datetime(raw_create_datetime()));
 	result.set(meta_name::modification_date,	decode_fat_datetime(raw_modified_datetime()));
 	result.set(meta_name::length,				file_size());
@@ -479,10 +476,10 @@ meta_data directory_entry::metadata() const
 //	impl ctor
 //-------------------------------------------------
 
-impl::impl(fsblk_t &blockdev, fsblk_t::block_t &&boot_sector_block, std::vector<fsblk_t::block_t> &&fat_sectors, u32 starting_sector, u32 sector_count, u16 reserved_sector_count, u8 bits_per_fat_entry)
+impl::impl(fsblk_t &blockdev, fsblk_t::block_t &&boot_sector_block, std::vector<u8> &&file_allocation_table, u32 starting_sector, u32 sector_count, u16 reserved_sector_count, u8 bits_per_fat_entry)
 	: filesystem_t(blockdev, 512)
 	, m_boot_sector_block(std::move(boot_sector_block))
-	, m_fat_sectors(std::move(fat_sectors))
+	, m_file_allocation_table(std::move(file_allocation_table))
 	, m_starting_sector(starting_sector)
 	, m_sector_count(sector_count)
 	, m_reserved_sector_count(reserved_sector_count)
@@ -493,10 +490,10 @@ impl::impl(fsblk_t &blockdev, fsblk_t::block_t &&boot_sector_block, std::vector<
 
 
 //-------------------------------------------------
-//	impl::metadata
+//	impl::volume_metadata
 //-------------------------------------------------
 
-meta_data impl::metadata()
+meta_data impl::volume_metadata()
 {
 	meta_data results;
 	results.set(meta_name::name,		m_boot_sector_block.rstr(43, 11));
@@ -506,14 +503,68 @@ meta_data impl::metadata()
 
 
 //-------------------------------------------------
-//	impl::root
+//	impl::metadata
 //-------------------------------------------------
 
-filesystem_t::dir_t impl::root()
+std::pair<err_t, meta_data> impl::metadata(const std::vector<std::string> &path)
 {
-	u32 first_sector = m_starting_sector + m_reserved_sector_count + (u32)m_fat_sectors.size();
-	u16 directory_entry_count = m_boot_sector_block.r16l(17);
-	return dir_t(new root_directory(*this, first_sector, directory_entry_count));
+	std::optional<directory_entry> dirent = find_entity(path);
+	if (!dirent)
+		return std::make_pair(ERR_NOT_FOUND, meta_data());
+
+	return std::make_pair(ERR_OK, dirent->metadata());
+}
+
+
+//-------------------------------------------------
+//	impl::directory_contents
+//-------------------------------------------------
+
+std::pair<err_t, std::vector<dir_entry>> impl::directory_contents(const std::vector<std::string> &path)
+{
+	directory_span::ptr dir = find_directory(path.begin(), path.end());
+	if (!dir)
+		return std::make_pair(ERR_NOT_FOUND, std::vector<dir_entry>());
+
+	std::vector<dir_entry> results;
+	auto callback = [&results](const directory_entry &dirent)
+	{
+		dir_entry_type entry_type = dirent.is_subdirectory() ? dir_entry_type::dir : dir_entry_type::file;
+		results.emplace_back(entry_type, dirent.metadata());
+		return false;
+	};
+	iterate_directory_entries(*dir, callback);
+	return std::make_pair(ERR_OK, std::move(results));
+}
+
+
+//-------------------------------------------------
+//	impl::file_read
+//-------------------------------------------------
+
+std::pair<err_t, std::vector<u8>> impl::file_read(const std::vector<std::string> &path)
+{
+	// find the file
+	std::optional<directory_entry> dirent = find_entity(path);
+	if (!dirent || dirent->is_subdirectory())
+		return std::make_pair(ERR_NOT_FOUND, std::vector<u8>());
+
+	// get the list of sectors for this file
+	std::vector<u32> sectors = get_sectors_from_fat(*dirent);
+
+	// prepare the results
+	std::vector<u8> result;
+	result.reserve(dirent->file_size());
+
+	// and add data from all sectors
+	for (u32 sector : sectors)
+	{
+		fsblk_t::block_t block = m_blockdev.get(sector);
+		const u8 *data = block.rodata();
+		size_t length = std::min((size_t)dirent->file_size() - result.size(), (size_t)block.size());
+		result.insert(result.end(), data, data + length);
+	}
+	return std::make_pair(ERR_OK, std::move(result));
 }
 
 
@@ -531,7 +582,8 @@ std::vector<u32> impl::get_sectors_from_fat(const directory_entry &dirent) const
 	u8 sectors_per_cluster = m_boot_sector_block.r8(13);
 	u16 root_directory_entry_count = m_boot_sector_block.r16l(17);
 	u16 root_directory_sector_count = (root_directory_entry_count + 1) / dirents_per_sector();
-	u32 data_starting_sector = m_starting_sector + m_reserved_sector_count + (u32)m_fat_sectors.size() + root_directory_sector_count;
+	u32 fat_sector_count = (u32)(m_file_allocation_table.size() / m_bytes_per_sector);
+	u32 data_starting_sector = m_starting_sector + m_reserved_sector_count + fat_sector_count + root_directory_sector_count;
 	u32 data_cluster_count = (m_sector_count - data_starting_sector) / sectors_per_cluster;
 
 	// find all clusters
@@ -549,17 +601,20 @@ std::vector<u32> impl::get_sectors_from_fat(const directory_entry &dirent) const
 
 		// sanity check; check for overflows
 		u32 new_cluster = 0;
-		if (entry_bit_position + m_bits_per_fat_entry <= m_fat_sectors.size() * bytes_per_sector() * 8)
+		if (entry_bit_position + m_bits_per_fat_entry <= m_file_allocation_table.size() * 8)
 		{
-			u32 bit = 0;
-			while (bit < m_bits_per_fat_entry)
+			// this awkward logic is here because we cannot rely on FAT entries all being in one
+			// sector (thank you FAT12)
+			u32 current_bit = 0;
+			while (current_bit < m_bits_per_fat_entry)
 			{
-				u32 fat_sector_index = (entry_bit_position + bit) / 8 / bytes_per_sector();
-				u32 offset = (entry_bit_position + bit) / 8 % bytes_per_sector();
-				u32 byte = m_fat_sectors[fat_sector_index].r8(offset);
-				u32 mask = ((1 << (m_bits_per_fat_entry - bit % 8)) - 1) & 0xFF;
-				new_cluster |= (byte & mask) << bit;
-				bit += 8 - ((m_bits_per_fat_entry - bit) % 8);
+				u32 pos = entry_bit_position + current_bit;
+				u32 shift = pos % 8;
+				u32 bit_count = std::min(8 - shift, m_bits_per_fat_entry - current_bit);
+				u32 bits = (m_file_allocation_table[pos / 8] >> shift) & ((1 << bit_count) - 1);
+
+				new_cluster |= (bits << current_bit);
+				current_bit += bit_count;
 			}
 
 			// normalize special cluster IDs
@@ -574,103 +629,83 @@ std::vector<u32> impl::get_sectors_from_fat(const directory_entry &dirent) const
 
 
 //-------------------------------------------------
-//	impl::dirent_from_key
+//	impl::find_entity
 //-------------------------------------------------
 
-directory_entry impl::dirent_from_key(u64 key)
-{	
-	u32 block = key / dirents_per_sector();
-	u32 offset = (key % dirents_per_sector()) * directory_entry::SIZE;
-	return directory_entry(m_blockdev.get(block), offset);
+std::optional<directory_entry> impl::find_entity(const std::vector<std::string> &path) const
+{
+	// special case; reject empty paths
+	if (path.empty())
+		return { };
+
+	// find the containing directory
+	directory_span::ptr dir = find_directory(path.begin(), path.end() - 1);
+	if (!dir)
+		return { };
+
+	// find the last child
+	return find_child(*dir, path[path.size() - 1]);
 }
 
 
 //-------------------------------------------------
-//	file ctor
+//	impl::find_directory
 //-------------------------------------------------
 
-impl::file::file(impl &fs, u64 key)
-	: m_fs(fs)
-	, m_dirent(fs.dirent_from_key(key))
+directory_span::ptr impl::find_directory(std::vector<std::string>::const_iterator path_begin, std::vector<std::string>::const_iterator path_end) const
 {
-}
+	// the root directory is treated differently
+	u32 first_sector = m_starting_sector + m_reserved_sector_count + (u32)m_file_allocation_table.size() / m_bytes_per_sector;
+	u16 directory_entry_count = m_boot_sector_block.r16l(17);
+	directory_span::ptr current_dir = std::make_unique<root_directory_span>(*this, first_sector, directory_entry_count);
 
-
-//-------------------------------------------------
-//	file::drop_weak_references
-//-------------------------------------------------
-
-void impl::file::drop_weak_references()
-{
-}
-
-
-//-------------------------------------------------
-//	file::metadata
-//-------------------------------------------------
-
-meta_data impl::file::metadata()
-{
-	return m_dirent.metadata();
-}
-
-
-//-------------------------------------------------
-//	file::read_all
-//-------------------------------------------------
-
-std::vector<u8> impl::file::read_all()
-{
-	std::vector<u32> sectors = m_fs.get_sectors_from_fat(m_dirent);
-
-	// prepare the results
-	std::vector<u8> result;
-	result.reserve(m_dirent.file_size());
-
-	// and add data from all sectors
-	for (u32 sector : sectors)
+	// traverse the directory
+	for (auto iter = path_begin; iter != path_end; iter++)
 	{
-		fsblk_t::block_t block = m_fs.blockdev().get(sector);
-		const u8 *data = block.rodata();
-		size_t length = std::min((size_t)m_dirent.file_size() - result.size(), (size_t)block.size());
-		result.insert(result.end(), data, data + length);
+		// find the child file
+		std::optional<directory_entry> child_directory = find_child(*current_dir, *iter);
+		if (!child_directory)
+			return { };
+
+		// advance into the child directory
+		current_dir = std::make_unique<subdirectory_span>(*this, std::move(*child_directory));
 	}
+
+	return current_dir;
+}
+
+
+//-------------------------------------------------
+//	impl::find_child
+//-------------------------------------------------
+
+std::optional<directory_entry> impl::find_child(const directory_span &current_dir, std::string_view target) const
+{
+	std::optional<directory_entry> result;
+	auto callback = [&result, target](const directory_entry &dirent)
+	{
+		bool found = dirent.name() == target;
+		if (found)
+			result = dirent;
+		return found;
+	};
+	iterate_directory_entries(current_dir, callback);
 	return result;
 }
 
 
 //-------------------------------------------------
-//	directory_base ctor
+//	impl::iterate_directory_entries
 //-------------------------------------------------
 
-impl::directory_base::directory_base(impl &fs)
-	: m_fs(fs)
+void impl::iterate_directory_entries(const directory_span &dir, const std::function<bool(const directory_entry &dirent)> &callback) const
 {
-}
-
-
-//-------------------------------------------------
-//	directory_base::drop_weak_references
-//-------------------------------------------------
-
-void impl::directory_base::drop_weak_references()
-{
-}
-
-
-//-------------------------------------------------
-//	directory_base::contents
-//-------------------------------------------------
-
-std::vector<dir_entry> impl::directory_base::contents()
-{
-	std::vector<u32> sectors = find_directory_entries();
-
-	std::vector<dir_entry> results;
+	std::vector<u32> sectors = dir.get_directory_sectors();
 	for (u32 sector : sectors)
 	{
-		fsblk_t::block_t block = m_fs.blockdev().get(sector);
-		for (u32 index = 0; index < m_fs.dirents_per_sector(); index++)
+		bool done = false;
+		fsblk_t::block_t block = m_blockdev.get(sector);
+		for (u32 index = 0; !done && (index < dirents_per_sector()); index++)
 		{
 			directory_entry dirent(block, index * 32);
 			if (dirent.raw_stem()[0] != 0x00)
@@ -680,47 +715,24 @@ std::vector<dir_entry> impl::directory_base::contents()
 				std::string_view ext = strtrimrightspace(dirent.raw_ext());
 				if (ext.empty() && (stem == "." || stem == ".."))
 					continue;
-				std::string filename = !ext.empty()
-					? util::string_format("%s.%s", stem, ext)
-					: std::string(stem);
 
-				// append the entry
-				dir_entry_type entry_type = dirent.is_subdirectory() ? dir_entry_type::dir : dir_entry_type::file;
-				u64 key = (u64)sector * m_fs.dirents_per_sector() + index;
-				results.emplace_back(std::move(filename), entry_type, key);
+				// invoke the callback
+				done = callback(dirent);
 			}
 		}
+
+		if (done)
+			break;
 	}
-	return results;
 }
 
 
 //-------------------------------------------------
-//	directory_base::file_get
+//	root_directory_span ctor
 //-------------------------------------------------
 
-filesystem_t::file_t impl::directory_base::file_get(u64 key)
-{
-	return file_t(new file(m_fs, key));
-}
-
-
-//-------------------------------------------------
-//	directory_base::dir_get
-//-------------------------------------------------
-
-filesystem_t::dir_t impl::directory_base::dir_get(u64 key)
-{
-	return dir_t(new subdirectory(m_fs, key));
-}
-
-
-//-------------------------------------------------
-//	root_directory ctor
-//-------------------------------------------------
-
-impl::root_directory::root_directory(impl &fs, u32 first_sector, u16 directory_entry_count)
-	: directory_base(fs)
+root_directory_span::root_directory_span(const impl &fs, u32 first_sector, u16 directory_entry_count)
+	: m_fs(fs)
 	, m_first_sector(first_sector)
 	, m_directory_entry_count(directory_entry_count)
 {
@@ -728,20 +740,10 @@ impl::root_directory::root_directory(impl &fs, u32 first_sector, u16 directory_e
 
 
 //-------------------------------------------------
-//	root_directory::metadata
+//	root_directory_span::get_directory_sectors
 //-------------------------------------------------
 
-meta_data impl::root_directory::metadata()
-{
-	return meta_data();
-}
-
-
-//-------------------------------------------------
-//	root_directory::find_directory_entries
-//-------------------------------------------------
- 
-std::vector<u32> impl::root_directory::find_directory_entries()
+std::vector<u32> root_directory_span::get_directory_sectors() const
 {
 	u32 directory_sector_count = (m_directory_entry_count + m_fs.dirents_per_sector() - 1) / m_fs.dirents_per_sector();
 
@@ -754,31 +756,21 @@ std::vector<u32> impl::root_directory::find_directory_entries()
 
 
 //-------------------------------------------------
-//	subdirectory ctor
+//	subdirectory_span ctor
 //-------------------------------------------------
 
-impl::subdirectory::subdirectory(impl &fs, u64 key)
-	: directory_base(fs)
-	, m_dirent(fs.dirent_from_key(key))
+subdirectory_span::subdirectory_span(const impl &fs, directory_entry &&dirent)
+	: m_fs(fs)
+	, m_dirent(std::move(dirent))
 {
 }
 
 
 //-------------------------------------------------
-//	subdirectory::metadata
+//	subdirectory_span::get_directory_sectors
 //-------------------------------------------------
 
-meta_data impl::subdirectory::metadata()
-{
-	return m_dirent.metadata();
-}
-
-
-//-------------------------------------------------
-//	subdirectory::find_directory_entries
-//-------------------------------------------------
-
-std::vector<u32> impl::subdirectory::find_directory_entries()
+std::vector<u32> subdirectory_span::get_directory_sectors() const
 {
 	return m_fs.get_sectors_from_fat(m_dirent);
 }
