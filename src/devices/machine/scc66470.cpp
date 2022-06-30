@@ -92,38 +92,37 @@
 #define PIXAC_TT  1
 #define PIXAC_NI  0
 
-typedef struct
+struct horizontal_settings_t
 {
 	uint32_t pixels;
 	uint32_t border;
-	uint32_t total;
-} horizontal_settings ;
+};
 
-static const horizontal_settings h_table[] =
+static const horizontal_settings_t h_table[] =
 {
-	//cf1 cf2 ss st
-	{ 512,  64, 320 },  // 0   0   0  0
-	{ 512,  64, 320 },  // 0   0   0  1
-	{ 512,   0, 320 },  // 0   0   1  0
-	{ 512,   0, 320 },  // 0   0   1  1
+	               //cf1 cf2 ss st
+	{ 512,  64 },  // 0   0   0  0
+	{ 512,  64 },  // 0   0   0  1
+	{ 512,   0 },  // 0   0   1  0
+	{ 512,   0 },  // 0   0   1  1
 
-	{ 640, 128, 384 },  // 0   1   0  0
-	{ 640, 128, 384 },  // 0   1   0  1
-	{ 640,   0, 384 },  // 0   1   1  0
-	{ 640,   0, 384 },  // 0   1   1  1
+	{ 640, 128 },  // 0   1   0  0
+	{ 640, 128 },  // 0   1   0  1
+	{ 640,   0 },  // 0   1   1  0
+	{ 640,   0 },  // 0   1   1  1
 
-	{ 720,  80, 448 },  // 1   0   0  0
-	{ 720,  80, 448 },  // 1   0   0  1
+	{ 720,  80 },  // 1   0   0  0
+	{ 720,  80 },  // 1   0   0  1
 
-	{ 720,   0, 448 },  // 1   0   1  0
-	{ 720,   0, 448 },  // 1   0   1  1
+	{ 720,   0 },  // 1   0   1  0
+	{ 720,   0 },  // 1   0   1  1
 
-	{ 768, 128, 480 },  // 1   1   0  0
-	{ 720,  80, 480 },  // 1   1   0  1
+	{ 768, 128 },  // 1   1   0  0
+	{ 720,  80 },  // 1   1   0  1
 
-	{ 768,   0, 480 },  // 1   1   1  0
+	{ 768,   0 },  // 1   1   1  0
 
-	{ 768,  48, 480 },  // 1   1   1  1
+	{ 768,  48 },  // 1   1   1  1
 };
 
 // device type definition
@@ -151,10 +150,8 @@ void scc66470_device::device_start()
 	m_irqcallback.resolve_safe();
 
 	m_ica_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(scc66470_device::process_ica), this));
-	m_ica_timer->adjust(attotime::never);
 
 	m_dca_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(scc66470_device::process_dca), this));
-	m_dca_timer->adjust(attotime::never);
 
 	save_item(NAME(m_csr));
 	save_item(NAME(m_dcr));
@@ -210,7 +207,7 @@ void scc66470_device::device_reset()
 
 void scc66470_device::set_vectors(uint16_t *src)
 {
-	memcpy(m_dram.get(), src, 8) ;
+	std::copy_n(src, 4, m_dram.get());
 }
 
 
@@ -226,32 +223,32 @@ uint16_t scc66470_device::dram_r(offs_t offset, uint16_t mem_mask)
 
 void scc66470_device::csr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA(&m_csr) ;
+	COMBINE_DATA(&m_csr);
 }
 
 void scc66470_device::dcr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA(&m_dcr) ;
+	COMBINE_DATA(&m_dcr);
 }
 
 void scc66470_device::vsr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA(&m_vsr) ;
+	COMBINE_DATA(&m_vsr);
 }
 
 void scc66470_device::bcr_w(offs_t offset, uint8_t data)
 {
-	m_bcr = data ;
+	m_bcr = data;
 }
 
 void scc66470_device::dcr2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA(&m_dcr2) ;
+	COMBINE_DATA(&m_dcr2);
 }
 
 void scc66470_device::dcp_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA(&m_dcp) ;
+	COMBINE_DATA(&m_dcp);
 }
 
 void scc66470_device::swm_w(offs_t offset, uint8_t data)
@@ -261,23 +258,23 @@ void scc66470_device::swm_w(offs_t offset, uint8_t data)
 
 void scc66470_device::stm_w(offs_t offset, uint8_t data)
 {
-	m_stm = data ;
+	m_stm = data;
 }
 
 void scc66470_device::reg_a_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA(&m_reg_a) ;
+	COMBINE_DATA(&m_reg_a);
 }
 
 void scc66470_device::reg_b_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA(&m_reg_b) ;
+	COMBINE_DATA(&m_reg_b);
 	perform_pixac_op();
 }
 
 void scc66470_device::pcr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA(&m_pcr) ;
+	COMBINE_DATA(&m_pcr);
 
 	if(!BIT(m_pcr, PIXAC_COL) || !BIT(m_pcr, PIXAC_4N) || !BIT(m_pcr, PIXAC_BIT))
 	{
@@ -287,42 +284,46 @@ void scc66470_device::pcr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void scc66470_device::mask_w(offs_t offset, uint8_t data)
 {
-	m_mask = data ;
+	m_mask = data;
 }
 
 void scc66470_device::shift_w(offs_t offset, uint8_t data)
 {
-	m_shift = data ;
+	m_shift = data;
 }
 
 void scc66470_device::index_w(offs_t offset, uint8_t data)
 {
-	m_index = data ;
+	m_index = data;
 }
 
 void scc66470_device::fc_w(offs_t offset, uint8_t data)
 {
-	m_fc = data ;
+	m_fc = data;
 }
 
 void scc66470_device::bc_w(offs_t offset, uint8_t data)
 {
-	m_bc = data ;
+	m_bc = data;
 }
 
 void scc66470_device::tc_w(offs_t offset, uint8_t data)
 {
-	m_tc = data ;
+	m_tc = data;
 }
 
 uint8_t scc66470_device::csr_r(offs_t offset)
 {
-	uint8_t val = m_csr_r ;
-	m_csr_r &= ~(CSR_R_IT1 | CSR_R_IT2);
+	uint8_t val = m_csr_r;
 
-	if(!m_irqcallback.isnull())
+	if(!machine().side_effects_disabled())
 	{
-		m_irqcallback(CLEAR_LINE);
+		m_csr_r &= ~(CSR_R_IT1 | CSR_R_IT2);
+
+		if(!m_irqcallback.isnull())
+		{
+			m_irqcallback(CLEAR_LINE);
+		}
 	}
 
 	int scanline = screen().vpos();
@@ -350,7 +351,7 @@ int scc66470_device::dram_dtack_cycles()
 	}
 	else if(slot_cycle < 9)
 	{
-		return 2 + 9 - slot_cycle ;
+		return 2 + 9 - slot_cycle;
 	}
 	else
 	{
@@ -385,15 +386,15 @@ int scc66470_device::pixac_trigger()
 {
 	if(BIT(m_pcr, PIXAC_COL))
 	{
-		return 1 ;
+		return 1;
 	}
 	else if(BIT(m_pcr, PIXAC_CPY) && !BIT(m_pcr, PIXAC_TT))
 	{
-		return 1 ;
+		return 1;
 	}
 	else
 	{
-		return 0 ;
+		return 0;
 	}
 }
 
@@ -403,16 +404,16 @@ void scc66470_device::perform_pixac_op()
 	{
 		if(BIT(m_pcr, PIXAC_4N))
 		{
-			uint16_t result = m_reg_b ;
+			uint16_t result = m_reg_b;
 			m_index &= 0xf;
 
 			if(BIT(m_reg_a, 15 - m_index))
 			{
-				result = (result & 0xff) | m_fc << 8 ;
+				result = (result & 0xff) | m_fc << 8;
 			}
 			else if(!BIT(m_pcr, PIXAC_TT))
 			{
-				result = (result & 0xff) | m_bc << 8 ;
+				result = (result & 0xff) | m_bc << 8;
 			}
 
 			m_index++;
@@ -421,11 +422,11 @@ void scc66470_device::perform_pixac_op()
 
 			if(BIT(m_reg_a, 15 - m_index))
 			{
-				result = (result & 0xff00) | m_fc ;
+				result = (result & 0xff00) | m_fc;
 			}
 			else if(!BIT(m_pcr, PIXAC_TT))
 			{
-				result = (result & 0xff00) | m_bc ;
+				result = (result & 0xff00) | m_bc;
 			}
 
 			m_index++;
@@ -442,7 +443,7 @@ uint16_t scc66470_device::ipa_r(offs_t offset, uint16_t mem_mask)
 	{
 		if(pixac_trigger())
 		{
-			reg_b_w(0,	m_dram[ offset ], 0xffff) ;
+			reg_b_w(0,	m_dram[ offset ], 0xffff);
 		}
 	}
 
@@ -455,7 +456,7 @@ void scc66470_device::ipa_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	{
 		if(pixac_trigger())
 		{
-			m_dram[ offset ] = m_reg_b ;
+			m_dram[ offset ] = m_reg_b;
 		}
 	}
 }
@@ -464,18 +465,18 @@ bool scc66470_device::display_enabled()
 {
 	if(BIT(DCR_REG, DCR_DE))
 	{
-		return true ;
+		return true;
 	}
 	else
 	{
-		return false ;
+		return false;
 	}
 }
 
 void scc66470_device::set_vsr(uint32_t vsr)
 {
-	m_dcr = (m_dcr  & 0xfff0) | ((vsr >> 16) & 0x0f) ;
-	m_vsr = vsr ;
+	m_dcr = (m_dcr  & 0xfff0) | ((vsr >> 16) & 0x0f);
+	m_vsr = vsr;
 }
 
 uint32_t scc66470_device::get_vsr()
@@ -485,24 +486,21 @@ uint32_t scc66470_device::get_vsr()
 
 uint32_t scc66470_device::get_dcp()
 {
-	return ((m_dcr2 & 0x0f) << 16) | m_dcp ;
+	return ((m_dcr2 & 0x0f) << 16) | m_dcp;
 }
 
 void scc66470_device::set_dcp(uint32_t dcp)
 {
-	m_dcr2 = (m_dcr2 & 0xfff0) | (dcp & 0x0f) ;
-	m_dcp = dcp ;
+	m_dcr2 = (m_dcr2 & 0xfff0) | (dcp & 0x0f);
+	m_dcp = dcp;
 }
 
 uint8_t *scc66470_device::line(int line)
 {
-	unsigned int vsr ;
-	unsigned int i;
-	unsigned char *dest = m_line_data;
-	uint8_t bc;
 	if(display_enabled() && line >= (total_height() - height()))
 	{
-		bc = m_bcr;
+		uint8_t bc = m_bcr;
+		unsigned char *dest = m_line_data;
 
 		if(BIT(DCR_REG, DCR_CM))  //4 bits/pixel
 		{
@@ -513,7 +511,7 @@ uint8_t *scc66470_device::line(int line)
 
 		if(line < border_height() || line >= (height() - border_height()))
 		{
-			std::fill_n(dest, width(), bc) ;
+			std::fill_n(dest, width(), bc);
 
 			if(line == height() - 1)
 			{
@@ -523,24 +521,20 @@ uint8_t *scc66470_device::line(int line)
 		else
 		{
 			uint8_t *src = reinterpret_cast<uint8_t *>(m_dram.get());
-
-			vsr = get_vsr() ;
-
-			vsr &= 0xfffff;
+			unsigned int vsr = get_vsr() & 0xfffff;
 
 			if(vsr)
 			{
-				std::fill_n(dest, border_width(), bc) ;
+				std::fill_n(dest, border_width(), bc);
 				dest += border_width();
 
 				if(BIT(DCR_REG, DCR_CM))  //4 bits/pixel
 				{
 					if(!BIT(DCR2_REG, DCR2_FT1))
 					{
-						for(i = 0 ; i < width() - (border_width() * 2) ; i += 2)
+						for(int i = 0 ; i < width() - (border_width() * 2) ; i += 2)
 						{
-							uint8_t pixels ;
-							pixels = src[ BYTE_XOR_BE(vsr) ] ;
+							uint8_t pixels = src[ BYTE_XOR_BE(vsr) ];
 							vsr++;
 							*dest++ = (pixels >> 4) & 0x0f;
 							*dest++ = (pixels) & 0x0f;
@@ -552,7 +546,7 @@ uint8_t *scc66470_device::line(int line)
 				{
 					if(!BIT(DCR2_REG, DCR2_FT1))
 					{
-						for(i = 0 ; i < width() - (border_width() * 2) ; i += 2)
+						for(int i = 0 ; i < width() - (border_width() * 2) ; i += 2)
 						{
 							*dest++ = src[ BYTE_XOR_BE(vsr) ];
 							*dest++ = src[ BYTE_XOR_BE(vsr) ];
@@ -562,7 +556,7 @@ uint8_t *scc66470_device::line(int line)
 					}
 				}
 
-				std::fill_n(dest, border_width(), bc) ;
+				std::fill_n(dest, border_width(), bc);
 
 				if(BIT(DCR_REG, DCR_LS))
 				{
@@ -570,7 +564,7 @@ uint8_t *scc66470_device::line(int line)
 
 					if(BIT(DCR_REG, DCR_IC))
 					{
-						m_working_dcp = vsr - 64 ;
+						m_working_dcp = vsr - 64;
 					}
 					else
 					{
@@ -587,27 +581,27 @@ uint8_t *scc66470_device::line(int line)
 
 							if(BIT(DCR_REG, DCR_IC))
 							{
-								vsr += 64 ;
+								vsr += 64;
 							}
 							else
 							{
-								vsr += 16 ;
+								vsr += 16;
 							}
 						}
 					}
 				}
 
-				set_vsr(vsr) ;
+				set_vsr(vsr);
 			}
 			else
 			{
-				std::fill_n(m_line_data, sizeof(m_line_data), 0) ;
+				std::fill_n(m_line_data, sizeof(m_line_data), 0);
 			}
 		}
 	}
 	else
 	{
-		std::fill_n(m_line_data, sizeof(m_line_data), 0) ;
+		std::fill_n(m_line_data, sizeof(m_line_data), 0);
 	}
 
 	return m_line_data;
@@ -615,15 +609,15 @@ uint8_t *scc66470_device::line(int line)
 
 TIMER_CALLBACK_MEMBER(scc66470_device::process_ica)
 {
-	bool stop = false ;
 	uint32_t ctrl = 0x400 / 2;
 
-	if((BIT(DCR_REG, DCR_IC) || BIT(DCR_REG, DCR_DC)) && m_dram[ 0x400 / 2 ] != 0)
+	if((BIT(DCR_REG, DCR_IC) || BIT(DCR_REG, DCR_DC)) && m_dram[ ctrl ] != 0)
 	{
+		bool stop = false;
 		while(!stop)
 		{
-			uint16_t cmd = m_dram[ ctrl++ ] ;
-			uint16_t data = m_dram[ ctrl++ ] ;
+			uint16_t cmd = m_dram[ ctrl++ ];
+			uint16_t data = m_dram[ ctrl++ ];
 
 			ctrl &= 0xffffe;
 
@@ -631,32 +625,32 @@ TIMER_CALLBACK_MEMBER(scc66470_device::process_ica)
 			{
 				case SCC_INS_STOP:
 					set_vsr((ctrl - 2) * 2);
-					stop = true ;
+					stop = true;
 					break;
 
 				case SCC_INS_NOP:
 					break;
 
 				case SCC_INS_LOAD_DCP:
-					set_dcp(((cmd & 0xf) << 16) | (data & 0xfc)) ;
-					break ;
+					set_dcp(((cmd & 0xf) << 16) | (data & 0xfc));
+					break;
 
 				case SCC_INS_LOAD_DCP_STOP:
-					set_dcp(((cmd & 0xf) << 16) | (data & 0xfc)) ;
+					set_dcp(((cmd & 0xf) << 16) | (data & 0xfc));
 					stop = true;
-					break ;
+					break;
 
 				case SCC_INS_LOAD_VSR:
-					ctrl = (((cmd & 0xf) << 16) | data) / 2 ;
+					ctrl = (((cmd & 0xf) << 16) | data) / 2;
 					ctrl &= 0xffffe;
-					break ;
+					break;
 
 				case SCC_INS_LOAD_VSR_STOP:
-					ctrl = ((cmd & 0xf) << 16) | data ;
+					ctrl = ((cmd & 0xf) << 16) | data;
 					ctrl &= 0xffffe;
 					set_vsr(ctrl);
 					stop = true;
-					break ;
+					break;
 
 				case SCC_INS_INTERRUPT:
 					m_csr_r |= CSR_R_IT1;
@@ -679,7 +673,7 @@ TIMER_CALLBACK_MEMBER(scc66470_device::process_ica)
 					else if((cmd & 0xf800) == SCC_INS_LOAD_BORDER_DSP)
 					{
 						m_bcr = cmd & 0xff;
-						m_dcr2 = (m_dcr2 & 0x90ff) | (data & 0x6f) << 8 ;
+						m_dcr2 = (m_dcr2 & 0x90ff) | (data & 0x6f) << 8;
 						m_dcr = (m_dcr & 0xfaff) | (data & 0x0500);
 					}
 					else if(cmd & SCC_INS_BEP_CONTROL)
@@ -694,7 +688,7 @@ TIMER_CALLBACK_MEMBER(scc66470_device::process_ica)
 		}
 	}
 
-	m_working_dcp = 0 ;
+	m_working_dcp = 0;
 
 	if(BIT(DCR_REG, DCR_DC) && BIT(DCR2_REG, DCR2_ID))
 	{
@@ -706,18 +700,17 @@ TIMER_CALLBACK_MEMBER(scc66470_device::process_ica)
 
 TIMER_CALLBACK_MEMBER(scc66470_device::process_dca)
 {
-	bool stop = false ;
-	bool new_dcp = false ;
-	uint32_t ctrl = m_working_dcp / 2;
-	uint32_t count;
-
-	ctrl &= 0xffffe;
+	uint32_t ctrl = (m_working_dcp / 2) & 0xffffe;
 
 	if(BIT(DCR_REG, DCR_DC) && ctrl)
 	{
+		bool stop = false;
+		bool new_dcp = false;
+		uint32_t count;
+
 		if(!BIT(DCR_REG, DCR_IC))
 		{
-			count = 16 ;
+			count = 16;
 		}
 		else
 		{
@@ -726,44 +719,44 @@ TIMER_CALLBACK_MEMBER(scc66470_device::process_dca)
 
 		while(!stop && count)
 		{
-			uint16_t cmd = m_dram[ ctrl++ ] ;
-			uint16_t data = m_dram[ ctrl++ ] ;
+			uint16_t cmd = m_dram[ ctrl++ ];
+			uint16_t data = m_dram[ ctrl++ ];
 
 			ctrl &= 0xffffe;
 
-			count -= 4 ;
+			count -= 4;
 
 			switch(cmd & 0xff00)
 			{
 				case SCC_INS_STOP:
-					stop = true ;
+					stop = true;
 					break;
 
 				case SCC_INS_NOP:
 					break;
 
 				case SCC_INS_LOAD_DCP:
-					m_working_dcp = ((cmd & 0xf) << 16) | (data & 0xfc)  ;
-					set_dcp(m_working_dcp) ;
+					m_working_dcp = ((cmd & 0xf) << 16) | (data & 0xfc);
+					set_dcp(m_working_dcp);
 					ctrl = m_working_dcp / 2;
 					ctrl &= 0xffffe;
-					break ;
+					break;
 
 				case SCC_INS_LOAD_DCP_STOP:
-					m_working_dcp = ((cmd & 0xf) << 16) | (data & 0xfc) ;
-					set_dcp(m_working_dcp) ;
+					m_working_dcp = ((cmd & 0xf) << 16) | (data & 0xfc);
+					set_dcp(m_working_dcp);
 					stop = true;
 					new_dcp = true;
-					break ;
+					break;
 
 				case SCC_INS_LOAD_VSR:
 					set_vsr(((cmd & 0xf) << 16) | data);
-					break ;
+					break;
 
 				case SCC_INS_LOAD_VSR_STOP:
 					set_vsr(((cmd & 0xf) << 16) | data);
 					stop = true;
-					break ;
+					break;
 
 				case SCC_INS_INTERRUPT:
 					m_csr_r |= CSR_R_IT1;
@@ -781,12 +774,12 @@ TIMER_CALLBACK_MEMBER(scc66470_device::process_dca)
 				default:
 					if((cmd & 0xf800) == SCC_INS_LOAD_BORDER)
 					{
-						m_bcr = cmd & 0xff ;
+						m_bcr = cmd & 0xff;
 					}
 					else if((cmd & 0xf800) == SCC_INS_LOAD_BORDER_DSP)
 					{
 						m_bcr = cmd & 0xff;
-						m_dcr2 = (m_dcr2 & 0x90ff) | (data & 0x6f) << 8 ;
+						m_dcr2 = (m_dcr2 & 0x90ff) | (data & 0x6f) << 8;
 						m_dcr = (m_dcr & 0xfaff) | (data & 0x0500);
 					}
 					else if(cmd & SCC_INS_BEP_CONTROL)
@@ -800,11 +793,11 @@ TIMER_CALLBACK_MEMBER(scc66470_device::process_dca)
 			}
 		}
 
-		ctrl *= 2 ;
+		ctrl *= 2;
 
 		if(!new_dcp)
 		{
-			ctrl += count ;
+			ctrl += count;
 		}
 
 		if(BIT(DCR_REG, DCR_DC) && BIT(DCR2_REG, DCR2_ID))
@@ -813,7 +806,7 @@ TIMER_CALLBACK_MEMBER(scc66470_device::process_dca)
 		}
 		else
 		{
-			m_working_dcp = 0 ;
+			m_working_dcp = 0;
 		}
 	}
 
@@ -833,25 +826,22 @@ TIMER_CALLBACK_MEMBER(scc66470_device::process_dca)
 
 unsigned int scc66470_device::border_width()
 {
-	unsigned hoffset ;
-	hoffset = (BIT(DCR_REG, DCR_CF1) << 3) | (BIT(DCR_REG, DCR_CF2) << 2) | (BIT(DCR_REG, DCR_SS) << 1) | BIT(CSR_REG, CSR_ST);
+	const unsigned hoffset = (BIT(DCR_REG, DCR_CF1) << 3) | (BIT(DCR_REG, DCR_CF2) << 2) | (BIT(DCR_REG, DCR_SS) << 1) | BIT(CSR_REG, CSR_ST);
 	return h_table[ hoffset ].border / 2;
 }
 
 int scc66470_device::border_height()
 {
-	int height;
-
-	height = 0 ;
+	int height = 0;
 
 	if(!BIT(DCR_REG, DCR_FD) && BIT(CSR_REG, CSR_ST))
 	{
-		height = 20 ;
+		height = 20;
 	}
 
 	if(!BIT(DCR_REG, DCR_SS))
 	{
-		height += 15 ;
+		height += 15;
 	}
 
 	return height;
@@ -859,8 +849,7 @@ int scc66470_device::border_height()
 
 unsigned int scc66470_device::width()
 {
-	unsigned hoffset ;
-	hoffset = (BIT(DCR_REG, DCR_CF1) << 3) | (BIT(DCR_REG, DCR_CF2) << 2) | (BIT(DCR_REG, DCR_SS) << 1) | BIT(CSR_REG, CSR_ST);
+	const unsigned hoffset = (BIT(DCR_REG, DCR_CF1) << 3) | (BIT(DCR_REG, DCR_CF2) << 2) | (BIT(DCR_REG, DCR_SS) << 1) | BIT(CSR_REG, CSR_ST);
 	return h_table[ hoffset ].pixels;
 }
 
@@ -880,10 +869,10 @@ unsigned int scc66470_device::total_height()
 {
 	if(BIT(DCR_REG, DCR_FD))
 	{
-		return 262 ;
+		return 262;
 	}
 	else
 	{
-		return 312 ;
+		return 312;
 	}
 }
