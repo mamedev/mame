@@ -3113,12 +3113,12 @@ msgstr "Υποστηρίζεται: Ναι"
 
 #: src/frontend/mame/ui/selmenu.cpp:681
 msgid "System is parent"
-msgstr "Ο Σύστημα είναι γονικός"
+msgstr "Το σύστημα είναι γονικό"
 
 #: src/frontend/mame/ui/selmenu.cpp:683 src/frontend/mame/ui/selmenu.cpp:685
 #, c-format
 msgid "System is clone of: %1$s"
-msgstr "Ο Σύστημα είναι κλώνος του: %1$s"
+msgstr "Το σύστημα είναι κλώνος του: %1$s"
 
 #: src/frontend/mame/ui/selmenu.cpp:721
 #, c-format
@@ -3189,7 +3189,7 @@ msgstr "Γενικές Πληροφορίες"
 #: src/frontend/mame/ui/selmenu.cpp:2864
 #, c-format
 msgid "Short Name\t%1$s\n"
-msgstr "Μικρό Όνομα\t%1$s"
+msgstr "Μικρό Όνομα\t%1$s\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2865
 #, c-format
@@ -3204,11 +3204,11 @@ msgstr "Κατασκευαστής\t%1$s\n"
 #: src/frontend/mame/ui/selmenu.cpp:2873
 #, c-format
 msgid "System is Clone of\t%1$s\n"
-msgstr "Ο Σύστημα είναι Κλώνος του\t%1$s\n"
+msgstr "Το σύστημα είναι Κλώνος του\t%1$s\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2878
 msgid "System is Parent\t\n"
-msgstr "Ο Σύστημα είναι Γονικός\t\n"
+msgstr "Το σύστημα είναι Γονικό\t\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2882
 msgid "Analog Controls\tYes\n"
@@ -3404,11 +3404,11 @@ msgstr "Χρονισμός\tΑτελής\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2998
 msgid "Mechanical System\tYes\n"
-msgstr "Μηχανικό Σύστημα\tΝαι"
+msgstr "Μηχανικό Σύστημα\tΝαι\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2998
 msgid "Mechanical System\tNo\n"
-msgstr "Μηχανικό Σύστημα\tΌχι"
+msgstr "Μηχανικό Σύστημα\tΌχι\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2999
 msgid "Requires Artwork\tYes\n"
@@ -3432,11 +3432,11 @@ msgstr "Υποστήριξη Κοκτέιλ\tΌχι\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3003
 msgid "System is BIOS\tYes\n"
-msgstr "Ο σύστημα είναι BIOS\tΝαι\n"
+msgstr "Το σύστημα είναι BIOS\tΝαι\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3003
 msgid "System is BIOS\tNo\n"
-msgstr "Ο σύστημα είναι BIOS\tΌχι\n"
+msgstr "Το σύστημα είναι BIOS\tΌχι\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3004
 msgid "Support Save\tYes\n"

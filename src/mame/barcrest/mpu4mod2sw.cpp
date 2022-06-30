@@ -2371,6 +2371,40 @@ ROM_END
 // runs, unprotected, 17 May 1990 BWBNFM26 in ROM
 GAME(1990, m4fourmr,  0,          mod2,       mpu4,    mpu4mod2_machines_state, init_m4default, ROT0,   "BWB","Four More (BWB) (MPU4)",GAME_FLAGS ) // no sound with either system?
 
+/*****************************************************************************************************************************************************************************
+*
+* Line Up
+* Speculator Club
+* - does not appear to be a Barcrest codebase, and game seems to be unprotected
+* - requires very specific AY handling to produce sounds, see note in mpu4.cpp
+* - reels shake continuously, does it need a different reel type?
+*
+*****************************************************************************************************************************************************************************/
+
+ROM_START( m4lineup )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "lineup5p1.bin", 0xc000, 0x004000, CRC(9ba9edbd) SHA1(385e01816b5631b6896e85343ae96b3c36f9647a) )
+	ROM_LOAD( "lineup5p2.bin", 0x8000, 0x004000, CRC(e9e4dfb0) SHA1(46a0efa84770036366c7a6a33ef1d42c7b2b782b) )
+	ROM_LOAD( "lineup5p3.bin", 0x6000, 0x002000, CRC(86623376) SHA1(e29442bfcd401361287852b87673368322e946b5) )
+ROM_END
+
+ROM_START( m4lineupa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "lu2_10p1.bin", 0xc000, 0x004000, CRC(2fb89062) SHA1(55e86de8fd0d36cca9aab8ad5aae7b4f5a62b940) )
+	ROM_LOAD( "lu2_10p2.bin", 0x8000, 0x004000, CRC(9d820af2) SHA1(63d27df91f80e47eb8c9685fcd2c3eff902a2ef8) )
+	ROM_LOAD( "lu2_10p3.bin", 0x6000, 0x002000, CRC(8c8a210c) SHA1(2599d979f1a62e9ef6acc70d0ad5c9b4a65d712a) )
+ROM_END
+
+ROM_START( m4specu )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "speculator.bin", 0x8000, 0x008000, CRC(4035d20c) SHA1(4a534294c5c7332eacd09ca44f351d6a6850cc29) )
+ROM_END
+
+GAME(199?, m4lineup,  0,          mod2,       mpu4,    mpu4mod2_machines_state, init_m4default, ROT0,   "BWB","Line Up (BWB) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4lineupa, m4lineup,   mod2,       mpu4,    mpu4mod2_machines_state, init_m4default, ROT0,   "BWB","Line Up (BWB) (MPU4) (set 2)",GAME_FLAGS )
+
+// very similar game to above
+GAME(199?, m4specu,   0,          mod2,       mpu4,    mpu4mod2_machines_state, init_m4default, ROT0,   "BWB","Speculator Club (BWB) (MPU4)",GAME_FLAGS )
 
 /*********************************************************************************************************
 

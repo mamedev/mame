@@ -23413,8 +23413,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	Eventually requires emulated Maple DMA "swap endian" mode (SB_MMSEL register = 0).
 	-->
 
-	<!-- <software name="chkrepair205r" cloneof="chkrepair216r"> -->
-	<software name="chkrepair205r" supported="no">
+	<software name="chkrepair205r" supported="no"> <!-- cloneof="chkrepair216r"> -->
 		<description>DC Checker for Repair v2.05R (World)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>

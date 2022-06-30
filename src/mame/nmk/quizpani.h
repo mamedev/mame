@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "nmk112.h"
+#include "machine/nmk112.h"
 
 #include "tilemap.h"
 

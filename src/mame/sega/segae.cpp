@@ -296,10 +296,10 @@ GND  8A 8B GND
 #include "emu.h"
 #include "segaipt.h"
 
+#include "cpu/z80/mc8123.h"
 #include "cpu/z80/z80.h"
 #include "machine/adc0804.h"
 #include "machine/i8255.h"
-#include "mc8123.h"
 #include "machine/rescap.h"
 #include "segacrp2_device.h"
 #include "machine/upd4701.h"

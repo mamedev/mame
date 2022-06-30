@@ -7,11 +7,10 @@
 
 #include "vsystem_spr.h"
 
-#include "k053936.h"
-
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "video/bufsprite.h"
+#include "video/k053936.h"
 
 #include "emupal.h"
 #include "tilemap.h"

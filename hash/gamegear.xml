@@ -232,6 +232,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 		</part>
 	</software>
 
+	<!-- "Disney's Aladdin (prototype, 19940124)" shares the same hashes as release version -->
 	<software name="aladdin">
 		<description>Disney's Aladdin (Euro, USA, Bra)</description>
 		<year>1994</year>
@@ -279,18 +280,6 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 			</dataarea>
 		</part>
 	</software>
-
-	<!-- same as jan 13 proto. was a mistake by drx? -->
-	<!--software name="aladdinp1a" cloneof="aladdin">
-	    <description>Disney's Aladdin (prototype WITH, 19940123)</description>
-	    <year>1994</year>
-	    <publisher>Sega</publisher>
-	    <part name="cart" interface="gamegear_cart">
-	        <dataarea name="rom" size="524288">
-	            <rom name="aladdin (prototype with - jan 23,  1994).bin" size="524288" crc="75a7f142" sha1="a968ee77938233a4ff94c73266c7fb36fa25657d"/>
-	        </dataarea>
-	    </part>
-	</software-->
 
 	<software name="alexkidd">
 		<description>Alex Kidd in Miracle World (Tw, SMS mode)</description>
@@ -1147,18 +1136,6 @@ a certain item) -->
 			</dataarea>
 		</part>
 	</software>
-
-	<!-- same as dec 11 proto. was a mistake by drx? -->
-	<!-- software name="bonkersp02a" cloneof="bonkers">
-	    <description>Disney's Bonkers Wax Up! (prototype, 19941212-B)</description>
-	    <year>1994</year>
-	    <publisher>Sega</publisher>
-	    <part name="cart" interface="gamegear_cart">
-	        <dataarea name="rom" size="524288">
-	            <rom name="bonkers wax up (prototype - dec 12,  1994 - b).bin" size="524288" crc="9a405d0d" sha1="e797640e2363f517fb83ee42903f5d13a1ffad73"/>
-	        </dataarea>
-	    </part>
-	</software-->
 
 	<software name="bonkersp01" cloneof="bonkers">
 		<description>Disney's Bonkers Wax Up! (prototype, 19941212-D)</description>
@@ -4354,18 +4331,6 @@ a certain item) -->
 		</part>
 	</software>
 
-	<!-- same as aug 14 proto. was a mistake by drx? -->
-	<!--software name="lionkingp5b" cloneof="lionking">
-	    <description>Disney's The Lion King (prototype, 19940815)</description>
-	    <year>1994</year>
-	    <publisher>Virgin Interactive</publisher>
-	    <part name="cart" interface="gamegear_cart">
-	        <dataarea name="rom" size="514486">
-	            <rom name="lion king, the (prototype - aug 15,  1994).bin" size="514486" crc="eb10a2d4" sha1="cdce953f16e4db6e9137ea8d523588b3469a544d"/>
-	        </dataarea>
-	    </part>
-	</software-->
-
 	<software name="lionkingp4" cloneof="lionking">
 		<description>Disney's The Lion King (prototype, 19940816)</description>
 		<year>1994</year>
@@ -5573,18 +5538,6 @@ a certain item) -->
 			</dataarea>
 		</part>
 	</software>
-
-	<!-- same as aug 25 proto. was a mistake by drx? -->
-	<!--software name="nfl95p11a" cloneof="nfl95">
-	    <description>NFL '95 (prototype, 19940825-B)</description>
-	    <year>1994</year>
-	    <publisher>Sega</publisher>
-	    <part name="cart" interface="gamegear_cart">
-	        <dataarea name="rom" size="524288">
-	            <rom name="nfl '95 (prototype - aug 25,  1994 - b).bin" size="524288" crc="fe140eaa" sha1="b79af203bc01ea1c59563e34105cb36cad158cca"/>
-	        </dataarea>
-	    </part>
-	</software-->
 
 	<software name="nfl95p11" cloneof="nfl95">
 		<description>NFL '95 (prototype, 19940825)</description>
@@ -9481,18 +9434,6 @@ a certain item) -->
 		</part>
 	</software>
 
-	<!-- same as aug 14 proto. was a mistake by drx? -->
-	<!--software name="tazmarsp11a" cloneof="tazmars">
-	    <description>Taz in Escape from Mars (prototype, 19940815)</description>
-	    <year>1994</year>
-	    <publisher>Sega</publisher>
-	    <part name="cart" interface="gamegear_cart">
-	        <dataarea name="rom" size="524288">
-	            <rom name="taz in escape from mars (prototype - aug 15,  1994).bin" size="524288" crc="9267d968" sha1="8800da06ea2aa3982cf2e294b165f5e1a9cab63c"/>
-	        </dataarea>
-	    </part>
-	</software-->
-
 	<software name="tazmarsp10" cloneof="tazmars">
 		<description>Taz in Escape from Mars (prototype, 19940819)</description>
 		<year>1994</year>
@@ -10384,18 +10325,6 @@ a certain item) -->
 			</dataarea>
 		</part>
 	</software>
-
-	<!-- same as aug 10 proto. was a mistake by drx? -->
-	<!--software name="xmenglp3a" cloneof="xmengl">
-	    <description>X-Men - Gamemaster's Legacy (prototype, 19940815)</description>
-	    <year>1994</year>
-	    <publisher>Sega</publisher>
-	    <part name="cart" interface="gamegear_cart">
-	        <dataarea name="rom" size="524288">
-	            <rom name="x-men - gamemaster's legacy (prototype - aug 15,  1994).bin" size="524288" crc="66cc4034" sha1="46237cf1c2810a8f2e5c31907a1ae04b647256c8"/>
-	        </dataarea>
-	    </part>
-	</software-->
 
 	<software name="xmenglp2" cloneof="xmengl">
 		<description>X-Men - Gamemaster's Legacy (prototype 36, 19940831)</description>
