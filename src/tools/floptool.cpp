@@ -263,47 +263,42 @@ static int flopcreate(int argc, char *argv[])
 	return ih.floppy_save(dest_format);
 }
 
-static void dir_scan(u32 depth, fs::filesystem_t::dir_t dir, std::vector<std::vector<std::string>> &entries, const std::unordered_map<fs::meta_name, size_t> &nmap, size_t nc, const std::vector<fs::meta_description> &dmetad, const std::vector<fs::meta_description> &fmetad)
+static void dir_scan(fs::filesystem_t *fs, u32 depth, const std::vector<std::string> &path, std::vector<std::vector<std::string>> &entries, const std::unordered_map<fs::meta_name, size_t> &nmap, size_t nc, const std::vector<fs::meta_description> &dmetad, const std::vector<fs::meta_description> &fmetad)
 {
 	std::string head;
 	for(u32 i = 0; i != depth; i++)
 		head += "  ";
-	auto contents = dir.contents();
+	auto [err, contents] = fs->directory_contents(path);
+	if(err)
+		return;
 	for(const auto &c : contents) {
 		size_t id = entries.size();
 		entries.resize(id+1);
 		entries[id].resize(nc);
 		switch(c.m_type) {
 		case fs::dir_entry_type::dir: {
-			auto subdir = dir.dir_get(c.m_key);
-			auto meta = subdir.metadata();
-			if (!meta.has(fs::meta_name::name))
-				meta.set(fs::meta_name::name, c.m_name);
 			for(const auto &m : dmetad) {
-				if(!meta.has(m.m_name))
+				if(!c.m_meta.has(m.m_name))
 					continue;
 				size_t slot = nmap.find(m.m_name)->second;
-				std::string val = meta.get(m.m_name).to_string();
+				std::string val = c.m_meta.get(m.m_name).to_string();
 				if(slot == 0)
 					val = head + "dir  " + val;
 				entries[id][slot] = val;
 			}
-			dir_scan(depth+1, subdir, entries, nmap, nc, dmetad, fmetad);
+			auto npath = path;
+			npath.push_back(c.m_name);
+			dir_scan(fs, depth+1, npath, entries, nmap, nc, dmetad, fmetad);
 			break;
 		}
-		case fs::dir_entry_type::file:
-		case fs::dir_entry_type::system_file: {
-			auto file = dir.file_get(c.m_key);
-			auto meta = file.metadata();
-			if (!meta.has(fs::meta_name::name))
-				meta.set(fs::meta_name::name, c.m_name);
+		case fs::dir_entry_type::file: {
 			for(const auto &m : fmetad) {
-				if(!meta.has(m.m_name))
+				if(!c.m_meta.has(m.m_name))
 					continue;
 				size_t slot = nmap.find(m.m_name)->second;
-				std::string val = meta.get(m.m_name).to_string();
+				std::string val = c.m_meta.get(m.m_name).to_string();
 				if(slot == 0)
-					val = head + (c.m_type == fs::dir_entry_type::system_file ? "sys  " : "file ") + val;
+					val = head + "file " + val;
 				entries[id][slot] = val;
 			}
 			break;
@@ -319,7 +314,7 @@ static int generic_dir(image_handler &ih)
 	auto fmetad = fsm->file_meta_description();
 	auto dmetad = fsm->directory_meta_description();
 
-	auto vmeta = fs->metadata();
+	auto vmeta = fs->volume_metadata();
 	if(!vmeta.empty()) {
 		std::string vinf = "Volume:";
 		for(const auto &e : vmetad)
@@ -340,14 +335,13 @@ static int generic_dir(image_handler &ih)
 	for(size_t i = 0; i != names.size(); i++)
 		nmap[names[i]] = i;
 
-	auto root = fs->root();
 	std::vector<std::vector<std::string>> entries;
 
 	entries.resize(1);
 	for(fs::meta_name n : names)
 		entries[0].push_back(fs::meta_data::entry_name(n));
 
-	dir_scan(0, root, entries, nmap, names.size(), dmetad, fmetad);
+	dir_scan(fs, 0, std::vector<std::string>(), entries, nmap, names.size(), dmetad, fmetad);
 
 	std::vector<u32> sizes(names.size());
 
@@ -443,50 +437,20 @@ static int generic_read(image_handler &ih, const char *srcpath, const char *dstp
 	auto [fsm, fs] = ih.get_fs();
 
 	std::vector<std::string> path = ih.path_split(srcpath);
-
-	auto dir = fs->root();
-	std::string apath;
-	for(unsigned int i = 0; i < path.size() - 1; i++) {
-		auto c = dir.contents();
-		unsigned int j;
-		for(j = 0; j != c.size(); j++)
-			if(c[j].m_name == path[i])
-				break;
-		if(j == c.size()) {
-			fprintf(stderr, "Error: directory %s%c%s not found\n", apath.c_str(), fsm->directory_separator(), path[i].c_str());
-			return 1;
-		}
-		if(c[j].m_type != fs::dir_entry_type::dir) {
-			fprintf(stderr, "Error: %s%c%s is not a directory\n", apath.c_str(), fsm->directory_separator(), path[i].c_str());
-			return 1;
-		}
-		dir = dir.dir_get(c[j].m_key);
-		apath += fsm->directory_separator() + path[i];
-	}
-
-	auto c = dir.contents();
-	unsigned int j;
-	for(j = 0; j != c.size(); j++)
-		if(c[j].m_name == path.back())
-			break;
-	if(j == c.size()) {
-		fprintf(stderr, "Error: file %s%c%s not found\n", apath.c_str(), fsm->directory_separator(), path.back().c_str());
-		return 1;
-	}
-	auto file = dir.file_get(c[j].m_key);
-	auto meta = file.metadata();
-
-	if(!meta.has(fs::meta_name::length)) {
-		fprintf(stderr, "Error: %s%c%s is not a readable file\n", apath.c_str(), fsm->directory_separator(), path.back().c_str());
+	auto [err, dfork] = fs->file_read(path);
+	if(err) {
+		if(err == fs::ERR_NOT_FOUND)
+			fprintf(stderr, "File not found.\n");
+		else
+			fprintf(stderr, "Unknown error (%d).\n", err);
 		return 1;
 	}
 
-	image_handler::fsave(dstpath, file.read_all());
+	image_handler::fsave(dstpath, dfork);
 
-	bool has_rsrc = fsm->has_rsrc() && meta.has(fs::meta_name::rsrc_length);
-
-	if(has_rsrc)
-		image_handler::fsave_rsrc(image_handler::path_make_rsrc(dstpath), file.rsrc_read_all());
+	auto [err2, rfork] = fs->file_rsrc_read(path);
+	if(!err2 && !rfork.empty())
+		image_handler::fsave_rsrc(image_handler::path_make_rsrc(dstpath), rfork);
 
 	return 0;
 }
@@ -568,44 +532,37 @@ static int generic_write(image_handler &ih, const char *srcpath, const char *dst
 	auto [fsm, fs] = ih.get_fs();
 
 	std::vector<std::string> path = ih.path_split(dstpath);
+	auto [err, meta] = fs->metadata(path);
 
-	auto dir = fs->root();
-	std::string apath;
-	for(unsigned int i = 0; i < path.size() - 1; i++) {
-		auto c = dir.contents();
-		unsigned int j;
-		for(j = 0; j != c.size(); j++)
-			if(c[j].m_name == path[i])
-				break;
-		if(j == c.size()) {
-			fprintf(stderr, "Error: directory %s%c%s not found\n", apath.c_str(), fsm->directory_separator(), path[i].c_str());
+	if(err) {
+		fs::meta_data meta;
+		meta.set(fs::meta_name::name, path.back());
+		auto dpath = path;
+		dpath.pop_back();
+		err = fs->file_create(dpath, meta);
+		if(!err) {
+			fprintf(stderr, "File creation failure.\n");
 			return 1;
 		}
-		if(c[j].m_type != fs::dir_entry_type::dir) {
-			fprintf(stderr, "Error: %s%c%s is not a directory\n", apath.c_str(), fsm->directory_separator(), path[i].c_str());
-			return 1;
-		}
-		dir = dir.dir_get(c[j].m_key);
-		apath += fsm->directory_separator() + path[i];
 	}
 
+	auto dfork = image_handler::fload(srcpath);
+	err = fs->file_write(path, dfork);
+	if(!err) {
+		fprintf(stderr, "File writing failure.\n");
+		return 1;
+	}
 
-	fs::meta_data meta;
-	meta.set(fs::meta_name::name, path.back());
-
-	auto file = dir.file_create(meta);
-	auto filedata = image_handler::fload(srcpath);
-	file.replace(filedata);
-
-	bool has_rsrc = fsm->has_rsrc();
-
-	if(has_rsrc) {
+	if(fsm->has_rsrc()) {
 		std::string rpath = image_handler::path_make_rsrc(dstpath);
 
 		if(image_handler::fexists(rpath)) {
-			filedata = image_handler::fload_rsrc(rpath);
-			if(!filedata.empty())
-				file.rsrc_replace(filedata);
+			auto rfork = image_handler::fload_rsrc(rpath);
+			if(!rfork.empty()) {
+				err = fs->file_rsrc_write(path, rfork);
+				fprintf(stderr, "File resource fork writing failure.\n");
+				return 1;
+			}
 		}
 	}
 

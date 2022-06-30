@@ -25,11 +25,6 @@ amiga/upscope.cpp
 aristocr/aristmk4.cpp
 aristocr/aristmk6.cpp
 aristocr/caswin.cpp
-ascii/big10.cpp
-ascii/forte2.cpp
-ascii/pengadvb.cpp
-ascii/sangho.cpp
-ascii/sfkick.cpp
 atari/akkaarrh.cpp
 atari/arcadecl.cpp
 atari/asteroid.cpp
@@ -191,6 +186,8 @@ capcom/supduck.cpp
 capcom/tigeroad.cpp
 capcom/tvcapcom.cpp
 capcom/vulgus.cpp
+cccp/istrebiteli.cpp
+cccp/tiamc1.cpp
 ces/cesclass.cpp
 ces/galgames.cpp
 cinemat/cchasm.cpp
@@ -265,6 +262,7 @@ dataeast/thedeep.cpp
 dataeast/tryout.cpp
 dataeast/tumbleb.cpp
 dataeast/vaportra.cpp
+ddr/polyplay.cpp
 dgrm/blackt96.cpp
 dgrm/pokechmp.cpp
 dooyong/dooyong.cpp
@@ -610,6 +608,7 @@ midway/vegas.cpp
 midway/williams.cpp
 midway/wmg.cpp
 midway/zwackery.cpp
+miltonbradley/vectrex.cpp
 misc/39in1.cpp
 misc/3do.cpp
 misc/4enlinea.cpp
@@ -843,7 +842,6 @@ misc/pntnpuzl.cpp
 misc/poker72.cpp
 misc/pokerout.cpp
 misc/policetr.cpp
-misc/polyplay.cpp
 misc/potgoldu.cpp
 misc/proconn.cpp
 misc/psattack.cpp
@@ -925,7 +923,6 @@ misc/usgames.cpp
 misc/v0bowl.cpp
 misc/vamphalf.cpp
 misc/vcombat.cpp
-misc/vectrex.cpp
 misc/video21.cpp
 misc/videosaa.cpp
 misc/vlc.cpp
@@ -943,6 +940,11 @@ misc/yuvomz80.cpp
 mr/dribling.cpp
 mr/sshot.cpp
 mr/subhuntr.cpp
+msx/big10.cpp
+msx/forte2.cpp
+msx/pengadvb.cpp
+msx/sangho.cpp
+msx/sfkick.cpp
 namco/20pacgal.cpp
 namco/30test.cpp
 namco/baraduke.cpp
@@ -1468,8 +1470,6 @@ tehkan/tecmosys.cpp
 tehkan/tehkanwc.cpp
 tehkan/wc90.cpp
 tehkan/wc90b.cpp
-terminal/istrebiteli.cpp
-terminal/tiamc1.cpp
 thepit/thepit.cpp
 thepit/timelimt.cpp
 toaplan/mjsister.cpp
@@ -1573,5 +1573,5 @@ zaccaria/zaccaria.cpp
 //ibmpc/sis630.cpp
 -shutms11
 
-//misc/vectrex.cpp
+//miltonbradley/vectrex.cpp
 -vectrex

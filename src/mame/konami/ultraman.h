@@ -13,7 +13,7 @@
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
 #include "k051960.h"
-#include "k051316.h"
+#include "video/k051316.h"
 #include "konami_helper.h"
 
 class ultraman_state : public driver_device

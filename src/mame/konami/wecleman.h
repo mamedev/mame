@@ -7,7 +7,7 @@
 
 #include "machine/timer.h"
 #include "sound/k007232.h"
-#include "k051316.h"
+#include "video/k051316.h"
 #include "k007452.h"
 #include "emupal.h"
 #include "screen.h"

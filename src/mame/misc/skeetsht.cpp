@@ -187,7 +187,6 @@ void skeetsht_state::hc11_pgm_map(address_map &map)
 	map(0x0000, 0xffff).rom().region("68hc11", 0);
 	map(0x1800, 0x1800).w(FUNC(skeetsht_state::ay8910_w));
 	map(0x2800, 0x2807).rw(FUNC(skeetsht_state::tms_r), FUNC(skeetsht_state::tms_w));
-	map(0xb600, 0xbdff).ram(); //internal EEPROM
 }
 
 
