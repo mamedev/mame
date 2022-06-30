@@ -33,23 +33,16 @@
 #include "emu.h"
 #include "ds1207.h"
 
-#include <cstdio>
+#define LOG_LINES    (1U << 0)
+#define LOG_STATE    (1U << 1)
+#define LOG_DATA     (1U << 2)
 
+//#define VERBOSE (LOG_LINES | LOG_STATE | LOG_DATA)
+#include "logmacro.h"
 
-#define VERBOSE_LEVEL ( 0 )
-
-inline void ATTR_PRINTF(3, 4) ds1207_device::verboselog(int n_level, const char *s_fmt, ...)
-{
-	if(VERBOSE_LEVEL >= n_level)
-	{
-		va_list v;
-		char buf[ 32768 ];
-		va_start(v, s_fmt);
-		vsprintf(buf, s_fmt, v);
-		va_end(v);
-		logerror("%s: ds1207(%s) %s", machine().describe_context(), tag(), buf);
-	}
-}
+#define LOGLINES(...)    LOGMASKED(LOG_LINES, __VA_ARGS__)
+#define LOGSTATE(...)    LOGMASKED(LOG_STATE, __VA_ARGS__)
+#define LOGDATA(...)     LOGMASKED(LOG_DATA, __VA_ARGS__)
 
 // device type definition
 DEFINE_DEVICE_TYPE(DS1207, ds1207_device, "ds1207", "DS1207 Time Key")
@@ -57,6 +50,7 @@ DEFINE_DEVICE_TYPE(DS1207, ds1207_device, "ds1207", "DS1207 Time Key")
 ds1207_device::ds1207_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DS1207, tag, owner, clock),
 	  device_nvram_interface(mconfig, *this),
+	  device_rtc_interface(mconfig, *this),
 	  m_region(*this, DEVICE_SELF),
 	  m_rst(0),
 	  m_clk(0),
@@ -77,6 +71,7 @@ void ds1207_device::device_start()
 	memset(m_command, 0, sizeof(m_command));
 	memset(m_compare_register, 0, sizeof(m_compare_register));
 	m_last_update_time = 0;
+	m_startup_time = 0;
 	memset(m_day_clock, 0, sizeof(m_day_clock));
 
 	save_item(NAME(m_rst));
@@ -95,6 +90,7 @@ void ds1207_device::device_start()
 	save_item(NAME(m_days_left));
 	save_item(NAME(m_start_time));
 	save_item(NAME(m_device_state));
+	save_item(NAME(m_startup_time));
 	save_item(NAME(m_last_update_time));
 }
 
@@ -115,12 +111,10 @@ void ds1207_device::nvram_default()
 	{
 		logerror("ds1207(%s) region not found\n", tag());
 	}
-
 	else if(m_region->bytes() != expected_bytes)
 	{
 		logerror("ds1207(%s) region length 0x%x expected 0x%x\n", tag(), m_region->bytes(), expected_bytes);
 	}
-
 	else
 	{
 		uint8_t *region = m_region->base();
@@ -222,7 +216,7 @@ WRITE_LINE_MEMBER(ds1207_device::write_rst)
 	if(m_rst != state)
 	{
 		m_rst = state;
-		verboselog(2, "rst=%d\n", m_rst);
+		LOGLINES("%s: DS1270 rst=%d\n", machine().describe_context(),m_rst);
 
 		if(m_rst)
 		{
@@ -233,15 +227,15 @@ WRITE_LINE_MEMBER(ds1207_device::write_rst)
 			switch(m_state)
 			{
 				case STATE_WRITE_IDENTIFICATION:
-					verboselog(0, "reset during write identification (bit=%d)\n", m_bit);
+					LOGSTATE("%s: DS1270 reset during write identification (bit=%d)\n", machine().describe_context(), m_bit);
 					break;
 
 				case STATE_WRITE_SECURITY_MATCH:
-					verboselog(0, "reset during write security match (bit=%d)\n", m_bit);
+					LOGSTATE("%s: DS1270 reset during write security match (bit=%d)\n", machine().describe_context(), m_bit);
 					break;
 
 				case STATE_WRITE_SECURE_MEMORY:
-					verboselog(0, "reset during write secure memory (bit=%d)\n", m_bit);
+					LOGSTATE("%s: DS1270 reset during write secure memory (bit=%d)\n", machine().describe_context(), m_bit);
 					break;
 			}
 
@@ -256,7 +250,7 @@ WRITE_LINE_MEMBER(ds1207_device::write_clk)
 	if(m_clk != state)
 	{
 		m_clk = state;
-		verboselog(2, "clk=%d (bit=%d)\n", m_clk, m_bit);
+		LOGLINES("%s: DS1270 clk=%d (bit=%d)\n", machine().describe_context(), m_clk, m_bit);
 
 		if(m_clk)
 		{
@@ -270,7 +264,7 @@ WRITE_LINE_MEMBER(ds1207_device::write_clk)
 
 				if(m_bit == 24)
 				{
-					verboselog(1, "-> command %02x %02x %02x (%02x %02x)\n",
+					LOGDATA("%s: DS1270 -> command %02x %02x %02x (%02x %02x)\n", machine().describe_context(),
 					           m_command[ 0 ], m_command[ 1 ], m_command[ 2 ], m_unique_pattern[ 0 ], m_unique_pattern[ 1 ]);
 							   
 					if(m_command[ 2 ] == m_unique_pattern[ 1 ] && (m_command[ 1 ] & ~3) == m_unique_pattern[ 0 ])
@@ -359,7 +353,7 @@ WRITE_LINE_MEMBER(ds1207_device::write_clk)
 
 				if(m_bit == 64)
 				{
-					verboselog(1, "<- identification %02x %02x %02x %02x %02x %02x %02x %02x\n",
+					LOGDATA("%s: DS1270 <- identification %02x %02x %02x %02x %02x %02x %02x %02x\n", machine().describe_context(),
 					           m_identification[ 0 ], m_identification[ 1 ], m_identification[ 2 ], m_identification[ 3 ],
 					           m_identification[ 4 ], m_identification[ 5 ], m_identification[ 6 ], m_identification[ 7 ]);
 
@@ -372,7 +366,7 @@ WRITE_LINE_MEMBER(ds1207_device::write_clk)
 
 				if(m_bit == 64)
 				{
-					verboselog(1, "-> compare register %02x %02x %02x %02x %02x %02x %02x %02x (%02x %02x %02x %02x %02x %02x %02x %02x)\n",
+					LOGDATA("%s: DS1207 -> compare register %02x %02x %02x %02x %02x %02x %02x %02x (%02x %02x %02x %02x %02x %02x %02x %02x)\n", machine().describe_context(),
 					           m_compare_register[ 0 ], m_compare_register[ 1 ], m_compare_register[ 2 ], m_compare_register[ 3 ],
 					           m_compare_register[ 4 ], m_compare_register[ 5 ], m_compare_register[ 6 ], m_compare_register[ 7 ],
 					           m_security_match[ 0 ], m_security_match[ 1 ], m_security_match[ 2 ], m_security_match[ 3 ],
@@ -419,7 +413,7 @@ WRITE_LINE_MEMBER(ds1207_device::write_clk)
 
 				if(m_bit == 64)
 				{
-					verboselog(1, "-> identification %02x %02x %02x %02x %02x %02x %02x %02x\n",
+					LOGDATA("%s: DS1207 -> identification %02x %02x %02x %02x %02x %02x %02x %02x\n", machine().describe_context(),
 					           m_identification[ 0 ], m_identification[ 1 ], m_identification[ 2 ], m_identification[ 3 ],
 					           m_identification[ 4 ], m_identification[ 5 ], m_identification[ 6 ], m_identification[ 7 ]);
 
@@ -432,7 +426,7 @@ WRITE_LINE_MEMBER(ds1207_device::write_clk)
 
 				if(m_bit == 64)
 				{
-					verboselog(1, ">- security match %02x %02x %02x %02x %02x %02x %02x %02x\n",
+					LOGDATA("%s: DS1207 >- security match %02x %02x %02x %02x %02x %02x %02x %02x\n", machine().describe_context(),
 					           m_security_match[ 0 ], m_security_match[ 1 ], m_security_match[ 2 ], m_security_match[ 3 ],
 					           m_security_match[ 4 ], m_security_match[ 5 ], m_security_match[ 6 ], m_security_match[ 7 ]);
 
@@ -455,11 +449,11 @@ WRITE_LINE_MEMBER(ds1207_device::write_clk)
 				{
 					if(m_command[ 0 ] == COMMAND_READ)
 					{
-						verboselog(1, "<- random\n");
+						LOGDATA("%s: DS1207 <- random\n", machine().describe_context());
 					}
 					else
 					{
-						verboselog(1, "-> ignore\n");
+						LOGDATA("%s: DS1207 -> ignore\n", machine().describe_context());
 					}
 
 					new_state(STATE_STOP);
@@ -502,7 +496,7 @@ WRITE_LINE_MEMBER(ds1207_device::write_dq)
 	{
 		m_dqw = state;
 
-		verboselog(2, "dqw=%d\n", m_dqw);
+		LOGLINES("%s: DS1270 dqw=%d\n", machine().describe_context(), m_dqw);
 	}
 }
 
@@ -510,11 +504,11 @@ READ_LINE_MEMBER(ds1207_device::read_dq)
 {
 	if(m_dqr == DQ_HIGH_IMPEDANCE)
 	{
-		verboselog(2, "dqr=high impedance\n");
+		LOGLINES("%s: DS1270 dqr=high impedance\n", machine().describe_context());
 		return 0;
 	}
 
-	verboselog(2, "dqr=%d (bit=%d)\n", m_dqr, m_bit);
+	LOGLINES("%s: DS1270 dqr=%d (bit=%d)\n", machine().describe_context(), m_dqr, m_bit);
 	return m_dqr;
 }
 
@@ -547,12 +541,12 @@ void ds1207_device::adjust_time_into_day()
 
 void ds1207_device::adjust_days_left()
 {
-	time_t current_time, start_time, time_diff;
+	uint64_t current_time, start_time, time_diff;
 	uint16_t days_elapsed, days_left;
 	uint32_t day_clock;
 	if(!(m_device_state & DAYS_EXPIRED) && (m_device_state & OSC_ENABLED) && (m_device_state & OSC_RUNNING))
 	{
-		time(&current_time);
+		current_time = m_startup_time + machine().time().as_ticks(1);
 
 		start_time = 0;
 
@@ -612,9 +606,9 @@ void ds1207_device::set_start_time()
 {
 	if(!(m_device_state & DAYS_EXPIRED) && m_device_state & OSC_ENABLED && !(m_device_state & OSC_RUNNING))
 	{
-		time_t current_time;
+		uint64_t current_time;
 
-		time(&current_time);
+		current_time = m_startup_time + machine().time().as_ticks(1);
 
 		for(int i = 0; i < 8 ; i++)
 		{
@@ -625,3 +619,39 @@ void ds1207_device::set_start_time()
 		m_device_state |= OSC_RUNNING;
 	}
 }
+
+void ds1207_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
+{
+	const int month_to_day_conversion[ 12 ] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
+
+	// put the seconds
+	uint64_t m_startup_time = second;
+
+	// put the minutes
+	m_startup_time += minute * 60;
+
+	// put the hours
+	m_startup_time += hour * 60 * 60;
+
+	// put the days (note -1) */
+	m_startup_time += (day - 1) * 60 * 60 * 24;
+
+	// take the months - despite popular beliefs, leap years aren't just evenly divisible by 4 */
+	if(((((year % 4) == 0) && ((year % 100) != 0)) || ((year % 400) == 0)) && month > 2)
+	{
+		m_startup_time += (month_to_day_conversion[ month - 1 ] + 1) * 60 * 60 * 24;
+	}
+	else
+	{
+		m_startup_time += (month_to_day_conversion[ month - 1 ]) * 60 * 60 * 24;
+	}
+
+	// put the years
+	int year_count = (year - 1969);
+
+	for(int i = 0; i < year_count - 1 ; i++)
+	{
+		m_startup_time += (((((i+1970) % 4) == 0) && (((i+1970) % 100) != 0)) || (((i+1970) % 400) == 0)) ? 60*60*24*366 : 60*60*24*365;
+	}
+}
+

@@ -12,8 +12,9 @@
 
 #pragma once
 
+#include "dirtc.h"
 
-class ds1207_device : public device_t, public device_nvram_interface
+class ds1207_device : public device_t, public device_nvram_interface, public device_rtc_interface
 {
 public:
 	// construction/destruction
@@ -34,8 +35,12 @@ protected:
 	virtual bool nvram_read(util::read_stream &file) override;
 	virtual bool nvram_write(util::write_stream &file) override;
 
+	// device_rtc_interface overrides
+	virtual bool rtc_feature_y2k() const override { return true; }
+	virtual bool rtc_feature_leap_year() const override { return true; }
+	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
+
 private:
-	inline void ATTR_PRINTF(3, 4) verboselog(int n_level, const char *s_fmt, ...);
 	void new_state(int state);
 	void writebit(uint8_t *buffer);
 	void readbit(uint8_t *buffer);
@@ -96,6 +101,7 @@ private:
 	int m_dqr;
 	int m_state;
 	int m_bit;
+	uint64_t m_startup_time;
 	uint64_t m_last_update_time;
 	uint8_t m_command[3];
 	uint8_t m_day_clock[3];
