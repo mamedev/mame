@@ -10541,6 +10541,25 @@ ROM_START( thunderl )
 	ROM_LOAD("tl-9", 0x000000, 0x117, BAD_DUMP CRC(3b62882d) SHA1(a590648cb013f20d837f18ddb2e839a89bac5fcb))
 ROM_END
 
+ROM_START( thunderla )
+	ROM_REGION( 0x010000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "tl-1-1.u1", 0x000000, 0x008000, CRC(3d4b1888) SHA1(9f26e777460e5ab8cf1f6cd97a8df7428f8068f7) )
+	ROM_LOAD16_BYTE( "tl-1-2.u4", 0x000001, 0x008000, CRC(974dddda) SHA1(cb685904c7e3b48dee9bf274b1e81d87c9e8f573) )
+
+	ROM_REGION( 0x080000, "gfx1", 0 )   /* Sprites */
+	ROM_LOAD16_BYTE( "t17", 0x000000, 0x020000, CRC(599a632a) SHA1(29da423dfe1f971cbb205767cf902d199d968d85) )
+	ROM_LOAD16_BYTE( "t16", 0x000001, 0x020000, CRC(3aeef91c) SHA1(a5dc8c22a7bcc1199bdd09c7d0f1f8a378e757c5) )
+	ROM_LOAD16_BYTE( "t15", 0x040000, 0x020000, CRC(b97a7b56) SHA1(c08d3586d489947af21f3493356e3a88d79746e8) )
+	ROM_LOAD16_BYTE( "t14", 0x040001, 0x020000, CRC(79c707be) SHA1(f67fa40c8f6ab0fbce44997fdfbf699fea1f0df6) )
+
+	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
+	ROM_LOAD( "r28", 0x000000, 0x080000, CRC(a043615d) SHA1(e483fa9fd8e922578a9d7b6ced0750643089ca78) )
+	ROM_LOAD( "r27", 0x080000, 0x080000, CRC(cb8425a3) SHA1(655afa295fbe99acc79c4004f03ed832560cff5b) )
+
+	ROM_REGION(0x200, "plds", 0)        /* Protection, bruteforced and recreated for GAL16V8 */
+	ROM_LOAD("tl-9", 0x000000, 0x117, BAD_DUMP CRC(3b62882d) SHA1(a590648cb013f20d837f18ddb2e839a89bac5fcb))
+ROM_END
+
 ROM_START( thunderlbl )
 	ROM_REGION( 0x010000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "20.g11", 0x000000, 0x008000, CRC(83500006) SHA1(f078e614078296df48bb8b953c3ba88f6f288255) )
@@ -12591,7 +12610,8 @@ GAME( 1989, drgnunit,  0,        drgnunit,  drgnunit,  seta_state,     empty_ini
 
 GAME( 1989, wits,      0,        wits,      wits,      seta_state,     empty_init,     ROT0,   "Athena (Visco license)",    "Wit's (Japan)" , 0) // Country/License: DSW
 
-GAME( 1990, thunderl,   0,       thunderl,  thunderl,  thunderl_state, empty_init,     ROT270, "Seta",                      "Thunder & Lightning" , 0) // Country/License: DSW
+GAME( 1990, thunderl,   0,       thunderl,  thunderl,  thunderl_state, empty_init,     ROT270, "Seta",                      "Thunder & Lightning (set 1)" , 0) // Country/License: DSW
+GAME( 1990, thunderla,  thunderl,thunderl,  thunderl,  thunderl_state, empty_init,     ROT270, "Seta",                      "Thunder & Lightning (set 2)" , 0) // Country/License: DSW
 GAME( 1991, thunderlbl, thunderl,thunderlbl,thunderlbl,thunderl_state, empty_init,     ROT270, "bootleg (Hyogo)",           "Thunder & Lightning (bootleg with Tetris sound, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // Country/License: DSW
 GAME( 1990, thunderlbl2,thunderl,thunderlbl,thunderl,  thunderl_state, empty_init,     ROT270, "bootleg",                   "Thunder & Lightning (bootleg with Tetris sound, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // Country/License: DSW
 
