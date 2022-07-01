@@ -39520,7 +39520,7 @@ specialp                        //
 specimx                         //
 unga                            //
 
-@source:misc/special_gambl.cpp
+@source:ussr/special_gambl.cpp
 dindice                         //
 
 @source:sinclair/specpls3.cpp

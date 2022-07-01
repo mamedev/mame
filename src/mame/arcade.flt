@@ -868,7 +868,6 @@ misc/smotor.cpp
 misc/smsmcorp.cpp
 misc/sothello.cpp
 misc/spdamjes.cpp
-misc/special_gambl.cpp
 misc/spool99.cpp
 misc/sprcros2.cpp
 misc/ssingles.cpp
@@ -1496,6 +1495,7 @@ upl/ninjakd2.cpp
 upl/nova2001.cpp
 upl/xxmissio.cpp
 ussr/istrebiteli.cpp
+ussr/special_gambl.cpp
 ussr/tiamc1.cpp
 valadon/bagman.cpp
 valadon/tankbust.cpp
