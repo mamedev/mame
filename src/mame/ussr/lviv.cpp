@@ -486,5 +486,5 @@ ROM_START(lviv)
 	ROMX_LOAD("lvivp.bin", 0x0000, 0x4000, CRC(f171c282) SHA1(c7dc2bdb02400e6b5cdcc50040eb06f506a7ed84), ROM_BIOS(2))
 ROM_END
 
-/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY        FULLNAME      FLAGS */
-COMP( 1989, lviv, 0,      0,      lviv,    lviv,  lviv_state, empty_init, "V. I. Lenin", "PK-01 Lviv", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                         FULLNAME      FLAGS */
+COMP( 1989, lviv, 0,      0,      lviv,    lviv,  lviv_state, empty_init, "Lviv Polytechnical Institute", "PK-01 Lviv", MACHINE_SUPPORTS_SAVE )
