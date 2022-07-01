@@ -1424,7 +1424,7 @@ apexc                           // 1955(?) APEXC: All-Purpose Electronic X-ray C
 apfimag                         //
 apfm1000                        //
 
-@source:sssr/apogee.cpp
+@source:ussr/apogee.cpp
 apogee                          //
 
 @source:apollo/apollo.cpp
@@ -1586,7 +1586,7 @@ tunixha                         // Tunix Home Arcade
 tvg2000                         // Schmid TVG 2000
 vdmaster                        // Video Master
 
-@source:sssr/argo.cpp
+@source:ussr/argo.cpp
 argo                            //
 
 @source:skeleton/argox.cpp
@@ -9444,7 +9444,7 @@ t3210                           //
 bitgrpha                        //
 bitgrphb                        //
 
-@source:sssr/bk.cpp
+@source:ussr/bk.cpp
 bk0010                          //
 bk001001                        //
 bk0010fd                        //
@@ -10642,7 +10642,7 @@ firebatl                        // (c) 1984 Taito
 @source:skeleton/clxvme186.cpp
 clxvme186                       //
 
-@source:sssr/cm1800.cpp
+@source:ussr/cm1800.cpp
 cm1800                          //
 
 @source:fairlight/cmi.cpp
@@ -12217,7 +12217,7 @@ leadang                         // (c) 1988 Seibu Kaihatsu
 popnrun                         // (c) 1987 Seibu Kaihatsu + Yukai Tsukai
 popnruna                        // (c) 1987 Seibu Kaihatsu + Yukai Tsukai
 
-@source:sssr/debut.cpp
+@source:ussr/debut.cpp
 debutm
 
 @source:dataeast/dec0.cpp
@@ -12801,10 +12801,10 @@ duet16                          //
 @source:igs/dunhuang.cpp
 dunhuang                        // (c) 1995
 
-@source:sssr/dvk_kcgd.cpp
+@source:ussr/dvk_kcgd.cpp
 dvk_kcgd                        //
 
-@source:sssr/dvk_ksm.cpp
+@source:ussr/dvk_ksm.cpp
 dvk_ksm                         //
 
 @source:misc/dwarfd.cpp
@@ -17374,7 +17374,7 @@ ikki                            // TVG17 (c) 1985 Sun Electronics (Japan)
 @source:skeleton/ikt5a.cpp
 ikt5a                           //
 
-@source:sssr/im01.cpp
+@source:ussr/im01.cpp
 im01
 im01t
 im05
@@ -17451,7 +17451,7 @@ intlc440                        //
 @source:intel/intellec8.cpp
 intlc8                          //
 
-@source:sssr/intellect02.cpp
+@source:ussr/intellect02.cpp
 intel02                         //
 
 @source:interpro/interpro.cpp
@@ -17554,7 +17554,7 @@ isld_vortex                     //
 istellar                        // (c) 1983 Funai / Gakken
 istellar2                       // (c) 1984 Funai / Gakken
 
-@source:sssr/istrebiteli.cpp
+@source:ussr/istrebiteli.cpp
 istreb                          //
 motogonki                       //
 
@@ -20464,7 +20464,7 @@ lvcardsa                        // (c) 1985 Tehkan
 lvpoker                         // ???? - (c) 1985 Tehkan
 ponttehk                        // 6011 - (c) 1985 Tehkan
 
-@source:sssr/lviv.cpp
+@source:ussr/lviv.cpp
 lviv                            // Lviv/L'vov
 
 @source:capcom/lwings.cpp
@@ -23889,7 +23889,7 @@ mikiehs                         // GX469 (c) 1984
 mikiej                          // GX469 (c) 1984
 mikiek                          // GX469 (c) 1984
 
-@source:sssr/mikro80.cpp
+@source:ussr/mikro80.cpp
 kristall2                       //
 mikro80                         //
 radio99                         //
@@ -23898,7 +23898,7 @@ radio99                         //
 mm1m6                           //
 mm1m7                           //
 
-@source:sssr/mikrosha.cpp
+@source:ussr/mikrosha.cpp
 m86rk                           //
 mikrosha                        //
 
@@ -24053,13 +24053,13 @@ mk1forth                        // (c) 2003 Andrew Holme
 @source:trainer/mk14.cpp
 mk14                            //
 
-@source:sssr/mk85.cpp
+@source:ussr/mk85.cpp
 mk85                            //
 
-@source:sssr/mk90.cpp
+@source:ussr/mk90.cpp
 mk90                            //
 
-@source:sssr/mk98.cpp
+@source:ussr/mk98.cpp
 mk98                            //
 
 @source:multitch/mkit09.cpp
@@ -31118,10 +31118,10 @@ blkbustr                        // (c) 1983 Kiwako + ECI license
 crazyblk                        // (c) 1983 Kiwako + ECI license
 mrjong                          // (c) 1983 Kiwako
 
-@source:sssr/ms0515.cpp
+@source:ussr/ms0515.cpp
 ms0515                          //
 
-@source:sssr/ms6102.cpp
+@source:ussr/ms6102.cpp
 ms6102                          //
 
 @source:jaleco/ms32.cpp
@@ -33906,7 +33906,7 @@ ojankocb                        // [1986] V-System Co. (Japan)
 ojankohs                        // [1988] V-System Co. (Japan)
 ojankoy                         // [1986] V-System Co. (Japan)
 
-@source:sssr/okean240.cpp
+@source:ussr/okean240.cpp
 okean240                        //
 okean240a                       //
 okean240t                       //
@@ -33976,7 +33976,7 @@ prav8d                          // 1985 Pravetz 8D
 prav8dd                         // 1989 Pravetz 8D (Disk ROM)
 telstrat                        // ??? Oric Telestrat/Stratos
 
-@source:sssr/orion.cpp
+@source:ussr/orion.cpp
 orion128                        //
 orionide                        //
 orionidm                        //
@@ -34233,7 +34233,7 @@ parodiusa                       // GX955 (c) 1990 (Asia)
 parodiuse                       // GX955 (c) 1990 (World)
 parodiusj                       // GX955 (c) 1990 (Japan)
 
-@source:sssr/partner.cpp
+@source:ussr/partner.cpp
 partner                         //
 
 @source:misc/pasha2.cpp
@@ -35551,12 +35551,12 @@ pitnrun                         // PR  (c) 1984 Taito Corporation
 pitnruna                        // PR  (c) 1984 Taito Corporation
 jumpkun                         // prototype
 
-@source:sssr/pk8000.cpp
+@source:ussr/pk8000.cpp
 hobby                           //
 pk8002                          //
 vesta                           //
 
-@source:sssr/pk8020.cpp
+@source:ussr/pk8020.cpp
 bk8t                            //
 kontur                          //
 korvet                          //
@@ -36345,7 +36345,7 @@ px4p                            // 1985 Epson PX-4+
 @source:epson/px8.cpp
 px8                             //
 
-@source:sssr/pyl601.cpp
+@source:ussr/pyl601.cpp
 pyl601                          //
 pyl601a                         //
 
@@ -36471,7 +36471,7 @@ rabbitjt                        // (c) 1996 Electronic Arts
 @source:misc/radikaldarts.cpp
 radikaldrt                      // (c) 2011? Gaelco Darts
 
-@source:sssr/radio86.cpp
+@source:ussr/radio86.cpp
 impuls03                        //
 kr03                            //
 mikron2                         //
@@ -39186,10 +39186,10 @@ spielbud                        // (c) 1985 ADP
 @source:skeleton/slsstars.cpp
 slsstars                        //
 
-@source:sssr/sm1800.cpp
+@source:ussr/sm1800.cpp
 sm1800                          //
 
-@source:sssr/sm7238.cpp
+@source:ussr/sm7238.cpp
 sm7238                          //
 
 @source:sony/smc777.cpp
@@ -39508,7 +39508,7 @@ hc128                           // 1991 HC-128
 spec128                         // 1986 ZX Spectrum 128
 specpls2                        // 1986 ZX Spectrum +2
 
-@source:sssr/special.cpp
+@source:ussr/special.cpp
 anakonda                        //
 erik                            //
 kharkovsky                      //
@@ -41622,7 +41622,7 @@ ti990_10                        // 1975 TI 990/10
 ti990_4                         // 1976 TI 990/4
 ti990_4v                        // 1976 TI 990/4 with video display terminal
 
-@source:sssr/tiamc1.cpp
+@source:ussr/tiamc1.cpp
 bilyard                         // (c) 1988 Terminal
 konek                           // (c) 1988 Terminal
 koroleva                        // (c) 1988 Terminal
@@ -42441,7 +42441,7 @@ paclandp                        // (c) 1989 Namco
 @source:motorola/uchroma68.cpp
 uchroma68                       // 1980 Motorola evaluation board for the MC6847
 
-@source:sssr/uknc.cpp
+@source:ussr/uknc.cpp
 uknc                            //
 
 @source:konami/ultraman.cpp
@@ -42482,7 +42482,7 @@ zeropnt2                        // (c) 1999
 zeropnta                        // (c) 1998
 zeropntj                        // (c) 1998 (Japan)
 
-@source:sssr/unior.cpp
+@source:ussr/unior.cpp
 unior                           //
 
 @source:skeleton/unistar.cpp
@@ -42517,7 +42517,7 @@ usg82                           // (c) 1988
 usg83x                          // (c) 1988
 usgames                         // (c) 1992
 
-@source:sssr/ut88.cpp
+@source:ussr/ut88.cpp
 ut88                            //
 ut88mini                        //
 
@@ -42648,7 +42648,7 @@ vd56sp                          //
 @source:mera/vdm7932x.cpp
 vdm79322                        //
 
-@source:sssr/vector06.cpp
+@source:ussr/vector06.cpp
 krista2                         //
 pk6128c                         //
 vec1200                         //
@@ -43077,7 +43077,7 @@ vt330                           // 1987 Digital Equipment Corporation
 vt420                           // 1990 Digital Equipment Corporation
 vt520                           // 1994 Digital Equipment Corporation
 
-@source:sssr/vta2000.cpp
+@source:ussr/vta2000.cpp
 vta2000                         //
 
 @source:vtech/vtech1.cpp

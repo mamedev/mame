@@ -1515,7 +1515,6 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"sony",
 		"sony_news",
 		"sord",
-		"sssr",
 		"stern",
 		"stm",
 		"subsino",
@@ -1565,6 +1564,7 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"univers",
 		"upl",
 		"usp",
+		"ussr",
 		"valadon",
 		"venture",
 		"verifone",
@@ -1893,10 +1893,10 @@ files {
 	MAME_DIR .. "src/mame/commodore/*.h",
 }
 
-createMAMEProjects(_target, _subtarget, "sssr")
+createMAMEProjects(_target, _subtarget, "ussr")
 files {
-	MAME_DIR .. "src/mame/sssr/*.cpp",
-	MAME_DIR .. "src/mame/sssr/*.h",
+	MAME_DIR .. "src/mame/ussr/*.cpp",
+	MAME_DIR .. "src/mame/ussr/*.h",
 }
 
 createMAMEProjects(_target, _subtarget, "cce")

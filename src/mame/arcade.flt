@@ -1315,8 +1315,6 @@ snk/snk6502.cpp
 snk/snk68.cpp
 sony/taitogn.cpp
 sony/zn.cpp
-sssr/istrebiteli.cpp
-sssr/tiamc1.cpp
 stern/astinvad.cpp
 stern/berzerk.cpp
 stern/cliffhgr.cpp
@@ -1497,6 +1495,8 @@ upl/mouser.cpp
 upl/ninjakd2.cpp
 upl/nova2001.cpp
 upl/xxmissio.cpp
+ussr/istrebiteli.cpp
+ussr/tiamc1.cpp
 valadon/bagman.cpp
 valadon/tankbust.cpp
 venture/looping.cpp
