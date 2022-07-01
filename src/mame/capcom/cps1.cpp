@@ -708,6 +708,20 @@ void cps_state::varthb2_map(address_map &map)
 	map(0xff0000, 0xffffff).ram().share("mainram");
 }
 
+void cps_state::varthb3_map(address_map &map) // TODO: check everything
+{
+	map(0x000000, 0x3fffff).rom();
+	map(0x880000, 0x880007).portr("IN1");            /* Player input ports */
+	map(0x880008, 0x88000f).r(FUNC(cps_state::cps1_hack_dsw_r));            /* System input ports / Dip Switches */
+	map(0x800030, 0x800037).w(FUNC(cps_state::cps1_coinctrl_w));
+	map(0x800100, 0x80013f).w(FUNC(cps_state::cps1_cps_a_w)).share("cps_a_regs");  /* CPS-A custom */
+	map(0x800140, 0x80017f).rw(FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share("cps_b_regs");
+	map(0x800180, 0x800187).w(FUNC(cps_state::cps1_soundlatch_w));    /* Sound command */
+	map(0x800188, 0x80018f).w(FUNC(cps_state::cps1_soundlatch2_w));   /* Sound timer fade */
+	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
+	map(0xff0000, 0xffffff).ram().share("mainram");
+}
+
 /***********************************************************
              INPUT PORTS, DIPs
 ***********************************************************/
@@ -3815,6 +3829,12 @@ void cps_state::varthb2(machine_config &config)
 {
 	cps1_12MHz(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps_state::varthb2_map);
+}
+
+void cps_state::varthb3(machine_config &config)
+{
+	cps1_12MHz(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cps_state::varthb3_map);
 }
 
 
@@ -11798,6 +11818,27 @@ ROM_START( varthb2 )
 	ROM_LOAD( "va_19.12c", 0x20000, 0x20000, CRC(0610a4ac) SHA1(3da02ea6a7a56c85de898806d2a1cf6bc526c1b3) )
 ROM_END
 
+ROM_START( varthb3 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "pd1.bin", 0x000000, 0x80000, CRC(8208c0d7) SHA1(335cbc183abac9a79d7a84ef9c713217ccbf27bb) )
+	ROM_LOAD16_BYTE( "c6.bin",  0x000001, 0x80000, CRC(7f654421) SHA1(05e87540bfe32a286c663782a788c5d573616dc1) )
+	ROM_LOAD16_BYTE( "pd2.bin", 0x100000, 0x20000, CRC(d8325c94) SHA1(59c09948ad48e434782b97cfb1eefee0b23dc3da) )
+	ROM_LOAD16_BYTE( "c5.bin",  0x100001, 0x20000, CRC(6152277d) SHA1(e93ae5c74cfe8d8c4bf6f3cd802f0e30192ffa2c) )
+
+	ROM_REGION( 0x600000, "gfx", ROMREGION_ERASE00 )
+	ROM_LOAD32_BYTE( "rom1.bin", 0x000000, 0x80000, CRC(473961b3) SHA1(e969ead42629607cecd8f38005d65085a9dd5ee9) )
+	ROM_LOAD32_BYTE( "rom3.bin", 0x000001, 0x80000, CRC(9b50384f) SHA1(a06efe61a4b74e3240807140d7704f7bffeb5f81) )
+	ROM_LOAD32_BYTE( "rom5.bin", 0x000002, 0x80000, CRC(516a4eea) SHA1(2e9b2d32344db926df2a980f1b0a8b34eda70126) )
+	ROM_LOAD32_BYTE( "rom7.bin", 0x000003, 0x80000, CRC(81023052) SHA1(a96dd88483807b6f7520fb42dbc0cdd7bfa105c9) )
+
+	ROM_REGION( 0x18000, "audiocpu", 0 )
+	ROM_LOAD( "j4.bin", 0x00000, 0x08000, CRC(7a99446e) SHA1(ca027f41e3e58be5abc33ad7380746658cb5380a) )
+	ROM_CONTINUE(       0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "j1.bin", 0x00000, 0x40000, CRC(1547e595) SHA1(27f47b1afd9700afd9e8167d7e4e2888be34a9e5) )
+ROM_END
+
 /* B-Board 89625B-1 */
 ROM_START( qad )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
@@ -14496,6 +14537,7 @@ GAME( 1992, varthu,      varth,    cps1_12MHz, varth,    cps_state, init_cps1,  
 GAME( 1992, varthj,      varth,    cps1_12MHz, varth,    cps_state, init_cps1,     ROT270, "Capcom", "Varth: Operation Thunderstorm (Japan 920714)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, varthjr,     varth,    cps1_12MHz, varth,    cps_state, init_cps1,     ROT270, "Capcom", "Varth: Operation Thunderstorm (Japan Resale Ver. 920714)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, varthb2,     varth,    varthb2,    varth,    cps_state, init_cps1,     ROT270, "bootleg", "Varth: Operation Thunderstorm (bootleg, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )  // World 920612
+GAME( 1992, varthb3,     varth,    varthb3,    varth,    cps_state, init_cps1,     ROT270, "bootleg", "Varth: Operation Thunderstorm (bootleg, set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // USA 920612, different 'mapper'?
 GAME( 1992, qad,         0,        cps1_12MHz, qad,      cps_state, init_cps1,     ROT0,   "Capcom", "Quiz & Dragons: Capcom Quiz Game (USA 920701)", MACHINE_SUPPORTS_SAVE ) // 12MHz verified
 GAME( 1994, qadjr,       qad,      cps1_12MHz, qadjr,    cps_state, init_cps1,     ROT0,   "Capcom", "Quiz & Dragons: Capcom Quiz Game (Japan Resale Ver. 940921)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, wof,         0,        qsound,     wof,      cps_state, init_wof,      ROT0,   "Capcom", "Warriors of Fate (World 921031)", MACHINE_SUPPORTS_SAVE )   // "ETC"
