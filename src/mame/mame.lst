@@ -40434,7 +40434,7 @@ superdq                         // ???? (c) 1984
 superdqa                        // ???? (c) 1984
 superdqs                        // ???? (c) 1984
 
-@source:misc/superga2.cpp
+@source:apple/superga2.cpp
 kuzmich
 
 @source:taito/superqix.cpp

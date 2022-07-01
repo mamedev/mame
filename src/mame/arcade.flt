@@ -22,6 +22,7 @@ amiga/arsystems.cpp
 amiga/cubo.cpp
 amiga/mquake.cpp
 amiga/upscope.cpp
+apple/superga2.cpp
 aristocr/aristmk4.cpp
 aristocr/aristmk6.cpp
 aristocr/caswin.cpp
@@ -881,7 +882,6 @@ misc/su2000.cpp
 misc/summit.cpp
 misc/sumt8035.cpp
 misc/supercrd.cpp
-misc/superga2.cpp
 misc/supertnk.cpp
 misc/tapatune.cpp
 misc/tattack.cpp
