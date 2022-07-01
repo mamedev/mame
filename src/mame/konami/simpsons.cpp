@@ -172,15 +172,13 @@ void simpsons_state::z80_arm_nmi_w(uint8_t data)
 	// MAME instead does not emulate memory cycle timing and checks the NMI before executing an instruction,
 	// so we have to manually delay the NMI until the following HALT instruction has started.
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	m_nmi_enabled = machine().time().as_ticks(m_audiocpu->clock()) + 3;
+	m_nmi_blocked->adjust(m_audiocpu->cycles_to_attotime(4));
 }
 
 void simpsons_state::z80_nmi_w(int state)
 {
-	if(state && m_nmi_enabled && machine().time().as_ticks(m_audiocpu->clock()) > m_nmi_enabled) {
-		m_nmi_enabled = 0;
+	if (state && !m_nmi_blocked->enabled())
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	}
 }
 
 void simpsons_state::z80_map(address_map &map)
