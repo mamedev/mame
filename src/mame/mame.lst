@@ -3364,7 +3364,7 @@ triviaes5                       // (c) 19?? (Maibesa hardware)
 @source:banctec/banctec.cpp
 banctec                         // BancTec ESeries panel
 
-@source:bandai/bandai_design_master.cpp
+@source:bandai/design_master.cpp
 bdesignm
 
 @source:sanritsu/bankp.cpp

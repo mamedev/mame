@@ -76,7 +76,7 @@ att/att630.cpp
 att/unixpc.cpp
 aviion/aviion88k.cpp
 banctec/banctec.cpp
-bandai/bandai_design_master.cpp
+bandai/design_master.cpp
 bandai/rx78.cpp
 bandai/sv8000.cpp
 bandai/tamag1.cpp
