@@ -1269,7 +1269,6 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"appliedtech",
 		"arcadia",
 		"aristocr",
-		"at",
 		"atari",
 		"atlus",
 		"att",
@@ -1290,6 +1289,7 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"cantab",
 		"capcom",
 		"casio",
+		"chess",
 		"commodore",
 		"cce",
 		"ccs",
@@ -1356,6 +1356,7 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"gridcomp",
 		"grundy",
 		"h01x",
+		"handheld",
 		"hartung",
 		"hds",
 		"heathkit",
@@ -1368,7 +1369,6 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"hp",
 		"husky",
 		"ibm6580",
-		"ibmpc",
 		"ie15",
 		"igs",
 		"igt",
@@ -1420,8 +1420,6 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"miltonbradley",
 		"mips",
 		"misc",
-		"misc_chess",
-		"misc_handheld",
 		"mit",
 		"mits",
 		"mitsubishi",
@@ -1581,7 +1579,6 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"wing",
 		"wyse",
 		"xerox",
-		"xussrpc",
 		"yamaha",
 		"yunsung",
 		"zaccaria",
@@ -1767,11 +1764,6 @@ files {
 createMAMEProjects(_target, _subtarget, "aristocr")
 files {
 	MAME_DIR .. "src/mame/aristocr/*.cpp",
-}
-
-createMAMEProjects(_target, _subtarget, "at")
-files {
-	MAME_DIR .. "src/mame/at/*.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "atari")
@@ -2334,11 +2326,6 @@ files {
 	MAME_DIR .. "src/mame/ibm6580/*.h",
 }
 
-createMAMEProjects(_target, _subtarget, "ibmpc")
-files {
-	MAME_DIR .. "src/mame/ibmpc/*.cpp",
-}
-
 createMAMEProjects(_target, _subtarget, "ie15")
 files {
 	MAME_DIR .. "src/mame/ie15/*.cpp",
@@ -2858,12 +2845,6 @@ createMAMEProjects(_target, _subtarget, "palm")
 files {
 	MAME_DIR .. "src/mame/palm/*.cpp",
 	MAME_DIR .. "src/mame/palm/*.ipp",
-}
-
-createMAMEProjects(_target, _subtarget, "pc")
-files {
-	MAME_DIR .. "src/mame/pc/*.cpp",
-	MAME_DIR .. "src/mame/pc/*.h",
 }
 
 createMAMEProjects(_target, _subtarget, "pce")
@@ -3505,12 +3486,6 @@ files {
 	MAME_DIR .. "src/mame/xerox/*.h",
 }
 
-createMAMEProjects(_target, _subtarget, "xussrpc")
-files {
-	MAME_DIR .. "src/mame/xussrpc/*.cpp",
-	MAME_DIR .. "src/mame/xussrpc/*.h",
-}
-
 createMAMEProjects(_target, _subtarget, "yamaha")
 files {
 	MAME_DIR .. "src/mame/yamaha/*.cpp",
@@ -3560,21 +3535,27 @@ files {
 -- remaining drivers
 --------------------------------------------------
 
+createMAMEProjects(_target, _subtarget, "chess")
+files {
+	MAME_DIR .. "src/mame/chess/*.cpp",
+}
+
+createMAMEProjects(_target, _subtarget, "handheld")
+files {
+	MAME_DIR .. "src/mame/handheld/*.cpp",
+	MAME_DIR .. "src/mame/handheld/*.h",
+}
+
 createMAMEProjects(_target, _subtarget, "misc")
 files {
 	MAME_DIR .. "src/mame/misc/*.cpp",
 	MAME_DIR .. "src/mame/misc/*.h",
 }
 
-createMAMEProjects(_target, _subtarget, "misc_chess")
+createMAMEProjects(_target, _subtarget, "pc")
 files {
-	MAME_DIR .. "src/mame/misc_chess/*.cpp",
-}
-
-createMAMEProjects(_target, _subtarget, "misc_handheld")
-files {
-	MAME_DIR .. "src/mame/misc_handheld/*.cpp",
-	MAME_DIR .. "src/mame/misc_handheld/*.h",
+	MAME_DIR .. "src/mame/pc/*.cpp",
+	MAME_DIR .. "src/mame/pc/*.h",
 }
 
 createMAMEProjects(_target, _subtarget, "skeleton")

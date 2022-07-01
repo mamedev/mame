@@ -345,17 +345,6 @@ gametron/gotya.cpp
 gametron/sbugger.cpp
 gottlieb/exterm.cpp
 gottlieb/gottlieb.cpp
-ibmpc/calchase.cpp
-ibmpc/fruitpc.cpp
-ibmpc/igspc.cpp
-ibmpc/pangofun.cpp
-ibmpc/paokaipc.cpp
-ibmpc/pcat_dyn.cpp
-ibmpc/pcat_nit.cpp
-ibmpc/pcxt.cpp
-ibmpc/quakeat.cpp
-ibmpc/queen.cpp
-ibmpc/sis630.cpp
 igs/cabaret.cpp
 igs/dunhuang.cpp
 igs/funtech.cpp
@@ -1065,6 +1054,17 @@ pacman/jrpacman.cpp
 pacman/pacman.cpp
 pacman/pengo.cpp
 pacman/schick.cpp
+pc/calchase.cpp
+pc/fruitpc.cpp
+pc/igspc.cpp
+pc/pangofun.cpp
+pc/paokaipc.cpp
+pc/pcat_dyn.cpp
+pc/pcat_nit.cpp
+pc/pcxt.cpp
+pc/quakeat.cpp
+pc/queen.cpp
+pc/sis630.cpp
 pce/ggconnie.cpp
 pce/paranoia.cpp
 pce/tourvis.cpp
@@ -1570,7 +1570,7 @@ zaccaria/zaccaria.cpp
 -saturnkr
 -vsaturn
 
-//ibmpc/sis630.cpp
+//pc/sis630.cpp
 -shutms11
 
 //miltonbradley/vectrex.cpp
