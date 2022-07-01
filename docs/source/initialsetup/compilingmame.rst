@@ -676,10 +676,10 @@ variables.
 Issues affecting Microsoft Visual Studio
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Microsoft introduced a new version of XAudio2 with Windows 8 that’s with the
-version included with DirectX for prior Windows versions at the API level.
-Newer versions of the Microsoft Windows SDK include headers and libraries for
-the new version of XAudio2.  By default, the target Windows version is set to
+Microsoft introduced a new version of XAudio2 with Windows 8 that’s incompatible
+with the version included with DirectX for prior Windows versions at the API
+level.  Newer versions of the Microsoft Windows SDK include headers and libraries
+for the new version of XAudio2.  By default, the target Windows version is set to
 Windows Vista (6.0) when compiling MAME, which prevents the use this version of
 the XAudio2 headers and libraries.  To build MAME with XAudio2 support using the
 Microsoft Windows SDK, you must do one of the following:
