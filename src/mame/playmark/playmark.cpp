@@ -1381,12 +1381,8 @@ ROM_START( bigtwin )
 	ROM_LOAD16_BYTE( "2.302",        0x000000, 0x80000, CRC(e6767f60) SHA1(ec0ba1c786e6fde04601c2f3f619e3c6545f9239) )
 	ROM_LOAD16_BYTE( "3.301",        0x000001, 0x80000, CRC(5aba6990) SHA1(4f664a91819fdd27821fa607425701d83fcbd8ce) )
 
-	ROM_REGION( 0x1000, "audiopic", ROMREGION_ERASE00 ) // sound (PIC16C57)
-//  ROM_LOAD( "16c57hs.bin",  0x0000, 0x1000, CRC(b4c95cc3) SHA1(7fc9b141e7782aa5c17310ee06db99d884537c30) )
-	// ROM will be copied here by the init code from "user1"
-
-	ROM_REGION( 0x3000, "user1", 0 )
-	ROM_LOAD( "pic16c57-hs_bigtwin_015.hex",  0x0000, 0x2d4c, CRC(c07e9375) SHA1(7a6714ab888ea6e37bc037bc7419f0998868cfce) )
+	ROM_REGION( 0x2000, "audiopic", 0 ) // sound (PIC16C57)
+	ROM_LOAD( "pic16c57-hs_bigtwin_015.bin",  0x0000, 0x2000, CRC(bd26d643) SHA1(c0ecd9a24fd950ee2a62bf914c0aad2edb02caff) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "4.311",        0x00000, 0x40000, CRC(6f628fbc) SHA1(51cdee457aef79fef5d89d30a173afdf13fbb2ef) )
@@ -1409,12 +1405,8 @@ ROM_START( bigtwinb )
 	ROM_LOAD16_BYTE( "2.u67", 0x00000, 0x20000, CRC(f5cdf1a9) SHA1(974328cf2b4ec5834a519e3300ee1ad8bc4d5c04) )
 	ROM_LOAD16_BYTE( "3.u66", 0x00001, 0x20000, CRC(084e990f) SHA1(d7c2e08c7f7c7b453dd19dcf1f30bad46d943c8a) )
 
-	ROM_REGION( 0x1000, "audiopic", ROMREGION_ERASE00 ) // sound (PIC16C57)
-//  ROM_LOAD( "16c57hs.bin",  0x0000, 0x1000, CRC(b4c95cc3) SHA1(7fc9b141e7782aa5c17310ee06db99d884537c30) )
-	// ROM will be copied here by the init code from "user1"
-
-	ROM_REGION( 0x3000, "user1", 0 )
-	ROM_LOAD( "pic16c57-hs_bigtwin_015.hex",  0x0000, 0x2d4c, CRC(c07e9375) SHA1(7a6714ab888ea6e37bc037bc7419f0998868cfce) )
+	ROM_REGION( 0x2000, "audiopic", 0 ) // sound (PIC16C57)
+	ROM_LOAD( "pic16c57-hs_bigtwin_015.bin",  0x0000, 0x2000, CRC(bd26d643) SHA1(c0ecd9a24fd950ee2a62bf914c0aad2edb02caff) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "4.u36", 0x000000, 0x20000, CRC(99aaeacc) SHA1(0281237722d5a94fb9831616ae2ffc8288e78e2c) )
@@ -1563,11 +1555,8 @@ ROM_START( excelsr ) // PCB marked EXC
 	ROM_LOAD16_BYTE( "20.u305", 0x200001, 0x80000, CRC(8692afe9) SHA1(b4411bad64a9a6efd8eb13dcf7c5eebfb5681f3d) )
 	ROM_LOAD16_BYTE( "17.u306", 0x200000, 0x80000, CRC(978f9a6b) SHA1(9514b97f071fd20740218a58af877765beffedad) )
 
-	ROM_REGION( 0x1000, "audiopic", ROMREGION_ERASE00 ) // sound (PIC16C57)
-	// ROM will be copied here by the init code from "user1"
-
-	ROM_REGION( 0x3000, "user1", 0 )
-	ROM_LOAD( "pic16c57-hs_excelsior_i015.hex", 0x0000, 0x2d4c, CRC(022c6941) SHA1(8ead40bfa7aa783b1ce62bd6cfa673cb876e29e7) )
+	ROM_REGION( 0x2000, "audiopic", ROMREGION_ERASE00 ) // sound (PIC16C57)
+	ROM_LOAD( "pic16c57-hs_excelsior_i015.bin",  0x0000, 0x2000, CRC(809194ab) SHA1(ef206a2715a7811ade0a4bf6db74f2d3f9c18219) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "26.u311",      0x000000, 0x80000, CRC(c171c059) SHA1(7bc45ef1d588f5f55a461adb91bca382155c1059) )
@@ -1595,11 +1584,8 @@ ROM_START( excelsra )
 	ROM_LOAD16_BYTE( "20.u305", 0x200001, 0x80000, CRC(8692afe9) SHA1(b4411bad64a9a6efd8eb13dcf7c5eebfb5681f3d) )
 	ROM_LOAD16_BYTE( "17.u306", 0x200000, 0x80000, CRC(978f9a6b) SHA1(9514b97f071fd20740218a58af877765beffedad) )
 
-	ROM_REGION( 0x1000, "audiopic", ROMREGION_ERASE00 ) // sound (PIC16C57)
-	// ROM will be copied here by the init code from "user1"
-
-	ROM_REGION( 0x3000, "user1", 0 )
-	ROM_LOAD( "pic16c57-hs_excelsior_i015.hex", 0x0000, 0x2d4c, CRC(022c6941) SHA1(8ead40bfa7aa783b1ce62bd6cfa673cb876e29e7) )
+	ROM_REGION( 0x2000, "audiopic", ROMREGION_ERASE00 ) // sound (PIC16C57)
+	ROM_LOAD( "pic16c57-hs_excelsior_i015.bin",  0x0000, 0x2000, CRC(809194ab) SHA1(ef206a2715a7811ade0a4bf6db74f2d3f9c18219) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "26.u311",      0x000000, 0x80000, CRC(c171c059) SHA1(7bc45ef1d588f5f55a461adb91bca382155c1059) )
@@ -1720,12 +1706,9 @@ ROM_START( hotmind ) // PCB marked Hard Times 28-06-94
 	ROM_LOAD16_BYTE( "21.u67",       0x00000, 0x20000, CRC(e9000f7f) SHA1(c19fee7b774d3f30f4d4025a63ec396ec119c855) )
 	ROM_LOAD16_BYTE( "22.u66",       0x00001, 0x20000, CRC(2c518ec5) SHA1(6d9e81ddb5793d64e22dc0254519b947f6ec6954) )
 
-	ROM_REGION( 0x1000, "audiopic", ROMREGION_ERASE00 ) // sound (PIC16C57)
-	// ROM will be copied here by the init code from "user1"
-
-	ROM_REGION( 0x3000, "user1", 0 )
-	ROM_LOAD( "hotmind_pic16c57-hs_io15.hex", 0x0000, 0x2d4c, BAD_DUMP CRC(f3300d13) SHA1(78892453c7374ea3d1606cdb81197cc466e2a8c5) )  // protected, contains upper nibble?
-	ROM_LOAD( "hotmind_pic16c57.hex",         0x0000, 0x2d4c, BAD_DUMP CRC(11957803) SHA1(c2f87659819bfcf3a5b43fbccf81988c43b9c9c8) )  // Using modified Excelsior PIC code to make it suite this game
+	ROM_REGION( 0x2000, "audiopic", ROMREGION_ERASE00 ) // sound (PIC16C57)
+	ROM_LOAD( "hotmind_pic16c57-hs_io15.bin", 0x0000, 0x2000, BAD_DUMP CRC(9a46fe7c) SHA1(cc5bba2a302b4339f4df2f633d3f36a42ad598fd) )  // Protected, contains upper nibble?
+	ROM_LOAD( "hotmind_pic16c57.bin",         0x0000, 0x2000, BAD_DUMP CRC(9ed01fd2) SHA1(bbcb3665ba42cdbd1269b1fcf39925a1d5af9d9e) )  // Using modified Excelsior PIC code to make it suite this game
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "23.u36",       0x000000, 0x10000, CRC(ddcf60b9) SHA1(0c0fbc44131cb7d36c21bf5aead87b498c5684f5) )
@@ -1747,12 +1730,12 @@ ROM_START( hotmind ) // PCB marked Hard Times 28-06-94
 	ROM_LOAD( "20.io13",      0x00000, 0x40000, CRC(0bf3a3e5) SHA1(2ae06f37a6bcd20bc5fbaa90d970aba2ebf3cf5a) )
 
 	ROM_REGION( 0x8000, "plds", 0 )     // These were read protected
-	ROM_LOAD( "palce16v8h-25-pc4_u58.jed",   0x0000, 0xb89,  BAD_DUMP CRC(ba88c1da) SHA1(9b55e96eee44a467bdfbf760137ccb2fb3afedf0) )
-	ROM_LOAD( "palce16v8h-25-pc4_u182.jed",  0x0000, 0xb89,  BAD_DUMP CRC(ba88c1da) SHA1(9b55e96eee44a467bdfbf760137ccb2fb3afedf0) )
-	ROM_LOAD( "palce16v8h-25-pc4_jamma.jed", 0x0000, 0xb89,  BAD_DUMP CRC(ba88c1da) SHA1(9b55e96eee44a467bdfbf760137ccb2fb3afedf0) )  // On the Jamma Expansion board
-	ROM_LOAD( "tibpal22v10acnt_u113.jed",    0x0000, 0x1e84, BAD_DUMP CRC(94106c63) SHA1(b4b153756398cc1378411a21d503f3ab325c9cf7) )
-	ROM_LOAD( "tibpal22v10acnt_u183.jed",    0x0000, 0x1e84, BAD_DUMP CRC(95a446b6) SHA1(e47e39bc51ff16b75acb37983cc307ad421bfcc7) )
-	ROM_LOAD( "tibpal22v10acnt_u211.jed",    0x0000, 0x1e84, BAD_DUMP CRC(94106c63) SHA1(b4b153756398cc1378411a21d503f3ab325c9cf7) )
+	ROM_LOAD( "palce16v8h-25-pc4_u58.bin",   0x0000, 0x117, BAD_DUMP CRC(f2a6e529) SHA1(350f2040e2b53fa9f76a0a1bef84305a94dd8cbb) )
+	ROM_LOAD( "palce16v8h-25-pc4_u182.bin",  0x0000, 0x117, BAD_DUMP CRC(f2a6e529) SHA1(350f2040e2b53fa9f76a0a1bef84305a94dd8cbb) )
+	ROM_LOAD( "palce16v8h-25-pc4_jamma.bin", 0x0000, 0x117, BAD_DUMP CRC(f2a6e529) SHA1(350f2040e2b53fa9f76a0a1bef84305a94dd8cbb) )  // On the Jamma Expansion board
+	ROM_LOAD( "tibpal22v10acnt_u113.jed",    0x0000, 0x100, NO_DUMP )
+	ROM_LOAD( "tibpal22v10acnt_u183.jed",    0x0000, 0x100, NO_DUMP )
+	ROM_LOAD( "tibpal22v10acnt_u211.jed",    0x0000, 0x100, NO_DUMP )
 ROM_END
 
 ROM_START( luckboomh )
@@ -1761,11 +1744,8 @@ ROM_START( luckboomh )
 	ROM_LOAD16_BYTE( "22.u66",       0x00001, 0x20000, CRC(1eb72a39) SHA1(d7ea9985013fd8cb89389829dbff2f2710a2297d) )
 
 	ROM_REGION( 0x2000, "audiopic", ROMREGION_ERASE00 ) // sound (PIC16C57)
-	// ROM will be copied here by the init code from "user1"
-	ROM_LOAD( "luckyboom_pic16c57-hs_io15.bin",  0x00000, 0x2000, BAD_DUMP CRC(c4b9c78e) SHA1(e85766383b22a62f19bf272d86d53c7fb1eb5ac4) ) // protected, contains upper nibble?
-
-	ROM_REGION( 0x3000, "user1", 0 )
-	ROM_LOAD( "luckyboom_pic16c57.hex", 0x0000, 0x2d4c, BAD_DUMP CRC(5c4b5c39) SHA1(d24a097bb4a134406dd95d3ad5ed912f81a6a849) )  // Using modified Excelsior PIC code to make it suite this game
+	ROM_LOAD( "luckyboom_pic16c57-hs_io15.bin", 0x00000, 0x2000, BAD_DUMP CRC(c4b9c78e) SHA1(e85766383b22a62f19bf272d86d53c7fb1eb5ac4) ) // Protected, contains upper nibble?
+	ROM_LOAD( "luckyboom_pic16c57.bin",         0x00000, 0x2000, BAD_DUMP CRC(3f5245e2) SHA1(1654a05c2676119cb55997689a015cd67cdef8f6) ) // Using modified Excelsior PIC code to make it suite this game
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "23.u36",       0x000000, 0x10000, CRC(71840dd9) SHA1(9d0a75555dedb6fd28bb7c04b863f3ef5a1f8aac) )
@@ -1789,97 +1769,15 @@ ROM_END
 
 
 
-u8 playmark_state::playmark_asciitohex(u8 data)
-{
-	// Convert ASCII data to HEX
-
-	if ((data >= 0x30) && (data < 0x3a)) data -= 0x30;
-	data &= 0xdf;           // remove case sensitivity
-	if ((data >= 0x41) && (data < 0x5b)) data -= 0x37;
-
-	return data;
-}
-
-void playmark_state::playmark_decode_pic_hex_dump(void)
-{
-	u8 *playmark_PICROM_HEX = memregion("user1")->base();
-	u16 *playmark_PICROM = (u16 *)memregion("audiopic")->base();
-	int32_t offs, data;
-	u16 src_pos = 0;
-	u16 dst_pos = 0;
-	u8 data_hi, data_lo;
-
-	/**** Convert the PIC16C57 ASCII HEX dumps to pure HEX ****/
-	do
-	{
-		if ((playmark_PICROM_HEX[src_pos + 0] == ':') &&
-			(playmark_PICROM_HEX[src_pos + 1] == '1') &&
-			(playmark_PICROM_HEX[src_pos + 2] == '0'))
-		{
-			src_pos += 9;
-
-			for (offs = 0; offs < 32; offs += 4)
-			{
-				data_hi = playmark_asciitohex((playmark_PICROM_HEX[src_pos + offs + 0]));
-				data_lo = playmark_asciitohex((playmark_PICROM_HEX[src_pos + offs + 1]));
-				if ((data_hi <= 0x0f) && (data_lo <= 0x0f))
-				{
-					data = (data_hi <<  4) | (data_lo << 0);
-					data_hi = playmark_asciitohex((playmark_PICROM_HEX[src_pos + offs + 2]));
-					data_lo = playmark_asciitohex((playmark_PICROM_HEX[src_pos + offs + 3]));
-
-					if ((data_hi <= 0x0f) && (data_lo <= 0x0f))
-					{
-						data |= (data_hi << 12) | (data_lo << 8);
-						playmark_PICROM[dst_pos] = data;
-						dst_pos += 1;
-					}
-				}
-			}
-			src_pos += 32;
-		}
-
-		// Get the PIC16C57 Config register data
-
-		if ((playmark_PICROM_HEX[src_pos + 0] == ':') &&
-			(playmark_PICROM_HEX[src_pos + 1] == '0') &&
-			(playmark_PICROM_HEX[src_pos + 2] == '2') &&
-			(playmark_PICROM_HEX[src_pos + 3] == '1'))
-		{
-			src_pos += 9;
-
-			data_hi = playmark_asciitohex((playmark_PICROM_HEX[src_pos + 0]));
-			data_lo = playmark_asciitohex((playmark_PICROM_HEX[src_pos + 1]));
-			data = (data_hi <<  4) | (data_lo << 0);
-			data_hi = playmark_asciitohex((playmark_PICROM_HEX[src_pos + 2]));
-			data_lo = playmark_asciitohex((playmark_PICROM_HEX[src_pos + 3]));
-			data |= (data_hi << 12) | (data_lo << 8);
-
-			m_audio_pic->set_config(data);
-
-			src_pos = 0x7fff;       // Force Exit
-		}
-		src_pos += 1;
-	} while (src_pos < 0x2d4c);     // 0x2d4c is the size of the HEX rom loaded
-}
-
-
-void playmark_state::init_pic_decode()
-{
-	playmark_decode_pic_hex_dump();
-}
-
-
-
-GAME( 1995, bigtwin,   0,        bigtwin,      bigtwin,   playmark_state, init_pic_decode, ROT0, "Playmark", "Big Twin", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, bigtwinb,  bigtwin,  bigtwinb,     bigtwinb,  playmark_state, init_pic_decode, ROT0, "Playmark", "Big Twin (No Girls Conversion)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wbeachvl,  0,        wbeachvl_pic, wbeachvl,  playmark_state, empty_init,      ROT0, "Playmark", "World Beach Volley (set 1, PIC16C57 audio CPU)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // no music due to incorrect OKI banking / PIC hookup
-GAME( 1995, wbeachvla, wbeachvl, wbeachvl_mcs, wbeachvl,  playmark_state, empty_init,      ROT0, "Playmark", "World Beach Volley (set 1, S87C751 audio CPU)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // wrong banking, so some sounds are played at the wrong time
-GAME( 1995, wbeachvl2, wbeachvl, wbeachvl_pic, wbeachvl,  playmark_state, empty_init,      ROT0, "Playmark", "World Beach Volley (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wbeachvl3, wbeachvl, wbeachvl_pic, wbeachvl,  playmark_state, empty_init,      ROT0, "Playmark", "World Beach Volley (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, excelsr,   0,        excelsr,      excelsr,   playmark_state, init_pic_decode, ROT0, "Playmark", "Excelsior (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, excelsra,  excelsr,  excelsr,      excelsr,   playmark_state, init_pic_decode, ROT0, "Playmark", "Excelsior (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, hrdtimes,  0,        hrdtimes,     hrdtimes,  playmark_state, empty_init,      ROT0, "Playmark", "Hard Times (set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, hrdtimesa, hrdtimes, hrdtimes,     hrdtimes,  playmark_state, empty_init,      ROT0, "Playmark", "Hard Times (set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, hotmind,   0,        hotmind,      hotmind,   playmark_state, init_pic_decode, ROT0, "Playmark", "Hot Mind (Hard Times hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, luckboomh, luckboom, luckboomh,    luckboomh, playmark_state, init_pic_decode, ROT0, "Playmark", "Lucky Boom (Hard Times hardware)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, bigtwin,   0,        bigtwin,      bigtwin,   playmark_state, empty_init, ROT0, "Playmark", "Big Twin",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1995, bigtwinb,  bigtwin,  bigtwinb,     bigtwinb,  playmark_state, empty_init, ROT0, "Playmark", "Big Twin (No Girls Conversion)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wbeachvl,  0,        wbeachvl_pic, wbeachvl,  playmark_state, empty_init, ROT0, "Playmark", "World Beach Volley (set 1, PIC16C57 audio CPU)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // no music due to incorrect OKI banking / PIC hookup
+GAME( 1995, wbeachvla, wbeachvl, wbeachvl_mcs, wbeachvl,  playmark_state, empty_init, ROT0, "Playmark", "World Beach Volley (set 1, S87C751 audio CPU)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // wrong banking, so some sounds are played at the wrong time
+GAME( 1995, wbeachvl2, wbeachvl, wbeachvl_pic, wbeachvl,  playmark_state, empty_init, ROT0, "Playmark", "World Beach Volley (set 2)",                     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wbeachvl3, wbeachvl, wbeachvl_pic, wbeachvl,  playmark_state, empty_init, ROT0, "Playmark", "World Beach Volley (set 3)",                     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, excelsr,   0,        excelsr,      excelsr,   playmark_state, empty_init, ROT0, "Playmark", "Excelsior (set 1)",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1996, excelsra,  excelsr,  excelsr,      excelsr,   playmark_state, empty_init, ROT0, "Playmark", "Excelsior (set 2)",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1994, hrdtimes,  0,        hrdtimes,     hrdtimes,  playmark_state, empty_init, ROT0, "Playmark", "Hard Times (set 1)",                             MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, hrdtimesa, hrdtimes, hrdtimes,     hrdtimes,  playmark_state, empty_init, ROT0, "Playmark", "Hard Times (set 2)",                             MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, hotmind,   0,        hotmind,      hotmind,   playmark_state, empty_init, ROT0, "Playmark", "Hot Mind (Hard Times hardware)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1996, luckboomh, luckboom, luckboomh,    luckboomh, playmark_state, empty_init, ROT0, "Playmark", "Lucky Boom (Hard Times hardware)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
