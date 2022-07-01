@@ -1515,7 +1515,6 @@ function linkProjects_mame_mame(_target, _subtarget)
 		"sony",
 		"sony_news",
 		"sord",
-		"special",
 		"sssr",
 		"stern",
 		"stm",
@@ -3137,12 +3136,6 @@ files {
 createMAMEProjects(_target, _subtarget, "sord")
 files {
 	MAME_DIR .. "src/mame/sord/*.cpp",
-}
-
-createMAMEProjects(_target, _subtarget, "special")
-files {
-	MAME_DIR .. "src/mame/special/*.cpp",
-	MAME_DIR .. "src/mame/special/*.h",
 }
 
 createMAMEProjects(_target, _subtarget, "stern")

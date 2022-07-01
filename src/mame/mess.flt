@@ -985,7 +985,6 @@ sony_news/news_38xx.cpp
 sony_news/news_68k.cpp
 sony_news/news_r3k.cpp
 sord/m5.cpp
-special/special.cpp
 sssr/apogee.cpp
 sssr/argo.cpp
 sssr/bk.cpp
@@ -1012,6 +1011,7 @@ sssr/pyl601.cpp
 sssr/radio86.cpp
 sssr/sm1800.cpp
 sssr/sm7238.cpp
+sssr/special.cpp
 sssr/uknc.cpp
 sssr/unior.cpp
 sssr/ut88.cpp

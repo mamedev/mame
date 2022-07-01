@@ -39508,7 +39508,7 @@ hc128                           // 1991 HC-128
 spec128                         // 1986 ZX Spectrum 128
 specpls2                        // 1986 ZX Spectrum +2
 
-@source:special/special.cpp
+@source:sssr/special.cpp
 anakonda                        //
 erik                            //
 kharkovsky                      //
