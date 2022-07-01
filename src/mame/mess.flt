@@ -316,6 +316,7 @@ hitachi/bmjr.cpp
 hitachi/bml3.cpp
 homebrew/4004clk.cpp
 homebrew/68ksbc.cpp
+homebrew/chaos.cpp
 homebrew/d6809.cpp
 homebrew/dcebridge.cpp
 homebrew/gigatron.cpp
@@ -770,7 +771,6 @@ skeleton/cd100.cpp
 skeleton/cd2650.cpp
 skeleton/cdc721.cpp
 skeleton/cdsys5.cpp
-skeleton/chaos.cpp
 skeleton/cit1500.cpp
 skeleton/ckz80.cpp
 skeleton/clxvme186.cpp
