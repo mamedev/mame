@@ -535,7 +535,7 @@ u4.a3 /
 bl-chr-0.j3 - Graphics (4M mask)
 bl-chr-1.l3 /
 
-bl-snd-0.a13 - Sound (4M mask)
+bl-snd-0.a13 - Sound (8M mask)
 
 Custom chips:   X1-001A X1-002A
                 X1-004
@@ -10831,16 +10831,11 @@ ROM_START( blockcar )
 	ROM_LOAD16_BYTE( "u4.a3",  0x000001, 0x020000, CRC(2237196d) SHA1(5a9d972fac94e62f026c36bca0c2f5fe8e0e1a1d) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )   /* Sprites */
-	ROM_LOAD( "bl-chr-0.j3",  0x000000, 0x080000, CRC(a33300ca) SHA1(b0a7ccb77c3e8e33c12b83e254924f30209a4c2c) )
-	ROM_LOAD( "bl-chr-1.l3",  0x080000, 0x080000, CRC(563de808) SHA1(40b2f9f4a4cb1a019f6419572ee21d66dda7d4af) )
+	ROM_LOAD( "bl-chr-0.u6.j3",  0x000000, 0x080000, CRC(a33300ca) SHA1(b0a7ccb77c3e8e33c12b83e254924f30209a4c2c) )
+	ROM_LOAD( "bl-chr-1.u9.l3",  0x080000, 0x080000, CRC(563de808) SHA1(40b2f9f4a4cb1a019f6419572ee21d66dda7d4af) )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
-	/* The game plays music from 0x000000 to 0x0bffff and sfx from 0x0c0000 to 0x0fffff
-	   Loading the ROM mirrored like this causes sfx to play instead of music in some levels.
-	   the most logical conclusion is that the ROM below was dumped at half size and should
-	   be 1MByte, hence BAD_DUMP */
-	ROM_LOAD( "bl-snd-0.a13",  0x000000, 0x080000, BAD_DUMP CRC(a92dabaf) SHA1(610c1dc0467753dfddaa4b27bc40cb118b0bc7a3) )
-	ROM_RELOAD(                0x080000, 0x080000  )
+	ROM_LOAD( "bl-snd-0.u39.a13",  0x000000, 0x100000, CRC(9c2130a2) SHA1(ef051528c3e37b61298f03a9d4a2649f0528dcfa) ) // 4 MBit silkscreen on PCB but it's actually double that
 ROM_END
 
 ROM_START( blockcarb )

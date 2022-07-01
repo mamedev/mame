@@ -5062,3 +5062,25 @@ if (MACHINES["SAA7191"]~=null) then
 		MAME_DIR .. "src/devices/machine/saa7191.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/segacrpt_device.h,MACHINES["SEGACRPT"] = true
+---------------------------------------------------
+if (MACHINES["SEGACRPT"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/segacrpt_device.cpp",
+		MAME_DIR .. "src/devices/machine/segacrpt_device.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/segacrp2_device.h,MACHINES["SEGACRP2"] = true
+---------------------------------------------------
+if (MACHINES["SEGACRP2"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/segacrp2_device.cpp",
+		MAME_DIR .. "src/devices/machine/segacrp2_device.h",
+	}
+end

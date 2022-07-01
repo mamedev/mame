@@ -47,7 +47,9 @@ void simpsons_state::coin_counter_w(uint8_t data)
 
 uint8_t simpsons_state::sound_interrupt_r()
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff ); // Z80
+	if (!machine().side_effects_disabled())
+		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+
 	return 0x00;
 }
 
@@ -73,7 +75,6 @@ void simpsons_state::machine_start()
 	membank("bank2")->configure_entries(2, 6, memregion("audiocpu")->base() + 0x10000, 0x4000);
 
 	save_item(NAME(m_firq_enabled));
-	save_item(NAME(m_nmi_enabled));
 	save_item(NAME(m_sprite_colorbase));
 	save_item(NAME(m_layer_colorbase));
 	save_item(NAME(m_layerpri));
@@ -81,6 +82,7 @@ void simpsons_state::machine_start()
 
 	m_dma_start_timer = timer_alloc(FUNC(simpsons_state::dma_start), this);
 	m_dma_end_timer = timer_alloc(FUNC(simpsons_state::dma_end), this);
+	m_nmi_blocked = timer_alloc(timer_expired_delegate());
 }
 
 void simpsons_state::machine_reset()
@@ -93,7 +95,6 @@ void simpsons_state::machine_reset()
 
 	m_sprite_colorbase = 0;
 	m_firq_enabled = 0;
-	m_nmi_enabled = 0;
 
 	/* init the default banks */
 	membank("bank1")->set_entry(0);
@@ -102,4 +103,8 @@ void simpsons_state::machine_reset()
 
 	m_dma_start_timer->adjust(attotime::never);
 	m_dma_end_timer->adjust(attotime::never);
+
+	// Z80 _NMI goes low at same time as reset
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }

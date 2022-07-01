@@ -519,6 +519,16 @@ void mpu4_state::pia_ic3_porta_w(uint8_t data)
 			// As a consequence, the lamp column data can change before the input strobe without
 			// causing the relevant lamps to black out.
 
+			if (m_overcurrent_detect)
+			{
+				m_overcurrent = true;
+			}
+			
+			if (m_undercurrent_detect) 
+			{
+				m_undercurrent = true;
+			}
+
 			for (i = 0; i < 8; i++)
 			{
 				m_lamps[(8*m_input_strobe)+i] = BIT(data, i);
@@ -537,6 +547,16 @@ void mpu4_state::pia_ic3_portb_w(uint8_t data)
 	{
 		if (m_lamp_strobe2 != m_input_strobe)
 		{
+			if (m_overcurrent_detect)
+			{
+				m_overcurrent = true;
+			}
+			
+			if (m_undercurrent_detect) 
+			{
+				m_undercurrent = true;
+			}
+
 			for (i = 0; i < 8; i++)
 			{
 				m_lamps[(8*m_input_strobe)+i+64] = BIT(data, i);
@@ -544,24 +564,6 @@ void mpu4_state::pia_ic3_portb_w(uint8_t data)
 			m_lamp_strobe2 = m_input_strobe;
 		}
 
-		if (m_led_lamp)
-		{
-			/* Some games (like Connect 4) use 'programmable' LED displays, built from light display lines in section 2. */
-			/* These are mostly low-tech machines, where such wiring proved cheaper than an extender card */
-			uint8_t pled_segs[2] = {0,0};
-
-			static const int lamps1[8] = { 106, 107, 108, 109, 104, 105, 110, 111 };
-			static const int lamps2[8] = { 114, 115, 116, 117, 112, 113, 118, 119 };
-
-			for (i = 0; i < 8; i++)
-			{
-				if (m_lamps[lamps1[i]]) pled_segs[0] |= (1 << i);
-				if (m_lamps[lamps2[i]]) pled_segs[1] |= (1 << i);
-			}
-
-			m_digits[8] = pled_segs[0];
-			m_digits[9] = pled_segs[1];
-		}
 	}
 }
 
@@ -635,7 +637,7 @@ void mpu4_state::ic24_setup()
 	{
 		double duration = TIME_OF_74LS123((220*1000),(0.1*0.000001));
 		{
-			m_ic23_active=1;
+			m_ic23_active=true;
 			ic24_output(0);
 			m_ic24_timer->adjust(attotime::from_double(duration));
 		}
@@ -645,14 +647,13 @@ void mpu4_state::ic24_setup()
 
 TIMER_CALLBACK_MEMBER(mpu4_state::update_ic24)
 {
-	m_ic23_active=0;
+	m_ic23_active=false;
 	ic24_output(1);
 }
 
 
 WRITE_LINE_MEMBER(mpu4_state::dataport_rxd)
 {
-	m_serial_data = state;
 	m_pia4->cb1_w(state);
 	LOG_IC3(("Dataport RX %x\n",state));
 }
@@ -697,7 +698,9 @@ void mpu4_state::pia_ic4_portb_w(uint8_t data)
 
 uint8_t mpu4_state::pia_ic4_portb_r()
 {
-	if ( m_serial_data )
+	m_ic4_input_b = 0x00;
+
+	if (m_pia5->ca2_output())
 	{
 		m_ic4_input_b |=  0x80;
 	}
@@ -735,17 +738,15 @@ uint8_t mpu4_state::pia_ic4_portb_r()
 	if ( m_signal_50hz )            m_ic4_input_b |=  0x04; /* 50 Hz */
 	else                            m_ic4_input_b &= ~0x04;
 
-	if (m_ic4_input_b & 0x02)
+	if ( m_overcurrent )
 	{
-		m_ic4_input_b &= ~0x02;
+		m_ic4_input_b |= 0x02;
 	}
-	else
+	
+	if ( m_undercurrent )
 	{
-		m_ic4_input_b |= 0x02; //Pulse the overcurrent line with every read to show the CPU each lamp has lit
+		m_ic4_input_b |= 0x01;
 	}
-#if 0
-	if ( lamp_undercurrent ) m_ic4_input_b |= 0x01;
-#endif
 
 	LOG_IC3(("%s: IC4 PIA Read of Port B %x\n",machine().describe_context(),m_ic4_input_b));
 	return m_ic4_input_b;
@@ -771,13 +772,16 @@ uint8_t mpu4_state::pia_ic5_porta_r()
 {
 	if (m_lamp_extender == LARGE_CARD_A)
 	{
-		if (m_lamp_sense && m_ic23_active)
+		if (m_overcurrent_detect)
 		{
-			m_aux1_input |= 0x40;
-		}
-		else
-		{
-			m_aux1_input &= ~0x40; //Pulse the overcurrent line with every read to show the CPU each lamp has lit
+			if (m_lamp_sense && m_ic23_active)
+			{
+				m_aux1_input |= 0x40;
+			}
+			else
+			{
+				m_aux1_input &= ~0x40; //Pulse the overcurrent line with every read to show the CPU each lamp has lit
+			}
 		}
 	}
 	if (m_hopper == HOPPER_NONDUART_A)
@@ -918,13 +922,6 @@ uint8_t mpu4_state::pia_ic5_portb_r()
 
 	uint8_t tempinput = m_aux2_port->read() | m_aux2_input;
 	return tempinput;
-}
-
-
-WRITE_LINE_MEMBER(mpu4_state::pia_ic5_ca2_w)
-{
-	LOG(("%s: IC5 PIA Write CA2 (Serial Tx) %2x\n",machine().describe_context(),state));
-	m_dataport->write_txd(state);
 }
 
 
@@ -1901,7 +1898,7 @@ MACHINE_START_MEMBER(mpu4_state,mod2)
 {
 	mpu4_config_common();
 
-	m_link7a_connected=0;
+	m_link7a_connected=false;
 	m_mod_number=2;
 }
 
@@ -1910,7 +1907,7 @@ MACHINE_START_MEMBER(mpu4_state,mpu4yam)
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	mpu4_config_common();
 
-	m_link7a_connected=0;
+	m_link7a_connected=false;
 	m_mod_number=4;
 	mpu4_install_mod4yam_space(space);
 }
@@ -1920,7 +1917,7 @@ MACHINE_START_MEMBER(mpu4_state,mpu4oki)
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	mpu4_config_common();
 
-	m_link7a_connected=0;
+	m_link7a_connected=false;
 	m_mod_number=4;
 	mpu4_install_mod4oki_space(space);
 }
@@ -2163,7 +2160,7 @@ void mpu4_state::use_m4_seven_reel()
 void mpu4_state::use_m4_low_volt_alt()
 {
 	//Some games can't use the 50Hz circuit to check voltage issues, handle it here
-	m_low_volt_detect_disable = 1;
+	m_low_volt_detect = false;
 }
 
 void mpu4_state::use_m4_small_extender()
@@ -2242,7 +2239,7 @@ void mpu4_state::setup_rom_banks()
 /* generate a 50 Hz signal (based on an RC time) */
 TIMER_DEVICE_CALLBACK_MEMBER(mpu4_state::gen_50hz)
 {
-	if (!m_low_volt_detect_disable)
+	if (m_low_volt_detect)
 	{
 		/* Although reported as a '50Hz' signal, the fact that both rising and
 		falling edges of the pulse are used means the timer actually gives a 100Hz
@@ -2325,7 +2322,7 @@ void mpu4_state::mpu4_common(machine_config &config)
 	m_pia5->readpb_handler().set(FUNC(mpu4_state::pia_ic5_portb_r));
 	m_pia5->writepa_handler().set(FUNC(mpu4_state::pia_ic5_porta_w));
 	m_pia5->writepb_handler().set(FUNC(mpu4_state::pia_ic5_portb_w));
-	m_pia5->ca2_handler().set(FUNC(mpu4_state::pia_ic5_ca2_w));
+	m_pia5->ca2_handler().set(m_dataport, FUNC(bacta_datalogger_device::write_txd));
 	m_pia5->cb2_handler().set(FUNC(mpu4_state::pia_ic5_cb2_w));
 	m_pia5->irqa_handler().set(FUNC(mpu4_state::cpu0_irq));
 	m_pia5->irqb_handler().set(FUNC(mpu4_state::cpu0_irq));
@@ -2419,6 +2416,13 @@ void mpu4_state::mod2(machine_config &config)
 	m_ay8913->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_ay8913->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 	mpu4_reels<0, 6>(config);
+}
+
+void mpu4_state::mod2_no_bacta(machine_config &config)
+{
+	mod2(config);
+	config.device_remove("dataport");
+	m_pia5->ca2_handler().set(m_pia4, FUNC(pia6821_device::cb1_w));
 }
 
 void mpu4_state::mod2_7reel(machine_config &config)
@@ -2530,6 +2534,13 @@ void mpu4_state::mod4yam(machine_config &config)
 	m_ym2413->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
 
+void mpu4_state::mod4yam_no_bacta(machine_config &config)
+{
+	mod4yam(config);
+	config.device_remove("dataport");
+	m_pia5->ca2_handler().set(m_pia4, FUNC(pia6821_device::cb1_w));
+}
+
 void mpu4_state::mod4yam_chr(machine_config &config)
 {
 	mod4yam(config);
@@ -2601,6 +2612,13 @@ void mpu4_state::mod4oki(machine_config &config)
 	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
 	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
+
+void mpu4_state::mod4oki_no_bacta(machine_config &config)
+{
+	mod4oki(config);
+	config.device_remove("dataport");
+	m_pia5->ca2_handler().set(m_pia4, FUNC(pia6821_device::cb1_w));
 }
 
 void mpu4_state::mod4oki_7reel(machine_config &config)

@@ -41,6 +41,7 @@ Pacman Ball (PMB2 Ver.A)                                         (C) Namco, 2003
 Panicuru Panekuru (PPA1 Ver.A)                                   (C) Namco, 2001
 *Photo Battle                                                    (C) Namco, 2001
 Point Blank 3 (GNN2 Ver. A)                                      (C) Namco, 2000
+Puzz Ball (PZB1 Ver. A)                                          (C) Namco, 2002
 *Ren-ai Quiz High School Angel                                   (C) Namco, 2002
 Seishun Quiz Colorful High School (CHS1 Ver.A)                   (C) Namco, 2002
 Sekai Kaseki Hakken (Japan, SKH1 Ver.A)                          (C) Namco, 2004
@@ -55,6 +56,7 @@ Taiko no Tatsujin 6 (TK61 Ver.A)                                 (C) Namco, 2004
 Tsukkomi Yousei Gips Nice Tsukkomi (NTK1 Ver.A)                  (C) Namco/Metro, 2002
 Uchuu Daisakusen Chocovader Contactee (CVC1 Ver.A)               (C) Namco, 2002
 Unknown medal (?) game (MTL1 SPR0B)                              (C) ?,     200?
+Unknown medal (?) game (peeled off sticker)                      (C) ?,     2005
 
 * - denotes not dumped yet.
 ** - denotes incomplete dump.
@@ -281,6 +283,7 @@ NFL Classic Football                                NCF3  Ver.A   KC027A   8E, 8
 Pacman Ball                                         PMB2  Ver.A   KC026A   8E, 8D               N/A
 Panicuru Panekuru                                   PPA1  Ver.A   KC017A   8E, 8D, 7E           N/A
 Point Blank 3                                       GNN2  Ver.A   KC002A   8E, 8D               N/A           see note 3
+Puzz Ball                                           PZB1  Ver.A   KC013A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB, unverified title
 Sekai Kaseki Hakken                                 SKH1  Ver.A   KC035A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB, unverified title
 Star Trigon                                         STT1  Ver.A   KC019A   8E, 8D               N/A
 Taiko no Tatsujin 2                                 TK21  Ver.C   KC010A   8E, 8D, 7E           TK21-A        KEYCUS is marked KC007A, KC010A is a sticker
@@ -290,6 +293,7 @@ Taiko no Tatsujin 5                                 TK51  Ver.A   KC031A   8E, 8
 Taiko no Tatsujin 6                                 TK61  Ver.A   KC036A   8E, 8D, 7E           TK-6
 Utyuu Daisakusen Chocovader Contactee               CVC1  Ver.A   KC022A   8E, 8D, 7E, 7D, 6E   N/A
 unknown medal (?) game                              MTL1  SPR0B   KC043A   8E, 8D               N/A           also has a Namco System10 EXFINAL PCB 8906962603 (8906962703)
+unknown medal (?) game                              peeled off    KC039A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB
 
       Notes:
       1. The ROM PCB has locations for 16x 128MBit FlashROMs (Total capacity = 2048MBits) but usually only a few are populated.
@@ -1317,6 +1321,15 @@ ROM_START( unks10md )
 	ROM_LOAD( "k9f2808u0c.8d",  0x1080000, 0x1080000, CRC(49a2a732) SHA1(1a473177827a6d0e58c289d9af064665b941519b) )
 ROM_END
 
+ROM_START( unks10md2 )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 ) /* bios */
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION16_LE( 0x2100000, "user2", 0 ) /* main prg */
+	ROM_LOAD( "k9f2808u0c.8e",  0x0000000, 0x1080000, CRC(53b3e255) SHA1(6e5a3addb859023d8c7e53237acf9f028c85f57b) )
+	ROM_LOAD( "k9f2808u0c.8d",  0x1080000, 0x1080000, CRC(a0ad9504) SHA1(43e9e83b0340dd2e0f28ff9ccd3667db4e70951a) )
+ROM_END
+
 ROM_START( kd2001 )
 	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 ) /* bios */
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
@@ -1359,6 +1372,15 @@ ROM_START( pacmball )
 	ROM_LOAD( "k9f2808u0c.8d",  0x1080000, 0x1080000, CRC(f79d7199) SHA1(4ef9b758ee778e12f7fef717e063597299fb8219) )
 ROM_END
 
+ROM_START( puzzball )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 ) /* bios */
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION16_LE( 0x2100000, "user2", 0 ) /* main prg */
+	ROM_LOAD( "k9f2808u0c.8e",  0x0000000, 0x1080000, CRC(ca6642a7) SHA1(550891c80feaf2c1b262f420cf90946419319640) )
+	ROM_LOAD( "k9f2808u0c.8d",  0x1080000, 0x1080000, CRC(b13f6f45) SHA1(66917476de5417596a9d3b9169ea74d93f3037fe) )
+ROM_END
+
 } // Anonymous namespace
 
 
@@ -1377,12 +1399,14 @@ GAME( 2002, startrgn,  0,        ns10_startrgn,      namcos10, namcos10_state, i
 GAME( 2002, panikuru,  0,        namcos10_memn,      namcos10, namcos10_state, init_panikuru, ROT0, "Namco", "Panicuru Panekuru (Japan, PPA1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2002, gamshara,  0,        ns10_gamshara,      namcos10, namcos10_state, init_gamshara, ROT0, "Mitchell", "Gamshara (World, 10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Ver. 20020912A ETC
 GAME( 2002, gamsharaj, gamshara, ns10_gamshara,      namcos10, namcos10_state, init_gamshara, ROT0, "Mitchell", "Gamshara (Japan, 10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, puzzball,  0,        namcos10_memn,      namcos10, namcos10_state, empty_init,    ROT0, "Namco", "Puzz Ball (Japan, PZB1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // title guessed based on known game list and PCB sticker
 GAME( 2003, nflclsfb,  0,        ns10_nflclsfb,      namcos10, namcos10_state, init_nflclsfb, ROT0, "Namco", "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2003, pacmball,  0,        namcos10_memn,      namcos10, namcos10_state, empty_init,    ROT0, "Namco", "Pacman BALL (PMB2 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2003, konotako,  0,        ns10_konotako,      namcos10, namcos10_state, init_konotako, ROT0, "Mitchell", "Kono Tako (10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 GAME( 2004, sekaikh,   0,        namcos10_memn,      namcos10, namcos10_state, empty_init,    ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.B)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 GAME( 2004, sekaikha,  sekaikh,  namcos10_memn,      namcos10, namcos10_state, empty_init,    ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 GAME( 2004, taiko6,    0,        namcos10_memn,      namcos10, namcos10_state, empty_init,    ROT0, "Namco", "Taiko no Tatsujin 6 (Japan, TK61 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 2005, unks10md2, 0,        namcos10_memn,      namcos10, namcos10_state, empty_init,    ROT0, "Namco", "unknown Namco System 10 medal game (unknown code)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND) // ROM VER. B0 FEB 09 2005 15:29:02 in test mode
 GAME( 2006, keroro,    0,        namcos10_memn,      namcos10, namcos10_state, empty_init,    ROT0, "Namco", "Keroro Gunso Chikyu Shinryaku Shirei Dearimasu! (KRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND) // ケロロ軍曹　地球侵略指令…であります！
 GAME( 2007, gegemdb,   0,        namcos10_memn,      namcos10, namcos10_state, empty_init,    ROT0, "Namco", "Gegege no Kitaro Yokai Yokocho Matsuri De Batoru Ja (GYM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND) // ゲゲゲの鬼太郎　妖怪横丁まつりでバトルじゃ
 GAME( 200?, unks10md,  0,        namcos10_memn,      namcos10, namcos10_state, empty_init,    ROT0, "Namco", "unknown Namco System 10 medal game (MTL1 SPR0B)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

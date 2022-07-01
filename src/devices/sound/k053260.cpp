@@ -100,6 +100,7 @@ k053260_device::k053260_device(const machine_config &mconfig, const char *tag, d
 	, m_timer(nullptr)
 	, m_keyon(0)
 	, m_mode(0)
+	, m_timer_state(0)
 	, m_voice{ { *this }, { *this }, { *this }, { *this } }
 {
 	std::fill(std::begin(m_portdata), std::end(m_portdata), 0);
@@ -115,7 +116,7 @@ void k053260_device::device_start()
 	m_sh1_cb.resolve_safe();
 	m_sh2_cb.resolve_safe();
 
-	m_stream = stream_alloc( 0, 2, clock() / CLOCKS_PER_SAMPLE );
+	m_stream = stream_alloc(0, 2, clock() / CLOCKS_PER_SAMPLE);
 
 	/* register with the save state system */
 	save_item(NAME(m_portdata));
@@ -137,7 +138,8 @@ void k053260_device::device_start()
 void k053260_device::device_clock_changed()
 {
 	m_stream->set_sample_rate(clock() / CLOCKS_PER_SAMPLE);
-	m_timer->adjust(attotime::from_ticks(16, clock()), 0, attotime::from_ticks(16, clock()));
+	attotime period = attotime::from_ticks(16, clock());
+	m_timer->adjust(period, 0, period);
 }
 
 
@@ -147,7 +149,8 @@ void k053260_device::device_clock_changed()
 
 void k053260_device::device_reset()
 {
-	m_timer->adjust(attotime::from_ticks(16, clock()), 0, attotime::from_ticks(16, clock()));
+	attotime period = attotime::from_ticks(16, clock());
+	m_timer->adjust(period, 0, period);
 
 	for (auto & elem : m_voice)
 		elem.voice_reset();

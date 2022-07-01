@@ -97,8 +97,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "emu.h"
 #include "pbaction.h"
 
-#include "segacrpt_device.h"
-
+#include "machine/segacrpt_device.h"
 #include "machine/74259.h"
 #include "sound/ay8910.h"
 #include "screen.h"

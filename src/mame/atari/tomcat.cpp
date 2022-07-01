@@ -25,11 +25,11 @@
 */
 
 #include "emu.h"
-#include "avgdvg.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
 #include "cpu/m6502/m6502.h"
+#include "video/avgdvg.h"
 #include "video/vector.h"
 #include "machine/74259.h"
 #include "machine/adc0808.h"

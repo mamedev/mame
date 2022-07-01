@@ -26,18 +26,10 @@ TODO:
 #include "speaker.h"
 
 
-#if 0
-uint16_t asterix_state::control2_r()
-{
-	return m_cur_control2;
-}
-#endif
-
 void asterix_state::control2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_cur_control2 = data;
 		/* bit 0 is data */
 		/* bit 1 is cs (active low) */
 		/* bit 2 is clock (active high) */
@@ -65,16 +57,17 @@ INTERRUPT_GEN_MEMBER(asterix_state::asterix_interrupt)
 	device.execute().set_input_line(5, HOLD_LINE); /* ??? All irqs have the same vector, and the mask used is 0 or 7 */
 }
 
-TIMER_CALLBACK_MEMBER(asterix_state::audio_nmi)
-{
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-}
-
 void asterix_state::sound_arm_nmi_w(uint8_t data)
 {
+	// see notes in simpsons driver (though judging from disasm, it seems asterix does not rely on it)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	if (!m_audio_nmi_timer->remaining().is_never())
-		m_audio_nmi_timer->adjust(attotime::from_usec(5));
+	m_nmi_blocked->adjust(m_audiocpu->cycles_to_attotime(4));
+}
+
+void asterix_state::z80_nmi_w(int state)
+{
+	if (state && !m_nmi_blocked->enabled())
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 void asterix_state::sound_irq_w(uint16_t data)
@@ -85,45 +78,6 @@ void asterix_state::sound_irq_w(uint16_t data)
 // Check the routine at 7f30 in the ead version.
 // You're not supposed to laugh.
 // This emulation is grossly overkill but hey, I'm having fun.
-#if 0
-void asterix_state::protection_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	COMBINE_DATA(m_prot + offset);
-
-	if (offset == 1)
-	{
-		uint32_t cmd = (m_prot[0] << 16) | m_prot[1];
-		switch (cmd >> 24)
-		{
-		case 0x64:
-			{
-			uint32_t param1 = (read_word(cmd & 0xffffff) << 16) | read_word((cmd & 0xffffff) + 2);
-			uint32_t param2 = (read_word((cmd & 0xffffff) + 4) << 16) | read_word((cmd & 0xffffff) + 6);
-
-			switch (param1 >> 24)
-			{
-				case 0x22:
-				{
-					int size = param2 >> 24;
-					param1 &= 0xffffff;
-					param2 &= 0xffffff;
-					while(size >= 0)
-					{
-						write_word(param2, read_word(param1));
-						param1 += 2;
-						param2 += 2;
-						size--;
-					}
-				break;
-				}
-			}
-			break;
-			}
-		}
-	}
-}
-#endif
-
 void asterix_state::protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_prot + offset);
@@ -223,9 +177,7 @@ INPUT_PORTS_END
 
 void asterix_state::machine_start()
 {
-	save_item(NAME(m_cur_control2));
 	save_item(NAME(m_prot));
-
 	save_item(NAME(m_sprite_colorbase));
 	save_item(NAME(m_spritebank));
 	save_item(NAME(m_layerpri));
@@ -233,12 +185,11 @@ void asterix_state::machine_start()
 	save_item(NAME(m_tilebanks));
 	save_item(NAME(m_spritebanks));
 
-	m_audio_nmi_timer = timer_alloc(FUNC(asterix_state::audio_nmi), this);
+	m_nmi_blocked = timer_alloc(timer_expired_delegate());
 }
 
 void asterix_state::machine_reset()
 {
-	m_cur_control2 = 0;
 	m_prot[0] = 0;
 	m_prot[1] = 0;
 
@@ -254,6 +205,10 @@ void asterix_state::machine_reset()
 		m_tilebanks[i] = 0;
 		m_spritebanks[i] = 0;
 	}
+
+	// Z80 _NMI goes low at same time as reset
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 void asterix_state::asterix(machine_config &config)
@@ -300,6 +255,7 @@ void asterix_state::asterix(machine_config &config)
 	k053260_device &k053260(K053260(config, "k053260", XTAL(32'000'000)/8)); // 4MHz
 	k053260.add_route(0, "lspeaker", 0.75);
 	k053260.add_route(1, "rspeaker", 0.75);
+	k053260.sh1_cb().set(FUNC(asterix_state::z80_nmi_w));
 }
 
 
@@ -429,17 +385,8 @@ ROM_START( asterixj )
 ROM_END
 
 
-void asterix_state::init_asterix()
-{
-#if 0
-	*(uint16_t *)(memregion("maincpu")->base() + 0x07f34) = 0x602a;
-	*(uint16_t *)(memregion("maincpu")->base() + 0x00008) = 0x0400;
-#endif
-}
-
-
-GAME( 1992, asterix,    0,       asterix, asterix, asterix_state, init_asterix, ROT0, "Konami", "Asterix (ver EAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, asterixeac, asterix, asterix, asterix, asterix_state, init_asterix, ROT0, "Konami", "Asterix (ver EAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, asterixeaa, asterix, asterix, asterix, asterix_state, init_asterix, ROT0, "Konami", "Asterix (ver EAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, asterixaad, asterix, asterix, asterix, asterix_state, init_asterix, ROT0, "Konami", "Asterix (ver AAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, asterixj,   asterix, asterix, asterix, asterix_state, init_asterix, ROT0, "Konami", "Asterix (ver JAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, asterix,    0,       asterix, asterix, asterix_state, empty_init, ROT0, "Konami", "Asterix (ver EAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, asterixeac, asterix, asterix, asterix, asterix_state, empty_init, ROT0, "Konami", "Asterix (ver EAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, asterixeaa, asterix, asterix, asterix, asterix_state, empty_init, ROT0, "Konami", "Asterix (ver EAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, asterixaad, asterix, asterix, asterix, asterix_state, empty_init, ROT0, "Konami", "Asterix (ver AAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, asterixj,   asterix, asterix, asterix, asterix_state, empty_init, ROT0, "Konami", "Asterix (ver JAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

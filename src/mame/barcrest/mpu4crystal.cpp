@@ -35,7 +35,7 @@ MACHINE_START_MEMBER(mpu4crystal_machines_state,mpu4cry)
 {
 	mpu4_config_common();
 
-	m_link7a_connected=0;
+	m_link7a_connected=false;
 	m_mod_number=4;
 }
 

@@ -27,9 +27,9 @@ vtech/gamemachine.cpp
 zaccaria/zaccaria.cpp
 
 // from midw8080/mw8080bw.cpp
++280zzzap
 +gunfight
 +gunfighto
-+280zzzap
 +lagunar
 
 // from sega/vicdual.cpp
@@ -37,9 +37,9 @@ zaccaria/zaccaria.cpp
 +brdrline
 +brdrlinet
 +brdrlins
++frogs
 +starrkr
 +tranqgun
-+frogs
 
 // extra parents to allow validation to pass
 +afighter

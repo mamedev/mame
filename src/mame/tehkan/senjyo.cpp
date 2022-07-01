@@ -80,8 +80,7 @@ I/O read/write
 #include "emu.h"
 #include "senjyo.h"
 
-#include "segacrpt_device.h"
-
+#include "machine/segacrpt_device.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 

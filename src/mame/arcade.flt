@@ -22,6 +22,7 @@ amiga/arsystems.cpp
 amiga/cubo.cpp
 amiga/mquake.cpp
 amiga/upscope.cpp
+apple/superga2.cpp
 aristocr/aristmk4.cpp
 aristocr/aristmk6.cpp
 aristocr/caswin.cpp
@@ -186,8 +187,6 @@ capcom/supduck.cpp
 capcom/tigeroad.cpp
 capcom/tvcapcom.cpp
 capcom/vulgus.cpp
-cccp/istrebiteli.cpp
-cccp/tiamc1.cpp
 ces/cesclass.cpp
 ces/galgames.cpp
 cinemat/cchasm.cpp
@@ -347,17 +346,6 @@ gametron/gotya.cpp
 gametron/sbugger.cpp
 gottlieb/exterm.cpp
 gottlieb/gottlieb.cpp
-ibmpc/calchase.cpp
-ibmpc/fruitpc.cpp
-ibmpc/igspc.cpp
-ibmpc/pangofun.cpp
-ibmpc/paokaipc.cpp
-ibmpc/pcat_dyn.cpp
-ibmpc/pcat_nit.cpp
-ibmpc/pcxt.cpp
-ibmpc/quakeat.cpp
-ibmpc/queen.cpp
-ibmpc/sis630.cpp
 igs/cabaret.cpp
 igs/dunhuang.cpp
 igs/funtech.cpp
@@ -880,7 +868,6 @@ misc/smotor.cpp
 misc/smsmcorp.cpp
 misc/sothello.cpp
 misc/spdamjes.cpp
-misc/special_gambl.cpp
 misc/spool99.cpp
 misc/sprcros2.cpp
 misc/ssingles.cpp
@@ -894,7 +881,6 @@ misc/su2000.cpp
 misc/summit.cpp
 misc/sumt8035.cpp
 misc/supercrd.cpp
-misc/superga2.cpp
 misc/supertnk.cpp
 misc/tapatune.cpp
 misc/tattack.cpp
@@ -1067,6 +1053,17 @@ pacman/jrpacman.cpp
 pacman/pacman.cpp
 pacman/pengo.cpp
 pacman/schick.cpp
+pc/calchase.cpp
+pc/fruitpc.cpp
+pc/igspc.cpp
+pc/pangofun.cpp
+pc/paokaipc.cpp
+pc/pcat_dyn.cpp
+pc/pcat_nit.cpp
+pc/pcxt.cpp
+pc/quakeat.cpp
+pc/queen.cpp
+pc/sis630.cpp
 pce/ggconnie.cpp
 pce/paranoia.cpp
 pce/tourvis.cpp
@@ -1497,6 +1494,9 @@ upl/mouser.cpp
 upl/ninjakd2.cpp
 upl/nova2001.cpp
 upl/xxmissio.cpp
+ussr/istrebiteli.cpp
+ussr/special_gambl.cpp
+ussr/tiamc1.cpp
 valadon/bagman.cpp
 valadon/tankbust.cpp
 venture/looping.cpp
@@ -1570,7 +1570,7 @@ zaccaria/zaccaria.cpp
 -saturnkr
 -vsaturn
 
-//ibmpc/sis630.cpp
+//pc/sis630.cpp
 -shutms11
 
 //miltonbradley/vectrex.cpp
