@@ -58,6 +58,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	// devices
@@ -340,6 +341,13 @@ void rollerg_state::machine_start()
 	m_nmi_blocked = timer_alloc(timer_expired_delegate());
 }
 
+void rollerg_state::machine_reset()
+{
+	// Z80 _NMI goes low at same time as reset
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+}
+
 
 void rollerg_state::rollerg(machine_config &config)
 {
@@ -386,7 +394,7 @@ void rollerg_state::rollerg(machine_config &config)
 
 	k053260_device &k053260(K053260(config, "k053260", 3.579545_MHz_XTAL));
 	k053260.add_route(ALL_OUTPUTS, "mono", 0.70);
-	k053260.sh2_cb().set(FUNC(rollerg_state::z80_nmi_w));
+	k053260.sh1_cb().set(FUNC(rollerg_state::z80_nmi_w));
 }
 
 

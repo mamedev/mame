@@ -366,7 +366,7 @@ void simpsons_state::simpsons(machine_config &config)
 	k053260_device &k053260(K053260(config, "k053260", XTAL(3'579'545))); /* verified on pcb */
 	k053260.add_route(0, "lspeaker", 1.00);
 	k053260.add_route(1, "rspeaker", 1.00);
-	k053260.sh2_cb().set(FUNC(simpsons_state::z80_nmi_w));
+	k053260.sh1_cb().set(FUNC(simpsons_state::z80_nmi_w));
 }
 
 

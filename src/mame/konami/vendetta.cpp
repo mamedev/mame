@@ -578,6 +578,10 @@ void vendetta_state::machine_reset()
 
 	m_sprite_colorbase = 0;
 	m_irq_enabled = 0;
+
+	// Z80 _NMI goes low at same time as reset
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 void vendetta_state::banking_callback(uint8_t data)
@@ -636,7 +640,7 @@ void vendetta_state::vendetta(machine_config &config)
 	k053260_device &k053260(K053260(config, "k053260", XTAL(3'579'545))); // verified with PCB
 	k053260.add_route(0, "lspeaker", 0.75);
 	k053260.add_route(1, "rspeaker", 0.75);
-	k053260.sh2_cb().set(FUNC(vendetta_state::z80_nmi_w));
+	k053260.sh1_cb().set(FUNC(vendetta_state::z80_nmi_w));
 }
 
 void vendetta_state::esckids(machine_config &config)
