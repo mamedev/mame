@@ -1436,7 +1436,11 @@ if _OPTIONS["SOURCES"] ~= nil then
 	for word in string.gmatch(str, '([^,]+)') do
 		local fullpath = path.join(MAME_DIR, word)
 		if (not os.isfile(fullpath)) and (not os.isdir(fullpath)) then
-			error("File/directory " .. word .. " does not exist")
+			word = path.join("src", _OPTIONS["target"], word)
+			fullpath = path.join(MAME_DIR, word)
+			if (not os.isfile(fullpath)) and (not os.isdir(fullpath)) then
+				error("File/directory " .. word .. " does not exist")
+			end
 		end
 		sourceargs = sourceargs .. " " .. word
 	end
