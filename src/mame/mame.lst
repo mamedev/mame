@@ -11933,7 +11933,7 @@ waidrive                        // 2005.01 WaiWai Drive
 xtrmhnt2                        // 2006.09 Extreme Hunting 2 Tournament Edition
 xtrmhunt                        // 2004.09 Extreme Hunting
 
-@source:segacons/dccons.cpp
+@source:sega/dccons.cpp
 dc                              // 1999 Sega Dreamcast (USA)
 dcdev                           // 1998 Sega HKT-0120 Sega Dreamcast Development Box
 dceu                            // 1999 Sega Dreamcast (Europe)
@@ -23053,7 +23053,7 @@ mechattu1                       // A8002 'MA' (c) 1989
 a51site4                        // ??           (c) 1998
 a51site4a                       // Sept.11,1998     (c) 1998
 
-@source:segacons/mdconsole.cpp
+@source:sega/mdconsole.cpp
 32x                             // 1994 Sega 32X (USA)
 32x_mcd                         // 1995 Sega Mega-CD (Europe w/32X addon)
 32x_mcdj                        // 1994 Sega Mega-CD (Japan w/32X addon)
@@ -23100,7 +23100,7 @@ ssf2mdb                         // MegaDrive-based hack
 topshoot                        // (c) 1995 Sun Mixing
 twinktmb                        // MegaDrive-based hack
 
-@source:segacons/megadriv_rad.cpp
+@source:sega/megadriv_rad.cpp
 rad_sf2                         // (c)2004 Radica
 rad_sf2p                        // (c)2004 Radica
 rad_gen1                        // (c)2004 Radica
@@ -23115,10 +23115,10 @@ msi_sf2
 dgunl3227
 ra145
 
-@source:segacons/megadriv_sunplus_hybrid.cpp
+@source:sega/megadriv_sunplus_hybrid.cpp
 reactmd
 
-@source:segacons/megadriv_vt_hybrid.cpp
+@source:sega/megadriv_vt_hybrid.cpp
 sarc110
 sarc110a
 
@@ -37779,10 +37779,10 @@ wg3dhfe                         // (c) 1996 Atari Games
 @source:skeleton/seattlecmp.cpp
 scp300f                         // Seattle SCP-300F
 
-@source:segacons/sega_beena.cpp
+@source:sega/sega_beena.cpp
 beena                           //
 
-@source:segacons/sega_sawatte.cpp
+@source:sega/sega_sawatte.cpp
 sawatte                         //
 
 @source:sega/segaatom.cpp
@@ -37949,13 +37949,13 @@ toutrunj1                       // 1987 (FD1094)
 toutrunj1d                      // bootleg
 toutrunjd                       // bootleg
 
-@source:segacons/segapico.cpp
+@source:sega/segapico.cpp
 copera                          // 1993 Sega / Yamaha
 pico                            // 1994 Sega Pico (Europe)
 picoj                           // 1993 Sega Pico (Japan)
 picou                           // 1994 Sega Pico (USA)
 
-@source:segacons/segapm.cpp
+@source:sega/segapm.cpp
 segapm                          // 1996 Sega Picture Magic (32x type hardware)
 
 @source:sega/segas16a.cpp
@@ -38869,7 +38869,7 @@ sfkick                          // (c) 1988 Haesung/HJ Corp
 sfkicka                         // (c) 198? Haesung
 spinkick                        // (c) 1988 Haesung/Seojin
 
-@source:segacons/sg1000.cpp
+@source:sega/sg1000.cpp
 omv1000                         // Tsukuda Original Othello Multivision FG-1000
 omv2000                         // Tsukuda Original Othello Multivision FG-2000
 sc3000                          // Sega SC-3000 (Japan)
@@ -40547,7 +40547,7 @@ svisionp                        //
 svisions                        //
 tvlinkp                         //
 
-@source:segacons/svmu.cpp
+@source:sega/svmu.cpp
 svmu                            // 1998 Sega Visual Memory Unit
 
 @source:namco/sweetland.cpp

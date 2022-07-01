@@ -215,12 +215,11 @@
 #include "emu.h"
 #include "goldstar.h"
 
-#include "segacrp2_device.h"
-#include "segacrpt_device.h"
-
 #include "cpu/z80/z80.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/nvram.h"
+#include "machine/segacrp2_device.h"
+#include "machine/segacrpt_device.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
 #include "sound/sn76496.h"

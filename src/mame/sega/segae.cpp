@@ -301,7 +301,7 @@ GND  8A 8B GND
 #include "machine/adc0804.h"
 #include "machine/i8255.h"
 #include "machine/rescap.h"
-#include "segacrp2_device.h"
+#include "machine/segacrp2_device.h"
 #include "machine/upd4701.h"
 #include "video/315_5124.h"
 #include "speaker.h"

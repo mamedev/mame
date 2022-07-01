@@ -165,8 +165,7 @@ Language
 
 #include "emu.h"
 
-#include "segacrp2_device.h"
-
+#include "machine/segacrp2_device.h"
 #include "cpu/z80/z80.h"
 #include "sound/msm5205.h"
 #include "sound/sn76496.h"

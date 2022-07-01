@@ -5,8 +5,7 @@
 
 #pragma once
 
-#include "segacrpt_device.h"
-
+#include "machine/segacrpt_device.h"
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
 

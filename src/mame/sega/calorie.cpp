@@ -82,7 +82,7 @@ Notes:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "segacrp2_device.h"
+#include "machine/segacrp2_device.h"
 #include "sound/ay8910.h"
 #include "emupal.h"
 #include "screen.h"

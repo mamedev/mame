@@ -24,8 +24,7 @@ Sega PCB 834-5137
 #include "emu.h"
 #include "suprloco.h"
 
-#include "segacrpt_device.h"
-
+#include "machine/segacrpt_device.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "sound/sn76496.h"

@@ -306,8 +306,7 @@ seem to have access to.
 #include "emu.h"
 #include "system1.h"
 
-#include "segacrpt_device.h"
-
+#include "machine/segacrpt_device.h"
 #include "cpu/z80/mc8123.h"
 #include "sound/sn76496.h"
 
