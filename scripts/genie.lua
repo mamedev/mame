@@ -1264,6 +1264,10 @@ configuration { "linux-*" }
 		end
 
 
+configuration { "netbsd" }
+		flags {
+			"LinkSupportCircularDependencies",
+		}
 
 configuration { "osx*" }
 		links {
