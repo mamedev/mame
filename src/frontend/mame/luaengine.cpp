@@ -563,11 +563,12 @@ void lua_engine::attach_notifiers()
 	machine().add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(&lua_engine::on_machine_frame, this));
 }
 
+
 //-------------------------------------------------
 //  handle_fs_error - report FS errors to LUA
 //-------------------------------------------------
 
-static void handle_fs_error(lua_State *L, fs::err_t err)
+static void handle_fs_error(sol::this_state s, fs::err_t err)
 {
 	std::string message;
 	switch (err)
@@ -600,7 +601,23 @@ static void handle_fs_error(lua_State *L, fs::err_t err)
 		break;
 	}
 	if (!message.empty())
-		luaL_error(L, message.c_str());
+		luaL_error(s, message.c_str());
+}
+
+
+//-------------------------------------------------
+//  string_vec_from_table
+//-------------------------------------------------
+
+static std::vector<std::string> string_vec_from_table(const sol::table &table)
+{
+	std::vector<std::string> results;
+	for (const auto &x : table)
+	{
+		std::string value = x.second.as<std::string>();
+		results.push_back(std::move(value));
+	}
+	return results;
 }
 
 
@@ -634,7 +651,7 @@ void lua_engine::initialize()
 		{ "FF_8", floppy_image::FF_8 }
 	};
 
-	static const enum_parser<fs::dir_entry_type, 3> s_dir_entry_type_parser =
+	static const enum_parser<fs::dir_entry_type, 2> s_dir_entry_type_parser =
 	{
 		{ "dir", fs::dir_entry_type::dir},
 		{ "file", fs::dir_entry_type::file}
@@ -1787,21 +1804,24 @@ void lua_engine::initialize()
 			fs::err_t err = fs.volume_metadata_change(meta);
 			handle_fs_error(L, err);
 		};
-	fs_filesystem_type["metadata"] = [](lua_State *L, fs::filesystem_t &fs, const std::vector<std::string> &path)
+	fs_filesystem_type["metadata"] = [](fs::filesystem_t &fs, sol::this_state s, const sol::table &path)
 		{
-			std::pair<fs::err_t, fs::meta_data> result = fs.metadata(path);
-			handle_fs_error(L, result.first);
+			std::vector<std::string> path_vec = string_vec_from_table(path);
+			std::pair<fs::err_t, fs::meta_data> result = fs.metadata(path_vec);
+			handle_fs_error(s, result.first);
 			return std::move(result.second);
 		};
-	fs_filesystem_type["metadata_change"] = [](lua_State *L, fs::filesystem_t &fs, const std::vector<std::string> &path, const fs::meta_data &meta)
+	fs_filesystem_type["metadata_change"] = [](fs::filesystem_t &fs, sol::this_state s, const sol::table &path, const fs::meta_data &meta)
 		{
-			fs::err_t err = fs.metadata_change(path, meta);
-			handle_fs_error(L, err);
+			std::vector<std::string> path_vec = string_vec_from_table(path);
+			fs::err_t err = fs.metadata_change(path_vec, meta);
+			handle_fs_error(s, err);
 		};
-	fs_filesystem_type["directory_contents"] = [](lua_State *L, fs::filesystem_t &fs, const std::vector<std::string> &path)
+	fs_filesystem_type["directory_contents"] = [](fs::filesystem_t &fs, sol::this_state s, const sol::table &path)
 		{
-			std::pair<fs::err_t, std::vector<fs::dir_entry>> result = fs.directory_contents(path);
-			handle_fs_error(L, result.first);
+			std::vector<std::string> path_vec = string_vec_from_table(path);
+			std::pair<fs::err_t, std::vector<fs::dir_entry>> result = fs.directory_contents(path_vec);
+			handle_fs_error(s, result.first);
 			return std::move(result.second);
 		};
 
