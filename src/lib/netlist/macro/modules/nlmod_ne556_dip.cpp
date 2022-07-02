@@ -5,6 +5,7 @@
 #include "devices/net_lib.h"
 
 NETLIST_START(NE556_DIP)
+{
 	NE555(A)
 	NE555(B)
 
@@ -21,4 +22,4 @@ NETLIST_START(NE556_DIP)
 		   A.GND, /*    GND |7            8| 2TRIG  */ B.TRIG
 				  /*        +--------------+        */
 	)
-NETLIST_END()
+}

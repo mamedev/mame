@@ -46,6 +46,7 @@
 //
 
 NETLIST_START(ripoff)
+{
 
 	SOLVER(Solver, 1000)
 	PARAM(Solver.DYNAMIC_TS, 1)
@@ -702,4 +703,4 @@ NETLIST_START(ripoff)
 	OPTIMIZE_FRONTIER(R1.1, RES_M(1), 50)
 #endif
 
-NETLIST_END()
+}

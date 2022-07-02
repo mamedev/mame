@@ -40,6 +40,7 @@
 //
 
 NETLIST_START(starhawk)
+{
 
 #if (HLE_LAZER_VCOS && HLE_SHIP_VCO)
 	SOLVER(Solver, 1000)
@@ -637,4 +638,4 @@ NETLIST_START(starhawk)
 	HINT(IC9E.13, NC)   // Q1
 	HINT(IC9E.14, NC)   // Q0
 
-NETLIST_END()
+}

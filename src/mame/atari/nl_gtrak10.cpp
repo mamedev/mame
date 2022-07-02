@@ -22,9 +22,13 @@
 
 #define GTRAK10_CLOCK 14318181
 
+// This disables the use of ROM pull up resistors and replaces some
+// capacitor / resistor pulse generating logic by pure-logic pulses (SYS_PULSE)
+// This gives significant performance increase.
+#define USE_SPEED_HACKS (1)
 
 NETLIST_START(gtrak10)
-
+{
 	// cribbed parameters from Tank
 	SOLVER(Solver, 48000)
 	PARAM(Solver.ACCURACY, 1e-5)
@@ -202,6 +206,13 @@ NETLIST_START(gtrak10)
 
 	// HCOUNT signal:
 	//        name, CLK,      J,        K,  CLRQ
+
+#if (USE_SPEED_HACKS)
+	SYS_PULSE(PULSE1, 10,10,1,1)
+	TTL_74107(L1_A,  1H,      P,  L1_B.QQ,  PULSE1.Q)
+	TTL_74107(L1_B,  1H, L1_A.Q,   GROUND,  PULSE1.Q)
+	NET_C(PULSE1.I, HSYNC_Q)
+#else
 	TTL_74107(L1_A,  1H,      P,  L1_B.QQ,  C9.2)
 	TTL_74107(L1_B,  1H, L1_A.Q,   GROUND,  C9.2)
 	CAP(C9, CAP_P(330))
@@ -212,6 +223,7 @@ NETLIST_START(gtrak10)
 	NET_C(C9.2, R1.2)
 	NET_C(C9.2, R2.1)
 	NET_C(R2.2, GROUND)
+#endif
 	ALIAS(HCOUNT, L1_A.QQ)
 
 
@@ -357,7 +369,9 @@ NETLIST_START(gtrak10)
 	// Actual ROM chip is labeled 74186:
 	// (MK28000,   "+OE1,+OE2,+ARQ,+A1,+A2,+A3,+A4,+A5,+A6,+A7,+A8,+A9,+A10,+A11,@VCC,@GND")
 	PROM_MK28000(J5, P,   P, AR, L4_B.AY, L4_A.AY, K4_B.AY, K4_A.AY, H5_C.Q, D2_A.Q, J4_A.AY, H4_B.AY, H4_A.AY, L5_C.Q, ABCD)
-
+#if (USE_SPEED_HACKS)
+	PARAM(J5.FORCE_TRISTATE_LOGIC, 1)
+#endif
 	PARAM(J5.ROM, "gamedata")
 
 	ALIAS(A0, L4_B.AY)
@@ -381,7 +395,7 @@ NETLIST_START(gtrak10)
 	TTL_7404_INVERT(J6_E, J5.O2) ALIAS(DATA1, J6_E.Q) // Note: J6_E pin numbers on schematics seem wrong (11 and 12)
 	TTL_7404_INVERT(J6_D, J5.O1) ALIAS(DATA0, J6_D.Q)
 
-	#if 1 //I'm uncertain if we actually need these:
+	#if (!USE_SPEED_HACKS) //I'm uncertain if we actually need these:
 	RES( R7,  RES_K(6.8)) NET_C( R7.1,  GROUND) NET_C( R7.2,  J5.O8)  // ACTUALLY CONNECTED TO -12V not ground
 	RES( R9A, RES_K(6.8)) NET_C( R9A.1, GROUND) NET_C( R9A.2, J5.O7)  // RENAMED TO R9A to avoid naming conflict with lemans
 	RES(R11, RES_K(6.8)) NET_C(R11.1, GROUND) NET_C(R11.2, J5.O6)
@@ -505,13 +519,18 @@ NETLIST_START(gtrak10)
 	TTL_7404_INVERT(E1_A, 4H)
 	ALIAS (4H_Q, E1_A.Q)
 
+#if (USE_SPEED_HACKS)
+	SYS_PULSE(PULSE2, 10, 200, 0, 0)
+	TTL_7400_NAND(D3_B, Ld1B_Q, PULSE2.Q)
+	NET_C(PULSE2.I, 32H)
+#else
 	TTL_7400_NAND(D3_B, Ld1B_Q, CAP4.2)
 	CAP(CAP4, CAP_P(100))
 	RES(R9, RES_R(470))
 	NET_C(CAP4.1, 32H)
 	NET_C(CAP4.2, R9.2)
 	NET_C(R9.1, GROUND)
-
+#endif
 	ALIAS(RT_CLOCK_Q, D3_B.Q)
 
 	// ----- VBLANK -----
@@ -804,4 +823,4 @@ NETLIST_START(gtrak10)
 // 7486 XOR A 123 B 456 C 8910 D 11 12 13
 
 
-NETLIST_END()
+}

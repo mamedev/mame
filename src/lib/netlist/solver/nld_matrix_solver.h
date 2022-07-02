@@ -119,23 +119,23 @@ namespace netlist::solver
 		, m_gs_sor(parent,   prefix + "SOR_FACTOR", defaults.m_gs_sor())
 		, m_method(parent,   prefix + "METHOD", defaults.m_method())
 		, m_fp_type(parent,  prefix + "FPTYPE", defaults.m_fp_type())
-		, m_reltol(parent,   prefix + "RELTOL", defaults.m_reltol())            ///< SPICE RELTOL parameter
-		, m_vntol(parent,    prefix + "VNTOL",  defaults.m_vntol())            ///< SPICE VNTOL parameter
-		, m_accuracy(parent, prefix + "ACCURACY", defaults.m_accuracy())          ///< Iterative solver accuracy
-		, m_nr_loops(parent, prefix + "NR_LOOPS", defaults.m_nr_loops())           ///< Maximum number of Newton-Raphson loops
-		, m_gs_loops(parent, prefix + "GS_LOOPS", defaults.m_gs_loops())             ///< Maximum number of Gauss-Seidel loops
+		, m_reltol(parent,   prefix + "RELTOL", defaults.m_reltol())            //!< SPICE RELTOL parameter
+		, m_vntol(parent,    prefix + "VNTOL",  defaults.m_vntol())            //!< SPICE VNTOL parameter
+		, m_accuracy(parent, prefix + "ACCURACY", defaults.m_accuracy())          //!< Iterative solver accuracy
+		, m_nr_loops(parent, prefix + "NR_LOOPS", defaults.m_nr_loops())           //!< Maximum number of Newton-Raphson loops
+		, m_gs_loops(parent, prefix + "GS_LOOPS", defaults.m_gs_loops())             //!< Maximum number of Gauss-Seidel loops
 
 		// general parameters
 		, m_gmin(parent, prefix + "GMIN", defaults.m_gmin())
-		, m_pivot(parent, prefix + "PIVOT", defaults.m_pivot())               ///< use pivoting on supported solvers
-		, m_nr_recalc_delay(parent, prefix + "NR_RECALC_DELAY", defaults.m_nr_recalc_delay()) ///< Delay to next solve attempt if nr loops exceeded
+		, m_pivot(parent, prefix + "PIVOT", defaults.m_pivot())               //!< use pivoting on supported solvers
+		, m_nr_recalc_delay(parent, prefix + "NR_RECALC_DELAY", defaults.m_nr_recalc_delay()) //!< Delay to next solve attempt if nr loops exceeded
 		, m_parallel(parent, prefix + "PARALLEL", defaults.m_parallel())
-		, m_min_ts_ts(parent, prefix + "MIN_TS_TS", defaults.m_min_ts_ts()) ///< The minimum time step for solvers with time stepping devices.
+		, m_min_ts_ts(parent, prefix + "MIN_TS_TS", defaults.m_min_ts_ts()) //!< The minimum time step for solvers with time stepping devices.
 
 		// automatic time step
-		, m_dynamic_ts(parent, prefix + "DYNAMIC_TS", defaults.m_dynamic_ts())     ///< Use dynamic time stepping
-		, m_dynamic_lte(parent, prefix + "DYNAMIC_LTE", defaults.m_dynamic_lte())    ///< dynamic time stepping slope
-		, m_dynamic_min_ts(parent, prefix + "DYNAMIC_MIN_TIMESTEP", defaults.m_dynamic_min_ts()) ///< smallest time step allowed
+		, m_dynamic_ts(parent, prefix + "DYNAMIC_TS", defaults.m_dynamic_ts())     //!< Use dynamic time stepping
+		, m_dynamic_lte(parent, prefix + "DYNAMIC_LTE", defaults.m_dynamic_lte())    //!< dynamic time stepping slope
+		, m_dynamic_min_ts(parent, prefix + "DYNAMIC_MIN_TIMESTEP", defaults.m_dynamic_min_ts()) //!< smallest time step allowed
 
 		// matrix sorting
 		, m_sort_type(parent, prefix + "SORT_TYPE", defaults.m_sort_type())

@@ -68,8 +68,10 @@
 
 #if (SOUND_VARIANT == VARIANT_STARCASTLE)
 NETLIST_START(starcas)
+{
 #else // (SOUND_VARIANT == VARIANT_WOTW)
 NETLIST_START(wotw)
+{
 #endif
 
 	// 192k is not high enough to make the laser and background pitches high enough
@@ -807,6 +809,6 @@ NETLIST_START(wotw)
 	OPTIMIZE_FRONTIER(IC26.3, RES_M(1), 50)
 #endif
 
-NETLIST_END()
+}
 
 #endif

@@ -45,7 +45,8 @@ DEFINE_DEVICE_TYPE(FIXFREQ, fixedfreq_device, "fixfreq", "Fixed-Frequency Monoch
 #define PORT_ADJUSTERX(_id, _name, _min, _max) \
 	PORT_START(# _id) \
 	configurer.field_alloc(IPT_ADJUSTER, (static_cast<fixedfreq_device &>(owner).monitor_val(_id)), 0xffff, ("Monitor - " _name)); \
-	PORT_MINMAX(_min, _max) PORT_CHANGED_MEMBER(DEVICE_SELF, fixedfreq_device, port_changed, _id) \
+	PORT_MINMAX(_min, _max) \
+	PORT_CHANGED_MEMBER(DEVICE_SELF, fixedfreq_device, port_changed, _id) \
 	PORT_CONDITION("ENABLE", 0x01, EQUALS, 0x01)
 
 #define IOPORT_ID(_id) ioport(# _id)
@@ -91,12 +92,12 @@ void fixedfreq_monitor_state::update_sync_channel(const time_type &time, const d
 			m_sig_field = avg_line_dur * 0.75 > m_last_line_duration;
 			LOG("%d %f %f %f\n", m_sig_field, m_last_line_duration, avg_line_dur, time);
 		}
-		if (!has_fields || (m_sig_field == 0))
-		{
-			m_intf.vsync_end_cb(time - m_last_vsync_time);
-			m_last_vsync_time = time;
-		}
-		m_last_y = 0; //m_desc.vbackporch_width();
+
+		// notify the controlling device about the vsync and the field.
+		m_intf.vsync_end_cb(time - m_last_vsync_time, m_sig_field);
+		m_last_vsync_time = time;
+
+		m_last_y = 0;
 	}
 	else if (last_vsync && !m_sig_vsync)
 	{
@@ -145,8 +146,9 @@ void fixedfreq_monitor_state::update_bm(const time_type &time)
 
 	if (!m_sig_vsync && !m_sig_composite)
 	{
+		//uint32_t mask = m_sig_field ? 0xffffffff : 0xffff0000;
 		m_fragments.push_back({static_cast<float>(m_last_y + m_sig_field * has_fields),
-			m_last_x * fhscale, pixels * fhscale, m_col});
+			m_last_x * fhscale, pixels * fhscale, m_col}); // & mask});
 	}
 	//m_intf.plot_hline(m_last_x, m_last_y + m_sig_field * has_fields, pixels, col);
 	m_last_x = pixels;
@@ -219,6 +221,7 @@ fixedfreq_device::fixedfreq_device(const machine_config &mconfig, device_type ty
 		m_enable(*this, "ENABLE"),
 		m_vector(*this, "VECTOR"),
 		m_scanline_height(1.0),
+		m_last_rt(0.0),
 		m_monitor(),
 		m_state(m_monitor, *this)
 {
@@ -233,6 +236,19 @@ void fixedfreq_device::device_config_complete()
 {
 	if (!has_screen())
 		return;
+	// Video signal processing will be moved into netlist to avoid
+	// aborting cpu slices. When this is done, the monitor specifications
+	// need to move to the netlist as well.
+	//
+	// At the time of device_config_complete the monitor specification will
+	// not be known - the netlist is parsed during device_start.
+	// In this case we have to use some temporary fixed values, e.g.
+	// screen().set_raw(7158196, 454, 0, 454, 262, 0, 262);
+	// This will be overwritten during the first vblank anyhow.
+	//
+	// However the width and height determine the width of the mame window.
+	// It is therefore recommended to use `set_raw` in the mame driver
+	// to specify the window size.
 	if (!screen().refresh_attoseconds())
 		screen().set_raw(m_monitor.m_monitor_clock, m_monitor.htotal(), 0,
 			m_monitor.htotal(), m_monitor.vtotal(), 0,
@@ -244,6 +260,8 @@ void fixedfreq_device::device_config_complete()
 
 void fixedfreq_device::device_start()
 {
+	LOG("start\n");
+
 	m_state.start();
 
 	// FIXME: will be done by netlist going forward
@@ -259,11 +277,11 @@ void fixedfreq_device::device_start()
 
 	/* sync separator */
 	save_item(NAME(m_state.m_vsync_filter));
-
 	save_item(NAME(m_state.m_sig_vsync));
 	save_item(NAME(m_state.m_sig_composite));
 	save_item(NAME(m_state.m_sig_field));
-	LOG("start\n");
+
+	save_item(NAME(m_last_rt));
 }
 
 void fixedfreq_device::device_reset()
@@ -337,7 +355,8 @@ static void draw_testpat(screen_device &screen, bitmap_rgb32 &bitmap, const rect
 
 uint32_t fixedfreq_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	//printf("%f %f\n", m_state.m_fragments[0].y, m_state.m_fragments[m_state.m_fragments.size()-1].y);
+	//printf("%f\n", machine().time().as_double());
+	//printf("%d %lu %f %f\n", m_state.m_sig_vsync, m_state.m_fragments.size(), m_state.m_fragments[0].y, m_state.m_fragments[m_state.m_fragments.size()-1].y);
 	bool force_vector = screen.screen_type() == SCREEN_TYPE_VECTOR || (m_vector->read() & 1);
 	bool debug_timing = (m_enable->read() & 2) == 2;
 	bool test_pat = (m_enable->read() & 4) == 4;
@@ -411,17 +430,33 @@ uint32_t fixedfreq_device::screen_update(screen_device &screen, bitmap_rgb32 &bi
 	return 0;
 }
 
-void fixedfreq_device::vsync_end_cb(double refresh_time)
+void fixedfreq_device::vsync_end_cb(double refresh_time, uint32_t field)
 {
 	const auto expected_frame_period(m_monitor.clock_period() * m_monitor.vtotal() * m_monitor.htotal());
+	bool progressive = (m_enable->read() & 8) == 8;
+
+	double mult = 0.5;
+
+	if (!progressive && (m_monitor.m_fieldcount == 2))
+	{
+		if (field == 0)
+		{
+			m_last_rt = refresh_time;
+			return;
+		}
+		else
+			mult = 1.0;
+	}
 
 	const auto refresh_limited(std::min(4.0 * expected_frame_period,
-			std::max(refresh_time, 0.25 * expected_frame_period)));
+			std::max((refresh_time + m_last_rt) * mult, 0.25 * expected_frame_period)));
 
+	m_last_rt = refresh_time;
 	rectangle visarea(m_monitor.minh(), m_monitor.maxh(), m_monitor.minv(), m_monitor.maxv());
 
-	screen().configure(m_monitor.htotal_scaled(), m_monitor.vtotal(), visarea, DOUBLE_TO_ATTOSECONDS(refresh_limited));
+	// reset_origin must be called first.
 	screen().reset_origin(m_state.m_last_y-(m_monitor.vsync_width() + m_monitor.vbackporch_width()), 0);
+	screen().configure(m_monitor.htotal_scaled(), m_monitor.vtotal(), visarea, DOUBLE_TO_ATTOSECONDS(refresh_limited));
 }
 
 NETDEV_ANALOG_CALLBACK_MEMBER(fixedfreq_device::update_composite_monochrome)
@@ -478,6 +513,10 @@ static INPUT_PORTS_START(fixedfreq_base_ports)
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x04, DEF_STR( On ) )
 
+	PORT_CONFNAME( 0x08, 0x00, "Interlace mode" ) PORT_CONDITION("VECTOR", 0x01, EQUALS, 0x00)
+	PORT_CONFSETTING(    0x00, "Interlaced" )
+	PORT_CONFSETTING(    0x08, "Progressive" )
+
 	PORT_ADJUSTERX(HVISIBLE, "H Visible", 10, 1000)
 	PORT_ADJUSTERX(HFRONTPORCH, "H Front porch width", 1, 100)
 	PORT_ADJUSTERX(HSYNC, "H Sync width", 1, 100)
@@ -489,7 +528,6 @@ static INPUT_PORTS_START(fixedfreq_base_ports)
 	PORT_ADJUSTERX(SYNCTHRESHOLD, "Sync threshold mV", 10, 2000)
 	PORT_ADJUSTERX(VSYNCTHRESHOLD, "V Sync threshold mV", 10, 1000)
 	PORT_ADJUSTERX(GAIN, "Signal Gain", 10, 1000)
-	PORT_ADJUSTERX(SCANLINE_HEIGHT, "Scanline Height", 10, 300)
 INPUT_PORTS_END
 
 
@@ -501,10 +539,14 @@ static INPUT_PORTS_START(fixedfreq_raster_ports)
 
 	PORT_INCLUDE(fixedfreq_base_ports)
 
+	PORT_ADJUSTERX(SCANLINE_HEIGHT, "Scanline Height", 10, 300)
+
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(fixedfreq_vector_ports)
 	PORT_INCLUDE(fixedfreq_base_ports)
+
+	PORT_ADJUSTERX(SCANLINE_HEIGHT, "Scanline Height", 10, 300)
 INPUT_PORTS_END
 
 ioport_constructor fixedfreq_device::device_input_ports() const

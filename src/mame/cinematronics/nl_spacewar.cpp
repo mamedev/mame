@@ -31,6 +31,7 @@
 //
 
 NETLIST_START(spacewar)
+{
 
 	SOLVER(Solver, 1000)
 	PARAM(Solver.DYNAMIC_TS, 1)
@@ -312,4 +313,4 @@ NETLIST_START(spacewar)
 	OPTIMIZE_FRONTIER(R38.2, RES_M(1), 50)
 #endif
 
-NETLIST_END()
+}

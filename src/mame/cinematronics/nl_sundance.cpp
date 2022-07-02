@@ -38,6 +38,7 @@
 //
 
 NETLIST_START(sundance)
+{
 
 	SOLVER(Solver, 1000)
 	PARAM(Solver.DYNAMIC_TS, 1)
@@ -479,4 +480,4 @@ NETLIST_START(sundance)
 
 //  NET_C(GND, IC6.3, IC28.8, IC28.9, IC28.10, IC28.11)
 
-NETLIST_END()
+}

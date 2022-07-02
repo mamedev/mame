@@ -44,6 +44,7 @@
 //
 
 NETLIST_START(boxingb)
+{
 
 	SOLVER(Solver, 1000)
 	PARAM(Solver.DYNAMIC_TS, 1)
@@ -1723,4 +1724,4 @@ NETLIST_START(boxingb)
 	OPTIMIZE_FRONTIER(U55.3, RES_M(1), 50)
 #endif
 
-NETLIST_END()
+}

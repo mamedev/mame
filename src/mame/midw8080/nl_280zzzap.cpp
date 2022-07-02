@@ -121,10 +121,12 @@
 #if (SOUND_VARIANT == VARIANT_280ZZZAP)
 
 static NETLIST_START(280zzzap_schematics)
+{
 
 #else // (SOUND_VARIANT == VARIANT_LAGUNAR)
 
 static NETLIST_START(lagunar_schematics)
+{
 
 #endif
 
@@ -912,16 +914,18 @@ static NETLIST_START(lagunar_schematics)
 
 	ALIAS(OUTPUT, J5_4.OUT)
 
-NETLIST_END()
+}
 
 
 #if (SOUND_VARIANT == VARIANT_280ZZZAP)
 
 NETLIST_START(280zzzap)
+{
 
 #else // (SOUND_VARIANT == VARIANT_LAGUNAR)
 
 NETLIST_START(lagunar)
+{
 
 #endif
 
@@ -1087,7 +1091,7 @@ NETLIST_START(lagunar)
 #endif
 #endif
 
-NETLIST_END()
+}
 
 
 #endif

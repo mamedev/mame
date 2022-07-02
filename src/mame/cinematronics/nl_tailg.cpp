@@ -39,6 +39,7 @@
 //
 
 NETLIST_START(tailg)
+{
 
 #if (HLE_HYPERSPACE_VCO && HLE_LASER_VCO)
 	SOLVER(Solver, 1000)
@@ -694,4 +695,4 @@ NETLIST_START(tailg)
 	HINT(IC23.11, NC)   // Q6
 	HINT(IC23.12, NC)   // Q7
 
-NETLIST_END()
+}

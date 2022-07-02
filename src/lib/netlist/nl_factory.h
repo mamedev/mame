@@ -114,9 +114,9 @@ namespace netlist::factory
 		element_type type() const noexcept { return m_properties.type(); }
 
 	private:
-		pstring    m_name;       ///< device name
-		properties m_properties; ///< source file and other information and
-								 ///< settings
+		pstring    m_name;       //!< device name
+		properties m_properties; //!< source file and other information and
+								 //!< settings
 	};
 
 	template <class C, typename... Args>
