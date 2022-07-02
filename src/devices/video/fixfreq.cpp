@@ -89,6 +89,7 @@ void fixedfreq_monitor_state::update_sync_channel(const time_type &time, const d
 			const auto avg_line_dur = (time - m_last_field_time) * m_desc.m_fieldcount / (m_last_y + 1);
 			m_last_field_time = time;
 			m_sig_field = avg_line_dur * 0.75 > m_last_line_duration;
+			LOG("%d %f %f %f\n", m_sig_field, m_last_line_duration, avg_line_dur, time);
 		}
 		if (!has_fields || (m_sig_field == 0))
 		{
@@ -107,12 +108,12 @@ void fixedfreq_monitor_state::update_sync_channel(const time_type &time, const d
 		if (m_sig_vsync)
 			LOG("Hsync in vsync\n");
 		//LOG("HSYNC up %d\n", m_last_x);
-		// FIXME: pixels > 50 filters some spurious hysnc on line 23/24 in breakout
+		// FIXME: pixels > 0 filters some spurious hysnc on line 23/24 in breakout
 		//        The hsync signal transition from high to low is 7 pixels too
 		//        early, goes up again after 6.8 pix and down after 7.2 pix.
 		//        Therefore we need to filter early low to high transitions
 		//        and base hsync on the start of the hsync signal.
-		if (!m_sig_vsync && (m_last_x > m_desc.m_hscale * 100))
+		if (!m_sig_vsync && (m_last_x > 0))
 		{
 			m_last_y += m_desc.m_fieldcount;
 			m_last_x = 0;

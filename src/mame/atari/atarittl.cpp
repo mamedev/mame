@@ -298,12 +298,13 @@ void gtrak10_state::gtrak10(machine_config &config)
 	FIXFREQ(config, m_video).set_screen("screen");
 	m_video->set_monitor_clock(GTRAK10_VIDCLOCK);
 	//                    Length of active video,   end of front-porch,   end of sync signal,  end of line/frame
-	m_video->set_horz_params(GTRAK10_HTOTAL*1 - 96,  GTRAK10_HTOTAL*1 - 64,  GTRAK10_HTOTAL*1 - 32,     GTRAK10_HTOTAL*1);
-	m_video->set_vert_params( GTRAK10_VTOTAL - 8,   GTRAK10_VTOTAL - 8,    GTRAK10_VTOTAL - 4,     GTRAK10_VTOTAL);
+	m_video->set_horz_params(GTRAK10_HTOTAL  - 96, GTRAK10_HTOTAL - 64, GTRAK10_HTOTAL - 32, GTRAK10_HTOTAL);
+	m_video->set_vert_params( GTRAK10_VTOTAL - 32, GTRAK10_VTOTAL -  8, GTRAK10_VTOTAL - 4,  GTRAK10_VTOTAL);
 	m_video->set_fieldcount(2);
 	m_video->set_threshold(1.0);
 	m_video->set_gain(1.50);
 	m_video->set_vsync_threshold(0.1);
+	m_video->set_horz_scale(2);
 }
 
 static INPUT_PORTS_START( gtrak10 )
