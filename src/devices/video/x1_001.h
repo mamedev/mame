@@ -1,20 +1,20 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia, David Haywood
-#ifndef MAME_VIDEO_SETA001_H
-#define MAME_VIDEO_SETA001_H
+#ifndef MAME_VIDEO_X1_001_H
+#define MAME_VIDEO_X1_001_H
 
 #pragma once
 
 typedef device_delegate<int (uint16_t code, uint8_t color)> gfxbank_cb_delegate;
 
-#define SETA001_SPRITE_GFXBANK_CB_MEMBER(_name) int _name(uint16_t code, uint8_t color)
+#define X1_001_SPRITE_GFXBANK_CB_MEMBER(_name) int _name(uint16_t code, uint8_t color)
 
-class seta001_device : public device_t, public device_gfx_interface
+class x1_001_device : public device_t, public device_gfx_interface
 {
 public:
-	seta001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	template <typename T> seta001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&palette_tag, const gfx_decode_entry *gfxinfo)
-		: seta001_device(mconfig, tag, owner, clock)
+	x1_001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T> x1_001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&palette_tag, const gfx_decode_entry *gfxinfo)
+		: x1_001_device(mconfig, tag, owner, clock)
 	{
 		set_info(gfxinfo);
 		set_palette(std::forward<T>(palette_tag));
@@ -82,10 +82,9 @@ private:
 	uint8_t m_bgflag = 0;
 	uint8_t m_spritectrl[4];
 	std::unique_ptr<uint8_t[]> m_spriteylow;
-	std::unique_ptr<uint8_t[]> m_spritecodelow; // tnzs.cpp stuff only uses half?
-	std::unique_ptr<uint8_t[]> m_spritecodehigh; // ^
+	std::unique_ptr<uint16_t[]> m_spritecode;
 };
 
-DECLARE_DEVICE_TYPE(SETA001_SPRITE, seta001_device)
+DECLARE_DEVICE_TYPE(X1_001, x1_001_device)
 
-#endif // MAME_VIDEO_SETA001_H
+#endif // MAME_VIDEO_X1_001_H

@@ -34,7 +34,7 @@
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-#include "seta001.h"
+#include "video/x1_001.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -47,7 +47,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
-		m_seta001(*this, "spritegen"),
+		m_spritegen(*this, "spritegen"),
 		m_palette(*this, "palette"),
 		m_iox_io(*this, "IOX"),
 		m_leds(*this, "led%u", 0U)
@@ -84,7 +84,7 @@ private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
-	required_device<seta001_device> m_seta001;
+	required_device<x1_001_device> m_spritegen;
 	required_device<palette_device> m_palette;
 	optional_ioport m_iox_io;
 	output_finder<8> m_leds;
@@ -111,7 +111,7 @@ uint32_t thedealr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 {
 	bitmap.fill(0x1f0, cliprect);
 
-	m_seta001->draw_sprites(screen, bitmap, cliprect, 0x1000);
+	m_spritegen->draw_sprites(screen, bitmap, cliprect, 0x1000);
 	return 0;
 }
 
@@ -119,7 +119,7 @@ WRITE_LINE_MEMBER(thedealr_state::screen_vblank)
 {
 	// rising edge
 	if (state)
-		m_seta001->setac_eof();
+		m_spritegen->setac_eof();
 }
 
 /***************************************************************************
@@ -321,11 +321,11 @@ void thedealr_state::thedealr_sub(address_map &map)
 	map(0x0100, 0x01ff).ram();
 
 	// Sprites
-	map(0x0800, 0x27ff).ram().rw(m_seta001, FUNC(seta001_device::spritecodelow_r8), FUNC(seta001_device::spritecodelow_w8));
-	map(0x2800, 0x3fff).ram().rw(m_seta001, FUNC(seta001_device::spritecodehigh_r8), FUNC(seta001_device::spritecodehigh_w8));
-	map(0x4000, 0x42ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r8), FUNC(seta001_device::spriteylow_w8));
-	map(0x4300, 0x4303).w(m_seta001, FUNC(seta001_device::spritectrl_w8));
-	map(0x4800, 0x4800).w(m_seta001, FUNC(seta001_device::spritebgflag_w8));   // enable / disable background transparency
+	map(0x0800, 0x27ff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecodelow_r8), FUNC(x1_001_device::spritecodelow_w8));
+	map(0x2800, 0x3fff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecodehigh_r8), FUNC(x1_001_device::spritecodehigh_w8));
+	map(0x4000, 0x42ff).ram().rw(m_spritegen, FUNC(x1_001_device::spriteylow_r8), FUNC(x1_001_device::spriteylow_w8));
+	map(0x4300, 0x4303).w(m_spritegen, FUNC(x1_001_device::spritectrl_w8));
+	map(0x4800, 0x4800).w(m_spritegen, FUNC(x1_001_device::spritebgflag_w8));   // enable / disable background transparency
 
 	// Comm RAM
 	map(0x5800, 0x5bff).ram().share("commram");
@@ -540,21 +540,21 @@ TIMER_DEVICE_CALLBACK_MEMBER(thedealr_state::thedealr_interrupt)
 void thedealr_state::thedealr(machine_config &config)
 {
 	// basic machine hardware
-	R65C02(config, m_maincpu, XTAL(16'000'000)/8);   // 2 MHz?
+	R65C02(config, m_maincpu, 16_MHz_XTAL / 8);   // 2 MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &thedealr_state::thedealr_main);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(thedealr_state::thedealr_interrupt), "screen", 0, 1);
 
-	R65C02(config, m_subcpu, XTAL(16'000'000)/8);    // 2 MHz?
+	R65C02(config, m_subcpu, 16_MHz_XTAL / 8);    // 2 MHz?
 	m_subcpu->set_addrmap(AS_PROGRAM, &thedealr_state::thedealr_sub);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	SETA001_SPRITE(config, m_seta001, 16'000'000, m_palette, gfx_thedealr);
-	m_seta001->set_bg_yoffsets(  0x11+1, -0x10 );   // + is up (down with flip)
-	m_seta001->set_fg_yoffsets( -0x12+1, -0x01 );
+	X1_001(config, m_spritegen, 16_MHz_XTAL, m_palette, gfx_thedealr);
+	m_spritegen->set_bg_yoffsets(  0x11+1, -0x10 );   // + is up (down with flip)
+	m_spritegen->set_fg_yoffsets( -0x12+1, -0x01 );
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -571,7 +571,7 @@ void thedealr_state::thedealr(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	ym2149_device &aysnd(YM2149(config, "aysnd", XTAL(16'000'000)/8));   // 2 MHz?
+	ym2149_device &aysnd(YM2149(config, "aysnd", 16_MHz_XTAL / 8));   // 2 MHz?
 	aysnd.port_a_read_callback().set_ioport("DSW2");
 	aysnd.port_b_read_callback().set_ioport("DSW1");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);

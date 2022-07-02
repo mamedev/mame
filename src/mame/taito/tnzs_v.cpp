@@ -47,7 +47,7 @@ uint32_t tnzs_base_state::screen_update_tnzs(screen_device &screen, bitmap_ind16
 {
 	bitmap.fill(0x1f0, cliprect);
 
-	m_seta001->draw_sprites(screen, bitmap, cliprect, 0x800);
+	m_spritegen->draw_sprites(screen, bitmap, cliprect, 0x800);
 	return 0;
 }
 
@@ -55,5 +55,5 @@ WRITE_LINE_MEMBER(tnzs_base_state::screen_vblank_tnzs)
 {
 	// rising edge
 	if (state)
-		m_seta001->tnzs_eof();
+		m_spritegen->tnzs_eof();
 }

@@ -438,13 +438,12 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "taitosnd.h"
 #include "taitocchip.h"
 
-#include "seta001.h"
-
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/timer.h"
 #include "sound/ymopm.h"
 #include "sound/ymopn.h"
+#include "video/x1_001.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -460,7 +459,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_seta001(*this, "spritegen"),
+		m_spritegen(*this, "spritegen"),
 		m_palette(*this, "palette"),
 		m_z80bank(*this, "z80bank"),
 		m_dswa_io(*this, "DSWA"),
@@ -485,7 +484,7 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<seta001_device> m_seta001;
+	required_device<x1_001_device> m_spritegen;
 	required_device<palette_device> m_palette;
 
 private:
@@ -621,9 +620,9 @@ void taitox_state::sound_bankswitch_w(u8 data)
 void taitox_state::taito_x_base_map(address_map &map)
 {
 	map(0xb00000, 0xb00fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0xd00000, 0xd005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16)); // Sprites Y
-	map(0xd00600, 0xd00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
-	map(0xe00000, 0xe03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16)); // Sprites Code + X + Attr
+	map(0xd00000, 0xd005ff).ram().rw(m_spritegen, FUNC(x1_001_device::spriteylow_r16), FUNC(x1_001_device::spriteylow_w16)); // Sprites Y
+	map(0xd00600, 0xd00607).ram().rw(m_spritegen, FUNC(x1_001_device::spritectrl_r16), FUNC(x1_001_device::spritectrl_w16));
+	map(0xe00000, 0xe03fff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecode_r16), FUNC(x1_001_device::spritecode_w16)); // Sprites Code + X + Attr
 	map(0xf00000, 0xf03fff).ram();         // Main RAM
 }
 
@@ -1006,7 +1005,7 @@ u32 taitox_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 {
 	bitmap.fill(0x1f0, cliprect);
 
-	m_seta001->draw_sprites(screen, bitmap,cliprect,0x1000);
+	m_spritegen->draw_sprites(screen, bitmap,cliprect,0x1000);
 	return 0;
 }
 
@@ -1016,11 +1015,11 @@ u32 taitox_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 void taitox_cchip_state::superman(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, XTAL(16'000'000) / 2);   // verified on PCB
+	M68000(config, m_maincpu, 16_MHz_XTAL / 2);   // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitox_cchip_state::superman_map);
 	m_maincpu->set_vblank_int("screen", FUNC(taitox_cchip_state::interrupt));
 
-	Z80(config, m_audiocpu, XTAL(16'000'000) / 4); // verified on PCB
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 4); // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitox_cchip_state::sound_map);
 
 	TAITO_CCHIP(config, m_cchip, 16_MHz_XTAL / 2); // 8MHz measured on pin 20
@@ -1033,10 +1032,10 @@ void taitox_cchip_state::superman(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));   // 10 CPU slices per frame - enough for the sound CPU to read all commands
 
-	SETA001_SPRITE(config, m_seta001, 16'000'000, m_palette, gfx_taito_x);
+	X1_001(config, m_spritegen, 16_MHz_XTAL, m_palette, gfx_taito_x);
 	// position kludges
-	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
-	m_seta001->set_bg_yoffsets(0x1, -0x1);
+	m_spritegen->set_fg_yoffsets(-0x12, 0x0e);
+	m_spritegen->set_bg_yoffsets(0x1, -0x1);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1053,7 +1052,7 @@ void taitox_cchip_state::superman(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(16'000'000) / 2));   // verified on PCB
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16_MHz_XTAL / 2));   // verified on PCB
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "lspeaker", 0.25);
 	ymsnd.add_route(0, "rspeaker", 0.25);
@@ -1068,19 +1067,19 @@ void taitox_cchip_state::superman(machine_config &config)
 void taitox_state::daisenpu(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, XTAL(16'000'000) / 2);   // verified on PCB
+	M68000(config, m_maincpu, 16_MHz_XTAL / 2);   // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitox_state::daisenpu_map);
 	m_maincpu->set_vblank_int("screen", FUNC(taitox_state::irq2_line_hold));
 
-	Z80(config, m_audiocpu, XTAL(16'000'000) / 4); // verified on PCB
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 4); // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitox_state::daisenpu_sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));   // 10 CPU slices per frame - enough for the sound CPU to read all commands
 
-	SETA001_SPRITE(config, m_seta001, 16'000'000, m_palette, gfx_taito_x);
+	X1_001(config, m_spritegen, 16_MHz_XTAL, m_palette, gfx_taito_x);
 	// position kludges
-	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
-	m_seta001->set_bg_yoffsets(0x1, -0x1);
+	m_spritegen->set_fg_yoffsets(-0x12, 0x0e);
+	m_spritegen->set_bg_yoffsets(0x1, -0x1);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1097,7 +1096,7 @@ void taitox_state::daisenpu(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(16'000'000) / 4)); // verified on PCB
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 16_MHz_XTAL / 4)); // verified on PCB
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "lspeaker", 0.45);
 	ymsnd.add_route(1, "rspeaker", 0.45);
@@ -1119,9 +1118,9 @@ void taitox_state::gigandes(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));   // 10 CPU slices per frame - enough for the sound CPU to read all commands
 
-	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_taito_x);
-	m_seta001->set_fg_yoffsets(-0xa, 0xe);
-	m_seta001->set_bg_yoffsets(0x1, -0x1);
+	X1_001(config, m_spritegen, 16_MHz_XTAL, m_palette, gfx_taito_x);
+	m_spritegen->set_fg_yoffsets(-0xa, 0xe);
+	m_spritegen->set_bg_yoffsets(0x1, -0x1);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1162,10 +1161,10 @@ void taitox_state::ballbros(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));   // 10 CPU slices per frame - enough for the sound CPU to read all commands
 
-	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_taito_x);
+	X1_001(config, m_spritegen, 16000000, m_palette, gfx_taito_x);
 	// position kludges
-	m_seta001->set_fg_yoffsets(-0x0a, 0x0e);
-	m_seta001->set_bg_yoffsets(0x1, -0x1);
+	m_spritegen->set_fg_yoffsets(-0x0a, 0x0e);
+	m_spritegen->set_bg_yoffsets(0x1, -0x1);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

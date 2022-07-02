@@ -20,7 +20,7 @@
 #include "machine/upd4701.h"
 #include "machine/upd4992.h"
 #include "sound/x1_010.h"
-#include "seta001.h"
+#include "video/x1_001.h"
 #include "x1_012.h"
 #include "emupal.h"
 #include "tilemap.h"
@@ -41,9 +41,9 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_seta001(*this, "spritegen"),
+		m_spritegen(*this, "spritegen"),
 		m_layers(*this, "layer%u", 1U),
-		m_x1(*this, "x1snd"),
+		m_x1snd(*this, "x1snd"),
 		m_soundlatch(*this, "soundlatch"),
 		m_dsw(*this, "DSW"),
 		m_coins(*this, "COINS"),
@@ -97,7 +97,7 @@ public:
 
 	void palette_init_RRRRRGGGGGBBBBB_proms(palette_device &palette) const;
 
-	SETA001_SPRITE_GFXBANK_CB_MEMBER(setac_gfxbank_callback);
+	X1_001_SPRITE_GFXBANK_CB_MEMBER(setac_gfxbank_callback);
 
 	u32 screen_update_seta_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -108,9 +108,9 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
-	required_device<seta001_device> m_seta001;
+	required_device<x1_001_device> m_spritegen;
 	optional_device_array<x1_012_device, 2> m_layers;
-	optional_device<x1_010_device> m_x1;
+	optional_device<x1_010_device> m_x1snd;
 	optional_device<generic_latch_8_device> m_soundlatch;
 
 	optional_ioport m_dsw;
