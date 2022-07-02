@@ -15,8 +15,10 @@
 //  To fill in some questions about the gtrak10 schematic, referencing the lemans schematic is helpful.
 
 
+// Couriersud: No jumping here
+// FXIME: Remove hack completely
 // use this hack to stop horizontal jumping due to netlist timing problems
-#define HORIZ_COUNTER_ADJ_HACK  // use 1 less than normal 450, substitute 1V instead of 2V, changes netlist timing
+//#define HORIZ_COUNTER_ADJ_HACK  // use 1 less than normal 450, substitute 1V instead of 2V, changes netlist timing
 
 #define GTRAK10_CLOCK 14318181
 

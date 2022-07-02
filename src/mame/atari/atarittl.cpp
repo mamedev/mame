@@ -107,17 +107,8 @@ namespace {
 #define TANK_HTOTAL     (952)
 #define TANK_VTOTAL     (262)
 
-#define GTRAK10_VIDCLOCK 14318181
+#define GTRAK10_VIDCLOCK (14318181 / 2)
 #define GTRAK10_HTOTAL 451
-//#define GTRAK10_HTOTAL 902
-// 451 only displays half of the frame
-// should be GTRAK10_HTOTAL 902 but that causes screen to disappear after 1 frame,
-//  possibly fixfreq.h vsync filter/vsync time constant formula
-//  double vsync_filter_timeconst() const noexcept
-//  {
-////    //return (double) (m_monitor_clock) / ((double) m_hbackporch * vsync_width());  // original formula
-//      return (double) (m_monitor_clock) /  (double) (hvisible_width());  // vsync will work with gtrak10
-//  }
 #define GTRAK10_VTOTAL 521
 
 class atarikee_state : public driver_device
@@ -293,26 +284,27 @@ void gtrak10_state::gtrak10(machine_config &config)
 	   Pixel Clock = 14.318MHz
 
 	   Horiz Total       = 451
-	   Horiz Front Porch =  0
-	   Horiz Sync        =  1
-	   Horiz Back Porch  = 31
+	   Horiz Front Porch =  ?
+	   Horiz Sync        =  32
+	   Horiz Back Porch  = ?
 
 	   Vert Total       = 521
-	   Vert Front Porch =   0
-	   Vert Sync        =   8
-	   Vert Back Porch  =   0
+	   Vert Front Porch =   ?
+	   Vert Sync        =   4
+	   Vert Back Porch  =   ?
 	*/
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 	FIXFREQ(config, m_video).set_screen("screen");
 	m_video->set_monitor_clock(GTRAK10_VIDCLOCK);
 	//                    Length of active video,   end of front-porch,   end of sync signal,  end of line/frame
-	m_video->set_horz_params(GTRAK10_HTOTAL*1 - 32,  GTRAK10_HTOTAL*1 - 32,  GTRAK10_HTOTAL*1 - 31,     GTRAK10_HTOTAL*1);
-	//m_video->set_horz_params(GTRAK10_HTOTAL - 32,  GTRAK10_HTOTAL - 32,  GTRAK10_HTOTAL - 31,     GTRAK10_HTOTAL);
-	m_video->set_vert_params( GTRAK10_VTOTAL - 8,   GTRAK10_VTOTAL - 8,       GTRAK10_VTOTAL,     GTRAK10_VTOTAL);
+	m_video->set_horz_params(GTRAK10_HTOTAL  - 96, GTRAK10_HTOTAL - 64, GTRAK10_HTOTAL - 32, GTRAK10_HTOTAL);
+	m_video->set_vert_params( GTRAK10_VTOTAL - 32, GTRAK10_VTOTAL -  8, GTRAK10_VTOTAL - 4,  GTRAK10_VTOTAL);
 	m_video->set_fieldcount(2);
 	m_video->set_threshold(1.0);
 	m_video->set_gain(1.50);
+	m_video->set_vsync_threshold(0.1);
+	m_video->set_horz_scale(2);
 }
 
 static INPUT_PORTS_START( gtrak10 )
