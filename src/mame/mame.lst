@@ -10281,7 +10281,7 @@ cd2650                          //
 @source:skeleton/cdc721.cpp
 cdc721                          //
 
-@source:misc/cdi.cpp
+@source:philips/cdi.cpp
 cdi490a                         //
 cdi910                          //
 cdibios                         // Base unit

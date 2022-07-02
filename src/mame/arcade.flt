@@ -641,7 +641,6 @@ misc/castle.cpp
 misc/cave.cpp
 misc/cavepc.cpp
 misc/cb2001.cpp
-misc/cdi.cpp
 misc/chameleonrx1.cpp
 misc/chance32.cpp
 misc/changyu.cpp
@@ -1068,6 +1067,7 @@ pce/ggconnie.cpp
 pce/paranoia.cpp
 pce/tourvis.cpp
 pce/uapce.cpp
+philips/cdi.cpp
 phoenix/naughtyb.cpp
 phoenix/phoenix.cpp
 phoenix/safarir.cpp
@@ -1538,7 +1538,7 @@ zaccaria/zaccaria.cpp
 -3do_m2
 -3do_pal
 
-//misc/cdi.cpp
+//philips/cdi.cpp
 -cdi490a
 -cdi910
 -cdimono1
