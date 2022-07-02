@@ -3275,7 +3275,7 @@ aztarac                         // (c) 1983 Centuri (vector game)
 @source:hitachi/b16.cpp
 b16                             //
 
-@source:bnpo/b2m.cpp
+@source:ussr/b2m.cpp
 b2m                             //
 b2mrom                          //
 
@@ -17243,7 +17243,7 @@ zekepeak                        //
 bsktbllp                        //
 v1                              //
 
-@source:ie15/ie15.cpp
+@source:ussr/ie15.cpp
 ie15                            //
 
 @source:skeleton/iez80.cpp
@@ -17508,7 +17508,7 @@ iqunlimgr                       // (c) 1995 VTech / Integrated Systems Inc.
 @source:sgi/iris3130.cpp
 iris3130                        // IP2: IRIS 3xx0, 68020, 16MHz
 
-@source:mgu/irisha.cpp
+@source:ussr/irisha.cpp
 irisha                          //
 
 @source:atari/irobot.cpp

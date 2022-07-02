@@ -84,7 +84,6 @@ bandai/wswan.cpp
 be/bebox.cpp
 beehive/microb.cpp
 bitcorp/gamate.cpp
-bnpo/b2m.cpp
 bondwell/bw12.cpp
 bondwell/bw2.cpp
 booth/apexc.cpp
@@ -365,7 +364,6 @@ husky/hunter16.cpp
 husky/hunter2.cpp
 husky/husky.cpp
 ibm6580/ibm6580.cpp
-ie15/ie15.cpp
 informer/informer_207_100.cpp
 informer/informer_207_376.cpp
 informer/informer_213.cpp
@@ -442,7 +440,6 @@ mera/konin.cpp
 mera/m79152pc.cpp
 mera/vdm7932x.cpp
 mg1/mg1.cpp
-mgu/irisha.cpp
 microkey/primo.cpp
 microsoft/xbox.cpp
 microterm/ergo201.cpp
@@ -1155,13 +1152,16 @@ unisys/univac.cpp
 usp/patinho_feio.cpp
 ussr/apogee.cpp
 ussr/argo.cpp
+ussr/b2m.cpp
 ussr/bk.cpp
 ussr/cm1800.cpp
 ussr/debut.cpp
 ussr/dvk_kcgd.cpp
 ussr/dvk_ksm.cpp
+ussr/ie15.cpp
 ussr/im01.cpp
 ussr/intellect02.cpp
+ussr/irisha.cpp
 ussr/lviv.cpp
 ussr/mikro80.cpp
 ussr/mikrosha.cpp
