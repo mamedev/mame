@@ -3423,17 +3423,17 @@
 		</rect>
 	</element>
 	<element name="led_digit_red">
-		<led7seg>
+		<led7seg invert="1">
 			<color red="1.0" green="0.0" blue="0.0"/>
 		</led7seg>
 	</element>
 	<element name="led_digit_green">
-		<led7seg>
+		<led7seg invert="1">
 			<color red="0.0" green="1.0" blue="0.0"/>
 		</led7seg>
 	</element>
 	<element name="led_digit_blue">
-		<led7seg>
+		<led7seg invert="1">
 			<color red="0.0" green="0.5" blue="1.0"/>
 		</led7seg>
 	</element>

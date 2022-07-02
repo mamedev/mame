@@ -642,12 +642,10 @@ protected:
 	bool m_use_pia4_porta_leds = true;
 	uint8_t m_pia4_porta_leds_base = 0;
 	uint8_t m_pia4_porta_leds_strobe = 0;
-	bool m_pia4_porta_leds_invert = false;
 
 	bool m_use_simplecard_leds = false;
 	uint8_t m_simplecard_leds_base = 0;
 	uint8_t m_simplecard_leds_strobe = 0;
-	bool m_simplecard_leds_invert = false;
 
 	int m_pageval = 0;
 	int m_pageset = 0;

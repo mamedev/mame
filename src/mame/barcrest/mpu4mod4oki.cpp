@@ -6735,11 +6735,9 @@ void mpu4mod4oki_machines_state::init_m4andybt()
 
 	m_use_simplecard_leds = true;
 	m_simplecard_leds_base = 0;
-	m_simplecard_leds_invert = true;
 
 	m_use_pia4_porta_leds = true;
 	m_pia4_porta_leds_base = 8;
-	m_pia4_porta_leds_invert = true;
 }
 
 

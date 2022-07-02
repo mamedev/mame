@@ -674,9 +674,9 @@ void mpu4_state::pia_ic4_porta_w(uint8_t data)
 			{
 				for(int i=0; i<8; i++)
 				{
-					m_mpu4leds[(((7 - m_input_strobe) | m_pia4_porta_leds_base) << 3) | i] = BIT(data, i) ^ (m_pia4_porta_leds_invert ? 1 : 0);
+					m_mpu4leds[(((7 - m_input_strobe) | m_pia4_porta_leds_base) << 3) | i] = BIT(data, i);
 				}
-				m_digits[(7 - m_input_strobe) | m_pia4_porta_leds_base] = data ^ (m_pia4_porta_leds_invert ? 0xff : 0x00);
+				m_digits[(7 - m_input_strobe) | m_pia4_porta_leds_base] = data;
 			}
 			m_pia4_porta_leds_strobe = m_input_strobe;
 		}
@@ -900,9 +900,9 @@ void mpu4_state::pia_ic5_portb_w(uint8_t data)
 		{
 			for(int i=0; i<8; i++)
 			{
-				m_mpu4leds[( ( (7 - m_input_strobe) | m_simplecard_leds_base) << 3) | i] = BIT(m_pia4->a_output(), i) ^ (m_simplecard_leds_invert ? 1 : 0);
+				m_mpu4leds[( ( (7 - m_input_strobe) | m_simplecard_leds_base) << 3) | i] = BIT(m_pia4->a_output(), i);
 			}
-			m_digits[(7 - m_input_strobe) | m_simplecard_leds_base] = m_pia4->a_output() ^ (m_simplecard_leds_invert ? 0xff : 0x00);
+			m_digits[(7 - m_input_strobe) | m_simplecard_leds_base] = m_pia4->a_output();
 		}
 		m_simplecard_leds_strobe = m_input_strobe;
 	}
