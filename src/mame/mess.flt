@@ -427,10 +427,10 @@ luxor/abc80.cpp
 luxor/abc80x.cpp
 luxor/ds90.cpp
 makerbot/replicator.cpp
-matsushi/duet16.cpp
-matsushi/jr100.cpp
-matsushi/jr200.cpp
-matsushi/myb3k.cpp
+matsushita/duet16.cpp
+matsushita/jr100.cpp
+matsushita/jr200.cpp
+matsushita/myb3k.cpp
 mattel/aquarius.cpp
 mattel/chess.cpp
 mattel/intv.cpp
@@ -478,8 +478,8 @@ motorola/mvme162.cpp
 motorola/sys1121.cpp
 motorola/uchroma68.cpp
 msx/msx.cpp
-multitch/mkit09.cpp
-multitch/mpf1.cpp
+multitech/mkit09.cpp
+multitech/mpf1.cpp
 mupid/mdisk.cpp
 mupid/mupid2.cpp
 nakajima/nakajies.cpp
@@ -507,8 +507,8 @@ nec/pce.cpp
 nec/pcfx.cpp
 nec/tk80bs.cpp
 neogeo/neogeocd.cpp
-netronic/elf.cpp
-netronic/exp85.cpp
+netronics/elf.cpp
+netronics/exp85.cpp
 next/next.cpp
 nintendo/compmahj.cpp
 nintendo/gamecube.cpp
@@ -584,7 +584,7 @@ philips/odyssey2.cpp
 philips/p2000t.cpp
 philips/vg5k.cpp
 philips/yes.cpp
-pitronic/beta.cpp
+pitronics/beta.cpp
 poly/poly.cpp
 poly/proteus.cpp
 poly88/poly88.cpp
@@ -1013,7 +1013,7 @@ tangerin/hhtiger.cpp
 tangerin/microtan.cpp
 tangerin/oric.cpp
 tatung/einstein.cpp
-teamconc/comquest.cpp
+teamconcepts/comquest.cpp
 tectoy/pensebem.cpp
 tektroni/tek405x.cpp
 tektroni/tek410x.cpp

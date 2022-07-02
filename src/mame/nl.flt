@@ -4,7 +4,7 @@
 
 atari/flyball.cpp
 capcom/1942.cpp
-cinemat/cinemat.cpp
+cinematronics/cinemat.cpp
 exidy/carpolo.cpp
 exidy/starfire.cpp
 irem/m62.cpp
@@ -22,7 +22,7 @@ sega/zaxxon.cpp
 skeleton/hazeltin.cpp
 skeleton/palestra.cpp
 skeleton/testpat.cpp
-univers/cheekyms.cpp
+universal/cheekyms.cpp
 vtech/gamemachine.cpp
 zaccaria/zaccaria.cpp
 
@@ -61,7 +61,7 @@ atari/pong.cpp
 // Skeletons                 //
 ///////////////////////////////
 
-alliedl/aleisttl.cpp
+alliedleisure/aleisttl.cpp
 exidy/exidyttl.cpp
 meadows/meadows.cpp
 misc/a1supply.cpp
