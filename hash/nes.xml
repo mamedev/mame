@@ -46184,6 +46184,87 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+<!-- These four Deja Vu prototypes were likely overdumped. All were released with doubled PRG ROMs which have been trimmed. It's probably the case that there is one 128K PRG chip and two 128K CHR chips on each board, but this needs verified. -->
+	<software name="dejavup" cloneof="dejavu">
+		<description>Deja Vu (USA, prototype, 19900703)</description>
+		<year>1990</year>
+		<publisher>Kemco</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb_model" value="HVC-TK22EPROM-01" />
+			<dataarea name="prg" size="131072">
+				<rom name="deja vu - july 3 1990.prg" size="131072" crc="265badd0" sha1="4f166ad125746f6dc5b754073bede222a24bf74b" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="deja vu - july 3 1990.chr" size="262144" crc="0b1bea9b" sha1="f2ed6a6b7d15a97afd43931ef87039f29fe9da49" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dejavup1" cloneof="dejavu">
+		<description>Deja Vu (USA, prototype, 19900515)</description>
+		<year>1990</year>
+		<publisher>Kemco</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb_model" value="HVC-TK22EPROM-01" />
+			<dataarea name="prg" size="131072">
+				<rom name="deja vu - 15 5 1990.prg" size="131072" crc="a08feffc" sha1="287d2d14c5a191f6114d38b805163ecc3ec86340" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="deja vu - 15 5 1990.chr" size="262144" crc="ffc9ef0a" sha1="0181f1dd041de33c9083ac3fa13e14721d008294" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dejavup2" cloneof="dejavu">
+		<description>Deja Vu (USA, prototype, 19900508)</description>
+		<year>1990</year>
+		<publisher>Kemco</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb_model" value="HVC-TK22EPROM-01" />
+			<dataarea name="prg" size="131072">
+				<rom name="deja vu - 8 5 1990.prg" size="131072" crc="2198cbf7" sha1="227a52318f52cbd641f7b1e787517194abea94fe" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="deja vu - 8 5 1990.chr" size="262144" crc="ffc9ef0a" sha1="0181f1dd041de33c9083ac3fa13e14721d008294" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dejavup3" cloneof="dejavu">
+		<description>Deja Vu (USA, prototype, 19900428)</description>
+		<year>1990</year>
+		<publisher>Kemco</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb_model" value="HVC-TK22EPROM-01" />
+			<dataarea name="prg" size="131072">
+				<rom name="deja vu - 4 28 1990.prg" size="131072" crc="4eda0eba" sha1="62a33c3b56005b6786982e42c6596f1a220db1e7" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="deja vu - 4 28 1990.chr" size="262144" crc="7d83ecae" sha1="80ffde9746e4d50b590ab7f0f494706c59adc5fc" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bigbangp" cloneof="clashdmn">
 		<description>Dengeki - Big Bang! (Jpn, Prototype)</description>
 		<year>19??</year>
