@@ -67,6 +67,10 @@ private:
 	uint8_t irq_ack_r();
 	void unk_w(uint8_t data);
 
+	// machine
+	emu_timer *m_led_timer;
+	TIMER_CALLBACK_MEMBER(update_leds);
+
 	// video
 	void thedealr_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -136,11 +140,8 @@ void thedealr_state::iox_p1_w(uint8_t data)
 	{
 		m_iox_leds = (m_iox_leds << 1) | BIT(data, 6);
 
-		// LED 0 = bet
-		// LED 1 = deal
-		// LED 4 = hold 1-5?
-		for (int i = 0; i < 8; i++)
-			m_leds[i] = BIT(m_iox_leds, i);
+		// HACK: retrigger timer to avoid output glitches (no latching signal seems to be provided)
+		m_led_timer->adjust(attotime::from_msec(2));
 	}
 
 	// Coin counters set by 0x40 command
@@ -150,6 +151,15 @@ void thedealr_state::iox_p1_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(3, !BIT(data, 4)); // coin-out
 
 	m_iox_p1 = data;
+}
+
+TIMER_CALLBACK_MEMBER(thedealr_state::update_leds)
+{
+	// LED 0 = bet
+	// LED 1 = deal
+	// LED 4 = hold 1-5?
+	for (int i = 0; i < 8; i++)
+		m_leds[i] = BIT(m_iox_leds, i);
 }
 
 void thedealr_state::iox_p2_w(uint8_t data)
@@ -436,6 +446,7 @@ GFXDECODE_END
 void thedealr_state::machine_start()
 {
 	m_leds.resolve();
+	m_led_timer = timer_alloc(FUNC(thedealr_state::update_leds), this);
 
 	m_iox_p1 = 0xff;
 	m_iox_p2 = 0xff;
