@@ -1224,7 +1224,7 @@ asmapro                         // (c) 1995 Intelligent Peripheral Devices
 @source:skeleton/alphasma3k.cpp
 asma3k                          // (c) 2000 AlphaSmart, Inc.
 
-@source:tangerin/alphatan.cpp
+@source:tangerine/alphatan.cpp
 alphatan                        // 1981 AlphaTantel
 
 @source:ta/alphatpx.cpp
@@ -16892,7 +16892,7 @@ tmscramb                        // Tomy
 tmtennis                        // Tomy
 ufombs                          // Bambino
 
-@source:tangerin/hhtiger.cpp
+@source:tangerine/hhtiger.cpp
 hhtiger                         // 1983 H/H Tiger
 
 @source:misc/hideseek.cpp
@@ -23703,7 +23703,7 @@ micronic                        //
 pentacup                        //
 pentacup2                       //
 
-@source:tangerin/microtan.cpp
+@source:tangerine/microtan.cpp
 mt65                            // 1979 Microtan 65
 micron                          // 1980 Micron
 spinveti                        // 1980 Space Invasion (ETI)
@@ -33973,7 +33973,7 @@ orao103                         //
 @source:atari/orbit.cpp
 orbit                           // 033689-033702    1978/11 [6800]
 
-@source:tangerin/oric.cpp
+@source:tangerine/oric.cpp
 oric1                           // 1983 Oric 1
 orica                           // 1984 Oric Atmos
 prav8d                          // 1985 Pravetz 8D
@@ -40414,7 +40414,7 @@ supduck                         // (c) Comad
 @source:adc/super6.cpp
 super6                          //
 
-@source:dicksmth/super80.cpp
+@source:dicksmith/super80.cpp
 super80                         //
 super80d                        //
 super80e                        //
@@ -41371,25 +41371,25 @@ tehkanwcc                       // bootleg
 tehkanwcd                       // (c) 1985 Tehkan
 tehkanwch                       // (c) 1986 (hack)
 
-@source:tektroni/tek405x.cpp
+@source:tektronix/tek405x.cpp
 tek4051                         //
 tek4052a                        //
 
-@source:tektroni/tek410x.cpp
+@source:tektronix/tek410x.cpp
 tek4107a                        //
 tek4109a                        //
 
-@source:tektroni/tek43xx.cpp
+@source:tektronix/tek43xx.cpp
 tek4319                         //
 
-@source:tektroni/tek440x.cpp
+@source:tektronix/tek440x.cpp
 tek4404                         // (c) 1984 Tektronix
 
-@source:tektroni/tekigw.cpp
+@source:tektronix/tekigw.cpp
 tek4132                         // Tektronix 4132
 tek6130                         // Tektronix 6130
 
-@source:tektroni/tekxp33x.cpp
+@source:tektronix/tekxp33x.cpp
 tekxp330                        //
 
 @source:skeleton/teleray10.cpp
