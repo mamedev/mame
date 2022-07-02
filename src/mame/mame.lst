@@ -33921,14 +33921,14 @@ olibochu                        // M47 (c) 1981 + "GDI presents"
 @source:olivetti/olivpc1.cpp
 olivpc1
 
-@source:olympia/olyboss.cpp
+@source:olympiaint/olyboss.cpp
 olybossb                        // Olympia BOSS B
 olybossc                        // Olympia BOSS C
 olybossd                        // Olympia BOSS D
 bossa85                         // Olympia BOSS A 8085
 bossb85                         // Olympia BOSS B 8085
 
-@source:olympia/olytext.cpp
+@source:olympiaint/olytext.cpp
 olytext                         // Olympia Olytext 20
 
 @source:midway/omegrace.cpp
@@ -34571,7 +34571,7 @@ pbem2017                        // 2017 TecToy Pense Bem
 pent1024                        //
 pentagon                        //
 
-@source:olympia/peoplepc.cpp
+@source:olympiaint/peoplepc.cpp
 olypeopl                        // Olympia People PC
 
 @source:igt/peplus.cpp

@@ -359,4 +359,4 @@ ROM_START( olypeopl )
 	ROM_LOAD( "m1.bin", 0x000, 0x400, NO_DUMP )
 ROM_END
 
-COMP( 1983, olypeopl, 0, 0, olypeopl, 0, peoplepc_state, empty_init, "Olympia", "People PC", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+COMP( 1983, olypeopl, 0, 0, olypeopl, 0, peoplepc_state, empty_init, "Olympia International", "People PC", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

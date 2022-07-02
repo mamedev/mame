@@ -546,9 +546,9 @@ novation/drumsta.cpp
 olivetti/m20.cpp
 olivetti/m24.cpp
 olivetti/olivpc1.cpp
-olympia/olyboss.cpp
-olympia/olytext.cpp
-olympia/peoplepc.cpp
+olympiaint/olyboss.cpp
+olympiaint/olytext.cpp
+olympiaint/peoplepc.cpp
 omnibyte/msbc1.cpp
 omnibyte/ob68k1a.cpp
 omron/luna_68k.cpp
