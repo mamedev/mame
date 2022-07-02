@@ -156,8 +156,8 @@ void seta_state::seta_coin_counter_w(u8 data)
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 
-	if (m_x1.found())
-		m_x1->enable_w(BIT(data, 6));
+	if (m_x1snd.found())
+		m_x1snd->enable_w(BIT(data, 6));
 }
 
 void seta_state::seta_coin_lockout_w(u8 data)
@@ -245,7 +245,7 @@ u16 usclssic_state::tile_offset(u16 code)
 	return m_tiles_offset + code;
 }
 
-SETA001_SPRITE_GFXBANK_CB_MEMBER(seta_state::setac_gfxbank_callback)
+X1_001_SPRITE_GFXBANK_CB_MEMBER(seta_state::setac_gfxbank_callback)
 {
 	const int bank = (color & 0x06) >> 1;
 	code = (code & 0x3fff) + (bank * 0x4000);
@@ -362,7 +362,7 @@ void seta_state::palette_init_RRRRRGGGGGBBBBB_proms(palette_device &palette) con
 
 void setaroul_state::setaroul_palette(palette_device &palette) const
 {
-	m_seta001->gfx(0)->set_granularity(16);
+	m_spritegen->gfx(0)->set_granularity(16);
 	m_layers[0]->gfx(0)->set_granularity(16);
 
 	palette_init_RRRRRGGGGGBBBBB_proms(palette);
@@ -457,7 +457,7 @@ u32 seta_state::screen_update_seta_no_layers(screen_device &screen, bitmap_ind16
 	set_pens();
 	bitmap.fill(0x1f0, cliprect);
 
-	m_seta001->draw_sprites(screen, bitmap,cliprect,0x1000);
+	m_spritegen->draw_sprites(screen, bitmap,cliprect,0x1000);
 	return 0;
 }
 
@@ -468,7 +468,7 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 	const rectangle &visarea = screen.visible_area();
 	const int vis_dimy = visarea.max_y - visarea.min_y + 1;
 
-	const int flip = m_seta001->is_flipped() ^ m_tilemaps_flip;
+	const int flip = m_spritegen->is_flipped() ^ m_tilemaps_flip;
 	for (int layer = 0; layer < 2; layer++)
 	{
 		if (m_layers[layer].found())
@@ -516,7 +516,7 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 		if (order & 2)  // layer-sprite priority?
 		{
-			if (layers_ctrl & 8) m_seta001->draw_sprites(screen, bitmap,cliprect,sprite_bank_size);
+			if (layers_ctrl & 8) m_spritegen->draw_sprites(screen, bitmap,cliprect,sprite_bank_size);
 
 			if (order & 4)
 			{
@@ -534,7 +534,7 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 			if (layers_ctrl & 1) m_layers[0]->draw(screen, bitmap, cliprect, 0, 0);
 
-			if (layers_ctrl & 8) m_seta001->draw_sprites(screen, bitmap,cliprect,sprite_bank_size);
+			if (layers_ctrl & 8) m_spritegen->draw_sprites(screen, bitmap,cliprect,sprite_bank_size);
 		}
 	}
 	else
@@ -543,7 +543,7 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 		if (order & 2)  // layer-sprite priority?
 		{
-			if (layers_ctrl & 8) m_seta001->draw_sprites(screen, bitmap,cliprect,sprite_bank_size);
+			if (layers_ctrl & 8) m_spritegen->draw_sprites(screen, bitmap,cliprect,sprite_bank_size);
 
 			if ((order & 4) && m_paletteram[1] != nullptr)
 			{
@@ -581,7 +581,7 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 				}
 			}
 
-			if (layers_ctrl & 8) m_seta001->draw_sprites(screen,bitmap,cliprect,sprite_bank_size);
+			if (layers_ctrl & 8) m_spritegen->draw_sprites(screen,bitmap,cliprect,sprite_bank_size);
 		}
 	}
 
@@ -608,7 +608,7 @@ WRITE_LINE_MEMBER(setaroul_state::screen_vblank)
 {
 	// rising edge
 	if (state)
-		m_seta001->tnzs_eof();
+		m_spritegen->tnzs_eof();
 }
 
 

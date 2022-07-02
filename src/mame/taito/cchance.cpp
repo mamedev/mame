@@ -92,14 +92,14 @@ void cchance_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 
-	map(0xa000, 0xafff).ram().rw(m_seta001, FUNC(seta001_device::spritecodelow_r8), FUNC(seta001_device::spritecodelow_w8));
-	map(0xb000, 0xbfff).ram().rw(m_seta001, FUNC(seta001_device::spritecodehigh_r8), FUNC(seta001_device::spritecodehigh_w8));
+	map(0xa000, 0xafff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecodelow_r8), FUNC(x1_001_device::spritecodelow_w8));
+	map(0xb000, 0xbfff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecodehigh_r8), FUNC(x1_001_device::spritecodehigh_w8));
 
 	map(0xc000, 0xdfff).ram();
 
-	map(0xe000, 0xe2ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r8), FUNC(seta001_device::spriteylow_w8));
-	map(0xe300, 0xe303).ram().mirror(0xfc).w(m_seta001, FUNC(seta001_device::spritectrl_w8));  /* control registers (0x80 mirror used by Arkanoid 2) */
-	map(0xe800, 0xe800).w(m_seta001, FUNC(seta001_device::spritebgflag_w8));   /* enable / disable background transparency */
+	map(0xe000, 0xe2ff).ram().rw(m_spritegen, FUNC(x1_001_device::spriteylow_r8), FUNC(x1_001_device::spriteylow_w8));
+	map(0xe300, 0xe303).ram().mirror(0xfc).w(m_spritegen, FUNC(x1_001_device::spritectrl_w8));  /* control registers (0x80 mirror used by Arkanoid 2) */
+	map(0xe800, 0xe800).w(m_spritegen, FUNC(x1_001_device::spritebgflag_w8));   /* enable / disable background transparency */
 
 	map(0xf000, 0xf000).nopr().nopw(); //???
 	map(0xf001, 0xf001).r(FUNC(cchance_state::input_1_r)).w(FUNC(cchance_state::output_0_w));
@@ -224,9 +224,9 @@ void cchance_state::cchance(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cchance_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cchance_state::irq0_line_hold));
 
-	SETA001_SPRITE(config, m_seta001, 12_MHz_XTAL, m_palette, gfx_cchance);
-	m_seta001->set_fg_yoffsets( -0x12, 0x0e );
-	m_seta001->set_bg_yoffsets( 0x1, -0x1 );
+	X1_001(config, m_spritegen, 12_MHz_XTAL, m_palette, gfx_cchance);
+	m_spritegen->set_fg_yoffsets( -0x12, 0x0e );
+	m_spritegen->set_bg_yoffsets( 0x1, -0x1 );
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

@@ -723,12 +723,12 @@ void tnzs_base_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).m(m_mainbank, FUNC(address_map_bank_device::amap8));
-	map(0xc000, 0xcfff).ram().rw(m_seta001, FUNC(seta001_device::spritecodelow_r8), FUNC(seta001_device::spritecodelow_w8));
-	map(0xd000, 0xdfff).ram().rw(m_seta001, FUNC(seta001_device::spritecodehigh_r8), FUNC(seta001_device::spritecodehigh_w8));
+	map(0xc000, 0xcfff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecodelow_r8), FUNC(x1_001_device::spritecodelow_w8));
+	map(0xd000, 0xdfff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecodehigh_r8), FUNC(x1_001_device::spritecodehigh_w8));
 	map(0xe000, 0xefff).ram().share("share1");
-	map(0xf000, 0xf2ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r8), FUNC(seta001_device::spriteylow_w8));
-	map(0xf300, 0xf303).mirror(0xfc).w(m_seta001, FUNC(seta001_device::spritectrl_w8));  /* control registers (0x80 mirror used by Arkanoid 2) */
-	map(0xf400, 0xf400).w(m_seta001, FUNC(seta001_device::spritebgflag_w8));   /* enable / disable background transparency */
+	map(0xf000, 0xf2ff).ram().rw(m_spritegen, FUNC(x1_001_device::spriteylow_r8), FUNC(x1_001_device::spriteylow_w8));
+	map(0xf300, 0xf303).mirror(0xfc).w(m_spritegen, FUNC(x1_001_device::spritectrl_w8));  /* control registers (0x80 mirror used by Arkanoid 2) */
+	map(0xf400, 0xf400).w(m_spritegen, FUNC(x1_001_device::spritebgflag_w8));   /* enable / disable background transparency */
 	map(0xf600, 0xf600).nopr().w(FUNC(tnzs_base_state::ramrom_bankswitch_w));
 	map(0xf800, 0xfbff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 }
@@ -745,12 +745,12 @@ void tnzsb_state::tnzsb_main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).m(m_mainbank, FUNC(address_map_bank_device::amap8));
-	map(0xc000, 0xcfff).ram().rw(m_seta001, FUNC(seta001_device::spritecodelow_r8), FUNC(seta001_device::spritecodelow_w8));
-	map(0xd000, 0xdfff).ram().rw(m_seta001, FUNC(seta001_device::spritecodehigh_r8), FUNC(seta001_device::spritecodehigh_w8));
+	map(0xc000, 0xcfff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecodelow_r8), FUNC(x1_001_device::spritecodelow_w8));
+	map(0xd000, 0xdfff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecodehigh_r8), FUNC(x1_001_device::spritecodehigh_w8));
 	map(0xe000, 0xefff).ram().share("share1");
-	map(0xf000, 0xf2ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r8), FUNC(seta001_device::spriteylow_w8));
-	map(0xf300, 0xf303).mirror(0xfc).w(m_seta001, FUNC(seta001_device::spritectrl_w8)); /* control registers (0x80 mirror used by Arkanoid 2) */
-	map(0xf400, 0xf400).w(m_seta001, FUNC(seta001_device::spritebgflag_w8));   /* enable / disable background transparency */
+	map(0xf000, 0xf2ff).ram().rw(m_spritegen, FUNC(x1_001_device::spriteylow_r8), FUNC(x1_001_device::spriteylow_w8));
+	map(0xf300, 0xf303).mirror(0xfc).w(m_spritegen, FUNC(x1_001_device::spritectrl_w8)); /* control registers (0x80 mirror used by Arkanoid 2) */
+	map(0xf400, 0xf400).w(m_spritegen, FUNC(x1_001_device::spritebgflag_w8));   /* enable / disable background transparency */
 	map(0xf600, 0xf600).w(FUNC(tnzsb_state::ramrom_bankswitch_w));
 	/* kabukiz still writes here but it's not used (it's palette RAM in type1 map) */
 	map(0xf800, 0xfbff).nopw();
@@ -851,12 +851,12 @@ void jpopnics_state::jpopnics_main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).m(m_mainbank, FUNC(address_map_bank_device::amap8));
-	map(0xc000, 0xcfff).ram().rw(m_seta001, FUNC(seta001_device::spritecodelow_r8), FUNC(seta001_device::spritecodelow_w8));
-	map(0xd000, 0xdfff).ram().rw(m_seta001, FUNC(seta001_device::spritecodehigh_r8), FUNC(seta001_device::spritecodehigh_w8));
+	map(0xc000, 0xcfff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecodelow_r8), FUNC(x1_001_device::spritecodelow_w8));
+	map(0xd000, 0xdfff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecodehigh_r8), FUNC(x1_001_device::spritecodehigh_w8));
 	map(0xe000, 0xefff).ram().share("share1"); /* WORK RAM (shared by the 2 z80's) */
-	map(0xf000, 0xf2ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r8), FUNC(seta001_device::spriteylow_w8));
-	map(0xf300, 0xf303).mirror(0xfc).w(m_seta001, FUNC(seta001_device::spritectrl_w8)); /* control registers (0x80 mirror used by Arkanoid 2) */
-	map(0xf400, 0xf400).w(m_seta001, FUNC(seta001_device::spritebgflag_w8));   /* enable / disable background transparency */
+	map(0xf000, 0xf2ff).ram().rw(m_spritegen, FUNC(x1_001_device::spriteylow_r8), FUNC(x1_001_device::spriteylow_w8));
+	map(0xf300, 0xf303).mirror(0xfc).w(m_spritegen, FUNC(x1_001_device::spritectrl_w8)); /* control registers (0x80 mirror used by Arkanoid 2) */
+	map(0xf400, 0xf400).w(m_spritegen, FUNC(x1_001_device::spritebgflag_w8));   /* enable / disable background transparency */
 	map(0xf600, 0xf600).nopr().w(FUNC(jpopnics_state::ramrom_bankswitch_w));
 	map(0xf800, 0xffff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 }
@@ -1544,9 +1544,9 @@ void tnzs_base_state::tnzs_base(machine_config &config)
 	config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
-	SETA001_SPRITE(config, m_seta001, 12'000'000, m_palette, gfx_tnzs);
-	m_seta001->set_fg_yoffsets( -0x12, 0x0e );
-	m_seta001->set_bg_yoffsets( 0x1, -0x1 );
+	X1_001(config, m_spritegen, 12'000'000, m_palette, gfx_tnzs);
+	m_spritegen->set_fg_yoffsets( -0x12, 0x0e );
+	m_spritegen->set_bg_yoffsets( 0x1, -0x1 );
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -1628,7 +1628,7 @@ void insectx_state::insectx(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &insectx_state::insectx_sub_map);
 
 	/* video hardware */
-	m_seta001->set_info(gfx_insectx);
+	m_spritegen->set_info(gfx_insectx);
 
 	/* sound hardware */
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000)/4)); /* verified on pcb */

@@ -673,6 +673,37 @@ around it by adding **-U_FORTIFY_SOURCE** to the compiler flags (e.g. by using
 the **ARCHOPTS** setting, or setting the **CFLAGS** and **CXXFLAGS** environment
 variables.
 
+Issues affecting Microsoft Visual Studio
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Microsoft introduced a new version of XAudio2 with Windows 8 that’s incompatible
+with the version included with DirectX for prior Windows versions at the API
+level.  Newer versions of the Microsoft Windows SDK include headers and libraries
+for the new version of XAudio2.  By default, the target Windows version is set to
+Windows Vista (6.0) when compiling MAME, which prevents the use of this version
+of the XAudio2 headers and libraries.  To build MAME with XAudio2 support using
+the Microsoft Windows SDK, you must do one of the following:
+
+* Add ``MODERN_WIN_API=1`` to the options passed to make when generating the
+  Visual Studio project files.  This will set the target Windows version to
+  Windows 8 (6.2).  The resulting binaries may not run on earlier versions of
+  Windows.
+* Install the DirectX SDL and configure the **osd_windows** project to search
+  the DirectX header/library paths before searching the Microsoft Windows SDK
+  paths.
+
+The MSVC compiler produces spurious warnings about potentially uninitialised
+local variables.  You currently need to add ``NOWERROR=1`` to the options passed
+to make when generating the Visual Studio project files.  This stops warnings
+from being treated as errors.  (MSVC seems to lack options to control which
+specific warnings are treated as error, which other compilers support.)
+
+There is an as-yet unresolved issue with duplicate COM GUIDS being defined in
+the PortAudio library when the target Windows version is set to Windows Vista
+(6.0) or later.  To work around this, add ``NO_USE_PORTAUDIO=1`` to the options
+passed to make when generating the Visual Studio project files.  MAME will be
+built without support for sound output via PortAudio.
+
 
 .. _compiling-unusual:
 

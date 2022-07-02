@@ -43,14 +43,14 @@
 	*/
 
 #include "emu.h"
-#include "seta001.h"
+#include "x1_001.h"
 #include "screen.h"
 
 
-DEFINE_DEVICE_TYPE(SETA001_SPRITE, seta001_device, "seta001", "Seta SETA001 Sprites")
+DEFINE_DEVICE_TYPE(X1_001, x1_001_device, "x1_001", "Seta X1-001 Sprites")
 
-seta001_device::seta001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SETA001_SPRITE, tag, owner, clock)
+x1_001_device::x1_001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, X1_001, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this)
 	, m_gfxbank_cb(*this)
 	, m_fg_flipxoffs(0)
@@ -67,11 +67,10 @@ seta001_device::seta001_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-void seta001_device::device_start()
+void x1_001_device::device_start()
 {
 	m_spriteylow = std::make_unique<uint8_t[]>(0x300); // 0x200 low y + 0x100 bg stuff
-	m_spritecodelow = std::make_unique<uint8_t[]>(0x2000);
-	m_spritecodehigh = std::make_unique<uint8_t[]>(0x2000);
+	m_spritecode = std::make_unique<uint16_t[]>(0x2000);
 
 	/* chukatai draws a column on the left from uninitialized RAM which causes garbage
 
@@ -95,10 +94,9 @@ void seta001_device::device_start()
 
 	*/
 
-	memset(m_spritectrl,0xff,4);
-	memset(m_spriteylow.get(),0xff,0x300);
-	memset(m_spritecodelow.get(),0xff,0x2000);
-	memset(m_spritecodehigh.get(),0xff,0x2000);
+	std::fill_n(m_spritectrl, 4, 0xff);
+	std::fill_n(m_spriteylow.get(), 0x300, 0xff);
+	std::fill_n(m_spritecode.get(), 0x2000, 0xffff);
 
 	m_bgflag = 0x00;
 
@@ -107,20 +105,19 @@ void seta001_device::device_start()
 	save_item(NAME(m_bgflag));
 	save_item(NAME(m_spritectrl));
 	save_pointer(NAME(m_spriteylow),0x300);
-	save_pointer(NAME(m_spritecodelow),0x2000);
-	save_pointer(NAME(m_spritecodehigh),0x2000);
+	save_pointer(NAME(m_spritecode),0x2000);
 }
 
-void seta001_device::device_reset()
+void x1_001_device::device_reset()
 {
 }
 
-uint16_t seta001_device::spritectrl_r16(offs_t offset)
+uint16_t x1_001_device::spritectrl_r16(offs_t offset)
 {
 	return m_spritectrl[offset];
 }
 
-void seta001_device::spritectrl_w16(offs_t offset, uint16_t data, uint16_t mem_mask)
+void x1_001_device::spritectrl_w16(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -128,22 +125,22 @@ void seta001_device::spritectrl_w16(offs_t offset, uint16_t data, uint16_t mem_m
 	}
 }
 
-uint8_t seta001_device::spritectrl_r8(offs_t offset)
+uint8_t x1_001_device::spritectrl_r8(offs_t offset)
 {
 	return m_spritectrl[offset];
 }
 
-void seta001_device::spritectrl_w8(offs_t offset, uint8_t data)
+void x1_001_device::spritectrl_w8(offs_t offset, uint8_t data)
 {
 	m_spritectrl[offset] = data;
 }
 
-uint16_t seta001_device::spriteylow_r16(offs_t offset)
+uint16_t x1_001_device::spriteylow_r16(offs_t offset)
 {
 	return m_spriteylow[offset];
 }
 
-void seta001_device::spriteylow_w16(offs_t offset, uint16_t data, uint16_t mem_mask)
+void x1_001_device::spriteylow_w16(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -151,51 +148,48 @@ void seta001_device::spriteylow_w16(offs_t offset, uint16_t data, uint16_t mem_m
 	}
 }
 
-uint8_t seta001_device::spriteylow_r8(offs_t offset)
+uint8_t x1_001_device::spriteylow_r8(offs_t offset)
 {
 	return m_spriteylow[offset];
 }
 
-void seta001_device::spriteylow_w8(offs_t offset, uint8_t data)
+void x1_001_device::spriteylow_w8(offs_t offset, uint8_t data)
 {
 	m_spriteylow[offset] = data;
 }
 
 
-uint8_t seta001_device::spritecodelow_r8(offs_t offset)
+uint8_t x1_001_device::spritecodelow_r8(offs_t offset)
 {
-	return m_spritecodelow[offset];
+	return m_spritecode[offset] & 0xff;
 }
 
-void seta001_device::spritecodelow_w8(offs_t offset, uint8_t data)
+void x1_001_device::spritecodelow_w8(offs_t offset, uint8_t data)
 {
-	m_spritecodelow[offset] = data;
+	m_spritecode[offset] = (m_spritecode[offset] & 0xff00) | data;
 }
 
-uint8_t seta001_device::spritecodehigh_r8(offs_t offset)
+uint8_t x1_001_device::spritecodehigh_r8(offs_t offset)
 {
-	return m_spritecodehigh[offset];
+	return (m_spritecode[offset] >> 8) & 0xff;
 }
 
-void seta001_device::spritecodehigh_w8(offs_t offset, uint8_t data)
+void x1_001_device::spritecodehigh_w8(offs_t offset, uint8_t data)
 {
-	m_spritecodehigh[offset] = data;
+	m_spritecode[offset] = (m_spritecode[offset] & 0x00ff) | uint16_t(data) << 8;
 }
 
-uint16_t seta001_device::spritecode_r16(offs_t offset)
+uint16_t x1_001_device::spritecode_r16(offs_t offset)
 {
-	uint16_t ret = m_spritecodelow[offset];
-	ret |= m_spritecodehigh[offset] << 8;
-	return ret;
+	return m_spritecode[offset];
 }
 
-void seta001_device::spritecode_w16(offs_t offset, uint16_t data, uint16_t mem_mask)
+void x1_001_device::spritecode_w16(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	if (ACCESSING_BITS_0_7) m_spritecodelow[offset] = data & 0x00ff;
-	if (ACCESSING_BITS_8_15)  m_spritecodehigh[offset] = (data & 0xff00)>>8;
+	COMBINE_DATA(&m_spritecode[offset]);
 }
 
-void seta001_device::spritebgflag_w8(uint8_t data)
+void x1_001_device::spritebgflag_w8(uint8_t data)
 {
 	m_bgflag = data;
 }
@@ -249,7 +243,7 @@ format
 
 
 
-void seta001_device::draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size)
+void x1_001_device::draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size)
 {
 	int transpen;
 
@@ -306,8 +300,8 @@ void seta001_device::draw_background( bitmap_ind16 &bitmap, const rectangle &cli
 		{
 			int i = ((col+startcol)&0xf) * 32 + offs;
 
-			int code = ((m_spritecodehigh[i+0x400+bank]) << 8) | m_spritecodelow[i+0x400+bank];
-			int color =((m_spritecodehigh[i+0x600+bank]) << 8) | m_spritecodelow[i+0x600+bank];
+			uint16_t code = m_spritecode[i+0x400+bank];
+			uint16_t color = m_spritecode[i+0x600+bank];
 
 			int flipx   =   code & 0x8000;
 			int flipy   =   code & 0x4000;
@@ -360,17 +354,15 @@ void seta001_device::draw_background( bitmap_ind16 &bitmap, const rectangle &cli
 }
 
 
-void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size)
+void x1_001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size)
 {
 	int const screenflip = (m_spritectrl[0] & 0x40) >> 6;
 	int const ctrl2 = m_spritectrl[1];
 
 	int const total_color_codes   =   gfx(0)->colors();
 
-	uint8_t *char_pointer = &m_spritecodelow[0x0000];
-	uint8_t *x_pointer = &m_spritecodelow[0x0200];
-	uint8_t *ctrl_pointer = &m_spritecodehigh[0x0000];
-	uint8_t *color_pointer = &m_spritecodehigh[0x0200];
+	uint16_t *char_pointer = &m_spritecode[0x0000];
+	uint16_t *x_pointer = &m_spritecode[0x0200];
 
 	// note that drgnunit, stg and qzkklogy run on the same board, yet they need different alignment
 	int xoffs = screenflip ? m_fg_flipxoffs : m_fg_noflipxoffs;
@@ -380,8 +372,6 @@ void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitma
 	{
 		char_pointer += bank_size;
 		x_pointer += bank_size;
-		ctrl_pointer += bank_size;
-		color_pointer += bank_size;
 	}
 
 	int const max_y = screen.height();
@@ -391,15 +381,15 @@ void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitma
 	{
 		int code, color, sx, sy, flipx, flipy;
 
-		code = char_pointer[i] + ((ctrl_pointer[i] & 0x3f) << 8);
-		color = (color_pointer[i] & 0xf8) >> 3;
+		code = char_pointer[i] & 0x3fff;
+		color = (x_pointer[i] & 0xf800) >> 11;
 
-		sx = x_pointer[i] - ((color_pointer[i] & 1) << 8);
+		sx = (x_pointer[i] & 0x00ff) - (x_pointer[i] & 0x0100);
 		sy =  (m_spriteylow[i] & 0xff);
-		flipx = ctrl_pointer[i] & 0x80;
-		flipy = ctrl_pointer[i] & 0x40;
+		flipx = char_pointer[i] & 0x8000;
+		flipy = char_pointer[i] & 0x4000;
 
-		if (!m_gfxbank_cb.isnull()) code = m_gfxbank_cb(code, color_pointer[i]);
+		if (!m_gfxbank_cb.isnull()) code = m_gfxbank_cb(code, x_pointer[i] >> 8);
 
 		color %= total_color_codes;
 
@@ -449,7 +439,7 @@ void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitma
 
 
 
-void seta001_device::setac_eof()
+void x1_001_device::setac_eof()
 {
 	// is this handling right?
 	// it differs to tnzs, and thundercade has sprite flickering issues (not related to the devicification)
@@ -459,43 +449,29 @@ void seta001_device::setac_eof()
 	if (~ctrl2 & 0x20)
 	{
 		if (ctrl2 & 0x40)
-		{
-			memcpy( &m_spritecodelow[0x0000], &m_spritecodelow[0x1000],0x800);
-			memcpy(&m_spritecodehigh[0x0000],&m_spritecodehigh[0x1000],0x800);
-		}
+			std::copy_n(&m_spritecode[0x1000], 0x800, &m_spritecode[0x0000]);
 		else
-		{
-			memcpy( &m_spritecodelow[0x1000], &m_spritecodelow[0x0000],0x800);
-			memcpy(&m_spritecodehigh[0x1000],&m_spritecodehigh[0x0000],0x800);
-		}
+			std::copy_n(&m_spritecode[0x0000], 0x800, &m_spritecode[0x1000]);
 	}
 }
 
-void seta001_device::tnzs_eof( void )
+void x1_001_device::tnzs_eof()
 {
 	int const ctrl2 = m_spritectrl[1];
 	if (~ctrl2 & 0x20)
 	{
 		// note I copy sprites only. setac implementation also copies the "floating tilemap"
 		if (ctrl2 & 0x40)
-		{
-			memcpy( &m_spritecodelow[0x0000],  &m_spritecodelow[0x0800], 0x0400);
-			memcpy(&m_spritecodehigh[0x0000], &m_spritecodehigh[0x0800], 0x0400);
-		}
+			std::copy_n(&m_spritecode[0x0800], 0x400, &m_spritecode[0x0000]);
 		else
-		{
-			memcpy( &m_spritecodelow[0x0800],  &m_spritecodelow[0x0000], 0x0400);
-			memcpy(&m_spritecodehigh[0x0800], &m_spritecodehigh[0x0000], 0x0400);
-		}
+			std::copy_n(&m_spritecode[0x0000], 0x400, &m_spritecode[0x0800]);
 
 		// and I copy the "floating tilemap" BACKWARDS - this fixes kabukiz
-		memcpy( &m_spritecodelow[0x0400],  &m_spritecodelow[0x0c00], 0x0400);
-		memcpy(&m_spritecodehigh[0x0400], &m_spritecodehigh[0x0c00], 0x0400);
+		std::copy_n(&m_spritecode[0x0c00], 0x0400, &m_spritecode[0x0400]);
 	}
-
 }
 
-void seta001_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size)
+void x1_001_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size)
 {
 	draw_background(bitmap, cliprect, bank_size);
 	draw_foreground(screen, bitmap, cliprect, bank_size);

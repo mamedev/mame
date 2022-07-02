@@ -154,12 +154,11 @@ Notes:
 
 #include "emu.h"
 
-#include "seta001.h"
-
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "sound/x1_010.h"
+#include "video/x1_001.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -174,7 +173,7 @@ public:
 	champbwl_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_seta001(*this, "spritegen"),
+		m_spritegen(*this, "spritegen"),
 		m_mainbank(*this, "mainbank")
 	{ }
 
@@ -182,7 +181,7 @@ protected:
 	virtual void machine_start() override;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<seta001_device> m_seta001;
+	required_device<x1_001_device> m_spritegen;
 	required_memory_bank m_mainbank;
 
 	void palette(palette_device &palette) const;
@@ -293,12 +292,12 @@ void champbwl_state::prg_map(address_map &map)
 	map(0x0000, 0x3fff).rom().region("maincpu", 0);
 	map(0x4000, 0x7fff).bankr(m_mainbank);
 	map(0x8000, 0x87ff).ram().share("nvram");
-	map(0xa000, 0xafff).ram().rw(m_seta001, FUNC(seta001_device::spritecodelow_r8), FUNC(seta001_device::spritecodelow_w8));
-	map(0xb000, 0xbfff).ram().rw(m_seta001, FUNC(seta001_device::spritecodehigh_r8), FUNC(seta001_device::spritecodehigh_w8));
+	map(0xa000, 0xafff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecodelow_r8), FUNC(x1_001_device::spritecodelow_w8));
+	map(0xb000, 0xbfff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecodehigh_r8), FUNC(x1_001_device::spritecodehigh_w8));
 	map(0xc000, 0xdfff).rw("x1snd", FUNC(x1_010_device::read), FUNC(x1_010_device::write));
-	map(0xe000, 0xe2ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r8), FUNC(seta001_device::spriteylow_w8));
-	map(0xe300, 0xe303).mirror(0xfc).w(m_seta001, FUNC(seta001_device::spritectrl_w8)); // control registers (0x80 mirror used by Arkanoid 2)
-	map(0xe800, 0xe800).w(m_seta001, FUNC(seta001_device::spritebgflag_w8)); // enable / disable background transparency
+	map(0xe000, 0xe2ff).ram().rw(m_spritegen, FUNC(x1_001_device::spriteylow_r8), FUNC(x1_001_device::spriteylow_w8));
+	map(0xe300, 0xe303).mirror(0xfc).w(m_spritegen, FUNC(x1_001_device::spritectrl_w8)); // control registers (0x80 mirror used by Arkanoid 2)
+	map(0xe800, 0xe800).w(m_spritegen, FUNC(x1_001_device::spritebgflag_w8)); // enable / disable background transparency
 
 	map(0xf000, 0xf000).r(FUNC(champbwl_state::trackball_r));
 	map(0xf002, 0xf002).lr8(NAME([this] () -> u8 { return !BIT(m_nvram[0x400], 7) ? ioport("IN0")->read() : ioport("IN1")->read(); }));
@@ -333,12 +332,12 @@ void doraemon_state::prg_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x7fff).bankr(m_mainbank);
 	map(0x8000, 0x87ff).ram().share("nvram");
-	map(0xa000, 0xafff).ram().rw(m_seta001, FUNC(seta001_device::spritecodelow_r8), FUNC(seta001_device::spritecodelow_w8));
-	map(0xb000, 0xbfff).ram().rw(m_seta001, FUNC(seta001_device::spritecodehigh_r8), FUNC(seta001_device::spritecodehigh_w8));
+	map(0xa000, 0xafff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecodelow_r8), FUNC(x1_001_device::spritecodelow_w8));
+	map(0xb000, 0xbfff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecodehigh_r8), FUNC(x1_001_device::spritecodehigh_w8));
 	map(0xc000, 0xc07f).rw("x1snd", FUNC(x1_010_device::read), FUNC(x1_010_device::write)); // Sound
-	map(0xe000, 0xe2ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r8), FUNC(seta001_device::spriteylow_w8));
-	map(0xe300, 0xe303).w(m_seta001, FUNC(seta001_device::spritectrl_w8));
-	map(0xe800, 0xe800).w(m_seta001, FUNC(seta001_device::spritebgflag_w8)); // enable / disable background transparency
+	map(0xe000, 0xe2ff).ram().rw(m_spritegen, FUNC(x1_001_device::spriteylow_r8), FUNC(x1_001_device::spriteylow_w8));
+	map(0xe300, 0xe303).w(m_spritegen, FUNC(x1_001_device::spritectrl_w8));
+	map(0xe800, 0xe800).w(m_spritegen, FUNC(x1_001_device::spritebgflag_w8)); // enable / disable background transparency
 	map(0xf000, 0xf000).portr("IN0").w(FUNC(doraemon_state::outputs_w));
 	map(0xf002, 0xf002).portr("IN1").nopw(); // Ack?
 	map(0xf004, 0xf004).nopw();              // Ack?
@@ -528,7 +527,7 @@ uint32_t champbwl_base_state::screen_update(screen_device &screen, bitmap_ind16 
 {
 	bitmap.fill(0x1f0, cliprect);
 
-	m_seta001->draw_sprites(screen, bitmap, cliprect, 0x800);
+	m_spritegen->draw_sprites(screen, bitmap, cliprect, 0x800);
 	return 0;
 }
 
@@ -536,7 +535,7 @@ WRITE_LINE_MEMBER(champbwl_state::screen_vblank)
 {
 	// rising edge
 	if (state)
-		m_seta001->tnzs_eof();
+		m_spritegen->tnzs_eof();
 }
 
 
@@ -549,9 +548,9 @@ void champbwl_state::champbwl(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SETA001_SPRITE(config, m_seta001, 16_MHz_XTAL, "palette", gfx_champbwl);
-	m_seta001->set_fg_yoffsets(-0x0a, 0x0e);
-	m_seta001->set_bg_yoffsets(0x01, -0x01);
+	X1_001(config, m_spritegen, 16_MHz_XTAL, "palette", gfx_champbwl);
+	m_spritegen->set_fg_yoffsets(-0x0a, 0x0e);
+	m_spritegen->set_bg_yoffsets(0x01, -0x01);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -579,7 +578,7 @@ WRITE_LINE_MEMBER(doraemon_state::screen_vblank)
 {
 	// rising edge
 	if (state)
-		m_seta001->setac_eof();
+		m_spritegen->setac_eof();
 }
 
 
@@ -592,9 +591,9 @@ void doraemon_state::doraemon(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SETA001_SPRITE(config, m_seta001, 14.318181_MHz_XTAL, "palette", gfx_champbwl);
-	m_seta001->set_bg_yoffsets(0x00, 0x01);
-	m_seta001->set_fg_yoffsets(0x00, 0x10);
+	X1_001(config, m_spritegen, 14.318181_MHz_XTAL, "palette", gfx_champbwl);
+	m_spritegen->set_bg_yoffsets(0x00, 0x01);
+	m_spritegen->set_fg_yoffsets(0x00, 0x10);
 
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(2000), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW );
 
