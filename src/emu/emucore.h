@@ -98,6 +98,9 @@ using util::DWORD_XOR_BE;
 using util::DWORD_XOR_LE;
 
 
+// input ports support up to 32 bits each
+typedef u32 ioport_value;
+
 // pen_t is used to represent pixel values in bitmaps
 typedef u32 pen_t;
 
