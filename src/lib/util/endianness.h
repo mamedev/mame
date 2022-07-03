@@ -56,6 +56,7 @@ public:
 	constexpr offset_endian_cast(In *ptr, std::ptrdiff_t offs) noexcept : m_ptr(reinterpret_cast<Out *>(ptr)), m_offs(offs) { }
 
 	constexpr Out &operator[](std::ptrdiff_t i) const noexcept { return m_ptr[(m_offs + i) ^ ((Endian != endianness::native) ? SWIZZLE : 0)]; }
+	constexpr Out &operator*() const noexcept { return m_ptr[m_offs ^ ((Endian != endianness::native) ? SWIZZLE : 0)]; }
 
 	constexpr offset_endian_cast operator+(std::ptrdiff_t i) const noexcept { return offset_endian_cast(*this) += i; }
 	constexpr offset_endian_cast operator-(std::ptrdiff_t i) const noexcept { return offset_endian_cast(*this) -= i; }
