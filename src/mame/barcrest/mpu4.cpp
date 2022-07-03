@@ -2537,7 +2537,7 @@ void mpu4_state::mod4yam(machine_config &config)
 
 	mpu4_reels<0, 6>(config);
 
-	YM2413(config, m_ym2413, MPU4_MASTER_CLOCK/4);
+	YM2413(config, m_ym2413, 2000000);
 	m_ym2413->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_ym2413->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }

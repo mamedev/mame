@@ -136,25 +136,6 @@ ROM_START( m4dracb )
 	M4DRAC_EXTRAS
 ROM_END
 
-ROM_START( m4exgam )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "czep30.bin", 0x0000, 0x010000, CRC(4614e6f6) SHA1(5602a68e9b47394cb31bbcd49a9920e19af6242f) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "generic_dutch_sound2.bin", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
-ROM_END
-
-
-
-
-ROM_START( m4frtgm )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "fruit.bin", 0x0000, 0x010000, CRC(dbe44316) SHA1(15cd49dd2e6166f7a7668663f7fea802d6cbb12f) )
-
-	ROM_REGION( 0x800000, "msm6376", 0 ) // this isn't OKI, or is corrupt (bad size)
-	ROM_LOAD( "fruitsnd.bin", 0x0000, 0x010000, CRC(86547dc7) SHA1(4bf64f22e84c0ee82d961b0ba64932b8bf6a521f) ) // matches 'Replay' on SC1 hardware, probably just belongs there.. or this is eurocoin with different sound hw here?
-ROM_END
-
 
 
 
@@ -363,13 +344,6 @@ ROM_END
 
 
 
-ROM_START( m4ringfr )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "rof03s.p1", 0x0000, 0x020000, CRC(4b4703fe) SHA1(853ce1f5932e09af2b5f3b5314709f13aa35cf19) )
-
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	// missing?
-ROM_END
 
 
 
@@ -1383,7 +1357,6 @@ GAME( 198?, m4rltst,  0,          mod2_no_bacta,       mpu4,    mpu4unsorted_sta
 
 // barcrest, to split
 
-GAME(199?, m4ringfr,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big_lextender,ROT0, "Barcrest","Ring Of Fire (Barcrest) (German) (MPU4) (ROF 0.3)",GAME_FLAGS )
 
 GAME(199?, m4royjwl,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::jewelcrown_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big_lextender,  ROT0,   "Barcrest","Royal Jewels (Barcrest) (German) (MPU4) (GRJ 1.4)",GAME_FLAGS )
 
@@ -1408,8 +1381,6 @@ GAME(199?, m4twintm,  0,          mod4oki_7reel_cheatchr_pal<mpu4_characteriser_
 // GEEN TUBES
 GAME(199?, m4holdtm,  0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m400_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Hold Timer (Barcrest) (Dutch) (MPU4) (DHT 1.0)",GAME_FLAGS )
 
-// Tube Sense ALM (this seems like an exported version of one of the Dutch games?)
-GAME(199?, m4exgam,   0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m400_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Extra Game (Fairplay - Barcrest) (MPU4) (CEG 2.0)",GAME_FLAGS )
 
 
 // GEEN TUBES, confirmed oki
@@ -1419,8 +1390,6 @@ GAME(199?, m4toptima, m4toptim,   mod4oki_alt_cheatchr_pal<mpu4_characteriser_pa
 // GEEN TUBES
 GAME(199?, m4univ,    0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m400_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Universe (Barcrest) (Dutch) (MPU4) (DUN 2.0)",GAME_FLAGS )
 
-// Sample EPROM Alm
-GAME(199?, m4frtgm,   0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m400_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Fruit Game (Barcrest) (MPU4) (FRU 2.0)",GAME_FLAGS )
 
 
 // GEEN TUBES
@@ -1522,7 +1491,7 @@ GAME(199?, m4riotrp,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::b
 // fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc 6c dc bc 7c fc fc fc fc fc fc fc fc fc 00 04 0c 1c 3c 7c fc fc fc fc fc fc fc fc d4 ac 5c bc 7c fc fc fc fc fc fc fc fc fc fc fc fc 00
 GAME(199?, m4luck7,   0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Lucky 7 (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
 
-// gives a DMD?? message if you attempt to coin it up, is there a mussing Dot Matrix Display ROM of some kind?
+// gives an "IMD ?" message if you attempt to coin it up
 GAME(199?, m4joljokh, 0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::salsa_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Jolly Joker (Barcrest) (Hungarian) (MPU4) (HJJ 1.4)",GAME_FLAGS )
 
 

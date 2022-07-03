@@ -8165,3 +8165,59 @@ ROM_END
 
 // GEEN TUBES
 GAME(199?, m4blkwhd,  0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::blackwhite_characteriser_prot>,    mpu4,    mpu4mod4oki_machines_state, init_m4default_six, ROT0,   "Barcrest","Black & White (Barcrest) (Dutch) (MPU4) (DBW 1.1)",GAME_FLAGS ) // Reel Error
+
+/*****************************************************************************************************************************************************************************
+*
+* Fruit Game
+* - likely using incorrect sound ROM
+* - behaves more like one of the Dutch games, but with English errors?
+*
+*****************************************************************************************************************************************************************************/
+
+ROM_START( m4frtgm )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "fruit.bin", 0x0000, 0x010000, CRC(dbe44316) SHA1(15cd49dd2e6166f7a7668663f7fea802d6cbb12f) )
+
+	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_LOAD( "generic_dutch_sound1.bin", 0x0000, 0x080000, BAD_DUMP CRC(f247ba83) SHA1(9b173503e63a4a861d1380b2ab1fe14af1a189bd) )
+ROM_END
+
+// TUBE SENSE ALM
+GAME(199?, m4frtgm,   0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m400_characteriser_prot>,mpu4,    mpu4mod4oki_machines_state, init_m4altreels, ROT0,   "Barcrest","Fruit Game (Barcrest) (MPU4) (FRU 2.0)",GAME_FLAGS )
+
+/*****************************************************************************************************************************************************************************
+*
+* Extra Game
+* - likely using incorrect sound ROM
+* - behaves more like one of the Dutch games, but with English errors?
+*
+*****************************************************************************************************************************************************************************/
+
+ROM_START( m4exgam )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "czep30.bin", 0x0000, 0x010000, CRC(4614e6f6) SHA1(5602a68e9b47394cb31bbcd49a9920e19af6242f) )
+
+	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_LOAD( "generic_dutch_sound2.bin", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
+ROM_END
+
+// Tube Sense ALM (this seems like an exported version of one of the Dutch games?)
+GAME(199?, m4exgam,   0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m400_characteriser_prot>,mpu4,    mpu4mod4oki_machines_state, init_m4altreels, ROT0,   "Barcrest","Extra Game (Fairplay - Barcrest) (MPU4) (CEG 2.0)",GAME_FLAGS )
+
+/*****************************************************************************************************************************************************************************
+*
+* Ring of Fire
+* - behaves more like one of the Dutch games, but with German errors?
+*
+*****************************************************************************************************************************************************************************/
+
+ROM_START( m4ringfr )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "rof03s.p1", 0x0000, 0x020000, CRC(4b4703fe) SHA1(853ce1f5932e09af2b5f3b5314709f13aa35cf19) )
+
+	ROM_REGION( 0x080000, "msm6376", 0 )
+	ROM_LOAD( "sounds.bin", 0x0000, 0x080000, NO_DUMP )
+ROM_END
+
+// Alarm 17
+GAME(199?, m4ringfr,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>,    mpu4,    mpu4mod4oki_machines_state, init_m4default_big_lextender,ROT0, "Barcrest","Ring Of Fire (Barcrest) (German) (MPU4) (ROF 0.3)",GAME_FLAGS )

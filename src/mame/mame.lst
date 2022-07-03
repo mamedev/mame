@@ -24468,8 +24468,6 @@ m4eaw51                         // Everyone's A Winner?
 m4esctbg                        // Escalera Tobogan (Vifico)
 m4esctbga                       //
 m4esctbgb                       //
-m4exgam                         // Extra Game (Fairplay - Barcrest)
-m4frtgm                         // Fruit Game (Barcrest)
 m4fsx                           // Fun Spot X
 m4fsxa                          //
 m4fsxb                          //
@@ -24520,7 +24518,6 @@ m4octo                          // Octopus (Nova)
 m4oldtmr                        // Old Timer (Barcrest)
 m4ordmnd                        // Oriental Diamonds (Barcrest)
 m4remag                         // Unknown MPU4 'ZTP 0.7'
-m4ringfr                        // Ring Of Fire (Barcrest)
 m4riotrp                        // Rio Tropico (unknown)
 m4rltst                         // MPU4 Reel Test (3.0)
 m4rmg                           // Unknown MPU4 'CTP 0.4'
@@ -27338,9 +27335,11 @@ m4eaw__w                        //
 m4eaw__x                        //
 m4eaw__y                        //
 m4eaw__z                        //
+m4exgam                         // Extra Game (Fairplay - Barcrest)
 m4fortcb                        // Fortune Club (Barcrest)
 m4fortcba                       //
 m4fortcbb                       //
+m4frtgm                         // Fruit Game (Barcrest)
 m4gb006                         // Games Bond 006 (Barcrest)
 m4gb006__a                      //
 m4gb006__b                      //
@@ -28874,6 +28873,7 @@ m4richfm__w                     //
 m4richfm__x                     //
 m4richfm__y                     //
 m4richfm__z                     //
+m4ringfr                        // Ring Of Fire (Barcrest)
 m4roadrn                        // Road Runner (Barcrest)
 m4rockmn                        // Rocket Money (Barcrest)
 m4rockmn__a                     //
