@@ -21,6 +21,13 @@
   which affects white balance.  Use the Monitors control panel to switch
   to the “Uncorrected Gamma” profile if you don’t like it.
 
+  System 6 will hang on start if 1 MB VRAM is installed, a PAL monitor
+  or encoder is connected, and the card has not been set up.  To avoid
+  this, start the system with a different monitor connected, use the
+  Monitors control panel to select a color mode and resolution, and shut
+  down the system cleanly.  After this, a PAL monitor or encoder can be
+  connected.  System 7 does not suffer from this issue.
+
   The CRTC counts half-lines vertically, which doesn’t integrate very
   well with MAME’s screen device.  The screen device also lacks any
   support for interlaced modes.  To make interlaced modes usable, a few
@@ -188,9 +195,7 @@ INPUT_PORTS_START( 48gc )
 	PORT_CONFSETTING(   0x04, u8"NTSC Monitor (512\u00d7384, 640\u00d7480)") // requires interlace modes
 	PORT_CONFSETTING(   0x05, u8"Macintosh Portrait Display (640\u00d7870)")
 	PORT_CONFSETTING(   0x06, u8"Macintosh Hi-Res Display (12-14\" 640\u00d7480)")
-	PORT_CONFSETTING(   0x0a, u8"PAL Encoder (640\u00d7480, 768\u00d7576)") // requires interlace modes
 	PORT_CONFSETTING(   0x0b, u8"NTSC Encoder (512\u00d7384, 640\u00d7480)") // requires interlace modes
-	PORT_CONFSETTING(   0x1e, u8"PAL Monitor (640\u00d7480, 768\u00d7576)") // requires interlace modes
 	PORT_CONFNAME(0x10, 0x00, u8"VRAM size")
 	PORT_CONFSETTING(   0x00, u8"512 kB (4\u20228)")
 	PORT_CONFSETTING(   0x10, u8"1 MB (8\u202224)")
