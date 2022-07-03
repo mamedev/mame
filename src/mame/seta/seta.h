@@ -161,7 +161,6 @@ protected:
 	TIMER_CALLBACK_MEMBER(uPD71054_timer_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(seta_interrupt_1_and_2);
 	TIMER_DEVICE_CALLBACK_MEMBER(seta_interrupt_2_and_4);
-	TIMER_DEVICE_CALLBACK_MEMBER(crazyfgt_interrupt);
 
 	void set_pens();
 	void seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_bank_size);

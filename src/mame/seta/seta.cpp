@@ -129,8 +129,7 @@ TODO:
 - flip screen and mirror support not working correctly in zombraid
 - gundhara visible area might be smaller (zombraid uses the same MachineDriver, and
   the current area is right for it)
-- crazyfgt: emulate protection & tickets, fix graphics glitches, find correct clocks,
-  level 2 interrupt should probably be triggered by the 3812 but sound tends to die that way.
+- crazyfgt: emulate protection & tickets, fix graphics glitches, find correct clocks.
 - jjsquawk: Player's shot sound is missing (not requested to X1-010?).
   Many sounds are wrong since MAME 0.62.
   i.e.
@@ -10001,23 +10000,12 @@ void pairlove_state::pairlove(machine_config &config)
                                 Crazy Fight
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(seta_state::crazyfgt_interrupt)
-{
-	int scanline = param;
-
-	if ((scanline % 48) == 0)
-		m_maincpu->set_input_line(2, HOLD_LINE); // should this be triggered by the 3812?
-
-	if (scanline == 240)
-		m_maincpu->set_input_line(1, HOLD_LINE);
-}
-
 void seta_state::crazyfgt(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::crazyfgt_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::crazyfgt_interrupt), "screen", 0, 1);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq1_line_hold));
 
 	X1_001(config, m_spritegen, 16_MHz_XTAL, m_palette, gfx_sprites);
 	m_spritegen->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
@@ -10043,6 +10031,7 @@ void seta_state::crazyfgt(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	ym3812_device &ymsnd(YM3812(config, "ymsnd", 16_MHz_XTAL / 4));
+	ymsnd.irq_handler().set_inputline(m_maincpu, 2);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	okim6295_device &oki(OKIM6295(config, "oki", 4.433619_MHz_XTAL / 4, okim6295_device::PIN7_HIGH));
