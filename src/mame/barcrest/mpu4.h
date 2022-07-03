@@ -14,7 +14,8 @@
 #include "machine/nvram.h"
 #include "machine/roc10937.h"
 #include "machine/steppers.h"
-#include "machine/timer.h"
+#include "machine/ticket.h"
+#include "machine/timer.h" //hoppers
 #include "sound/ay8910.h"
 #include "sound/okim6376.h"
 #include "sound/upd7759.h"
@@ -75,12 +76,13 @@
 
 
 //Hopper info
-#define TUBES               0
-#define HOPPER_DUART_A      1
-#define HOPPER_DUART_B      2
-#define HOPPER_DUART_C      3
-#define HOPPER_NONDUART_A   4
-#define HOPPER_NONDUART_B   5
+#define TUBES              0
+#define HOPPER_DUART_A     1
+#define HOPPER_DUART_B     2
+#define HOPPER_DUART_C     3
+#define HOPPER_NONDUART_A  4
+#define HOPPER_NONDUART_B  5
+#define HOPPER_TWIN_HOPPER 6
 
 INPUT_PORTS_EXTERN( mpu4 );
 INPUT_PORTS_EXTERN( mpu4_dutch );
@@ -133,10 +135,13 @@ public:
 		, m_characteriser_blastbank(*this, "characteriser_blastbank")
 		, m_characteriser_bwb(*this, "characteriser_bwb")
 		, m_duart68681(*this, "duart68681")
+		, m_hopper1(*this, "hopper")
+		, m_hopper2(*this, "hopper2")
 		, m_lamps(*this, "lamp%u", 0U)
 		, m_mpu4leds(*this, "mpu4led%u", 0U)
 		, m_digits(*this, "digit%u", 0U)
 		, m_triacs(*this, "triac%u", 0U)
+		
 	 { }
 
 	void init_m4default_alt();
@@ -461,6 +466,7 @@ protected:
 	void use_m4_hopper_duart_c();
 	void use_m4_hopper_nonduart_a();
 	void use_m4_hopper_nonduart_b();
+	void use_m4_hopper_twin_hopper();
 	void use_m4_led_a();
 	void use_m4_led_b();
 	void use_m4_led_c();
@@ -583,6 +589,9 @@ protected:
 
 	optional_device<mc68681_device> m_duart68681;
 
+	optional_device<hopper_device> m_hopper1;
+	optional_device<hopper_device> m_hopper2;
+
 	// not all systems have this many lamps/LEDs/digits but the driver is too much of a mess to split up now
 
 	// 0-63 are on PIA IC3 port A (always present)
@@ -656,7 +665,7 @@ protected:
 
 	int m_pageval = 0;
 	int m_pageset = 0;
-	int m_hopper = 0;
+	int m_hopper_type = 0;
 	int m_reels = 0;
 	int m_chrdata = 0;
 	int m_t1 = 0;
@@ -678,6 +687,9 @@ protected:
 
 	bool m_hack_duart_fixed_low = false;
 
+	bool m_hopper1_opto = false;
+	bool m_hopper2_opto = false;
+	
 	static constexpr uint8_t reel_mux_table[8]= {0,4,2,6,1,5,3,7};//include 7, although I don't think it's used, this is basically a wire swap
 	static constexpr uint8_t reel_mux_table7[8]= {3,1,5,6,4,2,0,7};
 };

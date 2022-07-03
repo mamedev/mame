@@ -709,39 +709,21 @@ uint8_t mpu4_state::pia_ic4_portb_r()
 	{
 		m_ic4_input_b |=  0x80;
 	}
-	else
-	{
-		m_ic4_input_b &= ~0x80;
-	}
 
 	if (!m_reel_mux)
 	{
 		if ( m_optic_pattern & 0x01 ) m_ic4_input_b |=  0x40; /* reel A tab */
-		else                          m_ic4_input_b &= ~0x40;
 
 		if ( m_optic_pattern & 0x02 ) m_ic4_input_b |=  0x20; /* reel B tab */
-		else                          m_ic4_input_b &= ~0x20;
 
 		if ( m_optic_pattern & 0x04 ) m_ic4_input_b |=  0x10; /* reel C tab */
-		else                          m_ic4_input_b &= ~0x10;
 
 		if ( m_optic_pattern & 0x08 ) m_ic4_input_b |=  0x08; /* reel D tab */
-		else                          m_ic4_input_b &= ~0x08;
-
 	}
 	else
 	{
-		if (m_optic_pattern & (1<<m_active_reel))
-		{
-			m_ic4_input_b |=  0x08;
-		}
-		else
-		{
-			m_ic4_input_b &= ~0x08;
-		}
+		if (m_optic_pattern & (1<<m_active_reel)) m_ic4_input_b |=  0x08;
 	}
-	if ( m_signal_50hz )            m_ic4_input_b |=  0x04; /* 50 Hz */
-	else                            m_ic4_input_b &= ~0x04;
 
 	if ( m_overcurrent )
 	{
@@ -789,17 +771,38 @@ uint8_t mpu4_state::pia_ic5_porta_r()
 			}
 		}
 	}
-	if (m_hopper == HOPPER_NONDUART_A)
+	if (m_hopper_type == HOPPER_NONDUART_A)
 	{
-/*      if (hopper1_active)
+		if (m_hopper1->line_r() && m_hopper1_opto)
         {
             m_aux1_input |= 0x04;
         }
         else
         {
             m_aux1_input &= ~0x04;
-        }*/
+        }
 	}
+	else if (m_hopper_type == HOPPER_TWIN_HOPPER)
+	{
+		if (m_hopper1->line_r())
+	    {
+	        m_aux1_input |= 0x08;
+	    }
+	    else
+	    {
+	        m_aux1_input &= ~0x08;
+	    }
+
+		if (m_hopper2->line_r())
+	    {
+	        m_aux1_input |= 0x04;
+	    }
+	    else
+	    {
+	        m_aux1_input &= ~0x04;
+	    }
+	}
+
 	LOG(("%s: IC5 PIA Read of Port A (AUX1)\n",machine().describe_context()));
 
 
@@ -811,10 +814,9 @@ uint8_t mpu4_state::pia_ic5_porta_r()
 void mpu4_state::pia_ic5_porta_w(uint8_t data)
 {
 	int i;
-	if (m_hopper == HOPPER_NONDUART_A)
+	if (m_hopper_type == HOPPER_NONDUART_A)
 	{
-		//opto line
-		//hopper1_drive_sensor(data&0x10);
+		m_hopper1_opto = (data & 0x10);
 	}
 
 	switch (m_lamp_extender)
@@ -884,10 +886,10 @@ void mpu4_state::pia_ic5_porta_w(uint8_t data)
 
 void mpu4_state::pia_ic5_portb_w(uint8_t data)
 {
-	if (m_hopper == HOPPER_NONDUART_B)
+	if (m_hopper_type == HOPPER_NONDUART_B)
 	{
-		//hopper1_drive_motor(data &0x01) motor
-		//hopper1_drive_sensor(data &0x08) opto
+		m_hopper1->motor_w(data & 0x01);
+		m_hopper1_opto = (data & 0x08);
 	}
 	if (m_led_extender == CARD_A)
 	{
@@ -910,16 +912,16 @@ void mpu4_state::pia_ic5_portb_w(uint8_t data)
 
 uint8_t mpu4_state::pia_ic5_portb_r()
 {
-	if (m_hopper == HOPPER_NONDUART_B)
-	{/*
-	    if (hopper1_active)
+	if (m_hopper_type == HOPPER_NONDUART_B)
+	{
+		if (m_hopper1->line_r() && m_hopper1_opto)
 	    {
 	        m_aux2_input |= 0x08;
 	    }
 	    else
 	    {
 	        m_aux2_input &= ~0x08;
-	    }*/
+	    }
 	}
 
 	LOG(("%s: IC5 PIA Read of Port B (coin input AUX2)\n",machine().describe_context()));
@@ -1085,13 +1087,18 @@ void mpu4_state::pia_ic7_porta_w(uint8_t data)
 
 void mpu4_state::pia_ic7_portb_w(uint8_t data)
 {
-	if (m_hopper == HOPPER_DUART_A)
+	if (m_hopper_type == HOPPER_DUART_A)
 	{
 		//duart write data
 	}
-	else if (m_hopper == HOPPER_NONDUART_A)
+	else if (m_hopper_type == HOPPER_NONDUART_A)
 	{
-		//hoppr1_drive_motor(data & 0x10);
+		m_hopper1->motor_w(BIT(data, 5));
+	}
+	else if (m_hopper_type == HOPPER_TWIN_HOPPER)
+	{
+		m_hopper1->motor_w(BIT(data, 5));
+		m_hopper2->motor_w(BIT(data, 6));		
 	}
 
 	m_mmtr_data = data;
@@ -1156,11 +1163,11 @@ uint8_t mpu4_state::pia_ic8_porta_r()
 
 void mpu4_state::pia_ic8_portb_w(uint8_t data)
 {
-	if (m_hopper == HOPPER_DUART_B)
+	if (m_hopper_type == HOPPER_DUART_B)
 	{
 //      duart.drive_sensor(data & 0x04, data & 0x01, 0, 0);
 	}
-	else if (m_hopper == HOPPER_DUART_C)
+	else if (m_hopper_type == HOPPER_DUART_C)
 	{
 //      duart.drive_sensor(data & 0x04, data & 0x01, data & 0x04, data & 0x02);
 	}
@@ -2286,32 +2293,37 @@ void mpu4_state::use_m4_large_extender_c()
 
 void mpu4_state::use_m4_hopper_tubes()
 {
-	m_hopper = TUBES;
+	m_hopper_type = TUBES;
 }
 
 void mpu4_state::use_m4_hopper_duart_a()
 {
-	m_hopper = HOPPER_DUART_A;
+	m_hopper_type = HOPPER_DUART_A;
 }
 
 void mpu4_state::use_m4_hopper_duart_b()
 {
-	m_hopper = HOPPER_DUART_B;
+	m_hopper_type = HOPPER_DUART_B;
 }
 
 void mpu4_state::use_m4_hopper_duart_c()
 {
-	m_hopper = HOPPER_DUART_C;
+	m_hopper_type = HOPPER_DUART_C;
 }
 
 void mpu4_state::use_m4_hopper_nonduart_a()
 {
-	m_hopper = HOPPER_NONDUART_A;
+	m_hopper_type = HOPPER_NONDUART_A;
 }
 
 void mpu4_state::use_m4_hopper_nonduart_b()
 {
-	m_hopper = HOPPER_NONDUART_B;
+	m_hopper_type = HOPPER_NONDUART_B;
+}
+
+void mpu4_state::use_m4_hopper_twin_hopper()
+{
+	m_hopper_type = HOPPER_TWIN_HOPPER;
 }
 
 void mpu4_state::use_m4_led_a()
@@ -2463,6 +2475,8 @@ void mpu4_state::mpu4_common(machine_config &config)
 
 	BACTA_DATALOGGER(config, m_dataport, 0);
 	m_dataport->rxd_handler().set(FUNC(mpu4_state::dataport_rxd));
+	
+	HOPPER(config, m_hopper1, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 }
 
 void mpu4_state::mpu4_common2(machine_config &config)
