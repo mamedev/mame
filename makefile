@@ -1491,6 +1491,23 @@ openbsd_x86: generate $(PROJECTDIR)/$(MAKETYPE)-openbsd/Makefile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-openbsd config=$(CONFIG)32
 
 #-------------------------------------------------
+# gmake-openbsd-clang
+#-------------------------------------------------
+
+$(PROJECTDIR)/$(MAKETYPE)-openbsd-clang/Makefile: makefile $(SCRIPTS) $(GENIE)
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=openbsd-clang --gcc_version=$(CLANG_VERSION) $(MAKETYPE)
+
+.PHONY: openbsd_x64_clang
+openbsd_x64_clang: generate $(PROJECTDIR)/$(MAKETYPE)-openbsd-clang/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-openbsd-clang config=$(CONFIG)64 precompile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-openbsd-clang config=$(CONFIG)64
+
+.PHONY: openbsd_x86_clang
+openbsd_x86_clang: generate $(PROJECTDIR)/$(MAKETYPE)-openbsd-clang/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-openbsd-clang config=$(CONFIG)32 precompile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-openbsd-clang config=$(CONFIG)32
+
+#-------------------------------------------------
 # Clean/bootstrap
 #-------------------------------------------------
 
