@@ -50,6 +50,8 @@ extern void *GetOSWindow(void *wincontroller);
 #include "bgfx/target.h"
 #include "bgfx/view.h"
 
+#include "modules/lib/osdobj_common.h"
+
 #include "imgui/imgui.h"
 
 //============================================================
