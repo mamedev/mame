@@ -24429,7 +24429,6 @@ m4bigbena                       //
 m4bigbenb                       //
 m4bigbend                       //
 m4bigbene                       //
-m4blkcat                        // Black Cat (Barcrest)
 m4blkgd                         // Black Gold (Gemini)
 m4blkgda                        //
 m4boltbl                        // Bolt From The Blue (DJE)
@@ -24466,7 +24465,6 @@ m4fsx                           // Fun Spot X
 m4fsxa                          //
 m4fsxb                          //
 m4funh                          // Fun House
-m4gldjok                        // Golden Joker (Barcrest)
 m4goldnn                        // Golden Years (Nova)
 m4hapfrt                        // Happy Fruits (Coinworld)
 m4hapfrta                       //
@@ -24489,9 +24487,7 @@ m4jungja                        //
 m4jungjb                        //
 m4jungjc                        //
 m4kqclub                        // Kings & Queens Club (Newby)
-m4luck7                         // Lucky 7 (Barcrest)
 m4luckdv                        // Lucky Devil (Barcrest) [Czech]
-m4luckdvd                       //
 m4luckwb                        // Lucky Wild Boar (Barcrest)
 m4luckwba                       //
 m4luckwbb                       //
@@ -24505,10 +24501,7 @@ m4nile                          // Nile Jewels (Barcrest)
 m4nod                           //
 m4octo                          // Octopus (Nova)
 m4ordmnd                        // Oriental Diamonds (Barcrest)
-m4remag                         // Unknown MPU4 'ZTP 0.7'
-m4riotrp                        // Rio Tropico (unknown)
 m4rltst                         // MPU4 Reel Test (3.0)
-m4rmg                           // Unknown MPU4 'CTP 0.4'
 m4royjwl                        // Royal Jewels (Barcrest)
 m4sbx                           // Super Bear X
 m4sbxa                          //
@@ -24526,9 +24519,6 @@ m4sunday                        // Sunday Sport
 m4surf                          // Super Surfin' (Gemini)
 m4surfa                         //
 m4surfb                         //
-m4tbplay                        // Turbo Play (Barcrest)
-m4tbplaya                       //
-m4tbplayb                       //
 m4topdk                         // Top Deck (Barcrest)
 m4treel                         //
 m4treela                        //
@@ -26652,6 +26642,7 @@ m4berser__w                     //
 m4berser__x                     //
 m4berser__y                     //
 m4berser__z                     //
+m4blkcat                        // Black Cat (Barcrest)
 m4blkwhd                        // Black & White (Barcrest) [Dutch]
 m4bluedm                        // Blue Diamond (Barcrest)
 m4bnkrol                        // Bank Roller Club (Barcrest)
@@ -27350,6 +27341,7 @@ m4gclue__t                      //
 m4gclue__u                      //
 m4gclue__v                      //
 m4gclue__w                      //
+m4gldjok                        // Golden Joker (Barcrest)
 m4gnsmk                         // Gun Smoke (Barcrest)
 m4goodtm                        // Let The Good Times Roll (Barcrest)
 m4goodtm__0                     //
@@ -27800,6 +27792,8 @@ m4kingqc__z                     //
 m4lazy                          // Lazy Bones (BWB)
 m4lazya                         //
 m4lazyb                         //
+m4luck7                         // Lucky 7 (Barcrest)
+m4luckdvd                       // Lucky Devil (Dutch)
 m4lucklv                        // Lucky Las Vegas (Barcrest)
 m4lucklv__0                     //
 m4lucklv__1                     //
@@ -28862,6 +28856,7 @@ m4richfm__x                     //
 m4richfm__y                     //
 m4richfm__z                     //
 m4ringfr                        // Ring Of Fire (Barcrest)
+m4riotrp                        // Rio Tropico (unknown)
 m4roadrn                        // Road Runner (Barcrest)
 m4rockmn                        // Rocket Money (Barcrest)
 m4rockmn__a                     //
@@ -28950,6 +28945,11 @@ m4takepk__w                     //
 m4takepk__x                     //
 m4takepk__y                     //
 m4takepk__z                     //
+m4tbplay                        // Turbo Play (Barcrest)
+m4tbplaya                       //
+m4tbplayb                       //
+m4tbplayc                       //
+m4tbplayd                       //
 m4techno                        // Techno Reel (Barcrest)
 m4technoa                       //
 m4tenten                        // 10 X 10 (Barcrest)

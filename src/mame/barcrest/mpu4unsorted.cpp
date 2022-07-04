@@ -59,16 +59,6 @@ ROM_END
 
 
 
-ROM_START( m4blkcat )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dbl14.bin", 0x0000, 0x010000, CRC(c5db9532) SHA1(309b5122b4a1cb33bbccfb97faf4fa996d29432e) )
-
-	ROM_REGION( 0x080000, "msm6376", 0 )
-	ROM_LOAD( "dblcsnd.bin", 0x0000, 0x080000, CRC(c90fa8ad) SHA1(a98f03d4b6f5892333279bff7537d4d6d887da62) )
-
-//	ROM_REGION( 0x200000, "msm6376_alt", 0 ) // bad dump of some sound rom? - just dblcsnd.bin in hex format!
-//	ROM_LOAD( "sdbl_1.snd", 0x0000, 0x18008e, CRC(e36f71ae) SHA1(ebb643cfa02d28550f2bef135ceefc902baf0df6) )
-ROM_END
 
 
 
@@ -119,13 +109,6 @@ ROM_END
 
 
 
-ROM_START( m4gldjok )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dgj12.bin", 0x0000, 0x010000, CRC(93ee0c35) SHA1(5ae67b14f7f3d8528fa106519a8a27437c997a70) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "sdgj.snd", 0x0000, 0x080000, CRC(b6cd118b) SHA1(51c5d694ed0dfde8d3fd682f2471d83eec236736) )
-ROM_END
 
 
 
@@ -150,25 +133,12 @@ ROM_START( m4jokmil )
 	// missing?
 ROM_END
 
-
 ROM_START( m4joljokh )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jollyjokerhungarian.bin", 0x0000, 0x010000, CRC(85b6a406) SHA1(e277f9d3b62faead04d65efbc06de7f4a50ae38d) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
 	ROM_LOAD( "jollyjokerhungariansnd.bin", 0x0000, 0x080000, CRC(93460383) SHA1(2b179a1dde09ebdfe8c84641899df7be87d443e5) )
-ROM_END
-
-
-
-
-
-ROM_START( m4luck7 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dl716.bin", 0x0000, 0x010000, CRC(141b23a9) SHA1(3bfb82ea0ee4104bd8739b545aba617f84bef770) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "dl7snd.bin", 0x0000, 0x080000, CRC(c90fa8ad) SHA1(a98f03d4b6f5892333279bff7537d4d6d887da62) )
 ROM_END
 
 ROM_START( m4luckdv )
@@ -178,14 +148,6 @@ ROM_START( m4luckdv )
 	ROM_REGION( 0x100000, "msm6376", 0 )
 	ROM_LOAD( "generic_dutch_sound1.bin", 0x000000, 0x080000, CRC(f247ba83) SHA1(9b173503e63a4a861d1380b2ab1fe14af1a189bd) )
 	ROM_LOAD( "generic_dutch_sound2.bin", 0x080000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
-ROM_END
-
-ROM_START( m4luckdvd )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dld13", 0x0000, 0x010000, CRC(b8ceb29b) SHA1(84b6ebad300214610635fb8141d18de2b7065435) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "sdld01.snd", 0x000000, 0x080000, CRC(9b035fa6) SHA1(51b7e5bc3abdf4f1beba2347146a91a2b3f4de35) ) // also in m4magrep
 ROM_END
 
 
@@ -308,43 +270,6 @@ ROM_END
 
 
 
-
-
-
-#define M4TBPLAY_EXTRAS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
-	ROM_LOAD( "dtps10_1", 0x000000, 0x080000, CRC(d1d2c981) SHA1(6a4940248b0bc8df0a9de0d60e98cfebf1962504) ) \
-	ROM_LOAD( "dtps20_1", 0x080000, 0x080000, CRC(f77c4f39) SHA1(dc0e056f4d8c00824b3e672a02da64613bbf204e) )
-
-ROM_START( m4tbplay )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dtp13", 0x0000, 0x010000, CRC(de424bc3) SHA1(c82dd56a0b3ccea78325cd90ed8e72ed68a1af77) )
-	M4TBPLAY_EXTRAS
-ROM_END
-
-ROM_START( m4tbplaya )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "rmtp4b", 0x0000, 0x010000, CRC(33a1764e) SHA1(7475f460dee015a2cd78fc3e0d1d14fd96fdbb9c) )
-	M4TBPLAY_EXTRAS
-ROM_END
-
-ROM_START( m4tbplayb )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "trmyid", 0x0000, 0x010000, CRC(e7af5944) SHA1(64559c97375a3536f7929d7f4d8d19c30527a3ec) )
-	M4TBPLAY_EXTRAS
-ROM_END
-
-ROM_START( m4remag )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "remagv2", 0x0000, 0x010000, CRC(80d9c1c2) SHA1(c77d443d92084c324ef75575acca66ffbd9beef3) )
-	M4TBPLAY_EXTRAS
-ROM_END
-
-ROM_START( m4rmg )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "rmgicdd", 0x0000, 0x010000, CRC(bd64be0d) SHA1(772b80619c7d514a7a253f35137896d6a73bf4c6) )
-	M4TBPLAY_EXTRAS
-ROM_END
 
 
 
@@ -836,14 +761,6 @@ ROM_START( m4wnud )
 ROM_END
 
 
-ROM_START( m4riotrp )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "drt10.bin", 0x0000, 0x010000, CRC(a1badb8a) SHA1(871786ea4e65ecbf61c9a776100321253922d11e) )
-
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	ROM_LOAD( "dblcsnd.bin", 0x0000, 0x080000, CRC(c90fa8ad) SHA1(a98f03d4b6f5892333279bff7537d4d6d887da62) )
-ROM_END
-
 
 #define M4SURF_EXTRAS \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
@@ -1154,21 +1071,9 @@ GAME(199?, m4dracb,   m4drac,     mod4oki_cheatchr_pal<mpu4_characteriser_pal::b
 
 GAME(199?, m4vegastg, 0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::viva_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Vegas Strip (Barcrest) (German) (MPU4)",GAME_FLAGS ) // 1 DM SW ALM
 
-GAME(199?, m4luckdv,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Lucky Devil (Barcrest) (Czech) (MPU4)",GAME_FLAGS ) // AUX2 locked
-
-GAME(199?, m4luckdvd, 0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::salsa_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Lucky Devil (Barcrest) (Dutch) (MPU4) (DLD 1.3)",GAME_FLAGS )
+GAME(199?, m4luckdv,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Lucky Devil (Barcrest) (Czech) (MPU4) (CLD 3.0)",GAME_FLAGS ) // AUX2 locked
 
 
-
-
-// GEEN TUBES
-GAME(199?, m4tbplay,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::turboplay_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Turbo Play (Barcrest) (Dutch) (MPU4) (DTP 1.3)",GAME_FLAGS )
-// NO METERS
-GAME(199?, m4tbplaya, m4tbplay,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::alf_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Turbo Play (Barcrest) (MPU4) (CTP 0.4)",GAME_FLAGS )
-GAME(199?, m4tbplayb, m4tbplay,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::alf_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Turbo Play (Barcrest) (MPU4) (ZTP 0.7)",GAME_FLAGS )
-// NO METERS, non-standard protection
-GAME(199?, m4remag,   m4tbplay,   mod2_bootleg_fixedret<0x19>,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Turbo Play (Barcrest) (bootleg) (MPU4) (ZTP 0.7)",GAME_FLAGS )
-GAME(199?, m4rmg,     m4tbplay,   mod2_bootleg_fixedret<0x6a>,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Turbo Play (Barcrest) (bootleg) (MPU4) (CTP 0.4)",GAME_FLAGS )
 
 
 
@@ -1198,20 +1103,6 @@ GAME(199?, m4hilonv,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::b
 GAME(199?, m4octo,    0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::fruitfall_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Octopus (Nova) (German) (MPU4) (OCT 0.3)",GAME_FLAGS )
 
 
-// boots but will give HOPPER JAM after a credit
-GAME(199?, m4gldjok,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::goljok_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Golden Joker (Barcrest) (Dutch) (MPU4) (DGJ 1.2)",GAME_FLAGS )
-
-// similar to m4gldjok but can't coin up
-GAME(199?, m4blkcat,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::blkcat_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Black Cat (Barcrest) (Dutch) (MPU4) (DBL 1.4)",GAME_FLAGS )
-
-// runs, coins don't work, Dutch?
-GAME(199?, m4riotrp,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::blkcat_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Rio Tropico (Barcrest) (Dutch) (MPU4) (DRT 1.0)",GAME_FLAGS )
-
-// expects the following response sequence, but check code is standard
-// was the CHR replaced with something else that just happens to give this seuqence, or is this valid somehow?
-// runs, coins don't work
-// fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc 6c dc bc 7c fc fc fc fc fc fc fc fc fc 00 04 0c 1c 3c 7c fc fc fc fc fc fc fc fc d4 ac 5c bc 7c fc fc fc fc fc fc fc fc fc fc fc fc 00
-GAME(199?, m4luck7,   0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Lucky 7 (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
 
 // gives an "IMD ?" message if you attempt to coin it up
 GAME(199?, m4joljokh, 0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::salsa_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Jolly Joker (Barcrest) (Hungarian) (MPU4) (HJJ 1.4)",GAME_FLAGS )
