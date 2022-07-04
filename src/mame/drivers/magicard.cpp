@@ -5,7 +5,7 @@
   MAGIC CARD - IMPERA
   -------------------
 
-  Preliminary driver by Roberto Fresca, David Haywood & Angelo Salese+
+  Preliminary driver by Roberto Fresca, David Haywood & Angelo Salese
 
 
   TODO:
@@ -17,6 +17,9 @@
   - hotslots, quingo: sets up 68070 timer chs 1 & 2, currently unsupported;
   - bigdeal0: punts with an address error PC=0x60ea3a A2=$c71c38e3;
   - determine what drives int1_w. (It's rtc on boards with rtc) (Not all games use this)
+  - Correct memory map - at the moment rom is mapped to several address spaces for
+    all games. This is probably wrong.
+  - dallaspk produces white noise after some sounds.
 
   Games running on this hardware:
 
@@ -111,9 +114,9 @@
 
   bigdeal0 crashes with excepiton errors in cpu core.
 
-  puzzlme - appears to work. Amount of credit for each coin input is set by values
-            in the eeprom but there doesn't appear to be any tests to set these.
-			Is something missing on this game ?  It's really poor!
+  puzzleme - appears to work. Amount of credit for each coin input is set by values
+             in the eeprom but there doesn't appear to be any tests to set these.
+			 Is something missing on this game ?
 
   magicardf, magicardw, unkte06 and lucky7i appear to work (but are they right?)
 
@@ -169,7 +172,7 @@
   unkte06		NO			YES[2]	24c02	16C56		YES
   lucky7i					YES[3]	24c02	NO
   unkpkr_w		NO			YES[2]	24c02	YES			NO
-  dallaspk		??			??		24c02	YES			NO			protection via serial port ?
+  dallaspk		NO			YES[4]	24c02	YES			NO			protection via serial port ?
   kajotcrd		YES			??		24c02	YES			NO
 
   PIC16F84 emulation not available
@@ -177,6 +180,7 @@
   [1] Use same signature
   [2] Use same signature
   [3] Use unique signature
+  [4] Use unique signature, 8 byte identification value isn't validated by the game.
   
   *1 Accesses I2C device 0x48 but fails. Game works anyway.
   
@@ -208,7 +212,7 @@ enum
 	I2C_CPU = 0,
 	I2C_PIC,
 	i2C_MEM
-} ;
+};
 
 class magicard_base_state : public driver_device
 {
@@ -239,7 +243,7 @@ protected:
 	required_device<scc68070_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_device<scc66470_device> m_scc66470 ;
+	required_device<scc66470_device> m_scc66470;
 	required_device<i2cmem_device> m_i2cmem;
 
 	uint8_t m_sda_state;
@@ -254,10 +258,6 @@ protected:
 	
 	void update_sda(uint8_t device, uint8_t state);
 	void update_scl(uint8_t device, uint8_t state);
-
-
-private:
-
 };
 
 class magicard_state : public magicard_base_state
@@ -267,7 +267,6 @@ public:
 		: magicard_base_state(mconfig, type, tag)
 		, m_nvram(*this, "nvram")
 		, m_ds1207(*this, "ds1207")
-
 	{ }
 
 	void magicard_pic54(machine_config &config);
@@ -278,7 +277,7 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	required_device<nvram_device>    m_nvram;
+	required_device<nvram_device> m_nvram;
 	required_device<ds1207_device> m_ds1207;
 	
 	void magicard_map(address_map &map);
@@ -287,7 +286,7 @@ private:
 	uint8_t read_ds1207(offs_t offset);
 	void write_ds1207(offs_t offset, uint8_t data);
 	
-	std::unique_ptr<uint8_t[]>   m_nvram8;
+	std::unique_ptr<uint8_t[]> m_nvram8;
 };
 
 class hotslots_state : public magicard_base_state
@@ -298,8 +297,6 @@ public:
 		, m_ds2401(*this, "serial_id")
 		, m_ds1207(*this, "ds1207")
 		, m_rtc(*this, "rtc")
-
-
 	{ }
 
 	void hotslots_base(machine_config &config);
@@ -309,10 +306,8 @@ public:
 	void puzzleme(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
 
 private:
-
 	optional_device<ds2401_device> m_ds2401;
 	optional_device<ds1207_device> m_ds1207;
 	required_device<rtc72421_device> m_rtc;
@@ -328,8 +323,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(cpu_int1);
 };
 
-#define NVRAM_SIZE ( 16384 )
-
 void magicard_base_state::machine_start()
 {
 	save_item(NAME(m_sda_state));
@@ -339,48 +332,35 @@ void magicard_base_state::machine_start()
 void magicard_state::machine_start()
 {
 	magicard_base_state::machine_start();
-	m_nvram8 = std::make_unique<uint8_t[]>(NVRAM_SIZE);
-	m_nvram->set_base(m_nvram8.get(),NVRAM_SIZE);
-}
-
-void hotslots_state::machine_start()
-{
-	 magicard_base_state::machine_start();
+	m_nvram8 = std::make_unique<uint8_t[]>(16384);
+	m_nvram->set_base(m_nvram8.get(),16384);
 }
 
 void magicard_state::nvram_w(offs_t offset, uint8_t data)
 {
-	if(offset < NVRAM_SIZE)
-	{
-		m_nvram8[ offset ] = data ;
-	}
+	m_nvram8[ offset ] = data;
 }
 
 uint8_t magicard_state::nvram_r(offs_t offset)
 {
-	if(offset < NVRAM_SIZE)
-	{
-		return m_nvram8[ offset ] ;
-	}
-	else
-	{
-		return 0 ;
-	}
+	return m_nvram8[ offset ];
 }
 
 void magicard_base_state::dram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	int cycles = m_scc66470->dram_dtack_cycles();
-	cycles = ((1.0/m_scc66470->clock()*cycles)/(1.0/(m_maincpu->clock())));
-	m_maincpu->eat_cycles(cycles);
+	if(!machine().side_effects_disabled())
+	{
+		m_maincpu->eat_cycles(m_maincpu->attotime_to_cycles(attotime::from_ticks(m_scc66470->dram_dtack_cycles(), m_scc66470->clock())));
+	}
 	m_scc66470->dram_w(offset,data,mem_mask);
 }
 
 uint16_t magicard_base_state::dram_r(offs_t offset, uint16_t mem_mask)
 {
-	int cycles = m_scc66470->dram_dtack_cycles();
-	cycles = ((1.0/m_scc66470->clock()*cycles)/(1.0/(m_maincpu->clock())));
-	m_maincpu->eat_cycles(cycles);
+	if(!machine().side_effects_disabled())
+	{
+		m_maincpu->eat_cycles(m_maincpu->attotime_to_cycles(attotime::from_ticks(m_scc66470->dram_dtack_cycles(), m_scc66470->clock())));
+	}
 	return m_scc66470->dram_r(offset, mem_mask);
 }
 
@@ -573,17 +553,11 @@ TODO: check this register,doesn't seem to be 100% correct.
 
 uint32_t magicard_base_state::screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *src;
-	uint32_t *dest;
 	int scanline = screen.vpos();
+	uint8_t *src = m_scc66470->line(scanline);
+	uint32_t *dest = &bitmap.pix(scanline);
 
-	if(scanline < 32)
-		return 0;
-
-	dest = &bitmap.pix(scanline);
-
-	src = m_scc66470->line(scanline);
-	for(int x = 0 ; x < 768 ; x++)
+	for(int x = cliprect.min_x ; x <= cliprect.max_x ; x++)
 	{
 		*dest++ = m_palette->pen(*src++);
 	}
@@ -601,9 +575,9 @@ uint8_t magicard_state::read_ds1207(offs_t offset)
 
 void magicard_state::write_ds1207(offs_t offset, uint8_t data)
 {
-	m_ds1207->write_rst(data&1);
-	m_ds1207->write_clk((data>>1)&1);
-	m_ds1207->write_dq((data>>3)&1);
+	m_ds1207->write_rst(BIT(data,0));
+	m_ds1207->write_clk(BIT(data,1));
+	m_ds1207->write_dq(BIT(data,3));
 }
 
 void magicard_base_state::output_w(offs_t offset, uint16_t data)
@@ -629,16 +603,16 @@ void magicard_base_state::output_w(offs_t offset, uint16_t data)
 
 uint8_t hotslots_state::read_ds1207_ds2401(offs_t offset)
 {
-	m_ds2401->write( true );
-	return (m_ds2401->read() ? 0x10 : 0x00) | (m_ds1207->read_dq() ? 0x08 : 0x00) ;
+	m_ds2401->write(true);
+	return (m_ds2401->read() ? 0x10 : 0x00) | (m_ds1207->read_dq() ? 0x08 : 0x00);
 }
 
 void hotslots_state::write_ds1207_ds2401(offs_t offset, uint8_t data)
 {
-	m_ds2401->write( data & 0x10 ? true : false );
-	m_ds1207->write_rst(data&1);
-	m_ds1207->write_clk((data>>1)&1);
-	m_ds1207->write_dq((data>>3)&1);
+	m_ds2401->write(BIT(data,4));
+	m_ds1207->write_rst(BIT(data,0));
+	m_ds1207->write_clk(BIT(data,1));
+	m_ds1207->write_dq(BIT(data,3));
 }
 
 void hotslots_state::output_w(offs_t offset, uint16_t data)
@@ -669,8 +643,8 @@ void hotslots_state::output_w(offs_t offset, uint16_t data)
 void magicard_state::magicard_map(address_map &map)
 {
 //  map.global_mask(0x1fffff);
-	map(0x00000000, 0x001fffff).m(m_scc66470, FUNC( scc66470_device::map ));
-	map(0x00000000, 0x0017ffff).rw(FUNC (magicard_base_state::dram_r), FUNC (magicard_base_state::dram_w));
+	map(0x00000000, 0x001fffff).m(m_scc66470, FUNC(scc66470_device::map));
+	map(0x00000000, 0x0017ffff).rw(FUNC(magicard_base_state::dram_r), FUNC(magicard_base_state::dram_w));
 	map(0x00180000, 0x001dffff).rom().region("maincpu", 0); // boot vectors point here
 	map(0x001e0000, 0x001e7fff).rw(FUNC(magicard_state::nvram_r), FUNC(magicard_state::nvram_w)).umask16(0x00ff);
 
@@ -695,7 +669,7 @@ void hotslots_state::hotslots_map_base(address_map &map)
 	// latter also will address error if we mirror with bank A by logic (i.e. .mirror(0x00a00000))
 	// we currently map it to B bank for now
 	//map(0x00000000, 0x001ffbff).mirror(0x00200000).ram().share("magicram");
-	map(0x00000000, 0x001fffff).m(m_scc66470, FUNC( scc66470_device::map ));
+	map(0x00000000, 0x001fffff).m(m_scc66470, FUNC(scc66470_device::map));
 	map(0x00000000, 0x0017ffff).rw(FUNC (magicard_base_state::dram_r), FUNC (magicard_base_state::dram_w));
 	map(0x00180000, 0x001ffbff).rom().region("maincpu", 0); // boot vectors point here
 	map(0x00200000, 0x003fffff).rw(m_scc66470, FUNC(scc66470_device::ipa_r), FUNC(scc66470_device::ipa_w));
@@ -741,26 +715,25 @@ static INPUT_PORTS_START( magicard )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("Remote 1")
 
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-	
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )   PORT_NAME("Hold 1")
 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )   PORT_NAME("Bet/Clear/Collect")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1")
 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )   PORT_NAME("Hold 5")
-	
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Bet/Clear/Collect")
+
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Hold 5")
+
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_BIT( 0x100, IP_ACTIVE_LOW, IPT_BUTTON2 )  PORT_NAME("Rental Book Keeping")  PORT_TOGGLE
-	PORT_BIT( 0x200, IP_ACTIVE_LOW, IPT_BUTTON3 )  PORT_NAME("Owner Book Keeping")
+	PORT_BIT( 0x100, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Rental Book Keeping") PORT_TOGGLE
+	PORT_BIT( 0x200, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Owner Book Keeping")
 
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Hold 4")
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2")
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3")
 
-
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Clear")  PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Pay Off")  PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Accounting 3")  PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Hopper Count") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Accounting 3") PORT_TOGGLE
 
 	PORT_START("SW1")
 	PORT_DIPNAME( 0x80, 0x80, "Hopper" )					PORT_DIPLOCATION("DIP 1:1")
@@ -769,76 +742,7 @@ static INPUT_PORTS_START( magicard )
 	PORT_DIPNAME( 0x40, 0x40, "Hopper" )					PORT_DIPLOCATION("DIP 1:2")
 	PORT_DIPSETTING(    0x40, "Coin B" )
 	PORT_DIPSETTING(    0x00, "Coin A" )
-	
-	PORT_DIPNAME( 0x38, 0x38, "Setting" )					PORT_DIPLOCATION("DIP 1:3,4,5")
-	PORT_DIPSETTING(    0x38, "Austria 1" )
-	PORT_DIPSETTING(    0x30, "Austria 2" )
-	PORT_DIPSETTING(    0x18, "Tschech 1" )
-	PORT_DIPSETTING(    0x10, "Tschech 2" )
-	PORT_DIPSETTING(    0x28, "Germany 1" )
-	PORT_DIPSETTING(    0x20, "Germany 2" )
-	PORT_DIPSETTING(    0x08, "Hungary 1" )
-	PORT_DIPSETTING(    0x00, "Hungary 2" )
 
-	PORT_DIPNAME( 0x04, 0x04, "Swap Coin Inputs" )			PORT_DIPLOCATION("DIP 1:6")
-	PORT_DIPSETTING(    0x04, "No" )
-	PORT_DIPSETTING(    0x00, "Yes" )
-	PORT_DIPNAME( 0x02, 0x02, "Remote/Keyboard" )			PORT_DIPLOCATION("DIP 1:7")
-	PORT_DIPSETTING(    0x02, "Remote Switch" )
-	PORT_DIPSETTING(    0x00, "Keyboard" )
-	PORT_DIPNAME( 0x01, 0x01, "Keyboard Test" )				PORT_DIPLOCATION("DIP 1:8")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON7 )     PORT_NAME("Hopper Full")      PORT_CODE(KEYCODE_A)  PORT_TOGGLE
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON8 )     PORT_NAME("Alarm")            PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON9 )     PORT_NAME("Counter Control")  PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED )      // PORT_NAME("N/C 1")
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )      // PORT_NAME("N/C 2")
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON12 )    PORT_NAME("Clear coinCard")  PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) PORT_NAME("Door Switch")     PORT_TOGGLE
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON13 )    PORT_NAME("Clear Credit")    PORT_CODE(KEYCODE_J)
-
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( magicardw )
-	PORT_START("SW0")
-
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Remote 2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("Remote 1")
-
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-	
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )   PORT_NAME("Hold 1")
-
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )   PORT_NAME("Bet/Clear/Collect")
-
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )   PORT_NAME("Hold 5")
-	
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
-
-	PORT_BIT( 0x100, IP_ACTIVE_LOW, IPT_BUTTON2 )  PORT_NAME("Rental Book Keeping")  PORT_TOGGLE
-	PORT_BIT( 0x200, IP_ACTIVE_LOW, IPT_BUTTON3 )  PORT_NAME("Owner Book Keeping")
-
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Hold 4")
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2")
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3")
-
-
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Clear")  PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Pay Off")  PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Accounting 3")  PORT_CODE(KEYCODE_E)
-
-	PORT_START("SW1")
-	PORT_DIPNAME( 0x80, 0x80, "Hopper" )					PORT_DIPLOCATION("DIP 1:1")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Hopper" )					PORT_DIPLOCATION("DIP 1:2")
-	PORT_DIPSETTING(    0x40, "Coin B" )
-	PORT_DIPSETTING(    0x00, "Coin A" )
-	
 	PORT_DIPNAME( 0x38, 0x38, "Setting" )					PORT_DIPLOCATION("DIP 1:5,4,3")
 	PORT_DIPSETTING(    0x38, "Austria 1" )
 	PORT_DIPSETTING(    0x30, "Austria 2" )
@@ -850,8 +754,8 @@ static INPUT_PORTS_START( magicardw )
 	PORT_DIPSETTING(    0x00, "Hungary 2" )
 
 	PORT_DIPNAME( 0x04, 0x04, "Swap Coin Inputs" )			PORT_DIPLOCATION("DIP 1:6")
-	PORT_DIPSETTING(    0x04, "No" )
-	PORT_DIPSETTING(    0x00, "Yes" )
+	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x02, 0x02, "Remote/Keyboard" )			PORT_DIPLOCATION("DIP 1:7")
 	PORT_DIPSETTING(    0x02, "Remote Switch" )
 	PORT_DIPSETTING(    0x00, "Keyboard" )
@@ -859,14 +763,26 @@ static INPUT_PORTS_START( magicardw )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON7 )     PORT_NAME("Hopper Full")   PORT_CODE(KEYCODE_A)  PORT_TOGGLE
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON7 )     PORT_NAME("Hopper Full")     PORT_CODE(KEYCODE_A)  PORT_TOGGLE
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )      // PORT_NAME("Reserve In 9")
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )      // PORT_NAME("Reserve In 8")
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED )      // PORT_NAME("Reserve In 7")
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )      // PORT_NAME("Reserve In 6")
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )      // PORT_NAME("Reserve In 5")
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) PORT_NAME("Door Switch")   PORT_TOGGLE
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON13 )    PORT_NAME("Clear Credit")  PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) PORT_NAME("Door Switch")     PORT_TOGGLE
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON13 )    PORT_NAME("Clear Credit")    PORT_CODE(KEYCODE_J)
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( magicarde )
+	PORT_INCLUDE( magicard )
+
+	PORT_MODIFY("SW1")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON8 )     PORT_NAME("Alarm")           PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON9 )     PORT_NAME("Counter Control") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED )      // PORT_NAME("N/C 1")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )      // PORT_NAME("N/C 2")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON12 )    PORT_NAME("Clear coinCard")  PORT_CODE(KEYCODE_H)
 
 INPUT_PORTS_END
 
@@ -878,11 +794,11 @@ static INPUT_PORTS_START( puzzleme )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON5 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 )  PORT_NAME("Clear")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 )  PORT_NAME("Show All Book Keeping")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("Clear")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Show All Book Keeping")
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON3 )  PORT_NAME("Rental Book Keeping") PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON4 )  PORT_NAME("Owner Book Keeping") PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Rental Book Keeping")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Owner Book Keeping")
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
@@ -890,7 +806,6 @@ static INPUT_PORTS_START( puzzleme )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	// the dip switches don't appear to be used for anything
 	PORT_START("SW1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -904,8 +819,9 @@ static INPUT_PORTS_START( puzzleme )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON6 )  PORT_NAME("Easy 1")		PORT_TOGGLE
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON7 )  PORT_NAME("Easy 2")		PORT_TOGGLE
+	PORT_CONFNAME( 0x1800, 0x1800, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(      0x1800, DEF_STR( Normal ) )
+	PORT_CONFSETTING(      0x0000, DEF_STR( Easy ) )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -913,36 +829,60 @@ static INPUT_PORTS_START( puzzleme )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( lucky7i )
-	PORT_START("SW0")
+	PORT_INCLUDE( magicard )
 
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_MODIFY("SW0")
 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Remote 2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("Remote 1")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Win Plan Scroll/Collect")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Einsatz")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start/Gamble")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Rental Book Keeping")
 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-	
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )   PORT_NAME("Hold 1")
-
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )   PORT_NAME("Win Plan Scroll/Collect")
-
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )   PORT_NAME("Einsatz")
-	
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )   PORT_NAME("Start/Gamble")
-
-	PORT_BIT( 0x100, IP_ACTIVE_LOW, IPT_BUTTON2 )  PORT_NAME("Rental Book Keeping")
-	PORT_BIT( 0x200, IP_ACTIVE_LOW, IPT_BUTTON3 )  PORT_NAME("Owner Book Keeping")
-
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Hold 4")
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2")
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3")
-
-
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hopper COllect") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Hopper Opto") PORT_CODE(KEYCODE_D)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SW1")
+	PORT_MODIFY("SW1")
+	PORT_DIPNAME( 0x80, 0x80, "Hopper" )					PORT_DIPLOCATION("DIP 1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_DIPNAME( 0x40, 0x40, "Hopper-Wert" )				PORT_DIPLOCATION("DIP 1:2")
+	PORT_DIPSETTING(    0x40, "10" )
+	PORT_DIPSETTING(    0x00, "5" )
+
+	PORT_DIPNAME( 0x08, 0x08, "Munzer1" )					PORT_DIPLOCATION("DIP 1:5")
+	PORT_DIPSETTING(    0x08, "10" )
+	PORT_DIPSETTING(    0x00, "5" )
+
+	PORT_DIPNAME( 0x04, 0x04, "Munzer2" )					PORT_DIPLOCATION("DIP 1:6")
+	PORT_DIPSETTING(    0x04, "10" )
+	PORT_DIPSETTING(    0x00, "5" )
+
+	PORT_DIPNAME( 0x02, 0x02, "Remote 1" )					PORT_DIPLOCATION("DIP 1:7")
+	PORT_DIPSETTING(    0x02, "100" )
+	PORT_DIPSETTING(    0x00, "10" )
+
+	PORT_DIPNAME( 0x20, 0x20, "Remote 2" )					PORT_DIPLOCATION("DIP 1:3")
+	PORT_DIPSETTING(    0x20, "100" )
+	PORT_DIPSETTING(    0x00, "50" )
+
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )			PORT_DIPLOCATION("DIP 1:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )			PORT_DIPLOCATION("DIP 1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Attendant Collect") PORT_CODE(KEYCODE_A)
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( dallaspk )
+	PORT_INCLUDE( magicard )
+
+	PORT_MODIFY("SW1")
 	PORT_DIPNAME( 0x80, 0x80, "Hopper" )					PORT_DIPLOCATION("DIP 1:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -967,30 +907,30 @@ static INPUT_PORTS_START( lucky7i )
 	PORT_DIPSETTING(    0x20, "100" )
 	PORT_DIPSETTING(    0x00, "50" )
 
-	PORT_DIPNAME( 0x10, 0x10, "DIP 4 N/U" )					PORT_DIPLOCATION("DIP 1:4")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )			PORT_DIPLOCATION("DIP 1:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x01, 0x01, "DIP 8 N/U" )					PORT_DIPLOCATION("DIP 1:8")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )			PORT_DIPLOCATION("DIP 1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
+INPUT_PORTS_END
 
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Attendant Collect") PORT_CODE(KEYCODE_A)
+static INPUT_PORTS_START( hotslots )
+	PORT_INCLUDE( magicard )
+
+	PORT_MODIFY("SW1")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON8 )     PORT_NAME("Alarm")           PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON9 )     PORT_NAME("Counter Control") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON12 )    PORT_NAME("Clear coinCard")  PORT_CODE(KEYCODE_H)
 
 INPUT_PORTS_END
 
 void magicard_base_state::machine_reset()
 {
 	uint16_t *src = (uint16_t*)memregion("maincpu")->base();
-	m_scc66470->set_vectors( src ) ;
+	m_scc66470->set_vectors( src );
 	
 	m_sda_state = 0;
 	m_scl_state = 0;
@@ -1209,10 +1149,10 @@ ROM_START( magicard )
 	ROM_LOAD16_WORD_SWAP( "magicorg.bin", 0x000000, 0x80000, CRC(810edf9f) SHA1(0f1638a789a4be7413aa019b4e198353ba9c12d9) )
 
 	ROM_REGION( 0x0100, "sereeprom", 0 )  // Serial EPROM
-	ROM_LOAD16_WORD_SWAP("mgorigee.bin",    0x0000, 0x0100, CRC(73522889) SHA1(3e10d6c1585c3a63cff717a0b950528d5373c781) )
+	ROM_LOAD16_WORD_SWAP("mgorigee.bin",    0x0000, 0x0100, CRC(f09eb2b2) SHA1(2d6efcea6c0835ea754285e22354dff8f059fdf5) )
 
 	ROM_REGION(0x4d, "ds1207", 0) /* timekey */
-	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(4407e5fd) SHA1(61491d6209134a5a01e2dfe8a32b3f2902f8d501) ) // just made up!
+	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(48528ccf) SHA1(182f5aa2938328bac59110eee1b340b3b4ea3e29) ) // created to match game
 
 	ROM_REGION(0x4000, "nvram", 0) /* Default NVRAM */
 	ROM_LOAD( "magicard.nv", 0x0000, 0x4000, CRC(3b7d957e) SHA1(2c56b7f37a2166a99c9e6b05d90ace0a4dd179e2) )
@@ -1229,10 +1169,10 @@ ROM_START( magicarda )
 	ROM_RELOAD(                           0x40001, 0x20000 )
 
 	ROM_REGION( 0x0100, "sereeprom", 0 )  // Serial EPROM
-	ROM_LOAD("mgorigee.bin",    0x0000, 0x0100, CRC(73522889) SHA1(3e10d6c1585c3a63cff717a0b950528d5373c781) )
+	ROM_LOAD("mgorigee.bin",    0x0000, 0x0100, CRC(f09eb2b2) SHA1(2d6efcea6c0835ea754285e22354dff8f059fdf5) )
 
 	ROM_REGION(0x4d, "ds1207", 0) /* timekey */
-	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(4902b7c2) SHA1(6e6fe825cfcf39bae60ecc45ab0742772f87cf80) ) // just made up!
+	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(4902b7c2) SHA1(6e6fe825cfcf39bae60ecc45ab0742772f87cf80) ) // created to match game
 
 	ROM_REGION(0x4000, "nvram", 0) /* Default NVRAM */
 	ROM_LOAD( "magicarda.nv", 0x0000, 0x4000, CRC(4d78bbcc) SHA1(943344f03a69ee25526e2b1f2e74722ae2601c11) )
@@ -1249,8 +1189,11 @@ ROM_START( magicardb )
 	ROM_REGION( 0x20000, "other", 0 )  // unknown
 	ROM_LOAD16_WORD_SWAP("mg_u3.bin",   0x00000, 0x20000, CRC(2116de31) SHA1(fb9c21ca936532e7c342db4bcaaac31c478b1a35) )
 
+	ROM_REGION( 0x0100, "sereeprom", 0 )  // Serial EPROM
+	ROM_LOAD("mgorigee.bin",    0x0000, 0x0100, CRC(fea8a821) SHA1(c744cac6af7621524fc3a2b0a9a135a32b33c81b) )
+
 	ROM_REGION(0x4d, "ds1207", 0) /* timekey */
-	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(cbcc1a42) SHA1(4b577c85f5856192ce04051a2d305a9080192177) ) // just made up!
+	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(cbcc1a42) SHA1(4b577c85f5856192ce04051a2d305a9080192177) ) // created to match game
 
 	ROM_REGION(0x4000, "nvram", 0) /* Default NVRAM */
 	ROM_LOAD( "magicardb.nv", 0x0000, 0x4000, CRC(4d78bbcc) SHA1(943344f03a69ee25526e2b1f2e74722ae2601c11) )
@@ -1403,16 +1346,16 @@ ROM_START( magicarde )
 	ROM_LOAD("pic16c54.ic29",   0x0000, 0x1fff, CRC(9c225a49) SHA1(249c12d23d1a85de828652c55a1a19ef8ec378ef) )
 
 	ROM_REGION( 0x0100, "sereeprom", 0 )  // Serial EPROM
-	ROM_LOAD("st24c02.ic26",    0x0000, 0x0100, CRC(98287c67) SHA1(ad34e55c1ce4f77c27049dac88050ed3c94af1a0) )
+	ROM_LOAD("st24c02.ic26",    0x0000, 0x0100, CRC(427bcdc7) SHA1(0b1debf6aa2a50717fcf85dfb8d98ba70871beb9) )
 
 	ROM_REGION(0x8, "serial_id", 0) /* serial number */
-	ROM_LOAD( "ds2401", 0x000000, 0x000008, BAD_DUMP CRC(3f87b999) SHA1(29649749d521ced9dc7ef1d0d6ddb9a8beea360f) ) // just made up!
+	ROM_LOAD( "ds2401", 0x000000, 0x000008, BAD_DUMP CRC(3f87b999) SHA1(29649749d521ced9dc7ef1d0d6ddb9a8beea360f) ) // created to match game
 
 	ROM_REGION(0x4d, "ds1207", 0) /* timekey */
-	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(b00bf924) SHA1(ab98b2955697765518d877d4e19dbe45de0d9503) ) // just made up!
+	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(b00bf924) SHA1(ab98b2955697765518d877d4e19dbe45de0d9503) ) // created to match game
 
 	ROM_REGION(0x10000, "nvram", 0) /* Default NVRAM */
-	ROM_LOAD( "magicarde.nv", 0x0000, 0x10000, CRC(5cf6b301) SHA1(4298517ce67721b025172bfd9abb9c0c13bb83d3) )
+	ROM_LOAD( "magicarde.nv", 0x0000, 0x10000, CRC(6b9f6abd) SHA1(fd171f465a16d3f2da9c19924ee31f6e56ee746c) )
 ROM_END
 
 /*
@@ -1441,16 +1384,16 @@ ROM_START( magicardea )
 	ROM_LOAD("pic16c54.ic29",   0x0000, 0x1fff, CRC(9c225a49) SHA1(249c12d23d1a85de828652c55a1a19ef8ec378ef) )
 
 	ROM_REGION( 0x0100, "sereeprom", 0 )  // Serial EPROM
-	ROM_LOAD("st24c02.ic26",    0x0000, 0x0100, CRC(98287c67) SHA1(ad34e55c1ce4f77c27049dac88050ed3c94af1a0) )
+	ROM_LOAD("st24c02.ic26",    0x0000, 0x0100, CRC(427bcdc7) SHA1(0b1debf6aa2a50717fcf85dfb8d98ba70871beb9) )
 
 	ROM_REGION(0x8, "serial_id", 0) /* serial number */
-	ROM_LOAD( "ds2401", 0x000000, 0x000008, BAD_DUMP CRC(3f87b999) SHA1(29649749d521ced9dc7ef1d0d6ddb9a8beea360f) ) // just made up!
+	ROM_LOAD( "ds2401", 0x000000, 0x000008, BAD_DUMP CRC(3f87b999) SHA1(29649749d521ced9dc7ef1d0d6ddb9a8beea360f) ) // created to match game
 
 	ROM_REGION(0x4d, "ds1207", 0) /* timekey */
-	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(b00bf924) SHA1(ab98b2955697765518d877d4e19dbe45de0d9503) ) // just made up!
+	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(b00bf924) SHA1(ab98b2955697765518d877d4e19dbe45de0d9503) ) // created to match game
 
 	ROM_REGION(0x10000, "nvram", 0) /* Default NVRAM */
-	ROM_LOAD( "magicardea.nv", 0x0000, 0x10000, CRC(d502293f) SHA1(a6295a50921ecf277644bccc7d2b8bffa7a8261d) )
+	ROM_LOAD( "magicardea.nv", 0x0000, 0x10000, CRC(a1043c84) SHA1(30c3bb43e91fc358a2592f9a6efbd146eec4e43c) )
 ROM_END
 
 /*
@@ -1469,17 +1412,20 @@ ROM_START( magicardeb )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "27c4002_v2.9a_5b64.ic21", 0x00000, 0x80000, CRC(81ad0437) SHA1(117e2681541f786874cd0bce7f8bfb2bffb0b548) )
 
+	// Serial EPROM undumped
+	ROM_REGION( 0x0100, "sereeprom", 0 )  // Serial EPROM
+	ROM_LOAD("st24c02.ic26",    0x0000, 0x0100, BAD_DUMP CRC(6c695dd7) SHA1(7fb56c449f7592e200204f38a4cbb4cf7f0f1665) )
+
 	ROM_REGION(0x8, "serial_id", 0) /* serial number */
-	ROM_LOAD( "ds2401", 0x000000, 0x000008, BAD_DUMP CRC(3f87b999) SHA1(29649749d521ced9dc7ef1d0d6ddb9a8beea360f) ) // just made up!
+	ROM_LOAD( "ds2401", 0x000000, 0x000008, BAD_DUMP CRC(3f87b999) SHA1(29649749d521ced9dc7ef1d0d6ddb9a8beea360f) ) // created to match game
 
 	ROM_REGION(0x4d, "ds1207", 0) /* timekey */
-	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(b00bf924) SHA1(ab98b2955697765518d877d4e19dbe45de0d9503) ) // just made up!
+	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(b00bf924) SHA1(ab98b2955697765518d877d4e19dbe45de0d9503) ) // created to match game
 
 	// PIC undumped
-	// Serial EPROM undumped
 
 	ROM_REGION(0x10000, "nvram", 0) /* Default NVRAM */
-	ROM_LOAD( "magicardeb.nv", 0x0000, 0x10000, CRC(1bd3c729) SHA1(224c6693da37ade933e1829e3e7e31b6ed48bc16) )
+	ROM_LOAD( "magicardeb.nv", 0x0000, 0x10000, CRC(f40bf542) SHA1(b73838f610dbf35099971d80e240abd672dd36e3) )
 ROM_END
 
 /*
@@ -1500,7 +1446,7 @@ ROM_START( magicardec )
 
 
 	ROM_REGION(0x8, "serial_id", 0) /* serial number */
-	ROM_LOAD( "ds2401", 0x000000, 0x000008, BAD_DUMP CRC(3f87b999) SHA1(29649749d521ced9dc7ef1d0d6ddb9a8beea360f) ) // just made up!
+	ROM_LOAD( "ds2401", 0x000000, 0x000008, BAD_DUMP CRC(3f87b999) SHA1(29649749d521ced9dc7ef1d0d6ddb9a8beea360f) ) // created to match game
 	// PIC undumped
 	// Serial EPROM undumped
 ROM_END
@@ -1531,13 +1477,13 @@ ROM_START( magicardf )
 	ROM_LOAD("mx29f1610.ic30",  0x000000, 0x200000, CRC(c8ba9820) SHA1(fcae1e200c718b549b91d1110025595ffd7bdd51) )
 
 	ROM_REGION( 0x0100, "sereeprom", 0 ) // Serial EEPROM
-	ROM_LOAD("24lc02b.ic26",    0x0000, 0x0100, CRC(47c8b137) SHA1(6581e1f4ea65c833fa566c21c76dbe741af488f4) )
+	ROM_LOAD("24lc02b.ic26",    0x0000, 0x0100, CRC(5cb1b2b2) SHA1(84d4535e5491d9a4a9c658d39df16757bc572a4b) )
 
 	ROM_REGION(0x8, "serial_id", 0) /* serial number */
-	ROM_LOAD( "ds2401", 0x000000, 0x000008, BAD_DUMP CRC(3f87b999) SHA1(29649749d521ced9dc7ef1d0d6ddb9a8beea360f) ) // just made up!
+	ROM_LOAD( "ds2401", 0x000000, 0x000008, BAD_DUMP CRC(3f87b999) SHA1(29649749d521ced9dc7ef1d0d6ddb9a8beea360f) ) // created to match game
 
 	ROM_REGION(0x10000, "nvram", 0) /* Default NVRAM */
-	ROM_LOAD( "magicardf.nv", 0x0000, 0x10000, CRC(a90b9972) SHA1(c54ced59cbe3e40bf3f16125be84fc67c61a6aaf) )
+	ROM_LOAD( "magicardf.nv", 0x0000, 0x10000, CRC(8beb061b) SHA1(c29a2086dea30c98565e811d9686af35da42c9d9) )
 ROM_END
 
 /*
@@ -1553,10 +1499,13 @@ ROM_START( magicardw )
 	ROM_LOAD("pic16c54a.bin",   0x0000, 0x1fff, CRC(e777e814) SHA1(e0440be76fa1f3c7ae7d31e1b29a2ba73552231c) )
 
 	ROM_REGION(0x4d, "ds1207", 0) /* timekey */
-	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(cbcc1a42) SHA1(4b577c85f5856192ce04051a2d305a9080192177) ) // just made up!
+	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(ab0b75a2) SHA1(3a3c594d77936e671d25f526459355cc446a0991) ) // created to match game
 
 	ROM_REGION(0x4000, "nvram", 0) /* Default NVRAM */
 	ROM_LOAD( "magicardw.nv", 0x0000, 0x4000, CRC(d6244455) SHA1(b6389574f1d4a4a64590d544c9bafe4892feb0a1) )
+
+	ROM_REGION( 0x0100, "sereeprom", 0 ) // Serial EEPROM
+	ROM_LOAD("24lc02b.ic26",    0x0000, 0x0100, CRC(fea8a821) SHA1(c744cac6af7621524fc3a2b0a9a135a32b33c81b) )
 ROM_END
 
 
@@ -1970,9 +1919,9 @@ ROM_END
   |                                         |LC324256BP-70|          |                  |           |___|           __|
   | _______                                 |_____________|          |     OF19802.3    |                          |
   ||DS1207 |                                                         |__________________|                          |
-  ||_______|                                                                                                       |                       
-  |         ___                       XTAL2                              __________                                |   
-  |        |   |        ________          ________________              | PIC16C54 |                               |        
+  ||_______|                                                                                                       |
+  |         ___                       XTAL2                              __________                                |
+  |        |   |        ________          ________________              | PIC16C54 |                               |
   |   ___  |PC7|       |        |        |                |             |__________|                               |__
   |  |   | |4HC|       |        |        |    IMPERA 8    |                   XTAL3                                 __|
   |  |HEF| |273|       |HYUNDAI |        |                |                                                         __|
@@ -2025,7 +1974,7 @@ ROM_START( unkte06 )
 	ROM_LOAD("pic16c56.bin",   0x0000, 0x1fff, CRC(b5655603) SHA1(d9126c36f3fca7e769ea60aaa711bb304b4b6a11) )
 
 	ROM_REGION(0x4d, "ds1207", 0) /* timekey */
-	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(cbcc1a42) SHA1(4b577c85f5856192ce04051a2d305a9080192177) ) // just made up!
+	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(cbcc1a42) SHA1(4b577c85f5856192ce04051a2d305a9080192177) ) // created to match game
 
 	ROM_REGION(0x4000, "nvram", 0) /* Default NVRAM */
 	ROM_LOAD( "unkte06.nv", 0x0000, 0x4000, CRC(5b62f04a) SHA1(0cc6404e1bb66801a562ff7a1479859c17e9f209) )
@@ -2104,7 +2053,7 @@ ROM_START( lucky7i )
 	ROM_LOAD16_WORD_SWAP( "27c210.5", 0x20000, 0x20000, CRC(b4da8856) SHA1(a33158d75047561fa9674ceb6b22cc63b5b49aed) )
 
 	ROM_REGION(0x4d, "ds1207", 0) /* timekey */
-	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(7b838ea7) SHA1(5c22b789251becd20f56f944b76c5b779e5a8892) ) // just made up!
+	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(7b838ea7) SHA1(5c22b789251becd20f56f944b76c5b779e5a8892) ) // created to match game
 
 	ROM_REGION(0x4000, "nvram", 0) /* Default NVRAM */
 	ROM_LOAD( "lucky7i.nv", 0x0000, 0x4000, CRC(51960419) SHA1(ef7f9d7d9714fda0af23b311232194567887a264) )
@@ -2203,7 +2152,7 @@ ROM_START( unkpkr_w )
 	ROM_LOAD16_WORD_SWAP( "w.bin", 0x00000, 0x80000, CRC(28300427) SHA1(83ea014a818246f476d769ad06cb2eba1ce699e8) )
 
 	ROM_REGION(0x4d, "ds1207", 0) /* timekey */
-	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(cbcc1a42) SHA1(4b577c85f5856192ce04051a2d305a9080192177) ) // just made up!
+	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(cbcc1a42) SHA1(4b577c85f5856192ce04051a2d305a9080192177) ) // created to match game
 
 	ROM_REGION(0x4000, "nvram", 0) /* Default NVRAM */
 	ROM_LOAD( "unkpkr_w.nv", 0x0000, 0x4000, CRC(2d2e1082) SHA1(f288fa800da59dc89cdca02e528c94161b149f1c) )
@@ -2297,6 +2246,12 @@ ROM_START( dallaspk )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "cz-v1-p.bin", 0x00000, 0x20000, CRC(ad575e3f) SHA1(4e22957c42610fec0a96bd85f4b766422b020d88) )
 	ROM_LOAD16_WORD_SWAP( "cz-v1-b.bin", 0x20000, 0x20000, CRC(2595d346) SHA1(34f09931d82b5376e4f3922222645c796dad0440) )
+
+	ROM_REGION(0x4d, "ds1207", 0) /* timekey */
+	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(37adab02) SHA1(2b9859ae6cabfdb9c70f94ccc38a271caf6539aa) ) // created to match game
+
+	ROM_REGION(0x4000, "nvram", 0) /* Default NVRAM */
+	ROM_LOAD( "dallaspk.nv", 0x0000, 0x4000, CRC(4886d292) SHA1(d06bbeb06c7bc407cb1cf6f2a6d266e578d359e2) )
 ROM_END
 
 
@@ -2371,7 +2326,7 @@ ROM_START( kajotcrd )
 	ROM_LOAD("x24c02.ic26",    0x0000, 0x0100, CRC(0f143d6f) SHA1(c293728a997cd0868705dced55955072c6ebf5c0) )
 
 	ROM_REGION(0x8, "serial_id", 0) /* serial number */
-	ROM_LOAD( "ds2401", 0x000000, 0x000008, BAD_DUMP CRC(3f87b999) SHA1(29649749d521ced9dc7ef1d0d6ddb9a8beea360f) ) // just made up!
+	ROM_LOAD( "ds2401", 0x000000, 0x000008, BAD_DUMP CRC(3f87b999) SHA1(29649749d521ced9dc7ef1d0d6ddb9a8beea360f) ) // created to match game
 ROM_END
 
 
@@ -2384,21 +2339,21 @@ ROM_END
 GAME( 199?, magicard,   0,        magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (set 1)",                         MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 199?, magicarda,  magicard, magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (set 2)",                         MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 199?, magicardb,  0,        magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (set 3)",                         MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1994, magicarde,  0,        hotslots_pic54, magicard,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94",                       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1994, magicardea, magicarde,hotslots_pic54, magicard,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.11a, set 2)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1994, magicardeb, magicarde,hotslots,       magicard,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.9a)",               MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1998, magicardec, magicarde,hotslots,       magicard,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export (v4.01)",                  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1994, magicardf,  magicarde,hotslots,       magicard,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Export (V.211A)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1998, magicardj,  0,        hotslots,       magicard,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card III Jackpot (4.01)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1993, magicardw,  magicardb,magicard_pic54, magicardw, magicard_state, empty_init, ROT0, "Impera",    "Magic Card - Wien (Sicherheitsversion 1.2)", MACHINE_SUPPORTS_SAVE )
-GAME( 2001, magicle,    0,        magicle,        magicard,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Lotto Export (5.03)",                  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 2002, hotslots,   0,        hotslots,       magicard,  hotslots_state, empty_init, ROT0, "Impera",    "Hot Slots (6.00)",                           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1999, quingo,     0,        magicle,        magicard,  hotslots_state, empty_init, ROT0, "Impera",    "Quingo Export (5.00)",                       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1999, belslots,   0,        magicle,        magicard,  hotslots_state, empty_init, ROT0, "Impera",    "Bel Slots Export (5.01)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1994, magicarde,  0,        hotslots_pic54, magicarde, hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.11a, set 1)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1994, magicardea, magicarde,hotslots_pic54, magicarde, hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.11a, set 2)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1994, magicardeb, magicarde,hotslots,       magicarde, hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.09a)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1998, magicardec, 0,        hotslots,       magicarde, hotslots_state, empty_init, ROT0, "Impera",    "Magic Card III Jackpot (V4.01 6/98)",        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1994, magicardf,  magicarde,hotslots,       magicarde, hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (V2.11a, set 3)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1998, magicardj,  0,        hotslots,       magicarde, hotslots_state, empty_init, ROT0, "Impera",    "Magic Card III Jackpot (V4.01 7/98)",        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1993, magicardw,  magicardb,magicard_pic54, magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card - Wien (Sicherheitsversion 1.2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, magicle,    0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Lotto Export (5.03)",                  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 2002, hotslots,   0,        hotslots,       hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Hot Slots (6.00)",                           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1999, quingo,     0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Quingo Export (5.00)",                       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1999, belslots,   0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Bel Slots Export (5.01)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 2001, bigdeal0,   0,        magicle,        magicard,  hotslots_state, empty_init, ROT0, "Impera",    "Big Deal Belgien (5.04)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 199?, puzzleme,   0,        puzzleme,       puzzleme,  hotslots_state, empty_init, ROT0, "Impera",    "Puzzle Me!",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1994, unkte06,    magicardb,unkte06,        magicardw, magicard_state, empty_init, ROT0, "Impera",    "unknown Poker 'TE06'",                       MACHINE_SUPPORTS_SAVE ) // strings in ROM
-GAME( 199?, lucky7i,    0,        magicard,       lucky7i,   magicard_state, empty_init, ROT0, "Impera",    "Lucky 7 (Impera)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1994, unkte06,    magicardb,unkte06,        magicard,  magicard_state, empty_init, ROT0, "Impera",    "unknown Poker 'TE06'",                       MACHINE_SUPPORTS_SAVE ) // strings in ROM
+GAME( 199?, lucky7i,    0,        magicard,       lucky7i,   magicard_state, empty_init, ROT0, "Impera",    "Lucky 7 (Impera) V04/91a",                   MACHINE_SUPPORTS_SAVE )
 GAME( 1993, unkpkr_w,   magicardb,magicard,       magicard,  magicard_state, empty_init, ROT0, "<unknown>", "unknown Poker 'W'",                          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1993, dallaspk,   0,        magicard,       magicard,  magicard_state, empty_init, ROT0, "<unknown>", "Dallas Poker",                               MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1993, dallaspk,   0,        magicard,       dallaspk,  magicard_state, empty_init, ROT0, "<unknown>", "Dallas Poker",                               MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1993, kajotcrd,   0,        hotslots,       magicard,  hotslots_state, empty_init, ROT0, "Amatic",    "Kajot Card (Version 1.01, Wien Euro)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
