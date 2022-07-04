@@ -333,7 +333,10 @@ void mpu4_state::update_meters()
 	switch (m_reel_mux)
 	{
 	case STANDARD_REEL:
-		// Change nothing
+		if (m_hopper_type != TUBES)
+		{
+			data = (data & 0x0F); //Strip reel data from meter drives, leaving active elements			
+		}
 		break;
 
 	case FIVE_REEL_5TO8:
@@ -1089,16 +1092,17 @@ void mpu4_state::pia_ic7_portb_w(uint8_t data)
 {
 	if (m_hopper_type == HOPPER_DUART_A)
 	{
-		//duart write data
+		m_hopper1->motor_w(data & 0x10);
+		//opto line is DUART op BIT 4 (MR, channel B)
 	}
 	else if (m_hopper_type == HOPPER_NONDUART_A)
 	{
-		m_hopper1->motor_w(BIT(data, 5));
+		m_hopper1->motor_w(data & 0x20);
 	}
 	else if (m_hopper_type == HOPPER_TWIN_HOPPER)
 	{
-		m_hopper1->motor_w(BIT(data, 5));
-		m_hopper2->motor_w(BIT(data, 6));		
+		m_hopper1->motor_w(data & 0x20);
+		m_hopper2->motor_w(data & 0x40);		
 	}
 
 	m_mmtr_data = data;
@@ -1165,11 +1169,18 @@ void mpu4_state::pia_ic8_portb_w(uint8_t data)
 {
 	if (m_hopper_type == HOPPER_DUART_B)
 	{
-//      duart.drive_sensor(data & 0x04, data & 0x01, 0, 0);
+		m_hopper1->motor_w(data & 0x01);
+		m_hopper1_opto =  (data & 0x04);
+		data &= ~0x05; //remove Triacs from use			
 	}
 	else if (m_hopper_type == HOPPER_DUART_C)
 	{
-//      duart.drive_sensor(data & 0x04, data & 0x01, data & 0x04, data & 0x02);
+		// Dual DUART hoppers share an opto line for some reason
+		m_hopper1->motor_w(data & 0x01);
+		m_hopper1_opto =  (data & 0x04);
+		m_hopper2->motor_w(data & 0x02);
+		m_hopper2_opto =  (data & 0x04);
+		data &= ~0x07; //remove Triacs from use			
 	}
 	LOG_IC8(("%s: IC8 PIA Port B Set to %2x (OUTPUT PORT, TRIACS)\n", machine().describe_context(),data));
 	for (int i = 0; i < 8; i++)
