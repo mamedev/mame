@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "osdwindow.h"
+#include "modules/lib/osdobj_common.h"
 #include "modules/monitor/monitor_module.h"
 
 #include "render/drawnone.h"
