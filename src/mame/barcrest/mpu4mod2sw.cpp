@@ -33,7 +33,7 @@ public:
 	void init_m4alladv();
 	void init_m4alpha();
 	void init_m4actclb();
-
+	void init_m4test();
 };
 
 #include "m4actclb.lh"
@@ -2412,6 +2412,36 @@ GAME(199?, m4blstbk,  0,          mod2_chr_blastbnk, mpu4,            mpu4mod2_m
 // different protection, call/response check with 6 possible values
 GAME(199?, m4copcsh,  0,          mod2_chr_copcash, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "bootleg","Coppa Cash (MPU4) (FC 2.0)",GAME_FLAGS )
 
+/*********************************************************************************************************
+
+    Test programs for base (mod2) hardware
+
+*********************************************************************************************************/
+
+void mpu4mod2_machines_state::init_m4test()
+{
+	init_m4default();
+	m_overcurrent_detect = true;
+}
+
+ROM_START( m4tst2 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "ut2.p1",  0xe000, 0x2000,  CRC(f7fb6575) SHA1(f7961cbd0801b9561d8cd2d23081043d733e1902))
+ROM_END
+
+ROM_START( m4clr )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "meter-zero.p1",  0x8000, 0x8000,  CRC(e74297e5) SHA1(49a2cc85eda14199975ec37a794b685c839d3ab9))
+ROM_END
+
+ROM_START( m4rltst )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "rtv.p1", 0x08000, 0x08000, CRC(7b78f3f2) SHA1(07ef8e6a08fd70ee48e4463672a1230ecc669532) )
+ROM_END
+
+GAME( 198?, m4tst2,   0,          mod2_no_bacta,       mpu4,    mpu4mod2_machines_state, init_m4test,  ROT0,   "Barcrest","MPU4 Unit Test (Program 2)",MACHINE_MECHANICAL )
+GAME( 198?, m4clr,    0,          mod2_no_bacta,       mpu4,    mpu4mod2_machines_state, init_m4test,  ROT0,   "Barcrest","MPU4 Meter Clear ROM",MACHINE_MECHANICAL )
+GAME( 198?, m4rltst,  0,          mod2_no_bacta,       mpu4,    mpu4mod2_machines_state, init_m4test,  ROT0,   "Barcrest","MPU4 Reel Test (3.0)",MACHINE_MECHANICAL )
 
 
 /*********************************************************************************************************

@@ -30,38 +30,11 @@ public:
 	}
 
 	void init_m4aao();
-	void init_m4test();
 };
 
-void mpu4unsorted_state::init_m4test()
-{
-	init_m4default();
-	m_overcurrent_detect = true;
-}
+
 
 #include "m4aao.lh"
-
-
-ROM_START( m4tst2 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
-	ROM_LOAD( "ut2.p1",  0xe000, 0x2000,  CRC(f7fb6575) SHA1(f7961cbd0801b9561d8cd2d23081043d733e1902))
-ROM_END
-
-ROM_START( m4clr )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
-	ROM_LOAD( "meter-zero.p1",  0x8000, 0x8000,  CRC(e74297e5) SHA1(49a2cc85eda14199975ec37a794b685c839d3ab9))
-ROM_END
-
-ROM_START( m4rltst )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "rtv.p1", 0x08000, 0x08000, CRC(7b78f3f2) SHA1(07ef8e6a08fd70ee48e4463672a1230ecc669532) )
-ROM_END
-
-
-
-
-
-
 
 
 ROM_START( m4casmul )
@@ -78,7 +51,6 @@ ROM_START( m4crzjk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "crjok2.04.bin", 0x0000, 0x010000, CRC(838336d6) SHA1(6f36de20c930cbbff479af2667c11152c6adb43e) )
 ROM_END
-
 
 #define M4DRAC_EXTRAS \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
@@ -104,18 +76,6 @@ ROM_START( m4dracb )
 	ROM_LOAD( "dra27.p1", 0x0000, 0x020000, CRC(8a095175) SHA1(41006e298f1688499ce6820ec28196c7578684b9) )
 	M4DRAC_EXTRAS
 ROM_END
-
-
-
-
-
-
-
-
-
-
-
-
 
 ROM_START( m4jok300 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
@@ -149,7 +109,6 @@ ROM_START( m4luckdv )
 	ROM_LOAD( "generic_dutch_sound1.bin", 0x000000, 0x080000, CRC(f247ba83) SHA1(9b173503e63a4a861d1380b2ab1fe14af1a189bd) )
 	ROM_LOAD( "generic_dutch_sound2.bin", 0x080000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
 ROM_END
-
 
 #define M4LUCKWB_EXTRAS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) /* these are all different sound roms... */  \
@@ -200,11 +159,6 @@ ROM_START( m4luckwbf )
 	M4LUCKWB_EXTRAS
 ROM_END
 
-
-
-
-
-
 ROM_START( m4nile )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "gjn08.p1", 0x0000, 0x020000, CRC(2bafac0c) SHA1(363d08f798b5bea409510b1a9415098a69f19ee0) )
@@ -216,9 +170,6 @@ ROM_START( m4nile )
 	ROM_LOAD( "gjnsnd.p4", 0x180000, 0x080000, CRC(da785b0a) SHA1(63358ab197eb1de8e489a9fd6ffbc2039efc9536) )
 ROM_END
 
-
-
-
 ROM_START( m4ordmnd )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "rab01.p1", 0x0000, 0x020000, CRC(99964fe7) SHA1(3745d09e7a4f417c8e85270d3ffec3e37ee1344d) )
@@ -229,17 +180,6 @@ ROM_START( m4ordmnd )
 	ROM_LOAD( "odsnd3.bin", 0x100000, 0x080000, CRC(b1b12def) SHA1(d8debf8cfb3af2157d5d1571927588dc1c8d07b6) )
 ROM_END
 
-
-
-
-
-
-
-
-
-
-
-
 ROM_START( m4royjwl )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "rj.bin", 0x0000, 0x020000, CRC(3ffbe4a8) SHA1(47a0309cc9ff315ad9f64e6855863409443e94e2) )
@@ -249,31 +189,10 @@ ROM_START( m4royjwl )
 	ROM_LOAD( "rj_sound2.bin", 0x080000, 0x080000, CRC(9456523e) SHA1(ea1b6bf16b7d1015c188ad83760336d9851de391) )
 ROM_END
 
-
-
-
-
-
-
-
-
-
-
-
-
 ROM_START( m4topdk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dtd26pj.bin", 0x0000, 0x010000, CRC(1f84d995) SHA1(7412632cf79008b980e48f14aea89c3f8d742ed2) )
 ROM_END
-
-
-
-
-
-
-
-
-
 
 ROM_START( m4twist )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -290,8 +209,6 @@ ROM_START( m4twistb )
 	ROM_LOAD( "twistagain-mki-27.bin", 0x8000, 0x008000, CRC(357f7072) SHA1(8a23509fff79a83a819b27eff8de8db08c679e3f) )
 ROM_END
 
-
-
 ROM_START( m4vegastg )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "vs.p1", 0x0000, 0x020000, CRC(4099d572) SHA1(91a7c1575013e61c754b2c2cb841e7687b76d7f9) )
@@ -299,12 +216,6 @@ ROM_START( m4vegastg )
 	ROM_REGION( 0x200000, "msm6376", 0 )
 	ROM_LOAD( "vssound.bin", 0x0000, 0x16ee37, CRC(456da6be) SHA1(f0e293f0a383878b581326f869c2e49bec61d0c5) )
 ROM_END
-
-
-
-
-
-
 
 
 void mpu4unsorted_state::init_m4aao()
@@ -1047,9 +958,6 @@ ROM_END
 
 
 /* Barcrest */
-GAME( 198?, m4tst2,   0,          mod2_no_bacta,       mpu4,    mpu4unsorted_state, init_m4test,  ROT0,   "Barcrest","MPU4 Unit Test (Program 2)",MACHINE_MECHANICAL )
-GAME( 198?, m4clr,    0,          mod2_no_bacta,       mpu4,    mpu4unsorted_state, init_m4test,  ROT0,   "Barcrest","MPU4 Meter Clear ROM",MACHINE_MECHANICAL )
-GAME( 198?, m4rltst,  0,          mod2_no_bacta,       mpu4,    mpu4unsorted_state, init_m4test,  ROT0,   "Barcrest","MPU4 Reel Test (3.0)",MACHINE_MECHANICAL )
 
 // barcrest, to split
 
@@ -1062,7 +970,7 @@ GAME(199?, m4nile,    0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::a
 
 // yes, the ingame display is 'Millenium' not 'Millennium'.  There are also strings from The Crystal Maze in the ROM, probably used as a base project?
 GAME(199?, m4jokmil,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m683_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big_lextender,ROT0,"Barcrest","Jokers Millenium 300 (Barcrest) (German) (MPU4) (DJO 0.1, set 1)",GAME_FLAGS ) // DM1 SW ALM
-GAME(199?, m4jok300,  m4jokmil,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::m683_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big_lextender,ROT0,"Barcrest","Jokers Millenium 300 (Barcrest) (German) (MPU4) (DJO 0.1, set 2)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4jok300,  m4jokmil,   mod4yam_cheatchr_pal<mpu4_characteriser_pal::m683_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big_lextender,ROT0,"Barcrest","Jokers Millenium 300 (Barcrest) (German) (MPU4) (DJO 0.1, set 2)",GAME_FLAGS ) // DM1 SW ALM
 
 GAME(199?, m4drac,    0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::bankrollerclub_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big_lextender,ROT0,"Barcrest","Dracula (Barcrest - Nova) (German) (MPU4) (DRA 2.1)",GAME_FLAGS ) // DM1 SW ALM
 GAME(199?, m4draca,   m4drac,     mod4oki_cheatchr_pal<mpu4_characteriser_pal::bankrollerclub_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big_lextender,ROT0,"Barcrest","Dracula (Barcrest - Nova) (German) (MPU4) (DRA 2.4)",GAME_FLAGS ) // DM1 SW ALM

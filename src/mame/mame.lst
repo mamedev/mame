@@ -24445,7 +24445,6 @@ m4ccc                           //
 m4ccop                          //
 m4ccopa                         //
 m4ccopb                         //
-m4clr                           // MPU4 Meter Clear ROM
 m4coney                         // Coney Island (Qps)
 m4crzcav                        // Crazy Cavern (Nova)
 m4crzcsn                        // Crazy Casino (Nova)
@@ -24501,7 +24500,6 @@ m4nile                          // Nile Jewels (Barcrest)
 m4nod                           //
 m4octo                          // Octopus (Nova)
 m4ordmnd                        // Oriental Diamonds (Barcrest)
-m4rltst                         // MPU4 Reel Test (3.0)
 m4royjwl                        // Royal Jewels (Barcrest)
 m4sbx                           // Super Bear X
 m4sbxa                          //
@@ -24522,7 +24520,6 @@ m4surfb                         //
 m4topdk                         // Top Deck (Barcrest)
 m4treel                         //
 m4treela                        //
-m4tst2                          // MPU4 Unit Test (Program 2)
 m4twist                         // Twist Again (Barcrest)
 m4twista                        //
 m4twistb                        //
@@ -26029,6 +26026,7 @@ m4clbcntc                       //
 m4clbcntd                       //
 m4clbdbl                        // Club Double (Barcrest)
 m4clbrpl                        // Club Replay (PCP)
+m4clr                           // MPU4 Meter Clear ROM
 m4conn4                         // Connect 4
 m4copcsh                        // Coppa Cash (Barcrest)
 m4crkpot                        // Crackpot Club (Barcrest)
@@ -26161,6 +26159,7 @@ m4r2r                           // Reel 2 Reel (Barcrest)
 m4randr                         // Random Roulette (Barcrest)
 m4redunk                        // unknown RED
 m4reelpk                        // Reel Poker (Barcrest)
+m4rltst                         // MPU4 Reel Test (3.0)
 m4rsg                           // Ready Steady Go (Barcrest) (type 1)
 m4rsga                          //
 m4runawy                        // Runaway Trail (Barcrest)
@@ -26240,6 +26239,7 @@ m4toptena                       //
 m4tribnk                        // Triple Bank (Barcrest)
 m4tricol                        // Tricolor (Barcrest)
 m4tridic                        // Triple Dice (Barcrest)
+m4tst2                          // MPU4 Unit Test (Program 2)
 m4ttak                          // Tic Tac Take (unknown)
 m4tupen                         // Tuppenny Cracker (Barcrest - Bootleg)
 m4twilgt                        // Twilight (Barcrest)
