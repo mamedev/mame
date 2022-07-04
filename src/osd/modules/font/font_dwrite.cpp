@@ -13,7 +13,9 @@
 
 #include <windows.h>
 
+#include <cmath>
 #include <memory>
+#include <stdexcept>
 
 // Windows Imaging Components
 #include <wincodec.h>
@@ -227,7 +229,7 @@ public:
 	{
 		if (m_designUnitsPerEm != other.m_designUnitsPerEm || m_emSizeInDip != other.m_emSizeInDip)
 		{
-			throw emu_fatalerror("Attempted subtraction of FontDimension with different scale.");
+			throw std::invalid_argument("Attempted subtraction of FontDimension with different scale.");
 		}
 
 		return FontDimension(m_designUnitsPerEm, m_emSizeInDip, m_designUnits - other.m_designUnits);
@@ -237,7 +239,7 @@ public:
 	{
 		if (m_designUnitsPerEm != other.m_designUnitsPerEm || m_emSizeInDip != other.m_emSizeInDip)
 		{
-			throw emu_fatalerror("Attempted addition of FontDimension with different scale.");
+			throw std::invalid_argument("Attempted addition of FontDimension with different scale.");
 		}
 
 		return FontDimension(m_designUnitsPerEm, m_emSizeInDip, m_designUnits + other.m_designUnits);
