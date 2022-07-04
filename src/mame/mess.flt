@@ -140,7 +140,6 @@ chess/conic_cchess3.cpp
 chess/regence.cpp
 chess/tasc.cpp
 chromatics/cgc7900.cpp
-chrysler/eva.cpp
 citoh/cit101.cpp
 citoh/cit101xl.cpp
 citoh/cit220.cpp
@@ -468,6 +467,7 @@ miltonbradley/milton6805.cpp
 miltonbradley/vectrex.cpp
 mips/mips.cpp
 misc/3do.cpp
+misc/eva.cpp
 mit/tx0.cpp
 mits/altair.cpp
 mits/mits680b.cpp

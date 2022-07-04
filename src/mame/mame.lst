@@ -13670,7 +13670,7 @@ europc                          // 1988 Schneider Euro PC (CGA or Hercules)
 europc2                         // 1989 Schneider Euro PC II
 euroxt                          // Schneider Euro XT
 
-@source:chrysler/eva.cpp
+@source:misc/eva.cpp
 eva11                           //
 eva24                           //
 
