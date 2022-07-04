@@ -8,10 +8,19 @@
 
 ***************************************************************************/
 
+#include "modules/lib/osdobj_common.h"
+
+#include "modules/font/font_module.h"
+#include "modules/input/input_module.h"
+#include "modules/sound/sound_module.h"
+#include "modules/debugger/debug_module.h"
+#include "modules/netdev/netdev_module.h"
+#include "modules/midi/midi_module.h"
+#include "modules/monitor/monitor_module.h"
+#include "watchdog.h"
 
 #include "emu.h"
-#include "osdepend.h"
-#include "modules/lib/osdobj_common.h"
+#include "../frontend/mame/ui/menuitem.h"
 
 #include <iostream>
 
@@ -757,4 +766,19 @@ void osd_common_t::video_options_add(const char *name, void *type)
 {
 	//m_video_options.add(name, type, false);
 	m_video_names.push_back(name);
+}
+
+osd_font::ptr osd_common_t::font_alloc()
+{
+	return m_font_module->font_alloc();
+}
+
+bool osd_common_t::get_font_families(std::string const &font_path, std::vector<std::pair<std::string, std::string> > &result)
+{
+	return m_font_module->get_font_families(font_path, result);
+}
+
+std::unique_ptr<osd_midi_device> osd_common_t::create_midi_device()
+{
+	return m_midi->create_midi_device();
 }

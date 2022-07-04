@@ -35,6 +35,7 @@ DEFINE_GUID(GUID_WICPixelFormat8bppAlpha, 0xe6cd0116, 0xeeba, 0x4161, 0xaa, 0x85
 #include "strconv.h"
 #include "corestr.h"
 #include "winutil.h"
+#include "osdcore.h"
 
 using namespace Microsoft::WRL;
 

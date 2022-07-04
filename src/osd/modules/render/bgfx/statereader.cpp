@@ -9,7 +9,23 @@
 
 #include "statereader.h"
 
+#include "osdcore.h"
+
 #include <cmath>
+
+bool state_reader::READER_CHECK(bool condition, const char* format, ...)
+{
+	if (!condition)
+	{
+		va_list ap;
+		va_start(ap, format);
+		char buf[2048];
+		vsnprintf(buf, 2048, format, ap);
+		osd_printf_error("Error: %s\n", buf);
+		va_end(ap);
+	}
+	return condition;
+}
 
 uint64_t state_reader::get_enum_from_value(const Value& value, std::string name, const uint64_t default_value, const string_to_enum* enums, const int count)
 {
