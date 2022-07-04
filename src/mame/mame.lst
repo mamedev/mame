@@ -1400,7 +1400,7 @@ kccomp                          // VEB KC compact
 amusco                          // 1987, Amusco.
 draw88pkr                       // 1988, BTE, Inc.
 
-@source:skeleton/amust.cpp
+@source:ausnz/amust.cpp
 amust                           //
 
 @source:misc/anes.cpp
@@ -1507,7 +1507,7 @@ apple2gsr3p                     // ??? 198? Apple IIgs ROM03 prototype
 @source:apple/apple3.cpp
 apple3                          // May 1980 Apple ///
 
-@source:skeleton/applix.cpp
+@source:ausnz/applix.cpp
 applix                          //
 
 @source:sanritsu/appoooh.cpp
@@ -3234,7 +3234,7 @@ smashdrv                        // (c) 2000
 smashdrvb                       // (c) 2000
 smashdrvs                       // (c) 2000
 
-@source:skeleton/aussiebyte.cpp
+@source:ausnz/aussiebyte.cpp
 aussieby                        //
 
 @source:atari/avalnche.cpp
@@ -9372,7 +9372,7 @@ bigkarnkm                       //
 bigstrkb                        // bootleg on different hardware
 bigstrkba                       // alt set of 'bigstrkb' with Italian teams
 
-@source:skeleton/binbug.cpp
+@source:ausnz/binbug.cpp
 binbug                          //
 
 @source:pinball/bingo.cpp
@@ -11805,7 +11805,7 @@ ckz80                           //
 @source:skeleton/d400.cpp
 d461                            //
 
-@source:skeleton/d6800.cpp
+@source:ausnz/d6800.cpp
 d6800                           // Dream 6800
 
 @source:homebrew/d6809.cpp
@@ -11876,7 +11876,7 @@ thndzonej                       // MAJ (c) 1991 Data East Corporation (Japan) - 
 @source:skeleton/datacast.cpp
 datacast                        //
 
-@source:trainer/datum.cpp
+@source:ausnz/datum.cpp
 datum                           // 1982
 
 @source:excellent/dblcrown.cpp
@@ -12453,7 +12453,7 @@ gemcrush
 @source:sony/dfs500.cpp
 dfs500                          // 1994 Sony DFS-500 Video Mixer
 
-@source:skeleton/dg680.cpp
+@source:ausnz/dg680.cpp
 dg680                           //
 
 @source:trs/dgn_beta.cpp
@@ -12646,7 +12646,7 @@ dm7000                          //
 @source:misc/dmainevent.cpp
 dmainevent                      // (c) 1983 Destron
 
-@source:skeleton/dmax8000.cpp
+@source:ausnz/dmax8000.cpp
 dmax8000                        //
 
 @source:snk/dmndrby.cpp
@@ -12891,7 +12891,7 @@ e100                            //
 @source:ericsson/e9161.cpp
 e9161                           //
 
-@source:skeleton/eacc.cpp
+@source:ausnz/eacc.cpp
 eacc                            //
 
 @source:skeleton/easy_karaoke.cpp
@@ -13647,7 +13647,7 @@ turbosub7                       // (c) 1985 Entertainment Sciences
 @source:heathkit/et3400.cpp
 et3400                          //
 
-@source:skeleton/eti660.cpp
+@source:ausnz/eti660.cpp
 eti660                          //
 
 @source:misc/ettrivia.cpp
@@ -13681,7 +13681,7 @@ tms9995bb                       // TMS9995 breadboard
 @source:nec/ews4800.cpp
 ews4800_310                     // NEC EWS4800/310
 
-@source:skeleton/excali64.cpp
+@source:ausnz/excali64.cpp
 excali64                        //
 
 @source:capcom/exedexes.cpp
@@ -20036,7 +20036,7 @@ skywolf3                        // bootleg
 sonofphx                        // bootleg
 srdmissn                        // (c) 1986 Taito Corporation
 
-@source:labtam/labtam.cpp
+@source:ausnz/labtam.cpp
 labtam                          // Labtam 3000 model 3006
 
 @source:konami/labyrunr.cpp
@@ -20856,7 +20856,7 @@ magictga                        // (c) 199? Acclaim
 magmax                          // (c) 1985
 magmaxa                         // (c) 1985
 
-@source:dulmont/magnum.cpp
+@source:ausnz/magnum.cpp
 magnum                          //
 
 @source:misc/magreel.cpp
@@ -22914,7 +22914,7 @@ mbc200                          //
 @source:sanyo/mbc55x.cpp
 mbc55x                          // Sanyo MBC-550, MBC-555
 
-@source:appliedtech/mbee.cpp
+@source:ausnz/mbee.cpp
 mbee                            // Microbee 16 Standard or Plus
 mbee128                         // Microbee 128K standard (CP/M)
 mbee128p                        // Microbee 128K premium (CP/M)
@@ -35529,7 +35529,7 @@ pinkiri8                        //
 ronjan                          //
 ronjans                         //
 
-@source:skeleton/pipbug.cpp
+@source:ausnz/pipbug.cpp
 pipbug                          //
 
 @source:vsystem/pipedrm.cpp
@@ -35906,7 +35906,7 @@ sshooter11                      // (c) 1998 P&P Marketing
 sshooter12                      // (c) 1998 P&P Marketing
 sshooter17                      // (c) 1998 P&P Marketing
 
-@source:poly/poly.cpp
+@source:ausnz/poly.cpp
 poly1                           // Poly 1
 poly1e                          // Poly 1 (early)
 poly2                           // Poly 2
@@ -36185,7 +36185,7 @@ progolfa                        // (c) 1981
 @source:sequential/prophet600.cpp
 prpht600                        // 1983 Sequential Circuits
 
-@source:poly/proteus.cpp
+@source:ausnz/proteus.cpp
 proteus                         // Poly Proteus
 
 @source:skeleton/proteus3.cpp
@@ -36312,7 +36312,7 @@ puckpkmn                        // (c) 2000 Genie
 puckpkmna                       // (c) 2000 IBS
 puckpkmnb                       // (c) 2000 IBS
 
-@source:skeleton/pulsar.cpp
+@source:ausnz/pulsar.cpp
 pulsarlb                        //
 
 @source:nintendo/punchout.cpp
@@ -40416,7 +40416,7 @@ supduck                         // (c) Comad
 @source:adc/super6.cpp
 super6                          //
 
-@source:dicksmith/super80.cpp
+@source:ausnz/super80.cpp
 super80                         //
 super80d                        //
 super80e                        //
@@ -41319,7 +41319,7 @@ tdv2324                         //
 @source:misc/teamjocs.cpp
 diaelite                        //
 
-@source:trainer/tec1.cpp
+@source:ausnz/tec1.cpp
 tec1                            // Talking Electronics Computer
 tecjmon                         // Talking Electronics Computer
 
