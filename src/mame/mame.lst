@@ -24423,7 +24423,6 @@ m4aliz                          // AlizBaz (Qps)
 m4bandgd                        // Bands Of Gold (Eurogames)
 m4barcrz                        // Bar Crazy (unknown)
 m4bclimb                        // Bear Climber
-m4bigban                        // Big Bandit (Nova)
 m4bigben                        // Big Ben (Coinworld)
 m4bigbena                       //
 m4bigbenb                       //
@@ -24446,8 +24445,6 @@ m4ccop                          //
 m4ccopa                         //
 m4ccopb                         //
 m4coney                         // Coney Island (Qps)
-m4crzcav                        // Crazy Cavern (Nova)
-m4crzcsn                        // Crazy Casino (Nova)
 m4crzjk                         // Crazy Jokers (Barcrest)
 m4dblchn                        // Double Chance (DJE)
 m4ddb                           // Ding Dong Bells (Coinworld)
@@ -24458,17 +24455,14 @@ m4dnjb                          //
 m4drac                          // Dracula (Barcrest - Nova)
 m4draca                         //
 m4dracb                         //
-m4dragon                        // Dragon (Nova)
 m4eaw51                         // Everyone's A Winner?
 m4fsx                           // Fun Spot X
 m4fsxa                          //
 m4fsxb                          //
 m4funh                          // Fun House
-m4goldnn                        // Golden Years (Nova)
 m4hapfrt                        // Happy Fruits (Coinworld)
 m4hapfrta                       //
 m4hapfrtb                       //
-m4hilonv                        // Hi Lo Casino (Nova)
 m4hstr                          // Happy Streak (Coinworld)
 m4hstra                         //
 m4hstrb                         //
@@ -24479,7 +24473,6 @@ m4hstrcsc                       //
 m4hstrcsd                       //
 m4jok300                        // Jokers 300 (Barcrest)
 m4jokmil                        // Jokers Millennium (Barcrest)
-m4joljokh                       //
 m4jp777                         // Jackpot 777
 m4jungj                         // Jungle Japes
 m4jungja                        //
@@ -24496,11 +24489,7 @@ m4luckwbe                       //
 m4luckwbf                       //
 m4matdr                         // Matador (unknown)
 m4mgpn                          // Monaco Grand Prix (Nova)
-m4nile                          // Nile Jewels (Barcrest)
 m4nod                           //
-m4octo                          // Octopus (Nova)
-m4ordmnd                        // Oriental Diamonds (Barcrest)
-m4royjwl                        // Royal Jewels (Barcrest)
 m4sbx                           // Super Bear X
 m4sbxa                          //
 m4sbxb                          //
@@ -24509,7 +24498,6 @@ m4sbxd                          //
 m4sbxe                          //
 m4sctagt                        // Secret Agent (Nova)
 m4snookr                        // Snooker (Eurocoin)
-m4spotln                        // Spotlight (Nova)
 m4stakex                        // Stake X (Leisurama)
 m4stakexa                       // Stake X (Leisurama)
 m4stand2                        // Stand To Deliver (DJE)
@@ -24523,8 +24511,6 @@ m4treela                        //
 m4twist                         // Twist Again (Barcrest)
 m4twista                        //
 m4twistb                        //
-m4vegastg                       //
-m4vivan                         // Viva Las Vegas (Nova)
 m4wife                          // Money Or Yer Wife (Gemini)
 m4wnud                          // Unknown MPU4 'W Nudge'
 m4zill                          // Zillionare's Challenge (Pure Leisure)
@@ -26642,6 +26628,7 @@ m4berser__w                     //
 m4berser__x                     //
 m4berser__y                     //
 m4berser__z                     //
+m4bigban                        // Big Bandit (Nova)
 m4blkcat                        // Black Cat (Barcrest)
 m4blkwhd                        // Black & White (Barcrest) [Dutch]
 m4bluedm                        // Blue Diamond (Barcrest)
@@ -27075,6 +27062,8 @@ m4crjwl2b                       //
 m4crjwla                        //
 m4crjwlb                        //
 m4crjwlc                        //
+m4crzcav                        // Crazy Cavern (Nova)
+m4crzcsn                        // Crazy Casino (Nova)
 m4crzjwl                        // Crown Jewels (Barcrest) (German)
 m4crzjwla                       //
 m4crzjwlb                       //
@@ -27143,6 +27132,7 @@ m4denmendtk                     //
 m4denmendtkd                    //
 m4denmendty                     //
 m4denmendtyd                    //
+m4dragon                        // Dragon (Nova)
 m4dtyfre                        // Duty Free (Barcrest)
 m4dtyfre_h1                     //
 m4dtyfre_h2                     //
@@ -27343,6 +27333,7 @@ m4gclue__v                      //
 m4gclue__w                      //
 m4gldjok                        // Golden Joker (Barcrest)
 m4gnsmk                         // Gun Smoke (Barcrest)
+m4goldnn                        // Golden Years (Nova)
 m4goodtm                        // Let The Good Times Roll (Barcrest)
 m4goodtm__0                     //
 m4goodtm__1                     //
@@ -27452,6 +27443,7 @@ m4hijinx__w                     //
 m4hijinx__x                     //
 m4hijinx__y                     //
 m4hijinx__z                     //
+m4hilonv                        // Hi Lo Casino (Nova)
 m4hittop                        // Hit The Top (Barcrest)
 m4hittop__0                     //
 m4hittop__1                     //
@@ -27591,6 +27583,7 @@ m4jolgem__w                     //
 m4jolgem__x                     //
 m4jolgem__y                     //
 m4jolgem__z                     //
+m4joljokh                       //
 m4jpgem                         // Jackpot Gems (Barcrest)
 m4jpgem__0                      //
 m4jpgem__1                      //
@@ -28094,6 +28087,7 @@ m4makmnt__w                     //
 m4makmnt__x                     //
 m4makmnt__y                     //
 m4makmnt__z                     //
+m4nile                          // Nile Jewels (Barcrest)
 m4nhtt                          // New Hit the Top (Barcrest)
 m4nhtt__a                       //
 m4nhtt__b                       //
@@ -28201,7 +28195,9 @@ m4oadrac__e                     //
 m4oadrac__f                     //
 m4oadrac__g                     //
 m4oadrac__h                     //
+m4octo                          // Octopus (Nova)
 m4oldtmr                        // Old Timer (Barcrest)
+m4ordmnd                        // Oriental Diamonds (Barcrest)
 m4overmn                        // Over The Moon (Barcrest)
 m4overmn__0                     //
 m4overmn__1                     //
@@ -28870,6 +28866,7 @@ m4rockmn__h                     //
 m4rockmn__i                     //
 m4rockmn__j                     //
 m4rockmn__k                     //
+m4royjwl                        // Royal Jewels (Barcrest)
 m4rwb                           // Red White & Blue (Barcrest)
 m4salsa                         // Salsa (Barcrest)
 m4shocm                         // Showcase Crystal Maze (Barcrest)
@@ -28897,6 +28894,7 @@ m4shodf__j                      //
 m4shodf__k                      //
 m4shodf__l                      //
 m4showtm                        // Show Timer (Barcrest)
+m4spotln                        // Spotlight (Nova)
 m4squid                         // Squids In (Barcrest)
 m4squid__a                      //
 m4squid__b                      //
@@ -29404,6 +29402,7 @@ m4vegast__u                     //
 m4vegast__x                     //
 m4vegast__0                     //
 m4vegast__1                     //
+m4vegastg                       // Vegas Strip (German)
 m4vivalvd                       //
 m4vivaes                        // Viva Espana (Barcrest)
 m4vivaes__0                     //
@@ -29473,6 +29472,7 @@ m4vivess__m                     //
 m4vivess__n                     //
 m4vivess__o                     //
 m4vivess__p                     //
+m4vivan                         // Viva Las Vegas (Nova)
 m4viz                           // Viz (Barcrest)
 m4viz__a                        //
 m4viz__b                        //
