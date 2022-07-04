@@ -239,22 +239,7 @@ ROM_START( m4luckwbf )
 ROM_END
 
 
-ROM_START( m4maglin )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dma21.bin", 0x0000, 0x010000, CRC(836a25e6) SHA1(5f83bb8a2c77dd3b02724c076d6b37d2c1c93b93) )
 
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "mlsound1.p1", 0x000000, 0x080000, CRC(ff8749ff) SHA1(509b53f09cdfe5ee865e60ab42fd578586ac53ea) )
-	ROM_LOAD( "mlsound2.p2", 0x080000, 0x080000, CRC(c8165b6c) SHA1(7c5059ee8630da31fc3ad50d84a4730297757d46) )
-ROM_END
-
-ROM_START( m4magrep )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dmr13.bin", 0x0000, 0x010000, CRC(c3015da3) SHA1(23cd505eedf666c012e4064a5fcf5a983f098e83) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "mrdsound.bin", 0x000000, 0x080000, CRC(9b035fa6) SHA1(51b7e5bc3abdf4f1beba2347146a91a2b3f4de35) ) // also in m4luckdvd
-ROM_END
 
 
 
@@ -310,22 +295,6 @@ ROM_END
 
 
 
-
-#define M4TECHNO_EXTRAS \
-	ROM_REGION( 0x080000, "msm6376", 0 ) \
-	ROM_LOAD( "generic_redhotroll_sound1.bin", 0x0000, 0x080000, CRC(3e80f8bd) SHA1(2e3a195b49448da11cc0c089a8a9b462894c766b) )
-
-ROM_START( m4techno )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dte13.bin", 0x0000, 0x010000, CRC(cf661d06) SHA1(316b2c42e7253a03b2c12b713821045d9f95a8a7) )
-	M4TECHNO_EXTRAS
-ROM_END
-
-ROM_START( m4technoa )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dte13hack.bin", 0x0000, 0x010000, CRC(8b8eafe3) SHA1(93a7714eb4c749b7b19f4f844cf88da9443b0bb7) )
-	M4TECHNO_EXTRAS
-ROM_END
 
 
 
@@ -396,13 +365,6 @@ ROM_START( m4twistb )
 	ROM_LOAD( "twistagain-mki-27.bin", 0x8000, 0x008000, CRC(357f7072) SHA1(8a23509fff79a83a819b27eff8de8db08c679e3f) )
 ROM_END
 
-ROM_START( m4univ )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dun20", 0x0000, 0x010000, CRC(6a845d4d) SHA1(82bfc3f3a0ede76a4d482efc71b0390610db7acf) )
-
-	ROM_REGION( 0x080000, "msm6376", 0 )
-	ROM_LOAD( "generic_dutch_sound2.bin", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
-ROM_END
 
 
 ROM_START( m4vegastg )
@@ -414,13 +376,6 @@ ROM_START( m4vegastg )
 ROM_END
 
 
-ROM_START( m4vivalvd )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dlv11.bin", 0x0000, 0x010000, CRC(a890184c) SHA1(26d9952bf2eb4b55d21cdb934ffc73ff1a1cfbac) )
-
-	ROM_REGION( 0x080000, "msm6376", 0 )
-	ROM_LOAD( "dpms.bin", 0x0000, 0x080000, CRC(93fd4253) SHA1(69feda7ffc56defd515c9cd1ce204af3d9731a3f) ) // same as m4prem (incorrect?)
-ROM_END
 
 
 
@@ -1184,26 +1139,6 @@ GAME( 198?, m4rltst,  0,          mod2_no_bacta,       mpu4,    mpu4unsorted_sta
 
 GAME(199?, m4royjwl,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::jewelcrown_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big_lextender,  ROT0,   "Barcrest","Royal Jewels (Barcrest) (German) (MPU4) (GRJ 1.4)",GAME_FLAGS )
 
-// GEEN TUBES
-GAME(199?, m4maglin,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::viva_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default_six_alt, ROT0,   "Barcrest","Magic Liner (Barcrest) (Dutch) (MPU4) (DMA 2.1)",GAME_FLAGS )
-
-
-
-
-
-// GEEN TUBES
-GAME(199?, m4techno,  0,          mod4oki_7reel_cheatchr_pal<mpu4_characteriser_pal::techno_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default_seven, ROT0,   "Barcrest","Techno Reel (Barcrest) (Dutch) (MPU4) (DTE 1.3, set 1)",GAME_FLAGS )
-GAME(199?, m4technoa, m4techno,   mod4oki_7reel_cheatchr_pal<mpu4_characteriser_pal::techno_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default_seven, ROT0,   "Barcrest","Techno Reel (Barcrest) (Dutch) (MPU4) (DTE 1.3, set 2)",GAME_FLAGS )
-
-
-// GEEN TUBES
-GAME(199?, m4univ,    0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m400_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Universe (Barcrest) (Dutch) (MPU4) (DUN 2.0)",GAME_FLAGS )
-
-
-
-
-// GEEN TUBES
-GAME(199?, m4magrep,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::turboplay_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Magic Replay (Barcrest) (Dutch) (MPU4) (DMR 1.3)",GAME_FLAGS )
 
 // GEEN TUBES, but German?
 GAME(199?, m4nile,    0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::actclba_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big_lextender,ROT0,"Barcrest","Nile Jewels (Barcrest) (German) (MPU4) (GJN 0.8)",GAME_FLAGS ) // DM1 SW ALM
@@ -1437,8 +1372,6 @@ GAME( 199?, m4c2,     0,          mod4oki_alt_cheatchr,    mpu4_invcoin,    mpu4
 // regular barcrest structure, keine tube (hopper issue)
 GAME( 199?, m4vivan,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::premier_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, 0,      "Nova",  "Viva Las Vegas (Nova) (MPU4) (GLV 1.2)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
 
-// GEEN TUBES
-GAME(199?, m4vivalvd, 0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::premier_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Viva Las Vegas (Barcrest) (Dutch) (MPU4) (DLV 1.1)",GAME_FLAGS )
 
 // runs
 GAME( 199?, m4spotln, 0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::viva_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, 0,      "Barcrest / Nova",  "Spotlight (Nova) (German) (MPU4) (GSP 0.1)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)

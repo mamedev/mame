@@ -24499,8 +24499,6 @@ m4luckwbc                       //
 m4luckwbd                       //
 m4luckwbe                       //
 m4luckwbf                       //
-m4maglin                        // Magic Liner (Barcrest)
-m4magrep                        // Magic Replay DeLuxe (Barcrest)
 m4matdr                         // Matador (unknown)
 m4mgpn                          // Monaco Grand Prix (Nova)
 m4nile                          // Nile Jewels (Barcrest)
@@ -24531,8 +24529,6 @@ m4surfb                         //
 m4tbplay                        // Turbo Play (Barcrest)
 m4tbplaya                       //
 m4tbplayb                       //
-m4techno                        // Techno Reel (Barcrest)
-m4technoa                       //
 m4topdk                         // Top Deck (Barcrest)
 m4treel                         //
 m4treela                        //
@@ -24540,9 +24536,7 @@ m4tst2                          // MPU4 Unit Test (Program 2)
 m4twist                         // Twist Again (Barcrest)
 m4twista                        //
 m4twistb                        //
-m4univ                          // Universe (Barcrest)
 m4vegastg                       //
-m4vivalvd                       //
 m4vivan                         // Viva Las Vegas (Nova)
 m4wife                          // Money Or Yer Wife (Gemini)
 m4wnud                          // Unknown MPU4 'W Nudge'
@@ -28047,6 +28041,8 @@ m4mag7s__w                      //
 m4mag7s__x                      //
 m4mag7s__y                      //
 m4mag7s__z                      //
+m4maglin                        // Magic Liner (Barcrest)
+m4magrep                        // Magic Replay DeLuxe (Barcrest)
 m4magtbo                        // Star Play / Magic Turbo
 m4makmnt                        // Make A Mint (Barcrest)
 m4makmnt__0                     //
@@ -28954,6 +28950,8 @@ m4takepk__w                     //
 m4takepk__x                     //
 m4takepk__y                     //
 m4takepk__z                     //
+m4techno                        // Techno Reel (Barcrest)
+m4technoa                       //
 m4tenten                        // 10 X 10 (Barcrest)
 m4tenten__0                     //
 m4tenten__1                     //
@@ -29326,6 +29324,7 @@ m4typcl__a                      //
 m4typcl__b                      //
 m4typcl__c                      //
 m4typcl__d                      //
+m4univ                          // Universe (Barcrest)
 m4uuaw                          // Up Up and Away (Barcrest)
 m4uuaw__0                       //
 m4uuaw__1                       //
@@ -29405,6 +29404,7 @@ m4vegast__u                     //
 m4vegast__x                     //
 m4vegast__0                     //
 m4vegast__1                     //
+m4vivalvd                       //
 m4vivaes                        // Viva Espana (Barcrest)
 m4vivaes__0                     //
 m4vivaes__1                     //
