@@ -19,11 +19,11 @@ known chips:
  @A67     HD38750  1982, Romtec Pucki & Monsters (ET-803)
 
  @A04     HD38800  1980, Gakken Heiankyo Alien
-  A16     HD38800  1981, Entex Select-A-Game cartridge: Basketball 3 -> sag.cpp
+  A16     HD38800  1981, Entex Select-A-Game cartridge: Basketball 3 -> entex/sag.cpp
  *A20     HD38800  1981, Entex Super Space Invader 2
  @A25     HD38800  1981, Coleco Alien Attack
  @A27     HD38800  1981, Bandai Packri Monster
- @A31     HD38800  1981, Entex Select-A-Game cartridge: Space Invader 2 -> sag.cpp - also used in 2nd version of Super Space Invader 2!
+ @A31     HD38800  1981, Entex Select-A-Game cartridge: Space Invader 2 -> entex/sag.cpp - also used in 2nd version of Super Space Invader 2!
   A36     HD38800  1981, Entex Select-A-Game cartridge: Pac-Man 2       -> "
   A37     HD38800  1981, Entex Select-A-Game cartridge: Baseball 4      -> "
   A38     HD38800  1981, Entex Select-A-Game cartridge: Pinball         -> "
@@ -69,16 +69,16 @@ known chips:
  @A88     HD38820  1984, Bandai Pair Match (PT-460) (1/2)
  @A89     HD38820  1984, Bandai Pair Match (PT-460) (2/2)
 
-  A34     HD44801  1981, SciSys Mini Chess -> saitek_minichess.cpp
-  A50     HD44801  1981, CXG Sensor Computachess -> cxg_scptchess.cpp
-  A75     HD44801  1982, Alpha 8201 protection MCU -> machine/alpha8201.*
+  A34     HD44801  1981, SciSys Mini Chess -> saitek/minichess.cpp
+  A50     HD44801  1981, CXG Sensor Computachess -> cxg/scptchess.cpp
+  A75     HD44801  1982, Alpha 8201 protection MCU -> alpha/alpha8201.*
  *A85     HD44801  1982, SciSys Travel Sensor / Travel Mate / Chesspartner 5000/6000
  *A92     HD44801  1982, SciSys Play Bridge Computer
   B35     HD44801  1983, Alpha 8302 protection MCU (see 8201)
   B42     HD44801  1983, Alpha 8303 protection MCU (see 8201)
  *B43     HD44801  1983, Alpha 8304 protection MCU (see 8201)
   C57     HD44801  1985, Alpha 8505 protection MCU (see 8201)
-  C89     HD44801  1985, CXG Portachess (1985 version) -> cxg_scptchess.cpp
+  C89     HD44801  1985, CXG Portachess (1985 version) -> cxg/scptchess.cpp
 
  *A86     HD44820  1983, Chess King Pocket Micro
  *B63     HD44820  1985, CXG Pocket Chess (12 buttons)

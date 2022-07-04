@@ -11760,8 +11760,8 @@ scmder
 sdtor
 
 @source:cxg/scptchess.cpp
-prtchess
 scptchess
+scptchessa
 
 @source:cxg/sphinx40.cpp
 sphinx40
