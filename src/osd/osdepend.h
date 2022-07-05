@@ -13,10 +13,11 @@
 #pragma once
 
 
-#include "emucore.h"
-#include "osdcore.h"
-#include "../frontend/mame/ui/menuitem.h"
+#include "emufwd.h"
 
+#include "bitmap.h"
+
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>
@@ -24,6 +25,8 @@
 
 // forward references
 class input_type_entry;     // FIXME: including emu.h does not work because emu.h includes osdepend.h
+class osd_midi_device;
+namespace ui { class menu_item; }
 
 
 //============================================================

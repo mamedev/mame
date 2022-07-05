@@ -6,6 +6,7 @@
  */
 
 #include "modules/osdmodule.h"
+#include "osdcore.h"
 
 #include <algorithm>
 
