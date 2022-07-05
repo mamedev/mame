@@ -1310,11 +1310,6 @@ ROM_START( m4atlan )
 	ROM_LOAD( "dat14.bin", 0x0000, 0x010000, CRC(d91fb9b2) SHA1(a06a868a17f84e2a012b0fe28025458e4f899c1d) ) // == m4tridic
 ROM_END
 
-ROM_START( m4tridic )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "trp.bin", 0x0000, 0x010000, CRC(d91fb9b2) SHA1(a06a868a17f84e2a012b0fe28025458e4f899c1d) ) // == m4atlan
-ROM_END
-
 
 
 ROM_START( m4bjc )
@@ -2005,10 +2000,9 @@ GAME(199?, m4jpjmpa,  m4jpjmp,    mod2_cheatchr_pal<mpu4_characteriser_pal::vivl
 
 GAME(199?, m4ambass,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::nifty_characteriser_prot>, mpu4_dutch,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Ambassador (Barcrest) (Dutch) (MPU4) (DAM 3.7)",GAME_FLAGS )
 
-GAME(199?, m4graffd,  0,  mod2_7reel_cheatchr_pal<mpu4_characteriser_pal::turboplay_characteriser_prot>, mpu4_dutch, mpu4mod2_machines_state, init_m4default_seven,  ROT0,   "Barcrest","Grafitti (Barcrest) (Dutch) (MPU4) (DGR 1.3)",GAME_FLAGS ) // ROL D SETUP ALM
+GAME(199?, m4graffd,  0,  mod2_7reel_cheatchr_pal<mpu4_characteriser_pal::turboplay_characteriser_prot>, mpu4_dutch, mpu4mod2_machines_state, init_m4default_seven,  ROT0,   "Barcrest","Grafitti (Barcrest) (Dutch) (MPU4) (DGR 1.3)",GAME_FLAGS )
 
-GAME(199?, m4atlan,   0,          mod2_cheatchr_pal<mpu4_characteriser_pal::m533_characteriser_prot>, mpu4_dutch,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Atlantis (Barcrest) (Dutch) (MPU4) (DAT 1.4)",GAME_FLAGS )
-GAME(199?, m4tridic,  m4atlan,    mod2_cheatchr_pal<mpu4_characteriser_pal::m533_characteriser_prot>, mpu4_dutch,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Triple Dice (Barcrest) (Dutch) (MPU4) (DAT 1.4)",GAME_FLAGS ) // == Atlantis
+GAME(199?, m4atlan,   0,          mod2_cheatchr_pal<mpu4_characteriser_pal::m533_characteriser_prot>, mpu4_dutch,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Atlantis (Barcrest) (Dutch) (MPU4) (DAT 1.4)",GAME_FLAGS ) // was also an identical set marked 'Triple Dice'
 
 GAME(199?, m4bjc,     0,          mod2_7reel_cheatchr_pal<mpu4_characteriser_pal::vivlv_characteriser_prot>, mpu4_dutch,            mpu4mod2_machines_state, init_m4default_seven, ROT0,   "Barcrest","Black Jack Club (Barcrest) (Dutch) (MPU4) (DBC 1.1)",GAME_FLAGS )
 
