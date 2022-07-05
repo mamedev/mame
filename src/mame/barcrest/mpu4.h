@@ -85,6 +85,7 @@
 INPUT_PORTS_EXTERN( mpu4 );
 INPUT_PORTS_EXTERN( mpu4_dutch );
 INPUT_PORTS_EXTERN( mpu4_dutch_invcoin );
+INPUT_PORTS_EXTERN( mpu4_dutch_alt_invcoin );
 INPUT_PORTS_EXTERN( mpu4_invcoin );
 INPUT_PORTS_EXTERN( mpu4_impcoin );
 INPUT_PORTS_EXTERN( mpu4_invimpcoin );

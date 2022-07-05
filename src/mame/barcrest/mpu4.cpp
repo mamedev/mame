@@ -1548,6 +1548,14 @@ INPUT_PORTS_START( mpu4_dutch_invcoin )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_COIN4)
 INPUT_PORTS_END
 
+INPUT_PORTS_START( mpu4_dutch_alt_invcoin )
+	PORT_INCLUDE( mpu4_dutch_invcoin )
+
+	PORT_MODIFY("AUX2")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) // needed for several sets to boot but gives coin jam error if pressed
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER)
+INPUT_PORTS_END
+
 INPUT_PORTS_START( mpu4_impcoin )
 	PORT_INCLUDE( mpu4 )
 

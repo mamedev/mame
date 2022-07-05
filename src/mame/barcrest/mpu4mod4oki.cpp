@@ -8971,6 +8971,63 @@ GAME(199?, m4jok300a, m4jok300,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::m
 
 /*****************************************************************************************************************************************************************************
 *
+* Monaco Grand Prix (German)
+*
+*****************************************************************************************************************************************************************************/
+
+ROM_START( m4mgpn )
+	ROM_REGION( 0x010000, "maincpu", 0 )
+	ROM_LOAD( "mgp15.p1", 0x0000, 0x010000, CRC(ec76233f) SHA1(aa8595c639c83026d7fe5c3a161f8b08ff9a8b46) )
+
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
+	ROM_LOAD( "mgpsnd.p1", 0x000000, 0x080000, CRC(d5f0b845) SHA1(6d97d0d4d07407bb0a51e1d62da95c664418a9e9) )
+	ROM_LOAD( "mgpsnd.p2", 0x080000, 0x080000, CRC(cefeea06) SHA1(45142ca1bab898dc6f3c32e382ee9157132810a6) )
+	ROM_LOAD( "mgpsnd.p3", 0x100000, 0x080000, CRC(be4b3bd0) SHA1(f14c08dc770a24db8bbd00a65d3edf6ee9895ca3) )
+	ROM_LOAD( "mgpsnd.p4", 0x180000, 0x080000, CRC(d74b4b03) SHA1(a35c99040a72485a6c2d4a4fdfc203634f6a9ad0) )
+ROM_END
+
+// TODO: check which sequence it uses rather than just 'cheatchr'
+GAME( 199?, m4mgpn,   0,          mod4oki_cheatchr,    mpu4_dutch_alt_invcoin,    mpu4mod4oki_machines_state, init_m4default, 0,      "Nova",  "Monaco Grand Prix (Nova) (German) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
+
+/*****************************************************************************************************************************************************************************
+*
+* Lucky Devil (Czech)
+*
+*****************************************************************************************************************************************************************************/
+
+ROM_START( m4luckdv )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cld_16.bin", 0x0000, 0x010000, CRC(89f63938) SHA1(8d3a5628e2c0bf39784afe2f00a007d40ea35423) )
+
+	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_LOAD( "generic_dutch_sound1.bin", 0x000000, 0x080000, BAD_DUMP CRC(f247ba83) SHA1(9b173503e63a4a861d1380b2ab1fe14af1a189bd) )
+	ROM_LOAD( "generic_dutch_sound2.bin", 0x080000, 0x080000, BAD_DUMP CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
+ROM_END
+
+// TODO: check which sequence it uses rather than just 'cheatchr'
+GAME(199?, m4luckdv,  0,          mod4oki_cheatchr,    mpu4_dutch_alt_invcoin,    mpu4mod4oki_machines_state, init_m4default, ROT0,   "Barcrest","Lucky Devil (Barcrest) (Czech) (MPU4) (CLD 3.0)",GAME_FLAGS ) // AUX2 locked
+
+/*****************************************************************************************************************************************************************************
+*
+* Secret Agent  (German)
+*  - needs a sample ROM to boot, or just gives an alarm, the one we load is incorrect for this game
+*
+*****************************************************************************************************************************************************************************/
+
+ROM_START( m4sctagt )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gse3_0.p1", 0x0000, 0x010000, CRC(eff705ff) SHA1(6bf96872ef4bcc8f8041c5384d892f072c72be2b) )
+
+	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_LOAD( "generic_dutch_sound1.bin", 0x000000, 0x080000, BAD_DUMP CRC(f247ba83) SHA1(9b173503e63a4a861d1380b2ab1fe14af1a189bd) )
+ROM_END
+
+// TODO: check which sequence it uses rather than just 'cheatchr'
+GAME(199?, m4sctagt,  0,          mod4oki_cheatchr,    mpu4_dutch_alt_invcoin,    mpu4mod4oki_machines_state, init_m4default, ROT0,   "Nova","Secret Agent (Nova) (German) (MPU4)",GAME_FLAGS ) // AUX2 LOCKED
+
+
+/*****************************************************************************************************************************************************************************
+*
 * Escalera Tobogan (Spain)
 *  - Spanish game with similar gameplay to Adders and Ladders
 *  - Gives a 'Network Error' which may have something to do with reel comms (different here to English releases?)

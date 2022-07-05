@@ -24477,7 +24477,6 @@ m4jungja                        //
 m4jungjb                        //
 m4jungjc                        //
 m4kqclub                        // Kings & Queens Club (Newby)
-m4luckdv                        // Lucky Devil (Barcrest) [Czech]
 m4luckwb                        // Lucky Wild Boar (Barcrest)
 m4luckwba                       //
 m4luckwbb                       //
@@ -24486,7 +24485,6 @@ m4luckwbd                       //
 m4luckwbe                       //
 m4luckwbf                       //
 m4matdr                         // Matador (unknown)
-m4mgpn                          // Monaco Grand Prix (Nova)
 m4nod                           //
 m4sbx                           // Super Bear X
 m4sbxa                          //
@@ -24494,7 +24492,6 @@ m4sbxb                          //
 m4sbxc                          //
 m4sbxd                          //
 m4sbxe                          //
-m4sctagt                        // Secret Agent (Nova)
 m4snookr                        // Snooker (Eurocoin)
 m4stakex                        // Stake X (Leisurama)
 m4stakexa                       // Stake X (Leisurama)
@@ -27788,6 +27785,7 @@ m4lazy                          // Lazy Bones (BWB)
 m4lazya                         //
 m4lazyb                         //
 m4luck7                         // Lucky 7 (Barcrest)
+m4luckdv                        // Lucky Devil (Barcrest) [Czech]
 m4luckdvd                       // Lucky Devil (Dutch)
 m4lucklv                        // Lucky Las Vegas (Barcrest)
 m4lucklv__0                     //
@@ -28089,6 +28087,7 @@ m4makmnt__w                     //
 m4makmnt__x                     //
 m4makmnt__y                     //
 m4makmnt__z                     //
+m4mgpn                          // Monaco Grand Prix (Nova)
 m4nile                          // Nile Jewels (Barcrest)
 m4nhtt                          // New Hit the Top (Barcrest)
 m4nhtt__a                       //
@@ -28871,6 +28870,7 @@ m4rockmn__k                     //
 m4royjwl                        // Royal Jewels (Barcrest)
 m4rwb                           // Red White & Blue (Barcrest)
 m4salsa                         // Salsa (Barcrest)
+m4sctagt                        // Secret Agent (Nova)
 m4shocm                         // Showcase Crystal Maze (Barcrest)
 m4shocm__a                      //
 m4shocm__b                      //
