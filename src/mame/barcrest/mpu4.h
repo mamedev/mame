@@ -542,7 +542,10 @@ protected:
 
 	uint8_t hack_duart_r()
 	{
-		return machine().rand() & 0x10;
+		if (m_hack_duart_fixed_low)
+			return 0x00;
+		else
+			return machine().rand() & 0x10;
 	}
 
 	uint8_t bootleg806_r(address_space &space, offs_t offset);
@@ -639,6 +642,14 @@ protected:
 	int m_bwb_bank = 0;
 	bool m_default_to_low_bank = false;
 
+	bool m_use_pia4_porta_leds = true;
+	uint8_t m_pia4_porta_leds_base = 0;
+	uint8_t m_pia4_porta_leds_strobe = 0;
+
+	bool m_use_simplecard_leds = false;
+	uint8_t m_simplecard_leds_base = 0;
+	uint8_t m_simplecard_leds_strobe = 0;
+
 	int m_pageval = 0;
 	int m_pageset = 0;
 	int m_hopper = 0;
@@ -654,11 +665,12 @@ protected:
 	bool m_overcurrent = false;
 	bool m_undercurrent = false;
 
-	bool m_overcurrent_detect = true;
+	bool m_overcurrent_detect = false;
 	bool m_undercurrent_detect = false;
 
 	bool m_low_volt_detect = true;
 
+	bool m_hack_duart_fixed_low = false;
 
 	static constexpr uint8_t reel_mux_table[8]= {0,4,2,6,1,5,3,7};//include 7, although I don't think it's used, this is basically a wire swap
 	static constexpr uint8_t reel_mux_table7[8]= {3,1,5,6,4,2,0,7};

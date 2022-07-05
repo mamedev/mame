@@ -30,82 +30,11 @@ public:
 	}
 
 	void init_m4aao();
-	void init_m4test();
 };
 
-void mpu4unsorted_state::init_m4test()
-{
-	init_m4default();
-	m_overcurrent_detect = true;
-}
+
 
 #include "m4aao.lh"
-
-
-ROM_START( m4tst2 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
-	ROM_LOAD( "ut2.p1",  0xe000, 0x2000,  CRC(f7fb6575) SHA1(f7961cbd0801b9561d8cd2d23081043d733e1902))
-ROM_END
-
-ROM_START( m4clr )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
-	ROM_LOAD( "meter-zero.p1",  0x8000, 0x8000,  CRC(e74297e5) SHA1(49a2cc85eda14199975ec37a794b685c839d3ab9))
-ROM_END
-
-ROM_START( m4rltst )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "rtv.p1", 0x08000, 0x08000, CRC(7b78f3f2) SHA1(07ef8e6a08fd70ee48e4463672a1230ecc669532) )
-ROM_END
-
-
-ROM_START( m4addrd )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dal12.bin", 0x0000, 0x010000, CRC(4affa79a) SHA1(68bceab42b3616641a34a64a83306175ffc1ce32) )
-ROM_END
-
-
-ROM_START( m4amhiwy )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dah20", 0x0000, 0x010000, CRC(e3f92f00) SHA1(122c8a429a1f75dac80b90c4f218bd311813daf5) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "sdr6_1.snd", 0x000000, 0x080000, CRC(63ad952d) SHA1(acc0ac3898fcc281e2d7ba19ada52d727885fe06) )
-	ROM_LOAD( "sdr6_2.snd", 0x080000, 0x080000, CRC(48d2ace5) SHA1(ada0180cc60266c0a6d981a019d66bbedbced21a) )
-ROM_END
-
-
-ROM_START( m4blkwhd )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dbw11.bin", 0x0000, 0x010000, CRC(337aaa2c) SHA1(26b12ea3ada9668293c6b44d62458590e5b4ac8f) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "bwsnd.bin", 0x0000, 0x080000, CRC(f247ba83) SHA1(9b173503e63a4a861d1380b2ab1fe14af1a189bd) )
-ROM_END
-
-
-
-
-
-ROM_START( m4blkcat )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dbl14.bin", 0x0000, 0x010000, CRC(c5db9532) SHA1(309b5122b4a1cb33bbccfb97faf4fa996d29432e) )
-
-	ROM_REGION( 0x080000, "msm6376", 0 )
-	ROM_LOAD( "dblcsnd.bin", 0x0000, 0x080000, CRC(c90fa8ad) SHA1(a98f03d4b6f5892333279bff7537d4d6d887da62) )
-
-	ROM_REGION( 0x200000, "msm6376_alt", 0 ) // bad dump of some sound rom?
-	ROM_LOAD( "sdbl_1.snd", 0x0000, 0x18008e, CRC(e36f71ae) SHA1(ebb643cfa02d28550f2bef135ceefc902baf0df6) )
-ROM_END
-
-
-ROM_START( m4bluedm )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dbd10.bin", 0x0000, 0x010000, CRC(b75e319d) SHA1(8b81e852e318cfde1f5ff2123e1ef7076b208253) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "bdsnd.bin", 0x0000, 0x080000, CRC(8ac4aae6) SHA1(70dba43b398010a8bd0d82cf91553d3f5e0921f0) )
-ROM_END
-
 
 
 ROM_START( m4casmul )
@@ -116,51 +45,12 @@ ROM_START( m4casmul )
 	ROM_LOAD( "casinomultiplaysnd.bin", 0x0000, 0x080000, CRC(be293e95) SHA1(bf0d419c898920a7546b542d8b205e25004ef04f) )
 ROM_END
 
-ROM_START( m4oldtmr )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dot11.bin",  0x00000, 0x10000,  CRC(da095666) SHA1(bc7654dc9da1f830a43f925db8079f27e18bb61e))
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "sdot01.bin", 0x0000, 0x080000, CRC(f247ba83) SHA1(9b173503e63a4a861d1380b2ab1fe14af1a189bd) )
-ROM_END
-
-ROM_START( m4casot )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "casrom.bin",  0x00000, 0x10000,  CRC(da095666) SHA1(bc7654dc9da1f830a43f925db8079f27e18bb61e) ) // == old timer   (aka b&wrom.bin)
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "cassound.bin", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) ) // ( aka b&wsound.bin )
-ROM_END
-
-ROM_START( m4jpmcla )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "jcv2.epr",  0x00000, 0x10000,  CRC(da095666) SHA1(bc7654dc9da1f830a43f925db8079f27e18bb61e) ) // == old timer
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "sjcv2.snd", 0x0000, 0x080000, CRC(f247ba83) SHA1(9b173503e63a4a861d1380b2ab1fe14af1a189bd) )
-ROM_END
-
-
-ROM_START( m4ceptr )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dce10.bin", 0x0000, 0x010000, CRC(c94d41ef) SHA1(58fdff2de8dd3ead3980f6f34362183d084ce917) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "cepsnd.p1", 0x000000, 0x080000, CRC(3a91784a) SHA1(7297ccec3264aa9f1e7b3a2841f5f8a1e4ca6c54) )
-	ROM_LOAD( "cepsnd.p2", 0x080000, 0x080000, CRC(a82f0096) SHA1(45b6b5a2ae06b45add9cdbb9f5e6f834687b4902) )
-ROM_END
-
-
-
 
 
 ROM_START( m4crzjk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "crjok2.04.bin", 0x0000, 0x010000, CRC(838336d6) SHA1(6f36de20c930cbbff479af2667c11152c6adb43e) )
 ROM_END
-
-
-
 
 #define M4DRAC_EXTRAS \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
@@ -187,81 +77,6 @@ ROM_START( m4dracb )
 	M4DRAC_EXTRAS
 ROM_END
 
-ROM_START( m4exgam )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "czep30.bin", 0x0000, 0x010000, CRC(4614e6f6) SHA1(5602a68e9b47394cb31bbcd49a9920e19af6242f) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "sczep.bin", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
-ROM_END
-
-
-
-
-ROM_START( m4frtgm )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "fruit.bin", 0x0000, 0x010000, CRC(dbe44316) SHA1(15cd49dd2e6166f7a7668663f7fea802d6cbb12f) )
-
-	ROM_REGION( 0x800000, "msm6376", 0 ) // this isn't OKI, or is corrupt (bad size)
-	ROM_LOAD( "fruitsnd.bin", 0x0000, 0x010000, CRC(86547dc7) SHA1(4bf64f22e84c0ee82d961b0ba64932b8bf6a521f) ) // matches 'Replay' on SC1 hardware, probably just belongs there.. or this is eurocoin with different sound hw here?
-ROM_END
-
-
-
-ROM_START( m4gldgat )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dgg22.bin", 0x0000, 0x010000, CRC(ef8498df) SHA1(6bf164ef18445e83e4510a000bc924cbe916ad99) )
-ROM_END
-
-ROM_START( m4gldjok )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dgj12.bin", 0x0000, 0x010000, CRC(93ee0c35) SHA1(5ae67b14f7f3d8528fa106519a8a27437c997a70) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "sdgj.snd", 0x0000, 0x080000, CRC(b6cd118b) SHA1(51c5d694ed0dfde8d3fd682f2471d83eec236736) )
-ROM_END
-
-
-
-ROM_START( m4gnsmk )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dgu16", 0x0000, 0x010000, CRC(6aa23345) SHA1(45e129ec95b1a796f334bedd08469f2ab47a18f8) )
-
-	ROM_REGION( 0x200000, "msm6376", 0 )
-	ROM_LOAD( "sdgu01.s1", 0x000000, 0x080000, CRC(bfb284a2) SHA1(860b98d54a3180fbb00b7b03feae049fb4cf9d7f) )
-	ROM_LOAD( "sdgu01.s2", 0x080000, 0x080000, CRC(1a46ba28) SHA1(d7154e5f92be8631207620eb313b28990c6a1c7f) )
-	ROM_LOAD( "sdgu01.s3", 0x100000, 0x080000, CRC(88bffcf4) SHA1(1da853193f6a22889edff5aafd9440c676a82ea6) )
-	ROM_LOAD( "sdgu01.s4", 0x180000, 0x080000, CRC(a6160bef) SHA1(807f7d470728a479a55c782fca3df1eacd0b594c) )
-ROM_END
-
-ROM_START( m4blkbuld )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dgu16", 0x0000, 0x010000, CRC(6aa23345) SHA1(45e129ec95b1a796f334bedd08469f2ab47a18f8) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "dbbsnd.p1", 0x000000, 0x080000, CRC(a913ad0d) SHA1(5f39b661912da903ce8d6658b7848081b191ea56) )
-	ROM_LOAD( "dbbsnd.p2", 0x080000, 0x080000, CRC(6a22b39f) SHA1(0e0dbeac4310e03490b665fff514392481ad265f) )
-ROM_END
-
-
-ROM_START( m4hpyjok )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dhj12", 0x0000, 0x010000, CRC(982439d7) SHA1(8d27fcecf7a6a7fd774678580074f945675758f4) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "dhjsnd", 0x0000, 0x080000, CRC(8ac4aae6) SHA1(70dba43b398010a8bd0d82cf91553d3f5e0921f0) )
-ROM_END
-
-
-ROM_START( m4holdtm )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dht10.hex", 0x0000, 0x010000, CRC(217d382b) SHA1(a27dd107c554d4787967633dff998d3962ee0ea5) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "sun01.hex", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
-ROM_END
-
-
 ROM_START( m4jok300 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "cjo", 0x0000, 0x020000, CRC(386e99db) SHA1(5bb0b513ef63ffaedd98b8e9e7206658fe784fda) )
@@ -279,43 +94,14 @@ ROM_START( m4jokmil )
 ROM_END
 
 
-ROM_START( m4joljokh )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "jollyjokerhungarian.bin", 0x0000, 0x010000, CRC(85b6a406) SHA1(e277f9d3b62faead04d65efbc06de7f4a50ae38d) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "jollyjokerhungariansnd.bin", 0x0000, 0x080000, CRC(93460383) SHA1(2b179a1dde09ebdfe8c84641899df7be87d443e5) )
-ROM_END
-
-
-
-
-
-ROM_START( m4luck7 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dl716.bin", 0x0000, 0x010000, CRC(141b23a9) SHA1(3bfb82ea0ee4104bd8739b545aba617f84bef770) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "dl7snd.bin", 0x0000, 0x080000, CRC(c90fa8ad) SHA1(a98f03d4b6f5892333279bff7537d4d6d887da62) )
-ROM_END
-
 ROM_START( m4luckdv )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cld_16.bin", 0x0000, 0x010000, CRC(89f63938) SHA1(8d3a5628e2c0bf39784afe2f00a007d40ea35423) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "cld_snd1.snd", 0x000000, 0x080000, CRC(f247ba83) SHA1(9b173503e63a4a861d1380b2ab1fe14af1a189bd) )
-	ROM_LOAD( "cld_snd2.snd", 0x080000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
+	ROM_LOAD( "generic_dutch_sound1.bin", 0x000000, 0x080000, CRC(f247ba83) SHA1(9b173503e63a4a861d1380b2ab1fe14af1a189bd) )
+	ROM_LOAD( "generic_dutch_sound2.bin", 0x080000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
 ROM_END
-
-ROM_START( m4luckdvd )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dld13", 0x0000, 0x010000, CRC(b8ceb29b) SHA1(84b6ebad300214610635fb8141d18de2b7065435) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "sdld01.snd", 0x000000, 0x080000, CRC(9b035fa6) SHA1(51b7e5bc3abdf4f1beba2347146a91a2b3f4de35) )
-ROM_END
-
 
 #define M4LUCKWB_EXTRAS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) /* these are all different sound roms... */  \
@@ -367,221 +153,14 @@ ROM_START( m4luckwbf )
 ROM_END
 
 
-ROM_START( m4maglin )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dma21.bin", 0x0000, 0x010000, CRC(836a25e6) SHA1(5f83bb8a2c77dd3b02724c076d6b37d2c1c93b93) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "mlsound1.p1", 0x000000, 0x080000, CRC(ff8749ff) SHA1(509b53f09cdfe5ee865e60ab42fd578586ac53ea) )
-	ROM_LOAD( "mlsound2.p2", 0x080000, 0x080000, CRC(c8165b6c) SHA1(7c5059ee8630da31fc3ad50d84a4730297757d46) )
-ROM_END
-
-ROM_START( m4magrep )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dmr13.bin", 0x0000, 0x010000, CRC(c3015da3) SHA1(23cd505eedf666c012e4064a5fcf5a983f098e83) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "mrdsound.bin", 0x000000, 0x080000, CRC(9b035fa6) SHA1(51b7e5bc3abdf4f1beba2347146a91a2b3f4de35) )
-ROM_END
 
 
-
-ROM_START( m4nile )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "gjn08.p1", 0x0000, 0x020000, CRC(2bafac0c) SHA1(363d08f798b5bea409510b1a9415098a69f19ee0) )
-
-	ROM_REGION( 0x200000, "msm6376", 0 )
-	ROM_LOAD( "gjnsnd.p1", 0x000000, 0x080000, CRC(1d839591) SHA1(2e4ba74f96e7c0592b85409a3f50ec81e00e064c) )
-	ROM_LOAD( "gjnsnd.p2", 0x080000, 0x080000, CRC(e2829c42) SHA1(2139c1625ad163cce99a522c2cf02ee47a8f9007) )
-	ROM_LOAD( "gjnsnd.p3", 0x100000, 0x080000, CRC(db084eb4) SHA1(9b46a3cb16974942b0edd25b1b080d30fc60c3df) )
-	ROM_LOAD( "gjnsnd.p4", 0x180000, 0x080000, CRC(da785b0a) SHA1(63358ab197eb1de8e489a9fd6ffbc2039efc9536) )
-ROM_END
-
-
-
-
-ROM_START( m4ordmnd )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "rab01.p1", 0x0000, 0x020000, CRC(99964fe7) SHA1(3745d09e7a4f417c8e85270d3ffec3e37ee1344d) )
-
-	ROM_REGION( 0x200000, "msm6376", 0 )
-	ROM_LOAD( "odsnd1.bin", 0x000000, 0x080000, CRC(d746bae4) SHA1(293e1dc9edf88a183cc23dbb4576cefbc8f9d028) )
-	ROM_LOAD( "odsnd2.bin", 0x080000, 0x080000, CRC(84ace1f4) SHA1(9cc70e59e9d26006870ea1cc522de33e71b71692) )
-	ROM_LOAD( "odsnd3.bin", 0x100000, 0x080000, CRC(b1b12def) SHA1(d8debf8cfb3af2157d5d1571927588dc1c8d07b6) )
-ROM_END
-
-
-
-
-ROM_START( m4prem )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dpm14.bin", 0x0000, 0x010000, CRC(de344759) SHA1(d3e7514da83bbf1eba63661fb0675a6230af93cd) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "dpms.bin", 0x0000, 0x080000, CRC(93fd4253) SHA1(69feda7ffc56defd515c9cd1ce204af3d9731a3f) )
-ROM_END
-
-
-ROM_START( m4rdht )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "drh12", 0x0000, 0x010000, CRC(b26cd308) SHA1(4e29f6cce773232a1c43cd2fb3ce9b844c446bb8) ) // aka gdjb
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "drh_1.snd", 0x0000, 0x080000, CRC(f652cd0c) SHA1(9ce986bc12bcf22a57e065329e82671d19cc96d7) ) // aka gn.snd
-ROM_END
-
-
-ROM_START( m4rwb )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "drw14.bin", 0x0000, 0x010000, CRC(22c30ebe) SHA1(479f66732aac56dae60c80d11f05c084865f9389) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "rwb_1.snd", 0x000000, 0x080000, CRC(e0a6def5) SHA1(e3867b83e588fd6a9039b8d45186480a9d0433ea) )
-	ROM_LOAD( "rwb_2.snd", 0x080000, 0x080000, CRC(54a2b2fd) SHA1(25875ff873bf22df510e7a4c56c336fbabcbdedb) )
-ROM_END
-
-
-ROM_START( m4ringfr )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "rof03s.p1", 0x0000, 0x020000, CRC(4b4703fe) SHA1(853ce1f5932e09af2b5f3b5314709f13aa35cf19) )
-
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	// missing?
-ROM_END
-
-
-ROM_START( m4roadrn )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dro19", 0x0000, 0x010000, CRC(8b591766) SHA1(df156390b427e31cdda64826a6c1d2457c915f25) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "dro_1.snd", 0x000000, 0x080000, CRC(895cfe63) SHA1(02134e149cef3526bbdb6cb93ef3efa283b9d6a2) )
-	ROM_LOAD( "dro_2.snd", 0x080000, 0x080000, CRC(1d5c8d4f) SHA1(15c18ae7286807cdc0feb825b958eae808445690) )
-ROM_END
-
-
-ROM_START( m4royjwl )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "rj.bin", 0x0000, 0x020000, CRC(3ffbe4a8) SHA1(47a0309cc9ff315ad9f64e6855863409443e94e2) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "rj_sound1.bin", 0x000000, 0x080000, CRC(443c4901) SHA1(7b3c6737b47dfe04c072f0e157d83c09340c3f9b) )
-	ROM_LOAD( "rj_sound2.bin", 0x080000, 0x080000, CRC(9456523e) SHA1(ea1b6bf16b7d1015c188ad83760336d9851de391) )
-ROM_END
-
-
-ROM_START( m4salsa )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dsa15.epr", 0x0000, 0x010000, CRC(22b60b0b) SHA1(4ad184d1557bfd01650684ea9d8ad794fded65f7) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "dsa_1@97c2.snd", 0x0000, 0x080000, CRC(0281a6dd) SHA1(a35a8cd0da32c51f77856ea3eeff7c58fd032333) )
-ROM_END
-
-
-ROM_START( m4showtm )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dsh13.bin", 0x0000, 0x010000, CRC(4ce40ff1) SHA1(f145d6c8e926ca4368d43dacda0fa38615988d84) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "sdsh01s1.snd", 0x0000, 0x080000, CRC(f247ba83) SHA1(9b173503e63a4a861d1380b2ab1fe14af1a189bd) )
-ROM_END
-
-
-ROM_START( m4steptm )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dst11.bin", 0x0000, 0x010000, CRC(3960f210) SHA1(c7c4fe74cb9a53eaa9114a84240de3bce4ffe75e) )
-
-	ROM_REGION( 0x080000, "msm6376", 0 )
-	ROM_LOAD( "sdun01.bin", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
-ROM_END
-
-
-
-
-#define M4TECHNO_EXTRAS \
-	ROM_REGION( 0x080000, "msm6376", 0 ) \
-	ROM_LOAD( "techno.bin", 0x0000, 0x080000, CRC(3e80f8bd) SHA1(2e3a195b49448da11cc0c089a8a9b462894c766b) )
-
-ROM_START( m4techno )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dte13.bin", 0x0000, 0x010000, CRC(cf661d06) SHA1(316b2c42e7253a03b2c12b713821045d9f95a8a7) )
-	M4TECHNO_EXTRAS
-ROM_END
-
-ROM_START( m4technoa )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dte13hack.bin", 0x0000, 0x010000, CRC(8b8eafe3) SHA1(93a7714eb4c749b7b19f4f844cf88da9443b0bb7) )
-	M4TECHNO_EXTRAS
-ROM_END
-
-
-ROM_START( m4toma )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dtk23.bin", 0x0000, 0x010000, CRC(ffba2b96) SHA1(c7635023ac5181e661e808c6b44ac1add58f4f56) )
-ROM_END
 
 
 ROM_START( m4topdk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dtd26pj.bin", 0x0000, 0x010000, CRC(1f84d995) SHA1(7412632cf79008b980e48f14aea89c3f8d742ed2) )
 ROM_END
-
-
-
-
-#define M4TOPTIM_EXTRAS \
-	ROM_REGION( 0x080000, "msm6376", 0 ) \
-	ROM_LOAD( "toptimer-snd.bin", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
-
-ROM_START( m4toptim )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "toptimer.bin", 0x0000, 0x010000, CRC(74804012) SHA1(0d9460ba6b1d359d358483c4e8bfd5518f364518) )
-	M4TOPTIM_EXTRAS
-ROM_END
-
-
-ROM_START( m4toptima )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dtt2-1.bin", 0x0000, 0x010000, CRC(f9c84a34) SHA1(ad654442f580d6a49658f0e4e39bacbd9d0d0018) )
-	M4TOPTIM_EXTRAS
-ROM_END
-
-
-
-
-#define M4TBPLAY_EXTRAS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
-	ROM_LOAD( "dtps10_1", 0x000000, 0x080000, CRC(d1d2c981) SHA1(6a4940248b0bc8df0a9de0d60e98cfebf1962504) ) \
-	ROM_LOAD( "dtps20_1", 0x080000, 0x080000, CRC(f77c4f39) SHA1(dc0e056f4d8c00824b3e672a02da64613bbf204e) )
-
-ROM_START( m4tbplay )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dtp13", 0x0000, 0x010000, CRC(de424bc3) SHA1(c82dd56a0b3ccea78325cd90ed8e72ed68a1af77) )
-	M4TBPLAY_EXTRAS
-ROM_END
-
-ROM_START( m4tbplaya )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "rmtp4b", 0x0000, 0x010000, CRC(33a1764e) SHA1(7475f460dee015a2cd78fc3e0d1d14fd96fdbb9c) )
-	M4TBPLAY_EXTRAS
-ROM_END
-
-ROM_START( m4tbplayb )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "trmyid", 0x0000, 0x010000, CRC(e7af5944) SHA1(64559c97375a3536f7929d7f4d8d19c30527a3ec) )
-	M4TBPLAY_EXTRAS
-ROM_END
-
-
-ROM_START( m4twintm )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "d2t11.bin", 0x0000, 0x010000, CRC(6a76ac6f) SHA1(824912ff1fc3155d11d32b597be53481532fdf5e) )
-
-	ROM_REGION( 0x080000, "msm6376", 0 )
-	ROM_LOAD( "sdun01.bin", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
-ROM_END
-
 
 ROM_START( m4twist )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -598,119 +177,6 @@ ROM_START( m4twistb )
 	ROM_LOAD( "twistagain-mki-27.bin", 0x8000, 0x008000, CRC(357f7072) SHA1(8a23509fff79a83a819b27eff8de8db08c679e3f) )
 ROM_END
 
-ROM_START( m4univ )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dun20", 0x0000, 0x010000, CRC(6a845d4d) SHA1(82bfc3f3a0ede76a4d482efc71b0390610db7acf) )
-
-	ROM_REGION( 0x080000, "msm6376", 0 )
-	ROM_LOAD( "sdun01.bin", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
-ROM_END
-
-
-ROM_START( m4vegastg )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "vs.p1", 0x0000, 0x020000, CRC(4099d572) SHA1(91a7c1575013e61c754b2c2cb841e7687b76d7f9) )
-
-	ROM_REGION( 0x200000, "msm6376", 0 )
-	ROM_LOAD( "vssound.bin", 0x0000, 0x16ee37, CRC(456da6be) SHA1(f0e293f0a383878b581326f869c2e49bec61d0c5) )
-ROM_END
-
-
-ROM_START( m4vivalvd )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dlv11.bin", 0x0000, 0x010000, CRC(a890184c) SHA1(26d9952bf2eb4b55d21cdb934ffc73ff1a1cfbac) )
-
-	ROM_REGION( 0x080000, "msm6376", 0 )
-	ROM_LOAD( "vegssnd.bin", 0x0000, 0x080000, CRC(93fd4253) SHA1(69feda7ffc56defd515c9cd1ce204af3d9731a3f) )
-ROM_END
-
-
-ROM_START( m4wildtm )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "wildtimer.bin", 0x0000, 0x010000, CRC(5bd54924) SHA1(23fcf13c52ee7b9b39f30f999a9102171fffd642) )
-
-	ROM_REGION( 0x080000, "msm6376", 0 )
-	ROM_LOAD( "wildtimer-snd.bin", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
-ROM_END
-
-
-/* Vifico MPU4 games.
-   Escalera Tobogan use the "Barcrest Sampled Sound" game PCB:
-
-  BARCREST SAMPLED SOUND
- _________________________
- | ·                      |
- | ·                      |
- | ·                      |
- | ·                      |_____________
- | ·           _________   _________  |_|
- |             SN74LS139N  |_A880440| |_|
- |             _____________________  |_|
- |             | ST EF68B21P        | |_|
- |             |____________________| |_|
- |   _______         _______________  |_|
- |  |  OKI  |       | PROG EPROM    | |_|
- |  | M6376 |       |_______________| |_|
- |  |_______|         ______________  |_|
- |                   | ST EF68B40P  | |_|
- | _______________   |______________| |_|
- | |  SOUND 2     |   __   ___________|_|
- | |______________|  | |  |
- | _______________   | |  |
- | |  SOUND 1     |  | |<-PAL16L8D
- | |______________|  |_|  |
- |________________________|
-
-Just one different byte between the three "Escalera y Tobogan" sets, at address 00001401:
- 1268: 0xF4
- 1269: 0xF5
- 1270: 0xF6
-May be the game serial number hard-encoded on the EPROM?
-*/
-ROM_START( m4esctbg )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "ma-15_b-1925-94_esc_1.6a_n-1270.rom1", 0x0000, 0x10000, CRC(6fa2a0ef) SHA1(3b60b545e417a45e61e3babbe27758a053ced926) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "escsnd_0.2_p1.rom2", 0x000000, 0x080000, CRC(2f6517bc) SHA1(b39a4fa17d3e373b7a89663668529d752e595641) )
-	ROM_LOAD( "escsnd_0.2_p2.rom3", 0x080000, 0x080000, CRC(3b0b9fed) SHA1(5a03be7f3a7f40252cfec5f719a845d175e3995c) )
-
-	ROM_REGION( 0x48, "chr", 0 )
-	ROM_LOAD( "m578.chr", 0x0000, 0x0048, NO_DUMP )
-
-	ROM_REGION( 0x104, "pld", 0 )
-	ROM_LOAD( "pal16l8d-2pc.ic7", 0x000, 0x104, CRC(e8e7ccde) SHA1(b1ece0d51003c794f00655a8c52e5f7fd843b4c5) )
-ROM_END
-
-ROM_START( m4esctbga )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "ma-15_b-1925-94_esc_1.6a_n-1269.rom1", 0x0000, 0x10000, CRC(8c3f1cf3) SHA1(0e7961bacc4ba701efbbd1ee99b2a72422f96b07) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "escsnd_0.2_p1.rom2", 0x000000, 0x080000, CRC(2f6517bc) SHA1(b39a4fa17d3e373b7a89663668529d752e595641) )
-	ROM_LOAD( "escsnd_0.2_p2.rom3", 0x080000, 0x080000, CRC(3b0b9fed) SHA1(5a03be7f3a7f40252cfec5f719a845d175e3995c) )
-
-	ROM_REGION( 0x48, "chr", 0 )
-	ROM_LOAD( "m578.chr", 0x0000, 0x0048, NO_DUMP )
-
-	ROM_REGION( 0x104, "pld", 0 )
-	ROM_LOAD( "pal16l8d-2pc.ic7", 0x000, 0x104, CRC(e8e7ccde) SHA1(b1ece0d51003c794f00655a8c52e5f7fd843b4c5) )
-ROM_END
-
-ROM_START( m4esctbgb )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "ma-15_b-1925-94_esc_1.6a_n-1268.rom1", 0x0000, 0x10000, CRC(d2b47707) SHA1(65096835d94242a5c07b266b8561a9e0d9f95e36) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "escsnd_0.2_p1.rom2", 0x000000, 0x080000, CRC(2f6517bc) SHA1(b39a4fa17d3e373b7a89663668529d752e595641) )
-	ROM_LOAD( "escsnd_0.2_p2.rom3", 0x080000, 0x080000, CRC(3b0b9fed) SHA1(5a03be7f3a7f40252cfec5f719a845d175e3995c) )
-
-	ROM_REGION( 0x48, "chr", 0 )
-	ROM_LOAD( "m578.chr", 0x0000, 0x0048, NO_DUMP )
-
-	ROM_REGION( 0x104, "pld", 0 )
-	ROM_LOAD( "pal16l8d-2pc.ic7", 0x000, 0x104, CRC(e8e7ccde) SHA1(b1ece0d51003c794f00655a8c52e5f7fd843b4c5) )
-ROM_END
 
 
 void mpu4unsorted_state::init_m4aao()
@@ -836,7 +302,7 @@ ROM_START( m4dblchn )
 	ROM_LOAD( "doublechance.bin", 0x0000, 0x010000, CRC(6feeeb7d) SHA1(40fe67d854fbf48959e08fdb5743e14d340c16e7) )
 
 	ROM_REGION( 0x080000, "msm6376", 0 )
-	ROM_LOAD( "doublechancesnd.bin", 0x0000, 0x080000, CRC(3e80f8bd) SHA1(2e3a195b49448da11cc0c089a8a9b462894c766b) )
+	ROM_LOAD( "generic_redhotroll_sound1.bin", 0x0000, 0x080000, CRC(3e80f8bd) SHA1(2e3a195b49448da11cc0c089a8a9b462894c766b) )
 ROM_END
 
 
@@ -875,47 +341,8 @@ ROM_START( m4stand2 )
 ROM_END
 
 
-ROM_START( m4bigban )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "big04.p1", 0x0000, 0x020000, CRC(f7ead9c6) SHA1(46c10abb892cb6d427ad508aae96752c14b4cb83) )
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	// Missing?
-ROM_END
 
-ROM_START( m4crzcsn )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "crz03.bin", 0x0000, 0x020000, CRC(48610c4f) SHA1(a62ac8b3ee704ee4e98f9d56bfc723d4cbb25b54) )
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	// Missing?
-ROM_END
 
-ROM_START( m4crzcav )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "gcv05.p1", 0x0000, 0x020000, CRC(b9ba46f6) SHA1(78b745d85b36444c39747982987088a772b20a7e) )
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	// Missing?
-ROM_END
-
-ROM_START( m4dragon )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "dgl01.p1", 0x0000, 0x020000, CRC(d7d39c9b) SHA1(5350c9db549edee30815516b1ce74a018390ff3d) )
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	// Missing?
-ROM_END
-
-ROM_START( m4hilonv )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "hnc02.p1", 0x0000, 0x020000, CRC(33a8022b) SHA1(5168b8f32630aa2cb56f30c941695f1728e4fb7a) )
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	// Missing?
-ROM_END
-
-ROM_START( m4octo )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "oct03.p1", 0x0000, 0x020000, CRC(8df66e94) SHA1(e1ab93982846d83becae36b5814ebbd515b9078e) )
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	// Missing?
-ROM_END
 
 ROM_START( m4sctagt )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1160,29 +587,12 @@ ROM_END
 
 
 
-ROM_START( m4remag )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "remagv2", 0x0000, 0x010000, CRC(80d9c1c2) SHA1(c77d443d92084c324ef75575acca66ffbd9beef3) )
-ROM_END
-
-ROM_START( m4rmg )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "rmgicdd", 0x0000, 0x010000, CRC(bd64be0d) SHA1(772b80619c7d514a7a253f35137896d6a73bf4c6) )
-ROM_END
 
 ROM_START( m4wnud )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "wnudge.bin", 0x8000, 0x008000, CRC(1d935575) SHA1(c4177c41473c0fb511e0ee035961f55ad43be14d) )
 ROM_END
 
-
-ROM_START( m4riotrp )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "drt10.bin", 0x0000, 0x010000, CRC(a1badb8a) SHA1(871786ea4e65ecbf61c9a776100321253922d11e) )
-
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	ROM_LOAD( "dblcsnd.bin", 0x0000, 0x080000, CRC(c90fa8ad) SHA1(a98f03d4b6f5892333279bff7537d4d6d887da62) )
-ROM_END
 
 
 #define M4SURF_EXTRAS \
@@ -1408,15 +818,7 @@ ROM_START( m4coney )
 ROM_END
 
 
-ROM_START( m4goldnn )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "goldenyears10.bin", 0x0000, 0x020000, CRC(1074bac6) SHA1(967ee64f267a80017fc95bbc6c5a38354e9cab65) )
 
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-	ROM_LOAD( "tgyosnd.p1", 0x000000, 0x080000, CRC(bda49b46) SHA1(fac143003641824bf0db4ac6841292e509fa00da) )
-	ROM_LOAD( "tgyosnd.p2", 0x080000, 0x080000, CRC(43d28a0a) SHA1(5863e493e84641e4fabcd69e6402e3bcca87dde2) )
-	ROM_LOAD( "tgyosnd.p3", 0x100000, 0x080000, CRC(b5b9eb68) SHA1(8d5a0a687dd7096da8dfd2a59c6fe96f4b1949f9) )
-ROM_END
 
 
 ROM_START( m4mgpn )
@@ -1431,21 +833,8 @@ ROM_START( m4mgpn )
 ROM_END
 
 
-ROM_START( m4spotln )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "gsp01.p1", 0x0000, 0x020000, CRC(54c56a07) SHA1(27f21872a7ffe0c497983fa5bbb59e967bf48974) )
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-ROM_END
 
 
-ROM_START( m4vivan )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "vlv.bin", 0x0000, 0x010000, CRC(f20c4858) SHA1(94bf19cfa79a1f5347ab61a80cbbce06942187a2) )
-
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-	ROM_LOAD( "vlvsound1.bin", 0x0000, 0x080000, CRC(ce4da47a) SHA1(7407f8053ee482db4d8d0732fdd7229aa531b405) )
-	ROM_LOAD( "vlvsound2.bin", 0x0000, 0x080000, CRC(571c00d1) SHA1(5e7be40d3caae88dc3a580415f8ab796f6efd67f) )
-ROM_END
 
 
 
@@ -1470,83 +859,11 @@ ROM_END
 
 
 /* Barcrest */
-GAME( 198?, m4tst2,   0,          mod2_no_bacta,       mpu4,    mpu4unsorted_state, init_m4test,  ROT0,   "Barcrest","MPU4 Unit Test (Program 2)",MACHINE_MECHANICAL )
-GAME( 198?, m4clr,    0,          mod2_no_bacta,       mpu4,    mpu4unsorted_state, init_m4test,  ROT0,   "Barcrest","MPU4 Meter Clear ROM",MACHINE_MECHANICAL )
-GAME( 198?, m4rltst,  0,          mod2_no_bacta,       mpu4,    mpu4unsorted_state, init_m4test,  ROT0,   "Barcrest","MPU4 Reel Test (3.0)",MACHINE_MECHANICAL )
 
 // barcrest, to split
 
-GAME(199?, m4ringfr,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big_lextender,ROT0, "Barcrest","Ring Of Fire (Barcrest) (German) (MPU4) (ROF 0.3)",GAME_FLAGS )
 
-GAME(199?, m4royjwl,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::jewelcrown_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big_lextender,  ROT0,   "Barcrest","Royal Jewels (Barcrest) (German) (MPU4) (GRJ 1.4)",GAME_FLAGS )
 
-// GEEN TUBES
-GAME(199?, m4maglin,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::viva_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default_six_alt, ROT0,   "Barcrest","Magic Liner (Barcrest) (Dutch) (MPU4) (DMA 2.1)",GAME_FLAGS )
-
-// GEEN TUBES
-GAME(199?, m4bluedm,  0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::bluediamond_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default_six_alt, ROT0,   "Barcrest","Blue Diamond (Barcrest) (Dutch) (MPU4) (DBD 1.0)",GAME_FLAGS )
-
-// GEEN TUBES
-GAME(199?, m4amhiwy,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m462_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default_five_rev, ROT0,   "Barcrest","American Highway (Barcrest) (Dutch) (MPU4) (DAH 2.0)",GAME_FLAGS )
-
-// GEEN TUBES
-GAME(199?, m4addrd,   0,          mod2_alt_cheatchr_pal<mpu4_characteriser_pal::m470_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4default_five_rev, ROT0,   "Barcrest","Adders & Ladders (Barcrest) (Dutch) (MPU4) (DAL 1.2)",GAME_FLAGS )
-
-// GEEN TUBES
-GAME(199?, m4rdht,    0,          mod4oki_7reel_cheatchr_pal<mpu4_characteriser_pal::redheat_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default_seven, ROT0,   "Barcrest","Red Heat (Barcrest) (Dutch) (MPU4) (DRH 1.2)",GAME_FLAGS )
-
-// GEEN TUBES
-GAME(199?, m4rwb,     0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::redwhite_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default_six_alt, ROT0,   "Barcrest","Red White & Blue (Barcrest) (Dutch) (MPU4) (DRW 1.4)",GAME_FLAGS )
-
-// GEEN TUBES
-GAME(199?, m4salsa,   0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::salsa_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default_six_alt, ROT0,   "Barcrest","Salsa (Barcrest) (Dutch) (MPU4) (DSA 1.5)",GAME_FLAGS )
-
-// GEEN TUBES
-GAME(199?, m4techno,  0,          mod4oki_7reel_cheatchr_pal<mpu4_characteriser_pal::techno_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default_seven, ROT0,   "Barcrest","Techno Reel (Barcrest) (Dutch) (MPU4) (DTE 1.3, set 1)",GAME_FLAGS )
-GAME(199?, m4technoa, m4techno,   mod4oki_7reel_cheatchr_pal<mpu4_characteriser_pal::techno_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default_seven, ROT0,   "Barcrest","Techno Reel (Barcrest) (Dutch) (MPU4) (DTE 1.3, set 2)",GAME_FLAGS )
-
-// GEEN TUBES
-GAME(199?, m4twintm,  0,          mod4oki_7reel_cheatchr_pal<mpu4_characteriser_pal::m533_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default_seven, ROT0,   "Barcrest","Twin Timer (Barcrest) (MPU4) (D2T 1.1)",GAME_FLAGS )
-
-// GEEN TUBES
-GAME(199?, m4gldgat,  0,          mod2_7reel_cheatchr_pal<mpu4_characteriser_pal::m450_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4default_seven, ROT0,   "Barcrest","Golden Gate (Barcrest) (Dutch) (MPU4) (DGG 2.2)",GAME_FLAGS )
-
-// GEEN TUBES
-GAME(199?, m4holdtm,  0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m400_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Hold Timer (Barcrest) (Dutch) (MPU4) (DHT 1.0)",GAME_FLAGS )
-
-// Tube Sense ALM (this seems like an exported version of one of the Dutch games?)
-GAME(199?, m4exgam,   0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m400_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Extra Game (Fairplay - Barcrest) (MPU4) (CEG 2.0)",GAME_FLAGS )
-
-// GEEN TUBES
-GAME(199?, m4toma,    0,          mod2_7reel_cheatchr_pal<mpu4_characteriser_pal::m400_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4default_seven, ROT0,   "Barcrest","Tomahawk (Barcrest) (Dutch) (MPU4) (DTK 2.3)",GAME_FLAGS )
-
-// GEEN TUBES, confirmed oki
-GAME(199?, m4toptim,  0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m400_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Top Timer (Barcrest) (Dutch) (MPU4) (DTT 1.8, set 1)",GAME_FLAGS )
-GAME(199?, m4toptima, m4toptim,   mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m400_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Top Timer (Barcrest) (Dutch) (MPU4) (DTT 1.8, set 2)",GAME_FLAGS )
-
-// GEEN TUBES
-GAME(199?, m4univ,    0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m400_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Universe (Barcrest) (Dutch) (MPU4) (DUN 2.0)",GAME_FLAGS )
-
-// Sample EPROM Alm
-GAME(199?, m4frtgm,   0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m400_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Fruit Game (Barcrest) (MPU4) (FRU 2.0)",GAME_FLAGS )
-
-// GEEN TUBES
-GAME(199?, m4roadrn,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::age_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Road Runner (Barcrest) (Dutch) (MPU4) (DRO 1.9)",GAME_FLAGS )
-
-// GEEN TUBES
-GAME(199?, m4showtm,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::andybt_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Show Timer (Barcrest) (Dutch) (MPU4) (DSH 1.3)",GAME_FLAGS )
-
-// GEEN TUBES
-GAME(199?, m4steptm,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::phr_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Step Timer (Barcrest) (Dutch) (MPU4) (DST 1.1)",GAME_FLAGS )
-
-// GEEN TUBES
-GAME(199?, m4wildtm,  0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::wildtime_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Wild Timer (Barcrest) (Dutch) (MPU4) (DWT 1.3)",GAME_FLAGS )
-
-// GEEN TUBES
-GAME(199?, m4magrep,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::turboplay_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Magic Replay (Barcrest) (Dutch) (MPU4) (DMR 1.3)",GAME_FLAGS )
-
-// GEEN TUBES, but German?
-GAME(199?, m4nile,    0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::actclba_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big_lextender,ROT0,"Barcrest","Nile Jewels (Barcrest) (German) (MPU4) (GJN 0.8)",GAME_FLAGS ) // DM1 SW ALM
 
 // yes, the ingame display is 'Millenium' not 'Millennium'.  There are also strings from The Crystal Maze in the ROM, probably used as a base project?
 GAME(199?, m4jokmil,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m683_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big_lextender,ROT0,"Barcrest","Jokers Millenium 300 (Barcrest) (German) (MPU4) (DJO 0.1, set 1)",GAME_FLAGS ) // DM1 SW ALM
@@ -1557,88 +874,18 @@ GAME(199?, m4draca,   m4drac,     mod4oki_cheatchr_pal<mpu4_characteriser_pal::b
 GAME(199?, m4dracb,   m4drac,     mod4oki_cheatchr_pal<mpu4_characteriser_pal::bankrollerclub_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big_lextender,ROT0,"Barcrest","Dracula (Barcrest - Nova) (German) (MPU4) (DRA 2.7)",GAME_FLAGS ) // DM1 SW ALM
 
 
-GAME(199?, m4vegastg, 0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::viva_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Vegas Strip (Barcrest) (German) (MPU4)",GAME_FLAGS ) // 1 DM SW ALM
 
-GAME(199?, m4luckdv,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Lucky Devil (Barcrest) (Czech) (MPU4)",GAME_FLAGS ) // AUX2 locked
-
-GAME(199?, m4luckdvd, 0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::salsa_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Lucky Devil (Barcrest) (Dutch) (MPU4) (DLD 1.3)",GAME_FLAGS )
-
-// GEEN TUBES
-GAME(199?, m4hpyjok,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::redheat_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Happy Joker (Barcrest) (Dutch) (MPU4) (DHJ 1.2)",GAME_FLAGS )
-
-// GEEN TUBES
-GAME(199?, m4ceptr,   0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::salsa_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Ceptor (Barcrest) (Dutch) (MPU4) (DCE 1.0)",GAME_FLAGS )
-
-// GEEN TUBES
-GAME(199?, m4gnsmk,   0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::age_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Gun Smoke (Barcrest) (Dutch) (MPU4) (DGU 1.6)",GAME_FLAGS )
-GAME(199?, m4blkbuld, m4gnsmk,    mod4oki_cheatchr_pal<mpu4_characteriser_pal::age_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Gun Smoke (Barcrest) (Dutch) (MPU4) (DGU 1.6) (alt sound roms)",GAME_FLAGS ) // was marked 'Black Bull' but is GunSmoke  not sure either set of sound roms is right
-
-// GEEN TUBES
-GAME(199?, m4blkwhd,  0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::blackwhite_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_six, ROT0,   "Barcrest","Black & White (Barcrest) (Dutch) (MPU4) (DBW 1.1)",GAME_FLAGS ) // Reel Error
-
-// GEEN TUBES, these 3 sets are identical, just with different sound ROMs, probably hacks?
-GAME(199?, m4oldtmr,  0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m470_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default_six,  ROT0,   "Barcrest","Old Timer (Barcrest) (Dutch) (MPU4) (DOT 1.1)",GAME_FLAGS )
-GAME(199?, m4casot,   m4oldtmr,   mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m470_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default_six,  ROT0,   "Barcrest","Old Timer (Barcrest) (Dutch, alt 'Black and White' sound roms) (DOT 1.1)",GAME_FLAGS ) // uses the same program???
-GAME(199?, m4jpmcla,  m4oldtmr,   mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m470_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default_six,  ROT0,   "Barcrest","Old Timer (Barcrest) (Dutch, alt 'JPM Classic' sound roms) (DOT 1.1)",GAME_FLAGS ) // uses the same program???
-
-// GEEN TUBES
-GAME(199?, m4tbplay,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::turboplay_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Turbo Play (Barcrest) (Dutch) (MPU4) (DTP 1.3)",GAME_FLAGS )
-// NO METERS
-GAME(199?, m4tbplaya, m4tbplay,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::alf_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Turbo Play (Barcrest) (MPU4) (CTP 0.4)",GAME_FLAGS )
-GAME(199?, m4tbplayb, m4tbplay,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::alf_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Turbo Play (Barcrest) (MPU4) (ZTP 0.7)",GAME_FLAGS )
-// NO METERS, non-standard protection
-GAME(199?, m4remag,   m4tbplay,   mod2_bootleg_fixedret<0x19>,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Turbo Play (Barcrest) (bootleg) (MPU4) (ZTP 0.7)",GAME_FLAGS )
-GAME(199?, m4rmg,     m4tbplay,   mod2_bootleg_fixedret<0x6a>,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Turbo Play (Barcrest) (bootleg) (MPU4) (CTP 0.4)",GAME_FLAGS )
+GAME(199?, m4luckdv,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Lucky Devil (Barcrest) (Czech) (MPU4) (CLD 3.0)",GAME_FLAGS ) // AUX2 locked
 
 
 
-// bwb/nova?
-GAME(199?, m4ordmnd,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::actclba_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Oriental Diamonds (Barcrest) (German) (MPU4) (RAB 0.1)",GAME_FLAGS )
+
+
 
 
 // GEEN TUBES (even in test mode)
 GAME(199?, m4topdk,   0,          mod2_cheatchr_pal<mpu4_characteriser_pal::intcep_characteriser_prot>,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Top Deck (Barcrest) (Dutch) (MPU4) (DT 2.6)",GAME_FLAGS )
 
-// GEEN TUBES, runs open door
-GAME(199?, m4bigban,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Big Bandit (Nova) (German) (MPU4) (BIG 0.4)",GAME_FLAGS ) // DM1 SW ALM
-
-// KEINE TOKENROEHR, runs open door
-GAME(199?, m4crzcsn,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::mag7s_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Crazy Casino (Nova) (German) (MPU4) (CRZ 0.3)",GAME_FLAGS )
-
-// only runs with door open or gets stuck on initializing?
-GAME(199?, m4crzcav,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::bdash_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Crazy Cavern (Nova) (MPU4) (GCV 0.5)",GAME_FLAGS )
-
-// can coin up, but start doesn't work? runs open door
-GAME(199?, m4dragon,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m683_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Dragon (Nova) (MPU4) (DGL 0.1)",GAME_FLAGS )
-
-// KEINE TOKENROEHR, runs open door
-GAME(199?, m4hilonv,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::bagtel_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Hi Lo Casino (Nova) (MPU4) (HNC 0.2)",GAME_FLAGS )
-
-// only runs with door open or gets stuck on initializing?
-GAME(199?, m4octo,    0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::fruitfall_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Octopus (Nova) (German) (MPU4) (OCT 0.3)",GAME_FLAGS )
-
-// NETWORK FAIL ALARM (reel comms?)
-GAME(1994, m4esctbg,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m578_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default,     ROT0, "Vifico", "Escalera Tobogan (MPU4) (ESC1, set 1)", GAME_FLAGS )
-GAME(1994, m4esctbga, m4esctbg,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::m578_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default,     ROT0, "Vifico", "Escalera Tobogan (MPU4) (ESC1, set 2)", GAME_FLAGS )
-GAME(1994, m4esctbgb, m4esctbg,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::m578_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default,     ROT0, "Vifico", "Escalera Tobogan (MPU4) (ESC1, set 3)", GAME_FLAGS )
-
-// boots but will give HOPPER JAM after a credit
-GAME(199?, m4gldjok,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::goljok_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Golden Joker (Barcrest) (Dutch) (MPU4) (DGJ 1.2)",GAME_FLAGS )
-
-// similar to m4gldjok but can't coin up
-GAME(199?, m4blkcat,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::blkcat_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Black Cat (Barcrest) (Dutch) (MPU4) (DBL 1.4)",GAME_FLAGS )
-
-// runs, coins don't work, Dutch?
-GAME(199?, m4riotrp,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::blkcat_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Rio Tropico (Barcrest) (Dutch) (MPU4) (DRT 1.0)",GAME_FLAGS )
-
-// expects the following response sequence, but check code is standard
-// was the CHR replaced with something else that just happens to give this seuqence, or is this valid somehow?
-// runs, coins don't work
-// fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc 6c dc bc 7c fc fc fc fc fc fc fc fc fc 00 04 0c 1c 3c 7c fc fc fc fc fc fc fc fc d4 ac 5c bc 7c fc fc fc fc fc fc fc fc fc fc fc fc 00
-GAME(199?, m4luck7,   0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Lucky 7 (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
-
-// gives a DMD?? message if you attempt to coin it up, is there a mussing Dot Matrix Display ROM of some kind?
-GAME(199?, m4joljokh, 0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::salsa_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Jolly Joker (Barcrest) (Hungarian) (MPU4) (HJJ 1.4)",GAME_FLAGS )
 
 
 // Others
@@ -1792,21 +1039,6 @@ GAME( 199?, m4crzjk,  0,          mod2_alt,       mpu4_invcoin,    mpu4unsorted_
 
 // not standard protection, but cheatchr passes it, code crashes after a short time?
 GAME( 199?, m4c2,     0,          mod4oki_alt_cheatchr,    mpu4_invcoin,    mpu4unsorted_state, init_m4default, 0,      "Nova?", "Circus Circus 2 (Nova?) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE) // COIN   ALM
-
-// regular barcrest structure, keine tube (hopper issue)
-GAME( 199?, m4vivan,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::premier_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, 0,      "Nova",  "Viva Las Vegas (Nova) (MPU4) (GLV 1.2)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
-
-// GEEN TUBES
-GAME(199?, m4vivalvd, 0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::premier_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Viva Las Vegas (Barcrest) (Dutch) (MPU4) (DLV 1.1)",GAME_FLAGS )
-
-// GEEN TUBES
-GAME(199?, m4prem,    0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::premier_characteriser_prot> ,mpu4,    mpu4unsorted_state, init_m4default_six_alt, ROT0,   "Barcrest","Premier (Barcrest) (Dutch) (MPU4) (DPM 1.4)",GAME_FLAGS )
-
-// runs
-GAME( 199?, m4spotln, 0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::viva_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, 0,      "Barcrest / Nova",  "Spotlight (Nova) (German) (MPU4) (GSP 0.1)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
-
-// runs
-GAME( 199?, m4goldnn, 0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::alf_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, 0,      "Nova",  "Golden Years (Nova) (German) (MPU4) (TGY 0.1)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
 
 // doesn't boot at all? (checking AUX ports?)
 GAME( 199?, m4mgpn,   0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, 0,      "Nova",  "Monaco Grand Prix (Nova) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)

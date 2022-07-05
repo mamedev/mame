@@ -362,11 +362,14 @@ void mpu4_state::update_meters()
 		awp_draw_reel(machine(),"reel6", *m_reel[5]);
 		break;
 
-	case SIX_REEL_5TO8:
+#if 0
+	case SIX_REEL_5TO8: // m_reel[4] for this case is already handled in pia_ic5_porta_w
 		m_reel[4]->update(((data >> 4) & 0x0f));
-		data = 0x00; //Strip all reel data from meter drives
+		//data = 0x00; //Strip all reel data from meter drives
+		data = (data & 0x0F);
 		awp_draw_reel(machine(),"reel5", *m_reel[4]);
 		break;
+#endif
 
 	case SEVEN_REEL:
 		m_reel[0]->update((((data & 0x01) + ((data & 0x08) >> 2) + ((data & 0x20) >> 3) + ((data & 0x80) >> 4)) & 0x0f)) ;
@@ -404,6 +407,8 @@ MACHINE_RESET_MEMBER(mpu4_state,mpu4)
 	m_lamp_strobe    = 0;
 	m_lamp_strobe2   = 0;
 	m_led_strobe     = 0;
+	m_pia4_porta_leds_strobe = 0;
+	m_simplecard_leds_strobe = 0;
 	m_mmtr_data      = 0;
 	m_remote_meter   = 0;
 
@@ -663,17 +668,17 @@ void mpu4_state::pia_ic4_porta_w(uint8_t data)
 {
 	if(m_ic23_active)
 	{
-		if (((m_lamp_extender == NO_EXTENDER) || (m_lamp_extender == SMALL_CARD) || (m_lamp_extender == LARGE_CARD_C)) && (m_led_extender == NO_EXTENDER))
+		if (m_use_pia4_porta_leds)
 		{
-			if(m_led_strobe != m_input_strobe)
+			if(m_pia4_porta_leds_strobe != m_input_strobe)
 			{
 				for(int i=0; i<8; i++)
 				{
-					m_mpu4leds[((7 - m_input_strobe) << 3) | i] = BIT(data, i);
+					m_mpu4leds[(((7 - m_input_strobe) | m_pia4_porta_leds_base) << 3) | i] = BIT(data, i);
 				}
-				m_digits[7 - m_input_strobe] = data;
+				m_digits[(7 - m_input_strobe) | m_pia4_porta_leds_base] = data;
 			}
-			m_led_strobe = m_input_strobe;
+			m_pia4_porta_leds_strobe = m_input_strobe;
 		}
 	}
 }
@@ -825,7 +830,7 @@ void mpu4_state::pia_ic5_porta_w(uint8_t data)
 			{
 				m_mpu4leds[((m_input_strobe | 8) << 3) | i] = BIT(data, i);
 			}
-			m_digits[m_input_strobe | 8] = data;
+		//	m_digits[m_input_strobe | 8] = data;
 		}
 		break;
 
@@ -842,6 +847,7 @@ void mpu4_state::pia_ic5_porta_w(uint8_t data)
 
 	case LARGE_CARD_B:
 		lamp_extend_large(data,m_input_strobe,m_ic23_active);
+#if 0
 		if ((m_ic23_active) && m_card_live)
 		{
 			for(i=0; i<8; i++)
@@ -850,6 +856,7 @@ void mpu4_state::pia_ic5_porta_w(uint8_t data)
 			}
 			m_digits[(m_last_b7 << 3) | m_input_strobe] = ~data;
 		}
+#endif
 		break;
 
 	case LARGE_CARD_C:
@@ -886,17 +893,18 @@ void mpu4_state::pia_ic5_portb_w(uint8_t data)
 	{
 		led_write_extender(data & 0x07, m_pia4->a_output(),m_input_strobe);
 	}
-	else if (m_led_extender == SIMPLE_CARD)
+
+	if (m_use_simplecard_leds)
 	{
-		if(m_led_strobe != m_input_strobe)
+		if(m_simplecard_leds_strobe != m_input_strobe)
 		{
 			for(int i=0; i<8; i++)
 			{
-				m_mpu4leds[( ( (7 - m_input_strobe) + 8) << 3) | i] = BIT(m_pia4->a_output(), i);
+				m_mpu4leds[( ( (7 - m_input_strobe) | m_simplecard_leds_base) << 3) | i] = BIT(m_pia4->a_output(), i);
 			}
-			m_digits[(7 - m_input_strobe) + 8] = m_pia4->a_output();
+			m_digits[(7 - m_input_strobe) | m_simplecard_leds_base] = m_pia4->a_output();
 		}
-		m_led_strobe = m_input_strobe;
+		m_simplecard_leds_strobe = m_input_strobe;
 	}
 }
 
@@ -2529,7 +2537,7 @@ void mpu4_state::mod4yam(machine_config &config)
 
 	mpu4_reels<0, 6>(config);
 
-	YM2413(config, m_ym2413, MPU4_MASTER_CLOCK/4);
+	YM2413(config, m_ym2413, 2000000);
 	m_ym2413->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_ym2413->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
