@@ -3219,7 +3219,7 @@ att615                          //
 att630                          //
 att730x                         //
 
-@source:skeleton/attache.cpp
+@source:otrona/attache.cpp
 attache                         // (c) 1982 Otrona
 attache816                      // (c) 1983 Otrona
 
@@ -3391,7 +3391,7 @@ redbarnp                        //
 @source:atari/bartop52.cpp
 barbball                        // (proto)          (c) 1983
 
-@source:skeleton/basf7100.cpp
+@source:basf/basf7100.cpp
 basf7120                        //
 
 @source:intel/basic52.cpp
@@ -9440,7 +9440,7 @@ sbishika                        // GX675 (c) 1998 (Korea)
 feap90                          //
 t3210                           //
 
-@source:skeleton/bitgraph.cpp
+@source:bbn/bitgraph.cpp
 bitgrpha                        //
 bitgrphb                        //
 
@@ -10015,7 +10015,7 @@ lynx128k                        //
 lynx48k                         //
 lynx96k                         //
 
-@source:skeleton/candela.cpp
+@source:candela/candela.cpp
 can09t                          //
 can09                           //
 
@@ -10275,7 +10275,7 @@ ccs300                          //
 @source:skeleton/cd100.cpp
 cd100b                          //
 
-@source:skeleton/cd2650.cpp
+@source:centraldata/cd2650.cpp
 cd2650                          //
 
 @source:skeleton/cdc721.cpp
@@ -10899,7 +10899,7 @@ panich                          // 8015 (c) 1980
 cosmicg                         // 7907 (c) 1979
 cosmicgi                        // bootleg (Inder)
 
-@source:skeleton/cosmicos.cpp
+@source:radiobulletin/cosmicos.cpp
 cosmicos                        //
 
 @source:misc/cosmos_playc8f.cpp
@@ -12474,7 +12474,7 @@ diablo              //
 diamondking                     // (c) 1997 SegaSA / Sonic
 diamondkinp                     // (c) 1997 SegaSA / Sonic
 
-@source:skeleton/didact.cpp
+@source:didact/didact.cpp
 md6802                          //
 mp68a                           //
 modulab                         //
@@ -12659,7 +12659,7 @@ dms5000                         //
 @source:dms/dms86.cpp
 dms86                           //
 
-@source:skeleton/dmv.cpp
+@source:ncr/dmv.cpp
 dmv                             //
 
 @source:universal/docastle.cpp
@@ -12728,7 +12728,7 @@ dotriman
 @source:quantel/dpb7000.cpp
 dpb7000                         //
 
-@source:skeleton/dps1.cpp
+@source:ithacaintersys/dps1.cpp
 dps1                            //
 
 @source:sony/dpsv55.cpp
@@ -12885,7 +12885,7 @@ dyndukej                        // (c) 1989 Seibu Kaihatsu (03SEP89
 dyndukeja                       // (c) 1989 Seibu Kaihatsu (25JUL89)
 dyndukeu                        // (c) 1989 Seibu Kaihatsu + Fabtek license (25JUL89)
 
-@source:skeleton/e100.cpp
+@source:didact/e100.cpp
 e100                            //
 
 @source:ericsson/e9161.cpp
@@ -15473,7 +15473,7 @@ gijoej                          // GX069 (c) 1991 (Japan)
 gijoeu                          // GX069 (c) 1991 (US)
 gijoeua                         // GX069 (c) 1991 (US)
 
-@source:skeleton/gimix.cpp
+@source:gimix/gimix.cpp
 gimix                           //
 
 @source:jaleco/ginganin.cpp
@@ -15977,7 +15977,7 @@ wizwarz                         // GV-??? (c) 1984 Mylstar - never released
 gotya                           // (c) 1981 Game-A-Tron
 thehand                         // (c) 1981 T.I.C.
 
-@source:skeleton/goupil.cpp
+@source:smt/goupil.cpp
 goupilg1                        //
 goupilg2                        //
 
@@ -17133,7 +17133,7 @@ hp9k370                         //
 hp9k380                         //
 hp9k382                         //
 
-@source:skeleton/hprot1.cpp
+@source:henry/hprot1.cpp
 hprot1                          //
 hprot2r6                        //
 hprotr8a                        //
@@ -17153,7 +17153,7 @@ hshavoc                         // (c) 1993 Data East
 @source:casio/ht6000.cpp
 ht6000                          // 1987 Casio
 
-@source:skeleton/ht68k.cpp
+@source:hawthornetech/ht68k.cpp
 ht68k                           //
 
 @source:ddr/huebler.cpp
@@ -17224,7 +17224,7 @@ ibmpcjx                         // 1985 IBM PC JX
 @source:skeleton/icebox.cpp
 icebox                          // Nutting Icebox
 
-@source:skeleton/icatel.cpp
+@source:icatel/icatel.cpp
 icatel                          //
 
 @source:misc/ice_bozopail.cpp
@@ -20354,7 +20354,7 @@ macxl                           // 1985 Apple Macintosh XL
 @source:tch/littlerb.cpp
 littlerb                        // (c) 1993 TCH
 
-@source:skeleton/lk3000.cpp
+@source:lexicon/lk3000.cpp
 lk3000
 
 @source:taito/lkage.cpp
@@ -23919,10 +23919,10 @@ milton                          // 1980 Milton Bradley
 @source:skeleton/milwaukee.cpp
 mc1200                          //
 
-@source:skeleton/mindset.cpp
+@source:mindset/mindset.cpp
 mindset                         // (c) 1984
 
-@source:skeleton/mini2440.cpp
+@source:friendlyarm/mini2440.cpp
 mini2440                        //
 
 @source:misc/miniboy7.cpp
@@ -23944,7 +23944,7 @@ minifram
 @source:cirsa/miniguay.cpp
 miniguay
 
-@source:skeleton/minitel_2_rpic.cpp
+@source:philips/minitel_2_rpic.cpp
 minitel2                        //
 
 @source:taito/minivadr.cpp
@@ -24080,16 +24080,16 @@ mlandingj                       // B09 (c) 1987 Taito Corporation (US)
 @source:nintendo/mmagic.cpp
 mmagic                          // (c) 1979 Nintendo
 
-@source:skeleton/mmd1.cpp
+@source:elinstruments/mmd1.cpp
 mmd1                            //
 
-@source:skeleton/mmd2.cpp
+@source:elinstruments/mmd2.cpp
 mmd2                            //
 
 @source:maygay/mmm.cpp
 mmm_ldip                        // Lucky Dip
 
-@source:skeleton/mod8.cpp
+@source:microsystemsint/mod8.cpp
 mod8                            //
 
 @source:sega/model1.cpp
@@ -34543,11 +34543,11 @@ pdt3100                         //
 pecom32                         //
 pecom64                         //
 
-@source:skeleton/pegasus.cpp
+@source:ausnz/pegasus.cpp
 pegasus                         //
 pegasusm                        //
 
-@source:skeleton/pencil2.cpp
+@source:hanimex/pencil2.cpp
 pencil2                         //
 
 @source:msx/pengadvb.cpp
@@ -35170,7 +35170,7 @@ pexmp030                        // (c) 1997 IGT - International Game Technology
 @source:skeleton/perq.cpp
 perq                            //
 
-@source:skeleton/pes.cpp
+@source:pes/pes.cpp
 pes                             //
 
 @source:commodore/pet.cpp
@@ -36290,11 +36290,11 @@ bombsa                          // (c) 1988 Jaleco
 psychic5                        // (c) 1987 Jaleco
 psychic5j                       // (c) 1987 Jaleco
 
-@source:skeleton/pt68k4.cpp
+@source:peripheraltech/pt68k4.cpp
 pt68k2                          //
 pt68k4                          //
 
-@source:skeleton/ptcsol.cpp
+@source:processortech/ptcsol.cpp
 sol20                           //
 
 @source:jaleco/pturn.cpp
@@ -37587,7 +37587,7 @@ savia84                         //
 @source:misc/savquest.cpp
 savquest                        //
 
-@source:skeleton/sb180.cpp
+@source:micromint/sb180.cpp
 sb180                          //
 
 @source:skeleton/sb8085.cpp
@@ -37778,7 +37778,7 @@ vaportrxp                       // (c) 1998 Atari Games
 wg3dh                           // (c) 1996 Atari Games
 wg3dhfe                         // (c) 1996 Atari Games
 
-@source:skeleton/seattlecmp.cpp
+@source:seattlecmp/seattlecmp.cpp
 scp300f                         // Seattle SCP-300F
 
 @source:sega/sega_beena.cpp
@@ -39412,7 +39412,7 @@ socrates                        // 1988 Socrates Educational Video System (USA)
 socratfc                        // 1988 Socrates SAITOUT (French Canada)
 vpainter                        // 1991 Video Painter
 
-@source:skeleton/softbox.cpp
+@source:sse/softbox.cpp
 softbox                         //
 
 @source:tehkan/solomon.cpp
@@ -39895,7 +39895,7 @@ spyu                            // GX857 (c) 1989 (US)
 spyhuntsp                       // (c) 1985 Recreativos Franco S.A. (Bally Midway license)
 spyhuntpr                       // (c) 1985 Recreativos Franco S.A.
 
-@source:skeleton/squale.cpp
+@source:apollo7/squale.cpp
 squale                          //
 
 @source:seta/srmp2.cpp
@@ -41358,7 +41358,7 @@ deroon2                         // (c) 1996 Tecmo
 tkdensho                        // (c) 1996 Tecmo
 tkdenshoa                       // (c) 1996 Tecmo
 
-@source:skeleton/tecnbras.cpp
+@source:tecnbras/tecnbras.cpp
 tecnbras                        //
 
 @source:misc/tecnodar.cpp
@@ -41556,7 +41556,7 @@ thunderxa                       // GX873 (c) 1988
 thunderxb                       // GX873 (c) 1988
 thunderxj                       // GX873 (c) 1988 (Japan)
 
-@source:skeleton/ti630.cpp
+@source:intelbras/ti630.cpp
 ti630                           //
 
 @source:ti/ti74.cpp
@@ -42185,7 +42185,7 @@ sys80p                          // EACA System 80
 trs80                           // TRS-80 Model I - Level I BASIC
 trs80l2                         // TRS-80 Model I - Level II BASIC
 
-@source:skeleton/trs80dt1.cpp
+@source:trs/trs80dt1.cpp
 trs80dt1                        // TRS-80 Data Terminal 1
 
 @source:trs/trs80m2.cpp
