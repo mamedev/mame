@@ -83,6 +83,8 @@
 #define HOPPER_NONDUART_B   5
 
 INPUT_PORTS_EXTERN( mpu4 );
+INPUT_PORTS_EXTERN( mpu4_dutch );
+INPUT_PORTS_EXTERN( mpu4_dutch_invcoin );
 INPUT_PORTS_EXTERN( mpu4_invcoin );
 INPUT_PORTS_EXTERN( mpu4_impcoin );
 INPUT_PORTS_EXTERN( mpu4_invimpcoin );
@@ -669,6 +671,8 @@ protected:
 	bool m_undercurrent_detect = false;
 
 	bool m_low_volt_detect = true;
+
+	bool m_use_coinlocks = false;
 
 	bool m_hack_duart_fixed_low = false;
 

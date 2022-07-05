@@ -24455,9 +24455,6 @@ m4ddba                          //
 m4dnj                           // Double Nudge (unknown)
 m4dnja                          //
 m4dnjb                          //
-m4drac                          // Dracula (Barcrest - Nova)
-m4draca                         //
-m4dracb                         //
 m4eaw51                         // Everyone's A Winner?
 m4fsx                           // Fun Spot X
 m4fsxa                          //
@@ -24508,7 +24505,6 @@ m4sunday                        // Sunday Sport
 m4surf                          // Super Surfin' (Gemini)
 m4surfa                         //
 m4surfb                         //
-m4topdk                         // Top Deck (Barcrest)
 m4treel                         //
 m4treela                        //
 m4twist                         // Twist Again (Barcrest)
@@ -26221,6 +26217,7 @@ m4topact                        // Top Action (Barcrest)
 m4topacta                       //
 m4topgr                         // Top Gear (Barcrest)
 m4toplot                        // Top The Lot (Barcrest)
+m4topdk                         // Top Deck (Barcrest)
 m4toprn                         // Top Run (unknown)
 m4topst                         // Top Stop (Barcrest)
 m4toptak                        // Top Take (Barcrest)
@@ -27135,6 +27132,9 @@ m4denmendtk                     //
 m4denmendtkd                    //
 m4denmendty                     //
 m4denmendtyd                    //
+m4drac                          // Dracula (Barcrest - Nova)
+m4draca                         //
+m4dracb                         //
 m4dragon                        // Dragon (Nova)
 m4dtyfre                        // Duty Free (Barcrest)
 m4dtyfre_h1                     //

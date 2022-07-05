@@ -923,10 +923,15 @@ uint8_t mpu4_state::pia_ic5_portb_r()
 	}
 
 	LOG(("%s: IC5 PIA Read of Port B (coin input AUX2)\n",machine().describe_context()));
-	machine().bookkeeping().coin_lockout_w(0, (m_pia5->b_output() & 0x01) );
-	machine().bookkeeping().coin_lockout_w(1, (m_pia5->b_output() & 0x02) );
-	machine().bookkeeping().coin_lockout_w(2, (m_pia5->b_output() & 0x04) );
-	machine().bookkeeping().coin_lockout_w(3, (m_pia5->b_output() & 0x08) );
+	if (m_use_coinlocks)
+	{
+		// why are these being set in a read, not when the outputs are written?
+		// maybe should be done as an output 'port' as differs between games?
+		machine().bookkeeping().coin_lockout_w(0, (m_pia5->b_output() & 0x01));
+		machine().bookkeeping().coin_lockout_w(1, (m_pia5->b_output() & 0x02));
+		machine().bookkeeping().coin_lockout_w(2, (m_pia5->b_output() & 0x04));
+		machine().bookkeeping().coin_lockout_w(3, (m_pia5->b_output() & 0x08));
+	}
 
 	uint8_t tempinput = m_aux2_port->read() | m_aux2_input;
 	return tempinput;
@@ -1456,6 +1461,91 @@ INPUT_PORTS_START( mpu4 )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4)
+INPUT_PORTS_END
+
+INPUT_PORTS_START( mpu4_dutch )
+	PORT_INCLUDE( mpu4 )
+
+	PORT_MODIFY("ORANGE1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("ORANGE1:01")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) // avoid REFILL NEEDED
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) // avoid REFILL NEEDED
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) // avoid NO TUBES
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("ORANGE1:05")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("ORANGE1:06")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("ORANGE1:07")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Unknown Door")  PORT_CODE(KEYCODE_T) PORT_TOGGLE
+
+	PORT_MODIFY("ORANGE2")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("ORANGE2:01")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("ORANGE2:02")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("ORANGE2:03")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("ORANGE2:04")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("ORANGE2:05")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("ORANGE2:06")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("ORANGE2:07")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("ORANGE2:08")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
+
+	PORT_MODIFY("DIL1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("DIL1:01")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("DIL1:02")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("DIL1:03")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("DIL1:04")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("DIL1:05")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("DIL1:06")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("DIL1:07")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("DIL1:08")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
+
+INPUT_PORTS_END
+
+INPUT_PORTS_START( mpu4_dutch_invcoin )
+	PORT_INCLUDE( mpu4_dutch )
+
+	PORT_MODIFY("AUX2")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_COIN1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_COIN2)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_COIN3)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_COIN4)
 INPUT_PORTS_END
 
 INPUT_PORTS_START( mpu4_impcoin )
@@ -2536,8 +2626,8 @@ void mpu4_state::mod4yam(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4yam)
 
 	mpu4_reels<0, 6>(config);
-
-	YM2413(config, m_ym2413, 2000000);
+	 
+	YM2413(config, m_ym2413, XTAL(3'579'545)/2); // XTAL on sound board
 	m_ym2413->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_ym2413->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
@@ -2582,7 +2672,7 @@ void mpu4_state::mod4yam_alt(machine_config &config)
 
 	mpu4_reels<1, 6>(config);
 
-	YM2413(config, m_ym2413, MPU4_MASTER_CLOCK/4);
+	YM2413(config, m_ym2413, XTAL(3'579'545)/2); // XTAL on sound board
 	m_ym2413->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_ym2413->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
@@ -2594,7 +2684,7 @@ void mpu4_state::mod4yam_7reel(machine_config &config)
 
 	mpu4_reels<0, 7>(config);
 
-	YM2413(config, m_ym2413, MPU4_MASTER_CLOCK/4);
+	YM2413(config, m_ym2413, XTAL(3'579'545)/2); // XTAL on sound board
 	m_ym2413->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_ym2413->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
