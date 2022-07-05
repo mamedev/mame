@@ -948,7 +948,7 @@ triothepj                       // (c) 1989 Data East Corporation (Japan)
 @source:tvgames/actions_atj2279b.cpp
 rbitgen
 
-@source:access/acvirus.cpp
+@source:skeleton/acvirus.cpp
 virusa                          // (c) 1997 Access GmbH
 virusb                          // (c) 1999 Access GmbH
 virusc                          // (c) 2002 Access GmbH
@@ -3253,7 +3253,7 @@ avigo_es                        // 1997 Avigo (Spanish)
 avigo_fr                        // 1997 Avigo (French)
 avigo_it                        // 1997 Avigo (Italian)
 
-@source:aviion/aviion88k.cpp
+@source:skeleton/aviion88k.cpp
 aviion_4600                     // Data General AViiON 4600
 
 @source:elektor/avrmax.cpp
@@ -3361,7 +3361,7 @@ triviayp                        // (c) 1984
 triviaes4                       // (c) 1988 (Maibesa hardware)
 triviaes5                       // (c) 19?? (Maibesa hardware)
 
-@source:banctec/banctec.cpp
+@source:skeleton/banctec.cpp
 banctec                         // BancTec ESeries panel
 
 @source:bandai/design_master.cpp
@@ -10267,7 +10267,7 @@ toprollr                        // (c) 1983 Jaleco
 yamato                          // (c) 1983 Sega
 yamato2                         // (c) 1983 Sega
 
-@source:ccs/ccs2810.cpp
+@source:skeleton/ccs2810.cpp
 ccs2422                         //
 ccs2810                         //
 ccs300                          //
@@ -10336,7 +10336,7 @@ millpac                         // Valadon
 multiped                        // hack
 warlords                        // 037153-037159    (c) 1980
 
-@source:ceres/ceres.cpp
+@source:skeleton/ceres.cpp
 ceres1                          // Eidgenössische Technische Hochschule Zürich Ceres-1
 
 @source:ces/cesclass.cpp
@@ -10792,14 +10792,14 @@ cncchess
 @source:nintendo/compmahj.cpp
 compmahj                        // 1983 Nintendo Computer Mah-jong Yakuman
 
-@source:isc/compucolor.cpp
+@source:skeleton/compucolor.cpp
 compclr2                        //
 
 @source:misc/compucranes.cpp
 mastcrane                       // (c) 199? Compumatic
 mastcranea                      // (c) 199? Compumatic
 
-@source:teamconcepts/comquest.cpp
+@source:skeleton/comquest.cpp
 comquest                        // Comquest Plus German
 
 @source:comx/comx35.cpp
@@ -13444,7 +13444,7 @@ electronsp                      // 1991 Acorn Electron (Stop Press 64i)
 @source:elektor/elekscmp.cpp
 elekscmp                        //
 
-@source:elektron/elektronmono.cpp
+@source:skeleton/elektronmono.cpp
 monomach                        // MK2 (c) 2004 Elektron
 machdrum                        // MK2 (c) 2007 Elektron
 
@@ -15563,7 +15563,7 @@ gluck2                          // 1992 Yung Yu / CYE
 @source:skeleton/gm1000.cpp
 gm1000                          //
 
-@source:hartung/gmaster.cpp
+@source:skeleton/gmaster.cpp
 gmaster                         // Hartung Gamemaster
 
 @source:skeleton/gnat10.cpp
@@ -17022,7 +17022,7 @@ nhomerun                        // (c) 1988 Jaleco
 @source:homebrew/homez80.cpp
 homez80                         //
 
-@source:northstar/horizon.cpp
+@source:skeleton/horizon.cpp
 nshrz                           //
 nshrz2mhz                       //
 vector1                         //
@@ -19625,7 +19625,7 @@ klaxd2                          // 136075           (c) 1989 (Germany)
 klaxj3                          // 136075           (c) 1989 (Japan)
 klaxj4                          // 136075           (c) 1989 (Japan)
 
-@source:kyber/kminus.cpp
+@source:skeleton/kminus.cpp
 kminus                          // 1982 Kyber Minus
 
 @source:seibu/kncljoe.cpp
@@ -19839,7 +19839,7 @@ krokha                          // 1990 SKB Kontur, USSR
 @source:skeleton/kron.cpp
 kron180                         // 1995 Kron Ltd, Ukraine
 
-@source:kurzweil/krz2000.cpp
+@source:skeleton/krz2000.cpp
 k2000                           // (c) 1990 Kurzweil Music Systems
 
 @source:taito/ksayakyu.cpp
@@ -20458,7 +20458,7 @@ luckybalc                       // (c) 1996 Sielcon Games
 luckybald                       // (c) 1996 Sielcon Games
 luckybale                       // (c) 1996 Sielcon Games
 
-@source:omron/luna_68k.cpp
+@source:skeleton/luna_68k.cpp
 luna                            // Omron Luna
 
 @source:tehkan/lvcards.cpp
@@ -23625,7 +23625,7 @@ gldarrow                        // (c) 1984 Meyco Games
 mfabfz                          //
 mfabfz85                        //
 
-@source:mg1/mg1.cpp
+@source:skeleton/mg1.cpp
 mg1                             // Whitechapel Computer Works MG-1
 
 @source:merit/mgames.cpp
@@ -23931,7 +23931,7 @@ miniboy7                        // (c) 1983, Bonanza Enterprises
 miniboy7a                       // (c) 1983, Bonanza Enterprises
 sminiboy                        // (c) 1984, Bonanza Enterprises
 
-@source:ultratec/minicom.cpp
+@source:skeleton/minicom.cpp
 mcom4_02                        //
 minicom                         //
 
@@ -31957,7 +31957,7 @@ mz80a                           // 1982 Sharp MZ80A
 mz80k                           // 1979 Sharp MZ80K
 mz80kj                          // 1979 Sharp MZ80K
 
-@source:mizar/mzr8105.cpp
+@source:skeleton/mzr8105.cpp
 mzr8105                         //
 
 @source:nintendo/n64.cpp
@@ -31978,7 +31978,7 @@ spacefevo2                      // (c) 1979 Nintendo
 spacelnc                        // (c) 1979 Nintendo
 westgun2                        // (c) 1980 Taito Corporation
 
-@source:nakajima/nakajies.cpp
+@source:skeleton/nakajies.cpp
 dator3k                         // 199? Dator 3000 (Spanish)
 drwrt100                        // 199? NTS DreamWriter T100
 drwrt200                        // 199? NTS DreamWriter T200
@@ -34249,7 +34249,7 @@ zdrum                           // (c) 2000 PARA Enterprises
 @source:toshiba/paso1600.cpp
 paso1600                        //
 
-@source:koei/pasogo.cpp
+@source:skeleton/pasogo.cpp
 pasogo                          // KOEI PasoGo
 
 @source:toshiba/pasopia.cpp
@@ -34271,7 +34271,7 @@ threedsa                        // (c) 1985
 @source:atlus/patapata.cpp
 patapata                        // 1993 NTC / NMK / ATLUS
 
-@source:usp/patinho_feio.cpp
+@source:skeleton/patinho_feio.cpp.cpp
 patinho                         // 1972 Patinho Feio
 
 @source:casio/pb1000.cpp
@@ -34566,7 +34566,7 @@ pengo6                          // 834-0386 (c) 1982 Sega
 pengob                          // bootleg
 penta                           // bootleg
 
-@source:tectoy/pensebem.cpp
+@source:skeleton/pensebem.cpp
 pbem2017                        // 2017 TecToy Pense Bem
 
 @source:sinclair/pentagon.cpp
@@ -35967,7 +35967,7 @@ popobear                        // (c) 2000 BMC
 @source:omori/popper.cpp
 popper                          // (c) 1983 Omori Electric Co., Ltd.
 
-@source:positron/positron.cpp
+@source:skeleton/positron.cpp
 positron                        // 1982 Positron 9000
 
 @source:olympia/portrait.cpp
@@ -35996,7 +35996,7 @@ powerinspu                      // prototype (USA)
 @source:skeleton/powerstack.cpp
 powerstk                        // Motorola Powerstack II
 
-@source:stm/pp.cpp
+@source:skeleton/pp.cpp
 pp                              // STM Pied Piper Communicator 1
 
 @source:zvt/pp01.cpp
@@ -36183,7 +36183,7 @@ prof80                          //
 progolf                         // (c) 1981
 progolfa                        // (c) 1981
 
-@source:sequential/prophet600.cpp
+@source:skeleton/prophet600.cpp
 prpht600                        // 1983 Sequential Circuits
 
 @source:ausnz/proteus.cpp
@@ -36341,7 +36341,7 @@ pve500                          // SONY PVE-500
 @source:skeleton/pwp14.cpp
 pwp14                           // Smith Corona PWP System 14
 
-@source:compugraphic/pwrview.cpp
+@source:skeleton/pwrview.cpp
 pwrview                         // Compugraphic MCS PowerView 10
 
 @source:epson/px4.cpp
@@ -36465,7 +36465,7 @@ r2dx_v33                        // (c) 1996 Seibu Kaihatsu
 r2dx_v33_r2                     // (c) 1996 Seibu Kaihatsu
 zerotm2k                        // (c) 2000 Seibu Kaihatsu
 
-@source:rolm/r9751.cpp
+@source:skeleton/r9751.cpp
 r9751                           // ROLM 9751 phone system
 
 @source:metro/rabbit.cpp
@@ -36576,7 +36576,7 @@ savanna                         // Olympia (c) 1982 (Jungler bootleg)
 tactcian                        // GX335 (c) 1982 Sega
 tactcian2                       // GX335 (c) 1981 Sega
 
-@source:ultimachine/rambo.cpp
+@source:skeleton/rambo.cpp
 metamaq2                        // Metamaquina 2 desktop 3d printer
 
 @source:atari/rampart.cpp
@@ -36707,7 +36707,7 @@ kuniokunb                       // bootleg
 renegade                        // TA-0018 (c) 1986 + Taito America license
 renegadeb                       // bootleg
 
-@source:makerbot/replicator.cpp
+@source:skeleton/replicator.cpp
 replica1                        // Makerbot Replicator 1 desktop 3d printer
 
 @source:taito/retofinv.cpp
@@ -37250,7 +37250,7 @@ safarirj                        // (c) 1979 Shin Nihon Kikaku (SNK)
 @source:entex/sag.cpp
 sag
 
-@source:sage/sage2.cpp
+@source:skeleton/sage2.cpp
 sage2
 
 @source:saitek/ccompan.cpp
@@ -40039,7 +40039,7 @@ st_sam4                         //
 stargzr                         //
 viperp                          //
 
-@source:saturn/st17xx.cpp
+@source:skeleton/st17xx.cpp
 st1700h                         //
 st1701                          //
 st1702                          //
@@ -41314,7 +41314,7 @@ tbowlp                          // Suspected proto of Japanese version for US Ma
 tceptor                         // (c) 1986
 tceptor2                        // (c) 1986
 
-@source:tandberg/tdv2324.cpp
+@source:skeleton/tdv2324.cpp
 tdv2324                         //
 
 @source:misc/teamjocs.cpp
@@ -42495,7 +42495,7 @@ unior                           //
 @source:skeleton/unistar.cpp
 unistar                         //
 
-@source:unisys/univac.cpp
+@source:skeleton/univac.cpp
 uts10                           //
 uts20                           //
 
@@ -44012,7 +44012,7 @@ wwfsstaru7                      // TA-0024 (c) 1989 (US, newer)
 wwfsstaru6                      // TA-0024 (c) 1989 (US)
 wwfsstaru4                      // TA-0024 (c) 1989 (US)
 
-@source:amirix/wxstar4000.cpp
+@source:skeleton/wxstar4000.cpp
 wxstar4k                        // 1990 Applied Microelectronics Research (Amirix) / The Weather Channel
 
 @source:wyse/wy100.cpp
@@ -44168,7 +44168,7 @@ dombikec                        //
 @source:skeleton/xbase09.cpp
 xbase09                         //
 
-@source:microsoft/xbox.cpp
+@source:skeleton/xbox.cpp
 xbox                            //
 
 @source:xerox/xerox820.cpp

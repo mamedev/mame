@@ -1,4 +1,3 @@
-access/acvirus.cpp
 acorn/aa310.cpp
 acorn/accomm.cpp
 acorn/acrnsys.cpp
@@ -27,7 +26,6 @@ altos/altos486.cpp
 altos/altos5.cpp
 altos/altos8600.cpp
 amiga/amiga.cpp
-amirix/wxstar4000.cpp
 ampro/ampro.cpp
 ampro/lb186.cpp
 ampro/lbpc.cpp
@@ -94,8 +92,6 @@ ausnz/proteus.cpp
 ausnz/pulsar.cpp
 ausnz/super80.cpp
 ausnz/tec1.cpp
-aviion/aviion88k.cpp
-banctec/banctec.cpp
 bandai/design_master.cpp
 bandai/rx78.cpp
 bandai/sv8000.cpp
@@ -131,8 +127,6 @@ casio/rz1.cpp
 casio/sk1.cpp
 casio/sx1000.cpp
 cce/mc1000.cpp
-ccs/ccs2810.cpp
-ceres/ceres.cpp
 chess/ave_arb.cpp
 chess/cking_master.cpp
 chess/compuchess.cpp
@@ -161,7 +155,6 @@ commodore/pet.cpp
 commodore/plus4.cpp
 commodore/vic10.cpp
 commodore/vic20.cpp
-compugraphic/pwrview.cpp
 comx/comx35.cpp
 concept/concept.cpp
 conitec/prof180x.cpp
@@ -222,7 +215,6 @@ elektor/avrmax.cpp
 elektor/ec65.cpp
 elektor/elekscmp.cpp
 elektor/junior.cpp
-elektron/elektronmono.cpp
 elinstruments/mmd1.cpp
 elinstruments/mmd2.cpp
 emusys/emax.cpp
@@ -306,7 +298,6 @@ handheld/talkingfb.cpp
 handheld/tispeak.cpp
 handheld/tispellb.cpp
 handheld/wildfire.cpp
-hartung/gmaster.cpp
 hds/hds200.cpp
 heathkit/et3400.cpp
 heathkit/h19.cpp
@@ -406,7 +397,6 @@ intel/sdk85.cpp
 intel/sdk86.cpp
 interpro/interpro.cpp
 interton/vc4000.cpp
-isc/compucolor.cpp
 jazz/jazz.cpp
 kawai/kawai_acr20.cpp
 kawai/kawai_k1.cpp
@@ -416,7 +406,6 @@ kawai/kawai_ksp10.cpp
 kawai/kawai_r100.cpp
 kawai/kawai_sx240.cpp
 kaypro/kaypro.cpp
-koei/pasogo.cpp
 kontron/kdt6.cpp
 korg/korgds8.cpp
 korg/korgdss1.cpp
@@ -428,8 +417,6 @@ korg/korgz3.cpp
 korg/microkorg.cpp
 korg/poly800.cpp
 korg/polysix.cpp
-kurzweil/krz2000.cpp
-kyber/kminus.cpp
 kyocera/kyocera.cpp
 leapfrog/leapfrog_iquest.cpp
 leapfrog/leapfrog_leappad.cpp
@@ -445,7 +432,6 @@ luxor/abc1600.cpp
 luxor/abc80.cpp
 luxor/abc80x.cpp
 luxor/ds90.cpp
-makerbot/replicator.cpp
 matsushita/duet16.cpp
 matsushita/jr100.cpp
 matsushita/jr200.cpp
@@ -460,9 +446,7 @@ mera/ec7915.cpp
 mera/konin.cpp
 mera/m79152pc.cpp
 mera/vdm7932x.cpp
-mg1/mg1.cpp
 microkey/primo.cpp
-microsoft/xbox.cpp
 microterm/ergo201.cpp
 microterm/microterm_f8.cpp
 microterm/mt420.cpp
@@ -479,7 +463,6 @@ mits/altair.cpp
 mits/mits680b.cpp
 mitsubishi/multi16.cpp
 mitsubishi/multi8.cpp
-mizar/mzr8105.cpp
 morrow/microdec.cpp
 morrow/mpz80.cpp
 morrow/tricep.cpp
@@ -501,7 +484,6 @@ multitech/mkit09.cpp
 multitech/mpf1.cpp
 mupid/mdisk.cpp
 mupid/mupid2.cpp
-nakajima/nakajies.cpp
 nascom/nascom1.cpp
 natsemi/ns32kdb.cpp
 natsemi/ns5652.cpp
@@ -551,7 +533,6 @@ nintendo/vt1682.cpp
 nokia/dbox.cpp
 nokia/mikromik.cpp
 nokia/nokia_3310.cpp
-northstar/horizon.cpp
 novag/cexpert.cpp
 novag/cforte.cpp
 novag/const.cpp
@@ -607,7 +588,6 @@ philips/vg5k.cpp
 philips/yes.cpp
 pitronics/beta.cpp
 poly88/poly88.cpp
-positron/positron.cpp
 psion/psion.cpp
 psion/psion5.cpp
 quantel/dpb7000.cpp
@@ -663,9 +643,7 @@ roland/roland_tr707.cpp
 roland/roland_tr808.cpp
 roland/roland_tr909.cpp
 roland/roland_u20.cpp
-rolm/r9751.cpp
 rtpc/rtpc.cpp
-sage/sage2.cpp
 saitek/ccompan.cpp
 saitek/chesstrv.cpp
 saitek/corona.cpp
@@ -690,7 +668,6 @@ samsung/spc1500.cpp
 sanyo/mbc200.cpp
 sanyo/mbc55x.cpp
 sanyo/phc25.cpp
-saturn/st17xx.cpp
 sega/dccons.cpp
 sega/mdconsole.cpp
 sega/megadriv_rad.cpp
@@ -704,7 +681,6 @@ sega/segapm.cpp
 sega/sg1000.cpp
 sega/sms.cpp
 sega/svmu.cpp
-sequential/prophet600.cpp
 sfrj/galaxy.cpp
 sfrj/galeb.cpp
 sfrj/lola8a.cpp
@@ -753,6 +729,7 @@ sinclair/zx.cpp
 skeleton/aaa.cpp
 skeleton/acd.cpp
 skeleton/aceex.cpp
+skeleton/acvirus.cpp
 skeleton/adacp150.cpp
 skeleton/adds2020.cpp
 skeleton/aid80f.cpp
@@ -769,7 +746,9 @@ skeleton/ampscarp.cpp
 skeleton/anzterm.cpp
 skeleton/argox.cpp
 skeleton/attache.cpp
+skeleton/aviion88k.cpp
 skeleton/ax20.cpp
+skeleton/banctec.cpp
 skeleton/bert.cpp
 skeleton/bitgraph.cpp
 skeleton/blit.cpp
@@ -781,14 +760,18 @@ skeleton/c2color.cpp
 skeleton/candela.cpp
 skeleton/cardinal.cpp
 skeleton/cbnt2039.cpp
+skeleton/ccs2810.cpp
 skeleton/cd100.cpp
 skeleton/cd2650.cpp
 skeleton/cdc721.cpp
 skeleton/cdsys5.cpp
+skeleton/ceres.cpp
 skeleton/cit1500.cpp
 skeleton/ckz80.cpp
 skeleton/clxvme186.cpp
 skeleton/codata.cpp
+skeleton/compucolor.cpp
+skeleton/comquest.cpp
 skeleton/consola_emt.cpp
 skeleton/controlid.cpp
 skeleton/cortex.cpp
@@ -811,6 +794,7 @@ skeleton/dps1.cpp
 skeleton/dsb46.cpp
 skeleton/dual68.cpp
 skeleton/easy_karaoke.cpp
+skeleton/elektronmono.cpp
 skeleton/elzet80.cpp
 skeleton/epic14e.cpp
 skeleton/esprit.cpp
@@ -828,12 +812,14 @@ skeleton/gameking.cpp
 skeleton/gem_rp.cpp
 skeleton/gimix.cpp
 skeleton/gm1000.cpp
+skeleton/gmaster.cpp
 skeleton/gnat10.cpp
 skeleton/goupil.cpp
 skeleton/grfd2301.cpp
 skeleton/hazeltin.cpp
 skeleton/hazl1420.cpp
 skeleton/hohnadam.cpp
+skeleton/horizon.cpp
 skeleton/hp3478a.cpp
 skeleton/hprot1.cpp
 skeleton/hpz80unk.cpp
@@ -856,7 +842,9 @@ skeleton/jade.cpp
 skeleton/jonos.cpp
 skeleton/juku.cpp
 skeleton/junior80.cpp
+skeleton/kminus.cpp
 skeleton/kron.cpp
+skeleton/krz2000.cpp
 skeleton/learnwin.cpp
 skeleton/lee1214.cpp
 skeleton/lee1220.cpp
@@ -868,6 +856,7 @@ skeleton/lms46.cpp
 skeleton/mccpm.cpp
 skeleton/mes.cpp
 skeleton/mfabfz.cpp
+skeleton/mg1.cpp
 skeleton/mice.cpp
 skeleton/micral.cpp
 skeleton/micro20.cpp
@@ -877,6 +866,7 @@ skeleton/mightyframe.cpp
 skeleton/milwaukee.cpp
 skeleton/mindset.cpp
 skeleton/mini2440.cpp
+skeleton/minicom.cpp
 skeleton/miniframe.cpp
 skeleton/miuchiz.cpp
 skeleton/ml20.cpp
@@ -892,14 +882,19 @@ skeleton/mw4pole.cpp
 skeleton/mx2178.cpp
 skeleton/mycom.cpp
 skeleton/myvision.cpp
+skeleton/mzr8105.cpp
+skeleton/nakajies.cpp
 skeleton/newton.cpp
 skeleton/ngen.cpp
 skeleton/notetaker.cpp
 skeleton/onyx.cpp
 skeleton/p8k.cpp
 skeleton/palestra.cpp
+skeleton/pasogo.cpp
+skeleton/patinho_feio.cpp
 skeleton/pdt3100.cpp
 skeleton/pencil2.cpp
+skeleton/pensebem.cpp
 skeleton/perq.cpp
 skeleton/pes.cpp
 skeleton/philipsbo.cpp
@@ -907,16 +902,24 @@ skeleton/picno.cpp
 skeleton/plan80.cpp
 skeleton/pm68k.cpp
 skeleton/pockchal.cpp
+skeleton/positron.cpp
 skeleton/powerstack.cpp
+skeleton/pp.cpp
+skeleton/prophet600.cpp
 skeleton/proteus3.cpp
 skeleton/pt68k4.cpp
 skeleton/ptcsol.cpp
 skeleton/pv9234.cpp
 skeleton/pwp14.cpp
+skeleton/pwrview.cpp
 skeleton/qtsbc.cpp
+skeleton/r9751.cpp
+skeleton/rambo.cpp
 skeleton/rd100.cpp
+skeleton/replicator.cpp
 skeleton/rvoice.cpp
 skeleton/sacstate.cpp
+skeleton/sage2.cpp
 skeleton/sansa_fuze.cpp
 skeleton/sartorius.cpp
 skeleton/sb180.cpp
@@ -932,6 +935,7 @@ skeleton/slsstars.cpp
 skeleton/softbox.cpp
 skeleton/solbourne.cpp
 skeleton/squale.cpp
+skeleton/st17xx.cpp
 skeleton/swyft.cpp
 skeleton/symbolics.cpp
 skeleton/synthex.cpp
@@ -940,6 +944,7 @@ skeleton/sys9002.cpp
 skeleton/systec.cpp
 skeleton/systel1.cpp
 skeleton/tavernie.cpp
+skeleton/tdv2324.cpp
 skeleton/tecnbras.cpp
 skeleton/teleray10.cpp
 skeleton/telex1192.cpp
@@ -956,6 +961,7 @@ skeleton/tr175.cpp
 skeleton/tsispch.cpp
 skeleton/tulip1.cpp
 skeleton/unistar.cpp
+skeleton/univac.cpp
 skeleton/v6809.cpp
 skeleton/vanguardmk1.cpp
 skeleton/vd56sp.cpp
@@ -965,7 +971,9 @@ skeleton/vp415.cpp
 skeleton/vp60.cpp
 skeleton/vsmilepro.cpp
 skeleton/wicat.cpp
+skeleton/wxstar4000.cpp
 skeleton/xbase09.cpp
+skeleton/xbox.cpp
 skeleton/xor100.cpp
 skeleton/zeebo_qualcomm_adreno130.cpp
 skeleton/zms8085.cpp
@@ -987,7 +995,6 @@ sony_news/news_38xx.cpp
 sony_news/news_68k.cpp
 sony_news/news_r3k.cpp
 sord/m5.cpp
-stm/pp.cpp
 sun/sun1.cpp
 sun/sun2.cpp
 sun/sun3.cpp
@@ -1005,14 +1012,11 @@ ta/alphatpc16.cpp
 ta/alphatpx.cpp
 ta/alphatro.cpp
 tab/tabe22.cpp
-tandberg/tdv2324.cpp
 tangerine/alphatan.cpp
 tangerine/hhtiger.cpp
 tangerine/microtan.cpp
 tangerine/oric.cpp
 tatung/einstein.cpp
-teamconcepts/comquest.cpp
-tectoy/pensebem.cpp
 tektronix/tek405x.cpp
 tektronix/tek410x.cpp
 tektronix/tek43xx.cpp
@@ -1144,12 +1148,8 @@ tvgames/xavix.cpp
 tvgames/xavix_2000.cpp
 tvgames/xavix_2002.cpp
 tvgames/xavix2.cpp
-ultimachine/rambo.cpp
-ultratec/minicom.cpp
 unicard/bbcbc.cpp
 unisonic/unichamp.cpp
-unisys/univac.cpp
-usp/patinho_feio.cpp
 ussr/apogee.cpp
 ussr/argo.cpp
 ussr/b2m.cpp
