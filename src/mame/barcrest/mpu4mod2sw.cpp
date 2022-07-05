@@ -1736,7 +1736,7 @@ GAME(199?, m4toplot,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::topl
 
 GAME(199?, m4topgr,   0,          mod2_cheatchr_pal<mpu4_characteriser_pal::topgear_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Top Gear (Barcrest) (MPU4) (TG4 1.1)",GAME_FLAGS )
 
-GAME(199?, m4bj,      0,          mod2_cheatchr_pal<mpu4_characteriser_pal::viz_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default_five_rev,     ROT0,   "Barcrest","Black Jack (Barcrest) (Dutch) (MPU4) (BJ 1.6)",GAME_FLAGS ) // reel issues
+GAME(199?, m4bj,      0,          mod2_cheatchr_pal<mpu4_characteriser_pal::viz_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default_five_rev,     ROT0,   "Barcrest","Black Jack (Barcrest) (Dutch) (MPU4) (BJ 1.6)",GAME_FLAGS )
 
 GAME(199?, m4flash,   0,          mod2_cheatchr_pal<mpu4_characteriser_pal::pzmoney_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Flash Cash (Barcrest) (MPU4, FC 1.0)",GAME_FLAGS )
 
@@ -1801,7 +1801,7 @@ GAME(199?, m4megbksa, m4megbks,   mod2_cheatchr_pal<mpu4_characteriser_pal::age_
 GAME(199?, m4megbksb, m4megbks,   mod2_cheatchr_pal<mpu4_characteriser_pal::age_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Mega Bucks (Barcrest) (MPU4) (BUC 4.1XD)",GAME_FLAGS )
 GAME(199?, m4megbksc, m4megbks,   mod2_cheatchr_pal<mpu4_characteriser_pal::age_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Mega Bucks (Barcrest) (MPU4) (BUC 3.1)",GAME_FLAGS )
 
-GAME(199?, m4mirage,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::alf_characteriser_prot>, mpu4_70pc,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Mirage (Barcrest) (MPU4) (RAG 4.1)",GAME_FLAGS ) // reel issue during play
+GAME(199?, m4mirage,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::alf_characteriser_prot>, mpu4_70pc,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Mirage (Barcrest) (MPU4) (RAG 4.1)",GAME_FLAGS )
 
 GAME(199?, m4nifty,   0,          mod2_cheatchr_pal<mpu4_characteriser_pal::nifty_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Nifty Fifty (Barcrest) (MPU4) (NF 2.0)",GAME_FLAGS )
 GAME(199?, m4niftya,  m4nifty,    mod2_cheatchr_pal<mpu4_characteriser_pal::nifty_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Nifty Fifty (Barcrest) (MPU4) (NF 2.1, set 1)",GAME_FLAGS )
@@ -1847,7 +1847,7 @@ GAME(199?, m4sunsetr, m4sunset,   mod2_cheatchr_pal<mpu4_characteriser_pal::topt
 GAME(199?, m4sunsets, m4sunset,   mod2_cheatchr_pal<mpu4_characteriser_pal::toptake_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 8)",GAME_FLAGS )
 GAME(199?, m4sunsett, m4sunset,   mod2_cheatchr_pal<mpu4_characteriser_pal::toptake_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 9)",GAME_FLAGS )
 // non-standard protection
-GAME(199?, m4sunsetc, m4sunset,   mod2_bootleg_fixedret<0xd0>,    mpu4,    mpu4mod2_machines_state, init_m4default, ROT0,   "bootleg","Sunset Boulevard (Barcrest) (bootleg) (MPU4) (OSB 0.2)",GAME_FLAGS ) // might be a mod 2
+GAME(199?, m4sunsetc, m4sunset,   mod2_bootleg_fixedret<0xd0>,    mpu4,    mpu4mod2_machines_state, init_m4default, ROT0,   "bootleg","Sunset Boulevard (Barcrest) (bootleg) (MPU4) (OSB 0.2)",GAME_FLAGS )
 
 
 GAME(199?, m4supslt,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::rr6_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Supa Slot (Barcrest) (MPU4) (S4S 1.0)",GAME_FLAGS )
@@ -1873,16 +1873,16 @@ GAME(199?, m4tribnk,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::trib
 // unprotected
 GAME(199?, m4tupen,   0,          mod2, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "bootleg","Tuppenny Cracker (unprotected bootleg) (MPU4)",GAME_FLAGS ) // bootleg of Barcrest game
 
-GAME(199?, m421,      0,          mod2_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Twenty One (Barcrest) (MPU4) (DTO 2.0)",GAME_FLAGS ) // reel issues after a few spins
+GAME(199?, m421,      0,          mod2_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default_five_rev,     ROT0,   "Barcrest","Twenty One (Barcrest) (Dutch) (MPU4) (DTO 2.0)",GAME_FLAGS )
 
 GAMEL(199?, m4alpha,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::m435_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4alpha,       ROT0,   "Barcrest","Alphabet (Barcrest) (MPU4) (A4B 1.0)",GAME_FLAGS, layout_m4alpha )
 
 GAME(199?, m4bjack,   0,          mod2_cheatchr_pal<mpu4_characteriser_pal::phr_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Black Jack (Barcrest) (MPU4) (B2J 2.2)",GAME_FLAGS )
 GAME(199?, m4bjacka,  m4bjack,    mod2_cheatchr_pal<mpu4_characteriser_pal::phr_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Black Jack (Barcrest) (MPU4) (BLA 2.0)",GAME_FLAGS )
 
-GAME(199?, m4bjsm,    0,          mod2_cheatchr_pal<mpu4_characteriser_pal::sunsetb_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Blackjack Super Multi (Barcrest) (MPU4) (SM H1.6)",GAME_FLAGS ) // reel issues
+GAME(199?, m4bjsm,    0,          mod2_cheatchr_pal<mpu4_characteriser_pal::sunsetb_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default_five_rev,     ROT0,   "Barcrest","Blackjack Super Multi (Barcrest) (German) (MPU4) (SM H1.6)",GAME_FLAGS )
 // RTC BAT FAIL, before any protection check
-GAME(199?, m4bjsma,   m4bjsm,     mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Blackjack Super Multi (Barcrest) (MPU4) (SM 1.6)",GAME_FLAGS ) // complains about battery, is this a different game?
+GAME(199?, m4bjsma,   m4bjsm,     mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default_five_rev,     ROT0,   "Barcrest","Blackjack Super Multi (Barcrest) (MPU4) (SM 1.6)",GAME_FLAGS ) // complains about battery, is this a different game?
 
 GAME(198?, m4supsl,   0,          mod2_cheatchr_pal<mpu4_characteriser_pal::nifty_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest",   "Supa Silva (Barcrest) (MPU4) (SS2V 1.0)",GAME_FLAGS )
 
@@ -1915,7 +1915,7 @@ GAMEL(199?, m4actclba,m4actclb,   mod2_cheatchr_pal<mpu4_characteriser_pal::actc
 GAME(199?, m4bluemn,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::m4lv_characteriser_prot>, mpu4_70pc,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Blue Moon (Barcrest) (MPU4) (BLU 2.3)",GAME_FLAGS )
 GAME(199?, m4bluemna, m4bluemn,   mod2_cheatchr_pal<mpu4_characteriser_pal::m4lv_characteriser_prot>, mpu4_70pc,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Blue Moon (Barcrest) (MPU4) (BLU 2.1)",GAME_FLAGS )
 // not using standard protection, hack?
-GAME(199?, m4bluemnb, m4bluemn,   mod2_bootleg_fixedret<0x51>, mpu4_70pc,            mpu4mod2_machines_state, init_m4default,     ROT0,   "hack?","Blue Moon (Barcrest) (MPU4) (BLU 1.1)",GAME_FLAGS ) // bad chr, non-blanked out start of rom (hack?)
+GAME(199?, m4bluemnb, m4bluemn,   mod2_bootleg_fixedret<0x51>, mpu4_70pc,            mpu4mod2_machines_state, init_m4default,     ROT0,   "hack?","Blue Moon (Barcrest) (MPU4) (BLU 1.1)",GAME_FLAGS )
 
 GAME(199?, m4take2,   0,          mod2_cheatchr_pal<mpu4_characteriser_pal::take2_characteriser_prot>, mpu4,   mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Take Two (Barcrest) (MPU4) (TTO 1.2)",GAME_FLAGS )
 // not using standard protection, hack?
@@ -1933,7 +1933,7 @@ GAME(199?, m4celclb,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::celc
 
 GAME(199?, m4centpt, 0,   mod2_cheatchr_pal<mpu4_characteriser_pal::actionbank_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Centrepoint (Barcrest) (MPU4) (DU 1.3)",GAME_FLAGS )
 
-GAME(199?, m4clbcls,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::m533_characteriser_prot>, mpu420p,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Club Classic (Barcrest) (MPU4) (CI  1.1)",GAME_FLAGS ) // set stake (still moans tho)
+GAME(199?, m4clbcls,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::m533_characteriser_prot>, mpu420p,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Club Classic (Barcrest) (MPU4) (CI  1.1)",GAME_FLAGS ) // set stake
 
 GAME(199?, m4c999,   0,           mod2_cheatchr_pal<mpu4_characteriser_pal::tictak_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Barcrest","Cloud 999 (Barcrest) (MPU4) (CLN 4.0 V)",GAME_FLAGS )
 // these are bootlegs with non-standard protection
@@ -2090,8 +2090,8 @@ GAME(199?, m4joltav,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::m574
 GAME(199?, m4joltava, m4joltav,   mod2_cheatchr_pal<mpu4_characteriser_pal::viva_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Jolly Taverner (Barcrest) (MPU4) (JT__ 2.0, set 1)",GAME_FLAGS )
 GAME(199?, m4joltavb, m4joltav,   mod2_cheatchr_pal<mpu4_characteriser_pal::viva_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Jolly Taverner (Barcrest) (MPU4) (JT__ 2.0, set 2)",GAME_FLAGS )
 //
-GAME(199?, m4unkjokb, m4joltav,   mod2_bootleg_fixedret<0x11>,       mpu4,    mpu4mod2_machines_state, init_m4default, ROT0,   "bootleg","Jolly Taverner (Barcrest) (bootleg) (MPU4) (TAV 1.1, set 1)",GAME_FLAGS ) // bad chr
-GAME(199?, m4unkjokc, m4joltav,   mod2_bootleg_fixedret<0x11>,       mpu4,    mpu4mod2_machines_state, init_m4default, ROT0,   "bootleg","Jolly Taverner (Barcrest) (bootleg) (MPU4) (TAV 1.1, set 2)",GAME_FLAGS ) // bad chr
+GAME(199?, m4unkjokb, m4joltav,   mod2_bootleg_fixedret<0x11>,       mpu4,    mpu4mod2_machines_state, init_m4default, ROT0,   "bootleg","Jolly Taverner (Barcrest) (bootleg) (MPU4) (TAV 1.1, set 1)",GAME_FLAGS )
+GAME(199?, m4unkjokc, m4joltav,   mod2_bootleg_fixedret<0x11>,       mpu4,    mpu4mod2_machines_state, init_m4default, ROT0,   "bootleg","Jolly Taverner (Barcrest) (bootleg) (MPU4) (TAV 1.1, set 2)",GAME_FLAGS )
 
 // this has a 'tri98' protection sequence check in ROM, but the code appears to have been hacked to expect a different response.
 GAME(199?, m4btclok,  0,          mod2_bootleg_fixedret<0x45>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "bootleg","Beat The Clock (Barcrest) (bootleg) (MPU4)",GAME_FLAGS )
