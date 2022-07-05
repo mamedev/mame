@@ -53,23 +53,6 @@ ROM_START( m4crzjk )
 ROM_END
 
 
-ROM_START( m4jok300 )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "cjo", 0x0000, 0x020000, CRC(386e99db) SHA1(5bb0b513ef63ffaedd98b8e9e7206658fe784fda) )
-
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASEFF )
-	//ROM_LOAD( "cjo.snd", 0x0000, 0x080000, NO_DUMP )
-ROM_END
-
-ROM_START( m4jokmil )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "cjm03.epr", 0x0000, 0x020000, CRC(e5e4986e) SHA1(149b950a739ad308f7759927c344de8193ce67c5) )
-
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASEFF )
-	//ROM_LOAD( "cjm03.snd", 0x0000, 0x080000, NO_DUMP )
-ROM_END
-
-
 ROM_START( m4luckdv )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cld_16.bin", 0x0000, 0x010000, CRC(89f63938) SHA1(8d3a5628e2c0bf39784afe2f00a007d40ea35423) )
@@ -831,10 +814,6 @@ ROM_END
 #define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
 
 
-
-// yes, the ingame display is 'Millenium' not 'Millennium'.  There are also strings from The Crystal Maze in the ROM, probably used as a base project?
-GAME(199?, m4jokmil,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m683_characteriser_prot>,    mpu4_dutch_invcoin,    mpu4unsorted_state, init_m4default_big_lextender,ROT0,"Barcrest","Jokers Millenium 300 (Barcrest) (German) (MPU4) (DJO 0.1, set 1)",GAME_FLAGS ) // DM1 SW ALM
-GAME(199?, m4jok300,  m4jokmil,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::m683_characteriser_prot>,    mpu4_dutch_invcoin,    mpu4unsorted_state, init_m4default_big_lextender,ROT0,"Barcrest","Jokers Millenium 300 (Barcrest) (German) (MPU4) (DJO 0.1, set 2)",GAME_FLAGS ) // DM1 SW ALM
 
 
 GAME(199?, m4luckdv,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Lucky Devil (Barcrest) (Czech) (MPU4) (CLD 3.0)",GAME_FLAGS ) // AUX2 locked

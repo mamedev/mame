@@ -2620,16 +2620,21 @@ void mpu4_state::mod2_alt_cheatchr(machine_config &config)
 
 ***********************************************************************************************/
 
+void mpu4_state::add_ym2413(machine_config &config)
+{
+	YM2413(config, m_ym2413, XTAL(3'579'545)); // XTAL on sound board
+	m_ym2413->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_ym2413->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
+
 void mpu4_state::mod4yam(machine_config &config)
 {
 	mpu4base(config);
 	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4yam)
 
 	mpu4_reels<0, 6>(config);
-	 
-	YM2413(config, m_ym2413, XTAL(3'579'545)/2); // XTAL on sound board
-	m_ym2413->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_ym2413->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+
+	add_ym2413(config);
 }
 
 void mpu4_state::mod4yam_no_bacta(machine_config &config)
@@ -2672,9 +2677,7 @@ void mpu4_state::mod4yam_alt(machine_config &config)
 
 	mpu4_reels<1, 6>(config);
 
-	YM2413(config, m_ym2413, XTAL(3'579'545)/2); // XTAL on sound board
-	m_ym2413->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_ym2413->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	add_ym2413(config);
 }
 
 void mpu4_state::mod4yam_7reel(machine_config &config)
@@ -2684,9 +2687,7 @@ void mpu4_state::mod4yam_7reel(machine_config &config)
 
 	mpu4_reels<0, 7>(config);
 
-	YM2413(config, m_ym2413, XTAL(3'579'545)/2); // XTAL on sound board
-	m_ym2413->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_ym2413->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	add_ym2413(config);
 }
 
 /***********************************************************************************************

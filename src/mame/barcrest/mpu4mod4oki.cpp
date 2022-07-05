@@ -8941,7 +8941,33 @@ ROM_END
 // gives an "IMD ?" message if you attempt to coin it up
 GAME(199?, m4joljokh, 0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::salsa_characteriser_prot>,    mpu4,    mpu4mod4oki_machines_state, init_m4default, ROT0,   "Barcrest","Jolly Joker (Barcrest) (Hungarian) (MPU4) (HJJ 1.4)",GAME_FLAGS )
 
+/*****************************************************************************************************************************************************************************
+*
+* Jokers Millenium 300 
+*  - the ingame display is 'Millenium' not 'Millennium'
+*  - there are also strings from The Crystal Maze in the ROM, probably used as a base project?
+*  - requires a sample ROM to be present or will hang reading sound status
+*
+*****************************************************************************************************************************************************************************/
 
+ROM_START( m4jok300a )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "cjo", 0x0000, 0x020000, CRC(386e99db) SHA1(5bb0b513ef63ffaedd98b8e9e7206658fe784fda) )
+
+	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_LOAD( "generic_dutch_sound1.bin", 0x0000, 0x080000, BAD_DUMP CRC(f247ba83) SHA1(9b173503e63a4a861d1380b2ab1fe14af1a189bd) )
+ROM_END
+
+ROM_START( m4jok300 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "cjm03.epr", 0x0000, 0x020000, CRC(e5e4986e) SHA1(149b950a739ad308f7759927c344de8193ce67c5) )
+
+	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_LOAD( "generic_dutch_sound1.bin", 0x0000, 0x080000, BAD_DUMP CRC(f247ba83) SHA1(9b173503e63a4a861d1380b2ab1fe14af1a189bd) )
+ROM_END
+
+GAME(199?, m4jok300,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m683_characteriser_prot>,    mpu4_dutch_invcoin,    mpu4mod4oki_machines_state, init_m4default_big_lextender,ROT0,"Barcrest","Jokers Millenium 300 (Barcrest) (German) (MPU4) (DJO 0.1, set 1)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4jok300a, m4jok300,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::m683_characteriser_prot>,    mpu4_dutch_invcoin,    mpu4mod4oki_machines_state, init_m4default_big_lextender,ROT0,"Barcrest","Jokers Millenium 300 (Barcrest) (German) (MPU4) (DJO 0.1, set 2)",GAME_FLAGS ) // DM1 SW ALM
 
 /*****************************************************************************************************************************************************************************
 *

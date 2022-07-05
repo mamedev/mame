@@ -485,6 +485,7 @@ protected:
 	void mpu4_install_mod4yam_space(address_space &space);
 	void mpu4_install_mod4oki_space(address_space &space);
 	void mpu4_config_common();
+	void add_ym2413(machine_config& config);
 
 	DECLARE_MACHINE_START(mod2);
 	DECLARE_MACHINE_RESET(mpu4);

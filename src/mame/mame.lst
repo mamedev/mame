@@ -24471,8 +24471,6 @@ m4hstrcsa                       //
 m4hstrcsb                       //
 m4hstrcsc                       //
 m4hstrcsd                       //
-m4jok300                        // Jokers 300 (Barcrest)
-m4jokmil                        // Jokers Millennium (Barcrest)
 m4jp777                         // Jackpot 777
 m4jungj                         // Jungle Japes
 m4jungja                        //
@@ -27533,6 +27531,8 @@ m4hotrod__u                     //
 m4hotrod__v                     //
 m4holdtm                        // Hold Timer (Barcrest)
 m4hpyjok                        // Happy Joker (Barcrest)
+m4jok300                        // Jokers Millenium 300
+m4jok300a                       // 
 m4jolgem                        // Jolly Gems (Barcrest)
 m4jolgem__0                     //
 m4jolgem__1                     //
