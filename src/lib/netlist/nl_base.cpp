@@ -183,7 +183,7 @@ namespace netlist
 		// This is for core macro libraries
 		m_setup->parser().add_include<plib::psource_str_t>("devices/net_lib.h",
 														   content);
-#if 0
+#if 1
 		NETLIST_NAME(base_lib)(m_setup->parser());
 		//#m_setup->parser().register_source<source_pattern_t>("../macro/modules/nlmod_{1}.cpp");
 		//#m_setup->parser().register_source<source_pattern_t>("../macro/nlm_{1}.cpp");
