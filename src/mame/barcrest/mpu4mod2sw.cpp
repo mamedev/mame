@@ -1725,7 +1725,7 @@ GAMEL(199?, m4actpaka,m4actpak,   mod2_cheatchr_pal<mpu4_characteriser_pal::clbv
 
 GAMEL(199?, m4alladv, 0,          mod2_cheatchr_pal<mpu4_characteriser_pal::buc_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4alladv,      ROT0,   "Barcrest","All Cash Advance (Barcrest) (MPU4) (C2B 6.0)",GAME_FLAGS, layout_m4alladv )
 
-GAME(199?, m4clbdbl,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::m574_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Club Double (Barcrest) (MPU4) (CD 1.6)",GAME_FLAGS ) // reel issues
+GAME(199?, m4clbdbl,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::m574_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default_five_rev,     ROT0,   "Barcrest","Club Double (Barcrest) (MPU4) (CD 1.6)",GAME_FLAGS )
 
 GAME(199?, m4hittp2,  m4hittop,   mod2_cheatchr_pal<mpu4_characteriser_pal::hittop_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Hit The Top (Barcrest) (MPU4, Mod 2 type, H4T 2.0, set 1)",GAME_FLAGS )
 GAME(199?, m4hittp2a, m4hittop,   mod2_cheatchr_pal<mpu4_characteriser_pal::hittop_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Hit The Top (Barcrest) (MPU4, Mod 2 type, H4T 2.0, set 2)",GAME_FLAGS )
@@ -1736,7 +1736,7 @@ GAME(199?, m4toplot,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::topl
 
 GAME(199?, m4topgr,   0,          mod2_cheatchr_pal<mpu4_characteriser_pal::topgear_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Top Gear (Barcrest) (MPU4) (TG4 1.1)",GAME_FLAGS )
 
-GAME(199?, m4bj,      0,          mod2_cheatchr_pal<mpu4_characteriser_pal::viz_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Black Jack (Barcrest) (Dutch) (MPU4) (BJ 1.6)",GAME_FLAGS ) // reel issues
+GAME(199?, m4bj,      0,          mod2_cheatchr_pal<mpu4_characteriser_pal::viz_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default_five_rev,     ROT0,   "Barcrest","Black Jack (Barcrest) (Dutch) (MPU4) (BJ 1.6)",GAME_FLAGS ) // reel issues
 
 GAME(199?, m4flash,   0,          mod2_cheatchr_pal<mpu4_characteriser_pal::pzmoney_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Flash Cash (Barcrest) (MPU4, FC 1.0)",GAME_FLAGS )
 
