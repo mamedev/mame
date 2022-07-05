@@ -34,6 +34,7 @@
 //
 
 NETLIST_START(speedfrk)
+{
 
 	SOLVER(Solver, 1000)
 	PARAM(Solver.DYNAMIC_TS, 1)
@@ -448,4 +449,4 @@ NETLIST_START(speedfrk)
 	HINT(U24.10, NC)    // Q4
 	HINT(U24.11, NC)    // Q5
 
-NETLIST_END()
+}

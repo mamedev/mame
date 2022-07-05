@@ -36,6 +36,9 @@ SpacesInAngles: false
 SpaceBeforeAssignmentOperators: true
 AlignConsecutiveDeclarations: true
 
+#Clang>=14
+#AlignArrayOfStructures: Left
+
 AllowShortIfStatementsOnASingleLine: false
 AllowShortCaseLabelsOnASingleLine: true
 AllowAllArgumentsOnNextLine: false
@@ -68,16 +71,17 @@ IncludeCategories:
     Priority:        10
 
 StatementMacros: 
-  - "NETLIB_DEVICE_IMPL_NS"
-  - "TTL_7400_NAND"
-  - "TTL_7402_NOR"
-  - "NET_C"
-  - "TRUTHTABLE_ENTRY"
-  - "LOCAL_LIB_ENTRY"
+  - "DIPPINS"
   - "TT_HEAD"
   - "TT_LINE"
   - "TT_FAMILY"
-  - "DIPPINS"
+#  - "TRUTH_TABLE"
+#  - "NETLIB_DEVICE_IMPL_NS"
+#  - "TTL_7400_NAND"
+#  - "TTL_7402_NOR"
+#  - "NET_C"
+#  - "TRUTHTABLE_ENTRY"
+  - "LOCAL_LIB_ENTRY"
 
 #StatementAttributeLikeMacros: 
 #  - "NETLIST_NAME"
@@ -87,16 +91,22 @@ TypenameMacros:
   - "NETLIST_NAME"
   - "NETLIB_NAME"
 
+WhitespaceSensitiveMacros: 
+  - "ALIAS"
+  - "NET_C"
+  - "DIPPINS"
+
 IndentPPDirectives: BeforeHash
-MacroBlockBegin: "^static NETLIST_START\\(.*\\)|static TRUTHTABLE_START\\(.*\\)$"
+MacroBlockBegin: "^static NETLIST_START\\(.+\\)|static TRUTHTABLE_START\\(.*\\)$"
 MacroBlockEnd: "^NETLIST_END\\(\\)|TRUTHTABLE_END\\(\\)$"
 # ReferenceAlignment: Middle
-# Avoid formatting (breaking) doxygen
-CommentPragmas:  '^\\.+'
-# Avoid formatting cspell ignored comments
-CommentPragmas:  '^#.+'
-# Avoid breaking tables
-CommentPragmas:  '^\|.+'
-# Avoid breaking clang-tidy
-CommentPragmas:  '^ NOLINT.+'
+
+# Avoid formatting 
+# -- clang-tidy
+#  - cspell
+#  - Doxygen tables
+#  - Doxygen commands
+#  - ignored comments
+#  - nltool parsed documentation
+CommentPragmas:  '^( NOLINT.+| spell-checker.+|/ \|.+|/ \\.+|#.+|-.+)'
 

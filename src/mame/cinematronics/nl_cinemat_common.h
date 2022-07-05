@@ -100,6 +100,7 @@
 #define LM556_DIP NE556_DIP
 
 static NETLIST_START(_NE556_DIP)
+{
 	NE555(A)
 	NE555(B)
 
@@ -116,7 +117,7 @@ static NETLIST_START(_NE556_DIP)
 		   A.GND, /*    GND |7            8| 2TRIG  */ B.TRIG
 				  /*        +--------------+        */
 	)
-NETLIST_END()
+}
 
 
 
@@ -127,6 +128,7 @@ NETLIST_END()
 #define TL182_DIP(name) SUBMODEL(_TL182_DIP, name)
 
 static NETLIST_START(_TL182_DIP)
+{
 	CD4066_GATE(A)
 	CD4066_GATE(B)
 
@@ -156,7 +158,7 @@ static NETLIST_START(_TL182_DIP)
 		A.VDD, /*  VLL |7            8| VREF */ A.VSS
 			   /*      +--------------+      */
 	)
-NETLIST_END()
+}
 
 
 
@@ -174,6 +176,7 @@ NETLIST_END()
 
 // Model dervied from https://www.onsemi.com/support/design-resources/models?rpn=2N6284
 static NETLIST_START(_Q_2N6426)
+{
 
 	QBJT_EB(Q1, "NPN(IS=1.73583e-11 BF=831.056 NF=1.05532 VAF=957.147 IKF=0.101183 ISE=1.65383e-10 NE=1.59909 BR=2.763 NR=1.03428 VAR=4.18534 IKR=0.0674174 ISC=1.00007e-13 NC=2.00765 RB=22.2759 IRB=0.208089 RBM=22.2759 RE=0.0002 RC=0.001 XTB=2.12676 XTI=1.82449 EG=1.05 CJE=2.62709e-10 VJE=0.95 MJE=0.23 TF=1e-09 XTF=1 VTF=10 ITF=0.01 CJC=3.59851e-10 VJC=0.845279 MJC=0.23 XCJC=0.9 FC=0.5 TR=1e-07 PTF=0 KF=0 AF=1)")
 
@@ -190,12 +193,13 @@ static NETLIST_START(_Q_2N6426)
 	NET_C(Q1.B, R1.1)
 	NET_C(Q2.E, D1.A, R2.2)
 	NET_C(Q1.E, Q2.B, R1.2, R2.1)
-NETLIST_END()
+}
 
 #else
 
 // super brain-dead model I threw together from a pair of 2N3904
 static NETLIST_START(_Q_2N6426)
+{
 	QBJT_EB(Q1, "NPN")
 	QBJT_EB(Q2, "NPN")
 
@@ -204,7 +208,7 @@ static NETLIST_START(_Q_2N6426)
 	ALIAS(E, Q2.E)
 	NET_C(Q1.C, Q2.C)
 	NET_C(Q1.E, Q2.B)
-NETLIST_END()
+}
 
 #endif
 
@@ -217,6 +221,7 @@ NETLIST_END()
 #define LM3900_DIP(name) SUBMODEL(_LM3900_DIP, name)
 
 static NETLIST_START(_LM3900_DIP)
+{
 	LM3900(A)
 	LM3900(B)
 	LM3900(C)
@@ -235,7 +240,7 @@ static NETLIST_START(_LM3900_DIP)
 		A.GND, /*  GND |7            8| 3IN- */ C.MINUS
 			   /*      +--------------+      */
 	)
-NETLIST_END()
+}
 
 
 
@@ -280,6 +285,7 @@ NETLIST_END()
 // the presence of an AFUNC.
 //
 static NETLIST_START(_CA3080_FAST_DIP)
+{
 	ALIAS(2, F.A0) // -
 	ALIAS(3, F.A1) // +
 	ALIAS(4, F.A2) // V-
@@ -299,7 +305,7 @@ static NETLIST_START(_CA3080_FAST_DIP)
 	ANALOG_INPUT(XGND, 0)
 	NET_C(XGND, VO.IN, VO.ON) // FIXME: assume symmetric supply
 	NET_C(F.Q, VO.IP)
-NETLIST_END()
+}
 
 
 //
@@ -312,6 +318,7 @@ NETLIST_END()
 // CA3080's.
 //
 static NETLIST_START(_CA3080_SLOW_DIP)
+{
 //
 // These items are common to several models
 //
@@ -356,7 +363,7 @@ static NETLIST_START(_CA3080_SLOW_DIP)
 	NET_C(Q7.E, Q8.C, Q8.B, Q9.B)       // N1N36
 	NET_C(Q4.C, Q5.E, Q10.E)            // N1N52
 	NET_C(Q11.B, Q12.C, Q12.B, Q13.E)   // N1N44
-NETLIST_END()
+}
 
 
 

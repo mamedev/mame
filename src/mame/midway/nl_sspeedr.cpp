@@ -46,6 +46,7 @@
 
 
 static NETLIST_START(sspeedr_noisegen)
+{
 
 	// See p. 25 of the Super Speed Race manual for the motherboard
 	// schematic, which includes the noise generator.
@@ -97,7 +98,7 @@ static NETLIST_START(sspeedr_noisegen)
 
 	ALIAS(NOISE_OUT, H5_SHFTREG.10)
 
-NETLIST_END()
+}
 
 
 //
@@ -106,6 +107,7 @@ NETLIST_END()
 
 
 static NETLIST_START(sspeedr_schematics)
+{
 
 	// **** Conversion of accelerator level to "engine speed" control
 	// **** voltage for engine sound, with capacitor-based "engine
@@ -529,10 +531,11 @@ static NETLIST_START(sspeedr_schematics)
 
 	ALIAS(OUTPUT, J1_1.OUT)
 
-NETLIST_END()
+}
 
 
 NETLIST_START(sspeedr)
+{
 
 	SOLVER(Solver, 48000)
 
@@ -648,4 +651,4 @@ NETLIST_START(sspeedr)
 	OPTIMIZE_FRONTIER(R27.1, RES_K(286), 50)
 #endif
 
-NETLIST_END()
+}

@@ -29,6 +29,7 @@
 //
 
 NETLIST_START(warrior)
+{
 
 #if (HLE_PITFALL_VCO)
 	SOLVER(Solver, 1000)
@@ -488,4 +489,4 @@ NETLIST_START(warrior)
     HINT(IC5.12, NC)    // Q5
 */
 
-NETLIST_END()
+}

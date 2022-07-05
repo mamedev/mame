@@ -45,6 +45,7 @@
 //
 
 NETLIST_START(solarq)
+{
 
 	SOLVER(Solver, 1000)
 	PARAM(Solver.DYNAMIC_TS, 1)
@@ -1270,4 +1271,4 @@ NETLIST_START(solarq)
 	OPTIMIZE_FRONTIER(U49.3, RES_M(1), 50)
 #endif
 
-NETLIST_END()
+}

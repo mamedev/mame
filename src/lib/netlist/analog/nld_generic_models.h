@@ -216,10 +216,10 @@ namespace netlist::analog
 	class generic_diode
 	{
 	public:
-		generic_diode(core_device_t &dev, const pstring &name)
-		: m_Vd(dev, name + ".m_Vd", nlconst::diode_start_voltage())
-		, m_Id(dev, name + ".m_Id", nlconst::zero())
-		, m_G(dev,  name + ".m_G", nlconst::cgminalt())
+		generic_diode()
+		: m_Vd(nlconst::diode_start_voltage())
+		, m_Id(nlconst::zero())
+		, m_G(nlconst::cgminalt())
 		, m_Vt(nlconst::zero())
 		, m_Vmin(nlconst::zero()) // not used in MOS model
 		, m_Is(nlconst::zero())
@@ -233,6 +233,14 @@ namespace netlist::analog
 			  , nlconst::one()
 			  , nlconst::cgminalt()
 			  , nlconst::T0());
+		}
+
+		generic_diode(core_device_t &dev, const pstring &name)
+		: generic_diode()
+		{
+			dev.state().save(dev, m_Vd, dev.name(), name + ".m_Vd");
+			dev.state().save(dev, m_Id, dev.name(), name + ".m_Id");
+			dev.state().save(dev, m_G, dev.name(), name + ".m_G");
 		}
 		// Basic math
 		//
@@ -253,7 +261,7 @@ namespace netlist::analog
 					// if the old voltage is less than zero and new is above
 					// make sure we move enough so that matrix and current
 					// changes.
-					const nl_fptype old = std::max(nlconst::zero(), m_Vd());
+					const nl_fptype old = std::max(nlconst::zero(), m_Vd);
 					const nl_fptype d = std::min(+fp_constants<nl_fptype>::DIODE_MAXDIFF(), nVd - old);
 					const nl_fptype a = plib::abs(d) * m_VtInv;
 					m_Vd = old + plib::signum(d) * plib::log1p(a) * m_Vt;
@@ -351,9 +359,9 @@ namespace netlist::analog
 		// owning object must save those ...
 
 	private:
-		state_var<nl_fptype> m_Vd;
-		state_var<nl_fptype> m_Id;
-		state_var<nl_fptype> m_G;
+		nl_fptype m_Vd;
+		nl_fptype m_Id;
+		nl_fptype m_G;
 
 		nl_fptype m_Vt;
 		nl_fptype m_Vmin;

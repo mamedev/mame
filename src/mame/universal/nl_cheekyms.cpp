@@ -41,6 +41,7 @@
  */
 
 static NETLIST_START(cheekyms_schematics)
+{
 
 	// Shared chips
 	TTL_7404_DIP(IC1)
@@ -232,21 +233,23 @@ static NETLIST_START(cheekyms_schematics)
 	NET_C(R46.2, R43.2, VR1.1)
 	NET_C(VR1.3, GND)
 
-NETLIST_END()
+}
 
 /* simple noise generator to replace BJT E-B one
  *
  */
 
 static NETLIST_START(NOISE)
+{
 	CS(FC, 0)
 	PARAM(FC.FUNC, "0.0000001 * rand()")
 
 	ALIAS(E, FC.P)
 	ALIAS(B, FC.N)
-NETLIST_END()
+}
 
 NETLIST_START(cheekyms)
+{
 
 	SOLVER(Solver, 48000)
 	PARAM(Solver.ACCURACY, 1e-10)
@@ -291,6 +294,6 @@ NETLIST_START(cheekyms)
 	NET_C(GND, I_MUTE.GND, I_CHEESE.GND, I_MUSIC.GND, I_MOUSE.GND, I_HAMMER.GND,
 		I_PEST.GND, I_MOUSE_DIES.GND, I_PEST_DIES.GND, I_COIN_EXTRA.GND)
 
-NETLIST_END()
+}
 
 

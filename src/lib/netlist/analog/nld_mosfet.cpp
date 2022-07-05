@@ -30,16 +30,10 @@
 
 #define BODY_CONNECTED_TO_SOURCE    (1)
 
-namespace netlist
-{
-namespace analog
+namespace netlist::analog
 {
 
 	using constants = plib::constants<nl_fptype>;
-
-	// -----------------------------------------------------------------------------
-	// nld_FET - Base classes
-	// -----------------------------------------------------------------------------
 
 	/// \brief Class representing the nmos/pmos model parameters.
 	///
@@ -53,7 +47,7 @@ namespace analog
 	///  Typically, SPICE uses the following parameters. A "Y" in the first
 	///  column indicates that the parameter is actually used in netlist.
 	///
-	/// | NL? |Name  |                                                            Description|Units  |Default   |Example          |
+	/// |NL? |Name  |                                                            Description|Units  |Default   |Example          |
 	/// |:---:|------|-----------------------------------------------------------------------|-------|---------:|----------------:|
 	/// |  Y  |Vto   | Zero-bias threshold voltage                                           | V     | 0        | 1               |
 	/// |  Y  |Kp    | Transconductance parameter                                            | A/V²  | 0.00002  | 0.00003         |
@@ -576,16 +570,43 @@ namespace analog
 		//                 S          D
 		m_SD.set_mat(  zero,    gSD + gBD,    zero,          // S
 					   gDS + gDB,   zero,       zero    );     // D
+
+		/// |
+		/// |               D                S              G          I
+		/// |
+		/// | D        gDD               gDS + gDB        gDG           ID
+		///
+		/// | S     gSD + gBD             gSSBB         gSG + gBG     IS+IB
+		///
+		/// | G         gGD              gGS + gGB       gGG           IG
+		/// |
+		/// | forward=yes, bulk diode=no, backgate transconductance=no
+		/// | IG = 0, gGG = 0, gGS, gGB =0, gGD=0l
+		///   gDD=gds + gbd=gds
+		///   gSD+gBD=-gds + gmb - gbd = -gds
+		///
+		/// |               D                S              G          I
+		/// |
+		/// | D        gDD               gDS + gDB        gDG           ID
+		///
+		/// | S     gSD + gBD             gSSBB         gSG + gBG     IS+IB
+		///
+		/// | G         0                   0                0              0
+		/// |
+		/// |
+		/// |
+		/// |
+		/// |
+		/// |
 	}
 
 	NETLIB_UPDATE_PARAM(MOSFET)
 	{
 	}
 
-} // namespace analog
+} // namespace netlist::analog
 
-namespace devices {
+namespace netlist::devices {
 	NETLIB_DEVICE_IMPL_NS(analog, MOSFET, "MOSFET", "MODEL")
-} // namespace devices
+} // namespace netlist::devices
 
-} // namespace netlist

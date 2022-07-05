@@ -218,6 +218,7 @@
 
 
 static NETLIST_START(gunfight_schematics)
+{
 
 	// **** Sound effect activation switches.
 
@@ -766,10 +767,11 @@ static NETLIST_START(gunfight_schematics)
 	// Nor am I sure whether it matters in practice. In any case, it's not
 	// modeled here.
 
-NETLIST_END()
+}
 
 
 NETLIST_START(gunfight)
+{
 
 	SOLVER(Solver, 48000)
 	PARAM(Solver.SORT_TYPE, "ASCENDING")
@@ -821,4 +823,4 @@ NETLIST_START(gunfight)
 	OPTIMIZE_FRONTIER(C305.1, RES_M(1), 50)
 #endif
 
-NETLIST_END()
+}

@@ -36,6 +36,7 @@
 //
 
 NETLIST_START(barrier)
+{
 
 	SOLVER(Solver, 1000)
 	PARAM(Solver.DYNAMIC_TS, 1)
@@ -298,4 +299,4 @@ NETLIST_START(barrier)
 	OPTIMIZE_FRONTIER(R38.1, RES_M(1), 50)
 #endif
 
-NETLIST_END()
+}

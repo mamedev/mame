@@ -55,8 +55,8 @@ sed -e 's/#define \(.*\)"\(.*\)"[ \t]*,[ \t]*\(.*\)/NET_ALIAS(\1,\2.\3)/' src/ma
 
 #define CONNECTION( ... ) CONNECTIONY( CONNECTIONX( __VA_ARGS__ ) )
 #define CONNECTIONY(a) a
-#define CONNECTIONX(a, b, c, d) setup.register_link(a "." # b, c "." # d);
-#define NET_CSTR(a, b) setup.register_link( a, b);
+#define CONNECTIONX(a, b, c, d) setup.register_connection(a "." # b, c "." # d);
+#define NET_CSTR(a, b) setup.register_connection( a, b);
 
 #define OHM(x) (x)
 #define K_OHM(x) ((x) * 1000.0)
@@ -117,8 +117,9 @@ public:
 #endif
 
 
-#define CIRCUIT_LAYOUT(x) NETLIST_START(x)
-#define CIRCUIT_LAYOUT_END NETLIST_END()
+#define CIRCUIT_LAYOUT(x) NETLIST_START(x) {
+
+#define CIRCUIT_LAYOUT_END }
 
 #define CHIP_555_Mono(name,  pdesc)   \
 	NE555_DIP(name) \

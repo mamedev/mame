@@ -33,6 +33,7 @@
 //
 
 NETLIST_START(armora)
+{
 
 #if (HLE_TANK_VCO)
 	SOLVER(Solver, 1000)
@@ -678,4 +679,4 @@ NETLIST_START(armora)
 	HINT(IC13.11, NC)
 //    HINT(IC27.2, NC)
 
-NETLIST_END()
+}
