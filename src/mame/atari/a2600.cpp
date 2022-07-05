@@ -635,16 +635,15 @@ void a2600_base_state::a2600_base_ntsc(machine_config &config)
 	m_riot->out_pb_callback().set(FUNC(a2600_state::switch_B_w));
 	m_riot->irq_callback().set(FUNC(a2600_state::irq_callback));
 #endif
+
+	VCS_CONTROL_PORT(config, CONTROL1_TAG, vcs_control_port_devices, "joy");
+	VCS_CONTROL_PORT(config, CONTROL2_TAG, vcs_control_port_devices, "joy");
 }
 
 
 void a2600_state::a2600(machine_config &config)
 {
 	a2600_base_ntsc(config);
-
-	VCS_CONTROL_PORT(config, CONTROL1_TAG, vcs_control_port_devices, "joy");
-	VCS_CONTROL_PORT(config, CONTROL2_TAG, vcs_control_port_devices, nullptr);
-
 	a2600_cartslot(config);
 	subdevice<software_list_device>("cart_list")->set_filter("NTSC");
 }
@@ -688,7 +687,7 @@ void a2600_state::a2600p(machine_config &config)
 #endif
 
 	VCS_CONTROL_PORT(config, CONTROL1_TAG, vcs_control_port_devices, "joy");
-	VCS_CONTROL_PORT(config, CONTROL2_TAG, vcs_control_port_devices, nullptr);
+	VCS_CONTROL_PORT(config, CONTROL2_TAG, vcs_control_port_devices, "joy");
 
 	a2600_cartslot(config);
 	subdevice<software_list_device>("cart_list")->set_filter("PAL");
@@ -699,9 +698,6 @@ void a2600_pop_state::a2600_pop(machine_config &config)
 {
 	a2600_base_ntsc(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &a2600_pop_state::memory_map);
-
-	VCS_CONTROL_PORT(config, CONTROL1_TAG, vcs_control_port_devices, "joy");
-	VCS_CONTROL_PORT(config, CONTROL2_TAG, vcs_control_port_devices, "joy");
 }
 
 
