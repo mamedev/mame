@@ -694,9 +694,9 @@ void jmfb_device::update_screen(screen_device &screen, bitmap_rgb32 &bitmap, con
 						rgb_t const c = pen_color(BIT(pixbelow, p));
 						*scanline++ = trans(
 								rgb_t(
-									(a.r() + (uint16_t(b.r()) << 1) + c.r()) >> 2,
-									(a.g() + (uint16_t(b.g()) << 1) + c.g()) >> 2,
-									(a.b() + (uint16_t(b.b()) << 1) + c.b()) >> 2));
+									(a.r() + (uint16_t(b.r()) << 1) + c.r() + 2) >> 2,
+									(a.g() + (uint16_t(b.g()) << 1) + c.g() + 2) >> 2,
+									(a.b() + (uint16_t(b.b()) << 1) + c.b() + 2) >> 2));
 					}
 				}
 				else if (0x4 == Mode) // 2bpp
@@ -708,9 +708,9 @@ void jmfb_device::update_screen(screen_device &screen, bitmap_rgb32 &bitmap, con
 						rgb_t const c = pen_color(BIT(pixbelow, p, 2));
 						*scanline++ = trans(
 								rgb_t(
-									(a.r() + (uint16_t(b.r()) << 1) + c.r()) >> 2,
-									(a.g() + (uint16_t(b.g()) << 1) + c.g()) >> 2,
-									(a.b() + (uint16_t(b.b()) << 1) + c.b()) >> 2));
+									(a.r() + (uint16_t(b.r()) << 1) + c.r() + 2) >> 2,
+									(a.g() + (uint16_t(b.g()) << 1) + c.g() + 2) >> 2,
+									(a.b() + (uint16_t(b.b()) << 1) + c.b() + 2) >> 2));
 					}
 				}
 				else if (0x8 == Mode) // 4bpp
@@ -722,9 +722,9 @@ void jmfb_device::update_screen(screen_device &screen, bitmap_rgb32 &bitmap, con
 						rgb_t const c = pen_color(BIT(pixbelow, p, 4));
 						*scanline++ = trans(
 								rgb_t(
-									(a.r() + (uint16_t(b.r()) << 1) + c.r()) >> 2,
-									(a.g() + (uint16_t(b.g()) << 1) + c.g()) >> 2,
-									(a.b() + (uint16_t(b.b()) << 1) + c.b()) >> 2));
+									(a.r() + (uint16_t(b.r()) << 1) + c.r() + 2) >> 2,
+									(a.g() + (uint16_t(b.g()) << 1) + c.g() + 2) >> 2,
+									(a.b() + (uint16_t(b.b()) << 1) + c.b() + 2) >> 2));
 					}
 				}
 				else if (0xc == Mode) // 8bpp
@@ -734,9 +734,9 @@ void jmfb_device::update_screen(screen_device &screen, bitmap_rgb32 &bitmap, con
 					rgb_t const c = pen_color(pixbelow);
 					*scanline++ = trans(
 							rgb_t(
-								(a.r() + (uint16_t(b.r()) << 1) + c.r()) >> 2,
-								(a.g() + (uint16_t(b.g()) << 1) + c.g()) >> 2,
-								(a.b() + (uint16_t(b.b()) << 1) + c.b()) >> 2));
+								(a.r() + (uint16_t(b.r()) << 1) + c.r() + 2) >> 2,
+								(a.g() + (uint16_t(b.g()) << 1) + c.g() + 2) >> 2,
+								(a.b() + (uint16_t(b.b()) << 1) + c.b() + 2) >> 2));
 				}
 			}
 		}

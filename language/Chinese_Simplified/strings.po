@@ -1310,7 +1310,7 @@ msgstr "非 BIOS"
 #: src/frontend/mame/ui/utils.cpp:95
 msgctxt "machine-filter"
 msgid "Parents"
-msgstr "母档"
+msgstr "主档"
 
 #: src/frontend/mame/ui/utils.cpp:96
 msgctxt "machine-filter"
@@ -1385,7 +1385,7 @@ msgstr "最爱"
 #: src/frontend/mame/ui/utils.cpp:113
 msgctxt "software-filter"
 msgid "Parents"
-msgstr "母档"
+msgstr "主档"
 
 #: src/frontend/mame/ui/utils.cpp:114
 msgctxt "software-filter"
@@ -2407,7 +2407,7 @@ msgstr " (%1$u %2$u) = GFX%3$u #%4$X:%5$X"
 #, c-format
 msgctxt "gfxview"
 msgid " %1$d×%2$d origin (%3$d %4$d)"
-msgstr ""
+msgstr " %1$d×%2$d 原点 (%3$d %4$d)"
 
 #: src/frontend/mame/ui/selgame.cpp:442
 msgid "System Settings"
@@ -3090,7 +3090,7 @@ msgstr "软件克隆于： %1$s"
 
 #: src/frontend/mame/ui/selmenu.cpp:650
 msgid "Software is parent"
-msgstr ""
+msgstr "软件为主档"
 
 #: src/frontend/mame/ui/selmenu.cpp:655
 msgid "Supported: No"
@@ -3106,7 +3106,7 @@ msgstr "已支援： 是"
 
 #: src/frontend/mame/ui/selmenu.cpp:681
 msgid "System is parent"
-msgstr ""
+msgstr "系统为主档"
 
 #: src/frontend/mame/ui/selmenu.cpp:683 src/frontend/mame/ui/selmenu.cpp:685
 #, c-format
@@ -3198,7 +3198,7 @@ msgstr "系统克隆于\t%1$s\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2878
 msgid "System is Parent\t\n"
-msgstr ""
+msgstr "系统为主档\t\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2882
 msgid "Analog Controls\tYes\n"

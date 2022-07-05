@@ -976,7 +976,7 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"本系統尚有可執行的仿製版： %s"
+"本系統尚有可執行的相容版： %s"
 
 #: src/frontend/mame/ui/info.cpp:365
 #, c-format
@@ -1310,12 +1310,12 @@ msgstr "非 BIOS"
 #: src/frontend/mame/ui/utils.cpp:95
 msgctxt "machine-filter"
 msgid "Parents"
-msgstr "母檔"
+msgstr "主檔"
 
 #: src/frontend/mame/ui/utils.cpp:96
 msgctxt "machine-filter"
 msgid "Clones"
-msgstr "仿製版"
+msgstr "相容版"
 
 #: src/frontend/mame/ui/utils.cpp:97
 msgctxt "machine-filter"
@@ -1385,12 +1385,12 @@ msgstr "最愛"
 #: src/frontend/mame/ui/utils.cpp:113
 msgctxt "software-filter"
 msgid "Parents"
-msgstr "母檔"
+msgstr "主檔"
 
 #: src/frontend/mame/ui/utils.cpp:114
 msgctxt "software-filter"
 msgid "Clones"
-msgstr "仿製版"
+msgstr "相容版"
 
 #: src/frontend/mame/ui/utils.cpp:115
 msgctxt "software-filter"
@@ -1508,7 +1508,7 @@ msgstr "群組"
 
 #: src/frontend/mame/ui/utils.cpp:1070
 msgid "Include clones"
-msgstr "包含仿製版"
+msgstr "包含相容版"
 
 #: src/frontend/mame/ui/utils.cpp:1130
 msgid "Category File"
@@ -2407,7 +2407,7 @@ msgstr " (%1$u %2$u) = GFX%3$u #%4$X:%5$X"
 #, c-format
 msgctxt "gfxview"
 msgid " %1$d×%2$d origin (%3$d %4$d)"
-msgstr ""
+msgstr " %1$d×%2$d 原點 (%3$d %4$d)"
 
 #: src/frontend/mame/ui/selgame.cpp:442
 msgid "System Settings"
@@ -2599,7 +2599,7 @@ msgstr "子項目顏色"
 #: src/frontend/mame/ui/custui.cpp:613
 msgctxt "color-option"
 msgid "Clone"
-msgstr "仿製版"
+msgstr "相容版"
 
 #: src/frontend/mame/ui/custui.cpp:614
 msgctxt "color-option"
@@ -2687,7 +2687,7 @@ msgstr "滑鼠經過"
 #: src/frontend/mame/ui/custui.cpp:665
 msgctxt "color-sample"
 msgid "Clone"
-msgstr "仿製版"
+msgstr "相容版"
 
 #: src/frontend/mame/ui/custui.cpp:880
 msgid "ARGB Settings"
@@ -3086,11 +3086,11 @@ msgstr "%1$s, %2$s"
 #: src/frontend/mame/ui/selmenu.cpp:648
 #, c-format
 msgid "Software is clone of: %1$s"
-msgstr ""
+msgstr "軟體相容於： %1$s"
 
 #: src/frontend/mame/ui/selmenu.cpp:650
 msgid "Software is parent"
-msgstr ""
+msgstr "軟體為主檔"
 
 #: src/frontend/mame/ui/selmenu.cpp:655
 msgid "Supported: No"
@@ -3106,12 +3106,12 @@ msgstr "已支援： 是"
 
 #: src/frontend/mame/ui/selmenu.cpp:681
 msgid "System is parent"
-msgstr ""
+msgstr "系統為主檔"
 
 #: src/frontend/mame/ui/selmenu.cpp:683 src/frontend/mame/ui/selmenu.cpp:685
 #, c-format
 msgid "System is clone of: %1$s"
-msgstr ""
+msgstr "系統相容於: %1$s"
 
 #: src/frontend/mame/ui/selmenu.cpp:721
 #, c-format
@@ -3194,11 +3194,11 @@ msgstr "製造商\t%1$s\n"
 #: src/frontend/mame/ui/selmenu.cpp:2873
 #, c-format
 msgid "System is Clone of\t%1$s\n"
-msgstr ""
+msgstr "系統相容於\t%1$s\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2878
 msgid "System is Parent\t\n"
-msgstr ""
+msgstr "系統為主檔\t\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2882
 msgid "Analog Controls\tYes\n"
