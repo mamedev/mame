@@ -556,18 +556,24 @@ protected:
 	//TODO: Configure this correctly via lines
 	uint8_t hack_duart_r()
 	{
-		int duart_data = 0;
-		if (m_hopper1->line_r() && m_hopper1_opto)
+		if (m_hack_duart_fixed_low)
 		{
-			duart_data |= 0x10;
+			return 0x00;
 		}
-		if (m_hopper2->line_r() && m_hopper2_opto)
+		else
 		{
-			duart_data |= 0x20;
+			int duart_data = 0;
+			if (m_hopper1->line_r() && m_hopper1_opto)
+			{
+				duart_data |= 0x10;
+			}
+			if (m_hopper2->line_r() && m_hopper2_opto)
+			{
+				duart_data |= 0x20;
+			}
+			return duart_data;
 		}
-		return duart_data;
 	}
-
 	uint8_t bootleg806_r(address_space &space, offs_t offset);
 
 	required_device<cpu_device> m_maincpu;
