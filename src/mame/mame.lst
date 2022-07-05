@@ -3391,7 +3391,7 @@ redbarnp                        //
 @source:atari/bartop52.cpp
 barbball                        // (proto)          (c) 1983
 
-@source:skeleton/basf7100.cpp
+@source:basf/basf7100.cpp
 basf7120                        //
 
 @source:intel/basic52.cpp
@@ -12474,7 +12474,7 @@ diablo              //
 diamondking                     // (c) 1997 SegaSA / Sonic
 diamondkinp                     // (c) 1997 SegaSA / Sonic
 
-@source:skeleton/didact.cpp
+@source:didact/didact.cpp
 md6802                          //
 mp68a                           //
 modulab                         //
@@ -12659,7 +12659,7 @@ dms5000                         //
 @source:dms/dms86.cpp
 dms86                           //
 
-@source:skeleton/dmv.cpp
+@source:ncr/dmv.cpp
 dmv                             //
 
 @source:universal/docastle.cpp
@@ -12885,7 +12885,7 @@ dyndukej                        // (c) 1989 Seibu Kaihatsu (03SEP89
 dyndukeja                       // (c) 1989 Seibu Kaihatsu (25JUL89)
 dyndukeu                        // (c) 1989 Seibu Kaihatsu + Fabtek license (25JUL89)
 
-@source:skeleton/e100.cpp
+@source:didact/e100.cpp
 e100                            //
 
 @source:ericsson/e9161.cpp
@@ -23944,7 +23944,7 @@ minifram
 @source:cirsa/miniguay.cpp
 miniguay
 
-@source:skeleton/minitel_2_rpic.cpp
+@source:philips/minitel_2_rpic.cpp
 minitel2                        //
 
 @source:taito/minivadr.cpp
@@ -24080,10 +24080,10 @@ mlandingj                       // B09 (c) 1987 Taito Corporation (US)
 @source:nintendo/mmagic.cpp
 mmagic                          // (c) 1979 Nintendo
 
-@source:skeleton/mmd1.cpp
+@source:elinstruments/mmd1.cpp
 mmd1                            //
 
-@source:skeleton/mmd2.cpp
+@source:elinstruments/mmd2.cpp
 mmd2                            //
 
 @source:maygay/mmm.cpp
@@ -34543,7 +34543,7 @@ pdt3100                         //
 pecom32                         //
 pecom64                         //
 
-@source:skeleton/pegasus.cpp
+@source:ausnz/pegasus.cpp
 pegasus                         //
 pegasusm                        //
 
@@ -42185,7 +42185,7 @@ sys80p                          // EACA System 80
 trs80                           // TRS-80 Model I - Level I BASIC
 trs80l2                         // TRS-80 Model I - Level II BASIC
 
-@source:skeleton/trs80dt1.cpp
+@source:trs/trs80dt1.cpp
 trs80dt1                        // TRS-80 Data Terminal 1
 
 @source:trs/trs80m2.cpp
