@@ -1776,7 +1776,7 @@ ROM_START( tengai )
 	ROM_LOAD( "1-u63.bin", 0x00000, 0x20000, CRC(2025e387) SHA1(334b0eb3b416d46ccaadff3eee6f1abba63285fb) )
 
 	ROM_REGION( 0x001fff, "mcu", 0 )       // MCU, not hooked up
-	ROM_LOAD( "tengai_pic16c57_decap-c172_ncp.u59", 0x00000, 0x01fff, CRC(6c59dd4c) SHA1(d439ce2d00cefe400f0347d8ed1246c6f70ace5b) )
+	ROM_LOAD( "4.u59", 0x00000, 0x01fff, CRC(6c59dd4c) SHA1(d439ce2d00cefe400f0347d8ed1246c6f70ace5b) )
 
 	ROM_REGION( 0x600000, "gfx1", 0 )   // Sprites
 	ROM_LOAD( "u20.bin",  0x000000, 0x200000, CRC(ed42ef73) SHA1(74693fcc83a2654ddb18fd513d528033863d6116) )
@@ -1804,7 +1804,7 @@ ROM_START( tengaij )
 	ROM_LOAD( "1-u63.bin", 0x00000, 0x20000, CRC(2025e387) SHA1(334b0eb3b416d46ccaadff3eee6f1abba63285fb) )
 
 	ROM_REGION( 0x001fff, "mcu", 0 )       // MCU, not hooked up
-	ROM_LOAD( "tengai_pic16c57_decap-c172_ncp.u59", 0x00000, 0x01fff, CRC(6c59dd4c) SHA1(d439ce2d00cefe400f0347d8ed1246c6f70ace5b) ) // From a World PCB
+	ROM_LOAD( "4.u59", 0x00000, 0x01fff, CRC(6c59dd4c) SHA1(d439ce2d00cefe400f0347d8ed1246c6f70ace5b) ) // From a World PCB
 
 	ROM_REGION( 0x600000, "gfx1", 0 )   // Sprites
 	ROM_LOAD( "u20.bin",  0x000000, 0x200000, CRC(ed42ef73) SHA1(74693fcc83a2654ddb18fd513d528033863d6116) )
