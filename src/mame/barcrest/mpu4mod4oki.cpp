@@ -8986,8 +8986,7 @@ ROM_START( m4mgpn )
 	ROM_LOAD( "mgpsnd.p4", 0x180000, 0x080000, CRC(d74b4b03) SHA1(a35c99040a72485a6c2d4a4fdfc203634f6a9ad0) )
 ROM_END
 
-// TODO: check which sequence it uses rather than just 'cheatchr'
-GAME( 199?, m4mgpn,   0,          mod4oki_cheatchr,    mpu4_dutch_alt_invcoin,    mpu4mod4oki_machines_state, init_m4default, 0,      "Nova",  "Monaco Grand Prix (Nova) (German) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
+GAME( 199?, m4mgpn,   0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::viva_characteriser_prot>,    mpu4_dutch_alt_invcoin,    mpu4mod4oki_machines_state, init_m4default, 0,      "Nova",  "Monaco Grand Prix (Nova) (German) (MPU4) (MGP 1.4)",GAME_FLAGS )
 
 /*****************************************************************************************************************************************************************************
 *
@@ -9004,8 +9003,7 @@ ROM_START( m4luckdv )
 	ROM_LOAD( "generic_dutch_sound2.bin", 0x080000, 0x080000, BAD_DUMP CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
 ROM_END
 
-// TODO: check which sequence it uses rather than just 'cheatchr'
-GAME(199?, m4luckdv,  0,          mod4oki_cheatchr,    mpu4_dutch_alt_invcoin,    mpu4mod4oki_machines_state, init_m4default, ROT0,   "Barcrest","Lucky Devil (Barcrest) (Czech) (MPU4) (CLD 3.0)",GAME_FLAGS ) // AUX2 locked
+GAME(199?, m4luckdv,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::bluediamond_characteriser_prot>,    mpu4_dutch_alt_invcoin,    mpu4mod4oki_machines_state, init_m4default, ROT0,   "Barcrest","Lucky Devil (Barcrest) (Czech) (MPU4) (CLD 3.0)",GAME_FLAGS )
 
 /*****************************************************************************************************************************************************************************
 *
@@ -9022,8 +9020,7 @@ ROM_START( m4sctagt )
 	ROM_LOAD( "generic_dutch_sound1.bin", 0x000000, 0x080000, BAD_DUMP CRC(f247ba83) SHA1(9b173503e63a4a861d1380b2ab1fe14af1a189bd) )
 ROM_END
 
-// TODO: check which sequence it uses rather than just 'cheatchr'
-GAME(199?, m4sctagt,  0,          mod4oki_cheatchr,    mpu4_dutch_alt_invcoin,    mpu4mod4oki_machines_state, init_m4default, ROT0,   "Nova","Secret Agent (Nova) (German) (MPU4)",GAME_FLAGS ) // AUX2 LOCKED
+GAME(199?, m4sctagt,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::bluediamond_characteriser_prot>,    mpu4_dutch_alt_invcoin,    mpu4mod4oki_machines_state, init_m4default, ROT0,   "Nova","Secret Agent (Nova) (German) (MPU4) (GSE 3.0)",GAME_FLAGS )
 
 
 /*****************************************************************************************************************************************************************************
