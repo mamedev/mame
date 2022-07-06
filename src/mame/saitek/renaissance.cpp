@@ -108,6 +108,8 @@ private:
 	u8 p6_r();
 	void p6_w(u8 data);
 
+	int m_ack_state = 0;
+	int m_rts_state = 0;
 	u8 m_inp_mux = 0;
 	u8 m_led_data[2] = { };
 };
@@ -116,6 +118,8 @@ void ren_state::machine_start()
 {
 	m_out_lcd.resolve();
 
+	save_item(NAME(m_ack_state));
+	save_item(NAME(m_rts_state));
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_data));
 }
@@ -200,7 +204,10 @@ u8 ren_state::control_r()
 
 void ren_state::exp_rts_w(int state)
 {
-	// NAND with ACK-P (not used by chesscomputer?)
+	// recursive NAND with ACK-P
+	if (state && m_ack_state)
+		m_expansion->ack_w(m_ack_state);
+	m_rts_state = state;
 }
 
 
@@ -243,8 +250,11 @@ void ren_state::p5_w(u8 data)
 	// d3: NAND with STB-P
 	m_stb->in_w<1>(BIT(data, 3));
 
-	// d5: expansion ACK-P
-	m_expansion->ack_w(BIT(data, 5));
+	// d5: expansion ACK-P (recursive NAND with RTS-P)
+	int ack_state = BIT(data, 5);
+	if (m_rts_state || !ack_state)
+		m_expansion->ack_w(ack_state);
+	m_ack_state = ack_state;
 
 	// d0: power-off on falling edge
 	m_expansion->pw_w(data & 1);
