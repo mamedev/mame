@@ -3890,10 +3890,10 @@ ROM_END
    Every other ROM on the driver is what was found on the PCB (Twin Revision C), so we're still missing the main CPU ROMs from Revision A. */
 ROM_START( manxtta ) // Manx TT Superbike Revision A, Model 2A
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
-	ROM_LOAD32_WORD( "epr-18822c.12",  0x000000, 0x020000, CRC(c7b3e45a) SHA1(d3a6910bf6efc138e0e40332219b90dea7d6ea56) )
-	ROM_LOAD32_WORD( "epr-18823c.13",  0x000002, 0x020000, CRC(6b0c1dfb) SHA1(6da5c071e3ce842a99f928f473d4ccf7165785ac) )
-	ROM_LOAD32_WORD( "epr-18824c.14",  0x040000, 0x020000, CRC(352bb817) SHA1(389cbf951ba606acb9ab7bff5cda85d9166e64ff) )
-	ROM_LOAD32_WORD( "epr-18825c.15",  0x040002, 0x020000, CRC(f88b036c) SHA1(f6196e8da5e6579fe3fa5c24ab9538964c98e267) )
+	ROM_LOAD32_WORD( "epr-18822c.12",  0x000000, 0x020000, BAD_DUMP CRC(c7b3e45a) SHA1(d3a6910bf6efc138e0e40332219b90dea7d6ea56) ) // Not dumped on this set (should be EPR-18744.12)
+	ROM_LOAD32_WORD( "epr-18823c.13",  0x000002, 0x020000, BAD_DUMP CRC(6b0c1dfb) SHA1(6da5c071e3ce842a99f928f473d4ccf7165785ac) ) // Not dumped on this set (should be EPR-18745.13)
+	ROM_LOAD32_WORD( "epr-18824c.14",  0x040000, 0x020000, BAD_DUMP CRC(352bb817) SHA1(389cbf951ba606acb9ab7bff5cda85d9166e64ff) ) // Not dumped on this set
+	ROM_LOAD32_WORD( "epr-18825c.15",  0x040002, 0x020000, BAD_DUMP CRC(f88b036c) SHA1(f6196e8da5e6579fe3fa5c24ab9538964c98e267) ) // Not dumped on this set
 
 	ROM_REGION32_LE( 0x2400000, "main_data", 0 ) // Data
 	ROM_LOAD32_WORD( "mpr-18751.10", 0x000000, 0x200000, CRC(773ad43d) SHA1(4d1601dc08a08b724e33e7cd90a4f22e18cfed9c) )
