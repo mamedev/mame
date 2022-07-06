@@ -1622,7 +1622,7 @@ ROM_START( hrdtimes ) // PCB marked Hard Times 28-06-94
 	ROM_LOAD16_BYTE( "32.u66",       0x00001, 0x80000, CRC(f2c6b382) SHA1(d73affed091a261c4bfe17f409657e0a46b6c163) )
 
 	ROM_REGION( 0x1fff, "audiopic", ROMREGION_ERASE00 ) // sound (PIC16C57)
-	ROM_LOAD( "hard_times_pic16c57_decap-c171_ncp.bin", 0x0000, 0x1fff, CRC(346aa2c8) SHA1(e4731c7b2038efed592a06ab8a173ebe8f9bb64d) )
+	ROM_LOAD( "pic16c57.bin", 0x0000, 0x1fff, CRC(346aa2c8) SHA1(e4731c7b2038efed592a06ab8a173ebe8f9bb64d) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "33.u36",       0x000000, 0x80000, CRC(d1239ce5) SHA1(8e966a39a47f66c5e904ec4357c751e896ed47cb) )
@@ -1649,7 +1649,7 @@ ROM_START( hrdtimesa )
 	ROM_LOAD16_BYTE( "u66.bin",       0x00001, 0x80000, CRC(041ec30a) SHA1(00476ebd0a64cbd027be159cae7666d2df6d11ba) )
 
 	ROM_REGION( 0x1fff, "audiopic", ROMREGION_ERASE00 ) // sound (PIC16C57)
-	ROM_LOAD( "hard_times_pic16c57_decap-c171_ncp.bin", 0x0000, 0x1fff, CRC(346aa2c8) SHA1(e4731c7b2038efed592a06ab8a173ebe8f9bb64d) )
+	ROM_LOAD( "pic16c57.bin", 0x0000, 0x1fff, CRC(346aa2c8) SHA1(e4731c7b2038efed592a06ab8a173ebe8f9bb64d) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "fh1_playmark_ht", 0x000000, 0x100000, CRC(3cca02b0) SHA1(22c57f4192bf81dd26caa6adfb1c80665bdc305c) )
