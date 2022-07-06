@@ -1536,7 +1536,7 @@ license:CC0
 		<description>Eight Man (NGM-025 ~ NGH-025)</description>
 		<year>1991</year>
 		<publisher>SNK / Pallas</publisher>
-		<info name="serial" value="NGM-024 (MVS), NGH-024 (AES)"/>
+		<info name="serial" value="NGM-025 (MVS), NGH-025 (AES)"/>
 		<info name="release" value="1991xxxx (MVS), 19911120 (AES)"/>
 		<info name="alt_title" value="8マン"/>
 		<sharedfeat name="release" value="MVS,AES" />
