@@ -1557,14 +1557,11 @@ GAME(199?, m4joljokd, 0,       mod4yam_cheatchr_pal<mpu4_characteriser_pal::celc
 
 GAME(199?, m4clbshf,  0,        mod4yam_cheatchr_pal<mpu4_characteriser_pal::shuffle_characteriser_prot>, mpu420p, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","Club Shuffle (Barcrest) (MPU4) (CSS 1.0)",GAME_FLAGS) // set stake (runs if you do)
 
-// GEEN TUBES
-GAME(199?, m4voodoo,  0,        mod4yam_cheatchr_pal<mpu4_characteriser_pal::m435_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4default_six,  ROT0,   "Barcrest","Voodoo 1000 (Barcrest) (Dutch) (MPU4) (DDO 3.2)",GAME_FLAGS ) // ROL F SETUP ALM
+GAME(199?, m4voodoo,  0,        mod4yam_cheatchr_pal<mpu4_characteriser_pal::m435_characteriser_prot>, mpu4_dutch, mpu4mod4yam_machines_state, init_m4default_six,  ROT0,   "Barcrest","Voodoo 1000 (Barcrest) (Dutch) (MPU4) (DDO 3.2)",GAME_FLAGS ) // ROL F SETUP ALM
 
-// GEEN TUBES
-GAME(199?, m4magdrg,  0,          mod4yam_7reel_cheatchr_pal<mpu4_characteriser_pal::magicdragon_characteriser_prot>, mpu4,    mpu4mod4yam_machines_state, init_m4default_seven, ROT0,   "Barcrest","Magic Dragon (Barcrest) (MPU4) (DMD1.0)",GAME_FLAGS )
+GAME(199?, m4magdrg,  0,          mod4yam_7reel_cheatchr_pal<mpu4_characteriser_pal::magicdragon_characteriser_prot>, mpu4_dutch,    mpu4mod4yam_machines_state, init_m4default_seven, ROT0,   "Barcrest","Magic Dragon (Barcrest) (MPU4) (DMD1.0)",GAME_FLAGS )
 
 // non-standard protection
 GAME(199?, m4hslo,    0,          mod4yam_bootleg_fixedret<0x56>,       mpu4_70pc,    mpu4mod4yam_machines_state, init_m4default, ROT0,   "(bootleg)","Hot Slot (bootleg) (MPU4) (HOT 3.0)",GAME_FLAGS )
 
-// GEEN TUBES
-GAME(199?, m4addrd,   0,          mod4yam_cheatchr_pal<mpu4_characteriser_pal::m470_characteriser_prot>,   mpu4,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Adders & Ladders (Barcrest) (Dutch) (MPU4) (DAL 1.2)",GAME_FLAGS )
+GAME(199?, m4addrd,   0,          mod4yam_cheatchr_pal<mpu4_characteriser_pal::m470_characteriser_prot>,   mpu4_dutch,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Adders & Ladders (Barcrest) (Dutch) (MPU4) (DAL 1.2)",GAME_FLAGS )

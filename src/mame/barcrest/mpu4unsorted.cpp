@@ -52,56 +52,8 @@ ROM_START( m4crzjk )
 	ROM_LOAD( "crjok2.04.bin", 0x0000, 0x010000, CRC(838336d6) SHA1(6f36de20c930cbbff479af2667c11152c6adb43e) )
 ROM_END
 
-#define M4DRAC_EXTRAS \
-	ROM_REGION( 0x200000, "msm6376", 0 ) \
-	ROM_LOAD( "drasnd.p1", 0x000000, 0x080000, CRC(54c3821c) SHA1(1fcc62e2b127dd7f1d5d27a3afdf56dc27f122f8) ) \
-	ROM_LOAD( "drasnd.p2", 0x080000, 0x080000, CRC(9096d2bc) SHA1(1b4c530b7b0fde869980d519255e2585c5461e13) ) \
-	ROM_LOAD( "drasnd.p3", 0x100000, 0x080000, CRC(a07f412b) SHA1(cca8f5cfe620ece45ca40bf801f0643cd76547e9) ) \
-	ROM_LOAD( "drasnd.p4", 0x180000, 0x080000, CRC(018ed789) SHA1(64202da2c542f5ef208faeb04945eb1a758d4746) )
-
-ROM_START( m4drac )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "dra21.bin", 0x0000, 0x020000, CRC(23be387e) SHA1(08a78f4b8ddef46069d1c75113300b21e52338c1) )
-	M4DRAC_EXTRAS
-ROM_END
-
-ROM_START( m4draca )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "dra24.bin", 0x0000, 0x020000, CRC(3db112ae) SHA1(b5303e2a65476931d4769327ca62afd0f6a9eda7) )
-	M4DRAC_EXTRAS
-ROM_END
-
-ROM_START( m4dracb )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "dra27.p1", 0x0000, 0x020000, CRC(8a095175) SHA1(41006e298f1688499ce6820ec28196c7578684b9) )
-	M4DRAC_EXTRAS
-ROM_END
-
-ROM_START( m4jok300 )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "cjo", 0x0000, 0x020000, CRC(386e99db) SHA1(5bb0b513ef63ffaedd98b8e9e7206658fe784fda) )
-
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASEFF )
-	// missing?
-ROM_END
-
-ROM_START( m4jokmil )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "cjm03.epr", 0x0000, 0x020000, CRC(e5e4986e) SHA1(149b950a739ad308f7759927c344de8193ce67c5) )
-
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASEFF )
-	// missing?
-ROM_END
 
 
-ROM_START( m4luckdv )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cld_16.bin", 0x0000, 0x010000, CRC(89f63938) SHA1(8d3a5628e2c0bf39784afe2f00a007d40ea35423) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "generic_dutch_sound1.bin", 0x000000, 0x080000, CRC(f247ba83) SHA1(9b173503e63a4a861d1380b2ab1fe14af1a189bd) )
-	ROM_LOAD( "generic_dutch_sound2.bin", 0x080000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
-ROM_END
 
 #define M4LUCKWB_EXTRAS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) /* these are all different sound roms... */  \
@@ -157,10 +109,7 @@ ROM_END
 
 
 
-ROM_START( m4topdk )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dtd26pj.bin", 0x0000, 0x010000, CRC(1f84d995) SHA1(7412632cf79008b980e48f14aea89c3f8d742ed2) )
-ROM_END
+
 
 ROM_START( m4twist )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -343,13 +292,6 @@ ROM_END
 
 
 
-
-ROM_START( m4sctagt )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "gse3_0.p1", 0x0000, 0x010000, CRC(eff705ff) SHA1(6bf96872ef4bcc8f8041c5384d892f072c72be2b) )
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	// Missing?
-ROM_END
 
 
 
@@ -817,29 +759,6 @@ ROM_START( m4coney )
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
 ROM_END
 
-
-
-
-
-ROM_START( m4mgpn )
-	ROM_REGION( 0x010000, "maincpu", 0 )
-	ROM_LOAD( "mgp15.p1", 0x0000, 0x010000, CRC(ec76233f) SHA1(aa8595c639c83026d7fe5c3a161f8b08ff9a8b46) )
-
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-	ROM_LOAD( "mgpsnd.p1", 0x000000, 0x080000, CRC(d5f0b845) SHA1(6d97d0d4d07407bb0a51e1d62da95c664418a9e9) )
-	ROM_LOAD( "mgpsnd.p2", 0x080000, 0x080000, CRC(cefeea06) SHA1(45142ca1bab898dc6f3c32e382ee9157132810a6) )
-	ROM_LOAD( "mgpsnd.p3", 0x100000, 0x080000, CRC(be4b3bd0) SHA1(f14c08dc770a24db8bbd00a65d3edf6ee9895ca3) )
-	ROM_LOAD( "mgpsnd.p4", 0x180000, 0x080000, CRC(d74b4b03) SHA1(a35c99040a72485a6c2d4a4fdfc203634f6a9ad0) )
-ROM_END
-
-
-
-
-
-
-
-
-
 ROM_START( m4funh )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "funhouse.bin", 0x00000, 0x10000, CRC(4e342025) SHA1(288125ff5e3da7249d89dfcc3cd0915f791f7d43) )
@@ -857,47 +776,11 @@ ROM_END
 
 #define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
 
-
-/* Barcrest */
-
-// barcrest, to split
-
-
-
-
-// yes, the ingame display is 'Millenium' not 'Millennium'.  There are also strings from The Crystal Maze in the ROM, probably used as a base project?
-GAME(199?, m4jokmil,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m683_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big_lextender,ROT0,"Barcrest","Jokers Millenium 300 (Barcrest) (German) (MPU4) (DJO 0.1, set 1)",GAME_FLAGS ) // DM1 SW ALM
-GAME(199?, m4jok300,  m4jokmil,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::m683_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big_lextender,ROT0,"Barcrest","Jokers Millenium 300 (Barcrest) (German) (MPU4) (DJO 0.1, set 2)",GAME_FLAGS ) // DM1 SW ALM
-
-GAME(199?, m4drac,    0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::bankrollerclub_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big_lextender,ROT0,"Barcrest","Dracula (Barcrest - Nova) (German) (MPU4) (DRA 2.1)",GAME_FLAGS ) // DM1 SW ALM
-GAME(199?, m4draca,   m4drac,     mod4oki_cheatchr_pal<mpu4_characteriser_pal::bankrollerclub_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big_lextender,ROT0,"Barcrest","Dracula (Barcrest - Nova) (German) (MPU4) (DRA 2.4)",GAME_FLAGS ) // DM1 SW ALM
-GAME(199?, m4dracb,   m4drac,     mod4oki_cheatchr_pal<mpu4_characteriser_pal::bankrollerclub_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big_lextender,ROT0,"Barcrest","Dracula (Barcrest - Nova) (German) (MPU4) (DRA 2.7)",GAME_FLAGS ) // DM1 SW ALM
-
-
-
-GAME(199?, m4luckdv,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Lucky Devil (Barcrest) (Czech) (MPU4) (CLD 3.0)",GAME_FLAGS ) // AUX2 locked
-
-
-
-
-
-
-
-// GEEN TUBES (even in test mode)
-GAME(199?, m4topdk,   0,          mod2_cheatchr_pal<mpu4_characteriser_pal::intcep_characteriser_prot>,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Top Deck (Barcrest) (Dutch) (MPU4) (DT 2.6)",GAME_FLAGS )
-
-
-
-// Others
-
-GAME(199?, m4sctagt,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Nova","Secret Agent (Nova) (MPU4)",GAME_FLAGS ) // AUX2 LOCKED
-
-
 // works.  This is not a Barcrest game, but has a standard CHR check after you coin up for the first time, expecting the m4lv sequence back.  Reports ILLEGAL SOFTWARE if it fails
 GAME(199?, m4bandgd,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m4lv_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Eurogames","Bands Of Gold (Eurogames) (MPU4)",GAME_FLAGS )
 
 // ERROR CODE 2. as with m4bandgd this isn't a Barcrest, but does the standard CHR check and shows ILLEGAL SOFTWARE if check fails, assume it is also by Eurogames
-GAME(199?, m4matdr,   0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m4lv_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Eurogames","Matador (Eurogames) (MPU4)",GAME_FLAGS )
+GAME(199?, m4matdr,   0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m4lv_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_six, ROT0,   "Eurogames","Matador (Eurogames) (MPU4)",GAME_FLAGS )
 
 // works, not standard protection, but cheatchr works
 GAME(199?, m4bigben,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Big Ben (Coinworld) (MPU4, set 1)",GAME_FLAGS )
@@ -1040,8 +923,7 @@ GAME( 199?, m4crzjk,  0,          mod2_alt,       mpu4_invcoin,    mpu4unsorted_
 // not standard protection, but cheatchr passes it, code crashes after a short time?
 GAME( 199?, m4c2,     0,          mod4oki_alt_cheatchr,    mpu4_invcoin,    mpu4unsorted_state, init_m4default, 0,      "Nova?", "Circus Circus 2 (Nova?) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE) // COIN   ALM
 
-// doesn't boot at all? (checking AUX ports?)
-GAME( 199?, m4mgpn,   0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, 0,      "Nova",  "Monaco Grand Prix (Nova) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
+
 
 // no protection?
 GAME(198?, m4funh,    0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, 0,      "<unknown>",      "Fun House (unknown) (MPU4)", GAME_FLAGS ) // TUNE ALARM  (was in the SC1 Fun House set)
