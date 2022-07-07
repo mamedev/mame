@@ -136,6 +136,6 @@ protected:
 
 // device type definition
 DECLARE_DEVICE_TYPE(IDE_HARDDISK, ide_hdd_device)
-DECLARE_DEVICE_TYPE(IDE_CF, ide_cf_device)
+DECLARE_DEVICE_TYPE(ATA_CF, ide_cf_device)
 
 #endif // MAME_BUS_ATA_IDEHD_H
