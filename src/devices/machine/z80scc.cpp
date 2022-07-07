@@ -1260,7 +1260,7 @@ void z80scc_channel::tra_complete()
 				set_rts(1);
 		}
 
-		check_waitrequest();
+		check_dma_request();
 
 		if (m_wr1 & WR1_TX_INT_ENABLE && m_tx_int_disarm == 0)
 		{
@@ -1380,8 +1380,12 @@ void z80scc_channel::update_rts()
 					set_rts(!m_rts);
 		}
 
-		// data terminal ready output follows the state programmed into the DTR bit*/
-		set_dtr((m_wr5 & WR5_DTR) ? 0 : 1);
+		// data terminal ready output follows the state programmed into the DTR bit
+		// unless configured to use the DTR pin as the transmit REQ pin for DMA
+		if (!(m_wr14 & WR14_DTR_REQ_FUNC))
+		{
+			set_dtr((m_wr5 & WR5_DTR) ? 0 : 1);
+		}
 }
 
 //-------------------------------------------------
@@ -1893,7 +1897,7 @@ void z80scc_channel::do_sccreg_wr1(uint8_t data)
 	LOG("- Wait/DMA Request Function %s\n", (data & WR1_WREQ_FUNCTION) ? "Request" : "Wait");
 	LOG("- Wait/DMA Request on %s\n", (data & WR1_WREQ_ON_RX_TX) ? "Receive" : "Transmit");
 
-	check_waitrequest();
+	check_dma_request();
 
 	switch (data & WR1_RX_INT_MODE_MASK)
 	{
@@ -1997,7 +2001,7 @@ void z80scc_channel::do_sccreg_wr5(uint8_t data)
 		safe_transmit_register_reset();
 		update_rts(); // Will also update DTR accordingly
 
-		check_waitrequest();
+		check_dma_request();
 	}
 }
 
@@ -2417,6 +2421,8 @@ uint8_t z80scc_channel::data_read()
 				m_uart->check_interrupts();
 			}
 		}
+
+		check_dma_request();
 	}
 	else
 	{
@@ -2515,7 +2521,7 @@ void z80scc_channel::data_write(uint8_t data)
 		}
 	}
 
-	check_waitrequest();
+	check_dma_request();
 
 	/* Transmitter enabled?  */
 	if (m_wr5 & WR5_TX_ENABLE)
@@ -2594,6 +2600,7 @@ void z80scc_channel::receive_data(uint8_t data)
 	}
 
 	m_rr0 |= RR0_RX_CHAR_AVAILABLE;
+	check_dma_request();
 
 	// receive interrupt on FIRST and ALL character
 	switch (m_wr1 & WR1_RX_INT_MODE_MASK)
@@ -2960,28 +2967,36 @@ void z80scc_channel::write_rx(int state)
 }
 
 /*
- * This is a partial implementation of the "wait/dma request" functionality of the SCC controlled by
+ * This is a partial implementation of the "wait/dma request" and "dtr request" DMA functionality of the SCC controlled by
  * bits D7, D6 and D5 in WR1. This implementation is sufficient to support DMA request on transmit
- * used by the InterPro driver.
+ * used by the InterPro driver and DMA request on receive by the NWS-5000X driver.
  *
  * TODO:
  *  - wait function (D6=0)
  *  - wait/request function on receive (D5=1)
+ *  - Synchronous mode timing differences
+ *  - Configuration of WREQ and DTR/REQ timing (see datasheet)
+ *  - Interaction with locked fifo on error condition
  */
-void z80scc_channel::check_waitrequest()
+void z80scc_channel::check_dma_request()
 {
-	// don't do anything if wait/request function is not enabled
-	if ((m_wr1 & WR1_WREQ_ENABLE) == 0)
-		return;
-
-	// wait/request function for receive not implemented
-	if (m_wr1 & WR1_WREQ_ON_RX_TX)
-		return;
-
-	// if dma request function is enabled
-	if (m_wr1 & WR1_WREQ_FUNCTION)
+	if (m_wr14 & WR14_DTR_REQ_FUNC)
 	{
-		// assert /W//REQ if transmit buffer is empty and transmitter is enabled
-		m_uart->m_out_wreq_cb[m_index](((m_rr0 & RR0_TX_BUFFER_EMPTY) && (m_wr5 & WR5_TX_ENABLE)) ? 0 : 1);
+		// assert /DTR//REQ if transmit buffer is empty
+		set_dtr((m_rr0 & RR0_TX_BUFFER_EMPTY) ? 0 : 1);
+	}
+
+	if ((m_wr1 & WR1_WREQ_ENABLE) && (m_wr1 & WR1_WREQ_FUNCTION))
+	{
+		if (m_wr1 & WR1_WREQ_ON_RX_TX)
+		{
+			// assert /W//REQ if receive buffer has a character avaliable
+			m_uart->m_out_wreq_cb[m_index]((m_rr0 & RR0_RX_CHAR_AVAILABLE) ? 0 : 1);
+		}
+		else
+		{
+			// assert /W//REQ if transmit buffer is empty and transmitter is enabled
+			m_uart->m_out_wreq_cb[m_index](((m_rr0 & RR0_TX_BUFFER_EMPTY) && (m_wr5 & WR5_TX_ENABLE)) ? 0 : 1);
+		}
 	}
 }
