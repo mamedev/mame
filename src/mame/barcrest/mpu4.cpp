@@ -2432,6 +2432,7 @@ void mpu4_state::mpu4_common(machine_config &config)
 	m_pia5->cb2_handler().set(FUNC(mpu4_state::pia_ic5_cb2_w));
 	m_pia5->irqa_handler().set(FUNC(mpu4_state::cpu0_irq));
 	m_pia5->irqb_handler().set(FUNC(mpu4_state::cpu0_irq));
+	m_pia5->set_port_a_input_overrides_output_mask(0x40); // needed for m4madhse
 
 	PIA6821(config, m_pia6, 0);
 	m_pia6->writepa_handler().set(FUNC(mpu4_state::pia_ic6_porta_w));
