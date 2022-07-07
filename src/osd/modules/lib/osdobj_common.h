@@ -312,12 +312,4 @@ private:
 	std::unordered_map<std::string, std::string> m_option_descs;
 };
 
-
-// this template function creates a stub which constructs a debugger
-template<class DeviceClass>
-debug_module *osd_debugger_creator()
-{
-	return new DeviceClass();
-}
-
 #endif  // MAME_OSD_LIB_OSDOBJ_COMMON_H
