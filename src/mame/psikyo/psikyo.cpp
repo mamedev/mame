@@ -1776,6 +1776,11 @@ ROM_START( tengai )
 	ROM_LOAD( "1-u63.bin", 0x00000, 0x20000, CRC(2025e387) SHA1(334b0eb3b416d46ccaadff3eee6f1abba63285fb) )
 
 	ROM_REGION( 0x001000, "mcu", 0 )       // MCU, not hooked up
+	/* PIC configuration:
+	     -User ID: 37EA
+	     -Watchdog Timer: ENABLE
+	     -Oscilator Mode: RC
+	*/
 	ROM_LOAD( "4.u59", 0x00000, 0x01000, CRC(e563b054) SHA1(7593389d35851a71a8af2e094ec7e55cd818743a) )
 
 	ROM_REGION( 0x600000, "gfx1", 0 )   // Sprites
@@ -1804,6 +1809,11 @@ ROM_START( tengaij )
 	ROM_LOAD( "1-u63.bin", 0x00000, 0x20000, CRC(2025e387) SHA1(334b0eb3b416d46ccaadff3eee6f1abba63285fb) )
 
 	ROM_REGION( 0x001000, "mcu", 0 )       // MCU, not hooked up
+	/* PIC configuration:
+	     -User ID: 37EA
+	     -Watchdog Timer: ENABLE
+	     -Oscilator Mode: RC
+	*/
 	ROM_LOAD( "4.u59", 0x00000, 0x01000, CRC(e563b054) SHA1(7593389d35851a71a8af2e094ec7e55cd818743a) ) // From a World PCB
 
 	ROM_REGION( 0x600000, "gfx1", 0 )   // Sprites
