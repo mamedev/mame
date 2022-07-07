@@ -780,7 +780,7 @@ ROM_END
 GAME(199?, m4bandgd,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m4lv_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Eurogames","Bands Of Gold (Eurogames) (MPU4)",GAME_FLAGS )
 
 // ERROR CODE 2. as with m4bandgd this isn't a Barcrest, but does the standard CHR check and shows ILLEGAL SOFTWARE if check fails, assume it is also by Eurogames
-GAME(199?, m4matdr,   0,          mod4oki_7reel_cheatchr_pal<mpu4_characteriser_pal::m4lv_characteriser_prot>,    mpu4_dutch,    mpu4unsorted_state, init_m4default_six, ROT0,   "Eurogames","Matador (Eurogames) (MPU4)",GAME_FLAGS )
+GAME(199?, m4matdr,   0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m4lv_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_six, ROT0,   "Eurogames","Matador (Eurogames) (MPU4)",GAME_FLAGS )
 
 // works, not standard protection, but cheatchr works
 GAME(199?, m4bigben,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Big Ben (Coinworld) (MPU4, set 1)",GAME_FLAGS )
