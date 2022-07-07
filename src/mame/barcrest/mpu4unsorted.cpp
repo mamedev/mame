@@ -774,6 +774,19 @@ ROM_END
 
 } // anonymous namespace
 
+template<const uint8_t* Table> void mpu4_state::mod4oki_cheatchr_pal(machine_config &config)
+{
+	mod4oki(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(Table);
+}
+
+
 #define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
 
 // works.  This is not a Barcrest game, but has a standard CHR check after you coin up for the first time, expecting the m4lv sequence back.  Reports ILLEGAL SOFTWARE if it fails

@@ -193,220 +193,27 @@ public:
 	void mod2_cheatchr(machine_config &config);
 	void mod2_chr(machine_config &config);
 
-	template<const uint8_t ReelNo, uint8_t Type>
-	void mpu4_add_reel(machine_config &config)
-	{
-		switch (Type)
-		{
-		default:
-		case 0x00: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 1, 3, 0x00, 2); break;
-		case 0x01: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 4, 12, 0x00, 2); break;
-		case 0x02: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 92, 3, 0x00, 2); break;
-		case 0x03: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 93, 2, 0x00, 2); break;
-		case 0x04: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 96, 3, 0x00, 2); break; // BWB
-		}
-
-		if (m_reel[ReelNo])
-			m_reel[ReelNo]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<ReelNo>));
-	}
-
-	template<uint8_t Type, uint8_t NumberOfReels>
-	void mpu4_reels(machine_config &config)
-	{
-		if (NumberOfReels>0) mpu4_add_reel<0, Type>(config);
-		if (NumberOfReels>1) mpu4_add_reel<1, Type>(config);
-		if (NumberOfReels>2) mpu4_add_reel<2, Type>(config);
-		if (NumberOfReels>3) mpu4_add_reel<3, Type>(config);
-		if (NumberOfReels>4) mpu4_add_reel<4, Type>(config);
-		if (NumberOfReels>5) mpu4_add_reel<5, Type>(config);
-		if (NumberOfReels>6) mpu4_add_reel<6, Type>(config);
-		if (NumberOfReels>7) mpu4_add_reel<7, Type>(config);
-	}
-
-	template<const uint8_t* Table> void mod2_cheatchr_pal(machine_config &config)
-	{
-		mod2(config);
-
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-		m_characteriser->set_cpu_tag("maincpu");
-		m_characteriser->set_allow_6809_cheat(true);
-		m_characteriser->set_lamp_table(Table);
-	}
-
-	template<const uint8_t* Table> void mod2_7reel_cheatchr_pal(machine_config &config)
-	{
-		mod2_7reel(config);
-
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-		m_characteriser->set_cpu_tag("maincpu");
-		m_characteriser->set_allow_6809_cheat(true);
-		m_characteriser->set_lamp_table(Table);
-	}
-
-	template<const uint8_t* Table> void mod2_alt_cheatchr_pal(machine_config &config)
-	{
-		mod2_alt(config);
-
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-		m_characteriser->set_cpu_tag("maincpu");
-		m_characteriser->set_allow_6809_cheat(true);
-		m_characteriser->set_lamp_table(Table);
-	}
-
-	template<const uint8_t* Table> void mod4oki_cheatchr_pal(machine_config &config)
-	{
-		mod4oki(config);
-
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-		m_characteriser->set_cpu_tag("maincpu");
-		m_characteriser->set_allow_6809_cheat(true);
-		m_characteriser->set_lamp_table(Table);
-	}
-
-	template<const uint8_t* Table> void mod4oki_7reel_cheatchr_pal(machine_config &config)
-	{
-		mod4oki_7reel(config);
-
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-		m_characteriser->set_cpu_tag("maincpu");
-		m_characteriser->set_allow_6809_cheat(true);
-		m_characteriser->set_lamp_table(Table);
-	}
-
-	template<const uint8_t* Table> void mod4oki_alt_cheatchr_pal(machine_config &config)
-	{
-		mod4oki_alt(config);
-
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-		m_characteriser->set_cpu_tag("maincpu");
-		m_characteriser->set_allow_6809_cheat(true);
-		m_characteriser->set_lamp_table(Table);
-	}
-
-	template<const uint8_t* Table> void mod4yam_cheatchr_pal(machine_config &config)
-	{
-		mod4yam(config);
-
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-		m_characteriser->set_cpu_tag("maincpu");
-		m_characteriser->set_allow_6809_cheat(true);
-		m_characteriser->set_lamp_table(Table);
-	}
-
-	template<const uint8_t* Table> void mod4yam_alt_cheatchr_pal(machine_config &config)
-	{
-		mod4yam_alt(config);
-
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-		m_characteriser->set_cpu_tag("maincpu");
-		m_characteriser->set_allow_6809_cheat(true);
-		m_characteriser->set_lamp_table(Table);
-	}
-
-	template<const uint8_t* Table> void mod4yam_7reel_cheatchr_pal(machine_config &config)
-	{
-		mod4yam_7reel(config);
-
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-		m_characteriser->set_cpu_tag("maincpu");
-		m_characteriser->set_allow_6809_cheat(true);
-		m_characteriser->set_lamp_table(Table);
-	}
-
-
-	template<const uint8_t* Table> void mod4oki_5r_cheatchr_pal(machine_config &config)
-	{
-		mod4oki_5r(config);
-
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-		m_characteriser->set_cpu_tag("maincpu");
-		m_characteriser->set_allow_6809_cheat(true);
-		m_characteriser->set_lamp_table(Table);
-	}
-
-	template<uint8_t Fixed> void mod4oki_5r_bootleg_fixedret(machine_config &config)
-	{
-		mod4oki_5r(config);
-
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
-
-		MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
-		m_characteriser_bl->set_bl_fixed_return(Fixed);
-	}
-
+	void mpu4_reels(machine_config &config, uint8_t NumberOfReels, int16_t start_index, int16_t end_index);
+	
+	template<const uint8_t* Table> void mod2_cheatchr_pal(machine_config &config);
+	template<const uint8_t* Table> void mod2_7reel_cheatchr_pal(machine_config &config);
+	template<const uint8_t* Table> void mod2_alt_cheatchr_pal(machine_config &config);
+	template<const uint8_t* Table> void mod4oki_cheatchr_pal(machine_config &config);
+	template<const uint8_t* Table> void mod4oki_7reel_cheatchr_pal(machine_config &config);
+	template<const uint8_t* Table> void mod4oki_alt_cheatchr_pal(machine_config &config);
+	template<const uint8_t* Table> void mod4yam_cheatchr_pal(machine_config &config);
+	template<const uint8_t* Table> void mod4yam_alt_cheatchr_pal(machine_config &config);
+	template<const uint8_t* Table> void mod4yam_7reel_cheatchr_pal(machine_config &config);
+	template<const uint8_t* Table> void mod4oki_5r_cheatchr_pal(machine_config &config);
+	template<uint8_t Fixed> void mod4oki_5r_bootleg_fixedret(machine_config &config);
 	void mod2_cheatchr_table(machine_config &config, const uint8_t* table);
 
 	// bootleg mod2
-	template<uint8_t Fixed> void mod2_bootleg_fixedret(machine_config &config)
-	{
-		mod2(config);
-
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
-
-		MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
-		m_characteriser_bl->set_bl_fixed_return(Fixed);
-	}
-
-	template<uint8_t Fixed> void mod2_alt_bootleg_fixedret(machine_config &config)
-	{
-		mod2_alt(config);
-
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
-
-		MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
-		m_characteriser_bl->set_bl_fixed_return(Fixed);
-	}
-
-	template<uint8_t Fixed> void mod4yam_bootleg_fixedret(machine_config &config)
-	{
-		mod4yam(config);
-
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
-
-		MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
-		m_characteriser_bl->set_bl_fixed_return(Fixed);
-	}
-
-	template<uint8_t Fixed> void mod4oki_bootleg_fixedret(machine_config &config)
-	{
-		mod4oki(config);
-
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
-
-		MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
-		m_characteriser_bl->set_bl_fixed_return(Fixed);
-	}
-
-	template<uint8_t Fixed> void mod4oki_alt_bootleg_fixedret(machine_config &config)
-	{
-		mod4oki_alt(config);
-
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
-
-		MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
-		m_characteriser_bl->set_bl_fixed_return(Fixed);
-	}
-
+	template<uint8_t Fixed> void mod2_bootleg_fixedret(machine_config &config);
+	template<uint8_t Fixed> void mod2_alt_bootleg_fixedret(machine_config &config);
+	template<uint8_t Fixed> void mod4yam_bootleg_fixedret(machine_config &config);
+	template<uint8_t Fixed> void mod4oki_bootleg_fixedret(machine_config &config);
+	template<uint8_t Fixed> void mod4oki_alt_bootleg_fixedret(machine_config &config);
 
 	void mod2_chr_blastbnk(machine_config &config);
 	void mod2_chr_copcash(machine_config &config);
@@ -500,8 +307,6 @@ protected:
 	DECLARE_MACHINE_START(mpu4oki);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(gen_50hz);
-
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 
 	void bankswitch_w(uint8_t data);
 	uint8_t bankswitch_r();

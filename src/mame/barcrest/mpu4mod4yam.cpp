@@ -111,7 +111,51 @@ INPUT_PORTS_START( m4addr )
 	PORT_DIPSETTING(    0x00, DEF_STR( On  ) )
 INPUT_PORTS_END
 
+template<const uint8_t* Table> void mpu4_state::mod4yam_cheatchr_pal(machine_config &config)
+{
+	mod4yam(config);
 
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(Table);
+}
+
+template<const uint8_t* Table> void mpu4_state::mod4yam_alt_cheatchr_pal(machine_config &config)
+{
+	mod4yam_alt(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(Table);
+}
+
+template<const uint8_t* Table> void mpu4_state::mod4yam_7reel_cheatchr_pal(machine_config &config)
+{
+	mod4yam_7reel(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(Table);
+}
+
+template<uint8_t Fixed> void mpu4_state::mod4yam_bootleg_fixedret(machine_config &config)
+{
+	mod4yam(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
+
+	MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
+	m_characteriser_bl->set_bl_fixed_return(Fixed);
+}
 
 
 #undef GAME_CUSTOM

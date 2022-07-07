@@ -30,14 +30,7 @@ public:
 	{
 	}
 
-	template<const uint8_t* Table> void mod2_cheatchr_pal_rtc(machine_config &config)
-	{
-		mod2_cheatchr_pal<Table>(config);
-
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4mod2_machines_state::mpu4_memmap_characteriser_rtc);
-
-		M48T02(config, "rtc");
-	}
+	template<const uint8_t* Table> void mod2_cheatchr_pal_rtc(machine_config &config);
 
 	void init_connect4();
 	void init_m4actpak();
@@ -65,6 +58,72 @@ void mpu4mod2_machines_state::mpu4_memmap_characteriser_rtc(address_map &map)
 
 } // anonymous namespace
 
+template<const uint8_t* Table> void mpu4_state::mod2_cheatchr_pal(machine_config &config)
+{
+	mod2(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(Table);
+}
+
+template<const uint8_t* Table> void mpu4_state::mod2_7reel_cheatchr_pal(machine_config &config)
+{
+	mod2_7reel(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(Table);
+}
+
+template<const uint8_t* Table> void mpu4_state::mod2_alt_cheatchr_pal(machine_config &config)
+{
+	mod2_alt(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(Table);
+}
+
+
+// bootleg mod2
+template<uint8_t Fixed> void mpu4_state::mod2_bootleg_fixedret(machine_config &config)
+{
+	mod2(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
+
+	MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
+	m_characteriser_bl->set_bl_fixed_return(Fixed);
+}
+
+template<uint8_t Fixed> void mpu4_state::mod2_alt_bootleg_fixedret(machine_config &config)
+{
+	mod2_alt(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
+
+	MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
+	m_characteriser_bl->set_bl_fixed_return(Fixed);
+}
+
+template<const uint8_t* Table> void mpu4mod2_machines_state::mod2_cheatchr_pal_rtc(machine_config &config)
+{
+	mod2_cheatchr_pal<Table>(config);
+	
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4mod2_machines_state::mpu4_memmap_characteriser_rtc);
+	
+	M48T02(config, "rtc");
+}
 
 
 void mpu4mod2_machines_state::init_connect4()

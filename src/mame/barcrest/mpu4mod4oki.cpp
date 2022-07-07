@@ -284,6 +284,84 @@ void mpu4mod4oki_machines_state::init_m4andycp()
 	//Front door code 39 Cash door code 38
 }
 
+template<const uint8_t* Table> void mpu4_state::mod4oki_cheatchr_pal(machine_config &config)
+{
+	mod4oki(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(Table);
+}
+
+template<const uint8_t* Table> void mpu4_state::mod4oki_7reel_cheatchr_pal(machine_config &config)
+{
+	mod4oki_7reel(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(Table);
+}
+
+template<const uint8_t* Table> void mpu4_state::mod4oki_alt_cheatchr_pal(machine_config &config)
+{
+	mod4oki_alt(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(Table);
+}
+
+template<const uint8_t* Table> void mpu4_state::mod4oki_5r_cheatchr_pal(machine_config &config)
+{
+	mod4oki_5r(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(Table);
+}
+
+template<uint8_t Fixed> void mpu4_state::mod4oki_5r_bootleg_fixedret(machine_config &config)
+{
+	mod4oki_5r(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
+
+	MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
+	m_characteriser_bl->set_bl_fixed_return(Fixed);
+}
+
+template<uint8_t Fixed> void mpu4_state::mod4oki_bootleg_fixedret(machine_config &config)
+{
+	mod4oki(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
+
+	MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
+	m_characteriser_bl->set_bl_fixed_return(Fixed);
+}
+
+template<uint8_t Fixed> void mpu4_state::mod4oki_alt_bootleg_fixedret(machine_config &config)
+{
+	mod4oki_alt(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
+
+	MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
+	m_characteriser_bl->set_bl_fixed_return(Fixed);
+}
+
 
 #define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
 

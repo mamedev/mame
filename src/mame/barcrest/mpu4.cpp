@@ -2416,6 +2416,20 @@ void mpu4_state::mpu4_memmap_bl_characteriser_blastbank(address_map &map)
 	map(0x0800, 0x081f).rw(m_characteriser_blastbank, FUNC(mpu4_characteriser_bl_blastbank::read), FUNC(mpu4_characteriser_bl_blastbank::write));
 }
 
+void mpu4_state::mpu4_reels(machine_config &config, uint8_t NumberOfReels, int16_t start_index, int16_t end_index)
+{
+	for(uint8_t i=0; i != NumberOfReels; i++)
+	{
+		REEL(config, m_reel[i], BARCREST_48STEP_REEL, start_index, end_index, 0x00, 2);
+		m_reel[i]->optic_handler().set([this, i](int state) {
+										   if (state)
+											   m_optic_pattern |= (1 << i);
+										   else
+											   m_optic_pattern &= ~(1 << i);
+									   });
+	}
+}
+
 void mpu4_state::mpu4_common(machine_config &config)
 {
 	TIMER(config, "50hz").configure_periodic(FUNC(mpu4_state::gen_50hz), attotime::from_hz(100));
@@ -2547,7 +2561,7 @@ void mpu4_state::mod2(machine_config &config)
 	m_ay8913->set_resistors_load(820, 0, 0);
 	m_ay8913->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_ay8913->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	mpu4_reels<0, 6>(config);
+	mpu4_reels(config, 6, 1, 3);
 }
 
 void mpu4_state::mod2_no_bacta(machine_config &config)
@@ -2565,7 +2579,7 @@ void mpu4_state::mod2_7reel(machine_config &config)
 	m_ay8913->set_resistors_load(820, 0, 0);
 	m_ay8913->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_ay8913->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	mpu4_reels<0, 7>(config);
+	mpu4_reels(config, 7, 1, 3);
 }
 
 void mpu4_state::mod2_cheatchr_table(machine_config &config, const uint8_t* table)
@@ -2626,7 +2640,7 @@ void mpu4_state::mod2_alt(machine_config &config)
 	m_ay8913->set_resistors_load(820, 0, 0);
 	m_ay8913->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_ay8913->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	mpu4_reels<1, 6>(config);
+	mpu4_reels(config, 6, 4, 12);
 }
 
 void mpu4_state::mod2_alt_cheatchr_table(machine_config &config, const uint8_t* table)
@@ -2666,7 +2680,7 @@ void mpu4_state::mod4yam(machine_config &config)
 	mpu4base(config);
 	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4yam)
 
-	mpu4_reels<0, 6>(config);
+	mpu4_reels(config, 6, 1, 3);
 
 	add_ym2413(config);
 }
@@ -2709,7 +2723,7 @@ void mpu4_state::mod4yam_alt(machine_config &config)
 	mpu4base(config);
 	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4yam)
 
-	mpu4_reels<1, 6>(config);
+	mpu4_reels(config, 6, 4, 12);
 
 	add_ym2413(config);
 }
@@ -2719,7 +2733,7 @@ void mpu4_state::mod4yam_7reel(machine_config &config)
 	mpu4base(config);
 	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4yam)
 
-	mpu4_reels<0, 7>(config);
+	mpu4_reels(config, 7, 1, 3);
 
 	add_ym2413(config);
 }
@@ -2740,7 +2754,7 @@ void mpu4_state::mod4oki(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4oki)
 
 	mpu4_common2(config);
-	mpu4_reels<0, 6>(config);
+	mpu4_reels(config, 6, 1, 3);
 
 	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
 	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
@@ -2760,7 +2774,7 @@ void mpu4_state::mod4oki_7reel(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4oki)
 
 	mpu4_common2(config);
-	mpu4_reels<0, 7>(config);
+	mpu4_reels(config, 7, 1, 3);
 
 	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
 	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
@@ -2805,7 +2819,7 @@ void mpu4_state::mod4oki_alt(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4oki)
 
 	mpu4_common2(config);
-	mpu4_reels<1, 6>(config);
+	mpu4_reels(config, 6, 4, 12);
 
 	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
 	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
@@ -2840,7 +2854,7 @@ void mpu4_state::mod4oki_5r(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4oki)
 
 	mpu4_common2(config);
-	mpu4_reels<0, 5>(config);
+	mpu4_reels(config, 5, 1, 3);
 
 	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
 	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);

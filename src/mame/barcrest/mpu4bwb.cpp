@@ -131,7 +131,7 @@ void mpu4bwb_machines_state::bwboki(machine_config &config)
 	mpu4base(config);
 	MCFG_MACHINE_START_OVERRIDE(mpu4bwb_machines_state,mpu4bwb)
 	mpu4_common2(config);
-	mpu4_reels<4, 5>(config);
+	mpu4_reels(config, 5, 96, 3);
 
 	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
 	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
