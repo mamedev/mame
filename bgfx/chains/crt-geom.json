@@ -141,7 +141,7 @@
 		  "screen": "raster" },
 		{ "type": "float",
 		  "name": "monitorgamma",
-		  "text": "    custom gamma",
+		  "text": "Custom display gamma",
 		  "default":  2.2,
 		  "max"    :  4.0,
 		  "min"    :  0.7,

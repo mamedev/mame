@@ -22,6 +22,7 @@ def path_components(path):
                 result.append(path)
             return tuple(reversed(result))
 
+
 class ParserBase:
     def process_lines(self, inputfile):
         self.input_line = 1
