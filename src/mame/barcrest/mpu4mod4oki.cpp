@@ -8887,7 +8887,7 @@ GAME(199?, m4dragon,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m
 
 /*****************************************************************************************************************************************************************************
 *
-* Dracula (German)
+* Dracula (German) 
 *  - missing sound ROM
 *
 *****************************************************************************************************************************************************************************/
@@ -8943,7 +8943,7 @@ GAME(199?, m4joljokh, 0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::s
 
 /*****************************************************************************************************************************************************************************
 *
-* Jokers Millenium 300
+* Jokers Millenium 300 
 *  - the ingame display is 'Millenium' not 'Millennium'
 *  - there are also strings from The Crystal Maze in the ROM, probably used as a base project?
 *  - requires a sample ROM to be present or will hang reading sound status

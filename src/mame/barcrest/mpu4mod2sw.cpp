@@ -1901,8 +1901,9 @@ GAMEL(199?, m4alpha,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::m435
 GAME(199?, m4bjack,   0,          mod2_cheatchr_pal<mpu4_characteriser_pal::phr_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Black Jack (Barcrest) (MPU4) (B2J 2.2)",GAME_FLAGS )
 GAME(199?, m4bjacka,  m4bjack,    mod2_cheatchr_pal<mpu4_characteriser_pal::phr_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Black Jack (Barcrest) (MPU4) (BLA 2.0)",GAME_FLAGS )
 
-GAME(199?, m4bjsm,    0,          mod2_cheatchr_pal_rtc<mpu4_characteriser_pal::sunsetb_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default_five_rev,     ROT0,   "Barcrest","Blackjack Super Multi (Barcrest) (German) (MPU4) (SM H1.6)",GAME_FLAGS )
-GAME(199?, m4bjsma,   m4bjsm,     mod2_cheatchr_pal_rtc<mpu4_characteriser_pal::sunsetb_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default_five_rev,     ROT0,   "Barcrest","Blackjack Super Multi (Barcrest) (MPU4) (SM 1.6)",GAME_FLAGS ) // is this a different game?
+GAME(199?, m4bjsm,    0,          mod2_cheatchr_pal<mpu4_characteriser_pal::sunsetb_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default_five_rev,     ROT0,   "Barcrest","Blackjack Super Multi (Barcrest) (German) (MPU4) (SM H1.6)",GAME_FLAGS )
+// RTC BAT FAIL, before any protection check
+GAME(199?, m4bjsma,   m4bjsm,     mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default_five_rev,     ROT0,   "Barcrest","Blackjack Super Multi (Barcrest) (MPU4) (SM 1.6)",GAME_FLAGS ) // complains about battery, is this a different game?
 
 GAME(198?, m4supsl,   0,          mod2_cheatchr_pal<mpu4_characteriser_pal::nifty_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest",   "Supa Silva (Barcrest) (MPU4) (SS2V 1.0)",GAME_FLAGS )
 
