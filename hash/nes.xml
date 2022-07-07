@@ -8341,12 +8341,12 @@ license:CC0
 	</software>
 
 	<software name="dejavuj" cloneof="dejavu">
-		<description>Deja Vu - Akumu wa Hontouni Yatte Kita (Jpn)</description>
+		<description>Deja Vu - Akumu wa Hontou ni Yatte Kita (Japan)</description>
 		<year>1988</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="KSC-DG"/>
 		<info name="release" value="19881122"/>
-		<info name="alt_title" value="ディジャブ 悪魔は本当にやって来た"/>
+		<info name="alt_title" value="ディジャブ 悪夢は本当にやって来た"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="HVC-TKROM" />
@@ -10922,7 +10922,7 @@ license:CC0
 	</software>
 
 	<software name="dejavu">
-		<description>Deja Vu (USA)</description>
+		<description>Déjà Vu (USA)</description>
 		<year>1990</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="NES-DG-USA"/>
@@ -10945,7 +10945,7 @@ license:CC0
 	</software>
 
 	<software name="dejavus" cloneof="dejavu">
-		<description>Deja Vu (Swe)</description>
+		<description>Déjà Vu (Sweden)</description>
 		<year>1992</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="NES-DG-SWE"/>
@@ -16245,6 +16245,23 @@ license:CC0
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="nes-wx-0 chr" size="131072" crc="1c90046b" sha1="87b4d43cbd60713c1f9e28a41d7b28ed6af7ce21" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hshredp" cloneof="snowchal">
+		<description>Heavy Shreddin' (USA, prototype)</description>
+		<year>1989</year>
+		<publisher>Absolute</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<feature name="pcb_model" value="NES-SKEPROM-01" />
+			<feature name="mmc1_type" value="MMC1B2" />
+			<dataarea name="prg" size="131072">
+				<rom name="heavy p bb73.ic1" size="131072" crc="d3fc341b" sha1="9b2e752007f723dd09cdbebfdfa5c72d77fc7315" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="heavy c 8255.ic3" size="131072" crc="7ca7fbfb" sha1="dfd808eabc500c122addb9d74511277ef12d59c7" />
 			</dataarea>
 		</part>
 	</software>
@@ -46184,6 +46201,86 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="dejavup" cloneof="dejavu">
+		<description>Déjà Vu (USA, prototype, 19900703)</description>
+		<year>1990</year>
+		<publisher>Kemco</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb_model" value="HVC-TK22EPROM-01" />
+			<dataarea name="prg" size="131072">
+				<rom name="deja vu - july 3 1990.prg" size="131072" crc="265badd0" sha1="4f166ad125746f6dc5b754073bede222a24bf74b" status="baddump" /> <!-- trimmed from doubled 256K PRG dump -->
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="deja vu - july 3 1990.chr" size="262144" crc="0b1bea9b" sha1="f2ed6a6b7d15a97afd43931ef87039f29fe9da49" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dejavup1" cloneof="dejavu">
+		<description>Déjà Vu (USA, prototype, 19900515)</description>
+		<year>1990</year>
+		<publisher>Kemco</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb_model" value="HVC-TK22EPROM-01" />
+			<dataarea name="prg" size="131072">
+				<rom name="deja vu - 15 5 1990.prg" size="131072" crc="a08feffc" sha1="287d2d14c5a191f6114d38b805163ecc3ec86340" status="baddump" /> <!-- trimmed from doubled 256K PRG dump -->
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="deja vu - 15 5 1990.chr" size="262144" crc="ffc9ef0a" sha1="0181f1dd041de33c9083ac3fa13e14721d008294" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dejavup2" cloneof="dejavu">
+		<description>Déjà Vu (USA, prototype, 19900508)</description>
+		<year>1990</year>
+		<publisher>Kemco</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb_model" value="HVC-TK22EPROM-01" />
+			<dataarea name="prg" size="131072">
+				<rom name="deja vu - 8 5 1990.prg" size="131072" crc="2198cbf7" sha1="227a52318f52cbd641f7b1e787517194abea94fe" status="baddump" /> <!-- trimmed from doubled 256K PRG dump -->
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="deja vu - 8 5 1990.chr" size="262144" crc="ffc9ef0a" sha1="0181f1dd041de33c9083ac3fa13e14721d008294" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dejavup3" cloneof="dejavu">
+		<description>Déjà Vu (USA, prototype, 19900428)</description>
+		<year>1990</year>
+		<publisher>Kemco</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb_model" value="HVC-TK22EPROM-01" />
+			<dataarea name="prg" size="131072">
+				<rom name="deja vu - 4 28 1990.prg" size="131072" crc="4eda0eba" sha1="62a33c3b56005b6786982e42c6596f1a220db1e7" status="baddump" /> <!-- trimmed from doubled 256K PRG dump -->
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="deja vu - 4 28 1990.chr" size="262144" crc="7d83ecae" sha1="80ffde9746e4d50b590ab7f0f494706c59adc5fc" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bigbangp" cloneof="clashdmn">
 		<description>Dengeki - Big Bang! (Jpn, Prototype)</description>
 		<year>19??</year>
@@ -50626,6 +50723,27 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="shadgatejp" cloneof="shadgate">
+		<description>Shadowgate (Japan, prototype)</description>
+		<year>1988</year>
+		<publisher>Kemco</publisher>
+		<info name="alt_title" value="シャドウゲイト"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb_model" value="HVC-TK22EPROM-01" />
+			<dataarea name="prg" size="131072">
+				<rom name="shadowgate 88 11.prg" size="131072" crc="680861d1" sha1="d549f53ebf93166291641a38a1b02c57a1defb64" status="baddump" /> <!-- trimmed from doubled 256K PRG dump -->
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="shadowgate 88 11.chr" size="131072" crc="ddd083d2" sha1="0e392be109b1d729355325cfb5dc61d1d007e657" status="baddump" /> <!-- trimmed from doubled 256K CHR dump -->
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="shadowbr">
 		<description>Shadow Brain (Jpn)</description>
 		<year>1991</year>
@@ -52063,8 +52181,28 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="uninvitep" cloneof="uninvite">
-		<description>Uninvited (USA, prototype)</description>
-		<year>1991</year>
+		<description>Uninvited (USA, prototype, 19900910)</description>
+		<year>1990</year>
+		<publisher>Kemco</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb_model" value="HVC-TK22EROM-01" />
+			<dataarea name="prg" size="131072">
+				<rom name="uninvited sept 10 1990.prg" size="131072" crc="4d88d5e2" sha1="12378b14186dc812298ca082d636747f0a04942d" status="baddump" /> <!-- trimmed from doubled 256K PRG dump -->
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="uninvited sept 10 1990.chr" size="131072" crc="59f0c324" sha1="3a88ba9bd5f6fd465582f9cc4a88e4eda27e0d83" status="baddump" /> <!-- trimmed from doubled 256K CHR dump -->
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uninvitep1" cloneof="uninvite">
+		<description>Uninvited (USA, prototype, 19900830)</description>
+		<year>1990</year>
 		<publisher>Kemco</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
@@ -52074,7 +52212,47 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 				<rom name="8.30 uninvited prg" size="131072" crc="d5081984" sha1="41c3067a09a21226742de5a3eaa57a64092458b1" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
-				<rom name="8.23 uninvited prg" size="131072" crc="f7019d0f" sha1="1cd6e1e868519aeefd1fd0d6f5bf32df1c48925a" />
+				<rom name="8.23 uninvited chr" size="131072" crc="f7019d0f" sha1="1cd6e1e868519aeefd1fd0d6f5bf32df1c48925a" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uninvitep2" cloneof="uninvite">
+		<description>Uninvited (USA, prototype, 19900823)</description>
+		<year>1990</year>
+		<publisher>Kemco</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb_model" value="HVC-TK22EROM-01" />
+			<dataarea name="prg" size="131072">
+				<rom name="uninvited aug 23 1990.prg" size="131072" crc="aeef72af" sha1="a3608496ff971936091d5e2d6dbedd5913b2f9e3" status="baddump" /> <!-- trimmed from doubled 256K PRG dump -->
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="uninvited aug 23 1990.chr" size="131072" crc="f7019d0f" sha1="1cd6e1e868519aeefd1fd0d6f5bf32df1c48925a" status="baddump" /> <!-- trimmed from doubled 256K CHR dump -->
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uninvitep3" cloneof="uninvite">
+		<description>Uninvited (USA, prototype, 19900704)</description>
+		<year>1990</year>
+		<publisher>Kemco</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb_model" value="HVC-TK22EROM-01" />
+			<dataarea name="prg" size="131072">
+				<rom name="uninvited july 4 1990.prg" size="131072" crc="7f81d312" sha1="ca6fffcc4d6b4deb8ac936cc17067a5a58af18d9" status="baddump" /> <!-- trimmed from doubled 256K PRG dump -->
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="uninvited july 4 1990.chr" size="131072" crc="b32f8a3b" sha1="69fa4d0c876e820207905a8b4e4c878542b184ab" status="baddump" /> <!-- trimmed from doubled 256K CHR dump -->
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
