@@ -879,18 +879,18 @@ void ide_hdd_device::device_add_mconfig(machine_config &config)
 }
 
 //**************************************************************************
-//  IDE HARD DISK DEVICE
+//  ATA COMPACTFLASH CARD DEVICE
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(IDE_CF, ide_cf_device, "idecf", "ATA CompactFlash Card")
+DEFINE_DEVICE_TYPE(ATA_CF, ide_cf_device, "atacf", "ATA CompactFlash Card")
 
 //-------------------------------------------------
 //  ide_cf_device - constructor
 //-------------------------------------------------
 
 ide_cf_device::ide_cf_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ide_hdd_device(mconfig, IDE_CF, tag, owner, clock)
+	: ide_hdd_device(mconfig, ATA_CF, tag, owner, clock)
 {
 }
 
@@ -900,7 +900,7 @@ ide_cf_device::ide_cf_device(const machine_config &mconfig, const char *tag, dev
 
 void ide_cf_device::device_add_mconfig(machine_config &config)
 {
-	HARDDISK(config, "image", "ide_cf");
+	HARDDISK(config, "image", "ata_cf");
 }
 
 //-------------------------------------------------
