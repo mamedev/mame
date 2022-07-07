@@ -1622,6 +1622,11 @@ ROM_START( hrdtimes ) // PCB marked Hard Times 28-06-94
 	ROM_LOAD16_BYTE( "32.u66",       0x00001, 0x80000, CRC(f2c6b382) SHA1(d73affed091a261c4bfe17f409657e0a46b6c163) )
 
 	ROM_REGION( 0x1000, "audiopic", ROMREGION_ERASE00 ) // sound (PIC16C57)
+	/* PIC configuration:
+	     -User ID (ASCII): 0794
+	     -Watchdog Timer: ENABLE
+	     -Oscilator Mode: RC
+	*/
 	ROM_LOAD( "pic16c57.bin", 0x0000, 0x1000, CRC(db307198) SHA1(21e98a69e673f6d48eb48239b4c51f6e7aa19a66) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
@@ -1649,6 +1654,11 @@ ROM_START( hrdtimesa )
 	ROM_LOAD16_BYTE( "u66.bin",       0x00001, 0x80000, CRC(041ec30a) SHA1(00476ebd0a64cbd027be159cae7666d2df6d11ba) )
 
 	ROM_REGION( 0x1000, "audiopic", ROMREGION_ERASE00 ) // sound (PIC16C57)
+	/* PIC configuration:
+	     -User ID (ASCII): 0794
+	     -Watchdog Timer: ENABLE
+	     -Oscilator Mode: RC
+	*/
 	ROM_LOAD( "pic16c57.bin", 0x0000, 0x1000, CRC(db307198) SHA1(21e98a69e673f6d48eb48239b4c51f6e7aa19a66) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
