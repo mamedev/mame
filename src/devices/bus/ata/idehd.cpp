@@ -878,6 +878,13 @@ void ide_hdd_device::device_add_mconfig(machine_config &config)
 	HARDDISK(config, "image", "ide_hdd");
 }
 
+//**************************************************************************
+//  IDE HARD DISK DEVICE
+//**************************************************************************
+
+// device type definition
+DEFINE_DEVICE_TYPE(IDE_CF, ide_cf_device, "idecf", "ATA CompactFlash Card")
+
 //-------------------------------------------------
 //  ide_cf_device - constructor
 //-------------------------------------------------
@@ -946,6 +953,3 @@ void ide_cf_device::ide_build_identify_device()
 	m_identify_buffer[160] = 0x00;                     /* 160:  Power requirement description*/
 	m_identify_buffer[161] = 0x00;                     /* 161-255: reserved */
 }
-
-// device type definition
-DEFINE_DEVICE_TYPE(IDE_CF, ide_cf_device, "idecf", "IDE CompactFlash")
