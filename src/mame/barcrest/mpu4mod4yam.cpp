@@ -5,33 +5,316 @@
 #include "emu.h"
 #include "mpu4.h"
 
+#include "sound/ymopl.h"
+
 namespace {
 
 class mpu4mod4yam_machines_state : public mpu4_state
 {
 public:
-
-	mpu4mod4yam_machines_state(const machine_config &mconfig, device_type type, const char *tag) :
-		mpu4_state(mconfig, type, tag)
+	mpu4mod4yam_machines_state(const machine_config &mconfig, device_type type, const char *tag)
+		: mpu4_state(mconfig, type, tag)
+		, m_ym2413(*this, "ym2413")
 	{
 	}
+
+	template<const uint8_t* Table> void mod4yam_cheatchr_pal(machine_config &config);
+	template<const uint8_t* Table> void mod4yam_alt_cheatchr_pal(machine_config &config);
+	template<const uint8_t* Table> void mod4yam_7reel_cheatchr_pal(machine_config &config);
+	template<uint8_t Fixed> void mod4yam_bootleg_fixedret(machine_config &config);
 
 	void init_m4addr();
 	void init_m4test4();
 
+	void mod4yam(machine_config &config);
+	void mod4yam_no_bacta(machine_config &config);
+	void mod4yam_7reel(machine_config &config);
+	void mod4yam_cheatchr(machine_config &config);
+	void mod4yam_cheatchr_table(machine_config& config, const uint8_t* table);
+	void mod4yam_chr(machine_config &config);
+
+	void mod4yam_alt(machine_config &config);
+
 	void mod4yam_cheatchr_gambal(machine_config &config);
 
 private:
+	void add_ym2413(machine_config& config);
+
+	void memmap_ym2413(address_map &map);
+	void memmap_characteriser_ym2413(address_map &map);
+	void memmap_bootleg_characteriser_ym2413(address_map &map);
+
+	DECLARE_MACHINE_START(mpu4yam);
+
 	void pia_ic5_porta_gambal_w(uint8_t data);
+
+	required_device<ym2413_device> m_ym2413;
 };
 
 #include "gamball.lh"
 #include "m4addr.lh"
 
 
-} // anonymous namespace
 
-#define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
+/***********************************************************************************************
+
+  Configs for Mod4 with YM
+
+***********************************************************************************************/
+
+void mpu4mod4yam_machines_state::add_ym2413(machine_config &config)
+{
+	YM2413(config, m_ym2413, XTAL(3'579'545)); // XTAL on sound board
+	m_ym2413->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_ym2413->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
+
+void mpu4mod4yam_machines_state::mod4yam(machine_config &config)
+{
+	mpu4base(config);
+	MCFG_MACHINE_START_OVERRIDE(mpu4mod4yam_machines_state,mpu4yam)
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4mod4yam_machines_state::memmap_ym2413);
+
+	mpu4_reels(config, 6, 1, 3);
+
+	add_ym2413(config);
+}
+
+void mpu4mod4yam_machines_state::mod4yam_no_bacta(machine_config &config)
+{
+	mod4yam(config);
+	config.device_remove("dataport");
+	m_pia5->ca2_handler().set(m_pia4, FUNC(pia6821_device::cb1_w));
+}
+
+void mpu4mod4yam_machines_state::mod4yam_chr(machine_config &config)
+{
+	mod4yam(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4mod4yam_machines_state::memmap_characteriser_ym2413);
+
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+}
+
+void mpu4mod4yam_machines_state::mod4yam_cheatchr_table(machine_config& config, const uint8_t* table)
+{
+	mod4yam(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4mod4yam_machines_state::memmap_characteriser_ym2413);
+
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(table);
+}
+
+void mpu4mod4yam_machines_state::mod4yam_cheatchr(machine_config &config)
+{
+	mod4yam_cheatchr_table(config, nullptr);
+}
+
+void mpu4mod4yam_machines_state::mod4yam_alt(machine_config &config)
+{
+	mpu4base(config);
+	MCFG_MACHINE_START_OVERRIDE(mpu4mod4yam_machines_state,mpu4yam)
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4mod4yam_machines_state::memmap_ym2413);
+
+	mpu4_reels(config, 6, 4, 12);
+
+	add_ym2413(config);
+}
+
+void mpu4mod4yam_machines_state::mod4yam_7reel(machine_config &config)
+{
+	mpu4base(config);
+	MCFG_MACHINE_START_OVERRIDE(mpu4mod4yam_machines_state,mpu4yam)
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4mod4yam_machines_state::memmap_ym2413);
+
+	mpu4_reels(config, 7, 1, 3);
+
+	add_ym2413(config);
+}
+
+template<const uint8_t* Table> void mpu4mod4yam_machines_state::mod4yam_cheatchr_pal(machine_config &config)
+{
+	mod4yam(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4mod4yam_machines_state::memmap_characteriser_ym2413);
+
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(Table);
+}
+
+template<const uint8_t* Table> void mpu4mod4yam_machines_state::mod4yam_alt_cheatchr_pal(machine_config &config)
+{
+	mod4yam_alt(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4mod4yam_machines_state::memmap_characteriser_ym2413);
+
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(Table);
+}
+
+template<const uint8_t* Table> void mpu4mod4yam_machines_state::mod4yam_7reel_cheatchr_pal(machine_config &config)
+{
+	mod4yam_7reel(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4mod4yam_machines_state::memmap_characteriser_ym2413);
+
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(Table);
+}
+
+template<uint8_t Fixed> void mpu4mod4yam_machines_state::mod4yam_bootleg_fixedret(machine_config &config)
+{
+	mod4yam(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4mod4yam_machines_state::memmap_bootleg_characteriser_ym2413);
+
+	MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
+	m_characteriser_bl->set_bl_fixed_return(Fixed);
+}
+
+MACHINE_START_MEMBER(mpu4mod4yam_machines_state,mpu4yam)
+{
+	mpu4_config_common();
+
+	m_link7a_connected=false;
+	m_mod_number=4;
+}
+
+
+void mpu4mod4yam_machines_state::memmap_ym2413(address_map &map)
+{
+	mpu4_memmap(map);
+	map(0x0880, 0x0881).w(m_ym2413, FUNC(ym2413_device::write));
+}
+
+void mpu4mod4yam_machines_state::memmap_characteriser_ym2413(address_map &map)
+{
+	mpu4_memmap_characteriser(map);
+	map(0x0880, 0x0881).w(m_ym2413, FUNC(ym2413_device::write));
+}
+
+void mpu4mod4yam_machines_state::memmap_bootleg_characteriser_ym2413(address_map &map)
+{
+	mpu4_memmap_bootleg_characteriser(map);
+	map(0x0880, 0x0881).w(m_ym2413, FUNC(ym2413_device::write));
+}
+
+
+void mpu4mod4yam_machines_state::pia_ic5_porta_gambal_w(uint8_t data)
+{
+	pia_ic5_porta_w(data);
+
+	/* The 'Gamball' device is a unique piece of mechanical equipment, designed to
+	provide a truly fair hi-lo gamble for an AWP. Functionally, it consists of
+	a ping-pong ball or similar enclosed in the machine's backbox, on a platform with 12
+	holes. When the low 4 bytes of AUX1 are triggered, this fires the ball out from the
+	hole it's currently in, to land in another. Landing in the same hole causes the machine to
+	refire the ball. The ball detection is done by the high 4 bytes of AUX1.
+	Here we call the MAME RNG, once to pick a row, once to pick from the four pockets within it. We
+	then trigger the switches corresponding to the correct number. This appears to be the best way
+	of making the game fair, short of simulating the physics of a bouncing ball ;)*/
+	if (data & 0x0f)
+	{
+		switch ((machine().rand()>>5) % 0x3)
+		{
+		case 0x00: //Top row
+			switch (machine().rand() & 0x3)
+			{
+			case 0x00: //7
+				m_aux1_input = (m_aux1_input & 0x0f);
+				m_aux1_input|= 0xa0;
+				break;
+
+			case 0x01://4
+				m_aux1_input = (m_aux1_input & 0x0f);
+				m_aux1_input|= 0xb0;
+				break;
+
+			case 0x02://9
+				m_aux1_input = (m_aux1_input & 0x0f);
+				m_aux1_input|= 0xc0;
+				break;
+
+			case 0x03://8
+				m_aux1_input = (m_aux1_input & 0x0f);
+				m_aux1_input|= 0xd0;
+				break;
+			}
+			break;
+
+		case 0x01: //Middle row - note switches don't match pattern
+			switch (machine().rand() & 0x3)
+			{
+			case 0x00://12
+				m_aux1_input = (m_aux1_input & 0x0f);
+				m_aux1_input|= 0x40;
+				break;
+
+			case 0x01://1
+				m_aux1_input = (m_aux1_input & 0x0f);
+				m_aux1_input|= 0x50;
+				break;
+
+			case 0x02://11
+				m_aux1_input = (m_aux1_input & 0x0f);
+				m_aux1_input|= 0x80;
+				break;
+
+			case 0x03://2
+				m_aux1_input = (m_aux1_input & 0x0f);
+				m_aux1_input|= 0x90;
+				break;
+			}
+			break;
+
+		case 0x02: //Bottom row
+			switch (machine().rand() & 0x3)
+			{
+			case 0x00://5
+				m_aux1_input = (m_aux1_input & 0x0f);
+				m_aux1_input|= 0x00;
+				break;
+
+			case 0x01://10
+				m_aux1_input = (m_aux1_input & 0x0f);
+				m_aux1_input|= 0x10;
+				break;
+
+			case 0x02://3
+				m_aux1_input = (m_aux1_input & 0x0f);
+				m_aux1_input|= 0x20;
+				break;
+
+			case 0x03://6
+				m_aux1_input = (m_aux1_input & 0x0f);
+				m_aux1_input|= 0x30;
+				break;
+			}
+			break;
+		}
+	}
+}
+
+
+void mpu4mod4yam_machines_state::mod4yam_cheatchr_gambal(machine_config &config)
+{
+	mod4yam_cheatchr_pal<mpu4_characteriser_pal::gambal_characteriser_prot>(config);
+
+	// custom hookup for gambal feature
+	m_pia5->writepa_handler().set(FUNC(mpu4mod4yam_machines_state::pia_ic5_porta_gambal_w));
+}
 
 
 /*****************************************************************************************************************************************************************************
@@ -85,6 +368,10 @@ void mpu4mod4yam_machines_state::init_m4test4()
 	m_overcurrent_detect = true;
 }
 
+} // anonymous namespace
+
+#define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
+
 
 INPUT_PORTS_START( m4addr )
 	PORT_INCLUDE(mpu4)
@@ -110,52 +397,6 @@ INPUT_PORTS_START( m4addr )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On  ) )
 INPUT_PORTS_END
-
-template<const uint8_t* Table> void mpu4_state::mod4yam_cheatchr_pal(machine_config &config)
-{
-	mod4yam(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-	m_characteriser->set_cpu_tag("maincpu");
-	m_characteriser->set_allow_6809_cheat(true);
-	m_characteriser->set_lamp_table(Table);
-}
-
-template<const uint8_t* Table> void mpu4_state::mod4yam_alt_cheatchr_pal(machine_config &config)
-{
-	mod4yam_alt(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-	m_characteriser->set_cpu_tag("maincpu");
-	m_characteriser->set_allow_6809_cheat(true);
-	m_characteriser->set_lamp_table(Table);
-}
-
-template<const uint8_t* Table> void mpu4_state::mod4yam_7reel_cheatchr_pal(machine_config &config)
-{
-	mod4yam_7reel(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-	m_characteriser->set_cpu_tag("maincpu");
-	m_characteriser->set_allow_6809_cheat(true);
-	m_characteriser->set_lamp_table(Table);
-}
-
-template<uint8_t Fixed> void mpu4_state::mod4yam_bootleg_fixedret(machine_config &config)
-{
-	mod4yam(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
-
-	MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
-	m_characteriser_bl->set_bl_fixed_return(Fixed);
-}
 
 
 #undef GAME_CUSTOM
@@ -431,111 +672,6 @@ INPUT_PORTS_START( m4gambal )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")PORT_IMPULSE(5)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")PORT_IMPULSE(5)
 INPUT_PORTS_END
-
-
-void mpu4mod4yam_machines_state::pia_ic5_porta_gambal_w(uint8_t data)
-{
-	pia_ic5_porta_w(data);
-
-	/* The 'Gamball' device is a unique piece of mechanical equipment, designed to
-	provide a truly fair hi-lo gamble for an AWP. Functionally, it consists of
-	a ping-pong ball or similar enclosed in the machine's backbox, on a platform with 12
-	holes. When the low 4 bytes of AUX1 are triggered, this fires the ball out from the
-	hole it's currently in, to land in another. Landing in the same hole causes the machine to
-	refire the ball. The ball detection is done by the high 4 bytes of AUX1.
-	Here we call the MAME RNG, once to pick a row, once to pick from the four pockets within it. We
-	then trigger the switches corresponding to the correct number. This appears to be the best way
-	of making the game fair, short of simulating the physics of a bouncing ball ;)*/
-	if (data & 0x0f)
-	{
-		switch ((machine().rand()>>5) % 0x3)
-		{
-		case 0x00: //Top row
-			switch (machine().rand() & 0x3)
-			{
-			case 0x00: //7
-				m_aux1_input = (m_aux1_input & 0x0f);
-				m_aux1_input|= 0xa0;
-				break;
-
-			case 0x01://4
-				m_aux1_input = (m_aux1_input & 0x0f);
-				m_aux1_input|= 0xb0;
-				break;
-
-			case 0x02://9
-				m_aux1_input = (m_aux1_input & 0x0f);
-				m_aux1_input|= 0xc0;
-				break;
-
-			case 0x03://8
-				m_aux1_input = (m_aux1_input & 0x0f);
-				m_aux1_input|= 0xd0;
-				break;
-			}
-			break;
-
-		case 0x01: //Middle row - note switches don't match pattern
-			switch (machine().rand() & 0x3)
-			{
-			case 0x00://12
-				m_aux1_input = (m_aux1_input & 0x0f);
-				m_aux1_input|= 0x40;
-				break;
-
-			case 0x01://1
-				m_aux1_input = (m_aux1_input & 0x0f);
-				m_aux1_input|= 0x50;
-				break;
-
-			case 0x02://11
-				m_aux1_input = (m_aux1_input & 0x0f);
-				m_aux1_input|= 0x80;
-				break;
-
-			case 0x03://2
-				m_aux1_input = (m_aux1_input & 0x0f);
-				m_aux1_input|= 0x90;
-				break;
-			}
-			break;
-
-		case 0x02: //Bottom row
-			switch (machine().rand() & 0x3)
-			{
-			case 0x00://5
-				m_aux1_input = (m_aux1_input & 0x0f);
-				m_aux1_input|= 0x00;
-				break;
-
-			case 0x01://10
-				m_aux1_input = (m_aux1_input & 0x0f);
-				m_aux1_input|= 0x10;
-				break;
-
-			case 0x02://3
-				m_aux1_input = (m_aux1_input & 0x0f);
-				m_aux1_input|= 0x20;
-				break;
-
-			case 0x03://6
-				m_aux1_input = (m_aux1_input & 0x0f);
-				m_aux1_input|= 0x30;
-				break;
-			}
-			break;
-		}
-	}
-}
-
-
-void mpu4mod4yam_machines_state::mod4yam_cheatchr_gambal(machine_config &config)
-{
-	mod4yam_cheatchr_pal<mpu4_characteriser_pal::gambal_characteriser_prot>(config);
-
-	// custom hookup for gambal feature
-	m_pia5->writepa_handler().set(FUNC(mpu4mod4yam_machines_state::pia_ic5_porta_gambal_w));
-}
 
 
 #undef GAME_CUSTOM

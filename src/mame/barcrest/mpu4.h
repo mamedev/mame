@@ -19,7 +19,6 @@
 #include "sound/ay8910.h"
 #include "sound/okim6376.h"
 #include "sound/upd7759.h"
-#include "sound/ymopl.h"
 
 #include "emupal.h"
 
@@ -127,7 +126,6 @@ public:
 		, m_reel(*this, "reel%u", 0U)
 		, m_palette(*this, "palette")
 		, m_meters(*this, "meters")
-		, m_ym2413(*this, "ym2413")
 		, m_ay8913(*this, "ay8913")
 		, m_dataport(*this, "dataport")
 		, m_characteriser(*this, "characteriser")
@@ -201,9 +199,6 @@ public:
 	template<const uint8_t* Table> void mod4oki_cheatchr_pal(machine_config &config);
 	template<const uint8_t* Table> void mod4oki_7reel_cheatchr_pal(machine_config &config);
 	template<const uint8_t* Table> void mod4oki_alt_cheatchr_pal(machine_config &config);
-	template<const uint8_t* Table> void mod4yam_cheatchr_pal(machine_config &config);
-	template<const uint8_t* Table> void mod4yam_alt_cheatchr_pal(machine_config &config);
-	template<const uint8_t* Table> void mod4yam_7reel_cheatchr_pal(machine_config &config);
 	template<const uint8_t* Table> void mod4oki_5r_cheatchr_pal(machine_config &config);
 	template<uint8_t Fixed> void mod4oki_5r_bootleg_fixedret(machine_config &config);
 	void mod2_cheatchr_table(machine_config &config, const uint8_t* table);
@@ -211,7 +206,6 @@ public:
 	// bootleg mod2
 	template<uint8_t Fixed> void mod2_bootleg_fixedret(machine_config &config);
 	template<uint8_t Fixed> void mod2_alt_bootleg_fixedret(machine_config &config);
-	template<uint8_t Fixed> void mod4yam_bootleg_fixedret(machine_config &config);
 	template<uint8_t Fixed> void mod4oki_bootleg_fixedret(machine_config &config);
 	template<uint8_t Fixed> void mod4oki_alt_bootleg_fixedret(machine_config &config);
 
@@ -237,15 +231,6 @@ public:
 	void mod4oki_cheatchr(machine_config &config);
 	void mod4oki_cheatchr_table(machine_config &config, const uint8_t* table);
 	void mod4oki_chr(machine_config &config);
-
-	void mod4yam(machine_config &config);
-	void mod4yam_no_bacta(machine_config &config);
-	void mod4yam_7reel(machine_config &config);
-	void mod4yam_cheatchr(machine_config &config);
-	void mod4yam_cheatchr_table(machine_config& config, const uint8_t* table);
-	void mod4yam_chr(machine_config &config);
-
-	void mod4yam_alt(machine_config &config);
 
 
 
@@ -296,14 +281,11 @@ protected:
 	void ic24_output(int data);
 	void ic24_setup();
 	void update_ay(device_t *device);
-	void mpu4_install_mod4yam_space(address_space &space);
 	void mpu4_install_mod4oki_space(address_space &space);
 	void mpu4_config_common();
-	void add_ym2413(machine_config& config);
 
 	DECLARE_MACHINE_START(mod2);
 	DECLARE_MACHINE_RESET(mpu4);
-	DECLARE_MACHINE_START(mpu4yam);
 	DECLARE_MACHINE_START(mpu4oki);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(gen_50hz);
@@ -311,9 +293,6 @@ protected:
 	void bankswitch_w(uint8_t data);
 	uint8_t bankswitch_r();
 	void bankset_w(uint8_t data);
-
-	void mpu4_ym2413_w(offs_t offset, uint8_t data);
-	uint8_t mpu4_ym2413_r(offs_t offset);
 
 	void ic3ss_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(cpu0_irq);
@@ -400,7 +379,6 @@ protected:
 	optional_device_array<stepper_device, 8> m_reel;
 	optional_device<palette_device> m_palette;
 	required_device<meters_device> m_meters;
-	optional_device<ym2413_device> m_ym2413;
 	optional_device<ay8913_device> m_ay8913;
 	optional_device<bacta_datalogger_device> m_dataport;
 	optional_device<mpu4_characteriser_pal> m_characteriser;

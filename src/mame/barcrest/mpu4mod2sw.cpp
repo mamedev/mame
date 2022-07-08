@@ -2242,10 +2242,10 @@ GAME_CUSTOM( 199?, m4nnww2__hx4,   m4nnww2, "classic adders + ladders_alt2",    
 		ROM_REGION( 0x10000, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME( year, setname, parent, mod4yam, mpu4, mpu4mod2_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS)
+	GAME( year, setname, parent, mod2, mpu4, mpu4mod2_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS)
 
-// fails to boot even without touching protection address, maybe bad?    These were in 'adders + ladders' sets but are clearly not
-GAME_CUSTOM( 199?, m4nnww2__hx5,   m4nnww2, "nik56c",                           0x0000, 0x010000, CRC(05fa11d1) SHA1(01d3d0c504489f1513a0c3aa26e910c9604f5366), "hack","Nudge Nudge Wink Wink (Barcrest) (MPU4, Mod2 type) (NNU 5.0, hack, set 3)")
+// fails to boot even without touching protection address due to checksum error.    These were in 'adders + ladders' sets but are clearly not
+GAME_CUSTOM( 199?, m4nnww2__hx5,   m4nnww2, "nik56c",                           0x0000, 0x010000, CRC(05fa11d1) SHA1(01d3d0c504489f1513a0c3aa26e910c9604f5366) BAD_DUMP, "hack","Nudge Nudge Wink Wink (Barcrest) (MPU4, Mod2 type) (NNU 5.0, hack, set 3)")
 
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \

@@ -1978,24 +1978,6 @@ INPUT_PORTS_END
 
 /* Common configurations */
 
-void mpu4_state::mpu4_ym2413_w(offs_t offset, uint8_t data)
-{
-	if (m_ym2413) m_ym2413->write(offset,data);
-}
-
-uint8_t mpu4_state::mpu4_ym2413_r(offs_t offset)
-{
-//  if (m_ym2413) return m_ym2413->read(offset);
-	return 0xff;
-}
-
-
-void mpu4_state::mpu4_install_mod4yam_space(address_space &space)
-{
-	space.install_read_handler(0x0880, 0x0882, read8sm_delegate(*this, FUNC(mpu4_state::mpu4_ym2413_r)));
-	space.install_write_handler(0x0880, 0x0881, write8sm_delegate(*this, FUNC(mpu4_state::mpu4_ym2413_w)));
-}
-
 void mpu4_state::mpu4_install_mod4oki_space(address_space &space)
 {
 	pia6821_device *const pia_ic4ss = subdevice<pia6821_device>("pia_ic4ss");
@@ -2024,16 +2006,6 @@ MACHINE_START_MEMBER(mpu4_state,mod2)
 
 	m_link7a_connected=false;
 	m_mod_number=2;
-}
-
-MACHINE_START_MEMBER(mpu4_state,mpu4yam)
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	mpu4_config_common();
-
-	m_link7a_connected=false;
-	m_mod_number=4;
-	mpu4_install_mod4yam_space(space);
 }
 
 MACHINE_START_MEMBER(mpu4_state,mpu4oki)
@@ -2658,84 +2630,6 @@ void mpu4_state::mod2_alt_cheatchr_table(machine_config &config, const uint8_t* 
 void mpu4_state::mod2_alt_cheatchr(machine_config &config)
 {
 	mod2_alt_cheatchr_table(config, nullptr);
-}
-
-/***********************************************************************************************
-
-  Configs for Mod4 with YM
-
-  TODO: mod4yam should eventually become a subclass
-
-***********************************************************************************************/
-
-void mpu4_state::add_ym2413(machine_config &config)
-{
-	YM2413(config, m_ym2413, XTAL(3'579'545)); // XTAL on sound board
-	m_ym2413->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_ym2413->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-}
-
-void mpu4_state::mod4yam(machine_config &config)
-{
-	mpu4base(config);
-	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4yam)
-
-	mpu4_reels(config, 6, 1, 3);
-
-	add_ym2413(config);
-}
-
-void mpu4_state::mod4yam_no_bacta(machine_config &config)
-{
-	mod4yam(config);
-	config.device_remove("dataport");
-	m_pia5->ca2_handler().set(m_pia4, FUNC(pia6821_device::cb1_w));
-}
-
-void mpu4_state::mod4yam_chr(machine_config &config)
-{
-	mod4yam(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-}
-
-void mpu4_state::mod4yam_cheatchr_table(machine_config& config, const uint8_t* table)
-{
-	mod4yam(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-	m_characteriser->set_cpu_tag("maincpu");
-	m_characteriser->set_allow_6809_cheat(true);
-	m_characteriser->set_lamp_table(table);
-}
-
-void mpu4_state::mod4yam_cheatchr(machine_config &config)
-{
-	mod4yam_cheatchr_table(config, nullptr);
-}
-
-void mpu4_state::mod4yam_alt(machine_config &config)
-{
-	mpu4base(config);
-	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4yam)
-
-	mpu4_reels(config, 6, 4, 12);
-
-	add_ym2413(config);
-}
-
-void mpu4_state::mod4yam_7reel(machine_config &config)
-{
-	mpu4base(config);
-	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4yam)
-
-	mpu4_reels(config, 7, 1, 3);
-
-	add_ym2413(config);
 }
 
 /***********************************************************************************************
