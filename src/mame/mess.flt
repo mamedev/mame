@@ -198,6 +198,7 @@ dec/decstation.cpp
 dec/dectalk.cpp
 dec/decwritr.cpp
 dec/jensen.cpp
+dec/pdp1.cpp
 dec/pdp11.cpp
 dec/rainbow.cpp
 dec/vax11.cpp
@@ -592,7 +593,6 @@ pc/ps2.cpp
 pc/sis630.cpp
 pc/tandy1t.cpp
 pc/tosh1000.cpp
-pdp1/pdp1.cpp
 philips/odyssey2.cpp
 philips/p2000t.cpp
 philips/vg5k.cpp

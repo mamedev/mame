@@ -34525,7 +34525,7 @@ tetriskr                        // (c) 1988? bootleg
 @source:amstrad/pda600.cpp
 pda600                          //
 
-@source:pdp1/pdp1.cpp
+@source:dec/pdp1.cpp
 pdp1                            // 1961 DEC PDP1
 
 @source:dec/pdp11.cpp
