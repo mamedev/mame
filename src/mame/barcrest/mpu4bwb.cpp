@@ -122,7 +122,6 @@ MACHINE_START_MEMBER(mpu4bwb_machines_state,mpu4bwb)
 	mpu4_config_common();
 
 	m_link7a_connected=false;
-	m_mod_number=4;
 	mpu4_install_mod4bwb_space(space);
 }
 

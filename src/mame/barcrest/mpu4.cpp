@@ -1036,7 +1036,7 @@ void mpu4_state::pia_ic6_portb_w(uint8_t data)
 void mpu4_state::pia_ic6_porta_w(uint8_t data)
 {
 	LOG(("%s: IC6 PIA Write A %2x\n", machine().describe_context(),data));
-	if (m_mod_number <4)
+	if (m_ay8913.found())
 	{
 		m_ay_data = data;
 		update_ay(m_pia6);
@@ -1047,7 +1047,7 @@ void mpu4_state::pia_ic6_porta_w(uint8_t data)
 WRITE_LINE_MEMBER(mpu4_state::pia_ic6_ca2_w)
 {
 	LOG(("%s: IC6 PIA write CA2 %2x (AY8913 BC1)\n", machine().describe_context(),state));
-	if (m_mod_number <4)
+	if (m_ay8913.found())
 	{
 		if ( state ) m_ay8913_address |=  0x01;
 		else         m_ay8913_address &= ~0x01;
@@ -1059,7 +1059,7 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic6_ca2_w)
 WRITE_LINE_MEMBER(mpu4_state::pia_ic6_cb2_w)
 {
 	LOG(("%s: IC6 PIA write CB2 %2x (AY8913 BCDIR)\n", machine().describe_context(),state));
-	if (m_mod_number <4)
+	if (m_ay8913.found())
 	{
 		if ( state ) m_ay8913_address |=  0x02;
 		else         m_ay8913_address &= ~0x02;
@@ -2005,7 +2005,6 @@ MACHINE_START_MEMBER(mpu4_state,mod2)
 	mpu4_config_common();
 
 	m_link7a_connected=false;
-	m_mod_number=2;
 }
 
 MACHINE_START_MEMBER(mpu4_state,mpu4oki)
@@ -2014,7 +2013,6 @@ MACHINE_START_MEMBER(mpu4_state,mpu4oki)
 	mpu4_config_common();
 
 	m_link7a_connected=false;
-	m_mod_number=4;
 	mpu4_install_mod4oki_space(space);
 }
 

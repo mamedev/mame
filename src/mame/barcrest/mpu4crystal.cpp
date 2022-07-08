@@ -7,6 +7,8 @@
 #include "emu.h"
 #include "mpu4.h"
 
+#include "sound/upd7759.h"
+
 namespace {
 
 class mpu4crystal_machines_state : public mpu4_state
@@ -36,7 +38,6 @@ MACHINE_START_MEMBER(mpu4crystal_machines_state,mpu4cry)
 	mpu4_config_common();
 
 	m_link7a_connected=false;
-	m_mod_number=4;
 }
 
 void mpu4crystal_machines_state::mpu4crys(machine_config &config)

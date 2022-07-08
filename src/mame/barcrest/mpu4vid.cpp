@@ -191,8 +191,6 @@ TODO:
 #include "sound/ay8910.h"
 #include "sound/okim6376.h"
 #include "sound/saa1099.h"
-#include "sound/upd7759.h"
-#include "sound/ymopl.h"
 
 #include "video/ef9369.h"
 #include "video/scn2674.h"
@@ -1868,7 +1866,6 @@ void mpu4vid_state::machine_start()
 {
 	mpu4_config_common();
 
-	m_mod_number=2;
 	/* setup communications */
 	m_link7a_connected = true;
 }

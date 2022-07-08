@@ -18,7 +18,6 @@
 #include "machine/timer.h" //hoppers
 #include "sound/ay8910.h"
 #include "sound/okim6376.h"
-#include "sound/upd7759.h"
 
 
 #define MPU4_MASTER_CLOCK           XTAL(6'880'000)
@@ -410,7 +409,6 @@ protected:
 
 	output_finder<8> m_triacs;
 
-	int m_mod_number = 0;
 	int m_mmtr_data = 0;
 	int m_ay8913_address = 0;
 	int m_signal_50hz = 0;
