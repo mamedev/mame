@@ -20,8 +20,6 @@
 #include "sound/okim6376.h"
 #include "sound/upd7759.h"
 
-#include "emupal.h"
-
 
 #define MPU4_MASTER_CLOCK           XTAL(6'880'000)
 #define VIDEO_MASTER_CLOCK          XTAL(10'000'000)
@@ -124,7 +122,6 @@ public:
 		, m_bank1(*this, "bank1")
 		, m_msm6376(*this, "msm6376")
 		, m_reel(*this, "reel%u", 0U)
-		, m_palette(*this, "palette")
 		, m_meters(*this, "meters")
 		, m_ay8913(*this, "ay8913")
 		, m_dataport(*this, "dataport")
@@ -377,7 +374,6 @@ protected:
 	optional_memory_bank m_bank1;
 	optional_device<okim6376_device> m_msm6376;
 	optional_device_array<stepper_device, 8> m_reel;
-	optional_device<palette_device> m_palette;
 	required_device<meters_device> m_meters;
 	optional_device<ay8913_device> m_ay8913;
 	optional_device<bacta_datalogger_device> m_dataport;

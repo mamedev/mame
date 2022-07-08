@@ -10,6 +10,7 @@
 #include "mpu4.h"
 
 #include "cpu/m68000/m68000.h"
+#include "emupal.h"
 #include "screen.h"
 
 namespace {
@@ -18,8 +19,9 @@ class mpu4plasma_state : public mpu4_state
 {
 public:
 	mpu4plasma_state(const machine_config &mconfig, device_type type, const char *tag)
-		: mpu4_state(mconfig, type, tag),
-		m_plasmaram(*this, "plasmaram")
+		: mpu4_state(mconfig, type, tag)
+		, m_plasmaram(*this, "plasmaram")
+		, m_palette(*this, "palette")
 	{
 	}
 
@@ -27,6 +29,7 @@ public:
 
 private:
 	required_shared_ptr<uint16_t> m_plasmaram;
+	required_device<palette_device> m_palette;
 
 	uint16_t mpu4plasma_unk_r()
 	{

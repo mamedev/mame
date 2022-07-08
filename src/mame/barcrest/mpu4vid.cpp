@@ -197,6 +197,7 @@ TODO:
 #include "video/ef9369.h"
 #include "video/scn2674.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -227,6 +228,7 @@ public:
 		m_trackx_port(*this, "TRACKX"),
 		m_tracky_port(*this, "TRACKY"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
 		m_ef9369(*this, "ef9369")
 	{
 	}
@@ -285,6 +287,7 @@ private:
 	optional_ioport m_trackx_port;
 	optional_ioport m_tracky_port;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	optional_device<ef9369_device> m_ef9369;
 
