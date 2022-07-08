@@ -1005,22 +1005,22 @@ inline void z80_device::exx()
 
 /***************************************************************
  * EX   (SP),r16
+ *  in: TDAT
  ***************************************************************/
 z80_device::ops_type z80_device::ex_sp()
 {
 	return ST_F {
-		TADR=TDAT;                     } MN
+		TDAT2=TDAT;                    } MN
 		pop()                          FN {
-		m_nomreq_cb(SP-1, 0x00, 0xff); } FN {
-		T(1);
-		m_icount_executing -= 2;
-		std::swap(TADR, TDAT);         } MN
+		TADR=SP-1;                     } MN
+		nomreq_addr(1)                 FN {
+		std::swap(TDAT, TDAT2);
+		m_icount_executing -= 2;       } MN
 		wm16_sp()                      FN {
-		m_nomreq_cb(SP, 0x00, 0xff);   } FN {
-		T(1);                          } FN {
-		m_nomreq_cb(SP, 0x00, 0xff);   } FN {
-		T(1);
-		TDAT=TADR;
+		m_icount_executing += 2;
+		TADR=SP;                       } MN
+		nomreq_addr(2)                 FN {
+		std::swap(TDAT, TDAT2);
 		WZ=TDAT;                       } EST
 }
 
@@ -3531,6 +3531,7 @@ void z80_device::device_start()
 		tables_initialised = true;
 	}
 
+	save_item(NAME(m_icount_executing));
 	save_item(NAME(m_cycle));
 	save_item(NAME(m_prefix));
 	save_item(NAME(m_opcode));
