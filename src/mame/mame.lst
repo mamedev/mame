@@ -20729,9 +20729,11 @@ maciivx                         // 1993 Apple Macintosh IIvx
 maciix                          // 1988 Apple Macintosh IIx
 maclc                           // 1990 Apple Macintosh LC
 maclc2                          // 1991 Apple Macintosh LC II
+macse30                         // 1989 Apple Macintosh SE/30
+
+@source:apple/maclc3.cpp
 maclc3                          // 1993 Apple Macintosh LC III
 maclc520                        // 1993 Apple Macintosh LC 520
-macse30                         // 1989 Apple Macintosh SE/30
 
 @source:apple/macpdm.cpp
 pmac6100                        // 1993 Apple Power Macintosh 6100
@@ -27528,7 +27530,7 @@ m4hotrod__v                     //
 m4holdtm                        // Hold Timer (Barcrest)
 m4hpyjok                        // Happy Joker (Barcrest)
 m4jok300                        // Jokers Millenium 300
-m4jok300a                       // 
+m4jok300a                       //
 m4jolgem                        // Jolly Gems (Barcrest)
 m4jolgem__0                     //
 m4jolgem__1                     //

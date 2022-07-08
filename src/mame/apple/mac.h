@@ -216,7 +216,6 @@ private:
 	{
 		RBV_TYPE_RBV = 0,
 		RBV_TYPE_V8,
-		RBV_TYPE_SONORA,
 		RBV_TYPE_DAFB
 	};
 
@@ -236,7 +235,7 @@ private:
 	int m_screen_buffer = 0;
 	int irq_count = 0, ca1_data = 0, ca2_data = 0;
 
-	// 60.15 Hz timer for RBV/V8/Sonora/Eagle/VASP/etc.
+	// 60.15 Hz timer for RBV/V8/Eagle/VASP/etc.
 	emu_timer *m_6015_timer = nullptr;
 
 	// ADB refresh timer, independent of anything else going on
@@ -248,7 +247,6 @@ private:
 	uint8_t m_rbv_regs[256]{}, m_rbv_ier = 0, m_rbv_ifr = 0, m_rbv_type = 0, m_rbv_montype = 0, m_rbv_vbltime = 0;
 	uint32_t m_rbv_colors[3]{}, m_rbv_count = 0, m_rbv_clutoffs = 0, m_rbv_immed10wr = 0;
 	uint32_t m_rbv_palette[256]{};
-	uint8_t m_sonora_vctl[8]{};
 	emu_timer *m_vbl_timer = nullptr, *m_cursor_timer = nullptr;
 	uint16_t m_cursor_line = 0;
 
@@ -295,8 +293,6 @@ private:
 	uint32_t rbv_ramdac_r();
 	void rbv_ramdac_w(offs_t offset, uint32_t data);
 	void ariel_ramdac_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint8_t mac_sonora_vctl_r(offs_t offset);
-	void mac_sonora_vctl_w(offs_t offset, uint8_t data);
 	uint8_t mac_rbv_r(offs_t offset);
 	void mac_rbv_w(offs_t offset, uint8_t data);
 
@@ -355,17 +351,14 @@ private:
 	void hdsel_w(int hdsel);
 
 	DECLARE_VIDEO_START(mac);
-	DECLARE_VIDEO_START(macsonora);
 	DECLARE_VIDEO_RESET(macrbv);
 	DECLARE_VIDEO_START(macv8);
-	DECLARE_VIDEO_RESET(macsonora);
 	DECLARE_VIDEO_RESET(maceagle);
 	DECLARE_VIDEO_START(macrbv);
 	uint32_t screen_update_macse30(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macrbv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macrbvvram(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macv8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_macsonora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER(mac_rbv_vbl);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
