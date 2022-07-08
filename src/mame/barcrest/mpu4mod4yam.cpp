@@ -29,7 +29,6 @@ public:
 	void mod4yam(machine_config &config);
 	void mod4yam_no_bacta(machine_config &config);
 	void mod4yam_7reel(machine_config &config);
-	void mod4yam_chr(machine_config &config);
 
 	void mod4yam_alt(machine_config &config);
 
@@ -84,15 +83,6 @@ void mpu4mod4yam_machines_state::mod4yam_no_bacta(machine_config &config)
 	mod4yam(config);
 	config.device_remove("dataport");
 	m_pia5->ca2_handler().set(m_pia4, FUNC(pia6821_device::cb1_w));
-}
-
-void mpu4mod4yam_machines_state::mod4yam_chr(machine_config &config)
-{
-	mod4yam(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4mod4yam_machines_state::memmap_characteriser_ym2413);
-
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
 }
 
 void mpu4mod4yam_machines_state::mod4yam_alt(machine_config &config)
