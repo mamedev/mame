@@ -350,7 +350,7 @@ static const u8 cc_ex[0x100] = {
  ***************************************************************/
 #define CC(prefix,opcode) do { m_icount_executing += m_cc_##prefix == nullptr ? 0 : m_cc_##prefix[opcode]; } while (0)
 // Defines cycles used by mread/mwrite/in/out (excluding opcode_fetch)
-#define MTM ((m_cc_op == nullptr ? 4 : m_cc_op[0])-1)
+#define MTM (execute_io_cycles()-1)
 
 #define T(icount) do { \
 	m_icount -= icount; \
@@ -388,7 +388,7 @@ z80_device::ops_type z80_device::in()
 {
 	return ST_F {
 		TDAT8 = m_io.read_byte(TADR); } FN {
-		T(4);                         } EST
+		T(execute_io_cycles());       } EST
 }
 
 /***************************************************************
@@ -398,7 +398,7 @@ z80_device::ops_type z80_device::out()
 {
 	return ST_F {
 		m_io.write_byte(TADR, TDAT8); } FN {
-		T(4);                         } EST
+		T(execute_io_cycles());       } EST
 }
 
 /***************************************************************
@@ -524,9 +524,9 @@ z80_device::ops_type z80_device::rop()
 {
 	return ST_F {
 		TDAT8 = opcode_read();               } FN {
-		T(execute_min_cycles());   /* 2 */   } MN
+		T(execute_io_cycles()-2);   /* 2 */  } MN
 		nomreq_ir(1)                         FN {
-		T(execute_min_cycles()-1); /* 1 */
+		T(1);                       /* 1 */
 		PC++;
 		m_r++;                               } EST
 }

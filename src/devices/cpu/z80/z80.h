@@ -140,6 +140,7 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
+	u32 execute_io_cycles() { return m_cc_op == nullptr ? 4 : m_cc_op[0]; }
 	void halt();
 	void leave_halt();
 
