@@ -723,7 +723,7 @@ z80_device::ops_type z80_device::reti()
 {
 	return ST_M
 		pop()                     FN {
-		PC=TDAT8;
+		PC=TDAT;
 		WZ = PC;
 		m_iff1 = m_iff2;
 		daisy_call_reti_device(); } EST
