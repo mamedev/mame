@@ -448,7 +448,6 @@ inline void z80_device::rm16(uint16_t addr, PAIR &r)
 
 /***************************************************************
  * Write a byte to given memory location
- * in: TADR, TDAT8
  ***************************************************************/
 void z80_device::data_write(u16 addr, u8 value) {
 	m_data.write_byte((u32)addr, value);
@@ -466,7 +465,7 @@ z80_device::ops_type z80_device::wm()
 
 /***************************************************************
  * Write a word to given memory location
- * in: TADR, TDAT
+ *  in: TADR, TDAT
  ***************************************************************/
 z80_device::ops_type z80_device::wm16()
 {
@@ -481,7 +480,7 @@ z80_device::ops_type z80_device::wm16()
 
 /***************************************************************
  * Write a word to (SP)
- * in: TDAT
+ *  in: TDAT
  ***************************************************************/
 z80_device::ops_type z80_device::wm16_sp()
 {
@@ -536,7 +535,6 @@ z80_device::ops_type z80_device::rop()
  * for reading opcode arguments. This difference can be used to
  * support systems that use different encoding mechanisms for
  * opcodes and opcode arguments
- *
  * out: TDAT8
  ***************************************************************/
 u8 z80_device::arg_read()
@@ -594,7 +592,7 @@ z80_device::ops_type z80_device::pop()
 
 /***************************************************************
  * PUSH
- * in: TDAT
+ *  in: TDAT
  ***************************************************************/
 z80_device::ops_type z80_device::push()
 {
