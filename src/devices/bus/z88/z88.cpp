@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(Z88CART_SLOT, z88cart_slot_device, "z88cart_slot", "Z88 Cartr
 
 
 //**************************************************************************
-//    Z88 cartridges Interface
+//    Z88 Cartridge Interface
 //**************************************************************************
 
 //-------------------------------------------------
@@ -76,22 +76,19 @@ void z88cart_slot_device::device_start()
 	// resolve callbacks
 	m_out_flp_cb.resolve_safe();
 
-	m_flp_timer = timer_alloc(TIMER_FLP_CLEAR);
+	m_flp_timer = timer_alloc(FUNC(z88cart_slot_device::close_flap), this);
 	m_flp_timer->reset();
 }
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  close_flap
 //-------------------------------------------------
 
-void z88cart_slot_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(z88cart_slot_device::close_flap)
 {
-	if (id == TIMER_FLP_CLEAR)
-	{
-		// close the flap
-		m_out_flp_cb(CLEAR_LINE);
-	}
+	// close the flap
+	m_out_flp_cb(CLEAR_LINE);
 }
 
 /*-------------------------------------------------
@@ -126,7 +123,7 @@ image_init_result z88cart_slot_device::call_load()
 	// open the flap
 	m_out_flp_cb(ASSERT_LINE);
 
-	// setup the timer for close the flap
+	// setup the timer to close the flap
 	m_flp_timer->adjust(CLOSE_FLAP_TIME);
 
 	return image_init_result::PASS;
@@ -151,7 +148,7 @@ void z88cart_slot_device::call_unload()
 	// open the flap
 	m_out_flp_cb(ASSERT_LINE);
 
-	// setup the timer for close the flap
+	// setup the timer to close the flap
 	m_flp_timer->adjust(CLOSE_FLAP_TIME);
 }
 

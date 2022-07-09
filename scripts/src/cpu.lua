@@ -553,6 +553,7 @@ end
 --------------------------------------------------
 -- DEC PDP-8
 --@src/devices/cpu/pdp8/pdp8.h,CPUS["PDP8"] = true
+--@src/devices/cpu/pdp8/hd6120.h,CPUS["PDP8"] = true
 --------------------------------------------------
 
 if CPUS["PDP8"] then
@@ -2719,6 +2720,8 @@ if (CPUS["Z80"]~=null or CPUS["KC80"]~=null) then
 		MAME_DIR .. "src/devices/cpu/z80/ez80.h",
 		MAME_DIR .. "src/devices/cpu/z80/lz8420m.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/lz8420m.h",
+		MAME_DIR .. "src/devices/cpu/z80/mc8123.cpp",
+		MAME_DIR .. "src/devices/cpu/z80/mc8123.h",
 		MAME_DIR .. "src/devices/cpu/z80/r800.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/r800.h",
 	}
@@ -2734,6 +2737,8 @@ if CPUS["KC80"] then
 		MAME_DIR .. "src/devices/cpu/z80/kl5c80a16.h",
 		MAME_DIR .. "src/devices/cpu/z80/kp63.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/kp63.h",
+		MAME_DIR .. "src/devices/cpu/z80/kp64.cpp",
+		MAME_DIR .. "src/devices/cpu/z80/kp64.h",
 		MAME_DIR .. "src/devices/cpu/z80/kp69.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/kp69.h",
 		MAME_DIR .. "src/devices/cpu/z80/ky80.cpp",
@@ -2787,6 +2792,8 @@ if CPUS["Z180"] then
 		MAME_DIR .. "src/devices/cpu/z180/z180ops.h",
 		MAME_DIR .. "src/devices/cpu/z180/z180tbl.h",
 		MAME_DIR .. "src/devices/cpu/z180/z180xy.hxx",
+		MAME_DIR .. "src/devices/cpu/z180/z180asci.cpp",
+		MAME_DIR .. "src/devices/cpu/z180/z180asci.h",
 	}
 end
 
@@ -3583,6 +3590,8 @@ if CPUS["M68HC16"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/m68hc16/cpu16.cpp",
 		MAME_DIR .. "src/devices/cpu/m68hc16/cpu16.h",
+		MAME_DIR .. "src/devices/cpu/m68hc16/m68hc16z.cpp",
+		MAME_DIR .. "src/devices/cpu/m68hc16/m68hc16z.h",
 	}
 end
 

@@ -67,7 +67,7 @@ psxcard_device::psxcard_device(const machine_config &mconfig, const char *tag, d
 void psxcard_device::device_start()
 {
 	m_owner = dynamic_cast<psx_controller_port_device *>(owner());
-	m_ack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(psxcard_device::ack_timer), this));
+	m_ack_timer = timer_alloc(FUNC(psxcard_device::ack_timer), this);
 
 	m_ack = true;
 	m_disabled = false;

@@ -84,7 +84,7 @@
 		::plib::testing::test_location source = PINT_LOCATION(); PINT_SET_LAST(source); \
 		m_parameters->m_num_tests++; \
 		try { exp; this->test_ok() << "got no exception for " # exp << std::endl;} \
-		catch (std::exception &ptest_e) { this->test_error(source) << "unexpected exception thrown: " << ptest_e.what() << std::endl; } \
+		catch (std::exception &test_exception) { this->test_error(source) << "unexpected exception thrown: " << test_exception.what() << std::endl; } \
 		catch (...) { this->test_error(source) << "unexpected exception thrown" << std::endl; } \
 	} else do {} while (0)
 
@@ -175,7 +175,14 @@ namespace plib::testing
 		reg_entry_base(const char *n, const char *d, test_location l)
 		: name(n), desc(d), location(l)
 		{
-			registry().push_back(this);
+			try
+			{
+				registry().push_back(this);
+			}
+			catch (...)
+			{
+				std::terminate();
+			}
 		}
 
 		reg_entry_base(const reg_entry_base &) = delete;
@@ -253,22 +260,22 @@ namespace plib::testing
 				t->set_parameters(&params);
 			})).first)
 			{
-				stream_error(std::cout, e->location) << "unexpected exception thrown during instantiation" << (r.second != "" ? ": " + r.second : "") << std::endl;
+				stream_error(std::cout, e->location) << "unexpected exception thrown during instantiation" << (!r.second.empty() ? ": " + r.second : "") << std::endl;
 				total_errors++;
 			}
 			else if ((r = catch_exception([&]{ t->SetUp(); })).first)
 			{
-				stream_error(std::cout, e->location) << "unexpected exception thrown during Setup" << (r.second != "" ? ": " + r.second : "") << std::endl;
+				stream_error(std::cout, e->location) << "unexpected exception thrown during Setup" << (!r.second.empty() ? ": " + r.second : "") << std::endl;
 				total_errors++;
 			}
 			else if ((r = catch_exception([&]{ t->run(); })).first)
 			{
-				stream_error(std::cout, params.m_last_source) << "unexpected exception thrown during run after this line" << (r.second != "" ? ": " + r.second : "") << std::endl;
+				stream_error(std::cout, params.m_last_source) << "unexpected exception thrown during run after this line" << (!r.second.empty() ? ": " + r.second : "") << std::endl;
 				total_errors++;
 			}
 			else if ((r = catch_exception([&]{ t->TearDown(); })).first)
 			{
-				stream_error(std::cout, e->location) << "unexpected exception thrown during Teardown" << (r.second != "" ? ": " + r.second : "") << std::endl;
+				stream_error(std::cout, e->location) << "unexpected exception thrown during Teardown" << (!r.second.empty() ? ": " + r.second : "") << std::endl;
 				total_errors++;
 			}
 

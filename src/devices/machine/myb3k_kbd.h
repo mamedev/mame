@@ -36,13 +36,6 @@ public:
 			device_t *owner,
 			u32 clock);
 
-	enum
-	{
-		TIMER_ID_SCAN_KEYS,
-		TIMER_ID_FIRST_BYTE,
-		TIMER_ID_SECOND_BYTE
-	};
-
 	template <typename... T>
 	void set_keyboard_callback(T &&... args)
 	{
@@ -61,15 +54,21 @@ protected:
 	virtual void device_reset() override;
 	virtual void send_byte(u8 code);
 	void key_changed(int x, int y, bool down);
-	void scan_keys();
 	void update_modifiers(int y, bool down);
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(scan_keys);
+	TIMER_CALLBACK_MEMBER(send_first_byte);
+	TIMER_CALLBACK_MEMBER(send_second_byte);
 
 	output_delegate             m_keyboard_cb;
 	required_ioport_array<12>   m_io_kbd_t;
 	u8                          m_io_kbd_state[12][8];
 
-	int m_x, m_y;
+	emu_timer *m_scan_timer;
+	emu_timer *m_first_byte_timer;
+	emu_timer *m_second_byte_timer;
+	int m_x;
+	int m_y;
 	u8 m_first_byte;
 	u8 m_second_byte;
 	u8 m_modifier_keys;

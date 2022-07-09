@@ -253,7 +253,7 @@ void upd1771c_device::device_start()
 	/* resolve callbacks */
 	m_ack_handler.resolve_safe();
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd1771c_device::ack_callback),this));
+	m_timer = timer_alloc(FUNC(upd1771c_device::ack_callback), this);
 
 	m_channel = stream_alloc(0, 1, clock() / 4);
 

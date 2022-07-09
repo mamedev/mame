@@ -103,9 +103,9 @@ void ns32202_device::device_start()
 	save_item(NAME(m_out_int_state));
 	save_item(NAME(m_out_cout_state));
 
-	m_interrupt = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ns32202_device::interrupt), this));
-	m_counter[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ns32202_device::counter<0>), this));
-	m_counter[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ns32202_device::counter<1>), this));
+	m_interrupt = timer_alloc(FUNC(ns32202_device::interrupt), this);
+	m_counter[0] = timer_alloc(FUNC(ns32202_device::counter<0>), this);
+	m_counter[1] = timer_alloc(FUNC(ns32202_device::counter<1>), this);
 }
 
 void ns32202_device::device_reset()

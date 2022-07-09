@@ -54,7 +54,9 @@ mc146818_device::mc146818_device(const machine_config &mconfig, device_type type
 		device_nvram_interface(mconfig, *this),
 		m_region(*this, DEVICE_SELF),
 		m_index(0),
-		m_clock_timer(nullptr), m_update_timer(nullptr), m_periodic_timer(nullptr),
+		m_clock_timer(nullptr),
+		m_update_timer(nullptr),
+		m_periodic_timer(nullptr),
 		m_write_irq(*this),
 		m_write_sqw(*this),
 		m_century_index(-1),
@@ -75,9 +77,9 @@ mc146818_device::mc146818_device(const machine_config &mconfig, device_type type
 void mc146818_device::device_start()
 {
 	m_data = make_unique_clear<uint8_t[]>(data_size());
-	m_clock_timer = timer_alloc(TIMER_CLOCK);
-	m_update_timer = timer_alloc(TIMER_UPDATE);
-	m_periodic_timer = timer_alloc(TIMER_PERIODIC);
+	m_clock_timer = timer_alloc(FUNC(mc146818_device::clock_tick), this);
+	m_update_timer = timer_alloc(FUNC(mc146818_device::time_tick), this);
+	m_periodic_timer = timer_alloc(FUNC(mc146818_device::periodic_tick), this);
 
 	m_write_irq.resolve_safe();
 	m_write_sqw.resolve_safe();
@@ -105,140 +107,136 @@ void mc146818_device::device_reset()
 }
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  timer events
 //-------------------------------------------------
 
-void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(mc146818_device::periodic_tick)
 {
-	switch (id)
+	m_sqw_state = !m_sqw_state;
+
+	if (m_data[REG_B] & REG_B_SQWE)
+		m_write_sqw(m_sqw_state);
+
+	// periodic flag/interrupt on rising edge of periodic timer
+	if (m_sqw_state)
 	{
-	case TIMER_PERIODIC:
-		m_sqw_state = !m_sqw_state;
-
-		if (m_data[REG_B] & REG_B_SQWE)
-			m_write_sqw(m_sqw_state);
-
-		// periodic flag/interrupt on rising edge of periodic timer
-		if (m_sqw_state)
-		{
-			m_data[REG_C] |= REG_C_PF;
-			update_irq();
-		}
-		break;
-
-	case TIMER_CLOCK:
-		if (!(m_data[REG_B] & REG_B_SET))
-		{
-			m_data[REG_A] |= REG_A_UIP;
-
-			m_update_timer->adjust(attotime::from_usec(244));
-		}
-		break;
-
-	case TIMER_UPDATE:
-		if (!param)
-		{
-			/// TODO: find out how the real chip deals with updates when binary/bcd values are already outside the normal range
-			int seconds = get_seconds() + 1;
-			if (seconds < 60)
-			{
-				set_seconds(seconds);
-			}
-			else
-			{
-				set_seconds(0);
-
-				int minutes = get_minutes() + 1;
-				if (minutes < 60)
-				{
-					set_minutes(minutes);
-				}
-				else
-				{
-					set_minutes(0);
-
-					int hours = get_hours() + 1;
-					if (hours < 24)
-					{
-						set_hours(hours);
-					}
-					else
-					{
-						set_hours(0);
-
-						int dayofweek = get_dayofweek() + 1;
-						if (dayofweek <= 7)
-						{
-							set_dayofweek(dayofweek);
-						}
-						else
-						{
-							set_dayofweek(1);
-						}
-
-						int dayofmonth = get_dayofmonth() + 1;
-						if (dayofmonth <= gregorian_days_in_month(get_month(), get_year() + 2000))
-						{
-							set_dayofmonth(dayofmonth);
-						}
-						else
-						{
-							set_dayofmonth(1);
-
-							int month = get_month() + 1;
-							if (month <= 12)
-							{
-								set_month(month);
-							}
-							else
-							{
-								set_month(1);
-
-								int year = get_year() + 1;
-								if (year <= 99)
-								{
-									set_year(year);
-								}
-								else
-								{
-									set_year(0);
-
-									if (century_count_enabled())
-									{
-										set_century((get_century() + 1) % 100);
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-
-			if ((m_data[REG_ALARM_SECONDS] == m_data[REG_SECONDS] || (m_data[REG_ALARM_SECONDS] & ALARM_DONTCARE) == ALARM_DONTCARE) &&
-				(m_data[REG_ALARM_MINUTES] == m_data[REG_MINUTES] || (m_data[REG_ALARM_MINUTES] & ALARM_DONTCARE) == ALARM_DONTCARE) &&
-				(m_data[REG_ALARM_HOURS] == m_data[REG_HOURS] || (m_data[REG_ALARM_HOURS] & ALARM_DONTCARE) == ALARM_DONTCARE))
-			{
-				// set the alarm interrupt flag AF
-				m_data[REG_C] |= REG_C_AF;
-			}
-
-			// defer the update end sequence if update cycle time is non-zero
-			if (m_tuc)
-			{
-				m_update_timer->adjust(attotime::from_usec(m_tuc), 1);
-				break;
-			}
-		}
-
-		// clear update in progress and set update ended
-		m_data[REG_A] &= ~REG_A_UIP;
-		m_data[REG_C] |= REG_C_UF;
-
+		m_data[REG_C] |= REG_C_PF;
 		update_irq();
-		break;
 	}
 }
 
+TIMER_CALLBACK_MEMBER(mc146818_device::clock_tick)
+{
+	if (!(m_data[REG_B] & REG_B_SET))
+	{
+		m_data[REG_A] |= REG_A_UIP;
+
+		m_update_timer->adjust(attotime::from_usec(244));
+	}
+}
+
+TIMER_CALLBACK_MEMBER(mc146818_device::time_tick)
+{
+	if (!param)
+	{
+		/// TODO: find out how the real chip deals with updates when binary/bcd values are already outside the normal range
+		int seconds = get_seconds() + 1;
+		if (seconds < 60)
+		{
+			set_seconds(seconds);
+		}
+		else
+		{
+			set_seconds(0);
+
+			int minutes = get_minutes() + 1;
+			if (minutes < 60)
+			{
+				set_minutes(minutes);
+			}
+			else
+			{
+				set_minutes(0);
+
+				int hours = get_hours() + 1;
+				if (hours < 24)
+				{
+					set_hours(hours);
+				}
+				else
+				{
+					set_hours(0);
+
+					int dayofweek = get_dayofweek() + 1;
+					if (dayofweek <= 7)
+					{
+						set_dayofweek(dayofweek);
+					}
+					else
+					{
+						set_dayofweek(1);
+					}
+
+					int dayofmonth = get_dayofmonth() + 1;
+					if (dayofmonth <= gregorian_days_in_month(get_month(), get_year() + 2000))
+					{
+						set_dayofmonth(dayofmonth);
+					}
+					else
+					{
+						set_dayofmonth(1);
+
+						int month = get_month() + 1;
+						if (month <= 12)
+						{
+							set_month(month);
+						}
+						else
+						{
+							set_month(1);
+
+							int year = get_year() + 1;
+							if (year <= 99)
+							{
+								set_year(year);
+							}
+							else
+							{
+								set_year(0);
+
+								if (century_count_enabled())
+								{
+									set_century((get_century() + 1) % 100);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if ((m_data[REG_ALARM_SECONDS] == m_data[REG_SECONDS] || (m_data[REG_ALARM_SECONDS] & ALARM_DONTCARE) == ALARM_DONTCARE) &&
+			(m_data[REG_ALARM_MINUTES] == m_data[REG_MINUTES] || (m_data[REG_ALARM_MINUTES] & ALARM_DONTCARE) == ALARM_DONTCARE) &&
+			(m_data[REG_ALARM_HOURS] == m_data[REG_HOURS] || (m_data[REG_ALARM_HOURS] & ALARM_DONTCARE) == ALARM_DONTCARE))
+		{
+			// set the alarm interrupt flag AF
+			m_data[REG_C] |= REG_C_AF;
+		}
+
+		// defer the update end sequence if update cycle time is non-zero
+		if (m_tuc)
+		{
+			m_update_timer->adjust(attotime::from_usec(m_tuc), 1);
+			return;
+		}
+	}
+
+	// clear update in progress and set update ended
+	m_data[REG_A] &= ~REG_A_UIP;
+	m_data[REG_C] |= REG_C_UF;
+
+	update_irq();
+}
 
 //-------------------------------------------------
 //  nvram_default - called to initialize NVRAM to

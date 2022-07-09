@@ -69,7 +69,6 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -121,10 +120,12 @@ private:
 	coco_cartridge_line         m_cart_line;
 	coco_cartridge_line         m_nmi_line;
 	coco_cartridge_line         m_halt_line;
+
 public:
 	devcb_write_line            m_cart_callback;
 	devcb_write_line            m_nmi_callback;
 	devcb_write_line            m_halt_callback;
+
 private:
 	// cartridge
 	device_cococart_interface   *m_cart;
@@ -133,6 +134,11 @@ private:
 	void set_line(line ln, coco_cartridge_line &line, line_value value);
 	void set_line_timer(coco_cartridge_line &line, line_value value);
 	void twiddle_line_if_q(coco_cartridge_line &line);
+
+	TIMER_CALLBACK_MEMBER(cart_line_timer_tick);
+	TIMER_CALLBACK_MEMBER(nmi_line_timer_tick);
+	TIMER_CALLBACK_MEMBER(halt_line_timer_tick);
+
 public:
 	static const char *line_value_string(line_value value);
 };

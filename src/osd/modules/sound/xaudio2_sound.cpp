@@ -22,13 +22,14 @@
 #undef interface
 
 // stdlib includes
-#include <mutex>
-#include <thread>
-#include <queue>
+#include <algorithm>
 #include <chrono>
+#include <mutex>
+#include <queue>
+#include <thread>
 
 // MAME headers
-#include "emu.h"
+#include "osdcore.h"
 #include "osdepend.h"
 
 #include "winutil.h"

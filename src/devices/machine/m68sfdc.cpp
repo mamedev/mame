@@ -73,8 +73,8 @@ void m68sfdc_device::device_start()
 	m_irq_handler.resolve_safe();
 	m_nmi_handler.resolve_safe();
 
-	m_timer_head_load = timer_alloc(TM_HEAD_LOAD);
-	m_timer_timeout = timer_alloc(TM_TIMEOUT);
+	m_timer_head_load = timer_alloc(FUNC(m68sfdc_device::head_load_update), this);
+	m_timer_timeout = timer_alloc(FUNC(m68sfdc_device::timeout_expired), this);
 	save_item(NAME(m_select_0));
 	save_item(NAME(m_select_1));
 	save_item(NAME(m_select_2));
@@ -97,7 +97,7 @@ void m68sfdc_device::device_start()
 
 	m_floppy = nullptr;
 
-	t_gen = timer_alloc(TM_GEN);
+	t_gen = timer_alloc(FUNC(m68sfdc_device::general_update), this);
 }
 
 void m68sfdc_device::device_reset()
@@ -148,35 +148,28 @@ WRITE_LINE_MEMBER(m68sfdc_device::handle_nmi)
 	m_nmi_handler(state);
 }
 
-void m68sfdc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(m68sfdc_device::head_load_update)
 {
-	switch (id)
+	live_sync();
+	m_head_load2 = 0;
+	u8 head_load = m_head_load1 && m_head_load2;
+	if (head_load != m_head_load)
 	{
-	case TM_HEAD_LOAD:
-	{
-		live_sync();
-		m_head_load2 = 0;
-		u8 head_load = m_head_load1 && m_head_load2;
-		if (head_load != m_head_load)
-		{
-			// TODO sound?
-			m_head_load = head_load;
-		}
-		break;
+		// TODO sound?
+		m_head_load = head_load;
 	}
-	case TM_TIMEOUT:
-	{
-		live_sync();
-		m_pia->ca1_w(0);
-		break;
-	}
-	case TM_GEN:
-		live_sync();
-		live_run();
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in m68sfdc_device::device_timer");
-	}
+}
+
+TIMER_CALLBACK_MEMBER(m68sfdc_device::timeout_expired)
+{
+	live_sync();
+	m_pia->ca1_w(0);
+}
+
+TIMER_CALLBACK_MEMBER(m68sfdc_device::general_update)
+{
+	live_sync();
+	live_run();
 }
 
 

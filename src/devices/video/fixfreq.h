@@ -105,7 +105,7 @@ private:
 struct fixedfreq_monitor_intf
 {
 	virtual ~fixedfreq_monitor_intf() = default;
-	virtual void vsync_end_cb(double refresh_time) = 0;
+	virtual void vsync_end_cb(double refresh_time, uint32_t field) = 0;
 };
 
 struct fixedfreq_monitor_line
@@ -174,7 +174,7 @@ struct fixedfreq_monitor_state
 
 		m_fragments.clear();
 
-		m_intf.vsync_end_cb(m_desc.clock_period() * m_desc.vtotal() * m_desc.htotal());
+		//m_intf.vsync_end_cb(m_desc.clock_period() * m_desc.vtotal() * m_desc.htotal(), 0);
 	}
 
 	void reset()
@@ -301,16 +301,16 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
-	//virtual void device_timer(emu_timer &timer, device_timer_id id, int param);
 
 	virtual ioport_constructor device_input_ports() const override;
 
-	void vsync_end_cb(double refresh_time) override;
+	void vsync_end_cb(double refresh_time, uint32_t field) override;
 
 private:
 	required_ioport m_enable;
 	required_ioport m_vector;
 	float m_scanline_height;
+	double m_last_rt;
 
 	/* adjustable by drivers */
 	fixedfreq_monitor_desc m_monitor;

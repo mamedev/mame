@@ -11792,7 +11792,7 @@ license:CC0
 		</part>
 	</software>
 
-		<software name="viewstor11" cloneof="viewstor">
+	<software name="viewstor11" cloneof="viewstor">
 		<description>ViewStore 1.1</description>
 		<year>1985</year>
 		<publisher>Acornsoft</publisher>
@@ -11804,7 +11804,7 @@ license:CC0
 		</part>
 	</software>
 
-		<software name="viewstor12" cloneof="viewstor">
+	<software name="viewstor12" cloneof="viewstor">
 		<description>ViewStore 1.2</description>
 		<year>1985</year>
 		<publisher>Acornsoft</publisher>
@@ -11816,7 +11816,7 @@ license:CC0
 		</part>
 	</software>
 
-		<software name="viewstor">
+	<software name="viewstor">
 		<description>ViewStore 1.5</description>
 		<year>1985</year>
 		<publisher>Acornsoft</publisher>

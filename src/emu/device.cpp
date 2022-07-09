@@ -460,28 +460,6 @@ u64 device_t::attotime_to_clocks(const attotime &duration) const noexcept
 
 
 //-------------------------------------------------
-//  timer_alloc - allocate a timer for our device
-//  callback
-//-------------------------------------------------
-
-emu_timer *device_t::timer_alloc(device_timer_id id)
-{
-	return machine().scheduler().timer_alloc(*this, id);
-}
-
-
-//-------------------------------------------------
-//  timer_set - set a temporary timer that will
-//  call our device callback
-//-------------------------------------------------
-
-void device_t::timer_set(const attotime &duration, device_timer_id id, int param)
-{
-	machine().scheduler().timer_set(duration, *this, id, param);
-}
-
-
-//-------------------------------------------------
 //  set_machine - notify that the machine now
 //  exists
 //-------------------------------------------------
@@ -876,17 +854,6 @@ void device_t::device_clock_changed()
 //-------------------------------------------------
 
 void device_t::device_debug_setup()
-{
-	// do nothing by default
-}
-
-
-//-------------------------------------------------
-//  device_timer - called whenever a device timer
-//  fires
-//-------------------------------------------------
-
-void device_t::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	// do nothing by default
 }

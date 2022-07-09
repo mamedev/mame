@@ -229,11 +229,13 @@ void sis5513_ide_device::bar_w(offs_t offset, u32 data)
 	m_bar[offset] = data;
 	// Bits 0 (primary) and 2 (secondary) control if the mapping is legacy or BAR
 	switch (offset) {
-	case 0 ... 1:
+	case 0:
+	case 1:
 		if (ide1_mode())
 			pci_device::address_base_w(offset, data);
 		break;
-	case 2 ... 3:
+	case 2:
+	case 3:
 		if (ide2_mode())
 			pci_device::address_base_w(offset, data);
 		break;

@@ -11,9 +11,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// TO DO: DPC should be made a separate device!
-
-//  m_dpc.oscillator = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a2600_state::modeDPC_timer_callback),this));
+// TODO: DPC should be made a separate device
 
 class dpc_device : public device_t
 {
@@ -27,7 +25,11 @@ public:
 	virtual void write(offs_t offset, uint8_t data);
 
 protected:
-	static constexpr device_timer_id TIMER_OSC = 0;
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	TIMER_CALLBACK_MEMBER(oscillator_tick);
 
 	struct df_t {
 		uint8_t   top;
@@ -38,11 +40,6 @@ protected:
 		uint8_t   music_mode;     /* Only used by data fetchers 5,6, and 7 */
 		uint8_t   osc_clk;        /* Only used by data fetchers 5,6, and 7 */
 	};
-
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	df_t    m_df[8];
 	uint8_t   m_movamt;

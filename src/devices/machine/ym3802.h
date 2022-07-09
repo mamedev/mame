@@ -3,7 +3,10 @@
 /*
  * ym3802.h - Yamaha YM3802/YM3523 MCS MIDI Communication and Service Controller
  *
- *  * Registers:
+ * CLK input - anywhere from 1MHz up to 4MHz
+ * CLKM input - usually either 1MHz or 0.5MHz, or CLKF input - usually 614.4kHz
+ *
+ * Registers:
  *     reg0 : IVR (read-only)
  *     reg1 : RGR (bit 8 = reset, bits 0-3 = register bank select)
  *     reg2 : ISR (read-only)
@@ -26,7 +29,7 @@
 class ym3802_device : public device_t, public device_serial_interface
 {
 public:
-		// construction/destruction
+	// construction/destruction
 	ym3802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
@@ -41,7 +44,6 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	enum
@@ -118,15 +120,8 @@ private:
 		IRQ_GENERAL_TIMER = 0x80
 	};
 
-	enum
-	{
-		TIMER_SYSTEM_CLOCK = 0x200,  // CLK input - anywhere from 1MHz up to 4MHz
-		TIMER_TX_CLOCK,
-		TIMER_MIDI_CLOCK            // CLKM input - usually either 1MHz or 0.5MHz, or CLKF input - usually 614.4kHz
-	};
-
-	void transmit_clk();
-	void midi_clk();
+	TIMER_CALLBACK_MEMBER(transmit_clk);
+	TIMER_CALLBACK_MEMBER(midi_clk);
 	void reset_midi_timer();
 	void set_comms_mode();
 	void set_irq(uint8_t irq);
@@ -135,7 +130,6 @@ private:
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_txd_handler;
 	devcb_read_line m_rxd_handler;
-	emu_timer* m_clock_timer;
 	emu_timer* m_midi_timer;
 	emu_timer* m_midi_counter_timer;
 

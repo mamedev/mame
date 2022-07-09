@@ -526,8 +526,8 @@ public:
 		switch (sdlevent.type)
 		{
 		case SDL_MOUSEMOTION:
-			mouse.lX += sdlevent.motion.xrel * INPUT_RELATIVE_PER_PIXEL;
-			mouse.lY += sdlevent.motion.yrel * INPUT_RELATIVE_PER_PIXEL;
+			mouse.lX += sdlevent.motion.xrel * osd::INPUT_RELATIVE_PER_PIXEL;
+			mouse.lY += sdlevent.motion.yrel * osd::INPUT_RELATIVE_PER_PIXEL;
 
 			{
 				int cx = -1, cy = -1;
@@ -676,8 +676,8 @@ public:
 
 		case SDL_JOYBALLMOTION:
 			//printf("Ball %d %d\n", sdlevent.jball.xrel, sdlevent.jball.yrel);
-			joystick.balls[sdlevent.jball.ball * 2] = sdlevent.jball.xrel * INPUT_RELATIVE_PER_PIXEL;
-			joystick.balls[sdlevent.jball.ball * 2 + 1] = sdlevent.jball.yrel * INPUT_RELATIVE_PER_PIXEL;
+			joystick.balls[sdlevent.jball.ball * 2] = sdlevent.jball.xrel * osd::INPUT_RELATIVE_PER_PIXEL;
+			joystick.balls[sdlevent.jball.ball * 2 + 1] = sdlevent.jball.yrel * osd::INPUT_RELATIVE_PER_PIXEL;
 			break;
 
 		case SDL_JOYHATMOTION:
@@ -965,10 +965,7 @@ public:
 		for (int button = 0; button < 4; button++)
 		{
 			input_item_id itemid = (input_item_id)(ITEM_ID_BUTTON1 + button);
-			char defname[20];
-			snprintf(defname, sizeof(defname), "B%d", button + 1);
-
-			devinfo.device()->add_item(defname, itemid, generic_button_get_state<std::int32_t>, &devinfo.mouse.buttons[button]);
+			devinfo.device()->add_item(default_button_name(button), itemid, generic_button_get_state<std::int32_t>, &devinfo.mouse.buttons[button]);
 		}
 
 		osd_printf_verbose("Mouse: Registered %s\n", devinfo.name());
@@ -1061,7 +1058,7 @@ public:
 
 		m_sixaxis_mode = downcast<const sdl_options *>(options())->sixaxis();
 
-		devmap_init(machine, &m_joy_map, SDLOPTION_JOYINDEX, 8, "Joystick mapping");
+		m_joy_map.init(machine, SDLOPTION_JOYINDEX, 8, "Joystick mapping");
 
 		osd_printf_verbose("Joystick: Start initialization\n");
 		for (int physical_stick = 0; physical_stick < SDL_NumJoysticks(); physical_stick++)
@@ -1144,8 +1141,7 @@ public:
 				else
 					itemid = ITEM_ID_OTHER_SWITCH;
 
-				snprintf(tempname, sizeof(tempname), "Button %d", button + 1);
-				devinfo->device()->add_item(tempname, itemid, generic_button_get_state<std::int32_t>, &devinfo->joystick.buttons[button]);
+				devinfo->device()->add_item(default_button_name(button), itemid, generic_button_get_state<std::int32_t>, &devinfo->joystick.buttons[button]);
 			}
 
 			// loop over all hats

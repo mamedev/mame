@@ -17,15 +17,13 @@
 #include "emu.h"
 #include "sc499.h"
 
+#define LOG_LEVEL0      (0x1U << 1)
+#define LOG_LEVEL1      (0x3U << 1)
+#define LOG_LEVEL2      (0x7U << 1)
+#define LOG_LEVEL3      (0xfU << 1)
 
-#define VERBOSE 0
-
-static int verbose = VERBOSE;
-
-#define LOG(x)  { logerror ("%s: ", cpu_context()); logerror x; logerror ("\n"); }
-#define LOG1(x) { if (verbose > 0) LOG(x)}
-#define LOG2(x) { if (verbose > 1) LOG(x)}
-#define LOG3(x) { if (verbose > 2) LOG(x)}
+#define VERBOSE (LOG_LEVEL0)
+#include "logmacro.h"
 
 #define SC499_CTAPE_TAG "sc499_ctape"
 DECLARE_DEVICE_TYPE(SC499_CTAPE, sc499_ctape_image_device)
@@ -332,20 +330,20 @@ void sc499_device::device_start()
 {
 	set_isa_device();
 
-	LOG1(("start sc499"));
+	LOGMASKED(LOG_LEVEL1, "%s: start sc499", cpu_context());
 
-	m_timer = timer_alloc(0);
-	m_timer1 = timer_alloc(1);
+	m_timer = timer_alloc(FUNC(sc499_device::timer_func), this);
+	m_timer1 = timer_alloc(FUNC(sc499_device::timer_func), this);
 
 	m_installed = false;
 
 	if (!m_image->is_open())
 	{
-		LOG2(("start sc499: no cartridge tape"));
+		LOGMASKED(LOG_LEVEL2, "%s: start sc499: no cartridge tape", cpu_context());
 	}
 	else
 	{
-		LOG2(("start sc499: cartridge tape image is %s", m_image->filename()));
+		LOGMASKED(LOG_LEVEL2, "%s: start sc499: cartridge tape image is %s", cpu_context(), m_image->filename());
 	}
 
 	m_ctape_block_buffer.resize(SC499_CTAPE_BLOCK_SIZE);
@@ -410,16 +408,6 @@ std::string sc499_device::cpu_context() const
 }
 
 /*-------------------------------------------------
- logerror - log an error message (w/o device tags)
- -------------------------------------------------*/
-
-template <typename Format, typename... Params>
-void sc499_device::logerror(Format &&fmt, Params &&... args) const
-{
-	machine().logerror(std::forward<Format>(fmt), std::forward<Params>(args)...);
-}
-
-/*-------------------------------------------------
  tape_status_clear - clear bits in tape status
  -------------------------------------------------*/
 
@@ -472,7 +460,7 @@ void sc499_device::check_tape()
 			m_ctape_block_count = (uint32_t)((m_image_length + SC499_CTAPE_BLOCK_SIZE - 1) / SC499_CTAPE_BLOCK_SIZE);
 		}
 
-		LOG1(("check_tape: tape image is %s with %d blocks", m_image->filename(), m_ctape_block_count));
+		LOGMASKED(LOG_LEVEL1, "%s: check_tape: tape image is %s with %d blocks", cpu_context(), m_image->filename(), m_ctape_block_count);
 	}
 	else
 	{
@@ -481,7 +469,7 @@ void sc499_device::check_tape()
 		m_image_length = 0;
 		m_ctape_block_count = 0;
 
-		LOG1(("check_tape: no cartridge tape"));
+		LOGMASKED(LOG_LEVEL1, "%s: check_tape: no cartridge tape", cpu_context());
 	}
 }
 
@@ -489,9 +477,9 @@ void sc499_device::check_tape()
  timer_func - handle timer interrupts
  -------------------------------------------------*/
 
-void sc499_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(sc499_device::timer_func)
 {
-	LOG2(("timer_func param=%d status=%x", param, m_status));
+	LOGMASKED(LOG_LEVEL2, "%s: timer_func param=%d status=%x", cpu_context(), param, m_status);
 
 	switch (param)
 	{
@@ -556,20 +544,20 @@ void sc499_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 				tape_status_clear(SC499_ST_CLEAR_ALL);
 				tape_status_set(SC499_ST_READ_ERROR);
 
-				LOG(("timer_func param=%d status=%x tape_pos=%d - read data underrun aborted at %d",
-						param, m_status, m_tape_pos, m_underrun_counter));
+				LOGMASKED(LOG_LEVEL0, "%s: timer_func param=%d status=%x tape_pos=%d - read data underrun aborted at %d",
+					cpu_context(), param, m_status, m_tape_pos, m_underrun_counter);
 			}
 			else
 			{
-				LOG2(("timer_func param=%d status=%x tape_pos=%d - read data underrun %d",
-						param, m_status, m_tape_pos, m_underrun_counter));
+				LOGMASKED(LOG_LEVEL2, "%s: timer_func param=%d status=%x tape_pos=%d - read data underrun %d",
+					cpu_context(), param, m_status, m_tape_pos, m_underrun_counter);
 			}
 			break;
 		}
 		else if ( m_tape_pos > m_ctape_block_count || !(m_status & SC499_STAT_RDY))
 		{
-			LOG1(("timer_func param=%d status=%x tape_pos=%d - end-of-tape or not ready",
-								param, m_status, m_tape_pos));
+			LOGMASKED(LOG_LEVEL1, "%s: timer_func param=%d status=%x tape_pos=%d - end-of-tape or not ready",
+				cpu_context(), param, m_status, m_tape_pos);
 			m_timer1->adjust(attotime::never, param, attotime::never);
 			m_status &= ~SC499_STAT_EXC;
 			m_status &= ~SC499_STAT_DIR;
@@ -584,8 +572,8 @@ void sc499_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 		{
 			if  (m_underrun_counter > 0)
 			{
-				LOG1(("timer_func param=%d status=%x tape_pos=%d - read data underrun ended at %d",
-						param, m_status, m_tape_pos, m_underrun_counter));
+				LOGMASKED(LOG_LEVEL1, "%s: timer_func param=%d status=%x tape_pos=%d - read data underrun ended at %d",
+					cpu_context(), param, m_status, m_tape_pos, m_underrun_counter);
 			}
 
 			read_block();
@@ -623,7 +611,7 @@ void sc499_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 		break;
 
 	default:
-		LOG(("timer_func param=%d UNEXPECTED", param));
+		LOGMASKED(LOG_LEVEL0, "%s: timer_func param=%d UNEXPECTED", cpu_context(), param);
 		m_timer->reset();
 		break;
 	}
@@ -638,7 +626,7 @@ void sc499_device::set_interrupt(enum line_state state)
 {
 	if (state != irq_state)
 	{
-		LOG2(("set_interrupt(%d)",state));
+		LOGMASKED(LOG_LEVEL2, "%s: set_interrupt(%d)", cpu_context(), state);
 		switch (m_irq)
 		{
 			case 2: m_isa->irq2_w(state); break;
@@ -661,7 +649,7 @@ void sc499_device::set_dma_drq(enum line_state state)
 {
 	if (state != dma_drq_state)
 	{
-		LOG2(("set_dma_drq(%d)",state));
+		LOGMASKED(LOG_LEVEL2, "%s: set_dma_drq(%d)", cpu_context(), state);
 
 		switch (m_drq)
 		{
@@ -686,36 +674,36 @@ void sc499_device::log_command(uint8_t data)
 	case SC499_CMD_SEL_2:
 	case SC499_CMD_SEL_3:
 	case SC499_CMD_SEL_4:
-		LOG1(("write_command_port: %02x Select %x", data, data & 0x1f));
+		LOGMASKED(LOG_LEVEL1, "%s: write_command_port: %02x Select %x", cpu_context(), data, data & 0x1f);
 		break;
 	case SC499_CMD_REWIND: // rewind tape
-		LOG1(("write_command_port: %02x Rewind Tape", data));
+		LOGMASKED(LOG_LEVEL1, "%s: write_command_port: %02x Rewind Tape", cpu_context(), data);
 		break;
 	case SC499_CMD_ERASE:  // erase tape
-		LOG1(("write_command_port: %02x Erase Tape", data));
+		LOGMASKED(LOG_LEVEL1, "%s: write_command_port: %02x Erase Tape", cpu_context(), data);
 		break;
 	case SC499_CMD_RETEN:  // retention tape
-		LOG1(("write_command_port: %02x Retention Tape", data));
+		LOGMASKED(LOG_LEVEL1, "%s: write_command_port: %02x Retention Tape", cpu_context(), data);
 		break;
 	case SC499_CMD_WRITE_DATA:
-		LOG1(("write_command_port: %02x Write Data %d ...", data, m_tape_pos));
+		LOGMASKED(LOG_LEVEL1, "%s: write_command_port: %02x Write Data %d ...", cpu_context(), data, m_tape_pos);
 		break;
 	case SC499_CMD_WRITE_FILEMARK:
-		LOG1(("write_command_port: %02x Write File Mark %d", data, m_tape_pos));
+		LOGMASKED(LOG_LEVEL1, "%s: write_command_port: %02x Write File Mark %d", cpu_context(), data, m_tape_pos);
 		break;
 	case SC499_CMD_READ_DATA:
-		LOG1(("write_command_port: %02x Read Data %d ...", data, m_tape_pos));
+		LOGMASKED(LOG_LEVEL1, "%s: write_command_port: %02x Read Data %d ...", cpu_context(), data, m_tape_pos);
 		break;
 	case SC499_CMD_READ_FILE_MARK:
-		LOG1(("write_command_port: %02x Read File Mark %d", data, m_tape_pos));
+		LOGMASKED(LOG_LEVEL1, "%s: write_command_port: %02x Read File Mark %d", cpu_context(), data, m_tape_pos);
 		break;
 	case SC499_CMD_READ_STATUS:
-		LOG1(("write_command_port: %02x Read Status (%04x %04x %04x)", data,
-				m_tape_status, m_data_error_counter, m_underrun_counter));
+		LOGMASKED(LOG_LEVEL1, "%s: write_command_port: %02x Read Status (%04x %04x %04x)", cpu_context(), data,
+			m_tape_status, m_data_error_counter, m_underrun_counter);
 		break;
 	case SC499_CMD_RESERVED: // Reserved
 	default:
-		LOG(("write_command_port: %02x Unexpected Command!", data));
+		LOGMASKED(LOG_LEVEL0, "%s: write_command_port: %02x Unexpected Command!", cpu_context(), data);
 		break;
 	}
 }
@@ -784,7 +772,7 @@ void sc499_device::do_command(uint8_t data)
 		{
 			// SC499_CMD_READ_DATA pending
 			m_status &= ~SC499_STAT_DIR;
-			LOG1(("do_command: Read data -> Read File Mark at %d", m_tape_pos));
+			LOGMASKED(LOG_LEVEL1, "%s: do_command: Read data -> Read File Mark at %d", cpu_context(), m_tape_pos);
 		}
 		else
 		{
@@ -819,7 +807,7 @@ void sc499_device::do_command(uint8_t data)
 
 void sc499_device::do_reset()
 {
-	LOG1(("do_reset: Reset controller microprocessor"));
+	LOGMASKED(LOG_LEVEL1, "%s: do_reset: Reset controller microprocessor", cpu_context());
 
 	m_data = 0;
 	m_command = SC499_CMD_NO_COMMAND;
@@ -861,7 +849,7 @@ uint8_t sc499_device::read_data_port()
 	// omit excessive logging
 	if (m_last_data != m_data)
 	{
-		LOG2(("read_data_port: %02x", m_data));
+		LOGMASKED(LOG_LEVEL2, "%s: read_data_port: %02x", cpu_context(), m_data);
 		m_last_data = m_data;
 	}
 
@@ -876,7 +864,7 @@ uint8_t sc499_device::read_data_port()
 
 void sc499_device::write_control_port( uint8_t data)
 {
-	LOG2(("write_control_port: %02x", data));
+	LOGMASKED(LOG_LEVEL2, "%s: write_control_port: %02x", cpu_context(), data);
 
 	if ((data ^ m_control) & SC499_CTR_RST)
 	{
@@ -897,7 +885,7 @@ void sc499_device::write_control_port( uint8_t data)
 		// Request to LSI chip has changed
 		if (data & SC499_CTR_REQ)
 		{
-			LOG3(("write_control_port: Request to LSI chip = On"));
+			LOGMASKED(LOG_LEVEL3, "%s: write_control_port: Request to LSI chip = On", cpu_context());
 
 			if (m_command == SC499_CMD_READ_STATUS) {
 				m_status |= SC499_STAT_EXC;
@@ -922,7 +910,7 @@ void sc499_device::write_control_port( uint8_t data)
 		}
 		else
 		{
-			LOG2(("write_control_port: Request to LSI chip = Off (%d)", m_data_index));
+			LOGMASKED(LOG_LEVEL2, "%s: write_control_port: Request to LSI chip = Off (%d)", cpu_context(), m_data_index);
 
 			if (!(m_status & SC499_STAT_DIR))
 			{
@@ -948,7 +936,7 @@ uint8_t sc499_device::read_status_port()
 	// omit excessive logging
 	if (m_last_status != m_status)
 	{
-		LOG2(("read_status_port: %02x", m_status));
+		LOGMASKED(LOG_LEVEL2, "%s: read_status_port: %02x", cpu_context(), m_status);
 		m_last_status = m_status;
 	}
 
@@ -963,7 +951,7 @@ uint8_t sc499_device::read_status_port()
 
 void sc499_device::write_dma_go( uint8_t data)
 {
-	LOG2(("write_dma_go: %02x", data));
+	LOGMASKED(LOG_LEVEL2, "%s: write_dma_go: %02x", cpu_context(), data);
 
 	m_status &= ~SC499_STAT_DON;
 
@@ -1008,7 +996,7 @@ void sc499_device::write_dma_go( uint8_t data)
 
 void sc499_device::write_dma_reset( uint8_t data)
 {
-	LOG2(("write_dma_reset: %02x", data));
+	LOGMASKED(LOG_LEVEL2, "%s: write_dma_reset: %02x", cpu_context(), data);
 
 	m_status &= ~SC499_STAT_DON;
 	m_control = 0;
@@ -1031,7 +1019,7 @@ void sc499_device::write(offs_t offset, uint8_t data)
 		write_dma_reset(data);
 		break;
 	default:
-		LOG(("writing sc499 Register at offset %02x = %02x", offset, data));
+		LOGMASKED(LOG_LEVEL0, "%s: writing sc499 Register at offset %02x = %02x", cpu_context(), offset, data);
 		break;
 	}
 }
@@ -1050,7 +1038,7 @@ uint8_t sc499_device::read(offs_t offset)
 //      set_interrupt(CLEAR_LINE);
 		break;
 	default:
-		LOG(("reading sc499 Register at offset %02x = %02x", offset, data));
+		LOGMASKED(LOG_LEVEL0, "%s: reading sc499 Register at offset %02x = %02x", cpu_context(), offset, data);
 		break;
 	}
 
@@ -1059,7 +1047,7 @@ uint8_t sc499_device::read(offs_t offset)
 
 void sc499_device::eop_w(int state)
 {
-	LOG2(("set_tc_state: block=%d state=%x", m_tape_pos-1, state));
+	LOGMASKED(LOG_LEVEL2, "%s: set_tc_state: block=%d state=%x", cpu_context(), m_tape_pos - 1, state);
 	if (state == 0)
 	{
 		m_status |= SC499_STAT_DON; // 37ec
@@ -1091,7 +1079,7 @@ uint8_t sc499_device::dack_r(int line)
 
 	if (m_ctape_block_index >= SC499_CTAPE_BLOCK_SIZE)
 	{
-		LOG3(("dack_read: read_block"));
+		LOGMASKED(LOG_LEVEL3, "%s: dack_read: read_block", cpu_context());
 		read_block();
 		m_nasty_readahead++;
 
@@ -1106,7 +1094,7 @@ uint8_t sc499_device::dack_r(int line)
 	data = m_ctape_block_buffer[m_ctape_block_index++];
 	if (m_ctape_block_index < 2 || m_ctape_block_index > 511)
 	{
-		LOG2(("dack_read: data[%d]=%x status=%x",  m_ctape_block_index-1, data, m_status));
+		LOGMASKED(LOG_LEVEL2, "%s: dack_read: data[%d]=%x status=%x", cpu_context(), m_ctape_block_index - 1, data, m_status);
 	}
 
 //  if (m_ctape_block_index < SC499_CTAPE_BLOCK_SIZE)
@@ -1119,7 +1107,7 @@ uint8_t sc499_device::dack_r(int line)
 
 void sc499_device::dack_w(int line, uint8_t data)
 {
-	LOG3(("dack_write: data=%x", data));
+	LOGMASKED(LOG_LEVEL3, "%s: dack_write: data=%x", cpu_context(), data);
 
 	if (m_ctape_block_index < SC499_CTAPE_BLOCK_SIZE)
 	{
@@ -1128,7 +1116,7 @@ void sc499_device::dack_w(int line, uint8_t data)
 
 	if (m_ctape_block_index == SC499_CTAPE_BLOCK_SIZE)
 	{
-		LOG3(("dack_write: write_block"));
+		LOGMASKED(LOG_LEVEL3, "%s: dack_write: write_block", cpu_context());
 		write_block();
 	}
 }
@@ -1141,7 +1129,7 @@ void sc499_device::log_block(const char *text)
 {
 	int data_length = 16;
 
-	if (verbose > 0) {
+	if (VERBOSE & (LOG_LEVEL1 | LOG_LEVEL2 | LOG_LEVEL3)) {
 		int i;
 		logerror("%s: %s %d -", cpu_context(), text, m_tape_pos);
 		for (i = 0; i < data_length && i < SC499_CTAPE_BLOCK_SIZE; i++) {
@@ -1190,7 +1178,7 @@ void sc499_device::read_block()
 	{
 		memcpy(&m_ctape_block_buffer[0], tape, SC499_CTAPE_BLOCK_SIZE);
 
-		//  if (verbose > 1 || m_tape_pos % 100 == 0)
+		//  if (m_tape_pos % 100 == 0)
 		{
 			log_block("read_block");
 		}
@@ -1203,7 +1191,7 @@ void sc499_device::read_block()
 			// FIXME: we must read first block twice (in MD for 'di c' and 'ld' or 'ex ...')
 			// why is this necessary???
 			m_tape_pos = 0;
-			LOG(("read_block - duplicating block %d", m_tape_pos));
+			LOGMASKED(LOG_LEVEL0, "%s: read_block - duplicating block %d", cpu_context(), m_tape_pos);
 		}
 		m_first_block_hack = 0;
 
@@ -1261,9 +1249,9 @@ int sc499_device::block_is_filemark()
 	static const uint8_t fm_pattern[] = {0xDE, 0xAF, 0xFA, 0xED};
 
 	int is_filemark = memcmp(&m_ctape_block_buffer[0], fm_pattern, 4) == 0 &&
-			memcmp(&m_ctape_block_buffer[0], &m_ctape_block_buffer[4], SC499_CTAPE_BLOCK_SIZE-4) == 0;
+			memcmp(&m_ctape_block_buffer[0], &m_ctape_block_buffer[4], SC499_CTAPE_BLOCK_SIZE - 4) == 0;
 
-	LOG3(("block_is_filemark for block %d = %d", m_tape_pos-1, is_filemark));
+	LOGMASKED(LOG_LEVEL3, "%s: block_is_filemark for block %d = %d", cpu_context(), m_tape_pos - 1, is_filemark);
 	return is_filemark;
 }
 

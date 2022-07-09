@@ -96,6 +96,7 @@ public:
 	virtual ~menu_game_info() override;
 
 protected:
+	virtual void menu_activated() override;
 	virtual void populate_text(std::optional<text_layout> &layout, float &width, int &lines) override;
 
 private:

@@ -11,12 +11,16 @@
 #ifndef __DRAWBGFX_EFFECT_READER__
 #define __DRAWBGFX_EFFECT_READER__
 
-#include <string>
-
 #include "statereader.h"
+
+#include <bgfx/bgfx.h>
+
+#include <string>
+#include <vector>
 
 class bgfx_effect;
 class bgfx_uniform;
+class osd_options;
 class shader_manager;
 
 class effect_reader : public state_reader

@@ -41,14 +41,14 @@ namespace netlist::devices {
 
 			// output
 			connect("_RV.2", "VDD");
-			register_subalias("OUT", "_RV.1");
+			register_sub_alias("OUT", "_RV.1");
 		}
 
 		NETLIB_RESETI()
 		{
 			//m_V0.initial(0.0);
 			//m_RV.do_reset();
-			m_RV.set_G_V_I(plib::reciprocal(m_R_LOW()),
+			m_RV().set_G_V_I(plib::reciprocal(m_R_LOW()),
 				nlconst::zero(),
 				nlconst::zero());
 			m_inc = netlist_time::from_fp(plib::reciprocal(m_FREQ()));
@@ -86,15 +86,15 @@ namespace netlist::devices {
 				const nl_fptype R = state ? m_R_HIGH : m_R_LOW;
 				const nl_fptype V = state ? m_VDD() : m_VSS();
 
-				m_RV.change_state([this, &R, &V]()
+				m_RV().change_state([this, &R, &V]()
 				{
-					m_RV.set_G_V_I(plib::reciprocal(R), V, nlconst::zero());
+					m_RV().set_G_V_I(plib::reciprocal(R), V, nlconst::zero());
 				});
 			}
 
 		}
 
-		analog::NETLIB_SUB(twoterm) m_RV;
+		NETLIB_SUB_NS(analog, two_terminal) m_RV;
 		analog_input_t m_VDD;
 		analog_input_t m_VGG;
 		analog_input_t m_VSS;

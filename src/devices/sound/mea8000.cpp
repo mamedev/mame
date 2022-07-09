@@ -137,7 +137,7 @@ void mea8000_device::device_start()
 	m_stream = stream_alloc(0, 1, clock() / 60);
 	save_item(NAME(m_output));
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mea8000_device::timer_expire),this));
+	m_timer = timer_alloc(FUNC(mea8000_device::timer_expire), this);
 
 	save_item(NAME(m_state));
 	save_item(NAME(m_buf));

@@ -18,10 +18,10 @@
 
 
 // MAMEOS headers
-#include "video.h"
 #include "window.h"
 #include "osdsdl.h"
 #include "modules/lib/osdlib.h"
+#include "modules/monitor/monitor_module.h"
 
 //============================================================
 //  CONSTANTS

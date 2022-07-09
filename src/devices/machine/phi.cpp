@@ -48,12 +48,12 @@ namespace {
 		return (T)1U << n;
 	}
 
-	template<typename T> void BIT_CLR(T& w , unsigned n)
+	template<typename T> void BIT_CLR(T& w, unsigned n)
 	{
 		w &= ~BIT_MASK<T>(n);
 	}
 
-	template<typename T> void BIT_SET(T& w , unsigned n)
+	template<typename T> void BIT_SET(T& w, unsigned n)
 	{
 		w |= BIT_MASK<T>(n);
 	}
@@ -205,42 +205,42 @@ phi_device::phi_device(const machine_config &mconfig, const char *tag, device_t 
 
 WRITE_LINE_MEMBER(phi_device::eoi_w)
 {
-	set_ext_signal(PHI_488_EOI , state);
+	set_ext_signal(PHI_488_EOI, state);
 }
 
 WRITE_LINE_MEMBER(phi_device::dav_w)
 {
-	set_ext_signal(PHI_488_DAV , state);
+	set_ext_signal(PHI_488_DAV, state);
 }
 
 WRITE_LINE_MEMBER(phi_device::nrfd_w)
 {
-	set_ext_signal(PHI_488_NRFD , state);
+	set_ext_signal(PHI_488_NRFD, state);
 }
 
 WRITE_LINE_MEMBER(phi_device::ndac_w)
 {
-	set_ext_signal(PHI_488_NDAC , state);
+	set_ext_signal(PHI_488_NDAC, state);
 }
 
 WRITE_LINE_MEMBER(phi_device::ifc_w)
 {
-	set_ext_signal(PHI_488_IFC , state);
+	set_ext_signal(PHI_488_IFC, state);
 }
 
 WRITE_LINE_MEMBER(phi_device::srq_w)
 {
-	set_ext_signal(PHI_488_SRQ , state);
+	set_ext_signal(PHI_488_SRQ, state);
 }
 
 WRITE_LINE_MEMBER(phi_device::atn_w)
 {
-	set_ext_signal(PHI_488_ATN , state);
+	set_ext_signal(PHI_488_ATN, state);
 }
 
 WRITE_LINE_MEMBER(phi_device::ren_w)
 {
-	set_ext_signal(PHI_488_REN , state);
+	set_ext_signal(PHI_488_REN, state);
 }
 
 void phi_device::bus_dio_w(uint8_t data)
@@ -248,27 +248,27 @@ void phi_device::bus_dio_w(uint8_t data)
 	update_pp();
 }
 
-void phi_device::set_ext_signal(phi_488_signal_t signal , int state)
+void phi_device::set_ext_signal(phi_488_signal_t signal, int state)
 {
 	state = !state;
-	if (m_ext_signals[ signal ] != state) {
-		m_ext_signals[ signal ] = state;
-		LOG_NOISY("EXT EOI %d DAV %d NRFD %d NDAC %d IFC %d SRQ %d ATN %d REN %d\n" ,
-				  m_ext_signals[ PHI_488_EOI ] ,
-				  m_ext_signals[ PHI_488_DAV ] ,
-				  m_ext_signals[ PHI_488_NRFD ] ,
-				  m_ext_signals[ PHI_488_NDAC ] ,
-				  m_ext_signals[ PHI_488_IFC ] ,
-				  m_ext_signals[ PHI_488_SRQ ] ,
-				  m_ext_signals[ PHI_488_ATN ] ,
-				  m_ext_signals[ PHI_488_REN ]);
+	if (m_ext_signals[signal] != state) {
+		m_ext_signals[signal] = state;
+		LOG_NOISY("EXT EOI %d DAV %d NRFD %d NDAC %d IFC %d SRQ %d ATN %d REN %d\n",
+				  m_ext_signals[PHI_488_EOI],
+				  m_ext_signals[PHI_488_DAV],
+				  m_ext_signals[PHI_488_NRFD],
+				  m_ext_signals[PHI_488_NDAC],
+				  m_ext_signals[PHI_488_IFC],
+				  m_ext_signals[PHI_488_SRQ],
+				  m_ext_signals[PHI_488_ATN],
+				  m_ext_signals[PHI_488_REN]);
 		update_fsm();
 	}
 }
 
 void phi_device::reg16_w(offs_t offset, uint16_t data)
 {
-	int_reg_w(offset , data & REG_ALL_MASK);
+	int_reg_w(offset, data & REG_ALL_MASK);
 }
 
 uint16_t phi_device::reg16_r(offs_t offset)
@@ -330,13 +330,13 @@ uint16_t phi_device::reg16_r(offs_t offset)
 			((res & REG_D0D1_MASK) >> (REG_D0D1_SHIFT - REG_STATUS_D0D1_BIT));
 	}
 
-	LOG_REG("R %u=%04x\n" , offset , res);
+	LOG_REG("R %u=%04x\n", offset, res);
 	return res;
 }
 
 void phi_device::reg8_w(offs_t offset, uint8_t data)
 {
-	int_reg_w(offset , data);
+	int_reg_w(offset, data);
 }
 
 uint8_t phi_device::reg8_r(offs_t offset)
@@ -381,8 +381,8 @@ void phi_device::device_start()
 	m_dmarq_write_func.resolve_safe();
 	m_sys_cntrl_read_func.resolve_safe(0);
 
-	m_sh_dly_timer = timer_alloc(SH_DELAY_TMR_ID);
-	m_c_dly_timer = timer_alloc(C_DELAY_TMR_ID);
+	m_sh_dly_timer = timer_alloc(FUNC(phi_device::delayed_update), this);
+	m_c_dly_timer = timer_alloc(FUNC(phi_device::delayed_update), this);
 }
 
 void phi_device::device_reset()
@@ -417,20 +417,20 @@ void phi_device::device_reset()
 	update_488();
 }
 
-void phi_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(phi_device::delayed_update)
 {
-	LOG_NOISY("tmr %d enabled %d\n" , id , timer.enabled());
+	LOG_NOISY("tmr %d enabled\n", param);
 	update_fsm();
 }
 
-void phi_device::int_reg_w(offs_t offset , uint16_t data)
+void phi_device::int_reg_w(offs_t offset, uint16_t data)
 {
-	if (BIT(m_reg_control , REG_CTRL_8BIT_PROC_BIT)) {
+	if (BIT(m_reg_control, REG_CTRL_8BIT_PROC_BIT)) {
 		// In 8-bit mode, D0/D1 come from status register
 		data = (data & REG_D08D15_MASK) | ((m_reg_status << (REG_D0D1_SHIFT - REG_STATUS_D0D1_BIT)) & REG_D0D1_MASK);
 	}
 
-	LOG_REG("W %u=%04x\n" , offset , data);
+	LOG_REG("W %u=%04x\n", offset, data);
 
 	switch (offset) {
 	case REG_W_INT_COND:
@@ -457,7 +457,7 @@ void phi_device::int_reg_w(offs_t offset , uint16_t data)
 		// Copy D0/D1 access bits into status register
 		m_reg_status = (m_reg_status & ~(3U << REG_STATUS_D0D1_BIT)) |
 			(data & (3U << REG_STATUS_D0D1_BIT));
-		if (BIT(data , REG_STATUS_DATA_FREEZE_BIT) && m_fifo_in.empty()) {
+		if (BIT(data, REG_STATUS_DATA_FREEZE_BIT) && m_fifo_in.empty()) {
 			BIT_CLR(m_reg_status, REG_STATUS_DATA_FREEZE_BIT);
 		}
 		update_fsm();
@@ -466,17 +466,17 @@ void phi_device::int_reg_w(offs_t offset , uint16_t data)
 	case REG_W_CONTROL:
 		// D0/D1/D15 are not mapped into register
 		m_reg_control = data & 0xfe;
-		if (BIT(data , REG_CTRL_INIT_OFIFO_BIT)) {
+		if (BIT(data, REG_CTRL_INIT_OFIFO_BIT)) {
 			m_fifo_out.clear();
 			if (m_c_state == PHI_C_CSBS) {
 				// Take control asynchronously
 				m_c_state = PHI_C_CSWS;
-				m_c_dly_timer->adjust(attotime::from_nsec(DELAY_T7));
+				m_c_dly_timer->adjust(attotime::from_nsec(DELAY_T7), 1);
 			}
 		}
 		if (m_loopback) {
 			// TODO: better?
-			m_id_enabled = BIT(m_reg_control , REG_CTRL_PP_RESPONSE_BIT);
+			m_id_enabled = BIT(m_reg_control, REG_CTRL_PP_RESPONSE_BIT);
 		}
 		update_fsm();
 		break;
@@ -485,18 +485,18 @@ void phi_device::int_reg_w(offs_t offset , uint16_t data)
 		{
 			// No D0/D1 in register
 			data &= REG_D08D15_MASK;
-			bool prev_ol = BIT(m_reg_address , REG_ADDR_ONLINE_BIT);
+			bool prev_ol = BIT(m_reg_address, REG_ADDR_ONLINE_BIT);
 			m_reg_address = data;
-			bool current_ol = BIT(m_reg_address , REG_ADDR_ONLINE_BIT);
+			bool current_ol = BIT(m_reg_address, REG_ADDR_ONLINE_BIT);
 			m_sys_controller = !current_ol || m_sys_cntrl_read_func();
 			m_loopback = !current_ol;
 			if (!current_ol) {
 				// IDENTIFY is enabled by PP_RESPONSE bit in control register
-				m_id_enabled = BIT(m_reg_control , REG_CTRL_PP_RESPONSE_BIT);
+				m_id_enabled = BIT(m_reg_control, REG_CTRL_PP_RESPONSE_BIT);
 			} else if (!prev_ol) {
 				// Going on-line
 				pon_msg();
-				m_id_enabled = BIT(m_reg_control , REG_CTRL_PP_RESPONSE_BIT);
+				m_id_enabled = BIT(m_reg_control, REG_CTRL_PP_RESPONSE_BIT);
 			}
 			configure_pp_response();
 			if (prev_ol != current_ol) {
@@ -536,7 +536,7 @@ uint8_t phi_device::get_dio(void)
 void phi_device::set_dio(uint8_t data)
 {
 	if (data != m_dio) {
-		LOG_NOISY("DIO=%02x\n" , data);
+		LOG_NOISY("DIO=%02x\n", data);
 		m_dio = data;
 		if (!m_loopback) {
 			m_dio_write_func(~data);
@@ -547,27 +547,27 @@ void phi_device::set_dio(uint8_t data)
 bool phi_device::get_signal(phi_488_signal_t signal)
 {
 	if (m_loopback) {
-		return m_signals[ signal ];
+		return m_signals[signal];
 	} else {
-		return m_ext_signals[ signal ];
+		return m_ext_signals[signal];
 	}
 }
 
-void phi_device::set_signal(phi_488_signal_t signal , bool state)
+void phi_device::set_signal(phi_488_signal_t signal, bool state)
 {
-	if (state != m_signals[ signal ]) {
-		m_signals[ signal ] = state;
-		LOG_NOISY("INT EOI %d DAV %d NRFD %d NDAC %d IFC %d SRQ %d ATN %d REN %d\n" ,
-				  m_signals[ PHI_488_EOI ] ,
-				  m_signals[ PHI_488_DAV ] ,
-				  m_signals[ PHI_488_NRFD ] ,
-				  m_signals[ PHI_488_NDAC ] ,
-				  m_signals[ PHI_488_IFC ] ,
-				  m_signals[ PHI_488_SRQ ] ,
-				  m_signals[ PHI_488_ATN ] ,
-				  m_signals[ PHI_488_REN ]);
+	if (state != m_signals[signal]) {
+		m_signals[signal] = state;
+		LOG_NOISY("INT EOI %d DAV %d NRFD %d NDAC %d IFC %d SRQ %d ATN %d REN %d\n",
+				  m_signals[PHI_488_EOI],
+				  m_signals[PHI_488_DAV],
+				  m_signals[PHI_488_NRFD],
+				  m_signals[PHI_488_NDAC],
+				  m_signals[PHI_488_IFC],
+				  m_signals[PHI_488_SRQ],
+				  m_signals[PHI_488_ATN],
+				  m_signals[PHI_488_REN]);
 		if (!m_loopback) {
-			m_signal_wr_fns[ signal ](!state);
+			m_signal_wr_fns[signal](!state);
 		}
 	}
 }
@@ -598,7 +598,7 @@ void phi_device::update_488(void)
 	} else {
 		m_dio_write_func(~m_dio);
 		for (unsigned i = 0; i < PHI_488_SIGNAL_COUNT; i++) {
-			m_signal_wr_fns[ i ](!m_signals[ i ]);
+			m_signal_wr_fns[i](!m_signals[i]);
 		}
 	}
 }
@@ -612,13 +612,13 @@ void phi_device::update_fsm(void)
 	}
 	m_no_recursion = true;
 
-	set_signal(PHI_488_IFC , m_sys_controller && BIT(m_reg_control , REG_CTRL_IFC_BIT));
-	set_signal(PHI_488_REN , m_sys_controller && BIT(m_reg_control , REG_CTRL_REN_BIT));
+	set_signal(PHI_488_IFC, m_sys_controller && BIT(m_reg_control, REG_CTRL_IFC_BIT));
+	set_signal(PHI_488_REN, m_sys_controller && BIT(m_reg_control, REG_CTRL_REN_BIT));
 
 	// TODO: improve (see SR FSM)
 	// This is not entirely correct but it works for now (on HP64K, the only system
 	// where it's relevant)
-	set_signal(PHI_488_SRQ , BIT(m_reg_control , REG_CTRL_SERVICE_REQ_BIT));
+	set_signal(PHI_488_SRQ, BIT(m_reg_control, REG_CTRL_SERVICE_REQ_BIT));
 
 	bool changed = true;
 	int prev_state;
@@ -628,10 +628,10 @@ void phi_device::update_fsm(void)
 	// TODO: SR FSM
 	// Loop until all changes settle
 	while (changed) {
-		LOG_NOISY("SH %d AH %d T %d SPMS %d L %d SR %d PP %d PPR %u S %d C %d SA %d\n" ,
-				  m_sh_state , m_ah_state , m_t_state , m_t_spms , m_l_state , m_sr_state ,
-				  m_pp_state , m_ppr_msg , m_s_sense , m_c_state , m_sa_state);
-		LOG_NOISY("O E/F=%d/%d I E/F=%d/%d\n" , m_fifo_out.empty() , m_fifo_out.full() , m_fifo_in.empty() , m_fifo_in.full());
+		LOG_NOISY("SH %d AH %d T %d SPMS %d L %d SR %d PP %d PPR %u S %d C %d SA %d\n",
+				  m_sh_state, m_ah_state, m_t_state, m_t_spms, m_l_state, m_sr_state,
+				  m_pp_state, m_ppr_msg, m_s_sense, m_c_state, m_sa_state);
+		LOG_NOISY("O E/F=%d/%d I E/F=%d/%d\n", m_fifo_out.empty(), m_fifo_out.full(), m_fifo_in.empty(), m_fifo_in.full());
 		changed = false;
 
 		// SH FSM
@@ -656,10 +656,10 @@ void phi_device::update_fsm(void)
 				break;
 
 			case PHI_SH_SGNS:
-				if ((m_nba_origin = nba_msg(new_byte , new_eoi)) != NBA_NONE) {
+				if ((m_nba_origin = nba_msg(new_byte, new_eoi)) != NBA_NONE) {
 					m_sh_state = PHI_SH_SDYS;
-					m_sh_dly_timer->adjust(attotime::from_nsec(DELAY_T1));
-					LOG_NOISY("SH DLY enabled %d\n" , m_sh_dly_timer->enabled());
+					m_sh_dly_timer->adjust(attotime::from_nsec(DELAY_T1), 0);
+					LOG_NOISY("SH DLY enabled %d\n", m_sh_dly_timer->enabled());
 				}
 				break;
 
@@ -671,14 +671,14 @@ void phi_device::update_fsm(void)
 
 			case PHI_SH_STRS:
 				if (!get_signal(PHI_488_NDAC)) {
-					LOG("%.6f TX %02x/%d\n" , machine().time().as_double() , m_dio , m_signals[ PHI_488_EOI ]);
+					LOG("%.6f TX %02x/%d\n", machine().time().as_double(), m_dio, m_signals[PHI_488_EOI]);
 					m_sh_state = PHI_SH_SGNS;
 					clear_nba((nba_origin_t)m_nba_origin);
 				}
 				break;
 
 			default:
-				logerror("Invalid SH state %d\n" , m_sh_state);
+				logerror("Invalid SH state %d\n", m_sh_state);
 				m_sh_state = PHI_SH_SIDS;
 			}
 		}
@@ -690,9 +690,9 @@ void phi_device::update_fsm(void)
 		// EOI is controlled by SH & C FSMs
 		bool eoi_signal = false;
 		uint8_t dio_byte = 0;
-		set_signal(PHI_488_DAV , m_sh_state == PHI_SH_STRS);
+		set_signal(PHI_488_DAV, m_sh_state == PHI_SH_STRS);
 		if (m_sh_state == PHI_SH_SDYS || m_sh_state == PHI_SH_STRS) {
-			nba_msg(new_byte , new_eoi);
+			nba_msg(new_byte, new_eoi);
 			dio_byte = new_byte;
 			eoi_signal = new_eoi;
 		}
@@ -733,9 +733,9 @@ void phi_device::update_fsm(void)
 					uint8_t if_cmd = get_dio();
 					bool parity_ok = odd_parity(if_cmd);
 					if (!parity_ok) {
-						BIT_SET(m_reg_int_cond , REG_INT_PARITY_ERR_BIT);
+						BIT_SET(m_reg_int_cond, REG_INT_PARITY_ERR_BIT);
 					}
-					if (BIT(m_reg_control , REG_CTRL_PAR_FREEZE_BIT) && !parity_ok) {
+					if (BIT(m_reg_control, REG_CTRL_PAR_FREEZE_BIT) && !parity_ok) {
 						// With even parity and PARITY FREEZE set, command is ignored and
 						// AH FSM freezes in ACDS
 						m_ah_state = PHI_AH_ACDS_FROZEN;
@@ -746,7 +746,7 @@ void phi_device::update_fsm(void)
 							m_ah_state = PHI_AH_AWNS;
 						}
 					}
-				} else if (byte_received(get_dio() , get_signal(PHI_488_EOI))) {
+				} else if (byte_received(get_dio(), get_signal(PHI_488_EOI))) {
 					m_ah_state = PHI_AH_AWNS;
 				}
 				break;
@@ -759,7 +759,7 @@ void phi_device::update_fsm(void)
 				break;
 
 			default:
-				logerror("Invalid AH state %d\n" , m_ah_state);
+				logerror("Invalid AH state %d\n", m_ah_state);
 				m_ah_state = PHI_AH_AIDS;
 			}
 		}
@@ -767,8 +767,8 @@ void phi_device::update_fsm(void)
 			changed = true;
 		}
 		// AH outputs
-		set_signal(PHI_488_NRFD , m_ah_state == PHI_AH_ANRS || m_ah_state == PHI_AH_ACDS || m_ah_state == PHI_AH_ACDS_FROZEN || m_ah_state == PHI_AH_AWNS);
-		set_signal(PHI_488_NDAC , m_ah_state == PHI_AH_ANRS || m_ah_state == PHI_AH_ACRS || m_ah_state == PHI_AH_ACDS || m_ah_state == PHI_AH_ACDS_FROZEN);
+		set_signal(PHI_488_NRFD, m_ah_state == PHI_AH_ANRS || m_ah_state == PHI_AH_ACDS || m_ah_state == PHI_AH_ACDS_FROZEN || m_ah_state == PHI_AH_AWNS);
+		set_signal(PHI_488_NDAC, m_ah_state == PHI_AH_ANRS || m_ah_state == PHI_AH_ACRS || m_ah_state == PHI_AH_ACDS || m_ah_state == PHI_AH_ACDS_FROZEN);
 
 		// T FSM
 		prev_state = m_t_state;
@@ -828,7 +828,7 @@ void phi_device::update_fsm(void)
 				break;
 
 			default:
-				logerror("Invalid T state %d\n" , m_t_state);
+				logerror("Invalid T state %d\n", m_t_state);
 				m_t_state = PHI_T_TIDS;
 			}
 		}
@@ -862,7 +862,7 @@ void phi_device::update_fsm(void)
 				break;
 
 			default:
-				logerror("Invalid L state %d\n" , m_l_state);
+				logerror("Invalid L state %d\n", m_l_state);
 				m_l_state = PHI_L_LIDS;
 			}
 		}
@@ -897,15 +897,15 @@ void phi_device::update_fsm(void)
 			break;
 
 		default:
-			logerror("Invalid PP state %d\n" , m_pp_state);
+			logerror("Invalid PP state %d\n", m_pp_state);
 			m_pp_state = PHI_PP_PPIS;
 		}
 		if (m_pp_state != prev_state) {
 			changed = true;
 		}
 		// PP outputs
-		if (m_pp_state == PHI_PP_PPAS && m_s_sense == !!BIT(m_reg_control , REG_CTRL_PP_RESPONSE_BIT)) {
-			LOG("%.6f PP %u\n" , machine().time().as_double() , m_ppr_msg);
+		if (m_pp_state == PHI_PP_PPAS && m_s_sense == !!BIT(m_reg_control, REG_CTRL_PP_RESPONSE_BIT)) {
+			LOG("%.6f PP %u\n", machine().time().as_double(), m_ppr_msg);
 			dio_byte |= BIT_MASK<uint8_t>(m_ppr_msg);
 		}
 
@@ -931,7 +931,7 @@ void phi_device::update_fsm(void)
 			case PHI_C_CACS:
 				// If there are ifcmds to send, just stay in CACS
 				// else wait for SH to finish its current transfer then decide what to do
-				if (nba_msg(new_byte , new_eoi) != NBA_CMD_FROM_OFIFO &&
+				if (nba_msg(new_byte, new_eoi) != NBA_CMD_FROM_OFIFO &&
 					m_sh_state != PHI_SH_STRS && m_sh_state != PHI_SH_SDYS) {
 					if (!m_fifo_out.empty()) {
 						// Possible cases
@@ -953,14 +953,14 @@ void phi_device::update_fsm(void)
 			case PHI_C_CPPS:
 				if (!rpp_msg()) {
 					m_c_state = PHI_C_CAWS;
-					m_c_dly_timer->adjust(attotime::from_nsec(DELAY_T9));
+					m_c_dly_timer->adjust(attotime::from_nsec(DELAY_T9), 1);
 				}
 				break;
 
 			case PHI_C_CSBS:
 				if (tcs_msg() && m_ah_state == PHI_AH_ANRS) {
 					m_c_state = PHI_C_CSHS;
-					m_c_dly_timer->adjust(attotime::from_nsec(DELAY_T10));
+					m_c_dly_timer->adjust(attotime::from_nsec(DELAY_T10), 1);
 				}
 				break;
 
@@ -968,7 +968,7 @@ void phi_device::update_fsm(void)
 				// tcs_msg cannot go false here
 				if (!m_c_dly_timer->enabled()) {
 					m_c_state = PHI_C_CSWS;
-					m_c_dly_timer->adjust(attotime::from_nsec(DELAY_T7));
+					m_c_dly_timer->adjust(attotime::from_nsec(DELAY_T7), 1);
 				}
 				break;
 
@@ -990,12 +990,12 @@ void phi_device::update_fsm(void)
 			case PHI_C_CSWS:
 				if (m_t_state == PHI_T_TADS || !m_c_dly_timer->enabled()) {
 					m_c_state = PHI_C_CAWS;
-					m_c_dly_timer->adjust(attotime::from_nsec(DELAY_T9));
+					m_c_dly_timer->adjust(attotime::from_nsec(DELAY_T9), 1);
 				}
 				break;
 
 			default:
-				logerror("Invalid C state %d\n" , m_c_state);
+				logerror("Invalid C state %d\n", m_c_state);
 				m_c_state = PHI_C_CIDS;
 			}
 		}
@@ -1003,11 +1003,11 @@ void phi_device::update_fsm(void)
 			changed = true;
 		}
 		// C outputs
-		set_signal(PHI_488_ATN , m_c_state == PHI_C_CACS ||
+		set_signal(PHI_488_ATN, m_c_state == PHI_C_CACS ||
 				   m_c_state == PHI_C_CPPS || m_c_state == PHI_C_CSWS ||
 				   m_c_state == PHI_C_CAWS || m_c_state == PHI_C_CTRS);
 		eoi_signal = eoi_signal || m_c_state == PHI_C_CPPS;
-		set_signal(PHI_488_EOI , eoi_signal);
+		set_signal(PHI_488_EOI, eoi_signal);
 		set_dio(dio_byte);
 	}
 
@@ -1035,7 +1035,7 @@ void phi_device::update_fsm(void)
 	}
 	m_reg_int_cond &= ~REG_INT_STATE_MASK;
 	if (m_fifo_out.empty()) {
-		BIT_SET(m_reg_int_cond , REG_INT_FIFO_IDLE_BIT);
+		BIT_SET(m_reg_int_cond, REG_INT_FIFO_IDLE_BIT);
 	}
 	if (!m_fifo_in.empty()) {
 		BIT_SET(m_reg_int_cond, REG_INT_FIFO_AV_BIT);
@@ -1053,7 +1053,7 @@ void phi_device::update_fsm(void)
 	m_no_recursion = false;
 }
 
-phi_device::nba_origin_t phi_device::nba_msg(uint8_t& new_byte , bool& new_eoi) const
+phi_device::nba_origin_t phi_device::nba_msg(uint8_t& new_byte, bool& new_eoi) const
 {
 	if (controller_in_charge() && m_c_state == PHI_C_CACS && !m_fifo_out.empty()) {
 		uint16_t word = m_fifo_out.peek();
@@ -1070,14 +1070,14 @@ phi_device::nba_origin_t phi_device::nba_msg(uint8_t& new_byte , bool& new_eoi) 
 
 	switch (m_t_state) {
 	case PHI_T_TACS:
-		if (!BIT(m_reg_status , REG_STATUS_DATA_FREEZE_BIT) &&
-			!BIT(m_reg_int_cond , REG_INT_DEV_CLEAR_BIT) &&
+		if (!BIT(m_reg_status, REG_STATUS_DATA_FREEZE_BIT) &&
+			!BIT(m_reg_int_cond, REG_INT_DEV_CLEAR_BIT) &&
 			!m_fifo_out.empty()) {
 			uint16_t word = m_fifo_out.peek();
-			if (!BIT(word , REG_OFIFO_SPECIAL_BIT)) {
+			if (!BIT(word, REG_OFIFO_SPECIAL_BIT)) {
 				// Talker sends a data byte
 				new_byte = (uint8_t)word;
-				new_eoi = BIT(word , REG_OFIFO_END_BIT);
+				new_eoi = BIT(word, REG_OFIFO_END_BIT);
 				return NBA_BYTE_FROM_OFIFO;
 			}
 		}
@@ -1131,7 +1131,7 @@ void phi_device::clear_nba(nba_origin_t origin)
 
 bool phi_device::if_cmd_received(uint8_t byte)
 {
-	LOG("%.6f RX cmd: %02x\n" , machine().time().as_double() , byte);
+	LOG("%.6f RX cmd: %02x\n", machine().time().as_double(), byte);
 
 	bool accepted = true;
 
@@ -1264,9 +1264,9 @@ bool phi_device::if_cmd_received(uint8_t byte)
 				case PHI_SA_PACS:
 					if ((byte & IFCMD_PPX_MASK) == IFCMD_PPE_VALUE && m_pp_state == PHI_PP_PPIS) {
 						// PPE
-						m_s_sense = BIT(byte , IFCMD_PPE_S_BIT);
+						m_s_sense = BIT(byte, IFCMD_PPE_S_BIT);
 						m_ppr_msg = byte & IFCMD_PPE_PPR_MASK;
-						LOG("PPE s=%d ppr=%u\n" , m_s_sense , m_ppr_msg);
+						LOG("PPE s=%d ppr=%u\n", m_s_sense, m_ppr_msg);
 						m_pp_state = PHI_PP_PPSS;
 					} else if ((byte & IFCMD_PPX_MASK) == IFCMD_PPD_VALUE && m_pp_state == PHI_PP_PPSS) {
 						// PPD
@@ -1277,7 +1277,7 @@ bool phi_device::if_cmd_received(uint8_t byte)
 				case PHI_SA_TPAS:
 				case PHI_SA_LPAS:
 					// command is a secondary address after MTA or MLA
-					if (m_fifo_in.full() || BIT(m_reg_int_cond , REG_INT_DEV_CLEAR_BIT)) {
+					if (m_fifo_in.full() || BIT(m_reg_int_cond, REG_INT_DEV_CLEAR_BIT)) {
 						// No room for secondary address in FIFO, stall handshake
 						accepted = false;
 					} else {
@@ -1304,7 +1304,7 @@ bool phi_device::if_cmd_received(uint8_t byte)
 	return accepted;
 }
 
-bool phi_device::byte_received(uint8_t byte , bool eoi)
+bool phi_device::byte_received(uint8_t byte, bool eoi)
 {
 	// Start with D0/D1 = 00
 	uint16_t word = byte;
@@ -1321,7 +1321,7 @@ bool phi_device::byte_received(uint8_t byte , bool eoi)
 		// Monitoring bytes being transferred on the bus
 		if (eoi) {
 			end_of_transfer = true;
-		} else if (!BIT(be_word , REG_OFIFO_LF_INH_BIT) && byte == 0x0a) {
+		} else if (!BIT(be_word, REG_OFIFO_LF_INH_BIT) && byte == 0x0a) {
 			// LF received -> D0/D1 = 11
 			word |= REG_IFIFO_LAST_MASK;
 			end_of_transfer = true;
@@ -1332,10 +1332,10 @@ bool phi_device::byte_received(uint8_t byte , bool eoi)
 		}
 	}
 
-	LOG("%.6f RX word:%04x\n" , machine().time().as_double() , word);
+	LOG("%.6f RX word:%04x\n", machine().time().as_double(), word);
 
 	if (m_l_state == PHI_L_LACS) {
-		if (m_fifo_in.full() || BIT(m_reg_int_cond , REG_INT_DEV_CLEAR_BIT)) {
+		if (m_fifo_in.full() || BIT(m_reg_int_cond, REG_INT_DEV_CLEAR_BIT)) {
 			// No room for received byte, stall handshake
 			LOG_NOISY("..stalled\n");
 			return false;
@@ -1366,12 +1366,12 @@ void phi_device::rx_n_data_freeze(uint16_t word)
 
 bool phi_device::ton_msg(void) const
 {
-	return BIT(m_reg_address , REG_ADDR_TA_BIT);
+	return BIT(m_reg_address, REG_ADDR_TA_BIT);
 }
 
 bool phi_device::lon_msg(void) const
 {
-	return BIT(m_reg_address , REG_ADDR_LA_BIT);
+	return BIT(m_reg_address, REG_ADDR_LA_BIT);
 }
 
 bool phi_device::odd_parity(uint8_t byte) const
@@ -1401,7 +1401,7 @@ bool phi_device::tcs_msg(void) const
 	// * There's an interface command to be sent at head of OFIFO
 	return (m_c_state == PHI_C_CSBS || m_c_state == PHI_C_CSHS || m_c_state == PHI_C_CSWS) &&
 		(rpp_msg() ||
-		 nba_msg(new_byte , new_eoi) == NBA_CMD_FROM_OFIFO);
+		 nba_msg(new_byte, new_eoi) == NBA_CMD_FROM_OFIFO);
 }
 
 bool phi_device::rpp_msg(void) const
@@ -1437,9 +1437,9 @@ void phi_device::update_pp()
 {
 	if (m_c_state == PHI_C_CPPS) {
 		if (m_fifo_in.empty() && get_pp_response()) {
-			BIT_SET(m_reg_int_cond , REG_INT_PP_RESPONSE_BIT);
+			BIT_SET(m_reg_int_cond, REG_INT_PP_RESPONSE_BIT);
 		} else {
-			BIT_CLR(m_reg_int_cond , REG_INT_PP_RESPONSE_BIT);
+			BIT_CLR(m_reg_int_cond, REG_INT_PP_RESPONSE_BIT);
 		}
 		update_interrupt();
 	}
@@ -1451,7 +1451,7 @@ void phi_device::update_interrupt()
 	bool int_line = false;
 	if (int_pending) {
 		BIT_SET(m_reg_int_cond, REG_INT_PENDING_BIT);
-		if (BIT(m_reg_int_mask , REG_INT_PENDING_BIT)) {
+		if (BIT(m_reg_int_mask, REG_INT_PENDING_BIT)) {
 			int_line = true;
 		}
 	} else {
@@ -1459,7 +1459,7 @@ void phi_device::update_interrupt()
 	}
 	if (int_line != m_int_line) {
 		m_int_line = int_line;
-		LOG_INT("INT %d\n" , m_int_line);
+		LOG_INT("INT %d\n", m_int_line);
 		m_int_write_func(m_int_line);
 	}
 }
@@ -1467,14 +1467,14 @@ void phi_device::update_interrupt()
 void phi_device::update_dmarq()
 {
 	bool new_dmarq_line;
-	if (BIT(m_reg_control , REG_CTRL_DMA_FIFO_BIT)) {
-		new_dmarq_line = BIT(m_reg_int_cond , REG_INT_FIFO_ROOM_BIT);
+	if (BIT(m_reg_control, REG_CTRL_DMA_FIFO_BIT)) {
+		new_dmarq_line = BIT(m_reg_int_cond, REG_INT_FIFO_ROOM_BIT);
 	} else {
-		new_dmarq_line = BIT(m_reg_int_cond , REG_INT_FIFO_AV_BIT);
+		new_dmarq_line = BIT(m_reg_int_cond, REG_INT_FIFO_AV_BIT);
 	}
 	if (new_dmarq_line != m_dmarq_line) {
 		m_dmarq_line = new_dmarq_line;
-		LOG_INT("DRQ %d\n" , m_dmarq_line);
+		LOG_INT("DRQ %d\n", m_dmarq_line);
 		m_dmarq_write_func(m_dmarq_line);
 	}
 }

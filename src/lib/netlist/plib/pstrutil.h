@@ -12,6 +12,7 @@
 #include "pstring.h"
 #include "ptypes.h"
 
+#include <algorithm>
 #include <exception>
 #include <iterator>
 #include <limits>
@@ -284,7 +285,7 @@ namespace plib
 	template <typename T>
 	std::vector<T> psplit_r(const T &stri,
 			const T &token,
-			const std::size_t maxsplit)
+			const std::size_t max_split)
 	{
 		T str(stri);
 		std::vector<T> result;
@@ -296,7 +297,7 @@ namespace plib
 			bool found = index!=T::npos;
 			if (found)
 				splits++;
-			if ((splits <= maxsplit || maxsplit == 0) && found)
+			if ((splits <= max_split || max_split == 0) && found)
 			{
 				result.push_back(str.substr(index+token.size()));
 				str = str.substr(0, index);

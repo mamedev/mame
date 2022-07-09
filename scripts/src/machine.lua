@@ -1866,30 +1866,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/m950x0.h,MACHINES["M950X0"] = true
----------------------------------------------------
-
-if (MACHINES["M950X0"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/m950x0.cpp",
-		MAME_DIR .. "src/devices/machine/m950x0.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/mm5740.h,MACHINES["MM5740"] = true
----------------------------------------------------
-
-if (MACHINES["MM5740"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/mm5740.cpp",
-		MAME_DIR .. "src/devices/machine/mm5740.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/kb3600.h,MACHINES["KB3600"] = true
 ---------------------------------------------------
 
@@ -1897,6 +1873,18 @@ if (MACHINES["KB3600"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/kb3600.cpp",
 		MAME_DIR .. "src/devices/machine/kb3600.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/kr1601rr1.h,MACHINES["KR1601RR1"] = true
+---------------------------------------------------
+
+if (MACHINES["KR1601RR1"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/kr1601rr1.cpp",
+		MAME_DIR .. "src/devices/machine/kr1601rr1.h",
 	}
 end
 
@@ -2091,6 +2079,18 @@ if (MACHINES["M6M80011AP"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/m6m80011ap.cpp",
 		MAME_DIR .. "src/devices/machine/m6m80011ap.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/m950x0.h,MACHINES["M950X0"] = true
+---------------------------------------------------
+
+if (MACHINES["M950X0"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/m950x0.cpp",
+		MAME_DIR .. "src/devices/machine/m950x0.h",
 	}
 end
 
@@ -2407,6 +2407,18 @@ if (MACHINES["MM5307"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/mm5307.cpp",
 		MAME_DIR .. "src/devices/machine/mm5307.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/mm5740.h,MACHINES["MM5740"] = true
+---------------------------------------------------
+
+if (MACHINES["MM5740"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/mm5740.cpp",
+		MAME_DIR .. "src/devices/machine/mm5740.h",
 	}
 end
 
@@ -4971,5 +4983,104 @@ if (MACHINES["NS32382"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/ns32382.cpp",
 		MAME_DIR .. "src/devices/machine/ns32382.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/fm_scsi.h,MACHINES["FM_SCSI"] = true
+---------------------------------------------------
+if (MACHINES["FM_SCSI"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/fm_scsi.cpp",
+		MAME_DIR .. "src/devices/machine/fm_scsi.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/archimedes_keyb.h,MACHINES["ARCHIMEDES_KEYB"] = true
+---------------------------------------------------
+if (MACHINES["ARCHIMEDES_KEYB"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/archimedes_keyb.cpp",
+		MAME_DIR .. "src/devices/machine/archimedes_keyb.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/cammu.h,MACHINES["CAMMU"] = true
+---------------------------------------------------
+if (MACHINES["CAMMU"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/cammu.cpp",
+		MAME_DIR .. "src/devices/machine/cammu.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/at.h,MACHINES["AT_MB"] = true
+---------------------------------------------------
+if (MACHINES["AT_MB"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/at.cpp",
+		MAME_DIR .. "src/devices/machine/at.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/bacta_datalogger.h,MACHINES["BACTA_DATALOGGER"] = true
+---------------------------------------------------
+if (MACHINES["BACTA_DATALOGGER"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/bacta_datalogger.cpp",
+		MAME_DIR .. "src/devices/machine/bacta_datalogger.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/nmk112.h,MACHINES["NMK112"] = true
+---------------------------------------------------
+if (MACHINES["NMK112"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/nmk112.cpp",
+		MAME_DIR .. "src/devices/machine/nmk112.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/saa7191.h,MACHINES["SAA7191"] = true
+---------------------------------------------------
+if (MACHINES["SAA7191"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/saa7191.cpp",
+		MAME_DIR .. "src/devices/machine/saa7191.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/segacrpt_device.h,MACHINES["SEGACRPT"] = true
+---------------------------------------------------
+if (MACHINES["SEGACRPT"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/segacrpt_device.cpp",
+		MAME_DIR .. "src/devices/machine/segacrpt_device.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/segacrp2_device.h,MACHINES["SEGACRP2"] = true
+---------------------------------------------------
+if (MACHINES["SEGACRP2"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/segacrp2_device.cpp",
+		MAME_DIR .. "src/devices/machine/segacrp2_device.h",
 	}
 end

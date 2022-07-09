@@ -215,7 +215,7 @@ void stereo_fx_device::device_start()
 	m_isa->install_device(0x022e, 0x022f, read8smo_delegate(*this, FUNC(stereo_fx_device::dsp_rbuf_status_r)), write8smo_delegate(*this, FUNC(stereo_fx_device::invalid_w)));
 	m_isa->install_device(0x0388, 0x0389, read8sm_delegate(ym3812, FUNC(ym3812_device::read)), write8sm_delegate(ym3812, FUNC(ym3812_device::write)));
 	m_isa->install_device(0x0228, 0x0229, read8sm_delegate(ym3812, FUNC(ym3812_device::read)), write8sm_delegate(ym3812, FUNC(ym3812_device::write)));
-	m_timer = timer_alloc();
+	m_timer = timer_alloc(FUNC(stereo_fx_device::clock_tick), this);
 	m_timer->adjust(attotime::from_hz(2000000), 0, attotime::from_hz(2000000));
 	m_isa->set_dma_channel(1, this, false);
 }
@@ -232,7 +232,7 @@ void stereo_fx_device::device_reset()
 	m_t0 = CLEAR_LINE;
 }
 
-void stereo_fx_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
+TIMER_CALLBACK_MEMBER(stereo_fx_device::clock_tick)
 {
 	m_t0 = !m_t0;
 	m_cpu->set_input_line(MCS51_T0_LINE, m_t0);

@@ -14,68 +14,6 @@ namespace fs {
 
 class vtech_image : public manager_t {
 public:
-	class impl : public filesystem_t {
-	public:
-		class root_dir : public idir_t {
-		public:
-			root_dir(impl &i) : m_fs(i) {}
-			virtual ~root_dir() = default;
-
-			virtual void drop_weak_references() override;
-
-			virtual meta_data metadata() override;
-			virtual void metadata_change(const meta_data &info) override;
-			virtual std::vector<dir_entry> contents() override;
-			virtual file_t file_get(u64 key) override;
-			virtual dir_t dir_get(u64 key) override;
-			virtual file_t file_create(const meta_data &info) override;
-			virtual void file_delete(u64 key) override;
-
-			void update_file(u16 key, const u8 *entry);
-
-		private:
-			impl &m_fs;
-
-			std::pair<fsblk_t::block_t, u32> get_dir_block(u64 key);
-		};
-
-		class file : public ifile_t {
-		public:
-			file(impl &fs, root_dir *dir, const u8 *entry, u16 key);
-			virtual ~file() = default;
-
-			virtual void drop_weak_references() override;
-
-			virtual meta_data metadata() override;
-			virtual void metadata_change(const meta_data &info) override;
-			virtual std::vector<u8> read_all() override;
-			virtual void replace(const std::vector<u8> &data) override;
-
-		private:
-			impl &m_fs;
-			root_dir *m_dir;
-			u16 m_key;
-			u8 m_entry[18];
-		};
-
-		impl(fsblk_t &blockdev);
-		virtual ~impl() = default;
-
-		virtual void format(const meta_data &meta) override;
-		virtual meta_data metadata() override;
-		virtual void metadata_change(const meta_data &info) override;
-		virtual dir_t root() override;
-
-		void drop_root_ref();
-
-		std::vector<std::pair<u8, u8>> allocate_blocks(u32 count);
-		void free_blocks(const std::vector<std::pair<u8, u8>> &blocks);
-		u32 free_block_count();
-
-	private:
-		dir_t m_root;
-	};
-
 	vtech_image() : manager_t() {}
 
 	virtual const char *name() const override;

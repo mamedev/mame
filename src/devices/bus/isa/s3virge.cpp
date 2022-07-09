@@ -83,8 +83,8 @@ void s3virge_vga_device::device_start()
 	save_item(vga.sequencer.data,"Sequencer Registers");
 	save_item(vga.attribute.data,"Attribute Registers");
 
-	m_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vga_device::vblank_timer_cb),this));
-	m_draw_timer = timer_alloc(TIMER_DRAW_STEP);
+	m_vblank_timer = timer_alloc(FUNC(vga_device::vblank_timer_cb), this);
+	m_draw_timer = timer_alloc(FUNC(s3virge_vga_device::draw_step_tick), this);
 
 	memset(&s3, 0, sizeof(s3));
 	memset(&s3virge, 0, sizeof(s3virge));
@@ -1427,33 +1427,94 @@ void s3virge_vga_device::bitblt_monosrc_step()
 	s3virge.s3d.bitblt_step_count++;
 }
 
-void s3virge_vga_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(s3virge_vga_device::draw_step_tick)
 {
 	// TODO: S3D state timing
-	if(id == TIMER_DRAW_STEP)
+	switch(s3virge.s3d.state)
 	{
-		switch(s3virge.s3d.state)
-		{
-			case S3D_STATE_IDLE:
-				m_draw_timer->adjust(attotime::zero);
-				break;
-			case S3D_STATE_2DLINE:
-				line2d_step();
-				break;
-			case S3D_STATE_2DPOLY:
-				poly2d_step();
-				break;
-			case S3D_STATE_3DLINE:
-				line3d_step();
-				break;
-			case S3D_STATE_3DPOLY:
-				poly3d_step();
-				break;
-			case S3D_STATE_BITBLT:
-				bitblt_step();
-				break;
-		}
+		case S3D_STATE_IDLE:
+			m_draw_timer->adjust(attotime::zero);
+			break;
+		case S3D_STATE_2DLINE:
+			line2d_step();
+			break;
+		case S3D_STATE_2DPOLY:
+			poly2d_step();
+			break;
+		case S3D_STATE_3DLINE:
+			line3d_step();
+			break;
+		case S3D_STATE_3DPOLY:
+			poly3d_step();
+			break;
+		case S3D_STATE_BITBLT:
+			bitblt_step();
+			break;
 	}
+}
+
+inline void s3virge_vga_device::write_pixel32(uint32_t base, uint16_t x, uint16_t y, uint32_t val)
+{
+	if(s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x00000002)
+		if(x < s3virge.s3d.clip_l || x > s3virge.s3d.clip_r || y < s3virge.s3d.clip_t || y > s3virge.s3d.clip_b)
+			return;
+	vga.memory[(base + (x*4) + (y*dest_stride())) % vga.svga_intf.vram_size] = val & 0xff;
+	vga.memory[(base + 1 + (x*4) + (y*dest_stride())) % vga.svga_intf.vram_size] = (val >> 8) & 0xff;
+	vga.memory[(base + 2 + (x*4) + (y*dest_stride())) % vga.svga_intf.vram_size] = (val >> 16) & 0xff;
+	vga.memory[(base + 3 + (x*4) + (y*dest_stride())) % vga.svga_intf.vram_size] = (val >> 24) & 0xff;
+}
+
+inline void s3virge_vga_device::write_pixel24(uint32_t base, uint16_t x, uint16_t y, uint32_t val)
+{
+	if(s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x00000002)
+		if(x < s3virge.s3d.clip_l || x > s3virge.s3d.clip_r || y < s3virge.s3d.clip_t || y > s3virge.s3d.clip_b)
+			return;
+	vga.memory[(base + (x*3) + (y*dest_stride())) % vga.svga_intf.vram_size] = val & 0xff;
+	vga.memory[(base + 1 + (x*3) + (y*dest_stride())) % vga.svga_intf.vram_size] = (val >> 8) & 0xff;
+	vga.memory[(base + 2 + (x*3) + (y*dest_stride())) % vga.svga_intf.vram_size] = (val >> 16) & 0xff;
+}
+
+inline void s3virge_vga_device::write_pixel16(uint32_t base, uint16_t x, uint16_t y, uint16_t val)
+{
+	if(s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x00000002)
+		if(x < s3virge.s3d.clip_l || x > s3virge.s3d.clip_r || y < s3virge.s3d.clip_t || y > s3virge.s3d.clip_b)
+			return;
+	vga.memory[(base + (x*2) + (y*dest_stride())) % vga.svga_intf.vram_size] = val & 0xff;
+	vga.memory[(base + 1 + (x*2) + (y*dest_stride())) % vga.svga_intf.vram_size] = (val >> 8) & 0xff;
+}
+
+inline void s3virge_vga_device::write_pixel8(uint32_t base, uint16_t x, uint16_t y, uint8_t val)
+{
+	if(s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x00000002)
+		if(x < s3virge.s3d.clip_l || x > s3virge.s3d.clip_r || y < s3virge.s3d.clip_t || y > s3virge.s3d.clip_b)
+			return;
+	vga.memory[(base + x + (y*dest_stride())) % vga.svga_intf.vram_size] = val;
+}
+
+inline uint32_t s3virge_vga_device::read_pixel32(uint32_t base, uint16_t x, uint16_t y)
+{
+	return (vga.memory[(base + (x*4) + (y*dest_stride())) % vga.svga_intf.vram_size] << 24) |
+		   (vga.memory[(base + 1 + (x*4) + (y*dest_stride())) % vga.svga_intf.vram_size] << 16) |
+		   (vga.memory[(base + 2 + (x*4) + (y*dest_stride())) % vga.svga_intf.vram_size] << 8) |
+		   vga.memory[(base + 3 + (x*4) + (y*dest_stride())) % vga.svga_intf.vram_size];
+}
+
+inline uint32_t s3virge_vga_device::read_pixel24(uint32_t base, uint16_t x, uint16_t y)
+{
+	return (vga.memory[(base + (x*3) + (y*dest_stride())) % vga.svga_intf.vram_size]) |
+		   (vga.memory[(base + 1 + (x*3) + (y*dest_stride())) % vga.svga_intf.vram_size] << 8) |
+		   (vga.memory[(base + 2 + (x*3) + (y*dest_stride())) % vga.svga_intf.vram_size] << 16);
+}
+
+inline uint16_t s3virge_vga_device::read_pixel16(uint32_t base, uint16_t x, uint16_t y)
+{
+	return (vga.memory[(base + (x*2) + (y*dest_stride()) % vga.svga_intf.vram_size)]) |
+		   (vga.memory[(base + 1 + (x*2) + (y*dest_stride())) % vga.svga_intf.vram_size] << 8);
+}
+
+inline uint8_t s3virge_vga_device::read_pixel8(uint32_t base, uint16_t x, uint16_t y)
+{
+	return vga.memory[(base + x + (y*dest_stride())) % vga.svga_intf.vram_size];
 }
 
 // 2D command register format - A500 (BitBLT), A900 (2D line), AD00 (2D Polygon)

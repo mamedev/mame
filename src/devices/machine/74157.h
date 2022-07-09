@@ -96,7 +96,7 @@ class ls157_x2_device : public ls157_device
 {
 public:
 	// construction/destruction
-	ls157_x2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ls157_x2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 // ======================> hc157_device
@@ -105,7 +105,7 @@ class hc157_device : public ls157_device
 {
 public:
 	// construction/destruction
-	hc157_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hc157_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 // ======================> hct157_device
@@ -114,7 +114,7 @@ class hct157_device : public ls157_device
 {
 public:
 	// construction/destruction
-	hct157_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hct157_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 

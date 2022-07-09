@@ -18,6 +18,9 @@ on:
     - 'COPYING'
     - 'makefile'
 
+permissions:
+  contents: read
+
 jobs:
   build-macos:
     runs-on: macOS-latest

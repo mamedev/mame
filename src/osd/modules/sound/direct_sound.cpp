@@ -12,7 +12,7 @@
 #if defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
 
 // MAME headers
-#include "emu.h"
+#include "osdcore.h"
 #include "osdepend.h"
 #include "emuopts.h"
 
@@ -28,9 +28,14 @@
 #include <utility>
 
 // standard windows headers
-#include <dsound.h>
-#include <mmsystem.h>
+
 #include <windows.h>
+
+#include <mmreg.h>
+#include <mmsystem.h>
+
+#include <dsound.h>
+
 #include <wrl/client.h>
 
 

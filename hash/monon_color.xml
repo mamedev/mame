@@ -110,7 +110,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ironmnhs" supported="no"> <!-- 106 - Iron Man: Hero Strike   -->
+	<software name="ironmnhs" supported="no"> <!-- 106 - Iron Man: Hero Strike -->
 		<description>Gāngtiě xiá-yīngxióng fǎnjí zhàn</description>
 		<year>2011</year>
 		<publisher>M&amp;D</publisher>
@@ -158,7 +158,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="lockfire" supported="no"> <!-- 203 - Locke Kingdom RPG: Black Fire   -->
+	<software name="lockfire" supported="no"> <!-- 203 - Locke Kingdom RPG: Black Fire -->
 		<description>Luòkè wángguó-hēi zhī yán</description>
 		<year>2011</year>
 		<publisher>M&amp;D</publisher>
@@ -182,7 +182,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="armorwr" supported="no"> <!-- 205 - Armor Warrior    -->
+	<software name="armorwr" supported="no"> <!-- 205 - Armor Warrior -->
 		<description>Kǎijiǎ yǒngshì dàluàn dòu</description>
 		<year>2011</year>
 		<publisher>M&amp;D</publisher>

@@ -223,12 +223,12 @@ namespace plib
 		}
 
 		//FIXME: no check!
-		size_type didx(size_type r, size_type c) const noexcept
+		constexpr size_type didx(size_type r, size_type c) const noexcept
 		{
 			return m_row[r] + c;
 		}
 
-		size_type colcount(size_type row) const noexcept
+		constexpr size_type col_count(size_type row) const noexcept
 		{
 			return m_row[row + 1] - m_row[row];
 		}

@@ -30,16 +30,10 @@
 
 #define BODY_CONNECTED_TO_SOURCE    (1)
 
-namespace netlist
-{
-namespace analog
+namespace netlist::analog
 {
 
 	using constants = plib::constants<nl_fptype>;
-
-	// -----------------------------------------------------------------------------
-	// nld_FET - Base classes
-	// -----------------------------------------------------------------------------
 
 	/// \brief Class representing the nmos/pmos model parameters.
 	///
@@ -53,7 +47,7 @@ namespace analog
 	///  Typically, SPICE uses the following parameters. A "Y" in the first
 	///  column indicates that the parameter is actually used in netlist.
 	///
-	/// | NL? |Name  |                                                            Description|Units  |Default   |Example          |
+	/// |NL? |Name  |                                                            Description|Units  |Default   |Example          |
 	/// |:---:|------|-----------------------------------------------------------------------|-------|---------:|----------------:|
 	/// |  Y  |Vto   | Zero-bias threshold voltage                                           | V     | 0        | 1               |
 	/// |  Y  |Kp    | Transconductance parameter                                            | A/V²  | 0.00002  | 0.00003         |
@@ -149,47 +143,20 @@ namespace analog
 		param_model_t::value_base_t<int> m_CAPMOD; //!< Capacitance model (0=no model 2=Meyer)
 	};
 
-	// Have a common start for mosfets
+	// -----------------------------------------------------------------------------
+	// nld_MOSFET
+	// -----------------------------------------------------------------------------
 
-	NETLIB_BASE_OBJECT(FET)
+	class nld_MOSFET : public base_device_t
 	{
 	public:
-		enum q_type {
-			FET_NMOS,
-			FET_PMOS
-		};
-
-		NETLIB_CONSTRUCTOR(FET)
+	public:                                                                        \
+		nld_MOSFET(constructor_param_t data)
+		: base_device_t(data)
 		, m_model(*this, "MODEL", "NMOS")
-		, m_qtype(FET_NMOS)
-		{
-		}
-
-		NETLIB_IS_DYNAMIC(true)
-
-		//NETLIB_RESETI();
-
-		q_type qtype() const noexcept { return m_qtype; }
-		bool is_qtype(q_type atype) const noexcept { return m_qtype == atype; }
-		void set_qtype(q_type atype) noexcept { m_qtype = atype; }
-	protected:
-
-		param_model_t m_model;
-	private:
-		q_type m_qtype;
-	};
-
-	// -----------------------------------------------------------------------------
-	// nld_QBJT_EB
-	// -----------------------------------------------------------------------------
-
-	NETLIB_OBJECT_DERIVED(MOSFET, FET)
-	{
-	public:
-		NETLIB_CONSTRUCTOR(MOSFET)
-		, m_DG(*this, "m_DG", NETLIB_DELEGATE(termhandler))
-		, m_SG(*this, "m_SG", NETLIB_DELEGATE(termhandler))
-		, m_SD(*this, "m_SD", NETLIB_DELEGATE(termhandler))
+		, m_DG(*this, "m_DG", NETLIB_DELEGATE(terminal_handler))
+		, m_SG(*this, "m_SG", NETLIB_DELEGATE(terminal_handler))
+		, m_SD(*this, "m_SD", NETLIB_DELEGATE(terminal_handler))
 		, m_D_BD(*this, "m_D_BD")
 #if (!BODY_CONNECTED_TO_SOURCE)
 		, m_D_BS(*this, "m_D_BS")
@@ -204,7 +171,7 @@ namespace analog
 		, m_lambda(nlconst::zero())
 		, m_Leff(nlconst::zero())
 		, m_CoxWL(nlconst::zero())
-		, m_polarity(qtype() == FET_NMOS ? nlconst::one() : -nlconst::one())
+		//S, m_polarity(qtype() == FET_NMOS ? nlconst::one() : -nlconst::one())
 		, m_Cgb(nlconst::zero())
 		, m_Cgs(nlconst::zero())
 		, m_Cgd(nlconst::zero())
@@ -213,17 +180,16 @@ namespace analog
 		, m_Vgd(*this, "m_Vgd", nlconst::zero())
 		, m_model_acc(m_model)
 	{
-			register_subalias("S", m_SG.P());   // Source
-			register_subalias("G", m_SG.N());   // Gate
+			register_sub_alias("S", m_SG.P());   // Source
+			register_sub_alias("G", m_SG.N());   // Gate
 
-			register_subalias("D", m_DG.P());   // Drain
+			register_sub_alias("D", m_DG.P());   // Drain
 
 			connect(m_SG.P(), m_SD.P());
 			connect(m_SG.N(), m_DG.N());
 			connect(m_DG.P(), m_SD.N());
 
-			set_qtype((m_model.type() == "NMOS_DEFAULT") ? FET_NMOS : FET_PMOS);
-			m_polarity = (qtype() == FET_NMOS ? nlconst::one() : -nlconst::one());
+			m_polarity = (m_model.type() == "NMOS_DEFAULT" ? nlconst::one() : -nlconst::one());
 
 			m_capacitor_model = m_model_acc.m_CAPMOD;
 			//# printf("capmod %d %g %g\n", m_capacitor_model, (nl_fptype)m_model_acc.m_VTO, m_polarity);
@@ -296,13 +262,14 @@ namespace analog
 			//#printf("Cox: %g\n", m_Cox);
 		}
 
+		NETLIB_IS_DYNAMIC(true)
 		NETLIB_IS_TIMESTEP(true || m_capacitor_model != 0)
 
 		NETLIB_TIMESTEPI()
 		{
 			if (m_capacitor_model != 0)
 			{
-				if (ts_type == timestep_type::FORWARD)
+				if (ts_type == time_step_type::FORWARD)
 				{
 					//#const nl_nl_fptype Ugd = -m_DG.deltaV() * m_polarity; // Gate - Drain
 					//#const nl_nl_fptype Ugs = -m_SG.deltaV() * m_polarity; // Gate - Source
@@ -311,9 +278,9 @@ namespace analog
 					const nl_fptype Ubs = nlconst::zero(); // Bulk - Source == 0 if connected
 					const nl_fptype Ugb = Ugs - Ubs;
 
-					m_cap_gb.timestep(m_Cgb, Ugb, step);
-					m_cap_gs.timestep(m_Cgs, Ugs, step);
-					m_cap_gd.timestep(m_Cgd, Ugd, step);
+					m_cap_gb.time_step(m_Cgb, Ugb, step);
+					m_cap_gs.time_step(m_Cgs, Ugs, step);
+					m_cap_gd.time_step(m_Cgd, Ugd, step);
 				}
 				else
 				{
@@ -328,7 +295,6 @@ namespace analog
 
 		NETLIB_RESETI()
 		{
-			NETLIB_NAME(FET)::reset();
 			// Bulk diodes
 
 			m_D_BD.set_param(m_model_acc.m_ISD, m_model_acc.m_N, exec().gmin(), constants::T0());
@@ -337,7 +303,7 @@ namespace analog
 			#endif
 		}
 
-		NETLIB_HANDLERI(termhandler)
+		NETLIB_HANDLERI(terminal_handler)
 		{
 			// only called if connected to a rail net ==> notify the solver to recalculate
 			auto *solv(m_SG.solver());
@@ -351,9 +317,11 @@ namespace analog
 
 	private:
 
-		nld_twoterm m_DG;
-		nld_twoterm m_SG;
-		nld_twoterm m_SD;
+		param_model_t m_model;
+
+		NETLIB_NAME(two_terminal) m_DG;
+		NETLIB_NAME(two_terminal) m_SG;
+		NETLIB_NAME(two_terminal) m_SD;
 
 		generic_diode<diode_e::MOS> m_D_BD;
 #if (!BODY_CONNECTED_TO_SOURCE)
@@ -543,8 +511,8 @@ namespace analog
 		const nl_fptype gbs = nlconst::zero();
 #endif
 		// exchange controlling nodes if necessary
-		const nl_fptype gsource = is_forward ? (gm + gmb) : nlconst::zero();
-		const nl_fptype gdrain  = is_forward ? nlconst::zero() : (gm + gmb);
+		const nl_fptype gate_source = is_forward ? (gm + gmb) : nlconst::zero();
+		const nl_fptype gate_drain  = is_forward ? nlconst::zero() : (gm + gmb);
 
 		const nl_fptype IeqDS = (is_forward) ?
 			   Ids - gm * Vgs - gmb * Vbs - gds * Vds
@@ -562,13 +530,13 @@ namespace analog
 		nl_fptype gGB = nlconst::zero();
 
 		nl_fptype gDG =  gm;
-		nl_fptype gDD =  gds + gbd - gdrain;
-		const nl_fptype gDS = -gds - gsource;
+		nl_fptype gDD =  gds + gbd - gate_drain;
+		const nl_fptype gDS = -gds - gate_source;
 		const nl_fptype gDB =  gmb - gbd;
 
 		nl_fptype gSG = -gm;
-		const nl_fptype gSD = -gds + gdrain;
-		nl_fptype gSS =  gbs + gds + gsource;
+		const nl_fptype gSD = -gds + gate_drain;
+		nl_fptype gSS =  gbs + gds + gate_source;
 		const nl_fptype gSB = -gbs - gmb;
 
 		nl_fptype gBG =  nlconst::zero();
@@ -594,24 +562,51 @@ namespace analog
 		const nl_fptype gSSBB = gSS + gBB + gBS + gSB;
 		const auto zero(nlconst::zero());
 		//                 S          G
-		m_SG.set_mat(    gSSBB,   gSG + gBG, +(IS + IB),       // S
-					   gGS + gGB,    gGG,      IG       );     // G
+		m_SG.set_mat(  gSSBB,   gSG + gBG, +(IS + IB),       // S
+					   gGS + gGB,    gGG,        IG     );     // G
 		//                 D          G
-		m_DG.set_mat(     gDD,       gDG,    +ID,              // D
-						  gGD,      zero,   zero        );     // G
+		m_DG.set_mat(   gDD,       gDG,        +ID,          // D
+						  gGD,      zero,       zero    );     // G
 		//                 S          D
-		m_SD.set_mat(    zero,    gSD + gBD, zero,             // S
-					   gDS + gDB,   zero,    zero);            // D
+		m_SD.set_mat(  zero,    gSD + gBD,    zero,          // S
+					   gDS + gDB,   zero,       zero    );     // D
+
+		/// |
+		/// |               D                S              G          I
+		/// |
+		/// | D        gDD               gDS + gDB        gDG           ID
+		///
+		/// | S     gSD + gBD             gSSBB         gSG + gBG     IS+IB
+		///
+		/// | G         gGD              gGS + gGB       gGG           IG
+		/// |
+		/// | forward=yes, bulk diode=no, backgate transconductance=no
+		/// | IG = 0, gGG = 0, gGS, gGB =0, gGD=0l
+		///   gDD=gds + gbd=gds
+		///   gSD+gBD=-gds + gmb - gbd = -gds
+		///
+		/// |               D                S              G          I
+		/// |
+		/// | D        gDD               gDS + gDB        gDG           ID
+		///
+		/// | S     gSD + gBD             gSSBB         gSG + gBG     IS+IB
+		///
+		/// | G         0                   0                0              0
+		/// |
+		/// |
+		/// |
+		/// |
+		/// |
+		/// |
 	}
 
 	NETLIB_UPDATE_PARAM(MOSFET)
 	{
 	}
 
-} // namespace analog
+} // namespace netlist::analog
 
-namespace devices {
+namespace netlist::devices {
 	NETLIB_DEVICE_IMPL_NS(analog, MOSFET, "MOSFET", "MODEL")
-} // namespace devices
+} // namespace netlist::devices
 
-} // namespace netlist

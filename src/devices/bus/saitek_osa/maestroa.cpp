@@ -17,9 +17,6 @@ Hardware notes:
 The CPU is a 4MHz part, higher speed modules overclock it. The PCB is not
 compatible for upgrading to newer Maestro versions.
 
-TODO:
-- does not work if cpu speed is 4MHz
-
 ***************************************************************************/
 
 #include "emu.h"

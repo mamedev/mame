@@ -716,13 +716,7 @@ void lua_engine::initialize()
 			static_cast<char const *(*)(char const *)>(&lang_translate),
 			static_cast<char const *(*)(char const *, char const *)>(&lang_translate));
 	emu["pid"] = &osd_getpid;
-	emu["subst_env"] =
-		[] (const std::string &str)
-		{
-			std::string result;
-			osd_subst_env(result, str);
-			return result;
-		};
+	emu.set_function("subst_env", &osd_subst_env);
 	emu["device_enumerator"] = sol::overload(
 			[] (device_t &dev) { return devenum<device_enumerator>(dev); },
 			[] (device_t &dev, int maxdepth) { return devenum<device_enumerator>(dev, maxdepth); });
@@ -1157,25 +1151,25 @@ void lua_engine::initialize()
 	auto core_options_entry_type = sol().registry().new_usertype<core_options::entry>("core_options_entry", "new", sol::no_constructor);
 	core_options_entry_type.set("value", sol::overload(
 		[this](core_options::entry &e, bool val) {
-			if(e.type() != OPTION_BOOLEAN)
+			if(e.type() != core_options::option_type::BOOLEAN)
 				luaL_error(m_lua_state, "Cannot set option to wrong type");
 			else
 				e.set_value(val ? "1" : "0", OPTION_PRIORITY_CMDLINE);
 		},
 		[this](core_options::entry &e, float val) {
-			if(e.type() != OPTION_FLOAT)
+			if(e.type() != core_options::option_type::FLOAT)
 				luaL_error(m_lua_state, "Cannot set option to wrong type");
 			else
 				e.set_value(string_format("%f", val), OPTION_PRIORITY_CMDLINE);
 		},
 		[this](core_options::entry &e, int val) {
-			if(e.type() != OPTION_INTEGER)
+			if(e.type() != core_options::option_type::INTEGER)
 				luaL_error(m_lua_state, "Cannot set option to wrong type");
 			else
 				e.set_value(string_format("%d", val), OPTION_PRIORITY_CMDLINE);
 		},
 		[this](core_options::entry &e, const char *val) {
-			if(e.type() != OPTION_STRING)
+			if(e.type() != core_options::option_type::STRING)
 				luaL_error(m_lua_state, "Cannot set option to wrong type");
 			else
 				e.set_value(val, OPTION_PRIORITY_CMDLINE);
@@ -1290,7 +1284,7 @@ void lua_engine::initialize()
 	game_driver_type["manufacturer"] = sol::readonly(&game_driver::manufacturer);
 	game_driver_type["parent"] = sol::readonly(&game_driver::parent);
 	game_driver_type["compatible_with"] = sol::property([] (game_driver const &driver) { return strcmp(driver.compatible_with, "0") ? driver.compatible_with : nullptr; });
-	game_driver_type["source_file"] = sol::property([] (game_driver const &driver) { return &driver.type.source()[0]; });
+	game_driver_type["source_file"] = sol::property([] (game_driver const &driver) { return driver.type.source(); });
 	game_driver_type["orientation"] = sol::property(
 			[] (game_driver const &driver)
 			{

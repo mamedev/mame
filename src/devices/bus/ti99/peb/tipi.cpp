@@ -105,6 +105,7 @@ tipi_card_device::tipi_card_device(const machine_config &mconfig, const char *ta
 	m_waitinit(false),
 	m_rpiconn(false),
 	m_tc(0),
+	m_rd(0),
 	m_lasttc(0)
 {
 }
@@ -155,9 +156,8 @@ void tipi_card_device::readz(offs_t offset, uint8_t *value)
 			int val = 0;
 			if (m_address & 2)
 			{
-				val = m_indqueue.front();
-				m_indqueue.pop();
-				LOGMASKED(LOG_PORTS, "RDIN -> %02x\n", val);
+				LOGMASKED(LOG_PORTS, "RDIN -> %02x\n", m_rd);
+				val = m_rd;
 			}
 			else
 			{
@@ -393,6 +393,9 @@ void tipi_card_device::process_message()
 					{
 						m_rc = m_tc;   // Auto-acknowledge
 						m_lasttc = m_tc;
+
+						m_rd = m_indqueue.front();
+						m_indqueue.pop();
 					}
 				}
 			}
@@ -406,7 +409,7 @@ void tipi_card_device::process_message()
 
     Default for port is 9901.
 */
-void tipi_card_device::open_websocket()
+TIMER_CALLBACK_MEMBER(tipi_card_device::open_websocket)
 {
 	if (m_rpiconn)
 	{
@@ -539,15 +542,6 @@ void tipi_card_device::websocket_error(const std::error_code& code)
 	}
 }
 
-/*
-    Restart the websocket connection
-*/
-void tipi_card_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	open_websocket();
-}
-
-
 void tipi_card_device::websocket_closed(int i, const std::string& msg)
 {
 	LOG("Closing connection\n");
@@ -573,7 +567,7 @@ void tipi_card_device::device_start()
 	save_item(NAME(m_rc));
 	save_item(NAME(m_lasttc));
 
-	m_restart_timer = timer_alloc(0);
+	m_restart_timer = timer_alloc(FUNC(tipi_card_device::open_websocket), this);
 	m_rpiconn = (m_rpi->exists());
 }
 
@@ -586,7 +580,7 @@ void tipi_card_device::device_reset()
 	m_dsr = false;
 	m_portaccess = false;
 	if (!m_rpiconn) LOGMASKED(LOG_CONFIG, "No Raspberry Pi connected\n");
-	open_websocket();
+	open_websocket(0);
 	m_connected = false;
 	m_lasttc = 0;
 	m_attempts = 5;
@@ -596,17 +590,18 @@ void tipi_card_device::device_stop()
 {
 	// MZ: Without this I'm getting segfaults/list corruption
 	// when leaving the emulation
-	m_wsclient = NULL;
+	m_wsclient->stop();
 	LOG("Stopping TIPI\n");
 }
 
 /*
     The CRU address base for the card.
+    For the Geneve OS version 7.30, CRU base 1800 is mandatory.
 */
 INPUT_PORTS_START( tipi )
 	PORT_START("SW1")
-	PORT_DIPNAME(0x1f, 0x10, "CRU base")
-		PORT_DIPSETTING(0x10, "1000") // Default setting
+	PORT_DIPNAME(0x1f, 0x18, "CRU base")
+		PORT_DIPSETTING(0x10, "1000")
 		PORT_DIPSETTING(0x11, "1100")
 		PORT_DIPSETTING(0x12, "1200")
 		PORT_DIPSETTING(0x13, "1300")
@@ -614,7 +609,7 @@ INPUT_PORTS_START( tipi )
 		PORT_DIPSETTING(0x15, "1500")
 		PORT_DIPSETTING(0x16, "1600")
 		PORT_DIPSETTING(0x17, "1700")
-		PORT_DIPSETTING(0x18, "1800")
+		PORT_DIPSETTING(0x18, "1800") // Default setting
 		PORT_DIPSETTING(0x19, "1900")
 		PORT_DIPSETTING(0x1a, "1a00")
 		PORT_DIPSETTING(0x1b, "1b00")

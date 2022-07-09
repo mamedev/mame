@@ -55,7 +55,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
@@ -66,13 +65,11 @@ protected:
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
 
 private:
-	inline void check_interrupt();
-	inline void set_pse_line(bool state);
-	inline uint8_t read_register(offs_t offset);
-	inline void write_register(offs_t offset, uint8_t data);
-	inline void advance_seconds();
-
-	static const device_timer_id TIMER_CLOCK = 0;
+	void check_interrupt();
+	void set_pse_line(bool state);
+	uint8_t read_register(offs_t offset);
+	void write_register(offs_t offset, uint8_t data);
+	TIMER_CALLBACK_MEMBER(advance_seconds);
 
 	devcb_write_line int_cb, pse_cb, nuc_cb;
 

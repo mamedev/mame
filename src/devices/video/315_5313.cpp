@@ -370,9 +370,9 @@ void sega315_5313_device::device_start()
 	if (m_use_alt_timing)
 		save_pointer(NAME(m_render_line), 1280);
 
-	m_irq6_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega315_5313_device::irq6_on_timer_callback), this));
-	m_irq4_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega315_5313_device::irq4_on_timer_callback), this));
-	m_render_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega315_5313_device::render_scanline), this));
+	m_irq6_on_timer = timer_alloc(FUNC(sega315_5313_device::irq6_on_timer_callback), this);
+	m_irq4_on_timer = timer_alloc(FUNC(sega315_5313_device::irq4_on_timer_callback), this);
+	m_render_timer = timer_alloc(FUNC(sega315_5313_device::render_scanline), this);
 
 	m_space68k = &m_cpu68k->space();
 

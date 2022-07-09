@@ -14,6 +14,7 @@
 //  X.4 : Triangle out
 
 NETLIST_START(oscillator)
+{
 
 	SOLVER(Solver, 48000)
 
@@ -30,5 +31,5 @@ NETLIST_START(oscillator)
 	NET_C(I_VC, X.5)
 	NET_C(GND, X.1, C1.2)
 	NET_C(C1.1, X.7)
-NETLIST_END()
+}
 //! [ne566_example]

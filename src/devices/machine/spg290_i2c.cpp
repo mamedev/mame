@@ -26,7 +26,7 @@ void spg290_i2c_device::device_start()
 	m_irq_cb.resolve_safe();
 	m_i2c_read_cb.resolve_safe(0);
 	m_i2c_write_cb.resolve_safe();
-	m_i2c_timer = timer_alloc();
+	m_i2c_timer = timer_alloc(FUNC(spg290_i2c_device::i2c_update), this);
 
 	save_item(NAME(m_config));
 	save_item(NAME(m_irq_control));
@@ -52,7 +52,7 @@ void spg290_i2c_device::device_reset()
 	m_irq_cb(CLEAR_LINE);
 }
 
-void spg290_i2c_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(spg290_i2c_device::i2c_update)
 {
 	if (m_config & 0x40)
 		m_rdata = m_i2c_read_cb(m_port_addr);

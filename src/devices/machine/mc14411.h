@@ -29,26 +29,25 @@
 class mc14411_device : public device_t
 {
 public:
-	// timers
-	enum timer_id // indexes
+	// timer indices
+	enum timer_id : int
 	{
-		TIMER_F1 = 0,
-		TIMER_F2 = 1,
-		TIMER_F3 = 2,
-		TIMER_F4 = 3,
-		TIMER_F5 = 4,
-		TIMER_F6 = 5,
-		TIMER_F7 = 6,
-		TIMER_F8 = 7,
-		TIMER_F9 = 8,
-		TIMER_F10 = 9,
-		TIMER_F11 = 10,
-		TIMER_F12 = 11,
-		TIMER_F13 = 12,
-		TIMER_F14 = 13,
-		TIMER_F15 = 14,
-		TIMER_F16 = 15,
-		TIMER_ID_RESET = 16
+		TIMER_F1,
+		TIMER_F2,
+		TIMER_F3,
+		TIMER_F4,
+		TIMER_F5,
+		TIMER_F6,
+		TIMER_F7,
+		TIMER_F8,
+		TIMER_F9,
+		TIMER_F10,
+		TIMER_F11,
+		TIMER_F12,
+		TIMER_F13,
+		TIMER_F14,
+		TIMER_F15,
+		TIMER_F16
 	};
 
 	// rate select inputs
@@ -78,26 +77,31 @@ protected:
 	virtual void device_start() override;
 	virtual void device_clock_changed() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(timer_tick);
+	TIMER_CALLBACK_MEMBER(reset_tick);
 
 private:
 	void arm_timer(int i);
 
-	emu_timer *m_fx_timer[16];
+	struct fx_timer
+	{
+		emu_timer *timer;
+		bool state;
+		bool enabled;
+	};
+
+	fx_timer m_fx_timers[16];
 	emu_timer *m_reset_timer;
-
-	uint32_t m_fx_state[16]; // F1-F16 output line states
-
-	// divider matrix
-	static const int s_counter_divider[16];
-	static const int s_divider_select[4];
 
 	devcb_write_line::array<16> m_out_fx_cbs;
 
 	uint32_t m_divider; // main divider to use, 0-3 column index into counter_divider
 	uint32_t m_reset;   // Reset line state
 
-	bool m_timer_enabled[16];
+	// divider matrix
+	static const int s_counter_divider[16];
+	static const int s_divider_select[4];
 };
 
 DECLARE_DEVICE_TYPE(MC14411, mc14411_device)

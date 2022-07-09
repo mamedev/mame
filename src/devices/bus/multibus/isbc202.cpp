@@ -100,13 +100,6 @@ constexpr unsigned HALF_BIT_CELL_US = 1;// Half bit cell duration in µs
 constexpr unsigned BIT_FREQUENCY = 500000;  // Frequency of bit cells in Hz
 constexpr uint16_t CRC_POLY = 0x1021;   // CRC-CCITT
 
-// Timers
-enum {
-	  TIMEOUT_TMR_ID,
-	  BYTE_TMR_ID,
-	  F_TMR_ID
-};
-
 // device type definition
 DEFINE_DEVICE_TYPE(ISBC202, isbc202_device, "isbc202", "iSBC-202 floppy controller")
 
@@ -404,9 +397,9 @@ void isbc202_device::device_start()
 		d->get_device()->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&isbc202_device::floppy_index_cb , this));
 	}
 
-	m_timeout_timer = timer_alloc(TIMEOUT_TMR_ID);
-	m_byte_timer = timer_alloc(BYTE_TMR_ID);
-	m_f_timer = timer_alloc(F_TMR_ID);
+	m_timeout_timer = timer_alloc(FUNC(isbc202_device::timeout_tick), this);
+	m_byte_timer = timer_alloc(FUNC(isbc202_device::byte_tick), this);
+	m_f_timer = timer_alloc(FUNC(isbc202_device::f_tick), this);
 
 	m_mem_space = &m_bus->space(AS_PROGRAM);
 	m_bus->space(AS_IO).install_readwrite_handler(0x78, 0x7f, read8m_delegate(*this, FUNC(isbc202_device::io_r)), write8m_delegate(*this, FUNC(isbc202_device::io_w)));
@@ -438,37 +431,32 @@ void isbc202_device::device_reset()
 	m_f_timer->reset();
 }
 
-void isbc202_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(isbc202_device::timeout_tick)
 {
-	switch (id) {
-	case TIMEOUT_TMR_ID:
-		m_inputs[ IN_SEL_TIMEOUT ] = true;
-		break;
+	m_inputs[ IN_SEL_TIMEOUT ] = true;
+}
 
-	case BYTE_TMR_ID:
-		m_inputs[ IN_SEL_F ] = true;
-		m_f_timer->adjust(attotime::from_usec(HALF_BIT_CELL_US * 2));
-		m_dlyd_amwrt = m_amwrt;
-		if (m_reading) {
-			m_last_f_time = machine().time();
-			rd_bits(8);
-			m_byte_timer->adjust(m_pll.ctime - machine().time());
-			// Updating of AZ flag actually happens when F goes low
-			m_inputs[ IN_SEL_AZ ] = m_crc == 0;
-		}
-		break;
+TIMER_CALLBACK_MEMBER(isbc202_device::byte_tick)
+{
+	m_inputs[ IN_SEL_F ] = true;
+	m_f_timer->adjust(attotime::from_usec(HALF_BIT_CELL_US * 2));
+	m_dlyd_amwrt = m_amwrt;
+	if (m_reading) {
+		m_last_f_time = machine().time();
+		rd_bits(8);
+		m_byte_timer->adjust(m_pll.ctime - machine().time());
+		// Updating of AZ flag actually happens when F goes low
+		m_inputs[ IN_SEL_AZ ] = m_crc == 0;
+	}
+}
 
-	case F_TMR_ID:
-		m_inputs[ IN_SEL_F ] = false;
-		if (m_writing) {
-			write_byte();
-			m_data_sr = dbus_r();
-			m_byte_timer->adjust(attotime::from_usec(HALF_BIT_CELL_US * 14));
-		}
-		break;
-
-	default:
-		break;
+TIMER_CALLBACK_MEMBER(isbc202_device::f_tick)
+{
+	m_inputs[ IN_SEL_F ] = false;
+	if (m_writing) {
+		write_byte();
+		m_data_sr = dbus_r();
+		m_byte_timer->adjust(attotime::from_usec(HALF_BIT_CELL_US * 14));
 	}
 }
 

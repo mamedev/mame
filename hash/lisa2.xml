@@ -36,7 +36,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-		<software name="xenixos">
+	<software name="xenixos">
 		<description>Xenix OS 3.0 Release 1.0</description>
 		<year>198?</year>
 		<publisher>Microsoft/SCO</publisher>
@@ -90,7 +90,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-		<software name="xenixdev">
+	<software name="xenixdev">
 		<description>Xenix Development System 3.0 Release 1.0</description>
 		<year>198?</year>
 		<publisher>Microsoft/SCO</publisher>
@@ -120,7 +120,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-		<software name="xenixtxt">
+	<software name="xenixtxt">
 		<description>Xenix Text Processing System</description>
 		<year>198?</year>
 		<publisher>Microsoft/SCO</publisher>

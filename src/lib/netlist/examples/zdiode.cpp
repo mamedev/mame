@@ -15,6 +15,7 @@
 // ZD.K:  voltage at Zener
 
 NETLIST_START(zdiode)
+{
 
 	SOLVER(Solver, 48000)
 	PARAM(Solver.DYNAMIC_TS, 1)
@@ -41,5 +42,5 @@ NETLIST_START(zdiode)
 	NET_C(RL.1, ZD.K)
 	NET_C(RL.2, GND)
 
-NETLIST_END()
+}
 //! [zdiode_example]

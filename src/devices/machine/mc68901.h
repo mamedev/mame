@@ -91,7 +91,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	void check_interrupts();
 	void take_interrupt(u16 mask);
@@ -99,7 +98,7 @@ protected:
 	void tx_error();
 	void rx_buffer_full();
 	void rx_error();
-	void timer_count(int index);
+	TIMER_CALLBACK_MEMBER(timer_count);
 	void timer_input(int index, int value);
 	void gpio_input(int bit, int state);
 	void gpio_output();

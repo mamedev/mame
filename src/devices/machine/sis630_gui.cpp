@@ -140,7 +140,8 @@ uint8_t sis630_svga_device::seq_reg_read(uint8_t index)
 			return m_ext_misc_ctrl_0;
 		case 0x0a:
 			return m_ext_vert_overflow;
-		case 0x0b ... 0x0c:
+		case 0x0b:
+		case 0x0c:
 			return m_ext_horz_overflow[index - 0xb];
 		case 0x0d:
 			return vga.crtc.start_addr_latch >> 16;
@@ -687,7 +688,7 @@ void sis630_bridge_device::map_extra(
 	// forward to "primary PCI" (host & LPC?) for A8 or A9 blocks for each 1KB blocks in I/O spaces,
 	// (i.e. $100-$3ff, $500-$7ff, $900-$bff etc.)
 	// even if I/O range is inside base and limits
-//	if (BIT(bridge_control, 2))
+//  if (BIT(bridge_control, 2))
 	// ...
 }
 

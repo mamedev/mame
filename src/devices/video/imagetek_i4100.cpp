@@ -384,7 +384,7 @@ void imagetek_i4100_device::device_start()
 	m_gfxrom_size = m_gfxrom.bytes();
 
 	m_irq_cb.resolve_safe();
-	m_blit_done_timer = timer_alloc(TIMER_BLIT_END);
+	m_blit_done_timer = timer_alloc(FUNC(imagetek_i4100_device::blit_done), this);
 
 	m_spritelist = std::make_unique<sprite_t []>(0x1000 / 8);
 	m_sprite_end = m_spritelist.get();
@@ -533,15 +533,10 @@ void imagetek_i4300_device::update_irq_state()
 	m_irq_cb(level);
 }
 
-void imagetek_i4100_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(imagetek_i4100_device::blit_done)
 {
-	switch (id)
-	{
-		case TIMER_BLIT_END:
-			if (m_blit_irq_level != -1)
-				set_irq(m_blit_irq_level);
-			break;
-	}
+	if (m_blit_irq_level != -1)
+		set_irq(m_blit_irq_level);
 }
 
 //**************************************************************************

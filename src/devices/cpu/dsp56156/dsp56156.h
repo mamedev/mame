@@ -23,8 +23,9 @@
 #define DSP56156_IRQ_MODC  2
 #define DSP56156_IRQ_RESET 3  /* Is this needed? */
 
-
 namespace DSP_56156 {
+
+class dsp56156_device;
 
 /***************************************************************************
     STRUCTURES & TYPEDEFS
@@ -145,7 +146,7 @@ struct dsp56156_pcu
 
 	// Other PCU internals
 	uint16_t reset_vector;
-
+	uint16_t ipc;
 };
 
 // 1-8 The dsp56156 CORE
@@ -182,15 +183,14 @@ struct dsp56156_core
 	uint8_t   repFlag;    // Knowing if we're in a 'repeat' state (dunno how the processor does this)
 	uint32_t  repAddr;    // The address of the instruction to repeat...
 
-
-	/* MAME internal stuff */
+	// MAME internal stuff
 	int icount;
 
 	uint32_t          ppc;
 	uint32_t          op;
-	int             interrupt_cycles;
-	void            (*output_pins_changed)(uint32_t pins);
-	cpu_device *device;
+	int               interrupt_cycles;
+	void              (*output_pins_changed)(uint32_t pins);
+	dsp56156_device   *device;
 	memory_access<16, 1, -1, ENDIANNESS_LITTLE>::cache cache;
 	memory_access<16, 1, -1, ENDIANNESS_LITTLE>::specific program;
 	memory_access<16, 1, -1, ENDIANNESS_LITTLE>::specific data;
@@ -211,18 +211,21 @@ public:
 	void host_interface_write(uint8_t offset, uint8_t data);
 	uint8_t host_interface_read(uint8_t offset);
 
-	uint16_t get_peripheral_memory(uint16_t addr);
-
 	void dsp56156_program_map(address_map &map);
 	void dsp56156_x_data_map(address_map &map);
+
+	auto portc_cb() { return portC_cb.bind(); }
+
+	void output_portc(uint16_t value) { portC_cb(value); }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 2 - 1) / 2; }
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 2); }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return clocks; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return cycles; }
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 8; }
 	virtual uint32_t execute_input_lines() const noexcept override { return 4; }
@@ -245,6 +248,8 @@ private:
 	required_shared_ptr<uint16_t> m_program_ram;
 
 	dsp56156_core m_core;
+
+	devcb_write16 portC_cb;
 
 	void agu_init();
 	void alu_init();

@@ -56,9 +56,8 @@ private:
 	uint8_t m_y_axis_reset_value;
 	const attotime m_interval;
 	emu_timer *m_sportspad_timer;
-	static const device_timer_id TIMER_SPORTSPAD = 0;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(read_tick);
 };
 
 

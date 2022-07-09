@@ -58,7 +58,7 @@ std::unique_ptr<util::disasm_interface> b5000_cpu_device::create_disassembler()
 // digit segment decoder
 u16 b5000_cpu_device::decode_digit(u8 data)
 {
-	static u8 lut_segs[0x10] =
+	static const u8 lut_segs[0x10] =
 	{
 		// 0-9 ok (6 and 9 have tails)
 		0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f,

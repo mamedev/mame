@@ -528,7 +528,7 @@ offs_t hp21mx_disassembler::dasm_mac(std::ostream &stream, u16 inst, offs_t pc, 
 	else if ((inst & 01740) == 01700)
 	{
 		// Dynamic Mapping System
-		switch (inst & 04027)
+		switch (inst & 04037)
 		{
 		case 04002:
 			stream << "MBI";

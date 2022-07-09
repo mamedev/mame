@@ -292,7 +292,7 @@ void ss50_dc5_device::device_start()
 	m_fdc_status = 0;
 	m_control_register = 0;
 	m_fdc_side = 0;
-	m_floppy_motor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ss50_dc5_device::floppy_motor_callback),this));
+	m_floppy_motor_timer = timer_alloc(FUNC(ss50_dc5_device::floppy_motor_callback), this);
 	m_motor_timer_out = 0;
 	m_fdc->set_force_ready(0);
 	m_fdc_prog_clock_div = 12;

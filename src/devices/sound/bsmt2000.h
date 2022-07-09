@@ -50,13 +50,16 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// device_rom_interface overrides
 	virtual void rom_bank_updated() override;
+
+	TIMER_CALLBACK_MEMBER(deferred_reset);
+	TIMER_CALLBACK_MEMBER(deferred_reg_write);
+	TIMER_CALLBACK_MEMBER(deferred_data_write);
 
 public:
 	// internal TMS I/O callbacks
@@ -72,7 +75,6 @@ private:
 	// timers
 	enum
 	{
-		TIMER_ID_RESET,
 		TIMER_ID_REG_WRITE,
 		TIMER_ID_DATA_WRITE
 	};
@@ -83,13 +85,16 @@ private:
 	// internal state
 	sound_stream *              m_stream;
 	required_device<tms32015_device> m_cpu;
-	uint16_t                      m_register_select;
-	uint16_t                      m_write_data;
-	uint16_t                      m_rom_address;
-	uint16_t                      m_rom_bank;
-	int16_t                       m_left_data;
-	int16_t                       m_right_data;
+	uint16_t                    m_register_select;
+	uint16_t                    m_write_data;
+	uint16_t                    m_rom_address;
+	uint16_t                    m_rom_bank;
+	int16_t                     m_left_data;
+	int16_t                     m_right_data;
 	bool                        m_write_pending;
+	emu_timer *                 m_deferred_reset;
+	emu_timer *                 m_deferred_reg_write;
+	emu_timer *                 m_deferred_data_write;
 
 	DECLARE_READ_LINE_MEMBER( tms_write_pending_r );
 };

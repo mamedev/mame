@@ -297,9 +297,9 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 		ui().draw_text_box(
 				container(),
 				string_format(
-						_("No machines found. Please check the rompath specified in the %1$s.ini file.\n\n"
-						"If this is your first time using %2$s, please see the config.txt file in "
-						"the docs directory for information on configuring %2$s."),
+						_("No system ROMs found. Please check the rompath setting specified in the %1$s.ini file.\n\n"
+						"If this is your first time using %2$s, please see the %2$s.pdf file in "
+						"the docs folder for information on setting up and using %2$s."),
 						emulator_info::get_configname(),
 						emulator_info::get_appname()),
 				text_layout::text_justify::CENTER,
@@ -335,7 +335,13 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 		tempbuf[1] = string_format(_("%1$s, %2$-.100s"), driver->year, driver->manufacturer);
 
 		// next line source path
-		tempbuf[2] = string_format(_("Driver: %1$s"), core_filename_extract_base(driver->type.source()));
+		std::string_view src(driver->type.source());
+		auto prefix(src.find("src/mame/"));
+		if (std::string_view::npos == prefix)
+			prefix = src.find("src\\mame\\");
+		if (std::string_view::npos != prefix)
+			src.remove_prefix(prefix + 9);
+		tempbuf[2] = string_format(_("Driver: %1$s"), src);
 
 		// update cached values if selection changed
 		if (driver != m_cached_driver)

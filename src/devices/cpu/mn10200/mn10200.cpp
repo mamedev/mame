@@ -150,7 +150,7 @@ void mn10200_device::device_start()
 
 	for (int tmr = 0; tmr < MN10200_NUM_TIMERS_8BIT; tmr++)
 	{
-		m_timer_timers[tmr] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mn10200_device::simple_timer_cb), this));
+		m_timer_timers[tmr] = timer_alloc(FUNC(mn10200_device::simple_timer_cb), this);
 		m_timer_timers[tmr]->adjust(attotime::never, tmr);
 	}
 

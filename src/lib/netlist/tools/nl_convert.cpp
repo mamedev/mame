@@ -51,7 +51,7 @@ static lib_map_t read_lib_map(const pstring &lm)
 	reader.stream().imbue(std::locale::classic());
 	lib_map_t m;
 	putf8string line;
-	while (reader.readline(line))
+	while (reader.read_line(line))
 	{
 		std::vector<pstring> split(plib::psplit(pstring(line), ','));
 		m[plib::trim(split[0])] = { plib::trim(split[1]), plib::trim(split[2]) };
@@ -65,7 +65,7 @@ static lib_map_t read_lib_map(const pstring &lm)
 
 nl_convert_base_t::nl_convert_base_t()
 	: out(&m_buf)
-	, m_numberchars("0123456789-+Ee.")
+	, m_number_chars("0123456789-+Ee.")
 {
 	m_buf.imbue(std::locale::classic());
 	m_units = {
@@ -322,7 +322,7 @@ double nl_convert_base_t::get_sp_unit(const pstring &unit) const
 double nl_convert_base_t::get_sp_val(const pstring &sin) const
 {
 	std::size_t p = 0;
-	while (p < sin.length() && (m_numberchars.find(sin.substr(p, 1)) != pstring::npos))
+	while (p < sin.length() && (m_number_chars.find(sin.substr(p, 1)) != pstring::npos))
 		++p;
 	pstring val = plib::left(sin, p);
 	pstring unit = sin.substr(p);
@@ -400,13 +400,14 @@ void nl_convert_spice_t::convert(const pstring &contents)
 	}
 
 	out("NETLIST_START(dummy)\n");
+	out("{\n");
 	add_term("0", "GND");
 	add_term("GND", "GND"); // For Kicad
 
 	convert_block(nl);
 	dump_nl();
 	// FIXME: Parameter
-	out("NETLIST_END()\n");
+	out("}\n");
 }
 
 static pstring rem(const std::vector<pstring> &vps, std::size_t start)
@@ -417,7 +418,7 @@ static pstring rem(const std::vector<pstring> &vps, std::size_t start)
 	return r;
 }
 
-static int npoly(const pstring &s)
+static int get_poly_count(const pstring &s)
 {
 	// Brute force
 	if (s=="POLY(1)")
@@ -451,13 +452,14 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				{
 					m_subckt = tt[1] + "_";
 					out("NETLIST_START({})\n", tt[1]);
+					out("{\n");
 					for (std::size_t i=2; i<tt.size(); i++)
 						add_ext_alias(tt[i]);
 				}
 				else if (tt[0] == ".ENDS")
 				{
 					dump_nl();
-					out("NETLIST_END()\n");
+					out("}\n");
 					m_subckt = "";
 				}
 				else if (tt[0] == ".MODEL")
@@ -531,7 +533,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				break;
 			case 'E':
 			{
-				auto n=npoly(tt[3]);
+				auto n=get_poly_count(tt[3]);
 				if (n<0)
 				{
 					add_device("VCVS", tt[0], get_sp_val(tt[5]));
@@ -550,26 +552,26 @@ void nl_convert_spice_t::process_line(const pstring &line)
 						out("// IGNORED {}: {}\n", tt[0], line);
 						break;
 					}
-					pstring lastnet = tt[1];
+					pstring last_net = tt[1];
 					for (std::size_t i=0; i < static_cast<std::size_t>(n); i++)
 					{
 						pstring devname = plib::pfmt("{}{}")(tt[0], i);
-						pstring nextnet = (i<static_cast<std::size_t>(n)-1) ? plib::pfmt("{}a{}")(tt[1], i) : tt[2];
+						pstring next_net = (i<static_cast<std::size_t>(n)-1) ? plib::pfmt("{}a{}")(tt[1], i) : tt[2];
 						auto net2 = plib::psplit(plib::replace_all(plib::replace_all(tt[sce+i],")",""),"(",""),',');
 						add_device("VCVS", devname, get_sp_val(tt[scoeff+i]));
-						add_term(lastnet, devname, 0);
-						add_term(nextnet, devname, 1);
+						add_term(last_net, devname, 0);
+						add_term(next_net, devname, 1);
 						add_term(net2[0], devname, 2);
 						add_term(net2[1], devname, 3);
 						//# add_device_extra(devname, "PARAM({}, {})", devname + ".G", tt[scoeff+i]);
-						lastnet = nextnet;
+						last_net = next_net;
 					}
 				}
 			}
 				break;
 			case 'F':
 				{
-					auto n=npoly(tt[3]);
+					auto n=get_poly_count(tt[3]);
 					unsigned sce(4);
 					unsigned scoeff(5 + static_cast<unsigned>(n));
 					if (n<0)
@@ -593,9 +595,9 @@ void nl_convert_spice_t::process_line(const pstring &line)
 						add_term(tt[1], devname, 0);
 						add_term(tt[2], devname, 1);
 
-						pstring extranetname = devname + "net";
-						m_replace.push_back({tt[sce+i], devname + ".IP", extranetname });
-						add_term(extranetname, devname + ".IN");
+						pstring extra_net_name = devname + "net";
+						m_replace.push_back({tt[sce+i], devname + ".IP", extra_net_name });
+						add_term(extra_net_name, devname + ".IN");
 						//# add_device_extra(devname, "PARAM({}, {})", devname + ".G", tt[scoeff+i]);
 					}
 				}
@@ -728,7 +730,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 // -------------------------------------------------
 
 nl_convert_eagle_t::tokenizer::tokenizer(nl_convert_eagle_t &convert)
-	: plib::ptokenizer()
+	: plib::tokenizer_t()
 	, m_convert(convert)
 {
 	this->identifier_chars("abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.-")
@@ -764,6 +766,7 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 	tok.set_token_source(&tokstor);
 
 	out("NETLIST_START(dummy)\n");
+	out("{\n");
 	add_term("GND", "GND");
 	add_term("VCC", "VCC");
 	tokenizer::token_t token = tok.get_token();
@@ -773,7 +776,7 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 		{
 			dump_nl();
 			// FIXME: Parameter
-			out("NETLIST_END()\n");
+			out("}\n");
 			return;
 		}
 
@@ -871,7 +874,7 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 // -------------------------------------------------
 
 nl_convert_rinf_t::tokenizer::tokenizer(nl_convert_rinf_t &convert)
-	: plib::ptokenizer()
+	: plib::tokenizer_t()
 	, m_convert(convert)
 {
 	this->identifier_chars(".abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_-")
@@ -918,6 +921,7 @@ void nl_convert_rinf_t::convert(const pstring &contents)
 	auto lm = read_lib_map(s_lib_map);
 
 	out("NETLIST_START(dummy)\n");
+	out("{\n");
 	add_term("GND", "GND");
 	add_term("VCC", "VCC");
 	tokenizer::token_t token = tok.get_token();
@@ -927,7 +931,7 @@ void nl_convert_rinf_t::convert(const pstring &contents)
 		{
 			dump_nl();
 			// FIXME: Parameter
-			out("NETLIST_END()\n");
+			out("}\n");
 			return;
 		}
 
@@ -1016,7 +1020,7 @@ void nl_convert_rinf_t::convert(const pstring &contents)
 			if (token.is(tok.m_tok_TER))
 			{
 				token = tok.get_token();
-				while (token.is_type(plib::ptoken_reader::token_type::IDENTIFIER))
+				while (token.is_type(plib::token_reader_t::token_type::IDENTIFIER))
 				{
 					pin = tok.get_identifier_or_number();
 					add_term(net, token.str() + "." + pin);

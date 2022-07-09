@@ -2520,7 +2520,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="starfrcet" cloneof="starfrce">
-			<description>Star Force (Tw)</description>
+		<description>Star Force (Tw)</description>
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="B-043"/>

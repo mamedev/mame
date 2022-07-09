@@ -29,7 +29,7 @@
 
 ALLOW_SAVE_TYPE(pic8259_device::state_t); // allow save_item on a non-fundamental type
 
-void pic8259_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(pic8259_device::irq_timer_tick)
 {
 	/* check the various IRQs */
 	for (int n = 0, irq = m_prio; n < 8; n++, irq = (irq + 1) & 7)
@@ -84,7 +84,7 @@ void pic8259_device::set_irq_line(int irq, int state)
 	}
 
 	if (m_inta_sequence == 0)
-		set_timer();
+		m_irq_timer->adjust(attotime::zero);
 }
 
 
@@ -105,7 +105,7 @@ uint8_t pic8259_device::acknowledge()
 				if (!m_auto_eoi)
 					m_isr |= mask;
 
-				set_timer();
+				m_irq_timer->adjust(attotime::zero);
 			}
 
 			if ((m_cascade!=0) && (m_master!=0) && (mask & m_slave))
@@ -167,7 +167,7 @@ uint8_t pic8259_device::acknowledge()
 				m_inta_sequence = 0;
 				if (m_auto_eoi && m_current_level != -1)
 					m_isr &= ~(1 << m_current_level);
-				set_timer();
+				m_irq_timer->adjust(attotime::zero);
 			}
 			if (m_cascade && m_master && m_current_level != -1 && BIT(m_slave, m_current_level))
 				return m_read_slave_ack_func(m_current_level);
@@ -205,7 +205,7 @@ uint8_t pic8259_device::read(offs_t offset)
 					if (!m_auto_eoi)
 						m_isr |= 1 << m_current_level;
 
-					set_timer();
+					m_irq_timer->adjust(attotime::zero);
 				}
 			}
 			else
@@ -376,7 +376,7 @@ void pic8259_device::write(offs_t offset, uint8_t data)
 			}
 			break;
 	}
-	set_timer();
+	m_irq_timer->adjust(attotime::zero);
 }
 
 
@@ -427,6 +427,8 @@ void pic8259_device::device_start()
 	save_item(NAME(m_inta_sequence));
 
 	m_inta_sequence = 0;
+
+	m_irq_timer = timer_alloc(FUNC(pic8259_device::irq_timer_tick), this);
 }
 
 

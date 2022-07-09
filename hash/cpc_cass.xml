@@ -450,7 +450,8 @@ Please stick to using the floppy versions for the time being...
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
-		<info name="alt_title" value="3D Boxkampf" />       <part name="cass1" interface="cpc_cass">
+		<info name="alt_title" value="3D Boxkampf" />
+		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="58470">
 				<rom name="3d boxing (uk) (1985) [original] [tape].cdt" size="58470" crc="19182316" sha1="adc783a37568ae81fcaa3c7a0af80b08258c038c"/>
 			</dataarea>
@@ -4287,17 +4288,17 @@ Please stick to using the floppy versions for the time being...
 		</part>
 	</software>
 
-			<software name="austerlz" supported="no">
-			<description>Battle of Austerlitz (UK)</description>
+	<software name="austerlz" supported="no">
+		<description>Battle of Austerlitz (UK)</description>
 		<year>1986</year>
 		<publisher>MC Lothlorien</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
-			<part name="cass1" interface="cpc_cass">
-				<dataarea name="cass" size="60391">
-					<rom name="battle of austerlitz (uk) (1987) [original].cdt" size="60391" crc="acf7b477" sha1="b5879b60df8181ecf720e9eec1ba47cdfd5dc3b3"/>
-				</dataarea>
-			</part>
-		</software>
+		<part name="cass1" interface="cpc_cass">
+			<dataarea name="cass" size="60391">
+				<rom name="battle of austerlitz (uk) (1987) [original].cdt" size="60391" crc="acf7b477" sha1="b5879b60df8181ecf720e9eec1ba47cdfd5dc3b3"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="battlebr" supported="no">
 		<description>Battle of Britain (UK)</description>
@@ -30968,7 +30969,7 @@ Please stick to using the floppy versions for the time being...
 				<rom name="samurai trilogy (uk,f,g,s) (face 2) (1987) [original] [tape].cdt" size="284618" crc="675d47c7" sha1="ba3785041c57374acd9536c6c24f7feb1dd6cc36"/>
 			</dataarea>
 		</part>
-		</software>
+	</software>
 
 	<software name="samuwarr" supported="no">
 		<description>Samurai Warrior (Spa)</description>

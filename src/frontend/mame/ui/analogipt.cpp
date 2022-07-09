@@ -57,6 +57,7 @@ menu_analog::menu_analog(mame_ui_manager &mui, render_container &container)
 	, m_hide_menu(false)
 {
 	set_process_flags(PROCESS_LR_REPEAT);
+	set_heading(_("Analog Input Adjustments"));
 }
 
 
@@ -192,6 +193,8 @@ void menu_analog::custom_render(void *selectedref, float top, float bottom, floa
 void menu_analog::menu_activated()
 {
 	// scripts could have changed something in the mean time
+	m_item_data.clear();
+	m_field_data.clear();
 	reset(reset_options::REMEMBER_POSITION);
 }
 
@@ -393,6 +396,10 @@ void menu_analog::populate(float &customtop, float &custombottom)
 				(data.cur <= data.min) ? FLAG_RIGHT_ARROW : (data.cur >= data.max) ? FLAG_LEFT_ARROW : FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW,
 				&data);
 	}
+
+	// display a message if there are toggle inputs enabled
+	if (!prev_owner)
+		item_append(_("[no analog inputs are enabled]"), FLAG_DISABLE, nullptr);
 
 	item_append(menu_item_type::SEPARATOR);
 

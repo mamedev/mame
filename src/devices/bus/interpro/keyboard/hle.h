@@ -31,7 +31,6 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_buffered_serial_interface overrides
 	virtual void tra_callback() override;
@@ -86,6 +85,8 @@ private:
 		COMMAND_LED = 0x0eU,
 		COMMAND_LAYOUT = 0x0fU
 	};
+
+	TIMER_CALLBACK_MEMBER(click_tick);
 
 	// device_buffered_serial_interface overrides
 	virtual void received_byte(u8 byte) override;

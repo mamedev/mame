@@ -49,11 +49,13 @@ TIDY_FLAGSX += -readability-implicit-bool-conversion,
 TIDY_FLAGSX += -readability-named-parameter,-readability-function-size,
 TIDY_FLAGSX += -llvmlibc-restrict-system-libc-headers,-llvmlibc-implementation-in-namespace,-llvmlibc-callee-namespace,
 TIDY_FLAGSX += -modernize-use-nodiscard,
+TIDY_FLAGSX += -modernize-use-auto,
 #TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
 #TIDY_FLAGSX += -cppcoreguidelines-prefer-member-initializer,
 #TIDY_FLAGSX += -modernize-use-transparent-functors,
 TIDY_FLAGSX += -readability-function-cognitive-complexity,
 TIDY_FLAGSX += -readability-uppercase-literal-suffix
+TIDY_FLAGSX += -cert-err58-cpp
 
 
 #TIDY_FLAGSX += -cppcoreguidelines-avoid-non-const-global-variables
@@ -103,6 +105,7 @@ MD = @mkdir
 RM = @rm
 endif
 
+CSPELL=cspell
 PYTHON=@python
 
 TIDY_DB = $(OBJ)/compile_commands.json
@@ -111,7 +114,7 @@ TIDY_DB = $(OBJ)/compile_commands.json
 #LTO decreases performance :-(
 #LTO = -flto=4  -fuse-linker-plugin -Wodr
 
-CCOREFLAGS = -g -O3 -std=c++17 -I$(SRC) -I$(SRC)/.. 
+CCOREFLAGS = -g -O3 -std=c++17 -I$(SRC) -I$(SRC)/.. -I$(SRC)/../..
 
 CFLAGS =  $(LTO) $(CCOREFLAGS) $(CEXTRAFLAGS)
 LDFLAGS = $(LTO) -g -O3 -std=c++17 $(LDEXTRAFLAGS)
@@ -287,25 +290,20 @@ native:
 	$(MAKE) CEXTRAFLAGS="-march=native -msse4.2 -Wall -Wpedantic -Wsign-compare -Wextra"
 
 gcc9:
-	$(MAKE) CC=g++-9 LD=g++-9 CEXTRAFLAGS="-march=native -Wall -pedantic -Wpedantic -fext-numeric-literals -Wsign-compare -Wextra" EXTRALIBS="-lquadmath" OBJ=obj/gcc9
+	$(MAKE) CC=g++-9 LD=g++-9 CEXTRAFLAGS="-march=native -Wall -Wextra -pedantic -Wpedantic -pedantic-errors -fext-numeric-literals -Wsign-compare" EXTRALIBS="-lquadmath" OBJ=obj/gcc9
 
-emsdk:
-	emmake $(MAKE) CC=emcc LD=emcc CEXTRAFLAGS="-fexceptions" LDEXTRAFLAGS="-fexceptions --emrun" OBJ=obj/emsdk EXESUFFIX=.html
-	
 clang:
 	#$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native -msse4.2 -Weverything -Wall -pedantic -Wpedantic -Wunused-private-field -Wno-padded -Wno-unused-template -Wno-missing-variable-declarations -Wno-float-equal -Wconversion -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral  -Wno-exit-time-destructors"
 	$(MAKE) CC=clang++-13 LD=clang++-13 OBJ=obj/clang CEXTRAFLAGS="-march=native \
-		-mllvm -inline-threshold=2000 \
+		-mllvm  -inline-threshold=2000 \
 		-Wunknown-warning-option \
-		-Weverything -Wall -pedantic -Wpedantic -Wunused-private-field  \
+		-Weverything -Wall -pedantic -Wpedantic \
 		-Werror -Wno-padded -Wno-weak-vtables -Wno-weak-template-vtables -Wunused-template \
-		-Wmissing-variable-declarations -Wno-float-equal -Wconversion \
-		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wformat-nonliteral \
-		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override \
-		-Wno-embedded-directive \
-		-Wno-undefined-reinterpret-cast \
-		-Wunreachable-code -Wno-gnu-alignof-expression \
-		-Wmissing-prototypes -Wno-error=deprecated"
+		-Wno-float-equal \
+		-Wno-c++98-compat -Wno-c++98-compat-pedantic \
+		-Wno-exit-time-destructors \
+		-Wno-undefined-reinterpret-cast -Wno-error=unused-macros \
+		-Wno-error=deprecated"
 
 clang-libc:
 	#clang-11 currently broken
@@ -342,6 +340,14 @@ mingw-cross:
 		LDEXTRAFLAGS="-Wl,--subsystem,console -municode" OBJ=obj/mingw-cross \
 		EXESUFFIX=.exe LIBS=
 
+#
+# run with emrun  --browser chrome nltool.html -c run  -t 10 -n kidniki nl_kidniki.cpp
+#
+emsdk:
+	emmake $(MAKE) CC=emcc LD=emcc CEXTRAFLAGS="-fexceptions -msimd128" LDEXTRAFLAGS="-s ALLOW_MEMORY_GROWTH=0 -s TOTAL_MEMORY=268435456 -fexceptions -msimd128 --emrun --embed-file ../../../mame/machine/nl_pongf.cpp@nl_pongf.cpp --embed-file ../../../mame/audio/nl_kidniki.cpp@nl_kidniki.cpp" OBJ=obj/emsdk EXESUFFIX=.html
+	# LDFLAGS  -s ASSERTIONS=1
+
+
 #-------------------------------------------------
 # regression tests
 #-------------------------------------------------
@@ -363,9 +369,9 @@ doc:
 	./nltool$(EXESUFFIX) -c docheader > ../documentation/devsyn.dox.h
 	$(DOXYGEN) doxygen.conf
 
-NLOBJS = 	$(patsubst $(SRC)%, $(OBJ)%, $(CORESOURCES:.cpp=.o))
 cspell:
-	cd .. && cspell -c build/cspell.json --no-color --relative $(patsubst $(SRC)/%, %, $(ALLHEADERS) $(ALLSOURCES)) | sed -e "s/ - Unknown/: error: Unknown/g"
+	#cd .. && cspell -c build/cspell.json --no-color --locale en-GB --relative $(patsubst $(SRC)/%, %, $(ALLHEADERS) ) | sed -e "s/ - Unknown/: error: Unknown/g"
+	cd .. && $(CSPELL) -c build/cspell.json --no-color --locale en-GB --relative $(patsubst $(SRC)/%, %, $(ALLHEADERS) $(ALLSOURCES)) | sed -e "s/ - Unknown/: error: Unknown/g"
 
 #-------------------------------------------------
 # depends
@@ -392,15 +398,15 @@ endif
 # generated
 #-------------------------------------------------
 
-$(SRC)/generated/lib_entries.hxx: $(DEVSOURCES)
+$(SRC)/generated/lib_entries.hxx: create_lib_entries.py $(DEVSOURCES)
 	@echo creating $@
 	$(PYTHON) create_lib_entries.py $^ > $@
 
-$(SRC)/generated/nld_devinc.h: $(DEVSOURCES)
+$(SRC)/generated/nld_devinc.h: create_devinc.py $(DEVSOURCES)
 	@echo creating $@
 	$(PYTHON) create_devinc.py $^ > $@
 
-$(SRC)/generated/nlm_modules_lib.cpp: $(MODULESOURCES)
+$(SRC)/generated/nlm_modules_lib.cpp: create_modules.py $(MODULESOURCES)
 	@echo creating $@
 	$(PYTHON) create_modules.py $^ > $@
 
@@ -419,7 +425,7 @@ fix_permissions:
 srcclean: $(ALLSOURCES) $(ALLHEADERS)
 	@../../../../srcclean -u $(ALLSOURCES) $(ALLHEADERS)
 
-precommit: fix_permissions srcclean
+precommit: fix_permissions srcclean all runtests
 
 #-------------------------------------------------
 # clang tidy

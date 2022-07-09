@@ -89,6 +89,8 @@ a2bus_agat840k_hle_device::a2bus_agat840k_hle_device(const machine_config &mconf
 	, m_floppy_image(*this, "floppy%u", 0U)
 	, m_d14(*this, "d14")
 	, m_d15(*this, "d15")
+	, m_timer_wait(nullptr)
+	, m_timer_seek(nullptr)
 	, m_rom(nullptr)
 {
 }
@@ -137,8 +139,8 @@ void a2bus_agat840k_hle_device::device_start()
 
 	m_mxcs = MXCSR_SYNC;
 
-	m_timer_wait = timer_alloc(TIMER_ID_WAIT);
-	m_timer_seek = timer_alloc(TIMER_ID_SEEK);
+	m_timer_wait = timer_alloc(FUNC(a2bus_agat840k_hle_device::timer_wait_tick), this);
+	m_timer_seek = timer_alloc(FUNC(a2bus_agat840k_hle_device::timer_seek_tick), this);
 
 	m_seektime = 6000; // 6 ms, per es5323.txt
 	m_waittime = 32;   // 16 bits x 2 us
@@ -226,27 +228,22 @@ void a2bus_agat840k_hle_device::device_reset()
 	m_mxcs &= ~MXCSR_TR;
 }
 
-void a2bus_agat840k_hle_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(a2bus_agat840k_hle_device::timer_wait_tick)
 {
-	switch (id)
-	{
-	case TIMER_ID_WAIT:
-	{
-		m_count_read++;
-		m_count_read %= 6250;
-		m_d15->pc4_w(0);
-		m_d15->pc4_w(1);
-		if (BIT(m_tracks[(2 * m_floppy->floppy_drive_get_current_track()) + m_side][m_count_read], 15))
-			m_mxcs &= ~MXCSR_SYNC;
-	}
-	break;
-
-	case TIMER_ID_SEEK:
-		m_floppy->floppy_stp_w(1);
-		m_floppy->floppy_stp_w(0);
-		break;
-	}
+	m_count_read++;
+	m_count_read %= 6250;
+	m_d15->pc4_w(0);
+	m_d15->pc4_w(1);
+	if (BIT(m_tracks[(2 * m_floppy->floppy_drive_get_current_track()) + m_side][m_count_read], 15))
+		m_mxcs &= ~MXCSR_SYNC;
 }
+
+TIMER_CALLBACK_MEMBER(a2bus_agat840k_hle_device::timer_seek_tick)
+{
+	m_floppy->floppy_stp_w(1);
+	m_floppy->floppy_stp_w(0);
+}
+
 
 
 /*-------------------------------------------------
