@@ -2819,7 +2819,7 @@ patched out (+ a fix for internal checksum)
 			<feature name="u2" value="U2 [empty]" />
 			<feature name="u3" value="U3 [CIC-NUS-6102]" />
 			<dataarea name="rom" size="0x1400000">
-				<rom name="nus-ndqe-0.u1" size="0x1400000" crc="6d48b64e" sha1="2700f7534d477c7b673dcdee0fe19b93dc95ca89" />
+				<rom name="nus-ndqe-0.u1" size="0x1400000" crc="6d48b64e" sha1="2700f7534d477c7b673dcdee0fe19b93dc95ca89" status="baddump" /> <!-- Underdump that should be 32MB -->
 			</dataarea>
 		</part>
 	</software>
@@ -2831,7 +2831,7 @@ patched out (+ a fix for internal checksum)
 		<info name="serial" value="NUS-NDQP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1400000">
-				<rom name="donald duck - quack attack (europe) (en,fr,de,es,it).bin" size="0x1400000" crc="5f67a191" sha1="6c761e0668247a5b264e2deb502f1de992f83346" />
+				<rom name="donald duck - quack attack (europe) (en,fr,de,es,it).bin" size="0x1400000" crc="5f67a191" sha1="6c761e0668247a5b264e2deb502f1de992f83346" status="baddump" /> <!-- Underdump that should be 32MB -->
 			</dataarea>
 		</part>
 	</software>
@@ -3134,14 +3134,13 @@ This cart features a RTC, currently unemulated
 		</part>
 	</software>
 
-	<!-- Possibly an overdump -->
 	<software name="duckdodgub" cloneof="duckdodg">
 		<description>Duck Dodgers Starring Daffy Duck (USA, final prototype)</description>
 		<year>2000</year>
 		<publisher>Infogrames</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1400000">
-				<rom name="duck dodgers starring daffy duck (usa) (en,fr,es) (beta).bin" size="0x1400000" crc="0829b87a" sha1="10cd84ceadd50dd7c5a06652bb1c203677644fb0" />
+				<rom name="duck dodgers starring daffy duck (usa) (en,fr,es) (beta).bin" size="0x1400000" crc="0829b87a" sha1="10cd84ceadd50dd7c5a06652bb1c203677644fb0" status="baddump" /> <!-- Supposedly comes from a prototype cart. First 16MB match the final USA release. Is this possibly just an overdump or an underdump from a 32MB dev cart? -->
 			</dataarea>
 		</part>
 	</software>
@@ -14346,7 +14345,7 @@ clips onto the player's ear.
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-16F32SB-B" /> <!-- label on cartridge shell -->
 			<dataarea name="rom" size="0x1800000">
-				<rom name="xtremeroller.bin" size="0x1800000" crc="9a47af0f" sha1="238efed4c5f4d6c3aba98774299bf7ea2cb0d021" />
+				<rom name="xtremeroller.bin" size="0x1800000" crc="9a47af0f" sha1="238efed4c5f4d6c3aba98774299bf7ea2cb0d021" status="baddump" /> <!-- Should be 32MB, probably just missing padding -->
 			</dataarea>
 		</part>
 	</software>
