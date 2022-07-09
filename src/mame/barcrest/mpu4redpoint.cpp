@@ -8,10 +8,10 @@
 
 namespace {
 
-class mpu4redhouse_state : public mpu4_state
+class mpu4redpoint_state : public mpu4_state
 {
 public:
-	mpu4redhouse_state(const machine_config &mconfig, device_type type, const char *tag)
+	mpu4redpoint_state(const machine_config &mconfig, device_type type, const char *tag)
 		: mpu4_state(mconfig, type, tag)
 		, m_ympcm(*this, "ympcm")
 	{
@@ -26,40 +26,40 @@ private:
 
 	void memmap_ympcm(address_map &map);
 
-	DECLARE_MACHINE_START(mpu4redhouse);
+	DECLARE_MACHINE_START(mpu4redpoint);
 
 	required_device<ymz280b_device> m_ympcm;
 };
 
-void mpu4redhouse_state::add_ympcm(machine_config &config)
+void mpu4redpoint_state::add_ympcm(machine_config &config)
 {
 	YMZ280B(config, m_ympcm, 16'934'400);
 	m_ympcm->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_ympcm->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
 
-void mpu4redhouse_state::memmap_ympcm(address_map &map)
+void mpu4redpoint_state::memmap_ympcm(address_map &map)
 {
 	mpu4_memmap(map);
 	map(0x1100, 0x1101).rw(m_ympcm, FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
 }
 
-void mpu4redhouse_state::base_f(machine_config &config)
+void mpu4redpoint_state::base_f(machine_config &config)
 {
 	mpu4base(config);
-	MCFG_MACHINE_START_OVERRIDE(mpu4redhouse_state,mpu4redhouse)
+	MCFG_MACHINE_START_OVERRIDE(mpu4redpoint_state,mpu4redpoint)
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4redhouse_state::memmap_ympcm);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4redpoint_state::memmap_ympcm);
 
 	add_ympcm(config);
 }
 
-mpu4_state::trait_wrapper mpu4redhouse_state::base(int trait)
+mpu4_state::trait_wrapper mpu4redpoint_state::base(int trait)
 {
-	return trait_wrapper(this, &mpu4redhouse_state::base_f, trait);
+	return trait_wrapper(this, &mpu4redpoint_state::base_f, trait);
 }
 
-MACHINE_START_MEMBER(mpu4redhouse_state,mpu4redhouse)
+MACHINE_START_MEMBER(mpu4redpoint_state,mpu4redpoint)
 {
 	mpu4_config_common();
 
@@ -144,4 +144,4 @@ ROM_START( m4cbing )
 ROM_END
 
 
-GAME( 1998, m4cbing,   0,          base(R4)(RT1), m4cbing, mpu4redhouse_state, init_m4, ROT0,   "Redpoint Systems", "Cherry Bingo (Redpoint Systems) (MPU4)", GAME_FLAGS )
+GAME( 1998, m4cbing,   0,          base(R4)(RT1), m4cbing, mpu4redpoint_state, init_m4, ROT0,   "Redpoint Systems", "Cherry Bingo (Redpoint Systems) (MPU4)", GAME_FLAGS )
