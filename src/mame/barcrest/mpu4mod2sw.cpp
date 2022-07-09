@@ -2,15 +2,12 @@
 // copyright-holders:David Haywood
 /* MPU4 'Mod2' Sets
 
- This is the original MPU4 board, with AY8913 chip
+ This is the original MPU4 board, with AY-3-8913 chip.
+ If a set requires samples it doesn't belong here!
 
- if a set requires samples it doesn't belong here!
- the AY was only present on the original MOD2 board
- although you could apparently fit one on a MOD4
- if you wanted.
-
- Sets only get here if they do enough and make enough
- sounds for me to know they use the AY.
+ The AY-3-8913 was only present on the original MOD2
+ board, although you could apparently fit an AY-3-8912
+ (which also has one I/O port) on a MOD4 if you wanted.
 
 */
 
@@ -24,13 +21,24 @@ namespace {
 class mpu4mod2_machines_state : public mpu4_state
 {
 public:
-
 	mpu4mod2_machines_state(const machine_config &mconfig, device_type type, const char *tag) :
 		mpu4_state(mconfig, type, tag)
 	{
 	}
 
+	template<const uint8_t* Table> void mod2_cheatchr_pal(machine_config &config);
+	template<const uint8_t* Table> void mod2_7reel_cheatchr_pal(machine_config &config);
+	template<const uint8_t* Table> void mod2_alt_cheatchr_pal(machine_config &config);
 	template<const uint8_t* Table> void mod2_cheatchr_pal_rtc(machine_config &config);
+
+	// bootleg mod2
+	template<uint8_t Fixed> void mod2_bootleg_fixedret(machine_config &config);
+	template<uint8_t Fixed> void mod2_alt_bootleg_fixedret(machine_config &config);
+
+	void mod2_chr_blastbnk(machine_config &config);
+	void mod2_chr_copcash(machine_config &config);
+
+	void mod4psg(machine_config &config);
 
 	void init_connect4();
 	void init_m4actpak();
@@ -41,28 +49,15 @@ public:
 
 private:
 	void mpu4_memmap_characteriser_rtc(address_map &map);
+
+	void ay8912_outport_w(uint8_t data);
 };
 
-void mpu4mod2_machines_state::mpu4_memmap_characteriser_rtc(address_map &map)
-{
-	mpu4_memmap_characteriser(map);
-
-	map(0x1000, 0x17ff).rw("rtc", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));
-}
-
-#include "m4actclb.lh"
-#include "m4actpak.lh"
-#include "m4alladv.lh"
-#include "m4alpha.lh"
-#include "connect4.lh"
-
-} // anonymous namespace
-
-template<const uint8_t* Table> void mpu4_state::mod2_cheatchr_pal(machine_config &config)
+template<const uint8_t* Table> void mpu4mod2_machines_state::mod2_cheatchr_pal(machine_config &config)
 {
 	mod2(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4mod2_machines_state::mpu4_memmap_characteriser);
 
 	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
 	m_characteriser->set_cpu_tag("maincpu");
@@ -70,11 +65,11 @@ template<const uint8_t* Table> void mpu4_state::mod2_cheatchr_pal(machine_config
 	m_characteriser->set_lamp_table(Table);
 }
 
-template<const uint8_t* Table> void mpu4_state::mod2_7reel_cheatchr_pal(machine_config &config)
+template<const uint8_t* Table> void mpu4mod2_machines_state::mod2_7reel_cheatchr_pal(machine_config &config)
 {
 	mod2_7reel(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4mod2_machines_state::mpu4_memmap_characteriser);
 
 	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
 	m_characteriser->set_cpu_tag("maincpu");
@@ -82,11 +77,11 @@ template<const uint8_t* Table> void mpu4_state::mod2_7reel_cheatchr_pal(machine_
 	m_characteriser->set_lamp_table(Table);
 }
 
-template<const uint8_t* Table> void mpu4_state::mod2_alt_cheatchr_pal(machine_config &config)
+template<const uint8_t* Table> void mpu4mod2_machines_state::mod2_alt_cheatchr_pal(machine_config &config)
 {
 	mod2_alt(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4mod2_machines_state::mpu4_memmap_characteriser);
 
 	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
 	m_characteriser->set_cpu_tag("maincpu");
@@ -96,24 +91,32 @@ template<const uint8_t* Table> void mpu4_state::mod2_alt_cheatchr_pal(machine_co
 
 
 // bootleg mod2
-template<uint8_t Fixed> void mpu4_state::mod2_bootleg_fixedret(machine_config &config)
+template<uint8_t Fixed> void mpu4mod2_machines_state::mod2_bootleg_fixedret(machine_config &config)
 {
 	mod2(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4mod2_machines_state::mpu4_memmap_bootleg_characteriser);
 
 	MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
 	m_characteriser_bl->set_bl_fixed_return(Fixed);
 }
 
-template<uint8_t Fixed> void mpu4_state::mod2_alt_bootleg_fixedret(machine_config &config)
+template<uint8_t Fixed> void mpu4mod2_machines_state::mod2_alt_bootleg_fixedret(machine_config &config)
 {
 	mod2_alt(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4mod2_machines_state::mpu4_memmap_bootleg_characteriser);
 
 	MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
 	m_characteriser_bl->set_bl_fixed_return(Fixed);
+}
+
+
+void mpu4mod2_machines_state::mpu4_memmap_characteriser_rtc(address_map &map)
+{
+	mpu4_memmap_characteriser(map);
+
+	map(0x1000, 0x17ff).rw("rtc", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));
 }
 
 template<const uint8_t* Table> void mpu4mod2_machines_state::mod2_cheatchr_pal_rtc(machine_config &config)
@@ -126,12 +129,60 @@ template<const uint8_t* Table> void mpu4mod2_machines_state::mod2_cheatchr_pal_r
 }
 
 
+void mpu4mod2_machines_state::mod2_chr_blastbnk(machine_config &config)
+{
+	mod2(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4mod2_machines_state::mpu4_memmap_bl_characteriser_blastbank);
+
+	MPU4_CHARACTERISER_BL_BLASTBANK(config, m_characteriser_blastbank, 0);
+}
+
+void mpu4mod2_machines_state::mod2_chr_copcash(machine_config &config)
+{
+	mod2(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4mod2_machines_state::mpu4_memmap_bl_characteriser_blastbank);
+
+	MPU4_CHARACTERISER_BL_BLASTBANK(config, m_characteriser_blastbank, 0);
+	m_characteriser_blastbank->set_retxor(0x03);
+}
+
+
+
+void mpu4mod2_machines_state::ay8912_outport_w(uint8_t data)
+{
+	// TODO: figure out what maps here
+	logerror("%s: AY-3-8912 output port <- $%02X\n", machine().describe_context(), data);
+}
+
+void mpu4mod2_machines_state::mod4psg(machine_config &config)
+{
+	mpu4base(config);
+	AY8912(config, m_ay8913, MPU4_MASTER_CLOCK/4);
+	m_ay8913->port_a_write_callback().set(FUNC(mpu4mod2_machines_state::ay8912_outport_w));
+	m_ay8913->set_flags(AY8910_SINGLE_OUTPUT);
+	m_ay8913->set_resistors_load(820, 0, 0);
+	m_ay8913->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_ay8913->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	mpu4_reels(config, 6, 1, 3);
+}
+
+
 void mpu4mod2_machines_state::init_connect4()
 {
 	m_reels = 0; //reel-free game
 	m_overcurrent_detect = true;
 	setup_rom_banks();
 }
+
+#include "m4actclb.lh"
+#include "m4actpak.lh"
+#include "m4alladv.lh"
+#include "m4alpha.lh"
+#include "connect4.lh"
+
+} // anonymous namespace
 
 
 INPUT_PORTS_START( connect4 )
@@ -1216,6 +1267,11 @@ ROM_START( m4wayina )
 	ROM_LOAD( "wi1.bin", 0xc000, 0x004000, CRC(d59d351a) SHA1(815ff595a74dc165e1996a46de29095174c80442) )
 	ROM_LOAD( "wi2.bin", 0x8000, 0x004000, CRC(cba2bcc5) SHA1(6412fa614ac8eef4eda6213afa35aabaf14ba6ce) )
 	ROM_LOAD( "wi3.bin", 0x6000, 0x002000, CRC(1ba06ef1) SHA1(495c4e21a5b34cba0859e4e8fc842036c97ec063) )
+ROM_END
+
+ROM_START( m4funh )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "funhouse.bin", 0x00000, 0x10000, CRC(4e342025) SHA1(288125ff5e3da7249d89dfcc3cd0915f791f7d43) )
 ROM_END
 
 
@@ -2535,3 +2591,5 @@ GAME(199?, m4pick,    0,          mod2, mpu4,            mpu4mod2_machines_state
 
 GAMEL(1989?, m4conn4, 0,          mod2, connect4,        mpu4mod2_machines_state, init_connect4,      ROT0, "Dolbeck Systems","Connect 4",MACHINE_IMPERFECT_GRAPHICS|MACHINE_REQUIRES_ARTWORK,layout_connect4 )
 
+// no protection?
+GAME(198?, m4funh,    0,          mod4psg, mpu4,         mpu4mod2_machines_state, init_m4default, 0,      "<unknown>",      "Fun House (unknown) (MPU4)", GAME_FLAGS ) // TUNE ALARM  (was in the SC1 Fun House set)

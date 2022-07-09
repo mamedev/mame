@@ -724,14 +724,6 @@ ROM_START( m4cbing )
 ROM_END
 
 
-ROM_START( m4nod )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "nod.bin", 0x0000, 0x010000, CRC(bc738af5) SHA1(8df436139554ccfb48c4db0a32e3333dbf3c4f46) )
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) //region was called "upd" but machine is mod4oki? Which one is correct?
-	ROM_LOAD( "nodsnd.bin", 0x0000, 0x080000, CRC(2134494a) SHA1(3b665bf79567a71195b20e76c50b02707d15b78d) )
-ROM_END
-
-
 ROM_START( m4aliz )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "70000000.bin", 0x0000, 0x040000, CRC(56f64dd9) SHA1(11f990c9a6864a969dc9a4146e1ac2c963e3eb9b) )
@@ -757,12 +749,6 @@ ROM_START( m4coney )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "70000060.bin", 0x0000, 0x010000, CRC(fda208e4) SHA1(b1a243b2681faa03add4ab6e4df98814f9c52fc5) )
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
-ROM_END
-
-ROM_START( m4funh )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "funhouse.bin", 0x00000, 0x10000, CRC(4e342025) SHA1(288125ff5e3da7249d89dfcc3cd0915f791f7d43) )
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) // no idea if it uses an OKI
 ROM_END
 
 
@@ -921,9 +907,6 @@ GAME(199?, m4booze,   0,          mod4oki,    mpu4,    mpu4unsorted_state, init_
  // custom sound system
 GAME(199?, m4cbing,   0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Redpoint Systems","Cherry Bingo (Redpoint Systems) (MPU4)",GAME_FLAGS )
 
-// just spins wheels badly
-GAME( 199?, m4nod,    0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, 0,      "Eurotech",   "Nod And A Wink (Eurotech) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE) // this has valid strings in it BEFORE the bfm decode, but decodes to valid code, does it use some funky mapping, or did they just fill unused space with valid looking data?
-
 // LINKUP SUCHE
 GAME( 199?, m4aliz,   0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default_big, 0,      "Qps",  "AlizBaz (Qps) (German) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
 
@@ -935,11 +918,6 @@ GAME( 199?, m4crzjk,  0,          mod2_alt,       mpu4_invcoin,    mpu4unsorted_
 
 // not standard protection, but cheatchr passes it, code crashes after a short time?
 GAME( 199?, m4c2,     0,          mod4oki_alt_cheatchr,    mpu4_invcoin,    mpu4unsorted_state, init_m4default, 0,      "Nova?", "Circus Circus 2 (Nova?) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE) // COIN   ALM
-
-
-
-// no protection?
-GAME(198?, m4funh,    0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, 0,      "<unknown>",      "Fun House (unknown) (MPU4)", GAME_FLAGS ) // TUNE ALARM  (was in the SC1 Fun House set)
 
 
 // REEL 1 FAULT

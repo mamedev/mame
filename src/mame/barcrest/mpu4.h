@@ -21,15 +21,6 @@
 
 
 #define MPU4_MASTER_CLOCK           XTAL(6'880'000)
-#define VIDEO_MASTER_CLOCK          XTAL(10'000'000)
-
-#ifdef MAME_DEBUG
-#define MPU4VIDVERBOSE 1
-#else
-#define MPU4VIDVERBOSE 0
-#endif
-
-#define LOGSTUFF(x) do { if (MPU4VIDVERBOSE) logerror x; } while (0)
 
 
 
@@ -188,10 +179,7 @@ public:
 	void mod2_chr(machine_config &config);
 
 	void mpu4_reels(machine_config &config, uint8_t NumberOfReels, int16_t start_index, int16_t end_index);
-	
-	template<const uint8_t* Table> void mod2_cheatchr_pal(machine_config &config);
-	template<const uint8_t* Table> void mod2_7reel_cheatchr_pal(machine_config &config);
-	template<const uint8_t* Table> void mod2_alt_cheatchr_pal(machine_config &config);
+
 	template<const uint8_t* Table> void mod4oki_cheatchr_pal(machine_config &config);
 	template<const uint8_t* Table> void mod4oki_7reel_cheatchr_pal(machine_config &config);
 	template<const uint8_t* Table> void mod4oki_alt_cheatchr_pal(machine_config &config);
@@ -199,14 +187,9 @@ public:
 	template<uint8_t Fixed> void mod4oki_5r_bootleg_fixedret(machine_config &config);
 	void mod2_cheatchr_table(machine_config &config, const uint8_t* table);
 
-	// bootleg mod2
-	template<uint8_t Fixed> void mod2_bootleg_fixedret(machine_config &config);
-	template<uint8_t Fixed> void mod2_alt_bootleg_fixedret(machine_config &config);
+	// bootleg mod4
 	template<uint8_t Fixed> void mod4oki_bootleg_fixedret(machine_config &config);
 	template<uint8_t Fixed> void mod4oki_alt_bootleg_fixedret(machine_config &config);
-
-	void mod2_chr_blastbnk(machine_config &config);
-	void mod2_chr_copcash(machine_config &config);
 
 	void mod2_alt(machine_config &config);
 	void mod2_alt_cheatchr(machine_config &config);
@@ -374,7 +357,7 @@ protected:
 	optional_device<okim6376_device> m_msm6376;
 	optional_device_array<stepper_device, 8> m_reel;
 	required_device<meters_device> m_meters;
-	optional_device<ay8913_device> m_ay8913;
+	optional_device<ay8910_device> m_ay8913;
 	optional_device<bacta_datalogger_device> m_dataport;
 	optional_device<mpu4_characteriser_pal> m_characteriser;
 	optional_device<mpu4_characteriser_bl> m_characteriser_bl;

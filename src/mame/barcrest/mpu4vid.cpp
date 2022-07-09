@@ -208,6 +208,9 @@ TODO:
 #include "v4strike.lh"
 
 
+#define VIDEO_MASTER_CLOCK          XTAL(10'000'000)
+
+
 namespace {
 
 class mpu4vid_state : public mpu4_state

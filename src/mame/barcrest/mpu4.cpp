@@ -2579,27 +2579,6 @@ void mpu4_state::mod2_cheatchr(machine_config &config)
 }
 
 
-void mpu4_state::mod2_chr_blastbnk(machine_config &config)
-{
-	mod2(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bl_characteriser_blastbank);
-
-	MPU4_CHARACTERISER_BL_BLASTBANK(config, m_characteriser_blastbank, 0);
-}
-
-void mpu4_state::mod2_chr_copcash(machine_config &config)
-{
-	mod2(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bl_characteriser_blastbank);
-
-	MPU4_CHARACTERISER_BL_BLASTBANK(config, m_characteriser_blastbank, 0);
-	m_characteriser_blastbank->set_retxor(0x03);
-
-}
-
-
 // alt reel setup
 
 void mpu4_state::mod2_alt(machine_config &config)
