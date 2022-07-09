@@ -30174,7 +30174,7 @@ m4bigchfc                       //
 m4click                         // Clickity Click (Barcrest)
 m4elite                         // Elite (Barcrest)
 
-@source:barcrest/mpu4redhouse.cpp
+@source:barcrest/mpu4redpoint.cpp
 m4cbing                         // Cherry Bingo
 
 @source:barcrest/mpu4vid.cpp
