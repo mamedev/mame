@@ -26,6 +26,104 @@
 
 ****************************************************************************
 
+Power Drift (Sega, 1988)
+Hardware info by Guru
+
+This game runs on the Sega Y Board hardware.
+
+PCB Layout
+----------
+
+Top board
+
+837-6565
+171-5609 (bottom side)
+837-6695 (sticker)
+834-6697-04 POWER DRIFT (sticker)
+|---------------------------------------------------------------------------------------------|
+|         CNF              CNE          CNG                CN6   CN4           CND            |
+| 2501 2501 2003 2003                                                         315-5328        |
+| 2501 2501      2003                                                         315-5280        |
+| SWA   SWB     315-5296                      UPC324      2115      Z80A     EPR-11753.IC102  |
+|                                                         2115      EPR-11894.IC107    2115   |
+|                                                         315-5218  EPR-11893.IC106  YM2151   |
+| 5.5V  315-5317  315-5318      M6253   MF6CN-50  MF6CN-50          EPR-11892.IC105           |
+|                 3773                  C4082                                                 |
+|                               16MHz   YM3012    DAC1022                                     |
+|                                                                                             |
+|   43256  EPR-11752.IC81      43256  EPR-11750B.IC54       43256                             |
+|     8464       315-5249                   315-5249         EPR-11748.IC27       315-5249    |
+|        8464                                                   EPR-11746A.IC25               |
+|                                                                                             |
+|                                                                                             |
+|                                                                                             |
+|   43256  EPR-11751.IC80      43256  EPR-11749B.IC53       43256                             |
+|     8464       315-5248                   315-5248         EPR-11747.IC26       315-5248    |
+|        8464               50MHz                               EPR-11745A.IC24               |
+|                                                                                             |
+|                                                                                             |
+|             6                           6                            6                      |
+|             8                           8                            8                      |
+|             0                           0                            0                      |
+|             0                           0                            0                      |
+|             0                           0                            0                      |
+|                                                                                             |
+| 315-5315                315-5316                         315-5314                           |
+|                                                                                             |
+|            CN8                         CNC                     CNA                          |
+|---------------------------------------------------------------------------------------------|
+Notes:
+      Z80 - Clock 4.000MHz [16/4]
+   YM2151 - Clock 4.000MHz [16/4]
+    68000 - Clock 12.500MHz [50/4] (for all 3 CPUs)
+
+
+Bottom Board
+
+837-6566
+171-5610 (bottom side)
+837-6696-01 (sticker)
+|---------------------------------------------------------------------------------------------|
+|EPR-11788.IC107    EPR-11772.IC111                     CNP                           CNR     |
+| EPR-11784.IC108    EPR-11768.IC112  X  X  X  X  X  X  X  X  X  X  X  X  X  X  X  X          |
+|  MPR-11780.IC109    MPR-11764.IC113                                                 315-5242|
+|   MPR-11776.IC110    MPR-11760.IC114                                                        |
+|                                     X  X  X  X  X  X  X  X  X  X  X  X  X  X  X  X   8464   |
+|                                                                                      8464   |
+|EPR-11787.IC79     EPR-11771.IC83                                                            |
+| EPR-11783.IC80     EPR-11767.IC84                                                           |
+|  MPR-11779.IC81     MPR-11763.IC85                                                          |
+|   MPR-11775.IC82     MPR-11759.IC86                                                         |
+|                                                                                             |
+|                                                                                             |
+|EPR-11786.IC68     EPR-11770.IC72          315-5306              315-5306          315-5312  |
+| EPR-11782.IC69     EPR-11766.IC73                                                           |
+|  MPR-11778.IC70     MPR-11762.IC74                                                          |
+|   MPR-11774.IC71     MPR-11758.IC75                                                         |
+|                                           315-5325                                          |
+|EPR-11785.IC60         EPR-11769.IC64                                                        |
+| EPR-11781.IC61         EPR-11765.IC65                                                       |
+|  MPR-11777.IC62         MPR-11761.IC66                                                      |
+|   MPR-11773.IC63         MPR-11757.IC67                                                     |
+|                   315-5319                               315-5196      2016  2016  2016     |
+|60MHz                                           2016 2016                2016  2016  2016    |
+|                                                2016 2016                                    |
+|                                                        EPR-11791.IC14                       |
+|   65256                                                  EPR-11792.IC15                     |
+|     65256         315-5305                                 EPR-11798.IC16                   |
+|                                                              EPR-11790.IC17       315-5213  |
+|                                                                                             |
+|            CNK                         CNL                     CNH                          |
+|---------------------------------------------------------------------------------------------|
+Notes:
+       X - HM65256 32kBx8-bit SRAM (32 chips)
+    2016 - SRM2016 2kBx8-bit SRAM or SONY CXK5814 2kBx8-bit SRAM
+315-5319 \
+315-5325 | PALs
+315-5313 /
+Remaining 315-xxxx chips are SEGA custom chips
+
+
 Network Board (used for Power Drift: Link Version)
 -------------
 
@@ -2353,18 +2451,15 @@ ROM_START( pdriftj )
 	ROMX_LOAD( "epr-11788.107", 0x300007, 0x20000, CRC(8464c66e) SHA1(af93cbcc50acbd929d0298fb9a75da0369e13ff7), ROM_SKIP(7) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )        // Z80 sound CPU
-	ROM_LOAD( "epr-11899.102",  0x000000, 0x10000, CRC(ed9fa889) SHA1(25d1a069254b34c31d8ee82d301ada895e8dc391) )
+	ROM_LOAD("epr-11753.ic102", 0x000000, 0x10000, CRC(e81f5748) SHA1(dea9425ddc0f9411b1446477b7fdd3c92a1d4742))
 
 	ROM_REGION( 0x200000, "pcm", ROMREGION_ERASEFF )    // SegaPCM samples
-	ROM_LOAD( "mpr-11754.107",  0x000000, 0x80000, CRC(ebeb8484) SHA1(269f33cb1a9be126bada858e25291385d48686a2) )
-	ROM_LOAD( "epr-11756.106",  0x080000, 0x20000, CRC(12e43f8a) SHA1(0f9a11ba6b7c1a352daa1146a01ce147945e91e4) )
-	ROM_RELOAD(                 0x0a0000, 0x20000 )
-	ROM_RELOAD(                 0x0c0000, 0x20000 )
-	ROM_RELOAD(                 0x0e0000, 0x20000 )
-	ROM_LOAD( "epr-11755.105",  0x100000, 0x20000, CRC(c2db1244) SHA1(c98fe17c9f04a639a862cc2a86fab17d1f5d025c) )
-	ROM_RELOAD(                 0x120000, 0x20000 )
-	ROM_RELOAD(                 0x140000, 0x20000 )
-	ROM_RELOAD(                 0x160000, 0x20000 )
+	ROM_LOAD("epr-11894.ic107", 0x000000, 0x40000, CRC(b1e573f2) SHA1(e566dc49b8f2002ca8d72a813856a272e0c9a9ac))
+	ROM_RELOAD(                 0x040000, 0x40000 )
+	ROM_LOAD("epr-11893.ic106", 0x080000, 0x40000, CRC(58b40f19) SHA1(20a06928392d0e612a5e764d4eb1492070afe526))
+	ROM_RELOAD(                 0x0c0000, 0x40000 )
+	ROM_LOAD("epr-11892.ic105", 0x100000, 0x40000, CRC(3248a758) SHA1(e6fc3a7b2356ef017f59858f8b37eef5d92f54a2))
+	ROM_RELOAD(                 0x140000, 0x40000 )
 
 	ROM_REGION( 0x100000, "user1", 0 )
 	// These are mpr-11754.107 split into 4 ROMs. They would be located on a Sega 839-0221 daughter card.
@@ -2440,19 +2535,16 @@ ROM_START(pdriftl)
 	ROMX_LOAD("epr-11787.79",  0x300006, 0x20000, CRC(e631dc12) SHA1(3fd6db2eb297890b35dec566b6a90fc2d96bd085), ROM_SKIP(7) )
 	ROMX_LOAD("epr-11788.107", 0x300007, 0x20000, CRC(8464c66e) SHA1(af93cbcc50acbd929d0298fb9a75da0369e13ff7), ROM_SKIP(7) )
 
-	ROM_REGION(0x10000, "soundcpu", 0)        // Z80 sound CPU
-	ROM_LOAD("epr-11899.102", 0x000000, 0x10000, CRC(ed9fa889) SHA1(25d1a069254b34c31d8ee82d301ada895e8dc391) )
+	ROM_REGION(0x10000, "soundcpu", 0) // Z80 sound CPU
+	ROM_LOAD("epr-11753.ic102", 0x000000, 0x10000, CRC(e81f5748) SHA1(dea9425ddc0f9411b1446477b7fdd3c92a1d4742))
 
-	ROM_REGION(0x200000, "pcm", ROMREGION_ERASEFF)    // SegaPCM samples
-	ROM_LOAD("mpr-11754.107", 0x000000, 0x80000, CRC(ebeb8484) SHA1(269f33cb1a9be126bada858e25291385d48686a2) )
-	ROM_LOAD("epr-11756.106", 0x080000, 0x20000, CRC(12e43f8a) SHA1(0f9a11ba6b7c1a352daa1146a01ce147945e91e4) )
-	ROM_RELOAD(               0x0a0000, 0x20000)
-	ROM_RELOAD(               0x0c0000, 0x20000)
-	ROM_RELOAD(               0x0e0000, 0x20000)
-	ROM_LOAD("epr-11755.105", 0x100000, 0x20000, CRC(c2db1244) SHA1(c98fe17c9f04a639a862cc2a86fab17d1f5d025c) )
-	ROM_RELOAD(               0x120000, 0x20000)
-	ROM_RELOAD(               0x140000, 0x20000)
-	ROM_RELOAD(               0x160000, 0x20000)
+	ROM_REGION(0x200000, "pcm", ROMREGION_ERASEFF) // SegaPCM samples
+	ROM_LOAD("epr-11894.ic107", 0x000000, 0x40000, CRC(b1e573f2) SHA1(e566dc49b8f2002ca8d72a813856a272e0c9a9ac))
+	ROM_RELOAD(0x040000, 0x40000)
+	ROM_LOAD("epr-11893.ic106", 0x080000, 0x40000, CRC(58b40f19) SHA1(20a06928392d0e612a5e764d4eb1492070afe526))
+	ROM_RELOAD(0x0c0000, 0x40000)
+	ROM_LOAD("epr-11892.ic105", 0x100000, 0x40000, CRC(3248a758) SHA1(e6fc3a7b2356ef017f59858f8b37eef5d92f54a2))
+	ROM_RELOAD(0x140000, 0x40000)
 
 	ROM_REGION(0x100000, "user1", 0)
 	// These are mpr-11754.107 split into 4 ROMs. They would be located on a Sega 839-0221 daughter card.
