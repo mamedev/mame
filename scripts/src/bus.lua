@@ -360,6 +360,14 @@ if (BUSES["ARCHIMEDES_PODULE"]~=null) then
 		MAME_DIR .. "src/devices/bus/archimedes/podule/faxpack.h",
 		MAME_DIR .. "src/devices/bus/archimedes/podule/greyhawk.cpp",
 		MAME_DIR .. "src/devices/bus/archimedes/podule/greyhawk.h",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/hdisc.cpp",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/hdisc.h",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/hdisc_cw.cpp",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/hdisc_cw.h",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/hdisc_morley.cpp",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/hdisc_morley.h",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/hdisc_we.cpp",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/hdisc_we.h",
 		MAME_DIR .. "src/devices/bus/archimedes/podule/ide_be.cpp",
 		MAME_DIR .. "src/devices/bus/archimedes/podule/ide_be.h",
 		MAME_DIR .. "src/devices/bus/archimedes/podule/ide_rdev.cpp",
@@ -455,6 +463,8 @@ if (BUSES["ATA"]~=null) then
 		MAME_DIR .. "src/devices/bus/ata/atapihle.h",
 		MAME_DIR .. "src/devices/bus/ata/cr589.cpp",
 		MAME_DIR .. "src/devices/bus/ata/cr589.h",
+		MAME_DIR .. "src/devices/bus/ata/gdrom.cpp",
+		MAME_DIR .. "src/devices/bus/ata/gdrom.h",
 		MAME_DIR .. "src/devices/bus/ata/idehd.cpp",
 		MAME_DIR .. "src/devices/bus/ata/idehd.h",
 		MAME_DIR .. "src/devices/bus/ata/px320a.cpp",
@@ -1994,6 +2004,8 @@ if (BUSES["PC_KBD"]~=null) then
 		MAME_DIR .. "src/devices/bus/pc_kbd/pc_kbdc.h",
 		MAME_DIR .. "src/devices/bus/pc_kbd/keyboards.cpp",
 		MAME_DIR .. "src/devices/bus/pc_kbd/keyboards.h",
+		MAME_DIR .. "src/devices/bus/pc_kbd/cherry_mx1500.cpp",
+		MAME_DIR .. "src/devices/bus/pc_kbd/cherry_mx1500.h",
 		MAME_DIR .. "src/devices/bus/pc_kbd/ec1841.cpp",
 		MAME_DIR .. "src/devices/bus/pc_kbd/ec1841.h",
 		MAME_DIR .. "src/devices/bus/pc_kbd/iskr1030.cpp",
@@ -2765,6 +2777,8 @@ end
 
 if (BUSES["NUBUS"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/nubus/cards.cpp",
+		MAME_DIR .. "src/devices/bus/nubus/cards.h",
 		MAME_DIR .. "src/devices/bus/nubus/nubus.cpp",
 		MAME_DIR .. "src/devices/bus/nubus/nubus.h",
 		MAME_DIR .. "src/devices/bus/nubus/nubus_48gc.cpp",
@@ -2795,6 +2809,8 @@ if (BUSES["NUBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/nubus/quadralink.h",
 		MAME_DIR .. "src/devices/bus/nubus/laserview.cpp",
 		MAME_DIR .. "src/devices/bus/nubus/laserview.h",
+		MAME_DIR .. "src/devices/bus/nubus/supermac.cpp",
+		MAME_DIR .. "src/devices/bus/nubus/supermac.h",
 		MAME_DIR .. "src/devices/bus/nubus/pds30_cb264.cpp",
 		MAME_DIR .. "src/devices/bus/nubus/pds30_cb264.h",
 		MAME_DIR .. "src/devices/bus/nubus/pds30_procolor816.cpp",
@@ -3073,6 +3089,7 @@ end
 ---------------------------------------------------
 --
 --@src/devices/bus/nes_ctrl/ctrl.h,BUSES["NES_CTRL"] = true
+--@src/devices/bus/nes_ctrl/zapper_sensor.h,BUSES["NES_CTRL"] = true
 ---------------------------------------------------
 
 if (BUSES["NES_CTRL"]~=null) then

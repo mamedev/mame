@@ -11,12 +11,10 @@
 
 #if defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
 
-#include "font_module.h"
-#include "modules/osdmodule.h"
-
 #include "strconv.h"
 #include "unicode.h"
 #include "corestr.h"
+#include "osdcore.h"
 
 #include <cstring>
 

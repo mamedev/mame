@@ -8,23 +8,22 @@
 #ifndef NL_CORE_EXEC_H_
 #define NL_CORE_EXEC_H_
 
+#include "../nltypes.h"
 #include "base_objects.h"
 #include "state_var.h"
 
-#include "../nltypes.h"
 #include "../plib/plists.h"
 #include "../plib/pstring.h"
 
 namespace netlist
 {
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 	// netlist_t
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 
 	class netlist_t // NOLINT(clang-analyzer-optin.performance.Padding)
 	{
 	public:
-
 		explicit netlist_t(netlist_state_t &state, const pstring &aname);
 
 		netlist_t(const netlist_t &) = delete;
@@ -36,7 +35,10 @@ namespace netlist
 
 		// run functions
 
-		constexpr const netlist_time_ext &time() const noexcept { return m_time; }
+		constexpr const netlist_time_ext &time() const noexcept
+		{
+			return m_time;
+		}
 
 		void process_queue(netlist_time_ext delta) noexcept;
 		void abort_current_queue_slice() noexcept
@@ -45,15 +47,20 @@ namespace netlist
 			queue_push(m_time, nullptr);
 		}
 
-		constexpr const detail::queue_t &queue() const noexcept { return m_queue; }
+		constexpr const detail::queue_t &queue() const noexcept
+		{
+			return m_queue;
+		}
 
 		template <typename... Args>
-		void queue_push(Args&&...args) noexcept
+		void queue_push(Args &&...args) noexcept
 		{
 			if (config::use_queue_stats::value && m_use_stats)
-				m_queue.emplace<true>(std::forward<Args>(args)...); // NOLINT(performance-move-const-arg)
+				m_queue.emplace<true>(std::forward<Args>(
+					args)...); // NOLINT(performance-move-const-arg)
 			else
-				m_queue.emplace<false>(std::forward<Args>(args)...); // NOLINT(performance-move-const-arg)
+				m_queue.emplace<false>(std::forward<Args>(
+					args)...); // NOLINT(performance-move-const-arg)
 		}
 
 		template <class R>
@@ -80,40 +87,38 @@ namespace netlist
 			return static_cast<X *>(m_solver)->gmin();
 		}
 
-		netlist_state_t &nl_state() noexcept { return m_state; }
+		netlist_state_t &      nl_state() noexcept { return m_state; }
 		const netlist_state_t &nl_state() const noexcept { return m_state; }
 
-		log_type & log() noexcept { return m_state.log(); }
+		log_type &      log() noexcept { return m_state.log(); }
 		const log_type &log() const noexcept { return m_state.log(); }
 
 		void print_stats() const;
 
 		constexpr bool stats_enabled() const noexcept { return m_use_stats; }
-		void enable_stats(bool val) noexcept { m_use_stats = val; }
+		void           enable_stats(bool val) noexcept { m_use_stats = val; }
 
 	private:
-
 		template <bool KEEP_STATS>
 		void process_queue_stats(netlist_time_ext delta) noexcept;
 
-		netlist_state_t &                   m_state;
-		devices::nld_solver *               m_solver;
+		netlist_state_t &    m_state;
+		devices::nld_solver *m_solver;
 
 		// mostly rw
-		//PALIGNAS(16)
-		netlist_time_ext                    m_time;
-		devices::nld_mainclock *            m_main_clock;
+		// PALIGNAS(16)
+		netlist_time_ext        m_time;
+		devices::nld_mainclock *m_main_clock;
 
-		//PALIGNAS_CACHELINE()
-		//PALIGNAS(16)
-		bool                                m_use_stats;
-		detail::queue_t                     m_queue;
+		// PALIGNAS_CACHELINE()
+		// PALIGNAS(16)
+		bool            m_use_stats;
+		detail::queue_t m_queue;
 		// performance
-		plib::pperftime_t<true>             m_stat_mainloop;
-		plib::pperfcount_t<true>            m_perf_out_processed;
+		plib::pperftime_t<true>  m_stat_mainloop;
+		plib::pperfcount_t<true> m_perf_out_processed;
 	};
 
 } // namespace netlist
-
 
 #endif // NL_CORE_EXEC_H_

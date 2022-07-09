@@ -2,11 +2,11 @@
 // copyright-holders: Angelo Salese
 /**************************************************************************************************
 
-	SiS 7001 USB Host controller
+    SiS 7001 USB Host controller
 
     TODO:
-	- Stub interface, to be improved;
-	- PCI values omitted from docs, assumes same as OpenHCI;
+    - Stub interface, to be improved;
+    - PCI values omitted from docs, assumes same as OpenHCI;
 
 **************************************************************************************************/
 
@@ -57,13 +57,13 @@ void sis7001_usb_device::io_map(address_map &map)
 	 // HcRhDescriptorA, writeable except for 0x4ff
 	map(0x048, 0x04b).lr32(NAME([this]() { return 0x01000000 | m_downstream_ports; }));
 	// ...
-//	map(0x05c, 0x05c) last item for function 2, missing on function 3
+//  map(0x05c, 0x05c) last item for function 2, missing on function 3
 
 	// legacy support mode (8-bit each)
-//	map(0x100, 0x100) control, bit 0 enables emulation mode
-//	map(0x104, 0x104) input
-//	map(0x108, 0x108) output
-//	map(0x10c, 0x10f) status
+//  map(0x100, 0x100) control, bit 0 enables emulation mode
+//  map(0x104, 0x104) input
+//  map(0x108, 0x108) output
+//  map(0x10c, 0x10f) status
 }
 
 void sis7001_usb_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
@@ -77,7 +77,7 @@ void sis7001_usb_device::device_start()
 	pci_device::device_start();
 
 	add_map(512, M_MEM, FUNC(sis7001_usb_device::io_map));
-	
+
 	// INTD#
 	intr_pin = 4;
 }
@@ -86,7 +86,7 @@ void sis7001_usb_device::device_start()
 void sis7001_usb_device::device_reset()
 {
 	pci_device::device_reset();
-	
+
 	command = 0x0000;
 	status = 0x0000;
 	m_HcFmInterval = 0;

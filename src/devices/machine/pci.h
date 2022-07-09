@@ -205,6 +205,7 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void interface_post_reset() override;
 	virtual space_config_vector memory_space_config() const override;
 
 	virtual device_t *bus_root();
@@ -251,6 +252,7 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void interface_post_reset() override;
 
 	virtual device_t *bus_root() override;
 

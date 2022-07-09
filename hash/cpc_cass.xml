@@ -450,7 +450,8 @@ Please stick to using the floppy versions for the time being...
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
-		<info name="alt_title" value="3D Boxkampf" />       <part name="cass1" interface="cpc_cass">
+		<info name="alt_title" value="3D Boxkampf" />
+		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="58470">
 				<rom name="3d boxing (uk) (1985) [original] [tape].cdt" size="58470" crc="19182316" sha1="adc783a37568ae81fcaa3c7a0af80b08258c038c"/>
 			</dataarea>

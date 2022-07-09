@@ -13,7 +13,9 @@
 
 #include <windows.h>
 
+#include <cmath>
 #include <memory>
+#include <stdexcept>
 
 // Windows Imaging Components
 #include <wincodec.h>
@@ -35,6 +37,7 @@ DEFINE_GUID(GUID_WICPixelFormat8bppAlpha, 0xe6cd0116, 0xeeba, 0x4161, 0xaa, 0x85
 #include "strconv.h"
 #include "corestr.h"
 #include "winutil.h"
+#include "osdcore.h"
 
 using namespace Microsoft::WRL;
 
@@ -226,7 +229,7 @@ public:
 	{
 		if (m_designUnitsPerEm != other.m_designUnitsPerEm || m_emSizeInDip != other.m_emSizeInDip)
 		{
-			throw emu_fatalerror("Attempted subtraction of FontDimension with different scale.");
+			throw std::invalid_argument("Attempted subtraction of FontDimension with different scale.");
 		}
 
 		return FontDimension(m_designUnitsPerEm, m_emSizeInDip, m_designUnits - other.m_designUnits);
@@ -236,7 +239,7 @@ public:
 	{
 		if (m_designUnitsPerEm != other.m_designUnitsPerEm || m_emSizeInDip != other.m_emSizeInDip)
 		{
-			throw emu_fatalerror("Attempted addition of FontDimension with different scale.");
+			throw std::invalid_argument("Attempted addition of FontDimension with different scale.");
 		}
 
 		return FontDimension(m_designUnitsPerEm, m_emSizeInDip, m_designUnits + other.m_designUnits);

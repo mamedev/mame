@@ -26,6 +26,7 @@
 //-
 
 static NETLIST_START(PROM_82S126_DIP)
+{
 
 	PROM_82S126(A)
 
@@ -51,7 +52,7 @@ static NETLIST_START(PROM_82S126_DIP)
 	ALIAS(14, A.CE2Q)
 	ALIAS(15, A.A7)
 	ALIAS(16, A.VCC)
-NETLIST_END()
+}
 
 //- Identifier:  PROM_74S287_DIP
 //- Title: 74S287 (256 x 4) 1024-Bit TTL PROM
@@ -75,6 +76,7 @@ NETLIST_END()
 //-
 
 static NETLIST_START(PROM_74S287_DIP)
+{
 
 	PROM_74S287(A)
 
@@ -100,7 +102,7 @@ static NETLIST_START(PROM_74S287_DIP)
 	ALIAS(14, A.CE2Q)
 	ALIAS(15, A.A7)
 	ALIAS(16, A.VCC)
-NETLIST_END()
+}
 
 //- Identifier:  PROM_82S123_DIP
 //- Title: 82S123 256 bit TTL bipolar PROM
@@ -124,6 +126,7 @@ NETLIST_END()
 //-
 
 static NETLIST_START(PROM_82S123_DIP)
+{
 
 	PROM_82S123(A)
 
@@ -150,7 +153,7 @@ static NETLIST_START(PROM_82S123_DIP)
 	ALIAS(14, A.A4)
 	ALIAS(15, A.CEQ)
 	ALIAS(16, A.VCC)
-NETLIST_END()
+}
 
 /*
  * nld_82S16.h
@@ -194,6 +197,7 @@ NETLIST_END()
 //-    http://pdf.datasheetcatalog.com/datasheets/400/500340_DS.pdf
 //-
 static NETLIST_START(EPROM_2716_DIP)
+{
 
 	EPROM_2716(A)
 
@@ -227,7 +231,7 @@ static NETLIST_START(EPROM_2716_DIP)
 	ALIAS(22, A.A9)
 	ALIAS(23, A.A8)
 	ALIAS(24, A.VCC)
-NETLIST_END()
+}
 
 /*  DM82S16: 256 Bit bipolar ram
  *
@@ -246,6 +250,7 @@ NETLIST_END()
  */
 
 static NETLIST_START(TTL_82S16_DIP)
+{
 	TTL_82S16(A)
 
 	DIPPINS(     /*        +--------------+       */
@@ -259,7 +264,7 @@ static NETLIST_START(TTL_82S16_DIP)
 		  A.GND, /*    GND |8            9| A5    */ A.A5
 				 /*        +--------------+       */
 	)
-NETLIST_END()
+}
 
 /*  82S115: 4K-bit TTL bipolar PROM (512 x 8)
  *
@@ -280,6 +285,7 @@ NETLIST_END()
  */
 
 static NETLIST_START(PROM_82S115_DIP)
+{
 	PROM_82S115(A)
 	NC_PIN(NC)
 
@@ -298,7 +304,7 @@ static NETLIST_START(PROM_82S115_DIP)
 		A.GND, /*  GND |12          13| FE1    */ NC.I
 			   /*      +--------------+        */
 	)
-NETLIST_END()
+}
 
 //- Identifier:  PROM_MK28000_DIP
 //- Title: MK28000 (2048 x 8 or 4096 x 4) 16384-Bit TTL PROM
@@ -311,6 +317,7 @@ NETLIST_END()
 //-    None.
 
 static NETLIST_START(PROM_MK28000_DIP)
+{
 
 	PROM_MK28000(A)
 
@@ -340,7 +347,7 @@ static NETLIST_START(PROM_MK28000_DIP)
 	ALIAS(22, A.O2)
 	ALIAS(23, A.O1)
 	ALIAS(24, A.OE1)
-NETLIST_END()
+}
 
 //- Identifier:  ROM_MCM14524_DIP
 //- Title: MCM14524 1024-BIT READ ONLY MEMORY
@@ -355,6 +362,7 @@ NETLIST_END()
 //-    http://www.bitsavers.org/components/motorola/_dataBooks/1978_Motorola_CMOS_Data_Book.pdf 7-439 (pdf page 488)
 
 static NETLIST_START(ROM_MCM14524_DIP)
+{
 
 	ROM_MCM14524(A)
 
@@ -373,7 +381,7 @@ static NETLIST_START(ROM_MCM14524_DIP)
 	  A.GND, /*  VSS |8          9| A3  */ A.A3
 			 /*      +------------+ */
 	)
-NETLIST_END()
+}
 
 /*  2102: 1024 x 1-bit Static RAM
  *
@@ -389,6 +397,7 @@ NETLIST_END()
  *          +--------------+
  */
 static NETLIST_START(RAM_2102A_DIP)
+{
 	RAM_2102A(A)
 
 	DIPPINS(   /*      +--------------+      */
@@ -402,10 +411,11 @@ static NETLIST_START(RAM_2102A_DIP)
 		 A.A0, /*   A0 |8            9| GND  */ A.GND
 			   /*      +--------------+      */
 	)
-NETLIST_END()
+}
 
 //FIXME: Documentation
 static NETLIST_START(ROM_TMS4800_DIP)
+{
 	ROM_TMS4800(A)
 
 	DIPPINS(   /*       +----------------+     */
@@ -423,10 +433,11 @@ static NETLIST_START(ROM_TMS4800_DIP)
 		A.A7,  /*    A7 |12            13| AR  */ A.AR
 			   /*       +----------------+      */
 	)
-NETLIST_END()
+}
 
 
 NETLIST_START(roms_lib)
+{
 
 	LOCAL_LIB_ENTRY(PROM_82S123_DIP)
 	LOCAL_LIB_ENTRY(PROM_82S126_DIP)
@@ -438,5 +449,5 @@ NETLIST_START(roms_lib)
 	LOCAL_LIB_ENTRY(ROM_MCM14524_DIP)
 	LOCAL_LIB_ENTRY(RAM_2102A_DIP)
 	LOCAL_LIB_ENTRY(ROM_TMS4800_DIP)
-	NETLIST_END()
+	}
 

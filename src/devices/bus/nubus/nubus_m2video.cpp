@@ -33,7 +33,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(NUBUS_M2VIDEO, nubus_m2video_device, "nb_m2vc", "Macintosh II Video Card")
+DEFINE_DEVICE_TYPE(NUBUS_M2VIDEO, nubus_m2video_device, "nb_m2vc", "Apple Macintosh II Video Card")
 
 
 //-------------------------------------------------

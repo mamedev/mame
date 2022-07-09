@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-06-11 09:24+1000\n"
-"PO-Revision-Date: 2022-01-05 19:14+0200\n"
+"PO-Revision-Date: 2022-06-19 17:51+0300\n"
 "Last-Translator: Stanley Kid <stanley.udr.kid@gmail.com>\n"
 "Language-Team: MAME Language Team\n"
 "Language: uk\n"
@@ -18,6 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Poedit 3.0.1\n"
 
 #: src/frontend/mame/ui/ui.cpp:470 src/frontend/mame/ui/ui.cpp:543
 msgid ""
@@ -33,6 +34,7 @@ msgstr ""
 msgid ""
 "This system requires media images to be mounted for the following device(s): "
 msgstr ""
+"Системі необхідні монтовані медіа-образи на пристрої: "
 
 #: src/frontend/mame/ui/ui.cpp:1249
 #, c-format
@@ -59,17 +61,17 @@ msgstr "Загальна гучність"
 #: src/frontend/mame/ui/ui.cpp:1469
 #, c-format
 msgid "%1$s Volume"
-msgstr "%1$s гучність"
+msgstr "Гучність %1$s"
 
 #: src/frontend/mame/ui/ui.cpp:1491
 #, c-format
 msgid "Overclock CPU %1$s"
-msgstr "CPU-розгін %1$s"
+msgstr "Розігнати CPU %1$s"
 
 #: src/frontend/mame/ui/ui.cpp:1499
 #, c-format
 msgid "Overclock %1$s sound"
-msgstr "Розгін %1$s звуку"
+msgstr "Розігнати звук %1$s"
 
 #: src/frontend/mame/ui/ui.cpp:1518
 #, c-format
@@ -114,22 +116,22 @@ msgstr "Вертикальне положення %1$s"
 #: src/frontend/mame/ui/ui.cpp:1553
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Stretch"
-msgstr "Горизонтальне розтягування %1$s Laserdisc"
+msgstr "Горизонтальне розтягування Laserdisc \"%1$s\""
 
 #: src/frontend/mame/ui/ui.cpp:1556
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Position"
-msgstr "Горизонтальне положення %1$s Laserdisc"
+msgstr "Горизонтальне положення Laserdisc \"%1$s\""
 
 #: src/frontend/mame/ui/ui.cpp:1558
 #, c-format
 msgid "Laserdisc '%1$s' Vert Stretch"
-msgstr "Вертикальне розтягування %1$s Laserdisc"
+msgstr "Вертикальне розтягування Laserdisc \"%1$s\""
 
 #: src/frontend/mame/ui/ui.cpp:1561
 #, c-format
 msgid "Laserdisc '%1$s' Vert Position"
-msgstr "Вертикальне положення %1$s Laserdisc"
+msgstr "Вертикальне положення Laserdisc \"%1$s\""
 
 #: src/frontend/mame/ui/ui.cpp:1571
 msgid "Vector Flicker"
@@ -223,12 +225,12 @@ msgstr "Зміщення прицілу Y %1$1.3f"
 
 #: src/frontend/mame/ui/ui.cpp:2111
 msgid "**Error saving ui.ini**"
-msgstr "**Помилка збереження ui.ini**"
+msgstr "**Помилка збереження ui.ini.**"
 
 #: src/frontend/mame/ui/ui.cpp:2170
 #, c-format
 msgid "**Error saving %s.ini**"
-msgstr "**Помилка збереження %s.ini**"
+msgstr "**Помилка збереження %s.ini.**"
 
 #: src/frontend/mame/ui/ui.cpp:2174 src/frontend/mame/ui/miscmenu.cpp:764
 msgid ""
@@ -236,6 +238,9 @@ msgid ""
 "    Settings saved    \n"
 "\n"
 msgstr ""
+"\n"
+"    Налаштування збережено.    \n"
+"\n"
 
 #: src/frontend/mame/ui/selsoft.cpp:485 src/frontend/mame/ui/selgame.cpp:298
 #, c-format
@@ -262,7 +267,7 @@ msgstr "[Розпочати порожнім]"
 
 #: src/frontend/mame/ui/selsoft.cpp:523
 msgid "[Use file manager]"
-msgstr "(Використовувати менеджер файлів)"
+msgstr "[Використовувати менеджер файлів]"
 
 #: src/frontend/mame/ui/selsoft.cpp:706
 #, c-format
@@ -291,7 +296,7 @@ msgstr "Перелік програм / пунктів: %1$s:%2$s"
 
 #: src/frontend/mame/ui/optsmenu.cpp:45 src/frontend/mame/ui/selgame.cpp:441
 msgid "General Settings"
-msgstr ""
+msgstr "Загальні налаштування"
 
 #: src/frontend/mame/ui/optsmenu.cpp:77 src/frontend/mame/ui/sndmenu.cpp:30
 msgid "Sound Options"
@@ -299,7 +304,7 @@ msgstr "Опції аудіо"
 
 #: src/frontend/mame/ui/optsmenu.cpp:80
 msgid "Input Assignments"
-msgstr ""
+msgstr "Призначення керування"
 
 #: src/frontend/mame/ui/optsmenu.cpp:83 src/frontend/mame/ui/miscmenu.cpp:879
 msgid "Plugins"
@@ -307,15 +312,15 @@ msgstr "Плаґіни"
 
 #: src/frontend/mame/ui/optsmenu.cpp:85
 msgid "Input Devices"
-msgstr ""
+msgstr "Пристрої керування"
 
 #: src/frontend/mame/ui/optsmenu.cpp:87
 msgid "Save Settings"
-msgstr ""
+msgstr "Зберегти налаштування"
 
 #: src/frontend/mame/ui/optsmenu.cpp:185 src/frontend/mame/ui/optsmenu.cpp:227
 msgid "System Filter"
-msgstr ""
+msgstr "Фільтр систем"
 
 #: src/frontend/mame/ui/optsmenu.cpp:197 src/frontend/mame/ui/custui.cpp:82
 msgid "Customize UI"
@@ -323,7 +328,7 @@ msgstr "Змінити UI"
 
 #: src/frontend/mame/ui/optsmenu.cpp:198 src/frontend/mame/ui/dirmenu.cpp:525
 msgid "Configure Folders"
-msgstr ""
+msgstr "Налаштувати теки"
 
 #: src/frontend/mame/ui/pluginopt.cpp:35
 msgid "Plugin Options"
@@ -369,7 +374,7 @@ msgstr "Читання образу, запис до diff"
 
 #: src/frontend/mame/ui/submenu.cpp:33
 msgid "Miscellaneous Options"
-msgstr "Різні опції"
+msgstr "Інші опції"
 
 #: src/frontend/mame/ui/submenu.cpp:34
 msgid "Skip imperfect emulation warnings"
@@ -377,7 +382,7 @@ msgstr "Пропускати попередження недосконалої �
 
 #: src/frontend/mame/ui/submenu.cpp:35
 msgid "Re-select last system launched"
-msgstr ""
+msgstr "Вибрати останню запущену систему знову"
 
 #: src/frontend/mame/ui/submenu.cpp:36
 msgid "Enlarge images in the right panel"
@@ -738,17 +743,17 @@ msgstr "Перезавантажити систему"
 
 #: src/frontend/mame/ui/filemngr.cpp:154
 msgid "Start System"
-msgstr ""
+msgstr "Запустити систему"
 
 #: src/frontend/mame/ui/videoopt.cpp:58
 #, c-format
 msgid "Screen #%d"
-msgstr "Екран #%d"
+msgstr "Екран %d"
 
 #: src/frontend/mame/ui/videoopt.cpp:101
 #, c-format
 msgid "Video Options: %1$s"
-msgstr ""
+msgstr "Опції відео: %1$s"
 
 #: src/frontend/mame/ui/videoopt.cpp:159
 msgid "Zoom to Screen Area"
@@ -888,6 +893,8 @@ msgid ""
 "One or more ROMs/disk images for this system are incorrect. The system may "
 "not run correctly.\n"
 msgstr ""
+"Один або декілька ROM'ів / образів дисків системи неправильні. Система може "
+"неналежно працювати.\n"
 
 #: src/frontend/mame/ui/info.cpp:80
 msgid ""
@@ -902,6 +909,7 @@ msgid ""
 "One or more ROMs/disk images for this system have not been correctly "
 "dumped.\n"
 msgstr ""
+"Один або декілька ROM'ів / образів дисків системи неналежно задамплено.\n"
 
 #: src/frontend/mame/ui/info.cpp:93
 msgid "Completely unemulated features: "
@@ -928,13 +936,15 @@ msgstr "Переворот екрана в коктейль-режим непі�
 
 #: src/frontend/mame/ui/info.cpp:132
 msgid "This system requires external artwork files.\n"
-msgstr ""
+msgstr "Системі необхідні зовнішні файли оформлення.\n"
 
 #: src/frontend/mame/ui/info.cpp:134
 msgid ""
 "This system was never completed. It may exhibit strange behavior or missing "
 "elements that are not bugs in the emulation.\n"
 msgstr ""
+"Систему не завершено. Її поведінка дивна чи відсутні елементи, які не є "
+"помилками емуляції.\n"
 
 #: src/frontend/mame/ui/info.cpp:136
 msgid ""
@@ -951,6 +961,9 @@ msgid ""
 "There is nothing you can do to fix this problem except wait for the "
 "developers to improve the emulation.\n"
 msgstr ""
+"\n"
+"Система не працює, її емуляцію не завершено. Дочекайся виправлення проблеми "
+"виробниками покращенням емуляції.\n"
 
 #: src/frontend/mame/ui/info.cpp:142
 msgid ""
@@ -1045,7 +1058,7 @@ msgstr ""
 #: src/frontend/mame/ui/info.cpp:504
 #, c-format
 msgid "Screen '%1$s'"
-msgstr "Екран '%1$s'"
+msgstr "Екран \"%1$s\""
 
 #: src/frontend/mame/ui/info.cpp:506
 msgid "Screen"
@@ -1058,7 +1071,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:618
 msgid "Media Image Information"
-msgstr ""
+msgstr "Відомості медіа-образу"
 
 #: src/frontend/mame/ui/info.cpp:666
 msgid "Not supported"
@@ -1131,7 +1144,7 @@ msgstr "Вибери початковий уміст."
 #: src/frontend/mame/ui/keyboard.cpp:29
 msgctxt "menu-keyboard"
 msgid "Keyboard Selection"
-msgstr ""
+msgstr "Вибір клавіатури"
 
 #: src/frontend/mame/ui/keyboard.cpp:46
 msgctxt "menu-keyboard"
@@ -1463,7 +1476,7 @@ msgstr "<встановити фільтри>"
 
 #: src/frontend/mame/ui/utils.cpp:390
 msgid "Select Filters"
-msgstr "Вибери фільтри"
+msgstr "Вибір фільтрів"
 
 #: src/frontend/mame/ui/utils.cpp:538
 #, c-format
@@ -1508,7 +1521,7 @@ msgstr "З урахуванням клонів"
 
 #: src/frontend/mame/ui/utils.cpp:1130
 msgid "Category File"
-msgstr ""
+msgstr "Файл категорій"
 
 #: src/frontend/mame/ui/utils.cpp:2029 src/frontend/mame/ui/inifile.cpp:277
 msgctxt "swlist-info"
@@ -1530,7 +1543,7 @@ msgstr "Вибір BIOS"
 
 #: src/frontend/mame/ui/miscmenu.cpp:74 src/frontend/mame/ui/miscmenu.cpp:812
 msgid "System"
-msgstr ""
+msgstr "Система"
 
 #: src/frontend/mame/ui/miscmenu.cpp:80
 msgid "Reset"
@@ -1583,7 +1596,7 @@ msgstr " (заблоковано)"
 #: src/frontend/mame/ui/miscmenu.cpp:354 src/frontend/mame/ui/miscmenu.cpp:541
 msgctxt "menu-crosshair"
 msgid "[built-in]"
-msgstr ""
+msgstr "[вбудовано]"
 
 #: src/frontend/mame/ui/miscmenu.cpp:395
 msgctxt "menu-crosshair"
@@ -1593,17 +1606,17 @@ msgstr "Опції прицілу"
 #: src/frontend/mame/ui/miscmenu.cpp:456
 msgctxt "menu-crosshair"
 msgid "Always"
-msgstr ""
+msgstr "Завжди"
 
 #: src/frontend/mame/ui/miscmenu.cpp:457
 msgctxt "menu-crosshair"
 msgid "Never"
-msgstr ""
+msgstr "Ніколи"
 
 #: src/frontend/mame/ui/miscmenu.cpp:458
 msgctxt "menu-crosshair"
 msgid "When moved"
-msgstr ""
+msgstr "При переміщенні"
 
 #: src/frontend/mame/ui/miscmenu.cpp:482
 #, c-format
@@ -1620,17 +1633,17 @@ msgstr "Приціл P%1$d"
 #: src/frontend/mame/ui/miscmenu.cpp:562
 msgctxt "menu-crosshair"
 msgid "Auto-Hide Delay"
-msgstr ""
+msgstr "Автоприховування затримки"
 
 #: src/frontend/mame/ui/miscmenu.cpp:563
 #, c-format
 msgctxt "menu-crosshair"
 msgid "%1$d s"
-msgstr ""
+msgstr "%1$d сек"
 
 #: src/frontend/mame/ui/miscmenu.cpp:584
 msgid "Export Displayed List to File"
-msgstr ""
+msgstr "Експортувати відображений перелік до файлу"
 
 #: src/frontend/mame/ui/miscmenu.cpp:644
 #, c-format
@@ -1664,6 +1677,8 @@ msgid ""
 "System Settings:\n"
 "%1$s"
 msgstr ""
+"Налаштування системи:\n"
+"%1$s"
 
 #: src/frontend/mame/ui/miscmenu.cpp:808
 msgid "BIOS"
@@ -1671,7 +1686,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/miscmenu.cpp:815
 msgid "[this system has no BIOS settings]"
-msgstr ""
+msgstr "[відсутні BIOS-налаштування системи]"
 
 #: src/frontend/mame/ui/miscmenu.cpp:824
 msgid "Add To Favorites"
@@ -1683,7 +1698,7 @@ msgstr "Вилучити з уподобань"
 
 #: src/frontend/mame/ui/miscmenu.cpp:829
 msgid "Save System Settings"
-msgstr ""
+msgstr "Зберегти налаштування системи"
 
 #: src/frontend/mame/ui/miscmenu.cpp:862 src/frontend/mame/ui/selmenu.cpp:2615
 msgid " (default)"
@@ -1782,7 +1797,7 @@ msgstr "%s [внутрішній]"
 
 #: src/frontend/mame/ui/inputmap.cpp:29
 msgid "Input Assignments (general)"
-msgstr ""
+msgstr "Призначення керування (загальні)"
 
 #: src/frontend/mame/ui/inputmap.cpp:39
 msgid "User Interface"
@@ -1800,15 +1815,15 @@ msgstr "Інше керування"
 #: src/frontend/mame/ui/inputmap.cpp:58
 #, c-format
 msgid "Input Assignments (%1$s)"
-msgstr ""
+msgstr "Призначення керування (%1$s)"
 
 #: src/frontend/mame/ui/inputmap.cpp:152
 msgid "Input Assignments (this system)"
-msgstr ""
+msgstr "Призначення керування (система)"
 
 #: src/frontend/mame/ui/inputmap.cpp:254
 msgid "[no assignable inputs are enabled]"
-msgstr ""
+msgstr "[не увімкнено призначених керувань]"
 
 #: src/frontend/mame/ui/inputmap.cpp:348
 msgid "Pressed"
@@ -1816,7 +1831,7 @@ msgstr "Натиснено"
 
 #: src/frontend/mame/ui/inputmap.cpp:418
 msgid "Invalid combination entered"
-msgstr ""
+msgstr "Указано недійсну комбінацію."
 
 #: src/frontend/mame/ui/inputmap.cpp:563
 #, c-format
@@ -1865,22 +1880,22 @@ msgstr ""
 #: src/frontend/mame/ui/inputdevices.cpp:147
 msgctxt "menu-inputdev"
 msgid "Input Devices"
-msgstr ""
+msgstr "Пристрої керування"
 
 #: src/frontend/mame/ui/inputdevices.cpp:188
 msgctxt "menu-inputdev"
 msgid "[no input devices are enabled]"
-msgstr ""
+msgstr "[не увімкнено пристроїв керування]"
 
 #: src/frontend/mame/ui/inputtoggle.cpp:22
 msgctxt "menu-inputtoggle"
 msgid "Toggle Inputs"
-msgstr ""
+msgstr "Перемкнути керування"
 
 #: src/frontend/mame/ui/inputtoggle.cpp:107
 msgctxt "menu-inputtoggle"
 msgid "[no toggle inputs are enabled]"
-msgstr ""
+msgstr "[не увімкнено перемкнених керувань]"
 
 #: src/frontend/mame/ui/tapectrl.cpp:42
 msgid "Tape Control"
@@ -1929,37 +1944,37 @@ msgstr "Перемотати вперед"
 #: src/frontend/mame/ui/inputopts.cpp:75
 msgctxt "menu-inputopts"
 msgid "Input Settings"
-msgstr ""
+msgstr "Налаштування керування"
 
 #: src/frontend/mame/ui/inputopts.cpp:95
 msgctxt "menu-inputopts"
 msgid "Input Assignments (general)"
-msgstr ""
+msgstr "Призначення керування (загальні)"
 
 #: src/frontend/mame/ui/inputopts.cpp:97
 msgctxt "menu-inputopts"
 msgid "Input Assignments (this system)"
-msgstr ""
+msgstr "Призначення керування (система)"
 
 #: src/frontend/mame/ui/inputopts.cpp:99
 msgctxt "menu-inputopts"
 msgid "Analog Input Adjustments"
-msgstr ""
+msgstr "Призначення аналогового керування"
 
 #: src/frontend/mame/ui/inputopts.cpp:101
 msgctxt "menu-inputopts"
 msgid "Keyboard Selection"
-msgstr ""
+msgstr "Вибір клавіатури"
 
 #: src/frontend/mame/ui/inputopts.cpp:103
 msgctxt "menu-inputopts"
 msgid "Toggle Inputs"
-msgstr ""
+msgstr "Перемкнути керування"
 
 #: src/frontend/mame/ui/inputopts.cpp:107
 msgctxt "menu-inputopts"
 msgid "Input Devices"
-msgstr ""
+msgstr "Пристрої керування"
 
 #: src/frontend/mame/ui/imgcntrl.cpp:132
 msgid "Cannot save over directory"
@@ -2004,6 +2019,10 @@ msgid ""
 "If this is your first time using %2$s, please see the %2$s.pdf file in the "
 "docs folder for information on setting up and using %2$s."
 msgstr ""
+"Не знайдено системних ROM'ів. Перевір указане налаштування шляху ROM'ів у %1$s.ini.\n"
+"\n"
+"При першому використанні %2$s переглянь %2$s.pdf у теці \"docs\" для отримання "
+"відомостей налаштування та використання %2$s."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:316
 #, c-format
@@ -2012,7 +2031,7 @@ msgstr "Укажи ім'я чи вибери: %1$s_."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:318
 msgid "Type name or select: (random)"
-msgstr "Укажи ім'я чи вибери: (випадково)."
+msgstr "Укажи ім'я чи вибери: (випадково)"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:332
 #, c-format
@@ -2243,7 +2262,7 @@ msgstr "Логотипи"
 #: src/frontend/mame/ui/dirmenu.cpp:72
 msgctxt "path-option"
 msgid "Scores"
-msgstr "Рекорди"
+msgstr "Рахунки"
 
 #: src/frontend/mame/ui/dirmenu.cpp:73
 msgctxt "path-option"
@@ -2282,7 +2301,7 @@ msgstr "Теки %1$s"
 #: src/frontend/mame/ui/dirmenu.cpp:421
 #, c-format
 msgid "%1$s Folder"
-msgstr ""
+msgstr "Тека %1$s"
 
 #: src/frontend/mame/ui/dirmenu.cpp:484
 msgid "Change Folder"
@@ -2300,7 +2319,7 @@ msgstr "Вилучити теку"
 #, c-format
 msgctxt "gfxview"
 msgid "Zoom = 1/%1$d"
-msgstr ""
+msgstr "Масштаб = 1 / %1$d"
 
 #: src/frontend/mame/ui/viewgfx.cpp:789 src/frontend/mame/ui/viewgfx.cpp:794
 #, c-format
@@ -2316,13 +2335,13 @@ msgstr "Розгорнути до розміру"
 #: src/frontend/mame/ui/viewgfx.cpp:822
 msgctxt "gfxview"
 msgid "All categories"
-msgstr ""
+msgstr "Усі категорії"
 
 #: src/frontend/mame/ui/viewgfx.cpp:824 src/frontend/mame/ui/viewgfx.cpp:829
 #, c-format
 msgctxt "gfxview"
 msgid "Category %1$d"
-msgstr ""
+msgstr "Категорія %1$d"
 
 #: src/frontend/mame/ui/viewgfx.cpp:926
 #, c-format
@@ -2364,7 +2383,7 @@ msgstr ""
 #, c-format
 msgctxt "gfxview"
 msgid "[root%1$s] %2$d/%3$d"
-msgstr ""
+msgstr "[root%1$s] %2$d / %3$d"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1157
 #, c-format
@@ -2376,19 +2395,19 @@ msgstr ""
 #, c-format
 msgctxt "gfxview"
 msgid " %1$d×%2$d color %3$X/%4$X"
-msgstr ""
+msgstr " %1$d * %2$d; колір %3$X / %4$X"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1305
 #, c-format
 msgctxt "gfxview"
 msgid "Tilemap %1$d/%2$d category %3$u"
-msgstr ""
+msgstr "Мапа плиток %1$d / %2$d; категорія %3$u"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1305
 #, c-format
 msgctxt "gfxview"
 msgid "Tilemap %1$d/%2$d "
-msgstr ""
+msgstr "Мапа плиток %1$d / %2$d "
 
 #: src/frontend/mame/ui/viewgfx.cpp:1327
 #, c-format
@@ -2400,11 +2419,11 @@ msgstr ""
 #, c-format
 msgctxt "gfxview"
 msgid " %1$d×%2$d origin (%3$d %4$d)"
-msgstr ""
+msgstr "%1$d * %2$d; XY-початок (%3$d %4$d)"
 
 #: src/frontend/mame/ui/selgame.cpp:442
 msgid "System Settings"
-msgstr ""
+msgstr "Налаштування системи"
 
 #: src/frontend/mame/ui/selgame.cpp:1058
 #, c-format
@@ -2425,12 +2444,12 @@ msgstr "%1$s - Шукати: %2$s_"
 #: src/frontend/mame/ui/selector.cpp:105
 msgctxt "menu-selector"
 msgid "[no matches]"
-msgstr ""
+msgstr "[без збігів]"
 
 #: src/frontend/mame/ui/selector.cpp:118
 msgctxt "menu-selector"
 msgid "[no choices]"
-msgstr ""
+msgstr "[без вибору]"
 
 #: src/frontend/mame/ui/selector.cpp:133
 #, c-format
@@ -2440,7 +2459,7 @@ msgstr "Натисни двічі ЛКМ чи %1$s для вибору."
 
 #: src/frontend/mame/ui/auditmenu.cpp:59
 msgid "Audit Media"
-msgstr ""
+msgstr "Перевірити медіа"
 
 #: src/frontend/mame/ui/auditmenu.cpp:63
 #, c-format
@@ -2453,7 +2472,7 @@ msgid ""
 "Auditing media for system %2$u of %3$u...\n"
 "%1$s"
 msgstr ""
-"Перевірка медіа для системи %2$u / %3$u...\n"
+"Перевірка медіа системи %2$u / %3$u...\n"
 "%1$s"
 
 #: src/frontend/mame/ui/auditmenu.cpp:119
@@ -2472,12 +2491,12 @@ msgstr ""
 #: src/frontend/mame/ui/auditmenu.cpp:139
 #, c-format
 msgid "Audit media for %1$u systems marked unavailable"
-msgstr "Перевірити медіа для %1$u систем позначених недоступними"
+msgstr "Перевірити медіа позначених недоступними %1$u систем"
 
 #: src/frontend/mame/ui/auditmenu.cpp:140
 #, c-format
 msgid "Audit media for all %1$u systems"
-msgstr "Перевірити медіа для всіх %1$u систем"
+msgstr "Перевірити медіа всіх %1$u систем"
 
 #: src/frontend/mame/ui/auditmenu.cpp:157
 #, c-format
@@ -2502,7 +2521,7 @@ msgstr "Приховати обидва"
 
 #: src/frontend/mame/ui/custui.cpp:142
 msgid "UI Language"
-msgstr ""
+msgstr "Мова"
 
 #: src/frontend/mame/ui/custui.cpp:167 src/frontend/mame/ui/custui.cpp:220
 msgid "System Names"
@@ -2510,7 +2529,7 @@ msgstr "Системні імена"
 
 #: src/frontend/mame/ui/custui.cpp:193 src/frontend/mame/ui/custui.cpp:223
 msgid "Show Side Panels"
-msgstr "Приховати бокові панелі"
+msgstr "Показати бокові панелі"
 
 #: src/frontend/mame/ui/custui.cpp:213
 msgid "Fonts"
@@ -2530,7 +2549,7 @@ msgstr "[вбудовано]"
 
 #: src/frontend/mame/ui/custui.cpp:334
 msgid "UI Fonts"
-msgstr ""
+msgstr "UI-шрифти"
 
 #: src/frontend/mame/ui/custui.cpp:363
 msgid "default"
@@ -2558,11 +2577,13 @@ msgstr "Розмір тексту відомостей"
 
 #: src/frontend/mame/ui/custui.cpp:529
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-msgstr "Зразок тексту - Сама біль - любов, головний замовник."
+msgstr ""
+"Зразок тексту:\n"
+"Сама біль - любов, головний замовник."
 
 #: src/frontend/mame/ui/custui.cpp:545
 msgid "UI Colors"
-msgstr ""
+msgstr "UI-кольори"
 
 #: src/frontend/mame/ui/custui.cpp:608
 msgctxt "color-option"
@@ -2784,12 +2805,12 @@ msgstr "Огляд: %1$s"
 
 #: src/frontend/mame/ui/analogipt.cpp:60
 msgid "Analog Input Adjustments"
-msgstr ""
+msgstr "Призначення аналогового керування"
 
 #: src/frontend/mame/ui/analogipt.cpp:92
 #, c-format
 msgid "Press %s to show menu"
-msgstr "Натисни %s для показу меню"
+msgstr "Натисни %s для показу меню."
 
 #: src/frontend/mame/ui/analogipt.cpp:372
 #, c-format
@@ -2813,7 +2834,7 @@ msgstr "%1$s чутливість"
 
 #: src/frontend/mame/ui/analogipt.cpp:402
 msgid "[no analog inputs are enabled]"
-msgstr ""
+msgstr "[не увімкнено аналогових керувань]"
 
 #: src/frontend/mame/ui/barcode.cpp:40
 msgid "Barcode Reader"
@@ -2834,7 +2855,7 @@ msgstr "Недійсна довжина штрих-коду!"
 #: src/frontend/mame/ui/mainmenu.cpp:114
 msgctxt "menu-main"
 msgid "Input Settings"
-msgstr ""
+msgstr "Налаштування керування"
 
 #: src/frontend/mame/ui/mainmenu.cpp:117
 msgctxt "menu-main"
@@ -2864,7 +2885,7 @@ msgstr "Відомості попередження"
 #: src/frontend/mame/ui/mainmenu.cpp:132
 msgctxt "menu-main"
 msgid "Media Image Information"
-msgstr ""
+msgstr "Відомості медіа-образу"
 
 #: src/frontend/mame/ui/mainmenu.cpp:134
 msgctxt "menu-main"
@@ -2950,7 +2971,7 @@ msgstr "Про %1$s"
 #: src/frontend/mame/ui/mainmenu.cpp:194
 msgctxt "menu-main"
 msgid "Start System"
-msgstr ""
+msgstr "Запустити систему"
 
 #: src/frontend/mame/ui/mainmenu.cpp:198
 msgctxt "menu-main"
@@ -2960,7 +2981,7 @@ msgstr "Вибрати нову систему"
 #: src/frontend/mame/ui/mainmenu.cpp:199
 msgctxt "menu-main"
 msgid "Close Menu"
-msgstr ""
+msgstr "Закрити меню"
 
 #: src/frontend/mame/ui/selmenu.cpp:77
 msgctxt "selmenu-artwork"
@@ -3030,7 +3051,7 @@ msgstr "Посібник"
 #: src/frontend/mame/ui/selmenu.cpp:90
 msgctxt "selmenu-artwork"
 msgid "Scores"
-msgstr "Рекорди"
+msgstr "Рахунки"
 
 #: src/frontend/mame/ui/selmenu.cpp:91
 msgctxt "selmenu-artwork"
@@ -3065,11 +3086,11 @@ msgstr "Показати перегляд DAT"
 
 #: src/frontend/mame/ui/selmenu.cpp:260
 msgid "Select Software Package Part"
-msgstr ""
+msgstr "Вибір частини програмного пакета:"
 
 #: src/frontend/mame/ui/selmenu.cpp:330
 msgid "Select System BIOS"
-msgstr ""
+msgstr "Вибір BIOS'у системи"
 
 #: src/frontend/mame/ui/selmenu.cpp:644 src/frontend/mame/ui/selmenu.cpp:675
 #, c-format
@@ -3172,7 +3193,7 @@ msgstr "Загальні відомості"
 #: src/frontend/mame/ui/selmenu.cpp:2864
 #, c-format
 msgid "Short Name\t%1$s\n"
-msgstr ""
+msgstr "Коротке ім'я\t%1$s\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2865
 #, c-format
@@ -3499,7 +3520,7 @@ msgid ""
 "\n"
 "The selected option enables the following items:\n"
 msgstr ""
-"(Опцію змонтовано в запущеній системі)\n"
+"[Опцію змонтовано в запущеній системі]\n"
 "\n"
 "Опція: %1$s\n"
 "Пристрій: %2$s\n"
@@ -3516,7 +3537,7 @@ msgid ""
 "\n"
 "If you select this option, the following items will be enabled:\n"
 msgstr ""
-"(Опцію не змонтовано в запущеній системі)\n"
+"[Опцію не змонтовано в запущеній системі]\n"
 "\n"
 "Опція: %1$s\n"
 "Пристрій: %2$s\n"
@@ -3534,17 +3555,17 @@ msgstr "* Відео:\n"
 #: src/frontend/mame/ui/devopt.cpp:120
 #, c-format
 msgid "  Screen '%1$s': Vector\n"
-msgstr "  Екран '%1$s': Вектор\n"
+msgstr "  Екран \"%1$s\": Вектор\n"
 
 #: src/frontend/mame/ui/devopt.cpp:139
 #, c-format
 msgid "  Screen '%1$s': %2$d × %3$d (V) %4$s Hz\n"
-msgstr ""
+msgstr "  Екран \"%1$s\": %2$d * %3$d (В) %4$s Гц\n"
 
 #: src/frontend/mame/ui/devopt.cpp:140
 #, c-format
 msgid "  Screen '%1$s': %2$d × %3$d (H) %4$s Hz\n"
-msgstr ""
+msgstr "  Екран \"%1$s\": %2$d * %3$d (Г) %4$s Гц\n"
 
 #: src/frontend/mame/ui/devopt.cpp:154
 msgid "* Sound:\n"
@@ -3557,13 +3578,13 @@ msgid ""
 "  %1$d options    [default: %2$s]\n"
 msgstr ""
 "* BIOS-налаштування:\n"
-"  %1$d опцій    (типово: %2$s)\n"
+"  %1$d опцій    [типово: %2$s]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:262 src/frontend/mame/ui/devopt.cpp:278
 #: src/frontend/mame/ui/devopt.cpp:339
 #, c-format
 msgid "  %1$s    [default: %2$s]\n"
-msgstr "  %1$s    (типово: %2$s)\n"
+msgstr "  %1$s    [типово: %2$s]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:267 src/frontend/mame/ui/devopt.cpp:283
 #, c-format
@@ -3585,42 +3606,42 @@ msgstr "* Пристрої керування:\n"
 #: src/frontend/mame/ui/devopt.cpp:300
 #, c-format
 msgid "  User inputs    [%1$d inputs]\n"
-msgstr "  Користувацьке керування    (%1$d даних)\n"
+msgstr "  Користувацьке керування    [%1$d даних]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:302
 #, c-format
 msgid "  Mahjong inputs    [%1$d inputs]\n"
-msgstr "  Маджонг-керування    (%1$d даних)\n"
+msgstr "  Маджонг-керування    [%1$d даних]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:304
 #, c-format
 msgid "  Hanafuda inputs    [%1$d inputs]\n"
-msgstr "  Ханафуда-керування    (%1$d даних)\n"
+msgstr "  Ханафуда-керування    [%1$d даних]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:306
 #, c-format
 msgid "  Gambling inputs    [%1$d inputs]\n"
-msgstr "  Азартні керування    (%1$d даних)\n"
+msgstr "  Азартні керування    [%1$d даних]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:308
 #, c-format
 msgid "  Analog inputs    [%1$d inputs]\n"
-msgstr "  Аналогові керування    (%1$d даних)\n"
+msgstr "  Аналогові керування    [%1$d даних]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:310
 #, c-format
 msgid "  Adjuster inputs    [%1$d inputs]\n"
-msgstr "  Регулювальні керування    (%1$d даних)\n"
+msgstr "  Регулювальні керування    [%1$d даних]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:312
 #, c-format
 msgid "  Keypad inputs    [%1$d inputs]\n"
-msgstr "  Міні-клавіатурні керування    (%1$d даних)\n"
+msgstr "  Міні-клавіатурні керування    [%1$d даних]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:314
 #, c-format
 msgid "  Keyboard inputs    [%1$d inputs]\n"
-msgstr "  Клавіатурні керування    (%1$d даних)\n"
+msgstr "  Клавіатурні керування    [%1$d даних]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:319
 msgid "* Media Options:\n"
@@ -4154,7 +4175,7 @@ msgstr "%p Маджонг Ставка"
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong Take Score"
-msgstr "%p Маджонг Отримання пунктів"
+msgstr "%p Маджонг Узяття рахунку"
 
 #: src/emu/inpttype.ipp:81 src/emu/inpttype.ipp:199 src/emu/inpttype.ipp:280
 #: src/emu/inpttype.ipp:347
@@ -4292,7 +4313,7 @@ msgstr "Зупинка"
 #: src/emu/inpttype.ipp:112
 msgctxt "input-name"
 msgid "Take Score"
-msgstr "Отримання пунктів"
+msgstr "Узяття рахунку"
 
 #: src/emu/inpttype.ipp:113
 msgctxt "input-name"
@@ -5792,11 +5813,11 @@ msgstr ""
 
 #: plugins/cheatfind/init.lua:678
 msgid "Left less than right"
-msgstr "Ліворуч менше, ніж праворуч"
+msgstr "Ліворуч менше праворуч"
 
 #: plugins/cheatfind/init.lua:680
 msgid "Left greater than right"
-msgstr "Ліворуч більше, ніж праворуч"
+msgstr "Ліворуч більше праворуч"
 
 #: plugins/cheatfind/init.lua:682
 msgid "Left equal to right"
@@ -5816,11 +5837,11 @@ msgstr "Ліворуч не рівне праворуч за бітмаскою"
 
 #: plugins/cheatfind/init.lua:690
 msgid "Left less than value"
-msgstr "Ліворуч менше, ніж значення"
+msgstr "Ліворуч менше значення"
 
 #: plugins/cheatfind/init.lua:692
 msgid "Left greater than value"
-msgstr "Ліворуч більше, ніж значення"
+msgstr "Ліворуч більше значення"
 
 #: plugins/cheatfind/init.lua:694
 msgid "Left equal to value"
@@ -6086,7 +6107,7 @@ msgstr "TIMECODE: Додаток %d розпочато на %s."
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Extra %d duration %s"
-msgstr "TIMECODE: Тривалість додатку %d %s."
+msgstr "TIMECODE: Тривалість додатка %d %s."
 
 #: plugins/timecode/init.lua:207
 #, lua-format
@@ -6166,7 +6187,7 @@ msgstr "[не встановлено]"
 #: plugins/inputmacro/inputmacro_menu.lua:359
 msgctxt "plugin-inputmacro"
 msgid "Activation combination"
-msgstr ""
+msgstr "Активація комбінації"
 
 #: plugins/inputmacro/inputmacro_menu.lua:362
 msgctxt "plugin-inputmacro"
@@ -6276,7 +6297,7 @@ msgstr "Виконано"
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Press %s to delete"
-msgstr "Натисни %s для видалення"
+msgstr "Натисни %s для видалення."
 
 #: plugins/inputmacro/inputmacro_menu.lua:573
 msgctxt "plugin-inputmacro"
@@ -6391,7 +6412,7 @@ msgstr "Команда"
 #: plugins/data/data_story.lua:22
 msgctxt "plugin-data"
 msgid "Mamescore"
-msgstr "MAME-пункти"
+msgstr "MAME-рахунок"
 
 #: plugins/data/data_sysinfo.lua:15
 msgctxt "plugin-data"
@@ -6406,7 +6427,7 @@ msgstr "Рекорди"
 #: plugins/data/data_marp.lua:136
 msgctxt "plugin-data"
 msgid "MARPScore"
-msgstr "MARP-пункти"
+msgstr "MARP-рахунок"
 
 #: plugins/data/data_gameinit.lua:16
 msgctxt "plugin-data"
@@ -6461,7 +6482,7 @@ msgstr "Скасувати"
 #: plugins/commonui/init.lua:197
 msgctxt "plugin-commonui"
 msgid "Invalid combination entered"
-msgstr ""
+msgstr "Указано недійсну комбінацію."
 
 #: plugins/commonui/init.lua:203
 #, lua-format
@@ -6470,169 +6491,5 @@ msgid ""
 "Enter combination or press %s to cancel\n"
 "%s"
 msgstr ""
-
-#~ msgid "Start Machine"
-#~ msgstr "Запустити машину"
-
-#~ msgid "Visible Delay"
-#~ msgstr "Видима затримка"
-
-#~ msgctxt "menu-main"
-#~ msgid "Start Machine"
-#~ msgstr "Запустити машину"
-
-#~ msgctxt "menu-main"
-#~ msgid "Return to Machine"
-#~ msgstr "Повернутися до машини"
-
-#~ msgid "Software part selection:"
-#~ msgstr "Вибір програмної частини:"
-
-#~ msgid "BIOS selection:"
-#~ msgstr "Вибір BIOS:"
-
-#~ msgid ""
-#~ "This driver requires images to be loaded in the following device(s): "
-#~ msgstr "Драйверу необхідне завантаження образів на пристрої: "
-
-#~ msgid ""
-#~ "\n"
-#~ "    Configuration saved    \n"
-#~ "\n"
-#~ msgstr ""
-#~ "\n"
-#~ "    Конфігурацію збережено.    \n"
-#~ "\n"
-
-#~ msgid "Re-select last machine launched"
-#~ msgstr "Вибрати останню запущену машину знову"
-
-#~ msgid ""
-#~ "One or more ROMs/CHDs for this machine are incorrect. The machine may not "
-#~ "run correctly.\n"
-#~ msgstr ""
-#~ "Один або декілька ROM'ів / CHD'ів машини неправильні. Машина може "
-#~ "неналежно працювати.\n"
-
-#~ msgid ""
-#~ "One or more ROMs/CHDs for this machine have not been correctly dumped.\n"
-#~ msgstr "Один або декілька ROM'ів / CHD'ів машини неналежно задамплено.\n"
-
-#~ msgid "This machine requires external artwork files.\n"
-#~ msgstr "Машині необхідні зовнішні файли оформлення.\n"
-
-#~ msgid ""
-#~ "This machine was never completed. It may exhibit strange behavior or "
-#~ "missing elements that are not bugs in the emulation.\n"
-#~ msgstr ""
-#~ "Машину не завершено. Її поведінка дивна чи відсутні елементи, які не є "
-#~ "помилками емуляції.\n"
-
-#~ msgid ""
-#~ "\n"
-#~ "THIS MACHINE DOESN'T WORK. The emulation for this machine is not yet "
-#~ "complete. There is nothing you can do to fix this problem except wait for "
-#~ "the developers to improve the emulation.\n"
-#~ msgstr ""
-#~ "\n"
-#~ "Машина не працює, її емуляцію не завершено. Дочекайся виправлення "
-#~ "проблеми виробниками покращенням емуляції.\n"
-
-#, c-format
-#~ msgid ""
-#~ "No machines found. Please check the rompath specified in the %1$s.ini "
-#~ "file.\n"
-#~ "\n"
-#~ "If this is your first time using %2$s, please see the config.txt file in "
-#~ "the docs directory for information on configuring %2$s."
-#~ msgstr ""
-#~ "Не знайдено машин. Перевір указаний у %1$s.ini шлях ROM'ів.\n"
-#~ "\n"
-#~ "При першому використанні %2$s переглянь config.txt у каталозі документів "
-#~ "для отримання відомостей налаштування %2$s."
-
-#~ msgid "General Inputs"
-#~ msgstr "Загальне керування"
-
-#~ msgid "Save Configuration"
-#~ msgstr "Зберегти конфігурацію"
-
-#~ msgid "Settings"
-#~ msgstr "Налаштування"
-
-#~ msgid "Configure Directories"
-#~ msgstr "Налаштувати каталоги"
-
-#~ msgid "Select category:"
-#~ msgstr "Вибери категорію:"
-
-#~ msgid "This machine has no BIOS."
-#~ msgstr "Відсутній BIOS машини."
-
-#~ msgid "Save Machine Configuration"
-#~ msgstr "Зберегти конфігурацію машини"
-
-#~ msgid "Configure Machine:"
-#~ msgstr "Налаштувати машину:"
-
-#~ msgid "This machine has no configurable inputs."
-#~ msgstr "Відсутні налаштовувані керування машини."
-
-#~ msgid "Invalid sequence entered"
-#~ msgstr "Указано недійсну послідовність."
-
-#~ msgid "Folders Setup"
-#~ msgstr "Налаштування тек"
-
-#, c-format
-#~ msgid "Zoom = 1 / %1$d"
-#~ msgstr "Масштаб = 1 / %1$d"
-
-#~ msgid "Configure Machine"
-#~ msgstr "Налаштувати машину"
-
-#~ msgid "UI Customization Settings"
-#~ msgstr "Зміна UI-налаштувань"
-
-#~ msgid "UI Fonts Settings"
-#~ msgstr "Налаштування UI-шрифту"
-
-#~ msgid "UI Color Settings"
-#~ msgstr "Налаштування UI-кольорів"
-
-#~ msgid "Input (general)"
-#~ msgstr "Керування (загальне)"
-
-#~ msgid "Input (this machine)"
-#~ msgstr "Керування (машина)"
-
-#~ msgid "Analog Controls"
-#~ msgstr "Аналогове керування"
-
-#~ msgid "Image Information"
-#~ msgstr "Відомості образу"
-
-#, c-format
-#~ msgid "  Screen '%1$s': %2$d × %3$d (V) %4$s Hz\n"
-#~ msgstr "  Екран '%1$s': %2$d * %3$d (В) %4$s Гц\n"
-
-#, c-format
-#~ msgid "  Screen '%1$s': %2$d × %3$d (H) %4$s Hz\n"
-#~ msgstr "  Екран '%1$s': %2$d * %3$d (Г) %4$s Гц\n"
-
-#~ msgctxt "plugin-inputmacro"
-#~ msgid "Activation sequence"
-#~ msgstr "Послідовність активації"
-
-#~ msgctxt "plugin-commonui"
-#~ msgid "Invalid sequence entered"
-#~ msgstr "Указано недійсну послідовність."
-
-#, lua-format
-#~ msgctxt "plugin-commonui"
-#~ msgid ""
-#~ "Enter sequence or press %s to cancel\n"
-#~ "%s"
-#~ msgstr ""
-#~ "Укажи послідовність або натисни %s для скасування.\n"
-#~ "%s"
+"Укажи комбінацію чи натисни %s для скасування.\n"
+"%s"

@@ -8,6 +8,7 @@
 #include "netlist/devices/net_lib.h"
 
 NETLIST_START(perf)
+{
 
 	SOLVER(Solver, 48000)
 
@@ -23,4 +24,4 @@ NETLIST_START(perf)
 	NET_C(CLK, TESTCHIP.1, TESTCHIP.13)
 	NET_C(CLK2, TESTCHIP.2, TESTCHIP.12)
 
-NETLIST_END()
+}

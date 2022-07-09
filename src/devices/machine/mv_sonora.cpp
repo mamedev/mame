@@ -25,7 +25,8 @@ mac_video_sonora_device::mac_video_sonora_device(const machine_config &mconfig, 
 	m_screen(*this, "screen"),
 	m_palette(*this, "palette"),
 	m_monitor_config(*this, "monitor"),
-	m_screen_vblank(*this)
+	m_screen_vblank(*this),
+	m_is32bit(false)
 {
 }
 
@@ -47,7 +48,7 @@ void mac_video_sonora_device::device_reset()
 	m_modeline_id = -1;
 	m_mode = 0x9f;
 	m_depth = 0;
-	m_monitor_id = 0;
+	m_monitor_id = 8;
 	m_vtest = 0;
 	m_vram_offset = 0;
 }
@@ -108,34 +109,110 @@ uint32_t mac_video_sonora_device::screen_update(screen_device &screen, bitmap_rg
 	uint32_t hres = m.htot - m.hfp - m.hs - m.hbp;
 	uint32_t vres = m.vtot - m.vfp - m.vs - m.vbp;
 
-	const uint64_t *vram = m_vram + (m_vram_offset / 8);
 	const pen_t *pens = m_palette->pens();
-	switch(m_depth) {
-	case 0: // 1bpp
-		for(uint32_t y = 0; y != vres; y++) {
-			uint32_t *scanline = &bitmap.pix(y);
-			for(uint32_t x = 0; x != hres; x += 64) {
-				uint64_t pixels = *vram ++;
-				for(int32_t bit = 63; bit >= 0; bit --)
-					*scanline ++ = pens[(((pixels >> bit) & 1) << 7) | 0x7f];
-			}
-		}
-		break;
 
-	case 3: // 8bpp
-		for(uint32_t y = 0; y != vres; y++) {
-			uint32_t *scanline = &bitmap.pix(y);
-			for(uint32_t x = 0; x != hres; x += 8) {
-				uint64_t pixels = *vram ++;
-				for(int32_t bit = 56; bit >= 0; bit -= 8)
-					*scanline ++ = pens[((pixels >> bit) & 0xff)];
+	if (m_is32bit) {
+		const uint32_t *vram = (uint32_t *)(m_vram + (m_vram_offset / 8));
+		switch (m_depth)
+		{
+		case 0: // 1bpp
+			for (uint32_t y = 0; y != vres; y++)
+			{
+				uint32_t *scanline = &bitmap.pix(y);
+				for (uint32_t x = 0; x != hres; x += 32)
+				{
+					uint32_t pixels = *vram++;
+					for (int32_t bit = 31; bit >= 0; bit--)
+						*scanline++ = pens[(((pixels >> bit) & 1) << 7) | 0x7f];
+				}
 			}
-		}
-		break;
+			break;
 
-	default:
-		bitmap.fill(0xff0000);
-		break;
+		case 1: // 2bpp
+			for (uint32_t y = 0; y != vres; y++)
+			{
+				uint32_t *scanline = &bitmap.pix(y);
+				for (uint32_t x = 0; x != hres; x += 16)
+				{
+					uint32_t pixels = *vram++;
+					for (int32_t bit = 30; bit >= 0; bit -= 2)
+						*scanline++ = pens[(((pixels >> bit) & 0x3)<<6) | 0x3f];
+				}
+			}
+			break;
+
+		case 2: // 4bpp
+			for (uint32_t y = 0; y != vres; y++)
+			{
+				uint32_t *scanline = &bitmap.pix(y);
+				for (uint32_t x = 0; x != hres; x += 8)
+				{
+					uint32_t pixels = *vram++;
+					for (int32_t bit = 28; bit >= 0; bit -= 4)
+						*scanline++ = pens[(((pixels >> bit) & 0x0f)<<4) | 0x0f];
+				}
+			}
+			break;
+
+		case 3: // 8bpp
+			for (uint32_t y = 0; y != vres; y++)
+			{
+				uint32_t *scanline = &bitmap.pix(y);
+				for (uint32_t x = 0; x != hres; x += 4)
+				{
+					uint32_t pixels = *vram++;
+					for (int32_t bit = 24; bit >= 0; bit -= 8)
+						*scanline++ = pens[((pixels >> bit) & 0xff)];
+				}
+			}
+			break;
+
+		case 4: // 16bpp
+			for (uint32_t y = 0; y != vres; y++)
+			{
+				uint32_t *scanline = &bitmap.pix(y);
+				for (uint32_t x = 0; x != hres; x += 2)
+				{
+					const uint32_t pixels = *vram++;
+					*scanline++ = rgb_t(((pixels >> 26) & 0x1f) << 3, ((pixels >> 21) & 0x1f) << 3, ((pixels >> 16) & 0x1f) << 3);
+					*scanline++ = rgb_t(((pixels >> 10) & 0x1f) << 3, ((pixels >> 5) & 0x1f) << 3, (pixels & 0x1f) << 3);
+				}
+			}
+			break;
+
+		default:
+			bitmap.fill(0xff0000);
+			break;
+		}
+	} else {
+		const uint64_t *vram = m_vram + (m_vram_offset / 8);
+		switch(m_depth) {
+		case 0: // 1bpp
+			for(uint32_t y = 0; y != vres; y++) {
+				uint32_t *scanline = &bitmap.pix(y);
+				for(uint32_t x = 0; x != hres; x += 64) {
+					uint64_t pixels = *vram ++;
+					for(int32_t bit = 63; bit >= 0; bit --)
+						*scanline ++ = pens[(((pixels >> bit) & 1) << 7) | 0x7f];
+				}
+			}
+			break;
+
+		case 3: // 8bpp
+			for(uint32_t y = 0; y != vres; y++) {
+				uint32_t *scanline = &bitmap.pix(y);
+				for(uint32_t x = 0; x != hres; x += 8) {
+					uint64_t pixels = *vram ++;
+					for(int32_t bit = 56; bit >= 0; bit -= 8)
+						*scanline ++ = pens[((pixels >> bit) & 0xff)];
+				}
+			}
+			break;
+
+		default:
+			bitmap.fill(0xff0000);
+			break;
+		}
 	}
 
 	return 0;

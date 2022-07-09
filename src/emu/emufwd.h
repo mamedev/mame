@@ -187,6 +187,7 @@ class running_machine;
 
 // declared in mconfig.h
 namespace emu::detail { class machine_config_replace; }
+struct internal_layout;
 class machine_config;
 
 // declared in natkeyboard.h

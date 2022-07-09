@@ -78,17 +78,40 @@ namespace netlist
 
 	namespace detail
 	{
-		// -----------------------------------------------------------------------------
-		// abstract_t
-		// -----------------------------------------------------------------------------
+		struct alias_t
+		{
+			alias_t(alias_type type, pstring alias, pstring references)
+			: m_type(type)
+			, m_alias(alias)
+			, m_references(references)
+			{}
 
+			alias_t(const alias_t &) = default;
+			alias_t &operator=(const alias_t &) = default;
+			alias_t(alias_t &&) noexcept = default;
+			alias_t &operator=(alias_t &&) noexcept = default;
+
+			pstring name() const { return m_alias; }
+			pstring references() const { return m_references; }
+			alias_type type() const { return m_type; }
+		private:
+			alias_type m_type;
+			pstring m_alias;
+			pstring m_references;
+		};
+
+		///
+		/// \brief class containing the abstract net list
+		///
+		/// After parsing a net list this class contains all raw
+		/// connections, parameter values and devices.
 		struct abstract_t
 		{
-			using link_t = std::pair<pstring, pstring>;
+			using connection_t = std::pair<pstring, pstring>;
 
 			abstract_t(log_type &log) : m_factory(log) { }
-			std::unordered_map<pstring, pstring>        m_alias;
-			std::vector<link_t>                         m_links;
+			std::unordered_map<pstring, alias_t>        m_aliases;
+			std::vector<connection_t>                   m_connections;
 			std::unordered_map<pstring, pstring>        m_param_values;
 			models_t::raw_map_t                         m_models;
 
@@ -179,11 +202,11 @@ namespace netlist
 		models_t &models() noexcept { return m_models; }
 		const models_t &models() const noexcept { return m_models; }
 
-		netlist_state_t &nlstate() { return m_nlstate; }
-		const netlist_state_t &nlstate() const { return m_nlstate; }
+		netlist_state_t &nlstate() noexcept { return m_nlstate; }
+		const netlist_state_t &nlstate() const noexcept { return m_nlstate; }
 
-		nlparse_t &parser() { return m_parser; }
-		const nlparse_t &parser() const { return m_parser; }
+		nlparse_t &parser() noexcept { return m_parser; }
+		const nlparse_t &parser() const noexcept { return m_parser; }
 
 		log_type &log() noexcept;
 		const log_type &log() const noexcept;
@@ -196,10 +219,10 @@ namespace netlist
 		void merge_nets(detail::net_t &this_net, detail::net_t &other_net);
 
 		void connect_terminals(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
-		void connect_input_output(detail::core_terminal_t &in, detail::core_terminal_t &out);
-		void connect_terminal_output(terminal_t &in, detail::core_terminal_t &out);
-		void connect_terminal_input(terminal_t &term, detail::core_terminal_t &inp);
-		bool connect_input_input(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
+		void connect_input_output(detail::core_terminal_t &input, detail::core_terminal_t &output);
+		void connect_terminal_output(detail::core_terminal_t &terminal, detail::core_terminal_t &output);
+		void connect_terminal_input(detail::core_terminal_t &terminal, detail::core_terminal_t &input);
+		bool connect_input_input(detail::core_terminal_t &input1, detail::core_terminal_t &input2);
 
 		bool connect(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
 

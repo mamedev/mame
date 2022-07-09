@@ -13,11 +13,10 @@
 
 #if defined(OSD_SDL)
 
-// standard sdl header
-#include <SDL2/SDL.h>
+#include "input_sdlcommon.h"
+
 #include <cctype>
 #include <cstddef>
-#include <mutex>
 #include <memory>
 #include <algorithm>
 
@@ -36,7 +35,6 @@
 
 #include "../../sdl/osdsdl.h"
 #include "input_common.h"
-#include "input_sdlcommon.h"
 
 
 #define GET_WINDOW(ev) window_from_id((ev)->windowID)
@@ -290,6 +288,50 @@ bool sdl_osd_interface::should_hide_mouse()
 void sdl_osd_interface::process_events_buf()
 {
 	SDL_PumpEvents();
+}
+
+//============================================================
+//  devmap_init - initializes a device_map based on
+//   an input option prefix and max number of devices
+//============================================================
+
+void device_map_t::init(running_machine &machine, const char *opt, int max_devices, const char *label)
+{
+	int dev;
+	char defname[20];
+
+	// The max devices the user specified, better not be bigger than the max the arrays can old
+	assert(max_devices <= MAX_DEVMAP_ENTRIES);
+
+	// Initialize the map to default uninitialized values
+	for (dev = 0; dev < MAX_DEVMAP_ENTRIES; dev++)
+	{
+		map[dev].name.clear();
+		map[dev].physical = -1;
+		logical[dev] = -1;
+	}
+	initialized = 0;
+
+	// populate the device map up to the max number of devices
+	for (dev = 0; dev < max_devices; dev++)
+	{
+		const char *dev_name;
+
+		// derive the parameter name from the option name and index. For instance: lightgun_index1 to lightgun_index8
+		sprintf(defname, "%s%d", opt, dev + 1);
+
+		// Get the user-specified name that matches the parameter
+		dev_name = machine.options().value(defname);
+
+		// If they've specified a name and it's not "auto", treat it as a custom mapping
+		if (dev_name && *dev_name && strcmp(dev_name, OSDOPTVAL_AUTO))
+		{
+			// remove the spaces from the name store it in the index
+			map[dev].name = remove_spaces(dev_name);
+			osd_printf_verbose("%s: Logical id %d: %s\n", label, dev + 1, map[dev].name);
+			initialized = 1;
+		}
+	}
 }
 
 #endif

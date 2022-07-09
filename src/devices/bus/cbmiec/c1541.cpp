@@ -138,6 +138,7 @@
 
 #include "emu.h"
 #include "c1541.h"
+#include "formats/fs_cbmdos.h"
 #include "bus/centronics/ctronics.h"
 
 
@@ -911,6 +912,7 @@ void c1541_device_base::floppy_formats(format_registration &fr)
 {
 	fr.add(FLOPPY_D64_FORMAT);
 	fr.add(FLOPPY_G64_FORMAT);
+	fr.add(fs::CBMDOS);
 }
 
 

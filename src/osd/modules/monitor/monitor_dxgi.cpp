@@ -5,7 +5,6 @@
 *
 */
 
-#include "emu.h"
 #include "modules/osdmodule.h"
 #include "monitor_module.h"
 
@@ -20,6 +19,7 @@
 #include "strconv.h"
 #include "modules/lib/osdlib.h"
 #include "monitor_common.h"
+#include "osdcore.h"
 #include "window.h"
 #include "windows/video.h"
 
