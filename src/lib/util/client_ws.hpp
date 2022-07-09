@@ -4,7 +4,7 @@
 /*
    Changes to the websocket client
 
-   July 2022: (Michael Zapf)
+   July 2022: (Michael Zapf, patch by Pete Eberlein [peberlein])
       Symptom: During the initial handshake, the ws client reads the HTTP header
       from the server and then waits for more data to come. In cases where the
       websocket server sends data immediately after the handshake to the client,
