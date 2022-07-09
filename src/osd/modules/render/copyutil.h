@@ -11,6 +11,10 @@
 #ifndef __RENDER_COPYUTIL__
 #define __RENDER_COPYUTIL__
 
+#include "palette.h"
+
+#include <cassert>
+
 
 class copy_util
 {

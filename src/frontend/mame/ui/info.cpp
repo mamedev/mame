@@ -362,11 +362,17 @@ std::string machine_info::game_info_string() const
 	std::ostringstream buf;
 
 	// print description, manufacturer, and CPU:
+	std::string_view src(m_machine.system().type.source());
+	auto prefix(src.find("src/mame/"));
+	if (std::string_view::npos == prefix)
+		prefix = src.find("src\\mame\\");
+	if (std::string_view::npos != prefix)
+		src.remove_prefix(prefix + 9);
 	util::stream_format(buf, _("%1$s\n%2$s %3$s\nDriver: %4$s\n\nCPU:\n"),
 			system_list::instance().systems()[driver_list::find(m_machine.system().name)].description,
 			m_machine.system().year,
 			m_machine.system().manufacturer,
-			core_filename_extract_base(m_machine.system().type.source()));
+			src);
 
 	// loop over all CPUs
 	execute_interface_enumerator execiter(m_machine.root_device());
@@ -519,6 +525,12 @@ menu_game_info::menu_game_info(mame_ui_manager &mui, render_container &container
 
 menu_game_info::~menu_game_info()
 {
+}
+
+void menu_game_info::menu_activated()
+{
+	// screen modes can be reconfigured while the menu isn't displayed, etc.
+	reset_layout();
 }
 
 void menu_game_info::populate_text(std::optional<text_layout> &layout, float &width, int &lines)

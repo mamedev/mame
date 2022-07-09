@@ -355,7 +355,7 @@
 			<color red="0.12" green="0.00" blue="0.00"/>
 		</rect>
 	</element>
-	<element name="lamp_162_1" defstate="0">
+	<element name="lamp_162_1" defstate="0" inputtag="AUX2" inputmask="0x80">
 		<rect state="1">
 			<color red="1.00" green="0.00" blue="0.00"/>
 		</rect>
@@ -535,7 +535,7 @@
 			<color red="0.06" green="0.06" blue="0.12"/>
 		</rect>
 	</element>
-	<element name="lamp_48_1" defstate="0">
+	<element name="lamp_48_1" defstate="0" inputtag="BLACK2" inputmask="0x20">
 		<rect state="1">
 			<color red="0.50" green="0.50" blue="1.00"/>
 		</rect>
@@ -1575,7 +1575,7 @@
 			<color red="0.12" green="0.12" blue="0.06"/>
 		</rect>
 	</element>
-	<element name="lamp_22_1" defstate="0">
+	<element name="lamp_22_1" defstate="0" inputtag="BLACK2" inputmask="0x80">
 		<rect state="1">
 			<color red="1.00" green="1.00" blue="0.50"/>
 		</rect>
@@ -3151,7 +3151,7 @@
 			<color red="0.12" green="0.00" blue="0.00"/>
 		</rect>
 	</element>
-	<element name="colour_button_196">
+	<element name="colour_button_196" inputtag="BLACK1" inputmask="0x01">
 		<rect state="1">
 			<color red="1.00" green="0.00" blue="0.00"/>
 		</rect>
@@ -3179,7 +3179,7 @@
 			<color red="0.12" green="0.00" blue="0.00"/>
 		</rect>
 	</element>
-	<element name="colour_button_197">
+	<element name="colour_button_197" inputtag="BLACK2" inputmask="0x02">
 		<rect state="1">
 			<color red="1.00" green="0.00" blue="0.00"/>
 		</rect>
@@ -3203,7 +3203,7 @@
 			<color red="0.12" green="0.06" blue="0.00"/>
 		</rect>
 	</element>
-	<element name="colour_button_198">
+	<element name="colour_button_198" inputtag="BLACK2" inputmask="0x01">
 		<rect state="1">
 			<color red="1.00" green="0.50" blue="0.00"/>
 		</rect>
@@ -3223,7 +3223,7 @@
 			<color red="0.12" green="0.00" blue="0.00"/>
 		</rect>
 	</element>
-	<element name="colour_button_199">
+	<element name="colour_button_199" inputtag="BLACK2" inputmask="0x04">
 		<rect state="1">
 			<color red="1.00" green="0.00" blue="0.00"/>
 		</rect>
@@ -3247,7 +3247,7 @@
 			<color red="0.12" green="0.00" blue="0.00"/>
 		</rect>
 	</element>
-	<element name="colour_button_200">
+	<element name="colour_button_200" inputtag="BLACK2" inputmask="0x08">
 		<rect state="1">
 			<color red="1.00" green="0.00" blue="0.00"/>
 		</rect>
@@ -3271,7 +3271,7 @@
 			<color red="0.12" green="0.00" blue="0.00"/>
 		</rect>
 	</element>
-	<element name="colour_button_201">
+	<element name="colour_button_201" inputtag="BLACK2" inputmask="0x10">
 		<rect state="1">
 			<color red="1.00" green="0.00" blue="0.00"/>
 		</rect>
@@ -3315,7 +3315,7 @@
 			<color red="0.12" green="0.12" blue="0.00"/>
 		</rect>
 	</element>
-	<element name="colour_button_203">
+	<element name="colour_button_203" inputtag="BLACK2" inputmask="0x40">
 		<rect state="1">
 			<color red="1.00" green="1.00" blue="0.00"/>
 		</rect>
@@ -3423,17 +3423,17 @@
 		</rect>
 	</element>
 	<element name="led_digit_red">
-		<led7seg>
+		<led7seg invert="1">
 			<color red="1.0" green="0.0" blue="0.0"/>
 		</led7seg>
 	</element>
 	<element name="led_digit_green">
-		<led7seg>
+		<led7seg invert="1">
 			<color red="0.0" green="1.0" blue="0.0"/>
 		</led7seg>
 	</element>
 	<element name="led_digit_blue">
-		<led7seg>
+		<led7seg invert="1">
 			<color red="0.0" green="0.5" blue="1.0"/>
 		</led7seg>
 	</element>
@@ -3458,31 +3458,31 @@
 	</element>
 	<element name="label_5">
 		<text string="LOTTERY">
-			<color red="0.0" green="0.0" blue="0.0"/>
+			<color red="1.0" green="1.0" blue="1.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.45"/>
 		</text>
 		<text string="TICKET">
-			<color red="0.0" green="0.0" blue="0.0"/>
+			<color red="1.0" green="1.0" blue="1.0"/>
 			<bounds x="0.05" y="0.50" width="0.90" height="0.45"/>
 		</text>
 	</element>
 	<element name="label_28">
 		<text string="Win">
-			<color red="0.0" green="0.0" blue="0.0"/>
+			<color red="1.0" green="1.0" blue="1.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.45"/>
 		</text>
 		<text string="Line">
-			<color red="0.0" green="0.0" blue="0.0"/>
+			<color red="1.0" green="1.0" blue="1.0"/>
 			<bounds x="0.05" y="0.50" width="0.90" height="0.45"/>
 		</text>
 	</element>
 	<element name="label_29">
 		<text string="Win">
-			<color red="0.0" green="0.0" blue="0.0"/>
+			<color red="1.0" green="1.0" blue="1.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.45"/>
 		</text>
 		<text string="Line">
-			<color red="0.0" green="0.0" blue="0.0"/>
+			<color red="1.0" green="1.0" blue="1.0"/>
 			<bounds x="0.05" y="0.50" width="0.90" height="0.45"/>
 		</text>
 	</element>
@@ -3494,27 +3494,27 @@
 	</element>
 	<element name="label_41">
 		<text string="BEER MONEY">
-			<color red="0.0" green="0.0" blue="0.0"/>
+			<color red="1.0" green="1.0" blue="1.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="label_58">
 		<text string="3 Mixed">
-			<color red="0.0" green="0.0" blue="0.0"/>
+			<color red="1.0" green="1.0" blue="1.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.45"/>
 		</text>
 		<text string="7's">
-			<color red="0.0" green="0.0" blue="0.0"/>
+			<color red="1.0" green="1.0" blue="1.0"/>
 			<bounds x="0.05" y="0.50" width="0.90" height="0.45"/>
 		</text>
 	</element>
 	<element name="label_64">
 		<text string="4 Mixed">
-			<color red="0.0" green="0.0" blue="0.0"/>
+			<color red="1.0" green="1.0" blue="1.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.45"/>
 		</text>
 		<text string="7's">
-			<color red="0.0" green="0.0" blue="0.0"/>
+			<color red="1.0" green="1.0" blue="1.0"/>
 			<bounds x="0.05" y="0.50" width="0.90" height="0.45"/>
 		</text>
 	</element>
@@ -3526,13 +3526,13 @@
 	</element>
 	<element name="label_129">
 		<text string="Cashpot">
-			<color red="0.0" green="0.0" blue="0.0"/>
+			<color red="1.0" green="1.0" blue="1.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="label_131">
 		<text string="Reserve">
-			<color red="0.0" green="0.0" blue="0.0"/>
+			<color red="1.0" green="1.0" blue="1.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
@@ -3544,11 +3544,11 @@
 	</element>
 	<element name="label_136">
 		<text string="the">
-			<color red="0.0" green="0.0" blue="0.0"/>
+			<color red="1.0" green="1.0" blue="1.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.45"/>
 		</text>
 		<text string="races">
-			<color red="0.0" green="0.0" blue="0.0"/>
+			<color red="1.0" green="1.0" blue="1.0"/>
 			<bounds x="0.05" y="0.50" width="0.90" height="0.45"/>
 		</text>
 	</element>
@@ -3560,17 +3560,17 @@
 	</element>
 	<element name="label_179">
 		<text string="Darts match">
-			<color red="0.0" green="0.0" blue="0.0"/>
+			<color red="1.0" green="1.0" blue="1.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="label_180">
 		<text string="Nudge">
-			<color red="0.0" green="0.0" blue="0.0"/>
+			<color red="1.0" green="1.0" blue="1.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.45"/>
 		</text>
 		<text string="pot">
-			<color red="0.0" green="0.0" blue="0.0"/>
+			<color red="1.0" green="1.0" blue="1.0"/>
 			<bounds x="0.05" y="0.50" width="0.90" height="0.45"/>
 		</text>
 	</element>
@@ -3582,7 +3582,7 @@
 	</element>
 	<element name="label_192">
 		<text string="1 - 12">
-			<color red="0.0" green="0.0" blue="0.0"/>
+			<color red="1.0" green="1.0" blue="1.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>

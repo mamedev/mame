@@ -32,9 +32,6 @@
 //  CONSTANTS
 //**************************************************************************
 
-// input ports support up to 32 bits each
-typedef u32 ioport_value;
-
 // active high/low values for input ports
 constexpr ioport_value IP_ACTIVE_HIGH = 0x00000000;
 constexpr ioport_value IP_ACTIVE_LOW = 0xffffffff;

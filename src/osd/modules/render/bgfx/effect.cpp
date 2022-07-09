@@ -11,6 +11,7 @@
 #include "uniform.h"
 
 #include "modules/osdmodule.h"
+#include "osdcore.h"
 
 bgfx_effect::bgfx_effect(uint64_t state, bgfx::ShaderHandle vertex_shader, bgfx::ShaderHandle fragment_shader, std::vector<bgfx_uniform*> uniforms)
 	: m_state(state)

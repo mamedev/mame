@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="nes_vt_cart" description="Cartridges compatible with VRT VT0x based units">
+
+	<!-- can be used with TimeTop Super Game 25-in-1 (GM-228) (timetp25) -->
+	<!-- many other 'xx Types of Crazy Games' cartridges exist -->
+	<software name="crazy10">
+		<description>Color Screen Game World - 10 Types of Crazy Games / Wonders 163-in-1</description>
+		<year>200?</year>
+		<publisher>TimeTop</publisher> <!-- maybe -->
+		<part name="cart" interface="nes_vt_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="s29al016d70tfi02.bin" size="0x200000" crc="f9d4bb5c" sha1="25af611b0ccc48bdab531d7c291a25db787d4212"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

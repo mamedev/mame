@@ -134,7 +134,7 @@ void spi_sdcard_device::latch_in()
 	m_in_latch &= ~0x01;
 	m_in_latch |= m_in_bit;
 	LOGMASKED(LOG_SPI, "\tsdcard: L %02x (%d) (out %02x)\n", m_in_latch, m_cur_bit, m_out_latch);
-	m_cur_bit++;
+		m_cur_bit++;
 	if (m_cur_bit == 8)
 	{
 		LOGMASKED(LOG_SPI, "SDCARD: got %02x\n", m_in_latch);
@@ -156,7 +156,6 @@ void spi_sdcard_device::latch_in()
 				m_state = SD_STATE_WRITE_DATA;
 				m_out_latch = 0xff;
 				m_write_ptr = 0;
-				change_state(SD_STATE_RCV);
 			}
 			break;
 
@@ -164,14 +163,8 @@ void spi_sdcard_device::latch_in()
 			m_data[m_write_ptr++] = m_in_latch;
 			if (m_write_ptr == (m_blksize + 2))
 			{
-				u32 blk = (u32(m_cmd[1]) << 24) | (u32(m_cmd[2]) << 16) | (u32(m_cmd[3]) << 8) | u32(m_cmd[4]);
-				if (m_type == SD_TYPE_V2)
-				{
-					blk /= m_blksize;
-				}
-
-				LOGMASKED(LOG_GENERAL, "writing LBA %x, data %02x %02x %02x %02x\n", blk, m_data[0], m_data[1], m_data[2], m_data[3]);
-				if (m_harddisk->write(blk, &m_data[0]))
+				LOGMASKED(LOG_GENERAL, "writing LBA %x, data %02x %02x %02x %02x\n", m_blknext, m_data[0], m_data[1], m_data[2], m_data[3]);
+				if (m_harddisk->write(m_blknext, &m_data[0]))
 				{
 					m_data[0] = DATA_RESPONSE_OK;
 				}
@@ -191,8 +184,7 @@ void spi_sdcard_device::latch_in()
 			{
 				m_data[0] = 0xfe; // data token
 				m_harddisk->read(m_blknext++, &m_data[1]);
-				util::crc16_t crc16 = util::crc16_creator::simple(
-					&m_data[1], m_blksize);
+				util::crc16_t crc16 = util::crc16_creator::simple(&m_data[1], m_blksize);
 				m_data[m_blksize + 1] = (crc16 >> 8) & 0xff;
 				m_data[m_blksize + 2] = (crc16 & 0xff);
 				send_data(1 + m_blksize + 2, SD_STATE_DATA_MULTI);
@@ -372,7 +364,12 @@ void spi_sdcard_device::do_command()
 
 		case 24: // CMD24 - WRITE_BLOCK
 			m_data[0] = 0;
-			send_data(1, SD_STATE_RCV);
+			m_blknext = (u32(m_cmd[1]) << 24) | (u32(m_cmd[2]) << 16) | (u32(m_cmd[3]) << 8) | u32(m_cmd[4]);
+			if (m_type == SD_TYPE_V2)
+			{
+				m_blknext /= m_blksize;
+			}
+			send_data(1, SD_STATE_WRITE_WAITFE);
 			break;
 
 		case 41:

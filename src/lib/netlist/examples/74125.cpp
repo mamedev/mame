@@ -13,6 +13,7 @@
 //  RL.1 : Output
 
 NETLIST_START(main)
+{
 
 	SOLVER(Solver, 48000) // could be 1 in this example
 
@@ -38,5 +39,5 @@ NETLIST_START(main)
 	NET_C(GND, RL.2, C1.GND, C2.GND, C3.GND, X1.GND, X2.GND)
 	NET_C(VCC,       C1.VCC, C2.VCC, C3.VCC, X1.VCC, X2.VCC)
 
-NETLIST_END()
+}
 //! [74125_example]

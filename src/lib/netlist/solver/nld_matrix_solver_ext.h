@@ -61,7 +61,7 @@ namespace netlist::solver
 
 			// FIXME: Not yet working, mat_cr.h needs some more work
 #if 0
-			auto mat_GE = dynamic_cast<plib::pGEmatrix_cr_t<typename M::base> *>(&mat);
+			auto mat_GE = plib::dynamic_downcast<plib::pGEmatrix_cr_t<typename M::base> *>(&mat);
 #endif
 			std::vector<unsigned> levL(iN, 0);
 			std::vector<unsigned> levU(iN, 0);

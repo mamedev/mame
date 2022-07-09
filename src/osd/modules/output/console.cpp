@@ -11,6 +11,8 @@
 #include "output_module.h"
 #include "modules/osdmodule.h"
 
+#include "osdcore.h"
+
 class output_console : public osd_module, public output_module
 {
 public:

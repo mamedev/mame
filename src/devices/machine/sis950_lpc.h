@@ -156,7 +156,7 @@ private:
 	bool m_at_spkrdata = 0;
 	uint8_t m_channel_check = 0;
 	int m_dma_channel = -1;
-//	bool m_cur_eop = false;
+//  bool m_cur_eop = false;
 	uint16_t m_dma_high_byte = 0;
 
 	DECLARE_WRITE_LINE_MEMBER(cpu_a20_w);

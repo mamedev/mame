@@ -9,16 +9,13 @@
 //
 //============================================================
 
-#include "emu.h"
+#include "inputpair.h"
+
 #include "../frontend/mame/ui/slider.h"
 
-#include "emucore.h"
-
-#include "inputpair.h"
 #include "texture.h"
 #include "target.h"
 #include "effect.h"
-#include "render.h"
 #include "uniform.h"
 #include "chainmanager.h"
 #include "slider.h"

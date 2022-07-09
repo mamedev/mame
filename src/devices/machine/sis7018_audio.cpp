@@ -2,11 +2,11 @@
 // copyright-holders: Angelo Salese
 /**************************************************************************************************
 
-	SiS 7018 Audio device (AC97 complaint)
+    SiS 7018 Audio device (AC97 complaint)
 
     TODO:
-	- Stub interface, to be improved;
-	- Should be easy to at least inherit SB16/MIDI/game port devices;
+    - Stub interface, to be improved;
+    - Should be easy to at least inherit SB16/MIDI/game port devices;
 
 **************************************************************************************************/
 
@@ -48,12 +48,12 @@ void sis7018_audio_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
 	// map(0x003e, 0x003f) max latency min=0x02, max=0x18
-	
+
 	map(0x40, 0xe3).rw(FUNC(sis7018_audio_device::unmap_log_r), FUNC(sis7018_audio_device::unmap_log_w));
 
 	// PMC capability identifier
 	map(0xdc, 0xdf).r(FUNC(sis7018_audio_device::pmc_id_r));
-//	map(0xe0, 0xe3).r(FUNC(sis7018_audio_device::pmc_status_r), FUNC(sis7018_audio_device::pmc_control_w));
+//  map(0xe0, 0xe3).r(FUNC(sis7018_audio_device::pmc_status_r), FUNC(sis7018_audio_device::pmc_control_w));
 }
 
 u8 sis7018_audio_device::capptr_r()
@@ -85,7 +85,7 @@ void sis7018_audio_device::io_map(address_map &map)
 void sis7018_audio_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
-//	io_space->install_device(0, 0x03ff, *this, &sis7018_audio_device::io_map);
+//  io_space->install_device(0, 0x03ff, *this, &sis7018_audio_device::io_map);
 	// TODO: legacy handling, including game port
 }
 
@@ -101,7 +101,7 @@ void sis7018_audio_device::device_start()
 void sis7018_audio_device::device_reset()
 {
 	pci_device::device_reset();
-	
+
 	command = 0x0000;
 	status = 0x0000;
 	// INTB#

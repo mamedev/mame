@@ -11,7 +11,7 @@
 
 function mainProject(_target, _subtarget)
 local projname
-if (_OPTIONS["SOURCES"] == nil) then
+if (_OPTIONS["SOURCES"] == nil) and (_OPTIONS["SOURCEFILTER"] == nil) then
 	if (_target == _subtarget) then
 		projname = _target
 	else
@@ -282,68 +282,80 @@ if (STANDALONE~=true) then
 		GEN_DIR .. _target .. "/" .. _subtarget .. "/drivlist.cpp",
 	}
 
-	if (_OPTIONS["SOURCES"] == nil) then
-
-		if os.isfile(MAME_DIR .. "src/" .. _target .."/" .. _subtarget ..".flt") then
-			dependency {
-				{ GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp", MAME_DIR .. "src/".._target .."/" .. _target ..".lst", true },
-			}
-			custombuildtask {
+	local driverlist = MAME_DIR .. "src/" .. _target .. "/" .. _target .. ".lst"
+	local driverssrc = GEN_DIR .. _target .. "/" .. _subtarget .. "/drivlist.cpp"
+	if _OPTIONS["SOURCES"] ~= nil then
+		dependency {
+			{ driverssrc, driverlist, true },
+		}
+		custombuildtask {
+			{
+				GEN_DIR .. _target .."/" .. _subtarget .. ".flt" ,
+				driverssrc,
+				{ MAME_DIR .. "scripts/build/makedep.py", driverlist },
 				{
-					MAME_DIR .. "src/" .. _target .. "/" .. _subtarget .. ".flt",
-					GEN_DIR .. _target .. "/" .. _subtarget .. "/drivlist.cpp",
-					{ MAME_DIR .. "scripts/build/makedep.py", MAME_DIR .. "src/" .. _target .."/" .. _target .. ".lst" },
-					{
-						"@echo Building driver list...",
-						PYTHON .. " $(1) driverlist $(2) -f $(<) > $(@)"
-					}
-				},
-			}
-		elseif os.isfile(MAME_DIR .. "src/" .._target .. "/" .. _subtarget ..".lst") then
-			custombuildtask {
+					"@echo Building driver list...",
+					PYTHON .. " $(1) -r " .. MAME_DIR .. " driverlist $(2) -f $(<) > $(@)"
+				}
+			},
+		}
+	elseif _OPTIONS["SOURCEFILTER"] ~= nil then
+		dependency {
+			{ driverssrc, driverlist, true },
+		}
+		custombuildtask {
+			{
+				MAME_DIR .. _OPTIONS["SOURCEFILTER"],
+				driverssrc,
+				{ MAME_DIR .. "scripts/build/makedep.py", driverlist },
 				{
-					MAME_DIR .. "src/" .. _target .. "/" .. _subtarget .. ".lst",
-					GEN_DIR .. _target .. "/" .. _subtarget .."/drivlist.cpp",
-					{ MAME_DIR .. "scripts/build/makedep.py" },
-					{
-						"@echo Building driver list...",
-						PYTHON .. " $(1) driverlist $(<) > $(@)"
-					}
-				},
-			}
-		else
-			dependency {
-				{ GEN_DIR .. _target .. "/" .. _target .."/drivlist.cpp", MAME_DIR .. "src/".._target .."/" .. _target ..".lst", true },
-			}
-			custombuildtask {
+					"@echo Building driver list...",
+					PYTHON .. " $(1) -r " .. MAME_DIR .. " driverlist $(2) -f $(<) > $(@)"
+				}
+			},
+		}
+	elseif os.isfile(MAME_DIR .. "src/" .. _target .."/" .. _subtarget ..".flt") then
+		dependency {
+			{ driverssrc, driverlist, true },
+		}
+		custombuildtask {
+			{
+				MAME_DIR .. "src/" .. _target .. "/" .. _subtarget .. ".flt",
+				driverssrc,
+				{ MAME_DIR .. "scripts/build/makedep.py", driverlist },
 				{
-					MAME_DIR .. "src/" .. _target .. "/" .. _target .. ".lst",
-					GEN_DIR .. _target .. "/" .. _target .. "/drivlist.cpp",
-					{  MAME_DIR .. "scripts/build/makedep.py" },
-					{
-						"@echo Building driver list...",
-						PYTHON .. " $(1) driverlist $(<) > $(@)"
-					}
-				},
-			}
-		end
-	end
-
-	if (_OPTIONS["SOURCES"] ~= nil) then
-			dependency {
-				{ GEN_DIR .. _target .. "/" .. _subtarget .."/drivlist.cpp",  MAME_DIR .. "src/".._target .."/" .. _target ..".lst", true },
-			}
-			custombuildtask {
+					"@echo Building driver list...",
+					PYTHON .. " $(1) -r " .. MAME_DIR .. " driverlist $(2) -f $(<) > $(@)"
+				}
+			},
+		}
+	elseif os.isfile(MAME_DIR .. "src/" .._target .. "/" .. _subtarget ..".lst") then
+		custombuildtask {
+			{
+				MAME_DIR .. "src/" .. _target .. "/" .. _subtarget .. ".lst",
+				driverssrc,
+				{ MAME_DIR .. "scripts/build/makedep.py" },
 				{
-					GEN_DIR .. _target .."/" .. _subtarget ..".flt" ,
-					GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",
-					{ MAME_DIR .. "scripts/build/makedep.py", MAME_DIR .. "src/".._target .."/" .. _target ..".lst"  },
-					{
-						"@echo Building driver list...",
-						PYTHON .. " $(1) driverlist $(2) -f $(<) > $(@)"
-					}
-				},
-			}
+					"@echo Building driver list...",
+					PYTHON .. " $(1) -r " .. MAME_DIR .. " driverlist $(<) > $(@)"
+				}
+			},
+		}
+	else
+		dependency {
+			{ driverssrc, driverlist, true },
+		}
+		custombuildtask {
+			{
+				driverlist,
+				driverssrc,
+				{ MAME_DIR .. "scripts/build/makedep.py" },
+				{
+					"@echo Building driver list...",
+					PYTHON .. " $(1) -r " .. MAME_DIR .. " driverlist $(<) > $(@)"
+				}
+			},
+		}
 	end
 
 	configuration { "mingw*" }

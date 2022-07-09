@@ -18,7 +18,7 @@
 
 #define DEBUG_TICKET 0
 
-#define VERBOSE	(DEBUG_TICKET)
+#define VERBOSE (DEBUG_TICKET)
 #include "logmacro.h"
 
 

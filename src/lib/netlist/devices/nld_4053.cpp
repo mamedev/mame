@@ -101,40 +101,40 @@ namespace netlist::devices {
 			const nl_fptype Roff = plib::reciprocal(exec().gmin());
 			const nl_fptype RX = newx ? Ron : Roff;
 			const nl_fptype RY = newy ? Ron : Roff;
-			if (m_RX.solver() == m_RY.solver())
+			if (m_RX().solver() == m_RY().solver())
 			{
-				m_RX.change_state([this, &RX, &RY]()
+				m_RX().change_state([this, &RX, &RY]()
 				{
-					m_RX.set_R(RX);
-					m_RY.set_R(RY);
+					m_RX().set_R(RX);
+					m_RY().set_R(RY);
 				});
 			}
 			else
 			{
-				m_RX.change_state([this, &RX]()
+				m_RX().change_state([this, &RX]()
 				{
-					m_RX.set_R(RX);
+					m_RX().set_R(RX);
 				});
-				m_RY.change_state([this, &RY]()
+				m_RY().change_state([this, &RY]()
 				{
-					m_RY.set_R(RY);
+					m_RY().set_R(RY);
 				});
 			}
 			m_last_x = newx;
 			m_last_y = newy;
 		}
 
-		analog::NETLIB_SUB(R_base) m_RX;
-		analog::NETLIB_SUB(R_base) m_RY;
-		analog_input_t             m_select;
-		analog_input_t             m_inhibit;
-		analog_input_t             m_VEE;
-		param_fp_t                 m_base_r;
-		state_var<bool>            m_last_x;
-		state_var<bool>            m_last_y;
-		state_var<bool>            m_select_state;
-		state_var<bool>            m_inhibit_state;
-		nld_power_pins             m_supply;
+		NETLIB_SUB_NS(analog, R_base) m_RX;
+		NETLIB_SUB_NS(analog, R_base) m_RY;
+		analog_input_t                m_select;
+		analog_input_t                m_inhibit;
+		analog_input_t                m_VEE;
+		param_fp_t                    m_base_r;
+		state_var<bool>               m_last_x;
+		state_var<bool>               m_last_y;
+		state_var<bool>               m_select_state;
+		state_var<bool>               m_inhibit_state;
+		nld_power_pins                m_supply;
 	};
 
 	NETLIB_DEVICE_IMPL(CD4053_GATE,         "CD4053_GATE",            "")

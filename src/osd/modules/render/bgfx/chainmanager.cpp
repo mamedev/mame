@@ -9,13 +9,16 @@
 //
 //============================================================
 
+#include "chainmanager.h"
+
 #include <bx/readerwriter.h>
 #include <bx/file.h>
 
-#include "emu.h"
+#include "emucore.h"
+#include "render.h"
 #include "../frontend/mame/ui/slider.h"
 
-#include "osdcore.h"
+#include "modules/lib/osdobj_common.h"
 #include "modules/osdwindow.h"
 
 #include <rapidjson/document.h>
@@ -23,7 +26,6 @@
 
 #include "bgfxutil.h"
 
-#include "chainmanager.h"
 #include "chainreader.h"
 #include "chain.h"
 
@@ -33,9 +35,26 @@
 
 #include "sliderdirtynotifier.h"
 
+#include "osdcore.h"
+#include "osdfile.h"
+
 using namespace rapidjson;
 
 const uint32_t chain_manager::CHAIN_NONE = 0;
+
+chain_manager::screen_prim::screen_prim(render_primitive *prim)
+{
+	m_prim = prim;
+	m_screen_width = (uint16_t)floorf(prim->get_full_quad_width() + 0.5f);
+	m_screen_height = (uint16_t)floorf(prim->get_full_quad_height() + 0.5f);
+	m_quad_width = (uint16_t)floorf(prim->get_quad_width() + 0.5f);
+	m_quad_height = (uint16_t)floorf(prim->get_quad_height() + 0.5f);
+	m_tex_width = (float)prim->texture.width;
+	m_tex_height = (float)prim->texture.height;
+	m_rowpixels = prim->texture.rowpixels;
+	m_palette_length = prim->texture.palette_length;
+	m_flags = prim->flags;
+}
 
 chain_manager::chain_manager(running_machine& machine, osd_options& options, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t window_index, slider_dirty_notifier& slider_notifier)
 	: m_machine(machine)

@@ -7,10 +7,11 @@
 //
 //============================================================
 
-#include "emu.h"
 #include "suppressor.h"
 
 #include "slider.h"
+
+#include <cstring>
 
 bgfx_suppressor::bgfx_suppressor(std::vector<bgfx_slider*> sliders, uint32_t condition, combine_mode combine, void* value)
 	: m_sliders(sliders)

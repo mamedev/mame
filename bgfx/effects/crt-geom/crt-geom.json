@@ -28,6 +28,7 @@
 		{ "name": "mask_texture",        "type": "int",  "values": [ 1 ] },
 		{ "name": "curvature",           "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] },
 		{ "name": "CRTgamma",            "type": "vec4", "values": [ 2.4, 0.0, 0.0, 0.0 ] },
+		{ "name": "monitorsRGB",         "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] },
 		{ "name": "monitorgamma",        "type": "vec4", "values": [ 2.2, 0.0, 0.0, 0.0 ] },
 		{ "name": "overscan",            "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
 		{ "name": "aspect",              "type": "vec4", "values": [ 1.0, 0.75,0.0, 0.0 ] },
