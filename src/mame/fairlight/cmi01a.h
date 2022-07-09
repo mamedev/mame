@@ -21,20 +21,22 @@
 
 class cmi01a_device : public device_t, public device_sound_interface {
 public:
-	cmi01a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t channel)
+	cmi01a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, u32 channel)
 		: cmi01a_device(mconfig, tag, owner, clock)
 	{
 		m_channel = channel;
 	}
 
-	cmi01a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cmi01a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	auto irq_callback() { return m_irq_cb.bind(); }
 
-	void write(offs_t offset, uint8_t data);
-	uint8_t read(offs_t offset);
+	void write(offs_t offset, u8 data);
+	u8 read(offs_t offset);
 
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+
+	void set_master_osc(double mosc) { m_mosc = mosc; }
 
 protected:
 	virtual void device_resolve_objects() override;
@@ -46,19 +48,18 @@ protected:
 	required_device_array<pia6821_device, 2> m_pia;
 	required_device<ptm6840_device> m_ptm;
 
-	required_device_array<pia6821_device, 2> m_cmi02_pia;
-
 	sound_stream* m_stream;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(cmi01a_irq);
+	void cmi01a_irq(int state);
 
-	TIMER_CALLBACK_MEMBER(bcas_tick);
-	void reset_bcas_counter();
+	TIMER_CALLBACK_MEMBER(bcas_q2_tick);
+	TIMER_CALLBACK_MEMBER(update_sample);
 
+	void load_envelope();
+	void update_envelope_tri();
 	void clock_envelope();
 	void tick_ediv();
-	void set_eclk(bool eclk);
 	void update_eclk();
 
 	void pulse_zcint();
@@ -66,82 +67,94 @@ private:
 	void reset_waveform_segment();
 	void check_segment_load();
 	void wpe_w(int state);
-	void load_w(int state);
+	void notload_w(int state);
+	int notload_r();
 
-	TIMER_CALLBACK_MEMBER(zx_timer_cb);
-	TIMER_CALLBACK_MEMBER(eosi_timer_cb);
+	void zx_tick();
 	void run_voice();
 	void update_wave_addr(int inc);
+	void set_segment_cnt(u16 segment_cnt);
 
-	uint32_t    m_channel;
-	emu_timer * m_zx_timer = nullptr;
-	uint8_t     m_zx_flag = 0;
-	uint8_t     m_zx_ff = 0;
+	void rp_w(u8 data);
+	u8 rp_r();
+	void ws_dir_w(u8 data);
+	u8 ws_dir_r();
+	int tri_r();
+	void pia_0_cb2_w(int state);
+	void eload_w(int state);
+	int eload_r();
 
-	emu_timer * m_eosi_timer = nullptr;
+	int eosi_r();
+	int zx_r();
+	u8 pia_1_a_r();
+	void pia_1_a_w(u8 data);
+	u8 pia_1_b_r();
+	void pia_1_b_w(u8 data);
 
-	emu_timer * m_bcas_timer = nullptr;
+	void ptm_o1(int state);
+	void ptm_o2(int state);
+	void ptm_o3(int state);
 
-	std::unique_ptr<uint8_t[]>    m_wave_ram;
-	uint16_t  m_segment_cnt = 0;
-	uint8_t   m_new_addr = 0;     // Flag
-	uint8_t   m_vol_latch = 0;
-	uint8_t   m_flt_latch = 0;
-	uint8_t   m_rp = 0;
-	uint8_t   m_ws = 0;
+	TIMER_CALLBACK_MEMBER(zcint_pulse_cb);
+	TIMER_CALLBACK_MEMBER(rstb_pulse_cb);
+
+	void dump_state();
+
+	u32         m_channel;
+	double      m_mosc = 0.0;
+	int         m_zx_ff = 0;
+	bool        m_rstb = true;
+
+	emu_timer * m_zcint_pulse_timer = nullptr;
+	emu_timer * m_rstb_pulse_timer = nullptr;
+	emu_timer * m_bcas_q2_timer = nullptr;
+	emu_timer * m_sample_timer = nullptr;
+
+	u8        m_current_sample = 0;
+	u16       m_current_sample_addr = 0;
+
+	std::unique_ptr<u8[]>    m_wave_ram;
+	u16       m_segment_cnt = 0;
+	int       m_new_addr = 0;
+	u8        m_vol_latch = 0;
+	u8        m_flt_latch = 0;
+	u8        m_rp = 0;
+	u8        m_ws = 0;
 	int       m_dir = 0;
 	int       m_env_dir = 0;
-	uint8_t   m_env = 0;
+	u8        m_env = 0;
 	int       m_pia0_cb2_state = 0;
 
-	uint8_t   m_bcas_q1_ticks = 0;
-	uint8_t   m_bcas_q1 = 0;
-	uint8_t   m_bcas_q2_ticks = 0;
-	uint8_t   m_bcas_q2 = 0;
-
-	double    m_freq = 0;
+	bool      m_bcas_q2 = false;
+	bool      m_bcas_q1 = false;
 
 	int       m_ptm_o1 = 0;
 	int       m_ptm_o2 = 0;
 	int       m_ptm_o3 = 0;
 
-	bool      m_load = 0;
-	bool      m_run = 0;
-	bool      m_gzx = 0;
-	bool      m_nwpe = 0;
-	bool      m_tri = 0;
-	bool      m_pia1_ca2 = 0;
+	bool      m_load = false;
+	bool      m_nload = false;
+	bool      m_run = false;
+	bool      m_gzx = false;
+	bool      m_wpe = false;
+	bool      m_nwpe = true;
+	bool      m_tri = false;
+	bool      m_pia1_ca2 = false;
 
 	bool      m_eclk = false;
 	bool      m_env_clk = false;
 	bool      m_ediv_out = false;
-	uint8_t   m_ediv_rate = 0;
-	uint8_t   m_ediv_count = 0;
+	u8        m_ediv_rate = 0;
+	bool      m_envdiv_toggles[6];
 
-	uint16_t  m_pitch = 0;
-	uint8_t   m_octave = 0;
+	u16       m_pitch = 0;
+	u8        m_octave = 0;
 
 	devcb_write_line m_irq_cb;
 
-	void rp_w(uint8_t data);
-	void ws_dir_w(uint8_t data);
-	uint8_t ws_dir_r();
-	DECLARE_READ_LINE_MEMBER( tri_r );
-	DECLARE_WRITE_LINE_MEMBER( pia_0_cb2_w );
-	DECLARE_WRITE_LINE_MEMBER( eload_w );
-
-	DECLARE_READ_LINE_MEMBER( eosi_r );
-	DECLARE_READ_LINE_MEMBER( zx_r );
-	uint8_t pia_1_a_r();
-	void pia_1_a_w(uint8_t data);
-	void pia_1_b_w(uint8_t data);
-
-	DECLARE_WRITE_LINE_MEMBER( ptm_o1 );
-	DECLARE_WRITE_LINE_MEMBER( ptm_o2 );
-	DECLARE_WRITE_LINE_MEMBER( ptm_o3 );
-	DECLARE_WRITE_LINE_MEMBER( ptm_irq );
-
-	static const uint8_t s_7497_rate_table[64][64];
+	FILE *m_pitch_log = nullptr;
+	int m_pitch_index = 1;
+	int m_pitch_crossing = 1;
 };
 
 // device type definition

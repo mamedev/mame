@@ -36,6 +36,8 @@ public:
 	// construction/destruction
 	pia6821_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
+	void dump_state(FILE *s_log_file = nullptr);
+
 	// TODO: REMOVE THESE
 	auto readpa_handler() { return m_in_a_handler.bind(); }
 	auto readpb_handler() { return m_in_b_handler.bind(); }
@@ -52,6 +54,7 @@ public:
 	auto irqa_handler() { return m_irqa_handler.bind(); }
 	auto irqb_handler() { return m_irqb_handler.bind(); }
 
+	void set_log(bool do_log, int logidx) { m_do_log = do_log; m_logidx = logidx; }
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 	uint8_t read_alt(offs_t offset) { return read(((offset << 1) & 0x02) | ((offset >> 1) & 0x01)); }
@@ -211,6 +214,8 @@ private:
 	bool m_logged_ca2_not_connected;
 	bool m_logged_cb1_not_connected;
 	bool m_logged_cb2_not_connected;
+	bool m_do_log;
+	int m_logidx;
 };
 
 

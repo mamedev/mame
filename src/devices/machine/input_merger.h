@@ -27,7 +27,9 @@ public:
 	template <unsigned Bit> void in_set(u8 data = 0) { in_w<Bit>(1); }
 	template <unsigned Bit> void in_clear(u8 data = 0) { in_w<Bit>(0); }
 
-protected:
+	void dump_state(FILE *s_log_file = nullptr);
+
+//protected:
 	// constructor/destructor
 	input_merger_device(
 			machine_config const &mconfig,
