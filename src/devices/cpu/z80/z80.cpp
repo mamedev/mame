@@ -2224,7 +2224,7 @@ void z80_device::init_op_steps() {
 /* LD   HX,C       */ OP(DD,61) { HX = C;                                          } EOP
 /* LD   HX,D       */ OP(DD,62) { HX = D;                                          } EOP
 /* LD   HX,E       */ OP(DD,63) { HX = E;                                          } EOP
-/* LD   HX,HX      */ OP(DD,64) {                                                  } EOP
+/* LD   HX,HX      */ OP_M(DD,64)                                                    EOP
 /* LD   HX,LX      */ OP(DD,65) { HX = LX;                                         } EOP
 /* LD   H,(IX+o)   */ OP_M(DD,66) eax() FN { TADR = PCD-1; } MN nomreq_addr(5) FN { TADR = m_ea; } MN rm() FN { H = TDAT8; } EOP
 /* LD   HX,A       */ OP(DD,67) { HX = A;                                          } EOP
@@ -2234,7 +2234,7 @@ void z80_device::init_op_steps() {
 /* LD   LX,D       */ OP(DD,6a) { LX = D;                                          } EOP
 /* LD   LX,E       */ OP(DD,6b) { LX = E;                                          } EOP
 /* LD   LX,HX      */ OP(DD,6c) { LX = HX;                                         } EOP
-/* LD   LX,LX      */ OP(DD,6d) {                                                  } EOP
+/* LD   LX,LX      */ OP_M(DD,6d)                                                    EOP
 /* LD   L,(IX+o)   */ OP_M(DD,6e) eax() FN { TADR = PCD-1; } MN nomreq_addr(5) FN { TADR = m_ea; } MN rm() FN { L = TDAT8; } EOP
 /* LD   LX,A       */ OP(DD,6f) { LX = A;                                          } EOP
 
@@ -2515,7 +2515,7 @@ void z80_device::init_op_steps() {
 /* LD   HY,C       */ OP(FD,61) { HY = C;                                          } EOP
 /* LD   HY,D       */ OP(FD,62) { HY = D;                                          } EOP
 /* LD   HY,E       */ OP(FD,63) { HY = E;                                          } EOP
-/* LD   HY,HY      */ OP(FD,64) {                                                  } EOP
+/* LD   HY,HY      */ OP_M(FD,64)                                                    EOP
 /* LD   HY,LY      */ OP(FD,65) { HY = LY;                                         } EOP
 /* LD   H,(IY+o)   */ OP_M(FD,66) eay() FN { TADR = PCD-1; } MN nomreq_addr(5) FN { TADR = m_ea; } MN rm() FN { H = TDAT8; } EOP
 /* LD   HY,A       */ OP(FD,67) { HY = A;                                          } EOP
@@ -2525,7 +2525,7 @@ void z80_device::init_op_steps() {
 /* LD   LY,D       */ OP(FD,6a) { LY = D;                                          } EOP
 /* LD   LY,E       */ OP(FD,6b) { LY = E;                                          } EOP
 /* LD   LY,HY      */ OP(FD,6c) { LY = HY;                                         } EOP
-/* LD   LY,LY      */ OP(FD,6d) {                                                  } EOP
+/* LD   LY,LY      */ OP_M(FD,6d)                                                    EOP
 /* LD   L,(IY+o)   */ OP_M(FD,6e) eay() FN { TADR = PCD-1; } MN nomreq_addr(5) FN { TADR = m_ea; } MN rm() FN { L = TDAT8; } EOP
 /* LD   LY,A       */ OP(FD,6f) { LY = A;                                          } EOP
 
@@ -2985,7 +2985,7 @@ void z80_device::init_op_steps() {
 /**********************************************************
  * main opcodes
  **********************************************************/
-/* NOP             */ OP(NONE,00) {                                                                       } EOP
+/* NOP             */ OP_M(NONE,00)                                                                         EOP
 /* LD   BC,w       */ OP_M(NONE,01) arg16() FN { BC = TDAT;                                               } EOP
 /* LD (BC),A       */ OP(NONE,02) { TADR=BC; TDAT8=A; } MN wm() FN { WZ_L = (BC + 1) & 0xFF;  WZ_H = A;   } EOP
 /* INC  BC         */ OP_M(NONE,03) nomreq_ir(2) FN { BC++;                                               } EOP
@@ -3057,7 +3057,7 @@ void z80_device::init_op_steps() {
 /* LD   A,n        */ OP_M(NONE,3e) arg() FN { A = TDAT8;                                                 } EOP
 /* CCF             */ OP(NONE,3f) { F = ((F&(SF|ZF|YF|XF|PF|CF))|((F&CF)<<4)|(A&(YF|XF)))^CF;             } EOP
 
-/* LD   B,B        */ OP(NONE,40) {                                                                       } EOP
+/* LD   B,B        */ OP_M(NONE,40)                                                                         EOP
 /* LD   B,C        */ OP(NONE,41) { B = C;                                                                } EOP
 /* LD   B,D        */ OP(NONE,42) { B = D;                                                                } EOP
 /* LD   B,E        */ OP(NONE,43) { B = E;                                                                } EOP
@@ -3067,7 +3067,7 @@ void z80_device::init_op_steps() {
 /* LD   B,A        */ OP(NONE,47) { B = A;                                                                } EOP
 
 /* LD   C,B        */ OP(NONE,48) { C = B;                                                                } EOP
-/* LD   C,C        */ OP(NONE,49) {                                                                       } EOP
+/* LD   C,C        */ OP_M(NONE,49)                                                                         EOP
 /* LD   C,D        */ OP(NONE,4a) { C = D;                                                                } EOP
 /* LD   C,E        */ OP(NONE,4b) { C = E;                                                                } EOP
 /* LD   C,H        */ OP(NONE,4c) { C = H;                                                                } EOP
@@ -3077,7 +3077,7 @@ void z80_device::init_op_steps() {
 
 /* LD   D,B        */ OP(NONE,50) { D = B;                                                                } EOP
 /* LD   D,C        */ OP(NONE,51) { D = C;                                                                } EOP
-/* LD   D,D        */ OP(NONE,52) {                                                                       } EOP
+/* LD   D,D        */ OP_M(NONE,52)                                                                         EOP
 /* LD   D,E        */ OP(NONE,53) { D = E;                                                                } EOP
 /* LD   D,H        */ OP(NONE,54) { D = H;                                                                } EOP
 /* LD   D,L        */ OP(NONE,55) { D = L;                                                                } EOP
@@ -3087,7 +3087,7 @@ void z80_device::init_op_steps() {
 /* LD   E,B        */ OP(NONE,58) { E = B;                                                                } EOP
 /* LD   E,C        */ OP(NONE,59) { E = C;                                                                } EOP
 /* LD   E,D        */ OP(NONE,5a) { E = D;                                                                } EOP
-/* LD   E,E        */ OP(NONE,5b) {                                                                       } EOP
+/* LD   E,E        */ OP_M(NONE,5b)                                                                         EOP
 /* LD   E,H        */ OP(NONE,5c) { E = H;                                                                } EOP
 /* LD   E,L        */ OP(NONE,5d) { E = L;                                                                } EOP
 /* LD   E,(HL)     */ OP(NONE,5e) { TADR=HL; } MN rm() FN { E = TDAT8;                                    } EOP
@@ -3097,7 +3097,7 @@ void z80_device::init_op_steps() {
 /* LD   H,C        */ OP(NONE,61) { H = C;                                                                } EOP
 /* LD   H,D        */ OP(NONE,62) { H = D;                                                                } EOP
 /* LD   H,E        */ OP(NONE,63) { H = E;                                                                } EOP
-/* LD   H,H        */ OP(NONE,64) {                                                                       } EOP
+/* LD   H,H        */ OP_M(NONE,64)                                                                         EOP
 /* LD   H,L        */ OP(NONE,65) { H = L;                                                                } EOP
 /* LD   H,(HL)     */ OP(NONE,66) { TADR=HL; } MN rm() FN { H = TDAT8;                                    } EOP
 /* LD   H,A        */ OP(NONE,67) { H = A;                                                                } EOP
@@ -3107,7 +3107,7 @@ void z80_device::init_op_steps() {
 /* LD   L,D        */ OP(NONE,6a) { L = D;                                                                } EOP
 /* LD   L,E        */ OP(NONE,6b) { L = E;                                                                } EOP
 /* LD   L,H        */ OP(NONE,6c) { L = H;                                                                } EOP
-/* LD   L,L        */ OP(NONE,6d) {                                                                       } EOP
+/* LD   L,L        */ OP_M(NONE,6d)                                                                         EOP
 /* LD   L,(HL)     */ OP(NONE,6e) { TADR=HL; } MN rm() FN { L = TDAT8;                                    } EOP
 /* LD   L,A        */ OP(NONE,6f) { L = A;                                                                } EOP
 
@@ -3127,7 +3127,7 @@ void z80_device::init_op_steps() {
 /* LD   A,H        */ OP(NONE,7c) { A = H;                                                                } EOP
 /* LD   A,L        */ OP(NONE,7d) { A = L;                                                                } EOP
 /* LD   A,(HL)     */ OP(NONE,7e) { TADR=HL; } MN rm() FN { A = TDAT8;                                    } EOP
-/* LD   A,A        */ OP(NONE,7f) {                                                                       } EOP
+/* LD   A,A        */ OP_M(NONE,7f)                                                                         EOP
 
 /* ADD  A,B        */ OP(NONE,80) { add_a(B);                                                             } EOP
 /* ADD  A,C        */ OP(NONE,81) { add_a(C);                                                             } EOP
@@ -3527,9 +3527,9 @@ void z80_device::device_start()
 			if( (i & 0x0f) == 0x0f ) SZHV_dec[i] |= HF;
 		}
 
-		init_op_steps();
 		tables_initialised = true;
 	}
+	init_op_steps();
 
 	save_item(NAME(m_icount_executing));
 	save_item(NAME(m_cycle));
