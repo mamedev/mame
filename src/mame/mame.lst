@@ -33480,7 +33480,7 @@ nws1580                         // Sony NEWS NWS-1580
 @source:sony_news/news_r3k.cpp
 nws3260                         // Sony NEWS NWS-3260
 
-@source:news_r4k.cpp
+@source:sony_news/news_r4k.cpp
 nws5000x                        // Sony NEWS NWS-5000X
 
 @source:skeleton/newton.cpp
