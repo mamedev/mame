@@ -24567,7 +24567,6 @@ m4booze                         // Booze Cruise
 m4c2                            // Circus Circus 2 (Nova)
 m4captb                         // Captain Bear
 m4casmul                        // Casino Multiplay (Barcrest)
-m4cbing                         // Cherry Bingo
 m4ccc                           //
 m4ccop                          //
 m4ccopa                         //
@@ -30174,6 +30173,9 @@ m4bigchfb                       //
 m4bigchfc                       //
 m4click                         // Clickity Click (Barcrest)
 m4elite                         // Elite (Barcrest)
+
+@source:barcrest/mpu4redhouse.cpp
+m4cbing                         // Cherry Bingo
 
 @source:barcrest/mpu4vid.cpp
 v4addlad                        // Adders and Ladders

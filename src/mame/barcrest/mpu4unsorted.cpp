@@ -663,14 +663,6 @@ ROM_START( m4booze )
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
 ROM_END
 
-ROM_START( m4cbing )
-	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "cherrybingoprg.bin", 0x0000, 0x010000, CRC(00c1d4f3) SHA1(626df7f2f597ed13c32ce0fa8846f2e27ca68eae) )
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) // not oki!
-	ROM_LOAD( "cherrybingosnd.p1", 0x000000, 0x100000, CRC(11bed9f9) SHA1(63ed45122dda8e412bb1eaeb967d8a0f925d4bde) )
-	ROM_LOAD( "cherrybingosnd.p2", 0x100000, 0x100000, CRC(b2a7ec28) SHA1(307f19ffb46f4a2e8e93923ddb666e50de43a00e) )
-ROM_END
-
 
 ROM_START( m4aliz )
 	ROM_REGION( 0x40000, "maincpu", 0 )
@@ -851,9 +843,6 @@ GAME(199?, m4dnjb,    m4dnj,      mod4oki,    mpu4,    mpu4unsorted_state, init_
 
 // PIC CHECK, backwards VFD
 GAME(199?, m4booze,   0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Extreme","Booze Cruise (Extreme) (MPU4)",GAME_FLAGS )
-
- // custom sound system
-GAME(199?, m4cbing,   0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Redpoint Systems","Cherry Bingo (Redpoint Systems) (MPU4)",GAME_FLAGS )
 
 // LINKUP SUCHE
 GAME( 199?, m4aliz,   0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default_big, 0,      "Qps",  "AlizBaz (Qps) (German) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
