@@ -24601,13 +24601,6 @@ m4jungja                        //
 m4jungjb                        //
 m4jungjc                        //
 m4kqclub                        // Kings & Queens Club (Newby)
-m4luckwb                        // Lucky Wild Boar (Barcrest)
-m4luckwba                       //
-m4luckwbb                       //
-m4luckwbc                       //
-m4luckwbd                       //
-m4luckwbe                       //
-m4luckwbf                       //
 m4matdr                         // Matador (unknown)
 m4sbx                           // Super Bear X
 m4sbxa                          //
@@ -28029,6 +28022,13 @@ m4luckst__w                     //
 m4luckst__x                     //
 m4luckst__y                     //
 m4luckst__z                     //
+m4luckwb                        // Lucky Wild Boar
+m4luckwba                       //
+m4luckwbb                       //
+m4luckwbc                       //
+m4luckwbd                       //
+m4luckwbe                       //
+m4luckwbf                       //
 m4luxor                         // Luxor (Barcrest)
 m4luxor__a                      //
 m4luxor__b                      //

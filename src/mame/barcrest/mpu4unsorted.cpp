@@ -55,58 +55,6 @@ ROM_END
 
 
 
-#define M4LUCKWB_EXTRAS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) /* these are all different sound roms... */  \
-	ROM_LOAD( "lwbs3.bin", 0x0000, 0x07dc89, CRC(ee102376) SHA1(3fed581a4654acf285dd430fbfbac33cd67411b8) ) \
-	ROM_LOAD( "lwbs7.bin", 0x0000, 0x080000, CRC(5d4177c7) SHA1(e13f145885bb719b0021ae4ce289261a3eaa2e18) ) \
-	ROM_LOAD( "lwbs8.bin", 0x0000, 0x080000, CRC(187cdf5b) SHA1(87ec189af27c95f278a7531ec13df53a08889af8) ) \
-	ROM_LOAD( "lwbs9.bin", 0x0000, 0x080000, CRC(2e02b617) SHA1(2502a1d2cff155a7fc5148e23a4723d4d60e9d42) )
-
-ROM_START( m4luckwb )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "lwb10.bin", 0x0000, 0x010000, CRC(6d43a14e) SHA1(267aba1a01bfd5f0eaa7683d041d5fcb2d301934) )
-	M4LUCKWB_EXTRAS
-ROM_END
-
-ROM_START( m4luckwba )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "lwb15.bin", 0x0000, 0x010000, CRC(b5af8cb2) SHA1(474975b83803627ad3ac4217d8cecb2d2db16fec) )
-	M4LUCKWB_EXTRAS
-ROM_END
-
-ROM_START( m4luckwbb )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "lwb21.bin", 0x0000, 0x010000, CRC(6c570733) SHA1(7488318ca9689371e4f80be0a0fddd8ad141733e) )
-	M4LUCKWB_EXTRAS
-ROM_END
-
-ROM_START( m4luckwbc )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "lwb22.bin", 0x0000, 0x010000, CRC(05b952a7) SHA1(952e328b280a18c1ffe253b6a56f2b5e893b1b72) )
-	M4LUCKWB_EXTRAS
-ROM_END
-
-ROM_START( m4luckwbd )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "lwb27.bin", 0x0000, 0x010000, CRC(9d6b6637) SHA1(65bad12cd08de128ca31c9488e32e3cebfb8eedb) )
-	M4LUCKWB_EXTRAS
-ROM_END
-
-ROM_START( m4luckwbe )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "lwb6.bin", 0x0000, 0x010000, CRC(8e7d4594) SHA1(4824a9a4628585a170c41e00f7b3fcb8a2330c02) )
-	M4LUCKWB_EXTRAS
-ROM_END
-
-ROM_START( m4luckwbf )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "lwb7.bin", 0x0000, 0x010000, CRC(8e651705) SHA1(bd4d09d586d14759a17d4d7d4016c427f3eef015) )
-	M4LUCKWB_EXTRAS
-ROM_END
-
-
-
-
 
 
 
@@ -869,12 +817,12 @@ GAME(199?, m4blkgda,  m4blkgd,    mod4oki,    mpu4,    mpu4unsorted_state, init_
 GAME(199?, m4zill,    0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Pure Leisure","Zillionare's Challenge (Pure Leisure) (MPU4) (set 1)",GAME_FLAGS )
 GAME(199?, m4zilla,   m4zill,     mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Pure Leisure","Zillionare's Challenge (Pure Leisure) (MPU4) (set 2)",GAME_FLAGS )
 
-// runs but corrupt VFD
+// ALARM S4
 GAME(199?, m4hstr,    0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Happy Streak (Coinworld) (MPU4) (set 1)",GAME_FLAGS )
 GAME(199?, m4hstra,   m4hstr,     mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Happy Streak (Coinworld) (MPU4) (set 2)",GAME_FLAGS )
 GAME(199?, m4hstrb,   m4hstr,     mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Happy Streak (Coinworld) (MPU4) (set 3)",GAME_FLAGS )
 
-// runs but corrupt VFD
+// "S4" error
 GAME(199?, m4hstrcs,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Casino Happy Streak (Coinworld) (MPU4) (set 1)",GAME_FLAGS )
 GAME(199?, m4hstrcsa, m4hstrcs,   mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Casino Happy Streak (Coinworld) (MPU4) (set 2)",GAME_FLAGS )
 GAME(199?, m4hstrcsb, m4hstrcs,   mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Casino Happy Streak (Coinworld) (MPU4) (set 3)",GAME_FLAGS )
@@ -885,13 +833,13 @@ GAME(199?, m4hstrcsd, m4hstrcs,   mod4oki,    mpu4,    mpu4unsorted_state, init_
 GAME(199?, m4ddb,     0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Ding Dong Bells (Coinworld) (MPU4) (set 1)",GAME_FLAGS )
 GAME(199?, m4ddba,    m4ddb,      mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Ding Dong Bells (Coinworld) (MPU4) (set 2)",GAME_FLAGS )
 
-// runs but corrupt VFD
+// "S4" error
 GAME(199?, m4hapfrt,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Happy Fruits (Coinworld) (MPU4) (set 1)",GAME_FLAGS )
 GAME(199?, m4hapfrta, m4hapfrt,   mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Happy Fruits (Coinworld) (MPU4) (set 2)",GAME_FLAGS )
 GAME(199?, m4hapfrtb, m4hapfrt,   mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Happy Fruits (Coinworld) (MPU4) (set 3)",GAME_FLAGS )
 
 // backwards VFD
-GAME(199?, m4sunday,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Pcp","Sunday Sport (Pcp) (MPU4)",GAME_FLAGS )
+GAME(199?, m4sunday,  0,          mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Pcp","Sunday Sport (Pcp) (MPU4)",GAME_FLAGS )
 
 // HOPPER FAULT
 GAME(199?, m4jp777,   0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Cotswold Microsystems","Jackpot 777 (Cotswold Microsystems) (MPU4)",GAME_FLAGS ) /* Hopper Fault */
@@ -933,16 +881,3 @@ GAME(1993, m4twistb,  m4twist,    mod2,       mpu4,    mpu4unsorted_state, init_
 // REEL 1 FAULT
 // has "(C) J. Brown 1988" in the ROM (assume same J.A. Brown as above)
 GAME(1988, m4wnud,    0,          mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "J.A. Brown","unknown MPU4 'W Nudge' (J.A. Brown) (MPU4)",GAME_FLAGS )
-
-
-
-// corrupt VFD (many XX), doesn't use standard Barcrest protection, maybe Coinworld?
-// reads a jump offset from 0x800 (where protection would usually map)
-GAME(199?, m4luckwb,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "<unknown>","Lucky Wild Boar (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4luckwba, m4luckwb,   mod4oki,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "<unknown>","Lucky Wild Boar (MPU4) (set 2)",GAME_FLAGS )
-GAME(199?, m4luckwbb, m4luckwb,   mod4oki,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "<unknown>","Lucky Wild Boar (MPU4) (set 3)",GAME_FLAGS )
-GAME(199?, m4luckwbc, m4luckwb,   mod4oki,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "<unknown>","Lucky Wild Boar (MPU4) (set 4)",GAME_FLAGS )
-GAME(199?, m4luckwbd, m4luckwb,   mod4oki,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "<unknown>","Lucky Wild Boar (MPU4) (set 5)",GAME_FLAGS )
-GAME(199?, m4luckwbe, m4luckwb,   mod4oki,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "<unknown>","Lucky Wild Boar (MPU4) (set 6)",GAME_FLAGS )
-GAME(199?, m4luckwbf, m4luckwb,   mod4oki,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "<unknown>","Lucky Wild Boar (MPU4) (set 7)",GAME_FLAGS )
-
