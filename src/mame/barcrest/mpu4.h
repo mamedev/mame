@@ -90,6 +90,51 @@ INPUT_PORTS_EXTERN( mpu4_70pc );
 // currently in mpu4.cpp this may get moved into the driver, or renamed to something more generic based on the setup
 INPUT_PORTS_EXTERN( grtecp );
 
+namespace mpu4_traits {
+	enum {
+		// Reels configurations
+		R4,
+		R5,
+		R5R,    // reversed
+		R5A,    // alternative
+		R6,
+		R6A,    // alternative
+		R7,
+		R8,
+
+		// Reel types (must be set after reel count)
+		RT1,    // 1-3
+		RT2,    // 4-12
+		RT3,    // 96-3
+		
+		// Lamp extenders
+		LPS,    // small
+		LPLA,   // large A
+		LPLB,   // large B
+		LPLC,   // large C
+
+		// Led extenders
+		LDS,    // simple
+		LDA,    // card A
+		LDB,    // card B
+		LDC,    // card C
+
+		// Hopper
+		HT,     // tubes
+		HDA,    // duart type A
+		HDB,    // duart type B
+		HDC,    // duart type C
+		HNA,    // non-duart type A
+		HNB,    // non-duart type B
+		HTW,    // twin
+
+		// Features
+		OVER,   // overcurrent detection
+		P4L,    // use pia4 port a leds
+	};
+}
+
+
 class mpu4_state : public driver_device
 {
 public:
@@ -129,6 +174,8 @@ public:
 		
 	 { }
 
+	void init_m4();
+
 	void init_m4default_alt();
 
 	void init_m4default();
@@ -140,7 +187,6 @@ public:
 
 	void init_m4default_big_low();
 	void init_m4default_big_aux2inv();
-	void init_m4default_806prot();
 	void init_m4tst2();
 
 	void init_m4default_big_five_std();
@@ -170,6 +216,85 @@ public:
 
 	void init_m4default_six_alt();
 	void init_m4default_seven();
+
+	void tr_r4(machine_config &config);
+	void tr_r5(machine_config &config);
+	void tr_r5r(machine_config &config);
+	void tr_r5a(machine_config &config);
+	void tr_r6(machine_config &config);
+	void tr_r6a(machine_config &config);
+	void tr_r7(machine_config &config);
+	void tr_r8(machine_config &config);
+	void tr_rt1(machine_config &config);
+	void tr_rt2(machine_config &config);
+	void tr_rt3(machine_config &config);
+	void tr_lps(machine_config &config);
+	void tr_lpla(machine_config &config);
+	void tr_lplb(machine_config &config);
+	void tr_lplc(machine_config &config);
+	void tr_lds(machine_config &config);
+	void tr_lda(machine_config &config);
+	void tr_ldb(machine_config &config);
+	void tr_ldc(machine_config &config);
+	void tr_ht(machine_config &config);
+	void tr_hda(machine_config &config);
+	void tr_hdb(machine_config &config);
+	void tr_hdc(machine_config &config);
+	void tr_hna(machine_config &config);
+	void tr_hnb(machine_config &config);
+	void tr_htw(machine_config &config);
+	void tr_over(machine_config &config);
+	void tr_p4l(machine_config &config);
+
+	struct trait_wrapper {
+		mpu4_state *state;
+		std::vector<void (mpu4_state::*)(machine_config &)> fragments;
+
+		template<typename T> trait_wrapper(mpu4_state *_state, void (T::*f)(machine_config &), int trait) : state(_state) {
+			fragments.push_back(reinterpret_cast<void (mpu4_state::*)(machine_config &)>(f));
+			(*this)(trait);
+		}
+
+		trait_wrapper operator()(int trait) {
+			switch(trait) {
+			case mpu4_traits::R4:   fragments.push_back(&mpu4_state::tr_r4); break;
+			case mpu4_traits::R5:   fragments.push_back(&mpu4_state::tr_r5); break;
+			case mpu4_traits::R5R:  fragments.push_back(&mpu4_state::tr_r5r); break;
+			case mpu4_traits::R5A:  fragments.push_back(&mpu4_state::tr_r5a); break;
+			case mpu4_traits::R6:   fragments.push_back(&mpu4_state::tr_r6); break;
+			case mpu4_traits::R6A:  fragments.push_back(&mpu4_state::tr_r6a); break;
+			case mpu4_traits::R7:   fragments.push_back(&mpu4_state::tr_r7); break;
+			case mpu4_traits::R8:   fragments.push_back(&mpu4_state::tr_r8); break;
+			case mpu4_traits::RT1:  fragments.push_back(&mpu4_state::tr_rt1); break;
+			case mpu4_traits::RT2:  fragments.push_back(&mpu4_state::tr_rt2); break;
+			case mpu4_traits::RT3:  fragments.push_back(&mpu4_state::tr_rt3); break;
+			case mpu4_traits::LPS:  fragments.push_back(&mpu4_state::tr_lps); break;
+			case mpu4_traits::LPLA: fragments.push_back(&mpu4_state::tr_lpla); break;
+			case mpu4_traits::LPLB: fragments.push_back(&mpu4_state::tr_lplb); break;
+			case mpu4_traits::LPLC: fragments.push_back(&mpu4_state::tr_lplc); break;
+			case mpu4_traits::LDS:  fragments.push_back(&mpu4_state::tr_lds); break;
+			case mpu4_traits::LDA:  fragments.push_back(&mpu4_state::tr_lda); break;
+			case mpu4_traits::LDB:  fragments.push_back(&mpu4_state::tr_ldb); break;
+			case mpu4_traits::LDC:  fragments.push_back(&mpu4_state::tr_ldc); break;
+			case mpu4_traits::HT:   fragments.push_back(&mpu4_state::tr_ht); break;
+			case mpu4_traits::HDA:  fragments.push_back(&mpu4_state::tr_hda); break;
+			case mpu4_traits::HDB:  fragments.push_back(&mpu4_state::tr_hdb); break;
+			case mpu4_traits::HDC:  fragments.push_back(&mpu4_state::tr_hdc); break;
+			case mpu4_traits::HNA:  fragments.push_back(&mpu4_state::tr_hna); break;
+			case mpu4_traits::HNB:  fragments.push_back(&mpu4_state::tr_hnb); break;
+			case mpu4_traits::HTW:  fragments.push_back(&mpu4_state::tr_htw); break;
+			case mpu4_traits::OVER: fragments.push_back(&mpu4_state::tr_over); break;
+			case mpu4_traits::P4L:  fragments.push_back(&mpu4_state::tr_p4l); break;
+			}
+
+			return *this;
+		}
+
+		void operator()(machine_config &config) {
+			for(auto t : fragments)
+				(state->*t)(config);
+		}
+	};
 
 	void mod2(machine_config &config);
 	void mod2_no_bacta(machine_config &config);

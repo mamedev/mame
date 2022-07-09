@@ -2159,11 +2159,16 @@ void mpu4_state::init_m4default_alt()
 	m_bwb_bank=0;
 }
 
-void mpu4_state::init_m4default()
+void mpu4_state::init_m4()
 {
-	use_m4_standard_reels();
 	m_bwb_bank = 0;
 	setup_rom_banks();
+}
+
+void mpu4_state::init_m4default()
+{
+	init_m4();
+	use_m4_standard_reels();
 }
 
 void mpu4_state::init_m4default_lextender()
@@ -2399,6 +2404,155 @@ void mpu4_state::mpu4_reels(machine_config &config, uint8_t NumberOfReels, int16
 									   });
 	}
 }
+
+void mpu4_state::tr_r4(machine_config &config)
+{
+	m_reel_mux = STANDARD_REEL;
+	m_reels = 4;
+}
+
+void mpu4_state::tr_r5(machine_config &config)
+{
+	m_reel_mux = FIVE_REEL_5TO8;
+	m_reels = 5;
+}
+
+void mpu4_state::tr_r5r(machine_config &config)
+{
+	m_reel_mux = FIVE_REEL_8TO5;
+	m_reels = 5;
+}
+
+void mpu4_state::tr_r5a(machine_config &config)
+{
+	m_reel_mux = FIVE_REEL_3TO6;
+	m_reels = 5;
+}
+
+void mpu4_state::tr_r6(machine_config &config)
+{
+	m_reel_mux = SIX_REEL_1TO8;
+	m_reels = 6;
+}
+
+void mpu4_state::tr_r6a(machine_config &config)
+{
+	m_reel_mux = SIX_REEL_5TO8;
+	m_reels = 6;
+}
+
+void mpu4_state::tr_r7(machine_config &config)
+{
+	m_reel_mux = SEVEN_REEL;
+	m_reels = 7;
+}
+
+void mpu4_state::tr_r8(machine_config &config)
+{
+	m_reel_mux = STANDARD_REEL;
+	m_reels = 8;
+}
+
+void mpu4_state::tr_rt1(machine_config &config)
+{
+	mpu4_reels(config, m_reels, 1, 3);
+}
+
+void mpu4_state::tr_rt2(machine_config &config)
+{
+	mpu4_reels(config, m_reels, 4, 12);
+}
+
+void mpu4_state::tr_rt3(machine_config &config)
+{
+	mpu4_reels(config, m_reels, 96, 3);
+}
+
+void mpu4_state::tr_lps(machine_config &config)
+{
+	m_lamp_extender = SMALL_CARD;
+}
+
+void mpu4_state::tr_lpla(machine_config &config)
+{
+	m_lamp_extender = LARGE_CARD_A;
+}
+
+void mpu4_state::tr_lplb(machine_config &config)
+{
+	m_lamp_extender = LARGE_CARD_B;
+}
+
+void mpu4_state::tr_lplc(machine_config &config)
+{
+	m_lamp_extender = LARGE_CARD_C;
+}
+
+void mpu4_state::tr_lds(machine_config &config)
+{
+	m_led_extender = SIMPLE_CARD;
+}
+
+void mpu4_state::tr_lda(machine_config &config)
+{
+	m_led_extender = CARD_A;
+}
+
+void mpu4_state::tr_ldb(machine_config &config)
+{
+	m_led_extender = CARD_B;
+}
+
+void mpu4_state::tr_ldc(machine_config &config)
+{
+	m_led_extender = CARD_C;
+}
+
+void mpu4_state::tr_ht(machine_config &config)
+{
+	m_hopper_type = TUBES;
+}
+
+void mpu4_state::tr_hda(machine_config &config)
+{
+	m_hopper_type = HOPPER_DUART_A;
+}
+
+void mpu4_state::tr_hdb(machine_config &config)
+{
+	m_hopper_type = HOPPER_DUART_B;
+}
+
+void mpu4_state::tr_hdc(machine_config &config)
+{
+	m_hopper_type = HOPPER_DUART_C;
+}
+
+void mpu4_state::tr_hna(machine_config &config)
+{
+	m_hopper_type = HOPPER_NONDUART_A;
+}
+
+void mpu4_state::tr_hnb(machine_config &config)
+{
+	m_hopper_type = HOPPER_NONDUART_B;
+}
+
+void mpu4_state::tr_htw(machine_config &config)
+{
+	m_hopper_type = HOPPER_TWIN_HOPPER;
+}
+
+void mpu4_state::tr_over(machine_config &config)
+{
+	m_overcurrent_detect = true;
+}
+
+void mpu4_state::tr_p4l(machine_config &config)
+{
+	m_use_pia4_porta_leds = true;
+}
+
 
 void mpu4_state::mpu4_common(machine_config &config)
 {
@@ -2756,24 +2910,4 @@ void mpu4_state::mod4oki_5r_cheatchr_table(machine_config &config, const uint8_t
 void mpu4_state::mod4oki_5r_cheatchr(machine_config &config)
 {
 	mod4oki_5r_cheatchr_table(config, nullptr);
-}
-
-
-/***********************************************************************************************
-
-  Inits
-
-***********************************************************************************************/
-
-// TODO: move this to mpu4_characteriser_bootleg.cpp, it's for a single game that requires
-//       a different 'fixed' value depending on the address
-uint8_t mpu4_state::bootleg806_r(address_space &space, offs_t offset)
-{
-	return 0x6a;
-}
-
-void mpu4_state::init_m4default_806prot()
-{
-	init_m4default_sextender();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0806, 0x0806, read8m_delegate(*this, FUNC(mpu4_state::bootleg806_r)));
 }
