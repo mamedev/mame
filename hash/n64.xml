@@ -3140,7 +3140,7 @@ This cart features a RTC, currently unemulated
 		<publisher>Infogrames</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1400000">
-				<rom name="duck dodgers starring daffy duck (usa) (en,fr,es) (beta).bin" size="0x1400000" crc="0829b87a" sha1="10cd84ceadd50dd7c5a06652bb1c203677644fb0" status="baddump" /> <!-- Supposedly comes from a prototype cart. First 16MB match the final USA release. Is this possibly just an overdump or an underdump from a 32MB dev cart? -->
+				<rom name="duck dodgers starring daffy duck (usa) (en,fr,es) (beta).bin" size="0x1400000" crc="0829b87a" sha1="10cd84ceadd50dd7c5a06652bb1c203677644fb0" status="baddump" /> <!-- Supposedly comes from a prototype cart. First 16MB match the final USA release. Is this possibly just an overdump, or is it an underdump from a 32MB dev cart? -->
 			</dataarea>
 		</part>
 	</software>
