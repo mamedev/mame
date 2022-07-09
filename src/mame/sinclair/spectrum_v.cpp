@@ -31,7 +31,7 @@ TIMER_CALLBACK_MEMBER(spectrum_state::finish_screen_update)
 	    https://github.com/mamedev/mame/pull/9670#issuecomment-1118576555
 	    https://github.com/mamedev/mame/pull/9750
 	*/
-	m_screen->update_now();
+	if(param >= 0) m_screen->update_now();
 	m_finish_screen_update_timer->adjust(m_screen->time_until_pos(m_screen->visible_area().bottom(), m_screen->visible_area().right() + 1));
 }
 
@@ -43,7 +43,7 @@ void spectrum_state::video_start()
 	m_irq_on_timer = timer_alloc(FUNC(spectrum_state::irq_on), this);
 	m_irq_off_timer = timer_alloc(FUNC(spectrum_state::irq_off), this);
 	m_finish_screen_update_timer = timer_alloc(FUNC(spectrum_state::finish_screen_update), this);
-	finish_screen_update(0);
+	finish_screen_update(-1); // just setup timer
 
 	m_frame_invert_count = 16;
 	m_screen_location = m_video_ram;
