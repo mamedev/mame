@@ -9,6 +9,13 @@
 
 #include "netlist/devices/net_lib.h"
 
+// uncomment the next line to change the way the horizontal count is done
+// Currently, the bike won't make it down to the second row without this hack
+//#define STUNT_CYCLE_HORIZ_COUNT_HACK 1
+
+// uncomment the next line to make the number of buses increase on 5 sec period
+//#define STUNT_CYCLE_BUS_COUNT_HACK 1
+
 NETLIST_START(stuntcyc)
 {
 
@@ -113,15 +120,32 @@ NETLIST_START(stuntcyc)
 	ALIAS(V4, K1.QD)
 	ALIAS(V_WINDOW, K2.RC)
 
-	TTL_7402_NOR(D4_3, DIRECTION, H6)   // Schematic says DIRECTION, maybe DIRECTION_Q?
-	TTL_7408_AND(B5_1, DIRECTION, H5_AND_H6) // Schematic says DIRECTION, maybe DIRECTION_Q?
+	TTL_7402_NOR(D4_3, DIRECTION_Q, H6)   // Schematic says DIRECTION, maybe DIRECTION_Q?
+	TTL_7408_AND(B5_1, DIRECTION_Q, H5_AND_H6) // Schematic says DIRECTION, maybe DIRECTION_Q?
 	TTL_7402_NOR(D4_4, D4_3.Q, B5_1.Q)
 	TTL_7400_NAND(H2_1, HSYNC_Q, D4_4.Q)
 	TTL_7400_NAND(H2_2, HSYNC_Q, H5)
 
-	TTL_9322(J1, HSYNC, V4, P, V3, 4V, V1, 1V, V2, 2V, GROUND)
-	PROM_82S115(hf1, GROUND, P, J1.Y3, J1.Y4, J1.Y2, J1.Y1, H2_2.Q, H2_1.Q, R2, R3, R4, P)
+	//"TTL_9322","+SELECT,+A1,+B1,+A2,+B2,+A3,+B3,+A4,+B4,+STROBE,@VCC,@GND")
+	TTL_9322(J1, HSYNC, V4, P, V3, 4V, V2, 2V, V1, 1V, GROUND)
+
+	// 1V, 2V, 4V is from the Screen Vertical Counter registers (used for bus images, rom read during hsync)
+	// V1, V2, V3, V4 is from the Vertical Motion registers (relative to cycle, rom read during horizontal scan)
+
+	// PROM_82S115(name, CE1Q, CE2, A0, A1, A2, A3, A4, A5, A6, A7, A8, STROBE)
+	PROM_82S115(hf1, GROUND, P, A0, A1, A2, A3, A4, A5, A6, A7, A8, P)
 	PARAM(hf1.ROM, "004275.f1")
+
+	// 9 bits of rom addressing, 512 bytes
+	ALIAS (A0, J1.Y4)  // image vertical row number 0..15
+	ALIAS (A1, J1.Y3)
+	ALIAS (A2, J1.Y2)
+	ALIAS (A3, J1.Y1)
+	ALIAS (A4, H2_2.Q)  // image horiz byte number  0..3  (0-2 = bike 3 = bus)
+	ALIAS (A5, H2_1.Q)
+	ALIAS (A6, R2)  // image number 0..3 (0=on ground, 1=half-wheelie, 2=full-wheelie, 3=flipped)
+	ALIAS (A7, R3)
+	ALIAS (A8, R4)  // animation frame 0..1
 
 	CLOCK(PROBECLK, 7129200)
 	ALIAS(probe_bit0, WHITE_VIDEO)
@@ -134,9 +158,12 @@ NETLIST_START(stuntcyc)
 	ALIAS(probe_clock, PROBECLK)
 
 	TTL_7404_INVERT(D3_5, H1)
-	TTL_74194(E1, D3_5.Q, MS_1, MS_2, GROUND,   hf1.O1, hf1.O2, hf1.O3, hf1.O4, E2.QA, CYCLE_RESET_A_Q)
-	TTL_74194(E2, D3_5.Q, MS_1, MS_2, E1.QD, hf1.O4, hf1.O5, hf1.O6, hf1.O7, GROUND,   CYCLE_RESET_A_Q)
 
+	// bike shift registers
+	TTL_74194(E1, D3_5.Q, MS_1, MS_2, GROUND, hf1.O1, hf1.O2, hf1.O3, hf1.O4, E2.QA,  CYCLE_RESET_A_Q)
+	TTL_74194(E2, D3_5.Q, MS_1, MS_2, E1.QD,  hf1.O5, hf1.O6, hf1.O7, hf1.O8, GROUND, CYCLE_RESET_A_Q)
+
+	// bus shift register
 	TTL_74165(F2, CLOCK, GROUND, HSYNC_Q, F2.QH, hf1.O1, hf1.O2, hf1.O3, hf1.O4, hf1.O5, hf1.O6, hf1.O7, hf1.O8)
 	TTL_7474(D2_1, CLOCK, F2.QH, OBJECT_ZONE, P)
 	ALIAS(OBJECTS_Q, D2_1.QQ)
@@ -221,18 +248,18 @@ NETLIST_START(stuntcyc)
 	ALIAS(QQ, C8_4.Q)
 
 	/* Start buttons, etc. */
-	SWITCH(START1)
-	RES(R11, RES_K(1))
+	SWITCH(START1)  // START1 is connected to R12
+	RES(R12, RES_K(1))
 	NET_C(START1.2, GND)
-	NET_C(R11.1, V5)
-	NET_C(START1.1, R11.2)
+	NET_C(R12.1, V5)
+	NET_C(START1.1, R12.2)
 	TTL_7410_NAND(H9_1, 2_PLAYER_CREDIT, START, R11.2)
 
-	SWITCH(START2)
-	RES(R12, RES_K(1))
+	SWITCH(START2)  // START2 connected to R11
+	RES(R11, RES_K(1))
 	NET_C(START2.2, GND)
-	NET_C(R12.1, V5)
-	NET_C(START2.1, R12.2)
+	NET_C(R11.1, V5)
+	NET_C(START2.1, R11.2)
 	TTL_7410_NAND(H9_2, H9_1.Q, START, R12.2)
 
 	TTL_7400_NAND(J8_2, FREE_COIN_Q, H8_2.QQ)
@@ -349,9 +376,22 @@ NETLIST_START(stuntcyc)
 	ALIAS(MOTOR_PULSE, C1.QA)
 	ALIAS(R4, C1.QD)
 
-	TTL_7400_NAND(B2_2, DIRECTION_Q, C2_2.Q)
-	TTL_9316(C3, HF_CLOCK, P,     P, H_COUNTER_RESET_Q, A3_2.Q, C2_2.Q, B2_2.Q, P, P)
-	TTL_9316(B3, HF_CLOCK, C3.RC, P, H_COUNTER_RESET_Q, A3_2.Q, GROUND,    P,      P, GROUND)
+#ifdef STUNT_CYCLE_HORIZ_COUNT_HACK
+	TTL_7486_XOR(B2_2, DIRECTION_Q, C2_2.Q) // FIXME HACK: this should be a 7400 NAND
+	// Horizontal counting (leftward movement) isn't quite working properly.
+	// Without this hack, the bike never will make it down to the ramp level.
+	// With this hack, the bike will move through the second level very quickly.
+	// The Horizontal Motion counters will reset after hitting 0x3ff,
+	// beginning from a count of 0x6d, 0x6e or 0x6f.
+	// (HF counter is 914, 2 times the 1H count of 457)
+	// 0x6d start = count of 913, move left 1
+	// 0x6e start = count of 914, no movement
+	// 0x6f start = count of 915, move right 1
+#else
+	TTL_7400_NAND(B2_2, DIRECTION_Q, C2_2.Q) // correct chip is a NAND
+#endif
+	TTL_9316(C3, HF_CLOCK, P,     P, H_COUNTER_RESET_Q, A3_2.Q, C2_2.Q, B2_2.Q, P, P)  // load 0xd, 0xe, or 0xf
+	TTL_9316(B3, HF_CLOCK, C3.RC, P, H_COUNTER_RESET_Q, A3_2.Q, GROUND, P, P, GROUND)  // load 0x6
 	ALIAS(H1, C3.QA)
 	ALIAS(H2, C3.QB)
 	ALIAS(H3, C3.QC)
@@ -404,7 +444,16 @@ NETLIST_START(stuntcyc)
 	TTL_7474(C5_2, GOOD_JUMP_Q, MAX_SCORE_Q, H5_4.Q, P)
 
 	TTL_7402_NOR(A8_2, E5.QA, C5_2.QQ)
+
+#ifdef STUNT_CYCLE_BUS_COUNT_HACK
+	CLOCK(BUSES_COUNT_UP, 0.20) // FIXME: HACK to increase the number of buses on 5 sec period clock
+	// When buses == 12, there is a strange graphics glitch on the leading ramp
+	NET_C(BUSES_COUNT_UP.VCC, VCC)
+	NET_C(BUSES_COUNT_UP.GND, GND)
+	TTL_74192(B8, GROUND, GROUND, GROUND, P, GROUND, START_Q, BUSES_COUNT_UP, P) // FIXME: HACK to test buses
+#else
 	TTL_74192(B8, GROUND, GROUND, GROUND, P, GROUND, START_Q, A8_2.Q, P)
+#endif
 	TTL_7474(A9_2, B8.CARRYQ, A9_2.QQ, START_Q, P)
 	TTL_7402_NOR(A8_3, A9_2.Q, B8.QD)
 	ALIAS(A, B8.QA)
@@ -415,7 +464,11 @@ NETLIST_START(stuntcyc)
 	ALIAS(F, A8_3.Q)
 
 	TTL_7408_AND(B5_2, E5.QA, C5_2.Q)
+#ifdef STUNT_CYCLE_BUS_COUNT_HACK
+	TTL_74192(B9, GROUND, GROUND, GROUND, P, GROUND, START_Q, BUSES_COUNT_UP, P)
+#else
 	TTL_74192(B9, GROUND, GROUND, GROUND, P, GROUND, START_Q, B5_2.Q, P)
+#endif
 	TTL_7474(A9_1, B9.CARRYQ, A9_1.QQ, START_Q, P)
 	TTL_7402_NOR(A8_1, A9_1.Q, B9.QD)
 	ALIAS(G, B9.QA)
@@ -431,7 +484,7 @@ NETLIST_START(stuntcyc)
 	ALIAS(PLAYER_CONTROL, H6_4.Q)
 
 	TTL_7404_INVERT(D3_2, 128V)
-	TTL_7450_ANDORINVERT(D1_1, D3_2.Q, 256H_Q, D5_4.Q, V_SCORE_Q)
+	TTL_7450_ANDORINVERT(D1_1, D3_2.Q, 256H_Q, D5_4.Q, 128V)
 
 	TTL_9322(B7, D1_1.Q, A, G, B, H, C, J, D, K, GROUND)
 	TTL_9322(A7, D1_1.Q, E, L, F, M, GROUND, GROUND, GROUND, GROUND, GROUND)
@@ -461,20 +514,20 @@ NETLIST_START(stuntcyc)
 	// The eprom is always enabled and outputs are only connected to logic inputs
 	PARAM(d7.FORCE_TRISTATE_LOGIC, 1)
 
-	ALIAS(MAX_SCORE_Q, d7.O6)
+	ALIAS(MAX_SCORE_Q, d7.O5)
 
 	TTL_7410_NAND(D6_1, 256H_Q, 128H, 128H)
 	TTL_7427_NOR(D8_3, 64H, 32H, D6_1.Q)
-	TTL_7486_XOR(C8_2, D6_1.Q, d7.O5)
+	TTL_7486_XOR(C8_2, D6_1.Q, d7.O4)
 	ALIAS(FIXED_RAMP_ZONE, D8_3.Q)
 
 	TTL_INPUT(FREESCORE_SW_B0, 0)
 	TTL_INPUT(FREESCORE_SW_B1, 0)
 	TTL_INPUT(FREESCORE_SW_B2, 0)
 	TTL_INPUT(FREESCORE_SW_B3, 1)
-	TTL_7402_NOR(K6_4, d7.O5, OBJECT_ZONE_Q)
-	TTL_7485(E6, d7.O1, d7.O2, d7.O3, d7.O4, 8H, 16H, 32H, 64H, GROUND, C8_2.Q, GROUND)
-	TTL_7485(E7, d7.O1, d7.O2, d7.O3, d7.O4, FREESCORE_SW_B0, FREESCORE_SW_B1, FREESCORE_SW_B2, FREESCORE_SW_B3, GROUND, K6_4.Q, GROUND)
+	TTL_7402_NOR(K6_4, d7.O4, OBJECT_ZONE_Q)
+	TTL_7485(E6, d7.O0, d7.O1, d7.O2, d7.O3, 8H, 16H, 32H, 64H, GROUND, C8_2.Q, GROUND)
+	TTL_7485(E7, d7.O0, d7.O1, d7.O2, d7.O3, FREESCORE_SW_B0, FREESCORE_SW_B1, FREESCORE_SW_B2, FREESCORE_SW_B3, GROUND, K6_4.Q, GROUND)
 	ALIAS(FREE_GAME, E7.EQOUT)
 
 	TTL_7474(F6_1, CLOCK_Q, E6.EQOUT, 128H_XOR_256H, P)
@@ -534,7 +587,7 @@ NETLIST_START(stuntcyc)
 
 	/* Controls */
 
-	CLOCK(SPEED_PULSES, 1000) // FIXME: Should be output of a 566 VCO
+	CLOCK(SPEED_PULSES, 250) // FIXME: Should be output of a 566 VCO
 	TTL_INPUT(R38_2, 0) // FIXME: Should be output of the resistor connected to LM747 L10_1
 	TTL_INPUT(R39_2, 0) // FIXME: Should be output of the resistor connected to LM747 L10_2
 
@@ -590,7 +643,10 @@ NETLIST_START(stuntcyc)
 	ALIAS(R2, M8.QB)
 	ALIAS(R3, M8.QC)
 
-	TTL_74193(L8, FIXED_RAMP_ZONE_Q, FIXED_RAMP_ZONE, P, P, JUMP_Q, LOAD_Q, P, GRAVITY) // Schematics say C and D should be to VCC - maybe ground instead?
+//	TTL_74193(L8, FIXED_RAMP_ZONE_Q, FIXED_RAMP_ZONE, P, P, JUMP_Q, LOAD_Q, P, GRAVITY) // Schematics say C and D should be to VCC - maybe ground instead?
+// changed C,D to GROUND and bike will jump, so maybe schematics incorrect
+	TTL_74193(L8, FIXED_RAMP_ZONE_Q, FIXED_RAMP_ZONE, GROUND, GROUND, JUMP_Q, LOAD_Q, P, GRAVITY) // Schematics say C and D should be to VCC - maybe ground instead?
+
 	ALIAS(Av, L8.QA)
 	ALIAS(Bv, L8.QB)
 	ALIAS(Cv, L8.QC)
@@ -639,8 +695,8 @@ NETLIST_START(stuntcyc)
 	CAP(C13, CAP_P(470))
 	CAP(C14, CAP_U(1))
 	TTL_9602_DIP(N6)
-	ALIAS(CYCLE_RESET, N6.9)
-	ALIAS(CYCLE_RESET_Q, N6.10)
+	ALIAS(CYCLE_RESET_Q, N6.9)
+	ALIAS(CYCLE_RESET, N6.10)
 	ALIAS(FLIP_TIMER_Q, N6.7)
 
 	NET_C(R40.1, V5)
@@ -660,6 +716,8 @@ NETLIST_START(stuntcyc)
 	NET_C(N6.14, R43.2)
 	NET_C(N6.13, P)
 	NET_C(N6.11, L6_2.Q)
+	NET_C(N6.16, VCC)  // hookups to VCC and ground
+	NET_C(N6.8, GND)
 
 	TTL_7400_NAND(M6_2, START_Q, R42.1)
 	NET_C(N6.12, M6_2.Q)
