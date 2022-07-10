@@ -46,15 +46,34 @@ online are missing it. A scan of the DX27/DX100 Overall Circuit Diagram is avail
 online separately; it does not appear to have spread as far and wide as the rest of the
 service manual, but is still readily available.
 
-*** Currently unemulated
+*** Currently imperfectly emulated
 
     - [TODO1] The cassette interface.
       This uses an 8-pin DIN with what appears to be the same pinout as the MSX.
       However, the remote lines are completely unused, and the tape player has
-      to be manually operated. I don't quite see how this case is supposed to be
-      programmed into MAME, which appears to rely on the emulated machine
-      controlling the tape player? Either way, I also don't know what the ranges
-      of cassette samples get translated to a 1 or a 0.
+      to be manually operated. The "dxconvert" project by rarepixel does claim to
+      support DX100 tape dumps, and does so by using the "castools" project by
+      joyrex2001, which includes a program to convert wav files storing the raw
+      tape audio to MSX .cas files. dxconvert uses the command-line parameters
+      "-p -e 4 -t 10"; I'm not sure how to interpret this, even after reading
+      the code.
+      
+      The constant used below for testing against m_cassette->input() was guessed
+      through trial and error until I could get a successful load at least somewhat
+      consistently. It still isn't perfect, but I don't know how to refine this
+      further.
+      
+      "dxconvert": https://github.com/rarepixel/dxconvert
+      "castools": https://github.com/joyrex2001/castools
+      The sample voices that I used to test can be found at
+      http://robertgomez.org/blog/2017/08/02/some-yamaha-dx100-dx27-synth-patches/
+      I loaded the wav download here, saved it to another wav,
+      verified that wav (the DX100 will ask to verify data you just
+      saved), and then converted both to .cas as described and compared
+      the two; they are identical.
+
+*** Currently unemulated
+
     - [TODO2] Bit 5 of port 6 is tied to the /G2A and /G2B pins of the two
       TC40H138P chips (~~ 74138?) that sit between the panel switches and the CPU.
       I don't yet understand how these lines are actually used, but I can still use
@@ -191,6 +210,7 @@ void yamaha_dx100_state::init_dx100()
 #include "machine/nvram.h"
 #include "sound/ymopm.h"
 #include "video/hd44780.h"
+#include "imagedev/cassette.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -208,6 +228,7 @@ public:
 		, m_keysbuttons(*this, "P6_%d", 0)
 		, m_midi_in(true)
 		, m_led(*this, "LED")
+		, m_cassette(*this, "cassette")
 	{
 	}
 
@@ -238,6 +259,8 @@ private:
 
 	// for hooking up the LED to layouts
 	output_finder<> m_led;
+
+	required_device<cassette_image_device> m_cassette;
 };
 
 void yamaha_dx100_state::driver_start()
@@ -510,13 +533,18 @@ void yamaha_dx100_state::dx100(machine_config &config)
 	m_maincpu->in_p2_cb().set_ioport("P2");
 	m_maincpu->out_p2_cb().set_ioport("P2");
 	m_maincpu->in_p6_cb().set([this]() -> u8 {
-		u8 casplay = m_port6_val & 0x80; // [TODO1]
-		u8 casrec = m_port6_val & 0x40; // [TODO1]
+		// [TODO1] The threshold here and the output values below should be double-checked.
+		u8 casplay = (m_cassette->input() > 0.009) ? 0x80 : 0;
+		// [TODO1] Need to verify if this bit is held on output or not
+		u8 casrec = m_port6_val & 0x40;
 		u8 adcval = ((u8) (m_adc->eoc_r() << 4)) & 0x10;
 		u8 port5line = (m_port6_val & 0x2f);
 		return casplay | casrec | adcval | port5line;
 	});
-	m_maincpu->out_p6_cb().set([this](u8 val) { m_port6_val = val; });
+	m_maincpu->out_p6_cb().set([this](u8 val) {
+		m_port6_val = val;
+		m_cassette->output(((m_port6_val & 0x40) != 0) ? -1.0 : 1.0);
+	});
 	m_maincpu->in_p5_cb().set([this]() -> u8 {
 		u8 line = m_port6_val & 0x2f;
 		if ((line & 0x20) != 0)
@@ -562,6 +590,10 @@ void yamaha_dx100_state::dx100(machine_config &config)
 	ym2164_device &ymsnd(YM2164(config, "ymsnd", 7.15909_MHz_XTAL / 2)); // with YM3014 DAC
 	ymsnd.add_route(0, "lspeaker", 0.60);
 	ymsnd.add_route(1, "rspeaker", 0.60);
+
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED);
+	m_cassette->set_interface("ymdx100_cass");
 }
 
 ROM_START(dx100)
