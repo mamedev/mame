@@ -11848,7 +11848,7 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<software name="kingqstd">
+	<software name="kingqstd" supported="no">
 		<description>King's Quest (DOS release)</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
