@@ -19,7 +19,11 @@ public:
 
 	void base_f(machine_config &config);
 
-	trait_wrapper base(int trait);
+	template <typename... T>
+	auto base(T... traits)
+	{
+		return trait_wrapper(this, &mpu4redpoint_state::base_f, traits...);
+	}
 
 private:
 	void add_ympcm(machine_config &config);
@@ -52,11 +56,6 @@ void mpu4redpoint_state::base_f(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4redpoint_state::memmap_ympcm);
 
 	add_ympcm(config);
-}
-
-mpu4_state::trait_wrapper mpu4redpoint_state::base(int trait)
-{
-	return trait_wrapper(this, &mpu4redpoint_state::base_f, trait);
 }
 
 MACHINE_START_MEMBER(mpu4redpoint_state,mpu4redpoint)
@@ -144,4 +143,4 @@ ROM_START( m4cbing )
 ROM_END
 
 
-GAME( 1998, m4cbing,   0,          base(R4)(RT1), m4cbing, mpu4redpoint_state, init_m4, ROT0,   "Redpoint Systems", "Cherry Bingo (Redpoint Systems) (MPU4)", GAME_FLAGS )
+GAME( 1998, m4cbing,   0,          base(R4, RT1), m4cbing, mpu4redpoint_state, init_m4, ROT0,   "Redpoint Systems", "Cherry Bingo (Redpoint Systems) (MPU4)", GAME_FLAGS )

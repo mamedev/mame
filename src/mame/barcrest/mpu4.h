@@ -246,55 +246,76 @@ public:
 	void tr_over(machine_config &config);
 	void tr_p4l(machine_config &config);
 
-	struct trait_wrapper {
-		mpu4_state *state;
-		std::vector<void (mpu4_state::*)(machine_config &)> fragments;
+	template <typename Class, unsigned Count>
+	struct trait_wrapper_impl
+	{
+	public:
+		using config_func = void (Class::*)(machine_config &);
 
-		template<typename T> trait_wrapper(mpu4_state *_state, void (T::*f)(machine_config &), int trait) : state(_state) {
-			fragments.push_back(reinterpret_cast<void (mpu4_state::*)(machine_config &)>(f));
-			(*this)(trait);
+		template <typename... T>
+		trait_wrapper_impl(Class *_state, T... traits)
+			: state(_state)
+			, fragments{ apply(traits)... }
+		{
 		}
 
-		trait_wrapper operator()(int trait) {
-			switch(trait) {
-			case mpu4_traits::R4:   fragments.push_back(&mpu4_state::tr_r4); break;
-			case mpu4_traits::R5:   fragments.push_back(&mpu4_state::tr_r5); break;
-			case mpu4_traits::R5R:  fragments.push_back(&mpu4_state::tr_r5r); break;
-			case mpu4_traits::R5A:  fragments.push_back(&mpu4_state::tr_r5a); break;
-			case mpu4_traits::R6:   fragments.push_back(&mpu4_state::tr_r6); break;
-			case mpu4_traits::R6A:  fragments.push_back(&mpu4_state::tr_r6a); break;
-			case mpu4_traits::R7:   fragments.push_back(&mpu4_state::tr_r7); break;
-			case mpu4_traits::R8:   fragments.push_back(&mpu4_state::tr_r8); break;
-			case mpu4_traits::RT1:  fragments.push_back(&mpu4_state::tr_rt1); break;
-			case mpu4_traits::RT2:  fragments.push_back(&mpu4_state::tr_rt2); break;
-			case mpu4_traits::RT3:  fragments.push_back(&mpu4_state::tr_rt3); break;
-			case mpu4_traits::LPS:  fragments.push_back(&mpu4_state::tr_lps); break;
-			case mpu4_traits::LPLA: fragments.push_back(&mpu4_state::tr_lpla); break;
-			case mpu4_traits::LPLB: fragments.push_back(&mpu4_state::tr_lplb); break;
-			case mpu4_traits::LPLC: fragments.push_back(&mpu4_state::tr_lplc); break;
-			case mpu4_traits::LDS:  fragments.push_back(&mpu4_state::tr_lds); break;
-			case mpu4_traits::LDA:  fragments.push_back(&mpu4_state::tr_lda); break;
-			case mpu4_traits::LDB:  fragments.push_back(&mpu4_state::tr_ldb); break;
-			case mpu4_traits::LDC:  fragments.push_back(&mpu4_state::tr_ldc); break;
-			case mpu4_traits::HT:   fragments.push_back(&mpu4_state::tr_ht); break;
-			case mpu4_traits::HDA:  fragments.push_back(&mpu4_state::tr_hda); break;
-			case mpu4_traits::HDB:  fragments.push_back(&mpu4_state::tr_hdb); break;
-			case mpu4_traits::HDC:  fragments.push_back(&mpu4_state::tr_hdc); break;
-			case mpu4_traits::HNA:  fragments.push_back(&mpu4_state::tr_hna); break;
-			case mpu4_traits::HNB:  fragments.push_back(&mpu4_state::tr_hnb); break;
-			case mpu4_traits::HTW:  fragments.push_back(&mpu4_state::tr_htw); break;
-			case mpu4_traits::OVER: fragments.push_back(&mpu4_state::tr_over); break;
-			case mpu4_traits::P4L:  fragments.push_back(&mpu4_state::tr_p4l); break;
-			}
-
-			return *this;
-		}
-
-		void operator()(machine_config &config) {
-			for(auto t : fragments)
+		void operator()(machine_config &config)
+		{
+			for (auto &t : fragments)
 				(state->*t)(config);
 		}
+
+	private:
+		config_func apply(int trait)
+		{
+			switch (trait)
+			{
+			case mpu4_traits::R4:   return &mpu4_state::tr_r4;
+			case mpu4_traits::R5:   return &mpu4_state::tr_r5;
+			case mpu4_traits::R5R:  return &mpu4_state::tr_r5r;
+			case mpu4_traits::R5A:  return &mpu4_state::tr_r5a;
+			case mpu4_traits::R6:   return &mpu4_state::tr_r6;
+			case mpu4_traits::R6A:  return &mpu4_state::tr_r6a;
+			case mpu4_traits::R7:   return &mpu4_state::tr_r7;
+			case mpu4_traits::R8:   return &mpu4_state::tr_r8;
+			case mpu4_traits::RT1:  return &mpu4_state::tr_rt1;
+			case mpu4_traits::RT2:  return &mpu4_state::tr_rt2;
+			case mpu4_traits::RT3:  return &mpu4_state::tr_rt3;
+			case mpu4_traits::LPS:  return &mpu4_state::tr_lps;
+			case mpu4_traits::LPLA: return &mpu4_state::tr_lpla;
+			case mpu4_traits::LPLB: return &mpu4_state::tr_lplb;
+			case mpu4_traits::LPLC: return &mpu4_state::tr_lplc;
+			case mpu4_traits::LDS:  return &mpu4_state::tr_lds;
+			case mpu4_traits::LDA:  return &mpu4_state::tr_lda;
+			case mpu4_traits::LDB:  return &mpu4_state::tr_ldb;
+			case mpu4_traits::LDC:  return &mpu4_state::tr_ldc;
+			case mpu4_traits::HT:   return &mpu4_state::tr_ht;
+			case mpu4_traits::HDA:  return &mpu4_state::tr_hda;
+			case mpu4_traits::HDB:  return &mpu4_state::tr_hdb;
+			case mpu4_traits::HDC:  return &mpu4_state::tr_hdc;
+			case mpu4_traits::HNA:  return &mpu4_state::tr_hna;
+			case mpu4_traits::HNB:  return &mpu4_state::tr_hnb;
+			case mpu4_traits::HTW:  return &mpu4_state::tr_htw;
+			case mpu4_traits::OVER: return &mpu4_state::tr_over;
+			case mpu4_traits::P4L:  return &mpu4_state::tr_p4l;
+			default: return nullptr; // crash later on invalid arguments
+			}
+		}
+
+		config_func apply(config_func f)
+		{
+			return f;
+		}
+
+		Class *state;
+		config_func fragments[Count];
 	};
+
+	template <typename T, typename... U>
+	auto trait_wrapper(T *state, U... traits)
+	{
+		return trait_wrapper_impl<T, sizeof...(U)>(state, traits...);
+	}
 
 	void mod2(machine_config &config);
 	void mod2_no_bacta(machine_config &config);
