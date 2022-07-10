@@ -500,7 +500,7 @@ static INPUT_PORTS_START(dx100)
 
 	PORT_START("AN3")
 	// The data entry slider stays in place to wherever it's set.
-	PORT_BIT( 0xff, 0, IPT_POSITIONAL ) PORT_NAME("Data Entry Slider") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_MINMAX(0x00, 0xff) PORT_CENTERDELTA(0)
+	PORT_BIT( 0xff, 0, IPT_POSITIONAL_V ) PORT_NAME("Data Entry Slider") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_MINMAX(0x00, 0xff) PORT_CENTERDELTA(0)
 
 	PORT_START("AN5")
 	PORT_CONFNAME( 0xff, 0x80, "Internal RAM Battery Level" )
