@@ -62,33 +62,6 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dinosaur">
-		<description>Dinosaur (cracked)</description>
-		<year>1991</year>
-		<publisher>日本ファルコム (Nihon Falcom)</publisher>
-		<info name="alt_title" value="ダイナソア" />
-		<info name="release" value="199110xx" />
-		<info name="usage" value="Requires 2 MB RAM"/>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Program Disk" />
-			<dataarea name="flop" size="1261568">
-				<rom name="dinosaur_program_disk.hdm" size="1261568" crc="2f652873" sha1="190dc1a07c1b4ac1ccc96295e8b178c15eaf89b1"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Scenario Disk 1" />
-			<dataarea name="flop" size="1261568">
-				<rom name="dinosaur_scenario_disk_1_cracked.hdm" size="1261568" crc="e230629d" sha1="a2d0f382a49bb8b9c71d0cd23c7ec9f7b13f823b"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Scenario Disk 2" />
-			<dataarea name="flop" size="1261568">
-				<rom name="dinosaur_scenario_disk_2_cracked.hdm" size="1261568" crc="6a449cdc" sha1="792c40cd43ab723b4832995e55ef1367a6e462ae"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<!-- All the files in these images match the original disks, except for an additional CONTENTS.GBX file. It's unclear if they are actually cracked or not. -->
 	<software name="supdaisn">
 		<description>Super Daisenryaku (cracked?)</description>

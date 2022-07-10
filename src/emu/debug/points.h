@@ -102,8 +102,8 @@ private:
 	void triggered(read_or_write type, offs_t address, u64 data, u64 mem_mask);
 
 	device_debug * m_debugInterface;                 // the interface we were created from
-	memory_passthrough_handler *m_phr;               // passthrough handler reference, read access
-	memory_passthrough_handler *m_phw;               // passthrough handler reference, write access
+	memory_passthrough_handler m_phr;                // passthrough handler reference, read access
+	memory_passthrough_handler m_phw;                // passthrough handler reference, write access
 	address_space &      m_space;                    // address space
 	int                  m_index;                    // user reported index
 	bool                 m_enabled;                  // enabled?
@@ -112,7 +112,7 @@ private:
 	offs_t               m_length;                   // length of watch area
 	parsed_expression    m_condition;                // condition
 	std::string          m_action;                   // action
-	int                  m_notifier;                 // address map change notifier id
+	util::notifier_subscription m_notifier;          // address map change notifier ID
 
 	offs_t               m_start_address[3];         // the start addresses of the checks to install
 	offs_t               m_end_address[3];           // the end addresses

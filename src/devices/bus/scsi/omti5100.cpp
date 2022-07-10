@@ -54,7 +54,7 @@ void omti5100_device::ExecCommand()
 		m_transfer_length = 0;
 		return;
 	}
-	hard_disk_info *info = hard_disk_get_info(image);
+	const auto &info = image->get_info();
 	switch(command[0])
 	{
 		case OMTI_READ_DATA_BUFFER:
@@ -77,7 +77,7 @@ void omti5100_device::ExecCommand()
 		{
 			int track = ((command[1]&0x1f)<<16 | command[2]<<8 | command[3]) / (m_param[drive].sectors ? m_param[drive].sectors : 1);
 			int heads = m_param[drive].heads ? m_param[drive].heads : 1;
-			if(((track % heads) > info->heads) || (track >= (info->cylinders * heads)))
+			if(((track % heads) > info.heads) || (track >= (info.cylinders * heads)))
 			{
 				m_phase = SCSI_PHASE_STATUS;
 				m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
@@ -94,15 +94,15 @@ void omti5100_device::ExecCommand()
 		case OMTI_FORMAT_TRACK:
 		{
 			int track = ((command[1]&0x1f)<<16 | command[2]<<8 | command[3]) / m_param[drive].sectors;
-			if(((track % m_param[drive].heads) <= info->heads) && (track < (info->cylinders * m_param[drive].heads)))
+			if(((track % m_param[drive].heads) <= info.heads) && (track < (info.cylinders * m_param[drive].heads)))
 			{
-				std::vector<uint8_t> sector(info->sectorbytes);
-				memset(&sector[0], 0xe5, info->sectorbytes);
+				std::vector<uint8_t> sector(info.sectorbytes);
+				memset(&sector[0], 0xe5, info.sectorbytes);
 				m_phase = SCSI_PHASE_STATUS;
 				m_status_code = SCSI_STATUS_CODE_GOOD;
 				m_transfer_length = 0;
-				for(int i = 0; i < info->sectors; i++)
-					hard_disk_write(image, track * info->sectors + i, &sector[0]);
+				for(int i = 0; i < info.sectors; i++)
+					image->write(track * info.sectors + i, &sector[0]);
 			}
 			else
 			{
@@ -149,7 +149,7 @@ void omti5100_device::WriteData( uint8_t *data, int dataLength )
 			m_param[drive].cylinders = ((data[4] << 8) | data[5]) + 1;
 			if(!data[8] && image)
 			{
-				switch(hard_disk_get_info(image)->sectorbytes)
+				switch(image->get_info().sectorbytes)
 				{
 					case 128:
 						m_param[drive].sectors = 53;

@@ -209,8 +209,8 @@ protected:
 	{
 		mitsumi_keyboard_base::device_start();
 
-		m_wd_timeout = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mitsumi_watchdog_keyboard_base::wd_timeout), this));
-		m_wd_pulse = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mitsumi_watchdog_keyboard_base::wd_pulse), this));
+		m_wd_timeout = timer_alloc(FUNC(mitsumi_watchdog_keyboard_base::wd_timeout), this);
+		m_wd_pulse = timer_alloc(FUNC(mitsumi_watchdog_keyboard_base::wd_pulse), this);
 
 		m_pd7 = 0x01U;
 
@@ -284,7 +284,7 @@ protected:
 	{
 		mitsumi_watchdog_keyboard_base::device_start();
 
-		m_reset_pulse = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a500_keyboard_base::reset_pulse), this));
+		m_reset_pulse = timer_alloc(FUNC(a500_keyboard_base::reset_pulse), this);
 
 		m_reset_active = 0U;
 
@@ -344,7 +344,7 @@ protected:
 	{
 		mitsumi_keyboard_base::device_start();
 
-		m_reset_pulse = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a600_keyboard_base::reset_pulse), this));
+		m_reset_pulse = timer_alloc(FUNC(a600_keyboard_base::reset_pulse), this);
 
 		m_reset_trigger = 0U;
 		m_reset_active = 0U;

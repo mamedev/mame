@@ -267,12 +267,12 @@ void via6522_device::device_start()
 	m_sr = 0;
 
 	m_time2 = m_time1 = machine().time();
-	m_t1 = timer_alloc(TIMER_T1);
-	m_t2 = timer_alloc(TIMER_T2);
-	m_ca2_timer = timer_alloc(TIMER_CA2);
-	m_cb2_timer = timer_alloc(TIMER_CB2);
-	m_shift_timer = timer_alloc(TIMER_SHIFT);
-	m_shift_irq_timer = timer_alloc(TIMER_SHIFT_IRQ);
+	m_t1 = timer_alloc(FUNC(via6522_device::t1_tick), this);
+	m_t2 = timer_alloc(FUNC(via6522_device::t2_tick), this);
+	m_ca2_timer = timer_alloc(FUNC(via6522_device::ca2_tick), this);
+	m_cb2_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
+	m_shift_timer = timer_alloc(FUNC(via6522_device::shift_tick), this);
+	m_shift_irq_timer = timer_alloc(FUNC(via6522_device::shift_irq_tick), this);
 
 	/* save state register */
 	save_item(NAME(m_in_a));
@@ -426,7 +426,7 @@ void via6522_device::clear_int(int data)
 
 
 /*-------------------------------------------------
-    via_shift
+    shift_out
 -------------------------------------------------*/
 
 void via6522_device::shift_out()
@@ -449,7 +449,7 @@ void via6522_device::shift_out()
 	}
 	else // Check for INT condition, eg the last and raising edge of the 15-0 falling/raising edges
 	{
-		if (!SO_T2_RATE(m_acr)) // The T2 continous shifter doesn't do interrupts (mode 4)
+		if (!SO_T2_RATE(m_acr)) // The T2 continuous shifter doesn't do interrupts (mode 4)
 		{
 			if (m_shift_counter == 0 && (SO_O2_CONTROL(m_acr) || SO_T2_CONTROL(m_acr)))
 			{
@@ -470,7 +470,7 @@ void via6522_device::shift_in()
 		m_sr =  (m_sr << 1) | (m_in_cb2 & 1);
 		LOGSHIFT("%02x\n", m_sr);
 
-		if (m_shift_counter == 0)
+		if (m_shift_counter == 0 && !SR_DISABLED(m_acr))
 		{
 			LOGINT("SHIFT in INT request ");
 //            set_int(INT_SR);// TODO: this interrupt is 1-2 clock cycles too early
@@ -480,94 +480,92 @@ void via6522_device::shift_in()
 	m_shift_counter = (m_shift_counter - 1) & 0x0f; // Count all edges
 }
 
-void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(via6522_device::shift_irq_tick)
 {
-	switch (id)
+	// This timer event is a delayed IRQ for improved cycle accuracy
+	set_int(INT_SR);  // triggered from shift_in or shift_out on the last rising edge
+	m_shift_irq_timer->adjust(attotime::never); // Not needed really...
+}
+
+TIMER_CALLBACK_MEMBER(via6522_device::shift_tick)
+{
+	LOGSHIFT("SHIFT timer event CB1 %s edge, %d\n", m_out_cb1 & 1 ? "falling" : "raising", m_shift_counter);
+	m_out_cb1 ^= 1;
+	m_cb1_handler(m_out_cb1);
+
+	// we call shift methods for all edges
+	if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
 	{
-		case TIMER_SHIFT_IRQ: // This timer event is a delayed IRQ for improved cycle accuracy
-			set_int(INT_SR);  // triggered from shift_in or shift_out on the last rising edge
-			m_shift_irq_timer->adjust(attotime::never); // Not needed really...
-			break;
-		case TIMER_SHIFT:
-			LOGSHIFT("SHIFT timer event CB1 %s edge, %d\n", m_out_cb1 & 1 ? "falling" : "raising", m_shift_counter);
-			m_out_cb1 ^= 1;
-			m_cb1_handler(m_out_cb1);
-
-			// we call shift methods for all edges
-			if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
-			{
-				shift_out();
-			}
-			else if (SI_T2_CONTROL(m_acr) || SI_O2_CONTROL(m_acr))
-			{
-				shift_in();
-			}
-
-			// If in continous mode or the shifter is still shifting we re-arm the timer
-			if (SO_T2_RATE(m_acr) || (m_shift_counter < 0x0f))
-			{
-				if (SI_O2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
-				{
-					m_shift_timer->adjust(clocks_to_attotime(1));
-				}
-				else if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SI_T2_CONTROL(m_acr))
-				{
-					m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2) / 2);
-				}
-				else // otherwise we stop it
-				{
-					m_shift_timer->adjust(attotime::never);
-				}
-			}
-			break;
-		case TIMER_T1:
-			if (T1_CONTINUOUS (m_acr))
-			{
-				m_t1_pb7 = !m_t1_pb7;
-				m_t1->adjust(clocks_to_attotime(TIMER1_VALUE + IFR_DELAY));
-			}
-			else
-			{
-				m_t1_pb7 = 1;
-				m_t1_active = 0;
-				m_time1 = machine().time();
-			}
-
-			if (T1_SET_PB7(m_acr))
-			{
-				output_pb();
-			}
-
-			LOGINT("T1 INT request ");
-			set_int(INT_T1);
-			break;
-
-		case TIMER_T2:
-			m_t2_active = 0;
-			m_time2 = machine().time();
-
-			LOGINT("T2 INT request ");
-			set_int(INT_T2);
-			break;
-
-		case TIMER_CA2:
-			m_out_ca2 = 1;
-			m_ca2_handler(m_out_ca2);
-			break;
+		shift_out();
 	}
+	else if (SI_T2_CONTROL(m_acr) || SI_O2_CONTROL(m_acr))
+	{
+		shift_in();
+	}
+
+	// If in continuous mode or the shifter is still shifting we re-arm the timer
+	if (SO_T2_RATE(m_acr) || (m_shift_counter < 0x0f))
+	{
+		if (SI_O2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
+		{
+			m_shift_timer->adjust(clocks_to_attotime(1));
+		}
+		else if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SI_T2_CONTROL(m_acr))
+		{
+			m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2) / 2);
+		}
+		else // otherwise we stop it
+		{
+			m_shift_timer->adjust(attotime::never);
+		}
+	}
+}
+
+TIMER_CALLBACK_MEMBER(via6522_device::t1_tick)
+{
+	if (T1_CONTINUOUS (m_acr))
+	{
+		m_t1_pb7 = !m_t1_pb7;
+		m_t1->adjust(clocks_to_attotime(TIMER1_VALUE + IFR_DELAY));
+	}
+	else
+	{
+		m_t1_pb7 = 1;
+		m_t1_active = 0;
+		m_time1 = machine().time();
+	}
+
+	if (T1_SET_PB7(m_acr))
+	{
+		output_pb();
+	}
+
+	LOGINT("T1 INT request ");
+	set_int(INT_T1);
+}
+
+TIMER_CALLBACK_MEMBER(via6522_device::t2_tick)
+{
+	m_t2_active = 0;
+	m_time2 = machine().time();
+
+	LOGINT("T2 INT request ");
+	set_int(INT_T2);
+}
+
+TIMER_CALLBACK_MEMBER(via6522_device::ca2_tick)
+{
+	m_out_ca2 = 1;
+	m_ca2_handler(m_out_ca2);
 }
 
 uint8_t via6522_device::input_pa()
 {
-	uint8_t pa = m_in_a & ~m_ddr_a;
-
-	/// TODO: REMOVE THIS
-	if (m_ddr_a != 0xff && !m_in_a_handler.isnull())
-		pa &= m_in_a_handler();
-
-	pa |= m_out_a & m_ddr_a;
-
-	return pa;
+	// HACK: port a in the real 6522 does not mask off the output pins, but you can't trust handlers.
+	if (!m_in_a_handler.isnull())
+		return (m_in_a & ~m_ddr_a & m_in_a_handler()) | (m_out_a & m_ddr_a);
+	else
+		return (m_out_a | ~m_ddr_a) & m_in_a;
 }
 
 void via6522_device::output_pa()
@@ -1019,7 +1017,7 @@ void via6522_device::write(offs_t offset, u8 data)
 			if (SI_T2_CONTROL(m_acr))  LOGSHIFT("IN on T2");
 			if (SI_O2_CONTROL(m_acr))  LOGSHIFT("IN on O2");
 			if (SI_EXT_CONTROL(m_acr)) LOGSHIFT("IN on EXT");
-			if (SO_T2_RATE(m_acr))     LOGSHIFT("OUT on continous T2");
+			if (SO_T2_RATE(m_acr))     LOGSHIFT("OUT on continuous T2");
 			if (SO_T2_CONTROL(m_acr))  LOGSHIFT("OUT on T2");
 			if (SO_O2_CONTROL(m_acr))  LOGSHIFT("OUT on O2");
 			if (SO_EXT_CONTROL(m_acr)) LOGSHIFT("OUT on EXT");
@@ -1189,7 +1187,7 @@ WRITE_LINE_MEMBER( via6522_device::write_cb1 )
 			LOGSHIFT("SHIFT OUT EXT/CB1 falling edge, %d\n",  m_shift_counter);
 			shift_out();
 		}
-		else if (SI_EXT_CONTROL(m_acr))
+		else if (SI_EXT_CONTROL(m_acr) || SR_DISABLED(m_acr))
 		{
 			LOGSHIFT("SHIFT IN EXT/CB1 raising edge, %d\n", m_shift_counter);
 			shift_in();

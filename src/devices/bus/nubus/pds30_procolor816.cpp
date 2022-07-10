@@ -16,6 +16,9 @@
 #include "pds30_procolor816.h"
 #include "screen.h"
 
+#include <algorithm>
+
+
 #define PROCOLOR816_SCREEN_NAME "cb264_screen"
 #define PROCOLOR816_ROM_REGION  "cb264_rom"
 
@@ -73,7 +76,7 @@ nubus_procolor816_device::nubus_procolor816_device(const machine_config &mconfig
 	device_t(mconfig, type, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	device_nubus_card_interface(mconfig, *this),
-	m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr)
+	m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr)
 {
 	set_screen(*this, PROCOLOR816_SCREEN_NAME);
 }
@@ -86,20 +89,19 @@ void nubus_procolor816_device::device_start()
 {
 	uint32_t slotspace;
 
-	install_declaration_rom(this, PROCOLOR816_ROM_REGION);
+	install_declaration_rom(PROCOLOR816_ROM_REGION);
 
 	slotspace = get_slotspace();
 
 //  printf("[procolor816 %p] slotspace = %x\n", this, slotspace);
 
-	m_vram.resize(VRAM_SIZE);
-	m_vram32 = (uint32_t *)&m_vram[0];
+	m_vram.resize(VRAM_SIZE / sizeof(uint32_t));
 
 	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32s_delegate(*this, FUNC(nubus_procolor816_device::vram_r)), write32s_delegate(*this, FUNC(nubus_procolor816_device::vram_w)));
 	nubus().install_device(slotspace+0x900000, slotspace+VRAM_SIZE-1+0x900000, read32s_delegate(*this, FUNC(nubus_procolor816_device::vram_r)), write32s_delegate(*this, FUNC(nubus_procolor816_device::vram_w)));
 	nubus().install_device(slotspace+0xf00000, slotspace+0xff7fff, read32s_delegate(*this, FUNC(nubus_procolor816_device::procolor816_r)), write32s_delegate(*this, FUNC(nubus_procolor816_device::procolor816_w)));
 
-	m_timer = timer_alloc(0);
+	m_timer = timer_alloc(FUNC(nubus_procolor816_device::vbl_tick), this);
 	m_timer->adjust(screen().time_until_pos(479, 0), 0);
 }
 
@@ -113,7 +115,7 @@ void nubus_procolor816_device::device_reset()
 	m_clutoffs = 0;
 	m_vbl_disable = 1;
 	m_mode = 3;
-	memset(&m_vram[0], 0, VRAM_SIZE);
+	std::fill(m_vram.begin(), m_vram.end(), 0);
 	memset(m_palette, 0, sizeof(m_palette));
 
 	m_palette[0] = rgb_t(255, 255, 255);
@@ -121,7 +123,7 @@ void nubus_procolor816_device::device_reset()
 }
 
 
-void nubus_procolor816_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
+TIMER_CALLBACK_MEMBER(nubus_procolor816_device::vbl_tick)
 {
 	if (!m_vbl_disable)
 	{
@@ -139,7 +141,7 @@ void nubus_procolor816_device::device_timer(emu_timer &timer, device_timer_id ti
 
 uint32_t nubus_procolor816_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t const *const vram = &m_vram[4];
+	auto const vram8 = util::big_endian_cast<uint8_t const>(&m_vram[0]) + 4;
 
 	switch (m_mode)
 	{
@@ -149,7 +151,7 @@ uint32_t nubus_procolor816_device::screen_update(screen_device &screen, bitmap_r
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < 640/8; x++)
 				{
-					uint8_t const pixels = vram[(y * 640/8) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * 640/8) + x];
 
 					*scanline++ = m_palette[(pixels&0x80)];
 					*scanline++ = m_palette[((pixels<<1)&0x80)];
@@ -169,7 +171,7 @@ uint32_t nubus_procolor816_device::screen_update(screen_device &screen, bitmap_r
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < 640/4; x++)
 				{
-					uint8_t const pixels = vram[(y * 640/4) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * 640/4) + x];
 
 					*scanline++ = m_palette[(pixels&0xc0)];
 					*scanline++ = m_palette[((pixels<<2)&0xc0)];
@@ -185,7 +187,7 @@ uint32_t nubus_procolor816_device::screen_update(screen_device &screen, bitmap_r
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < 640/2; x++)
 				{
-					uint8_t const pixels = vram[(y * 640/2) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * 640/2) + x];
 
 					*scanline++ = m_palette[(pixels&0xf0)];
 					*scanline++ = m_palette[((pixels&0x0f)<<4)];
@@ -199,7 +201,7 @@ uint32_t nubus_procolor816_device::screen_update(screen_device &screen, bitmap_r
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < 640; x++)
 				{
-					uint8_t const pixels = vram[(y * 640) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * 640) + x];
 					*scanline++ = m_palette[pixels];
 				}
 			}
@@ -207,14 +209,14 @@ uint32_t nubus_procolor816_device::screen_update(screen_device &screen, bitmap_r
 
 		case 4: // 15 bpp
 			{
-				uint16_t const *const vram16 = (uint16_t *)&m_vram[0];
+				auto const vram16 = util::big_endian_cast<uint16_t const>(&m_vram[0]);
 
 				for (int y = 0; y < 480; y++)
 				{
 					uint32_t *scanline = &bitmap.pix(y);
 					for (int x = 0; x < 640; x++)
 					{
-						uint16_t const pixels = vram16[(y * 640) + BYTE_XOR_BE(x)];
+						uint16_t const pixels = vram16[(y * 640) + x];
 						*scanline++ = rgb_t(pal5bit((pixels>>10) & 0x1f), pal5bit((pixels>>5) & 0x1f), pal5bit(pixels & 0x1f));
 					}
 				}
@@ -325,10 +327,10 @@ uint32_t nubus_procolor816_device::procolor816_r(offs_t offset, uint32_t mem_mas
 
 void nubus_procolor816_device::vram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	COMBINE_DATA(&m_vram32[offset]);
+	COMBINE_DATA(&m_vram[offset]);
 }
 
 uint32_t nubus_procolor816_device::vram_r(offs_t offset, uint32_t mem_mask)
 {
-	return m_vram32[offset];
+	return m_vram[offset];
 }

@@ -102,8 +102,9 @@ private:
 		// helpers
 		asmjit::x86::Gp select_register(asmjit::x86::Gp defreg) const;
 		asmjit::x86::Xmm select_register(asmjit::x86::Xmm defreg) const;
-		template <typename T> T select_register(T defreg, be_parameter const &checkparam) const;
-		template <typename T> T select_register(T defreg, be_parameter const &checkparam, be_parameter const &checkparam2) const;
+		asmjit::x86::Gp select_register(asmjit::x86::Gp defreg, be_parameter const &checkparam) const;
+		asmjit::x86::Gp select_register(asmjit::x86::Gp defreg, be_parameter const &checkparam, be_parameter const &checkparam2) const;
+		asmjit::x86::Xmm select_register(asmjit::x86::Xmm defreg, be_parameter const &checkparam) const;
 
 	private:
 		// private constructor

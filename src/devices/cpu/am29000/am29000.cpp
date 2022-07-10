@@ -15,7 +15,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "am29000.h"
 #include "am29dasm.h"
 

@@ -78,7 +78,7 @@ public:
 	// snapshots
 	bool snap_native() const { return m_snap_native; }
 	render_target &snapshot_target() { return *m_snap_target; }
-	void save_snapshot(screen_device *screen, emu_file &file);
+	void save_snapshot(screen_device *screen, util::core_file &file);
 	void save_active_screen_snapshots();
 
 	// movies

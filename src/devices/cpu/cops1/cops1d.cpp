@@ -60,11 +60,11 @@ const u8 cops1_common_disassembler::s_bits[] =
 const u32 cops1_common_disassembler::s_flags[] =
 {
 	0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0,
+	0, STEP_COND, STEP_COND, 0, 0, STEP_COND, 0, STEP_COND, 0, 0, STEP_COND,
+	STEP_COND, STEP_COND, STEP_COND, STEP_COND,
 	0, 0, 0, 0, 0, 0,
 	0, STEP_OVER, STEP_OUT, STEP_OUT, 0, STEP_OVER, 0,
-	0, 0, 0, 0, 0,
+	0, STEP_COND, STEP_COND, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0
 };
@@ -109,7 +109,7 @@ offs_t cops1_common_disassembler::common_disasm(const u8 *lut_opmap, std::ostrea
 	}
 
 	// disassemble it
-	util::stream_format(stream, "%-8s ", s_name[instr]);
+	util::stream_format(stream, "%-8s", s_name[instr]);
 	if (mask > 0)
 	{
 		if (mask < 16)

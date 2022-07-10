@@ -214,8 +214,8 @@ smioc_device::smioc_device(const machine_config &mconfig, const char *tag, devic
 
 void smioc_device::device_start()
 {
-	m_dma_timer = timer_alloc(0);
-	m_451_timer = timer_alloc(1);
+	m_dma_timer = timer_alloc(FUNC(smioc_device::raise_drq), this);
+	m_451_timer = timer_alloc(FUNC(smioc_device::raise_int1), this);
 
 	/* Resolve callbacks */
 	m_m68k_r_cb.resolve_safe(0);
@@ -245,20 +245,17 @@ void smioc_device::SoftReset()
 	m_deviceBusy = 1;
 }
 
-
-void smioc_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
+TIMER_CALLBACK_MEMBER(smioc_device::raise_drq)
 {
-	switch (tid)
-	{
-	case 0: // DMA Timer
-		m_smioccpu->drq0_w(1);
-		break;
+	// DMA Timer
+	m_smioccpu->drq0_w(1);
+}
 
-	case 1: // 451 emulation timer - Trigger the SMIOC to read from C0180 and store data
-		m_smioccpu->int1_w(CLEAR_LINE);
-		m_smioccpu->int1_w(HOLD_LINE);
-		break;
-	}
+TIMER_CALLBACK_MEMBER(smioc_device::raise_int1)
+{
+	// 451 emulation timer - Trigger the SMIOC to read from C0180 and store data
+	m_smioccpu->int1_w(CLEAR_LINE);
+	m_smioccpu->int1_w(HOLD_LINE);
 }
 
 void smioc_device::SendCommand(u16 command)

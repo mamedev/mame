@@ -6,40 +6,32 @@
 //
 //============================================================
 
-#include "input_module.h"
 #include "modules/osdmodule.h"
 
 #if defined(OSD_WINDOWS)
 
-// standard windows headers
-#include <windows.h>
-#include <tchar.h>
-#undef interface
+// MAME headers
+#include "emu.h"
+
+#include "input_windows.h"
+
+#include "winmain.h"
+#include "window.h"
+
+#include "modules/lib/osdlib.h"
+#include "strconv.h"
 
 #include <algorithm>
 #include <functional>
 #include <mutex>
+#include <new>
 
-// MAME headers
-#include "emu.h"
-#include "strconv.h"
-
-// MAMEOS headers
-#include "modules/lib/osdlib.h"
-#include "winmain.h"
-#include "window.h"
-
-#include "input_common.h"
-#include "input_windows.h"
+// standard windows headers
+#include <windows.h>
+#include <tchar.h>
 
 
 namespace {
-
-// Typedefs for dynamically loaded functions
-typedef UINT (WINAPI *get_rawinput_device_list_ptr)(PRAWINPUTDEVICELIST, PUINT, UINT);
-typedef UINT (WINAPI *get_rawinput_data_ptr)( HRAWINPUT, UINT, LPVOID, PUINT, UINT);
-typedef UINT (WINAPI *get_rawinput_device_info_ptr)(HANDLE, UINT, LPVOID, PUINT);
-typedef BOOL (WINAPI *register_rawinput_devices_ptr)(PCRAWINPUTDEVICE, UINT, UINT);
 
 class safe_regkey
 {
@@ -294,7 +286,7 @@ public:
 
 	rawinput_keyboard_device(running_machine &machine, std::string &&name, std::string &&id, input_module &module) :
 		rawinput_device(machine, std::move(name), std::move(id), DEVICE_CLASS_KEYBOARD, module),
-		keyboard({{0}})
+		keyboard({ { 0 } })
 	{
 	}
 
@@ -326,7 +318,7 @@ class rawinput_mouse_device : public rawinput_device
 private:
 	std::mutex  m_device_lock;
 public:
-	mouse_state          mouse;
+	mouse_state mouse;
 
 	rawinput_mouse_device(running_machine &machine, std::string &&name, std::string &&id, input_module &module) :
 		rawinput_device(machine, std::move(name), std::move(id), DEVICE_CLASS_MOUSE, module),
@@ -355,12 +347,12 @@ public:
 		if (rawinput.data.mouse.usFlags == MOUSE_MOVE_RELATIVE)
 		{
 
-			mouse.lX += rawinput.data.mouse.lLastX * INPUT_RELATIVE_PER_PIXEL;
-			mouse.lY += rawinput.data.mouse.lLastY * INPUT_RELATIVE_PER_PIXEL;
+			mouse.lX += rawinput.data.mouse.lLastX * osd::INPUT_RELATIVE_PER_PIXEL;
+			mouse.lY += rawinput.data.mouse.lLastY * osd::INPUT_RELATIVE_PER_PIXEL;
 
 			// update zaxis
 			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_WHEEL)
-				mouse.lZ += static_cast<int16_t>(rawinput.data.mouse.usButtonData) * INPUT_RELATIVE_PER_PIXEL;
+				mouse.lZ += static_cast<int16_t>(rawinput.data.mouse.usButtonData) * osd::INPUT_RELATIVE_PER_PIXEL;
 
 			// update the button states; always update the corresponding mouse buttons
 			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_DOWN) mouse.rgbButtons[0] = 0x80;
@@ -413,12 +405,12 @@ public:
 		{
 
 			// update the X/Y positions
-			lightgun.lX = normalize_absolute_axis(rawinput.data.mouse.lLastX, 0, INPUT_ABSOLUTE_MAX);
-			lightgun.lY = normalize_absolute_axis(rawinput.data.mouse.lLastY, 0, INPUT_ABSOLUTE_MAX);
+			lightgun.lX = normalize_absolute_axis(rawinput.data.mouse.lLastX, 0, osd::INPUT_ABSOLUTE_MAX);
+			lightgun.lY = normalize_absolute_axis(rawinput.data.mouse.lLastY, 0, osd::INPUT_ABSOLUTE_MAX);
 
 			// update zaxis
 			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_WHEEL)
-				lightgun.lZ += static_cast<int16_t>(rawinput.data.mouse.usButtonData) * INPUT_RELATIVE_PER_PIXEL;
+				lightgun.lZ += static_cast<int16_t>(rawinput.data.mouse.usButtonData) * osd::INPUT_RELATIVE_PER_PIXEL;
 
 			// update the button states; always update the corresponding mouse buttons
 			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_DOWN) lightgun.rgbButtons[0] = 0x80;
@@ -442,12 +434,7 @@ public:
 class rawinput_module : public wininput_module
 {
 private:
-	osd::dynamic_module::ptr      m_user32_dll;
-	get_rawinput_device_list_ptr  get_rawinput_device_list = nullptr;
-	get_rawinput_data_ptr         get_rawinput_data = nullptr;
-	get_rawinput_device_info_ptr  get_rawinput_device_info = nullptr;
-	register_rawinput_devices_ptr register_rawinput_devices = nullptr;
-	std::mutex                    m_module_lock;
+	std::mutex  m_module_lock;
 
 public:
 	rawinput_module(const char *type, const char *name) : wininput_module(type, name)
@@ -456,163 +443,234 @@ public:
 
 	bool probe() override
 	{
-		m_user32_dll = osd::dynamic_module::open({ "user32.dll" });
-
-		get_rawinput_device_list  = m_user32_dll->bind<get_rawinput_device_list_ptr>("GetRawInputDeviceList");
-		get_rawinput_data         = m_user32_dll->bind<get_rawinput_data_ptr>("GetRawInputData");
-		get_rawinput_device_info  = m_user32_dll->bind<get_rawinput_device_info_ptr>("GetRawInputDeviceInfoW");
-		register_rawinput_devices = m_user32_dll->bind<register_rawinput_devices_ptr>("RegisterRawInputDevices");
-
-		return get_rawinput_device_list && get_rawinput_data && get_rawinput_device_info && register_rawinput_devices;
+		return true;
 	}
 
 	void input_init(running_machine &machine) override
 	{
-		// get the number of devices, allocate a device list, and fetch it
+		// get initial number of devices
 		UINT device_count = 0;
-		if ((*get_rawinput_device_list)(nullptr, &device_count, sizeof(RAWINPUTDEVICELIST)) != 0)
+		if (GetRawInputDeviceList(nullptr, &device_count, sizeof(RAWINPUTDEVICELIST)) != 0)
+		{
+			osd_printf_error("Error getting initial number of RawInput devices.\n");
+			return;
+		}
+		if (!device_count)
 			return;
 
-		if (device_count == 0)
+		std::unique_ptr<RAWINPUTDEVICELIST []> rawinput_devices;
+		UINT retrieved;
+		do
+		{
+			rawinput_devices.reset(new (std::nothrow) RAWINPUTDEVICELIST [device_count]);
+			if (!rawinput_devices)
+			{
+				osd_printf_error("Error allocating buffer for RawInput device list.\n");
+				return;
+			}
+			retrieved = GetRawInputDeviceList(rawinput_devices.get(), &device_count, sizeof(RAWINPUTDEVICELIST));
+		}
+		while ((UINT(-1) == retrieved) && (GetLastError() == ERROR_INSUFFICIENT_BUFFER));
+		if (UINT(-1) == retrieved)
+		{
+			osd_printf_error("Error listing RawInput devices.\n");
 			return;
-
-		auto rawinput_devices = std::make_unique<RAWINPUTDEVICELIST[]>(device_count);
-		if ((*get_rawinput_device_list)(rawinput_devices.get(), &device_count, sizeof(RAWINPUTDEVICELIST)) == UINT(-1))
-			return;
+		}
 
 		// iterate backwards through devices; new devices are added at the head
-		for (int devnum = device_count - 1; devnum >= 0; devnum--)
-		{
-			RAWINPUTDEVICELIST *device = &rawinput_devices[devnum];
-			add_rawinput_device(machine, device);
-		}
+		for (int devnum = retrieved - 1; devnum >= 0; devnum--)
+			add_rawinput_device(machine, rawinput_devices[devnum]);
 
 		// don't enable global inputs when debugging
 		if (!machine.options().debug())
-		{
 			m_global_inputs_enabled = downcast<windows_options &>(machine.options()).global_inputs();
-		}
 
 		// If we added no devices, no need to register for notifications
-		if (devicelist()->size() == 0)
+		if (devicelist().empty())
 			return;
 
 		// finally, register to receive raw input WM_INPUT messages if we found devices
 		RAWINPUTDEVICE registration;
 		registration.usUsagePage = usagepage();
 		registration.usUsage = usage();
-		registration.dwFlags = m_global_inputs_enabled ? 0x00000100 : 0;
+		registration.dwFlags = RIDEV_DEVNOTIFY;
+		if (m_global_inputs_enabled)
+			registration.dwFlags |= RIDEV_INPUTSINK;
 		registration.hwndTarget = std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window();
 
 		// register the device
-		(*register_rawinput_devices)(&registration, 1, sizeof(registration));
+		RegisterRawInputDevices(&registration, 1, sizeof(registration));
 	}
 
 protected:
-	virtual void add_rawinput_device(running_machine &machine, RAWINPUTDEVICELIST *device) = 0;
+	virtual void add_rawinput_device(running_machine &machine, RAWINPUTDEVICELIST const &device) = 0;
 	virtual USHORT usagepage() = 0;
 	virtual USHORT usage() = 0;
 
 	int init_internal() override
 	{
-		if (!get_rawinput_device_list || !get_rawinput_data ||
-			!get_rawinput_device_info || !register_rawinput_devices )
-		{
-			return 1;
-		}
-
-		osd_printf_verbose("RawInput: APIs detected\n");
 		return 0;
 	}
 
 	template<class TDevice>
-	TDevice *create_rawinput_device(running_machine &machine, PRAWINPUTDEVICELIST rawinputdevice)
+	TDevice *create_rawinput_device(running_machine &machine, RAWINPUTDEVICELIST const &rawinputdevice)
 	{
 		// determine the length of the device name, allocate it, and fetch it if not nameless
 		UINT name_length = 0;
-		if ((*get_rawinput_device_info)(rawinputdevice->hDevice, RIDI_DEVICENAME, nullptr, &name_length) != 0)
+		if (GetRawInputDeviceInfoW(rawinputdevice.hDevice, RIDI_DEVICENAME, nullptr, &name_length) != 0)
 			return nullptr;
 
 		std::unique_ptr<WCHAR []> tname = std::make_unique<WCHAR []>(name_length + 1);
-		if (name_length > 1 && (*get_rawinput_device_info)(rawinputdevice->hDevice, RIDI_DEVICENAME, tname.get(), &name_length) == UINT(-1))
+		if (name_length > 1 && GetRawInputDeviceInfoW(rawinputdevice.hDevice, RIDI_DEVICENAME, tname.get(), &name_length) == UINT(-1))
 			return nullptr;
 
 		// if this is an RDP name, skip it
-		if (_tcsstr(tname.get(), TEXT("Root#RDP_")) != nullptr)
+		if (wcsstr(tname.get(), L"Root#RDP_") != nullptr)
 			return nullptr;
 
 		// improve the name and then allocate a device
-		std::wstring name = rawinput_device_improve_name(tname.get());
+		std::string utf8_name = osd::text::from_wstring(rawinput_device_improve_name(tname.get()));
 
-		// convert name to utf8
-		std::string utf8_name = osd::text::from_wstring(name);
-
-		// set device id to raw input name
+		// set device ID to raw input name
 		std::string utf8_id = osd::text::from_wstring(tname.get());
 
-		TDevice &devinfo = devicelist()->create_device<TDevice>(machine, std::move(utf8_name), std::move(utf8_id), *this);
+		tname.reset();
+
+		TDevice &devinfo = devicelist().create_device<TDevice>(machine, std::move(utf8_name), std::move(utf8_id), *this);
 
 		// Add the handle
-		devinfo.set_handle(rawinputdevice->hDevice);
+		devinfo.set_handle(rawinputdevice.hDevice);
 
 		return &devinfo;
 	}
 
 	bool handle_input_event(input_event eventid, void *eventdata) override
 	{
-		// Only handle raw input data
-		if (!input_enabled() || eventid != INPUT_EVENT_RAWINPUT)
-			return false;
-
-		HRAWINPUT rawinputdevice = *static_cast<HRAWINPUT*>(eventdata);
-
-		BYTE small_buffer[4096];
-		std::unique_ptr<BYTE[]> larger_buffer;
-		LPBYTE data = small_buffer;
-		UINT size;
-
-		// ignore if not enabled
-		if (!input_enabled())
-			return false;
-
-		// determine the size of databuffer we need
-		if ((*get_rawinput_data)(rawinputdevice, RID_INPUT, nullptr, &size, sizeof(RAWINPUTHEADER)) != 0)
-			return false;
-
-		// if necessary, allocate a temporary buffer and fetch the data
-		if (size > sizeof(small_buffer))
+		switch (eventid)
 		{
-			larger_buffer = std::make_unique<BYTE[]>(size);
-			data = larger_buffer.get();
-			if (data == nullptr)
-				return false;
-		}
-
-		// fetch the data and process the appropriate message types
-		bool result = (*get_rawinput_data)(static_cast<HRAWINPUT>(rawinputdevice), RID_INPUT, data, &size, sizeof(RAWINPUTHEADER));
-		if (result)
-		{
-			std::lock_guard<std::mutex> scope_lock(m_module_lock);
-
-			auto *input = reinterpret_cast<RAWINPUT*>(data);
-
-			// find the device in the list and update
-			auto target_device = std::find_if(
-					devicelist()->begin(),
-					devicelist()->end(),
-					[input] (auto const &device)
-					{
-						auto devinfo = dynamic_cast<rawinput_device *>(device.get());
-						return devinfo && (input->header.hDevice == devinfo->device_handle());
-					});
-
-			if (target_device != devicelist()->end())
+		// handle raw input data
+		case INPUT_EVENT_RAWINPUT:
 			{
-				static_cast<rawinput_device *>((*target_device).get())->queue_events(input, 1);
+				// ignore if not enabled
+				if (!input_enabled())
+					return false;
+
+				HRAWINPUT rawinputdevice = *static_cast<HRAWINPUT *>(eventdata);
+
+				BYTE small_buffer[4096];
+				std::unique_ptr<BYTE []> larger_buffer;
+				LPBYTE data = small_buffer;
+				UINT size;
+
+				// determine the size of data buffer we need
+				if (GetRawInputData(rawinputdevice, RID_INPUT, nullptr, &size, sizeof(RAWINPUTHEADER)) != 0)
+					return false;
+
+				// if necessary, allocate a temporary buffer and fetch the data
+				if (size > sizeof(small_buffer))
+				{
+					larger_buffer.reset(new (std::nothrow) BYTE [size]);
+					data = larger_buffer.get();
+					if (!data)
+						return false;
+				}
+
+				// fetch the data and process the appropriate message types
+				UINT result = GetRawInputData(rawinputdevice, RID_INPUT, data, &size, sizeof(RAWINPUTHEADER));
+				if (UINT(-1) == result)
+				{
+					return false;
+				}
+				else if (result)
+				{
+					std::lock_guard<std::mutex> scope_lock(m_module_lock);
+
+					auto *input = reinterpret_cast<RAWINPUT *>(data);
+					if (!input->header.hDevice)
+						return false;
+
+					// find the device in the list and update
+					auto target_device = std::find_if(
+							devicelist().begin(),
+							devicelist().end(),
+							[input] (auto const &device)
+							{
+								auto devinfo = dynamic_cast<rawinput_device *>(device.get());
+								return devinfo && (input->header.hDevice == devinfo->device_handle());
+							});
+					if (devicelist().end() == target_device)
+						return false;
+
+					static_cast<rawinput_device *>(target_device->get())->queue_events(input, 1);
+					return true;
+				}
+			}
+			break;
+
+		case INPUT_EVENT_ARRIVAL:
+			{
+				HRAWINPUT rawinputdevice = *static_cast<HRAWINPUT *>(eventdata);
+
+				// determine the length of the device name, allocate it, and fetch it if not nameless
+				UINT name_length = 0;
+				if (GetRawInputDeviceInfoW(rawinputdevice, RIDI_DEVICENAME, nullptr, &name_length) != 0)
+					return false;
+
+				std::unique_ptr<WCHAR []> tname = std::make_unique<WCHAR []>(name_length + 1);
+				if (name_length > 1 && GetRawInputDeviceInfoW(rawinputdevice, RIDI_DEVICENAME, tname.get(), &name_length) == UINT(-1))
+					return false;
+				std::string utf8_id = osd::text::from_wstring(tname.get());
+				tname.reset();
+
+				std::lock_guard<std::mutex> scope_lock(m_module_lock);
+
+				// find the device in the list and update
+				auto target_device = std::find_if(
+						devicelist().begin(),
+						devicelist().end(),
+						[&utf8_id] (auto const &device)
+						{
+							auto devinfo = dynamic_cast<rawinput_device *>(device.get());
+							return devinfo && !devinfo->device_handle() && (devinfo->id() == utf8_id);
+						});
+				if (devicelist().end() == target_device)
+					return false;
+
+				static_cast<rawinput_device *>(target_device->get())->set_handle(rawinputdevice);
 				return true;
 			}
+			break;
+
+		case INPUT_EVENT_REMOVAL:
+			{
+				HRAWINPUT rawinputdevice = *static_cast<HRAWINPUT *>(eventdata);
+
+				std::lock_guard<std::mutex> scope_lock(m_module_lock);
+
+				// find the device in the list and update
+				auto target_device = std::find_if(
+						devicelist().begin(),
+						devicelist().end(),
+						[rawinputdevice] (auto const &device)
+						{
+							auto devinfo = dynamic_cast<rawinput_device *>(device.get());
+							return devinfo && (rawinputdevice == devinfo->device_handle());
+						});
+
+				if (devicelist().end() == target_device)
+					return false;
+
+				(*target_device)->reset();
+				static_cast<rawinput_device *>(target_device->get())->set_handle(nullptr);
+				return true;
+			}
+			break;
+
+		default:
+			break;
 		}
 
+		// must have been unhandled
 		return false;
 	}
 };
@@ -633,10 +691,10 @@ protected:
 	USHORT usagepage() override { return 1; }
 	USHORT usage() override { return 6; }
 
-	void add_rawinput_device(running_machine &machine, RAWINPUTDEVICELIST *device) override
+	void add_rawinput_device(running_machine &machine, RAWINPUTDEVICELIST const &device) override
 	{
 		// make sure this is a keyboard
-		if (device->dwType != RIM_TYPEKEYBOARD)
+		if (device.dwType != RIM_TYPEKEYBOARD)
 			return;
 
 		// allocate and link in a new device
@@ -679,10 +737,10 @@ protected:
 	USHORT usagepage() override { return 1; }
 	USHORT usage() override { return 2; }
 
-	void add_rawinput_device(running_machine &machine, RAWINPUTDEVICELIST *device) override
+	void add_rawinput_device(running_machine &machine, RAWINPUTDEVICELIST const &device) override
 	{
 		// make sure this is a mouse
-		if (device->dwType != RIM_TYPEMOUSE)
+		if (device.dwType != RIM_TYPEMOUSE)
 			return;
 
 		// allocate and link in a new device
@@ -728,11 +786,11 @@ protected:
 	USHORT usagepage() override { return 1; }
 	USHORT usage() override { return 2; }
 
-	void add_rawinput_device(running_machine &machine, RAWINPUTDEVICELIST *device) override
+	void add_rawinput_device(running_machine &machine, RAWINPUTDEVICELIST const &device) override
 	{
 
 		// make sure this is a mouse
-		if (device->dwType != RIM_TYPEMOUSE)
+		if (device.dwType != RIM_TYPEMOUSE)
 			return;
 
 		// allocate and link in a new device
@@ -765,6 +823,8 @@ protected:
 } // anonymous namespace
 
 #else // defined(OSD_WINDOWS)
+
+#include "input_module.h"
 
 MODULE_NOT_SUPPORTED(keyboard_input_rawinput, OSD_KEYBOARDINPUT_PROVIDER, "rawinput")
 MODULE_NOT_SUPPORTED(mouse_input_rawinput, OSD_MOUSEINPUT_PROVIDER, "rawinput")

@@ -9,7 +9,6 @@
 #include "emu.h"
 #include "sm510.h"
 #include "sm510d.h"
-#include "debugger.h"
 
 
 // MCU types
@@ -156,7 +155,7 @@ void sm510_device::execute_one()
 	} // big switch
 
 	// BM high bit is only valid for 1 step
-	m_sbm = (m_op == 0x02);
+	m_bmask = (m_op == 0x02) ? 0x40 : 0;
 }
 
 bool sm510_device::op_argument()

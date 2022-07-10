@@ -924,8 +924,8 @@ void voodoo_1_device::device_start()
 	m_stall_trigger = 51324 + index;
 
 	// allocate timers for VBLANK
-	m_vsync_stop_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_1_device::vblank_stop), this));
-	m_vsync_start_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_1_device::vblank_start),this));
+	m_vsync_stop_timer = timer_alloc(FUNC(voodoo_1_device::vblank_stop), this);
+	m_vsync_start_timer = timer_alloc(FUNC(voodoo_1_device::vblank_start),this);
 
 	// add TMUs to the chipmask if memory is specified (later chips leave
 	// the tmumem values at 0 and set the chipmask directly to indicate
@@ -1011,7 +1011,7 @@ void voodoo_1_device::device_start()
 	// set up the PCI FIFO
 	m_pci_fifo.configure(m_pci_fifo_mem, 64*2);
 	m_stall_state = NOT_STALLED;
-	m_stall_resume_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_1_device::stall_resume_callback), this));
+	m_stall_resume_timer = timer_alloc(FUNC(voodoo_1_device::stall_resume_callback), this);
 
 	// initialize registers
 	m_init_enable = 0;
@@ -2794,7 +2794,7 @@ void voodoo_1_device::recompute_video_timing(u32 hsyncon, u32 hsyncoff, u32 hvis
 	m_xoffs = hbp;
 	m_yoffs = vbp;
 	m_vsyncstart = vsyncoff;
-	m_vsyncstop = vsyncon;
+	m_vsyncstop = 0;
 	logerror("yoffs: %d vsyncstart: %d vsyncstop: %d\n", vbp, m_vsyncstart, m_vsyncstop);
 
 	adjust_vblank_start_timer();

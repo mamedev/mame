@@ -21,7 +21,6 @@
 #include "emu.h"
 #include "e0c6200.h"
 #include "e0c6200d.h"
-#include "debugger.h"
 
 
 // construction/destruction

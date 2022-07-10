@@ -92,7 +92,7 @@ void rtc9701_device::device_validity_check(validity_checker &valid) const
 void rtc9701_device::device_start()
 {
 	/* let's call the timer callback every second */
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rtc9701_device::timer_callback), this));
+	m_timer = timer_alloc(FUNC(rtc9701_device::timer_callback), this);
 	m_timer->adjust(attotime::from_hz(clock() / XTAL(32'768)), 0, attotime::from_hz(clock() / XTAL(32'768)));
 
 	system_time systime;
@@ -160,9 +160,10 @@ void rtc9701_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void rtc9701_device::nvram_read(emu_file &file)
+bool rtc9701_device::nvram_read(util::read_stream &file)
 {
-	file.read(rtc9701_data, 0x200);
+	size_t actual;
+	return !file.read(rtc9701_data, 0x200, actual) && actual == 0x200;
 }
 
 
@@ -171,9 +172,10 @@ void rtc9701_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void rtc9701_device::nvram_write(emu_file &file)
+bool rtc9701_device::nvram_write(util::write_stream &file)
 {
-	file.write(rtc9701_data, 0x200);
+	size_t actual;
+	return !file.write(rtc9701_data, 0x200, actual) && actual == 0x200;
 }
 
 //-------------------------------------------------

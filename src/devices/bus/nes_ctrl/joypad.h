@@ -28,19 +28,21 @@ public:
 	// construction/destruction
 	nes_joypad_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual ioport_constructor device_input_ports() const override;
-
-protected:
-	nes_joypad_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
-
-	// device-level overrides
-	virtual void device_start() override;
-
 	virtual u8 read_bit0() override;
 	virtual void write(u8 data) override;
 
+protected:
+	nes_joypad_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 latch_fill = 0x80);
+
+	// device-level overrides
+	virtual void device_start() override;
+	virtual ioport_constructor device_input_ports() const override;
+
+	virtual void set_latch() { m_latch = m_joypad->read(); }
+
 	required_ioport m_joypad;
 	u32 m_latch;  // wider than standard joypad's 8-bit latch to accomodate subclass devices
+	const u32 m_latch_fill;  // the new MSB as a joypad's shift register shifts
 };
 
 
@@ -52,11 +54,11 @@ public:
 	// construction/destruction
 	nes_fcpadexp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-protected:
-	nes_fcpadexp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
-
 	virtual u8 read_bit0() override { return 0; }
 	virtual u8 read_exp(offs_t offset) override;
+
+protected:
+	nes_fcpadexp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 latch_fill = 0x80);
 };
 
 
@@ -68,10 +70,11 @@ public:
 	// construction/destruction
 	nes_fcpad2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual u8 read_bit2() override;
 
 protected:
-	virtual u8 read_bit2() override;
+	// device-level overrides
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	required_ioport m_mic;
@@ -86,6 +89,8 @@ public:
 	// construction/destruction
 	nes_ccpadl_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+protected:
+	// device-level overrides
 	virtual ioport_constructor device_input_ports() const override;
 };
 
@@ -98,6 +103,8 @@ public:
 	// construction/destruction
 	nes_ccpadr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+protected:
+	// device-level overrides
 	virtual ioport_constructor device_input_ports() const override;
 };
 
@@ -110,15 +117,31 @@ public:
 	// construction/destruction
 	nes_arcstick_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-protected:
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-
 	virtual u8 read_exp(offs_t offset) override;
 	virtual void write(u8 data) override;
 
+protected:
+	// device-level overrides
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
 	required_device<nes_control_port_device> m_daisychain;
 	required_ioport m_cfg;
+};
+
+
+// ======================> nes_vboyctrl_device
+
+class nes_vboyctrl_device : public nes_joypad_device
+{
+public:
+	// construction/destruction
+	nes_vboyctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	// device-level overrides
+	virtual ioport_constructor device_input_ports() const override;
 };
 
 
@@ -129,5 +152,6 @@ DECLARE_DEVICE_TYPE(NES_FCPAD_P2,       nes_fcpad2_device)
 DECLARE_DEVICE_TYPE(NES_CCPAD_LEFT,     nes_ccpadl_device)
 DECLARE_DEVICE_TYPE(NES_CCPAD_RIGHT,    nes_ccpadr_device)
 DECLARE_DEVICE_TYPE(NES_ARCSTICK,       nes_arcstick_device)
+DECLARE_DEVICE_TYPE(NES_VBOYCTRL,       nes_vboyctrl_device)
 
 #endif // MAME_BUS_NES_CTRL_JOYPAD_H

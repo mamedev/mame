@@ -2,6 +2,8 @@
 <!--
 license:CC0
 copyright-holders:Barry Rodewald
+
+Data East Alphanumeric Display Type 2
 -->
 
 <mamelayout version="2">
@@ -10,11 +12,6 @@ copyright-holders:Barry Rodewald
 		<led14segsc>
 			<color red="1.0" green="0.0" blue="0.0" />
 		</led14segsc>
-	</element>
-	<element name="ldigit" defstate="0">
-		<led7seg>
-			<color red="1.0" green="0.0" blue="0.0" />
-		</led7seg>
 	</element>
 	<element name="P3"><text string="Player 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="P4"><text string="Player 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
@@ -25,7 +22,7 @@ copyright-holders:Barry Rodewald
 		<repeat count="7">
 			<param name="n" start="~s~" increment="1" />
 			<param name="x" start="0" increment="24" />
-			<element name="digit~n~" ref="~e~">
+			<element name="digit~n~" ref="digit">
 				<bounds x="~x~" y="0" width="24" height="39" />
 			</element>
 		</repeat>
@@ -37,31 +34,27 @@ copyright-holders:Barry Rodewald
 		<!-- LEDs -->
 
 		<!-- Player 1 Score -->
-		<param name="e" value="digit" />
 		<param name="s" value="1" />
 		<group ref="score">
 			<bounds left="10" top="45" right="174" bottom="84" />
 		</group>
 
 		<!-- Player 2 Score -->
-		<param name="e" value="digit" />
 		<param name="s" value="9" />
 		<group ref="score">
-			<bounds left="190" top="45" right="354" bottom="84" />
+			<bounds left="202" top="45" right="354" bottom="84" />
 		</group>
 
 		<!-- Player 3 Score -->
-		<param name="e" value="ldigit" />
 		<param name="s" value="17" />
 		<group ref="score">
 			<bounds left="10" top="100" right="174" bottom="139" />
 		</group>
 
 		<!-- Player 4 Score -->
-		<param name="e" value="ldigit" />
 		<param name="s" value="25" />
 		<group ref="score">
-			<bounds left="190" top="100" right="354" bottom="139" />
+			<bounds left="202" top="100" right="354" bottom="139" />
 		</group>
 
 		<element ref="P3"><bounds left="10" right="174" top="30" bottom="42" /></element>

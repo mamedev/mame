@@ -37,16 +37,16 @@ namespace netlist::devices {
 		, m_inhibit(*this, "INH", NETLIB_DELEGATE(controls))
 		, m_VEE(*this, "VEE", NETLIB_DELEGATE(controls))
 		, m_base_r(*this, "BASER", nlconst::magic(270.0))
-		, m_lastx(*this, "m_lastx", false)
-		, m_lasty(*this, "m_lasty", false)
+		, m_last_x(*this, "m_lastx", false)
+		, m_last_y(*this, "m_lasty", false)
 		, m_select_state(*this, "m_select_state", false)
 		, m_inhibit_state(*this, "m_inhibit_state", false)
 		, m_supply(*this)
 		{
 			connect("RX.2", "RY.2");
-			register_subalias("X", "RX.1");
-			register_subalias("Y", "RY.1");
-			register_subalias("XY", "RX.2");
+			register_sub_alias("X", "RX.1");
+			register_sub_alias("Y", "RY.1");
+			register_sub_alias("XY", "RX.2");
 		}
 
 		NETLIB_RESETI()
@@ -57,22 +57,22 @@ namespace netlist::devices {
 	private:
 		NETLIB_HANDLERI(controls)
 		{
-			bool newx = false;
-			bool newy = false;
+			bool new_x = false;
+			bool new_y = false;
 			if (!on(m_inhibit, m_inhibit_state))
 			{
 				if (!on(m_select, m_select_state))
 				{
-					newx = true;
+					new_x = true;
 				}
 				else
 				{
-					newy = true;
+					new_y = true;
 				}
 			}
 
-			if (newx != m_lastx || newy != m_lasty)
-				update_state(newx, newy);
+			if (new_x != m_last_x || new_y != m_last_y)
+				update_state(new_x, new_y);
 		}
 
 		bool on(analog_input_t &input, bool &state)
@@ -101,40 +101,40 @@ namespace netlist::devices {
 			const nl_fptype Roff = plib::reciprocal(exec().gmin());
 			const nl_fptype RX = newx ? Ron : Roff;
 			const nl_fptype RY = newy ? Ron : Roff;
-			if (m_RX.solver() == m_RY.solver())
+			if (m_RX().solver() == m_RY().solver())
 			{
-				m_RX.change_state([this, &RX, &RY]()
+				m_RX().change_state([this, &RX, &RY]()
 				{
-					m_RX.set_R(RX);
-					m_RY.set_R(RY);
+					m_RX().set_R(RX);
+					m_RY().set_R(RY);
 				});
 			}
 			else
 			{
-				m_RX.change_state([this, &RX]()
+				m_RX().change_state([this, &RX]()
 				{
-					m_RX.set_R(RX);
+					m_RX().set_R(RX);
 				});
-				m_RY.change_state([this, &RY]()
+				m_RY().change_state([this, &RY]()
 				{
-					m_RY.set_R(RY);
+					m_RY().set_R(RY);
 				});
 			}
-			m_lastx = newx;
-			m_lasty = newy;
+			m_last_x = newx;
+			m_last_y = newy;
 		}
 
-		analog::NETLIB_SUB(R_base) m_RX;
-		analog::NETLIB_SUB(R_base) m_RY;
-		analog_input_t             m_select;
-		analog_input_t             m_inhibit;
-		analog_input_t             m_VEE;
-		param_fp_t                 m_base_r;
-		state_var<bool>            m_lastx;
-		state_var<bool>            m_lasty;
-		state_var<bool>            m_select_state;
-		state_var<bool>            m_inhibit_state;
-		nld_power_pins             m_supply;
+		NETLIB_SUB_NS(analog, R_base) m_RX;
+		NETLIB_SUB_NS(analog, R_base) m_RY;
+		analog_input_t                m_select;
+		analog_input_t                m_inhibit;
+		analog_input_t                m_VEE;
+		param_fp_t                    m_base_r;
+		state_var<bool>               m_last_x;
+		state_var<bool>               m_last_y;
+		state_var<bool>               m_select_state;
+		state_var<bool>               m_inhibit_state;
+		nld_power_pins                m_supply;
 	};
 
 	NETLIB_DEVICE_IMPL(CD4053_GATE,         "CD4053_GATE",            "")

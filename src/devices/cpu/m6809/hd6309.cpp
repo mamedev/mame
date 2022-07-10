@@ -115,7 +115,6 @@ March 2013 NPW:
 *****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "hd6309.h"
 #include "m6809inl.h"
 #include "6x09dasm.h"

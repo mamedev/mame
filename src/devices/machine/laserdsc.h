@@ -150,15 +150,8 @@ public:
 	}
 
 protected:
-	// timer IDs
-	enum
-	{
-		TID_VBI_FETCH,
-		TID_FIRST_PLAYER_TIMER
-	};
-
 	// common laserdisc states
-	enum player_state
+	enum player_state : uint32_t
 	{
 		LDSTATE_NONE,                           // unspecified state
 		LDSTATE_EJECTING,                       // in the process of ejecting
@@ -190,7 +183,7 @@ protected:
 	};
 
 	// slider position
-	enum slider_position
+	enum slider_position : uint32_t
 	{
 		SLIDER_MINIMUM,                         // at the minimum value
 		SLIDER_VIRTUAL_LEADIN,                  // within the virtual lead-in area
@@ -204,8 +197,8 @@ protected:
 	struct player_state_info
 	{
 		player_state    m_state;                // current state
-		int32_t           m_substate;             // internal sub-state; starts at 0 on any state change
-		int32_t           m_param;                // parameter for current state
+		int32_t         m_substate;             // internal sub-state; starts at 0 on any state change
+		int32_t         m_param;                // parameter for current state
 		attotime        m_endtime;              // minimum ending time for current state
 	};
 
@@ -218,11 +211,12 @@ protected:
 	virtual void device_start() override;
 	virtual void device_stop() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_validity_check(validity_checker &valid) const override;
 
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+
+	virtual TIMER_CALLBACK_MEMBER(fetch_vbi_data);
 
 	// subclass helpers
 	void set_audio_squelch(bool squelchleft, bool squelchright) { m_stream->update(); m_audiosquelch = (squelchleft ? 1 : 0) | (squelchright ? 2 : 0); }
@@ -233,12 +227,15 @@ protected:
 	int32_t generic_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime, player_state_info &curstate);
 
 	// general helpers
+	bool is_cav_disc() const { return m_is_cav_disc; }
 	bool is_start_of_frame(const vbi_metadata &vbi);
 	int frame_from_metadata(const vbi_metadata &metadata);
 	int chapter_from_metadata(const vbi_metadata &metadata);
 
 	player_state_info   m_player_state;         // active state
 	player_state_info   m_saved_state;          // saved state during temporary operations
+
+	emu_timer           *m_vbi_fetch_timer;     // fetcher for our VBI data
 
 private:
 	// internal type definitions
@@ -277,6 +274,7 @@ private:
 	// disc parameters
 	chd_file *          m_disc;                 // handle to the disc itself
 	std::vector<uint8_t> m_vbidata;             // pointer to precomputed VBI data
+	bool                m_is_cav_disc;          // precomputed check if the mounted disc is CAV
 	int                 m_width;                // width of video
 	int                 m_height;               // height of video
 	uint32_t            m_fps_times_1million;   // frame rate of video

@@ -36,7 +36,9 @@ void isa16_svga_cirrus_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update("vga", FUNC(cirrus_gd5430_device::screen_update));
 
-	CIRRUS_GD5430(config, m_vga, 0).set_screen("screen");
+	CIRRUS_GD5430(config, m_vga, 0);
+	m_vga->set_screen("screen");
+	m_vga->set_vram_size(0x200000);
 }
 
 //-------------------------------------------------
@@ -114,7 +116,9 @@ void isa16_svga_cirrus_gd542x_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update("vga", FUNC(cirrus_gd5428_device::screen_update));
 
-	CIRRUS_GD5428(config, m_vga, 0).set_screen("screen");
+	CIRRUS_GD5428(config, m_vga, 0);
+	m_vga->set_screen("screen");
+	m_vga->set_vram_size(0x200000);
 }
 
 //-------------------------------------------------

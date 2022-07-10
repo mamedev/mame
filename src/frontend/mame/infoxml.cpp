@@ -436,7 +436,13 @@ void info_xml_creator::output(std::ostream &out, const std::function<bool(const 
 		prepared_info() = default;
 		prepared_info(const prepared_info &) = delete;
 		prepared_info(prepared_info &&) = default;
+#if defined(_CPPLIB_VER) && defined(_MSVC_STL_VERSION)
+		// MSVCPRT currently requires default-constructible std::future promise types to be assignable
+		// remove this workaround when that's fixed
+		prepared_info &operator=(const prepared_info &) = default;
+#else
 		prepared_info &operator=(const prepared_info &) = delete;
+#endif
 
 		std::string     m_xml_snippet;
 		device_type_set m_dev_set;
@@ -742,11 +748,13 @@ void output_one(std::ostream &out, driver_enumerator &drivlist, const game_drive
 	util::stream_format(out, "\t<%s name=\"%s\"", XML_TOP, normalize_string(driver.name));
 
 	// strip away any path information from the source_file and output it
-	const char *start = strrchr(driver.type.source(), '/');
-	if (!start)
-		start = strrchr(driver.type.source(), '\\');
-	start = start ? (start + 1) : driver.type.source();
-	util::stream_format(out, " sourcefile=\"%s\"", normalize_string(start));
+	std::string_view src(driver.type.source());
+	auto prefix(src.find("src/mame/"));
+	if (std::string_view::npos == prefix)
+		prefix = src.find("src\\mame\\");
+	if (std::string_view::npos != prefix)
+		src.remove_prefix(prefix + 9);
+	util::stream_format(out, " sourcefile=\"%s\"", normalize_string(src));
 
 	// append bios and runnable flags
 	if (driver.flags & machine_flags::IS_BIOS_ROOT)
@@ -838,8 +846,12 @@ void output_one_device(std::ostream &out, machine_config &config, device_t &devi
 
 	// start to output info
 	util::stream_format(out, "\t<%s name=\"%s\"", XML_TOP, normalize_string(device.shortname()));
-	std::string src(device.source());
-	strreplace(src,"../", "");
+	std::string_view src(device.source());
+	auto prefix(src.find("src/"));
+	if (std::string_view::npos == prefix)
+		prefix = src.find("src\\");
+	if (std::string_view::npos != prefix)
+		src.remove_prefix(prefix + 4);
 	util::stream_format(out, " sourcefile=\"%s\" isdevice=\"yes\" runnable=\"no\"", normalize_string(src));
 	auto const parent(device.type().parent_rom_device_type());
 	if (parent)

@@ -30,6 +30,7 @@
 
 #include "emu.h"
 #include "mc68k.h"
+
 #include "machine/6522via.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
@@ -161,20 +162,22 @@ void electron_mc68k_device::device_reset()
 	// address map during booting
 	program.install_rom(0x0000, 0x0fff, m_boot_rom->base());
 
-	m_rom_shadow_tap = program.install_read_tap(0x800000, 0xffffff, "rom_shadow_r", [this](offs_t offset, u16 &data, u16 mem_mask)
-	{
-		if (!machine().side_effects_disabled())
-		{
-			// delete this tap
-			m_rom_shadow_tap->remove();
+	m_rom_shadow_tap.remove();
+	m_rom_shadow_tap = program.install_read_tap(
+			0x800000, 0xffffff,
+			"rom_shadow_r",
+			[this] (offs_t offset, u16 &data, u16 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+				{
+					// delete this tap
+					m_rom_shadow_tap.remove();
 
-			// address map after booting
-			m_maincpu->space(AS_PROGRAM).install_ram(0x000000, m_ram->mask(), m_ram->pointer());
-		}
-
-		// return the original data
-		return data;
-	});
+					// address map after booting
+					m_maincpu->space(AS_PROGRAM).install_ram(0x000000, m_ram->mask(), m_ram->pointer());
+				}
+			},
+			&m_rom_shadow_tap);
 }
 
 //-------------------------------------------------

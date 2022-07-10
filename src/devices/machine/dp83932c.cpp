@@ -66,7 +66,7 @@ static u16 const regmask[] =
 
 dp83932c_device::dp83932c_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, DP83932C, tag, owner, clock)
-	, device_network_interface(mconfig, *this, 10.0f)
+	, device_network_interface(mconfig, *this, 10)
 	, m_bus(*this, finder_base::DUMMY_TAG, 0)
 	, m_out_int(*this)
 	, m_int_state(false)
@@ -82,7 +82,7 @@ void dp83932c_device::device_start()
 {
 	m_out_int.resolve();
 
-	m_command = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dp83932c_device::command), this));
+	m_command = timer_alloc(FUNC(dp83932c_device::command), this);
 
 	save_item(NAME(m_int_state));
 	save_item(NAME(m_reg));
@@ -149,7 +149,7 @@ int dp83932c_device::recv_start_cb(u8 *buf, int length)
 	if (m_reg[CRDA] & 1)
 	{
 		// re-read the previous descriptor link field
-		m_reg[CRDA] = m_bus->read_word(EA(m_reg[URDA], m_reg[LLFA]));
+		m_reg[CRDA] = read_bus_word(EA(m_reg[URDA], m_reg[LLFA]));
 		if (m_reg[CRDA] & 1)
 		{
 			logerror("no receive descriptor available\n");
@@ -182,19 +182,19 @@ int dp83932c_device::recv_start_cb(u8 *buf, int length)
 	// write status to rda
 	// TODO: don't write the rda if rba limit exceeded (buffer overflow)
 	offs_t const rda = EA(m_reg[URDA], m_reg[CRDA]);
-	m_bus->write_word(rda + 0 * width, m_reg[RCR]);
-	m_bus->write_word(rda + 1 * width, length);
-	m_bus->write_word(rda + 2 * width, m_reg[CRBA0]);
-	m_bus->write_word(rda + 3 * width, m_reg[CRBA1]);
-	m_bus->write_word(rda + 4 * width, m_reg[RSC]);
+	write_bus_word(rda + 0 * width, m_reg[RCR]);
+	write_bus_word(rda + 1 * width, length);
+	write_bus_word(rda + 2 * width, m_reg[CRBA0]);
+	write_bus_word(rda + 3 * width, m_reg[CRBA1]);
+	write_bus_word(rda + 4 * width, m_reg[RSC]);
 	m_reg[LLFA] = m_reg[CRDA] + 5 * width;
-	m_reg[CRDA] = m_bus->read_word(rda + 5 * width);
+	m_reg[CRDA] = read_bus_word(rda + 5 * width);
 
 	// check for end of list
 	if (m_reg[CRDA] & 1)
 		m_reg[ISR] |= ISR_RDE;
 	else
-		m_bus->write_word(rda + 6 * width, 0);
+		write_bus_word(rda + 6 * width, 0);
 
 	// handle buffer exhaustion
 	if (rbwc < m_reg[EOBC])
@@ -231,11 +231,8 @@ void dp83932c_device::reg_w(offs_t offset, u16 data)
 
 				m_reg[CR] &= ~CR_RST;
 			}
-
-			return;
 		}
-
-		if (data & CR_RST)
+		else if (data & CR_RST)
 		{
 			LOGMASKED(LOG_COMMAND, "enter software reset\n");
 
@@ -243,12 +240,22 @@ void dp83932c_device::reg_w(offs_t offset, u16 data)
 
 			m_reg[CR] &= ~(CR_LCAM | CR_RRRA | CR_TXP | CR_HTX);
 			m_reg[CR] |= (CR_RST | CR_RXDIS);
-
-			return;
 		}
-
-		m_reg[offset] |= data & regmask[offset];
-		m_command->adjust(attotime::zero, data & regmask[offset]);
+		else
+		{
+			u16 cmd_to_run = data & regmask[offset];
+			if (m_reg[CR] & CR_TXP)
+			{
+				// Per section 3.5.4 in the datasheet, TDAs can be dynamically added.
+				// The TXP command will be re-sent by the host, but doesn't do anything
+				// unless the SONIC finished the last commmand right before the TDA was
+				// appended to the list. So, null the CR_TXP bit if it was already set
+				// so we don't smash the currently running transmission.
+				cmd_to_run &= ~CR_TXP;
+			}
+			m_reg[offset] |= data & regmask[offset];
+			m_command->adjust(attotime::zero, cmd_to_run);
+		}
 		break;
 
 	case RCR:
@@ -349,9 +356,9 @@ void dp83932c_device::transmit()
 
 	// read control information from tda and load registers
 	u16 const tcr = m_reg[TCR];
-	m_reg[TCR] = m_bus->read_word(tda + word++ * width) & TCR_TPC;
-	m_reg[TPS] = m_bus->read_word(tda + word++ * width);
-	m_reg[TFC] = m_bus->read_word(tda + word++ * width);
+	m_reg[TCR] = read_bus_word(tda + word++ * width) & TCR_TPC;
+	m_reg[TPS] = read_bus_word(tda + word++ * width);
+	m_reg[TFC] = read_bus_word(tda + word++ * width);
 
 	// check for programmable interrupt
 	if ((m_reg[TCR] & TCR_PINT) && !(tcr & TCR_PINT))
@@ -365,9 +372,9 @@ void dp83932c_device::transmit()
 	for (unsigned fragment = 0; fragment < m_reg[TFC]; fragment++)
 	{
 		// read fragment address and size
-		m_reg[TSA0] = m_bus->read_word(tda + word++ * width);
-		m_reg[TSA1] = m_bus->read_word(tda + word++ * width);
-		m_reg[TFS] = m_bus->read_word(tda + word++ * width);
+		m_reg[TSA0] = read_bus_word(tda + word++ * width);
+		m_reg[TSA1] = read_bus_word(tda + word++ * width);
+		m_reg[TFS] = read_bus_word(tda + word++ * width);
 
 		offs_t const tsa = EA(m_reg[TSA1], m_reg[TSA0]);
 
@@ -407,13 +414,13 @@ void dp83932c_device::send_complete_cb(int result)
 	}
 
 	// write descriptor status
-	m_bus->write_word(EA(m_reg[UTDA], m_reg[TTDA]), m_reg[TCR] & TCR_TPS);
+	write_bus_word(EA(m_reg[UTDA], m_reg[TTDA]), m_reg[TCR] & TCR_TPS);
 
 	// check for halt
 	if (!(m_reg[CR] & CR_HTX))
 	{
 		// load next descriptor address
-		m_reg[CTDA] = m_bus->read_word(EA(m_reg[UTDA], m_reg[CTDA]));
+		m_reg[CTDA] = read_bus_word(EA(m_reg[UTDA], m_reg[CTDA]));
 
 		// check for end of list
 		if (m_reg[CTDA] & 1)
@@ -440,10 +447,10 @@ void dp83932c_device::read_rra(bool command)
 
 	offs_t const rrp = EA(m_reg[URRA], m_reg[RRP]);
 
-	m_reg[CRBA0] = m_bus->read_word(rrp + 0 * width);
-	m_reg[CRBA1] = m_bus->read_word(rrp + 1 * width);
-	m_reg[RBWC0] = m_bus->read_word(rrp + 2 * width);
-	m_reg[RBWC1] = m_bus->read_word(rrp + 3 * width);
+	m_reg[CRBA0] = read_bus_word(rrp + 0 * width);
+	m_reg[CRBA1] = read_bus_word(rrp + 1 * width);
+	m_reg[RBWC0] = read_bus_word(rrp + 2 * width);
+	m_reg[RBWC1] = read_bus_word(rrp + 3 * width);
 
 	LOG("read_rra crba 0x%08x rbwc 0x%08x\n",
 		EA(m_reg[CRBA1], m_reg[CRBA0]), EA(m_reg[RBWC1], m_reg[RBWC0]));
@@ -472,10 +479,10 @@ void dp83932c_device::load_cam()
 	{
 		offs_t const cdp = EA(m_reg[URRA], m_reg[CDP]);
 
-		u16 const cep = m_bus->read_word(cdp + 0 * width) & 0xf;
-		u16 const cap0 = m_bus->read_word(cdp + 1 * width);
-		u16 const cap1 = m_bus->read_word(cdp + 2 * width);
-		u16 const cap2 = m_bus->read_word(cdp + 3 * width);
+		u16 const cep = read_bus_word(cdp + 0 * width) & 0xf;
+		u16 const cap0 = read_bus_word(cdp + 1 * width);
+		u16 const cap1 = read_bus_word(cdp + 2 * width);
+		u16 const cap2 = read_bus_word(cdp + 3 * width);
 
 		// FIXME: documented byte/word order doesn't match emulation
 
@@ -491,7 +498,7 @@ void dp83932c_device::load_cam()
 	}
 
 	// read cam enable
-	m_reg[CE] = m_bus->read_word(EA(m_reg[URRA], m_reg[CDP]));
+	m_reg[CE] = read_bus_word(EA(m_reg[URRA], m_reg[CDP]));
 	LOG("load_cam enable 0x%04x\n", m_reg[CE]);
 
 	m_reg[CR] &= ~CR_LCAM;
@@ -571,4 +578,17 @@ void dp83932c_device::dump_bytes(u8 *buf, int length)
 				buf[i * 8 + 0], buf[i * 8 + 1], buf[i * 8 + 2], buf[i * 8 + 3],
 				buf[i * 8 + 4], buf[i * 8 + 5], buf[i * 8 + 6], buf[i * 8 + 7]);
 	}
+}
+
+u16 dp83932c_device::read_bus_word(offs_t address)
+{
+	return (m_reg[DCR] & DCR_DW) ? m_bus->read_dword(address) : m_bus->read_word(address);
+}
+
+void dp83932c_device::write_bus_word(offs_t address, u16 data)
+{
+	if (m_reg[DCR] & DCR_DW)
+		m_bus->write_dword(address, data);
+	else
+		m_bus->write_word(address, data);
 }

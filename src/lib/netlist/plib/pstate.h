@@ -71,12 +71,12 @@ public:
 	{
 		using list_t = std::vector<entry_t>;
 
-		entry_t(const pstring &stname, const datatype_t &dt, const void *owner,
+		entry_t(const pstring &item_name, const datatype_t &dt, const void *owner,
 				const std::size_t count, void *ptr)
-		: m_name(stname), m_dt(dt), m_owner(owner), m_callback(nullptr), m_count(count), m_ptr(ptr) { }
+		: m_name(item_name), m_dt(dt), m_owner(owner), m_callback(nullptr), m_count(count), m_ptr(ptr) { }
 
-		entry_t(const pstring &stname, const void *owner, callback_t *callback)
-		: m_name(stname), m_dt(datatype_t(true)), m_owner(owner), m_callback(callback), m_count(0), m_ptr(nullptr) { }
+		entry_t(const pstring &item_name, const void *owner, callback_t *callback)
+		: m_name(item_name), m_dt(datatype_t(true)), m_owner(owner), m_callback(callback), m_count(0), m_ptr(nullptr) { }
 
 		pstring name() const noexcept { return m_name; }
 		datatype_t dt() const noexcept { return m_dt; }
@@ -98,56 +98,56 @@ public:
 
 	struct saver_t
 	{
-		saver_t(state_manager_t &sm, const void *owner, const pstring &membername)
+		saver_t(state_manager_t &sm, const void *owner, const pstring &member_name)
 		: m_sm(sm)
 		, m_owner(owner)
-		, m_membername(membername)
+		, m_member_name(member_name)
 		{ }
 
 		template <typename XS>
-		void save_item(XS &xstate, const pstring &itemname)
+		void save_item(XS &some_state, const pstring &item_name)
 		{
-			m_sm.save_item(m_owner, xstate, m_membername + "." + itemname);
+			m_sm.save_item(m_owner, some_state, m_member_name + "." + item_name);
 		}
 
 		state_manager_t &m_sm;
 		const void * m_owner;
-		const pstring m_membername;
+		const pstring m_member_name;
 	};
 
 	template<typename C>
-	void save_item(const void *owner, C &state, const pstring &stname)
+	void save_item(const void *owner, C &state, const pstring &item_name)
 	{
-		save_item_dispatch(owner, state, stname);
+		save_item_dispatch(owner, state, item_name);
 	}
 
 	template<typename C, std::size_t N>
-	void save_item(const void *owner, C (&state)[N], const pstring &stname) // NOLINT(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
+	void save_item(const void *owner, C (&state)[N], const pstring &item_name) // NOLINT(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
 	{
-		save_state_ptr(owner, stname, dtype<C>(), N, &(state[0]));
+		save_state_ptr(owner, item_name, dtype<C>(), N, &(state[0]));
 	}
 
 	template<typename C>
-	void save_item(const void *owner, C *state, const pstring &stname, const std::size_t count)
+	void save_item(const void *owner, C *state, const pstring &item_name, const std::size_t count)
 	{
-		save_state_ptr(owner, stname, dtype<C>(), count, state);
+		save_state_ptr(owner, item_name, dtype<C>(), count, state);
 	}
 
 	template<typename C, typename A>
-	void save_item(const void *owner, std::vector<C, A> &v, const pstring &stname)
+	void save_item(const void *owner, std::vector<C, A> &v, const pstring &item_name)
 	{
-		save_state_ptr(owner, stname, dtype<C>(), v.size(), v.data());
+		save_state_ptr(owner, item_name, dtype<C>(), v.size(), v.data());
 	}
 
 	template<typename C, std::size_t N>
-	void save_item(const void *owner, std::array<C, N> &a, const pstring &stname)
+	void save_item(const void *owner, std::array<C, N> &a, const pstring &item_name)
 	{
-		save_state_ptr(owner, stname, dtype<C>(), N, a.data());
+		save_state_ptr(owner, item_name, dtype<C>(), N, a.data());
 	}
 
-	void save_state_ptr(const void *owner, const pstring &stname, const datatype_t &dt, const std::size_t count, void *ptr)
+	void save_state_ptr(const void *owner, const pstring &item_name, const datatype_t &dt, const std::size_t count, void *ptr)
 	{
-		m_save.emplace_back(stname, dt, owner, count, ptr);
+		m_save.emplace_back(item_name, dt, owner, count, ptr);
 	}
 
 	void pre_save()
@@ -195,17 +195,17 @@ private:
 	template<typename C>
 	std::enable_if_t<plib::is_integral<C>::value || std::is_enum<C>::value
 			|| plib::is_floating_point<C>::value>
-	save_item_dispatch(const void *owner, C &state, const pstring &stname)
+	save_item_dispatch(const void *owner, C &state, const pstring &item_name)
 	{
-		save_state_ptr( owner, stname, dtype<C>(), 1, &state);
+		save_state_ptr( owner, item_name, dtype<C>(), 1, &state);
 	}
 
 	template<typename C>
 	std::enable_if_t<!(plib::is_integral<C>::value || std::is_enum<C>::value
 			|| plib::is_floating_point<C>::value)>
-	save_item_dispatch(const void *owner, C &state, const pstring &stname)
+	save_item_dispatch(const void *owner, C &state, const pstring &item_name)
 	{
-		saver_t sav(*this, owner, stname);
+		saver_t sav(*this, owner, item_name);
 		state.save_state(sav);
 	}
 
@@ -215,10 +215,10 @@ private:
 };
 
 template<>
-inline void state_manager_t::save_item(const void *owner, callback_t &state, const pstring &stname)
+inline void state_manager_t::save_item(const void *owner, callback_t &state, const pstring &item_name)
 {
-	m_custom.emplace_back(stname, owner, &state);
-	state.register_state(*this, stname);
+	m_custom.emplace_back(item_name, owner, &state);
+	state.register_state(*this, item_name);
 }
 
 

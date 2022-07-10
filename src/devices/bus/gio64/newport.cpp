@@ -1111,7 +1111,7 @@ gio64_xl24_device::gio64_xl24_device(const machine_config &mconfig, const char *
 
 void newport_base_device::device_start()
 {
-	m_dcb_timeout_timer = timer_alloc(DCB_TIMEOUT);
+	m_dcb_timeout_timer = timer_alloc(FUNC(newport_base_device::dcb_timeout_tick), this);
 
 	save_item(NAME(m_rex3.m_draw_mode0));
 	save_item(NAME(m_rex3.m_color_host));
@@ -1282,12 +1282,9 @@ void newport_base_device::stop_logging()
 }
 #endif
 
-void newport_base_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(newport_base_device::dcb_timeout_tick)
 {
-	if (id == DCB_TIMEOUT)
-	{
-		m_rex3.m_status &= ~STATUS_BACKBUSY;
-	}
+	m_rex3.m_status &= ~STATUS_BACKBUSY;
 }
 
 uint32_t newport_base_device::screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect)

@@ -78,7 +78,7 @@ void cd90_351_device::device_add_mconfig(machine_config &config)
 void cd90_351_device::device_start()
 {
 	m_rom_bank->configure_entries(0, 4, m_rom->base(), 0x800);
-	m_timer_motoroff = timer_alloc(ID_MOTOROFF);
+	m_timer_motoroff = timer_alloc(FUNC(cd90_351_device::motor_off), this);
 
 	save_item(NAME(m_cmd0));
 	save_item(NAME(m_cmd1));
@@ -122,15 +122,11 @@ void cd90_351_device::device_reset()
 	m_cur_floppy = nullptr;
 }
 
-void cd90_351_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(cd90_351_device::motor_off)
 {
-	switch(id) {
-	case ID_MOTOROFF:
-		logerror("motor off\n");
-		if(m_cur_floppy)
-			m_cur_floppy->mon_w(1);
-		break;
-	}
+	logerror("motor off\n");
+	if(m_cur_floppy)
+		m_cur_floppy->mon_w(1);
 }
 
 void cd90_351_device::device_post_load()

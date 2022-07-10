@@ -61,8 +61,7 @@ protected:
 
 	required_ioport m_input_s3;
 
-	memory_passthrough_handler *m_rom_shadow_tap;
-	memory_passthrough_handler *m_ram_wwp_tap;
+	memory_passthrough_handler m_rom_shadow_tap;
 
 	required_region_ptr<uint16_t> m_sysrom;
 	required_shared_ptr<uint16_t> m_localram;
@@ -80,7 +79,7 @@ protected:
 	uint16_t vme_a16_r();
 	void vme_a16_w(uint16_t data);
 
-	uint16_t rom_shadow_tap(offs_t address, u16 data, u16 mem_mask);
+	void rom_shadow_tap(offs_t address, u16 data, u16 mem_mask);
 
 	DECLARE_WRITE_LINE_MEMBER(watchdog_reset);
 	DECLARE_WRITE_LINE_MEMBER(mfp_interrupt);

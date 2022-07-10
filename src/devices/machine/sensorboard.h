@@ -59,6 +59,7 @@ public:
 	// handle pieces
 	void cancel_hand();
 	void remove_hand();
+	int get_handpos() { return m_handpos; }
 	bool drop_piece(u8 x, u8 y);
 	bool pickup_piece(u8 x, u8 y);
 
@@ -85,8 +86,8 @@ protected:
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
-	virtual void nvram_read(emu_file &file) override;
-	virtual void nvram_write(emu_file &file) override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
 	virtual bool nvram_can_write() override;
 
 private:

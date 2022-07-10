@@ -52,6 +52,20 @@ Acorn BBC Master - 80186 Co-Processor discs
 		</part>
 	</software>
 
+	<software name="dospe">
+		<description>DOS Plus with Econet Software</description>
+		<year>1987</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="AES39" />
+		<info name="format" value="ADFS-DOS" />
+		<info name="usage" value="Requires 80186 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="DOSPlus Econet.adl" size="655360" crc="2c0e3ae7" sha1="3695b95952564cd924981462c8d91f71e3bfe060"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="m512tg">
 		<description>Master 512 Technical Guide Programs</description>
 		<year>1989</year>

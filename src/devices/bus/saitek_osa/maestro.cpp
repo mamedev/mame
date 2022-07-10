@@ -26,7 +26,6 @@ higher speed versions, they overclocked the CPU. And if the CPU couldn't
 handle the overclock well enough, they went for a slightly lower speed XTAL.
 
 TODO:
-- does not work if cpu speed is 4MHz
 - cpu clock divider after writing to 0x2000/0x2200
 
 ***************************************************************************/
@@ -284,7 +283,7 @@ void saitekosa_maestro_device::control_w(u8 data)
 
 u8 saitekosa_maestro_device::ack_r()
 {
-	// d6: ?
+	// d6: _Vcc
 	// d7: ACK-P
 	return m_expansion->ack_state() ? 0x80 : 0x00;
 }

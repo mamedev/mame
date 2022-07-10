@@ -76,9 +76,10 @@ void m6m80011ap_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void m6m80011ap_device::nvram_read(emu_file &file)
+bool m6m80011ap_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_eeprom_data, 0x100);
+	size_t actual;
+	return !file.read(m_eeprom_data, 0x100, actual) && actual == 0x100;
 }
 
 
@@ -87,9 +88,10 @@ void m6m80011ap_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void m6m80011ap_device::nvram_write(emu_file &file)
+bool m6m80011ap_device::nvram_write(util::write_stream &file)
 {
-	file.write(m_eeprom_data, 0x100);
+	size_t actual;
+	return !file.write(m_eeprom_data, 0x100, actual) && actual == 0x100;
 }
 
 //**************************************************************************

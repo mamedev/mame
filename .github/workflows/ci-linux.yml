@@ -20,6 +20,9 @@ on:
     - 'COPYING'
     - 'makefile'
 
+permissions:
+  contents: read
+
 jobs:
   build-linux:
     runs-on: ubuntu-latest
@@ -52,6 +55,8 @@ jobs:
         run: make -j2
       - name: Validate
         run: ./mame -validate
+      - name: Reconcile driver list
+        run: ./mame -listxml | python scripts/build/makedep.py reconcilelist -l src/mame/mame.lst -
       - name: ORM check
         run: python scripts/minimaws/minimaws.py load --executable ./mame --softwarepath hash
       - uses: actions/upload-artifact@master

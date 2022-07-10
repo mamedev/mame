@@ -45,7 +45,7 @@ private:
 	int m_devsel;
 	int m_register;
 
-	enum { STATE_IDLE, STATE_DEVSEL, STATE_REGISTER, STATE_DATAIN, STATE_DATAOUT };
+	enum { STATE_IDLE, STATE_DEVSEL, STATE_REGISTER, STATE_DATAIN, STATE_DATAOUT, STATE_READSELACK };
 
 	// registers
 	enum

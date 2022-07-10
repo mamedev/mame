@@ -617,7 +617,7 @@ license:CC0
 	<software name="modem">
 		<description>Modem Program</description>
 		<year>1983</year>
-		<publisher>Mattel</publisher>
+		<publisher>Mattel Electronics</publisher>
 		<part name="cass1" interface="aquarius_cass">
 			<feature name="part_id" value="MODEM_BAS"/>
 			<dataarea name="cass" size="449">

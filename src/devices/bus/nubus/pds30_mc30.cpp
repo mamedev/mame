@@ -73,7 +73,7 @@ nubus_xceedmc30_device::nubus_xceedmc30_device(const machine_config &mconfig, de
 	device_t(mconfig, type, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	device_nubus_card_interface(mconfig, *this),
-	m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr)
+	m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr)
 {
 	set_screen(*this, XCEEDMC30_SCREEN_NAME);
 }
@@ -86,19 +86,18 @@ void nubus_xceedmc30_device::device_start()
 {
 	uint32_t slotspace;
 
-	install_declaration_rom(this, XCEEDMC30_ROM_REGION);
+	install_declaration_rom(XCEEDMC30_ROM_REGION);
 
 	slotspace = get_slotspace();
 
 //  printf("[xceedmc30 %p] slotspace = %x\n", this, slotspace);
 
-	m_vram.resize(VRAM_SIZE);
-	m_vram32 = (uint32_t *)&m_vram[0];
+	m_vram.resize(VRAM_SIZE / sizeof(uint32_t));
 
 	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32s_delegate(*this, FUNC(nubus_xceedmc30_device::vram_r)), write32s_delegate(*this, FUNC(nubus_xceedmc30_device::vram_w)));
 	nubus().install_device(slotspace+0x800000, slotspace+0xefffff, read32s_delegate(*this, FUNC(nubus_xceedmc30_device::xceedmc30_r)), write32s_delegate(*this, FUNC(nubus_xceedmc30_device::xceedmc30_w)));
 
-	m_timer = timer_alloc(0);
+	m_timer = timer_alloc(FUNC(nubus_xceedmc30_device::vbl_tick), this);
 	m_timer->adjust(screen().time_until_pos(479, 0), 0);
 }
 
@@ -112,7 +111,7 @@ void nubus_xceedmc30_device::device_reset()
 	m_clutoffs = 0;
 	m_vbl_disable = 1;
 	m_mode = 0;
-	memset(&m_vram[0], 0, VRAM_SIZE);
+	std::fill(m_vram.begin(), m_vram.end(), 0);
 	memset(m_palette, 0, sizeof(m_palette));
 
 	m_palette[0] = rgb_t(255, 255, 255);
@@ -120,7 +119,7 @@ void nubus_xceedmc30_device::device_reset()
 }
 
 
-void nubus_xceedmc30_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
+TIMER_CALLBACK_MEMBER(nubus_xceedmc30_device::vbl_tick)
 {
 	if (!m_vbl_disable)
 	{
@@ -138,7 +137,7 @@ void nubus_xceedmc30_device::device_timer(emu_timer &timer, device_timer_id tid,
 
 uint32_t nubus_xceedmc30_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t const *const vram = &m_vram[4*1024];
+	auto const vram8 = util::big_endian_cast<uint8_t const>(&m_vram[1024]);
 
 	switch (m_mode)
 	{
@@ -148,7 +147,7 @@ uint32_t nubus_xceedmc30_device::screen_update(screen_device &screen, bitmap_rgb
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < 640/8; x++)
 				{
-					uint8_t const pixels = vram[(y * 1024) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * 1024) + x];
 
 					*scanline++ = m_palette[BIT(pixels, 7)];
 					*scanline++ = m_palette[BIT(pixels, 6)];
@@ -168,7 +167,7 @@ uint32_t nubus_xceedmc30_device::screen_update(screen_device &screen, bitmap_rgb
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < 640/4; x++)
 				{
-					uint8_t const pixels = vram[(y * 1024) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * 1024) + x];
 
 					*scanline++ = m_palette[((pixels>>6)&3)];
 					*scanline++ = m_palette[((pixels>>4)&3)];
@@ -185,7 +184,7 @@ uint32_t nubus_xceedmc30_device::screen_update(screen_device &screen, bitmap_rgb
 
 				for (int x = 0; x < 640/2; x++)
 				{
-					uint8_t const pixels = vram[(y * 1024) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * 1024) + x];
 
 					*scanline++ = m_palette[(pixels>>4)];
 					*scanline++ = m_palette[(pixels&0xf)];
@@ -200,20 +199,16 @@ uint32_t nubus_xceedmc30_device::screen_update(screen_device &screen, bitmap_rgb
 
 				for (int x = 0; x < 640; x++)
 				{
-					uint8_t const pixels = vram[(y * 1024) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * 1024) + x];
 					*scanline++ = m_palette[pixels];
 				}
 			}
 			break;
 
 		case 4: // 24 bpp
+			for (int y = 0; y < 480; y++)
 			{
-				uint32_t const *const vram32 = (uint32_t *)vram;
-
-				for (int y = 0; y < 480; y++)
-				{
-					std::copy_n(&vram32[y * 1024], 640, &bitmap.pix(y));
-				}
+				std::copy_n(&m_vram[(y * 1024) + (1024 / 8)], 640, &bitmap.pix(y));
 			}
 			break;
 
@@ -311,10 +306,10 @@ uint32_t nubus_xceedmc30_device::xceedmc30_r(offs_t offset, uint32_t mem_mask)
 
 void nubus_xceedmc30_device::vram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	COMBINE_DATA(&m_vram32[offset]);
+	COMBINE_DATA(&m_vram[offset]);
 }
 
 uint32_t nubus_xceedmc30_device::vram_r(offs_t offset, uint32_t mem_mask)
 {
-	return m_vram32[offset];
+	return m_vram[offset];
 }

@@ -20,6 +20,7 @@
 //-     +---+---++---+
 //-
 static NETLIST_START(CD4001_DIP)
+{
 	CD4001_GATE(A)
 	CD4001_GATE(B)
 	CD4001_GATE(C)
@@ -28,17 +29,18 @@ static NETLIST_START(CD4001_DIP)
 	NET_C(A.VDD, B.VDD, C.VDD, D.VDD)
 	NET_C(A.VSS, B.VSS, C.VSS, D.VSS)
 
-	DIPPINS(   /*     +--------------+     */
-		  A.A, /*  A1 |1     ++    14| VDD */ A.VDD,
-		  A.B, /*  B1 |2           13| B4  */ D.B,
-		  A.Q, /*  Y1 |3           12| A4  */ D.A,
-		  B.Q, /*  Y2 |4    4001   11| Y4  */ D.Q,
-		  B.A, /*  A2 |5           10| Y3  */ C.Q,
-		  B.B, /*  B2 |6            9| B3  */ C.B,
-		A.VSS, /* VSS |7            8| A3  */ C.A
-			   /*     +--------------+     */
+	DIPPINS(
+		/*#          +--------------+     */
+		  A.A, /*#  A1 |1     ++    14| VDD */ A.VDD, //
+		  A.B, /*#  B1 |2           13| B4  */ D.B, //
+		  A.Q, /*#  Y1 |3           12| A4  */ D.A, //
+		  B.Q, /*#  Y2 |4    4001   11| Y4  */ D.Q, //
+		  B.A, /*#  A2 |5           10| Y3  */ C.Q, //
+		  B.B, /*#  B2 |6            9| B3  */ C.B, //
+		A.VSS, /*# VSS |7            8| A3  */ C.A //
+			   /*#     +--------------+     */
 	)
-NETLIST_END()
+}
 
 //- Identifier: CD4006_DIP
 //- Title: CD4006BM/CD4006BC 18-Stage Static Shift Register
@@ -49,6 +51,7 @@ NETLIST_END()
 //-    http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS005942.PDF
 //-
 static NETLIST_START(CD4006_DIP)
+{
 	CD4006(A)
 	NC_PIN(NC)
 
@@ -62,7 +65,7 @@ static NETLIST_START(CD4006_DIP)
 		  A.VSS, /*   VSS |7            8| D4+4 */ A.D4P4
 				 /*       +--------------+      */
 	)
-NETLIST_END()
+}
 
 //- Identifier: CD4011_DIP
 //- Title: CD4011BM/CD4011BC Quad 2-Input NAND Buffered B Series Gate
@@ -81,6 +84,7 @@ NETLIST_END()
 //-     +---+---++---+
 //-
 static NETLIST_START(CD4011_DIP)
+{
 	   CD4011_GATE(A)
 	   CD4011_GATE(B)
 	   CD4011_GATE(C)
@@ -99,7 +103,7 @@ static NETLIST_START(CD4011_DIP)
 			A.VSS, /* VSS |7            8| E   */ C.A
 				   /*     +--------------+     */
 	   )
-NETLIST_END()
+}
 
 //- Identifier: CD4013_DIP
 //- Title: CD4013BM/CD4013BC Dual D Flip-Flop
@@ -121,6 +125,7 @@ NETLIST_END()
 //-     +-----+---+---+---++---+----+
 //-
 static NETLIST_START(CD4013_DIP)
+{
 	CD4013(A)
 	CD4013(B)
 
@@ -137,7 +142,7 @@ static NETLIST_START(CD4013_DIP)
 		  A.VSS, /*     VSS |7            8| SET2   */ B.SET
 				 /*         +--------------+        */
 	)
-NETLIST_END()
+}
 
 //- Identifier: CD4016_DIP
 //- Title: CD4016BM/CD4016BC Quad Bilateral Switch
@@ -148,6 +153,7 @@ NETLIST_END()
 //-    http://pdf.datasheetcatalog.com/datasheets/185/108711_DS.pdf
 //-
 static NETLIST_START(CD4016_DIP)
+{
 	CD4066_GATE(A)
 	CD4066_GATE(B)
 	CD4066_GATE(C)
@@ -171,7 +177,7 @@ static NETLIST_START(CD4016_DIP)
 		A.VSS,      /*      VSS |7            8| INOUTC   */ C.R.2
 					/*          +--------------+          */
 	)
-NETLIST_END()
+}
 
 //- Identifier: CD4017_DIP
 //- Title: CD4017BM/CD4017BC Decade Counter/Divider with 10 Decoded Outputs
@@ -182,6 +188,7 @@ NETLIST_END()
 //-    http://pdf.datasheetcatalog.com/datasheets/166/108736_DS.pdf
 //-
 static NETLIST_START(CD4017_DIP)
+{
 	CD4017(A)
 
 	DIPPINS(   /*     +--------------+              */
@@ -195,7 +202,7 @@ static NETLIST_START(CD4017_DIP)
 		A.VSS, /* VSS |8            9| Q8           */ A.Q8
 			   /*     +--------------+              */
 	)
-NETLIST_END()
+}
 
 //- Identifier: CD4020_DIP
 //- Title: CD4020BC 14-Stage Ripple Carry Binary Counters
@@ -206,6 +213,7 @@ NETLIST_END()
 //-    http://pdf.datasheetcatalog.com/datasheets/90/109006_DS.pdf
 //-
 static NETLIST_START(CD4020_DIP)
+{
 	CD4020(A)
 
 	DIPPINS(   /*     +--------------+       */
@@ -218,7 +226,7 @@ static NETLIST_START(CD4020_DIP)
 		 A.Q4, /*  Q4 |7           10| PHI1  */ A.IP,
 		A.VSS, /* VSS |8            9| Q1    */ A.Q1
 			   /*     +--------------+       */)
-NETLIST_END()
+}
 
 //- Identifier: CD4022_DIP
 //- Title: CD4022BM/CD4022BC Divide-by-8 Counter/Divider with 8 Decoded Outputs
@@ -229,6 +237,7 @@ NETLIST_END()
 //-    http://pdf.datasheetcatalog.com/datasheets/166/108736_DS.pdf
 //-
 static NETLIST_START(CD4022_DIP)
+{
 	CD4022(A)
 	NC_PIN(NC)
 
@@ -243,7 +252,7 @@ static NETLIST_START(CD4022_DIP)
 		A.VSS, /* VSS |8            9| NC           */ NC.I
 			   /*     +--------------+              */
 	)
-NETLIST_END()
+}
 
 //- Identifier: CD4024_DIP
 //- Title: CD4024BM/CD4024BC 7-Stage Ripple Carry Binary Counter
@@ -254,6 +263,7 @@ NETLIST_END()
 //-    http://pdf.datasheetcatalog.com/datasheets/120/108894_DS.pdf
 //-
 static NETLIST_START(CD4024_DIP)
+{
 	CD4024(A)
 	NC_PIN(NC)
 
@@ -266,7 +276,7 @@ static NETLIST_START(CD4024_DIP)
 		   A.Q4, /*    Q4 |6            9| Q3  */ A.Q3,
 		  A.VSS, /*   VSS |7            8| NC  */ NC.I
 				 /*       +--------------+     */)
-NETLIST_END()
+}
 
 //- Identifier: CD4029_DIP
 //- Title: CD4029BM/CD4029BC Presettable Binary/Decade Up/Down Counter
@@ -387,6 +397,7 @@ NETLIST_END()
 //-         +-----+-----+-----++----+----+----+----+
 //-
 static NETLIST_START(CD4029_DIP)
+{
 	CD4029(A)
 
 	DIPPINS(     /*     +--------------+     */
@@ -399,7 +410,7 @@ static NETLIST_START(CD4029_DIP)
 		   A.CO, /*  CO |7           10| U/D */ A.UD,
 		  A.VSS, /* VSS |8            9| B/D */ A.BD
 				 /*     +--------------+  */)
-NETLIST_END()
+}
 
 //- Identifier: CD4030_DIP
 //- Title: CD4030M/CD4030C Quad EXCLUSIVE-OR Gate
@@ -412,6 +423,7 @@ NETLIST_END()
 //-    https://www.uni-kl.de/elektronik-lager/418055
 //-
 static NETLIST_START(CD4030_DIP)
+{
 	   CD4030_GATE(A)
 	   CD4030_GATE(B)
 	   CD4030_GATE(C)
@@ -427,7 +439,7 @@ static NETLIST_START(CD4030_DIP)
 		A.VSS, /* VSS |7            8| A3  */ C.A
 			   /*     +--------------+     */
 	)
-NETLIST_END()
+}
 
 //- Identifier: CD4042_DIP
 //- Title: CD4042BM/CD4042BC Quad Clocked D Latch
@@ -452,6 +464,7 @@ NETLIST_END()
 //-         if D changes Q and QQ(/Q) will instantly change.
 //-
 static NETLIST_START(CD4042_DIP)
+{
 	CD4042(A)
 
 	DIPPINS(     /*     +--------------+     */
@@ -465,7 +478,7 @@ static NETLIST_START(CD4042_DIP)
 		  A.VSS, /* VSS |8            9| Q2Q */ A.Q2Q
 				 /*     +--------------+        */
 	)
-NETLIST_END()
+}
 
 //- Identifier: CD4049_DIP
 //- Title: CD4049UBM/CD4049UBC Hex Inverting Buffer
@@ -478,6 +491,7 @@ NETLIST_END()
 //-    http://pdf.datasheetcatalog.com/datasheets/134/109125_DS.pdf
 //-
 static NETLIST_START(CD4049_DIP)
+{
 	CD4049_GATE(A)
 	CD4049_GATE(B)
 	CD4049_GATE(C)
@@ -511,7 +525,7 @@ static NETLIST_START(CD4049_DIP)
 		A.VSS, /* VSS |8            9| D   */ D.A
 			   /*     +--------------+     */
 	)
-NETLIST_END()
+}
 
 //- Identifier: CD4053_DIP
 //- Title: CD4053BM/CD4053BC Triple 2-Channel AnalogMultiplexer/Demultiplexer
@@ -522,6 +536,7 @@ NETLIST_END()
 //-    http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS005662.PDF
 //-
 static NETLIST_START(CD4053_DIP)
+{
 	CD4053_GATE(A)
 	CD4053_GATE(B)
 	CD4053_GATE(C)
@@ -546,7 +561,7 @@ static NETLIST_START(CD4053_DIP)
 		A.VSS, /*     VSS |8            9| C       */ C.S
 			   /*         +--------------+         */
 	)
-NETLIST_END()
+}
 
 //- Identifier: CD4066_DIP
 //- Title: CD4066BM/CD4066BC Quad Bilateral Switch
@@ -557,6 +572,7 @@ NETLIST_END()
 //-    http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS005665.PDF
 //-
 static NETLIST_START(CD4066_DIP)
+{
 	CD4066_GATE(A)
 	CD4066_GATE(B)
 	CD4066_GATE(C)
@@ -580,7 +596,7 @@ static NETLIST_START(CD4066_DIP)
 		A.VSS, /*      VSS |7            8| INOUTC   */ C.R.2
 			   /*          +--------------+          */
 	)
-NETLIST_END()
+}
 
 //- Identifier: CD4069_DIP
 //- Title: CD4069UBM/CD4069UBC Inverter Circuits
@@ -591,6 +607,7 @@ NETLIST_END()
 //-    http://pdf.datasheetcatalog.com/datasheets/150/206783_DS.pdf
 //-
 static NETLIST_START(CD4069_DIP)
+{
 	CD4069_GATE(A)
 	CD4069_GATE(B)
 	CD4069_GATE(C)
@@ -611,7 +628,7 @@ static NETLIST_START(CD4069_DIP)
 		A.VSS, /* VSS |7            8| Y4  */ D.Q
 			   /*     +--------------+     */
 	)
-NETLIST_END()
+}
 
 //- Identifier: CD4070_DIP
 //- Title: CD4070BM/CD4070BC Quad 2-Input EXCLUSIVE-OR Gate
@@ -622,6 +639,7 @@ NETLIST_END()
 //-    http://pdf.datasheetcatalog.com/datasheets/150/206783_DS.pdf
 //-
 static NETLIST_START(CD4070_DIP)
+{
 	CD4070_GATE(A)
 	CD4070_GATE(B)
 	CD4070_GATE(C)
@@ -640,7 +658,7 @@ static NETLIST_START(CD4070_DIP)
 		A.VSS, /* VSS |7            8| E   */ C.A
 			   /*     +--------------+     */
 	)
-NETLIST_END()
+}
 
 //- Identifier: CD4071_DIP
 //- Title: CD4071BC Quad 2-Input OR Buffered B Series Gate
@@ -648,9 +666,10 @@ NETLIST_END()
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-    pdf.datasheetcatalog.com/datasheets/185/109289_DS.pdf
+//-    http://pdf.datasheetcatalog.com/datasheets/185/109289_DS.pdf
 //-
 static NETLIST_START(CD4071_DIP)
+{
 	CD4071_GATE(A)
 	CD4071_GATE(B)
 	CD4071_GATE(C)
@@ -669,7 +688,7 @@ static NETLIST_START(CD4071_DIP)
 		A.VSS, /* VSS |7            8| E   */ C.A
 			   /*     +--------------+     */
 	)
-NETLIST_END()
+}
 
 //- Identifier: CD4076_DIP
 //- Title: CD4076BM/CD4076BC TRI-STATE(R) Quad D Flip-Flop
@@ -706,6 +725,7 @@ NETLIST_END()
 //-         +-----+-----+-----++-----+
 //-
 static NETLIST_START(CD4076_DIP)
+{
 	CD4076(A)
 
 	DIPPINS(     /*     +--------------+     */
@@ -719,7 +739,7 @@ static NETLIST_START(CD4076_DIP)
 		  A.VSS, /* VSS |8            9| ID1 */ A.ID1
 				 /*     +--------------+     */
 	)
-NETLIST_END()
+}
 
 //- Identifier: CD4081_DIP
 //- Title: CD4081BC Quad 2-Input AND Buffered B Series Gate
@@ -727,9 +747,10 @@ NETLIST_END()
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-    pdf.datasheetcatalog.com/datasheets/185/109289_DS.pdf
+//-    http://pdf.datasheetcatalog.com/datasheets/185/109289_DS.pdf
 //-
 static NETLIST_START(CD4081_DIP)
+{
 	CD4081_GATE(A)
 	CD4081_GATE(B)
 	CD4081_GATE(C)
@@ -748,7 +769,7 @@ static NETLIST_START(CD4081_DIP)
 		A.VSS, /* VSS |7            8| E   */ C.A
 			   /*     +--------------+     */
 	)
-NETLIST_END()
+}
 
 //- Identifier: CD4316_DIP
 //- Title: 74HC/HCT4316 Quad bilateral switches
@@ -759,6 +780,7 @@ NETLIST_END()
 //-    http://pdf.datasheetcatalog.com/datasheet/philips/74HCT4316.pdf
 //-
 static NETLIST_START(CD4316_DIP)
+{
 	CD4316_GATE(A)
 	CD4316_GATE(B)
 	CD4316_GATE(C)
@@ -784,7 +806,7 @@ static NETLIST_START(CD4316_DIP)
 		A.VSS, /* GND |8            9| VEE */ VEE
 			   /*     +--------------+     */
 	)
-NETLIST_END()
+}
 
 //- Identifier:  CD4538_DIP
 //- Title: CD4538BC Dual Precision Monostable
@@ -800,6 +822,7 @@ NETLIST_END()
 //-    https://pdf1.alldatasheet.com/datasheet-pdf/view/50871/FAIRCHILD/CD4538.html
 //-
 static NETLIST_START(CD4538_DIP)
+{
 	CD4538(A)
 	CD4538(B)
 
@@ -817,10 +840,11 @@ static NETLIST_START(CD4538_DIP)
 		 A.VSS, /* GND |8            9| VEE */ B.QQ
 				/*     +--------------+     */
 	)
-NETLIST_END()
+}
 
 //FIXME: Documentation
 static NETLIST_START(MM5837_DIP)
+{
 	MM5837(A)
 	NC_PIN(NC)
 
@@ -836,75 +860,84 @@ static NETLIST_START(MM5837_DIP)
 		A.VSS,  /*   VSS |4      5| NC */ NC.I
 				/*       +--------+    */
 	)
-NETLIST_END()
+}
 
-static TRUTHTABLE_START(CD4001_GATE, 2, 1, "")
+static TRUTH_TABLE(CD4001_GATE, 2, 1, "")
+{
 	TT_HEAD("A , B | Q ")
 	TT_LINE("0,0|1|110")
 	TT_LINE("X,1|0|120")
 	TT_LINE("1,X|0|120")
 	TT_FAMILY("CD4XXX")
-TRUTHTABLE_END()
+}
 
-static TRUTHTABLE_START(CD4011_GATE, 2, 1, "")
+static TRUTH_TABLE(CD4011_GATE, 2, 1, "")
+{
 	TT_HEAD("A,B|Q ")
 	TT_LINE("0,X|1|100")
 	TT_LINE("X,0|1|100")
 	TT_LINE("1,1|0|100")
 	TT_FAMILY("CD4XXX")
-TRUTHTABLE_END()
+}
 
-static TRUTHTABLE_START(CD4030_GATE, 2, 1, "")
+static TRUTH_TABLE(CD4030_GATE, 2, 1, "")
+{
 	TT_HEAD("A,B|Q ")
 	TT_LINE("0,0|0|100")
 	TT_LINE("0,1|1|100")
 	TT_LINE("1,0|1|100")
 	TT_LINE("1,1|0|100")
 	TT_FAMILY("CD4XXX")
-TRUTHTABLE_END()
+}
 
-static TRUTHTABLE_START(CD4049_GATE, 1, 1, "")
+static TRUTH_TABLE(CD4049_GATE, 1, 1, "")
+{
 	TT_HEAD("A|Q ")
 	TT_LINE("0|1|45")
 	TT_LINE("1|0|45")
 	TT_FAMILY("CD4XXX")
-TRUTHTABLE_END()
+}
 
-static TRUTHTABLE_START(CD4069_GATE, 1, 1, "")
+static TRUTH_TABLE(CD4069_GATE, 1, 1, "")
+{
 	TT_HEAD("A|Q ")
 	TT_LINE("0|1|55")
 	TT_LINE("1|0|55")
 	TT_FAMILY("CD4XXX")
-TRUTHTABLE_END()
+}
 
-static TRUTHTABLE_START(CD4070_GATE, 2, 1, "")
+static TRUTH_TABLE(CD4070_GATE, 2, 1, "")
+{
 	TT_HEAD("A,B|Q ")
 	TT_LINE("0,0|0|15")
 	TT_LINE("0,1|1|22")
 	TT_LINE("1,0|1|22")
 	TT_LINE("1,1|0|15")
 	TT_FAMILY("CD4XXX")
-TRUTHTABLE_END()
+}
 
-static TRUTHTABLE_START(CD4071_GATE, 2, 1, "")
+static TRUTH_TABLE(CD4071_GATE, 2, 1, "")
+{
 	TT_HEAD("A,B|Q ")
 	TT_LINE("0,0|0|200")
 	TT_LINE("0,1|1|200")
 	TT_LINE("1,0|1|200")
 	TT_LINE("1,1|1|200")
 	TT_FAMILY("CD4XXX")
-TRUTHTABLE_END()
+}
 
-static TRUTHTABLE_START(CD4081_GATE, 2, 1, "")
+static TRUTH_TABLE(CD4081_GATE, 2, 1, "")
+{
 	TT_HEAD("A,B|Q ")
 	TT_LINE("0,0|0|200")
 	TT_LINE("0,1|0|200")
 	TT_LINE("1,0|0|200")
 	TT_LINE("1,1|1|200")
 	TT_FAMILY("CD4XXX")
-TRUTHTABLE_END()
+}
 
 NETLIST_START(cd4xxx_lib)
+{
 
 	TRUTHTABLE_ENTRY(CD4001_GATE)
 	TRUTHTABLE_ENTRY(CD4011_GATE)
@@ -942,4 +975,4 @@ NETLIST_START(cd4xxx_lib)
 
 	LOCAL_LIB_ENTRY(MM5837_DIP)
 
-NETLIST_END()
+}

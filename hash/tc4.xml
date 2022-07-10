@@ -22,7 +22,7 @@ through the softwarelist.
 		<year>1981</year>
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="tc4_cart">
-			<feature name="pinout" value="0x01" />
+			<feature name="pinout" value="0x1" />
 			<dataarea name="nodata" size="0x10"></dataarea>
 		</part>
 	</software>
@@ -32,7 +32,7 @@ through the softwarelist.
 		<year>1981</year>
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="tc4_cart">
-			<feature name="pinout" value="0x08" />
+			<feature name="pinout" value="0x8" />
 			<dataarea name="nodata" size="0x10"></dataarea>
 		</part>
 	</software>
@@ -42,7 +42,7 @@ through the softwarelist.
 		<year>1981</year>
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="tc4_cart">
-			<feature name="pinout" value="0x04" />
+			<feature name="pinout" value="0x4" />
 			<dataarea name="nodata" size="0x10"></dataarea>
 		</part>
 	</software>
@@ -52,7 +52,7 @@ through the softwarelist.
 		<year>1981</year>
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="tc4_cart">
-			<feature name="pinout" value="0x02" />
+			<feature name="pinout" value="0x2" />
 			<dataarea name="nodata" size="0x10"></dataarea>
 		</part>
 	</software>

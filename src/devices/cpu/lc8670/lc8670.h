@@ -93,7 +93,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
@@ -111,6 +110,9 @@ protected:
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+	TIMER_CALLBACK_MEMBER(base_timer_update);
+	TIMER_CALLBACK_MEMBER(clock_timer_update);
 
 private:
 	// helpers
@@ -195,8 +197,6 @@ private:
 	memory_access< 8, 0, 0, ENDIANNESS_BIG>::specific m_io;      // I/O ports
 
 	// timers
-	static const device_timer_id BASE_TIMER = 1;
-	static const device_timer_id CLOCK_TIMER = 2;
 	emu_timer *           m_basetimer;
 	emu_timer *           m_clocktimer;
 

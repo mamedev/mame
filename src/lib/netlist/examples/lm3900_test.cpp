@@ -19,6 +19,7 @@
 #include "netlist/devices/net_lib.h"
 
 NETLIST_START(main)
+{
 
 	/* Standard stuff */
 
@@ -100,4 +101,4 @@ NETLIST_START(main)
 	LOG(log_Y, R1.1)
 	LOG(log_Z, f)
 #endif
-NETLIST_END()
+}

@@ -19,14 +19,9 @@
 	"vertex": "chains/misc/vs_lut",
 	"fragment": "chains/misc/fs_lut",
 	"uniforms": [
-		{
-			"name": "s_tex",
-			"type": "int",
-			"values": [ 1.0 ]
-		}, {
-			"name": "s_3dlut",
-			"type": "int",
-			"values": [ 1.0 ]
-		}
+		{ "name": "s_tex", "type": "int", "values": [ 1.0 ] },
+		{ "name": "s_3dlut", "type": "int", "values": [ 1.0 ] },
+		{ "name": "u_tex_size1", "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
+		{ "name": "u_inv_tex_size1", "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] }
 	]
 }

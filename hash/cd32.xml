@@ -3,7 +3,7 @@
 <!--
 license:CC0
 -->
-<softwarelist name="cd32" description="Commodore Amiga CD-32 CD-ROMs">
+<softwarelist name="cd32" description="Commodore Amiga CD32 CD-ROMs">
 
 	<!--
 	UNDUMPED:
@@ -11,12 +11,12 @@ license:CC0
 	1001 Girl
 	Acid Attack Compilation (Guardian, Roadkill, Super Skidmarks)
 	Amiga CD Football (Sports: Football)
+	Amiga CD32 Sports Football
 	Amiga Workbench 3.0
 	Arabian Nights [Poland]
-	Assassins 4
 	Brian The Lion
 	Brutal: Paws Of Fury
-	Camel Racer
+	Camel Racer (same as CDTV release?)
 	CD32 Scene - Volume 1
 	CD Exchange Vol 1
 	CD Micro French
@@ -75,7 +75,7 @@ license:CC0
 	James Pond 3: Operation Starfi5h [Kixx]
 	John Barnes European Football
 	Jungle Strike
-	Kang Fu
+	Kang Fu (AmigaCD)
 	Karaoke: Julsånger I
 	Kingpin: Arcade Sports Bowling
 	Labyrinth Of Time, The
@@ -157,7 +157,7 @@ license:CC0
 		<publisher>I.C.E.</publisher>
 		<info name="barcode" value="5 024598 013278"/>
 		<info name="disc_matrix" value="AKIRACD32 :   MASTERED BY NIMBUS"/>
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="akira (europe)" sha1="1abe30f210f4ee779a75796727f5fe3ef1781692"/>
 			</diskarea>
@@ -172,7 +172,7 @@ license:CC0
 		<info name="serial" value="/DP130003 [Box], /CS090011 [Disc]"/>
 		<info name="barcode" value="5 018247 408454 >"/>
 		<info name="disc_matrix" value="CDD2971 /CS090011 ·   MASTERED BY NIMBUS"/>
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="alfred chicken (europe)" sha1="6b6f249c830e15f7c5a5dffbe75596982a07c2c1"/>
 			</diskarea>
@@ -188,7 +188,7 @@ license:CC0
 		<info name="alt_title" value="Team 17 CD32 Double Pack" /> <!-- In-game title -->
 		<info name="barcode" value="5 022358 170216 >" />
 		<info name="disc_matrix" value="CDD3186 ABSE/QWAK ::   MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="alien breed special edition and qwak (europe) (en,fr,de,it,da)" sha1="499614c9a89026cbd748af7afd65445c50dd6167"/>
 			</diskarea>
@@ -203,7 +203,7 @@ license:CC0
 		<publisher>Team 17</publisher>
 		<info name="barcode" value="5 022358 170476" />
 		<info name="disc_matrix" value="CDR00345 ALIEN BREED/TOWER ASSAULT CD 32" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="alien breed - tower assault (europe)" sha1="0a34fc651775b813a910057f0235a0c26157c39e"/>
 			</diskarea>
@@ -218,7 +218,7 @@ license:CC0
 		<publisher>Team 17 / Ocean</publisher>
 		<info name="barcode" value="5 022358 170599" />
 		<info name="disc_matrix" value="CDR00861   ALIEN BREED 3D   PC WISE" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="alien breed 3d (europe)" sha1="b6a9037ba0cd5fee65f5445b28e968074c335bbe"/>
 			</diskarea>
@@ -233,7 +233,7 @@ license:CC0
 		<publisher>Future Publishing</publisher>
 		<info name="release" value="199403xx" />
 		<info name="disc_matrix" value="S AMIGACD32-10 01   FUTURE DISCTRONICS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="amiga cd32 - volume 1 (europe)" sha1="3d1fae40469a0c030f0140af3f6f081bbfc5d496"/>
 			</diskarea>
@@ -248,7 +248,7 @@ license:CC0
 		<publisher>Future Publishing</publisher>
 		<info name="release" value="199410xx" />
 		<info name="disc_matrix" value="AMIGA NOV 94 26 SEP 94   MPO   01 @@ 1" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="amiga cd32 - volume 2 (europe)" sha1="e42e631874291ccf5062f6653b3c35385aa66f6b"/>
 			</diskarea>
@@ -261,7 +261,7 @@ license:CC0
 		<year>1994</year>
 		<publisher>Paragon Publishing</publisher>
 		<info name="release" value="199405xx" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="amiga cd32 gamer vol. 01 (1994-05)(paragon publishing)(gb)" sha1="ceb082a7eaf0fb98008d4398edf4883de7a61496" status="baddump"/>
 			</diskarea>
@@ -276,7 +276,7 @@ license:CC0
 		<publisher>Paragon Publishing</publisher>
 		<info name="release" value="199406xx" />
 		<info name="disc_matrix" value="CDR00128 PCWISE LTD/CD32 GAMER 2" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="amiga cd32 gamer - game demos volume 2 (europe)" sha1="21de657435961a67d9bb5db0ff657894e4bab2de"/>
 			</diskarea>
@@ -289,7 +289,7 @@ license:CC0
 		<year>1994</year>
 		<publisher>Paragon Publishing</publisher>
 		<info name="release" value="19940714" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="amiga cd32 gamer vol. 03 (1994-07-14)(paragon publishing)(gb)" sha1="ef8be0a94897bc1a3c8504e931fdf7470084f1c7" status="baddump"/>
 			</diskarea>
@@ -302,7 +302,7 @@ license:CC0
 		<year>1994</year>
 		<publisher>Paragon Publishing</publisher>
 		<info name="release" value="19940808" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="amiga cd32 gamer vol. 04 (1994-08-08)(paragon publishing)(gb)" sha1="2f1ed16a7a604a64c2ffe1beafb08d08588bd9b2" status="baddump"/>
 			</diskarea>
@@ -315,7 +315,7 @@ license:CC0
 		<year>1994</year>
 		<publisher>Paragon Publishing</publisher>
 		<info name="release" value="19941013" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="amiga cd32 gamer vol. 05 (1994-10-13)(paragon publishing)(gb)" sha1="e249c7096e87a942e7c166bda8bd4bd5972cdb97" status="baddump"/>
 			</diskarea>
@@ -328,7 +328,7 @@ license:CC0
 		<year>1994</year>
 		<publisher>Paragon Publishing</publisher>
 		<info name="release" value="19941110" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="amiga cd32 gamer vol. 06 (1994-11-10)(paragon publishing)(gb)" sha1="be226accca732c8243223c84e9c7786ca08cb85c" status="baddump"/>
 			</diskarea>
@@ -341,7 +341,7 @@ license:CC0
 		<year>1994</year>
 		<publisher>Paragon Publishing</publisher>
 		<info name="release" value="19941208" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="amiga cd32 gamer vol. 07 (1994-12-08)(paragon publishing)(gb)" sha1="59b82a04d92adfb8f5eded0351bc54bb4846b620" status="baddump"/>
 			</diskarea>
@@ -356,7 +356,7 @@ license:CC0
 		<publisher>Paragon Publishing</publisher>
 		<info name="release" value="19950112" />
 		<info name="disc_matrix" value="AMGA CD32 ISSUE 9" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="cd32 gamer - playable game demos, demos, multimedia and shareware volume 8 (europe)" sha1="88234c7de4e1188fb9130342aca3f1c398de4df9"/>
 			</diskarea>
@@ -369,7 +369,7 @@ license:CC0
 		<year>1995</year>
 		<publisher>Paragon Publishing</publisher>
 		<info name="release" value="19950209" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="amiga cd32 gamer vol. 09 (1995-02-09)(paragon publishing)(gb)" sha1="29df212d20f7b035514ee3b275cd3a50347e9387" status="baddump"/>
 			</diskarea>
@@ -382,7 +382,7 @@ license:CC0
 		<year>1995</year>
 		<publisher>Paragon Publishing</publisher>
 		<info name="release" value="19950309" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="amiga cd32 gamer vol. 10 (1995-03-09)(paragon publishing)(gb)[amiga cd32 issue 10]" sha1="14f61389485768d9de93c061372eae34d3bf55c1" status="baddump"/>
 			</diskarea>
@@ -395,7 +395,7 @@ license:CC0
 		<year>1995</year>
 		<publisher>Paragon Publishing</publisher>
 		<info name="release" value="19950413" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="amiga cd32 gamer vol. 11 (1995-04-13)(paragon publishing)(gb)" sha1="6391a4ee14dc13cfe2bf6c9d4f0318783af5e3be" status="baddump"/>
 			</diskarea>
@@ -408,7 +408,7 @@ license:CC0
 		<year>1995</year>
 		<publisher>Paragon Publishing</publisher>
 		<info name="release" value="19950511" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="amiga cd32 gamer vol. 12 (1995-05-11)(paragon publishing)(gb)[cd 32 gamer 00449, 00471]" sha1="6117859767922a931d418f1abe32bb39f3c0acfa" status="baddump"/>
 			</diskarea>
@@ -421,7 +421,7 @@ license:CC0
 		<year>1995</year>
 		<publisher>Paragon Publishing</publisher>
 		<info name="release" value="19950608" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="amiga cd32 gamer vol. 13 (1995-06-08)(paragon publishing)(gb)" sha1="996b4ede3fa5378e377e34d9d886747d2cd570b6" status="baddump"/>
 			</diskarea>
@@ -434,7 +434,7 @@ license:CC0
 		<year>1995</year>
 		<publisher>Paragon Publishing</publisher>
 		<info name="release" value="19950713" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="amiga cd32 gamer vol. 14 (1995-07-13)(paragon publishing)(gb)" sha1="d5e6787cbb7e588c74ee88002c076c9bfea4629b" status="baddump"/>
 			</diskarea>
@@ -447,7 +447,7 @@ license:CC0
 		<year>1995</year>
 		<publisher>Paragon Publishing</publisher>
 		<info name="release" value="19950810" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="amiga cd32 gamer vol. 15 (1995-08-10)(paragon publishing)(gb)" sha1="4cd5d8f0fb5118503518182ec8c7530114ebde03" status="baddump"/>
 			</diskarea>
@@ -460,7 +460,7 @@ license:CC0
 		<year>1995</year>
 		<publisher>Paragon Publishing</publisher>
 		<info name="release" value="19950914" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="amiga cd32 gamer vol. 16 (1995-09-14)(paragon publishing)(gb)" sha1="21aa69e223625e96ced9d641e9370d5cf7ed9879" status="baddump"/>
 			</diskarea>
@@ -473,7 +473,7 @@ license:CC0
 		<year>1995</year>
 		<publisher>Paragon Publishing</publisher>
 		<info name="release" value="19951012" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="amiga cd32 gamer vol. 17 (1995-10-12)(paragon publishing)(gb)" sha1="c6251deef7386e74e148121dc73b5fba53408548" status="baddump"/>
 			</diskarea>
@@ -486,7 +486,7 @@ license:CC0
 		<year>1995</year>
 		<publisher>Paragon Publishing</publisher>
 		<info name="release" value="19951109" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="amiga cd32 gamer vol. 18 (1995-11-09)(paragon publishing)(gb)" sha1="01a2c58e29ea6ebabedd3964b12207d451a1a222" status="baddump"/>
 			</diskarea>
@@ -499,7 +499,7 @@ license:CC0
 		<year>1995</year>
 		<publisher>Paragon Publishing</publisher>
 		<info name="release" value="19951214" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="amiga cd32 gamer vol. 19 (1995-12-14)(paragon publishing)(gb)" sha1="298c48dd32596170623dc5160829ab32040313f3" status="baddump"/>
 			</diskarea>
@@ -512,7 +512,7 @@ license:CC0
 		<year>1996</year>
 		<publisher>Paragon Publishing</publisher>
 		<info name="release" value="19960111" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="amiga cd32 gamer vol. 20 (1996-01-11)(paragon publishing)(gb)" sha1="656d334358c915114f447fc44cdcbbf89a75c45d" status="baddump"/>
 			</diskarea>
@@ -525,7 +525,7 @@ license:CC0
 		<year>1996</year>
 		<publisher>Paragon Publishing</publisher>
 		<info name="release" value="19960208" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="amiga cd32 gamer vol. 21 (1996-02-08)(paragon publishing)(gb)" sha1="b56cad65f70f5ab901a487e4d3d5bfce60ef8835" status="baddump"/>
 			</diskarea>
@@ -538,7 +538,7 @@ license:CC0
 		<year>1996</year>
 		<publisher>Paragon Publishing</publisher>
 		<info name="release" value="19960314" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="amiga cd32 gamer vol. 22 (1996-03-14)(paragon publishing)(gb)" sha1="621775bf4089f3c7c968d5cde12e34e79ef4e65e" status="baddump"/>
 			</diskarea>
@@ -552,7 +552,7 @@ license:CC0
 		<publisher>Buzz</publisher>
 		<info name="barcode" value="5 017898 901529 >" />
 		<info name="disc_matrix" value="CDD2857 BUZZ-AN ·   MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="arabian nights (europe) (en,fr,de,it)" sha1="1199d1e5303f6e9cac6df78d0c032ad5a97387bd"/>
 			</diskarea>
@@ -566,7 +566,7 @@ license:CC0
 		<publisher>Team 17</publisher>
 		<info name="barcode" value="5 022235 170353" />
 		<info name="disc_matrix" value="CDR00281   PC WISE LTD   TEAM 17 - ARCADE POOL CD 32" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="arcade pool (europe) (en,fr,de,it) (alt)" sha1="f497eb75d8a8ab1ec15630ad652700a0b0463a25"/>
 			</diskarea>
@@ -581,7 +581,7 @@ license:CC0
 		<publisher>Team 17</publisher>
 		<info name="barcode" value="5 022235 170353" />
 		<info name="disc_matrix" value="CDD4978 ARCADE POOL ·   MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="arcade pool (europe) (en,fr,de,it)" sha1="c74becbe39a592c1e9cc441dd67282951c750e9c"/>
 			</diskarea>
@@ -593,7 +593,7 @@ license:CC0
 		<year>1995</year>
 		<publisher>Team 17</publisher>
 		<info name="disc_matrix" value="CDD6125 ATR CD32 :   MASTERED BY NIMBUS"/>
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="atr - all terrain racing (1995)(team 17)" sha1="edefcd613796faea7e279b3729fd876243623171"/>
 			</diskarea>
@@ -608,7 +608,7 @@ license:CC0
 		<publisher>Core</publisher>
 		<info name="barcode" value="5 0207 17 200444 >" />
 		<info name="disc_matrix" value="CDD4103 BANSHEE ·   MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="banshee (europe) (en,fr,de,da)" sha1="f10de2115430176776215aef8b239dccb54e34ec"/>
 			</diskarea>
@@ -621,7 +621,7 @@ license:CC0
 		<year>1995</year>
 		<publisher>Rasputin</publisher>
 		<info name="disc_matrix" value="CD PLANT AB BASEJUMPERS CDM01" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="base jumpers (europe)" sha1="9ef68bd83d199015dc3180333da79a8292908365"/>
 			</diskarea>
@@ -635,7 +635,7 @@ license:CC0
 		<publisher>Interplay</publisher>
 		<info name="barcode" value="5 026102 005090" />
 		<info name="disc_matrix" value="INTERPLAY DISCTRONICS S BATTLECHESS 01" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="battle chess (europe)" sha1="727925e4c42a11eb2b79023473cbddd6b79333f9"/>
 			</diskarea>
@@ -650,7 +650,7 @@ license:CC0
 		<publisher>Mindscape</publisher>
 		<info name="serial" value="/DP130018 [Box], /CS090030 [Disc]" />
 		<info name="disc_matrix" value="CDD3904 /CS090030 ·   MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="battletoads (europe)" sha1="31278a9d639c93cc48f2780a682d3c86e6e6ab5d"/>
 			</diskarea>
@@ -665,7 +665,7 @@ license:CC0
 		<publisher>Unique</publisher>
 		<info name="barcode" value="5 013248 004551 >" />
 		<info name="disc_matrix" value="CDR 00049 P.C.WISELTD." />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="beavers (europe)" sha1="5d7e7b4dcbacf92c6ec17632f124dcd27ab333fd"/>
 			</diskarea>
@@ -679,7 +679,7 @@ license:CC0
 		<publisher>Virgin</publisher>
 		<info name="barcode" value="5 028587 000287" />
 		<info name="disc_matrix" value="ABLEX 80554-1" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="beneath a steel sky (europe) (en,fr,de,it)" sha1="a69d0c78450a4740076533d1609612b4d131b0bc"/>
 			</diskarea>
@@ -693,7 +693,7 @@ license:CC0
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
 		<info name="disc_matrix" value="DADC AUSTRIA   BENEFACTOR-CD32 13" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="benefactor (europe)" sha1="3a2add193cc9869a16a37090eaddc5ce98b36bc8"/>
 			</diskarea>
@@ -706,21 +706,21 @@ license:CC0
 		<description>The Big 6 (Dizzy Collection)</description>
 		<year>1994</year>
 		<publisher>Codemasters</publisher>
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="big 6, the (1994)(codemasters)(en-de)[compilation]" sha1="ecea85b6f6bd167b0b5164fde31b782e6b188e30"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<!-- Doesn't boot -->
+	<!-- Boot OK, has stripe glitch during FMV, road doesn't draw when player is on the left side of the road -->
 	<!-- http://redump.org/disc/3306/ -->
 	<software name="blkviper" supported="no">
 		<description>Black Viper</description>
 		<year>1996</year>
 		<publisher>Neo</publisher>
 		<info name="disc_matrix" value="SONOPRESS CD-ROM Q-0230 A   5" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="black viper (europe) (en,de,it)" sha1="9fffbfb004596330d5befd2011216c1640cfa5d5"/>
 			</diskarea>
@@ -734,7 +734,7 @@ license:CC0
 		<publisher>Millennium</publisher>
 		<info name="alt_title" value="Brutal Football" /> <!-- Cover title -->
 		<info name="disc_matrix" value="CDD3361 BRUTAL FOOTBALL : MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="brutal football (europe)" sha1="360d2d53cf83c7d22edca4845ff4f5f77e240037"/>
 			</diskarea>
@@ -749,7 +749,7 @@ license:CC0
 		<publisher>Core</publisher>
 		<info name="barcode" value="5 020717 200345 >" />
 		<info name="disc_matrix" value="CDD3297 BUBBA :   MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="bubba n stix (europe)" sha1="32f0704bc31e357c9bc98c85d16718ae5302d569"/>
 			</diskarea>
@@ -763,7 +763,7 @@ license:CC0
 		<year>1994</year>
 		<publisher>Audiogenic</publisher>
 		<info name="disc_matrix" value="CDD4696 :   MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="bubble and squeak (europe)" sha1="fc9bc6d45a891a88c517870923bba0be6f5cb74e"/>
 			</diskarea>
@@ -778,7 +778,7 @@ license:CC0
 		<publisher>Grandslam</publisher>
 		<info name="barcode" value="5 013248 004650 >" />
 		<info name="disc_matrix" value="BUMP N BURN 10332211 01 &amp;   MADE IN U.K. BY PDO" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="bump n burn (europe)" sha1="15c624de3acbbc6e23b45deefbe5b007e4eaf8ab"/>
 			</diskarea>
@@ -792,7 +792,7 @@ license:CC0
 		<publisher>Virgin</publisher>
 		<info name="barcode" value="5 013715 060455" />
 		<info name="disc_matrix" value="ABLEX 80343-4 @ 4" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="cannon fodder (europe)" sha1="11a0c5316bf765cae1f9280d4f2ec2843dc8c2d0"/>
 			</diskarea>
@@ -806,7 +806,7 @@ license:CC0
 		<publisher>Interplay</publisher>
 		<info name="barcode" value="5 026102 008091" />
 		<info name="disc_matrix" value="**CASTLE/2**   121634-X4-3335-2 DISCTRONICS, S castle 2 01 Disctronics Interplay 13" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="castles ii - siege and conquest (europe)" sha1="b0b85836d783ac6e349de557a7f83f9eaf432068"/>
 			</diskarea>
@@ -821,7 +821,7 @@ license:CC0
 		<publisher>Unique</publisher>
 		<info name="barcode" value="5 013248 004537 >, 5 013248 004544" />
 		<info name="disc_matrix" value="PC WISE 0685 350505 SHAOLIN" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="chambers of shaolin (europe)" sha1="8a58723a29465fedc8e709aa2d96830055761b05"/>
 			</diskarea>
@@ -836,7 +836,7 @@ license:CC0
 		<publisher>Renegade</publisher>
 		<info name="barcode" value="5 018247 404456" />
 		<info name="disc_matrix" value="CDD3445 /RCS090001 :·   ·MASTERED BY NIMBUS·" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="chaos engine, the (europe) (en,fr,de,it)" sha1="0044770e73765705061cb5c63a337eab579574d9"/>
 			</diskarea>
@@ -851,7 +851,7 @@ license:CC0
 		<publisher>Corkers</publisher>
 		<info name="barcode" value="5 020717 200390 >" />
 		<info name="disc_matrix" value="CDD3296 CHUCK ROCK ·   MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="chuck rock (europe)" sha1="23f177c36a219d5b604bbf9091231c0133f94926"/>
 			</diskarea>
@@ -866,7 +866,7 @@ license:CC0
 		<publisher>Core</publisher>
 		<info name="barcode" value="5 020717 200338 >" />
 		<info name="disc_matrix" value="CDD3490 SON OF CHUCK ·   MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="chuck rock ii - son of chuck (europe)" sha1="6fc1f9194487d4431a0b39510d10575fcd5d09ad"/>
 			</diskarea>
@@ -881,7 +881,7 @@ license:CC0
 		<publisher>Gremlin</publisher>
 		<info name="barcode" value="5 013658 033387" />
 		<info name="disc_matrix" value="LOTUS TRILOGY 10279491 02 &amp;   MADE IN U.K. BY PDO" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="classic lotus trilogy, the (europe)" sha1="da66caa5da1a7b150772e96ca8591222057b3c39"/>
 			</diskarea>
@@ -893,7 +893,7 @@ license:CC0
 		<description>Clockwiser</description>
 		<year>1994</year>
 		<publisher>Rasputin</publisher>
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="clockwiser (1994)(rasputin)" sha1="0d92ecfc00175486022c4c3bcfd7e26a21568d20"/>
 			</diskarea>
@@ -908,22 +908,22 @@ license:CC0
 		<info name="serial" value="/DP130001 [Box], /CS090008 [Disc]" />
 		<info name="barcode" value="5 018247 279450 >" />
 		<info name="disc_matrix" value="SONOPRESS CD-ROM * H-3072 * A" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="d-generation (europe)" sha1="caefe01fe46eee977e9d46f32ecc3bbf37acb613"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<!-- Doesn't boot -->
+	<!-- GFX color glitch with Flair mascot at boot -->
 	<!-- http://redump.org/disc/16189/ -->
-	<software name="dstreets" supported="no">
+	<software name="dstreets" supported="partial">
 		<description>Dangerous Streets</description>
 		<year>1994</year>
 		<publisher>Flair</publisher>
 		<info name="barcode" value="5 021423 000922" />
 		<info name="disc_matrix" value="CDD2925 DANGEROUS STREETS ·   MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="dangerous streets (europe) (en,fr,de,it)" sha1="1f5e47178af36e299489589065ec0354c9ed3136"/>
 			</diskarea>
@@ -938,7 +938,7 @@ license:CC0
 		<publisher>Cyberdreams</publisher>
 		<info name="barcode" value="7 629881 331008" />
 		<info name="disc_matrix" value="CDD4925 DARK SEED :   MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="darkseed (europe)" sha1="6122a88390ed1e258190bc3f3009997f3a7e778e"/>
 			</diskarea>
@@ -952,7 +952,7 @@ license:CC0
 		<publisher>I.C.E.</publisher>
 		<info name="barcode" value="5 024598 009271" />
 		<info name="disc_matrix" value="CDD2998 DEEP CORE N/2 :   MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="deep core (europe)" sha1="653a2112634619ec6df2be3f4ac98a1a61fbee1e"/>
 			</diskarea>
@@ -964,7 +964,7 @@ license:CC0
 		<description>Diggers + Oscar</description>
 		<year>1993</year>
 		<publisher>Commodore</publisher>
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="diggers and oscar (1993)(commodore)(m4)[compilation][amiga-cd 31, 54]" sha1="88422ad455a8b8c7255c83812aa69132f15e1bf6"/>
 			</diskarea>
@@ -978,7 +978,7 @@ license:CC0
 		<year>1994</year>
 		<publisher>Gremlin</publisher>
 		<info name="disc_matrix" value="DISPOSABLE HERO 10279461 02 &amp; MADE IN U.K. BY PDO" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="disposable hero (europe)" sha1="46c462df763b680018e018911b8d7ed68d47d24e"/>
 			</diskarea>
@@ -993,7 +993,7 @@ license:CC0
 		<publisher>Supervision</publisher>
 		<info name="barcode" value="5 025796 001111" />
 		<info name="disc_matrix" value="SONOPRESS CD-ROM * I-1050 * A   3" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="donk (europe)" sha1="ea2998f8d0a0728c3e6c1d9f7cdf0f6723792bbc"/>
 			</diskarea>
@@ -1008,7 +1008,7 @@ license:CC0
 		<publisher>Core</publisher>
 		<info name="barcode" value="5 0207 17 200550 >" />
 		<info name="disc_matrix" value="CDD5013 DRAGON STONE ·   -MASTERED BY NIMBUS-" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="dragonstone (europe)" sha1="43b3408395549c877ddcbc405b35d13d26b085b0"/>
 			</diskarea>
@@ -1023,7 +1023,7 @@ license:CC0
 		<publisher>Almathera</publisher>
 		<info name="barcode" value="5 024913 000914" />
 		<info name="disc_matrix" value="MASTERED BY NIMBUS CDD4410 EMERALD MINES/B." />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="emerald mines (europe)" sha1="0b12f7863bc94f3f8b2e0b362242be4daec6b43f"/>
 			</diskarea>
@@ -1039,7 +1039,7 @@ license:CC0
 		<info name="alt_title" value="Fire &amp; Ice: The Daring Adventures of Cool Coyote" /> <!-- Box title -->
 		<info name="barcode" value="5 018247 373455" />
 		<info name="disc_matrix" value="CDD3616 /RCS090002 :   MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="fire and ice - the daring adventures of cool coyote (europe) (en,fr,de,it)" sha1="064cadd6379a64d764a24db466807c2b1ded659d"/>
 			</diskarea>
@@ -1053,7 +1053,7 @@ license:CC0
 		<publisher>I.C.E.</publisher>
 		<info name="barcode" value="5 024598 003279" />
 		<info name="disc_matrix" value="CDD2999 FIREFORCE * 1:0 MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="fire force (europe)" sha1="9172161a616b456983f149a1eb8659375d35cd90"/>
 			</diskarea>
@@ -1068,7 +1068,7 @@ license:CC0
 		<publisher>Buzz</publisher>
 		<info name="barcode" value="5 017898 901574" />
 		<info name="disc_matrix" value="CDD3114 BUZZ-FH 1:1 MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="fly harder (europe)" sha1="334fd2661914f7dc3355c40c44011bf39b36263b"/>
 			</diskarea>
@@ -1079,7 +1079,7 @@ license:CC0
 		<description>Frog Feast (Demo)</description>
 		<year>2007</year>
 		<publisher>Rastersoft</publisher>
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Frog" sha1="a3dd1f3ff331c65dcf2180b41c03ea61264fe3de"/>
 			</diskarea>
@@ -1094,7 +1094,7 @@ license:CC0
 		<publisher>GameTek</publisher>
 		<info name="barcode" value="5 026555 100021" />
 		<info name="disc_matrix" value="DAMONT   FRONTIER ELITE CD32   CDMA2" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="frontier - elite ii (europe)" sha1="be555965d60784428787bb923c900c535c101474"/>
 			</diskarea>
@@ -1109,7 +1109,7 @@ license:CC0
 		<publisher>Millennium</publisher>
 		<info name="barcode" value="5 016012 001206" />
 		<info name="disc_matrix" value="CDD3342 GLOBAL EFFECT ·   MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="global effect (europe)" sha1="daa68df85bf70e202dce8e323dfd2090be92ff24"/>
 			</diskarea>
@@ -1124,7 +1124,7 @@ license:CC0
 		<publisher>Guildhall</publisher>
 		<info name="barcode" value="5 012323 059219" />
 		<info name="disc_matrix" value="GH19 13 JUL 95   MPO   02 @@@ 1 00" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="gloom (europe)" sha1="b19ec06a135c04bbfe4a355908129a230395f309"/>
 			</diskarea>
@@ -1139,7 +1139,7 @@ license:CC0
 		<publisher>Acid Software</publisher>
 		<info name="barcode" value="9 417810 100034" />
 		<info name="disc_matrix" value="GUARDIAN 10325611 01 &amp; MADE IN U.K. BY PDO" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="guardian (europe)" sha1="4a1101de8fd10e4c2f6c59894ac97663d360a623"/>
 			</diskarea>
@@ -1153,7 +1153,7 @@ license:CC0
 		<publisher>I.C.E.</publisher>
 		<info name="release" value="199409xx" />
 		<info name="disc_matrix" value="GULPCD32 ·   MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="gulp (europe) (en,fr,de,es,it)" sha1="574eee872637153009dc1a4cc36ee1dd0e5d9a79"/>
 			</diskarea>
@@ -1166,7 +1166,7 @@ license:CC0
 		<year>1994</year>
 		<publisher>Core</publisher>
 		<info name="disc_matrix" value="CDD3924 HEIMDALL 2 CD32 :   MASTERED BY NIMBUS"/>
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="heimdall 2 - into the hall of worlds (1994)(core)" sha1="5de73081c4278135362eb079a1f73053a50f86dc"/>
 			</diskarea>
@@ -1181,7 +1181,7 @@ license:CC0
 		<publisher>System 3</publisher>
 		<info name="barcode" value="5 020573 000257" />
 		<info name="disc_matrix" value="CDD3215 IK ·   MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="international karate plus (europe)" sha1="6f69a642e1f4104bbe7d1f66353473752c14e64c"/>
 			</diskarea>
@@ -1194,7 +1194,7 @@ license:CC0
 		<year>1994</year>
 		<publisher>Rasputin</publisher>
 		<info name="disc_matrix" value="BR00400-01 Made by KAO Ireland" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="jetstrike (1994)(rasputin)" sha1="54876d6371e67338e902986adf58452d97724d01"/>
 			</diskarea>
@@ -1208,7 +1208,7 @@ license:CC0
 		<year>1994</year>
 		<publisher>Ocean Software</publisher>
 		<info name="disc_matrix" value="ABLEX 80422" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="kid chaos (europe)" sha1="5c0345d317f19501fe0ecb3c1df54a3b7a7cde31"/>
 			</diskarea>
@@ -1220,7 +1220,7 @@ license:CC0
 		<description>Liberation - Captive II</description>
 		<year>1994</year>
 		<publisher>Mindscape</publisher>
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="liberation - captive ii v2.02-2.00c (1994-04-08)(mindscape)[cdd3716]" sha1="e4270283304e913a9397888f536be1b146482af1"/>
 			</diskarea>
@@ -1235,7 +1235,7 @@ license:CC0
 		<publisher>21st Century Entertainment</publisher>
 		<info name="barcode" value="5 012635 300344" />
 		<info name="disc_matrix" value="ABLEX 80574" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="marvins marvellous adventure (europe) (en,fr,de,es,it)" sha1="37ad971a24da23a15d45735737d396e0dec7a44f"/>
 			</diskarea>
@@ -1250,7 +1250,7 @@ license:CC0
 		<publisher>I.C.E.</publisher>
 		<info name="barcode" value="5 024598 010277" />
 		<info name="disc_matrix" value="CDD2886 MEAN ARENAS ·   MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="mean arenas (europe)" sha1="0a48eceb7d86ab776b91657c3e9a1af1b7a06a13"/>
 			</diskarea>
@@ -1263,7 +1263,7 @@ license:CC0
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
 		<info name="disc_matrix" value="DADC AUSTRIA   MCD32-1  11     A2" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="microcosm (1994)(psygnosis)" sha1="4151e7109a476bb3bdebedb5989fdf7fc2030038"/>
 			</diskarea>
@@ -1277,7 +1277,7 @@ license:CC0
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
 		<info name="disc_matrix" value="FLINK-CD32 15 A2" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="flink (europe)" sha1="cff2b90f271818b540d6670e689f6dcc2b5ebe58"/>
 			</diskarea>
@@ -1289,7 +1289,7 @@ license:CC0
 		<description>Morph</description>
 		<year>1993</year>
 		<publisher>Millennium</publisher>
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="morph (1993)(millennium)" sha1="3a8909d88d48b17b7e02284866f57085fbe62e2e"/>
 			</diskarea>
@@ -1304,7 +1304,7 @@ license:CC0
 		<publisher>System 3</publisher>
 		<info name="barcode" value="5 020573 000264" />
 		<info name="disc_matrix" value="CDD3228 MYTH ·   MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="myth - history in the making (europe)" sha1="b6dea115e02f5016f01ce18e155de4525159583e"/>
 			</diskarea>
@@ -1319,7 +1319,7 @@ license:CC0
 		<publisher>Interactivision</publisher>
 		<info name="barcode" value="5 709382 000282" />
 		<info name="disc_matrix" value="NAUGHTY ONES   94040503" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="naughty ones (europe)" sha1="ad33482cdd6d82303f624f4e5472236fdcc5ee51"/>
 			</diskarea>
@@ -1335,7 +1335,7 @@ license:CC0
 		<info name="serial" value="/DP130002 [Box], /CS090010 [Disc]" />
 		<info name="barcode" value="5 018247 410457 >" />
 		<info name="disc_matrix" value="CDD2797 OVERKILL/LUNAR-C :   MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="overkill and lunar-c (europe)" sha1="b17f3f64dedada407ddb3cd7b835bc1da17cb0ee"/>
 			</diskarea>
@@ -1348,7 +1348,7 @@ license:CC0
 		<year>1995</year>
 		<publisher>Ocean</publisher>
 		<info name="disc_matrix" value="ABLEX 80581" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="pga european tour (europe)" sha1="aa2b02803af1f8df1abe8add07d9cae59888960c"/>
 			</diskarea>
@@ -1363,7 +1363,7 @@ license:CC0
 		<info name="serial" value="/DP130020 [Box], /CS090033 [Disc]" />
 		<info name="barcode" value="5 018247 415452" />
 		<info name="disc_matrix" value="CS090033   14   DADC AUSTRIA" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="pierre le chef is ... out to lunch (europe)" sha1="ed836b5870d85afe28df72acc3a321577f1d0f93"/>
 			</diskarea>
@@ -1375,19 +1375,19 @@ license:CC0
 		<description>Pinball Fantasies CD Edition</description>
 		<year>1993</year>
 		<publisher>21st Century Entertainment</publisher>
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="pinball fantasies (1993)(21st century entertainment)" sha1="01b589f79dc0c6e9ebc3ed898aa021c6e59daa70"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<!-- Glitchy sprites, no sound, like the Ami1200 AGA version -->
+	<!-- Glitchy sprites, no sound, like the Amiga 1200 AGA version -->
 	<software name="pballill" supported="no">
 		<description>Pinball Illusions</description>
 		<year>1995</year>
 		<publisher>21st Century Entertainment</publisher>
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="pinball illusions (1995)(21st century entertainment)" sha1="1b657df40d086d9ce8f498e32033993361f3452b"/>
 			</diskarea>
@@ -1401,7 +1401,7 @@ license:CC0
 		<publisher>U.S. Gold</publisher>
 		<info name="barcode" value="5 013442 560518 >" />
 		<info name="disc_matrix" value="USG005 10347691 01 &amp;   MADE IN U.K. BY PDO" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="power drive (europe) (en,fr,de,es,it)" sha1="10e66363ef495aa37b4ceac9590c77b77256d23a" status="baddump"/>
 			</diskarea>
@@ -1414,7 +1414,7 @@ license:CC0
 		<year>1994</year>
 		<publisher>Media Team</publisher>
 		<info name="disc_matrix" value="50439 618 01 >" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="power-games (europe) (en,de)" sha1="2fa54f496f5f7b0f9c168d1d0dcf357d5c4edf11"/>
 			</diskarea>
@@ -1428,20 +1428,20 @@ license:CC0
 		<publisher>Almathera</publisher>
 		<info name="barcode" value="5 024913 000068 >" />
 		<info name="disc_matrix" value="SONOPRESS CD-ROM * H-6021 * A   2" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="prey - an alien encounter (europe)" sha1="a63ee5d54f70fe53a966ddcd0c2a7085d7c7426a"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<!-- Heavy GFX glitches in Project-X, DSKDAT W 0000 in F17 Challenge-->
+	<!-- Heavy GFX glitches in Project-X, DSKDAT W 0000 (?) in F17 Challenge-->
 	<software name="projxf17" supported="no">
 		<description>Project-X and F17 Challenge</description>
 		<year>1994</year>
 		<publisher>Team 17</publisher>
 		<info name="disc_matrix" value="CDD3499 PX VERSION 2 :   MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="project-x and f17 challenge (1994)(team 17)" sha1="9c0010cc8b648b8d929dadb266d1f6464b1ef14d"/>
 			</diskarea>
@@ -1456,7 +1456,7 @@ license:CC0
 		<publisher>Team 17</publisher>
 		<info name="barcode" value="5 022358 170551" />
 		<info name="disc_matrix" value="CDR00308 THE SDL PACK TEAM 17 PC WISE" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="project-x and ultimate body blows (europe)" sha1="cb944c9b2ca7e6c877a9a16029d82b71c57b52b1"/>
 			</diskarea>
@@ -1471,7 +1471,7 @@ license:CC0
 		<publisher>Paragon Publishing</publisher>
 		<info name="release" value="199504xx" />
 		<info name="disc_matrix" value="CDR 00535 QUIK PC WISE" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="quik the thunder rabbit (europe)" sha1="18f6fc02352b650edeaf4c479c8f2043899aa220"/>
 			</diskarea>
@@ -1486,7 +1486,7 @@ license:CC0
 		<publisher>Time Warner Interactive</publisher>
 		<info name="barcode" value="5 026890 000185" />
 		<info name="disc_matrix" value="RISE OF THE ROBOTS - DISKXPRESS 02" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="rise of the robots (europe)" sha1="40f0ff022606a6247e6f935c669c522102ada456"/>
 			</diskarea>
@@ -1501,7 +1501,7 @@ license:CC0
 		<publisher>Acid</publisher>
 		<info name="barcode" value="9 417810 100133" />
 		<info name="disc_matrix" value="CDD4971 ROADKILL ·   MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="roadkill (europe)" sha1="234bd47866333732f74a7563e149f0ab73529294"/>
 			</diskarea>
@@ -1514,7 +1514,7 @@ license:CC0
 		<year>1995</year>
 		<publisher>Acid</publisher>
 		<info name="disc_matrix" value="GH 32 23 AUG 95 MPO 01 @@@ 9 00" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="roadkill (europe) (alt)" sha1="030a9af9f5a4aa6d201447225e3256c98dd315a4"/>
 			</diskarea>
@@ -1530,7 +1530,7 @@ license:CC0
 		<info name="serial" value="/DP130006 [Box], /CS090017 [Disc]" />
 		<info name="barcode" value="5 018247 547450" />
 		<info name="disc_matrix" value="CDD3065 / CS090017 1:0 MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="seek and destroy (europe)" sha1="a2259e18e629c3d49b5c290a880d8b4451d2a77a"/>
 			</diskarea>
@@ -1544,7 +1544,7 @@ license:CC0
 		<publisher>Unique</publisher>
 		<info name="barcode" value="5 013248 004537 >" />
 		<info name="disc_matrix" value="PC WISE LTD 0685 350505 JAMBALA" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="seven gates of jambala, the (europe)" sha1="2536a8fea70e753c640dc9392f2331f6dd565dd1"/>
 			</diskarea>
@@ -1559,7 +1559,7 @@ license:CC0
 		<publisher>Gremlin</publisher>
 		<info name="barcode" value="5 013658 033639 >" />
 		<info name="disc_matrix" value="CDD5693 ·   MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="shadow fighter (europe)" sha1="ea78034b0c53fcbf9188cddc7f095bb5a1b47e25"/>
 			</diskarea>
@@ -1572,7 +1572,7 @@ license:CC0
 		<year>1994</year>
 		<publisher>Better Concepts</publisher>
 		<info name="disc_matrix" value="ZENEX: SHEERS DELIGHT Technidisc #1122-094-030F 09/30/94D" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sheer delight (europe)" sha1="507488ca70ece79e134abd1284cb467a8fa38d32"/>
 			</diskarea>
@@ -1586,7 +1586,7 @@ license:CC0
 		<publisher>Adventuresoft</publisher>
 		<info name="barcode" value="5 026924 000129 >" />
 		<info name="disc_matrix" value="CDD4166 SIMON CD32 :   MASTERED BY NIMBUS, CDD4166 SIMON CD32 NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="simon the sorcerer (europe)" sha1="31f19ec35b25a8292a9a0bd07c40e2f23a713be9"/>
 			</diskarea>
@@ -1601,7 +1601,7 @@ license:CC0
 		<publisher>Core</publisher>
 		<info name="barcode" value="5 020717 200437 >" />
 		<info name="disc_matrix" value="CDD5880 SKELETON 1:0 MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="skeleton krew (europe)" sha1="cd23102a322ff40fad7b2c50f43d7135ebeb16b4"/>
 			</diskarea>
@@ -1615,20 +1615,21 @@ license:CC0
 		<publisher>Team 17</publisher>
 		<info name="barcode" value="5 022358 170612" />
 		<info name="disc_matrix" value="CDR 01062   SPERIS LEGACY CD32   PC WISE" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="speris legacy, the (europe)" sha1="ec1383aa5cc6f743771ded75b51addf607cbc915"/>
 			</diskarea>
 		</part>
 	</software>
 
+	<!-- boot OK -->
 	<!-- http://redump.org/disc/3307/ -->
-	<software name="strippot" supported="no">
+	<software name="strippot" supported="yes">
 		<description>Strip Pot</description>
 		<year>1994</year>
 		<publisher>Guildhall Leisure</publisher>
 		<info name="disc_matrix" value="DAMONT   STRIP POTCD-32   CDM01" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="strip pot (europe)" sha1="f4fa71da618aaf532fb66d133383c6369e16366c"/>
 			</diskarea>
@@ -1641,21 +1642,22 @@ license:CC0
 		<year>1994</year>
 		<publisher>MicroProse</publisher>
 		<info name="disc_matrix" value="CDD5418 SUBWAR CD32 ·   MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="subwar 2050 (europe) (en,fr,de)" sha1="27f896040b4f86e29e1f70dcafed27a6638451b8"/>
 			</diskarea>
 		</part>
 	</software>
 
+	<!-- 2nd screen text has an overlayed glitchy black stripe in the swimming event -->
 	<!-- http://redump.org/disc/3230/ -->
-	<software name="solympix" supported="no">
+	<software name="solympix" supported="partial">
 		<description>Summer Olympix</description>
 		<year>1994</year>
 		<publisher>Flair</publisher>
 		<info name="barcode" value="5 021423 000885" />
 		<info name="disc_matrix" value="CDD3207 SO ·   MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="summer olympix (europe)" sha1="7f52aba39ce7d8dfb6f0cafca1909d0244db8bd4"/>
 			</diskarea>
@@ -1669,7 +1671,7 @@ license:CC0
 		<publisher>Apache</publisher>
 		<info name="barcode" value="5 027760 000021" />
 		<info name="disc_matrix" value="MANUFACTURED BY KAO IRELAND   BR002451-01" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="super methane bros. (europe)" sha1="6a37c24062494a512ac521fb51d46384875db2c4"/>
 			</diskarea>
@@ -1684,7 +1686,7 @@ license:CC0
 		<publisher>System 3</publisher>
 		<info name="barcode" value="5 020573 000240" />
 		<info name="disc_matrix" value="CDD3216 SUPER PUTTY ·   MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="super putty (europe)" sha1="d54277fda64459223792b49741f3a8450fb98567"/>
 			</diskarea>
@@ -1698,7 +1700,7 @@ license:CC0
 		<publisher>Guildhall Leisure</publisher>
 		<info name="barcode" value="9 417810 100089" />
 		<info name="disc_matrix" value="GH 1 21 APR 95   MPO   01 @@@ 1" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="super skidmarks (europe)" sha1="9c978f5412163ac0acd03c89758cbab86b1d9a5f"/>
 			</diskarea>
@@ -1714,7 +1716,7 @@ license:CC0
 		<publisher>Guildhall Leisure</publisher>
 		<info name="barcode" value="9 417810 100089" />
 		<info name="disc_matrix" value="GH 1 10 AUG 95   MPO   03 @@@ 1" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="super skidmarks (europe) (alt)" sha1="ff15f0c45b71c26df7da0d1dce1b16b64517a528"/>
 			</diskarea>
@@ -1729,7 +1731,7 @@ license:CC0
 		<publisher>Team 17</publisher>
 		<info name="barcode" value="5 022358 170445" />
 		<info name="disc_matrix" value="CDR00344 SUPER STARDUST CD32" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="super stardust (europe)" sha1="e875bf9ede995a2b2de78ae2d8c8b6962d6674fd"/>
 			</diskarea>
@@ -1743,7 +1745,7 @@ license:CC0
 		<publisher>Team 17</publisher>
 		<info name="barcode" value="5 022358 170384" />
 		<info name="disc_matrix" value="CDD4979 SUPER FROG ·   MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="superfrog (europe)" sha1="fe741cff2a47021cc4ee33f46369589ae12e5d0f"/>
 			</diskarea>
@@ -1758,7 +1760,7 @@ license:CC0
 		<publisher>Islona</publisher>
 		<info name="barcode" value="5 022358 170384" />
 		<info name="disc_matrix" value="FD7989 THAMESDOWN 01793 421300 ZFS1" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="superfrog (europe) (rev 1)" sha1="4295e7e97d90f3709cad9361841942a3f09866c8" status="baddump"/>
 			</diskarea>
@@ -1772,7 +1774,7 @@ license:CC0
 		<publisher>MicroValue</publisher>
 		<info name="barcode" value="5 021423 000892" />
 		<info name="disc_matrix" value="CDD3434 SURF NINJAS ·   -MASTERED BY NIMBUS-" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="surf ninjas (europe)" sha1="67fb1ac867011d903c3d421179e2c0b4e69266bf"/>
 			</diskarea>
@@ -1788,7 +1790,7 @@ license:CC0
 		<info name="serial" value="DP130055 [Box], CS090112 [Disc]"/>
 		<info name="barcode" value="5018247906455" />
 		<info name="disc_matrix" value="S CD 35 01   MINDSCAPE   DISCTRONICS, S CD 35 01   MINDSCAPE   DISCTRONICS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="syndicate (europe) (en,fr,it)" sha1="d887224380f180aa4e52a1ebc04f4121a1a598b7"/>
 			</diskarea>
@@ -1802,7 +1804,7 @@ license:CC0
 		<publisher>Mindscape</publisher>
 		<info name="serial" value="DP130042 [Box], CS090088 [Disc]"/>
 		<info name="disc_matrix" value="DADC AUSTRIA   CS090088   15" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="theme park (europe) (en,fr,de,it)" sha1="94458c802249df0d0b6b21414b2ea1f60f208ed2"/>
 			</diskarea>
@@ -1817,7 +1819,7 @@ license:CC0
 		<publisher>I.C.E.</publisher>
 		<info name="barcode" value="5 024598 012271" />
 		<info name="disc_matrix" value="CDD3489 TOTAL CARNAGE ·   MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="total carnage (europe)" sha1="0480df394dea8e8b892dc7d41c7c933e5dacb497"/>
 			</diskarea>
@@ -1832,7 +1834,7 @@ license:CC0
 		<info name="alt_title" value="Trivial Pursuit: The CD 32 Edition" /> <!-- Cover title -->
 		<info name="barcode" value="5 022231 036189" />
 		<info name="disc_matrix" value="CDD3224 :   MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="trivial pursuit - the cd32 edition (europe)" sha1="cf1ba7ca069b804eaa34881ec1cfb875a68d8daa"/>
 			</diskarea>
@@ -1846,7 +1848,7 @@ license:CC0
 		<publisher>Flair</publisher>
 		<info name="barcode" value="5 021423 000915" />
 		<info name="disc_matrix" value="CDD2771 TROLLS   MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="trolls (europe)" sha1="cf1f60ca86170c2fe396c3eb76e80a5572ec670d"/>
 			</diskarea>
@@ -1859,7 +1861,7 @@ license:CC0
 		<year>1994</year>
 		<publisher>MicroProse</publisher>
 		<info name="disc_matrix" value="MP 133177 DOIR CD 32 PC WISE CDR00278 UFO" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ufo - enemy unknown (europe) (en,fr,de)" sha1="c40c51d2435ed427992e163b4aea64586132ed55"/>
 			</diskarea>
@@ -1873,7 +1875,7 @@ license:CC0
 		<publisher>Team 17</publisher>
 		<info name="barcode" value="5 022358 170261" />
 		<info name="disc_matrix" value="CDD3321 UBB ::   ·MASTERED BY NIMBUS·" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ultimate body blows (europe)" sha1="737f46a3d4ed22f8d69ebff24e66e6bdc170ad81"/>
 			</diskarea>
@@ -1886,7 +1888,7 @@ license:CC0
 		<year>1994</year>
 		<publisher>Core</publisher>
 		<info name="disc_matrix" value="CDD4533 UNIVERSE :   MASTERED BY NIMBUS"/>
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="universe (1994)(core)" sha1="bf6dbeab33ea5bb977649a4ce0a9bf3718ca4417"/>
 			</diskarea>
@@ -1900,7 +1902,7 @@ license:CC0
 		<year>1994</year>
 		<publisher>Millennium</publisher>
 		<info name="disc_matrix" value="VITAL LIGHT 10328981 01 &amp;   MADE IN U.K. BY PDO" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="vital light (europe)" sha1="552ad81da4c89b08dca3c5fef5f8d64b08bf23e4"/>
 			</diskarea>
@@ -1915,7 +1917,7 @@ license:CC0
 		<publisher>Paragon Publishing</publisher>
 		<info name="release" value="199508xx" />
 		<info name="disc_matrix" value="VITA LIFE MADE IN THE U.K. BY CD-SYSTEMS 01429" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="vital light (europe) (alt)" sha1="0696ea358fc0f503d56a3327253501926cacbe52"/>
 			</diskarea>
@@ -1929,7 +1931,7 @@ license:CC0
 		<publisher>Audiogenic</publisher>
 		<info name="barcode" value="9 781851 108466" />
 		<info name="disc_matrix" value="WEMBLEY 1 10292711 02 &amp;   MADE IN U.K. BY PDO" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="wembley international soccer (europe)" sha1="2bbaf85b56d35c34599a2a975da0806b6b1324ef"/>
 			</diskarea>
@@ -1942,7 +1944,7 @@ license:CC0
 		<year>1993</year>
 		<publisher>Flair</publisher>
 		<info name="disc_matrix" value="CDD2736 ENGLISH ·   MASTERED BY NIMBUS" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="whale's voyage (europe)" sha1="c44d30e4466aa65faa28a4c47e6ab56b41703464"/>
 			</diskarea>
@@ -1955,7 +1957,7 @@ license:CC0
 		<year>1994</year>
 		<publisher>Millennium</publisher>
 		<info name="disc_matrix" value="WILD CUP SOCCER 10312431 01 &amp;   MADE IN U.K. BY PDO" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="wild cup soccer (europe)" sha1="e5c2b907f62d133ee8187c3b680130f9ef65582d"/>
 			</diskarea>
@@ -1970,7 +1972,7 @@ license:CC0
 		<publisher>Team 17</publisher>
 		<info name="barcode" value="5 022358 170643" />
 		<info name="disc_matrix" value="CDR00865   WORMS CD32   PC WISE" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="worms (europe) (en,fr,de)" sha1="daf98201fb405a934424e70a0287a412d3df2c62"/>
 			</diskarea>
@@ -1984,7 +1986,7 @@ license:CC0
 		<publisher>Gremlin</publisher>
 		<info name="barcode" value="5013658033332" />
 		<info name="disc_matrix" value="ROM DISCTRONICS ROM S ZOOL 1 02" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="zool - ninja of the nth dimension (europe)" sha1="87128d563ccfa8c98d55712f1bf8ae28f21537b8"/>
 			</diskarea>
@@ -1998,7 +2000,7 @@ license:CC0
 		<publisher>Gremlin</publisher>
 		<info name="barcode" value="5 013658 033523" />
 		<info name="disc_matrix" value="CDD4242 ZOOL 2 CD32 PAL ·   -MASTERED BY NIMBUS-" />
-		<part name="cdrom" interface="cd32_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="zool 2 (europe)" sha1="d8389e41dd4c73a32ed71dd6070433815b80da71"/>
 			</diskarea>

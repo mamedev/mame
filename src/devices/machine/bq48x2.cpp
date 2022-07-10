@@ -507,13 +507,13 @@ int bq48x2_device::get_delay()
 
 void bq48x2_device::device_start()
 {
-	m_clock_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bq48x2_device::rtc_clock_cb), this));
+	m_clock_timer = timer_alloc(FUNC(bq48x2_device::rtc_clock_cb), this);
 
 	// Periodic timer
-	m_periodic_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bq48x2_device::rtc_periodic_cb), this));
+	m_periodic_timer = timer_alloc(FUNC(bq48x2_device::rtc_periodic_cb), this);
 
 	// Watchdog timer
-	m_watchdog_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bq48x2_device::rtc_watchdog_cb), this));
+	m_watchdog_timer = timer_alloc(FUNC(bq48x2_device::rtc_watchdog_cb), this);
 
 	// Interrupt line
 	m_interrupt_cb.resolve_safe();
@@ -541,18 +541,24 @@ void bq48x2_device::nvram_default()
 	std::fill_n(m_sram.get(), m_memsize, 0);
 }
 
-void bq48x2_device::nvram_read(emu_file &file)
+bool bq48x2_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_sram.get(), m_memsize);
+	size_t actual;
+	if (file.read(m_sram.get(), m_memsize, actual) || actual != m_memsize)
+		return false;
 
 	transfer_to_access();  // Transfer the system time into the readable registers
 
 	// Clear the saved flags
 	set_register(reg_flags, 0xf8, true);
+
+	return true;
 }
 
-void bq48x2_device::nvram_write(emu_file &file)
+bool bq48x2_device::nvram_write(util::write_stream &file)
 {
 	transfer_to_access();
-	file.write(m_sram.get(), m_memsize);
+
+	size_t actual;
+	return !file.write(m_sram.get(), m_memsize, actual) && actual == m_memsize;
 }

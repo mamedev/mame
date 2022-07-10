@@ -13,6 +13,7 @@
 #include "rendlay.h"
 #include "rendutil.h"
 #include "emuopts.h"
+#include "fileio.h"
 #include "aviio.h"
 #include "png.h"
 #include "screen.h"
@@ -504,7 +505,7 @@ bool shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *r
 	snap_width = winoptions.d3d_snap_width();
 	snap_height = winoptions.d3d_snap_height();
 
-	this->options = make_unique_clear<hlsl_options>().release();
+	this->options = new hlsl_options;
 	this->options->params_init = false;
 
 	// copy last options if initialized
@@ -2318,7 +2319,7 @@ void shaders::init_slider_list()
 	}
 	internal_sliders.clear();
 
-	const screen_device *first_screen = screen_device_enumerator(machine->root_device()).first();;
+	const screen_device *first_screen = screen_device_enumerator(machine->root_device()).first();
 	if (first_screen == nullptr)
 	{
 		return;

@@ -36,30 +36,23 @@ DEFINE_DEVICE_TYPE(NES_CONY1K, nes_cony1k_device, "nes_cony1k", "NES Cart Cony 1
 DEFINE_DEVICE_TYPE(NES_YOKO,   nes_yoko_device,   "nes_yoko",   "NES Cart Yoko PCB")
 
 
-nes_cony_device::nes_cony_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: nes_nrom_device(mconfig, type, tag, owner, clock)
-	, m_irq_count(0)
-	, m_irq_enable(0)
-	, irq_timer(nullptr)
-	, m_extra_addr(type == NES_YOKO ? 0x1400 : 0x1100)
-	, m_mask(type == NES_YOKO ? 0x0f : 0x1f)
-	, m_mode_reg(0)
-	, m_outer_reg(0)
+nes_cony_device::nes_cony_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 extra_addr, u8 mask)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr), m_extra_addr(extra_addr), m_mask(mask), m_mode_reg(0), m_outer_reg(0)
 {
 }
 
 nes_cony_device::nes_cony_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_cony_device(mconfig, NES_CONY, tag, owner, clock)
+	: nes_cony_device(mconfig, NES_CONY, tag, owner, clock, 0x1100, 0x1f)
 {
 }
 
 nes_cony1k_device::nes_cony1k_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_cony_device(mconfig, NES_CONY1K, tag, owner, clock)
+	: nes_cony_device(mconfig, NES_CONY1K, tag, owner, clock, 0x1100, 0x1f)
 {
 }
 
 nes_yoko_device::nes_yoko_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_cony_device(mconfig, NES_YOKO, tag, owner, clock)
+	: nes_cony_device(mconfig, NES_YOKO, tag, owner, clock, 0x1400, 0x0f)
 {
 }
 
@@ -69,7 +62,7 @@ nes_yoko_device::nes_yoko_device(const machine_config &mconfig, const char *tag,
 void nes_cony_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_cony_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -119,18 +112,15 @@ void nes_cony_device::pcb_reset()
 
  -------------------------------------------------*/
 
-void nes_cony_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_cony_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
+	if (m_irq_enable)
 	{
-		if (m_irq_enable)
+		m_irq_count += BIT(m_mode_reg, 6) ? -1 : 1;
+		if (!m_irq_count)
 		{
-			m_irq_count += BIT(m_mode_reg, 6) ? -1 : 1;
-			if (!m_irq_count)
-			{
-				set_irq_line(ASSERT_LINE);
-				m_irq_enable = 0;
-			}
+			set_irq_line(ASSERT_LINE);
+			m_irq_enable = 0;
 		}
 	}
 }

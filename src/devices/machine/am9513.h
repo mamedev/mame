@@ -93,11 +93,11 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_clock_changed() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	// internal helpers
 	TIMER_CALLBACK_MEMBER(clear_outputs);
+	TIMER_CALLBACK_MEMBER(timer_tick);
 	void master_reset();
 	void init_freq_timer(int f);
 	void select_freq_timer(int f, int c, bool selected, bool cycle);
@@ -161,14 +161,6 @@ private:
 
 	// frequency timer
 	u8 m_f;
-	enum
-	{
-		TIMER_F1,
-		TIMER_F2,
-		TIMER_F3,
-		TIMER_F4,
-		TIMER_F5
-	};
 	emu_timer *m_freq_timer[5];
 	u8 m_freq_timer_selected[5];
 	u8 m_freq_timer_cycle[5];

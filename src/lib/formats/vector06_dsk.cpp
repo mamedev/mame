@@ -45,4 +45,4 @@ const vector06_format::format vector06_format::formats[] =
 	{}
 };
 
-const floppy_format_type FLOPPY_VECTOR06_FORMAT = &floppy_image_format_creator<vector06_format>;
+const vector06_format FLOPPY_VECTOR06_FORMAT;

@@ -467,16 +467,16 @@ uint32_t sh_disassembler::op1000(std::ostream &stream, uint32_t pc, uint16_t opc
 		break;
 	case  9:
 		util::stream_format(stream, "BT      $%08X", pc + SIGNX8(opcode & 0xff) * 2 + 2);
-		break;
+		return STEP_COND;
 	case 11:
 		util::stream_format(stream, "BF      $%08X", pc + SIGNX8(opcode & 0xff) * 2 + 2);
-		break;
+		return STEP_COND;
 	case 13:
 		util::stream_format(stream, "BTS     $%08X", pc + SIGNX8(opcode & 0xff) * 2 + 2);
-		break;
+		return STEP_COND | step_over_extra(1);
 	case 15:
 		util::stream_format(stream, "BFS     $%08X", pc + SIGNX8(opcode & 0xff) * 2 + 2);
-		break;
+		return STEP_COND | step_over_extra(1);
 	default :
 		util::stream_format(stream, "invalid $%04X", opcode);
 	}

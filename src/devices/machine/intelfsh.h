@@ -66,16 +66,17 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
-	virtual void nvram_read(emu_file &file) override;
-	virtual void nvram_write(emu_file &file) override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
 
 	// derived helpers
 	uint32_t read_full(uint32_t offset);
 	void write_full(uint32_t offset, uint32_t data);
+
+	TIMER_CALLBACK_MEMBER(delay_tick);
 
 	optional_memory_region   m_region;
 

@@ -20,7 +20,8 @@
 DEFINE_DEVICE_TYPE(SWIM2, swim2_device, "swim2", "Apple SWIM2 (Sander/Wozniak Integrated Machine) version 2 floppy controller")
 
 swim2_device::swim2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	applefdintf_device(mconfig, SWIM2, tag, owner, clock)
+	applefdintf_device(mconfig, SWIM2, tag, owner, clock),
+	m_floppy(nullptr)
 {
 }
 
@@ -76,10 +77,6 @@ void swim2_device::device_reset()
 	std::fill(m_flux_write.begin(), m_flux_write.end(), 0);
 
 	m_last_sync = machine().time().as_ticks(clock());
-}
-
-void swim2_device::device_timer(emu_timer &, device_timer_id, int)
-{
 }
 
 void swim2_device::set_floppy(floppy_image_device *floppy)

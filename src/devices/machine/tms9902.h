@@ -73,10 +73,13 @@ public:
 	void cruwrite(offs_t offset, uint8_t data);
 
 protected:
-	virtual void    device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void    device_start() override;
 	virtual void    device_reset() override;
 	virtual void    device_stop() override;
+
+	TIMER_CALLBACK_MEMBER(decrementer_expired);
+	TIMER_CALLBACK_MEMBER(recv_tick);
+	TIMER_CALLBACK_MEMBER(send_tick);
 
 private:
 	void    field_interrupts();

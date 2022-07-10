@@ -13,10 +13,12 @@
 #include "palloc.h"
 #include "parray.h"
 #include "pconfig.h"
-#include "pmath.h"
+#include "pexception.h"
+#include "pfmtlog.h"
 #include "pmatrix2d.h"
 #include "pomp.h"
 #include "ptypes.h"
+#include "putil.h"              // <- container::contains
 
 #include <algorithm>
 #include <array>
@@ -26,7 +28,7 @@
 namespace plib
 {
 
-	template<typename T, int N, typename C = uint16_t>
+	template<typename ARENA, typename T, int N, typename C = uint16_t>
 	struct pmatrix_cr
 	{
 		using index_type = C;
@@ -38,7 +40,7 @@ namespace plib
 		pmatrix_cr(const pmatrix_cr &) = default;
 		pmatrix_cr &operator=(const pmatrix_cr &) = default;
 		pmatrix_cr(pmatrix_cr &&) noexcept(std::is_nothrow_move_constructible<parray<value_type, NSQ>>::value) = default;
-		pmatrix_cr &operator=(pmatrix_cr &&) noexcept(std::is_nothrow_move_assignable<parray<value_type, NSQ>>::value && std::is_nothrow_move_assignable<pmatrix2d_vrl<index_type>>::value) = default;
+		pmatrix_cr &operator=(pmatrix_cr &&) noexcept(std::is_nothrow_move_assignable<parray<value_type, NSQ>>::value && std::is_nothrow_move_assignable<pmatrix2d_vrl<ARENA, index_type>>::value) = default;
 
 		enum constants_e
 		{
@@ -47,7 +49,7 @@ namespace plib
 
 		// FIXME: these should be private
 		// NOLINTNEXTLINE
-		parray<index_type, N> diag;      // diagonal index pointer n
+		parray<index_type, N> diagonal;      // diagonal index pointer n
 		// NOLINTNEXTLINE
 		parray<index_type, Np1> row_idx;      // row index pointer n + 1
 		// NOLINTNEXTLINE
@@ -57,14 +59,14 @@ namespace plib
 		// NOLINTNEXTLINE
 		std::size_t nz_num;
 
-		explicit pmatrix_cr(std::size_t n)
-		: diag(n)
+		explicit pmatrix_cr(ARENA &arena, std::size_t n)
+		: diagonal(n)
 		, row_idx(n+1)
 		, col_idx(n*n)
 		, A(n*n)
 		, nz_num(0)
 		//, nzbd(n * (n+1) / 2)
-		, m_nzbd(n, n)
+		, m_nzbd(arena, n, n)
 		, m_size(n)
 		{
 			for (std::size_t i=0; i<n+1; i++)
@@ -77,27 +79,27 @@ namespace plib
 
 		constexpr std::size_t size() const noexcept { return (N>0) ? narrow_cast<std::size_t>(N) : m_size; }
 
-		void clear() noexcept
+		constexpr void clear() noexcept
 		{
 			nz_num = 0;
 			for (std::size_t i=0; i < size() + 1; i++)
 				row_idx[i] = 0;
 		}
 
-		void set_scalar(T scalar) noexcept
+		constexpr void set_scalar(T scalar) noexcept
 		{
 			for (std::size_t i=0, e=nz_num; i<e; i++)
 				A[i] = scalar;
 		}
 
-		void set_row_scalar(C r, T val) noexcept
+		constexpr void set_row_scalar(C r, T val) noexcept
 		{
 			C ri = row_idx[r];
 			while (ri < row_idx[r+1])
 				A[ri++] = val;
 		}
 
-		void set(C r, C c, T val) noexcept
+		constexpr void set(C r, C c, T val) noexcept
 		{
 			C ri = row_idx[r];
 			while (ri < row_idx[r+1] && col_idx[ri] < c)
@@ -118,7 +120,7 @@ namespace plib
 					row_idx[i]++;
 				nz_num++;
 				if (c==r)
-					diag[r] = ri;
+					diagonal[r] = ri;
 			}
 		}
 
@@ -138,7 +140,7 @@ namespace plib
 					{
 						col_idx[nz] = narrow_cast<C>(j);
 						if (j == k)
-							diag[k] = nz;
+							diagonal[k] = nz;
 						nz++;
 					}
 			}
@@ -152,8 +154,8 @@ namespace plib
 			{
 				for (std::size_t j=k + 1; j < size(); j++)
 					if (f[j][k] < FILL_INFINITY)
-						m_nzbd.set(k, m_nzbd.colcount(k), narrow_cast<C>(j));
-				m_nzbd.set(k, m_nzbd.colcount(k), 0); // end of sequence
+						m_nzbd.set(k, m_nzbd.col_count(k), narrow_cast<C>(j));
+				m_nzbd.set(k, m_nzbd.col_count(k), 0); // end of sequence
 			}
 
 		}
@@ -231,13 +233,13 @@ namespace plib
 				A[k] = src.A[k];
 		}
 
-		index_type * nzbd(std::size_t row) { return m_nzbd[row]; }
-		std::size_t nzbd_count(std::size_t row) { return m_nzbd.colcount(row) - 1; }
+		constexpr index_type * nzbd(std::size_t row) noexcept { return m_nzbd[row]; }
+		constexpr std::size_t nzbd_count(std::size_t row) noexcept { return m_nzbd.col_count(row) - 1; }
 	protected:
 		// FIXME: this should be private
 		// NOLINTNEXTLINE
 		//parray<std::vector<index_type>, N > m_nzbd;    // Support for gaussian elimination
-		pmatrix2d_vrl<index_type> m_nzbd;    // Support for gaussian elimination
+		pmatrix2d_vrl<ARENA, index_type> m_nzbd;    // Support for gaussian elimination
 	private:
 		//parray<C, N < 0 ? -N * (N-1) / 2 : N * (N+1) / 2 > nzbd;    // Support for gaussian elimination
 		std::size_t m_size;
@@ -254,15 +256,16 @@ namespace plib
 		pGEmatrix_cr(pGEmatrix_cr &&) noexcept(std::is_nothrow_move_constructible<base_type>::value) = default;
 		pGEmatrix_cr &operator=(pGEmatrix_cr &&) noexcept(std::is_nothrow_move_assignable<base_type>::value) = default;
 
-		explicit pGEmatrix_cr(std::size_t n)
-		: B(n)
+		template<typename ARENA>
+		explicit pGEmatrix_cr(ARENA &arena, std::size_t n)
+		: B(arena, n)
 		{
 		}
 
 		~pGEmatrix_cr() = default;
 
 		template <typename M>
-		std::pair<std::size_t, std::size_t> gaussian_extend_fill_mat(M &fill)
+		std::pair<std::size_t, std::size_t> gaussian_extend_fill_mat(M &fill) noexcept
 		{
 			std::size_t ops = 0;
 			std::size_t fill_max = 0;
@@ -295,14 +298,14 @@ namespace plib
 		}
 
 		template <typename V>
-		void gaussian_elimination(V & RHS)
+		void gaussian_elimination(V & RHS) noexcept
 		{
 			const std::size_t iN = base_type::size();
 
 			for (std::size_t i = 0; i < iN - 1; i++)
 			{
 				std::size_t nzbdp = 0;
-				std::size_t pi = base_type::diag[i];
+				std::size_t pi = base_type::diagonal[i];
 				auto f = reciprocal(base_type::A[pi++]);
 				const std::size_t piie = base_type::row_idx[i+1];
 
@@ -335,7 +338,7 @@ namespace plib
 			}
 		}
 
-		int get_parallel_level(std::size_t k) const
+		int get_parallel_level(std::size_t k) const noexcept
 		{
 			for (std::size_t i = 0; i <  m_ge_par.size(); i++)
 				if (plib::container::contains( m_ge_par[i], k))
@@ -344,7 +347,7 @@ namespace plib
 		}
 
 		template <typename V>
-		void gaussian_elimination_parallel(V & RHS)
+		void gaussian_elimination_parallel(V & RHS) noexcept
 		{
 			//printf("omp: %ld %d %d\n", m_ge_par.size(), nz_num, (int)m_ge_par[m_ge_par.size()-2].size());
 			for (auto l = 0UL; l < m_ge_par.size(); l++)
@@ -353,7 +356,7 @@ namespace plib
 					auto &i = m_ge_par[l][ll];
 					{
 						std::size_t nzbdp = 0;
-						std::size_t pi = base_type::diag[i];
+						std::size_t pi = base_type::diagonal[i];
 						const auto f = reciprocal(base_type::A[pi++]);
 						const std::size_t piie = base_type::row_idx[i+1];
 						const auto &nz = base_type::nzbd[i];
@@ -385,44 +388,44 @@ namespace plib
 		}
 
 		template <typename V1, typename V2>
-		void gaussian_back_substitution(V1 &V, const V2 &RHS)
+		void gaussian_back_substitution(V1 &V, const V2 &RHS) noexcept
 		{
 			const std::size_t iN = base_type::size();
 			// row n-1
-			V[iN - 1] = RHS[iN - 1] / base_type::A[base_type::diag[iN - 1]];
+			V[iN - 1] = RHS[iN - 1] / base_type::A[base_type::diagonal[iN - 1]];
 
 			for (std::size_t j = iN - 1; j-- > 0;)
 			{
 				typename base_type::value_type tmp = 0;
-				const auto jdiag = base_type::diag[j];
+				const auto diagonal_j = base_type::diagonal[j];
 				const std::size_t e = base_type::row_idx[j+1];
-				for (std::size_t pk = jdiag + 1; pk < e; pk++)
+				for (std::size_t pk = diagonal_j + 1; pk < e; pk++)
 					tmp += base_type::A[pk] * V[base_type::col_idx[pk]];
-				V[j] = (RHS[j] - tmp) / base_type::A[jdiag];
+				V[j] = (RHS[j] - tmp) / base_type::A[diagonal_j];
 			}
 		}
 
 		template <typename V1>
-		void gaussian_back_substitution(V1 &V)
+		void gaussian_back_substitution(V1 &V) noexcept
 		{
 			const std::size_t iN = base_type::size();
 			// row n-1
-			V[iN - 1] = V[iN - 1] / base_type::A[base_type::diag[iN - 1]];
+			V[iN - 1] = V[iN - 1] / base_type::A[base_type::diagonal[iN - 1]];
 
 			for (std::size_t j = iN - 1; j-- > 0;)
 			{
 				typename base_type::value_type tmp = 0;
-				const auto jdiag = base_type::diag[j];
+				const auto diagonal_j = base_type::diagonal[j];
 				const std::size_t e = base_type::row_idx[j+1];
-				for (std::size_t pk = jdiag + 1; pk < e; pk++)
+				for (std::size_t pk = diagonal_j + 1; pk < e; pk++)
 					tmp += base_type::A[pk] * V[base_type::col_idx[pk]];
-				V[j] = (V[j] - tmp) / base_type::A[jdiag];
+				V[j] = (V[j] - tmp) / base_type::A[diagonal_j];
 			}
 		}
 
 	private:
 		template <typename M>
-		void build_parallel_gaussian_execution_scheme(const M &fill)
+		void build_parallel_gaussian_execution_scheme(const M &fill) noexcept
 		{
 			// calculate parallel scheme for gaussian elimination
 			std::vector<std::vector<std::size_t>> rt(base_type::size());
@@ -491,8 +494,9 @@ namespace plib
 		pLUmatrix_cr(pLUmatrix_cr &&) noexcept(std::is_nothrow_move_constructible<base_type>::value) = default;
 		pLUmatrix_cr &operator=(pLUmatrix_cr &&) noexcept(std::is_nothrow_move_assignable<base_type>::value) = default;
 
-		explicit pLUmatrix_cr(std::size_t n)
-		: B(n)
+		template<typename ARENA>
+		explicit pLUmatrix_cr(ARENA &arena, std::size_t n)
+		: B(arena, n)
 		, ilu_rows(n+1)
 		, m_ILUp(0)
 		{
@@ -501,7 +505,7 @@ namespace plib
 		~pLUmatrix_cr() = default;
 
 		template <typename M>
-		void build(M &fill, std::size_t ilup)
+		void build(M &fill, std::size_t ilup) noexcept(false)
 		{
 			std::size_t p(0);
 			// build ilu_rows
@@ -548,7 +552,7 @@ namespace plib
 		///      k=k+1
 		///    i=i+1
 		///
-		void incomplete_LU_factorization(const base_type &mat)
+		void incomplete_LU_factorization(const base_type &mat) noexcept
 		{
 			if (m_ILUp < 1)
 				this->raw_copy_from(mat);
@@ -559,23 +563,23 @@ namespace plib
 			while (auto i = ilu_rows[p++]) // NOLINT(bugprone-infinite-loop)
 			{
 				const auto p_i_end = base_type::row_idx[i + 1];
-				// loop over all columns k left of diag in row i
-				//if (row_idx[i] < diag[i])
+				// loop over all columns k left of diagonal in row i
+				//if (row_idx[i] < diagonal[i])
 				//  printf("occ %d\n", (int)i);
-				for (auto i_k = base_type::row_idx[i]; i_k < base_type::diag[i]; i_k++)
+				for (auto i_k = base_type::row_idx[i]; i_k < base_type::diagonal[i]; i_k++)
 				{
-					const auto k(base_type::col_idx[i_k]);
-					const auto p_k_end(base_type::row_idx[k + 1]);
-					const typename base_type::value_type LUp_i_k = base_type::A[i_k] = base_type::A[i_k] / base_type::A[base_type::diag[k]];
+					const index_type k(base_type::col_idx[i_k]);
+					const index_type p_k_end(base_type::row_idx[k + 1]);
+					const typename base_type::value_type LUp_i_k = base_type::A[i_k] = base_type::A[i_k] / base_type::A[base_type::diagonal[k]];
 
-					std::size_t k_j(base_type::diag[k] + 1);
+					std::size_t k_j(base_type::diagonal[k] + 1);
 					std::size_t i_j(i_k + 1);
 
 					while (i_j < p_i_end && k_j < p_k_end )  // pj = (i, j)
 					{
 						// we can assume that within a row ja increases continuously
-						const std::size_t c_i_j(base_type::col_idx[i_j]); // row i, column j
-						const auto c_k_j(base_type::col_idx[k_j]); // row k, column j
+						const index_type c_i_j(base_type::col_idx[i_j]); // row i, column j
+						const index_type c_k_j(base_type::col_idx[k_j]); // row k, column j
 
 						if (c_k_j == c_i_j)
 							base_type::A[i_j] -= LUp_i_k * base_type::A[k_j];
@@ -611,13 +615,13 @@ namespace plib
 		/// This can be solved for x using backwards elimination in U.
 		///
 		template <typename R>
-		void solveLU (R &r)
+		void solveLU (R &r) noexcept
 		{
 			for (std::size_t i = 1; i < base_type::size(); ++i )
 			{
 				typename base_type::value_type tmp(0);
-				const auto j1(base_type::row_idx[i]);
-				const auto j2(base_type::diag[i]);
+				const index_type j1(base_type::row_idx[i]);
+				const index_type j2(base_type::diagonal[i]);
 
 				for (auto j = j1; j < j2; ++j )
 					tmp +=  base_type::A[j] * r[base_type::col_idx[j]];
@@ -627,8 +631,8 @@ namespace plib
 			for (std::size_t i = base_type::size(); i-- > 0; )
 			{
 				typename base_type::value_type tmp(0);
-				const auto di(base_type::diag[i]);
-				const auto j2(base_type::row_idx[i+1]);
+				const index_type di(base_type::diagonal[i]);
+				const index_type j2(base_type::row_idx[i+1]);
 				for (std::size_t j = di + 1; j < j2; j++ )
 					tmp += base_type::A[j] * r[base_type::col_idx[j]];
 				r[i] = (r[i] - tmp) / base_type::A[di];

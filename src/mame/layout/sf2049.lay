@@ -3,6 +3,12 @@
 license:CC0
 -->
 <mamelayout version="2">
+	<element name="sysled" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+
 	<element name="abort" defstate="0">
 		<disk state="0">
 			<bounds x="0.0" y="0.0" width="2.444444444" height="1.0" />
@@ -135,5 +141,12 @@ license:CC0
 		<element name="lamp8" ref="leader">
 			<bounds x="1.75" y="3.1" width="0.5" height="0.23" />
 		</element>
+
+		<collection name="System LED" visible="no">
+			<element name="system_led" ref="sysled">
+				<bounds x="1.3" y="3.1" width="0.2" height="0.3" />
+			</element>
+		</collection>
 	</view>
+
 </mamelayout>

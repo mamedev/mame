@@ -13,7 +13,6 @@
 
 #include "emu.h"
 #include "i86.h"
-#include "debugger.h"
 #include "i86inline.h"
 #include "cpu/i386/i386dasm.h"
 

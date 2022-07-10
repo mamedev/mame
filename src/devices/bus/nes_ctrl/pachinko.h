@@ -26,15 +26,13 @@ public:
 	// construction/destruction
 	nes_pachinko_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+protected:
+	// device-level overrides
 	virtual ioport_constructor device_input_ports() const override;
 
-protected:
-	virtual u8 read_exp(offs_t offset) override;
-	virtual void write(u8 data) override;
+	virtual void set_latch() override;
 
 private:
-	void set_latch();
-
 	required_ioport m_trigger;
 };
 

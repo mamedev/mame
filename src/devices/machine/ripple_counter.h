@@ -43,11 +43,12 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_clock_changed() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_rom_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 	virtual void rom_bank_updated() override;
+
+	TIMER_CALLBACK_MEMBER(advance_counter);
 
 private:
 	// internal helpers
@@ -58,10 +59,6 @@ private:
 	devcb_write8 m_rom_out_cb;
 
 	// device timers
-	enum
-	{
-		TIMER_COUNT
-	};
 	emu_timer *m_count_timer;
 
 	// configuration parameters

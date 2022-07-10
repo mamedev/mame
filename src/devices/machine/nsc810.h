@@ -38,12 +38,12 @@ public:
 	auto portA_write_callback() { return m_portA_w.bind(); }
 	auto portB_write_callback() { return m_portB_w.bind(); }
 	auto portC_write_callback() { return m_portC_w.bind(); }
-	auto timer0_callback() { return m_timer0_out.bind(); }
-	auto timer1_callback() { return m_timer1_out.bind(); }
+	auto timer0_callback() { return m_timer_out[0].bind(); }
+	auto timer1_callback() { return m_timer_out[1].bind(); }
 
-	void set_timer0_clock(uint32_t clk) { m_timer0_clock = clk; }
+	void set_timer0_clock(uint32_t clk) { m_timer_clock[0] = clk; }
 	void set_timer0_clock(const XTAL &clk) { set_timer0_clock(clk.value()); }
-	void set_timer1_clock(uint32_t clk) { m_timer1_clock = clk; }
+	void set_timer1_clock(uint32_t clk) { m_timer_clock[1] = clk; }
 	void set_timer1_clock(const XTAL &clk) { set_timer1_clock(clk.value()); }
 
 	uint8_t read(offs_t offset);
@@ -52,7 +52,8 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	template <int Timer> TIMER_CALLBACK_MEMBER(timer_tick);
 
 private:
 	uint8_t m_portA_latch;
@@ -62,18 +63,12 @@ private:
 	uint8_t m_ddrB;
 	uint8_t m_ddrC;
 	uint8_t m_mode;
-	emu_timer* m_timer0;
-	emu_timer* m_timer1;
-	uint8_t m_timer0_mode;
-	uint8_t m_timer1_mode;
-	uint16_t m_timer0_counter;
-	uint16_t m_timer1_counter;
-	uint16_t m_timer0_base;
-	uint16_t m_timer1_base;
-	bool m_timer0_running;
-	bool m_timer1_running;
-	uint32_t m_timer0_clock;
-	uint32_t m_timer1_clock;
+	emu_timer* m_timer[2];
+	uint8_t m_timer_mode[2];
+	uint16_t m_timer_counter[2];
+	uint16_t m_timer_base[2];
+	bool m_timer_running[2];
+	uint32_t m_timer_clock[2];
 	bool m_ramselect;
 
 	devcb_read8 m_portA_r;
@@ -82,11 +77,7 @@ private:
 	devcb_write8 m_portA_w;
 	devcb_write8 m_portB_w;
 	devcb_write8 m_portC_w;
-	devcb_write_line m_timer0_out;
-	devcb_write_line m_timer1_out;
-
-	static constexpr device_timer_id TIMER0_CLOCK = 0;
-	static constexpr device_timer_id TIMER1_CLOCK = 1;
+	devcb_write_line::array<2> m_timer_out;
 
 	enum
 	{

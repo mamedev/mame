@@ -8,40 +8,23 @@
 //
 //============================================================
 
-#ifndef INPUT_SDLCOMMON_H_
-#define INPUT_SDLCOMMON_H_
+#ifndef MAME_OSD_INPUT_INPUT_SDLCOMMON_H
+#define MAME_OSD_INPUT_INPUT_SDLCOMMON_H
 
-#include <unordered_map>
+#pragma once
+
+// standard sdl header
+#include <SDL2/SDL.h>
+
 #include <algorithm>
+#include <memory>
+#include <mutex>
+#include <string>
+#include <unordered_map>
 
 #define MAX_DEVMAP_ENTRIES  16
 #define SDL_MODULE_EVENT_BUFFER_SIZE 5
 
-// state information for a keyboard
-struct keyboard_state
-{
-	int32_t   state[0x3ff];                                   // must be int32_t!
-	int8_t    oldkey[MAX_KEYS];
-	int8_t    currkey[MAX_KEYS];
-};
-
-// state information for a mouse
-struct mouse_state
-{
-	int32_t lX, lY;
-	int32_t buttons[MAX_BUTTONS];
-};
-
-
-// state information for a joystick; DirectInput state must be first element
-struct joystick_state
-{
-	SDL_Joystick *device;
-	int32_t axes[MAX_AXES];
-	int32_t buttons[MAX_BUTTONS];
-	int32_t hatsU[MAX_HATS], hatsD[MAX_HATS], hatsL[MAX_HATS], hatsR[MAX_HATS];
-	int32_t balls[MAX_AXES];
-};
 
 struct device_map_t
 {
@@ -51,6 +34,8 @@ struct device_map_t
 	} map[MAX_DEVMAP_ENTRIES];
 	int     logical[MAX_DEVMAP_ENTRIES];
 	int     initialized;
+
+	void init(running_machine &machine, const char *opt, int max_devices, const char *label);
 };
 
 //============================================================
@@ -79,15 +64,14 @@ public:
 	{
 	}
 
-	void subscribe(int* event_types, int num_event_types, TSubscriber *subscriber)
+	template <size_t N>
+	void subscribe(int const (&event_types)[N], TSubscriber *subscriber)
 	{
 		std::lock_guard<std::mutex> scope_lock(m_lock);
 
 		// Add the subscription
-		for (int i = 0; i < num_event_types; i++)
-		{
-			m_subscription_index.emplace(event_types[i], subscriber);
-		}
+		for (int i : event_types)
+			m_subscription_index.emplace(i, subscriber);
 	}
 
 	void unsubscribe(TSubscriber *subscriber)
@@ -155,48 +139,4 @@ static inline std::string remove_spaces(const char *s)
 	return output;
 }
 
-//============================================================
-//  devmap_init - initializes a device_map based on
-//   an input option prefix and max number of devices
-//============================================================
-
-static inline void devmap_init(running_machine &machine, device_map_t *devmap, const char *opt, int max_devices, const char *label)
-{
-	int dev;
-	char defname[20];
-
-	// The max devices the user specified, better not be bigger than the max the arrays can old
-	assert(max_devices <= MAX_DEVMAP_ENTRIES);
-
-	// Initialize the map to default uninitialized values
-	for (dev = 0; dev < MAX_DEVMAP_ENTRIES; dev++)
-	{
-		devmap->map[dev].name.clear();
-		devmap->map[dev].physical = -1;
-		devmap->logical[dev] = -1;
-	}
-	devmap->initialized = 0;
-
-	// populate the device map up to the max number of devices
-	for (dev = 0; dev < max_devices; dev++)
-	{
-		const char *dev_name;
-
-		// derive the parameter name from the option name and index. For instance: lightgun_index1 to lightgun_index8
-		sprintf(defname, "%s%d", opt, dev + 1);
-
-		// Get the user-specified name that matches the parameter
-		dev_name = machine.options().value(defname);
-
-		// If they've specified a name and it's not "auto", treat it as a custom mapping
-		if (dev_name && *dev_name && strcmp(dev_name, OSDOPTVAL_AUTO))
-		{
-			// remove the spaces from the name store it in the index
-			devmap->map[dev].name = remove_spaces(dev_name);
-			osd_printf_verbose("%s: Logical id %d: %s\n", label, dev + 1, devmap->map[dev].name);
-			devmap->initialized = 1;
-		}
-	}
-}
-
-#endif
+#endif // MAME_OSD_INPUT_INPUT_SDLCOMMON_H

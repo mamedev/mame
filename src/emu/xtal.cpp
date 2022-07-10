@@ -457,6 +457,7 @@ const double XTAL::known_xtals[] = {
 	 57'272'727, /* 57.272727_MHz_XTAL     Psikyo SH2 with /2 divider (16x NTSC subcarrier)*/
 	 57'283'200, /* 57.2832_MHz_XTAL       Macintosh IIci RBV, 15-inch portrait display */
 	 58'000'000, /* 58_MHz_XTAL            Magic Reel (Play System) */
+	 58'982'400, /* 58.9824_MHz_XTAL       Wyse WY-65 */
 	 59'292'000, /* 59.292_MHz_XTAL        Data General D461 */
 	 60'000'000, /* 60_MHz_XTAL            ARM610 */
 	 61'440'000, /* 61.44_MHz_XTAL         Donkey Kong */

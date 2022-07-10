@@ -233,7 +233,7 @@ const char *const nscsi_full_device::command_names[256] = {
 void nscsi_full_device::device_start()
 {
 	nscsi_device::device_start();
-	scsi_timer = timer_alloc(SCSI_TIMER);
+	scsi_timer = timer_alloc(FUNC(nscsi_full_device::update_tick), this);
 	save_item(NAME(scsi_cmdbuf));
 	save_item(NAME(scsi_sense_buffer));
 	save_item(NAME(scsi_cmdsize));
@@ -266,13 +266,9 @@ void nscsi_full_device::device_reset()
 	sense(false, SK_NO_SENSE);
 }
 
-void nscsi_full_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nscsi_full_device::update_tick)
 {
-	if(id != SCSI_TIMER)
-		return;
-
 	step(true);
-
 }
 
 void nscsi_full_device::scsi_ctrl_changed()

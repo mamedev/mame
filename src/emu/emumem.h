@@ -17,6 +17,8 @@
 #ifndef MAME_EMU_EMUMEM_H
 #define MAME_EMU_EMUMEM_H
 
+#include "notifier.h"
+
 #include <optional>
 #include <set>
 #include <type_traits>
@@ -49,6 +51,14 @@ enum class read_or_write
 	READWRITE = 3
 };
 
+
+//**************************************************************************
+//  FORWARD DECLARATIONS
+//**************************************************************************
+
+class handler_entry;
+template<int Width, int AddrShift> class handler_entry_read_passthrough;
+template<int Width, int AddrShift> class handler_entry_write_passthrough;
 
 
 //**************************************************************************
@@ -90,7 +100,7 @@ struct memory_entry_context {
 
 struct memory_entry {
 	offs_t start, end;
-	class handler_entry *entry;
+	handler_entry *entry;
 	std::vector<memory_entry_context> context;
 };
 
@@ -465,6 +475,29 @@ constexpr int handler_entry_dispatch_lowbits(int highbits, int width, int ashift
 		width + ashift;
 }
 
+
+// =====================-> Passthrough handler management structure
+
+class memory_passthrough_handler_impl
+{
+public:
+	memory_passthrough_handler_impl(address_space &space) : m_space(space) {}
+	memory_passthrough_handler_impl(memory_passthrough_handler_impl const &) = delete;
+
+	void remove();
+
+private:
+	address_space &m_space;
+	std::unordered_set<handler_entry *> m_handlers;
+
+	void add_handler(handler_entry *handler) { m_handlers.insert(handler); }
+	void remove_handler(handler_entry *handler) { m_handlers.erase(m_handlers.find(handler)); }
+
+	friend address_space;
+	template<int Width, int AddrShift> friend class ::handler_entry_read_passthrough;
+	template<int Width, int AddrShift> friend class ::handler_entry_write_passthrough;
+};
+
 } // namespace emu::detail
 
 
@@ -561,8 +594,6 @@ protected:
 
 // Provides the populate/read/get_ptr/lookup API
 
-template<int Width, int AddrShift> class handler_entry_read_passthrough;
-
 template<int Width, int AddrShift> class handler_entry_read : public handler_entry
 {
 public:
@@ -596,7 +627,7 @@ public:
 	virtual void populate_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_read<Width, AddrShift> *handler);
 	virtual void populate_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_read<Width, AddrShift> *handler);
 
-	inline void populate_mismatched(offs_t start, offs_t end, offs_t mirror, const memory_units_descriptor<Width, AddrShift> &descriptor) {
+	void populate_mismatched(offs_t start, offs_t end, offs_t mirror, const memory_units_descriptor<Width, AddrShift> &descriptor) {
 		start &= ~NATIVE_MASK;
 		end |= NATIVE_MASK;
 		std::vector<mapping> mappings;
@@ -609,7 +640,7 @@ public:
 	virtual void populate_mismatched_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, const memory_units_descriptor<Width, AddrShift> &descriptor, u8 rkey, std::vector<mapping> &mappings);
 	virtual void populate_mismatched_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, const memory_units_descriptor<Width, AddrShift> &descriptor, std::vector<mapping> &mappings);
 
-	inline void populate_passthrough(offs_t start, offs_t end, offs_t mirror, handler_entry_read_passthrough<Width, AddrShift> *handler) {
+	void populate_passthrough(offs_t start, offs_t end, offs_t mirror, handler_entry_read_passthrough<Width, AddrShift> *handler) {
 		start &= ~NATIVE_MASK;
 		end |= NATIVE_MASK;
 		std::vector<mapping> mappings;
@@ -635,8 +666,6 @@ public:
 // =====================-> The parent class of all write handlers
 
 // Provides the populate/write/get_ptr/lookup API
-
-template<int Width, int AddrShift> class handler_entry_write_passthrough;
 
 template<int Width, int AddrShift> class handler_entry_write : public handler_entry
 {
@@ -711,20 +740,21 @@ public:
 // =====================-> Passthrough handler management structure
 class memory_passthrough_handler
 {
-	template<int Width, int AddrShift> friend class handler_entry_read_passthrough;
-	template<int Width, int AddrShift> friend class handler_entry_write_passthrough;
-
 public:
-	memory_passthrough_handler(address_space &space) : m_space(space) {}
+	memory_passthrough_handler() : m_impl() {}
+	memory_passthrough_handler(std::shared_ptr<emu::detail::memory_passthrough_handler_impl> const &impl) : m_impl(impl) {}
 
-	inline void remove();
+	void remove()
+	{
+		auto impl(m_impl.lock());
+		if (impl)
+			impl->remove();
+	}
 
 private:
-	address_space &m_space;
-	std::unordered_set<handler_entry *> m_handlers;
+	std::weak_ptr<emu::detail::memory_passthrough_handler_impl> m_impl;
 
-	void add_handler(handler_entry *handler) { m_handlers.insert(handler); }
-	void remove_handler(handler_entry *handler) { m_handlers.erase(m_handlers.find(handler)); }
+	friend class address_space;
 };
 
 // =====================-> Forward declaration for address_space
@@ -1543,6 +1573,8 @@ private:
 	handler_entry_read <Width, AddrShift> *m_root_read;  // decode tree roots
 	handler_entry_write<Width, AddrShift> *m_root_write;
 
+	util::notifier_subscription m_subscription;
+
 	NativeType read_native(offs_t address, NativeType mask = ~NativeType(0));
 	void write_native(offs_t address, NativeType data, NativeType mask = ~NativeType(0));
 	std::pair<NativeType, u16> read_native_flags(offs_t address, NativeType mask = ~NativeType(0));
@@ -1687,32 +1719,32 @@ public:
 	virtual void install_device_delegate(offs_t addrstart, offs_t addrend, device_t &device, address_map_constructor &map, u64 unitmask = 0, int cswidth = 0, u16 flags = 0) = 0;
 
 	// install taps without mirroring
-	memory_passthrough_handler *install_read_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u8  &data, u8  mem_mask)> tap, memory_passthrough_handler *mph = nullptr) { return install_read_tap(addrstart, addrend, 0, name, tap, mph); }
-	memory_passthrough_handler *install_read_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u16 &data, u16 mem_mask)> tap, memory_passthrough_handler *mph = nullptr) { return install_read_tap(addrstart, addrend, 0, name, tap, mph); }
-	memory_passthrough_handler *install_read_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u32 &data, u32 mem_mask)> tap, memory_passthrough_handler *mph = nullptr) { return install_read_tap(addrstart, addrend, 0, name, tap, mph); }
-	memory_passthrough_handler *install_read_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u64 &data, u64 mem_mask)> tap, memory_passthrough_handler *mph = nullptr) { return install_read_tap(addrstart, addrend, 0, name, tap, mph); }
-	memory_passthrough_handler *install_write_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u8  &data, u8  mem_mask)> tap, memory_passthrough_handler *mph = nullptr) { return install_write_tap(addrstart, addrend, 0, name, tap, mph); }
-	memory_passthrough_handler *install_write_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u16 &data, u16 mem_mask)> tap, memory_passthrough_handler *mph = nullptr) { return install_write_tap(addrstart, addrend, 0, name, tap, mph); }
-	memory_passthrough_handler *install_write_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u32 &data, u32 mem_mask)> tap, memory_passthrough_handler *mph = nullptr) { return install_write_tap(addrstart, addrend, 0, name, tap, mph); }
-	memory_passthrough_handler *install_write_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u64 &data, u64 mem_mask)> tap, memory_passthrough_handler *mph = nullptr) { return install_write_tap(addrstart, addrend, 0, name, tap, mph); }
-	memory_passthrough_handler *install_readwrite_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u8  &data, u8  mem_mask)> tapr, std::function<void (offs_t offset, u8  &data, u8  mem_mask)> tapw, memory_passthrough_handler *mph = nullptr) { return install_readwrite_tap(addrstart, addrend, 0, name, tapr, tapw, mph); }
-	memory_passthrough_handler *install_readwrite_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u16 &data, u16 mem_mask)> tapr, std::function<void (offs_t offset, u16 &data, u16 mem_mask)> tapw, memory_passthrough_handler *mph = nullptr) { return install_readwrite_tap(addrstart, addrend, 0, name, tapr, tapw, mph); }
-	memory_passthrough_handler *install_readwrite_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u32 &data, u32 mem_mask)> tapr, std::function<void (offs_t offset, u32 &data, u32 mem_mask)> tapw, memory_passthrough_handler *mph = nullptr) { return install_readwrite_tap(addrstart, addrend, 0, name, tapr, tapw, mph); }
-	memory_passthrough_handler *install_readwrite_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u64 &data, u64 mem_mask)> tapr, std::function<void (offs_t offset, u64 &data, u64 mem_mask)> tapw, memory_passthrough_handler *mph = nullptr) { return install_readwrite_tap(addrstart, addrend, 0, name, tapr, tapw, mph); }
+	memory_passthrough_handler install_read_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u8  &data, u8  mem_mask)> tap, memory_passthrough_handler *mph = nullptr) { return install_read_tap(addrstart, addrend, 0, name, tap, mph); }
+	memory_passthrough_handler install_read_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u16 &data, u16 mem_mask)> tap, memory_passthrough_handler *mph = nullptr) { return install_read_tap(addrstart, addrend, 0, name, tap, mph); }
+	memory_passthrough_handler install_read_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u32 &data, u32 mem_mask)> tap, memory_passthrough_handler *mph = nullptr) { return install_read_tap(addrstart, addrend, 0, name, tap, mph); }
+	memory_passthrough_handler install_read_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u64 &data, u64 mem_mask)> tap, memory_passthrough_handler *mph = nullptr) { return install_read_tap(addrstart, addrend, 0, name, tap, mph); }
+	memory_passthrough_handler install_write_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u8  &data, u8  mem_mask)> tap, memory_passthrough_handler *mph = nullptr) { return install_write_tap(addrstart, addrend, 0, name, tap, mph); }
+	memory_passthrough_handler install_write_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u16 &data, u16 mem_mask)> tap, memory_passthrough_handler *mph = nullptr) { return install_write_tap(addrstart, addrend, 0, name, tap, mph); }
+	memory_passthrough_handler install_write_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u32 &data, u32 mem_mask)> tap, memory_passthrough_handler *mph = nullptr) { return install_write_tap(addrstart, addrend, 0, name, tap, mph); }
+	memory_passthrough_handler install_write_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u64 &data, u64 mem_mask)> tap, memory_passthrough_handler *mph = nullptr) { return install_write_tap(addrstart, addrend, 0, name, tap, mph); }
+	memory_passthrough_handler install_readwrite_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u8  &data, u8  mem_mask)> tapr, std::function<void (offs_t offset, u8  &data, u8  mem_mask)> tapw, memory_passthrough_handler *mph = nullptr) { return install_readwrite_tap(addrstart, addrend, 0, name, tapr, tapw, mph); }
+	memory_passthrough_handler install_readwrite_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u16 &data, u16 mem_mask)> tapr, std::function<void (offs_t offset, u16 &data, u16 mem_mask)> tapw, memory_passthrough_handler *mph = nullptr) { return install_readwrite_tap(addrstart, addrend, 0, name, tapr, tapw, mph); }
+	memory_passthrough_handler install_readwrite_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u32 &data, u32 mem_mask)> tapr, std::function<void (offs_t offset, u32 &data, u32 mem_mask)> tapw, memory_passthrough_handler *mph = nullptr) { return install_readwrite_tap(addrstart, addrend, 0, name, tapr, tapw, mph); }
+	memory_passthrough_handler install_readwrite_tap(offs_t addrstart, offs_t addrend, std::string name, std::function<void (offs_t offset, u64 &data, u64 mem_mask)> tapr, std::function<void (offs_t offset, u64 &data, u64 mem_mask)> tapw, memory_passthrough_handler *mph = nullptr) { return install_readwrite_tap(addrstart, addrend, 0, name, tapr, tapw, mph); }
 
 	// install taps with mirroring
-	virtual memory_passthrough_handler *install_read_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u8  &data, u8  mem_mask)> tap, memory_passthrough_handler *mph = nullptr);
-	virtual memory_passthrough_handler *install_read_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u16 &data, u16 mem_mask)> tap, memory_passthrough_handler *mph = nullptr);
-	virtual memory_passthrough_handler *install_read_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u32 &data, u32 mem_mask)> tap, memory_passthrough_handler *mph = nullptr);
-	virtual memory_passthrough_handler *install_read_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u64 &data, u64 mem_mask)> tap, memory_passthrough_handler *mph = nullptr);
-	virtual memory_passthrough_handler *install_write_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u8  &data, u8  mem_mask)> tap, memory_passthrough_handler *mph = nullptr);
-	virtual memory_passthrough_handler *install_write_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u16 &data, u16 mem_mask)> tap, memory_passthrough_handler *mph = nullptr);
-	virtual memory_passthrough_handler *install_write_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u32 &data, u32 mem_mask)> tap, memory_passthrough_handler *mph = nullptr);
-	virtual memory_passthrough_handler *install_write_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u64 &data, u64 mem_mask)> tap, memory_passthrough_handler *mph = nullptr);
-	virtual memory_passthrough_handler *install_readwrite_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u8  &data, u8  mem_mask)> tapr, std::function<void (offs_t offset, u8  &data, u8  mem_mask)> tapw, memory_passthrough_handler *mph = nullptr);
-	virtual memory_passthrough_handler *install_readwrite_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u16 &data, u16 mem_mask)> tapr, std::function<void (offs_t offset, u16 &data, u16 mem_mask)> tapw, memory_passthrough_handler *mph = nullptr);
-	virtual memory_passthrough_handler *install_readwrite_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u32 &data, u32 mem_mask)> tapr, std::function<void (offs_t offset, u32 &data, u32 mem_mask)> tapw, memory_passthrough_handler *mph = nullptr);
-	virtual memory_passthrough_handler *install_readwrite_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u64 &data, u64 mem_mask)> tapr, std::function<void (offs_t offset, u64 &data, u64 mem_mask)> tapw, memory_passthrough_handler *mph = nullptr);
+	virtual memory_passthrough_handler install_read_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u8  &data, u8  mem_mask)> tap, memory_passthrough_handler *mph = nullptr);
+	virtual memory_passthrough_handler install_read_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u16 &data, u16 mem_mask)> tap, memory_passthrough_handler *mph = nullptr);
+	virtual memory_passthrough_handler install_read_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u32 &data, u32 mem_mask)> tap, memory_passthrough_handler *mph = nullptr);
+	virtual memory_passthrough_handler install_read_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u64 &data, u64 mem_mask)> tap, memory_passthrough_handler *mph = nullptr);
+	virtual memory_passthrough_handler install_write_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u8  &data, u8  mem_mask)> tap, memory_passthrough_handler *mph = nullptr);
+	virtual memory_passthrough_handler install_write_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u16 &data, u16 mem_mask)> tap, memory_passthrough_handler *mph = nullptr);
+	virtual memory_passthrough_handler install_write_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u32 &data, u32 mem_mask)> tap, memory_passthrough_handler *mph = nullptr);
+	virtual memory_passthrough_handler install_write_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u64 &data, u64 mem_mask)> tap, memory_passthrough_handler *mph = nullptr);
+	virtual memory_passthrough_handler install_readwrite_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u8  &data, u8  mem_mask)> tapr, std::function<void (offs_t offset, u8  &data, u8  mem_mask)> tapw, memory_passthrough_handler *mph = nullptr);
+	virtual memory_passthrough_handler install_readwrite_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u16 &data, u16 mem_mask)> tapr, std::function<void (offs_t offset, u16 &data, u16 mem_mask)> tapw, memory_passthrough_handler *mph = nullptr);
+	virtual memory_passthrough_handler install_readwrite_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u32 &data, u32 mem_mask)> tapr, std::function<void (offs_t offset, u32 &data, u32 mem_mask)> tapw, memory_passthrough_handler *mph = nullptr);
+	virtual memory_passthrough_handler install_readwrite_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, u64 &data, u64 mem_mask)> tapr, std::function<void (offs_t offset, u64 &data, u64 mem_mask)> tapw, memory_passthrough_handler *mph = nullptr);
 
 	// install views
 	void install_view(offs_t addrstart, offs_t addrend, memory_view &view) { install_view(addrstart, addrend, 0, view); }
@@ -1918,11 +1950,6 @@ class address_space : public address_space_installer
 	template<int Width, int AddrShift> friend class handler_entry_read_unmapped;
 	template<int Width, int AddrShift> friend class handler_entry_write_unmapped;
 
-	struct notifier_t {
-		std::function<void (read_or_write)> m_notifier;
-		int m_id;
-	};
-
 protected:
 	// construction/destruction
 	address_space(memory_manager &manager, device_memory_interface &memory, int spacenum);
@@ -1962,15 +1989,14 @@ public:
 		v.set(this, get_specific_info());
 	}
 
-	int add_change_notifier(std::function<void (read_or_write)> n);
-	void remove_change_notifier(int id);
+	util::notifier_subscription add_change_notifier(delegate<void (read_or_write)> &&n);
+	template <typename T> util::notifier_subscription add_change_notifier(T &&n) { return add_change_notifier(delegate<void (read_or_write)>(std::forward<T>(n))); }
 
 	void invalidate_caches(read_or_write mode) {
 		if(u32(mode) & ~m_in_notification) {
 			u32 old = m_in_notification;
 			m_in_notification |= u32(mode);
-			for(const auto &n : m_notifiers)
-				n.m_notifier(mode);
+			m_notifiers(mode);
 			m_in_notification = old;
 		}
 	}
@@ -1981,7 +2007,7 @@ public:
 
 	u64 unmap() const { return m_unmap; }
 
-	memory_passthrough_handler *make_mph();
+	std::shared_ptr<emu::detail::memory_passthrough_handler_impl> make_mph(memory_passthrough_handler *mph);
 
 	// debug helpers
 	virtual std::string get_handler_string(read_or_write readorwrite, offs_t byteaddress) const = 0;
@@ -2088,10 +2114,9 @@ protected:
 	handler_entry           *m_nop_r;
 	handler_entry           *m_nop_w;
 
-	std::vector<std::unique_ptr<memory_passthrough_handler>> m_mphs;
+	std::vector<std::shared_ptr<emu::detail::memory_passthrough_handler_impl>> m_mphs;
 
-	std::vector<notifier_t> m_notifiers;        // notifier list for address map change
-	int                     m_notifier_id;      // next notifier id
+	util::notifier<read_or_write> m_notifiers;  // notifier list for address map change
 	u32                     m_in_notification;  // notification(s) currently being done
 };
 
@@ -2397,7 +2422,7 @@ write_native(offs_t address, typename emu::detail::handler_entry_size<Width>::uX
 	m_cache_w->write(address, data, mask);
 }
 
-void memory_passthrough_handler::remove()
+inline void emu::detail::memory_passthrough_handler_impl::remove()
 {
 	m_space.remove_passthrough(m_handlers);
 }
@@ -2421,18 +2446,19 @@ set(address_space *space, std::pair<void *, void *> rw)
 	m_space = space;
 	m_addrmask = space->addrmask();
 
-	space->add_change_notifier([this](read_or_write mode) {
-								   if(u32(mode) & u32(read_or_write::READ)) {
-									   m_addrend_r = 0;
-									   m_addrstart_r = 1;
-									   m_cache_r = nullptr;
-								   }
-								   if(u32(mode) & u32(read_or_write::WRITE)) {
-									   m_addrend_w = 0;
-									   m_addrstart_w = 1;
-									   m_cache_w = nullptr;
-								   }
-							   });
+	m_subscription = space->add_change_notifier(
+			[this] (read_or_write mode) {
+			   if(u32(mode) & u32(read_or_write::READ)) {
+				   m_addrend_r = 0;
+				   m_addrstart_r = 1;
+				   m_cache_r = nullptr;
+			   }
+			   if(u32(mode) & u32(read_or_write::WRITE)) {
+				   m_addrend_w = 0;
+				   m_addrstart_w = 1;
+				   m_cache_w = nullptr;
+			   }
+		   });
 	m_root_read  = (handler_entry_read <Width, AddrShift> *)(rw.first);
 	m_root_write = (handler_entry_write<Width, AddrShift> *)(rw.second);
 

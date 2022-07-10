@@ -76,8 +76,9 @@ if __name__ == '__main__':
     print("#include \"devices/net_lib.h\"")
     print("")
     print("NETLIST_START(modules_lib)")
+    print("{")
     print("")
     for entry in files_sorted:
         process_file(entry)
     print("")
-    print("NETLIST_END()")
+    print("}")

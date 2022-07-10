@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="white"><rect><color red="0.8" green="0.8" blue="0.8" /></rect></element>
+
+	<element name="lane">
+		<rect><bounds x="0" y="0" width="1" height="1" /><color red="0.8" green="0.8" blue="0.8" /></rect>
+		<rect><bounds x="0.05" y="0" width="0.9" height="1" /><color red="0" green="0" blue="0" /></rect>
+	</element>
+
+	<element name="gear" defstate="3">
+		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
+		<text state="3" string="GEAR:1"><color red="0.6" green="0.6" blue="0.6" /></text>
+		<text state="1" string="GEAR:2"><color red="0.6" green="0.6" blue="0.6" /></text>
+		<text state="0" string="GEAR:3"><color red="0.6" green="0.6" blue="0.6" /></text>
+		<text state="2" string="GEAR:4"><color red="0.6" green="0.6" blue="0.6" /></text>
+	</element>
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
+	</element>
+
+	<element name="led" defstate="0">
+		<rect>
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+			<color alpha="0" />
+		</rect>
+		<rect state="0">
+			<bounds x="0.35" y="0.0" width="0.3" height="1.0" />
+			<color red="0.1" green="0.01" blue="0.015" />
+		</rect>
+		<rect state="1">
+			<bounds x="0.35" y="0.0" width="0.3" height="1.0" />
+			<color red="0.5" green="0.05" blue="0.075" />
+		</rect>
+		<rect state="2">
+			<bounds x="0.35" y="0.0" width="0.3" height="1.0" />
+			<color red="1.0" green="0.1" blue="0.15" />
+		</rect>
+	</element>
+
+
+<!-- 7seg leds -->
+
+	<group name="digits">
+		<element name="digit7" ref="digit"><bounds x="7" y="0" width="0.75" height="1" /></element>
+		<element name="digit8" ref="digit"><bounds x="8" y="0" width="0.75" height="1" /></element>
+	</group>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="16" right="24" top="5.8" bottom="34.5" />
+
+		<!-- bezel -->
+		<element ref="lane"><bounds x="18.69" y="9.7" width="2.62" height="24" /></element>
+
+		<element ref="white" inputtag="IN.0" inputmask="0x00" inputraw="yes"><bounds x="16" y="9.7" width="8" height="0.8" /></element>
+		<collection name="Gear Position">
+			<element ref="gear" inputtag="IN.0" inputmask="0x0c" inputraw="yes"><bounds x="16" y="9.7" width="8" height="0.8" /></element>
+		</collection>
+
+		<!-- led matrix -->
+		<repeat count="7">
+			<param name="y" start="12.1" increment="3.2" />
+			<param name="i1" start="6" increment="-1" />
+
+			<element name="~i1~.2" ref="led"><bounds x="17.0" y="~y~" width="1" height="0.8" /></element>
+			<element name="~i1~.5" ref="led"><bounds x="19.5" y="~y~" width="1" height="0.8" /></element>
+			<element name="~i1~.6" ref="led"><bounds x="22.0" y="~y~" width="1" height="0.8" /></element>
+		</repeat>
+
+		<group ref="digits"><bounds x="18" y="6.6" width="4" height="2.3" /></group>
+
+	</view>
+</mamelayout>

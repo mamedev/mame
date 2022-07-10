@@ -26,7 +26,7 @@ const t11_device::opcode_func t11_device::s_opcode_table[65536 >> 3] =
 {
 	/* 0x0000 */
 	OP(op_0000),    OP(halt),       OP(illegal),    OP(illegal),    OP(illegal),    OP(illegal),    OP(illegal),    OP(illegal),
-	OP(illegal),    OP(jmp_rgd),    OP(jmp_in),     OP(jmp_ind),    OP(jmp_de),     OP(jmp_ded),    OP(jmp_ix),     OP(jmp_ixd),
+	OP(illegal4),   OP(jmp_rgd),    OP(jmp_in),     OP(jmp_ind),    OP(jmp_de),     OP(jmp_ded),    OP(jmp_ix),     OP(jmp_ixd),
 	OP(rts),        OP(illegal),    OP(illegal),    OP(illegal),    OP(ccc),        OP(ccc),        OP(scc),        OP(scc),
 	OP(swab_rg),    OP(swab_rgd),   OP(swab_in),    OP(swab_ind),   OP(swab_de),    OP(swab_ded),   OP(swab_ix),    OP(swab_ixd),
 	/* 0x0100 */
@@ -65,15 +65,15 @@ const t11_device::opcode_func t11_device::s_opcode_table[65536 >> 3] =
 	OP(ble),        OP(ble),        OP(ble),        OP(ble),        OP(ble),        OP(ble),        OP(ble),        OP(ble),
 	OP(ble),        OP(ble),        OP(ble),        OP(ble),        OP(ble),        OP(ble),        OP(ble),        OP(ble),
 	/* 0x0800 */
-	OP(illegal),    OP(jsr_rgd),    OP(jsr_in),     OP(jsr_ind),    OP(jsr_de),     OP(jsr_ded),    OP(jsr_ix),     OP(jsr_ixd),
-	OP(illegal),    OP(jsr_rgd),    OP(jsr_in),     OP(jsr_ind),    OP(jsr_de),     OP(jsr_ded),    OP(jsr_ix),     OP(jsr_ixd),
-	OP(illegal),    OP(jsr_rgd),    OP(jsr_in),     OP(jsr_ind),    OP(jsr_de),     OP(jsr_ded),    OP(jsr_ix),     OP(jsr_ixd),
-	OP(illegal),    OP(jsr_rgd),    OP(jsr_in),     OP(jsr_ind),    OP(jsr_de),     OP(jsr_ded),    OP(jsr_ix),     OP(jsr_ixd),
+	OP(illegal4),   OP(jsr_rgd),    OP(jsr_in),     OP(jsr_ind),    OP(jsr_de),     OP(jsr_ded),    OP(jsr_ix),     OP(jsr_ixd),
+	OP(illegal4),   OP(jsr_rgd),    OP(jsr_in),     OP(jsr_ind),    OP(jsr_de),     OP(jsr_ded),    OP(jsr_ix),     OP(jsr_ixd),
+	OP(illegal4),   OP(jsr_rgd),    OP(jsr_in),     OP(jsr_ind),    OP(jsr_de),     OP(jsr_ded),    OP(jsr_ix),     OP(jsr_ixd),
+	OP(illegal4),   OP(jsr_rgd),    OP(jsr_in),     OP(jsr_ind),    OP(jsr_de),     OP(jsr_ded),    OP(jsr_ix),     OP(jsr_ixd),
 	/* 0x0900 */
-	OP(illegal),    OP(jsr_rgd),    OP(jsr_in),     OP(jsr_ind),    OP(jsr_de),     OP(jsr_ded),    OP(jsr_ix),     OP(jsr_ixd),
-	OP(illegal),    OP(jsr_rgd),    OP(jsr_in),     OP(jsr_ind),    OP(jsr_de),     OP(jsr_ded),    OP(jsr_ix),     OP(jsr_ixd),
-	OP(illegal),    OP(jsr_rgd),    OP(jsr_in),     OP(jsr_ind),    OP(jsr_de),     OP(jsr_ded),    OP(jsr_ix),     OP(jsr_ixd),
-	OP(illegal),    OP(jsr_rgd),    OP(jsr_in),     OP(jsr_ind),    OP(jsr_de),     OP(jsr_ded),    OP(jsr_ix),     OP(jsr_ixd),
+	OP(illegal4),   OP(jsr_rgd),    OP(jsr_in),     OP(jsr_ind),    OP(jsr_de),     OP(jsr_ded),    OP(jsr_ix),     OP(jsr_ixd),
+	OP(illegal4),   OP(jsr_rgd),    OP(jsr_in),     OP(jsr_ind),    OP(jsr_de),     OP(jsr_ded),    OP(jsr_ix),     OP(jsr_ixd),
+	OP(illegal4),   OP(jsr_rgd),    OP(jsr_in),     OP(jsr_ind),    OP(jsr_de),     OP(jsr_ded),    OP(jsr_ix),     OP(jsr_ixd),
+	OP(illegal4),   OP(jsr_rgd),    OP(jsr_in),     OP(jsr_ind),    OP(jsr_de),     OP(jsr_ded),    OP(jsr_ix),     OP(jsr_ixd),
 	/* 0x0a00 */
 	OP(clr_rg),     OP(clr_rgd),    OP(clr_in),     OP(clr_ind),    OP(clr_de),     OP(clr_ded),    OP(clr_ix),     OP(clr_ixd),
 	OP(com_rg),     OP(com_rgd),    OP(com_in),     OP(com_ind),    OP(com_de),     OP(com_ded),    OP(com_ix),     OP(com_ixd),

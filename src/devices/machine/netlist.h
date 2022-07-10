@@ -57,6 +57,47 @@ namespace netlist {
 	void _name(const int data, const attotime &time)
 
 
+// ----------------------------------------------------------------------------------------
+// netlist_log_csv
+// ----------------------------------------------------------------------------------------
+
+template <int USE>
+struct netlist_log_csv
+{
+private:
+	static constexpr int MAX_BUFFER_ENTRIES = 1000;
+public:
+	void open(running_machine &machine, const std::string &name) { }
+	void close() { }
+	void log_add(char const* param, double value, bool isfloat) { }
+	void log_flush(int count = MAX_BUFFER_ENTRIES) { }
+
+private:
+};
+
+template <>
+struct netlist_log_csv<1>
+{
+private:
+	static constexpr int MAX_BUFFER_ENTRIES = 1000;
+public:
+	void open(running_machine &machine, const std::string &name);
+	void close();
+
+	void log_add(char const* param, double value, bool isfloat);
+	void log_flush(int count = MAX_BUFFER_ENTRIES);
+private:
+	struct buffer_entry
+	{
+		attotime time;
+		bool isfloat;
+		double value;
+		char const *string;
+	};
+	std::deque<buffer_entry> m_buffer;
+	FILE* m_csv_file = nullptr;
+	running_machine * m_machine;
+};
 
 // ----------------------------------------------------------------------------------------
 // netlist_mame_device
@@ -82,6 +123,7 @@ public:
 
 	static void register_memregion_source(netlist::nlparse_t &parser, device_t &dev, const char *name);
 
+	auto &log_csv() { return m_log_csv; }
 protected:
 
 	netlist_mame_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -113,24 +155,7 @@ private:
 	func_type m_setup_func;
 	bool m_device_reset_called;
 
-#if NETLIST_CREATE_CSV
-	static constexpr int MAX_BUFFER_ENTRIES = 1000;
-
-public:
-	void log_add(char const* param, double value, bool isfloat);
-	void log_flush(int count = MAX_BUFFER_ENTRIES);
-
-private:
-	struct buffer_entry
-	{
-		attotime time;
-		bool isfloat;
-		double value;
-		char const *string;
-	};
-	std::deque<buffer_entry> m_buffer;
-	FILE* m_csv_file = nullptr;
-#endif
+	netlist_log_csv<NETLIST_CREATE_CSV> m_log_csv;
 };
 
 class netlist_mame_cpu_device : public netlist_mame_device,
@@ -168,16 +193,6 @@ public:
 	void update_icount(netlist::netlist_time_ext time) noexcept;
 	void check_mame_abort_slice() noexcept;
 
-	netlist::netlist_time_ext nltime_ext_from_clocks(unsigned c) const noexcept
-	{
-		return (m_div * c).shr(MDIV_SHIFT);
-	}
-
-	netlist::netlist_time nltime_from_clocks(unsigned c) const noexcept
-	{
-		return static_cast<netlist::netlist_time>((m_div * c).shr(MDIV_SHIFT));
-	}
-
 protected:
 	// netlist_mame_device
 	virtual void nl_register_devices(netlist::nlparse_t &parser) const override;
@@ -204,6 +219,9 @@ protected:
 	address_space_config m_program_config;
 
 private:
+	netlist::netlist_time_ext nltime_ext_from_clocks(unsigned c) const noexcept;
+	netlist::netlist_time nltime_from_clocks(unsigned c) const noexcept;
+
 	int m_icount;
 	netlist::netlist_time_ext    m_div;
 	netlist::netlist_time_ext    m_rem;
@@ -230,6 +248,8 @@ private:
 
 // ----------------------------------------------------------------------------------------
 // netlist_mame_sound_input_buffer
+//
+// This is a wrapper device to provide operator[] on read_stream_view.
 // ----------------------------------------------------------------------------------------
 
 class netlist_mame_sound_input_buffer : public read_stream_view
@@ -382,13 +402,14 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(sync_callback);
 
 private:
 	netlist::param_num_t<netlist::nl_fptype> *m_param;
 	bool   m_auto_port;
 	const char *m_param_name;
-	double m_value_for_device_timer;
+	double m_value_to_sync;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -482,7 +503,8 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(sync_callback);
 
 private:
 	netlist::param_num_t<int> *m_param;
@@ -523,7 +545,8 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(sync_callback);
 
 private:
 	netlist::param_num_t<bool> *m_param;
@@ -551,7 +574,8 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(sync_callback);
 
 private:
 	netlist::param_ptr_t *m_param;

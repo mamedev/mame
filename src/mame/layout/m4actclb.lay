@@ -2975,1974 +2975,1001 @@
 		<element ref="debug_backdrop_colour">
 			<bounds x="0" y="0" width="1920" height="1080"/>
 		</element>
+
 		<element name="lamp0" ref="debug_lamp_reel" state="0">
 			<bounds x="32" y="32" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_0" ref="debug_lamp_label_0">
-			<bounds x="47" y="47" width="30" height="30"/>
 		</element>
 		<element name="lamp1" ref="debug_lamp_reel" state="0">
 			<bounds x="96" y="32" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_1" ref="debug_lamp_label_1">
-			<bounds x="111" y="47" width="30" height="30"/>
-		</element>
 		<element name="lamp2" ref="debug_lamp_reel" state="0">
 			<bounds x="160" y="32" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_2" ref="debug_lamp_label_2">
-			<bounds x="175" y="47" width="30" height="30"/>
 		</element>
 		<element name="lamp3" ref="debug_lamp_reel" state="0">
 			<bounds x="224" y="32" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_3" ref="debug_lamp_label_3">
-			<bounds x="239" y="47" width="30" height="30"/>
-		</element>
 		<element name="lamp4" ref="debug_lamp_standard" state="0">
 			<bounds x="288" y="32" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_4" ref="debug_lamp_label_4">
-			<bounds x="303" y="47" width="30" height="30"/>
 		</element>
 		<element name="lamp5" ref="debug_lamp_standard" state="0">
 			<bounds x="352" y="32" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_5" ref="debug_lamp_label_5">
-			<bounds x="367" y="47" width="30" height="30"/>
-		</element>
 		<element name="lamp6" ref="debug_lamp_standard" state="0">
 			<bounds x="416" y="32" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_6" ref="debug_lamp_label_6">
-			<bounds x="431" y="47" width="30" height="30"/>
 		</element>
 		<element name="lamp7" ref="debug_lamp_standard" state="0">
 			<bounds x="480" y="32" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_7" ref="debug_lamp_label_7">
-			<bounds x="495" y="47" width="30" height="30"/>
-		</element>
 		<element name="lamp8" ref="debug_lamp_reel" state="0">
 			<bounds x="544" y="32" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_8" ref="debug_lamp_label_8">
-			<bounds x="559" y="47" width="30" height="30"/>
 		</element>
 		<element name="lamp9" ref="debug_lamp_reel" state="0">
 			<bounds x="608" y="32" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_9" ref="debug_lamp_label_9">
-			<bounds x="623" y="47" width="30" height="30"/>
-		</element>
 		<element name="lamp10" ref="debug_lamp_reel" state="0">
 			<bounds x="672" y="32" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_10" ref="debug_lamp_label_10">
-			<bounds x="687" y="47" width="30" height="30"/>
 		</element>
 		<element name="lamp11" ref="debug_lamp_reel" state="0">
 			<bounds x="736" y="32" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_11" ref="debug_lamp_label_11">
-			<bounds x="751" y="47" width="30" height="30"/>
-		</element>
 		<element name="lamp12" ref="debug_lamp_standard" state="0">
 			<bounds x="800" y="32" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_12" ref="debug_lamp_label_12">
-			<bounds x="815" y="47" width="30" height="30"/>
 		</element>
 		<element name="lamp13" ref="debug_lamp_standard" state="0">
 			<bounds x="864" y="32" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_13" ref="debug_lamp_label_13">
-			<bounds x="879" y="47" width="30" height="30"/>
-		</element>
 		<element name="lamp14" ref="debug_lamp_standard" state="0">
 			<bounds x="928" y="32" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_14" ref="debug_lamp_label_14">
-			<bounds x="943" y="47" width="30" height="30"/>
 		</element>
 		<element name="lamp15" ref="debug_lamp_standard" state="0">
 			<bounds x="992" y="32" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_15" ref="debug_lamp_label_15">
-			<bounds x="1007" y="47" width="30" height="30"/>
-		</element>
 		<element name="lamp16" ref="debug_lamp_reel" state="0">
 			<bounds x="32" y="96" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_16" ref="debug_lamp_label_16">
-			<bounds x="47" y="111" width="30" height="30"/>
 		</element>
 		<element name="lamp17" ref="debug_lamp_reel" state="0">
 			<bounds x="96" y="96" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_17" ref="debug_lamp_label_17">
-			<bounds x="111" y="111" width="30" height="30"/>
-		</element>
 		<element name="lamp18" ref="debug_lamp_reel" state="0">
 			<bounds x="160" y="96" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_18" ref="debug_lamp_label_18">
-			<bounds x="175" y="111" width="30" height="30"/>
 		</element>
 		<element name="lamp19" ref="debug_lamp_reel" state="0">
 			<bounds x="224" y="96" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_19" ref="debug_lamp_label_19">
-			<bounds x="239" y="111" width="30" height="30"/>
-		</element>
 		<element name="lamp20" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="288" y="96" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_20" ref="debug_lamp_label_20">
-			<bounds x="303" y="111" width="30" height="30"/>
 		</element>
 		<element name="lamp21" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="352" y="96" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_21" ref="debug_lamp_label_21">
-			<bounds x="367" y="111" width="30" height="30"/>
-		</element>
 		<element name="lamp22" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="416" y="96" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_22" ref="debug_lamp_label_22">
-			<bounds x="431" y="111" width="30" height="30"/>
 		</element>
 		<element name="lamp23" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="480" y="96" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_23" ref="debug_lamp_label_23">
-			<bounds x="495" y="111" width="30" height="30"/>
-		</element>
 		<element name="lamp24" ref="debug_lamp_button" state="0">
 			<bounds x="544" y="96" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_24" ref="debug_lamp_label_24">
-			<bounds x="559" y="111" width="30" height="30"/>
 		</element>
 		<element name="lamp25" ref="debug_lamp_button" state="0">
 			<bounds x="608" y="96" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_25" ref="debug_lamp_label_25">
-			<bounds x="623" y="111" width="30" height="30"/>
-		</element>
 		<element name="lamp26" ref="debug_lamp_button" state="0">
 			<bounds x="672" y="96" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_26" ref="debug_lamp_label_26">
-			<bounds x="687" y="111" width="30" height="30"/>
 		</element>
 		<element name="lamp27" ref="debug_lamp_standard" state="0">
 			<bounds x="736" y="96" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_27" ref="debug_lamp_label_27">
-			<bounds x="751" y="111" width="30" height="30"/>
-		</element>
 		<element name="lamp28" ref="debug_lamp_standard" state="0">
 			<bounds x="800" y="96" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_28" ref="debug_lamp_label_28">
-			<bounds x="815" y="111" width="30" height="30"/>
 		</element>
 		<element name="lamp29" ref="debug_lamp_standard" state="0">
 			<bounds x="864" y="96" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_29" ref="debug_lamp_label_29">
-			<bounds x="879" y="111" width="30" height="30"/>
-		</element>
 		<element name="lamp30" ref="debug_lamp_standard" state="0">
 			<bounds x="928" y="96" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_30" ref="debug_lamp_label_30">
-			<bounds x="943" y="111" width="30" height="30"/>
 		</element>
 		<element name="lamp31" ref="debug_lamp_standard" state="0">
 			<bounds x="992" y="96" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_31" ref="debug_lamp_label_31">
-			<bounds x="1007" y="111" width="30" height="30"/>
-		</element>
 		<element name="lamp32" ref="debug_lamp_button" state="0">
 			<bounds x="32" y="160" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_32" ref="debug_lamp_label_32">
-			<bounds x="47" y="175" width="30" height="30"/>
 		</element>
 		<element name="lamp33" ref="debug_lamp_button" state="0">
 			<bounds x="96" y="160" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_33" ref="debug_lamp_label_33">
-			<bounds x="111" y="175" width="30" height="30"/>
-		</element>
 		<element name="lamp34" ref="debug_lamp_button" state="0">
 			<bounds x="160" y="160" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_34" ref="debug_lamp_label_34">
-			<bounds x="175" y="175" width="30" height="30"/>
 		</element>
 		<element name="lamp35" ref="debug_lamp_standard" state="0">
 			<bounds x="224" y="160" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_35" ref="debug_lamp_label_35">
-			<bounds x="239" y="175" width="30" height="30"/>
-		</element>
 		<element name="lamp36" ref="debug_lamp_standard" state="0">
 			<bounds x="288" y="160" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_36" ref="debug_lamp_label_36">
-			<bounds x="303" y="175" width="30" height="30"/>
 		</element>
 		<element name="lamp37" ref="debug_lamp_standard" state="0">
 			<bounds x="352" y="160" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_37" ref="debug_lamp_label_37">
-			<bounds x="367" y="175" width="30" height="30"/>
-		</element>
 		<element name="lamp38" ref="debug_lamp_standard" state="0">
 			<bounds x="416" y="160" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_38" ref="debug_lamp_label_38">
-			<bounds x="431" y="175" width="30" height="30"/>
 		</element>
 		<element name="lamp39" ref="debug_lamp_standard" state="0">
 			<bounds x="480" y="160" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_39" ref="debug_lamp_label_39">
-			<bounds x="495" y="175" width="30" height="30"/>
-		</element>
 		<element name="lamp40" ref="debug_lamp_button" state="0">
 			<bounds x="544" y="160" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_40" ref="debug_lamp_label_40">
-			<bounds x="559" y="175" width="30" height="30"/>
 		</element>
 		<element name="lamp41" ref="debug_lamp_button" state="0">
 			<bounds x="608" y="160" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_41" ref="debug_lamp_label_41">
-			<bounds x="623" y="175" width="30" height="30"/>
-		</element>
 		<element name="lamp42" ref="debug_lamp_standard" state="0">
 			<bounds x="672" y="160" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_42" ref="debug_lamp_label_42">
-			<bounds x="687" y="175" width="30" height="30"/>
 		</element>
 		<element name="lamp43" ref="debug_lamp_standard" state="0">
 			<bounds x="736" y="160" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_43" ref="debug_lamp_label_43">
-			<bounds x="751" y="175" width="30" height="30"/>
-		</element>
 		<element name="lamp44" ref="debug_lamp_standard" state="0">
 			<bounds x="800" y="160" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_44" ref="debug_lamp_label_44">
-			<bounds x="815" y="175" width="30" height="30"/>
 		</element>
 		<element name="lamp45" ref="debug_lamp_standard" state="0">
 			<bounds x="864" y="160" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_45" ref="debug_lamp_label_45">
-			<bounds x="879" y="175" width="30" height="30"/>
-		</element>
 		<element name="lamp46" ref="debug_lamp_standard" state="0">
 			<bounds x="928" y="160" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_46" ref="debug_lamp_label_46">
-			<bounds x="943" y="175" width="30" height="30"/>
 		</element>
 		<element name="lamp47" ref="debug_lamp_standard" state="0">
 			<bounds x="992" y="160" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_47" ref="debug_lamp_label_47">
-			<bounds x="1007" y="175" width="30" height="30"/>
-		</element>
 		<element name="lamp48" ref="debug_lamp_button" state="0">
 			<bounds x="32" y="224" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_48" ref="debug_lamp_label_48">
-			<bounds x="47" y="239" width="30" height="30"/>
 		</element>
 		<element name="lamp49" ref="debug_lamp_button" state="0">
 			<bounds x="96" y="224" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_49" ref="debug_lamp_label_49">
-			<bounds x="111" y="239" width="30" height="30"/>
-		</element>
 		<element name="lamp50" ref="debug_lamp_button" state="0">
 			<bounds x="160" y="224" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_50" ref="debug_lamp_label_50">
-			<bounds x="175" y="239" width="30" height="30"/>
 		</element>
 		<element name="lamp51" ref="debug_lamp_standard" state="0">
 			<bounds x="224" y="224" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_51" ref="debug_lamp_label_51">
-			<bounds x="239" y="239" width="30" height="30"/>
-		</element>
 		<element name="lamp52" ref="debug_lamp_standard" state="0">
 			<bounds x="288" y="224" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_52" ref="debug_lamp_label_52">
-			<bounds x="303" y="239" width="30" height="30"/>
 		</element>
 		<element name="lamp53" ref="debug_lamp_standard" state="0">
 			<bounds x="352" y="224" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_53" ref="debug_lamp_label_53">
-			<bounds x="367" y="239" width="30" height="30"/>
-		</element>
 		<element name="lamp54" ref="debug_lamp_standard" state="0">
 			<bounds x="416" y="224" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_54" ref="debug_lamp_label_54">
-			<bounds x="431" y="239" width="30" height="30"/>
 		</element>
 		<element name="lamp55" ref="debug_lamp_standard" state="0">
 			<bounds x="480" y="224" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_55" ref="debug_lamp_label_55">
-			<bounds x="495" y="239" width="30" height="30"/>
-		</element>
 		<element name="lamp56" ref="debug_lamp_button" state="0">
 			<bounds x="544" y="224" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_56" ref="debug_lamp_label_56">
-			<bounds x="559" y="239" width="30" height="30"/>
 		</element>
 		<element name="lamp57" ref="debug_lamp_standard" state="0">
 			<bounds x="608" y="224" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_57" ref="debug_lamp_label_57">
-			<bounds x="623" y="239" width="30" height="30"/>
-		</element>
 		<element name="lamp58" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="672" y="224" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_58" ref="debug_lamp_label_58">
-			<bounds x="687" y="239" width="30" height="30"/>
 		</element>
 		<element name="lamp59" ref="debug_lamp_standard" state="0">
 			<bounds x="736" y="224" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_59" ref="debug_lamp_label_59">
-			<bounds x="751" y="239" width="30" height="30"/>
-		</element>
 		<element name="lamp60" ref="debug_lamp_standard" state="0">
 			<bounds x="800" y="224" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_60" ref="debug_lamp_label_60">
-			<bounds x="815" y="239" width="30" height="30"/>
 		</element>
 		<element name="lamp61" ref="debug_lamp_standard" state="0">
 			<bounds x="864" y="224" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_61" ref="debug_lamp_label_61">
-			<bounds x="879" y="239" width="30" height="30"/>
-		</element>
 		<element name="lamp62" ref="debug_lamp_standard" state="0">
 			<bounds x="928" y="224" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_62" ref="debug_lamp_label_62">
-			<bounds x="943" y="239" width="30" height="30"/>
 		</element>
 		<element name="lamp63" ref="debug_lamp_standard" state="0">
 			<bounds x="992" y="224" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_63" ref="debug_lamp_label_63">
-			<bounds x="1007" y="239" width="30" height="30"/>
-		</element>
 		<element name="lamp64" ref="debug_lamp_standard" state="0">
 			<bounds x="32" y="288" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_64" ref="debug_lamp_label_64">
-			<bounds x="47" y="303" width="30" height="30"/>
 		</element>
 		<element name="lamp65" ref="debug_lamp_standard" state="0">
 			<bounds x="96" y="288" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_65" ref="debug_lamp_label_65">
-			<bounds x="111" y="303" width="30" height="30"/>
-		</element>
 		<element name="lamp66" ref="debug_lamp_standard" state="0">
 			<bounds x="160" y="288" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_66" ref="debug_lamp_label_66">
-			<bounds x="175" y="303" width="30" height="30"/>
 		</element>
 		<element name="lamp67" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="224" y="288" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_67" ref="debug_lamp_label_67">
-			<bounds x="239" y="303" width="30" height="30"/>
-		</element>
 		<element name="lamp68" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="288" y="288" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_68" ref="debug_lamp_label_68">
-			<bounds x="303" y="303" width="30" height="30"/>
 		</element>
 		<element name="lamp69" ref="debug_lamp_standard" state="0">
 			<bounds x="352" y="288" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_69" ref="debug_lamp_label_69">
-			<bounds x="367" y="303" width="30" height="30"/>
-		</element>
 		<element name="lamp70" ref="debug_lamp_standard" state="0">
 			<bounds x="416" y="288" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_70" ref="debug_lamp_label_70">
-			<bounds x="431" y="303" width="30" height="30"/>
 		</element>
 		<element name="lamp71" ref="debug_lamp_standard" state="0">
 			<bounds x="480" y="288" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_71" ref="debug_lamp_label_71">
-			<bounds x="495" y="303" width="30" height="30"/>
-		</element>
 		<element name="lamp72" ref="debug_lamp_standard" state="0">
 			<bounds x="544" y="288" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_72" ref="debug_lamp_label_72">
-			<bounds x="559" y="303" width="30" height="30"/>
 		</element>
 		<element name="lamp73" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="608" y="288" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_73" ref="debug_lamp_label_73">
-			<bounds x="623" y="303" width="30" height="30"/>
-		</element>
 		<element name="lamp74" ref="debug_lamp_standard" state="0">
 			<bounds x="672" y="288" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_74" ref="debug_lamp_label_74">
-			<bounds x="687" y="303" width="30" height="30"/>
 		</element>
 		<element name="lamp75" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="736" y="288" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_75" ref="debug_lamp_label_75">
-			<bounds x="751" y="303" width="30" height="30"/>
-		</element>
 		<element name="lamp76" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="800" y="288" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_76" ref="debug_lamp_label_76">
-			<bounds x="815" y="303" width="30" height="30"/>
 		</element>
 		<element name="lamp77" ref="debug_lamp_standard" state="0">
 			<bounds x="864" y="288" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_77" ref="debug_lamp_label_77">
-			<bounds x="879" y="303" width="30" height="30"/>
-		</element>
 		<element name="lamp78" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="928" y="288" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_78" ref="debug_lamp_label_78">
-			<bounds x="943" y="303" width="30" height="30"/>
 		</element>
 		<element name="lamp79" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="992" y="288" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_79" ref="debug_lamp_label_79">
-			<bounds x="1007" y="303" width="30" height="30"/>
-		</element>
 		<element name="lamp80" ref="debug_lamp_standard" state="0">
 			<bounds x="32" y="352" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_80" ref="debug_lamp_label_80">
-			<bounds x="47" y="367" width="30" height="30"/>
 		</element>
 		<element name="lamp81" ref="debug_lamp_standard" state="0">
 			<bounds x="96" y="352" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_81" ref="debug_lamp_label_81">
-			<bounds x="111" y="367" width="30" height="30"/>
-		</element>
 		<element name="lamp82" ref="debug_lamp_standard" state="0">
 			<bounds x="160" y="352" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_82" ref="debug_lamp_label_82">
-			<bounds x="175" y="367" width="30" height="30"/>
 		</element>
 		<element name="lamp83" ref="debug_lamp_standard" state="0">
 			<bounds x="224" y="352" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_83" ref="debug_lamp_label_83">
-			<bounds x="239" y="367" width="30" height="30"/>
-		</element>
 		<element name="lamp84" ref="debug_lamp_standard" state="0">
 			<bounds x="288" y="352" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_84" ref="debug_lamp_label_84">
-			<bounds x="303" y="367" width="30" height="30"/>
 		</element>
 		<element name="lamp85" ref="debug_lamp_standard" state="0">
 			<bounds x="352" y="352" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_85" ref="debug_lamp_label_85">
-			<bounds x="367" y="367" width="30" height="30"/>
-		</element>
 		<element name="lamp86" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="416" y="352" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_86" ref="debug_lamp_label_86">
-			<bounds x="431" y="367" width="30" height="30"/>
 		</element>
 		<element name="lamp87" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="480" y="352" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_87" ref="debug_lamp_label_87">
-			<bounds x="495" y="367" width="30" height="30"/>
-		</element>
 		<element name="lamp88" ref="debug_lamp_standard" state="0">
 			<bounds x="544" y="352" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_88" ref="debug_lamp_label_88">
-			<bounds x="559" y="367" width="30" height="30"/>
 		</element>
 		<element name="lamp89" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="608" y="352" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_89" ref="debug_lamp_label_89">
-			<bounds x="623" y="367" width="30" height="30"/>
-		</element>
 		<element name="lamp90" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="672" y="352" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_90" ref="debug_lamp_label_90">
-			<bounds x="687" y="367" width="30" height="30"/>
 		</element>
 		<element name="lamp91" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="736" y="352" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_91" ref="debug_lamp_label_91">
-			<bounds x="751" y="367" width="30" height="30"/>
-		</element>
 		<element name="lamp92" ref="debug_lamp_standard" state="0">
 			<bounds x="800" y="352" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_92" ref="debug_lamp_label_92">
-			<bounds x="815" y="367" width="30" height="30"/>
 		</element>
 		<element name="lamp93" ref="debug_lamp_standard" state="0">
 			<bounds x="864" y="352" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_93" ref="debug_lamp_label_93">
-			<bounds x="879" y="367" width="30" height="30"/>
-		</element>
 		<element name="lamp94" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="928" y="352" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_94" ref="debug_lamp_label_94">
-			<bounds x="943" y="367" width="30" height="30"/>
 		</element>
 		<element name="lamp95" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="992" y="352" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_95" ref="debug_lamp_label_95">
-			<bounds x="1007" y="367" width="30" height="30"/>
-		</element>
 		<element name="lamp96" ref="debug_lamp_standard" state="0">
 			<bounds x="32" y="416" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_96" ref="debug_lamp_label_96">
-			<bounds x="47" y="431" width="30" height="30"/>
 		</element>
 		<element name="lamp97" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="96" y="416" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_97" ref="debug_lamp_label_97">
-			<bounds x="111" y="431" width="30" height="30"/>
-		</element>
 		<element name="lamp98" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="160" y="416" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_98" ref="debug_lamp_label_98">
-			<bounds x="175" y="431" width="30" height="30"/>
 		</element>
 		<element name="lamp99" ref="debug_lamp_standard" state="0">
 			<bounds x="224" y="416" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_99" ref="debug_lamp_label_99">
-			<bounds x="239" y="431" width="30" height="30"/>
-		</element>
 		<element name="lamp100" ref="debug_lamp_standard" state="0">
 			<bounds x="288" y="416" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_100" ref="debug_lamp_label_100">
-			<bounds x="303" y="431" width="30" height="30"/>
 		</element>
 		<element name="lamp101" ref="debug_lamp_standard" state="0">
 			<bounds x="352" y="416" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_101" ref="debug_lamp_label_101">
-			<bounds x="367" y="431" width="30" height="30"/>
-		</element>
 		<element name="lamp102" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="416" y="416" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_102" ref="debug_lamp_label_102">
-			<bounds x="431" y="431" width="30" height="30"/>
 		</element>
 		<element name="lamp103" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="480" y="416" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_103" ref="debug_lamp_label_103">
-			<bounds x="495" y="431" width="30" height="30"/>
-		</element>
 		<element name="lamp104" ref="debug_lamp_standard" state="0">
 			<bounds x="544" y="416" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_104" ref="debug_lamp_label_104">
-			<bounds x="559" y="431" width="30" height="30"/>
 		</element>
 		<element name="lamp105" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="608" y="416" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_105" ref="debug_lamp_label_105">
-			<bounds x="623" y="431" width="30" height="30"/>
-		</element>
 		<element name="lamp106" ref="debug_lamp_standard" state="0">
 			<bounds x="672" y="416" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_106" ref="debug_lamp_label_106">
-			<bounds x="687" y="431" width="30" height="30"/>
 		</element>
 		<element name="lamp107" ref="debug_lamp_standard" state="0">
 			<bounds x="736" y="416" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_107" ref="debug_lamp_label_107">
-			<bounds x="751" y="431" width="30" height="30"/>
-		</element>
 		<element name="lamp108" ref="debug_lamp_standard" state="0">
 			<bounds x="800" y="416" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_108" ref="debug_lamp_label_108">
-			<bounds x="815" y="431" width="30" height="30"/>
 		</element>
 		<element name="lamp109" ref="debug_lamp_standard" state="0">
 			<bounds x="864" y="416" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_109" ref="debug_lamp_label_109">
-			<bounds x="879" y="431" width="30" height="30"/>
-		</element>
 		<element name="lamp110" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="928" y="416" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_110" ref="debug_lamp_label_110">
-			<bounds x="943" y="431" width="30" height="30"/>
 		</element>
 		<element name="lamp111" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="992" y="416" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_111" ref="debug_lamp_label_111">
-			<bounds x="1007" y="431" width="30" height="30"/>
-		</element>
 		<element name="lamp112" ref="debug_lamp_standard" state="0">
 			<bounds x="32" y="480" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_112" ref="debug_lamp_label_112">
-			<bounds x="47" y="495" width="30" height="30"/>
 		</element>
 		<element name="lamp113" ref="debug_lamp_standard" state="0">
 			<bounds x="96" y="480" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_113" ref="debug_lamp_label_113">
-			<bounds x="111" y="495" width="30" height="30"/>
-		</element>
 		<element name="lamp114" ref="debug_lamp_standard" state="0">
 			<bounds x="160" y="480" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_114" ref="debug_lamp_label_114">
-			<bounds x="175" y="495" width="30" height="30"/>
 		</element>
 		<element name="lamp115" ref="debug_lamp_standard" state="0">
 			<bounds x="224" y="480" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_115" ref="debug_lamp_label_115">
-			<bounds x="239" y="495" width="30" height="30"/>
-		</element>
 		<element name="lamp116" ref="debug_lamp_standard" state="0">
 			<bounds x="288" y="480" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_116" ref="debug_lamp_label_116">
-			<bounds x="303" y="495" width="30" height="30"/>
 		</element>
 		<element name="lamp117" ref="debug_lamp_standard" state="0">
 			<bounds x="352" y="480" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_117" ref="debug_lamp_label_117">
-			<bounds x="367" y="495" width="30" height="30"/>
-		</element>
 		<element name="lamp118" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="416" y="480" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_118" ref="debug_lamp_label_118">
-			<bounds x="431" y="495" width="30" height="30"/>
 		</element>
 		<element name="lamp119" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="480" y="480" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_119" ref="debug_lamp_label_119">
-			<bounds x="495" y="495" width="30" height="30"/>
-		</element>
 		<element name="lamp120" ref="debug_lamp_standard" state="0">
 			<bounds x="544" y="480" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_120" ref="debug_lamp_label_120">
-			<bounds x="559" y="495" width="30" height="30"/>
 		</element>
 		<element name="lamp121" ref="debug_lamp_standard" state="0">
 			<bounds x="608" y="480" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_121" ref="debug_lamp_label_121">
-			<bounds x="623" y="495" width="30" height="30"/>
-		</element>
 		<element name="lamp122" ref="debug_lamp_standard" state="0">
 			<bounds x="672" y="480" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_122" ref="debug_lamp_label_122">
-			<bounds x="687" y="495" width="30" height="30"/>
 		</element>
 		<element name="lamp123" ref="debug_lamp_standard" state="0">
 			<bounds x="736" y="480" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_123" ref="debug_lamp_label_123">
-			<bounds x="751" y="495" width="30" height="30"/>
-		</element>
 		<element name="lamp124" ref="debug_lamp_standard" state="0">
 			<bounds x="800" y="480" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_124" ref="debug_lamp_label_124">
-			<bounds x="815" y="495" width="30" height="30"/>
 		</element>
 		<element name="lamp125" ref="debug_lamp_standard" state="0">
 			<bounds x="864" y="480" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_125" ref="debug_lamp_label_125">
-			<bounds x="879" y="495" width="30" height="30"/>
-		</element>
 		<element name="lamp126" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="928" y="480" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_126" ref="debug_lamp_label_126">
-			<bounds x="943" y="495" width="30" height="30"/>
 		</element>
 		<element name="lamp127" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="992" y="480" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_127" ref="debug_lamp_label_127">
-			<bounds x="1007" y="495" width="30" height="30"/>
-		</element>
 		<element name="lamp128" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="32" y="544" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_128" ref="debug_lamp_label_128">
-			<bounds x="47" y="559" width="30" height="30"/>
 		</element>
 		<element name="lamp129" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="96" y="544" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_129" ref="debug_lamp_label_129">
-			<bounds x="111" y="559" width="30" height="30"/>
-		</element>
 		<element name="lamp130" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="160" y="544" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_130" ref="debug_lamp_label_130">
-			<bounds x="175" y="559" width="30" height="30"/>
 		</element>
 		<element name="lamp131" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="224" y="544" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_131" ref="debug_lamp_label_131">
-			<bounds x="239" y="559" width="30" height="30"/>
-		</element>
 		<element name="lamp132" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="288" y="544" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_132" ref="debug_lamp_label_132">
-			<bounds x="303" y="559" width="30" height="30"/>
 		</element>
 		<element name="lamp133" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="352" y="544" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_133" ref="debug_lamp_label_133">
-			<bounds x="367" y="559" width="30" height="30"/>
-		</element>
 		<element name="lamp134" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="416" y="544" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_134" ref="debug_lamp_label_134">
-			<bounds x="431" y="559" width="30" height="30"/>
 		</element>
 		<element name="lamp135" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="480" y="544" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_135" ref="debug_lamp_label_135">
-			<bounds x="495" y="559" width="30" height="30"/>
-		</element>
 		<element name="lamp136" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="544" y="544" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_136" ref="debug_lamp_label_136">
-			<bounds x="559" y="559" width="30" height="30"/>
 		</element>
 		<element name="lamp137" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="608" y="544" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_137" ref="debug_lamp_label_137">
-			<bounds x="623" y="559" width="30" height="30"/>
-		</element>
 		<element name="lamp138" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="672" y="544" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_138" ref="debug_lamp_label_138">
-			<bounds x="687" y="559" width="30" height="30"/>
 		</element>
 		<element name="lamp139" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="736" y="544" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_139" ref="debug_lamp_label_139">
-			<bounds x="751" y="559" width="30" height="30"/>
-		</element>
 		<element name="lamp140" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="800" y="544" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_140" ref="debug_lamp_label_140">
-			<bounds x="815" y="559" width="30" height="30"/>
 		</element>
 		<element name="lamp141" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="864" y="544" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_141" ref="debug_lamp_label_141">
-			<bounds x="879" y="559" width="30" height="30"/>
-		</element>
 		<element name="lamp142" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="928" y="544" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_142" ref="debug_lamp_label_142">
-			<bounds x="943" y="559" width="30" height="30"/>
 		</element>
 		<element name="lamp143" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="992" y="544" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_143" ref="debug_lamp_label_143">
-			<bounds x="1007" y="559" width="30" height="30"/>
-		</element>
 		<element name="lamp144" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="32" y="608" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_144" ref="debug_lamp_label_144">
-			<bounds x="47" y="623" width="30" height="30"/>
 		</element>
 		<element name="lamp145" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="96" y="608" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_145" ref="debug_lamp_label_145">
-			<bounds x="111" y="623" width="30" height="30"/>
-		</element>
 		<element name="lamp146" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="160" y="608" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_146" ref="debug_lamp_label_146">
-			<bounds x="175" y="623" width="30" height="30"/>
 		</element>
 		<element name="lamp147" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="224" y="608" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_147" ref="debug_lamp_label_147">
-			<bounds x="239" y="623" width="30" height="30"/>
-		</element>
 		<element name="lamp148" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="288" y="608" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_148" ref="debug_lamp_label_148">
-			<bounds x="303" y="623" width="30" height="30"/>
 		</element>
 		<element name="lamp149" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="352" y="608" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_149" ref="debug_lamp_label_149">
-			<bounds x="367" y="623" width="30" height="30"/>
-		</element>
 		<element name="lamp150" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="416" y="608" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_150" ref="debug_lamp_label_150">
-			<bounds x="431" y="623" width="30" height="30"/>
 		</element>
 		<element name="lamp151" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="480" y="608" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_151" ref="debug_lamp_label_151">
-			<bounds x="495" y="623" width="30" height="30"/>
-		</element>
 		<element name="lamp152" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="544" y="608" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_152" ref="debug_lamp_label_152">
-			<bounds x="559" y="623" width="30" height="30"/>
 		</element>
 		<element name="lamp153" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="608" y="608" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_153" ref="debug_lamp_label_153">
-			<bounds x="623" y="623" width="30" height="30"/>
-		</element>
 		<element name="lamp154" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="672" y="608" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_154" ref="debug_lamp_label_154">
-			<bounds x="687" y="623" width="30" height="30"/>
 		</element>
 		<element name="lamp155" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="736" y="608" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_155" ref="debug_lamp_label_155">
-			<bounds x="751" y="623" width="30" height="30"/>
-		</element>
 		<element name="lamp156" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="800" y="608" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_156" ref="debug_lamp_label_156">
-			<bounds x="815" y="623" width="30" height="30"/>
 		</element>
 		<element name="lamp157" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="864" y="608" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_157" ref="debug_lamp_label_157">
-			<bounds x="879" y="623" width="30" height="30"/>
-		</element>
 		<element name="lamp158" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="928" y="608" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_158" ref="debug_lamp_label_158">
-			<bounds x="943" y="623" width="30" height="30"/>
 		</element>
 		<element name="lamp159" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="992" y="608" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_159" ref="debug_lamp_label_159">
-			<bounds x="1007" y="623" width="30" height="30"/>
-		</element>
 		<element name="lamp160" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="32" y="672" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_160" ref="debug_lamp_label_160">
-			<bounds x="47" y="687" width="30" height="30"/>
 		</element>
 		<element name="lamp161" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="96" y="672" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_161" ref="debug_lamp_label_161">
-			<bounds x="111" y="687" width="30" height="30"/>
-		</element>
 		<element name="lamp162" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="160" y="672" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_162" ref="debug_lamp_label_162">
-			<bounds x="175" y="687" width="30" height="30"/>
 		</element>
 		<element name="lamp163" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="224" y="672" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_163" ref="debug_lamp_label_163">
-			<bounds x="239" y="687" width="30" height="30"/>
-		</element>
 		<element name="lamp164" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="288" y="672" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_164" ref="debug_lamp_label_164">
-			<bounds x="303" y="687" width="30" height="30"/>
 		</element>
 		<element name="lamp165" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="352" y="672" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_165" ref="debug_lamp_label_165">
-			<bounds x="367" y="687" width="30" height="30"/>
-		</element>
 		<element name="lamp166" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="416" y="672" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_166" ref="debug_lamp_label_166">
-			<bounds x="431" y="687" width="30" height="30"/>
 		</element>
 		<element name="lamp167" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="480" y="672" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_167" ref="debug_lamp_label_167">
-			<bounds x="495" y="687" width="30" height="30"/>
-		</element>
 		<element name="lamp168" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="544" y="672" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_168" ref="debug_lamp_label_168">
-			<bounds x="559" y="687" width="30" height="30"/>
 		</element>
 		<element name="lamp169" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="608" y="672" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_169" ref="debug_lamp_label_169">
-			<bounds x="623" y="687" width="30" height="30"/>
-		</element>
 		<element name="lamp170" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="672" y="672" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_170" ref="debug_lamp_label_170">
-			<bounds x="687" y="687" width="30" height="30"/>
 		</element>
 		<element name="lamp171" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="736" y="672" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_171" ref="debug_lamp_label_171">
-			<bounds x="751" y="687" width="30" height="30"/>
-		</element>
 		<element name="lamp172" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="800" y="672" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_172" ref="debug_lamp_label_172">
-			<bounds x="815" y="687" width="30" height="30"/>
 		</element>
 		<element name="lamp173" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="864" y="672" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_173" ref="debug_lamp_label_173">
-			<bounds x="879" y="687" width="30" height="30"/>
-		</element>
 		<element name="lamp174" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="928" y="672" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_174" ref="debug_lamp_label_174">
-			<bounds x="943" y="687" width="30" height="30"/>
 		</element>
 		<element name="lamp175" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="992" y="672" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_175" ref="debug_lamp_label_175">
-			<bounds x="1007" y="687" width="30" height="30"/>
-		</element>
 		<element name="lamp176" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="32" y="736" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_176" ref="debug_lamp_label_176">
-			<bounds x="47" y="751" width="30" height="30"/>
 		</element>
 		<element name="lamp177" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="96" y="736" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_177" ref="debug_lamp_label_177">
-			<bounds x="111" y="751" width="30" height="30"/>
-		</element>
 		<element name="lamp178" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="160" y="736" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_178" ref="debug_lamp_label_178">
-			<bounds x="175" y="751" width="30" height="30"/>
 		</element>
 		<element name="lamp179" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="224" y="736" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_179" ref="debug_lamp_label_179">
-			<bounds x="239" y="751" width="30" height="30"/>
-		</element>
 		<element name="lamp180" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="288" y="736" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_180" ref="debug_lamp_label_180">
-			<bounds x="303" y="751" width="30" height="30"/>
 		</element>
 		<element name="lamp181" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="352" y="736" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_181" ref="debug_lamp_label_181">
-			<bounds x="367" y="751" width="30" height="30"/>
-		</element>
 		<element name="lamp182" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="416" y="736" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_182" ref="debug_lamp_label_182">
-			<bounds x="431" y="751" width="30" height="30"/>
 		</element>
 		<element name="lamp183" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="480" y="736" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_183" ref="debug_lamp_label_183">
-			<bounds x="495" y="751" width="30" height="30"/>
-		</element>
 		<element name="lamp184" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="544" y="736" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_184" ref="debug_lamp_label_184">
-			<bounds x="559" y="751" width="30" height="30"/>
 		</element>
 		<element name="lamp185" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="608" y="736" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_185" ref="debug_lamp_label_185">
-			<bounds x="623" y="751" width="30" height="30"/>
-		</element>
 		<element name="lamp186" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="672" y="736" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_186" ref="debug_lamp_label_186">
-			<bounds x="687" y="751" width="30" height="30"/>
 		</element>
 		<element name="lamp187" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="736" y="736" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_187" ref="debug_lamp_label_187">
-			<bounds x="751" y="751" width="30" height="30"/>
-		</element>
 		<element name="lamp188" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="800" y="736" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_188" ref="debug_lamp_label_188">
-			<bounds x="815" y="751" width="30" height="30"/>
 		</element>
 		<element name="lamp189" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="864" y="736" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_189" ref="debug_lamp_label_189">
-			<bounds x="879" y="751" width="30" height="30"/>
-		</element>
 		<element name="lamp190" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="928" y="736" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_190" ref="debug_lamp_label_190">
-			<bounds x="943" y="751" width="30" height="30"/>
 		</element>
 		<element name="lamp191" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="992" y="736" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_191" ref="debug_lamp_label_191">
-			<bounds x="1007" y="751" width="30" height="30"/>
-		</element>
 		<element name="lamp192" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="32" y="800" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_192" ref="debug_lamp_label_192">
-			<bounds x="47" y="815" width="30" height="30"/>
 		</element>
 		<element name="lamp193" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="96" y="800" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_193" ref="debug_lamp_label_193">
-			<bounds x="111" y="815" width="30" height="30"/>
-		</element>
 		<element name="lamp194" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="160" y="800" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_194" ref="debug_lamp_label_194">
-			<bounds x="175" y="815" width="30" height="30"/>
 		</element>
 		<element name="lamp195" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="224" y="800" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_195" ref="debug_lamp_label_195">
-			<bounds x="239" y="815" width="30" height="30"/>
-		</element>
 		<element name="lamp196" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="288" y="800" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_196" ref="debug_lamp_label_196">
-			<bounds x="303" y="815" width="30" height="30"/>
 		</element>
 		<element name="lamp197" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="352" y="800" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_197" ref="debug_lamp_label_197">
-			<bounds x="367" y="815" width="30" height="30"/>
-		</element>
 		<element name="lamp198" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="416" y="800" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_198" ref="debug_lamp_label_198">
-			<bounds x="431" y="815" width="30" height="30"/>
 		</element>
 		<element name="lamp199" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="480" y="800" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_199" ref="debug_lamp_label_199">
-			<bounds x="495" y="815" width="30" height="30"/>
-		</element>
 		<element name="lamp200" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="544" y="800" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_200" ref="debug_lamp_label_200">
-			<bounds x="559" y="815" width="30" height="30"/>
 		</element>
 		<element name="lamp201" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="608" y="800" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_201" ref="debug_lamp_label_201">
-			<bounds x="623" y="815" width="30" height="30"/>
-		</element>
 		<element name="lamp202" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="672" y="800" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_202" ref="debug_lamp_label_202">
-			<bounds x="687" y="815" width="30" height="30"/>
 		</element>
 		<element name="lamp203" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="736" y="800" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_203" ref="debug_lamp_label_203">
-			<bounds x="751" y="815" width="30" height="30"/>
-		</element>
 		<element name="lamp204" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="800" y="800" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_204" ref="debug_lamp_label_204">
-			<bounds x="815" y="815" width="30" height="30"/>
 		</element>
 		<element name="lamp205" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="864" y="800" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_205" ref="debug_lamp_label_205">
-			<bounds x="879" y="815" width="30" height="30"/>
-		</element>
 		<element name="lamp206" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="928" y="800" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_206" ref="debug_lamp_label_206">
-			<bounds x="943" y="815" width="30" height="30"/>
 		</element>
 		<element name="lamp207" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="992" y="800" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_207" ref="debug_lamp_label_207">
-			<bounds x="1007" y="815" width="30" height="30"/>
-		</element>
 		<element name="lamp208" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="32" y="864" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_208" ref="debug_lamp_label_208">
-			<bounds x="47" y="879" width="30" height="30"/>
 		</element>
 		<element name="lamp209" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="96" y="864" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_209" ref="debug_lamp_label_209">
-			<bounds x="111" y="879" width="30" height="30"/>
-		</element>
 		<element name="lamp210" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="160" y="864" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_210" ref="debug_lamp_label_210">
-			<bounds x="175" y="879" width="30" height="30"/>
 		</element>
 		<element name="lamp211" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="224" y="864" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_211" ref="debug_lamp_label_211">
-			<bounds x="239" y="879" width="30" height="30"/>
-		</element>
 		<element name="lamp212" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="288" y="864" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_212" ref="debug_lamp_label_212">
-			<bounds x="303" y="879" width="30" height="30"/>
 		</element>
 		<element name="lamp213" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="352" y="864" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_213" ref="debug_lamp_label_213">
-			<bounds x="367" y="879" width="30" height="30"/>
-		</element>
 		<element name="lamp214" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="416" y="864" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_214" ref="debug_lamp_label_214">
-			<bounds x="431" y="879" width="30" height="30"/>
 		</element>
 		<element name="lamp215" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="480" y="864" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_215" ref="debug_lamp_label_215">
-			<bounds x="495" y="879" width="30" height="30"/>
-		</element>
 		<element name="lamp216" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="544" y="864" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_216" ref="debug_lamp_label_216">
-			<bounds x="559" y="879" width="30" height="30"/>
 		</element>
 		<element name="lamp217" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="608" y="864" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_217" ref="debug_lamp_label_217">
-			<bounds x="623" y="879" width="30" height="30"/>
-		</element>
 		<element name="lamp218" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="672" y="864" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_218" ref="debug_lamp_label_218">
-			<bounds x="687" y="879" width="30" height="30"/>
 		</element>
 		<element name="lamp219" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="736" y="864" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_219" ref="debug_lamp_label_219">
-			<bounds x="751" y="879" width="30" height="30"/>
-		</element>
 		<element name="lamp220" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="800" y="864" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_220" ref="debug_lamp_label_220">
-			<bounds x="815" y="879" width="30" height="30"/>
 		</element>
 		<element name="lamp221" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="864" y="864" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_221" ref="debug_lamp_label_221">
-			<bounds x="879" y="879" width="30" height="30"/>
-		</element>
 		<element name="lamp222" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="928" y="864" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_222" ref="debug_lamp_label_222">
-			<bounds x="943" y="879" width="30" height="30"/>
 		</element>
 		<element name="lamp223" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="992" y="864" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_223" ref="debug_lamp_label_223">
-			<bounds x="1007" y="879" width="30" height="30"/>
-		</element>
 		<element name="lamp224" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="32" y="928" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_224" ref="debug_lamp_label_224">
-			<bounds x="47" y="943" width="30" height="30"/>
 		</element>
 		<element name="lamp225" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="96" y="928" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_225" ref="debug_lamp_label_225">
-			<bounds x="111" y="943" width="30" height="30"/>
-		</element>
 		<element name="lamp226" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="160" y="928" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_226" ref="debug_lamp_label_226">
-			<bounds x="175" y="943" width="30" height="30"/>
 		</element>
 		<element name="lamp227" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="224" y="928" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_227" ref="debug_lamp_label_227">
-			<bounds x="239" y="943" width="30" height="30"/>
-		</element>
 		<element name="lamp228" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="288" y="928" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_228" ref="debug_lamp_label_228">
-			<bounds x="303" y="943" width="30" height="30"/>
 		</element>
 		<element name="lamp229" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="352" y="928" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_229" ref="debug_lamp_label_229">
-			<bounds x="367" y="943" width="30" height="30"/>
-		</element>
 		<element name="lamp230" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="416" y="928" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_230" ref="debug_lamp_label_230">
-			<bounds x="431" y="943" width="30" height="30"/>
 		</element>
 		<element name="lamp231" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="480" y="928" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_231" ref="debug_lamp_label_231">
-			<bounds x="495" y="943" width="30" height="30"/>
-		</element>
 		<element name="lamp232" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="544" y="928" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_232" ref="debug_lamp_label_232">
-			<bounds x="559" y="943" width="30" height="30"/>
 		</element>
 		<element name="lamp233" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="608" y="928" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_233" ref="debug_lamp_label_233">
-			<bounds x="623" y="943" width="30" height="30"/>
-		</element>
 		<element name="lamp234" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="672" y="928" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_234" ref="debug_lamp_label_234">
-			<bounds x="687" y="943" width="30" height="30"/>
 		</element>
 		<element name="lamp235" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="736" y="928" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_235" ref="debug_lamp_label_235">
-			<bounds x="751" y="943" width="30" height="30"/>
-		</element>
 		<element name="lamp236" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="800" y="928" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_236" ref="debug_lamp_label_236">
-			<bounds x="815" y="943" width="30" height="30"/>
 		</element>
 		<element name="lamp237" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="864" y="928" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_237" ref="debug_lamp_label_237">
-			<bounds x="879" y="943" width="30" height="30"/>
-		</element>
 		<element name="lamp238" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="928" y="928" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_238" ref="debug_lamp_label_238">
-			<bounds x="943" y="943" width="30" height="30"/>
 		</element>
 		<element name="lamp239" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="992" y="928" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_239" ref="debug_lamp_label_239">
-			<bounds x="1007" y="943" width="30" height="30"/>
-		</element>
 		<element name="lamp240" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="32" y="992" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_240" ref="debug_lamp_label_240">
-			<bounds x="47" y="1007" width="30" height="30"/>
 		</element>
 		<element name="lamp241" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="96" y="992" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_241" ref="debug_lamp_label_241">
-			<bounds x="111" y="1007" width="30" height="30"/>
-		</element>
 		<element name="lamp242" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="160" y="992" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_242" ref="debug_lamp_label_242">
-			<bounds x="175" y="1007" width="30" height="30"/>
 		</element>
 		<element name="lamp243" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="224" y="992" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_243" ref="debug_lamp_label_243">
-			<bounds x="239" y="1007" width="30" height="30"/>
-		</element>
 		<element name="lamp244" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="288" y="992" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_244" ref="debug_lamp_label_244">
-			<bounds x="303" y="1007" width="30" height="30"/>
 		</element>
 		<element name="lamp245" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="352" y="992" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_245" ref="debug_lamp_label_245">
-			<bounds x="367" y="1007" width="30" height="30"/>
-		</element>
 		<element name="lamp246" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="416" y="992" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_246" ref="debug_lamp_label_246">
-			<bounds x="431" y="1007" width="30" height="30"/>
 		</element>
 		<element name="lamp247" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="480" y="992" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_247" ref="debug_lamp_label_247">
-			<bounds x="495" y="1007" width="30" height="30"/>
-		</element>
 		<element name="lamp248" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="544" y="992" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_248" ref="debug_lamp_label_248">
-			<bounds x="559" y="1007" width="30" height="30"/>
 		</element>
 		<element name="lamp249" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="608" y="992" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_249" ref="debug_lamp_label_249">
-			<bounds x="623" y="1007" width="30" height="30"/>
-		</element>
 		<element name="lamp250" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="672" y="992" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_250" ref="debug_lamp_label_250">
-			<bounds x="687" y="1007" width="30" height="30"/>
 		</element>
 		<element name="lamp251" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="736" y="992" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_251" ref="debug_lamp_label_251">
-			<bounds x="751" y="1007" width="30" height="30"/>
-		</element>
 		<element name="lamp252" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="800" y="992" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_252" ref="debug_lamp_label_252">
-			<bounds x="815" y="1007" width="30" height="30"/>
 		</element>
 		<element name="lamp253" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="864" y="992" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_253" ref="debug_lamp_label_253">
-			<bounds x="879" y="1007" width="30" height="30"/>
-		</element>
 		<element name="lamp254" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="928" y="992" width="60" height="60"/>
-		</element>
-		<element name="debug_lamp_label_254" ref="debug_lamp_label_254">
-			<bounds x="943" y="1007" width="30" height="30"/>
 		</element>
 		<element name="lamp255" ref="debug_lamp_unreferenced" state="0">
 			<bounds x="992" y="992" width="60" height="60"/>
 		</element>
-		<element name="debug_lamp_label_255" ref="debug_lamp_label_255">
-			<bounds x="1007" y="1007" width="30" height="30"/>
-		</element>
+
+		<repeat count="16">
+			<param name="s" start="0" increment="16" />
+			<param name="y" start="47" increment="64" />
+			<repeat count="16">
+				<param name="n" start="~s~" increment="1" />
+				<param name="x" start="47" increment="64" />
+				<element name="debug_lamp_label_~n~" ref="debug_lamp_label_~n~">
+					<bounds x="~x~" y="~y~" width="30" height="30"/>
+				</element>
+			</repeat>
+		</repeat>
+
 		<element name="debug_button_0" ref="debug_button_unreferenced" state="0" inputtag="ORANGE1" inputmask="0x01">
 			<bounds x="1100" y="660" width="80" height="44"/>
-		</element>
-		<element name="debug_button_label_0" ref="debug_button_label_0">
-			<bounds x="1120" y="671" width="40" height="22"/>
 		</element>
 		<element name="debug_button_1" ref="debug_button_unreferenced" state="0" inputtag="ORANGE1" inputmask="0x02">
 			<bounds x="1184" y="660" width="80" height="44"/>
 		</element>
-		<element name="debug_button_label_1" ref="debug_button_label_1">
-			<bounds x="1204" y="671" width="40" height="22"/>
-		</element>
 		<element name="debug_button_2" ref="debug_button_unreferenced" state="0" inputtag="ORANGE1" inputmask="0x04">
 			<bounds x="1268" y="660" width="80" height="44"/>
-		</element>
-		<element name="debug_button_label_2" ref="debug_button_label_2">
-			<bounds x="1288" y="671" width="40" height="22"/>
 		</element>
 		<element name="debug_button_3" ref="debug_button_unreferenced" state="0" inputtag="ORANGE1" inputmask="0x08">
 			<bounds x="1352" y="660" width="80" height="44"/>
 		</element>
-		<element name="debug_button_label_3" ref="debug_button_label_3">
-			<bounds x="1372" y="671" width="40" height="22"/>
-		</element>
 		<element name="debug_button_4" ref="debug_button_unreferenced" state="0" inputtag="ORANGE1" inputmask="0x10">
 			<bounds x="1436" y="660" width="80" height="44"/>
-		</element>
-		<element name="debug_button_label_4" ref="debug_button_label_4">
-			<bounds x="1456" y="671" width="40" height="22"/>
 		</element>
 		<element name="debug_button_5" ref="debug_button_unreferenced" state="0" inputtag="ORANGE1" inputmask="0x20">
 			<bounds x="1520" y="660" width="80" height="44"/>
 		</element>
-		<element name="debug_button_label_5" ref="debug_button_label_5">
-			<bounds x="1540" y="671" width="40" height="22"/>
-		</element>
 		<element name="debug_button_6" ref="debug_button_unreferenced" state="0" inputtag="ORANGE1" inputmask="0x40">
 			<bounds x="1604" y="660" width="80" height="44"/>
-		</element>
-		<element name="debug_button_label_6" ref="debug_button_label_6">
-			<bounds x="1624" y="671" width="40" height="22"/>
 		</element>
 		<element name="debug_button_7" ref="debug_button_unreferenced" state="0" inputtag="ORANGE1" inputmask="0x80">
 			<bounds x="1688" y="660" width="80" height="44"/>
 		</element>
-		<element name="debug_button_label_7" ref="debug_button_label_7">
-			<bounds x="1708" y="671" width="40" height="22"/>
-		</element>
 		<element name="debug_button_8" ref="debug_button_unreferenced" state="0" inputtag="ORANGE2" inputmask="0x01">
 			<bounds x="1100" y="708" width="80" height="44"/>
-		</element>
-		<element name="debug_button_label_8" ref="debug_button_label_8">
-			<bounds x="1120" y="719" width="40" height="22"/>
 		</element>
 		<element name="debug_button_9" ref="debug_button_unreferenced" state="0" inputtag="ORANGE2" inputmask="0x02">
 			<bounds x="1184" y="708" width="80" height="44"/>
 		</element>
-		<element name="debug_button_label_9" ref="debug_button_label_9">
-			<bounds x="1204" y="719" width="40" height="22"/>
-		</element>
 		<element name="debug_button_10" ref="debug_button_unreferenced" state="0" inputtag="ORANGE2" inputmask="0x04">
 			<bounds x="1268" y="708" width="80" height="44"/>
-		</element>
-		<element name="debug_button_label_10" ref="debug_button_label_10">
-			<bounds x="1288" y="719" width="40" height="22"/>
 		</element>
 		<element name="debug_button_11" ref="debug_button_unreferenced" state="0" inputtag="ORANGE2" inputmask="0x08">
 			<bounds x="1352" y="708" width="80" height="44"/>
 		</element>
-		<element name="debug_button_label_11" ref="debug_button_label_11">
-			<bounds x="1372" y="719" width="40" height="22"/>
-		</element>
 		<element name="debug_button_12" ref="debug_button_unreferenced" state="0" inputtag="ORANGE2" inputmask="0x10">
 			<bounds x="1436" y="708" width="80" height="44"/>
-		</element>
-		<element name="debug_button_label_12" ref="debug_button_label_12">
-			<bounds x="1456" y="719" width="40" height="22"/>
 		</element>
 		<element name="debug_button_13" ref="debug_button_unreferenced" state="0" inputtag="ORANGE2" inputmask="0x20">
 			<bounds x="1520" y="708" width="80" height="44"/>
 		</element>
-		<element name="debug_button_label_13" ref="debug_button_label_13">
-			<bounds x="1540" y="719" width="40" height="22"/>
-		</element>
 		<element name="debug_button_14" ref="debug_button_unreferenced" state="0" inputtag="ORANGE2" inputmask="0x40">
 			<bounds x="1604" y="708" width="80" height="44"/>
-		</element>
-		<element name="debug_button_label_14" ref="debug_button_label_14">
-			<bounds x="1624" y="719" width="40" height="22"/>
 		</element>
 		<element name="debug_button_15" ref="debug_button_unreferenced" state="0" inputtag="ORANGE2" inputmask="0x80">
 			<bounds x="1688" y="708" width="80" height="44"/>
 		</element>
-		<element name="debug_button_label_15" ref="debug_button_label_15">
-			<bounds x="1708" y="719" width="40" height="22"/>
-		</element>
 		<element name="debug_button_16" ref="debug_button_unreferenced" state="0" inputtag="BLACK1" inputmask="0x01">
 			<bounds x="1100" y="756" width="80" height="44"/>
-		</element>
-		<element name="debug_button_label_16" ref="debug_button_label_16">
-			<bounds x="1120" y="767" width="40" height="22"/>
 		</element>
 		<element name="lamp48" ref="debug_button_standard" state="0" inputtag="BLACK1" inputmask="0x02">
 			<bounds x="1184" y="756" width="80" height="44"/>
 		</element>
-		<element name="debug_button_label_17" ref="debug_button_label_17">
-			<bounds x="1204" y="767" width="40" height="22"/>
-		</element>
 		<element name="lamp49" ref="debug_button_standard" state="0" inputtag="BLACK1" inputmask="0x04">
 			<bounds x="1268" y="756" width="80" height="44"/>
-		</element>
-		<element name="debug_button_label_18" ref="debug_button_label_18">
-			<bounds x="1288" y="767" width="40" height="22"/>
 		</element>
 		<element name="lamp50" ref="debug_button_standard" state="0" inputtag="BLACK1" inputmask="0x08">
 			<bounds x="1352" y="756" width="80" height="44"/>
 		</element>
-		<element name="debug_button_label_19" ref="debug_button_label_19">
-			<bounds x="1372" y="767" width="40" height="22"/>
-		</element>
 		<element name="debug_button_20" ref="debug_button_unreferenced" state="0" inputtag="BLACK1" inputmask="0x10">
 			<bounds x="1436" y="756" width="80" height="44"/>
-		</element>
-		<element name="debug_button_label_20" ref="debug_button_label_20">
-			<bounds x="1456" y="767" width="40" height="22"/>
 		</element>
 		<element name="debug_button_21" ref="debug_button_unreferenced" state="0" inputtag="BLACK1" inputmask="0x20">
 			<bounds x="1520" y="756" width="80" height="44"/>
 		</element>
-		<element name="debug_button_label_21" ref="debug_button_label_21">
-			<bounds x="1540" y="767" width="40" height="22"/>
-		</element>
 		<element name="debug_button_22" ref="debug_button_unreferenced" state="0" inputtag="BLACK1" inputmask="0x40">
 			<bounds x="1604" y="756" width="80" height="44"/>
-		</element>
-		<element name="debug_button_label_22" ref="debug_button_label_22">
-			<bounds x="1624" y="767" width="40" height="22"/>
 		</element>
 		<element name="debug_button_23" ref="debug_button_unreferenced" state="0" inputtag="BLACK1" inputmask="0x80">
 			<bounds x="1688" y="756" width="80" height="44"/>
 		</element>
-		<element name="debug_button_label_23" ref="debug_button_label_23">
-			<bounds x="1708" y="767" width="40" height="22"/>
-		</element>
 		<element name="lamp24" ref="debug_button_standard" state="0" inputtag="BLACK2" inputmask="0x01">
 			<bounds x="1100" y="804" width="80" height="44"/>
-		</element>
-		<element name="debug_button_label_24" ref="debug_button_label_24">
-			<bounds x="1120" y="815" width="40" height="22"/>
 		</element>
 		<element name="lamp25" ref="debug_button_standard" state="0" inputtag="BLACK2" inputmask="0x02">
 			<bounds x="1184" y="804" width="80" height="44"/>
 		</element>
-		<element name="debug_button_label_25" ref="debug_button_label_25">
-			<bounds x="1204" y="815" width="40" height="22"/>
-		</element>
 		<element name="lamp26" ref="debug_button_standard" state="0" inputtag="BLACK2" inputmask="0x04">
 			<bounds x="1268" y="804" width="80" height="44"/>
-		</element>
-		<element name="debug_button_label_26" ref="debug_button_label_26">
-			<bounds x="1288" y="815" width="40" height="22"/>
 		</element>
 		<element name="lamp32" ref="debug_button_standard" state="0" inputtag="BLACK2" inputmask="0x08">
 			<bounds x="1352" y="804" width="80" height="44"/>
 		</element>
-		<element name="debug_button_label_27" ref="debug_button_label_27">
-			<bounds x="1372" y="815" width="40" height="22"/>
-		</element>
 		<element name="lamp33" ref="debug_button_standard" state="0" inputtag="BLACK2" inputmask="0x10">
 			<bounds x="1436" y="804" width="80" height="44"/>
-		</element>
-		<element name="debug_button_label_28" ref="debug_button_label_28">
-			<bounds x="1456" y="815" width="40" height="22"/>
 		</element>
 		<element name="lamp34" ref="debug_button_standard" state="0" inputtag="BLACK2" inputmask="0x20">
 			<bounds x="1520" y="804" width="80" height="44"/>
 		</element>
-		<element name="debug_button_label_29" ref="debug_button_label_29">
-			<bounds x="1540" y="815" width="40" height="22"/>
-		</element>
 		<element name="lamp40" ref="debug_button_standard" state="0" inputtag="BLACK2" inputmask="0x40">
 			<bounds x="1604" y="804" width="80" height="44"/>
-		</element>
-		<element name="debug_button_label_30" ref="debug_button_label_30">
-			<bounds x="1624" y="815" width="40" height="22"/>
 		</element>
 		<element name="lamp41" ref="debug_button_standard" state="0" inputtag="BLACK2" inputmask="0x80">
 			<bounds x="1688" y="804" width="80" height="44"/>
 		</element>
-		<element name="debug_button_label_31" ref="debug_button_label_31">
-			<bounds x="1708" y="815" width="40" height="22"/>
-		</element>
 		<element name="debug_button_32" ref="debug_button_unreferenced" state="0" inputtag="DIL1" inputmask="0x01">
 			<bounds x="1100" y="852" width="80" height="44"/>
-		</element>
-		<element name="debug_button_label_32" ref="debug_button_label_32">
-			<bounds x="1120" y="863" width="40" height="22"/>
 		</element>
 		<element name="debug_button_33" ref="debug_button_unreferenced" state="0" inputtag="DIL1" inputmask="0x02">
 			<bounds x="1184" y="852" width="80" height="44"/>
 		</element>
-		<element name="debug_button_label_33" ref="debug_button_label_33">
-			<bounds x="1204" y="863" width="40" height="22"/>
-		</element>
 		<element name="debug_button_34" ref="debug_button_unreferenced" state="0" inputtag="DIL1" inputmask="0x04">
 			<bounds x="1268" y="852" width="80" height="44"/>
-		</element>
-		<element name="debug_button_label_34" ref="debug_button_label_34">
-			<bounds x="1288" y="863" width="40" height="22"/>
 		</element>
 		<element name="debug_button_35" ref="debug_button_unreferenced" state="0" inputtag="DIL1" inputmask="0x08">
 			<bounds x="1352" y="852" width="80" height="44"/>
 		</element>
-		<element name="debug_button_label_35" ref="debug_button_label_35">
-			<bounds x="1372" y="863" width="40" height="22"/>
-		</element>
 		<element name="debug_button_36" ref="debug_button_unreferenced" state="0" inputtag="DIL1" inputmask="0x10">
 			<bounds x="1436" y="852" width="80" height="44"/>
-		</element>
-		<element name="debug_button_label_36" ref="debug_button_label_36">
-			<bounds x="1456" y="863" width="40" height="22"/>
 		</element>
 		<element name="debug_button_37" ref="debug_button_unreferenced" state="0" inputtag="DIL1" inputmask="0x20">
 			<bounds x="1520" y="852" width="80" height="44"/>
 		</element>
-		<element name="debug_button_label_37" ref="debug_button_label_37">
-			<bounds x="1540" y="863" width="40" height="22"/>
-		</element>
 		<element name="debug_button_38" ref="debug_button_unreferenced" state="0" inputtag="DIL1" inputmask="0x40">
 			<bounds x="1604" y="852" width="80" height="44"/>
-		</element>
-		<element name="debug_button_label_38" ref="debug_button_label_38">
-			<bounds x="1624" y="863" width="40" height="22"/>
 		</element>
 		<element name="debug_button_39" ref="debug_button_unreferenced" state="0" inputtag="DIL1" inputmask="0x80">
 			<bounds x="1688" y="852" width="80" height="44"/>
 		</element>
-		<element name="debug_button_label_39" ref="debug_button_label_39">
-			<bounds x="1708" y="863" width="40" height="22"/>
-		</element>
 		<element name="debug_button_40" ref="debug_button_unreferenced" state="0" inputtag="DIL2" inputmask="0x01">
 			<bounds x="1100" y="900" width="80" height="44"/>
-		</element>
-		<element name="debug_button_label_40" ref="debug_button_label_40">
-			<bounds x="1120" y="911" width="40" height="22"/>
 		</element>
 		<element name="debug_button_41" ref="debug_button_unreferenced" state="0" inputtag="DIL2" inputmask="0x02">
 			<bounds x="1184" y="900" width="80" height="44"/>
 		</element>
-		<element name="debug_button_label_41" ref="debug_button_label_41">
-			<bounds x="1204" y="911" width="40" height="22"/>
-		</element>
 		<element name="debug_button_42" ref="debug_button_unreferenced" state="0" inputtag="DIL2" inputmask="0x04">
 			<bounds x="1268" y="900" width="80" height="44"/>
-		</element>
-		<element name="debug_button_label_42" ref="debug_button_label_42">
-			<bounds x="1288" y="911" width="40" height="22"/>
 		</element>
 		<element name="debug_button_43" ref="debug_button_unreferenced" state="0" inputtag="DIL2" inputmask="0x08">
 			<bounds x="1352" y="900" width="80" height="44"/>
 		</element>
-		<element name="debug_button_label_43" ref="debug_button_label_43">
-			<bounds x="1372" y="911" width="40" height="22"/>
-		</element>
 		<element name="debug_button_44" ref="debug_button_unreferenced" state="0" inputtag="DIL2" inputmask="0x10">
 			<bounds x="1436" y="900" width="80" height="44"/>
-		</element>
-		<element name="debug_button_label_44" ref="debug_button_label_44">
-			<bounds x="1456" y="911" width="40" height="22"/>
 		</element>
 		<element name="debug_button_45" ref="debug_button_unreferenced" state="0" inputtag="DIL2" inputmask="0x20">
 			<bounds x="1520" y="900" width="80" height="44"/>
 		</element>
-		<element name="debug_button_label_45" ref="debug_button_label_45">
-			<bounds x="1540" y="911" width="40" height="22"/>
-		</element>
 		<element name="debug_button_46" ref="debug_button_unreferenced" state="0" inputtag="DIL2" inputmask="0x40">
 			<bounds x="1604" y="900" width="80" height="44"/>
-		</element>
-		<element name="debug_button_label_46" ref="debug_button_label_46">
-			<bounds x="1624" y="911" width="40" height="22"/>
 		</element>
 		<element name="debug_button_47" ref="debug_button_unreferenced" state="0" inputtag="DIL2" inputmask="0x80">
 			<bounds x="1688" y="900" width="80" height="44"/>
 		</element>
-		<element name="debug_button_label_47" ref="debug_button_label_47">
-			<bounds x="1708" y="911" width="40" height="22"/>
-		</element>
 		<element name="debug_button_48" ref="debug_button_unreferenced" state="0" inputtag="AUX1" inputmask="0x01">
 			<bounds x="1100" y="948" width="80" height="44"/>
-		</element>
-		<element name="debug_button_label_48" ref="debug_button_label_48">
-			<bounds x="1120" y="959" width="40" height="22"/>
 		</element>
 		<element name="debug_button_49" ref="debug_button_unreferenced" state="0" inputtag="AUX1" inputmask="0x02">
 			<bounds x="1184" y="948" width="80" height="44"/>
 		</element>
-		<element name="debug_button_label_49" ref="debug_button_label_49">
-			<bounds x="1204" y="959" width="40" height="22"/>
-		</element>
 		<element name="debug_button_50" ref="debug_button_unreferenced" state="0" inputtag="AUX1" inputmask="0x04">
 			<bounds x="1268" y="948" width="80" height="44"/>
-		</element>
-		<element name="debug_button_label_50" ref="debug_button_label_50">
-			<bounds x="1288" y="959" width="40" height="22"/>
 		</element>
 		<element name="debug_button_51" ref="debug_button_unreferenced" state="0" inputtag="AUX1" inputmask="0x08">
 			<bounds x="1352" y="948" width="80" height="44"/>
 		</element>
-		<element name="debug_button_label_51" ref="debug_button_label_51">
-			<bounds x="1372" y="959" width="40" height="22"/>
-		</element>
 		<element name="debug_button_52" ref="debug_button_unreferenced" state="0" inputtag="AUX1" inputmask="0x10">
 			<bounds x="1436" y="948" width="80" height="44"/>
-		</element>
-		<element name="debug_button_label_52" ref="debug_button_label_52">
-			<bounds x="1456" y="959" width="40" height="22"/>
 		</element>
 		<element name="debug_button_53" ref="debug_button_unreferenced" state="0" inputtag="AUX1" inputmask="0x20">
 			<bounds x="1520" y="948" width="80" height="44"/>
 		</element>
-		<element name="debug_button_label_53" ref="debug_button_label_53">
-			<bounds x="1540" y="959" width="40" height="22"/>
-		</element>
 		<element name="debug_button_54" ref="debug_button_unreferenced" state="0" inputtag="AUX1" inputmask="0x40">
 			<bounds x="1604" y="948" width="80" height="44"/>
-		</element>
-		<element name="debug_button_label_54" ref="debug_button_label_54">
-			<bounds x="1624" y="959" width="40" height="22"/>
 		</element>
 		<element name="debug_button_55" ref="debug_button_unreferenced" state="0" inputtag="AUX1" inputmask="0x80">
 			<bounds x="1688" y="948" width="80" height="44"/>
 		</element>
-		<element name="debug_button_label_55" ref="debug_button_label_55">
-			<bounds x="1708" y="959" width="40" height="22"/>
-		</element>
 		<element name="debug_button_56" ref="debug_button_unreferenced" state="0" inputtag="AUX2" inputmask="0x01">
 			<bounds x="1100" y="996" width="80" height="44"/>
-		</element>
-		<element name="debug_button_label_56" ref="debug_button_label_56">
-			<bounds x="1120" y="1007" width="40" height="22"/>
 		</element>
 		<element name="debug_button_57" ref="debug_button_unreferenced" state="0" inputtag="AUX2" inputmask="0x02">
 			<bounds x="1184" y="996" width="80" height="44"/>
 		</element>
-		<element name="debug_button_label_57" ref="debug_button_label_57">
-			<bounds x="1204" y="1007" width="40" height="22"/>
-		</element>
 		<element name="debug_button_58" ref="debug_button_unreferenced" state="0" inputtag="AUX2" inputmask="0x04">
 			<bounds x="1268" y="996" width="80" height="44"/>
-		</element>
-		<element name="debug_button_label_58" ref="debug_button_label_58">
-			<bounds x="1288" y="1007" width="40" height="22"/>
 		</element>
 		<element name="debug_button_59" ref="debug_button_unreferenced" state="0" inputtag="AUX2" inputmask="0x08">
 			<bounds x="1352" y="996" width="80" height="44"/>
 		</element>
-		<element name="debug_button_label_59" ref="debug_button_label_59">
-			<bounds x="1372" y="1007" width="40" height="22"/>
-		</element>
 		<element name="debug_button_60" ref="debug_button_unreferenced" state="0" inputtag="AUX2" inputmask="0x10">
 			<bounds x="1436" y="996" width="80" height="44"/>
-		</element>
-		<element name="debug_button_label_60" ref="debug_button_label_60">
-			<bounds x="1456" y="1007" width="40" height="22"/>
 		</element>
 		<element name="debug_button_61" ref="debug_button_unreferenced" state="0" inputtag="AUX2" inputmask="0x20">
 			<bounds x="1520" y="996" width="80" height="44"/>
 		</element>
-		<element name="debug_button_label_61" ref="debug_button_label_61">
-			<bounds x="1540" y="1007" width="40" height="22"/>
-		</element>
 		<element name="debug_button_62" ref="debug_button_unreferenced" state="0" inputtag="AUX2" inputmask="0x40">
 			<bounds x="1604" y="996" width="80" height="44"/>
-		</element>
-		<element name="debug_button_label_62" ref="debug_button_label_62">
-			<bounds x="1624" y="1007" width="40" height="22"/>
 		</element>
 		<element name="lamp56" ref="debug_button_standard" state="0" inputtag="AUX2" inputmask="0x80">
 			<bounds x="1688" y="996" width="80" height="44"/>
 		</element>
-		<element name="debug_button_label_63" ref="debug_button_label_63">
-			<bounds x="1708" y="1007" width="40" height="22"/>
-		</element>
-		<element name="vfd15" ref="debug_vfd" state="0">
-			<bounds x="1150" y="600" width="32" height="48"/>
-		</element>
-		<element name="vfd14" ref="debug_vfd" state="0">
-			<bounds x="1182" y="600" width="32" height="48"/>
-		</element>
-		<element name="vfd13" ref="debug_vfd" state="0">
-			<bounds x="1214" y="600" width="32" height="48"/>
-		</element>
-		<element name="vfd12" ref="debug_vfd" state="0">
-			<bounds x="1246" y="600" width="32" height="48"/>
-		</element>
-		<element name="vfd11" ref="debug_vfd" state="0">
-			<bounds x="1278" y="600" width="32" height="48"/>
-		</element>
-		<element name="vfd10" ref="debug_vfd" state="0">
-			<bounds x="1310" y="600" width="32" height="48"/>
-		</element>
-		<element name="vfd9" ref="debug_vfd" state="0">
-			<bounds x="1342" y="600" width="32" height="48"/>
-		</element>
-		<element name="vfd8" ref="debug_vfd" state="0">
-			<bounds x="1374" y="600" width="32" height="48"/>
-		</element>
-		<element name="vfd7" ref="debug_vfd" state="0">
-			<bounds x="1406" y="600" width="32" height="48"/>
-		</element>
-		<element name="vfd6" ref="debug_vfd" state="0">
-			<bounds x="1438" y="600" width="32" height="48"/>
-		</element>
-		<element name="vfd5" ref="debug_vfd" state="0">
-			<bounds x="1470" y="600" width="32" height="48"/>
-		</element>
-		<element name="vfd4" ref="debug_vfd" state="0">
-			<bounds x="1502" y="600" width="32" height="48"/>
-		</element>
-		<element name="vfd3" ref="debug_vfd" state="0">
-			<bounds x="1534" y="600" width="32" height="48"/>
-		</element>
-		<element name="vfd2" ref="debug_vfd" state="0">
-			<bounds x="1566" y="600" width="32" height="48"/>
-		</element>
-		<element name="vfd1" ref="debug_vfd" state="0">
-			<bounds x="1598" y="600" width="32" height="48"/>
-		</element>
-		<element name="vfd0" ref="debug_vfd" state="0">
-			<bounds x="1630" y="600" width="32" height="48"/>
-		</element>
+
+		<repeat count="8">
+			<param name="s" start="0" increment="8" />
+			<param name="y" start="671" increment="48" />
+			<repeat count="8">
+				<param name="n" start="~s~" increment="1" />
+				<param name="x" start="1120" increment="84" />
+				<element name="debug_button_label_~n~" ref="debug_button_label_~n~">
+					<bounds x="~x~" y="~y~" width="40" height="22"/>
+				</element>
+			</repeat>
+		</repeat>
+
+		<repeat count="16">
+			<param name="n" start="15" increment="-1" />
+			<param name="x" start="1150" increment="32" />
+			<element name="vfd~n~" ref="debug_vfd" state="0">
+				<bounds x="~x~" y="600" width="32" height="48"/>
+			</element>
+		</repeat>
+
 		<element ref="reel_background">
 			<bounds x="1100" y="32" width="120" height="240"/>
 		</element>

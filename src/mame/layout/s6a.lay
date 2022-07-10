@@ -51,22 +51,22 @@ copyright-holders:Robbbert
 		</group>
 
 		<!-- Player 3 Score -->
-		<param name="s" value="17" />
+		<param name="s" value="21" />
 		<group ref="score">
 			<bounds left="10" top="165" right="308" bottom="204" />
 		</group>
 
 		<!-- Player 4 Score -->
-		<param name="s" value="25" />
+		<param name="s" value="29" />
 		<group ref="score">
 			<bounds left="10" top="225" right="308" bottom="264" />
 		</group>
 
 		<!-- Credits and Balls -->
-		<element name="digit16" ref="digit">
+		<element name="digit20" ref="digit">
 			<bounds left="10" top="345" right="44" bottom="384" />
 		</element>
-		<element name="digit24" ref="digit">
+		<element name="digit28" ref="digit">
 			<bounds left="54" top="345" right="88" bottom="384" />
 		</element>
 		<element name="digit60" ref="diag">

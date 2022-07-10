@@ -42,9 +42,9 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// device_nvram_interface
-	void nvram_default() override;
-	void nvram_read(emu_file &file) override;
-	void nvram_write(emu_file &file) override;
+	virtual void nvram_default() override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
 
 private:
 	int     m_gk_switch[6];         // Used to cache the switch settings.

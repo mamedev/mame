@@ -117,7 +117,7 @@ license:CC0
 	</software>
 
 	<software name="androids">
-	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+	<!-- Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks. -->
 		<description>Androids</description>
 		<year>1983</year>
 		<publisher>Timex Computer Corporation</publisher>
@@ -140,7 +140,7 @@ license:CC0
 	</software>
 
 	<software name="artworx">
-	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+	<!-- Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks. -->
 		<description>Artworx</description>
 		<year>1985</year>
 		<publisher>NovelSoft</publisher>
@@ -151,19 +151,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="assaltoa">
-		<description>Assalto A Embaixada</description>
-		<year>1982</year>
-		<publisher>TMX Portugal Ltda</publisher>
-		<part name="cass" interface="spectrum_cass">
-			<dataarea name="cass" size="18866">
-				<rom name="assalto a embaixada (1982)(tmx portugal ltda).tzx" size="18866" crc="adb7e4a1" sha1="89b661813b6fcb19aecabd93f5921e2f884ad55c"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="astrobla">
-	<!--    Thought to be a bootleg of Quicksilva's Spectrum release.   -->
+	<!-- Thought to be a bootleg of Quicksilva's Spectrum release. -->
 		<description>Astro Blaster (bootleg?)</description>
 		<year>1984</year>
 		<publisher>Metal Soft</publisher>
@@ -175,7 +164,7 @@ license:CC0
 	</software>
 
 	<software name="autoanaly">
-	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+	<!-- Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks. -->
 		<description>Auto Analyzer</description>
 		<year>1983</year>
 		<publisher>Timex Computer Corporation</publisher>
@@ -198,7 +187,7 @@ license:CC0
 	</software>
 
 	<software name="b64demo2068">
-	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+	<!-- Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks. -->
 		<description>Basic 64 Demo - TC 2068</description>
 		<year>1985</year>
 		<publisher>TMX Portugal Ltda</publisher>
@@ -283,7 +272,7 @@ license:CC0
 	</software>
 
 	<software name="chess">
-	<!--    Needs verification. This dump was previously thought to come from an alternate Spectrum release.    -->
+	<!-- Needs verification. This dump was previously thought to come from an alternate Spectrum release. -->
 		<description>Chess</description>
 		<year>1983</year>
 		<publisher>Timex Computer Corporation</publisher>
@@ -346,8 +335,8 @@ license:CC0
 	</software>
 
 	<software name="cozinhei">
-	<!--    Bad dump    -->
-	<!--    Portuguese adaptation of Mr. Wimpy  -->
+	<!-- Bad dump -->
+	<!-- Portuguese adaptation of Mr. Wimpy -->
 		<description>Cozinheiro</description>
 		<year>198?</year>
 		<publisher>TMX Portugal Ltda</publisher>
@@ -359,7 +348,7 @@ license:CC0
 	</software>
 
 	<software name="crazybug">
-	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+	<!-- Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks. -->
 		<description>Crazy Bugs</description>
 		<year>1983</year>
 		<publisher>Timex Computer Corporation</publisher>
@@ -422,7 +411,7 @@ license:CC0
 	</software>
 
 	<software name="desktopp">
-	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+	<!-- Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks. -->
 		<description>Desktop Publisher</description>
 		<year>1987</year>
 		<publisher>Charles Stelding</publisher>
@@ -434,7 +423,7 @@ license:CC0
 	</software>
 
 	<software name="disassem">
-	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+	<!-- Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks. -->
 		<description>Disassembler</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -479,7 +468,7 @@ license:CC0
 	</software>
 
 	<software name="formula">
-	<!--    Bad dump    -->
+	<!-- Bad dump -->
 		<description>Fórmula 1</description>
 		<year>198?</year>
 		<publisher>TMX Portugal Ltda</publisher>
@@ -491,7 +480,7 @@ license:CC0
 	</software>
 
 	<software name="frogger">
-	<!--    Bad dump    -->
+	<!-- Bad dump -->
 		<description>Frogger</description>
 		<year>1983</year>
 		<publisher>Games to Learn By Inc</publisher>
@@ -547,7 +536,7 @@ license:CC0
 	</software>
 
 	<software name="heroi">
-	<!--    Portuguese adaptation of H.E.R.O.   -->
+	<!-- Portuguese adaptation of H.E.R.O. -->
 		<description>Herói</description>
 		<year>198?</year>
 		<publisher>TMX Portugal Ltda</publisher>
@@ -570,7 +559,7 @@ license:CC0
 	</software>
 
 	<software name="horaspid">
-	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+	<!-- Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks. -->
 		<description>Horace &amp; the Spiders</description>
 		<year>1983</year>
 		<publisher>Timex Computer Corporation</publisher>
@@ -604,7 +593,7 @@ license:CC0
 	</software>
 
 	<software name="hotzd143" cloneof="hotzd195">
-	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+	<!-- Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks. -->
 		<description>Hot Z Disassembler v1.43</description>
 		<year>1984</year>
 		<publisher>Ray Kingsley</publisher>
@@ -616,7 +605,7 @@ license:CC0
 	</software>
 
 	<software name="hotzd184" cloneof="hotzd195">
-	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+	<!-- Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks. -->
 		<description>Hot Z Disassembler v1.84</description>
 		<year>1984</year>
 		<publisher>Ray Kingsley</publisher>
@@ -628,7 +617,7 @@ license:CC0
 	</software>
 
 	<software name="hotzd195">
-	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+	<!-- Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks. -->
 		<description>Hot Z Disassembler v1.95</description>
 		<year>1984</year>
 		<publisher>Ray Kingsley</publisher>
@@ -653,10 +642,10 @@ license:CC0
 	<software name="intrs232">
 		<description>Interface RS232</description>
 		<year>198?</year>
-		<publisher>Timex Computer Corporation</publisher>
+		<publisher>TMX Portugal Ltda</publisher>
 		<part name="cass" interface="spectrum_cass">
 			<dataarea name="cass" size="418">
-				<rom name="interface rs232 (198x)(timex computer corporation).tzx" size="418" crc="81e729fd" sha1="88c2e38ca230f2cb535f7ea404f807f2cfed9f6c"/>
+				<rom name="interface rs232 - timex computer.tzx" size="418" crc="81e729fd" sha1="88c2e38ca230f2cb535f7ea404f807f2cfed9f6c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -702,7 +691,7 @@ license:CC0
 	</software>
 
 	<software name="keyword1" cloneof="keyword5">
-	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+	<!-- Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks. -->
 		<description>Keyword v1</description>
 		<year>1984</year>
 		<publisher>Glyn Kendall, Jack Dohany</publisher>
@@ -714,7 +703,7 @@ license:CC0
 	</software>
 
 	<software name="keyword5">
-	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+	<!-- Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks. -->
 		<description>Keyword v5.0</description>
 		<year>198?</year>
 		<publisher>Jack Dohany</publisher>
@@ -781,7 +770,7 @@ license:CC0
 	</software>
 
 	<software name="mscript">
-	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+	<!-- Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks. -->
 		<description>Mscript</description>
 		<year>1983</year>
 		<publisher>21st Century Electronics</publisher>
@@ -793,7 +782,7 @@ license:CC0
 	</software>
 
 	<software name="mscriptr" cloneof="mscript">
-	<!--    Bad dump    -->
+	<!-- Bad dump -->
 		<description>Mscript (rerelease)</description>
 		<year>1983</year>
 		<publisher>Zebra Systems Inc</publisher>
@@ -859,18 +848,6 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="perigosns">
-	<!--    Portuguese adaptation of Jungle Trouble -->
-		<description>Perigos Na Selva</description>
-		<year>1983</year>
-		<publisher>TMX Portugal Ltda</publisher>
-		<part name="cass" interface="spectrum_cass">
-			<dataarea name="cass" size="23070">
-				<rom name="perigos na selva (1983)(tmx portugal ltda).tzx" size="23070" crc="61c78a5f" sha1="c5b5c0a590164db3f7f4f6d35c8d5327a804580e"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="pershofi">
 		<description>Personal Home Finance</description>
 		<year>1983</year>
@@ -883,7 +860,7 @@ license:CC0
 	</software>
 
 	<software name="perspoma">
-	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+	<!-- Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks. -->
 		<description>Personal Portfolio Manager</description>
 		<year>1983</year>
 		<publisher>Timex Computer Corporation</publisher>
@@ -895,7 +872,7 @@ license:CC0
 	</software>
 
 	<software name="propinba">
-	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+	<!-- Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks. -->
 		<description>Pro Pinball</description>
 		<year>1983</year>
 		<publisher>Timex Computer Corporation</publisher>
@@ -907,31 +884,13 @@ license:CC0
 	</software>
 
 	<software name="prof2068">
-	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+	<!-- Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks. -->
 		<description>Pro-File 2068</description>
 		<year>19??</year>
 		<publisher>P.O. Box 64</publisher>
 		<part name="cass" interface="spectrum_cass">
 			<dataarea name="cass" size="15660">
 				<rom name="pro-file 2068 (19xx)(p.o. box 64).tap" size="15660" crc="48ad211e" sha1="bc27d8301c1857a8169dfe5f5f483e1be583e17a"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="prpresen">
-		<description>Programa de a presentaçao</description>
-		<year>1983</year>
-		<publisher>TMX Portugal Ltda</publisher>
-		<part name="cass1" interface="spectrum_cass">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="cass" size="64513">
-				<rom name="programa de a presentacao - side a (1983)(tmx portugal ltda).tzx" size="64513" crc="473f0089" sha1="3cfcc1e405f6dfcdd9f99be11651f5a680904fcc"/>
-			</dataarea>
-		</part>
-		<part name="cass2" interface="spectrum_cass">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="cass" size="87645">
-				<rom name="programa de a presentacao - side b (1983)(tmx portugal ltda).tzx" size="87645" crc="988ad0de" sha1="c4322b5a4f7560377c118746413c798f37aa6cc9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -970,24 +929,13 @@ license:CC0
 	</software>
 
 	<software name="smarttr1">
-	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+	<!-- Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks. -->
 		<description>Smart Terminal 1</description>
 		<year>1983</year>
 		<publisher>Timex Computer Corporation</publisher>
 		<part name="cass" interface="spectrum_cass">
 			<dataarea name="cass" size="8543">
 				<rom name="smart terminal 1 (1983)(timex computer corporation).tap" size="8543" crc="ac4ff16c" sha1="729956100e526e0fe89c1a82fc6930383259c697"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="spacerai">
-		<description>Space Raiders</description>
-		<year>1983</year>
-		<publisher>TMX Portugal Ltda</publisher>
-		<part name="cass" interface="spectrum_cass">
-			<dataarea name="cass" size="22651">
-				<rom name="space raiders (1983)(tmx portugal ltda).tzx" size="22651" crc="03aaf3e4" sha1="05fb367e864377853ed63b9a3e79be00fde37eae"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1055,7 +1003,7 @@ license:CC0
 	</software>
 
 	<software name="suprhzd251">
-	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+	<!-- Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks. -->
 		<description>Super Hot Z Disassembler v2.51</description>
 		<year>19??</year>
 		<publisher>Ray Kingsley</publisher>
@@ -1067,7 +1015,7 @@ license:CC0
 	</software>
 
 	<software name="tapecorr">
-	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+	<!-- Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks. -->
 		<description>Tape Corrector</description>
 		<year>1988</year>
 		<publisher>Byte Power</publisher>
@@ -1079,7 +1027,7 @@ license:CC0
 	</software>
 
 	<software name="tasword2">
-	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+	<!-- Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks. -->
 		<description>Tasword Two</description>
 		<year>1983</year>
 		<publisher>Tasman Software</publisher>
@@ -1142,7 +1090,7 @@ license:CC0
 	</software>
 
 	<software name="theworx">
-	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+	<!-- Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks. -->
 		<description>The Worx</description>
 		<year>1986</year>
 		<publisher>NovelSoft</publisher>
@@ -1154,7 +1102,7 @@ license:CC0
 	</software>
 
 	<software name="timachin">
-	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+	<!-- Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks. -->
 		<description>Timachine</description>
 		<year>1986</year>
 		<publisher>NovelSoft</publisher>
@@ -1206,7 +1154,7 @@ license:CC0
 	</software>
 
 	<software name="toolkit">
-	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+	<!-- Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks. -->
 		<description>Toolkit</description>
 		<year>1986</year>
 		<publisher>TMX Portugal Ltda</publisher>
@@ -1240,7 +1188,7 @@ license:CC0
 	</software>
 
 	<software name="upload2k">
-	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+	<!-- Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks. -->
 		<description>Upload-2000</description>
 		<year>1983</year>
 		<publisher>EZ-Key</publisher>
@@ -1252,7 +1200,7 @@ license:CC0
 	</software>
 
 	<software name="vu3d">
-	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+	<!-- Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks. -->
 		<description>VU-3D</description>
 		<year>1983</year>
 		<publisher>Timex Computer Corporation</publisher>
@@ -1264,7 +1212,7 @@ license:CC0
 	</software>
 
 	<software name="vucalc">
-	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+	<!-- Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks. -->
 		<description>VU-Calc</description>
 		<year>1983</year>
 		<publisher>Timex Computer Corporation</publisher>
@@ -1276,7 +1224,7 @@ license:CC0
 	</software>
 
 	<software name="vufile">
-	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+	<!-- Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks. -->
 		<description>VU-File</description>
 		<year>1983</year>
 		<publisher>Timex Computer Corporation</publisher>
@@ -1299,7 +1247,7 @@ license:CC0
 	</software>
 
 	<software name="windowp32">
-	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+	<!-- Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks. -->
 		<description>Window Print 32</description>
 		<year>1987</year>
 		<publisher>John M. Bell</publisher>
@@ -1311,7 +1259,7 @@ license:CC0
 	</software>
 
 	<software name="windowp64">
-	<!--    Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks.  -->
+	<!-- Needs a proper dump. Current TZX is a direct copy of this TAP, missing the original pauses between blocks. -->
 		<description>Window Print 64</description>
 		<year>1987</year>
 		<publisher>John M. Bell</publisher>
@@ -1376,4 +1324,31 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- ##################################################
+	      Covertapes from "Byte Power, 1st Class Magazine"
+	     ################################################## -->
+	<!--
+	    Undumped covertapes confirmed to exist as of July 1988 (more may have been released afterwards):
+	        August 1986
+	        September 1986
+	        October 1986
+	        November 1986
+	        December 1986 - January 1987
+	        February 1987
+	        Spring 1987
+	        Fall 1987
+	        May 1988
+	-->
+	<software name="bpfeb88">
+		<description>Byte Power (February 1988)</description>
+		<year>1988</year>
+		<publisher>Byte Power</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="141395">
+				<rom name="byte-power-02-1988.tzx" size="141395" crc="6556dc57" sha1="c9f740a2b2f47930321c078001f6fc3ec98e119a"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

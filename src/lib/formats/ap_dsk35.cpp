@@ -1238,7 +1238,7 @@ bool dc42_format::supports_save() const
 	return true;
 }
 
-int dc42_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int dc42_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t size;
 	if(io.length(size) || (size < 0x54))
@@ -1258,10 +1258,10 @@ int dc42_format::identify(util::random_read &io, uint32_t form_factor, const std
 		return 0;
 	}
 
-	return (size == 0x54+tsize+dsize && h[0] < 64 && h[0x52] == 1 && h[0x53] == 0) ? 100 : 0;
+	return (size == 0x54+tsize+dsize && h[0] < 64 && h[0x52] == 1 && h[0x53] == 0) ? FIFID_STRUCT|FIFID_STRUCT : 0;
 }
 
-bool dc42_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool dc42_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	size_t actual;
 	uint8_t h[0x54];
@@ -1348,7 +1348,7 @@ void dc42_format::update_chk(const uint8_t *data, int size, uint32_t &chk)
 	}
 }
 
-bool dc42_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool dc42_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	int g_tracks, g_heads;
 	image->get_actual_geometry(g_tracks, g_heads);
@@ -1414,7 +1414,7 @@ bool dc42_format::save(util::random_read_write &io, const std::vector<uint32_t> 
 	return true;
 }
 
-const floppy_format_type FLOPPY_DC42_FORMAT = &floppy_image_format_creator<dc42_format>;
+const dc42_format FLOPPY_DC42_FORMAT;
 
 
 apple_gcr_format::apple_gcr_format() : floppy_image_format_t()
@@ -1441,19 +1441,19 @@ bool apple_gcr_format::supports_save() const
 	return true;
 }
 
-int apple_gcr_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int apple_gcr_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t size;
 	if(io.length(size))
 		return 0;
 
 	if(size == 409600 || (size == 819200 && (variants.empty() || has_variant(variants, floppy_image::DSDD))))
-		return 50;
+		return FIFID_SIZE;
 
 	return 0;
 }
 
-bool apple_gcr_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool apple_gcr_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	size_t actual;
 	desc_gcr_sector sectors[12];
@@ -1497,7 +1497,7 @@ bool apple_gcr_format::load(util::random_read &io, uint32_t form_factor, const s
 	return true;
 }
 
-bool apple_gcr_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool apple_gcr_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	int g_tracks, g_heads;
 	image->get_actual_geometry(g_tracks, g_heads);
@@ -1523,7 +1523,7 @@ bool apple_gcr_format::save(util::random_read_write &io, const std::vector<uint3
 	return true;
 }
 
-const floppy_format_type FLOPPY_APPLE_GCR_FORMAT = &floppy_image_format_creator<apple_gcr_format>;
+const apple_gcr_format FLOPPY_APPLE_GCR_FORMAT;
 
 // .2MG format
 apple_2mg_format::apple_2mg_format() : floppy_image_format_t()
@@ -1550,26 +1550,26 @@ bool apple_2mg_format::supports_save() const
 	return true;
 }
 
-int apple_2mg_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int apple_2mg_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t signature[4];
 	size_t actual;
 	io.read_at(0, signature, 4, actual);
 	if (!strncmp(reinterpret_cast<char *>(signature), "2IMG", 4))
 	{
-		return 100;
+		return FIFID_SIGN;
 	}
 
 	// Bernie ][ The Rescue wrote 2MGs with the signature byte-flipped, other fields are valid
 	if (!strncmp(reinterpret_cast<char *>(signature), "GMI2", 4))
 	{
-		return 100;
+		return FIFID_SIGN;
 	}
 
 	return 0;
 }
 
-bool apple_2mg_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool apple_2mg_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	size_t actual;
 	desc_gcr_sector sectors[12];
@@ -1607,7 +1607,7 @@ bool apple_2mg_format::load(util::random_read &io, uint32_t form_factor, const s
 	return true;
 }
 
-bool apple_2mg_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool apple_2mg_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	size_t actual;
 
@@ -1648,4 +1648,4 @@ bool apple_2mg_format::save(util::random_read_write &io, const std::vector<uint3
 	return true;
 }
 
-const floppy_format_type FLOPPY_APPLE_2MG_FORMAT = &floppy_image_format_creator<apple_2mg_format>;
+const apple_2mg_format FLOPPY_APPLE_2MG_FORMAT;

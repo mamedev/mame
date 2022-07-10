@@ -12,9 +12,7 @@
 #include "nld_ms_direct.h"
 #include "nld_solver.h"
 
-namespace netlist
-{
-namespace solver
+namespace netlist::solver
 {
 	template <typename FT>
 	class matrix_solver_direct1_t: public matrix_solver_direct_t<FT, 1>
@@ -33,7 +31,7 @@ namespace solver
 		// ----------------------------------------------------------------------------------------
 		// matrix_solver - Direct1
 		// ----------------------------------------------------------------------------------------
-		void vsolve_non_dynamic() override
+		void upstream_solve_non_dynamic() override
 		{
 			this->clear_square_mat(this->m_A);
 			this->fill_matrix_and_rhs();
@@ -43,8 +41,7 @@ namespace solver
 	};
 
 
-} // namespace solver
-} // namespace netlist
+} // namespace netlist::solver
 
 
 #endif // NLD_MS_DIRECT1_H_

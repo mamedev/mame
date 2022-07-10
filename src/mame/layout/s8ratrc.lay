@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+copyright-holders:Robbbert
+Layout for Williams Rat Race
+-->
+
+<mamelayout version="2">
+
+	<element name="digit" defstate="0">
+		<led14segsc>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</led14segsc>
+	</element>
+	<element name="diag" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.0" blue="1.0" />
+		</led7seg>
+	</element>
+	<element name="P1"><text string="Credits"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P3"><text string="Player 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P4"><text string="Player 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+
+	<group name="score">
+		<repeat count="7">
+			<param name="n" start="~s~" increment="1" />
+			<param name="x" start="0" increment="44" />
+			<element name="digit~n~" ref="digit">
+				<bounds x="~x~" y="0" width="34" height="39" />
+			</element>
+		</repeat>
+	</group>
+
+	<view name="Default Layout">
+		<bounds left="0" top="20" right="318" bottom="214" />
+
+		<!-- LEDs -->
+
+		<!-- Player 1 Score -->
+		<param name="s" value="1" />
+		<group ref="score">
+			<bounds left="10" top="45" right="308" bottom="84" />
+		</group>
+
+		<!-- Player 2 Score -->
+		<param name="s" value="9" />
+		<group ref="score">
+			<bounds left="10" top="105" right="308" bottom="144" />
+		</group>
+
+		<!-- Credits and Balls -->
+		<element name="digit16" ref="digit">
+			<bounds left="10" top="165" right="44" bottom="204" />
+		</element>
+		<element name="digit24" ref="digit">
+			<bounds left="54" top="165" right="88" bottom="204" />
+		</element>
+		<element ref="P1"><bounds left="30" right="88" top="150" bottom="162" /></element>
+		<element ref="P3"><bounds left="100" right="180" top="30" bottom="42" /></element>
+		<element ref="P4"><bounds left="100" right="180" top="90" bottom="102" /></element>
+	</view>
+</mamelayout>

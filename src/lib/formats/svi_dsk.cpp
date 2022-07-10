@@ -32,19 +32,19 @@ const char *svi_format::extensions() const
 	return "dsk";
 }
 
-int svi_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int svi_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t size;
 	if (io.length(size))
 		return 0;
 
 	if (size == 172032 || size == 346112)
-		return 50;
+		return FIFID_SIZE;
 
 	return 0;
 }
 
-bool svi_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool svi_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	uint64_t size;
 	if (io.length(size))
@@ -99,7 +99,7 @@ bool svi_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-bool svi_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool svi_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	if (io.seek(0, SEEK_SET))
 		return false;
@@ -144,4 +144,4 @@ bool svi_format::supports_save() const
 	return true;
 }
 
-const floppy_format_type FLOPPY_SVI_FORMAT = &floppy_image_format_creator<svi_format>;
+const svi_format FLOPPY_SVI_FORMAT;

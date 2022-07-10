@@ -235,30 +235,33 @@ void vme_mvme120_device::device_reset()
 	program.install_rom(0x000000, 0x000007, m_sysrom);
 	m_memory_read_count = 0;
 
-	m_rom_shadow_tap = program.install_read_tap(0x000000, 0x000007, "rom_shadow_r",[this](offs_t offset, u16 &data, u16 mem_mask)
-	{
-		rom_shadow_tap(offset, data, mem_mask);
-	});
+	m_rom_shadow_tap.remove();
+	m_rom_shadow_tap = program.install_read_tap(
+			0x000000, 0x000007,
+			"rom_shadow_r",
+			[this] (offs_t offset, u16 &data, u16 mem_mask)
+			{
+				rom_shadow_tap(offset, data, mem_mask);
+			},
+			&m_rom_shadow_tap);
 
 	ctrlreg_w(0, 0xFF); // /RESET flips the latch bits to $FF
 }
 
-uint16_t vme_mvme120_device::rom_shadow_tap(offs_t address, u16 data, u16 mem_mask)
+void vme_mvme120_device::rom_shadow_tap(offs_t address, u16 data, u16 mem_mask)
 {
 	if(!machine().side_effects_disabled())
 	{
 		if(m_memory_read_count >= 3)
 		{
 			// delete this tap
-			m_rom_shadow_tap->remove();
+			m_rom_shadow_tap.remove();
 
-			// reinstall ram over the rom shadow
+			// reinstall RAM over the ROM shadow
 			m_maincpu->space(AS_PROGRAM).install_ram(0x000000, 0x000007, m_localram);
 		}
 		m_memory_read_count++;
 	}
-
-	return data;
 }
 
 WRITE_LINE_MEMBER(vme_mvme120_device::watchdog_reset)

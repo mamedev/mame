@@ -1,10 +1,28 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles, Brad Hughes
+//============================================================
+//
+//  input_dinput.h - Windows DirectInput support
+//
+//============================================================
 #ifndef MAME_OSD_INPUT_INPUT_DINPUT_H
 #define MAME_OSD_INPUT_INPUT_DINPUT_H
 
 #pragma once
 
-#include "input_common.h"
+#include "input_windows.h"
+
 #include "modules/lib/osdlib.h"
+#include "modules/lib/osdobj_common.h"
+
+#include "window.h"
+
+#include "strconv.h"
+
+#include <dinput.h>
+#include <windows.h>
+#include <wrl/client.h>
+
 
 //============================================================
 //  dinput_device - base directinput device
@@ -52,14 +70,14 @@ public:
 	virtual ~dinput_api_helper();
 	int initialize();
 
-	template<class TDevice>
-	TDevice* create_device(
-		running_machine &machine,
-		input_module_base &module,
-		LPCDIDEVICEINSTANCE instance,
-		LPCDIDATAFORMAT format1,
-		LPCDIDATAFORMAT format2,
-		dinput_cooperative_level cooperative_level)
+	template <class TDevice>
+	TDevice *create_device(
+			running_machine &machine,
+			input_module_base &module,
+			LPCDIDEVICEINSTANCE instance,
+			LPCDIDATAFORMAT format1,
+			LPCDIDATAFORMAT format2,
+			dinput_cooperative_level cooperative_level)
 	{
 		HRESULT result;
 		std::shared_ptr<win_window_info> window;
@@ -72,7 +90,7 @@ public:
 		std::string utf8_instance_id = utf8_instance_name + " product_" + guid_to_string(instance->guidProduct) + " instance_" + guid_to_string(instance->guidInstance);
 
 		// allocate memory for the device object
-		TDevice &devinfo = module.devicelist()->create_device<TDevice>(machine, std::move(utf8_instance_name), std::move(utf8_instance_id), module);
+		TDevice &devinfo = module.devicelist().create_device<TDevice>(machine, std::move(utf8_instance_name), std::move(utf8_instance_id), module);
 
 		// attempt to create a device
 		result = m_dinput->CreateDevice(instance->guidInstance, devinfo.dinput.device.GetAddressOf(), nullptr);
@@ -133,7 +151,7 @@ public:
 		return &devinfo;
 
 	error:
-		module.devicelist()->free_device(devinfo);
+		module.devicelist().free_device(devinfo);
 		return nullptr;
 	}
 

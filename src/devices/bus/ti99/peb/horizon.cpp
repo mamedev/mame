@@ -450,13 +450,10 @@ void horizon_ramdisk_device::nvram_default()
 }
 
 
-void horizon_ramdisk_device::nvram_read(emu_file &file)
+bool horizon_ramdisk_device::nvram_read(util::read_stream &file)
 {
 	int ramsize, dsrsize;
 	get_mem_size(ramsize, dsrsize);
-
-	if (file.size() != ramsize + dsrsize)
-		LOGMASKED(LOG_WARN, "NVRAM file size (%d) does not match the current configuration. Check settings.\n", file.size());
 
 	// NVRAM plus ROS, according to the current configuration
 	auto buffer = make_unique_clear<uint8_t []>(ramsize + dsrsize);
@@ -466,8 +463,10 @@ void horizon_ramdisk_device::nvram_read(emu_file &file)
 
 	// Read complete file, at most ramsize+dsrsize
 	// Mind that the configuration may have changed
-	int filesize = file.read(&buffer[0], ramsize + dsrsize);
-	int nvramsize = filesize - dsrsize;
+	size_t filesize;
+	if (file.read(&buffer[0], ramsize + dsrsize, filesize))
+		return false;
+	int nvramsize = int(filesize) - dsrsize;
 
 	// At least the DSR must be complete
 	if (nvramsize >= 0)
@@ -475,10 +474,14 @@ void horizon_ramdisk_device::nvram_read(emu_file &file)
 		// Copy from buffer to NVRAM and ROS
 		if (nvramsize > 0) memcpy(m_ram->pointer(), &buffer[0], nvramsize);
 		memcpy(m_dsrram->pointer(), &buffer[nvramsize], dsrsize);
+
+		return true;
 	}
+
+	return false;
 }
 
-void horizon_ramdisk_device::nvram_write(emu_file &file)
+bool horizon_ramdisk_device::nvram_write(util::write_stream &file)
 {
 	int ramsize, dsrsize;
 	get_mem_size(ramsize, dsrsize);
@@ -490,7 +493,8 @@ void horizon_ramdisk_device::nvram_write(emu_file &file)
 	memcpy(&buffer[ramsize], m_dsrram->pointer(), dsrsize);
 
 	// Store both parts in one file
-	file.write(buffer.get(), ramsize + dsrsize);
+	size_t filesize;
+	return !file.write(buffer.get(), ramsize + dsrsize, filesize) && filesize == ramsize + dsrsize;
 }
 
 bool horizon_ramdisk_device::nvram_can_write()

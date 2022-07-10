@@ -17,7 +17,7 @@
 #include "imagedev/harddriv.h"
 #include "bus/ata/ataintf.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 
 
 namespace {
@@ -78,8 +78,8 @@ public:
 protected:
 	// device_config_nvram_interface overrides
 	virtual void nvram_default() override;
-	virtual void nvram_read(emu_file &file) override;
-	virtual void nvram_write(emu_file &file) override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
 };
 
 class a2bus_cffa2_6502_device : public a2bus_cffa2000_device, public device_nvram_interface
@@ -91,8 +91,8 @@ public:
 protected:
 	// device_config_nvram_interface overrides
 	virtual void nvram_default() override;
-	virtual void nvram_read(emu_file &file) override;
-	virtual void nvram_write(emu_file &file) override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
 };
 
 /***************************************************************************
@@ -295,14 +295,16 @@ void a2bus_cffa2_device::nvram_default()
 	memcpy(m_eeprom, m_rom, 0x1000);
 }
 
-void a2bus_cffa2_device::nvram_read(emu_file &file)
+bool a2bus_cffa2_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_eeprom, 0x1000);
+	size_t actual;
+	return !file.read(m_eeprom, 0x1000, actual) && actual == 0x1000;
 }
 
-void a2bus_cffa2_device::nvram_write(emu_file &file)
+bool a2bus_cffa2_device::nvram_write(util::write_stream &file)
 {
-	file.write(m_eeprom, 0x1000);
+	size_t actual;
+	return !file.write(m_eeprom, 0x1000, actual) && actual == 0x1000;
 }
 
 void a2bus_cffa2_6502_device::nvram_default()
@@ -310,14 +312,16 @@ void a2bus_cffa2_6502_device::nvram_default()
 	memcpy(m_eeprom, m_rom, 0x1000);
 }
 
-void a2bus_cffa2_6502_device::nvram_read(emu_file &file)
+bool a2bus_cffa2_6502_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_eeprom, 0x1000);
+	size_t actual;
+	return !file.read(m_eeprom, 0x1000, actual) && actual == 0x1000;
 }
 
-void a2bus_cffa2_6502_device::nvram_write(emu_file &file)
+bool a2bus_cffa2_6502_device::nvram_write(util::write_stream &file)
 {
-	file.write(m_eeprom, 0x1000);
+	size_t actual;
+	return !file.write(m_eeprom, 0x1000, actual) && actual == 0x1000;
 }
 
 } // anonymous namespace

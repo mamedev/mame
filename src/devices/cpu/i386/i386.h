@@ -274,8 +274,9 @@ protected:
 	uint32_t m_dr[8];       // Debug registers
 	uint32_t m_tr[8];       // Test registers
 
-	memory_passthrough_handler* m_dr_breakpoints[4];
-	int m_notifier;
+	memory_passthrough_handler m_dr_breakpoints[4];
+	util::notifier_subscription m_notifier;
+	bool m_dri_changed_active;
 
 	//386 Debug Register change handlers.
 	inline void dri_changed();
@@ -1649,6 +1650,8 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	virtual void opcode_cpuid() override;
 };
 
 

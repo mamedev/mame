@@ -41,6 +41,7 @@
 
 #include "corestr.h"
 #include "emuopts.h"
+#include "fileio.h"
 #include "rendfont.h"
 #include "rendlay.h"
 #include "rendutil.h"

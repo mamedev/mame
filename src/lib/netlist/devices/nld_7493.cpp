@@ -59,7 +59,7 @@
 
 namespace netlist::devices {
 
-	static constexpr std::array<netlist_time, 3> out_delay { NLTIME_FROM_NS(18), NLTIME_FROM_NS(36), NLTIME_FROM_NS(54) };
+	static constexpr const std::array<const netlist_time, 3> out_delay { NLTIME_FROM_NS(18), NLTIME_FROM_NS(36), NLTIME_FROM_NS(54) };
 
 	NETLIB_OBJECT(7493)
 	{
@@ -67,7 +67,7 @@ namespace netlist::devices {
 		, m_CLKA(*this, "CLKA", NETLIB_DELEGATE(updA))
 		, m_CLKB(*this, "CLKB", NETLIB_DELEGATE(updB))
 		, m_QA(*this, "QA")
-		, m_QB(*this, {"QB", "QC", "QD"})
+		, m_QBCD(*this, {"QB", "QC", "QD"})
 		, m_a(*this, "m_a", 0)
 		, m_bcd(*this, "m_b", 0)
 		, m_R1(*this, "R1", NETLIB_DELEGATE(inputs))
@@ -96,7 +96,7 @@ namespace netlist::devices {
 				m_CLKA.inactivate();
 				m_CLKB.inactivate();
 				m_QA.push(0, NLTIME_FROM_NS(40));
-				m_QB.push(0, NLTIME_FROM_NS(40));
+				m_QBCD.push(0, NLTIME_FROM_NS(40));
 				m_a = m_bcd = 0;
 			}
 		}
@@ -110,14 +110,14 @@ namespace netlist::devices {
 		NETLIB_HANDLERI(updB)
 		{
 			const auto cnt(++m_bcd &= 0x07);
-			m_QB.push(cnt, out_delay);
+			m_QBCD.push(cnt, out_delay);
 		}
 
 		logic_input_t m_CLKA;
 		logic_input_t m_CLKB;
 
 		logic_output_t m_QA;
-		object_array_t<logic_output_t, 3> m_QB;
+		object_array_t<logic_output_t, 3> m_QBCD;
 
 		state_var<unsigned> m_a;
 		state_var<unsigned> m_bcd;

@@ -161,6 +161,8 @@ offs_t pic17_disassembler::disassemble(std::ostream &stream, offs_t pc, const pi
 		util::stream_format(stream, "%-8s", s_bit_ops[BIT(opcode, 11, 2)]);
 		format_register(stream, opcode & 0x00ff);
 		util::stream_format(stream, ",%d", BIT(opcode, 8, 3));
+		if (BIT(opcode, 12))
+			words |= STEP_COND;
 	}
 	else if (opcode >= 0x6000)
 	{
@@ -189,6 +191,7 @@ offs_t pic17_disassembler::disassemble(std::ostream &stream, offs_t pc, const pi
 		{
 			util::stream_format(stream, "%-8s", s_cp_ops[BIT(opcode, 8, 2)]);
 			format_register(stream, opcode & 0x00ff);
+			words |= STEP_COND;
 		}
 		else if (opcode < 0x3500)
 		{
@@ -205,6 +208,8 @@ offs_t pic17_disassembler::disassemble(std::ostream &stream, offs_t pc, const pi
 		format_register(stream, opcode & 0x00ff);
 		if (opcode >= 0x0200)
 			util::stream_format(stream, ",%c", BIT(opcode, 8) ? 'F' : 'W');
+		if ((opcode & 0x3600) == 0x1600 || (opcode & 0x3c00) == 0x2400)
+			words |= STEP_COND;
 	}
 	else switch (opcode)
 	{

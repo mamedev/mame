@@ -18,13 +18,13 @@ license:CC0
 <!-- build screen -->
 
 	<view name="Test Layout">
-		<bounds left="0" right="10" top="0" bottom="10" />
+		<bounds left="0" right="10" top="0" bottom="12" />
 		<element ref="static_black">
-			<bounds left="0" right="10" top="0" bottom="10" />
+			<bounds left="0" right="10" top="0" bottom="12" />
 		</element>
 
-		<!-- max 9*4*2 matrix -->
-		<repeat count="9">
+		<!-- max 12*4*2 matrix -->
+		<repeat count="12">
 			<param name="y" start="0" increment="1" />
 
 			<!-- h1 -->

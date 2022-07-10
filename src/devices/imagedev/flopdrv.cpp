@@ -129,7 +129,7 @@ void legacy_floppy_image_device::floppy_drive_init()
 	/* initialise flags */
 	m_flags = 0;
 	m_index_pulse_callback = nullptr;
-	m_index_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(legacy_floppy_image_device::floppy_drive_index_callback),this));
+	m_index_timer = timer_alloc(FUNC(legacy_floppy_image_device::floppy_drive_index_callback), this);
 	m_idx = 0;
 
 	floppy_drive_set_geometry(m_config->floppy_type);
@@ -692,6 +692,9 @@ void legacy_floppy_image_device::device_start()
 	/* disk changed */
 	m_dskchg = CLEAR_LINE;
 //  m_out_dskchg_func(m_dskchg);
+
+	/* write-protect callback */
+	m_wpt_timer = timer_alloc(FUNC(legacy_floppy_image_device::set_wpt), this);
 }
 
 
@@ -746,7 +749,7 @@ image_init_result legacy_floppy_image_device::call_load()
 	else
 		next_wpt = 0;
 
-	machine().scheduler().timer_set(attotime::from_msec(250), timer_expired_delegate(FUNC(legacy_floppy_image_device::set_wpt),this), next_wpt);
+	m_wpt_timer->adjust(attotime::from_msec(250), next_wpt);
 
 	return retVal;
 }
@@ -768,7 +771,7 @@ void legacy_floppy_image_device::call_unload()
 	//m_out_wpt_func(m_wpt);
 
 	/* set timer for disk eject */
-	machine().scheduler().timer_set(attotime::from_msec(250), timer_expired_delegate(FUNC(legacy_floppy_image_device::set_wpt),this), 1);
+	m_wpt_timer->adjust(attotime::from_msec(250), 1);
 }
 
 bool legacy_floppy_image_device::is_creatable() const noexcept

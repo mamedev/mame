@@ -12,10 +12,10 @@
 #include "pps41d.h"
 
 
-DEFINE_DEVICE_TYPE(MM78, mm78_device, "mm78", "Rockwell MM78") // 2KB ROM, 128 nibbles RAM
-DEFINE_DEVICE_TYPE(MM78L, mm78l_device, "mm78l", "Rockwell MM78L") // low-power
-DEFINE_DEVICE_TYPE(MM77, mm77_device, "mm77", "Rockwell MM77") // 1.3KB ROM, 96 nibbles RAM
-DEFINE_DEVICE_TYPE(MM77L, mm77l_device, "mm77l", "Rockwell MM77L") // 1.5KB ROM, low-power
+DEFINE_DEVICE_TYPE(MM78, mm78_device, "mm78", "Rockwell MM78 A7800") // 2KB ROM, 128 nibbles RAM
+DEFINE_DEVICE_TYPE(MM78L, mm78l_device, "mm78l", "Rockwell MM78L B7800") // low-power
+DEFINE_DEVICE_TYPE(MM77, mm77_device, "mm77", "Rockwell MM77 A7700") // 1.3KB ROM, 96 nibbles RAM
+DEFINE_DEVICE_TYPE(MM77L, mm77l_device, "mm77l", "Rockwell MM77L B7700") // 1.5KB ROM, low-power
 
 
 // constructor
@@ -91,7 +91,7 @@ void mm78_device::device_start()
 	mm76_device::device_start();
 	m_stack_levels = 2;
 
-	state_add(++m_state_count, "X", m_x).formatstr("%01X");
+	state_add(++m_state_count, "X", m_x).formatstr("%01X"); // 6
 }
 
 void mm78_device::device_reset()

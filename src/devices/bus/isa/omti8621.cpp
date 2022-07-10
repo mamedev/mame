@@ -20,14 +20,13 @@
 #include "formats/naslite_dsk.h"
 #include "formats/apollo_dsk.h"
 
-#define VERBOSE 0
+#define LOG_LEVEL0      (0x1U << 1)
+#define LOG_LEVEL1      (0x3U << 1)
+#define LOG_LEVEL2      (0x7U << 1)
+#define LOG_LEVEL3      (0xfU << 1)
 
-static int verbose = VERBOSE;
-
-#define LOG(x)  { logerror ("%s: ", cpu_context()); logerror x; logerror ("\n"); }
-#define LOG1(x) { if (verbose > 0) LOG(x)}
-#define LOG2(x) { if (verbose > 1) LOG(x)}
-#define LOG3(x) { if (verbose > 2) LOG(x)}
+#define VERBOSE (LOG_LEVEL0)
+#include "logmacro.h"
 
 #define OMTI_DISK_SECTOR_SIZE 1056
 
@@ -105,7 +104,7 @@ public:
 
 #define OMTI_STATUS_REQ  0x01 // Request (1 = request transfer of data via data in/out register)
 #define OMTI_STATUS_IO   0x02 // In/Out (1 = direction of transfer is from controller to host)
-#define OMTI_STATUS_CD   0x04 // Command/Data ( 1 = byte transferred is command or status byte)
+#define OMTI_STATUS_CD   0x04 // Command/Data (1 = byte transferred is command or status byte)
 #define OMTI_STATUS_BUSY 0x08 // Busy (0 = controller is idle, 1 = controller selected)
 #define OMTI_STATUS_DREQ 0x10 // Data Request (0 = no DMA request, 1 = DMA cycle requested)
 #define OMTI_STATUS_IREQ 0x20 // Interrupt Request (0 = no interrupt, 1 = command complete)
@@ -281,15 +280,15 @@ ioport_constructor omti8621_device::device_input_ports() const
 
 void omti8621_device::device_start()
 {
-	LOG2(("device_start"));
+	LOGMASKED(LOG_LEVEL2, "device_start");
 
 	set_isa_device();
 
 	m_installed = false;
 
-	sector_buffer.resize(OMTI_DISK_SECTOR_SIZE*OMTI_MAX_BLOCK_COUNT);
+	m_sector_buffer.resize(OMTI_DISK_SECTOR_SIZE*OMTI_MAX_BLOCK_COUNT);
 
-	m_timer = timer_alloc(0);
+	m_timer = timer_alloc(FUNC(omti8621_device::trigger_interrupt), this);
 
 	our_disks[0] = subdevice<omti_disk_image_device>(OMTI_DISK0_TAG);
 	our_disks[1] = subdevice<omti_disk_image_device>(OMTI_DISK1_TAG);
@@ -303,7 +302,7 @@ void omti8621_device::device_reset()
 {
 	static const int io_bases[8] = { 0x320, 0x324, 0x328, 0x32c, 0x1a0, 0x1a4, 0x1a8, 0x1ac };
 
-	LOG2(("device_reset"));
+	LOGMASKED(LOG_LEVEL2, "device_reset");
 
 	// you can't read I/O ports in device_start() even if they're required_ioport<> in your class!
 	if (!m_installed)
@@ -331,38 +330,38 @@ void omti8621_device::device_reset()
 	set_jumper(our_disks[0]->m_type);
 
 	// should go from reset to idle after 100 us
-	// state->omti_state = OMTI_STATE_RESET;
-	omti_state = OMTI_STATE_IDLE;
+	// m_omti_state = OMTI_STATE_RESET;
+	m_omti_state = OMTI_STATE_IDLE;
 
-	status_port =  OMTI_STATUS_NU6 | OMTI_STATUS_NU7;
-	config_port = ~jumper;
-	mask_port = 0;
+	m_status_port = OMTI_STATUS_NU6 | OMTI_STATUS_NU7;
+	m_config_port = ~m_jumper;
+	m_mask_port = 0;
 
 	// default the sector data buffer with model and status information
 	// (i.e. set sector data buffer for cmd=0x0e READ SECTOR BUFFER)
 
-	memset(&sector_buffer[0], 0, OMTI_DISK_SECTOR_SIZE);
-	memcpy(&sector_buffer[0], "8621VB.4060487xx", 0x10);
-	sector_buffer[0x10] = 0; // ROM Checksum error
-	sector_buffer[0x11] = 0; // Processor Register error
-	sector_buffer[0x12] = 0; // Buffer RAM error
-	sector_buffer[0x13] = 0; // Sequencer Register File error
-	sector_buffer[0x14] = 0xc0; // 32K buffer size
+	memset(&m_sector_buffer[0], 0, OMTI_DISK_SECTOR_SIZE);
+	memcpy(&m_sector_buffer[0], "8621VB.4060487xx", 0x10);
+	m_sector_buffer[0x10] = 0; // ROM Checksum error
+	m_sector_buffer[0x11] = 0; // Processor Register error
+	m_sector_buffer[0x12] = 0; // Buffer RAM error
+	m_sector_buffer[0x13] = 0; // Sequencer Register File error
+	m_sector_buffer[0x14] = 0xc0; // 32K buffer size
 	// TODO: add missing Default values for LUN 0, 1 and 3
 
-	command_length = 0;
-	command_index = 0;
-	command_status = 0;
+	m_command_length = 0;
+	m_command_index = 0;
+	m_command_status = 0;
 
-	data_index = 0;
-	data_length = 0;
+	m_data_index = 0;
+	m_data_length = 0;
 
 	clear_sense_data();
 
-	diskaddr_ecc_error = 0;
-	diskaddr_format_bad_track = 0;
-	alternate_track_address[0] = 0;
-	alternate_track_address[1] = 0;
+	m_diskaddr_ecc_error = 0;
+	m_diskaddr_format_bad_track = 0;
+	m_alternate_track_address[0] = 0;
+	m_alternate_track_address[1] = 0;
 
 	fd_moten_w(0);
 	fd_rate_w(0);
@@ -395,8 +394,22 @@ omti8621_device::omti8621_device(
 	, m_floppy(*this, OMTI_FDC_TAG":%u", 0U)
 	, m_iobase(*this, "IO_BASE")
 	, m_biosopts(*this, "BIOS_OPTS")
-	, jumper(0), omti_state(0), status_port(0), config_port(0), mask_port(0), command_length(0), command_index(0), command_status(0), data_buffer(nullptr)
-	, data_length(0), data_index(0), diskaddr_ecc_error(0), diskaddr_format_bad_track(0), m_timer(nullptr), m_moten(0), m_installed(false)
+	, m_jumper(0)
+	, m_omti_state(0)
+	, m_status_port(0)
+	, m_config_port(0)
+	, m_mask_port(0)
+	, m_command_length(0)
+	, m_command_index(0)
+	, m_command_status(0)
+	, m_data_buffer(nullptr)
+	, m_data_length(0)
+	, m_data_index(0)
+	, m_diskaddr_ecc_error(0)
+	, m_diskaddr_format_bad_track(0)
+	, m_timer(nullptr)
+	, m_moten(0)
+	, m_installed(false)
 {
 }
 
@@ -404,13 +417,13 @@ omti8621_device::omti8621_device(
  set_interrupt - update the IRQ state
  -------------------------------------------------*/
 
-void omti8621_device::set_interrupt(enum line_state line_state)
+void omti8621_device::set_interrupt(line_state state)
 {
-	LOG2(("set_interrupt: status_port=%x, line_state %d", status_port, line_state));
-	m_isa->irq14_w(line_state);
+	LOGMASKED(LOG_LEVEL2, "%s: set_interrupt: status_port=%x, line_state %d", cpu_context(), m_status_port, state);
+	m_isa->irq14_w(state);
 }
 
-void omti8621_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(omti8621_device::trigger_interrupt)
 {
 	set_interrupt(ASSERT_LINE);
 }
@@ -420,8 +433,8 @@ void omti8621_device::device_timer(emu_timer &timer, device_timer_id id, int par
  ***************************************************************************/
 
 void omti8621_device::clear_sense_data() {
-	LOG2(("clear_sense_data"));
-	memset(sense_data, 0, sizeof(sense_data));
+	LOGMASKED(LOG_LEVEL2, "%s: clear_sense_data", cpu_context());
+	std::fill_n(m_sense_data, std::size(m_sense_data), 0);
 }
 
 /***************************************************************************
@@ -429,11 +442,11 @@ void omti8621_device::clear_sense_data() {
  ***************************************************************************/
 
 void omti8621_device::set_sense_data(uint8_t code, const uint8_t * cdb) {
-	LOG2(("set_sense_data code=%x", code));
-	sense_data[0]=code;
-	sense_data[1]=cdb[1];
-	sense_data[2]=cdb[2];
-	sense_data[3]=cdb[3];
+	LOGMASKED(LOG_LEVEL2, "%s: set_sense_data code=%x", cpu_context(), code);
+	m_sense_data[0] = code;
+	m_sense_data[1] = cdb[1];
+	m_sense_data[2] = cdb[2];
+	m_sense_data[3] = cdb[3];
 }
 
 /***************************************************************************
@@ -441,7 +454,7 @@ void omti8621_device::set_sense_data(uint8_t code, const uint8_t * cdb) {
  ***************************************************************************/
 
 void omti8621_device::set_configuration_data(uint8_t lun) {
-	LOG2(("set_configuration_data lun=%x", lun));
+	LOGMASKED(LOG_LEVEL2, "%s: set_configuration_data lun=%x", cpu_context(), lun);
 
 	// initialize the configuration data
 	omti_disk_image_device *disk = our_disks[lun];
@@ -485,7 +498,7 @@ uint8_t omti8621_device::check_disk_address(const uint8_t *cdb)
 	uint32_t disk_addr = (disk_track * disk->m_sectors) + sector;
 
 	if (block_count > OMTI_MAX_BLOCK_COUNT) {
-		LOG(("########### check_disk_address: unexpected block count %x", block_count));
+		LOGMASKED(LOG_LEVEL0, "%s: ########### check_disk_address: unexpected block count %x", cpu_context(), block_count);
 		sense_code = OMTI_SENSE_CODE_ILLEGAL_ADDRESS | OMTI_SENSE_CODE_ADDRESS_VALID;
 	}
 
@@ -499,18 +512,18 @@ uint8_t omti8621_device::check_disk_address(const uint8_t *cdb)
 		sense_code = OMTI_SENSE_CODE_ILLEGAL_ADDRESS | OMTI_SENSE_CODE_ADDRESS_VALID;
 	} else if (cylinder >= disk->m_cylinders) {
 		sense_code = OMTI_SENSE_CODE_ILLEGAL_ADDRESS | OMTI_SENSE_CODE_ADDRESS_VALID;
-	} else if ( disk_track == diskaddr_format_bad_track && disk_track != 0) {
+	} else if (disk_track == m_diskaddr_format_bad_track && disk_track != 0) {
 		sense_code = OMTI_SENSE_CODE_BAD_TRACK;
-	} else if (disk_addr == diskaddr_ecc_error && disk_addr != 0) {
+	} else if (disk_addr == m_diskaddr_ecc_error && disk_addr != 0) {
 		sense_code = OMTI_SENSE_CODE_ECC_ERROR;
-	} else if (disk_track == alternate_track_address[1] && disk_track != 0) {
+	} else if (disk_track == m_alternate_track_address[1] && disk_track != 0) {
 		sense_code = OMTI_SENSE_CODE_ALTERNATE_TRACK;
 	}
 
 	if (sense_code == OMTI_SENSE_CODE_NO_ERROR) {
 		clear_sense_data();
 	} else {
-		command_status |= OMTI_COMMAND_STATUS_ERROR;
+		m_command_status |= OMTI_COMMAND_STATUS_ERROR;
 		set_sense_data(sense_code, cdb);
 	}
 	return sense_code == OMTI_SENSE_CODE_NO_ERROR;
@@ -544,29 +557,29 @@ uint32_t omti8621_device::get_disk_address(const uint8_t * cdb) {
 void omti8621_device::set_data_transfer(uint8_t *data, uint16_t length)
 {
 	// set controller for read data transfer
-	omti_state = OMTI_STATE_DATA;
-	status_port |= OMTI_STATUS_REQ | OMTI_STATUS_IO | OMTI_STATUS_BUSY;
-	status_port &= ~OMTI_STATUS_CD;
+	m_omti_state = OMTI_STATE_DATA;
+	m_status_port |= OMTI_STATUS_REQ | OMTI_STATUS_IO | OMTI_STATUS_BUSY;
+	m_status_port &= ~OMTI_STATUS_CD;
 
-	data_buffer = data;
-	data_length = length;
-	data_index = 0;
+	m_data_buffer = data;
+	m_data_length = length;
+	m_data_index = 0;
 }
 
 /***************************************************************************
- read_sectors_from_disk - read sectors starting at diskaddr into sector_buffer
+ read_sectors_from_disk - read sectors starting at diskaddr into m_sector_buffer
  ***************************************************************************/
 
 void omti8621_device::read_sectors_from_disk(int32_t diskaddr, uint8_t count, uint8_t lun)
 {
-	uint8_t *data_buffer = &sector_buffer[0];
+	uint8_t *data_buffer = &m_sector_buffer[0];
 	device_image_interface *image = our_disks[lun]->m_image;
 
 	while (count-- > 0) {
-		LOG2(("read_sectors_from_disk lun=%d diskaddr=%x", lun, diskaddr));
+		LOGMASKED(LOG_LEVEL2, "%s: read_sectors_from_disk lun=%d diskaddr=%x", cpu_context(), lun, diskaddr);
 
-		image->fseek( diskaddr * OMTI_DISK_SECTOR_SIZE, SEEK_SET);
-		image->fread( data_buffer, OMTI_DISK_SECTOR_SIZE);
+		image->fseek(diskaddr * OMTI_DISK_SECTOR_SIZE, SEEK_SET);
+		image->fread(data_buffer, OMTI_DISK_SECTOR_SIZE);
 
 		diskaddr++;
 		data_buffer += OMTI_DISK_SECTOR_SIZE;
@@ -574,23 +587,23 @@ void omti8621_device::read_sectors_from_disk(int32_t diskaddr, uint8_t count, ui
 }
 
 /***************************************************************************
- write_sectors_to_disk - write sectors starting at diskaddr from sector_buffer
+ write_sectors_to_disk - write sectors starting at diskaddr from m_sector_buffer
  ***************************************************************************/
 
 void omti8621_device::write_sectors_to_disk(int32_t diskaddr, uint8_t count, uint8_t lun)
 {
-	uint8_t *data_buffer = &sector_buffer[0];
+	uint8_t *data_buffer = &m_sector_buffer[0];
 	device_image_interface *image = our_disks[lun]->m_image;
 
 	while (count-- > 0) {
-		LOG2(("write_sectors_to_disk lun=%d diskaddr=%x", lun, diskaddr));
+		LOGMASKED(LOG_LEVEL2, "%s: write_sectors_to_disk lun=%d diskaddr=%x", cpu_context(), lun, diskaddr);
 
-		image->fseek( diskaddr * OMTI_DISK_SECTOR_SIZE, SEEK_SET);
-		image->fwrite( data_buffer, OMTI_DISK_SECTOR_SIZE);
+		image->fseek(diskaddr * OMTI_DISK_SECTOR_SIZE, SEEK_SET);
+		image->fwrite(data_buffer, OMTI_DISK_SECTOR_SIZE);
 
-		if (diskaddr == diskaddr_ecc_error) {
+		if (diskaddr == m_diskaddr_ecc_error) {
 			// reset previous ECC error
-			diskaddr_ecc_error = 0;
+			m_diskaddr_ecc_error = 0;
 		}
 
 		diskaddr++;
@@ -606,18 +619,18 @@ void omti8621_device::copy_sectors(int32_t dst_addr, int32_t src_addr, uint8_t c
 {
 	device_image_interface *image = our_disks[lun]->m_image;
 
-	LOG2(("copy_sectors lun=%d src_addr=%x dst_addr=%x count=%x", lun, src_addr, dst_addr, count));
+	LOGMASKED(LOG_LEVEL2, "%s: copy_sectors lun=%d src_addr=%x dst_addr=%x count=%x", cpu_context(), lun, src_addr, dst_addr, count);
 
 	while (count-- > 0) {
-		image->fseek( src_addr * OMTI_DISK_SECTOR_SIZE, SEEK_SET);
-		image->fread( &sector_buffer[0], OMTI_DISK_SECTOR_SIZE);
+		image->fseek(src_addr * OMTI_DISK_SECTOR_SIZE, SEEK_SET);
+		image->fread(&m_sector_buffer[0], OMTI_DISK_SECTOR_SIZE);
 
-		image->fseek( dst_addr * OMTI_DISK_SECTOR_SIZE, SEEK_SET);
-		image->fwrite( &sector_buffer[0], OMTI_DISK_SECTOR_SIZE);
+		image->fseek(dst_addr * OMTI_DISK_SECTOR_SIZE, SEEK_SET);
+		image->fwrite(&m_sector_buffer[0], OMTI_DISK_SECTOR_SIZE);
 
-		if (dst_addr == diskaddr_ecc_error) {
+		if (dst_addr == m_diskaddr_ecc_error) {
 			// reset previous ECC error
-			diskaddr_ecc_error = 0;
+			m_diskaddr_ecc_error = 0;
 		}
 
 		src_addr++;
@@ -635,29 +648,29 @@ void omti8621_device::format_track(const uint8_t * cdb)
 	uint32_t disk_addr = get_disk_address(cdb);
 	uint32_t disk_track = get_disk_track(cdb);
 
-	if (diskaddr_ecc_error == disk_addr) {
+	if (m_diskaddr_ecc_error == disk_addr) {
 		// reset previous ECC error
-		diskaddr_ecc_error = 0;
+		m_diskaddr_ecc_error = 0;
 	}
 
-	if (diskaddr_format_bad_track == disk_track) {
+	if (m_diskaddr_format_bad_track == disk_track) {
 		// reset previous bad track formatting
-		diskaddr_format_bad_track = 0;
+		m_diskaddr_format_bad_track = 0;
 	}
 
-	if (alternate_track_address[0] == disk_track) {
+	if (m_alternate_track_address[0] == disk_track) {
 		// reset source of alternate track address
-		alternate_track_address[0] = 0;
+		m_alternate_track_address[0] = 0;
 	}
 
-	if (alternate_track_address[1] == disk_track) {
+	if (m_alternate_track_address[1] == disk_track) {
 		// reset alternate track address
-		alternate_track_address[1] = 0;
+		m_alternate_track_address[1] = 0;
 	}
 
 	if (check_disk_address(cdb) ) {
 		if ((cdb[5] & 0x40) == 0) {
-			memset(&sector_buffer[0], 0x6C, OMTI_DISK_SECTOR_SIZE * our_disks[lun]->m_sectors);
+			memset(&m_sector_buffer[0], 0x6C, OMTI_DISK_SECTOR_SIZE * our_disks[lun]->m_sectors);
 		}
 		write_sectors_to_disk(disk_addr, our_disks[lun]->m_sectors, lun);
 	}
@@ -696,8 +709,7 @@ void omti8621_device::logerror(Format &&fmt, Params &&... args) const
 
 void omti8621_device::log_command(const uint8_t cdb[], const uint16_t cdb_length)
 {
-	if (verbose > 0) {
-		int i;
+	if (VERBOSE & (LOG_LEVEL1 | LOG_LEVEL2 | LOG_LEVEL3)) {
 		logerror("%s: OMTI command ", cpu_context());
 		switch (cdb[0]) {
 		case OMTI_CMD_TEST_DRIVE_READY: // 0x00
@@ -770,7 +782,7 @@ void omti8621_device::log_command(const uint8_t cdb[], const uint16_t cdb_length
 			logerror("!!! Unexpected Command !!!");
 		}
 //      logerror(" (%02x, length=%02x)", cdb[0], cdb_length);
-		for (i = 0; i < cdb_length; i++) {
+		for (int i = 0; i < cdb_length; i++) {
 			logerror(" %02x", cdb[i]);
 		}
 
@@ -795,15 +807,14 @@ void omti8621_device::log_command(const uint8_t cdb[], const uint16_t cdb_length
 
 void omti8621_device::log_data()
 {
-	if (verbose > 0) {
-		int i;
-		logerror("%s: OMTI data (length=%02x)", cpu_context(),
-				data_length);
-		for (i = 0; i < data_length && i < OMTI_DISK_SECTOR_SIZE; i++) {
-			logerror(" %02x", data_buffer[i]);
+	if (VERBOSE & LOG_LEVEL1) {
+		logerror("%s: OMTI data (length=%02x)", cpu_context(), m_data_length);
+		uint16_t i;
+		for (i = 0; i < m_data_length && i < OMTI_DISK_SECTOR_SIZE; i++) {
+			logerror(" %02x", m_data_buffer[i]);
 		}
 
-		if (i < data_length) {
+		if (i < m_data_length) {
 			logerror(" ...");
 		}
 		logerror("\n");
@@ -820,19 +831,19 @@ void omti8621_device::do_command(const uint8_t cdb[], const uint16_t cdb_length)
 	omti_disk_image_device *disk = our_disks[lun];
 	int command_duration = 0; // ms
 
-	log_command( cdb, cdb_length);
+	log_command(cdb, cdb_length);
 
 	// default to read status and status is successful completion
-	omti_state = OMTI_STATE_STATUS;
-	status_port |= OMTI_STATUS_IO | OMTI_STATUS_CD;
-	command_status = lun ? OMTI_COMMAND_STATUS_LUN : 0;
+	m_omti_state = OMTI_STATE_STATUS;
+	m_status_port |= OMTI_STATUS_IO | OMTI_STATUS_CD;
+	m_command_status = lun ? OMTI_COMMAND_STATUS_LUN : 0;
 
-	if (mask_port & OMTI_MASK_INTE) {
+	if (m_mask_port & OMTI_MASK_INTE) {
 		set_interrupt(CLEAR_LINE);
 	}
 
 	if (!disk->m_image->exists()) {
-		command_status |= OMTI_COMMAND_STATUS_ERROR; // no such drive
+		m_command_status |= OMTI_COMMAND_STATUS_ERROR; // no such drive
 	}
 
 	switch (cdb[0]) {
@@ -847,7 +858,7 @@ void omti8621_device::do_command(const uint8_t cdb[], const uint16_t cdb_length)
 		break;
 
 	case OMTI_CMD_REQUEST_SENSE: // 0x03
-		set_data_transfer(sense_data, sizeof(sense_data));
+		set_data_transfer(m_sense_data, sizeof(m_sense_data));
 		break;
 
 	case OMTI_CMD_READ_VERIFY: // 0x05
@@ -859,14 +870,14 @@ void omti8621_device::do_command(const uint8_t cdb[], const uint16_t cdb_length)
 		break;
 
 	case OMTI_CMD_FORMAT_BAD_TRACK: // 0x07
-		diskaddr_format_bad_track = get_disk_address(cdb);
+		m_diskaddr_format_bad_track = get_disk_address(cdb);
 		break;
 
 	case OMTI_CMD_READ: // 0x08
 		if (check_disk_address(cdb)) {
 			// read data from controller
 			read_sectors_from_disk(get_disk_address(cdb), cdb[4], lun);
-			set_data_transfer(&sector_buffer[0],  OMTI_DISK_SECTOR_SIZE*cdb[4]);
+			set_data_transfer(&m_sector_buffer[0],  OMTI_DISK_SECTOR_SIZE*cdb[4]);
 		}
 		break;
 
@@ -882,7 +893,7 @@ void omti8621_device::do_command(const uint8_t cdb[], const uint16_t cdb_length)
 		break;
 
 	case OMTI_CMD_READ_SECTOR_BUFFER: // 0x0E
-		set_data_transfer(&sector_buffer[0], OMTI_DISK_SECTOR_SIZE*cdb[4]);
+		set_data_transfer(&m_sector_buffer[0], OMTI_DISK_SECTOR_SIZE*cdb[4]);
 		break;
 
 	case OMTI_CMD_WRITE_SECTOR_BUFFER: // 0x0F
@@ -904,8 +915,8 @@ void omti8621_device::do_command(const uint8_t cdb[], const uint16_t cdb_length)
 #if 0   // this command seems unused by Domain/OS, and it's unclear what the intent of the code is (it makes some versions of GCC quite unhappy)
 	case OMTI_CMD_ASSIGN_ALTERNATE_TRACK: // 0x11
 		log_data();
-		alternate_track_address[0] = get_disk_track(cdb);
-		alternate_track_address[1] = get_disk_track(alternate_track_buffer-1);
+		m_alternate_track_address[0] = get_disk_track(cdb);
+		m_alternate_track_address[1] = get_disk_track(m_alternate_track_buffer - 1);
 		break;
 #endif
 
@@ -935,7 +946,7 @@ void omti8621_device::do_command(const uint8_t cdb[], const uint16_t cdb_length)
 		if (check_disk_address(cdb)) {
 			// read data from controller
 			read_sectors_from_disk(get_disk_address(cdb), cdb[4], lun);
-			set_data_transfer(&sector_buffer[0], OMTI_DISK_SECTOR_SIZE+6);
+			set_data_transfer(&m_sector_buffer[0], OMTI_DISK_SECTOR_SIZE+6);
 		}
 		break;
 
@@ -945,7 +956,7 @@ void omti8621_device::do_command(const uint8_t cdb[], const uint16_t cdb_length)
 			uint32_t diskaddr =  get_disk_address(cdb);
 			write_sectors_to_disk(diskaddr, cdb[4], lun);
 			// this will spoil the ECC code
-			diskaddr_ecc_error = diskaddr;
+			m_diskaddr_ecc_error = diskaddr;
 		}
 		break;
 
@@ -956,28 +967,28 @@ void omti8621_device::do_command(const uint8_t cdb[], const uint16_t cdb_length)
 
 	case OMTI_CMD_INVALID_COMMAND: // 0xFF
 		set_sense_data(OMTI_SENSE_CODE_INVALID_COMMAND, cdb);
-		command_status |= OMTI_COMMAND_STATUS_ERROR;
+		m_command_status |= OMTI_COMMAND_STATUS_ERROR;
 		break;
 
 	default:
-		LOG(("do_command: UNEXPECTED command %02x",cdb[0]));
+		LOGMASKED(LOG_LEVEL0, "%s: do_command: UNEXPECTED command %02x", cpu_context(), cdb[0]);
 		set_sense_data(OMTI_SENSE_CODE_INVALID_COMMAND, cdb);
-		command_status |= OMTI_COMMAND_STATUS_ERROR;
+		m_command_status |= OMTI_COMMAND_STATUS_ERROR;
 		break;
 	}
 
-	if (mask_port & OMTI_MASK_INTE) {
-//      if (omti_state != OMTI_STATE_STATUS) {
-//          LOG(("do_command: UNEXPECTED omti_state %02x",omti_state));
+	if (m_mask_port & OMTI_MASK_INTE) {
+//      if (m_omti_state != OMTI_STATE_STATUS) {
+//          LOGMASKED(LOG_LEVEL0, "%s: do_command: UNEXPECTED omti_state %02x", cpu_context(), m_omti_state));
 //      }
-		status_port |= OMTI_STATUS_IREQ;
+		m_status_port |= OMTI_STATUS_IREQ;
 		if (command_duration == 0)
 		{
 			set_interrupt(ASSERT_LINE);
 		}
 		else
 		{
-			// FIXME: should delay omti_state and status_port as well
+			// FIXME: should delay m_omti_state and m_status_port as well
 			m_timer->adjust(attotime::from_msec(command_duration), 0);
 		}
 	}
@@ -999,16 +1010,16 @@ uint8_t omti8621_device::get_command_length(uint8_t command_byte)
 uint16_t omti8621_device::get_data()
 {
 	uint16_t data = 0xff;
-	if (data_index < data_length) {
-		data = data_buffer[data_index++];
-		data |= data_buffer[data_index++] << 8;
-		if (data_index >= data_length) {
-			omti_state = OMTI_STATE_STATUS;
-			status_port |= OMTI_STATUS_IO | OMTI_STATUS_CD;
+	if (m_data_index < m_data_length) {
+		data = m_data_buffer[m_data_index++];
+		data |= m_data_buffer[m_data_index++] << 8;
+		if (m_data_index >= m_data_length) {
+			m_omti_state = OMTI_STATE_STATUS;
+			m_status_port |= OMTI_STATUS_IO | OMTI_STATUS_CD;
 			log_data();
 		}
 	} else {
-		LOG(("UNEXPECTED reading OMTI 8621 data (buffer length exceeded)"));
+		LOGMASKED(LOG_LEVEL0, "%s: UNEXPECTED reading OMTI 8621 data (buffer length exceeded)", cpu_context());
 	}
 	return data;
 }
@@ -1019,14 +1030,14 @@ uint16_t omti8621_device::get_data()
 
 void omti8621_device::set_data(uint16_t data)
 {
-	if (data_index < data_length) {
-		data_buffer[data_index++] = data & 0xff;
-		data_buffer[data_index++] = data >> 8;
-		if (data_index >= data_length) {
-			do_command(command_buffer, command_index);
+	if (m_data_index < m_data_length) {
+		m_data_buffer[m_data_index++] = data & 0xff;
+		m_data_buffer[m_data_index++] = data >> 8;
+		if (m_data_index >= m_data_length) {
+			do_command(m_command_buffer, m_command_index);
 		}
 	} else {
-		LOG(("UNEXPECTED writing OMTI 8621 data (buffer length exceeded)"));
+		LOGMASKED(LOG_LEVEL0, "%s: UNEXPECTED writing OMTI 8621 data (buffer length exceeded)", cpu_context());
 	}
 }
 
@@ -1057,91 +1068,89 @@ void omti8621_device::write8(offs_t offset, uint8_t data)
 	switch (offset)
 	{
 	case OMTI_PORT_DATA_OUT: //  0x00
-		switch (omti_state) {
+		switch (m_omti_state) {
 		case OMTI_STATE_COMMAND:
-			LOG2(("writing OMTI 8621 Command Register at offset %02x = %02x", offset, data));
-			if (command_index == 0) {
-				command_length = get_command_length(data);
+			LOGMASKED(LOG_LEVEL2, "%s: writing OMTI 8621 Command Register at offset %02x = %02x", cpu_context(), offset, data);
+			if (m_command_index == 0) {
+				m_command_length = get_command_length(data);
 			}
 
-			if (command_index < command_length) {
-				command_buffer[command_index++] = data;
+			if (m_command_index < m_command_length) {
+				m_command_buffer[m_command_index++] = data;
 			} else {
-				LOG(("UNEXPECTED writing OMTI 8621 Data Register at offset %02x = %02x (command length exceeded)", offset, data));
+				LOGMASKED(LOG_LEVEL0, "%s: UNEXPECTED writing OMTI 8621 Data Register at offset %02x = %02x (command length exceeded)", cpu_context(), offset, data);
 			}
 
-			if (command_index == command_length) {
-				switch (command_buffer[0]) {
+			if (m_command_index == m_command_length) {
+				switch (m_command_buffer[0]) {
 				case OMTI_CMD_WRITE: // 0x0A
 					// TODO: check diskaddr
-					// Fall through
+					[[fallthrough]];
 				case OMTI_CMD_WRITE_SECTOR_BUFFER: // 0x0F
-					set_data_transfer(&sector_buffer[0],
-							OMTI_DISK_SECTOR_SIZE * command_buffer[4]);
-					status_port &= ~OMTI_STATUS_IO;
+					set_data_transfer(&m_sector_buffer[0], OMTI_DISK_SECTOR_SIZE * m_command_buffer[4]);
+					m_status_port &= ~OMTI_STATUS_IO;
 					break;
 
 				case OMTI_CMD_ASSIGN_ALTERNATE_TRACK: // 0x11
-					set_data_transfer(alternate_track_buffer, sizeof(alternate_track_buffer));
-					status_port &= ~OMTI_STATUS_IO;
+					set_data_transfer(m_alternate_track_buffer, sizeof(m_alternate_track_buffer));
+					m_status_port &= ~OMTI_STATUS_IO;
 					break;
 
 				case OMTI_CMD_WRITE_LONG: // 0xE6
 					// TODO: check diskaddr
-					set_data_transfer(&sector_buffer[0],
-							(OMTI_DISK_SECTOR_SIZE +6) * command_buffer[4]);
-					status_port &= ~OMTI_STATUS_IO;
+					set_data_transfer(&m_sector_buffer[0], (OMTI_DISK_SECTOR_SIZE +6) * m_command_buffer[4]);
+					m_status_port &= ~OMTI_STATUS_IO;
 					break;
 
 				default:
-					do_command(command_buffer, command_index);
+					do_command(m_command_buffer, m_command_index);
 					break;
 				}
 			}
 			break;
 
 		case OMTI_STATE_DATA:
-			LOG(("UNEXPECTED: writing OMTI 8621 Data Register at offset %02x = %02x", offset, data));
+			LOGMASKED(LOG_LEVEL0, "%s: UNEXPECTED: writing OMTI 8621 Data Register at offset %02x = %02x", cpu_context(), offset, data);
 			break;
 
 		default:
-			LOG(("UNEXPECTED writing OMTI 8621 Data Register at offset %02x = %02x (omti state = %02x)", offset, data, omti_state));
+			LOGMASKED(LOG_LEVEL0, "%s: UNEXPECTED writing OMTI 8621 Data Register at offset %02x = %02x (omti state = %02x)", cpu_context(), offset, data, m_omti_state);
 			break;
 		}
 		break;
 
 	case OMTI_PORT_RESET: // 0x01
-		LOG2(("writing OMTI 8621 Reset Register at offset %02x = %02x", offset, data));
+		LOGMASKED(LOG_LEVEL2, "%s: writing OMTI 8621 Reset Register at offset %02x = %02x", cpu_context(), offset, data);
 		device_reset();
 		break;
 
 	case OMTI_PORT_SELECT: // 0x02
-		LOG2(("writing OMTI 8621 Select Register at offset %02x = %02x (omti state = %02x)", offset, data, omti_state));
-		omti_state = OMTI_STATE_COMMAND;
+		LOGMASKED(LOG_LEVEL2, "%s: writing OMTI 8621 Select Register at offset %02x = %02x (omti state = %02x)", cpu_context(), offset, data, m_omti_state);
+		m_omti_state = OMTI_STATE_COMMAND;
 
-		status_port |= OMTI_STATUS_BUSY | OMTI_STATUS_REQ | OMTI_STATUS_CD;
-		status_port &= ~OMTI_STATUS_IO;
+		m_status_port |= OMTI_STATUS_BUSY | OMTI_STATUS_REQ | OMTI_STATUS_CD;
+		m_status_port &= ~OMTI_STATUS_IO;
 
-		command_status = 0;
-		command_index = 0;
+		m_command_status = 0;
+		m_command_index = 0;
 		break;
 
 	case OMTI_PORT_MASK: // 0x03
-		LOG2(("writing OMTI 8621 Mask Register at offset %02x = %02x", offset, data));
-		mask_port = data;
+		LOGMASKED(LOG_LEVEL2, "%s: writing OMTI 8621 Mask Register at offset %02x = %02x", cpu_context(), offset, data);
+		m_mask_port = data;
 
 		if ((data & OMTI_MASK_INTE) == 0) {
-			status_port &= ~OMTI_STATUS_IREQ;
+			m_status_port &= ~OMTI_STATUS_IREQ;
 			set_interrupt(CLEAR_LINE);
 		}
 
 		if ((data & OMTI_MASK_DMAE) == 0) {
-			status_port &= ~OMTI_STATUS_DREQ;
+			m_status_port &= ~OMTI_STATUS_DREQ;
 		}
 		break;
 
 	default:
-		LOG(("UNEXPECTED writing OMTI 8621 Register at offset %02x = %02x", offset, data));
+		LOGMASKED(LOG_LEVEL0, "%s: UNEXPECTED writing OMTI 8621 Register at offset %02x = %02x", cpu_context(), offset, data);
 		break;
 	}
 }
@@ -1166,69 +1175,64 @@ uint8_t omti8621_device::read8(offs_t offset)
 
 	switch (offset) {
 	case OMTI_PORT_DATA_IN: // 0x00
-		if (status_port & OMTI_STATUS_CD)
+		if (m_status_port & OMTI_STATUS_CD)
 		{
-			data = command_status;
-			switch (omti_state)
+			data = m_command_status;
+			switch (m_omti_state)
 			{
 			case OMTI_STATE_COMMAND:
-				LOG2(("reading OMTI 8621 Data Status Register 1 at offset %02x = %02x (omti state = %02x)", offset, data, omti_state));
+				LOGMASKED(LOG_LEVEL2, "%s: reading OMTI 8621 Data Status Register 1 at offset %02x = %02x (omti state = %02x)", cpu_context(), offset, data, m_omti_state);
 				break;
 			case OMTI_STATE_STATUS:
-				omti_state = OMTI_STATE_IDLE;
-				status_port &= ~(OMTI_STATUS_BUSY | OMTI_STATUS_CD  | OMTI_STATUS_IO | OMTI_STATUS_REQ);
-				LOG2(("reading OMTI 8621 Data Status Register 2 at offset %02x = %02x", offset, data));
+				m_omti_state = OMTI_STATE_IDLE;
+				m_status_port &= ~(OMTI_STATUS_BUSY | OMTI_STATUS_CD  | OMTI_STATUS_IO | OMTI_STATUS_REQ);
+				LOGMASKED(LOG_LEVEL2, "%s: reading OMTI 8621 Data Status Register 2 at offset %02x = %02x", cpu_context(), offset, data);
 				break;
 			default:
-				LOG(("UNEXPECTED reading OMTI 8621 Data Status Register 3 at offset %02x = %02x (omti state = %02x)", offset, data, omti_state));
+				LOGMASKED(LOG_LEVEL0, "%s: UNEXPECTED reading OMTI 8621 Data Status Register 3 at offset %02x = %02x (omti state = %02x)", cpu_context(), offset, data, m_omti_state);
 				break;
 			}
 		}
 		else
 		{
-			LOG(("UNEXPECTED reading OMTI 8621 Data Register 4 at offset %02x = %02x (status bit C/D = 0)", offset, data));
+			LOGMASKED(LOG_LEVEL0, "%s: UNEXPECTED reading OMTI 8621 Data Register 4 at offset %02x = %02x (status bit C/D = 0)", cpu_context(), offset, data);
 		}
 		break;
 
 	case OMTI_PORT_STATUS: // 0x01
-		data = status_port;
+		data = m_status_port;
 		// omit excessive logging
 		if (data != last_data)
 		{
-			LOG2(("reading OMTI 8621 Status Register 5 at offset %02x = %02x", offset, data));
+			LOGMASKED(LOG_LEVEL2, "%s: reading OMTI 8621 Status Register 5 at offset %02x = %02x", cpu_context(), offset, data);
 //          last_data = data;
 		}
 		break;
 
 	case OMTI_PORT_CONFIG: // 0x02
-		data = config_port;
-		LOG2(("reading OMTI 8621 Configuration Register at offset %02x = %02x", offset, data));
+		data = m_config_port;
+		LOGMASKED(LOG_LEVEL2, "%s: reading OMTI 8621 Configuration Register at offset %02x = %02x", cpu_context(), offset, data);
 		break;
 
 	case OMTI_PORT_MASK: // 0x03
-		data = mask_port ;
+		data = m_mask_port;
 		// win.dex will update the mask register with read-modify-write
-		// LOG2(("reading OMTI 8621 Mask Register at offset %02x = %02x (UNEXPECTED!)", offset, data));
+		// LOGMASKED(LOG_LEVEL2, "%s: reading OMTI 8621 Mask Register at offset %02x = %02x (UNEXPECTED!)", cpu_context(), offset, data);
 		break;
 
 	default:
-		LOG(("UNEXPECTED reading OMTI 8621 Register at offset %02x = %02x", offset, data));
+		LOGMASKED(LOG_LEVEL0, "%s: UNEXPECTED reading OMTI 8621 Register at offset %02x = %02x", cpu_context(), offset, data);
 		break;
 	}
 
 	return data;
 }
 
-void omti8621_device::set_verbose(int on_off)
-{
-	verbose = on_off == 0 ? 0 : VERBOSE > 1 ? VERBOSE : 1;
-}
-
 /***************************************************************************
  get_sector - get sector diskaddr of logical unit lun into data_buffer
  ***************************************************************************/
 
-uint32_t omti8621_apollo_device::get_sector(int32_t diskaddr, uint8_t *data_buffer, uint32_t length, uint8_t lun)
+uint32_t omti8621_apollo_device::get_sector(int32_t diskaddr, uint8_t *buffer, uint32_t length, uint8_t lun)
 {
 	omti_disk_image_device *disk = our_disks[lun];
 
@@ -1238,13 +1242,13 @@ uint32_t omti8621_apollo_device::get_sector(int32_t diskaddr, uint8_t *data_buff
 	}
 	else
 	{
-//      LOG1(("omti8621_get_sector %x on lun %d", diskaddr, lun));
+//      LOGMASKED(LOG_LEVEL1, "%s: omti8621_get_sector %x on lun %d", cpu_context(), diskaddr, lun);
 
 		// restrict length to size of 1 sector (i.e. 1024 Byte)
 		length = length < OMTI_DISK_SECTOR_SIZE ? length  : OMTI_DISK_SECTOR_SIZE;
 
 		disk->m_image->fseek(diskaddr * OMTI_DISK_SECTOR_SIZE, SEEK_SET);
-		disk->m_image->fread(data_buffer, length);
+		disk->m_image->fread(buffer, length);
 
 		return length;
 	}
@@ -1256,17 +1260,17 @@ uint32_t omti8621_apollo_device::get_sector(int32_t diskaddr, uint8_t *data_buff
 
 void omti8621_device::set_jumper(uint16_t disk_type)
 {
-	LOG1(("set_jumper: disk type=%x", disk_type));
+	LOGMASKED(LOG_LEVEL1, "%s: set_jumper: disk type=%x", cpu_context(), disk_type);
 
 	switch (disk_type)
 	{
 	case OMTI_DISK_TYPE_348_MB: // Maxtor 380 MB (348-MB FA formatted)
-		jumper = OMTI_CONFIG_W22 | OMTI_CONFIG_W23;
+		m_jumper = OMTI_CONFIG_W22 | OMTI_CONFIG_W23;
 		break;
 
 	case OMTI_DISK_TYPE_155_MB: // Micropolis 170 MB (155-MB formatted)
 	default:
-		jumper = OMTI_CONFIG_W20;
+		m_jumper = OMTI_CONFIG_W20;
 		break;
 	}
 }

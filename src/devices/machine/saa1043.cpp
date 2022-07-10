@@ -24,7 +24,6 @@ saa1043_device::saa1043_device(const machine_config &mconfig, const char *tag, d
 	, m_outputs(*this)
 	, m_type(PAL)
 {
-	std::fill(std::begin(m_outputs_hooked), std::end(m_outputs_hooked), false);
 }
 
 void saa1043_device::device_start()
@@ -32,50 +31,26 @@ void saa1043_device::device_start()
 	m_h = attotime::from_ticks(320, clock() * 2);
 	m_line_count = s_line_counts[m_type];
 
-	// resolve callbacks
-	for (uint32_t i = 0; i < OUT_COUNT; i++)
-	{
-		m_outputs[i].resolve_safe();
-		if (m_outputs_hooked[i])
-		{
-			m_timers[i] = timer_alloc(i);
-			switch(i)
-			{
-				case V2:
-					m_timers[V2]->adjust(m_h * 6, 1);
-					break;
-				default:
-					// Not yet implemented
-					break;
-			}
-		}
-	}
+	m_outputs.resolve_all_safe();
+
+	m_timers[OUT_V2] = timer_alloc(FUNC(saa1043_device::toggle_v2), this);
+	m_timers[OUT_V2]->adjust(m_h * 6, 1);
 }
 
 void saa1043_device::device_reset()
 {
-	// Clear any existing clock states
 	for (uint32_t i = 0; i < OUT_COUNT; i++)
 	{
 		m_outputs[i](CLEAR_LINE);
 	}
-	m_outputs[V2](ASSERT_LINE);
+	m_outputs[OUT_V2](ASSERT_LINE);
 }
 
-void saa1043_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(saa1043_device::toggle_v2)
 {
-	switch (id)
-	{
-		case V2:
-			m_outputs[V2](1 - param);
-			if (param)
-				m_timers[V2]->adjust(m_h * (m_line_count - 9), 0);
-			else
-				m_timers[V2]->adjust(m_h * 9, 1);
-			break;
-
-		default:
-			// Not yet implemented
-			break;
-	}
+	m_outputs[OUT_V2](1 - param);
+	if (param)
+		m_timers[OUT_V2]->adjust(m_h * (m_line_count - 9), 0);
+	else
+		m_timers[OUT_V2]->adjust(m_h * 9, 1);
 }

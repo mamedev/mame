@@ -23,7 +23,7 @@ public:
 	virtual void prg_cb(int start, int bank);
 	virtual void chr_cb(int start, int bank, int source);
 
-	virtual void hblank_irq(int scanline, int vblank, int blanked) override;
+	virtual void hblank_irq(int scanline, bool vblank, bool blanked) override;
 	virtual void pcb_reset() override;
 
 protected:
@@ -87,17 +87,15 @@ class nes_txsrom_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_txsrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_txsrom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	// device-level overrides
-	virtual void write_h(offs_t offset, uint8_t data) override;
-	virtual void chr_cb(int start, int bank, int source) override;
+	virtual void write_h(offs_t offset, u8 data) override;
 
 protected:
 	// construction/destruction
 	nes_txsrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	void set_mirror();
+	virtual void set_chr(u8 chr, int chr_base, int chr_mask) override;
 };
 
 
@@ -107,10 +105,13 @@ class nes_tqrom_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_tqrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_tqrom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void chr_cb(int start, int bank, int source) override;
 
 protected:
-	virtual void set_chr( uint8_t chr, int chr_base, int chr_mask ) override;
+	// construction/destruction
+	nes_tqrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 };
 
 
@@ -120,10 +121,10 @@ class nes_qj_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_qj_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_qj_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	// device-level overrides
-	virtual void write_m(offs_t offset, uint8_t data) override;
+	virtual void write_m(offs_t offset, u8 data) override;
+
 	virtual void pcb_reset() override;
 };
 
@@ -134,10 +135,10 @@ class nes_zz_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_zz_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_zz_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	// device-level overrides
-	virtual void write_m(offs_t offset, uint8_t data) override;
+	virtual void write_m(offs_t offset, u8 data) override;
+
 	virtual void pcb_reset() override;
 };
 

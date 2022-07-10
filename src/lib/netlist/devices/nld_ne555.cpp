@@ -29,13 +29,13 @@ namespace netlist::devices {
 		, m_last_reset(*this, "m_last_reset", false)
 		, m_overshoot(*this, "m_overshoot", 0.0)
 		, m_undershoot(*this, "m_undershoot", 0.0)
-		, m_ovlimit(0.0)
+		, m_overshoot_limit(0.0)
 		{
-			register_subalias("GND",  "R3.2");    // Pin 1
-			register_subalias("CONT", "R1.2");    // Pin 5
-			register_subalias("DISCH", "RDIS.1"); // Pin 7
-			register_subalias("VCC",  "R1.1");    // Pin 8
-			register_subalias("OUT",  "ROUT.1");  // Pin 3
+			register_sub_alias("GND",  "R3.2");    // Pin 1
+			register_sub_alias("CONT", "R1.2");    // Pin 5
+			register_sub_alias("DISCH", "RDIS.1"); // Pin 7
+			register_sub_alias("VCC",  "R1.1");    // Pin 8
+			register_sub_alias("OUT",  "ROUT.1");  // Pin 3
 
 			connect("R1.2", "R2.1");
 			connect("R2.2", "R3.1");
@@ -46,17 +46,17 @@ namespace netlist::devices {
 		NETLIB_RESETI()
 		{
 			/* FIXME make resistances a parameter, properly model other variants */
-			m_R1.set_R(nlconst::magic(5000));
-			m_R2.set_R(nlconst::magic(5000));
-			m_R3.set_R(nlconst::magic(5000));
-			m_ROUT.set_R(nlconst::magic(20));
-			m_RDIS.set_R(nlconst::magic(R_OFF));
+			m_R1().set_R(nlconst::magic(5000));
+			m_R2().set_R(nlconst::magic(5000));
+			m_R3().set_R(nlconst::magic(5000));
+			m_ROUT().set_R(nlconst::magic(20));
+			m_RDIS().set_R(nlconst::magic(R_OFF));
 
 			m_last_out = true;
 			// Check for astable setup, usually TRIG AND THRES connected. Enable
 			// overshoot compensation in this case.
 			if (m_TRIG.net() == m_THRES.net())
-				m_ovlimit = nlconst::magic(0.5);
+				m_overshoot_limit = nlconst::magic(0.5);
 		}
 
 	private:
@@ -66,12 +66,12 @@ namespace netlist::devices {
 
 			const auto reset = m_RESET();
 
-			const nl_fptype vthresh = clamp_hl(m_R2.P()(), nlconst::magic(0.7), nlconst::magic(1.4));
-			const nl_fptype vtrig = clamp_hl(m_R2.N()(), nlconst::magic(0.7), nlconst::magic(1.4));
+			const nl_fptype v_threshold = clamp_hl(m_R2().P()(), nlconst::magic(0.7), nlconst::magic(1.4));
+			const nl_fptype v_trigger = clamp_hl(m_R2().N()(), nlconst::magic(0.7), nlconst::magic(1.4));
 
 			// avoid artificial oscillation due to overshoot compensation when
 			// the control input is used.
-			const auto ovlimit = std::min(m_ovlimit, std::max(0.0, (vthresh - vtrig) / 3.0));
+			const auto overshoot_limit = std::min(m_overshoot_limit, std::max(0.0, (v_threshold - v_trigger) / 3.0));
 
 			if (!reset && m_last_reset)
 			{
@@ -80,15 +80,15 @@ namespace netlist::devices {
 			else
 			{
 #if (NL_USE_BACKWARD_EULER)
-				const bool bthresh = (m_THRES() + m_overshoot > vthresh);
-				const bool btrig = (m_TRIG() - m_overshoot > vtrig);
+				const bool threshold_exceeded = (m_THRES() + m_overshoot > v_threshold);
+				const bool trigger_exceeded = (m_TRIG() - m_overshoot > v_trigger);
 #else
-				const bool bthresh = (m_THRES() + m_overshoot > vthresh);
-				const bool btrig = (m_TRIG() - m_undershoot > vtrig);
+				const bool threshold_exceeded = (m_THRES() + m_overshoot > v_threshold);
+				const bool trigger_exceeded = (m_TRIG() - m_undershoot > v_trigger);
 #endif
-				if (!btrig)
+				if (!trigger_exceeded)
 					m_ff = true;
-				else if (bthresh)
+				else if (threshold_exceeded)
 				{
 					m_ff = false;
 				}
@@ -99,43 +99,43 @@ namespace netlist::devices {
 			if (m_last_out && !out)
 			{
 #if (NL_USE_BACKWARD_EULER)
-				m_overshoot += ((m_THRES() - vthresh)) * 2.0;
+				m_overshoot += ((m_THRES() - v_threshold)) * 2.0;
 #else
-				m_overshoot += ((m_THRES() - vthresh));
+				m_overshoot += ((m_THRES() - v_threshold));
 #endif
-				m_overshoot = plib::clamp(m_overshoot(), nlconst::zero(), ovlimit);
+				m_overshoot = plib::clamp(m_overshoot(), nlconst::zero(), overshoot_limit);
 				//if (this->name() == "IC6_2")
 				//  printf("%f %s %f %f %f\n", exec().time().as_double(), this->name().c_str(), m_overshoot(), m_R2.P()(), m_THRES());
-				m_RDIS.change_state([this]()
+				m_RDIS().change_state([this]()
 					{
-						m_RDIS.set_R(nlconst::magic(R_ON));
+						m_RDIS().set_R(nlconst::magic(R_ON));
 					});
-				m_OUT.push(m_R3.N()());
+				m_OUT.push(m_R3().N()());
 			}
 			else if (!m_last_out && out)
 			{
 #if (NL_USE_BACKWARD_EULER)
-				m_overshoot += (vtrig - m_TRIG()) * 2.0;
-				m_overshoot = plib::clamp(m_overshoot(), nlconst::zero(), ovlimit);
+				m_overshoot += (v_trigger - m_TRIG()) * 2.0;
+				m_overshoot = plib::clamp(m_overshoot(), nlconst::zero(), overshoot_limit);
 #else
-				m_undershoot += (vtrig - m_TRIG());
-				m_undershoot = plib::clamp(m_undershoot(), nlconst::zero(), ovlimit);
+				m_undershoot += (v_trigger - m_TRIG());
+				m_undershoot = plib::clamp(m_undershoot(), nlconst::zero(), overshoot_limit);
 #endif
-				m_RDIS.change_state([this]()
+				m_RDIS().change_state([this]()
 					{
-						m_RDIS.set_R(nlconst::magic(R_OFF));
+						m_RDIS().set_R(nlconst::magic(R_OFF));
 					});
 				// FIXME: Should be delayed by 100ns
-				m_OUT.push(m_R1.P()());
+				m_OUT.push(m_R1().P()());
 			}
 			m_last_reset = reset;
 			m_last_out = out;
 		}
-		analog::NETLIB_SUB(R_base) m_R1;
-		analog::NETLIB_SUB(R_base) m_R2;
-		analog::NETLIB_SUB(R_base) m_R3;
-		analog::NETLIB_SUB(R_base) m_ROUT;
-		analog::NETLIB_SUB(R_base) m_RDIS;
+		NETLIB_SUB_NS(analog, R_base) m_R1;
+		NETLIB_SUB_NS(analog, R_base) m_R2;
+		NETLIB_SUB_NS(analog, R_base) m_R3;
+		NETLIB_SUB_NS(analog, R_base) m_ROUT;
+		NETLIB_SUB_NS(analog, R_base) m_RDIS;
 
 		logic_input_t m_RESET;
 		analog_input_t m_THRES;
@@ -147,11 +147,11 @@ namespace netlist::devices {
 		state_var<bool> m_last_reset;
 		state_var<nl_fptype> m_overshoot;
 		state_var<nl_fptype> m_undershoot;
-		nl_fptype m_ovlimit;
+		nl_fptype m_overshoot_limit;
 
 		nl_fptype clamp_hl(const nl_fptype v, const nl_fptype a, const nl_fptype b) noexcept
 		{
-			const nl_fptype vcc = m_R1.P()();
+			const nl_fptype vcc = m_R1().P()();
 			return plib::clamp(v, b, vcc - a);
 		}
 	};

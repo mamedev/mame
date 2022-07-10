@@ -177,6 +177,25 @@ std::string ns32000_disassembler::reglist(u8 imm)
 	return result;
 }
 
+std::string ns32000_disassembler::config(u8 imm)
+{
+	static char const *const cfg[] = { "I", "F", "M", "C", "FF", "FM", "FC", "P" };
+	std::string result;
+
+	for (unsigned i = 0; i < 8; i++)
+	{
+		if (BIT(imm, i))
+		{
+			if (!result.empty())
+				result.append(",");
+
+			result.append(cfg[i]);
+		}
+	}
+
+	return result;
+}
+
 offs_t ns32000_disassembler::disassemble(std::ostream &stream, offs_t pc, data_buffer const &opcodes, data_buffer const &params)
 {
 	uint32_t flags = SUPPORTED;
@@ -188,6 +207,8 @@ offs_t ns32000_disassembler::disassemble(std::ostream &stream, offs_t pc, data_b
 	{
 		// format 0: cccc 1010
 		util::stream_format(stream, "B%-2s     0x%X", cond_code[BIT(opbyte, 4, 4)], pc + displacement(pc, opcodes, bytes));
+		if (BIT(opbyte, 4, 4) < 0xe)
+			flags |= STEP_COND;
 	}
 	else if ((opbyte & 15) == 2)
 	{
@@ -239,7 +260,7 @@ offs_t ns32000_disassembler::disassemble(std::ostream &stream, offs_t pc, data_b
 		case 1: util::stream_format(stream, "CMPQ%c   %d, %s", size_char[size], s32(quick << 28) >> 28, mode[0].mode); break;
 		case 2: util::stream_format(stream, "SPR%c    %s, %s", size_char[size], procreg[quick], mode[0].mode); break;
 		case 3: util::stream_format(stream, "S%s%c    %s", cond_code[quick], size_char[size], mode[0].mode); break;
-		case 4: util::stream_format(stream, "ACB%c    %d, %s, 0x%X", size_char[size], s32(quick << 28) >> 28, mode[0].mode, pc + displacement(pc, opcodes, bytes)); break;
+		case 4: util::stream_format(stream, "ACB%c    %d, %s, 0x%X", size_char[size], s32(quick << 28) >> 28, mode[0].mode, pc + displacement(pc, opcodes, bytes)); flags |= STEP_COND; break;
 		case 5: util::stream_format(stream, "MOVQ%c   %d, %s", size_char[size], s32(quick << 28) >> 28, mode[0].mode); break;
 		case 6: util::stream_format(stream, "LPR%c    %s, %s", size_char[size], procreg[quick], mode[0].mode); break;
 		case 7:
@@ -295,7 +316,6 @@ offs_t ns32000_disassembler::disassemble(std::ostream &stream, offs_t pc, data_b
 			u16 const opword = opcodes.r16(pc + bytes); bytes += 2;
 
 			char const *const options[] = { "", "B", "W", "W,B", "", "", "U", "U,B" };
-			char const *const config[] = { "", "I", "F", "F,I", "M", "M,I", "M,F", "M,F,I", "C", "C,I", "C,F", "C,F,I", "C,M", "C,M,I", "C,M,F", "C,M,F,I" };
 
 			size_code const size = size_code(opword & 3);
 
@@ -313,7 +333,7 @@ offs_t ns32000_disassembler::disassemble(std::ostream &stream, offs_t pc, data_b
 				else
 					util::stream_format(stream, "CMPS%c   %s", size_char[size], options[BIT(opword, 8, 3)]);
 				break;
-			case 2: util::stream_format(stream, "SETCFG  [%s]", config[BIT(opword, 7, 4)]); break;
+			case 2: util::stream_format(stream, "SETCFG  [%s]", config(BIT(opword, 7, 8))); break;
 			case 3:
 				if (BIT(opword, 7))
 					util::stream_format(stream, "SKPST%c  %s", size_char[size], options[BIT(opword, 8, 3)]);
@@ -382,8 +402,8 @@ offs_t ns32000_disassembler::disassemble(std::ostream &stream, offs_t pc, data_b
 			{
 			case 0x0: util::stream_format(stream, "MOVM%c   %s, %s, %d", size_char[size], mode[0].mode, mode[1].mode, displacement(pc, opcodes, bytes) / (size + 1) + 1); break;
 			case 0x1: util::stream_format(stream, "CMPM%c   %s, %s, %d", size_char[size], mode[0].mode, mode[1].mode, displacement(pc, opcodes, bytes) / (size + 1) + 1); break;
-			case 0x2: util::stream_format(stream, "INSS%c   %s, %s, %d", size_char[size], mode[0].mode, mode[1].mode, imm >> 5, imm & 31); break;
-			case 0x3: util::stream_format(stream, "EXTS%c   %s, %s, %d", size_char[size], mode[0].mode, mode[1].mode, imm >> 5, imm & 31); break;
+			case 0x2: util::stream_format(stream, "INSS%c   %s, %s, %d, %d", size_char[size], mode[0].mode, mode[1].mode, imm >> 5, (imm & 31) + 1); break;
+			case 0x3: util::stream_format(stream, "EXTS%c   %s, %s, %d, %d", size_char[size], mode[0].mode, mode[1].mode, imm >> 5, (imm & 31) + 1); break;
 			case 0x4: util::stream_format(stream, "MOVXBW  %s, %s", mode[0].mode, mode[1].mode); break;
 			case 0x5: util::stream_format(stream, "MOVZBW  %s, %s", mode[0].mode, mode[1].mode); break;
 			case 0x6: util::stream_format(stream, "MOVZ%cD  %s, %s", size_char[size], mode[0].mode, mode[1].mode); break;
@@ -548,13 +568,35 @@ offs_t ns32000_disassembler::disassemble(std::ostream &stream, offs_t pc, data_b
 			}
 		}
 		break;
-	case 0xfe: // format 12
+	case 0xfe:
+		// format 12: xxxx xyyy yyoo oo0f 1111 1110
+		{
+			u16 const opword = opcodes.r16(pc + bytes); bytes += 2;
+
+			addr_mode mode[] = { addr_mode(BIT(opword, 11, 5)), addr_mode(BIT(opword, 6, 5)) };
+			size_code const size_f = BIT(opword, 0) ? SIZE_D : SIZE_Q;
+
+			mode[0].size_f(size_f);
+			mode[1].size_f(size_f);
+			decode(mode, pc, opcodes, bytes);
+
+			switch (BIT(opword, 2, 4))
+			{
+			case 0x2: util::stream_format(stream, "POLY%c   %s, %s", BIT(opword, 0) ? 'F' : 'L', mode[0].mode, mode[1].mode); break;
+			case 0x3: util::stream_format(stream, "DOT%c    %s, %s", BIT(opword, 0) ? 'F' : 'L', mode[0].mode, mode[1].mode); break;
+			case 0x4: util::stream_format(stream, "SCALB%c  %s, %s", BIT(opword, 0) ? 'F' : 'L', mode[0].mode, mode[1].mode); break;
+			case 0x5: util::stream_format(stream, "LOGB%c   %s, %s", BIT(opword, 0) ? 'F' : 'L', mode[0].mode, mode[1].mode); break;
+			default: bytes = 1; break;
+			}
+		}
+		break;
 	case 0x9e: // format 13
 		bytes = 1;
 		break;
 	case 0x1e:
 		// format 14: xxxx xsss s0oo ooii 0001 1110
 		{
+			// TODO: different mmu registers for 32332 and 32532
 			char const *const mmureg[] = { "BPR0", "BPR1", "", "", "PF0", "PF1", "", "", "SC", "", "MSR", "BCNT", "PTB0", "PTB1", "", "EIA" };
 
 			u16 const opword = opcodes.r16(pc + bytes); bytes += 2;

@@ -5270,22 +5270,46 @@ static void config_gal16v8_pins(const pal_data* pal, const jed_data* jed)
 
 			for (index = 0; index < std::size(macrocells); ++index)
 			{
-				if (jed_get_fuse(jed, macrocells[index].ac1_fuse))
+				if (macrocells[index].pin != 15 && macrocells[index].pin != 16)
 				{
-					/* Pin is for input only */
-
-					input_pins_combinatorialsimple[input_pin_count] = macrocells[index].pin;
-
-					++input_pin_count;
-
-					if (macrocells[index].pin == 15 || macrocells[index].pin == 16)
+					if (jed_get_fuse(jed, macrocells[index].ac1_fuse))
 					{
-						fprintf(stderr, "Pin %d cannot be configured as an input pin.\n",
-								macrocells[index].pin);
+						/* Pin is for input only */
+
+						input_pins_combinatorialsimple[input_pin_count] = macrocells[index].pin;
+
+						++input_pin_count;
+					}
+					else
+					{
+						output_pins[output_pin_count].pin = macrocells[index].pin;
+						output_pins[output_pin_count].flags = OUTPUT_COMBINATORIAL;
+
+						if (jed_get_fuse(jed, macrocells[index].xor_fuse))
+						{
+							output_pins[output_pin_count].flags |= OUTPUT_ACTIVEHIGH;
+						}
+						else
+						{
+							output_pins[output_pin_count].flags |= OUTPUT_ACTIVELOW;
+						}
+
+						output_pins[output_pin_count].flags |= OUTPUT_FEEDBACK_OUTPUT;
+
+						input_pins_combinatorialsimple[input_pin_count] = macrocells[index].pin;
+
+						++input_pin_count;
+
+						++output_pin_count;
 					}
 				}
 				else
 				{
+					/* For pins 15 and 16 ignore the value of the ac1_fuse (This
+					   normally determine if the pin is an input or output.) because
+					   according to the datasheet these macrocells are output
+					   only when in simple mode. */
+
 					output_pins[output_pin_count].pin = macrocells[index].pin;
 					output_pins[output_pin_count].flags = OUTPUT_COMBINATORIAL;
 
@@ -5298,19 +5322,7 @@ static void config_gal16v8_pins(const pal_data* pal, const jed_data* jed)
 						output_pins[output_pin_count].flags |= OUTPUT_ACTIVELOW;
 					}
 
-					if (output_pins[output_pin_count].pin != 15 &&
-						output_pins[output_pin_count].pin != 16)
-					{
-						output_pins[output_pin_count].flags |= OUTPUT_FEEDBACK_OUTPUT;
-
-						input_pins_combinatorialsimple[input_pin_count] = macrocells[index].pin;
-
-						++input_pin_count;
-					}
-					else
-					{
-						output_pins[output_pin_count].flags |= OUTPUT_FEEDBACK_NONE;
-					}
+					output_pins[output_pin_count].flags |= OUTPUT_FEEDBACK_NONE;
 
 					++output_pin_count;
 				}

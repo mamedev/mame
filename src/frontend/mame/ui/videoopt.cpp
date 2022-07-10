@@ -37,6 +37,7 @@ constexpr uintptr_t ITEM_VIEW_FIRST     = 0x00000300;
 menu_video_targets::menu_video_targets(mame_ui_manager &mui, render_container &container)
 	: menu(mui, container)
 {
+	set_heading(_("Video Options"));
 }
 
 menu_video_targets::~menu_video_targets()
@@ -90,36 +91,18 @@ void menu_video_targets::handle(event const *ev)
 menu_video_options::menu_video_options(
 		mame_ui_manager &mui,
 		render_container &container,
+		std::string_view title,
 		render_target &target,
 		bool snapshot)
 	: menu(mui, container)
 	, m_target(target)
-	, m_title()
-	, m_show_title(false)
 	, m_snapshot(snapshot)
 {
+	set_heading(util::string_format(_("Video Options: %1$s"), title));
+
 	if (!m_snapshot || !machine().video().snap_native())
 	{
 		set_selected_index(target.view());
-		reset(reset_options::REMEMBER_POSITION);
-	}
-}
-
-menu_video_options::menu_video_options(
-		mame_ui_manager &mui,
-		render_container &container,
-		std::string &&title,
-		render_target &target,
-		bool snapshot)
-	: menu(mui, container)
-	, m_target(target)
-	, m_title(std::move(title))
-	, m_show_title(true)
-	, m_snapshot(snapshot)
-{
-	if (!m_snapshot || !machine().video().snap_native())
-	{
-		set_selected_index(target.view() + 2);
 		reset(reset_options::REMEMBER_POSITION);
 	}
 }
@@ -131,13 +114,6 @@ menu_video_options::~menu_video_options()
 void menu_video_options::populate(float &customtop, float &custombottom)
 {
 	uintptr_t ref;
-
-	// add title if requested
-	if (m_show_title)
-	{
-		item_append(m_title, FLAG_DISABLE, nullptr);
-		item_append(menu_item_type::SEPARATOR);
-	}
 
 	// add items for each view
 	if (!m_snapshot || !machine().video().snap_native())

@@ -8,6 +8,7 @@
 /// \file nld_generic_models.h
 ///
 
+#include "core/state_var.h"
 #include "nl_base.h"
 
 //
@@ -20,9 +21,7 @@
 
 #define USE_TEXTBOOK_DIODE  (1)
 
-namespace netlist
-{
-namespace analog
+namespace netlist::analog
 {
 
 	// -----------------------------------------------------------------------------
@@ -68,15 +67,14 @@ namespace analog
 			//return m_h * cap +  m_gmin;
 		}
 
-		nl_fptype Ieq(nl_fptype cap, nl_fptype v) const noexcept
+		nl_fptype Ieq(nl_fptype cap, [[maybe_unused]] nl_fptype v) const noexcept
 		{
-			plib::unused_var(v);
 			//return -m_h * 0.5 * ((cap + m_c) * m_v + (cap - m_c) * v) ;
 			return -m_h * nlconst::half() * (cap + m_c) * m_v;
 			//return -m_h * cap * m_v;
 		}
 
-		void timestep(nl_fptype cap, nl_fptype v, nl_fptype step) noexcept
+		void time_step(nl_fptype cap, nl_fptype v, nl_fptype step) noexcept
 		{
 			m_h = plib::reciprocal(step);
 			m_c = cap;
@@ -88,7 +86,7 @@ namespace analog
 			// no state used
 		}
 
-		void setparams(nl_fptype gmin) noexcept { m_gmin = gmin; }
+		void set_params(nl_fptype gmin) noexcept { m_gmin = gmin; }
 
 	private:
 		state_var<nl_fptype> m_h;
@@ -111,15 +109,13 @@ namespace analog
 
 		static capacitor_e type() noexcept { return capacitor_e::CONSTANT_CAPACITY; }
 		nl_fptype G(nl_fptype cap) const noexcept { return cap * m_h +  m_gmin; }
-		nl_fptype Ieq(nl_fptype cap, nl_fptype v) const noexcept
+		nl_fptype Ieq(nl_fptype cap, [[maybe_unused]] nl_fptype v) const noexcept
 		{
-			plib::unused_var(v);
 			return - G(cap) * m_v;
 		}
 
-		void timestep(nl_fptype cap, nl_fptype v, nl_fptype step) noexcept
+		void time_step([[maybe_unused]] nl_fptype cap, nl_fptype v, nl_fptype step) noexcept
 		{
-			plib::unused_var(cap);
 			m_h = plib::reciprocal(step);
 			m_v = v;
 		}
@@ -137,14 +133,15 @@ namespace analog
 	struct generic_capacitor_const
 	{
 	public:
-		generic_capacitor_const(core_device_t &dev, const pstring &name)
+		generic_capacitor_const( /*[[maybe_unused]]*/ core_device_t &dev, /*[[maybe_unused]]*/ const pstring &name)
 		: m_gmin(nlconst::zero())
 		{
+			// gcc 7.2 (mingw) and 7.5 (ubuntu) don't accept maybe_unused here
 			plib::unused_var(dev, name);
 		}
 
 		// Returns { G, Ieq }
-		std::pair<nl_fptype, nl_fptype> timestep(nl_fptype cap, nl_fptype v, nl_fptype step) const noexcept
+		std::pair<nl_fptype, nl_fptype> time_step(nl_fptype cap, nl_fptype v, nl_fptype step) const noexcept
 		{
 			const nl_fptype h(plib::reciprocal(step));
 			const nl_fptype G(cap * h + m_gmin);
@@ -154,7 +151,7 @@ namespace analog
 		{
 			// this one has no state
 		}
-		void setparams(nl_fptype gmin) noexcept { m_gmin = gmin; }
+		void set_parameters(nl_fptype gmin) noexcept { m_gmin = gmin; }
 	private:
 		nl_fptype m_gmin;
 	};
@@ -165,17 +162,16 @@ namespace analog
 	struct generic_capacitor_const
 	{
 	public:
-		generic_capacitor_const(core_device_t &dev, const pstring &name)
+		generic_capacitor_const([[maybe_unused]] core_device_t &dev, [[maybe_unused]] const pstring &name)
 		: m_gmin(nlconst::zero())
 		, m_vn(0)
 		, m_in(0)
 		, m_trn(0.0)
 		{
-			plib::unused_var(dev, name);
 		}
 
 		// Returns { G, Ieq }
-		std::pair<nl_fptype, nl_fptype> timestep(nl_fptype cap, nl_fptype v, nl_fptype step) noexcept
+		std::pair<nl_fptype, nl_fptype> time_step(nl_fptype cap, nl_fptype v, nl_fptype step) noexcept
 		{
 			const nl_fptype h(plib::reciprocal(step));
 			if (m_trn == 0.0)
@@ -198,7 +194,7 @@ namespace analog
 		{
 			// this one has no state
 		}
-		void setparams(nl_fptype gmin) noexcept { m_gmin = gmin; }
+		void set_parameters(nl_fptype gmin) noexcept { m_gmin = gmin; }
 	private:
 		nl_fptype m_gmin;
 		nl_fptype m_vn;
@@ -220,10 +216,10 @@ namespace analog
 	class generic_diode
 	{
 	public:
-		generic_diode(core_device_t &dev, const pstring &name)
-		: m_Vd(dev, name + ".m_Vd", nlconst::diode_start_voltage())
-		, m_Id(dev, name + ".m_Id", nlconst::zero())
-		, m_G(dev,  name + ".m_G", nlconst::cgminalt())
+		generic_diode()
+		: m_Vd(nlconst::diode_start_voltage())
+		, m_Id(nlconst::zero())
+		, m_G(nlconst::cgminalt())
 		, m_Vt(nlconst::zero())
 		, m_Vmin(nlconst::zero()) // not used in MOS model
 		, m_Is(nlconst::zero())
@@ -237,6 +233,14 @@ namespace analog
 			  , nlconst::one()
 			  , nlconst::cgminalt()
 			  , nlconst::T0());
+		}
+
+		generic_diode(core_device_t &dev, const pstring &name)
+		: generic_diode()
+		{
+			dev.state().save(dev, m_Vd, dev.name(), name + ".m_Vd");
+			dev.state().save(dev, m_Id, dev.name(), name + ".m_Id");
+			dev.state().save(dev, m_G, dev.name(), name + ".m_G");
 		}
 		// Basic math
 		//
@@ -257,7 +261,7 @@ namespace analog
 					// if the old voltage is less than zero and new is above
 					// make sure we move enough so that matrix and current
 					// changes.
-					const nl_fptype old = std::max(nlconst::zero(), m_Vd());
+					const nl_fptype old = std::max(nlconst::zero(), m_Vd);
 					const nl_fptype d = std::min(+fp_constants<nl_fptype>::DIODE_MAXDIFF(), nVd - old);
 					const nl_fptype a = plib::abs(d) * m_VtInv;
 					m_Vd = old + plib::signum(d) * plib::log1p(a) * m_Vt;
@@ -355,9 +359,9 @@ namespace analog
 		// owning object must save those ...
 
 	private:
-		state_var<nl_fptype> m_Vd;
-		state_var<nl_fptype> m_Id;
-		state_var<nl_fptype> m_G;
+		nl_fptype m_Vd;
+		nl_fptype m_Id;
+		nl_fptype m_G;
 
 		nl_fptype m_Vt;
 		nl_fptype m_Vmin;
@@ -374,7 +378,6 @@ namespace analog
 	};
 
 
-} // namespace analog
-} // namespace netlist
+} // namespace netlist::analog
 
 #endif // NLD_GENERIC_MODELS_H_

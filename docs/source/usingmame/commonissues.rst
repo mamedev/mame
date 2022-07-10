@@ -309,7 +309,7 @@ You can try changing the
 :ref:`lightgunprovider <mame-commandline-lightgunprovider>` setting (depending
 on which kind of device you’re having issues with) from ``rawinput`` to one of
 the other options such as ``dinput`` or ``win32``.  See
-:ref:`osd-commandline-options` for details on input provider options
+:ref:`mame-commandline-osdoptions` for details on input provider options
 
 
 .. _ExternalOPL:

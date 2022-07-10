@@ -14,7 +14,6 @@
 #include "emu.h"
 #include "t11.h"
 #include "t11dasm.h"
-#include "debugger.h"
 
 
 /*************************************

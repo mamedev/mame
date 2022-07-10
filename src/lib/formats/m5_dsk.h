@@ -26,6 +26,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_M5_FORMAT;
+extern const m5_format FLOPPY_M5_FORMAT;
 
 #endif // MAME_FORMATS_M5_DSK_H

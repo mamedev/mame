@@ -2100,7 +2100,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-		<software name="dropzone">
+	<software name="dropzone">
 		<description>Dropzone</description>
 		<year>20??</year>
 		<publisher>Video 61</publisher>
@@ -2402,7 +2402,7 @@ Compiled by K1W1
 		<description>Final Orbit</description>
 		<year>1983</year>
 		<publisher>Sirius</publisher>
-			<info name="serial" value="3300?" />
+		<info name="serial" value="3300?" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
 			<dataarea name="rom" size="8192">
@@ -4119,7 +4119,7 @@ Compiled by K1W1
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
-					<rom name="pastfinder.rom" size="16384" crc="14fddfb8" sha1="5fa7c9c35ee8b1a844222f035ab4e99a0eb7f9fd"/> <!-- Verified -->
+				<rom name="pastfinder.rom" size="16384" crc="14fddfb8" sha1="5fa7c9c35ee8b1a844222f035ab4e99a0eb7f9fd"/> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -4131,7 +4131,7 @@ Compiled by K1W1
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
-					<rom name="explorer (proto).rom" size="16384" crc="98a4e5b7" sha1="c00061d53278403e846cf3d008cbc2e2b862081e"/>
+				<rom name="explorer (proto).rom" size="16384" crc="98a4e5b7" sha1="c00061d53278403e846cf3d008cbc2e2b862081e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4314,6 +4314,30 @@ Compiled by K1W1
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
 				<rom name="popeye (eu).rom" size="16384" crc="a35d5e6a" sha1="5dcef8b50bc32b305846867ff9039b65841490c0"/> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="popeyep" cloneof="popeye">
+		<description>Popeye (prototype, 19830829)</description>
+		<year>1983</year>
+		<publisher>Parker Brothers</publisher>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_16k" />
+			<dataarea name="rom" size="16384">
+				<rom name="popeye (8-29-83).rom" size="16384" crc="34bcdb96" sha1="a2183d6a89d12c7b6b9fbacc4af1fa61370079e6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="popeyep1" cloneof="popeye">
+		<description>Popeye (prototype, WIP8)</description>
+		<year>1983</year>
+		<publisher>Parker Brothers</publisher>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a800_16k" />
+			<dataarea name="rom" size="16384">
+				<rom name="popeye_wip8.rom" size="16384" crc="da07e268" sha1="7719e2c6102ff8b7ff715a6df6c1e6efe3b0b159"/>
 			</dataarea>
 		</part>
 	</software>

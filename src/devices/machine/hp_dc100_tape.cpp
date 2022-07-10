@@ -33,16 +33,18 @@
 #include "util/ioprocsfilter.h"
 
 // Debugging
-#include "logmacro.h"
+
 #define LOG_TMR_MASK (LOG_GENERAL << 1)
-#define LOG_TMR(...) LOGMASKED(LOG_TMR_MASK, __VA_ARGS__)
 #define LOG_DBG_MASK (LOG_TMR_MASK << 1)
-#define LOG_DBG(...) LOGMASKED(LOG_DBG_MASK, __VA_ARGS__)
 #define LOG_RW_MASK (LOG_DBG_MASK << 1)
+
+#define LOG_TMR(...) LOGMASKED(LOG_TMR_MASK, __VA_ARGS__)
+#define LOG_DBG(...) LOGMASKED(LOG_DBG_MASK, __VA_ARGS__)
 #define LOG_RW(...) LOGMASKED(LOG_RW_MASK, __VA_ARGS__)
-#undef VERBOSE
+
 //#define VERBOSE (LOG_GENERAL | LOG_TMR_MASK | LOG_DBG_MASK | LOG_RW_MASK)
 #define VERBOSE (LOG_GENERAL)
+#include "logmacro.h"
 
 // Bit manipulation
 namespace {
@@ -51,12 +53,12 @@ namespace {
 		return (T)1U << n;
 	}
 
-	template<typename T> void BIT_CLR(T& w , unsigned n)
+	template<typename T> void BIT_CLR(T& w, unsigned n)
 	{
 		w &= ~BIT_MASK<T>(n);
 	}
 
-	template<typename T> void BIT_SET(T& w , unsigned n)
+	template<typename T> void BIT_SET(T& w, unsigned n)
 	{
 		w |= BIT_MASK<T>(n);
 	}
@@ -65,20 +67,12 @@ namespace {
 // Device type definition
 DEFINE_DEVICE_TYPE(HP_DC100_TAPE, hp_dc100_tape_device, "hp_dc100_tape", "HP DC100 tape drive")
 
-// Timers
-enum {
-	BIT_TMR_ID,
-	TACHO_TMR_ID,
-	HOLE_TMR_ID,
-	MOTION_TMR_ID
-};
-
 // Constants
 constexpr double MOTION_MARGIN = 1e-5;  // Margin to ensure motion events have passed when timer expires (10 µs)
 constexpr hti_format_t::tape_pos_t TAPE_INIT_POS = 80 * hti_format_t::ONE_INCH_POS; // Initial tape position: 80" from beginning (just past the punched part)
 
 hp_dc100_tape_device::hp_dc100_tape_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: microtape_image_device(mconfig , HP_DC100_TAPE , tag , owner , clock)
+	: microtape_image_device(mconfig, HP_DC100_TAPE, tag, owner, clock)
 	, m_cart_out_handler(*this)
 	, m_hole_handler(*this)
 	, m_tacho_tick_handler(*this)
@@ -103,7 +97,7 @@ image_init_result hp_dc100_tape_device::call_create(int format_type, util::optio
 
 void hp_dc100_tape_device::call_unload()
 {
-	LOG("call_unload dirty=%d\n" , m_image_dirty);
+	LOG("call_unload dirty=%d\n", m_image_dirty);
 
 	device_reset();
 
@@ -152,7 +146,7 @@ std::string hp_dc100_tape_device::call_display()
 
 	int pos_in = get_approx_pos() / hti_format_t::ONE_INCH_POS;
 
-	buffer += string_format("%c %c%c [%04d/1824]" , r_w , m1 , m2 , pos_in);
+	buffer += string_format("%c %c%c [%04d/1824]", r_w, m1, m2, pos_in);
 
 	return buffer;
 }
@@ -167,7 +161,7 @@ void hp_dc100_tape_device::set_acceleration(double accel)
 	m_acceleration = accel;
 }
 
-void hp_dc100_tape_device::set_set_points(double slow_sp , double fast_sp)
+void hp_dc100_tape_device::set_set_points(double slow_sp, double fast_sp)
 {
 	m_slow_set_point = slow_sp;
 	m_fast_set_point = fast_sp;
@@ -196,7 +190,7 @@ void hp_dc100_tape_device::set_name(const std::string& name)
 void hp_dc100_tape_device::set_track_no(unsigned track)
 {
 	if (m_track != track && track < m_image.no_of_tracks()) {
-		LOG_DBG("Setting track %u (op=%d)\n" , track , static_cast<int>(m_current_op));
+		LOG_DBG("Setting track %u (op=%d)\n", track, static_cast<int>(m_current_op));
 		auto saved_op = m_current_op;
 		if (m_current_op != OP_IDLE) {
 			// Close current op on old track
@@ -210,7 +204,7 @@ void hp_dc100_tape_device::set_track_no(unsigned track)
 	}
 }
 
-bool hp_dc100_tape_device::set_speed_setpoint(tape_speed_t speed , bool fwd)
+bool hp_dc100_tape_device::set_speed_setpoint(tape_speed_t speed, bool fwd)
 {
 	if (!m_present) {
 		return false;
@@ -220,7 +214,7 @@ bool hp_dc100_tape_device::set_speed_setpoint(tape_speed_t speed , bool fwd)
 
 	if (m_set_point != new_setpoint) {
 		update_speed_pos();
-		LOG_DBG("Speed SP changed %f->%f %.6f p=%d\n" , m_set_point , new_setpoint , machine().time().as_double() , m_tape_pos);
+		LOG_DBG("Speed SP changed %f->%f %.6f p=%d\n", m_set_point, new_setpoint, machine().time().as_double(), m_tape_pos);
 		m_tape_speed = speed;
 		m_set_point = new_setpoint;
 		// Speed set point changed, accelerate/decelerate
@@ -240,13 +234,13 @@ bool hp_dc100_tape_device::set_speed_setpoint(tape_speed_t speed , bool fwd)
 	}
 }
 
-void hp_dc100_tape_device::set_op(tape_op_t op , bool force)
+void hp_dc100_tape_device::set_op(tape_op_t op, bool force)
 {
 	if (!m_present || m_start_time.is_never()) {
 		return;
 	}
 	if (!m_in_set_op && (op != m_current_op || force)) {
-		LOG_DBG("Op %d->%d (f=%d)\n" , m_current_op , op , force);
+		LOG_DBG("Op %d->%d (f=%d)\n", m_current_op, op, force);
 		m_in_set_op = true;
 		update_speed_pos();
 		auto prev_op = m_current_op;
@@ -265,21 +259,21 @@ void hp_dc100_tape_device::set_op(tape_op_t op , bool force)
 				LOG("Starting RD after WR?\n");
 			}
 			if (fabs(m_speed) < m_slow_set_point) {
-				LOG("Starting RD at %f speed?\n" , m_speed);
+				LOG("Starting RD at %f speed?\n", m_speed);
 			}
-			m_rd_it_valid = m_image.next_data(get_track_no() , m_tape_pos , is_moving_fwd() , false , m_rd_it);
+			m_rd_it_valid = m_image.next_data(get_track_no(), m_tape_pos, is_moving_fwd(), false, m_rd_it);
 			load_rd_word();
 			m_gap_detect_start = m_tape_pos;
 			break;
 
 		case OP_WRITE:
 			if (m_accelerating || fabs(m_speed) != m_slow_set_point) {
-				LOG("Starting WR at %f speed (acc=%d)?\n" , m_speed , m_accelerating);
+				LOG("Starting WR at %f speed (acc=%d)?\n", m_speed, m_accelerating);
 			}
 			if (prev_op == OP_READ) {
 				// Switching from RD to WR
 				// Clear out the part of m_rw_word that is going to be written
-				LOG_RW("Switch RD->WR @%d, idx=%d, w=%04x\n" , m_rw_pos , m_bit_idx , m_rw_word);
+				LOG_RW("Switch RD->WR @%d, idx=%d, w=%04x\n", m_rw_pos, m_bit_idx, m_rw_word);
 				if (is_moving_fwd()) {
 					if (--m_bit_idx >= 0) {
 						m_rw_word &= 0xffffU << (m_bit_idx + 1);
@@ -311,7 +305,7 @@ void hp_dc100_tape_device::set_op(tape_op_t op , bool force)
 			break;
 
 		case OP_ERASE:
-			LOG_DBG("Start GAP @%d\n" , m_tape_pos);
+			LOG_DBG("Start GAP @%d\n", m_tape_pos);
 			m_rw_pos = m_tape_pos;
 			break;
 
@@ -351,11 +345,11 @@ void hp_dc100_tape_device::update_speed_pos()
 		double acceleration = m_set_point > m_speed ? m_acceleration : -m_acceleration;
 		bool retrigger_motion = false;
 		if (delta_time_double < time_to_const_v) {
-			space_const_a = const_a_space(acceleration , delta_time_double);
+			space_const_a = const_a_space(acceleration, delta_time_double);
 			m_speed += delta_time_double * acceleration;
 			time_const_v = 0.0;
 		} else {
-			space_const_a = const_a_space(acceleration , time_to_const_v);
+			space_const_a = const_a_space(acceleration, time_to_const_v);
 			time_const_v = delta_time_double - time_to_const_v;
 			LOG_DBG("Acceleration ends\n");
 			m_accelerating = false;
@@ -371,13 +365,13 @@ void hp_dc100_tape_device::update_speed_pos()
 			(fabs(prev_speed) - m_go_threshold) * (fabs(m_speed) - m_go_threshold) < 0.0) {
 			// Slow speed threshold crossed
 			// In-motion threshold crossed
-			LOG_DBG("Thr crossed %f->%f\n" , prev_speed , m_speed);
+			LOG_DBG("Thr crossed %f->%f\n", prev_speed, m_speed);
 			motion_event = true;
 			retrigger_motion = true;
 		}
 		if (prev_speed * m_speed < 0.0) {
 			// Direction inverted (speed sign flipped)
-			LOG_DBG("Dir inverted s=%f\n" , m_speed);
+			LOG_DBG("Dir inverted s=%f\n", m_speed);
 			inverted = true;
 			retrigger_motion = true;
 		}
@@ -390,8 +384,8 @@ void hp_dc100_tape_device::update_speed_pos()
 	}
 
 	hti_format_t::tape_pos_t delta_pos = (hti_format_t::tape_pos_t)((space_const_a + m_speed * time_const_v) * hti_format_t::ONE_INCH_POS);
-	LOG_DBG("dp=%d\n" , delta_pos);
-	if (!hti_format_t::pos_offset(m_tape_pos , true , delta_pos)) {
+	LOG_DBG("dp=%d\n", delta_pos);
+	if (!hti_format_t::pos_offset(m_tape_pos, true, delta_pos)) {
 		LOG("Tape unspooled!\n");
 	}
 
@@ -418,7 +412,7 @@ hti_format_t::tape_pos_t hp_dc100_tape_device::get_approx_pos() const
 	attotime delta_time{ machine().time() - m_start_time };
 	hti_format_t::tape_pos_t delta_pos = (hti_format_t::tape_pos_t)(delta_time.as_double() * m_speed * hti_format_t::ONE_INCH_POS);
 	auto tape_pos = m_tape_pos;
-	hti_format_t::pos_offset(tape_pos , true , delta_pos);
+	hti_format_t::pos_offset(tape_pos, true, delta_pos);
 	return tape_pos;
 }
 
@@ -429,15 +423,15 @@ bool hp_dc100_tape_device::gap_reached(hti_format_t::tape_pos_t min_gap_size)
 	if (m_gap_detect_start != hti_format_t::NULL_TAPE_POS &&
 		abs(m_gap_detect_start - m_tape_pos) >= min_gap_size) {
 		auto tmp = m_tape_pos;
-		hti_format_t::pos_offset(tmp , is_moving_fwd() , -min_gap_size);
-		if (m_image.just_gap(get_track_no() , tmp , m_tape_pos)) {
+		hti_format_t::pos_offset(tmp, is_moving_fwd(), -min_gap_size);
+		if (m_image.just_gap(get_track_no(), tmp, m_tape_pos)) {
 			return true;
 		}
 	}
 	return false;
 }
 
-void hp_dc100_tape_device::time_to_next_gap(hti_format_t::tape_pos_t min_gap_size , bool new_gap , emu_timer *target_timer)
+void hp_dc100_tape_device::time_to_next_gap(hti_format_t::tape_pos_t min_gap_size, bool new_gap, emu_timer *target_timer)
 {
 	update_speed_pos();
 
@@ -446,17 +440,17 @@ void hp_dc100_tape_device::time_to_next_gap(hti_format_t::tape_pos_t min_gap_siz
 	bool found = true;
 	if (new_gap) {
 		hti_format_t::track_iterator_t it;
-		found = m_image.next_data(get_track_no() , tmp , fwd , true , it);
+		found = m_image.next_data(get_track_no(), tmp, fwd, true, it);
 		if (found) {
-			tmp = m_image.farthest_end(it , !fwd);
+			tmp = m_image.farthest_end(it, !fwd);
 		}
 	}
-	if (found && m_image.next_gap(get_track_no() , tmp , fwd , min_gap_size)) {
+	if (found && m_image.next_gap(get_track_no(), tmp, fwd, min_gap_size)) {
 		hti_format_t::tape_pos_t dummy;
-		LOG_DBG("TTNG T%u S%d N%d %d->%d\n" , get_track_no() , min_gap_size , new_gap , m_tape_pos , tmp);
+		LOG_DBG("TTNG T%u S%d N%d %d->%d\n", get_track_no(), min_gap_size, new_gap, m_tape_pos, tmp);
 		time_to_distance(tmp - m_tape_pos, dummy, target_timer);
 	} else {
-		LOG_DBG("TTNG T%u S%d N%d %d->X\n" , get_track_no() , min_gap_size , new_gap , m_tape_pos);
+		LOG_DBG("TTNG T%u S%d N%d %d->X\n", get_track_no(), min_gap_size, new_gap, m_tape_pos);
 		target_timer->reset();
 	}
 }
@@ -493,10 +487,10 @@ void hp_dc100_tape_device::device_start()
 	save_item(NAME(m_next_hole_pos));
 	save_item(NAME(m_image_dirty));
 
-	m_bit_timer = timer_alloc(BIT_TMR_ID);
-	m_tacho_timer = timer_alloc(TACHO_TMR_ID);
-	m_hole_timer = timer_alloc(HOLE_TMR_ID);
-	m_motion_timer = timer_alloc(MOTION_TMR_ID);
+	m_bit_timer = timer_alloc(FUNC(hp_dc100_tape_device::bit_timer_tick), this);
+	m_tacho_timer = timer_alloc(FUNC(hp_dc100_tape_device::tacho_timer_tick), this);
+	m_hole_timer = timer_alloc(FUNC(hp_dc100_tape_device::hole_timer_tick), this);
+	m_motion_timer = timer_alloc(FUNC(hp_dc100_tape_device::motion_timer_tick), this);
 }
 
 void hp_dc100_tape_device::device_reset()
@@ -504,71 +498,76 @@ void hp_dc100_tape_device::device_reset()
 	clear_state();
 }
 
-void hp_dc100_tape_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(hp_dc100_tape_device::bit_timer_tick)
 {
-	LOG_TMR("%.6f TMR %d p=%d s=%.3f(%.3f) a=%d\n" , machine().time().as_double() , id , m_tape_pos , m_speed , m_set_point , m_accelerating);
+	LOG_TMR("%.6f TMR 0 p=%d s=%.3f(%.3f) a=%d\n", machine().time().as_double(), m_tape_pos, m_speed, m_set_point, m_accelerating);
 	update_speed_pos();
 
-	switch (id) {
-	case BIT_TMR_ID:
-		m_tape_pos = m_next_bit_pos;
-		if (m_current_op == OP_READ) {
-			bool bit = BIT(m_rd_it->second , m_bit_idx);
-			m_rd_bit_handler(bit);
-			if (is_moving_fwd()) {
-				if (--m_bit_idx >= 0) {
-					time_to_distance(m_image.bit_length(BIT(m_rd_it->second , m_bit_idx)), m_next_bit_pos, m_bit_timer);
-				} else {
-					m_rd_it_valid = m_image.adv_it(get_track_no() , true , m_rd_it) != hti_format_t::ADV_NO_MORE_DATA;
-					load_rd_word();
-				}
+	m_tape_pos = m_next_bit_pos;
+	if (m_current_op == OP_READ) {
+		bool bit = BIT(m_rd_it->second, m_bit_idx);
+		m_rd_bit_handler(bit);
+		if (is_moving_fwd()) {
+			if (--m_bit_idx >= 0) {
+				time_to_distance(m_image.bit_length(BIT(m_rd_it->second, m_bit_idx)), m_next_bit_pos, m_bit_timer);
 			} else {
-				if (++m_bit_idx < 16) {
-					time_to_distance(-m_image.bit_length(BIT(m_rd_it->second , m_bit_idx)), m_next_bit_pos, m_bit_timer);
-				} else {
-					m_rd_it_valid = m_image.adv_it(get_track_no() , false , m_rd_it) != hti_format_t::ADV_NO_MORE_DATA;
-					load_rd_word();
-				}
+				m_rd_it_valid = m_image.adv_it(get_track_no(), true, m_rd_it) != hti_format_t::ADV_NO_MORE_DATA;
+				load_rd_word();
 			}
-		} else if (m_current_op == OP_WRITE) {
-			bool bit = m_wr_bit_handler();
-			hti_format_t::tape_pos_t bit_len = m_image.bit_length(bit);
-			if (bit) {
-				BIT_SET(m_rw_word , m_bit_idx);
-			}
-			if (is_moving_fwd()) {
-				if (--m_bit_idx < 0) {
-					store_wr_word();
-				}
+		} else {
+			if (++m_bit_idx < 16) {
+				time_to_distance(-m_image.bit_length(BIT(m_rd_it->second, m_bit_idx)), m_next_bit_pos, m_bit_timer);
 			} else {
-				if (++m_bit_idx >= 16) {
-					store_wr_word();
-				}
-				bit_len = -bit_len;
+				m_rd_it_valid = m_image.adv_it(get_track_no(), false, m_rd_it) != hti_format_t::ADV_NO_MORE_DATA;
+				load_rd_word();
 			}
-			time_to_distance(bit_len, m_next_bit_pos, m_bit_timer);
 		}
-		break;
-
-	case TACHO_TMR_ID:
-		m_tape_pos = m_next_tacho_pos;
-		m_tacho_tick_handler(1);
-		adjust_tacho_timer();
-		break;
-
-	case HOLE_TMR_ID:
-		m_tape_pos = m_next_hole_pos;
-		m_hole_handler(1);
-		adjust_hole_timer();
-		break;
-
-	case MOTION_TMR_ID:
-		// In itself it does nothing (all work is in update_speed_pos)
-		break;
-
-	default:
-		break;
+	} else if (m_current_op == OP_WRITE) {
+		bool bit = m_wr_bit_handler();
+		hti_format_t::tape_pos_t bit_len = m_image.bit_length(bit);
+		if (bit) {
+			BIT_SET(m_rw_word, m_bit_idx);
+		}
+		if (is_moving_fwd()) {
+			if (--m_bit_idx < 0) {
+				store_wr_word();
+			}
+		} else {
+			if (++m_bit_idx >= 16) {
+				store_wr_word();
+			}
+			bit_len = -bit_len;
+		}
+		time_to_distance(bit_len, m_next_bit_pos, m_bit_timer);
 	}
+}
+
+TIMER_CALLBACK_MEMBER(hp_dc100_tape_device::tacho_timer_tick)
+{
+	LOG_TMR("%.6f TMR 1 p=%d s=%.3f(%.3f) a=%d\n", machine().time().as_double(), m_tape_pos, m_speed, m_set_point, m_accelerating);
+	update_speed_pos();
+
+	m_tape_pos = m_next_tacho_pos;
+	m_tacho_tick_handler(1);
+	adjust_tacho_timer();
+}
+
+TIMER_CALLBACK_MEMBER(hp_dc100_tape_device::hole_timer_tick)
+{
+	LOG_TMR("%.6f TMR 2 p=%d s=%.3f(%.3f) a=%d\n", machine().time().as_double(), m_tape_pos, m_speed, m_set_point, m_accelerating);
+	update_speed_pos();
+
+	m_tape_pos = m_next_hole_pos;
+	m_hole_handler(1);
+	adjust_hole_timer();
+}
+
+TIMER_CALLBACK_MEMBER(hp_dc100_tape_device::motion_timer_tick)
+{
+	LOG_TMR("%.6f TMR 2 p=%d s=%.3f(%.3f) a=%d\n", machine().time().as_double(), m_tape_pos, m_speed, m_set_point, m_accelerating);
+	update_speed_pos();
+
+	// All work is in update_speed_pos
 }
 
 void hp_dc100_tape_device::clear_state()
@@ -599,7 +598,7 @@ void hp_dc100_tape_device::clear_state()
 
 image_init_result hp_dc100_tape_device::internal_load(bool is_create)
 {
-	LOG("load %d\n" , is_create);
+	LOG("load %d\n", is_create);
 
 	device_reset();
 
@@ -624,7 +623,7 @@ image_init_result hp_dc100_tape_device::internal_load(bool is_create)
 		}
 		if (!m_image.load_tape(*io)) {
 			LOG("load failed\n");
-			seterror(image_error::INVALIDIMAGE , "Wrong format");
+			seterror(image_error::INVALIDIMAGE, "Wrong format");
 			set_tape_present(false);
 			return image_init_result::FAIL;
 		}
@@ -645,7 +644,7 @@ void hp_dc100_tape_device::set_tape_present(bool present)
 	}
 }
 
-double hp_dc100_tape_device::compute_set_point(tape_speed_t speed , bool fwd) const
+double hp_dc100_tape_device::compute_set_point(tape_speed_t speed, bool fwd) const
 {
 	double sp;
 
@@ -666,7 +665,7 @@ double hp_dc100_tape_device::compute_set_point(tape_speed_t speed , bool fwd) co
 
 void hp_dc100_tape_device::start_tape()
 {
-	LOG_DBG("Tape started %.6f p=%d\n" , machine().time().as_double() , m_tape_pos);
+	LOG_DBG("Tape started %.6f p=%d\n", machine().time().as_double(), m_tape_pos);
 	m_start_time = machine().time();
 	m_accelerating = true;
 	m_speed = 0;
@@ -674,7 +673,7 @@ void hp_dc100_tape_device::start_tape()
 
 void hp_dc100_tape_device::stop_tape()
 {
-	LOG_DBG("Tape stops %.6f p=%d\n" , machine().time().as_double() , m_tape_pos);
+	LOG_DBG("Tape stops %.6f p=%d\n", machine().time().as_double(), m_tape_pos);
 	m_start_time = attotime::never;
 	m_accelerating = false;
 	m_speed = 0;
@@ -684,34 +683,34 @@ void hp_dc100_tape_device::stop_tape()
 	stop_op();
 }
 
-double hp_dc100_tape_device::const_a_space(double a , double t) const
+double hp_dc100_tape_device::const_a_space(double a, double t) const
 {
 	// Space traveled in time 't' at constant acceleration 'a' starting with 'm_speed' speed
 	return t * (m_speed + a / 2 * t);
 }
 
-attotime hp_dc100_tape_device::time_to_threshold(double threshold , bool zero_allowed) const
+attotime hp_dc100_tape_device::time_to_threshold(double threshold, bool zero_allowed) const
 {
 	attotime time{ attotime::never };
 
 	auto delta_sp = m_set_point - m_speed;
 	auto delta_t  = threshold - m_speed;
-	LOG_DBG("Dsp=%.6f D+th=%.6f\n" , delta_sp , delta_t);
+	LOG_DBG("Dsp=%.6f D+th=%.6f\n", delta_sp, delta_t);
 
 	if ((delta_sp * delta_t > 0.0 && fabs(delta_t) <= fabs(delta_sp)) ||
 		(zero_allowed && delta_t == 0.0)) {
 		time = attotime::from_double(fabs(delta_t) / m_acceleration);
-		LOG_DBG("Time to +th: %.6f\n" , time.as_double());
+		LOG_DBG("Time to +th: %.6f\n", time.as_double());
 	}
 
 	delta_t = -threshold - m_speed;
-	LOG_DBG("Dsp=%.6f D-th=%.6f\n" , delta_sp , delta_t);
+	LOG_DBG("Dsp=%.6f D-th=%.6f\n", delta_sp, delta_t);
 	if ((delta_sp * delta_t > 0.0 && fabs(delta_t) <= fabs(delta_sp)) ||
 		(zero_allowed && delta_t == 0.0)) {
 		double tm = fabs(delta_t) / m_acceleration;
 		if (tm < time.as_double()) {
 			time = attotime::from_double(tm);
-			LOG_DBG("Time to -th: %.6f\n" , time.as_double());
+			LOG_DBG("Time to -th: %.6f\n", time.as_double());
 		}
 	}
 	return time;
@@ -728,16 +727,16 @@ void hp_dc100_tape_device::set_motion_timer()
 		// 3. Tape direction reverses
 		// 4. Set point is reached
 		// Motion timer is set to expire at the event that occurs first
-		attotime time{ time_to_threshold(m_slow_set_point , true) };
+		attotime time{ time_to_threshold(m_slow_set_point, true) };
 
-		attotime tmp{ time_to_threshold(m_go_threshold , false) };
+		attotime tmp{ time_to_threshold(m_go_threshold, false) };
 		if (tmp < time) {
 			time = tmp;
 		}
 
 		// Time to the moment when tape inverts its motion
 		// (i.e. when m_speed crosses 0)
-		tmp = time_to_threshold(0.0 , false);
+		tmp = time_to_threshold(0.0, false);
 		if (tmp < time) {
 			time = tmp;
 		}
@@ -760,7 +759,7 @@ void hp_dc100_tape_device::set_motion_timer()
 	}
 }
 
-void hp_dc100_tape_device::time_to_distance(hti_format_t::tape_pos_t distance , hti_format_t::tape_pos_t& target_pos , emu_timer *target_timer) const
+void hp_dc100_tape_device::time_to_distance(hti_format_t::tape_pos_t distance, hti_format_t::tape_pos_t& target_pos, emu_timer *target_timer) const
 {
 	if (m_start_time.is_never()) {
 		// If tape is stopped we'll never get there..
@@ -769,7 +768,7 @@ void hp_dc100_tape_device::time_to_distance(hti_format_t::tape_pos_t distance , 
 	}
 
 	target_pos = m_tape_pos;
-	if (!hti_format_t::pos_offset(target_pos , true , distance)) {
+	if (!hti_format_t::pos_offset(target_pos, true, distance)) {
 		// Beyond end of tape
 		target_timer->reset();
 		return;
@@ -792,11 +791,11 @@ void hp_dc100_tape_device::time_to_distance(hti_format_t::tape_pos_t distance , 
 		if (has_root) {
 			double time_in_const_a_pos = (sqrt(delta) - m_speed) / acceleration;
 			double time_in_const_a_neg = -(sqrt(delta) + m_speed) / acceleration;
-			LOG_DBG("TTD %.6f %.6f\n" , time_in_const_a_pos , time_in_const_a_neg);
+			LOG_DBG("TTD %.6f %.6f\n", time_in_const_a_pos, time_in_const_a_neg);
 			if (time_in_const_a_pos >= 0.0) {
 				if (time_in_const_a_neg >= 0.0) {
 					// pos + neg +
-					time_in_const_a = std::min(time_in_const_a_pos , time_in_const_a_neg);
+					time_in_const_a = std::min(time_in_const_a_pos, time_in_const_a_neg);
 				} else {
 					// pos + neg -
 					time_in_const_a = time_in_const_a_pos;
@@ -811,14 +810,14 @@ void hp_dc100_tape_device::time_to_distance(hti_format_t::tape_pos_t distance , 
 				}
 			}
 		}
-		LOG_DBG("TTD %d %d %.6f %.6f %.6f\n" , distance , has_root , m_speed , time_to_const_v , time_in_const_a);
+		LOG_DBG("TTD %d %d %.6f %.6f %.6f\n", distance, has_root, m_speed, time_to_const_v, time_in_const_a);
 		if (has_root && time_in_const_a <= time_to_const_v) {
 			// Entirely in the constant A phase
 			time_const_a = time_in_const_a;
 			space = 0.0;
 		} else {
 			// Partly in const A & partly in const V
-			double space_in_const_a = const_a_space(acceleration , time_to_const_v);
+			double space_in_const_a = const_a_space(acceleration, time_to_const_v);
 			space -= space_in_const_a;
 			time_const_a = time_to_const_v;
 		}
@@ -843,7 +842,7 @@ void hp_dc100_tape_device::time_to_distance(hti_format_t::tape_pos_t distance , 
 	} else {
 		time_const_v = 0.0;
 	}
-	LOG_DBG("TTD %.6f %.6f\n" , time_const_a , time_const_v);
+	LOG_DBG("TTD %.6f %.6f\n", time_const_a, time_const_v);
 
 	target_timer->adjust(attotime::from_double(time_const_a + time_const_v));
 }
@@ -864,13 +863,13 @@ void hp_dc100_tape_device::adjust_tacho_timer()
 		// on a tick (tick_fract == 0)
 		dist_to_next = -m_tick_size;
 	}
-	LOG_DBG("Next tick @%d (pos=%d)\n" , dist_to_next , m_tape_pos);
+	LOG_DBG("Next tick @%d (pos=%d)\n", dist_to_next, m_tape_pos);
 	time_to_distance(dist_to_next, m_next_tacho_pos, m_tacho_timer);
 }
 
 void hp_dc100_tape_device::adjust_hole_timer()
 {
-	auto hole_pos = m_image.next_hole(m_tape_pos , is_moving_fwd());
+	auto hole_pos = m_image.next_hole(m_tape_pos, is_moving_fwd());
 	if (hole_pos == hti_format_t::NULL_TAPE_POS) {
 		m_hole_timer->reset();
 	} else {
@@ -883,8 +882,8 @@ void hp_dc100_tape_device::stop_op()
 	if (m_current_op == OP_WRITE) {
 		store_wr_word();
 	} else if (m_current_op == OP_ERASE) {
-		LOG_DBG("Wr gap from %d to %d\n" , m_rw_pos , m_tape_pos);
-		m_image.write_gap(get_track_no() , m_rw_pos , m_tape_pos);
+		LOG_DBG("Wr gap from %d to %d\n", m_rw_pos, m_tape_pos);
+		m_image.write_gap(get_track_no(), m_rw_pos, m_tape_pos);
 		m_image_dirty = true;
 	}
 	m_bit_timer->reset();
@@ -902,16 +901,16 @@ void hp_dc100_tape_device::load_rd_word()
 			m_bit_idx = 0;
 		}
 		// This is actually the nearest end (dir is inverted)
-		m_rw_pos = m_next_bit_pos = m_image.farthest_end(m_rd_it , !fwd);
+		m_rw_pos = m_next_bit_pos = m_image.farthest_end(m_rd_it, !fwd);
 		// Compute end of bit cell
-		hti_format_t::tape_pos_t bit_len = m_image.bit_length(BIT(m_rd_it->second , m_bit_idx));
+		hti_format_t::tape_pos_t bit_len = m_image.bit_length(BIT(m_rd_it->second, m_bit_idx));
 		if (!fwd) {
 			bit_len = -bit_len;
 		}
-		time_to_distance(m_next_bit_pos + bit_len - m_tape_pos , m_next_bit_pos , m_bit_timer);
-		LOG_RW("RD %04x @%d\n" , m_rd_it->second , m_next_bit_pos);
+		time_to_distance(m_next_bit_pos + bit_len - m_tape_pos, m_next_bit_pos, m_bit_timer);
+		LOG_RW("RD %04x @%d\n", m_rd_it->second, m_next_bit_pos);
 	} else {
-		LOG_RW("End of RD data @%d\n" , m_tape_pos);
+		LOG_RW("End of RD data @%d\n", m_tape_pos);
 		stop_op();
 		m_gap_detect_start = m_tape_pos;
 	}
@@ -928,8 +927,8 @@ void hp_dc100_tape_device::store_wr_word()
 	if (!fwd) {
 		m_rw_pos -= word_length;
 	}
-	LOG_RW("WR %04x @%d\n" , m_rw_word , m_rw_pos);
-	m_image.write_word(get_track_no() , m_rw_pos , m_rw_word , word_length , fwd);
+	LOG_RW("WR %04x @%d\n", m_rw_word, m_rw_pos);
+	m_image.write_word(get_track_no(), m_rw_pos, m_rw_word, word_length, fwd);
 	m_image_dirty = true;
 	m_rw_word = 0;
 	if (fwd) {

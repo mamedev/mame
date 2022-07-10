@@ -26,26 +26,26 @@ public:
 
 protected:
 	// construction/destruction
-	nes_cony_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	nes_cony_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 extra_addr, u8 mask);
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void set_prg();
 	virtual void set_chr();
 
+	TIMER_CALLBACK_MEMBER(irq_timer_tick);
+
 	u16 m_irq_count;
 	int m_irq_enable;
 
-	static constexpr device_timer_id TIMER_IRQ = 0;
 	emu_timer *irq_timer;
 
 	u8 m_mmc_prg_bank[4];
 	u8 m_mmc_vrom_bank[8];
 	u8 m_extra_ram[4];
-	u16 m_extra_addr;
-	u8 m_mask;
+	const u16 m_extra_addr;
+	const u8 m_mask;
 	u8 m_mode_reg;
 	u8 m_outer_reg;
 };

@@ -128,7 +128,7 @@ public:
 	sound_manager &sound() const { assert(m_sound != nullptr); return *m_sound; }
 	video_manager &video() const { assert(m_video != nullptr); return *m_video; }
 	network_manager &network() const { assert(m_network != nullptr); return *m_network; }
-	bookkeeping_manager &bookkeeping() const { assert(m_network != nullptr); return *m_bookkeeping; }
+	bookkeeping_manager &bookkeeping() const { assert(m_bookkeeping != nullptr); return *m_bookkeeping; }
 	configuration_manager  &configuration() const { assert(m_configuration != nullptr); return *m_configuration; }
 	output_manager  &output() const { assert(m_output != nullptr); return *m_output; }
 	ui_manager &ui() const { assert(m_ui != nullptr); return *m_ui; }
@@ -177,8 +177,8 @@ public:
 	void export_http_api();
 
 	// TODO: Do saves and loads still require scheduling?
-	void immediate_save(const char *filename);
-	void immediate_load(const char *filename);
+	void immediate_save(std::string_view filename);
+	void immediate_load(std::string_view filename);
 
 	// rewind operations
 	bool rewind_capture();
@@ -217,7 +217,7 @@ public:
 	bool debug_enabled() { return (debug_flags & DEBUG_FLAG_ENABLED) != 0; }
 
 	// used by debug_console to take ownership of the debug.log file
-	std::unique_ptr<emu_file> steal_debuglogfile() { return std::move(m_debuglogfile); }
+	std::unique_ptr<emu_file> steal_debuglogfile();
 
 private:
 	class side_effects_disabler {

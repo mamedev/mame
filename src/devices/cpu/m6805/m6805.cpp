@@ -37,8 +37,6 @@
 #include "m6805defs.h"
 #include "6805dasm.h"
 
-#include "debugger.h"
-
 #include <algorithm>
 
 #define OP(name)        (&m6805_base_device::name<big>)

@@ -220,7 +220,7 @@ void MainWindow::toggleBreakpointAtCursor(bool changedTo)
 			command = string_format("bpset 0x%X", address);
 		else
 			command = string_format("bpclear 0x%X", bp->index());
-		m_machine.debugger().console().execute_command(command.c_str(), true);
+		m_machine.debugger().console().execute_command(command, true);
 	}
 
 	refreshAll();
@@ -242,7 +242,7 @@ void MainWindow::enableBreakpointAtCursor(bool changedTo)
 		{
 			int32_t const bpindex = bp->index();
 			std::string command = string_format(bp->enabled() ? "bpdisable 0x%X" : "bpenable 0x%X", bpindex);
-			m_machine.debugger().console().execute_command(command.c_str(), true);
+			m_machine.debugger().console().execute_command(command, true);
 		}
 	}
 
@@ -257,7 +257,7 @@ void MainWindow::runToCursor(bool changedTo)
 	{
 		offs_t address = downcast<debug_view_disasm*>(dasmView)->selected_address();
 		std::string command = string_format("go 0x%X", address);
-		m_machine.debugger().console().execute_command(command.c_str(), true);
+		m_machine.debugger().console().execute_command(command, true);
 	}
 }
 

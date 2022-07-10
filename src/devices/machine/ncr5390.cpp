@@ -199,7 +199,7 @@ void ncr5390_device::device_start()
 	config = 0;
 	bus_id = 0;
 	select_timeout = 0;
-	tm = timer_alloc(0);
+	tm = timer_alloc(FUNC(ncr5390_device::update_tick), this);
 }
 
 void ncr5390_device::device_reset()
@@ -251,7 +251,7 @@ void ncr5390_device::scsi_ctrl_changed()
 	step(false);
 }
 
-void ncr5390_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(ncr5390_device::update_tick)
 {
 	step(true);
 }

@@ -1,25 +1,7 @@
-// AsmJit - Machine code generation for C++
+// This file is part of AsmJit project <https://asmjit.com>
 //
-//  * Official AsmJit Home Page: https://asmjit.com
-//  * Official Github Repository: https://github.com/asmjit/asmjit
-//
-// Copyright (c) 2008-2020 The AsmJit Authors
-//
-// This software is provided 'as-is', without any express or implied
-// warranty. In no event will the authors be held liable for any damages
-// arising from the use of this software.
-//
-// Permission is granted to anyone to use this software for any purpose,
-// including commercial applications, and to alter it and redistribute it
-// freely, subject to the following restrictions:
-//
-// 1. The origin of this software must not be misrepresented; you must not
-//    claim that you wrote the original software. If you use this software
-//    in a product, an acknowledgment in the product documentation would be
-//    appreciated but is not required.
-// 2. Altered source versions must be plainly marked as such, and must not be
-//    misrepresented as being the original software.
-// 3. This notice may not be removed or altered from any source distribution.
+// See asmjit.h or LICENSE.md for license and copyright information
+// SPDX-License-Identifier: Zlib
 
 // ----------------------------------------------------------------------------
 // This is a working example that demonstrates how multiple sections can be
@@ -33,6 +15,9 @@
 //   - Relocate the code
 //   - Copy the code to the destination address.
 // ----------------------------------------------------------------------------
+
+#include <asmjit/core.h>
+#if !defined(ASMJIT_NO_X86) && ASMJIT_ARCH_X86
 
 #include <asmjit/x86.h>
 #include <stdio.h>
@@ -48,19 +33,19 @@ using namespace asmjit;
 static const uint8_t dataArray[] = { 2, 9, 4, 7, 1, 3, 8, 5, 6, 0 };
 
 static void fail(const char* message, Error err) {
-  printf("%s: %s\n", message, DebugUtils::errorAsString(err));
+  printf("** FAILURE: %s (%s) **\n", message, DebugUtils::errorAsString(err));
   exit(1);
 }
 
 int main() {
   printf("AsmJit X86 Sections Test\n\n");
 
-  Environment env = hostEnvironment();
+  Environment env = Environment::host();
   JitAllocator allocator;
 
 #ifndef ASMJIT_NO_LOGGING
   FileLogger logger(stdout);
-  logger.setIndentation(FormatOptions::kIndentationCode, 2);
+  logger.setIndentation(FormatIndentationGroup::kCode, 2);
 #endif
 
   CodeHolder code;
@@ -71,7 +56,7 @@ int main() {
 #endif
 
   Section* dataSection;
-  Error err = code.newSection(&dataSection, ".data", SIZE_MAX, 0, 8);
+  Error err = code.newSection(&dataSection, ".data", SIZE_MAX, SectionFlags::kNone, 8);
 
   if (err) {
     fail("Failed to create a .data section", err);
@@ -85,7 +70,7 @@ int main() {
     Label data = a.newLabel();
 
     FuncDetail func;
-    func.init(FuncSignatureT<size_t, size_t>(CallConv::kIdHost), code.environment());
+    func.init(FuncSignatureT<size_t, size_t>(CallConvId::kHost), code.environment());
 
     FuncFrame frame;
     frame.init(func);
@@ -115,7 +100,7 @@ int main() {
   // how to do it explicitly.
   printf("\nCalculating section offsets:\n");
   uint64_t offset = 0;
-  for (Section* section : code.sections()) {
+  for (Section* section : code.sectionsByOrder()) {
     offset = Support::alignUp(offset, section->alignment());
     section->setOffset(offset);
     offset += section->realSize();
@@ -142,34 +127,46 @@ int main() {
   }
 
   // Allocate memory for the function and relocate it there.
-  void* roPtr;
+  void* rxPtr;
   void* rwPtr;
-  err = allocator.alloc(&roPtr, &rwPtr, codeSize);
+  err = allocator.alloc(&rxPtr, &rwPtr, codeSize);
   if (err)
     fail("Failed to allocate executable memory", err);
 
   // Relocate to the base-address of the allocated memory.
-  code.relocateToBase(uint64_t(uintptr_t(roPtr)));
+  code.relocateToBase(uint64_t(uintptr_t(rxPtr)));
+
+  VirtMem::protectJitMemory(VirtMem::ProtectJitAccess::kReadWrite);
 
   // Copy the flattened code into `mem.rw`. There are two ways. You can either copy
   // everything manually by iterating over all sections or use `copyFlattenedData`.
   // This code is similar to what `copyFlattenedData(p, codeSize, 0)` would do:
-  for (Section* section : code.sections())
+  for (Section* section : code.sectionsByOrder())
     memcpy(static_cast<uint8_t*>(rwPtr) + size_t(section->offset()), section->data(), section->bufferSize());
+
+  VirtMem::protectJitMemory(VirtMem::ProtectJitAccess::kReadExecute);
+  VirtMem::flushInstructionCache(rwPtr, code.codeSize());
 
   // Execute the function and test whether it works.
   typedef size_t (*Func)(size_t idx);
-  Func fn = (Func)roPtr;
+  Func fn = (Func)rxPtr;
 
   printf("\n");
   if (fn(0) != dataArray[0] ||
       fn(3) != dataArray[3] ||
       fn(6) != dataArray[6] ||
       fn(9) != dataArray[9] ) {
-    printf("Failure:\n  The generated function returned incorrect result(s)\n");
+    printf("** FAILURE: The generated function returned incorrect result(s) **\n");
     return 1;
   }
 
-  printf("Success:\n  The generated function returned expected results\n");
+  printf("** SUCCESS **\n");
   return 0;
 }
+
+#else
+int main() {
+  printf("AsmJit X86 Sections Test is disabled on non-x86 host\n\n");
+  return 0;
+}
+#endif // !ASMJIT_NO_X86 && ASMJIT_ARCH_X86

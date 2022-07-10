@@ -15,7 +15,6 @@
 
 #include "emu.h"
 #include "cp1610.h"
-#include "debugger.h"
 #include "1610dasm.h"
 
 DEFINE_DEVICE_TYPE(CP1610, cp1610_cpu_device, "cp1610", "GI CP1610")

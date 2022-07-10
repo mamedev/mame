@@ -24,7 +24,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
@@ -32,6 +31,9 @@ protected:
 
 	// device_rom_interface overrides
 	virtual void rom_bank_updated() override;
+
+	TIMER_CALLBACK_MEMBER(timer_a_expired);
+	TIMER_CALLBACK_MEMBER(timer_b_expired);
 
 private:
 	struct YMF271Slot

@@ -45,15 +45,4 @@ const apollo_format::format apollo_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_APOLLO_FORMAT = &floppy_image_format_creator<apollo_format>;
-
-int apollo_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
-{
-	uint64_t size;
-	if (io.length(size))
-		return 0;
-
-	constexpr uint32_t expected_size = 77*2*8*1024;
-
-	return ((size == expected_size) || (size == 0)) ? 1 : 0;
-}
+const apollo_format FLOPPY_APOLLO_FORMAT;

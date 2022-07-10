@@ -44,12 +44,6 @@
 //#define LOG(...) LOGMASKED(LOG_GENERAL,   __VA_ARGS__) // Already defined in logmacro.h
 #define LOGSETUP(...) LOGMASKED(LOG_SETUP,   __VA_ARGS__)
 
-#ifdef _MSC_VER
-#define FUNCNAME __func__
-#else
-#define FUNCNAME __PRETTY_FUNCTION__
-#endif
-
 
 /***************************************************************************
     INTERNAL TABLES
@@ -115,20 +109,21 @@ mc14411_device::mc14411_device(const machine_config &mconfig, device_type type, 
 
 void mc14411_device::device_start()
 {
-	LOGSETUP("%s\n", FUNCNAME);
+	LOGSETUP("mc14411_device::device_start\n");
 
 	for (int i = TIMER_F1; i <= TIMER_F16; i++)
 	{
+		m_fx_timers[i].timer = timer_alloc(FUNC(mc14411_device::timer_tick), this);
+		m_fx_timers[i].enabled = true;
 		m_out_fx_cbs[i].resolve();
-		m_fx_timer[i] = timer_alloc(i);
-		m_timer_enabled[i] = !m_out_fx_cbs[i].isnull();
 	}
 
 	save_item(NAME(m_divider));
 	save_item(NAME(m_reset));
-	save_item(NAME(m_timer_enabled));
+	save_item(STRUCT_MEMBER(m_fx_timers, state));
+	save_item(STRUCT_MEMBER(m_fx_timers, enabled));
 
-	m_reset_timer = timer_alloc(TIMER_ID_RESET);
+	m_reset_timer = timer_alloc(FUNC(mc14411_device::reset_tick), this);
 }
 
 
@@ -141,7 +136,7 @@ void mc14411_device::device_clock_changed()
 {
 	for (int i = TIMER_F1; i <= TIMER_F16; i++)
 	{
-		if (m_timer_enabled[i])
+		if (m_fx_timers[i].enabled)
 			arm_timer(i);
 	}
 }
@@ -154,18 +149,18 @@ void mc14411_device::device_clock_changed()
 void mc14411_device::timer_enable(timer_id i, bool enable)
 {
 	assert(i >= TIMER_F1 && i <= TIMER_F16);
-	m_timer_enabled[i] = enable;
+	m_fx_timers[i].enabled = enable;
 
 	if (!enable)
-		m_fx_timer[i]->enable(false);
-	else if (!m_fx_timer[i]->enabled())
+		m_fx_timers[i].timer->enable(false);
+	else if (!m_fx_timers[i].timer->enabled())
 		arm_timer(i);
 }
 
 void mc14411_device::timer_disable_all()
 {
 	for (int i = TIMER_F1; i <= TIMER_F16; i++)
-		timer_enable((timer_id) i, false);
+		timer_enable((timer_id)i, false);
 }
 
 //-------------------------------------------------
@@ -175,13 +170,13 @@ void mc14411_device::timer_disable_all()
 
 void mc14411_device::arm_timer(int i)
 {
-	assert(!m_out_fx_cbs[i].isnull());
-
+	if (m_out_fx_cbs[i].isnull())
+		return;
 	int divider = s_counter_divider[i];
 	if (i < TIMER_F15)
 		divider *= s_divider_select[m_divider];
 	attotime half_cycle = clocks_to_attotime(divider) / 2; // 2 flanks per cycle
-	m_fx_timer[i]->adjust(half_cycle, i, half_cycle);
+	m_fx_timers[i].timer->adjust(half_cycle, i, half_cycle);
 	LOGSETUP(" - arming timer for F%d at %fHz (/%d)\n", i + 1, double(clock()) / divider, divider);
 }
 
@@ -193,47 +188,47 @@ void mc14411_device::arm_timer(int i)
 
 void mc14411_device::device_reset()
 {
-	LOGSETUP("%s\n", FUNCNAME);
+	LOGSETUP("mc14411_device::device_reset\n");
 
 	for (int i = TIMER_F1; i <= TIMER_F16; i++)
 	{
+		// Reset line according to datasheet and remember it for transitions to come
+		m_fx_timers[i].state = !(i < TIMER_F15);
 		if (!m_out_fx_cbs[i].isnull())
-		{
-			// Reset line according to datasheet and remember it for transitions to come
-			(m_out_fx_cbs[i])(m_fx_state[i] = (i < TIMER_F15 ? 0 : 1));
-		}
+			m_out_fx_cbs[i](m_fx_timers[i].state);
 	}
 
 	if (m_reset == ASSERT_LINE)
 	{
-		m_reset_timer->adjust(attotime::from_nsec((double)900), TIMER_ID_RESET, attotime::from_nsec((double)900));
+		m_reset_timer->adjust(attotime::from_nsec(900));
 	}
 }
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  timer_tick - update the output state for a
+//  given Fx timer
 //-------------------------------------------------
 
-void mc14411_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(mc14411_device::timer_tick)
 {
-	if (id >= TIMER_F1 && id <= TIMER_F16)
+	m_out_fx_cbs[param](m_fx_timers[param].state);
+	m_fx_timers[param].state = !m_fx_timers[param].state;
+}
+
+
+//-------------------------------------------------
+//  reset_tick - log information if the device's
+//  reset pulse is too short
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(mc14411_device::reset_tick)
+{
+	// NOTE: This check could be triggered by either faulty hardware design or non accurate emulation so is just informative if the reset line is handled
+	//       explicitelly instead of relying on calling device_reset
+	if (!(m_reset == ASSERT_LINE))
 	{
-		(m_out_fx_cbs[id])(m_fx_state[id]++ & 1);
-	}
-	else if (id == TIMER_ID_RESET)
-	{
-		// NOTE: This check could be triggered by either faulty hardware design or non accurate emulation so is just informative if the reset line is handled
-		//       explicitelly instead of relying on calling device_reset
-		if (!(m_reset == ASSERT_LINE))
-		{
-			LOG("Reset pulse is too short, should be 900nS minimum");
-			logerror("Reset pulse is too short, should be 900nS minimum");
-		}
-	}
-	else
-	{
-		LOG("Unhandled Timer ID %d\n", id);
+		LOG("Reset pulse is too short, should be 900nS minimum");
 	}
 }
 
@@ -246,7 +241,7 @@ void mc14411_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 void mc14411_device::rate_select_w(uint8_t data)
 {
-	LOGSETUP("%s %02x\n", FUNCNAME, data);
+	LOGSETUP("mc14411_device::rate_select_w %02x\n", data);
 
 	if (m_divider != (data & 3))
 	{
@@ -263,7 +258,7 @@ void mc14411_device::rate_select_w(uint8_t data)
 
 void mc14411_device::rsa_w(int state)
 {
-	LOGSETUP("%s %02x\n", FUNCNAME, state);
+	LOGSETUP("mc14411_device::rsa_w %02x\n", state);
 
 	if ((m_divider & RSA) != (state == ASSERT_LINE ? RSA : 0))
 	{
@@ -280,7 +275,7 @@ void mc14411_device::rsa_w(int state)
 
 void mc14411_device::rsb_w(int state)
 {
-	LOGSETUP("%s %02x\n", FUNCNAME, state);
+	LOGSETUP("mc14411_device::rsb_w %02x\n", state);
 
 	if ((m_divider & RSB) != (state == ASSERT_LINE ? RSB : 0))
 	{
@@ -297,7 +292,7 @@ void mc14411_device::rsb_w(int state)
 
 void mc14411_device::reset_w(int state)
 {
-	LOGSETUP("%s %02x\n", FUNCNAME, state);
+	LOGSETUP("mc14411_device::reset_w %02x\n", state);
 
 	m_reset = state;
 

@@ -77,6 +77,8 @@ private:
 	bool m_req;
 	bool m_drq;
 	bool m_pren;
+	bool m_prac;
+	bool m_trrq;
 };
 
 

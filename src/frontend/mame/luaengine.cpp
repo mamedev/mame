@@ -21,6 +21,7 @@
 #include "debugger.h"
 #include "drivenum.h"
 #include "emuopts.h"
+#include "fileio.h"
 #include "inputdev.h"
 #include "natkeyboard.h"
 #include "screen.h"
@@ -28,6 +29,7 @@
 #include "uiinput.h"
 
 #include "corestr.h"
+#include "notifier.h"
 
 #include <cstring>
 #include <thread>
@@ -91,18 +93,6 @@ namespace sol
 
 template <> struct is_container<image_interface_formats> : std::true_type { };
 template <> struct is_container<plugin_options_plugins> : std::true_type { };
-
-
-sol::buffer *sol_lua_get(sol::types<buffer *>, lua_State *L, int index, sol::stack::record &tracking)
-{
-	return new sol::buffer(stack::get<int>(L, index), L);
-}
-
-int sol_lua_push(sol::types<buffer *>, lua_State *L, buffer *value)
-{
-	delete value;
-	return 1;
-}
 
 
 template <typename T>
@@ -362,16 +352,18 @@ sol::object lua_engine::call_plugin(const std::string &name, sol::object in)
 {
 	std::string field = "cb_" + name;
 	sol::object obj = sol().registry()[field];
-	if(obj.is<sol::protected_function>())
+	if (obj.is<sol::protected_function>())
 	{
 		auto res = invoke(obj.as<sol::protected_function>(), in);
-		if(!res.valid())
+		if (!res.valid())
 		{
 			sol::error err = res;
 			osd_printf_error("[LUA ERROR] in call_plugin: %s\n", err.what());
 		}
 		else
+		{
 			return res.get<sol::object>();
+		}
 	}
 	return sol::lua_nil;
 }
@@ -390,7 +382,7 @@ std::optional<long> lua_engine::menu_populate(const std::string &menu, std::vect
 		}
 		else
 		{
-			std::tuple<sol::table, std::optional<long>, std::string> table = res;
+			std::tuple<sol::table, std::optional<long>, std::optional<std::string> > table = res;
 			for (auto &entry : std::get<0>(table))
 			{
 				if (entry.second.is<sol::table>())
@@ -399,7 +391,10 @@ std::optional<long> lua_engine::menu_populate(const std::string &menu, std::vect
 					menu_list.emplace_back(enttable.get<std::string, std::string, std::string>(1, 2, 3));
 				}
 			}
-			flags = std::get<2>(table);
+			if (std::get<2>(table))
+				flags = *std::get<2>(table);
+			else
+				flags.clear();
 			return std::get<1>(table);
 		}
 	}
@@ -410,7 +405,7 @@ std::optional<long> lua_engine::menu_populate(const std::string &menu, std::vect
 std::pair<bool, std::optional<long> > lua_engine::menu_callback(const std::string &menu, int index, const std::string &event)
 {
 	std::string field = "menu_cb_" + menu;
-	std::pair<bool, std::optional<long> > ret(false, std::nullopt);
+	std::pair<std::optional<bool>, std::optional<long> > ret(false, std::nullopt);
 	sol::object obj = sol().registry()[field];
 	if (obj.is<sol::protected_function>())
 	{
@@ -425,7 +420,7 @@ std::pair<bool, std::optional<long> > lua_engine::menu_callback(const std::strin
 			ret = res;
 		}
 	}
-	return ret;
+	return std::make_pair(std::get<0>(ret) && *std::get<0>(ret), std::get<1>(ret));
 }
 
 void lua_engine::set_machine(running_machine *machine)
@@ -433,9 +428,10 @@ void lua_engine::set_machine(running_machine *machine)
 	m_machine = machine;
 }
 
-int lua_engine::enumerate_functions(const char *id, std::function<bool(const sol::protected_function &func)> &&callback)
+template <typename T>
+size_t lua_engine::enumerate_functions(const char *id, T &&callback)
 {
-	int count = 0;
+	size_t count = 0;
 	sol::object functable = sol().registry()[id];
 	if (functable.is<sol::table>())
 	{
@@ -449,23 +445,24 @@ int lua_engine::enumerate_functions(const char *id, std::function<bool(const sol
 					break;
 			}
 		}
-		return true;
 	}
 	return count;
 }
 
 bool lua_engine::execute_function(const char *id)
 {
-	int count = enumerate_functions(id, [this](const sol::protected_function &func)
-	{
-		auto ret = invoke(func);
-		if(!ret.valid())
-		{
-			sol::error err = ret;
-			osd_printf_error("[LUA ERROR] in execute_function: %s\n", err.what());
-		}
-		return true;
-	});
+	size_t count = enumerate_functions(
+			id,
+			[] (const sol::protected_function &func)
+			{
+				auto ret = invoke(func);
+				if (!ret.valid())
+				{
+					sol::error err = ret;
+					osd_printf_error("[LUA ERROR] in execute_function: %s\n", err.what());
+				}
+				return true;
+			});
 	return count > 0;
 }
 
@@ -531,21 +528,23 @@ void lua_engine::on_periodic()
 bool lua_engine::on_missing_mandatory_image(const std::string &instance_name)
 {
 	bool handled = false;
-	enumerate_functions("LUA_ON_MANDATORY_FILE_MANAGER_OVERRIDE", [this, &instance_name, &handled](const sol::protected_function &func)
-	{
-		auto ret = invoke(func, instance_name);
+	enumerate_functions(
+			"LUA_ON_MANDATORY_FILE_MANAGER_OVERRIDE",
+			[&instance_name, &handled] (const sol::protected_function &func)
+			{
+				auto ret = invoke(func, instance_name);
 
-		if(!ret.valid())
-		{
-			sol::error err = ret;
-			osd_printf_error("[LUA ERROR] in on_missing_mandatory_image: %s\n", err.what());
-		}
-		else if (ret.get<bool>())
-		{
-			handled = true;
-		}
-		return !handled;
-	});
+				if (!ret.valid())
+				{
+					sol::error err = ret;
+					osd_printf_error("[LUA ERROR] in on_missing_mandatory_image: %s\n", err.what());
+				}
+				else if (ret.get<bool>())
+				{
+					handled = true;
+				}
+				return !handled;
+			});
 	return handled;
 }
 
@@ -717,13 +716,7 @@ void lua_engine::initialize()
 			static_cast<char const *(*)(char const *)>(&lang_translate),
 			static_cast<char const *(*)(char const *, char const *)>(&lang_translate));
 	emu["pid"] = &osd_getpid;
-	emu["subst_env"] =
-		[] (const std::string &str)
-		{
-			std::string result;
-			osd_subst_env(result, str);
-			return result;
-		};
+	emu.set_function("subst_env", &osd_subst_env);
 	emu["device_enumerator"] = sol::overload(
 			[] (device_t &dev) { return devenum<device_enumerator>(dev); },
 			[] (device_t &dev, int maxdepth) { return devenum<device_enumerator>(dev, maxdepth); });
@@ -740,6 +733,10 @@ void lua_engine::initialize()
 			[] (device_t &dev) { return devenum<slot_interface_enumerator>(dev); },
 			[] (device_t &dev, int maxdepth) { return devenum<slot_interface_enumerator>(dev, maxdepth); });
 
+
+	auto notifier_subscription_type = sol().registry().new_usertype<util::notifier_subscription>("notifier_subscription", sol::no_constructor);
+	notifier_subscription_type["unsubscribe"] = &util::notifier_subscription::reset;
+	notifier_subscription_type["is_active"] = sol::property(&util::notifier_subscription::operator bool);
 
 	auto attotime_type = emu.new_usertype<attotime>(
 			"attotime",
@@ -828,7 +825,15 @@ void lua_engine::initialize()
 					}
 					new (&file) emu_file(path, flags);
 				}));
-	file_type.set("read", [](emu_file &file, sol::buffer *buff) { buff->set_len(file.read(buff->get_ptr(), buff->get_len())); return buff; });
+	file_type.set("read",
+			[] (emu_file &file, sol::this_state s, size_t len)
+			{
+				buffer_helper buf(s);
+				auto space = buf.prepare(len);
+				space.add(file.read(space.get(), len));
+				buf.push();
+				return sol::make_reference(s, sol::stack_reference(s, -1));
+			});
 	file_type.set("write", [](emu_file &file, const std::string &data) { return file.write(data.data(), data.size()); });
 	file_type.set("puts", &emu_file::puts);
 	file_type.set("open", static_cast<std::error_condition (emu_file::*)(std::string_view)>(&emu_file::open));
@@ -972,12 +977,14 @@ void lua_engine::initialize()
 				}));
 	item_type.set("size", sol::readonly(&save_item::size));
 	item_type.set("count", sol::readonly(&save_item::count));
-	item_type.set("read", [this](save_item &item, int offset) -> sol::object {
-			if(!item.base || (offset >= item.count))
+	item_type.set("read",
+		[this] (save_item &item, int offset) -> sol::object
+		{
+			if (!item.base || (offset >= item.count))
 				return sol::lua_nil;
 			const void *const data = reinterpret_cast<const uint8_t *>(item.base) + (item.stride * (offset / item.valcount));
 			uint64_t ret = 0;
-			switch(item.size)
+			switch (item.size)
 			{
 				case 1:
 				default:
@@ -995,29 +1002,38 @@ void lua_engine::initialize()
 			}
 			return sol::make_object(sol(), ret);
 		});
-	item_type.set("read_block", [](save_item &item, int offset, sol::buffer *buff) {
-			if(!item.base || ((offset + buff->get_len()) > (item.size * item.count)))
+	item_type.set("read_block",
+		[] (save_item &item, sol::this_state s, uint32_t offset, size_t len) -> sol::object
+		{
+			if (!item.base)
 			{
-				buff->set_len(0);
+				luaL_error(s, "Invalid save item");
+				return sol::lua_nil;
 			}
-			else
+
+			if ((offset + len) > (item.size * item.count))
 			{
-				const uint32_t blocksize = item.size * item.valcount;
-				uint32_t remaining = buff->get_len();
-				uint8_t *dest = reinterpret_cast<uint8_t *>(buff->get_ptr());
-				while(remaining)
-				{
-					const uint32_t blockno = offset / blocksize;
-					const uint32_t available = blocksize - (offset % blocksize);
-					const uint32_t chunk = (available < remaining) ? available : remaining;
-					const void *const source = reinterpret_cast<const uint8_t *>(item.base) + (blockno * item.stride) + (offset % blocksize);
-					std::memcpy(dest, source, chunk);
-					offset += chunk;
-					remaining -= chunk;
-					dest += chunk;
-				}
+				luaL_error(s, "Range extends beyond end of save item");
+				return sol::lua_nil;
 			}
-			return buff;
+
+			luaL_Buffer buff;
+			uint8_t *dest = reinterpret_cast<uint8_t *>(luaL_buffinitsize(s, &buff, len));
+			const uint32_t blocksize = item.size * item.valcount;
+			size_t remaining = len;
+			while (remaining)
+			{
+				const uint32_t blockno = offset / blocksize;
+				const uint32_t available = blocksize - (offset % blocksize);
+				const uint32_t chunk = (available < remaining) ? available : remaining;
+				const void *const source = reinterpret_cast<const uint8_t *>(item.base) + (blockno * item.stride) + (offset % blocksize);
+				std::memcpy(dest, source, chunk);
+				offset += chunk;
+				remaining -= chunk;
+				dest += chunk;
+			}
+			luaL_pushresultsize(&buff, len);
+			return sol::make_reference(s, sol::stack_reference(s, -1));
 		});
 	item_type.set("write", [](save_item &item, int offset, uint64_t value) {
 			if(!item.base || (offset >= item.count))
@@ -1135,25 +1151,25 @@ void lua_engine::initialize()
 	auto core_options_entry_type = sol().registry().new_usertype<core_options::entry>("core_options_entry", "new", sol::no_constructor);
 	core_options_entry_type.set("value", sol::overload(
 		[this](core_options::entry &e, bool val) {
-			if(e.type() != OPTION_BOOLEAN)
+			if(e.type() != core_options::option_type::BOOLEAN)
 				luaL_error(m_lua_state, "Cannot set option to wrong type");
 			else
 				e.set_value(val ? "1" : "0", OPTION_PRIORITY_CMDLINE);
 		},
 		[this](core_options::entry &e, float val) {
-			if(e.type() != OPTION_FLOAT)
+			if(e.type() != core_options::option_type::FLOAT)
 				luaL_error(m_lua_state, "Cannot set option to wrong type");
 			else
 				e.set_value(string_format("%f", val), OPTION_PRIORITY_CMDLINE);
 		},
 		[this](core_options::entry &e, int val) {
-			if(e.type() != OPTION_INTEGER)
+			if(e.type() != core_options::option_type::INTEGER)
 				luaL_error(m_lua_state, "Cannot set option to wrong type");
 			else
 				e.set_value(string_format("%d", val), OPTION_PRIORITY_CMDLINE);
 		},
 		[this](core_options::entry &e, const char *val) {
-			if(e.type() != OPTION_STRING)
+			if(e.type() != core_options::option_type::STRING)
 				luaL_error(m_lua_state, "Cannot set option to wrong type");
 			else
 				e.set_value(val, OPTION_PRIORITY_CMDLINE);
@@ -1181,54 +1197,54 @@ void lua_engine::initialize()
 
 
 	auto machine_type = sol().registry().new_usertype<running_machine>("machine", sol::no_constructor);
-	machine_type["exit"] = &running_machine::schedule_exit;
-	machine_type["hard_reset"] = &running_machine::schedule_hard_reset;
-	machine_type["soft_reset"] = &running_machine::schedule_soft_reset;
-	machine_type["save"] = &running_machine::schedule_save; // TODO: some kind of completion notification?
-	machine_type["load"] = &running_machine::schedule_load; // TODO: some kind of completion notification?
-	machine_type["buffer_save"] =
-		[] (running_machine &m, sol::this_state s)
-		{
-			// FIXME: this needs to schedule saving to a buffer and return asynchronously somehow
-			// right now it's broken by anonymous timers, synchronize, etc.
-			lua_State *L = s;
-			luaL_Buffer buff;
-			int size = ram_state::get_size(m.save());
-			u8 *ptr = (u8 *)luaL_buffinitsize(L, &buff, size);
-			save_error error = m.save().write_buffer(ptr, size);
-			if (error == STATERR_NONE)
+	machine_type.set_function("exit", &running_machine::schedule_exit);
+	machine_type.set_function("hard_reset", &running_machine::schedule_hard_reset);
+	machine_type.set_function("soft_reset", &running_machine::schedule_soft_reset);
+	machine_type.set_function("save", &running_machine::schedule_save); // TODO: some kind of completion notification?
+	machine_type.set_function("load", &running_machine::schedule_load); // TODO: some kind of completion notification?
+	machine_type.set_function("buffer_save",
+			[] (running_machine &m, sol::this_state s)
 			{
-				luaL_pushresultsize(&buff, size);
-				return sol::make_reference(L, sol::stack_reference(L, -1));
-			}
-			luaL_error(L, "State save error.");
-			return sol::make_reference(L, nullptr);
-		};
-	machine_type["buffer_load"] =
-		[] (running_machine &m, sol::this_state s, std::string str)
-		{
-			// FIXME: this needs to schedule loading from the buffer and return asynchronously somehow
-			// right now it's broken by anonymous timers, synchronize, etc.
-			save_error error = m.save().read_buffer((u8 *)str.data(), str.size());
-			if (error == STATERR_NONE)
+				// FIXME: this needs to schedule saving to a buffer and return asynchronously somehow
+				// right now it's broken by anonymous timers, synchronize, etc.
+				lua_State *L = s;
+				luaL_Buffer buff;
+				int size = ram_state::get_size(m.save());
+				u8 *ptr = (u8 *)luaL_buffinitsize(L, &buff, size);
+				save_error error = m.save().write_buffer(ptr, size);
+				if (error == STATERR_NONE)
+				{
+					luaL_pushresultsize(&buff, size);
+					return sol::make_reference(L, sol::stack_reference(L, -1));
+				}
+				luaL_error(L, "State save error.");
+				return sol::make_reference(L, nullptr);
+			});
+	machine_type.set_function("buffer_load",
+			[] (running_machine &m, sol::this_state s, std::string str)
 			{
-				return true;
-			}
-			else
+				// FIXME: this needs to schedule loading from the buffer and return asynchronously somehow
+				// right now it's broken by anonymous timers, synchronize, etc.
+				save_error error = m.save().read_buffer((u8 *)str.data(), str.size());
+				if (error == STATERR_NONE)
+				{
+					return true;
+				}
+				else
+				{
+					luaL_error(s,"State load error.");
+					return false;
+				}
+			});
+	machine_type.set_function("popmessage",
+			[] (running_machine &m, std::optional<const char *> str)
 			{
-				luaL_error(s,"State load error.");
-				return false;
-			}
-		};
-	machine_type["popmessage"] =
-		[] (running_machine &m, const char *str)
-		{
-			if (str)
-				m.popmessage("%s", str);
-			else
-				m.popmessage();
-		};
-	machine_type["logerror"]  = [] (running_machine &m, std::string const *str) { m.logerror("[luaengine] %s\n", str); };
+				if (str)
+					m.popmessage("%s", *str);
+				else
+					m.popmessage();
+			});
+	machine_type.set_function("logerror", [] (running_machine &m, char const *str) { m.logerror("[luaengine] %s\n", str); });
 	machine_type["time"] = sol::property(&running_machine::time);
 	machine_type["system"] = sol::property(&running_machine::system);
 	machine_type["parameters"] = sol::property(&running_machine::parameters);
@@ -1268,7 +1284,7 @@ void lua_engine::initialize()
 	game_driver_type["manufacturer"] = sol::readonly(&game_driver::manufacturer);
 	game_driver_type["parent"] = sol::readonly(&game_driver::parent);
 	game_driver_type["compatible_with"] = sol::property([] (game_driver const &driver) { return strcmp(driver.compatible_with, "0") ? driver.compatible_with : nullptr; });
-	game_driver_type["source_file"] = sol::property([] (game_driver const &driver) { return &driver.type.source()[0]; });
+	game_driver_type["source_file"] = sol::property([] (game_driver const &driver) { return driver.type.source(); });
 	game_driver_type["orientation"] = sol::property(
 			[] (game_driver const &driver)
 			{
@@ -1331,15 +1347,16 @@ void lua_engine::initialize()
 
 
 	auto device_type = sol().registry().new_usertype<device_t>("device", sol::no_constructor);
-	device_type["subtag"] = &device_t::subtag;
-	device_type["siblingtag"] = &device_t::siblingtag;
-	device_type["memregion"] = &device_t::memregion;
-	device_type["memshare"] = &device_t::memshare;
-	device_type["membank"] = &device_t::membank;
-	device_type["ioport"] = &device_t::ioport;
-	device_type["subdevice"] = static_cast<device_t *(device_t::*)(std::string_view) const>(&device_t::subdevice);
-	device_type["siblingdevice"] = static_cast<device_t *(device_t::*)(std::string_view) const>(&device_t::siblingdevice);
-	device_type["parameter"] = &device_t::parameter;
+	device_type.set_function(sol::meta_function::to_string, [] (device_t &d) { return util::string_format("%s(%s)", d.shortname(), d.tag()); });
+	device_type.set_function("subtag", &device_t::subtag);
+	device_type.set_function("siblingtag", &device_t::siblingtag);
+	device_type.set_function("memregion", &device_t::memregion);
+	device_type.set_function("memshare", &device_t::memshare);
+	device_type.set_function("membank", &device_t::membank);
+	device_type.set_function("ioport", &device_t::ioport);
+	device_type.set_function("subdevice", static_cast<device_t *(device_t::*)(std::string_view) const>(&device_t::subdevice));
+	device_type.set_function("siblingdevice", static_cast<device_t *(device_t::*)(std::string_view) const>(&device_t::siblingdevice));
+	device_type.set_function("parameter", &device_t::parameter);
 	device_type["tag"] = sol::property(&device_t::tag);
 	device_type["basetag"] = sol::property(&device_t::basetag);
 	device_type["name"] = sol::property(&device_t::name);
@@ -1774,6 +1791,7 @@ void lua_engine::initialize()
 	ui_type["single_step"] = sol::property(&mame_ui_manager::single_step, &mame_ui_manager::set_single_step);
 	ui_type["show_fps"] = sol::property(&mame_ui_manager::show_fps, &mame_ui_manager::set_show_fps);
 	ui_type["show_profiler"] = sol::property(&mame_ui_manager::show_profiler, &mame_ui_manager::set_show_profiler);
+	ui_type["image_display_enabled"] = sol::property(&mame_ui_manager::image_display_enabled, &mame_ui_manager::set_image_display_enabled);
 
 
 /*  device_state_entry library
@@ -1908,35 +1926,29 @@ void lua_engine::resume(int nparam)
 	luaL_unref(m_lua_state, LUA_REGISTRYINDEX, nparam);
 }
 
-void lua_engine::run(sol::load_result res)
+//-------------------------------------------------
+//  load_script - load script from file path
+//-------------------------------------------------
+
+sol::load_result lua_engine::load_script(std::string const &filename)
 {
-	if(res.valid())
-	{
-		auto ret = invoke(res.get<sol::protected_function>());
-		if(!ret.valid())
-		{
-			sol::error err = ret;
-			osd_printf_error("[LUA ERROR] in run: %s\n", err.what());
-		}
-	}
-	else
-		osd_printf_error("[LUA ERROR] %d loading Lua script\n", (int)res.status());
+	return sol().load_file(filename);
 }
 
 //-------------------------------------------------
-//  execute - load and execute script
+//  load_string - load script from string
 //-------------------------------------------------
 
-void lua_engine::load_script(const char *filename)
+sol::load_result lua_engine::load_string(std::string const &value)
 {
-	run(sol().load_file(filename));
+	return sol().load(value);
 }
 
 //-------------------------------------------------
-//  execute_string - execute script from string
+//  make_environment - make a sandbox
 //-------------------------------------------------
 
-void lua_engine::load_string(const char *value)
+sol::environment lua_engine::make_environment()
 {
-	run(sol().load(value));
+	return sol::environment(sol(), sol::create, sol().globals());
 }

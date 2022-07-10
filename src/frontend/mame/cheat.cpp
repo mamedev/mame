@@ -81,6 +81,7 @@
 
 #include "corestr.h"
 #include "emuopts.h"
+#include "fileio.h"
 
 #include <cstring>
 #include <iterator>

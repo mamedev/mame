@@ -7,9 +7,9 @@ copyright-holders:Robbbert
 <mamelayout version="2">
 
 	<element name="digit" defstate="0">
-		<led8seg_gts1>
+		<led14segsc>
 			<color red="1.0" green="0.0" blue="0.0" />
-		</led8seg_gts1>
+		</led14segsc>
 	</element>
 
 	<group name="score">
@@ -38,13 +38,13 @@ copyright-holders:Robbbert
 		</group>
 
 		<!-- Player 3 Score -->
-		<param name="s" value="22" />
+		<param name="s" value="26" />
 		<group ref="score">
 			<bounds left="10" top="165" right="308" bottom="204" />
 		</group>
 
 		<!-- Player 4 Score -->
-		<param name="s" value="29" />
+		<param name="s" value="33" />
 		<group ref="score">
 			<bounds left="10" top="225" right="308" bottom="264" />
 		</group>

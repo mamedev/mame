@@ -113,7 +113,7 @@ void am9513_device::device_start()
 	// Set up frequency timers
 	for (int f = 0; f < 5; f++)
 	{
-		m_freq_timer[f] = timer_alloc(TIMER_F1 + f);
+		m_freq_timer[f] = timer_alloc(FUNC(am9513_device::timer_tick), this);
 		m_freq_timer_selected[f] = (f == 0) ? (m_fout_cb.isnull() ? 0x3e : 0x3f) : 0;
 		m_freq_timer_cycle[f] = 0;
 	}
@@ -205,9 +205,9 @@ void am9513_device::init_freq_timer(int f)
 
 	attotime freq = clocks_to_attotime(scale);
 	if (m_freq_timer_cycle[f] == 0)
-		m_freq_timer[f]->adjust(freq, 0, freq);
+		m_freq_timer[f]->adjust(freq, f, freq);
 	else
-		m_freq_timer[f]->adjust(freq / 2, 0, freq / 2);
+		m_freq_timer[f]->adjust(freq / 2, f, freq / 2);
 	m_freq_timer[f]->enable(m_freq_timer_selected[f] != 0);
 
 	LOGMASKED(LOG_GENERAL, "F%d = %f Hz (%s cycle emulation)\n", f + 1, double(clock()) / scale,
@@ -228,21 +228,18 @@ void am9513_device::device_clock_changed()
 
 
 //-------------------------------------------------
-//  device_timer - called whenever a device timer
-//  fires
+//  timer_tick - advance our counters
 //-------------------------------------------------
 
-void am9513_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(am9513_device::timer_tick)
 {
-	assert(id >= TIMER_F1 && id <= TIMER_F5);
-
-	int cycle = m_freq_timer_cycle[id - TIMER_F1] == 0 ? 2 : 1;
+	int cycle = m_freq_timer_cycle[param] == 0 ? 2 : 1;
 	while (cycle-- > 0)
 	{
-		m_f ^= 1 << (id - TIMER_F1);
-		bool level = BIT(m_f, id - TIMER_F1);
+		m_f ^= 1 << param;
+		bool level = BIT(m_f, param);
 
-		int source = id - TIMER_F1 + 11;
+		int source = param + 11;
 		for (int c = 0; c < 5; c++)
 		{
 			if ((m_counter_mode[c] & 0x0f00) >> 8 == source && BIT(m_counter_mode[c], 12) == !level)
@@ -250,7 +247,7 @@ void am9513_device::device_timer(emu_timer &timer, device_timer_id id, int param
 		}
 
 		// FOUT Source = Fn
-		if ((m_mmr & 0x00f0) >> 4 == source || ((m_mmr & 0x00f0) == 0 && id == TIMER_F1))
+		if ((m_mmr & 0x00f0) >> 4 == source || ((m_mmr & 0x00f0) == 0 && param == 0))
 			fout_tick();
 	}
 }

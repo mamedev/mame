@@ -129,18 +129,18 @@ void rx50img_format::find_size(util::random_read &io, uint8_t &track_count, uint
 	track_count = head_count = sector_count = 0;
 }
 
-int rx50img_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int rx50img_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
 
 	if(track_count)
-		return 50;
+		return FIFID_SIZE;
 	return 0;
 }
 
 	//  /* Sectors are numbered 1 to 10 */
-bool rx50img_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool rx50img_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	uint8_t track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
@@ -169,7 +169,7 @@ bool rx50img_format::load(util::random_read &io, uint32_t form_factor, const std
 	return true;
 }
 
-bool rx50img_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool rx50img_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	int track_count, head_count, sector_count;
 	get_geometry_mfm_pc(image, 2000, track_count, head_count, sector_count);
@@ -212,7 +212,7 @@ bool rx50img_format::save(util::random_read_write &io, const std::vector<uint32_
 	return true;
 }
 
-const floppy_format_type FLOPPY_RX50IMG_FORMAT = &floppy_image_format_creator<rx50img_format>;
+const rx50img_format FLOPPY_RX50IMG_FORMAT;
 
 
 /*

@@ -57,7 +57,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -73,6 +72,8 @@ private:
 	void portb_w(offs_t offset, uint8_t data);
 	uint8_t portc_r(offs_t offset);
 	void portc_w(offs_t offset, uint8_t data);
+
+	TIMER_CALLBACK_MEMBER(cr_tick);
 
 	/* fake memory I/O to get past memory reset check */
 	uint8_t fakemem_r();

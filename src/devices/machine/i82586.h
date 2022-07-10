@@ -167,7 +167,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_network_interface overrides
@@ -181,7 +180,7 @@ protected:
 	virtual void update_scb();
 
 	// command unit
-	virtual void cu_execute();
+	virtual TIMER_CALLBACK_MEMBER(cu_execute);
 	virtual void cu_complete(const u16 status);
 	virtual bool cu_iasetup() = 0;
 	virtual bool cu_configure() = 0;
@@ -211,7 +210,6 @@ protected:
 	address_space *m_space;
 
 	devcb_write_line m_out_irq;
-	static const device_timer_id CU_TIMER = 0;
 	emu_timer *m_cu_timer;
 
 	// interrupt state

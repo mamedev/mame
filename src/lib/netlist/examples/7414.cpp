@@ -8,6 +8,7 @@
 #include "netlist/devices/net_lib.h"
 
 NETLIST_START(7414_astable)
+{
 
 	/*
 	 * Simple oscillator with 74LS14
@@ -30,4 +31,4 @@ NETLIST_START(7414_astable)
 	NET_C(GND, U4A1.GND)
 	NET_C(R39.1, U4A1.Q)
 
-NETLIST_END()
+}

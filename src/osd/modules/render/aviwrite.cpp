@@ -10,6 +10,7 @@
 #include "aviwrite.h"
 
 #include "modules/lib/osdobj_common.h"
+#include "fileio.h"
 #include "screen.h"
 
 

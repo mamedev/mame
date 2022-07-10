@@ -152,6 +152,9 @@ class memory_view;
 // declared in emuopts.h
 class emu_options;
 
+// declared in fileio.h
+class emu_file;
+
 // declared in http.h
 class http_manager;
 
@@ -184,6 +187,7 @@ class running_machine;
 
 // declared in mconfig.h
 namespace emu::detail { class machine_config_replace; }
+struct internal_layout;
 class machine_config;
 
 // declared in natkeyboard.h

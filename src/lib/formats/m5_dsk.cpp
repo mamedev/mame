@@ -42,4 +42,4 @@ const m5_format::format m5_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_M5_FORMAT = &floppy_image_format_creator<m5_format>;
+const m5_format FLOPPY_M5_FORMAT;

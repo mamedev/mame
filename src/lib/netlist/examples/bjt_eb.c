@@ -10,6 +10,7 @@
 #include "netlist/devices/net_lib.h"
 
 NETLIST_START(bjt)
+{
 	/* Standard stuff */
 
 	CLOCK(clk, 10000) // 10000 Hz
@@ -41,4 +42,4 @@ NETLIST_START(bjt)
 	//LOG(logB, Q.B)
 	//LOG(logC, Q.C)
 
-NETLIST_END()
+}

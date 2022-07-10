@@ -24,6 +24,7 @@ copyright-holders:Robbbert
 	</element>
 	<element name="P0"><text string="Ball / Match"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="P1"><text string="Credits"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P2"><text string="Bonus"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="P3"><text string="Player 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="P4"><text string="Player 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="P5"><text string="Player 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
@@ -31,8 +32,6 @@ copyright-holders:Robbbert
 
 	<view name="Default Layout">
 		<bounds left="0" top="20" right="318" bottom="394" />
-
-		<!-- LEDs -->
 
 		<!-- Player 1 Score -->
 
@@ -127,21 +126,45 @@ copyright-holders:Robbbert
 			<bounds left="274" top="225" right="308" bottom="264" />
 		</element>
 
+		<!-- Bonus Score -->
+		<element name="digit45" ref="digit">
+			<bounds left="10" top="285" right="44" bottom="324" />
+		</element>
+		<element name="digit44" ref="digit">
+			<bounds left="54" top="285" right="88" bottom="324" />
+		</element>
+		<element name="digit43" ref="digit">
+			<bounds left="98" top="285" right="132" bottom="324" />
+		</element>
+		<element name="digit42" ref="digit">
+			<bounds left="142" top="285" right="176" bottom="324" />
+		</element>
+		<element name="digit41" ref="digit">
+			<bounds left="186" top="285" right="220" bottom="324" />
+		</element>
+		<element name="digit40" ref="digit">
+			<bounds left="230" top="285" right="264" bottom="324" />
+		</element>
+		<element name="digit55" ref="digit">
+			<bounds left="274" top="285" right="308" bottom="324" />
+		</element>
+
 		<!-- Credits and Balls -->
-		<element name="digit55" ref="digit7">
+		<element name="digit75" ref="digit7">
 			<bounds left="30" top="345" right="64" bottom="384" />
 		</element>
-		<element name="digit54" ref="digit7">
+		<element name="digit74" ref="digit7">
 			<bounds left="69" top="345" right="103" bottom="384" />
 		</element>
-		<element name="digit53" ref="digit7">
+		<element name="digit73" ref="digit7">
 			<bounds left="171" top="345" right="205" bottom="384" />
 		</element>
-		<element name="digit52" ref="digit7">
+		<element name="digit72" ref="digit7">
 			<bounds left="210" top="345" right="244" bottom="384" />
 		</element>
 		<element ref="P0"><bounds left="200" right="258" top="330" bottom="342" /></element>
 		<element ref="P1"><bounds left="50" right="108" top="330" bottom="342" /></element>
+		<element ref="P2"><bounds left="100" right="180" top="270" bottom="282" /></element>
 		<element name="text3" ref="P3"><bounds left="100" right="180" top="30" bottom="42" /></element>
 		<element name="text2" ref="P4"><bounds left="100" right="180" top="90" bottom="102" /></element>
 		<element name="text1" ref="P5"><bounds left="100" right="180" top="150" bottom="162" /></element>

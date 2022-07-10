@@ -6,17 +6,17 @@
 //
 //============================================================
 
+#include "winutil.h"
+
+// lib/util
+#include "timeconv.h"
+
+// osd
+#include "strconv.h"
+
 // standard windows headers
 #include <windows.h>
 #include <direct.h>
-
-// MAME headers
-#include "emu.h"
-
-// MAMEOS headers
-#include "winutil.h"
-#include "strconv.h"
-#include "timeconv.h"
 
 
 //============================================================
@@ -101,7 +101,7 @@ BOOL win_is_gui_application()
 //============================================================
 //  osd_subst_env
 //============================================================
-void osd_subst_env(std::string &dst, const std::string &src)
+std::string osd_subst_env(std::string_view src)
 {
 	std::wstring const w_src = osd::text::to_wstring(src);
 	std::vector<wchar_t> buffer(w_src.size() + 2);
@@ -112,10 +112,11 @@ void osd_subst_env(std::string &dst, const std::string &src)
 		buffer.resize(length + 1);
 		length = ExpandEnvironmentStringsW(w_src.c_str(), &buffer[0], buffer.size());
 	}
+
+	std::string dst;
 	if (length)
 		osd::text::from_wstring(dst, &buffer[0]);
-	else
-		dst.clear();
+	return dst;
 }
 
 //-------------------------------------------------

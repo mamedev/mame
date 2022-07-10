@@ -13,7 +13,6 @@
 #include "emu.h"
 #include "sm500.h"
 #include "sm510d.h"
-#include "debugger.h"
 
 
 // MCU types
@@ -36,13 +35,13 @@ void sm500_device::data_4x10x4(address_map &map)
 
 
 // device definitions
-sm500_device::sm500_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	sm500_device(mconfig, SM500, tag, owner, clock, 1 /* stack levels */, 7 /* o group pins */, 11 /* prg width */, address_map_constructor(FUNC(sm500_device::program_1_2k), this), 6 /* data width */, address_map_constructor(FUNC(sm500_device::data_4x10x4), this))
-{ }
-
 sm500_device::sm500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_pins, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
 	sm510_base_device(mconfig, type, tag, owner, clock, stack_levels, prgwidth, program, datawidth, data),
 	m_o_pins(o_pins)
+{ }
+
+sm500_device::sm500_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	sm500_device(mconfig, SM500, tag, owner, clock, 1 /* stack levels */, 7 /* o group pins */, 11 /* prg width */, address_map_constructor(FUNC(sm500_device::program_1_2k), this), 6 /* data width */, address_map_constructor(FUNC(sm500_device::data_4x10x4), this))
 { }
 
 
@@ -65,7 +64,6 @@ void sm500_device::device_start()
 	// init/zerofill
 	memset(m_ox, 0, sizeof(m_ox));
 	memset(m_o, 0, sizeof(m_o));
-	m_cn = 0;
 	m_mx = 0;
 	m_cb = 0;
 	m_s = 0;
@@ -74,7 +72,6 @@ void sm500_device::device_start()
 	// register for savestates
 	save_item(NAME(m_ox));
 	save_item(NAME(m_o));
-	save_item(NAME(m_cn));
 	save_item(NAME(m_mx));
 	save_item(NAME(m_cb));
 	save_item(NAME(m_s));
@@ -95,7 +92,7 @@ void sm500_device::device_reset()
 	// SM500 specific
 	push_stack();
 	op_idiv();
-	m_1s = true;
+	m_gamma = 1;
 	m_cb = 0;
 	m_rsub = false;
 	m_r = 0xf;
@@ -109,14 +106,14 @@ void sm500_device::device_reset()
 
 void sm500_device::lcd_update()
 {
-	// 2 columns
+	// 2 rows
 	for (int h = 0; h < 2; h++)
 	{
 		for (int o = 0; o < m_o_pins; o++)
 		{
 			// 4 segments per group
 			u8 seg = h ? m_ox[o] : m_o[o];
-			m_write_segs(o << 1 | h, m_bp ? seg : 0, 0xffff);
+			m_write_segs(o << 1 | h, (m_bp & 1) ? seg : 0);
 		}
 	}
 }

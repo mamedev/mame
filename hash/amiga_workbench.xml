@@ -506,8 +506,8 @@ license:CC0
 		<description>AmigaOS 3.5</description>
 		<year>1999</year>
 		<publisher>Haage &amp; Partner</publisher>
-		<part name="disc" interface="cdrom">
-			<diskarea name="disc">
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
 				<disk name="amigaos35" sha1="6dcf1e5821717128ac2e763064f1ef31dee3ce8c"/>
 			</diskarea>
 		</part>

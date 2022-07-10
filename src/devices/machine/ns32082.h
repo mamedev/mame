@@ -10,6 +10,7 @@
 
 class ns32082_device
 	: public device_t
+	, public ns32000_slow_slave_interface
 	, public ns32000_mmu_interface
 {
 public:

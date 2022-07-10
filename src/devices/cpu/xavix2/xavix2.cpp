@@ -4,7 +4,6 @@
 #include "emu.h"
 #include "xavix2.h"
 #include "xavix2d.h"
-#include "debugger.h"
 
 DEFINE_DEVICE_TYPE(XAVIX2, xavix2_device, "xavix2", "Xavix 2 CPU")
 

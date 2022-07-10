@@ -105,7 +105,7 @@ void s3520cf_device::device_validity_check(validity_checker &valid) const
 void s3520cf_device::device_start()
 {
 	/* let's call the timer callback every second for now */
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(s3520cf_device::timer_callback), this));
+	m_timer = timer_alloc(FUNC(s3520cf_device::timer_callback), this);
 	m_timer->adjust(attotime::from_hz(clock() / XTAL(32'768)), 0, attotime::from_hz(clock() / XTAL(32'768)));
 
 	system_time systime;
@@ -172,9 +172,10 @@ void s3520cf_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void s3520cf_device::nvram_read(emu_file &file)
+bool s3520cf_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_nvdata, 15);
+	size_t actual;
+	return !file.read(m_nvdata, 15, actual) && actual == 15;
 }
 
 //-------------------------------------------------
@@ -182,9 +183,10 @@ void s3520cf_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void s3520cf_device::nvram_write(emu_file &file)
+bool s3520cf_device::nvram_write(util::write_stream &file)
 {
-	file.write(m_nvdata, 15);
+	size_t actual;
+	return !file.write(m_nvdata, 15, actual) && actual == 15;
 }
 
 //-------------------------------------------------
