@@ -9,6 +9,13 @@
 
 #include "netlist/devices/net_lib.h"
 
+// uncomment the next line to change the way the horizontal count is done
+// Currently, the bike won't make it down to the second row without this hack
+//#define STUNT_CYCLE_HORIZ_COUNT_HACK 1
+
+// uncomment the next line to make the number of buses increase on 5 sec period
+//#define STUNT_CYCLE_BUS_COUNT_HACK 1
+
 NETLIST_START(stuntcyc)
 {
 
@@ -122,8 +129,8 @@ NETLIST_START(stuntcyc)
 	//"TTL_9322","+SELECT,+A1,+B1,+A2,+B2,+A3,+B3,+A4,+B4,+STROBE,@VCC,@GND")
 	TTL_9322(J1, HSYNC, V4, P, V3, 4V, V2, 2V, V1, 1V, GROUND)
 
-	// 1V, 2V, 4V is from the VERTICAL COUNT registers (screen, used for bus images, read during hsync)
-	// V1, V2, V3, V4 is from the VERTICAL MOTION registers (relative to the start of the cycle)
+	// 1V, 2V, 4V is from the Screen Vertical Counter registers (used for bus images, rom read during hsync)
+	// V1, V2, V3, V4 is from the Vertical Motion registers (relative to cycle, rom read during horizontal scan)
 
 	// PROM_82S115(name, CE1Q, CE2, A0, A1, A2, A3, A4, A5, A6, A7, A8, STROBE)
 	PROM_82S115(hf1, GROUND, P, A0, A1, A2, A3, A4, A5, A6, A7, A8, P)
@@ -369,9 +376,22 @@ NETLIST_START(stuntcyc)
 	ALIAS(MOTOR_PULSE, C1.QA)
 	ALIAS(R4, C1.QD)
 
-	TTL_7400_NAND(B2_2, DIRECTION_Q, C2_2.Q)
-	TTL_9316(C3, HF_CLOCK, P,     P, H_COUNTER_RESET_Q, A3_2.Q, C2_2.Q, B2_2.Q, P, P)
-	TTL_9316(B3, HF_CLOCK, C3.RC, P, H_COUNTER_RESET_Q, A3_2.Q, GROUND,    P,      P, GROUND)
+#ifdef STUNT_CYCLE_HORIZ_COUNT_HACK
+	TTL_7486_XOR(B2_2, DIRECTION_Q, C2_2.Q) // FIXME HACK: this should be a 7400 NAND
+	// Horizontal counting (leftward movement) isn't quite working properly.
+	// Without this hack, the bike never will make it down to the ramp level.
+	// With this hack, the bike will move through the second level very quickly.
+	// The Horizontal Motion counters will reset after hitting 0x3ff,
+	// beginning from a count of 0x6d, 0x6e or 0x6f.
+	// (HF counter is 914, 2 times the 1H count of 457)
+	// 0x6d start = count of 913, move left 1
+	// 0x6e start = count of 914, no movement
+	// 0x6f start = count of 915, move right 1
+#else
+	TTL_7400_NAND(B2_2, DIRECTION_Q, C2_2.Q) // correct chip is a NAND
+#endif
+	TTL_9316(C3, HF_CLOCK, P,     P, H_COUNTER_RESET_Q, A3_2.Q, C2_2.Q, B2_2.Q, P, P)  // load 0xd, 0xe, or 0xf
+	TTL_9316(B3, HF_CLOCK, C3.RC, P, H_COUNTER_RESET_Q, A3_2.Q, GROUND, P, P, GROUND)  // load 0x6
 	ALIAS(H1, C3.QA)
 	ALIAS(H2, C3.QB)
 	ALIAS(H3, C3.QC)
@@ -424,7 +444,16 @@ NETLIST_START(stuntcyc)
 	TTL_7474(C5_2, GOOD_JUMP_Q, MAX_SCORE_Q, H5_4.Q, P)
 
 	TTL_7402_NOR(A8_2, E5.QA, C5_2.QQ)
+
+#ifdef STUNT_CYCLE_BUS_COUNT_HACK
+	CLOCK(BUSES_COUNT_UP, 0.20) // FIXME: HACK to increase the number of buses on 5 sec period clock
+	// When buses == 12, there is a strange graphics glitch on the leading ramp
+	NET_C(BUSES_COUNT_UP.VCC, VCC)
+	NET_C(BUSES_COUNT_UP.GND, GND)
+	TTL_74192(B8, GROUND, GROUND, GROUND, P, GROUND, START_Q, BUSES_COUNT_UP, P) // FIXME: HACK to test buses
+#else
 	TTL_74192(B8, GROUND, GROUND, GROUND, P, GROUND, START_Q, A8_2.Q, P)
+#endif
 	TTL_7474(A9_2, B8.CARRYQ, A9_2.QQ, START_Q, P)
 	TTL_7402_NOR(A8_3, A9_2.Q, B8.QD)
 	ALIAS(A, B8.QA)
@@ -435,7 +464,11 @@ NETLIST_START(stuntcyc)
 	ALIAS(F, A8_3.Q)
 
 	TTL_7408_AND(B5_2, E5.QA, C5_2.Q)
+#ifdef STUNT_CYCLE_BUS_COUNT_HACK
+	TTL_74192(B9, GROUND, GROUND, GROUND, P, GROUND, START_Q, BUSES_COUNT_UP, P)
+#else
 	TTL_74192(B9, GROUND, GROUND, GROUND, P, GROUND, START_Q, B5_2.Q, P)
+#endif
 	TTL_7474(A9_1, B9.CARRYQ, A9_1.QQ, START_Q, P)
 	TTL_7402_NOR(A8_1, A9_1.Q, B9.QD)
 	ALIAS(G, B9.QA)
@@ -554,7 +587,7 @@ NETLIST_START(stuntcyc)
 
 	/* Controls */
 
-	CLOCK(SPEED_PULSES, 1000) // FIXME: Should be output of a 566 VCO
+	CLOCK(SPEED_PULSES, 250) // FIXME: Should be output of a 566 VCO
 	TTL_INPUT(R38_2, 0) // FIXME: Should be output of the resistor connected to LM747 L10_1
 	TTL_INPUT(R39_2, 0) // FIXME: Should be output of the resistor connected to LM747 L10_2
 
