@@ -2677,7 +2677,7 @@ void mpu4_state::mpu4base(machine_config &config)
 
 ***********************************************************************************************/
 
-void mpu4_state::mod2(machine_config &config)
+void mpu4_state::mod2_f(machine_config &config)
 {
 	mpu4base(config);
 	AY8913(config, m_ay8913, MPU4_MASTER_CLOCK/4);
@@ -2688,79 +2688,23 @@ void mpu4_state::mod2(machine_config &config)
 	mpu4_reels(config, 6, 1, 3);
 }
 
-void mpu4_state::mod2_no_bacta(machine_config &config)
+void mpu4_state::mod2_no_bacta_f(machine_config &config)
 {
-	mod2(config);
+	mod2_f(config);
 	config.device_remove("dataport");
 	m_pia5->ca2_handler().set(m_pia4, FUNC(pia6821_device::cb1_w));
 }
 
-void mpu4_state::mod2_7reel(machine_config &config)
+void mpu4_state::mod2_cheatchr_f(machine_config &config)
 {
-	mpu4base(config);
-	AY8913(config, m_ay8913, MPU4_MASTER_CLOCK/4);
-	m_ay8913->set_flags(AY8910_SINGLE_OUTPUT);
-	m_ay8913->set_resistors_load(820, 0, 0);
-	m_ay8913->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_ay8913->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	mpu4_reels(config, 7, 1, 3);
-}
-
-void mpu4_state::mod2_cheatchr_table(machine_config &config, const uint8_t* table)
-{
-	mod2(config);
+	mod2_f(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
 
 	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
 	m_characteriser->set_cpu_tag("maincpu");
 	m_characteriser->set_allow_6809_cheat(true);
-	m_characteriser->set_lamp_table(table);
-}
-
-void mpu4_state::mod2_chr(machine_config &config)
-{
-	mod2(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-}
-
-void mpu4_state::mod2_cheatchr(machine_config &config)
-{
-	mod2_cheatchr_table(config, nullptr);
-}
-
-
-// alt reel setup
-
-void mpu4_state::mod2_alt(machine_config &config)
-{
-	mpu4base(config);
-	AY8913(config, m_ay8913, MPU4_MASTER_CLOCK/4);
-	m_ay8913->set_flags(AY8910_SINGLE_OUTPUT);
-	m_ay8913->set_resistors_load(820, 0, 0);
-	m_ay8913->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_ay8913->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	mpu4_reels(config, 6, 4, 12);
-}
-
-void mpu4_state::mod2_alt_cheatchr_table(machine_config &config, const uint8_t* table)
-{
-	mod2_alt(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-	m_characteriser->set_cpu_tag("maincpu");
-	m_characteriser->set_allow_6809_cheat(true);
-	m_characteriser->set_lamp_table(table);
-}
-
-void mpu4_state::mod2_alt_cheatchr(machine_config &config)
-{
-	mod2_alt_cheatchr_table(config, nullptr);
+	m_characteriser->set_lamp_table(nullptr);
 }
 
 /***********************************************************************************************

@@ -26,6 +26,7 @@ public:
 
 } // anonymous namespace
 
+using namespace mpu4_traits;
 
 #define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
 
@@ -35,7 +36,7 @@ public:
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod2, mpu4, mpu4avan_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod2(R6, RT1), mpu4, mpu4avan_machines_state, init_m4, ROT0, company, title, GAME_FLAGS )
 
 
 // robotica - latvia

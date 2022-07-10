@@ -700,6 +700,8 @@ ROM_END
 
 } // anonymous namespace
 
+using namespace mpu4_traits;
+
 template<const uint8_t* Table> void mpu4_state::mod4oki_cheatchr_pal(machine_config &config)
 {
 	mod4oki(config);
@@ -728,19 +730,19 @@ GAME(199?, m4bigbenb, m4bigben,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_sta
 GAME(199?, m4bigbend, m4bigben,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Big Ben (Coinworld) (MPU4, set 4)",GAME_FLAGS )
 GAME(199?, m4bigbene, m4bigben,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Big Ben (Coinworld) (MPU4, set 5)",GAME_FLAGS )
 
-GAME(199?, m4kqclub,  0,          mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Newby","Kings & Queens Club (Newby) (MPU4)",GAME_FLAGS )
+GAME(199?, m4kqclub,  0,          mod2(R6, RT1),       mpu4,    mpu4unsorted_state, init_m4, ROT0,   "Newby","Kings & Queens Club (Newby) (MPU4)",GAME_FLAGS )
 
-GAME(199?, m4snookr,  0,          mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Eurocoin","Snooker (Eurocoin) (MPU4)",GAME_FLAGS ) // works?
+GAME(199?, m4snookr,  0,          mod2(R6, RT1),       mpu4,    mpu4unsorted_state, init_m4, ROT0,   "Eurocoin","Snooker (Eurocoin) (MPU4)",GAME_FLAGS ) // works?
 
 GAME(199?, m4stakex,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Leisurama","Stake X (Leisurama) (MPU4, set 1)",GAME_FLAGS ) // has issues with coins in 'separate bank' (default) mode, reel issues
 GAME(199?, m4stakexa, m4stakex,   mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Leisurama","Stake X (Leisurama) (MPU4, set 2)",GAME_FLAGS ) // like above, but doesn't default to separate bank?
 
-GAME(199?, m4boltbl,  0,          mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "DJE","Bolt From The Blue (DJE) (MPU4, set 1)",GAME_FLAGS ) // Reel 1 Fault
-GAME(199?, m4boltbla, m4boltbl,   mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "DJE","Bolt From The Blue (DJE) (MPU4, set 2)",GAME_FLAGS )
-GAME(199?, m4boltblb, m4boltbl,   mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "DJE","Bolt From The Blue (DJE) (MPU4, set 3)",GAME_FLAGS )
-GAME(199?, m4boltblc, m4boltbl,   mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "DJE","Bolt From The Blue (DJE) (MPU4, set 4)",GAME_FLAGS )
+GAME(199?, m4boltbl,  0,          mod2(R6, RT1),       mpu4,    mpu4unsorted_state, init_m4, ROT0,   "DJE","Bolt From The Blue (DJE) (MPU4, set 1)",GAME_FLAGS ) // Reel 1 Fault
+GAME(199?, m4boltbla, m4boltbl,   mod2(R6, RT1),       mpu4,    mpu4unsorted_state, init_m4, ROT0,   "DJE","Bolt From The Blue (DJE) (MPU4, set 2)",GAME_FLAGS )
+GAME(199?, m4boltblb, m4boltbl,   mod2(R6, RT1),       mpu4,    mpu4unsorted_state, init_m4, ROT0,   "DJE","Bolt From The Blue (DJE) (MPU4, set 3)",GAME_FLAGS )
+GAME(199?, m4boltblc, m4boltbl,   mod2(R6, RT1),       mpu4,    mpu4unsorted_state, init_m4, ROT0,   "DJE","Bolt From The Blue (DJE) (MPU4, set 4)",GAME_FLAGS )
 
-GAME(199?, m4stand2,  0,          mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "DJE","Stand To Deliver (DJE) (MPU4)",GAME_FLAGS ) // Reel 1 Fault
+GAME(199?, m4stand2,  0,          mod2(R6, RT1),       mpu4,    mpu4unsorted_state, init_m4, ROT0,   "DJE","Stand To Deliver (DJE) (MPU4)",GAME_FLAGS ) // Reel 1 Fault
 
 GAME(199?, m4dblchn,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "DJE","Double Chance (DJE) (MPU4)",GAME_FLAGS ) // Reels spin forever
 
@@ -789,8 +791,8 @@ GAME(199?, m4ccopb,   m4ccop,     mod4oki,    mpu4_cw, mpu4unsorted_state, init_
 GAME(199?, m4ccc,     0,          mod4oki,    mpu4_cw, mpu4unsorted_state, init_m4default, ROT0, "Coinworld","Criss Cross Crazy (Coinworld) (MPU4?)",GAME_FLAGS )
 
 // PAL ERROR
-GAME(199?, m4treel,   0,          mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Turbo Reels (unknown) (MPU4?) (set 1)",GAME_FLAGS )
-GAME(199?, m4treela,  m4treel,    mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Turbo Reels (unknown) (MPU4?) (set 2)",GAME_FLAGS )
+GAME(199?, m4treel,   0,          mod2(R6, RT1),       mpu4,    mpu4unsorted_state, init_m4, ROT0,   "<unknown>","Turbo Reels (unknown) (MPU4?) (set 1)",GAME_FLAGS )
+GAME(199?, m4treela,  m4treel,    mod2(R6, RT1),       mpu4,    mpu4unsorted_state, init_m4, ROT0,   "<unknown>","Turbo Reels (unknown) (MPU4?) (set 2)",GAME_FLAGS )
 
 // works
 GAME(199?, m4surf,    0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Gemini","Super Surfin' (Gemini) (MPU4) (set 1)",GAME_FLAGS )
@@ -831,7 +833,7 @@ GAME(199?, m4hapfrta, m4hapfrt,   mod4oki,    mpu4,    mpu4unsorted_state, init_
 GAME(199?, m4hapfrtb, m4hapfrt,   mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Happy Fruits (Coinworld) (MPU4) (set 3)",GAME_FLAGS )
 
 // backwards VFD
-GAME(199?, m4sunday,  0,          mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Pcp","Sunday Sport (Pcp) (MPU4)",GAME_FLAGS )
+GAME(199?, m4sunday,  0,          mod2(R6, RT1),       mpu4,    mpu4unsorted_state, init_m4, ROT0,   "Pcp","Sunday Sport (Pcp) (MPU4)",GAME_FLAGS )
 
 // HOPPER FAULT
 GAME(199?, m4jp777,   0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Cotswold Microsystems","Jackpot 777 (Cotswold Microsystems) (MPU4)",GAME_FLAGS ) /* Hopper Fault */
@@ -851,7 +853,7 @@ GAME( 199?, m4aliz,   0,          mod4oki,    mpu4,    mpu4unsorted_state, init_
 GAME( 199?, m4coney,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, 0,      "Qps",   "Coney Island (Qps) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
 
 // very similar to m4c2 behavior below, but no protection?
-GAME( 199?, m4crzjk,  0,          mod2_alt,       mpu4_invcoin,    mpu4unsorted_state, init_m4default, 0,      "Nova?", "Crazy Jokers (Nova?) (MPU4)",GAME_FLAGS )
+GAME( 199?, m4crzjk,  0,          mod2(R6, RT2),       mpu4_invcoin,    mpu4unsorted_state, init_m4, 0,      "Nova?", "Crazy Jokers (Nova?) (MPU4)",GAME_FLAGS )
 
 // not standard protection, but cheatchr passes it, code crashes after a short time?
 GAME( 199?, m4c2,     0,          mod4oki_alt_cheatchr,    mpu4_invcoin,    mpu4unsorted_state, init_m4default, 0,      "Nova?", "Circus Circus 2 (Nova?) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE) // COIN   ALM
@@ -859,14 +861,14 @@ GAME( 199?, m4c2,     0,          mod4oki_alt_cheatchr,    mpu4_invcoin,    mpu4
 
 // REEL 1 FAULT
 // Not the same as Barcrest Everyone's A Winner? has "(C) J.A. Brown 1991" in the ROM
-GAME(1991, m4eaw51,   0,          mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0, "J.A. Brown", "Everyone's A Winner (J.A. Brown) (MPU4) (EAW 5.1)", GAME_FLAGS )
+GAME(1991, m4eaw51,   0,          mod2(R6, RT1),       mpu4,    mpu4unsorted_state, init_m4, ROT0, "J.A. Brown", "Everyone's A Winner (J.A. Brown) (MPU4) (EAW 5.1)", GAME_FLAGS )
 
 // REEL 1 FAULT
 // has "(C) J.A. Brown 1993" in the ROM
-GAME(1993, m4twist,   0,          mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "J.A. Brown","Twist Again (J.A. Brown) (MPU4) (TA 9.6, set 1)",GAME_FLAGS ) //   REEL 1 FAULT
-GAME(1993, m4twista,  m4twist,    mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "J.A. Brown","Twist Again (J.A. Brown) (MPU4) (TA 9.6, set 2)",GAME_FLAGS ) // TA 9.6  REEL 1 FAULT
-GAME(1993, m4twistb,  m4twist,    mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "J.A. Brown","Twist Again (J.A. Brown) (MPU4) (TA 9.6, set 3)",GAME_FLAGS ) // TA 9.6  REEL 1 FAULT
+GAME(1993, m4twist,   0,          mod2(R6, RT1),       mpu4,    mpu4unsorted_state, init_m4, ROT0,   "J.A. Brown","Twist Again (J.A. Brown) (MPU4) (TA 9.6, set 1)",GAME_FLAGS ) //   REEL 1 FAULT
+GAME(1993, m4twista,  m4twist,    mod2(R6, RT1),       mpu4,    mpu4unsorted_state, init_m4, ROT0,   "J.A. Brown","Twist Again (J.A. Brown) (MPU4) (TA 9.6, set 2)",GAME_FLAGS ) // TA 9.6  REEL 1 FAULT
+GAME(1993, m4twistb,  m4twist,    mod2(R6, RT1),       mpu4,    mpu4unsorted_state, init_m4, ROT0,   "J.A. Brown","Twist Again (J.A. Brown) (MPU4) (TA 9.6, set 3)",GAME_FLAGS ) // TA 9.6  REEL 1 FAULT
 
 // REEL 1 FAULT
 // has "(C) J. Brown 1988" in the ROM (assume same J.A. Brown as above)
-GAME(1988, m4wnud,    0,          mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "J.A. Brown","unknown MPU4 'W Nudge' (J.A. Brown) (MPU4)",GAME_FLAGS )
+GAME(1988, m4wnud,    0,          mod2(R6, RT1),       mpu4,    mpu4unsorted_state, init_m4, ROT0,   "J.A. Brown","unknown MPU4 'W Nudge' (J.A. Brown) (MPU4)",GAME_FLAGS )

@@ -317,12 +317,27 @@ public:
 		return trait_wrapper_impl<T, sizeof...(U)>(state, traits...);
 	}
 
-	void mod2(machine_config &config);
-	void mod2_no_bacta(machine_config &config);
-	void mod2_7reel(machine_config &config);
+	void mod2_f(machine_config &config);
+	void mod2_no_bacta_f(machine_config &config);
+	void mod2_cheatchr_f(machine_config &config);
 
-	void mod2_cheatchr(machine_config &config);
-	void mod2_chr(machine_config &config);
+	template<typename... T>
+	auto mod2(T... traits)
+	{
+		return trait_wrapper(this, &mpu4_state::mod2_f, traits...);
+	}
+
+	template<typename... T>
+	auto mod2_no_bacta(T... traits)
+	{
+		return trait_wrapper(this, &mpu4_state::mod2_no_bacta_f, traits...);
+	}
+
+	template<typename... T>
+	auto mod2_cheatchr(T... traits)
+	{
+		return trait_wrapper(this, &mpu4_state::mod2_cheatchr_f, traits...);
+	}
 
 	void mpu4_reels(machine_config &config, uint8_t NumberOfReels, int16_t start_index, int16_t end_index);
 
@@ -336,10 +351,6 @@ public:
 	// bootleg mod4
 	template<uint8_t Fixed> void mod4oki_bootleg_fixedret(machine_config &config);
 	template<uint8_t Fixed> void mod4oki_alt_bootleg_fixedret(machine_config &config);
-
-	void mod2_alt(machine_config &config);
-	void mod2_alt_cheatchr(machine_config &config);
-	void mod2_alt_cheatchr_table(machine_config &config, const uint8_t* table);
 
 	void mod4oki_5r(machine_config &config);
 	void mod4oki_5r_chr(machine_config &config);

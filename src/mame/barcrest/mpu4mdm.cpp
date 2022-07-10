@@ -426,6 +426,8 @@ ROM_END
 
 } // anonymous namespace
 
+using namespace mpu4_traits;
+
 #define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
 
 /* MDM
@@ -459,11 +461,11 @@ GAME(199?, m4colosse, m4coloss, mod4oki, mpu4, mpu4mdm_machines_state, init_m4de
 GAME(199?, m4colossf, m4coloss, mod4oki, mpu4, mpu4mdm_machines_state, init_m4default, ROT0,   "Mdm","Colossus (Mdm) (MPU4, set 7)",   GAME_FLAGS|MACHINE_NO_SOUND )
 GAME(199?, m4colossg, m4coloss, mod4oki, mpu4, mpu4mdm_machines_state, init_m4default, ROT0,   "Mdm","Colossus (Mdm) (MPU4, set 8)",   GAME_FLAGS|MACHINE_NO_SOUND )
 
-GAME(199?, m4firebl,  0,        mod2    ,mpu4, mpu4mdm_machines_state, init_m4default, ROT0,   "Mdm","Fireball (Mdm) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND ) // hangs after spin (sound status?)
-GAME(199?, m4firebla, m4firebl, mod2    ,mpu4, mpu4mdm_machines_state, init_m4default, ROT0,   "Mdm","Fireball (Mdm) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND ) // hangs after spin (sound status?)
-GAME(199?, m4fireblb, m4firebl, mod2    ,mpu4, mpu4mdm_machines_state, init_m4default, ROT0,   "Mdm","Fireball (Mdm) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND ) // hangs after spin (sound status?)
-GAME(199?, m4fireblc, m4firebl, mod2    ,mpu4, mpu4mdm_machines_state, init_m4default, ROT0,   "Mdm","Fireball (Mdm) (MPU4, set 4)",   GAME_FLAGS|MACHINE_NO_SOUND ) // hangs after spin (sound status?)
-GAME(199?, m4firebld, m4firebl, mod2    ,mpu4, mpu4mdm_machines_state, init_m4default, ROT0,   "Mdm","Fireball (Mdm) (MPU4, set 5)",   GAME_FLAGS|MACHINE_NO_SOUND ) // hangs after spin (sound status?)
+GAME(199?, m4firebl,  0,        mod2(R6, RT1),mpu4, mpu4mdm_machines_state, init_m4, ROT0,   "Mdm","Fireball (Mdm) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND ) // hangs after spin (sound status?)
+GAME(199?, m4firebla, m4firebl, mod2(R6, RT1),mpu4, mpu4mdm_machines_state, init_m4, ROT0,   "Mdm","Fireball (Mdm) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND ) // hangs after spin (sound status?)
+GAME(199?, m4fireblb, m4firebl, mod2(R6, RT1),mpu4, mpu4mdm_machines_state, init_m4, ROT0,   "Mdm","Fireball (Mdm) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND ) // hangs after spin (sound status?)
+GAME(199?, m4fireblc, m4firebl, mod2(R6, RT1),mpu4, mpu4mdm_machines_state, init_m4, ROT0,   "Mdm","Fireball (Mdm) (MPU4, set 4)",   GAME_FLAGS|MACHINE_NO_SOUND ) // hangs after spin (sound status?)
+GAME(199?, m4firebld, m4firebl, mod2(R6, RT1),mpu4, mpu4mdm_machines_state, init_m4, ROT0,   "Mdm","Fireball (Mdm) (MPU4, set 5)",   GAME_FLAGS|MACHINE_NO_SOUND ) // hangs after spin (sound status?)
 
 GAME(199?, m4mayhem,  0,        mod4oki, mpu4, mpu4mdm_machines_state, init_m4default, ROT0,   "Mdm","Mayhem (Mdm) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
 GAME(199?, m4mayhema, m4mayhem, mod4oki, mpu4, mpu4mdm_machines_state, init_m4default, ROT0,   "Mdm","Mayhem (Mdm) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
@@ -472,8 +474,8 @@ GAME(199?, m4themob,  0,        mod4oki, mpu4, mpu4mdm_machines_state, init_m4de
 GAME(199?, m4themoba, m4themob, mod4oki, mpu4, mpu4mdm_machines_state, init_m4default, ROT0,   "Mdm","The Mob (Mdm) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
 GAME(199?, m4themobb, m4themob, mod4oki, mpu4, mpu4mdm_machines_state, init_m4default, ROT0,   "Mdm","The Mob (Mdm) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
 
-GAME(199?, m4nudbon,  0,        mod2    ,mpu4, mpu4mdm_machines_state, init_m4default, ROT0,   "Mdm","Nudge Bonanza (Mdm) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4nudbona, m4nudbon, mod2    ,mpu4, mpu4mdm_machines_state, init_m4default, ROT0,   "Mdm","Nudge Bonanza (Mdm) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4nudbon,  0,        mod2(R6, RT1),mpu4, mpu4mdm_machines_state, init_m4, ROT0,   "Mdm","Nudge Bonanza (Mdm) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4nudbona, m4nudbon, mod2(R6, RT1),mpu4, mpu4mdm_machines_state, init_m4, ROT0,   "Mdm","Nudge Bonanza (Mdm) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
 
 GAME(199?, m4nudgem,  0,        mod4oki, mpu4, mpu4mdm_machines_state, init_m4default, ROT0,   "Mdm","Nudge Gems (Mdm) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
 
@@ -482,7 +484,7 @@ GAME(199?, m4smshgba,m4smshgb,  mod4oki, mpu4, mpu4mdm_machines_state, init_m4de
 GAME(199?, m4smshgbb,m4smshgb,  mod4oki, mpu4, mpu4mdm_machines_state, init_m4default, ROT0,   "Mdm","Smash 'n' Grab (Mdm) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
 GAME(199?, m4smshgbc,m4smshgb,  mod4oki, mpu4, mpu4mdm_machines_state, init_m4default, ROT0,   "Mdm","Smash 'n' Grab (Mdm) (MPU4, set 4)",   GAME_FLAGS|MACHINE_NO_SOUND )
 
-GAME(199?, m4snklad, 0,         mod2    ,mpu4, mpu4mdm_machines_state, init_m4default, ROT0,   "Mdm","Snakes & Ladders (Mdm) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4snklad, 0,         mod2(R6, RT1),mpu4, mpu4mdm_machines_state, init_m4, ROT0,   "Mdm","Snakes & Ladders (Mdm) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
 
 GAME(199?, m4excam, 0,          mod4oki ,mpu4, mpu4mdm_machines_state, init_m4default, ROT0,   "Mdm","Excalibur (Mdm) (MPU4, V1.4)",   GAME_FLAGS|MACHINE_NO_SOUND )
 GAME(199?, m4excamd,m4excam,    mod4oki ,mpu4, mpu4mdm_machines_state, init_m4default, ROT0,   "Mdm","Excalibur (Mdm) (MPU4, V1.0D)",   GAME_FLAGS|MACHINE_NO_SOUND )
@@ -491,6 +493,6 @@ GAME(199?, m4front, 0,          mod4oki ,mpu4, mpu4mdm_machines_state, init_m4de
 
 GAME(199?, m4safar, 0,          mod4oki ,mpu4, mpu4mdm_machines_state, init_m4default, ROT0,   "Mdm","Safari Club (Mdm) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
 
-GAME(199?, m4snowbl, 0,         mod2    ,mpu4, mpu4mdm_machines_state, init_m4default, ROT0,   "Mdm","Snowball Bingo (Mdm) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4snowbl, 0,         mod2(R6, RT1),mpu4, mpu4mdm_machines_state, init_m4, ROT0,   "Mdm","Snowball Bingo (Mdm) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
 
 GAME(199?, m4ewshft, 0,         mod4oki ,mpu4, mpu4mdm_machines_state, init_m4default, ROT0,   "Mdm","Each Way Shifter (Mdm) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
