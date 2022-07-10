@@ -101,9 +101,9 @@ license:CC0
 	  Angelique Special 2 (Japan) [T-7627G]                                                 | ########MISSING########
 	  Angelique Special 2 (Japan) (Premium Box) [T-7638G]                                   |  @@
 	  Another Memories (Japan) [T-38001G]                                                   | (amemorie)
-	  Aponashi Girls: Olympos (Japan) (Shokai Gentei Cel Ga Package A) [T-4304G]           | - are these the same disc as the B package?
-	  Aponashi Girls: Olympos (Japan) (Shokai Gentei Cel Ga Package B) [T-4306G]           | (olympos)
-	  Aponashi Girls: Olympos (Japan) (Shokai Gentei Cel Ga Package C) [T-4307G]           | - are these the same disc as the B package?
+	  Aponashi Girls: Olympos (Japan) (Shokai Gentei Cel-ga Package A) [T-4304G]           | - are these the same disc as the B package?
+	  Aponashi Girls: Olympos (Japan) (Shokai Gentei Cel-ga Package B) [T-4306G]           | (olympos)
+	  Aponashi Girls: Olympos (Japan) (Shokai Gentei Cel-ga Package C) [T-4307G]           | - are these the same disc as the B package?
 	  Aqua-World Umibi Monogatari (Japan) [T-30301G]                                        | (aquawld)
 	  AquaZone Desktop Life (Japan) [T-24001G]                                              | (aquazone)
 	  AquaZone Option Disc Series 1 Angel Fish (Japan) [T-24002G]                           | (aquaopt1)
@@ -24906,9 +24906,9 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying No-appointment Gals Olympos (Shokai Gentei Cel Ga Package B) (T-4306G)... -->
+	<!-- Identifying No-appointment Gals Olympos (Shokai Gentei Cel-ga Package B) (T-4306G)... -->
 	<software name="olympos" supported="no">
-		<description>Apo Nashi Gals Olympos (Jpn, Shokai Gentei Cel Ga Package B)</description>
+		<description>Apo Nashi Gals Olympos (Jpn, Shokai Gentei Cel-ga Package B)</description>
 		<year>1996</year>
 		<publisher>Human</publisher>
 		<info name="serial" value="T-4306G"/>
@@ -24917,7 +24917,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="no-appointment gals olympos (shokai gentei cel ga package b) (t-4306g)" sha1="1a474ca547a4e9909824b22d4156c8fba483e156" />
+				<disk name="no-appointment gals olympos (shokai gentei cel-ga package b) (t-4306g)" sha1="1a474ca547a4e9909824b22d4156c8fba483e156" />
 			</diskarea>
 		</part>
 	</software>
