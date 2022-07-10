@@ -153,7 +153,7 @@ ROM_START( analyst )
 	ROMX_LOAD("b6c_721_u3.u3",  0x8000, 0x8000, CRC(b1e57023) SHA1(6cec5cdc0bf4f8ac88afb0397fcb4738136b0431), ROM_BIOS(0))
 
 	// C (C and above are shared Maestro/Analyst)
-	ROM_SYSTEM_BIOS(1, "c", "Analyst C (set 1)")
+	ROM_SYSTEM_BIOS(1, "c1", "Analyst C (set 1)")
 	ROMX_LOAD("m6l_b30d_u2.u2", 0x0000, 0x8000, CRC(bb10e15c) SHA1(7b0fb987c49da76a03b46c80d2b4eacaa785ee75), ROM_BIOS(1))
 	ROMX_LOAD("b6c_721_u3.u3",  0x8000, 0x8000, CRC(b1e57023) SHA1(6cec5cdc0bf4f8ac88afb0397fcb4738136b0431), ROM_BIOS(1))
 
