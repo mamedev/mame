@@ -2542,5 +2542,5 @@ GAME(199?, m4pick,    0,          mod2(R6, RT1), mpu4,            mpu4mod2_machi
 // No reels
 GAMEL(1989?, m4conn4, 0,          mod2(OVER), connect4,        mpu4mod2_machines_state, init_m4,      ROT0, "Dolbeck Systems","Connect 4",MACHINE_IMPERFECT_GRAPHICS|MACHINE_REQUIRES_ARTWORK,layout_connect4 )
 
-// no protection?
-GAME(198?, m4funh,    0,          mod4psg(R6, RT1), mpu4,         mpu4mod2_machines_state, init_m4, 0,      "<unknown>",      "Fun House (unknown) (MPU4)", GAME_FLAGS ) // TUNE ALARM  (was in the SC1 Fun House set)
+// TUNE ALARM (may or may not be sound-related); probably needs RS-232 link
+GAME(198?, m4funh,    0,          mod4psg(R6, RT1), mpu4,         mpu4mod2_machines_state, init_m4, 0,      "<unknown>",      "Fun House (unknown) (MPU4)", GAME_FLAGS ) // was in the SC1 Fun House set

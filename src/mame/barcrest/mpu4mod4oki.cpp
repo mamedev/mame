@@ -9179,7 +9179,7 @@ ROM_START( m4nod )
 ROM_END
 
 // just spins wheels badly
-GAME( 199?, m4nod,    0,          mod4oki,    mpu4,    mpu4mod4oki_machines_state, init_m4default, 0,      "Eurotech",   "Nod And A Wink (Eurotech) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE) // this has valid strings in it BEFORE the bfm decode, but decodes to valid code, does it use some funky mapping, or did they just fill unused space with valid looking data?
+GAME( 199?, m4nod,    0,          mod4oki,    mpu4,    mpu4mod4oki_machines_state, init_m4default, 0,      "Eurotech",   "Nod And A Wink (Eurotech) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
 
 
 

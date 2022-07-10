@@ -528,10 +528,10 @@ ROM_START( m4blkgd )
 	M4BLKGD_EXTRAS
 ROM_END
 
-//Early rom banks empty? May need different loading
 ROM_START( m4blkgda )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "blackgoldversion2.4.bin", 0x0000, 0x040000, CRC(fad4e360) SHA1(23c6a13e8d1ca307b0ef22edffed536675985aca) )
+	ROM_LOAD( "blackgoldversion2.4.bin", 0x0000, 0x020000, CRC(fad4e360) SHA1(23c6a13e8d1ca307b0ef22edffed536675985aca) )
+	ROM_CONTINUE( 0x0000, 0x020000 ) //Early rom banks empty
 	M4BLKGD_EXTRAS
 ROM_END
 
