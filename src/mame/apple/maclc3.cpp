@@ -35,6 +35,8 @@
 #include "screen.h"
 #include "softlist_dev.h"
 
+namespace {
+
 static constexpr u32 C7M = 7833600;
 static constexpr u32 C15M = (C7M * 2);
 
@@ -318,6 +320,8 @@ ROM_START( maclc520 )
 	ROM_REGION32_BE(0x100000, "bootrom", 0)
 	ROM_LOAD( "ede66cbd.rom", 0x000000, 0x100000, CRC(a893cb0f) SHA1(c54ee2f45020a4adeb7451adce04cd6e5fb69790) )
 ROM_END
+
+} // anonymous namespace
 
 COMP(1993, maclc3, 0, 0, maclc3, macadb, macvail_state, empty_init, "Apple Computer", "Macintosh LC III", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND)
 COMP(1993, maclc520, 0, 0, maclc520, macadb, macvail_state, empty_init, "Apple Computer", "Macintosh LC 520", MACHINE_NOT_WORKING)

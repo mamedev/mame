@@ -405,7 +405,7 @@ public:
 	void jumpingi(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void machine_start() override;
 
 private:
 	uint8_t latch_r();
@@ -451,17 +451,13 @@ uint32_t rbisland_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 {
 	m_pc080sn->tilemap_update();
 
-	int layer[2];
-
-	layer[0] = 0;
-	layer[1] = 1;
-
 	screen.priority().fill(0, cliprect);
 
-	m_pc080sn->tilemap_draw(screen, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
-	m_pc080sn->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);
+	m_pc080sn->tilemap_draw(screen, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 1);
+	m_pc080sn->tilemap_draw(screen, bitmap, cliprect, 1, 0, 2);
 
 	m_pc090oj->draw_sprites(screen, bitmap, cliprect);
+
 	return 0;
 }
 
@@ -476,8 +472,10 @@ the Y settings are active low.
 
 */
 
-void jumping_state::video_start()
+void jumping_state::machine_start()
 {
+	base_state::machine_start();
+
 	m_pc080sn->set_trans_pen(1, 15);
 
 	m_sprite_ctrl = 0;
@@ -495,14 +493,9 @@ uint32_t jumping_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	// Override values, or foreground layer is in wrong position
 	m_pc080sn->set_scroll(1, 16, 0);
 
-	int layer[2];
-
-	layer[0] = 0;
-	layer[1] = 1;
-
 	screen.priority().fill(0, cliprect);
 
-	m_pc080sn->tilemap_draw(screen, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 0);
+	m_pc080sn->tilemap_draw(screen, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
 
 	// Draw the sprites. 128 sprites in total
 	for (int offs = m_spriteram.bytes() / 2 - 8; offs >= 0; offs -= 8)
@@ -526,14 +519,10 @@ uint32_t jumping_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		}
 	}
 
-	m_pc080sn->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 0);
+	m_pc080sn->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);
 
 #if 0
-	{
-		char buf[80];
-		sprintf(buf,"sprite_ctrl: %04x", m_sprite_ctrl);
-		popmessage(buf);
-	}
+	popmessage(buf,"sprite_ctrl: %04x", m_sprite_ctrl);
 #endif
 	return 0;
 }
@@ -795,6 +784,8 @@ GFXDECODE_END
 
 void rbisland_state::machine_start()
 {
+	base_state::machine_start();
+
 	uint8_t *rom = memregion("audiocpu")->base();
 	membank("soundbank")->configure_entries(0, 4, &rom[0xc000], 0x4000);
 }
