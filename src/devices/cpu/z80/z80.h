@@ -33,6 +33,7 @@ public:
 	z80_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	void z80_set_cycle_tables(const u8 *op, const u8 *cb, const u8 *ed, const u8 *xy, const u8 *xycb, const u8 *ex);
+	void z80_set_cycles_multiplier(u8 multiplier) { m_cycles_multiplier = multiplier; }
 	template <typename... T> void set_memory_map(T &&... args) { set_addrmap(AS_PROGRAM, std::forward<T>(args)...); }
 	template <typename... T> void set_m1_map(T &&... args) { set_addrmap(AS_OPCODES, std::forward<T>(args)...); }
 	template <typename... T> void set_io_map(T &&... args) { set_addrmap(AS_IO, std::forward<T>(args)...); }
@@ -140,7 +141,10 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	u8 execute_io_cycles() { return m_cc_op == nullptr ? 4 : m_cc_op[0]; }
+	virtual u8 get_opfetch_cycles() const noexcept { return m_cc_op[0]; }
+	void calculate_icount();
+	void execute_cycles(u8 icount);
+
 	void halt();
 	void leave_halt();
 
@@ -239,7 +243,6 @@ protected:
 	void ei();
 
 	ops_type next_op();
-	void calculate_icount();
 	virtual void check_interrupts();
 	void take_interrupt();
 	void take_nmi();
@@ -307,6 +310,7 @@ protected:
 	const u8 *   m_cc_xy;
 	const u8 *   m_cc_xycb;
 	const u8 *   m_cc_ex;
+	u8 m_cycles_multiplier = 1; // multiplier for based cycles. deprecated to use except legacy e.g. "system1" till update.
 };
 
 DECLARE_DEVICE_TYPE(Z80, z80_device)

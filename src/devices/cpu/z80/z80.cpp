@@ -350,12 +350,8 @@ static const u8 cc_ex[0x100] = {
  ***************************************************************/
 #define CC(prefix,opcode) do { m_icount_executing += m_cc_##prefix == nullptr ? 0 : m_cc_##prefix[opcode]; } while (0)
 // Defines cycles used by mread/mwrite/in/out (excluding opcode_fetch)
-#define MTM (execute_io_cycles()-1)
-
-#define T(icount) do { \
-	m_icount -= icount; \
-	m_icount_executing -= icount; \
-} while (0)
+#define MTM (3*m_cycles_multiplier)
+#define T(icount) execute_cycles(icount)
 
 /***************************************************************
  * Enter halt state; write 1 to callback on first execution
@@ -388,7 +384,7 @@ z80_device::ops_type z80_device::in()
 {
 	return ST_F {
 		TDAT8 = m_io.read_byte(TADR); } FN {
-		T(execute_io_cycles());       } EST
+		T(4 * m_cycles_multiplier);   } EST
 }
 
 /***************************************************************
@@ -398,7 +394,7 @@ z80_device::ops_type z80_device::out()
 {
 	return ST_F {
 		m_io.write_byte(TADR, TDAT8); } FN {
-		T(execute_io_cycles());       } EST
+		T(4 * m_cycles_multiplier);   } EST
 }
 
 /***************************************************************
@@ -522,12 +518,12 @@ u8 z80_device::opcode_read()
 z80_device::ops_type z80_device::rop()
 {
 	return ST_F {
-		TDAT8 = opcode_read();               } FN {
-		T(execute_io_cycles()-2);   /* 2 */  } MN
-		nomreq_ir(1)                         FN {
-		T(1);                       /* 1 */
+		TDAT8 = opcode_read();                                        } FN {
+		T(get_opfetch_cycles() - (2 * m_cycles_multiplier)); /* 2 */  } MN
+		nomreq_ir(1)                                                  FN {
+		T(1 * m_cycles_multiplier);                          /* 1 */
 		PC++;
-		m_r++;                               } EST
+		m_r++;                                                        } EST
 }
 
 /****************************************************************
@@ -607,9 +603,9 @@ z80_device::ops_type z80_device::push()
 z80_device::ops_type z80_device::jp()
 {
 	return ST_M
-		arg16()   FN {
+		arg16()     FN {
 		PCD = TDAT;
-		WZ = PCD;   } EST
+		WZ = PC;    } EST
 }
 
 /***************************************************************
@@ -619,13 +615,13 @@ z80_device::ops_type z80_device::jp_cond()
 {
 	return ST_M
 		DOIF { return TDAT8; } MN
-			arg16()		   FN {
+			arg16()		     FN {
 			PC=TDAT;
-			WZ=PCD;            }
+			WZ=PCD;          }
 		DOELSE
 			/* implicit do PC += 2 */
-			arg16()		   FN {
-			WZ=TDAT;           }
+			arg16()		     FN {
+			WZ=TDAT;         }
 		EDO EST
 }
 
@@ -635,7 +631,7 @@ z80_device::ops_type z80_device::jp_cond()
 z80_device::ops_type z80_device::jr()
 {
 	return ST_M
-		arg()          FN {
+		arg()            FN {
 		TADR=PCD-1;      } MN
 		nomreq_addr(5)   FN {
 		PC += (s8)TDAT8;
@@ -683,7 +679,7 @@ z80_device::ops_type z80_device::call_cond(u8 opcode)
 			CC(ex, opcode);    } MN
 			call()
 		DOELSE
-			arg16()          FN {
+			arg16()            FN {
 			WZ=TDAT;           }
 		EDO EST
 }
@@ -2440,21 +2436,21 @@ void z80_device::init_op_steps() {
 /* DB   FD         */ OP(FD,1f) { illegal_1(); } JP(1f)
 
 /* DB   FD         */ OP(FD,20) { illegal_1(); } JP(20)
-/* LD   IY,w       */ OP_M(FD,21) arg16() FN { IY = TDAT;                        } EOP
+/* LD   IY,w       */ OP_M(FD,21) arg16() FN { IY = TDAT;                          } EOP
 /* LD   (w),IY     */ OP_M(FD,22) arg16() FN { m_ea=TDAT; TADR=m_ea; TDAT=IY; } MN wm16() FN { WZ = m_ea + 1; } EOP
 /* INC  IY         */ OP_M(FD,23) nomreq_ir(2) FN { IY++;                          } EOP
-/* INC  HY         */ OP(FD,24) { inc(HY);                                    } EOP
-/* DEC  HY         */ OP(FD,25) { dec(HY);                                    } EOP
-/* LD   HY,n       */ OP_M(FD,26) arg() FN { HY = TDAT8;                         } EOP
+/* INC  HY         */ OP(FD,24) { inc(HY);                                         } EOP
+/* DEC  HY         */ OP(FD,25) { dec(HY);                                         } EOP
+/* LD   HY,n       */ OP_M(FD,26) arg() FN { HY = TDAT8;                           } EOP
 /* DB   FD         */ OP(FD,27) { illegal_1(); } JP(27)
 
 /* DB   FD         */ OP(FD,28) { illegal_1(); } JP(28)
 /* ADD  IY,IY      */ OP(FD,29) { TDAT=IY; TDAT2=IY; } MN add16() FN { IY=TDAT;    } EOP
 /* LD   IY,(w)     */ OP_M(FD,2a) arg16() FN { m_ea=TDAT; TADR=m_ea; TDAT=IY; } MN rm16() FN { WZ = m_ea + 1; } EOP
 /* DEC  IY         */ OP_M(FD,2b) nomreq_ir(2) FN { IY--;                          } EOP
-/* INC  LY         */ OP(FD,2c) { inc(LY);                                    } EOP
-/* DEC  LY         */ OP(FD,2d) { dec(LY);                                    } EOP
-/* LD   LY,n       */ OP_M(FD,2e) arg() FN { LY = TDAT8;                         } EOP
+/* INC  LY         */ OP(FD,2c) { inc(LY);                                         } EOP
+/* DEC  LY         */ OP(FD,2d) { dec(LY);                                         } EOP
+/* LD   LY,n       */ OP_M(FD,2e) arg() FN { LY = TDAT8;                           } EOP
 /* DB   FD         */ OP(FD,2f) { illegal_1(); } JP(2f)
 
 /* DB   FD         */ OP(FD,30) { illegal_1(); } JP(30)
@@ -3400,7 +3396,7 @@ z80_device::ops_type z80_device::nomreq_addr(s8 cycles)
 {
 	auto steps = ST_F {
 		m_nomreq_cb(TADR, 0x00, 0xff); } FN {
-		T(1);                          } EST
+		T(1*m_cycles_multiplier);      } EST
 
 	while(--cycles) {
 		steps.push_back(steps[0]);
@@ -3703,6 +3699,13 @@ void z80_device::calculate_icount()
 		case XY_CB: CC(xycb, m_opcode); break;
 		default:    assert(false);
 	}
+}
+
+inline void z80_device::execute_cycles(u8 icount)
+{
+	//assert(icount >= 0);
+	m_icount -= icount;
+	m_icount_executing -= icount;
 }
 
 /****************************************************************************
