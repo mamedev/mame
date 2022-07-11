@@ -1,12 +1,12 @@
 # Brazilian Portuguese translation for the MAME Project.
-# Tradução pro Português Brasileiro pro Projeto MAME.
+# Tradução pro Português Brasileiro para o Projeto MAME.
 # Copyright (C) 1997-2019  MAMEDev and contributors
 # This file is distributed under the same license as the MAME Project.
 # Automatically generated, 2022.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: MAME 0.237\n"
+"Project-Id-Version: MAME 0.245\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-06-11 09:24+1000\n"
 "PO-Revision-Date: 2022-07-09 13:21-0300\n"
@@ -612,7 +612,7 @@ msgstr "Atribuição do Dispositivo Pedal"
 
 #: src/frontend/mame/ui/submenu.cpp:106
 msgid "AD Stick Device Assignment"
-msgstr "Atribuição do dispositivo direcional AD"
+msgstr "Atribuição do dispositivo alavanca AD"
 
 #: src/frontend/mame/ui/submenu.cpp:107
 msgid "Paddle Device Assignment"
@@ -1070,7 +1070,7 @@ msgstr "Tela"
 
 #: src/frontend/mame/ui/info.cpp:577 src/frontend/mame/ui/info.cpp:588
 #, c-format
-#| msgid "  %1$s\n"
+#| msgid "%1$s\n"
 msgid "%1$s:\n"
 msgstr "%1$s:\n"
 
@@ -1157,7 +1157,7 @@ msgid "Keyboard Mode"
 msgstr "Modo Teclado"
 
 #: src/frontend/mame/ui/keyboard.cpp:47 src/frontend/mame/ui/keyboard.cpp:92
-#| msgid "Natural"
+#| msgid ""
 msgctxt "menu-keyboard"
 msgid "Natural"
 msgstr "Natural"
@@ -3145,7 +3145,7 @@ msgstr "O software é pai"
 #: src/frontend/mame/ui/selmenu.cpp:683 src/frontend/mame/ui/selmenu.cpp:685
 #, c-format
 msgid "System is clone of: %1$s"
-msgstr "O software é clone do: %1$s"
+msgstr "O sistema é clone do: %1$s"
 
 #: src/frontend/mame/ui/selmenu.cpp:721
 #, c-format
@@ -3513,8 +3513,8 @@ msgid ""
 "Media Audit\tDisabled\n"
 "Samples Audit\tDisabled\n"
 msgstr ""
-"Auditoria da Mídia \tDesativada\n"
-"Auditoria das Amostras \tDesativada\n"
+"Auditoria da Mídia\tDesativada\n"
+"Auditoria das Amostras\tDesativada\n"
 
 #: src/frontend/mame/ui/sndmenu.cpp:114 src/frontend/mame/ui/sndmenu.cpp:150
 msgid "Sample Rate"
@@ -6349,7 +6349,7 @@ msgstr "%03d:%02d:%02d"
 #: plugins/timer/init.lua:32
 msgctxt "plugin-timer"
 msgid "Wall clock"
-msgstr "Relógio de parede"
+msgstr "Cronômetro"
 
 #: plugins/timer/init.lua:32
 msgctxt "plugin-timer"
