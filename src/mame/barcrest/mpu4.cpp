@@ -2016,172 +2016,14 @@ MACHINE_START_MEMBER(mpu4_state,mpu4oki)
 	mpu4_install_mod4oki_space(space);
 }
 
-//TODO: Replace with standard six reels once sets are sorted out - is really six_reel_std
-void mpu4_state::init_m4altreels()
-{
-	m_reel_mux = SIX_REEL_1TO8;
-	m_reels = 6;
-	setup_rom_banks();
-}
-
-void mpu4_state::init_m4altreels_big()
-{
-	init_m4default_big();
-	m_reel_mux = SIX_REEL_1TO8;
-	m_reels = 6;
-}
-
-
-void mpu4_state::init_m4default_sextender()
-{
-	init_m4default();
-	use_m4_small_extender();
-}
-
-void mpu4_state::init_m4default_big_five_std()
-{
-	init_m4default_big();
-	use_m4_five_reel_std();
-}
-
-void mpu4_state::init_m4default_big_five_rev()
-{
-	init_m4default_big();
-	use_m4_five_reel_rev();
-}
-
-void mpu4_state::init_m4default_big_five_rev_lextender()
-{
-	init_m4default_big_five_rev();
-	use_m4_large_extender_b();
-}
-
-void mpu4_state::init_m4default_big_six()
-{
-	init_m4default_big();
-	use_m4_six_reel_std();
-}
-
-void mpu4_state::init_m4default_big_six_lextender()
-{
-	init_m4default_big_six();
-	use_m4_large_extender_b();
-}
-
-void mpu4_state::init_m4default_big_six_alt()
-{
-	init_m4default_big();
-	use_m4_six_reel_alt();
-}
-
-
-void mpu4_state::init_m4default_five_std()
-{
-	init_m4default();
-	use_m4_five_reel_std();
-}
-
-void mpu4_state::init_m4default_five_std_sextender()
-{
-	init_m4default_five_std();
-	use_m4_small_extender();
-}
-
-void mpu4_state::init_m4default_five_rev()
-{
-	init_m4default();
-	use_m4_five_reel_rev();
-}
-
-void mpu4_state::init_m4default_five_rev_lextender()
-{
-	init_m4default_five_rev();
-	use_m4_large_extender_b();
-}
-
-void mpu4_state::init_m4default_five_rev_sextender()
-{
-	init_m4default_five_rev();
-	use_m4_small_extender();
-}
-
-void mpu4_state::init_m4default_five_alt()
-{
-	init_m4default();
-	use_m4_five_reel_alt();
-}
-
-
-void mpu4_state::init_m4default_six()
-{
-	init_m4default();
-	use_m4_six_reel_std();
-}
-
-void mpu4_state::init_m4default_six_sextender()
-{
-	init_m4default_six();
-	use_m4_small_extender();
-}
-
-void mpu4_state::init_m4default_six_alt()
-{
-	init_m4default();
-	use_m4_six_reel_alt();
-}
-
-
-void mpu4_state::init_m4default_seven()
-{
-	init_m4default();
-	use_m4_seven_reel();
-}
-
-
-void mpu4_state::init_big_extenda()
-{
-	init_m4default_big();
-	m_lamp_extender = LARGE_CARD_A;
-}
-
-void mpu4_state::init_m4default_big_low()
-{
-	init_m4default_big();
-	m_default_to_low_bank = true;
-}
-
-void mpu4_state::init_m4default_alt()
-{
-	m_reel_mux = STANDARD_REEL;
-	m_reels = 8;
-	setup_rom_banks();
-
-	m_bwb_bank=0;
-}
-
 void mpu4_state::init_m4()
 {
 	m_bwb_bank = 0;
 	setup_rom_banks();
 }
 
-void mpu4_state::init_m4default()
+void mpu4_state::init_m4big()
 {
-	init_m4();
-	use_m4_standard_reels();
-}
-
-void mpu4_state::init_m4default_lextender()
-{
-	init_m4default();
-	use_m4_large_extender_b();
-}
-
-
-void mpu4_state::init_m4default_big()
-{
-	use_m4_standard_reels();
-
 	int size = memregion("maincpu")->bytes();
 	if (size <= 0x10000)
 	{
@@ -2206,130 +2048,10 @@ void mpu4_state::init_m4default_big()
 	m_bank1->set_entry(m_numbanks);
 }
 
-void mpu4_state::init_m4default_big_lextender()
+void mpu4_state::init_m4big_low()
 {
-	init_m4default_big();
-	use_m4_large_extender_b();
-}
-
-
-// these are not 'init' functions in their own right, they can be called from init functions
-void mpu4_state::use_m4_standard_reels()
-{
-	m_reel_mux = STANDARD_REEL;
-	m_reels = 4;
-}
-
-void mpu4_state::use_m4_five_reel_std()
-{
-	m_reel_mux = FIVE_REEL_5TO8;
-	m_reels = 5;
-}
-
-void mpu4_state::use_m4_five_reel_rev()
-{
-	m_reel_mux = FIVE_REEL_8TO5;
-	m_reels = 5;
-}
-
-void mpu4_state::use_m4_five_reel_alt()
-{
-	m_reel_mux = FIVE_REEL_3TO6;
-	m_reels = 5;
-}
-
-void mpu4_state::use_m4_six_reel_std()
-{
-	m_reel_mux = SIX_REEL_1TO8;
-	m_reels = 6;
-}
-
-void mpu4_state::use_m4_six_reel_alt()
-{
-	m_reel_mux = SIX_REEL_5TO8;
-	m_reels = 6;
-}
-
-void mpu4_state::use_m4_seven_reel()
-{
-	m_reel_mux = SEVEN_REEL;
-	m_reels = 7;
-}
-
-void mpu4_state::use_m4_low_volt_alt()
-{
-	//Some games can't use the 50Hz circuit to check voltage issues, handle it here
-	m_low_volt_detect = false;
-}
-
-void mpu4_state::use_m4_small_extender()
-{
-	m_lamp_extender = SMALL_CARD;
-}
-
-void mpu4_state::use_m4_large_extender_b()
-{
-	m_lamp_extender = LARGE_CARD_B;
-}
-
-void mpu4_state::use_m4_large_extender_c()
-{
-	m_lamp_extender = LARGE_CARD_C;
-}
-
-void mpu4_state::use_m4_hopper_tubes()
-{
-	m_hopper_type = TUBES;
-}
-
-void mpu4_state::use_m4_hopper_duart_a()
-{
-	m_hopper_type = HOPPER_DUART_A;
-}
-
-void mpu4_state::use_m4_hopper_duart_b()
-{
-	m_hopper_type = HOPPER_DUART_B;
-}
-
-void mpu4_state::use_m4_hopper_duart_c()
-{
-	m_hopper_type = HOPPER_DUART_C;
-}
-
-void mpu4_state::use_m4_hopper_nonduart_a()
-{
-	m_hopper_type = HOPPER_NONDUART_A;
-}
-
-void mpu4_state::use_m4_hopper_nonduart_b()
-{
-	m_hopper_type = HOPPER_NONDUART_B;
-}
-
-void mpu4_state::use_m4_hopper_twin_hopper()
-{
-	m_hopper_type = HOPPER_TWIN_HOPPER;
-}
-
-void mpu4_state::use_m4_led_a()
-{
-	m_led_extender = CARD_A;
-}
-
-void mpu4_state::use_m4_led_b()
-{
-	m_led_extender = CARD_B;
-}
-
-void mpu4_state::use_m4_led_c()
-{
-	m_led_extender = CARD_C;
-}
-
-void mpu4_state::use_m4_led_simple()
-{
-	m_led_extender = SIMPLE_CARD;
+	init_m4big();
+	m_default_to_low_bank = true;
 }
 
 void mpu4_state::setup_rom_banks()
@@ -2553,6 +2275,11 @@ void mpu4_state::tr_p4l(machine_config &config)
 	m_use_pia4_porta_leds = true;
 }
 
+void mpu4_state::tr_scardl(machine_config &config)
+{
+	m_use_simplecard_leds = true;
+}
+
 
 void mpu4_state::mpu4_common(machine_config &config)
 {
@@ -2717,141 +2444,33 @@ void mpu4_state::mod2_cheatchr_f(machine_config &config)
 
 // standard reel setup
 
-void mpu4_state::mod4oki(machine_config &config)
+void mpu4_state::mod4oki_f(machine_config &config)
 {
 	mpu4base(config);
 	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4oki)
 
 	mpu4_common2(config);
-	mpu4_reels(config, 6, 1, 3);
 
 	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
 	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
 
-void mpu4_state::mod4oki_no_bacta(machine_config &config)
+void mpu4_state::mod4oki_no_bacta_f(machine_config &config)
 {
-	mod4oki(config);
+	mod4oki_f(config);
 	config.device_remove("dataport");
 	m_pia5->ca2_handler().set(m_pia4, FUNC(pia6821_device::cb1_w));
 }
 
-void mpu4_state::mod4oki_7reel(machine_config &config)
+void mpu4_state::mod4oki_cheatchr_f(machine_config &config)
 {
-	mpu4base(config);
-	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4oki)
-
-	mpu4_common2(config);
-	mpu4_reels(config, 7, 1, 3);
-
-	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
-	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-}
-
-void mpu4_state::mod4oki_chr(machine_config &config)
-{
-	mod4oki(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-}
-
-
-void mpu4_state::mod4oki_cheatchr_table(machine_config &config, const uint8_t* table)
-{
-	mod4oki(config);
+	mod4oki_f(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
 
 	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
 	m_characteriser->set_cpu_tag("maincpu");
 	m_characteriser->set_allow_6809_cheat(true);
-	m_characteriser->set_lamp_table(table);
-}
-
-void mpu4_state::mod4oki_cheatchr(machine_config &config)
-{
-	mod4oki_cheatchr_table(config, nullptr);
-}
-
-
-
-
-// alt reel setup
-
-void mpu4_state::mod4oki_alt(machine_config &config)
-{
-	mpu4base(config);
-	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4oki)
-
-	mpu4_common2(config);
-	mpu4_reels(config, 6, 4, 12);
-
-	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
-	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-}
-
-
-
-void mpu4_state::mod4oki_alt_cheatchr_table(machine_config& config, const uint8_t* table)
-{
-	mod4oki_alt(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-	m_characteriser->set_cpu_tag("maincpu");
-	m_characteriser->set_allow_6809_cheat(true);
-	m_characteriser->set_lamp_table(table);
-}
-
-void mpu4_state::mod4oki_alt_cheatchr(machine_config &config)
-{
-	mod4oki_alt_cheatchr_table(config, nullptr);
-}
-
-
-// 5 reel setup
-
-void mpu4_state::mod4oki_5r(machine_config &config)
-{
-	mpu4base(config);
-	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4oki)
-
-	mpu4_common2(config);
-	mpu4_reels(config, 5, 1, 3);
-
-	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
-	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-}
-
-void mpu4_state::mod4oki_5r_chr(machine_config &config)
-{
-	mod4oki_5r(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-}
-
-void mpu4_state::mod4oki_5r_cheatchr_table(machine_config &config, const uint8_t* table)
-{
-	mod4oki_5r(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-	m_characteriser->set_cpu_tag("maincpu");
-	m_characteriser->set_allow_6809_cheat(true);
-	m_characteriser->set_lamp_table(table);
-}
-
-void mpu4_state::mod4oki_5r_cheatchr(machine_config &config)
-{
-	mod4oki_5r_cheatchr_table(config, nullptr);
+	m_characteriser->set_lamp_table(nullptr);
 }

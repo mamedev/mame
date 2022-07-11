@@ -131,6 +131,7 @@ namespace mpu4_traits {
 		// Features
 		OVER,   // overcurrent detection
 		P4L,    // use pia4 port a leds
+		SCARDL, // use simple card leds
 	};
 }
 
@@ -175,47 +176,10 @@ public:
 	 { }
 
 	void init_m4();
+	void init_m4big();
+	void init_m4big_low();
 
-	void init_m4default_alt();
-
-	void init_m4default();
-	void init_m4default_lextender();
-	void init_m4default_sextender();
-
-	void init_m4default_big();
-	void init_m4default_big_lextender();
-
-	void init_m4default_big_low();
-	void init_m4default_big_aux2inv();
-	void init_m4tst2();
-
-	void init_m4default_big_five_std();
-
-	void init_m4default_big_five_rev();
-	void init_m4default_big_five_rev_lextender();
-
-	void init_m4default_big_six();
-	void init_m4default_big_six_lextender();
-
-	void init_m4default_big_six_alt();
-
-	void init_m4tst();
-	void init_big_extenda();
-	void init_m4altreels();
-	void init_m4altreels_big();
-	void init_m4default_five_std();
-	void init_m4default_five_std_sextender();
-
-	void init_m4default_five_rev();
-	void init_m4default_five_rev_lextender();
-	void init_m4default_five_rev_sextender();
-
-	void init_m4default_five_alt();
-	void init_m4default_six();
-	void init_m4default_six_sextender();
-
-	void init_m4default_six_alt();
-	void init_m4default_seven();
+	void mpu4_reels(machine_config &config, uint8_t NumberOfReels, int16_t start_index, int16_t end_index);
 
 	void tr_r4(machine_config &config);
 	void tr_r5(machine_config &config);
@@ -245,6 +209,7 @@ public:
 	void tr_htw(machine_config &config);
 	void tr_over(machine_config &config);
 	void tr_p4l(machine_config &config);
+	void tr_scardl(machine_config &config);
 
 	template <typename Class, unsigned Count>
 	struct trait_wrapper_impl
@@ -270,34 +235,35 @@ public:
 		{
 			switch (trait)
 			{
-			case mpu4_traits::R4:   return &mpu4_state::tr_r4;
-			case mpu4_traits::R5:   return &mpu4_state::tr_r5;
-			case mpu4_traits::R5R:  return &mpu4_state::tr_r5r;
-			case mpu4_traits::R5A:  return &mpu4_state::tr_r5a;
-			case mpu4_traits::R6:   return &mpu4_state::tr_r6;
-			case mpu4_traits::R6A:  return &mpu4_state::tr_r6a;
-			case mpu4_traits::R7:   return &mpu4_state::tr_r7;
-			case mpu4_traits::R8:   return &mpu4_state::tr_r8;
-			case mpu4_traits::RT1:  return &mpu4_state::tr_rt1;
-			case mpu4_traits::RT2:  return &mpu4_state::tr_rt2;
-			case mpu4_traits::RT3:  return &mpu4_state::tr_rt3;
-			case mpu4_traits::LPS:  return &mpu4_state::tr_lps;
-			case mpu4_traits::LPLA: return &mpu4_state::tr_lpla;
-			case mpu4_traits::LPLB: return &mpu4_state::tr_lplb;
-			case mpu4_traits::LPLC: return &mpu4_state::tr_lplc;
-			case mpu4_traits::LDS:  return &mpu4_state::tr_lds;
-			case mpu4_traits::LDA:  return &mpu4_state::tr_lda;
-			case mpu4_traits::LDB:  return &mpu4_state::tr_ldb;
-			case mpu4_traits::LDC:  return &mpu4_state::tr_ldc;
-			case mpu4_traits::HT:   return &mpu4_state::tr_ht;
-			case mpu4_traits::HDA:  return &mpu4_state::tr_hda;
-			case mpu4_traits::HDB:  return &mpu4_state::tr_hdb;
-			case mpu4_traits::HDC:  return &mpu4_state::tr_hdc;
-			case mpu4_traits::HNA:  return &mpu4_state::tr_hna;
-			case mpu4_traits::HNB:  return &mpu4_state::tr_hnb;
-			case mpu4_traits::HTW:  return &mpu4_state::tr_htw;
-			case mpu4_traits::OVER: return &mpu4_state::tr_over;
-			case mpu4_traits::P4L:  return &mpu4_state::tr_p4l;
+			case mpu4_traits::R4:     return &mpu4_state::tr_r4;
+			case mpu4_traits::R5:     return &mpu4_state::tr_r5;
+			case mpu4_traits::R5R:    return &mpu4_state::tr_r5r;
+			case mpu4_traits::R5A:    return &mpu4_state::tr_r5a;
+			case mpu4_traits::R6:     return &mpu4_state::tr_r6;
+			case mpu4_traits::R6A:    return &mpu4_state::tr_r6a;
+			case mpu4_traits::R7:     return &mpu4_state::tr_r7;
+			case mpu4_traits::R8:     return &mpu4_state::tr_r8;
+			case mpu4_traits::RT1:    return &mpu4_state::tr_rt1;
+			case mpu4_traits::RT2:    return &mpu4_state::tr_rt2;
+			case mpu4_traits::RT3:    return &mpu4_state::tr_rt3;
+			case mpu4_traits::LPS:    return &mpu4_state::tr_lps;
+			case mpu4_traits::LPLA:   return &mpu4_state::tr_lpla;
+			case mpu4_traits::LPLB:   return &mpu4_state::tr_lplb;
+			case mpu4_traits::LPLC:   return &mpu4_state::tr_lplc;
+			case mpu4_traits::LDS:    return &mpu4_state::tr_lds;
+			case mpu4_traits::LDA:    return &mpu4_state::tr_lda;
+			case mpu4_traits::LDB:    return &mpu4_state::tr_ldb;
+			case mpu4_traits::LDC:    return &mpu4_state::tr_ldc;
+			case mpu4_traits::HT:     return &mpu4_state::tr_ht;
+			case mpu4_traits::HDA:    return &mpu4_state::tr_hda;
+			case mpu4_traits::HDB:    return &mpu4_state::tr_hdb;
+			case mpu4_traits::HDC:    return &mpu4_state::tr_hdc;
+			case mpu4_traits::HNA:    return &mpu4_state::tr_hna;
+			case mpu4_traits::HNB:    return &mpu4_state::tr_hnb;
+			case mpu4_traits::HTW:    return &mpu4_state::tr_htw;
+			case mpu4_traits::OVER:   return &mpu4_state::tr_over;
+			case mpu4_traits::P4L:    return &mpu4_state::tr_p4l;
+			case mpu4_traits::SCARDL: return &mpu4_state::tr_scardl;
 			default: return nullptr; // crash later on invalid arguments
 			}
 		}
@@ -316,6 +282,7 @@ public:
 	{
 		return trait_wrapper_impl<T, sizeof...(U)>(state, traits...);
 	}
+
 
 	void mod2_f(machine_config &config);
 	void mod2_no_bacta_f(machine_config &config);
@@ -339,35 +306,42 @@ public:
 		return trait_wrapper(this, &mpu4_state::mod2_cheatchr_f, traits...);
 	}
 
-	void mpu4_reels(machine_config &config, uint8_t NumberOfReels, int16_t start_index, int16_t end_index);
 
-	template<const uint8_t* Table> void mod4oki_cheatchr_pal(machine_config &config);
-	template<const uint8_t* Table> void mod4oki_7reel_cheatchr_pal(machine_config &config);
-	template<const uint8_t* Table> void mod4oki_alt_cheatchr_pal(machine_config &config);
-	template<const uint8_t* Table> void mod4oki_5r_cheatchr_pal(machine_config &config);
-	template<uint8_t Fixed> void mod4oki_5r_bootleg_fixedret(machine_config &config);
-	void mod2_cheatchr_table(machine_config &config, const uint8_t* table);
+	void mod4oki_f(machine_config &config);
+	void mod4oki_no_bacta_f(machine_config &config);
+	void mod4oki_cheatchr_f(machine_config &config);
+	template<const uint8_t* Table> void mod4oki_cheatchr_pal_f(machine_config &config);
+	template<uint8_t Fixed> void mod4oki_bootleg_fixedret_f(machine_config &config);
 
-	// bootleg mod4
-	template<uint8_t Fixed> void mod4oki_bootleg_fixedret(machine_config &config);
-	template<uint8_t Fixed> void mod4oki_alt_bootleg_fixedret(machine_config &config);
+	template<typename... T>
+	auto mod4oki(T... traits)
+	{
+		return trait_wrapper(this, &mpu4_state::mod4oki_f, traits...);
+	}
 
-	void mod4oki_5r(machine_config &config);
-	void mod4oki_5r_chr(machine_config &config);
-	void mod4oki_5r_cheatchr(machine_config &config);
-	void mod4oki_5r_cheatchr_table(machine_config &config, const uint8_t* table);
+	template<typename... T>
+	auto mod4oki_no_bacta(T... traits)
+	{
+		return trait_wrapper(this, &mpu4_state::mod4oki_no_bacta_f, traits...);
+	}
 
-	void mod4oki_alt(machine_config &config);
-	void mod4oki_alt_cheatchr(machine_config &config);
-	void mod4oki_alt_cheatchr_table(machine_config& config, const uint8_t* table);
+	template<typename... T>
+	auto mod4oki_cheatchr(T... traits)
+	{
+		return trait_wrapper(this, &mpu4_state::mod4oki_cheatchr_f, traits...);
+	}
 
-	void mod4oki(machine_config &config);
-	void mod4oki_no_bacta(machine_config &config);
-	void mod4oki_7reel(machine_config &config);
-	void mod4oki_cheatchr(machine_config &config);
-	void mod4oki_cheatchr_table(machine_config &config, const uint8_t* table);
-	void mod4oki_chr(machine_config &config);
+	template<const uint8_t* Table, typename... T>
+	auto mod4oki_cheatchr_pal(T... traits)
+	{
+		return trait_wrapper(this, &mpu4_state::mod4oki_cheatchr_pal_f<Table>, traits...);
+	}
 
+	template<uint8_t Fixed, typename... T>
+	auto mod4oki_bootleg_fixedret(T... traits)
+	{
+		return trait_wrapper(this, &mpu4_state::mod4oki_bootleg_fixedret_f<Fixed>, traits...);
+	}
 
 
 	void mpu4_common(machine_config &config);
@@ -376,30 +350,6 @@ public:
 	void mpu4_bacta(machine_config &config);
 
 protected:
-
-	void use_m4_standard_reels();
-	void use_m4_low_volt_alt();
-	void use_m4_five_reel_std();
-	void use_m4_five_reel_rev();
-	void use_m4_five_reel_alt();
-	void use_m4_six_reel_std();
-	void use_m4_six_reel_alt();
-	void use_m4_seven_reel();
-	void use_m4_small_extender();
-	void use_m4_large_extender_b();
-	void use_m4_large_extender_c();
-	void use_m4_hopper_tubes();
-	void use_m4_hopper_duart_a();
-	void use_m4_hopper_duart_b();
-	void use_m4_hopper_duart_c();
-	void use_m4_hopper_nonduart_a();
-	void use_m4_hopper_nonduart_b();
-	void use_m4_hopper_twin_hopper();
-	void use_m4_led_a();
-	void use_m4_led_b();
-	void use_m4_led_c();
-	void use_m4_led_simple();
-
 	void setup_rom_banks();
 
 	TIMER_CALLBACK_MEMBER(update_ic24);
@@ -627,3 +577,25 @@ protected:
 	static constexpr uint8_t reel_mux_table7[8]= {3,1,5,6,4,2,0,7};
 };
 
+
+template<const uint8_t* Table> void mpu4_state::mod4oki_cheatchr_pal_f(machine_config &config)
+{
+	mod4oki_f(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(Table);
+}
+
+template<uint8_t Fixed> void mpu4_state::mod4oki_bootleg_fixedret_f(machine_config &config)
+{
+	mod4oki_f(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
+
+	MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
+	m_characteriser_bl->set_bl_fixed_return(Fixed);
+}
