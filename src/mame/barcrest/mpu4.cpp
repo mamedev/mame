@@ -2412,7 +2412,6 @@ void mpu4_state::mod2_f(machine_config &config)
 	m_ay8913->set_resistors_load(820, 0, 0);
 	m_ay8913->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_ay8913->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	mpu4_reels(config, 6, 1, 3);
 }
 
 void mpu4_state::mod2_no_bacta_f(machine_config &config)
