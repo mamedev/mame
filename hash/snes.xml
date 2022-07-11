@@ -3568,7 +3568,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="superman">
 		<!-- snescentral.com -->
-		<description>Superman Unfinished Version (demo)</description>
+		<description>Superman - Unfinished Version (demo)</description>
 		<year>1992</year>
 		<publisher>Sunsoft</publisher>
 		<part name="cart" interface="snes_cart">
