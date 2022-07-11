@@ -97,14 +97,14 @@ static const uint8_t asic_unlock_seq[15] =
    The following tables show the possible ram configurations :*/
 static const int RamConfigurations[8 * 4] =
 {
-	0, 1, 2, 3,                        /* config 0 */
-	0, 1, 2, 7,                        /* config 1 */
-	4, 5, 6, 7,                        /* config 2 */
-	0, 3, 2, 7,                        /* config 3 */
-	0, 4, 2, 3,                        /* config 4 */
-	0, 5, 2, 3,                        /* config 5 */
-	0, 6, 2, 3,                        /* config 6 */
-	0, 7, 2, 3                       /* config 7 */
+	0, 1, 2, 3,              /* config 0 */
+	0, 1, 2, 7,              /* config 1 */
+	4, 5, 6, 7,              /* config 2 */
+	0, 3, 2, 7,              /* config 3 */
+	0, 4, 2, 3,              /* config 4 */
+	0, 5, 2, 3,              /* config 5 */
+	0, 6, 2, 3,              /* config 6 */
+	0, 7, 2, 3               /* config 7 */
 };
 
 
@@ -165,32 +165,32 @@ static const rgb_t amstrad_green_palette[32] =
 	rgb_t(0x000, 0x07F, 0x000),        /*13*/
 	rgb_t(0x000, 0x0BA, 0x000),        /*19*/
 	rgb_t(0x000, 0x0F5, 0x000),        /*25*/
-	rgb_t(0x000, 0x009, 0x000),        /*1*/
-	rgb_t(0x000, 0x044, 0x000),        /*7*/
+	rgb_t(0x000, 0x009, 0x000),        /* 1*/
+	rgb_t(0x000, 0x044, 0x000),        /* 7*/
 	rgb_t(0x000, 0x062, 0x000),        /*10*/
 	rgb_t(0x000, 0x09C, 0x000),        /*16*/
-	rgb_t(0x000, 0x044, 0x000),        /*7*/
+	rgb_t(0x000, 0x044, 0x000),        /* 7*/
 	rgb_t(0x000, 0x0F5, 0x000),        /*25*/
 	rgb_t(0x000, 0x0EB, 0x000),        /*24*/
 	rgb_t(0x000, 0x0FF, 0x000),        /*26*/
-	rgb_t(0x000, 0x03A, 0x000),        /*6*/
-	rgb_t(0x000, 0x04E, 0x000),        /*8*/
+	rgb_t(0x000, 0x03A, 0x000),        /* 6*/
+	rgb_t(0x000, 0x04E, 0x000),        /* 8*/
 	rgb_t(0x000, 0x093, 0x000),        /*15*/
 	rgb_t(0x000, 0x0A6, 0x000),        /*17*/
-	rgb_t(0x000, 0x009, 0x000),        /*1*/
+	rgb_t(0x000, 0x009, 0x000),        /* 1*/
 	rgb_t(0x000, 0x0BA, 0x000),        /*19*/
 	rgb_t(0x000, 0x0B0, 0x000),        /*18*/
 	rgb_t(0x000, 0x0C4, 0x000),        /*20*/
-	rgb_t(0x000, 0x000, 0x000),        /*0*/
-	rgb_t(0x000, 0x013, 0x000),        /*2*/
-	rgb_t(0x000, 0x058, 0x000),        /*9*/
+	rgb_t(0x000, 0x000, 0x000),        /* 0*/
+	rgb_t(0x000, 0x013, 0x000),        /* 2*/
+	rgb_t(0x000, 0x058, 0x000),        /* 9*/
 	rgb_t(0x000, 0x06B, 0x000),        /*11*/
-	rgb_t(0x000, 0x027, 0x000),        /*4*/
+	rgb_t(0x000, 0x027, 0x000),        /* 4*/
 	rgb_t(0x000, 0x0D7, 0x000),        /*22*/
 	rgb_t(0x000, 0x0CD, 0x000),        /*21*/
 	rgb_t(0x000, 0x0E1, 0x000),        /*23*/
-	rgb_t(0x000, 0x01D, 0x000),        /*3*/
-	rgb_t(0x000, 0x031, 0x000),        /*5*/
+	rgb_t(0x000, 0x01D, 0x000),        /* 3*/
+	rgb_t(0x000, 0x031, 0x000),        /* 5*/
 	rgb_t(0x000, 0x075, 0x000),        /*12*/
 	rgb_t(0x000, 0x089, 0x000)         /*14*/
 };

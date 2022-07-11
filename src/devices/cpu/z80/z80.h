@@ -310,7 +310,7 @@ protected:
 	const u8 *   m_cc_xy;
 	const u8 *   m_cc_xycb;
 	const u8 *   m_cc_ex;
-	u8 m_cycles_multiplier = 1; // multiplier for based cycles. deprecated to use except legacy e.g. "system1" till update.
+	u8 m_cycles_multiplier = 1; // multiplier for based cycles. deprecated to use except legacy with synthetic clock (e.g. "system1") till update.
 };
 
 DECLARE_DEVICE_TYPE(Z80, z80_device)
