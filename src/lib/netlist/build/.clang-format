@@ -25,13 +25,14 @@ BreakStringLiterals: false
 AlwaysBreakTemplateDeclarations: Yes
 # AfterComma does not work <= 13
 #BreakInheritanceList: AfterComma
-#BreakInheritanceList: BeforeComma
+BreakInheritanceList: BeforeComma
 #BreakInheritanceList: false
 SpaceBeforeInheritanceColon: true
 
 #AlignAfterOpenBracket: DontAlign
 AlignAfterOpenBracket: Align
 PointerAlignment: Right
+ReferenceAlignment: Right
 SpacesInAngles: false
 SpaceBeforeAssignmentOperators: true
 AlignConsecutiveDeclarations: true
@@ -90,16 +91,17 @@ StatementMacros:
 TypenameMacros: 
   - "NETLIST_NAME"
   - "NETLIB_NAME"
+  - "PENUM"
 
 WhitespaceSensitiveMacros: 
   - "ALIAS"
-  - "NET_C"
   - "DIPPINS"
+  - "NET_C"
+  - "PENUM"
 
 IndentPPDirectives: BeforeHash
 MacroBlockBegin: "^static NETLIST_START\\(.+\\)|static TRUTHTABLE_START\\(.*\\)$"
 MacroBlockEnd: "^NETLIST_END\\(\\)|TRUTHTABLE_END\\(\\)$"
-# ReferenceAlignment: Middle
 
 # Avoid formatting 
 # -- clang-tidy
