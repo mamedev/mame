@@ -199,12 +199,12 @@ public:
 	// some models have all 4 LCD bits wired to adjacent port bits, but some don't
 	// (and even those don't always have them wired the same way -
 	//  in some cases they're not even all connected to the same port)
-	template <unsigned i>
-	DECLARE_CUSTOM_INPUT_MEMBER(lcd_bit_r) { return BIT(m_lcdc->db_r(), i); }
-	template <unsigned i>
+	template <unsigned Bit>
+	DECLARE_CUSTOM_INPUT_MEMBER(lcd_bit_r) { return BIT(m_lcdc->db_r(), Bit); }
+	template <unsigned Bit>
 	DECLARE_WRITE_LINE_MEMBER(lcd_bit_w)
 	{
-		m_lcd_data = (m_lcd_data & ~(1 << i)) | (state << i);
+		m_lcd_data = (m_lcd_data & ~(1 << Bit)) | (state << Bit);
 		m_lcdc->db_w(m_lcd_data);
 	}
 

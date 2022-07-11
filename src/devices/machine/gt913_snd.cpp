@@ -246,8 +246,7 @@ void gt913_sound_device::command_w(u16 data)
 	}
 
 	auto& voice = m_voices[voicenum];
-	// voice data write commands
-	if (voicecmd == 0x0008)
+	if (voicecmd == 0x0008) // voice data write commands
 	{
 		/*
 		sample start addresses seem to need to be word-aligned to decode properly
@@ -339,9 +338,7 @@ void gt913_sound_device::command_w(u16 data)
 		*/
 		voice.m_volume_rate = (base * 3) << (shift + 5);
 	}
-
-	// voice data read commands
-	else if (voicecmd == 0x2028)
+	else if (voicecmd == 0x2028) // voice data read commands
 	{
 		/*
 		data0 is used to determine if it's time to start the next part of the volume envelope or not
