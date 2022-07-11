@@ -90,8 +90,7 @@ public:
 			m_audio_in(*this, "nl_audio:in%u", 0U),
 			m_samples(*this, "samples"),
 			m_nvram(*this, "nvram", 0x100, ENDIANNESS_BIG),
-			m_dips(*this, "DIP%u", 0U),
-			m_dac(*this, "dac")
+			m_dips(*this, "DIP%u", 0U)
 	{ }
 
 	void jpmsru_3k(machine_config &config);
@@ -115,7 +114,6 @@ public:
 protected:
 	virtual void machine_start() override;
 
-private:
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(opto_cb) { m_opto[N] = state; }
 
 	uint8_t inputs_r(offs_t offset);
@@ -142,7 +140,6 @@ private:
 	void out_coin_lockout_w(offs_t offset, uint8_t data);
 	void out_10p_lockout_w(offs_t offset, uint8_t data);
 	void out_50p_lockout_w(offs_t offset, uint8_t data);
-	void out_loudspeaker_w(offs_t offset, uint8_t data);
 	void out_logicext_w(offs_t offset, uint8_t data);
 
 	void jpmsru_3k_map(address_map &map);
@@ -189,7 +186,18 @@ private:
 
 	memory_share_creator<uint8_t> m_nvram;
 	optional_ioport_array<3> m_dips;
-	optional_device<dac_1bit_device> m_dac;
+};
+
+class jpmsru_dac_state : public jpmsru_state
+{
+public:
+	jpmsru_dac_state(const machine_config &mconfig, device_type type, const char *tag) :
+			jpmsru_state(mconfig, type, tag),
+			m_dac(*this, "dac")
+	{ }
+
+private:
+	required_device<dac_1bit_device> m_dac;
 };
 
 void jpmsru_state::jpmsru_3k_map(address_map &map)
@@ -388,7 +396,7 @@ void jpmsru_state::outputs_lc(address_map &map)
 	map(0x3c, 0x3d).w(FUNC(jpmsru_state::out_payout_2x50p_a_w));
 	map(0x3e, 0x3f).w(FUNC(jpmsru_state::out_payout_2x50p_b_w));
 	map(0x40, 0x4b).w(FUNC(jpmsru_state::out_disp_w));
-	map(0x4e, 0x4f).w(FUNC(jpmsru_state::out_loudspeaker_w));
+	map(0x4e, 0x4f).w("dac", FUNC(dac_bit_interface::data_w)).umask16(0xff00);
 	map(0x50, 0x61).w(FUNC(jpmsru_state::out_logicext_w));
 	map(0x62, 0x63).nopw(); // 2x50p B payout 2
 	map(0x6c, 0x6d).w(FUNC(jpmsru_state::out_10p_lockout_w));
@@ -508,11 +516,6 @@ void jpmsru_state::out_logicext_w(offs_t offset, uint8_t data)
 		case 7: m_logicext_addr = (m_logicext_addr & ~(1 << (offset - 2))) | (data ? 0 : (1 << (offset - 2))); break;
 		case 8: m_logicext_addr = 0; break;
 	}
-}
-
-void jpmsru_state::out_loudspeaker_w(offs_t offset, uint8_t data)
-{
-	m_dac->write(data);
 }
 
 void jpmsru_state::audio_w(offs_t offset, uint8_t data)
@@ -1277,7 +1280,7 @@ void jpmsru_state::lc(machine_config &config)
 	jpmsru_6k(config);
 	m_maincpu->set_addrmap(AS_IO, &jpmsru_state::outputs_lc);
 
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.5);
+	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 ROM_START( j_ewn )
@@ -1542,5 +1545,5 @@ GAMEL( 198?,  j_sup2p,   0,        sup2p,     j_sup2p,       jpmsru_state, init_
 GAMEL( 1983?, j_la,      0,        lan,       j_la,          jpmsru_state, init_jpmsru, ROT0, "<unknown>", "Lucky Aces (SRU) (£1.50 Jackpot)", GAME_FLAGS, layout_j_la )
 GAMEL( 198?,  j_cnudgr,  0,        lan,       j_cnudgr,      jpmsru_state, init_jpmsru, ROT0, "<unknown>", "Cash Nudger? (SRU) (5p Stake, £2 Jackpot)", GAME_FLAGS, layout_j_cnudgr )
 // Club
-GAMEL( 1981,  j_lc,      0,        lc,        j_lc,          jpmsru_state, init_jpmsru, ROT0, "JPM", "Lucky Casino (JPM) (SRU) (revision 8A)", GAME_FLAGS, layout_j_lc )
-GAMEL( 1981,  j_lca,     j_lc,     lc,        j_lc,          jpmsru_state, init_jpmsru, ROT0, "JPM", "Lucky Casino (JPM) (SRU) (revision 8, lower %)", GAME_FLAGS, layout_j_lc ) // Smaller hold chance, probably revision 8B/8C
+GAMEL( 1981,  j_lc,      0,        lc,        j_lc,          jpmsru_dac_state, init_jpmsru, ROT0, "JPM", "Lucky Casino (JPM) (SRU) (revision 8A)", GAME_FLAGS, layout_j_lc )
+GAMEL( 1981,  j_lca,     j_lc,     lc,        j_lc,          jpmsru_dac_state, init_jpmsru, ROT0, "JPM", "Lucky Casino (JPM) (SRU) (revision 8, lower %)", GAME_FLAGS, layout_j_lc ) // Smaller hold chance, probably revision 8B/8C
