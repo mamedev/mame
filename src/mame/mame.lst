@@ -19617,6 +19617,9 @@ kinst2uk                        // (c) 1995 Rare
 kissp                           //
 kissp2                          //
 
+@source:seta/kiwame.cpp
+kiwame                          // (c) 1994 Athena
+
 @source:atari/klax.cpp
 klax                            // 136075           (c) 1989
 klax4                           // 136075           (c) 1989
@@ -38539,7 +38542,6 @@ jockeyc                         // (c) 1990 Seta (Visco license)
 kamenrid                        // (c) 1993 Toei / Banpresto
 keroppi                         // (c) 1993 Sammy
 keroppij                        // (c) 1993 Sammy
-kiwame                          // (c) 1994 Athena
 krzybowl                        // (c) 1994 American Sammy
 madshark                        // (c) 1993 Allumer
 magspeed                        // (c) 1994 Allumer
