@@ -2446,7 +2446,7 @@ void z80_device::init_op_steps() {
 
 /* DB   FD         */ OP(FD,28) { illegal_1(); } JP(28)
 /* ADD  IY,IY      */ OP(FD,29) { TDAT=IY; TDAT2=IY; } MN add16() FN { IY=TDAT;    } EOP
-/* LD   IY,(w)     */ OP_M(FD,2a) arg16() FN { m_ea=TDAT; TADR=m_ea; TDAT=IY; } MN rm16() FN { WZ = m_ea + 1; } EOP
+/* LD   IY,(w)     */ OP_M(FD,2a) arg16() FN { m_ea=TDAT; TADR=m_ea; } MN rm16() FN { IY=TDAT; WZ = m_ea + 1; } EOP
 /* DEC  IY         */ OP_M(FD,2b) nomreq_ir(2) FN { IY--;                          } EOP
 /* INC  LY         */ OP(FD,2c) { inc(LY);                                         } EOP
 /* DEC  LY         */ OP(FD,2d) { dec(LY);                                         } EOP
