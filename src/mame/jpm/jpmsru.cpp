@@ -106,7 +106,6 @@ public:
 	void ews(machine_config &config);
 	void lt(machine_config &config);
 	void sup2p(machine_config &config);
-	void lc(machine_config &config);
 
 	void init_jpmsru();
 
@@ -155,7 +154,6 @@ protected:
 	void outputs_super2(address_map &map);
 	void outputs_ews(address_map &map);
 	void outputs_sup2p(address_map &map);
-	void outputs_lc(address_map &map);
 
 	bool m_int1;
 	bool m_int2;
@@ -196,7 +194,11 @@ public:
 			m_dac(*this, "dac")
 	{ }
 
+	void lc(machine_config &config);
+	
 private:
+	void outputs_lc(address_map &map);
+
 	required_device<dac_1bit_device> m_dac;
 };
 
@@ -377,30 +379,30 @@ void jpmsru_state::outputs_sup2p(address_map &map)
 	map(0x6e, 0x6f).w(FUNC(jpmsru_state::out_coin_lockout_w));
 }
 
-void jpmsru_state::outputs_lc(address_map &map)
+void jpmsru_dac_state::outputs_lc(address_map &map)
 {
 	jpmsru_io(map);
 
-	map(0x60, 0x6f).r(FUNC(jpmsru_state::inputs_ext_r)); // Input Extension
+	map(0x60, 0x6f).r(FUNC(jpmsru_dac_state::inputs_ext_r)); // Input Extension
 
 	/* There are 2 outputs for each payout, labeled payout 1 and payout 2.
 	   Both are always written to at the same time. I'm using the first output for payouts. */
 	map(0x28, 0x29).nopw(); // 10p payout 2
 	map(0x2a, 0x2b).nopw(); // 2x50p A payout 2
-	map(0x30, 0x31).w(FUNC(jpmsru_state::out_meter_w<0>));
-	map(0x32, 0x33).w(FUNC(jpmsru_state::out_meter_w<1>));
-	map(0x34, 0x35).w(FUNC(jpmsru_state::out_meter_w<2>));
-	map(0x36, 0x37).w(FUNC(jpmsru_state::out_meter_w<3>));
-	map(0x38, 0x39).w(FUNC(jpmsru_state::out_meter_w<4>));
-	map(0x3a, 0x3b).w(FUNC(jpmsru_state::out_payout_cash_w)); // 10p payout
-	map(0x3c, 0x3d).w(FUNC(jpmsru_state::out_payout_2x50p_a_w));
-	map(0x3e, 0x3f).w(FUNC(jpmsru_state::out_payout_2x50p_b_w));
-	map(0x40, 0x4b).w(FUNC(jpmsru_state::out_disp_w));
-	map(0x4e, 0x4f).w("dac", FUNC(dac_bit_interface::data_w)).umask16(0xff00);
-	map(0x50, 0x61).w(FUNC(jpmsru_state::out_logicext_w));
+	map(0x30, 0x31).w(FUNC(jpmsru_dac_state::out_meter_w<0>));
+	map(0x32, 0x33).w(FUNC(jpmsru_dac_state::out_meter_w<1>));
+	map(0x34, 0x35).w(FUNC(jpmsru_dac_state::out_meter_w<2>));
+	map(0x36, 0x37).w(FUNC(jpmsru_dac_state::out_meter_w<3>));
+	map(0x38, 0x39).w(FUNC(jpmsru_dac_state::out_meter_w<4>));
+	map(0x3a, 0x3b).w(FUNC(jpmsru_dac_state::out_payout_cash_w)); // 10p payout
+	map(0x3c, 0x3d).w(FUNC(jpmsru_dac_state::out_payout_2x50p_a_w));
+	map(0x3e, 0x3f).w(FUNC(jpmsru_dac_state::out_payout_2x50p_b_w));
+	map(0x40, 0x4b).w(FUNC(jpmsru_dac_state::out_disp_w));
+	map(0x4e, 0x4f).w(m_dac, FUNC(dac_bit_interface::data_w)).umask16(0xff00);
+	map(0x50, 0x61).w(FUNC(jpmsru_dac_state::out_logicext_w));
 	map(0x62, 0x63).nopw(); // 2x50p B payout 2
-	map(0x6c, 0x6d).w(FUNC(jpmsru_state::out_10p_lockout_w));
-	map(0x6e, 0x6f).w(FUNC(jpmsru_state::out_50p_lockout_w));
+	map(0x6c, 0x6d).w(FUNC(jpmsru_dac_state::out_10p_lockout_w));
+	map(0x6e, 0x6f).w(FUNC(jpmsru_dac_state::out_50p_lockout_w));
 }
 
 uint8_t jpmsru_state::inputs_r(offs_t offset)
@@ -1275,12 +1277,12 @@ void jpmsru_state::sup2p(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &jpmsru_state::outputs_sup2p);
 }
 
-void jpmsru_state::lc(machine_config &config)
+void jpmsru_dac_state::lc(machine_config &config)
 {
 	jpmsru_6k(config);
-	m_maincpu->set_addrmap(AS_IO, &jpmsru_state::outputs_lc);
+	m_maincpu->set_addrmap(AS_IO, &jpmsru_dac_state::outputs_lc);
 
-	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.5);
+	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 ROM_START( j_ewn )
