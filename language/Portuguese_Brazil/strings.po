@@ -1,8 +1,8 @@
-# Brazilian Portuguese translations for MAME Project.
-# Traduções para o Português do Brasil para o Projeto MAME.
+# Brazilian Portuguese translation for the MAME Project.
+# Tradução pro Português Brasileiro pro Projeto MAME.
 # Copyright (C) 1997-2019  MAMEDev and contributors
 # This file is distributed under the same license as the MAME Project.
-# Automatically generated, 2019.
+# Automatically generated, 2022.
 #
 msgid ""
 msgstr ""
@@ -279,7 +279,7 @@ msgstr "%1$s %2$s ( %3$d / %4$d pacotes do software )"
 #: src/frontend/mame/ui/selsoft.cpp:707
 #, c-format
 msgid "System: \"%1$s\" software list "
-msgstr "Sistema: lista de software \"%1$s\" "
+msgstr "Sistema: lista dos softwares \"%1$s\" "
 
 #: src/frontend/mame/ui/selsoft.cpp:712 src/frontend/mame/ui/selgame.cpp:1074
 #, c-format
