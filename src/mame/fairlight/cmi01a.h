@@ -53,69 +53,106 @@ protected:
 private:
 	void cmi01a_irq(int state);
 
-	TIMER_CALLBACK_MEMBER(bcas_q2_tick);
 	TIMER_CALLBACK_MEMBER(update_sample);
 
 	void load_envelope();
 	void update_envelope_tri();
 	void clock_envelope();
 	void tick_ediv();
-	void update_eclk();
 
-	void pulse_zcint();
-	void pulse_gzx();
-	void reset_waveform_segment();
-	void check_segment_load();
-	void wpe_w(int state);
+	void not_wpe_w(int state);
 	void notload_w(int state);
 	int notload_r();
 
-	void zx_tick();
 	void run_voice();
-	void update_wave_addr(int inc);
-	void set_segment_cnt(u16 segment_cnt);
 
 	void rp_w(u8 data);
 	u8 rp_r();
 	void ws_dir_w(u8 data);
 	u8 ws_dir_r();
 	int tri_r();
-	void pia_0_cb2_w(int state);
-	void eload_w(int state);
-	int eload_r();
+	void run_w(int state);
+	void permit_eload_w(int state);
 
 	int eosi_r();
 	int zx_r();
-	u8 pia_1_a_r();
-	void pia_1_a_w(u8 data);
-	u8 pia_1_b_r();
-	void pia_1_b_w(u8 data);
+	u8 pitch_octave_r();
+	void pitch_octave_w(u8 data);
+	u8 pitch_lsb_r();
+	void pitch_lsb_w(u8 data);
 
 	void ptm_o1(int state);
 	void ptm_o2(int state);
 	void ptm_o3(int state);
 
-	TIMER_CALLBACK_MEMBER(zcint_pulse_cb);
-	TIMER_CALLBACK_MEMBER(rstb_pulse_cb);
-
 	void dump_state();
+
+	// New functions below this line
+	void pulse_rstb();
+	TIMER_CALLBACK_MEMBER(rstb_pulse_cb);
+	void set_not_rstb(const bool not_rstb);
+
+	void update_bcas_q1_enable();
+	TIMER_CALLBACK_MEMBER(bcas_q1_tick);
+
+	void set_zx_flipflop_clock(const bool zx_ff_clk);
+	void set_zx_flipflop_state(const bool zx_ff);
+
+	void pulse_zcint();
+	TIMER_CALLBACK_MEMBER(zcint_pulse_cb);
+	void set_not_zcint(const bool not_zcint);
+
+	void set_not_load(const bool not_load);
+
+	void update_gzx();
+	void set_gzx(const bool gzx);
+
+	void update_not_eload();
+	void set_not_eload(const bool not_eload);
+	void try_load_envelope();
+	void set_envelope(const u8 env);
+	void update_envelope_divider();
+	void set_envelope_dir(const int env_dir);
+	void update_envelope_clock();
+
+	void set_not_wpe(const bool not_wpe);
+	void update_upper_wave_addr_load();
+	void set_upper_wave_addr_load(const bool upper_wave_addr_load);
+	void try_load_upper_wave_addr();
+	void set_wave_addr_lsb(const u8 wave_addr_lsb);
+	void set_wave_addr_msb(const u8 wave_addr_msb);
+	void set_wave_addr_msb_clock(const bool wave_addr_msb_clock);
+
+	void set_zx(const bool zx);
+	void update_ptm_c1();
 
 	u32         m_channel;
 	double      m_mosc = 0.0;
-	int         m_zx_ff = 0;
-	bool        m_rstb = true;
+	bool        m_zx_ff_clk = false;
+	bool        m_zx_ff = false;
+	bool        m_not_rstb = true;
+	bool        m_upper_wave_addr_load = false;
+	bool        m_zx = false;
+	bool        m_not_eload = true;
+	bool        m_not_load = false;
+	bool        m_bcas_q1_enabled = true;
+	bool        m_eclk = false;
+	bool        m_env_clk = false;
+	bool        m_wave_addr_msb_clock = true;
+	u8          m_env_divider = 0;
+	u8          m_wave_addr_lsb = 0;
+	u8          m_wave_addr_msb = 0;
 
 	emu_timer * m_zcint_pulse_timer = nullptr;
 	emu_timer * m_rstb_pulse_timer = nullptr;
-	emu_timer * m_bcas_q2_timer = nullptr;
+	emu_timer * m_bcas_q1_timer = nullptr;
 	emu_timer * m_sample_timer = nullptr;
 
 	u8        m_current_sample = 0;
 	u16       m_current_sample_addr = 0;
 
 	std::unique_ptr<u8[]>    m_wave_ram;
-	u16       m_segment_cnt = 0;
-	int       m_new_addr = 0;
+	bool      m_new_addr = false;
 	u8        m_vol_latch = 0;
 	u8        m_flt_latch = 0;
 	u8        m_rp = 0;
@@ -123,28 +160,22 @@ private:
 	int       m_dir = 0;
 	int       m_env_dir = 0;
 	u8        m_env = 0;
-	int       m_pia0_cb2_state = 0;
+	bool      m_run = false;
+	bool      m_not_zcint = true;
+	bool      m_gzx = false;
+	bool      m_not_wpe = true;
 
 	bool      m_bcas_q2 = false;
 	bool      m_bcas_q1 = false;
 
-	int       m_ptm_o1 = 0;
-	int       m_ptm_o2 = 0;
-	int       m_ptm_o3 = 0;
+	bool      m_ptm_o1 = false;
+	bool      m_ptm_o2 = false;
+	bool      m_ptm_o3 = false;
 
-	bool      m_load = false;
-	bool      m_nload = false;
-	bool      m_run = false;
-	bool      m_gzx = false;
-	bool      m_wpe = false;
-	bool      m_nwpe = true;
 	bool      m_tri = false;
-	bool      m_pia1_ca2 = false;
+	bool      m_permit_eload = false;
 
-	bool      m_eclk = false;
-	bool      m_env_clk = false;
 	bool      m_ediv_out = false;
-	u8        m_ediv_rate = 0;
 	bool      m_envdiv_toggles[6];
 
 	u16       m_pitch = 0;

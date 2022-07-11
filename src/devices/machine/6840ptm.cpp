@@ -604,6 +604,7 @@ void ptm6840_device::write(offs_t offset, uint8_t data)
 					for (int i = 0; i < 3; i++)
 					{
 						m_hightime[i] = false;
+						reload_count(i);
 						if (!m_timer[i]->remaining().is_never() && ((m_control_reg[i] & INTERNAL_CLK_EN) || m_external_clock[i] != 0.0))
 						{
 							if (m_do_log)
@@ -740,7 +741,7 @@ void ptm6840_device::write(offs_t offset, uint8_t data)
 			update_interrupts();
 
 			// Reload the count if in an appropriate mode
-			if (!(m_control_reg[idx] & 0x10)/* || (m_control_reg[0] & RESET_TIMERS)*/)
+			if (!(m_control_reg[idx] & 0x10) || (m_control_reg[0] & RESET_TIMERS))
 			{
 				m_hightime[idx] = false;
 				reload_count(idx);
@@ -766,7 +767,7 @@ TIMER_CALLBACK_MEMBER(ptm6840_device::timeout)
 	m_status_read_since_int &= ~(1 << param);
 	update_interrupts();
 
-	if (m_do_log && (param == 0 || m_logidx == 1))
+	if (m_do_log)
 		LOGMASKED(LOG_MOG, "PTM Timeout Channel %d, control is %02x, latch is %04x\n", param + 1, m_control_reg[param], m_latch[param]);
 
 	if (m_control_reg[param] & COUNT_OUT_EN)
