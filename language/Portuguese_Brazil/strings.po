@@ -1,6 +1,6 @@
 # Brazilian Portuguese translation for the MAME Project.
 # Tradução pro Português Brasileiro para o Projeto MAME.
-# Copyright (C) 1997-2019  MAMEDev and contributors
+# Copyright (C) 1997-2022  MAMEDev and contributors
 # This file is distributed under the same license as the MAME Project.
 # Automatically generated, 2022.
 #
@@ -279,7 +279,7 @@ msgstr "%1$s %2$s ( %3$d / %4$d pacotes do software )"
 #: src/frontend/mame/ui/selsoft.cpp:707
 #, c-format
 msgid "System: \"%1$s\" software list "
-msgstr "Sistema: lista dos softwares \"%1$s\" "
+msgstr "Sistema: lista dos conteúdos \"%1$s\" "
 
 #: src/frontend/mame/ui/selsoft.cpp:712 src/frontend/mame/ui/selgame.cpp:1074
 #, c-format
@@ -2986,7 +2986,7 @@ msgstr "Remover dos Favoritos"
 #, c-format
 msgctxt "menu-main"
 msgid "About %1$s"
-msgstr "Sobre o %s"
+msgstr "Sobre o %1$s"
 
 #: src/frontend/mame/ui/mainmenu.cpp:194
 msgctxt "menu-main"
@@ -3140,7 +3140,7 @@ msgstr "Suportado: Sim"
 
 #: src/frontend/mame/ui/selmenu.cpp:681
 msgid "System is parent"
-msgstr "O software é pai"
+msgstr "O sistema é pai"
 
 #: src/frontend/mame/ui/selmenu.cpp:683 src/frontend/mame/ui/selmenu.cpp:685
 #, c-format
