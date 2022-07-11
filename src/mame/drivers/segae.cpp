@@ -79,7 +79,7 @@ Transformer/Astro Flash 1986
 Riddle of Pythagoras    1986
 Megumi Rescue           1987
 Opa Opa                 1987
-Fantasy Zone 2          1988
+Fantasy Zone 2          1988			// 0xde00=1 is FM-Pac Active
 Tetris                  1988
 
 PCB Layout
@@ -199,7 +199,7 @@ ROMs:
 
 Game                     IC2         IC3         IC4         IC5         IC7
 ---------------------------------------------------------------------------------
-Megumi Rescue*           IC-2        IC-3        IC-4        IC-5        IC-7
+Megumi Rescue            V10.30 IC-2 V10.30 IC-3 V10.30 IC-4 V10.30 IC-5 V10.30 IC-7
 Hang-On Jr.              EPR-7261    EPR-7260    EPR-7259    EPR-7258    EPR-7257B
 Transformer              EPR-7350    EPR-7606    EPR-7348    EPR-7347    EPR-7605
            /Astro Flash  EPR-7350    EPR-7349    EPR-7348    EPR-7347    EPR-7723
@@ -209,13 +209,6 @@ Opa Opa (unencrypted)    EPR-11019   EPR-11020   EPR-11021   EPR-11022   EPR-110
 Opa Opa (encrypted)      EPR-11220   EPR-11221   EPR-11222   EPR-11223   EPR-11224
 Fantasy Zone 2           EPR-11412   EPR-11413   EPR-11414   EPR-11415   EPR-11416
 Tetris                   -           -           EPR-12211   EPR-12212   EPR-12213
-
-* Only one board for Megumi Rescue has been seen (from an eBay auction), ROM labels where in this form:
-
-MEGUMI RESCUE
-IC-7
-(C)1987 SEGA/EXA
-
 
 A System E PCB can run all of the games simply by swapping the EPROMs plus CPU.
 Well, in theory anyway. To run the non-encrypted games, just swap EPROMs and they will work.
@@ -301,17 +294,19 @@ GND  8A 8B GND
 
 
 #include "emu.h"
-#include "includes/segaipt.h"
+#include "segaipt.h"
 
+#include "cpu/z80/mc8123.h"
 #include "cpu/z80/z80.h"
 #include "machine/adc0804.h"
 #include "machine/i8255.h"
-#include "machine/mc8123.h"
 #include "machine/rescap.h"
 #include "machine/segacrp2_device.h"
 #include "machine/upd4701.h"
 #include "video/315_5124.h"
+#include "sound/ymopl.h"
 #include "speaker.h"
+#include "sound/ymopl.h"
 
 
 class systeme_state : public driver_device
@@ -323,6 +318,7 @@ public:
 		m_vdp1(*this, "vdp1"),
 		m_vdp2(*this, "vdp2"),
 		m_ppi(*this, "ppi"),
+		m_ym2413(*this, "ymsnd"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
 		m_maincpu_region(*this, "maincpu"),
 		m_bank1(*this, "bank1"),
@@ -366,6 +362,8 @@ private:
 	required_device<sega315_5124_device> m_vdp1;
 	required_device<sega315_5124_device> m_vdp2;
 	required_device<i8255_device>        m_ppi;
+	//required_device<ym2413_device> 		 m_ym2413;
+	optional_device<ym2413_device>		 m_ym2413;
 
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	required_memory_region m_maincpu_region;
@@ -430,6 +428,8 @@ void systeme_state::io_map(address_map &map)
 	map(0xf3, 0xf3).portr("f3");
 	map(0xf7, 0xf7).w(FUNC(systeme_state::bank_write));
 	map(0xf8, 0xfb).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
+
+	map(0xf0, 0xf1).w(m_ym2413,FUNC(ym2413_device::write));
 }
 
 
@@ -856,6 +856,22 @@ static INPUT_PORTS_START( ridleofp ) /* Used By Riddle Of Pythagoras */
 	//"SW2:8" unused
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( megrescu )
+	PORT_INCLUDE( segae_ridleofp_generic )
+
+	PORT_MODIFY("e0")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_START2 )
+
+	PORT_MODIFY("f3")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x00, "Cheat" ) // unlimited?
+	PORT_DIPSETTING(    0x0c, "2" )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPNAME(0x10, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(   0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(   0x10, DEF_STR( Cocktail ) )
+INPUT_PORTS_END
 
 uint32_t systeme_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -909,6 +925,8 @@ void systeme_state::systeme(machine_config &config)
 	m_vdp2->n_int().set_inputline(m_maincpu, 0);
 	m_vdp2->set_addrmap(0, &systeme_state::vdp2_map);
 	m_vdp2->add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	YM2413(config, m_ym2413, XTAL(10'738'635)/2).add_route(ALL_OUTPUTS, "mono", 1.8);
 }
 
 void systeme_state::hangonjr(machine_config &config)
@@ -983,6 +1001,9 @@ void systeme_state::init_opaopa()
 void systeme_state::init_fantzn2()
 {
 	downcast<mc8123_device &>(*m_maincpu).decode(m_maincpu_region->base(), m_decrypted_opcodes, 0x8000);
+
+	if (m_ym2413)
+		m_ym2413->reset();
 }
 
 
@@ -1128,6 +1149,30 @@ ROM_START( astrofl )
 	ROM_LOAD( "epr-7350.ic2",   0x28000, 0x08000, CRC(0052165d) SHA1(cf4b5dffa54238e513515b3fc90faa7ce0b65d34) )
 ROM_END
 
+//*************************************************************************************************************************
+//  Megumi Rescue
+//   Game ID# 833-6200
+//
+//   ROMs have no SEGA EPR codes but are all marked
+//
+//        Megumi Rescue
+//           V10.30
+//        Final Version
+//            IC-x
+//       (c)1987SEGA/EXA
+//
+//   (where -x is the IC position on the PCB)
+
+ROM_START( megrescu )
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "v10_30ic.7",   0x00000, 0x08000, CRC(490d0059) SHA1(de4e23eb862ef3c29b2fbdceba14360eb6e2a8ef) ) /* Fixed Code */
+
+	ROM_LOAD( "v10_30ic.5",   0x10000, 0x08000, CRC(278caba8) SHA1(809e504f6c680f742f0a5968d6bb16c2f67f851c) )
+	ROM_LOAD( "v10_30ic.4",   0x18000, 0x08000, CRC(bda242d1) SHA1(3704da98fe91d9e7f4380ea5e1f897b6b7049466) )
+	ROM_LOAD( "v10_30ic.3",   0x20000, 0x08000, CRC(56e36f85) SHA1(84aa78bc628bce64b1b990a8c9fcca25e5940bd3) )
+	ROM_LOAD( "v10_30ic.2",   0x28000, 0x08000, CRC(5b74c767) SHA1(dbc82a4e046f01130c72bbd7a81190d7f0ca209c) )
+ROM_END
+
 
 //    YEAR, NAME,     PARENT,   MACHINE,           INPUT,    STATE          INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
 GAME( 1985, hangonjr, 0,        hangonjr,          hangonjr, systeme_state, empty_init,    ROT0,   "Sega", "Hang-On Jr. (Rev. B)", MACHINE_SUPPORTS_SAVE )
@@ -1139,3 +1184,4 @@ GAME( 1987, opaopa,   0,        systemeb,          opaopa,   systeme_state, init
 GAME( 1987, opaopan,  opaopa,   systeme,           opaopa,   systeme_state, empty_init,    ROT0,   "Sega", "Opa Opa (Rev A, unprotected)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, fantzn2,  0,        systemex,          fantzn2,  systeme_state, init_fantzn2,  ROT0,   "Sega", "Fantasy Zone II - The Tears of Opa-Opa (MC-8123, 317-0057)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, tetrisse, 0,        systeme,           tetrisse, systeme_state, empty_init,    ROT0,   "Sega", "Tetris (Japan, System E)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, megrescu, 0,        ridleofp,          megrescu, systeme_state, empty_init,    ROT90,  "Sega / Exa", "Megumi Rescue", MACHINE_SUPPORTS_SAVE )
