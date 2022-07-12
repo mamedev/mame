@@ -1635,8 +1635,9 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX2623" />
 		<info name="programmer" value="Warren Robinett" />
+		<sharedfeat name="joyport1_default" value="keypad" />
+		<sharedfeat name="joyport2_default" value="keypad" />
 		<part name="cart" interface="a2600_cart">
-			<feature name="peripheral" value="keypad" />
 			<dataarea name="rom" size="4096">
 				<rom name="basic programming.bin" size="4096" crc="26a3c844" sha1="6c56fad688b2e9bb783f8a5a2360c80ad2338e47"/>
 			</dataarea>
@@ -1649,8 +1650,9 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<publisher>Telegames</publisher>
 		<info name="serial" value="CX2620" />
 		<info name="programmer" value="Warren Robinett" />
+		<sharedfeat name="joyport1_default" value="keypad" />
+		<sharedfeat name="joyport2_default" value="keypad" />
 		<part name="cart" interface="a2600_cart">
-			<feature name="peripheral" value="keypad" />
 			<dataarea name="rom" size="4096">
 				<rom name="basic programming (pal).bin" size="4096" crc="c207f43e" sha1="ff4da01319153a2bde2d2cb1bb1dd900ae105e9a"/>
 			</dataarea>
@@ -2694,6 +2696,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Brain Games</description>
 		<year>1978</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="keypad" />
+		<sharedfeat name="joyport2_default" value="keypad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="brain games (keyboard controller) (1978) (atari, larry kaplan - sears) (cx2664 - 6-99818).bin" size="2048" crc="150709c2" sha1="238915cafd26f69bc8a3b9aa7d880dde59f6f12d"/>
@@ -2705,6 +2709,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Brain Games (PAL)</description>
 		<year>1978</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="keypad" />
+		<sharedfeat name="joyport2_default" value="keypad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="brain games (keyboard controller) (1978) (atari, larry kaplan) (cx2664, cx2664p) (pal).bin" size="2048" crc="ea630e68" sha1="7b9d9ac288ea1fda8e8cbbde75e84b4e2ed37a5e"/>
@@ -3615,6 +3621,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Codebreaker - Code Breaker</description>
 		<year>1978</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="keypad" />
+		<sharedfeat name="joyport2_default" value="keypad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="codebreaker - code breaker (numbers) (keyboard controller) (1978) (atari, larry kaplan - sears) (cx2643 - 6-99815).bin" size="2048" crc="947edb18" sha1="137bd3d3f36e2549c6e1cc3a60f2a7574f767775"/>
@@ -3626,6 +3634,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Codebreaker (PAL)</description>
 		<year>1978</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="keypad" />
+		<sharedfeat name="joyport2_default" value="keypad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="codebreaker (numbers) (keyboard controller) (1978) (atari, larry kaplan) (cx2643) (pal).bin" size="2048" crc="b1cb7cdc" sha1="0252bb61f8ca0462cc57a273d575c4bcdb5a95f2"/>
@@ -7519,6 +7529,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Hunt &amp; Score - Memory Match</description>
 		<year>1978</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="keypad" />
+		<sharedfeat name="joyport2_default" value="keypad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="hunt &amp; score - memory match (keyboard controller) (1978) (atari, alan miller - sears) (cx2642 - 6-99814).bin" size="2048" crc="17de8070" sha1="a6e42c63138a2fd527cdbe9b7e60f5feabdd55c8"/>
@@ -7530,6 +7542,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Hunt &amp; Score (PAL)</description>
 		<year>1978</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="keypad" />
+		<sharedfeat name="joyport2_default" value="keypad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="hunt &amp; score (keyboard controller) (1978) (atari, alan miller) (cx2642) (pal).bin" size="2048" crc="403b0d89" sha1="564ba5e3a70bd76dd7902fd9ee43b67429dea29c"/>
@@ -8895,6 +8909,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>MagiCard</description>
 		<year>1981</year>
 		<publisher>CommaVid</publisher>
+		<sharedfeat name="joyport1_default" value="keypad" />
+		<sharedfeat name="joyport2_default" value="keypad" />
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_cv" />
 			<dataarea name="rom" size="2048">
