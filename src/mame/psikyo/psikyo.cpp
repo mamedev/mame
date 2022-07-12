@@ -1778,8 +1778,8 @@ ROM_START( tengai )
 	ROM_REGION( 0x001000, "mcu", 0 )       // MCU, not hooked up
 	/* PIC configuration:
 	     -User ID: 37EA
-	     -Watchdog Timer: ENABLE
-	     -Oscilator Mode: RC
+	     -Watchdog Timer: unknown
+	     -Oscilator Mode: probably XT (unconfirmed)
 	*/
 	ROM_LOAD( "4.u59", 0x00000, 0x01000, CRC(e563b054) SHA1(7593389d35851a71a8af2e094ec7e55cd818743a) )
 
@@ -1811,8 +1811,8 @@ ROM_START( tengaij )
 	ROM_REGION( 0x001000, "mcu", 0 )       // MCU, not hooked up
 	/* PIC configuration:
 	     -User ID: 37EA
-	     -Watchdog Timer: ENABLE
-	     -Oscilator Mode: RC
+	     -Watchdog Timer: unknown
+	     -Oscilator Mode: probably XT (unconfirmed)
 	*/
 	ROM_LOAD( "4.u59", 0x00000, 0x01000, CRC(e563b054) SHA1(7593389d35851a71a8af2e094ec7e55cd818743a) ) // From a World PCB
 
