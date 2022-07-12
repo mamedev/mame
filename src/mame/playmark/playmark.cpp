@@ -1257,7 +1257,7 @@ void playmark_state::hrdtimes(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(playmark_state::irq6_line_hold));
 
 	PIC16C57(config, m_audio_pic, XTAL(24'000'000)/2);    // verified on pcb
-	m_audio_pic->write_a().set(FUNC(playmark_state::playmark_oki_banking_w));
+	m_audio_pic->write_a().set(FUNC(playmark_state::playmark_oki_banking_w)); // Banking data output but not wired. Port C is wired to the OKI banking instead
 	m_audio_pic->read_b().set(FUNC(playmark_state::playmark_snd_command_r));
 	m_audio_pic->write_b().set(FUNC(playmark_state::playmark_oki_w));
 	m_audio_pic->read_c().set(FUNC(playmark_state::playmark_snd_flag_r));
