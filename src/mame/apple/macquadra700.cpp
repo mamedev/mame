@@ -36,9 +36,9 @@
 
 #include "formats/ap_dsk35.h"
 
-#define C7M (7833600)
-#define C15M (C7M*2)
-#define C32M (C15M*2)
+#define C32M 31.3344_MHz_XTAL
+#define C15M (C32M/2)
+#define C7M (C32M/4)
 
 
 namespace {
@@ -945,7 +945,7 @@ void macquadra_state::macqd700(machine_config &config)
 	applefdintf_device::add_35_hd(config, m_floppy[0]);
 	applefdintf_device::add_35_nc(config, m_floppy[1]);
 
-	SCC85C30(config, m_scc, C7M);
+	SCC8530N(config, m_scc, C7M);
 //  m_scc->intrq_callback().set(FUNC(macquadra_state::set_scc_interrupt));
 
 	// SCSI bus and devices
@@ -1003,7 +1003,7 @@ void macquadra_state::macqd700(machine_config &config)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	ASC(config, m_easc, C15M, asc_device::asc_type::EASC);
+	ASC(config, m_easc, 22579200, asc_device::asc_type::EASC);
 //  m_easc->irqf_callback().set(FUNC(macquadra_state::mac_asc_irq));
 	m_easc->add_route(0, "lspeaker", 1.0);
 	m_easc->add_route(1, "rspeaker", 1.0);
