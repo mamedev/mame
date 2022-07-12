@@ -63,7 +63,7 @@ private:
 	required_device<hd61603_device> m_lcd;
 	required_device<pwm_display_device> m_display;
 	required_device<sensorboard_device> m_board;
-	required_device<dac_2bit_binary_weighted_ones_complement_device> m_dac;
+	required_device<dac_2bit_ones_complement_device> m_dac;
 	required_ioport_array<3> m_inputs;
 	output_finder<8> m_out_digit;
 	output_finder<64> m_out_lcd;
@@ -249,7 +249,7 @@ void y532xl_state::y532xl(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.125);
+	DAC_2BIT_ONES_COMPLEMENT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.125);
 }
 
 

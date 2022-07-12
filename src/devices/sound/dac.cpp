@@ -8,7 +8,7 @@
 
     Binary Weighted Resistor Network, R-2R Ladder & PWM
 
-    Binary, Ones Complement, Twos Complement or Sign Magnitude coding
+    Binary, Ones Complement, or Twos Complement coding
 
 ***************************************************************************/
 
@@ -34,8 +34,8 @@ stream_buffer::sample_t dac_mapper_unsigned(u32 input, u8 bits)
 
 
 //-------------------------------------------------
-//  dac_mapper_signed - map a signed value of
-//  the given number of bits to a sample value
+//  dac_mapper_signed - map a signed (2s complement)
+//  value of the given number of bits to a sample value
 //-------------------------------------------------
 
 stream_buffer::sample_t dac_mapper_signed(u32 input, u8 bits)
