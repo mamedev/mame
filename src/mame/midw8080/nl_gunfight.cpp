@@ -201,7 +201,7 @@
 // lower, perhaps 350-600, with an average around 450-500.
 //
 // The high gain of Gun Fight's A-138 transistors causes a "ka-pow" effect in
-// its shot sounds; I explain how later. (Andy Wellburn, in a Discord chat on
+// its shot sounds; I explain how later. (Andy Welburn, in a Discord chat on
 // 2020-06-05, confirmed this effect can be heard in some actual machines. He
 // measured an h_FE of 238 for one A-138 from a Gun Fight sound board, but he
 // warned that for old transistors like this, h_FE measurements can vary a

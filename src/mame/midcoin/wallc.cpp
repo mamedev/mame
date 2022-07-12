@@ -60,6 +60,8 @@ Thanks to HIGHWAYMAN for providing info on how to get to these epoxies
 #include "tilemap.h"
 
 
+namespace {
+
 class wallc_state : public driver_device
 {
 public:
@@ -71,6 +73,7 @@ public:
 	{ }
 
 	void sidampkr(machine_config &config);
+	void sidampkra(machine_config &config);
 	void unkitpkr(machine_config &config);
 	void wallc(machine_config &config);
 	void wallca(machine_config &config);
@@ -549,23 +552,29 @@ void wallc_state::wallca(machine_config &config)
 	m_maincpu->set_clock(12_MHz_XTAL / 4);
 }
 
-void wallc_state::unkitpkr(machine_config &config)
+void wallc_state::sidampkra(machine_config &config)
 {
 	wallc(config);
 	config.device_remove("adc");
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &wallc_state::unkitpkr_map);
 
-	MCFG_VIDEO_START_OVERRIDE(wallc_state, unkitpkr)
 	subdevice<palette_device>("palette")->set_init(FUNC(wallc_state::unkitpkr_palette));
 
 	/* sound hardware */
 	subdevice<ay8912_device>("aysnd")->reset_routes().add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
+void wallc_state::unkitpkr(machine_config &config)
+{
+	sidampkra(config);
+
+	MCFG_VIDEO_START_OVERRIDE(wallc_state, unkitpkr)
+}
+
 void wallc_state::sidampkr(machine_config &config)
 {
-	unkitpkr(config);
+	sidampkra(config);
 
 	MCFG_VIDEO_START_OVERRIDE(wallc_state, sidampkr)
 }
@@ -667,18 +676,40 @@ D7 to cpu
 
 */
 
-ROM_START( sidampkr )
+ROM_START( sidampkr ) // 11600 PCB + small riser PCB with Z80 and PAL (epoxy cover removed but etched 11610 on PCB)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "11600.0",     0x0000, 0x1000, CRC(88cac4d2) SHA1(a369da3dc80671eeff549077cf2ce860d5f4ea35) )
-	ROM_LOAD( "11600.1",     0x1000, 0x1000, CRC(96cca320) SHA1(85326f7126c8250a22f35f6eed138051a9ab35cb) )
+	ROM_LOAD( "11600.0.h6",     0x0000, 0x1000, CRC(88cac4d2) SHA1(a369da3dc80671eeff549077cf2ce860d5f4ea35) )
+	ROM_LOAD( "11600.1.h5",     0x1000, 0x1000, CRC(96cca320) SHA1(85326f7126c8250a22f35f6eed138051a9ab35cb) )
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_LOAD( "11605.b",     0x0800, 0x0800, CRC(a7800f8a) SHA1(3955e0f71ced6fd759f52d12c0b39ab6aab31ca4) )
-	ROM_LOAD( "11605.g",     0x1800, 0x0800, CRC(b7bebf1e) SHA1(764536989ba4c4c143a61d4453c3bba547bc630a) )
-	ROM_LOAD( "11605.r",     0x2800, 0x0800, CRC(4d645b8d) SHA1(d4f8d11c4ef796cf66ebf2e6b8a11247d630951a) )
+	ROM_LOAD( "11605.b.e1",     0x0800, 0x0800, CRC(a7800f8a) SHA1(3955e0f71ced6fd759f52d12c0b39ab6aab31ca4) )
+	ROM_LOAD( "11605.g.e2",     0x1800, 0x0800, CRC(b7bebf1e) SHA1(764536989ba4c4c143a61d4453c3bba547bc630a) )
+	ROM_LOAD( "11605.r.e3",     0x2800, 0x0800, CRC(4d645b8d) SHA1(d4f8d11c4ef796cf66ebf2e6b8a11247d630951a) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "11607-74.288",  0x0000, 0x0020, CRC(e14bf545) SHA1(5e8c5a9ea6e4842f27a47c1d7224ed294bbaa40b) )
+	ROM_LOAD( "11607-74.288.c3",  0x0000, 0x0020, CRC(e14bf545) SHA1(5e8c5a9ea6e4842f27a47c1d7224ed294bbaa40b) )
+
+	ROM_REGION( 0x0104, "plds", 0 ) // probably encryption related
+	ROM_LOAD( "pal16r4anc.sub",  0x0000, 0x0104, NO_DUMP )
+ROM_END
+
+ROM_START( sidampkra ) // 11700B PCB + small riser PCB with Z80 and PAL (with 11610 epoxy cover)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "11704.0.h6",     0x0000, 0x2000, CRC(62a7ff4f) SHA1(66ed12e5ec9da5e97fabf37e971342c0cfbce372) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_LOAD( "11705.b.e1",     0x0800, 0x0800, CRC(50a9a468) SHA1(182a753748296df859f938655e9fa27889d5cd3f) )
+	ROM_LOAD( "11705.g.e2",     0x1800, 0x0800, CRC(d3366b36) SHA1(e1eb148b07a302f2ba66ad196959f019a81145f6) )
+	ROM_LOAD( "11705.r.e3",     0x2800, 0x0800, CRC(d51df283) SHA1(46bd52e156be99db731e6d56ab8241d1c396ab99) )
+
+	ROM_REGION( 0x0040, "proms", ROMREGION_ERASE00 )
+	ROM_LOAD( "11707.c3",         0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "11708.c2",         0x0020, 0x0020, NO_DUMP )
+	ROM_LOAD( "74s288.c2",        0x0000, 0x0020, CRC(83e3e293) SHA1(a98c5e63b688de8d175adb6539e0cdc668f313fd) ) //  using the one from unkitpkr for now
+
+
+	ROM_REGION( 0x0104, "plds", 0 ) // probably encryption related
+	ROM_LOAD( "pal16r4anc.sub",  0x0000, 0x0104, NO_DUMP )
 ROM_END
 
 void wallc_state::init_sidam()
@@ -775,11 +806,14 @@ void wallc_state::init_unkitpkr()
 	save_item(NAME(m_bookkeeping_mode));
 }
 
+} // anonymous namespace
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE        INIT      ROT      COMPANY             FULLNAME                              FLAGS
-GAME( 1984, wallc,    0,      wallc,    wallc,    wallc_state, init_wallc,    ROT0,   "Midcoin",          "Wall Crash (set 1)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1984, wallca,   wallc,  wallca,   wallc,    wallc_state, init_wallca,   ROT0,   "Midcoin",          "Wall Crash (set 2)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1984, brkblast, wallc,  wallc,    wallc,    wallc_state, init_wallca,   ROT0,   "bootleg (Fadesa)", "Brick Blast (bootleg of Wall Crash)", MACHINE_SUPPORTS_SAVE ) // Spanish bootleg board, Fadesa stickers / text on various components
 
-GAME( 1984, sidampkr, 0,      sidampkr, sidampkr, wallc_state, init_sidam,    ROT270, "Sidam",            "unknown Sidam poker",                 MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // colors should be verified
-GAME( 198?, unkitpkr, 0,      unkitpkr, unkitpkr, wallc_state, init_unkitpkr, ROT0,   "<unknown>",        "unknown Italian poker game",          MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT    MACHINE    INPUT     STATE        INIT           ROT     COMPANY             FULLNAME                               FLAGS
+GAME( 1984, wallc,     0,        wallc,     wallc,    wallc_state, init_wallc,    ROT0,   "Midcoin",          "Wall Crash (set 1)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1984, wallca,    wallc,    wallca,    wallc,    wallc_state, init_wallca,   ROT0,   "Midcoin",          "Wall Crash (set 2)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1984, brkblast,  wallc,    wallc,     wallc,    wallc_state, init_wallca,   ROT0,   "bootleg (Fadesa)", "Brick Blast (bootleg of Wall Crash)", MACHINE_SUPPORTS_SAVE ) // Spanish bootleg board, Fadesa stickers / text on various components
+
+GAME( 1984, sidampkr,  0,        sidampkr,  sidampkr, wallc_state, init_sidam,    ROT270, "Sidam",            "unknown Sidam poker (vertical)",      MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // colors should be verified
+GAME( 1984, sidampkra, sidampkr, sidampkra, sidampkr, wallc_state, init_sidam,    ROT0,   "Sidam",            "unknown Sidam poker (horizontal)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // colors should be verified, cards GFX look wrong
+GAME( 198?, unkitpkr,  0,        unkitpkr,  unkitpkr, wallc_state, init_unkitpkr, ROT0,   "<unknown>",        "unknown Italian poker game",          MACHINE_SUPPORTS_SAVE )

@@ -124,10 +124,50 @@ Notes:
 Remaining 315-xxxx chips are SEGA custom chips
 
 
+Drive Board
+-----------
+This board is used to control the feedback motors on the deluxe moving cabinet.
+
+837-6565 (printed on PCB)
+839-0123 (sticker on top of the above number)
+REV A (sticker)
+|------------------------------------|
+|CN3 CN4    CN1           CN2        |
+|PS2501 SW1                   ADC0804|
+|                                 CN5|
+|                                    |
+|               PAL  PAL      8255   |
+|CN6                                 |
+|MB3773        4MHz                  |
+|D71054 MB8464                    CN7|
+|D71054 EPR-11???.IC27 Z80A          |
+|------------------------------------|
+Notes:
+        D71054 - NEC D71054 Programmable Timer/Counter
+        MB8464 - Fujitsu MB8464 8kBx8-bit SRAM
+EPR-11???.IC27 - 27C256 EPROM (Z80 program)
+          Z80A - NEC D780C-1 Z80A CPU. Clock input 4.000MHz
+          8255 - NEC D8255AC-2 Programmable Peripheral Interface (PPI)
+       ADC0804 - National ADC0804 8-Bit Microprocessor-Compatible Analog-to-Digital Converter
+           PAL - AMPAL16R4, both marked 315-5331
+        MB3773 - Fujitsu MB3773 Master Reset and Watchdog IC
+           SW1 - 4 position DIP Switch, all set OFF
+                 This is used to select the type of drive motor...
+                 Motor 350-5133 - OFF OFF OFF OFF
+                 Motor 350-5134 - ON  OFF OFF OFF
+           CN1 - 26-pin connector for limit switches, sensor, bank and vibration motor switches
+           CN2 - 34-pin connector for feedback from the 5k bank pot. Only 2 wires are used. Also joins to main board via 839-0211 FILTER BD
+           CN3 - 10-pin connector joining to the FET driver and FET driver mini boards. These boards power the cabinet motion 110V motors.
+           CN4 - 4-pin connector (not used)
+           CN5 - 10-pin connector for power input (5V / GND)
+           CN6 - 50-pin connector (not used)
+           CN7 - 26-pin connector joining to connector CNE on the main game board (possibly for main board<>drive board communication?)
+
+
 Network Board (used for Power Drift: Link Version)
 -------------
 
-Board: 834-6740
+834-6740
 |-------------| |-| |--------|---|-|
 | _ 315-5336  RX  TX          CNC  |
 ||C|                               |
@@ -136,23 +176,22 @@ Board: 834-6740
 ||_|                      315-5337 |
 |    SW1     LED   16MHz     Z80E  |
 |----------------------------------|
-
 Notes:
-      PALs      : 315-5337, 315-5336, both PAL16L8
-      Z80 clock : 8.000MHz [16/2]
-      5563      : Toshiba TC5563APL-12L 8k x 8 SRAM
-      MB8421    : Fujitsu 2k x 8 Dual-Port SRAM (SDIP52)
-      MB89372   : Fujitsu Multi-Protocol Controller
-      EPR-12028 : 27C256 EPROM
-      CNA       : 50 Pin connector to main board
-      CNC       : 10 pin connector
-      SW1       : Dipswitch block, 8 switches
-
-MB89372 - Uses 3 serial data transfer protocols: ASYNC, COP & BOP. Has a built
-          in DMA controller and Interrupt controller to handle interrupts
-          from the serial interface unit (SIU) & DMA controller (DMAC)
+     PALs - 315-5337, 315-5336, both PAL16L8
+      Z80 - Clock 8.000MHz [16/2]
+     5563 - Toshiba TC5563APL-12L 8kBx8-bit SRAM
+   MB8421 - Fujitsu 2kBx8-bit Dual-Port SRAM (SDIP52)
+  MB89372 - Fujitsu Multi-Protocol Controller
+            Uses 3 serial data transfer protocols: ASYNC, COP & BOP. Has a built
+            in DMA controller and Interrupt controller to handle interrupts
+            from the serial interface unit (SIU) & DMA controller (DMAC)
+EPR-12028 - 27C256 EPROM
+      CNA - 50 Pin connector joining to main board
+      CNC - 10 pin connector
+      SW1 - 8-position DIP switch
 
 ***************************************************************************/
+
 
 #include "emu.h"
 #include "segaybd.h"
@@ -2142,7 +2181,7 @@ ROM_START( pdrift )
 	ROM_LOAD16_BYTE( "epr-12018a.53", 0x000001, 0x20000, CRC(1c582e1f) SHA1(c32d2f921554bddd7dedcb81e231aa91f50fa27b) )
 
 	ROM_REGION( 0x08000, "drive_board", 0 )
-	ROM_LOAD( "epr-11485.ic37",  0x00000, 0x08000, NO_DUMP )
+	ROM_LOAD( "epr-11485.ic27",  0x00000, 0x08000, CRC(069b4201) SHA1(7a9a87aef17cb65bc5b03ca9dea4d2d5cdda228a) ) // handwritten label, not confirmed it is actually epr-11485 but the real board works correctly
 
 	ROM_REGION16_BE( 0x080000, "bsprites", 0 )
 	ROM_LOAD16_BYTE( "epr-11789.16",  0x000000, 0x20000, CRC(b86f8d2b) SHA1(a053f2021841fd0ef89fd3f28050a698b36c435e) )
@@ -2228,7 +2267,7 @@ ROM_START( pdrifta )
 	ROM_LOAD16_BYTE( "epr-12018.53", 0x000001, 0x20000, CRC(0a3f7faf) SHA1(fe20a164a7a2c9e9bf0e7aade75b0488bdc93d79) )
 
 	ROM_REGION( 0x08000, "drive_board", 0 )
-	ROM_LOAD( "epr-11485.ic37",  0x00000, 0x08000, NO_DUMP )
+	ROM_LOAD( "epr-11485.ic27",  0x00000, 0x08000, CRC(069b4201) SHA1(7a9a87aef17cb65bc5b03ca9dea4d2d5cdda228a) ) // handwritten label, not confirmed it is actually epr-11485 but the real board works correctly
 
 	ROM_REGION16_BE( 0x080000, "bsprites", 0 )
 	ROM_LOAD16_BYTE( "epr-11789.16",  0x000000, 0x20000, CRC(b86f8d2b) SHA1(a053f2021841fd0ef89fd3f28050a698b36c435e) )
@@ -2315,7 +2354,7 @@ ROM_START( pdrifte )
 	ROM_LOAD16_BYTE( "epr-11902.53",  0x000001, 0x20000, CRC(e8028e08) SHA1(de4ee5011e9552e624b6223e0e1ef00bc271a811) )
 
 	ROM_REGION( 0x08000, "drive_board", 0 )
-	ROM_LOAD( "epr-11485.ic37",  0x00000, 0x08000, NO_DUMP )
+	ROM_LOAD( "epr-11485.ic27",  0x00000, 0x08000, CRC(069b4201) SHA1(7a9a87aef17cb65bc5b03ca9dea4d2d5cdda228a) ) // handwritten label, not confirmed it is actually epr-11485 but the real board works correctly
 
 	ROM_REGION16_BE( 0x080000, "bsprites", 0 )
 	ROM_LOAD16_BYTE( "epr-11789.16",  0x000000, 0x20000, CRC(b86f8d2b) SHA1(a053f2021841fd0ef89fd3f28050a698b36c435e) )
@@ -2405,7 +2444,7 @@ ROM_START( pdriftj )
 	ROM_LOAD16_BYTE( "epr-11749b.53", 0x000001, 0x20000, CRC(9e385568) SHA1(74e22eaed645cc80b1eb0c52912186066e58b9d2) )
 
 	ROM_REGION( 0x08000, "drive_board", 0 )
-	ROM_LOAD( "epr-11485.ic37",  0x00000, 0x08000, NO_DUMP )
+	ROM_LOAD( "epr-11485.ic27",  0x00000, 0x08000, CRC(069b4201) SHA1(7a9a87aef17cb65bc5b03ca9dea4d2d5cdda228a) ) // handwritten label, not confirmed it is actually epr-11485 but the real board works correctly
 
 	ROM_REGION16_BE( 0x080000, "bsprites", 0 )
 	ROM_LOAD16_BYTE( "epr-11789.16",  0x000000, 0x20000, CRC(b86f8d2b) SHA1(a053f2021841fd0ef89fd3f28050a698b36c435e) )
@@ -2490,7 +2529,7 @@ ROM_START(pdriftl)
 	ROM_LOAD16_BYTE("epr-12108.53", 0x000001, 0x20000, CRC(a3a56771) SHA1(f41d466f31a1b833d21a7011314c48d5056409eb) )
 
 	ROM_REGION( 0x08000, "drive_board", 0 )
-	ROM_LOAD( "epr-11485.ic37",  0x00000, 0x08000, NO_DUMP )
+	ROM_LOAD( "epr-11485.ic27",  0x00000, 0x08000, CRC(069b4201) SHA1(7a9a87aef17cb65bc5b03ca9dea4d2d5cdda228a) ) // handwritten label, not confirmed it is actually epr-11485 but the real board works correctly
 
 	ROM_REGION16_BE(0x080000, "bsprites", 0)
 	ROM_LOAD16_BYTE("epr-12114.16", 0x000000, 0x20000, CRC(8b07e8eb) SHA1(22a4aff968d6de52372b7b2b5322d353f7b835ef) )
