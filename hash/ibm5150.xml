@@ -1264,7 +1264,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="kingqst" supported="no">
-		<description>King's Quest (PC Booter realease, cracked)</description>
+		<description>King's Quest (PC Booter release, cracked)</description>
 		<year>1984</year>
 		<publisher>IBM</publisher>
 		<info name="developer" value="Sierra On-Line" />
@@ -15816,7 +15816,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="tempdeat">
-		<description>Temple of Death (PC Disk Quaterly #9)</description>
+		<description>Temple of Death (PC Disk Quarterly #9)</description>
 		<year>1991</year>
 		<publisher>I.B. Mafazette</publisher>
 		<part name="flop1" interface="floppy_5_25">
