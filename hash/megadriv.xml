@@ -24804,6 +24804,23 @@ Red screen
 	</software>
 
 	<software name="roadriot">
+		<description>Road Riot 4WD (prototype, 19930719)</description>
+		<year>1993</year>
+		<publisher>Tengen</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5694-01"/>
+			<feature name="ic1" value="D27C020-150V10"/>
+			<feature name="ic2" value="D27C020-150V10"/>
+			<feature name="ic3" value="D27C020-150V10"/>
+			<feature name="ic4" value="D27C020-150V10"/>
+			<feature name="ic5" value="PC74HC139P"/>
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="road riot 4wd (unreleased prototype, 7-19-1993 build).bin" size="1048576" crc="98e49e68" sha1="35dde53932ed6b6086c1416d45d95e772a8725dd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="roadriota" cloneof="roadriot">
 		<description>Road Riot 4WD (prototype)</description>
 		<year>1992?</year>
 		<publisher>Tengen</publisher>
@@ -27414,13 +27431,34 @@ $040000-$0fffff, $280000-$2fffff, $380000-$3fffff - junk copies of above
 		</part>
 	</software>
 
-	<software name="steeltalp"   cloneof="steeltal">
+	<software name="steeltalp" cloneof="steeltal" supported="no">
 		<description>Steel Talons (USA, prototype)</description>
 		<year>1992</year>
 		<publisher>Tengen</publisher>
+		<notes><![CDATA[
+Freezes at the start of any in-game mode
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="steel talons (usa) (beta).bin" size="524288" crc="c4052f18" sha1="c3edd1f6b9f4fb16104d09c17b66feebb3785f4e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="steeltalp1" cloneof="steeltal" supported="no">
+		<description>Steel Talons (USA, prototype, 199206xx)</description>
+		<year>1992</year>
+		<publisher>Tengen</publisher>
+		<notes><![CDATA[
+Freezes at the start of any in-game mode
+]]></notes>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5694-01"/>
+			<feature name="ic1" value="D27C020-150V10"/>
+			<feature name="ic2" value="D27C020-150V10"/>
+			<feature name="ic5" value="PC74HC139P"/>
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="steel talons (beta 06, 1992).bin" size="524288" crc="163d3b4b" sha1="90ee0e176f47882c6bcc0a7ee44f0f4baab3d78e"/>
 			</dataarea>
 		</part>
 	</software>
