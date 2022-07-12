@@ -44,7 +44,6 @@ using dac_mapper_callback = stream_buffer::sample_t (*)(u32 input, u8 bits);
 stream_buffer::sample_t dac_mapper_unsigned(u32 input, u8 bits);
 stream_buffer::sample_t dac_mapper_signed(u32 input, u8 bits);
 stream_buffer::sample_t dac_mapper_ones_complement(u32 input, u8 bits);
-stream_buffer::sample_t dac_mapper_sign_magnitude(u32 input, u8 bits);
 
 
 // ======================> dac_bit_interface
@@ -239,7 +238,6 @@ DAC_GENERATOR(DAC_16BIT_R2R_TWOS_COMPLEMENT, dac_16bit_r2r_twos_complement_devic
 
 // special odd cases -- are these real?
 DAC_GENERATOR(DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT, dac_2bit_binary_weighted_ones_complement_device, dac_byte_device_base, dac_mapper_ones_complement, 2, dac_gain_bw, "2-Bit Binary Weighted Ones Complement DAC", "dac_2bit_bw_oc")
-DAC_GENERATOR(DAC_4BIT_BINARY_WEIGHTED_SIGN_MAGNITUDE,  dac_4bit_binary_weighted_sign_magnitude_device,  dac_byte_device_base, dac_mapper_sign_magnitude,  4, dac_gain_bw, "4-Bit Binary Weighted Sign Magnitude DAC",  "dac_4bit_bw_sm")
 
 
 #undef DAC_GENERATOR

@@ -62,23 +62,6 @@ stream_buffer::sample_t dac_mapper_ones_complement(u32 input, u8 bits)
 
 
 //-------------------------------------------------
-//  dac_mapper_ones_complement - map a value where
-//  the top bit is a sign bit and the lower bits
-//  are absolute magnitude
-//-------------------------------------------------
-
-stream_buffer::sample_t dac_mapper_sign_magnitude(u32 input, u8 bits)
-{
-	// this mapping assumes symmetric reference voltages,
-	// which is true for all existing cases
-	if (BIT(input, bits - 1))
-		return 0.5 - 0.5 * dac_mapper_unsigned(input, bits - 1);
-	else
-		return 0.5 + 0.5 * dac_mapper_unsigned(input, bits - 1);
-}
-
-
-//-------------------------------------------------
 //  dac_device_base - constructor
 //-------------------------------------------------
 
