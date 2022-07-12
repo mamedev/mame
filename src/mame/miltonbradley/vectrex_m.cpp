@@ -50,7 +50,7 @@ TIMER_CALLBACK_MEMBER(vectrex_base_state::update_analog)
 {
 	update_vector();
 	if (param & 0x100)
-		m_analog[param&0xff] = param>>9;
+		m_analog[param&0xff] = param >> 9;
 	else
 		m_analog[param] = m_via_out[PORTA];
 }
