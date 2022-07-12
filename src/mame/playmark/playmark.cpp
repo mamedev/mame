@@ -1624,8 +1624,8 @@ ROM_START( hrdtimes ) // PCB marked Hard Times 28-06-94
 	ROM_REGION( 0x1000, "audiopic", ROMREGION_ERASE00 ) // sound (PIC16C57)
 	/* PIC configuration:
 	     -User ID: 0794
-	     -Watchdog Timer: ENABLE
-	     -Oscilator Mode: RC
+	     -Watchdog Timer: unknown
+	     -Oscilator Mode: probably XT (unconfirmed)
 	*/
 	ROM_LOAD( "pic16c57.bin", 0x0000, 0x1000, CRC(db307198) SHA1(21e98a69e673f6d48eb48239b4c51f6e7aa19a66) )
 
@@ -1656,8 +1656,8 @@ ROM_START( hrdtimesa )
 	ROM_REGION( 0x1000, "audiopic", ROMREGION_ERASE00 ) // sound (PIC16C57)
 	/* PIC configuration:
 	     -User ID: 0794
-	     -Watchdog Timer: ENABLE
-	     -Oscilator Mode: RC
+	     -Watchdog Timer: unknown
+	     -Oscilator Mode: probably XT (unconfirmed)
 	*/
 	ROM_LOAD( "pic16c57.bin", 0x0000, 0x1000, CRC(db307198) SHA1(21e98a69e673f6d48eb48239b4c51f6e7aa19a66) )
 
