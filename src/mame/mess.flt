@@ -140,6 +140,7 @@ chess/conic_cchess2.cpp
 chess/conic_cchess3.cpp
 chess/regence.cpp
 chess/tasc.cpp
+chess/yeno_532xl.cpp
 chromatics/cgc7900.cpp
 citoh/cit101.cpp
 citoh/cit101xl.cpp

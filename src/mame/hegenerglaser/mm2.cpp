@@ -66,9 +66,8 @@ $8000-$FFF ROM
 For rebel5 and newer, the chess engine is by Ed Schröder. Older chesscomputers in
 this driver were authored by Ulf Rathsman.
 
-The MM II program was also licensed to Daimler-Benz, who manufactured several custom
-chesscomputers as a parting gift to retiring executives. The hardware seems identical to
-MM II, except on one of them it looks like an 8MHz XTAL was used instead of 7.3728MHz.
+The MM II program was also licensed to Daimler-Benz, who gave away several custom
+chesscomputers as a parting gift to retiring executives. The hardware is same as MM II.
 see(1): http://chesseval.com/ChessEvalJournal/DaimlerBenz.htm
 see(2): http://chesseval.com/RareBoard/DaimlerBenzBoard.htm
 

@@ -3,7 +3,7 @@
 // thanks-to:Sean Riddle
 /***************************************************************************
 
-  ** subclass of hh_tms1k_state (includes/hh_tms1k.h, drivers/hh_tms1k.cpp) **
+  ** subclass of hh_tms1k_state (hh_tms1k.h, hh_tms1k.cpp) **
 
   Texas Instruments Spelling B hardware
 
