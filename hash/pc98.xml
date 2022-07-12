@@ -41098,7 +41098,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="sorcerexp4" cloneof="sorcer">
-		<description>Sorcerian Tsuika Scenario 4 - Uchuu Kara no Homonsha</description>
+		<description>Sorcerian Tsuika Scenario 4 - Uchuu kara no Houmonsha</description>
 		<year>1989</year>
 		<publisher>アモルファス (Amorphous)</publisher>
 		<info name="alt_title" value="ソーサリアン 追加シナリオ Ｖｏｌ．４ 宇宙からの訪問者" />
@@ -41112,7 +41112,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="sorcerexp4a" cloneof="sorcer">
-		<description>Sorcerian Tsuika Scenario 4 - Uchuu Kara no Homonsha (Alt)</description>
+		<description>Sorcerian Tsuika Scenario 4 - Uchuu kara no Houmonsha (alt)</description>
 		<year>1989</year>
 		<publisher>アモルファス (Amorphous)</publisher>
 		<info name="alt_title" value="ソーサリアン 追加シナリオ Ｖｏｌ．４ 宇宙からの訪問者" />

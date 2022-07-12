@@ -20958,7 +20958,7 @@ more investigation needed...
 
 	<software name="parodiusj" cloneof="parodius">
 		<!-- Notes: Also re-released through Nintendo Power -->
-		<description>Parodius da! - Shinwa Kara Owarai e (Jpn)</description>
+		<description>Parodius Da! - Shinwa kara Owarai e (Jpn)</description>
 		<year>1992</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="SHVC-PD" />
@@ -28150,7 +28150,7 @@ more investigation needed...
 	</software>
 
 	<software name="supnaxat">
-		<description>Super Naxat Open - Golf de Shoubu da Dorabocchan (Jpn)</description>
+		<description>Super Naxat Open - Golf de Shoubu Da! Dorabocchan (Jpn)</description>
 		<year>1994</year>
 		<publisher>Naxat Soft</publisher>
 		<info name="serial" value="SHVC-XD" />
@@ -38801,7 +38801,7 @@ List of unclassified roms
 	</software>
 
 	<software name="downtown">
-		<description>Downtown Nekketsu Baseball Monogatari - Yakyuu de Shoubu da! Kunio-kun (Jpn)</description>
+		<description>Downtown Nekketsu Baseball Monogatari - Yakyuu de Shoubu Da! Kunio-kun (Jpn)</description>
 		<year>1993</year>
 		<publisher>Technos Japan</publisher>
 		<info name="serial" value="SHVC-NV" />
@@ -39659,7 +39659,7 @@ List of unclassified roms
 	</software>
 
 	<software name="esparks">
-		<description>Esparks - Ijikuu Kara no Raihousha (Jpn)</description>
+		<description>Esparks - Ijikuu kara no Raihousha (Jpn)</description>
 		<year>1995</year>
 		<publisher>Tomy</publisher>
 		<info name="serial" value="SHVC-EP" />
@@ -42072,7 +42072,7 @@ List of unclassified roms
 	</software>
 
 	<software name="gbattlg2">
-		<description>The Great Battle Gaiden 2 - Matsuri da Wasshoi (Jpn)</description>
+		<description>The Great Battle Gaiden 2 - Matsuri Da Wasshoi (Jpn)</description>
 		<year>1994</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="SHVC-K8" />
@@ -42819,7 +42819,7 @@ List of unclassified roms
 	</software>
 
 	<software name="herakl4">
-		<description>Herakles no Eikou IV - Kamigami Kara no Okurimono (Jpn)</description>
+		<description>Herakles no Eikou IV - Kamigami kara no Okurimono (Jpn)</description>
 		<year>1994</year>
 		<publisher>Data East</publisher>
 		<info name="serial" value="SHVC-4E" />
@@ -43753,7 +43753,7 @@ List of unclassified roms
 	</software>
 
 	<software name="inazuma">
-		<description>Inazuma Serve da! Super Beach Volley (Jpn)</description>
+		<description>Inazuma Serve Da! Super Beach Volley (Jpn)</description>
 		<year>1995</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="SHVC-AV7J-JPN" />
@@ -46607,12 +46607,12 @@ List of unclassified roms
 	</software>
 
 	<software name="ladystal">
-		<description>Lady Stalker - Kako Kara no Chousen (Jpn)</description>
+		<description>Lady Stalker - Kako kara no Chousen (Jpn)</description>
 		<year>1995</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="SHVC-ALSJ-JPN" />
 		<info name="release" value="19950401" />
-		<info name="alt_title" value="レディストーカー ~過去からの挑 戦~" />
+		<info name="alt_title" value="レディストーカー ~過去からの挑戦~" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="2621440">
@@ -60941,12 +60941,12 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="superzug">
-		<description>Super Zugan - Hakotenjou Kara no Shoutaijou (Jpn)</description>
+		<description>Super Zugan - Hakotenjou kara no Shoutaijou (Jpn)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts Victor</publisher>
 		<info name="serial" value="SHVC-ZU" />
 		<info name="release" value="19940211" />
-		<info name="alt_title" value="スーパーヅガン ―ハコテン 城からの招待状―" />
+		<info name="alt_title" value="スーパーヅガン ―ハコテン城からの招待状―" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="1048576">
@@ -65671,12 +65671,12 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="zenprowf">
-		<description>Zen-Nihon Pro Wres - Fight da Pon! (Jpn)</description>
+		<description>Zen-Nihon Pro Wres - Fight Da Pon! (Jpn)</description>
 		<year>1994</year>
 		<publisher>Masaya</publisher>
 		<info name="serial" value="SHVC-JF" />
 		<info name="release" value="19940625" />
-		<info name="alt_title" value="全日本プロレス ファイト だポン!" />
+		<info name="alt_title" value="全日本プロレス ファイトだポン!" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="1048576">
@@ -65824,12 +65824,12 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="zigzag">
-		<description>Zig Zag Cat - Dachou Club mo Oosawagi da (Jpn)</description>
+		<description>Zig Zag Cat - Dachou Club mo Oosawagi Da (Jpn)</description>
 		<year>1994</year>
 		<publisher>Den'Z</publisher>
 		<info name="serial" value="SHVC-ZP" />
 		<info name="release" value="19940624" />
-		<info name="alt_title" value="ジグザグキャットダチョウ倶楽 部も大騒ぎタ" />
+		<info name="alt_title" value="ジグザグキャットダチョウ倶楽 部も大騒ぎダ" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="1572864">

@@ -27,9 +27,9 @@ license:CC0
     NOTE: there appears to be a problem with the either the 'REDUMP.ORG' images, or the emulation / cuesheet
     handling.  The REDUMP.ORG images appear to have each data track as 2 seconds longer causing an additional
     2 second offset in the cuesheet for each data track, furthermore they refuse to boot simply throwing a
-    'read error' in MESS/MAME.  Is this some kind of protection on the original discs, or just errors in the way
+    'read error' in MAME.  Is this some kind of protection on the original discs, or just errors in the way
     various PC software and/or emulators handle them?  There are multiple second audio offset issues with
-    several games in MESS/MAME which could be related.
+    several games in MAME which could be related.
 
     TODO:
     - Fix sharedfeat for Arcade Card (ACD) games, once that we split implementation from scdsys;
@@ -3268,7 +3268,7 @@ license:CC0
 	</software>
 
 	<software name="mamonoht">
-		<description>Mamono Hunter Youko - Makai Kara no Tenkousei (CD)(Jpn)</description>
+		<description>Mamono Hunter Youko - Makai kara no Tenkousei (CD)(Jpn)</description>
 		<year>1992</year>
 		<publisher>NCS</publisher>
 		<info name="serial" value="NSCD2011"/>
