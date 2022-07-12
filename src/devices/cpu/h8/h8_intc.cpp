@@ -205,13 +205,18 @@ gt913_intc_device::gt913_intc_device(const machine_config &mconfig, const char *
 	irq_vector_base = 4;
 	irq_vector_count = 1;
 	irq_vector_nmi = 3;
-
-	ier = 0x01;
 }
 
 gt913_intc_device::gt913_intc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	h8_intc_device(mconfig, type, tag, owner, clock)
 {
+}
+
+void gt913_intc_device::device_reset()
+{
+	h8_intc_device::device_reset();
+
+	ier = 0x01;
 }
 
 void gt913_intc_device::clear_interrupt(int vector)
