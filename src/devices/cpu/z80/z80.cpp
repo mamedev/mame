@@ -648,8 +648,7 @@ z80_device::ops_type z80_device::jr_cond(u8 opcode)
 			CC(ex, opcode);  } MN
 			jr()
 		DOELSE
-			arg()	         FN {
-			WZ=TDAT8;        }
+			arg()
 		EDO EST
 }
 
@@ -2762,8 +2761,8 @@ void z80_device::init_op_steps() {
 /* DB   ED         */ OP(ED,3e) { illegal_2();                                     } EOP
 /* DB   ED         */ OP(ED,3f) { illegal_2();                                     } EOP
 
-/* IN   B,(C)      */ OP(ED,40) { TADR=BC; } MN in() FN { B = TDAT8; F = (F & CF) | SZP[B]; } EOP
-/* OUT  (C),B      */ OP(ED,41) { TADR=BC; TDAT8=B; } MN out()                       EOP
+/* IN   B,(C)      */ OP(ED,40) { TADR=BC; } MN in() FN { B = TDAT8; F = (F & CF) | SZP[B]; WZ = TADR + 1; } EOP
+/* OUT  (C),B      */ OP(ED,41) { TADR=BC; TDAT8=B; } MN out() FN { WZ = TADR + 1; } EOP
 /* SBC  HL,BC      */ OP(ED,42) { TDAT=BC; } MN sbc_hl()                             EOP
 /* LD   (w),BC     */ OP_M(ED,43) arg16() FN { m_ea=TDAT; TADR=m_ea; TDAT=BC; } MN wm16() FN { WZ = m_ea + 1; } EOP
 /* NEG             */ OP(ED,44) { neg();                                           } EOP
@@ -2771,8 +2770,8 @@ void z80_device::init_op_steps() {
 /* IM   0          */ OP(ED,46) { m_im = 0;                                        } EOP
 /* LD   i,A        */ OP_M(ED,47) ld_i_a()                                           EOP
 
-/* IN   C,(C)      */ OP(ED,48) { TADR=BC; } MN in() FN { C = TDAT8; F = (F & CF) | SZP[C]; } EOP
-/* OUT  (C),C      */ OP(ED,49) { TADR=BC; TDAT8=C; } MN out()                       EOP
+/* IN   C,(C)      */ OP(ED,48) { TADR=BC; } MN in() FN { C = TDAT8; F = (F & CF) | SZP[C]; WZ = TADR + 1;} EOP
+/* OUT  (C),C      */ OP(ED,49) { TADR=BC; TDAT8=C; } MN out() FN { WZ = TADR + 1; } EOP
 /* ADC  HL,BC      */ OP(ED,4a) { TDAT=BC; } MN adc_hl()                             EOP
 /* LD   BC,(w)     */ OP_M(ED,4b) arg16() FN { m_ea=TDAT; TADR=m_ea; } MN rm16() FN { BC=TDAT; WZ = m_ea + 1; } EOP
 /* NEG             */ OP(ED,4c) { neg();                                           } EOP
@@ -2780,8 +2779,8 @@ void z80_device::init_op_steps() {
 /* IM   0          */ OP(ED,4e) { m_im = 0;                                        } EOP
 /* LD   r,A        */ OP_M(ED,4f) ld_r_a()                                           EOP
 
-/* IN   D,(C)      */ OP(ED,50) { TADR=BC; } MN in() FN { D = TDAT8; F = (F & CF) | SZP[D]; } EOP
-/* OUT  (C),D      */ OP(ED,51) { TADR=BC; TDAT8=D; } MN out()                       EOP
+/* IN   D,(C)      */ OP(ED,50) { TADR=BC; } MN in() FN { D = TDAT8; F = (F & CF) | SZP[D]; WZ = TADR + 1; } EOP
+/* OUT  (C),D      */ OP(ED,51) { TADR=BC; TDAT8=D; } MN out() FN { WZ = TADR + 1; } EOP
 /* SBC  HL,DE      */ OP(ED,52) { TDAT=DE; } MN sbc_hl()                             EOP
 /* LD   (w),DE     */ OP_M(ED,53) arg16() FN { m_ea=TDAT; TADR=m_ea; TDAT=DE; } MN wm16() FN { WZ = m_ea + 1; } EOP
 /* NEG             */ OP(ED,54) { neg();                                           } EOP
@@ -2789,8 +2788,8 @@ void z80_device::init_op_steps() {
 /* IM   1          */ OP(ED,56) { m_im = 1;                                        } EOP
 /* LD   A,i        */ OP_M(ED,57) ld_a_i()                                           EOP
 
-/* IN   E,(C)      */ OP(ED,58) { TADR=BC; } MN in() FN { E = TDAT8; F = (F & CF) | SZP[E]; } EOP
-/* OUT  (C),E      */ OP(ED,59) { TADR=BC; TDAT8=E; } MN out()                       EOP
+/* IN   E,(C)      */ OP(ED,58) { TADR=BC; } MN in() FN { E = TDAT8; F = (F & CF) | SZP[E]; WZ = TADR + 1; } EOP
+/* OUT  (C),E      */ OP(ED,59) { TADR=BC; TDAT8=E; } MN out() FN { WZ = TADR + 1; } EOP
 /* ADC  HL,DE      */ OP(ED,5a) { TDAT=DE; } MN adc_hl()                             EOP
 /* LD   DE,(w)     */ OP_M(ED,5b) arg16() FN { m_ea=TDAT; TADR=m_ea; } MN rm16() FN { DE=TDAT; WZ = m_ea + 1; } EOP
 /* NEG             */ OP(ED,5c) { neg();                                           } EOP
@@ -2798,8 +2797,8 @@ void z80_device::init_op_steps() {
 /* IM   2          */ OP(ED,5e) { m_im = 2;                                        } EOP
 /* LD   A,r        */ OP_M(ED,5f) ld_a_r()                                           EOP
 
-/* IN   H,(C)      */ OP(ED,60) { TADR=BC; } MN in() FN { H = TDAT8; F = (F & CF) | SZP[H];               } EOP
-/* OUT  (C),H      */ OP(ED,61) { TADR=BC; TDAT8=H; } MN out()                       EOP
+/* IN   H,(C)      */ OP(ED,60) { TADR=BC; } MN in() FN { H = TDAT8; F = (F & CF) | SZP[H]; WZ = TADR + 1; } EOP
+/* OUT  (C),H      */ OP(ED,61) { TADR=BC; TDAT8=H; } MN out() FN { WZ = TADR + 1; } EOP
 /* SBC  HL,HL      */ OP(ED,62) { TDAT=HL; } MN sbc_hl()                             EOP
 /* LD   (w),HL     */ OP_M(ED,63) arg16() FN { m_ea=TDAT; TADR=m_ea; TDAT=HL; } MN wm16() FN { WZ = m_ea + 1; } EOP
 /* NEG             */ OP(ED,64) { neg();                                           } EOP
@@ -2807,8 +2806,8 @@ void z80_device::init_op_steps() {
 /* IM   0          */ OP(ED,66) { m_im = 0;                                        } EOP
 /* RRD  (HL)       */ OP_M(ED,67) rrd()                                              EOP
 
-/* IN   L,(C)      */ OP(ED,68) { TADR=BC; } MN in() FN { L = TDAT8; F = (F & CF) | SZP[L];               } EOP
-/* OUT  (C),L      */ OP(ED,69) { TADR=BC; TDAT8=L; } MN out()                       EOP
+/* IN   L,(C)      */ OP(ED,68) { TADR=BC; } MN in() FN { L = TDAT8; F = (F & CF) | SZP[L]; WZ = TADR + 1; } EOP
+/* OUT  (C),L      */ OP(ED,69) { TADR=BC; TDAT8=L; } MN out() FN { WZ = TADR + 1; } EOP
 /* ADC  HL,HL      */ OP(ED,6a) { TDAT=HL; } MN adc_hl()                             EOP
 /* LD   HL,(w)     */ OP_M(ED,6b) arg16() FN { m_ea=TDAT; TADR=m_ea; } MN rm16() FN { HL=TDAT; WZ = m_ea + 1; } EOP
 /* NEG             */ OP(ED,6c) { neg();                                           } EOP
@@ -2816,8 +2815,8 @@ void z80_device::init_op_steps() {
 /* IM   0          */ OP(ED,6e) { m_im = 0;                                        } EOP
 /* RLD  (HL)       */ OP_M(ED,6f) rld()                                              EOP
 
-/* IN   0,(C)      */ OP(ED,70) { TADR=BC; } MN in() FN { F = (F & CF) | SZP[TDAT8]; } EOP
-/* OUT  (C),0      */ OP(ED,71) { TADR=BC; TDAT8=0; } MN out()                       EOP
+/* IN   0,(C)      */ OP(ED,70) { TADR=BC; } MN in() FN { F = (F & CF) | SZP[TDAT8]; WZ = TADR + 1; } EOP
+/* OUT  (C),0      */ OP(ED,71) { TADR=BC; TDAT8=0; } MN out() FN { WZ = TADR + 1; } EOP
 /* SBC  HL,SP      */ OP(ED,72) { TDAT=SP; } MN sbc_hl()                             EOP
 /* LD   (w),SP     */ OP_M(ED,73) arg16() FN { m_ea=TDAT; TADR=m_ea; TDAT=SP; } MN wm16() FN { WZ = m_ea + 1; } EOP
 /* NEG             */ OP(ED,74) { neg();                                           } EOP
@@ -2825,8 +2824,8 @@ void z80_device::init_op_steps() {
 /* IM   1          */ OP(ED,76) { m_im = 1;                                        } EOP
 /* DB   ED,77      */ OP(ED,77) { illegal_2();                                     } EOP
 
-/* IN   A,(C)      */ OP(ED,78) { TADR=BC; } MN in() FN { A = TDAT8; F = (F & CF) | SZP[A]; WZ = BC + 1;  } EOP
-/* OUT  (C),A      */ OP(ED,79) { TADR=BC; TDAT8=A; } MN out() FN { WZ = BC + 1;   } EOP
+/* IN   A,(C)      */ OP(ED,78) { TADR=BC; } MN in() FN { A = TDAT8; F = (F & CF) | SZP[A]; WZ = TADR + 1; } EOP
+/* OUT  (C),A      */ OP(ED,79) { TADR=BC; TDAT8=A; } MN out() FN { WZ = TADR + 1; } EOP
 /* ADC  HL,SP      */ OP(ED,7a) { TDAT=SP; } MN adc_hl()                             EOP
 /* LD   SP,(w)     */ OP_M(ED,7b) arg16() FN { m_ea=TDAT; TADR=m_ea; } MN rm16() FN { SP=TDAT; WZ = m_ea + 1; } EOP
 /* NEG             */ OP(ED,7c) { neg();                                           } EOP
