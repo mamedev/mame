@@ -44,9 +44,9 @@ TODO:
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/w65c02s.h"
 #include "video/pwm.h"
-#include "machine/sensorboard.h"
 #include "machine/6522via.h"
 #include "machine/nvram.h"
+#include "machine/sensorboard.h"
 #include "sound/dac.h"
 
 #include "speaker.h"
