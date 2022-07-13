@@ -508,7 +508,7 @@ license:CC0
 	</element>
 	<element name="text_l10a">
 		<rect><color red="0.17" green="0.15" blue="0.15" /></rect>
-		<text string="FORWARD"><color red="0.81" green="0.8" blue="0.79" /></text>
+		<text string=" FORWARD"><color red="0.81" green="0.8" blue="0.79" /></text>
 	</element>
 	<element name="text_l11">
 		<rect><color red="0.17" green="0.15" blue="0.15" /></rect>
@@ -516,7 +516,7 @@ license:CC0
 	</element>
 	<element name="text_l11a">
 		<rect><color red="0.17" green="0.15" blue="0.15" /></rect>
-		<text string="TAKE BACK"><color red="0.81" green="0.8" blue="0.79" /></text> <!-- actually 2 lines of text -->
+		<text string=" TAKE BACK"><color red="0.81" green="0.8" blue="0.79" /></text> <!-- actually 2 lines of text -->
 	</element>
 	<element name="text_l12">
 		<rect><color red="0.17" green="0.15" blue="0.15" /></rect>
@@ -541,11 +541,11 @@ license:CC0
 	</element>
 	<element name="text_l15">
 		<rect><color red="0.7" green="0.2" blue="0.05" /></rect>
-		<text string="NEW GAME"><color red="0.81" green="0.8" blue="0.79" /></text> <!-- actually 2 lines of text -->
+		<text string=" NEW GAME"><color red="0.81" green="0.8" blue="0.79" /></text> <!-- actually 2 lines of text -->
 	</element>
 	<element name="text_l15a">
 		<rect><color red="0.7" green="0.2" blue="0.05" /></rect>
-		<text string="CL. BOARD"><color red="0.81" green="0.8" blue="0.79" /></text> <!-- actually "CLEAR BOARD", 2 lines of text -->
+		<text string=" CL. BOARD"><color red="0.81" green="0.8" blue="0.79" /></text> <!-- actually "CLEAR BOARD", 2 lines of text -->
 	</element>
 	<element name="text_l16">
 		<rect><color red="0.7" green="0.2" blue="0.05" /></rect>
@@ -604,8 +604,8 @@ license:CC0
 
 		<element ref="text_l10"><bounds x="12.1" y="1" width="1" height="1.5" /></element>
 		<element ref="text_l11"><bounds x="12.1" y="11" width="1" height="1.5" /></element>
-		<element ref="text_l10a"><bounds x="8.75" y="3.5" width="5.7" height="1.5" /></element>
-		<element ref="text_l11a"><bounds x="8.75" y="13.5" width="5.7" height="1.5" /></element>
+		<element ref="text_l10a"><bounds x="8.5" y="3.5" width="6" height="1.5" /></element>
+		<element ref="text_l11a"><bounds x="8.5" y="13.5" width="6" height="1.5" /></element>
 		<element ref="text_l12"><bounds x="8.5" y="22.25" width="6" height="1.5" /></element>
 		<element ref="text_l13"><bounds x="8.5" y="31.5" width="6" height="1.5" /></element>
 		<element ref="text_l13a"><bounds x="8.5" y="33" width="6" height="1.5" /></element>
@@ -624,8 +624,8 @@ license:CC0
 
 		<element ref="text_l14"><bounds x="8.5" y="41.5" width="6" height="1.5" /></element>
 		<element ref="text_l14a"><bounds x="8.5" y="43" width="6" height="1.5" /></element>
-		<element ref="text_l15"><bounds x="8.75" y="51" width="5.7" height="1.5" /></element>
-		<element ref="text_l15a"><bounds x="8.75" y="53.5" width="5.7" height="1.5" /></element>
+		<element ref="text_l15"><bounds x="8.5" y="51" width="6" height="1.5" /></element>
+		<element ref="text_l15a"><bounds x="8.5" y="53.5" width="6" height="1.5" /></element>
 		<element ref="text_l16"><bounds x="8.5" y="62.25" width="6" height="1.5" /></element>
 		<element ref="text_l17"><bounds x="8.5" y="72.25" width="6" height="1.5" /></element>
 

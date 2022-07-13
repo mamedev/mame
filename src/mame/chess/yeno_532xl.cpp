@@ -15,6 +15,10 @@ Hardware notes:
 - HD61603, 2 4*7seg LCD screens
 - TTL, piezo, 8*8+7 LEDs, button sensors
 
+The software searches for an opening book ROM in 0x4000-0x7fff, it looks like
+it's compatible with Conchess L16 / Mephisto HG240. Though the hardware does
+not have an edge connector or empty ROM socket for it.
+
 ******************************************************************************/
 
 #include "emu.h"
@@ -139,6 +143,7 @@ u8 y532xl_state::input_r()
 void y532xl_state::cb_w(u8 data)
 {
 	// d0-d7: chessboard input mux
+	// d0-d3: lcd data
 	m_cb_mux = data;
 	update_display();
 }
