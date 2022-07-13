@@ -63,7 +63,6 @@
 #include "j_dud.lh"
 #include "j_ewn.lh"
 #include "j_ews.lh"
-#include "j_ewsbl.lh"
 #include "j_ewsdlx.lh"
 #include "j_la.lh"
 #include "j_lan.lh"
@@ -74,6 +73,7 @@
 #include "j_ssh.lh"
 #include "j_sup2p.lh"
 #include "j_super2.lh"
+#include "j_supsh.lh"
 
 #define MAIN_CLOCK 6_MHz_XTAL
 
@@ -937,21 +937,6 @@ static INPUT_PORTS_START( j_ews )
 	PORT_CONFSETTING(    0x02, "Full" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( j_ewsbl )
-	PORT_INCLUDE( j_ews )
-
-	PORT_MODIFY("IN0")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) /* No stake jumper, 50p coin pulses meter 1 160 times if this is on and prizes
-	                                                are doubled as well, which doesn't make sense with 10p coins */
-
-	PORT_MODIFY("IN2")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // No coin tube switch
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("10p") PORT_IMPULSE(2)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("10p Token") PORT_IMPULSE(2)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p") PORT_IMPULSE(2)
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( j_ewsdlx )
 	PORT_INCLUDE( j_ews )
 
@@ -972,6 +957,31 @@ static INPUT_PORTS_START( j_ssh )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("20p") PORT_IMPULSE(2)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("10p") PORT_IMPULSE(2)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("2p") PORT_IMPULSE(2)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p") PORT_IMPULSE(2)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( j_supsh )
+	PORT_INCLUDE( j_ews )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) /* No stake jumper, 50p coin pulses meter 1 160 times if this is on and prizes
+	                                                are doubled as well, which doesn't make sense with 10p coins */
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // No coin tube switch
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("10p") PORT_IMPULSE(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("10p Token") PORT_IMPULSE(2)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p") PORT_IMPULSE(2)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( j_supsha )
+	PORT_INCLUDE( j_supsh )
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("5p") PORT_IMPULSE(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("10p") PORT_IMPULSE(2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("20p") PORT_IMPULSE(2)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p") PORT_IMPULSE(2)
 INPUT_PORTS_END
 
@@ -1419,13 +1429,6 @@ ROM_START( j_ewsb )
 	ROM_LOAD( "ews13.3", 0x0800, 0x400, CRC(4d8e197a) SHA1(1569327f0e4b5d7632658b69abf59076effb2600) )
 ROM_END
 
-ROM_START( j_ewsbl )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ews.1", 0x0000, 0x400, CRC(e2f28e4f) SHA1(1ace28cd0da0a31264f5c7f7e885f2df1dff22d2) )
-	ROM_LOAD( "ews.2", 0x0400, 0x400, CRC(028ea40f) SHA1(541e450153f0076c63cd0f1f3074d0a44717ee11) )
-	ROM_LOAD( "ews.3", 0x0800, 0x400, CRC(9e871667) SHA1(b2119b119173e7a9f23a124cecc1efca7131a543) )
-ROM_END
-
 ROM_START( j_ewsdlx )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ewsdlx.1", 0x0000, 0x400, CRC(b628ef7d) SHA1(cd10a0bbaefd93cfbd14f1398de2d3a528760806) )
@@ -1438,6 +1441,20 @@ ROM_START( j_ssh )
 	ROM_LOAD( "ssh.1", 0x0000, 0x400, CRC(7bbf8c00) SHA1(edb59505abeae28d3ecd9c7f8f1f49ba1eaf72ab) )
 	ROM_LOAD( "ssh.2", 0x0400, 0x400, CRC(97100cbd) SHA1(154e1348e48a4c9170c7b85e51ec8d381ea420f7) )
 	ROM_LOAD( "ssh.3", 0x0800, 0x400, CRC(a01848d7) SHA1(bd6b093655855aa4870bb319191ae690abebbece) )
+ROM_END
+
+ROM_START( j_supsh )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "supsh.1", 0x0000, 0x400, CRC(e2f28e4f) SHA1(1ace28cd0da0a31264f5c7f7e885f2df1dff22d2) )
+	ROM_LOAD( "supsh.2", 0x0400, 0x400, CRC(028ea40f) SHA1(541e450153f0076c63cd0f1f3074d0a44717ee11) )
+	ROM_LOAD( "supsh.3", 0x0800, 0x400, CRC(9e871667) SHA1(b2119b119173e7a9f23a124cecc1efca7131a543) )
+ROM_END
+
+ROM_START( j_supsha )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "supsh.1", 0x0000, 0x400, CRC(1ed7a9a3) SHA1(1f11566a0e28f5f792cabd983b90e1e4ce5cd7a7) )
+	ROM_LOAD( "supsh.2", 0x0400, 0x400, CRC(6358f793) SHA1(eebafbac489bec2864f114ebd1d79d76453a1807) )
+	ROM_LOAD( "supsh.3", 0x0800, 0x400, CRC(b1e5467b) SHA1(6756e35ca0285313f5dab266967b12ec3e55af2c) )
 ROM_END
 
 // LUCKY TWOS REV
@@ -1536,9 +1553,10 @@ GAMEL( 198?,  j_super2,  j_lan,    super2,    j_super2,      jpmsru_state, init_
 GAMEL( 1981,  j_ews,     0,        ews,       j_ews,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Shuffle (JPM) (SRU) (revision 8A, £2 Jackpot)", GAME_FLAGS, layout_j_ews )
 GAMEL( 1981,  j_ewsa,    j_ews,    ews,       j_ews,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Shuffle (JPM) (SRU) (revision 13A, £2 Jackpot)", GAME_FLAGS, layout_j_ews )
 GAMEL( 1981,  j_ewsb,    j_ews,    ews,       j_ews,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Shuffle (JPM) (SRU) (revision 13C, £2 Jackpot)", GAME_FLAGS, layout_j_ews )
-GAMEL( 198?,  j_ewsbl,   j_ews,    ews,       j_ewsbl,       jpmsru_state, init_jpmsru, ROT0, "bootleg?", "Each Way Shuffle (bootleg?) (SRU) (10p Stake, £3 Jackpot)", GAME_FLAGS, layout_j_ewsbl ) // Has extra "Jackpot" symbol
 GAMEL( 1983?, j_ewsdlx,  j_ews,    ews,       j_ewsdlx,      jpmsru_state, init_jpmsru, ROT0, "CTL", "Each Way Shuffle Deluxe (CTL) (SRU) (£3 Jackpot)", GAME_FLAGS, layout_j_ewsdlx ) // £3 rebuild of Each Way Shuffle
 GAMEL( 1983?, j_ssh,     j_ews,    ews,       j_ssh,         jpmsru_state, init_jpmsru, ROT0, "CTL", "Silver Shuffle (CTL) (SRU) (2p Stake, £1.50 Jackpot)", GAME_FLAGS, layout_j_ssh ) // £1.50/2p rebuild of Each Way Shuffle
+GAMEL( 1983?, j_supsh,   j_ews,    ews,       j_supsh,       jpmsru_state, init_jpmsru, ROT0, "Louth Coin", "Super Shuffle (Louth Coin) (SRU) (10p Stake, £3 Jackpot)", GAME_FLAGS, layout_j_supsh ) // Rebuild of Each Way Shuffle, adds an extra symbol
+GAMEL( 1983?, j_supsha,  j_ews,    ews,       j_supsha,      jpmsru_state, init_jpmsru, ROT0, "Louth Coin", "Super Shuffle (Louth Coin) (SRU) (5p Stake, £1.50 Jackpot)", GAME_FLAGS, layout_j_supsh )
 GAMEL( 1981,  j_lt,      0,        lt,        j_lt,          jpmsru_state, init_jpmsru, ROT0, "JPM", "Lucky 2's (JPM) (SRU) (revision 9, 10p Stake, £2 Jackpot)", GAME_FLAGS, layout_j_lt )
 GAMEL( 1982,  j_ts,      j_lt,     lt,        j_lt,          jpmsru_state, init_jpmsru, ROT0, "JPM", "Two Step (JPM) (SRU) (5p Stake, £2 Jackpot)", GAME_FLAGS, layout_j_lt )
 GAMEL( 198?,  j_plus2,   j_lt,     lt,        j_plus2,       jpmsru_state, init_jpmsru, ROT0, "CTL", "Plus 2 (CTL) (SRU) (2p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_plus2 ) // £1/2p rebuild of Lucky 2's
