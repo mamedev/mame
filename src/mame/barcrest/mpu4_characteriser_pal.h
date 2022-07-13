@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
 
@@ -30,6 +31,11 @@ public:
 	void set_character_table(uint8_t* table)
 	{
 		m_current_chr_table = table;
+	}
+
+	void set_allow_6800_cheat(bool allow)
+	{
+		m_allow_6800_cheat = allow;
 	}
 
 	void set_allow_6809_cheat(bool allow)
@@ -1412,6 +1418,7 @@ private:
 
 	optional_device<cpu_device> m_cpu; // needed for some of the protection 'cheats'
 
+	bool m_allow_6800_cheat;
 	bool m_allow_6809_cheat;
 	bool m_allow_68k_cheat;
 
