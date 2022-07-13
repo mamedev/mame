@@ -182,13 +182,24 @@ void gt913_sound_device::update_sample(voice_t& voice)
 		/*
 		The last 12 bytes of each sample are a table containing five sample and exponent value pairs
 		for the data words immediately after the loop point. The first pair corresponds to what the
-		sample and exponent value will be _after_ processing the first sample after the loop,
+		sample and exponent value will be _after_ processing the first 16-bit word after the loop,
 		so once we've reached that point, use those values to reload the current sample and exponent
 		*/
 		const u32 addr_loop_data = (voice.m_addr_end + 1) & ~1;
 
 		voice.m_sample_next = read_word(addr_loop_data) - voice.m_sample;
 		voice.m_exp = read_word(addr_loop_data + 10) & 7;
+
+		if (!BIT(voice.m_addr_current, 0))
+		{
+			/*
+			the loop data represents the state after applying both samples in a 16-bit word,
+			so if we're looping to the first of the two samples, compensate for the second one
+			*/
+			const u16 word = read_word(voice.m_addr_current);
+			const s16 delta = sample_7_to_8[word >> 9];
+			voice.m_sample_next -= delta * (1 << voice.m_exp);
+		}
 	}
 	else
 	{
@@ -209,7 +220,6 @@ void gt913_sound_device::update_sample(voice_t& voice)
 		{
 			delta = sample_7_to_8[word >> 9];
 		}
-
 		voice.m_sample_next = delta * (1 << voice.m_exp);
 	}
 
