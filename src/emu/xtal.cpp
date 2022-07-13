@@ -330,6 +330,7 @@ const double XTAL::known_xtals[] = {
 	 22'321'000, /* 22.321_MHz_XTAL        Apple LaserWriter II NT */
 	 22'464'000, /* 22.464_MHz_XTAL        CIT-101 132-column display clock */
 	 22'579'000, /* 22.579_MHz_XTAL        Sega System H1 SCSP clock */
+	 22'579'200, /* 22.5792_MHz_XTAL       (44100 * 512) */
 	 22'656'000, /* 22.656_MHz_XTAL        Super Pinball Action (~1440x NTSC line rate) */
 	 22'680'000, /* 22.680_MHz_XTAL        HDS200 80-columns display clock */
 	 22'896'000, /* 22.896_MHz_XTAL        DEC VT220 132-column display clock */

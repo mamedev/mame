@@ -924,7 +924,7 @@ INPUT_PORTS_END
 void macquadra_state::macqd700(machine_config &config)
 {
 	/* basic machine hardware */
-	M68040(config, m_maincpu, 25000000);
+	M68040(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &macquadra_state::quadra700_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -957,7 +957,7 @@ void macquadra_state::macqd700(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi1:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi1:5", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi1:6", mac_scsi_devices, "harddisk");
-	NSCSI_CONNECTOR(config, "scsi1:7").option_set("ncr5394", NCR53CF94).clock(24_MHz_XTAL).machine_config(
+	NSCSI_CONNECTOR(config, "scsi1:7").option_set("ncr5394", NCR53CF94).clock(50_MHz_XTAL / 2).machine_config(
 		[this] (device_t *device)
 		{
 			ncr53cf94_device &adapter = downcast<ncr53cf94_device &>(*device);
@@ -967,10 +967,10 @@ void macquadra_state::macqd700(machine_config &config)
 			adapter.drq_handler_cb().set(*this, FUNC(macquadra_state::drq_539x_1_w));
 		});
 
-	DP83932C(config, m_sonic, 20_MHz_XTAL);
+	DP83932C(config, m_sonic, 40_MHz_XTAL / 2);
 	m_sonic->set_bus(m_maincpu, 0);
 
-	nubus_device &nubus(NUBUS(config, "nubus", 0));
+	nubus_device &nubus(NUBUS(config, "nubus", 40_MHz_XTAL / 4));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
 	nubus.out_irq9_callback().set(FUNC(macquadra_state::nubus_irq_9_w));
 	nubus.out_irqa_callback().set(FUNC(macquadra_state::nubus_irq_a_w));
@@ -1003,7 +1003,7 @@ void macquadra_state::macqd700(machine_config &config)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	ASC(config, m_easc, 22579200, asc_device::asc_type::EASC);
+	ASC(config, m_easc, 22.5792_MHz_XTAL, asc_device::asc_type::EASC);
 //  m_easc->irqf_callback().set(FUNC(macquadra_state::mac_asc_irq));
 	m_easc->add_route(0, "lspeaker", 1.0);
 	m_easc->add_route(1, "rspeaker", 1.0);
