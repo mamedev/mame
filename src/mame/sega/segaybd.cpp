@@ -128,8 +128,8 @@ Drive Board
 -----------
 This board is used to control the feedback motors on the deluxe moving cabinet.
 
-837-6565 (printed on PCB)
-839-0123 (sticker on top of the above number)
+839-0161 (printed on PCB)
+839-0213 (sticker on top of the above number)
 REV A (sticker)
 |------------------------------------|
 |CN3 CN4    CN1           CN2        |
@@ -145,7 +145,7 @@ REV A (sticker)
 Notes:
         D71054 - NEC D71054 Programmable Timer/Counter
         MB8464 - Fujitsu MB8464 8kBx8-bit SRAM
-EPR-11???.IC27 - 27C256 EPROM (Z80 program)
+EPR-11???.IC27 - 27C256 EPROM (Z80 program) - supposedly EPR-11485 but original label was lost
           Z80A - NEC D780C-1 Z80A CPU. Clock input 4.000MHz
           8255 - NEC D8255AC-2 Programmable Peripheral Interface (PPI)
        ADC0804 - National ADC0804 8-Bit Microprocessor-Compatible Analog-to-Digital Converter

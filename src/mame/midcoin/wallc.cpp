@@ -467,6 +467,25 @@ static INPUT_PORTS_START( sidampkr )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( sidampkra )
+	PORT_INCLUDE(unkitpkr)
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW1:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW1:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:5" )
+	PORT_DIPNAME( 0x60, 0x60, "Min/Max Bet" )  PORT_DIPLOCATION("SW1:6,7")
+	PORT_DIPSETTING(    0x00, "Min:1; Max:5" )
+	PORT_DIPSETTING(    0x20, "Min:1; Max:10" )
+	PORT_DIPSETTING(    0x40, "Min:1; Max:20" )
+	PORT_DIPSETTING(    0x60, "Min:1; Max:40" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Language ) ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( French ) )
+INPUT_PORTS_END
+
 static const gfx_layout charlayout =
 {
 	8,8,    /* 8*8 characters */
@@ -809,11 +828,11 @@ void wallc_state::init_unkitpkr()
 } // anonymous namespace
 
 
-//    YEAR  NAME       PARENT    MACHINE    INPUT     STATE        INIT           ROT     COMPANY             FULLNAME                               FLAGS
-GAME( 1984, wallc,     0,        wallc,     wallc,    wallc_state, init_wallc,    ROT0,   "Midcoin",          "Wall Crash (set 1)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1984, wallca,    wallc,    wallca,    wallc,    wallc_state, init_wallca,   ROT0,   "Midcoin",          "Wall Crash (set 2)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1984, brkblast,  wallc,    wallc,     wallc,    wallc_state, init_wallca,   ROT0,   "bootleg (Fadesa)", "Brick Blast (bootleg of Wall Crash)", MACHINE_SUPPORTS_SAVE ) // Spanish bootleg board, Fadesa stickers / text on various components
+//    YEAR  NAME       PARENT    MACHINE    INPUT      STATE        INIT           ROT     COMPANY             FULLNAME                               FLAGS
+GAME( 1984, wallc,     0,        wallc,     wallc,     wallc_state, init_wallc,    ROT0,   "Midcoin",          "Wall Crash (set 1)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1984, wallca,    wallc,    wallca,    wallc,     wallc_state, init_wallca,   ROT0,   "Midcoin",          "Wall Crash (set 2)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1984, brkblast,  wallc,    wallc,     wallc,     wallc_state, init_wallca,   ROT0,   "bootleg (Fadesa)", "Brick Blast (bootleg of Wall Crash)", MACHINE_SUPPORTS_SAVE ) // Spanish bootleg board, Fadesa stickers / text on various components
 
-GAME( 1984, sidampkr,  0,        sidampkr,  sidampkr, wallc_state, init_sidam,    ROT270, "Sidam",            "unknown Sidam poker (vertical)",      MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // colors should be verified
-GAME( 1984, sidampkra, sidampkr, sidampkra, sidampkr, wallc_state, init_sidam,    ROT0,   "Sidam",            "unknown Sidam poker (horizontal)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // colors should be verified, cards GFX look wrong
-GAME( 198?, unkitpkr,  0,        unkitpkr,  unkitpkr, wallc_state, init_unkitpkr, ROT0,   "<unknown>",        "unknown Italian poker game",          MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sidampkr,  0,        sidampkr,  sidampkr,  wallc_state, init_sidam,    ROT270, "Sidam",            "unknown Sidam poker (vertical)",      MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // colors should be verified
+GAME( 1984, sidampkra, sidampkr, sidampkra, sidampkra, wallc_state, init_sidam,    ROT0,   "Sidam",            "unknown Sidam poker (horizontal)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // colors should be verified, cards GFX look wrong
+GAME( 198?, unkitpkr,  0,        unkitpkr,  unkitpkr,  wallc_state, init_unkitpkr, ROT0,   "<unknown>",        "unknown Italian poker game",          MACHINE_SUPPORTS_SAVE )
