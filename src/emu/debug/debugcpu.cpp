@@ -1894,10 +1894,8 @@ void device_debug::tracer::update(offs_t pc)
 
 		// if we just finished looping, indicate as much
 		if (m_loops != 0)
-		{
 			fprintf(&m_file, "\n   (loops for %d instructions)\n\n", m_loops);
-			m_debug.m_device.machine().logerror("\n   (loops for %d instructions)\n\n", m_loops);
-		}
+
 		m_loops = 0;
 	}
 
@@ -1913,7 +1911,6 @@ void device_debug::tracer::update(offs_t pc)
 
 	// output the result
 	fprintf(&m_file, "%s: %s\n", buffer.pc_to_string(pc).c_str(), instruction.c_str());
-	m_debug.m_device.machine().logerror("%s: %s\n", buffer.pc_to_string(pc).c_str(), instruction.c_str());
 
 	// do we need to step the trace over this instruction?
 	if (m_trace_over && (dasmresult & util::disasm_interface::SUPPORTED) != 0 && (dasmresult & util::disasm_interface::STEP_OVER) != 0)
@@ -1944,9 +1941,6 @@ void device_debug::tracer::vprintf(const char *format, va_list va)
 	// pass through to the file
 	vfprintf(&m_file, format, va);
 	fflush(&m_file);
-	char temp_buf[2048];
-	vsprintf(temp_buf, format, va);
-	m_debug.m_device.machine().logerror("%s\n", temp_buf);
 }
 
 

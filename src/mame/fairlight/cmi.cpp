@@ -105,9 +105,8 @@
 #include "speaker.h"
 
 #define LOG_CHANNELS (1 << 1U)
-#define LOG_MOG (1 << 2U)
 
-#define VERBOSE     (LOG_CHANNELS | LOG_MOG)
+#define VERBOSE     (0)
 #include "logmacro.h"
 
 #define Q209_CPU_CLOCK          (40.21_MHz_XTAL / 40) // verified by manual
@@ -1509,7 +1508,6 @@ WRITE_LINE_MEMBER( cmi_state::wd1791_drq )
 
 void cmi_state::master_tune_w(uint8_t data)
 {
-	LOGMASKED(LOG_MOG, "CMI02 Master Tune Write: %02x\n", data);
 	m_master_tune = data;
 	double mfreq = ((0xf00 | data) * (MASTER_OSCILLATOR.dvalue() / 2.0)) / 4096.0;
 	for (int i = 0; i < 8; i++)
@@ -1520,26 +1518,21 @@ void cmi_state::master_tune_w(uint8_t data)
 
 uint8_t cmi_state::master_tune_r()
 {
-	LOGMASKED(LOG_MOG, "CMI02 Master Tune Read: %02x\n", m_master_tune);
 	return m_master_tune;
-//  double mfreq = ((0xf00 | data) * (MASTER_OSCILLATOR.dvalue() / 2.0)) / 4096.0;
 }
 
 void cmi_state::cmi02_chsel_w(uint8_t data)
 {
-	LOGMASKED(LOG_MOG, "CMI02 Channel Select Mask Write: %02x\n", data);
 	m_cmi02_pia_chsel = data;
 }
 
 uint8_t cmi_state::cmi02_chsel_r()
 {
-	LOGMASKED(LOG_MOG, "CMI02 Channel Select Mask Read: %02x\n", m_cmi02_pia_chsel);
 	return m_cmi02_pia_chsel;
 }
 
 WRITE_LINE_MEMBER( cmi_state::cmi02_ptm_irq )
 {
-	LOGMASKED(LOG_MOG, "%s: cmi02_ptm_irq: %d\n", machine().describe_context(), state);
 	m_cmi02_ptm_irq = state;
 	set_interrupt(CPU_1, IRQ_TIMINT_LEVEL, m_cmi02_ptm_irq ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -1582,39 +1575,29 @@ uint8_t cmi_state::cmi02_r(offs_t offset)
 	}
 	else
 	{
-		uint8_t data = 0;
 		switch (offset)
 		{
 			case 0x20: case 0x21: case 0x22: case 0x23:
-				data = m_cmi02_pia[0]->read(offset & 3);
-				LOGMASKED(LOG_MOG, "%s: CMI02 PIA 1 read (offset %d): %02x\n", machine().describe_context(), offset & 3, data);
-				return data;
+				return m_cmi02_pia[0]->read(offset & 3);
 
 			case 0x26:
 				m_maincpu2->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 				/* LS123 one-shot with 10n and 150k */
 				m_jam_timeout_timer->adjust(attotime::from_usec(675));
-				LOGMASKED(LOG_MOG, "%s: CMI02 Jam Timeout timer trigger read: %02x\n", machine().describe_context(), 0xff);
 				return 0xff;
 
 			case 0x27:
 				m_maincpu2->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-				LOGMASKED(LOG_MOG, "%s: CMI02 CPU2 Unhalt read: %02x\n", machine().describe_context(), 0xff);
 				return 0xff;
 
 			case 0x28: case 0x29: case 0x2a: case 0x2b:
-				data = m_cmi02_pia[1]->read(offset & 3);
-				LOGMASKED(LOG_MOG, "%s: CMI02 PIA 2 read (offset %d): %02x\n", machine().describe_context(), offset & 3, data);
-				return data;
+				return m_cmi02_pia[1]->read(offset & 3);
 
 			case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
-				data = m_cmi02_ptm->read(offset & 7);
-				LOGMASKED(LOG_MOG, "%s: CMI02 PTM read (offset %d): %02x\n", machine().describe_context(), offset & 7, data);
-				return data;
+				return m_cmi02_ptm->read(offset & 7);
 
 			default:
-				LOGMASKED(LOG_MOG, "%s: CMI02 Unknown read (offset %02x): %02x\n", machine().describe_context(), offset, 0x00);
-				return data;
+				return 0;
 		}
 	}
 }
@@ -1636,41 +1619,32 @@ void cmi_state::cmi02_w(offs_t offset, uint8_t data)
 		switch (offset)
 		{
 			case 0x20: case 0x21: case 0x22: case 0x23:
-				LOGMASKED(LOG_MOG, "%s: CMI02 PIA 1 write (offset %d): %02x\n", machine().describe_context(), offset & 3, data);
 				m_cmi02_pia[0]->write(offset & 3, data);
 				break;
 
 			case 0x28: case 0x29: case 0x2a: case 0x2b:
-				LOGMASKED(LOG_MOG, "%s: CMI02 PIA 2 write (offset %d): %02x\n", machine().describe_context(), offset & 3, data);
 				m_cmi02_pia[1]->write(offset & 3, data);
 				break;
 
 			case 0x30:
-				LOGMASKED(LOG_MOG, "%s: CMI02 PICU 3 B/SGS write (clearing main CPU IRQ merger, clearing high-prio IRQ): %02x\n", machine().describe_context(), data);
 				m_hp_int = 0;
 				m_maincpu1_irq_merger->in_w<1>(0);
-				//if (m_lp_int == 0)
-				//  m_maincpu1->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 				m_i8214[2]->b_sgs_w(~(data & 0xf));
 				break;
 
 			case 0x31: case 0x32:
-				LOGMASKED(LOG_MOG, "%s: CMI02 INTP1 %s write: %02x\n", machine().describe_context(), (offset & 2) ? "clear" : "set", data);
 				set_interrupt(0, IRQ_INTP1_LEVEL, (offset & 2) ? CLEAR_LINE : ASSERT_LINE);
 				break;
 
 			case 0x33: case 0x34:
-				LOGMASKED(LOG_MOG, "%s: CMI02 INTP2 %s write: %02x\n", machine().describe_context(), (offset & 4) ? "clear" : "set", data);
 				set_interrupt(1, IRQ_INTP2_LEVEL, (offset & 4) ? CLEAR_LINE : ASSERT_LINE);
 				break;
 
 			case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
-				LOGMASKED(LOG_MOG, "%s: CMI02 PTM write (offset %d): %02x\n", machine().describe_context(), offset & 7, data);
 				m_cmi02_ptm->write(offset & 7, data);
 				break;
 
 			default:
-				LOGMASKED(LOG_MOG, "%s: CMI02 Unknown write (offset %02x): %02x\n", machine().describe_context(), offset, data);
 				break;
 		}
 	}
@@ -2172,7 +2146,6 @@ void cmi_state::cmi2x(machine_config &config)
 	m_cmi02_ptm->set_external_clocks(0, 0, 0);
 	m_cmi02_ptm->o2_callback().set(FUNC(cmi_state::cmi02_ptm_o2));
 	m_cmi02_ptm->irq_callback().set(FUNC(cmi_state::cmi02_ptm_irq));
-	m_cmi02_ptm->set_log(true, 1);
 
 	clock_device &q133_acia_clock(CLOCK(config, "q133_acia_clock", 1.8432_MHz_XTAL / 12));
 	q133_acia_clock.signal_handler().set(FUNC(cmi_state::q133_acia_clock));

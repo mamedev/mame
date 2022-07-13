@@ -15,12 +15,11 @@
 
 #define LOG_SETUP   (1 << 2U)
 #define LOG_CA1     (1 << 3U)
-#define LOG_MOG     (1 << 4U)
 
 //#define VERBOSE (LOG_SETUP | LOG_GENERAL | LOG_CA1)
 //#define LOG_OUTPUT_STREAM std::cout
 
-#define VERBOSE (1 | LOG_MOG)
+#define VERBOSE (0)
 
 #include "logmacro.h"
 #define LOGSETUP(...) LOGMASKED(LOG_SETUP,   __VA_ARGS__)
@@ -65,7 +64,7 @@ pia6821_device::pia6821_device(const machine_config &mconfig, const char *tag, d
 		m_in_ca2_pushed(false), m_out_ca2_needs_pulled(false), m_in_b_pushed(false), m_out_b_needs_pulled(false),
 		m_in_cb1_pushed(false), m_in_cb2_pushed(false), m_out_cb2_needs_pulled(false), m_logged_port_a_not_connected(false),
 		m_logged_port_b_not_connected(false), m_logged_ca1_not_connected(false), m_logged_ca2_not_connected(false),
-		m_logged_cb1_not_connected(false), m_logged_cb2_not_connected(false), m_do_log(false), m_logidx(0)
+		m_logged_cb1_not_connected(false), m_logged_cb2_not_connected(false)
 {
 }
 
@@ -601,39 +600,19 @@ uint8_t pia6821_device::read(offs_t offset)
 	{
 	default: // impossible
 	case 0x00:
-		if (output_selected(m_ctl_a))
-		{
-			ret = port_a_r();
-			if (m_do_log) LOG("PIA%d Port A Read: %02x\n", m_logidx, ret);
-		}
-		else
-		{
-			ret = ddr_a_r();
-			if (m_do_log) LOG("PIA%d DDR A Read: %02x\n", m_logidx, ret);
-		}
+		ret = output_selected(m_ctl_a) ? port_a_r() : ddr_a_r();
 		break;
 
 	case 0x01:
 		ret = control_a_r();
-		if (m_do_log) LOG("PIA%d Control A Read: %02x\n", m_logidx, ret);
 		break;
 
 	case 0x02:
-		if (output_selected(m_ctl_b))
-		{
-			ret = port_b_r();
-			if (m_do_log) LOG("PIA%d Port B Read: %02x\n", m_logidx, ret);
-		}
-		else
-		{
-			ret = ddr_b_r();
-			if (m_do_log) LOG("PIA%d DDR B Read: %02x\n", m_logidx, ret);
-		}
+		ret = output_selected(m_ctl_b) ? port_b_r() : ddr_b_r();
 		break;
 
 	case 0x03:
 		ret = control_b_r();
-		if (m_do_log) LOG("PIA%d Control B Read: %02x\n", m_logidx, ret);
 		break;
 	}
 
@@ -859,37 +838,23 @@ void pia6821_device::write(offs_t offset, uint8_t data)
 	default: // impossible
 	case 0x00:
 		if (output_selected(m_ctl_a))
-		{
-			if (m_do_log) LOG("PIA%d Port A Write: %02x\n", m_logidx, data);
 			port_a_w(data);
-		}
 		else
-		{
-			if (m_do_log) LOG("PIA%d DDR A Write: %02x\n", m_logidx, data);
 			ddr_a_w(data);
-		}
 		break;
 
 	case 0x01:
-		if (m_do_log) LOG("PIA%d Control A Write: %02x\n", m_logidx, data);
 		control_a_w(data);
 		break;
 
 	case 0x02:
 		if (output_selected(m_ctl_b))
-		{
-			if (m_do_log) LOG("PIA%d Port B Write: %02x\n", m_logidx, data);
 			port_b_w(data);
-		}
 		else
-		{
-			if (m_do_log) LOG("PIA%d DDR B Write: %02x\n", m_logidx, data);
 			ddr_b_w(data);
-		}
 		break;
 
 	case 0x03:
-		if (m_do_log) LOG("PIA%d Control B Write: %02x\n", m_logidx, data);
 		control_b_w(data);
 		break;
 	}
@@ -959,9 +924,6 @@ WRITE_LINE_MEMBER( pia6821_device::ca1_w )
 	// the new state has caused a transition
 	if ((m_in_ca1 != state) && ((state && c1_low_to_high(m_ctl_a)) || (!state && c1_high_to_low(m_ctl_a))))
 	{
-		if (m_do_log)
-			LOG("CA1 triggering\n");
-
 		// mark the IRQ
 		m_irq_a1 = true;
 
@@ -990,9 +952,6 @@ WRITE_LINE_MEMBER( pia6821_device::ca2_w )
 	// if input mode and the new state has caused a transition
 	if (c2_input(m_ctl_a) && (m_in_ca2 != state) && ((state && c2_low_to_high(m_ctl_a)) || (!state && c2_high_to_low(m_ctl_a))))
 	{
-		if (m_do_log)
-			LOG("CA2 triggering\n");
-
 		// mark the IRQ
 		m_irq_a2 = true;
 
@@ -1081,17 +1040,9 @@ uint8_t pia6821_device::b_output()
 
 WRITE_LINE_MEMBER( pia6821_device::cb1_w )
 {
-	if (m_in_cb1 != state && m_do_log)
-	{
-		LOG("Set PIA input CB1 = %d\n", state);
-	}
-
 	// the new state has caused a transition
 	if ((m_in_cb1 != state) && ((state && c1_low_to_high(m_ctl_b)) || (!state && c1_high_to_low(m_ctl_b))))
 	{
-		if (m_do_log)
-			LOG("CB1 triggering, m_ctl_b %02x, m_ctl_a %02x\n", m_ctl_b, m_ctl_a);
-
 		// mark the IRQ
 		m_irq_b1 = true;
 
@@ -1116,19 +1067,11 @@ WRITE_LINE_MEMBER( pia6821_device::cb1_w )
 
 WRITE_LINE_MEMBER( pia6821_device::cb2_w )
 {
-	if (m_in_cb1 != state && m_do_log)
-	{
-		LOG("Set PIA input CB2 = %d\n", state);
-	}
-
 	// if input mode and the new state has caused a transition
 	if (c2_input(m_ctl_b) &&
 		(m_in_cb2 != state) &&
 		((state && c2_low_to_high(m_ctl_b)) || (!state && c2_high_to_low(m_ctl_b))))
 	{
-		if (m_do_log)
-			LOG("CB2 triggering\n");
-
 		// mark the IRQ
 		m_irq_b2 = true;
 
@@ -1182,81 +1125,3 @@ inline bool pia6821_device::c2_set_mode(uint8_t c)     { return  bool(BIT(c, 4))
 inline bool pia6821_device::c2_strobe_mode(uint8_t c)  { return !bool(BIT(c, 4)); }
 inline bool pia6821_device::c2_output(uint8_t c)       { return  bool(BIT(c, 5)); }
 inline bool pia6821_device::c2_input(uint8_t c)        { return !bool(BIT(c, 5)); }
-
-void pia6821_device::dump_state(FILE *s_log_file)
-{
-	if (s_log_file == nullptr)
-	{
-		LOGMASKED(LOG_MOG, "    m_in_a: %02x\n", m_in_a);
-		LOGMASKED(LOG_MOG, "    m_in_ca1: %d\n", m_in_ca1);
-		LOGMASKED(LOG_MOG, "    m_in_ca2: %d\n", m_in_ca2);
-		LOGMASKED(LOG_MOG, "    m_out_a: %02x\n", m_out_a);
-		LOGMASKED(LOG_MOG, "    m_out_ca2: %d\n", m_out_ca2);
-		LOGMASKED(LOG_MOG, "    m_ddr_a: %02x\n", m_ddr_a);
-		LOGMASKED(LOG_MOG, "    m_irq_a1: %d\n", m_irq_a1);
-		LOGMASKED(LOG_MOG, "    m_irq_a2: %d\n", m_irq_a2);
-		LOGMASKED(LOG_MOG, "    m_irq_a_state: %02x\n", m_irq_a_state);
-		LOGMASKED(LOG_MOG, "    m_ctl_a: %02x\n", m_ctl_a);
-		LOGMASKED(LOG_MOG, "        IRQ1 Enabled: %d\n", BIT(m_ctl_a, 0));
-		LOGMASKED(LOG_MOG, "        C1 Low->High: %d\n", BIT(m_ctl_a, 1));
-		LOGMASKED(LOG_MOG, "        Out Selected: %d\n", BIT(m_ctl_a, 2));
-		LOGMASKED(LOG_MOG, "        IRQ2 Enabled / Strobe E Reset / C2 Set: %d\n", BIT(m_ctl_a, 3));
-		LOGMASKED(LOG_MOG, "        C2 Low->High / Set Mode: %d\n", BIT(m_ctl_a, 4));
-		LOGMASKED(LOG_MOG, "        C2 Output: %d\n", BIT(m_ctl_a, 5));
-		LOGMASKED(LOG_MOG, "    m_ctl_b: %02x\n", m_ctl_b);
-		LOGMASKED(LOG_MOG, "        IRQ1 Enabled: %d\n", BIT(m_ctl_b, 0));
-		LOGMASKED(LOG_MOG, "        C1 Low->High: %d\n", BIT(m_ctl_b, 1));
-		LOGMASKED(LOG_MOG, "        Out Selected: %d\n", BIT(m_ctl_b, 2));
-		LOGMASKED(LOG_MOG, "        IRQ2 Enabled / Strobe E Reset / C2 Set: %d\n", BIT(m_ctl_b, 3));
-		LOGMASKED(LOG_MOG, "        C2 Low->High / Set Mode: %d\n", BIT(m_ctl_b, 4));
-		LOGMASKED(LOG_MOG, "        C2 Output: %d\n", BIT(m_ctl_b, 5));
-		LOGMASKED(LOG_MOG, "    m_in_b: %02x\n", m_in_b);
-		LOGMASKED(LOG_MOG, "    m_in_cb1: %d\n", m_in_cb1);
-		LOGMASKED(LOG_MOG, "    m_in_cb2: %d\n", m_in_cb2);
-		LOGMASKED(LOG_MOG, "    m_out_b: %02x\n", m_out_b);
-		LOGMASKED(LOG_MOG, "    m_out_cb2: %d\n", m_out_cb2);
-		LOGMASKED(LOG_MOG, "    m_last_out_cb2_z: %02x\n", m_last_out_cb2_z);
-		LOGMASKED(LOG_MOG, "    m_ddr_b: %02x\n", m_ddr_b);
-		LOGMASKED(LOG_MOG, "    m_irq_b2: %d\n", m_irq_b2);
-		LOGMASKED(LOG_MOG, "    m_irq_b_state: %02x\n", m_irq_b_state);
-		LOGMASKED(LOG_MOG, "    m_in_a: %02x\n", m_in_a);
-		LOGMASKED(LOG_MOG, "    m_in_a: %02x\n", m_in_a);
-	}
-	else
-	{
-		fprintf(s_log_file, "    m_in_a: %02x\n", m_in_a);
-		fprintf(s_log_file, "    m_in_ca1: %d\n", m_in_ca1);
-		fprintf(s_log_file, "    m_in_ca2: %d\n", m_in_ca2);
-		fprintf(s_log_file, "    m_out_a: %02x\n", m_out_a);
-		fprintf(s_log_file, "    m_out_ca2: %d\n", m_out_ca2);
-		fprintf(s_log_file, "    m_ddr_a: %02x\n", m_ddr_a);
-		fprintf(s_log_file, "    m_irq_a1: %d\n", m_irq_a1);
-		fprintf(s_log_file, "    m_irq_a2: %d\n", m_irq_a2);
-		fprintf(s_log_file, "    m_irq_a_state: %02x\n", m_irq_a_state);
-		fprintf(s_log_file, "    m_ctl_a: %02x\n", m_ctl_a);
-		fprintf(s_log_file, "        IRQ1 Enabled: %d\n", BIT(m_ctl_a, 0));
-		fprintf(s_log_file, "        C1 Low->High: %d\n", BIT(m_ctl_a, 1));
-		fprintf(s_log_file, "        Out Selected: %d\n", BIT(m_ctl_a, 2));
-		fprintf(s_log_file, "        IRQ2 Enabled / Strobe E Reset / C2 Set: %d\n", BIT(m_ctl_a, 3));
-		fprintf(s_log_file, "        C2 Low->High / Set Mode: %d\n", BIT(m_ctl_a, 4));
-		fprintf(s_log_file, "        C2 Output: %d\n", BIT(m_ctl_a, 5));
-		fprintf(s_log_file, "    m_ctl_b: %02x\n", m_ctl_b);
-		fprintf(s_log_file, "        IRQ1 Enabled: %d\n", BIT(m_ctl_b, 0));
-		fprintf(s_log_file, "        C1 Low->High: %d\n", BIT(m_ctl_b, 1));
-		fprintf(s_log_file, "        Out Selected: %d\n", BIT(m_ctl_b, 2));
-		fprintf(s_log_file, "        IRQ2 Enabled / Strobe E Reset / C2 Set: %d\n", BIT(m_ctl_b, 3));
-		fprintf(s_log_file, "        C2 Low->High / Set Mode: %d\n", BIT(m_ctl_b, 4));
-		fprintf(s_log_file, "        C2 Output: %d\n", BIT(m_ctl_b, 5));
-		fprintf(s_log_file, "    m_in_b: %02x\n", m_in_b);
-		fprintf(s_log_file, "    m_in_cb1: %d\n", m_in_cb1);
-		fprintf(s_log_file, "    m_in_cb2: %d\n", m_in_cb2);
-		fprintf(s_log_file, "    m_out_b: %02x\n", m_out_b);
-		fprintf(s_log_file, "    m_out_cb2: %d\n", m_out_cb2);
-		fprintf(s_log_file, "    m_last_out_cb2_z: %02x\n", m_last_out_cb2_z);
-		fprintf(s_log_file, "    m_ddr_b: %02x\n", m_ddr_b);
-		fprintf(s_log_file, "    m_irq_b2: %d\n", m_irq_b2);
-		fprintf(s_log_file, "    m_irq_b_state: %02x\n", m_irq_b_state);
-		fprintf(s_log_file, "    m_in_a: %02x\n", m_in_a);
-		fprintf(s_log_file, "    m_in_a: %02x\n", m_in_a);
-	}
-}

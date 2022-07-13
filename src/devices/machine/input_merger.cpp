@@ -32,10 +32,7 @@ TODO:
 #include <algorithm>
 #include <iterator>
 
-#define LOG_MOG (1 << 1U)
-
-//#define VERBOSE 1
-#define VERBOSE (LOG_MOG)
+#define VERBOSE (0)
 #include "logmacro.h"
 
 
@@ -105,18 +102,6 @@ TIMER_CALLBACK_MEMBER(input_merger_device::update_state)
 		LOG("state[%d] = %d\n", param >> 1, BIT(param, 0));
 		m_state ^= u32(1) << (param >> 1);
 		m_output_handler((m_state ^ m_xorval) ? m_active : !m_active);
-	}
-}
-
-void input_merger_device::dump_state(FILE *s_log_file)
-{
-	if (s_log_file == nullptr)
-	{
-		LOGMASKED(LOG_MOG, "    m_state: %08x\n", m_state);
-	}
-	else
-	{
-		fprintf(s_log_file, "    m_state: %08x\n", m_state);
 	}
 }
 

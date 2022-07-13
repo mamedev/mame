@@ -26,8 +26,6 @@ public:
 	// construction/destruction
 	ptm6840_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void dump_state(FILE *s_log_file = nullptr);
-
 	void set_external_clocks(double clock0, double clock1, double clock2) { m_external_clock[0] = clock0; m_external_clock[1] = clock1; m_external_clock[2] = clock2; }
 	void set_external_clocks(const XTAL &clock0, const XTAL &clock1, const XTAL &clock2) { set_external_clocks(clock0.dvalue(), clock1.dvalue(), clock2.dvalue()); }
 	auto o1_callback() { return m_out_cb[0].bind(); }
@@ -35,7 +33,6 @@ public:
 	auto o3_callback() { return m_out_cb[2].bind(); }
 	auto irq_callback() { return m_irq_cb.bind(); }
 
-	void set_log(bool do_log, int logidx) { m_do_log = do_log; m_logidx = logidx; }
 	int status(int clock) const { return m_enabled[clock]; } // get whether timer is enabled
 	int irq_state() const { return m_irq; }                 // get IRQ state
 	uint16_t count(int counter) const { return compute_counter(counter); }    // get counter value
@@ -70,7 +67,6 @@ private:
 
 	uint16_t compute_counter(int counter) const;
 	void reload_count(int idx);
-	void init_internal_timer(int idx);
 
 	enum
 	{
@@ -111,9 +107,9 @@ private:
 	devcb_write_line m_irq_cb;
 
 	uint8_t m_control_reg[3];
-	uint8_t m_output[3]; // Output states
-	uint8_t m_gate[3];   // Counter gate states
-	uint8_t m_clk[3];  // Clock states
+	bool m_output[3]; // Output states
+	bool m_gate[3];   // Counter gate states
+	bool m_clk[3];    // Clock states
 	bool m_enabled[3];
 	uint8_t m_mode[3];
 	bool m_fired[3];
@@ -130,14 +126,12 @@ private:
 
 	uint16_t m_latch[3];
 	uint16_t m_counter[3];
+	attotime m_disable_time[3];
 
 	static const char *const opmode[];
 
 	// set in dual 8 bit mode to indicate Output high time cycle
 	bool m_hightime[3];
-
-	bool m_do_log;
-	int m_logidx;
 };
 
 

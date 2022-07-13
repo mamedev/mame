@@ -13,12 +13,6 @@
 #include "machine/6840ptm.h"
 #include "machine/input_merger.h"
 
-#define ENV_DIR_UP              0
-#define ENV_DIR_DOWN            1
-
-#define CHANNEL_STATUS_LOAD     1
-#define CHANNEL_STATUS_RUN      2
-
 class cmi01a_device : public device_t, public device_sound_interface {
 public:
 	cmi01a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, u32 channel)
@@ -51,16 +45,16 @@ protected:
 	sound_stream* m_stream;
 
 private:
+	enum : int
+	{
+		ENV_DIR_UP,
+		ENV_DIR_DOWN
+	};
+
 	void cmi01a_irq(int state);
 
 	TIMER_CALLBACK_MEMBER(update_sample);
 
-	void load_envelope();
-	void update_envelope_tri();
-	void clock_envelope();
-	void tick_ediv();
-
-	void not_wpe_w(int state);
 	void notload_w(int state);
 	int notload_r();
 
@@ -85,10 +79,9 @@ private:
 	void ptm_o2(int state);
 	void ptm_o3(int state);
 
-	void dump_state();
-
 	// New functions below this line
-	void pulse_rstb();
+	void update_rstb_pulser();
+	void set_run_load_xor(const bool run_load_xor);
 	TIMER_CALLBACK_MEMBER(rstb_pulse_cb);
 	void set_not_rstb(const bool not_rstb);
 
@@ -114,8 +107,11 @@ private:
 	void update_envelope_divider();
 	void set_envelope_dir(const int env_dir);
 	void update_envelope_clock();
+	void clock_envelope();
+	void tick_ediv();
 
-	void set_not_wpe(const bool not_wpe);
+	void update_envelope_tri();
+	void not_wpe_w(int state);
 	void update_upper_wave_addr_load();
 	void set_upper_wave_addr_load(const bool upper_wave_addr_load);
 	void try_load_upper_wave_addr();
@@ -127,65 +123,66 @@ private:
 	void update_ptm_c1();
 
 	u32         m_channel;
-	double      m_mosc = 0.0;
-	bool        m_zx_ff_clk = false;
-	bool        m_zx_ff = false;
-	bool        m_not_rstb = true;
-	bool        m_upper_wave_addr_load = false;
-	bool        m_zx = false;
-	bool        m_not_eload = true;
-	bool        m_not_load = false;
-	bool        m_bcas_q1_enabled = true;
-	bool        m_eclk = false;
-	bool        m_env_clk = false;
-	bool        m_wave_addr_msb_clock = true;
-	u8          m_env_divider = 0;
-	u8          m_wave_addr_lsb = 0;
-	u8          m_wave_addr_msb = 0;
 
 	emu_timer * m_zcint_pulse_timer = nullptr;
 	emu_timer * m_rstb_pulse_timer = nullptr;
 	emu_timer * m_bcas_q1_timer = nullptr;
 	emu_timer * m_sample_timer = nullptr;
 
-	u8        m_current_sample = 0;
-	u16       m_current_sample_addr = 0;
-
-	std::unique_ptr<u8[]>    m_wave_ram;
-	bool      m_new_addr = false;
-	u8        m_vol_latch = 0;
-	u8        m_flt_latch = 0;
-	u8        m_rp = 0;
-	u8        m_ws = 0;
-	int       m_dir = 0;
-	int       m_env_dir = 0;
-	u8        m_env = 0;
-	bool      m_run = false;
-	bool      m_not_zcint = true;
-	bool      m_gzx = false;
-	bool      m_not_wpe = true;
-
-	bool      m_bcas_q2 = false;
-	bool      m_bcas_q1 = false;
-
-	bool      m_ptm_o1 = false;
-	bool      m_ptm_o2 = false;
-	bool      m_ptm_o3 = false;
-
-	bool      m_tri = false;
-	bool      m_permit_eload = false;
-
-	bool      m_ediv_out = false;
-	bool      m_envdiv_toggles[6];
-
-	u16       m_pitch = 0;
-	u8        m_octave = 0;
-
 	devcb_write_line m_irq_cb;
 
-	FILE *m_pitch_log = nullptr;
-	int m_pitch_index = 1;
-	int m_pitch_crossing = 1;
+	std::unique_ptr<u8[]>    m_wave_ram;
+	u8          m_current_sample = 0;
+
+	double      m_mosc = 0.0;
+	u16         m_pitch = 0;
+	u8          m_octave = 0;
+
+	bool        m_zx_ff_clk = false;
+	bool        m_zx_ff = false;
+	bool        m_zx = false;
+	bool        m_gzx = false;
+
+	bool        m_run = false;
+	bool        m_not_rstb = true;
+	bool        m_not_load = false;
+	bool        m_not_zcint = true;
+	bool        m_not_wpe = true;
+	bool        m_new_addr = false;
+
+	bool        m_tri = false;
+	bool        m_permit_eload = false;
+	bool        m_not_eload = true;
+
+	bool        m_bcas_q1_enabled = true;
+	bool        m_bcas_q1 = false;
+	bool        m_bcas_q2 = false;
+
+	int         m_env_dir = 0;
+	u8          m_env = 0;
+	u8          m_env_divider = 0;
+	bool        m_ediv_out = false;
+	bool        m_envdiv_toggles[6];
+	bool        m_eclk = false;
+	bool        m_env_clk = false;
+
+	u8          m_wave_addr_lsb = 0;
+	u8          m_wave_addr_msb = 0;
+	bool        m_upper_wave_addr_load = false;
+	bool        m_wave_addr_msb_clock = true;
+	bool        m_run_load_xor = true;
+	bool        m_delayed_inverted_run_load = false;
+
+	bool        m_ptm_c1 = false;
+	bool        m_ptm_o1 = false;
+	bool        m_ptm_o2 = false;
+	bool        m_ptm_o3 = false;
+
+	u8          m_vol_latch = 0;
+	u8          m_flt_latch = 0;
+	u8          m_rp = 0;
+	u8          m_ws = 0;
+	int         m_dir = 0;
 };
 
 // device type definition
