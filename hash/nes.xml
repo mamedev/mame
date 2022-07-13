@@ -2705,7 +2705,7 @@ license:CC0
 	</software>
 
 	<software name="baltron">
-		<description>Baltron (Jpn)</description>
+		<description>Baltron (Japan)</description>
 		<year>1986</year>
 		<publisher>Toei Animation</publisher>
 		<info name="serial" value="TDF-BT"/>
@@ -2725,7 +2725,7 @@ license:CC0
 	</software>
 
 	<software name="banana">
-		<description>Banana (Jpn)</description>
+		<description>Banana (Japan)</description>
 		<year>1986</year>
 		<publisher>Victor Ongaku Sangyou</publisher>
 		<info name="serial" value="VFR-B1 (01)"/>
@@ -2745,7 +2745,7 @@ license:CC0
 	</software>
 
 	<software name="bprince">
-		<description>Banana Prince (Ger)</description>
+		<description>Banana Prince (Germany)</description>
 		<year>1992</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="NES-BN-NOE"/>
@@ -8008,7 +8008,7 @@ license:CC0
 	</software>
 
 	<software name="darkwingg" cloneof="darkwing">
-		<description>Disney's Darkwing Duck (Ger)</description>
+		<description>Disney's Darkwing Duck (Germany)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NES-DZ-NOE"/>
@@ -10595,7 +10595,7 @@ license:CC0
 	</software>
 
 	<software name="ducktal2g" cloneof="ducktal2">
-		<description>Disney's DuckTales 2 (Ger)</description>
+		<description>Disney's DuckTales 2 (Germany)</description>
 		<year>1994</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NES-DL-NOE"/>
@@ -10633,7 +10633,7 @@ license:CC0
 	</software>
 
 	<software name="ducktal2f" cloneof="ducktal2">
-		<description>Disney's DuckTales 2 - la Bande a Picsou (Fra)</description>
+		<description>Disney's DuckTales 2 - la Bande a Picsou (France)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NES-DL-FRA"/>
@@ -11559,7 +11559,7 @@ license:CC0
 	</software>
 
 	<software name="f15sef" cloneof="f15se">
-		<description>F-15 Strike Eagle (Fra)</description>
+		<description>F-15 Strike Eagle (France)</description>
 		<year>1993</year>
 		<publisher>Microprose</publisher>
 		<info name="serial" value="NES-8F-FRA"/>
@@ -11578,7 +11578,7 @@ license:CC0
 	</software>
 
 	<software name="f15seg" cloneof="f15se">
-		<description>F-15 Strike Eagle (Ger)</description>
+		<description>F-15 Strike Eagle (Germany)</description>
 		<year>1993</year>
 		<publisher>Microprose</publisher>
 		<info name="serial" value="NES-8F-FRG"/>
@@ -11597,7 +11597,7 @@ license:CC0
 	</software>
 
 	<software name="f15sei" cloneof="f15se">
-		<description>F-15 Strike Eagle (Ita)</description>
+		<description>F-15 Strike Eagle (Italy)</description>
 		<year>1993</year>
 		<publisher>Microprose</publisher>
 		<info name="serial" value="NES-8F-ITA"/>
@@ -11616,7 +11616,7 @@ license:CC0
 	</software>
 
 	<software name="f15sesw" cloneof="f15se">
-		<description>F-15 Strike Eagle (Swe)</description>
+		<description>F-15 Strike Eagle (Sweden)</description>
 		<year>1993</year>
 		<publisher>Microprose</publisher>
 		<info name="serial" value="NES-8F-SCN"/>
@@ -11635,7 +11635,7 @@ license:CC0
 	</software>
 
 	<software name="f1circus">
-		<description>F1 Circus (Jpn)</description>
+		<description>F1 Circus (Japan)</description>
 		<year>1992</year>
 		<publisher>Nihon Bussan</publisher>
 		<info name="serial" value="NBF-7F (11)"/>
@@ -11659,7 +11659,7 @@ license:CC0
 	</software>
 
 	<software name="f1race">
-		<description>F-1 Race (Jpn)</description>
+		<description>F-1 Race (Japan)</description>
 		<year>1984</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="HVC-FR"/>
@@ -11697,7 +11697,7 @@ license:CC0
 	</software>
 
 	<software name="famijmp2">
-		<description>Famicom Jump II - Saikyou no 7 Nin (Jpn)</description>
+		<description>Famicom Jump II - Saikyou no 7 Nin (Japan)</description>
 		<year>1991</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BA-FJ2"/>
@@ -18354,7 +18354,7 @@ license:CC0
 	</software>
 
 	<software name="indora">
-		<description>Indora no Hikari (Jpn)</description>
+		<description>Indora no Hikari (Japan)</description>
 		<year>1987</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="KSC-IN"/>
@@ -18397,7 +18397,7 @@ license:CC0
 	</software>
 
 	<software name="insectx">
-		<description>Insector X (Jpn)</description>
+		<description>Insector X (Japan)</description>
 		<year>1990</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="TFC-IS-5900 (33)"/>
@@ -23424,7 +23424,7 @@ license:CC0
 	</software>
 
 	<software name="mmansionf" cloneof="mmansion">
-		<description>Maniac Mansion (Fra)</description>
+		<description>Maniac Mansion (France)</description>
 		<year>1992</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="NES-JM-FRA"/>
@@ -23447,7 +23447,7 @@ license:CC0
 	</software>
 
 	<software name="mmansiong" cloneof="mmansion">
-		<description>Maniac Mansion (Ger)</description>
+		<description>Maniac Mansion (Germany)</description>
 		<year>1991</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="NES-JM-NOE"/>
@@ -23470,7 +23470,7 @@ license:CC0
 	</software>
 
 	<software name="mmansions" cloneof="mmansion">
-		<description>Maniac Mansion (Spa)</description>
+		<description>Maniac Mansion (Spain)</description>
 		<year>1992</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="NES-JM-ESP"/>
@@ -23493,7 +23493,7 @@ license:CC0
 	</software>
 
 	<software name="mmansionsw" cloneof="mmansion">
-		<description>Maniac Mansion (Swe)</description>
+		<description>Maniac Mansion (Sweden)</description>
 		<year>1992</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="NES-JM-SWE"/>
@@ -23516,7 +23516,7 @@ license:CC0
 	</software>
 
 	<software name="mappy">
-		<description>Mappy (Jpn)</description>
+		<description>Mappy (Japan)</description>
 		<year>1984</year>
 		<publisher>Namcot</publisher>
 		<info name="serial" value="NAM-NMP-4500 (04)"/>
@@ -23537,7 +23537,7 @@ license:CC0
 	</software>
 
 	<software name="mappykid">
-		<description>Mappy Kids (Jpn)</description>
+		<description>Mappy Kids (Japan)</description>
 		<year>1989</year>
 		<publisher>Namcot</publisher>
 		<info name="serial" value="NAM-FMK-5800"/>
@@ -23560,7 +23560,7 @@ license:CC0
 	</software>
 
 	<software name="mappylndj" cloneof="mappylnd">
-		<description>Mappy-Land (Jpn)</description>
+		<description>Mappy-Land (Japan)</description>
 		<year>1986</year>
 		<publisher>Namcot</publisher>
 		<info name="serial" value="NAM-ML-3900"/>
@@ -25273,7 +25273,7 @@ license:CC0
 	</software>
 
 	<software name="miraclepf" cloneof="miraclep" supported="no">
-		<description>The Miracle Piano Teaching System (Fra)</description>
+		<description>The Miracle Piano Teaching System (France)</description>
 		<year>1991</year>
 		<publisher>Mindscape</publisher>
 		<info name="serial" value="NES-9M-FRA"/>
@@ -25296,7 +25296,7 @@ license:CC0
 	</software>
 
 	<software name="ropit">
-		<description>Miracle Ropit's Adventure in 2100 (Jpn)</description>
+		<description>Miracle Ropit's Adventure in 2100 (Japan)</description>
 		<year>1987</year>
 		<publisher>King Records</publisher>
 		<info name="serial" value="KIN-GM"/>
@@ -25384,7 +25384,7 @@ license:CC0
 	</software>
 
 	<software name="missimpf" cloneof="missimp">
-		<description>Mission: Impossible (Fra)</description>
+		<description>Mission: Impossible (France)</description>
 		<year>1991</year>
 		<publisher>Palcom</publisher>
 		<info name="serial" value="NES-U4-FRA"/>
@@ -25846,7 +25846,7 @@ license:CC0
 	</software>
 
 	<software name="monopolyf" cloneof="monopoly">
-		<description>Monopoly (Fra)</description>
+		<description>Monopoly (France)</description>
 		<year>1991</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="NES-6B-FRA"/>
@@ -25864,7 +25864,7 @@ license:CC0
 	</software>
 
 	<software name="monopolyg" cloneof="monopoly">
-		<description>Monopoly (Ger)</description>
+		<description>Monopoly (Germany)</description>
 		<year>1992</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="NES-6B-NOE"/>
@@ -29566,7 +29566,7 @@ license:CC0
 	</software>
 
 	<software name="ppersiaf" cloneof="ppersia">
-		<description>Prince of Persia (Fra)</description>
+		<description>Prince of Persia (France)</description>
 		<year>1993</year>
 		<publisher>Mindscape</publisher>
 		<info name="serial" value="NES-PA-FRA"/>
@@ -29585,7 +29585,7 @@ license:CC0
 	</software>
 
 	<software name="ppersiag" cloneof="ppersia">
-		<description>Prince of Persia (Ger)</description>
+		<description>Prince of Persia (Germany)</description>
 		<year>1993</year>
 		<publisher>Mindscape</publisher>
 		<info name="serial" value="NES-PA-NOE"/>
@@ -29604,7 +29604,7 @@ license:CC0
 	</software>
 
 	<software name="ppersias" cloneof="ppersia">
-		<description>Prince of Persia (Spa)</description>
+		<description>Prince of Persia (Spain)</description>
 		<year>1992</year>
 		<publisher>Mindscape</publisher>
 		<info name="serial" value="NES-PA-ESP"/>
@@ -31886,7 +31886,7 @@ license:CC0
 	</software>
 
 	<software name="rollerbl">
-		<description>Rollerball (Aus)</description>
+		<description>Rollerball (Australia)</description>
 		<year>1992</year>
 		<publisher>HAL Laboratory</publisher>
 		<info name="serial" value="NES-RH-AUS"/>
@@ -31905,7 +31905,7 @@ license:CC0
 	</software>
 
 	<software name="rollerblj" cloneof="rollerbl">
-		<description>Rollerball (Jpn)</description>
+		<description>Rollerball (Japan)</description>
 		<year>1988</year>
 		<publisher>HAL Kenkyuujo</publisher>
 		<info name="serial" value="HAL-RH"/>
@@ -33658,7 +33658,7 @@ license:CC0
 	</software>
 
 	<software name="shadgatef" cloneof="shadgate">
-		<description>Shadowgate (Fra)</description>
+		<description>Shadowgate (France)</description>
 		<year>1991</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="NES-3S-FRA"/>
@@ -33681,7 +33681,7 @@ license:CC0
 	</software>
 
 	<software name="shadgateg" cloneof="shadgate">
-		<description>Shadowgate (Ger)</description>
+		<description>Shadowgate (Germany)</description>
 		<year>1992</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="NES-3S-NOE"/>
@@ -33704,7 +33704,7 @@ license:CC0
 	</software>
 
 	<software name="shadgatesw" cloneof="shadgate">
-		<description>Shadowgate (Swe)</description>
+		<description>Shadowgate (Sweden)</description>
 		<year>1991</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="NES-3S-SWE"/>
@@ -33727,7 +33727,7 @@ license:CC0
 	</software>
 
 	<software name="shanghai">
-		<description>Shanghai (Jpn)</description>
+		<description>Shanghai (Japan)</description>
 		<year>1987</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="SUN-SS9-5300"/>
@@ -33747,7 +33747,7 @@ license:CC0
 	</software>
 
 	<software name="shangh2">
-		<description>Shanghai II (Jpn)</description>
+		<description>Shanghai II (Japan)</description>
 		<year>1990</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="TEC-XT"/>
@@ -33805,7 +33805,7 @@ license:CC0
 	</software>
 
 	<software name="holmeshr">
-		<description>Sherlock Holmes - Hakushaku Reijou Yuukai Jiken (Jpn)</description>
+		<description>Sherlock Holmes - Hakushaku Reijou Yuukai Jiken (Japan)</description>
 		<year>1986</year>
 		<publisher>Towa Chiki</publisher>
 		<info name="serial" value="TCC-SH"/>
@@ -37742,7 +37742,7 @@ license:CC0
 	</software>
 
 	<software name="swordsrpf" cloneof="swordsrp">
-		<description>Swords and Serpents (Fra)</description>
+		<description>Swords and Serpents (France)</description>
 		<year>1993</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NES-WP-FRA"/>
@@ -38850,7 +38850,7 @@ license:CC0
 	</software>
 
 	<software name="tmnti" cloneof="tmnt">
-		<description>Teenage Mutant Ninja Turtles (Ita)</description>
+		<description>Teenage Mutant Ninja Turtles (Italy)</description>
 		<year>1990</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NES-U2-ITA"/>
@@ -38868,7 +38868,7 @@ license:CC0
 	</software>
 
 	<software name="tmntj" cloneof="tmnt2">
-		<description>Teenage Mutant Ninja Turtles (Jpn)</description>
+		<description>Teenage Mutant Ninja Turtles (Japan)</description>
 		<year>1990</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="KON-RC853"/>
@@ -38916,7 +38916,7 @@ license:CC0
 	</software>
 
 	<software name="tmnt2j" cloneof="tmnt3">
-		<description>Teenage Mutant Ninja Turtles 2 - The Manhattan Project (Jpn)</description>
+		<description>Teenage Mutant Ninja Turtles 2 - The Manhattan Project (Japan)</description>
 		<year>1991</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="KON-RC863"/>
@@ -38956,7 +38956,7 @@ license:CC0
 	</software>
 
 	<software name="tmnt2a" cloneof="tmnt2">
-		<description>Teenage Mutant Ninja Turtles II - The Arcade Game (Aus)</description>
+		<description>Teenage Mutant Ninja Turtles II - The Arcade Game (Australia)</description>
 		<year>1991</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NES-2N-AUS"/>
@@ -39012,7 +39012,7 @@ license:CC0
 	</software>
 
 	<software name="tenchikua" cloneof="destempr">
-		<description>Tenchi wo Kurau (Jpn)</description>
+		<description>Tenchi wo Kurau (Japan)</description>
 		<year>1989</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="CAP-YZ"/>
@@ -39036,7 +39036,7 @@ license:CC0
 	</software>
 
 	<software name="tenchik2a" cloneof="tenchik2">
-		<description>Tenchi wo Kurau II - Shokatsu Koumei Den (Jpn)</description>
+		<description>Tenchi wo Kurau II - Shokatsu Koumei Den (Japan)</description>
 		<year>1991</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="CAP-2V"/>
@@ -39060,7 +39060,7 @@ license:CC0
 	</software>
 
 	<software name="mitokoum">
-		<description>Tenka no Goikenban - Mito Koumon (Jpn)</description>
+		<description>Tenka no Goikenban - Mito Koumon (Japan)</description>
 		<year>1987</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="SUN-MK-5300 (SS7)"/>
@@ -39080,7 +39080,7 @@ license:CC0
 	</software>
 
 	<software name="kerunagu">
-		<description>Tenkaichi Bushi - Keru Naguuru (Jpn)</description>
+		<description>Tenkaichi Bushi - Keru Naguuru (Japan)</description>
 		<year>1989</year>
 		<publisher>Namcot</publisher>
 		<info name="serial" value="NAM-FKN-4900"/>
@@ -39100,7 +39100,7 @@ license:CC0
 	</software>
 
 	<software name="tennisju" cloneof="tennis">
-		<description>Tennis (Jpn, USA)</description>
+		<description>Tennis (Japan, USA)</description>
 		<year>1984</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="HVC-TE, NES-TE-USA"/>
@@ -46186,7 +46186,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="defcrownf" cloneof="defcrown">
-		<description>Defender of the Crown (Fra)</description>
+		<description>Defender of the Crown (France)</description>
 		<year>1991</year>
 		<publisher>Palcom</publisher>
 		<part name="cart" interface="nes_cart">
@@ -47737,7 +47737,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="hookj" cloneof="hook">
-		<description>Hook (Jpn)</description>
+		<description>Hook (Japan)</description>
 		<year>1992</year>
 		<publisher>Epic / Sony Records</publisher>
 		<info name="serial" value="ESF-7Q (ESPG-43)"/>
@@ -47827,7 +47827,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="softball">
-		<description>I Love Softball (Jpn)</description>
+		<description>I Love Softball (Japan)</description>
 		<year>1989</year>
 		<publisher>Coconuts Japan</publisher>
 		<info name="serial" value="CDS-S6"/>
@@ -47846,7 +47846,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="igomeikn">
-		<description>Igo Meikan (Jpn)</description>
+		<description>Igo Meikan (Japan)</description>
 		<year>1990</year>
 		<publisher>Hector</publisher>
 		<info name="serial" value="HCT-II/006"/>
@@ -47866,7 +47866,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="igoshi92">
-		<description>Igo Shinan '92 (Jpn)</description>
+		<description>Igo Shinan '92 (Japan)</description>
 		<year>1992</year>
 		<publisher>Hector</publisher>
 		<info name="serial" value="HCT-53/015"/>
@@ -47885,7 +47885,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="igoshi93">
-		<description>Igo Shinan '93 (Jpn)</description>
+		<description>Igo Shinan '93 (Japan)</description>
 		<year>1992</year>
 		<publisher>Hector</publisher>
 		<info name="serial" value="HCT-IF/018"/>
@@ -47904,7 +47904,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="igoshi94">
-		<description>Igo Shinan '94 (Jpn)</description>
+		<description>Igo Shinan '94 (Japan)</description>
 		<year>1993</year>
 		<publisher>Hector</publisher>
 		<info name="serial" value="HCT-IR/020"/>
@@ -47923,7 +47923,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="igoshin">
-		<description>Igo Shinan (Jpn)</description>
+		<description>Igo Shinan (Japan)</description>
 		<year>1989</year>
 		<publisher>Hector</publisher>
 		<info name="serial" value="HCT-ID/004"/>
@@ -47943,7 +47943,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="ikari2j" cloneof="ikari2">
-		<description>Ikari II - Dogosoken (Jpn)</description>
+		<description>Ikari II - Dogosoken (Japan)</description>
 		<year>1988</year>
 		<publisher>KAC</publisher>
 		<info name="serial" value="KAC-DS"/>
@@ -48834,7 +48834,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="maxwarr" cloneof="isolatwr">
-		<description>Max Warrior - Wakusei Kaigenrei (Jpn)</description>
+		<description>Max Warrior - Wakusei Kaigenrei (Japan)</description>
 		<year>1991</year>
 		<publisher>Vap</publisher>
 		<info name="serial" value="VAP-ZN"/>
@@ -48853,7 +48853,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="mckidsf" cloneof="mckids">
-		<description>M.C. Kids (Fra)</description>
+		<description>M.C. Kids (France)</description>
 		<year>1993</year>
 		<publisher>Ocean</publisher>
 		<info name="alt_title" value="McDonaldland (Box)"/>
@@ -52675,7 +52675,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 <!-- HES (and clones) -->
 
 	<software name="duckmaze">
-		<description>Duck Maze (Aus)</description>
+		<description>Duck Maze (Australia)</description>
 		<year>19??</year>
 		<publisher>HES</publisher>
 		<part name="cart" interface="nes_cart">
@@ -52692,7 +52692,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="othelloa">
-		<description>Othello (Aus)</description>
+		<description>Othello (Australia)</description>
 		<year>19??</year>
 		<publisher>HES</publisher>
 		<part name="cart" interface="nes_cart">
@@ -52710,7 +52710,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="pipe5">
-		<description>Pipe 5 (Aus)</description>
+		<description>Pipe 5 (Australia)</description>
 		<year>19??</year>
 		<publisher>HES</publisher>
 		<info name="alt_title" value="PipeMania (Box)"/>
@@ -52728,7 +52728,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="funblast">
-		<description>Fun Blaster Pak (Aus)</description>
+		<description>Fun Blaster Pak (Australia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -52744,7 +52744,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="mindblow">
-		<description>Mind Blower Pak (Aus)</description>
+		<description>Mind Blower Pak (Australia)</description>
 		<year>1992</year>
 		<publisher>HES</publisher>
 		<part name="cart" interface="nes_cart">
@@ -52760,7 +52760,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="totalfun">
-		<description>Total Funpak (Aus)</description>
+		<description>Total Funpak (Australia)</description>
 		<year>1992</year>
 		<publisher>HES</publisher>
 		<part name="cart" interface="nes_cart">
@@ -52810,7 +52810,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="maxi15">
-		<description>Maxi 15 (Aus)</description>
+		<description>Maxi 15 (Australia)</description>
 		<year>1992</year>
 		<publisher>HES</publisher>
 		<info name="serial" value="HES-MG"/>
@@ -61592,7 +61592,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- nointro -->
 	<software name="mjcompan">
-		<description>Mahjong Companion (Japan, hacker)</description>
+		<description>Mahjong Companion (Japan, Hacker)</description>
 		<!-- TOSEC title Mahjong Companion - Roppongi Hen check -->
 		<year>1990</year>
 		<publisher>Hacker International</publisher>
@@ -61613,7 +61613,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- nointro -->
 	<software name="metalfgt1" cloneof="metalfgt">
-		<description>Metal Fighter μ (Japan, hacker)</description>
+		<description>Metal Fighter μ (Japan, Hacker)</description>
 		<!-- HES pirate according to TOSEC, by Joy Van according GoodNES, check -->
 		<year>19??</year>
 		<publisher>Hacker International</publisher>
@@ -61727,7 +61727,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 <!-- nointro -->
 	<!-- same as the Sachen game, but with nudity -->
 	<software name="pyramidj" cloneof="pyramid">
-		<description>Pyramid (Japan, hacker)</description>
+		<description>Pyramid (Japan, Hacker)</description>
 		<!-- Sexy Pyramid - Cleopatra Kiki Ippatsu (1990)(Hacker Interantional) in TOSEC, check -->
 		<year>1990</year>
 		<publisher>Hacker International</publisher>
@@ -61771,7 +61771,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 <!-- FIXME: How much VRAM & WRAM should WAIXING-A, B, C, D, E, F, G, H boards have? -->
 
 	<software name="csjyx" cloneof="watarug">
-		<description>Chuang Shi Ji Ying Xiong (Chi)</description>
+		<description>Chuang Shi Ji Ying Xiong (China)</description>
 		<year>199?</year>
 		<publisher>Waixing</publisher>
 		<info name="alt_title" value="创世纪英雄"/>
@@ -64160,7 +64160,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="6in1hes">
-		<description>6 in 1 (Aus)</description>
+		<description>6 in 1 (Australia)</description>
 		<year>19??</year>
 		<publisher>HES</publisher>
 		<info name="alt_title" value="Real Player's Pak (maybe?)"/>
