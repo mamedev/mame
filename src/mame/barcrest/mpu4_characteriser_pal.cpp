@@ -197,7 +197,7 @@ uint8_t mpu4_characteriser_pal::protection_r()
 			if ((addr >= 0x800) && (addr <= 0xfff)) return 0x00; // prevent recursion, only care about ram/rom areas for this cheat.
 
 			ret = m_cpu->space(AS_PROGRAM).read_byte(addr);
-			logerror("%s: Chareacteriser protection_r WITH 6809 CHEAT (col is %02x returning %02x from addr %04x)\n", machine().describe_context(), m_prot_col, ret, addr);
+			logerror("%s: Characteriser protection_r WITH 6809 CHEAT (col is %02x returning %02x from addr %04x)\n", machine().describe_context(), m_prot_col, ret, addr);
 		}
 		else if (m_allow_68k_cheat)
 		{
