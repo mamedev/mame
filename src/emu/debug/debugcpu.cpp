@@ -1895,7 +1895,6 @@ void device_debug::tracer::update(offs_t pc)
 		// if we just finished looping, indicate as much
 		if (m_loops != 0)
 			fprintf(&m_file, "\n   (loops for %d instructions)\n\n", m_loops);
-
 		m_loops = 0;
 	}
 

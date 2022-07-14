@@ -32,7 +32,7 @@ TODO:
 #include <algorithm>
 #include <iterator>
 
-#define VERBOSE (0)
+//#define VERBOSE 1
 #include "logmacro.h"
 
 
@@ -104,6 +104,7 @@ TIMER_CALLBACK_MEMBER(input_merger_device::update_state)
 		m_output_handler((m_state ^ m_xorval) ? m_active : !m_active);
 	}
 }
+
 
 //**************************************************************************
 //  SPECIALISATIONS
