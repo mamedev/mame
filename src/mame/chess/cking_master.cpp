@@ -62,7 +62,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pwm_display_device> m_display;
 	required_device<sensorboard_device> m_board;
-	required_device<dac_2bit_binary_weighted_ones_complement_device> m_dac;
+	required_device<dac_2bit_ones_complement_device> m_dac;
 	required_device<address_map_bank_device> m_mainmap;
 	required_ioport_array<2> m_inputs;
 
@@ -234,7 +234,7 @@ void master_state::master(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.125);
+	DAC_2BIT_ONES_COMPLEMENT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.125);
 }
 
 

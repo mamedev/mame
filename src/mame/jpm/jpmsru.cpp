@@ -52,6 +52,7 @@
 #include "machine/nvram.h"
 #include "machine/steppers.h"
 #include "machine/timer.h"
+#include "sound/dac.h"
 
 #include "speaker.h"
 
@@ -105,7 +106,6 @@ public:
 	void ews(machine_config &config);
 	void lt(machine_config &config);
 	void sup2p(machine_config &config);
-	void lc(machine_config &config);
 
 	void init_jpmsru();
 
@@ -113,7 +113,6 @@ public:
 protected:
 	virtual void machine_start() override;
 
-private:
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(opto_cb) { m_opto[N] = state; }
 
 	uint8_t inputs_r(offs_t offset);
@@ -155,7 +154,6 @@ private:
 	void outputs_super2(address_map &map);
 	void outputs_ews(address_map &map);
 	void outputs_sup2p(address_map &map);
-	void outputs_lc(address_map &map);
 
 	bool m_int1;
 	bool m_int2;
@@ -186,6 +184,22 @@ private:
 
 	memory_share_creator<uint8_t> m_nvram;
 	optional_ioport_array<3> m_dips;
+};
+
+class jpmsru_dac_state : public jpmsru_state
+{
+public:
+	jpmsru_dac_state(const machine_config &mconfig, device_type type, const char *tag) :
+			jpmsru_state(mconfig, type, tag),
+			m_dac(*this, "dac")
+	{ }
+
+	void lc(machine_config &config);
+	
+private:
+	void outputs_lc(address_map &map);
+
+	required_device<dac_1bit_device> m_dac;
 };
 
 void jpmsru_state::jpmsru_3k_map(address_map &map)
@@ -365,33 +379,30 @@ void jpmsru_state::outputs_sup2p(address_map &map)
 	map(0x6e, 0x6f).w(FUNC(jpmsru_state::out_coin_lockout_w));
 }
 
-void jpmsru_state::outputs_lc(address_map &map)
+void jpmsru_dac_state::outputs_lc(address_map &map)
 {
 	jpmsru_io(map);
 
-	map(0x60, 0x6f).r(FUNC(jpmsru_state::inputs_ext_r)); // Input Extension
+	map(0x60, 0x6f).r(FUNC(jpmsru_dac_state::inputs_ext_r)); // Input Extension
 
 	/* There are 2 outputs for each payout, labeled payout 1 and payout 2.
 	   Both are always written to at the same time. I'm using the first output for payouts. */
 	map(0x28, 0x29).nopw(); // 10p payout 2
 	map(0x2a, 0x2b).nopw(); // 2x50p A payout 2
-	map(0x30, 0x31).w(FUNC(jpmsru_state::out_meter_w<0>));
-	map(0x32, 0x33).w(FUNC(jpmsru_state::out_meter_w<1>));
-	map(0x34, 0x35).w(FUNC(jpmsru_state::out_meter_w<2>));
-	map(0x36, 0x37).w(FUNC(jpmsru_state::out_meter_w<3>));
-	map(0x38, 0x39).w(FUNC(jpmsru_state::out_meter_w<4>));
-	map(0x3a, 0x3b).w(FUNC(jpmsru_state::out_payout_cash_w)); // 10p payout
-	map(0x3c, 0x3d).w(FUNC(jpmsru_state::out_payout_2x50p_a_w));
-	map(0x3e, 0x3f).w(FUNC(jpmsru_state::out_payout_2x50p_b_w));
-	map(0x40, 0x4b).w(FUNC(jpmsru_state::out_disp_w));
-	/* Manual calls this "Loudspeaker"
-	   It's toggled at a regular speed, not fast like a DAC, so looks like a
-	   fixed beeper of some kind. No other information on what this is. */
-	map(0x4e, 0x4f).nopw();
-	map(0x50, 0x61).w(FUNC(jpmsru_state::out_logicext_w));
+	map(0x30, 0x31).w(FUNC(jpmsru_dac_state::out_meter_w<0>));
+	map(0x32, 0x33).w(FUNC(jpmsru_dac_state::out_meter_w<1>));
+	map(0x34, 0x35).w(FUNC(jpmsru_dac_state::out_meter_w<2>));
+	map(0x36, 0x37).w(FUNC(jpmsru_dac_state::out_meter_w<3>));
+	map(0x38, 0x39).w(FUNC(jpmsru_dac_state::out_meter_w<4>));
+	map(0x3a, 0x3b).w(FUNC(jpmsru_dac_state::out_payout_cash_w)); // 10p payout
+	map(0x3c, 0x3d).w(FUNC(jpmsru_dac_state::out_payout_2x50p_a_w));
+	map(0x3e, 0x3f).w(FUNC(jpmsru_dac_state::out_payout_2x50p_b_w));
+	map(0x40, 0x4b).w(FUNC(jpmsru_dac_state::out_disp_w));
+	map(0x4e, 0x4f).w(m_dac, FUNC(dac_bit_interface::data_w)).umask16(0xff00);
+	map(0x50, 0x61).w(FUNC(jpmsru_dac_state::out_logicext_w));
 	map(0x62, 0x63).nopw(); // 2x50p B payout 2
-	map(0x6c, 0x6d).w(FUNC(jpmsru_state::out_10p_lockout_w));
-	map(0x6e, 0x6f).w(FUNC(jpmsru_state::out_50p_lockout_w));
+	map(0x6c, 0x6d).w(FUNC(jpmsru_dac_state::out_10p_lockout_w));
+	map(0x6e, 0x6f).w(FUNC(jpmsru_dac_state::out_50p_lockout_w));
 }
 
 uint8_t jpmsru_state::inputs_r(offs_t offset)
@@ -1168,7 +1179,7 @@ void jpmsru_state::jpmsru_3k(machine_config &config)
 
 	NETLIST_SOUND(config, "nl_audio", 48000)
 		.set_source(NETLIST_NAME(jpmsru))
-		.add_route(ALL_OUTPUTS, "mono", 0.25);
+		.add_route(ALL_OUTPUTS, "mono", 0.1);
 
 	NETLIST_LOGIC_INPUT(config, m_audio_in[0], "IN1.IN", 0);
 	NETLIST_LOGIC_INPUT(config, m_audio_in[1], "IN2.IN", 0);
@@ -1178,7 +1189,7 @@ void jpmsru_state::jpmsru_3k(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, m_audio_in[5], "IN6.IN", 0);
 	NETLIST_ANALOG_INPUT(config, "nl_audio:pot", "R8.DIAL");
 
-	NETLIST_STREAM_OUTPUT(config, "nl_audio:cout0", 0, "OUT").set_mult_offset(1.0, 0.0);
+	NETLIST_STREAM_OUTPUT(config, "nl_audio:cout0", 0, "OUT").set_mult_offset(1.0, -2.0);
 
 	FRUIT_SAMPLES(config, m_samples);
 }
@@ -1266,10 +1277,12 @@ void jpmsru_state::sup2p(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &jpmsru_state::outputs_sup2p);
 }
 
-void jpmsru_state::lc(machine_config &config)
+void jpmsru_dac_state::lc(machine_config &config)
 {
 	jpmsru_6k(config);
-	m_maincpu->set_addrmap(AS_IO, &jpmsru_state::outputs_lc);
+	m_maincpu->set_addrmap(AS_IO, &jpmsru_dac_state::outputs_lc);
+
+	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 ROM_START( j_ewn )
@@ -1534,5 +1547,5 @@ GAMEL( 198?,  j_sup2p,   0,        sup2p,     j_sup2p,       jpmsru_state, init_
 GAMEL( 1983?, j_la,      0,        lan,       j_la,          jpmsru_state, init_jpmsru, ROT0, "<unknown>", "Lucky Aces (SRU) (£1.50 Jackpot)", GAME_FLAGS, layout_j_la )
 GAMEL( 198?,  j_cnudgr,  0,        lan,       j_cnudgr,      jpmsru_state, init_jpmsru, ROT0, "<unknown>", "Cash Nudger? (SRU) (5p Stake, £2 Jackpot)", GAME_FLAGS, layout_j_cnudgr )
 // Club
-GAMEL( 1981,  j_lc,      0,        lc,        j_lc,          jpmsru_state, init_jpmsru, ROT0, "JPM", "Lucky Casino (JPM) (SRU) (revision 8A)", GAME_FLAGS | MACHINE_IMPERFECT_SOUND, layout_j_lc )
-GAMEL( 1981,  j_lca,     j_lc,     lc,        j_lc,          jpmsru_state, init_jpmsru, ROT0, "JPM", "Lucky Casino (JPM) (SRU) (revision 8, lower %)", GAME_FLAGS | MACHINE_IMPERFECT_SOUND, layout_j_lc ) // Smaller hold chance, probably revision 8B/8C
+GAMEL( 1981,  j_lc,      0,        lc,        j_lc,          jpmsru_dac_state, init_jpmsru, ROT0, "JPM", "Lucky Casino (JPM) (SRU) (revision 8A)", GAME_FLAGS, layout_j_lc )
+GAMEL( 1981,  j_lca,     j_lc,     lc,        j_lc,          jpmsru_dac_state, init_jpmsru, ROT0, "JPM", "Lucky Casino (JPM) (SRU) (revision 8, lower %)", GAME_FLAGS, layout_j_lc ) // Smaller hold chance, probably revision 8B/8C

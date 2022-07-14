@@ -478,7 +478,7 @@ void microvision_state::microvision(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	DAC_2BIT_ONES_COMPLEMENT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "microvision_cart");

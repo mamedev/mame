@@ -92,11 +92,6 @@ Custom: Imagetek I5000 (2ch video & 2ch sound)
 class rabbit_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_BLIT_DONE
-	};
-
 	rabbit_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),

@@ -9,7 +9,6 @@ TODO:
 - OSC pin (input is resistor)
 - SB pin, halts internal clock
 - SYNC pin for chip cascading
-- RE pin, resets count
 - READY pin
 
 */
@@ -44,6 +43,11 @@ void hd61603_device::device_start()
 	save_item(NAME(m_count));
 	save_item(NAME(m_data));
 	save_item(NAME(m_ram));
+}
+
+void hd61603_device::device_reset()
+{
+	m_count = 0;
 }
 
 

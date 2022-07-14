@@ -3,7 +3,7 @@
 /***************************************************************************
 
  Bishi Bashi Champ Mini Game Senshuken (c) 1996 Konami
- Super Bishi Bashi Championship        (c) 1998 Konami
+ Super Bishi Bashi Champ               (c) 1998 Konami
 
  Driver by R. Belmont
 
@@ -502,7 +502,7 @@ ROM_START( sbishika )
 	ROM_LOAD( "675kaa04.8f", 0x180000, 0x080000, CRC(ebcbd813) SHA1(d67540d0ea303f09866f4a766e2d5162f05cd4ac) )
 ROM_END
 
-GAME( 1996, bishi,    0,      bishi,    bishi,    bishi_state, empty_init, ROT0, "Konami", "Bishi Bashi Championship Mini Game Senshuken (ver JAA, 3 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, sbishi,   0,      bishi,    bishi2p,  bishi_state, empty_init, ROT0, "Konami", "Super Bishi Bashi Championship (ver JAA, 2 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, sbishik,  sbishi, bishi,    bishi,    bishi_state, empty_init, ROT0, "Konami", "Super Bishi Bashi Championship (ver KAB, 3 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, sbishika, sbishi, bishi,    bishi,    bishi_state, empty_init, ROT0, "Konami", "Super Bishi Bashi Championship (ver KAA, 3 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bishi,    0,      bishi,    bishi,    bishi_state, empty_init, ROT0, "Konami", "Bishi Bashi Champ Mini Game Senshuken (ver JAA, 3 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, sbishi,   0,      bishi,    bishi2p,  bishi_state, empty_init, ROT0, "Konami", "Super Bishi Bashi Champ (ver JAA, 2 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, sbishik,  sbishi, bishi,    bishi,    bishi_state, empty_init, ROT0, "Konami", "Super Bishi Bashi Champ (ver KAB, 3 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, sbishika, sbishi, bishi,    bishi,    bishi_state, empty_init, ROT0, "Konami", "Super Bishi Bashi Champ (ver KAA, 3 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

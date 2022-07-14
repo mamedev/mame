@@ -72,13 +72,6 @@ public:
 	void tms_right_w(uint16_t data);
 
 private:
-	// timers
-	enum
-	{
-		TIMER_ID_REG_WRITE,
-		TIMER_ID_DATA_WRITE
-	};
-
 	// configuration state
 	ready_callback              m_ready_callback;
 

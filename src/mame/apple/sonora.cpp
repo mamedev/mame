@@ -6,11 +6,13 @@
 
     Sonora contains the following:
     - A memory controller for up to 36MB (up to 4MB soldered and 32MB of SIMMs)
-    - A VRAM controller and framebuffer controller
+    - A VRAM controller and framebuffer controller, supporting monitor ID selection
     - A full VIA (VIA1) and a "pseudo-VIA", which is basically a combination GPIO and
       interrupt controller that looks somewhat like a VIA with no timers and no shift register.
     - A SWIM2 floppy controller
     - An ASC-like 4-channel audio controller
+    - 16/25 MHz CPU clock generator
+    - Support logic for various external subsystems (ADB, PDS, SCC, SCSI, SONIC)
 
     The "Ardbeg" ASIC (LC 520) appears to be a renamed copy of Sonora, and "Prime Time"
     (LC 475/575 and some low-end Quadras) is Sonora adapted to the 68040 bus.  "Prime Time II"
@@ -21,7 +23,9 @@
 
 #include "emu.h"
 #include "sonora.h"
+
 #include "formats/ap_dsk35.h"
+
 
 static constexpr u32 C7M  = 7833600;
 static constexpr u32 C15M = (C7M * 2);
