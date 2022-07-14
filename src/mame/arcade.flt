@@ -1115,6 +1115,7 @@ pinball/micropin.cpp
 pinball/missamer.cpp
 pinball/mrgame.cpp
 pinball/nsm.cpp
+pinball/newcanasta.cpp
 pinball/peyper.cpp
 pinball/play_1.cpp
 pinball/play_2.cpp

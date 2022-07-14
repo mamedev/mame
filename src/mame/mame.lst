@@ -32807,7 +32807,7 @@ ryuuha                          // (c) 1987
 secolove                        // (c) 1986
 seiha                           // (c) 1987
 seiham                          // (c) 1987
-swinggal            // (c) 1987 Digital Denshi
+swinggal                        // (c) 1987 Digital Denshi
 vipclub                         // (c) 1988 Daiichi Denshi
 
 @source:nichibutsu/nbmj8891.cpp
@@ -33471,6 +33471,9 @@ zonefusn
 newbrain                        //
 newbraina                       //
 newbrainmd                      //
+
+@source:pinball/newcanasta.cpp
+newcanasta                      // (c) 2010 Marsaplay
 
 @source:misc/news.cpp
 news                            // "Virus"??? ((c) 1993 Poby in ROM VIRUS.4)
