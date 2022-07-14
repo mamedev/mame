@@ -170,7 +170,6 @@ private:
 
 	emu_timer *m_cmi10_scnd_timer;
 	emu_timer *m_velocity_timers[KEY_COUNT];
-	bool m_key_pressed[KEY_COUNT];
 	bool m_key_held[KEY_COUNT];
 
 	int     m_kbd_acia_irq;
