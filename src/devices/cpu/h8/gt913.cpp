@@ -253,7 +253,7 @@ void gt913_device::execute_set_input(int inputnum, int state)
 {
 	if (inputnum == INPUT_LINE_NMI)
 	{
-		if (!BIT(m_syscr, 2))
+		if (BIT(m_syscr, 2))
 			state ^= ASSERT_LINE;
 	}
 
