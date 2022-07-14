@@ -19,7 +19,7 @@ license:CC0
 	S-4  *SC0004-SAI  SAI (series 1) Volume 1
 	S-5  *SC0005-SAI  SAI (series 2) Volume 1  (same series as 6,9,19,21,22)
 	S-6  *SC0006-SAI  SAI (series 2) Volume 2  (same series as 5,9,19,21,22)
-	S-7   SC0007-     unknown(2) Volume 1
+	S-7  *SC0007-DCS  Detective Conan Volume 1
 	S-8   SC0008-SAI  SAI (series 3) Volume 2
 	S-9  *SC0009-SAI  SAI (series 2) Volume 3  (same series as 5,6,19,21,22)
 	S-10 *SC0010-HWK  HWK (untranslated)
@@ -27,7 +27,7 @@ license:CC0
 	S-12 *SC0012-SAI  SAI (series 3) Volume 3
 	S-13  SC0013-     SAI (series 2) Volume 4
 	S-14  SC0014-     SAI (series 3) Volume 4
-	S-15  SC0015-     unknown(2) Volume 2
+	S-15 *SC0015-DCS  Detective Conan Volume 2
 	S-16  SC0016-SAI  SAI (series 2) Volume 5
 	S-17  SC0017-     unknown(1) Volume 2
 	S-18 *SC0018-SAI  Challenge Artist Volume 1
@@ -99,6 +99,18 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="sc0007">
+		<description>Detective Conan Volume 1 (Japan) (SC0007-DCS)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="sc0007-dcs.u1" size="0x200000" crc="5b8cf5ee" sha1="b31e610110fda7c7b49e7318d3191967fcf49ed8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	
 	<software name="sc0009">
 		<description>SAI (series 2) Volume 3 (Japan) (SC0009-SAI)</description>
 		<year>2001</year>
@@ -132,6 +144,19 @@ license:CC0
 		</part>
 	</software>
 
+	
+	<software name="sc0015">
+		<description>Detective Conan Volume 2 (Japan) (SC0015-DCS)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="sc0015-dcs.u1" size="0x200000" crc="a1b31faa" sha1="e5508940c5e674a1e12ef2cc9a5d10365ac4fa64"/>
+			</dataarea>
+		</part>
+	</software>
+
+	
 	<software name="sc0018">
 		<description>Challenge Artist Volume 1 (Japan) (SC0018-SAI)</description>
 		<year>2002</year>

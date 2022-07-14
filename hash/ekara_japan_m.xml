@@ -12,9 +12,9 @@ license:CC0
 	M-2   MC0002-ATM  Artist Mini Volume 2 (untranslated artist)
 	M-3   MC0003-ATM  Artist Mini Volume 3 (untranslated artist)
 	M-4  *MC0004-ATM  Artist Mini Volume 4 (w-inds)
-	M-5   MC0005-     KSM? unknown Vol 1
+	M-5  *MC0005-KSM  KSM Mini Volume 1
 	M-6  *MC0006-KSM  KSM Mini Volume 2
-	M-7   MC0007-ATM  Artist Mini Volume 5 (SMAP, KinKi Kids)
+	M-7  *MC0007-ATM  Artist Mini Volume 5 (SMAP, KinKi Kids)
 	M-8   MC0008-     KSM? TPM? unknown Vol 3 (TV)
 	M-9   MC0009-KSM  JPop Mix Mini Vol 1
 	M-10  MC0010-ATM  Artist Mini Volume 6 (untranslated artist)
@@ -47,6 +47,7 @@ license:CC0
 		</part>
 	</software>
 
+	
 	<software name="mc0004">
 		<description>Artist Mini Volume 4 (w-inds) (Japan) (MC0004-ATM)</description>
 		<year>2003</year>
@@ -54,6 +55,17 @@ license:CC0
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0004-atm.u1" size="0x080000" crc="e9ba14c1" sha1="3cad1a6b0d1ba24dfb6c1aec84a6d87816b16d54"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc0005">
+		<description>KSM Mini Volume 1 (Japan) (MC0005-KSM)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="mc0005-ksm.u1" size="0x080000" crc="a84c6d0d" sha1="dee82de4609ec93ed5152d01860e59d8693b9736"/>
 			</dataarea>
 		</part>
 	</software>
@@ -68,6 +80,18 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="mc0007">
+		<description>Artist Mini Volume 7 (SMAP, KinKi Kids) (Japan) (MC0004-ATM)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="mc0007-atm.u1" size="0x080000" crc="a9a19914" sha1="556adfad645ae635901b690ee57173766a5e497a"/>
+			</dataarea>
+		</part>
+	</software>
+	
 
 	<software name="mc0012">
 		<description>Artist Mini Volume 7 (untranslated artist) (Japan) (MC0012-ATM)</description>
