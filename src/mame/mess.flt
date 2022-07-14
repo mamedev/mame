@@ -244,7 +244,6 @@ epson/qx10.cpp
 ericsson/e9161.cpp
 ericsson/eispc.cpp
 exidy/sorcerer.cpp
-exorterm/exorterm.cpp
 fairchild/channelf.cpp
 fairchild/f387x.cpp
 fairlight/cmi.cpp
@@ -482,6 +481,7 @@ morrow/mpz80.cpp
 morrow/tricep.cpp
 mos/kim1.cpp
 motorola/exorciser.cpp
+motorola/exorterm.cpp
 motorola/m6805evs.cpp
 motorola/m68705prg.cpp
 motorola/mekd1.cpp
