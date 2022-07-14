@@ -22,12 +22,6 @@ public:
 		int col = 0, set = 0;
 	};
 
-	enum
-	{
-		TIMER_NAMCOIO0_RUN,
-		TIMER_NAMCOIO1_RUN
-	};
-
 	gaplus_base_state(const machine_config &mconfig, device_type type, const char *tag, const char *namco56xx_tag, const char *namco58xx_tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")

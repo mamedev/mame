@@ -8,6 +8,7 @@
 #include "netlist/devices/net_lib.h"
 
 NETLIST_START(7400_astable)
+{
 
 	/*
 	 * Astable multivibrator using two 7400 gates (or inverters)
@@ -32,4 +33,4 @@ NETLIST_START(7400_astable)
 	LOG(logn1Q, n1.Q)
 	LOG(logn2Q, n2.Q)
 
-NETLIST_END()
+}

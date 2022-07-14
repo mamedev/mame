@@ -1005,7 +1005,7 @@ void mac_state::mac_via2_out_b(uint8_t data)
 	}
 }
 
-// This signal is generated internally on RBV, V8, Sonora, VASP, Eagle, etc.
+// This signal is generated internally on RBV, V8, VASP, Eagle, etc.
 TIMER_CALLBACK_MEMBER(mac_state::mac_6015_tick)
 {
 	m_via1->write_ca1(0);
@@ -1048,7 +1048,6 @@ void mac_state::machine_start()
 	save_item(NAME(m_rbv_count));
 	save_item(NAME(m_rbv_clutoffs));
 	save_item(NAME(m_rbv_palette));
-	save_item(NAME(m_sonora_vctl));
 	save_item(NAME(m_scc_interrupt));
 	save_item(NAME(m_via_interrupt));
 	save_item(NAME(m_via2_interrupt));

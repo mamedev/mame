@@ -12,9 +12,9 @@
 #define MAME_OSD_SDL_WINDOW_H
 
 #include "osdsdl.h"
-#include "video.h"
 
 #include "modules/osdwindow.h"
+#include "osdsync.h"
 
 #include <cstdint>
 #include <memory>

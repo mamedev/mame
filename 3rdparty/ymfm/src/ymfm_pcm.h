@@ -38,6 +38,46 @@
 namespace ymfm
 {
 
+/*
+Note to self: Sega "Multi-PCM" is almost identical to this
+
+28 channels
+
+Writes:
+00 = data reg, causes write
+01 = target slot = data - (data / 8)
+02 = address (clamped to 7)
+
+Slot data (registers with ADSR/KSR seem to be inaccessible):
+0: xxxx---- panpot
+1: xxxxxxxx wavetable low
+2: xxxxxx-- pitch low
+   -------x wavetable high
+3: xxxx---- octave
+   ----xxxx pitch hi
+4: x------- key on
+5: xxxxxxx- total level
+   -------x level direct (0=interpolate)
+6: --xxx--- LFO frequency
+   -----xxx PM sensitivity
+7: -----xxx AM sensitivity
+
+Sample data:
++00: start hi
++01: start mid
++02: start low
++03: loop hi
++04: loop low
++05: -end hi
++06: -end low
++07: vibrato (reg 6)
++08: attack/decay
++09: sustain level/rate
++0A: ksr/release
++0B: LFO amplitude (reg 7)
+
+*/
+
 //*********************************************************
 //  INTERFACE CLASSES
 //*********************************************************

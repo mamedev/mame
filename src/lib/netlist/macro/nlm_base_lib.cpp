@@ -11,6 +11,7 @@
  * ---------------------------------------------------------------------------*/
 
 static NETLIST_START(diode_models)
+{
 	NET_MODEL("D _(IS=1e-15 N=1 NBV=3 IBV=0.001 BV=1E9)")
 
 	NET_MODEL("1N914 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon)")
@@ -39,26 +40,28 @@ static NETLIST_START(diode_models)
 	NET_MODEL("1N5240  D(BV=10 IS=14.4p RS=32.0 N=1.10 CJO=24.1p VJ=0.750 M=0.330 TT=50.1n)")
 	NET_MODEL("1N5240B D(BV=10 IS=14.4p RS=32.0 N=1.10 CJO=24.1p VJ=0.750 M=0.330 TT=50.1n)")
 
-NETLIST_END()
+}
 
 /* ----------------------------------------------------------------------------
  *  Mosfet Models
  * ---------------------------------------------------------------------------*/
 
 static NETLIST_START(mosfet_models)
+{
 	//NET_MODEL("NMOS _(VTO=0.0 N=1.0 IS=1E-14 KP=2E-5 UO=600 PHI=0.6 LD=0.0 L=1.0 TOX=1E-7 W=1.0 NSUB=0.0 GAMMA=0.0 RD=0.0 RS=0.0 LAMBDA=0.0)")
 	//NET_MODEL("PMOS _(VTO=0.0 N=1.0 IS=1E-14 KP=2E-5 UO=600 PHI=0.6 LD=0.0 L=1.0 TOX=1E-7 W=1.0 NSUB=0.0 GAMMA=0.0 RD=0.0 RS=0.0 LAMBDA=0.0)")
 
 	// NMOS_DEFAULT and PMOS_DEFAULT are created in nl_setup.cpp
 	NET_MODEL("NMOS NMOS_DEFAULT(VTO=0.0 N=1.0 IS=1E-14 KP=0.0 UO=600 PHI=0.0 LD=0.0 L=100e-6 TOX=1E-7 W=100e-6 NSUB=0.0 GAMMA=0.0 RD=0.0 RS=0.0 LAMBDA=0.0 CGSO=0 CGDO=0 CGBO=0)")
 	NET_MODEL("PMOS PMOS_DEFAULT(VTO=0.0 N=1.0 IS=1E-14 KP=0.0 UO=600 PHI=0.0 LD=0.0 L=100e-6 TOX=1E-7 W=100e-6 NSUB=0.0 GAMMA=0.0 RD=0.0 RS=0.0 LAMBDA=0.0 CGSO=0 CGDO=0 CGBO=0)")
-NETLIST_END()
+}
 
 /* ----------------------------------------------------------------------------
  *  BJT Models
  * ---------------------------------------------------------------------------*/
 
 static NETLIST_START(bjt_models)
+{
 	NET_MODEL("NPN _(IS=1e-15 BF=100 NF=1 BR=1 NR=1 CJE=0 CJC=0)")
 	NET_MODEL("PNP _(IS=1e-15 BF=100 NF=1 BR=1 NR=1 CJE=0 CJC=0)")
 
@@ -98,13 +101,14 @@ static NETLIST_START(bjt_models)
 	NET_MODEL("BC817-25 NPN(IS=9.198E-14 NF=1.003 ISE=4.468E-16 NE=1.65 BF=338.8 IKF=0.4913 VAF=107.9 NR=1.002 ISC=5.109E-15 NC=1.071 BR=29.48 IKR=0.193 VAR=25 RB=1 IRB=1000 RBM=1 RE=0.2126 RC=0.143 XTB=0 EG=1.11 XTI=3 CJE=3.825E-11 VJE=0.7004 MJE=0.364 TF=5.229E-10 XTF=219.7 VTF=3.502 ITF=7.257 PTF=0 CJC=1.27E-11 VJC=0.4431 MJC=0.3983 XCJC=0.4555 TR=7E-11 CJS=0 VJS=0.75 MJS=0.333 FC=0.905 Vceo=45 Icrating=500m mfg=Philips)")
 
 	NET_MODEL("9013 NPN(IS=3.40675E-14 BF=166 VAF=67 IKF=1.164 ISE=12.37e-15 NE=2 BR=15.17 VAR=40.84 IKR=0.261352 ISC=1.905E-15 NC=1.066 RB=63.2 IRB=5.62E-6 RBM=22.1 RE=0.02 RC=0.7426 CJE=3.53E-11 VJE=0.808 MJE=0.372 CJC=1.74E-11 VJC=0.614 MJC=0.388 XCJC=0.349 XTB=1.4025 EG=1.0999 XTI=3 VC=0.5 VCEO=20)")
-NETLIST_END()
+}
 
 /* ----------------------------------------------------------------------------
  *  Family models
  * ---------------------------------------------------------------------------*/
 
 static NETLIST_START(family_models)
+{
 
 	// FAMILIES always need a type. UNKNOWN below will break
 	NET_MODEL("FAMILY _(TYPE=UNKNOWN IVL=0.16 IVH=0.4 OVL=0.1 OVH=1.0 ORL=1.0 ORH=130.0)")
@@ -121,13 +125,14 @@ static NETLIST_START(family_models)
 	NET_MODEL("CD4XXX FAMILY(TYPE=CMOS IVL=0.3 IVH=0.7 OVL=0.05 OVH=0.05 ORL=500 ORH=500)")
 
 	NET_MODEL("74XXOC FAMILY(TYPE=TTL IVL=0.16 IVH=0.4 OVL=0.1 OVH=0.05 ORL=10.0 ORH=1.0e8)")
-NETLIST_END()
+}
 
 /* ----------------------------------------------------------------------------
  *  Always included
  * ---------------------------------------------------------------------------*/
 
 NETLIST_START(base_lib)
+{
 	NET_REGISTER_DEV(GNDA, GND)
 	NET_REGISTER_DEV(PARAMETER, NETLIST)
 
@@ -157,5 +162,5 @@ NETLIST_START(base_lib)
 
 	INCLUDE(modules_lib)
 
-NETLIST_END()
+}
 

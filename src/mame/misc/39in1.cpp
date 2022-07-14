@@ -19,7 +19,7 @@
  *
  * International Amusement Machine (I.A.M.) slots from the second half of the
  * 2000s use very similar PCBs (almost same main components, very similar layout,
- * same encryption.
+ * same encryption).
  *
  * TODO:
  *   - PXA255 peripherals
@@ -29,8 +29,6 @@
  *     from the CPLD (probably)
  *   - 19in1, 48in1, 48in1a, 48in1b, 48in1c, 60in1 have more conditional XORs,
  *     encryption isn't completely beaten yet
- *   - I.A.M. games are all incomplete dumps and they might use different
- *     hardware features. If they diverge too much, move to own driver.
  *
  *
  * 39in1 notes:

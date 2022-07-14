@@ -316,7 +316,7 @@ private:
 	uint8_t input_port_c_r();
 	void output_port_c_w(uint8_t data);
 
-	uint8_t m_trdr;
+	uint8_t m_trdr = 0;
 	uint8_t m_led_on = 0;
 
 	required_device<v9938_device> m_v9938;
@@ -391,6 +391,7 @@ M_MAP     EQU  90H    ; [A]= Bank to select (BIT6=MEM, BIT7=EN_NMI)
 /**************************************
 *            R/W handlers             *
 **************************************/
+
 void luckybal_state::z180_trdr_w(uint8_t data)
 {
 	m_trdr = data;
@@ -415,14 +416,14 @@ void luckybal_state::ppi_bitswap_w(offs_t offset, uint8_t data)
 void luckybal_state::output_port_a_w(uint8_t data)
 {
 	if (m_trdr & 0x80)
-	{
 		m_trdr = m_trdr & 0x7f;
-		if (m_trdr > 36) m_trdr = m_led_on;  // Prevents unexpected data.
-	}
 
-	m_lamps[m_led_on] = 0;
-	m_lamps[m_trdr] = 1;
-	m_led_on = m_trdr;
+	if (m_trdr <= 36)
+	{
+		m_lamps[m_led_on] = 0;
+		m_lamps[m_trdr] = 1;
+		m_led_on = m_trdr;
+	}
 
 	m_dac->write(data);
 }
@@ -432,7 +433,6 @@ void luckybal_state::output_port_b_w(uint8_t data)
 	for (int n = 0; n < 3; n++)
 		if (!BIT(data, n + 3))
 			m_latch[n]->write_bit(data & 7, BIT(data, 6));
-
 }
 
 uint8_t luckybal_state::input_port_c_r()

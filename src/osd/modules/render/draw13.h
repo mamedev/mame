@@ -25,6 +25,9 @@ typedef uint64_t HashT;
 // standard SDL headers
 #include <SDL2/SDL.h>
 
+#include "emucore.h"
+#include "render.h"
+
 struct quad_setup_data
 {
 	quad_setup_data()

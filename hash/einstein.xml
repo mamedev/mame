@@ -581,7 +581,6 @@ Xtal Systems (Xtal Research)
 	</software>
 
 	<software name="druid" supported="no">
-		<!-- Does not work in MESS-->
 		<description>Druid</description>
 		<year>19??</year>
 		<publisher>Merlin Software</publisher>

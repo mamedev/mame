@@ -9,6 +9,7 @@
 #include "netlist/devices/net_lib.h"
 
 NETLIST_START(msx)
+{
 	/* The BJT is used as an amplifier. RESCHED_LOOPS must be relatively high to
 	 * allow Newton-Raphson to finish. */
 
@@ -62,4 +63,4 @@ NETLIST_START(msx)
 	//LOG(logB, T2.B)
 	LOG(logC, T2.C)
 
-NETLIST_END()
+}

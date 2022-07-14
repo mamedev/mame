@@ -90,9 +90,9 @@ namespace netlist
 			false);
 
 	private:
-		nl_fptype *m_Idr; ///< drive current
-		nl_fptype *m_go;  ///< conductance for Voltage from other term
-		nl_fptype *m_gt;  ///< conductance for total conductance
+		nl_fptype *m_Idr; //!< drive current
+		nl_fptype *m_go;  //!< conductance for Voltage from other term
+		nl_fptype *m_gt;  //!< conductance for total conductance
 	};
 
 	// -------------------------------------------------------------------------
@@ -107,9 +107,9 @@ namespace netlist
 	{
 	public:
 		/// \brief Constructor
-		analog_input_t(core_device_t &dev,     ///< owning device
-			const pstring &           aname,   ///< name of terminal
-			nl_delegate               delegate ///< delegate
+		analog_input_t(core_device_t &dev,     //!< owning device
+			const pstring &           aname,   //!< name of terminal
+			nl_delegate               delegate //!< delegate
 		);
 
 		/// \brief returns voltage at terminal.

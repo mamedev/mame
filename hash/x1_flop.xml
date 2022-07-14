@@ -2509,7 +2509,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="sorcerexp4" cloneof="sorcer">
-		<description>Sorcerian New Scenario Vol.1 - Uchuu Kara no Homonsha</description>
+		<description>Sorcerian New Scenario Vol.1 - Uchuu kara no Houmonsha</description>
 		<year>1989</year>
 		<publisher>ブラザー工業 (Brother Kougyou)</publisher>
 		<!-- Turbo only -->

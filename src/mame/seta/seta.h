@@ -16,11 +16,10 @@
 #include "machine/gen_latch.h"
 #include "machine/ticket.h"
 #include "machine/timer.h"
-#include "machine/tmp68301.h"
 #include "machine/upd4701.h"
 #include "machine/upd4992.h"
 #include "sound/x1_010.h"
-#include "seta001.h"
+#include "video/x1_001.h"
 #include "x1_012.h"
 #include "emupal.h"
 #include "tilemap.h"
@@ -41,9 +40,9 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_seta001(*this, "spritegen"),
+		m_spritegen(*this, "spritegen"),
 		m_layers(*this, "layer%u", 1U),
-		m_x1(*this, "x1snd"),
+		m_x1snd(*this, "x1snd"),
 		m_soundlatch(*this, "soundlatch"),
 		m_dsw(*this, "DSW"),
 		m_coins(*this, "COINS"),
@@ -97,7 +96,7 @@ public:
 
 	void palette_init_RRRRRGGGGGBBBBB_proms(palette_device &palette) const;
 
-	SETA001_SPRITE_GFXBANK_CB_MEMBER(setac_gfxbank_callback);
+	X1_001_SPRITE_GFXBANK_CB_MEMBER(setac_gfxbank_callback);
 
 	u32 screen_update_seta_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -108,9 +107,9 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
-	required_device<seta001_device> m_seta001;
+	required_device<x1_001_device> m_spritegen;
 	optional_device_array<x1_012_device, 2> m_layers;
-	optional_device<x1_010_device> m_x1;
+	optional_device<x1_010_device> m_x1snd;
 	optional_device<generic_latch_8_device> m_soundlatch;
 
 	optional_ioport m_dsw;
@@ -161,7 +160,6 @@ protected:
 	TIMER_CALLBACK_MEMBER(uPD71054_timer_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(seta_interrupt_1_and_2);
 	TIMER_DEVICE_CALLBACK_MEMBER(seta_interrupt_2_and_4);
-	TIMER_DEVICE_CALLBACK_MEMBER(crazyfgt_interrupt);
 
 	void set_pens();
 	void seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_bank_size);
@@ -352,30 +350,6 @@ protected:
 
 private:
 	u8 m_thunderl_protection_reg;
-};
-
-class kiwame_state : public seta_state
-{
-public:
-	kiwame_state(const machine_config &mconfig, device_type type, const char *tag) :
-		seta_state(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_key(*this, "KEY%u", 0U)
-	{ }
-
-	void kiwame(machine_config &config);
-
-private:
-	void row_select_w(u16 data);
-	u16 input_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(kiwame_vblank);
-
-	void kiwame_map(address_map &map);
-
-	required_device<tmp68301_device> m_maincpu;
-	required_ioport_array<10> m_key;
-
-	u16 m_kiwame_row_select = 0;
 };
 
 class magspeed_state : public seta_state

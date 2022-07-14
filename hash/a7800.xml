@@ -2372,7 +2372,7 @@ almost nothing like the prototype.
 	<!-- XM board enhanced -->
 	<!-- from http://atariage.com/forums/topic/204250-donkey-kong-xm-pre-order-and-demo/ -->
 
-	<!-- these ones are listed as 'working in MESS' but are apparently the only images that work on real hardware too -->
+	<!-- these ones are listed as 'working in MAME' but are apparently the only images that work on real hardware too -->
 	<software name="dkongxm">
 		<description>Donkey Kong (PAL, Demo, XM enhanced, V1.2)</description>
 		<year>2012</year>

@@ -12,7 +12,7 @@
 #if defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
 
 // MAME headers
-#include "emu.h"
+#include "osdcore.h"
 #include "osdepend.h"
 #include "emuopts.h"
 

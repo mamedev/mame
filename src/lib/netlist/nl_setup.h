@@ -49,7 +49,7 @@
 		setup.register_link(# name "." # input, # output);
 
 #define NET_C(term1, ...)                                                      \
-		setup.register_link_arr( # term1 ", " # __VA_ARGS__);
+		setup.register_connection_arr( # term1 ", " # __VA_ARGS__);
 
 #define PARAM(name, val)                                                       \
 		setup.register_param(NET_STR(name), NET_STR(val));
@@ -70,9 +70,6 @@
 
 #define NETLIST_START(name)                                                    \
 void NETLIST_NAME(name)([[maybe_unused]] netlist::nlparse_t &setup)            \
-{                                                                              \
-
-#define NETLIST_END()  }
 
 #define LOCAL_SOURCE(name)                                                     \
 		setup.register_source_proc(# name, &NETLIST_NAME(name));
@@ -110,22 +107,27 @@ void NETLIST_NAME(name)([[maybe_unused]] netlist::nlparse_t &setup)            \
 #if 0
 #define TRUTHTABLE_START(cname, in, out, pdef_params)                          \
 	void NETLIST_NAME(cname ## _impl)(netlist::tt_desc &desc);                 \
-	static NETLIST_START(cname)                                                \
+	static NETLIST_START(cname)
+{                                                \
 		netlist::tt_desc xdesc{ #cname, in, out, "" };                         \
 		auto sloc = PSOURCELOC();                                              \
 		const pstring def_params = pdef_params;                                \
 		NETLIST_NAME(cname ## _impl)(xdesc);                                   \
 		setup.truth_table_create(xdesc, def_params, std::move(sloc));          \
-	NETLIST_END()                                                              \
+	}                                                              \
 	static void NETLIST_NAME(cname ## _impl)(netlist::tt_desc &desc)           \
 	{
 #else
-#define TRUTHTABLE_START(cname, in, out, pdef_params)                          \
-	NETLIST_START(cname)                                                       \
-		netlist::tt_desc desc{ #cname, in, out, "", {} };                      \
-		auto sloc = PSOURCELOC();                                              \
-		const pstring def_params = pdef_params;                                \
-		plib::functor_guard lg([&](){ setup.truth_table_create(desc, def_params, std::move(sloc)); });
+#define TRUTH_TABLE(cname, in, out, pdef_params)                               \
+	void NETLIST_NAME(cname ## _impl)(netlist::nlparse_t &setup, netlist::tt_desc &desc); \
+	static void NETLIST_NAME(cname)(netlist::nlparse_t &setup)      \
+	{ \
+		netlist::tt_desc desc{ #cname, in, out, "", {} };   \
+		NETLIST_NAME(cname ## _impl)(setup, desc); \
+		setup.truth_table_create(desc, pdef_params, PSOURCELOC()); \
+	} \
+	static void NETLIST_NAME(cname ## _impl)([[maybe_unused]] netlist::nlparse_t &setup, netlist::tt_desc &desc)      \
+
 #endif
 
 #define TT_HEAD(x) \
@@ -136,9 +138,6 @@ void NETLIST_NAME(name)([[maybe_unused]] netlist::nlparse_t &setup)            \
 
 #define TT_FAMILY(x) \
 		desc.family = x;
-
-#define TRUTHTABLE_END() \
-	NETLIST_END()
 
 #define TRUTHTABLE_ENTRY(name)                                                 \
 	LOCAL_SOURCE(name)                                                         \
@@ -176,8 +175,30 @@ namespace netlist
 		nlparse_t(log_type &log, detail::abstract_t &abstract);
 
 		void register_model(const pstring &model_in);
-		void register_alias(const pstring &alias, const pstring &out);
-		void register_alias_no_fqn(const pstring &alias, const pstring &out);
+
+		/// \brief Register an aliases
+		///
+		/// Both alias and points_to are considered to be relative to the
+		/// current netlist naming level and changed to fully qualified names.
+		/// The alias type will be automatically determined. If it is a number,
+		/// it will be PACKAGE_PIN - in all other cases READABILITY.
+		/// This call is only used by the ALIAS macro.
+		/// \param alias the alias to be qualified
+		/// \param points_to the pin aliased
+		void register_alias(const pstring &alias, const pstring &points_to);
+		/// \brief Register an aliases
+		///
+		/// Both alias and points_to are considered to be relative to the
+		/// current netlist naming level and changed to fully qualified names.
+		/// \param type the alias type see \ref alias_type
+		/// \param alias the alias to be qualified
+		/// \param points_to the pin aliased
+		void register_alias(detail::alias_type type, const pstring &alias, const pstring &points_to);
+		/// \brief Register an aliases where alias and references are fully qualified names
+		/// \param type the alias type see \ref alias_type
+		/// \param alias the alias to be qualified
+		/// \param points_to the pin aliased
+		void register_fqn_alias(detail::alias_type type, const pstring &alias, const pstring &points_to);
 		void register_dip_alias_arr(const pstring &terms);
 
 		// last argument only needed by nltool
@@ -192,10 +213,10 @@ namespace netlist
 
 		void register_hint(const pstring &object_name, const pstring &hint_name);
 
-		void register_link(const pstring &sin, const pstring &sout);
-		void register_link_arr(const pstring &terms);
+		void register_connection(const pstring &sin, const pstring &sout);
+		void register_connection_arr(const pstring &terms);
 		// also called from devices for late binding connected terminals
-		void register_link_fqn(const pstring &sin, const pstring &sout);
+		void register_connection_fqn(const pstring &sin, const pstring &sout);
 
 		void register_param(const pstring &param, const pstring &value);
 

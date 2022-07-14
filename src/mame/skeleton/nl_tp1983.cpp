@@ -26,6 +26,7 @@
 //efine SB9 0
 
 NETLIST_START(tp1983)
+{
 
 	SOLVER(Solver, 480000)
 //  PARAM(Solver.PARALLEL, 0) // Don't do parallel solvers
@@ -120,5 +121,5 @@ NETLIST_START(tp1983)
 	HINT(clk, NO_DEACTIVATE)
 #endif
 
-NETLIST_END()
+}
 

@@ -963,7 +963,7 @@ void macpb030_state::macpb140(machine_config &config)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	ASC(config, m_asc, C15M, asc_device::asc_type::ASC);
+	ASC(config, m_asc, 22.5792_MHz_XTAL, asc_device::asc_type::EASC);
 	m_asc->irqf_callback().set(FUNC(macpb030_state::asc_irq_w));
 	m_asc->add_route(0, "lspeaker", 1.0);
 	m_asc->add_route(1, "rspeaker", 1.0);
@@ -1075,7 +1075,7 @@ void macpb030_state::macpb160(machine_config &config)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	ASC(config, m_asc, C15M, asc_device::asc_type::ASC);
+	ASC(config, m_asc, 22.5792_MHz_XTAL, asc_device::asc_type::EASC);
 	m_asc->irqf_callback().set(FUNC(macpb030_state::asc_irq_w));
 	m_asc->add_route(0, "lspeaker", 1.0);
 	m_asc->add_route(1, "rspeaker", 1.0);

@@ -7,7 +7,7 @@
 
     TODO:
         - V8 and friends (LC, LC2, Classic 2, Color Classic) to own driver
-        - LC3 / LC520 / IIvx / IIvi to own driver
+        - IIvx / IIvi to own driver
 
 ****************************************************************************/
 
@@ -144,23 +144,6 @@ void mac_state::ariel_ramdac_w(offs_t offset, uint32_t data, uint32_t mem_mask) 
 	else    // color key reg
 	{
 	}
-}
-
-uint8_t mac_state::mac_sonora_vctl_r(offs_t offset)
-{
-	if (offset == 2)
-	{
-//        printf("Sonora: read monitor ID at PC=%x\n", m_maincpu->pc());
-		return (m_montype.read_safe(6)<<4);
-	}
-
-	return m_sonora_vctl[offset];
-}
-
-void mac_state::mac_sonora_vctl_w(offs_t offset, uint8_t data)
-{
-//  printf("Sonora: %02x to vctl %x\n", data, offset);
-	m_sonora_vctl[offset] = data;
 }
 
 void mac_state::rbv_recalc_irqs()
@@ -491,7 +474,6 @@ void mac_state::maclc3_map(address_map &map)
 	map(0x50016000, 0x50017fff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w)).mirror(0x00f00000);
 	map(0x50024000, 0x50025fff).w(FUNC(mac_state::ariel_ramdac_w)).mirror(0x00f00000);
 	map(0x50026000, 0x50027fff).rw(FUNC(mac_state::mac_rbv_r), FUNC(mac_state::mac_rbv_w)).mirror(0x00f00000);
-	map(0x50028000, 0x50028003).rw(FUNC(mac_state::mac_sonora_vctl_r), FUNC(mac_state::mac_sonora_vctl_w)).mirror(0x00f00000);
 
 	map(0x5ffffffc, 0x5fffffff).r(FUNC(mac_state::mac_read_id));
 
@@ -923,35 +905,6 @@ void mac_state::maccclas(machine_config &config)
 	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b_cdadb));
 }
 
-void mac_state::maclc3(machine_config &config, bool egret)
-{
-	maclc(config, false, false, asc_device::asc_type::SONORA, 2);
-
-	M68030(config, m_maincpu, 25000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maclc3_map);
-	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
-
-	MCFG_VIDEO_START_OVERRIDE(mac_state,macsonora)
-	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macsonora)
-
-	m_screen->set_screen_update(FUNC(mac_state::screen_update_macsonora));
-
-	m_ram->set_default_size("4M");
-	m_ram->set_extra_options("8M,16M,32M,48M,64M,80M");
-
-	if (egret)
-	{
-		add_egret(config, EGRET_341S0851);
-	}
-}
-
-void mac_state::maclc520(machine_config &config)
-{
-	maclc3(config, false);
-	add_cuda(config, CUDA_341S0060);
-	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b_cdadb));
-}
-
 void mac_state::maciivx(machine_config &config)
 {
 	maclc(config, false, true, asc_device::asc_type::VASP);
@@ -1232,20 +1185,11 @@ ROM_START( maclc2 )
 	ROM_LOAD32_BYTE( "341-0473_ub2-ll.bin", 0x000003, 0x020000, CRC(8843c37c) SHA1(bb5104110507ca543d106f11c6061245fd90c1a7) )
 ROM_END
 
-ROM_START( maclc3 )
-	ROM_REGION32_BE(0x100000, "bootrom", 0)
-		ROM_LOAD( "ecbbc41c.rom", 0x000000, 0x100000, CRC(e578f5f3) SHA1(c77df3220c861f37a2c553b6ee9241b202dfdffc) )
-ROM_END
-
 ROM_START( maccclas )
 	ROM_REGION32_BE(0x100000, "bootrom", 0)
 	ROM_LOAD( "ecd99dc0.rom", 0x000000, 0x100000, CRC(c84c3aa5) SHA1(fd9e852e2d77fe17287ba678709b9334d4d74f1e) )
 ROM_END
 
-ROM_START( maclc520 )
-	ROM_REGION32_BE(0x100000, "bootrom", 0)
-	ROM_LOAD( "ede66cbd.rom", 0x000000, 0x100000, CRC(a893cb0f) SHA1(c54ee2f45020a4adeb7451adce04cd6e5fb69790) )
-ROM_END
 
 /*    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT    CLASS      INIT                COMPANY           FULLNAME */
 COMP( 1987, macii,     0,        0,      macii,    macadb,  mac_state, init_macii,         "Apple Computer", "Macintosh II",  MACHINE_SUPPORTS_SAVE )
@@ -1261,7 +1205,5 @@ COMP( 1990, maciisi,   0,        0,      maciisi,  maciici, mac_state, init_maci
 COMP( 1991, macclas2,  0,        0,      macclas2, macadb,  mac_state, init_macclassic2,   "Apple Computer", "Macintosh Classic II", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND )
 COMP( 1991, maclc2,    0,        0,      maclc2,   maciici, mac_state, init_maclc2,        "Apple Computer", "Macintosh LC II",  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )
 COMP( 1993, maccclas,  0,        0,      maccclas, macadb,  mac_state, init_maclrcclassic, "Apple Computer", "Macintosh Color Classic", MACHINE_NOT_WORKING )
-COMP( 1993, maclc3,    0,        0,      maclc3,   maciici, mac_state, init_maclc3,        "Apple Computer", "Macintosh LC III",  MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND )
 COMP( 1993, maciivx,   0,        0,      maciivx,  maciici, mac_state, init_maciivx,       "Apple Computer", "Macintosh IIvx", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND )
 COMP( 1993, maciivi,   maciivx,  0,      maciivi,  maciici, mac_state, init_maciivi,       "Apple Computer", "Macintosh IIvi", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND )
-COMP( 1993, maclc520,  0,        0,      maclc520, maciici, mac_state, init_maclc520,      "Apple Computer", "Macintosh LC 520",  MACHINE_NOT_WORKING )

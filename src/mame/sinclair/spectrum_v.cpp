@@ -31,7 +31,7 @@ TIMER_CALLBACK_MEMBER(spectrum_state::finish_screen_update)
 	    https://github.com/mamedev/mame/pull/9670#issuecomment-1118576555
 	    https://github.com/mamedev/mame/pull/9750
 	*/
-	m_screen->update_now();
+	if (started()) m_screen->update_now();
 	m_finish_screen_update_timer->adjust(m_screen->time_until_pos(m_screen->visible_area().bottom(), m_screen->visible_area().right() + 1));
 }
 

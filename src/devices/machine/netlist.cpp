@@ -498,7 +498,7 @@ void netlist_mame_analog_output_device::custom_netlist_additions(netlist::nlpars
 	pstring dname = pstring("OUT_") + pin;
 
 	parser.register_dev(dname, dname);
-	parser.register_link(dname + ".IN", pin);
+	parser.register_connection(dname + ".IN", pin);
 }
 
 void netlist_mame_analog_output_device::pre_parse_action(netlist::nlparse_t &parser)
@@ -548,7 +548,7 @@ void netlist_mame_logic_output_device::custom_netlist_additions(netlist::nlparse
 	pstring dname = pstring("OUT_") + pin;
 
 	parser.register_dev(dname, dname);
-	parser.register_link(dname + ".IN", pin);
+	parser.register_connection(dname + ".IN", pin);
 }
 
 void netlist_mame_logic_output_device::pre_parse_action(netlist::nlparse_t &parser)
@@ -852,7 +852,7 @@ void netlist_mame_stream_output_device::custom_netlist_additions(netlist::nlpars
 	pstring dname = plib::pfmt("STREAM_OUT_{1}")(m_channel);
 
 	parser.register_dev(dname, dname);
-	parser.register_link(dname + ".IN", pstring(m_out_name));
+	parser.register_connection(dname + ".IN", pstring(m_out_name));
 }
 
 void netlist_mame_stream_output_device::process(netlist::netlist_time_ext tim, netlist::nl_fptype val)

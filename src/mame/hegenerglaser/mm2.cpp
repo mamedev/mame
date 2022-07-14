@@ -63,6 +63,17 @@ $8000-$FFF ROM
 
 ===============================================================================
 
+For rebel5 and newer, the chess engine is by Ed Schröder. Older chesscomputers in
+this driver were authored by Ulf Rathsman.
+
+The MM II program was also licensed to Daimler-Benz, who gave away several custom
+chesscomputers as a parting gift to retiring executives. The hardware is same as MM II.
+see(1): http://chesseval.com/ChessEvalJournal/DaimlerBenz.htm
+see(2): http://chesseval.com/RareBoard/DaimlerBenzBoard.htm
+
+MM III was never released officially. Rebell 5,0 is commonly known as MM III, but the
+real one didn't get further than a prototype.
+
 Mephisto 4 Turbo Kit 18mhz - (mm4tk)
     This is a replacement rom combining the turbo kit initial rom with the original MM IV.
     The Turbo Kit powers up to it's tiny rom, copies itself to ram, banks in normal rom,
@@ -75,7 +86,7 @@ Mephisto 4 Turbo Kit 18mhz - (mm4tk)
 
     -- Cowering (2011)
 
-The MM V prototype was the program that Ed Schroeder participated with as "Rebel" at the
+The MM V prototype was the program that Ed Schröder participated with as "Rebel" at the
 1989 WMCCC in Portorose. It was used with the TK20 TurboKit.
 For more information, see: http://chesseval.com/ChessEvalJournal/PrototypeMMV.htm
 
@@ -395,38 +406,40 @@ void mm2_state::mm2(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
-ROM_START( mm2 )
+ROM_START( mm2 ) // 10-09-86
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("400", 0x8000, 0x8000, CRC(e8c1f431) SHA1(c32dfa66eefbf3e539438d2fe6e6916f78a128be) ) // HN27C256G-20
+	// 2-EPROM version also exists: CRC32 e9adcb8f & d40cbfc2
 ROM_END
 
-ROM_START( mm2a ) // binary identical to mm2
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("mm2a_1.bin", 0x8000, 0x4000, CRC(e9adcb8f) SHA1(498f48f96678f7bf429fd43e4f392ec6dd649fc6) )
-	ROM_LOAD("mm2a_2.bin", 0xc000, 0x4000, CRC(d40cbfc2) SHA1(4e9b19b1a0ad97868b31d7a55143a1778110cc96) )
-ROM_END
-
-ROM_START( mm2b )
+ROM_START( mm2a )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("300", 0x8000, 0x8000, CRC(60c777d4) SHA1(a77d678be60094073275558b4e8f0d34b43dd9ae) ) // D27C256D-20
+	// 2-EPROM version also exists: CRC32 86a5a14f & a122f2c0
 ROM_END
 
-ROM_START( mm2c )
+ROM_START( mm2b ) // 21-04-1986
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("8-b_21.4_green", 0x8000, 0x4000, CRC(09cf6228) SHA1(7f33d3776afcc984998a955b433d5feb12de28f8) ) // D27128A-2
-	ROM_LOAD("c-f_21.4_red",   0xc000, 0x4000, CRC(86d77724) SHA1(e46c59e87465a9a1784fbaf4743649b2c10006e0) ) // "
+	ROM_LOAD("200", 0x8000, 0x8000, CRC(9b69aaab) SHA1(98ee4879eef4d8b06553290f16ca661cf4181af8) )
+	// 2-EPROM version also exists: CRC32 09cf6228 & 86d77724, ROM labels 8-b_21.4 & c-f_21.4
 ROM_END
 
-ROM_START( mm2d )
+ROM_START( mm2c ) // serial 05780xx
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("mm2d_1.bin", 0x8000, 0x4000, CRC(e2daac82) SHA1(c9fa59ca92362f8ee770733073bfa2ab8c7904ad) )
-	ROM_LOAD("mm2d_2.bin", 0xc000, 0x4000, CRC(5e296939) SHA1(badd2a377259cf738cd076d8fb245c3dc284c24d) )
+	ROM_LOAD("hg86", 0x8000, 0x4000, CRC(e26d1f17) SHA1(3227bb1f8f22dd0d902a9a8be3c508b45c57d6cc) )
+	ROM_LOAD("50",   0xc000, 0x4000, CRC(86d77724) SHA1(e46c59e87465a9a1784fbaf4743649b2c10006e0) )
 ROM_END
 
-ROM_START( mm2e )
+ROM_START( mm2d ) // serial 05650xx
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("mm2e_1.bin", 0x8000, 0x4000, CRC(b91dab77) SHA1(67762304afe51fb8f1eb91259567b2451bf9bbfd) )
-	ROM_LOAD("mm2e_2.bin", 0xc000, 0x4000, CRC(01143cc1) SHA1(f78474b410dbecb209aa23ef81e9f894e8b54942) )
+	ROM_LOAD("mm2d_1.bin", 0x8000, 0x4000, CRC(b91dab77) SHA1(67762304afe51fb8f1eb91259567b2451bf9bbfd) )
+	ROM_LOAD("mm2d_2.bin", 0xc000, 0x4000, CRC(01143cc1) SHA1(f78474b410dbecb209aa23ef81e9f894e8b54942) )
+ROM_END
+
+ROM_START( mm2e ) // 13-09-1985, serial 05569xx
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("hg86_13.9", 0x8000, 0x4000, CRC(e2daac82) SHA1(c9fa59ca92362f8ee770733073bfa2ab8c7904ad) )
+	ROM_LOAD("c-f_6.9",   0xc000, 0x4000, CRC(5e296939) SHA1(badd2a377259cf738cd076d8fb245c3dc284c24d) )
 ROM_END
 
 
@@ -500,12 +513,12 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE   INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS */
-CONS( 1984, mm2,     0,      0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 1, v4.00 1 EPROM)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1984, mm2a,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 2, v4.00 2 EPROMs)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1984, mm2b,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 3, v3.00)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1984, mm2c,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1984, mm2d,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 5)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1984, mm2e,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, mm2,     0,      0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 1, v4.00)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, mm2a,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 2, v3.00)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, mm2b,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 3, v2.00)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, mm2c,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, mm2d,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 5)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, mm2e,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1985, bup,     0,      0,      bup,      bup,   mm2_state, empty_init, "Hegener + Glaser", u8"Mephisto Blitz- und Problemlösungs-Modul (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1985, bupa,    bup,    0,      bup,      bup,   mm2_state, empty_init, "Hegener + Glaser", u8"Mephisto Blitz- und Problemlösungs-Modul (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

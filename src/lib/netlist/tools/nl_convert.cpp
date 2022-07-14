@@ -400,13 +400,14 @@ void nl_convert_spice_t::convert(const pstring &contents)
 	}
 
 	out("NETLIST_START(dummy)\n");
+	out("{\n");
 	add_term("0", "GND");
 	add_term("GND", "GND"); // For Kicad
 
 	convert_block(nl);
 	dump_nl();
 	// FIXME: Parameter
-	out("NETLIST_END()\n");
+	out("}\n");
 }
 
 static pstring rem(const std::vector<pstring> &vps, std::size_t start)
@@ -451,13 +452,14 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				{
 					m_subckt = tt[1] + "_";
 					out("NETLIST_START({})\n", tt[1]);
+					out("{\n");
 					for (std::size_t i=2; i<tt.size(); i++)
 						add_ext_alias(tt[i]);
 				}
 				else if (tt[0] == ".ENDS")
 				{
 					dump_nl();
-					out("NETLIST_END()\n");
+					out("}\n");
 					m_subckt = "";
 				}
 				else if (tt[0] == ".MODEL")
@@ -764,6 +766,7 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 	tok.set_token_source(&tokstor);
 
 	out("NETLIST_START(dummy)\n");
+	out("{\n");
 	add_term("GND", "GND");
 	add_term("VCC", "VCC");
 	tokenizer::token_t token = tok.get_token();
@@ -773,7 +776,7 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 		{
 			dump_nl();
 			// FIXME: Parameter
-			out("NETLIST_END()\n");
+			out("}\n");
 			return;
 		}
 
@@ -918,6 +921,7 @@ void nl_convert_rinf_t::convert(const pstring &contents)
 	auto lm = read_lib_map(s_lib_map);
 
 	out("NETLIST_START(dummy)\n");
+	out("{\n");
 	add_term("GND", "GND");
 	add_term("VCC", "VCC");
 	tokenizer::token_t token = tok.get_token();
@@ -927,7 +931,7 @@ void nl_convert_rinf_t::convert(const pstring &contents)
 		{
 			dump_nl();
 			// FIXME: Parameter
-			out("NETLIST_END()\n");
+			out("}\n");
 			return;
 		}
 

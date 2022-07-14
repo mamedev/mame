@@ -54178,7 +54178,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<rom name="Shibasu 1-2-3 Destiny! (Japan) (Track 2) [SLPS-01893].bin" size="59585568" crc="734cc7e7" sha1="4c35670f19089a6514355c92e80b9dcb565b944f"/>
 		<rom name="Shibasu 1-2-3 Destiny! (Japan) [SLPS-01893].cue" size="231" crc="f466decf" sha1="9c55cbb6a0c51087de1ea2a2b96c38abcba44e40"/>
 		-->
-		<description>Shiibas 1-2-3 - Destiny! Unmei O Kaerusha! (Jpn)</description>
+		<description>Shiibas 1-2-3 - Destiny! Unmei o Kaeru Mono! (Jpn)</description>
 		<year>2000</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="SLPS-01893" />
@@ -56641,7 +56641,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<rom name="T kara Hajimaru Monogatari (Japan) [SLPS-01350].bin" size="199322592" crc="ea799678" sha1="0f3922b60da85edfed83f414dbc754ca0cecbd51"/>
 		<rom name="T kara Hajimaru Monogatari (Japan) [SLPS-01350].cue" size="239" crc="d2db88ff" sha1="e4f001d31849582e70a1c390a3ca0c532c5dc04c"/>
 		-->
-		<description>T Kara Hajimaru Monogatari (Jpn)</description>
+		<description>T kara Hajimaru Monogatari (Jpn)</description>
 		<year>1998</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="SLPS-01350" />

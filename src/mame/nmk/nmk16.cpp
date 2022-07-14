@@ -627,6 +627,23 @@ void nmk16_state::acrobatm_map(address_map &map)
 	map(0xd4000, 0xd47ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
 }
 
+void nmk16_state::acrobatmbl_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).rom();
+	map(0x80000, 0x8ffff).ram().share("mainram");
+	map(0xc0000, 0xc0001).portr("IN0");
+	map(0xc0002, 0xc0003).portr("IN1");
+	map(0xc0008, 0xc0009).portr("DSW1");
+	map(0xc000a, 0xc000b).portr("DSW2");
+	map(0xc0015, 0xc0015).w(FUNC(nmk16_state::flipscreen_w));
+	map(0xc0019, 0xc0019).w(FUNC(nmk16_state::tilebank_w));
+	map(0xc001e, 0xc001f).w("seibu_sound", FUNC(seibu_sound_device::main_mustb_w));
+	map(0xc4000, 0xc45ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xc8000, 0xc8007).ram().w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
+	map(0xcc000, 0xcffff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
+	map(0xd4000, 0xd47ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
+}
+
 void nmk16_state::bioship_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
@@ -2245,6 +2262,40 @@ static INPUT_PORTS_START( acrobatm )
 	PORT_DIPSETTING(    0xc0, "3" )
 	PORT_DIPSETTING(    0x80, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( acrobatmbl )
+	PORT_INCLUDE(acrobatm)
+
+	PORT_MODIFY("DSW1") // for some reason changed from move.w to move.b
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1c00, 0x1c00, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW1:6,5,4")
+	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x1800, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x1c00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0c00, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x1400, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_4C ) )
+	PORT_DIPNAME( 0xe000, 0xe000, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:3,2,1")
+	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0xc000, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0xe000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x6000, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0xa000, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( 1C_4C ) )
+
+	PORT_START("COIN")  // referenced by Seibu sound board
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bioship )
@@ -4538,6 +4589,45 @@ void nmk16_state::acrobatm(machine_config &config)
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
 }
 
+void nmk16_state::acrobatmbl(machine_config &config)
+{
+	// basic machine hardware
+	M68000(config, m_maincpu, 8_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::acrobatmbl_map);
+	set_hacky_interrupt_timing(config);
+
+	Z80(config, m_audiocpu, 8_MHz_XTAL / 2); // divider not verified
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::seibu_sound_map);
+	m_audiocpu->set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
+
+	PIC16C57(config, "mcu", 8_MHz_XTAL / 2).set_disable();  // divider not verified
+
+	// video hardware
+	set_hacky_screen_lowres(config); // TODO: video XTAL is 12 MHz
+	m_spritegen->set_colpri_callback(FUNC(nmk16_state::get_colour_4bit));
+	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 768);
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 8_MHz_XTAL / 2)); // divider not verified
+	ymsnd.irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	OKIM6295(config, "oki", 8_MHz_XTAL / 8, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.40); // divider not verified
+
+	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
+	seibu_sound.int_callback().set_inputline(m_audiocpu, 0);
+	seibu_sound.set_rom_tag("audiocpu");
+	seibu_sound.set_rombank_tag("seibu_bank1");
+	seibu_sound.ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
+	seibu_sound.ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
+}
+
 void nmk16_state::tdragonb(machine_config &config)    // bootleg using Raiden sound hardware
 {
 	// basic machine hardware
@@ -5473,6 +5563,32 @@ void nmk16_state::init_bjtwin()
 
 }
 
+void nmk16_state::init_acrobatmbl()
+{
+/*
+    Dumper's notes:
+
+    The PIC is security...
+    It has control of the RAM @ 8ff00 - 90000
+
+    To get it to run fine on MAME, I patched the 2 bum jumps to the "pic area":
+    6C6 -
+    OLD: 4eb9 0008 ff68
+    NEW: 4eb9 0000 2d84
+
+    6D2
+    OLD:  4eb9 0008 ff00
+    NEW: 4eb9 0000 3510
+*/
+
+	// patch PIC protection for now. TODO: remove and hook up PIC once dumped
+	u16 *rom = (u16 *)memregion("maincpu")->base();
+	rom[0x6c8/2] = 0x0000;
+	rom[0x6ca/2] = 0x2d84;
+	rom[0x6d4/2] = 0x0000;
+	rom[0x6d6/2] = 0x3510;
+}
+
 void nmk16_state::init_gunnailb()
 {
 	decode_gfx();
@@ -6394,6 +6510,34 @@ ROM_START( acrobatm )
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "10.ic81",    0x0000, 0x0100, CRC(cfdbb86c) SHA1(588822f6308a860937349c9106c2b4b1a75823ec) )  // 82S129, unknown purpose
 	ROM_LOAD( "11.ic80",    0x0100, 0x0100, CRC(633ab1c9) SHA1(acd99fcca41eaab7948ca84988352f1d7d519c61) )  // 82S135, unknown purpose
+ROM_END
+
+ROM_START( acrobatmbl ) // this bootleg has a PIC performing simple protection checks and Raiden sounds
+	ROM_REGION( 0x40000, "maincpu", 0 ) // extremely similar to the original
+	ROM_LOAD16_BYTE( "4.10c", 0x00000, 0x20000, CRC(c516dac3) SHA1(7d3950b96314ebb801baaf78d0743cf5f9b72caa) )
+	ROM_LOAD16_BYTE( "3.10f", 0x00001, 0x20000, CRC(ae6d2349) SHA1(2a0fc168fe149c3b4572ac045551819b8f68e803) )
+
+	ROM_REGION( 0x2000, "mcu", 0 ) // needs to be decapped
+	ROM_LOAD( "pic16c57", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION( 0x10000, "fgtile", 0 )
+	ROM_LOAD( "10m", 0x00000, 0x10000, CRC(d86c186e) SHA1(2e263d4780f2ba7acc7faa88472c85216fbae6a3) ) // label peeled off, possibly 5
+
+	ROM_REGION( 0x100000, "bgtile", 0 )
+	ROM_LOAD( "a.9x", 0x000000, 0x100000, CRC(7c12afed) SHA1(ae793e41599355a126cbcce91cd2c9f212d21853) )
+
+	ROM_REGION( 0x180000, "sprites", 0 )
+	ROM_LOAD( "b.2k",  0x000000, 0x100000, CRC(5672bdaa) SHA1(5401a104d72904de19b73125451767bc63d36809) )
+	ROM_LOAD( "c.2m",  0x100000, 0x080000, CRC(a3f5a3e0) SHA1(886294ed61a61f99393c49f9af9b6593c6c850af) )
+	ROM_IGNORE(                  0x080000 ) // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )
+	ROM_LOAD( "2.12w",             0x00000, 0x08000, CRC(99ee7505) SHA1(b97c8ee5e26e8554b5de506fba3b32cc2fde53c9) )
+	ROM_CONTINUE(                  0x10000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x00000, 0x18000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "1.14y", 0x00000, 0x10000, CRC(f6f6c4bf) SHA1(ea4cf74d968e254ae47c16c2f4c2f4bc1a528808) )
 ROM_END
 
 /*
@@ -9109,6 +9253,7 @@ GAME( 1997, tomagic,   0,         tomagic,      tomagic,      nmk16_tomagic_stat
 // these use the Seibu sound system (sound / music stolen from Raiden) rather than the bootleggers copying the nmk004
 GAME( 1990, mustangb,   mustang,  mustangb,     mustang,      nmk16_state, empty_init,           ROT0,   "bootleg",                       "US AAF Mustang (bootleg, set 1)", 0 )
 GAME( 1990, mustangb2,  mustang,  mustangb,     mustang,      nmk16_state, empty_init,           ROT0,   "bootleg (TAB Austria)",         "US AAF Mustang (TAB Austria bootleg)", 0 ) // PCB and ROMs have TAB Austria stickers
+GAME( 1991, acrobatmbl, acrobatm, acrobatmbl,   acrobatmbl,   nmk16_state, init_acrobatmbl,      ROT270, "bootleg",                       "Acrobat Mission (bootleg with Raiden sounds)", 0 )
 GAME( 1991, tdragonb,   tdragon,  tdragonb,     tdragonb,     nmk16_state, init_tdragonb,        ROT270, "bootleg",                       "Thunder Dragon (bootleg with Raiden sounds, encrypted)", 0 )
 GAME( 1991, tdragonb3,  tdragon,  tdragonb3,    tdragonb,     nmk16_state, empty_init,           ROT270, "bootleg",                       "Thunder Dragon (bootleg with Raiden sounds, unencrypted)", 0 )
 GAME( 1992, strahljbl,  strahl,   strahljbl,    strahljbl,    nmk16_state, empty_init,           ROT0,   "bootleg",                       "Koutetsu Yousai Strahl (Japan, bootleg)", 0 )
