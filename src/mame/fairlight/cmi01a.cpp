@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "cmi01a.h"
 
-#define VERBOSE     (1)
+#define VERBOSE     (0)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(CMI01A_CHANNEL_CARD, cmi01a_device, "cmi_01a", "Fairlight CMI-01A Channel Card")
@@ -331,7 +331,7 @@ void cmi01a_device::run_w(int state)
 	}
 }
 
-void cmi01a_device::update_rstb_pulser()
+inline void cmi01a_device::update_rstb_pulser()
 {
 	set_run_load_xor(m_run != !m_not_load);
 }
@@ -424,7 +424,7 @@ void cmi01a_device::set_zx_flipflop_state(const bool zx_ff)
 	pulse_zcint();
 }
 
-void cmi01a_device::pulse_zcint()
+inline void cmi01a_device::pulse_zcint()
 {
 	set_not_zcint(false);
 	m_zcint_pulse_timer->adjust(attotime::from_nsec(2750));
@@ -455,7 +455,7 @@ void cmi01a_device::set_not_load(const bool not_load)
 	update_ptm_c1();
 }
 
-void cmi01a_device::update_gzx()
+inline void cmi01a_device::update_gzx()
 {
 	set_gzx(!m_not_rstb || !m_not_zcint);
 }
@@ -472,7 +472,7 @@ void cmi01a_device::set_gzx(const bool gzx)
 		set_envelope_dir(m_dir);
 }
 
-void cmi01a_device::update_not_eload()
+inline void cmi01a_device::update_not_eload()
 {
 	set_not_eload(!(m_permit_eload && m_gzx));
 }
@@ -486,7 +486,7 @@ void cmi01a_device::set_not_eload(const bool not_eload)
 	try_load_envelope();
 }
 
-void cmi01a_device::try_load_envelope()
+inline void cmi01a_device::try_load_envelope()
 {
 	if (m_not_eload)
 		return;
@@ -605,13 +605,13 @@ void cmi01a_device::not_wpe_w(int state)
 	update_upper_wave_addr_load();
 }
 
-void cmi01a_device::update_upper_wave_addr_load()
+inline void cmi01a_device::update_upper_wave_addr_load()
 {
 	const bool c10_and_out = (!m_not_wpe && m_gzx);
 	set_upper_wave_addr_load(c10_and_out || !m_not_rstb);
 }
 
-void cmi01a_device::set_upper_wave_addr_load(const bool upper_wave_addr_load)
+inline void cmi01a_device::set_upper_wave_addr_load(const bool upper_wave_addr_load)
 {
 	if (upper_wave_addr_load == m_upper_wave_addr_load)
 		return;
@@ -620,7 +620,7 @@ void cmi01a_device::set_upper_wave_addr_load(const bool upper_wave_addr_load)
 	try_load_upper_wave_addr();
 }
 
-void cmi01a_device::try_load_upper_wave_addr()
+inline void cmi01a_device::try_load_upper_wave_addr()
 {
 	if (!m_upper_wave_addr_load)
 		return;

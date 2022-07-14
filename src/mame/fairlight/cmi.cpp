@@ -2066,7 +2066,6 @@ void cmi_state::cmi2x(machine_config &config)
 	MC6809E(config, m_maincpu1, Q209_CPU_CLOCK);
 	m_maincpu1->set_addrmap(AS_PROGRAM, &cmi_state::maincpu1_map);
 	m_maincpu1->set_irq_acknowledge_callback(FUNC(cmi_state::cpu1_interrupt_callback));
-	config.set_perfect_quantum(m_maincpu1);
 
 	MC6809E(config, m_maincpu2, Q209_CPU_CLOCK);
 	m_maincpu2->set_addrmap(AS_PROGRAM, &cmi_state::maincpu2_map);
@@ -2224,28 +2223,28 @@ void cmi_state::cmi2x(machine_config &config)
 
 	// Channel cards
 	CMI01A_CHANNEL_CARD(config, m_channels[0], SYSTEM_CAS_CLOCK, 0);
-	m_channels[0]->add_route(ALL_OUTPUTS, "mono", 0.12);
+	m_channels[0]->add_route(ALL_OUTPUTS, "mono", 0.125);
 	m_channels[0]->irq_callback().set(FUNC(cmi_state::channel_irq<0>));
 	CMI01A_CHANNEL_CARD(config, m_channels[1], SYSTEM_CAS_CLOCK, 1);
-	m_channels[1]->add_route(ALL_OUTPUTS, "mono", 0.12);
+	m_channels[1]->add_route(ALL_OUTPUTS, "mono", 0.125);
 	m_channels[1]->irq_callback().set(FUNC(cmi_state::channel_irq<1>));
 	CMI01A_CHANNEL_CARD(config, m_channels[2], SYSTEM_CAS_CLOCK, 2);
-	m_channels[2]->add_route(ALL_OUTPUTS, "mono", 0.12);
+	m_channels[2]->add_route(ALL_OUTPUTS, "mono", 0.125);
 	m_channels[2]->irq_callback().set(FUNC(cmi_state::channel_irq<2>));
 	CMI01A_CHANNEL_CARD(config, m_channels[3], SYSTEM_CAS_CLOCK, 3);
-	m_channels[3]->add_route(ALL_OUTPUTS, "mono", 0.12);
+	m_channels[3]->add_route(ALL_OUTPUTS, "mono", 0.125);
 	m_channels[3]->irq_callback().set(FUNC(cmi_state::channel_irq<3>));
 	CMI01A_CHANNEL_CARD(config, m_channels[4], SYSTEM_CAS_CLOCK, 4);
-	m_channels[4]->add_route(ALL_OUTPUTS, "mono", 0.12);
+	m_channels[4]->add_route(ALL_OUTPUTS, "mono", 0.125);
 	m_channels[4]->irq_callback().set(FUNC(cmi_state::channel_irq<4>));
 	CMI01A_CHANNEL_CARD(config, m_channels[5], SYSTEM_CAS_CLOCK, 5);
-	m_channels[5]->add_route(ALL_OUTPUTS, "mono", 0.12);
+	m_channels[5]->add_route(ALL_OUTPUTS, "mono", 0.125);
 	m_channels[5]->irq_callback().set(FUNC(cmi_state::channel_irq<5>));
 	CMI01A_CHANNEL_CARD(config, m_channels[6], SYSTEM_CAS_CLOCK, 6);
-	m_channels[6]->add_route(ALL_OUTPUTS, "mono", 0.12);
+	m_channels[6]->add_route(ALL_OUTPUTS, "mono", 0.125);
 	m_channels[6]->irq_callback().set(FUNC(cmi_state::channel_irq<6>));
 	CMI01A_CHANNEL_CARD(config, m_channels[7], SYSTEM_CAS_CLOCK, 7);
-	m_channels[7]->add_route(ALL_OUTPUTS, "mono", 0.12);
+	m_channels[7]->add_route(ALL_OUTPUTS, "mono", 0.125);
 	m_channels[7]->irq_callback().set(FUNC(cmi_state::channel_irq<7>));
 }
 
