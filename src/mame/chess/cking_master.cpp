@@ -91,8 +91,6 @@ void master_state::machine_start()
     I/O
 ******************************************************************************/
 
-// TTL/generic
-
 void master_state::control_w(u8 data)
 {
 	// d0-d3: 74145 A-D
@@ -215,7 +213,7 @@ INPUT_PORTS_END
 
 void master_state::master(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, 8_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &master_state::main_trampoline);
 	ADDRESS_MAP_BANK(config, "mainmap").set_map(&master_state::main_map).set_options(ENDIANNESS_LITTLE, 8, 16);
@@ -228,11 +226,11 @@ void master_state::master(machine_config &config)
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 2);
 	config.set_default_layout(layout_ck_master);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_2BIT_ONES_COMPLEMENT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.125);
 }

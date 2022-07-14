@@ -142,8 +142,8 @@ u8 y532xl_state::input_r()
 
 void y532xl_state::cb_w(u8 data)
 {
+	// d0-d3: lcd data (see control_w)
 	// d0-d7: chessboard input mux
-	// d0-d3: lcd data
 	m_cb_mux = data;
 	update_display();
 }
@@ -173,8 +173,8 @@ void y532xl_state::control_w(offs_t offset, u8 data)
 	// Q7 rising edge: write to lcd
 	if (~prev & m_control & 0x80)
 		m_lcd->data_w(m_cb_mux & 0xf);
-
 }
+
 
 
 /******************************************************************************
@@ -232,7 +232,7 @@ INPUT_PORTS_END
 
 void y532xl_state::y532xl(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	R65C02(config, m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &y532xl_state::main_map);
 
@@ -246,14 +246,14 @@ void y532xl_state::y532xl(machine_config &config)
 	m_board->set_delay(attotime::from_msec(150));
 	m_board->set_nvram_enable(true);
 
-	/* video hardware */
+	// video hardware
 	HD61603(config, m_lcd, 0);
 	m_lcd->write_segs().set(FUNC(y532xl_state::lcd_seg_w));
 
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	config.set_default_layout(layout_yeno_532xl);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_2BIT_ONES_COMPLEMENT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.125);
 }

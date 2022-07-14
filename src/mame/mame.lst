@@ -3257,8 +3257,10 @@ avigo_it                        // 1997 Avigo (Italian)
 aviion_4600                     // Data General AViiON 4600
 
 @source:elektor/avrmax.cpp
+atm18mcc
 avrmax
 avrmaxg
+cc2schach
 
 @source:misc/avt.cpp
 avtbingo                        // (c) 1985 AVT

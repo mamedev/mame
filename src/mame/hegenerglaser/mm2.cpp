@@ -58,8 +58,8 @@ $2400 // Chess Board
 $2800 // Chess Board
 $3000 // Chess Board
 
-$4000-7FFF Opening Modul HG550
-$8000-$FFF ROM
+$4000-$7FFF Opening Module HG550
+$8000-$FFFF ROM
 
 ===============================================================================
 
