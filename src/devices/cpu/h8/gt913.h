@@ -34,8 +34,8 @@ public:
 	void data_w(offs_t offset, uint8_t data);
 	uint8_t data_r(offs_t offset);
 
-	void mem_control_w(uint8_t data);
-	uint8_t mem_control_r();
+	void syscr_w(uint8_t data);
+	uint8_t syscr_r();
 
 protected:
 	/* indirect reads/writes with banking support */
@@ -82,7 +82,7 @@ protected:
 	address_space_config data_config;
 	memory_access<32, 1, 0, ENDIANNESS_BIG>::specific m_data;
 	uint16_t m_banknum;
-	uint8_t m_mem_ctrl;
+	uint8_t m_syscr;
 
 	required_device<gt913_intc_device> m_intc;
 

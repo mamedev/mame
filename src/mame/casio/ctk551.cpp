@@ -32,8 +32,10 @@
 	- Demo: MIDI loopback test
 	- Harpsichord: exit test mode
 
-	TODO: fix backup RAM getting re-initialized on every boot
-	(depends on bit 2 of GT913 register $fff5 being implemented correctly)
+	TODO: fix backup RAM getting re-initialized on every boot.
+	Depends on the power switch being implemented correctly - turning the power off
+	is supposed to trigger a NMI which updates the RAM checksum, but the NMI handler
+	always proceeds to fully start up the system as if the power is being turned on
 
 -------------------------------------------------------------------------------
 
@@ -273,9 +275,9 @@ INPUT_CHANGED_MEMBER(ctk551_state::switch_power_w)
 	if (!oldval && newval)
 	{
 		if (m_switch == 0x1 && param != m_switch)
-			m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-		else
 			m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		else
+			m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
 		m_switch = param;
 	}
@@ -885,7 +887,7 @@ INPUT_PORTS_START(ctk601)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER )    PORT_NAME("Mode (Fingered)")         PORT_CHANGED_MEMBER(DEVICE_SELF, ctk551_state, switch_w, 0x2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER )    PORT_NAME("Mode (Casio Chord)")      PORT_CHANGED_MEMBER(DEVICE_SELF, ctk551_state, switch_w, 0x4)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER )    PORT_NAME("Mode (Normal)")           PORT_CHANGED_MEMBER(DEVICE_SELF, ctk551_state, switch_w, 0x8)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_NAME("Power")                   PORT_CHANGED_MEMBER(DEVICE_SELF, ctk551_state, power_w, 0)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_POWER_ON ) PORT_NAME("Power")                   PORT_CHANGED_MEMBER(DEVICE_SELF, ctk551_state, power_w, 0)
 
 	PORT_START("IN0")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(ctk551_state, switch_r)

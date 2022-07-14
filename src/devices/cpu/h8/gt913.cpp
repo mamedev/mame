@@ -86,7 +86,7 @@ void gt913_device::map(address_map &map)
 	map(0xfff2, 0xfff2).rw(m_port[0], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 	map(0xfff3, 0xfff3).rw(m_port[1], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 	map(0xfff4, 0xfff4).rw(m_port[2], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
-	map(0xfff5, 0xfff5).rw(FUNC(gt913_device::mem_control_r), FUNC(gt913_device::mem_control_w));
+	map(0xfff5, 0xfff5).rw(FUNC(gt913_device::syscr_r), FUNC(gt913_device::syscr_w));
 }
 
 void gt913_device::device_add_mconfig(machine_config &config)
@@ -141,19 +141,18 @@ uint8_t gt913_device::uart_control_r(offs_t offset)
 	return (m_sci[num]->ssr_r() & 0xf0) | (m_sci[num]->scr_r() >> 4);
 }
 
-void gt913_device::mem_control_w(uint8_t data)
+void gt913_device::syscr_w(uint8_t data)
 {
-	m_mem_ctrl = data;
+	if (BIT(m_syscr ^ data, 2))
+		// NMI active edge has changed
+		m_intc->set_input(INPUT_LINE_NMI, CLEAR_LINE);
+
+	m_syscr = data;
 }
 
-uint8_t gt913_device::mem_control_r()
+uint8_t gt913_device::syscr_r()
 {
-	/*
-	TODO: ctk601 doesn't seem to expect bit 2 to reflect what was last written
-	otherwise the NMI handler doesn't seem to know whether the keyboard should be powered on or off
-	for now, keeping this bit high still allows it to power on and off like normal
-	*/
-	return m_mem_ctrl | 0x04;
+	return m_syscr;
 }
 
 void gt913_device::data_w(offs_t offset, uint8_t data)
@@ -168,7 +167,7 @@ uint8_t gt913_device::data_r(offs_t offset)
 
 uint8_t gt913_device::read8ib(uint32_t adr)
 {
-	if (BIT(m_mem_ctrl, 0))
+	if (BIT(m_syscr, 0))
 		// indirect bank disabled
 		return program.read_byte(adr);
 	else if ((IR[0] & 0x0070) == 0)
@@ -181,7 +180,7 @@ uint8_t gt913_device::read8ib(uint32_t adr)
 
 void gt913_device::write8ib(uint32_t adr, uint8_t data)
 {
-	if (BIT(m_mem_ctrl, 0))
+	if (BIT(m_syscr, 0))
 		// indirect bank disabled
 		program.write_byte(adr, data);
 	else if ((IR[0] & 0x0070) == 0)
@@ -196,7 +195,7 @@ uint16_t gt913_device::read16ib(uint32_t adr)
 {
 	adr &= ~1;
 
-	if (BIT(m_mem_ctrl, 0))
+	if (BIT(m_syscr, 0))
 		// indirect bank disabled
 		return program.read_word(adr);
 	else if ((IR[0] & 0x0070) == 0)
@@ -211,7 +210,7 @@ void gt913_device::write16ib(uint32_t adr, uint16_t data)
 {
 	adr &= ~1;
 
-	if (BIT(m_mem_ctrl, 0))
+	if (BIT(m_syscr, 0))
 		// indirect bank disabled
 		program.write_word(adr, data);
 	else if ((IR[0] & 0x0070) == 0)
@@ -252,6 +251,12 @@ void gt913_device::internal_update(uint64_t current_time)
 
 void gt913_device::execute_set_input(int inputnum, int state)
 {
+	if (inputnum == INPUT_LINE_NMI)
+	{
+		if (!BIT(m_syscr, 2))
+			state ^= ASSERT_LINE;
+	}
+
 	m_intc->set_input(inputnum, state);
 }
 
@@ -271,7 +276,7 @@ void gt913_device::device_start()
 	space(AS_DATA).specific(m_data);
 
 	save_item(NAME(m_banknum));
-	save_item(NAME(m_mem_ctrl));
+	save_item(NAME(m_syscr));
 }
 
 void gt913_device::device_reset()
@@ -279,7 +284,7 @@ void gt913_device::device_reset()
 	h8_device::device_reset();
 
 	m_banknum = 0;
-	m_mem_ctrl = 0;
+	m_syscr = 0;
 }
 
 #include "cpu/h8/gt913.hxx"
