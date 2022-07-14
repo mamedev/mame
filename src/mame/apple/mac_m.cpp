@@ -48,30 +48,6 @@
      TODO:
         - Call the RTC timer
 
-     Egret version spotting:
-     341S0850 - 0x???? (1.01, earlier) - LC, LC II
-     341S0851 - 0x0101 (1.01, later) - Classic II, IIsi, IIvx/IIvi, LC III
-     344S0100 - 0x0100 (1.00) - Some (early production?) IIsi
-
-     Cuda version spotting:
-     341S0262 - 0x0003f200 (3.02) - some PMac 6500, Bondi blue iMac
-     341S0285 - No version (x.xx) - PMac 4400 + Mac clones ("Cuda Lite" with 768 bytes more ROM + PS/2 keyboard/mouse support)
-     341S0060 - 0x00020028 (2.40) - Performa/Quadra 6xx, PMac 6200, x400, some x500, Pippin, "Gossamer" G3, others?
-                                    (verified found in PMac 5500-225, G3-333)
-     341S0788 - 0x00020025 (2.37) - LC 475/575/Quadra 605, Quadra 660AV/840AV, PMac 7200
-     341S0417 - 0x00020023 (2.35) - Color Classic
-
-     Caboose version spotting:
-     341S0853 - 0x0100 (1.00) - Quadra 950
-
-     PG&E (68HC05 PMU) version spotting:
-     (find the text "BORG" in the system ROM, the next 32768 bytes are the PG&E image.
-      offset +4 in the image is the version byte).
-     01 - PowerBook Duo 210/230/250
-     02 - PowerBook 540c, PBDuo 270C, PBDuo 280/280C
-     03 - PowerBook 150
-     08 - PB190cs, PowerBook 540c PPC update, all PowerPC PowerBooks through WallStreet G3s
-
 ****************************************************************************/
 
 #include "emu.h"
