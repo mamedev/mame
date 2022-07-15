@@ -63,7 +63,7 @@ void newcanasta_state::machine_reset()
 void newcanasta_state::newcanasta(machine_config &config)
 {
 	// Basic machine hardware
-	PENTIUM4(config, m_maincpu, 100000000); // Pentium 4, exact model unknown
+	PENTIUM4(config, m_maincpu, 100000000); // FSB1333 socket CPU, exact model unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &newcanasta_state::newcanasta_map);
 
 	// Video hardware
