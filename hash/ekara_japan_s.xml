@@ -47,6 +47,7 @@ license:CC0
 		<description>Hello Kitty Special (Japan) (SC0001-KTY)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="ハローキティ"/> <!-- from title screen -->
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="01.bin" size="0x100000" crc="0635e39f" sha1="bfe33b0de01e8618abfdd190abf752cee53a6403"/>
@@ -59,6 +60,7 @@ license:CC0
 		<description>Kids' Challenge Volume 1 (Japan) (SC0003-xxx)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ キッズチャレンジ"/> <!-- from title screen -->
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="sc0003-.u1" size="0x100000" crc="935e3445" sha1="e86949467e65d515523629ca1e8f8b47cdaaacf0"/>
@@ -167,6 +169,7 @@ license:CC0
 		<description>Saiten Cartridge Challenge Artist (Japan) (SC0018-SAI)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ チャレンジアーティスト"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="sc0018-sai.u1" size="0x100000" crc="23545417" sha1="64b84de483c6c5d1129826324b30580a189077ea"/>

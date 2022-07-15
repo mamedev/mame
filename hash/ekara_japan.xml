@@ -9,7 +9,7 @@ license:CC0
 	<!--
 
 	Japanese e-kara carts appear to have a number of different genres split across various
-	cart sub-series (often supporting different hw types) special releases etc.
+	cart sub-series (often supporting different hardware types) special releases etc.
 
 	This file is for the base set (number on case, ECxxxx-xxx part numbers)
 
@@ -25,8 +25,8 @@ license:CC0
 	G82 = 1982-1984 collection
 	BHT = Best Hit
 	BAT = Best Artist
-	SAI = (used with S series carts)
-	HKW = (used with S series carts)
+	SAI = Saiten Cartridge
+	HKW = Hikawa Kiyoshi
 	ATM = Artist Mini
 	TPJ = TV Pop
 	MIN = mini-moni
