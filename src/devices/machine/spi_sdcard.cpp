@@ -134,7 +134,7 @@ void spi_sdcard_device::latch_in()
 	m_in_latch &= ~0x01;
 	m_in_latch |= m_in_bit;
 	LOGMASKED(LOG_SPI, "\tsdcard: L %02x (%d) (out %02x)\n", m_in_latch, m_cur_bit, m_out_latch);
-		m_cur_bit++;
+	m_cur_bit++;
 	if (m_cur_bit == 8)
 	{
 		LOGMASKED(LOG_SPI, "SDCARD: got %02x\n", m_in_latch);
