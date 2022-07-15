@@ -14,25 +14,25 @@ license:CC0
   your performance
 
 	S-1  *SC0001-KTY  Hello Kitty Special
-	S-2   SC0002-SAI  SAI (series 3) Volume 1
+	S-2   SC0002-SAI  Saiten Cartridge Challenge Idol vol.1
 	S-3  *SC0003-     Kids' Challenge Volume 1
-	S-4  *SC0004-SAI  Saiten Cartridge Enka no Tatsujin Volume 1
+	S-4  *SC0004-SAI  Saiten Cartridge Enka no Tatsujin
 	S-5  *SC0005-SAI  Saiten Cartridge Nesshō vol. 1
 	S-6  *SC0006-SAI  Saiten Cartridge Nesshō vol. 2
 	S-7  *SC0007-DCS  Detective Conan Volume 1
-	S-8   SC0008-SAI  SAI (series 3) Volume 2
+	S-8   SC0008-SAI  Saiten Cartridge Challenge Idol vol.2
 	S-9  *SC0009-SAI  Saiten Cartridge Nesshō vol. 3
 	S-10 *SC0010-HWK  HWK (untranslated)
 	S-11  SC0011-     PostPet
-	S-12 *SC0012-SAI  SAI (series 3) Volume 3
+	S-12 *SC0012-SAI  Saiten Cartridge Challenge Idol vol.3
 	S-13  SC0013-     Saiten Cartridge Nesshō vol. 4
-	S-14  SC0014-     SAI (series 3) Volume 4
+	S-14  SC0014-     Saiten Cartridge Challenge Idol vol.4
 	S-15 *SC0015-DCS  Detective Conan Volume 2
 	S-16  SC0016-SAI  Saiten Cartridge Nesshō vol. 5
 	S-17  SC0017-     unknown(1) Volume 2
 	S-18 *SC0018-SAI  Challenge Artist Volume 1
 	S-19 *SC0019-SAI  Saiten Cartridge Nesshō vol. 6
-	S-20  SC0020-     SAI (series 3) Volume 5
+	S-20  SC0020-     Saiten Cartridge Challenge Idol vol.5
 	S-21 *SC0021-SAI  Saiten Cartridge Nesshō vol. 7
 	S-22 *SC0022-SAI  Saiten Cartridge Nesshō vol. 8
 
@@ -127,7 +127,7 @@ license:CC0
 	</software>
 
 	<software name="sc0010">
-		<description>HWK (Japan) (SC0010-HKW)</description>
+		<description>HKW (Japan) (SC0010-HKW)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
@@ -138,9 +138,10 @@ license:CC0
 	</software>
 
 	<software name="sc0012">
-		<description>SAI (series 3) Volume 3 (Japan) (SC0012-SAI)</description>
+		<description>Saiten Cartridge Challenge Idol vol.3 (Japan) (SC0012-SAI)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ Challenge Idol vol.3"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="sc0012-sai.u1" size="0x100000" crc="8b971664" sha1="5f748d3406dbe74ce06c68aa07bafa9e288d5b51"/>
@@ -185,7 +186,7 @@ license:CC0
 	</software>
 
 	<software name="sc0021">
-		<description>Saiten Cartridge Nesshō vol. 7 (Japan) (SC0021-SAI)</description>
+		<description>Saiten Cartridge Nesshō vol. 7 - Mrs Selection (Japan) (SC0021-SAI)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="採点カートリッジ熱唱 vol. 7"/>
