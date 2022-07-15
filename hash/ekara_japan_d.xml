@@ -34,7 +34,7 @@ license:CC0
 
 	<!-- The first two releases will show Dream Cartridge Volume 1 or 2 (series details) when used with Popira, rather than the cartridge title -->
 	<software name="dc0001"> 
-		<description>Best Hit Volume 8 (Japan) / Dream Cartridge Volume 1 (DC0001-BHT)</description>
+		<description>Best Hit Volume 8 / Dream Cartridge Volume 1 (Japan) (DC0001-BHT)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
@@ -46,7 +46,7 @@ license:CC0
 	</software>
 
 	<software name="dc0002">
-		<description>Best Artist Volume 6 (Japan) / Dream Cartridge Volume 2 (DC0002-BAT)</description>
+		<description>Best Artist Volume 6 / Dream Cartridge Volume 2 (Japan) (DC0002-BAT)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
