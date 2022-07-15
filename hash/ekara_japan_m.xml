@@ -12,21 +12,21 @@ license:CC0
 	M-2   MC0002-ATM  Artist Mini Volume 2 (untranslated artist)
 	M-3   MC0003-ATM  Artist Mini Volume 3 (untranslated artist)
 	M-4  *MC0004-ATM  Artist Mini Volume 4 (w-inds)
-	M-5  *MC0005-KSM  KSM Mini Volume 1
-	M-6  *MC0006-KSM  KSM Mini Volume 2
+	M-5  *MC0005-KSM  Kids Song Mini Volume 1
+	M-6  *MC0006-KSM  Kids Song Mini Volume 2
 	M-7  *MC0007-ATM  Artist Mini Volume 5 (SMAP, KinKi Kids)
-	M-8   MC0008-     KSM? TPM? unknown Vol 3 (TV)
-	M-9   MC0009-KSM  JPop Mix Mini Vol 1
+	M-8   MC0008-     Kids Song Mini Vol 3 (or maybe TPM TV Pop Mini Vol 3?)
+	M-9   MC0009-KSM  JPop Mix Mini Volume 1
 	M-10  MC0010-ATM  Artist Mini Volume 6 (untranslated artist)
-	M-11  MC0011-     KSM? unknown Vol 4
+	M-11  MC0011-     Kids Song Mini Volume 4
 	M-12 *MC0012-ATM  Artist Mini Volume 7 (untranslated artist)
-	M-13 *MC0013-KSM  KSM Mini Volume 5
+	M-13 *MC0013-KSM  Kids Song Mini Volume 5
 	M-14 *MC0014-ATM  Artist Mini Volume 8 (BoA)
-	M-15  MC0015-     KSM? TPM? unknown Vol 6 (TV Pop)
+	M-15  MC0015-     Kids Song Mini Volume 6 (or maybe TPM TV Pop Mini Vol 6?)
 	M-16  MC0016-ATM  Artist Mini Volume 9  (untranslated artist)
-	M-17  MC0017-     KSM? TPM? TV Pop Mini Vol 7 (TV Pop)
+	M-17  MC0017-     Kids Song Mini Volume 7 (or maybe TPM TV Pop Mini Vol 7?)
 
-	unsure of KSM / TMP naming,  MC0005/0005/0008/0011/0013/0015/0017 all seem to be the same series
+	unsure of KSM / TMP naming,  MC0005/0006/0008/0011/0013/0015/0017 all seem to be the same series
 	but might have different 3 letter codes
 
 	(more? what's the M highest number?)
@@ -60,7 +60,7 @@ license:CC0
 	</software>
 
 	<software name="mc0005">
-		<description>KSM Mini Volume 1 (Japan) (MC0005-KSM)</description>
+		<description>Kids Song Mini Volume 1 (Japan) (MC0005-KSM)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
@@ -71,7 +71,7 @@ license:CC0
 	</software>
 
 	<software name="mc0006">
-		<description>KSM Mini Volume 2 (Japan) (MC0006-KSM)</description>
+		<description>Kids Song Mini Volume 2 (Japan) (MC0006-KSM)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
@@ -105,7 +105,7 @@ license:CC0
 	</software>
 
 	<software name="mc0013">
-		<description>KSM Mini Volume 5 (Japan) (MC0013-KSM)</description>
+		<description>Kids Song Mini Volume 5 (Japan) (MC0013-KSM)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
