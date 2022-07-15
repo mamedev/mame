@@ -310,7 +310,7 @@ INPUT_PORTS_END
 
 void mm2_state::rebel5(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	R65C02(config, m_maincpu, 9.8304_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mm2_state::rebel5_mem);
 
@@ -331,7 +331,7 @@ void mm2_state::rebel5(machine_config &config)
 	MEPHISTO_DISPLAY_MODULE1(config, m_display);
 	config.set_default_layout(layout_mephisto_mm2);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
@@ -340,7 +340,7 @@ void mm2_state::mm5p(machine_config &config)
 {
 	rebel5(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_clock(4.9152_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mm2_state::mm5p_mem);
 
@@ -352,7 +352,7 @@ void mm2_state::mm4(machine_config &config)
 {
 	mm5p(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &mm2_state::mm4_mem);
 
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "mephisto_cart");
@@ -375,7 +375,7 @@ void mm2_state::bup(machine_config &config)
 {
 	rebel5(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_clock(7.3728_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mm2_state::bup_mem);
 
@@ -391,7 +391,7 @@ void mm2_state::mm2(machine_config &config)
 {
 	bup(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &mm2_state::mm2_mem);
 
 	config.set_default_layout(layout_mephisto_mm2);
@@ -406,7 +406,7 @@ void mm2_state::mm2(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
-ROM_START( mm2 ) // 10-09-86
+ROM_START( mm2 ) // 10 Sep 1986
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("400", 0x8000, 0x8000, CRC(e8c1f431) SHA1(c32dfa66eefbf3e539438d2fe6e6916f78a128be) ) // HN27C256G-20
 	// 2-EPROM version also exists: CRC32 e9adcb8f & d40cbfc2
@@ -418,7 +418,7 @@ ROM_START( mm2a )
 	// 2-EPROM version also exists: CRC32 86a5a14f & a122f2c0
 ROM_END
 
-ROM_START( mm2b ) // 21-04-1986
+ROM_START( mm2b ) // 21 Apr 1986
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("200", 0x8000, 0x8000, CRC(9b69aaab) SHA1(98ee4879eef4d8b06553290f16ca661cf4181af8) )
 	// 2-EPROM version also exists: CRC32 09cf6228 & 86d77724, ROM labels 8-b_21.4 & c-f_21.4
@@ -436,7 +436,7 @@ ROM_START( mm2d ) // serial 05650xx
 	ROM_LOAD("mm2d_2.bin", 0xc000, 0x4000, CRC(01143cc1) SHA1(f78474b410dbecb209aa23ef81e9f894e8b54942) )
 ROM_END
 
-ROM_START( mm2e ) // 13-09-1985, serial 05569xx
+ROM_START( mm2e ) // 13 Sep 1985, serial 05569xx
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("hg86_13.9", 0x8000, 0x4000, CRC(e2daac82) SHA1(c9fa59ca92362f8ee770733073bfa2ab8c7904ad) )
 	ROM_LOAD("c-f_6.9",   0xc000, 0x4000, CRC(5e296939) SHA1(badd2a377259cf738cd076d8fb245c3dc284c24d) )
@@ -456,14 +456,19 @@ ROM_START( bupa )
 ROM_END
 
 
-ROM_START( rebel5 )
+ROM_START( rebel5 ) // 8 Feb 1987?
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("rebel5.bin", 0x8000, 0x8000, CRC(17232752) SHA1(3cd6893c0071f3dc02785bf99f1950eed81eba39) )
 ROM_END
 
-ROM_START( rebel5a )
+ROM_START( rebel5a ) // 5 Dec 1986
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("rebell_5.12.86", 0x8000, 0x8000, CRC(8d02e1ef) SHA1(9972c75936613bd68cfd3fe62bd222e90e8b1083) )
+ROM_END
+
+ROM_START( rebel5b ) // 18 Aug 1986
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("reb_18.8.86", 0x8000, 0x8000, CRC(c8c95e81) SHA1(0fb83ade11d2a2a74c94d7bd6f71130ebbc77497) )
 ROM_END
 
 
@@ -525,6 +530,7 @@ CONS( 1985, bupa,    bup,    0,      bup,      bup,   mm2_state, empty_init, "He
 
 CONS( 1986, rebel5,  0,      0,      rebel5,   mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto Rebell 5,0 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka MM III
 CONS( 1986, rebel5a, rebel5, 0,      rebel5,   mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto Rebell 5,0 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // "
+CONS( 1986, rebel5b, rebel5, 0,      rebel5,   mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto Rebell 5,0 (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // "
 
 CONS( 1987, mm4,     0,      0,      mm4,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM IV (v7.10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1987, mm4a,    mm4,    0,      mm4,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM IV (v7.00)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
