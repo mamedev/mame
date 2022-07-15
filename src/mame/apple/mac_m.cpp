@@ -1014,9 +1014,7 @@ void mac_state::machine_start()
 	save_item(NAME(m_nubus_irq_state));
 	save_item(NAME(m_se30_vbl_enable));
 	save_item(NAME(m_adb_irq_pending));
-	save_item(NAME(irq_count));
 	save_item(NAME(ca1_data));
-	save_item(NAME(ca2_data));
 	save_item(NAME(m_rbv_regs));
 	save_item(NAME(m_rbv_ier));
 	save_item(NAME(m_rbv_ifr));
@@ -1291,15 +1289,6 @@ void mac_state::vblank_irq()
 	if (m_macadb)
 	{
 		m_macadb->adb_vblank();
-	}
-
-	if (++irq_count == 60)
-	{
-		irq_count = 0;
-
-		ca2_data ^= 1;
-		/* signal 1 Hz irq on CA2 input on the VIA */
-		m_via1->write_ca2(ca2_data);
 	}
 
 	// handle SE/30 vblank IRQ
