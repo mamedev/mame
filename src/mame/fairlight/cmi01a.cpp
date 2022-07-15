@@ -404,12 +404,12 @@ TIMER_CALLBACK_MEMBER(cmi01a_device::bcas_q1_tick)
 
 void cmi01a_device::set_zx_flipflop_clock(const bool zx_ff_clk)
 {
-	if (zx_ff_clk == m_zx_ff_clk || !m_run)
+	if (zx_ff_clk == m_zx_ff_clk)
 		return;
 
 	m_zx_ff_clk = zx_ff_clk;
 
-	if (m_zx_ff_clk)
+	if (m_zx_ff_clk && m_run)
 		set_zx_flipflop_state(m_ptm_o1);
 }
 

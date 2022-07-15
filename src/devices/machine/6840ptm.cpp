@@ -314,13 +314,14 @@ uint16_t ptm6840_device::compute_counter(int counter) const
 	uint32_t clk;
 
 	// If there's no timer, return the count
-	if (!m_enabled[counter]/* || (m_control_reg[0] & RESET_TIMERS)*/)
+	if (!m_enabled[counter])
 	{
 		LOGMASKED(LOG_COUNTERS, "Timer #%d read counter: %04x\n", counter + 1, m_counter[counter]);
 		return m_counter[counter];
 	}
 	else if (m_control_reg[0] & RESET_TIMERS)
 	{
+		// If we're held in reset, return the latch value, as it's what is meaningful
 		return m_latch[counter];
 	}
 
@@ -777,6 +778,11 @@ void ptm6840_device::set_gate(int idx, int state)
 
 void ptm6840_device::set_clock(int idx, int state)
 {
+	if (m_clk[idx] == state)
+	{
+		return;
+	}
+
 	const bool old_clk = m_clk[idx];
 	m_clk[idx] = state;
 	const bool rising_edge = !old_clk && state;
