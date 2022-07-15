@@ -31,6 +31,8 @@
 
 #include "speaker.h"
 
+namespace {
+
 #include "mpu1.lh"
 #include "m_bappl2.lh"
 #include "m_bapple.lh"
@@ -48,6 +50,8 @@ public:
 		m_pia1(*this, "pia1"),
 		m_pia2(*this, "pia2"),
 		m_lamps(*this, "lamp%u", 0U),
+		m_reel_out(*this, "reel%u", 1U),
+		m_sreel_out(*this, "sreel%u", 1U),
 		m_dac(*this, "dac"),
 		m_samples(*this, "samples")
 	{ }
@@ -56,9 +60,6 @@ public:
 
 	void mpu1(machine_config &config);
 	void mpu1_lg(machine_config &config);
-
-	void init_mpu1();
-	void init_mpu1_lg();
 
 protected:
 	virtual void machine_start() override;
@@ -78,21 +79,21 @@ private:
 	void coin_lockout_w(bool state);
 	void reel_w(int reel, bool state);
 
-	void draw_reel(int reel);
-	void postload();
-
 	void mpu1_map(address_map &map);
 
 	uint8_t m_reel_select;
 	bool m_pia2a_select;
+	bool m_prev_payout[2];
 	uint8_t m_reel_state[4];
-	int m_reel_pos[4];
+	uint16_t m_reel_pos[4];
 	emu_timer *m_reel_timer[4];
 	attotime m_reel_speed;
-	int m_startup_time;
+	uint8_t m_pia2a_bit7_value;
+	emu_timer *m_change_pia2a_bit7_timer;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi);
 	template <unsigned Reel> TIMER_CALLBACK_MEMBER(reel_move);
+	TIMER_CALLBACK_MEMBER(change_pia2a_bit7);
 
 	enum
 	{
@@ -106,6 +107,8 @@ private:
 	required_device<pia6821_device> m_pia1;
 	required_device<pia6821_device> m_pia2;
 	output_finder<13> m_lamps;
+	output_finder<4> m_reel_out;
+	output_finder<4> m_sreel_out;
 	required_device<dac_1bit_device> m_dac;
 	required_device<fruit_samples_device> m_samples;
 };
@@ -146,7 +149,12 @@ void mpu1_state::pia1_portb_w(uint8_t data)
 
 void mpu1_state::pia1_portb_lg_w(uint8_t data)
 {
-	if(data == 0) for(int i = 0; i < 5; i++) meter_w(i, 0);
+	if(data == 0)
+	{
+		for(int i = 0; i < 5; i++) meter_w(i, 0);
+		payout_cash_w(0);
+		payout_token_w(0);
+	}
 
 	if(BIT(data, 7) == 0)
 	{
@@ -174,7 +182,7 @@ uint8_t mpu1_state::pia2_porta_r()
 {
 	if(m_pia2a_select == 0)
 	{
-		int pos = m_reel_pos[m_reel_select];
+		uint16_t pos = m_reel_pos[m_reel_select];
 		if(pos % 20 == 0)
 			return (pos / 20) + 1;
 		else 
@@ -183,7 +191,7 @@ uint8_t mpu1_state::pia2_porta_r()
 	else
 	{
 		// Games won't boot until bit 7 here reads 1, but will only accept coins if it's 0 (door interlock switch?)
-		return (machine().time().seconds() < m_startup_time) ? 0x80 : 0; // Return 1 for a second from boot, then 0
+		return m_pia2a_bit7_value;
 	}
 }
 
@@ -200,12 +208,14 @@ void mpu1_state::pia2_portb_w(uint8_t data)
 
 void mpu1_state::payout_cash_w(bool state)
 {
-	if(state) m_samples->play(fruit_samples_device::SAMPLE_PAYOUT);
+	if(!m_prev_payout[0] && state) m_samples->play(fruit_samples_device::SAMPLE_PAYOUT);
+	m_prev_payout[0] = state;
 }
 
 void mpu1_state::payout_token_w(bool state)
 {
-	if(state) m_samples->play(fruit_samples_device::SAMPLE_PAYOUT);
+	if(!m_prev_payout[1] && state) m_samples->play(fruit_samples_device::SAMPLE_PAYOUT);
+	m_prev_payout[1] = state;
 }
 
 void mpu1_state::meter_w(int meter, bool state)
@@ -238,6 +248,11 @@ INPUT_CHANGED_MEMBER( mpu1_state::coin_input )
 	}
 }
 
+TIMER_CALLBACK_MEMBER( mpu1_state::change_pia2a_bit7 )
+{
+	m_pia2a_bit7_value = 0;
+}
+
 /* MPU1 does not have stepper reels, it instead uses an electromechanical reel system.
    Each reel has a single output - setting the output high causes the reel to start moving, 
    and once it's set back low, the reel will stop at whichever symbol it's heading towards.
@@ -246,15 +261,6 @@ INPUT_CHANGED_MEMBER( mpu1_state::coin_input )
 
    I've modeled the reels as having 400 virtual "steps". Every reel has 20 symbols, which
    gives 20 "steps" between each symbol. */
-void mpu1_state::draw_reel(int reel)
-{
-	// Simplified implementation of awp_draw_reel
-	const char reelnames[4][6] = { "reel1", "reel2", "reel3", "reel4" };
-	const char sreelnames[4][7] = { "sreel1", "sreel2", "sreel3", "sreel4" };
-	machine().output().set_value(reelnames[reel], m_reel_pos[reel]);
-	machine().output().set_value(sreelnames[reel], (m_reel_pos[reel] * 0x10000) / 400);
-}
-
 void mpu1_state::reel_w(int reel, bool state)
 {
 	if(m_reel_state[reel] == REEL_STOPPED)
@@ -297,12 +303,8 @@ TIMER_CALLBACK_MEMBER( mpu1_state::reel_move )
 	}
 	else m_reel_timer[Reel]->adjust(m_reel_speed);
 
-	draw_reel(Reel);
-}
-
-void mpu1_state::postload()
-{
-	for(int i = 0; i < 4; i++) draw_reel(i);
+	m_reel_out[Reel] = m_reel_pos[Reel];
+	m_sreel_out[Reel] = (m_reel_pos[Reel] * 0x10000) / 400;
 }
 
 static INPUT_PORTS_START( mpu1_inputs )
@@ -375,48 +377,31 @@ INPUT_PORTS_END
 void mpu1_state::machine_start()
 {
 	m_lamps.resolve();
+	m_reel_out.resolve();
+	m_sreel_out.resolve();
 
-	save_item(NAME(m_reel_state[0]));
-	save_item(NAME(m_reel_state[1]));
-	save_item(NAME(m_reel_state[2]));
-	save_item(NAME(m_reel_state[3]));
-	save_item(NAME(m_reel_pos[0]));
-	save_item(NAME(m_reel_pos[1]));
-	save_item(NAME(m_reel_pos[2]));
-	save_item(NAME(m_reel_pos[3]));
+	save_item(NAME(m_reel_state));
+	save_item(NAME(m_reel_pos));
 	save_item(NAME(m_reel_speed));
-
-	save_item(NAME(m_reel_select));
-	save_item(NAME(m_startup_time));
-
-	machine().save().register_postload(save_prepost_delegate(FUNC(mpu1_state::postload), this));
 
 	m_reel_timer[0] = timer_alloc(FUNC(mpu1_state::reel_move<0>), this);
 	m_reel_timer[1] = timer_alloc(FUNC(mpu1_state::reel_move<1>), this);
 	m_reel_timer[2] = timer_alloc(FUNC(mpu1_state::reel_move<2>), this);
 	m_reel_timer[3] = timer_alloc(FUNC(mpu1_state::reel_move<3>), this);
-}
+	m_change_pia2a_bit7_timer = timer_alloc(FUNC(mpu1_state::change_pia2a_bit7), this);
 
-void mpu1_state::machine_reset()
-{
-	m_startup_time = machine().time().seconds() + 1;
-}
-
-void mpu1_state::init_mpu1()
-{
 	for(int i = 0; i < 4; i++) 
 	{
 		m_reel_state[i] = REEL_STOPPED;
 		m_reel_pos[i] = 0;
 	}
-	m_reel_speed = attotime::from_usec(2000); // Seems close enough to footage of a real machine
 }
 
-void mpu1_state::init_mpu1_lg()
+void mpu1_state::machine_reset()
 {
-	init_mpu1();
-
-	m_reel_speed = attotime::from_usec(2600); // Slower reels
+	// Return PIA2 port A bit 7 as set for 0.1s from boot, then clear it
+	m_pia2a_bit7_value = 0x80;
+	m_change_pia2a_bit7_timer->adjust(attotime::from_msec(100));
 }
 
 void mpu1_state::mpu1(machine_config &config)
@@ -450,6 +435,8 @@ void mpu1_state::mpu1(machine_config &config)
 	m_pia2->cb1_w(0);
 	m_pia2->cb2_handler().set(FUNC(mpu1_state::pia_lamp_w<10>));
 
+	m_reel_speed = attotime::from_usec(2000); // Seems close enough to footage of a real machine
+
 	SPEAKER(config, "mono").front_center();
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
 
@@ -461,6 +448,8 @@ void mpu1_state::mpu1_lg(machine_config &config)
 	mpu1(config);
 
 	m_pia1->writepb_handler().set(FUNC(mpu1_state::pia1_portb_lg_w));
+
+	m_reel_speed = attotime::from_usec(2600); // Slower reels
 }
 
 // Common mask ROM on most cartridges, also used by MPU2
@@ -517,11 +506,13 @@ ROM_START( m_bappl2 )
 	ROM_FILL(              0x600, 0xa00, 0x00)
 ROM_END
 
+} // anonymous namespace
+
 #define GAME_FLAGS MACHINE_NOT_WORKING|MACHINE_MECHANICAL|MACHINE_REQUIRES_ARTWORK|MACHINE_SUPPORTS_SAVE
 
-GAMEL(1978,  m_gndgit,  0,        mpu1, m_gndgit,  mpu1_state, init_mpu1, ROT0, "Barcrest", "Golden Nudge It (Barcrest) (MPU1) (5p Stake, £1 Jackpot)", GAME_FLAGS, layout_m_gndgit )
-GAMEL(1979,  m_mtchit,  0,        mpu1, m_mtchit,  mpu1_state, init_mpu1, ROT0, "Barcrest", "Match It (Barcrest) (MPU1) (5p Stake, £1 Jackpot)", GAME_FLAGS, layout_m_mtchit )
-GAMEL(1981,  m_mtchup,  0,        mpu1, m_mtchup,  mpu1_state, init_mpu1, ROT0, "Barcrest", "Match Up (Barcrest) (MPU1) (10p Stake, £2 Jackpot)", GAME_FLAGS, layout_m_mtchup )
-GAMEL(1980?, m_lndg,    0,        mpu1_lg, m_lndg,  mpu1_state, init_mpu1_lg, ROT0, "Leisure Games", "Lucky Nudge (Leisure Games) (MPU1) (5p Stake, £1 Jackpot)", GAME_FLAGS, layout_m_lndg )
-GAMEL(1980?, m_bapple,  0,        mpu1_lg, m_lndg,  mpu1_state, init_mpu1_lg, ROT0, "Leisure Games", "Big Apple (Leisure Games) (MPU1) (5p Stake, £1 Jackpot)", GAME_FLAGS, layout_m_bapple )
-GAMEL(1981?, m_bappl2,  0,        mpu1_lg, m_lndg,  mpu1_state, init_mpu1_lg, ROT0, "Leisure Games", "Big Apple (Leisure Games) (MPU1) (5p Stake, £2 Jackpot)", GAME_FLAGS, layout_m_bappl2 ) // Remade version with different sounds etc.
+GAMEL(1978,  m_gndgit,  0,        mpu1, m_gndgit,  mpu1_state, empty_init, ROT0, "Barcrest", "Golden Nudge It (Barcrest) (MPU1) (5p Stake, £1 Jackpot)", GAME_FLAGS, layout_m_gndgit )
+GAMEL(1979,  m_mtchit,  0,        mpu1, m_mtchit,  mpu1_state, empty_init, ROT0, "Barcrest", "Match It (Barcrest) (MPU1) (5p Stake, £1 Jackpot)", GAME_FLAGS, layout_m_mtchit )
+GAMEL(1981,  m_mtchup,  0,        mpu1, m_mtchup,  mpu1_state, empty_init, ROT0, "Barcrest", "Match Up (Barcrest) (MPU1) (10p Stake, £2 Jackpot)", GAME_FLAGS, layout_m_mtchup )
+GAMEL(1980?, m_lndg,    0,        mpu1_lg, m_lndg,  mpu1_state, empty_init, ROT0, "Leisure Games", "Lucky Nudge (Leisure Games) (MPU1) (5p Stake, £1 Jackpot)", GAME_FLAGS, layout_m_lndg )
+GAMEL(1980?, m_bapple,  0,        mpu1_lg, m_lndg,  mpu1_state, empty_init, ROT0, "Leisure Games", "Big Apple (Leisure Games) (MPU1) (5p Stake, £1 Jackpot)", GAME_FLAGS, layout_m_bapple )
+GAMEL(1981?, m_bappl2,  0,        mpu1_lg, m_lndg,  mpu1_state, empty_init, ROT0, "Leisure Games", "Big Apple (Leisure Games) (MPU1) (5p Stake, £2 Jackpot)", GAME_FLAGS, layout_m_bappl2 ) // Remade version with different sounds etc.
