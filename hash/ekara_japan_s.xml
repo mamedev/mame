@@ -82,7 +82,7 @@ license:CC0
 		<description>Saiten Cartridge Nesshō vol. 1 (Japan) (SC0005-SAI)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="採点カートリッジ熱唱 vol. 1"/>
+		<info name="alt_title" value="採点カートリッジ 熱唱 vol. 1"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="sc0005-sai.u1" size="0x100000" crc="f919b155" sha1="60fc9985d277422d4d64fb4f0cebf2732e2958aa"/>
@@ -94,7 +94,7 @@ license:CC0
 		<description>Saiten Cartridge Nesshō vol. 2 (Japan) (SC0006-SAI)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="採点カートリッジ熱唱 vol. 2"/>
+		<info name="alt_title" value="採点カートリッジ 熱唱 vol. 2"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="sc0006-sai.u1" size="0x100000" crc="4bd8669e" sha1="e77d16ecead2a6c660fedcbca3a1e0e719648be4"/>
@@ -118,7 +118,7 @@ license:CC0
 		<description>Saiten Cartridge Nesshō vol. 3 (Japan) (SC0009-SAI)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="採点カートリッジ熱唱 vol. 3"/>
+		<info name="alt_title" value="採点カートリッジ 熱唱 vol. 3"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="sc0009-sai.u1" size="0x100000" crc="61413fd5" sha1="47dad178faa99301009ae74554a39b15c01e0db2"/>
@@ -142,7 +142,7 @@ license:CC0
 		<description>Saiten Cartridge Challenge Idol vol.3 (Japan) (SC0012-SAI)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="採点カートリッジ Challenge Idol vol.3"/>
+		<info name="alt_title" value="採点カートリッジ チャレンジアイドル vol.3"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="sc0012-sai.u1" size="0x100000" crc="8b971664" sha1="5f748d3406dbe74ce06c68aa07bafa9e288d5b51"/>
@@ -178,7 +178,7 @@ license:CC0
 		<description>Saiten Cartridge Nesshō vol. 6 (Japan) (SC0019-SAI)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="採点カートリッジ熱唱 vol. 6"/>
+		<info name="alt_title" value="採点カートリッジ 熱唱 vol. 6"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="sc0019-sai.u1" size="0x100000" crc="136c12e3" sha1="fabd2e83732fdbbd737fc55902a3b1612c73f929"/>
@@ -190,7 +190,7 @@ license:CC0
 		<description>Saiten Cartridge Nesshō vol. 7 - Mrs Selection (Japan) (SC0021-SAI)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="採点カートリッジ熱唱 vol. 7"/>
+		<info name="alt_title" value="採点カートリッジ 熱唱 vol. 7 ～ミセスセレクション～"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="sc0021-sai.u1" size="0x100000" crc="fbc77e6c" sha1="eee3c8a68807dbac62c8021f9c755d08076925e2"/>
@@ -202,7 +202,7 @@ license:CC0
 		<description>Saiten Cartridge Nesshō vol. 8 (Japan) (SC0022-SAI)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="採点カートリッジ熱唱 vol. 8"/>
+		<info name="alt_title" value="採点カートリッジ 熱唱 vol. 8"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="sc0022-sai.u1" size="0x100000" crc="d631d890" sha1="a0953aa347c9ec152e64bc455fc360056c5c0807"/>
