@@ -23,13 +23,13 @@ license:CC0
 	G76 = 1976-1978 collection
 	G79 = 1979-1981 collection
 	G82 = 1982-1984 collection
-	BHT = (Best Artists?)
-	BAT = (Artist Selection?) but not the same series as ATS
+	BHT = Best Hit
+	BAT = Best Artist
 	SAI = (used with S series carts)
 	HKW = (used with S series carts)
-	ATM = unknown (used by the M series 'mini' carts)
+	ATM = Artist Mini
 	TPJ = TV Pop
-	MIN = unknown
+	MIN = mini-moni
 
 	Some Japanese carts have a number starting with S  (S-x on case, SCxxxx-xxx part numbers) (see ekara_japan_s.xml)  (for e-kara - custom presentation)
 	                                                M  (M-x on case, MCxxxx-xxx part numbers) (see ekara_japan_m.xml)  (for e-kara - custom presentation)

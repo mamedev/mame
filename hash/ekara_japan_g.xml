@@ -14,21 +14,21 @@ license:CC0
 	1. e-Kara
 	2. Popira (and Popira 2? - earlier carts will run it as regular Popira, later carts have full Popira 2 support)
 
-	G-1  *GC0001-BAT  BAT Volume 1 (Artist Selection?)
-	G-2  *GC0002-BHT  BHT Volume 1 (Best Artists?)
-	G-3  *GC0003-BAT  BAT Volume 2 (Artist Selection?)
-	G-4  *GC0004-BHT  BHT Volume 2 (Best Artists?)
+	G-1  *GC0001-BAT  Best Artist Volume 1
+	G-2  *GC0002-BHT  Best Hit Volume 1
+	G-3  *GC0003-BAT  Best Artist Volume 2
+	G-4  *GC0004-BHT  Best Hit Volume 2
 	G-5   GC0005-TPJ  TV Pop Volume 1
-	G-6  *GC0006-BHT  BHT Volume 3 (Best Artists?)
-	G-7  *GC0007-BAT  BAT Volume 3 (Artist Selection?)
+	G-6  *GC0006-BHT  Best Hit Volume 3
+	G-7  *GC0007-BAT  Best Artist Volume 3
 	G-8  *GC0008-MIN  mini-moni Volume 1
 	G-9   GC0009-TPJ  TV Pop Volume 3 (Volume 2 is 'P-2' in 'P' series)
-	G-10 *GC0010-BAT  BAT Volume 4 (Artist Selection?)
+	G-10 *GC0010-BAT  Best Artist Volume 4
 	G-11 *GC0011-TPJ  TV Pop Volume 4
-	G-12  GC0012-BHT  BHT Volume 5 (Best Artists?) (Volume 4 is 'P-1' in 'P' series)
+	G-12  GC0012-BHT  Best Hit Volume 5 (Volume 4 is 'P-1' in 'P' series)
 	G-13  GC0013-     (unknown) Volume 6
 	G-14 *GC0014-MIN  mini-moni Volume 2
-	G-15 *GC0015-BAT  BAT Volume 5 (Artist Selection?)
+	G-15 *GC0015-BAT  Best Artist Volume 5
 	G-16 *GC0016-TPJ  TV Pop Volume 5
 	G-17 *GC0017-TPJ  TV Pop Volume 6
 	G-18 *GC0018-TPJ  TV Pop Volume 7
@@ -38,7 +38,7 @@ license:CC0
 	-->
 
 	<software name="gc0001">
-		<description>BAT Volume 1 (Japan) (GC0001-BAT)</description>
+		<description>Best Artist Volume 1 (Japan) (GC0001-BAT)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
@@ -49,7 +49,7 @@ license:CC0
 	</software>
 
 	<software name="gc0002">
-		<description>BHT Volume 1 (Japan) (GC0002-BHT)</description>
+		<description>Best Hit Volume 1 (Japan) (GC0002-BHT)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
@@ -60,7 +60,7 @@ license:CC0
 	</software>
 
 	<software name="gc0003">
-		<description>BAT Volume 2 (Japan) (GC0003-BAT)</description>
+		<description>Best Artist Volume 2 (Japan) (GC0003-BAT)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
@@ -71,7 +71,7 @@ license:CC0
 	</software>
 
 	<software name="gc0004">
-		<description>BHT Volume 2 (Japan) (GC0004-BHT)</description>
+		<description>Best Hit Volume 2 (Japan) (GC0004-BHT)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
@@ -82,7 +82,7 @@ license:CC0
 	</software>
 
 	<software name="gc0006">
-		<description>BHT Volume 3 (Japan) (GC0006-BHT)</description>
+		<description>Best Hit Volume 3 (Japan) (GC0006-BHT)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
@@ -93,7 +93,7 @@ license:CC0
 	</software>
 
 	<software name="gc0007">
-		<description>BAT Volume 3 (Japan) (GC0007-BAT)</description>
+		<description>Best Artist Volume 3 (Japan) (GC0007-BAT)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
@@ -138,7 +138,7 @@ license:CC0
 	    Popira 2 however can make use of these pins -->
 
 	<software name="gc0010">
-		<description>BAT Volume 4 (Japan) (GC0010-BAT)</description>
+		<description>Best Artist Volume 4 (Japan) (GC0010-BAT)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
@@ -177,7 +177,7 @@ license:CC0
 
 	<!-- G15 looks like G16- 74HC125 and 24LC02. -->
 	<software name="gc0015">
-		<description>BAT Volume 5 (Japan) (GC0015-BAT)</description>
+		<description>Best Artist Volume 5 (Japan) (GC0015-BAT)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
