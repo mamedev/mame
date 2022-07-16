@@ -14,7 +14,6 @@
 #ifndef MAME_VIDEO_FIXFREQ_H
 #define MAME_VIDEO_FIXFREQ_H
 
-#include "emu.h"
 #include "machine/netlist.h"
 #include "screen.h"
 

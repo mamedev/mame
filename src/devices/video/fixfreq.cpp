@@ -13,9 +13,11 @@
 
 ***************************************************************************/
 
+// emu.h must be first to be included
+#include "emu.h"
+
 #include "fixfreq.h"
 
-#include "emu.h"
 #include "render.h"
 #include "ui/uimain.h"
 
