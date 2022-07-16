@@ -6583,6 +6583,8 @@ ROM_START( dragonsh )
 	ROM_REGION( 0x20000, "audiobios", 0 )
 	ROM_LOAD( "sm1.sm1", 0x00000, 0x20000, CRC(94416d67) SHA1(42f9d7ddd6c0931fd64226a60dc73602b2819dcf) )
 	ROM_REGION( 0x30000, "cslot1:audiocpu", ROMREGION_ERASEFF )
+	ROM_FILL(0x38,1,0x18)
+	ROM_FILL(0x39,1,0xfe) // stop error.log filling up
 	// not present
 
 	ROM_REGION( 0x200000, "cslot1:ymsnd:adpcma", ROMREGION_ERASE00 )

@@ -6008,7 +6008,7 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME       PARENT   COMPAT   MACHINE    INPUT  CLASS         INIT            COMPANY        FULLNAME                FLAGS
-COMP( 198?, asi100b0,  ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "<unknown",    "ASI 100B0, identified as HAM 12 TI 286 Motherboard ZERO WAIT", MACHINE_NOT_WORKING )
+COMP( 198?, asi100b0,  ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "<unknown>",    "ASI 100B0, identified as HAM 12 TI 286 Motherboard ZERO WAIT", MACHINE_NOT_WORKING )
 COMP( 1987, at,        ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "<generic>",   "PC/AT (6 MHz, MF2 Keyboard)", MACHINE_NOT_WORKING )
 COMP( 1987, ataripc4,  ibm5170, 0,       neat,      0,     at_state,     init_at,        "Atari", "PC4", MACHINE_NOT_WORKING )
 COMP( 1989, atariabc286,ibm5170,0,       neat,      0,     at_state,     init_at,        "Atari", "ABC-286/30", MACHINE_NOT_WORKING )

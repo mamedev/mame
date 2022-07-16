@@ -1054,7 +1054,7 @@ void polygonet_state::plygonet(machine_config &config)
 	Z80(config, m_audiocpu, 8000000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &polygonet_state::sound_map);
 
-	config.set_maximum_quantum(attotime::from_hz(600)); // occasional lockup in-game otherwise
+	config.set_maximum_quantum(attotime::from_hz(6000)); // occasional lockup in-game otherwise
 
 	EEPROM_ER5911_8BIT(config, m_eeprom);
 
@@ -1151,5 +1151,5 @@ ROM_END
 //-------------------------------------------------
 
 //    YEAR  NAME      PARENT   MACHINE   INPUT      STATE            INIT
-GAME( 1993, plygonet, 0,       plygonet, polygonet, polygonet_state, empty_init, ROT90, "Konami", "Polygonet Commanders (ver UAA)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1993, polynetw, 0,       plygonet, polynetw,  polygonet_state, empty_init, ROT90, "Konami", "Poly-Net Warriors (ver JAA)",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1993, plygonet, 0,       plygonet, polygonet, polygonet_state, empty_init, ROT90, "Konami", "Polygonet Commanders (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1993, polynetw, 0,       plygonet, polynetw,  polygonet_state, empty_init, ROT90, "Konami", "Poly-Net Warriors (ver JAA)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )

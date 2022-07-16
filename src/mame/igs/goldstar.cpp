@@ -12632,6 +12632,35 @@ ROM_START( lucky8l )
 	ROM_LOAD( "w4.d12", 0x0000, 0x0117, CRC(41b55fb0) SHA1(f31a31dc2c0789d08957785e8c8f804690133450) ) // GAL16V8D
 ROM_END
 
+ROM_START( animalw ) // according to the dumper: runs on the same HW as lucky8 but at the two 8255 has some shorts
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "rom8.bin",  0x0000, 0x8000, CRC(8826e4e7) SHA1(70cff8c5ce75ab0f568e8cdf39ef9165b73fa2c0) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "rom5.bin",  0x00000, 0x8000, CRC(516def6d) SHA1(8602dc1b9ebdb4c1982d82aee4590dbba70cd873) )
+	ROM_LOAD( "rom6.bin",  0x08000, 0x8000, CRC(71f2e1d0) SHA1(64e6ce53b34df1d6c59577c26e77c01f00f376bc) )
+	ROM_LOAD( "rom7.bin",  0x10000, 0x8000, CRC(b837e59e) SHA1(dd9b4bb774ce8d9af94f5b97c0fbc1cd0a92874f) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "rom1.bin",  0x0000, 0x2000, CRC(ccec731b) SHA1(25e17bb1be0098f660e719c561523bc6a4e6f466) )
+	ROM_LOAD( "rom2.bin",  0x2000, 0x2000, CRC(d795f697) SHA1(ee5f6277d79704984ce946fead676ea425dc3df0) )
+	ROM_LOAD( "rom3.bin",  0x4000, 0x2000, CRC(adcee626) SHA1(48051e6e476d1b013c7c6f06a75ed27488675eae) )
+	ROM_LOAD( "rom4.bin",  0x6000, 0x2000, CRC(a6c87bb3) SHA1(073b19e7892dec52dd7cf1b7573f4dc3b2f8142c) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "13-g.bin", 0x0000, 0x0100, CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "14-g.bin", 0x0100, 0x0100, CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x40, "proms2", 0 )
+	ROM_LOAD( "13-d.bin", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "3-f.bin",  0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "12-d.bin", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
 
 // TMPZ84C00AP-6 main CPU, 2 x D71055C, 1 x SN76489AN, 4 x 8-dip banks
 ROM_START( nd8lines )
@@ -19846,6 +19875,7 @@ GAME(  198?, ladylinrc, ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladyl
 GAME(  198?, ladylinrd, ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladylinrd, ROT0, "TAB Austria",       "Lady Liner (encrypted, set 3)",                            0 )
 GAME(  198?, ladylinre, ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladylinre, ROT0, "TAB Austria",       "Lady Liner (encrypted, set 4)",                            0 )
 GAME(  1995, wcat3,     0,        wcat3,    lucky8,   wingco_state,   init_wcat3,     ROT0, "E.A.I.",            "Wild Cat 3",                                               MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS ) // decryption partially wrong, needs soft resets before running. Bad PROM decode
+GAMEL( 199?, animalw,   0,        lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "bootleg",           "Animal Wonders (ver A900)",                                MACHINE_NOT_WORKING,    layout_lucky8 )    // not looked at yet
 
 GAME(  1985, luckylad,  0,        luckylad, luckylad, wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Lucky Lady (Wing, encrypted)",                             MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS )  // controls / dips, colors not correctly decoded
 GAME(  1991, megaline,  0,        megaline, megaline, unkch_state,    empty_init,     ROT0, "Fun World",         "Mega Lines",                                               MACHINE_NOT_WORKING )

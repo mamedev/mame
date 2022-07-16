@@ -88,6 +88,7 @@ private:
 		T3_PRESCALE_EN  = 0x01,
 		INTERNAL_CLK_EN = 0x02,
 		COUNT_MODE_8BIT = 0x04,
+		MODE_BITS       = 0x38,
 		INTERRUPT_EN    = 0x40,
 		COUNT_OUT_EN    = 0x80
 	};
@@ -106,12 +107,12 @@ private:
 	devcb_write_line m_irq_cb;
 
 	uint8_t m_control_reg[3];
-	uint8_t m_output[3]; // Output states
-	uint8_t m_gate[3];   // Input gate states
-	uint8_t m_clk[3];  // Clock states
-	uint8_t m_enabled[3];
+	bool m_output[3]; // Output states
+	bool m_gate[3];   // Counter gate states
+	bool m_clk[3];    // Clock states
+	bool m_enabled[3];
 	uint8_t m_mode[3];
-	uint8_t m_fired[3];
+	bool m_fired[3];
 	uint8_t m_t3_divisor;
 	uint8_t m_t3_scaler;
 	uint8_t m_irq;
@@ -125,6 +126,7 @@ private:
 
 	uint16_t m_latch[3];
 	uint16_t m_counter[3];
+	attotime m_disable_time[3];
 
 	static const char *const opmode[];
 

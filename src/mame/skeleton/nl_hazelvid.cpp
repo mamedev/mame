@@ -13,6 +13,7 @@
 #endif
 
 NETLIST_START(hazelvid)
+{
 
 	SOLVER(Solver, 48000)
 	PARAM(Solver.PARALLEL, 0) // Don't do parallel solvers
@@ -254,4 +255,4 @@ NETLIST_START(hazelvid)
 	NET_C(GND, high.GND, low.GND, cpu_ba4.GND, cpu_iowq.GND, ba13.GND, memwq.GND, rwq.GND, mrq.GND,
 		cpu_db0.GND, cpu_db1.GND, cpu_db2.GND, cpu_db3.GND, cpu_db4.GND, cpu_db5.GND, cpu_db6.GND, cpu_db7.GND)
 
-NETLIST_END()
+}

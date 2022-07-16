@@ -251,7 +251,7 @@ protected:
 	int get_rx_word_length();
 	int get_tx_word_length();
 	void safe_transmit_register_reset();
-	void check_waitrequest();
+	void check_dma_request();
 
 	// receiver state
 	uint8_t m_rx_data_fifo[8];    // receive data FIFO

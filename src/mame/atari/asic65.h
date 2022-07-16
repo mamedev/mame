@@ -43,11 +43,6 @@ public:
 	void stat_w(u16 data);
 	u16 stat_r();
 
-	enum
-	{
-		TIMER_M68K_ASIC65_DEFERRED_W
-	};
-
 	void asic65_io_map(address_map &map);
 	void asic65_program_map(address_map &map);
 protected:

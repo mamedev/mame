@@ -6,14 +6,12 @@
 //
 //============================================================
 
+#include "chainreader.h"
+
 #include <string>
 #include <vector>
 #include <map>
 
-#include "emu.h"
-#include <modules/lib/osdobj_common.h>
-
-#include "chainreader.h"
 #include "chain.h"
 #include "chainmanager.h"
 #include "sliderreader.h"

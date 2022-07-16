@@ -70,6 +70,7 @@ private:
 
 
 static NETLIST_START(attack)
+{
 	SOLVER(Solver, 48000)
 //  PARAM(Solver.FREQ, 48000)
 	PARAM(Solver.ACCURACY, 1e-4) // works and is sufficient
@@ -79,7 +80,7 @@ static NETLIST_START(attack)
 
 //  NETDEV_ANALOG_CALLBACK(sound_cb, sound, exidyttl_state, sound_cb, "")
 //  NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
-NETLIST_END()
+}
 
 
 

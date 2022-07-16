@@ -5,14 +5,13 @@
 
 #pragma once
 
-#include "seta001.h"
-
 #include "cpu/mcs48/mcs48.h"
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "machine/upd4701.h"
 #include "sound/dac.h"
 #include "sound/samples.h"
+#include "video/x1_001.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -25,7 +24,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_subcpu(*this, "sub")
-		, m_seta001(*this, "spritegen")
+		, m_spritegen(*this, "spritegen")
 		, m_palette(*this, "palette")
 		, m_screen(*this, "screen")
 		, m_mainbank(*this, "mainbank")
@@ -53,7 +52,7 @@ protected:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_subcpu;
-	required_device<seta001_device> m_seta001;
+	required_device<x1_001_device> m_spritegen;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	optional_device<address_map_bank_device> m_mainbank; /* FIXME: optional because of reuse from cchance.cpp */

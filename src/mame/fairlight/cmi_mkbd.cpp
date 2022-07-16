@@ -38,6 +38,9 @@
 #include "cpu/m6800/m6800.h"
 #include "machine/clock.h"
 
+#define VERBOSE (0)
+#include "logmacro.h"
+
 DEFINE_DEVICE_TYPE(CMI_MUSIC_KEYBOARD, cmi_music_keyboard_device, "cmi_mkbd", "Fairlight CMI Music Keyboard")
 
 cmi_music_keyboard_device::cmi_music_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -77,6 +80,12 @@ void cmi_music_keyboard_device::device_start()
 	m_cmi10_scnd_timer->adjust(attotime::from_hz(4000000 / 4 / 2048 / 2), 0, attotime::from_hz(4000000 / 4 / 2048 / 2));
 
 	m_scnd = 0;
+
+	for (u32 i = 0; i < KEY_COUNT; i++)
+	{
+		m_velocity_timers[i] = timer_alloc(FUNC(cmi_music_keyboard_device::velkey_down), this);
+		m_key_held[i] = false;
+	}
 }
 
 TIMER_CALLBACK_MEMBER(cmi_music_keyboard_device::scnd_update)
@@ -84,6 +93,11 @@ TIMER_CALLBACK_MEMBER(cmi_music_keyboard_device::scnd_update)
 	m_cmi10_pia_u20->ca1_w(m_scnd);
 	m_scnd ^= 1;
 	m_cmi10_pia_u21->ca1_w(m_scnd);
+}
+
+TIMER_CALLBACK_MEMBER(cmi_music_keyboard_device::velkey_down)
+{
+	m_key_held[param] = true;
 }
 
 /*
@@ -179,6 +193,18 @@ WRITE_LINE_MEMBER( cmi_music_keyboard_device::cmi10_u21_cb2_w )
 //  state = state;
 }
 
+u32 cmi_music_keyboard_device::get_key_for_indices(int mux, int module, int key)
+{
+	if (mux == 3)
+	{
+		if (module == 2)
+		{
+			return KEY_F6;
+		}
+		return KEY_COUNT;
+	}
+	return KEY_F0 + (module * 24) + (mux * 8) + key;
+}
 
 u8 cmi_music_keyboard_device::cmi10_u21_a_r()
 {
@@ -225,15 +251,37 @@ u8 cmi_music_keyboard_device::cmi10_u21_a_r()
 
 	return data;
 #else
+	int thld = m_cmi10_pia_u21->ca2_output();
 	int sel = m_cmi10_pia_u20->a_output();
 	int key = sel & 7;
 	int mux = (sel >> 3) & 3;
-	u8 data = 0xf8; // slave keyboard not used
+	u8 data = 0xff; // slave keyboard not used
 
 	for (int module = 0; module < 3; ++module)
 	{
 		u8 keyval = m_key_mux_ports[mux][module]->read();
-		data |= BIT(keyval, key) << module;
+		u32 keyidx = get_key_for_indices(mux, module, key);
+		if (keyidx < KEY_COUNT)
+		{
+			if (m_key_held[keyidx])
+			{
+				// Key is fully pressed
+				data &= ~(1 << module);
+			}
+			else if (!BIT(keyval, key))
+			{
+				// User has started pressing the key
+				if (m_velocity_timers[keyidx]->remaining().is_never())
+				{
+					data &= ~(1 << module);
+					m_velocity_timers[keyidx]->adjust(attotime::from_hz(10), keyidx);
+				}
+				else if (thld == 0)
+				{
+					data &= ~(1 << module);
+				}
+			}
+		}
 	}
 
 	/* Now do KD7 */
@@ -245,10 +293,10 @@ u8 cmi_music_keyboard_device::cmi10_u21_a_r()
 		else if (!BIT(sel, 4))
 			bit = BIT(m_keypad_b_port->read(), sel & 7);
 
-		data |= (bit && BIT(sel, 7)) << 7;
+		data &= ~((bit && BIT(sel, 7)) << 7);
 	}
 
-	return data;
+	return ~data;
 #endif
 }
 
@@ -312,12 +360,35 @@ WRITE_LINE_MEMBER( cmi_music_keyboard_device::kbd_cts_w )
 	m_acia_kbd->write_cts(state);
 }
 
+void cmi_music_keyboard_device::kbd_acia_w(offs_t offset, u8 data)
+{
+	m_acia_kbd->write(offset, data);
+	LOG("%s: music keyboard ACIA write: %02x = %02x\n", machine().describe_context(), offset, data);
+}
+
+u8 cmi_music_keyboard_device::kbd_acia_r(offs_t offset)
+{
+	u8 data = m_acia_kbd->read(offset);
+	LOG("%s: music keyboard ACIA read: %02x: %02x\n", machine().describe_context(), offset, data);
+	return data;
+}
+
+INPUT_CHANGED_MEMBER(cmi_music_keyboard_device::key_changed)
+{
+	if (newval)
+	{
+		// Key released
+		m_velocity_timers[param]->adjust(attotime::never);
+	}
+	m_key_held[param] = false;
+}
+
 void cmi_music_keyboard_device::muskeys_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0080, 0x0083).rw(m_cmi10_pia_u21, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0090, 0x0093).rw(m_cmi10_pia_u20, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x00a0, 0x00a1).rw(m_acia_kbd, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x00a0, 0x00a1).rw(FUNC(cmi_music_keyboard_device::kbd_acia_r), FUNC(cmi_music_keyboard_device::kbd_acia_w));
 	map(0x00b0, 0x00b1).rw(m_acia_cmi, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x4000, 0x47ff).ram();
 	map(0xb000, 0xb400).rom();
@@ -327,124 +398,124 @@ void cmi_music_keyboard_device::muskeys_map(address_map &map)
 static INPUT_PORTS_START(cmi_music_keyboard)
 	/* Keypad */
 	PORT_START("KEYPAD_A")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3_PAD)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5_PAD)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7_PAD)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8_PAD)
 
 	PORT_START("KEYPAD_B")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0_PAD)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3_PAD)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5_PAD)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9_PAD)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_0_PAD)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6_PAD)
 
 	/* Master musical keyboard */
 	PORT_START("KEY_0_0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F0")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F0 #")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G0")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G0 #")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A1")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A1 #")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B1")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("F0")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_F0)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("F0 #")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_F0S)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("G0")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_G0)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("G0 #")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_G0S)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("A1")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_A1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("A1 #")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_A1S)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("B1")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_B1)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C1")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_C1)
 
 	PORT_START("KEY_0_1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C1 #")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D1")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D1 #")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E1")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1 #")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G1")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G1 #")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C1 #")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_C1S)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("D1")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_D1)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("D1 #")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_D1S)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("E1")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_E1)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("F1")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_F1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("F1 #")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_F1S)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("G1")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_G1)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("G1 #")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_G1S)
 
 	PORT_START("KEY_0_2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A2")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A2 #")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B2")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C2")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C2 #")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D2")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D2 #")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("A2")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_A2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("A2 #")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_A2S)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("B2")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_B2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C2")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_C2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C2 #")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_C2S)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("D2")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_D2)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("D2 #")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_D2S)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("E2")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_E2)
 
 	PORT_START("KEY_0_3")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("KEY_1_0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F2")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F2 #")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G2")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G2 #")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A3")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A3 #")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B3")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("F2")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_F2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("F2 #")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_F2S)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("G2")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_G2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("G2 #")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_G2S)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("A3")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_A3)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("A3 #")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_A3S)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("B3")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_B3)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C3")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_C3)
 
 	PORT_START("KEY_1_1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C3 #")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D3")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D3 #")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E3")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F3")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G3")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G3 #")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A4")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C3 #")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_C3S)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("D3")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_D3)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("D3 #")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_D3S)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("E3")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_E3)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("F3")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_F3)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("F3 #")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_F3S)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("G3")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_G3)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("G3 #")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_G3S)
 
 	PORT_START("KEY_1_2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A4 #")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B4")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B4 #")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C4")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C4 #")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D4")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D4 #")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E4")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("A4")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_A4)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("A4 #")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_A4S)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("B4")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_B4)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C4")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_C4)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C4 #")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_C4S)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("D4")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_D4)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("D4 #")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_D4S)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("E4")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_E4)
 
 	PORT_START("KEY_1_3")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("KEY_2_0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F4")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F4 #")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G4")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G4 #")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A5")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A5 #")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B5")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C5")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("F4")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_F4)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("F4 #")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_F4S)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("G4")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_G4)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("G4 #")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_G4S)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("A5")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_A5)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("A5 #")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_A5S)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("B5")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_B5)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C5")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_C5)
 
 	PORT_START("KEY_2_1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C5 #")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D5")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D5 #")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E5")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F5")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F5 #")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G5")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G5 #")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C5 #")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_C5S)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("D5")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_D5)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("D5 #")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_D5S)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("E5")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_E5)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("F5")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_F5)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("F5 #")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_F5S)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("G5")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_G5)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("G5 #")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_G5S)
 
 	PORT_START("KEY_2_2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A6")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A6 #")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B6")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C6")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C6 #")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D6")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D6 #")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E6")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("A6")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_A6)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("A6 #")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_A6S)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("B6")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_B6)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C6")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_C6)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C6 #")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_C6S)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("D6")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_D6)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("D6 #")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_D6S)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("E6")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_E6)
 
 	PORT_START("KEY_2_3")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F6")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("F6")		PORT_CHANGED_MEMBER(DEVICE_SELF, cmi_music_keyboard_device, key_changed, cmi_music_keyboard_device::KEY_F6)
 
 	PORT_START("ANALOG")
 	PORT_BIT(0xff, 0x00, IPT_PEDAL) PORT_MINMAX(0, 128) PORT_SENSITIVITY(100) PORT_KEYDELTA(50)

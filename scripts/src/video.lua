@@ -1421,3 +1421,15 @@ if (VIDEOS["AVGDVG"]~=null) then
 		MAME_DIR .. "src/devices/video/avgdvg.h",
 	}
 end
+
+--------------------------------------------------
+--
+--@src/devices/video/x1_001.h,VIDEOS["X1_001"] = true
+--------------------------------------------------
+
+if (VIDEOS["X1_001"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/x1_001.cpp",
+		MAME_DIR .. "src/devices/video/x1_001.h",
+	}
+end

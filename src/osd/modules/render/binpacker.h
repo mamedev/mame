@@ -5,7 +5,9 @@
 #ifndef __RECTPACKER_H__
 #define __RECTPACKER_H__
 
+#include "bitmap.h"
 
+#include <cstdint>
 #include <vector>
 
 class rectangle_packer

@@ -19,15 +19,215 @@ Differences between these sets include
 ***************************************************************************/
 
 #include "emu.h"
-#include "fgoal.h"
-#include "cpu/m6800/m6800.h"
 
+#include "cpu/m6800/m6800.h"
+#include "machine/mb14241.h"
+
+#include "emupal.h"
+#include "screen.h"
+
+
+namespace {
+
+class fgoal_state : public driver_device
+{
+public:
+	fgoal_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_mb14241(*this, "mb14241"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_video_ram(*this, "video_ram"),
+		m_in1(*this, "IN1"),
+		m_paddle(*this, "PADDLE%u", 0U)
+	{ }
+
+	void fgoal(machine_config &config);
+
+	DECLARE_READ_LINE_MEMBER(_80_r);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<mb14241_device> m_mb14241;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
+	// memory pointers
+	required_shared_ptr<uint8_t> m_video_ram;
+
+	// I/O ports
+	required_ioport m_in1;
+	required_ioport_array<2> m_paddle;
+
+	// video-related
+	bitmap_ind16 m_bgbitmap{};
+	bitmap_ind16 m_fgbitmap{};
+	uint8_t m_xpos = 0U;
+	uint8_t m_ypos = 0U;
+	uint8_t m_current_color = 0U;
+
+	// misc
+	uint8_t m_player = 0U;
+	uint8_t m_row = 0U;
+	uint8_t m_col = 0U;
+	uint8_t m_prev_coin = 0U;
+	emu_timer *m_interrupt_timer = nullptr;
+
+	uint8_t analog_r();
+	uint8_t nmi_reset_r();
+	uint8_t irq_reset_r();
+	uint8_t row_r();
+	void row_w(uint8_t data);
+	void col_w(uint8_t data);
+	uint8_t address_hi_r();
+	uint8_t address_lo_r();
+	uint8_t shifter_reverse_r();
+	void sound1_w(uint8_t data);
+	void sound2_w(uint8_t data);
+	void color_w(uint8_t data);
+	void ypos_w(uint8_t data);
+	void xpos_w(uint8_t data);
+
+	TIMER_CALLBACK_MEMBER(interrupt_callback);
+
+	void palette(palette_device &palette) const;
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	static int intensity(int bits);
+	unsigned video_ram_address();
+
+	void cpu_map(address_map &map);
+};
+
+
+// video
+
+void fgoal_state::color_w(uint8_t data)
+{
+	m_current_color = data & 3;
+}
+
+
+void fgoal_state::ypos_w(uint8_t data)
+{
+	m_ypos = data;
+}
+
+
+void fgoal_state::xpos_w(uint8_t data)
+{
+	m_xpos = data;
+}
+
+
+void fgoal_state::video_start()
+{
+	m_screen->register_screen_bitmap(m_fgbitmap);
+	m_screen->register_screen_bitmap(m_bgbitmap);
+
+	save_item(NAME(m_fgbitmap));
+	save_item(NAME(m_bgbitmap));
+}
+
+
+uint32_t fgoal_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	uint8_t const *VRAM = m_video_ram;
+
+	// draw color overlay foreground and background
+
+	if (m_player == 1 && (m_in1->read() & 0x40))
+	{
+		m_gfxdecode->gfx(0)->zoom_opaque(m_fgbitmap, cliprect,
+			0, (m_player << 2) | m_current_color,
+			1, 1,
+			0, 16,
+			0x40000,
+			0x40000);
+
+		m_gfxdecode->gfx(1)->zoom_opaque(m_bgbitmap, cliprect,
+			0, 0,
+			1, 1,
+			0, 16,
+			0x40000,
+			0x40000);
+	}
+	else
+	{
+		m_gfxdecode->gfx(0)->zoom_opaque(m_fgbitmap, cliprect,
+			0, (m_player << 2) | m_current_color,
+			0, 0,
+			0, 0,
+			0x40000,
+			0x40000);
+
+		m_gfxdecode->gfx(1)->zoom_opaque(m_bgbitmap, cliprect,
+			0, 0,
+			0, 0,
+			0, 0,
+			0x40000,
+			0x40000);
+	}
+
+	// the ball has a fixed color
+
+	for (int y = m_ypos; y < m_ypos + 8; y++)
+	{
+		for (int x = m_xpos; x < m_xpos + 8; x++)
+		{
+			if (y < 256 && x < 256)
+			{
+				m_fgbitmap.pix(y, x) = 128 + 16;
+			}
+		}
+	}
+
+	// draw bitmap layer
+
+	for (int y = 0; y < 256; y++)
+	{
+		uint16_t *const p = &bitmap.pix(y);
+
+		uint16_t const *const FG = &m_fgbitmap.pix(y);
+		uint16_t const *const BG = &m_bgbitmap.pix(y);
+
+		for (int x = 0; x < 256; x += 8)
+		{
+			uint8_t v = *VRAM++;
+
+			for (int n = 0; n < 8; n++)
+			{
+				if (v & (1 << n))
+				{
+					p[x + n] = FG[x + n];
+				}
+				else
+				{
+					p[x + n] = BG[x + n];
+				}
+			}
+		}
+	}
+	return 0;
+}
+
+
+// machine
 
 int fgoal_state::intensity(int bits)
 {
 	int v = 0;
 
-	// contrary to the schems pull-up resistors are 270 and not 390
+	// contrary to the schematics pull-up resistors are 270 and not 390
 
 	if (1)
 		v += 0x2e; // 100 + 270
@@ -42,7 +242,7 @@ int fgoal_state::intensity(int bits)
 }
 
 
-void fgoal_state::fgoal_palette(palette_device &palette) const
+void fgoal_state::palette(palette_device &palette) const
 {
 	// for B/W screens PCB can be jumpered to use lower half of PROM
 
@@ -55,8 +255,8 @@ void fgoal_state::fgoal_palette(palette_device &palette) const
 
 	for (int i = 0; i < 8; i++)
 	{
-		palette.set_pen_color(128 + 0*8 + i, rgb_t(0x2e, 0x80, 0x2e));
-		palette.set_pen_color(128 + 1*8 + i, rgb_t(0x2e, 0x2e, 0x2e));
+		palette.set_pen_color(128 + 0 * 8 + i, rgb_t(0x2e, 0x80, 0x2e));
+		palette.set_pen_color(128 + 1 * 8 + i, rgb_t(0x2e, 0x2e, 0x2e));
 	}
 
 	// ball is a fixed color
@@ -66,8 +266,7 @@ void fgoal_state::fgoal_palette(palette_device &palette) const
 
 TIMER_CALLBACK_MEMBER(fgoal_state::interrupt_callback)
 {
-	int scanline;
-	int coin = (ioport("IN1")->read() & 2);
+	int coin = (m_in1->read() & 2);
 
 	m_maincpu->set_input_line(0, ASSERT_LINE);
 
@@ -76,7 +275,7 @@ TIMER_CALLBACK_MEMBER(fgoal_state::interrupt_callback)
 
 	m_prev_coin = coin;
 
-	scanline = m_screen->vpos() + 128;
+	int scanline = m_screen->vpos() + 128;
 
 	if (scanline > 256)
 		scanline = 0;
@@ -85,7 +284,7 @@ TIMER_CALLBACK_MEMBER(fgoal_state::interrupt_callback)
 }
 
 
-unsigned fgoal_state::video_ram_address( )
+unsigned fgoal_state::video_ram_address()
 {
 	return 0x4000 | (m_row << 5) | (m_col >> 3);
 }
@@ -93,15 +292,13 @@ unsigned fgoal_state::video_ram_address( )
 
 uint8_t fgoal_state::analog_r()
 {
-	return ioport(m_player ? "PADDLE1" : "PADDLE0")->read(); /* PCB can be jumpered to use a single dial */
+	return m_paddle[m_player]->read(); // PCB can be jumpered to use a single dial
 }
 
 
 READ_LINE_MEMBER(fgoal_state::_80_r)
 {
-	uint8_t ret = (m_screen->vpos() & 0x80) ? 1 : 0;
-
-	return ret;
+	return BIT(m_screen->vpos(), 7);
 }
 
 uint8_t fgoal_state::nmi_reset_r()
@@ -148,13 +345,6 @@ uint8_t fgoal_state::address_lo_r()
 	return video_ram_address() & 0xff;
 }
 
-uint8_t fgoal_state::shifter_r()
-{
-	uint8_t v = m_mb14241->shift_result_r();
-
-	return bitswap<8>(v, 7, 6, 5, 4, 3, 2, 1, 0);
-}
-
 uint8_t fgoal_state::shifter_reverse_r()
 {
 	uint8_t v = m_mb14241->shift_result_r();
@@ -165,25 +355,25 @@ uint8_t fgoal_state::shifter_reverse_r()
 
 void fgoal_state::sound1_w(uint8_t data)
 {
-	/* BIT0 => SX2 */
-	/* BIT1 => SX1 */
-	/* BIT2 => SX1 */
-	/* BIT3 => SX1 */
-	/* BIT4 => SX1 */
-	/* BIT5 => SX1 */
-	/* BIT6 => SX1 */
-	/* BIT7 => SX1 */
+	// BIT0 => SX2
+	// BIT1 => SX1
+	// BIT2 => SX1
+	// BIT3 => SX1
+	// BIT4 => SX1
+	// BIT5 => SX1
+	// BIT6 => SX1
+	// BIT7 => SX1
 }
 
 
 void fgoal_state::sound2_w(uint8_t data)
 {
-	/* BIT0 => CX0 */
-	/* BIT1 => SX6 */
-	/* BIT2 => N/C */
-	/* BIT3 => SX5 */
-	/* BIT4 => SX4 */
-	/* BIT5 => SX3 */
+	// BIT0 => CX0
+	// BIT1 => SX6
+	// BIT2 => N/C
+	// BIT3 => SX5
+	// BIT4 => SX4
+	// BIT5 => SX3
 	m_player = data & 1;
 }
 
@@ -199,7 +389,7 @@ void fgoal_state::cpu_map(address_map &map)
 	map(0x00f3, 0x00f3).portr("IN1");
 	map(0x00f4, 0x00f4).r(FUNC(fgoal_state::address_hi_r));
 	map(0x00f5, 0x00f5).r(FUNC(fgoal_state::address_lo_r));
-	map(0x00f6, 0x00f6).r(FUNC(fgoal_state::shifter_r));
+	map(0x00f6, 0x00f6).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 	map(0x00f7, 0x00f7).r(FUNC(fgoal_state::shifter_reverse_r));
 	map(0x00f8, 0x00fb).r(FUNC(fgoal_state::nmi_reset_r));
 	map(0x00fc, 0x00ff).r(FUNC(fgoal_state::irq_reset_r));
@@ -213,7 +403,7 @@ void fgoal_state::cpu_map(address_map &map)
 	map(0x00fc, 0x00ff).w(FUNC(fgoal_state::sound2_w));
 
 	map(0x0100, 0x03ff).ram();
-	map(0x4000, 0x7fff).ram().share("video_ram");
+	map(0x4000, 0x7fff).ram().share(m_video_ram);
 
 	map(0x8000, 0x8000).w(FUNC(fgoal_state::ypos_w));
 	map(0x8001, 0x8001).w(FUNC(fgoal_state::xpos_w));
@@ -233,7 +423,7 @@ static INPUT_PORTS_START( fgoal )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Lives ))
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x20, "5" )
-	PORT_DIPNAME( 0x18, 0x18, "Options" ) /* bit #4 comes from a jumper */
+	PORT_DIPNAME( 0x18, 0x18, "Options" ) // bit #4 comes from a jumper
 	PORT_DIPSETTING(    0x00, "Clear All Helmets" )
 	PORT_DIPSETTING(    0x08, "No Extra Ball" )
 	PORT_DIPSETTING(    0x10, "No Extra Credit" )
@@ -247,10 +437,10 @@ static INPUT_PORTS_START( fgoal )
 	PORT_DIPSETTING(    0x05, "65000" )
 	PORT_DIPSETTING(    0x06, "79000" )
 	PORT_DIPSETTING(    0x07, "93000" )
-	/* extra credit score changes depending on player's performance */
+	// extra credit score changes depending on player's performance
 
 	PORT_START("IN1")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(fgoal_state, _80_r) /* 128V */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(fgoal_state, _80_r) // 128V
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ))
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ))
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ))
@@ -267,7 +457,7 @@ static INPUT_PORTS_START( fgoal )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
 
-	/* game freezes when analog controls read $00 or $ff */
+	// game freezes when analog controls read $00 or $ff
 	PORT_START("PADDLE0")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(1, 254) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE PORT_PLAYER(1)
 
@@ -314,8 +504,8 @@ static const gfx_layout gfxlayout =
 
 
 static GFXDECODE_START( gfx_fgoal )
-	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout, 0x00, 8 ) /* foreground */
-	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout, 0x80, 1 ) /* background */
+	GFXDECODE_ENTRY( "tiles", 0, gfxlayout, 0x00, 8 ) // foreground
+	GFXDECODE_ENTRY( "tiles", 0, gfxlayout, 0x80, 1 ) // background
 GFXDECODE_END
 
 
@@ -348,14 +538,14 @@ void fgoal_state::machine_reset()
 
 void fgoal_state::fgoal(machine_config &config)
 {
-	/* basic machine hardware */
-	M6800(config, m_maincpu, 10065000 / 10); /* ? */
+	// basic machine hardware
+	M6800(config, m_maincpu, 10065000 / 10); // ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &fgoal_state::cpu_map);
 
-	/* add shifter */
-	MB14241(config, "mb14241");
+	// add shifter
+	MB14241(config, m_mb14241);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(256, 263);
@@ -364,9 +554,10 @@ void fgoal_state::fgoal(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fgoal);
-	PALETTE(config, m_palette, FUNC(fgoal_state::fgoal_palette), 128 + 16 + 1);
+	PALETTE(config, m_palette, FUNC(fgoal_state::palette), 128 + 16 + 1);
 
-	/* sound hardware */
+	// sound hardware
+	// TODO: netlist
 }
 
 
@@ -381,7 +572,7 @@ ROM_START( fgoal )
 	ROM_LOAD( "tf01.m46", 0xb800, 0x0800, CRC(1b0bfa5c) SHA1(768e14f08063cc022d7e18a9cb2197d64a9e1b8d) )
 	ROM_RELOAD(           0xf800, 0x0800 )
 
-	ROM_REGION( 0x1000, "gfx1", 0 ) /* overlay proms */
+	ROM_REGION( 0x1000, "tiles", 0 ) // overlay PROMs
 	ROM_LOAD( "tf05.m11", 0x0000, 0x0400, CRC(925b78ab) SHA1(97d6e572658715dc4f6c37b98ba5352643fc8e27) )
 	ROM_LOAD( "tf06.m4",  0x0400, 0x0400, CRC(3d2f007b) SHA1(7f4b6f3f08be8c886af3e2ccd3c0d93ae54d4649) )
 	ROM_LOAD( "tf07.m12", 0x0800, 0x0400, CRC(0b1d01c4) SHA1(8680602fecd412e5136e1107618a2e0a59b37d08) )
@@ -405,7 +596,7 @@ ROM_START( fgoala )
 	ROM_RELOAD(           0xf800, 0x0800 )
 	ROM_LOAD( "mf05.m22", 0xd800, 0x0800, CRC(58082b8b) SHA1(72cd4153f7939cd33fc69ba82b44391fc19ae152) )
 
-	ROM_REGION( 0x1000, "gfx1", 0 ) /* overlay proms */
+	ROM_REGION( 0x1000, "tiles", 0 ) // overlay PROMs
 	ROM_LOAD( "tf05.m11", 0x0000, 0x0400, CRC(925b78ab) SHA1(97d6e572658715dc4f6c37b98ba5352643fc8e27) )
 	ROM_LOAD( "tf06.m4",  0x0400, 0x0400, CRC(3d2f007b) SHA1(7f4b6f3f08be8c886af3e2ccd3c0d93ae54d4649) )
 	ROM_LOAD( "tf07.m12", 0x0800, 0x0400, CRC(0b1d01c4) SHA1(8680602fecd412e5136e1107618a2e0a59b37d08) )
@@ -415,6 +606,8 @@ ROM_START( fgoala )
 	ROM_LOAD_NIB_LOW ( "tf09.m13", 0x0000, 0x0100, CRC(b0fc4b80) SHA1(c6029f6d912275aa65302ca97281e10ccbf63159) )
 	ROM_LOAD_NIB_HIGH( "tf10.m6",  0x0000, 0x0100, CRC(7b30b15d) SHA1(e9826a107b209e18d891ead341eda3d4523ce195) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1979, fgoal,  0,     fgoal, fgoal, fgoal_state, empty_init, ROT90, "Taito", "Field Goal (set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

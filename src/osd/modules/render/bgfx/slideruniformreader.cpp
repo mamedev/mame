@@ -6,7 +6,6 @@
 //
 //==================================================================
 
-#include "emu.h"
 #include "slideruniformreader.h"
 
 #include <vector>

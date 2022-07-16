@@ -8,8 +8,7 @@
 #ifndef SOUND_MODULE_H_
 #define SOUND_MODULE_H_
 
-#include "osdepend.h"
-#include "modules/osdmodule.h"
+#include <cstdint>
 
 //============================================================
 //  CONSTANTS

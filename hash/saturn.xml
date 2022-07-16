@@ -101,9 +101,9 @@ license:CC0
 	  Angelique Special 2 (Japan) [T-7627G]                                                 | ########MISSING########
 	  Angelique Special 2 (Japan) (Premium Box) [T-7638G]                                   |  @@
 	  Another Memories (Japan) [T-38001G]                                                   | (amemorie)
-	  Aponashi Girls: Olympos (Japan) (Shokai Gentei Cell Ga Package A) [T-4304G]           | - are these the same disc as the B package?
-	  Aponashi Girls: Olympos (Japan) (Shokai Gentei Cell Ga Package B) [T-4306G]           | (olympos)
-	  Aponashi Girls: Olympos (Japan) (Shokai Gentei Cell Ga Package C) [T-4307G]           | - are these the same disc as the B package?
+	  Aponashi Girls: Olympos (Japan) (Shokai Gentei Cel-ga Package A) [T-4304G]           | - are these the same disc as the B package?
+	  Aponashi Girls: Olympos (Japan) (Shokai Gentei Cel-ga Package B) [T-4306G]           | (olympos)
+	  Aponashi Girls: Olympos (Japan) (Shokai Gentei Cel-ga Package C) [T-4307G]           | - are these the same disc as the B package?
 	  Aqua-World Umibi Monogatari (Japan) [T-30301G]                                        | (aquawld)
 	  AquaZone Desktop Life (Japan) [T-24001G]                                              | (aquazone)
 	  AquaZone Option Disc Series 1 Angel Fish (Japan) [T-24002G]                           | (aquaopt1)
@@ -257,7 +257,7 @@ license:CC0
 	  Dead or Alive (Japan) (Gentei Seisan Ban) [T-3604G]                                   |  @@
 	  Deadalus (Japan) [GS-9008]                                                            | (deadalus)
 	  Death Crimson (Japan) [T-23202G]                                                      | (deathcri)
-	  Death Throttle: Kakuzetsu Toshi Kara no Dasshutsu (Japan) [T-26403G]                  | (deaththr)        playable?
+	  Death Throttle: Kakuzetsu Toshi kara no Dasshutsu (Japan) [T-26403G]                  | (deaththr)        playable?
 	  DeathMask (Japan) [T-22701G]                                                          | (deathmsk)
 	  DecAthlete (Japan) [GS-9096]                                                          | (decathltj)
 	  DecAthlete (Japan) (Satakore) [GS-9150]                                               | (decathltjsa)
@@ -1027,7 +1027,7 @@ license:CC0
 	  Seifuku Densetsu: Pretty Fighter X (Japan) [T-15001G]                                 | (prettyx)
 	  Seikai Risshiden: Yoi Kuni Yoi Seiji (Japan) [T-1805G]                                | (seikairi)
 	  Seireki 1999: Pharoah no Fukkatsu (Japan) [T-18001G]                                  | (seireki)
-	  Sekai no Shasou Kara I Swiss-hen: Alps Tozantetsudou no Tabi (Japan) [T-32201G]       | (swisshen)
+	  Sekai no Shasou kara I Swiss-hen: Alps Tozantetsudou no Tabi (Japan) [T-32201G]       | (swisshen)
 	  Sengoku Blade: Sengoku Ace Episode II (Japan) [T-14410G]                              | (sengblad)
 	  Senken Kikyouden (Japan) [T-37401G]                                                   | (senken)
 	  Senkutsu Katsuryu Taisen: Chaos Seed (Japan) [T-30902G]                               | (chaossd)
@@ -1230,7 +1230,7 @@ license:CC0
 	  Thunder Force V (Japan) (Special Pack) [T-1812G]                                      |  @@
 	  Thunder Storm & Road Blaster (Japan) [T-20701G]                                       | (tstrmrbl)
 	  Thunderhawk II (Japan) [T-6006G]                                                      | (thawk2j)
-	  Tilk: Aoi Umi Kara Kita Shoujo (Japan) [T-32508G]                                     | (tilk)
+	  Tilk: Aoi Umi kara Kita Shoujo (Japan) [T-32508G]                                     | (tilk)
 	  Time Bokan Series: Bokan to Ippatsu! Doronboo Kanpekiban (Japan) [T-20607G]           | (timeboka)
 	  Time Commando (Japan) [T-8129G]                                                       | (timecomm)
 	  Time Gal & Ninja Hayate (Japan) [T-20702G]                                            | (tgalninh)
@@ -3202,9 +3202,9 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Conveni 2, The - Zenkoku Chain Tenkai da! (Japan)... -->
+	<!-- Identifying Conveni 2, The - Zenkoku Chain Tenkai Da! (Japan)... -->
 	<software name="conveni2" supported="no">
-		<description>The Conveni 2 - Zenkoku Chain Tenkai da! (Jpn)</description>
+		<description>The Conveni 2 - Zenkoku Chain Tenkai Da! (Jpn)</description>
 		<year>1998</year>
 		<publisher>Human</publisher>
 		<info name="serial" value="T-4317G"/>
@@ -20995,7 +20995,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying The Conveni 2 - Zenkoku Chain Tenkai da (T-4317G)... -->
 	<software name="conveni2a" cloneof="conveni2" supported="no">
-		<description>The Conveni 2 - Zenkoku Chain Tenkai da! (Jpn, alt)</description>
+		<description>The Conveni 2 - Zenkoku Chain Tenkai Da! (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Human</publisher>
 		<info name="serial" value="T-4317G"/>
@@ -24906,9 +24906,9 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying No-appointment Gals Olympos (Shokai Gentei Cell Ga Package B) (T-4306G)... -->
+	<!-- Identifying No-appointment Gals Olympos (Shokai Gentei Cel-ga Package B) (T-4306G)... -->
 	<software name="olympos" supported="no">
-		<description>Apo Nashi Gals Olympos (Jpn, Shokai Gentei Cell Ga Package B)</description>
+		<description>Apo Nashi Gals Olympos (Jpn, Shokai Gentei Cel-ga Package B)</description>
 		<year>1996</year>
 		<publisher>Human</publisher>
 		<info name="serial" value="T-4306G"/>
@@ -24917,7 +24917,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="no-appointment gals olympos (shokai gentei cell ga package b) (t-4306g)" sha1="1a474ca547a4e9909824b22d4156c8fba483e156" />
+				<disk name="no-appointment gals olympos (shokai gentei cel-ga package b) (t-4306g)" sha1="1a474ca547a4e9909824b22d4156c8fba483e156" />
 			</diskarea>
 		</part>
 	</software>
@@ -29482,9 +29482,9 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Sekai no Shasou Kara 1 Swiss Hen - Alps Tozantetsudou no Tabi (T-32201G)... -->
+	<!-- Identifying Sekai no Shasou kara 1 Swiss Hen - Alps Tozantetsudou no Tabi (T-32201G)... -->
 	<software name="swisshen" supported="no">
-		<description>Sekai no Shasou Kara 1 Swiss-hen - Alps Tozantetsudou no Tabi (Jpn)</description>
+		<description>Sekai no Shasou kara 1 Swiss-hen - Alps Tozantetsudou no Tabi (Jpn)</description>
 		<year>1996</year>
 		<publisher>Fujitsu</publisher>
 		<info name="serial" value="T-32201G"/>

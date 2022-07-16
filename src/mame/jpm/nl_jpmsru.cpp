@@ -4,6 +4,7 @@
 #include "netlist/devices/net_lib.h"
 
 NETLIST_START(jpmsru)
+{
 
 	SOLVER(Solver, 48000)
 	ANALOG_INPUT(V5, 5)
@@ -60,4 +61,4 @@ NETLIST_START(jpmsru)
 	OPTIMIZE_FRONTIER(R5.1, RES_K(1.5), 50)
 	OPTIMIZE_FRONTIER(R6.1, RES_K(1.5), 50)
 
-NETLIST_END()
+}

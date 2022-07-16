@@ -120,7 +120,6 @@ Undumped
   - Sound Fantasy - USA & Japan, for 1993 or later, Nintendo
   - Spanky no Orifuru Puzzle - Japan, for 1995, Natsume
   - Spot Goes To Hollywood - Europ, for 199?, Virgin
-  - Superman - USA, for 1993, Sunsoft
   - Super Hustler - Japan, for 199?, Opera House
   - Taloon's Mystery Dungeon - USA, for 199?, Squaresoft
   - Targa - Europe, for 1995, Virgin Interactive
@@ -1050,6 +1049,32 @@ Beyond that last category are the roms waiting to be classified.
 				<rom name="sns-8e-0.u1" size="4194304" crc="0e204fbd" sha1="05bca9d1097a148d8808028b8d75553dd8b7b972" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="2048">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doraemn2p" cloneof="doraemn2">
+		<description>Doraemon 2 - Nobita no Toys Land Daibouken (Japan, prototype)</description>
+		<year>1993</year>
+		<publisher>Epoch</publisher>
+		<info name="alt_title" value="ドラえもん2 のび太のトイズランド大冒険" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-4PV5B-01" />
+			<feature name="u1" value="U1 EPROM" />
+			<feature name="u2" value="U2 EPROM" />
+			<feature name="u3" value="U3 EPROM" /> <!-- empty socket -->
+			<feature name="u4" value="U4 EPROM" /> <!-- empty socket -->
+			<feature name="u5" value="U5 SRAM" /> <!-- empty socket -->
+			<feature name="u6" value="U6 PLD" />
+			<feature name="u7" value="U7 74LS157" />
+			<feature name="u8" value="U8 CIC" />
+			<feature name="lockout" value="D411A 9316 BA" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="no shell" /> <!-- cardboard label attached to solder side of PCB -->
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="u1" size="0x80000" crc="c9e2bf0b" sha1="0d67819edac04346c1ec0fdba12c82f6e556037f" offset="0x00000" />
+				<rom name="u2" size="0x80000" crc="10b620e8" sha1="1bbe3d59f18ddc3a1828aae3de84b236d74432bc" offset="0x80000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3541,6 +3566,30 @@ Beyond that last category are the roms waiting to be classified.
 		</part>
 	</software>
 
+	<software name="superman">
+		<!-- snescentral.com -->
+		<description>Superman - Unfinished Version (demo)</description>
+		<year>1992</year>
+		<publisher>Sunsoft</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2P3B-01" />
+			<feature name="u1" value="U1 EPROM(J) [D27C040-150V10]" />
+			<feature name="u2" value="U2 EPROM(J)" /> <!-- empty socket -->
+			<feature name="u3" value="U3 SRAM [LH5268AF-10TLL]" />
+			<feature name="u4" value="U4 74F139" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="lockout" value="D411A 9344 BA" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="no shell" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="snes-superman 5-25 demo.u1" size="524288" crc="26a050c4" sha1="4295ef8931377a923dec6d69ddd9dc8ef8cf2f77" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sylvestr1" cloneof="sylvestr">
 		<!-- pending: awaiting documentation -->
 		<description>Sylvester and Tweety (USA, prototype 19931215)</description>
@@ -4546,7 +4595,7 @@ Beyond that last category are the roms waiting to be classified.
 		</part>
 	</software>
 
-	<software name="tinhead">
+	<software name="tinheadp" cloneof="tinhead">
 		<!-- Notes: not much is known about this rom, but the game producer, Stuart Whyte, has confirmed its development -->
 		<description>Tinhead (Euro, prototype)</description>
 		<year>1994</year>
@@ -20909,7 +20958,7 @@ more investigation needed...
 
 	<software name="parodiusj" cloneof="parodius">
 		<!-- Notes: Also re-released through Nintendo Power -->
-		<description>Parodius da! - Shinwa Kara Owarai e (Jpn)</description>
+		<description>Parodius Da! - Shinwa kara Owarai e (Jpn)</description>
 		<year>1992</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="SHVC-PD" />
@@ -28101,7 +28150,7 @@ more investigation needed...
 	</software>
 
 	<software name="supnaxat">
-		<description>Super Naxat Open - Golf de Shoubu da Dorabocchan (Jpn)</description>
+		<description>Super Naxat Open - Golf de Shoubu Da! Dorabocchan (Jpn)</description>
 		<year>1994</year>
 		<publisher>Naxat Soft</publisher>
 		<info name="serial" value="SHVC-XD" />
@@ -38752,7 +38801,7 @@ List of unclassified roms
 	</software>
 
 	<software name="downtown">
-		<description>Downtown Nekketsu Baseball Monogatari - Yakyuu de Shoubu da! Kunio-kun (Jpn)</description>
+		<description>Downtown Nekketsu Baseball Monogatari - Yakyuu de Shoubu Da! Kunio-kun (Jpn)</description>
 		<year>1993</year>
 		<publisher>Technos Japan</publisher>
 		<info name="serial" value="SHVC-NV" />
@@ -39610,7 +39659,7 @@ List of unclassified roms
 	</software>
 
 	<software name="esparks">
-		<description>Esparks - Ijikuu Kara no Raihousha (Jpn)</description>
+		<description>Esparks - Ijikuu kara no Raihousha (Jpn)</description>
 		<year>1995</year>
 		<publisher>Tomy</publisher>
 		<info name="serial" value="SHVC-EP" />
@@ -41892,6 +41941,19 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="gourmetw" cloneof="gourmet">
+		<description>Gourmet Warriors</description>
+		<year>2019</year>
+		<publisher>Piko Interactive</publisher>
+		<info name="release" value="20190415" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2621440">
+				<rom name="gourmet warriors (world) (aftermarket) (unl).sfc" size="2621440" crc="b1731446" sha1="a34385584f49c013171b9865755b31a1dd27b48b" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gousouji" cloneof="musya">
 		<description>Gousou Jinrai Densetsu - Musha (Jpn)</description>
 		<year>1992</year>
@@ -42010,7 +42072,7 @@ List of unclassified roms
 	</software>
 
 	<software name="gbattlg2">
-		<description>The Great Battle Gaiden 2 - Matsuri da Wasshoi (Jpn)</description>
+		<description>The Great Battle Gaiden 2 - Matsuri Da Wasshoi (Jpn)</description>
 		<year>1994</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="SHVC-K8" />
@@ -42757,7 +42819,7 @@ List of unclassified roms
 	</software>
 
 	<software name="herakl4">
-		<description>Herakles no Eikou IV - Kamigami Kara no Okurimono (Jpn)</description>
+		<description>Herakles no Eikou IV - Kamigami kara no Okurimono (Jpn)</description>
 		<year>1994</year>
 		<publisher>Data East</publisher>
 		<info name="serial" value="SHVC-4E" />
@@ -43691,7 +43753,7 @@ List of unclassified roms
 	</software>
 
 	<software name="inazuma">
-		<description>Inazuma Serve da! Super Beach Volley (Jpn)</description>
+		<description>Inazuma Serve Da! Super Beach Volley (Jpn)</description>
 		<year>1995</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="SHVC-AV7J-JPN" />
@@ -44290,6 +44352,30 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="jellyboyp" cloneof="jellyboy">
+		<description>Jelly Boy (prototype)</description>
+		<year>1991?</year>
+		<publisher>Ocean</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="jelly boy prototype.sfc" size="1048576" crc="84381ef4" sha1="5273f8289330875ac872e2ccafcf9f0b0899678e" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jellyboyp1" cloneof="jellyboy">
+		<description>Jelly Boy (earlier prototype)</description>
+		<year>1991?</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="jelly2.sfc" size="1048576" crc="0c130961" sha1="50c1cdd54967c725a51b629c4a02d82d1abd4e1a" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jeopardy">
 		<description>Jeopardy! (USA)</description>
 		<year>1992</year>
@@ -44517,6 +44603,18 @@ List of unclassified roms
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="524288">
 				<rom name="jimmy connors pro tennis tour (france).sfc" size="524288" crc="bea289fc" sha1="bad6ead80316ff9c1105e2cb7f16529939a0be50" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="connorsgp" cloneof="connors">
+		<description>Jimmy Connors Pro Tennis Tour (Germany, prototype)</description>
+		<year>1992</year>
+		<publisher>Ubi Soft</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="jimmy connors pro tennis tour (prototype).sfc" size="524288" crc="585947eb" sha1="7f937d1b747691fc9361087f5f8052621c65d020" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -46509,12 +46607,12 @@ List of unclassified roms
 	</software>
 
 	<software name="ladystal">
-		<description>Lady Stalker - Kako Kara no Chousen (Jpn)</description>
+		<description>Lady Stalker - Kako kara no Chousen (Jpn)</description>
 		<year>1995</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="SHVC-ALSJ-JPN" />
 		<info name="release" value="19950401" />
-		<info name="alt_title" value="レディストーカー ~過去からの挑 戦~" />
+		<info name="alt_title" value="レディストーカー ~過去からの挑戦~" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="2621440">
@@ -52387,6 +52485,18 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="pinkie">
+		<description>Pinkie</description>
+		<year>2018</year>
+		<publisher>Piko Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="pinkie (world) (aftermarket) (unl).sfc" size="1048576" crc="d2aa58d3" sha1="6e6eb5051b0edcd245e2279ed926d81e6f498471" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pinkiep" cloneof="pinkie">
 		<description>Pinkie (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>Data Design</publisher>
@@ -60831,12 +60941,12 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="superzug">
-		<description>Super Zugan - Hakotenjou Kara no Shoutaijou (Jpn)</description>
+		<description>Super Zugan - Hakotenjou kara no Shoutaijou (Jpn)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts Victor</publisher>
 		<info name="serial" value="SHVC-ZU" />
 		<info name="release" value="19940211" />
-		<info name="alt_title" value="スーパーヅガン ―ハコテン 城からの招待状―" />
+		<info name="alt_title" value="スーパーヅガン ―ハコテン城からの招待状―" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="1048576">
@@ -62177,6 +62287,19 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
+	<software name="tinhead">
+		<description>Tinhead</description>
+		<year>2019</year>
+		<publisher>Piko Interactive</publisher>
+		<info name="release" value="20190415" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="tinhead (world) (aftermarket) (unl).sfc" size="1048576" crc="bfd26228" sha1="90bc3a78bf2569ddbc1efbc612e8915e5b28df04" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ttoonbbls" cloneof="ttoonbbl">
 		<description>Tiny Toon Adventures - Buster Busts Loose! (Spa)</description>
 		<year>1993</year>
@@ -62528,6 +62651,18 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="total carnage (usa) (beta) (alt 1).sfc" size="1048576" crc="82b17b1b" sha1="850c64ddc49a07f7f7a198a02dab4afed8acf3c0" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="totalcarupb" cloneof="totalcar" supported="no"> <!-- inputs mostly don't respond -->
+		<description>Total Carnage (USA, prototype 19930610)</description>
+		<year>1993</year>
+		<publisher>Malibu Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="total carnage.sfc" size="1048576" crc="d2be0688" sha1="2b498ad3fd7f23ec14039382d683b8d666a92645" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -65536,12 +65671,12 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="zenprowf">
-		<description>Zen-Nihon Pro Wres - Fight da Pon! (Jpn)</description>
+		<description>Zen-Nihon Pro Wres - Fight Da Pon! (Jpn)</description>
 		<year>1994</year>
 		<publisher>Masaya</publisher>
 		<info name="serial" value="SHVC-JF" />
 		<info name="release" value="19940625" />
-		<info name="alt_title" value="全日本プロレス ファイト だポン!" />
+		<info name="alt_title" value="全日本プロレス ファイトだポン!" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="1048576">
@@ -65689,12 +65824,12 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="zigzag">
-		<description>Zig Zag Cat - Dachou Club mo Oosawagi da (Jpn)</description>
+		<description>Zig Zag Cat - Dachou Club mo Oosawagi Da (Jpn)</description>
 		<year>1994</year>
 		<publisher>Den'Z</publisher>
 		<info name="serial" value="SHVC-ZP" />
 		<info name="release" value="19940624" />
-		<info name="alt_title" value="ジグザグキャットダチョウ倶楽 部も大騒ぎタ" />
+		<info name="alt_title" value="ジグザグキャットダチョウ倶楽 部も大騒ぎダ" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="1572864">

@@ -37,7 +37,7 @@ HD44801A50 used in:
 
 HD44801C89 used in:
 - CXG Portachess (1985 version, "NEW 16 LEVELS") - 1st use
-- CXG Sensor Computachess (198? rerelease, "NEW 16 LEVELS")
+- CXG Sensor Computachess (1985 rerelease, "NEW 16 LEVELS")
 - CXG Portachess II (1986)
 - CXG Computachess IV (1986)
 - CXG Sphinx Chess Voyager? (1992)
@@ -58,7 +58,7 @@ HD44801C89 used in:
 
 // internal artwork
 #include "cxg_scptchess_v1.lh" // clickable
-#include "cxg_prtchess_v2.lh" // clickable
+#include "cxg_scptchess_v2.lh" // clickable
 
 
 namespace {
@@ -72,18 +72,17 @@ public:
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
-		m_inputs(*this, "IN.%u", 0)
+		m_inputs(*this, "IN.0")
 	{ }
 
 	void scptchess_v1(machine_config &config);
-	void prtchess_v2(machine_config &config);
+	void scptchess_v2(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
-	DECLARE_INPUT_CHANGED_MEMBER(save_switch) { update_halt(); }
+	// New Game button is directly tied to MCU reset
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override { update_halt(); }
 
 private:
 	// devices/pointers
@@ -91,9 +90,8 @@ private:
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
-	required_ioport_array<2> m_inputs;
+	required_ioport m_inputs;
 
-	void update_halt();
 	void update_display();
 	template<int N> void mux_w(u8 data);
 	void leds_w(u16 data);
@@ -107,20 +105,6 @@ void scptchess_state::machine_start()
 {
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_data));
-}
-
-void scptchess_state::update_halt()
-{
-	// power switch to "Save" disables the leds and halts the MCU
-	m_maincpu->set_input_line(HMCS40_INPUT_LINE_HLT, (m_inputs[1]->read() & 2) ? ASSERT_LINE : CLEAR_LINE);
-	m_display->clear();
-}
-
-INPUT_CHANGED_MEMBER(scptchess_state::reset_button)
-{
-	// New Game button is directly tied to MCU reset
-	if (~m_inputs[1]->read() & 2)
-		m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -157,7 +141,7 @@ u16 scptchess_state::input_r()
 	u16 data = 0;
 
 	// D7: read buttons
-	if (m_inp_mux & m_inputs[0]->read())
+	if (m_inp_mux & m_inputs->read())
 		data |= 0x80;
 
 	// D8-D15: read chessboard
@@ -174,22 +158,21 @@ u16 scptchess_state::input_r()
     Input Ports
 ******************************************************************************/
 
-static INPUT_PORTS_START( shared_v1 )
+static INPUT_PORTS_START( scptchess_v1 )
 	PORT_START("IN.0")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Sound") // only hooked up on 1st version
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Reverse Play")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
-
-	PORT_START("IN.1") // these are not available up on 1st version
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CHANGED_MEMBER(DEVICE_SELF, scptchess_state, reset_button, 0) PORT_NAME("New Game")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, scptchess_state, save_switch, 0) PORT_NAME("Save Switch")
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( shared_v2 )
-	PORT_INCLUDE( shared_v1 )
+static INPUT_PORTS_START( scptchess_v2 )
+	PORT_INCLUDE( scptchess_v1 )
 
 	PORT_MODIFY("IN.0")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("RESET")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CHANGED_MEMBER(DEVICE_SELF, scptchess_state, reset_button, 0) PORT_NAME("New Game")
 INPUT_PORTS_END
 
 
@@ -220,10 +203,10 @@ void scptchess_state::scptchess_v1(machine_config &config)
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
-void scptchess_state::prtchess_v2(machine_config &config)
+void scptchess_state::scptchess_v2(machine_config &config)
 {
 	scptchess_v1(config);
-	config.set_default_layout(layout_cxg_prtchess_v2);
+	config.set_default_layout(layout_cxg_scptchess_v2);
 }
 
 
@@ -237,7 +220,7 @@ ROM_START( scptchess )
 	ROM_LOAD("white_allcock_44801a50", 0x0000, 0x2000, CRC(c5c53e05) SHA1(8fa9b8e48ca54f08585afd83ae78fb1970fbd382) )
 ROM_END
 
-ROM_START( prtchess )
+ROM_START( scptchessa )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD("202_newcrest_16_hd44801c89", 0x0000, 0x2000, CRC(56b48f70) SHA1(84ec62323c6d3314e0515bccfde2f65f6d753e99) )
 ROM_END
@@ -250,6 +233,6 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME       PARENT    CMP MACHINE       INPUT      STATE            INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1981, scptchess, 0,         0, scptchess_v1, shared_v1, scptchess_state, empty_init, "CXG Systems / White & Allcock", "Sensor Computachess (1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1985, prtchess,  scptchess, 0, prtchess_v2,  shared_v2, scptchess_state, empty_init, "CXG Systems / Newcrest Technology", "Portachess (1985 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME        PARENT    CMP MACHINE       INPUT         STATE            INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1981, scptchess,  0,         0, scptchess_v1, scptchess_v1, scptchess_state, empty_init, "CXG Systems / White & Allcock", "Sensor Computachess (1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, scptchessa, scptchess, 0, scptchess_v2, scptchess_v2, scptchess_state, empty_init, "CXG Systems / Newcrest Technology", "Sensor Computachess (1985 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

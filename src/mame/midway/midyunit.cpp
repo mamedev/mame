@@ -3463,7 +3463,40 @@ ROM_START( totcarn )
 ROM_END
 
 
-ROM_START( totcarnp )
+ROM_START( totcarnp2 )
+	ROM_REGION( 0x50000, "adpcm:cpu", 0 )   /* sound CPU */
+	ROM_LOAD (  "sl1_total_carnage_sound_rom_u3.u3", 0x10000, 0x20000, CRC(5bdb4665) SHA1(c6b90b914785b8703790957cc4bb4983a332fba6) )
+	ROM_RELOAD (                                     0x30000, 0x20000 )
+
+	ROM_REGION( 0x100000, "adpcm:oki", 0 )  /* ADPCM */
+	ROM_LOAD ( "sl1_total_carnage_sound_rom_u12.u12", 0x00000, 0x40000, CRC(d0000ac7) SHA1(2d476c7727462623feb2f1a23fb797eaeed5ce30) )
+	ROM_RELOAD(                                       0x40000, 0x40000 )
+	ROM_LOAD ( "sl1_total_carnage_sound_rom_u13.u13", 0x80000, 0x40000, CRC(e48e6f0c) SHA1(bf7d548b6b1901966f99c815129ea160ef36f024) )
+	ROM_RELOAD(                                       0xc0000, 0x40000 )
+
+	ROM_REGION16_LE( 0x100000, "user1", 0 ) /* 34010 code */
+	ROM_LOAD16_BYTE( "proto2_total_carnage_game_rom_u105.u105", 0x80000, 0x40000, CRC(e273d43c) SHA1(9f2040328917f02153edced28f9a4e1fb7d0cee7) )
+	ROM_LOAD16_BYTE( "proto2_total_carnage_game_rom_u89.u89",   0x80001, 0x40000, CRC(e759078b) SHA1(a7712b51215029422e21ba803dac3afd44c941ac) )
+
+	ROM_REGION( 0x800000, "gfx1", 0 )
+	ROM_LOAD ( "la1_total_carnage_game_rom_u111.u111", 0x000000, 0x40000, CRC(13f3f231) SHA1(6df0dca72e170818c260d9931477103a38864a1e) ) // Also known to be labeled as PA1
+	ROM_LOAD ( "la1_total_carnage_game_rom_u112.u112", 0x040000, 0x40000, CRC(72e45007) SHA1(b6f5dfb844b6ff46a3594d20e85f1f20bdbfb793) )
+	ROM_LOAD ( "la1_total_carnage_game_rom_u113.u113", 0x080000, 0x40000, CRC(2c8ec753) SHA1(9393179ea19cbec7ac7e4f8e912bb4f86d93e8bd) )
+	ROM_LOAD ( "la1_total_carnage_game_rom_u114.u114", 0x0c0000, 0x40000, CRC(6210c36c) SHA1(607acdf024c1d36238ed19841c3ef2c96f49038f) )
+
+	ROM_LOAD ( "la1_total_carnage_game_rom_u95.u95",   0x200000, 0x40000, CRC(579caeba) SHA1(de7d9921a210839e1db4bf54fb96833bcb073862) )
+	ROM_LOAD ( "la1_total_carnage_game_rom_u96.u96",   0x240000, 0x40000, CRC(f43f1ffe) SHA1(60401092be1fed52a028dc81b7a28ade923c35ea) )
+	ROM_LOAD ( "la1_total_carnage_game_rom_u97.u97",   0x280000, 0x40000, CRC(1675e50d) SHA1(1479712b03fa2b67fcd2d4694f26ce1bd1959b97) )
+	ROM_LOAD ( "la1_total_carnage_game_rom_u98.u98",   0x2c0000, 0x40000, CRC(ab06c885) SHA1(09163060269fed2ebd697b71602166e906c95317) )
+
+	ROM_LOAD ( "la1_total_carnage_game_rom_u106.u106", 0x400000, 0x40000, CRC(146e3863) SHA1(1933e62a060eb667889b1edd5002c30a37ae00a7) )
+	ROM_LOAD ( "la1_total_carnage_game_rom_u107.u107", 0x440000, 0x40000, CRC(95323320) SHA1(5296206f3d84c21374968ffcacfe59eb3215ca46) )
+	ROM_LOAD ( "la1_total_carnage_game_rom_u108.u108", 0x480000, 0x40000, CRC(ed152acc) SHA1(372dbc4fdb581ac00a7eb5669cc1ac7afd6033f8) )
+	ROM_LOAD ( "la1_total_carnage_game_rom_u109.u109", 0x4c0000, 0x40000, CRC(80715252) SHA1(4586a259780963837ce362b526f161122d2e3cb4) )
+ROM_END
+
+
+ROM_START( totcarnp1 )
 	ROM_REGION( 0x50000, "adpcm:cpu", 0 )   /* sound CPU */
 	ROM_LOAD (  "sl1_total_carnage_sound_rom_u3.u3", 0x10000, 0x20000, CRC(5bdb4665) SHA1(c6b90b914785b8703790957cc4bb4983a332fba6) )
 	ROM_RELOAD (                                     0x30000, 0x20000 )
@@ -3563,4 +3596,5 @@ GAME( 1992, mkyawdim3,  mk,       mkyawdim,                mkyawdim, midyunit_st
 GAME( 1992, mkyawdim4,  mk,       mkyawdim,                mkyawdim, midyunit_state, init_mkyawdim,  ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 4)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND) // are some sound effects missing/wrong?
 
 GAME( 1992, totcarn,    0,        yunit_adpcm_6bit_fast,   totcarn, midyunit_state,  init_totcarn,  ROT0, "Midway",   "Total Carnage (rev LA1 03/10/92)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, totcarnp,   totcarn,  yunit_adpcm_6bit_fast,   totcarn, midyunit_state,  init_totcarn,  ROT0, "Midway",   "Total Carnage (prototype, proto v 1.0 01/25/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, totcarnp2,  totcarn,  yunit_adpcm_6bit_fast,   totcarn, midyunit_state,  init_totcarn,  ROT0, "Midway",   "Total Carnage (prototype, proto v 2.0 02/10/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, totcarnp1,  totcarn,  yunit_adpcm_6bit_fast,   totcarn, midyunit_state,  init_totcarn,  ROT0, "Midway",   "Total Carnage (prototype, proto v 1.0 01/25/92)", MACHINE_SUPPORTS_SAVE )

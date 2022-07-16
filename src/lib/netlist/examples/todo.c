@@ -8,6 +8,7 @@
 #include "netlist/devices/net_lib.h"
 
 NETLIST_START(7400_TTL)
+{
 	NET_REGISTER_DEV(7400, s1)
 	NET_REGISTER_DEV(7400, s2)
 	NET_REGISTER_DEV(7400, s3)
@@ -29,16 +30,18 @@ NETLIST_START(7400_TTL)
 	ALIAS(13, s4.B);
 	ALIAS(11, s4.Q);
 
-NETLIST_END()
+}
 
 NETLIST_START(lib)
-	TRUTHTABLE_START(7400A, 2, 1, 0, "+A,B")
+{
+	TRUTH_TABLE(7400A, 2, 1, 0, "+A,B")
+{
 		TT_HEAD(" A , B | Q ")
 		TT_LINE(" 0 , X | 1 |22")
 		TT_LINE(" X , 0 | 1 |22")
 		TT_LINE(" 1 , 1 | 0 |15")
-	TRUTHTABLE_END()
-NETLIST_END()
+	}
+}
 
 
 

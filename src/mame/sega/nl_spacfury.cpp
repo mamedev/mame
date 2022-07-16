@@ -70,6 +70,7 @@
 #define CA3080_FAST_DIP(name) SUBMODEL(_CA3080_FAST_DIP, name)
 #define CA3080_SLOW_DIP(name) SUBMODEL(_CA3080_SLOW_DIP, name)
 static NETLIST_START(_CA3080_FAST_DIP)
+{
 	ALIAS(2, F.A0) // -
 	ALIAS(3, F.A1) // +
 	ALIAS(4, F.A2) // V-
@@ -89,9 +90,10 @@ static NETLIST_START(_CA3080_FAST_DIP)
 	ANALOG_INPUT(XGND, 0)
 	NET_C(XGND, VO.IN, VO.ON) // FIXME: assume symmetric supply
 	NET_C(F.Q, VO.IP)
-NETLIST_END()
+}
 
 static NETLIST_START(_CA3080_SLOW_DIP)
+{
 //
 // These items are common to several models
 //
@@ -136,7 +138,7 @@ static NETLIST_START(_CA3080_SLOW_DIP)
 	NET_C(Q7.E, Q8.C, Q8.B, Q9.B)       // N1N36
 	NET_C(Q4.C, Q5.E, Q10.E)            // N1N52
 	NET_C(Q11.B, Q12.C, Q12.B, Q13.E)   // N1N44
-NETLIST_END()
+}
 
 
 
@@ -145,6 +147,7 @@ NETLIST_END()
 //
 
 NETLIST_START(spacfury)
+{
 
 	SOLVER(Solver, 1000)
 	PARAM(Solver.DYNAMIC_TS, 1)
@@ -1100,4 +1103,4 @@ NETLIST_START(spacfury)
 	OPTIMIZE_FRONTIER(R20.1, RES_K(22), RXX)
 #endif
 
-NETLIST_END()
+}
