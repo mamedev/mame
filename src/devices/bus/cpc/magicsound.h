@@ -74,6 +74,7 @@ private:
 	required_device<am9517a_device> m_dmac;
 	required_device<pit8254_device> m_timer1;
 	required_device<pit8254_device> m_timer2;
+	required_device<ram_device> m_ramptr;
 
 	void set_timer_gate(bool state);
 
@@ -82,7 +83,6 @@ private:
 	uint8_t m_output[4];
 	bool m_dack[4];
 	int8_t m_current_channel;
-	ram_device* m_ramptr;
 	uint8_t m_current_output;
 };
 
