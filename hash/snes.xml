@@ -10382,7 +10382,7 @@ more investigation needed...
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SHVC-KU" />
 		<info name="release" value="19930730" />
-		<info name="alt_title" value="クレヨンしんちゃん 嵐を呼ぶ園児" />
+		<info name="alt_title" value="クレヨンしんちゃん 〝嵐を呼ぶ園児〞" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-2A0N-01, SHVC-2A0N-10" />
@@ -10407,7 +10407,7 @@ more investigation needed...
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SHVC-UE" />
 		<info name="release" value="19940527" />
-		<info name="alt_title" value="クレヨンしんちゃん2 ゛大魔王の逆襲″" />
+		<info name="alt_title" value="クレヨンしんちゃん2 〝大魔王の逆襲〞" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-1A0N-20" />

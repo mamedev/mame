@@ -4469,7 +4469,7 @@ license:CC0
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-K4J" />
 		<info name="release" value="19930409" />
-		<info name="alt_title" value="クレヨンしんちゃん ゛オラとシロはお友達だよ″" />
+		<info name="alt_title" value="クレヨンしんちゃん 〝オラとシロはお友達だよ〞" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -4484,7 +4484,7 @@ license:CC0
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-COJ" />
 		<info name="release" value="19931022" />
-		<info name="alt_title" value="クレヨンしんちゃん2 ゛オラとわんぱくごっこだゾ″" />
+		<info name="alt_title" value="クレヨンしんちゃん2 〝オラとわんぱくごっこだゾ〞" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
@@ -4520,7 +4520,7 @@ license:CC0
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-H9J" />
 		<info name="release" value="19940826" />
-		<info name="alt_title" value="クレヨンしんちゃん4 ゛オラのいたずら大変身″" />
+		<info name="alt_title" value="クレヨンしんちゃん4 〝オラのいたずら大変身〞" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
