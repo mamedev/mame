@@ -11,14 +11,11 @@
 #include "emu.h"
 #include "netlist.h"
 
-#include "netlist/nl_base.h"
 #include "netlist/nl_setup.h"
 #include "netlist/nl_factory.h"
 #include "netlist/nl_parser.h"
 #include "netlist/nl_interface.h"
 
-#include "netlist/plib/palloc.h"
-#include "netlist/plib/pmempool.h"
 #include "netlist/plib/pdynlib.h"
 #include "netlist/plib/pstonum.h"
 
