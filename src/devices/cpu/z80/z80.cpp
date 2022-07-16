@@ -518,12 +518,12 @@ u8 z80_device::opcode_read()
 z80_device::ops_type z80_device::rop()
 {
 	return ST_F {
-		TDAT8 = opcode_read();                                        } FN {
-		T(get_opfetch_cycles() - (2 * m_cycles_multiplier)); /* 2 */  } MN
-		nomreq_ir(1)                                                  FN {
-		T(1 * m_cycles_multiplier);                          /* 1 */
+		TDAT8 = opcode_read();                                               } FN {
+		T(get_opfetch_cycles() - (2 * m_cycles_multiplier));                 } FN {
+		m_refresh_cb((m_i << 8) | (m_r2 & 0x80) | (m_r & 0x7f), 0x00, 0xff); } FN {
+		T(2 * m_cycles_multiplier);
 		PC++;
-		m_r++;                                                        } EST
+		m_r++;                                                               } EST
 }
 
 /****************************************************************
