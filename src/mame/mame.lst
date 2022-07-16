@@ -3257,8 +3257,10 @@ avigo_it                        // 1997 Avigo (Italian)
 aviion_4600                     // Data General AViiON 4600
 
 @source:elektor/avrmax.cpp
+atm18mcc
 avrmax
 avrmaxg
+cc2schach
 
 @source:misc/avt.cpp
 avtbingo                        // (c) 1985 AVT
@@ -10235,6 +10237,7 @@ cannonb2                        // (c) 1985 TV Game Gruenberg
 cannonb3                        // (c) 1985 Soft
 ccboot                          // bootleg
 ccboot2                         // bootleg
+ccbootmm                        // ManilaMatic bootleg
 ccbootmr                        // Model Racing bootleg
 cclimber                        // (c) 1980 Nichibutsu
 cclimbera                       // (c) 1980 Nichibutsu
@@ -13758,7 +13761,7 @@ rhunting                        // bootleg of deathrac
 @source:motorola/exorciser.cpp
 exorciser                       // 1975 Motorola
 
-@source:exorterm/exorterm.cpp
+@source:motorola/exorterm.cpp
 exorterm155                     // (c) 1979 Motorola
 
 @source:netronics/exp85.cpp
@@ -14045,6 +14048,8 @@ fex68kb                         //
 fex68km2                        //
 fex68km2a                       //
 fex68km3                        //
+fex68km3a                       //
+fex68km3b                       //
 fex68km4                        //
 
 @source:fidelity/eldorado.cpp
@@ -19614,6 +19619,9 @@ kinst2uk                        // (c) 1995 Rare
 kissp                           //
 kissp2                          //
 
+@source:seta/kiwame.cpp
+kiwame                          // (c) 1994 Athena
+
 @source:atari/klax.cpp
 klax                            // 136075           (c) 1989
 klax4                           // 136075           (c) 1989
@@ -20729,9 +20737,11 @@ maciivx                         // 1993 Apple Macintosh IIvx
 maciix                          // 1988 Apple Macintosh IIx
 maclc                           // 1990 Apple Macintosh LC
 maclc2                          // 1991 Apple Macintosh LC II
+macse30                         // 1989 Apple Macintosh SE/30
+
+@source:apple/maclc3.cpp
 maclc3                          // 1993 Apple Macintosh LC III
 maclc520                        // 1993 Apple Macintosh LC 520
-macse30                         // 1989 Apple Macintosh SE/30
 
 @source:apple/macpdm.cpp
 pmac6100                        // 1993 Apple Power Macintosh 6100
@@ -23342,6 +23352,7 @@ mm5a                            // Mephisto MM V
 mm5p
 rebel5                          // Mephisto Rebell 5.0
 rebel5a                         // Mephisto Rebell 5.0
+rebel5b                         // Mephisto Rebell 5.0
 
 @source:hegenerglaser/modena.cpp
 modena                          // 1992 Mephisto Modena
@@ -27528,7 +27539,7 @@ m4hotrod__v                     //
 m4holdtm                        // Hold Timer (Barcrest)
 m4hpyjok                        // Happy Joker (Barcrest)
 m4jok300                        // Jokers Millenium 300
-m4jok300a                       // 
+m4jok300a                       //
 m4jolgem                        // Jolly Gems (Barcrest)
 m4jolgem__0                     //
 m4jolgem__1                     //
@@ -32799,7 +32810,7 @@ ryuuha                          // (c) 1987
 secolove                        // (c) 1986
 seiha                           // (c) 1987
 seiham                          // (c) 1987
-swinggal            // (c) 1987 Digital Denshi
+swinggal                        // (c) 1987 Digital Denshi
 vipclub                         // (c) 1988 Daiichi Denshi
 
 @source:nichibutsu/nbmj8891.cpp
@@ -33463,6 +33474,9 @@ zonefusn
 newbrain                        //
 newbraina                       //
 newbrainmd                      //
+
+@source:pinball/newcanasta.cpp
+newcanasta                      // (c) 2010 Marsaplay
 
 @source:misc/news.cpp
 news                            // "Virus"??? ((c) 1993 Poby in ROM VIRUS.4)
@@ -34525,7 +34539,7 @@ tetriskr                        // (c) 1988? bootleg
 @source:amstrad/pda600.cpp
 pda600                          //
 
-@source:pdp1/pdp1.cpp
+@source:dec/pdp1.cpp
 pdp1                            // 1961 DEC PDP1
 
 @source:dec/pdp11.cpp
@@ -38534,7 +38548,6 @@ jockeyc                         // (c) 1990 Seta (Visco license)
 kamenrid                        // (c) 1993 Toei / Banpresto
 keroppi                         // (c) 1993 Sammy
 keroppij                        // (c) 1993 Sammy
-kiwame                          // (c) 1994 Athena
 krzybowl                        // (c) 1994 American Sammy
 madshark                        // (c) 1993 Allumer
 magspeed                        // (c) 1994 Allumer
@@ -43120,6 +43133,7 @@ wackygtr                        // Wacky Gator
 @source:midcoin/wallc.cpp
 brkblast                        // bootleg (Fadesa)
 sidampkr                        //
+sidampkra                       //
 unkitpkr                        //
 wallc                           // (c) 1984 Midcoin
 wallca                          // (c) 1984 Midcoin
@@ -44227,6 +44241,9 @@ xyonix                          // [1989 Philko]
 higurashi                       // (c)2009 AQ Interactive
 kof2002um                       // (c)2009 SNK Playmore / New Channel
 kof2002umj                      // (c)2009 SNK Playmore / New Channel
+
+@source:chess/yeno_532xl.cpp
+y532xl
 
 @source:philips/yes.cpp
 yes                             //

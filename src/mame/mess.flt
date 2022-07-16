@@ -50,6 +50,7 @@ apple/lisa.cpp
 apple/lwriter.cpp
 apple/mac.cpp
 apple/mac128.cpp
+apple/maclc3.cpp
 apple/macpci.cpp
 apple/macpdm.cpp
 apple/macprtb.cpp
@@ -139,6 +140,7 @@ chess/conic_cchess2.cpp
 chess/conic_cchess3.cpp
 chess/regence.cpp
 chess/tasc.cpp
+chess/yeno_532xl.cpp
 chromatics/cgc7900.cpp
 citoh/cit101.cpp
 citoh/cit101xl.cpp
@@ -198,6 +200,7 @@ dec/decstation.cpp
 dec/dectalk.cpp
 dec/decwritr.cpp
 dec/jensen.cpp
+dec/pdp1.cpp
 dec/pdp11.cpp
 dec/rainbow.cpp
 dec/vax11.cpp
@@ -241,7 +244,6 @@ epson/qx10.cpp
 ericsson/e9161.cpp
 ericsson/eispc.cpp
 exidy/sorcerer.cpp
-exorterm/exorterm.cpp
 fairchild/channelf.cpp
 fairchild/f387x.cpp
 fairlight/cmi.cpp
@@ -479,6 +481,7 @@ morrow/mpz80.cpp
 morrow/tricep.cpp
 mos/kim1.cpp
 motorola/exorciser.cpp
+motorola/exorterm.cpp
 motorola/m6805evs.cpp
 motorola/m68705prg.cpp
 motorola/mekd1.cpp
@@ -592,7 +595,6 @@ pc/ps2.cpp
 pc/sis630.cpp
 pc/tandy1t.cpp
 pc/tosh1000.cpp
-pdp1/pdp1.cpp
 philips/odyssey2.cpp
 philips/p2000t.cpp
 philips/vg5k.cpp

@@ -85,6 +85,7 @@
 #include "chessmsr.h"
 #include "finalchs.h"
 #include "bblue2.h"
+#include "opus100pm.h"
 
 
 void pc_isa8_cards(device_slot_interface &device)
@@ -141,6 +142,7 @@ void pc_isa8_cards(device_slot_interface &device)
 	device.option_add("babyblue2", ISA8_BABYBLUE2);
 	device.option_add("acb2072", ACB2072);
 	device.option_add("3xtwin", ISA8_3XTWIN);
+	device.option_add("opus108pm", ISA8_OPUS108PM);
 }
 
 void pc_isa16_cards(device_slot_interface &device)
@@ -187,6 +189,7 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("babyblue2", ISA8_BABYBLUE2);
 	device.option_add("acb2072", ACB2072);
 	device.option_add("3xtwin", ISA8_3XTWIN);
+	device.option_add("opus108pm", ISA8_OPUS108PM);
 	// 16-bit
 	device.option_add("ide", ISA16_IDE);
 	device.option_add("ne2000", NE2000);

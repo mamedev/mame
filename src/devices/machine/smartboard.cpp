@@ -2,7 +2,7 @@
 // copyright-holders:Sandro Ronco, hap
 /******************************************************************************
 
-Tasc SmartBoard SB30
+Tasc SmartBoard SB30 (analog)
 
 Chessboard controller for use with Tasc R30 chesscomputer, or as PC peripheral.
 

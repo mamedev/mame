@@ -1115,6 +1115,7 @@ pinball/micropin.cpp
 pinball/missamer.cpp
 pinball/mrgame.cpp
 pinball/nsm.cpp
+pinball/newcanasta.cpp
 pinball/peyper.cpp
 pinball/play_1.cpp
 pinball/play_2.cpp
@@ -1281,6 +1282,7 @@ seibu/wiz.cpp
 seta/albazc.cpp
 seta/hanaawas.cpp
 seta/jclub2.cpp
+seta/kiwame.cpp
 seta/macs.cpp
 seta/seta.cpp
 seta/seta2.cpp

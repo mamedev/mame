@@ -6384,8 +6384,8 @@ private:
 
 void elecdet_state::write_r(u16 data)
 {
-	// R7,R8: speaker out
-	m_speaker->level_w((m_o & 0x80) ? (data >> 7 & 3) : 0);
+	// R7,R8(tied together): speaker out
+	m_speaker->level_w((m_o & 0x80) ? population_count_32(data >> 7 & 3) : 0);
 
 	// R0-R6: select digit
 	m_display->matrix(data, bitswap<8>(m_o,7,5,2,1,4,0,6,3));
@@ -6473,8 +6473,8 @@ void elecdet_state::elecdet(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	static const double speaker_levels[4] = { 0.0, 0.5, 0.5, 1.0};
-	m_speaker->set_levels(4, speaker_levels);
+	static const double speaker_levels[3] = { 0.0, 0.5, 1.0};
+	m_speaker->set_levels(3, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -8209,13 +8209,14 @@ protected:
 	virtual void machine_start() override;
 
 private:
+	void update_speaker();
 	void write_r(u16 data);
 	void write_o(u16 data);
 	u8 read_k();
 
-	int m_gearbox_pos = 0;
-	bool sensor_state() { return m_gearbox_pos < 0 && m_display->element_on(0, 0); }
 	TIMER_DEVICE_CALLBACK_MEMBER(gearbox_sim_tick);
+	bool sensor_state() { return m_gearbox_pos < 0 && m_display->element_on(0, 0); }
+	int m_gearbox_pos = 0;
 
 	output_finder<> m_left_motor_forward;
 	output_finder<> m_left_motor_reverse;
@@ -8253,6 +8254,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(bigtrak_state::gearbox_sim_tick)
 		m_gearbox_pos++;
 }
 
+void bigtrak_state::update_speaker()
+{
+	int data = (m_o & 1) | (m_o >> 6 & 2) | (m_r >> 8 & 4);
+	m_speaker->level_w(population_count_32(data));
+}
+
 void bigtrak_state::write_r(u16 data)
 {
 	// R0-R5,R8: input mux (keypad, ext in enable)
@@ -8264,8 +8271,8 @@ void bigtrak_state::write_r(u16 data)
 	m_display->matrix(1, (data >> 7 & 1) | (data >> 8 & 2));
 
 	// (O0,O7,)R10(tied together): speaker out
-	m_speaker->level_w((m_o & 1) | (m_o >> 6 & 2) | (data >> 8 & 4));
 	m_r = data;
+	update_speaker();
 }
 
 void bigtrak_state::write_o(u16 data)
@@ -8283,8 +8290,8 @@ void bigtrak_state::write_o(u16 data)
 	m_ext_out = data >> 5 & 1;
 
 	// O0,O7(,R10)(tied together): speaker out
-	m_speaker->level_w((data & 1) | (data >> 6 & 2) | (m_r >> 8 & 4));
 	m_o = data;
+	update_speaker();
 }
 
 u8 bigtrak_state::read_k()
@@ -8368,8 +8375,8 @@ void bigtrak_state::bigtrak(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	static const double speaker_levels[8] = { 0.0, 1.0/3.0, 1.0/3.0, 2.0/3.0, 1.0/3.0, 2.0/3.0, 2.0/3.0, 1.0 };
-	m_speaker->set_levels(8, speaker_levels);
+	static const double speaker_levels[4] = { 0.0, 1.0/3.0, 2.0/3.0, 1.0 };
+	m_speaker->set_levels(4, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -8672,7 +8679,7 @@ void arcmania_state::write_r(u16 data)
 void arcmania_state::write_o(u16 data)
 {
 	// O0-O2(tied together): speaker out
-	m_speaker->level_w(data & 7);
+	m_speaker->level_w(population_count_32(data & 7));
 
 	// O3,O4,O6: input mux
 	m_inp_mux = (data >> 3 & 3) | (data >> 4 & 4);
@@ -8739,8 +8746,8 @@ void arcmania_state::arcmania(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	static const double speaker_levels[8] = { 0.0, 1.0/3.0, 1.0/3.0, 2.0/3.0, 1.0/3.0, 2.0/3.0, 2.0/3.0, 1.0 };
-	m_speaker->set_levels(8, speaker_levels);
+	static const double speaker_levels[4] = { 0.0, 1.0/3.0, 2.0/3.0, 1.0 };
+	m_speaker->set_levels(4, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -8949,7 +8956,7 @@ void merlin_state::write_r(u16 data)
 void merlin_state::write_o(u16 data)
 {
 	// O4-O6(tied together): speaker out
-	m_speaker->level_w(data >> 4 & 7);
+	m_speaker->level_w(population_count_32(data >> 4 & 7));
 
 	// O0-O3: input mux
 	// O7: N/C
@@ -9005,8 +9012,8 @@ void merlin_state::merlin(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	static const double speaker_levels[8] = { 0.0, 1.0/3.0, 1.0/3.0, 2.0/3.0, 1.0/3.0, 2.0/3.0, 2.0/3.0, 1.0 };
-	m_speaker->set_levels(8, speaker_levels);
+	static const double speaker_levels[4] = { 0.0, 1.0/3.0, 2.0/3.0, 1.0 };
+	m_speaker->set_levels(4, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -9262,10 +9269,7 @@ void stopthief_state::write_r(u16 data)
 	m_display->matrix(data & 7, bitswap<8>(m_o,3,5,2,1,4,0,6,7) & 0x7f);
 
 	// R3-R8(tied together): speaker out
-	int level = 0;
-	for (int i = 0; m_o & 8 && i < 6; i++)
-		level += (data >> (i+3) & 1);
-	m_speaker->level_w(level);
+	m_speaker->level_w((m_o & 8) ? population_count_32(data >> 3 & 0x3f) : 0);
 }
 
 void stopthief_state::write_o(u16 data)
@@ -9336,7 +9340,7 @@ void stopthief_state::stopthief(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	static const double speaker_levels[7] = { 1.0/7.0, 1.0/6.0, 1.0/5.0, 1.0/4.0, 1.0/3.0, 1.0/2.0, 1.0 };
+	static const double speaker_levels[7] = { 0.0, 1.0/6.0, 2.0/6.0, 3.0/6.0, 4.0/6.0, 5.0/6.0, 1.0 };
 	m_speaker->set_levels(7, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -13210,7 +13214,7 @@ void dxfootb_state::dxfootb(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0 };
+	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
 	m_speaker->set_levels(4, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -13422,7 +13426,7 @@ void copycatm2_state::copycatm2(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0 };
+	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
 	m_speaker->set_levels(4, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -13509,7 +13513,7 @@ void ditto_state::ditto(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0 };
+	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
 	m_speaker->set_levels(4, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }

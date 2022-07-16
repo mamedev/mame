@@ -19,21 +19,22 @@ license:CC0
 
 	note BAT and BHT aren't the same series
 
-	*D-1   DC0001-BHT  BHT (Best Artists?) Volume 8 (most other BHT carts are in G series, or P series)
-	*D-2   DC0002-BAT  BAT Volume 6
-	*D-3   DC0003-BHT  BHT (Best Artists?) Volume 9
+	*D-1   DC0001-BHT  Best Hit Volume 8 (most other BHT carts are in G series, or P series)
+	*D-2   DC0002-BAT  Best Artist Volume 6
+	*D-3   DC0003-BHT  Best Hit Volume 9
 	 D-4   DC0004-TPJ  TV Pop Volume 8
 	*D-5   DC0005-TPJ  TV Pop Volume 9
-	 D-6   DC0006-BHT  BHT (Best Artists?) Volume 10
+	 D-6   DC0006-BHT  Best Hit Volume 10
 	 D-7   DC0007-     (untranslated) Volume 4
-	 D-8   DC0008-BAT  BAT Volume 7?
+	 D-8   DC0008-BAT  Best Artist Volume 7?
 
 	(more? what's the D highest number?)
 
 	-->
 
-	<software name="dc0001">
-		<description>BHT Volume 8 (Japan) (DC0001-BHT)</description>
+	<!-- The first two releases will show Dream Cartridge Volume 1 or 2 (series details) when used with Popira, rather than the cartridge title -->
+	<software name="dc0001"> 
+		<description>Best Hit Volume 8 / Dream Cartridge Volume 1 (Japan) (DC0001-BHT)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
@@ -45,7 +46,7 @@ license:CC0
 	</software>
 
 	<software name="dc0002">
-		<description>BAT Volume 6 (Japan) (DC0002-BAT)</description>
+		<description>Best Artist Volume 6 / Dream Cartridge Volume 2 (Japan) (DC0002-BAT)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
@@ -56,8 +57,9 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- The remaining releases show the cartridge name -->
 	<software name="dc0003">
-		<description>BHT Volume 9 (Japan) (DC0003-BHT)</description>
+		<description>Best Hit Volume 9 (Japan) (DC0003-BHT)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">

@@ -4479,7 +4479,7 @@ license:CC0
 	</software>
 
 	<software name="crayon2">
-		<description>Crayon Shin-chan 2 - Ora to Wanpaku Gokko Dazo (Japan)</description>
+		<description>Crayon Shin-chan 2 - Ora to Wanpaku Gokko Da zo (Japan)</description>
 		<year>1993</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-COJ" />
@@ -11738,7 +11738,7 @@ license:CC0
 	</software>
 
 	<software name="kizuchid">
-		<description>Kizuchi da Quiz da Gen-san da! (Japan)</description>
+		<description>Kizuchi Da Quiz Da Gen-san Da! (Japan)</description>
 		<year>1992</year>
 		<publisher>Irem</publisher>
 		<info name="serial" value="DMG-QGJ (IG-09)" />
@@ -17580,7 +17580,7 @@ license:CC0
 	</software>
 
 	<software name="parodiusj" cloneof="parodius">
-		<description>Parodius da! (Japan)</description>
+		<description>Parodius Da! (Japan)</description>
 		<year>1991</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-PVJ" />
@@ -25728,7 +25728,7 @@ license:CC0
 	</software>
 
 	<software name="twinbee" cloneof="popntwin">
-		<description>TwinBee da!! (Japan)</description>
+		<description>TwinBee Da!! (Japan)</description>
 		<year>1990</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-TDJ" />

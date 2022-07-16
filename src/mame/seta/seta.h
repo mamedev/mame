@@ -16,7 +16,6 @@
 #include "machine/gen_latch.h"
 #include "machine/ticket.h"
 #include "machine/timer.h"
-#include "machine/tmp68301.h"
 #include "machine/upd4701.h"
 #include "machine/upd4992.h"
 #include "sound/x1_010.h"
@@ -351,30 +350,6 @@ protected:
 
 private:
 	u8 m_thunderl_protection_reg;
-};
-
-class kiwame_state : public seta_state
-{
-public:
-	kiwame_state(const machine_config &mconfig, device_type type, const char *tag) :
-		seta_state(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_key(*this, "KEY%u", 0U)
-	{ }
-
-	void kiwame(machine_config &config);
-
-private:
-	void row_select_w(u16 data);
-	u16 input_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(kiwame_vblank);
-
-	void kiwame_map(address_map &map);
-
-	required_device<tmp68301_device> m_maincpu;
-	required_ioport_array<10> m_key;
-
-	u16 m_kiwame_row_select = 0;
 };
 
 class magspeed_state : public seta_state

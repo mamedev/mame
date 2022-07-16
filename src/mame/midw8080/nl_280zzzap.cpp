@@ -8,7 +8,7 @@
 // and Laguna Racer, based on Midway's schematics "280 ZZZAP Game Logic P.C.
 // 0610-00907A", "Laguna Racer Game Logic A084-90700-A622", and "Laguna Racer
 // Game Logic A084-90700-B622". Midway PCB drawings for Laguna Racer and a
-// photo by Andrew Wellburn of a 280-ZZZAP game logic board were also used to
+// photo by Andrew Welburn of a 280-ZZZAP game logic board were also used to
 // help determine correct values for certain components. The netlist should
 // also apply to Taito/Midway's Super Speed Race with only modest changes,
 // because that game uses very similar sound circuits to 280-ZZZAP and Laguna
@@ -58,7 +58,7 @@
 // B622's schematics show sound circuitry differences from 280-ZZZAP and A622,
 // and these differences are consistent with Midway's PCB drawings for *both*
 // the A622 and B622 games boards. Some of them are also consistent with
-// Wellburn's 280-ZZZAP PCB photo. So it seems that actual 280-ZZZAP boards
+// Welburn's 280-ZZZAP PCB photo. So it seems that actual 280-ZZZAP boards
 // lie somewhere between the 280-ZZZAP schematic and the B622 Laguna Racer
 // schematic.
 
@@ -195,7 +195,7 @@ static NETLIST_START(lagunar_schematics)
 	// For the following resistors R51 and R46-R49, the values given are
 	// those shown in the Laguna Racer PCB drawings, the Laguna Racer B622
 	// board schematic, the Super Speed Race schematic, and Andrew
-	// Wellburn's 280-ZZZAP PCB photo. In the 280-ZZZAP schematic (and the
+	// Welburn's 280-ZZZAP PCB photo. In the 280-ZZZAP schematic (and the
 	// Laguna Racer A622 board schematic, a near copy), R51 and R48 are
 	// 480 Kohms and R46 is 2 Mohms, but these seem to be errors in that
 	// schematic. 480 Kohm is not even a standard resistor value for any
@@ -437,7 +437,7 @@ static NETLIST_START(lagunar_schematics)
 	// The value of resistor R30 is what changes the engine sound between
 	// 280-ZZZAP and the later games. The 280-ZZZAP schematic indicates
 	// that it is 110 Kohm in that game. This resistor is hidden on Andrew
-	// Wellburn's 280-ZZZAP PCB photo, but the sound resulting from 110
+	// Welburn's 280-ZZZAP PCB photo, but the sound resulting from 110
 	// Kohm is more consistent with actual 280-ZZZAP machines than that
 	// from 100 Kohm.
 	// The resistor is 100 Kohm in the B622 Laguna Racer and Super Speed
@@ -712,7 +712,7 @@ static NETLIST_START(lagunar_schematics)
 
 	// For resistor R11, the value given is that shown in the Laguna Racer
 	// PCB drawings, the Laguna Racer B622 board schematic, the Super
-	// Speed Race schematic, and Andrew Wellburn's 280-ZZZAP PCB photo. In
+	// Speed Race schematic, and Andrew Welburn's 280-ZZZAP PCB photo. In
 	// the 280-ZZZAP schematic and the near-copy Laguna Racer A622 board
 	// schematic, R11 is 100 Kohms, but this seems to be a schematic
 	// error. (The original National Semiconductor Application Note 72
@@ -804,7 +804,7 @@ static NETLIST_START(lagunar_schematics)
 	// Resistor R18, part of the BOOM filter, is 2.2 Kohms on the
 	// 280-ZZZAP schematic as well as in Laguna Racer, but the 280-ZZZAP
 	// schematic has a note "E" saying that the first 325 machines had a
-	// 6.8 Kohm resistor here instead. Andrew Wellburn's 280-ZZZAP board
+	// 6.8 Kohm resistor here instead. Andrew Welburn's 280-ZZZAP board
 	// photo may show such a resistor. With this larger resistor, the
 	// filter's values are: center frequency 54 Hz, Q 16.9, gain 73.5; so
 	// the filter is slightly broader, pitched a bit lower, and has only a
@@ -866,7 +866,7 @@ static NETLIST_START(lagunar_schematics)
 	// on the 280-ZZZAP schematic and in Laguna Racer and Super Speed
 	// Race, but the 280-ZZZAP schematic has a note "F" saying that the
 	// first 325 machines had a 4.3 Kohm resistor here instead. Andrew
-	// Wellburn's 280-ZZZAP board photo shows such a resistor. The lower
+	// Welburn's 280-ZZZAP board photo shows such a resistor. The lower
 	// resistor makes the BOOM effect much louder, countering the reduced
 	// gain on its generating filter described above. In fact, it makes it
 	// loud enough to be clipped by the post-mixer op-amps; turning down
