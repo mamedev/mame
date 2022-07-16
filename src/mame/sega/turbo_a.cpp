@@ -41,17 +41,19 @@ void turbo_state::update_samples()
 
 TIMER_CALLBACK_MEMBER(turbo_state::update_sound_a)
 {
-	discrete_device *discrete = machine.device<discrete_device>("discrete");
 	int data = param;
 
 	// missing short crash sample, but I've never seen it triggered
-	discrete->write(0, !(data & 0x01));
-	discrete->write(1, (data >> 1) & 1);
-	discrete->write(2, (data >> 2) & 1);
-	discrete->write(3, (data >> 3) & 1);
-	discrete->write(4, (data >> 4) & 1);
-	discrete->write(5, !(data & 0x20));
-	discrete->write(6, !(data & 0x40));
+	if (m_discrete)
+	{
+		m_discrete->write(0, !(data & 0x01));
+		m_discrete->write(1, (data >> 1) & 1);
+		m_discrete->write(2, (data >> 2) & 1);
+		m_discrete->write(3, (data >> 3) & 1);
+		m_discrete->write(4, (data >> 4) & 1);
+		m_discrete->write(5, !(data & 0x20));
+		m_discrete->write(6, !(data & 0x40));
+	}
 
 if (!((data >> 1) & 1)) osd_printf_debug("/TRIG1\n");
 if (!((data >> 2) & 1)) osd_printf_debug("/TRIG2\n");
