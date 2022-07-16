@@ -36,9 +36,9 @@ license:CC0
 -->
 
 	<software name="89denku">
-		<description>'89 Dennou Kyuusei Uranai (Jpn)</description>
+		<description>'89 Dennou Kyuusei Uranai by Jingūkan (Japan)</description>
 		<year>1988</year>
-		<publisher>Jingukan</publisher>
+		<publisher>Induction Produce</publisher>
 		<info name="serial" value="IPC-J1-01"/>
 		<info name="release" value="19881210"/>
 		<info name="alt_title" value="神宮館'89電脳九星占い"/>
@@ -1186,8 +1186,9 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ajyureir">
-		<description>Akagawa Jirou no Yuurei Ressha (Jpn)</description>
+<!-- Game has no sound. Could this be related to sound issue in early Enix games? -->
+	<software name="ajyureir" supported="no">
+		<description>Akagawa Jirou no Yuurei Ressha (Japan)</description>
 		<year>1991</year>
 		<publisher>King Records</publisher>
 		<info name="serial" value="KIN-YU"/>
@@ -2026,12 +2027,12 @@ license:CC0
 	</software>
 
 	<software name="aso" cloneof="alphamis">
-		<description>ASO - Armored Scrum Object (Jpn)</description>
+		<description>ASO - Armored Scrum Object (Japan)</description>
 		<year>1986</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="SFX-AO"/>
 		<info name="release" value="19860903"/>
-		<info name="alt_title" value="エー エス オー"/>
+		<info name="alt_title" value="エー・エス・オー"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="HVC-CNROM" />
@@ -3591,12 +3592,12 @@ license:CC0
 	</software>
 
 	<software name="batlstad">
-		<description>Battle Stadium - Senbatsu Pro Yakyuu (Jpn)</description>
+		<description>Battle Stadium - Senbatsu Pro Yakyuu (Japan)</description>
 		<year>1990</year>
 		<publisher>IGS</publisher>
 		<info name="serial" value="IGS-X8"/>
 		<info name="release" value="19901220"/>
-		<info name="alt_title" value="バトルスタジアム"/>
+		<info name="alt_title" value="バトルスタジアム 選抜プロ野球"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SKROM" />
@@ -4413,7 +4414,7 @@ license:CC0
 	</software>
 
 	<software name="biosdan" cloneof="bashibaz">
-		<description>Bio Senshi Dan - Increaser tono Tatakai (Jpn)</description>
+		<description>Bio Senshi Dan - Increaser to no Tatakai (Japan)</description>
 		<year>1987</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-14"/>
@@ -4687,7 +4688,7 @@ license:CC0
 	</software>
 
 	<software name="bloodwar">
-		<description>Bloody Warriors - Shan-Go no Gyakushuu (Jpn)</description>
+		<description>Bloody Warriors - Shan-Go Troop Strikes Back! (Japan)</description>
 		<year>1990</year>
 		<publisher>Toei Animation</publisher>
 		<info name="serial" value="TDF-94"/>
@@ -6817,13 +6818,13 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tonpuu">
-		<description>Chuugoku Janshi Story - Tonpuu (Jpn)</description>
+	<software name="tonfuu">
+		<description>Chuugoku Janshi Story - Tonfuu (Japan)</description>
 		<year>1989</year>
 		<publisher>Natsume</publisher>
 		<info name="serial" value="NAT-T8"/>
 		<info name="release" value="19891223"/>
-		<info name="alt_title" value="中国雀士ストーリー 東風"/>
+		<info name="alt_title" value="中国雀士物語・東風"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
@@ -7816,11 +7817,12 @@ license:CC0
 	</software>
 
 	<software name="daigens2">
-		<description>Daiku no Gen-San 2 - Akage no Dan no Gyakushuu (Jpn)</description>
+		<description>Daiku no Gen-san 2 - Akage no Dan no Gyakushuu (Japan)</description>
 		<year>1993</year>
 		<publisher>Irem</publisher>
 		<info name="serial" value="IF-29"/>
 		<info name="release" value="19931022"/>
+		<info name="alt_title" value="大工の源さん2 赤毛のダンの逆襲"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="h3001" />
 			<feature name="pcb" value="IREM-H-3001" />
@@ -8770,7 +8772,7 @@ license:CC0
 		<publisher>Vap</publisher>
 		<info name="serial" value="VAP-VO"/>
 		<info name="release" value="19910809"/>
-		<info name="alt_title" value="ドキ!ドキ!遊園地 クレイジーランド"/>
+		<info name="alt_title" value="ドキ!ドキ!遊園地 〜クレイジーランド大作戦〜"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="HVC-TLROM" />
@@ -10082,7 +10084,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dquest2" cloneof="dwarr2">
+<!-- Game has no sound. Will this freeze up at some point like the other early Enix games? -->
+	<software name="dquest2" cloneof="dwarr2" supported="no">
 		<description>Dragon Quest II - Akuryou no Kamigami (Japan)</description>
 		<year>1987</year>
 		<publisher>Enix</publisher>
@@ -11111,7 +11114,7 @@ license:CC0
 	</software>
 
 	<software name="10baiyak">
-		<description>Emo Yan no 10 Bai Pro Yakyuu (Jpn)</description>
+		<description>Emo Yan no 10-bai Pro Yakyuu - Ce League-hen (Japan)</description>
 		<year>1989</year>
 		<publisher>Hect</publisher>
 		<info name="serial" value="HCT-IB/005"/>
@@ -11195,7 +11198,7 @@ license:CC0
 	</software>
 
 	<software name="esperbt">
-		<description>Esper Bouken Tai (Japan)</description>
+		<description>Esper Boukentai - Maou no Toride (Japan)</description>
 		<year>1987</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-15"/>
@@ -11623,7 +11626,7 @@ license:CC0
 		<publisher>Nihon Bussan</publisher>
 		<info name="serial" value="NBF-7F (11)"/>
 		<info name="release" value="19920207"/>
-		<info name="alt_title" value="F-1サーカス"/>
+		<info name="alt_title" value="F1サーカス"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="HVC-TKROM" />
@@ -11680,7 +11683,7 @@ license:CC0
 	</software>
 
 	<software name="famijmp2">
-		<description>Famicom Jump II - Saikyou no 7 Nin (Japan)</description>
+		<description>Famicom Jump II - Saikyou no 7-nin (Japan)</description>
 		<year>1991</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BA-FJ2"/>
@@ -12697,7 +12700,7 @@ license:CC0
 	</software>
 
 	<software name="fcgenjin" cloneof="bonk">
-		<description>FC Genjin - Freakthoropus Computerus (Jpn)</description>
+		<description>FC Genjin - Friendthropus Computerurus (Japan)</description>
 		<year>1993</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="HFC-F3"/>
@@ -14054,7 +14057,7 @@ license:CC0
 	</software>
 
 	<software name="ggoemg">
-		<description>Ganbare Goemon Gaiden - Keita Ougon Kiseru (Jpn)</description>
+		<description>Ganbare Goemon Gaiden - Kieta Ougon Kiseru (Japan)</description>
 		<year>1990</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="KON-RC840"/>
@@ -14781,7 +14784,7 @@ license:CC0
 	</software>
 
 	<software name="gingaed">
-		<description>Ginga Eiyuu Densetsu (Jpn)</description>
+		<description>Ginga Eiyuu Densetsu - Waga Yuku wa Hoshi no Taikai (Japan)</description>
 		<year>1988</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="KSC-GE"/>
@@ -19389,12 +19392,12 @@ license:CC0
 	</software>
 
 	<software name="holein1">
-		<description>Jumbo Ozaki no Hole in One Professional (Jpn)</description>
+		<description>Jumbo Ozaki no Hole in One Professional (Japan)</description>
 		<year>1988</year>
 		<publisher>HAL Kenkyuujo</publisher>
 		<info name="serial" value="HAL-JO"/>
 		<info name="release" value="19880201"/>
-		<info name="alt_title" value="ジャンボ尾崎のホールインワン プロフェッショナル"/>
+		<info name="alt_title" value="ジャンボ尾崎のホールインワン・プロフェッショナル"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SJROM" />
@@ -29312,8 +29315,9 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="portopia">
-		<description>Portopia Renzoku Satsujin Jiken (Jpn)</description>
+<!-- Game has no sound and freezes when you dial a phone number -->
+	<software name="portopia" supported="no">
+		<description>Portopia Renzoku Satsujin Jiken (Japan)</description>
 		<year>1985</year>
 		<publisher>Enix</publisher>
 		<info name="serial" value="EFC-PR"/>
@@ -44102,7 +44106,7 @@ license:CC0
 	</software>
 
 	<software name="zoids2">
-		<description>Zoids 2 - Zenebasu no Gyakushuu (Japan)</description>
+		<description>Zoids 2 - Zenebas no Gyakushuu (Japan)</description>
 		<year>1989</year>
 		<publisher>Toemiland</publisher>
 		<info name="serial" value="TFS-Z2"/>
@@ -57273,7 +57277,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="dquest4c" cloneof="dwarr">
+<!-- Game has no sound. Does this freeze up like the Japanese original? -->
+	<software name="dquest4c" cloneof="dwarr" supported="no">
 		<!-- Notes: AKA Dragon Quest IV -->
 		<description>Yong Zhe Dou E Long IV (China, decrypted)</description>
 		<year>19??</year>
@@ -58194,12 +58199,13 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="dquest5" cloneof="dwarr2">
-		<description>Yong Zhe Dou E Long V (China, decrypted)</description>
+<!-- Game has no sound. Does this freeze up? -->
+	<software name="dquest5" cloneof="dwarr2" supported="no">
+		<description>Yǒngzhě Dòu Èlóng V (China, decrypted)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1106"/>
-		<info name="alt_title" value="勇者斗恶龙Ⅴ"/>
+		<info name="alt_title" value="勇者斗悪龍Ⅴ"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
@@ -62629,11 +62635,12 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="dquest2c" cloneof="dwarr2">
-		<description>Yong Zhe Dou E Long II (China)</description>
+<!-- Game has no sound. Does this freeze up? -->
+	<software name="dquest2c" cloneof="dwarr2" supported="no">
+		<description>Yǒngzhě Dòu Èlóng II (China)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
-		<info name="alt_title" value="勇者斗恶龙Ⅱ"/>
+		<info name="alt_title" value="勇者斗悪龍Ⅱ"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
@@ -67343,7 +67350,7 @@ We don't include these hacks because they were not burned into real carts nor so
 
 <!-- nointro -->
 <!-- For some reason this won't run from a cold boot and needs to be soft reset once. Once running game has no sound (probably same issue as dquest, which it appears to be derived from). -->
-	<software name="yingxion" supported="no">
+	<software name="yingxion" cloneof="dwarr" supported="no">
 		<description>Yīngxióng Yuán Yìjīng Chuánqí (China)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi</publisher>
