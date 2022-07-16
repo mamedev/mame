@@ -580,10 +580,10 @@ z80_device::ops_type z80_device::eay()
 z80_device::ops_type z80_device::pop()
 {
 	return ST_F {
-		TDAT_L = m_data.read_byte(SPD); } FN {
-		T(MTM); SP++;                   } FN {
-		TDAT_H = m_data.read_byte(SPD); } FN {
-		T(MTM); SP++;                   } EST
+		TDAT_L = data_read(SPD); } FN {
+		T(MTM); SP++;            } FN {
+		TDAT_H = data_read(SPD); } FN {
+		T(MTM); SP++;            } EST
 }
 
 /***************************************************************
