@@ -481,6 +481,11 @@ void a2600_state::machine_start()
 		break;
 	case A26_SS:
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8sm_delegate(*m_cart, FUNC(vcs_cart_slot_device::read_rom)));
+		// The SuperCharger monitors the entire address bus for changes
+		m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x0000, 0x1fff, "tap",
+			[this](offs_t offset, u8 &, u8) { if(!machine().side_effects_disabled()) m_cart->tap(offset); },
+			[this](offs_t offset, u8 &, u8) { if(!machine().side_effects_disabled()) m_cart->tap(offset); }
+		);
 		break;
 	case A26_CM:
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8sm_delegate(*m_cart, FUNC(vcs_cart_slot_device::read_rom)));

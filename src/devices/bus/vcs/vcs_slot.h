@@ -57,6 +57,7 @@ public:
 	virtual uint8_t read_rom(offs_t offset) { return 0xff; }
 	// writing to RAM chips (sometimes it is in a different range than write_bank!)
 	virtual void write_ram(offs_t offset, uint8_t data) { }
+	virtual void tap(offs_t offset) { }
 
 	// read/write to bankswitch address
 	virtual uint8_t read_bank(address_space &space, offs_t offset) { return 0xff; }
@@ -120,6 +121,7 @@ public:
 	virtual uint8_t read_bank(address_space &space, offs_t offset);
 	virtual void write_bank(address_space &space, offs_t offset, uint8_t data);
 	virtual void write_ram(offs_t offset, uint8_t data);
+	virtual void tap(offs_t offset);
 
 protected:
 	// device-level overrides

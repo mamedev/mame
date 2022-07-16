@@ -799,6 +799,12 @@ uint8_t vcs_cart_slot_device::read_bank(address_space &space, offs_t offset)
 		return 0xff;
 }
 
+void vcs_cart_slot_device::tap(offs_t offset)
+{
+	if (m_cart)
+		m_cart->tap(offset);
+}
+
 
 /*-------------------------------------------------
  write

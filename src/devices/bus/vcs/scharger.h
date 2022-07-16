@@ -22,6 +22,7 @@ public:
 
 	// reading and writing
 	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void tap(offs_t offset) override;
 
 private:
 	// device-level overrides
@@ -32,15 +33,15 @@ private:
 
 	required_device<cassette_image_device> m_cassette;
 
-	cpu_device   *m_maincpu;
 	inline uint8_t read_byte(uint32_t offset);
 
 	int m_base_banks[2];
 	uint8_t m_reg;
-	uint8_t m_write_delay, m_ram_write_enabled, m_rom_enabled;
-	uint32_t m_byte_started;
-	uint16_t m_last_address;
-	uint32_t m_diff_adjust;
+	uint8_t m_write_delay;
+	bool m_ram_write_enabled;
+	bool m_rom_enabled;
+	uint16_t m_last_address_bus;
+	uint32_t m_address_bus_changes;
 };
 
 
