@@ -18,14 +18,19 @@
 #include <vector>
 
 #ifdef _WIN32
-#include <cwchar>
-#define PMAIN(app_class) \
-extern "C" int wmain(int argc, wchar_t *argv[]) { return plib::app::run_main<app_class, wchar_t>(argc, argv); }
+	#include <cwchar>
+	#define PMAIN(app_class)                                                   \
+		extern "C" int wmain(int argc, wchar_t *argv[])                        \
+		{                                                                      \
+			return plib::app::run_main<app_class, wchar_t>(argc, argv);        \
+		}
 #else
-#define PMAIN(app_class) \
-int main(int argc, char **argv) { return plib::app::run_main<app_class, char>(argc, argv); }
+	#define PMAIN(app_class)                                                   \
+		int main(int argc, char **argv)                                        \
+		{                                                                      \
+			return plib::app::run_main<app_class, char>(argc, argv);           \
+		}
 #endif
-
 
 namespace plib {
 
@@ -61,11 +66,8 @@ namespace plib {
 		int main_utfX(const std::vector<putf8string> &argv);
 		int main_utfX(int argc, char *argv[]);
 		int main_utfX(int argc, wchar_t *argv[]);
-
 	};
 
 } // namespace plib
-
-
 
 #endif // PMAIN_H_

@@ -7,8 +7,8 @@
 #include "nl_factory.h"
 #include "nl_setup.h"
 
-namespace netlist
-{
+namespace netlist {
+
 	// -------------------------------------------------------------------------
 	// A netlist parser
 	// -------------------------------------------------------------------------
@@ -20,8 +20,8 @@ namespace netlist
 	}
 
 	parser_t::parser_t(nlparse_t &setup)
-	: m_setup(setup)
-	, m_cur_local(nullptr)
+		: m_setup(setup)
+		, m_cur_local(nullptr)
 	{
 		m_tokenizer
 			.identifier_chars(
@@ -72,16 +72,16 @@ namespace netlist
 
 	bool parser_t::parse(plib::istream_uptr &&strm, const pstring &nlname)
 	{
-		token_store_t tokstor;
-		parse_tokens(std::move(strm), tokstor);
-		return parse(tokstor, nlname);
+		token_store_t token_store;
+		parse_tokens(std::move(strm), token_store);
+		return parse(token_store, nlname);
 	}
 
-	void
-	parser_t::parse_tokens(plib::istream_uptr &&strm, token_store_t &tokstor)
+	void parser_t::parse_tokens(plib::istream_uptr &&strm,
+								token_store_t       &token_store)
 	{
 		plib::putf8_reader u8reader(strm.release_stream());
-		m_tokenizer.append_to_store(&u8reader, tokstor);
+		m_tokenizer.append_to_store(&u8reader, token_store);
 	}
 
 	bool parser_t::parse(const token_store_t &store, const pstring &nlname)
@@ -100,7 +100,7 @@ namespace netlist
 				return false;
 			}
 
-			if (token.is(m_tok_brace_right))  // Netlist ended?
+			if (token.is(m_tok_brace_right)) // Netlist ended?
 			{
 				if (!in_nl)
 					error(MF_PARSER_UNEXPECTED_1(token.str()));

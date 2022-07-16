@@ -13,8 +13,7 @@
 
 #include "../plib/pstring.h"
 
-namespace netlist
-{
+namespace netlist {
 	// -------------------------------------------------------------------------
 	// core_device_t construction parameters
 	// -------------------------------------------------------------------------
@@ -40,12 +39,12 @@ namespace netlist
 
 	private:
 		core_device_data_t(netlist_state_t &o, const pstring &n)
-		: owner(o)
-		, name(n)
+			: owner(o)
+			, name(n)
 		{
 		}
 		netlist_state_t &owner;
-		const pstring &  name;
+		const pstring   &name;
 	};
 
 	// The type use to pass data on
@@ -104,7 +103,7 @@ namespace netlist
 
 	public:
 		virtual void time_step([[maybe_unused]] detail::time_step_type ts_type,
-			[[maybe_unused]] nl_fptype                         st) noexcept
+							   [[maybe_unused]] nl_fptype st) noexcept
 		{
 		}
 		virtual void update_terminals() noexcept {}
@@ -172,7 +171,8 @@ namespace netlist
 
 		template <class O, class C, typename... Args>
 		void create_and_register_sub_device(O &owner, const pstring &name,
-			device_arena::unique_ptr<C> &dev, Args &&...args)
+											device_arena::unique_ptr<C> &dev,
+											Args &&...args)
 		{
 			// dev = state().make_pool_object<C>(owner, name,
 			// std::forward<Args>(args)...);
@@ -180,17 +180,18 @@ namespace netlist
 			dev = state().make_pool_object<C>(
 				dev_constructor_data_t{state(), owner.name() + "." + name},
 				std::forward<Args>(args)...);
-			state().register_device(dev->name(),
+			state().register_device(
+				dev->name(),
 				device_arena::owned_ptr<core_device_t>(dev.get(), false));
 		}
 
-		void register_sub_alias(const pstring &name,
-			const detail::core_terminal_t &    term);
+		void register_sub_alias(const pstring                 &name,
+								const detail::core_terminal_t &term);
 		void register_sub_alias(const pstring &name, const pstring &aliased);
 
 		void connect(const pstring &t1, const pstring &t2);
 		void connect(const detail::core_terminal_t &t1,
-			const detail::core_terminal_t &         t2);
+					 const detail::core_terminal_t &t2);
 
 	protected:
 		// NETLIB_UPDATE_TERMINALSI() { }

@@ -6,17 +6,16 @@
 ///
 ///
 #if 0
-#ifndef NLD_MS_DIRECT_H_
-#define NLD_MS_DIRECT_H_
+	#ifndef NLD_MS_DIRECT_H_
+		#define NLD_MS_DIRECT_H_
 
 // Names
 // spell-checker: words Seidel,Crout
 
+		#include "solver/nld_matrix_solver.h"
+		#include "solver/nld_solver.h"
 
-#include "solver/nld_solver.h"
-#include "solver/nld_matrix_solver.h"
-
-#include <algorithm>
+		#include <algorithm>
 
 //#define A(r, c) m_A[_r][_c]
 
@@ -26,7 +25,7 @@ namespace netlist
 	{
 //#define nl_ext_double _float128 // slow, very slow
 //#define nl_ext_double long double // slightly slower
-#define nl_ext_double double
+		#define nl_ext_double double
 
 template <unsigned m_N, unsigned storage_N>
 class matrix_solver_direct_t: public matrix_solver_t
@@ -57,13 +56,13 @@ protected:
 	{
 		//const unsigned kN = N();
 
-		const double akki = 1.0 / A(k,k);
+		const double A_kk = 1.0 / A(k,k);
 		const unsigned * const p = m_terms[k]->m_nzrd.data();
 		const unsigned e = m_terms[k]->m_nzrd.size();
 
 		for (int i = k+1; i < storage_N;i++)
 		{
-			const double alpha = A(i,k) * akki;
+			const double alpha = A(i,k) * A_kk;
 			A(i,k) = alpha;
 			if (alpha != 0.0)
 				for (int j = 0; j < e; j++)
@@ -116,13 +115,13 @@ protected:
 
 		for (int k = sk; k < kN - 1; k++)
 		{
-			const double akki = 1.0 / A(k,k);
+			const double A_kk = 1.0 / A(k,k);
 			const unsigned * const p = m_terms[k]->m_nzrd.data();
 			const unsigned e = m_terms[k]->m_nzrd.size();
 
 			for (int i = k+1; i < kN;i++)
 			{
-				const double alpha = A(i,k) * akki;
+				const double alpha = A(i,k) * A_kk;
 				A(i,k) = alpha;
 				if (alpha != 0.0)
 					for (int j = 0; j < e; j++)
@@ -256,14 +255,14 @@ void matrix_solver_direct_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 		m_terms[k]->set_pointers();
 	}
 
-#if 1
+		#if 1
 
 	// Sort in descending order by number of connected matrix voltages.
 	// The idea is, that for Gauss-Seidel algo the first voltage computed
 	// depends on the greatest number of previous voltages thus taking into
 	// account the maximum amount of information.
 	//
-	// This actually improves performance on popeye slightly. Average
+	// This actually improves performance on `popeye` slightly. Average
 	// GS computations reduce from 2.509 to 2.370
 	//
 	// Smallest to largest : 2.613
@@ -298,7 +297,7 @@ void matrix_solver_direct_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 				other[i] = get_net_idx(&m_terms[k]->terms()[i]->m_other_terminal->net());
 	}
 
-#endif
+		#endif
 
 	// create a list of non zero elements right of the diagonal
 	// These list anticipate the population of array elements by
@@ -403,8 +402,8 @@ void matrix_solver_direct_t<m_N, storage_N>::build_LE_RHS(nl_double * RESTRICT r
 	const unsigned iN = N();
 	for (unsigned k = 0; k < iN; k++)
 	{
-		nl_double rhsk_a = 0.0;
-		nl_double rhsk_b = 0.0;
+		nl_double rhs_a = 0.0;
+		nl_double rhs_b = 0.0;
 
 		const int terms_count = m_terms[k]->count();
 		const nl_double * RESTRICT go = m_terms[k]->go();
@@ -412,28 +411,28 @@ void matrix_solver_direct_t<m_N, storage_N>::build_LE_RHS(nl_double * RESTRICT r
 		const nl_double * const * RESTRICT other_cur_analog = m_terms[k]->connected_net_V();
 
 		for (int i = 0; i < terms_count; i++)
-			rhsk_a = rhsk_a + Idr[i];
+			rhs_a = rhs_a + Idr[i];
 
 		for (int i = m_terms[k]->m_rail_start; i < terms_count; i++)
-			//#rhsk = rhsk + go[i] * terms[i]->m_other_terminal->net().as_analog().Q_Analog();
-			rhsk_b = rhsk_b + go[i] * *other_cur_analog[i];
+			//#rhs = rhs + go[i] * terms[i]->m_other_terminal->net().as_analog().Q_Analog();
+			rhs_b = rhs_b + go[i] * *other_cur_analog[i];
 
-		rhs[k] = rhsk_a + rhsk_b;
+		rhs[k] = rhs_a + rhs_b;
 	}
 }
 
-#if 1
-#else
+		#if 1
+		#else
 // Crout algo
 template <unsigned m_N, unsigned storage_N>
 void matrix_solver_direct_t<m_N, storage_N>::LE_solve()
 {
 	const unsigned kN = N();
 
-	[[maybe_unused]] int imax;
+	[[maybe_unused]] int max_i;
 	[[maybe_unused]] double big,temp;
 
-#if 0
+			#if 0
 	double vv[storage_N];
 
 	for (i=0;i<kN;i++)
@@ -445,10 +444,10 @@ void matrix_solver_direct_t<m_N, storage_N>::LE_solve()
 		//#if (big == 0.0) nrerror("Singular matrix in routine LUDCMP");
 		vv[i]=1.0/big;
 	}
-#endif
+			#endif
 	for (int j = 0; j < kN; j++)
 	{
-#if 1
+			#if 1
 		for (int i=0; i < kN;i++)
 		{
 			double sum = 0.0;
@@ -457,7 +456,7 @@ void matrix_solver_direct_t<m_N, storage_N>::LE_solve()
 				sum += A(i,k) * A(k,j);
 			A(i,j) -= sum;
 		}
-#else
+			#else
 		for (int i=0; i < j;i++)
 		{
 			double * RESTRICT p = m_A[i];
@@ -474,29 +473,29 @@ void matrix_solver_direct_t<m_N, storage_N>::LE_solve()
 			for (int k = 0; k < j; k++)
 				sum += p[k] * m_A[k][j];
 			p[j] -= sum;
-#if 0
+				#if 0
 			if ( (dum=vv[i]*fabs(sum)) >= big) {
 				big=dum;
-				imax=i;
+				max_i=i;
 			}
-#endif
+				#endif
 		}
-#endif
-#if 0
+			#endif
+			#if 0
 		// USE_PIVOT_SEARCH
 		// omit pivoting for now
-		if (j != imax)
+		if (j != max_i)
 		{
 			for (k=0;k<kN;k++)
 			{
-				dum=m_A[imax][k];
-				m_A[imax][k]=m_A[j][k];
+				dum=m_A[max_i][k];
+				m_A[max_i][k]=m_A[j][k];
 				m_A[j][k]=dum;
 			}
-			vv[imax]=vv[j];
+			vv[max_i]=vv[j];
 		}
-		indx[j]=imax;
-#endif
+		indx[j]=max_i;
+			#endif
 		//if (m_A[j][j] == 0.0)
 		//  m_A[j][j] = 1e-20;
 		double dum = 1.0 / A(j,j);
@@ -504,7 +503,7 @@ void matrix_solver_direct_t<m_N, storage_N>::LE_solve()
 			A(i,j) *= dum;
 	}
 }
-#endif
+		#endif
 
 template <unsigned m_N, unsigned storage_N>
 void matrix_solver_direct_t<m_N, storage_N>::LE_back_subst(
@@ -623,5 +622,5 @@ matrix_solver_direct_t<m_N, storage_N>::matrix_solver_direct_t(const eSolverType
 	} //namespace devices
 } // namespace netlist
 
-#endif // NLD_MS_DIRECT_H_
+	#endif // NLD_MS_DIRECT_H_
 #endif

@@ -8,11 +8,10 @@
 /// \file ptokenizer.h
 ///
 
-#include "pstream.h"
-#include "pstring.h"
-
 #include "penum.h"
 #include "psource.h"
+#include "pstream.h"
+#include "pstring.h"
 
 #include <unordered_map>
 #include <vector>
@@ -36,17 +35,18 @@ namespace plib {
 		struct token_id_t
 		{
 		public:
-
 			static constexpr std::size_t npos = static_cast<std::size_t>(-1);
 
 			token_id_t()
-			: m_id(npos)
-			{}
+				: m_id(npos)
+			{
+			}
 
 			explicit token_id_t(std::size_t id, const pstring &name)
-			: m_id(id)
-			, m_name(name)
-			{}
+				: m_id(id)
+				, m_name(name)
+			{
+			}
 
 			token_id_t(const token_id_t &) = default;
 			token_id_t &operator=(const token_id_t &) = default;
@@ -55,8 +55,9 @@ namespace plib {
 
 			~token_id_t() = default;
 
-			constexpr std::size_t id() const { return m_id; }
-			constexpr const pstring & name() const { return m_name; }
+			constexpr std::size_t    id() const { return m_id; }
+			constexpr const pstring &name() const { return m_name; }
+
 		private:
 			std::size_t m_id;
 			pstring     m_name;
@@ -65,19 +66,27 @@ namespace plib {
 		struct token_t
 		{
 			explicit token_t(token_type type)
-			: m_type(type), m_id(token_id_t::npos), m_token("")
+				: m_type(type)
+				, m_id(token_id_t::npos)
+				, m_token("")
 			{
 			}
 			token_t(token_type type, const pstring &str)
-			: m_type(type), m_id(token_id_t::npos), m_token(str)
+				: m_type(type)
+				, m_id(token_id_t::npos)
+				, m_token(str)
 			{
 			}
 			token_t(const token_id_t &id)
-			: m_type(token_type::TOKEN), m_id(id.id()), m_token(id.name())
+				: m_type(token_type::TOKEN)
+				, m_id(id.id())
+				, m_token(id.name())
 			{
 			}
 			token_t(const token_id_t &id, const pstring &str)
-			: m_type(token_type::TOKEN), m_id(id.id()), m_token(str)
+				: m_type(token_type::TOKEN)
+				, m_id(id.id())
+				, m_token(str)
 			{
 			}
 
@@ -88,16 +97,25 @@ namespace plib {
 
 			~token_t() = default;
 
-			constexpr bool is(const token_id_t &tok_id) const noexcept { return m_id == tok_id.id(); }
-			constexpr bool is_not(const token_id_t &tok_id) const noexcept { return !is(tok_id); }
-			constexpr bool is_type(const token_type type) const noexcept { return m_type == type; }
-			constexpr token_type type() const noexcept { return m_type; }
+			constexpr bool is(const token_id_t &tok_id) const noexcept
+			{
+				return m_id == tok_id.id();
+			}
+			constexpr bool is_not(const token_id_t &tok_id) const noexcept
+			{
+				return !is(tok_id);
+			}
+			constexpr bool is_type(const token_type type) const noexcept
+			{
+				return m_type == type;
+			}
+			constexpr token_type     type() const noexcept { return m_type; }
 			constexpr const pstring &str() const noexcept { return m_token; }
 
 		private:
-			token_type m_type;
+			token_type  m_type;
 			std::size_t m_id;
-			pstring m_token;
+			pstring     m_token;
 		};
 
 		class token_store_t : public std::vector<token_t>
@@ -116,11 +134,11 @@ namespace plib {
 		using token_store_t = detail::token_store_t;
 
 		explicit tokenizer_t() // NOLINT(misc-forwarding-reference-overload, bugprone-forwarding-reference-overload)
-		: m_strm(nullptr)
-		, m_unget(0)
-		, m_string('"')
-		, m_support_line_markers(true) // FIXME
-		, m_token_queue(nullptr)
+			: m_strm(nullptr)
+			, m_unget(0)
+			, m_string('"')
+			, m_support_line_markers(true) // FIXME
+			, m_token_queue(nullptr)
 		{
 			clear();
 		}
@@ -141,11 +159,29 @@ namespace plib {
 			return ret;
 		}
 
-		tokenizer_t & identifier_chars(const pstring &s) { m_identifier_chars = s; return *this; }
-		tokenizer_t & number_chars(const pstring &st, const pstring & rem) { m_number_chars_start = st; m_number_chars = rem; return *this; }
-		tokenizer_t & string_char(pstring::value_type c) { m_string = c; return *this; }
-		tokenizer_t & whitespace(const pstring & s) { m_whitespace = s; return *this; }
-		tokenizer_t & comment(const pstring &start, const pstring &end, const pstring &line)
+		tokenizer_t &identifier_chars(const pstring &s)
+		{
+			m_identifier_chars = s;
+			return *this;
+		}
+		tokenizer_t &number_chars(const pstring &st, const pstring &rem)
+		{
+			m_number_chars_start = st;
+			m_number_chars = rem;
+			return *this;
+		}
+		tokenizer_t &string_char(pstring::value_type c)
+		{
+			m_string = c;
+			return *this;
+		}
+		tokenizer_t &whitespace(const pstring &s)
+		{
+			m_whitespace = s;
+			return *this;
+		}
+		tokenizer_t &
+		comment(const pstring &start, const pstring &end, const pstring &line)
 		{
 			m_tok_comment_start = register_token(start);
 			m_tok_comment_end = register_token(end);
@@ -156,7 +192,6 @@ namespace plib {
 		void append_to_store(putf8_reader *reader, token_store_t &store);
 
 	private:
-
 		void clear()
 		{
 			m_cur_line = "";
@@ -172,46 +207,45 @@ namespace plib {
 		void skip_eol();
 
 		pstring::value_type getc();
-		void ungetc(pstring::value_type c);
+		void                ungetc(pstring::value_type c);
 
 		bool eof() const { return m_strm->eof(); }
 
 		putf8_reader *m_strm;
 
-		pstring m_cur_line;
+		pstring                 m_cur_line;
 		pstring::const_iterator m_px;
-		pstring::value_type m_unget;
+		pstring::value_type     m_unget;
 
 		// tokenizer stuff follows ...
 
-		pstring m_identifier_chars;
-		pstring m_number_chars;
-		pstring m_number_chars_start;
+		pstring                                 m_identifier_chars;
+		pstring                                 m_number_chars;
+		pstring                                 m_number_chars_start;
 		std::unordered_map<pstring, token_id_t> m_tokens;
-		pstring m_whitespace;
-		pstring::value_type  m_string;
+		pstring                                 m_whitespace;
+		pstring::value_type                     m_string;
 
 		token_id_t m_tok_comment_start;
 		token_id_t m_tok_comment_end;
 		token_id_t m_tok_line_comment;
 
 	protected:
-		bool m_support_line_markers;
+		bool           m_support_line_markers;
 		token_store_t *m_token_queue;
 	};
 
 	class token_reader_t
 	{
 	public:
-
 		using token_t = tokenizer_t::token_t;
 		using token_type = tokenizer_t::token_type;
 		using token_id_t = tokenizer_t::token_id_t;
 		using token_store = tokenizer_t::token_store_t;
 
 		explicit token_reader_t()
-		: m_idx(0)
-		, m_token_store(nullptr)
+			: m_idx(0)
+			, m_token_store(nullptr)
 		{
 			// add a first entry to the stack
 			m_source_location.emplace_back(plib::source_location("Unknown", 0));
@@ -240,7 +274,7 @@ namespace plib {
 		pstring get_identifier_or_number();
 
 		double get_number_double();
-		long get_number_long();
+		long   get_number_long();
 
 		void require_token(const token_id_t &token_num);
 		void require_token(const token_t &tok, const token_id_t &token_num);
@@ -264,12 +298,13 @@ namespace plib {
 			return token_t(token_type::ENDOFFILE);
 		}
 
-		// source locations, vector used as stack because we need to loop through stack
+		// source locations, vector used as stack because we need to loop
+		// through stack
 
 		std::vector<plib::source_location> m_source_location;
-		pstring m_line;
-		std::size_t m_idx;
-		const token_store * m_token_store;
+		pstring                            m_line;
+		std::size_t                        m_idx;
+		const token_store                 *m_token_store;
 	};
 
 } // namespace plib

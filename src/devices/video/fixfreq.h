@@ -20,22 +20,22 @@
 struct fixedfreq_monitor_desc
 {
 	fixedfreq_monitor_desc()
-	// default to NTSC "704x480@30i"
-	: m_monitor_clock(13500000)
-	, m_fieldcount(2)
-	, m_sync_threshold(0.3)
-	, m_gain(1.0 / 3.7)
-	, m_hscale(1)
-	, m_vsync_threshold(0.600)
-	, // trigger at 91% of vsync length 1-exp(-0.6)
-	m_hvisible(704)
-	, m_hfrontporch(728)
-	, m_hsync(791)
-	, m_hbackporch(858)
-	, m_vvisible(480)
-	, m_vfrontporch(486)
-	, m_vsync(492)
-	, m_vbackporch(525)
+		// default to NTSC "704x480@30i"
+		: m_monitor_clock(13500000)
+		, m_fieldcount(2)
+		, m_sync_threshold(0.3)
+		, m_gain(1.0 / 3.7)
+		, m_hscale(1)
+		, m_vsync_threshold(0.600)
+		, // trigger at 91% of vsync length 1-exp(-0.6)
+		m_hvisible(704)
+		, m_hfrontporch(728)
+		, m_hsync(791)
+		, m_hbackporch(858)
+		, m_vvisible(480)
+		, m_vfrontporch(486)
+		, m_vsync(492)
+		, m_vbackporch(525)
 	{
 	}
 
@@ -141,22 +141,22 @@ struct fixedfreq_monitor_state
 
 	fixedfreq_monitor_state(fixedfreq_monitor_desc &desc,
 							fixedfreq_monitor_intf &intf)
-	: m_desc(desc)
-	, m_intf(intf)
-	, m_last_sync_val(0)
-	, m_col(0)
-	, m_last_x(0)
-	, m_last_y(0)
-	, m_last_sync_time(time_type(0))
-	, m_line_time(time_type(0))
-	, m_last_hsync_time(time_type(0))
-	, m_last_vsync_time(time_type(0))
-	, m_last_line_duration(time_type(0))
-	, m_last_field_time(time_type(0))
-	, m_vsync_filter(0)
-	, m_sig_vsync(0)
-	, m_sig_composite(0)
-	, m_sig_field(0)
+		: m_desc(desc)
+		, m_intf(intf)
+		, m_last_sync_val(0)
+		, m_col(0)
+		, m_last_x(0)
+		, m_last_y(0)
+		, m_last_sync_time(time_type(0))
+		, m_line_time(time_type(0))
+		, m_last_hsync_time(time_type(0))
+		, m_last_vsync_time(time_type(0))
+		, m_last_line_duration(time_type(0))
+		, m_last_field_time(time_type(0))
+		, m_vsync_filter(0)
+		, m_sig_vsync(0)
+		, m_sig_composite(0)
+		, m_sig_field(0)
 	{
 	}
 
@@ -249,9 +249,9 @@ struct fixedfreq_monitor_state
 // ======================> fixedfreq_device
 
 class fixedfreq_device
-: public device_t
-, public device_video_interface
-, public fixedfreq_monitor_intf
+	: public device_t
+	, public device_video_interface
+	, public fixedfreq_monitor_intf
 {
 public:
 	using time_type = fixedfreq_monitor_state::time_type;

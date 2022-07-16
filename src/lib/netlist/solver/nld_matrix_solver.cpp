@@ -16,17 +16,16 @@
 
 #include "plib/putil.h"
 
-namespace netlist::solver
-{
+namespace netlist::solver {
 
 	terms_for_net_t::terms_for_net_t(arena_type &arena, analog_net_t *net)
-	: m_nz(arena)
-	, m_nzrd(arena)
-	, m_nzbd(arena)
-	, m_connected_net_idx(arena)
-	, m_terms(arena)
-	, m_net(net)
-	, m_rail_start(0)
+		: m_nz(arena)
+		, m_nzrd(arena)
+		, m_nzbd(arena)
+		, m_connected_net_idx(arena)
+		, m_terms(arena)
+		, m_net(net)
+		, m_rail_start(0)
 	{
 	}
 
@@ -56,26 +55,26 @@ namespace netlist::solver
 									 const pstring       &name,
 									 const net_list_t    &nets,
 									 const solver::solver_parameters_t *params)
-	//: device_t(static_cast<device_t &>(main_solver), name)
-	: device_t(
-		device_data_t{main_solver.state(), main_solver.name() + "." + name})
-	, m_params(*params)
-	, m_gonn(m_arena)
-	, m_gtn(m_arena)
-	, m_Idrn(m_arena)
-	, m_connected_net_Vn(m_arena)
-	, m_iterative_fail(*this, "m_iterative_fail", 0)
-	, m_iterative_total(*this, "m_iterative_total", 0)
-	, m_main_solver(main_solver)
-	, m_stat_calculations(*this, "m_stat_calculations", 0)
-	, m_stat_newton_raphson(*this, "m_stat_newton_raphson", 0)
-	, m_stat_newton_raphson_fail(*this, "m_stat_newton_raphson_fail", 0)
-	, m_stat_vsolver_calls(*this, "m_stat_vsolver_calls", 0)
-	, m_last_step(*this, "m_last_step", netlist_time_ext::zero())
-	, m_step_funcs(m_arena)
-	, m_dynamic_funcs(m_arena)
-	, m_inputs(m_arena)
-	, m_ops(0)
+		//: device_t(static_cast<device_t &>(main_solver), name)
+		: device_t(
+			device_data_t{main_solver.state(), main_solver.name() + "." + name})
+		, m_params(*params)
+		, m_gonn(m_arena)
+		, m_gtn(m_arena)
+		, m_Idrn(m_arena)
+		, m_connected_net_Vn(m_arena)
+		, m_iterative_fail(*this, "m_iterative_fail", 0)
+		, m_iterative_total(*this, "m_iterative_total", 0)
+		, m_main_solver(main_solver)
+		, m_stat_calculations(*this, "m_stat_calculations", 0)
+		, m_stat_newton_raphson(*this, "m_stat_newton_raphson", 0)
+		, m_stat_newton_raphson_fail(*this, "m_stat_newton_raphson_fail", 0)
+		, m_stat_vsolver_calls(*this, "m_stat_vsolver_calls", 0)
+		, m_last_step(*this, "m_last_step", netlist_time_ext::zero())
+		, m_step_funcs(m_arena)
+		, m_dynamic_funcs(m_arena)
+		, m_inputs(m_arena)
+		, m_ops(0)
 	{
 		setup_base(this->state().setup(), nets);
 

@@ -7,11 +7,12 @@
 /// tests to check for experimental code before commit
 ///
 
+#include "plib/ptests.h"
+
 #include "nl_config.h"
 
 #include "plib/pconfig.h"
 #include "plib/ppmf.h"
-#include "plib/ptests.h"
 
 PTEST(test_precommit, precommit)
 {

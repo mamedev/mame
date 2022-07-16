@@ -23,16 +23,16 @@
 
 #include <sstream>
 
-namespace netlist
-{
+namespace netlist {
+
 	// -------------------------------------------------------------------------
 	// nl_parse_t
 	// -------------------------------------------------------------------------
 
 	nlparse_t::nlparse_t(log_type &log, detail::abstract_t &abstract)
-	: m_abstract(abstract)
-	, m_log(log)
-	, m_frontier_cnt(0)
+		: m_abstract(abstract)
+		, m_log(log)
+		, m_frontier_cnt(0)
 	{
 	}
 
@@ -93,11 +93,11 @@ namespace netlist
 	}
 
 	void
-	nlparse_t::register_dev(const pstring &                     classname,
+	nlparse_t::register_dev(const pstring                      &classname,
 							std::initializer_list<const char *> more_parameters)
 	{
 		std::vector<pstring> params;
-		const auto *         i(more_parameters.begin());
+		const auto          *i(more_parameters.begin());
 		pstring              name(*i);
 		++i;
 		for (; i != more_parameters.end(); ++i)
@@ -110,7 +110,7 @@ namespace netlist
 	void
 	nlparse_t::register_dev(const pstring &classname, const pstring &name,
 							const std::vector<pstring> &params_and_connections,
-							factory::element_t **       factory_element)
+							factory::element_t        **factory_element)
 	{
 
 		auto *f = factory().factory_by_name(classname);
@@ -209,10 +209,11 @@ namespace netlist
 		}
 	}
 
-	void nlparse_t::register_connection(const pstring &sin, const pstring &sout)
+	void
+	nlparse_t::register_connection(const pstring &input, const pstring &output)
 	{
-		register_connection_fqn(build_fqn(plib::trim(sin)),
-								build_fqn(plib::trim(sout)));
+		register_connection_fqn(build_fqn(plib::trim(input)),
+								build_fqn(plib::trim(output)));
 	}
 
 	void nlparse_t::register_connection_arr(const pstring &terms)
@@ -316,8 +317,8 @@ namespace netlist
 		return m_abstract.m_factory;
 	}
 
-	void nlparse_t::register_lib_entry(const pstring &         name,
-									   const pstring &         def_params,
+	void nlparse_t::register_lib_entry(const pstring          &name,
+									   const pstring          &def_params,
 									   plib::source_location &&loc)
 	{
 		factory().add(plib::make_unique<factory::library_element_t, host_arena>(
@@ -380,11 +381,11 @@ namespace netlist
 		return namespace_prefix() + obj_name;
 	}
 
-	void
-	nlparse_t::register_connection_fqn(const pstring &sin, const pstring &sout)
+	void nlparse_t::register_connection_fqn(const pstring &input,
+											const pstring &output)
 	{
-		detail::abstract_t::connection_t temp(sin, sout);
-		log().debug("link {1} <== {2}", sin, sout);
+		detail::abstract_t::connection_t temp(input, output);
+		log().debug("link {1} <== {2}", input, output);
 		m_abstract.m_connections.push_back(temp);
 	}
 
@@ -397,7 +398,7 @@ namespace netlist
 	}
 
 	bool nlparse_t::parse_tokens(const plib::detail::token_store_t &tokens,
-								 const pstring &                    name)
+								 const pstring                     &name)
 	{
 		parser_t parser(*this);
 		return parser.parse(tokens, name);
@@ -427,7 +428,7 @@ namespace netlist
 		const auto filename = in_stream.filename();
 		auto       preprocessed = std::make_unique<std::stringstream>(
 			putf8string(plib::ppreprocessor(m_includes, &m_defines)
-							.process(std::move(in_stream), filename)));
+								  .process(std::move(in_stream), filename)));
 
 		parser_t::token_store_t st;
 		parser_t                parser(*this);
@@ -520,12 +521,12 @@ namespace netlist
 	// -------------------------------------------------------------------------
 
 	setup_t::setup_t(netlist_state_t &nlstate)
-	: m_abstract(nlstate.log())
-	, m_parser(nlstate.log(), m_abstract)
-	, m_nlstate(nlstate)
-	, m_models(m_abstract.m_models) // FIXME : parse abstract_t only
-	, m_netlist_params(nullptr)
-	, m_proxy_cnt(0)
+		: m_abstract(nlstate.log())
+		, m_parser(nlstate.log(), m_abstract)
+		, m_nlstate(nlstate)
+		, m_models(m_abstract.m_models) // FIXME : parse abstract_t only
+		, m_netlist_params(nullptr)
+		, m_proxy_cnt(0)
 	{
 	}
 
@@ -607,9 +608,10 @@ namespace netlist
 						   const std::array<terminal_t *, 2> &splitter_terms)
 	{
 		this->register_term(term);
-		m_connected_terminals.insert(
-			{&term,
-			 {other_term, splitter_terms[0], splitter_terms[1], nullptr}});
+		m_connected_terminals.insert({
+			&term,
+			{other_term, splitter_terms[0], splitter_terms[1], nullptr}
+		});
 	}
 
 	void setup_t::register_param_t(param_t &param)
@@ -733,7 +735,7 @@ namespace netlist
 	}
 
 	detail::core_terminal_t *
-	setup_t::find_terminal(const pstring &       terminal_in,
+	setup_t::find_terminal(const pstring        &terminal_in,
 						   detail::terminal_type atype, bool required) const
 	{
 		const pstring &tname = resolve_alias(terminal_in);
@@ -800,7 +802,7 @@ namespace netlist
 
 		pstring x = plib::pfmt("proxy_da_{1}_{2}")(out.name())(m_proxy_cnt);
 		auto    new_proxy = (*out_cast)->logic_family()->create_d_a_proxy(
-			m_nlstate, x, *out_cast);
+			   m_nlstate, x, *out_cast);
 		m_proxy_cnt++;
 		// connect all existing terminals to new net
 
@@ -1082,7 +1084,7 @@ namespace netlist
 																	 // 1 net
 			if (!ret)
 			{
-				// the above was not successfull - try to connect input2 to
+				// the above was not successful - try to connect input2 to
 				// TERMINAL type terminals of input 1 net's terminals
 				for (detail::core_terminal_t *t :
 					 input1.net().core_terms_copy())
@@ -1279,8 +1281,8 @@ namespace netlist
 			detail::core_terminal_t *term = i.second;
 			const pstring            name_da = de_alias(term->name());
 			bool                     is_nc_pin(
-				dynamic_cast<devices::NETLIB_NAME(nc_pin) *>(&term->device())
-				!= nullptr);
+									dynamic_cast<devices::NETLIB_NAME(nc_pin) *>(&term->device())
+									!= nullptr);
 			bool is_nc_flagged(false);
 
 			auto hnc = m_abstract.m_hints.find(name_da + sHINT_NC);
@@ -1369,7 +1371,7 @@ namespace netlist
 		}
 	}
 
-	log_type &      setup_t::log() noexcept { return m_nlstate.log(); }
+	log_type       &setup_t::log() noexcept { return m_nlstate.log(); }
 	const log_type &setup_t::log() const noexcept { return m_nlstate.log(); }
 
 	// -------------------------------------------------------------------------
@@ -1466,8 +1468,8 @@ namespace netlist
 
 		nl_fptype factor = nlconst::one();
 		auto      p = std::next(
-			tmp.begin(),
-			plib::narrow_cast<pstring::difference_type>(tmp.length() - 1));
+				 tmp.begin(),
+				 plib::narrow_cast<pstring::difference_type>(tmp.length() - 1));
 		switch (*p)
 		{
 			case 'M': factor = nlconst::magic(1e6); break; // NOLINT
@@ -1506,7 +1508,7 @@ namespace netlist
 	{
 	public:
 		logic_family_std_proxy_t(family_type ft)
-		: m_family_type(ft)
+			: m_family_type(ft)
 		{
 		}
 
@@ -1575,13 +1577,13 @@ namespace netlist
 	public:
 		template <typename P>
 		family_model_t(P &model)
-		: m_TYPE(model, "TYPE")
-		, m_IVL(model, "IVL")
-		, m_IVH(model, "IVH")
-		, m_OVL(model, "OVL")
-		, m_OVH(model, "OVH")
-		, m_ORL(model, "ORL")
-		, m_ORH(model, "ORH")
+			: m_TYPE(model, "TYPE")
+			, m_IVL(model, "IVL")
+			, m_IVH(model, "IVH")
+			, m_OVL(model, "OVL")
+			, m_OVH(model, "OVH")
+			, m_ORL(model, "ORL")
+			, m_ORH(model, "ORH")
 		{
 		}
 
@@ -1637,11 +1639,11 @@ namespace netlist
 				break;
 		}
 
-		auto *retp = ret.get();
+		auto *return_pointer = ret.get();
 
 		m_nlstate.family_cache().emplace(model, std::move(ret));
 
-		return retp;
+		return return_pointer;
 	}
 
 	// -------------------------------------------------------------------------

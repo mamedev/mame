@@ -11,7 +11,7 @@
 /// \brief More accurate measurements the processor supports RDTSCP.
 ///
 #ifndef PHAS_RDTSCP
-#define PHAS_RDTSCP (0)
+	#define PHAS_RDTSCP (0)
 #endif
 
 /// \brief Use accurate timing measurements.
@@ -19,13 +19,13 @@
 /// Only works if \ref PHAS_RDTSCP == 1
 ///
 #ifndef PUSE_ACCURATE_STATS
-#define PUSE_ACCURATE_STATS (0)
+	#define PUSE_ACCURATE_STATS (0)
 #endif
 
 /// \brief Add support for the __float128 floating point type.
 ///
 #ifndef PUSE_FLOAT128
-#define PUSE_FLOAT128 (0)
+	#define PUSE_FLOAT128 (0)
 #endif
 
 /// \brief Compile with support for OPENMP
@@ -33,7 +33,7 @@
 /// OpenMP adds about 10% to 20% performance for analog netlists.
 ///
 #ifndef PUSE_OPENMP
-#define PUSE_OPENMP              (1)
+	#define PUSE_OPENMP (1)
 #endif
 
 /// \brief Use aligned optimizations.
@@ -41,11 +41,11 @@
 /// Set this to one if you want to use aligned storage optimizations.
 ///
 #ifndef PUSE_ALIGNED_OPTIMIZATIONS
-#if defined(__EMSCRIPTEN__)
-#define PUSE_ALIGNED_OPTIMIZATIONS (0)
-#else
-#define PUSE_ALIGNED_OPTIMIZATIONS (1)
-#endif
+	#if defined(__EMSCRIPTEN__)
+		#define PUSE_ALIGNED_OPTIMIZATIONS (0)
+	#else
+		#define PUSE_ALIGNED_OPTIMIZATIONS (1)
+	#endif
 #endif
 
 /// \brief Use aligned allocations.
@@ -63,34 +63,36 @@
 ///
 /// Defaults to \ref PUSE_ALIGNED_OPTIMIZATIONS.
 ///
-#define PUSE_ALIGNED_HINTS      (PUSE_ALIGNED_OPTIMIZATIONS)
+#define PUSE_ALIGNED_HINTS (PUSE_ALIGNED_OPTIMIZATIONS)
 
 /// \brief Number of bytes for cache line alignment
 ///
-#define PALIGN_CACHELINE        (64)
+#define PALIGN_CACHELINE (64)
 
 /// \brief Number of bytes for vector alignment
 ///
-#define PALIGN_VECTOROPT        (32)
+#define PALIGN_VECTOROPT (32)
 
-#define PALIGN_MIN_SIZE         (16)
+#define PALIGN_MIN_SIZE (16)
 
 #if (PUSE_ALIGNED_OPTIMIZATIONS)
-#define PALIGNAS_CACHELINE()    PALIGNAS(PALIGN_CACHELINE)
-#define PALIGNAS_VECTOROPT()    PALIGNAS(PALIGN_VECTOROPT)
+	#define PALIGNAS_CACHELINE() PALIGNAS(PALIGN_CACHELINE)
+	#define PALIGNAS_VECTOROPT() PALIGNAS(PALIGN_VECTOROPT)
 #else
-#define PALIGNAS_CACHELINE()
-#define PALIGNAS_VECTOROPT()
+	#define PALIGNAS_CACHELINE()
+	#define PALIGNAS_VECTOROPT()
 #endif
 
 // FIXME: Breaks mame build on windows mingw due to `-Wattribute`
 //        also triggers `-Wattribute` on ARM
 //        This is fixed on mingw version 10
 // FIXME: no error on cross-compile - need further checks
-#if defined(__GNUC__) && ((defined(_WIN32) && __GNUC__ < 10) || defined(__arm__) || defined(__ARMEL__))
-#define PALIGNAS(x)
+#if defined(__GNUC__)                                                          \
+	&& ((defined(_WIN32) && __GNUC__ < 10) || defined(__arm__)                 \
+		|| defined(__ARMEL__))
+	#define PALIGNAS(x)
 #else
-#define PALIGNAS(x) alignas(x)
+	#define PALIGNAS(x) alignas(x)
 #endif
 
 // ============================================================
@@ -123,7 +125,6 @@
 	#error "C++ version not supported"
 #endif
 
-
 #if (PUSE_FLOAT128)
 typedef __float128 FLOAT128;
 #endif
@@ -133,43 +134,41 @@ typedef __float128 FLOAT128;
 //============================================================
 
 #if defined(OPENMP)
-#if ( OPENMP >= 200805 )
-#define PHAS_OPENMP (1)
-#else
-#define PHAS_OPENMP (0)
-#endif
+	#if (OPENMP >= 200805)
+		#define PHAS_OPENMP (1)
+	#else
+		#define PHAS_OPENMP (0)
+	#endif
 #elif defined(_OPENMP)
-#if ( _OPENMP >= 200805 )
-#define PHAS_OPENMP (1)
+	#if (_OPENMP >= 200805)
+		#define PHAS_OPENMP (1)
+	#else
+		#define PHAS_OPENMP (0)
+	#endif
 #else
-#define PHAS_OPENMP (0)
+	#define PHAS_OPENMP (0)
 #endif
-#else
-#define PHAS_OPENMP (0)
-#endif
-
 
 //============================================================
 //  WARNINGS
 //============================================================
 
 #if (PUSE_OPENMP)
-#if (!(PHAS_OPENMP))
-//#error To use openmp compile and link with "-fopenmp"
-#undef PUSE_OPENMP
-#define PUSE_OPENMP (0)
-#endif
+	#if (!(PHAS_OPENMP))
+		//#error To use openmp compile and link with "-fopenmp"
+		#undef PUSE_OPENMP
+		#define PUSE_OPENMP (0)
+	#endif
 #endif
 
 #if (PUSE_FLOAT128)
-#if defined(__has_include)
-#if !__has_include(<quadmath.h>)
-//#pragma message "disabling PUSE_FLOAT128 due to missing quadmath.h"
-#undef PUSE_FLOAT128
-#define PUSE_FLOAT128 (0)
+	#if defined(__has_include)
+		#if !__has_include(<quadmath.h>)
+			//#pragma message "disabling PUSE_FLOAT128 due to missing quadmath.h"
+			#undef PUSE_FLOAT128
+			#define PUSE_FLOAT128 (0)
+		#endif
+	#endif
 #endif
-#endif
-#endif
-
 
 #endif // PCONFIG_H_

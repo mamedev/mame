@@ -28,22 +28,22 @@
 #include <algorithm>
 #include <type_traits>
 
-namespace netlist::devices
-{
+namespace netlist::devices {
 
 	// -------------------------------------------------------------------------
 	// solver
 	// -------------------------------------------------------------------------
 
 	nld_solver::nld_solver(constructor_param_t data)
-	: device_t(data)
-	, m_fb_step(*this, "FB_step", NETLIB_DELEGATE(fb_step<false>))
-	, m_Q_step(*this, "Q_step")
-	, m_params(*this, "", solver::solver_parameter_defaults::get_instance())
-	, m_queue(
-		  this->state().pool(), config::max_solver_queue_size(),
-		  queue_type::id_delegate(&NETLIB_NAME(solver)::get_solver_id, this),
-		  queue_type::obj_delegate(&NETLIB_NAME(solver)::solver_by_id, this))
+		: device_t(data)
+		, m_fb_step(*this, "FB_step", NETLIB_DELEGATE(fb_step<false>))
+		, m_Q_step(*this, "Q_step")
+		, m_params(*this, "", solver::solver_parameter_defaults::get_instance())
+		, m_queue(this->state().pool(), config::max_solver_queue_size(),
+				  queue_type::id_delegate(&NETLIB_NAME(solver)::get_solver_id,
+										  this),
+				  queue_type::obj_delegate(&NETLIB_NAME(solver)::solver_by_id,
+										   this))
 	{
 		// internal stuff
 		state().save(*this,
@@ -78,9 +78,9 @@ namespace netlist::devices
 		const std::size_t      nthreads = m_params.m_parallel() < 2
 											  ? 1
 											  : std::min(
-											 static_cast<std::size_t>(
+												  static_cast<std::size_t>(
 												 m_params.m_parallel()),
-											 plib::omp::get_max_threads());
+												  plib::omp::get_max_threads());
 		const netlist_time_ext sched(
 			now
 			+ (nthreads <= 1 ? netlist_time_ext::zero()
@@ -96,7 +96,7 @@ namespace netlist::devices
 		while (!m_queue.empty())
 		{
 			const auto t = m_queue.top().exec_time();
-			auto *     o = m_queue.top().object();
+			auto      *o = m_queue.top().object();
 			if (t != now)
 				if (t > sched)
 					break;
@@ -222,7 +222,7 @@ namespace netlist::devices
 	template <class C, class A>
 	NETLIB_NAME(solver)::solver_ptr
 	create_it(A &arena, NETLIB_NAME(solver) &main_solver, pstring name,
-			  NETLIB_NAME(solver)::net_list_t &  nets,
+			  NETLIB_NAME(solver)::net_list_t   &nets,
 			  const solver::solver_parameters_t *params, std::size_t size)
 	{
 		return plib::make_unique<C>(arena, main_solver, name, nets, params,
@@ -233,7 +233,7 @@ namespace netlist::devices
 	NETLIB_NAME(solver)::solver_ptr NETLIB_NAME(solver)::create_solver(
 		std::size_t size, const pstring &solver_name,
 		const solver::solver_parameters_t *params,
-		NETLIB_NAME(solver)::net_list_t &  nets)
+		NETLIB_NAME(solver)::net_list_t   &nets)
 	{
 		switch (params->m_method())
 		{

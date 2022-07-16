@@ -14,8 +14,7 @@
 #include "../plib/pmempool.h"
 #include "../plib/pstring.h"
 
-namespace netlist
-{
+namespace netlist {
 	/// \brief Logic families descriptors are used to create proxy devices.
 	///  The logic family describes the analog capabilities of logic devices,
 	///  inputs and outputs.
@@ -32,17 +31,17 @@ namespace netlist
 
 		// FOXME: Should be move constructible
 		logic_family_desc_t(logic_family_desc_t &&) noexcept = delete;
-		logic_family_desc_t &operator=(
-			logic_family_desc_t &&) noexcept = delete;
+		logic_family_desc_t &
+		operator=(logic_family_desc_t &&) noexcept = delete;
 
 		virtual ~logic_family_desc_t() noexcept = default;
 
 		virtual device_arena::unique_ptr<devices::nld_base_d_to_a_proxy>
 		create_d_a_proxy(netlist_state_t &anetlist, const pstring &name,
-			const logic_output_t *proxied) const = 0;
+						 const logic_output_t *proxied) const = 0;
 		virtual device_arena::unique_ptr<devices::nld_base_a_to_d_proxy>
 		create_a_d_proxy(netlist_state_t &anetlist, const pstring &name,
-			const logic_input_t *proxied) const = 0;
+						 const logic_input_t *proxied) const = 0;
 
 		nl_fptype low_threshold_V(nl_fptype VN, nl_fptype VP) const noexcept
 		{
@@ -58,13 +57,13 @@ namespace netlist
 		nl_fptype R_high() const noexcept { return m_R_high; }
 
 		bool is_above_high_threshold_V(nl_fptype V, nl_fptype VN,
-			nl_fptype VP) const noexcept
+									   nl_fptype VP) const noexcept
 		{
 			return V > high_threshold_V(VN, VP);
 		}
 
 		bool is_below_low_threshold_V(nl_fptype V, nl_fptype VN,
-			nl_fptype VP) const noexcept
+									  nl_fptype VP) const noexcept
 		{
 			return V < low_threshold_V(VN, VP);
 		}
@@ -109,11 +108,11 @@ namespace netlist
 	{
 	public:
 		logic_family_t()
-		: m_logic_family(nullptr)
+			: m_logic_family(nullptr)
 		{
 		}
 		logic_family_t(const logic_family_desc_t *d)
-		: m_logic_family(d)
+			: m_logic_family(d)
 		{
 		}
 

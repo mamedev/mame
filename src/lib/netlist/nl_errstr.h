@@ -11,8 +11,7 @@
 #include "plib/pexception.h"
 #include "plib/pfmtlog.h"
 
-namespace netlist
-{
+namespace netlist {
 
 	static constexpr const char sHINT_NO_DEACTIVATE[]
 		= ".HINT_NO_DEACTIVATE"; // NOLINT(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
@@ -34,7 +33,7 @@ namespace netlist
 
 		explicit nl_exception(const pstring &text //!< text to be passed
 							  )
-		: plib::pexception(text)
+			: plib::pexception(text)
 		{
 		}
 
@@ -45,7 +44,7 @@ namespace netlist
 		explicit nl_exception(const pstring &fmt, //!< format to be used
 							  Args &&...args      //!< arguments to be passed
 							  )
-		: plib::pexception(plib::pfmt(fmt)(std::forward<Args>(args)...))
+			: plib::pexception(plib::pfmt(fmt)(std::forward<Args>(args)...))
 		{
 		}
 	};

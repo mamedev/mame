@@ -22,9 +22,9 @@
 #include <unordered_map>
 #include <vector>
 
-//============================================================
+// -----------------------------------------------------------------------------
 //  MACROS - netlist definitions
-//============================================================
+// -----------------------------------------------------------------------------
 
 #define NET_STR(x) #x
 
@@ -120,12 +120,11 @@
 	LOCAL_SOURCE(name)                                                         \
 	INCLUDE(name)
 
-namespace netlist
-{
+namespace netlist {
 
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 	// truth table desc
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 
 	struct tt_desc
 	{
@@ -136,15 +135,15 @@ namespace netlist
 		std::vector<pstring> desc;
 	};
 
-	// ----------------------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 	// static compiled netlist.
-	// ----------------------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 
 	using nlsetup_func = void (*)(nlparse_t &);
 
-	// ----------------------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 	// nlparse_t
-	// ----------------------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 
 	class nlparse_t
 	{
@@ -163,6 +162,7 @@ namespace netlist
 		/// \param alias the alias to be qualified
 		/// \param points_to the pin aliased
 		void register_alias(const pstring &alias, const pstring &points_to);
+
 		/// \brief Register an aliases
 		///
 		/// Both alias and points_to are considered to be relative to the
@@ -172,12 +172,14 @@ namespace netlist
 		/// \param points_to the pin aliased
 		void register_alias(detail::alias_type type, const pstring &alias,
 							const pstring &points_to);
+
 		/// \brief Register an aliases where alias and references are fully qualified names
 		/// \param type the alias type see \ref alias_type
 		/// \param alias the alias to be qualified
 		/// \param points_to the pin aliased
 		void register_fqn_alias(detail::alias_type type, const pstring &alias,
 								const pstring &points_to);
+
 		void register_dip_alias_arr(const pstring &terms);
 
 		// last argument only needed by nltool
@@ -194,10 +196,11 @@ namespace netlist
 		void
 		register_hint(const pstring &object_name, const pstring &hint_name);
 
-		void register_connection(const pstring &sin, const pstring &sout);
+		void register_connection(const pstring &input, const pstring &output);
 		void register_connection_arr(const pstring &terms);
 		// also called from devices for late binding connected terminals
-		void register_connection_fqn(const pstring &sin, const pstring &sout);
+		void
+		register_connection_fqn(const pstring &input, const pstring &output);
 
 		void register_param(const pstring &param, const pstring &value);
 

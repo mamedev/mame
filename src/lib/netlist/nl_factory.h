@@ -39,8 +39,8 @@
 	extern factory::constructor_ptr_t decl_##p_alias;                          \
 	factory::constructor_ptr_t        decl_##p_alias = NETLIB_NAME(p_alias##_c);
 
-namespace netlist::factory
-{
+namespace netlist::factory {
+
 	enum class element_type
 	{
 		BUILTIN,
@@ -49,11 +49,11 @@ namespace netlist::factory
 
 	struct properties
 	{
-		properties(const pstring &         default_parameter,
+		properties(const pstring          &default_parameter,
 				   plib::source_location &&location)
-		: m_default_parameter(default_parameter)
-		, m_location(std::move(location))
-		, m_type(element_type::BUILTIN)
+			: m_default_parameter(default_parameter)
+			, m_location(std::move(location))
+			, m_type(element_type::BUILTIN)
 		{
 		}
 
@@ -127,8 +127,8 @@ namespace netlist::factory
 
 		device_element_t(const pstring &name, properties &&props,
 						 Args &&...args)
-		: element_t(name, std::move(props))
-		, m_args(std::forward<Args>(args)...)
+			: element_t(name, std::move(props))
+			, m_args(std::forward<Args>(args)...)
 		{
 		}
 
@@ -226,8 +226,7 @@ namespace netlist::factory
 
 } // namespace netlist::factory
 
-namespace netlist::devices
-{
+namespace netlist::devices {
 	void initialize_factory(factory::list_t &factory);
 } // namespace netlist::devices
 

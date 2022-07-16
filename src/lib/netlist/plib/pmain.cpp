@@ -6,10 +6,9 @@
 namespace plib {
 
 	app::app()
-	: std_out(&std::cout)
-	, std_err(&std::cerr)
+		: std_out(&std::cout)
+		, std_err(&std::cerr)
 	{
-
 	}
 
 	int app::main_utfX(const std::vector<putf8string> &argv)

@@ -106,11 +106,9 @@
 
 #define PSOURCELOC() plib::source_location(__FILE__, __LINE__)
 
-namespace plib
-{
+namespace plib {
 
-	namespace util
-	{
+	namespace util {
 		pstring basename(const pstring &filename, const pstring &suffix = "");
 		pstring path(const pstring &filename);
 		bool    exists(const pstring &filename);
@@ -118,8 +116,7 @@ namespace plib
 		pstring environment(const pstring &var, const pstring &default_val);
 	} // namespace util
 
-	namespace container
-	{
+	namespace container {
 		template <class C, class T>
 		bool contains(C &con, const T &elem)
 		{
@@ -138,7 +135,7 @@ namespace plib
 
 		template <class C>
 		void insert_at(C &con, const std::size_t index,
-			const typename C::value_type &elem)
+					   const typename C::value_type &elem)
 		{
 			con.insert(con.begin() + narrow_cast<std::ptrdiff_t>(index), elem);
 		}
@@ -190,7 +187,7 @@ namespace plib
 		///
 		/// \param f functor to execute
 		functor_guard(F &&f)
-		: m_f(std::move(f))
+			: m_f(std::move(f))
 		{
 		}
 		/// \brief destructor

@@ -17,7 +17,6 @@
 #include "emu.h"
 
 #include "fixfreq.h"
-
 #include "render.h"
 #include "ui/uimain.h"
 
@@ -236,21 +235,21 @@ void fixedfreq_monitor_state::update_sync(const time_type &time,
 fixedfreq_device::fixedfreq_device(const machine_config &mconfig,
 								   device_type type, const char *tag,
 								   device_t *owner, uint32_t clock)
-: device_t(mconfig, type, tag, owner, clock)
-, device_video_interface(mconfig, *this, false)
-, m_enable(*this, "ENABLE")
-, m_vector(*this, "VECTOR")
-, m_scanline_height(1.0)
-, m_last_rt(0.0)
-, m_monitor()
-, m_state(m_monitor, *this)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_video_interface(mconfig, *this, false)
+	, m_enable(*this, "ENABLE")
+	, m_vector(*this, "VECTOR")
+	, m_scanline_height(1.0)
+	, m_last_rt(0.0)
+	, m_monitor()
+	, m_state(m_monitor, *this)
 {
 }
 
 fixedfreq_device::fixedfreq_device(const machine_config &mconfig,
 								   const char *tag, device_t *owner,
 								   uint32_t clock)
-: fixedfreq_device(mconfig, FIXFREQ, tag, owner, clock)
+	: fixedfreq_device(mconfig, FIXFREQ, tag, owner, clock)
 {
 }
 
@@ -539,8 +538,6 @@ NETDEV_ANALOG_CALLBACK_MEMBER(fixedfreq_device::update_sync)
 	m_state.update_sync(ctime, data);
 }
 
-/***************************************************************************/
-
 // clang-format off
 
 static INPUT_PORTS_START(fixedfreq_base_ports)
@@ -591,7 +588,6 @@ static INPUT_PORTS_START(fixedfreq_vector_ports)
 	PORT_ADJUSTERX(SCANLINE_HEIGHT, "Scanline Height", 10, 300)
 INPUT_PORTS_END
 
-//
 // clang-format on
 
 ioport_constructor fixedfreq_device::device_input_ports() const

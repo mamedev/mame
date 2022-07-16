@@ -21,8 +21,8 @@
 #include <utility>
 #include <vector>
 
-namespace netlist
-{
+namespace netlist {
+
 	// -----------------------------------------------------------------------------
 	// netlist_state__t
 	// -----------------------------------------------------------------------------
@@ -130,7 +130,7 @@ namespace netlist
 		{
 			this->run_state_manager().save_state_ptr(
 				plib::void_ptr_cast(&owner), module + "." + stname,
-				plib::state_manager_t::dtype<C>(), count, state);
+				plib::state_manager_t::datatype<C>(), count, state);
 		}
 
 		// FIXME: only used by queue_t save state

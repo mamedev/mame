@@ -32,8 +32,7 @@
 
 #define BODY_CONNECTED_TO_SOURCE (1)
 
-namespace netlist::analog
-{
+namespace netlist::analog {
 
 	using constants = plib::constants<nl_fptype>;
 
@@ -101,26 +100,26 @@ namespace netlist::analog
 	{
 	public:
 		fet_model_t(param_model_t &model)
-		: m_VTO(model, "VTO")
-		, m_N(model, "N")
-		, m_ISS(model, "IS") // Haven't seen a model using ISS / ISD
-		, m_ISD(model, "IS")
-		, m_LD(model, "LD")
-		, m_L(model, "L")
-		, m_W(model, "W")
-		, m_TOX(model, "TOX")
-		, m_KP(model, "KP")
-		, m_UO(model, "UO")
-		, m_PHI(model, "PHI")
-		, m_NSUB(model, "NSUB")
-		, m_GAMMA(model, "GAMMA")
-		, m_LAMBDA(model, "LAMBDA")
-		, m_RD(model, "RD")
-		, m_RS(model, "RS")
-		, m_CGSO(model, "CGSO")
-		, m_CGDO(model, "CGDO")
-		, m_CGBO(model, "CGBO")
-		, m_CAPMOD(model, "CAPMOD")
+			: m_VTO(model, "VTO")
+			, m_N(model, "N")
+			, m_ISS(model, "IS") // Haven't seen a model using ISS / ISD
+			, m_ISD(model, "IS")
+			, m_LD(model, "LD")
+			, m_L(model, "L")
+			, m_W(model, "W")
+			, m_TOX(model, "TOX")
+			, m_KP(model, "KP")
+			, m_UO(model, "UO")
+			, m_PHI(model, "PHI")
+			, m_NSUB(model, "NSUB")
+			, m_GAMMA(model, "GAMMA")
+			, m_LAMBDA(model, "LAMBDA")
+			, m_RD(model, "RD")
+			, m_RS(model, "RS")
+			, m_CGSO(model, "CGSO")
+			, m_CGDO(model, "CGDO")
+			, m_CGBO(model, "CGBO")
+			, m_CAPMOD(model, "CAPMOD")
 		{
 		}
 
@@ -158,33 +157,34 @@ namespace netlist::analog
 	{
 	public:
 		nld_MOSFET(constructor_param_t data)
-		: base_device_t(data)
-		, m_model(*this, "MODEL", "NMOS")
-		, m_DG(*this, "m_DG", NETLIB_DELEGATE(terminal_handler))
-		, m_SG(*this, "m_SG", NETLIB_DELEGATE(terminal_handler))
-		, m_SD(*this, "m_SD", NETLIB_DELEGATE(terminal_handler))
-		, m_D_BD(*this, "m_D_BD")
+			: base_device_t(data)
+			, m_model(*this, "MODEL", "NMOS")
+			, m_DG(*this, "m_DG", NETLIB_DELEGATE(terminal_handler))
+			, m_SG(*this, "m_SG", NETLIB_DELEGATE(terminal_handler))
+			, m_SD(*this, "m_SD", NETLIB_DELEGATE(terminal_handler))
+			, m_D_BD(*this, "m_D_BD")
 #if (!BODY_CONNECTED_TO_SOURCE)
-		, m_D_BS(*this, "m_D_BS")
+			, m_D_BS(*this, "m_D_BS")
 #endif
-		, m_cap_gb(*this, "m_cap_gb")
-		, m_cap_gs(*this, "m_cap_gs")
-		, m_cap_gd(*this, "m_cap_gd")
-		, m_phi(nlconst::zero())
-		, m_gamma(nlconst::zero())
-		, m_vto(nlconst::zero())
-		, m_beta(nlconst::zero())
-		, m_lambda(nlconst::zero())
-		, m_Leff(nlconst::zero())
-		, m_CoxWL(nlconst::zero())
-		// S, m_polarity(qtype() == FET_NMOS ? nlconst::one() : -nlconst::one())
-		, m_Cgb(nlconst::zero())
-		, m_Cgs(nlconst::zero())
-		, m_Cgd(nlconst::zero())
-		, m_capacitor_model(2)
-		, m_Vgs(*this, "m_Vgs", nlconst::zero())
-		, m_Vgd(*this, "m_Vgd", nlconst::zero())
-		, m_model_acc(m_model)
+			, m_cap_gb(*this, "m_cap_gb")
+			, m_cap_gs(*this, "m_cap_gs")
+			, m_cap_gd(*this, "m_cap_gd")
+			, m_phi(nlconst::zero())
+			, m_gamma(nlconst::zero())
+			, m_vto(nlconst::zero())
+			, m_beta(nlconst::zero())
+			, m_lambda(nlconst::zero())
+			, m_Leff(nlconst::zero())
+			, m_CoxWL(nlconst::zero())
+			// S, m_polarity(qtype() == FET_NMOS ? nlconst::one() :
+			// -nlconst::one())
+			, m_Cgb(nlconst::zero())
+			, m_Cgs(nlconst::zero())
+			, m_Cgd(nlconst::zero())
+			, m_capacitor_model(2)
+			, m_Vgs(*this, "m_Vgs", nlconst::zero())
+			, m_Vgd(*this, "m_Vgd", nlconst::zero())
+			, m_model_acc(m_model)
 		{
 			register_sub_alias("S", m_SG.P()); // Source
 			register_sub_alias("G", m_SG.N()); // Gate
@@ -658,7 +658,6 @@ namespace netlist::analog
 
 } // namespace netlist::analog
 
-namespace netlist::devices
-{
+namespace netlist::devices {
 	NETLIB_DEVICE_IMPL_NS(analog, MOSFET, "MOSFET", "MODEL")
 } // namespace netlist::devices

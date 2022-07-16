@@ -7,8 +7,7 @@
 
 #include "solver/nld_solver.h"
 
-namespace netlist::analog
-{
+namespace netlist::analog {
 
 	// -------------------------------------------------------------------------
 	// nld_twoterm
@@ -215,8 +214,7 @@ namespace netlist::analog
 
 } // namespace netlist::analog
 
-namespace netlist::devices
-{
+namespace netlist::devices {
 	// clang-format off
 	NETLIB_DEVICE_IMPL_NS(analog, R,    "RES",   "R")
 	NETLIB_DEVICE_IMPL_NS(analog, POT,  "POT",   "R")

@@ -20,8 +20,7 @@
 #include <memory>
 #include <vector>
 
-namespace netlist::devices
-{
+namespace netlist::devices {
 	// -------------------------------------------------------------------------
 	// solver
 	// -------------------------------------------------------------------------
@@ -75,12 +74,12 @@ namespace netlist::devices
 		template <typename FT, int SIZE>
 		solver_ptr create_solver(std::size_t size, const pstring &solver_name,
 								 const solver::solver_parameters_t *params,
-								 net_list_t &                       nets);
+								 net_list_t                        &nets);
 
 		template <typename FT>
-		solver_ptr create_solvers(const pstring &                    sname,
+		solver_ptr create_solvers(const pstring                     &sname,
 								  const solver::solver_parameters_t *params,
-								  net_list_t &                       nets);
+								  net_list_t                        &nets);
 
 		std::size_t get_solver_id(const solver::matrix_solver_t *net) const;
 		solver::matrix_solver_t *solver_by_id(std::size_t id) const;

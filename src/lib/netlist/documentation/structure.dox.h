@@ -2,8 +2,8 @@
 ///
 /// \defgroup compiledefine Compilation defines
 ///
-/// Compilation defines can be specified using -DDEFINE=VALUE during compilation.
-/// If this is not done, a default is set, e.g.
+/// Compilation defines can be specified using -DDEFINE=VALUE during
+/// compilation. If this is not done, a default is set, e.g.
 /// \code
 /// #ifndef DEFINE
 /// #define DEFINE (0)
@@ -45,4 +45,4 @@ namespace netlist
 	namespace detail
 	{
 	}
-}
+} // namespace netlist

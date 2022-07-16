@@ -64,7 +64,8 @@ and enjoy the results.
 # Recap
 
 We have created our first netlist fragment. nltool was used to model the
-periodically forced charge/discharge circuit for 50ms. Finally we plotted both input
-and output voltages using the plot_nl command using the log files we generated.
+periodically forced charge/discharge circuit for 50ms. Finally we plotted both
+input and output voltages using the plot_nl command using the log files we
+generated.
 
 */

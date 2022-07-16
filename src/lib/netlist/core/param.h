@@ -21,8 +21,8 @@
 
 #include <memory>
 
-namespace netlist
-{
+namespace netlist {
+
 	/// @brief Base class for all device parameters
 	///
 	/// All device parameters classes derive from this object.
@@ -75,8 +75,8 @@ namespace netlist
 	public:
 		using value_type = T;
 
-		param_num_t(core_device_t &device, const pstring &name, T val) noexcept(
-			false);
+		param_num_t(core_device_t &device, const pstring &name,
+					T val) noexcept(false);
 
 		constexpr const T &operator()() const noexcept { return m_param; }
 		constexpr operator const T &() const noexcept { return m_param; }
@@ -102,7 +102,7 @@ namespace netlist
 		using value_type = T;
 
 		param_enum_t(core_device_t &device, const pstring &name,
-			T val) noexcept(false);
+					 T val) noexcept(false);
 
 		constexpr T operator()() const noexcept { return m_param; }
 		constexpr   operator T() const noexcept { return m_param; }
@@ -130,7 +130,7 @@ namespace netlist
 	{
 	public:
 		param_ptr_t(core_device_t &device, const pstring &name,
-			std::uint8_t *val);
+					std::uint8_t *val);
 		std::uint8_t *operator()() const noexcept { return m_param; }
 		void          set(std::uint8_t *param) noexcept
 		{
@@ -155,12 +155,12 @@ namespace netlist
 	{
 	public:
 		param_str_t(core_device_t &device, const pstring &name,
-			const pstring &val);
+					const pstring &val);
 		// FIXME: The device less constructor is only used by macro parameters
 		//        Every macro device gets a nld_wrapper object as the owner.
 		//        Use this as the owner and get rid of this constructor.
 		param_str_t(netlist_state_t &state, const pstring &name,
-			const pstring &val);
+					const pstring &val);
 
 		pstring operator()() const noexcept { return str(); }
 		void    set(const pstring &param)
@@ -194,16 +194,16 @@ namespace netlist
 		{
 		public:
 			template <typename P, typename Y = T,
-				typename DUMMY = std::enable_if_t<
-					plib::is_arithmetic<Y>::value>>
+					  typename DUMMY = std::enable_if_t<
+						  plib::is_arithmetic<Y>::value>>
 			value_base_t(P &param, const pstring &name)
-			: m_value(gsl::narrow<T>(param.value(name)))
+				: m_value(gsl::narrow<T>(param.value(name)))
 			{
 			}
 			template <typename P, typename Y = T,
-				std::enable_if_t<!plib::is_arithmetic<Y>::value, int> = 0>
+					  std::enable_if_t<!plib::is_arithmetic<Y>::value, int> = 0>
 			value_base_t(P &param, const pstring &name)
-			: m_value(static_cast<T>(param.value_str(name)))
+				: m_value(static_cast<T>(param.value_str(name)))
 			{
 			}
 			T operator()() const noexcept { return m_value; }
@@ -217,8 +217,8 @@ namespace netlist
 		using value_str_t = value_base_t<pstring>;
 
 		param_model_t(core_device_t &device, const pstring &name,
-			const pstring &val)
-		: param_str_t(device, name, val)
+					  const pstring &val)
+			: param_str_t(device, name, val)
 		{
 		}
 
@@ -242,7 +242,7 @@ namespace netlist
 	{
 	public:
 		param_data_t(core_device_t &device, const pstring &name)
-		: param_str_t(device, name, "")
+			: param_str_t(device, name, "")
 		{
 		}
 
@@ -276,9 +276,9 @@ namespace netlist
 
 	template <typename T>
 	param_num_t<T>::param_num_t(core_device_t &device, const pstring &name,
-		const T val)
-	: param_t(device, name)
-	, m_param(val)
+								const T val)
+		: param_t(device, name)
+		, m_param(val)
 	{
 		bool    found = false;
 		pstring p = this->get_initial(&device, &found);
@@ -299,9 +299,9 @@ namespace netlist
 
 	template <typename T>
 	param_enum_t<T>::param_enum_t(core_device_t &device, const pstring &name,
-		const T val)
-	: param_t(device, name)
-	, m_param(val)
+								  const T val)
+		: param_t(device, name)
+		, m_param(val)
 	{
 		bool    found = false;
 		pstring p = this->get_initial(&device, &found);
@@ -323,8 +323,8 @@ namespace netlist
 
 	template <typename ST, std::size_t AW, std::size_t DW>
 	param_rom_t<ST, AW, DW>::param_rom_t(core_device_t &device,
-		const pstring &                                 name)
-	: param_data_t(device, name)
+										 const pstring &name)
+		: param_data_t(device, name)
 	{
 		auto f = this->stream();
 		if (!f.empty())
