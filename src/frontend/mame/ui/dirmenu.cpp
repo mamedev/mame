@@ -42,6 +42,7 @@ struct folders_entry
 const folders_entry f_folders[] =
 {
 	{ N_p("path-option", "ROMs"),               OPTION_MEDIAPATH,          ADDING },
+	{ N_p("path-option", "Software Lists"),     OPTION_HASHPATH,           CHANGE },
 	{ N_p("path-option", "Software Media"),     OPTION_SWPATH,             CHANGE },
 	{ N_p("path-option", "Sound Samples"),      OPTION_SAMPLEPATH,         ADDING },
 	{ N_p("path-option", "Artwork"),            OPTION_ARTPATH,            ADDING },
