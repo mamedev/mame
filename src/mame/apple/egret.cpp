@@ -32,6 +32,19 @@
     x---      O  680x0 reset
     -x--      ?  680x0 IPL 2 (used in both directions)
     --xx      ?  IPL 1/0 for hardware power switch, trickle sense (bit 1) and pulled up to +5v (bit 0) if Egret controls the PSU
+
+    Egret version spotting:
+    341S0850 - 0x???? (1.01, earlier) - LC, LC II
+    341S0851 - 0x0101 (1.01, later) - Classic II, IIsi, IIvx/IIvi, LC III
+    344S0100 - 0x0100 (1.00) - Some (early production?) IIsi
+
+    Caboose version spotting:
+    341S0853 - 0x0100 (1.00) - Quadra 950
+
+    Caboose appears to be a slightly modified version of Egret with keysense support added to its power management functions.
+    It may also retain Egret's ADB interface, though the Quadra 900 & 950 disconnect its port pins from the ADB data line,
+    which is instead connected to a PIC.
+
 */
 
 

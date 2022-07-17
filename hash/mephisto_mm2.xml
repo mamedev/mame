@@ -6,7 +6,7 @@ license:CC0
 
 <softwarelist name="mephisto_mm2" description="Mephisto MM II Modules">
 
-<!-- HG 240 module is exclusively used with MM II -->
+<!-- HG 240 module works with MM II and MM III, it is 100% identical to Conchess L16 -->
 
 	<software name="hg240">
 		<description>Mephisto HG 240 Opening Library</description>

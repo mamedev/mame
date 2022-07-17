@@ -4342,7 +4342,8 @@ void mwcbaseb_state::grid_w(u16 data)
 
 void mwcbaseb_state::speaker_w(u8 data)
 {
-	// R50,R51+R52(tied together): speaker out
+	// R50: speaker lead 1
+	// R51+R52(tied together): speaker lead 2
 	m_speaker->level_w(data & 7);
 }
 

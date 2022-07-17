@@ -13,16 +13,16 @@ license:CC0
 
 	(check what units these are for)
 
-	 EN-1  (unknown)
-	 EN-2  (unknown)
-	*EN-3  (unknown)
+	 EN-1  Enka Collection - Volume 1
+	 EN-2  Enka Collection - Volume 2
+	*EN-3  Enka Collection - Volume 3
 
 	(more? what's the EN highest number?)
 
 	-->
 
 	<software name="en3">
-		<description>EN-3 (Japan)</description>
+		<description>Enka Collection - Volume 3 (Japan) (EN-3)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">

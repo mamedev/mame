@@ -14,33 +14,35 @@ license:CC0
 	1. e-Kara
 	2. Popira (and Popira 2? - earlier carts will run it as regular Popira, later carts have full Popira 2 support)
 
-	G-1  *GC0001-BAT  BAT Volume 1 (Artist Selection?)
-	G-2  *GC0002-BHT  BHT Volume 1 (Best Artists?)
-	G-3  *GC0003-BAT  BAT Volume 2 (Artist Selection?)
-	G-4  *GC0004-BHT  BHT Volume 2 (Best Artists?)
+	G-1  *GC0001-BAT  Best Artist Volume 1
+	G-2  *GC0002-BHT  Best Hit Volume 1
+	G-3  *GC0003-BAT  Best Artist Volume 2
+	G-4  *GC0004-BHT  Best Hit Volume 2
 	G-5   GC0005-TPJ  TV Pop Volume 1
-	G-6  *GC0006-BHT  BHT Volume 3 (Best Artists?)
-	G-7  *GC0007-BAT  BAT Volume 3 (Artist Selection?)
+	G-6  *GC0006-BHT  Best Hit Volume 3
+	G-7  *GC0007-BAT  Best Artist Volume 3
 	G-8  *GC0008-MIN  mini-moni Volume 1
 	G-9   GC0009-TPJ  TV Pop Volume 3 (Volume 2 is 'P-2' in 'P' series)
-	G-10 *GC0010-BAT  BAT Volume 4 (Artist Selection?)
-	G-11  GC0011-TPJ  TV Pop Volume 4
-	G-12  GC0012-BHT  BHT Volume 5 (Best Artists?) (Volume 4 is 'P-1' in 'P' series)
+	G-10 *GC0010-BAT  Best Artist Volume 4
+	G-11 *GC0011-TPJ  TV Pop Volume 4
+	G-12  GC0012-BHT  Best Hit Volume 5 (Volume 4 is 'P-1' in 'P' series)
 	G-13  GC0013-     (unknown) Volume 6
 	G-14 *GC0014-MIN  mini-moni Volume 2
-	G-15 *GC0015-BAT  BAT Volume 5 (Artist Selection?)
+	G-15 *GC0015-BAT  Best Artist Volume 5
 	G-16 *GC0016-TPJ  TV Pop Volume 5
 	G-17 *GC0017-TPJ  TV Pop Volume 6
-	G-18  GC0018-TPJ  TV Pop Volume 7
+	G-18 *GC0018-TPJ  TV Pop Volume 7
 
 	(more? what's the G highest number?)
 
 	-->
 
 	<software name="gc0001">
-		<description>BAT Volume 1 (Japan) (GC0001-BAT)</description>
+		<!-- Morning Musume, Petit Moni, Tanpopo -->
+		<description>Best Artist Volume 1 (Japan) (GC0001-BAT)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストアーティスト Vol.1"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="gc0001-bat.u1" size="0x100000" crc="226224f3" sha1="d2609f342e19b0cd38678d2709866baa041658e7"/>
@@ -49,9 +51,10 @@ license:CC0
 	</software>
 
 	<software name="gc0002">
-		<description>BHT Volume 1 (Japan) (GC0002-BHT)</description>
+		<description>Best Hit Volume 1 (Japan) (GC0002-BHT)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストヒット Vol.1"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="gc0002-bht.u1" size="0x100000" crc="eae1cb3b" sha1="d1e594858eecde5409898684654caab0555ac1b4"/>
@@ -60,9 +63,11 @@ license:CC0
 	</software>
 
 	<software name="gc0003">
-		<description>BAT Volume 2 (Japan) (GC0003-BAT)</description>
+		<!-- Utada Hikaru -->
+		<description>Best Artist Volume 2 (Japan) (GC0003-BAT)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストアーティスト Vol.2"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="gc0003-bat.u1" size="0x100000" crc="49536d5a" sha1="c112b6ac62f586fc1d1615406362fc659e587772"/>
@@ -71,9 +76,10 @@ license:CC0
 	</software>
 
 	<software name="gc0004">
-		<description>BHT Volume 2 (Japan) (GC0004-BHT)</description>
+		<description>Best Hit Volume 2 (Japan) (GC0004-BHT)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストヒット Vol.2"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="gc0004-bht.u1" size="0x100000" crc="6d2e9711" sha1="0478578c297f14d78a6612ecd61387129bd6df42"/>
@@ -82,9 +88,10 @@ license:CC0
 	</software>
 
 	<software name="gc0006">
-		<description>BHT Volume 3 (Japan) (GC0006-BHT)</description>
+		<description>Best Hit Volume 3 (Japan) (GC0006-BHT)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストヒット Vol.3"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="gc0006-bht.u1" size="0x100000" crc="76bbefae" sha1="a2a41f58b5750fafa92d6e3094562dd05a5d9029"/>
@@ -93,9 +100,11 @@ license:CC0
 	</software>
 
 	<software name="gc0007">
-		<description>BAT Volume 3 (Japan) (GC0007-BAT)</description>
+		<!-- Morning Musume, San-nin Matsuri, 7-nin Matsuri, 10-nin Matsuri -->
+		<description>Best Artist Volume 3 (Japan) (GC0007-BAT)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストアーティスト Vol.3"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="gc0007-bat.u1" size="0x100000" crc="27b49bdb" sha1="2b64d978fc5df5869bc3c27d16642727e2d38999"/>
@@ -107,6 +116,7 @@ license:CC0
 		<description>mini-moni Volume 1 (Japan) (GC0008-MIN) (set 1)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="ミニモニ。"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="gc0008-min.u1" size="0x200000" crc="8414c402" sha1="340c432eec8eb2108b8364b5936dd22dc34b51a9"/>
@@ -118,6 +128,7 @@ license:CC0
 		<description>mini-moni Volume 1 (Japan) (GC0008-MIN) (set 2)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="ミニモニ。"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="gc0008-min(alt).u1" size="0x200000" crc="b34d1721" sha1="3621f02423f55c43d1b16855c01189719ddbcb6e"/>
@@ -138,9 +149,10 @@ license:CC0
 	    Popira 2 however can make use of these pins -->
 
 	<software name="gc0010">
-		<description>BAT Volume 4 (Japan) (GC0010-BAT)</description>
+		<description>Best Artist Volume 4 (Japan) (GC0010-BAT)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストアーティスト Vol.4"/>
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24lc02_gc0010"/>
 			<dataarea name="rom" size="0x100000">
@@ -149,11 +161,25 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="gc0011">
+		<description>TV Pop Volume 4 (Japan) (GC0011-TPJ)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc02_gc0010"/>
+			<dataarea name="rom" size="0x100000">
+				<rom name="gc0011-tpj.u1" size="0x100000" crc="4ca23131" sha1="297cea5f456c90820adc97cf0f8a40b058edb0b5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	
 
 	<software name="gc0014">
 		<description>mini-moni Volume 2 (GC0014-MIN)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="ミニモニ。 Vol.2"/>
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24lc02"/> <!-- with 74HC125 -->
 			<dataarea name="rom" size="0x200000">
@@ -164,9 +190,11 @@ license:CC0
 
 	<!-- G15 looks like G16- 74HC125 and 24LC02. -->
 	<software name="gc0015">
-		<description>BAT Volume 5 (Japan) (GC0015-BAT)</description>
+		<!-- Morning Musume, Petit Moni, Tanpopo -->
+		<description>Best Artist Volume 5 (Japan) (GC0015-BAT)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストアーティスト Vol.5"/>
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24lc02"/> <!-- with 74HC125 -->
 			<dataarea name="rom" size="0x100000">
@@ -179,6 +207,7 @@ license:CC0
 		<description>TV Pop Volume 5 (Japan) (GC0016-TPJ)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="TV POPジュニアvol.5"/>
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24lc02"/> <!-- with 74HC125 -->
 			<dataarea name="rom" size="0x100000">
@@ -191,10 +220,23 @@ license:CC0
 		<description>TV Pop Volume 6 (Japan) (GC0017-TPJ)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="TV POPジュニアvol.6"/>
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24lc02"/> <!-- with 74HC125 -->
 			<dataarea name="rom" size="0x100000">
 				<rom name="gc0017-tpj.u1" size="0x100000" crc="2c7d00a2" sha1="5976b9f3a95afb3b23f1d1d996de0b7aa41ee25c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gc0018">
+		<description>TV Pop Volume 7 (Japan) (GC0018-TPJ)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc02"/>	<!-- with 74HC125 -->
+			<dataarea name="rom" size="0x100000">
+				<rom name="gc0018-tpj.u1" size="0x100000" crc="5e7fee64" sha1="14ebc6e47808f30de4724ec720c49223c2c6f22d"/>
 			</dataarea>
 		</part>
 	</software>

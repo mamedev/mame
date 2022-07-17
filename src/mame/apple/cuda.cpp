@@ -33,6 +33,14 @@
     -x--      ?  680x0 IPL 2 (used in both directions)
     --x-      ?  IPL 1/pull up for passive power, trickle sense for soft and secure
     ---x      ?  IPL 0 for passive power, pull-up for soft power, file server switch for secure power
+
+    Cuda version spotting:
+    341S0262 - 0x0003f200 (3.02) - some PMac 6500, Bondi blue iMac
+    341S0285 - No version (x.xx) - PMac 4400 + Mac clones ("Cuda Lite" with 768 bytes more ROM + PS/2 keyboard/mouse support)
+    341S0060 - 0x00020028 (2.40) - Performa/Quadra 6xx, PMac 6200, x400, some x500, Pippin, "Gossamer" G3, others?
+                                    (verified found in PMac 5500-225, G3-333)
+    341S0788 - 0x00020025 (2.37) - LC 475/575/Quadra 605, Quadra 660AV/840AV, PMac 7200
+    341S0417 - 0x00020023 (2.35) - Color Classic
 */
 
 

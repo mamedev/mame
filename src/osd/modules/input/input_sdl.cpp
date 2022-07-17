@@ -725,15 +725,14 @@ public:
 		{
 		case SDL_JOYAXISMOTION:
 			{
-				int axis = sdlevent.jaxis.axis;
-
+				int const axis = sdlevent.jaxis.axis;
 				if (axis <= 3)
 				{
 					joystick.axes[sdlevent.jaxis.axis] = (sdlevent.jaxis.value * 2);
 				}
 				else
 				{
-					int magic = (sdlevent.jaxis.value / 2) + 16384;
+					int const magic = (sdlevent.jaxis.value / 2) + 16384;
 					joystick.axes[sdlevent.jaxis.axis] = magic;
 				}
 			}
@@ -974,32 +973,6 @@ public:
 };
 
 
-void devmap_register(device_map_t &devmap, int physical_idx, const std::string &name)
-{
-	// Attempt to find the entry by name
-	auto entry = std::find_if(
-			std::begin(devmap.map),
-			std::end(devmap.map),
-			[&name] (auto const &item) { return (item.name == name) && (item.physical < 0); });
-
-	// If we didn't find it by name, find the first free slot
-	if (entry == std::end(devmap.map))
-	{
-		entry = std::find_if(
-				std::begin(devmap.map),
-				std::end(devmap.map),
-				[] (auto const &item) { return item.name.empty(); });
-	}
-
-	if (entry != std::end(devmap.map))
-	{
-		entry->physical = physical_idx;
-		entry->name = name;
-		int logical_idx = std::distance(std::begin(devmap.map), entry);
-		devmap.logical[physical_idx] = logical_idx;
-	}
-}
-
 //============================================================
 //  sdl_joystick_module
 //============================================================
@@ -1007,10 +980,9 @@ void devmap_register(device_map_t &devmap, int physical_idx, const std::string &
 class sdl_joystick_module : public sdl_input_module
 {
 private:
-	device_map_t   m_joy_map;
-	bool           m_initialized_joystick;
-	bool           m_initialized_haptic;
-	bool           m_sixaxis_mode;
+	bool m_initialized_joystick;
+	bool m_initialized_haptic;
+	bool m_sixaxis_mode;
 public:
 	sdl_joystick_module() :
 		sdl_input_module(OSD_JOYSTICKINPUT_PROVIDER),
@@ -1058,28 +1030,25 @@ public:
 
 		m_sixaxis_mode = downcast<const sdl_options *>(options())->sixaxis();
 
-		m_joy_map.init(machine, SDLOPTION_JOYINDEX, 8, "Joystick mapping");
-
 		osd_printf_verbose("Joystick: Start initialization\n");
 		for (int physical_stick = 0; physical_stick < SDL_NumJoysticks(); physical_stick++)
 		{
-			std::string joy_name = remove_spaces(SDL_JoystickNameForIndex(physical_stick));
-			devmap_register(m_joy_map, physical_stick, joy_name);
-		}
-
-		for (int stick = 0; stick < MAX_DEVMAP_ENTRIES; stick++)
-		{
-			sdl_joystick_device *const devinfo = create_joystick_device(machine, &m_joy_map, stick, DEVICE_CLASS_JOYSTICK);
-
-			if (!devinfo)
-				continue;
-
-			int const physical_stick = m_joy_map.map[stick].physical;
 			SDL_Joystick *const joy = SDL_JoystickOpen(physical_stick);
+			char const *const name = SDL_JoystickName(joy);
 			SDL_JoystickGUID guid = SDL_JoystickGetGUID(joy);
 			char guid_str[256];
 			guid_str[0] = '\0';
 			SDL_JoystickGetGUIDString(guid, guid_str, sizeof(guid_str) - 1);
+
+			sdl_joystick_device *const devinfo = m_sixaxis_mode
+					? &devicelist().create_device<sdl_sixaxis_joystick_device>(machine, name ? name : guid_str, guid_str, *this)
+					: &devicelist().create_device<sdl_joystick_device>(machine, name ? name : guid_str, guid_str, *this);
+
+			if (!devinfo)
+			{
+				SDL_JoystickClose(joy);
+				continue;
+			}
 
 			devinfo->sdl_state.device = joy;
 			devinfo->sdl_state.joystick_id = SDL_JoystickInstanceID(joy);
@@ -1093,7 +1062,7 @@ public:
 				devinfo->sdl_state.serial = std::nullopt;
 
 			osd_printf_verbose("Joystick: %s [GUID %s] Vendor ID %04X, Product ID %04X, Revision %04X\n",
-					SDL_JoystickNameForIndex(physical_stick),
+					name ? name : "<nullptr>",
 					guid_str,
 					SDL_JoystickGetVendor(joy),
 					SDL_JoystickGetProduct(joy),
@@ -1103,7 +1072,6 @@ public:
 					SDL_JoystickNumButtons(joy),
 					SDL_JoystickNumHats(joy),
 					SDL_JoystickNumBalls(joy));
-			osd_printf_verbose("Joystick:   ...  Physical id %d mapped to logical id %d\n", physical_stick, stick + 1);
 			if (devinfo->sdl_state.hapdevice)
 				osd_printf_verbose("Joystick:   ...  Has haptic capability\n");
 			else
@@ -1255,32 +1223,6 @@ private:
 				return device;
 		}
 		return nullptr;
-	}
-
-	sdl_joystick_device *create_joystick_device(running_machine &machine, device_map_t *devmap, int index, input_device_class devclass)
-	{
-		char tempname[20];
-		char guid_str[256];
-		SDL_JoystickGUID guid = SDL_JoystickGetDeviceGUID(m_joy_map.map[index].physical);
-		SDL_JoystickGetGUIDString(guid, guid_str, sizeof(guid_str) - 1);
-
-		if (devmap->map[index].name.empty())
-		{
-			// only map place holders if there were mappings specified
-			if (devmap->initialized)
-			{
-				snprintf(tempname, std::size(tempname), "NC%d", index);
-				m_sixaxis_mode
-						? devicelist().create_device<sdl_sixaxis_joystick_device>(machine, tempname, guid_str, *this)
-						: devicelist().create_device<sdl_joystick_device>(machine, tempname, guid_str, *this);
-			}
-
-			return nullptr;
-		}
-
-		return m_sixaxis_mode
-				? &devicelist().create_device<sdl_sixaxis_joystick_device>(machine, std::string(devmap->map[index].name), guid_str, *this)
-				: &devicelist().create_device<sdl_joystick_device>(machine, std::string(devmap->map[index].name), guid_str, *this);
 	}
 };
 

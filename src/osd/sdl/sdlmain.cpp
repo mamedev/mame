@@ -103,14 +103,6 @@ const options_entry sdl_options::s_option_entries[] =
 
 	// joystick mapping
 	{ nullptr,                               nullptr,        core_options::option_type::HEADER,     "SDL JOYSTICK MAPPING" },
-	{ SDLOPTION_JOYINDEX "1",                OSDOPTVAL_AUTO, core_options::option_type::STRING,     "name of joystick mapped to joystick #1" },
-	{ SDLOPTION_JOYINDEX "2",                OSDOPTVAL_AUTO, core_options::option_type::STRING,     "name of joystick mapped to joystick #2" },
-	{ SDLOPTION_JOYINDEX "3",                OSDOPTVAL_AUTO, core_options::option_type::STRING,     "name of joystick mapped to joystick #3" },
-	{ SDLOPTION_JOYINDEX "4",                OSDOPTVAL_AUTO, core_options::option_type::STRING,     "name of joystick mapped to joystick #4" },
-	{ SDLOPTION_JOYINDEX "5",                OSDOPTVAL_AUTO, core_options::option_type::STRING,     "name of joystick mapped to joystick #5" },
-	{ SDLOPTION_JOYINDEX "6",                OSDOPTVAL_AUTO, core_options::option_type::STRING,     "name of joystick mapped to joystick #6" },
-	{ SDLOPTION_JOYINDEX "7",                OSDOPTVAL_AUTO, core_options::option_type::STRING,     "name of joystick mapped to joystick #7" },
-	{ SDLOPTION_JOYINDEX "8",                OSDOPTVAL_AUTO, core_options::option_type::STRING,     "name of joystick mapped to joystick #8" },
 	{ SDLOPTION_SIXAXIS,                     "0",            core_options::option_type::BOOLEAN,    "use special handling for PS3 Sixaxis controllers" },
 
 #if (USE_XINPUT)
@@ -125,26 +117,6 @@ const options_entry sdl_options::s_option_entries[] =
 	{ SDLOPTION_LIGHTGUNINDEX "7",           OSDOPTVAL_AUTO, core_options::option_type::STRING,     "name of lightgun mapped to lightgun #7" },
 	{ SDLOPTION_LIGHTGUNINDEX "8",           OSDOPTVAL_AUTO, core_options::option_type::STRING,     "name of lightgun mapped to lightgun #8" },
 #endif
-
-	{ nullptr,                               nullptr,        core_options::option_type::HEADER,     "SDL MOUSE MAPPING" },
-	{ SDLOPTION_MOUSEINDEX "1",              OSDOPTVAL_AUTO, core_options::option_type::STRING,     "name of mouse mapped to mouse #1" },
-	{ SDLOPTION_MOUSEINDEX "2",              OSDOPTVAL_AUTO, core_options::option_type::STRING,     "name of mouse mapped to mouse #2" },
-	{ SDLOPTION_MOUSEINDEX "3",              OSDOPTVAL_AUTO, core_options::option_type::STRING,     "name of mouse mapped to mouse #3" },
-	{ SDLOPTION_MOUSEINDEX "4",              OSDOPTVAL_AUTO, core_options::option_type::STRING,     "name of mouse mapped to mouse #4" },
-	{ SDLOPTION_MOUSEINDEX "5",              OSDOPTVAL_AUTO, core_options::option_type::STRING,     "name of mouse mapped to mouse #5" },
-	{ SDLOPTION_MOUSEINDEX "6",              OSDOPTVAL_AUTO, core_options::option_type::STRING,     "name of mouse mapped to mouse #6" },
-	{ SDLOPTION_MOUSEINDEX "7",              OSDOPTVAL_AUTO, core_options::option_type::STRING,     "name of mouse mapped to mouse #7" },
-	{ SDLOPTION_MOUSEINDEX "8",              OSDOPTVAL_AUTO, core_options::option_type::STRING,     "name of mouse mapped to mouse #8" },
-
-	{ nullptr,                               nullptr,        core_options::option_type::HEADER,     "SDL KEYBOARD MAPPING" },
-	{ SDLOPTION_KEYBINDEX "1",               OSDOPTVAL_AUTO, core_options::option_type::STRING,     "name of keyboard mapped to keyboard #1" },
-	{ SDLOPTION_KEYBINDEX "2",               OSDOPTVAL_AUTO, core_options::option_type::STRING,     "name of keyboard mapped to keyboard #2" },
-	{ SDLOPTION_KEYBINDEX "3",               OSDOPTVAL_AUTO, core_options::option_type::STRING,     "name of keyboard mapped to keyboard #3" },
-	{ SDLOPTION_KEYBINDEX "4",               OSDOPTVAL_AUTO, core_options::option_type::STRING,     "name of keyboard mapped to keyboard #4" },
-	{ SDLOPTION_KEYBINDEX "5",               OSDOPTVAL_AUTO, core_options::option_type::STRING,     "name of keyboard mapped to keyboard #5" },
-	{ SDLOPTION_KEYBINDEX "6",               OSDOPTVAL_AUTO, core_options::option_type::STRING,     "name of keyboard mapped to keyboard #6" },
-	{ SDLOPTION_KEYBINDEX "7",               OSDOPTVAL_AUTO, core_options::option_type::STRING,     "name of keyboard mapped to keyboard #7" },
-	{ SDLOPTION_KEYBINDEX "8",               OSDOPTVAL_AUTO, core_options::option_type::STRING,     "name of keyboard mapped to keyboard #8" },
 
 	// SDL low level driver options
 	{ nullptr,                               nullptr,         core_options::option_type::HEADER,    "SDL LOW-LEVEL DRIVER OPTIONS" },

@@ -3257,8 +3257,10 @@ avigo_it                        // 1997 Avigo (Italian)
 aviion_4600                     // Data General AViiON 4600
 
 @source:elektor/avrmax.cpp
+atm18mcc
 avrmax
 avrmaxg
+cc2schach
 
 @source:misc/avt.cpp
 avtbingo                        // (c) 1985 AVT
@@ -13759,7 +13761,7 @@ rhunting                        // bootleg of deathrac
 @source:motorola/exorciser.cpp
 exorciser                       // 1975 Motorola
 
-@source:exorterm/exorterm.cpp
+@source:motorola/exorterm.cpp
 exorterm155                     // (c) 1979 Motorola
 
 @source:netronics/exp85.cpp
@@ -20478,7 +20480,9 @@ lviv                            // Lviv/L'vov
 
 @source:capcom/lwings.cpp
 avengers                        // 2/1987 (c) 1987 (US)
-avengers2                       // 2/1987 (c) 1987 (US)
+avengersa                       // 2/1987 (c) 1987 (US)
+avengersb                       // 2/1987 (c) 1987 (US)
+avengersc                       // 2/1987 (c) 1987 (US)
 buraiken                        // 2/1987 (c) 1987 (Japan)
 buraikenb                       // 2/1987 (c) 1987 (Japan)
 fball                           //
@@ -23350,6 +23354,7 @@ mm5a                            // Mephisto MM V
 mm5p
 rebel5                          // Mephisto Rebell 5.0
 rebel5a                         // Mephisto Rebell 5.0
+rebel5b                         // Mephisto Rebell 5.0
 
 @source:hegenerglaser/modena.cpp
 modena                          // 1992 Mephisto Modena
@@ -23891,6 +23896,7 @@ mk4a                            // (c) 1997 Midway (v2.1)
 mk4b                            // (c) 1997 Midway (v1.0)
 thegrid                         // (c) 2001 Midway (v1.2) Latest offical release
 thegrida                        // (c) 2001 Midway (v1.1)
+thegridb                        // (c) 2001 Midway (v1.01)
 
 @source:skeleton/mightyframe.cpp
 mightyframe                     // Convergent
@@ -32805,7 +32811,7 @@ ryuuha                          // (c) 1987
 secolove                        // (c) 1986
 seiha                           // (c) 1987
 seiham                          // (c) 1987
-swinggal            // (c) 1987 Digital Denshi
+swinggal                        // (c) 1987 Digital Denshi
 vipclub                         // (c) 1988 Daiichi Denshi
 
 @source:nichibutsu/nbmj8891.cpp
@@ -33469,6 +33475,9 @@ zonefusn
 newbrain                        //
 newbraina                       //
 newbrainmd                      //
+
+@source:pinball/newcanasta.cpp
+newcanasta                      // (c) 2010 Marsaplay
 
 @source:misc/news.cpp
 news                            // "Virus"??? ((c) 1993 Poby in ROM VIRUS.4)
@@ -43125,6 +43134,7 @@ wackygtr                        // Wacky Gator
 @source:midcoin/wallc.cpp
 brkblast                        // bootleg (Fadesa)
 sidampkr                        //
+sidampkra                       //
 unkitpkr                        //
 wallc                           // (c) 1984 Midcoin
 wallca                          // (c) 1984 Midcoin
@@ -44232,6 +44242,9 @@ xyonix                          // [1989 Philko]
 higurashi                       // (c)2009 AQ Interactive
 kof2002um                       // (c)2009 SNK Playmore / New Channel
 kof2002umj                      // (c)2009 SNK Playmore / New Channel
+
+@source:chess/yeno_532xl.cpp
+y532xl
 
 @source:philips/yes.cpp
 yes                             //

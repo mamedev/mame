@@ -14,9 +14,11 @@
     - 16/25 MHz CPU clock generator
     - Support logic for various external subsystems (ADB, PDS, SCC, SCSI, SONIC)
 
-    The "Ardbeg" ASIC (LC 520) appears to be a renamed copy of Sonora, and "Prime Time"
-    (LC 475/575 and some low-end Quadras) is Sonora adapted to the 68040 bus.  "Prime Time II"
-    is similar but adds an ATA controller.
+    The "Ardbeg" ASIC (LC 520) appears to be a modest update of Sonora, adding support for
+    pushbuttons controlling display brightness and sound volume, plus monitor power saver mode.
+    "Prime Time" (LC 475/575 and Quadra 605) adapts the peripheral section of Sonora to the
+    68040 bus, but omits the DRAM and video controllers.  "Prime Time II" is similar but adds
+    an ATA controller.
 
     Sonora's video controller is in some of the PowerMac chipsets as well.
 */

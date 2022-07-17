@@ -9,7 +9,7 @@ license:CC0
 	<!--
 
 	Japanese e-kara carts appear to have a number of different genres split across various
-	cart sub-series (often supporting different hw types) special releases etc.
+	cart sub-series (often supporting different hardware types) special releases etc.
 
 	This file is for the base set (number on case, ECxxxx-xxx part numbers)
 
@@ -23,13 +23,13 @@ license:CC0
 	G76 = 1976-1978 collection
 	G79 = 1979-1981 collection
 	G82 = 1982-1984 collection
-	BHT = (Best Artists?)
-	BAT = (Artist Selection?) but not the same series as ATS
-	SAI = (used with S series carts)
-	HKW = (used with S series carts)
-	ATM = unknown (used by the M series 'mini' carts)
+	BHT = Best Hit
+	BAT = Best Artist
+	SAI = Saiten Cartridge
+	HKW = Hikawa Kiyoshi
+	ATM = Artist Mini
 	TPJ = TV Pop
-	MIN = unknown
+	MIN = mini-moni
 
 	Some Japanese carts have a number starting with S  (S-x on case, SCxxxx-xxx part numbers) (see ekara_japan_s.xml)  (for e-kara - custom presentation)
 	                                                M  (M-x on case, MCxxxx-xxx part numbers) (see ekara_japan_m.xml)  (for e-kara - custom presentation)
@@ -41,6 +41,7 @@ license:CC0
 	                                                D  (D-x on case, DCxxxx-xxx part numbers) (see ekara_japan_d.xml)  (for e-kara, Popira / 2, Taiko De Popira)
 	                                                SP (SP-x on case, no part numbers)        (see ekara_japan_sp.xml) (for e-kara, Popira / 2, Taiko de Popira, Jumping Popira)
 	                                                A  (A-x on case, Pichi Pichi Pitch series)(see ekara_japan_a.xml)  (for e-kara / e-pitch)
+													                        AC (KR-xx on cart, maybe part of A series)
 	                                                JP (JP-x on case)                         (see ekara_japan_jp.xml) (for Jumping Popira Only)
 
 	these exist but haven't got any
@@ -48,7 +49,6 @@ license:CC0
 	                                                KE (for Kids Lyric book device Only?)
 	                                                KD (for e-kara?)
 	                                                PR (seen a PR-02 AYY) (what is it?)
-	                                                KR (seen a KR-1) (bundled with later units?)
 
 	(there are others, need to document them)
 

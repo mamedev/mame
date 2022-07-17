@@ -13,7 +13,7 @@ Auto Response Board (ARB) overview:
 - PCB label AV001C01 REV A
 
 The electronic magnetic chessboard is the first of its kind. AVE later licensed
-it to Fidelity (see fidel_elite.cpp).
+it to Fidelity (see fidelity/elite.cpp).
 ARB is a romless system, the program ROM is on a cartridge.
 
 Known chess modules (*denotes not dumped yet):
@@ -44,9 +44,9 @@ TODO:
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/w65c02s.h"
 #include "video/pwm.h"
-#include "machine/sensorboard.h"
 #include "machine/6522via.h"
 #include "machine/nvram.h"
+#include "machine/sensorboard.h"
 #include "sound/dac.h"
 
 #include "speaker.h"

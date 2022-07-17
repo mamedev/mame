@@ -238,7 +238,6 @@ void saitekosa_analyst_device::device_add_mconfig(machine_config &config)
 
 	// video hardware
 	HD44780(config, m_lcd, 0);
-	m_lcd->set_lcd_size(2, 8);
 }
 
 

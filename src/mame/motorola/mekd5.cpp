@@ -94,11 +94,6 @@ FS 0 to F
 class mekd5_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_TRACE
-	};
-
 	mekd5_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")

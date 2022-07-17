@@ -276,12 +276,6 @@ public:
 class ste_state : public st_state
 {
 public:
-	enum
-	{
-		TIMER_DMASOUND_TICK,
-		TIMER_MICROWIRE_TICK
-	};
-
 	ste_state(const machine_config &mconfig, device_type type, const char *tag)
 		: st_state(mconfig, type, tag),
 			m_lmc1992(*this, LMC1992_TAG)

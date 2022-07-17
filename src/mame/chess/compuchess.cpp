@@ -21,7 +21,7 @@ BTANB:
 ===============================================================================
 
 DataCash Systems's CompuChess released mid-1977. One of the first chess
-computers, the first one being Fidelity Chess Challenger (fidel_cc1.cpp)
+computers, the first one being Fidelity Chess Challenger (fidelity/cc1.cpp)
 
 Hardware notes:
 - PCB label: CompuChess 1, STAID INC, REV A, 7-77
@@ -41,6 +41,7 @@ and G for "Survival".
 The game underneath CompuChess is better known as Novag's MK I, it was an
 unlicensed clone. The ROM is identical. DCS sued JS&A / Novag Industries for
 copyright infringement and somehow didn't manage to win the case.
+see: https://law.justia.com/cases/federal/district-courts/FSupp/480/1063/1531498/
 
 Unlike CompuChess, MK I was a large success, we can assume that it kickstarted
 Novag's chess computer generation. It was also distributed as "Computer Chess"

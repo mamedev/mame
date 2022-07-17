@@ -2440,6 +2440,42 @@ license:CC0
 		</part>
 	</software>
 
+<!-- Tutor Vision -->
+
+	<software name="tv_mmaze" supported="no">
+		<description>Map Mazes (unreleased)</description>
+		<year>1989</year>
+		<publisher>World Book</publisher>
+		<info name="serial" value="B-9709-1"/>
+		<sharedfeat name="compatibility" value="WBEXEC"/>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="0x4000">
+				<rom name="map mazes.50" size="0x4000" crc="c1814b5c" sha1="b2d3948cd333dd71365bd6e23631b6236ca252df"/>
+			</dataarea>
+			<dataarea name="9000" size="0x4000">
+				<rom name="map mazes.90" size="0x4000" crc="00f53fc1" sha1="39367bb4d25d41b7117b9f7823829a18b951bbc3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tv_shape" supported="no">
+		<description>Shapes in Space (unreleased)</description>
+		<year>1989</year>
+		<publisher>World Book</publisher>
+		<info name="serial" value="B-9706-1"/>
+		<sharedfeat name="compatibility" value="WBEXEC"/>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="0x4000">
+				<rom name="shapes in space.50" size="0x4000" crc="244465b5" sha1="d437121ca2f0f87bde267dad3280f02850bd1402"/>
+			</dataarea>
+			<dataarea name="9000" size="0x4000">
+				<rom name="shapes in space.90" size="0x4000" crc="3ebb3230" sha1="9648652712e8c74269f0c7ea858beabe97c3dde7"/>
+			</dataarea>
+		</part>
+	</software>
+
 
 	<software name="imitc">
 		<description>IMI Test Cartridge</description>

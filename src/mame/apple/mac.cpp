@@ -569,7 +569,10 @@ static void mac_lcpds_cards(device_slot_interface &device)
 void mac_state::add_base_devices(machine_config &config, bool rtc, int woz_version)
 {
 	if (rtc)
+	{
 		RTC3430042(config, m_rtc, XTAL(32'768));
+		m_rtc->cko_cb().set(m_via1, FUNC(via6522_device::write_ca2));
+	}
 
 	switch (woz_version) {
 	case 0:
