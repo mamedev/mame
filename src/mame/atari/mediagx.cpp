@@ -660,12 +660,43 @@ uint16_t mk_parport_outval(uint8_t v) {
 	return v2 << 8;
 }
 
+//#define READ_0x1_TEST 1
+// #define READ_0x18_TEST 1
+// #define READ_0x2_TEST 1
+// #define READ_0x3_TEST 1
+// #define READ_0x4_TEST 1
+// #define READ_0x5_TEST 1 
+// #define READ_0x6_TEST 1
+//#define READ_0xFF_TEST 1
+
+// for the very end, as if all were switched on, overrides all values as well
+//#define READ_BLANKET_TEST 1
+
+bool lock = false;
+int parallelPointMark = 10;
+
 // Reads from the parallel port, seems to hit what we're looking for?
 // 'offset' seems to be nearly constant in this case
 // the 'mem_mask' changes between (L) 0000FF00 and (H) 00FF0000
 uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
+
+	uint32_t mp00 = m_ports[0].read_safe(0);
+	if(mp00 == 0x4 && !lock) {
+		// bump 'down' & lock
+		parallelPointMark--;
+		printf("Mark down to %d\n", parallelPointMark);
+		lock = true;
+	} else if(mp00 == 0x8 && !lock) {
+		// bump 'up' & lock
+		parallelPointMark++;
+		printf("Mark up to %d\n", parallelPointMark);
+		lock = true;
+	} else if(mp00 == 0) {
+		// unlock
+		lock = false;
+	}
 
 	// ACCESSING_BITS_8_15 is a synonym for the following
 	// ((mem_mask & 0x0000ff00U) != 0)
@@ -686,9 +717,14 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 		if(m_parport_control_reg == 0x10) {
 			// TODO something here?
 			// not really, was just testing here too
-			// mp0 = m_ports[0].read_safe(0);
-			// r |= mk_parport_outval(mp0 >> 8);
+			#ifdef READ_0x1_TEST
+			mp0 = m_ports[0].read_safe(0);
+			r |= mk_parport_outval(mp0 >> 8);
+
+			#else
 			r |= mk_parport_outval(0);
+
+			#endif
 
 		} else if(m_parport_control_reg == 0x18) {
 			// Reset internal pointer to 0
@@ -697,6 +733,12 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 			// Check for F2 to open the system menu
 			// TEST MODE switch, only works here on 0x18
 			mp0 = m_ports[0].read_safe(0);
+
+			#ifdef READ_0x18_TEST
+			r |= mk_parport_outval(mp0 >> 0x8);
+
+			#else
+
 			if(mp0 & 1) {
 				// accounts for inverted upper bit
 				r |= 0x9000;
@@ -705,6 +747,8 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 				// default response...must be retained unless all cases are handled
 				r |= mk_parport_outval(0);
 			}
+
+			#endif
 
 			// don't really think this part helps, but keeping just in case...(historical)
 			// else {
@@ -720,24 +764,28 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 			// read from port 1
 			//r |= m_ports[1]->read() << 8;
 
-			// >>>>>>> 2 LINES ADDED for testing
-			// mp0 = m_ports[0].read_safe(0);
-			// r |= mk_parport_outval(mp0 >> 0x8);
-
+			#ifdef READ_0x2_TEST
+			mp0 = m_ports[0].read_safe(0);
+			r |= mk_parport_outval(mp0 >> 0x8);
+			#else
 			// default response...must be retained unless all cases are handled
 			r |= mk_parport_outval(0);
+			#endif
 
 		} else if(upperReg == 0x3) {
 			// TODO OLD
 			// read from port 2
 			//r |= m_ports[2]->read() << 8;
 
-			// >>>>>>> 2 LINES ADDED for testing
-			// mp0 = m_ports[0].read_safe(0);
-			// r |= mk_parport_outval(mp0 >> 0x8);
+			#ifdef READ_0x3_TEST
+			mp0 = m_ports[0].read_safe(0);
+			r |= mk_parport_outval(mp0 >> 0x8);
 
+			#else
 			// default response...must be retained unless all cases are handled
 			r |= mk_parport_outval(0);
+
+			#endif
 
 		} else if(upperReg == 0x4) {
 			// TODO coin counters coming back on this...but interestingly not needed to update coins
@@ -751,6 +799,13 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 			*/
 			mp0 = m_ports[0].read_safe(0);
 
+
+			#ifdef READ_0x4_TEST
+			// test value regardless of the 
+			r = mk_parport_outval(mp0 >> 0x8);
+
+			#else
+
 			// to avoid coin duplication
 			if (mp0 & 0x100 && !(mp0 & 0x400)) {
 				mp0 ^= 0x100;
@@ -763,6 +818,8 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 			// TODO: maybe adjust this so key '4' is pressed at all times here.
 
 			r |= mk_parport_outval(mp0 >> 0x8);
+
+			#endif
 
 		} else if(upperReg == 0x5) {
 			// > START BUTTONS!
@@ -781,12 +838,21 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 			*/
 			mp0 = m_ports[0].read_safe(0);
 
+			#ifdef READ_0x5_TEST
+			// TODO, running this test gives us direct 1 + 2 start button control mapping, interesting
+			r = mk_parport_outval(mp0 >> 0x8);
+
+			#else
+
 			// to avoid coin duplication
+			// but no coin duplication, how does this work now?
 			if (mp0 & 0x100 && !(mp0 & 0x400)) {
 				mp0 ^= 0x100;
 			}
 
 			r |= mk_parport_outval(mp0 >> 0x8);
+
+			#endif
 
 		} else if(m_parport_control_reg == 0x60) {
 			// TODO Reset watchdogs?
@@ -801,6 +867,11 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 			// coins & coin tracker only tripped together under 0x60
 			mp0 = m_ports[0].read_safe(0);
 
+			#ifdef READ_0x6_TEST
+			r = mk_parport_outval(mp0 >> 0x8);
+
+			#else
+
 			// keeping 0xf0 as the bitmask pushes the coin insertion to keys 5-8, which is desirable
 			if(mp0 & 0xf0) {
 			
@@ -814,6 +885,8 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 				// r |= mk_parport_outval(mp0 >> 0x8);
 			}
 
+			#endif
+
 		} else if(upperReg == 0xF) {
 			// TODO Internal pointer advance?
 			mp0 = m_ports[0].read_safe(0);
@@ -821,6 +894,12 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 			// i suspect this is the culprit...nope, not the case
 			//r |= mk_parport_outval(mp0 >> 0x8);
 
+			#ifdef READ_0xFF_TEST
+			// test value regardless of the par pointer state 
+			//r = mk_parport_outval(mp0 >> 0x8);
+			r = mk_parport_outval(0x5);
+
+			#else
 			// 0b1011 1000 is our bitmask, but now I have a handy function to abstract that away from me!
 			// not below 6, but above for screen & movement?
 			// but unsure about upper bound for < 12, no movement then?
@@ -830,7 +909,8 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 			// here's what we got so far
 			// Combination of keys [1] and [3] held will lead this to do 'something', but only for the following range of 10-12, 9 too?
 			
-			if(mp0 & 0xf00 && m_parallel_pointer == 10) {
+			// only need the one 'f' since we're just getting a nibble back I believe...not a lot of info, but yeah that's kinda how it works.
+			if(mp0 & 0xf00 && m_parallel_pointer == parallelPointMark) {
 				// Range of 10 is very important, w/out it, and w/out the below, a number of components (like volume menu access & start button pressing) don't work
 				// there's a lot at play here
 				/*
@@ -840,8 +920,26 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 				Upper controls are co-dependent on this here as well...interesting
 				*/
 				//printf("%08x\n", mp0 >> 0x8);
-				r |= mk_parport_outval(mp0 >> 0x8); // was 0x5
+				// TODO disabled for just a moment...
+				//r |= mk_parport_outval(mp0 >> 0x8); // was 0x5
+
+				// ENABLES P2 Start as well as P1 start and allows some basic controls as such
+				// TODO, was 0x5, but fixing this is NOT correct...trying other things here
+				r |= mk_parport_outval(0x5);
+
+				// P2 START is TRIGGERED here when 0x5 is set, in fact so is P1 (when (mp0 & 0xf00 && m_parallel_pointer == 10) === true)
+				/*
+				r |= mk_parport_outval(0x5);
+				...
+				1 + 3 = P1 start
+				2 + 3 = P2 start
+				...
+				during the game
+				1 + 3 = Fire special weapon, weird...seems to by cycling still
+				*/
 			}
+
+			#endif 
 
 			// @montymxb, June 5th, 2022
 			// TODO Having this extra default response for 0xFF commands causes coins not to work...possibly other parts as well, but not sure why
@@ -857,6 +955,13 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 			printf("UNRECOGNIZED PARPORT_STATE = %08X\n", m_parport_control_reg);
 
 		}
+
+		#ifdef READ_BLANKET_TEST
+		// blanket cover!
+		mp0 = m_ports[0].read_safe(0);
+		r = mk_parport_outval(mp0 >> 8);
+
+		#endif
 
 	}
 	else if (ACCESSING_BITS_16_23)
@@ -1219,12 +1324,13 @@ GFXDECODE_END
 
 static INPUT_PORTS_START(mediagx)
 	PORT_START("IN0")
+	// activates the debug service menu
 	PORT_SERVICE_NO_TOGGLE( 0x001, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x004, IP_ACTIVE_HIGH, IPT_SERVICE2 )
 	PORT_BIT( 0x008, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN )
 	// TODO NO volume up button! Just volume down???
-	//PORT_BIT( 0x00., IP_ACTIVE_HIGH, IPT_VOLUME_UP)
+	//PORT_BIT( 0x001, IP_ACTIVE_HIGH, IPT_VOLUME_UP)
 
 	/*
 	- CREDIT
@@ -1240,8 +1346,6 @@ static INPUT_PORTS_START(mediagx)
 
 	- JGUN 1 ?
 	- JGUN 2 ?
-
-	None of this other shit...
 	*/
 
 	PORT_BIT( 0x010, IP_ACTIVE_HIGH, IPT_COIN1 )
