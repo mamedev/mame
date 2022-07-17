@@ -13,8 +13,8 @@
     - print resolution of 300x300 dpi
     - four standard emulations (HP LaserJet Series II, HP DeskJet Plus, IBM Proprinter X24, Epson LQ850)
     - one Centronics parallel port
-	- 5 buttons (Power, On-line, Print Quality, Form-feed, Copy)
-	- 5 LEDs (Battery Check, Charger Active, Ribbon/Paper, Power, On-Line)
+    - 5 buttons (Power, On-line, Print Quality, Form-feed, Copy)
+    - 5 LEDs (Battery Check, Charger Active, Ribbon/Paper, Power, On-Line)
 
   2 dipswitches (strings from ROM)
    - = switched off

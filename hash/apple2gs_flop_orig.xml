@@ -3841,13 +3841,13 @@ license:CC0
 				<rom name="DragonsLair3_D9.po" size="819200" crc="0f069269" sha1="68587a76d4df483646fd0654605028d61a3973fd"/>
 			</dataarea>
 		</part>
-		<part name="flopA" interface="floppy_3_5">
+		<part name="flopa" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 10"/>
 			<dataarea name="flop" size="819200">
 				<rom name="DragonsLair3_DA.po" size="819200" crc="88905424" sha1="3b6c1e96a029ca9eec7eaa631c813f1f5eed4e67"/>
 			</dataarea>
 		</part>
-		<part name="flopB" interface="floppy_3_5">
+		<part name="flopb" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 11"/>
 			<dataarea name="flop" size="819200">
 				<rom name="DragonsLair3_DB.po" size="819200" crc="10dd0992" sha1="70e6ca9f5b4b011a13c866150ba8ede08cd5953f"/>
