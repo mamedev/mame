@@ -3886,7 +3886,7 @@ ROM_START( manxttc ) /* Manx TT Superbike Twin Revision C, Model 2A */
 	MODEL2A_VID_BOARD
 ROM_END
 
-/* This set was badly upgraded to Revision C, lefting over the sound CPU ROM from Revision A.
+/* This set was badly upgraded to Revision C, leaving over the sound CPU ROM from Revision A.
    Every other ROM on the driver is what was found on the PCB (Twin Revision C), so we're still missing the main CPU ROMs from Revision A. */
 ROM_START( manxtta ) // Manx TT Superbike Revision A, Model 2A
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
