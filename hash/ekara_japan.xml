@@ -934,8 +934,8 @@ license:CC0
 	<software name="ec0069"> <!-- custom presentation -->
 		<description>Enka Taizen (Japan) (EC0069-ETZ)</description>
 		<year>2001</year>
-		<info name="alt_title" value="演歌大全" />
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌大全" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="ec0069-etz.u1" size="0x200000" crc="849ebd23" sha1="752c500d3ff48f04b985fef04219824d1d746034"/>
@@ -1046,8 +1046,8 @@ license:CC0
 	<software name="ec0079"> <!-- custom presentation -->
 		<description>Enka Taizen Dai Ni-hen (Japan) (EC0079-ETZ)</description>
 		<year>2002</year>
-		<info name="alt_title" value="演歌大全 第二篇" />
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌大全 第二篇" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="ec0079-etz.u1" size="0x200000" crc="c03b5411" sha1="a88156aec4e0f024461f129c955a953647f51554"/>

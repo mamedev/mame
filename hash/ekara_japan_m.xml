@@ -64,8 +64,8 @@ license:CC0
 	<software name="mc0005">
 		<description>Kids Song Mini Volume 1 (Japan) (MC0005-KSM)</description>
 		<year>2003</year>
-		<info name="alt_title" value="キッズソングミニ mini vol.1"/>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="キッズソングミニ mini vol.1"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0005-ksm.u1" size="0x080000" crc="a84c6d0d" sha1="dee82de4609ec93ed5152d01860e59d8693b9736"/>
