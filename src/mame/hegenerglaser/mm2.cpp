@@ -2,7 +2,7 @@
 // copyright-holders:Dirk Verwiebe, Cowering, hap
 /******************************************************************************
 
-Mephisto 4 + 5 Chess Computer
+Mephisto MM II series chesscomputers
 2007 Dirk V.
 
 TODO:
@@ -13,7 +13,40 @@ TODO:
 
 ===============================================================================
 
-Hardware notes:
+For rebel5 and newer, the chess engine is by Ed Schröder. Older chesscomputers in
+this driver were authored by Ulf Rathsman.
+
+The MM II program was also licensed to Daimler-Benz, who gave away several custom
+chesscomputers as a parting gift to retiring executives. The hardware is same as MM II.
+see(1): http://chesseval.com/ChessEvalJournal/DaimlerBenz.htm
+see(2): http://chesseval.com/RareBoard/DaimlerBenzBoard.htm
+
+MM III was never released officially. Rebell 5,0 is commonly known as MM III, but the
+real one didn't get further than a prototype.
+
+Mephisto 4 Turbo Kit 18mhz - (mm4tk)
+    This is a replacement rom combining the turbo kit initial rom with the original MM IV.
+    The Turbo Kit powers up to it's tiny rom, copies itself to ram, banks in normal rom,
+    copies that to faster SRAM, then patches the checksum and the LED blink delays.
+    If someone else wants to code up the power up banking, feel free
+
+    There is an undumped MM V Turbo Kit, which will be the exact same except for location of
+    the patches. The mm5tk just needs the normal mm5 ROM swapped out for that one to
+    blinks the LEDs a little slower.
+
+    -- Cowering (2011)
+
+The MM V prototype was the program that Ed Schröder participated with as "Rebel" at the
+1989 WMCCC in Portorose. It was used with the TK20 TurboKit.
+For more information, see: http://chesseval.com/ChessEvalJournal/PrototypeMMV.htm
+
+MM VI (Saitek, 1994) is on different hardware, H8 CPU.
+
+===============================================================================
+
+MM IV + MM V hardware notes
+
+Overview:
 - CPU: R65C02P3/R65C02P4 or G65SC02P-4
 - Clock: 4.9152 MHz
 - NMI CLK: 600 Hz
@@ -61,37 +94,6 @@ $3000 // Chess Board
 $4000-$7FFF Opening Module HG550
 $8000-$FFFF ROM
 
-===============================================================================
-
-For rebel5 and newer, the chess engine is by Ed Schröder. Older chesscomputers in
-this driver were authored by Ulf Rathsman.
-
-The MM II program was also licensed to Daimler-Benz, who gave away several custom
-chesscomputers as a parting gift to retiring executives. The hardware is same as MM II.
-see(1): http://chesseval.com/ChessEvalJournal/DaimlerBenz.htm
-see(2): http://chesseval.com/RareBoard/DaimlerBenzBoard.htm
-
-MM III was never released officially. Rebell 5,0 is commonly known as MM III, but the
-real one didn't get further than a prototype.
-
-Mephisto 4 Turbo Kit 18mhz - (mm4tk)
-    This is a replacement rom combining the turbo kit initial rom with the original MM IV.
-    The Turbo Kit powers up to it's tiny rom, copies itself to ram, banks in normal rom,
-    copies that to faster SRAM, then patches the checksum and the LED blink delays.
-    If someone else wants to code up the power up banking, feel free
-
-    There is an undumped MM V Turbo Kit, which will be the exact same except for location of
-    the patches. The mm5tk just needs the normal mm5 ROM swapped out for that one to
-    blinks the LEDs a little slower.
-
-    -- Cowering (2011)
-
-The MM V prototype was the program that Ed Schröder participated with as "Rebel" at the
-1989 WMCCC in Portorose. It was used with the TK20 TurboKit.
-For more information, see: http://chesseval.com/ChessEvalJournal/PrototypeMMV.htm
-
-MM VI (Saitek, 1994) is on different hardware, H8 CPU.
-
 ******************************************************************************/
 
 #include "emu.h"
@@ -108,8 +110,8 @@ MM VI (Saitek, 1994) is on different hardware, H8 CPU.
 #include "speaker.h"
 
 // internal artwork
-#include "mephisto_mm2.lh"
 #include "mephisto_bup.lh"
+#include "mephisto_mm2.lh"
 
 
 namespace {
@@ -180,7 +182,7 @@ void mm2_state::lcd_irqack_w(u8 data)
 {
 	m_display->data_w(data);
 
-	// accessing 0x2800 also clears irq
+	// accessing here also clears irq
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
@@ -219,7 +221,7 @@ void mm2_state::rebel5_mem(address_map &map)
 	map(0x2000, 0x2007).w("outlatch", FUNC(hc259_device::write_d7)).nopr();
 	map(0x3000, 0x3007).r(FUNC(mm2_state::keys_r));
 	map(0x4000, 0x4000).r("board", FUNC(mephisto_board_device::input_r));
-	map(0x5000, 0x5000).w(m_display, FUNC(mephisto_display1_device::data_w));
+	map(0x5000, 0x5000).w(FUNC(mm2_state::lcd_irqack_w));
 	map(0x6000, 0x6000).w("board", FUNC(mephisto_board_device::led_w));
 	map(0x7000, 0x7000).w("board", FUNC(mephisto_board_device::mux_w));
 	map(0x8000, 0xffff).rom();
@@ -314,8 +316,8 @@ void mm2_state::rebel5(machine_config &config)
 	R65C02(config, m_maincpu, 9.8304_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mm2_state::rebel5_mem);
 
-	const attotime nmi_period = attotime::from_hz(9.8304_MHz_XTAL / 2 / 0x2000); // 600Hz
-	m_maincpu->set_periodic_int(FUNC(mm2_state::nmi_line_pulse), nmi_period);
+	const attotime irq_period = attotime::from_hz(9.8304_MHz_XTAL / 2 / 0x2000); // 600Hz
+	m_maincpu->set_periodic_int(FUNC(mm2_state::irq0_line_assert), irq_period);
 
 	HC259(config, m_outlatch);
 	m_outlatch->q_out_cb<0>().set_output("led100");
@@ -406,6 +408,19 @@ void mm2_state::mm2(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
+ROM_START( bup )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("bup_1.bin", 0x8000, 0x4000, CRC(e1e9625a) SHA1(8a757e28b7afca2a092f8ff419087e06b07b743e) )
+	ROM_LOAD("bup_2.bin", 0xc000, 0x4000, CRC(6db30b80) SHA1(df4b379c4e916dff6b4110ec9c3591a9620c3424) )
+ROM_END
+
+ROM_START( bupa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("bupa_1.bin", 0x8000, 0x4000, CRC(e1e9625a) SHA1(8a757e28b7afca2a092f8ff419087e06b07b743e) )
+	ROM_LOAD("bupa_2.bin", 0xc000, 0x4000, CRC(708338ea) SHA1(d617c4aa2161865a22b4b0646ba793f8a1fda863) )
+ROM_END
+
+
 ROM_START( mm2 ) // 10 Sep 1986
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("400", 0x8000, 0x8000, CRC(e8c1f431) SHA1(c32dfa66eefbf3e539438d2fe6e6916f78a128be) ) // HN27C256G-20
@@ -440,19 +455,6 @@ ROM_START( mm2e ) // 13 Sep 1985, serial 05569xx
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("hg86_13.9", 0x8000, 0x4000, CRC(e2daac82) SHA1(c9fa59ca92362f8ee770733073bfa2ab8c7904ad) )
 	ROM_LOAD("c-f_6.9",   0xc000, 0x4000, CRC(5e296939) SHA1(badd2a377259cf738cd076d8fb245c3dc284c24d) )
-ROM_END
-
-
-ROM_START( bup )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("bup_1.bin", 0x8000, 0x4000, CRC(e1e9625a) SHA1(8a757e28b7afca2a092f8ff419087e06b07b743e) )
-	ROM_LOAD("bup_2.bin", 0xc000, 0x4000, CRC(6db30b80) SHA1(df4b379c4e916dff6b4110ec9c3591a9620c3424) )
-ROM_END
-
-ROM_START( bupa )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("bupa_1.bin", 0x8000, 0x4000, CRC(e1e9625a) SHA1(8a757e28b7afca2a092f8ff419087e06b07b743e) )
-	ROM_LOAD("bupa_2.bin", 0xc000, 0x4000, CRC(708338ea) SHA1(d617c4aa2161865a22b4b0646ba793f8a1fda863) )
 ROM_END
 
 
@@ -518,15 +520,15 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE   INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS */
+CONS( 1985, bup,     0,      0,      bup,      bup,   mm2_state, empty_init, "Hegener + Glaser", u8"Mephisto Blitz- und Problemlösungs-Modul (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, bupa,    bup,    0,      bup,      bup,   mm2_state, empty_init, "Hegener + Glaser", u8"Mephisto Blitz- und Problemlösungs-Modul (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
 CONS( 1985, mm2,     0,      0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 1, v4.00)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1985, mm2a,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 2, v3.00)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1985, mm2b,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 3, v2.00)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1985, mm2c,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1985, mm2d,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 5)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1985, mm2e,    mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-
-CONS( 1985, bup,     0,      0,      bup,      bup,   mm2_state, empty_init, "Hegener + Glaser", u8"Mephisto Blitz- und Problemlösungs-Modul (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1985, bupa,    bup,    0,      bup,      bup,   mm2_state, empty_init, "Hegener + Glaser", u8"Mephisto Blitz- und Problemlösungs-Modul (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1986, rebel5,  0,      0,      rebel5,   mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto Rebell 5,0 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka MM III
 CONS( 1986, rebel5a, rebel5, 0,      rebel5,   mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto Rebell 5,0 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // "
