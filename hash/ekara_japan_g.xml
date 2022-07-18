@@ -65,7 +65,7 @@ license:CC0
 		<description>Best Artist Volume 2 (Utada Hikaru) (Japan) (GC0003-BAT)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="ベストアーティスト Vol.2"/>
+		<info name="alt_title" value="ベストアーティスト Vol.2 (宇多田ヒカル)"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="gc0003-bat.u1" size="0x100000" crc="49536d5a" sha1="c112b6ac62f586fc1d1615406362fc659e587772"/>
@@ -101,7 +101,7 @@ license:CC0
 		<description>Best Artist Volume 3 (Morning Musume, San-nin Matsuri, 7-nin Matsuri, 10-nin Matsuri) (Japan) (GC0007-BAT)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="ベストアーティスト Vol.3"/>
+		<info name="alt_title" value="ベストアーティスト Vol.3 (モーニング娘。他)"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="gc0007-bat.u1" size="0x100000" crc="27b49bdb" sha1="2b64d978fc5df5869bc3c27d16642727e2d38999"/>
@@ -149,7 +149,7 @@ license:CC0
 		<description>Best Artist Volume 4 (Morning Musume, Tanpopo, Petit Moni, Gotō Maki) (Japan) (GC0010-BAT)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="ベストアーティスト Vol.4"/>
+		<info name="alt_title" value="ベストアーティスト Vol.4 (モーニング娘。他)"/>
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24lc02_gc0010"/>
 			<dataarea name="rom" size="0x100000">
@@ -191,7 +191,7 @@ license:CC0
 		<description>Best Artist Volume 5 (Morning Musume, Petit Moni, Tanpopo) (Japan) (GC0015-BAT)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="ベストアーティスト Vol.5"/>
+		<info name="alt_title" value="ベストアーティスト Vol.5 (モーニング娘。他)"/>
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24lc02"/> <!-- with 74HC125 -->
 			<dataarea name="rom" size="0x100000">
