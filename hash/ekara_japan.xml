@@ -77,14 +77,14 @@ license:CC0
 	..  *EC0006-ENK  ENK Volume 1
 	..  *EC0007-G76  1976-78 Volume 1
 	..  *EC0008-G79  1979-81 Volume 1
-	..  *EC0009-ANM  ANM Volume 1
+	..  *EC0009-ANM  AniSon Club Volume 1 (abbreviated from Anime Song Club)
 
 	..  *EC0010-KID  Kid's Mix Volume 1
 	..  *EC0011-JPM  J-Pop Mix Volume 6
 	..  *EC0012-JPM  J-Pop Mix Volume 7
 	..  *EC0013-JPM  J-Pop Mix Volume 8
 	..  *EC0014-ATS  Artist Selection Volume 1 - Southern All Stars, Kuwata Keisuke
-	..  *EC0015-ATS  Artist Selection Volume 2 - untranslated artist
+	..  *EC0015-ATS  Artist Selection Volume 2 - Shīna Ringo, Tomosaka Rie
 	..  *EC0016-ENK  ENK Volume 2
 	..  *EC0017-G73  1973-75 Volume 1
 	..  *EC0018-G82  1982-84 Volume 1
@@ -103,7 +103,7 @@ license:CC0
 
 	30  *EC0030-ENK  ENK Volume 3
 	31  *EC0031-ATS  Artist Selection Volume 4 - Ishihara Yūjirō
-	32  *EC0032-ANM  ANM Volume 2
+	32  *EC0032-ANM  AniSon Club Volume 2 (abbreviated from Anime Song Club)
 	33  *EC0033-JPM  J-Pop Mix Volume 17
 	34  *EC0034-KID  Kid's Mix Volume 3
 	35  *EC0035-ATS  Artist Selection Volume 5 - Matsuda Seiko
@@ -283,9 +283,10 @@ license:CC0
 	</software>
 
 	<software name="ec0009">
-		<description>ANM Volume 1 (Japan) (EC0009-ANM)</description>
+		<description>AniSon Club Volume 1 - Gachaman no Uta, Cutie Honey, Mazinger Z, Zankokuna Tenshi na Thesis (Japan) (EC0009-ANM)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="アニソンクラブ Vol.1 ガッチマンの歌 キューティーハニー マジンガーＺ 残酷な天使のテーゼ" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0009-anm.u1" size="0x100000" crc="1dbbd209" sha1="b8ca02ed1a36aa9caa067db95377cda107b1046b"/>
@@ -349,7 +350,7 @@ license:CC0
 	</software>
 
 	<software name="ec0015">
-		<description>Artist Selection Volume 2 (unknown) (Japan) (EC0015-ATS)</description>
+		<description>Artist Selection Volume 2 (Shīna Ringo, Tomosaka Rie) (Japan) (EC0015-ATS)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
@@ -537,9 +538,10 @@ license:CC0
 	</software>
 
 	<software name="ec0032">
-		<description>ANM Volume 2 (Japan) (EC0032-ANM)</description>
+		<description>AniSon Club Volume 2 - Uchū Senkan Yamato, Tamashi no Refrain (Japan) (EC0032-ANM)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="アニソンクラブ Vol.2 宇宙戦艦ヤマト 魂のルフラン" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0032-anm.u1" size="0x100000" crc="6b46c0f8" sha1="c5d8cc10d89e5057b476d792509cabe333b0f497"/>
