@@ -18,28 +18,27 @@ license:CC0
 	G-2  *GC0002-BHT  Best Hit Volume 1
 	G-3  *GC0003-BAT  Best Artist Volume 2
 	G-4  *GC0004-BHT  Best Hit Volume 2
-	G-5   GC0005-TPJ  TV Pop Volume 1
+	G-5   GC0005-TPJ  TV Pop Junior Volume 1
 	G-6  *GC0006-BHT  Best Hit Volume 3
 	G-7  *GC0007-BAT  Best Artist Volume 3
 	G-8  *GC0008-MIN  mini-moni Volume 1
-	G-9   GC0009-TPJ  TV Pop Volume 3 (Volume 2 is 'P-2' in 'P' series)
+	G-9   GC0009-TPJ  TV Pop Junior Volume 3 (Volume 2 is 'P-2' in 'P' series)
 	G-10 *GC0010-BAT  Best Artist Volume 4
-	G-11 *GC0011-TPJ  TV Pop Volume 4
+	G-11 *GC0011-TPJ  TV Pop Junior Volume 4
 	G-12  GC0012-BHT  Best Hit Volume 5 (Volume 4 is 'P-1' in 'P' series)
 	G-13  GC0013-     (unknown) Volume 6
 	G-14 *GC0014-MIN  mini-moni Volume 2
 	G-15 *GC0015-BAT  Best Artist Volume 5
-	G-16 *GC0016-TPJ  TV Pop Volume 5
-	G-17 *GC0017-TPJ  TV Pop Volume 6
-	G-18 *GC0018-TPJ  TV Pop Volume 7
+	G-16 *GC0016-TPJ  TV Pop Junior Volume 5
+	G-17 *GC0017-TPJ  TV Pop Junior Volume 6
+	G-18 *GC0018-TPJ  TV Pop Junior Volume 7
 
 	(more? what's the G highest number?)
 
 	-->
 
 	<software name="gc0001">
-		<!-- Morning Musume, Petit Moni, Tanpopo -->
-		<description>Best Artist Volume 1 (Japan) (GC0001-BAT)</description>
+		<description>Best Artist Volume 1 (Morning Musume, Petit Moni, Tanpopo) (Japan) (GC0001-BAT)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ベストアーティスト Vol.1"/>
@@ -63,8 +62,7 @@ license:CC0
 	</software>
 
 	<software name="gc0003">
-		<!-- Utada Hikaru -->
-		<description>Best Artist Volume 2 (Japan) (GC0003-BAT)</description>
+		<description>Best Artist Volume 2 (Utada Hikaru) (Japan) (GC0003-BAT)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ベストアーティスト Vol.2"/>
@@ -100,8 +98,7 @@ license:CC0
 	</software>
 
 	<software name="gc0007">
-		<!-- Morning Musume, San-nin Matsuri, 7-nin Matsuri, 10-nin Matsuri -->
-		<description>Best Artist Volume 3 (Japan) (GC0007-BAT)</description>
+		<description>Best Artist Volume 3 (Morning Musume, San-nin Matsuri, 7-nin Matsuri, 10-nin Matsuri) (Japan) (GC0007-BAT)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ベストアーティスト Vol.3"/>
@@ -149,7 +146,7 @@ license:CC0
 	    Popira 2 however can make use of these pins -->
 
 	<software name="gc0010">
-		<description>Best Artist Volume 4 (Japan) (GC0010-BAT)</description>
+		<description>Best Artist Volume 4 (Morning Musume, Tanpopo, Petit Moni, Gotō Maki) (Japan) (GC0010-BAT)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ベストアーティスト Vol.4"/>
@@ -162,9 +159,10 @@ license:CC0
 	</software>
 
 	<software name="gc0011">
-		<description>TV Pop Volume 4 (Japan) (GC0011-TPJ)</description>
+		<description>TV Pop Junior Volume 4 (Japan) (GC0011-TPJ)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="TV POPジュニアVol.4"/>
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24lc02_gc0010"/>
 			<dataarea name="rom" size="0x100000">
@@ -190,8 +188,7 @@ license:CC0
 
 	<!-- G15 looks like G16- 74HC125 and 24LC02. -->
 	<software name="gc0015">
-		<!-- Morning Musume, Petit Moni, Tanpopo -->
-		<description>Best Artist Volume 5 (Japan) (GC0015-BAT)</description>
+		<description>Best Artist Volume 5 (Morning Musume, Petit Moni, Tanpopo) (Japan) (GC0015-BAT)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ベストアーティスト Vol.5"/>
@@ -204,7 +201,7 @@ license:CC0
 	</software>
 
 	<software name="gc0016">
-		<description>TV Pop Volume 5 (Japan) (GC0016-TPJ)</description>
+		<description>TV Pop Junior Volume 5 (Japan) (GC0016-TPJ)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="TV POPジュニアvol.5"/>
@@ -217,7 +214,7 @@ license:CC0
 	</software>
 
 	<software name="gc0017">
-		<description>TV Pop Volume 6 (Japan) (GC0017-TPJ)</description>
+		<description>TV Pop Junior Volume 6 (Japan) (GC0017-TPJ)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="TV POPジュニアvol.6"/>
@@ -230,9 +227,10 @@ license:CC0
 	</software>
 
 	<software name="gc0018">
-		<description>TV Pop Volume 7 (Japan) (GC0018-TPJ)</description>
+		<description>TV Pop Junior Volume 7 (Japan) (GC0018-TPJ)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="TV POPジュニアvol.7"/>
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24lc02"/>	<!-- with 74HC125 -->
 			<dataarea name="rom" size="0x100000">

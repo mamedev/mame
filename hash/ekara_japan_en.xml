@@ -22,9 +22,10 @@ license:CC0
 	-->
 
 	<software name="en3">
-		<description>Enka Collection - Volume 3 (Japan) (EN-3)</description>
+		<description>Enka-shū Dai San-hen (Japan) (EN-3)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌集 第三篇" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="en-3.u1" size="0x100000" crc="e3686ff4" sha1="e7e9a53a778739c406b2b226300d2f525cd9676b"/>

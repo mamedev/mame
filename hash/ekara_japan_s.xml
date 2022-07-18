@@ -19,7 +19,7 @@ license:CC0
 	S-4  *SC0004-SAI  Saiten Cartridge Enka no Tatsujin
 	S-5  *SC0005-SAI  Saiten Cartridge Nesshō vol. 1
 	S-6  *SC0006-SAI  Saiten Cartridge Nesshō vol. 2
-	S-7  *SC0007-DCS  Detective Conan Volume 1
+	S-7  *SC0007-DCS  Saiten Cartridge Detective Conan Volume 1
 	S-8   SC0008-SAI  Saiten Cartridge Challenge Idol vol.2
 	S-9  *SC0009-SAI  Saiten Cartridge Nesshō vol. 3
 	S-10 *SC0010-HKW  Hikawa Kiyoshi no Karaoke Dōjō
@@ -27,7 +27,7 @@ license:CC0
 	S-12 *SC0012-SAI  Saiten Cartridge Challenge Idol vol.3
 	S-13  SC0013-     Saiten Cartridge Nesshō vol. 4
 	S-14  SC0014-     Saiten Cartridge Challenge Idol vol.4
-	S-15 *SC0015-DCS  Detective Conan Volume 2
+	S-15 *SC0015-DCS  Saiten Cartridge Detective Conan Volume 2
 	S-16  SC0016-SAI  Saiten Cartridge Nesshō vol. 5
 	S-17  SC0017-     unknown(1) Volume 2
 	S-18 *SC0018-SAI  Saiten Cartridge Challenge Artist
@@ -105,9 +105,10 @@ license:CC0
 	</software>
 
 	<software name="sc0007">
-		<description>Detective Conan Volume 1 (Japan) (SC0007-DCS)</description>
+		<description>Saiten Cartridge Detective Conan Volume 1 (Japan) (SC0007-DCS)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ 名探偵コナン Vol.1"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="sc0007-dcs.u1" size="0x200000" crc="5b8cf5ee" sha1="b31e610110fda7c7b49e7318d3191967fcf49ed8"/>
@@ -154,9 +155,10 @@ license:CC0
 
 	
 	<software name="sc0015">
-		<description>Detective Conan Volume 2 (Japan) (SC0015-DCS)</description>
+		<description>Saiten Cartridge Detective Conan Volume 2 (Japan) (SC0015-DCS)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ 名探偵コナン Vol.2"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="sc0015-dcs.u1" size="0x200000" crc="a1b31faa" sha1="e5508940c5e674a1e12ef2cc9a5d10365ac4fa64"/>
