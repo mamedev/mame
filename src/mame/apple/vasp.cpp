@@ -166,6 +166,8 @@ void vasp_device::device_reset()
 	m_pseudovia_regs[1] = 0x06;
 	m_pseudovia_regs[2] = 0x7f;
 	m_pseudovia_regs[3] = 0;
+	m_pseudovia_ier = 0;
+	m_pseudovia_ifr = 0;
 	m_via_interrupt = m_via2_interrupt = m_scc_interrupt = 0;
 	m_last_taken_interrupt = -1;
 
