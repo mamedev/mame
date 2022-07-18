@@ -1058,8 +1058,8 @@ license:CC0
 	<software name="ec0077">
 		<description>Artist Selection Volume 15 (Kuwata Keisuke, Southern All Stars) (Japan) (EC0077-ATS)</description>
 		<year>2001</year>
-		<info name="alt_title" value="アーティストセレクション Vol.15 (桑田佳祐 他)" />
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストセレクション Vol.15 (桑田佳祐 他)" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0077-ats.u1" size="0x100000" crc="368b0daf" sha1="8274a06ca2e3dbcd5176ac1b916be4a5a0df12ef"/>
