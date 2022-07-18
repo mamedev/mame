@@ -193,7 +193,7 @@ void device_rtc_interface::advance_days()
 	{
 		int month_end_day = gregorian_days_in_month(m_register[RTC_MONTH], m_register[RTC_YEAR]);
 
-		if (!rtc_feature_leap_year() && m_register[RTC_MONTH] == 2 && month_end_day == 29)
+		if (!rtc_feature_leap_year() && m_register[RTC_MONTH] == 2)
 			month_end_day = 28;
 
 		if (m_register[RTC_DAY] > month_end_day)
