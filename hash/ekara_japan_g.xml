@@ -21,7 +21,7 @@ license:CC0
 	G-5   GC0005-TPJ  TV Pop Junior Volume 1
 	G-6  *GC0006-BHT  Best Hit Volume 3
 	G-7  *GC0007-BAT  Best Artist Volume 3
-	G-8  *GC0008-MIN  mini-moni Volume 1
+	G-8  *GC0008-MIN  mini-moni
 	G-9   GC0009-TPJ  TV Pop Junior Volume 3 (Volume 2 is 'P-2' in 'P' series)
 	G-10 *GC0010-BAT  Best Artist Volume 4
 	G-11 *GC0011-TPJ  TV Pop Junior Volume 4
@@ -110,7 +110,7 @@ license:CC0
 	</software>
 
 	<software name="gc0008">
-		<description>mini-moni Volume 1 (Japan) (GC0008-MIN) (set 1)</description>
+		<description>mini-moni (Japan) (GC0008-MIN) (set 1)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ミニモニ。"/>
@@ -122,7 +122,7 @@ license:CC0
 	</software>
 
 	<software name="gc0008a" cloneof="gc0008">
-		<description>mini-moni Volume 1 (Japan) (GC0008-MIN) (set 2)</description>
+		<description>mini-moni (Japan) (GC0008-MIN) (set 2)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ミニモニ。"/>

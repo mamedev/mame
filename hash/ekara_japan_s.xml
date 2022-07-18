@@ -13,7 +13,7 @@ license:CC0
   This is the 'Saiten Cartridge' (Scoring Cartridge) series with all titles ranking you on
   your performance
 
-	S-1  *SC0001-KTY  Hello Kitty Special
+	S-1  *SC0001-KTY  Hello Kitty Vol.1
 	S-2   SC0002-SAI  Saiten Cartridge Challenge Idol vol.1
 	S-3  *SC0003-     Kids' Challenge Volume 1
 	S-4  *SC0004-SAI  Saiten Cartridge Enka no Tatsujin
@@ -44,9 +44,10 @@ license:CC0
 	<!-- these have unique presentation -->
 
 	<software name="sc0001">
-		<description>Hello Kitty Special (Japan) (SC0001-KTY)</description>
+		<description>Hello Kitty Volume 1 (Japan) (SC0001-KTY)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="ハローキティ Vol.1"/> <!-- from box art -->
 		<info name="alt_title" value="ハローキティ"/> <!-- from title screen -->
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
