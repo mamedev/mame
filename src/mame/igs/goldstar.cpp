@@ -11556,6 +11556,32 @@ ROM_START( cmasterk )
 	ROM_LOAD( "prom3.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 ROM_END
 
+ROM_START( ll3 ) // WANG QL-1  V3.03 string
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "min bet 8.u1", 0x00000, 0x10000, CRC(f19d0af3) SHA1(deefe5782213d60d8d0aae6826aa6a0109925289) ) // on sub PCB
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "lucky line iii rom 7.u16", 0x00000, 0x8000, CRC(304f9630) SHA1(78089e9d59e471e4cd70fbf254e46dc0c0729957) )
+	ROM_LOAD( "lucky line iii rom 6.u11", 0x08000, 0x8000, CRC(1afe38d9) SHA1(cf247634b80f72c8288e49b7c5628b5cc9e555d3) )
+	ROM_LOAD( "lucky line iii rom 5.u4",  0x10000, 0x8000, CRC(e7660d2c) SHA1(1df9553bfaaf94ca076cea772dc72b6b5cb2c557) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "lucky line iii rom 4.u15",  0x0000, 0x2000, CRC(f9d75b29) SHA1(b56572fcfc2a20f45f241ec433e1fa813cb3e260) )
+	ROM_LOAD( "lucky line iii rom 3.u10",  0x2000, 0x2000, CRC(104eda10) SHA1(71b77dbf0c34d2186ac25e906da406fc74c180fc) )
+	ROM_LOAD( "lucky line iii rom 2.u14",  0x4000, 0x2000, CRC(14369397) SHA1(32dc356d333e9b439e490407cef9eb70c44e86a4) )
+	ROM_LOAD( "lucky line iii rom 1.u9",   0x6000, 0x2000, CRC(626947e5) SHA1(13b7dd7fad4659ddc6a82883f1da5a8dd09e46b5) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "lucky line iii rom 8.u53",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "prom1.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "prom2.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "prom3.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
 
 ROM_START( cmast99 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -18836,6 +18862,26 @@ void cmaster_state::init_cmtetrsd()
 	init_cm();
 }
 
+void cmaster_state::init_ll3() // verified with ICE dump
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	// swap some 0x1000 blocks around
+	for (int i = 0x0000; i < 0x1000; i ++)
+	{
+		std::swap(rom[i], rom[0x8000 + i]);
+		std::swap(rom[0x5000 + i], rom[0x7000 + i]);
+	}
+
+	// swap some 0x800 blocks around
+	for (int i = 0x000; i < 0x800; i ++)
+	{
+		std::swap(rom[0x1800 + i], rom[0x4800 + i]);
+		std::swap(rom[0x2800 + i], rom[0xa800 + i]);
+		std::swap(rom[0x6800 + i], rom[0x9800 + i]);
+	}
+}
+
 void goldstar_state::init_cmast91()
 {
 	uint8_t *rom = memregion("maincpu")->base();
@@ -19826,6 +19872,7 @@ GAMEL( 1991, cmasterj,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,
 GAMEL( 1991, cmasterk,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 11, TAKE stops all)", 0,          layout_cmasterb )
 GAMEL( 199?, super7,    cmaster,  super7,   cmaster,  cmaster_state,  init_super7,    ROT0, "bootleg",           "Super Seven",                                 MACHINE_NOT_WORKING, layout_cmasterb ) // bad palette, no reels, decryption might be missing something, too
 GAME ( 199?, wcat3a,    wcat3,    chryangl, cmaster,  cmaster_state,  init_wcat3a,    ROT0, "E.A.I.",            "Wild Cat 3 (CMV4 hardware)",                  MACHINE_NOT_WORKING ) // does not boot. Wrong decryption, wrong machine or wrong what?
+GAMEL( 199?, ll3,       cmaster,  cm,       cmasterb, cmaster_state,  init_ll3,       ROT0, "bootleg",           "Lucky Line III",                              MACHINE_NOT_WORKING, layout_cmasterb )  // not looked at yet
 
 GAMEL( 1991, tonypok,   0,        cm,       tonypok,  cmaster_state,  init_tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",       0 ,                layout_tonypok )
 GAME(  1999, jkrmast,   0,        pkrmast,  pkrmast,  goldstar_state, init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master (V515)",                         MACHINE_NOT_WORKING ) // encryption broken, needs GFX and controls
