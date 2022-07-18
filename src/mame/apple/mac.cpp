@@ -7,7 +7,6 @@
 
     TODO:
         - V8 and friends (LC, LC2, Classic 2, Color Classic) to own driver
-        - IIvx / IIvi to own driver
 
 ****************************************************************************/
 
@@ -461,25 +460,6 @@ void mac_state::maclc_map(address_map &map)
 	map(0xf40000, 0xfbffff).ram().share("vram");
 }
 
-void mac_state::maclc3_map(address_map &map)
-{
-	map(0x40000000, 0x400fffff).rom().region("bootrom", 0).mirror(0x0ff00000);
-
-	map(0x50000000, 0x50001fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
-	map(0x50004000, 0x50005fff).rw(FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w)).mirror(0x00f00000);
-	map(0x50006000, 0x50007fff).rw(FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w)).mirror(0x00f00000);
-	map(0x50010000, 0x50011fff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w)).mirror(0x00f00000);
-	map(0x50012000, 0x50013fff).rw(FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w)).mirror(0x00f00000);
-	map(0x50014000, 0x50015fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x00f00000);
-	map(0x50016000, 0x50017fff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w)).mirror(0x00f00000);
-	map(0x50024000, 0x50025fff).w(FUNC(mac_state::ariel_ramdac_w)).mirror(0x00f00000);
-	map(0x50026000, 0x50027fff).rw(FUNC(mac_state::mac_rbv_r), FUNC(mac_state::mac_rbv_w)).mirror(0x00f00000);
-
-	map(0x5ffffffc, 0x5fffffff).r(FUNC(mac_state::mac_read_id));
-
-	map(0x60000000, 0x600fffff).ram().mirror(0x0ff00000).share("vram");
-}
-
 void mac_state::macii_map(address_map &map)
 {
 	map(0x40000000, 0x4003ffff).rom().region("bootrom", 0).mirror(0x0ffc0000);
@@ -908,33 +888,6 @@ void mac_state::maccclas(machine_config &config)
 	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b_cdadb));
 }
 
-void mac_state::maciivx(machine_config &config)
-{
-	maclc(config, false, true, asc_device::asc_type::VASP);
-
-	M68030(config, m_maincpu, C32M);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maclc3_map);
-	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
-
-	MCFG_VIDEO_START_OVERRIDE(mac_state,macv8)
-	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macrbv)
-
-	m_screen->set_screen_update(FUNC(mac_state::screen_update_macrbvvram));
-
-	add_nubus(config, false);
-
-	m_ram->set_default_size("4M");
-	m_ram->set_extra_options("8M,12M,16M,20M,24M,28M,32M,36M,40M,44M,48M,52M,56M,60M,64M");
-
-	m_egret->set_type(EGRET_341S0851);
-}
-
-void mac_state::maciivi(machine_config &config)
-{
-	maciivx(config);
-	m_maincpu->set_clock(C15M);
-}
-
 void mac_state::maciix(machine_config &config, bool nubus_bank1, bool nubus_bank2)
 {
 	macii(config, false, asc_device::asc_type::ASC, true, nubus_bank1, nubus_bank2);
@@ -1161,16 +1114,6 @@ ROM_START( maciisi )
 	ROM_LOAD( "36b7fb6c.rom", 0x000000, 0x080000, CRC(f304d973) SHA1(f923de4125aae810796527ff6e25364cf1d54eec) )
 ROM_END
 
-ROM_START( maciivx )
-	ROM_REGION32_BE(0x100000, "bootrom", 0)
-	ROM_LOAD( "4957eb49.rom", 0x000000, 0x100000, CRC(61be06e5) SHA1(560ce203d65178657ad09d03f532f86fa512bb40) )
-ROM_END
-
-ROM_START( maciivi )
-	ROM_REGION32_BE(0x100000, "bootrom", 0)
-	ROM_LOAD( "4957eb49.rom", 0x000000, 0x100000, CRC(61be06e5) SHA1(560ce203d65178657ad09d03f532f86fa512bb40) )
-ROM_END
-
 ROM_START( macclas2 )
 	ROM_REGION32_BE(0x100000, "bootrom", 0) // 3193670e
 	//ROM_LOAD( "3193670e.rom", 0x000000, 0x080000, CRC(96d2e1fd) SHA1(50df69c1b6e805e12a405dc610bc2a1471b2eac2) )
@@ -1208,5 +1151,3 @@ COMP( 1990, maciisi,   0,        0,      maciisi,  maciici, mac_state, init_maci
 COMP( 1991, macclas2,  0,        0,      macclas2, macadb,  mac_state, init_macclassic2,   "Apple Computer", "Macintosh Classic II", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND )
 COMP( 1991, maclc2,    0,        0,      maclc2,   maciici, mac_state, init_maclc2,        "Apple Computer", "Macintosh LC II",  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )
 COMP( 1993, maccclas,  0,        0,      maccclas, macadb,  mac_state, init_maclrcclassic, "Apple Computer", "Macintosh Color Classic", MACHINE_NOT_WORKING )
-COMP( 1993, maciivx,   0,        0,      maciivx,  maciici, mac_state, init_maciivx,       "Apple Computer", "Macintosh IIvx", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND )
-COMP( 1993, maciivi,   maciivx,  0,      maciivi,  maciici, mac_state, init_maciivi,       "Apple Computer", "Macintosh IIvi", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND )
