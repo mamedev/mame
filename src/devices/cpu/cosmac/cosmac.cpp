@@ -1500,10 +1500,10 @@ void cosmac_device::xid()   { m_xie = 0; }
 void cosmac_device::cie()   { m_cie = 1; }
 void cosmac_device::cid()   { m_cie = 0; }
 
-void cosmac_device::scm1()  { m_cnt_mode = 2; }
-void cosmac_device::scm2()  { m_cnt_mode = 3; }
-void cosmac_device::spm1()  { m_cnt_mode = 4; }
-void cosmac_device::spm2()  { m_cnt_mode = 5; }
+void cosmac_device::scm1()  { stop_count(); m_cnt_mode = 2; }
+void cosmac_device::scm2()  { stop_count(); m_cnt_mode = 3; }
+void cosmac_device::spm1()  { stop_count(); m_cnt_mode = 4; }
+void cosmac_device::spm2()  { stop_count(); m_cnt_mode = 5; }
 
 void cosmac_device::gec()   { D = get_count(); }
 void cosmac_device::stpc()  { stop_count(); }

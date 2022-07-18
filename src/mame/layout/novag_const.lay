@@ -7,6 +7,8 @@ license:CC0
 <!-- define elements -->
 
 	<element name="red"><rect><color red="0.75" green="0.25" blue="0.05" /></rect></element>
+	<element name="whitew"><rect><color red="1" green="1" blue="1" /></rect></element>
+	<element name="whitem"><rect><color red="0.31" green="0.43" blue="0.49" /></rect></element>
 
 	<element name="ledr" defstate="0">
 		<rect state="1"><color red="1.0" green="0.1" blue="0.15" /></rect>
@@ -55,37 +57,19 @@ license:CC0
 	<element name="text_rg6"><text string="Black"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_rg7"><text string="White"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 
-	<element name="text_king1"><text string="[K]"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_queen1"><text string="[Q]"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_rook1"><text string="[R]"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_bishop1"><text string="[B]"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_knight1"><text string="[N]"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_pawn1"><text string="[P]"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_p1"><image file="chess/wk.svg"></image></element>
+	<element name="text_p2"><image file="chess/wq.svg"></image></element>
+	<element name="text_p3"><image file="chess/wb.svg"></image></element>
+	<element name="text_p4"><image file="chess/wn.svg"></image></element>
+	<element name="text_p5"><image file="chess/wr.svg"></image></element>
+	<element name="text_p6"><image file="chess/wp.svg"></image></element>
 
-	<element name="text_king2">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="[K]"><color red="0.5" green="0.37" blue="0.3" /></text>
-	</element>
-	<element name="text_queen2">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="[Q]"><color red="0.5" green="0.37" blue="0.3" /></text>
-	</element>
-	<element name="text_rook2">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="[R]"><color red="0.5" green="0.37" blue="0.3" /></text>
-	</element>
-	<element name="text_bishop2">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="[B]"><color red="0.5" green="0.37" blue="0.3" /></text>
-	</element>
-	<element name="text_knight2">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="[N]"><color red="0.5" green="0.37" blue="0.3" /></text>
-	</element>
-	<element name="text_pawn2">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="[P]"><color red="0.5" green="0.37" blue="0.3" /></text>
-	</element>
+	<element name="text_p7"><image file="chess/bk.svg"></image></element>
+	<element name="text_p8"><image file="chess/bq.svg"></image></element>
+	<element name="text_p9"><image file="chess/bb.svg"></image></element>
+	<element name="text_p10"><image file="chess/bn.svg"></image></element>
+	<element name="text_p11"><image file="chess/br.svg"></image></element>
+	<element name="text_p12"><image file="chess/bp.svg"></image></element>
 
 	<element name="text_rb01a">
 		<rect><color red="0.5" green="0.37" blue="0.3" /></rect>
@@ -508,21 +492,35 @@ license:CC0
 		<element ref="text_rb17b"><bounds x="95.5" y="70.3" width="9" height="1.5" /></element>
 		<element ref="text_rb18"><bounds x="95.5" y="74.2" width="9" height="1.5" /></element>
 
-		<element ref="cwhite"><bounds x="88" y="6" width="6" height="4" /></element>
-		<element ref="cwhite"><bounds x="88" y="16" width="6" height="4" /></element>
-		<element ref="cwhite"><bounds x="88" y="26" width="6" height="4" /></element>
-		<element ref="cwhite"><bounds x="88" y="36" width="6" height="4" /></element>
-		<element ref="cwhite"><bounds x="88" y="46" width="6" height="4" /></element>
-		<element ref="cwhite"><bounds x="88" y="56" width="6" height="4" /></element>
+		<element ref="whitew"><bounds x="88" y="6" width="6" height="4" /></element>
+		<element ref="whitew"><bounds x="88" y="16" width="6" height="4" /></element>
+		<element ref="whitew"><bounds x="88" y="26" width="6" height="4" /></element>
+		<element ref="whitew"><bounds x="88" y="36" width="6" height="4" /></element>
+		<element ref="whitew"><bounds x="88" y="46" width="6" height="4" /></element>
+		<element ref="whitew"><bounds x="88" y="56" width="6" height="4" /></element>
 		<element ref="cwhite"><bounds x="88" y="66" width="6" height="4" /></element>
 		<element ref="cwhite"><bounds x="88" y="76" width="6" height="4" /></element>
 
-		<element ref="text_king2"><bounds x="88" y="6.7" width="6" height="2.2" /></element>
-		<element ref="text_queen2"><bounds x="88" y="16.7" width="6" height="2.2" /></element>
-		<element ref="text_bishop2"><bounds x="88" y="26.7" width="6" height="2.2" /></element>
-		<element ref="text_knight2"><bounds x="88" y="36.7" width="6" height="2.2" /></element>
-		<element ref="text_rook2"><bounds x="88" y="46.7" width="6" height="2.2" /></element>
-		<element ref="text_pawn2"><bounds x="88" y="56.7" width="6" height="2.2" /></element>
+		<element ref="text_p7"><bounds x="89.55" y="6.45"  width="2.9" height="2.9" /></element>
+		<element ref="text_p8"><bounds x="89.55" y="16.45" width="2.9" height="2.9" /></element>
+		<element ref="text_p9"><bounds x="89.55" y="26.45" width="2.9" height="2.9" /></element>
+		<element ref="text_p10"><bounds x="89.55" y="36.45" width="2.9" height="2.9" /></element>
+		<element ref="text_p11"><bounds x="89.55" y="46.45" width="2.9" height="2.9" /></element>
+		<element ref="text_p12"><bounds x="89.55" y="56.45" width="2.9" height="2.9" /></element>
+
+		<element ref="whitem" blend="multiply"><bounds x="88" y="6" width="6" height="4" /></element>
+		<element ref="whitem" blend="multiply"><bounds x="88" y="16" width="6" height="4" /></element>
+		<element ref="whitem" blend="multiply"><bounds x="88" y="26" width="6" height="4" /></element>
+		<element ref="whitem" blend="multiply"><bounds x="88" y="36" width="6" height="4" /></element>
+		<element ref="whitem" blend="multiply"><bounds x="88" y="46" width="6" height="4" /></element>
+		<element ref="whitem" blend="multiply"><bounds x="88" y="56" width="6" height="4" /></element>
+
+		<element ref="cblack" blend="add"><bounds x="88" y="6" width="6" height="4" /></element>
+		<element ref="cblack" blend="add"><bounds x="88" y="16" width="6" height="4" /></element>
+		<element ref="cblack" blend="add"><bounds x="88" y="26" width="6" height="4" /></element>
+		<element ref="cblack" blend="add"><bounds x="88" y="36" width="6" height="4" /></element>
+		<element ref="cblack" blend="add"><bounds x="88" y="46" width="6" height="4" /></element>
+		<element ref="cblack" blend="add"><bounds x="88" y="56" width="6" height="4" /></element>
 
 		<element ref="hlb" inputtag="IN.0" inputmask="0x02"><bounds x="88" y="6" width="6" height="4" /><color alpha="0.4" /></element>
 		<element ref="hlb" inputtag="IN.1" inputmask="0x02"><bounds x="88" y="16" width="6" height="4" /><color alpha="0.4" /></element>
@@ -551,6 +549,15 @@ license:CC0
 
 	<!-- right side leds -->
 
+		<element ref="text_p1"><bounds x="109" y="8.5"  width="2" height="2" /></element>
+		<element ref="text_p2"><bounds x="109" y="18.5" width="2" height="2" /></element>
+		<element ref="text_p3"><bounds x="109" y="28.5" width="2" height="2" /></element>
+		<element ref="text_p4"><bounds x="109" y="38.5" width="2" height="2" /></element>
+		<element ref="text_p5"><bounds x="109" y="48.5" width="2" height="2" /></element>
+		<element ref="text_p6"><bounds x="109" y="58.5" width="2" height="2" /></element>
+
+		<element ref="cwhite" blend="multiply"><bounds x="108" y="2.5" width="4" height="81" /></element>
+
 		<element ref="text_rg0"><bounds x="105" y="5.7" width="10" height="1.5" /></element>
 		<element ref="text_rg1"><bounds x="105" y="15.7" width="10" height="1.5" /></element>
 		<element ref="text_rg2"><bounds x="105" y="25.7" width="10" height="1.5" /></element>
@@ -559,13 +566,6 @@ license:CC0
 		<element ref="text_rg5"><bounds x="105" y="55.7" width="10" height="1.5" /></element>
 		<element ref="text_rg6"><bounds x="105" y="65.7" width="10" height="1.5" /></element>
 		<element ref="text_rg7"><bounds x="105" y="75.7" width="10" height="1.5" /></element>
-
-		<element ref="text_king1"><bounds x="105.2" y="8.7" width="10" height="1.5" /></element>
-		<element ref="text_queen1"><bounds x="105.2" y="18.7" width="10" height="1.5" /></element>
-		<element ref="text_bishop1"><bounds x="105.2" y="28.7" width="10" height="1.5" /></element>
-		<element ref="text_knight1"><bounds x="105.2" y="38.7" width="10" height="1.5" /></element>
-		<element ref="text_rook1"><bounds x="105.2" y="48.7" width="10" height="1.5" /></element>
-		<element ref="text_pawn1"><bounds x="105.2" y="58.7" width="10" height="1.5" /></element>
 
 		<element name="0.0" ref="ledg"><bounds x="109" y="7.5" width="2" height="1" /></element>
 		<element name="0.1" ref="ledg"><bounds x="109" y="17.5" width="2" height="1" /></element>
