@@ -12,18 +12,18 @@ license:CC0
 	M-2   MC0002-ATM  Artist Mini Volume 2 (untranslated artist)
 	M-3   MC0003-ATM  Artist Mini Volume 3 (untranslated artist)
 	M-4  *MC0004-ATM  Artist Mini Volume 4 (w-inds)
-	M-5  *MC0005-KSM  Kids Song Mini Volume 1
-	M-6  *MC0006-KSM  Kids Song Mini Volume 2
-	M-7  *MC0007-ATM  Artist Mini Volume 5 (SMAP, KinKi Kids)
+	M-5  *MC0005-KSM  Kids Song Mini Volume 1 (TV Song)
+	M-6  *MC0006-KSM  Kids Song Mini Volume 2 (TV Hero)
+	M-7  *MC0007-ATM  Artist Mini Volume 5 (SMAP, KinKi Kids, ARASHI, TOKIO)
 	M-8   MC0008-     Kids Song Mini Vol 3 (or maybe TPM TV Pop Mini Vol 3?)
 	M-9   MC0009-     JPop Mix Mini Volume 1
 	M-10  MC0010-ATM  Artist Mini Volume 6 (untranslated artist)
-	M-11  MC0011-     Kids Song Mini Volume 4
+	M-11  MC0011-     Kids Song Mini Volume 4 (Fantastic)
 	M-12 *MC0012-ATM  Artist Mini Volume 7 (Ayumi Hamasaki)
 	M-13 *MC0013-KSM  Kids Song Mini Volume 5
 	M-14 *MC0014-ATM  Artist Mini Volume 8 (BoA)
 	M-15  MC0015-     Kids Song Mini Volume 6 (or maybe TPM TV Pop Mini Vol 6?)
-	M-16  MC0016-ATM  Artist Mini Volume 9  (untranslated artist)
+	M-16  MC0016-ATM  Artist Mini Volume 9  (Yamaguchi Momoe)
 	M-17  MC0017-     Kids Song Mini Volume 7 (or maybe TPM TV Pop Mini Vol 7?)
 
 	unsure of KSM / TMP naming,  MC0005/0006/0008/0011/0013/0015/0017 all seem to be the same series
@@ -53,7 +53,7 @@ license:CC0
 		<description>Artist Mini Volume 4 (w-inds) (Japan) (MC0004-ATM)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="アーティストミニ mini vol.4"/>
+		<info name="alt_title" value="アーティストミニ mini vol.4 (w-inds.)"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0004-atm.u1" size="0x080000" crc="e9ba14c1" sha1="3cad1a6b0d1ba24dfb6c1aec84a6d87816b16d54"/>
@@ -62,10 +62,10 @@ license:CC0
 	</software>
 
 	<software name="mc0005">
-		<description>Kids Song Mini Volume 1 (Japan) (MC0005-KSM)</description>
+		<description>Kids Song Mini Volume 1 (TV Song) (Japan) (MC0005-KSM)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="キッズソングミニ mini vol.1"/>
+		<info name="alt_title" value="キッズソングミニ mini vol.1 (TVソング)"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0005-ksm.u1" size="0x080000" crc="a84c6d0d" sha1="dee82de4609ec93ed5152d01860e59d8693b9736"/>
@@ -74,10 +74,10 @@ license:CC0
 	</software>
 
 	<software name="mc0006">
-		<description>Kids Song Mini Volume 2 (Japan) (MC0006-KSM)</description>
+		<description>Kids Song Mini Volume 2 (TV Hero) (Japan) (MC0006-KSM)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="キッズソングミニ mini vol.2"/>
+		<info name="alt_title" value="キッズソングミニ mini vol.2 (TVヒーロー)"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0006-ksm.u1" size="0x080000" crc="6d3c8c02" sha1="568a0e156a2189156149578277b6d615fe4e157f"/>
@@ -86,10 +86,10 @@ license:CC0
 	</software>
 
 	<software name="mc0007">
-		<description>Artist Mini Volume 5 (SMAP, KinKi Kids) (Japan) (MC0007-ATM)</description>
+		<description>Artist Mini Volume 5 (SMAP, KinKi Kids, ARASHI, TOKIO) (Japan) (MC0007-ATM)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="アーティストミニ mini vol.5"/>
+		<info name="alt_title" value="アーティストミニ mini vol.5 (SMAP・KinKi Kids・嵐 他)"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0007-atm.u1" size="0x080000" crc="a9a19914" sha1="556adfad645ae635901b690ee57173766a5e497a"/>
@@ -102,7 +102,7 @@ license:CC0
 		<description>Artist Mini Volume 7 (Hamasaki Ayumi) (Japan) (MC0012-ATM)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="アーティストミニ mini vol.7"/>
+		<info name="alt_title" value="アーティストミニ mini vol.7 (浜崎あゆみ)"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0012-atm.u1" size="0x080000" crc="f31d3de9" sha1="41e4de960b2f348a4bed3b9b6d51229878e8c8f3"/>
@@ -126,7 +126,7 @@ license:CC0
 		<description>Artist Mini Volume 8 (BoA) (Japan) (MC0014-ATM)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="アーティストミニ mini vol.8"/>
+		<info name="alt_title" value="アーティストミニ mini vol.8 (BoA)"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0014-atm.u1" size="0x080000" crc="170e02af" sha1="02b38146db7d74727f7dccf6dcc3d004979210a1"/>
