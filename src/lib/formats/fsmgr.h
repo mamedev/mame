@@ -290,7 +290,7 @@ public:
 	struct floppy_enumerator {
 		virtual ~floppy_enumerator() = default;
 
-		virtual void add(const floppy_image_format_t &type, u32 image_size, const char *name, const char *description) = 0;
+		virtual void add(const floppy_image_format_t &type, u32 form_factor, u32 variant, u32 image_size, const char *name, const char *description) = 0;
 		virtual void add_raw(const char *name, u32 key, const char *description) = 0;
 	};
 
@@ -312,7 +312,7 @@ public:
 	virtual const char *name() const = 0;
 	virtual const char *description() const = 0;
 
-	virtual void enumerate_f(floppy_enumerator &fe, u32 form_factor, const std::vector<u32> &variants) const;
+	virtual void enumerate_f(floppy_enumerator &fe) const;
 	virtual void enumerate_h(hd_enumerator &he) const;
 	virtual void enumerate_c(cdrom_enumerator &ce) const;
 
@@ -331,11 +331,11 @@ public:
 	// Create a filesystem object from a block device
 	virtual std::unique_ptr<filesystem_t> mount(fsblk_t &blockdev) const = 0;
 
-protected:
-	manager_t() = default;
-
 	static bool has(u32 form_factor, const std::vector<u32> &variants, u32 ff, u32 variant);
 	static bool has_variant(const std::vector<u32> &variants, u32 variant);
+
+protected:
+	manager_t() = default;
 };
 
 } // namespace fs

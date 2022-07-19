@@ -156,10 +156,11 @@ protected:
 	struct fs_enum : public fs::manager_t::floppy_enumerator {
 		floppy_image_device *m_fid;
 		const fs::manager_t *m_manager;
+		u32 m_best_8, m_best_525, m_best_35, m_best_3;
 
-		fs_enum(floppy_image_device *fid) : fs::manager_t::floppy_enumerator(), m_fid(fid) {}
+		fs_enum(floppy_image_device *fid);
 
-		virtual void add(const floppy_image_format_t &type, u32 image_size, const char *name, const char *description) override;
+		virtual void add(const floppy_image_format_t &type, u32 form_factor, u32 variant, u32 image_size, const char *name, const char *description) override;
 		virtual void add_raw(const char *name, u32 key, const char *description) override;
 	};
 

@@ -318,14 +318,87 @@ void floppy_image_device::setup_led_cb(led_cb cb)
 	cur_led_cb = cb;
 }
 
-void floppy_image_device::fs_enum::add(const floppy_image_format_t &type, u32 image_size, const char *name, const char *description)
+floppy_image_device::fs_enum::fs_enum(floppy_image_device *fid)
+	: fs::manager_t::floppy_enumerator()
+	, m_fid(fid)
 {
-	m_fid->m_fs.emplace_back(fs_info(m_manager, &type, image_size, name, description));
+	m_best_8 =
+		m_fid->form_factor == floppy_image::FF_8 ?
+		fs::manager_t::has_variant(m_fid->variants, floppy_image::DSDD) ? fs::unformatted_image::FSI_8_DSDD :
+		fs::manager_t::has_variant(m_fid->variants, floppy_image::DSSD) ? fs::unformatted_image::FSI_8_DSSD : fs::unformatted_image::FSI_8_SSSD
+		: fs::unformatted_image::FSI_NONE;
+
+	m_best_525 =
+		m_fid->form_factor == floppy_image::FF_525 ?
+		fs::manager_t::has_variant(m_fid->variants, floppy_image::DSHD) ? fs::unformatted_image::FSI_525_DSHD :
+		fs::manager_t::has_variant(m_fid->variants, floppy_image::DSQD) ? fs::unformatted_image::FSI_525_DSQD :
+		fs::manager_t::has_variant(m_fid->variants, floppy_image::DSDD) ? fs::unformatted_image::FSI_525_DSDD :
+		fs::manager_t::has_variant(m_fid->variants, floppy_image::SSQD) ? fs::unformatted_image::FSI_525_SSQD :
+		fs::manager_t::has_variant(m_fid->variants, floppy_image::SSDD) ? fs::unformatted_image::FSI_525_SSDD : fs::unformatted_image::FSI_525_SSSD
+		: fs::unformatted_image::FSI_NONE;
+
+	m_best_35 =
+		m_fid->form_factor == floppy_image::FF_35 ?
+		fs::manager_t::has_variant(m_fid->variants, floppy_image::DSDD) ? fs::unformatted_image::FSI_35_DSDD : fs::unformatted_image::FSI_35_SSDD
+		: fs::unformatted_image::FSI_NONE;
+
+	m_best_3 =
+		m_fid->form_factor == floppy_image::FF_3 ?
+		fs::manager_t::has_variant(m_fid->variants, floppy_image::DSDD) ? fs::unformatted_image::FSI_3_DSDD : fs::unformatted_image::FSI_3_SSDD
+		: fs::unformatted_image::FSI_NONE;
+}
+
+void floppy_image_device::fs_enum::add(const floppy_image_format_t &type, u32 form_factor, u32 variant, u32 image_size, const char *name, const char *description)
+{
+	if (fs::manager_t::has(m_fid->form_factor, m_fid->variants, form_factor, variant))
+		m_fid->m_fs.emplace_back(fs_info(m_manager, &type, image_size, name, description));
 }
 
 void floppy_image_device::fs_enum::add_raw(const char *name, u32 key, const char *description)
 {
-	m_fid->m_fs.emplace_back(fs_info(name, key, description));
+	std::optional<u32> best, variant;
+	switch (key)
+	{
+	case fs::unformatted_image::FSI_8_DSDD:
+	case fs::unformatted_image::FSI_8_DSSD:
+	case fs::unformatted_image::FSI_8_SSSD:
+		best = m_best_8;
+		break;
+
+	case fs::unformatted_image::FSI_525_DSHD:
+	case fs::unformatted_image::FSI_525_DSQD:
+	case fs::unformatted_image::FSI_525_DSDD:
+	case fs::unformatted_image::FSI_525_SSQD:
+	case fs::unformatted_image::FSI_525_SSDD:
+	case fs::unformatted_image::FSI_525_SSSD:
+		best = m_best_525;
+		break;
+
+	case fs::unformatted_image::FSI_525_DSSD:
+		// we don't check best_525 for this one
+		break;
+
+	case fs::unformatted_image::FSI_35_DSED:
+		variant = floppy_image::DSED;
+		break;
+
+	case fs::unformatted_image::FSI_35_DSHD:
+		variant = floppy_image::DSHD;
+		break;
+
+	case fs::unformatted_image::FSI_35_DSDD:
+	case fs::unformatted_image::FSI_35_SSDD:
+		best = m_best_35;
+		break;
+
+	case fs::unformatted_image::FSI_3_DSDD:
+	case fs::unformatted_image::FSI_3_SSDD:
+		best = m_best_3;
+		break;
+	}
+
+	if ((!best || key == best) && (variant && fs::manager_t::has_variant(m_fid->variants, key)))
+		m_fid->m_fs.emplace_back(fs_info(name, key, description));
 }
 
 void floppy_image_device::register_formats()
@@ -346,7 +419,7 @@ void floppy_image_device::register_formats()
 	for(const fs::manager_t *fmt : fr.m_fs)
 	{
 		fse.m_manager = fmt;
-		fmt->enumerate_f(fse, form_factor, variants);
+		fmt->enumerate_f(fse);
 		m_fs_managers.push_back(fmt);
 	}
 }

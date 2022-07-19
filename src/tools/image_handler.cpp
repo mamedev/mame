@@ -42,12 +42,16 @@ namespace {
 
 	struct fs_enum : public fs::manager_t::floppy_enumerator {
 		filesystem_format *m_format;
+		const std::vector<u32> &m_variants;
 
-		fs_enum(filesystem_format *format) : m_format(format) {}
+		fs_enum(filesystem_format *format, const std::vector<u32> &variants) : m_format(format), m_variants(variants) {}
 
-		virtual void add(const floppy_image_format_t &type, u32 image_size, const char *name, const char *description) override {
-			m_format->m_floppy = true;
-			m_format->m_floppy_create.emplace_back(std::make_unique<floppy_create_info>(m_format->m_manager, &type, image_size, name, description));
+		virtual void add(const floppy_image_format_t &type, u32 form_factor, u32 variant, u32 image_size, const char *name, const char *description) override {
+			if (fs::manager_t::has(floppy_image::FF_UNKNOWN, m_variants, form_factor, variant))
+			{
+				m_format->m_floppy = true;
+				m_format->m_floppy_create.emplace_back(std::make_unique<floppy_create_info>(m_format->m_manager, &type, image_size, name, description));
+			}
 		}
 
 		virtual void add_raw(const char *name, u32 key, const char *description) override {
@@ -65,8 +69,8 @@ void formats_table::init()
 	mame_formats_full_list(en);
 
 	for(auto &f : filesystem_formats) {
-		fs_enum fen(f.get());
-		f->m_manager->enumerate_f(fen, floppy_image::FF_UNKNOWN, variants);
+		fs_enum fen(f.get(), variants);
+		f->m_manager->enumerate_f(fen);
 	}
 
 	for(auto &f : floppy_format_infos) {

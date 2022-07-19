@@ -48,7 +48,7 @@ bool refcounted_inner::unref_weak()
 
 
 
-void manager_t::enumerate_f(floppy_enumerator &fe, u32 form_factor, const std::vector<u32> &variants) const
+void manager_t::enumerate_f(floppy_enumerator &fe) const
 {
 }
 

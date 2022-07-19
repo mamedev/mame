@@ -109,13 +109,10 @@ const char *fs::cbmdos_image::description() const
 //  enumerate_f
 //-------------------------------------------------
 
-void fs::cbmdos_image::enumerate_f(floppy_enumerator &fe, u32 form_factor, const std::vector<u32> &variants) const
+void fs::cbmdos_image::enumerate_f(floppy_enumerator &fe) const
 {
-	if (has(form_factor, variants, floppy_image::FF_525, floppy_image::SSSD))
-	{
-		fe.add(FLOPPY_D64_FORMAT, 174848, "d64_cbmdos_35", "D64 CBMDOS single-sided 35 tracks");
-		fe.add(FLOPPY_D64_FORMAT, 192256, "d64_cbmdos_40", "D64 CBMDOS single-sided 40 tracks");
-	}
+	fe.add(FLOPPY_D64_FORMAT, floppy_image::FF_525, floppy_image::SSSD, 174848, "d64_cbmdos_35", "D64 CBMDOS single-sided 35 tracks");
+	fe.add(FLOPPY_D64_FORMAT, floppy_image::FF_525, floppy_image::SSSD, 192256, "d64_cbmdos_40", "D64 CBMDOS single-sided 40 tracks");
 }
 
 
