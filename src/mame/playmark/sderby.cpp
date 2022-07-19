@@ -1296,6 +1296,22 @@ ROM_START( magictch )
 	ROM_LOAD( "gal22cv10-15lnc.u40", 0x000, 0x2e5, NO_DUMP ) // soldered
 ROM_END
 
+ROM_START( croupierb ) // identical PCB as magictch, but with 'ROULETTE' sticker and a Dallas DS1220Y instead of the M48Z02
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "12.u43", 0x00000, 0x20000, CRC(fe6c95f6) SHA1(9a90e15753fab2304a05192202456a3ee7adbc38) ) // TMS27C010A
+	ROM_LOAD16_BYTE( "13.u42", 0x00001, 0x20000, CRC(9e76bd67) SHA1(19951f6a1201feecf8caa79bff6b46508db0f999) ) // TMS27C010A
+
+	ROM_REGION( 0x080000, "oki", 0 )
+	ROM_LOAD( "1.u16", 0x00000, 0x40000, CRC(6673de85) SHA1(df390cd6268efc0e743a9020f19bc0cbeb757cfa) ) // TMS27C020, same as other croupier sets
+
+	ROM_REGION( 0x280000, "gfx", 0 )
+	ROM_LOAD( "8.u76", 0x000000, 0x80000, CRC(d3d1343b) SHA1(7ac8d84567920f9f0ad8cfd406de1eb39b65b93e) ) // MX27C4000DC
+	ROM_LOAD( "7.u77", 0x080000, 0x80000, CRC(c6563b8a) SHA1(6bb05ca006efc8cccf2f8eb6f696d0116a0e8302) ) // MX27C4000DC
+	ROM_LOAD( "6.u78", 0x100000, 0x80000, CRC(e1e181c2) SHA1(f60d3df5fd9c2841e4f6dc656f4ac3cab5c404c7) ) // MX27C4000DC
+	ROM_LOAD( "5.u79", 0x180000, 0x80000, CRC(2c59e118) SHA1(dffbd47f18276a11e964ec4a4bd3ff81d21e2a76) ) // MX27C4000DC
+	ROM_LOAD( "4.u80", 0x200000, 0x80000, CRC(f48c59f3) SHA1(5fd0ec940a50ec923790597723785cca10e81479) ) // MX27C4000DC
+ROM_END
+
 } // anonymous namespace
 
 
@@ -1310,5 +1326,6 @@ GAMEL( 1996, spacewin,  0,        spacewin, spacewin, sderby_state, empty_init, 
 GAME(  1996, shinygld,  0,        shinygld, shinygld, sderby_state, empty_init, ROT0, "Playmark", "Shiny Golds",                          0                                                                    )
 GAMEL( 1997, croupier,  0,        pmroulet, pmroulet, sderby_state, empty_init, ROT0, "Playmark", "Croupier (Playmark Roulette v.20.05)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_pmroulet )
 GAMEL( 1997, croupiera, croupier, pmroulet, pmroulet, sderby_state, empty_init, ROT0, "Playmark", "Croupier (Playmark Roulette v.09.04)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_pmroulet )
+GAMEL( 1997, croupierb, croupier, magictch, spacewin, sderby_state, empty_init, ROT0, "Playmark", "Croupier (Playmark Roulette v.03.09)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS,    layout_pmroulet ) // title screen says Croupier 2 but every string in ROM says Croupier. See magictch below for emulation problems
 GAME(  1996, luckboom,  0,        luckboom, luckboom, sderby_state, empty_init, ROT0, "Playmark", "Lucky Boom",                           0                                                                    )
 GAME(  1998, magictch,  0,        magictch, spacewin, sderby_state, empty_init, ROT0, "Playmark", "Magic Touch",                          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // wrong text layer hook up, stops during boot and needs debugger help to go in game, inputs aren't done, some scroll offsets are wrong
