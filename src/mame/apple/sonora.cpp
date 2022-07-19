@@ -138,6 +138,8 @@ void sonora_device::device_start()
 
 	m_rom_ptr = &m_rom[0];
 	m_rom_size = m_rom.length() << 2;
+
+	m_pseudovia_ier = m_pseudovia_ifr = 0;
 }
 
 //-------------------------------------------------

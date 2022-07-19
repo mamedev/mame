@@ -148,8 +148,8 @@ void vasp_device::device_start()
 	m_rom_ptr = &m_rom[0];
 	m_rom_size = m_rom.length() << 2;
 
-	m_pseudovia_ier = 0;
-	m_pseudovia_ifr = 0;
+	m_pseudovia_ier = m_pseudovia_ifr = 0;
+	m_pal_address = m_pal_idx = m_pal_control = m_pal_colkey = 0;
 }
 
 //-------------------------------------------------
