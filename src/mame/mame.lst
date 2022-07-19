@@ -15833,6 +15833,7 @@ ladylinrb                       // (c) 198? TAB Austria
 ladylinrc                       // (c) 198? TAB Austria
 ladylinrd                       // (c) 198? TAB Austria
 ladylinre                       // (c) 198? TAB Austria
+ll3                             // bootleg
 lucky8                          // (c) 1989 Wing Co. Ltd
 lucky8a                         // (c) 1989 Wing Co. Ltd
 lucky8b                         // (c) 1989 Wing Co. Ltd
@@ -20480,9 +20481,9 @@ lviv                            // Lviv/L'vov
 
 @source:capcom/lwings.cpp
 avengers                        // 2/1987 (c) 1987 (US)
-avengers2                       // 2/1987 (c) 1987 (US)
-avengers3                       // 2/1987 (c) 1987 (US)
-avengers4                       // 2/1987 (c) 1987 (US)
+avengersa                       // 2/1987 (c) 1987 (US)
+avengersb                       // 2/1987 (c) 1987 (US)
+avengersc                       // 2/1987 (c) 1987 (US)
 buraiken                        // 2/1987 (c) 1987 (Japan)
 buraikenb                       // 2/1987 (c) 1987 (Japan)
 fball                           //
@@ -20734,12 +20735,14 @@ maciicx                         // 1989 Apple Macintosh IIcx
 maciifx                         // 1990 Apple Macintosh IIfx
 maciihmu                        // 1987 Apple Macintosh II (w/o 68851 MMU)
 maciisi                         // 1990 Apple Macintosh IIsi
-maciivi                         // 1993 Apple Macintosh IIvi
-maciivx                         // 1993 Apple Macintosh IIvx
 maciix                          // 1988 Apple Macintosh IIx
 maclc                           // 1990 Apple Macintosh LC
 maclc2                          // 1991 Apple Macintosh LC II
 macse30                         // 1989 Apple Macintosh SE/30
+
+@source:apple/maciivx.cpp
+maciivx                         // 1993 Apple Macintosh IIvx
+maciivi                         // 1993 Apple Macintosh IIvi
 
 @source:apple/maclc3.cpp
 maclc3                          // 1993 Apple Macintosh LC III
@@ -23896,6 +23899,7 @@ mk4a                            // (c) 1997 Midway (v2.1)
 mk4b                            // (c) 1997 Midway (v1.0)
 thegrid                         // (c) 2001 Midway (v1.2) Latest offical release
 thegrida                        // (c) 2001 Midway (v1.1)
+thegridb                        // (c) 2001 Midway (v1.01)
 
 @source:skeleton/mightyframe.cpp
 mightyframe                     // Convergent
@@ -24155,6 +24159,7 @@ lastbrnx                        // 1996.06 Last Bronx (Export, Revision A)
 lastbrnxj                       // 1996.06 Last Bronx (Japan, Revision A)
 lastbrnxu                       // 1996.06 Last Bronx (USA, Revision A)
 manxtt                          // 1995.11 Manx T.T. DX (Revision D)
+manxtta                         // 1995.?? Manx T.T. (Revision A)
 manxttc                         // 1995.11 Manx T.T. (Revision C)
 motoraid                        // 1997.10 Motor Raid Twin
 motoraiddx                      // 1997.10 Motor Raid DX

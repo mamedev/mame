@@ -31,6 +31,7 @@ license:CC0
 		<description>A-1 Pichi Pichi Pitch vol.1 (Japan)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="ぴちぴちピッチ vol.1 " />
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24c08_epitch"/>
 			<dataarea name="rom" size="0x200000">
@@ -43,6 +44,7 @@ license:CC0
 		<description>A-3 Pichi Pichi Pitch vol.3 (Japan)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="ぴちぴちピッチ vol.3 " />
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24c08_epitch"/>
 			<dataarea name="rom" size="0x200000">
@@ -52,9 +54,10 @@ license:CC0
 	</software>
 
 	<software name="a4" supported="no">
-		<description>A-4 Pichi Pichi Pitch Pure Chapter 1 (Japan)</description>
+		<description>A-4 Pichi Pichi Pitch Pure Dai 1-shō (Japan)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="ぴちぴちピッチ ピュア第1章 " />
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24c08_epitch"/>
 			<dataarea name="rom" size="0x200000">
@@ -67,6 +70,7 @@ license:CC0
 		<description>A-5 Pichi Pichi Pitch Karaoke Party (Japan)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="ぴちぴちピッチ カラオケパーティー" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ekaraa5.bin" size="0x100000" crc="6cec888a" sha1="5cb4abefb4a5aaec8827bf2d6abc2dfda8099136"/>
@@ -75,9 +79,10 @@ license:CC0
 	</software>
 
 	<software name="a6">
-		<description>A-6 Pichi Pichi Pitch Pure Chapter 2 (Japan)</description>
+		<description>A-6 Pichi Pichi Pitch Pure Dai 2-shō (Japan)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="ぴちぴちピッチ ピュア第2章 " />
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24c08_epitch"/>
 			<dataarea name="rom" size="0x200000">
@@ -87,9 +92,10 @@ license:CC0
 	</software>
 
 	<software name="a7" supported="no">
-		<description>A-7 Pichi Pichi Pitch Pure Chapter 3 (Japan)</description>
+		<description>A-7 Pichi Pichi Pitch Pure Dai 3-shō (Japan)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="ぴちぴちピッチ ピュア第3章 " />
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24c08_epitch"/>
 			<dataarea name="rom" size="0x200000">
@@ -102,6 +108,7 @@ license:CC0
 		<description>A-8 Pichi Pichi Pitch Karaoke Party 2 (Japan)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="ぴちぴちピッチ カラオケパーティー2" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ekaraa8.bin" size="0x100000" crc="252ce01f" sha1="2b4c06f7a636d4b8179bf25cb08f6e07b6366bb0"/>

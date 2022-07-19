@@ -194,6 +194,7 @@ public:
 	void init_cmpacmanb();
 	void init_cmtetrsc();
 	void init_cmtetrsd();
+	void init_ll3();
 
 	uint32_t screen_update_amcoe1a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

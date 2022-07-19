@@ -1168,7 +1168,7 @@ static INPUT_PORTS_START( gcslottv ) // TODO: proper button names
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Bet from credits") // not sure, decreases your credits if you have any
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_GAMBLE_BET ) // inserting a medal bets automatically, use this to bet from current credits
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) // insert medal / coin (there is a physical coin slot on toy for the medals) auto bets if bet possible, otherwise adds to credits
@@ -1903,6 +1903,7 @@ ROM_START( evio )
 ROM_END
 
 
+// ガチンコ勝負！ パチスロTV
 ROM_START( gcslottv )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "sammyslotunit.bin", 0x000000, 0x200000, CRC(2ba6f3ab) SHA1(1c7fc0c85d817db1550d40c0258f424770e0bd81) )
@@ -2034,13 +2035,13 @@ CONS( 2000, popira,   0,           0,  xavix_cart_popira,popira,   xavix_cart_st
 
 CONS( 2002, popira2,  0,           0,  xavix_cart_popira2,popira2,  xavix_popira2_cart_state, init_xavix,    "Takara / SSD Company LTD",                 "Popira 2 (Japan)", MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ ) // Popira 2 is a set of 2 blue & green linked units (2nd unit is just a controller, no CPU or TV out)
 
-CONS( 2003, taikodp,  0,           0,  xavix_i2c_taiko,  taikodp,  xavix_i2c_cart_state, init_xavix,    "Takara / SSD Company LTD",                     "Taiko De Popira (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ ) // inputs? are the drums analog?
+CONS( 2003, taikodp,  0,           0,  xavix_i2c_taiko,  taikodp,  xavix_i2c_cart_state, init_xavix,    "Takara / SSD Company LTD",                     "Taiko de Popira (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ ) // inputs? are the drums analog?
 
 CONS( 2004, jpopira,  0,           0,  xavix_i2c_jpopira,jpopira,  xavix_i2c_cart_state, init_xavix,    "Takara / SSD Company LTD",                     "Jumping Popira (Japan)", MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ )
 
 CONS( 2003, evio,     0,           0,  xavix_cart_evio,  evio,     xavix_cart_state,     init_xavix,    "Tomy / SSD Company LTD",                       "Evio (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ ) // inputs? it's a violin controller
 
-CONS( 2002, gcslottv, 0,           0,  xavix_cart_gcslottv,  gcslottv,     xavix_cart_gcslottv_state,     init_xavix,    "Takara / Sammy / DCT / SSD Company LTD",       "Gachinko Contest! Slot machine TV (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ )
+CONS( 2002, gcslottv, 0,           0,  xavix_cart_gcslottv,  gcslottv,     xavix_cart_gcslottv_state,     init_xavix,    "Takara / Sammy / DCT / SSD Company LTD",       "Gachinko Shoubu! PachisloTV (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ )
 
 // Let’s!TVプレイ 超にんきスポット!ころがしほーだい たまごっちりぞーと   (Let's! TV Play Chou Ninki Spot! Korogashi-Houdai Tamagotchi Resort) (only on the Japanese list? http://test.shinsedai.co.jp/english/products/Applied/list.html )   This also allows you to use an IR reciever to import a Tamagotchi from compatible games
 CONS( 2006, ltv_tam,  0,           0,  xavix_i2c_24lc04_tam,  ltv_tam,xavix_i2c_ltv_tam_state,      init_xavix,    "Bandai / SSD Company LTD",                      "Let's! TV Play Chou Ninki Spot! Korogashi-Houdai Tamagotchi Resort (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

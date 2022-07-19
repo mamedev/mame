@@ -412,14 +412,7 @@ void ptm6840_device::reload_count(int idx)
 	if (one_shot_mode)
 	{
 		m_output[idx] = false;
-		if (!(m_control_reg[idx] & COUNT_OUT_EN))
-		{
-			m_out_cb[idx](0);
-		}
-		else
-		{
-			m_out_cb[idx](m_output[idx]);
-		}
+		m_out_cb[idx](m_output[idx]);
 	}
 
 	// Set the timer
@@ -441,7 +434,7 @@ void ptm6840_device::reload_count(int idx)
 
 		duration += attotime::from_ticks(2, clock());
 
-		LOGMASKED(LOG_COUNTERS, "Timer #%d init_timer: output = %f\n", idx + 1, duration.as_double());
+		LOGMASKED(LOG_COUNTERS, "Timer #%d init_timer: duration = %f\n", idx + 1, duration.as_double());
 
 		m_enabled[idx] = 1;
 
@@ -636,10 +629,11 @@ void ptm6840_device::write(offs_t offset, uint8_t data)
 						if (gated)
 						{
 							m_timer[idx]->adjust(attotime::never);
+							m_disable_time[idx] = duration;
 						}
 						else
 						{
-							m_disable_time[idx] = duration;
+							m_timer[idx]->adjust(duration, idx);
 						}
 					}
 				}
@@ -738,8 +732,14 @@ TIMER_CALLBACK_MEMBER(ptm6840_device::timeout)
 	{
 		m_out_cb[param](0);
 	}
-	m_enabled[param]= 0;
-	reload_count(param);
+
+	m_enabled[param] = 0;
+
+	const bool one_shot_mode = m_mode[param] == 4 || m_mode[param] == 6;
+	if (!one_shot_mode)
+	{
+		reload_count(param);
+	}
 }
 
 

@@ -4709,7 +4709,7 @@ Beyond that last category are the roms waiting to be classified.
 		</part>
 	</software>
 
-	<!-- This is temporarily included for reference, until we fix emulation of the good dump -->
+	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
 	<software name="aladdi2kh" cloneof="aladdi2k">
 		<description>Aladdin 2000 (Bra, Mega Drive Bootleg, Cracked)</description>
 		<year>199?</year>
@@ -4774,7 +4774,7 @@ more investigation needed...
 		</part>
 	</software>
 
-	<!--Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
+	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
 	<software name="bugslifeh" cloneof="bugslife">
 		<description>A Bug's Life (Bra, Cracked)</description>
 		<year>199?</year>
@@ -4809,6 +4809,31 @@ more investigation needed...
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
 				<rom name="digimon adventure (cracked).sfc" size="2097152" crc="aea5e0ba" sha1="d00689883bbf5504996490088250a479647f94a3" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbzfb" supported="no">
+		<description>Dragon Ball Z - Final Bout (pirate)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="4194304">
+				<rom name="dragon ball z - final bout (pirate).sfc" size="4194304" crc="85164f9d" sha1="a27dde45890be69d6921c77c0b36b5f33a576cb4" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
+	<software name="dbzfbh" cloneof="dbzfb">
+		<description>Dragon Ball Z - Final Bout (pirate, hacked)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="4194304">
+				<rom name="dragon ball z - final bout (pirate - hacked).sfc" size="4194304" crc="a911c842" sha1="48ebb510529ab0c52ec792a44ccfc112929b49b6" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -10382,7 +10407,7 @@ more investigation needed...
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SHVC-KU" />
 		<info name="release" value="19930730" />
-		<info name="alt_title" value="クレヨンしんちゃん 嵐を呼ぶ園児" />
+		<info name="alt_title" value="クレヨンしんちゃん 〝嵐を呼ぶ園児〞" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-2A0N-01, SHVC-2A0N-10" />
@@ -10407,7 +10432,7 @@ more investigation needed...
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SHVC-UE" />
 		<info name="release" value="19940527" />
-		<info name="alt_title" value="クレヨンしんちゃん2 ゛大魔王の逆襲″" />
+		<info name="alt_title" value="クレヨンしんちゃん2 〝大魔王の逆襲〞" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-1A0N-20" />

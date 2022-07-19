@@ -225,6 +225,7 @@ void nes_state::fds(machine_config &config)
 	config.device_remove("ntb_list");
 	config.device_remove("kstudio_list");
 	config.device_remove("datach_list");
+	config.device_remove("famibox_list");
 }
 
 MACHINE_START_MEMBER( nes_state, famitwin )

@@ -50,6 +50,7 @@ apple/lisa.cpp
 apple/lwriter.cpp
 apple/mac.cpp
 apple/mac128.cpp
+apple/maciivx.cpp
 apple/maclc3.cpp
 apple/macpci.cpp
 apple/macpdm.cpp

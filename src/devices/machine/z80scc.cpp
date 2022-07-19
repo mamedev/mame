@@ -416,6 +416,7 @@ inline void z80scc_channel::out_dtr_cb(int state)
 z80scc_device::z80scc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
 	: device_t(mconfig, type, tag, owner, clock),
 	device_z80daisy_interface(mconfig, *this),
+	m_wr9(0),
 	m_chanA(*this, CHANA_TAG),
 	m_chanB(*this, CHANB_TAG),
 	m_rxca(0),

@@ -2,9 +2,9 @@
 // copyright-holders:Nathan Woods, Raphael Nabet, R. Belmont
 /*****************************************************************************
  *
- * includes/mac.h
+ * mac.h
  *
- * Macintosh driver declarations
+ * Macintosh II driver declarations
  *
  ****************************************************************************/
 #ifndef MAME_INCLUDES_MAC_H
@@ -93,14 +93,10 @@ public:
 	void maclc(machine_config &config, bool cpu = true, bool egret = true, asc_device::asc_type asc_type = asc_device::asc_type::V8, int woz_version = 1);
 	void maciisi(machine_config &config);
 	void maclc2(machine_config &config, bool egret = true, int woz_version = 1);
-	void maclc3(machine_config &config, bool egret = true);
 	void macpd210(machine_config &config);
 	void maciici(machine_config &config);
 	void maciix(machine_config &config, bool nubus_bank1 = true, bool nubus_bank2 = true);
-	void maclc520(machine_config &config);
-	void maciivx(machine_config &config);
 	void maccclas(machine_config &config);
-	void maciivi(machine_config &config);
 	void maciicx(machine_config &config);
 	void macse30(machine_config &config);
 	void maciifx(machine_config &config);
@@ -113,20 +109,15 @@ public:
 	void init_maclc2();
 	void init_maciifdhd();
 	void init_macse30();
-	void init_maciivx();
-	void init_maciivi();
 	void init_macii();
 	void init_macclassic2();
 	void init_maciifx();
 	void init_maclc();
-	void init_maclc520();
 	void init_maciici();
 	void init_maciix();
 	void init_maclrcclassic();
 	void init_maciisi();
 	void init_maciicx();
-	void init_maclc3();
-	void init_maclc3plus();
 
 	/* tells which model is being emulated (set by macxxx_init) */
 	enum model_t

@@ -31,10 +31,16 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- this one has some songs programmed into it (TODO, list them here for reference) -->
-
+	<!-- this one has some songs programmed into it:
+	     河内おとこ節              中村美律子      Kawachi Otokobushi          Nakamura Mitsuko
+	     珍島(チンド)物語          天童よしみ      Chindo Monogatari           Tendō Yoshimi
+	     こころ酒                  藤あや子        Kokoro Sake                 Fuji Ayako
+	     夜桜お七                  坂本冬美        Yozakura O-shichi           Sakamoto Fuyumi
+	     愛燦燦(あいさんさん)      美空ひばり      Ai Sansan                   Misora Hibari
+	     川の流れのように          美空ひばり      Kawa no Nagare no Yō ni     Misora Hibari
+	     真赤な太陽                美空ひばり      Makkana TaiYō               Misora Hibari -->
 	<software name="ekaraweb12a">
-		<description>e-kara Web cartridge 12M (used, with 7 Songs) (Japan)</description>
+		<description>e-kara Web cartridge 12M (used, with 7 songs) (Japan)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
