@@ -184,9 +184,9 @@ void real_profiler_state::update_text(running_machine &machine)
 	for ( ; curtype < PROFILER_TOTAL; ++curtype)
 		computed += m_data[curtype];
 
-	// this becomes the total; if we end up with 0 for anything, we were just started, so return empty
+	// this becomes the total; if we end up with 0, we were just started, so return empty
 	u64 total = computed;
-	if (total == 0 || normalize == 0)
+	if (total == 0)
 	{
 		m_text.clear();
 		return;
