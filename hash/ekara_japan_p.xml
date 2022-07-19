@@ -3,11 +3,12 @@
 <!--
 license:CC0
 -->
-<softwarelist name="ekara_japan_p" description="Takara e-kara (Japan) P-xx / PCxxxx- series cartridges">
+<softwarelist name="ekara_japan_p" description="Takara e-kara (Japan) Platinum Cartridge series (P-xx / PCxxxx-)">
 	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit
 
 	***********************************************************************************
 
+	Platinum Cartridge (プラチナカートリッジ) series
 	Japanese cart listing (by P code) (for use on multiple devices, including DDR) (P on box, P/PC on cart)
 
 	These are for use with 3 different units
@@ -17,7 +18,7 @@ license:CC0
 
 	*P-1  Best Hit Volume 4 (1,2,3, 5 in G series)
 	*P-2  TV Pop Junior Volume 2 (1,3,4 in G series)
-	*P-3  Enka-dō Best Volume 1
+	*P-3  Enkamichi Best Volume 1
 	*P-4  Best Hit Volume 7
 	-->
 
@@ -58,7 +59,7 @@ license:CC0
 	</software>
 
 	<software name="pc0003">
-		<description>Enka-dō Best Volume 1 (Japan) (PC0003-ENB)</description>
+		<description>Enkamichi Best Volume 1 (Japan) (PC0003-ENB)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="演歌道ベスト Vol.1"/>

@@ -3,11 +3,12 @@
 <!--
 license:CC0
 -->
-<softwarelist name="ekara_japan_g" description="Takara e-kara (Japan) G-xx / GCxxxx- series cartridges">
+<softwarelist name="ekara_japan_g" description="Takara e-kara (Japan) Gold Cartridge series (G-xx / GCxxxx-)">
 	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit
 
 	***********************************************************************************
 
+	Gold Cartridge (ゴールドカートリッジ) series
 	Japanese cart listing (by G code)  (G-x on cartridge / box, GC in cart identifier code)
 
 	These are for use with 2 different units
