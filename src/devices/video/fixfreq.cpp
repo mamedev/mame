@@ -2,14 +2,14 @@
 // copyright-holders:Couriersud
 /***************************************************************************
 
-	fixfreq.h
+    fixfreq.h
 
-	2013-2021 Couriersud
+    2013-2021 Couriersud
 
-	Fixed frequency monochrome monitor emulation
+    Fixed frequency monochrome monitor emulation
 
-	The driver is intended for drivers which provide an analog video signal.
-	VSYNC and HSYNC levels are used to create the bitmap.
+    The driver is intended for drivers which provide an analog video signal.
+    VSYNC and HSYNC levels are used to create the bitmap.
 
 ***************************************************************************/
 
@@ -24,9 +24,9 @@
 #include <iostream>
 
 // for quick and dirty debugging
-#define VERBOSE 0
 #define LOG_GENERAL (1U << 0)
 
+#define VERBOSE 0
 #define LOG_OUTPUT_STREAM std::cerr
 
 #include "logmacro.h"
@@ -73,8 +73,7 @@ enum fixedfreq_tag_id_e
 	SCANLINE_HEIGHT
 };
 
-void fixedfreq_monitor_state::update_sync_channel(const time_type &time,
-												  const double     newval)
+void fixedfreq_monitor_state::update_sync_channel(const time_type &time, double newval)
 {
 	const time_type delta_time = time - m_last_sync_time;
 
@@ -168,14 +167,13 @@ void fixedfreq_monitor_state::update_bm(const time_type &time)
 	m_last_x = pixels;
 }
 
-void fixedfreq_monitor_state::update_composite_monochrome(const time_type &time,
-														  const double     data)
+void fixedfreq_monitor_state::update_composite_monochrome(const time_type &time, double data)
 {
 	update_bm(time);
 	update_sync_channel(time, data);
 
-	//#int colv = (int) ((data - m_desc.m_sync_threshold) * m_desc.m_gain * 255.0);
-	int colv = (int)((data - 1.5) * m_desc.m_gain * 255.0);
+	//#int colv = int((data - m_desc.m_sync_threshold) * m_desc.m_gain * 255.0);
+	int colv = int((data - 1.5) * m_desc.m_gain * 255.0);
 	if (colv > 255)
 		colv = 255;
 	if (colv < 0)
@@ -185,12 +183,11 @@ void fixedfreq_monitor_state::update_composite_monochrome(const time_type &time,
 		m_col = 0xff000000 | (colv << 16) | (colv << 8) | colv;
 }
 
-void fixedfreq_monitor_state::update_red(const time_type &time,
-										 const double     data)
+void fixedfreq_monitor_state::update_red(const time_type &time, double data)
 {
 	update_bm(time);
 
-	int colv = (int)((data - m_desc.m_sync_threshold) * m_desc.m_gain * 255.0);
+	int colv = int((data - m_desc.m_sync_threshold) * m_desc.m_gain * 255.0);
 	if (colv > 255)
 		colv = 255;
 	if (colv < 0)
@@ -198,13 +195,12 @@ void fixedfreq_monitor_state::update_red(const time_type &time,
 	m_col = (m_col & 0xff00ffff) | (colv << 16);
 }
 
-void fixedfreq_monitor_state::update_green(const time_type &time,
-										   const double     data)
+void fixedfreq_monitor_state::update_green(const time_type &time, double data)
 {
 	update_bm(time);
 	// update_sync_channel(ctime, data);
 
-	int colv = (int)((data - m_desc.m_sync_threshold) * m_desc.m_gain * 255.0);
+	int colv = int((data - m_desc.m_sync_threshold) * m_desc.m_gain * 255.0);
 	if (colv > 255)
 		colv = 255;
 	if (colv < 0)
@@ -212,13 +208,12 @@ void fixedfreq_monitor_state::update_green(const time_type &time,
 	m_col = (m_col & 0xffff00ff) | (colv << 8);
 }
 
-void fixedfreq_monitor_state::update_blue(const time_type &time,
-										  const double     data)
+void fixedfreq_monitor_state::update_blue(const time_type &time, double data)
 {
 	update_bm(time);
 	// update_sync_channel(ctime, data);
 
-	int colv = (int)((data - m_desc.m_sync_threshold) * m_desc.m_gain * 255.0);
+	int colv = int((data - m_desc.m_sync_threshold) * m_desc.m_gain * 255.0);
 	if (colv > 255)
 		colv = 255;
 	if (colv < 0)
@@ -226,31 +221,35 @@ void fixedfreq_monitor_state::update_blue(const time_type &time,
 	m_col = (m_col & 0xffffff00) | colv;
 }
 
-void fixedfreq_monitor_state::update_sync(const time_type &time,
-										  const double     data)
+void fixedfreq_monitor_state::update_sync(const time_type &time, double data)
 {
 	update_bm(time);
 	update_sync_channel(time, data);
 }
 
-fixedfreq_device::fixedfreq_device(const machine_config &mconfig,
-								   device_type type, const char *tag,
-								   device_t *owner, uint32_t clock)
-: device_t(mconfig, type, tag, owner, clock)
-, device_video_interface(mconfig, *this, false)
-, m_enable(*this, "ENABLE")
-, m_vector(*this, "VECTOR")
-, m_scanline_height(1.0)
-, m_last_rt(0.0)
-, m_monitor()
-, m_state(m_monitor, *this)
+fixedfreq_device::fixedfreq_device(
+		const machine_config &mconfig,
+		device_type type,
+		const char *tag,
+		device_t *owner,
+		uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_video_interface(mconfig, *this, false)
+	, m_enable(*this, "ENABLE")
+	, m_vector(*this, "VECTOR")
+	, m_scanline_height(1.0)
+	, m_last_rt(0.0)
+	, m_monitor()
+	, m_state(m_monitor, *this)
 {
 }
 
-fixedfreq_device::fixedfreq_device(const machine_config &mconfig,
-								   const char *tag, device_t *owner,
-								   uint32_t clock)
-: fixedfreq_device(mconfig, FIXFREQ, tag, owner, clock)
+fixedfreq_device::fixedfreq_device(
+		const machine_config &mconfig,
+		const char *tag,
+		device_t *owner,
+		uint32_t clock)
+	: fixedfreq_device(mconfig, FIXFREQ, tag, owner, clock)
 {
 }
 
@@ -272,12 +271,14 @@ void fixedfreq_device::device_config_complete()
 	// It is therefore recommended to use `set_raw` in the mame driver
 	// to specify the window size.
 	if (!screen().refresh_attoseconds())
-		screen().set_raw(m_monitor.m_monitor_clock, m_monitor.htotal(), 0,
-						 m_monitor.htotal(), m_monitor.vtotal(), 0,
-						 m_monitor.vtotal());
+	{
+		screen().set_raw(
+				m_monitor.m_monitor_clock, m_monitor.htotal(), 0,
+				m_monitor.htotal(), m_monitor.vtotal(), 0,
+				m_monitor.vtotal());
+	}
 	if (!screen().has_screen_update())
-		screen().set_screen_update(*this,
-								   FUNC(fixedfreq_device::screen_update));
+		screen().set_screen_update(*this, FUNC(fixedfreq_device::screen_update));
 	LOG("config complete\n");
 }
 
@@ -336,20 +337,21 @@ void fixedfreq_device::device_post_load()
 
 static uint32_t nom_col(uint32_t col)
 {
-	float r = ((col >> 16) & 0xff);
-	float g = ((col >> 8) & 0xff);
-	float b = ((col >> 0) & 0xff);
+	float const r = ((col >> 16) & 0xff);
+	float const g = ((col >>  8) & 0xff);
+	float const b = ((col >>  0) & 0xff);
 
-	float m = std::max(r, std::max(g, b));
+	float const m = std::max(r, std::max(g, b));
 	if (m == 0.0f)
 		return 0;
-	return (((uint32_t)m) << 24) | (((uint32_t)(r / m * 255.0f)) << 16)
-		   | (((uint32_t)(g / m * 255.0f)) << 8)
-		   | (((uint32_t)(b / m * 255.0f)) << 0);
+	return
+		(uint32_t(m)              << 24) |
+		(uint32_t(r / m * 255.0f) << 16) |
+		(uint32_t(g / m * 255.0f) <<  8) |
+		(uint32_t(b / m * 255.0f) <<  0);
 }
 
-static void draw_testpat(screen_device &screen, bitmap_rgb32 &bitmap,
-						 const rectangle &cliprect)
+static void draw_testpat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// Test pattern Grey scale
 	const int stripes = 255;
@@ -361,8 +363,7 @@ static void draw_testpat(screen_device &screen, bitmap_rgb32 &bitmap,
 		int l = va.left() + (i * va.width() / stripes);
 		int w = (va.left() + (i + 1) * va.width() / stripes) - l;
 		int v = (255 * i) / stripes;
-		bitmap.plot_box(l, va.top() + 20, w, va.height() / 2 - 20,
-						rgb_t(0xff, v, v, v));
+		bitmap.plot_box(l, va.top() + 20, w, va.height() / 2 - 20, rgb_t(0xff, v, v, v));
 	}
 
 	int l(va.left() + va.width() / 4);
@@ -379,9 +380,7 @@ static void draw_testpat(screen_device &screen, bitmap_rgb32 &bitmap,
 	bitmap.plot_box(l, t, w, h, rgb_t(0xff, 0xc3, 0xc3, 0xc3)); // 195
 }
 
-uint32_t
-fixedfreq_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
-								const rectangle &cliprect)
+uint32_t fixedfreq_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// printf("%f\n", machine().time().as_double());
 	// printf("%d %lu %f %f\n", m_state.m_sig_vsync, m_state.m_fragments.size(),
@@ -492,11 +491,11 @@ void fixedfreq_device::vsync_end_cb(double refresh_time, uint32_t field)
 
 	// reset_origin must be called first.
 	screen().reset_origin(
-		m_state.m_last_y
-			- (m_monitor.vsync_width() + m_monitor.vbackporch_width()),
-		0);
-	screen().configure(m_monitor.htotal_scaled(), m_monitor.vtotal(), visarea,
-					   DOUBLE_TO_ATTOSECONDS(refresh_limited));
+			m_state.m_last_y - (m_monitor.vsync_width() + m_monitor.vbackporch_width()),
+			0);
+	screen().configure(
+			m_monitor.htotal_scaled(), m_monitor.vtotal(), visarea,
+			DOUBLE_TO_ATTOSECONDS(refresh_limited));
 }
 
 NETDEV_ANALOG_CALLBACK_MEMBER(fixedfreq_device::update_composite_monochrome)

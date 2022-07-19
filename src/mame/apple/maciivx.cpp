@@ -332,7 +332,7 @@ void maciivx_state::maciiv_base(machine_config &config)
 
 	VASP(config, m_vasp, C15M);
 	m_vasp->set_maincpu_tag("maincpu");
-	m_vasp->set_rom_tag(":bootrom");
+	m_vasp->set_rom_tag("bootrom");
 	m_vasp->hdsel_callback().set(FUNC(maciivx_state::hdsel_w));
 
 	MACADB(config, m_macadb, C15M);

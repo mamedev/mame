@@ -16,7 +16,7 @@ To Do:
     counter rather than behaving as a memory-mapped black box.
 -   Avengers had a protection chip underneath the sound module. Needs dumping.
     The protection is extensive: palette data, calculates player movement, 
-	even a hand in the sound.  The angle/movement stuff isn't 100% accurate either.
+    even a hand in the sound.  The angle/movement stuff isn't 100% accurate either.
 -   accurate music tempo (audiocpu irq freq)
 -   accurate video timing, raw params
 
