@@ -80,7 +80,8 @@ vcs_cart_slot_device::vcs_cart_slot_device(const machine_config &mconfig, const 
 	device_t(mconfig, VCS_CART_SLOT, tag, owner, clock),
 	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_vcs_cart_interface>(mconfig, *this),
-	m_cart(nullptr), m_type(0)
+	m_cart(nullptr),
+	m_type(0)
 {
 }
 
@@ -302,6 +303,12 @@ image_init_result vcs_cart_slot_device::call_load()
 	}
 
 	return image_init_result::PASS;
+}
+
+void vcs_cart_slot_device::install_taps(address_space &space)
+{
+	if (m_cart)
+		m_cart->install_taps(space);
 }
 
 
@@ -783,26 +790,12 @@ std::string vcs_cart_slot_device::get_default_card_software(get_default_card_sof
  read
  -------------------------------------------------*/
 
-uint8_t vcs_cart_slot_device::read_rom(offs_t offset)
+uint8_t vcs_cart_slot_device::read(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_rom(offset);
+		return m_cart->read(offset);
 	else
 		return 0xff;
-}
-
-uint8_t vcs_cart_slot_device::read_bank(address_space &space, offs_t offset)
-{
-	if (m_cart)
-		return m_cart->read_bank(space, offset);
-	else
-		return 0xff;
-}
-
-void vcs_cart_slot_device::tap(offs_t offset)
-{
-	if (m_cart)
-		m_cart->tap(offset);
 }
 
 
@@ -810,14 +803,8 @@ void vcs_cart_slot_device::tap(offs_t offset)
  write
  -------------------------------------------------*/
 
-void vcs_cart_slot_device::write_bank(address_space &space, offs_t offset, uint8_t data)
+void vcs_cart_slot_device::write(offs_t offset, uint8_t data)
 {
 	if (m_cart)
-		m_cart->write_bank(space, offset, data);
-}
-
-void vcs_cart_slot_device::write_ram(offs_t offset, uint8_t data)
-{
-	if (m_cart)
-		m_cart->write_ram(offset, data);
+		m_cart->write(offset, data);
 }

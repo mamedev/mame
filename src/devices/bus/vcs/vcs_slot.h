@@ -53,15 +53,11 @@ public:
 	// construction/destruction
 	virtual ~device_vcs_cart_interface();
 
-	// reading from ROM
-	virtual uint8_t read_rom(offs_t offset) { return 0xff; }
-	// writing to RAM chips (sometimes it is in a different range than write_bank!)
-	virtual void write_ram(offs_t offset, uint8_t data) { }
-	virtual void tap(offs_t offset) { }
+	virtual void install_taps(address_space &space) { }
 
-	// read/write to bankswitch address
-	virtual uint8_t read_bank(address_space &space, offs_t offset) { return 0xff; }
-	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) { }
+	// Access to ROM area
+	virtual uint8_t read(offs_t offset) { return 0xff; }
+	virtual void write(offs_t offset, uint8_t data) { }
 
 	virtual void setup_addon_ptr(uint8_t *ptr) { }
 
@@ -116,12 +112,11 @@ public:
 	int get_cart_type() { return m_type; }
 	static int identify_cart_type(const uint8_t *ROM, uint32_t len);
 
+	void install_taps(address_space &space);
+
 	// reading and writing
-	virtual uint8_t read_rom(offs_t offset);
-	virtual uint8_t read_bank(address_space &space, offs_t offset);
-	virtual void write_bank(address_space &space, offs_t offset, uint8_t data);
-	virtual void write_ram(offs_t offset, uint8_t data);
-	virtual void tap(offs_t offset);
+	virtual uint8_t read(offs_t offset);
+	virtual void write(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides

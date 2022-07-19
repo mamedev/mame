@@ -20,9 +20,10 @@ public:
 	// construction/destruction
 	a26_rom_ss_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual void install_taps(address_space &space) override;
+
 	// reading and writing
-	virtual uint8_t read_rom(offs_t offset) override;
-	virtual void tap(offs_t offset) override;
+	virtual uint8_t read(offs_t offset) override;
 
 private:
 	// device-level overrides
@@ -33,7 +34,8 @@ private:
 
 	required_device<cassette_image_device> m_cassette;
 
-	inline uint8_t read_byte(uint32_t offset);
+	uint8_t read_byte(uint32_t offset);
+	void tap(offs_t offset);
 
 	int m_base_banks[2];
 	uint8_t m_reg;

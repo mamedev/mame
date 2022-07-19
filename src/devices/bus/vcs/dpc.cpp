@@ -264,18 +264,18 @@ void a26_rom_dpc_device::device_add_mconfig(machine_config &config)
 	ATARI_DPC(config, m_dpc, 0);
 }
 
-uint8_t a26_rom_dpc_device::read_rom(offs_t offset)
+uint8_t a26_rom_dpc_device::read(offs_t offset)
 {
 	if (offset < 0x40)
 		return m_dpc->read(offset);
 	else
-		return a26_rom_f8_device::read_rom(offset);
+		return a26_rom_f8_device::read(offset);
 }
 
-void a26_rom_dpc_device::write_bank(address_space &space, offs_t offset, uint8_t data)
+void a26_rom_dpc_device::write(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x40 && offset < 0x80)
 		m_dpc->write(offset, data);
 	else
-		a26_rom_f8_device::write_bank(space, offset, data);
+		a26_rom_f8_device::write(offset, data);
 }

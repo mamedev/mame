@@ -25,7 +25,7 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual uint8_t read_rom(offs_t offset) override;
+	virtual uint8_t read(offs_t offset) override;
 };
 
 

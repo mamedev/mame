@@ -73,8 +73,8 @@ public:
 	required_device<dpc_device> m_dpc;
 
 	// reading and writing
-	virtual uint8_t read_rom(offs_t offset) override;
-	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) override;
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 
 	virtual void setup_addon_ptr(uint8_t *ptr) override;
 

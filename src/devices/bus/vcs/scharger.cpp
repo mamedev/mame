@@ -107,6 +107,14 @@ inline uint8_t a26_rom_ss_device::read_byte(uint32_t offset)
 		return 0xff;
 }
 
+void a26_rom_ss_device::install_taps(address_space &space)
+{
+	space.install_readwrite_tap(0x0000, 0x1fff, "bank", 
+		[this](offs_t offset, u8 &, u8) { if(!machine().side_effects_disabled()) tap(offset); },
+		[this](offs_t offset, u8 &, u8) { if(!machine().side_effects_disabled()) tap(offset); }
+	);
+}
+
 void a26_rom_ss_device::tap(offs_t offset)
 {
 	if (m_last_address_bus != offset)
@@ -114,7 +122,7 @@ void a26_rom_ss_device::tap(offs_t offset)
 	m_last_address_bus = offset;
 }
 
-uint8_t a26_rom_ss_device::read_rom(offs_t offset)
+uint8_t a26_rom_ss_device::read(offs_t offset)
 {
 	if (machine().side_effects_disabled())
 		return read_byte(offset);

@@ -124,7 +124,7 @@ void a26_rom_harmony_device::check_bankswitch(offs_t offset)
 	}
 }
 
-uint8_t a26_rom_harmony_device::read_rom(offs_t offset)
+uint8_t a26_rom_harmony_device::read(offs_t offset)
 {
 	uint8_t retvalue = read8_r(offset + 0xc00); // banks start at 0xc00
 
@@ -133,8 +133,8 @@ uint8_t a26_rom_harmony_device::read_rom(offs_t offset)
 	return retvalue;
 }
 
-void a26_rom_harmony_device::write_bank(address_space &space, offs_t offset, uint8_t data)
+void a26_rom_harmony_device::write(offs_t offset, uint8_t data)
 {
 	check_bankswitch(offset);
-//  a26_rom_f8_device::write_bank(space, offset, data);
+//  a26_rom_f8_device::write_bank(offset, data);
 }

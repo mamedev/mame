@@ -67,7 +67,7 @@ void tvboy_state::tvboy_mem(address_map &map)
 	map(0x0000, 0x007f).mirror(0x0f00).rw("tia_video", FUNC(tia_video_device::read), FUNC(tia_video_device::write));
 	map(0x0080, 0x00ff).mirror(0x0d00).ram().share("riot_ram");
 #if USE_NEW_RIOT
-	map(0x0280, 0x029f).mirror(0x0d00).m("riot", FUNC(mos6532_t::io_map));
+	map(0x0280, 0x029f).mirror(0x0d00).m("riot", FUNC(mos6532_new_device::io_map));
 #else
 	map(0x0280, 0x029f).mirror(0x0d00).rw("riot", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
 #endif
