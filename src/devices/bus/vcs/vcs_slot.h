@@ -7,44 +7,6 @@
 
 #include "imagedev/cartrom.h"
 
-
-/***************************************************************************
- TYPE DEFINITIONS
- ***************************************************************************/
-
-#define A26SLOT_ROM_REGION_TAG ":cart:rom"
-
-/* PCB */
-enum
-{
-	A26_2K = 0,
-	A26_4K,
-	A26_F4,
-	A26_F6,
-	A26_F8,
-	A26_F8SW,
-	A26_FA,
-	A26_FE,
-	A26_3E,     // to test
-	A26_3F,
-	A26_E0,
-	A26_E7,
-	A26_UA,
-	A26_DC,
-	A26_CV,
-	A26_FV,
-	A26_JVP,    // to test
-	A26_32IN1,
-	A26_8IN1,
-	A26_4IN1,
-	A26_DPC,
-	A26_SS,
-	A26_CM,
-	A26_X07,
-	A26_HARMONY,
-};
-
-
 // ======================> device_vcs_cart_interface
 
 class device_vcs_cart_interface : public device_interface

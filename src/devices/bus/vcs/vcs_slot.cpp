@@ -23,6 +23,35 @@
 
 DEFINE_DEVICE_TYPE(VCS_CART_SLOT, vcs_cart_slot_device, "vcs_cart_slot", "Atari VCS 2600 Cartridge Slot")
 
+/* PCB */
+enum
+{
+	A26_2K = 0,
+	A26_4K,
+	A26_F4,
+	A26_F6,
+	A26_F8,
+	A26_F8SW,
+	A26_FA,
+	A26_FE,
+	A26_3E,     // to test
+	A26_3F,
+	A26_E0,
+	A26_E7,
+	A26_UA,
+	A26_DC,
+	A26_CV,
+	A26_FV,
+	A26_JVP,    // to test
+	A26_32IN1,
+	A26_8IN1,
+	A26_4IN1,
+	A26_DPC,
+	A26_SS,
+	A26_CM,
+	A26_X07,
+	A26_HARMONY,
+};
 
 //-------------------------------------------------
 //  device_vcs_cart_interface - constructor
@@ -52,7 +81,7 @@ void device_vcs_cart_interface::rom_alloc(uint32_t size, const char *tag)
 {
 	if (m_rom == nullptr)
 	{
-		m_rom = device().machine().memory().region_alloc(std::string(tag).append(A26SLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom = device().machine().memory().region_alloc(std::string(tag).append(":cart:rom").c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 	}
 }
