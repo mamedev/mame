@@ -368,14 +368,11 @@ void floppy_image_device::fs_enum::add_raw(const char *name, u32 key, const char
 	case fs::unformatted_image::FSI_525_DSHD:
 	case fs::unformatted_image::FSI_525_DSQD:
 	case fs::unformatted_image::FSI_525_DSDD:
+	case fs::unformatted_image::FSI_525_DSSD:
 	case fs::unformatted_image::FSI_525_SSQD:
 	case fs::unformatted_image::FSI_525_SSDD:
 	case fs::unformatted_image::FSI_525_SSSD:
 		best = m_best_525;
-		break;
-
-	case fs::unformatted_image::FSI_525_DSSD:
-		// we don't check best_525 for this one
 		break;
 
 	case fs::unformatted_image::FSI_35_DSED:
@@ -397,7 +394,7 @@ void floppy_image_device::fs_enum::add_raw(const char *name, u32 key, const char
 		break;
 	}
 
-	if ((!best || key == best) && (variant && fs::manager_t::has_variant(m_fid->variants, key)))
+	if ((!best || key == best) && (!variant || fs::manager_t::has_variant(m_fid->variants, key)))
 		m_fid->m_fs.emplace_back(fs_info(name, key, description));
 }
 
