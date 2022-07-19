@@ -2,16 +2,12 @@
 // copyright-holders:Nathan Woods, Raphael Nabet, R. Belmont
 /***************************************************************************
 
-    video/mac.c
+    video/mac.cpp
 
     Macintosh video hardware
 
-    Emulates the video hardware for compact Macintosh series (original
-    Macintosh (128k, 512k, 512ke), Macintosh Plus, Macintosh SE, Macintosh
-    Classic)
-
-    Also emulates on-board video for systems with the
-    RBV, V8, Eagle, and DAFB chips.
+    Emulates the video hardware for systems with the
+    RBV, V8, and Eagle chips.
 
     ----------------------------------------------------------------------
     Monitor sense codes
@@ -52,7 +48,6 @@ Apple color FPD      01           11           10   (FPD = Full Page Display)
 
 ***************************************************************************/
 
-
 #include "emu.h"
 #include "sound/asc.h"
 #include "mac.h"
@@ -84,7 +79,7 @@ uint32_t mac_state::screen_update_macse30(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-// IIci/IIsi RAM-Based Video (RBV) and children: V8, Eagle, Spice, VASP
+// IIci/IIsi RAM-Based Video (RBV) and children: V8, Eagle, Spice
 
 VIDEO_START_MEMBER(mac_state,macrbv)
 {
@@ -267,130 +262,6 @@ uint32_t mac_state::screen_update_macrbv(screen_device &screen, bitmap_rgb32 &bi
 				}
 			}
 		}
-	}
-
-	return 0;
-}
-
-uint32_t mac_state::screen_update_macrbvvram(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	int hres, vres;
-	switch (m_rbv_montype)
-	{
-		case 1: // 15" portrait display
-			hres = 640;
-			vres = 870;
-			break;
-
-		case 2: // 12" RGB
-			hres = 512;
-			vres = 384;
-			break;
-
-		case 6: // 13" RGB
-		default:
-			hres = 640;
-			vres = 480;
-			break;
-	}
-
-	switch (m_rbv_regs[0x10] & 7)
-	{
-		case 0: // 1bpp
-		{
-			auto const vram8 = util::big_endian_cast<uint8_t const>(m_vram.target());
-
-			for (int y = 0; y < vres; y++)
-			{
-				uint32_t *scanline = &bitmap.pix(y);
-				for (int x = 0; x < hres; x+=8)
-				{
-					uint8_t const pixels = vram8[(y * 2048) + (x / 8)];
-
-					*scanline++ = m_rbv_palette[0x7f|(pixels&0x80)];
-					*scanline++ = m_rbv_palette[0x7f|((pixels<<1)&0x80)];
-					*scanline++ = m_rbv_palette[0x7f|((pixels<<2)&0x80)];
-					*scanline++ = m_rbv_palette[0x7f|((pixels<<3)&0x80)];
-					*scanline++ = m_rbv_palette[0x7f|((pixels<<4)&0x80)];
-					*scanline++ = m_rbv_palette[0x7f|((pixels<<5)&0x80)];
-					*scanline++ = m_rbv_palette[0x7f|((pixels<<6)&0x80)];
-					*scanline++ = m_rbv_palette[0x7f|((pixels<<7)&0x80)];
-				}
-			}
-		}
-		break;
-
-		case 1: // 2bpp
-		{
-			auto const vram8 = util::big_endian_cast<uint8_t const>(m_vram.target());
-
-			for (int y = 0; y < vres; y++)
-			{
-				uint32_t *scanline = &bitmap.pix(y);
-				for (int x = 0; x < hres/4; x++)
-				{
-					uint8_t const pixels = vram8[(y * 2048) + x];
-
-					*scanline++ = m_rbv_palette[0x3f|(pixels&0xc0)];
-					*scanline++ = m_rbv_palette[0x3f|((pixels<<2)&0xc0)];
-					*scanline++ = m_rbv_palette[0x3f|((pixels<<4)&0xc0)];
-					*scanline++ = m_rbv_palette[0x3f|((pixels<<6)&0xc0)];
-				}
-			}
-		}
-		break;
-
-		case 2: // 4bpp
-		{
-			auto const vram8 = util::big_endian_cast<uint8_t const>(m_vram.target());
-
-			for (int y = 0; y < vres; y++)
-			{
-				uint32_t *scanline = &bitmap.pix(y);
-
-				for (int x = 0; x < hres/2; x++)
-				{
-					uint8_t const pixels = vram8[(y * 2048) + x];
-
-					*scanline++ = m_rbv_palette[0x0f|(pixels&0xf0)];
-					*scanline++ = m_rbv_palette[0x0f|((pixels<<4)&0xf0)];
-				}
-			}
-		}
-		break;
-
-		case 3: // 8bpp
-		{
-			auto const vram8 = util::big_endian_cast<uint8_t const>(m_vram.target());
-
-			for (int y = 0; y < vres; y++)
-			{
-				uint32_t *scanline = &bitmap.pix(y);
-
-				for (int x = 0; x < hres; x++)
-				{
-					uint8_t const pixels = vram8[(y * 2048) + x];
-					*scanline++ = m_rbv_palette[pixels];
-				}
-			}
-		}
-		break;
-
-		case 4: // 16bpp
-		{
-			auto const vram16 = util::big_endian_cast<uint16_t const>(m_vram.target());
-
-			for (int y = 0; y < vres; y++)
-			{
-				uint32_t *scanline = &bitmap.pix(y);
-				for (int x = 0; x < hres; x++)
-				{
-					uint16_t const pixels = vram16[(y * 1024) + x];
-					*scanline++ = rgb_t(((pixels >> 10) & 0x1f) << 3, ((pixels >> 5) & 0x1f) << 3, (pixels & 0x1f) << 3);
-				}
-			}
-		}
-		break;
 	}
 
 	return 0;

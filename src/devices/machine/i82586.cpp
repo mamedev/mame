@@ -120,6 +120,7 @@ i82586_base_device::i82586_base_device(const machine_config &mconfig, device_typ
 	, m_rnr(false)
 	, m_initialised(false)
 	, m_reset(false)
+	, m_irq(false)
 	, m_irq_assert(1)
 	, m_cu_state(CU_IDLE)
 	, m_ru_state(RU_IDLE)
@@ -165,7 +166,6 @@ void i82586_base_device::device_start()
 	m_out_irq.resolve_safe();
 
 	m_cu_timer = timer_alloc(FUNC(i82586_base_device::cu_execute), this);
-	m_cu_timer->enable(false);
 
 	save_item(NAME(m_cx));
 	save_item(NAME(m_fr));
@@ -173,6 +173,7 @@ void i82586_base_device::device_start()
 	save_item(NAME(m_rnr));
 	save_item(NAME(m_initialised));
 	save_item(NAME(m_reset));
+	save_item(NAME(m_irq));
 
 	save_item(NAME(m_cu_state));
 	save_item(NAME(m_ru_state));
@@ -189,7 +190,7 @@ void i82586_base_device::device_start()
 
 void i82586_base_device::device_reset()
 {
-	m_cu_timer->enable(false);
+	m_cu_timer->reset();
 
 	m_cx = false;
 	m_fr = false;
@@ -202,6 +203,8 @@ void i82586_base_device::device_reset()
 
 	m_scp_address = SCP_ADDRESS;
 	m_mac_multi = 0;
+
+	set_irq(false);
 }
 
 device_memory_interface::space_config_vector i82586_base_device::memory_space_config() const
@@ -327,12 +330,12 @@ void i82586_base_device::process_scb()
 
 	case CUC_RESUME:
 		m_cu_state = CU_ACTIVE;
-		m_cu_timer->enable(true);
+		m_cu_timer->adjust(attotime::zero);
 		break;
 
 	case CUC_SUSPEND:
 		m_cu_state = CU_SUSPENDED;
-		m_cu_timer->enable(false);
+		m_cu_timer->reset();
 		m_cna = true;
 		break;
 
@@ -491,7 +494,7 @@ void i82586_base_device::cu_complete(const u16 status)
 	if (cb_cs & CB_S)
 	{
 		m_cu_state = CU_SUSPENDED;
-		m_cu_timer->enable(false);
+		m_cu_timer->reset();
 		m_cna = true;
 	}
 
@@ -557,9 +560,16 @@ void i82586_base_device::set_irq(bool irq)
 	{
 		LOG("irq asserted\n");
 
+		// ensure an edge is generated if interrupt already asserted
+		if (m_irq)
+			m_out_irq(!m_irq_assert);
+
 		m_out_irq(m_irq_assert);
-		m_out_irq(!m_irq_assert);
 	}
+	else if (m_irq)
+		m_out_irq(!m_irq_assert);
+
+	m_irq = irq;
 }
 
 u32 i82586_base_device::compute_crc(u8 *buf, int length, bool crc16)

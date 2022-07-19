@@ -231,7 +231,7 @@ license:CC0
 	</element>
 
 	<element name="text_uit1" defstate="0">
-		<text string="SB.MOBIL" state="0"><color red="0.81" green="0.8" blue="0.79" /></text>
+		<text string="SB.MIRAGE" state="0"><color red="0.81" green="0.8" blue="0.79" /></text>
 		<text string="SB.MODULAR" state="1"><color red="0.81" green="0.8" blue="0.79" /></text>
 	</element>
 	<element name="text_uit2"><text string="INTERFACE"><color red="0.81" green="0.8" blue="0.79" /></text></element>

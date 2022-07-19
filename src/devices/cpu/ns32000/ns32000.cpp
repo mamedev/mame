@@ -340,7 +340,7 @@ template <int Width> template<typename T> T ns32000_device<Width>::mem_read(unsi
 	return 0;
 }
 
-template <int Width> template<typename T> void ns32000_device<Width>::mem_write(unsigned st, u32 address, T data, bool user)
+template <int Width> template<typename T> void ns32000_device<Width>::mem_write(unsigned st, u32 address, u64 data, bool user)
 {
 	u32 physical = address;
 	ns32000_mmu_interface::translate_result tr = m_mmu ?
@@ -402,10 +402,44 @@ template <int Width> template<typename T> void ns32000_device<Width>::mem_write(
 		else
 		{
 			// aligned access
+			/*
+			 * Tektronix 4132 firmware requires that MOVB rN,<mem> (where mem
+			 * is a word-aligned memory address) drives a 16-bit value from the
+			 * register onto the data bus (with /HBE deasserted). The effect is
+			 * important when the data is being written to a fixed-width 16-bit
+			 * register (Am9516 in this case), as the byte enables are ignored
+			 * and a 16-bit value is latched. This code assumes the same effect
+			 * occurs with word/dword-aligned MOVB/MOVW on the 32032 and 32332.
+			 */
+			// TODO: verify how real hardware behaves
 			switch (sizeof(T))
 			{
-			case 1: m_bus[st].write_byte(physical, data); break;
-			case 2: m_bus[st].write_word(physical, data); break;
+			case 1:
+				if (Width == 1)
+				{
+					unsigned const shift = (physical & 1) * 8;
+
+					m_bus[st].write_word(physical, data << shift, 0xffU << shift);
+				}
+				else if (Width == 2)
+				{
+					unsigned const shift = (physical & 3) * 8;
+
+					m_bus[st].write_dword(physical, data << shift, 0xffU << shift);
+				}
+				else
+					m_bus[st].write_byte(physical, data);
+				break;
+			case 2:
+				if (Width == 2)
+				{
+					unsigned const shift = (physical & 2) * 8;
+
+					m_bus[st].write_dword(physical, data << shift, 0xffffU << shift);
+				}
+				else
+					m_bus[st].write_word(physical, data);
+				break;
 			case 4: m_bus[st].write_dword(physical, data); break;
 			case 8: m_bus[st].write_qword(physical, data); break;
 			}
@@ -1645,7 +1679,9 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						mode[1].write_i(size);
 						decode(mode, bytes);
 
-						u32 const src = gen_read(mode[0]);
+						// special-case non-masked source data when moving from
+						// register to memory; see comments in mem_write()
+						u32 const src = (mode[0].type == REG) ? m_r[mode[0].gen] : gen_read(mode[0]);
 
 						gen_write(mode[1], src);
 
