@@ -15177,7 +15177,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Tape 1: Ghosts'n Goblins Side 2"/>
 			<dataarea name="cass" size="718105">
-				<rom name="Thrill_Time_Gold_1_Tape_2_Side_2.tap" size="718105" crc="f404f736" sha1="521ef46faddeffe8f0a39fa490cd990265e91891"/>
+				<rom name="Thrill_Time_Gold_1_Tape_1_Side_2.tap" size="718105" crc="f404f736" sha1="521ef46faddeffe8f0a39fa490cd990265e91891"/>
 			</dataarea>
 		</part>
 
