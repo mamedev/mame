@@ -93,6 +93,16 @@ license:CC0
 		<text string="H"><color red="0.01" green="0.01" blue="0.01" /></text>
 	</element>
 
+	<!-- generic speaker icon, (C) Mobius, public domain -->
+	<element name="speaker">
+		<image><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.0" width="500" height="500" viewBox="0 0 75 75">
+				<path d="M39.389,13.769 L22.235,28.606 L6,28.606 L6,47.699 L21.989,47.699 L39.389,62.75 L39.389,13.769z" style="stroke:#262626;stroke-width:5;stroke-linejoin:round;fill:#262626;"/>
+				<path d="M48,27.6a19.5,19.5 0 0 1 0,21.4M55.1,20.5a30,30 0 0 1 0,35.6M61.6,14a38.8,38.8 0 0 1 0,48.6" style="fill:none;stroke:#262626;stroke-width:5;stroke-linecap:round"/>
+			</svg>
+		]]></data></image>
+	</element>
+
 	<element name="text_re">
 		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
 		<text string="RE"><color red="0.15" green="0.15" blue="0.15" /></text>
@@ -112,10 +122,6 @@ license:CC0
 	<element name="text_lv">
 		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
 		<text string="LV"><color red="0.15" green="0.15" blue="0.15" /></text>
-	</element>
-	<element name="text_spk">
-		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
-		<text string="spk"><color red="0.15" green="0.15" blue="0.15" /></text>
 	</element>
 	<element name="text_dm">
 		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
@@ -502,7 +508,7 @@ license:CC0
 		<element ref="text_pb"><bounds x="90.2" y="22.8" width="5" height="3" /></element>
 		<element ref="text_pv"><bounds x="90.2" y="31.6" width="5" height="3" /></element>
 		<element ref="text_lv"><bounds x="90.2" y="40.4" width="5" height="3" /></element>
-		<element ref="text_spk"><bounds x="90.2" y="49.05" width="5" height="3" /></element>
+		<element ref="speaker"><bounds x="91.0" y="49.0" width="3.4" height="3.4" /></element>
 		<element ref="text_dm"><bounds x="90.2" y="58" width="5" height="3" /></element>
 		<element ref="text_rv"><bounds x="90.2" y="66.8" width="5" height="3" /></element>
 
