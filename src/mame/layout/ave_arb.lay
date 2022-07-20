@@ -112,12 +112,12 @@ license:CC0
 	<element name="text_s3"><text string="Take Back" align="1"><color red="0.55" green="0.55" blue="0.55" /></text></element>
 	<element name="text_s4"><text string="Clear" align="1"><color red="0.55" green="0.55" blue="0.55" /></text></element>
 
-	<element name="text_r11"><image file="chess/wp.svg"><color alpha="0.78" /></image></element>
-	<element name="text_r21"><image file="chess/wn.svg"><color alpha="0.78" /></image></element>
-	<element name="text_r31"><image file="chess/wb.svg"><color alpha="0.78" /></image></element>
-	<element name="text_r41"><image file="chess/wr.svg"><color alpha="0.78" /></image></element>
-	<element name="text_r51"><image file="chess/wq.svg"><color alpha="0.78" /></image></element>
-	<element name="text_r61"><image file="chess/wk.svg"><color alpha="0.78" /></image></element>
+	<element name="text_r11"><image file="chess/wp.svg"><color alpha="0.79" /></image></element>
+	<element name="text_r21"><image file="chess/wn.svg"><color alpha="0.79" /></image></element>
+	<element name="text_r31"><image file="chess/wb.svg"><color alpha="0.79" /></image></element>
+	<element name="text_r41"><image file="chess/wr.svg"><color alpha="0.79" /></image></element>
+	<element name="text_r51"><image file="chess/wq.svg"><color alpha="0.79" /></image></element>
+	<element name="text_r61"><image file="chess/wk.svg"><color alpha="0.79" /></image></element>
 	<element name="text_r71"><text string="W"><color red="0.81" green="0.8" blue="0.79" /></text></element> <!-- White -->
 	<element name="text_r81"><text string="B"><color red="0.81" green="0.8" blue="0.79" /></text></element> <!-- Black -->
 

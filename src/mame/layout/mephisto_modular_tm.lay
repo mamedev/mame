@@ -32,6 +32,20 @@ license:CC0
 	<element name="text_g"> <rect><color red="0.56" green="0.33" blue="0.12" /></rect> <text string="G"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
 	<element name="text_h"> <rect><color red="0.56" green="0.33" blue="0.12" /></rect> <text string="H"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
 
+
+<!-- sb board -->
+
+	<element name="cblack"><rect><color red="0.56" green="0.33" blue="0.12" /></rect></element>
+	<element name="cwhite"><rect><color red="0.84" green="0.75" blue="0.50" /></rect></element>
+
+	<element name="hlbb" defstate="0">
+		<text string=" "><bounds x="0" y="0" width="1" height="1" /></text>
+		<disk state="1">
+			<bounds x="0.12" y="0.12" width="0.76" height="0.76" />
+			<color red="0" green="0" blue="0" />
+		</disk>
+	</element>
+
 	<element name="piece" defstate="0">
 		<image file="chess/wp.svg" state="1"/>
 		<image file="chess/wn.svg" state="2"/>
@@ -61,20 +75,6 @@ license:CC0
 		<image file="chess/br.svg" state="22"><color alpha="0.5" /></image>
 		<image file="chess/bq.svg" state="23"><color alpha="0.5" /></image>
 		<image file="chess/bk.svg" state="24"><color alpha="0.5" /></image>
-	</element>
-
-
-<!-- sb board -->
-
-	<element name="cblack"><rect><color red="0.56" green="0.33" blue="0.12" /></rect></element>
-	<element name="cwhite"><rect><color red="0.84" green="0.75" blue="0.50" /></rect></element>
-
-	<element name="hlbb" defstate="0">
-		<text string=" "><bounds x="0" y="0" width="1" height="1" /></text>
-		<disk state="1">
-			<bounds x="0.12" y="0.12" width="0.76" height="0.76" />
-			<color red="0" green="0" blue="0" />
-		</disk>
 	</element>
 
 	<group name="sb_board">
