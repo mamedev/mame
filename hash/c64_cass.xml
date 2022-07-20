@@ -15389,13 +15389,13 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="455643">
-				<rom name="Time_Tunnel.tap.tap" size="455643" crc="40d446aa" sha1="b03646587ca1aca5dc242395101c5b5b7bb107bb"/>
+				<rom name="Time_Tunnel.tap" size="455643" crc="40d446aa" sha1="b03646587ca1aca5dc242395101c5b5b7bb107bb"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="455643">
-				<rom name="Time_Tunnel.tap_a1.tap" size="455643" crc="d4805b29" sha1="6050ce7a853e4b042f3c787d4574d584d171d65e"/>
+				<rom name="Time_Tunnel_a1.tap" size="455643" crc="d4805b29" sha1="6050ce7a853e4b042f3c787d4574d584d171d65e"/>
 			</dataarea>
 		</part>
 	</software>
