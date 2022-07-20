@@ -13,7 +13,7 @@
  *
  *
  * Sources:
- *  - http://bitsavers.org/components/amd/_dataBooks/1989_AMD_Personal_Computer_Products.pdf
+ *  - Personal Computer Products Data Book, © 1989 Advanced Micro Devices
  *
  * TODO:
  *  - start after chaining
