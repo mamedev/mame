@@ -45,7 +45,7 @@ DEFINE_DEVICE_TYPE(A26_ROM_SUPERCHARGER, a26_rom_ss_device, "a2600_ss", "Atari 2
 
 
 a26_rom_ss_device::a26_rom_ss_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: a26_rom_f6_device(mconfig, A26_ROM_SUPERCHARGER, tag, owner, clock),
+	: a26_rom_base_device(mconfig, A26_ROM_SUPERCHARGER, tag, owner, clock),
 	m_cassette(*this, "cassette"),
 	m_reg(0),
 	m_write_delay(0),
@@ -107,9 +107,10 @@ inline uint8_t a26_rom_ss_device::read_byte(uint32_t offset)
 		return 0xff;
 }
 
-void a26_rom_ss_device::install_taps(address_space &space)
+void a26_rom_ss_device::install_memory_handlers(address_space *space)
 {
-	space.install_readwrite_tap(0x0000, 0x1fff, "bank", 
+	space->install_read_handler(0x1000, 0x1fff, read8sm_delegate(*this, FUNC(a26_rom_ss_device::read)));
+	space->install_readwrite_tap(0x0000, 0x1fff, "bank", 
 		[this](offs_t offset, u8 &, u8) { if(!machine().side_effects_disabled()) tap(offset); },
 		[this](offs_t offset, u8 &, u8) { if(!machine().side_effects_disabled()) tap(offset); }
 	);

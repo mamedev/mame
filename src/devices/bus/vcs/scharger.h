@@ -14,19 +14,15 @@
 
 // ======================> a26_rom_ss_device
 
-class a26_rom_ss_device : public a26_rom_f6_device
+class a26_rom_ss_device : public a26_rom_base_device
 {
 public:
-	// construction/destruction
 	a26_rom_ss_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void install_taps(address_space &space) override;
-
-	// reading and writing
-	virtual uint8_t read(offs_t offset) override;
+	virtual void install_memory_handlers(address_space *space) override;
+	uint8_t read(offs_t offset);
 
 private:
-	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

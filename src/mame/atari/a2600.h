@@ -96,8 +96,6 @@ public:
 	void a2600p(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-
 	void a2600_cartslot(machine_config &config);
 
 private:

@@ -112,13 +112,10 @@ void a2600_base_state::a2600_mem(address_map &map) // 6507 has 13-bit address sp
 #endif
 }
 
-
-void a2600_state::a2600_mem(address_map &map) // 6507 has 13-bit address space, 0x0000 - 0x1fff
+void a2600_state::a2600_mem(address_map &map)
 {
 	a2600_base_state::a2600_mem(map);
-	map(0x1000, 0x1fff).rw(m_cartslot, FUNC(vcs_cart_slot_device::read), FUNC(vcs_cart_slot_device::write));
 }
-
 
 void a2600_pop_state::memory_map(address_map &map) // 6507 has 13-bit address space, 0x0000 - 0x1fff
 {
@@ -332,13 +329,6 @@ void a2600_base_state::machine_start()
 	save_item(NAME(m_current_screen_height));
 }
 
-void a2600_state::machine_start()
-{
-	a2600_base_state::machine_start();
-	m_cartslot->install_taps(m_maincpu->space(AS_PROGRAM));
-}
-
-
 void a2600_pop_state::machine_start()
 {
 	a2600_base_state::machine_start();
@@ -404,8 +394,7 @@ INPUT_PORTS_END
 
 static void a2600_cart(device_slot_interface &device)
 {
-	device.option_add("a26_2k",    A26_ROM_2K);
-	device.option_add("a26_4k",    A26_ROM_4K);
+	device.option_add("a26_2k_4k", A26_ROM_2K_4K);
 	device.option_add("a26_f4",    A26_ROM_F4);
 	device.option_add("a26_f6",    A26_ROM_F6);
 	device.option_add("a26_f8",    A26_ROM_F8);
@@ -434,6 +423,7 @@ static void a2600_cart(device_slot_interface &device)
 void a2600_state::a2600_cartslot(machine_config &config)
 {
 	VCS_CART_SLOT(config, m_cartslot, a2600_cart, nullptr).set_must_be_loaded(true);
+	m_cartslot->set_address_space(m_maincpu, AS_PROGRAM);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("a2600");
@@ -482,7 +472,6 @@ void a2600_base_state::a2600_base_ntsc(machine_config &config)
 void a2600_state::a2600(machine_config &config)
 {
 	a2600_base_ntsc(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &a2600_state::a2600_mem);
 
 	VCS_CONTROL_PORT(config, CONTROL1_TAG, vcs_control_port_devices, "joy");
 	VCS_CONTROL_PORT(config, CONTROL2_TAG, vcs_control_port_devices, nullptr);

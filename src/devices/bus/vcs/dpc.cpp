@@ -243,11 +243,6 @@ a26_rom_dpc_device::a26_rom_dpc_device(const machine_config &mconfig, const char
 //  mapper specific start/reset
 //-------------------------------------------------
 
-void a26_rom_dpc_device::device_start()
-{
-	save_item(NAME(m_base_bank));
-}
-
 void a26_rom_dpc_device::device_reset()
 {
 	m_base_bank = 0;
@@ -262,6 +257,12 @@ void a26_rom_dpc_device::setup_addon_ptr(uint8_t *ptr)
 void a26_rom_dpc_device::device_add_mconfig(machine_config &config)
 {
 	ATARI_DPC(config, m_dpc, 0);
+}
+
+void a26_rom_dpc_device::install_memory_handlers(address_space *space)
+{
+	space->install_read_handler(0x1000, 0x1fff, read8sm_delegate(*this, FUNC(a26_rom_dpc_device::read)));
+	space->install_write_handler(0x1000, 0x1fff, write8sm_delegate(*this, FUNC(a26_rom_dpc_device::write)));
 }
 
 uint8_t a26_rom_dpc_device::read(offs_t offset)
