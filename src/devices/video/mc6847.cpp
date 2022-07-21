@@ -991,7 +991,7 @@ mc6847_friend_device::character_map::character_map(const uint8_t *text_fontdata,
 
 
 //-------------------------------------------------
-//  round_fontdata8x12
+//  vdg_t1_fontdata8x12
 //-------------------------------------------------
 
 const uint8_t mc6847_friend_device::vdg_t1_fontdata8x12[] =
@@ -1099,7 +1099,7 @@ const uint8_t mc6847_friend_device::vdg_t1_fontdata8x12[] =
 
 
 //-------------------------------------------------
-//  square_fontdata8x12
+//  vdg_fontdata8x12
 //-------------------------------------------------
 
 const uint8_t mc6847_friend_device::vdg_fontdata8x12[] =
