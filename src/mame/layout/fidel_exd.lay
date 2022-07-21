@@ -9,8 +9,10 @@ license:CC0
 <!-- define elements -->
 
 	<element name="black"><rect><color red="0.17" green="0.15" blue="0.15" /></rect></element>
+	<element name="blackb"><rect><color red="0" green="0" blue="0" /></rect></element>
 	<element name="white"><rect><color red="0.81" green="0.8" blue="0.79" /></rect></element>
 	<element name="redb"><rect><color red="0.81" green="0.3" blue="0.29" /></rect></element>
+	<element name="redm"><rect><color red="0.64" green="0.15" blue="0.14" /></rect></element>
 
 	<element name="digit" defstate="0">
 		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
@@ -168,6 +170,10 @@ license:CC0
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
 		<text string="LEVEL"><color red="0.17" green="0.15" blue="0.15" /></text>
 	</element>
+	<element name="text_t4">
+		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
+		<text string=" "><color red="0.17" green="0.15" blue="0.15" /></text>
+	</element>
 	<element name="text_t41">
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
 		<text string="TAKE"><color red="0.17" green="0.15" blue="0.15" /></text>
@@ -189,30 +195,12 @@ license:CC0
 		<text string="CLEAR"><color red="0.17" green="0.15" blue="0.15" /></text>
 	</element>
 
-	<element name="text_tl7">
-		<rect><color red="0.17" green="0.15" blue="0.15" /></rect>
-		<text string="[K]"><color red="0.65" green="0.15" blue="0.14" /></text>
-	</element>
-	<element name="text_tl6">
-		<rect><color red="0.17" green="0.15" blue="0.15" /></rect>
-		<text string="[Q]"><color red="0.65" green="0.15" blue="0.14" /></text>
-	</element>
-	<element name="text_tl5">
-		<rect><color red="0.17" green="0.15" blue="0.15" /></rect>
-		<text string="[R]"><color red="0.65" green="0.15" blue="0.14" /></text>
-	</element>
-	<element name="text_tl4">
-		<rect><color red="0.17" green="0.15" blue="0.15" /></rect>
-		<text string="[B]"><color red="0.65" green="0.15" blue="0.14" /></text>
-	</element>
-	<element name="text_tl3">
-		<rect><color red="0.17" green="0.15" blue="0.15" /></rect>
-		<text string="[N]"><color red="0.65" green="0.15" blue="0.14" /></text>
-	</element>
-	<element name="text_tl2">
-		<rect><color red="0.17" green="0.15" blue="0.15" /></rect>
-		<text string="[P]"><color red="0.65" green="0.15" blue="0.14" /></text>
-	</element>
+	<element name="text_p1"><image file="chess/wk.svg" /></element>
+	<element name="text_p2"><image file="chess/wq.svg" /></element>
+	<element name="text_p3"><image file="chess/wr.svg" /></element>
+	<element name="text_p4"><image file="chess/wb.svg" /></element>
+	<element name="text_p5"><image file="chess/wn.svg" /></element>
+	<element name="text_p6"><image file="chess/wp.svg" /></element>
 
 
 <!-- sb board -->
@@ -506,8 +494,7 @@ license:CC0
 
 		<group ref="sb_ui"><bounds x="-12" y="3.5" width="10" height="80" /></group>
 
-	<!-- chessboard coords -->
-
+		<!-- chessboard coords -->
 		<element ref="text_8"><bounds x="0.7" y="9" width="2" height="2" /></element>
 		<element ref="text_7"><bounds x="0.7" y="19" width="2" height="2" /></element>
 		<element ref="text_6"><bounds x="0.7" y="29" width="2" height="2" /></element>
@@ -526,15 +513,13 @@ license:CC0
 		<element ref="text_g"><bounds x="65.5" y="83.7" width="2" height="2" /></element>
 		<element ref="text_h"><bounds x="75.5" y="83.7" width="2" height="2" /></element>
 
-	<!-- left side labels -->
-
+		<!-- left side labels -->
 		<element ref="text_9"><bounds  x="-0.9" y="12" width="2.6" height="2" /></element>
 		<element ref="text_10"><bounds x="-0.9" y="22" width="2.6" height="2" /></element>
 		<element ref="text_11"><bounds x="-0.9" y="32" width="2.6" height="2" /></element>
 		<element ref="text_12"><bounds x="-0.9" y="42" width="2.6" height="2" /></element>
 
-	<!-- bottom side labels -->
-
+		<!-- bottom side labels -->
 		<element ref="text_lb"><bounds x="13.5" y="85.8" width="10" height="2" /></element>
 		<element ref="text_lc"><bounds x="23.5" y="85.8" width="10" height="2" /></element>
 		<element ref="text_ld"><bounds x="33.5" y="85.8" width="10" height="2" /></element>
@@ -543,8 +528,7 @@ license:CC0
 		<element ref="text_lh"><bounds x="73.5" y="85.8" width="10" height="2" /></element>
 		<element ref="text_lg"><bounds x="62.5" y="85.8" width="12" height="2" /></element>
 
-	<!-- chessboard leds -->
-
+		<!-- chessboard leds -->
 		<element name="0.7" ref="led"><bounds x="2.5" y="7.25" width="1.5" height="1.5" /></element>
 		<element name="0.6" ref="led"><bounds x="2.5" y="17.25" width="1.5" height="1.5" /></element>
 		<element name="0.5" ref="led"><bounds x="2.5" y="27.25" width="1.5" height="1.5" /></element>
@@ -563,8 +547,7 @@ license:CC0
 		<element name="1.6" ref="ledg"><bounds x="67.75" y="82.5" width="1.5" height="1.5" /></element>
 		<element name="1.7" ref="ledg"><bounds x="77.75" y="82.5" width="1.5" height="1.5" /></element>
 
-	<!-- 7seg leds -->
-
+		<!-- 7seg leds -->
 		<element name="digit2" ref="digit">
 			<bounds x="64.18" y="-12" width="5.66" height="8.5" />
 		</element>
@@ -585,54 +568,43 @@ license:CC0
 			<bounds x="76.31" y="-5.85" width="0.85" height="0.85" />
 		</element>
 
-	<!-- right side -->
+		<!-- right side -->
+		<element ref="blackb"><bounds x="86" y="2.5" width="10" height="81" /></element>
 
-		<element ref="black"><bounds x="86" y="2.5" width="10" height="81" /></element>
+		<repeat count="6">
+			<param name="y" start="17.1" increment="8.75" />
+			<param name="i" start="1" increment="1" />
+			<element ref="text_p~i~"><bounds x="89.3" y="~y~" width="3.4" height="3.4" /></element>
+			<element ref="redm" blend="multiply"><bounds x="89.3" y="~y~" width="3.4" height="3.4" /></element>
+		</repeat>
 
-		<element ref="text_tl7"><bounds x="87" y="16.2" width="8" height="2.5" /></element>
-		<element ref="text_tl6"><bounds x="87" y="25.2" width="8" height="2.5" /></element>
-		<element ref="text_tl5"><bounds x="87" y="34.2" width="8" height="2.5" /></element>
-		<element ref="text_tl4"><bounds x="87" y="43.2" width="8" height="2.5" /></element>
-		<element ref="text_tl3"><bounds x="87" y="52.2" width="8" height="2.5" /></element>
-		<element ref="text_tl2"><bounds x="87" y="61.2" width="8" height="2.5" /></element>
+		<element ref="black" blend="add"><bounds x="86" y="2.5" width="10" height="81" /></element>
+
+		<repeat count="7">
+			<param name="y1" start="20.5" increment="8.75" />
+			<param name="y2" start="20.8" increment="8.75" />
+			<param name="y3" start="21.75" increment="8.75" />
+			<param name="i" start="7" increment="-1" />
+
+			<element ref="redb"><bounds x="87" y="~y1~" width="8" height="4" /></element>
+			<element ref="white"><bounds x="87.3" y="~y2~" width="7.4" height="3.4" /></element>
+			<element ref="text_t~i~"><bounds x="87.5" y="~y3~" width="7.0" height="1.5" /></element>
+		</repeat>
+
+		<element ref="text_t41"><bounds x="87.5" y="47.25" width="7.0" height="1.5" /></element>
+		<element ref="text_t42"><bounds x="87.5" y="48.75" width="7.0" height="1.5" /></element>
+
+		<repeat count="7">
+			<param name="y" start="20.5" increment="8.75" />
+			<param name="mask" start="0x40" rshift="1" />
+			<element ref="hlb" inputtag="IN.0" inputmask="~mask~"><bounds x="87" y="~y~" width="8" height="4" /><color alpha="0.4" /></element>
+		</repeat>
 
 		<element ref="redb"><bounds x="87" y="9" width="8" height="4" /></element>
-		<element ref="redb"><bounds x="87" y="19" width="8" height="4" /></element>
-		<element ref="redb"><bounds x="87" y="28" width="8" height="4" /></element>
-		<element ref="redb"><bounds x="87" y="37" width="8" height="4" /></element>
-		<element ref="redb"><bounds x="87" y="46" width="8" height="4" /></element>
-		<element ref="redb"><bounds x="87" y="55" width="8" height="4" /></element>
-		<element ref="redb"><bounds x="87" y="64" width="8" height="4" /></element>
-		<element ref="redb"><bounds x="87" y="73" width="8" height="4" /></element>
-
 		<element ref="white"><bounds x="87.3" y="9.3" width="7.4" height="3.4" /></element>
-		<element ref="white"><bounds x="87.3" y="19.3" width="7.4" height="3.4" /></element>
-		<element ref="white"><bounds x="87.3" y="28.3" width="7.4" height="3.4" /></element>
-		<element ref="white"><bounds x="87.3" y="37.3" width="7.4" height="3.4" /></element>
-		<element ref="white"><bounds x="87.3" y="46.3" width="7.4" height="3.4" /></element>
-		<element ref="white"><bounds x="87.3" y="55.3" width="7.4" height="3.4" /></element>
-		<element ref="white"><bounds x="87.3" y="64.3" width="7.4" height="3.4" /></element>
-		<element ref="white"><bounds x="87.3" y="73.3" width="7.4" height="3.4" /></element>
-
-		<element ref="text_t81"><bounds x="87.35" y="9.5" width="7.3" height="1.5" /></element>
-		<element ref="text_t82"><bounds x="87.35" y="11" width="7.3" height="1.5" /></element>
-		<element ref="text_t7"><bounds x="87.35" y="20.25" width="7.3" height="1.5" /></element>
-		<element ref="text_t6"><bounds x="87.35" y="29.25" width="7.3" height="1.5" /></element>
-		<element ref="text_t5"><bounds x="87.35" y="38.25" width="7.3" height="1.5" /></element>
-		<element ref="text_t41"><bounds x="87.35" y="46.5" width="7.3" height="1.5" /></element>
-		<element ref="text_t42"><bounds x="87.35" y="48" width="7.3" height="1.5" /></element>
-		<element ref="text_t3"><bounds x="87.35" y="56.25" width="7.3" height="1.5" /></element>
-		<element ref="text_t2"><bounds x="87.35" y="65.25" width="7.3" height="1.5" /></element>
-		<element ref="text_t1"><bounds x="87.35" y="74.25" width="7.3" height="1.5" /></element>
-
+		<element ref="text_t81"><bounds x="87.5" y="9.5" width="7.0" height="1.5" /></element>
+		<element ref="text_t82"><bounds x="87.5" y="11" width="7.0" height="1.5" /></element>
 		<element ref="hlb" inputtag="IN.0" inputmask="0x80"><bounds x="87" y="9" width="8" height="4" /><color alpha="0.4" /></element>
-		<element ref="hlb" inputtag="IN.0" inputmask="0x40"><bounds x="87" y="19" width="8" height="4" /><color alpha="0.4" /></element>
-		<element ref="hlb" inputtag="IN.0" inputmask="0x20"><bounds x="87" y="28" width="8" height="4" /><color alpha="0.4" /></element>
-		<element ref="hlb" inputtag="IN.0" inputmask="0x10"><bounds x="87" y="37" width="8" height="4" /><color alpha="0.4" /></element>
-		<element ref="hlb" inputtag="IN.0" inputmask="0x08"><bounds x="87" y="46" width="8" height="4" /><color alpha="0.4" /></element>
-		<element ref="hlb" inputtag="IN.0" inputmask="0x04"><bounds x="87" y="55" width="8" height="4" /><color alpha="0.4" /></element>
-		<element ref="hlb" inputtag="IN.0" inputmask="0x02"><bounds x="87" y="64" width="8" height="4" /><color alpha="0.4" /></element>
-		<element ref="hlb" inputtag="IN.0" inputmask="0x01"><bounds x="87" y="73" width="8" height="4" /><color alpha="0.4" /></element>
 
 	</view>
 </mamelayout>

@@ -15040,6 +15040,110 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="tsam">
+		<description>They Sold a Million</description>
+		<year>1985</year>
+		<publisher>The Hit Squad</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 1: Beach Head"/>
+			<dataarea name="cass" size="521830">
+				<rom name="They_Sold_a_Million_Tape_1_Side_1.tap" size="521830" crc="96f7d76d" sha1="50aa7a3c10c739367d3d08a74ee4ba73fb6f9c65"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 2: Daley Thompson's Decathlon"/>
+			<dataarea name="cass" size="582574">
+				<rom name="They_Sold_a_Million_Tape_1_Side_2.tap" size="582574" crc="0c816054" sha1="3ea08c86e7331460c546066fb6103da248bea4ea"/>
+			</dataarea>
+		</part>
+
+		<part name="cass3" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 1: The Staff of Karnath"/>
+			<dataarea name="cass" size="608040">
+				<rom name="They_Sold_a_Million_Tape_2_Side_1.tap" size="608040" crc="5cc91b61" sha1="7f99adc48243d33bec4c9ae45428a5093d438f1f"/>
+			</dataarea>
+		</part>
+
+		<part name="cass4" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 2: Jet Set Willy"/>
+			<dataarea name="cass" size="549309">
+				<rom name="They_Sold_a_Million_Tape_2_Side_2.tap" size="549309" crc="9dde030e" sha1="d945c69f3a5e0c6fd00f4749977e8a73bbbc51cc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tsam3">
+		<description>They Sold a Million 3</description>
+		<year>1987</year>
+		<publisher>The Hit Squad</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 1: Fighter Pilot"/>
+			<dataarea name="cass" size="467987">
+				<rom name="They_Sold_a_Million_3_Tape_1_Side_1.tap" size="467987" crc="b5e396f9" sha1="744901e47fe48889bb977b139950eb3d0921e369"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 2: Ghostbusters"/>
+			<dataarea name="cass" size="467899">
+				<rom name="They_Sold_a_Million_3_Tape_1_Side_2.tap" size="467899" crc="d2dcae23" sha1="89c890b50c7f3b8b1154abb7546a7b5d92fd5e97"/>
+			</dataarea>
+		</part>
+
+		<part name="cass3" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 1: Rambo: First Blood Part II"/>
+			<dataarea name="cass" size="743240">
+				<rom name="They_Sold_a_Million_3_Tape_2_Side_1.tap" size="743240" crc="1a90107d" sha1="b414bca7f103b271a581c6abc0d87ee73f76ab62"/>
+			</dataarea>
+		</part>
+
+		<part name="cass4" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 2: Kung-Fu Master"/>
+			<dataarea name="cass" size="554682">
+				<rom name="They_Sold_a_Million_3_Tape_2_Side_2.tap" size="554682" crc="92c7cdfc" sha1="f241d3d405c0c28377474f960748ab441561f909"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="theystol" supported="no"> <!-- copy protection prevents from fully loading -->
+		<description>They Stole a Million</description>
+		<year>1986</year>
+		<publisher>39 Steps</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="818802">
+				<rom name="They_Stole_a_Million.tap" size="818802" crc="05b790a5" sha1="387cd54da257d34d389626e17c212aba0f74f820"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thingbou">
+		<description>Thing Bounces Back</description>
+		<year>1987</year>
+		<publisher>Gremlin Graphics</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="520062">
+				<rom name="Thing_Bounces_Back.tap" size="520062" crc="52a8033d" sha1="ea1650775bc053c5aeec1557e8b491ea88e67600"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thingspr">
+		<description>Thing on a Spring</description>
+		<year>1985</year>
+		<publisher>Gremlin Graphics</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="584750">
+				<rom name="Thing_on_a_Spring.tap" size="584750" crc="4943d2fc" sha1="581be3c67cec04f143031f7524e2362b50075dd7"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="thomas">
 		<description>Thomas the Tank Engine &amp; Friends</description>
 		<year>1990</year>
@@ -15054,6 +15158,80 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="596672">
 				<rom name="Thomas_the_Tank_Engine_&amp;_Friends_a1.tap" size="596672" crc="6ccba0bb" sha1="803b0bd1a395780f8c2834751d45095ea20ffbc4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ttgold1">
+		<description>Thrill Time Gold 1</description>
+		<year>1986</year>
+		<publisher>Elite Systems</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1: Ghosts'n Goblins Side 1"/>
+			<dataarea name="cass" size="718105">
+				<rom name="Thrill_Time_Gold_1_Tape_1_Side_1.tap" size="718105" crc="70456b71" sha1="8ebd4250205347aecb0773c7fbeedc72455f27a9"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1: Ghosts'n Goblins Side 2"/>
+			<dataarea name="cass" size="718105">
+				<rom name="Thrill_Time_Gold_1_Tape_1_Side_2.tap" size="718105" crc="f404f736" sha1="521ef46faddeffe8f0a39fa490cd990265e91891"/>
+			</dataarea>
+		</part>
+
+		<part name="cass3" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2: Paperboy Side 1"/>
+			<dataarea name="cass" size="718553">
+				<rom name="Thrill_Time_Gold_1_Tape_2_Side_1.tap" size="718553" crc="4b422b1a" sha1="ae233f871d9fc0f25c1ca4e39841803e46f7ec54"/>
+			</dataarea>
+		</part>
+
+		<part name="cass4" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2: Paperboy Side 2"/>
+			<dataarea name="cass" size="718553">
+				<rom name="Thrill_Time_Gold_1_Tape_2_Side_2.tap" size="718553" crc="ccafd24f" sha1="91d4999c720633e2dd665f334a10c2043c4d101a"/>
+			</dataarea>
+		</part>
+		<part name="cass5" interface="cbm_cass">
+			<feature name="part_id" value="Tape 3: Batty Side 1"/>
+			<dataarea name="cass" size="725849">
+				<rom name="Thrill_Time_Gold_1_Tape_3_Side_1.tap" size="725849" crc="b52f8d77" sha1="19838ab64d437203472680f252f5cdeb9de6468a"/>
+			</dataarea>
+		</part>
+
+		<part name="cass6" interface="cbm_cass">
+			<feature name="part_id" value="Tape 3: Batty Side 2"/>
+			<dataarea name="cass" size="725849">
+				<rom name="Thrill_Time_Gold_1_Tape_3_Side_2.tap" size="725849" crc="115b3738" sha1="b4eac11cf27dae9062adb981a7d7d810fb0ef29c"/>
+			</dataarea>
+		</part>
+
+		<part name="cass7" interface="cbm_cass">
+			<feature name="part_id" value="Tape 4: Turbo Esprit Side 1"/>
+			<dataarea name="cass" size="675956">
+				<rom name="Thrill_Time_Gold_1_Tape_4_Side_1.tap" size="675956" crc="08d2eca9" sha1="ea54f36940184e825bd0a8de54bc79fe99aae917"/>
+			</dataarea>
+		</part>
+
+		<part name="cass8" interface="cbm_cass">
+			<feature name="part_id" value="Tape 4: Turbo Esprit Side 2"/>
+			<dataarea name="cass" size="675956">
+				<rom name="Thrill_Time_Gold_1_Tape_4_Side_2.tap" size="675956" crc="b05d4f63" sha1="3ad47fa4f036be6e65f7bcb4b260f14ec0d751ae"/>
+			</dataarea>
+		</part>
+		<part name="cass9" interface="cbm_cass">
+			<feature name="part_id" value="Tape 5: Bomb Jack Side 1"/>
+			<dataarea name="cass" size="565967">
+				<rom name="Thrill_Time_Gold_1_Tape_5_Side_1.tap" size="565967" crc="552f1063" sha1="828d5682d0bd98af48ff42ef11eb674a7daab14d"/>
+			</dataarea>
+		</part>
+
+		<part name="cass10" interface="cbm_cass">
+			<feature name="part_id" value="Tape 5: Bomb Jack Side 2"/>
+			<dataarea name="cass" size="565967">
+				<rom name="Thrill_Time_Gold_1_Tape_5_Side_2.tap" size="565967" crc="b37638b4" sha1="7d42c52420f75789ae87215d2ab921f69856b055"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15106,6 +15284,26 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="tbladeu" cloneof="tblade">
+		<description>Thunder Blade (U.S. Gold)</description>
+		<year>1988</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="1056714">
+				<rom name="Thunder_Blade_Side_1.tap" size="1056714" crc="9ee164b4" sha1="7c2abe29b8a091b47c5b597bac59e6deb0362e8f"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="984412">
+				<rom name="Thunder_Blade_Side_2.tap" size="984412" crc="b99488bd" sha1="aa4cf510efb0450962774844b207fdb05786e225"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="thndcats">
 		<description>Thundercats</description>
 		<year>1989</year>
@@ -15118,6 +15316,24 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="thndcatse" cloneof="thndcats">
+		<description>Thundercats (Elite Systems)</description>
+		<year>1987</year>
+		<publisher>Elite Systems</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="674065">
+				<rom name="Thundercats.tap" size="674065" crc="669e8bfd" sha1="cfc9932231a8263d6a693993008287a776688ca9"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="674070">
+				<rom name="Thundercats_a1.tap" size="674070" crc="8cb0f2d1" sha1="23dfb00c4622253608f7d94e8347157671bf20dd"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="thndforc">
 		<description>Thunderforce</description>
 		<year>1987</year>
@@ -15126,6 +15342,30 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="591004">
 				<rom name="Thunderforce.tap" size="591004" crc="a9c05b13" sha1="17f97c20d89a6a5f7d1eeb9ae7b4ea757625dc32"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tigermis">
+		<description>Tiger Mission</description>
+		<year>1987</year>
+		<publisher>Status Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="417475">
+				<rom name="Tiger_Mission.tap" size="417475" crc="b1ba40b3" sha1="1e760f9b914ec33296b0eb6f0932c2ced4765594"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tilt">
+		<description>Tilt</description>
+		<year>1990</year>
+		<publisher>Codemasters</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="573951">
+				<rom name="Tilt.tap" size="573951" crc="5ba07cf3" sha1="4cee47ade811bdc815bf302228643bfe66961357"/>
 			</dataarea>
 		</part>
 	</software>

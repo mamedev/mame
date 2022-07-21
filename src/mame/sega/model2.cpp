@@ -3757,13 +3757,13 @@ Sega ID #:
 Known missing roms:
 
 Manx TT DX
-EPR-18742 - Sound CPU rom (on Sound BD)
-MPR-18743 - Sound Samples (on Sound BD)
+EPR-18742 - Sound CPU rom (on Sound BD, dumped)
+MPR-18743 - Sound Samples (on Sound BD, dumped)
 EPR-18744.12 - Program rom
 EPR-18745.13 - Program rom
 EPR-18784.14 - Program rom
 EPR-18785.15 - Program rom
-EPR-18746.30 (already dumped, added as 'manxtta')
+EPR-18746.30 - Sound CPU rom (dumped, added in 'manxtta')
 EPR-18767.5  - Data
 EPR-18768.4  - Data
 
@@ -3771,7 +3771,7 @@ EPR-18763.31 & alt sound CPU code EPR-18924a.30 are dumped
 
 */
 
-ROM_START( manxtt ) /* Manx TT Superbike Twin Revision D, Model 2A - Can be set to Twin or Deluxe - Found in DX setup */
+ROM_START( manxtt ) /* Manx TT Superbike DX/Twin Revision D, Model 2A - defaults to DX mode */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD( "epr-18822d.12", 0x000000, 0x020000, CRC(4f435990) SHA1(0fcf64598384012caea27394280de89a9348a47d) )
 	ROM_LOAD32_WORD( "epr-18823d.13", 0x000002, 0x020000, CRC(b8eddb5c) SHA1(7e3b97e3370e68d92922e8999246064196610270) )
@@ -3827,11 +3827,14 @@ ROM_START( manxtt ) /* Manx TT Superbike Twin Revision D, Model 2A - Can be set 
 	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
 	ROM_LOAD16_WORD_SWAP( "epr-18643a.7", 0x000000, 0x020000, CRC(b5e048ec) SHA1(8182e05a2ffebd590a936c1359c81e60caa79c2a) )
 
+	ROM_REGION16_LE( 0x0000080, "eeprom", 0 ) // default EEPROM
+	ROM_LOAD( "manxtt_dx_nvran", 0x000000, 0x000080, CRC(b22787a3) SHA1(a0f65e4e1a22c7f0848bbf583e5849d1f7f2adc3) ) // Default
+
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
 ROM_END
 
-ROM_START( manxttc ) /* Manx TT Superbike Twin Revision C, Model 2A */
+ROM_START( manxttc ) /* Manx TT Superbike DX/Twin Revision C, Model 2A - Set to Twin mode becuase we need to preserve the Twin sound ROMs */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD( "epr-18822c.12",  0x000000, 0x020000, CRC(c7b3e45a) SHA1(d3a6910bf6efc138e0e40332219b90dea7d6ea56) )
 	ROM_LOAD32_WORD( "epr-18823c.13",  0x000002, 0x020000, CRC(6b0c1dfb) SHA1(6da5c071e3ce842a99f928f473d4ccf7165785ac) )
@@ -3882,18 +3885,20 @@ ROM_START( manxttc ) /* Manx TT Superbike Twin Revision C, Model 2A */
 	ROM_LOAD16_WORD_SWAP( "epr-18643.7",  0x000000, 0x020000, CRC(7166fca7) SHA1(f5d02906b64bb2fd1af8e3772c1b01a4e006c060) )
 //  ROM_LOAD16_WORD_SWAP( "epr-18643a.7", 0x000000, 0x020000, CRC(b5e048ec) SHA1(8182e05a2ffebd590a936c1359c81e60caa79c2a) ) /* COMM boards found with either revision */
 
+	ROM_REGION16_LE( 0x0000080, "eeprom", 0 ) // default EEPROM
+	ROM_LOAD( "manxttc_twin_nvran", 0x000000, 0x000080, CRC(f3be38fe) SHA1(5d639800c8bdf8ba6c31ed9a711e4b307233d48b) ) // Set to Twin mode
+
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
 ROM_END
 
-/* This set was badly upgraded to Revision C, leaving over the sound CPU ROM from Revision A.
-   Every other ROM on the driver is what was found on the PCB (Twin Revision C), so we're still missing the main CPU ROMs from Revision A. */
-ROM_START( manxtta ) // Manx TT Superbike Revision A, Model 2A
+/* This set was badly upgraded to a Revision C Manx TT Twin/DX, leaving the DX only sound CPU ROM */
+ROM_START( manxtta ) // Manx TT Superbike DX/Twin Revision C, Model 2A - Set to DX becuase we need to preserve the original DX only sound ROMs
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
-	ROM_LOAD32_WORD( "epr-18822c.12",  0x000000, 0x020000, BAD_DUMP CRC(c7b3e45a) SHA1(d3a6910bf6efc138e0e40332219b90dea7d6ea56) ) // Not dumped on this set (should be EPR-18744.12)
-	ROM_LOAD32_WORD( "epr-18823c.13",  0x000002, 0x020000, BAD_DUMP CRC(6b0c1dfb) SHA1(6da5c071e3ce842a99f928f473d4ccf7165785ac) ) // Not dumped on this set (should be EPR-18745.13)
-	ROM_LOAD32_WORD( "epr-18824c.14",  0x040000, 0x020000, BAD_DUMP CRC(352bb817) SHA1(389cbf951ba606acb9ab7bff5cda85d9166e64ff) ) // Not dumped on this set
-	ROM_LOAD32_WORD( "epr-18825c.15",  0x040002, 0x020000, BAD_DUMP CRC(f88b036c) SHA1(f6196e8da5e6579fe3fa5c24ab9538964c98e267) ) // Not dumped on this set
+	ROM_LOAD32_WORD( "epr-18822c.12",  0x000000, 0x020000, BAD_DUMP CRC(c7b3e45a) SHA1(d3a6910bf6efc138e0e40332219b90dea7d6ea56) ) // correct DX only ROM should be EPR-18744.12
+	ROM_LOAD32_WORD( "epr-18823c.13",  0x000002, 0x020000, BAD_DUMP CRC(6b0c1dfb) SHA1(6da5c071e3ce842a99f928f473d4ccf7165785ac) ) // correct DX only ROM should be EPR-18745.13
+	ROM_LOAD32_WORD( "epr-18824c.14",  0x040000, 0x020000, BAD_DUMP CRC(352bb817) SHA1(389cbf951ba606acb9ab7bff5cda85d9166e64ff) ) // correct DX only ROM should be EPR-18784.14
+	ROM_LOAD32_WORD( "epr-18825c.15",  0x040002, 0x020000, BAD_DUMP CRC(f88b036c) SHA1(f6196e8da5e6579fe3fa5c24ab9538964c98e267) ) // correct DX only ROM should be EPR-18785.15
 
 	ROM_REGION32_LE( 0x2400000, "main_data", 0 ) // Data
 	ROM_LOAD32_WORD( "mpr-18751.10", 0x000000, 0x200000, CRC(773ad43d) SHA1(4d1601dc08a08b724e33e7cd90a4f22e18cfed9c) )
@@ -3902,8 +3907,8 @@ ROM_START( manxtta ) // Manx TT Superbike Revision A, Model 2A
 	ROM_LOAD32_WORD( "mpr-18750.9",  0x400002, 0x200000, CRC(40b55494) SHA1(d98ae5518c5d31b155b1a7c4f7d9d67f44d7beae) )
 	ROM_LOAD32_WORD( "mpr-18747.6",  0x800000, 0x200000, CRC(a65ec1e8) SHA1(92636bdff0ae4cdb43dfc2986fad2d1b59469323) )
 	ROM_LOAD32_WORD( "mpr-18748.7",  0x800002, 0x200000, CRC(375e3748) SHA1(6c2e903dd073b130bcabb347631b876dc868b494) )
-	ROM_LOAD32_WORD( "epr-18862.4",  0xc00000, 0x080000, CRC(9adc3a30) SHA1(029db946338f8e0eccace8590082cc96bdf13e31) )
-	ROM_LOAD32_WORD( "epr-18863.5",  0xc00002, 0x080000, CRC(603742e9) SHA1(f78a5f7e582d313880c734158bb0fa68b256a58a) )
+	ROM_LOAD32_WORD( "epr-18862.4",  0xc00000, 0x080000, BAD_DUMP CRC(9adc3a30) SHA1(029db946338f8e0eccace8590082cc96bdf13e31) ) // correct DX only ROM should be EPR-18768.4
+	ROM_LOAD32_WORD( "epr-18863.5",  0xc00002, 0x080000, BAD_DUMP CRC(603742e9) SHA1(f78a5f7e582d313880c734158bb0fa68b256a58a) ) // correct DX only ROM should be EPR-18767.5
 	ROM_COPY( "main_data", 0xc00000, 0xd00000, 0x100000 )
 	ROM_COPY( "main_data", 0xc00000, 0xe00000, 0x100000 )
 	ROM_COPY( "main_data", 0xc00000, 0xf00000, 0x100000 )
@@ -3925,16 +3930,27 @@ ROM_START( manxtta ) // Manx TT Superbike Revision A, Model 2A
 	ROM_LOAD32_WORD( "mpr-18759.24", 0x000002, 0x200000, CRC(278d8742) SHA1(5f285fc8cfe88c00ba2bbe1b509b49abd38e00ec) )
 
 	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
-	ROM_LOAD16_WORD_SWAP( "epr-18746.30", 0x000000, 0x040000, CRC(d7e21774) SHA1(7dba4c1fe34986e2b8f5d54b388ffc673adbc91d) )
+	ROM_LOAD16_WORD_SWAP( "epr-18746.30", 0x000000, 0x040000, CRC(d7e21774) SHA1(7dba4c1fe34986e2b8f5d54b388ffc673adbc91d) ) // Sound program for DX only set
 
 	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
-	ROM_LOAD16_WORD_SWAP( "mpr-18827.31", 0x000000, 0x200000, CRC(58d78ca1) SHA1(95275ed8315c044bfde2f23c10416f22627b34df) ) // Sound sample for Twin set
+	ROM_LOAD16_WORD_SWAP( "mpr-18763.31", 0x000000, 0x200000, CRC(1bcb2283) SHA1(a4a8a2f8f0901bfb57778351210ccfc421cacbd4) ) // Sound sample for DX set
 	ROM_LOAD16_WORD_SWAP( "mpr-18764.32", 0x200000, 0x200000, CRC(0dc6a860) SHA1(cb2ada0f8a592940de11ee781ad4beb5095c3b37) )
 	ROM_LOAD16_WORD_SWAP( "mpr-18765.36", 0x400000, 0x200000, CRC(ca4a803c) SHA1(70b59da8f2532a02e980caba5bb86ec13a4d7ab5) )
 	ROM_LOAD16_WORD_SWAP( "mpr-18766.37", 0x600000, 0x200000, CRC(e41892ea) SHA1(9ef5e26db4abf0ed36df63fc246b568e1c5d6cfa) )
 
+	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
+	ROM_LOAD16_WORD_SWAP("epr-18742.7", 0x000000, 0x020000, CRC(1b78da74) SHA1(939b0f2413ae3c11fac11b49ab8b0de2c5e35e61) )
+
+	ROM_REGION( 0x400000, M1AUDIO_MPCM1_REGION, 0 ) // Samples
+	ROM_LOAD("mpr-18743.32", 0x000000, 0x200000, CRC(17e84e15) SHA1(8437cddc4c4d729e886a5ab076885a54bb7a30d0) )
+
+	ROM_REGION( 0x400000, M1AUDIO_MPCM2_REGION, ROMREGION_ERASE00 ) // Samples
+
 	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
 	ROM_LOAD16_WORD_SWAP( "epr-18643.7",  0x000000, 0x020000, CRC(7166fca7) SHA1(f5d02906b64bb2fd1af8e3772c1b01a4e006c060) )
+
+	ROM_REGION16_LE( 0x0000080, "eeprom", 0 ) // default EEPROM
+	ROM_LOAD( "manxtta_dx_nvran", 0x000000, 0x000080, CRC(b22787a3) SHA1(a0f65e4e1a22c7f0848bbf583e5849d1f7f2adc3) ) // Default
 
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
@@ -5511,10 +5527,10 @@ ROM_START( bel ) /* Behind Enemy Lines, Model 2C */
 	ROM_LOAD16_WORD_SWAP("mpr-20253.35",  0x0600000, 0x200000, CRC(ca6aa17c) SHA1(f6df2483ca75573449ba36638dbbed4be7843a44) )
 ROM_END
 
-ROM_START( overrev ) /* Over Rev Revision A, Model 2C */
+ROM_START( overrev ) /* Over Rev Revision A, Model 2C, Sega game ID# 836-13277 OVER REV, ROM board ID# 836-13278 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
-	ROM_LOAD32_WORD( "epr-20124a.15", 0x000000, 0x080000, CRC(74beb8d7) SHA1(c65c641138ecd7312c4930702d1498b8a346175a) )
-	ROM_LOAD32_WORD( "epr-20125a.16", 0x000002, 0x080000, CRC(def64456) SHA1(cedb64d2d99a73301ef45c2f5f860a9b87faf6a7) )
+	ROM_LOAD32_WORD( "epr-20124a.15", 0x000000, 0x080000, CRC(74beb8d7) SHA1(c65c641138ecd7312c4930702d1498b8a346175a) ) /* sum16 7506 printed on label */
+	ROM_LOAD32_WORD( "epr-20125a.16", 0x000002, 0x080000, CRC(def64456) SHA1(cedb64d2d99a73301ef45c2f5f860a9b87faf6a7) ) /* sum16 D659 printed on label */
 
 	ROM_REGION32_LE( 0x2000000, "main_data", 0 ) // Data
 	ROM_LOAD32_WORD( "mpr-19996.11",  0x000000, 0x400000, CRC(21928a00) SHA1(6b439fd2b113b64df9378ef8180a17aa6fa975c5) )
@@ -7356,9 +7372,9 @@ GAME( 1994, vf2,        0,        model2a,      vf2,       model2a_state, empty_
 GAME( 1994, vf2b,       vf2,      model2a,      vf2,       model2a_state, empty_init,    ROT0, "Sega",   "Virtua Fighter 2 (Revision B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1994, vf2a,       vf2,      model2a,      vf2,       model2a_state, empty_init,    ROT0, "Sega",   "Virtua Fighter 2 (Revision A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1994, vf2o,       vf2,      model2a,      vf2,       model2a_state, empty_init,    ROT0, "Sega",   "Virtua Fighter 2", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1995, manxtt,     0,        manxttdx,     manxtt,    model2a_state, empty_init,    ROT0, "Sega",   "Manx TT Superbike - DX (Revision D)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, manxttc,    0,        manxtt,       manxtt,    model2a_state, empty_init,    ROT0, "Sega",   "Manx TT Superbike - Twin (Revision C)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, manxtta,    manxttc,  manxtt,       manxtt,    model2a_state, empty_init,    ROT0, "Sega",   "Manx TT Superbike - Twin (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, manxtt,     0,        manxttdx,     manxtt,    model2a_state, empty_init,    ROT0, "Sega",   "Manx TT Superbike - DX/Twin (Revision D)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS ) // Defaults to DX mode
+GAME( 1995, manxttc,    manxtt,   manxtt,       manxtt,    model2a_state, empty_init,    ROT0, "Sega",   "Manx TT Superbike - DX/Twin (Revision C, set 1)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS ) // set to Twin mode - used to place hold Twin sound ROMs
+GAME( 1995, manxtta,    manxtt,   manxttdx,     manxtt,    model2a_state, empty_init,    ROT0, "Sega",   "Manx TT Superbike - DX/Twin (Revision C, set 2)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS ) // set to DX mode - used to place hold DX only sound ROMs
 GAME( 1995, srallyc,    0,        srallyc,      srallyc,   model2a_state, empty_init,    ROT0, "Sega",   "Sega Rally Championship - Twin/DX (Revision C)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, srallycb,   srallyc,  srallyc,      srallyc,   model2a_state, empty_init,    ROT0, "Sega",   "Sega Rally Championship - Twin/DX (Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, srallycc,   srallyc,  srallyc,      srallyc,   model2a_state, empty_init,    ROT0, "Sega",   "Sega Rally Championship - Twin/DX (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )

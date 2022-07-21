@@ -5084,3 +5084,15 @@ if (MACHINES["SEGACRP2"]~=null) then
 		MAME_DIR .. "src/devices/machine/segacrp2_device.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/am9516.h,MACHINES["AM9516"] = true
+---------------------------------------------------
+
+if (MACHINES["AM9516"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/am9516.cpp",
+		MAME_DIR .. "src/devices/machine/am9516.h",
+	}
+end
