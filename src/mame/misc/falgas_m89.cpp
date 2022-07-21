@@ -74,13 +74,15 @@ SN74LS14N -> | |       _________________|
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i8085/i8085.h"
 #include "machine/i8155.h"
 #include "machine/i8255.h"
-#include "screen.h"
 #include "sound/ay8910.h"
-#include "speaker.h"
 #include "video/tms9928a.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 namespace
 {
@@ -91,7 +93,6 @@ public:
 	falgasm89_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_videocpu(*this, "videocpu")
 		, m_inputs(*this, "IN%u", 0U)
 		, m_psg_pa(0xff)
 	{
@@ -99,7 +100,6 @@ public:
 
 	void falgasm89_simple(machine_config &config);
 	void falgasm89(machine_config &config);
-	void falgasm89_video(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -112,10 +112,24 @@ private:
 	void io_map(address_map &map);
 
 	required_device<i8085a_cpu_device> m_maincpu;
-	optional_device<i8085a_cpu_device> m_videocpu;
 	required_ioport_array<4> m_inputs;
 
 	u8 m_psg_pa;
+};
+
+class falgasm89_video_state : public falgasm89_state
+{
+public:
+	falgasm89_video_state(const machine_config &mconfig, device_type type, const char *tag)
+		: falgasm89_state(mconfig, type, tag)
+		, m_videocpu(*this, "videocpu")
+	{
+	}
+
+	void falgasm89_video(machine_config &config);
+
+private:
+	required_device<i8085a_cpu_device> m_videocpu;
 };
 
 void falgasm89_state::machine_start()
@@ -194,9 +208,9 @@ void falgasm89_state::falgasm89(machine_config &config)
 	I8255(config, "i8255"); // NEC D71055C
 }
 
-void falgasm89_state::falgasm89_video(machine_config &config)
+void falgasm89_video_state::falgasm89_video(machine_config &config)
 {
-	falgasm89(config);
+	falgasm89_state::falgasm89(config);
 
 	I8085A(config, m_videocpu, 6_MHz_XTAL); // OKI M80C85A-2
 
@@ -233,6 +247,6 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR  NAME         PARENT MACHINE           INPUT      CLASS            INIT        ROT   COMPANY   FULLNAME            FLAGS
-GAME( 1991, cbully,      0,     falgasm89_simple, falgasm89, falgasm89_state, empty_init, ROT0, "Falgas", "Coche Bully",      MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1991, rmontecarlo, 0,     falgasm89_video,  falgasm89, falgasm89_state, empty_init, ROT0, "Falgas", "Rally Montecarlo", MACHINE_IS_SKELETON_MECHANICAL )
+//    YEAR  NAME         PARENT MACHINE           INPUT      CLASS                  INIT        ROT   COMPANY   FULLNAME            FLAGS
+GAME( 1991, cbully,      0,     falgasm89_simple, falgasm89, falgasm89_state,       empty_init, ROT0, "Falgas", "Coche Bully",      MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1991, rmontecarlo, 0,     falgasm89_video,  falgasm89, falgasm89_video_state, empty_init, ROT0, "Falgas", "Rally Montecarlo", MACHINE_IS_SKELETON_MECHANICAL )
