@@ -869,7 +869,7 @@ void am9516_device::channel::write_word(u16 data, bool flip)
 	u16 &cau = flip ? caau : cabu;
 	u16 &cal = flip ? caal : cabl;
 
-	return udc.space((cau & ARU_AR) >> 6).write_word(address(cau, cal, 2), data);
+	udc.space((cau & ARU_AR) >> 6).write_word(address(cau, cal, 2), data);
 }
 
 void am9516_device::channel::interrupt(bool assert)
