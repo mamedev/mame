@@ -1592,7 +1592,9 @@ Known to exist but currently undumped, a set with all ROMs stamped U for the US 
   revision D, with each having a red stripe across the label.
 
 It was common for Capcom to use the same ROM label across regional sets but add a RED stripe for the US
-  region, BLUE stripe for Europe and no stripe for the Japanese region.
+  region, BLUE stripe for Europe and no stripe for the Japanese region. Capcom was not always consistent
+  including the region letter stamped on labels. Different US PCBs show the red stripe across the label both
+  with and without the "U" being stamped.
 
 */
 ROM_START( avengers )
@@ -1634,8 +1636,8 @@ ROM_START( avengers )
 	ROM_LOAD( "av_19.2n",     0x38000, 0x8000, CRC(a00485ec) SHA1(cc24e7243f55bdfaedeabb7dddf7e1ef32811c45) )
 
 	ROM_REGION( 0x10000, "gfx4", 0 ) /* bg tiles */
-	ROM_LOAD( "av_25.15n",    0x00000, 0x8000, CRC(230d9e30) SHA1(05a20bb32ce1299d7645312624de8a1d074bacee) ) /* planes 0,1 - Red stripe across label for US region */
-	ROM_LOAD( "av_24.13n",    0x08000, 0x8000, CRC(a6354024) SHA1(ce2aaec8349c08f58cc469514100bcd3a97d24d7) ) /* planes 2,3 - Red stripe across label for US region */
+	ROM_LOAD( "avu_25.15n",    0x00000, 0x8000, CRC(230d9e30) SHA1(05a20bb32ce1299d7645312624de8a1d074bacee) ) /* planes 0,1 - Red stripe across label for US region */
+	ROM_LOAD( "avu_24.13n",    0x08000, 0x8000, CRC(a6354024) SHA1(ce2aaec8349c08f58cc469514100bcd3a97d24d7) ) /* planes 2,3 - Red stripe across label for US region */
 
 	ROM_REGION( 0x08000, "gfx5", 0 )
 	ROM_LOAD( "av_23.9n",     0x0000,  0x8000, CRC(c0a93ef6) SHA1(2dc9cd4eb142d74aea8d151904cb60a0767c6393) )  /* Tile Map */
@@ -1684,8 +1686,8 @@ ROM_START( avengersa )
 	ROM_LOAD( "av_19.2n",     0x38000, 0x8000, CRC(a00485ec) SHA1(cc24e7243f55bdfaedeabb7dddf7e1ef32811c45) )
 
 	ROM_REGION( 0x10000, "gfx4", 0 ) /* bg tiles */
-	ROM_LOAD( "av_25.15n",    0x00000, 0x8000, CRC(230d9e30) SHA1(05a20bb32ce1299d7645312624de8a1d074bacee) ) /* planes 0,1 - Red stripe across label for US region */
-	ROM_LOAD( "av_24.13n",    0x08000, 0x8000, CRC(a6354024) SHA1(ce2aaec8349c08f58cc469514100bcd3a97d24d7) ) /* planes 2,3 - Red stripe across label for US region */
+	ROM_LOAD( "avu_25.15n",    0x00000, 0x8000, CRC(230d9e30) SHA1(05a20bb32ce1299d7645312624de8a1d074bacee) ) /* planes 0,1 - Red stripe across label for US region */
+	ROM_LOAD( "avu_24.13n",    0x08000, 0x8000, CRC(a6354024) SHA1(ce2aaec8349c08f58cc469514100bcd3a97d24d7) ) /* planes 2,3 - Red stripe across label for US region */
 
 	ROM_REGION( 0x08000, "gfx5", 0 )
 	ROM_LOAD( "av_23.9n",     0x0000,  0x8000, CRC(c0a93ef6) SHA1(2dc9cd4eb142d74aea8d151904cb60a0767c6393) )  /* Tile Map */
@@ -1734,8 +1736,8 @@ ROM_START( avengersb )
 	ROM_LOAD( "av_19.2n",     0x38000, 0x8000, CRC(a00485ec) SHA1(cc24e7243f55bdfaedeabb7dddf7e1ef32811c45) )
 
 	ROM_REGION( 0x10000, "gfx4", 0 ) /* bg tiles */
-	ROM_LOAD( "av_25.15n",    0x00000, 0x8000, CRC(230d9e30) SHA1(05a20bb32ce1299d7645312624de8a1d074bacee) ) /* planes 0,1 - Red stripe across label for US region */
-	ROM_LOAD( "av_24.13n",    0x08000, 0x8000, CRC(a6354024) SHA1(ce2aaec8349c08f58cc469514100bcd3a97d24d7) ) /* planes 2,3 - Red stripe across label for US region */
+	ROM_LOAD( "avu_25.15n",    0x00000, 0x8000, CRC(230d9e30) SHA1(05a20bb32ce1299d7645312624de8a1d074bacee) ) /* planes 0,1 - Red stripe across label for US region */
+	ROM_LOAD( "avu_24.13n",    0x08000, 0x8000, CRC(a6354024) SHA1(ce2aaec8349c08f58cc469514100bcd3a97d24d7) ) /* planes 2,3 - Red stripe across label for US region */
 
 	ROM_REGION( 0x08000, "gfx5", 0 )
 	ROM_LOAD( "av_23.9n",     0x0000,  0x8000, CRC(c0a93ef6) SHA1(2dc9cd4eb142d74aea8d151904cb60a0767c6393) )  /* Tile Map */
@@ -1784,8 +1786,8 @@ ROM_START( avengersc )
 	ROM_LOAD( "av_19.2n",     0x38000, 0x8000, CRC(a00485ec) SHA1(cc24e7243f55bdfaedeabb7dddf7e1ef32811c45) )
 
 	ROM_REGION( 0x10000, "gfx4", 0 ) /* bg tiles */
-	ROM_LOAD( "av_25.15n",    0x00000, 0x8000, CRC(230d9e30) SHA1(05a20bb32ce1299d7645312624de8a1d074bacee) ) /* planes 0,1 - Red stripe across label for US region */
-	ROM_LOAD( "av_24.13n",    0x08000, 0x8000, CRC(a6354024) SHA1(ce2aaec8349c08f58cc469514100bcd3a97d24d7) ) /* planes 2,3 - Red stripe across label for US region */
+	ROM_LOAD( "avu_25.15n",    0x00000, 0x8000, CRC(230d9e30) SHA1(05a20bb32ce1299d7645312624de8a1d074bacee) ) /* planes 0,1 - Red stripe across label for US region */
+	ROM_LOAD( "avu_24.13n",    0x08000, 0x8000, CRC(a6354024) SHA1(ce2aaec8349c08f58cc469514100bcd3a97d24d7) ) /* planes 2,3 - Red stripe across label for US region */
 
 	ROM_REGION( 0x08000, "gfx5", 0 )
 	ROM_LOAD( "av_23.9n",     0x0000,  0x8000, CRC(c0a93ef6) SHA1(2dc9cd4eb142d74aea8d151904cb60a0767c6393) )  /* Tile Map */
@@ -1834,8 +1836,8 @@ ROM_START( buraiken )
 	ROM_LOAD( "av_19.2n",     0x38000, 0x8000, CRC(a00485ec) SHA1(cc24e7243f55bdfaedeabb7dddf7e1ef32811c45) )
 
 	ROM_REGION( 0x10000, "gfx4", 0 )
-	ROM_LOAD( "av_25.15n",    0x00000, 0x8000, CRC(88a505a7) SHA1(ef4371e082b2370fcbfc96bfef5a94910acd9eff) ) /* planes 0,1 - sldh (no red stripe) */
-	ROM_LOAD( "av_24.13n",    0x08000, 0x8000, CRC(1f4463c8) SHA1(04cdb0187dcbdd4f5f53e60c856d4925ade8d7df) ) /* planes 2,3 - sldh (no red stripe) */
+	ROM_LOAD( "av_25.15n",    0x00000, 0x8000, CRC(88a505a7) SHA1(ef4371e082b2370fcbfc96bfef5a94910acd9eff) ) /* planes 0,1 - no stripe across the label */
+	ROM_LOAD( "av_24.13n",    0x08000, 0x8000, CRC(1f4463c8) SHA1(04cdb0187dcbdd4f5f53e60c856d4925ade8d7df) ) /* planes 2,3 - no stripe across the label */
 
 	ROM_REGION( 0x08000, "gfx5", 0 )
 	ROM_LOAD( "av_23.9n",     0x0000,  0x8000, CRC(c0a93ef6) SHA1(2dc9cd4eb142d74aea8d151904cb60a0767c6393) )  /* Tile Map */
@@ -1881,8 +1883,8 @@ ROM_START( buraikenb )
 	ROM_LOAD( "av_19.2n",     0x38000, 0x8000, CRC(a00485ec) SHA1(cc24e7243f55bdfaedeabb7dddf7e1ef32811c45) )
 
 	ROM_REGION( 0x10000, "gfx4", 0 )
-	ROM_LOAD( "av_25.15n",    0x00000, 0x8000, CRC(88a505a7) SHA1(ef4371e082b2370fcbfc96bfef5a94910acd9eff) ) /* planes 0,1 - sldh (no red stripe) */
-	ROM_LOAD( "av_24.13n",    0x08000, 0x8000, CRC(1f4463c8) SHA1(04cdb0187dcbdd4f5f53e60c856d4925ade8d7df) ) /* planes 2,3 - sldh (no red stripe) */
+	ROM_LOAD( "av_25.15n",    0x00000, 0x8000, CRC(88a505a7) SHA1(ef4371e082b2370fcbfc96bfef5a94910acd9eff) ) /* planes 0,1 - no stripe across the label */
+	ROM_LOAD( "av_24.13n",    0x08000, 0x8000, CRC(1f4463c8) SHA1(04cdb0187dcbdd4f5f53e60c856d4925ade8d7df) ) /* planes 2,3 - no stripe across the label */
 
 	ROM_REGION( 0x08000, "gfx5", 0 )
 	ROM_LOAD( "av_23.9n",     0x0000,  0x8000, CRC(c0a93ef6) SHA1(2dc9cd4eb142d74aea8d151904cb60a0767c6393) )  /* Tile Map */

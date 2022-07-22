@@ -3834,7 +3834,7 @@ ROM_START( manxtt ) /* Manx TT Superbike DX/Twin Revision D, Model 2A - defaults
 	MODEL2A_VID_BOARD
 ROM_END
 
-ROM_START( manxttc ) /* Manx TT Superbike DX/Twin Revision C, Model 2A - Set to Twin mode becuase we need to preserve the Twin sound ROMs */
+ROM_START( manxttc ) /* Manx TT Superbike DX/Twin Revision C, Model 2A - Set to Twin mode because we need to preserve the Twin sound ROMs */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD( "epr-18822c.12",  0x000000, 0x020000, CRC(c7b3e45a) SHA1(d3a6910bf6efc138e0e40332219b90dea7d6ea56) )
 	ROM_LOAD32_WORD( "epr-18823c.13",  0x000002, 0x020000, CRC(6b0c1dfb) SHA1(6da5c071e3ce842a99f928f473d4ccf7165785ac) )
@@ -3893,7 +3893,7 @@ ROM_START( manxttc ) /* Manx TT Superbike DX/Twin Revision C, Model 2A - Set to 
 ROM_END
 
 /* This set was badly upgraded to a Revision C Manx TT Twin/DX, leaving the DX only sound CPU ROM */
-ROM_START( manxtta ) // Manx TT Superbike DX/Twin Revision C, Model 2A - Set to DX becuase we need to preserve the original DX only sound ROMs
+ROM_START( manxtta ) // Manx TT Superbike DX/Twin Revision C, Model 2A - Set to DX because we need to preserve the original DX only sound ROMs
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD( "epr-18822c.12",  0x000000, 0x020000, BAD_DUMP CRC(c7b3e45a) SHA1(d3a6910bf6efc138e0e40332219b90dea7d6ea56) ) // correct DX only ROM should be EPR-18744.12
 	ROM_LOAD32_WORD( "epr-18823c.13",  0x000002, 0x020000, BAD_DUMP CRC(6b0c1dfb) SHA1(6da5c071e3ce842a99f928f473d4ccf7165785ac) ) // correct DX only ROM should be EPR-18745.13

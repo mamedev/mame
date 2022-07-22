@@ -2137,7 +2137,7 @@ void msx_state::fmx(machine_config &config)
 	msx1(TMS9928A, config);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
-	// 1 Cartridge slot, 2 "Fujistu expansion slots
+	// 1 Cartridge slot, 2 "Fujitsu expansion slots
 
 	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1); // 16KB RAM

@@ -775,17 +775,6 @@ INPUT_PORTS_END
 *     Graphics Layouts      *
 ****************************/
 
-static const gfx_layout tiles8x8_layout =
-{
-	8, 8,
-	RGN_FRAC(1,5),
-	5,
-	{ RGN_FRAC(4,5), RGN_FRAC(3,5), RGN_FRAC(2,5), RGN_FRAC(1,5), RGN_FRAC(0,5) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
 static const gfx_layout tiles16x16_layout =
 {
 	16, 16,
@@ -807,7 +796,7 @@ static const gfx_layout tiles16x16_layout =
 ****************************/
 
 static GFXDECODE_START( gfx_sderby )
-	GFXDECODE_ENTRY( "gfx", 0, tiles8x8_layout,   0x000, 256  )
+	GFXDECODE_ENTRY( "gfx", 0, gfx_8x8x5_planar,  0x000, 256  )
 	GFXDECODE_ENTRY( "gfx", 0, tiles16x16_layout, 0x000, 256  )
 GFXDECODE_END
 
@@ -1310,6 +1299,9 @@ ROM_START( croupierb ) // identical PCB as magictch, but with 'ROULETTE' sticker
 	ROM_LOAD( "6.u78", 0x100000, 0x80000, CRC(e1e181c2) SHA1(f60d3df5fd9c2841e4f6dc656f4ac3cab5c404c7) ) // MX27C4000DC
 	ROM_LOAD( "5.u79", 0x180000, 0x80000, CRC(2c59e118) SHA1(dffbd47f18276a11e964ec4a4bd3ff81d21e2a76) ) // MX27C4000DC
 	ROM_LOAD( "4.u80", 0x200000, 0x80000, CRC(f48c59f3) SHA1(5fd0ec940a50ec923790597723785cca10e81479) ) // MX27C4000DC
+
+	ROM_REGION( 0x300, "plds", 0)
+	ROM_LOAD( "gal22cv10-15lnc.u40", 0x000, 0x2e5, NO_DUMP ) // soldered
 ROM_END
 
 } // anonymous namespace
