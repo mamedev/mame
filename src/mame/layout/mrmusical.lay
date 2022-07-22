@@ -4,10 +4,6 @@ license:CC0
 -->
 <mamelayout version="2">
 
-<!-- note: the digits were very small, wide space between them, and not the same style as (MAME's-)default -->
-<!-- note 2: the PLUS sign is supposed to be lop sided like that (theoretically, this could have been avoided) -->
-<!-- note 3: the EQUALS sign digit is lower than the others, 1st version had it on the same height level -->
-
 <!-- define elements -->
 
 	<element name="digit" defstate="0">
@@ -51,7 +47,7 @@ license:CC0
 			<bounds x="40" y="0" width="10" height="15" />
 		</element>
 		<element name="digit3" ref="digit">
-			<bounds x="50" y="3.5" width="10" height="15" />
+			<bounds x="50" y="0" width="10" height="15" />
 		</element>
 		<element name="digit2" ref="digit">
 			<bounds x="60" y="0" width="10" height="15" />
