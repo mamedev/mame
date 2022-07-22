@@ -3598,6 +3598,7 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="dlair1">
 		<description>Dragon's Lair</description>
 		<year>2022</year>
@@ -3653,6 +3654,7 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>	
+
 	<software name="dlair1sc">
 		<description>Dragon's Lair: Escape from Singe's Castle</description>
 		<year>2022</year>
@@ -3714,6 +3716,7 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>	
+
 	<software name="dlair2tw">
 		<description>Dragon's Lair II: Time Warp</description>
 		<year>2022</year>
@@ -3775,6 +3778,7 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="dlair3cm">
 		<description>Dragon's Lair III: Curse of Mordread</description>
 		<year>2022</year>
@@ -3854,4 +3858,21 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="tomahawk">
+		<description>Tomahawk</description>
+		<year>1987</year>
+		<publisher>Datasoft</publisher>
+		<info name="release" value="2022-07-05"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Tomahawk" is a 1987 simulation game ported to the Apple IIgs by John Brooks; sound effects by John Brooks, Thomas J. Clement, and Jerry Vincent; music by Thomas J. Clement; graphics by Bonita Long-Hemsath and John Brooks; disk routines by Robin Kar and John Brooks; based on an original game by D.K. Marshall; and distributed by Datasoft. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345370">
+				<rom name="tomahawk iigs.woz" size="1345370" crc="5f1f2610" sha1="226f3b885a5ccfcb73c819be0b038a52e430175a"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
