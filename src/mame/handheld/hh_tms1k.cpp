@@ -118,7 +118,8 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP3005   TMS1730   1989, Tiger Copy Cat (model 7-522)
  @MP3200   TMS1000   1978, Parker Brothers Electronic Master Mind
  @MP3201   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750A)
- @MP3206   TMS1000   1978, Concept 2000 Mr. Mus-I-Cal
+ @MP3206   TMS1000   1978, Concept 2000 Mr. Mus-I-Cal (model 560)
+ *MP3207   TMS1000   1978, Concept 2000 Lite 'n Learn: Electronic Organ (model 554)
  @MP3208   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750B)
  @MP3226   TMS1000   1978, Milton Bradley Simon (Rev A)
  *MP3232   TMS1000   1979, Fonas 2 Player Baseball (no "MP" on chip label)
@@ -2867,9 +2868,11 @@ ROM_END
 
 /***************************************************************************
 
-  Concept 2000 Mr. Mus-I-Cal
+  Concept 2000 Mr. Mus-I-Cal (model 560)
   * TMS1000NLL MP3206 (die label 1000C, MP3206)
   * 9-digit 7seg LED display(one custom digit), 1-bit sound
+
+  It's a simple 4-function calculator, and plays music tones too.
 
 ***************************************************************************/
 
