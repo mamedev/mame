@@ -231,7 +231,7 @@ void mm2_state::mm5p_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x2000).mirror(0x03ff).w(m_display, FUNC(mephisto_display1_device::data_w));
-	map(0x2400, 0x2407).mirror(0x03f8).w("board", FUNC(mephisto_board_device::led_w)).nopr();
+	map(0x2400, 0x2400).mirror(0x03ff).w("board", FUNC(mephisto_board_device::led_w)).nopr();
 	map(0x2800, 0x2800).mirror(0x03ff).w("board", FUNC(mephisto_board_device::mux_w));
 	map(0x2c00, 0x2c07).mirror(0x03f8).r(FUNC(mm2_state::keys_r));
 	map(0x3000, 0x3000).mirror(0x03ff).r("board", FUNC(mephisto_board_device::input_r));
