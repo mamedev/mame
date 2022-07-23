@@ -477,15 +477,17 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
-	<software name="actforce">
+	<software name="actforce" cloneof="gijoe">
 		<description>Action Force (PAL)</description>
 		<year>1983</year>
 		<publisher>Parker Bros</publisher>
 		<info name="serial" value="931511" />
 		<info name="alt_title" value="Action Man - Action Force" />
+		<info name="usage" value="Paddles in left port control barriers. Right port joystick controls snake." />
 		<sharedfeat name="compatibility" value="PAL" />
+		<sharedfeat name="joyport1_default" value="pad" />
+		<sharedfeat name="joyport2_default" value="joy" />
 		<part name="cart" interface="a2600_cart">
-			<feature name="peripheral" value="paddles" />
 			<dataarea name="rom" size="4096">
 				<rom name="action force.bin" size="4096" crc="896446cf" sha1="9e6fb047ee9fa0a454ca23673ed9693430032dc6"/>
 			</dataarea>
@@ -1452,6 +1454,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<info name="serial" value="1002" />
 		<info name="programmer" value="Joel H. Martin" />
 		<sharedfeat name="compatibility" value="NTSC" />
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="bachelor party.bin" size="4096" crc="d9cd6c95" sha1="75e7efa861f7e7d8e367c09bf7c0cc351b472f03"/>
@@ -1466,6 +1469,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<info name="serial" value="1002" />
 		<info name="programmer" value="Joel H. Martin" />
 		<sharedfeat name="compatibility" value="NTSC" />
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="bachelorette party.bin" size="4096" crc="e8189eeb" sha1="b88ca823aaa10a7a4a3d325023881b2de969c156"/>
@@ -1631,8 +1635,9 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX2623" />
 		<info name="programmer" value="Warren Robinett" />
+		<sharedfeat name="joyport1_default" value="keypad" />
+		<sharedfeat name="joyport2_default" value="keypad" />
 		<part name="cart" interface="a2600_cart">
-			<feature name="peripheral" value="keypad" />
 			<dataarea name="rom" size="4096">
 				<rom name="basic programming.bin" size="4096" crc="26a3c844" sha1="6c56fad688b2e9bb783f8a5a2360c80ad2338e47"/>
 			</dataarea>
@@ -1645,8 +1650,9 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<publisher>Telegames</publisher>
 		<info name="serial" value="CX2620" />
 		<info name="programmer" value="Warren Robinett" />
+		<sharedfeat name="joyport1_default" value="keypad" />
+		<sharedfeat name="joyport2_default" value="keypad" />
 		<part name="cart" interface="a2600_cart">
-			<feature name="peripheral" value="keypad" />
 			<dataarea name="rom" size="4096">
 				<rom name="basic programming (pal).bin" size="4096" crc="c207f43e" sha1="ff4da01319153a2bde2d2cb1bb1dd900ae105e9a"/>
 			</dataarea>
@@ -1797,8 +1803,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<publisher>American Multiple Industries</publisher>
 		<info name="serial" value="1003" />
 		<info name="programmer" value="Joel H. Martin" />
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
-			<feature name="peripheral" value="paddles" />
 			<dataarea name="rom" size="4096">
 				<rom name="beat'em and eat'em (mystique).bin" size="4096" crc="c90d4f84" sha1="e2c29d0a73a4575028b62dca745476a17f07c8f0"/>
 			</dataarea>
@@ -1810,8 +1816,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<year>1982</year>
 		<publisher>Dynacom</publisher>
 		<info name="programmer" value="Joel H. Martin" />
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
-			<feature name="peripheral" value="paddles" />
 			<dataarea name="rom" size="4096">
 				<rom name="beat'em and eat'em (dynacom).bin" size="4096" crc="e4f66058" sha1="8e8e334fa481698d0adb7f9cb7852e49ac462eb9"/>
 			</dataarea>
@@ -1823,8 +1829,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<year>1982</year>
 		<publisher>American Multiple Industries</publisher>
 		<info name="programmer" value="Joel H. Martin" />
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
-			<feature name="peripheral" value="paddles" />
 			<dataarea name="rom" size="4096">
 				<rom name="beat'em and eat'em (mystique)(pal).bin" size="4096" crc="461c9f2c" sha1="8b7d6a0c5e14c52ddb18e7be7c84f45abef94bc0"/>
 			</dataarea>
@@ -2248,6 +2254,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Blackjack - Black Jack</description>
 		<year>1977</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
+		<sharedfeat name="joyport2_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="blackjack - black jack (gambling) (paddle) (1977) (atari, bob whitehead - sears) (cx2651 - 99805, 49-75602).bin" size="2048" crc="4b0ee010" sha1="edfd905a34870196f8acb2a9cd41f79f4326f88d"/>
@@ -2259,6 +2267,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Blackjack (PAL)</description>
 		<year>1977</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
+		<sharedfeat name="joyport2_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="blackjack (gambling) (paddle) (1977) (atari, bob whitehead) (cx2651) (pal).bin" size="2048" crc="7125a8b9" sha1="59b74bb16cb046da0fb38c28750d28c3f071f1c0"/>
@@ -2270,6 +2280,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Blackjack (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
+		<sharedfeat name="joyport2_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="blackjack (paddle) (unknown) (pal).bin" size="2048" crc="c36dde62" sha1="9b15906f4011927a47ef353dc2f299e821e38341"/>
@@ -2684,6 +2696,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Brain Games</description>
 		<year>1978</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="keypad" />
+		<sharedfeat name="joyport2_default" value="keypad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="brain games (keyboard controller) (1978) (atari, larry kaplan - sears) (cx2664 - 6-99818).bin" size="2048" crc="150709c2" sha1="238915cafd26f69bc8a3b9aa7d880dde59f6f12d"/>
@@ -2695,6 +2709,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Brain Games (PAL)</description>
 		<year>1978</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="keypad" />
+		<sharedfeat name="joyport2_default" value="keypad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="brain games (keyboard controller) (1978) (atari, larry kaplan) (cx2664, cx2664p) (pal).bin" size="2048" crc="ea630e68" sha1="7b9d9ac288ea1fda8e8cbbde75e84b4e2ed37a5e"/>
@@ -2706,6 +2722,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Breakout - Breakaway IV</description>
 		<year>1978</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
+		<sharedfeat name="joyport2_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="breakout - breakaway iv (paddle) (1978) (atari, brad stewart - sears) (cx2622 - 6-99813, 49-75107).bin" size="2048" crc="3037638c" sha1="8d473b87b70e26890268e6c417c0bb7f01e402eb"/>
@@ -2717,6 +2735,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Breakout (PAL)</description>
 		<year>1978</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
+		<sharedfeat name="joyport2_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="breakout (paddle) (1978) (atari, brad stewart) (cx2622, cx2622p) (pal).bin" size="2048" crc="33717471" sha1="4d37ccf1d983917ff59659b78573d1430ad4f273"/>
@@ -2774,6 +2794,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Bugs</description>
 		<year>1982</year>
 		<publisher>Data Age</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="bugs (paddle) (1982) (data age) (da1005).bin" size="4096" crc="1202427c" sha1="67387d0d3d48a44800c44860bf15339a81f41aa9"/>
@@ -2785,6 +2806,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Bugs (PAL)</description>
 		<year>1983</year>
 		<publisher>Gameworld</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="bugs (paddle) (1983) (gameworld) (133-005) (pal).bin" size="4096" crc="d1ddb571" sha1="a8aedea627c67c38032cdde441fb98dad226916a"/>
@@ -2846,6 +2868,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Bumper Bash</description>
 		<year>1983</year>
 		<publisher>Spectravideo</publisher>
+		<info name="usage" value="Use both left port paddle buttons to control flippers and plunger. Press both simultaneously to launch ball." />
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="bumper bash (paddle) (1983) (spectravideo, david lubar) (sa-218).bin" size="4096" crc="b1a6a23e" sha1="6c199782c79686dc0cbce6d5fe805f276a86a3f5"/>
@@ -2857,6 +2881,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Bumper Bash (PAL)</description>
 		<year>1983</year>
 		<publisher>Spectravideo</publisher>
+		<info name="usage" value="Use both left port paddle buttons to control flippers and plunger. Press both simultaneously to launch ball." />
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="bumper bash (paddle) (1983) (spectravideo, david lubar) (sa-218) (pal).bin" size="4096" crc="5d1798c2" sha1="ad48f4952e867a2b97900d965b69f50fddf8ba2d"/>
@@ -3081,6 +3107,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Canyon Bomber</description>
 		<year>1979</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="canyon bomber (paddle) (1979) (atari, david crane - sears) (cx2607 - 6-99828, 49-75115).bin" size="2048" crc="e914b8ca" sha1="b89443a0029e765c2716774fe2582be37650115c"/>
@@ -3125,6 +3152,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Casino - Poker Plus</description>
 		<year>1979</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
+		<sharedfeat name="joyport2_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="casino - poker plus (paddle) (1979) (atari, bob whitehead - sears) (cx2652 - 6-99816, 49-75151).bin" size="4096" crc="420b8248" sha1="08598101e38756916613f37581ef1b61c719016f"/>
@@ -3136,6 +3165,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Casino (PAL)</description>
 		<year>1979</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
+		<sharedfeat name="joyport2_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="casino (paddle) (1979) (atari, bob whitehead) (cx2652, cx2652p) (pal).bin" size="4096" crc="675c7f84" sha1="0a7c41b4215f792e499d20ff86fd6da9c2648d17"/>
@@ -3533,6 +3564,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Circus Atari - Circus</description>
 		<year>1980</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="circus atari - circus (paddle) (1980) (atari, mike lorenzen - sears) (cx2630 - 49-75122).bin" size="4096" crc="d2a330a3" sha1="8a91ecdbd8bf9d412da051c3422abb004eab8603"/>
@@ -3555,6 +3587,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Circus Atari (PAL)</description>
 		<year>1980</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="circus atari (paddle) (1980) (atari, mike lorenzen) (cx2630, cx2630p) (pal).bin" size="4096" crc="95c9fe2b" sha1="342cabe30592db8dcf692994666e40fb176c8d86"/>
@@ -3588,6 +3621,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Codebreaker - Code Breaker</description>
 		<year>1978</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="keypad" />
+		<sharedfeat name="joyport2_default" value="keypad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="codebreaker - code breaker (numbers) (keyboard controller) (1978) (atari, larry kaplan - sears) (cx2643 - 6-99815).bin" size="2048" crc="947edb18" sha1="137bd3d3f36e2549c6e1cc3a60f2a7574f767775"/>
@@ -3599,6 +3634,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Codebreaker (PAL)</description>
 		<year>1978</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="keypad" />
+		<sharedfeat name="joyport2_default" value="keypad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="codebreaker (numbers) (keyboard controller) (1978) (atari, larry kaplan) (cx2643) (pal).bin" size="2048" crc="b1cb7cdc" sha1="0252bb61f8ca0462cc57a273d575c4bcdb5a95f2"/>
@@ -4776,6 +4813,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Demons to Diamonds</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="demons to diamonds (hot rox) (paddle) (1982) (alan j. murphy, nick 'sandy maiwald' turner - sears) (cx2615 - 49-75140).bin" size="4096" crc="9b97c3da" sha1="b45582de81c48b04c2bb758d69021e8088c70ce7"/>
@@ -4787,6 +4825,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Demons to Diamonds (CCE)</description>
 		<year>19??</year>
 		<publisher>CCE</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="demons to diamonds (paddle) (cce).bin" size="4096" crc="934aa0a2" sha1="38e24871d35c6c25b8fa9157244aaaff2b2b6e27"/>
@@ -4798,6 +4837,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Demons to Diamonds (PAL)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="demons to diamonds (hot rox) (paddle) (1982) (atari, alan j. murphy, nick 'sandy maiwald' turner) (cx2615) (pal).bin" size="4096" crc="9a61405c" sha1="18c83930841b052b4339ccf054cd0fce6964facf"/>
@@ -5402,10 +5442,11 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
-	<software name="hazzardp" cloneof="hazzard">
+	<software name="hazzardp">
 		<description>Dukes of Hazzard (prototype)</description>
 		<year>1980</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="dukes of hazzard (aka stunt cycle) (paddle) (1980) (atari, robert c. polaro) (prototype).bin" size="2048" crc="2e09a905" sha1="5da98e39d2ce2dbf889e770e963e531ac9098df0"/>
@@ -5545,6 +5586,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Eggomania</description>
 		<year>1982</year>
 		<publisher>U.S. Games Corporation</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="eggomania (weird bird) (paddle) (1982) (u.s. games corporation, todd marshall, wes trager, henry will iv) (vc2003).bin" size="4096" crc="c78ec927" sha1="68cbfadf097ae2d1e838f315c7cc7b70bbf2ccc8"/>
@@ -5556,6 +5598,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Eggomania (PAL)</description>
 		<year>1983</year>
 		<publisher>Carrere Video</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="eggomania (paddle) (1983) (carrere video, todd marshall, wes trager, henry will iv - teldec) (usc2003) (pal).bin" size="4096" crc="a0543f23" sha1="5b1a7dc9c5a6b7523f26a91ad9edb30467aff573"/>
@@ -5616,6 +5659,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Encounter at L-5</description>
 		<year>1982</year>
 		<publisher>Data Age</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="encounter at l-5 (megalon invasion) (paddle) (1982) (data age) (da1001).bin" size="4096" crc="e78fe552" sha1="205af4051ea39fb5a038a8545c78bff91df321b7"/>
@@ -5627,6 +5671,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Encounter at L-5 (PAL)</description>
 		<year>1983</year>
 		<publisher>Gameworld</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="encounter at l-5 (megalon invasion) (paddle) (1983) (gameworld) (133-001) (pal).bin" size="4096" crc="e01a9dde" sha1="6b1e0787ef595af5f85fef3bf780553b3fba4c7d"/>
@@ -6561,6 +6606,10 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>G.I. Joe - Cobra Strike</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
+		<info name="usage" value="Paddles in left port control barriers. Right port joystick controls snake." />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<sharedfeat name="joyport1_default" value="pad" />
+		<sharedfeat name="joyport2_default" value="joy" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="g.i. joe - cobra strike (paddle) (1983) (parker brothers, john emerson) (pb5920).bin" size="4096" crc="6bcbcd37" sha1="9cfb6288a5c2dae63ee6f5e9325200ccd21a3055"/>
@@ -7155,6 +7204,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Guardian</description>
 		<year>1982</year>
 		<publisher>Apollo</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="guardian (cosmic combat) (paddle) (1982) (apollo, larry martin) (ap-2008).bin" size="4096" crc="121738f5" sha1="7d30ff565ad7b2a3143d049c5b39e4a6ac3f9cd5"/>
@@ -7166,6 +7216,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Guardian (prototype)</description>
 		<year>1982</year>
 		<publisher>Apollo</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="guardian (cosmic combat) (paddle) (1982) (apollo, larry martin) (ap-2008) (prototype).bin" size="4096" crc="23972366" sha1="a034090e4a72ac4006952a7f021ea0d08639f577"/>
@@ -7478,6 +7529,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Hunt &amp; Score - Memory Match</description>
 		<year>1978</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="keypad" />
+		<sharedfeat name="joyport2_default" value="keypad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="hunt &amp; score - memory match (keyboard controller) (1978) (atari, alan miller - sears) (cx2642 - 6-99814).bin" size="2048" crc="17de8070" sha1="a6e42c63138a2fd527cdbe9b7e60f5feabdd55c8"/>
@@ -7489,6 +7542,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Hunt &amp; Score (PAL)</description>
 		<year>1978</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="keypad" />
+		<sharedfeat name="joyport2_default" value="keypad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="hunt &amp; score (keyboard controller) (1978) (atari, alan miller) (cx2642) (pal).bin" size="2048" crc="403b0d89" sha1="564ba5e3a70bd76dd7902fd9ee43b67429dea29c"/>
@@ -7634,6 +7689,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Indy 500 - Race</description>
 		<year>1977</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="wheel" />
+		<sharedfeat name="joyport2_default" value="wheel" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="indy 500 - race (race car) (driving controller) (1977) (carla meninsky, ed riddle) (cx2611 - 99821, 49-75149).bin" size="2048" crc="b43da2a3" sha1="620ab88d63cdd3f8ce67deac00a22257c7205c8b"/>
@@ -7645,6 +7702,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Indy 500 (PAL)</description>
 		<year>1977</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="wheel" />
+		<sharedfeat name="joyport2_default" value="wheel" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="indy 500 (race car) (driving controller) (1977) (atari, carla meninsky, ed riddle) (cx2611, cx2611p) (pal).bin" size="2048" crc="7f77afc9" sha1="f6ca3ca4af6d9ac5a539f1bc4c7a3a04837c2e44"/>
@@ -7995,6 +8054,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Kaboom!</description>
 		<year>1981</year>
 		<publisher>Activision</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="kaboom (paddle) (1981) (activision, larry kaplan, david crane) (ag-010, ag-010-04).bin" size="2048" crc="813f00f6" sha1="40d4df4f8e4a69a299ae7678c17e72bedeb70105"/>
@@ -8006,6 +8066,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Kaboom! (CCE)</description>
 		<year>19??</year>
 		<publisher>CCE</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="kaboom (paddle) (cce).bin" size="2048" crc="b4901d54" sha1="ae5af59b3503858bd847c07fea8033139890ff34"/>
@@ -8017,6 +8078,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Kaboom! - Schneller als der Knall (PAL)</description>
 		<year>1981</year>
 		<publisher>Activision</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="kaboom - schneller als der knall (paddle) (1981) (larry kaplan, david crane) (eag-010, pag-010 - 711 010-720) (pal).bin" size="2048" crc="63f8f529" sha1="a257546271b33d7e3b9e7ea0ec4606ec47cfbc94"/>
@@ -8847,6 +8909,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>MagiCard</description>
 		<year>1981</year>
 		<publisher>CommaVid</publisher>
+		<sharedfeat name="joyport1_default" value="keypad" />
+		<sharedfeat name="joyport2_default" value="keypad" />
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_cv" />
 			<dataarea name="rom" size="2048">
@@ -9260,6 +9324,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<year>2006</year>
 		<publisher>Darrell Spice Jr.</publisher>
 		<sharedfeat name="compatibility" value="NTSC" />
+		<sharedfeat name="joyport1_default" value="pad" />
+		<sharedfeat name="joyport2_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f4" />
 			<dataarea name="rom" size="32768">
@@ -9268,11 +9334,13 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
-	<software name="midmayhmp" cloneof="midmayhm">
+	<software name="midmayhme" cloneof="midmayhm">
 		<description>Medieval Mayhem (PAL)</description>
 		<year>2006</year>
 		<publisher>Darrell Spice Jr.</publisher>
 		<sharedfeat name="compatibility" value="PAL" />
+		<sharedfeat name="joyport1_default" value="pad" />
+		<sharedfeat name="joyport2_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f4" />
 			<dataarea name="rom" size="32768">
@@ -10163,6 +10231,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>The Music Machine</description>
 		<year>1983</year>
 		<publisher>Sparrow</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="music machine, the (paddle) (homecomputer software co., dan schafer, glenn stohel, jon tedesco) (gcg 1001t).bin" size="4096" crc="bd133d59" sha1="5a641caa2ab3c7c0cd5deb027acbc58efccf8d6a"/>
@@ -10303,6 +10372,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Night Driver</description>
 		<year>1980</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="compatibility" value="NTSC" />
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="night driver (paddle) (1980) (atari, rob fulop - sears) (cx2633 - 49-75119).bin" size="2048" crc="600d8a96" sha1="372771aeb4e2fb2cd1dead5497e3821e4236d5fc"/>
@@ -10315,6 +10386,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<year>1980</year>
 		<publisher>Atari</publisher>
 		<sharedfeat name="compatibility" value="PAL" />
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="night driver (paddle) (1980) (atari, rob fulop) (cx2633, cx2633p) (pal).bin" size="2048" crc="b028e338" sha1="b0f04e4592fb9c55faaa69a1a465049c2a9c7cac"/>
@@ -11158,6 +11230,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Picnic</description>
 		<year>1982</year>
 		<publisher>U.S. Games Corporation</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="picnic (catch the fly) (paddle) (1982) (u.s. games corporation, tom sloper) (vc2004).bin" size="4096" crc="1d507a61" sha1="483fc907471c5c358fb3e624097861a2fc9c1e45"/>
@@ -11169,6 +11242,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Picnic (PAL)</description>
 		<year>1983</year>
 		<publisher>Carrere Video</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="picnic (paddle) (1983) (carrere video, tom sloper - teldec) (usc2004) (pal).bin" size="4096" crc="c8bc1076" sha1="70f4e4b38d9d6b21824341386e71eb1c4a7e30f4"/>
@@ -11180,6 +11254,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Piece o' Cake</description>
 		<year>1982</year>
 		<publisher>U.S. Games Corporation</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="piece o' cake (bakery) (paddle) (1982) (u.s. games corporation) (vc2005).bin" size="4096" crc="40355166" sha1="57774193081acea010bd935a0449bc8f53157128"/>
@@ -13459,6 +13534,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Secret Agent (prototype)</description>
 		<year>1983</year>
 		<publisher>Data Age</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="secret agent (paddle) (1983) (data age) (prototype).bin" size="4096" crc="d16c45f9" sha1="1914f57ab0a6f221f2ad344b244a3cdd7b1d991a"/>
@@ -14116,6 +14192,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Solar Storm</description>
 		<year>1983</year>
 		<publisher>Imagic</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="solar storm (paddle) (1983) (imagic, wilfredo 'willy' aguilar, michael becker, dennis koble) (720113-1a, 03206).bin" size="4096" crc="a970b3e3" sha1="ec65ef9e47239a7d15db9bca7e625b166e8ac242"/>
@@ -14127,6 +14204,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Solar Storm (PAL)</description>
 		<year>1983</year>
 		<publisher>Imagic</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="solar storm (paddle) (1983) (imagic, wilfredo 'willy' aguilar, michael becker, dennis koble) (720113-2a, 13206) (pal).bin" size="4096" crc="dd8efc87" sha1="f0a9822ab9c109f6e4f3e757199594dc2e4655f0"/>
@@ -15189,6 +15267,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Star Wars - Jedi Arena</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="star wars - jedi arena (paddle) (1983) (parker brothers, rex bradford) (pb5000).bin" size="4096" crc="9e36d347" sha1="36b9edc7150311203f375c1be10d0510efde6476"/>
@@ -15200,6 +15279,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Star Wars - Jedi Arena (PAL)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="star wars - jedi arena (paddle) (1983) (parker brothers, rex bradford) (931507) (pal).bin" size="4096" crc="3bd1cda3" sha1="ac51aa0192cc41bc08329776c1b02ae388a9c558"/>
@@ -15455,6 +15535,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Steeplechase</description>
 		<year>1980</year>
 		<publisher>Sears</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
+		<sharedfeat name="joyport2_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="steeplechase (paddle) (1980) (sears tele-games, jim huether) (cx2614 - 49-75126).bin" size="2048" crc="5f6c32c3" sha1="e56ef1c0313d6d04e25446c4e34f9bb7eda8efac"/>
@@ -15462,7 +15544,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
-	<software name="steeplece" cloneof="steeplec">
+	<software name="steeplev">
 		<description>Steeplechase (PAL)</description>
 		<year>1983</year>
 		<publisher>Video Gems</publisher>
@@ -15477,6 +15559,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Steeplechase (prototype 19800415)</description>
 		<year>1980</year>
 		<publisher>Sears</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
+		<sharedfeat name="joyport2_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="steeplechase (paddle) (04-15-1980) (sears tele-games, jim huether) (cx2614 - 49-75126) (prototype).bin" size="2048" crc="9ba7be18" sha1="c09cc17f53630b07f5ab672316f58b2dfedf4197"/>
@@ -15576,6 +15660,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Street Racer - Speedway II</description>
 		<year>1977</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
+		<sharedfeat name="joyport2_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="street racer - speedway ii (wheels) (paddle) (1977) (atari, larry kaplan - sears) (cx2612 - 99804, 49-75103).bin" size="2048" crc="47592880" sha1="bffb3d41916c83398624151eb00aa2a3acd23ab8"/>
@@ -15587,6 +15673,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Street Racer (PAL)</description>
 		<year>1977</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
+		<sharedfeat name="joyport2_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="street racer (wheels) (paddle) (1977) (atari, larry kaplan) (cx2612, cx2612p) (pal).bin" size="2048" crc="c39ab46a" sha1="10f66b516eae5bb96193fdea46aafb36213ab3be"/>
@@ -15609,6 +15697,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Stunt Cycle (prototype 19800721)</description>
 		<year>1980</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="stunt cycle (paddle) (07-21-1980) (atari, robert c. polaro) (cx26157) (prototype).bin" size="2048" crc="6354ff4c" sha1="2e19d7e16cf17682b043baaa30e345e6fa4540e5"/>
@@ -15772,6 +15861,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Super Breakout</description>
 		<year>1981?</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="super breakout (paddle) (1982 - 1981) (atari, carol shaw, nick 'sandy maiwald' turner - sears) (cx2608 - 49-75165).bin" size="4096" crc="b0f20d31" sha1="ac2aad2196c155c1d87d6f42fa88891825f4fde6"/>
@@ -15783,6 +15873,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Super Breakout (alt)</description>
 		<year>1981?</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="super breakout (paddle) (1982 - 1981) (atari, carol shaw, nick 'sandy maiwald' turner - sears) (cx2608 - 49-75165) [a].bin" size="4096" crc="171dbe92" sha1="e380e243c671e954e86aa1a3a0bfeb36d5e0c3e2"/>
@@ -15794,6 +15885,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Super Breakout (PAL)</description>
 		<year>1981?</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="super breakout (paddle) (1982 - 1981) (atari, carol shaw, nick 'sandy maiwald' turner) (cx2608) (pal).bin" size="4096" crc="79ec7688" sha1="3a9e296950aa8e93e75218b971b8614516292f86"/>
@@ -16240,6 +16332,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Tac-Scan</description>
 		<year>1982</year>
 		<publisher>Sega</publisher>
+		<info name="usage" value="Controller is the right paddle in the right port." />
+		<sharedfeat name="joyport2_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="tac-scan (paddle) (1982) (sega) (001-01).bin" size="4096" crc="a2a42bec" sha1="55e98fe14b07460734781a6aa2f4f1646830c0af"/>
@@ -17339,6 +17433,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Video Olympics - Pong Sports</description>
 		<year>1977</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
+		<sharedfeat name="joyport2_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="video olympics - pong sports (paddle) (1977) (atari, joe decuir - sears) (cx2621 - 99806, 6-99806, 49-75104).bin" size="2048" crc="e4bc89c4" sha1="1ffe89d79d55adabc0916b95cc37e18619ef7830"/>
@@ -17350,6 +17446,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Video Olympics (PAL)</description>
 		<year>1977</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
+		<sharedfeat name="joyport2_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="video olympics (paddle) (1977) (atari, joe decuir) (cx2621, cx2621p) (pal).bin" size="2048" crc="cc6a454a" sha1="a91cf3f977d9ae0c505ef4e7b353ccdcb0bde56e"/>
@@ -17560,6 +17658,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Warlords</description>
 		<year>1981</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
+		<sharedfeat name="joyport2_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="warlords (kings in the corner) (paddle) (1981) (atari, carla meninsky - sears) (cx2610 - 49-75127).bin" size="4096" crc="cf174b57" sha1="2d7563d337cbc0cdf4fc14f69853ab6757697788"/>
@@ -17571,6 +17671,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Warlords (PAL)</description>
 		<year>1981</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
+		<sharedfeat name="joyport2_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="warlords (kings in the corner) (paddle) (1981) (atari, carla meninsky) (cx2610) (pal).bin" size="4096" crc="1d35687b" sha1="c3fba4bebc2dda8436126433e1f4c15e51ef1bd4"/>
@@ -17582,6 +17684,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Warplock</description>
 		<year>1982</year>
 		<publisher>Data Age</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="warplock (paddle) (1982) (data age) (da1002).bin" size="4096" crc="6531d4e1" sha1="232a370519a7fcce121e15f850d0d3671909f8b8"/>
@@ -17593,6 +17696,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Warplock (PAL)</description>
 		<year>1983</year>
 		<publisher>Gameworld</publisher>
+		<sharedfeat name="joyport1_default" value="pad" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="warplock (paddle) (1983) (gameworld) (133-002) (pal).bin" size="4096" crc="faf0700d" sha1="3cfdd92952dc4a019a7c9b050f6e4cc6656a0149"/>
