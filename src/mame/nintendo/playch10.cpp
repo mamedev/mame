@@ -1874,7 +1874,7 @@ GAME( 1987, pc_tkfld, playch10, playch10_a, playch10, playch10_state, init_pcabo
 // B-Board Games
 GAME( 1986, pc_pwrst, playch10, playch10_b, playch10, playch10_state, init_pcbboard, ROT0, "Nintendo",                                 "Pro Wrestling (PlayChoice-10)", 0 )
 GAME( 1986, pc_trjan, playch10, playch10_b, playch10, playch10_state, init_pcbboard, ROT0, "Capcom USA (Nintendo of America license)", "Trojan (PlayChoice-10)", 0 )
-GAME( 1987, pc_cvnia, playch10, playch10_b, playch10, playch10_state, init_pcbboard, ROT0, "Konami (Nintendo of America license)",     "Castlevania (PlayChoice-10)", 0 )
+GAME( 1987, pc_cvnia, playch10, playch10_b, playch10, playch10_state, init_pcbboard, ROT0, "Konami (Nintendo of America license)",     "Castlevania (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS ) // Pillars have some orange lines. 2nd room.
 GAME( 1987, pc_dbldr, playch10, playch10_b, playch10, playch10_state, init_pcbboard, ROT0, "Konami (Nintendo of America license)",     "Double Dribble (PlayChoice-10)", 0 )
 GAME( 1987, pc_rnatk, playch10, playch10_b, playch10, playch10_state, init_pcbboard, ROT0, "Konami (Nintendo of America license)",     "Rush'n Attack (PlayChoice-10)", 0 )
 GAME( 1987, pc_rygar, playch10, playch10_b, playch10, playch10_state, init_pcbboard, ROT0, "Tecmo (Nintendo of America license)",      "Rygar (PlayChoice-10)", 0 )
@@ -1894,7 +1894,7 @@ GAME( 1987, pc_miket, playch10, playch10_e, playch10, playch10_state, init_pcebo
 GAME( 1987, pc_rcpam, playch10, playch10_f, playch10, playch10_state, init_pcfboard, ROT0, "Rare",                                     "R.C. Pro-Am (PlayChoice-10)", 0 )
 GAME( 1988, pc_ddrgn, playch10, playch10_f, playch10, playch10_state, init_pcfboard, ROT0, "Technos Japan",                            "Double Dragon (PlayChoice-10)", 0 )
 GAME( 1989, pc_ngaid, playch10, playch10_f, playch10, playch10_state, init_pcfboard, ROT0, "Tecmo (Nintendo of America license)",      "Ninja Gaiden (PlayChoice-10)", 0 )
-GAME( 1989, pc_tmnt,  playch10, playch10_f, playch10, playch10_state, init_pcfboard, ROT0, "Konami (Nintendo of America license)",     "Teenage Mutant Ninja Turtles (PlayChoice-10)", 0 )
+GAME( 1989, pc_tmnt,  playch10, playch10_f, playch10, playch10_state, init_pcfboard, ROT0, "Konami (Nintendo of America license)",     "Teenage Mutant Ninja Turtles (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS ) // Sewer on the right. Graphics issue. Health bar and everything below keep going away.
 GAME( 1989, pc_ftqst, playch10, playch10_f, playch10, playch10_state, init_pcfboard, ROT0, "Sunsoft (Nintendo of America license)",    "Uncle Fester's Quest: The Addams Family (PlayChoice-10)", 0 )
 GAME( 1989, pc_bstar, playch10, playch10_f2,playch10, playch10_state, init_pcfboard, ROT0, "SNK (Nintendo of America license)",        "Baseball Stars: Be a Champ! (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1989, pc_tbowl, playch10, playch10_f, playch10, playch10_state, init_pcfboard, ROT0, "Tecmo (Nintendo of America license)",      "Tecmo Bowl (PlayChoice-10)", 0 )
@@ -1925,7 +1925,7 @@ GAME( 1985, pc_gntlt, playch10, playch10_g, playch10, playch10_state, init_pcgbo
 GAME( 1988, pc_pinbt, playch10, playch10_h, playch10, playch10_state, init_pchboard, ROT0, "Rare (Nintendo of America license)",       "PinBot (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
 
 // i-Board Games
-GAME( 1989, pc_cshwk, playch10, playch10_i, playch10, playch10_state, init_pciboard, ROT0, "Rare (Nintendo of America license)",       "Captain Sky Hawk (PlayChoice-10)", 0 )
+GAME( 1989, pc_cshwk, playch10, playch10_i, playch10, playch10_state, init_pciboard, ROT0, "Rare (Nintendo of America license)",       "Captain Sky Hawk (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS ) // Sky level is having graphics issue.
 GAME( 1990, pc_sjetm, playch10, playch10_i, playch10, playch10_state, init_pciboard, ROT0, "Rare",                                     "Solar Jetman (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
 
 // K-Board Games
