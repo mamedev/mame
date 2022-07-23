@@ -422,7 +422,7 @@ namespace {
 /***************************************************************************
 
   A-One LSI Match Number
-  * PCB label PT-204 "Pair Card"
+  * PCB label: PT-204 "Pair Card"
   * TMS1000NLL MP0163 (die label 1000B, MP0163)
   * 2x2-digit 7seg LED displays + 3 LEDs, 1-bit sound
 
@@ -567,7 +567,7 @@ ROM_END
 /***************************************************************************
 
   A-One LSI Arrange Ball
-  * PCB label Kaken, PT-249
+  * PCB label: Kaken, PT-249
   * TMS1000NLL MP0166 (die label 1000B, MP0166)
   * 2-digit 7seg LED display + 22 LEDs, 1-bit sound
 
@@ -1275,9 +1275,9 @@ ROM_END
 /***************************************************************************
 
   Canon Palmtronic MD-8 (Multi 8) / Canon Canola MD 810
+  * PCB label: Canon EHI-0115-03
   * TMS1070 MCU label TMC1079 (die label 1070B, 1079A)
   * 2-line cyan VFD display, each 9-digit 7seg + 1 custom (label 20-ST-22)
-  * PCB label Canon EHI-0115-03
 
   The only difference between MD-8 and MD 810 is the form factor. The latter
   is a tabletop calculator.
@@ -2208,7 +2208,7 @@ ROM_END
 /***************************************************************************
 
   Coleco Head to Head: Electronic Baseball (model 2180)
-  * PCB labels Coleco rev C 73891/2
+  * PCB labels: Coleco rev C 73891/2
   * TMS1170NLN MP1525-N2 (die label MP1525)
   * 9-digit cyan VFD display, and other LEDs behind bezel, 1-bit sound
 
@@ -2869,6 +2869,7 @@ ROM_END
 /***************************************************************************
 
   Concept 2000 Mr. Mus-I-Cal (model 560)
+  * PCB label: CONCEPT 2000 ITE 556
   * TMS1000NLL MP3206 (die label 1000C, MP3206)
   * 9-digit 7seg LED display(one custom digit), 1-bit sound
 
@@ -2901,8 +2902,8 @@ void mrmusical_state::update_display()
 
 void mrmusical_state::write_r(u16 data)
 {
-	// R10: speaker out
-	m_speaker->level_w(BIT(data, 10));
+	// R10: speaker out (there's a speaker off-on switch)
+	m_speaker->level_w(m_inputs[6]->read() & BIT(data, 10));
 
 	// R0-R5: input mux
 	// R0-R8: digit select (R6 is a math symbol like with lilprof)
@@ -2960,6 +2961,11 @@ static INPUT_PORTS_START( mrmusical )
 	PORT_CONFNAME( 0x01, 0x00, "Mode" )
 	PORT_CONFSETTING(    0x01, "A" )
 	PORT_CONFSETTING(    0x00, "=" )
+
+	PORT_START("IN.6") // no read
+	PORT_CONFNAME( 0x01, 0x01, "Speaker" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
 void mrmusical_state::mrmusical(machine_config &config)
@@ -3001,7 +3007,7 @@ ROM_END
 /***************************************************************************
 
   Conic Electronic Basketball
-  * PCB label CONIC 101-006
+  * PCB label: CONIC 101-006
   * TMS1000NLL MP0907 (die label 1000B MP0907)
   * DS8871N, 2 7seg LEDs, 30 other LEDs, 1-bit sound
 
@@ -3126,7 +3132,7 @@ ROM_END
 /***************************************************************************
 
   Conic Electronic Multisport
-  * PCB label CONIC 101-027(1979), or CONIC 101-021 REV A(1980, with DS8871N)
+  * PCB label: CONIC 101-027(1979), or CONIC 101-021 REV A(1980, with DS8871N)
   * TMS1000 MP0168 (die label same)
   * 2 7seg LEDs, 33 other LEDs, 1-bit sound
 
@@ -4066,7 +4072,7 @@ ROM_END
 /***************************************************************************
 
   Entex (Electronic) Baseball 2
-  * PCB label ZENY
+  * PCB label: ZENY
   * TMS1000 MCU, MP0923 (die label same)
   * 3 7seg LEDs, and other LEDs behind bezel, 1-bit sound
 
@@ -4204,7 +4210,7 @@ ROM_END
 /***************************************************************************
 
   Entex (Electronic) Baseball 3
-  * PCB label ZENY
+  * PCB label: ZENY
   * TMS1100NLL 6007 MP1204 (rev. E!) (die label MP1204)
   * 2*SN75492N LED display driver
   * 4 7seg LEDs, and other LEDs behind bezel, 1-bit sound
@@ -5369,7 +5375,7 @@ ROM_END
 /***************************************************************************
 
   Fonas 2 Player Baseball
-  * PCB label CA-014 (probably Cassia)
+  * PCB label: CA-014 (probably Cassia)
   * TMS1000NLL MP0154 (die label 1000B, MP0154)
   * 4 7seg LEDs, 37 other LEDs, 1-bit sound
 
@@ -5508,7 +5514,7 @@ ROM_END
 /***************************************************************************
 
   Fonas 3 in 1: Football, Basketball, Soccer
-  * PCB label HP-801
+  * PCB label: HP-801
   * TMS1100NLL MP1185
   * 4 7seg LEDs, 40 other LEDs, 1-bit sound
 
@@ -5657,7 +5663,7 @@ ROM_END
 /***************************************************************************
 
   Gakken Poker
-  * PCB label POKER. gakken
+  * PCB label: POKER. gakken
   * TMS1370 MP2105 (die label same)
   * 11-digit cyan VFD display Itron FG1114B, oscillator sound
 
@@ -5812,7 +5818,7 @@ ROM_END
 /***************************************************************************
 
   Gakken Jackpot: Gin Rummy & Black Jack
-  * PCB label gakken
+  * PCB label: gakken
   * TMS1670 MPF553 (die label same)
   * 11-digit cyan VFD display Itron FG1114B, oscillator sound
 
@@ -5935,7 +5941,7 @@ ROM_END
 /***************************************************************************
 
   Gakken Invader
-  * PCB label GAKKEN, INVADER, KS-00779
+  * PCB label: GAKKEN, INVADER, KS-00779
   * TMS1370 MP2110
   * cyan VFD display Itron? CP5008A, 1-bit sound
 
@@ -7241,7 +7247,7 @@ ROM_END
 /***************************************************************************
 
   Mattel Thoroughbred Horse Race Analyzer
-  * PCB label 1670-4619D
+  * PCB label: 1670-4619D
   * TMS1100NLL MP3491-N2 (die label 1100E MP3491)
   * HLCD0569, 67-segment LCD panel, no sound
 
@@ -7718,7 +7724,7 @@ ROM_END
 /***************************************************************************
 
   Milton Bradley Electronic Battleship (1977 version, model 4750A)
-  * PCB label 4750A
+  * PCB label: 4750A
   * TMS1000NL MP3201 (die label 1000C, MP3201)
   * LM324N, MC14016CP/TP4016AN, NE555P, discrete sound
   * 4 sliding buttons, light bulb
@@ -7884,7 +7890,7 @@ ROM_END
 /***************************************************************************
 
   Milton Bradley Electronic Battleship (1977 version, model 4750B)
-  * PCB label MB 4750B
+  * PCB label: MB 4750B
   * TMS1000NLL MP3208 (die label 1000C, MP3208)
   * SN75494N (acting as inverters), SN76477 sound
   * 4 sliding buttons, light bulb
@@ -10054,7 +10060,7 @@ ROM_END
 /***************************************************************************
 
   Tandy Championship Football (model 60-2150)
-  * PCB label CYG-316
+  * PCB label: CYG-316
   * TMS1100NLL MP1193 (die label 1100B, MP1193)
   * 7-digit 7seg LED display + LED grid, 1-bit sound
 
@@ -10549,7 +10555,7 @@ ROM_END
 /***************************************************************************
 
   Tandy 3 in 1 Sports Arena (model 60-2178)
-  * PCB label HP-804
+  * PCB label: HP-804
   * TMS1100 (just a datestamp label (8331), die label 1100B MP1231)
   * 2x2-digit 7seg LED display + 47 other LEDs, 1-bit sound
 
@@ -12977,7 +12983,7 @@ ROM_END
 /***************************************************************************
 
   Tiger Sub Wars (model 7-490)
-  * PCB label CSG201A(main), CSG201B(leds)
+  * PCB label: CSG201A(main), CSG201B(leds)
   * TMS1200N2LL MP3352 (die label 1000C, MP3352)
   * 4-digit 7seg LED display + 55 other LEDs, 1-bit sound
 
@@ -13372,7 +13378,7 @@ ROM_END
 /***************************************************************************
 
   Tiger Electronics Copy Cat (model 7-520)
-  * PCB label CC REV B
+  * PCB label: CC REV B
   * TMS1000 MCU, label 69-11513 MP0919 (die label MP0919)
   * 4 LEDs, 1-bit sound
 
@@ -13492,7 +13498,7 @@ ROM_END
 /***************************************************************************
 
   Tiger Electronics Copy Cat (model 7-522)
-  * PCB label WS 8107-1
+  * PCB label: WS 8107-1
   * TMS1730 MCU, label MP3005N (die label 1700 MP3005)
   * 4 LEDs, 1-bit sound
 
@@ -13802,7 +13808,7 @@ ROM_END
 /***************************************************************************
 
   Tomy(tronics) Break Up (manufactured in Japan)
-  * PCB label TOMY B.O.
+  * PCB label: TOMY B.O.
   * TMS1040 MP2726 TOMY WIPE (die label MP2726A)
   * TMS1025N2LL I/O expander
   * 2-digit 7seg display, 46 other leds, 1-bit sound
@@ -14003,7 +14009,7 @@ ROM_END
 /***************************************************************************
 
   Tomy Power House Pinball
-  * PCB label TOMY P-B
+  * PCB label: TOMY P-B
   * TMS1100 MP1180 TOMY PINB (die label MP1180)
   * 3 7seg LEDs, and other LEDs behind bezel, 1-bit sound
 
