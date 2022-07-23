@@ -1925,7 +1925,7 @@ GAME( 1985, pc_gntlt, playch10, playch10_g, playch10, playch10_state, init_pcgbo
 GAME( 1988, pc_pinbt, playch10, playch10_h, playch10, playch10_state, init_pchboard, ROT0, "Rare (Nintendo of America license)",       "PinBot (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
 
 // i-Board Games
-GAME( 1989, pc_cshwk, playch10, playch10_i, playch10, playch10_state, init_pciboard, ROT0, "Rare (Nintendo of America license)",       "Captain Sky Hawk (PlayChoice-10)", 0 )
+GAME( 1989, pc_cshwk, playch10, playch10_i, playch10, playch10_state, init_pciboard, ROT0, "Rare (Nintendo of America license)",       "Captain Sky Hawk (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1990, pc_sjetm, playch10, playch10_i, playch10, playch10_state, init_pciboard, ROT0, "Rare",                                     "Solar Jetman (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
 
 // K-Board Games
