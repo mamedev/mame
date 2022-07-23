@@ -1144,21 +1144,21 @@ ROM_END
 //   ROMs have no SEGA EPR codes but are all marked
 //
 //        Megumi Rescue
-//           V10.30
-//        Final Version
+//        Version 10.30
+//        Final Version 
 //            IC-x
 //       (c)1987SEGA/EXA
 //
 //   (where -x is the IC position on the PCB)
 
 ROM_START( megrescu )
-	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "v10_30ic.7",   0x00000, 0x08000, CRC(490d0059) SHA1(de4e23eb862ef3c29b2fbdceba14360eb6e2a8ef) ) /* Fixed Code */
+                ROM_REGION( 0x30000, "maincpu", 0 )
+                ROM_LOAD( "megumi_rescue_version_10.30_final_version_ic-7.ic7",   0x00000, 0x08000, CRC(490d0059) SHA1(de4e23eb862ef3c29b2fbdceba14360eb6e2a8ef) ) /* Fixed Code */
 
-	ROM_LOAD( "v10_30ic.5",   0x10000, 0x08000, CRC(278caba8) SHA1(809e504f6c680f742f0a5968d6bb16c2f67f851c) )
-	ROM_LOAD( "v10_30ic.4",   0x18000, 0x08000, CRC(bda242d1) SHA1(3704da98fe91d9e7f4380ea5e1f897b6b7049466) )
-	ROM_LOAD( "v10_30ic.3",   0x20000, 0x08000, CRC(56e36f85) SHA1(84aa78bc628bce64b1b990a8c9fcca25e5940bd3) )
-	ROM_LOAD( "v10_30ic.2",   0x28000, 0x08000, CRC(5b74c767) SHA1(dbc82a4e046f01130c72bbd7a81190d7f0ca209c) )
+                ROM_LOAD( "megumi_rescue_version_10.30_final_version_ic-5.ic5",   0x10000, 0x08000, CRC(278caba8) SHA1(809e504f6c680f742f0a5968d6bb16c2f67f851c) )
+                ROM_LOAD( "megumi_rescue_version_10.30_final_version_ic-4.ic4",   0x18000, 0x08000, CRC(bda242d1) SHA1(3704da98fe91d9e7f4380ea5e1f897b6b7049466) )
+                ROM_LOAD( "megumi_rescue_version_10.30_final_version_ic-3.ic3",   0x20000, 0x08000, CRC(56e36f85) SHA1(84aa78bc628bce64b1b990a8c9fcca25e5940bd3) )
+                ROM_LOAD( "megumi_rescue_version_10.30_final_version_ic-2.ic2",   0x28000, 0x08000, CRC(5b74c767) SHA1(dbc82a4e046f01130c72bbd7a81190d7f0ca209c) )
 ROM_END
 
 
