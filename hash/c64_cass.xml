@@ -15382,6 +15382,80 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="timetunn">
+		<description>Time Tunnel</description>
+		<year>1986</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="455643">
+				<rom name="Time_Tunnel.tap" size="455643" crc="40d446aa" sha1="b03646587ca1aca5dc242395101c5b5b7bb107bb"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="455643">
+				<rom name="Time_Tunnel_a1.tap" size="455643" crc="d4805b29" sha1="6050ce7a853e4b042f3c787d4574d584d171d65e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tintinmn">
+		<description>Tintin on the Moon</description>
+		<year>1989</year>
+		<publisher>Infogrames</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="374729">
+				<rom name="Tintin_on_the_Moon_Side_1.tap" size="374729" crc="21a67379" sha1="da430f71582472f01dbe842fcefc8d29503385a8"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="601472">
+				<rom name="Tintin_on_the_Moon_Side_2.tap" size="601472" crc="527936b8" sha1="db345fd560ab7be170d6c097dd18f2702c62a32a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tokenofg">
+		<description>Token of Ghall</description>
+		<year>1983</year>
+		<publisher>Interceptor Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1678874">
+				<rom name="Token_of_Ghall.tap" size="1678874" crc="b1a36c73" sha1="ea0b9de77f6f16ef23d5cac307ed98695dcd70ba"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tomjerry">
+		<description>Tom &amp; Jerry</description>
+		<year>1989</year>
+		<publisher>Magic Bytes</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1741292">
+				<rom name="Tom_&amp;_Jerry.tap" size="1741292" crc="5058143f" sha1="d3753931e27c7065d7ed780ddc747149df0bda94"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tom">
+		<description>Tom</description>
+		<year>1988</year>
+		<publisher>Kingsoft</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="590275">
+				<rom name="Tom.tap" size="590275" crc="f3618674" sha1="cedc121264c03ff135705042bf9f9e7340b92740"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tomahawk">
 		<description>Tomahawk</description>
 		<year>1990</year>
@@ -15402,6 +15476,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="896221">
 				<rom name="Tombs_of_Xeiops.tap" size="896221" crc="8984e78d" sha1="16634cd6c3088c11f161ddcd8451c58816950055"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="topgun">
+		<description>Top Gun</description>
+		<year>1987</year>
+		<publisher>Ocean</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="589155">
+				<rom name="Top_Gun.tap" size="589155" crc="570a087f" sha1="385582e915a21edc1af4adea0048af8e0d1b2125"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15438,6 +15524,62 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="264766">
 				<rom name="Trailblazer.tap" size="264766" crc="d63de7e8" sha1="34902c9b53dcebdd2fbdb62a0f2d4da034018cc4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trailblzg" cloneof="trailblz" supported="no"> <!-- game title doesn't fully load (stuck on light blue screen) -->
+		<description>Trailblazer (Gremlin Graphics)</description>
+		<year>1986</year>
+		<publisher>Gremlin Graphics</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="367554">
+				<rom name="Trailblazer.tap" size="367554" crc="438a9b25" sha1="17dd29b0734627df03ef7343296215001bb36eee"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thetrain">
+		<description>The Train: Escape to Normandy</description>
+		<year>1988</year>
+		<publisher>Electronic Arts</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="567109">
+				<rom name="Train,_The-_Escape_to_Normandy_Side_1.tap" size="567109" crc="fb7a4241" sha1="6b70c8d79f13d531910c690237c33b4134fd23a2"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="518231">
+				<rom name="Train,_The-_Escape_to_Normandy_Side_2.tap" size="518231" crc="cc0405dd" sha1="719c8563fabae568fae2c0575333aecc1e63c265"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="transbse">
+		<description>The Transformers: Battle to Save the Earth</description>
+		<year>1986</year>
+		<publisher>Activision</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="629137">
+				<rom name="Transformers_-_Battle_to_Save_the_Earth.tap" size="629137" crc="461acfbd" sha1="bc8e8c9eb51dfa8dbcb5e27cb2b88fba5653ec7f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="transylv">
+		<description>Transylvanian Tower</description>
+		<year>1983</year>
+		<publisher>Richard Shepherd Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="761544">
+				<rom name="Transylvanian_Tower.tap" size="761544" crc="e2ef50ef" sha1="dc736ea141785d704e9314afa7c2bccd000d6690"/>
 			</dataarea>
 		</part>
 	</software>
