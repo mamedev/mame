@@ -48679,4 +48679,836 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="keylinr2">
+		<description>Key Lingo (Revision 2) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Prentice Associates</publisher>
+		<info name="release" value="2022-06-28"/>
+		<!--"Key Lingo" is a 1983 educational program developed by Prentice Associates. This is revision 2, which was never commercially released. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="key lingo rev. 2 (4am crack).dsk" size="143360" crc="1c9c1977" sha1="f6743bd85a8ca0c1e35609e7166733e184926974"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="numexplo">
+		<description>Number Explorer (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Spinifex Software</publisher>
+		<info name="release" value="2022-06-28"/>
+		<!--"Number Explorer" is a 1985 educational program developed by Ian Greig, Ray Stace, and Michael Fazzolare, and distributed by Spinifex Software. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="number explorer (4am crack).dsk" size="143360" crc="ed60f4cd" sha1="a7f23d42ac09271e990773f1685caf3c0a9da80a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pfsfileb01">
+		<description>PFS File (Version B.01) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Software Publishing Corporation</publisher>
+		<info name="release" value="2022-06-28"/>
+		<!--"PFS File" is a 1982 productivity program developed and distributed by Software Publishing Corporation. This is version B.01.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pfs file vb.01 (4am crack).dsk" size="143360" crc="090d2c52" sha1="55fde1cfbea9eb7debf40e2bb8cc55f8bcc2a28c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pfsfilec00">
+		<description>PFS File (Version C.00) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Software Publishing Corporation</publisher>
+		<info name="release" value="2022-06-28"/>
+		<!--"PFS File" is a 1982 productivity program developed and distributed by Software Publishing Corporation. This is version C.00. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pfs file vc.00 (4am crack).dsk" size="143360" crc="79c0d1f6" sha1="417fbfd3c8b11a4ee15775f4dbd89c40b69f308c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pfsg8301">
+		<description>PFS Graph (Version 1983-01-12) (cleanly cracked)</description>
+		<year>19831983</year>
+		<publisher>Software Publishing Corporation</publisher>
+		<info name="release" value="2022-06-28"/>
+        <!-- Due to programming errors, this version works best on an unenhanced Apple //e -->
+		<!--"PFS Graph" is a 1983 productivity program developed and distributed by Software Publishing Corporation. This version is dated 1983-01-12 according to file metadata. Due to programming errors, this version works best on an unenhanced Apple //e. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pfs graph 1983-01-12 (4am crack).dsk" size="143360" crc="56ee1260" sha1="29f14fd0564e271a10db7c73918735e9149d5d45"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pfsg8401">
+		<description>PFS Graph (Version 1984-01-31) (cleanly cracked)</description>
+		<year>19841984</year>
+		<publisher>Software Publishing Corporation</publisher>
+		<info name="release" value="2022-06-28"/>
+        <!-- Due to programming errors, this version works best on an unenhanced Apple //e -->
+		<!--"PFS Graph" is a 1984 productivity program developed and distributed by Software Publishing Corporation. This version is dated 1984-01-31 according to file metadata. Due to programming errors, this version works best on an unenhanced Apple //e. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pfs graph 1984-01-31 (4am crack).dsk" size="143360" crc="d6629d33" sha1="d97550d6308f80cd629cd88c0d3a5f3ce902fd55"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spnmstry">
+		<description>Spanish for Mastery (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>D.C. Heath</publisher>
+		<info name="release" value="2022-07-02"/>
+		<!--"Spanish for Mastery" is a 1985 educational program developed by Jean-Paul Valette and Rebecca M. Valette, and distributed by D.C. Heath. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="spanish for mastery (4am and san inc crack) disk 1a - program.dsk" size="143360" crc="f6c18c3c" sha1="0fdca4305f050bb66a5206ab3db5318bc159ffa6"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B - Units 1 and 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="spanish for mastery (4am and san inc crack) disk 1b - units 1 and 2.dsk" size="143360" crc="ddad9fab" sha1="b2eb3d8117c95119b9708af3e70e898cf8e53345"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A - Units 3 and 4"/>
+			<dataarea name="flop" size="143360">
+				<rom name="spanish for mastery (4am and san inc crack) disk 2a - units 3 and 4.dsk" size="143360" crc="8b9ad62b" sha1="27e027fa5a7bbcf21fb4a091cca34edc3b901b5c"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B - Units 5 and 6"/>
+			<dataarea name="flop" size="143360">
+				<rom name="spanish for mastery (4am and san inc crack) disk 2b - units 5 and 6.dsk" size="143360" crc="a1822972" sha1="cdca70940cc32b795b80677dfab8927e9b7c0795"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side A - Units 7 and 8"/>
+			<dataarea name="flop" size="143360">
+				<rom name="spanish for mastery (4am and san inc crack) disk 3a - units 7 and 8.dsk" size="143360" crc="c01d5b19" sha1="91fffc25c6d5121f57a8ce4716f03041ed00d84c"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side B - Units 9 and 10"/>
+			<dataarea name="flop" size="143360">
+				<rom name="spanish for mastery (4am and san inc crack) disk 3b - units 9 and 10.dsk" size="143360" crc="66459bcf" sha1="e5837c7ca9eba6d4dbe41bb915fad383e719b75d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chvocabr2">
+		<description>The Chambers of Vocab (Revision 2) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Prentice Associates</publisher>
+		<info name="release" value="2022-07-03"/>
+		<!--"The Chambers of Vocab" is a 1983 educational program developed by Prentice Associates. This is revision 2, which was never commercially released. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the chambers of vocab rev. 2 (4am crack).dsk" size="143360" crc="4491e7bc" sha1="11070b712282664c69066674704ddbbd682a1c1f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="take1v06401">
+		<description>Take 1 (Version 06401) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Baudville</publisher>
+		<info name="release" value="2022-07-03"/>
+		<!--"Take 1" is a 1984 graphics program developed by Maurizio Barbatano, Michael Darooge, Edward McCullough, and David Walker, and distributed by Baudville. This is version 06401.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="take 1 v06401 (4am crack).dsk" size="143360" crc="67154f3c" sha1="f8bff8aa05cab804565ba9fb60f8c6f3afb1676d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="surdird">
+		<description>Sur les traces du Deirdron (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Ediciel</publisher>
+		<info name="release" value="2022-07-03"/>
+		<!--"Sur les traces du Deirdron" (French version of "In Search of The Most Amazing Thing") is a 1984 educational game developed by Tom Snyder Productions and distributed by Ediciel.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="sur les traces du deirdron (4am crack) side a - program.dsk" size="143360" crc="b4ac46dd" sha1="5cd55d2d66bb59efbe0c747858e29ce95c46dbcb"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Demo"/>
+			<dataarea name="flop" size="143360">
+				<rom name="sur les traces du deirdron (4am crack) side b - demo.dsk" size="143360" crc="d964ca87" sha1="b4d4a359c7b1183c9aef5755b8644f461a8af555"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pixitv01331">
+		<description>Pixit (Version 01331) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Baudville</publisher>
+		<info name="release" value="2022-07-03"/>
+		<!--"Pixit" is a 1983 graphics program developed by Michael Darooge, Edward McCullough, and Kimberly Evans, and distributed by Baudville. This is version 01331.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pixit v01331 (4am crack).dsk" size="143360" crc="92c24ed0" sha1="f75659cb387ecd096b7de38f17e88358b4de72d2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="portrobo">
+		<description>Portrait Robot (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Ediciel</publisher>
+		<info name="release" value="2022-07-03"/>
+		<!--"Portrait Robot" (French version of "FaceMaker") is a 1984 educational program developed by Spinnaker Software and distributed by Ediciel.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="portrait robot (4am crack).dsk" size="143360" crc="c32f34d2" sha1="39bf2e1cf5a078f997a7817c0b6351954db12129"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pfsw8601">
+		<description>PFS Write (Version 1986-01-01) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Software Publishing Corporation</publisher>
+		<info name="release" value="2022-07-03"/>
+		<!--"PFS Write" is a 1986 productivity program developed and distributed by Software Publishing Corporation. This version is dated 1986-01-01 according to file metadata.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="pfs write 1986-01-01 (4am crack) disk 1 - program.dsk" size="143360" crc="d2ef2a63" sha1="2d1c64286fbcfbec2d5375d91e09f2411d22c9b8"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Dictionary"/>
+			<dataarea name="flop" size="143360">
+				<rom name="pfs write 1986-01-01 (4am crack) disk 2 - dictionary.dsk" size="143360" crc="d35cffbd" sha1="785576f05170b86903533a7dfa5931e7af98bc85"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Learning activities"/>
+			<dataarea name="flop" size="143360">
+				<rom name="pfs write 1986-01-01 (4am crack) disk 3 - learning activities.dsk" size="143360" crc="f755fd9d" sha1="d0c608b622ed4b7243f869046d5c01c1047ccda9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blzpdls0">
+		<description>Blazing Paddles (Revision 0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Baudville</publisher>
+		<info name="release" value="2022-07-03"/>
+		<!--"Blazing Paddles" is a 1984 graphics program developed by Michael Darooge, Edward McCullough, and David Walker, and distributed by Baudville. Unlike all other known versions, this version has no visible version number, suggesting the earliest release.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="blazing paddles rev. 0 (4am crack).dsk" size="143360" crc="180c3a29" sha1="94c9e3c97fff3d19dacfe1b82ad954a757cf1e1a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pfsg8403">
+		<description>PFS Graph (Version 1984-03-14) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Software Publishing Corporation</publisher>
+		<info name="release" value="2022-06-29"/>
+		<!--"PFS Graph" is a 1984 productivity program developed and distributed by Software Publishing Corporation. This version is dated 1984-03-14 according to file metadata. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pfs graph 1984-03-14 (4am crack).dsk" size="143360" crc="a64f0d4c" sha1="4a3e779d550c5c4cf73b91b022e57f7f4050a758"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pfsw8409">
+		<description>PFS Write (Version 1984-09-27) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Software Publishing Corporation</publisher>
+		<info name="release" value="2022-06-29"/>
+		<!--"PFS Write" is a 1984 productivity program developed and distributed by Software Publishing Corporation. This version is dated 1984-09-27 according to file metadata. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pfs write 1984-09-27 (4am crack).dsk" size="143360" crc="4007b909" sha1="e50ce5a9adc1f4e10c066db427d0d89b40917984"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pfsrep8108">
+		<description>PFS Report (Version B:00 1981-01-03) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Software Publishing Corporation</publisher>
+		<info name="release" value="2022-06-29"/>
+		<!--"PFS Report" is a 1981 productivity program developed and distributed by Software Publishing Corporation. This version is dated 1981-01-03 according to file metadata, and displays its version as "B:00" on boot. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pfs report 1981-01-03 (vb.00) (4am crack).dsk" size="143360" crc="47f55268" sha1="a67c4ef6e2591bc0600b565c88f00552eecb5a51"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rainydg">
+		<description>Rainy Day Games (Version 13501) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Baudville</publisher>
+		<info name="release" value="2022-06-29"/>
+		<!--"Rainy Day Games" is a 1985 set of card games developed and distributed by Baudville. This is version 13501.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="rainy day games (4am crack).dsk" size="143360" crc="50b78018" sha1="2d03e73d475f3ab54ec98b2e22dc7b04fa7a52d5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skicrazd">
+		<description>Ski Crazed (Version 28701) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Baudville</publisher>
+		<info name="release" value="2022-06-29"/>
+		<!--"Ski Crazed" is a 1987 sports game developed by Jason Rubin and Andy Gavin, and distributed by Baudville. This is version 28701.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="ski crazed v28701 (4am crack).dsk" size="143360" crc="abec2de2" sha1="8cf6c8abcb4203b6629580f5d6ff3ad4bf62a2fc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vidveg">
+		<description>Video Vegas (Version 12511) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Baudville</publisher>
+		<info name="release" value="2022-06-29"/>
+		<!--"Video Vegas" is a 1985 sports game developed and distributed by Baudville. This is version 12511.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="video vegas v12511 (4am crack).dsk" size="143360" crc="d820d4e7" sha1="73f75859cd31983166f3a4afffb7aed1795fd7f1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trkcoy84">
+		<description>Trickster Coyote (Version 1984) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>None</publisher>
+		<info name="release" value="2022-06-30"/>
+		<!--"Trickster Coyote" is a 1984 educational program developed by Prentice Associates. This 1984 revision was never commercially released. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="trickster coyote 1984 (4am crack).dsk" size="143360" crc="4f1ccb00" sha1="6324dde10b57442caa8b4c0bf2572ddd9a52360b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blzpad04421">
+		<description>Blazing Paddles (Version 04421) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Baudville</publisher>
+		<info name="release" value="2022-06-30"/>
+		<!--"Blazing Paddles" is a 1984 graphics program developed by Michael Darooge, Edward McCullough, and David Walker, and distributed by Baudville. This is version 04421.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="blazing paddles v04421 (4am crack).dsk" size="143360" crc="799282c4" sha1="5a0603178bf47f4f67c28206b910ea3af413b2d5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pfsrep8201">
+		<description>PFS Report (Version 1982-01-14) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Software Publishing Corporation</publisher>
+		<info name="release" value="2022-06-30"/>
+        <!-- Due to programming errors unrelated to the copy protection, this version works best on an unenhanced Apple //e -->
+		<!--"PFS Report" is a 1982 productivity program developed and distributed by Software Publishing Corporation. This version is dated 1982-01-14 according to file metadata, although the main menu says 1983. Due to programming errors unrelated to the copy protection, this version works best on an unenhanced Apple //e. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pfs report 1982-01-14 (4am crack).dsk" size="143360" crc="4da01078" sha1="7f9e9dec317c332bce8f182afc95674dff36eb54"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prin15531">
+		<description>Prince (Version 15531) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Baudville</publisher>
+		<info name="release" value="2022-07-03"/>
+		<!--"Prince" is a 1985 graphics program developed by Joel Novak, Ken Steiner, Michael Darooge, Bob Svihovec, and Bryan Koeff, and distributed by Baudville. This is version 15531.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="prince v15531 (4am crack) side a.dsk" size="143360" crc="076b4c37" sha1="17642c6dde2665450c39a3b629faa5e1e097c2ea"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="prince v15531 (4am crack) side b.dsk" size="143360" crc="ef036e55" sha1="9d51c9cf230414c3d004dd72c79aa25d68139da3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pfsw8411">
+		<description>PFS Write (Version 1984-11-01) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Software Publishing Corporation</publisher>
+		<info name="release" value="2022-06-30"/>
+		<!--"PFS Write" is a 1984 productivity program developed and distributed by Software Publishing Corporation. This version is dated 1984-11-01 according to file metadata. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pfs write 1984-11-01 (4am crack).dsk" size="143360" crc="cfab2c65" sha1="b165e9b7d5dd63433e2812c9bf2fe8044ef18a94"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gervocab">
+		<description>German Vocabulary for Shopping Use (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Control Data</publisher>
+		<info name="release" value="2022-06-30"/>
+        <!-- Due to programming errors unrelated to the copy protection, this disk works best on an Apple ][+ or an unenhanced Apple //e. Later models will crash when you try to view a word list. -->
+		<!--"German Vocabulary for Shopping Use" is a 1982 educational program developed and distributed by Control Data. Due to programming errors unrelated to the copy protection, this disk works best on an Apple ][+ or an unenhanced Apple //e. Later models will crash when you try to view a word list. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="german- vocabulary for shopping use (4am crack).dsk" size="143360" crc="dab6f45e" sha1="dd4cd31e137a315f3674a0f675117d3ba28a8ba2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prdetqavl">
+		<description>Profession Détective: Qui a volé Lily (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Ediciel</publisher>
+		<info name="release" value="2022-06-30"/>
+		<!--"Profession Détective: Qui a volé Lily" is a 1984 educational game developed by Tom Snyder and distributed by Ediciel. It is an all-French version of "Snooper Troops: The Case of the Disappearing Dolphin."-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="profession detective- qui a vole lily (4am crack).dsk" size="143360" crc="c53b5f2c" sha1="2da07c366d09327c09eab7ea93fe7b1b31ce0fbd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fact1984">
+		<description>The Factory (Version 1984) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-06-30"/>
+		<!--"The Factory" is a 1984 educational game developed by Marge Kosel and Mike Fish, and distributed by Sunburst Communications. This version is dated 1984 according to the logo screen displayed on boot. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the factory 1984 (4am crack).dsk" size="143360" crc="af3f1d49" sha1="d8c9020da2797de3abe3a8de0d1db73fc2b7ac7b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prin15521">
+		<description>Prince (Version 15521) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Baudville</publisher>
+		<info name="release" value="2022-06-30"/>
+		<!--"Prince" is a 1985 graphics program developed by Joel Novak, Ken Steiner, Michael Darooge, Bob Svihovec, and Bryan Koeff, and distributed by Baudville. This is version 15521, displayed during boot.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="prince v15521 (4am crack) side a.dsk" size="143360" crc="e6553b4f" sha1="e299c1b148446d9519dcabe766bc19ff5ef92635"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="prince v15521 (4am crack) side b.dsk" size="143360" crc="ef036e55" sha1="9d51c9cf230414c3d004dd72c79aa25d68139da3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frcfolie">
+		<description>Fractions en Folie (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Ediciel</publisher>
+		<info name="release" value="2022-06-30"/>
+		<!--"Fractions en Folie" (French version of "Fraction Fever") is a 1984 educational program developed by Tom Snyder and distributed by Ediciel.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="fractions en folie (4am crack).dsk" size="143360" crc="a2fd8aa8" sha1="ea6c59ba4fdb4e4bb2dcd658df732bb9efd41de7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pfse8411">
+		<description>PFS Etat (Version 1984-11-26) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Software Publishing Corporation</publisher>
+		<info name="release" value="2022-06-30"/>
+		<!--"PFS Etat" (French version of "PFS Report") is a 1984 productivity program developed and distributed by Software Publishing Corporation. This version is dated 1984-11-26 according to file metadata.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pfs etat 1984-11-26 (4am crack).dsk" size="143360" crc="47aab309" sha1="60457eefaa21a29bc94b49e9f656aed2edd08ae6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magcal2084">
+		<description>Magicalc (Version 2.0-1984) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Artsci</publisher>
+		<info name="release" value="2022-07-01"/>
+		<!--"Magicalc" is a 1984 productivity program developed by William G. Graves and distributed by Artsci. This is version 2.0-1984. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="magicalc v2.0-1984 (4am crack).dsk" size="143360" crc="7cd67710" sha1="49fb8be7b916dba4824b3635ff7be4f7eb24dbfa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dskopt2v11">
+		<description>Disk Optimizer II (Version 1.1) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>AAJS Computer Products</publisher>
+		<info name="release" value="2022-07-02"/>
+		<!--"Disk Optimizer II" is a 1985 disk utility program developed and distributed by AAJS Computer Products. This is version 1.1. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="disk optimizer system ii v1.1 (4am crack).dsk" size="143360" crc="5ccc907c" sha1="7dba267969cb04d97aa19998706a9afe4858da3c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chasmcasm">
+		<description>CHASM Checking Account Systems Manager (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Digital Masters</publisher>
+		<info name="release" value="2022-07-02"/>
+		<!--"CHASM Checking Account Systems Manager" is a 1985 productivity program developed by Bryant Fraser and distributed by Digital Masters. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="chasm checking account systems manager (4am crack).dsk" size="143360" crc="b434be6b" sha1="0257237f3eaf6d2cd97963fe4d7015e4822b75c5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geomapgl">
+		<description>Learning about Geography, Maps, and Globes (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Educational Activities</publisher>
+		<info name="release" value="2022-07-10"/>
+		<!--"Learning about Geography, Maps, and Globes" is a 1988 educational program developed by Activity Records and distributed by Educational Activities. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Introduction"/>
+			<dataarea name="flop" size="143360">
+				<rom name="learning about geography, maps, and globes (4am crack) disk 1 - introduction.dsk" size="143360" crc="048031e3" sha1="c42d63677af8e47131a9ad5c1c2b90ec22cc094e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Making use of maps"/>
+			<dataarea name="flop" size="143360">
+				<rom name="learning about geography, maps, and globes (4am crack) disk 2 - making use of maps.dsk" size="143360" crc="0875d62d" sha1="413b14f229c6e26530b5874df70af761b4d5fd23"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Maps in your life"/>
+			<dataarea name="flop" size="143360">
+				<rom name="learning about geography, maps, and globes (4am crack) disk 3 - maps in your life.dsk" size="143360" crc="d6962f05" sha1="5a0d4391ff2335ca6fedadfa291e8f8aebd97ef6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sv1envir">
+		<description>Science Volume 1: The Environment (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Decision DevelopmentThe Ellen Nelson Learning Library</publisher>
+		<info name="release" value="2022-07-10"/>
+		<!--"Science Volume 1: The Environment" is a 1986 educational program developed by Decision Development Co. and distributed by The Ellen Nelson Learning Library. This is version 1.0. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="science volume 1- the environment (4am crack).dsk" size="143360" crc="6d8b7ff7" sha1="09e19994fa696ff53a167986393c74b0863f6014"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdiag22p">
+		<description>Master Diagnostics II and II Plus (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Nikrom Technical Products</publisher>
+		<info name="release" value="2022-07-10"/>
+		<!--"Master Diagnostics II and II Plus" is a 1981 utility program developed and distributed by Nikrom Technical Products. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="master diagnostics ii and ii plus (4am crack).dsk" size="143360" crc="cad083db" sha1="71eb04f2a09d249ff922548fa074a955a2540d9d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pfsfich8411">
+		<description>PFS Fichier (Version 1984-11-26) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Software Publishing Corporation</publisher>
+		<info name="release" value="2022-07-10"/>
+		<!--"PFS Fichier" (French version of "PFS File") is a 1984 productivity program developed and distributed by Software Publishing Corporation. This version is dated 1984-11-26 according to file metadata.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pfs fichier 1984-11-26 (4am crack).dsk" size="143360" crc="7bd22192" sha1="5831295341c97ac7007d047bbad87eb73ec18da5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pfsrep8509">
+		<description>PFS Report (Version 1985-09-10) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Software Publishing Corporation</publisher>
+		<info name="release" value="2022-07-10"/>
+		<!--"PFS Report" is a 1985 productivity program developed and distributed by Software Publishing Corporation. This version is dated 1985-09-10 according to file metadata.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pfs report 1985-09-10 (4am crack).dsk" size="143360" crc="6b693ea6" sha1="c3c8d9aae12ad540925be3d5a1b7d7e4b7d9a944"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacif231">
+		<description>Pacific 231 (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Ediciel</publisher>
+		<info name="release" value="2022-07-10"/>
+		<!--"Pacific 231" is a 1984 French educational program developed by Spinnaker Software and distributed by Ediciel.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Color"/>
+			<dataarea name="flop" size="143360">
+				<rom name="pacific 231 (4am crack) side a - color.dsk" size="143360" crc="85fb46c7" sha1="bc634f48cb8e0054c93837f3ff3fec662ce4c15f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Monochrome"/>
+			<dataarea name="flop" size="143360">
+				<rom name="pacific 231 (4am crack) side b - monochrome.dsk" size="143360" crc="366a209b" sha1="8f1d2ef52f299b2b8b6231c65aeb7fca6d8b9db3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sherwood">
+		<description>Sherwood Forest (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Phoenix Software</publisher>
+		<info name="release" value="2022-07-10"/>
+		<!--"Sherwood Forest" is a 1982 adventure game developed by Dale Johnson and Dav Holle, and distributed by Phoenix Software.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="sherwood forest (4am crack).dsk" size="143360" crc="ac69c7c4" sha1="f806b905b4ec5a055e2764b39e8f8d5147d73d07"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matcprsl5">
+		<description>Mathematics Courseware Problem Solving Level 5 (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>McGraw-Hill</publisher>
+		<info name="release" value="2022-07-17"/>
+		<!--"Mathematics Courseware Problem Solving Level 5" is a 1987 educational game developed by Tom Snyder Productions and distributed by McGraw-Hill. This is version 1.0. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Teacher disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mathematics courseware problem solving level 5 (4am crack) disk 1 - teacher disk.dsk" size="143360" crc="9c603ec4" sha1="6df4d5a2017608e2b550bb4c47a68d8ca4ac118b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Student disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mathematics courseware problem solving level 5 (4am crack) disk 2 - student disk.dsk" size="143360" crc="e6f60b08" sha1="bfff9db51c403edd8dec067ca6ec5e9f7e8f1b9f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starwr2">
+		<description>Star Warrior (Revision 2) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Automated Simulations</publisher>
+		<info name="release" value="2022-07-17"/>
+		<!--"Star Warrior" is a 1981 roleplaying game developed and distributed by Automated Simulations.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="star warrior rev. 2 (4am and san inc crack).dsk" size="143360" crc="60cd093f" sha1="1e8c42513bc5280d42143b4d9dac6d402845d1bc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cntparr0">
+		<description>Counting Parade (Revision 0) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Spinnaker</publisher>
+		<info name="release" value="2022-07-07"/>
+		<!--"Counting Parade" is a 1985 educational game developed and distributed by Spinnaker Software. This is believed to be the first release because, unlike later releases, it does not have a file named "V" containing a date and version number. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="counting parade rev. 0 (4am crack).dsk" size="143360" crc="3b128c8e" sha1="3a39a75dd59ec4f138b58d678aefdc16da7343bc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lclpwtc">
+		<description>Living Chess Library: Paul Whitehead Teaches Chess (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Enlightenment, Inc.</publisher>
+		<info name="release" value="2022-07-10"/>
+		<!--"Living Chess Library: Paul Whitehead Teaches Chess" is a 1985 educational program developed by Paul Whitehead, Julio Kaplan, and Dan Goldman, and distributed by Enlightenment, Inc. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="living chess library - paul whitehead teaches chess (4am crack) side 1.dsk" size="143360" crc="33d0de07" sha1="d024b7afb00b3b308ace067913e69654d2d046ba"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="living chess library - paul whitehead teaches chess (4am crack) side 2.dsk" size="143360" crc="207f0bb5" sha1="6ea7a1f3794bb0c28e8b37ce34814ddf5c31b5c1"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="living chess library - paul whitehead teaches chess (4am crack) side 3.dsk" size="143360" crc="53a88fb9" sha1="800e27c1c9a047b0a2a5a744c4112474e5c996a3"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side 4"/>
+			<dataarea name="flop" size="143360">
+				<rom name="living chess library - paul whitehead teaches chess (4am crack) side 4.dsk" size="143360" crc="f7d35835" sha1="1648f6ce663a89d2dbd50538cf33cf0f62cf30f2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lclkid">
+		<description>Living Chess Library: King's Indian Defense (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Enlightenment, Inc.</publisher>
+		<info name="release" value="2022-07-10"/>
+		<!--"Living Chess Library: King's Indian Defense" is a 1985 educational program developed by Edward A. Chang, Peter Biyiasas, Julio Kaplan, and Dan Goldman, and distributed by Enlightenment, Inc. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="living chess library - king's indian defense (4am crack) side 1.dsk" size="143360" crc="39f31c49" sha1="9ab94006492be5760f3f605479e880573821a638"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="living chess library - king's indian defense (4am crack) side 2.dsk" size="143360" crc="c900e849" sha1="cdabaf41afb02f520ea9c031574ff9600cde9c00"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="living chess library - king's indian defense (4am crack) side 3.dsk" size="143360" crc="5d48434b" sha1="8684e301c8ad71419274e6ce0b70a3c12a8efd52"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side 4"/>
+			<dataarea name="flop" size="143360">
+				<rom name="living chess library - king's indian defense (4am crack) side 4.dsk" size="143360" crc="9844c595" sha1="906037a5dac31c9dcf9e3802e4cbfc1e8d9e63cd"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Side 5"/>
+			<dataarea name="flop" size="143360">
+				<rom name="living chess library - king's indian defense (4am crack) side 5.dsk" size="143360" crc="9c148069" sha1="61dc2ec666a9d04b94271118150ef3eb59f8e710"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lcl50cg">
+		<description>Living Chess Library: 50 Classic Games (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Enlightenment, Inc.</publisher>
+		<info name="release" value="2022-07-10"/>
+		<!--"Living Chess Library: 50 Classic Games" is a 1985 educational program developed by Paul Whitehead and distributed by Enlightenment, Inc. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="living chess library - 50 classic games (4am crack) side 1.dsk" size="143360" crc="4efad7be" sha1="a2bc813a8cbe41fa26bfe28d960b7bdf0c8315b3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="living chess library - 50 classic games (4am crack) side 2.dsk" size="143360" crc="cf529a19" sha1="563456acc25085f2902a2348abc35c6e82f66d37"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="living chess library - 50 classic games (4am crack) side 3.dsk" size="143360" crc="b31c2613" sha1="e4e7f0710ceb7f2075c34181a782941e1c0f922e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cotfifi">
+		<description>Cotton's First Files (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Mindplay</publisher>
+		<info name="release" value="2022-07-10"/>
+		<!--"Cotton's First Files" is a 1989 educational game developed by Methods and Solutions and distributed by Mindplay. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="cotton's first files (4am crack) side a.dsk" size="143360" crc="8b4962bd" sha1="2fd4aae54822a521045f48410e29fae41aab68aa"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="cotton's first files (4am crack) side b.dsk" size="143360" crc="ae7d19e8" sha1="afbcc8066fa1bf4869186dbcbb0f42685dda8d17"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
