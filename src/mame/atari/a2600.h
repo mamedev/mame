@@ -52,6 +52,8 @@ protected:
 
 	virtual void machine_start() override;
 
+	void a2600_mem(address_map &map);
+
 	void a2600_base_ntsc(machine_config &config);
 
 	void switch_A_w(uint8_t data);
@@ -62,8 +64,6 @@ protected:
 	uint8_t a2600_get_databus_contents(offs_t offset);
 	void a2600_tia_vsync_callback(uint16_t data);
 	void a2600_tia_vsync_callback_pal(uint16_t data);
-
-	void a2600_mem(address_map &map);
 
 	required_shared_ptr<uint8_t> m_riot_ram;
 	required_device<tia_video_device> m_tia;
@@ -87,26 +87,19 @@ class a2600_state : public a2600_base_state
 public:
 	a2600_state(const machine_config &mconfig, device_type type, const char *tag) :
 		a2600_base_state(mconfig, type, tag),
-		m_cart(*this, "cartslot")
+		m_cartslot(*this, "cartslot")
 	{ }
+
+	void a2600_mem(address_map &map);
 
 	void a2600(machine_config &config);
 	void a2600p(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-
-	void cart_over_tia_w(address_space &space, offs_t offset, uint8_t data);
-	// investigate how the carts mapped here (Mapper JVP) interact with the RIOT device
-	uint8_t cart_over_riot_r(address_space &space, offs_t offset);
-	void cart_over_riot_w(address_space &space, offs_t offset, uint8_t data);
-	uint8_t cart_over_all_r(address_space &space, offs_t offset);
-	void cart_over_all_w(address_space &space, offs_t offset, uint8_t data);
-
 	void a2600_cartslot(machine_config &config);
 
 private:
-	required_device<vcs_cart_slot_device> m_cart;
+	required_device<vcs_cart_slot_device> m_cartslot;
 };
 
 

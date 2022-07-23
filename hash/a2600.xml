@@ -3293,9 +3293,10 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 	</software>
 
 	<software name="challenge" cloneof="challeng">
-		<description>Challenge (PAL)</description>
+		<description>Challenge / Surfer's Paradise (PAL)</description>
 		<year>19??</year>
 		<publisher>HES</publisher>
+		<info name="usage" value="Set right difficulty switch to A for Surfer's Paradise, to B (default) for Challenge" />
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_fv" />
 			<dataarea name="rom" size="8192">

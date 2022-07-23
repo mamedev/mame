@@ -37,20 +37,22 @@
 #include "sound/wave.h"
 #include "formats/a26_cas.h"
 
+//#define VERBOSE (LOG_GENERAL)
+#include "logmacro.h"
+
+
 DEFINE_DEVICE_TYPE(A26_ROM_SUPERCHARGER, a26_rom_ss_device, "a2600_ss", "Atari 2600 ROM Cart Supercharger")
 
 
 a26_rom_ss_device::a26_rom_ss_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: a26_rom_f6_device(mconfig, A26_ROM_SUPERCHARGER, tag, owner, clock),
+	: a26_rom_base_device(mconfig, A26_ROM_SUPERCHARGER, tag, owner, clock),
 	m_cassette(*this, "cassette"),
-	m_maincpu(nullptr),
 	m_reg(0),
 	m_write_delay(0),
 	m_ram_write_enabled(0),
 	m_rom_enabled(0),
-	m_byte_started(0),
-	m_last_address(0),
-	m_diff_adjust(0)
+	m_last_address_bus(0),
+	m_address_bus_changes(0)
 {
 }
 
@@ -60,16 +62,13 @@ a26_rom_ss_device::a26_rom_ss_device(const machine_config &mconfig, const char *
 
 void a26_rom_ss_device::device_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-
 	save_item(NAME(m_base_banks));
 	save_item(NAME(m_reg));
 	save_item(NAME(m_write_delay));
 	save_item(NAME(m_ram_write_enabled));
 	save_item(NAME(m_rom_enabled));
-	save_item(NAME(m_byte_started));
-	save_item(NAME(m_last_address));
-	save_item(NAME(m_diff_adjust));
+	save_item(NAME(m_last_address_bus));
+	save_item(NAME(m_address_bus_changes));
 }
 
 void a26_rom_ss_device::device_reset()
@@ -78,12 +77,11 @@ void a26_rom_ss_device::device_reset()
 	m_base_banks[0] = 2;
 	m_base_banks[1] = 3;
 	m_ram_write_enabled = 0;
-	m_byte_started = 0;
 	m_reg = 0;
 	m_write_delay = 0;
 	m_rom_enabled = 1;
-	m_last_address = 0;
-	m_diff_adjust = 0;
+	m_last_address_bus = 0;
+	m_address_bus_changes = 0;
 }
 
 
@@ -109,7 +107,23 @@ inline uint8_t a26_rom_ss_device::read_byte(uint32_t offset)
 		return 0xff;
 }
 
-uint8_t a26_rom_ss_device::read_rom(offs_t offset)
+void a26_rom_ss_device::install_memory_handlers(address_space *space)
+{
+	space->install_read_handler(0x1000, 0x1fff, read8sm_delegate(*this, FUNC(a26_rom_ss_device::read)));
+	space->install_readwrite_tap(0x0000, 0x1fff, "bank", 
+		[this](offs_t offset, u8 &, u8) { if(!machine().side_effects_disabled()) tap(offset); },
+		[this](offs_t offset, u8 &, u8) { if(!machine().side_effects_disabled()) tap(offset); }
+	);
+}
+
+void a26_rom_ss_device::tap(offs_t offset)
+{
+	if (m_last_address_bus != offset)
+		m_address_bus_changes++;
+	m_last_address_bus = offset;
+}
+
+uint8_t a26_rom_ss_device::read(offs_t offset)
 {
 	if (machine().side_effects_disabled())
 		return read_byte(offset);
@@ -117,13 +131,13 @@ uint8_t a26_rom_ss_device::read_rom(offs_t offset)
 	// Bankswitch
 	if (offset == 0xff8)
 	{
-		//logerror("%04X: Access to control register data = %02X\n", m_maincpu->pc(), m_modeSS_byte);
+		LOG("write control register %02X\n", m_reg);
 		m_write_delay = m_reg >> 5;
 		m_ram_write_enabled = BIT(m_reg, 1);
 		m_rom_enabled = !BIT(m_reg, 0);
 
-		// compensate time spent in this access to avoid spurious RAM write
-		m_byte_started -= 5;
+		// prevent spurious RAM write
+		m_address_bus_changes += 6;
 
 		// handle bankswitch
 		switch (m_reg & 0x1c)
@@ -167,11 +181,10 @@ uint8_t a26_rom_ss_device::read_rom(offs_t offset)
 	// Cassette port read
 	else if (offset == 0xff9)
 	{
-		//logerror("%04X: Cassette port read, tap_val = %f\n", m_maincpu->pc(), tap_val);
 		double tap_val = m_cassette->input();
 
-		// compensate time spent in this access to avoid spurious RAM write
-		m_byte_started -= 5;
+		// prevent spurious RAM write
+		m_address_bus_changes += 6;
 
 		if (tap_val < 0)
 			return 0x00;
@@ -183,35 +196,30 @@ uint8_t a26_rom_ss_device::read_rom(offs_t offset)
 	{
 		if (m_ram_write_enabled)
 		{
-			/* Check for dummy read from same address */
-			if (m_last_address == offset)
-				m_diff_adjust++;
-
-			int diff = m_maincpu->total_cycles() - m_byte_started;
-			//logerror("%04X: offset = %04X, %d\n", m_maincpu->pc(), offset, diff);
-
-			if (diff - m_diff_adjust == 5)
+			if (m_address_bus_changes == 5)
 			{
-				//logerror("%04X: RAM write offset = %04X, data = %02X\n", m_maincpu->pc(), offset, m_modeSS_byte );
 				if (offset < 0x800)
+				{
+					LOG("%s: RAM write offset %04X, data %02X\n", machine().describe_context(), (offset & 0x7ff) + (m_base_banks[0] * 0x800), m_reg);
 					m_ram[(offset & 0x7ff) + (m_base_banks[0] * 0x800)] = m_reg;
+				}
 				else if (m_base_banks[1] != 3)
+				{
+					LOG("%s: RAM write offset %04X, data %02X\n", machine().describe_context(), (offset & 0x7ff) + (m_base_banks[1] * 0x800), m_reg);
 					m_ram[(offset & 0x7ff) + (m_base_banks[1] * 0x800)] = m_reg;
+				}
 			}
 			else if (offset < 0x0100)
 			{
 				m_reg = offset;
-				m_byte_started = m_maincpu->total_cycles();
-				m_diff_adjust = 0;
+				m_address_bus_changes = 0;
 			}
 		}
 		else if (offset < 0x0100)
 		{
 			m_reg = offset;
-			m_byte_started = m_maincpu->total_cycles();
-			m_diff_adjust = 0;
+			m_address_bus_changes = 0;
 		}
-		m_last_address = offset;
 		return read_byte(offset);
 	}
 }

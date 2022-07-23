@@ -243,11 +243,6 @@ a26_rom_dpc_device::a26_rom_dpc_device(const machine_config &mconfig, const char
 //  mapper specific start/reset
 //-------------------------------------------------
 
-void a26_rom_dpc_device::device_start()
-{
-	save_item(NAME(m_base_bank));
-}
-
 void a26_rom_dpc_device::device_reset()
 {
 	m_base_bank = 0;
@@ -264,18 +259,24 @@ void a26_rom_dpc_device::device_add_mconfig(machine_config &config)
 	ATARI_DPC(config, m_dpc, 0);
 }
 
-uint8_t a26_rom_dpc_device::read_rom(offs_t offset)
+void a26_rom_dpc_device::install_memory_handlers(address_space *space)
+{
+	space->install_read_handler(0x1000, 0x1fff, read8sm_delegate(*this, FUNC(a26_rom_dpc_device::read)));
+	space->install_write_handler(0x1000, 0x1fff, write8sm_delegate(*this, FUNC(a26_rom_dpc_device::write)));
+}
+
+uint8_t a26_rom_dpc_device::read(offs_t offset)
 {
 	if (offset < 0x40)
 		return m_dpc->read(offset);
 	else
-		return a26_rom_f8_device::read_rom(offset);
+		return a26_rom_f8_device::read(offset);
 }
 
-void a26_rom_dpc_device::write_bank(address_space &space, offs_t offset, uint8_t data)
+void a26_rom_dpc_device::write(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x40 && offset < 0x80)
 		m_dpc->write(offset, data);
 	else
-		a26_rom_f8_device::write_bank(space, offset, data);
+		a26_rom_f8_device::write(offset, data);
 }
