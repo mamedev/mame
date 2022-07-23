@@ -11138,7 +11138,7 @@ ROM_END
 
   As seen listed above, the basic 4-function TMS0972 calculator MCU was used
   in many calculators. It was licensed to other manufacturers too, one funny
-  example being a Mattel Barbie handheld calculator.
+  example being a Concept 2000 Barbie handheld calculator.
 
   Some cheaper models lacked the memory buttons (the function itself still works).
   The ABLE series was for educational purposes, with each having a small subset of

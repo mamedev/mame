@@ -230,13 +230,13 @@ void mm2_state::rebel5_mem(address_map &map)
 void mm2_state::mm5p_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x2000).w(m_display, FUNC(mephisto_display1_device::data_w));
-	map(0x2400, 0x2400).w("board", FUNC(mephisto_board_device::led_w));
-	map(0x2800, 0x2800).w("board", FUNC(mephisto_board_device::mux_w));
-	map(0x2c00, 0x2c07).r(FUNC(mm2_state::keys_r));
-	map(0x3000, 0x3000).r("board", FUNC(mephisto_board_device::input_r));
-	map(0x3400, 0x3407).w("outlatch", FUNC(hc259_device::write_d7)).nopr();
-	map(0x3800, 0x3800).nopw(); // N/C
+	map(0x2000, 0x2000).mirror(0x03ff).w(m_display, FUNC(mephisto_display1_device::data_w));
+	map(0x2400, 0x2407).mirror(0x03f8).w("board", FUNC(mephisto_board_device::led_w)).nopr();
+	map(0x2800, 0x2800).mirror(0x03ff).w("board", FUNC(mephisto_board_device::mux_w));
+	map(0x2c00, 0x2c07).mirror(0x03f8).r(FUNC(mm2_state::keys_r));
+	map(0x3000, 0x3000).mirror(0x03ff).r("board", FUNC(mephisto_board_device::input_r));
+	map(0x3400, 0x3407).mirror(0x03f8).w("outlatch", FUNC(hc259_device::write_d7)).nopr();
+	map(0x3800, 0x3800).mirror(0x03ff).nopw(); // N/C
 	map(0x4000, 0xffff).rom();
 }
 
