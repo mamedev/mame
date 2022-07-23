@@ -91,12 +91,12 @@ license:CC0
 	<element name="text_p5"><image file="chess/wq.svg"/></element>
 	<element name="text_p6"><image file="chess/wk.svg"/></element>
 
-	<element name="text_p7"><image file="chess/bp.svg"/></element>
-	<element name="text_p8"><image file="chess/bn.svg"/></element>
-	<element name="text_p9"><image file="chess/bb.svg"/></element>
-	<element name="text_p10"><image file="chess/br.svg"/></element>
-	<element name="text_p11"><image file="chess/bq.svg"/></element>
-	<element name="text_p12"><image file="chess/bk.svg"/></element>
+	<element name="text_p7"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/bp.svg" /><rect><color red="1" green="1" blue="1" alpha="0.12" /></rect></element>
+	<element name="text_p8"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/bn.svg" /><rect><color red="1" green="1" blue="1" alpha="0.12" /></rect></element>
+	<element name="text_p9"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/bb.svg" /><rect><color red="1" green="1" blue="1" alpha="0.12" /></rect></element>
+	<element name="text_p10"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/br.svg" /><rect><color red="1" green="1" blue="1" alpha="0.12" /></rect></element>
+	<element name="text_p11"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/bq.svg" /><rect><color red="1" green="1" blue="1" alpha="0.12" /></rect></element>
+	<element name="text_p12"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/bk.svg" /><rect><color red="1" green="1" blue="1" alpha="0.12" /></rect></element>
 
 
 <!-- sb board -->
@@ -485,12 +485,12 @@ license:CC0
 		<element ref="white"><bounds x="101.4" y="70.44" width="5.7" height="3.7" /></element>
 		<element ref="static_red"><bounds x="101.4" y="78.15" width="5.7" height="3.7" /></element>
 
-		<element ref="text_p12"><bounds x="93.33" y="24.70" width="2.5" height="2.5" /><color alpha="0.9" /></element>
-		<element ref="text_p11"><bounds x="93.33" y="32.41" width="2.5" height="2.5" /><color alpha="0.9" /></element>
-		<element ref="text_p9"><bounds x="93.33" y="40.13" width="2.5" height="2.5" /><color alpha="0.9" /></element>
-		<element ref="text_p8"><bounds x="93.33" y="47.84" width="2.5" height="2.5" /><color alpha="0.9" /></element>
-		<element ref="text_p10"><bounds x="93.33" y="55.56" width="2.5" height="2.5" /><color alpha="0.9" /></element>
-		<element ref="text_p7"><bounds x="93.33" y="63.27" width="2.5" height="2.5" /><color alpha="0.9" /></element>
+		<element ref="text_p12" blend="multiply"><bounds x="93.33" y="24.70" width="2.5" height="2.5" /></element>
+		<element ref="text_p11" blend="multiply"><bounds x="93.33" y="32.41" width="2.5" height="2.5" /></element>
+		<element ref="text_p9" blend="multiply"><bounds x="93.33" y="40.13" width="2.5" height="2.5" /></element>
+		<element ref="text_p8" blend="multiply"><bounds x="93.33" y="47.84" width="2.5" height="2.5" /></element>
+		<element ref="text_p10" blend="multiply"><bounds x="93.33" y="55.56" width="2.5" height="2.5" /></element>
+		<element ref="text_p7" blend="multiply"><bounds x="93.33" y="63.27" width="2.5" height="2.5" /></element>
 
 		<element ref="hlb" inputtag="IN.0" inputmask="0x02"><bounds x="91.63" y="24.00" width="6" height="4" /><color alpha="0.4" /></element>
 		<element ref="hlb" inputtag="IN.1" inputmask="0x02"><bounds x="91.63" y="31.71" width="6" height="4" /><color alpha="0.4" /></element>

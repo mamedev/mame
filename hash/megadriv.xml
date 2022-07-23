@@ -13894,7 +13894,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<publisher>Ma-Ba</publisher>
 		<info name="serial" value="T-16033"/>
 		<info name="release" value="19940311"/>
-		<info name="alt_title" value="クレヨンしんちゃん ゛嵐を呼ぶ園児″"/>
+		<info name="alt_title" value="クレヨンしんちゃん 〝嵐を呼ぶ園児〞"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="crayon shin-chan - arashi o yobu enji (jpn).bin" size="2097152" crc="97fc42d2" sha1="46214898990ebc5e74413a53f7304ad466875fbe"/>

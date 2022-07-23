@@ -3598,5 +3598,260 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-
+	<software name="dlair1">
+		<description>Dragon's Lair</description>
+		<year>2022</year>
+		<publisher>Brutal Deluxe Software</publisher>
+		<info name="release" value="2022-3-30"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!--  Apple IIgs version by Antoine Vignau and Olivier Zardini -->
+		<!--  After booting your Apple IIgs with a system disk, or autobooting from a hard drive, insert Dragon's Lair disk #1 and double click the DragonsLair icon to begin the game. -->
+	    <!--  To install Dragon's Lair on a hard drive, create a DragonsLair folder on your hard drive and copy the content of the 7 disks into it. To run Dragon's Lair from your hard drive, double click on the DragonsLair directory icon on your hard drive then double click on the DragonsLair Icon. -->
+		<!--  System Requirements: Apple IIgs ROM 01/3 with 1.5 MB RAM, one 3.5" disk drive, System 5.0.4 -->
+		<!--  Recommended: Apple IIgs ROM 01/3 with 4 MB RAM, accelerator card, hard drive, System 6.0.1 -->
+		
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="819200">
+				<rom name="DragonsLair_D1.po" size="819200" crc="446089f9" sha1="36cac553f94139f7859085b0903197627a595d54"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="819200">
+				<rom name="DragonsLair_D2.po" size="819200" crc="72e7cd1d" sha1="a3f425dae0c6b26d0151470f613fcac048ff6943"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="819200">
+				<rom name="DragonsLair_D3.po" size="819200" crc="b21c1bcb" sha1="3812523da3d4dedd885cc61e6f318fac89f635af"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="819200">
+				<rom name="DragonsLair_D4.po" size="819200" crc="bbc018ab" sha1="70036a6d2b19f48eba64a48c778199ede4033680"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5"/>
+			<dataarea name="flop" size="819200">
+				<rom name="DragonsLair_D5.po" size="819200" crc="90be7d87" sha1="6c4f53579ccf388df989edf2260dce25b7c978a4"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6"/>
+			<dataarea name="flop" size="819200">
+				<rom name="DragonsLair_D6.po" size="819200" crc="8cf849ea" sha1="a9c23c048ec0bb2676bc733ca6ed41182d44e90f"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 7"/>
+			<dataarea name="flop" size="819200">
+				<rom name="DragonsLair_D7.po" size="819200" crc="a66498de" sha1="84de9890a44db7ad90e9fc1fd671538df3709bc5"/>
+			</dataarea>
+		</part>
+	</software>	
+	<software name="dlair1sc">
+		<description>Dragon's Lair: Escape from Singe's Castle</description>
+		<year>2022</year>
+		<publisher>Brutal Deluxe Software</publisher>
+		<info name="release" value="2022-4-30"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!--  Apple IIgs version by Antoine Vignau and Olivier Zardini -->
+		<!--  After booting your Apple IIgs with a system disk, or autobooting from a hard drive, insert Dragon's Lair disk #1 and double click the DragonsLair1 icon to begin the game. -->
+	    <!--  To install Dragon's Lair 1 on a hard drive, create a DragonsLair1 folder on your hard drive and copy the content of the 8 disks into it. To run Dragon's Lair 1 from your hard drive, double click on the DragonsLair1 directory icon on your hard drive then double click on the DragonsLair1 Icon. -->
+		<!--  System Requirements: Apple IIgs ROM 01/3 with 1.5 MB RAM, one 3.5" disk drive, System 5.0.4 -->
+		<!--  Recommended: Apple IIgs ROM 01/3 with 4 MB RAM, accelerator card, hard drive, System 6.0.1 -->
+		
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="819200">
+				<rom name="DragonsLair1_D1.po" size="819200" crc="a90f26bf" sha1="ec8bdb9fa13857eb0ec3db66b58f3d85d310c4c2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="819200">
+				<rom name="DragonsLair1_D2.po" size="819200" crc="8795c47d" sha1="f6864ac7d320bdf444a4990c8a5d0cff60529bb5"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="819200">
+				<rom name="DragonsLair1_D3.po" size="819200" crc="32de1399" sha1="ac7b5345dd22da25989144a0da2904f63e11826b"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="819200">
+				<rom name="DragonsLair1_D4.po" size="819200" crc="5b237c17" sha1="63a3c9bae3ddbf211069a2a813ae9606ea758b99"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5"/>
+			<dataarea name="flop" size="819200">
+				<rom name="DragonsLair1_D5.po" size="819200" crc="793983c3" sha1="15aa32dd7dd535f3d5a429f13d798b8b1142adb4"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6"/>
+			<dataarea name="flop" size="819200">
+				<rom name="DragonsLair1_D6.po" size="819200" crc="fc05ec6b" sha1="67652c70a5d5f1e0fef9696666b9fa67293e2ce1"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 7"/>
+			<dataarea name="flop" size="819200">
+				<rom name="DragonsLair1_D7.po" size="819200" crc="95fc9d87" sha1="7372a022eaeaf3c34ef35bf1a55d70b4acb17b06"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 8"/>
+			<dataarea name="flop" size="819200">
+				<rom name="DragonsLair1_D8.po" size="819200" crc="746ae6e5" sha1="0afc386f4b4656c7ea9193695b436a376329f017"/>
+			</dataarea>
+		</part>
+	</software>	
+	<software name="dlair2tw">
+		<description>Dragon's Lair II: Time Warp</description>
+		<year>2022</year>
+		<publisher>Brutal Deluxe Software</publisher>
+		<info name="release" value="2022-5-30"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!--  Apple IIgs version by Antoine Vignau and Olivier Zardini -->
+		<!--  After booting your Apple IIgs with a system disk, or autobooting from a hard drive, insert Dragon's Lair 2 disk #1 and double click the DragonsLair2 icon to begin the game. -->
+		<!--  To install Dragon's Lair 2 on a hard drive, create a DragonsLair2 folder on your hard drive and copy the content of the 8 disks into it. To run Dragon's Lair 2 from your hard drive, double click on the DragonsLair2 directory icon on your hard drive then double click on the DragonsLair2 Icon. -->
+		<!--  System Requirements: Apple IIgs ROM 01/3 with 1.5 MB RAM, one 3.5" disk drive, System 5.0.4 -->
+		<!--  Recommended: Apple IIgs ROM 01/3 with 4 MB RAM, accelerator card, hard drive, System 6.0.1 -->
+		
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="819200">
+				<rom name="DragonsLair2_D1.po" size="819200" crc="e97dfc57" sha1="b6c9b9301ea316459a616764622aa78d82650146"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="819200">
+				<rom name="DragonsLair2_D2.po" size="819200" crc="6d3cf116" sha1="4eeef96158cbbdf6cd534eae2b297bb28cea4c58"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="819200">
+				<rom name="DragonsLair2_D3.po" size="819200" crc="6c611611" sha1="e9ea0751946a355116f048ffc89e2d638681da96"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="819200">
+				<rom name="DragonsLair2_D4.po" size="819200" crc="445125a9" sha1="69c14d5ddbfeb451c4c992418a05453ea048a870"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5"/>
+			<dataarea name="flop" size="819200">
+				<rom name="DragonsLair2_D5.po" size="819200" crc="7ce75c2e" sha1="9f90b26985ae5e659abf1d1cfd16ef46fcdc4339"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6"/>
+			<dataarea name="flop" size="819200">
+				<rom name="DragonsLair2_D6.po" size="819200" crc="42cac270" sha1="0c98b9d2bc46973615d01e95dfeb0e8b7554d9dd"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 7"/>
+			<dataarea name="flop" size="819200">
+				<rom name="DragonsLair2_D7.po" size="819200" crc="19c6c854" sha1="130bac3aefe35c680c2839bfb0cc1e96d2b08100"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 8"/>
+			<dataarea name="flop" size="819200">
+				<rom name="DragonsLair2_D8.po" size="819200" crc="86ac38f7" sha1="482daa26d4d6a3a3228c48b1dd9b423d34830736"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="dlair3cm">
+		<description>Dragon's Lair III: Curse of Mordread</description>
+		<year>2022</year>
+		<publisher>Brutal Deluxe Software</publisher>
+		<info name="release" value="2022-6-30"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!--  Apple IIgs version by Antoine Vignau and Olivier Zardini -->
+		<!--  After booting your Apple IIgs with a system disk, or autobooting from a hard drive, insert Dragon's Lair 3 disk #1 and double click the DragonsLair3 icon to begin the game. -->
+		<!--  To install Dragon's Lair 3 on a hard drive, create a DragonsLair3 folder on your hard drive and copy the content of the 11 disks into it. To run Dragon's Lair 3 from your hard drive, double click on the DragonsLair3 directory icon on your hard drive then double click on the DragonsLair3 Icon -->
+		<!--  System Requirements: Apple IIgs ROM 01/3 with 1.4 MB RAM, one 3.5" disk drive, System 5.0.4 -->
+		<!--  Recommended: Apple IIgs ROM 01/3 with 4 MB RAM, accelerator card, hard drive, System 6.0.1 -->
+		
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="819200">
+				<rom name="DragonsLair3_D1.po" size="819200" crc="706c70e8" sha1="f04b9ab7c19ca541f5e4a3b1bd63f3b0780bc38c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="819200">
+				<rom name="DragonsLair3_D2.po" size="819200" crc="6242d28b" sha1="5dca48f83201e6796b9ae47e493d1419688e3017"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="819200">
+				<rom name="DragonsLair3_D3.po" size="819200" crc="ea7eb9a9" sha1="b48c30e01dea8ce4ef874958635b49c9b216dab8"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="819200">
+				<rom name="DragonsLair3_D4.po" size="819200" crc="a15730c7" sha1="a1a4196b9af26ade4bb7d286fba0f6b40c91ca12"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5"/>
+			<dataarea name="flop" size="819200">
+				<rom name="DragonsLair3_D5.po" size="819200" crc="2a38afd7" sha1="5bdaa72c59dada8835ef95fc977c20aee89395c1"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6"/>
+			<dataarea name="flop" size="819200">
+				<rom name="DragonsLair3_D6.po" size="819200" crc="5449bfc5" sha1="99c9637159b0bd973d857afc1083ce19d28dbfa4"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 7"/>
+			<dataarea name="flop" size="819200">
+				<rom name="DragonsLair3_D7.po" size="819200" crc="1dbb59af" sha1="4226f08e0d342eae62ccaf2aabe4a574309ce674"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 8"/>
+			<dataarea name="flop" size="819200">
+				<rom name="DragonsLair3_D8.po" size="819200" crc="cb219fde" sha1="89ee620229891193e1654ecba8c980ac136211bf"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 9"/>
+			<dataarea name="flop" size="819200">
+				<rom name="DragonsLair3_D9.po" size="819200" crc="0f069269" sha1="68587a76d4df483646fd0654605028d61a3973fd"/>
+			</dataarea>
+		</part>
+		<part name="flopa" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 10"/>
+			<dataarea name="flop" size="819200">
+				<rom name="DragonsLair3_DA.po" size="819200" crc="88905424" sha1="3b6c1e96a029ca9eec7eaa631c813f1f5eed4e67"/>
+			</dataarea>
+		</part>
+		<part name="flopb" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 11"/>
+			<dataarea name="flop" size="819200">
+				<rom name="DragonsLair3_DB.po" size="819200" crc="10dd0992" sha1="70e6ca9f5b4b011a13c866150ba8ede08cd5953f"/>
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

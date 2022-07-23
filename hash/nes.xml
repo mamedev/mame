@@ -736,17 +736,21 @@ license:CC0
 		</part>
 	</software>
 
-<!-- TODO: This is alleged to be a 3-byte hack of the actual dump to make it run. Original proto doesn't work on hardware? Investigate... -->
 	<software name="drfrankn">
 		<description>The Adventures of Dr. Franken (USA, prototype)</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>Elite</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="NES-UNEPROM" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
-				<rom name="adv of franken nes rn0036" size="131072" crc="3b0f4db2" sha1="2185dc04b9967a14008baebefa58f06bbcf844a3" offset="00000" />
+				<!-- This is the original dump, patched here with fills. The widely distributed ROM hack has CRC 3b0f4db2. -->
+				<rom name="adv of franken nes rn0036" size="131072" crc="4b1aa202" sha1="f2f0a6acf11cca61374fb50ab42375cf6b55bfbc" offset="00000" />
+				<!-- Replace 'bne $000e' with 'stx $54' -->
+				<!-- Reset vector points to 0x(1)c018. This hack has the effect of initializing $54 to 1. Presumably setting $54 to anything between 0x01 and 0x7f would work, so this prototype will boot depending on the random contents of RAM on hardware? -->
+				<rom size="1" offset="0x1c02d" value="0x86" loadflag="fill"/>
+				<rom size="1" offset="0x1c02e" value="0x54" loadflag="fill"/>
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">

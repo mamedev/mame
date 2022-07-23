@@ -3604,6 +3604,21 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="casperp" cloneof="casper">
+		<description>Casper (prototype)</description>
+		<year>1995?</year>
+		<publisher>Natsume</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMGC-MBC1-2M-EPROM1-01" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [DMG MBC1B1]" />
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="131072">
+				<rom name="casper - gameboy.u1" size="131072" crc="39dcd93a" sha1="f04c2da54ebe91673a651989965ba2aa61d5d7bd" status="baddump" /> <!-- Trimmed from an 8MB overdump. Needs confirmed. -->
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="casperu" cloneof="casper">
 		<description>Casper (USA)</description>
 		<year>1996</year>
@@ -4469,7 +4484,7 @@ license:CC0
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-K4J" />
 		<info name="release" value="19930409" />
-		<info name="alt_title" value="クレヨンしんちゃん ゛オラとシロはお友達だよ″" />
+		<info name="alt_title" value="クレヨンしんちゃん 〝オラとシロはお友達だよ〞" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -4484,7 +4499,7 @@ license:CC0
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-COJ" />
 		<info name="release" value="19931022" />
-		<info name="alt_title" value="クレヨンしんちゃん2 ゛オラとわんぱくごっこだゾ″" />
+		<info name="alt_title" value="クレヨンしんちゃん2 〝オラとわんぱくごっこだゾ〞" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
@@ -4520,7 +4535,7 @@ license:CC0
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-H9J" />
 		<info name="release" value="19940826" />
-		<info name="alt_title" value="クレヨンしんちゃん4 ゛オラのいたずら大変身″" />
+		<info name="alt_title" value="クレヨンしんちゃん4 〝オラのいたずら大変身〞" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
@@ -4934,7 +4949,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="deathtrk" supported="no">
+	<software name="deathtrk">
 		<description>Death Track (prototype)</description>
 		<year>1992</year>
 		<publisher>Argonaut Software</publisher>
@@ -16907,6 +16922,22 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="outburstp" cloneof="raginfgt">
+		<description>Outburst (Japan, prototype)</description>
+		<year>1993</year>
+		<publisher>Konami</publisher>
+		<info name="alt_title" value="アウトバースト" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMGC-MBC1-2M-EPROM1-01" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2 [DMG MBC1B1]" />
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="262144">
+				<rom name="t.u1" size="262144" crc="9837ffac" sha1="4a45cc555b486f5dafa4e844a7b6afceb709a1b9" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="oyatsuqz">
 		<description>Oyatsu Quiz Mogu Mogu Q (Japan)</description>
 		<year>1997</year>
@@ -19193,6 +19224,19 @@ license:CC0
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="dmg-ar9p-0.u1" size="262144" crc="c95d927b" sha1="8561d62cd7df59082d6b3c048ca3b85a30d769b7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="primalp" cloneof="primal">
+		<description>Primal Rage (prototype)</description>
+		<year>1995?</year>
+		<publisher>Time Warner Interactive</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="262144">
+				<rom name="primal rage (prototype).bin" size="262144" crc="f738d4d1" sha1="2aa5b610058e8676126c35ad123fcbd5b4ce99a4" />
 			</dataarea>
 		</part>
 	</software>
@@ -22481,6 +22525,18 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="splitzp" cloneof="splitz">
+		<description>Splitz (prototype)</description>
+		<year>1993</year>
+		<publisher>Imagineer</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="131072">
+				<rom name="splitz (prototype).bin" size="131072" crc="5e8f955e" sha1="5f36290557f23c48ca7f2f17a1af9b691ede5bff" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="splitzj" cloneof="splitz">
 		<description>Splitz - Nigaoe 15 Game (Japan)</description>
 		<year>1993</year>
@@ -23654,6 +23710,18 @@ license:CC0
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="dmg-ore-0.u1" size="131072" crc="3e2810be" sha1="acde7750bcf99d7bb76b895534fda43ece222dfa" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superoffp" cloneof="superoff">
+		<description>Super Off Road (prototype)</description>
+		<year>1992</year>
+		<publisher>Tradewest</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="131072">
+				<rom name="super off road.bin" size="131072" crc="419a2ae3" sha1="742c33e45d3b79101d34fdc6537371ae96084235" />
 			</dataarea>
 		</part>
 	</software>

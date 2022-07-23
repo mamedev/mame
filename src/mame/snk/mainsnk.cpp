@@ -32,7 +32,7 @@ Notes:
 
 
 - canvas doesn't use the tx layer, though the circuitry is presumably still
-  present on the pcb. One gfx ROM socket is left empty which causes the tx layer
+  present on the PCB. One gfx ROM socket is left empty which causes the tx layer
   to be completely transparent.
 
 - neither mainsnk nor canvas pass the ROM test in service mode. This looks like
@@ -47,17 +47,17 @@ TODO:
 
 - several unknown dip switches
 
-- the hardware surely supports sprite shadows as most of the games in snk.c, but
+- the hardware surely supports sprite shadows as most of the games in snk.cpp, but
   the feature isn't used by these two games.
 
-- mainsnk doesn't seem to write to the bg/sprite scroll registers? SO I hardcoded
+- mainsnk doesn't seem to write to the bg/sprite scroll registers? So I hardcoded
   scroll values for these two games, even if canvas does seem to write to them.
 
 - canvas writes to several unknown addresses on startup. Most of them should be
   the scroll registers while others are unknown.
 
 - the bg tilemap is set to 256x256, however it could well be 512x256 as in the
-  other early SNK games in snk.c.
+  other early SNK games in snk.cpp.
 
 -----
 
@@ -73,9 +73,9 @@ Canvas Croquis, SNK 1984
 
 Note:
 
-The bproms(MB7054) was read as 74s572.
+The BPROMs(MB7054) were read as 74s572.
 I have not tested this PCB yet so I have no idea if it's working.
-All Bproms and P1-P8 is on top pcb, P9-P14 on bottom board, see pictures.
+All BPROMs and P1-P8 are on top PCB, P9-P14 on bottom board, see pictures.
 
 Documentation:
 
@@ -110,13 +110,239 @@ cc_p14.j2 8192 0xedc6a1eb M5L2764k
 */
 
 #include "emu.h"
-#include "mainsnk.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/ay8910.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
+
+namespace {
+
+class mainsnk_state : public driver_device
+{
+public:
+	mainsnk_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
+		m_bgram(*this, "bgram"),
+		m_spriteram(*this, "spriteram"),
+		m_fgram(*this, "fgram")
+	{ }
+
+	void mainsnk(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+
+	required_shared_ptr<uint8_t> m_bgram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_fgram;
+
+	tilemap_t *m_tx_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint32_t m_bg_tile_offset = 0;
+
+	uint8_t sound_ack_r();
+	void c600_w(uint8_t data);
+	void fgram_w(offs_t offset, uint8_t data);
+	void bgram_w(offs_t offset, uint8_t data);
+
+	TILEMAP_MAPPER_MEMBER(tx_scan_cols);
+	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+
+	void palette(palette_device &palette) const;
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int scrollx, int scrolly);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
+	void sound_portmap(address_map &map);
+};
+
+
+// video
+
+void mainsnk_state::palette(palette_device &palette) const
+{
+	uint8_t const *const color_prom = memregion("proms")->base();
+	constexpr int num_colors = 0x400;
+
+	for (int i = 0; i < num_colors; i++)
+	{
+		int bit0 = BIT(color_prom[i + 2*num_colors], 3);
+		int bit1 = BIT(color_prom[i], 1);
+		int bit2 = BIT(color_prom[i], 2);
+		int bit3 = BIT(color_prom[i], 3);
+		int const r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
+		bit0 = BIT(color_prom[i + 2*num_colors], 2);
+		bit1 = BIT(color_prom[i + num_colors], 2);
+		bit2 = BIT(color_prom[i + num_colors], 3);
+		bit3 = BIT(color_prom[i], 0);
+		int const g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
+		bit0 = BIT(color_prom[i + 2*num_colors], 0);
+		bit1 = BIT(color_prom[i + 2*num_colors], 1);
+		bit2 = BIT(color_prom[i + num_colors], 0);
+		bit3 = BIT(color_prom[i + num_colors], 1);
+		int const b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
+}
+
+TILEMAP_MAPPER_MEMBER(mainsnk_state::tx_scan_cols)
+{
+	// tilemap is 36x28, the central part is from the first RAM page and the
+	// extra 4 columns are from the second page
+	col -= 2;
+	if (col & 0x20)
+		return 0x400 + row + ((col & 0x1f) << 5);
+	else
+		return row + (col << 5);
+}
+
+TILE_GET_INFO_MEMBER(mainsnk_state::get_tx_tile_info)
+{
+	int code = m_fgram[tile_index];
+
+	tileinfo.set(0,
+			code,
+			0,
+			tile_index & 0x400 ? TILE_FORCE_LAYER0 : 0);
+}
+
+TILE_GET_INFO_MEMBER(mainsnk_state::get_bg_tile_info)
+{
+	int code = (m_bgram[tile_index]);
+
+	tileinfo.set(0,
+			m_bg_tile_offset + code,
+			0,
+			0);
+}
+
+
+void mainsnk_state::video_start()
+{
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mainsnk_state::get_tx_tile_info)), tilemap_mapper_delegate(*this, FUNC(mainsnk_state::tx_scan_cols)), 8, 8, 36, 28);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mainsnk_state::get_bg_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+
+	m_tx_tilemap->set_transparent_pen(15);
+	m_tx_tilemap->set_scrolldy(8, 8);
+
+	m_bg_tilemap->set_scrolldx(16, 16);
+	m_bg_tilemap->set_scrolldy(8,  8);
+
+	save_item(NAME(m_bg_tile_offset));
+}
+
+
+void mainsnk_state::c600_w(uint8_t data)
+{
+	int total_elements = m_gfxdecode->gfx(0)->elements();
+
+	flip_screen_set(BIT(data, 7));
+
+	m_bg_tilemap->set_palette_offset((data & 0x07) << 4);
+	m_tx_tilemap->set_palette_offset((data & 0x07) << 4);
+
+	int bank = 0;
+	if (total_elements == 0x400)    // mainsnk
+		bank = ((data & 0x30) >> 4);
+	else if (total_elements == 0x800)   // canvas
+		bank = ((data & 0x40) >> 6) | ((data & 0x30) >> 3);
+
+	if (m_bg_tile_offset != (bank << 8))
+	{
+		m_bg_tile_offset = bank << 8;
+		m_bg_tilemap->mark_all_dirty();
+	}
+}
+
+void mainsnk_state::fgram_w(offs_t offset, uint8_t data)
+{
+	m_fgram[offset] = data;
+	m_tx_tilemap->mark_tile_dirty(offset);
+}
+
+void mainsnk_state::bgram_w(offs_t offset, uint8_t data)
+{
+	m_bgram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+
+
+void mainsnk_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int scrollx, int scrolly)
+{
+	gfx_element *gfx = m_gfxdecode->gfx(1);
+	const uint8_t *source = m_spriteram;
+	const uint8_t *finish = source + 25 * 4;
+
+	while (source < finish)
+	{
+		int attributes = source[3];
+		int tile_number = source[1];
+		int sy = source[0];
+		int sx = source[2];
+		int color = attributes & 0xf;
+		int flipx = 0;
+		int flipy = 0;
+		if (sy > 240) sy -= 256;
+
+		tile_number |= attributes << 4 & 0x300;
+
+		sx = 288 - 16 - sx;
+		sy += 8;
+
+		if (flip_screen())
+		{
+			sx = 288 - 16 - sx;
+			sy = 224 + 8 - 16 - sy;
+			flipx = !flipx;
+			flipy = !flipy;
+		}
+
+		gfx->transpen(bitmap, cliprect,
+			tile_number,
+			color,
+			flipx, flipy,
+			sx, sy, 7);
+
+		source += 4;
+	}
+}
+
+
+uint32_t mainsnk_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect, 0, 0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
+
+
+// machine
 
 uint8_t mainsnk_state::sound_ack_r()
 {
@@ -137,10 +363,10 @@ void mainsnk_state::main_map(address_map &map)
 	map(0xc500, 0xc500).portr("DSW2");
 	map(0xc600, 0xc600).w(FUNC(mainsnk_state::c600_w));
 	map(0xc700, 0xc700).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xd800, 0xdbff).ram().w(FUNC(mainsnk_state::bgram_w)).share("bgram");
+	map(0xd800, 0xdbff).ram().w(FUNC(mainsnk_state::bgram_w)).share(m_bgram);
 	map(0xdc00, 0xe7ff).ram();
-	map(0xe800, 0xefff).ram().share("spriteram");
-	map(0xf000, 0xf7ff).ram().w(FUNC(mainsnk_state::fgram_w)).share("fgram");    // + work RAM
+	map(0xe800, 0xefff).ram().share(m_spriteram);
+	map(0xf000, 0xf7ff).ram().w(FUNC(mainsnk_state::fgram_w)).share(m_fgram);    // + work RAM
 }
 
 void mainsnk_state::sound_map(address_map &map)
@@ -169,7 +395,7 @@ static INPUT_PORTS_START( mainsnk )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r)  /* sound CPU status */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r)  // sound CPU status
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SERVICE )
 
@@ -232,8 +458,8 @@ static INPUT_PORTS_START( mainsnk )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSW2:1,2,3")
-//  PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )    // duplicate
-//  PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )    // duplicate
+	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )    // duplicate
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )    // duplicate
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
@@ -243,7 +469,7 @@ static INPUT_PORTS_START( mainsnk )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("DSW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x10, 0x10, "Round Time" ) PORT_DIPLOCATION("DSW2:5") /* $1ecf */
+	PORT_DIPNAME( 0x10, 0x10, "Round Time" ) PORT_DIPLOCATION("DSW2:5") // $1ecf
 	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "Short" )
 	PORT_DIPNAME( 0x60, 0x20, "Game mode" ) PORT_DIPLOCATION("DSW2:6,7")
@@ -263,7 +489,7 @@ static INPUT_PORTS_START( canvas )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r)  /* sound CPU status */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r)  // sound CPU status
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SERVICE )
 
@@ -301,7 +527,7 @@ static INPUT_PORTS_START( canvas )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSW1:4,5,6")
-//  PORT_DIPSETTING(    0x08, DEF_STR( 5C_1C ) )    // duplicate
+	PORT_DIPSETTING(    0x08, DEF_STR( 5C_1C ) )    // duplicate
 	PORT_DIPSETTING(    0x10, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 2C_1C ) )
@@ -357,8 +583,8 @@ static const gfx_layout sprite_layout =
 
 
 static GFXDECODE_START( gfx_mainsnk )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_lsb,   0x100, 0x080>>4 )
-	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout,          0x000, 0x080>>3 )
+	GFXDECODE_ENTRY( "tiles",   0, gfx_8x8x4_packed_lsb,   0x100, 0x080 >> 4 )
+	GFXDECODE_ENTRY( "sprites", 0, sprite_layout,          0x000, 0x080 >> 3 )
 GFXDECODE_END
 
 
@@ -374,7 +600,7 @@ void mainsnk_state::mainsnk(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &mainsnk_state::sound_portmap);
 	m_audiocpu->set_periodic_int(FUNC(mainsnk_state::irq0_line_assert), attotime::from_hz(244));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_size(36*8, 28*8);
@@ -383,7 +609,7 @@ void mainsnk_state::mainsnk(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mainsnk);
-	PALETTE(config, m_palette, FUNC(mainsnk_state::mainsnk_palette), 0x400);
+	PALETTE(config, m_palette, FUNC(mainsnk_state::palette), 0x400);
 	m_palette->enable_shadows();
 
 	SPEAKER(config, "mono").front_center();
@@ -409,13 +635,13 @@ ROM_START(mainsnk)
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "snk.p07",         0x0000, 0x4000, CRC(4208391e) SHA1(d110ca4ff9d21fe7813f04ec43c2c23471c6517f) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_REGION( 0x08000, "tiles", 0 )
 	ROM_LOAD( "snk.p12",      0x0000, 0x2000, CRC(ecf87eb7) SHA1(83b8d19070d5930b306a0309ebba05b04c2abebf) )
 	ROM_LOAD( "snk.p11",      0x2000, 0x2000, CRC(3f6bc5ba) SHA1(02e49f58f5d94117113b59037fa49b8897d05b4b) )
 	ROM_LOAD( "snk.p10",      0x4000, 0x2000, CRC(b5147a96) SHA1(72641fadabd16f2de4f4cf6ff3ef07233de5ddfd) )
 	ROM_LOAD( "snk.p09",      0x6000, 0x2000, CRC(0ebcf837) SHA1(7b93cdffd3b8d768b98bb01956114e4ff012d029) )
 
-	ROM_REGION( 0x12000, "gfx2", 0 )
+	ROM_REGION( 0x12000, "sprites", 0 )
 	ROM_LOAD( "snk.p13",      0x00000, 0x2000, CRC(2eb624a4) SHA1(157d7beb6ff0baa9276e388774a85996dc03821d) )
 	ROM_LOAD( "snk.p16",      0x02000, 0x2000, CRC(dc502869) SHA1(024c868e8cd74c52f4787a19b9ad292b7a9dcc1c) )
 	ROM_LOAD( "snk.p19",      0x04000, 0x2000, CRC(58d566a1) SHA1(1451b223ddb7c975b770f28af6c41775daaf95c1) )
@@ -445,13 +671,13 @@ ROM_START( canvas )
 	ROM_LOAD( "cc_p7.h2",      0x0000, 0x4000, CRC(029b5ea0) SHA1(88f84b4dd01656ded8d983396ded404c9d8186f1) )
 	ROM_LOAD( "cc_p8.f2",      0x4000, 0x2000, CRC(0f0368ce) SHA1(a02f066ea024285a931b85709822a50a4099e0b0) )
 
-	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_REGION( 0x10000, "tiles", 0 )
 	ROM_FILL(                  0x0000, 0x4000, 0xff )   // empty, causes tx layer to be fully transparent
 	ROM_LOAD( "cc_p11.c2",     0x4000, 0x4000, CRC(4c8c2156) SHA1(7f1d9a1e1c6cab91f24c7fc75d0c7ec2702137af) )   // banks = 18&58
 	ROM_LOAD( "cc_p10.b2",     0x8000, 0x4000, CRC(3c0a4eeb) SHA1(53742a5bef16e71bebefb0e43a175341f5bf0aa6) )   // banks = 28&68
 	ROM_LOAD( "cc_p9.a2",      0xc000, 0x4000, CRC(b58c5f24) SHA1(7026b3d4f8060fd6607eb6d356d6b61cc9cb75c3) )   // banks = 30&70
 
-	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_REGION( 0x6000, "sprites", 0 )
 	ROM_LOAD( "cc_p12.j8",     0x0000, 0x2000, CRC(9003a979) SHA1(f63959a9dc9ee67622865e783d2e501c640a4bed) )
 	ROM_LOAD( "cc_p13.j5",     0x2000, 0x2000, CRC(a52cd549) SHA1(1902b8c107c5156113068ced74349ac576ac047c) )
 	ROM_LOAD( "cc_p14.j2",     0x4000, 0x2000, CRC(edc6a1e8) SHA1(8c948a5f057e13bb9ed9738b66c702f45586fe59) )
@@ -462,6 +688,8 @@ ROM_START( canvas )
 	ROM_LOAD( "cc_bprom1.j10", 0x0800, 0x0400, CRC(fbbbf911) SHA1(86394a7f67bc4f89f72b9607ca3733ab3d690289) )
 ROM_END
 
+} // anonymous namespace
+
 
 GAME( 1984, mainsnk, 0, mainsnk, mainsnk, mainsnk_state, empty_init, ROT180, "SNK", "Main Event (1984)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, canvas,  0, mainsnk, canvas,  mainsnk_state, empty_init, ROT0,   "SNK", "Canvas Croquis", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, canvas,  0, mainsnk, canvas,  mainsnk_state, empty_init, ROT0,   "SNK", "Canvas Croquis",    MACHINE_SUPPORTS_SAVE )

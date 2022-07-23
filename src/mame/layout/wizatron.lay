@@ -11,24 +11,24 @@ license:CC0
 <!-- define elements -->
 
 	<element name="digit" defstate="0">
-		<led7seg><color red="1.0" green="0.3" blue="0.2" /></led7seg>
+		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
 	</element>
 
 	<element name="lamp_dot" defstate="0">
-		<disk state="1"><color red="1.0" green="0.3" blue="0.2" /></disk>
-		<disk state="0"><color red="0.125490" green="0.035294" blue="0.0235294" /></disk>
+		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
+		<disk state="0"><color red="0.125" green="0.012" blue="0.019" /></disk>
 	</element>
 	<element name="lamp_dash" defstate="0">
-		<rect state="1"><color red="1.0" green="0.3" blue="0.2" /></rect>
-		<rect state="0"><color red="0.125490" green="0.035294" blue="0.0235294" /></rect>
+		<rect state="1"><color red="1.0" green="0.1" blue="0.15" /></rect>
+		<rect state="0"><color red="0.125" green="0.012" blue="0.019" /></rect>
 	</element>
 	<element name="lamp_slash" defstate="0">
-		<text string="/" state="1"><color red="1.0" green="0.3" blue="0.2" /></text>
-		<text string="/" state="0"><color red="0.125490" green="0.035294" blue="0.0235294" /></text>
+		<text string="/" state="1"><color red="1.0" green="0.1" blue="0.15" /></text>
+		<text string="/" state="0"><color red="0.125" green="0.012" blue="0.019" /></text>
 	</element>
 	<element name="lamp_backslash" defstate="0">
-		<text string="&#x5c;" state="1"><color red="1.0" green="0.3" blue="0.2" /></text>
-		<text string="&#x5c;" state="0"><color red="0.125490" green="0.035294" blue="0.0235294" /></text>
+		<text string="&#x5c;" state="1"><color red="1.0" green="0.1" blue="0.15" /></text>
+		<text string="&#x5c;" state="0"><color red="0.125" green="0.012" blue="0.019" /></text>
 	</element>
 
 
@@ -63,8 +63,7 @@ license:CC0
 			<bounds x="80" y="0" width="10" height="15" />
 		</element>
 
-<!-- math symbols custom digit -->
-
+		<!-- math symbols custom digit -->
 		<element name="6.5" ref="lamp_dash"><bounds x="21.5" y="7.25" width="7" height="0.5" /></element>
 
 		<element name="6.1" ref="lamp_slash"><bounds x="24" y="-0.5" width="5" height="7.5" /></element>

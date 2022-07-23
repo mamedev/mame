@@ -14,22 +14,29 @@ license:CC0
 	This file is for the base set (number on case, ECxxxx-xxx part numbers)
 
 	The genres in the Japanese games are represented by the code after the EC/DC/MC/GC/PC etc. number
-	JPM = J-Pop Mix
-	ATS = Artist Selection (all songs by a single artist)
-	KID = Kid's Mix
-	ENK = unknown
-	BSC = Graduation Encouragement
-	G73 = 1973-1975 collection
-	G76 = 1976-1978 collection
-	G79 = 1979-1981 collection
-	G82 = 1982-1984 collection
-	BHT = Best Hit
-	BAT = Best Artist
-	SAI = Saiten Cartridge
-	HKW = Hikawa Kiyoshi
+	ANM = AniSon Club (anime theme songs - abbreviated from Anime Song Club)
 	ATM = Artist Mini
-	TPJ = TV Pop
+	ATS = Artist Selection (all songs by a single artist or related artists)
+	BAT = Best Artist (all song by a single artist or related artists)
+	BHT = Best Hit
+	BSC = Best Scene
+	DCS = Detective Conan Saiten Cartridge
+	DUE = Duet Song
+	ENK = Enkamichi
+	ETZ = Enka Taizen
+	G73 = 2th Century Gallery 1973-75
+	G76 = 2th Century Gallery 1976-78
+	G79 = 2th Century Gallery 1979-81
+	G82 = 2th Century Gallery 1982-84
+	HKW = Hikawa Kiyoshi
+	JPM = J-Pop Mix
+	KID = Kids' Song
+	KIR = Kirarin Revolution
+	KSM = Kids' Song Mini
+	KTY = Hello Kitty
 	MIN = mini-moni
+	SAI = Saiten Cartridge (supports scoring)
+	TPJ = TV Pop Junior
 
 	Some Japanese carts have a number starting with S  (S-x on case, SCxxxx-xxx part numbers) (see ekara_japan_s.xml)  (for e-kara - custom presentation)
 	                                                M  (M-x on case, MCxxxx-xxx part numbers) (see ekara_japan_m.xml)  (for e-kara - custom presentation)
@@ -38,7 +45,7 @@ license:CC0
 	                                                GK (GK-X on case)                         (see ekara_japan_gk.xml) (for e-kara / e-pitch - custom presentation)
 	                                                G  (G-x on case, GCxxxx-xxx part numbers) (see ekara_japan_g.xml)  (for e-kara, Popira / 2)
 	                                                P  (P-x on case, PCxxxx-xxx part numbers) (see ekara_japan_p.xml)  (for e-kara, Popira / 2, DDR Family Mat)
-	                                                D  (D-x on case, DCxxxx-xxx part numbers) (see ekara_japan_d.xml)  (for e-kara, Popira / 2, Taiko De Popira)
+	                                                D  (D-x on case, DCxxxx-xxx part numbers) (see ekara_japan_d.xml)  (for e-kara, Popira / 2, Taiko de Popira)
 	                                                SP (SP-x on case, no part numbers)        (see ekara_japan_sp.xml) (for e-kara, Popira / 2, Taiko de Popira, Jumping Popira)
 	                                                A  (A-x on case, Pichi Pichi Pitch series)(see ekara_japan_a.xml)  (for e-kara / e-pitch)
 													                        AC (KR-xx on cart, maybe part of A series)
@@ -65,7 +72,7 @@ license:CC0
 	* = dumped
 
 	The EC number is printed on the left side of the cart label, as well as in the serial code
-	early carts don't have a number printed on the box, only the title, after a certain point a number was added (when?)
+	Carts EC0001-0010 don't have a number printed on the box, only the title - the number was added starting with EC0011
 
 	Only known undumped carts in main series are 58, 64, 81, 83, 84, 85 (assuming highest number is 85)
 
@@ -74,25 +81,25 @@ license:CC0
 	..  *EC0003-JPM  J-Pop Mix Volume 3
 	..  *EC0004-JPM  J-Pop Mix Volume 4
 	..  *EC0005-JPM  J-Pop Mix Volume 5
-	..  *EC0006-ENK  ENK Volume 1
-	..  *EC0007-G76  1976-78 Volume 1
-	..  *EC0008-G79  1979-81 Volume 1
-	..  *EC0009-ANM  ANM Volume 1
+	..  *EC0006-ENK  Enkamichi Volume 1
+	..  *EC0007-G76  20th Century Gallery 1976-78 Volume 1
+	..  *EC0008-G79  20th Century Gallery 1979-81 Volume 1
+	..  *EC0009-ANM  AniSon Club Volume 1
 
-	..  *EC0010-KID  Kid's Mix Volume 1
-	..  *EC0011-JPM  J-Pop Mix Volume 6
-	..  *EC0012-JPM  J-Pop Mix Volume 7
-	..  *EC0013-JPM  J-Pop Mix Volume 8
-	..  *EC0014-ATS  Artist Selection Volume 1 - untranslated artist
-	..  *EC0015-ATS  Artist Selection Volume 2 - untranslated artist
-	..  *EC0016-ENK  ENK Volume 2
-	..  *EC0017-G73  1973-75 Volume 1
-	..  *EC0018-G82  1982-84 Volume 1
-	..  *EC0019-BSC  Graduation Encouragement Volume 1
+	..  *EC0010-KID  Kids' Song Volume 1
+	11  *EC0011-JPM  J-Pop Mix Volume 6
+	12  *EC0012-JPM  J-Pop Mix Volume 7
+	13  *EC0013-JPM  J-Pop Mix Volume 8
+	14  *EC0014-ATS  Artist Selection Volume 1 - Southern All Stars, Kuwata Keisuke
+	15  *EC0015-ATS  Artist Selection Volume 2 - Shīna Ringo, Tomosaka Rie
+	16  *EC0016-ENK  Enkamichi Volume 2
+	17  *EC0017-G73  20th Century Gallery 1973-75 Volume 1
+	18  *EC0018-G82  20th Century Gallery 1982-84 Volume 1
+	19  *EC0019-BSC  Best Scene Volume 1 - Wedding-hen
 
-	..  *EC0020-KID  Kid's Mix Volume 2
-	..  *EC0021-JPM  J-Pop Mix Volume 9
-	..  *EC0022-JPM  J-Pop Mix Volume 10
+	20  *EC0020-KID  Kids' Song Volume 2
+	21  *EC0021-JPM  J-Pop Mix Volume 9
+	22  *EC0022-JPM  J-Pop Mix Volume 10
 	23  *EC0023-JPM  J-Pop Mix Volume 11
 	24  *EC0024-JPM  J-Pop Mix Volume 12
 	25  *EC0025-JPM  J-Pop Mix Volume 13
@@ -101,49 +108,49 @@ license:CC0
 	28  *EC0028-JPM  J-Pop Mix Volume 16
 	29  *EC0029-ATS  Artist Selection Volume 3 - Dreams Come True
 
-	30  *EC0030-ENK  ENK Volume 3
-	31  *EC0031-ATS  Artist Selection Volume 4 - untranslated artist
-	32  *EC0032-ANM  ANM Volume 2
+	30  *EC0030-ENK  Enkamichi Volume 3
+	31  *EC0031-ATS  Artist Selection Volume 4 - Ishihara Yūjirō
+	32  *EC0032-ANM  AniSon Club Volume 2
 	33  *EC0033-JPM  J-Pop Mix Volume 17
-	34  *EC0034-KID  Kid's Mix Volume 3
+	34  *EC0034-KID  Kids' Song Volume 3
 	35  *EC0035-ATS  Artist Selection Volume 5 - Matsuda Seiko
 	36  *EC0036-ATS  Artist Selection Volume 6 - KinKi Kids
-	37  *EC0037-ENK  ENK Volume 4
-	38  *EC0038-BSC  Graduation Encouragement Volume 2
+	37  *EC0037-ENK  Enkamichi Volume 4
+	38  *EC0038-BSC  Best Scene Volume 2 - Sotsugyō/Hagemashi-hen
 	39  *EC0039-ATS  Artist Selection Volume 7 - B'z
 
 	40  *EC0040-JPM  J-Pop Mix Volume 18
-	41  *EC0041-ATS  Artist Selection Volume 8 - untranslated artist
+	41  *EC0041-ATS  Artist Selection Volume 8 - Hamasaki Ayumi
 	42  *EC0042-JPM  J-Pop Mix Volume 19
-	43  *EC0043-ENK  ENK Volume 5
+	43  *EC0043-ENK  Enkamichi Volume 5
 	44  *EC0044-ATS  Artist Selection Volume 9 - Every Little Thing
 	45  *EC0045-ATS  Artist Selection Volume 10 - Mr. Children
 	46  *EC0046-JPM  J-Pop Mix Volume 20
-	47  *EC0047-DUE  DUE Volume 1
-	48  *EC0048-ENK  ENK Volume 6
+	47  *EC0047-DUE  Duet Song Volume 1
+	48  *EC0048-ENK  Enkamichi Volume 6
 	49  *EC0049-ATS  Artist Selection Volume 11 - Judy and Mary
 
 	50  *EC0050-ATS  Artist Selection Volume 12 - The Beatles
 	51  *EC0051-JPM  J-Pop Mix Volume 21
-	52  *EC0052-ENK  ENK Volume 7
+	52  *EC0052-ENK  Enkamichi Volume 7
 	53  *EC0053-JPM  J-Pop Mix Volume 22
 	54  *EC0054-JPM  J-Pop Mix Volume 23
-	55  *EC0055-ATS  Artist Selection Volume 13 - Tube
+	55  *EC0055-ATS  Artist Selection Volume 13 - TUBE
 	56  *EC0056-JPM  J-Pop Mix Volume 24
-	57  *EC0057-ATS  Artist Selection Volume 14 - SMAP (should be Vol 14? sales sheet still lists 13 tho)
-	58   EC0058-ENK  ENK Volume 8
+	57  *EC0057-ATS  Artist Selection Volume 14 - SMAP
+	58   EC0058-ENK  Enkamichi Volume 8
 	59  *EC0059-JPM  J-Pop Mix Volume 25
 
 	60  *EC0060-JPM  J-Pop Mix Volume 26
 	61  *EC0061-JPM  J-Pop Mix Volume 27
 	62  *EC0062-JPM  J-Pop Mix Volume 28
 	63  *EC0063-JPM  J-Pop Mix Volume 29
-	64   EC0064-ENK  ENK Volume 9
+	64   EC0064-ENK  Enkamichi Volume 9
 	65  *EC0065-JPM  J-Pop Mix Volume 30
 	66  *EC0066-JPM  J-Pop Mix Volume 31
 	67  *EC0067-JPM  J-Pop Mix Volume 32
 	68  *EC0068-JPM  J-Pop Mix Volume 33
-	69  *EC0069-ETZ  ETZ (custom presentation etc.)
+	69  *EC0069-ETZ  Enka Taizen (custom presentation etc.)
 
 	70  *EC0070-JPM  J-Pop Mix Volume 34
 	71  *EC0071-JPM  J-Pop Mix Volume 35
@@ -154,13 +161,14 @@ license:CC0
 	76  *EC0076-JPM  J-Pop Mix Volume 39
 	77  *EC0077-ATS  Artist Selection Volume 15 - Keisuke Kuwata (should be Vol 15? sales sheet lists 5?)
 	78  *EC0078-JPM  J-Pop Mix Volume 40
-	79  *EC0079-ETZ  ETZ 2 (custom presentation etc.)
+	79  *EC0079-ETZ  Enka Taizen Volume 2 (custom presentation etc.)
+
 	80  *EC0080-JPM  J-Pop Mix Volume 41
 	81   EC0081-JPM  J-Pop Mix Volume 42
 	82  *EC0082-MBH  Matthew's Best Hit Selection
 	83   EC0083-JPM  J-Pop Mix Volume 43
-	84   EC0084-     (unknown, seen)
-	85   EC0085-ETZ  ETZ 3 (custom presentation etc.) (guess)
+	84   EC0084-     Kids' Song Best 40
+	85   EC0085-ETZ  Enka Taizen Volume 3 (custom presentation etc.) (guess)
 
 	(more? what's the highest regular number?)
 
@@ -168,11 +176,13 @@ license:CC0
 
 	Japanese cart listing (by KD code)
 
-	Seems to be for kids? not the same as KE series below or the -KID carts in the regular series
+	Cartridges containing 20 children's songs each
 	These look like normal e-kara carts
 
-	KD-01  (unknown)
-	KD-02  (unknown)
+	KD-1  Kids' Song 20
+	KD-2  (unknown)
+	KD-3  (unknown)
+	KD-4  Kids' Song 20
 
 	************************************************************************************************************************************************************
 	 Everything below might not work with a standard e-kara, requires different hardware even if cart form is the same
@@ -183,8 +193,8 @@ license:CC0
 	These are only compatible with some special 'Kids' unit and shaped as lyric books
 	(not e-kara compatible?)
 
-	KE-01  (unknown)
-	KE-02  (unknown)
+	KE-01  Dōyō 1 (どうよう 1)
+	KE-02  Television 1 (テレビ 1)
 
 	(more?)
 
@@ -250,9 +260,10 @@ license:CC0
 	</software>
 
 	<software name="ec0006">
-		<description>ENK Volume 1 (Japan) (EC0006-ENK)</description>
+		<description>Enkamichi Volume 1 (Japan) (EC0006-ENK)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌道ベスト Vol.1" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0006-enk.u1" size="0x100000" crc="294a0639" sha1="f1f58057a80257c9083093be146ed287ca1aee39"/>
@@ -261,9 +272,10 @@ license:CC0
 	</software>
 
 	<software name="ec0007">
-		<description>1976-78 Volume 1 (Japan) (EC0007-G76)</description>
+		<description>20-seiki Gallery 1976-78 Volume 1 (Japan) (EC0007-G76)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="20世紀ギャラリー1976～78 Vol.1" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0007-g76.u1" size="0x100000" crc="c474f87c" sha1="1818ff5be084e6aca697cc8151a357b77947eb5e"/>
@@ -272,9 +284,10 @@ license:CC0
 	</software>
 
 	<software name="ec0008">
-		<description>1979-81 Volume 1 (Japan) (EC0008-G79)</description>
+		<description>20-seiki Gallery 1979-81 Volume 1 (Japan) (EC0008-G79)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="20世紀ギャラリー1979～81 Vol.1" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0008-g79.u1" size="0x100000" crc="0151f46b" sha1="942f9d5c1e54753d806fbadc508624ea41963b6d"/>
@@ -283,9 +296,10 @@ license:CC0
 	</software>
 
 	<software name="ec0009">
-		<description>ANM Volume 1 (Japan) (EC0009-ANM)</description>
+		<description>AniSon Club Volume 1 (Japan) (EC0009-ANM)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="アニソンクラブ Vol.1" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0009-anm.u1" size="0x100000" crc="1dbbd209" sha1="b8ca02ed1a36aa9caa067db95377cda107b1046b"/>
@@ -294,9 +308,10 @@ license:CC0
 	</software>
 
 	<software name="ec0010">
-		<description>Kid's Mix Volume 1 (Japan) (EC0010-KID)</description>
+		<description>Kids' Song Volume 1 (Japan) (EC0010-KID)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="キッズソング Vol.1" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0010-kid.u1" size="0x100000" crc="3cc17df6" sha1="50e5916850ac20921a6a7aa98f4fff126943b7b5"/>
@@ -338,7 +353,7 @@ license:CC0
 	</software>
 
 	<software name="ec0014">
-		<description>Artist Selection Volume 1 (unknown) (Japan) (EC0014-ATS)</description>
+		<description>Artist Selection Volume 1 (Southern All Stars, Kuwata Keisuke) (Japan) (EC0014-ATS)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
@@ -349,7 +364,7 @@ license:CC0
 	</software>
 
 	<software name="ec0015">
-		<description>Artist Selection Volume 2 (unknown) (Japan) (EC0015-ATS)</description>
+		<description>Artist Selection Volume 2 (Shīna Ringo, Tomosaka Rie) (Japan) (EC0015-ATS)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
@@ -360,9 +375,10 @@ license:CC0
 	</software>
 
 	<software name="ec0016">
-		<description>ENK Volume 2 (Japan) (EC0016-ENK)</description>
+		<description>Enkamichi Volume 2 (Japan) (EC0016-ENK)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌道ベスト Vol.2" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0016-enk.u1" size="0x100000" crc="1bac5cc7" sha1="d80e266d079ea2e8a5acb8c1ed97a94c5d31e6ec"/>
@@ -371,9 +387,10 @@ license:CC0
 	</software>
 
 	<software name="ec0017">
-		<description>1973-75 Volume 1 (Japan) (EC0017-G73)</description>
+		<description>20-seiki Gallery 1973-75 Volume 1 (Japan) (EC0017-G73)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="20世紀ギャラリー1973～75 Vol.1" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0017-g73.u1" size="0x100000" crc="7f4efd49" sha1="32403cf65f4ae372da64cef25e03ddd66cdffa25"/>
@@ -382,9 +399,10 @@ license:CC0
 	</software>
 
 	<software name="ec0018">
-		<description>1982-84 Volume 1 (Japan) (EC0018-G82)</description>
+		<description>20-seiki Gallery 1982-84 Volume 1 (Japan) (EC0018-G82)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="20世紀ギャラリー1982～84 Vol.1" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0018-g82.u1" size="0x100000" crc="04327372" sha1="a0fe161aa9b9b6715e2386c15f01f35fdfba76a3"/>
@@ -393,9 +411,10 @@ license:CC0
 	</software>
 
 	<software name="ec0019">
-		<description>Graduation Encouragement Volume 1 (Japan) (EC0019-BSC)</description>
+		<description>Best Scene Volume 1 - Wedding-hen (Japan) (EC0019-BSC)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストシーン Vol.1 ウェディング編" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0019-bsc.u1" size="0x100000" crc="c7de4c19" sha1="2cfc8c8b684f7b5ddac384840665fae97b8d9829"/>
@@ -404,9 +423,10 @@ license:CC0
 	</software>
 
 	<software name="ec0020">
-		<description>Kid's Mix Volume 2 (Japan) (EC0020-KID)</description>
+		<description>Kids' Song Volume 2 (Japan) (EC0020-KID)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="キッズソング Vol.2" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0020-kid.u1" size="0x100000" crc="ed3e5c2c" sha1="c9ca415b50a7b87d8bf54beb3c9f794bd928e489"/>
@@ -506,6 +526,7 @@ license:CC0
 		<description>Artist Selection Volume 3 (Dreams Come True) (Japan) (EC0029-ATS)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストセレクション Vol.3 (Dreams Come True)" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0029-ats.u1" size="0x100000" crc="cb9b1ab0" sha1="70f1c40e58aac1dcd6777c90063c2ae8d0cbb895"/>
@@ -514,9 +535,10 @@ license:CC0
 	</software>
 
 	<software name="ec0030">
-		<description>ENK Volume 3 (Japan) (EC0030-ENK)</description>
+		<description>Enkamichi Volume 3 (Japan) (EC0030-ENK)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌道ベスト Vol.3" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0030-enk.u1" size="0x100000" crc="28556ca2" sha1="bf5b14208e339369e2d719441e673bf2c6534978"/>
@@ -525,9 +547,10 @@ license:CC0
 	</software>
 
 	<software name="ec0031">
-		<description>Artist Selection Volume 4 (unknown) (Japan) (EC0031-ATS)</description>
+		<description>Artist Selection Volume 4 (Ishihara Yūjirō) (Japan) (EC0031-ATS)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストセレクション Vol.4 (石原裕次郎 他)" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0031-ats.u1" size="0x100000" crc="0e4f6c31" sha1="3f42e80fde8c5d5cf6321b0fe1547ad2d1936e5c"/>
@@ -536,9 +559,10 @@ license:CC0
 	</software>
 
 	<software name="ec0032">
-		<description>ANM Volume 2 (Japan) (EC0032-ANM)</description>
+		<description>AniSon Club Volume 2 (Japan) (EC0032-ANM)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="アニソンクラブ Vol.2" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0032-anm.u1" size="0x100000" crc="6b46c0f8" sha1="c5d8cc10d89e5057b476d792509cabe333b0f497"/>
@@ -558,9 +582,10 @@ license:CC0
 	</software>
 
 	<software name="ec0034">
-		<description>Kid's Mix Volume 3 (Japan) (EC0034-KID)</description>
+		<description>Kids' Song Volume 3 (Japan) (EC0034-KID)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="キッズソング Vol.3" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0034-kid.u1" size="0x100000" crc="80fb5241" sha1="5619605ae7099e955fff69466a0a2f0b2ce3049a"/>
@@ -572,6 +597,7 @@ license:CC0
 		<description>Artist Selection Volume 5 (Matsuda Seiko) (Japan) (EC0035-ATS)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストセレクション Vol.5 (松田 聖子)" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0035-ats.u1" size="0x100000" crc="54a09158" sha1="0570d09e761a3d15cdb8910540c535780c20c833"/>
@@ -583,6 +609,7 @@ license:CC0
 		<description>Artist Selection Volume 6 (KinKi Kids) (Japan) (EC0036-ATS)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストセレクション Vol.6 (KinKi Kids)" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0036-ats.u1" size="0x100000" crc="c8a7117d" sha1="a3b4a48816119c898acbf5078c906692f2fc68c9"/>
@@ -591,9 +618,10 @@ license:CC0
 	</software>
 
 	<software name="ec0037">
-		<description>ENK Volume 4 (Japan) (EC0037-ENK)</description>
+		<description>Enkamichi Volume 4 (Japan) (EC0037-ENK)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌道ベスト Vol.4" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0037-enk.u1" size="0x100000" crc="3c61036c" sha1="b09096a58f361f70041b35c29a02b768ef1758d2"/>
@@ -602,9 +630,10 @@ license:CC0
 	</software>
 
 	<software name="ec0038">
-		<description>Graduation Encouragement Volume 2 (Japan) (EC0038-BSC)</description>
+		<description>Best Scene Volume 2 - Sotsugyō/Hagemashi-hen (Japan) (EC0038-BSC)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="ベストシーン Vol.2 卒業・励まし編" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0038-bsc.u1" size="0x100000" crc="34817291" sha1="a6069419bf3fd143fb247ba625c41b42000cda27"/>
@@ -616,6 +645,7 @@ license:CC0
 		<description>Artist Selection Volume 7 (B'z) (Japan) (EC0039-ATS)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストセレクション Vol.7 (B'z)" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0039-ats.u1" size="0x100000" crc="aa50b08a" sha1="91a97c0591e137e50b20f052b402ce52b70a16eb"/>
@@ -635,9 +665,10 @@ license:CC0
 	</software>
 
 	<software name="ec0041">
-		<description>Artist Selection Volume 8 (unknown) (Japan) (EC0041-ATS)</description>
+		<description>Artist Selection Volume 8 (Hamasaki Ayumi) (Japan) (EC0041-ATS)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストセレクション Vol.8 (浜崎 あゆみ)" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0041-ats.u1" size="0x100000" crc="a784e312" sha1="86e15ebfe7ff8c5e5f15065b735c8422ddc15f42"/>
@@ -657,9 +688,10 @@ license:CC0
 	</software>
 
 	<software name="ec0043">
-		<description>ENK Volume 5 (Japan) (EC0043-ENK)</description>
+		<description>Enkamichi Volume 5 (Japan) (EC0043-ENK)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌道ベスト Vol.5" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0043-enk.u1" size="0x100000" crc="c730037d" sha1="c283b99fe4ae51adc3e13a6fae4eaffb891ec20d"/>
@@ -671,6 +703,7 @@ license:CC0
 		<description>Artist Selection Volume 9 (Every Little Thing) (Japan) (EC0044-ATS)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストセレクション Vol.7 (Every Little Thing)" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0044-ats.u1" size="0x100000" crc="5ed25544" sha1="2cb30b442d97813af32530c6f61d7fcc7653f533"/>
@@ -685,6 +718,7 @@ license:CC0
 		<description>Artist Selection Volume 10 (Mr. Children) (Japan) (EC0045-ATS)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストセレクション Vol.10 (Mr.Children)" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0045-ats.u1" size="0x100000" crc="d1f4ba12" sha1="385a341a9e92881ae362294bd61cb66bf05e2b08"/>
@@ -704,9 +738,10 @@ license:CC0
 	</software>
 
 	<software name="ec0047">
-		<description>DUE Volume 1 (Japan) (EC0047-DUE)</description>
+		<description>Duet Song Volume 1 (Japan) (EC0047-DUE)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="デュエットソング Vol.1" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0047-due.u1" size="0x100000" crc="3438b438" sha1="f75fbfc54e4843908e3307de3d2a03658ec74db7"/>
@@ -715,9 +750,10 @@ license:CC0
 	</software>
 
 	<software name="ec0048">
-		<description>ENK Volume 6 (Japan) (EC0048-ENK)</description>
+		<description>Enkamichi Volume 6 (Japan) (EC0048-ENK)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌道ベスト Vol.6" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0048-enk.u1" size="0x100000" crc="32ad1da7" sha1="7033988a6652fffca840348c68d5d54e5e28f225"/>
@@ -729,6 +765,7 @@ license:CC0
 		<description>Artist Selection Volume 11 (Judy and Mary) (Japan) (EC0049-ATS)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストセレクション Vol.11 (JUDY AND MARY)" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0049-ats.u1" size="0x100000" crc="110a1cde" sha1="339901556bcb54e3d09b5291038746687bfaed14"/>
@@ -740,6 +777,7 @@ license:CC0
 		<description>Artist Selection Volume 12 (The Beatles) (Japan) (EC0050-ATS)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストセレクション Vol.12 (THE BEATLES)" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="ec0050-ats.u1" size="0x200000" crc="56ce5d3a" sha1="c499bae5faa00e0987b89185d0e2ec142054773a"/>
@@ -760,9 +798,10 @@ license:CC0
 	</software>
 
 	<software name="ec0052">
-		<description>ENK Volume 7 (Japan) (EC0052-ENK)</description>
+		<description>Enkamichi Volume 7 (Japan) (EC0052-ENK)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌道ベスト Vol.7" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0052-enk.u1" size="0x100000" crc="120662ff" sha1="292d15f49f6bf450662f343e805fd49c484a04ad"/>
@@ -793,9 +832,10 @@ license:CC0
 	</software>
 
 	<software name="ec0055">
-		<description>Artist Selection Volume 13 (Tube) (Japan) (EC0055-ATS)</description>
+		<description>Artist Selection Volume 13 (TUBE) (Japan) (EC0055-ATS)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストセレクション Vol.13 (ＴＵＢＥ)" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0055-ats.u1" size="0x100000" crc="af6b0f2a" sha1="719bd1bc88517e4e067e99416547afe9ca1ff93f"/>
@@ -818,6 +858,7 @@ license:CC0
 		<description>Artist Selection Volume 14 (SMAP) (Japan) (EC0057-ATS)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストセレクション Vol.14 (ＳＭＡＰ)" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0057-ats.u1" size="0x100000" crc="15345511" sha1="7e5197a8f7a0ec0160d7f5214428b153f35619f6"/>
@@ -825,7 +866,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- EC0058-ENK  ENK Volume 8 -->
+	<!-- EC0058-ENK  Enkamichi Volume 8 -->
 
 	<software name="ec0059">
 		<description>J-Pop Mix Volume 25 (Japan) (EC0059-JPM)</description>
@@ -882,7 +923,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- EC0064-ENK  ENK Volume 9 -->
+	<!-- EC0064-ENK  Enkamichi Volume 9 -->
 
 	<software name="ec0065">
 		<description>J-Pop Mix Volume 30 (Japan) (EC0065-JPM)</description>
@@ -928,10 +969,12 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- box art says 大ヒット演歌 五十曲入り -->
 	<software name="ec0069"> <!-- custom presentation -->
-		<description>ETZ (Japan) (EC0069-ETZ)</description>
+		<description>Enka Taizen (Japan) (EC0069-ETZ)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌大全" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="ec0069-etz.u1" size="0x200000" crc="849ebd23" sha1="752c500d3ff48f04b985fef04219824d1d746034"/>
@@ -1017,9 +1060,10 @@ license:CC0
 	</software>
 
 	<software name="ec0077">
-		<description>Artist Selection Volume 15 - Keisuke Kuwata (Japan) (EC0077-ATS)</description>
+		<description>Artist Selection Volume 15 (Kuwata Keisuke, Southern All Stars) (Japan) (EC0077-ATS)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="アーティストセレクション Vol.15 (桑田佳祐 他)" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0077-ats.u1" size="0x100000" crc="368b0daf" sha1="8274a06ca2e3dbcd5176ac1b916be4a5a0df12ef"/>
@@ -1038,10 +1082,12 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- box art says 大ヒット演歌 五十曲入り -->
 	<software name="ec0079"> <!-- custom presentation -->
-		<description>ETZ 2 (Japan) (EC0079-ETZ)</description> <!-- Japanese text in 'Volume' box -->
+		<description>Enka Taizen Dai Ni-hen (Japan) (EC0079-ETZ)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌大全 第二篇" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="ec0079-etz.u1" size="0x200000" crc="c03b5411" sha1="a88156aec4e0f024461f129c955a953647f51554"/>
@@ -1075,7 +1121,7 @@ license:CC0
 
 	<!-- EC0083-JPM  J-Pop Mix Volume 43 -->
 
-	<!-- EC0084-     Something 40 (unknown, seen) -->
+	<!-- EC0084-     Kids' Song Best 40 (seen) -->
 
 	<!-- EC0085-     (unknown, seen in the wild, sequel to 69, 79 so probably ETZ) -->
 

@@ -118,7 +118,8 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP3005   TMS1730   1989, Tiger Copy Cat (model 7-522)
  @MP3200   TMS1000   1978, Parker Brothers Electronic Master Mind
  @MP3201   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750A)
- *MP3206   TMS1000   1979, Concept 2000 Mr. Mus-I-Cal
+ @MP3206   TMS1000   1978, Concept 2000 Mr. Mus-I-Cal (model 560)
+ *MP3207   TMS1000   1978, Concept 2000 Lite 'n Learn: Electronic Organ (model 554)
  @MP3208   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750B)
  @MP3226   TMS1000   1978, Milton Bradley Simon (Rev A)
  *MP3232   TMS1000   1979, Fonas 2 Player Baseball (no "MP" on chip label)
@@ -270,6 +271,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "mmarvin.lh" // clickable
 #include "mmerlin.lh" // clickable
 #include "monkeysee.lh"
+#include "mrmusical.lh"
 #include "palmf31.lh"
 #include "palmmd8.lh"
 #include "pbmastm.lh"
@@ -2858,6 +2860,138 @@ ROM_START( tc4 )
 	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
 	ROM_REGION( 557, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1400_tc4_output.pla", 0, 557, CRC(3b908725) SHA1(f83bf5faa5b3cb51f87adc1639b00d6f9a71ad19) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Concept 2000 Mr. Mus-I-Cal (model 560)
+  * TMS1000NLL MP3206 (die label 1000C, MP3206)
+  * 9-digit 7seg LED display(one custom digit), 1-bit sound
+
+  It's a simple 4-function calculator, and plays music tones too.
+
+***************************************************************************/
+
+class mrmusical_state : public hh_tms1k_state
+{
+public:
+	mrmusical_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void mrmusical(machine_config &config);
+
+protected:
+	void update_display();
+	virtual void write_o(u16 data);
+	virtual void write_r(u16 data);
+	virtual u8 read_k();
+};
+
+// handlers
+
+void mrmusical_state::update_display()
+{
+	m_display->matrix(m_r, m_o);
+}
+
+void mrmusical_state::write_r(u16 data)
+{
+	// R10: speaker out
+	m_speaker->level_w(BIT(data, 10));
+
+	// R0-R5: input mux
+	// R0-R8: digit select (R6 is a math symbol like with lilprof)
+	m_inp_mux = m_r = data;
+	update_display();
+}
+
+void mrmusical_state::write_o(u16 data)
+{
+	// O0-O7: digit segment data
+	m_o = data;
+	update_display();
+}
+
+u8 mrmusical_state::read_k()
+{
+	// K: multiplexed inputs
+	return read_inputs(6);
+}
+
+// config
+
+static INPUT_PORTS_START( mrmusical )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("A=")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CE")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_NAME("C")
+
+	PORT_START("IN.5") // R5
+	PORT_CONFNAME( 0x01, 0x00, "Mode" )
+	PORT_CONFSETTING(    0x01, "A" )
+	PORT_CONFSETTING(    0x00, "=" )
+INPUT_PORTS_END
+
+void mrmusical_state::mrmusical(machine_config &config)
+{
+	// basic machine hardware
+	TMS1000(config, m_maincpu, 300000); // approximation - RC osc. R=33K, C=100pF
+	m_maincpu->k().set(FUNC(mrmusical_state::read_k));
+	m_maincpu->o().set(FUNC(mrmusical_state::write_o));
+	m_maincpu->r().set(FUNC(mrmusical_state::write_r));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
+	m_display->set_segmask(0x1ff, 0xff);
+	m_display->set_segmask(0x180, 0x7f); // no DP for leftmost 2 digits
+	config.set_default_layout(layout_mrmusical);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( mrmusical )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp3206", 0x0000, 0x0400, CRC(15013d4d) SHA1(2bbc5599183381ad050b7518bca1babc579ee79d) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common1_micro.pla", 0, 867, CRC(4becec19) SHA1(3c8a9be0f00c88c81f378b76886c39b10304f330) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_mrmusical_output.pla", 0, 365, CRC(9652aa3b) SHA1(be41e1588561875b362ba878098ede8299792166) )
 ROM_END
 
 
@@ -7975,7 +8109,7 @@ INPUT_PORTS_END
 void simon_state::simon(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 350000); // approximation - RC osc. R=33K, C=100pF
+	TMS1000(config, m_maincpu, 325000); // approximation - RC osc. R=33K, C=100pF
 	m_maincpu->k().set(FUNC(simon_state::read_k));
 	m_maincpu->r().set(FUNC(simon_state::write_r));
 
@@ -14354,6 +14488,8 @@ CONS( 1980, h2hbaseb,   0,         0, h2hbaseb,  h2hbaseb,  h2hbaseb_state,  emp
 CONS( 1981, h2hboxing,  0,         0, h2hboxing, h2hboxing, h2hboxing_state, empty_init, "Coleco", "Head to Head: Electronic Boxing", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, quizwizc,   0,         0, quizwizc,  quizwizc,  quizwizc_state,  empty_init, "Coleco", "Quiz Wiz Challenger", MACHINE_SUPPORTS_SAVE ) // ***
 CONS( 1981, tc4,        0,         0, tc4,       tc4,       tc4_state,       empty_init, "Coleco", "Total Control 4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+
+COMP( 1978, mrmusical,  0,         0, mrmusical, mrmusical, mrmusical_state, empty_init, "Concept 2000", "Mr. Mus-I-Cal", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1979, cnbaskb,    0,         0, cnbaskb,   cnbaskb,   cnbaskb_state,   empty_init, "Conic", "Electronic Basketball (Conic)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, cmsport,    0,         0, cmsport,   cmsport,   cmsport_state,   empty_init, "Conic", "Electronic Multisport", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
