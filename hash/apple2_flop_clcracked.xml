@@ -48740,7 +48740,7 @@ license:CC0
 		<year>19831983</year>
 		<publisher>Software Publishing Corporation</publisher>
 		<info name="release" value="2022-06-28"/>
-		<info name="uasage" value="Due to programming errors, this version works best on an unenhanced Apple //e"/>
+		<info name="usage" value="Due to programming errors, this version works best on an unenhanced Apple //e"/>
 		<!--"PFS Graph" is a 1983 productivity program developed and distributed by Software Publishing Corporation. This version is dated 1983-01-12 according to file metadata. Due to programming errors, this version works best on an unenhanced Apple //e. It is preserved here for the first time.-->
 
 		<part name="flop1" interface="floppy_5_25">
