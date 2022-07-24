@@ -49,7 +49,7 @@ void mpu4mod4yam_machines_state::init_m4addr()
 	use_m4_standard_reels();
 
 	m_use_pia4_porta_leds = true;
-    m_pia4_porta_leds_base = 0;
+	m_pia4_porta_leds_base = 0;
    // uint8_t m_pia4_porta_leds_strobe = 0;
 
 	//PCKEY =0

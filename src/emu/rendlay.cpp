@@ -2477,8 +2477,8 @@ protected:
 
 	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
-        rgb_t const onpen = rgb_t(m_invert ? 0x20 : 0xff, 0xff, 0xff, 0xff);
-        rgb_t const offpen = rgb_t(m_invert ? 0xff : 0x20, 0xff, 0xff, 0xff);
+		rgb_t const onpen = rgb_t(m_invert ? 0x20 : 0xff, 0xff, 0xff, 0xff);
+		rgb_t const offpen = rgb_t(m_invert ? 0xff : 0x20, 0xff, 0xff, 0xff);
 
 		// sizes for computation
 		int const bmwidth = 250;

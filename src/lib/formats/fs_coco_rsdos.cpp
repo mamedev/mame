@@ -25,8 +25,8 @@ namespace {
 
 class coco_rsdos_impl : public filesystem_t {
 public:
-    coco_rsdos_impl(fsblk_t &blockdev);
-    virtual ~coco_rsdos_impl() = default;
+	coco_rsdos_impl(fsblk_t &blockdev);
+	virtual ~coco_rsdos_impl() = default;
 
 	struct rsdos_dirent
 	{

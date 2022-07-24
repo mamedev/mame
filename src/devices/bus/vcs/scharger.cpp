@@ -110,7 +110,7 @@ inline uint8_t a26_rom_ss_device::read_byte(uint32_t offset)
 void a26_rom_ss_device::install_memory_handlers(address_space *space)
 {
 	space->install_read_handler(0x1000, 0x1fff, read8sm_delegate(*this, FUNC(a26_rom_ss_device::read)));
-	space->install_readwrite_tap(0x0000, 0x1fff, "bank", 
+	space->install_readwrite_tap(0x0000, 0x1fff, "bank",
 		[this] (offs_t offset, u8 &, u8) { if (!machine().side_effects_disabled()) tap(offset); },
 		[this] (offs_t offset, u8 &, u8) { if (!machine().side_effects_disabled()) tap(offset); });
 }
