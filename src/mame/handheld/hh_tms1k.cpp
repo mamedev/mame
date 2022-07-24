@@ -9169,16 +9169,6 @@ ROM_START( merlin )
 	ROM_LOAD( "tms1100_merlin_output.pla", 0, 365, CRC(3921b074) SHA1(12bd58e4d6676eb8c7059ef53598279e4f1a32ea) )
 ROM_END
 
-ROM_START( merlina )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "mp3404", 0x0000, 0x0800, CRC(9362d9f9) SHA1(266d2a4a98cc33944a4fc7ed073ba9321bba8e05) ) // 1 bit different
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common3_micro.pla", 0, 867, CRC(03574895) SHA1(04407cabfb3adee2ee5e4218612cb06c12c540f4) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_merlin_output.pla", 0, 365, CRC(3921b074) SHA1(12bd58e4d6676eb8c7059ef53598279e4f1a32ea) )
-ROM_END
-
 
 
 
@@ -14552,8 +14542,7 @@ CONS( 1981, mbdtower,   0,         0, mbdtower,  mbdtower,  mbdtower_state,  emp
 CONS( 1983, arcmania,   0,         0, arcmania,  arcmania,  arcmania_state,  empty_init, "Milton Bradley", "Electronic Arcade Mania (Arcade Machine)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_REQUIRES_ARTWORK ) // ***
 
 CONS( 1977, cnsector,   0,         0, cnsector,  cnsector,  cnsector_state,  empty_init, "Parker Brothers", "Code Name: Sector", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // ***
-CONS( 1978, merlin,     0,         0, merlin,    merlin,    merlin_state,    empty_init, "Parker Brothers", "Merlin - The Electronic Wizard (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1978, merlina,    merlin,    0, merlin,    merlin,    merlin_state,    empty_init, "Parker Brothers", "Merlin - The Electronic Wizard (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1978, merlin,     0,         0, merlin,    merlin,    merlin_state,    empty_init, "Parker Brothers", "Merlin - The Electronic Wizard", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1978, pbmastm,    0,         0, pbmastm,   pbmastm,   pbmastm_state,   empty_init, "Parker Brothers", "Electronic Master Mind (Parker Brothers)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW ) // ***
 CONS( 1979, stopthief,  0,         0, stopthief, stopthief, stopthief_state, empty_init, "Parker Brothers", "Stop Thief - Electronic Cops and Robbers (Electronic Crime Scanner)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 CONS( 1979, stopthiefp, stopthief, 0, stopthief, stopthief, stopthief_state, empty_init, "Parker Brothers", "Stop Thief - Electronic Cops and Robbers (Electronic Crime Scanner) (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***

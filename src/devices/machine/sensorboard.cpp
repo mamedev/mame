@@ -319,6 +319,9 @@ u16 sensorboard_device::read_rank(u8 y, bool reverse)
 
 void sensorboard_device::refresh()
 {
+	if (machine().phase() < machine_phase::RESET)
+		return;
+
 	bool custom_out = !m_custom_output_cb.isnull();
 
 	// output spawn icons
