@@ -97,42 +97,45 @@ private:
 	required_shared_ptr<uint8_t> m_tileram;
 
 	tilemap_t *m_tilemap = nullptr;
+
 	void tileram_w(offs_t offset, uint8_t data);
 	void dac_w(uint8_t data);
 	void gfxram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void io_map(address_map &map);
+
 	void prg_map(address_map &map);
+	void io_map(address_map &map);
 };
 
 
 void mogura_state::palette(palette_device &palette) const
 {
 	uint8_t const *const color_prom = memregion("proms")->base();
-	for (int i = 0, j = 0; i < 0x20; i++)
+	for (int i = 0; i < 0x20; i++)
 	{
+		int bit0, bit1, bit2;
+
 		// red component
-		int bit0 = BIT(color_prom[i], 0);
-		int bit1 = BIT(color_prom[i], 1);
-		int bit2 = BIT(color_prom[i], 2);
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
 		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		// green component
 		bit0 = BIT(color_prom[i], 3);
 		bit1 = BIT(color_prom[i], 4);
 		bit2 = BIT(color_prom[i], 5);
 		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		// blue component
 		bit0 = 0;
 		bit1 = BIT(color_prom[i], 6);
 		bit2 = BIT(color_prom[i], 7);
 		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette.set_pen_color(j, rgb_t(r, g, b));
-		j += 4;
-		if (j > 31)
-			j -= 31;
+		palette.set_pen_color(bitswap<5>(i, 2, 1, 0, 4, 3), rgb_t(r, g, b));
 	}
 }
 
