@@ -20728,8 +20728,6 @@ uccopsu                         // (c) 1992 Irem America (US)
 
 @source:apple/mac.cpp
 mac2fdhd                        // 1988 Apple Macintosh II (FDHD)
-maccclas                        // 1993 Apple Macintosh Color Classic
-macclas2                        // 1991 Apple Macintosh Classic II
 macii                           // 1987 Apple Macintosh II
 maciici                         // 1989 Apple Macintosh IIci
 maciicx                         // 1989 Apple Macintosh IIcx
@@ -20737,9 +20735,13 @@ maciifx                         // 1990 Apple Macintosh IIfx
 maciihmu                        // 1987 Apple Macintosh II (w/o 68851 MMU)
 maciisi                         // 1990 Apple Macintosh IIsi
 maciix                          // 1988 Apple Macintosh IIx
+macse30                         // 1989 Apple Macintosh SE/30
+
+@source:apple/maclc.cpp
 maclc                           // 1990 Apple Macintosh LC
 maclc2                          // 1991 Apple Macintosh LC II
-macse30                         // 1989 Apple Macintosh SE/30
+macclas2                        // 1991 Apple Macintosh Classic II
+maccclas                        // 1993 Apple Macintosh Color Classic
 
 @source:apple/maciivx.cpp
 maciivx                         // 1993 Apple Macintosh IIvx
