@@ -86,8 +86,8 @@ public:
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void ram_alloc(uint32_t size);
-	uint8_t* get_rom_base() { return m_rom; }
-	uint8_t* get_ram_base() { return &m_ram[0]; }
+	uint8_t *get_rom_base() { return m_rom; }
+	uint8_t *get_ram_base() { return &m_ram[0]; }
 	uint32_t get_rom_size() { return m_rom_size; }
 	uint32_t get_ram_size() { return m_ram.size(); }
 

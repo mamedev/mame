@@ -112,11 +112,6 @@ void a2600_base_state::a2600_mem(address_map &map) // 6507 has 13-bit address sp
 #endif
 }
 
-void a2600_state::a2600_mem(address_map &map)
-{
-	a2600_base_state::a2600_mem(map);
-}
-
 void a2600_pop_state::memory_map(address_map &map) // 6507 has 13-bit address space, 0x0000 - 0x1fff
 {
 	a2600_base_state::a2600_mem(map);
