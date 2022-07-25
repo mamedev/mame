@@ -4688,12 +4688,13 @@ license:CC0
 	</software>
 
 	<software name="bloodwar">
-		<description>Bloody Warriors - Shan-Go Troop Strikes Back! (Japan)</description>
+		<description>Bloody Warriors - Shan-Go no Gyakushuu! (Japan)</description>
 		<year>1990</year>
 		<publisher>Toei Animation</publisher>
 		<info name="serial" value="TDF-94"/>
 		<info name="release" value="19901019"/>
-		<info name="alt_title" value="ブラッディ ウォーリアーズ シャンゴーの逆襲"/>
+		<info name="alt_title" value="ブラッディ ウァリアーズ シャンゴーの逆襲"/>
+		<info name="alt_title" value="Bloody Warriors - Shan-Go Troop Strikes Back!"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SNROM" />
