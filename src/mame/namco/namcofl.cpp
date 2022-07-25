@@ -604,14 +604,14 @@ ROM_START( speedrcr )
 	ROM_LOAD32_WORD("se1obj1l.ic3", 0x400000, 0x200000, CRC(c4809fd5) SHA1(e0b80fccc17c83fb9d08f7f1cf2cd2f0f3a510b4) )
 	ROM_LOAD32_WORD("se1obj1u.ic4", 0x400002, 0x200000, CRC(0beefa56) SHA1(012fb7b330dbf851ab2217da0a0e7136ddc3d23f) )
 
-	ROM_REGION( 0x100000, "c169roz:mask", 0 ) // "RSHAPE" (roz mask like NB-1?)
-	ROM_LOAD("se1_rsh.14k",    0x000000, 0x100000, CRC(7aa5a962) SHA1(ff936dfcfcc4ee1f5f2232df62def76ff99e671e) )
+	ROM_REGION( 0x80000, "c169roz:mask", 0 ) // "RSHAPE" (roz mask like NB-1?)
+	ROM_LOAD("se1_rsh.14k",    0x000000, 0x080000, CRC(f6408a1f) SHA1(3a299719090de3915331fc1ddbe0f41834da063a) )
 
-	ROM_REGION( 0x100000, "c123tmap:mask", 0 ) // "SSHAPE" (mask for other tiles?)
-	ROM_LOAD("se1_ssh.18u",    0x000000, 0x100000, CRC(7a8e0bda) SHA1(f6a508d90274d0205fec0c46f5f783a2715c0c6e) )
+	ROM_REGION( 0x80000, "c123tmap:mask", 0 ) // "SSHAPE" (mask for other tiles?)
+	ROM_LOAD("se1_ssh.18u",    0x000000, 0x080000, CRC(cb534142) SHA1(935a377c72b3a815ed46dfdb6ea6734d312da373) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
-	ROM_LOAD("se1_voi.23s",   0x000000, 0x400000, CRC(b95e2ffb) SHA1(7669232d772caa9afa4c7593d018e8b6e534114a) )
+	ROM_LOAD("se1_voi.23s",   0x000000, 0x400000, CRC(0cfa2d8a) SHA1(e029b39432cf35071eec8da27df8beeccd458eba) )
 
 	ROM_REGION( 0x000005, "pals", 0) /* PAL's */
 	ROM_LOAD( "sysfl-1.bin",  0x000000, 0x000001, NO_DUMP ) /* PAL16L8BCN at 2S */
