@@ -4688,7 +4688,7 @@ license:CC0
 	</software>
 
 	<software name="bloodwar">
-		<description>Bloody Warriors - Shan-Go no Gyakushuu! (Japan)</description>
+		<description>Bloody Warriors - Shan-Go no Gyakushuu (Japan)</description>
 		<year>1990</year>
 		<publisher>Toei Animation</publisher>
 		<info name="serial" value="TDF-94"/>
@@ -18946,12 +18946,12 @@ license:CC0
 	</software>
 
 	<software name="drjekyllj" cloneof="drjekyll">
-		<description>Jekyll Hakase no Houma ga Toki (Jpn)</description>
+		<description>Jekyll Hakase no Houma ga Toki (Japan)</description>
 		<year>1988</year>
 		<publisher>Toho</publisher>
 		<info name="serial" value="THF-TK"/>
 		<info name="release" value="19880408"/>
-		<info name="alt_title" value="ジキール博士の彷魔が刻"/>
+		<info name="alt_title" value="ジーキル博士の彷魔が刻"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="HVC-UNROM" />
@@ -19739,7 +19739,7 @@ license:CC0
 	</software>
 
 	<software name="kaijumon">
-		<description>Kaijuu Monogatari (Jpn)</description>
+		<description>Kaijuu Monogatari - Shell Saurs Story (Japan)</description>
 		<year>1988</year>
 		<publisher>Namcot</publisher>
 		<info name="serial" value="NAM-KM-5500"/>
@@ -19930,7 +19930,7 @@ license:CC0
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="SUN-TKR-4900 (SS5)"/>
 		<info name="release" value="19860703"/>
-		<info name="alt_title" value="東海道五十三次"/>
+		<info name="alt_title" value="かんしゃく玉なげカン太郎の東海道五十三次"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sunsoft1" />
 			<feature name="pcb" value="SUNSOFT-1" />
@@ -21521,7 +21521,7 @@ license:CC0
 	</software>
 
 	<software name="labyrint">
-		<description>Labyrinth (Jpn)</description>
+		<description>Labyrinth - Maou no Meikyuu (Japan)</description>
 		<year>1987</year>
 		<publisher>Tokuma Shoten</publisher>
 		<info name="serial" value="GTS-LA"/>
@@ -26507,7 +26507,7 @@ license:CC0
 	</software>
 
 	<software name="namcomj3">
-		<description>Namco Mahjong III - Mahjong Tengoku (Jpn)</description>
+		<description>Namcot Mahjong III - Mahjong Tengoku (Japan)</description>
 		<year>1991</year>
 		<publisher>Namcot</publisher>
 		<info name="serial" value="NAM-NM3-4900"/>
@@ -48832,7 +48832,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Vap</publisher>
 		<info name="serial" value="VAP-ZN"/>
 		<info name="release" value="19910215"/>
-		<info name="alt_title" value="マックスウォリアー 惑星戒厳令"/>
+		<info name="alt_title" value="マックス・ウォーリアー 〜惑星戒厳令〜"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
