@@ -49,7 +49,7 @@ std::unique_ptr<util::disasm_interface> axc51core_cpu_device::create_disassemble
 // AX208 (specific CPU)
 
 ax208_cpu_device::ax208_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: axc51core_cpu_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(ax208_cpu_device::ax208_internal_program_mem), this), address_map_constructor(FUNC(ax208_cpu_device::data_internal), this), 0, 7)
+	: axc51core_cpu_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(ax208_cpu_device::ax208_internal_program_mem), this), address_map_constructor(FUNC(ax208_cpu_device::ax208_internal_data_mem), this), 0, 7)
 {
 }
 
@@ -69,6 +69,11 @@ void ax208_cpu_device::ax208_internal_program_mem(address_map &map)
 	map(0x8000, 0x9fff).rom().region("rom", 0); // this can only be read from code running within the same region
 }
 
+void ax208_cpu_device::ax208_internal_data_mem(address_map &map)
+{
+	map(0x0000, 0x00ff).ram().share("scratchpad");
+	map(0x0100, 0x01ff).ram().share("sfr_ram"); /* SFR */
+}
 
 
 ROM_START( ax208 ) // assume all production ax208 chips use this internal ROM

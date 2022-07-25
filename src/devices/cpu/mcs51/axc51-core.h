@@ -48,6 +48,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	void ax208_internal_program_mem(address_map &map);
+	void ax208_internal_data_mem(address_map &map);
 };
 
 class ax208p_cpu_device : public ax208_cpu_device
