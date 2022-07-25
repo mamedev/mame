@@ -52649,7 +52649,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="wangphz">
-		<description>Wang Pai Hai Zhan (Chi)</description>
+		<description>Wang Pai Hai Zhan (China)</description>
 		<year>19??</year>
 		<publisher>TCL</publisher>
 		<part name="cart" interface="nes_cart">
@@ -56941,7 +56941,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="jdyx" cloneof="sdgndgs3" supported="no">
-		<description>Jue Dai Ying Xiong (Chi)</description>
+		<description>Jue Dai Ying Xiong (China)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1022"/>
@@ -58117,7 +58117,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="xiyouji">
-		<description>Xi You Ji Hou Zhuan (Chi)</description>
+		<description>Xi You Ji Hou Zhuan (China)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1097"/>
@@ -58154,7 +58154,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="hywz">
-		<description>Huo Yan Wen Zhang - Sheng Zhan De Xi Pu (Chi)</description>
+		<description>Huo Yan Wen Zhang - Sheng Zhan De Xi Pu (China)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1100"/>
@@ -59262,7 +59262,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="mcwy">
-		<description>Mu Chang Wu Yu (Chi)</description>
+		<description>Mu Chang Wu Yu (China)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ011"/>
@@ -59285,7 +59285,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="cjjq">
-		<description>Chaoji Ji Qi Ren Da Zhan A (Chi)</description>
+		<description>Chaoji Ji Qi Ren Da Zhan A (China)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ012"/>
@@ -59308,7 +59308,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="hlb">
-		<description>Han Liu Bang (Chi)</description>
+		<description>Han Liu Bang (China)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ013"/>
@@ -59331,7 +59331,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="shengjcs">
-		<description>Sheng Jian Chuan Shuo (Chi)</description>
+		<description>Sheng Jian Chuan Shuo (China)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ014"/>
@@ -59356,7 +59356,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 <!-- [NJ015] 楚汉风云 ~ Chu Han Fengyun -->
 
 	<software name="tkhx">
-		<description>Tai Kong Huan Xiang (Chi)</description>
+		<description>Tai Kong Huan Xiang (China)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ016"/>
@@ -59379,7 +59379,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="xjqxz">
-		<description>Xian Jian Ji Xia Zhuan (Chi)</description>
+		<description>Xian Jian Ji Xia Zhuan (China)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ017"/>
@@ -59403,7 +59403,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 	<software name="sanguocz">
 		<!-- Notes: AKA Romance of the Three Kingdoms - The Legend of Cao Cao -->
-		<description>San Guo Zhi - CaoCao Zhuan (Chi)</description>
+		<description>San Guo Zhi - CaoCao Zhuan (China)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ018"/>
@@ -59427,7 +59427,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 	<software name="shssn">
 		<!-- Notes: port of the GBC game by Vast Fame -->
-		<description>Shui Hu Shen Shou (Chi, Nanjing)</description>
+		<description>Shui Hu Shen Shou (China, Nanjing)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ019"/>
@@ -59450,7 +59450,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="hjty">
-		<description>Huang Jin Tai Yang (Chi)</description>
+		<description>Huang Jin Tai Yang (China)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ020"/>
@@ -59473,7 +59473,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="dahuaxyn">
-		<description>Da Hua Xi You (Chi, Nanjing)</description>
+		<description>Da Hua Xi You (China, Nanjing)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ021"/>
@@ -59496,7 +59496,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="sseiyac">
-		<description>Saint Saiya - Tian Ma Huan Xiang (Chi)</description>
+		<description>Saint Saiya - Tian Ma Huan Xiang (China)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ022"/>
@@ -59548,7 +59548,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 <!-- [NJ027] 逐鹿三国 ~ Zhu Lu San Guo -->
 
 	<software name="shuihu3">
-		<description>Shui Hu 3 (Chi)</description>
+		<description>Shui Hu 3 (China)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ028"/>
@@ -59571,7 +59571,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="qgdz">
-		<description>Qi Guo Da Zhan (Chi)</description>
+		<description>Qi Guo Da Zhan (China)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ029"/>
@@ -59594,7 +59594,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="styx">
-		<description>Sui Tang Ying Xiong (Chi)</description>
+		<description>Sui Tang Ying Xiong (China)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ030"/>
@@ -59617,7 +59617,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="sjjs">
-		<description>Jin Yong Qun Xia Zhuan - Shu Jian Jiang Shan (Chi)</description>
+		<description>Jin Yong Qun Xia Zhuan - Shu Jian Jiang Shan (China)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ031"/>
@@ -59640,7 +59640,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="yugioh">
-		<description>Yu-Gi-Oh! (Chi)</description>
+		<description>Yu-Gi-Oh! (China)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ032"/>
@@ -59665,7 +59665,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 <!-- [NJ033] 真侍魂-武士道烈传 ~ Zhen Shi Hun - Wushidao Lie Chuan (Samurai Spirits - Bushido Retsuden) -->
 <!-- is this correct or is it a sequel of NJ033? and what is the relation with NJ042 below? they seem the same game... -->
 	<software name="ssamsho2a" cloneof="ssamsho2">
-		<description>Zhen Shi Hun - Wushidao Lie Zhuan (Chi)</description>
+		<description>Zhen Shi Hun - Wushidao Lie Zhuan (China)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="NJ033"/>
@@ -59690,7 +59690,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 	<software name="huanshil">
 		<!-- Notes: this is a backport from a PC game -->
-		<description>Huan Shi Lu (Chi)</description>
+		<description>Huan Shi Lu (China)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ034"/>
@@ -59713,7 +59713,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="tlbb">
-		<description>Tian Long Ba Bu (Chi)</description>
+		<description>Tian Long Ba Bu (China)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ035"/>
@@ -59736,7 +59736,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="nzcq">
-		<description>Ne Zha Chuan Qi (Chi)</description>
+		<description>Ne Zha Chuan Qi (China)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ036"/>
@@ -59759,7 +59759,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="diablo">
-		<description>Diablo (Chi)</description>
+		<description>Diablo (China)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ037"/>
@@ -59782,7 +59782,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="skzl">
-		<description>Shi Kong Zhi Lun - Chrono Trigger (Chi)</description>
+		<description>Shi Kong Zhi Lun - Chrono Trigger (China)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ038"/>
@@ -59805,7 +59805,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="hulujg">
-		<description>Hu Lu Jin Gang (Chi)</description>
+		<description>Hu Lu Jin Gang (China)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ039"/>
@@ -59828,7 +59828,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="sanguolv">
-		<description>San Guo Zhi - Lv Bu Zhuan (Chi)</description>
+		<description>San Guo Zhi - Lv Bu Zhuan (China)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ040"/>
@@ -59854,7 +59854,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 	<software name="zshhzlr">
 		<!-- Notes: Title screen hack of NJ033? -->
-		<description>Zhen Shi Hun - Hun Zhi Li Ren (Chi)</description>
+		<description>Zhen Shi Hun - Hun Zhi Li Ren (China)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ042"/>
@@ -59880,7 +59880,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 <!-- [NJ044] 剑侠情缘 ~ Jian Xia Qing Yuan -->
 
 	<software name="xuanyuan">
-		<description>Xuan Yuan Jian - Wai Zhuan Zhi Tian Zhi Hen (Chi)</description>
+		<description>Xuan Yuan Jian - Wai Zhuan Zhi Tian Zhi Hen (China)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ045"/>
@@ -59904,7 +59904,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 
 	<software name="ldhbkqcs">
-		<description>Lei Dian Huang Bi Ka Qiu Chuan Shuo (Chi)</description>
+		<description>Lei Dian Huang Bi Ka Qiu Chuan Shuo (China)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ046"/>
@@ -59927,7 +59927,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="sanguows" supported="partial">
-		<description>San Guo Wu Shuang - Meng Jiang Zhuan (Chi)</description>
+		<description>San Guo Wu Shuang - Meng Jiang Zhuan (China)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ047"/>
@@ -61165,7 +61165,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="dahuaxyu">
-		<description>Da Hua Xi You (Chi, Union Bond)</description>
+		<description>Da Hua Xi You (China, Union Bond)</description>
 		<year>19??</year>
 		<publisher>Union Bond</publisher>
 		<info name="serial" value="G-0004"/>
@@ -61664,7 +61664,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- nointro -->
 	<software name="pukejing">
-		<description>Pu Ke Jing Ling (Chi)</description>
+		<description>Pu Ke Jing Ling (China)</description>
 		<!-- TOSEC title Mari, Ayami, Luka no AV Poker - Pu Nu Jing Ling, check if doubling the second rom we get  d6a102ed!! -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -61837,7 +61837,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="dzl" cloneof="daisenr">
-		<description>Dai Zhan Lue (Chi)</description>
+		<description>Dai Zhan Lue (China)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<part name="cart" interface="nes_cart">
@@ -61927,7 +61927,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="dbzgaidnc" cloneof="dbzgaidn">
-		<description>Dragon Ball Z Gaiden - Saiyajin Zetsumetsu Keikaku (Chi)</description>
+		<description>Dragon Ball Z Gaiden - Saiyajin Zetsumetsu Keikaku (China)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1096?"/>
@@ -61952,7 +61952,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="dbz2c" cloneof="dbz2">
-		<description>Dragon Ball Z II - Gekishin Freeza!! (Chi)</description>
+		<description>Dragon Ball Z II - Gekishin Freeza!! (China)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1094"/>
@@ -61977,7 +61977,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="dbz2ca" cloneof="dbz2">
-		<description>Ji Zhan Fu Li Sa Zhi Sun Wu Fan (Chi)</description>
+		<description>Ji Zhan Fu Li Sa Zhi Sun Wu Fan (China)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1094"/>
@@ -64509,7 +64509,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="mihunche" cloneof="bbcar">
-		<description>Mi Hun Che (Chi)</description>
+		<description>Mi Hun Che (China)</description>
 		<year>1988</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -64525,7 +64525,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="scche" cloneof="bbcar">
-		<description>Super Car (Chi)</description>  <!-- This is not the correct title! -->
+		<description>Super Car (China)</description>  <!-- This is not the correct title! -->
 		<year>1988</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -64591,7 +64591,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="blockfrc">
-		<description>Block Force (Asia, Ripped from Tetris Family 9 in 1?)</description>
+		<description>Block Force (Asia, ripped from Tetris Family 9 in 1?)</description>
 		<year>19??</year>
 		<publisher>Hwang Shinwei</publisher>
 		<part name="cart" interface="nes_cart">
@@ -65176,7 +65176,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="erzhanzj">
-		<description>Er Zhan Zhi Jing Dian Zhan Yi (Chi)</description>
+		<description>Er Zhan Zhi Jing Dian Zhan Yi (China)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi</publisher>
 		<info name="alt_title" value="二战之经典战役"/>
@@ -65466,7 +65466,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- Other two games forming the whole F-646 HIGH K Power Sports 4-in-1 were identical to original releases, so went undumped apparently -->
 	<software name="goal5" cloneof="tecmowc">
-		<description>Goal 5 Soccer (Ripped from F-646 HIGH K Power Sports 4-in-1)</description>
+		<description>Goal 5 Soccer (ripped from F-646 HIGH K Power Sports 4-in-1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -65514,7 +65514,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="hstar2" cloneof="f1hero2">
-		<description>High Way Star II (Ripped from F-646 HIGH K Power Sports 4-in-1)</description>
+		<description>High Way Star II (ripped from F-646 HIGH K Power Sports 4-in-1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -65530,7 +65530,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="huoyansz">
-		<description>Huo Yan Shi Zhe (Chi)</description>
+		<description>Huo Yan Shi Zhe (China)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi</publisher>
 		<info name="alt_title" value="火焰使者"/>
@@ -65568,7 +65568,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="2socdanc">
-		<description>Super 2 in 1 (Chi, hacked)</description>
+		<description>Super 2 in 1 (China, hacked)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -65982,7 +65982,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- nointro -->
 	<software name="mgfh" supported="no">
-		<description>Mei Guo Fu Hao - Super Rich (Chi)</description>
+		<description>Mei Guo Fu Hao - Super Rich (China)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi</publisher>
 		<info name="alt_title" value="美国富豪"/>
@@ -66042,7 +66042,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="menghxj">
-		<description>Meng Huan Xian Jing (Chi)</description>
+		<description>Meng Huan Xian Jing (China)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi</publisher>
 		<info name="alt_title" value="梦幻仙境"/>
@@ -66080,7 +66080,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="molizhan">
-		<description>Mo Li Zhan Shi (Chi)</description>
+		<description>Mo Li Zhan Shi (China)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi</publisher>
 		<info name="alt_title" value="魔力战士"/>
@@ -66170,7 +66170,7 @@ We don't include these hacks because they were not burned into real carts nor so
 	</software>
 
 	<software name="pandawrl">
-		<description>Panda World (Asia, Ripped from multicart XB-F812)</description>
+		<description>Panda World (Asia, ripped from multicart XB-F812)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="Ripped from XB-F812 9-in-1 multicart"/>
@@ -66203,7 +66203,7 @@ We don't include these hacks because they were not burned into real carts nor so
 	</software>
 
 	<software name="pokemon">
-		<description>Pocket Monster (Ripped from multicart, hacked)</description>
+		<description>Pocket Monster (ripped from multicart, hacked)</description>
 		<!-- TOSEC title: Pocket Monster (199x)(-)(As)[H2 Dr. Titus][P][Ripped From 23 in 1, Ines Title]. check -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -66335,7 +66335,7 @@ We don't include these hacks because they were not burned into real carts nor so
 	</software>
 
 	<software name="quanba4">
-		<description>Quan Ba 4 Dai (Chi)</description>
+		<description>Quan Ba 4 Dai (China)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi?</publisher>
 		<info name="alt_title" value="拳霸四代"/>
@@ -66372,7 +66372,7 @@ We don't include these hacks because they were not burned into real carts nor so
 	</software>
 
 	<software name="saieqxz">
-		<description>Sai Er Qi Xia Zhuan (Chi)</description>
+		<description>Sai Er Qi Xia Zhuan (China)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi</publisher>
 		<info name="alt_title" value="塞外奇侠传"/>
@@ -66437,7 +66437,7 @@ We don't include these hacks because they were not burned into real carts nor so
 	</software>
 
 	<software name="sanguo2h">
-		<description>San Guo Zhi II (Chi)</description>
+		<description>San Guo Zhi II (China)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi</publisher>
 		<info name="alt_title" value="三国志II"/>
@@ -66479,7 +66479,7 @@ We don't include these hacks because they were not burned into real carts nor so
 
 <!-- nointro -->
 	<software name="shanggsj">
-		<description>Shang Gu Shen Jian (Chi)</description>
+		<description>Shang Gu Shen Jian (China)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi</publisher>
 		<info name="alt_title" value="上古神剑"/>
@@ -66539,7 +66539,7 @@ We don't include these hacks because they were not burned into real carts nor so
 	</software>
 
 	<software name="shenqbb">
-		<description>Shen Qi Bao Bei (Chi)</description>
+		<description>Shen Qi Bao Bei (China)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi</publisher>
 		<info name="alt_title" value="神奇宝贝"/>
@@ -66560,7 +66560,7 @@ We don't include these hacks because they were not burned into real carts nor so
 	</software>
 
 	<software name="shudu">
-		<description>Shudu (Chi, Ripped from 5 in 1 cart?)</description>
+		<description>Shudu (China, ripped from 5 in 1 cart?)</description>
 		<year>19??</year>
 		<publisher>Nice Code?</publisher>
 		<part name="cart" interface="nes_cart">
@@ -66578,7 +66578,7 @@ We don't include these hacks because they were not burned into real carts nor so
 
 <!-- nointro -->
 	<software name="shuqiyuz">
-		<description>Shu Qi Yu - Zhi Li Xiao Zhuan Yuan (Chi)</description>
+		<description>Shu Qi Yu - Zhi Li Xiao Zhuan Yuan (China)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -66598,7 +66598,7 @@ We don't include these hacks because they were not burned into real carts nor so
 	</software>
 
 	<software name="shuqiyus">
-		<description>Shu Qi Yu - Shu Xue Xiao Zhuan Yuan (Chi)</description>
+		<description>Shu Qi Yu - Shu Xue Xiao Zhuan Yuan (China)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -66653,7 +66653,7 @@ We don't include these hacks because they were not burned into real carts nor so
 	</software>
 
 	<software name="alpski" cloneof="skiing">
-		<description>Alps Skiing (Chi)</description>
+		<description>Alps Skiing (China)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -67090,7 +67090,7 @@ We don't include these hacks because they were not burned into real carts nor so
 
 <!-- nointro -->
 	<software name="wangzifu">
-		<description>Wang Zi Fu Chou Ji (Chi)</description>
+		<description>Wang Zi Fu Chou Ji (China)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi</publisher>
 		<info name="alt_title" value="王子复仇记"/>
@@ -67170,7 +67170,7 @@ We don't include these hacks because they were not burned into real carts nor so
 	</software>
 
 	<software name="wujiandf">
-		<description>Wu Jian Dao Feng Yun (Chi)</description>
+		<description>Wu Jian Dao Feng Yun (China)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi</publisher>
 		<info name="alt_title" value="无间道风云"/>
@@ -67214,7 +67214,7 @@ We don't include these hacks because they were not burned into real carts nor so
 	</software>
 
 	<software name="xplan" cloneof="contrafc">
-		<description>X-Plan (Asia, Ripped from multicart XB-F865)</description>
+		<description>X-Plan (Asia, ripped from multicart XB-F865)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -67230,7 +67230,7 @@ We don't include these hacks because they were not burned into real carts nor so
 	</software>
 
 	<software name="xwar" cloneof="silkworm">
-		<description>X-War (Asia, Ripped from multicart)</description>
+		<description>X-War (Asia, ripped from multicart)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -67283,7 +67283,7 @@ We don't include these hacks because they were not burned into real carts nor so
 <!-- nointro -->
 <!-- How is this related to the Waixing title?? -->
 	<software name="xinghzs" cloneof="waixngzs">
-		<description>Xing He Zhan Shi (Chi)</description>
+		<description>Xing He Zhan Shi (China)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi</publisher>
 		<info name="alt_title" value="星河战士"/>
@@ -67306,7 +67306,7 @@ We don't include these hacks because they were not burned into real carts nor so
 <!-- nointro -->
 <!-- How is this related to the Waixing title?? -->
 	<software name="xingjizb" cloneof="waixngzs" supported="partial">
-		<description>Xing Ji Zheng Ba (Chi)</description>
+		<description>Xing Ji Zheng Ba (China)</description>
 		<year>1996</year>
 		<publisher>HengGedianzi</publisher>
 		<info name="alt_title" value="星际争霸 (Starcraft?)"/>
@@ -67329,7 +67329,7 @@ We don't include these hacks because they were not burned into real carts nor so
 <!-- nointro -->
 <!-- How is this related to the Waixing title?? -->
 	<software name="xingzhan" cloneof="waixngz2">
-		<description>Xing Zhan Qing Yuan (Chi)</description>
+		<description>Xing Zhan Qing Yuan (China)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi</publisher>
 		<info name="alt_title" value="星战情缘"/>
@@ -67373,7 +67373,7 @@ We don't include these hacks because they were not burned into real carts nor so
 
 <!-- nointro -->
 	<software name="youling" supported="partial">
-		<description>You Ling Xing Dong (Chi)</description>
+		<description>You Ling Xing Dong (China)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi</publisher>
 		<info name="alt_title" value="幽灵行动"/>
@@ -67397,7 +67397,7 @@ We don't include these hacks because they were not burned into real carts nor so
 	</software>
 
 	<software name="zhonghyx">
-		<description>Zhong Hua Ying Xiong (Chi)</description>
+		<description>Zhong Hua Ying Xiong (China)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi?</publisher>
 		<info name="alt_title" value="中华英雄"/>
@@ -68324,7 +68324,7 @@ All musics were removed in this game.
 	</software>
 
 	<software name="lyxz">
-		<description>Lu Ye Xian Zong (Chi)</description>
+		<description>Lu Ye Xian Zong (China)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<info name="alt_title" value="绿野仙踪"/>
@@ -68341,7 +68341,7 @@ All musics were removed in this game.
 	</software>
 
 	<software name="mofamen" supported="no">
-		<description>Mo Fa Men - Ying Xiong Wu Di (Chi)</description>
+		<description>Mo Fa Men - Ying Xiong Wu Di (China)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<info name="alt_title" value="魔法门-英雄无敌 ~ mófǎ mén-yīngxióng wúdí (Heroes of Might &amp; Magic?)"/>
@@ -68358,7 +68358,7 @@ All musics were removed in this game.
 	</software>
 
 	<software name="mabumi" supported="partial">
-		<description>Ma Bu Mi Zhen &amp; Qu Wei Cheng Yu Wu (Chi)</description>
+		<description>Ma Bu Mi Zhen &amp; Qu Wei Cheng Yu Wu (China)</description>
 		<year>19??</year>
 		<publisher>Subor</publisher>
 		<part name="cart" interface="nes_cart">
@@ -73415,7 +73415,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="edu18">
-		<description>Education Games 18 in 1 (Chi)</description>
+		<description>Education Games 18 in 1 (China)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -73436,7 +73436,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="studygam">
-		<description>Study and Game 32 in 1 (Chi)</description>
+		<description>Study and Game 32 in 1 (China)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -73477,7 +73477,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="abm5" supported="partial">
-		<description>ABM Study Card V5.0 (Chi)</description>
+		<description>ABM Study Card V5.0 (China)</description>
 		<year>1995?</year>
 		<publisher>ABM</publisher>
 		<part name="cart" interface="nes_cart">
@@ -73519,7 +73519,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="beitf98">
-		<description>Bei TongFang Win 98 (Chi)</description>
+		<description>Bei TongFang Win 98 (China)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -73535,7 +73535,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="ghgc" supported="no">
-		<description>Gaau Hok Gwong Cheung (Chi)</description>
+		<description>Gaau Hok Gwong Cheung (China)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -73551,7 +73551,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="dongshen">
-		<description>Dong Sheng English Sound-Word Blaster (Chi)</description>
+		<description>Dong Sheng English Sound-Word Blaster (China)</description>
 		<year>19??</year>
 		<publisher>Dong Sheng</publisher>
 		<part name="cart" interface="nes_cart">
@@ -75394,7 +75394,7 @@ Other
 	</software>
 
 	<software name="angrybr2" cloneof="moaikun">
-		<description>Angry Birds 2 (Moai Kun pirate, Ripped from multicart)</description>
+		<description>Angry Birds 2 (Moai Kun pirate, ripped from multicart)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<info name="alt_title" value="愤怒的小鸟2"/>
@@ -75412,7 +75412,7 @@ Other
 	</software>
 
 	<software name="angrybr3">
-		<description>Angry Birds 3 (Chi)</description>
+		<description>Angry Birds 3 (China)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<info name="alt_title" value="愤怒的小鸟3"/>
@@ -76588,7 +76588,7 @@ Other
 	</software>
 
 	<software name="plantzom">
-		<description>Plants Vs. Zombies (Chi)</description>
+		<description>Plants Vs. Zombies (China)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<info name="alt_title" value="植物大战僵尸"/>
@@ -77483,7 +77483,7 @@ Other
 	</software>
 
 	<software name="scontra2" cloneof="probot">
-		<description>Super Contra II (Chi, Contra pirate)</description>
+		<description>Super Contra II (China, Contra pirate)</description>
 		<year>19??</year>
 		<publisher>Mars</publisher>
 		<info name="serial" value="G-135"/>
@@ -77519,7 +77519,7 @@ Other
 
 	<software name="93contra" cloneof="probot">
 		<!-- Alt. Title: Super Contra II (cart label?) -->
-		<description>'93 Chaoji Hun (Chi, Contra pirate)</description>
+		<description>'93 Chaoji Hun (China, Contra pirate)</description>
 		<year>1993</year>
 		<publisher>Yanshan RuanJian</publisher>
 		<info name="alt_title" value="93超级魂"/>
@@ -77569,7 +77569,7 @@ Other
 	</software>
 
 	<software name="scontra5" cloneof="gijoeaf">
-		<description>Super Contra 5 (Chi, G.I. Joe Atlantis Factor pirate)</description>
+		<description>Super Contra 5 (China, G.I. Joe Atlantis Factor pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -77799,7 +77799,7 @@ Other
 	</software>
 
 	<software name="ustrike" cloneof="cobracom">
-		<description>Urban Strike (Cobra Command pirate, Ripped from multicart)</description>
+		<description>Urban Strike (Cobra Command pirate, ripped from multicart)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<info name="serial" value="Ripped from NG-011 4-in-1 cart"/>
@@ -79535,7 +79535,7 @@ be better to redump them properly. -->
 	</software>
 
 	<software name="ssamsho2" supported="partial">
-		<description>Shin Samurai Spirits 2 - Haoumaru Jigoku Hen (Chi)</description>
+		<description>Shin Samurai Spirits 2 - Haoumaru Jigoku Hen (China)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -79708,7 +79708,7 @@ be better to redump them properly. -->
 	</software>
 
 	<software name="sf5">
-		<description>Street Fighter V (Asia, 20 characters, Ripped from multicart?)</description>
+		<description>Street Fighter V (Asia, 20 characters, ripped from multicart?)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
