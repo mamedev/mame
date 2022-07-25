@@ -112,6 +112,7 @@ $8000-$FFFF ROM
 // internal artwork
 #include "mephisto_bup.lh"
 #include "mephisto_mm2.lh"
+#include "mephisto_mm5.lh"
 
 
 namespace {
@@ -371,6 +372,8 @@ void mm2_state::mm5(machine_config &config)
 {
 	mm4(config);
 	SOFTWARE_LIST(config.replace(), "cart_list").set_original("mephisto_mm5");
+
+	config.set_default_layout(layout_mephisto_mm5); // does not apply to mm5p
 }
 
 void mm2_state::bup(machine_config &config)
