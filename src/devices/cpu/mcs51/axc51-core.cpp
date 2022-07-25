@@ -37,7 +37,7 @@ axc51core_cpu_device::axc51core_cpu_device(const machine_config& mconfig, device
 }
 
 axc51core_cpu_device::axc51core_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: axc51core_cpu_device(mconfig, AXC51CORE, tag, owner, clock, address_map_constructor(FUNC(axc51core_cpu_device::program_internal), this), address_map_constructor(FUNC(axc51core_cpu_device::data_internal), this), 0, 7)
+	: axc51core_cpu_device(mconfig, AXC51CORE, tag, owner, clock, address_map_constructor(FUNC(axc51core_cpu_device::program_internal), this), address_map_constructor(FUNC(axc51core_cpu_device::data_internal), this), 0, 8)
 {
 }
 
@@ -49,7 +49,7 @@ std::unique_ptr<util::disasm_interface> axc51core_cpu_device::create_disassemble
 // AX208 (specific CPU)
 
 ax208_cpu_device::ax208_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: axc51core_cpu_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(ax208_cpu_device::ax208_internal_program_mem), this), address_map_constructor(FUNC(ax208_cpu_device::ax208_internal_data_mem), this), 0, 7)
+	: axc51core_cpu_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(ax208_cpu_device::ax208_internal_program_mem), this), address_map_constructor(FUNC(ax208_cpu_device::ax208_internal_data_mem), this), 0, 8)
 {
 }
 
