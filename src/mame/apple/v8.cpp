@@ -40,8 +40,8 @@ static constexpr u32 C15M = (C7M * 2);
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(V8, v8_device, "v8", "Apple V8 system ASIC")
-DEFINE_DEVICE_TYPE(EAGLE, eagle_device, "eagle", "Apple Eagle system ASIC")
-DEFINE_DEVICE_TYPE(SPICE, spice_device, "spice", "Apple Spice system ASIC")
+DEFINE_DEVICE_TYPE(EAGLE, eagle_device, "v8eagle", "Apple Eagle system ASIC")
+DEFINE_DEVICE_TYPE(SPICE, spice_device, "v8spice", "Apple Spice system ASIC")
 
 static INPUT_PORTS_START( v8 )
 	PORT_START("MONTYPE")
