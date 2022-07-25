@@ -4,17 +4,27 @@
     Apple "V8", "Eagle", and "Spice" system ASICs
     Emulation by R. Belmont
 
-    V8 contains the following:
+    V8 (343S0116 or 343-0155) contains the following:
     - A memory controller for up to 10 MB (2 or 4 MB on the motherboard + 6 or 8 MB in SIMMs)
     - A VRAM controller and framebuffer controller, supporting monitor ID selection
     - A full VIA (VIA1) and a "pseudo-VIA", which is basically a combination GPIO and
       interrupt controller that looks somewhat like a VIA with no timers and no shift register
-    - An ASC-like 4-channel audio controller
+    - An ASC-like 4-channel audio controller, with a 1 KB FIFO stored in main memory
     - Support logic for various external subsystems (ADB, FDC, PDS, SCC, SCSI)
 
-    Eagle is identical to V8 but with only monochrome 512x342 video supported
+    The VRAM data path is 16 bits wide and connects to the Ariel RAMDAC (343S1045 or 344S0145
+    on the original LC, 343S1069 or 344S1069 on later models).
 
-    Spice is identical to V8 but incorporates a SWIM2 floppy controller
+    Eagle (343S1054) is similar to V8 but only supports a 512x342 monochrome monitor.
+    It generates the video output directly without a RAMDAC.
+
+    Spice (343S0132) is an enhanced version of V8 that incorporates a SWIM2 floppy controller
+    and adds the option for an optional ROM expansion plus support for pushbutton sound volume
+    and display intensity controls and power saver mode.
+
+    VISA (343S0101) is a predecessor of V8 and Eagle without support for dedicated VRAM banks
+    or VGA modes.  It was coupled to a non-customized Bt450 RAMDAC on the Elsie prototype, and
+    did not offer video modes with more than 4 bits per pixel.
 
     The RAM controller in these chips is weird.  The motherboard RAM maps after any SIMMs, and
     the first 2MB of the motherboard RAM always exists in the 0x800000-0x9FFFFF range.  Later
