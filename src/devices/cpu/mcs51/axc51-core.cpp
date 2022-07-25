@@ -31,7 +31,7 @@ DEFINE_DEVICE_TYPE(AX208P, ax208p_cpu_device, "ax208p", "AppoTech AX208 (AXC51-C
 
 // AXC51CORE (base device)
 
-axc51core_cpu_device::axc51core_cpu_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock,  address_map_constructor program_map, address_map_constructor data_map, int program_width, int data_width, uint8_t features)
+axc51core_cpu_device::axc51core_cpu_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock, address_map_constructor program_map, address_map_constructor data_map, int program_width, int data_width, uint8_t features)
 	: mcs51_cpu_device(mconfig, type, tag, owner, clock, program_map, data_map, program_width, data_width, features)
 {
 }
