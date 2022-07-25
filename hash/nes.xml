@@ -53823,7 +53823,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	<software name="jovial">
 		<!-- Important: there is also an image with prg crc 55089f7e which according to my research
 		should be a Chinese translation by Puszta of the original Sachen game, so we don't include it here -->
-		<description>Jovial Race (Tw, NES cart)</description>
+		<description>Jovial Race (Taiwan, NES cart)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="TC-001"/>
@@ -53858,7 +53858,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 	<software name="hidchess">
 		<!-- Um Chi (Glommy Chess, Joy Van) in GoodNES, check title -->
-		<description>An Qi ~ Hidden Chinese Chess (Tw)</description>
+		<description>An Qi ~ Hidden Chinese Chess (Taiwan)</description>
 		<year>1989</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="TC-002"/>
@@ -53877,7 +53877,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="sidewinda" cloneof="sidewind">
-		<description>Sidewinder - Xiang Wei She (Tw, NES cart)</description>
+		<description>Sidewinder - Xiang Wei She (Taiwan, NES cart)</description>
 		<year>1989</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="TC-003"/>
@@ -54006,7 +54006,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="twineagh">
-		<description>Twin Eagle (Tw, NES cart)</description>
+		<description>Twin Eagle (Taiwan, NES cart)</description>
 		<year>1989</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="TC-006"/>
@@ -54024,7 +54024,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="twineagha" cloneof="twineagh">
-		<description>Shuang Ying (Tw, FC cart)</description>
+		<description>Shuang Ying (Taiwan, FC cart)</description>
 		<year>1989</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="TC-006"/>
@@ -54043,7 +54043,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- is this good? check -->
 	<software name="shuang" cloneof="twineagh">
-		<description>Shuang Ying (Tw)</description>
+		<description>Shuang Ying (Taiwan)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="Twin Eagle"/>
@@ -54061,7 +54061,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="mastrchua" cloneof="mastrchu">
-		<description>Master Chu &amp; Drunkard Hu (Tw, Pal)</description>
+		<description>Master Chu &amp; Drunkard Hu (Taiwan, PAL)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="TC-007"/>
@@ -54115,7 +54115,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="galcrusa" cloneof="galcrus">
-		<description>Galactic Crusader (Tw, NES cart)</description>
+		<description>Galactic Crusader (Taiwan, NES cart)</description>
 		<year>1990</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="TC-009"/>
@@ -54152,7 +54152,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="mjtrapz">
-		<description>Mahjong Trap - Si Cuan Ma Que - Zhi Fu Pian (Tw)</description>
+		<description>Mahjong Trap - Si Cuan Ma Que - Zhi Fu Pian (Taiwan)</description>
 		<!-- Shisen Mahjong - Seifuku Hen (Sachen) in GoodNES, check title -->
 		<year>1990</year>
 		<publisher>Sachen</publisher>
@@ -54172,7 +54172,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="chaldrgna" cloneof="chaldrgn">
-		<description>Challenge of the Dragon (Tw, NES cart)</description>
+		<description>Challenge of the Dragon (Taiwan, NES cart)</description>
 		<year>1990</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="TC-011"/>
@@ -54722,7 +54722,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="supcart1">
-		<description>Super Cartridge Ver 1 - 4 in 1 (Tw)</description>
+		<description>Super Cartridge Ver 1 - 4 in 1 (Taiwan)</description>
 		<year>1994</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="TC-SC1"/>
@@ -54739,7 +54739,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="supcart2">
-		<description>Super Cartridge Ver 2 - 10 in 1 (Tw)</description>
+		<description>Super Cartridge Ver 2 - 10 in 1 (Taiwan)</description>
 		<year>1994</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
@@ -54755,7 +54755,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="supcart3">
-		<description>Super Cartridge Ver 3 - 8 in 1 (Tw)</description>
+		<description>Super Cartridge Ver 3 - 8 in 1 (Taiwan)</description>
 		<year>1994</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
@@ -54771,7 +54771,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="supcart4">
-		<description>Super Cartridge Ver 4 - 6 in 1 (Tw)</description>
+		<description>Super Cartridge Ver 4 - 6 in 1 (Taiwan)</description>
 		<year>1994</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
@@ -54787,7 +54787,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="supcart5">
-		<description>Super Cartridge Ver 5 - 7 in 1 (Tw)</description>
+		<description>Super Cartridge Ver 5 - 7 in 1 (Taiwan)</description>
 		<year>1994</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
@@ -54803,7 +54803,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="supcart6">
-		<description>Super Cartridge Ver 6 - 6 in 1 (Tw)</description>
+		<description>Super Cartridge Ver 6 - 6 in 1 (Taiwan)</description>
 		<year>1994</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
@@ -54819,7 +54819,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="supcart7">
-		<description>Super Cartridge Ver 7 - 4 in 1 (Tw)</description>
+		<description>Super Cartridge Ver 7 - 4 in 1 (Taiwan)</description>
 		<year>1994</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
@@ -54835,7 +54835,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="supcart8">
-		<description>Super Cartridge Ver 8 - 4 in 1 (Tw)</description>
+		<description>Super Cartridge Ver 8 - 4 in 1 (Taiwan)</description>
 		<year>1994</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
@@ -54851,7 +54851,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="supcart9">
-		<description>Super Cartridge Ver 9 - 3 in 1 (Tw)</description>
+		<description>Super Cartridge Ver 9 - 3 in 1 (Taiwan)</description>
 		<year>1994</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
@@ -54923,7 +54923,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 	<!-- SA-002 is Penguin and Seal, and its dump coincides with the HES version, Arctic Adventure -->
 	<software name="pengseal">
-		<description>The Penguin &amp; Seal (Tw, Aus)</description>
+		<description>The Penguin &amp; Seal (Taiwan, Australia)</description>
 		<year>1989</year>
 		<publisher>Sachen ~ HES</publisher>
 		<info name="serial" value="SA-002"/>
@@ -54943,7 +54943,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- nointro -->
 	<software name="dongdong" cloneof="pengseal">
-		<description>Dong Dong Nao 1 (Tw)</description>
+		<description>Dong Dong Nao 1 (Taiwan)</description>
 		<year>1989</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="SA-002"/>
@@ -55001,7 +55001,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="lucky777">
-		<description>777 Lucky Bingo (Tw, NES cart)</description>
+		<description>777 Lucky Bingo (Taiwan, NES cart)</description>
 		<year>1989</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="SA-004"/>
@@ -55020,7 +55020,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="colorful">
-		<description>Colorful Dragon (Tw, NES cart)</description>
+		<description>Colorful Dragon (Taiwan, NES cart)</description>
 		<year>1989</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="SA-005"/>
@@ -55380,7 +55380,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="pokermj">
-		<description>Poker Mahjong - Pu Ke Mao Que (Tw)</description>
+		<description>Poker Mahjong - Pu Ke Mao Que (Taiwan)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="SA-018"/>
@@ -55398,7 +55398,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="greatwl">
-		<description>The Great Wall (Tw, NES cart)</description>
+		<description>The Great Wall (Taiwan, NES cart)</description>
 		<year>1992</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="SA-019"/>
@@ -55415,7 +55415,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="fcombat">
-		<description>Final Combat (Tw, FC cart)</description>
+		<description>Final Combat (Taiwan, FC cart)</description>
 		<year>1992</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="SA-020"/>
@@ -55432,7 +55432,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="fcombata" cloneof="fcombat">
-		<description>Final Combat (Tw, NES cart)</description>
+		<description>Final Combat (Taiwan, NES cart)</description>
 		<year>1992</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="SA-020"/>
@@ -55449,7 +55449,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="tasac">
-		<description>Tasac (Tw)</description>
+		<description>Tasac (Taiwan)</description>
 		<year>1992</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="SA-021"/>
@@ -55486,7 +55486,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="2ccopcm">
-		<description>Lightgun Game 2 in 1 - Cosmocop + Cyber Monster (Tw)</description>
+		<description>Lightgun Game 2 in 1 - Cosmocop + Cyber Monster (Taiwan)</description>
 		<year>1993</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="SA-023"/>
@@ -55504,7 +55504,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="2tcstc">
-		<description>Lightgun Game 2 in 1 - Tough Cop + Super Tough Cop (Tw)</description>
+		<description>Lightgun Game 2 in 1 - Tough Cop + Super Tough Cop (Taiwan)</description>
 		<year>1993</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="SA-024"/>
@@ -55522,7 +55522,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="tai16mj2">
-		<description>Taiwan Mahjong 2 (Tw)</description>
+		<description>Taiwan Mahjong 2 (Taiwan)</description>
 		<year>1992</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="SA-025"/>
@@ -55541,7 +55541,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="mjacad">
-		<description>Mahjong Academy (Tw)</description>
+		<description>Mahjong Academy (Taiwan)</description>
 		<year>1992</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="SA-026"/>
@@ -55559,7 +55559,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="mjcompana" cloneof="mjcompan">
-		<description>Mahjong Companion (Tw, Sachen)</description>
+		<description>Mahjong Companion (Taiwan, Sachen)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="SA-027"/>
@@ -55576,7 +55576,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="chinkngf">
-		<description>Chinese KungFu (Tw)</description>
+		<description>Chinese KungFu (Taiwan)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
@@ -56147,7 +56147,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="huangdi">
-		<description>Huang Di (Tw)</description>
+		<description>Huang Di (Taiwan)</description>
 		<year>199?</year>
 		<publisher>NTDEC</publisher>
 		<info name="serial" value="CN-29"/>
@@ -56223,7 +56223,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- Also verified on a Spanish cart by Gluk Video -->
 	<software name="creatom">
-		<description>Creatom (Tw, Spa)</description>
+		<description>Creatom (Spain, Taiwan)</description>
 		<year>199?</year>
 		<publisher>TXC Corp / Gluk Video</publisher>
 		<info name="serial" value="MGC-003"/>
@@ -56243,7 +56243,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 	<!-- From GoodNES -->
 	<software name="bingo">
-		<description>Bingo (Tw)</description>
+		<description>Bingo (Taiwan)</description>
 		<year>19??</year>
 		<publisher>Micro Genius</publisher>
 		<info name="serial" value="MGC-005"/>
@@ -56262,7 +56262,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="mjblock">
-		<description>Mahjong Block (Tw)</description>
+		<description>Mahjong Block (Taiwan)</description>
 		<year>1991</year>
 		<publisher>Micro Genius</publisher>
 		<info name="serial" value="MGC-008"/>
@@ -56280,7 +56280,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 	<!-- there is also a version with removed protection and crcs a2d70c92 and 0689d618 -->
 	<software name="dumarac">
-		<description>1991 Du Ma Racing (Tw)</description>
+		<description>1991 Du Ma Racing (Taiwan)</description>
 		<year>1991</year>
 		<publisher>Super Mega</publisher>
 		<info name="serial" value="MGC-009"/>
