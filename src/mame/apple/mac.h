@@ -26,7 +26,6 @@
 #include "macrtc.h"
 #include "macscsi.h"
 #include "sound/asc.h"
-#include "sound/dac.h"
 #include "cpu/m68000/m68000.h"
 #include "emupal.h"
 #include "screen.h"
@@ -66,8 +65,6 @@ public:
 		m_montype(*this, "MONTYPE"),
 		m_main_buffer(true),
 		m_vram(*this,"vram"),
-		m_vram16(*this,"vram16"),
-		m_vram64(*this,"vram64"),
 		m_via2_ca1_hack(0),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")
@@ -172,8 +169,6 @@ private:
 
 	// this is shared among all video setups with vram
 	optional_shared_ptr<uint32_t> m_vram;
-	optional_shared_ptr<uint16_t> m_vram16;
-	optional_shared_ptr<uint64_t> m_vram64;
 
 	// interrupts
 	int m_scc_interrupt = false, m_via_interrupt = false, m_via2_interrupt = false, m_scsi_interrupt = false, m_last_taken_interrupt = false;
@@ -234,7 +229,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(nubus_irq_d_w);
 	DECLARE_WRITE_LINE_MEMBER(nubus_irq_e_w);
 
-	DECLARE_WRITE_LINE_MEMBER(cuda_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(egret_reset_w);
 
 	DECLARE_WRITE_LINE_MEMBER(mac_scsi_irq);
 	DECLARE_WRITE_LINE_MEMBER(mac_asc_irq);
@@ -242,10 +237,7 @@ private:
 	void macii_map(address_map &map);
 	void maciici_map(address_map &map);
 	void maciifx_map(address_map &map);
-	void maclc3_map(address_map &map);
-	void maclc_map(address_map &map);
 	void macse30_map(address_map &map);
-	void pwrmac_map(address_map &map);
 
 	uint8_t m_oss_regs[0x400]{};
 
@@ -267,11 +259,7 @@ private:
 	void devsel_w(uint8_t devsel);
 	void hdsel_w(int hdsel);
 
-	DECLARE_VIDEO_START(mac);
-	DECLARE_VIDEO_RESET(macrbv);
-	DECLARE_VIDEO_START(macv8);
-	DECLARE_VIDEO_RESET(maceagle);
-	DECLARE_VIDEO_START(macrbv);
+	void macrbv_reset();
 	uint32_t screen_update_macse30(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macrbv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macrbvvram(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

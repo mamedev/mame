@@ -88,7 +88,6 @@
 
 #include "emu.h"
 
-#include "macrtc.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m5074x.h"
 #include "machine/6522via.h"

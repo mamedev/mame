@@ -844,13 +844,16 @@ void mac_state::machine_start()
 	save_item(NAME(m_se30_vbl_enable));
 	save_item(NAME(m_adb_irq_pending));
 	save_item(NAME(ca1_data));
-	save_item(NAME(m_rbv_regs));
-	save_item(NAME(m_rbv_ier));
-	save_item(NAME(m_rbv_ifr));
-	save_item(NAME(m_rbv_colors));
-	save_item(NAME(m_rbv_count));
-	save_item(NAME(m_rbv_clutoffs));
-	save_item(NAME(m_rbv_palette));
+	if ((m_model == MODEL_MAC_IICI) || (m_model == MODEL_MAC_IISI))
+	{
+		save_item(NAME(m_rbv_regs));
+		save_item(NAME(m_rbv_ier));
+		save_item(NAME(m_rbv_ifr));
+		save_item(NAME(m_rbv_colors));
+		save_item(NAME(m_rbv_count));
+		save_item(NAME(m_rbv_clutoffs));
+		save_item(NAME(m_rbv_palette));
+	}
 	save_item(NAME(m_scc_interrupt));
 	save_item(NAME(m_via_interrupt));
 	save_item(NAME(m_via2_interrupt));
@@ -870,7 +873,11 @@ void mac_state::machine_reset()
 	// stop 60.15 Hz timer
 	m_6015_timer->adjust(attotime::never);
 
-	m_rbv_vbltime = 0;
+	if ((m_model == MODEL_MAC_IICI) || (m_model == MODEL_MAC_IISI))
+	{
+		m_rbv_vbltime = 0;
+		macrbv_reset();
+	}
 
 	// start 60.15 Hz timer for most systems
 	if ((m_model >= MODEL_MAC_IICI) && (m_model <= MODEL_MAC_IIFX))
@@ -907,7 +914,7 @@ void mac_state::machine_reset()
 	m_last_taken_interrupt = 0;
 }
 
-WRITE_LINE_MEMBER(mac_state::cuda_reset_w)
+WRITE_LINE_MEMBER(mac_state::egret_reset_w)
 {
 	if (state == ASSERT_LINE)
 	{

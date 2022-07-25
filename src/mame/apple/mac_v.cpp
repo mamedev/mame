@@ -52,10 +52,6 @@ Apple color FPD      01           11           10   (FPD = Full Page Display)
 #include "machine/ram.h"
 #include "render.h"
 
-VIDEO_START_MEMBER(mac_state,mac)
-{
-}
-
 uint32_t mac_state::screen_update_macse30(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint32_t const video_base = (m_screen_buffer ? 0x8000 : 0) + (MAC_H_VIS/8);
@@ -77,20 +73,9 @@ uint32_t mac_state::screen_update_macse30(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-// IIci/IIsi RAM-Based Video (RBV) and children: V8, Eagle, Spice
+// IIci/IIsi RAM-Based Video (RBV)
 
-VIDEO_START_MEMBER(mac_state,macrbv)
-{
-}
-
-VIDEO_RESET_MEMBER(mac_state,maceagle)
-{
-	m_rbv_montype = 32;
-	m_rbv_palette[0xfe] = 0xffffff;
-	m_rbv_palette[0xff] = 0;
-}
-
-VIDEO_RESET_MEMBER(mac_state,macrbv)
+void mac_state::macrbv_reset()
 {
 	int htotal, vtotal;
 	double framerate;

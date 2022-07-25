@@ -556,7 +556,7 @@ void mac_state::add_via2(machine_config &config)
 void mac_state::add_egret(machine_config &config, int type)
 {
 	EGRET(config, m_egret, type);
-	m_egret->reset_callback().set(FUNC(mac_state::cuda_reset_w));
+	m_egret->reset_callback().set(FUNC(mac_state::egret_reset_w));
 	m_egret->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
 	m_egret->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
 	m_egret->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
@@ -771,8 +771,6 @@ void mac_state::macse30(machine_config &config)
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME_INVERTED);
 
-	MCFG_VIDEO_START_OVERRIDE(mac_state,mac)
-
 	add_base_devices(config, true, 1);
 	add_asc(config, asc_device::asc_type::ASC);
 	add_scsi(config);
@@ -802,9 +800,6 @@ void mac_state::maciici(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maciici_map);
 	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
 
-	MCFG_VIDEO_START_OVERRIDE(mac_state,macrbv)
-	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macrbv)
-
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
 	m_screen->set_size(640, 870);
@@ -825,9 +820,6 @@ void mac_state::maciisi(machine_config &config)
 	M68030(config, m_maincpu, 20000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maciici_map);
 	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
-
-	MCFG_VIDEO_START_OVERRIDE(mac_state,macrbv)
-	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macrbv)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
