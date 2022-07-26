@@ -627,9 +627,9 @@ void mastboy_state::mastboy_map(address_map &map)
 {
 	map(0x4000, 0x7fff).rom(); // External ROM
 
-	map(0x8000, 0x8fff).ram().share("workram");// work ram
-	map(0x9000, 0x9fff).ram().share("tileram");// tilemap ram
-	map(0xa000, 0xa1ff).ram().share("colram").mirror(0x0e00);  // colour ram
+	map(0x8000, 0x8fff).ram().share("workram"); // Work RAM
+	map(0x9000, 0x9fff).ram().share("tileram"); // Tilemap RAM
+	map(0xa000, 0xa1ff).ram().share("colram").mirror(0x0e00);  // Colour RAM
 
 	map(0xc000, 0xffff).m("bank_c000", FUNC(address_map_bank_device::amap8));
 
@@ -1021,6 +1021,7 @@ ROM_START( mastboyia )
 	ROM_LOAD( "gal16v8-25.ic84",   0x00022e, 0x000117, NO_DUMP )
 ROM_END
 
+// PCB dated 03/02/92
 ROM_START( mastboyib )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "hd647180.bin",        0x00000, 0x4000, BAD_DUMP CRC(75716dd1) SHA1(9b14b9b889b29b6022a3815de95487fb6a720d7a) ) // game code is internal to the CPU!
@@ -1077,7 +1078,7 @@ ROM_END
 GAME( 1991, mastboy,   0,       mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco", "Master Boy (Spanish, rev A)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1991, mastboya,  mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco", "Master Boy (Spanish, rev A, hack?)", MACHINE_SUPPORTS_SAVE )
 
-/* There were specific Gaelco Master Boy PCBs for the Italian market, silkcreened on Italian instead of on Spanish ("DOMANDE ROMS", "MASTER-BOY VERSIONE", etc.). */
+// There were specific Gaelco Master Boy PCBs for the Italian market, silkcreened on Italian instead of on Spanish ("DOMANDE ROMS", "MASTER-BOY VERSIONE", etc.).
 GAME( 1991, mastboyi,  mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy (Italian, rev A, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, mastboyia, mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy (Italian, rev A, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mastboyib, mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy (Italian, rev A, set 3)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // Questions from 1992, needs a newer MCU program
+GAME( 1992, mastboyib, mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy (Italian, rev A, set 3)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // Questions from 1992, needs a different MCU program
