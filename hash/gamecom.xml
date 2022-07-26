@@ -169,8 +169,8 @@ List of games which were planned but never finished or released.
 		<publisher>Tiger Electronics</publisher>
 		<info name="serial" value="71-711" />
 		<part name="cart" interface="gamecom_cart">
-			<dataarea name="rom" size="1835008">
-				<rom name="mortal kombat trilogy (1997)(midway).bin" size="1835008" crc="72893a77" sha1="d8a403a180f4a397098c8a598dd6cd5b45ef377a"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="mortal kombat trilogy (1997)(midway).bin" size="0x200000" crc="bd29c844" sha1="a560ad2b916a9e4ace917d7e707cdcafbffe6e66"/>
 			</dataarea>
 		</part>
 	</software>
@@ -193,8 +193,8 @@ List of games which were planned but never finished or released.
 		<publisher>Tiger Electronics</publisher>
 		<info name="serial" value="71-745" />
 		<part name="cart" interface="gamecom_cart">
-			<dataarea name="rom" size="1835008">
-				<rom name="resident evil 2 (1998)(capcom).bin" size="1835008" crc="4f09457d" sha1="1d4d4ff13c8f7c228f30bddab174d4781b370ec9"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="resident evil 2 (1998)(capcom).bin" size="0x200000" crc="0984c7f5" sha1="e32357d08b07a6a8f6a7e64205cca35e50225269"/>
 			</dataarea>
 		</part>
 	</software>
@@ -229,8 +229,8 @@ List of games which were planned but never finished or released.
 		<publisher>Tiger Electronics</publisher>
 		<info name="serial" value="71-731" />
 		<part name="cart" interface="gamecom_cart">
-			<dataarea name="rom" size="1835008">
-				<rom name="tiger casino (1998).bin" size="1835008" crc="ba698142" sha1="32ce1be96f7f367b8a0adb8cc61a8cca7d6b79dd"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="tiger casino (1998).bin" size="0x200000" crc="e7fb8fd9" sha1="3620491b531b9fce67545e822eff2f99c1adb4a4"/>
 			</dataarea>
 		</part>
 	</software>
