@@ -6,6 +6,16 @@ Mogura Desse, Konami 1991
 Hardware info by Guru
 ---------------------
 
+This is a small test board. The game is basically a whack-a-mole type
+game and has basic sound but the game is purely a bonus. The board is
+primarily for testing the controls and setting up the screen and may
+have been provided in non-dedicated empty Konami cabinets from the era
+as there is (or was?) a Japanese law stating that arcade cabinets
+could not be sold without a game included. If this is true then there
+were likely many of these boards manufactured, but due to the simple
+game may have been thrown away by arcade operators so how many survive
+today is unknown.
+
 PCB Layout
 ----------
 

@@ -41,90 +41,209 @@ ClawGrip, Jul 2006
 */
 
 #include "emu.h"
-#include "pokechmp.h"
 
 #include "cpu/m6502/m6502.h"
+#include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "sound/ymopn.h"
 #include "sound/ymopl.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
-void pokechmp_state::pokechmp_bank_w(uint8_t data)
+namespace {
+
+class pokechmp_state : public driver_device
 {
-	uint8_t *ROM = memregion("maincpu")->base();
+public:
+	pokechmp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_mainbank(*this, "mainbank"),
+		m_okibank(*this, "okibank")
+	{ }
 
-	int bank;
+	void pokechmp(machine_config &config);
 
-	bank  = (data & 0x1) ? 0x04000 : 0x00000;
-	bank |= (data & 0x2) ? 0x10000 : 0x00000;
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
-	membank("bank1")->set_base(&ROM[bank]);
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_memory_bank m_mainbank;
+	required_memory_bank m_okibank;
+
+	tilemap_t *m_bg_tilemap = nullptr;
+
+	void main_bank_w(uint8_t data);
+	void oki_bank_w(uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	void flipscreen_w(uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(sound_irq);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void main_map(address_map &map);
+	void oki_map(address_map &map);
+	void sound_map(address_map &map);
+};
+
+
+// video
+
+void pokechmp_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
+}
+
+void pokechmp_state::flipscreen_w(uint8_t data)
+{
+	if (flip_screen() != (data & 0x80))
+	{
+		flip_screen_set(data & 0x80);
+		machine().tilemap().mark_all_dirty();
+	}
+}
+
+TILE_GET_INFO_MEMBER(pokechmp_state::get_bg_tile_info)
+{
+	int code = m_videoram[tile_index * 2 + 1] + ((m_videoram[tile_index * 2] & 0x3f) << 8);
+	int color = m_videoram[tile_index * 2] >> 6;
+
+	tileinfo.set(0, code, color, 0);
+}
+
+void pokechmp_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pokechmp_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+}
+
+void pokechmp_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int offs = 0; offs < m_spriteram.bytes(); offs += 4)
+	{
+		if (m_spriteram[offs] != 0xf8)
+		{
+			int sx = 240 - m_spriteram[offs + 2];
+			int sy = 240 - m_spriteram[offs];
+
+			int flipx = m_spriteram[offs + 1] & 0x04;
+			int flipy = m_spriteram[offs + 1] & 0x02;
+
+			if (flip_screen())
+			{
+				sx = 240 - sx;
+				sy = 240 - sy;
+				if (flipx) flipx = 0; else flipx = 1;
+				if (flipy) flipy = 0; else flipy = 1;
+			}
+
+			int tileno = m_spriteram[offs + 3];
+
+			if (m_spriteram[offs + 1] & 0x01) tileno += 0x100;
+			if (m_spriteram[offs + 1] & 0x08) tileno += 0x200;
+
+			m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+					tileno,
+					(m_spriteram[offs + 1] & 0xf0) >> 4,
+					flipx, flipy,
+					sx, sy, 0);
+		}
+	}
+}
+
+uint32_t pokechmp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect);
+	return 0;
 }
 
 
-void pokechmp_state::pokechmp_sound_bank_w(uint8_t data)
+// machine
+
+void pokechmp_state::machine_start()
 {
-	uint8_t *ROM = memregion("oki")->base();
-	membank("okibank")->set_base(&ROM[data*0x8000]);
+	m_mainbank->configure_entries(0, 2, memregion("maincpu")->base(), 0x4000);
+	m_mainbank->configure_entries(2, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
+
+	m_okibank->configure_entries(0, 16, memregion("oki")->base(), 0x8000);
+	m_okibank->set_entry(0x08);
 }
 
 
-void pokechmp_state::pokechmp_sound_w(uint8_t data)
+void pokechmp_state::main_bank_w(uint8_t data)
 {
-	m_soundlatch->write(data);
-	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	m_mainbank->set_entry(data & 0x03);
 }
 
 
+void pokechmp_state::oki_bank_w(uint8_t data)
+{
+	m_okibank->set_entry(data & 0x0f);
+}
 
 
-void pokechmp_state::pokechmp_map(address_map &map)
+void pokechmp_state::main_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x0800, 0x0fff).ram().w(FUNC(pokechmp_state::pokechmp_videoram_w)).share("videoram");
-	map(0x1000, 0x11ff).ram().share("spriteram");
+	map(0x0800, 0x0fff).ram().w(FUNC(pokechmp_state::videoram_w)).share(m_videoram);
+	map(0x1000, 0x11ff).ram().share(m_spriteram);
 
 	map(0x1800, 0x1800).portr("P1");
-	map(0x1801, 0x1801).w(FUNC(pokechmp_state::pokechmp_flipscreen_w));
-	/* 1800 - 0x181f are unused BAC-06 registers, see video/dec0.c */
+	map(0x1801, 0x1801).w(FUNC(pokechmp_state::flipscreen_w));
+	// 1800 - 0x181f are unused BAC-06 registers
 	map(0x1802, 0x181f).nopw();
 
-	map(0x1a00, 0x1a00).portr("P2").w(FUNC(pokechmp_state::pokechmp_sound_w));
-	map(0x1c00, 0x1c00).portr("DSW").w(FUNC(pokechmp_state::pokechmp_bank_w));
+	map(0x1a00, 0x1a00).portr("P2").w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x1c00, 0x1c00).portr("DSW").w(FUNC(pokechmp_state::main_bank_w));
 
-	/* Extra on Poke Champ (not on Pocket Gal) */
+	// Extra on Poke Champ (not on Pocket Gal)
 	map(0x2000, 0x23ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0x2400, 0x27ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 
-	map(0x4000, 0x7fff).bankr("bank1");
-	map(0x8000, 0xffff).bankr("fixed");
+	map(0x4000, 0x7fff).bankr(m_mainbank);
+	map(0x8000, 0xffff).rom().region("maincpu", 0x18000);
 }
 
 
 /***************************************************************************/
 
-void pokechmp_state::pokechmp_sound_map(address_map &map)
+void pokechmp_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
 	map(0x0800, 0x0801).w("ym1", FUNC(ym2203_device::write));
 	map(0x1000, 0x1001).w("ym2", FUNC(ym3812_device::write));
-	map(0x1800, 0x1800).nopw();    /* MSM5205 chip on Pocket Gal, not connected here? */
-	map(0x2000, 0x2000).w(FUNC(pokechmp_state::pokechmp_sound_bank_w)); /* sound rom bank seems to be replaced with OKI bank */
+	map(0x1800, 0x1800).nopw();    // MSM5205 chip on Pocket Gal, not connected here?
+	map(0x2000, 0x2000).w(FUNC(pokechmp_state::oki_bank_w)); // sound ROM bank seems to be replaced with OKI bank
 	map(0x2800, 0x2800).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // extra
-	map(0x3000, 0x3000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-//  map(0x3400, 0x3400).r(FUNC(pokechmp_state::pokechmp_adpcm_reset_r)); /* not on here */
-	map(0x4000, 0x7fff).bankr("bank3");
-	map(0x8000, 0xffff).rom();
+	map(0x3000, 0x3000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x8000, 0xffff).rom().region("audiocpu", 0x8000);
 }
 
 
-void pokechmp_state::pokechmp_oki_map(address_map &map)
+void pokechmp_state::oki_map(address_map &map)
 {
 	map(0x00000, 0x37fff).rom();
-	map(0x38000, 0x3ffff).bankr("okibank");
+	map(0x38000, 0x3ffff).bankr(m_okibank);
 }
 
 
@@ -149,7 +268,7 @@ static INPUT_PORTS_START( pokechmp )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 
-	PORT_START("DSW")   /* Dip switch */
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:8,7")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
@@ -164,46 +283,46 @@ static INPUT_PORTS_START( pokechmp )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:3") /* Affects Time: Normal=120 & Hardest=100 */
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:3") // Affects Time: Normal=120 & Hardest=100
 	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:2") /* Listed as "Number of Balls" in the manual */
-	PORT_DIPSETTING(    0x00, "3" ) /* Manual shows 2 */
-	PORT_DIPSETTING(    0x40, "4" ) /* Manual shows 3 */
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:1") /* Not shown or listed in the manual */
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:2") // Listed as "Number of Balls" in the manual
+	PORT_DIPSETTING(    0x00, "3" ) // Manual shows 2
+	PORT_DIPSETTING(    0x40, "4" ) // Manual shows 3
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:1") // Not shown or listed in the manual
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static const gfx_layout pokechmp_charlayout =
 {
-	8,8, /* 8*8 characters */
+	8,8, // 8*8 characters
 	RGN_FRAC(1,8),
 	8,
-	/* bizzare order, but it seems to be correct? */
+	// bizarre order, but it seems to be correct?
 	{ RGN_FRAC(1,8), RGN_FRAC(3,8),RGN_FRAC(0,8),RGN_FRAC(5,8),RGN_FRAC(2,8),RGN_FRAC(7,8),RGN_FRAC(4,8),RGN_FRAC(6,8) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8  /* every char takes 8 consecutive bytes */
+	8*8  // every char takes 8 consecutive bytes
 };
 
 
 
 static const gfx_layout pokechmp_spritelayout =
 {
-	16,16,  /* 16*16 sprites */
-	RGN_FRAC(1,4),   /* 1024 sprites */
+	16,16,  // 16*16 sprites
+	RGN_FRAC(1,4),   // 1024 sprites
 	4,
 	{RGN_FRAC(0,4),RGN_FRAC(1,4),RGN_FRAC(2,4),RGN_FRAC(3,4)},
 	{ 128+7, 128+6, 128+5, 128+4, 128+3, 128+2, 128+1, 128+0, 7, 6, 5, 4, 3, 2, 1, 0 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	32*8    /* every char takes 8 consecutive bytes */
+	32*8    // every char takes 8 consecutive bytes
 };
 
 
 static GFXDECODE_START( gfx_pokechmp )
-	GFXDECODE_ENTRY( "bgs", 0x00000, pokechmp_charlayout,   0x100, 4 ) /* chars */
-	GFXDECODE_ENTRY( "sprites", 0x00000, pokechmp_spritelayout,   0,  32 ) /* sprites */
+	GFXDECODE_ENTRY( "bgs", 0x00000, pokechmp_charlayout,   0x100, 4 )
+	GFXDECODE_ENTRY( "sprites", 0x00000, pokechmp_spritelayout,   0,  32 )
 GFXDECODE_END
 
 /*
@@ -228,20 +347,20 @@ WRITE_LINE_MEMBER(pokechmp_state::sound_irq)
 
 void pokechmp_state::pokechmp(machine_config &config)
 {
-	/* basic machine hardware */
-	M6502(config, m_maincpu, 4_MHz_XTAL/4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pokechmp_state::pokechmp_map);
+	// basic machine hardware
+	M6502(config, m_maincpu, 4_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pokechmp_state::main_map);
 
-	M6502(config, m_audiocpu, 4_MHz_XTAL/4);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &pokechmp_state::pokechmp_sound_map);
+	M6502(config, m_audiocpu, 4_MHz_XTAL / 4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &pokechmp_state::sound_map);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(pokechmp_state::screen_update_pokechmp));
+	screen.set_screen_update(FUNC(pokechmp_state::screen_update));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	screen.screen_vblank().append(FUNC(pokechmp_state::sound_irq));
@@ -249,31 +368,19 @@ void pokechmp_state::pokechmp(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pokechmp);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x400);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	YM2203(config, "ym1", XTAL(4'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.60);
+	YM2203(config, "ym1", 4_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 0.60);
 
-	YM3812(config, "ym2", XTAL(24'000'000)/16).add_route(ALL_OUTPUTS, "mono", 1.0);
+	YM3812(config, "ym2", 24_MHz_XTAL / 16).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	okim6295_device &oki(OKIM6295(config, "oki", XTAL(24'000'000)/16, okim6295_device::PIN7_LOW));
-	oki.add_route(ALL_OUTPUTS, "mono", 0.50); /* sound fx */
+	okim6295_device &oki(OKIM6295(config, "oki", 24_MHz_XTAL / 16, okim6295_device::PIN7_LOW));
 	oki.add_route(ALL_OUTPUTS, "mono", 0.50);
-	oki.set_addrmap(0, &pokechmp_state::pokechmp_oki_map);
-}
-
-void pokechmp_state::init_pokechmp()
-{
-	// default sound rom bank
-	membank("bank3")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0x4000);
-
-	// default fixed area for main CPU
-	membank("fixed")->set_base( memregion("maincpu")->base() + 0x18000 );
-
-	// default OKI sample bank
-	membank("okibank")->set_base( memregion("oki")->base() + 0x40000 );
+	oki.add_route(ALL_OUTPUTS, "mono", 0.50);
+	oki.set_addrmap(0, &pokechmp_state::oki_map);
 }
 
 
@@ -281,9 +388,8 @@ ROM_START( pokechmp )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "pokechamp_11_27010.bin", 0x00000, 0x20000, CRC(9afb6912) SHA1(e45da9524e3bb6f64a68200b70d0f83afe6e4379) )
 
-	ROM_REGION( 0x18000, "audiocpu", 0 )     /* 96k for code + 96k for decrypted opcodes */
-	ROM_LOAD( "pokechamp_09_27c512.bin",       0x10000, 0x8000, CRC(c78f6483) SHA1(a0d063effd8d1850f674edccb6e7a285b2311d21) )
-	ROM_CONTINUE(              0x08000, 0x8000 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "pokechamp_09_27c512.bin", 0x00000, 0x10000, CRC(c78f6483) SHA1(a0d063effd8d1850f674edccb6e7a285b2311d21) ) // 0xxxxxxxxxxxxxxx = 0x00
 
 	ROM_REGION( 0x100000, "bgs", 0 )
 	ROM_LOAD( "pokechamp_05_27c020.bin",       0x00000, 0x40000, CRC(554cfa42) SHA1(862d0dd83697da7bd52dc640c34926c62691afea) )
@@ -292,7 +398,7 @@ ROM_START( pokechmp )
 	ROM_LOAD( "pokechamp_08_27c020.bin",       0xc0000, 0x40000, CRC(e9db54d6) SHA1(ac3b7c06d0f61847bf9bc6147f2f88d712f2b4b3) )
 
 	ROM_REGION( 0x20000, "sprites", 0 )
-	/* the first half of all these roms is identical.  For rom 3 both halves match.  Correct decode is to ignore the first half */
+	// the first half of all these ROMs is identical.  For ROM 3 both halves match.  Correct decode is to ignore the first half
 	ROM_LOAD( "pokechamp_02_27c512.bin",       0x00000, 0x08000, CRC(1ff44545) SHA1(2eee44484accce7b0ba21babf6e8344b234a4e87) ) ROM_CONTINUE( 0x00000, 0x8000 )
 	ROM_LOAD( "pokechamp_01_27c512.bin",       0x08000, 0x08000, CRC(338fc412) SHA1(bb8ae99ee6a399a8c67bedb88d0837fd0a4a426c) ) ROM_CONTINUE( 0x08000, 0x8000 )
 	ROM_LOAD( "pokechamp_04_27c512.bin",       0x10000, 0x08000, CRC(ee6991af) SHA1(8eca3cdfd2eb74257253957a87b245b7f85bd038) ) ROM_CONTINUE( 0x10000, 0x8000 )
@@ -303,13 +409,12 @@ ROM_START( pokechmp )
 ROM_END
 
 // only the 'maincpu' and 'bgs' regions were dumped for this set, others assumed to be the same
-ROM_START( pokechmpa )
+ROM_START( pokechmpa ) // PCB: DGRM NO 1342
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "1", 0x00000, 0x20000, CRC(7d051c36) SHA1(8c2329f863ad677f4398a7dab7476c9492ad4f24) )
 
-	ROM_REGION( 0x18000, "audiocpu", 0 )     /* 96k for code + 96k for decrypted opcodes */
-	ROM_LOAD("pokechamp_09_27c512.bin", 0x10000, 0x8000, CRC(c78f6483) SHA1(a0d063effd8d1850f674edccb6e7a285b2311d21))
-	ROM_CONTINUE(              0x08000, 0x8000 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD("pokechamp_09_27c512.bin", 0x00000, 0x10000, CRC(c78f6483) SHA1(a0d063effd8d1850f674edccb6e7a285b2311d21)) // 0xxxxxxxxxxxxxxx = 0x00
 
 	ROM_REGION( 0x100000, "bgs", 0 )
 	ROM_LOAD( "6",       0x00000, 0x40000, CRC(1aec1de2) SHA1(f42db2445dcf1fb0957bf8a4414c3266ae47fae1) )
@@ -318,7 +423,7 @@ ROM_START( pokechmpa )
 	ROM_LOAD( "3",       0xc0000, 0x40000, CRC(a22946b8) SHA1(d77fb5bfe00349753a9e6ea9de82c1eefca090f7) )
 
 	ROM_REGION( 0x20000, "sprites", 0 )
-	/* the first half of all these roms is identical.  For rom 3 both halves match.  Correct decode is to ignore the first half */
+	// the first half of all these ROMs is identical.  For ROM 3 both halves match.  Correct decode is to ignore the first half
 	ROM_LOAD( "pokechamp_02_27c512.bin",       0x00000, 0x08000, CRC(1ff44545) SHA1(2eee44484accce7b0ba21babf6e8344b234a4e87) ) ROM_CONTINUE( 0x00000, 0x8000 )
 	ROM_LOAD( "pokechamp_01_27c512.bin",       0x08000, 0x08000, CRC(338fc412) SHA1(bb8ae99ee6a399a8c67bedb88d0837fd0a4a426c) ) ROM_CONTINUE( 0x08000, 0x8000 )
 	ROM_LOAD( "pokechamp_04_27c512.bin",       0x10000, 0x08000, CRC(ee6991af) SHA1(8eca3cdfd2eb74257253957a87b245b7f85bd038) ) ROM_CONTINUE( 0x10000, 0x8000 )
@@ -333,9 +438,8 @@ ROM_START(billlist)
 	ROM_REGION(0x20000, "maincpu", 0)
 	ROM_LOAD("billiard_list.1", 0x00000, 0x20000, CRC(4ef416f7) SHA1(e995410e2c79a3fbd2ac76a80dc6c412eb454e52) )
 
-	ROM_REGION(0x18000, "audiocpu", 0)     /* 96k for code + 96k for decrypted opcodes */
-	ROM_LOAD("pokechamp_09_27c512.bin", 0x10000, 0x8000, CRC(c78f6483) SHA1(a0d063effd8d1850f674edccb6e7a285b2311d21))
-	ROM_CONTINUE(0x08000, 0x8000)
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("pokechamp_09_27c512.bin", 0x00000, 0x10000, CRC(c78f6483) SHA1(a0d063effd8d1850f674edccb6e7a285b2311d21)) // 0xxxxxxxxxxxxxxx = 0x00
 
 	ROM_REGION(0x100000, "bgs", 0)
 	ROM_LOAD("billiard_list.6", 0x00000, 0x40000, CRC(e674f7c0) SHA1(8a610a92ae141f3004497dc3ce102d07a178683f) )
@@ -344,7 +448,7 @@ ROM_START(billlist)
 	ROM_LOAD("billiard_list.3", 0xc0000, 0x40000, CRC(1ac4fa42) SHA1(2da5c6aa7e6b34ad1a2f052a41a2e607e2f904c2) )
 
 	ROM_REGION(0x20000, "sprites", 0)
-	/* the first half of all these roms is identical.  For rom 3 both halves match.  Correct decode is to ignore the first half */
+	// the first half of all these ROMs is identical.  For ROM 3 both halves match.  Correct decode is to ignore the first half
 	ROM_LOAD("pokechamp_02_27c512.bin", 0x00000, 0x08000, CRC(1ff44545) SHA1(2eee44484accce7b0ba21babf6e8344b234a4e87)) ROM_CONTINUE(0x00000, 0x8000)
 	ROM_LOAD("pokechamp_01_27c512.bin", 0x08000, 0x08000, CRC(338fc412) SHA1(bb8ae99ee6a399a8c67bedb88d0837fd0a4a426c)) ROM_CONTINUE(0x08000, 0x8000)
 	ROM_LOAD("pokechamp_04_27c512.bin", 0x10000, 0x08000, CRC(ee6991af) SHA1(8eca3cdfd2eb74257253957a87b245b7f85bd038)) ROM_CONTINUE(0x10000, 0x8000)
@@ -354,6 +458,9 @@ ROM_START(billlist)
 	ROM_LOAD("billiard_list.x", 0x00000, 0x80000, CRC(b54806ed) SHA1(c6e1485c263ebd9102ff1e8c09b4c4ca5f63c3da) )
 ROM_END
 
-GAME( 1995, pokechmp, 0,        pokechmp, pokechmp, pokechmp_state, init_pokechmp, ROT0, "D.G.R.M.", "Poke Champ (set 1)", 0 )
-GAME( 1995, pokechmpa,pokechmp, pokechmp, pokechmp, pokechmp_state, init_pokechmp, ROT0, "D.G.R.M.", "Poke Champ (set 2)", 0 )
-GAME( 1995, billlist, pokechmp, pokechmp, pokechmp, pokechmp_state, init_pokechmp, ROT0, "D.G.R.M.", "Billard List", 0)
+} // anonymous namespace
+
+
+GAME( 1995, pokechmp,  0,        pokechmp, pokechmp, pokechmp_state, empty_init, ROT0, "D.G.R.M.", "Poke Champ (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, pokechmpa, pokechmp, pokechmp, pokechmp, pokechmp_state, empty_init, ROT0, "D.G.R.M.", "Poke Champ (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, billlist,  pokechmp, pokechmp, pokechmp, pokechmp_state, empty_init, ROT0, "D.G.R.M.", "Billard List",       MACHINE_SUPPORTS_SAVE )
