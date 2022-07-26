@@ -4,6 +4,25 @@ license:CC0
 -->
 <mamelayout version="2">
 
+<!-- luascript (-plugin layout), for pressing 2 buttons simultaneously -->
+
+	<script><![CDATA[
+		local layout = {}
+		local prev_state = 0
+
+		function layout.frame()
+			local cur_state = machine.ioport.ports[":CLICKABLE"]:read() & 1
+			if cur_state ~= prev_state then
+				machine.ioport.ports[":KEY"]:field(0x40):set_value(cur_state)
+				machine.ioport.ports[":KEY"]:field(0x80):set_value(cur_state)
+			end
+			prev_state = cur_state
+		end
+
+		return layout
+	]]></script>
+
+
 <!-- define elements -->
 
 	<element name="led" defstate="0">
@@ -23,6 +42,10 @@ license:CC0
 			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
 			<color red="0.7" green="0.7" blue="0.7" />
 		</rect>
+	</element>
+
+	<element name="nothing" defstate="0">
+		<rect><color alpha="0" /></rect>
 	</element>
 
 	<element name="text_1">       <text string="1">        <color red="0.9" green="0.9" blue="0.9" /></text> </element>
@@ -368,14 +391,18 @@ license:CC0
 	<group name="panel2">
 		<bounds left="0" right="24" top="11" bottom="24" />
 
-		<element ref="hlb" inputtag="KEY" inputmask="0x04">   <bounds x="0.5"  y="11" width="5" height="1" /> </element>
-		<element ref="hlb" inputtag="KEY" inputmask="0x08">   <bounds x="6.5"  y="11" width="5" height="1" /> </element>
-		<element ref="hlb" inputtag="KEY" inputmask="0x10">   <bounds x="12.5" y="11" width="5" height="1" /> </element>
-		<element ref="hlb" inputtag="KEY" inputmask="0x20">   <bounds x="18.5" y="11" width="5" height="1" /> </element>
-		<element ref="hlb" inputtag="KEY" inputmask="0x40">   <bounds x="0.5"  y="20" width="5" height="1" /> </element>
-		<element ref="hlb" inputtag="KEY" inputmask="0x80">   <bounds x="6.5"  y="20" width="5" height="1" /> </element>
-		<element ref="hlb" inputtag="KEY" inputmask="0x02">   <bounds x="12.5" y="20" width="5" height="1" /> </element>
-		<element ref="hlb" inputtag="KEY" inputmask="0x01">   <bounds x="18.5" y="20" width="5" height="1" /> </element>
+		<element ref="hlb" inputtag="KEY" inputmask="0x04"><bounds x="0.5"  y="11" width="5" height="1" /></element>
+		<element ref="hlb" inputtag="KEY" inputmask="0x08"><bounds x="6.5"  y="11" width="5" height="1" /></element>
+		<element ref="hlb" inputtag="KEY" inputmask="0x10"><bounds x="12.5" y="11" width="5" height="1" /></element>
+		<element ref="hlb" inputtag="KEY" inputmask="0x20"><bounds x="18.5" y="11" width="5" height="1" /></element>
+
+		<element ref="nothing" inputtag="CLICKABLE" inputmask="0x01"><bounds x="0.5" y="20" width="5" height="1" /></element>
+		<element ref="nothing" inputtag="CLICKABLE" inputmask="0x01"><bounds x="6.5" y="20" width="5" height="1" /></element>
+		<element ref="hlb" inputtag="KEY" inputmask="0x40"><bounds x="0.5" y="20" width="5" height="1" /></element>
+		<element ref="hlb" inputtag="KEY" inputmask="0x80"><bounds x="6.5" y="20" width="5" height="1" /></element>
+
+		<element ref="hlb" inputtag="KEY" inputmask="0x02"><bounds x="12.5" y="20" width="5" height="1" /></element>
+		<element ref="hlb" inputtag="KEY" inputmask="0x01"><bounds x="18.5" y="20" width="5" height="1" /></element>
 
 		<element ref="text_up">       <bounds x="0.5"  y="12.5" width="5"  height="1.4" /> </element>
 		<element ref="text_down">     <bounds x="6.5"  y="12.5" width="5"  height="1.4" /> </element>

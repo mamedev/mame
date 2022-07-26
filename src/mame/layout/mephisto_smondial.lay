@@ -31,14 +31,9 @@ license:CC0
 		</rect>
 	</element>
 	<element name="hlb" defstate="0">
-		<text string=" ">
-			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
-			<color red="0.0" green="0.0" blue="0.0" />
-		</text>
-		<disk state="1">
-			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+		<rect state="1">
 			<color red="1.0" green="1.0" blue="1.0" />
-		</disk>
+		</rect>
 	</element>
 
 	<element name="led7seg_background"><rect><color red="0.54" green="0.57" blue="0.58" />      </rect></element>
