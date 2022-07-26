@@ -194,22 +194,11 @@ INPUT_PORTS_END
 */
 
 
-static const gfx_layout layout16x16 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4), STEP8(4*8*16,4) },
-	{ STEP16(0,4*8) },
-	16*16*4
-};
-
 static GFXDECODE_START( gfx_ginganin )
-	GFXDECODE_ENTRY( "gfx1", 0, layout16x16,          256*3, 16 ) /* [0] bg */
-	GFXDECODE_ENTRY( "gfx2", 0, layout16x16,          256*2, 16 ) /* [1] fg */
-	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_packed_msb, 256*0, 16 ) /* [2] txt */
-	GFXDECODE_ENTRY( "gfx4", 0, layout16x16,          256*1, 16 ) /* [3] sprites */
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_col_2x2_group_packed_msb, 256*3, 16 ) /* [0] bg */
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_col_2x2_group_packed_msb, 256*2, 16 ) /* [1] fg */
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_packed_msb,               256*0, 16 ) /* [2] txt */
+	GFXDECODE_ENTRY( "gfx4", 0, gfx_8x8x4_col_2x2_group_packed_msb, 256*1, 16 ) /* [3] sprites */
 GFXDECODE_END
 
 
