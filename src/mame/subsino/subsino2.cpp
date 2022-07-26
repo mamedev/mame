@@ -2996,7 +2996,7 @@ void subsino2_state::mtrain(machine_config &config)
 
 void subsino2_state::saklove(machine_config &config)
 {
-	I80188(config, m_maincpu, XTAL(20'000'000)*2);    // !! AMD AM188-EM !!
+	AM188EM(config, m_maincpu, XTAL(20'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino2_state::saklove_map);
 	m_maincpu->set_addrmap(AS_IO, &subsino2_state::saklove_io);
 
@@ -3031,7 +3031,7 @@ void subsino2_state::saklove(machine_config &config)
 
 void subsino2_state::xplan(machine_config &config)
 {
-	I80188(config, m_maincpu, XTAL(20'000'000)*2);    // !! AMD AM188-EM !!
+	AM188EM(config, m_maincpu, XTAL(20'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino2_state::xplan_map);
 	m_maincpu->set_addrmap(AS_IO, &subsino2_state::xplan_io);
 
@@ -3045,7 +3045,7 @@ void subsino2_state::xplan(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);   // game reads vblank state
 	m_screen->set_screen_update(FUNC(subsino2_state::screen_update_subsino2));
 	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set("maincpu", FUNC(i80188_cpu_device::int0_w));
+	m_screen->screen_vblank().set("maincpu", FUNC(am188em_device::int0_w));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ss9601);
 	PALETTE(config, m_palette).set_entries(256);
