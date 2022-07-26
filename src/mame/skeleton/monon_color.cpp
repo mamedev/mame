@@ -31,7 +31,7 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_mainram(*this, "mainram"),
-		m_otherram(*this, "otherram"),
+		//m_otherram(*this, "otherram"),
 		m_bootcopy(0)
 	{ }
 
@@ -51,7 +51,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_mainram;
-	required_shared_ptr<uint8_t> m_otherram;
+	//required_shared_ptr<uint8_t> m_otherram;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
@@ -73,8 +73,6 @@ void monon_color_state::machine_start()
 
 void monon_color_state::machine_reset()
 {
-	m_maincpu->set_state_int(MCS51_PC, 0x4000);
-
 	uint8_t* flash = memregion("flash")->base();
 	uint8_t* maincpu = &m_mainram[0];
 
@@ -130,7 +128,7 @@ INPUT_PORTS_END
 void monon_color_state::monon_color_map(address_map &map)
 {
 	map(0x4000, 0x6fff).ram().share("mainram");
-	map(0x9000, 0x9fff).ram().share("otherram"); // lots of jumps to here, is there some kind of BIOS? none of the code appears to map here?
+//	map(0x9000, 0x9fff).rom() // internal to CPU
 }
 
 void monon_color_state::monon_color(machine_config &config)
