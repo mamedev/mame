@@ -451,8 +451,7 @@
 
 #include <algorithm>
 
-namespace
-{
+namespace {
 
 class mastboy_state : public driver_device
 {
@@ -1078,7 +1077,7 @@ ROM_END
 GAME( 1991, mastboy,   0,       mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco", "Master Boy (Spanish, rev A)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1991, mastboya,  mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco", "Master Boy (Spanish, rev A, hack?)", MACHINE_SUPPORTS_SAVE )
 
-// There were specific Gaelco Master Boy PCBs for the Italian market, silkcreened on Italian instead of on Spanish ("DOMANDE ROMS", "MASTER-BOY VERSIONE", etc.).
+// There were specific Gaelco Master Boy PCBs for the Italian market, silkcreened in Italian instead of in Spanish ("DOMANDE ROMS", "MASTER-BOY VERSIONE", etc.).
 GAME( 1991, mastboyi,  mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy (Italian, rev A, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, mastboyia, mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy (Italian, rev A, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, mastboyib, mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy (Italian, rev A, set 3)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // Questions from 1992, needs a different MCU program
