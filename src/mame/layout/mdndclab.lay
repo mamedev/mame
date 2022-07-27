@@ -72,7 +72,7 @@ license:CC0
 			for num, col in pairs(walls) do
 				if col[1] < x and (col[1] + 2.5) > x then
 					for num2, wall in pairs(col[2]) do
-							if wall < y and (wall + 7.5) > y then
+						if wall < y and (wall + 7.5) > y then
 							local state = machine.output:get_indexed_value("colwall", (num * 10) + num2)
 							machine.output:set_indexed_value("colwall", (num * 10) + num2, (~state) & 1)
 							return
