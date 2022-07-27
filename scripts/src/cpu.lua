@@ -1100,7 +1100,7 @@ if opt_tool(CPUS, "MCS51") then
 end
 
 --------------------------------------------------
--- Intel 8051 and derivatives
+-- Appotech AXC-51 (extended Intel 8051)
 --@src/devices/cpu/axc51/axc51.h,CPUS["AXC51"] = true
 --------------------------------------------------
 
