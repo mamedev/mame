@@ -554,7 +554,7 @@ namespace {
 /***************************************************************************
 
   Nintendo Game & Watch: Ball (model AC-01)
-  * PCB label AC-01
+  * PCB label: AC-01
   * Sharp SM5A label AC-01 5009 (no decap)
   * lcd screen with custom segments, 1-bit sound
 
@@ -617,7 +617,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Flagman (model FL-02)
-  * PCB label FL-02
+  * PCB label: FL-02
   * Sharp SM5A label FL-02 2005 (no decap)
   * lcd screen with custom segments, 1-bit sound
 
@@ -684,7 +684,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Vermin (model MT-03)
-  * PCB label MT-03
+  * PCB label: MT-03
   * Sharp SM5A label MT-03 5012 (no decap)
   * lcd screen with custom segments, 1-bit sound
 
@@ -747,7 +747,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Fire (model RC-04)
-  * PCB label RC-04
+  * PCB label: RC-04
   * Sharp SM5A label RC-04 5103 (no decap)
   * lcd screen with custom segments, 1-bit sound
 
@@ -812,7 +812,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Judge (model IP-05)
-  * PCB label IP-05
+  * PCB label: IP-05
   * Sharp SM5A label IP-05 5010, or IP-15 5012 (no decap)
   * lcd screen with custom segments, 1-bit sound
 
@@ -889,7 +889,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Manhole (model MH-06)
-  * PCB label MH-06
+  * PCB label: MH-06
   * Sharp SM5A label MH-06 5104 (no decap)
   * lcd screen with custom segments, 1-bit sound
 
@@ -960,7 +960,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Helmet (model CN-07)
-  * PCB label CN-07
+  * PCB label: CN-07
   * Sharp SM5A label CN-07 5102, or CN-17 21ZA (no decap)
   * lcd screen with custom segments, 1-bit sound
 
@@ -1040,7 +1040,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Lion (model LN-08)
-  * PCB label LN-08
+  * PCB label: LN-08
   * Sharp SM5A label LN-08 519A (no decap)
   * lcd screen with custom segments, 1-bit sound
 
@@ -1117,7 +1117,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Parachute (model PR-21)
-  * PCB label PR-21Y
+  * PCB label: PR-21Y
   * Sharp SM5A label PR-21 52XC (no decap)
   * lcd screen with custom segments, 1-bit sound
 
@@ -1185,7 +1185,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Octopus (model OC-22)
-  * PCB label OC-22Y A
+  * PCB label: OC-22Y A
   * Sharp SM5A label OC-22 204A (no decap)
   * lcd screen with custom segments, 1-bit sound
 
@@ -1271,7 +1271,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Popeye (model PP-23)
-  * PCB label PP-23 Y
+  * PCB label: PP-23 Y
   * Sharp SM5A label PP-23 52YD (no decap)
   * lcd screen with custom segments, 1-bit sound
 
@@ -1341,7 +1341,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Chef (model FP-24)
-  * PCB label FP-24
+  * PCB label: FP-24
   * Sharp SM5A label FP-24 51YB (die label CMS646, ROM ID 74)
   * lcd screen with custom segments, 1-bit sound
 
@@ -1424,7 +1424,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Mickey Mouse (model MC-25), Egg (model EG-26)
-  * PCB label MC-25 EG-26 (yes, both listed)
+  * PCB label: MC-25 EG-26 (yes, both listed)
   * Sharp SM5A label MC-25 51YD (Mickey Mouse), MC-25 519D (Egg) (no decap)
   * lcd screen with custom segments, 1-bit sound
 
@@ -1720,7 +1720,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Fire (model FR-27)
-  * PCB label FR-27
+  * PCB label: FR-27
   * Sharp SM5A label FR-27 523B (no decap)
   * lcd screen with custom segments, 1-bit sound
 
@@ -1810,7 +1810,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Turtle Bridge (model TL-28)
-  * PCB label TL-28
+  * PCB label: TL-28
   * Sharp SM510 label TL-28 523C (no decap)
   * lcd screen with custom segments, 1-bit sound
 
@@ -1881,7 +1881,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Fire Attack (model ID-29)
-  * PCB label ID-29
+  * PCB label: ID-29
   * Sharp SM510 label ID-29 524B (no decap)
   * lcd screen with custom segments, 1-bit sound
 
@@ -1948,7 +1948,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Snoopy Tennis (model SP-30)
-  * PCB label SP-30
+  * PCB label: SP-30
   * Sharp SM510 label SP-30 525B (no decap)
   * lcd screen with custom segments, 1-bit sound
 
@@ -2015,7 +2015,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Oil Panic (model OP-51)
-  * PCB label OP-51A
+  * PCB label: OP-51A
   * Sharp SM510 label OP-51 28ZB (no decap)
   * vertical dual lcd screens with custom segments, 1-bit sound
 
@@ -2085,7 +2085,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Donkey Kong (model DK-52)
-  * PCB label DK-52C
+  * PCB label: DK-52C
   * Sharp SM510 label DK-52 52ZD (no decap)
   * vertical dual lcd screens with custom segments, 1-bit sound
 
@@ -2154,7 +2154,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Mickey & Donald (model DM-53)
-  * PCB label DM-53
+  * PCB label: DM-53
   * Sharp SM510 label DM-53 52ZC (die label CMS54C, CMS565)
   * vertical dual lcd screens with custom segments, 1-bit sound
 
@@ -2221,7 +2221,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Green House (model GH-54)
-  * PCB label GH-54
+  * PCB label: GH-54
   * Sharp SM510 label GH-54 52ZD (no decap)
   * vertical dual lcd screens with custom segments, 1-bit sound
 
@@ -2298,7 +2298,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Donkey Kong II (model JR-55)
-  * PCB label JR-55
+  * PCB label: JR-55
   * Sharp SM510 label JR-55 53YC (die label CMS54C, KMS560)
   * vertical dual lcd screens with custom segments, 1-bit sound
 
@@ -2367,7 +2367,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Mario Bros. (model MW-56)
-  * PCB label MW-56-M-I (left), MW-56-S (right)
+  * PCB label: MW-56-M-I (left), MW-56-S (right)
   * Sharp SM510 label MW-56 533C (no decap)
   * horizontal dual lcd screens with custom segments, 1-bit sound
 
@@ -2583,7 +2583,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Pinball (model PB-59)
-  * PCB label PB-59
+  * PCB label: PB-59
   * Sharp SM511 label PB-59 53ZD (no decap)
   * vertical dual lcd screens with custom segments, 1-bit sound
 
@@ -2656,7 +2656,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Black Jack (model BJ-60)
-  * PCB label BJ-60
+  * PCB label: BJ-60
   * Sharp SM512 label BJ-60 564D (no decap)
   * vertical dual lcd screens with custom segments, 1-bit sound
 
@@ -2719,7 +2719,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Squish (model MG-61)
-  * PCB label MG-61
+  * PCB label: MG-61
   * Sharp SM510 label MG-61 8841B (no decap)
   * vertical dual lcd screens with custom segments, 1-bit sound
 
@@ -2792,7 +2792,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Bomb Sweeper (model BD-62)
-  * PCB label BD-62
+  * PCB label: BD-62
   * Sharp SM512 label BD-62 8727 A (no decap)
   * vertical dual lcd screens with custom segments, 1-bit sound
 
@@ -2865,7 +2865,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Safe Buster (model JB-63)
-  * PCB label JB-63
+  * PCB label: JB-63
   * Sharp SM511 label JB-63 8841 B (no decap)
   * vertical dual lcd screens with custom segments, 1-bit sound
 
@@ -2937,7 +2937,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Gold Cliff (model MV-64)
-  * PCB label MV-64
+  * PCB label: MV-64
   * Sharp SM512 label MV-64 9027 A (no decap)
   * vertical dual lcd screens with custom segments, 1-bit sound
 
@@ -3014,7 +3014,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Zelda (model ZL-65)
-  * PCB label ZL-65
+  * PCB label: ZL-65
   * Sharp SM512 label ZL-65 8935 A (no decap)
   * vertical dual lcd screens with custom segments, 1-bit sound
 
@@ -3716,7 +3716,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Manhole (model NH-103)
-  * PCB label NH-103
+  * PCB label: NH-103
   * Sharp SM510 label NH-103 538A (no decap)
   * lcd screen with custom segments, 1-bit sound
 
@@ -3787,7 +3787,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Tropical Fish (model TF-104)
-  * PCB label TF-104
+  * PCB label: TF-104
   * Sharp SM510 label TF-104 8739A (no decap)
   * lcd screen with custom segments, 1-bit sound
 
@@ -3849,10 +3849,10 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Super Mario Bros. (model: see below)
-  * PCB label YM-801 (Crystal Screen), YM-105 (New Wide Screen)
+  * PCB label: YM-801 (Crystal Screen), YM-105 (New Wide Screen)
   * Sharp SM511
-     - label YM-801 8034A (crystal screen) (not dumped yet)
-     - label YM-105 9024B (new wide screen version) (die label ?)
+     - label YM-801 8034A (Crystal Screen) (not dumped yet)
+     - label YM-105 9024B (New Wide Screen) (die label ?)
   * lcd screen with custom segments, 1-bit sound
 
   First released in 1986 on Crystal Screen (model YM-801), rereleased on
@@ -3944,10 +3944,10 @@ ROM_END
 
   Nintendo Game & Watch: Climber Crystal Screen (model DR-802),
   Nintendo Game & Watch: Climber New Wide Screen (model DR-106)
-  * PCB label DR-802 (Crystal Screen), DR-106 (New Wide Screen)
+  * PCB label: DR-802 (Crystal Screen), DR-106 (New Wide Screen)
   * Sharp SM511
-     - label DR-802 8626A (crystal screen) (not dumped yet)
-     - label DR-106 9038B (new wide screen version) (no decap)
+     - label DR-802 8626A (Crystal Screen) (not dumped yet)
+     - label DR-106 9038B (New Wide Screen) (no decap)
   * lcd screen with custom segments, 1-bit sound
 
   First released in 1986 on Crystal Screen (model DR-802), rereleased on
@@ -4039,12 +4039,10 @@ ROM_END
 
   Nintendo Game & Watch: Balloon Fight Crystal Screen (model BF-803),
   Nintendo Game & Watch: Balloon Fight New Wide Screen (model BF-107)
-  * PCB labels
-     - DR-802-2 (Crystal Screen)
-     - DR-106 (new wide screen version)
+  * PCB label: DR-802-2 (Crystal Screen), DR-106 (New Wide Screen)
   * Sharp SM511
-     - label BF-803 8646A (crystal screen) (not dumped yet)
-     - label BF-107 9031B (new wide screen version) (no decap)
+     - label BF-803 8646A (Crystal Sscreen) (not dumped yet)
+     - label BF-107 9031B (New Wide Screen) (no decap)
   * lcd screen with custom segments, 1-bit sound
 
   First released in 1986 on Crystal Screen (model BF-803), rereleased on
@@ -4137,7 +4135,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Mario The Juggler (model MB-108)
-  * PCB label MB-108
+  * PCB label: MB-108
   * Sharp SM511 label MB-108 9209B (no decap)
   * lcd screen with custom segments, 1-bit sound
 
@@ -4202,7 +4200,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Spitball Sparky (model BU-201)
-  * PCB label BU-201
+  * PCB label: BU-201
   * Sharp SM510 label BU-201 542A (no decap)
   * lcd screen with custom segments, 1-bit sound
 
@@ -4269,7 +4267,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Game & Watch: Crab Grab (model UD-202)
-  * PCB label UD-202
+  * PCB label: UD-202
   * Sharp SM510 label UD-202 542B (no decap)
   * lcd screen with custom segments, 1-bit sound
 
@@ -4433,7 +4431,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Micro Vs. System: Donkey Kong 3 (model AK-302)
-  * PCB label AK-302M
+  * PCB label: AK-302M
   * Sharp SM511 label AK-302 299D (no decap)
   * wide lcd screen with custom segments, 1-bit sound
 
@@ -4485,7 +4483,7 @@ ROM_END
 /***************************************************************************
 
   Nintendo Micro Vs. System: Donkey Kong Hockey (model HK-303)
-  * PCB label HK-303M
+  * PCB label: HK-303M
   * Sharp SM511 label HK-303 57XD (no decap)
   * wide lcd screen with custom segments, 1-bit sound
 
@@ -4542,7 +4540,7 @@ ROM_END
 /***************************************************************************
 
   Telko Bassmate Computer (model BM-501)
-  * PCB label BM-501
+  * PCB label: BM-501
   * Sharp SM511 label BM-501 556AA (no decap)
   * vertical dual lcd screens with custom segments, 1-bit sound
 
@@ -4687,7 +4685,7 @@ ROM_END
 /***************************************************************************
 
   Konami Top Gun
-  * PCB label BH003
+  * PCB label: BH003
   * Sharp SM510 under epoxy (die label CMS54C, KMS598)
   * lcd screen with custom segments, 1-bit sound
 
@@ -4748,7 +4746,7 @@ ROM_END
 /***************************************************************************
 
   Konami Contra
-  * PCB label BH002
+  * PCB label: BH002
   * Sharp SM511 under epoxy (die label KMS73B, KMS773)
   * lcd screen with custom segments, 1-bit sound
 
@@ -4817,7 +4815,7 @@ ROM_END
 /***************************************************************************
 
   Konami Teenage Mutant Ninja Turtles
-  * PCB label BH005
+  * PCB label: BH005
   * Sharp SM511 under epoxy (die label KMS73B, KMS774)
   * lcd screen with custom segments, 1-bit sound
 
@@ -4882,7 +4880,7 @@ ROM_END
 /***************************************************************************
 
   Konami Gradius
-  * PCB label BH004
+  * PCB label: BH004
   * Sharp SM511 under epoxy (die label KMS73B, KMS774)
   * lcd screen with custom segments, 1-bit sound
 
@@ -4944,7 +4942,7 @@ ROM_END
 /***************************************************************************
 
   Konami Lone Ranger
-  * PCB label BH009
+  * PCB label: BH009
   * Sharp SM511 under epoxy (die label KMS73B, KMS781)
   * lcd screen with custom segments, 1-bit sound
 
@@ -5004,7 +5002,7 @@ ROM_END
 /***************************************************************************
 
   Konami Blades of Steel
-  * PCB label BH011
+  * PCB label: BH011
   * Sharp SM511 under epoxy (die label KMS73B, KMS782)
   * lcd screen with custom segments, 1-bit sound
 

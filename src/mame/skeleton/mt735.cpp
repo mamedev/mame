@@ -1,7 +1,67 @@
 // license:BSD-3-Clause
 // copyright-holders:Cowering, Olivier Galibert
 /*
-  Brother MT735 thermal printer
+  Mannesmann Tally MT735 portable thermal printer
+  Also released by Siemens as HighPrint 730/735 Compact?
+
+  Designed by Siemens Office Products Division
+
+  Features:
+    - 6ppm
+    - 1MB of RAM (178KB used for downloaded soft fonts, 50KB input buffer)
+    - 18 resident Portrait and Landscape fonts
+    - print resolution of 300x300 dpi
+    - four standard emulations (HP LaserJet Series II, HP DeskJet Plus, IBM Proprinter X24, Epson LQ850)
+    - one Centronics parallel port
+    - 5 buttons (Power, On-line, Print Quality, Form-feed, Copy)
+    - 5 LEDs (Battery Check, Charger Active, Ribbon/Paper, Power, On-Line)
+
+  2 dipswitches (strings from ROM)
+   - = switched off
+   o = switched on
+
+  - - - - PC-8
+  - - - o HP Roman-8
+  - - o - PC-8 Den/Nor
+  - - o o ISO 04 UK
+  - o - - ISO 21 GER
+  - o - o ISO 69 FRA
+  - o o - ISO 15 ITA
+  - o o o ISO 60 NOR
+  o - - - ISO 11 SWN
+  o - - o ISO 17 SPA
+  o - o - ISO 06 ASCII US
+  o - o o ISO 16 PORT
+  o o - - ISO 14 JAP
+  o o - o ISO 02 IRV / Denmark 1
+  o o o - ECMA-94
+  o o o o Legal / PC-8/DOWN LOAD
+          - -     HP LaserJet Series II
+          - o     HP DeskJet Plus
+          o -     IBM Proprinter 4207 001
+          o o     EPSON LQ850
+              - - DIN A4
+              - o US legal
+              o - US letter
+              o o undefined
+
+  o CR=CR+LF
+  - CR=CR
+    o Select intern fixed ON
+    - Select intern fixed OFF
+      o Landscape
+      - Portrait
+        o no function
+        - no function
+          o AGM ON
+          - AGM OFF
+            o LF=LF+CR,FF=FF+CR
+            - LF=LF,FF=FF
+              o no function
+              - no function
+                o LF=LF+CR,FF=FF+CR
+                - LF=LF,FF=FF+CR
+
 */
 
 
@@ -76,4 +136,4 @@ ROM_START( mt735 )
 	ROM_LOAD16_BYTE( "spg_m_o_ic102.bin", 1, 0x20000, CRC(84d8446b) SHA1(b1cedd8b09556eb8118f79b012aeec5b61e3ff32) )
 ROM_END
 
-COMP( ????, mt735, 0, 0, mt735, mt735, mt735_state, empty_init, "Brother", "MT735", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+COMP( 1990, mt735, 0, 0, mt735, mt735, mt735_state, empty_init, "Mannesmann Tally", "MT735", MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) // Program ROM Datecode: 19901126, Internal Font ROM Datecode: 19900807

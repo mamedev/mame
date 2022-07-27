@@ -118,7 +118,8 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP3005   TMS1730   1989, Tiger Copy Cat (model 7-522)
  @MP3200   TMS1000   1978, Parker Brothers Electronic Master Mind
  @MP3201   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750A)
- *MP3206   TMS1000   1979, Concept 2000 Mr. Mus-I-Cal
+ @MP3206   TMS1000   1978, Concept 2000 Mr. Mus-I-Cal (model 560)
+ *MP3207   TMS1000   1978, Concept 2000 Lite 'n Learn: Electronic Organ (model 554)
  @MP3208   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750B)
  @MP3226   TMS1000   1978, Milton Bradley Simon (Rev A)
  *MP3232   TMS1000   1979, Fonas 2 Player Baseball (no "MP" on chip label)
@@ -270,6 +271,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "mmarvin.lh" // clickable
 #include "mmerlin.lh" // clickable
 #include "monkeysee.lh"
+#include "mrmusical.lh"
 #include "palmf31.lh"
 #include "palmmd8.lh"
 #include "pbmastm.lh"
@@ -420,7 +422,7 @@ namespace {
 /***************************************************************************
 
   A-One LSI Match Number
-  * PCB label PT-204 "Pair Card"
+  * PCB label: PT-204 "Pair Card"
   * TMS1000NLL MP0163 (die label 1000B, MP0163)
   * 2x2-digit 7seg LED displays + 3 LEDs, 1-bit sound
 
@@ -565,7 +567,7 @@ ROM_END
 /***************************************************************************
 
   A-One LSI Arrange Ball
-  * PCB label Kaken, PT-249
+  * PCB label: Kaken, PT-249
   * TMS1000NLL MP0166 (die label 1000B, MP0166)
   * 2-digit 7seg LED display + 22 LEDs, 1-bit sound
 
@@ -1273,9 +1275,9 @@ ROM_END
 /***************************************************************************
 
   Canon Palmtronic MD-8 (Multi 8) / Canon Canola MD 810
+  * PCB label: Canon EHI-0115-03
   * TMS1070 MCU label TMC1079 (die label 1070B, 1079A)
   * 2-line cyan VFD display, each 9-digit 7seg + 1 custom (label 20-ST-22)
-  * PCB label Canon EHI-0115-03
 
   The only difference between MD-8 and MD 810 is the form factor. The latter
   is a tabletop calculator.
@@ -2206,7 +2208,7 @@ ROM_END
 /***************************************************************************
 
   Coleco Head to Head: Electronic Baseball (model 2180)
-  * PCB labels Coleco rev C 73891/2
+  * PCB labels: Coleco rev C 73891/2
   * TMS1170NLN MP1525-N2 (die label MP1525)
   * 9-digit cyan VFD display, and other LEDs behind bezel, 1-bit sound
 
@@ -2866,8 +2868,146 @@ ROM_END
 
 /***************************************************************************
 
+  Concept 2000 Mr. Mus-I-Cal (model 560)
+  * PCB label: CONCEPT 2000 ITE 556
+  * TMS1000NLL MP3206 (die label 1000C, MP3206)
+  * 9-digit 7seg LED display(one custom digit), 1-bit sound
+
+  It's a simple 4-function calculator, and plays music tones too.
+
+***************************************************************************/
+
+class mrmusical_state : public hh_tms1k_state
+{
+public:
+	mrmusical_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void mrmusical(machine_config &config);
+
+protected:
+	void update_display();
+	virtual void write_o(u16 data);
+	virtual void write_r(u16 data);
+	virtual u8 read_k();
+};
+
+// handlers
+
+void mrmusical_state::update_display()
+{
+	m_display->matrix(m_r, m_o);
+}
+
+void mrmusical_state::write_r(u16 data)
+{
+	// R10: speaker out (there's a speaker off-on switch)
+	m_speaker->level_w(m_inputs[6]->read() & BIT(data, 10));
+
+	// R0-R5: input mux
+	// R0-R8: digit select (R6 is a math symbol like with lilprof)
+	m_inp_mux = m_r = data;
+	update_display();
+}
+
+void mrmusical_state::write_o(u16 data)
+{
+	// O0-O7: digit segment data
+	m_o = data;
+	update_display();
+}
+
+u8 mrmusical_state::read_k()
+{
+	// K: multiplexed inputs
+	return read_inputs(6);
+}
+
+// config
+
+static INPUT_PORTS_START( mrmusical )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("A=")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CE")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_NAME("C")
+
+	PORT_START("IN.5") // R5
+	PORT_CONFNAME( 0x01, 0x00, "Mode" )
+	PORT_CONFSETTING(    0x01, "A" )
+	PORT_CONFSETTING(    0x00, "=" )
+
+	PORT_START("IN.6") // no read
+	PORT_CONFNAME( 0x01, 0x01, "Speaker" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+INPUT_PORTS_END
+
+void mrmusical_state::mrmusical(machine_config &config)
+{
+	// basic machine hardware
+	TMS1000(config, m_maincpu, 300000); // approximation - RC osc. R=33K, C=100pF
+	m_maincpu->k().set(FUNC(mrmusical_state::read_k));
+	m_maincpu->o().set(FUNC(mrmusical_state::write_o));
+	m_maincpu->r().set(FUNC(mrmusical_state::write_r));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
+	m_display->set_segmask(0x1ff, 0xff);
+	m_display->set_segmask(0x180, 0x7f); // no DP for leftmost 2 digits
+	config.set_default_layout(layout_mrmusical);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( mrmusical )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp3206", 0x0000, 0x0400, CRC(15013d4d) SHA1(2bbc5599183381ad050b7518bca1babc579ee79d) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common1_micro.pla", 0, 867, CRC(4becec19) SHA1(3c8a9be0f00c88c81f378b76886c39b10304f330) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_mrmusical_output.pla", 0, 365, CRC(9652aa3b) SHA1(be41e1588561875b362ba878098ede8299792166) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Conic Electronic Basketball
-  * PCB label CONIC 101-006
+  * PCB label: CONIC 101-006
   * TMS1000NLL MP0907 (die label 1000B MP0907)
   * DS8871N, 2 7seg LEDs, 30 other LEDs, 1-bit sound
 
@@ -2992,7 +3132,7 @@ ROM_END
 /***************************************************************************
 
   Conic Electronic Multisport
-  * PCB label CONIC 101-027(1979), or CONIC 101-021 REV A(1980, with DS8871N)
+  * PCB label: CONIC 101-027(1979), or CONIC 101-021 REV A(1980, with DS8871N)
   * TMS1000 MP0168 (die label same)
   * 2 7seg LEDs, 33 other LEDs, 1-bit sound
 
@@ -3932,7 +4072,7 @@ ROM_END
 /***************************************************************************
 
   Entex (Electronic) Baseball 2
-  * PCB label ZENY
+  * PCB label: ZENY
   * TMS1000 MCU, MP0923 (die label same)
   * 3 7seg LEDs, and other LEDs behind bezel, 1-bit sound
 
@@ -4070,7 +4210,7 @@ ROM_END
 /***************************************************************************
 
   Entex (Electronic) Baseball 3
-  * PCB label ZENY
+  * PCB label: ZENY
   * TMS1100NLL 6007 MP1204 (rev. E!) (die label MP1204)
   * 2*SN75492N LED display driver
   * 4 7seg LEDs, and other LEDs behind bezel, 1-bit sound
@@ -5235,7 +5375,7 @@ ROM_END
 /***************************************************************************
 
   Fonas 2 Player Baseball
-  * PCB label CA-014 (probably Cassia)
+  * PCB label: CA-014 (probably Cassia)
   * TMS1000NLL MP0154 (die label 1000B, MP0154)
   * 4 7seg LEDs, 37 other LEDs, 1-bit sound
 
@@ -5374,7 +5514,7 @@ ROM_END
 /***************************************************************************
 
   Fonas 3 in 1: Football, Basketball, Soccer
-  * PCB label HP-801
+  * PCB label: HP-801
   * TMS1100NLL MP1185
   * 4 7seg LEDs, 40 other LEDs, 1-bit sound
 
@@ -5523,7 +5663,7 @@ ROM_END
 /***************************************************************************
 
   Gakken Poker
-  * PCB label POKER. gakken
+  * PCB label: POKER. gakken
   * TMS1370 MP2105 (die label same)
   * 11-digit cyan VFD display Itron FG1114B, oscillator sound
 
@@ -5678,7 +5818,7 @@ ROM_END
 /***************************************************************************
 
   Gakken Jackpot: Gin Rummy & Black Jack
-  * PCB label gakken
+  * PCB label: gakken
   * TMS1670 MPF553 (die label same)
   * 11-digit cyan VFD display Itron FG1114B, oscillator sound
 
@@ -5801,7 +5941,7 @@ ROM_END
 /***************************************************************************
 
   Gakken Invader
-  * PCB label GAKKEN, INVADER, KS-00779
+  * PCB label: GAKKEN, INVADER, KS-00779
   * TMS1370 MP2110
   * cyan VFD display Itron? CP5008A, 1-bit sound
 
@@ -7107,7 +7247,7 @@ ROM_END
 /***************************************************************************
 
   Mattel Thoroughbred Horse Race Analyzer
-  * PCB label 1670-4619D
+  * PCB label: 1670-4619D
   * TMS1100NLL MP3491-N2 (die label 1100E MP3491)
   * HLCD0569, 67-segment LCD panel, no sound
 
@@ -7584,7 +7724,7 @@ ROM_END
 /***************************************************************************
 
   Milton Bradley Electronic Battleship (1977 version, model 4750A)
-  * PCB label 4750A
+  * PCB label: 4750A
   * TMS1000NL MP3201 (die label 1000C, MP3201)
   * LM324N, MC14016CP/TP4016AN, NE555P, discrete sound
   * 4 sliding buttons, light bulb
@@ -7750,7 +7890,7 @@ ROM_END
 /***************************************************************************
 
   Milton Bradley Electronic Battleship (1977 version, model 4750B)
-  * PCB label MB 4750B
+  * PCB label: MB 4750B
   * TMS1000NLL MP3208 (die label 1000C, MP3208)
   * SN75494N (acting as inverters), SN76477 sound
   * 4 sliding buttons, light bulb
@@ -7975,7 +8115,7 @@ INPUT_PORTS_END
 void simon_state::simon(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 350000); // approximation - RC osc. R=33K, C=100pF
+	TMS1000(config, m_maincpu, 325000); // approximation - RC osc. R=33K, C=100pF
 	m_maincpu->k().set(FUNC(simon_state::read_k));
 	m_maincpu->r().set(FUNC(simon_state::write_r));
 
@@ -9029,16 +9169,6 @@ ROM_START( merlin )
 	ROM_LOAD( "tms1100_merlin_output.pla", 0, 365, CRC(3921b074) SHA1(12bd58e4d6676eb8c7059ef53598279e4f1a32ea) )
 ROM_END
 
-ROM_START( merlina )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "mp3404", 0x0000, 0x0800, CRC(9362d9f9) SHA1(266d2a4a98cc33944a4fc7ed073ba9321bba8e05) ) // 1 bit different
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_common3_micro.pla", 0, 867, CRC(03574895) SHA1(04407cabfb3adee2ee5e4218612cb06c12c540f4) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_merlin_output.pla", 0, 365, CRC(3921b074) SHA1(12bd58e4d6676eb8c7059ef53598279e4f1a32ea) )
-ROM_END
-
 
 
 
@@ -9920,7 +10050,7 @@ ROM_END
 /***************************************************************************
 
   Tandy Championship Football (model 60-2150)
-  * PCB label CYG-316
+  * PCB label: CYG-316
   * TMS1100NLL MP1193 (die label 1100B, MP1193)
   * 7-digit 7seg LED display + LED grid, 1-bit sound
 
@@ -10415,7 +10545,7 @@ ROM_END
 /***************************************************************************
 
   Tandy 3 in 1 Sports Arena (model 60-2178)
-  * PCB label HP-804
+  * PCB label: HP-804
   * TMS1100 (just a datestamp label (8331), die label 1100B MP1231)
   * 2x2-digit 7seg LED display + 47 other LEDs, 1-bit sound
 
@@ -10998,7 +11128,7 @@ ROM_END
 
   As seen listed above, the basic 4-function TMS0972 calculator MCU was used
   in many calculators. It was licensed to other manufacturers too, one funny
-  example being a Mattel Barbie handheld calculator.
+  example being a Concept 2000 Barbie handheld calculator.
 
   Some cheaper models lacked the memory buttons (the function itself still works).
   The ABLE series was for educational purposes, with each having a small subset of
@@ -12843,7 +12973,7 @@ ROM_END
 /***************************************************************************
 
   Tiger Sub Wars (model 7-490)
-  * PCB label CSG201A(main), CSG201B(leds)
+  * PCB label: CSG201A(main), CSG201B(leds)
   * TMS1200N2LL MP3352 (die label 1000C, MP3352)
   * 4-digit 7seg LED display + 55 other LEDs, 1-bit sound
 
@@ -13238,7 +13368,7 @@ ROM_END
 /***************************************************************************
 
   Tiger Electronics Copy Cat (model 7-520)
-  * PCB label CC REV B
+  * PCB label: CC REV B
   * TMS1000 MCU, label 69-11513 MP0919 (die label MP0919)
   * 4 LEDs, 1-bit sound
 
@@ -13358,7 +13488,7 @@ ROM_END
 /***************************************************************************
 
   Tiger Electronics Copy Cat (model 7-522)
-  * PCB label WS 8107-1
+  * PCB label: WS 8107-1
   * TMS1730 MCU, label MP3005N (die label 1700 MP3005)
   * 4 LEDs, 1-bit sound
 
@@ -13668,7 +13798,7 @@ ROM_END
 /***************************************************************************
 
   Tomy(tronics) Break Up (manufactured in Japan)
-  * PCB label TOMY B.O.
+  * PCB label: TOMY B.O.
   * TMS1040 MP2726 TOMY WIPE (die label MP2726A)
   * TMS1025N2LL I/O expander
   * 2-digit 7seg display, 46 other leds, 1-bit sound
@@ -13869,7 +13999,7 @@ ROM_END
 /***************************************************************************
 
   Tomy Power House Pinball
-  * PCB label TOMY P-B
+  * PCB label: TOMY P-B
   * TMS1100 MP1180 TOMY PINB (die label MP1180)
   * 3 7seg LEDs, and other LEDs behind bezel, 1-bit sound
 
@@ -14355,6 +14485,8 @@ CONS( 1981, h2hboxing,  0,         0, h2hboxing, h2hboxing, h2hboxing_state, emp
 CONS( 1981, quizwizc,   0,         0, quizwizc,  quizwizc,  quizwizc_state,  empty_init, "Coleco", "Quiz Wiz Challenger", MACHINE_SUPPORTS_SAVE ) // ***
 CONS( 1981, tc4,        0,         0, tc4,       tc4,       tc4_state,       empty_init, "Coleco", "Total Control 4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
+COMP( 1978, mrmusical,  0,         0, mrmusical, mrmusical, mrmusical_state, empty_init, "Concept 2000", "Mr. Mus-I-Cal", MACHINE_SUPPORTS_SAVE )
+
 CONS( 1979, cnbaskb,    0,         0, cnbaskb,   cnbaskb,   cnbaskb_state,   empty_init, "Conic", "Electronic Basketball (Conic)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, cmsport,    0,         0, cmsport,   cmsport,   cmsport_state,   empty_init, "Conic", "Electronic Multisport", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1979, cnfball,    0,         0, cnfball,   cnfball,   cnfball_state,   empty_init, "Conic", "Electronic Football (Conic, TMS1000 version)", MACHINE_SUPPORTS_SAVE )
@@ -14410,8 +14542,7 @@ CONS( 1981, mbdtower,   0,         0, mbdtower,  mbdtower,  mbdtower_state,  emp
 CONS( 1983, arcmania,   0,         0, arcmania,  arcmania,  arcmania_state,  empty_init, "Milton Bradley", "Electronic Arcade Mania (Arcade Machine)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_REQUIRES_ARTWORK ) // ***
 
 CONS( 1977, cnsector,   0,         0, cnsector,  cnsector,  cnsector_state,  empty_init, "Parker Brothers", "Code Name: Sector", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // ***
-CONS( 1978, merlin,     0,         0, merlin,    merlin,    merlin_state,    empty_init, "Parker Brothers", "Merlin - The Electronic Wizard (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1978, merlina,    merlin,    0, merlin,    merlin,    merlin_state,    empty_init, "Parker Brothers", "Merlin - The Electronic Wizard (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1978, merlin,     0,         0, merlin,    merlin,    merlin_state,    empty_init, "Parker Brothers", "Merlin - The Electronic Wizard", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1978, pbmastm,    0,         0, pbmastm,   pbmastm,   pbmastm_state,   empty_init, "Parker Brothers", "Electronic Master Mind (Parker Brothers)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW ) // ***
 CONS( 1979, stopthief,  0,         0, stopthief, stopthief, stopthief_state, empty_init, "Parker Brothers", "Stop Thief - Electronic Cops and Robbers (Electronic Crime Scanner)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 CONS( 1979, stopthiefp, stopthief, 0, stopthief, stopthief, stopthief_state, empty_init, "Parker Brothers", "Stop Thief - Electronic Cops and Robbers (Electronic Crime Scanner) (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***

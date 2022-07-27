@@ -12,6 +12,7 @@
 #include "queue.h"
 
 #include "../plib/plists.h"
+#include "../plib/pmempool.h"
 #include "../plib/pstate.h"
 #include "../plib/pstring.h"
 
@@ -31,8 +32,8 @@ namespace netlist
 	public:
 		using nets_collection_type = std::vector<
 			device_arena::owned_ptr<detail::net_t>>;
-		using family_collection_type = std::unordered_map<pstring,
-			host_arena::unique_ptr<logic_family_desc_t>>;
+		using family_collection_type = std::unordered_map<
+			pstring, host_arena::unique_ptr<logic_family_desc_t>>;
 
 		// need to preserve order of device creation ...
 		using devices_collection_type = std::vector<
@@ -55,8 +56,9 @@ namespace netlist
 			return bool(plib::dynamic_downcast<C *>(p));
 		}
 
-		core_device_t *get_single_device(const pstring &classname,
-			bool (*cc)(core_device_t *)) const noexcept(false);
+		core_device_t *
+		get_single_device(const pstring &classname,
+						  bool (*cc)(core_device_t *)) const noexcept(false);
 
 		/// \brief Get single device filtered by class and name
 		///
@@ -91,7 +93,7 @@ namespace netlist
 
 		// logging
 
-		log_type &      log() noexcept { return m_log; }
+		log_type       &log() noexcept { return m_log; }
 		const log_type &log() const noexcept { return m_log; }
 
 		plib::dynamic_library_base &static_solver_lib() const noexcept
@@ -108,23 +110,23 @@ namespace netlist
 		void set_static_solver_lib(
 			std::unique_ptr<plib::dynamic_library_base> &&lib);
 
-		netlist_t &      exec() noexcept { return *m_netlist; }
+		netlist_t       &exec() noexcept { return *m_netlist; }
 		const netlist_t &exec() const noexcept { return *m_netlist; }
 
 		// state handling
 		plib::state_manager_t &run_state_manager() noexcept { return m_state; }
 
 		template <typename O, typename C>
-		void save(O &owner, C &state, const pstring &module,
-			const pstring &stname)
+		void
+		save(O &owner, C &state, const pstring &module, const pstring &stname)
 		{
 			this->run_state_manager().save_item(plib::void_ptr_cast(&owner),
-				state, module + "." + stname);
+												state, module + "." + stname);
 		}
 
 		template <typename O, typename C>
 		void save(O &owner, C *state, const pstring &module,
-			const pstring &stname, const std::size_t count)
+				  const pstring &stname, const std::size_t count)
 		{
 			this->run_state_manager().save_state_ptr(
 				plib::void_ptr_cast(&owner), module + "." + stname,
@@ -165,8 +167,8 @@ namespace netlist
 		/// \param dev Device to be registered
 
 		template <typename T>
-		void register_device(const pstring &name,
-			device_arena::owned_ptr<T> &&   dev) noexcept(false)
+		void register_device(const pstring               &name,
+							 device_arena::owned_ptr<T> &&dev) noexcept(false)
 		{
 			for (auto &d : m_devices)
 				if (d.first == name)
@@ -187,11 +189,11 @@ namespace netlist
 		/// \param dev Device to be registered
 
 		template <typename T>
-		void register_device(const pstring &name,
-			device_arena::unique_ptr<T> &&  dev)
+		void
+		register_device(const pstring &name, device_arena::unique_ptr<T> &&dev)
 		{
-			register_device(name, device_arena::owned_ptr<T>(dev.release(),
-									  true, dev.get_deleter()));
+			register_device(name, device_arena::owned_ptr<T>(
+									  dev.release(), true, dev.get_deleter()));
 		}
 
 		/// \brief Remove device
@@ -203,24 +205,24 @@ namespace netlist
 
 		void remove_device(core_device_t *dev);
 
-		setup_t &      setup() noexcept { return *m_setup; }
+		setup_t       &setup() noexcept { return *m_setup; }
 		const setup_t &setup() const noexcept { return *m_setup; }
 
-		nlparse_t &      parser() noexcept;
+		nlparse_t       &parser() noexcept;
 		const nlparse_t &parser() const noexcept;
 
 		// FIXME: make a post load member and include code there
 		void rebuild_lists(); // must be called after post_load !
 
-		static void compile_defines(
-			std::vector<std::pair<pstring, pstring>> &defs);
+		static void
+		compile_defines(std::vector<std::pair<pstring, pstring>> &defs);
 		static pstring version();
 		static pstring version_patchlevel();
 
-		nets_collection_type &      nets() noexcept { return m_nets; }
+		nets_collection_type       &nets() noexcept { return m_nets; }
 		const nets_collection_type &nets() const noexcept { return m_nets; }
 
-		devices_collection_type &      devices() noexcept { return m_devices; }
+		devices_collection_type       &devices() noexcept { return m_devices; }
 		const devices_collection_type &devices() const noexcept
 		{
 			return m_devices;
@@ -234,13 +236,13 @@ namespace netlist
 			return plib::make_unique<T>(m_pool, std::forward<Args>(args)...);
 		}
 		// memory pool - still needed in some places
-		device_arena &      pool() noexcept { return m_pool; }
+		device_arena       &pool() noexcept { return m_pool; }
 		const device_arena &pool() const noexcept { return m_pool; }
 
 		struct stats_info
 		{
-			const detail::queue_t &         m_queue; // performance
-			const plib::pperftime_t<true> & m_stat_mainloop;
+			const detail::queue_t          &m_queue; // performance
+			const plib::pperftime_t<true>  &m_stat_mainloop;
 			const plib::pperfcount_t<true> &m_perf_out_processed;
 		};
 
@@ -256,8 +258,8 @@ namespace netlist
 		///
 		void free_setup_resources();
 #if !(NL_USE_INPLACE_CORE_TERMS)
-		std::vector<detail::core_terminal_t *> &core_terms(
-			const detail::net_t &net)
+		std::vector<detail::core_terminal_t *> &
+		core_terms(const detail::net_t &net)
 		{
 			return m_core_terms[&net];
 		}
@@ -281,7 +283,7 @@ namespace netlist
 #if !(NL_USE_INPLACE_CORE_TERMS)
 		// all terms for a net
 		std::unordered_map<const detail::net_t *,
-			std::vector<detail::core_terminal_t *>>
+						   std::vector<detail::core_terminal_t *>>
 			m_core_terms;
 #endif
 		// dummy version

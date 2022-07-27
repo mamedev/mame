@@ -50,6 +50,8 @@ apple/lisa.cpp
 apple/lwriter.cpp
 apple/mac.cpp
 apple/mac128.cpp
+apple/maciivx.cpp
+apple/maclc.cpp
 apple/maclc3.cpp
 apple/macpci.cpp
 apple/macpdm.cpp
@@ -244,7 +246,6 @@ epson/qx10.cpp
 ericsson/e9161.cpp
 ericsson/eispc.cpp
 exidy/sorcerer.cpp
-exorterm/exorterm.cpp
 fairchild/channelf.cpp
 fairchild/f387x.cpp
 fairlight/cmi.cpp
@@ -482,6 +483,7 @@ morrow/mpz80.cpp
 morrow/tricep.cpp
 mos/kim1.cpp
 motorola/exorciser.cpp
+motorola/exorterm.cpp
 motorola/m6805evs.cpp
 motorola/m68705prg.cpp
 motorola/mekd1.cpp
@@ -679,6 +681,7 @@ saitek/ssystem3.cpp
 saitek/stratos.cpp
 saitek/superstar.cpp
 samcoupe/samcoupe.cpp
+samsung/dvd-n5xx.cpp
 samsung/spc1000.cpp
 samsung/spc1500.cpp
 sanyo/mbc200.cpp

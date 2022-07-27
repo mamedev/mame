@@ -4608,7 +4608,7 @@ license:CC0
 		<year>1983</year>
 		<publisher>Electronequip</publisher>
 		<part name="rom1" interface="bbc_rom">
-			<dataarea name="rom" size="v">
+			<dataarea name="rom" size="8192">
 				<rom name="EpsonFX80-1.00.rom" size="8192" crc="60ff9be7" sha1="b9cc33e67033c6b59f9113672ca4f84dea774769"/>
 			</dataarea>
 		</part>

@@ -158,7 +158,6 @@ private:
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
 	WRITE_LINE_MEMBER(via_cb2_w) { m_macadb->adb_data_w(state); }
 	int m_via_interrupt = 0, m_via2_interrupt = 0, m_scc_interrupt = 0, m_last_taken_interrupt = 0;
-	int m_irq_count = 0, m_ca2_data = 0;
 
 	uint32_t rom_switch_r(offs_t offset);
 	bool m_overlay = 0;
@@ -235,7 +234,6 @@ void macquadra_state::machine_start()
 	m_rom_size = memregion("bootrom")->bytes();
 	m_via_interrupt = m_via2_interrupt = m_scc_interrupt = 0;
 	m_last_taken_interrupt = -1;
-	m_irq_count = m_ca2_data = 0;
 
 	m_6015_timer = timer_alloc(FUNC(macquadra_state::mac_6015_tick), this);
 	m_6015_timer->adjust(attotime::never);
@@ -261,8 +259,6 @@ void macquadra_state::machine_start()
 	save_item(NAME(m_via2_interrupt));
 	save_item(NAME(m_scc_interrupt));
 	save_item(NAME(m_last_taken_interrupt));
-	save_item(NAME(m_irq_count));
-	save_item(NAME(m_ca2_data));
 	save_item(NAME(m_overlay));
 }
 
@@ -275,7 +271,6 @@ void macquadra_state::machine_reset()
 	m_overlay = true;
 	m_via_interrupt = m_via2_interrupt = m_scc_interrupt = 0;
 	m_last_taken_interrupt = -1;
-	m_irq_count = m_ca2_data = 0;
 
 	// put ROM mirror at 0
 	address_space& space = m_maincpu->space(AS_PROGRAM);
@@ -766,15 +761,6 @@ TIMER_CALLBACK_MEMBER(macquadra_state::mac_6015_tick)
 {
 	/* handle ADB keyboard/mouse */
 	m_macadb->adb_vblank();
-
-	if (++m_irq_count == 60)
-	{
-		m_irq_count = 0;
-
-		m_ca2_data ^= 1;
-		/* signal 1 Hz irq on CA2 input on the VIA */
-		m_via1->write_ca2(m_ca2_data);
-	}
 }
 
 uint8_t macquadra_state::mac_5396_r(offs_t offset)
@@ -937,6 +923,7 @@ void macquadra_state::macqd700(machine_config &config)
 	PALETTE(config, m_palette).set_entries(256);
 
 	RTC3430042(config, m_rtc, XTAL(32'768));
+	m_rtc->cko_cb().set(m_via1, FUNC(via6522_device::write_ca2));
 
 	SWIM1(config, m_swim, C15M);
 	m_swim->phases_cb().set(FUNC(macquadra_state::phases_w));

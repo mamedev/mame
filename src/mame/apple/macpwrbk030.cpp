@@ -92,6 +92,14 @@
     INT1: 60 Hz clock
     INT2: INT2 PULLUP (pulled up and otherwise N/C)
 
+    PG&E (68HC05 PMU) version spotting:
+    (find the text "BORG" in the system ROM, the next 32768 bytes are the PG&E image.
+     offset +4 in the image is the version byte).
+    01 - PowerBook Duo 210/230/250
+    02 - PowerBook 540c, PBDuo 270C, PBDuo 280/280C
+    03 - PowerBook 150
+    08 - PB190cs, PowerBook 540c PPC update, all PowerPC PowerBooks through WallStreet G3s
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -137,6 +145,7 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_swim(*this, "fdc"),
 		m_floppy(*this, "fdc:%d", 0U),
+		m_rtc(*this, "rtc"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_asc(*this, "asc"),
@@ -171,6 +180,7 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<applefdintf_device> m_swim;
 	required_device_array<floppy_connector, 2> m_floppy;
+	required_device<rtc3430042_device> m_rtc;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<asc_device> m_asc;
@@ -211,7 +221,7 @@ private:
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
 	WRITE_LINE_MEMBER(via_cb2_w) { m_macadb->adb_data_w(state); }
 	int m_via_interrupt = 0, m_via2_interrupt = 0, m_scc_interrupt = 0, m_asc_interrupt = 0, m_last_taken_interrupt = 0;
-	int m_irq_count = 0, m_ca1_data = 0, m_ca2_data = 0, m_via2_ca1_hack = 0;
+	int m_ca1_data = 0, m_via2_ca1_hack = 0;
 
 	u32 rom_switch_r(offs_t offset);
 	bool m_overlay = false;
@@ -388,7 +398,7 @@ void macpb030_state::machine_start()
 	m_rom_size = memregion("bootrom")->bytes();
 	m_via_interrupt = m_via2_interrupt = m_scc_interrupt = m_asc_interrupt = 0;
 	m_last_taken_interrupt = -1;
-	m_irq_count = m_ca1_data = m_ca2_data = 0;
+	m_ca1_data = 0;
 
 	m_6015_timer = timer_alloc(FUNC(macpb030_state::mac_6015_tick), this);
 	m_6015_timer->adjust(attotime::never);
@@ -399,7 +409,7 @@ void macpb030_state::machine_reset()
 	m_overlay = true;
 	m_via_interrupt = m_via2_interrupt = m_scc_interrupt = m_asc_interrupt = 0;
 	m_last_taken_interrupt = -1;
-	m_irq_count = m_ca1_data = m_ca2_data = 0;
+	m_ca1_data = 0;
 	m_via2_ca1_hack = 0;
 
 	m_cur_floppy = nullptr;
@@ -594,15 +604,6 @@ TIMER_CALLBACK_MEMBER(macpb030_state::mac_6015_tick)
 
 	m_pmu->set_input_line(m50753_device::M50753_INT1_LINE, ASSERT_LINE);
 	m_macadb->adb_vblank();
-
-	if (++m_irq_count == 60)
-	{
-		m_irq_count = 0;
-
-		m_ca2_data ^= 1;
-		/* signal 1 Hz irq on CA2 input on the VIA */
-		m_via1->write_ca2(m_ca2_data);
-	}
 }
 
 u16 macpb030_state::scsi_r(offs_t offset, u16 mem_mask)
@@ -837,7 +838,7 @@ u8 macpb030_state::mac_via_in_a()
 
 u8 macpb030_state::mac_via_in_b()
 {
-	return 0x08;    // flag indicating no Target Disk Mode
+	return 0x08 | m_rtc->data_r();    // flag indicating no Target Disk Mode
 }
 
 void macpb030_state::mac_via_out_a(u8 data)
@@ -855,6 +856,9 @@ void macpb030_state::mac_via_out_a(u8 data)
 
 void macpb030_state::mac_via_out_b(u8 data)
 {
+	m_rtc->ce_w(BIT(data, 2));
+	m_rtc->data_w(BIT(data, 0));
+	m_rtc->clk_w(BIT(data, 1));
 }
 
 u8 macpb030_state::mac_via2_in_a()
@@ -915,6 +919,9 @@ void macpb030_state::macpb140(machine_config &config)
 	m_macadb->set_mcu_mode(true);
 	m_macadb->adb_data_callback().set(FUNC(macpb030_state::set_adb_line));
 
+	RTC3430042(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->cko_cb().set(m_via1, FUNC(via6522_device::write_ca2));
+
 	SWIM1(config, m_swim, C15M);
 	m_swim->phases_cb().set(FUNC(macpb030_state::phases_w));
 	m_swim->devsel_cb().set(FUNC(macpb030_state::devsel_w));
@@ -946,7 +953,7 @@ void macpb030_state::macpb140(machine_config &config)
 	SCC85C30(config, m_scc, C7M);
 //  m_scc->intrq_callback().set(FUNC(macpb030_state::set_scc_interrupt));
 
-	R65NC22(config, m_via1, C7M/10);
+	R65C22(config, m_via1, C7M/10);
 	m_via1->readpa_handler().set(FUNC(macpb030_state::mac_via_in_a));
 	m_via1->readpb_handler().set(FUNC(macpb030_state::mac_via_in_b));
 	m_via1->writepa_handler().set(FUNC(macpb030_state::mac_via_out_a));
@@ -1027,6 +1034,9 @@ void macpb030_state::macpb160(machine_config &config)
 	m_macadb->set_mcu_mode(true);
 	m_macadb->adb_data_callback().set(FUNC(macpb030_state::set_adb_line));
 
+	RTC3430042(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->cko_cb().set(m_via1, FUNC(via6522_device::write_ca2));
+
 	SWIM1(config, m_swim, C15M);
 	m_swim->phases_cb().set(FUNC(macpb030_state::phases_w));
 	m_swim->devsel_cb().set(FUNC(macpb030_state::devsel_w));
@@ -1058,7 +1068,7 @@ void macpb030_state::macpb160(machine_config &config)
 	SCC85C30(config, m_scc, C7M);
 	//  m_scc->intrq_callback().set(FUNC(macpb030_state::set_scc_interrupt));
 
-	R65NC22(config, m_via1, C7M / 10);
+	R65C22(config, m_via1, C7M / 10);
 	m_via1->readpa_handler().set(FUNC(macpb030_state::mac_via_in_a));
 	m_via1->readpb_handler().set(FUNC(macpb030_state::mac_via_in_b));
 	m_via1->writepa_handler().set(FUNC(macpb030_state::mac_via_out_a));

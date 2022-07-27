@@ -95,7 +95,7 @@ public:
 
 	private:
 		fsblk_t::block_t    m_block;
-		std::string			m_filename;
+		std::string         m_filename;
 	};
 
 	// ctor/dtor

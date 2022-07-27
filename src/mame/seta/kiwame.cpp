@@ -39,7 +39,6 @@ private:
 	u16 input_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(kiwame_vblank);
 
-	X1_001_SPRITE_GFXBANK_CB_MEMBER(setac_gfxbank_callback);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void kiwame_map(address_map &map);
@@ -76,14 +75,6 @@ WRITE_LINE_MEMBER(kiwame_state::kiwame_vblank)
 {
 	if (state)
 		m_maincpu->external_interrupt_0();
-}
-
-X1_001_SPRITE_GFXBANK_CB_MEMBER(kiwame_state::setac_gfxbank_callback)
-{
-	const int bank = (color & 0x06) >> 1;
-	code = (code & 0x3fff) + (bank * 0x4000);
-
-	return code;
 }
 
 u32 kiwame_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -286,10 +277,9 @@ void kiwame_state::kiwame(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &kiwame_state::kiwame_map);
 	m_maincpu->out_parallel_callback().set(FUNC(kiwame_state::row_select_w));
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 2x LH52B256D-70LL + battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 2x LH52B256D-70LL + battery (possibly only lower bytes battery-backed)
 
 	X1_001(config, m_spritegen, 16000000, "palette", gfx_sprites);
-	m_spritegen->set_gfxbank_callback(FUNC(kiwame_state::setac_gfxbank_callback));
 	// position kludges
 	m_spritegen->set_fg_xoffsets(-16, 0); // correct (test grid)
 	m_spritegen->set_fg_yoffsets(-0x12, 0x0e);

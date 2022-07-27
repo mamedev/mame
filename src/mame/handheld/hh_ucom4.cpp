@@ -225,7 +225,7 @@ namespace {
 /***************************************************************************
 
   Bambino UFO Master-Blaster Station (manufactured in Japan)
-  * PCB label Emix Corp. ET-02
+  * PCB label: Emix Corp. ET-02
   * NEC uCOM-44 MCU, label EMIX D552C 017
   * cyan VFD display Emix-101, with blue color overlay
 
@@ -352,7 +352,7 @@ ROM_END
 /***************************************************************************
 
   Bambino Superstar Football (manufactured in Japan)
-  * PCB label Emix Corp. ET-03
+  * PCB label: Emix Corp. ET-03
   * NEC uCOM-43 MCU, label D553C 031
   * cyan VFD display Emix-102, with bezel
 
@@ -514,7 +514,7 @@ ROM_END
 /***************************************************************************
 
   Bambino Kick The Goal Soccer
-  * PCB label Emix Corp. ET-10/08 (PCB is for 2 possible games)
+  * PCB label: Emix Corp. ET-10/08 (PCB is for 2 possible games)
   * NEC uCOM-44 MCU, label D552C 043
   * cyan VFD display Emix-105, with bezel overlay
 
@@ -653,7 +653,7 @@ ROM_END
 /***************************************************************************
 
   Bambino Safari (manufactured in Japan)
-  * PCB label Emix Corp. ET-11
+  * PCB label: Emix Corp. ET-11
   * NEC uCOM-44 MCU, label EMIX D552C 049
   * cyan VFD display Emix-108
 
@@ -772,7 +772,7 @@ ROM_END
 /***************************************************************************
 
   Bambino Space Laser Fight (manufactured in Japan)
-  * PCB label Emix Corp. ET-12
+  * PCB label: Emix Corp. ET-12
   * NEC uCOM-43 MCU, label D553C 055
   * cyan VFD display Emix-104, with blue or green color overlay
 
@@ -935,7 +935,7 @@ ROM_END
 /***************************************************************************
 
   Bandai Crazy Climber (manufactured in Japan)
-  * PCB labels SM-020/SM-021
+  * PCB labels: SM-020/SM-021
   * NEC uCOM-43 MCU, label D553C 170
   * cyan/red/green VFD display NEC FIP6AM2-T no. 1-8 2, with partial color overlay and bezel
 
@@ -1318,7 +1318,7 @@ ROM_END
 /***************************************************************************
 
   Epoch Invader From Space (manufactured in Japan)
-  * PCB labels 36010(A/B)
+  * PCB labels: 36010(A/B)
   * NEC uCOM-44 MCU, label D552C 054
   * cyan VFD display NEC FIP9AM18T tube no. 0D, with color overlay
 
@@ -1432,7 +1432,7 @@ ROM_END
 /***************************************************************************
 
   Epoch Electronic Football (manufactured in Japan)
-  * PCB labels 36020(A/B/C)
+  * PCB labels: 36020(A/B/C)
   * NEC uCOM-43 MCU, label D553C 080
   * cyan VFD display NEC FIP10AM15T tube no. 0F, with bezel overlay
 
@@ -1549,7 +1549,7 @@ ROM_END
 /***************************************************************************
 
   Epoch Galaxy II (manufactured in Japan)
-  * PCB labels 19096/96062
+  * PCB labels: 19096/96062
   * NEC uCOM-43 MCU, label D553C 153
   * cyan/red VFD display NEC FIP10xM20T, with color overlay. x = multiple VFD
     revisions exist, with different graphics: rev B no. 1-8, rev. D no. 2-21.
@@ -1684,7 +1684,7 @@ ROM_END
 /***************************************************************************
 
   Epoch Astro Command (manufactured in Japan)
-  * PCB labels 96111/96112
+  * PCB labels: 96111/96112
   * NEC uCOM-43 MCU, label D553C 202
   * cyan/red VFD display NEC FIP9AM20T no. 42-42, with color overlay + bezel
 
@@ -1806,7 +1806,7 @@ ROM_END
 /***************************************************************************
 
   Epoch Dracula (manufactured in Japan)
-  * PCB label 96121
+  * PCB label: 96121
   * NEC uCOM-43 MCU, label D553C 206
   * cyan/red/green VFD display NEC FIP8BM20T no. 2-42
 
@@ -2008,7 +2008,7 @@ ROM_END
 /***************************************************************************
 
   Mego Mini-Vid: Break Free (manufactured in Japan)
-  * PCB label Mego 79 rev F
+  * PCB label: Mego 79 rev F
   * NEC uCOM-43 MCU, label D553C 049
   * cyan VFD display Futaba DM-4.5 91
 
@@ -2121,7 +2121,7 @@ ROM_END
 /***************************************************************************
 
   Takatoku Toys(T.T) Game Robot 9 「ゲームロボット九」
-  * PCB label GAME ROBOT 7520
+  * PCB label: GAME ROBOT 7520
   * NEC uCOM-43 MCU, label TTGR-512 (die label NEC D557 511)
   * 9 lamps behind buttons
 
@@ -2246,7 +2246,7 @@ ROM_END
 /***************************************************************************
 
   Tomy(tronic) Cosmic Combat (manufactured in Japan)
-  * PCB label 2E1019-E01
+  * PCB label: 2E1019-E01
   * NEC uCOM-44 MCU, label D552C 042
   * cyan VFD display NEC FIP32AM18Y tube no. 0E, with color overlay
 
@@ -2356,7 +2356,7 @@ ROM_END
 /***************************************************************************
 
   Tomy(tronic) Tennis (manufactured in Japan)
-  * PCB label TOMY TN-04 TENNIS
+  * PCB label: TOMY TN-04 TENNIS
   * NEC uCOM-44 MCU, label D552C 048
   * cyan VFD display NEC FIP11AM15T tube no. 0F, with overlay
 
@@ -2528,7 +2528,7 @@ ROM_END
 /***************************************************************************
 
   Tomy(tronic) Pac-Man (manufactured in Japan)
-  * PCB label TN-08 2E108E01
+  * PCB label: TN-08 2E108E01
   * NEC uCOM-43 MCU, label D553C 160
   * cyan/red/green VFD display NEC FIP8AM18T no. 2-21
   * bright yellow round casing
@@ -2649,7 +2649,7 @@ ROM_END
 /***************************************************************************
 
   Tomy(tronic) Scramble (manufactured in Japan)
-  * PCB label TN-10 2E114E01
+  * PCB label: TN-10 2E114E01
   * NEC uCOM-43 MCU, label D553C 192
   * cyan/red/green VFD display NEC FIP10CM20T no. 2-41
 
@@ -2764,7 +2764,7 @@ ROM_END
 /***************************************************************************
 
   Tomy(tronic) Caveman (manufactured in Japan)
-  * PCB label TN-12 2E114E03
+  * PCB label: TN-12 2E114E03
   * NEC uCOM-43 MCU, label D553C 209
   * cyan/red/green VFD display NEC FIP8AM20T no. 2-42
 
@@ -2875,7 +2875,7 @@ ROM_END
 /***************************************************************************
 
   Tomy Alien Chase (manufactured in Japan)
-  * PCB label TN-16 2E121B01
+  * PCB label: TN-16 2E121B01
   * NEC uCOM-43 MCU, label D553C 258
   * red/green VFD display NEC FIP9AM24T, with color overlay, 2-sided*
 

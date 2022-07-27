@@ -1287,6 +1287,38 @@ ROM_START( footbpow )
 //  ROM_LOAD( "fop_37.ic37", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) )
 ROM_END
 
+ROM_START( footbpow11 )
+	ROM_REGION( 0x200000, "maincpu", 0 )    // 68020 code
+	ROM_LOAD32_BYTE( "fop11_7.ic7",   0x000000, 0x80000, CRC(1314e1d6) SHA1(9d049a0659d07af7b874bc541e4abfd249a430c8) )
+	ROM_LOAD32_BYTE( "fop11_12.ic12", 0x000001, 0x80000, CRC(d0dea4db) SHA1(688fa53a682cb0a76f547364600e6a61a85a1a1d) )
+	ROM_LOAD32_BYTE( "fop11_13.ic13", 0x000002, 0x80000, CRC(c58afb45) SHA1(0b0f95b31532bcdf599d160d1a9fd46fe9d24b55) )
+	ROM_LOAD32_BYTE( "fop11_19.ic19", 0x000003, 0x80000, CRC(c6380cf1) SHA1(845d9db0e8f4a762f5e527da45f6751e5583cb71) )
+
+	ROM_REGION16_LE( 0x400000, "user1", 0 ) // ADSP-2115 code & data
+	ROM_LOAD( "fop_ic23.ic23", 0x0000000, 0x400000, CRC(3c02f7c6) SHA1(2325f2a1b260ac60929c82640ced481ad67bb2e0) )
+
+	ROM_REGION32_LE( 0x1000000, "user2", 0 )
+	ROM_LOAD32_WORD( "fop_ic48.ic48", 0x000000, 0x800000, CRC(efddf5c1) SHA1(1014b0193d17de05ebcc733fc5d26089b932385b) )
+	ROM_LOAD32_WORD( "fop_ic42.ic42", 0x000002, 0x800000, CRC(8772e536) SHA1(530dfb4e27466bd97582c4fd50af01f14716ed2b) )
+
+	ROM_REGION( 0x2000000, "gfx1", 0 )
+	ROM_LOAD( "fop_ic8.ic8",   0x0000000, 0x400000, CRC(eaff30ec) SHA1(63f5d33b98194a206c558f9e02c432e7e05aa0e6) )
+	ROM_LOAD( "fop_ic10.ic10", 0x0800000, 0x400000, CRC(536c822b) SHA1(235e96af470785f6cca010782560a4071f285901) )
+	ROM_LOAD( "fop_ic15.ic15", 0x1000000, 0x400000, CRC(c8903051) SHA1(b5927a0bbba017d42b98e7850df966cfa9eeb64a) )
+	ROM_LOAD( "fop_ic17.ic17", 0x1800000, 0x400000, CRC(559a38ae) SHA1(e36d596ad90d0f3657d677e3afa984be30c1fa3b) )
+
+	ROM_REGION( 0x0080000, "gfx2", 0 )
+	ROM_LOAD( "fop_24.ic24", 0x0000000, 0x020000, CRC(3214ae1b) SHA1(3ae2fa28ef603b34b3c72313c513f200e2750b85) )
+	ROM_LOAD( "fop_25.ic25", 0x0020000, 0x020000, CRC(69a8734c) SHA1(835db85371d8fbf0c1a2bc0c6109286f12c95794) )
+	ROM_LOAD( "fop_26.ic26", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) )
+	ROM_LOAD( "fop_27.ic27", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) )
+	// These 4 are copies of the previous 4
+//  ROM_LOAD( "fop_34.ic34", 0x0000000, 0x020000, CRC(3214ae1b) SHA1(3ae2fa28ef603b34b3c72313c513f200e2750b85) )
+//  ROM_LOAD( "fop_35.ic35", 0x0020000, 0x020000, CRC(69a8734c) SHA1(835db85371d8fbf0c1a2bc0c6109286f12c95794) )
+//  ROM_LOAD( "fop_36.ic36", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) )
+//  ROM_LOAD( "fop_37.ic37", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) )
+ROM_END
+
 
 /*************************************
  *
@@ -1306,3 +1338,4 @@ GAME( 1998, radikalb,   0,        gaelco3d2, radikalb, gaelco3d_state, empty_ini
 GAME( 1998, radikalba,  radikalb, gaelco3d2, radikalb, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Radikal Bikers (Version 2.02, Atari license)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 
 GAME( 1999, footbpow,   0,        footbpow,  footbpow, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Football Power (Version 1.2)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
+GAME( 1999, footbpow11, footbpow, footbpow,  footbpow, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Football Power (Version 1.1)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )

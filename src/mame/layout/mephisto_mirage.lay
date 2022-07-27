@@ -231,7 +231,7 @@ license:CC0
 	</element>
 
 	<element name="text_uit1" defstate="0">
-		<text string="SB.MOBIL" state="0"><color red="0.81" green="0.8" blue="0.79" /></text>
+		<text string="SB.MIRAGE" state="0"><color red="0.81" green="0.8" blue="0.79" /></text>
 		<text string="SB.MODULAR" state="1"><color red="0.81" green="0.8" blue="0.79" /></text>
 	</element>
 	<element name="text_uit2"><text string="INTERFACE"><color red="0.81" green="0.8" blue="0.79" /></text></element>
@@ -407,6 +407,11 @@ license:CC0
 	<element name="gray"><rect><color red="0.25" green="0.25" blue="0.25" /></rect></element>
 	<element name="white"><rect><color red="0.95" green="0.95" blue="0.95" /></rect></element>
 
+	<element name="blackw">
+		<rect><bounds x="0" y="0" width="0.6" height="0.9" /><color red="0.95" green="0.95" blue="0.95" /></rect>
+		<rect><bounds x="0.125" y="0.125" width="0.35" height="0.65" /><color red="0.25" green="0.25" blue="0.25" /></rect>
+	</element>
+
 	<element name="keys" defstate="0">
 		<rect state="1"><color red="0.0" green="0.0" blue="0.0" /></rect>
 	</element>
@@ -479,8 +484,7 @@ license:CC0
 		<element ref="text_b35"><bounds x="16" y="10.7" width="2.7" height="1.3" /></element>
 		<element ref="text_b36"><bounds x="20" y="10.7" width="2.7" height="1.3" /></element>
 
-		<element ref="white"><bounds x="17.2" y="10.925" width="0.6" height="0.9" /></element>
-		<element ref="gray"><bounds x="17.325" y="11.05" width="0.35" height="0.65" /></element>
+		<element ref="blackw"><bounds x="17.2" y="10.925" width="0.6" height="0.9" /></element>
 		<element ref="white"><bounds x="21.2" y="10.925" width="0.6" height="0.9" /></element>
 
 		<element ref="text_p6"><bounds x="4" y="7.1" width="1.4" height="1.4" /></element>

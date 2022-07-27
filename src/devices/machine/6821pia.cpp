@@ -13,12 +13,13 @@
 //  MACROS
 //**************************************************************************
 
-#define LOG_GENERAL 0x01
-#define LOG_SETUP   0x02
-#define LOG_CA1     0x08
+#define LOG_SETUP   (1 << 1U)
+#define LOG_CA1     (1 << 2U)
 
 //#define VERBOSE (LOG_SETUP | LOG_GENERAL | LOG_CA1)
 //#define LOG_OUTPUT_STREAM std::cout
+
+#define VERBOSE (0)
 
 #include "logmacro.h"
 #define LOGSETUP(...) LOGMASKED(LOG_SETUP,   __VA_ARGS__)
@@ -843,7 +844,7 @@ void pia6821_device::write(offs_t offset, uint8_t data)
 		break;
 
 	case 0x01:
-		control_a_w( data);
+		control_a_w(data);
 		break;
 
 	case 0x02:

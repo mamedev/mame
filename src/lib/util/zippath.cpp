@@ -726,7 +726,7 @@ std::error_condition zippath_fopen(std::string_view filename, uint32_t openflags
 		}
 
 		if (subpath.empty())
-			filerr = util::core_file::open(std::string(filename), openflags, file);
+			filerr = util::core_file::open(filename, openflags, file);
 		else
 			filerr = std::errc::no_such_file_or_directory;
 

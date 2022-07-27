@@ -219,6 +219,7 @@ protected:
 	bool m_rnr;         // receive unit became not ready
 	bool m_initialised;
 	bool m_reset;
+	bool m_irq;
 	int m_irq_assert;   // configurable interrupt polarity
 
 	// receive/command unit state

@@ -23427,4 +23427,20 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="lauren25">
+		<description>Lauren of the 25th Century</description>
+		<year>1985</year>
+		<publisher>Addison-Wesley</publisher>
+		<info name="release" value="2022-07-22"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Lauren of the 25th Century" is a 1985 educational game developed by Lucy Werth Ewell and Elizabeth R. Stott, Ph.D. of Rhiannon Software, and distributed by Addison-Wesley. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234835">
+				<rom name="lauren of the 25th century.woz" size="234835" crc="8cfeba56" sha1="9383641151206c241381196a37a59df0a53daa74"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

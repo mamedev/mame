@@ -3257,8 +3257,10 @@ avigo_it                        // 1997 Avigo (Italian)
 aviion_4600                     // Data General AViiON 4600
 
 @source:elektor/avrmax.cpp
+atm18mcc
 avrmax
 avrmaxg
+cc2schach
 
 @source:misc/avt.cpp
 avtbingo                        // (c) 1985 AVT
@@ -13759,7 +13761,7 @@ rhunting                        // bootleg of deathrac
 @source:motorola/exorciser.cpp
 exorciser                       // 1975 Motorola
 
-@source:exorterm/exorterm.cpp
+@source:motorola/exorterm.cpp
 exorterm155                     // (c) 1979 Motorola
 
 @source:netronics/exp85.cpp
@@ -14521,6 +14523,7 @@ wrally2a                        // (c) 1995 - Ref 950510
 
 @source:gaelco/gaelco3d.cpp
 footbpow                        // (c) 1999 - Ref 000208
+footbpow11                      // (c) 1999 - Ref 980512 (main) + 000208 (ROMs)
 radikalb                        // (c) 1998 - Ref ???
 radikalba                       // (c) 1998 - Ref ???
 speedup                         // (c) 1996 - Ref 961022 (main) + 961029 (ROMs)
@@ -14528,7 +14531,7 @@ speedup12                       // (c) 1996 - Ref ???
 speedup10                       // (c) 1996 - Ref ???
 surfplnt                        // (c) 1997 - Ref 971223
 surfplnt40                      // (c) 1997 - Ref 970514
-surfplnt30                      // (c) 1997 - Red 970489
+surfplnt30                      // (c) 1997 - Ref 970489
 
 @source:gaelco/gaelcof3.cpp
 autopapa                        //
@@ -15831,6 +15834,7 @@ ladylinrb                       // (c) 198? TAB Austria
 ladylinrc                       // (c) 198? TAB Austria
 ladylinrd                       // (c) 198? TAB Austria
 ladylinre                       // (c) 198? TAB Austria
+ll3                             // bootleg
 lucky8                          // (c) 1989 Wing Co. Ltd
 lucky8a                         // (c) 1989 Wing Co. Ltd
 lucky8b                         // (c) 1989 Wing Co. Ltd
@@ -16822,10 +16826,10 @@ mathmarv                        // Texas Instruments
 mbdtower                        // Milton Bradley
 mdndclab                        // Mattel
 merlin                          // Parker Bros
-merlina                         // Parker Bros
 mmarvin                         // Entex
 mmerlin                         // Parker Bros
 monkeysee                       // Tandy Corporation
+mrmusical                       // Concept 2000
 palmf31                         // Canon
 palmmd8                         // Canon
 pbmastm                         // Parker Bros
@@ -17036,6 +17040,7 @@ nbapbp                          // GX778 (c)1998
 nbapbpa                         // GX778 (c)1998
 sscope                          // GX830 (c)1999
 sscope2                         // GX931 (c)2000
+sscope2e                        // GX931 (c)2000
 sscopea                         // GX830 (c)1999
 sscopeb                         // GX830 (c)1999
 sscopec                         // GX830 (c)1999
@@ -20478,7 +20483,9 @@ lviv                            // Lviv/L'vov
 
 @source:capcom/lwings.cpp
 avengers                        // 2/1987 (c) 1987 (US)
-avengers2                       // 2/1987 (c) 1987 (US)
+avengersa                       // 2/1987 (c) 1987 (US)
+avengersb                       // 2/1987 (c) 1987 (US)
+avengersc                       // 2/1987 (c) 1987 (US)
 buraiken                        // 2/1987 (c) 1987 (Japan)
 buraikenb                       // 2/1987 (c) 1987 (Japan)
 fball                           //
@@ -20722,20 +20729,24 @@ uccopsu                         // (c) 1992 Irem America (US)
 
 @source:apple/mac.cpp
 mac2fdhd                        // 1988 Apple Macintosh II (FDHD)
-maccclas                        // 1993 Apple Macintosh Color Classic
-macclas2                        // 1991 Apple Macintosh Classic II
 macii                           // 1987 Apple Macintosh II
 maciici                         // 1989 Apple Macintosh IIci
 maciicx                         // 1989 Apple Macintosh IIcx
 maciifx                         // 1990 Apple Macintosh IIfx
 maciihmu                        // 1987 Apple Macintosh II (w/o 68851 MMU)
 maciisi                         // 1990 Apple Macintosh IIsi
-maciivi                         // 1993 Apple Macintosh IIvi
-maciivx                         // 1993 Apple Macintosh IIvx
 maciix                          // 1988 Apple Macintosh IIx
+macse30                         // 1989 Apple Macintosh SE/30
+
+@source:apple/maclc.cpp
 maclc                           // 1990 Apple Macintosh LC
 maclc2                          // 1991 Apple Macintosh LC II
-macse30                         // 1989 Apple Macintosh SE/30
+macclas2                        // 1991 Apple Macintosh Classic II
+maccclas                        // 1993 Apple Macintosh Color Classic
+
+@source:apple/maciivx.cpp
+maciivx                         // 1993 Apple Macintosh IIvx
+maciivi                         // 1993 Apple Macintosh IIvi
 
 @source:apple/maclc3.cpp
 maclc3                          // 1993 Apple Macintosh LC III
@@ -23350,6 +23361,7 @@ mm5a                            // Mephisto MM V
 mm5p
 rebel5                          // Mephisto Rebell 5.0
 rebel5a                         // Mephisto Rebell 5.0
+rebel5b                         // Mephisto Rebell 5.0
 
 @source:hegenerglaser/modena.cpp
 modena                          // 1992 Mephisto Modena
@@ -23891,6 +23903,7 @@ mk4a                            // (c) 1997 Midway (v2.1)
 mk4b                            // (c) 1997 Midway (v1.0)
 thegrid                         // (c) 2001 Midway (v1.2) Latest offical release
 thegrida                        // (c) 2001 Midway (v1.1)
+thegridb                        // (c) 2001 Midway (v1.01)
 
 @source:skeleton/mightyframe.cpp
 mightyframe                     // Convergent
@@ -24150,6 +24163,7 @@ lastbrnx                        // 1996.06 Last Bronx (Export, Revision A)
 lastbrnxj                       // 1996.06 Last Bronx (Japan, Revision A)
 lastbrnxu                       // 1996.06 Last Bronx (USA, Revision A)
 manxtt                          // 1995.11 Manx T.T. DX (Revision D)
+manxtta                         // 1995.?? Manx T.T. (Revision A)
 manxttc                         // 1995.11 Manx T.T. (Revision C)
 motoraid                        // 1997.10 Motor Raid Twin
 motoraiddx                      // 1997.10 Motor Raid DX
@@ -32807,7 +32821,7 @@ ryuuha                          // (c) 1987
 secolove                        // (c) 1986
 seiha                           // (c) 1987
 seiham                          // (c) 1987
-swinggal            // (c) 1987 Digital Denshi
+swinggal                        // (c) 1987 Digital Denshi
 vipclub                         // (c) 1988 Daiichi Denshi
 
 @source:nichibutsu/nbmj8891.cpp
@@ -33471,6 +33485,9 @@ zonefusn
 newbrain                        //
 newbraina                       //
 newbrainmd                      //
+
+@source:pinball/newcanasta.cpp
+newcanasta                      // (c) 2010 Marsaplay
 
 @source:misc/news.cpp
 news                            // "Virus"??? ((c) 1993 Poby in ROM VIRUS.4)
@@ -37731,6 +37748,7 @@ scyclone                        // (c) 1980 Taito Corporation
 @source:playmark/sderby.cpp
 croupier                        // (c) 1997 Playmark
 croupiera                       // (c) 1997 Playmark
+croupierb                       // (c) 1997 Playmark
 luckboom                        //
 magictch                        //
 sderby                          // (c) 1996
@@ -39493,6 +39511,9 @@ spartanxtec
 spbactn                         // 9002 - (c) 1991 Tecmo
 spbactnj                        // 9002 - (c) 1991 Tecmo
 spbactnp                        // prototype
+
+@source:samsung/dvd-n5xx.cpp
+n501
 
 @source:samsung/spc1000.cpp
 spc1000                         //

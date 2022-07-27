@@ -6,6 +6,7 @@ license:CC0
 <softwarelist name="ekara_japan_en" description="Takara e-kara (Japan) EN-xx series cartridges">
 	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit -->
 	<!--
+	Enka-shū (演歌集) series
 	Japanese cart listing (by EN code)  * = dumped
 	 * = dumped
 
@@ -13,18 +14,20 @@ license:CC0
 
 	(check what units these are for)
 
-	 EN-1  (unknown)
-	 EN-2  (unknown)
-	*EN-3  (unknown)
+	 EN-1  Enka Collection - Volume 1
+	 EN-2  Enka Collection - Volume 2
+	*EN-3  Enka Collection - Volume 3
+	 EN-4  Enka Collection - Volume 4
 
 	(more? what's the EN highest number?)
 
 	-->
 
 	<software name="en3">
-		<description>EN-3 (Japan)</description>
+		<description>Enka-shū Dai San-hen (Japan) (EN-3)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="演歌集 第三篇" />
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="en-3.u1" size="0x100000" crc="e3686ff4" sha1="e7e9a53a778739c406b2b226300d2f525cd9676b"/>

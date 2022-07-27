@@ -77,8 +77,8 @@ void mephisto_display1_device::strobe_w(int state)
 {
 	state = state ? 1 : 0;
 
-	// update lcd on rising edge
-	if (state && ~m_strobe)
+	// update lcd on any edge
+	if (state != m_strobe)
 		update_lcd();
 
 	m_strobe = state;
