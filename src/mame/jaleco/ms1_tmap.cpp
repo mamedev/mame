@@ -63,19 +63,8 @@ megasys1_tilemap_device::megasys1_tilemap_device(const machine_config &mconfig, 
  *
  *************************************/
 
-static const gfx_layout tilelayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1)   },
-	{ STEP8(0,4)   },
-	{ STEP8(0,4*8) },
-	8*8*4
-};
-
 GFXDECODE_MEMBER(megasys1_tilemap_device::gfxinfo)
-	GFXDECODE_DEVICE(DEVICE_SELF, 0, tilelayout, 0, 16)
+	GFXDECODE_DEVICE(DEVICE_SELF, 0, gfx_8x8x4_packed_msb, 0, 16)
 GFXDECODE_END
 
 //-------------------------------------------------
