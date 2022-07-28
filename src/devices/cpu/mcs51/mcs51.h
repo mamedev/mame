@@ -182,7 +182,7 @@ protected:
 	void clear_current_irq();
 	uint8_t r_acc();
 	uint8_t r_psw();
-	offs_t external_ram_iaddr(offs_t offset, offs_t mem_mask);
+	virtual offs_t external_ram_iaddr(offs_t offset, offs_t mem_mask);
 	uint8_t iram_read(size_t offset);
 	void iram_write(size_t offset, uint8_t data);
 	void push_pc();
