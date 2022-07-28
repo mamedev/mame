@@ -1321,7 +1321,7 @@ ROM_START( heatof11 )
 	/* Ring codes found on the disc:
           703EAA02 PN.0000046809  1 + + + + +  IFPI L251
           IFPI 42MO */
-	DISK_IMAGE_READONLY( "703eaa02", 0, SHA1(679315f1ec6630b3cb5b8061cfcc534e31be1ffa) )
+	DISK_IMAGE_READONLY( "703eaa02", 0, SHA1(f8a87eacfdbbd22659f39c7a72e3895f0a7697b7) )
 ROM_END
 
 ROM_START( evilngt )
