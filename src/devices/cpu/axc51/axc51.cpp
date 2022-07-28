@@ -68,7 +68,6 @@ axc51base_cpu_device::axc51base_cpu_device(const machine_config &mconfig, device
 	, m_pc(0)
 	, m_features(features)
 	, m_rom_size(program_width > 0 ? 1 << program_width : 0)
-	, m_ram_mask( (data_width == 8) ? 0xFF : 0x7F )
 	, m_num_interrupts(5)
 	, m_sfr_ram(*this, "sfr_ram")
 	, m_scratchpad(*this, "scratchpad")
@@ -122,8 +121,8 @@ device_memory_interface::space_config_vector axc51base_cpu_device::memory_space_
 
 /* Read/Write a byte from/to the Internal RAM indirectly */
 /* (called from indirect addressing)                     */
-uint8_t axc51base_cpu_device::iram_iread(offs_t a) { return (a <= m_ram_mask) ? m_data.read_byte(a) : 0xff; }
-void axc51base_cpu_device::iram_iwrite(offs_t a, uint8_t d) { if (a <= m_ram_mask) m_data.write_byte(a, d); }
+uint8_t axc51base_cpu_device::iram_iread(offs_t a) { return m_data.read_byte(a); }
+void axc51base_cpu_device::iram_iwrite(offs_t a, uint8_t d) { m_data.write_byte(a, d); }
 
 #define IRAM_IR(a)      iram_iread(a)
 #define IRAM_IW(a, d)   iram_iwrite(a, d)
@@ -143,7 +142,6 @@ void axc51base_cpu_device::iram_iwrite(offs_t a, uint8_t d) { if (a <= m_ram_mas
 
 #define PPC     m_ppc
 #define PC      m_pc
-#define RWM     m_rwm
 
 /* SFR Registers - These are accessed directly for speed on read */
 /* Read accessors                                                */
@@ -484,7 +482,7 @@ void axc51base_cpu_device::execute_op(uint8_t op)
 		case 0x02:  ljmp(op);                      break;  //LJMP code addr
 		case 0x03:  rr_a(op);                      break;  //RR A
 		case 0x04:  inc_a(op);                     break;  //INC A
-		case 0x05:  RWM=1; inc_mem(op); RWM=0;     break;  //INC data addr
+		case 0x05:  inc_mem(op);                   break;  //INC data addr
 
 		case 0x06:
 		case 0x07:  inc_ir(op&1);                       break;  //INC @R0/@R1
@@ -498,12 +496,12 @@ void axc51base_cpu_device::execute_op(uint8_t op)
 		case 0x0e:
 		case 0x0f:  inc_r(op&7);                       break;  //INC R0 to R7
 
-		case 0x10:  RWM=1; jbc(op); RWM=0;             break;  //JBC bit addr, code addr
+		case 0x10:  jbc(op);                       break;  //JBC bit addr, code addr
 		case 0x11:  acall(op);                     break;  //ACALL code addr
 		case 0x12:  lcall(op);                         break;  //LCALL code addr
 		case 0x13:  rrc_a(op);                     break;  //RRC A
 		case 0x14:  dec_a(op);                     break;  //DEC A
-		case 0x15:  RWM=1; dec_mem(op); RWM=0;     break;  //DEC data addr
+		case 0x15:  dec_mem(op);                   break;  //DEC data addr
 
 		case 0x16:
 		case 0x17:  dec_ir(op&1);                  break;  //DEC @R0/@R1
@@ -557,8 +555,8 @@ void axc51base_cpu_device::execute_op(uint8_t op)
 
 		case 0x40:  jc(op);                            break;  //JC code addr
 		case 0x41:  ajmp(op);                      break;  //AJMP code addr
-		case 0x42:  RWM=1; orl_mem_a(op);  RWM=0;  break;  //ORL data addr, A
-		case 0x43:  RWM=1; orl_mem_byte(op); RWM=0;    break;  //ORL data addr, #data
+		case 0x42:  orl_mem_a(op);                 break;  //ORL data addr, A
+		case 0x43:  orl_mem_byte(op);              break;  //ORL data addr, #data
 		case 0x44:  orl_a_byte(op);                    break;
 		case 0x45:  orl_a_mem(op);                 break;  //ORL A, data addr
 
@@ -576,8 +574,8 @@ void axc51base_cpu_device::execute_op(uint8_t op)
 
 		case 0x50:  jnc(op);                       break;  //JNC code addr
 		case 0x51:  acall(op);                     break;  //ACALL code addr
-		case 0x52:  RWM=1; anl_mem_a(op); RWM=0;       break;  //ANL data addr, A
-		case 0x53:  RWM=1; anl_mem_byte(op); RWM=0;    break;  //ANL data addr, #data
+		case 0x52:  anl_mem_a(op);                 break;  //ANL data addr, A
+		case 0x53:  anl_mem_byte(op);              break;  //ANL data addr, #data
 		case 0x54:  anl_a_byte(op);                    break;  //ANL A, #data
 		case 0x55:  anl_a_mem(op);                 break;  //ANL A, data addr
 
@@ -595,8 +593,8 @@ void axc51base_cpu_device::execute_op(uint8_t op)
 
 		case 0x60:  jz(op);                            break;  //JZ code addr
 		case 0x61:  ajmp(op);                      break;  //AJMP code addr
-		case 0x62:  RWM=1; xrl_mem_a(op); RWM=0;       break;  //XRL data addr, A
-		case 0x63:  RWM=1; xrl_mem_byte(op); RWM=0;    break;  //XRL data addr, #data
+		case 0x62:  xrl_mem_a(op);                 break;  //XRL data addr, A
+		case 0x63:  xrl_mem_byte(op);              break;  //XRL data addr, #data
 		case 0x64:  xrl_a_byte(op);                    break;  //XRL A, #data
 		case 0x65:  xrl_a_mem(op);                 break;  //XRL A, data addr
 
@@ -652,7 +650,7 @@ void axc51base_cpu_device::execute_op(uint8_t op)
 
 		case 0x90:  mov_dptr_byte(op);             break;  //MOV DPTR, #data
 		case 0x91:  acall(op);                     break;  //ACALL code addr
-		case 0x92:  RWM = 1; mov_bitaddr_c(op); RWM = 0; break;    //MOV bit addr, C
+		case 0x92:  mov_bitaddr_c(op);             break;    //MOV bit addr, C
 		case 0x93:  movc_a_iadptr(op);             break;  //MOVC A, @A + DPTR
 		case 0x94:  subb_a_byte(op);                   break;  //SUBB A, #data
 		case 0x95:  subb_a_mem(op);                    break;  //SUBB A, data addr
@@ -690,7 +688,7 @@ void axc51base_cpu_device::execute_op(uint8_t op)
 
 		case 0xb0:  anl_c_nbitaddr(op);                break;  //ANL C,/bit addr
 		case 0xb1:  acall(op);                     break;  //ACALL code addr
-		case 0xb2:  RWM=1; cpl_bitaddr(op); RWM=0;     break;  //CPL bit addr
+		case 0xb2:  cpl_bitaddr(op);               break;  //CPL bit addr
 		case 0xb3:  cpl_c(op);                     break;  //CPL C
 		case 0xb4:  cjne_a_byte(op);                   break;  //CJNE A, #data, code addr
 		case 0xb5:  cjne_a_mem(op);                    break;  //CJNE A, data addr, code addr
@@ -709,7 +707,7 @@ void axc51base_cpu_device::execute_op(uint8_t op)
 
 		case 0xc0:  push(op);                      break;  //PUSH data addr
 		case 0xc1:  ajmp(op);                      break;  //AJMP code addr
-		case 0xc2:  RWM=1; clr_bitaddr(op); RWM=0; break;  //CLR bit addr
+		case 0xc2:  clr_bitaddr(op);               break;  //CLR bit addr
 		case 0xc3:  clr_c(op);                         break;  //CLR C
 		case 0xc4:  swap_a(op);                        break;  //SWAP A
 		case 0xc5:  xch_a_mem(op);                 break;  //XCH A, data addr
@@ -728,10 +726,10 @@ void axc51base_cpu_device::execute_op(uint8_t op)
 
 		case 0xd0:  pop(op);                           break;  //POP data addr
 		case 0xd1:  acall(op);                     break;  //ACALL code addr
-		case 0xd2:  RWM=1; setb_bitaddr(op); RWM=0;    break;  //SETB bit addr
+		case 0xd2:  setb_bitaddr(op);              break;  //SETB bit addr
 		case 0xd3:  setb_c(op);                        break;  //SETB C
 		case 0xd4:  da_a(op);                      break;  //DA A
-		case 0xd5:  RWM=1; djnz_mem(op); RWM=0;        break;  //DJNZ data addr, code addr
+		case 0xd5:  djnz_mem(op);                  break;  //DJNZ data addr, code addr
 
 		case 0xd6:
 		case 0xd7:  xchd_a_ir(op&1);                   break;  //XCHD A, @R0/@R1
@@ -912,12 +910,11 @@ uint8_t axc51base_cpu_device::sfr_read(size_t offset)
 
 	switch (offset)
 	{
-		/* Read/Write/Modify operations read the port latch ! */
 		/* Move to memory map */
-		case ADDR_P0:   return RWM ? P0 : (P0 | m_forced_inputs[0]) & m_port_in_cb[0]();
-		case ADDR_P1:   return RWM ? P1 : (P1 | m_forced_inputs[1]) & m_port_in_cb[1]();
-		case ADDR_P2:   return RWM ? P2 : (P2 | m_forced_inputs[2]) & m_port_in_cb[2]();
-		case ADDR_P3:   return RWM ? P3 : (P3 | m_forced_inputs[3]) & m_port_in_cb[3]()
+		case ADDR_P0:   return (P0 | m_forced_inputs[0]) & m_port_in_cb[0]();
+		case ADDR_P1:   return (P1 | m_forced_inputs[1]) & m_port_in_cb[1]();
+		case ADDR_P2:   return (P2 | m_forced_inputs[2]) & m_port_in_cb[2]();
+		case ADDR_P3:   return (P3 | m_forced_inputs[3]) & m_port_in_cb[3]()
 							& ~(GET_BIT(m_last_line_state, AXC51_INT0_LINE) ? 4 : 0)
 							& ~(GET_BIT(m_last_line_state, AXC51_INT1_LINE) ? 8 : 0);
 
@@ -956,13 +953,8 @@ void axc51base_cpu_device::device_start()
 	save_item(NAME(m_pc));
 	save_item(NAME(m_last_op));
 	save_item(NAME(m_last_bit));
-	save_item(NAME(m_rwm) );
 	save_item(NAME(m_cur_irq_prio) );
 	save_item(NAME(m_last_line_state) );
-	save_item(NAME(m_t0_cnt) );
-	save_item(NAME(m_t1_cnt) );
-	save_item(NAME(m_t2_cnt) );
-	save_item(NAME(m_t2ex_cnt) );
 	save_item(NAME(m_recalc_parity) );
 	save_item(NAME(m_irq_prio) );
 	save_item(NAME(m_irq_active) );
@@ -1028,10 +1020,6 @@ void axc51base_cpu_device::state_string_export(const device_state_entry &entry, 
 void axc51base_cpu_device::device_reset()
 {
 	m_last_line_state = 0;
-	m_t0_cnt = 0;
-	m_t1_cnt = 0;
-	m_t2_cnt = 0;
-	m_t2ex_cnt = 0;
 
 	/* Flag as NO IRQ in Progress */
 	m_irq_active = 0;
@@ -1040,7 +1028,6 @@ void axc51base_cpu_device::device_reset()
 	m_last_bit = 0;
 
 	/* these are all defined reset states */
-	RWM = 0;
 	PPC = PC;
 	PC = 0;
 	SP = 0x7;
