@@ -2923,7 +2923,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="tankent2">
-		<description>Tanken-tai 2 - Makyo Amazon no Okuchi ni Kogane Densetsu wo Mita!</description>
+		<description>Tankentai 2 - Makyou Amazon no Okuchi ni Ougon Densetsu o Mita!</description>
 		<year>1985</year>
 		<publisher>データウエスト (Data West)</publisher>
 		<!-- Turbo only -->
