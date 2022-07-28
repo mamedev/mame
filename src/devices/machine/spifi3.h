@@ -171,7 +171,7 @@ private:
 		{
 			if(size == FIFO_SIZE)
 			{
-				fatalerror("SPIFI3: FIFO overflow!");
+				fatalerror("spifi3: FIFO overflow!");
 			}
 
 			fifo[tail] = value;
@@ -183,7 +183,7 @@ private:
 		{
 			if (size == 0) 
 			{
-				fatalerror("SPIFI3: FIFO underflow!");
+				fatalerror("spifi3: FIFO underflow!");
 			}
 
 			const T removed_value = fifo[head];
@@ -294,7 +294,7 @@ private:
 	void cmd_buf_w(offs_t offset, uint8_t data);
 
 	// Data helpers
-	inline bool dma_command(dma_direction current_direction)
+	bool dma_command(dma_direction current_direction) const
 	{
 		return current_direction != DMA_NONE;
 	}

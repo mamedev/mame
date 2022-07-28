@@ -34,6 +34,7 @@
 #define SPIFI3_TRACE (SPIFI3_DEBUG | LOG_STATE | LOG_CMD)
 #define SPIFI3_MAX (SPIFI3_TRACE | LOG_DATA)
 
+#define VERBOSE SPIFI3_TRACE
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(SPIFI3, spifi3_device, "spifi3", "HP 1TV3-0302 SPIFI3 SCSI-2 Protocol Controller")
@@ -45,65 +46,65 @@ ALLOW_SAVE_TYPE(spifi3_device::dma_direction)
 namespace
 {
 	// AUXCTRL constants and functions
-	static constexpr uint32_t AUXCTRL_DMAEDGE = 0x04;
-	static constexpr uint32_t AUXCTRL_SETRST = 0x20;
-	static constexpr uint32_t AUXCTRL_CRST = 0x40;
-	static constexpr uint32_t AUXCTRL_SRST = 0x80;
+	constexpr uint32_t AUXCTRL_DMAEDGE = 0x04;
+	constexpr uint32_t AUXCTRL_SETRST = 0x20;
+	constexpr uint32_t AUXCTRL_CRST = 0x40;
+	constexpr uint32_t AUXCTRL_SRST = 0x80;
 
 	// spstat - not fully implemented yet
-	static constexpr uint32_t SPS_IDLE = 0x00;
-	static constexpr uint32_t SPS_MSGOUT = 0x04;
-	static constexpr uint32_t SPS_COMMAND = 0x05;
-	static constexpr uint32_t SPS_INTR = 0x08;
-	static constexpr uint32_t SPS_STATUS = 0x0c;
-	static constexpr uint32_t SPS_MSGIN = 0x0d;
-	static constexpr uint32_t SPS_DATAOUT = 0x0e;
-	static constexpr uint32_t SPS_DATAIN = 0x0f;
+	constexpr uint32_t SPS_IDLE = 0x00;
+	constexpr uint32_t SPS_MSGOUT = 0x04;
+	constexpr uint32_t SPS_COMMAND = 0x05;
+	constexpr uint32_t SPS_INTR = 0x08;
+	constexpr uint32_t SPS_STATUS = 0x0c;
+	constexpr uint32_t SPS_MSGIN = 0x0d;
+	constexpr uint32_t SPS_DATAOUT = 0x0e;
+	constexpr uint32_t SPS_DATAIN = 0x0f;
 
 	// prstat - PRS_Z not implemented yet
-	static constexpr uint32_t PRS_IO = 0x08;
-	static constexpr uint32_t PRS_CD = 0x10;
-	static constexpr uint32_t PRS_MSG = 0x20;
-	static constexpr uint32_t PRS_ATN = 0x40;
+	constexpr uint32_t PRS_IO = 0x08;
+	constexpr uint32_t PRS_CD = 0x10;
+	constexpr uint32_t PRS_MSG = 0x20;
+	constexpr uint32_t PRS_ATN = 0x40;
 
 	// Interrupt status register - Not all interrupts implemented yet
-	static constexpr uint32_t INTR_BSRQ = 0x01;
-	static constexpr uint32_t INTR_TIMEO = 0x08;
-	static constexpr uint32_t INTR_FCOMP = 0x80;
+	constexpr uint32_t INTR_BSRQ = 0x01;
+	constexpr uint32_t INTR_TIMEO = 0x08;
+	constexpr uint32_t INTR_FCOMP = 0x80;
 
 	// Interrupt condition register - Not all interrupts implemented yet
-	static constexpr uint32_t ICOND_CNTZERO = 0x40;
-	static constexpr uint32_t ICOND_UXPHASEZ = 0x80;
+	constexpr uint32_t ICOND_CNTZERO = 0x40;
+	constexpr uint32_t ICOND_UXPHASEZ = 0x80;
 
 	// Select register - SETATN and IRESELEN not implemented yet
-	static constexpr uint32_t SEL_ISTART = 0x08;
-	static constexpr uint32_t SEL_WATN = 0x80;
-	static constexpr uint32_t SEL_TARGET = 0x70;
+	constexpr uint32_t SEL_ISTART = 0x08;
+	constexpr uint32_t SEL_WATN = 0x80;
+	constexpr uint32_t SEL_TARGET = 0x70;
 
 	// Autodata register
-	static constexpr uint32_t ADATA_IN = 0x40;
-	static constexpr uint32_t ADATA_EN = 0x80;
-	static constexpr uint32_t ADATA_TARGET_ID = 0x07;
+	constexpr uint32_t ADATA_IN = 0x40;
+	constexpr uint32_t ADATA_EN = 0x80;
+	constexpr uint32_t ADATA_TARGET_ID = 0x07;
 
 	// cmlen register
-	static constexpr uint32_t CML_LENMASK = 0x0f;
-	static constexpr uint32_t CML_AMSG_EN = 0x40;
-	static constexpr uint32_t CML_ACOM_EN = 0x80;
+	constexpr uint32_t CML_LENMASK = 0x0f;
+	constexpr uint32_t CML_AMSG_EN = 0x40;
+	constexpr uint32_t CML_ACOM_EN = 0x80;
 
 	// init_status register
-	static constexpr uint32_t INIT_STATUS_ACK = 0x40;
+	constexpr uint32_t INIT_STATUS_ACK = 0x40;
 
 	// FIFOCTRL constants and functions
 	// Based on the existence of CLREVEN/ODD, the fact that NetBSD only uses EVEN, and the max is 8
 	// even though this is a 4 bit value, it seems likely that there are actually two FIFOs,
 	// one in the even slots, and one in the odd slots
-	static constexpr uint32_t FIFOC_FSLOT = 0x0f; // Free slots in FIFO, max 8. Free slots = 8 - (FIFOCTRL & FIFOC_FSLOT)
-	static constexpr uint32_t FIFOC_SSTKACT = 0x10;
-	static constexpr uint32_t FIFOC_RQOVRN = 0x20;
-	static constexpr uint32_t FIFOC_CLREVEN = 0x00;
-	static constexpr uint32_t FIFOC_CLRODD = 0x40;
-	static constexpr uint32_t FIFOC_FLUSH = 0x80;
-	static constexpr uint32_t FIFOC_LOAD = 0xc0;
+	constexpr uint32_t FIFOC_FSLOT = 0x0f; // Free slots in FIFO, max 8. Free slots = 8 - (FIFOCTRL & FIFOC_FSLOT)
+	constexpr uint32_t FIFOC_SSTKACT = 0x10;
+	constexpr uint32_t FIFOC_RQOVRN = 0x20;
+	constexpr uint32_t FIFOC_CLREVEN = 0x00;
+	constexpr uint32_t FIFOC_CLRODD = 0x40;
+	constexpr uint32_t FIFOC_FLUSH = 0x80;
+	constexpr uint32_t FIFOC_LOAD = 0xc0;
 
 	// SPIFI commands
 	enum PRCMD_COMMANDS : uint32_t
@@ -120,8 +121,8 @@ namespace
 		PRC_NJMP = 0x80
 	};
 
-	static constexpr uint32_t PRCMD_MASK = 0x1f;
-	static const std::string prcmd_command_names[9] = {"PRC_DATAOUT", "PRC_DATAIN", "PRC_COMMAND", "PRC_STATUS", "PRC_TRPAD", "UNKNOWN", "PRC_MSGOUT", "PRC_MSGIN", "PRC_KILLREQ"};
+	constexpr uint32_t PRCMD_MASK = 0x1f;
+	const std::string_view prcmd_command_names[9] = {"PRC_DATAOUT", "PRC_DATAIN", "PRC_COMMAND", "PRC_STATUS", "PRC_TRPAD", "UNKNOWN", "PRC_MSGOUT", "PRC_MSGIN", "PRC_KILLREQ"};
 
 	enum
 	{
@@ -904,7 +905,7 @@ void spifi3_device::send_byte(scsi_data_target data_source)
 		// Send next data from cmbuf
 		if (command_pos > 11)
 		{
-			fatalerror("Tried to send command past the end of cdb! Command_pos: %d", command_pos);
+			fatalerror("%s: Tried to send command past the end of cdb! Command_pos: %d", tag(), command_pos);
 		}
 		LOGMASKED(LOG_CMD, "Sending byte from cmbuf[%d].cdb[%d] = 0x%x\n", scsi_id, command_pos, spifi_reg.cmbuf[scsi_id].cdb[command_pos]);
 		scsi_bus->data_w(scsi_refid, spifi_reg.cmbuf[scsi_id].cdb[command_pos++]);
@@ -989,7 +990,7 @@ void spifi3_device::decrement_tcounter(uint32_t count)
 	}
 	else if (count > tcounter)
 	{
-		fatalerror("tcounter ran out of bytes!");
+		fatalerror("%s: tcounter ran out of bytes!", tag());
 	}
 
 	tcounter -= count;
@@ -1157,7 +1158,7 @@ void spifi3_device::auto_phase_transfer(uint32_t new_phase)
 {
 	if (xfr_phase == new_phase)
 	{
-		fatalerror("spifi3 auto_phase_transfer called without phase transition!");
+		fatalerror("%s: auto_phase_transfer called without phase transition!", tag());
 	}
 	LOGMASKED(LOG_STATE, "Phase changed to %d\n", new_phase);
 	state = INIT_XFR_BUS_COMPLETE;
@@ -1229,7 +1230,7 @@ void spifi3_device::step(bool timeout)
 			{
 				scsi_bus->data_w(scsi_refid, 0);
 				scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
-				fatalerror("spifi3_device::step need to wait for bus free (lost arbitration)\n");
+				fatalerror("%s: need to wait for bus free (lost arbitration)\n", tag());
 			}
 
 			// Now that we won arbitration, we need to assert SEL and wait for the bus to settle.
@@ -1464,7 +1465,7 @@ void spifi3_device::step(bool timeout)
 			if (!(spifi_reg.select & SEL_WATN))
 			{
 				// The NWS-5000 APmonitor, NEWS-OS, and NetBSD all set SEL_WATN, so this code path is never taken.
-				fatalerror("spifi3 SEL_WATN was not asserted - this is not yet implemented!");
+				fatalerror("%s: SEL_WATN was not asserted - this is not yet implemented!", tag());
 				state = DISC_SEL_WAIT_REQ;
 			}
 			else
@@ -1734,7 +1735,7 @@ void spifi3_device::step(bool timeout)
 				}
 				else
 				{
-					fatalerror("spifi3 ran out of CDB bytes to transfer!");
+					fatalerror("%s: ran out of CDB bytes to transfer!", tag());
 				}
 			}
 			else
@@ -1876,7 +1877,7 @@ void spifi3_device::step(bool timeout)
 
 		default:
 		{
-			fatalerror("spifi step() unexpected state %d.%d\n", state & STATE_MASK, (state & SUB_MASK) >> SUB_SHIFT);
+			fatalerror("%s: step() unexpected state %d.%d\n", tag(), state & STATE_MASK, (state & SUB_MASK) >> SUB_SHIFT);
 		}
 	}
 }
