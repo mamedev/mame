@@ -12,7 +12,6 @@ enum
 	AXC51_PC=1, AXC51_SP, AXC51_PSW, AXC51_ACC, AXC51_B, AXC51_DPTR, AXC51_DPH, AXC51_DPL, AXC51_IE, AXC51_IP,
 	AXC51_P0, AXC51_P1, AXC51_P2, AXC51_P3,
 	AXC51_R0, AXC51_R1, AXC51_R2, AXC51_R3, AXC51_R4, AXC51_R5, AXC51_R6, AXC51_R7, AXC51_RB,
-	AXC51_TCON, AXC51_TMOD, AXC51_TL0, AXC51_TL1, AXC51_TH0, AXC51_TH1
 };
 
 enum
@@ -277,6 +276,147 @@ protected:
 	void xrl_a_ir(uint8_t r);
 	void xrl_a_r(uint8_t r);
 	void illegal(uint8_t r);
+
+
+	/* Internal address in SFR of registers */
+	enum
+	{
+		ADDR_P0          = 0x80,
+		ADDR_SP          = 0x81, // SPL
+		ADDR_DPL         = 0x82, // DPL0
+		ADDR_DPH         = 0x83, // DPH0
+		AXC51_DPL1       = 0x84,
+		AXC51_DPH1       = 0x85,
+		AXC51_DPCON      = 0x86,
+		ADDR_PCON        = 0x87, // PCON0
+		AXC51_SDCON0     = 0x88, // not ADDR_TCON   = 0x88,
+		AXC51_SDCON1     = 0x89, // not ADDR_TMOD   = 0x89,
+		AXC51_SDCON2     = 0x8a, // not ADDR_TL0    = 0x8a,
+		AXC51_JPGCON4    = 0x8b, // not ADDR_TL1    = 0x8b,
+		AXC51_JPGCON3    = 0x8c, // not ADDR_TH0    = 0x8c,
+		AXC51_JPGCON2    = 0x8d, // not ADDR_TH1    = 0x8d,
+		AXC51_JPGCON1    = 0x8e,
+		AXC51_TRAP       = 0x8f,
+		ADDR_P1          = 0x90,
+		AXC51_SDBAUD     = 0x91,
+		AXC51_SDCPTR     = 0x92,
+		AXC51_SDDCNT     = 0x93,
+		AXC51_SDDPTR     = 0x94,
+		AXC51_IE2CRPT    = 0x95, // controls automatic encryption
+		AXC51_UARTBAUDH  = 0x96,
+		AXC51_PWKEN      = 0x97,
+		AXC51_PWKPND     = 0x98, // not ADDR_SCON   = 0x98,
+		AXC51_PWKEDGE    = 0x99, // not ADDR_SBUF   = 0x99,
+		AXC51_PIE0       = 0x9a,
+		AXC51_DBASE      = 0x9b,
+		AXC51_PCON1      = 0x9c,
+		AXC51_PIE1       = 0x9d,
+		AXC51_IRTDATA    = 0x9e,
+		AXC51_IRTCON     = 0x9f,
+		ADDR_P2          = 0xa0,
+		AXC51_GP0        = 0xa1,
+		AXC51_GP1        = 0xa2,
+		AXC51_GP2        = 0xa3,
+		AXC51_GP3        = 0xa4,
+		AXC51_DACCON     = 0xa5,
+		AXC51_DACLCH     = 0xa6,
+		AXC51_DACRCH     = 0xa7,
+		ADDR_IE          = 0xa8, // IE0
+		AXC51_IE1        = 0xa9,
+		AXC51_KEY0       = 0xaa,
+		AXC51_KEY1       = 0xab,
+		AXC51_TMR3CON    = 0xac,
+		AXC51_TMR3CNT    = 0xad,
+		AXC51_TMR3PR     = 0xae,
+		AXC51_TMR3PSR    = 0xaf,
+		ADDR_P3          = 0xb0,
+		AXC51_GP4        = 0xb1,
+		AXC51_GP5        = 0xb2,
+		AXC51_GP6        = 0xb3,
+		AXC51_P4         = 0xb4,
+		AXC51_GP7        = 0xb5,
+		AXC51_LCDCON     = 0xb6,
+		AXC51_PLLCON     = 0xb7,
+		ADDR_IP          = 0xb8, // IP0
+		AXC51_IP1        = 0xb9,
+		AXC51_P0DIR      = 0xba,
+		AXC51_P1DIR      = 0xbb,
+		AXC51_P2DIR      = 0xbc,
+		AXC51_P3DIR      = 0xbd,
+		AXC51_P4DIR      = 0xbe,
+		AXC51_LVDCON     = 0xbf,
+		AXC51_JPGCON0    = 0xc0,
+		AXC51_TMR2CON    = 0xc1,
+		AXC51_JPGCON9    = 0xc2,
+		AXC51_JPGCON5    = 0xc3,
+		AXC51_JPGCON6    = 0xc4,
+		AXC51_JPGCON7    = 0xc5,
+		AXC51_JPGCON8    = 0xc6,
+		AXC51_LCDPR      = 0xc7,
+		AXC51_LCDTCON    = 0xc8,
+		AXC51_USBCON0    = 0xc9,
+		AXC51_USBCON1    = 0xca,
+		AXC51_USBCON2    = 0xcb,
+		AXC51_USBDATA    = 0xcc,
+		AXC51_USBADR     = 0xcd,
+		AXC51_ILLEGAL    = 0xce,
+		AXC51_MICCON     = 0xcf,
+		ADDR_PSW         = 0xd0,
+		AXC51_PGCON      = 0xd1,
+		AXC51_ADCCON     = 0xd2,
+		AXC51_PCON2      = 0xd3,
+		AXC51_ADCDATAL   = 0xd4,
+		AXC51_ADCDATAH   = 0xd5,
+		AXC51_SPIDMAADR  = 0xd6,
+		AXC51_SPIDMACNT  = 0xd7,
+		AXC51_SPICON     = 0xd8,
+		AXC51_SPIBUF     = 0xd9,
+		AXC51_SPIBAUD    = 0xda,
+		AXC51_CLKCON     = 0xdb,
+		AXC51_CLKCON1    = 0xdc,
+		AXC51_USBDPDM    = 0xdd,
+		AXC51_LFSRPOLY0  = 0xde,
+		AXC51_LFSRPOLY1  = 0xdf,
+		ADDR_ACC         = 0xe0,
+		AXC51_TMR1CON    = 0xe1,
+		AXC51_UID0       = 0xe2,
+		AXC51_UID1       = 0xe3,
+		AXC51_UID2       = 0xe4,
+		AXC51_UID3       = 0xe5,
+		AXC51_ER00       = 0xe6,
+		AXC51_ER01       = 0xe7,
+		AXC51_ER10       = 0xe8,
+		AXC51_ER11       = 0xe9,
+		AXC51_ER20       = 0xea,
+		AXC51_ER21       = 0xeb,
+		AXC51_ER30       = 0xec,
+		AXC51_ER31       = 0xed,
+		AXC51_ER8        = 0xee,
+		AXC51_ILLEGAL2   = 0xef,
+		ADDR_B           = 0xf0,
+		AXC51_HUFFBUF    = 0xf1,
+		AXC51_HUFFSFT    = 0xf2,
+		AXC51_HUFFDCL    = 0xf3,
+		AXC51_HUFFDCH    = 0xf4,
+		AXC51_CRC        = 0xf5,
+		AXC51_LFSRFIFO   = 0xf6,
+		AXC51_WDTCON     = 0xf7,
+		AXC51_TMR0CON    = 0xf8,
+		AXC51_TMR0CNT    = 0xf9,
+		AXC51_TMR0PR     = 0xfa,
+		AXC51_TMR0PSR    = 0xfb,
+		AXC51_UARTSTA    = 0xfc,
+		AXC51_UARTCON    = 0xfd,
+		AXC51_UARTBAUD   = 0xfe,
+		AXC51_UARTDATA   = 0xff,
+	};
+
+	enum
+	{
+		V_RESET = 0x000,    /* power on address */
+		V_IE0   = 0x003,    /* External Interrupt 0 */
+	};
+
 };
 
 
@@ -305,19 +445,6 @@ protected:
 
 	virtual void sfr_write(size_t offset, uint8_t data) override;
 	virtual uint8_t sfr_read(size_t offset) override;
-
-	enum
-	{
-		AXC51_DPCON = 0x86,
-
-		AXC51_IRTCON = 0x9f,
-
-		AXC51_SPIDMAADR = 0xd6,
-		AXC51_SPIDMACNT = 0xd7,
-		AXC51_SPICON = 0xd8,
-		AXC51_SPIBUF = 0xd9,
-		AXC51_SPIBAUD = 0xda
-	};
 
 	uint8_t spicon_r();
 	uint8_t spibuf_r();

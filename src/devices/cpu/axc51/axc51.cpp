@@ -36,43 +36,6 @@
     CONSTANTS
 ***************************************************************************/
 
-/* Internal address in SFR of registers */
-enum
-{
-	ADDR_PSW    = 0xd0,
-	ADDR_ACC    = 0xe0,
-	ADDR_B      = 0xf0,
-
-	ADDR_P0     = 0x80,
-	ADDR_SP     = 0x81,
-	ADDR_DPL    = 0x82,
-	ADDR_DPH    = 0x83,
-	ADDR_PCON   = 0x87,
-	ADDR_TCON   = 0x88,
-	ADDR_TMOD   = 0x89,
-	ADDR_TL0    = 0x8a,
-	ADDR_TL1    = 0x8b,
-	ADDR_TH0    = 0x8c,
-	ADDR_TH1    = 0x8d,
-	ADDR_P1     = 0x90,
-	ADDR_SCON   = 0x98,
-	ADDR_SBUF   = 0x99,
-	ADDR_P2     = 0xa0,
-	ADDR_IE     = 0xa8,
-	ADDR_P3     = 0xb0,
-	ADDR_IP     = 0xb8,
-};
-
-/* PC vectors */
-
-enum
-{
-	V_RESET = 0x000,    /* power on address */
-	V_IE0   = 0x003,    /* External Interrupt 0 */
-};
-
-
-
 
 DEFINE_DEVICE_TYPE(AX208, ax208_cpu_device, "ax208", "AppoTech AX208 (AXC51-CORE)")
 DEFINE_DEVICE_TYPE(AX208P, ax208p_cpu_device, "ax208p", "AppoTech AX208 (AXC51-CORE) (prototype?)")
@@ -198,17 +161,9 @@ void axc51base_cpu_device::iram_iwrite(offs_t a, uint8_t d) { if (a <= m_ram_mas
 #define DPL         SFR_A(ADDR_DPL)
 #define DPH         SFR_A(ADDR_DPH)
 #define PCON        SFR_A(ADDR_PCON)
-#define TCON        SFR_A(ADDR_TCON)
-#define TMOD        SFR_A(ADDR_TMOD)
-#define TL0         SFR_A(ADDR_TL0)
-#define TL1         SFR_A(ADDR_TL1)
-#define TH0         SFR_A(ADDR_TH0)
-#define TH1         SFR_A(ADDR_TH1)
-#define SCON        SFR_A(ADDR_SCON)
 #define IE          SFR_A(ADDR_IE)
 #define IP          SFR_A(ADDR_IP)
 #define B           SFR_A(ADDR_B)
-#define SBUF        SFR_A(ADDR_SBUF)
 
 #define R_REG(r)    m_scratchpad[(r) | (PSW & 0x18)]
 #define DPTR        ((DPH<<8) | DPL)
@@ -226,8 +181,7 @@ void axc51base_cpu_device::iram_iwrite(offs_t a, uint8_t d) { if (a <= m_ram_mas
 #define SET_P2(v)   IRAM_W(ADDR_P2, v)
 #define SET_P3(v)   IRAM_W(ADDR_P3, v)
 
-/* Within the cpu core, do not trigger a send */
-#define SET_SBUF(v) SET_SFR_A(ADDR_SBUF, v)
+
 
 /* No actions triggered on write */
 #define SET_REG(r, v)   do { m_scratchpad[(r) | (PSW & 0x18)] = (v); } while (0)
@@ -931,25 +885,16 @@ void axc51base_cpu_device::sfr_write(size_t offset, uint8_t data)
 		case ADDR_P1:   m_port_out_cb[1](data);             break;
 		case ADDR_P2:   m_port_out_cb[2](data);             break;
 		case ADDR_P3:   m_port_out_cb[3](data);             break;
-		case ADDR_SBUF: serial_transmit(data);         break;
 		case ADDR_PSW:  SET_PARITY();                       break;
 		case ADDR_ACC:  SET_PARITY();                       break;
 		case ADDR_IP:   update_irq_prio(data, 0);  break;
-		/* R_SBUF = data;        //This register is used only for "Receiving data coming in!" */
 
 		case ADDR_B:
 		case ADDR_SP:
 		case ADDR_DPL:
 		case ADDR_DPH:
 		case ADDR_PCON:
-		case ADDR_TCON:
-		case ADDR_TMOD:
 		case ADDR_IE:
-		case ADDR_TL0:
-		case ADDR_TL1:
-		case ADDR_TH0:
-		case ADDR_TH1:
-		case ADDR_SCON:
 			break;
 		default:
 			LOG(("axc51 '%s': attemping to write to an invalid/non-implemented SFR address: %x at 0x%04x, data=%x\n", tag(), (uint32_t)offset,PC,data));
@@ -981,14 +926,6 @@ uint8_t axc51base_cpu_device::sfr_read(size_t offset)
 		case ADDR_DPL:
 		case ADDR_DPH:
 		case ADDR_PCON:
-		case ADDR_TCON:
-		case ADDR_TMOD:
-		case ADDR_TL0:
-		case ADDR_TL1:
-		case ADDR_TH0:
-		case ADDR_TH1:
-		case ADDR_SCON:
-		case ADDR_SBUF:
 		case ADDR_IE:
 		case ADDR_IP:
 			return m_data.read_byte((size_t) offset | 0x100);
@@ -1058,12 +995,7 @@ void axc51base_cpu_device::device_start()
 	state_add<uint8_t>( AXC51_R6,  "R6", [this](){ return R_REG(6); }, [this](uint8_t r){ SET_REG(6, r); }).formatstr("%02X");
 	state_add<uint8_t>( AXC51_R7,  "R7", [this](){ return R_REG(7); }, [this](uint8_t r){ SET_REG(7, r); }).formatstr("%02X");
 	state_add<uint8_t>( AXC51_RB,  "RB", [this](){ return (PSW & 0x18)>>3; }, [this](uint8_t rb){ SET_RS(rb); }).mask(0x03).formatstr("%02X");
-	state_add( AXC51_TCON, "TCON", TCON).formatstr("%02X");
-	state_add( AXC51_TMOD, "TMOD", TMOD).formatstr("%02X");
-	state_add( AXC51_TL0,  "TL0",  TL0).formatstr("%02X");
-	state_add( AXC51_TH0,  "TH0",  TH0).formatstr("%02X");
-	state_add( AXC51_TL1,  "TL1",  TL1).formatstr("%02X");
-	state_add( AXC51_TH1,  "TH1",  TH1).formatstr("%02X");
+
 
 	state_add( STATE_GENPC, "GENPC", m_pc ).noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_pc ).noshow();
@@ -1118,14 +1050,8 @@ void axc51base_cpu_device::device_reset()
 	IP = 0;
 	update_irq_prio(IP, 0);
 	IE = 0;
-	SCON = 0;
-	TCON = 0;
-	TMOD = 0;
 	PCON = 0;
-	TH1 = 0;
-	TH0 = 0;
-	TL1 = 0;
-	TL0 = 0;
+
 
 	/* set the port configurations to all 1's */
 	SET_P3(0xff);
