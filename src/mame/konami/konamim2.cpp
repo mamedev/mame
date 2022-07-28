@@ -1294,7 +1294,7 @@ ROM_START( btltryst )
 	DISK_IMAGE_READONLY( "636jac02", 0, SHA1(d36556a3a4b91058100924a9e9f1a58983399c6e) )
 ROM_END
 
-/*
+#if 0
 ROM_START( btltrysta )
 	ROM_REGION64_BE( 0x200000, "boot", 0 )
 	ROM_LOAD16_WORD( "636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b) )
@@ -1305,7 +1305,7 @@ ROM_START( btltrysta )
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "636jaa02", 0, SHA1(d36556a3a4b91058100924a9e9f1a58983399c6e) )
 ROM_END
-*/
+#endif
 
 ROM_START( heatof11 )
 	ROM_REGION64_BE( 0x200000, "boot", 0 )  // boot ROM
@@ -1387,7 +1387,7 @@ ROM_START( totlvice )
 	DISK_IMAGE_READONLY( "639eba01", 0, BAD_DUMP SHA1(d95c13575e015169b126f7e8492d150bd7e5ebda) )
 ROM_END
 
-/*
+#if 0
 // NB: Dumped by Phil, hasn't been converted to CHD yet
 ROM_START( totlvicd )
 	ROM_REGION64_BE( 0x200000, "boot", 0 )
@@ -1399,7 +1399,7 @@ ROM_START( totlvicd )
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "639ead01", 0, SHA1(9d1085281aeb14185e2e78f3f21e7004a591039c) )
 ROM_END
-*/
+#endif
 
 ROM_START( totlvicu )
 	ROM_REGION64_BE( 0x200000, "boot", 0 )
@@ -1434,14 +1434,13 @@ ROM_START( totlvicj )
 	DISK_IMAGE_READONLY( "639jad01", 0, BAD_DUMP SHA1(39d41d5a9d1c40636d174c8bb8172b1121e313f8) )
 ROM_END
 
-/*
-// FIXME
+#if 0 // FIXME
 ROM_START( 3do_m2 )
 	ROM_REGION64_BE( 0x100000, "boot", 0 )
 	ROM_SYSTEM_BIOS( 0, "panafz35", "Panasonic FZ-35S (3DO M2)" )
 	ROMX_LOAD( "fz35_jpn.bin", 0x000000, 0x100000, CRC(e1c5bfd3) SHA1(0a3e27d672be79eeee1d2dc2da60d82f6eba7934), ROM_BIOS(1) )
 ROM_END
-*/
+#endif
 
 /*************************************
  *
