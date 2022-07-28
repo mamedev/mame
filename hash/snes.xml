@@ -705,6 +705,31 @@ Beyond that last category are the roms waiting to be classified.
         </part>
 -->
 
+	<software name="boxinglgup" cloneof="boxinglg">
+		<!-- 64history.net -->
+		<description>Boxing Legends of the Ring (USA, prototype)</description>
+		<year>1993</year>
+		<publisher>Electro Brain</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2Q5B-03" />
+			<feature name="u1" value="U1 4/2/1M EPROM(J)" />
+			<feature name="u2" value="U2 4/2/1M EPROM(J)" />
+			<feature name="u3" value="U3 256/64K SRAM" /> <!-- empty socket -->
+			<feature name="u4" value="U4 D77C25/P25" /> <!-- empty socket -->
+			<feature name="u5" value="U5 74F138" />
+			<feature name="u6" value="U6 74HCU04" />
+			<feature name="u7" value="U7 CIC" />
+			<feature name="lockout" value="D411A 9246 CA" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="no shell" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="u1" size="0x80000" crc="ad45bc76" sha1="855768724252723f47b1bc7e79b43d9e503b97ca" offset="0x00000" />
+				<rom name="u2" size="0x80000" crc="6dbceca8" sha1="a06b690a401f5fefd4b04be9ffb33ca32bd38d3d" offset="0x80000" />
+			</dataarea>
+		</part>
+	</software>
+
 <!--
     <software name="brainiesup" cloneof="brainies">
         <!- - retrogamesuk - ->
@@ -1549,6 +1574,34 @@ Beyond that last category are the roms waiting to be classified.
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="524288">
 				<rom name="gft-m 0.u1" size="524288" crc="4aafa462" sha1="b38560d091801db5e833d17393fe1df1398909b6" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hammerlkp" cloneof="hammerlk">
+		<!-- 64history.net -->
+		<description>Hammer Lock Wrestling (USA, prototype)</description>
+		<year>1994</year>
+		<publisher>Jaleco</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-4PV5B-01" />
+			<feature name="u1" value="U1 EPROM [27C040-10]" />
+			<feature name="u2" value="U2 EPROM [27C040-10]" />
+			<feature name="u3" value="U3 EPROM [27C040-10]" />
+			<feature name="u4" value="U4 EPROM [27C040-10]" />
+			<feature name="u5" value="U5 SRAM" /> <!-- empty socket -->
+			<feature name="u6" value="U6 PLD [EP330-15CN]" />
+			<feature name="u7" value="U7 74LS157 [SN74LS157N]" />
+			<feature name="u8" value="U8 CIC" />
+			<feature name="lockout" value="D413A 9214 BB" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="no shell" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="snes hammer rom0.u1" size="0x80000" crc="2bbf2ea6" sha1="6c5147ca6573e9bb31adda3f566379121e8d4beb" offset="0x000000" />
+				<rom name="snes hammer rom1.u2" size="0x80000" crc="9c972de6" sha1="b269a2c8e877124c90092644561e8673a19f9989" offset="0x080000" />
+				<rom name="snes hammer rom2.u3" size="0x80000" crc="a90df966" sha1="29af872caac9757762156800793db9cdc69b0e70" offset="0x100000" />
+				<rom name="snes hammer rom3.u4" size="0x80000" crc="37140060" sha1="ba9b99d6816d496542d5de19fa6f6c906fe6ff99" offset="0x180000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3486,6 +3539,36 @@ Beyond that last category are the roms waiting to be classified.
     </software>
 -->
 
+	<software name="suppunchp" cloneof="suppunch">
+		<!-- 64history.net -->
+		<description>Super Punch-Out!! (Euro, prototype)</description>
+		<year>1994</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-4PV5B-01" />
+			<feature name="u1" value="U1 EPROM [D27C4001D-15]" />
+			<feature name="u2" value="U2 EPROM [D27C4001D-15]" />
+			<feature name="u3" value="U3 EPROM [D27C4001D-15]" />
+			<feature name="u4" value="U4 EPROM [D27C4001D-15]" />
+			<feature name="u5" value="U5 SRAM [LH5168FB-10L]" />
+			<feature name="u6" value="U6 PLD [EP330-15CN]" />
+			<feature name="u7" value="U7 74LS157 [SN74LS157N]" />
+			<feature name="u8" value="U8 CIC" />
+			<feature name="lockout" value="D413A 9404 CA" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="no shell" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="sns-4q ver0.0 rom0 6eb9h.u1" size="0x80000" crc="d1ad463a" sha1="93cd6a2c23068896edbf327e2bbd87a81e3a3d3b" offset="0x000000" />
+				<rom name="sns-4q ver0.0 rom1 344fh.u2" size="0x80000" crc="785898fb" sha1="057d5afe9c9f6d37c4c559b7eaec4a12a2d02c13" offset="0x080000" />
+				<rom name="sns-4q ver0.0 rom2 d795h.u3" size="0x80000" crc="f6db99dc" sha1="28af39ee02a20d2a1bf57b117e5f6d49a254f2b8" offset="0x100000" />
+				<rom name="sns-4q ver0.0 rom3 f28ah.u4" size="0x80000" crc="7feecd9e" sha1="a51d255c41fd3ee2282a428dd32149eaf651a850" offset="0x180000" />
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="starwarsp" cloneof="starwars">
 		<!-- legrospixel.com -->
 		<!-- Notes: identical to the final release, except it has full save capability -->
@@ -3795,6 +3878,32 @@ Beyond that last category are the roms waiting to be classified.
 				<rom name="u6" size="524288" crc="e3fcaeb4" sha1="822a4f08a9837aa8b7296aa7ec4b667cae039024" offset="0x280000" />
 			</dataarea>
 			<dataarea name="nvram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="werebackup" cloneof="wereback">
+		<!-- 64history.net -->
+		<description>We're Back! - A Dinosaur's Story (USA, prototype)</description>
+		<year>1993</year>
+		<publisher>Hi Tech Expressions</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-4PV5B-01" />
+			<feature name="u1" value="U1 EPROM" />
+			<feature name="u2" value="U2 EPROM" />
+			<feature name="u3" value="U3 EPROM" /> <!-- empty socket -->
+			<feature name="u4" value="U4 EPROM" /> <!-- empty socket -->
+			<feature name="u5" value="U5 SRAM" /> <!-- empty socket -->
+			<feature name="u6" value="U6 PLD" />
+			<feature name="u7" value="U7 74LS157" />
+			<feature name="u8" value="U8 CIC" />
+			<feature name="lockout" value="D411A 9218 BB" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="no shell" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="story.u1" size="0x80000" crc="992ffef8" sha1="0a7da060982bcc69a819321ad47034bc69580b96" offset="0x00000" />
+				<rom name="dinosaur.u2" size="0x80000" crc="a5111fbf" sha1="e38a4981e0feeaff329b75c460744ce7f74efba6" offset="0x80000" />
 			</dataarea>
 		</part>
 	</software>
@@ -52947,11 +53056,22 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
-	<software name="porkypigua" cloneof="porkypig">
-		<description>Porky Pig's Haunted Holiday (Sunsoft) (USA)</description>
+	<software name="porkypigup" cloneof="porkypig">
+		<description>Porky Pig's Haunted Holiday (USA, prototype 19950807)</description>
+		<year>1995</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="porky_pigs_haunted_holiday_prototype.sfc" size="0x200000" crc="a108d59d" sha1="10e6cebe9a660a3a035f8066837ba4cf9b4cf922" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="porkypigup1" cloneof="porkypig">
+		<description>Porky Pig's Haunted Holiday (USA, prototype 19950126)</description>
 		<year>1995</year>
 		<publisher>Sunsoft?</publisher>
-		<info name="release" value="199510xx" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
