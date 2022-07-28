@@ -24,8 +24,8 @@ protected:
 		{
 		}
 
-		static constexpr int DMA_EN = 0x1;
-		static constexpr int DMA_DIRECTION = 0x2; // 1 = out, 0 = in
+		static constexpr uint32_t DMA_EN = 0x1;
+		static constexpr uint32_t DMA_DIRECTION = 0x2; // 1 = out, 0 = in
 
 		// total bytes avaliable for use by this channel
 		uint32_t fifo_size = 0;
@@ -54,7 +54,7 @@ protected:
 
 		void reset();
 
-		bool dma_cycle();
+		bool dma_check();
 
 		auto dma_r_cb() { return dma_r_callback.bind(); }
 
@@ -79,6 +79,8 @@ protected:
 		// DMA callback pointers
 		devcb_read8 dma_r_callback;
 		devcb_write8 dma_w_callback;
+
+		bool dma_cycle();
 	};
 
 public:
@@ -107,22 +109,21 @@ public:
 	auto dma_w_cb() { return fifo_channels[ChannelNumber].dma_w_cb(); };
 
 protected:
-	std::unique_ptr<uint32_t[]> fifo_ram;
+	static constexpr int FIFO_CH_TOTAL = 4;
 
+	std::unique_ptr<uint32_t[]> fifo_ram;
 	emu_timer *fifo_timer;
+	devcb_write_line out_irq;
+	apfifo_channel fifo_channels[FIFO_CH_TOTAL];
+
 	TIMER_CALLBACK_MEMBER(fifo_dma_execute);
 
-	// Interrupts
-	devcb_write_line out_irq;
 	void device_resolve_objects() override;
 	void irq_check();
 
 	// device_t overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
-	static constexpr int FIFO_CH_TOTAL = 4;
-	apfifo_channel fifo_channels[FIFO_CH_TOTAL];
 
 	// FIFO operations
 	uint32_t read_fifo_size(offs_t offset);

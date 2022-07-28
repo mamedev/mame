@@ -33,32 +33,32 @@ DEFINE_DEVICE_TYPE(CXD8442Q, cxd8442q_device, "cxd8442q", "Sony CXD8442Q WSC-FIF
 namespace
 {
 	// 128KiB used as the FIFO RAM (can be divided up to 4 regions, 1 per channel)
-	static constexpr int FIFO_MAX_RAM_SIZE = 0x20000;
+	constexpr int FIFO_MAX_RAM_SIZE = 0x20000;
+
+	// offset from the channel 0 control register to the RAM
+	constexpr int FIFO_RAM_OFFSET = 0x80000;
+
+	// DMA update timer rate
+	// TODO: figure out the real clock rate for this
+	constexpr int DMA_TIMER = 1;
 
 	// offset shift counters for extracting the FIFO channel
-	static inline uint32_t dw_offset_to_channel(offs_t offset)
+	constexpr uint32_t dw_offset_to_channel(offs_t offset)
 	{
 		// u32 handlers get dword offsets
 		return offset >> 14;
 	}
 
-	static inline uint32_t byte_offset_to_channel(offs_t offset)
+	constexpr uint32_t byte_offset_to_channel(offs_t offset)
 	{
 		// u8 handlers get byte offsets
 		return offset >> 16;
 	}
-
-	// offset from the channel 0 control register to the RAM
-	static constexpr int FIFO_RAM_OFFSET = 0x80000;
-
-	// DMA update timer rate
-	// TODO: figure out the real clock rate for this
-	static constexpr int DMA_TIMER = 1;
 }
 
 cxd8442q_device::cxd8442q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CXD8442Q, tag, owner, clock), out_irq(*this),
-	  fifo_channels{apfifo_channel(*this), apfifo_channel(*this), apfifo_channel(*this), apfifo_channel(*this)}
+	  fifo_channels{{ *this }, { *this }, { *this }, { *this }}
 {
 }
 
@@ -185,9 +185,9 @@ void cxd8442q_device::device_start()
 	fifo_ram = std::make_unique<uint32_t[]>(FIFO_MAX_RAM_SIZE);
 	fifo_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cxd8442q_device::fifo_dma_execute), this));
 
-	for (int channel = 0; channel < FIFO_CH_TOTAL; ++channel)
+	for (apfifo_channel& channel : fifo_channels)
 	{
-		fifo_channels[channel].resolve_callbacks();
+		channel.resolve_callbacks();
 	}
 
 	save_pointer(NAME(fifo_ram), FIFO_MAX_RAM_SIZE);
@@ -204,34 +204,18 @@ void cxd8442q_device::device_start()
 
 void cxd8442q_device::device_reset()
 {
-	for (int channel = 0; channel < FIFO_CH_TOTAL; ++channel)
+	for (apfifo_channel& channel : fifo_channels)
 	{
-		fifo_channels[channel].reset();
+		channel.reset();
 	}
 }
 
 TIMER_CALLBACK_MEMBER(cxd8442q_device::fifo_dma_execute)
 {
 	bool dma_active = false;
-	for (int channel = 0; channel < FIFO_CH_TOTAL; ++channel)
+	for (apfifo_channel& channel : fifo_channels)
 	{
-		apfifo_channel &this_channel = fifo_channels[channel];
-
-		// Skip this channel if we don't need to do anything
-		if (!(this_channel.dma_mode & apfifo_channel::DMA_EN))
-		{
-			continue;
-		}
-
-		// Check DRQ to see if the device is ready to give or receive data
-		if (this_channel.drq)
-		{
-			if (this_channel.dma_cycle())
-			{
-				dma_active = true;
-			}
-		}
-		else
+		if (channel.dma_check())
 		{
 			dma_active = true;
 		}
@@ -247,11 +231,10 @@ TIMER_CALLBACK_MEMBER(cxd8442q_device::fifo_dma_execute)
 void cxd8442q_device::irq_check()
 {
 	bool irq_state = false;
-	for (int channel = 0; channel < FIFO_CH_TOTAL; ++channel)
+	for (apfifo_channel& channel : fifo_channels)
 	{
-		apfifo_channel &this_channel = fifo_channels[channel];
-		auto mask = this_channel.intctrl & 0x1;
-		if (this_channel.intstat & mask)
+		uint32_t mask = channel.intctrl & 0x1;
+		if (channel.intstat & mask)
 		{
 			irq_state = true;
 		}
@@ -268,6 +251,26 @@ void cxd8442q_device::apfifo_channel::reset()
 	intstat = 0;
 	count = 0;
 	drq = false;
+}
+
+bool cxd8442q_device::apfifo_channel::dma_check()
+{
+	if (!(dma_mode & DMA_EN))
+	{
+		return false;
+	}
+
+	// Check DRQ to see if the device is ready to give or receive data
+	bool stay_active;
+	if (drq)
+	{
+		stay_active = dma_cycle();
+	}
+	else
+	{
+		stay_active = true;
+	}
+	return stay_active;
 }
 
 bool cxd8442q_device::apfifo_channel::dma_cycle()
