@@ -46,16 +46,18 @@ DEFINE_DEVICE_TYPE(AX208P, ax208p_cpu_device, "ax208p", "AppoTech AX208 (AXC51-C
 
 void axc51base_cpu_device::program_internal(address_map &map)
 {
-	if (m_rom_size > 0)
-		map(0, m_rom_size - 1).rom().region(DEVICE_SELF, 0);
 }
 
 void axc51base_cpu_device::data_internal(address_map &map)
 {
-	map(0x0000, m_ram_mask).ram().share("scratchpad");
+	map(0x0000, 0x00ff).ram().share("scratchpad");
 	map(0x0100, 0x01ff).ram().share("sfr_ram"); /* SFR */
 }
 
+void ax208_cpu_device::ax208_internal_program_mem(address_map &map)
+{
+	map(0x8000, 0x9fff).rom().region("rom", 0); // this can only be read from code running within the same region
+}
 
 
 axc51base_cpu_device::axc51base_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map, address_map_constructor data_map, int program_width, int data_width, uint8_t features)
@@ -1080,7 +1082,7 @@ std::unique_ptr<util::disasm_interface> axc51base_cpu_device::create_disassemble
 // AX208 (specific CPU)
 
 ax208_cpu_device::ax208_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: axc51base_cpu_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(ax208_cpu_device::ax208_internal_program_mem), this), address_map_constructor(FUNC(ax208_cpu_device::ax208_internal_data_mem), this), 0, 8)
+	: axc51base_cpu_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(ax208_cpu_device::ax208_internal_program_mem), this), address_map_constructor(FUNC(ax208_cpu_device::data_internal), this), 0, 8)
 {
 }
 
@@ -1095,16 +1097,8 @@ std::unique_ptr<util::disasm_interface> ax208_cpu_device::create_disassembler()
 	return std::make_unique<ax208_disassembler>();
 }
 
-void ax208_cpu_device::ax208_internal_program_mem(address_map &map)
-{
-	map(0x8000, 0x9fff).rom().region("rom", 0); // this can only be read from code running within the same region
-}
 
-void ax208_cpu_device::ax208_internal_data_mem(address_map &map)
-{
-	map(0x0000, 0x00ff).ram().share("scratchpad");
-	map(0x0100, 0x01ff).ram().share("sfr_ram"); /* SFR */
-}
+
 
 offs_t ax208_cpu_device::external_ram_iaddr(offs_t offset, offs_t mem_mask)
 {

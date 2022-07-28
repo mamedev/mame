@@ -441,7 +441,6 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	void ax208_internal_program_mem(address_map &map);
-	void ax208_internal_data_mem(address_map &map);
 
 	virtual void sfr_write(size_t offset, uint8_t data) override;
 	virtual uint8_t sfr_read(size_t offset) override;
