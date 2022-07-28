@@ -854,7 +854,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<year>1984</year>
 		<publisher>Infogrames</publisher>
 		<info name="hacked" value="Prehisto" />
-		
+
 		<part name="flop1" interface="thom_flop">
 			<dataarea name="flop" size="327680">
 				<rom name="mandragore (1984)(infogrames)(fr)[m prehisto][3.5'', bootable].fd" size="327680" crc="acb88fbb" sha1="e2a1cdbea99e22e5b9781bd7fc34bf88748dc6b3"/>
