@@ -1011,11 +1011,6 @@ offs_t axc51_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 	return disassemble_op(stream, PC, pc,  opcodes, params, op);
 }
 
-axc51newbase_disassembler::axc51newbase_disassembler() : axc51_disassembler(default_names)
-{
-}
-
-
 // SOME of these might be AX208 specific, we do not currently hvae enough information to split it into AXC51 / AX208 however
 const axc51core_disassembler::mem_info axc51core_disassembler::axc51core_names[] = {
 

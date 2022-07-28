@@ -49,13 +49,6 @@ private:
 
 };
 
-class axc51newbase_disassembler : public axc51_disassembler
-{
-public:
-	axc51newbase_disassembler();
-	virtual ~axc51newbase_disassembler() = default;
-};
-
 class axc51core_disassembler : public axc51_disassembler
 {
 public:

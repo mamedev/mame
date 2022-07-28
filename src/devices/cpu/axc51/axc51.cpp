@@ -74,7 +74,6 @@ enum
 
 
 
-DEFINE_DEVICE_TYPE(AXC51CORE, axc51core_cpu_device, "axc51core", "AppoTech AXC51-CORE")
 DEFINE_DEVICE_TYPE(AX208, ax208_cpu_device, "ax208", "AppoTech AX208 (AXC51-CORE)")
 DEFINE_DEVICE_TYPE(AX208P, ax208p_cpu_device, "ax208p", "AppoTech AX208 (AXC51-CORE) (prototype?)")
 
@@ -919,9 +918,7 @@ void axc51base_cpu_device::execute_run()
 }
 
 
-/****************************************************************************
- * AXC51/8051 Section
- ****************************************************************************/
+
 
 void axc51base_cpu_device::sfr_write(size_t offset, uint8_t data)
 {
@@ -1149,31 +1146,15 @@ void axc51base_cpu_device::device_reset()
 
 std::unique_ptr<util::disasm_interface> axc51base_cpu_device::create_disassembler()
 {
-	return std::make_unique<axc51newbase_disassembler>();
-}
-
-
-// AXC51CORE (base device)
-
-axc51core_cpu_device::axc51core_cpu_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock, address_map_constructor program_map, address_map_constructor data_map, int program_width, int data_width, uint8_t features)
-	: axc51base_cpu_device(mconfig, type, tag, owner, clock, program_map, data_map, program_width, data_width, features)
-{
-}
-
-axc51core_cpu_device::axc51core_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: axc51core_cpu_device(mconfig, AXC51CORE, tag, owner, clock, address_map_constructor(FUNC(axc51core_cpu_device::program_internal), this), address_map_constructor(FUNC(axc51core_cpu_device::data_internal), this), 0, 8)
-{
-}
-
-std::unique_ptr<util::disasm_interface> axc51core_cpu_device::create_disassembler()
-{
 	return std::make_unique<axc51core_disassembler>();
 }
+
+
 
 // AX208 (specific CPU)
 
 ax208_cpu_device::ax208_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: axc51core_cpu_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(ax208_cpu_device::ax208_internal_program_mem), this), address_map_constructor(FUNC(ax208_cpu_device::ax208_internal_data_mem), this), 0, 8)
+	: axc51base_cpu_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(ax208_cpu_device::ax208_internal_program_mem), this), address_map_constructor(FUNC(ax208_cpu_device::ax208_internal_data_mem), this), 0, 8)
 {
 }
 
@@ -1337,7 +1318,7 @@ const tiny_rom_entry *ax208_cpu_device::device_rom_region() const
 
 void ax208_cpu_device::device_reset()
 {
-	axc51core_cpu_device::device_reset();
+	axc51base_cpu_device::device_reset();
 	set_state_int(AXC51_PC, 0x8000);
 
 	m_spiaddr = 0;

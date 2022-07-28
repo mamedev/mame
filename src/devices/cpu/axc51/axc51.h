@@ -281,25 +281,10 @@ protected:
 
 
 
-DECLARE_DEVICE_TYPE(AXC51CORE, axc51core_cpu_device)
 DECLARE_DEVICE_TYPE(AX208, ax208_cpu_device)
 DECLARE_DEVICE_TYPE(AX208P, ax208p_cpu_device)
 
-
-
-class axc51core_cpu_device : public axc51base_cpu_device
-{
-public:
-	// construction/destruction
-	axc51core_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	axc51core_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock,  address_map_constructor program_map, address_map_constructor data_map, int program_width, int data_width, uint8_t features = 0);
-
-protected:
-	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-};
-
-
-class ax208_cpu_device : public axc51core_cpu_device
+class ax208_cpu_device : public axc51base_cpu_device
 {
 public:
 	// construction/destruction
