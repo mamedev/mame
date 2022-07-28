@@ -15,7 +15,7 @@ To Do:
 -   clean up Avengers protection; it currently checks against hard-coded program
     counter rather than behaving as a memory-mapped black box.
 -   Avengers had a protection chip underneath the sound module. Needs dumping.
-    The protection is extensive: palette data, calculates player movement, 
+    The protection is extensive: palette data, calculates player movement,
     even a hand in the sound.  The angle/movement stuff isn't 100% accurate either.
 -   accurate music tempo (audiocpu irq freq)
 -   accurate video timing, raw params
@@ -1592,7 +1592,9 @@ Known to exist but currently undumped, a set with all ROMs stamped U for the US 
   revision D, with each having a red stripe across the label.
 
 It was common for Capcom to use the same ROM label across regional sets but add a RED stripe for the US
-  region, BLUE stripe for Europe and no stripe for the Japanese region.
+  region, BLUE stripe for Europe and no stripe for the Japanese region. Capcom was not always consistent
+  including the region letter stamped on labels. Different US PCBs show the red stripe across the label both
+  with and without the "U" being stamped.
 
 */
 ROM_START( avengers )
@@ -1606,6 +1608,9 @@ ROM_START( avengers )
 
 	ROM_REGION( 0x10000, "adpcm", 0 )     /* ADPCM CPU */
 	ROM_LOAD( "av_01.6d",     0x0000, 0x8000, CRC(c1e5d258) SHA1(88ed978e6df72ce22f9371930360aa9cde73abe9) ) /* adpcm player - "Talker" ROM */
+
+	ROM_REGION( 0x1000, "mcu", 0 ) // Intel C8751H-88
+	ROM_LOAD( "av.13k", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "av_03.8k",     0x00000, 0x8000, CRC(efb5883e) SHA1(08aebf579f2c5ff472db66597cde1c6871d7d757) )  /* characters */
@@ -1631,8 +1636,8 @@ ROM_START( avengers )
 	ROM_LOAD( "av_19.2n",     0x38000, 0x8000, CRC(a00485ec) SHA1(cc24e7243f55bdfaedeabb7dddf7e1ef32811c45) )
 
 	ROM_REGION( 0x10000, "gfx4", 0 ) /* bg tiles */
-	ROM_LOAD( "av_25.15n",    0x00000, 0x8000, CRC(230d9e30) SHA1(05a20bb32ce1299d7645312624de8a1d074bacee) ) /* planes 0,1 - Red stripe across label for US region */
-	ROM_LOAD( "av_24.13n",    0x08000, 0x8000, CRC(a6354024) SHA1(ce2aaec8349c08f58cc469514100bcd3a97d24d7) ) /* planes 2,3 - Red stripe across label for US region */
+	ROM_LOAD( "avu_25.15n",    0x00000, 0x8000, CRC(230d9e30) SHA1(05a20bb32ce1299d7645312624de8a1d074bacee) ) /* planes 0,1 - Red stripe across label for US region */
+	ROM_LOAD( "avu_24.13n",    0x08000, 0x8000, CRC(a6354024) SHA1(ce2aaec8349c08f58cc469514100bcd3a97d24d7) ) /* planes 2,3 - Red stripe across label for US region */
 
 	ROM_REGION( 0x08000, "gfx5", 0 )
 	ROM_LOAD( "av_23.9n",     0x0000,  0x8000, CRC(c0a93ef6) SHA1(2dc9cd4eb142d74aea8d151904cb60a0767c6393) )  /* Tile Map */
@@ -1654,6 +1659,9 @@ ROM_START( avengersa )
 	ROM_REGION( 0x10000, "adpcm", 0 )     /* ADPCM CPU */
 	ROM_LOAD( "av_01.6d",     0x0000, 0x8000, CRC(c1e5d258) SHA1(88ed978e6df72ce22f9371930360aa9cde73abe9) ) /* adpcm player - "Talker" ROM */
 
+	ROM_REGION( 0x1000, "mcu", 0 ) // Intel C8751H-88
+	ROM_LOAD( "av.13k", 0x0000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "av_03.8k",     0x00000, 0x8000, CRC(efb5883e) SHA1(08aebf579f2c5ff472db66597cde1c6871d7d757) )  /* characters */
 
@@ -1678,8 +1686,8 @@ ROM_START( avengersa )
 	ROM_LOAD( "av_19.2n",     0x38000, 0x8000, CRC(a00485ec) SHA1(cc24e7243f55bdfaedeabb7dddf7e1ef32811c45) )
 
 	ROM_REGION( 0x10000, "gfx4", 0 ) /* bg tiles */
-	ROM_LOAD( "av_25.15n",    0x00000, 0x8000, CRC(230d9e30) SHA1(05a20bb32ce1299d7645312624de8a1d074bacee) ) /* planes 0,1 - Red stripe across label for US region */
-	ROM_LOAD( "av_24.13n",    0x08000, 0x8000, CRC(a6354024) SHA1(ce2aaec8349c08f58cc469514100bcd3a97d24d7) ) /* planes 2,3 - Red stripe across label for US region */
+	ROM_LOAD( "avu_25.15n",    0x00000, 0x8000, CRC(230d9e30) SHA1(05a20bb32ce1299d7645312624de8a1d074bacee) ) /* planes 0,1 - Red stripe across label for US region */
+	ROM_LOAD( "avu_24.13n",    0x08000, 0x8000, CRC(a6354024) SHA1(ce2aaec8349c08f58cc469514100bcd3a97d24d7) ) /* planes 2,3 - Red stripe across label for US region */
 
 	ROM_REGION( 0x08000, "gfx5", 0 )
 	ROM_LOAD( "av_23.9n",     0x0000,  0x8000, CRC(c0a93ef6) SHA1(2dc9cd4eb142d74aea8d151904cb60a0767c6393) )  /* Tile Map */
@@ -1701,6 +1709,9 @@ ROM_START( avengersb )
 	ROM_REGION( 0x10000, "adpcm", 0 )     /* ADPCM CPU */
 	ROM_LOAD( "av_01.6d",     0x0000, 0x8000, CRC(c1e5d258) SHA1(88ed978e6df72ce22f9371930360aa9cde73abe9) ) /* adpcm player - "Talker" ROM */
 
+	ROM_REGION( 0x1000, "mcu", 0 ) // Intel C8751H-88
+	ROM_LOAD( "av.13k", 0x0000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "av_03.8k",     0x00000, 0x8000, CRC(efb5883e) SHA1(08aebf579f2c5ff472db66597cde1c6871d7d757) )  /* characters */
 
@@ -1725,8 +1736,8 @@ ROM_START( avengersb )
 	ROM_LOAD( "av_19.2n",     0x38000, 0x8000, CRC(a00485ec) SHA1(cc24e7243f55bdfaedeabb7dddf7e1ef32811c45) )
 
 	ROM_REGION( 0x10000, "gfx4", 0 ) /* bg tiles */
-	ROM_LOAD( "av_25.15n",    0x00000, 0x8000, CRC(230d9e30) SHA1(05a20bb32ce1299d7645312624de8a1d074bacee) ) /* planes 0,1 - Red stripe across label for US region */
-	ROM_LOAD( "av_24.13n",    0x08000, 0x8000, CRC(a6354024) SHA1(ce2aaec8349c08f58cc469514100bcd3a97d24d7) ) /* planes 2,3 - Red stripe across label for US region */
+	ROM_LOAD( "avu_25.15n",    0x00000, 0x8000, CRC(230d9e30) SHA1(05a20bb32ce1299d7645312624de8a1d074bacee) ) /* planes 0,1 - Red stripe across label for US region */
+	ROM_LOAD( "avu_24.13n",    0x08000, 0x8000, CRC(a6354024) SHA1(ce2aaec8349c08f58cc469514100bcd3a97d24d7) ) /* planes 2,3 - Red stripe across label for US region */
 
 	ROM_REGION( 0x08000, "gfx5", 0 )
 	ROM_LOAD( "av_23.9n",     0x0000,  0x8000, CRC(c0a93ef6) SHA1(2dc9cd4eb142d74aea8d151904cb60a0767c6393) )  /* Tile Map */
@@ -1748,6 +1759,9 @@ ROM_START( avengersc )
 	ROM_REGION( 0x10000, "adpcm", 0 )     /* ADPCM CPU */
 	ROM_LOAD( "av_01.6d",     0x0000, 0x8000, CRC(c1e5d258) SHA1(88ed978e6df72ce22f9371930360aa9cde73abe9) ) /* adpcm player - "Talker" ROM */
 
+	ROM_REGION( 0x1000, "mcu", 0 ) // Intel C8751H-88
+	ROM_LOAD( "av.13k", 0x0000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "av_03.8k",     0x00000, 0x8000, CRC(efb5883e) SHA1(08aebf579f2c5ff472db66597cde1c6871d7d757) )  /* characters */
 
@@ -1772,8 +1786,8 @@ ROM_START( avengersc )
 	ROM_LOAD( "av_19.2n",     0x38000, 0x8000, CRC(a00485ec) SHA1(cc24e7243f55bdfaedeabb7dddf7e1ef32811c45) )
 
 	ROM_REGION( 0x10000, "gfx4", 0 ) /* bg tiles */
-	ROM_LOAD( "av_25.15n",    0x00000, 0x8000, CRC(230d9e30) SHA1(05a20bb32ce1299d7645312624de8a1d074bacee) ) /* planes 0,1 - Red stripe across label for US region */
-	ROM_LOAD( "av_24.13n",    0x08000, 0x8000, CRC(a6354024) SHA1(ce2aaec8349c08f58cc469514100bcd3a97d24d7) ) /* planes 2,3 - Red stripe across label for US region */
+	ROM_LOAD( "avu_25.15n",    0x00000, 0x8000, CRC(230d9e30) SHA1(05a20bb32ce1299d7645312624de8a1d074bacee) ) /* planes 0,1 - Red stripe across label for US region */
+	ROM_LOAD( "avu_24.13n",    0x08000, 0x8000, CRC(a6354024) SHA1(ce2aaec8349c08f58cc469514100bcd3a97d24d7) ) /* planes 2,3 - Red stripe across label for US region */
 
 	ROM_REGION( 0x08000, "gfx5", 0 )
 	ROM_LOAD( "av_23.9n",     0x0000,  0x8000, CRC(c0a93ef6) SHA1(2dc9cd4eb142d74aea8d151904cb60a0767c6393) )  /* Tile Map */
@@ -1794,6 +1808,9 @@ ROM_START( buraiken )
 
 	ROM_REGION( 0x10000, "adpcm", 0 )     /* ADPCM CPU */
 	ROM_LOAD( "av_01.6d",     0x0000, 0x8000, CRC(c1e5d258) SHA1(88ed978e6df72ce22f9371930360aa9cde73abe9) ) /* adpcm player - "Talker" ROM */
+
+	ROM_REGION( 0x1000, "mcu", 0 ) // Intel C8751H-88
+	ROM_LOAD( "av.13k", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "av_03.8k",     0x00000, 0x8000, CRC(efb5883e) SHA1(08aebf579f2c5ff472db66597cde1c6871d7d757) )  /* characters */
@@ -1819,8 +1836,8 @@ ROM_START( buraiken )
 	ROM_LOAD( "av_19.2n",     0x38000, 0x8000, CRC(a00485ec) SHA1(cc24e7243f55bdfaedeabb7dddf7e1ef32811c45) )
 
 	ROM_REGION( 0x10000, "gfx4", 0 )
-	ROM_LOAD( "av_25.15n",    0x00000, 0x8000, CRC(88a505a7) SHA1(ef4371e082b2370fcbfc96bfef5a94910acd9eff) ) /* planes 0,1 - sldh (no red stripe) */
-	ROM_LOAD( "av_24.13n",    0x08000, 0x8000, CRC(1f4463c8) SHA1(04cdb0187dcbdd4f5f53e60c856d4925ade8d7df) ) /* planes 2,3 - sldh (no red stripe) */
+	ROM_LOAD( "av_25.15n",    0x00000, 0x8000, CRC(88a505a7) SHA1(ef4371e082b2370fcbfc96bfef5a94910acd9eff) ) /* planes 0,1 - no stripe across the label */
+	ROM_LOAD( "av_24.13n",    0x08000, 0x8000, CRC(1f4463c8) SHA1(04cdb0187dcbdd4f5f53e60c856d4925ade8d7df) ) /* planes 2,3 - no stripe across the label */
 
 	ROM_REGION( 0x08000, "gfx5", 0 )
 	ROM_LOAD( "av_23.9n",     0x0000,  0x8000, CRC(c0a93ef6) SHA1(2dc9cd4eb142d74aea8d151904cb60a0767c6393) )  /* Tile Map */
@@ -1866,8 +1883,8 @@ ROM_START( buraikenb )
 	ROM_LOAD( "av_19.2n",     0x38000, 0x8000, CRC(a00485ec) SHA1(cc24e7243f55bdfaedeabb7dddf7e1ef32811c45) )
 
 	ROM_REGION( 0x10000, "gfx4", 0 )
-	ROM_LOAD( "av_25.15n",    0x00000, 0x8000, CRC(88a505a7) SHA1(ef4371e082b2370fcbfc96bfef5a94910acd9eff) ) /* planes 0,1 - sldh (no red stripe) */
-	ROM_LOAD( "av_24.13n",    0x08000, 0x8000, CRC(1f4463c8) SHA1(04cdb0187dcbdd4f5f53e60c856d4925ade8d7df) ) /* planes 2,3 - sldh (no red stripe) */
+	ROM_LOAD( "av_25.15n",    0x00000, 0x8000, CRC(88a505a7) SHA1(ef4371e082b2370fcbfc96bfef5a94910acd9eff) ) /* planes 0,1 - no stripe across the label */
+	ROM_LOAD( "av_24.13n",    0x08000, 0x8000, CRC(1f4463c8) SHA1(04cdb0187dcbdd4f5f53e60c856d4925ade8d7df) ) /* planes 2,3 - no stripe across the label */
 
 	ROM_REGION( 0x08000, "gfx5", 0 )
 	ROM_LOAD( "av_23.9n",     0x0000,  0x8000, CRC(c0a93ef6) SHA1(2dc9cd4eb142d74aea8d151904cb60a0767c6393) )  /* Tile Map */

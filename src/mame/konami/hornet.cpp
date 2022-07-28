@@ -1593,6 +1593,38 @@ ROM_START(sscope2)
 	ROM_LOAD( "at93c46.8g", 0x000000, 0x000080, BAD_DUMP CRC(cc63c213) SHA1(fb20e56fb73a887dc7b6db49efd1f8a18b959152) ) // hand built
 ROM_END
 
+ROM_START(sscope2e)
+	ROM_REGION32_BE(0x400000, "prgrom", 0)   // PowerPC program
+	ROM_LOAD16_WORD_SWAP("931d01.27p", 0x200000, 0x200000, CRC(4065fde6) SHA1(84f2dedc3e8f61651b22c0a21433a64993e1b9e2) )
+	ROM_RELOAD(0x000000, 0x200000)
+
+	ROM_REGION32_BE(0x800000, "datarom", 0)   // Data roms
+	ROM_LOAD32_WORD_SWAP("931a04.16t", 0x000000, 0x200000, CRC(4f5917e6) SHA1(a63a107f1d6d9756e4ab0965d72ea446f0692814) )
+
+	ROM_REGION32_BE(0x800000, "comm_board", 0)   // Comm board roms
+	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
+	ROM_LOAD("931a20.6e", 0x400000, 0x400000, CRC(d367a4c9) SHA1(8bf029841d9d3be20dea0423240bfec825477a1d) )
+
+	ROM_REGION(0x800000, "master_cgboard", ROMREGION_ERASE00)    // CG Board texture roms
+
+	ROM_REGION(0x80000, "audiocpu", 0)      // 68K Program
+	ROM_LOAD16_WORD_SWAP("931a08.7s", 0x000000, 0x80000, CRC(1597d604) SHA1(a1eab4d25907930b59ea558b484c3b6ddcb9303c) )
+
+	ROM_REGION16_LE(0xc00000, "rfsnd", 0)        // PCM sample roms
+	ROM_LOAD( "931a09.16p",   0x000000, 0x400000, CRC(694c354c) SHA1(42f54254a5959e1b341f2801f1ad032c4ed6f329) )
+	ROM_LOAD( "931a10.14p",   0x400000, 0x400000, CRC(78ceb519) SHA1(e61c0d21b6dc37a9293e72814474f5aee59115ad) )
+	ROM_LOAD( "931a11.12p",   0x800000, 0x400000, CRC(9c8362b2) SHA1(a8158c4db386e2bbd61dc9a600720f07a1eba294) )
+
+	ROM_REGION(0x2000, "m48t58",0)
+	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, BAD_DUMP CRC(f7c40218) SHA1(5021089803024a6f552e5c9d42b905e804b9d904) ) // needs proper dump for the European version
+
+	ROM_REGION(0x8, "lan_serial_id", 0)     // LAN Board DS2401
+	ROM_LOAD( "ds2401.16g", 0x000000, 0x000008, CRC(2b813979) SHA1(b940f4e1c0e1867788632bca3bdc3df265bdde7a) )
+
+	ROM_REGION16_BE(0x80, "lan_eeprom", 0)       // LAN Board AT93C46
+	ROM_LOAD16_WORD_SWAP( "at93c46.8g", 0x000000, 0x000080, CRC(b6da86a4) SHA1(3a6570ac25748fb5e6b8a0dd6b832ee2d463cc7b) )
+ROM_END
+
 ROM_START(sscope2b)
 	ROM_REGION32_BE(0x400000, "prgrom", 0)   // PowerPC program
 	ROM_LOAD16_WORD_SWAP("931b01.27p", 0x200000, 0x200000, CRC(deb036b7) SHA1(12280aa4e37c3492e5192d630c26e758d08744dd))
@@ -1842,7 +1874,7 @@ GAMEL( 1999, sscopea,   sscope,   sscope,  sscope,    hornet_state, init_sscope,
 GAMEL( 1999, sscoped,   sscope,   sscope_voodoo2,  sscope,  hornet_state, init_sscope,  ROT0, "Konami", "Silent Scope (ver UAD, Ver 1.33, GQ871 video board)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
 
 GAMEL( 2000, sscope2,   0,        sscope2, sscope2,   hornet_state, init_sscope2, ROT0, "Konami", "Silent Scope 2 : Dark Silhouette (ver UAD)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN , layout_dualhsxs )
-//GAMEL( 2000, sscope2e, sscope2, sscope2, sscope2,   hornet_state, init_sscope2, ROT0, "Konami", "Silent Scope 2 : Fatal Judgement (ver EAD)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN , layout_dualhsxs )
+GAMEL( 2000, sscope2e,  sscope2,  sscope2, sscope2,   hornet_state, init_sscope2, ROT0, "Konami", "Silent Scope 2 : Fatal Judgement (ver EAD)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN , layout_dualhsxs ) // hardware error as the dumped LAN PCB EEPROM region doesn't match the one on the main PCB timekeeper dump
 //GAMEL( 2000, sscope2j, sscope2  sscope2, sscope2,   hornet_state, init_sscope2, ROT0, "Konami", "Silent Scope 2 : Innocent Sweeper (ver JAD)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN , layout_dualhsxs )
 
 // These versions of Silent Scope 2 run on GN715 video boards (Voodoo 1 instead of Voodoo 2)

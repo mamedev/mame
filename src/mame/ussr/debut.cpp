@@ -7,6 +7,7 @@
 
 Released in 1994 in Russian Federation by ЭНЕРГОПРИБОР (Energopribor), Moscow.
 It's running the Mirage chess engine by Vladimir Rybinkin, originally made for MS-DOS.
+Also sold in 1996 as Феникс (Fenix), same ROM contents as Debut-M.
 
 TODO:
 - where does the interrupt come from?

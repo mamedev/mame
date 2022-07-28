@@ -20,12 +20,14 @@ public:
 	a26_rom_cm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
 	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_reset() override;
 
-	// reading and writing
-	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void install_memory_handlers(address_space *space) override;
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	uint8_t read(offs_t offset);
 };
 
 

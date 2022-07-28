@@ -16826,10 +16826,10 @@ mathmarv                        // Texas Instruments
 mbdtower                        // Milton Bradley
 mdndclab                        // Mattel
 merlin                          // Parker Bros
-merlina                         // Parker Bros
 mmarvin                         // Entex
 mmerlin                         // Parker Bros
 monkeysee                       // Tandy Corporation
+mrmusical                       // Concept 2000
 palmf31                         // Canon
 palmmd8                         // Canon
 pbmastm                         // Parker Bros
@@ -17040,6 +17040,7 @@ nbapbp                          // GX778 (c)1998
 nbapbpa                         // GX778 (c)1998
 sscope                          // GX830 (c)1999
 sscope2                         // GX931 (c)2000
+sscope2e                        // GX931 (c)2000
 sscopea                         // GX830 (c)1999
 sscopeb                         // GX830 (c)1999
 sscopec                         // GX830 (c)1999
@@ -20728,8 +20729,6 @@ uccopsu                         // (c) 1992 Irem America (US)
 
 @source:apple/mac.cpp
 mac2fdhd                        // 1988 Apple Macintosh II (FDHD)
-maccclas                        // 1993 Apple Macintosh Color Classic
-macclas2                        // 1991 Apple Macintosh Classic II
 macii                           // 1987 Apple Macintosh II
 maciici                         // 1989 Apple Macintosh IIci
 maciicx                         // 1989 Apple Macintosh IIcx
@@ -20737,9 +20736,13 @@ maciifx                         // 1990 Apple Macintosh IIfx
 maciihmu                        // 1987 Apple Macintosh II (w/o 68851 MMU)
 maciisi                         // 1990 Apple Macintosh IIsi
 maciix                          // 1988 Apple Macintosh IIx
+macse30                         // 1989 Apple Macintosh SE/30
+
+@source:apple/maclc.cpp
 maclc                           // 1990 Apple Macintosh LC
 maclc2                          // 1991 Apple Macintosh LC II
-macse30                         // 1989 Apple Macintosh SE/30
+macclas2                        // 1991 Apple Macintosh Classic II
+maccclas                        // 1993 Apple Macintosh Color Classic
 
 @source:apple/maciivx.cpp
 maciivx                         // 1993 Apple Macintosh IIvx
@@ -39506,6 +39509,9 @@ spbactn                         // 9002 - (c) 1991 Tecmo
 spbactnj                        // 9002 - (c) 1991 Tecmo
 spbactnp                        // prototype
 
+@source:samsung/dvd-n5xx.cpp
+n501
+
 @source:samsung/spc1000.cpp
 spc1000                         //
 
@@ -41721,7 +41727,8 @@ uk2086                          // 1986 UK2086
 
 @source:handheld/tispeak.cpp
 k28m2                           // Tiger Electronics
-lantutor                        //
+lantrans                        //
+lantransp                       //
 snmath                          //
 snmatha                         //
 snmathp                         //

@@ -656,7 +656,7 @@ ROM_END
 /***************************************************************************
 
   Ideal Flash
-  * PCB label 25-600321, REV C, TCI-A3H / 94HB
+  * PCB label: 25-600321, REV C, TCI-A3H / 94HB
   * PIC 1655A-078
   * 2 7seg LEDs + 8 other LEDs, 1-bit sound with volume decay
 

@@ -3598,6 +3598,7 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="dlair1">
 		<description>Dragon's Lair</description>
 		<year>2022</year>
@@ -3606,10 +3607,10 @@ license:CC0
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!--  Apple IIgs version by Antoine Vignau and Olivier Zardini -->
 		<!--  After booting your Apple IIgs with a system disk, or autobooting from a hard drive, insert Dragon's Lair disk #1 and double click the DragonsLair icon to begin the game. -->
-	    <!--  To install Dragon's Lair on a hard drive, create a DragonsLair folder on your hard drive and copy the content of the 7 disks into it. To run Dragon's Lair from your hard drive, double click on the DragonsLair directory icon on your hard drive then double click on the DragonsLair Icon. -->
+		<!--  To install Dragon's Lair on a hard drive, create a DragonsLair folder on your hard drive and copy the content of the 7 disks into it. To run Dragon's Lair from your hard drive, double click on the DragonsLair directory icon on your hard drive then double click on the DragonsLair Icon. -->
 		<!--  System Requirements: Apple IIgs ROM 01/3 with 1.5 MB RAM, one 3.5" disk drive, System 5.0.4 -->
 		<!--  Recommended: Apple IIgs ROM 01/3 with 4 MB RAM, accelerator card, hard drive, System 6.0.1 -->
-		
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="819200">
@@ -3652,7 +3653,8 @@ license:CC0
 				<rom name="DragonsLair_D7.po" size="819200" crc="a66498de" sha1="84de9890a44db7ad90e9fc1fd671538df3709bc5"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
+
 	<software name="dlair1sc">
 		<description>Dragon's Lair: Escape from Singe's Castle</description>
 		<year>2022</year>
@@ -3661,10 +3663,10 @@ license:CC0
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!--  Apple IIgs version by Antoine Vignau and Olivier Zardini -->
 		<!--  After booting your Apple IIgs with a system disk, or autobooting from a hard drive, insert Dragon's Lair disk #1 and double click the DragonsLair1 icon to begin the game. -->
-	    <!--  To install Dragon's Lair 1 on a hard drive, create a DragonsLair1 folder on your hard drive and copy the content of the 8 disks into it. To run Dragon's Lair 1 from your hard drive, double click on the DragonsLair1 directory icon on your hard drive then double click on the DragonsLair1 Icon. -->
+		<!--  To install Dragon's Lair 1 on a hard drive, create a DragonsLair1 folder on your hard drive and copy the content of the 8 disks into it. To run Dragon's Lair 1 from your hard drive, double click on the DragonsLair1 directory icon on your hard drive then double click on the DragonsLair1 Icon. -->
 		<!--  System Requirements: Apple IIgs ROM 01/3 with 1.5 MB RAM, one 3.5" disk drive, System 5.0.4 -->
 		<!--  Recommended: Apple IIgs ROM 01/3 with 4 MB RAM, accelerator card, hard drive, System 6.0.1 -->
-		
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="819200">
@@ -3713,7 +3715,8 @@ license:CC0
 				<rom name="DragonsLair1_D8.po" size="819200" crc="746ae6e5" sha1="0afc386f4b4656c7ea9193695b436a376329f017"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
+
 	<software name="dlair2tw">
 		<description>Dragon's Lair II: Time Warp</description>
 		<year>2022</year>
@@ -3725,7 +3728,7 @@ license:CC0
 		<!--  To install Dragon's Lair 2 on a hard drive, create a DragonsLair2 folder on your hard drive and copy the content of the 8 disks into it. To run Dragon's Lair 2 from your hard drive, double click on the DragonsLair2 directory icon on your hard drive then double click on the DragonsLair2 Icon. -->
 		<!--  System Requirements: Apple IIgs ROM 01/3 with 1.5 MB RAM, one 3.5" disk drive, System 5.0.4 -->
 		<!--  Recommended: Apple IIgs ROM 01/3 with 4 MB RAM, accelerator card, hard drive, System 6.0.1 -->
-		
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="819200">
@@ -3775,6 +3778,7 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="dlair3cm">
 		<description>Dragon's Lair III: Curse of Mordread</description>
 		<year>2022</year>
@@ -3786,7 +3790,7 @@ license:CC0
 		<!--  To install Dragon's Lair 3 on a hard drive, create a DragonsLair3 folder on your hard drive and copy the content of the 11 disks into it. To run Dragon's Lair 3 from your hard drive, double click on the DragonsLair3 directory icon on your hard drive then double click on the DragonsLair3 Icon -->
 		<!--  System Requirements: Apple IIgs ROM 01/3 with 1.4 MB RAM, one 3.5" disk drive, System 5.0.4 -->
 		<!--  Recommended: Apple IIgs ROM 01/3 with 4 MB RAM, accelerator card, hard drive, System 6.0.1 -->
-		
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="819200">
@@ -3854,4 +3858,21 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="tomahawk">
+		<description>Tomahawk</description>
+		<year>1987</year>
+		<publisher>Datasoft</publisher>
+		<info name="release" value="2022-07-05"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Tomahawk" is a 1987 simulation game ported to the Apple IIgs by John Brooks; sound effects by John Brooks, Thomas J. Clement, and Jerry Vincent; music by Thomas J. Clement; graphics by Bonita Long-Hemsath and John Brooks; disk routines by Robin Kar and John Brooks; based on an original game by D.K. Marshall; and distributed by Datasoft. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345370">
+				<rom name="tomahawk iigs.woz" size="1345370" crc="5f1f2610" sha1="226f3b885a5ccfcb73c819be0b038a52e430175a"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

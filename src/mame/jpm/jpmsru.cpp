@@ -195,7 +195,7 @@ public:
 	{ }
 
 	void lc(machine_config &config);
-	
+
 private:
 	void outputs_lc(address_map &map);
 

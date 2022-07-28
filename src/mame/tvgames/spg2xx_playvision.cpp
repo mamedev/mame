@@ -224,7 +224,7 @@ void pvmil_state::pvmil(machine_config &config)
 }
 
 ROM_START( pvmil )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) // Fujistu 29Z0002TN, read as ST M29W320FB
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) // Fujitsu 29Z0002TN, read as ST M29W320FB
 	ROM_LOAD16_WORD_SWAP( "millionare4.bin", 0x000000, 0x400000, CRC(9c43d0f2) SHA1(fb4ba0115000b10b7c0e0d44b9fa3234c900e694) )
 ROM_END
 

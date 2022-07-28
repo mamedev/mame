@@ -2,12 +2,10 @@
 // copyright-holders:Nathan Woods, Raphael Nabet, R. Belmont
 /***************************************************************************
 
-    video/mac.cpp
-
+    mac_v.cpp
     Macintosh video hardware
 
-    Emulates the video hardware for systems with the
-    RBV, V8, and Eagle chips.
+    Emulates the video hardware for systems with RBV and SE/30 video
 
     ----------------------------------------------------------------------
     Monitor sense codes
@@ -54,10 +52,6 @@ Apple color FPD      01           11           10   (FPD = Full Page Display)
 #include "machine/ram.h"
 #include "render.h"
 
-VIDEO_START_MEMBER(mac_state,mac)
-{
-}
-
 uint32_t mac_state::screen_update_macse30(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint32_t const video_base = (m_screen_buffer ? 0x8000 : 0) + (MAC_H_VIS/8);
@@ -79,20 +73,9 @@ uint32_t mac_state::screen_update_macse30(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-// IIci/IIsi RAM-Based Video (RBV) and children: V8, Eagle, Spice
+// IIci/IIsi RAM-Based Video (RBV)
 
-VIDEO_START_MEMBER(mac_state,macrbv)
-{
-}
-
-VIDEO_RESET_MEMBER(mac_state,maceagle)
-{
-	m_rbv_montype = 32;
-	m_rbv_palette[0xfe] = 0xffffff;
-	m_rbv_palette[0xff] = 0;
-}
-
-VIDEO_RESET_MEMBER(mac_state,macrbv)
+void mac_state::macrbv_reset()
 {
 	int htotal, vtotal;
 	double framerate;
@@ -106,8 +89,6 @@ VIDEO_RESET_MEMBER(mac_state,macrbv)
 
 	m_rbv_regs[2] = 0x7f;
 	m_rbv_regs[3] = 0;
-
-	m_rbv_type = RBV_TYPE_RBV;
 
 	view = 0;
 
@@ -145,21 +126,6 @@ VIDEO_RESET_MEMBER(mac_state,macrbv)
 	target->set_view(view);
 }
 
-VIDEO_START_MEMBER(mac_state,macv8)
-{
-	memset(m_rbv_regs, 0, sizeof(m_rbv_regs));
-
-	m_rbv_count = 0;
-	m_rbv_clutoffs = 0;
-	m_rbv_immed10wr = 0;
-
-	m_rbv_regs[0] = 0x4f;
-	m_rbv_regs[1] = 0x06;
-	m_rbv_regs[2] = 0x7f;
-
-	m_rbv_type = RBV_TYPE_V8;
-}
-
 uint32_t mac_state::screen_update_macrbv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint8_t const *vram8 = (uint8_t *)m_ram->pointer();
@@ -167,12 +133,6 @@ uint32_t mac_state::screen_update_macrbv(screen_device &screen, bitmap_rgb32 &bi
 
 	switch (m_rbv_montype)
 	{
-		case 32: // classic II built-in display
-			hres = MAC_H_VIS;
-			vres = MAC_V_VIS;
-			vram8 += 0x1f9a80;  // Classic II apparently doesn't use VRAM?
-			break;
-
 		case 1: // 15" portrait display
 			hres = 640;
 			vres = 870;
@@ -262,114 +222,6 @@ uint32_t mac_state::screen_update_macrbv(screen_device &screen, bitmap_rgb32 &bi
 				}
 			}
 		}
-	}
-
-	return 0;
-}
-
-uint32_t mac_state::screen_update_macv8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	int hres, vres;
-	switch (m_rbv_montype)
-	{
-		case 1: // 15" portrait display
-			hres = 640;
-			vres = 870;
-			break;
-
-		case 2: // 12" RGB
-			hres = 512;
-			vres = 384;
-			break;
-
-		case 6: // 13" RGB
-		default:
-			hres = 640;
-			vres = 480;
-			break;
-	}
-
-	switch (m_rbv_regs[0x10] & 7)
-	{
-		case 0: // 1bpp
-		{
-			uint8_t const *const vram8 = (uint8_t *)m_vram.target();
-
-			for (int y = 0; y < vres; y++)
-			{
-				uint32_t *scanline = &bitmap.pix(y);
-				for (int x = 0; x < hres; x+=8)
-				{
-					uint8_t const pixels = vram8[(y * 1024) + ((x/8)^3)];
-
-					*scanline++ = m_rbv_palette[0x7f|(pixels&0x80)];
-					*scanline++ = m_rbv_palette[0x7f|((pixels<<1)&0x80)];
-					*scanline++ = m_rbv_palette[0x7f|((pixels<<2)&0x80)];
-					*scanline++ = m_rbv_palette[0x7f|((pixels<<3)&0x80)];
-					*scanline++ = m_rbv_palette[0x7f|((pixels<<4)&0x80)];
-					*scanline++ = m_rbv_palette[0x7f|((pixels<<5)&0x80)];
-					*scanline++ = m_rbv_palette[0x7f|((pixels<<6)&0x80)];
-					*scanline++ = m_rbv_palette[0x7f|((pixels<<7)&0x80)];
-				}
-			}
-		}
-		break;
-
-		case 1: // 2bpp
-		{
-			uint8_t const *const vram8 = (uint8_t *)m_vram.target();
-
-			for (int y = 0; y < vres; y++)
-			{
-				uint32_t *scanline = &bitmap.pix(y);
-				for (int x = 0; x < hres/4; x++)
-				{
-					uint8_t const pixels = vram8[(y * 1024) + (BYTE4_XOR_BE(x))];
-
-					*scanline++ = m_rbv_palette[0x3f|(pixels&0xc0)];
-					*scanline++ = m_rbv_palette[0x3f|((pixels<<2)&0xc0)];
-					*scanline++ = m_rbv_palette[0x3f|((pixels<<4)&0xc0)];
-					*scanline++ = m_rbv_palette[0x3f|((pixels<<6)&0xc0)];
-				}
-			}
-		}
-		break;
-
-		case 2: // 4bpp
-		{
-			uint8_t const *const vram8 = (uint8_t *)m_vram.target();
-
-			for (int y = 0; y < vres; y++)
-			{
-				uint32_t *scanline = &bitmap.pix(y);
-
-				for (int x = 0; x < hres/2; x++)
-				{
-					uint8_t const pixels = vram8[(y * 1024) + (BYTE4_XOR_BE(x))];
-
-					*scanline++ = m_rbv_palette[(pixels&0xf0) | 0xf];
-					*scanline++ = m_rbv_palette[((pixels&0x0f)<<4) | 0xf];
-				}
-			}
-		}
-		break;
-
-		case 3: // 8bpp
-		{
-			uint8_t const *const vram8 = (uint8_t *)m_vram.target();
-
-			for (int y = 0; y < vres; y++)
-			{
-				uint32_t *scanline = &bitmap.pix(y);
-
-				for (int x = 0; x < hres; x++)
-				{
-					uint8_t const pixels = vram8[(y * 1024) + (BYTE4_XOR_BE(x))];
-					*scanline++ = m_rbv_palette[pixels];
-				}
-			}
-		}
-		break;
 	}
 
 	return 0;

@@ -23,6 +23,34 @@
 
 DEFINE_DEVICE_TYPE(VCS_CART_SLOT, vcs_cart_slot_device, "vcs_cart_slot", "Atari VCS 2600 Cartridge Slot")
 
+/* PCB */
+enum
+{
+	A26_2K_4K = 0,
+	A26_F4,
+	A26_F6,
+	A26_F8,
+	A26_F8SW,
+	A26_FA,
+	A26_FE,
+	A26_3E,     // to test
+	A26_3F,
+	A26_E0,
+	A26_E7,
+	A26_UA,
+	A26_DC,
+	A26_CV,
+	A26_FV,
+	A26_JVP,    // to test
+	A26_32IN1,
+	A26_8IN1,
+	A26_4IN1,
+	A26_DPC,
+	A26_SS,
+	A26_CM,
+	A26_X07,
+	A26_HARMONY,
+};
 
 //-------------------------------------------------
 //  device_vcs_cart_interface - constructor
@@ -52,7 +80,7 @@ void device_vcs_cart_interface::rom_alloc(uint32_t size, const char *tag)
 {
 	if (m_rom == nullptr)
 	{
-		m_rom = device().machine().memory().region_alloc(std::string(tag).append(A26SLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom = device().machine().memory().region_alloc(std::string(tag).append(":cart:rom").c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 	}
 }
@@ -80,7 +108,9 @@ vcs_cart_slot_device::vcs_cart_slot_device(const machine_config &mconfig, const 
 	device_t(mconfig, VCS_CART_SLOT, tag, owner, clock),
 	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_vcs_cart_interface>(mconfig, *this),
-	m_cart(nullptr), m_type(0)
+	m_cart(nullptr),
+	m_type(0),
+	m_address_space(*this, finder_base::DUMMY_TAG, -1, 8)
 {
 }
 
@@ -121,8 +151,7 @@ struct vcs_slot
 // Here, we take the feature attribute from .xml (i.e. the PCB name) and we assign a unique ID to it
 static const vcs_slot slot_list[] =
 {
-	{ A26_2K, "a26_2k" },
-	{ A26_4K, "a26_4k" },
+	{ A26_2K_4K, "a26_2k_4k" },
 	{ A26_F4, "a26_f4" },
 	{ A26_F6, "a26_f6" },
 	{ A26_F8, "a26_f8" },
@@ -167,22 +196,14 @@ static const char *vcs_get_slot(int type)
 			return elem.slot_option;
 	}
 
-	return "a26_4k";
+	return "a26_2k_4k";
 }
 
 image_init_result vcs_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint8_t *ROM;
-		uint32_t len;
-
-		if (loaded_through_softlist())
-			len = get_software_region_length("rom");
-		else
-			len = length();
-
-		//printf("Size: 0x%X\n", len);
+		const uint32_t len = loaded_through_softlist() ? get_software_region_length("rom") : length();
 
 		// check that filesize is among the supported ones
 		switch (len)
@@ -205,15 +226,14 @@ image_init_result vcs_cart_slot_device::call_load()
 		}
 
 		m_cart->rom_alloc(len, tag());
-		ROM = m_cart->get_rom_base();
+		uint8_t *ROM = m_cart->get_rom_base();
 
 		if (loaded_through_softlist())
 		{
-			const char *pcb_name;
-			bool has_ram = get_software_region("ram") ? true : false;
 			memcpy(ROM, get_software_region("rom"), len);
+			const char *pcb_name = get_feature("slot");
 
-			if ((pcb_name = get_feature("slot")) != nullptr)
+			if (pcb_name != nullptr)
 				m_type = vcs_get_pcb_id(pcb_name);
 			else
 			{
@@ -221,10 +241,8 @@ image_init_result vcs_cart_slot_device::call_load()
 				switch (len)
 				{
 					case 0x800:
-						m_type = A26_2K;
-						break;
 					case 0x1000:
-						m_type = A26_4K;
+						m_type = A26_2K_4K;
 						break;
 					case 0x2000:
 						m_type = A26_F8;
@@ -249,13 +267,13 @@ image_init_result vcs_cart_slot_device::call_load()
 						m_type = A26_3F;
 						break;
 					default:
-						m_type = A26_4K;
+						m_type = A26_2K_4K;
 						printf("Unrecognized cart type!\n");
 						break;
 				}
 			}
 
-			if (has_ram)
+			if (get_software_region("ram"))
 				m_cart->ram_alloc(get_software_region_length("ram"));
 		}
 		else
@@ -263,17 +281,12 @@ image_init_result vcs_cart_slot_device::call_load()
 			fread(ROM, len);
 			m_type = identify_cart_type(ROM, len);
 
-			// check for Special Chip (128bytes of RAM)
+			// check for Super Chip (128bytes of RAM)
 			if (len == 0x2000 || len == 0x4000 || len == 0x8000)
 				if (detect_super_chip(ROM, len))
 				{
 					m_cart->ram_alloc(0x80);
-					//printf("Super Chip detected!\n");
 				}
-			// Super chip games:
-			// dig dig, crystal castles, millipede, stargate, defender ii, jr. Pac Man,
-			// desert falcon, dark chambers, super football, sprintmaster, fatal run,
-			// off the wall, shooting arcade, secret quest, radar lock, save mary, klax
 
 			// add CBS RAM+ (256bytes of RAM)
 			if (m_type == A26_FA)
@@ -292,11 +305,11 @@ image_init_result vcs_cart_slot_device::call_load()
 				m_cart->ram_alloc(0x8000);
 		}
 
-		//printf("Type: %s\n", vcs_get_slot(m_type));
-
 		// pass a pointer to the now allocated ROM for the DPC chip
 		if (m_type == A26_DPC)
 			m_cart->setup_addon_ptr((uint8_t *)m_cart->get_rom_base() + 0x2000);
+
+		m_cart->install_memory_handlers(m_address_space.target());
 
 		return image_init_result::PASS;
 	}
@@ -717,10 +730,8 @@ int vcs_cart_slot_device::identify_cart_type(const uint8_t *ROM, uint32_t len)
 		switch (len)
 		{
 			case 0x800:
-				type = A26_2K;
-				break;
 			case 0x1000:
-				type = A26_4K;
+				type = A26_2K_4K;
 				break;
 			case 0x2000:
 				type = A26_F8;
@@ -745,7 +756,7 @@ int vcs_cart_slot_device::identify_cart_type(const uint8_t *ROM, uint32_t len)
 				type = A26_3F;
 				break;
 			default:
-				type = A26_4K;
+				type = A26_2K_4K;
 				printf("Unrecognized cart type!\n");
 				break;
 		}
@@ -775,43 +786,5 @@ std::string vcs_cart_slot_device::get_default_card_software(get_default_card_sof
 		return std::string(slot_string);
 	}
 	else
-		return software_get_default_slot("a26_4k");
-}
-
-
-/*-------------------------------------------------
- read
- -------------------------------------------------*/
-
-uint8_t vcs_cart_slot_device::read_rom(offs_t offset)
-{
-	if (m_cart)
-		return m_cart->read_rom(offset);
-	else
-		return 0xff;
-}
-
-uint8_t vcs_cart_slot_device::read_bank(address_space &space, offs_t offset)
-{
-	if (m_cart)
-		return m_cart->read_bank(space, offset);
-	else
-		return 0xff;
-}
-
-
-/*-------------------------------------------------
- write
- -------------------------------------------------*/
-
-void vcs_cart_slot_device::write_bank(address_space &space, offs_t offset, uint8_t data)
-{
-	if (m_cart)
-		m_cart->write_bank(space, offset, data);
-}
-
-void vcs_cart_slot_device::write_ram(offs_t offset, uint8_t data)
-{
-	if (m_cart)
-		m_cart->write_ram(offset, data);
+		return software_get_default_slot("a26_2k_4k");
 }

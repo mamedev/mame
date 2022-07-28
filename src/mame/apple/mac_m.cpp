@@ -20,10 +20,6 @@
          - Mac IIcx             030             SWIM    MacII ADB  ext      NuBus card
          - Mac IIci             030             SWIM    MacII ADB  ext      Internal "RBV" type
          - Mac IIsi             030             SWIM    Egret ADB  n/a      Internal "RBV" type
-         - Mac LC               020             SWIM    Egret ADB  n/a      Internal "V8" type
-         - Mac LC II            030             SWIM    Egret ADB  n/a      Internal "V8" type
-         - Mac Classic II       030             SWIM    Egret ADB  n/a      Internal "Eagle" type (V8 clone)
-         - Mac Color Classic    030             SWIM    Cuda ADB   n/a      Internal "Spice" type (V8 clone)
 
     Notes:
         - On the SE and most later Macs, the first access to ROM turns off the overlay.
@@ -51,7 +47,7 @@
 #include "emu.h"
 #include "mac.h"
 
-#define INTS_RBV    ((m_model >= MODEL_MAC_IICI) && (m_model <= MODEL_MAC_IIVI)) || ((m_model >= MODEL_MAC_LC) && (m_model <= MODEL_MAC_LC_580))
+#define INTS_RBV    ((m_model == MODEL_MAC_IICI) || (m_model == MODEL_MAC_IISI))
 
 #ifdef MAME_DEBUG
 #define LOG_ADB         0
@@ -207,89 +203,6 @@ void mac_state::set_scc_waitrequest(int waitrequest)
 	/* Not Yet Implemented */
 }
 
-void mac_state::v8_resize()
-{
-	offs_t memory_size;
-	uint8_t *memory_data;
-	int is_rom;
-
-	is_rom = (m_overlay) ? 1 : 0;
-
-	// get what memory we're going to map
-	if (is_rom)
-	{
-		/* ROM mirror */
-		memory_size = m_rom_size;
-		memory_data = reinterpret_cast<uint8_t *>(m_rom_ptr);
-		is_rom = true;
-	}
-	else
-	{
-		/* RAM */
-		memory_size = m_ram->size();
-		memory_data = m_ram->pointer();
-		is_rom = false;
-	}
-
-//    printf("mac_v8_resize: memory_size = %x, ctrl bits %02x (overlay %d = %s)\n", memory_size, m_rbv_regs[1] & 0xe0, m_overlay, is_rom ? "ROM" : "RAM");
-
-	if (is_rom)
-	{
-		mac_install_memory(0x00000000, memory_size-1, memory_size, memory_data, is_rom);
-
-		// install catcher in place of ROM that will detect the first access to ROM in its real location
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa00000, 0xafffff, read32sm_delegate(*this, FUNC(mac_state::rom_switch_r)), 0xffffffff);
-	}
-	else
-	{
-		address_space& space = m_maincpu->space(AS_PROGRAM);
-		uint32_t onboard_amt, simm_amt, simm_size;
-		static const uint32_t simm_sizes[4] = { 0, 2*1024*1024, 4*1024*1024, 8*1024*1024 };
-
-		// re-install ROM in its normal place
-		size_t rom_mirror = 0xfffff ^ (m_rom_size - 1);
-		m_maincpu->space(AS_PROGRAM).install_rom(0xa00000, 0xafffff, rom_mirror, m_rom_ptr);
-
-		// force unmap of entire RAM region
-		space.unmap_write(0, 0x9fffff);
-
-		// LC and Classic II have 2 MB built-in, all other V8-style machines have 4 MB
-		// we reserve the first 2 or 4 MB of mess_ram for the onboard,
-		// RAM above that mark is the SIMM
-		onboard_amt = ((m_model == MODEL_MAC_LC) || (m_model == MODEL_MAC_CLASSIC_II)) ? 2*1024*1024 : 4*1024*1024;
-		simm_amt = (m_rbv_regs[1]>>6) & 3;  // size of SIMM RAM window
-		simm_size = memory_size - onboard_amt;  // actual amount of RAM available for SIMMs
-
-		// installing SIMM RAM?
-		if (simm_amt != 0)
-		{
-//            printf("mac_v8_resize: SIMM region size is %x, SIMM size is %x, onboard size is %x\n", simm_sizes[simm_amt], simm_size, onboard_amt);
-
-			if ((simm_amt > 0) && (simm_size > 0))
-			{
-//              mac_install_memory(0x000000, simm_sizes[simm_amt]-1, simm_sizes[simm_amt], memory_data + onboard_amt, is_rom);
-				mac_install_memory(0x000000, simm_size-1, simm_size, memory_data + onboard_amt, is_rom);
-			}
-
-			// onboard RAM sits immediately above the SIMM, if any
-			if (simm_sizes[simm_amt] + onboard_amt <= 0x800000)
-			{
-				mac_install_memory(simm_sizes[simm_amt], simm_sizes[simm_amt] + onboard_amt - 1, onboard_amt, memory_data, is_rom);
-			}
-
-			// a mirror of the first 2 MB of on board RAM always lives at 0x800000
-			mac_install_memory(0x800000, 0x9fffff, 0x200000, memory_data, is_rom);
-		}
-		else
-		{
-//          printf("mac_v8_resize: SIMM off, mobo RAM at 0 and top\n");
-
-			mac_install_memory(0x000000, onboard_amt-1, onboard_amt, memory_data, is_rom);
-			mac_install_memory(0x900000, 0x9fffff, 0x200000, memory_data+0x100000, is_rom);
-		}
-	}
-}
-
 void mac_state::set_memory_overlay(int overlay)
 {
 	offs_t memory_size;
@@ -318,12 +231,7 @@ void mac_state::set_memory_overlay(int overlay)
 		}
 
 		/* install the memory */
-		if (((m_model >= MODEL_MAC_LC) && (m_model <= MODEL_MAC_COLOR_CLASSIC)) || (m_model == MODEL_MAC_CLASSIC_II))
-		{
-			m_overlay = overlay;
-			v8_resize();
-		}
-		else if ((m_model == MODEL_MAC_IICI) || (m_model == MODEL_MAC_IISI))
+		if ((m_model == MODEL_MAC_IICI) || (m_model == MODEL_MAC_IISI))
 		{
 			// ROM is OK to flood to 3fffffff
 			if (is_rom)
@@ -503,13 +411,6 @@ void mac_state::macii_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 WRITE_LINE_MEMBER(mac_state::mac_scsi_irq)
 {
-/*  mac_state *mac = machine.driver_data<mac_state>();
-
-    if ((mac->m_scsiirq_enable) && ((mac->m_model == MODEL_MAC_SE) || (mac->m_model == MODEL_MAC_CLASSIC)))
-    {
-        mac->m_scsi_interrupt = state;
-        mac->field_interrupts();
-    }*/
 }
 
 void mac_state::scsi_berr_w(uint8_t data)
@@ -591,10 +492,6 @@ WRITE_LINE_MEMBER(mac_state::mac_adb_via_out_cb2)
 	{
 		m_egret->set_via_data(state & 1);
 	}
-	else if (ADB_IS_CUDA)
-	{
-		m_cuda->set_via_data(state & 1);
-	}
 	else
 	{
 		if (m_macadb)
@@ -654,10 +551,6 @@ uint8_t mac_state::mac_via_in_a()
 		case MODEL_MAC_SE30:
 			return 0x81 | PA6;
 
-		case MODEL_MAC_LC:
-		case MODEL_MAC_LC_II:
-			return 0x81 | PA6 | PA4 | PA2;
-
 		case MODEL_MAC_IICI:
 			return 0x81 | PA6 | PA2 | PA1;
 
@@ -669,16 +562,6 @@ uint8_t mac_state::mac_via_in_a()
 
 		case MODEL_MAC_IICX:
 			return 0x81 | PA6;
-
-		case MODEL_MAC_CLASSIC_II:
-		case MODEL_MAC_QUADRA_800:
-			return 0x81 | PA4 | PA1;
-
-		case MODEL_MAC_QUADRA_900:
-			return 0x81 | PA6 | PA4;
-
-		case MODEL_MAC_COLOR_CLASSIC:
-			return 0x81 | PA1;
 
 		default:
 			return 0x80;
@@ -707,11 +590,6 @@ uint8_t mac_state::mac_via_in_b()
 	{
 		val |= m_egret->get_xcvr_session()<<3;
 	}
-	else if (ADB_IS_CUDA)
-	{
-		logerror("%s cuda treq %d\n", machine().time().to_string(), m_cuda->get_treq());
-		val |= m_cuda->get_treq()<<3;
-	}
 
 //  printf("%s VIA1 IN_B = %02x\n", machine().describe_context().c_str(), val);
 
@@ -736,10 +614,6 @@ uint8_t mac_state::mac_via_in_b_ii()
 	else if (ADB_IS_EGRET)
 	{
 		val |= m_egret->get_xcvr_session()<<3;
-	}
-	else if (ADB_IS_CUDA)
-	{
-		val |= m_cuda->get_treq()<<3;
 	}
 
 //  printf("%s VIA1 IN_B_II = %02x\n", machine().describe_context().c_str(), val);
@@ -797,17 +671,6 @@ void mac_state::mac_via_out_b_egadb(uint8_t data)
 	#endif
 	m_egret->set_via_full((data&0x10) ? 1 : 0);
 	m_egret->set_sys_session((data&0x20) ? 1 : 0);
-}
-
-void mac_state::mac_via_out_b_cdadb(uint8_t data)
-{
-//  printf("%s VIA1 OUT B: %02x\n", machine().describe_context().c_str(), data);
-
-	#if LOG_ADB
-	printf("%s 68K: New Cuda state: TIP %d BYTEACK %d\n", machine().describe_context().c_str(), (data>>5)&1, (data>>4)&1);
-	#endif
-	m_cuda->set_byteack((data&0x10) ? 1 : 0);
-	m_cuda->set_tip((data&0x20) ? 1 : 0);
 }
 
 WRITE_LINE_MEMBER(mac_state::mac_via_irq)
@@ -913,28 +776,12 @@ void mac_state::mac_via2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint8_t mac_state::mac_via2_in_a()
 {
-	uint8_t result;
-
-	if ((m_model == MODEL_MAC_QUADRA_900) || (m_model == MODEL_MAC_QUADRA_950))
-	{
-		result = 0x80 | m_nubus_irq_state;
-	}
-	else
-	{
-		result = 0xc0 | m_nubus_irq_state;
-	}
-
-	return result;
+	return 0xc0 | m_nubus_irq_state;
 }
 
 uint8_t mac_state::mac_via2_in_b()
 {
 //  logerror("%s VIA2 IN B\n", machine().describe_context());
-
-	if ((m_model == MODEL_MAC_LC) || (m_model == MODEL_MAC_LC_II) || (m_model == MODEL_MAC_CLASSIC_II))
-	{
-		return 0x4f;
-	}
 
 	if ((m_model == MODEL_MAC_SE30) || (m_model == MODEL_MAC_IIX))
 	{
@@ -997,13 +844,16 @@ void mac_state::machine_start()
 	save_item(NAME(m_se30_vbl_enable));
 	save_item(NAME(m_adb_irq_pending));
 	save_item(NAME(ca1_data));
-	save_item(NAME(m_rbv_regs));
-	save_item(NAME(m_rbv_ier));
-	save_item(NAME(m_rbv_ifr));
-	save_item(NAME(m_rbv_colors));
-	save_item(NAME(m_rbv_count));
-	save_item(NAME(m_rbv_clutoffs));
-	save_item(NAME(m_rbv_palette));
+	if ((m_model == MODEL_MAC_IICI) || (m_model == MODEL_MAC_IISI))
+	{
+		save_item(NAME(m_rbv_regs));
+		save_item(NAME(m_rbv_ier));
+		save_item(NAME(m_rbv_ifr));
+		save_item(NAME(m_rbv_colors));
+		save_item(NAME(m_rbv_count));
+		save_item(NAME(m_rbv_clutoffs));
+		save_item(NAME(m_rbv_palette));
+	}
 	save_item(NAME(m_scc_interrupt));
 	save_item(NAME(m_via_interrupt));
 	save_item(NAME(m_via2_interrupt));
@@ -1015,7 +865,7 @@ void mac_state::machine_start()
 
 void mac_state::machine_reset()
 {
-	if ((ADB_IS_EGRET) || (ADB_IS_CUDA))
+	if (ADB_IS_EGRET)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
@@ -1023,19 +873,16 @@ void mac_state::machine_reset()
 	// stop 60.15 Hz timer
 	m_6015_timer->adjust(attotime::never);
 
-	m_rbv_vbltime = 0;
-
-	// start 60.15 Hz timer for most systems
-	if (((m_model >= MODEL_MAC_IICI) && (m_model <= MODEL_MAC_IIFX)) || (m_model >= MODEL_MAC_LC))
+	if ((m_model == MODEL_MAC_IICI) || (m_model == MODEL_MAC_IISI))
 	{
-		m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
+		m_rbv_vbltime = 0;
+		macrbv_reset();
 	}
 
-	// default to 32-bit mode on LC
-	if (m_model == MODEL_MAC_LC)
+	// start 60.15 Hz timer for most systems
+	if ((m_model >= MODEL_MAC_IICI) && (m_model <= MODEL_MAC_IIFX))
 	{
-		m68000_base_device *m68k = downcast<m68000_base_device *>(m_maincpu.target());
-		m68k->set_hmmu_enable(M68K_HMMU_DISABLE);
+		m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
 	}
 
 	m_last_taken_interrupt = -1;
@@ -1046,14 +893,7 @@ void mac_state::machine_reset()
 
 	if (m_overlay_timeout != (emu_timer *)nullptr)
 	{
-		if (((m_model >= MODEL_MAC_LC) && (m_model <= MODEL_MAC_COLOR_CLASSIC)) || (m_model == MODEL_MAC_CLASSIC_II))
-		{
-			m_overlay_timeout->adjust(attotime::never);
-		}
-		else
-		{
-			m_overlay_timeout->adjust(m_maincpu->cycles_to_attotime(8));
-		}
+		m_overlay_timeout->adjust(m_maincpu->cycles_to_attotime(8));
 	}
 
 	/* setup videoram */
@@ -1074,7 +914,7 @@ void mac_state::machine_reset()
 	m_last_taken_interrupt = 0;
 }
 
-WRITE_LINE_MEMBER(mac_state::cuda_reset_w)
+WRITE_LINE_MEMBER(mac_state::egret_reset_w)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -1106,47 +946,6 @@ TIMER_CALLBACK_MEMBER(mac_state::overlay_timeout_func)
 	m_overlay_timeout->adjust(attotime::never);
 }
 
-uint32_t mac_state::mac_read_id()
-{
-//    printf("Mac read ID reg @ PC=%x\n", m_maincpu->pc());
-
-	switch (m_model)
-	{
-		case MODEL_MAC_LC_475:
-			return 0xa55a2221;
-
-		case MODEL_MAC_LC_550:
-			return 0xa55a0101;
-
-		case MODEL_MAC_LC_575:
-			return 0xa55a222e;
-
-		case MODEL_MAC_PBDUO_210:
-			return 0xa55a1004;
-
-		case MODEL_MAC_PBDUO_230:
-			return 0xa55a1005;
-
-		case MODEL_MAC_PBDUO_250:
-			return 0xa55a1006;
-
-		case MODEL_MAC_QUADRA_605:
-			return 0xa55a2225;
-
-		case MODEL_MAC_QUADRA_610:
-		case MODEL_MAC_QUADRA_650:
-		case MODEL_MAC_QUADRA_800:
-			return 0xa55a2bad;
-
-		case MODEL_MAC_QUADRA_660AV:
-		case MODEL_MAC_QUADRA_840AV:
-			return 0xa55a2830;
-
-		default:
-			return 0;
-	}
-}
-
 void mac_state::mac_driver_init(model_t model)
 {
 	m_overlay = 1;
@@ -1164,8 +963,7 @@ void mac_state::mac_driver_init(model_t model)
 
 	memset(m_ram->pointer(), 0, m_ram->size());
 
-	if ((model == MODEL_MAC_CLASSIC_II) || (model == MODEL_MAC_LC) || (model == MODEL_MAC_COLOR_CLASSIC) ||
-		(model == MODEL_MAC_LC_II) || ((m_model >= MODEL_MAC_II) && (m_model <= MODEL_MAC_SE30)))
+	if ((m_model >= MODEL_MAC_II) && (m_model <= MODEL_MAC_SE30))
 	{
 		m_overlay_timeout = timer_alloc(FUNC(mac_state::overlay_timeout_func), this);
 	}
@@ -1184,14 +982,10 @@ void mac_state::init_##label()     \
 	mac_driver_init(model); \
 }
 
-MAC_DRIVER_INIT(maclc, MODEL_MAC_LC)
-MAC_DRIVER_INIT(maclc2, MODEL_MAC_LC_II)
 MAC_DRIVER_INIT(maciici, MODEL_MAC_IICI)
 MAC_DRIVER_INIT(maciisi, MODEL_MAC_IISI)
 MAC_DRIVER_INIT(macii, MODEL_MAC_II)
 MAC_DRIVER_INIT(macse30, MODEL_MAC_SE30)
-MAC_DRIVER_INIT(macclassic2, MODEL_MAC_CLASSIC_II)
-MAC_DRIVER_INIT(maclrcclassic, MODEL_MAC_COLOR_CLASSIC)
 MAC_DRIVER_INIT(maciifx, MODEL_MAC_IIFX)
 MAC_DRIVER_INIT(maciicx, MODEL_MAC_IICX)
 MAC_DRIVER_INIT(maciifdhd, MODEL_MAC_II_FDHD)

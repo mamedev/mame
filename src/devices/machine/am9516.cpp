@@ -845,7 +845,7 @@ u8 am9516_device::channel::read_byte(bool flip)
 	u16 &cau = flip ? cabu : caau;
 	u16 &cal = flip ? cabl : caal;
 
-	return udc.space((cau & ARU_AR) >> 6).read_byte(BYTE_XOR_BE(address(cau, cal, 1)));
+	return udc.space((cau & ARU_AR) >> 6).read_byte(address(cau, cal, 1));
 }
 
 void am9516_device::channel::write_byte(u8 data, bool flip)
@@ -853,7 +853,7 @@ void am9516_device::channel::write_byte(u8 data, bool flip)
 	u16 &cau = flip ? caau : cabu;
 	u16 &cal = flip ? caal : cabl;
 
-	return udc.space((cau & ARU_AR) >> 6).write_byte(BYTE_XOR_BE(address(cau, cal, 1)), data);
+	udc.space((cau & ARU_AR) >> 6).write_byte(address(cau, cal, 1), data);
 }
 
 u16 am9516_device::channel::read_word(bool flip)
@@ -861,7 +861,7 @@ u16 am9516_device::channel::read_word(bool flip)
 	u16 &cau = flip ? cabu : caau;
 	u16 &cal = flip ? cabl : caal;
 
-	return udc.space((cau & ARU_AR) >> 6).read_word(address(cau, cal, 1));
+	return udc.space((cau & ARU_AR) >> 6).read_word(address(cau, cal, 2));
 }
 
 void am9516_device::channel::write_word(u16 data, bool flip)
@@ -869,7 +869,7 @@ void am9516_device::channel::write_word(u16 data, bool flip)
 	u16 &cau = flip ? caau : cabu;
 	u16 &cal = flip ? caal : cabl;
 
-	return udc.space((cau & ARU_AR) >> 6).write_word(address(cau, cal, 1), data);
+	udc.space((cau & ARU_AR) >> 6).write_word(address(cau, cal, 2), data);
 }
 
 void am9516_device::channel::interrupt(bool assert)

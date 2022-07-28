@@ -1520,18 +1520,18 @@ ROM_START( ccbootmm )
 	// 0x1800-0xffff - empty
 	ROM_LOAD( "11_mm", 0x2000, 0x0800, BAD_DUMP CRC(75bbf31d) SHA1(4bdcb54f5bc4df39523ffe6386fe6d255a135055) )
 	// 0x2800-0x2fff - empty
-	ROM_LOAD( "10_mm", 0x3000, 0x0800, BAD_DUMP CRC(e7b9df03) SHA1(b4be9546b1eb53b21dbd7d78947b45b156229cdd) )
+	ROM_LOAD( "10_mm", 0x3000, 0x0800, CRC(67127253) SHA1(e27556ed74e73644a2578ce6645c312d64f484c6) )
 	// 0x3800-0x3fff - empty
 
 	ROM_REGION( 0x1000, "gfx2", 0 )
 	ROM_LOAD( "9_mm", 0x0000, 0x0800, BAD_DUMP CRC(98c5cfcd) SHA1(b4c1a6d0be5c5af1a33ffd8f2432ddc7227699ee) )
 	ROM_LOAD( "8_mm", 0x0800, 0x0800, BAD_DUMP CRC(21acf226) SHA1(ebc9c13ea8645af2a80975e8612174efd2da64eb) )
 
-	ROM_REGION( 0x0160, "proms", 0 ) // not dumped for this set
-	ROM_LOAD( "cclimber.pr1", 0x0000, 0x0020, BAD_DUMP CRC(751c3325) SHA1(edce2bc883996c1d72dc6c1c9f62799b162d415a) )
-	ROM_LOAD( "cclimber.pr2", 0x0020, 0x0020, BAD_DUMP CRC(ab1940fa) SHA1(8d98e05cbaa6f55770c12e0a9a8ed9c73cc54423) )
-	ROM_LOAD( "cclimber.pr3", 0x0040, 0x0020, BAD_DUMP CRC(71317756) SHA1(1195f0a037e379cc1a3c0314cb746f5cd2bffe50) )
-	ROM_LOAD( "ccboot.prm",   0x0060, 0x0100, BAD_DUMP CRC(9e11550d) SHA1(b8cba8e16e10e23fba1f11551102ab77b680bdf0) )    // decryption table (not used)
+	ROM_REGION( 0x0160, "proms", 0 )
+	ROM_LOAD( "cclimber.pr1", 0x0000, 0x0020, CRC(751c3325) SHA1(edce2bc883996c1d72dc6c1c9f62799b162d415a) )
+	ROM_LOAD( "cclimber.pr2", 0x0020, 0x0020, CRC(ab1940fa) SHA1(8d98e05cbaa6f55770c12e0a9a8ed9c73cc54423) )
+	ROM_LOAD( "cclimber.pr3", 0x0040, 0x0020, CRC(71317756) SHA1(1195f0a037e379cc1a3c0314cb746f5cd2bffe50) )
+	ROM_LOAD( "ccboot.prm",   0x0060, 0x0100, CRC(9e11550d) SHA1(b8cba8e16e10e23fba1f11551102ab77b680bdf0) )    // decryption table (not used)
 
 	ROM_REGION( 0x2000, "cclimber_audio:samples", 0 )
 	ROM_LOAD( "mm_7", 0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )

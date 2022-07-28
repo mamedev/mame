@@ -6,7 +6,6 @@ license:CC0
 
 <softwarelist name="snread" description="Speak &amp; Read modules">
 
-
 	<software name="dogonlog">
 		<description>A Dog on a Log</description>
 		<year>1980</year>
@@ -102,6 +101,5 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-
 
 </softwarelist>

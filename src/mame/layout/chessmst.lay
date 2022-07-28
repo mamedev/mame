@@ -4,6 +4,25 @@ license:CC0
 -->
 <mamelayout version="2">
 
+<!-- luascript (-plugin layout), for pressing 2 buttons simultaneously -->
+
+	<script><![CDATA[
+		local layout = {}
+		local prev_state = 0
+
+		function layout.frame()
+			local cur_state = machine.ioport.ports[":CLICKABLE"]:read() & 1
+			if cur_state ~= prev_state then
+				machine.ioport.ports[":IN.1"]:field(0x01):set_value(cur_state)
+				machine.ioport.ports[":IN.1"]:field(0x02):set_value(cur_state)
+			end
+			prev_state = cur_state
+		end
+
+		return layout
+	]]></script>
+
+
 <!-- define elements -->
 
 	<element name="ledr" defstate="0">
@@ -40,6 +59,10 @@ license:CC0
 			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
 			<color red="0.37" green="0.33" blue="0.3" />
 		</disk>
+	</element>
+
+	<element name="nothing" defstate="0">
+		<rect><color alpha="0" /></rect>
 	</element>
 
 	<element name="whitew"><rect><color red="1" green="1" blue="1" /></rect></element>
@@ -482,6 +505,8 @@ license:CC0
 		<element ref="hlb" inputtag="IN.0" inputmask="0x04"><bounds x="118" y="55" width="4" height="4" /></element>
 		<element ref="hlb" inputtag="IN.0" inputmask="0x02"><bounds x="118" y="62" width="4" height="4" /></element>
 		<element ref="hlb" inputtag="IN.0" inputmask="0x01"><bounds x="118" y="69" width="4" height="4" /></element>
+
+		<element ref="nothing" inputtag="CLICKABLE" inputmask="0x01"><bounds x="108" y="79" width="4" height="4" /></element>
 		<element ref="hlb" inputtag="IN.1" inputmask="0x02"><bounds x="108" y="79" width="4" height="4" /></element>
 		<element ref="hlb" inputtag="IN.1" inputmask="0x01"><bounds x="122" y="79" width="4" height="4" /></element>
 

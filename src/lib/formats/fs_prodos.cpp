@@ -292,10 +292,10 @@ std::pair<err_t, std::vector<dir_entry>> prodos_impl::directory_contents(const s
 				auto rootblk = m_blockdev.get(blk.r16l(off+0x11));
 				meta.set(meta_name::length, rootblk.r24l(0x005));
 				meta.set(meta_name::rsrc_length, rootblk.r24l(0x105));
-			
+
 			} else if(type >= 1 && type <= 3)
 				meta.set(meta_name::length, blk.r24l(off + 0x15));
-			
+
 			res.emplace_back(dir_entry(type == 0xd ? dir_entry_type::dir : dir_entry_type::file, meta));
 			off += 39;
 		}
@@ -373,10 +373,10 @@ std::pair<err_t, meta_data> prodos_impl::metadata(const std::vector<std::string>
 			auto rootblk = m_blockdev.get(r16l(entry+0x11));
 			res.set(meta_name::length, rootblk.r24l(0x005));
 			res.set(meta_name::rsrc_length, rootblk.r24l(0x105));
-			
+
 		} else if(type >= 1 && type <= 3)
 			res.set(meta_name::length, r24l(entry + 0x15));
-		
+
 		else
 			return std::make_pair(ERR_UNSUPPORTED, meta_data());
 	}

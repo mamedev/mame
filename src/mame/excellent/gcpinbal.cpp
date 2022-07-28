@@ -295,31 +295,9 @@ INPUT_PORTS_END
                        GFX DECODING
 **************************************************************/
 
-static const gfx_layout charlayout =
-{
-	16,16,  /* 16*16 characters */
-	RGN_FRAC(1,1),
-	4,  /* 4 bits per pixel */
-	{ STEP4(0,1) },
-	{ STEP16(0,4) },
-	{ STEP16(0,4*16) },
-	16*16*4   /* every sprite takes 128 consecutive bytes */
-};
-
-static const gfx_layout char_8x8_layout =
-{
-	8,8,    /* 8*8 characters */
-	RGN_FRAC(1,1),
-	4,  /* 4 bits per pixel */
-	{ STEP4(0,1) },
-	{ STEP8(0,4) },
-	{ STEP8(0,4*8) },
-	8*8*4    /* every sprite takes 32 consecutive bytes */
-};
-
 static GFXDECODE_START( gfx_gcpinbal )
-	GFXDECODE_ENTRY( "bg0", 0, charlayout,          0, 0x60 )  // playfield
-	GFXDECODE_ENTRY( "fg0", 0, char_8x8_layout, 0x700, 0x10 )  // playfield
+	GFXDECODE_ENTRY( "bg0", 0, gfx_16x16x4_packed_msb,     0, 0x60 )  // playfield
+	GFXDECODE_ENTRY( "fg0", 0, gfx_8x8x4_packed_msb,   0x700, 0x10 )  // playfield
 GFXDECODE_END
 
 
