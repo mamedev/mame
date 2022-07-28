@@ -3,6 +3,26 @@
 license:CC0
 -->
 <mamelayout version="2">
+
+<!-- luascript (-plugin layout), for pressing 2 buttons simultaneously -->
+
+	<script><![CDATA[
+		local layout = {}
+		local prev_state = 0
+
+		function layout.frame()
+			local cur_state = machine.ioport.ports[":CLICKABLE"]:read() & 1
+			if cur_state ~= prev_state then
+				machine.ioport.ports[":KEY"]:field(0x40):set_value(cur_state)
+				machine.ioport.ports[":KEY"]:field(0x80):set_value(cur_state)
+			end
+			prev_state = cur_state
+		end
+
+		return layout
+	]]></script>
+
+
 <!-- define elements -->
 
 	<element name="white"><rect><color red="1" green="1" blue="1" /></rect></element>
@@ -34,6 +54,10 @@ license:CC0
 			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
 			<color red="0.7" green="0.7" blue="0.7" />
 		</rect>
+	</element>
+
+	<element name="nothing" defstate="0">
+		<rect><color alpha="0" /></rect>
 	</element>
 
 	<element name="text_1">        <text string="1">        <color red="1" green="1" blue="1" /></text> </element>
@@ -377,6 +401,9 @@ license:CC0
 		<element ref="hlb" inputtag="KEY" inputmask="0x20">   <bounds x="6.5"  y="20" width="5" height="1" /> </element>
 		<element ref="hlb" inputtag="KEY" inputmask="0x40">   <bounds x="12.5" y="20" width="5" height="1" /> </element>
 		<element ref="hlb" inputtag="KEY" inputmask="0x80">   <bounds x="18.5" y="20" width="5" height="1" /> </element>
+
+		<!-- hidden input below ENTER/CLEAR buttons to press both -->
+		<element ref="nothing" inputtag="CLICKABLE" inputmask="0x01"><bounds x="14.7" y="21.65" width="6.6" height="1.2" /></element>
 
 		<element ref="text_training"> <bounds x="0"  y="9"  width="6" height="1.4" /> </element>
 		<element ref="text_info">     <bounds x="6"  y="9"  width="6" height="1.4" /> </element>

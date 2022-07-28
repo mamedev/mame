@@ -172,7 +172,7 @@ license:CC0
 		</part>
 	</software>
 
-	
+
 
 	<software name="gc0014">
 		<description>mini-moni Volume 2 (GC0014-MIN)</description>
@@ -233,7 +233,7 @@ license:CC0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="TV POPジュニアvol.7"/>
 		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24lc02"/>	<!-- with 74HC125 -->
+			<feature name="slot" value="rom_24lc02"/>   <!-- with 74HC125 -->
 			<dataarea name="rom" size="0x100000">
 				<rom name="gc0018-tpj.u1" size="0x100000" crc="5e7fee64" sha1="14ebc6e47808f30de4724ec720c49223c2c6f22d"/>
 			</dataarea>

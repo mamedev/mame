@@ -4,11 +4,28 @@ license:CC0
 -->
 <mamelayout version="2">
 
+<!-- luascript (-plugin layout), for pressing 2 buttons simultaneously -->
+
+	<script><![CDATA[
+		local layout = {}
+		local prev_state = 0
+
+		function layout.frame()
+			local cur_state = machine.ioport.ports[":CLICKABLE"]:read() & 1
+			if cur_state ~= prev_state then
+				machine.ioport.ports[":IN.1"]:field(0x01):set_value(cur_state)
+				machine.ioport.ports[":IN.1"]:field(0x02):set_value(cur_state)
+			end
+			prev_state = cur_state
+		end
+
+		return layout
+	]]></script>
+
+
 <!-- define elements -->
 
 	<element name="black"><rect><color red="0.17" green="0.15" blue="0.15" /></rect></element>
-	<element name="white"><rect><color red="0.81" green="0.8" blue="0.79" /></rect></element>
-	<element name="disk_black"><disk><color red="0.17" green="0.15" blue="0.15" /></disk></element>
 
 	<element name="led" defstate="0">
 		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
@@ -31,6 +48,10 @@ license:CC0
 	<element name="bt" defstate="0">
 		<disk state="0"><color red="0.17" green="0.15" blue="0.15" /></disk>
 		<disk state="1"><color red="0.34" green="0.3" blue="0.3" /></disk>
+	</element>
+
+	<element name="nothing" defstate="0">
+		<rect><color alpha="0" /></rect>
 	</element>
 
 	<element name="text_1">
@@ -548,6 +569,7 @@ license:CC0
 		<element name="9.9" ref="led2"><bounds x="91" y="60.25" width="1.5" height="1.5" /></element>
 		<element name="9.8" ref="led2"><bounds x="91" y="63.25" width="1.5" height="1.5" /></element>
 
+		<element ref="nothing" inputtag="CLICKABLE" inputmask="0x01"><bounds x="95" y="13" width="2" height="2" /></element>
 		<element ref="bt" inputtag="IN.1" inputmask="0x01"><bounds x="95" y="13" width="2" height="2" /></element>
 		<element ref="bt" inputtag="IN.1" inputmask="0x02"><bounds x="95" y="17" width="2" height="2" /></element>
 

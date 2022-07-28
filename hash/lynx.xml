@@ -1184,24 +1184,26 @@ Known undumped prototypes:
 		</part>
 	</software>
 
-	<software name="yastuna1" supported="no"> <!-- Stops with a 'INSERT GAME' screen -->
+	<software name="yastuna1">
 		<description>Yastuna Vol.1 - The Alchemy of Cubes</description>
 		<year>2008</year>
 		<publisher>Fadest</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="yastuna1.lnx" size="262208" crc="a87ed55e" sha1="2c311788def1e4ec7d5adc64e2fbb44c851861e8" />
+			<feature name="granularity" value="1024"/>
+			<dataarea name="rom" size="0x40000">
+				<rom name="yastuna1.bin" size="0x40000" crc="a6fe24af" sha1="78ab610f29e97b111cfe4c48b681a416d5e79d42" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="yastuna2" supported="no"> <!-- Stops with a 'INSERT GAME' screen -->
+	<software name="yastuna2">
 		<description>Yastuna Vol.2 - The Space Incident</description>
 		<year>2008</year>
 		<publisher>Fadest</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="yastuna2.lnx" size="262208" crc="658929e1" sha1="4be4ba20a495c5b865e2512d0194d31185b016c5" />
+			<feature name="granularity" value="1024"/>
+			<dataarea name="rom" size="0x40000">
+				<rom name="yastuna2.bin" size="0x40000" crc="6b09d810" sha1="e38728654920868905e2a7b1e98985acaa9d21ae" />
 			</dataarea>
 		</part>
 	</software>

@@ -112,12 +112,12 @@ namespace {
 /***************************************************************************
 
   Coleco Frogger (manufactured in Japan, licensed from Sega)
-  * PCB label Coleco Frogger Code No. 01-81543, KS-003282 Japan
+  * PCB label: Coleco Frogger Code No. 01-81543, KS-003282 Japan
   * Mitsubishi M58846-701P MCU
   * cyan/red/green VFD display Itron CP5090GLR R1B, with partial color overlay
 
   Gakken / Konami Frogger
-  * PCB label Konami Gakken KH-8201D
+  * PCB label: Konami Gakken KH-8201D
   * Mitsubishi M58846-700P MCU (Konami logo on it)
   * cyan/red/green VFD display, with partial color overlay
 
@@ -244,7 +244,7 @@ ROM_END
 /***************************************************************************
 
   Gakken / Konami Jungler (manufactured in Japan)
-  * PCB label Konami Gakken GR503
+  * PCB label: Konami Gakken GR503
   * Mitsubishi M58846-702P MCU
   * cyan/red/green VFD display Itron CP5143GLR SGA, with light-yellow color overlay
 

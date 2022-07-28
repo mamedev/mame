@@ -25,6 +25,7 @@ h8_device::h8_device(const machine_config &mconfig, device_type type, const char
 	mode_advanced = false;
 	mode_a20 = false;
 	has_exr = false;
+	has_mac = false;
 	mac_saturating = false;
 	has_trace = false;
 	has_hc = true;

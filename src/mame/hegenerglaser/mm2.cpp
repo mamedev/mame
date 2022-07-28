@@ -112,6 +112,7 @@ $8000-$FFFF ROM
 // internal artwork
 #include "mephisto_bup.lh"
 #include "mephisto_mm2.lh"
+#include "mephisto_mm5.lh"
 
 
 namespace {
@@ -230,13 +231,13 @@ void mm2_state::rebel5_mem(address_map &map)
 void mm2_state::mm5p_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x2000).w(m_display, FUNC(mephisto_display1_device::data_w));
-	map(0x2400, 0x2400).w("board", FUNC(mephisto_board_device::led_w));
-	map(0x2800, 0x2800).w("board", FUNC(mephisto_board_device::mux_w));
-	map(0x2c00, 0x2c07).r(FUNC(mm2_state::keys_r));
-	map(0x3000, 0x3000).r("board", FUNC(mephisto_board_device::input_r));
-	map(0x3400, 0x3407).w("outlatch", FUNC(hc259_device::write_d7)).nopr();
-	map(0x3800, 0x3800).nopw(); // N/C
+	map(0x2000, 0x2000).mirror(0x03ff).w(m_display, FUNC(mephisto_display1_device::data_w));
+	map(0x2400, 0x2400).mirror(0x03ff).w("board", FUNC(mephisto_board_device::led_w)).nopr();
+	map(0x2800, 0x2800).mirror(0x03ff).w("board", FUNC(mephisto_board_device::mux_w));
+	map(0x2c00, 0x2c07).mirror(0x03f8).r(FUNC(mm2_state::keys_r));
+	map(0x3000, 0x3000).mirror(0x03ff).r("board", FUNC(mephisto_board_device::input_r));
+	map(0x3400, 0x3407).mirror(0x03f8).w("outlatch", FUNC(hc259_device::write_d7)).nopr();
+	map(0x3800, 0x3800).mirror(0x03ff).nopw(); // N/C
 	map(0x4000, 0xffff).rom();
 }
 
@@ -276,6 +277,9 @@ static INPUT_PORTS_START( mm2 )
 	PORT_START("RESET")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RES 1") PORT_CODE(KEYCODE_Z) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, mm2_state, reset_button, 0)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RES 2") PORT_CODE(KEYCODE_X) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, mm2_state, reset_button, 0)
+
+	PORT_START("CLICKABLE") // helper for clickable artwork
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bup )
@@ -302,6 +306,9 @@ static INPUT_PORTS_START( bup )
 	PORT_START("RESET")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RES 1") PORT_CODE(KEYCODE_Z) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, mm2_state, reset_button, 0)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RES 2") PORT_CODE(KEYCODE_X) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, mm2_state, reset_button, 0)
+
+	PORT_START("CLICKABLE") // helper for clickable artwork
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER)
 INPUT_PORTS_END
 
 
@@ -371,6 +378,8 @@ void mm2_state::mm5(machine_config &config)
 {
 	mm4(config);
 	SOFTWARE_LIST(config.replace(), "cart_list").set_original("mephisto_mm5");
+
+	config.set_default_layout(layout_mephisto_mm5); // does not apply to mm5p
 }
 
 void mm2_state::bup(machine_config &config)

@@ -109,7 +109,7 @@ using util::BIT;
 #include "cpu/mcs40/mcs40dasm.h"
 #include "cpu/mcs48/mcs48dsm.h"
 #include "cpu/mcs51/mcs51dasm.h"
-#include "cpu/mcs51/axc51-core_dasm.h"
+#include "cpu/axc51/axc51dasm.h"
 #include "cpu/mcs96/i8x9xd.h"
 #include "cpu/mcs96/i8xc196d.h"
 #include "cpu/melps4/melps4d.h"

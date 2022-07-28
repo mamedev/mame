@@ -48,7 +48,7 @@ license:CC0
 	                                                D  (D-x on case, DCxxxx-xxx part numbers) (see ekara_japan_d.xml)  (for e-kara, Popira / 2, Taiko de Popira)
 	                                                SP (SP-x on case, no part numbers)        (see ekara_japan_sp.xml) (for e-kara, Popira / 2, Taiko de Popira, Jumping Popira)
 	                                                A  (A-x on case, Pichi Pichi Pitch series)(see ekara_japan_a.xml)  (for e-kara / e-pitch)
-													                        AC (KR-xx on cart, maybe part of A series)
+	                                                                        AC (KR-xx on cart, maybe part of A series)
 	                                                JP (JP-x on case)                         (see ekara_japan_jp.xml) (for Jumping Popira Only)
 
 	these exist but haven't got any

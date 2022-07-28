@@ -35,7 +35,7 @@ license:CC0
 	-->
 
 	<!-- The first two releases will show Dream Cartridge Volume 1 or 2 (series details) when used with Popira, rather than the cartridge title -->
-	<software name="dc0001"> 
+	<software name="dc0001">
 		<description>Dream Cartridge: Best Hit Vol.8 (Japan) (DC0001-BHT)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>

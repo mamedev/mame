@@ -508,8 +508,8 @@ void midnrun_state::main_memmap(address_map &map)
 	map(0x78040000, 0x7804000f).rw(m_k001006_1, FUNC(k001006_device::read), FUNC(k001006_device::write));
 	map(0x780c0000, 0x780c0007).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
 	map(0x7e000000, 0x7e003fff).rw(FUNC(midnrun_state::sysreg_r), FUNC(midnrun_state::sysreg_w));
-	map(0x7e008000, 0x7e009fff).rw(m_k056230, FUNC(k056230_device::regs_r), FUNC(k056230_device::regs_w));	// LANC registers
-	map(0x7e00a000, 0x7e00bfff).rw(m_k056230, FUNC(k056230_device::ram_r), FUNC(k056230_device::ram_w));	// LANC Buffer RAM (27E)
+	map(0x7e008000, 0x7e009fff).rw(m_k056230, FUNC(k056230_device::regs_r), FUNC(k056230_device::regs_w));  // LANC registers
+	map(0x7e00a000, 0x7e00bfff).rw(m_k056230, FUNC(k056230_device::ram_r), FUNC(k056230_device::ram_w));    // LANC Buffer RAM (27E)
 	map(0x7e00c000, 0x7e00c00f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
 	map(0x7f800000, 0x7f9fffff).rom().region("prgrom", 0);
 	map(0x7fe00000, 0x7fffffff).rom().region("prgrom", 0);
@@ -536,8 +536,8 @@ void jetwave_state::main_memmap(address_map &map)
 	map(0x78080000, 0x7808000f).rw(m_k001006_2, FUNC(k001006_device::read), FUNC(k001006_device::write));
 	map(0x780c0000, 0x780c0007).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
 	map(0x7e000000, 0x7e003fff).rw(FUNC(jetwave_state::sysreg_r), FUNC(jetwave_state::sysreg_w));
-	map(0x7e008000, 0x7e009fff).rw(m_k056230, FUNC(k056230_device::regs_r), FUNC(k056230_device::regs_w));	// LANC registers
-	map(0x7e00a000, 0x7e00bfff).rw(m_k056230, FUNC(k056230_device::ram_r), FUNC(k056230_device::ram_w));	// LANC Buffer RAM (27E)
+	map(0x7e008000, 0x7e009fff).rw(m_k056230, FUNC(k056230_device::regs_r), FUNC(k056230_device::regs_w));  // LANC registers
+	map(0x7e00a000, 0x7e00bfff).rw(m_k056230, FUNC(k056230_device::ram_r), FUNC(k056230_device::ram_w));    // LANC Buffer RAM (27E)
 	map(0x7e00c000, 0x7e00c00f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
 	map(0x7f000000, 0x7f3fffff).rom().region("datarom", 0);
 	map(0x7f800000, 0x7f9fffff).rom().region("prgrom", 0);
