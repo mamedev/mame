@@ -26389,6 +26389,72 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="chaortgd">
+	<!-- 2MB rom with crc 1159836b is taizou's cracked version running on base MBC5 -->
+		<description>Chāorén Tègōngduì (Taiwan)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="超人特攻隊 (title screen)"/>
+		<info name="alt_title" value="超人特工隊 (cartridge)"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="chao ren te gong dui (unl) (chn) [c] [raw].gbc" size="0x200000" crc="e1d61242" sha1="31f54bdfa59d1e76777f044c1ef4686552f715f6"/>
+			</dataarea>
+			<dataarea name="nvram" size="0x8000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fengkag3">
+	<!-- 4MB rom with crc 73ef06f4 is taizou's cracked version running on base MBC5 -->
+		<description>Fēngkuáng Āgěi Ⅲ - Chāojí Zhàdànrén (Taiwan)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="瘋狂阿給Ⅲ - 超級炸彈人"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="feng kuang a gei iii - chao ji zha dan ren (unl) (chn) [c] [raw].gbc" size="0x200000" crc="8059e009" sha1="84011e3ae407613cfd7b6b1fe85f3812097afc66"/>
+			</dataarea>
+			<dataarea name="nvram" size="0x8000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wangzutt">
+	<!-- 2MB rom with crc ed67adac is taizou's cracked version running on base MBC5 -->
+		<description>Wángzú Tiāntáng (Taiwan)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="王族天堂"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="wang zu tian tang (unl) (chn) [c] [raw].gbc" size="0x200000" crc="dee597fc" sha1="4e01c94ab55f2d299bd0bea83c0ef500fb9e738c"/>
+			</dataarea>
+			<dataarea name="nvram" size="0x8000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xiandcru">
+	<!-- 2MB rom with crc fda80268 is taizou's cracked version running on base MBC5 -->
+		<description>Xiándàn Chāorén - Ultraman (Taiwan)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="咸蛋超人 (title screen)"/>
+		<info name="alt_title" value="閒蛋超人 (cartridge)"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="xian dan chao ren - ultraman (unl) (chn) [c] [raw].gbc" size="0x200000" crc="e81701e8" sha1="2a96a6f2164d80aa81eebdebc0d8f2ff45c3180f"/>
+			</dataarea>
+			<dataarea name="nvram" size="0x8000">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="3gokum2">
 	<!-- 4MB rom with crc 8de5f8d5 is taizou's cracked version running on base MBC5 -->
 		<description>Zhen San Guo Wu Shuang 2 - Shin Sangokumusou 2 (China)</description>
