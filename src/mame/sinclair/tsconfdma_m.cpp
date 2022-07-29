@@ -7,7 +7,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "tsconfdma.h"
+#include "tsconfdma_m.h"
 
 tsconfdma_device::tsconfdma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TSCONF_DMA, tag, owner, clock),
