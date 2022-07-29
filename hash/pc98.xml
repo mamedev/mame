@@ -5887,7 +5887,7 @@ TODO:
 		<description>Art Jigsaw - Data Shuu</description>
 		<year>1992</year>
 		<publisher>タケル (Takeru)</publisher>
-		<info name="alt_title" value="アートジグソー　データ集" />
+		<info name="alt_title" value="アートジグソー　データ集" />
 		<info name="release" value="19920608" />
 		<info name="usage" value="Requires a &quot;Art Jigsaw&quot; disk to work" />
 		<part name="flop1" interface="floppy_5_25">
@@ -9521,7 +9521,7 @@ TODO:
 		<description>Canvas 98</description>
 		<year>1992</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="キャンバス98" />
+		<info name="alt_title" value="キャンバス98" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1281968">
@@ -10973,7 +10973,7 @@ TODO:
 		<description>Classic Road 3 - Perfect Guide</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="クラシックロード３　パーフェクトガイド" />
+		<info name="alt_title" value="クラシックロード３　パーフェクトガイド" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
 				<rom name="croad3guide.d88" size="1281968" crc="742abaca" sha1="68a8455b66e3582178e5b20ff3201dda8e002742" offset="0" />
@@ -15634,21 +15634,21 @@ TODO:
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Runner's High"/> <!-- ランナーズ・ハイ -->
+			<feature name="part_id" value="Runner's High"/> <!-- ランナーズ・ハイ -->
 			<dataarea name="flop" size="1265664">
 				<rom name="runner's high.fdi" size="1265664" crc="63051378" sha1="f2c4a4bc96673d7632201ba16d1d2ff11f8e8955" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Nazo Puyo"/> <!-- なぞぷよ -->
+			<feature name="part_id" value="Nazo Puyo"/> <!-- なぞぷよ -->
 			<dataarea name="flop" size="1265664">
 				<rom name="nazo puyo.fdi" size="1265664" crc="54b61d5e" sha1="0ae90b427dc20901ca1494de663417c33eef4c0f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Ore Kakirifuda"/>    <!-- 俺が切り札！ -->
+			<feature name="part_id" value="Ore ga Kirifuda"/>    <!-- 俺が切り札！ -->
 			<dataarea name="flop" size="1265664">
-				<rom name="ore kakirifuda.fdi" size="1265664" crc="687947c5" sha1="3267aa22a744049e54bef499649bc5e40ddc23ca" offset="0" />
+				<rom name="ore ga kirifuda.fdi" size="1265664" crc="687947c5" sha1="3267aa22a744049e54bef499649bc5e40ddc23ca" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
@@ -17432,7 +17432,7 @@ TODO:
 		<description>Dual Targets - The 4th Unit Act. 3</description>
 		<year>1989</year>
 		<publisher>データウエスト (Data West)</publisher>
-		<info name="alt_title" value="第４のユニット　３　デュアルターゲット" />
+		<info name="alt_title" value="第４のユニット　３　デュアルターゲット" />
 		<info name="release" value="198905xx" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
@@ -20259,7 +20259,7 @@ TODO:
 		<description>Floppy Bunko 03 - Bishoujo Graphic Data Shuu Vol. 01</description>
 		<year>1992</year>
 		<publisher>エファット (EFAT)</publisher>
-		<info name="alt_title" value="フロッピー文庫０３ 美少女グラフィックデータ集　Ｖｏｌ．１" />
+		<info name="alt_title" value="フロッピー文庫０３ 美少女グラフィックデータ集　Ｖｏｌ．１" />
 		<info name="release" value="19920726" />
 		<info name="usage" value="Run CG98.BAT from DOS" />
 		<part name="flop1" interface="floppy_5_25">
@@ -20993,7 +20993,7 @@ TODO:
 		<description>Fushigi no Umi no Nadia - Option Disk</description>
 		<year>1992?</year>
 		<publisher>ガイナックス (Gainax)</publisher>
-		<info name="alt_title" value="ふしぎの海のナディア オプション" />
+		<info name="alt_title" value="ふしぎの海のナディア オプション" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="nadia_op.fdi" size="1265664" crc="a31924b2" sha1="0c21f92eac460648831e1331a8437462553bde37" offset="0" />
@@ -21386,7 +21386,7 @@ TODO:
 		<description>Gao Gao! Omake Disk</description>
 		<year>19??</year>
 		<publisher>フォア・ナイン (Fournine)</publisher>
-		<info name="alt_title" value="がおがお おまけディスク" />
+		<info name="alt_title" value="がおがお おまけディスク" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
@@ -22348,7 +22348,7 @@ TODO:
 		<description>Golf Links Champion - Course Pinehurst Resort and Country Club</description>
 		<year>1995?</year>
 		<publisher>サイベル (Cybelle)</publisher>
-		<info name="alt_title" value="リンクス　パインハースト" />
+		<info name="alt_title" value="リンクス　パインハースト" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="links pinehurst resort and country club.fdi" size="1265664" crc="d428ef11" sha1="427e6a82333d1832aceeceac0246bde01528cde5" offset="0" />
@@ -22360,7 +22360,7 @@ TODO:
 		<description>Golf Links Champion - Course Pinehurst Resort and Country Club (Alt Format)</description>
 		<year>1995?</year>
 		<publisher>サイベル (Cybelle)</publisher>
-		<info name="alt_title" value="リンクス　パインハースト" />
+		<info name="alt_title" value="リンクス　パインハースト" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
 				<rom name="1.d88" size="1281968" crc="76d15b31" sha1="63f11e9f18c67b94fec6ab455a148935ba9d7985" offset="0" />
@@ -22372,7 +22372,7 @@ TODO:
 		<description>Golf Links Champion - Course The Belfry Brabozon Course</description>
 		<year>1995?</year>
 		<publisher>サイベル (Cybelle)</publisher>
-		<info name="alt_title" value="リンクス　ベルフライ" />
+		<info name="alt_title" value="リンクス　ベルフライ" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="links the belfry brabozon course.fdi" size="1265664" crc="30b03b0a" sha1="98dce2773717f83d3e64c370ee0b48d3080394cb" offset="0" />
@@ -22384,7 +22384,7 @@ TODO:
 		<description>Golf Links Champion - Course The Belfry Brabozon Course (Alt Format)</description>
 		<year>1995?</year>
 		<publisher>サイベル (Cybelle)</publisher>
-		<info name="alt_title" value="リンクス　ベルフライ" />
+		<info name="alt_title" value="リンクス　ベルフライ" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
 				<rom name="1.d88" size="1281968" crc="7910c306" sha1="52adbe7e7aaba6b9d3e7318c74f413a47fe12a90" offset="0" />
@@ -34579,7 +34579,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<description>Pick Up Mahjong Master</description>
 		<year>1994</year>
 		<publisher>アレックス (Allex)</publisher>
-		<info name="alt_title" value="ピックアップ麻雀マスター" />
+		<info name="alt_title" value="ピックアップ麻雀マスター" />
 		<info name="release" value="199409xx" />
 		<info name="usage" value="Boot DOS 3.11 or higher from floppy, swap it with Disk A, run INSTALL.EXE and follow on screen instructions" />
 		<!-- Alt version without install: after swap just run MUSIC -> ALBIOS -> _SHELL A:<yen> B:<yen> (aka above AUTOEXEC.BAT output with 2 drives selected) -->
@@ -36412,7 +36412,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<description>Prism 98 (v1.00)</description>
 		<year>1992</year>
 		<publisher>ウルフチーム (WolfTeam)</publisher>
-		<info name="alt_title" value="プリズム９８" />
+		<info name="alt_title" value="プリズム９８" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
 				<rom name="prism.d88" size="1281968" crc="212ec654" sha1="e59722630e65000c4dbe1be7c56708dc339e75df" offset="0" />
@@ -41610,7 +41610,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<description>Stella Navigator v1.0</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="ステラナビゲーター ver1.0" />
+		<info name="alt_title" value="ステラナビゲーター ver1.0" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
@@ -48461,7 +48461,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<description>Xevious</description>
 		<year>1985</year>
 		<publisher>エニックス (Enix)</publisher>
-		<info name="alt_title" value="ゼビウス" />
+		<info name="alt_title" value="ゼビウス" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1086448">
 				<rom name="xevious.d88" size="1086448" crc="0c33b327" sha1="e56b3ae501024268ac9b7916dedb0bbce4ae052f" offset="0" />
@@ -49796,7 +49796,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<description>Zero - The 4th Unit Act. 4</description>
 		<year>1989</year>
 		<publisher>データウエスト (Data West)</publisher>
-		<info name="alt_title" value="第4のユニット４　ゼロ" />
+		<info name="alt_title" value="第4のユニット４　ゼロ" />
 		<info name="release" value="19891220" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
@@ -65040,7 +65040,7 @@ SPACE EMPIRE
 		<description>Doujin Soft Shuusaku Game Collection Vol. 1 (5.25&quot; Disks)</description>
 		<year>19??</year>
 		<publisher>Shuwa System Trading</publisher>
-		<info name="alt_title" value="同人ソフト秀作ゲームコレクションＶｏｌ１" />
+		<info name="alt_title" value="同人ソフト秀作ゲームコレクションＶｏｌ１" />
 		<info name="usage" value="Run INST.EXE from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
@@ -65078,7 +65078,7 @@ SPACE EMPIRE
 		<description>Doujin Soft Shuusaku Game Collection Vol. 1 (3.5&quot; Disks)</description>
 		<year>19??</year>
 		<publisher>Shuwa System Trading</publisher>
-		<info name="alt_title" value="同人ソフト秀作ゲームコレクションＶｏｌ１" />
+		<info name="alt_title" value="同人ソフト秀作ゲームコレクションＶｏｌ１" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="doujin1.hdm" size="1261568" crc="14c373d5" sha1="3d14424849c87dea389f39e22a1409e61a426bf2" offset="0" />
@@ -65115,7 +65115,7 @@ SPACE EMPIRE
 		<description>Doujin Soft Shuusaku Game Collection Vol. 2</description>
 		<year>19??</year>
 		<publisher>Shuwa System Trading</publisher>
-		<info name="alt_title" value="同人ソフト秀作ゲームコレクションＶｏｌ２" />
+		<info name="alt_title" value="同人ソフト秀作ゲームコレクションＶｏｌ２" />
 		<info name="usage" value="Run INST.EXE from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
@@ -65143,7 +65143,7 @@ SPACE EMPIRE
 		<description>Doujin Soft Shuusaku Game Collection Tokubetsu-hen</description>
 		<year>19??</year>
 		<publisher>Shuwa System Trading</publisher>
-		<info name="alt_title" value="同人ソフト秀作ゲームコレクション 特別編" />
+		<info name="alt_title" value="同人ソフト秀作ゲームコレクション 特別編" />
 		<info name="usage" value="Run INST.BAT from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
@@ -65646,7 +65646,7 @@ SPACE EMPIRE
 		<description>Bio 100% Free Games Collection</description>
 		<year>199?</year>
 		<publisher>アスキー (ASCII)</publisher>
-		<info name="alt_title" value="Bio 100% フリーゲームコレクション" />
+		<info name="alt_title" value="Bio 100% フリーゲームコレクション" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
@@ -65666,7 +65666,7 @@ SPACE EMPIRE
 		<description>Bio 100% Free Games Collection (Alt Format)</description>
 		<year>199?</year>
 		<publisher>アスキー (ASCII)</publisher>
-		<info name="alt_title" value="Bio 100% フリーゲームコレクション" />
+		<info name="alt_title" value="Bio 100% フリーゲームコレクション" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1261568">
@@ -66655,7 +66655,7 @@ doujin?!?
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>   <!-- is this really a doujin soft? -->
 		<info name="author" value="Fancy Soft" />
-		<info name="alt_title" value="ファイブギャルズコネクション" />
+		<info name="alt_title" value="ファイブギャルズコネクション" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="676528">
 				<rom name="5gals.d88" size="676528" crc="b1fd633d" sha1="308c13eaf8c0e436ef36d255d1d12a1993d678cd" offset="0" />
@@ -66741,7 +66741,7 @@ doujin?!?
 		<description>Akazukin-chan ni Kiwotsukete</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
-		<info name="alt_title" value="赤ずきんちゃんに気をつけて" />
+		<info name="alt_title" value="赤ずきんちゃんに気をつけて" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="red_riding_hood.fdi" size="1265664" crc="f6bb8d19" sha1="027409e3a4a1b1927ca0da9079c053e316988ce5" offset="0" />
@@ -67431,7 +67431,7 @@ doujin?!?
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="author" value="Studio Sold Out" />
-		<info name="alt_title" value="げげらの女子高印度化計画っ！part1" />
+		<info name="alt_title" value="げげらの女子高印度化計画っ！part1" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="gegerano_joshikou indo_ka_keikaku_tsu_part1.fdi" size="1265664" crc="b05d5d54" sha1="f75751dab20a09e7d4de6e4ef70aa31107efd224" offset="0" />
@@ -67511,7 +67511,7 @@ doujin?!?
 		<description>Ike Ike Dendai Bus</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
-		<info name="alt_title" value="行け行け電大バス" />
+		<info name="alt_title" value="行け行け電大バス" />
 		<info name="usage" value="Run DDB.BAT from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
@@ -67524,7 +67524,7 @@ doujin?!?
 		<description>Ike Ike Dendai Bus (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
-		<info name="alt_title" value="行け行け電大バス" />
+		<info name="alt_title" value="行け行け電大バス" />
 		<info name="usage" value="Run DDB.BAT from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
@@ -67884,7 +67884,7 @@ doujin?!?
 		<year>1996</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="author" value="Splush Wave" />
-		<info name="alt_title" value="マルガリータ" />
+		<info name="alt_title" value="マルガリータ" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="marg.fdi" size="1265664" crc="9702fe3d" sha1="023a7023986168ccdfa7a0a5a0f96ef81bccf95a" offset="0" />
@@ -68070,7 +68070,7 @@ doujin?!?
 		<description>Momotarou II - Ohimesama Kaiwai</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
-		<info name="alt_title" value="桃太郎Ⅱ　お姫様がいっぱい" />
+		<info name="alt_title" value="桃太郎Ⅱ　お姫様がいっぱい" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
@@ -69729,7 +69729,7 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		<description>Datsui Mahjong Margarita</description>
 		<year>199?</year>
 		<publisher>Splush Wave (Doujin)</publisher>
-		<info name="alt_title" value="脱衣麻雀マルガリータ" />
+		<info name="alt_title" value="脱衣麻雀マルガリータ" />
 		<info name="usage" value="From DOS, install to HDD via INSTALL.BAT. SEDIT the resulting MA.BAT, edit NAX.EXE line suffixing a -2 or -3 (-26/-86 compatible mode respectively), save and launch it" />
 		<!-- alt way: Just save an empty PCM.TBL in the directory -->
 		<part name="flop1" interface="floppy_5_25">
@@ -69885,7 +69885,7 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 	</software>
 
 <!--    <software name="">
-        <description>lodoss tou senki - custom (turbo program?) / ロードス島戦記カスタム</description>
+        <description>lodoss tou senki - custom (turbo program?) / ロードス島戦記カスタム</description>
         <year>19??</year>
         <publisher>&lt;unknown&gt;</publisher>
         <part name="flop1" interface="floppy_5_25">

@@ -1353,7 +1353,7 @@ ROM_START( alleymas )
 	ROM_LOAD( "02-13509-00.u101",  0x00000, 0x02000, CRC(4273e260) SHA1(1b2a726e0a6fe6a60d447c987471a6e1a9e78479) )
 	ROM_LOAD( "02-13510-00.u102",  0x10000, 0x02000, CRC(eb6575aa) SHA1(0876c83d13565937610b5af52aacee1ae6fd59ba) )
 	ROM_CONTINUE(                  0x1c000, 0x02000 )
-	ROM_LOAD( "02-13511-0x.u103",  0x12000, 0x02000, CRC(cc9d778c) SHA1(293ac75d45be4531af1982c0b99597d18bab6a05) ) /* Not verified if rev "00" or rev "01" */
+	ROM_LOAD( "02-13511-00.u103",  0x12000, 0x02000, CRC(cc9d778c) SHA1(293ac75d45be4531af1982c0b99597d18bab6a05) )
 	ROM_CONTINUE(                  0x1e000, 0x02000 )
 	ROM_LOAD( "02-13512-00.u104",  0x14000, 0x02000, CRC(8edb129b) SHA1(f1268617cf18c1c3fd5fb324e882db14cced3d8c) )
 	ROM_CONTINUE(                  0x20000, 0x02000 )
@@ -2325,8 +2325,8 @@ For Ironman Ivan Stewart's Super Off-Road Track-Pak, the label format is:
 */
 ROM_START( offroadt )
 	ROM_REGION( 0x040000, "master", 0 )
-	ROM_LOAD( "ortpu58t.bin",   0x00000, 0x10000, CRC(adbc6211) SHA1(cb3181a0dd64754d9a65a7a557e4a183b8d539a2) ) /* likely 03-25017-0x.u58t */
-	ROM_LOAD( "ortpu59t.bin",   0x10000, 0x10000, CRC(296dd3b6) SHA1(01ae1f2976e2fecc8237fc7b4cf4fb86dd170a70) ) /* likely 03-25016-0x.u59t */
+	ROM_LOAD( "03-25016-0x.u58t",  0x00000, 0x10000, CRC(adbc6211) SHA1(cb3181a0dd64754d9a65a7a557e4a183b8d539a2) ) // likely rev 4
+	ROM_LOAD( "03-25017-0x.u59t",  0x10000, 0x10000, CRC(296dd3b6) SHA1(01ae1f2976e2fecc8237fc7b4cf4fb86dd170a70) ) // likely rev 4
 	ROM_LOAD( "03-22120-01.u57t",  0x20000, 0x10000, CRC(e9f0f175) SHA1(db8c55015d1e8230f1fb27dfac6b8b364b0718a2) )
 	ROM_LOAD( "03-25015-01.u56t",  0x30000, 0x10000, CRC(2c1a22b3) SHA1(fb18af5ec873968beab47d163d9ef23532c40771) )
 
@@ -2434,10 +2434,10 @@ Pig Out: Dine Like a Swine!, the label format is:
 |PIGOUT           U58T | -> Game name & ROM PCB location
 ------------------------
 */
-ROM_START( pigout )
+ROM_START( pigout ) // Service mode accessible via P1 Start + Service (F2)
 	ROM_REGION( 0x040000, "master", 0 )
-	ROM_LOAD( "03-29020.u58t",    0x00000, 0x10000, CRC(8fe4b683) SHA1(6f98a4e54a558a642b7193af85823b29ade46919) ) /* more likely rev 02 than rev 00 */
-	ROM_LOAD( "03-29021.u59t",    0x10000, 0x10000, CRC(ab907762) SHA1(971c34ae42c17aa27880665966dc15a98387bebb) ) /* more likely rev 02 than rev 00 */
+	ROM_LOAD( "03-29020-0x.u58t", 0x00000, 0x10000, CRC(8fe4b683) SHA1(6f98a4e54a558a642b7193af85823b29ade46919) ) // likely rev 02
+	ROM_LOAD( "03-29021-0x.u59t", 0x10000, 0x10000, CRC(ab907762) SHA1(971c34ae42c17aa27880665966dc15a98387bebb) ) // likely rev 02
 	ROM_LOAD( "03-29019-01.u57t", 0x20000, 0x10000, CRC(c22be0ff) SHA1(52b76918358046f40ea4b74e53a38d8984125dbb) )
 
 	ROM_REGION( 0x080000, "slave", 0 )
@@ -2499,7 +2499,7 @@ ROM_START( pigout )
 	ROM_LOAD( "11-01.u27", 0x1200, 0x0104, NO_DUMP ) // MMI PAL16R8ACNS
 ROM_END
 
-ROM_START( pigouta )
+ROM_START( pigouta ) // Cannot enter service mode with P1 start + Service (F2)
 	ROM_REGION( 0x040000, "master", 0 )
 	ROM_LOAD( "03-29020-01.u58t", 0x00000, 0x10000, CRC(6c815982) SHA1(0720b22afd16e9bdc5d4a9e9a0071674ea46d038) )
 	ROM_LOAD( "03-29021-01.u59t", 0x10000, 0x10000, CRC(9de7a763) SHA1(9a612730a9d80d84114c1afc4a1887277d1ad5bc) )
@@ -3402,9 +3402,9 @@ GAME( 1989, aafbb,      aafb,     lelandi,  teamqb,     redline_state, init_aafb
 /* huge master banks, large slave banks, 80186 sound */
 GAME( 1989, offroad,    0,        lelandi,  offroad,    redline_state, init_offroad,  ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road (rev 4)", 0 )
 GAME( 1989, offroad3,   offroad,  lelandi,  offroad,    redline_state, init_offroad,  ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road (rev 3)", 0 )
-GAME( 1989, offroadt,   0,        lelandi,  offroad,    redline_state, init_offroadt, ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road Track-Pak", 0 )
+GAME( 1989, offroadt,   0,        lelandi,  offroad,    redline_state, init_offroadt, ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road Track-Pak (rev 4?)", 0 ) // need to verify revision
 GAME( 1989, offroadt2p, offroadt, lelandi,  offroadt2p, redline_state, init_offroadt, ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road Track-Pak (rev 4, 2 Players)", 0 )
-GAME( 1990, pigout,     0,        lelandi,  pigout,     redline_state, init_pigout,   ROT0,   "Leland Corporation", "Pig Out: Dine Like a Swine! (rev 2?)", 0 ) /* need to verify revision */
+GAME( 1990, pigout,     0,        lelandi,  pigout,     redline_state, init_pigout,   ROT0,   "Leland Corporation", "Pig Out: Dine Like a Swine! (rev 2?)", 0 ) // need to verify revision
 GAME( 1990, pigouta,    pigout,   lelandi,  pigout,     redline_state, init_pigout,   ROT0,   "Leland Corporation", "Pig Out: Dine Like a Swine! (rev 1)", 0 )
 
 /* Ataxx-era PCB, 80186 sound */

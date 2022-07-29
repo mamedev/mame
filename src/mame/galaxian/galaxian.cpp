@@ -15120,7 +15120,7 @@ ROM_END
 Moonwar
 
 Although the game displays Moonwar as the title the "original" Moon War is/was a prototype on Stern Berzerk/Frenzy hardware,
-see berzerk.cpp  So this version is commonly refered to as Moon War II becuase the ROMs & PCB were labeled as MOON WAR II
+see berzerk.cpp  So this version is commonly refered to as Moon War II because the ROMs & PCB were labeled as MOON WAR II
 
 NOTE: This version the title screen shows MOONWAR, on the prototype it specifically shows "MOON WAR"
 
@@ -15153,7 +15153,7 @@ NOTE: A PCB with ROMs at 2F & 2H specifically labeled as "RXA22" was dumped and 
       notes in the input code:
          Player 1 Dial: P1 dial works normally, P2 dial is reversed, both share same port
          Player 2 Dial: doesn't actually work due to bug in game code
-      It would seem to indicate the code is different becuase for moonwar the issue was corrected.
+      It would seem to indicate the code is different because for moonwar the issue was corrected.
 */
 ROM_START( moonwar )
 	ROM_REGION( 0x10000, "maincpu", 0 )

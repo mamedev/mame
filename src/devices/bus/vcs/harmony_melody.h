@@ -11,28 +11,23 @@
 
 // ======================> a26_rom_harmony_device
 
-class a26_rom_harmony_device : public a26_rom_f8_device
+class a26_rom_harmony_device : public a26_rom_f6_device
 {
 public:
-	// construction/destruction
 	a26_rom_harmony_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 private:
-	// device-level overrides
-	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	// reading and writing
-	virtual uint8_t read_rom(offs_t offset) override;
-	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) override;
+	virtual void install_memory_handlers(address_space *space) override;
 
 private:
 	void check_bankswitch(offs_t offset);
-
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 	uint8_t read8_r(offs_t offset);
-
 	void harmony_arm7_map(address_map &map);
 
 	required_device<lpc210x_device> m_cpu;

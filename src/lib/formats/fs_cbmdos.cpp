@@ -2,11 +2,11 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-	fs_cbmdos.cpp
+    fs_cbmdos.cpp
 
-	Management of CBM (Commodore) DOS disk images
+    Management of CBM (Commodore) DOS disk images
 
-	http://fileformats.archiveteam.org/wiki/CBMFS
+    http://fileformats.archiveteam.org/wiki/CBMFS
 
 ***************************************************************************/
 
@@ -32,18 +32,18 @@ class impl : public filesystem_t {
 public:
 	struct cbmdos_dirent
 	{
-		u8		m_next_directory_track;
-		u8		m_next_directory_sector;
-		u8		m_file_type;
-		u8		m_file_first_track;
-		u8		m_file_first_sector;
-		char	m_file_name[16];
-		u8		m_first_side_sector_block_track;
-		u8		m_first_side_sector_block_sector;
-		u8		m_rel_file_record_length;
-		u8		m_unused[6];
-		u8		m_sector_count_low;
-		u8		m_sector_count_high;
+		u8      m_next_directory_track;
+		u8      m_next_directory_sector;
+		u8      m_file_type;
+		u8      m_file_first_track;
+		u8      m_file_first_sector;
+		char    m_file_name[16];
+		u8      m_first_side_sector_block_track;
+		u8      m_first_side_sector_block_sector;
+		u8      m_rel_file_record_length;
+		u8      m_unused[6];
+		u8      m_sector_count_low;
+		u8      m_sector_count_high;
 	};
 
 	class block_iterator
@@ -56,11 +56,11 @@ public:
 		u8 size() const;
 
 	private:
-		const impl &					m_fs;
-		fsblk_t::block_t				m_block;
-		std::set<std::tuple<u8, u8>>	m_visited_set;
-		u8								m_track;
-		u8								m_sector;
+		const impl &                    m_fs;
+		fsblk_t::block_t                m_block;
+		std::set<std::tuple<u8, u8>>    m_visited_set;
+		u8                              m_track;
+		u8                              m_sector;
 	};
 
 	impl(fsblk_t &blockdev);
@@ -111,7 +111,7 @@ const char *fs::cbmdos_image::description() const
 
 void fs::cbmdos_image::enumerate_f(floppy_enumerator &fe, u32 form_factor, const std::vector<u32> &variants) const
 {
-	if (has(form_factor, variants, floppy_image::FF_525, floppy_image::SSDD))
+	if (has(form_factor, variants, floppy_image::FF_525, floppy_image::SSSD))
 	{
 		fe.add(FLOPPY_D64_FORMAT, 174848, "d64_cbmdos_35", "D64 CBMDOS single-sided 35 tracks");
 		fe.add(FLOPPY_D64_FORMAT, 192256, "d64_cbmdos_40", "D64 CBMDOS single-sided 40 tracks");

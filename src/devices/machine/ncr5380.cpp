@@ -72,6 +72,11 @@ void ncr5380_device::device_start()
 	m_irq_handler.resolve_safe();
 	m_drq_handler.resolve_safe();
 
+	// Need to be cleared here so that set_irq/drq called from reset
+	// does not compare with uninitialized
+	m_irq_state = false;
+	m_drq_state = false;
+
 	m_state_timer = timer_alloc(FUNC(ncr5380_device::state_timer), this);
 
 	save_item(NAME(m_state));

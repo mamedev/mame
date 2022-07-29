@@ -2,12 +2,12 @@
 // copyright-holders:Couriersud
 /***************************************************************************
 
-	fixfreq.h
+    fixfreq.h
 
-	Fixed frequency monochrome monitor emulation
+    Fixed frequency monochrome monitor emulation
 
-	The driver is intended for drivers which provide an analog video signal.
-	VSYNC and HSYNC levels are used to create the bitmap.
+    The driver is intended for drivers which provide an analog video signal.
+    VSYNC and HSYNC levels are used to create the bitmap.
 
 ***************************************************************************/
 
@@ -27,8 +27,7 @@ struct fixedfreq_monitor_desc
 		, m_gain(1.0 / 3.7)
 		, m_hscale(1)
 		, m_vsync_threshold(0.600)
-		, // trigger at 91% of vsync length 1-exp(-0.6)
-		m_hvisible(704)
+		, m_hvisible(704) // trigger at 91% of vsync length 1-exp(-0.6)
 		, m_hfrontporch(728)
 		, m_hsync(791)
 		, m_hbackporch(858)
@@ -94,13 +93,13 @@ struct fixedfreq_monitor_desc
 
 	double vsync_filter_timeconst() const noexcept
 	{
-		return (double)(m_monitor_clock)
-			   / ((double)m_hbackporch * vsync_width());
+		return double(m_monitor_clock)
+			   / (double(m_hbackporch) * vsync_width());
 	}
 
 	double hsync_filter_timeconst() const noexcept
 	{
-		return (double)m_monitor_clock / (double)hsync_width();
+		return double(m_monitor_clock) / double(hsync_width());
 	}
 
 	uint32_t m_monitor_clock;
@@ -213,14 +212,13 @@ struct fixedfreq_monitor_state
 		m_fragments.clear();
 	}
 
-	void update_sync_channel(const time_type &time, const double newval);
+	void update_sync_channel(const time_type &time, double newval);
 	void update_bm(const time_type &time);
-	void
-	update_composite_monochrome(const time_type &time, const double newval);
-	void update_red(const time_type &time, const double data);
-	void update_green(const time_type &time, const double data);
-	void update_blue(const time_type &time, const double data);
-	void update_sync(const time_type &time, const double data);
+	void update_composite_monochrome(const time_type &time, double newval);
+	void update_red(const time_type &time, double data);
+	void update_green(const time_type &time, double data);
+	void update_blue(const time_type &time, double data);
+	void update_sync(const time_type &time, double data);
 
 	const fixedfreq_monitor_desc &m_desc;
 	fixedfreq_monitor_intf       &m_intf;
@@ -257,8 +255,7 @@ public:
 	using time_type = fixedfreq_monitor_state::time_type;
 
 	// construction/destruction
-	fixedfreq_device(const machine_config &mconfig, const char *tag,
-					 device_t *owner, uint32_t clock = 0);
+	fixedfreq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// inline configuration helpers
 	fixedfreq_device &set_monitor_clock(uint32_t clock)
@@ -286,18 +283,14 @@ public:
 		m_monitor.m_gain = gain;
 		return *this;
 	}
-	fixedfreq_device &
-	set_horz_params(int visible, int frontporch, int sync, int backporch)
+	fixedfreq_device &set_horz_params(int visible, int frontporch, int sync, int backporch)
 	{
-		m_monitor.set_h_rel(visible, frontporch - visible, sync - frontporch,
-							backporch - sync);
+		m_monitor.set_h_rel(visible, frontporch - visible, sync - frontporch, backporch - sync);
 		return *this;
 	}
-	fixedfreq_device &
-	set_vert_params(int visible, int frontporch, int sync, int backporch)
+	fixedfreq_device &set_vert_params(int visible, int frontporch, int sync, int backporch)
 	{
-		m_monitor.set_v_rel(visible, frontporch - visible, sync - frontporch,
-							backporch - sync);
+		m_monitor.set_v_rel(visible, frontporch - visible, sync - frontporch, backporch - sync);
 		return *this;
 	}
 	fixedfreq_device &set_horz_scale(int hscale)
@@ -329,8 +322,7 @@ public:
 		return *this;
 	}
 
-	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
-								   const rectangle &cliprect);
+	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	NETDEV_ANALOG_CALLBACK_MEMBER(update_composite_monochrome);
 	NETDEV_ANALOG_CALLBACK_MEMBER(update_red);
@@ -343,8 +335,12 @@ public:
 	unsigned monitor_val(unsigned param) const;
 
 protected:
-	fixedfreq_device(const machine_config &mconfig, device_type type,
-					 const char *tag, device_t *owner, uint32_t clock);
+	fixedfreq_device(
+			const machine_config &mconfig,
+			device_type type,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock);
 
 	// device-level overrides
 	virtual void device_config_complete() override;

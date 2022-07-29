@@ -490,23 +490,12 @@ static const gfx_layout leland_layout =
 	8*8
 };
 
-static const gfx_layout ataxx_layout =
-{
-	8,8,
-	RGN_FRAC(1,6),
-	6,
-	{ RGN_FRAC(5,6), RGN_FRAC(4,6), RGN_FRAC(3,6), RGN_FRAC(2,6), RGN_FRAC(1,6), RGN_FRAC(0,6) },
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	8*8
-};
-
 static GFXDECODE_START( gfx_leland )
 	GFXDECODE_ENTRY( "bg_gfx", 0, leland_layout, 0, 8*16) // *16 is foreground
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_ataxx )
-	GFXDECODE_ENTRY( "bg_gfx", 0, ataxx_layout, 0, 16) // 16 is foreground
+	GFXDECODE_ENTRY( "bg_gfx", 0, gfx_8x8x6_planar, 0, 16) // 16 is foreground
 GFXDECODE_END
 
 void leland_state::leland_video(machine_config &config)

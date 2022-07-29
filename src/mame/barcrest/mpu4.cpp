@@ -288,7 +288,7 @@ void mpu4_state::lamp_extend_large(int data,int column,int active)
 			{
 				for (int i = 0; i < 8; i++)
 				{
-					// this includes bit 7, so you don't get a true 128 extra lamps as the last row is always 0 or 1 depending on which set of 64 we're dealing with 
+					// this includes bit 7, so you don't get a true 128 extra lamps as the last row is always 0 or 1 depending on which set of 64 we're dealing with
 					m_lamps[(8*column)+i+128+lampbase] = BIT(data, i);
 				}
 				m_lamp_strobe_ext[bit7] = column;
@@ -528,8 +528,8 @@ void mpu4_state::pia_ic3_porta_w(uint8_t data)
 			{
 				m_overcurrent = true;
 			}
-			
-			if (m_undercurrent_detect) 
+
+			if (m_undercurrent_detect)
 			{
 				m_undercurrent = true;
 			}
@@ -556,8 +556,8 @@ void mpu4_state::pia_ic3_portb_w(uint8_t data)
 			{
 				m_overcurrent = true;
 			}
-			
-			if (m_undercurrent_detect) 
+
+			if (m_undercurrent_detect)
 			{
 				m_undercurrent = true;
 			}
@@ -747,7 +747,7 @@ uint8_t mpu4_state::pia_ic4_portb_r()
 	{
 		m_ic4_input_b |= 0x02;
 	}
-	
+
 	if ( m_undercurrent )
 	{
 		m_ic4_input_b |= 0x01;
@@ -830,7 +830,7 @@ void mpu4_state::pia_ic5_porta_w(uint8_t data)
 			{
 				m_mpu4leds[((m_input_strobe | 8) << 3) | i] = BIT(data, i);
 			}
-		//	m_digits[m_input_strobe | 8] = data;
+		//  m_digits[m_input_strobe | 8] = data;
 		}
 		break;
 

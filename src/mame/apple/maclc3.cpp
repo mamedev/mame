@@ -79,9 +79,6 @@ private:
 
 	virtual void machine_start() override;
 
-	WRITE_LINE_MEMBER(adb_irq_w) { m_adb_irq_pending = state; }
-	int m_adb_irq_pending = 0;
-
 	u16 scc_r(offs_t offset)
 	{
 		u16 result = m_scc->dc_ab_r(offset);
@@ -112,8 +109,6 @@ private:
 void macvail_state::machine_start()
 {
 	m_sonora->set_ram_info((u32 *) m_ram->pointer(), m_ram->size());
-
-	save_item(NAME(m_adb_irq_pending));
 }
 
 /***************************************************************************
@@ -266,10 +261,9 @@ void macvail_state::maclc3_base(machine_config &config)
 
 	SONORA(config, m_sonora, C15M);
 	m_sonora->set_maincpu_tag("maincpu");
-	m_sonora->set_rom_tag(":bootrom");
+	m_sonora->set_rom_tag("bootrom");
 
 	MACADB(config, m_macadb, C15M);
-	m_macadb->adb_irq_callback().set(FUNC(macvail_state::adb_irq_w));
 	m_macadb->set_mcu_mode(true);
 }
 

@@ -67,22 +67,19 @@ DECLARE_DEVICE_TYPE(ATARI_DPC, dpc_device)
 class a26_rom_dpc_device : public a26_rom_f8_device
 {
 public:
-	// construction/destruction
 	a26_rom_dpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	required_device<dpc_device> m_dpc;
 
-	// reading and writing
-	virtual uint8_t read_rom(offs_t offset) override;
-	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) override;
+	virtual void install_memory_handlers(address_space *space) override;
 
 	virtual void setup_addon_ptr(uint8_t *ptr) override;
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_reset() override;
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 };
 
 

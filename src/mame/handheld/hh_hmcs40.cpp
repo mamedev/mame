@@ -388,7 +388,7 @@ ROM_END
 /***************************************************************************
 
   Bambino Dribble Away Basketball (manufactured in Japan)
-  * PCB label Emix Corp. ET-05
+  * PCB label: Emix Corp. ET-05
   * Hitachi HD38750A08 MCU
   * cyan VFD display Emix-106, with bezel overlay
 
@@ -514,7 +514,7 @@ ROM_END
 /***************************************************************************
 
   Bambino Knock-Em Out Boxing
-  * PCB label Emix Corp. ET-06B
+  * PCB label: Emix Corp. ET-06B
   * Hitachi HD38750A07 MCU
   * cyan VFD display Emix-103, with blue or green color overlay
 
@@ -663,7 +663,7 @@ ROM_END
 /***************************************************************************
 
   Bandai Frisky Tom (manufactured in Japan)
-  * PCB label Kaken Corp., PT-327A
+  * PCB label: Kaken Corp., PT-327A
   * Hitachi HD38800A77 MCU
   * cyan/red/green VFD display Futaba DM-43ZK 2E
 
@@ -794,7 +794,7 @@ ROM_END
 /***************************************************************************
 
   Bandai Packri Monster (manufactured in Japan)
-  * PCB label DM-21ZA2
+  * PCB label: DM-21ZA2
   * Hitachi HD38800A27 MCU
   * cyan/red/green VFD display Futaba DM-21ZK 2B, with bezel overlay
 
@@ -918,7 +918,7 @@ ROM_END
 /***************************************************************************
 
   Bandai Zaxxon (manufactured in Japan, licensed from Sega)
-  * PCB label FL Zaxxon
+  * PCB label: FL Zaxxon
   * Hitachi HD38800B19 MCU
   * cyan/red/blue VFD display NEC FIP11BM24T no. 4-8, half of it reflected
     with a one-way mirror to give the illusion of a 3D display
@@ -1176,7 +1176,7 @@ ROM_END
 /***************************************************************************
 
   Bandai Pengo (manufactured in Japan, licensed from Sega)
-  * PCB label FL Pengo(in katakana)
+  * PCB label: FL Pengo(in katakana)
   * Hitachi QFP HD38820A63 MCU
   * cyan/red/blue VFD display Futaba DM-68ZK 3D DM-63
 
@@ -1311,7 +1311,7 @@ ROM_END
 /***************************************************************************
 
   Bandai Burger Time (manufactured in Japan, licensed from Data East)
-  * PCB label Kaken Corp. PT-389 Burger Time
+  * PCB label: Kaken Corp. PT-389 Burger Time
   * Hitachi QFP HD38820A65 MCU
   * cyan/red/green VFD display NEC FIP6AM25T no. 21-21
 
@@ -1536,7 +1536,7 @@ ROM_END
 /***************************************************************************
 
   Bandai Dokodemo Dorayaki Doraemon (FL LSI Game Push Up) (manufactured in Japan)
-  * PCB label Kaken Corp PT-412 FL-Doreamon(in katakana)
+  * PCB label: Kaken Corp PT-412 FL-Doreamon(in katakana)
   * Hitachi HD38800B43 MCU
   * cyan/red/blue VFD display Futaba DM-71
 
@@ -1760,7 +1760,7 @@ ROM_END
 /***************************************************************************
 
   Bandai Ultraman Monster Battle (FL LSI Game Push Up) (manufactured in Japan)
-  * PCB label Kaken Corp. PT-424 FL Ultra Man
+  * PCB label: Kaken Corp. PT-424 FL Ultra Man
   * Hitachi HD38800B52 MCU
   * cyan/red/blue VFD display NEC FIP8BM25T no. 21-8 2
 
@@ -1987,7 +1987,7 @@ ROM_END
 /***************************************************************************
 
   Bandai Machine Man (FL Flat Type) (manufactured in Japan)
-  * PCB label Kaken PT-438
+  * PCB label: Kaken PT-438
   * Hitachi QFP HD38820A85 MCU
   * cyan/red/green VFD display NEC FIP5CM33T no. 4 21
 
@@ -2089,7 +2089,7 @@ ROM_END
 /***************************************************************************
 
   Bandai Pair Match (manufactured in Japan)
-  * PCB label Kaken Corp. PT-460
+  * PCB label: Kaken Corp. PT-460
   * Hitachi QFP HD38820A88 MCU(main), HD38820A89(audio)
   * cyan/red VFD display
 
@@ -2393,7 +2393,7 @@ ROM_END
 /***************************************************************************
 
   Coleco Donkey Kong (manufactured in Taiwan, licensed from Nintendo)
-  * PCB label Coleco Rev C 75790 DK
+  * PCB label: Coleco Rev C 75790 DK
   * Hitachi QFP HD38820A45 MCU
   * RC circuit for speaker volume decay
   * cyan/red VFD display Futaba DM-47ZK 2K, with color overlay
@@ -2538,7 +2538,7 @@ ROM_END
 /***************************************************************************
 
   Coleco Galaxian (manufactured in Taiwan)
-  * PCB label Coleco Rev A 75718
+  * PCB label: Coleco Rev A 75718
   * Hitachi HD38800A70 MCU
   * discrete sound (when alien attacks)
   * cyan/red VFD display Futaba DM-36Z 2H, with color overlay
@@ -2678,7 +2678,7 @@ ROM_END
 /***************************************************************************
 
   Coleco Pac-Man (manufactured in Taiwan, licensed from Midway)
-  * PCB label Coleco 75690
+  * PCB label: Coleco 75690
   * Hitachi QFP HD38820A28/29 MCU
   * cyan/red VFD display Futaba DM-34Z 2A, with color overlay
 
@@ -2821,7 +2821,7 @@ ROM_END
 /***************************************************************************
 
   Coleco Ms. Pac-Man (manufactured in Taiwan, licensed from Midway)
-  * PCB label Coleco 911171
+  * PCB label: Coleco 911171
   * Hitachi QFP HD38820A61 MCU
   * cyan/red VFD display Futaba DM-60Z 3I, with color overlay
 
@@ -2950,7 +2950,7 @@ ROM_END
 /***************************************************************************
 
   Entex Galaxian 2 (manufactured in Japan)
-  * PCB labels ENTEX GALAXIAN PB-118/116/097 80-210137/135/114
+  * PCB labels: ENTEX GALAXIAN PB-118/116/097 80-210137/135/114
   * Hitachi QFP HD38820A13 MCU
   * cyan/red/green VFD display Futaba DM-20
 
@@ -3088,7 +3088,7 @@ ROM_END
 /***************************************************************************
 
   Entex Pac Man 2 (manufactured in Japan)
-  * PCB labels ENTEX PAC-MAN PB-093/094 80-210149/50/51
+  * PCB labels: ENTEX PAC-MAN PB-093/094 80-210149/50/51
   * Hitachi QFP HD38820A23 MCU
   * cyan/red VFD display Futaba DM-28Z 1G(cyan Pac-Man) or DM-28 1K(orange Pac-Man)
 
@@ -3304,7 +3304,7 @@ ROM_END
 /***************************************************************************
 
   Entex Turtles (manufactured in Japan)
-  * PCB label 560359
+  * PCB label: 560359
   * Hitachi QFP HD38820A43 MCU
   * COP411L sub MCU, label COP411L-KED/N
   * cyan/red/green VFD display NEC FIP15BM32T
@@ -3506,7 +3506,7 @@ ROM_END
 /***************************************************************************
 
   Entex Stargate (manufactured in Japan)
-  * PCB label 5603521/31
+  * PCB label: 5603521/31
   * Hitachi QFP HD38820A42 MCU
   * COP411L sub MCU, label ~/B8236 COP411L-KEC/N
   * cyan/red/green VFD display NEC FIP15AM32T (EL628-003) no. 2-421, with partial color overlay
@@ -3758,7 +3758,7 @@ ROM_END
 /***************************************************************************
 
   Gakken Crazy Kong (manufactured in Japan)
-  * PCB label ZENY 5603601
+  * PCB label: ZENY 5603601
   * Hitachi HD38800B01 MCU
   * cyan/red/blue VFD display Futaba DM-54Z 2H, with bezel overlay
 
@@ -3893,7 +3893,7 @@ ROM_END
 /***************************************************************************
 
   Gakken Super Cobra
-  * PCB label SUPER COBRA 3000N
+  * PCB label: SUPER COBRA 3000N
   * Hitachi QFP HD38820A32 MCU
   * cyan/red/green VFD display
 
@@ -4159,7 +4159,7 @@ ROM_END
 /***************************************************************************
 
   Gakken Dig Dug (manufactured in Japan)
-  * PCB label Gakken DIG-DAG KS-004283(A/B)
+  * PCB label: Gakken DIG-DAG KS-004283(A/B)
   * Hitachi QFP HD38820A69 MCU
   * cyan/red/green VFD display Futaba DM-69Z 3F, with color overlay
 
@@ -4287,7 +4287,7 @@ ROM_END
 /***************************************************************************
 
   Mattel World Championship Baseball (model 3201)
-  * PCB label MEL-001 Baseball Rev. B
+  * PCB label: MEL-001 Baseball Rev. B
   * Hitachi QFP HD38820A09 MCU
   * cyan/red/green VFD display Futaba DM-24ZK 1G, with etched overlay
 
@@ -4463,7 +4463,7 @@ ROM_END
 /***************************************************************************
 
   Mattel Star Hawk (manufactured in Japan)
-  * PCB label Kaken, PT-317B
+  * PCB label: Kaken, PT-317B
   * Hitachi HD38800A73 MCU
   * cyan/red VFD display Futaba DM-41ZK, with partial color overlay + bezel
 
@@ -4603,7 +4603,7 @@ ROM_END
 /***************************************************************************
 
   Parker Brothers Q*Bert
-  * PCB label 13662 REV-4
+  * PCB label: 13662 REV-4
   * Hitachi QFP HD38820A70 MCU
   * cyan/red/green/darkgreen VFD display Itron CP5137
 
@@ -4801,7 +4801,7 @@ ROM_END
 /***************************************************************************
 
   Tomy(tronic) Tron (manufactured in Japan)
-  * PCB label THN-02 2E114E07
+  * PCB label: THN-02 2E114E07
   * Hitachi HD38800A88 MCU
   * cyan/red/green VFD display NEC FIP10AM24T no. 2-8 1
 
@@ -4929,7 +4929,7 @@ ROM_END
 /***************************************************************************
 
   Tomy Kingman (manufactured in Japan)
-  * PCB label THF-01II 2E138E01/2E128E02
+  * PCB label: THF-01II 2E138E01/2E128E02
   * Hitachi HD38800B23 MCU
   * cyan/red/blue VFD display Futaba DM-65ZK 3A
 

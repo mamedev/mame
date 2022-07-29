@@ -45,7 +45,8 @@ public:
 		m_brake(*this, "BRAKE"),
 		m_steer(*this, "STEER"),
 		m_stickx(*this, "STICKX"),
-		m_sticky(*this, "STICKY")
+		m_sticky(*this, "STICKY"),
+		m_cpua_out(*this, "genout%u", 0U)
 	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(gas_pedal_r);
@@ -92,6 +93,7 @@ protected:
 	optional_ioport m_steer;
 	optional_ioport m_stickx;
 	optional_ioport m_sticky;
+	output_finder<8> m_cpua_out;
 
 	/* misc */
 	u16      m_cpua_ctrl;
@@ -117,6 +119,7 @@ public:
 	}
 
 	void aquajack(machine_config &config);
+	void dblaxle(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -136,9 +139,12 @@ private:
 	void chasehq_draw_sprites_16x16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs);
 	void aquajack_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs);
 	u32 screen_update_aquajack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_dblaxle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void aquajack_map(address_map &map);
 	void aquajack_cpub_map(address_map &map);
+	void dblaxle_map(address_map &map);
+	void dblaxle_cpub_map(address_map &map);
 
 	required_memory_bank m_z80bank;
 };
@@ -186,18 +192,13 @@ class chasehq_state : public taitoz_z80_sound_state
 public:
 	chasehq_state(const machine_config &mconfig, device_type type, const char *tag) :
 		taitoz_z80_sound_state(mconfig, type, tag),
-		m_unknown_io(*this, "UNK%u", 1U),
-		m_lamps(*this, "lamp%u", 0U)
+		m_unknown_io(*this, "UNK%u", 1U)
 	{
 	}
 
 	void chasehq(machine_config &config);
 
-protected:
-	virtual void machine_start() override;
-
 private:
-	void chasehq_cpua_ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u8 chasehq_input_bypass_r();
 	u16 chasehq_motor_r(offs_t offset);
 	void chasehq_motor_w(offs_t offset, u16 data);
@@ -206,7 +207,6 @@ private:
 	void chasehq_cpub_map(address_map &map);
 
 	required_ioport_array<4> m_unknown_io;
-	output_finder<2> m_lamps;
 };
 
 
@@ -257,7 +257,8 @@ public:
 		taitoz_z80_sound_state(mconfig, type, tag),
 		m_motor_dir(*this, "Motor_%u_Direction", 1U),
 		m_motor_speed(*this, "Motor_%u_Speed", 1U),
-		m_motor_debug(*this, "motor_debug")
+		m_motor_debug(*this, "motor_debug"),
+		m_lamps(*this, "lamp%u", 0U)
 	{
 	}
 
@@ -268,6 +269,7 @@ protected:
 
 private:
 	void nightstr_motor_w(offs_t offset, u16 data);
+	void nightstr_lamps_w(u8 data);
 
 	void nightstr_map(address_map &map);
 	void nightstr_cpub_map(address_map &map);
@@ -275,6 +277,7 @@ private:
 	output_finder<3> m_motor_dir;
 	output_finder<3> m_motor_speed;
 	output_finder<> m_motor_debug;
+	output_finder<8> m_lamps;
 };
 
 
@@ -307,34 +310,6 @@ private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_ioport m_io_eepromout;
 	output_finder<2> m_recoil;
-
-	u8       m_eep_latch;
-};
-
-
-class dblaxle_state : public taitoz_z80_sound_state
-{
-public:
-	dblaxle_state(const machine_config &mconfig, device_type type, const char *tag) :
-		taitoz_z80_sound_state(mconfig, type, tag),
-		m_wheel_vibration(*this, "Wheel_Vibration")
-	{
-	}
-
-	void dblaxle(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
-
-private:
-	void dblaxle_cpua_ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-
-	u32 screen_update_dblaxle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void dblaxle_map(address_map &map);
-	void dblaxle_cpub_map(address_map &map);
-
-	output_finder<> m_wheel_vibration;
 };
 
 #endif // MAME_INCLUDES_TAITO_Z_H

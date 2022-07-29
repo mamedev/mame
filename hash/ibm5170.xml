@@ -10202,6 +10202,20 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="aitd2sd">
+		<description>Alone in the Dark 2 - Secret Doors (USA)</description>
+		<year>1994</year>
+		<publisher>I·Motion</publisher>
+		<notes>This bonus cheat disk "Secret Doors" was included with later floppy releases of Alone in the Dark 2. This disk contains 6 packages of 6 saved games.</notes>
+		<info name="developer" value="Infogrames" />
+		<info name="usage" value="Requires 'Alone in the Dark 2 (USA)' previously installed" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark 2 - Secret Doors (USA) [I-Motion] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="15f2080e" sha1="5d39ddf3658cfbf887c888f74d2f69a781b87fc8"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="amazon">
 		<description>Amazon - Guardians of Eden</description>
 		<year>1992</year>
@@ -13574,6 +13588,37 @@ license:CC0
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="pc disk2.img" size="1474560" crc="cbf98649" sha1="e94671b751bcc4cc443770009fa4a84f3384e01d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="genesia">
+		<description>Genesia (v1.41)</description>
+		<year>1994</year>
+		<publisher>Mindscape</publisher>
+		<info name="developer" value="Microïds" />
+		<info name="version" value="1.41" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Genesia [Mindscape] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="7e62274c" sha1="bd804b3bb8b91f3ad6c96d74ccd2ad0d472b0f38"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Genesia [Mindscape] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="75213ca7" sha1="4dc86881c1df5785557e9af59950469515b0c0e8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="genesiab" cloneof="genesia">
+		<description>Genesia (v1.4)</description>
+		<year>1994</year>
+		<publisher>Mindscape</publisher>
+		<info name="developer" value="Microïds" />
+		<info name="version" value="1.4" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Genesia [Mindscape] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="3481e8d5" sha1="ac9bbeea9218e6a364319cfdb0e2679b44f22224"/>
 			</dataarea>
 		</part>
 	</software>

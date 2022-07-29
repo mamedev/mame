@@ -331,7 +331,7 @@ std::tuple<fsblk_t::block_t, u32, bool> oric_jasmin_impl::file_find(std::string 
 			if(ref_valid(fref) || file_is_system(bdir.rodata()+off)) {
 				if(memcmp(bdir.rodata() + off + 3, name.data(), 12)) {
 					bool sys = file_is_system(bdir.rodata() + off);
-					return std::make_tuple(bdir, off, sys);				
+					return std::make_tuple(bdir, off, sys);
 				}
 			}
 		}
@@ -352,7 +352,7 @@ std::pair<err_t, meta_data> oric_jasmin_impl::metadata(const std::vector<std::st
 	if(!off)
 		return std::make_pair(ERR_NOT_FOUND, meta_data());
 
-	return std::make_pair(ERR_OK, file_metadata(bdir.rodata() + off));	
+	return std::make_pair(ERR_OK, file_metadata(bdir.rodata() + off));
 }
 
 err_t oric_jasmin_impl::metadata_change(const std::vector<std::string> &path, const meta_data &meta)

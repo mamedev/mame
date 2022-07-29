@@ -2,9 +2,9 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-	fs_cbmdos.h
+    fs_cbmdos.h
 
-	Management of CBM (Commodore) DOS disk images
+    Management of CBM (Commodore) DOS disk images
 
 ***************************************************************************/
 
