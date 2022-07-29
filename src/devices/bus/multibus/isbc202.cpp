@@ -266,11 +266,10 @@ uint8_t isbc202_device::io_r(address_space &space, offs_t offset)
 
 	case 3:
 		// Read result byte (no auto XACK)
-		if (!m_rd_2nd_pass) {
+		if (!m_2nd_pass) {
 			set_start(3 , true);
-			m_rd_2nd_pass = true;
 		} else {
-			m_rd_2nd_pass = false;
+			m_2nd_pass = false;
 			res = m_data_low_out;
 		}
 		break;
@@ -297,12 +296,12 @@ void isbc202_device::io_w(address_space &space, offs_t offset, uint8_t data)
 	case 4:
 	case 5:
 	case 6:
-		if (m_rd_2nd_pass) {
-			LOG("Read 2nd pass when writing!\n");
+		if (!m_2nd_pass) {
+			m_cpu_data = data;
+			set_start(offset , false);
+		} else {
+			m_2nd_pass = false;
 		}
-		m_rd_2nd_pass = false;
-		m_cpu_data = data;
-		set_start(offset , false);
 		break;
 
 	case 7:
@@ -361,7 +360,7 @@ void isbc202_device::device_start()
 	save_item(NAME(m_op_us));
 	save_item(NAME(m_px_s1s0));
 	save_item(NAME(m_cmd));
-	save_item(NAME(m_rd_2nd_pass));
+	save_item(NAME(m_2nd_pass));
 	save_item(NAME(m_ready_in));
 	save_item(NAME(m_ready_ff));
 	save_item(NAME(m_gate_lower));
@@ -419,7 +418,7 @@ void isbc202_device::device_reset()
 	m_inputs[ IN_SEL_TIMEOUT ] = true;
 	m_inputs[ IN_SEL_F ] = false;
 
-	m_rd_2nd_pass = false;
+	m_2nd_pass = false;
 
 	m_irq = false;
 
@@ -742,11 +741,7 @@ void isbc202_device::set_output()
 		if (BIT(m_mask , 5)) {
 			// Release CPU from wait state
 			LOG_BUS("CPU out of wait state\n");
-			if (m_cpu_rd) {
-				set_wait_io_rd(0);
-			} else {
-				set_wait_io_wr(0);
-			}
+			xack_w(0);
 			// Ensure the MCU executes a few instruction before the CPU
 			machine().scheduler().boost_interleave(attotime::from_usec(1) , attotime::from_usec(5));
 			m_inputs[ IN_SEL_START ] = false;
@@ -1004,12 +999,9 @@ void isbc202_device::set_start(uint8_t off , bool read)
 	m_cmd = off;
 	m_inputs[ IN_SEL_START ] = true;
 	// Put CPU in wait state
-	if (read) {
-		set_wait_io_rd(1);
-	} else {
-		set_wait_io_wr(1);
-	}
+	xack_w(1);
 	m_cpu_rd = read;
+	m_2nd_pass = true;
 	LOG_BUS("CPU in wait state (rd=%d)\n" , read);
 }
 

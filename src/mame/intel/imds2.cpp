@@ -103,8 +103,7 @@ public:
 
 	void imds2(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(wait_io_rd);
-	DECLARE_WRITE_LINE_MEMBER(wait_io_wr);
+	DECLARE_WRITE_LINE_MEMBER(xack);
 
 private:
 	uint8_t ipc_mem_read(offs_t offset);
@@ -307,29 +306,17 @@ void imds2_state::imds2(machine_config &config)
 	m_ioc->parallel_int_cb().set(m_ipclocpic, FUNC(pic8259_device::ir5_w));
 
 	MULTIBUS(config, m_bus, 9'830'400);
-	m_bus->wait_io_rd_cb().set(FUNC(imds2_state::wait_io_rd));
-	m_bus->wait_io_wr_cb().set(FUNC(imds2_state::wait_io_wr));
+	m_bus->xack_cb().set(FUNC(imds2_state::xack));
 	MULTIBUS_SLOT(config, m_slot, m_bus, imds2_cards, nullptr, false); // FIXME: isbc202
 }
 
-WRITE_LINE_MEMBER(imds2_state::wait_io_rd)
+WRITE_LINE_MEMBER(imds2_state::xack)
 {
 	if (state) {
 		// Put CPU in wait state
 		m_ipccpu->spin_until_trigger(1);
-		// Rewind PC so that the "IN" instruction is repeated when CPU is released
+		// Rewind PC so that the "IN" & "OUT" instructions are repeated when CPU is released
 		m_ipccpu->set_pc(m_ipccpu->pc() - 2);
-	} else {
-		// Release CPU from wait state
-		m_ipccpu->trigger(1);
-	}
-}
-
-WRITE_LINE_MEMBER(imds2_state::wait_io_wr)
-{
-	if (state) {
-		// Put CPU in wait state
-		m_ipccpu->spin_until_trigger(1);
 	} else {
 		// Release CPU from wait state
 		m_ipccpu->trigger(1);

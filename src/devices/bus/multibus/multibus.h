@@ -87,13 +87,11 @@ public:
 	template <unsigned I> auto int_callback() { return m_int_cb[I].bind(); }
 	template <unsigned I> void int_w(int state) { m_int_cb[I](state); }
 
-	// wait signal callbacks (split for read/write operations)
-	auto wait_io_rd_cb() { return m_wait_rd_cb.bind(); }
-	auto wait_io_wr_cb() { return m_wait_wr_cb.bind(); }
+	// XACK/
+	auto xack_cb() { return m_xack_cb.bind(); }
 
-	// Set wait signals (these are meant for "device_multibus_interface" devices)
-	void set_wait_io_rd(int state) { m_wait_rd_cb(state); }
-	void set_wait_io_wr(int state) { m_wait_wr_cb(state); }
+	// Set XACK/ signal (this is meant for "device_multibus_interface" devices)
+	void xack_w(int state) { m_xack_cb(state); }
 
 protected:
 	// device_t overrides
@@ -107,8 +105,7 @@ private:
 	address_space_config const m_pio_config;
 
 	devcb_write_line::array<8> m_int_cb;
-	devcb_write_line m_wait_rd_cb;
-	devcb_write_line m_wait_wr_cb;
+	devcb_write_line m_xack_cb;
 };
 
 class multibus_slot_device
@@ -149,8 +146,7 @@ protected:
 	template <unsigned I> void int_w(int state) { m_bus->int_w<I>(state); }
 	void int_w(unsigned number, int state);
 
-	void set_wait_io_rd(int state) { m_bus->set_wait_io_rd(state); }
-	void set_wait_io_wr(int state) { m_bus->set_wait_io_wr(state); }
+	void xack_w(int state) { m_bus->xack_w(state); }
 
 	multibus_device *m_bus;
 };
