@@ -10,6 +10,7 @@ NOTES:
 
 TODO:
 	* Palette (PEN2)
+	* ports read
 	* ATM2+ (compare to ATM2) has only 1M RAM vs 512K
 	* Mem masks are hardcoded to 1M RAM, 64K ROM
 	* CMOS
@@ -327,7 +328,7 @@ void atm_state::atm_update_screen_tx(screen_device &screen, bitmap_ind16 &bitmap
 		{
 			u16 x = hpos - get_screen_area().left();
 			u8 *symb_location = m_screen_location + 0x1c0 + (x >> 4) + ((y >> 3) * 64);
-			u8 *attr_location = symb_location - (4 << 14);
+			u8 *attr_location = symb_location - (4 << 14) + BIT(x, 3);
 			if (BIT(x, 3))
 				symb_location += 0x2000;
 			else
