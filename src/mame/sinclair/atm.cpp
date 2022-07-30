@@ -109,7 +109,7 @@ private:
 	u8 m_pages_map[2][4]; // map: 0,1
 
 	int m_pen2;           // palette selector
-	int m_rg;             // 0:320x200lo, 2:640:200hi, 3:256x192zx, 6:80x25txt
+	int m_rg = 0b011;     // 0:320x200lo, 2:640:200hi, 3:256x192zx, 6:80x25txt
 	u8 m_border_bright;
 	tilemap_t *m_txt_tilemap = nullptr;
 
@@ -248,7 +248,7 @@ void atm_state::atm_update_video_mode()
 	bool double_width = BIT(m_rg, 1) && !zx_scale;
 	u8 border_x = (48 - (32 * !zx_scale)) << double_width;
 	rectangle scr = get_screen_area();
-	m_screen->configure(440 << double_width, 320, {scr.left() - border_x, scr.right() + border_x, scr.top() - 48, scr.bottom() + 48}, m_screen->frame_period().as_attoseconds());
+	m_screen->configure(448 << double_width, 320, {scr.left() - border_x, scr.right() + border_x, scr.top() - 48, scr.bottom() + 48}, m_screen->frame_period().as_attoseconds());
 	LOGVIDEO("Video mode: %d\n", m_rg);
 }
 
@@ -440,7 +440,7 @@ void atm_state::machine_reset()
 	m_port_1ffd_data = -1;
 
 	m_border_bright = 0;
-	atm_port_ff77_w(0x4000, 3); // CPM=0(on), PEN disabled, PEN2 disabled; vmode: zx
+	atm_port_ff77_w(0x4000, 3); // CPM=0(on), PEN=0(off), PEN2=1(off); vmode: zx
 }
 
 void atm_state::video_start()
