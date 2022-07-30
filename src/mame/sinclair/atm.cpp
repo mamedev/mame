@@ -181,7 +181,7 @@ void atm_state::atm_port_ff77_w(offs_t offset, u8 data)
 	m_pen = BIT(offset, 8);
 	m_cpm = BIT(offset, 9);
 	m_pen2 = BIT(offset, 14);
-	LOGMEM("PEN %s, CPM %s, PEN2 %s\n", m_pen ? "on" : "off", m_cpm ? "off" : "on", m_pen2 ? "off" : "on");
+	LOGMASKED(LOG_VIDEO | LOG_MEM, "PEN %s, CPM %s, PEN2 %s\n", m_pen ? "on" : "off", m_cpm ? "off" : "on", m_pen2 ? "off" : "on");
 	atm_update_memory();
 
 	m_maincpu->set_clock(X1_128_SINCLAIR / 10 * (1 << BIT(data, 3))); // 0 - 3.5MHz, 1 - 7MHz
@@ -207,7 +207,7 @@ void atm_state::atm_port_fff7_w(offs_t offset, u8 data)
 	u8 bank = offset >> 14;
 	u8 page = (data & 0xc0) | (~data & 0x3f);
 
-	LOGMASKED(LOG_VIDEO | LOG_MEM, "PEN%s.%s = %X %s%d: %02X\n", (page | DOS7FFD_MASK) ? "+" : "!", BIT(m_port_7ffd_data, 4), data, (page & RAM_MASK) ? "RAM" : "ROM", bank, page & 0x3f);
+	LOGMEM("PEN%s.%s = %X %s%d: %02X\n", (page | DOS7FFD_MASK) ? "+" : "!", BIT(m_port_7ffd_data, 4), data, (page & RAM_MASK) ? "RAM" : "ROM", bank, page & 0x3f);
 	PEN_PAGE(bank) = page;
 	atm_update_memory();
 }
