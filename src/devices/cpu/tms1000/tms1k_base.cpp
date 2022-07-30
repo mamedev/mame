@@ -270,9 +270,9 @@ void tms1k_base_device::device_reset()
 
 	// clear outputs
 	m_r = 0;
-	m_write_r(0, m_r & m_r_mask, 0xffff);
+	m_write_r(m_r & m_r_mask);
 	write_o_output(0);
-	m_write_r(0, m_r & m_r_mask, 0xffff);
+	m_write_r(m_r & m_r_mask);
 	m_power_off(0);
 }
 
@@ -320,13 +320,13 @@ void tms1k_base_device::write_o_output(u8 index)
 	// a hardcoded table is supported if the output pla is unknown
 	m_o_index = index;
 	m_o = (m_output_pla_table == nullptr) ? m_opla->read(index) : m_output_pla_table[index];
-	m_write_o(0, m_o & m_o_mask, 0xffff);
+	m_write_o(m_o & m_o_mask);
 }
 
 u8 tms1k_base_device::read_k_input()
 {
 	// K1,2,4,8 (KC test pin is not emulated)
-	return m_read_k(0, 0xff) & 0xf;
+	return m_read_k() & 0xf;
 }
 
 void tms1k_base_device::set_cki_bus()
@@ -494,14 +494,14 @@ void tms1k_base_device::op_setr()
 {
 	// SETR: set one R-output line
 	m_r = m_r | (1 << m_y);
-	m_write_r(0, m_r & m_r_mask, 0xffff);
+	m_write_r(m_r & m_r_mask);
 }
 
 void tms1k_base_device::op_rstr()
 {
 	// RSTR: reset one R-output line
 	m_r = m_r & ~(1 << m_y);
-	m_write_r(0, m_r & m_r_mask, 0xffff);
+	m_write_r(m_r & m_r_mask);
 }
 
 void tms1k_base_device::op_tdo()

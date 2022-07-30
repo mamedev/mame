@@ -35,7 +35,7 @@ Wiz-A-Tron or Little Professor. But the popularity of this product was much
 above expectations. TI continued to manufacture many products for this line.
 
     Speak & Spell (US), 1978
-    - MCU: TMC0271, label TMC0271NL DBS (die label T0270B 0271B)
+    - MCU: TMC0271, label TMC0271NL DBS (die label: T0270B 0271B)
     - TMS51xx: TMC0281
     - VSM(1/2): 16KB TMC0351NL
     - VSM(2/2): 16KB TMC0352NL
@@ -43,7 +43,7 @@ above expectations. TI continued to manufacture many products for this line.
     - notes: keyboard has buttons instead of cheap membrane
 
     Speak & Spell (US), 1979
-    - MCU: TMC0271, label TMC0271H-N2L FDS (die label T0270D 0271H)
+    - MCU: TMC0271, label TMC0271H-N2L FDS (die label: T0270D 0271H)
     - TMS51xx: TMC0281
     - VSM(1/2): 16KB TMC0351N2L
     - VSM(2/2): 16KB TMC0352N2L
@@ -81,21 +81,22 @@ above expectations. TI continued to manufacture many products for this line.
     - notes: this one has a dedicated voice actor
 
     Speak & Spell (Spanish, prototype), 1981
-    - MCU: CD2701N2L P (die label T0270D 2701)
-    - TMS51xx: TMC0281 (die label T0280A 0281)
+    - MCU: CD2701N2L P (die label: T0270D 2701)
+    - TMS51xx: TMC0281 (die label: T0280A 0281)
     - VSM(1/2): 16KB CD2319
     - VSM(2/2): 16KB CD2320
     - VFD: 8 digits with 14 segments, DP and accent mark
 
     Speak & Spell (France) "La Dictée Magique", 1980
-    - MCU: CD2702, label CD2702AN2L (die label TMC0270F 2702A)
+    - MCU: CD2702, label CD2702AN2L (die label: TMC0270F 2702A)
     - TMS51xx: CD2801
     - VSM: 16KB CD2352
 
-    Speak & Spell (Germany) "Buddy", 1980
+    Speak & Spell (Germany) "Buddy", 1980 (stylized as "buddy")
     - MCU & TMS51xx: same as French 1980 version
     - VSM(1/2): 16KB CD2345*
     - VSM(2/2): 16KB CD2346*
+    - VFD: has umlaut instead of apostrophe
 
     Speak & Spell (Italy) "Grillo Parlante", 1982
     - MCU & TMS51xx: same as French 1980 version
@@ -104,8 +105,8 @@ above expectations. TI continued to manufacture many products for this line.
     - notes: it appears that TI ran out of original snspell VFDs in the early 80s?
 
     Speak & Spell Compact (US), 1981
-    - MCU: CD8011, label CD8011A-NL (die label 1100B)
-    - TMS51xx: TMC0281D (die label T0280F 0281D)
+    - MCU: CD8011, label CD8011A-NL (die label: 1100B)
+    - TMS51xx: TMC0281D (die label: T0280F 0281D)
     - VSM: 16KB CD2354, CD2354(rev.A)
     - notes: no display, MCU is TMS1100 instead of TMS0270, overall similar to Touch & Tell
 
@@ -140,9 +141,9 @@ Note that they are interchangeable, eg. you can use a French module on a US Spea
     French:
     - No.1: Les Mots de Base: VSM: 16KB CD2353 (1st release was called "Module No. 1 de Jacques Capelovici")
     - No.2: Les Mots Difficiles (aka Les Mots de Base): VSM: 16KB CD62177A
-    - No.3: Les Animaux Familiers: VSM: 16KB? CD62047*
+    - No.3: Les Animaux Familiers: VSM: 16KB CD62047*
     - No.4: Les Magasins de la Rue: VSM: 16KB CD62048
-    - No.5: Les Extra-Terrestres: VSM: 16KB? CD62178*
+    - No.5: Les Extra-Terrestres: VSM: 16KB CD62178*
 
     Italian:
     - Super Modulo: VSM: 16KB? CD62313*
@@ -151,7 +152,7 @@ Note that they are interchangeable, eg. you can use a French module on a US Spea
 Speak & Math:
 
     Speak & Math (US), 1980 (renamed to "Speak & Maths" in UK, but is the same product)
-    - MCU: CD2704, label CD2704B-N2L (die label TMC0270F 2704B) - 2nd revision?(mid-1982)
+    - MCU: CD2704, label CD2704B-N2L (die label: TMC0270F 2704B) - 2nd revision?(mid-1982)
     - TMS51xx: CD2801
     - VSM(1/2): 16KB CD2392
     - VSM(2/2): 16KB CD2393
@@ -162,7 +163,7 @@ Speak & Math:
       never found out and it ended up in the final product.
 
     Speak & Math (US), 1986
-    - MCU: CD2708, label CD2708N2L (die label TMC0270F 2708A)
+    - MCU: CD2708, label CD2708N2L (die label: TMC0270F 2708A)
     - TMS51xx: CD2801
     - VSM(1/2): 16KB CD2381
     - VSM(2/2): 4KB CD2614
@@ -178,7 +179,7 @@ Speak & Math:
 Speak & Read:
 
     Speak & Read (US), 1980
-    - MCU: CD2705, label CD2705B-N2L (die label TMC0270E 2705B) - 2nd revision?(late-1981)
+    - MCU: CD2705, label CD2705B-N2L (die label: TMC0270E 2705B) - 2nd revision?(late-1981)
     - TMS51xx: CD2801
     - VSM(1/2): 16KB CD2394(rev.A)
     - VSM(2/2): 16KB CD2395(rev.A)
@@ -200,7 +201,7 @@ Speak & Read modules:
 Touch & Tell:
 
     Touch & Tell (US), 1981
-    - MCU: CD8012, label CD8012NL (die label 1100G CD8012)
+    - MCU: CD8012, label CD8012NL (die label: 1100G CD8012)
     - TMS51xx: CD2802
     - VSM: 4KB CD2610
     - notes: MCU is TMS1100 instead of TMS0270. CD8010 is seen in some devices
@@ -220,7 +221,7 @@ Touch & Tell:
 
     Touch & Tell (Italy) "Libro Parlante", 1982
     - MCU & TMS51xx: same as US version
-    - VSM: ?KB CD62176*
+    - VSM: ?KB CD62176* (on a module)
 
     Vocaid (US), 1982
     - MCU & TMS51xx: same as Touch & Tell (US)
@@ -329,8 +330,8 @@ Initially sold as Language Translator, renamed to Language Tutor a year later.
 It was rebranded from translator to a 'language aid'.
 
     Language Translator (US), 1979
-    - MCU: TMC0275 (die label T0270D 0275B)
-    - TMS51xx: CD2801 (die label T0280B 2801)
+    - MCU: TMC0275 (die label: T0270D 0275B)
+    - TMS51xx: CD2801 (die label: T0280B 2801)
     - VFD: Itron FG106A2
     - notes: external module is required (see below)
 
@@ -621,16 +622,18 @@ void tispeak_state::update_display()
 
 void tispeak_state::snspell_write_r(u16 data)
 {
+	// R0-R7: input mux and select digit (+R8 if the device has 9 digits)
+	// R15: filament on
+	// other bits: MCU internal use
+	m_inp_mux = data;
+	m_grid = data & 0x81ff;
+	update_display();
+
 	// R13: power-off request, on falling edge
 	if (~data & m_r & 0x2000)
 		power_off();
 
-	// R0-R7: input mux and select digit (+R8 if the device has 9 digits)
-	// R15: filament on
-	// other bits: MCU internal use
-	m_r = m_inp_mux = data;
-	m_grid = data & 0x81ff;
-	update_display();
+	m_r = data;
 }
 
 void tispeak_state::snspell_write_o(u16 data)
@@ -675,6 +678,9 @@ void tispeak_state::lantrans_write_r(u16 data)
 
 void tispeak_state::snspellc_write_r(u16 data)
 {
+	// R0-R8: input mux
+	m_inp_mux = data;
+
 	// R10: TMS5100 PDC pin
 	m_tms5100->pdc_w(data >> 10 & 1);
 
@@ -682,8 +688,7 @@ void tispeak_state::snspellc_write_r(u16 data)
 	if (~data & m_r & 0x200)
 		power_off();
 
-	// R0-R8: input mux
-	m_r = m_inp_mux = data;
+	m_r = data;
 }
 
 void tispeak_state::snspellc_write_o(u16 data)
@@ -772,12 +777,13 @@ void tispeak_state::k28_write_r(u16 data)
 	// R5: input mux high bit
 	m_inp_mux = (m_inp_mux & 0xff) | (data << 3 & 0x100);
 
+	// R7-R10: LCD data
+	k28_update_display(m_r >> 7 & 0xf, data >> 7 & 0xf);
+
 	// R6: power-off request, on falling edge
 	if (~data & m_r & 0x40)
 		power_off();
 
-	// R7-R10: LCD data
-	k28_update_display(m_r >> 7 & 0xf, data >> 7 & 0xf);
 	m_r = r;
 }
 
@@ -1909,7 +1915,7 @@ ROM_END
 
 
 
-//    YEAR  NAME        PARENT   CMP MACHINE       INPUT       CLASS          INIT           COMPANY              FULLNAME                            FLAGS
+//    YEAR  NAME        PARENT   CMP MACHINE       INPUT       CLASS          INIT           COMPANY, FULLNAME, FLAGS
 COMP( 1979, snspell,    0,        0, sns_tmc0281,  snspell,    tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (US, 1979 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1978, snspellua,  snspell,  0, sns_tmc0281,  snspell,    tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (US, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1980, snspellub,  snspell,  0, sns_tmc0281d, snspell,    tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (US, 1980 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // less speech data
@@ -1919,7 +1925,7 @@ COMP( 1981, snspelluka, snspell,  0, sns_cd2801,   snspell,    tispeak_state, in
 COMP( 1979, snspelljp,  snspell,  0, sns_tmc0281,  snspell,    tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // speaks English
 COMP( 1981, snspellsp,  snspell,  0, snspellsp,    snspellsp,  tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (Spanish, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1980, snspellfr,  snspell,  0, sns_cd2801,   snspellfr,  tispeak_state, init_snspell,  "Texas Instruments", u8"La Dictée Magique (France)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1982, snspellit,  snspell,  0, snspellit,    snspellit,  tispeak_state, init_snspell,  "Texas Instruments", "Grillo Parlante (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1982, snspellit,  snspell,  0, snspellit,    snspellit,  tispeak_state, init_snspell,  "Texas Instruments / Clementoni", "Grillo Parlante (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
 COMP( 1982, snspellc,   0,        0, snspellc,     snspellc,   tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell Compact (US, 1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1981, snspellca,  snspellc, 0, snspellc,     snspellc,   tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell Compact (US, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
