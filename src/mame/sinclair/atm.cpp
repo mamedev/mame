@@ -245,7 +245,7 @@ u8 atm_state::get_border_color(u16 hpos, u16 vpos)
 void atm_state::atm_update_video_mode()
 {
 	bool zx_scale = BIT(m_rg, 0);
-	bool double_width = !zx_scale & BIT(m_rg, 1);
+	bool double_width = BIT(m_rg, 1) && !zx_scale;
 	u8 border_x = (48 - (32 * !zx_scale)) << double_width;
 	rectangle scr = get_screen_area();
 	m_screen->configure(440 << double_width, 320, {scr.left() - border_x, scr.right() + border_x, scr.top() - 48, scr.bottom() + 48}, m_screen->frame_period().as_attoseconds());
