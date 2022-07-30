@@ -9,7 +9,6 @@ NOTES:
 	code must be moved to atmtb2_state not modified.
 
 TODO:
-	* Palette (PEN2)
 	* ports read
 	* ATM2+ (compare to ATM2) has only 1M RAM vs 512K
 	* Mem masks are hardcoded to 1M RAM, 64K ROM
@@ -57,6 +56,7 @@ public:
 		, m_bank_view3(*this, "bank_view3")
 		, m_bank_rom(*this, "bank_rom%u", 0U)
 		, m_beta(*this, BETA_DISK_TAG)
+		, m_palette(*this, "palette")
 		, m_gfxdecode(*this, "gfxdecode")
 	{ }
 
@@ -81,6 +81,7 @@ private:
 	u8 beta_disable_r(offs_t offset);
 
 	void atm_ula_w(offs_t offset, u8 data);
+	void atm_port_ffff_w(offs_t offset, u8 data);
 	void atm_port_ff77_w(offs_t offset, u8 data);
 	void atm_port_fff7_w(offs_t offset, u8 data);
 	void atm_port_7ffd_w(offs_t offset, u8 data);
@@ -101,6 +102,7 @@ private:
 	memory_view m_bank_view3;
 	required_memory_bank_array<4> m_bank_rom;
 	required_device<beta_disk_device> m_beta;
+	required_device<device_palette_interface> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	TILE_GET_INFO_MEMBER(get_tile_info_txt);
@@ -154,6 +156,28 @@ void atm_state::atm_ula_w(offs_t offset, u8 data)
 {
 	m_border_bright = ~offset & 0x08;
 	spectrum_128_state::spectrum_ula_w(offset, data);
+}
+
+void atm_state::atm_port_ffff_w(offs_t offset, u8 data)
+{
+	if(!SHADOW)
+		return;
+
+	if (m_pen2)
+	{
+		m_beta->param_w(data);
+	}
+	else
+	{
+		// Must read current ULA value (which is doesn't work now) from the BUS.
+		// Good enough as none-border case is too complicated and possibly none software uses it.
+		u8 pen = get_border_color(m_screen->hpos(), m_screen->vpos());
+		u8 ndata = ~data;
+		m_palette->set_pen_color(pen,
+			BIT(ndata, 1) ? 0xbf | (0x40 * BIT(ndata, 6)) : 0,
+			BIT(ndata, 4) ? 0xbf | (0x40 * BIT(ndata, 7)) : 0,
+			BIT(ndata, 0) ? 0xbf | (0x40 * BIT(ndata, 5)) : 0);
+	}
 }
 
 u8 atm_state::atm_port_ff7b_r(offs_t offset)
@@ -251,6 +275,8 @@ void atm_state::atm_update_video_mode()
 	rectangle scr = get_screen_area();
 	m_screen->configure(448 << double_width, 320, {scr.left() - border_x, scr.right() + border_x, scr.top() - 48, scr.bottom() + 48}, m_screen->frame_period().as_attoseconds());
 	LOGVIDEO("Video mode: %d\n", m_rg);
+
+	//spectrum_palette(m_palette);
 }
 
 void atm_state::spectrum_update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -401,7 +427,8 @@ void atm_state::atm_io(address_map &map)
 	map(0x003f, 0x003f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::track_r), FUNC(beta_disk_device::track_w));
 	map(0x005f, 0x005f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::sector_r), FUNC(beta_disk_device::sector_w));
 	map(0x007f, 0x007f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::data_r), FUNC(beta_disk_device::data_w));
-	map(0x00ff, 0x00ff).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::state_r), FUNC(beta_disk_device::param_w));
+	map(0x00ff, 0x00ff).mirror(0xff00).r(m_beta, FUNC(beta_disk_device::state_r));
+	map(0x00ff, 0x00ff).mirror(0xff00).w(FUNC(atm_state::atm_port_ffff_w));
 	map(0x00f6, 0x00f6).select(0xff08).rw(FUNC(atm_state::spectrum_ula_r), FUNC(atm_state::atm_ula_w));
 	map(0x00fd, 0x00fd).mirror(0xff00).w(FUNC(atm_state::atm_port_7ffd_w));
 	map(0x0077, 0x0077).select(0xff00).w(FUNC(atm_state::atm_port_ff77_w));
