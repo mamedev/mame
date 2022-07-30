@@ -35,7 +35,7 @@ namespace plib {
 	}
 
 	void passert_fail(const char *assertion, const char *file, int lineno,
-					  const char *msg) noexcept
+		const char *msg) noexcept
 	{
 		try
 		{

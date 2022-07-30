@@ -226,7 +226,7 @@ namespace netlist::detail {
 		static constexpr netlist_sig_t OUT_TRISTATE() { return INP_MASK; }
 
 		static_assert(INP_BITS * 2 <= sizeof(netlist_sig_t) * 8,
-					  "netlist_sig_t size not sufficient");
+			"netlist_sig_t size not sufficient");
 
 		enum state_e
 		{
@@ -239,7 +239,7 @@ namespace netlist::detail {
 		};
 
 		core_terminal_t(core_device_t &dev, const pstring &aname, state_e state,
-						nl_delegate delegate);
+			nl_delegate delegate);
 		virtual ~core_terminal_t() noexcept = default;
 
 		PCOPYASSIGNMOVE(core_terminal_t, delete)
@@ -279,8 +279,8 @@ namespace netlist::detail {
 
 		void reset() noexcept(false)
 		{
-			set_state(is_type(terminal_type::OUTPUT) ? STATE_OUT
-													 : STATE_INP_ACTIVE);
+			set_state(
+				is_type(terminal_type::OUTPUT) ? STATE_OUT : STATE_INP_ACTIVE);
 		}
 
 		constexpr void

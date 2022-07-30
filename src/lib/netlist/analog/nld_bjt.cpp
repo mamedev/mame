@@ -122,8 +122,8 @@ namespace netlist::analog {
 	{
 	public:
 		bjt_model_t(param_model_t &model)
-			: m_type((model.type() == "NPN") ? bjt_type::BJT_NPN
-											 : bjt_type::BJT_PNP)
+			: m_type(
+				(model.type() == "NPN") ? bjt_type::BJT_NPN : bjt_type::BJT_PNP)
 			, m_IS(model, "IS")
 			, m_BF(model, "BF")
 			, m_NF(model, "NF")
@@ -247,8 +247,8 @@ namespace netlist::analog {
 	class nld_three_terminal : public base_device_t
 	{
 	public:
-		nld_three_terminal(constructor_param_t    data,
-						   std::array<pstring, 3> pins)
+		nld_three_terminal(constructor_param_t data,
+			std::array<pstring, 3>             pins)
 			: base_device_t(data)
 			, m_P0_P2(*this, "m_P1_P3", NETLIB_DELEGATE(terminal_handler))
 			, m_P1_P2(*this, "m_P2_P3", NETLIB_DELEGATE(terminal_handler))
@@ -282,7 +282,7 @@ namespace netlist::analog {
 		nl_fptype delta_V() const noexcept
 		{
 			static_assert(PIN1 >= 0 && PIN2 >= 0 && PIN1 <= 2 && PIN2 <= 2,
-						  "out of bounds pin number");
+				"out of bounds pin number");
 			static constexpr const int sel = PIN1 * 10 + PIN2;
 			if constexpr (sel == 0)
 				return 0.0;
@@ -305,8 +305,8 @@ namespace netlist::analog {
 		}
 
 		void set_mat_ex(double xee, double xec, double xeb, double xIe,
-						double xce, double xcc, double xcb, double xIc,
-						double xbe, double xbc, double xbb, double xIb)
+			double xce, double xcc, double xcb, double xIc, double xbe,
+			double xbc, double xbb, double xIb)
 		{
 			using row2 = std::array<nl_fptype, 3>;
 			// rows 0 and 2

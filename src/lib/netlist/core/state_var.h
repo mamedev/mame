@@ -37,17 +37,17 @@ namespace netlist {
 
 		template <typename O>
 		//! Constructor.
-		state_var(O             &owner, //!< owner must have a netlist() method.
-				  const pstring &name,  //!< identifier/name for this state
-										//!< variable
-				  const T &value        //!< Initial value after construction
+		state_var(O       &owner, //!< owner must have a netlist() method.
+			const pstring &name,  //!< identifier/name for this state
+								 //!< variable
+			const T &value //!< Initial value after construction
 		);
 
 		template <typename O>
 		//! Constructor.
-		state_var(O             &owner, //!< owner must have a netlist() method.
-				  const pstring &name   //!< identifier/name for this state
-										//!< variable
+		state_var(O       &owner, //!< owner must have a netlist() method.
+			const pstring &name   //!< identifier/name for this state
+								  //!< variable
 		);
 
 		state_var(state_var &&) noexcept = delete;
@@ -117,20 +117,20 @@ namespace netlist {
 		using value_type = typename C::value_type;
 		//! Constructor.
 		template <typename O>
-		state_container(O &owner, //!< owner must have a netlist() method.
-						const pstring &name, //!< identifier/name for this state
-											 //!< variable
-						const value_type &value //!< Initial value after
-												//!< construction
+		state_container(O &owner,   //!< owner must have a netlist() method.
+			const pstring &name,    //!< identifier/name for this state
+									//!< variable
+			const value_type &value //!< Initial value after
+									//!< construction
 		);
 		//! Constructor.
 		template <typename O>
-		state_container(O &owner, //!< owner must have a netlist() method.
-						const pstring &name, //!< identifier/name for this state
-											 //!< variable
-						std::size_t       n, //!< number of elements to allocate
-						const value_type &value //!< Initial value after
-												//!< construction
+		state_container(O &owner,   //!< owner must have a netlist() method.
+			const pstring &name,    //!< identifier/name for this state
+									//!< variable
+			std::size_t       n,    //!< number of elements to allocate
+			const value_type &value //!< Initial value after
+									//!< construction
 		);
 		//! Copy Constructor.
 		state_container(const state_container &rhs) noexcept = default;
@@ -176,8 +176,7 @@ namespace netlist {
 
 	template <typename C>
 	template <typename O>
-	state_container<C>::state_container(
-		O &owner, const pstring &name,
+	state_container<C>::state_container(O &owner, const pstring &name,
 		const state_container<C>::value_type &value)
 	{
 		owner.state().save(owner, static_cast<C &>(*this), owner.name(), name);
@@ -187,9 +186,8 @@ namespace netlist {
 
 	template <typename C>
 	template <typename O>
-	state_container<C>::state_container(
-		O &owner, const pstring &name, std::size_t n,
-		const state_container<C>::value_type &value)
+	state_container<C>::state_container(O &owner, const pstring &name,
+		std::size_t n, const state_container<C>::value_type &value)
 		: C(n, value)
 	{
 		owner.state().save(owner, static_cast<C &>(*this), owner.name(), name);

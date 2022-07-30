@@ -59,7 +59,7 @@ namespace netlist::interface {
 	{
 	public:
 		nld_analog_callback(constructor_param_t data, nl_fptype threshold,
-							FUNC &&func)
+			FUNC &&func)
 			: device_t(data)
 			, m_in(*this, "IN", NETLIB_DELEGATE(in))
 			, m_threshold(threshold)
@@ -207,7 +207,7 @@ namespace netlist::interface {
 		}
 
 		void buffer_reset(netlist_time sample_time, std::size_t num_samples,
-						  T *inputs)
+			T *inputs)
 		{
 			m_samples = num_samples;
 			m_sample_time = sample_time;

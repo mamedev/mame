@@ -123,7 +123,7 @@ namespace netlist::analog {
 		}
 
 		void time_step([[maybe_unused]] nl_fptype cap, nl_fptype v,
-					   nl_fptype step) noexcept
+			nl_fptype step) noexcept
 		{
 			m_h = plib::reciprocal(step);
 			m_v = v;
@@ -144,7 +144,7 @@ namespace netlist::analog {
 	{
 	public:
 		generic_capacitor_const(/*[[maybe_unused]]*/ core_device_t &dev,
-								/*[[maybe_unused]]*/ const pstring &name)
+			/*[[maybe_unused]]*/ const pstring                     &name)
 			: m_gmin(nlconst::zero())
 		{
 			// gcc 7.2 (mingw) and 7.5 (ubuntu) don't accept maybe_unused here
@@ -176,7 +176,7 @@ namespace netlist::analog {
 	{
 	public:
 		generic_capacitor_const([[maybe_unused]] core_device_t &dev,
-								[[maybe_unused]] const pstring &name)
+			[[maybe_unused]] const pstring                     &name)
 			: m_gmin(nlconst::zero())
 			, m_vn(0)
 			, m_in(0)
@@ -245,7 +245,7 @@ namespace netlist::analog {
 			, m_Vcrit(nlconst::zero())
 		{
 			set_param(nlconst::np_Is(), nlconst::one(), nlconst::cgminalt(),
-					  nlconst::T0());
+				nlconst::T0());
 		}
 
 		generic_diode(core_device_t &dev, const pstring &name)
@@ -282,7 +282,7 @@ namespace netlist::analog {
 				}
 				else
 					m_Vd = std::max(-fp_constants<nl_fptype>::DIODE_MAXDIFF(),
-									nVd);
+						nVd);
 
 				if (m_Vd < m_Vmin)
 				{
@@ -331,7 +331,7 @@ namespace netlist::analog {
 				{
 					const auto IseVDVt = plib::exp(
 						std::min(+fp_constants<nl_fptype>::DIODE_MAXVOLT(),
-								 m_logIs + m_Vd * m_VtInv));
+							m_logIs + m_Vd * m_VtInv));
 					m_Id = IseVDVt - m_Is;
 					m_G = IseVDVt * m_VtInv + m_gmin;
 				}
@@ -339,7 +339,7 @@ namespace netlist::analog {
 		}
 
 		void set_param(nl_fptype Is, nl_fptype n, nl_fptype gmin,
-					   nl_fptype temp) noexcept
+			nl_fptype temp) noexcept
 		{
 			m_Is = Is;
 			m_logIs = plib::log(Is);

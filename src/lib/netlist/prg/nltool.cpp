@@ -129,7 +129,7 @@ public:
 
 	template <typename... ARGS>
 	void output_with_prefix(const pstring &prefix, const pstring &fmt,
-							ARGS &&...args)
+		ARGS &&...args)
 	{
 		pstring res = plib::pfmt(fmt)(std::forward<ARGS>(args)...);
 		auto    lines(plib::psplit(res, '\n', false));
@@ -205,16 +205,14 @@ private:
 	void logger(plib::plog_level l, const pstring &ls);
 
 	void run_with_progress(netlist_tool_t &nt, netlist::netlist_time_ext start,
-						   netlist::netlist_time_ext duration);
+		netlist::netlist_time_ext duration);
 
 	void run();
 	void validate();
 	void convert();
 
-	void
-		 compile_one_and_add_to_map(const pstring &file, const pstring &name,
-									netlist::solver::static_compile_target target,
-									compile_map                           &map);
+	void compile_one_and_add_to_map(const pstring &file, const pstring &name,
+		netlist::solver::static_compile_target target, compile_map &map);
 	void static_compile();
 
 	void mac_out(const pstring &s, bool cont = true);
@@ -265,7 +263,7 @@ class netlist_tool_t : public netlist::netlist_state_t
 {
 public:
 	netlist_tool_t(plib::plog_delegate logger, const pstring &name,
-				   const pstring &boost_lib)
+		const pstring &boost_lib)
 		: netlist::netlist_state_t(name, logger)
 	{
 		if (boost_lib == "builtin")
@@ -284,10 +282,8 @@ public:
 	}
 
 	void read_netlist(const pstring &filename, const pstring &name,
-					  const std::vector<pstring> &logs,
-					  const std::vector<pstring> &defines,
-					  const std::vector<pstring> &roms,
-					  const std::vector<pstring> &includes)
+		const std::vector<pstring> &logs, const std::vector<pstring> &defines,
+		const std::vector<pstring> &roms, const std::vector<pstring> &includes)
 	{
 		// read the netlist ...
 
@@ -325,7 +321,7 @@ public:
 			std::size_t sz = s->dt().size() * s->count();
 			if (s->dt().is_float() || s->dt().is_integral())
 				std::copy(static_cast<char *>(s->ptr()),
-						  static_cast<char *>(s->ptr()) + sz, p);
+					static_cast<char *>(s->ptr()) + sz, p);
 			else
 				log().fatal("found unsupported save element {1}\n", s->name());
 			p += sz;
@@ -373,7 +369,7 @@ struct input_t
 
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
 		int e = std::sscanf(line.c_str(), "%lf,%[^,],%lf", &t, buf.data(),
-							&val);
+			&val);
 		if (e != 3)
 			throw netlist::nl_exception(
 				plib::pfmt("error {1} scanning line {2}\n")(e)(line));
@@ -434,9 +430,8 @@ read_input(const netlist::setup_t &setup, const pstring &fname)
 	return ret;
 }
 
-void tool_app_t::run_with_progress(netlist_tool_t           &nt,
-								   netlist::netlist_time_ext start,
-								   netlist::netlist_time_ext duration)
+void tool_app_t::run_with_progress(netlist_tool_t &nt,
+	netlist::netlist_time_ext start, netlist::netlist_time_ext duration)
 {
 	if (!opt_progress())
 		nt.exec().process_queue(duration);
@@ -459,8 +454,7 @@ void tool_app_t::run_with_progress(netlist_tool_t           &nt,
 			else
 			{
 				nt.exec().process_queue(next_sec - now);
-				std_out(
-					"progress {1:4}s : {2}\r", elapsed_sec,
+				std_out("progress {1:4}s : {2}\r", elapsed_sec,
 					pstring(gsl::narrow_cast<std::size_t>(elapsed_sec), '*'));
 				std_out.flush();
 			}
@@ -492,12 +486,12 @@ void tool_app_t::run()
 
 	if (!plib::util::exists(opt_files()[0]))
 		throw netlist::nl_exception("nltool: file doesn't exists: {}",
-									opt_files()[0]);
+			opt_files()[0]);
 
 	t.start();
 
 	netlist_tool_t nt(plib::plog_delegate(&tool_app_t::logger, this), "netlist",
-					  opt_boost_lib());
+		opt_boost_lib());
 
 	nt.exec().enable_stats(opt_stats());
 
@@ -507,7 +501,7 @@ void tool_app_t::run()
 		nt.log().info.set_enabled(false);
 
 	nt.read_netlist(opt_files()[0], opt_name(), opt_logs(), m_defines,
-					opt_data_folders(), opt_includes());
+		opt_data_folders(), opt_includes());
 
 	// Inputs must be read before reset -> will clear setup and parser
 	inputs = read_input(nt.setup(), opt_inp());
@@ -531,7 +525,7 @@ void tool_app_t::run()
 		reader.read(load_state);
 		nt.load_state(load_state);
 		std_out("Loaded state, run will continue at {1:.6f}\n",
-				nt.exec().time().as_double());
+			nt.exec().time().as_double());
 	}
 
 	t.reset();
@@ -557,7 +551,7 @@ void tool_app_t::run()
 		else
 		{
 			std_out("end time {1:.6f} less than saved time {2:.6f}\n",
-					duration.as_double(), nlt.as_double());
+				duration.as_double(), nlt.as_double());
 			duration = nlt;
 		}
 	}
@@ -566,7 +560,7 @@ void tool_app_t::run()
 	{
 		auto           save_state = nt.save_state();
 		plib::ofstream strm(plib::filesystem::u8path(opt_save_state()),
-							std::ios_base::binary);
+			std::ios_base::binary);
 		if (strm.fail())
 			throw plib::file_open_e(opt_save_state());
 		strm.imbue(std::locale::classic());
@@ -580,15 +574,15 @@ void tool_app_t::run()
 		std_out("\n");
 	auto emulation_time(t.as_seconds<netlist::nl_fptype>());
 	std_out("{1:f} seconds emulation took {2:f} real time ==> {3:5.2f}%\n",
-			(duration - start).as_fp<netlist::nl_fptype>(), emulation_time,
-			(duration - start).as_fp<netlist::nl_fptype>() / emulation_time
-				* netlist::nlconst::hundred());
+		(duration - start).as_fp<netlist::nl_fptype>(), emulation_time,
+		(duration - start).as_fp<netlist::nl_fptype>() / emulation_time
+			* netlist::nlconst::hundred());
 }
 
 void tool_app_t::validate()
 {
 	netlist_tool_t nt(plib::plog_delegate(&tool_app_t::logger, this), "netlist",
-					  opt_boost_lib());
+		opt_boost_lib());
 
 	if (opt_files().size() != 1)
 		throw netlist::nl_exception("nltool: validate needs exactly one file");
@@ -604,7 +598,7 @@ void tool_app_t::validate()
 	try
 	{
 		nt.read_netlist(opt_files()[0], opt_name(), opt_logs(), m_defines,
-						opt_data_folders(), opt_includes());
+			opt_data_folders(), opt_includes());
 	}
 	catch (netlist::nl_exception &e)
 	{
@@ -620,24 +614,24 @@ void tool_app_t::validate()
 
 	if (m_warnings + m_errors > 0)
 		throw netlist::nl_exception("validation: {1} errors {2} warnings",
-									m_errors, m_warnings);
+			m_errors, m_warnings);
 }
 
-void tool_app_t::compile_one_and_add_to_map(
-	const pstring &file, const pstring &name,
-	netlist::solver::static_compile_target target, compile_map &map)
+void tool_app_t::compile_one_and_add_to_map(const pstring &file,
+	const pstring &name, netlist::solver::static_compile_target target,
+	compile_map &map)
 {
 	try
 	{
 		netlist_tool_t nt(plib::plog_delegate(&tool_app_t::logger, this),
-						  "netlist", opt_boost_lib());
+			"netlist", opt_boost_lib());
 
 		nt.log().verbose.set_enabled(false);
 		nt.log().info.set_enabled(false);
 		nt.log().warning.set_enabled(false);
 
 		nt.read_netlist(file, name, opt_logs(), m_defines, opt_data_folders(),
-						opt_includes());
+			opt_includes());
 
 		// need to reset ...
 
@@ -656,8 +650,8 @@ void tool_app_t::compile_one_and_add_to_map(
 				if (it->second.m_code != e.second)
 				{
 					pstring msg = plib::pfmt(
-						"nltool: found hash conflict in {1}, netlist {2}")(
-						file, name);
+						"nltool: found hash conflict in {1}, netlist {2}")(file,
+						name);
 					throw netlist::nl_exception(msg);
 				}
 				if (!plib::container::contains(it->second.m_modules, name))
@@ -766,12 +760,12 @@ void tool_app_t::static_compile()
 			sort_map.emplace_back(e.second.m_modules[0], e.first);
 
 		std::sort(sort_map.begin(), sort_map.end(),
-				  [](const auto &a, const auto &b)
-				  {
-					  return a.first < b.first
-								 ? true
-								 : (a.first == b.first && a.second < b.second);
-				  });
+			[](const auto &a, const auto &b)
+			{
+				return a.first < b.first
+						   ? true
+						   : (a.first == b.first && a.second < b.second);
+			});
 
 		pstring        last;
 		plib::ofstream output_splitted;
@@ -899,7 +893,7 @@ read_documentation_from_source(const pstring &fname, const pstring &id)
 					{
 						l = plib::ltrim(l);
 						if (!(plib::startsWith(l, "//-  ")
-							  || plib::startsWith(l, "//-\t"))
+								|| plib::startsWith(l, "//-\t"))
 							&& !(plib::rtrim(l) == "//-"))
 							break;
 						v = v + "\n" + pstring(l.substr(3));
@@ -919,8 +913,8 @@ read_documentation_from_source(const pstring &fname, const pstring &id)
 					else if (n == "FunctionTable")
 						ret.function_table = v;
 					else if (n == "Param")
-						ret.params.emplace_back(
-							v2, plib::trim(v.substr(v2.length())));
+						ret.params.emplace_back(v2,
+							plib::trim(v.substr(v2.length())));
 					else if (n == "Example")
 					{
 						ret.example = plib::psplit(plib::trim(v), ',', true);
@@ -1010,7 +1004,7 @@ void tool_app_t::mac(const netlist::factory::element_t *e)
 				std_out("{1:10}: Terminal\n", r);
 			else if (plib::startsWith(s, "@"))
 				std_out("{1:10}: Power terminal - automatically connected\n",
-						r);
+					r);
 			else
 				std_out("{1:10}: Parameter\n", r);
 		}
@@ -1026,13 +1020,13 @@ void tool_app_t::create_header()
 			opt_files().size());
 
 	netlist_tool_t nt(plib::plog_delegate(&tool_app_t::logger, this), "netlist",
-					  opt_boost_lib());
+		opt_boost_lib());
 
 	nt.log().verbose.set_enabled(false);
 	nt.log().info.set_enabled(false);
 
 	nt.parser().register_source<netlist::source_proc_t>("dummy",
-														&netlist_dummy);
+		&netlist_dummy);
 	nt.parser().include("dummy");
 
 	std_out("// license:BSD-3-Clause\n");
@@ -1069,12 +1063,12 @@ void tool_app_t::create_header()
 			if (last_source != e->source().file_name())
 			{
 				last_source = e->source().file_name();
-				std_out("{1}\n", plib::rpad(pstring("// "), pstring("-"),
-											opt_line_width()));
+				std_out("{1}\n",
+					plib::rpad(pstring("// "), pstring("-"), opt_line_width()));
 				std_out("{1}{2}\n", "// Source: ",
-						plib::replace_all(e->source().file_name(), "../", ""));
-				std_out("{1}\n", plib::rpad(pstring("// "), pstring("-"),
-											opt_line_width()));
+					plib::replace_all(e->source().file_name(), "../", ""));
+				std_out("{1}\n",
+					plib::rpad(pstring("// "), pstring("-"), opt_line_width()));
 			}
 			header_entry(e.get());
 		}
@@ -1087,20 +1081,20 @@ void tool_app_t::create_header()
 void tool_app_t::create_doc_header()
 {
 	netlist_tool_t nt(plib::plog_delegate(&tool_app_t::logger, this), "netlist",
-					  opt_boost_lib());
+		opt_boost_lib());
 
 	nt.log().verbose.set_enabled(false);
 	nt.log().info.set_enabled(false);
 
 	nt.parser().register_source<netlist::source_proc_t>("dummy",
-														&netlist_dummy);
+		&netlist_dummy);
 	nt.parser().include("dummy");
 
 	std::vector<pstring> devices;
 	for (auto &e : nt.parser().factory())
 		devices.push_back(e->name());
 	std::sort(devices.begin(), devices.end(),
-			  [&](pstring &a, pstring &b) { return a < b; });
+		[&](pstring &a, pstring &b) { return a < b; });
 
 	std_out("// license:BSD-3-Clause\n");
 	std_out("// copyright-holders:Couriersud\n");
@@ -1166,12 +1160,12 @@ void tool_app_t::create_doc_header()
 			output_with_prefix("///", "  @section {}_1 Synopsis", d.id);
 			output_with_prefix("///", "");
 			output_with_prefix("///", "  @snippet devsyn.dox.h {} synopsis",
-							   d.id);
+				d.id);
 			output_with_prefix("///", "");
 			output_with_prefix("///", "  @section {}_11 C Synopsis", d.id);
 			output_with_prefix("///", "");
 			output_with_prefix("///", "  @snippet devsyn.dox.h {} csynopsis",
-							   d.id);
+				d.id);
 			output_with_prefix("///", "");
 
 			output_with_prefix("///", "  @section {}_2 Parameters", d.id);
@@ -1179,19 +1173,19 @@ void tool_app_t::create_doc_header()
 			if (!d.params.empty())
 			{
 				output_with_prefix("///", "  <table>");
-				output_with_prefix(
-					"///", "  <tr><th>Name</th><th>Description</th></tr>");
+				output_with_prefix("///",
+					"  <tr><th>Name</th><th>Description</th></tr>");
 				for (auto &e : d.params)
 					output_with_prefix("///",
-									   "  <tr><td>{1}</td><td>{2}</td></tr>",
-									   e.first, e.second);
+						"  <tr><td>{1}</td><td>{2}</td></tr>", e.first,
+						e.second);
 				output_with_prefix("///", "  </table>");
 			}
 			else
 				output_with_prefix("///", "  This device has no parameters.");
 			output_with_prefix("///", "");
 			output_with_prefix("///", "  @section {}_3 Connection Diagram",
-							   d.id);
+				d.id);
 			output_with_prefix("///", "");
 
 			if (!d.pin_alias.empty())
@@ -1204,9 +1198,9 @@ void tool_app_t::create_doc_header()
 					output_with_prefix("///", " {1:10} +--------+", " ");
 					for (std::size_t i = 0; i < pins.size() / 2; i++)
 					{
-						output_with_prefix(
-							"///", " {1:10} |{2:-2}    {3:2}| {4:-10}", pins[i],
-							i + 1, pins.size() - i, pins[pins.size() - i - 1]);
+						output_with_prefix("///",
+							" {1:10} |{2:-2}    {3:2}| {4:-10}", pins[i], i + 1,
+							pins.size() - i, pins[pins.size() - i - 1]);
 					}
 					output_with_prefix("///", " {1:10} +--------+", " ");
 				}
@@ -1218,7 +1212,7 @@ void tool_app_t::create_doc_header()
 					for (std::size_t i = 0; i < pins.size(); i++)
 					{
 						output_with_prefix("///", " {1:10} |{2:-2}      |",
-										   pins[i], i + 1);
+							pins[i], i + 1);
 					}
 					output_with_prefix("///", " {1:10} +--------+", " ");
 				}
@@ -1242,7 +1236,7 @@ void tool_app_t::create_doc_header()
 				output_with_prefix("///", "");
 				output_with_prefix("///", "  @section {}_6 Example", d.id);
 				output_with_prefix("///", "  @snippet {1} {2}", d.example[0],
-								   d.example[1]);
+					d.example[1]);
 				output_with_prefix("///", "");
 				output_with_prefix("", "");
 			}
@@ -1258,7 +1252,7 @@ void tool_app_t::create_doc_header()
 void tool_app_t::list_devices()
 {
 	netlist_tool_t nt(plib::plog_delegate(&tool_app_t::logger, this), "netlist",
-					  opt_boost_lib());
+		opt_boost_lib());
 
 	nt.log().verbose.set_enabled(false);
 	nt.log().info.set_enabled(false);
@@ -1267,7 +1261,7 @@ void tool_app_t::list_devices()
 	netlist::factory::list_t &list = nt.parser().factory();
 
 	nt.parser().register_source<netlist::source_proc_t>("dummy",
-														&netlist_dummy);
+		&netlist_dummy);
 	nt.parser().include("dummy");
 	nt.setup().prepare_to_run();
 
@@ -1280,7 +1274,7 @@ void tool_app_t::list_devices()
 
 		netlist::factory::element_t *f = nullptr;
 		nt.parser().register_dev(fl->name(), fl->name() + "_lc",
-								 std::vector<pstring>(), &f);
+			std::vector<pstring>(), &f);
 
 		auto d = f->make_device(nt.pool(), nt, f->name() + "_lc");
 		// get the list of terminals ...
@@ -1312,14 +1306,14 @@ void tool_app_t::list_devices()
 void tool_app_t::list_models()
 {
 	netlist_tool_t nt(plib::plog_delegate(&tool_app_t::logger, this), "netlist",
-					  opt_boost_lib());
+		opt_boost_lib());
 
 	nt.log().verbose.set_enabled(false);
 	nt.log().info.set_enabled(false);
 	nt.log().warning.set_enabled(false);
 
 	nt.parser().register_source<netlist::source_proc_t>("dummy",
-														&netlist_dummy);
+		&netlist_dummy);
 	nt.parser().include("dummy");
 	nt.setup().prepare_to_run();
 
@@ -1461,8 +1455,8 @@ int tool_app_t::execute()
 	}
 
 	m_defines = opt_defines();
-	m_defines.emplace_back("NLTOOL_VERSION="
-						   + netlist::netlist_state_t::version());
+	m_defines.emplace_back(
+		"NLTOOL_VERSION=" + netlist::netlist_state_t::version());
 	if (opt_pre_pro())
 		m_defines.emplace_back("__PREPROCESSOR_DEBUG__=1");
 

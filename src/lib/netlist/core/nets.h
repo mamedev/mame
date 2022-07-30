@@ -36,7 +36,7 @@ namespace netlist::detail {
 		};
 
 		net_t(netlist_state_t &nl, const pstring &aname,
-			  core_terminal_t *rail_terminal = nullptr);
+			core_terminal_t *rail_terminal = nullptr);
 
 		net_t(const net_t &) = delete;
 		net_t &operator=(const net_t &) = delete;
@@ -122,7 +122,7 @@ namespace netlist::detail {
 		{
 			std::vector<detail::core_terminal_t *> ret(core_terms_ref().size());
 			std::copy(core_terms_ref().begin(), core_terms_ref().end(),
-					  ret.begin());
+				ret.begin());
 			return ret;
 		}
 
@@ -259,7 +259,7 @@ namespace netlist::detail {
 				// if we avoid queue pushes we must test if m_cur_Q and
 				// m_new_Q are equal
 				if ((!config::avoid_noop_queue_pushes::value
-					 || (m_cur_Q != m_new_Q))
+						|| (m_cur_Q != m_new_Q))
 					&& (m_next_scheduled_time > exec().time()))
 				{
 					m_in_queue = queue_status::QUEUED; // pending
@@ -305,8 +305,8 @@ namespace netlist::detail {
 	}
 
 	// only used for logic nets
-	inline void net_t::set_Q_and_push(netlist_sig_t       newQ,
-									  const netlist_time &delay) noexcept
+	inline void net_t::set_Q_and_push(netlist_sig_t newQ,
+		const netlist_time                         &delay) noexcept
 	{
 		gsl_Expects(delay >= netlist_time::zero());
 
@@ -345,7 +345,7 @@ namespace netlist {
 	{
 	public:
 		analog_net_t(netlist_state_t &nl, const pstring &aname,
-					 detail::core_terminal_t *rail_terminal = nullptr);
+			detail::core_terminal_t *rail_terminal = nullptr);
 
 		void reset() noexcept override;
 
@@ -376,7 +376,7 @@ namespace netlist {
 	{
 	public:
 		logic_net_t(netlist_state_t &nl, const pstring &aname,
-					detail::core_terminal_t *rail_terminal = nullptr);
+			detail::core_terminal_t *rail_terminal = nullptr);
 
 		using detail::net_t::initial;
 		using detail::net_t::Q;

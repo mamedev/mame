@@ -28,13 +28,11 @@ namespace netlist::solver {
 	public:
 		using float_type = FT;
 
-		matrix_solver_SOR_t(devices::nld_solver         &main_solver,
-							const pstring               &name,
-							matrix_solver_t::net_list_t &nets,
-							const solver_parameters_t   *params,
-							const std::size_t            size)
+		matrix_solver_SOR_t(devices::nld_solver &main_solver,
+			const pstring &name, matrix_solver_t::net_list_t &nets,
+			const solver_parameters_t *params, const std::size_t size)
 			: matrix_solver_direct_t<FT, SIZE>(main_solver, name, nets, params,
-											   size)
+				size)
 			, m_lp_fact(*this, "m_lp_fact", 0)
 			, w(size, plib::constants<FT>::zero())
 			, one_m_w(size, plib::constants<FT>::zero())
@@ -120,8 +118,8 @@ namespace netlist::solver {
 						static_cast<float_type>(gtot_t + gabs_t));
 					one_m_w[k] = plib::constants<FT>::one()
 								 - plib::constants<FT>::one()
-									   * static_cast<FT>(gtot_t
-														 / (gtot_t + gabs_t));
+									   * static_cast<FT>(
+										   gtot_t / (gtot_t + gabs_t));
 				}
 			}
 			else

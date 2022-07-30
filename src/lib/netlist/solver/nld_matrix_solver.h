@@ -137,7 +137,7 @@ namespace netlist::solver {
 	{
 		template <typename D>
 		solver_parameters_t(device_t &parent, const pstring &prefix,
-							D &defaults)
+			D &defaults)
 			: m_freq(parent, prefix + "FREQ", defaults.m_freq())
 
 			// iteration parameters
@@ -145,47 +145,47 @@ namespace netlist::solver {
 			, m_method(parent, prefix + "METHOD", defaults.m_method())
 			, m_fp_type(parent, prefix + "FPTYPE", defaults.m_fp_type())
 			, m_reltol(parent, prefix + "RELTOL",
-					   defaults.m_reltol()) //!< SPICE RELTOL parameter
+				  defaults.m_reltol()) //!< SPICE RELTOL parameter
 			, m_vntol(parent, prefix + "VNTOL",
-					  defaults.m_vntol()) //!< SPICE VNTOL
-										  //!< parameter
+				  defaults.m_vntol()) //!< SPICE VNTOL
+									  //!< parameter
 			, m_accuracy(parent, prefix + "ACCURACY",
-						 defaults.m_accuracy()) //!< Iterative solver accuracy
+				  defaults.m_accuracy()) //!< Iterative solver accuracy
 			, m_nr_loops(parent, prefix + "NR_LOOPS",
-						 defaults.m_nr_loops()) //!< Maximum number of
-												//!< Newton-Raphson loops
+				  defaults.m_nr_loops()) //!< Maximum number of
+										 //!< Newton-Raphson loops
 			, m_gs_loops(parent, prefix + "GS_LOOPS",
-						 defaults.m_gs_loops()) //!< Maximum number of
-												//!< Gauss-Seidel loops
+				  defaults.m_gs_loops()) //!< Maximum number of
+										 //!< Gauss-Seidel loops
 
 			// general parameters
 			, m_gmin(parent, prefix + "GMIN", defaults.m_gmin())
 			, m_pivot(parent, prefix + "PIVOT",
-					  defaults.m_pivot()) //!< use
-										  //!< pivoting on
-										  //!< supported
-										  //!< solvers
+				  defaults.m_pivot()) //!< use
+									  //!< pivoting on
+									  //!< supported
+									  //!< solvers
 			, m_nr_recalc_delay(parent, prefix + "NR_RECALC_DELAY",
-								defaults.m_nr_recalc_delay()) //!< Delay to next
-															  //!< solve attempt
-															  //!< if nr loops
-															  //!< exceeded
+				  defaults.m_nr_recalc_delay()) //!< Delay to next
+												//!< solve attempt
+												//!< if nr loops
+												//!< exceeded
 			, m_parallel(parent, prefix + "PARALLEL", defaults.m_parallel())
 			, m_min_ts_ts(parent, prefix + "MIN_TS_TS",
-						  defaults.m_min_ts_ts()) //!< The minimum time step for
-												  //!< solvers with time
-												  //!< stepping devices.
+				  defaults.m_min_ts_ts()) //!< The minimum time step for
+										  //!< solvers with time
+										  //!< stepping devices.
 
 			// automatic time step
 			, m_dynamic_ts(parent, prefix + "DYNAMIC_TS",
-						   defaults.m_dynamic_ts()) //!< Use dynamic time
-													//!< stepping
+				  defaults.m_dynamic_ts()) //!< Use dynamic time
+										   //!< stepping
 			, m_dynamic_lte(parent, prefix + "DYNAMIC_LTE",
-							defaults.m_dynamic_lte()) //!< dynamic time stepping
-													  //!< slope
+				  defaults.m_dynamic_lte()) //!< dynamic time stepping
+											//!< slope
 			, m_dynamic_min_ts(parent, prefix + "DYNAMIC_MIN_TIMESTEP",
-							   defaults.m_dynamic_min_ts()) //!< smallest time
-															//!< step allowed
+				  defaults.m_dynamic_min_ts()) //!< smallest time
+											   //!< step allowed
 
 			// matrix sorting
 			, m_sort_type(parent, prefix + "SORT_TYPE", defaults.m_sort_type())
@@ -283,7 +283,7 @@ namespace netlist::solver {
 	{
 	public:
 		proxied_analog_output_t(core_device_t &dev, const pstring &aname,
-								analog_net_t *pnet)
+			analog_net_t *pnet)
 			: analog_output_t(dev, aname)
 			, m_proxied_net(pnet)
 		{
@@ -376,7 +376,7 @@ namespace netlist::solver {
 			[[maybe_unused]] solver::static_compile_target target)
 		{
 			return {"",
-					plib::pfmt("// solver doesn't support static compile\n\n")};
+				plib::pfmt("// solver doesn't support static compile\n\n")};
 		}
 
 		// return number of floating point operations for solve
@@ -384,8 +384,7 @@ namespace netlist::solver {
 
 	protected:
 		matrix_solver_t(devices::nld_solver &main_solver, const pstring &name,
-						const net_list_t          &nets,
-						const solver_parameters_t *params);
+			const net_list_t &nets, const solver_parameters_t *params);
 
 		virtual void upstream_solve_non_dynamic() = 0;
 		virtual netlist_time
@@ -454,7 +453,7 @@ namespace netlist::solver {
 		plib::arena_vector<arena_type, nl_delegate_ts>  m_step_funcs;
 		plib::arena_vector<arena_type, nl_delegate_dyn> m_dynamic_funcs;
 		plib::arena_vector<arena_type,
-						   device_arena::unique_ptr<proxied_analog_output_t>>
+			device_arena::unique_ptr<proxied_analog_output_t>>
 			m_inputs;
 
 		std::size_t m_ops;

@@ -16,7 +16,7 @@ namespace plib {
 	}
 
 	option::option(options &parent, const pstring &ashort, const pstring &along,
-				   const pstring &help, bool has_argument)
+		const pstring &help, bool has_argument)
 		: option_base(parent, help)
 		, m_short(ashort)
 		, m_long(along)
@@ -174,10 +174,8 @@ namespace plib {
 		return argv.size();
 	}
 
-	pstring
-	options::split_paragraphs(const pstring &text, unsigned width,
-							  unsigned indent, unsigned firstline_indent,
-							  const pstring &line_end)
+	pstring options::split_paragraphs(const pstring &text, unsigned width,
+		unsigned indent, unsigned firstline_indent, const pstring &line_end)
 	{
 		auto    paragraphs = psplit(text, '\n');
 		pstring ret("");
@@ -185,7 +183,7 @@ namespace plib {
 		for (auto &p : paragraphs)
 		{
 			pstring line = plib::rpad(pstring(""), pstring(" "),
-									  firstline_indent);
+				firstline_indent);
 			for (auto &s : psplit(p, ' '))
 			{
 				if (line.length() + s.length() > width)
@@ -203,7 +201,7 @@ namespace plib {
 	}
 
 	pstring options::help(const pstring &description, const pstring &usage,
-						  unsigned width, unsigned indent) const
+		unsigned width, unsigned indent) const
 	{
 		pstring ret;
 
@@ -254,7 +252,7 @@ namespace plib {
 				}
 				else
 					ret += split_paragraphs(line + opt->help(), width, indent,
-											0)
+							   0)
 						   + "\n";
 			}
 			else if (auto *grp = dynamic_cast<option_group *>(optbase))

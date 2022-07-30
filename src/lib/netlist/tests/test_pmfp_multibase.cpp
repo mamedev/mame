@@ -19,8 +19,8 @@
 
 template <class F, class S>
 typename std::enable_if_t<!plib::has_ostream_operator<std::basic_ostream<char>,
-													  std::pair<F, S>>::value,
-						  std::basic_ostream<char> &>
+							  std::pair<F, S>>::value,
+	std::basic_ostream<char> &>
 operator<<(std::basic_ostream<char> &os, const std::pair<F, S> &p)
 {
 	os << "{ " << p.first << ", " << p.second << " }";
@@ -34,7 +34,7 @@ typename std::enable_if_t<
 	!plib::has_ostream_operator<std::basic_ostream<char>, T>::value,
 	std::basic_ostream<char> &>
 operator<<([[maybe_unused]] std::basic_ostream<char> &os,
-		   [[maybe_unused]] const T                  &p)
+	[[maybe_unused]] const T                         &p)
 {
 	os << std::string(typeid(T).name());
 	return os;
@@ -333,9 +333,9 @@ PTEST_F(pmfp_test_complex_return, multibase_test)
 	obj2.y = 8;
 	obj2.z = 9;
 	PEXPECT_NE(static_cast<void *>(static_cast<vb *>(&obj2)),
-			   static_cast<void *>(static_cast<vd1 *>(&obj2)));
+		static_cast<void *>(static_cast<vd1 *>(&obj2)));
 	PEXPECT_NE(static_cast<void *>(static_cast<vb *>(&obj2)),
-			   static_cast<void *>(static_cast<vd2 *>(&obj2)));
+		static_cast<void *>(static_cast<vd2 *>(&obj2)));
 
 #if defined(_MSC_VER) && !defined(__clang__)
 	f = make_forward_delegate(&forward::xp, &obj2);
@@ -481,9 +481,9 @@ PTEST_F(pmfp_test_simple_return, multibase_test)
 	obj2.y = 8;
 	obj2.z = 9;
 	PEXPECT_NE(static_cast<void *>(static_cast<vb *>(&obj2)),
-			   static_cast<void *>(static_cast<vd1 *>(&obj2)));
+		static_cast<void *>(static_cast<vd1 *>(&obj2)));
 	PEXPECT_NE(static_cast<void *>(static_cast<vb *>(&obj2)),
-			   static_cast<void *>(static_cast<vd2 *>(&obj2)));
+		static_cast<void *>(static_cast<vd2 *>(&obj2)));
 
 #if defined(_MSC_VER) && !defined(__clang__)
 	f = make_forward_delegate(&forward::xp, &obj2);

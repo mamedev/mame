@@ -34,7 +34,7 @@ namespace netlist::detail {
 	template <typename A, typename O>
 	class queue_base
 		: public config::timed_queue<A,
-									 plib::queue_entry_t<netlist_time_ext, O *>>
+			  plib::queue_entry_t<netlist_time_ext, O *>>
 		, public plib::state_manager_t::callback_t
 	{
 	public:
@@ -44,7 +44,7 @@ namespace netlist::detail {
 		using obj_delegate = plib::pmfp<O *(std::size_t)>;
 
 		explicit queue_base(A &arena, std::size_t size, id_delegate get_id,
-							obj_delegate get_obj)
+			obj_delegate get_obj)
 			: base_queue(arena, size)
 			, m_size(0)
 			, m_times(size)
@@ -63,13 +63,13 @@ namespace netlist::detail {
 
 	protected:
 		void register_state(plib::state_manager_t &manager,
-							const pstring         &module) override
+			const pstring                         &module) override
 		{
 			manager.save_item(this, m_size, module + "." + "size");
 			manager.save_item(this, &m_times[0], module + "." + "times",
-							  m_times.size());
+				m_times.size());
 			manager.save_item(this, &m_net_ids[0], module + "." + "names",
-							  m_net_ids.size());
+				m_net_ids.size());
 		}
 		void
 		on_pre_save([[maybe_unused]] plib::state_manager_t &manager) override

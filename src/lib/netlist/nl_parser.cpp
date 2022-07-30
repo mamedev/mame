@@ -78,7 +78,7 @@ namespace netlist {
 	}
 
 	void parser_t::parse_tokens(plib::istream_uptr &&strm,
-								token_store_t       &token_store)
+		token_store_t                               &token_store)
 	{
 		plib::putf8_reader u8reader(strm.release_stream());
 		m_tokenizer.append_to_store(&u8reader, token_store);
@@ -134,8 +134,8 @@ namespace netlist {
 				m_local.emplace(name.str(), token_store_t());
 				m_cur_local = &m_local[name.str()];
 				auto sl = location();
-				auto li = plib::pfmt("# {1} \"{2}\"")(sl.line(),
-													  sl.file_name());
+				auto li = plib::pfmt(
+					"# {1} \"{2}\"")(sl.line(), sl.file_name());
 
 				m_cur_local->push_back(token_t(token_type::LINEMARKER, li));
 				m_cur_local->push_back(token);
@@ -440,9 +440,9 @@ namespace netlist {
 		for (std::size_t i = 0; i < n / 2; i++)
 		{
 			m_setup.register_alias(detail::alias_type::PACKAGE_PIN,
-								   plib::pfmt("{1}")(i + 1), pins[i * 2]);
+				plib::pfmt("{1}")(i + 1), pins[i * 2]);
 			m_setup.register_alias(detail::alias_type::PACKAGE_PIN,
-								   plib::pfmt("{1}")(n - i), pins[i * 2 + 1]);
+				plib::pfmt("{1}")(n - i), pins[i * 2 + 1]);
 		}
 	}
 
@@ -476,7 +476,7 @@ namespace netlist {
 		if (tok.is_type(token_type::STRING))
 		{
 			m_setup.log().debug("Parser: DefParam: {1} {2}\n", param,
-								tok.str());
+				tok.str());
 			m_setup.register_default_param(param, tok.str());
 			require_token(m_tok_paren_right);
 		}

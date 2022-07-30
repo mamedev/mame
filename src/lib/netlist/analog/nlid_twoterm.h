@@ -67,7 +67,7 @@ namespace netlist::analog {
 		// the terminal handler on to the terminals.
 
 		nld_two_terminal(base_device_t &owner, const pstring &name,
-						 nl_delegate owner_delegate)
+			nl_delegate owner_delegate)
 			: base_device_t(
 				constructor_data_t{owner.state(), owner.name() + "." + name})
 			, m_P(owner, name + ".1", &m_N, owner_delegate)
@@ -110,7 +110,7 @@ namespace netlist::analog {
 		nl_fptype V2N() const noexcept { return m_N.net().Q_Analog(); }
 
 		void set_mat(nl_fptype a11, nl_fptype a12, nl_fptype rhs1, //
-					 nl_fptype a21, nl_fptype a22, nl_fptype rhs2  //
+			nl_fptype a21, nl_fptype a22, nl_fptype rhs2           //
 		) const noexcept
 		{
 			//               GT,  GO,     I
@@ -187,13 +187,13 @@ namespace netlist::analog {
 		{
 			const nl_fptype G = plib::reciprocal(R);
 			set_mat(G, -G, nlconst::zero(), //
-					-G, G, nlconst::zero());
+				-G, G, nlconst::zero());
 		}
 
 		void set_G(nl_fptype G) const noexcept
 		{
 			set_mat(G, -G, nlconst::zero(), //
-					-G, G, nlconst::zero());
+				-G, G, nlconst::zero());
 		}
 
 		// NETLIB_RESETI();
@@ -319,7 +319,7 @@ namespace netlist::analog {
 				const nl_fptype G = res.first;
 				const nl_fptype I = res.second;
 				set_mat(G, -G, -I, //
-						-G, G, I);
+					-G, G, I);
 			}
 			else
 				m_cap.restore_state();
@@ -368,7 +368,7 @@ namespace netlist::analog {
 				const nl_fptype I = m_cap.Ieq(m_C(), deltaV());
 				const nl_fptype G = m_cap.G(m_C());
 				set_mat(G, -G, -I, //
-						-G, G, I);
+					-G, G, I);
 			}
 		}
 
@@ -378,7 +378,7 @@ namespace netlist::analog {
 			const nl_fptype I = m_cap.Ieq(m_C(), deltaV());
 			const nl_fptype G = m_cap.G(m_C());
 			set_mat(G, -G, -I, //
-					-G, G, I);
+				-G, G, I);
 		}
 
 		param_fp_t m_C;
@@ -577,7 +577,7 @@ namespace netlist::analog {
 			register_sub_alias("N", N());
 			if (!m_func().empty())
 				m_compiled->compile(m_func(),
-									std::vector<pstring>({{pstring("T")}}));
+					std::vector<pstring>({{pstring("T")}}));
 		}
 
 		NETLIB_IS_TIMESTEP(!m_func().empty())
@@ -589,8 +589,7 @@ namespace netlist::analog {
 				m_t += step;
 				m_funcparam[0] = m_t;
 				this->set_G_V_I(plib::reciprocal(m_R()),
-								m_compiled->evaluate(m_funcparam),
-								nlconst::zero());
+					m_compiled->evaluate(m_funcparam), nlconst::zero());
 			}
 			else
 				m_t -= step; // only need to restore state, will be called again
@@ -631,7 +630,7 @@ namespace netlist::analog {
 			register_sub_alias("N", "2");
 			if (!m_func().empty())
 				m_compiled->compile(m_func(),
-									std::vector<pstring>({{pstring("T")}}));
+					std::vector<pstring>({{pstring("T")}}));
 		}
 
 		NETLIB_IS_TIMESTEP(!m_func().empty())
@@ -644,7 +643,7 @@ namespace netlist::analog {
 				const nl_fptype I = m_compiled->evaluate(m_funcparam);
 				const auto      zero(nlconst::zero());
 				set_mat(zero, zero, -I, //
-						zero, zero, I);
+					zero, zero, I);
 			}
 			else
 				m_t -= step;
@@ -656,7 +655,7 @@ namespace netlist::analog {
 			nld_two_terminal::reset();
 			const auto zero(nlconst::zero());
 			set_mat(zero, zero, -m_I(), //
-					zero, zero, m_I());
+				zero, zero, m_I());
 		}
 
 		NETLIB_UPDATE_PARAMI()
@@ -669,7 +668,7 @@ namespace netlist::analog {
 				{
 					const auto zero(nlconst::zero());
 					set_mat(zero, zero, -m_I(), //
-							zero, zero, m_I());
+						zero, zero, m_I());
 				});
 		}
 

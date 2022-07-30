@@ -18,13 +18,13 @@ namespace netlist::analog {
 		, m_G(*this, "G", nlconst::one())
 		, m_RI(*this, "RI", ri)
 		, m_OP(*this, "OP", &m_IP, {&m_ON, &m_IN},
-			   NETLIB_DELEGATE(terminal_handler))
+			  NETLIB_DELEGATE(terminal_handler))
 		, m_ON(*this, "ON", &m_IP, {&m_OP, &m_IN},
-			   NETLIB_DELEGATE(terminal_handler))
+			  NETLIB_DELEGATE(terminal_handler))
 		, m_IP(*this, "IP", &m_IN, {&m_OP, &m_ON},
-			   NETLIB_DELEGATE(terminal_handler))
+			  NETLIB_DELEGATE(terminal_handler))
 		, m_IN(*this, "IN", &m_IP, {&m_OP, &m_ON},
-			   NETLIB_DELEGATE(terminal_handler))
+			  NETLIB_DELEGATE(terminal_handler))
 		, m_OP1(*this, "_OP1", &m_IN, NETLIB_DELEGATE(terminal_handler))
 		, m_ON1(*this, "_ON1", &m_IN, NETLIB_DELEGATE(terminal_handler))
 		, m_factor(nlconst::one())

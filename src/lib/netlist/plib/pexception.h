@@ -30,7 +30,7 @@ namespace plib {
 	[[noreturn]] void terminate(const char *msg) noexcept;
 
 	[[noreturn]] void passert_fail(const char *assertion, const char *file,
-								   int lineno, const char *msg) noexcept;
+		int lineno, const char *msg) noexcept;
 
 	//============================================================
 	//  exception base

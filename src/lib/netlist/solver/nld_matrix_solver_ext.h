@@ -21,9 +21,8 @@ namespace netlist::solver {
 		using float_type = FT;
 
 		matrix_solver_ext_t(devices::nld_solver &main_solver,
-							const pstring &name, const net_list_t &nets,
-							const solver::solver_parameters_t *params,
-							const std::size_t                  size)
+			const pstring &name, const net_list_t &nets,
+			const solver::solver_parameters_t *params, const std::size_t size)
 			: matrix_solver_t(main_solver, name, nets, params)
 			, m_new_V(size)
 			, m_RHS(size)
@@ -39,15 +38,15 @@ namespace netlist::solver {
 			//
 			state().save(*this, m_last_V.as_base(), this->name(), "m_last_V");
 			state().save(*this, m_DD_n_m_1.as_base(), this->name(),
-						 "m_DD_n_m_1");
+				"m_DD_n_m_1");
 			state().save(*this, m_h_n_m_1.as_base(), this->name(), "m_h_n_m_1");
 		}
 
 	protected:
-		static constexpr const std::size_t SIZEABS = plib::parray<
-			FT, SIZE>::SIZEABS();
+		static constexpr const std::size_t SIZEABS = plib::parray<FT,
+			SIZE>::SIZEABS();
 		static constexpr const std::size_t m_pitch_ABS = (((SIZEABS + 0) + 7)
-														  / 8)
+															 / 8)
 														 * 8;
 
 		// PALIGNAS_VECTOROPT() `parray` defines alignment already
@@ -107,7 +106,7 @@ namespace netlist::solver {
 					levL[k], levU[k], mat_GE ? mat_GE->get_parallel_level(k) : 0, fm);
 #else
 				this->log().verbose("{1:4} {2} {3:4} {4:4} {5:4} {6:4}", k, ml,
-									levL[k], levU[k], 0, fm);
+					levL[k], levU[k], 0, fm);
 #endif
 			}
 		}
@@ -177,7 +176,7 @@ namespace netlist::solver {
 		}
 
 		netlist_time compute_next_time_step(fptype cur_ts, fptype min_ts,
-											fptype max_ts) override
+			fptype max_ts) override
 		{
 			fptype new_solver_time_step_sq(max_ts * max_ts);
 
@@ -189,7 +188,7 @@ namespace netlist::solver {
 				const fptype DD_n = std::max(
 					-fp_constants<fptype>::TIMESTEP_MAXDIFF(),
 					std::min(+fp_constants<fptype>::TIMESTEP_MAXDIFF(),
-							 (v - m_last_V[k])));
+						(v - m_last_V[k])));
 
 				// m_last_V[k] = v;
 				const fptype hn = cur_ts;
@@ -209,7 +208,7 @@ namespace netlist::solver {
 															nlconst::half()
 															* DD2);
 					new_solver_time_step_sq = std::min(new_net_time_step_sq,
-													   new_solver_time_step_sq);
+						new_solver_time_step_sq);
 				}
 			}
 
@@ -219,7 +218,7 @@ namespace netlist::solver {
 			// FIXME: Factor 2 below is important. Without, we get timing
 			// issues. This must be a bug elsewhere.
 			return std::max(netlist_time::from_fp(new_solver_time_step_sq),
-							netlist_time::quantum() * 2);
+				netlist_time::quantum() * 2);
 		}
 
 		template <typename M>
@@ -243,7 +242,7 @@ namespace netlist::solver {
 					}
 				}
 				nl_assert_always(cnt == this->m_terms[k].rail_start(),
-								 "Count and rail start mismatch");
+					"Count and rail start mismatch");
 				m_mat_ptr[k][this->m_terms[k].rail_start()] = &(mat[k][k]);
 			}
 		}
@@ -280,8 +279,8 @@ namespace netlist::solver {
 
 				//# FIXME: gonn, gtn and Idr - which float types should they have?
 
-				auto gtot_t = std::accumulate(
-					gt, gt + term_count, plib::constants<source_type>::zero());
+				auto gtot_t = std::accumulate(gt, gt + term_count,
+					plib::constants<source_type>::zero());
 
 				// update diagonal element ...
 				*tcr_r[rail_start] = static_cast<FT>(
@@ -290,8 +289,7 @@ namespace netlist::solver {
 				for (std::size_t i = 0; i < rail_start; i++)
 					*tcr_r[i] += static_cast<FT>(go[i]);
 
-				auto RHS_t = std::accumulate(
-					Idr, Idr + term_count,
+				auto RHS_t = std::accumulate(Idr, Idr + term_count,
 					plib::constants<source_type>::zero());
 
 				for (std::size_t i = rail_start; i < term_count; i++)

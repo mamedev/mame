@@ -31,13 +31,11 @@ namespace netlist::solver {
 		// maximize the efficiency of the incomplete LUT.
 		// This is already preconditioning.
 
-		matrix_solver_GMRES_t(devices::nld_solver               &main_solver,
-							  const pstring                     &name,
-							  matrix_solver_t::net_list_t       &nets,
-							  const solver::solver_parameters_t *params,
-							  const std::size_t                  size)
+		matrix_solver_GMRES_t(devices::nld_solver &main_solver,
+			const pstring &name, matrix_solver_t::net_list_t &nets,
+			const solver::solver_parameters_t *params, const std::size_t size)
 			: matrix_solver_direct_t<FT, SIZE>(main_solver, name, nets, params,
-											   size)
+				size)
 			, m_ops(this->m_arena, size, 0)
 			, m_gmres(size)
 		{
@@ -86,7 +84,7 @@ namespace netlist::solver {
 
 	private:
 		using matrix_type = typename plib::pmatrix_cr<arena_type, FT,
-													  SIZE>::index_type;
+			SIZE>::index_type;
 
 		// plib::mat_precondition_none<FT, SIZE> m_ops;
 		plib::mat_precondition_ILU<arena_type, FT, SIZE> m_ops;
@@ -117,9 +115,9 @@ namespace netlist::solver {
 			static_cast<float_type>(this->m_params.m_accuracy));
 
 		auto iter = std::max(plib::constants<std::size_t>::one(),
-							 this->m_params.m_gs_loops());
+			this->m_params.m_gs_loops());
 		auto gsl = m_gmres.solve(m_ops, this->m_new_V, this->m_RHS, iter,
-								 accuracy);
+			accuracy);
 
 		this->m_iterative_total += gsl;
 

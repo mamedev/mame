@@ -4,7 +4,6 @@ UseTab: ForContinuationAndIndentation
 TabWidth: 4
 IndentWidth: 4
 ColumnLimit: 80
-ContinuationIndentWidth: 4
 ConstructorInitializerIndentWidth: 4
 NamespaceIndentation: All
 CompactNamespaces: true
@@ -40,11 +39,11 @@ AlwaysBreakTemplateDeclarations: Yes
 # AfterComma does not work <= 13
 #BreakInheritanceList: AfterComma
 BreakInheritanceList: BeforeComma
-#BreakInheritanceList: false
 SpaceBeforeInheritanceColon: true
 
-#AlignAfterOpenBracket: DontAlign
-AlignAfterOpenBracket: Align
+AlignAfterOpenBracket: DontAlign
+#AlignAfterOpenBracket: Align
+ContinuationIndentWidth: 4
 PointerAlignment: Right
 ReferenceAlignment: Right
 SpacesInAngles: false
@@ -79,17 +78,17 @@ IncludeCategories:
   - Regex:           '^(("|"../)solver)/'
     Priority:        23
   - Regex:           '^"plib/ptests\.h"'
-    Priority:        0
+    Priority:        -1
   - Regex:           '^(("|"../)plib)/'
     Priority:        30
   - Regex:           '<[([:alnum:]|_).]+>'
     Priority:        40
   - Regex:           '^"emu\.h"'
-    Priority:        0
+    Priority:        -1
   - Regex:           '.*'
     Priority:        10
 
-StatementMacros: 
+StatementMacros:
   - "DIPPINS"
   - "TT_HEAD"
   - "TT_LINE"
@@ -102,7 +101,7 @@ StatementMacros:
 #  - "TRUTHTABLE_ENTRY"
   - "LOCAL_LIB_ENTRY"
 
-#StatementAttributeLikeMacros: 
+#StatementAttributeLikeMacros:
 #  - "NETLIST_NAME"
 #  - "NETLIB_NAME"
 
@@ -111,7 +110,7 @@ TypenameMacros:
   - "NETLIB_NAME"
   - "PENUM"
 
-WhitespaceSensitiveMacros: 
+WhitespaceSensitiveMacros:
   - "ALIAS"
   - "DIPPINS"
   - "NET_C"

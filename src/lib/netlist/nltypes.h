@@ -161,10 +161,9 @@ namespace netlist {
 	///
 	/// \note This is not the right location yet.
 	///
-	using device_arena = std::conditional_t<
-		config::use_mempool::value,
+	using device_arena = std::conditional_t<config::use_mempool::value,
 		plib::mempool_arena<plib::aligned_arena<>,
-							config::mempool_align::value>,
+			config::mempool_align::value>,
 		plib::aligned_arena<>>;
 
 	using host_arena = plib::aligned_arena<>;
@@ -220,11 +219,11 @@ namespace netlist {
 	using netlist_time_ext = plib::ptime<
 		std::conditional<config::prefer_int128::value
 							 && plib::compile_info::has_int128::value,
-						 INT128, std::int64_t>::type,
+			INT128, std::int64_t>::type,
 		config::INTERNAL_RES::value>;
 
 	static_assert(noexcept(netlist_time::from_nsec(1)),
-				  "Not evaluated as constexpr");
+		"Not evaluated as constexpr");
 
 	//============================================================
 	//  MACROS
@@ -266,7 +265,7 @@ namespace netlist {
 		/// \brief: used to hold two static netlist_time values
 		///
 		template <netlist_time::internal_type value0,
-				  netlist_time::internal_type value1>
+			netlist_time::internal_type       value1>
 		struct times_ns2
 		{
 			static constexpr netlist_time value(std::size_t N)
@@ -278,8 +277,8 @@ namespace netlist {
 		/// \brief: used to hold three static netlist_time values
 		///
 		template <netlist_time::internal_type value0,
-				  netlist_time::internal_type value1,
-				  netlist_time::internal_type value2>
+			netlist_time::internal_type       value1,
+			netlist_time::internal_type       value2>
 		struct times_ns3
 		{
 			static constexpr netlist_time value(std::size_t N)

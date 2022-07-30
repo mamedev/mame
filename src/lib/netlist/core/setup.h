@@ -82,7 +82,7 @@ namespace netlist {
 		struct alias_t
 		{
 			alias_t(alias_type type, const pstring &alias,
-					const pstring &references)
+				const pstring &references)
 				: m_type(type)
 				, m_alias(alias)
 				, m_references(references)
@@ -184,7 +184,7 @@ namespace netlist {
 
 		void register_term(detail::core_terminal_t &term);
 		void register_term(terminal_t &term, terminal_t *other_term,
-						   const std::array<terminal_t *, 2> &splitter_terms);
+			const std::array<terminal_t *, 2> &splitter_terms);
 
 		// called from matrix_solver_t::get_connected_net
 		// returns the terminal being part of a two terminal device.
@@ -214,9 +214,8 @@ namespace netlist {
 		get_terminals_for_device_name(const pstring &devname) const;
 
 		// needed by proxy device to check power terminals
-		detail::core_terminal_t *
-		find_terminal(const pstring &terminal_in, detail::terminal_type atype,
-					  bool required = true) const;
+		detail::core_terminal_t *find_terminal(const pstring &terminal_in,
+			detail::terminal_type atype, bool required = true) const;
 		detail::core_terminal_t *
 		find_terminal(const pstring &terminal_in, bool required = true) const;
 		pstring de_alias(const pstring &alias) const;
@@ -244,15 +243,15 @@ namespace netlist {
 		void merge_nets(detail::net_t &this_net, detail::net_t &other_net);
 
 		void connect_terminals(detail::core_terminal_t &t1,
-							   detail::core_terminal_t &t2);
+			detail::core_terminal_t                    &t2);
 		void connect_input_output(detail::core_terminal_t &input,
-								  detail::core_terminal_t &output);
+			detail::core_terminal_t                       &output);
 		void connect_terminal_output(detail::core_terminal_t &terminal,
-									 detail::core_terminal_t &output);
+			detail::core_terminal_t                          &output);
 		void connect_terminal_input(detail::core_terminal_t &terminal,
-									detail::core_terminal_t &input);
+			detail::core_terminal_t                         &input);
 		bool connect_input_input(detail::core_terminal_t &input1,
-								 detail::core_terminal_t &input2);
+			detail::core_terminal_t                      &input2);
 
 		bool connect(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
 
@@ -287,7 +286,7 @@ namespace netlist {
 												 m_connected_terminals;
 		std::unordered_map<pstring, param_ref_t> m_params;
 		std::unordered_map<const detail::core_terminal_t *,
-						   devices::nld_base_proxy *>
+			devices::nld_base_proxy *>
 													 m_proxies;
 		std::vector<host_arena::unique_ptr<param_t>> m_defparam_lifetime;
 

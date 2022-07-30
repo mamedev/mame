@@ -135,7 +135,7 @@ namespace plib {
 
 		template <class C>
 		void insert_at(C &con, const std::size_t index,
-					   const typename C::value_type &elem)
+			const typename C::value_type &elem)
 		{
 			con.insert(con.begin() + narrow_cast<std::ptrdiff_t>(index), elem);
 		}

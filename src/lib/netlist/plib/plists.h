@@ -101,7 +101,7 @@ namespace plib {
 
 	private:
 		std::array<typename std::aligned_storage<sizeof(C), alignof(C)>::type,
-				   N>
+			N>
 			m_buf;
 	};
 
@@ -206,7 +206,7 @@ namespace plib {
 
 	private:
 		std::array<typename std::aligned_storage<sizeof(C), alignof(C)>::type,
-				   N>
+			N>
 				  m_buf;
 		size_type m_pos;
 	};

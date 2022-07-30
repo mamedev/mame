@@ -47,7 +47,7 @@ namespace plib {
 		using defines_map_type = std::unordered_map<pstring, define_t>;
 
 		explicit ppreprocessor(psource_collection_t &sources,
-							   defines_map_type     *defines = nullptr);
+			defines_map_type                        *defines = nullptr);
 
 		PCOPYASSIGNMOVE(ppreprocessor, delete)
 
@@ -65,8 +65,7 @@ namespace plib {
 		{
 			m_outbuf.clear();
 			m_stack.emplace_back(input_context(in_stream.release_stream(),
-											   plib::util::path(filename),
-											   filename));
+				plib::util::path(filename), filename));
 			process_stack();
 			return m_outbuf;
 		}
@@ -88,7 +87,7 @@ namespace plib {
 		void process_stack();
 
 		string_list tokenize(const pstring &str, const string_list &sep,
-							 bool remove_ws, bool concat);
+			bool remove_ws, bool concat);
 		static bool is_valid_token(const pstring &str);
 
 		std::pair<pstring, bool> process_line(const pstring &line_in);
@@ -107,7 +106,7 @@ namespace plib {
 		{
 			template <typename T>
 			input_context(T &&in_stream, const pstring &local_path,
-						  const pstring &name)
+				const pstring &name)
 				: m_reader(std::forward<T>(in_stream))
 				, m_lineno(0)
 				, m_local_path(local_path)

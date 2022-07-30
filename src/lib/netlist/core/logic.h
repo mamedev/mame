@@ -31,7 +31,7 @@ namespace netlist {
 	{
 	public:
 		logic_t(device_t &dev, const pstring &aname, state_e terminal_state,
-				nl_delegate delegate);
+			nl_delegate delegate);
 
 		logic_net_t &net() noexcept
 		{
@@ -51,7 +51,7 @@ namespace netlist {
 	{
 	public:
 		logic_input_t(device_t &dev, const pstring &aname,
-					  nl_delegate delegate);
+			nl_delegate delegate);
 
 		// const netlist_sig_t &operator()() const noexcept
 		constexpr netlist_sig_t operator()() const noexcept
@@ -141,10 +141,9 @@ namespace netlist {
 		///
 		/// This function terminates if actually called.
 		///
-		[[noreturn]] static void
-		set_tristate([[maybe_unused]] netlist_sig_t v,
-					 [[maybe_unused]] netlist_time  ts_off_on,
-					 [[maybe_unused]] netlist_time  ts_on_off)
+		[[noreturn]] static void set_tristate([[maybe_unused]] netlist_sig_t v,
+			[[maybe_unused]] netlist_time ts_off_on,
+			[[maybe_unused]] netlist_time ts_on_off)
 		{
 			plib::terminate(
 				"set_tristate on logic_output should never be called!");
@@ -175,7 +174,7 @@ namespace netlist {
 	{
 	public:
 		tristate_output_t(device_t &dev, const pstring &aname,
-						  bool force_logic);
+			bool force_logic);
 
 		void push(netlist_sig_t newQ, netlist_time delay) noexcept
 		{
@@ -185,14 +184,14 @@ namespace netlist {
 		}
 
 		void set_tristate(netlist_sig_t v, netlist_time ts_off_on,
-						  netlist_time ts_on_off) noexcept
+			netlist_time ts_on_off) noexcept
 		{
 			if (!m_force_logic)
 				if (v != m_tristate)
 				{
 					logic_output_t::push((v != 0) ? OUT_TRISTATE()
 												  : m_last_logic,
-										 v ? ts_off_on : ts_on_off);
+						v ? ts_off_on : ts_on_off);
 					m_tristate = v;
 				}
 		}

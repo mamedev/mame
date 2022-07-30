@@ -117,7 +117,7 @@ namespace plib {
 		{
 			if (name == m_name)
 				return {std::make_unique<std::stringstream>(putf8string(m_str)),
-						name};
+					name};
 
 			return istream_uptr();
 		}
@@ -144,7 +144,7 @@ namespace plib {
 		void add_source(Args &&...args)
 		{
 			static_assert(std::is_base_of<psource_t, S>::value,
-						  "S must inherit from plib::psource_t");
+				"S must inherit from plib::psource_t");
 
 			auto src = std::make_unique<S>(std::forward<Args>(args)...);
 			m_collection.push_back(std::move(src));

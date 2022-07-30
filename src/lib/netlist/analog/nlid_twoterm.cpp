@@ -117,7 +117,7 @@ namespace netlist::analog {
 		m_I = nlconst::zero();
 		m_G = m_gmin;
 		set_mat(m_G, -m_G, -m_I, //
-				-m_G, m_G, m_I);
+			-m_G, m_G, m_I);
 	}
 
 	NETLIB_UPDATE_PARAM(L) {}
@@ -132,7 +132,7 @@ namespace netlist::analog {
 			m_I += m_G * deltaV();
 			m_G = step / m_L() + m_gmin;
 			set_mat(m_G, -m_G, -m_I, //
-					-m_G, m_G, m_I);
+				-m_G, m_G, m_I);
 		}
 		else
 		{
@@ -168,7 +168,7 @@ namespace netlist::analog {
 		const nl_fptype G(m_D.G());
 		const nl_fptype I(m_D.Ieq());
 		set_mat(G, -G, -I, //
-				-G, G, I);
+			-G, G, I);
 		// set(m_D.G(), 0.0, m_D.Ieq());
 	}
 
@@ -179,12 +179,12 @@ namespace netlist::analog {
 	NETLIB_RESET(Z)
 	{
 		nl_fptype IsBV = m_modacc.m_IBV
-						 / (plib::exp(m_modacc.m_BV
-									  / nlconst::np_VT(m_modacc.m_NBV))
-							- nlconst::one());
+						 / (plib::exp(
+								m_modacc.m_BV / nlconst::np_VT(m_modacc.m_NBV))
+							 - nlconst::one());
 
 		m_D.set_param(m_modacc.m_IS, m_modacc.m_N, exec().gmin(),
-					  nlconst::T0());
+			nlconst::T0());
 		m_R.set_param(IsBV, m_modacc.m_NBV, exec().gmin(), nlconst::T0());
 		set_G_V_I(m_D.G(), nlconst::zero(), m_D.Ieq());
 	}
@@ -192,12 +192,12 @@ namespace netlist::analog {
 	NETLIB_UPDATE_PARAM(Z)
 	{
 		nl_fptype IsBV = m_modacc.m_IBV
-						 / (plib::exp(m_modacc.m_BV
-									  / nlconst::np_VT(m_modacc.m_NBV))
-							- nlconst::one());
+						 / (plib::exp(
+								m_modacc.m_BV / nlconst::np_VT(m_modacc.m_NBV))
+							 - nlconst::one());
 
 		m_D.set_param(m_modacc.m_IS, m_modacc.m_N, exec().gmin(),
-					  nlconst::T0());
+			nlconst::T0());
 		m_R.set_param(IsBV, m_modacc.m_NBV, exec().gmin(), nlconst::T0());
 		set_G_V_I(m_D.G(), nlconst::zero(), m_D.Ieq());
 	}
@@ -209,7 +209,7 @@ namespace netlist::analog {
 		const nl_fptype G(m_D.G() + m_R.G());
 		const nl_fptype I(m_D.Ieq() - m_R.Ieq());
 		set_mat(G, -G, -I, //
-				-G, G, I);
+			-G, G, I);
 	}
 
 } // namespace netlist::analog

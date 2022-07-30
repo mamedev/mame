@@ -32,7 +32,7 @@ namespace netlist {
 		///  Allows a descriptive text to be passed to the exception
 
 		explicit nl_exception(const pstring &text //!< text to be passed
-							  )
+			)
 			: plib::pexception(text)
 		{
 		}
@@ -42,8 +42,8 @@ namespace netlist {
 
 		template <typename... Args>
 		explicit nl_exception(const pstring &fmt, //!< format to be used
-							  Args &&...args      //!< arguments to be passed
-							  )
+			Args &&...args                        //!< arguments to be passed
+			)
 			: plib::pexception(plib::pfmt(fmt)(std::forward<Args>(args)...))
 		{
 		}

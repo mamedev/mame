@@ -109,7 +109,7 @@ namespace plib {
 
 	template <typename T>
 	void vec_add_mult_scalar_p(const std::size_t n, T *result, const T *v,
-							   T scalar) noexcept
+		T scalar) noexcept
 	{
 		for (std::size_t i = 0; i < n; i++)
 			result[i] += scalar * v[i];

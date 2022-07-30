@@ -52,7 +52,7 @@ namespace plib {
 	{
 	public:
 		option_example(options &parent, const pstring &group,
-					   const pstring &help)
+			const pstring &help)
 			: option_base(parent, help)
 			, m_example(group)
 		{
@@ -68,7 +68,7 @@ namespace plib {
 	{
 	public:
 		option(options &parent, const pstring &short_opt,
-			   const pstring &long_opt, const pstring &help, bool has_argument);
+			const pstring &long_opt, const pstring &help, bool has_argument);
 
 		// no_argument options will be called with "" argument
 
@@ -97,8 +97,8 @@ namespace plib {
 	{
 	public:
 		option_str(options &parent, const pstring &short_opt,
-				   const pstring &long_opt, const pstring &default_value,
-				   const pstring &help)
+			const pstring &long_opt, const pstring &default_value,
+			const pstring &help)
 			: option(parent, short_opt, long_opt, help, true)
 			, m_val(default_value)
 		{
@@ -117,8 +117,8 @@ namespace plib {
 	{
 	public:
 		option_str_limit_base(options &parent, const pstring &short_opt,
-							  const pstring         &long_opt,
-							  std::vector<pstring> &&limit, const pstring &help)
+			const pstring &long_opt, std::vector<pstring> &&limit,
+			const pstring &help)
 			: option(parent, short_opt, long_opt, help, true)
 			, m_limit(limit)
 		{
@@ -135,10 +135,10 @@ namespace plib {
 	{
 	public:
 		option_str_limit(options &parent, const pstring &short_opt,
-						 const pstring &long_opt, const T &default_value,
-						 std::vector<pstring> &&limit, const pstring &help)
+			const pstring &long_opt, const T &default_value,
+			std::vector<pstring> &&limit, const pstring &help)
 			: option_str_limit_base(parent, short_opt, long_opt,
-									std::move(limit), help)
+				std::move(limit), help)
 			, m_val(default_value)
 		{
 		}
@@ -169,7 +169,7 @@ namespace plib {
 	{
 	public:
 		option_bool(options &parent, const pstring &short_opt,
-					const pstring &long_opt, const pstring &help)
+			const pstring &long_opt, const pstring &help)
 			: option(parent, short_opt, long_opt, help, false)
 			, m_val(false)
 		{
@@ -189,10 +189,9 @@ namespace plib {
 	{
 	public:
 		option_num(options &parent, const pstring &short_opt,
-				   const pstring &long_opt, T default_value,
-				   const pstring &help,
-				   T              min_val = std::numeric_limits<T>::lowest(),
-				   T              max_val = std::numeric_limits<T>::max())
+			const pstring &long_opt, T default_value, const pstring &help,
+			T min_val = std::numeric_limits<T>::lowest(),
+			T max_val = std::numeric_limits<T>::max())
 			: option(parent, short_opt, long_opt, help, true)
 			, m_val(default_value)
 			, m_min(min_val)
@@ -228,7 +227,7 @@ namespace plib {
 	{
 	public:
 		option_vec(options &parent, const pstring &short_opt,
-				   const pstring &long_opt, const pstring &help)
+			const pstring &long_opt, const pstring &help)
 			: option(parent, short_opt, long_opt, help, true)
 		{
 		}
@@ -265,15 +264,14 @@ namespace plib {
 		std::size_t parse(const std::vector<putf8string> &argv);
 
 		pstring help(const pstring &description, const pstring &usage,
-					 unsigned width = 72, unsigned indent = 20) const;
+			unsigned width = 72, unsigned indent = 20) const;
 
 		pstring app() const { return m_app; }
 
 	private:
 		static pstring
 		split_paragraphs(const pstring &text, unsigned width, unsigned indent,
-						 unsigned       first_line_indent,
-						 const pstring &line_end = "\n");
+			unsigned first_line_indent, const pstring &line_end = "\n");
 
 		void check_consistency() noexcept(false);
 

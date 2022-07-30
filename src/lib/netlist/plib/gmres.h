@@ -39,8 +39,8 @@ namespace plib {
 		using mat_type = plib::pmatrix_cr<ARENA, FT, SIZE>;
 		using matLU_type = plib::pLUmatrix_cr<mat_type>;
 
-		mat_precondition_ILU(
-			ARENA &arena, std::size_t size, std::size_t ilu_scale = 4,
+		mat_precondition_ILU(ARENA &arena, std::size_t size,
+			std::size_t ilu_scale = 4,
 			std::size_t bw = plib::pmatrix_cr<ARENA, FT, SIZE>::FILL_INFINITY)
 			: m_mat(arena, narrow_cast<typename mat_type::index_type>(size))
 			, m_LU(arena, narrow_cast<typename mat_type::index_type>(size))
@@ -82,7 +82,7 @@ namespace plib {
 	struct mat_precondition_diagonal
 	{
 		mat_precondition_diagonal(ARENA &arena, std::size_t size,
-								  [[maybe_unused]] int dummy = 0)
+			[[maybe_unused]] int dummy = 0)
 			: m_mat(arena, size)
 			, m_diagonal(size)
 			, nz_col(size)
@@ -219,13 +219,13 @@ namespace plib {
 		// constexpr static int RESTART = RESTARTMAX;
 		constexpr static const int RESTART = (SIZE > 0)
 												 ? ((SIZE < RESTARTMAX)
-														? SIZE
-														: RESTARTMAX)
+														 ? SIZE
+														 : RESTARTMAX)
 												 : ((SIZE < 0)
-														? ((-SIZE < RESTARTMAX)
-															   ? -SIZE
-															   : RESTARTMAX)
-														: RESTARTMAX);
+														 ? ((-SIZE < RESTARTMAX)
+																 ? -SIZE
+																 : RESTARTMAX)
+														 : RESTARTMAX);
 
 		explicit gmres_t(std::size_t size)
 			: residual(size)
@@ -244,7 +244,7 @@ namespace plib {
 
 		template <typename OPS, typename VT, typename VRHS>
 		std::size_t solve(OPS &ops, VT &x, const VRHS &rhs,
-						  const std::size_t itr_max, float_type accuracy)
+			const std::size_t itr_max, float_type accuracy)
 		{
 			// -------------------------------------------------------------------------
 			// The code below was inspired by code published by John Burkardt
@@ -356,10 +356,10 @@ namespace plib {
 
 		template <int k, typename OPS, typename VT>
 		bool do_k(OPS &ops, VT &x, std::size_t &itr_used, FT rho_delta,
-				  [[maybe_unused]] bool dummy)
+			[[maybe_unused]] bool dummy)
 		{
 			if (do_k<k - 1, OPS>(ops, x, itr_used, rho_delta,
-								 do_k_helper<k - 1>::value))
+					do_k_helper<k - 1>::value))
 				return true;
 
 			constexpr const std::size_t kp1 = k + 1;

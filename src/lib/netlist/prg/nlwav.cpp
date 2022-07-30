@@ -47,13 +47,13 @@ public:
 	};
 
 	wav_t(std::ostream &strm, bool is_seekable, format fmt, std::size_t sr,
-		  std::size_t channels)
+		std::size_t channels)
 		: m_f(strm)
 		, m_stream_is_seekable(is_seekable)
 		, m_format(fmt)
 		// force "play" to play and warn about eof instead of being silent
 		, m_fmt(static_cast<std::uint16_t>(channels),
-				static_cast<std::uint32_t>(sr), fmt)
+			  static_cast<std::uint32_t>(sr), fmt)
 		, m_data(is_seekable ? 0 : 0xffffffff)
 	{
 
@@ -232,7 +232,7 @@ public:
 					// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
 					if (2
 						!= std::sscanf(line.c_str(), "%lf %lf", &m_e[i].t,
-									   &m_e[i].v))
+							&m_e[i].v))
 						fprintf(stderr, "arg: <%s>\n", line.c_str());
 					m_e[i].need_more = false;
 				}
@@ -400,8 +400,7 @@ class wav_writer
 {
 public:
 	wav_writer(std::ostream &fo, bool is_seekable, wav_t::format fmt,
-			   std::size_t channels, std::size_t sample_rate,
-			   double amplification)
+		std::size_t channels, std::size_t sample_rate, double amplification)
 		: max_samples(channels, -1e9)
 		, min_samples(channels, 1e9)
 		, m_n(channels, 0)
@@ -461,7 +460,7 @@ public:
 	};
 
 	vcd_writer(std::ostream &fo, const std::vector<pstring> &channels,
-			   format_e format, double high_level = 2.0, double low_level = 1.0)
+		format_e format, double high_level = 2.0, double low_level = 1.0)
 		: m_channels(channels.size())
 		, m_last_time(0)
 		, m_fo(fo)
@@ -525,7 +524,7 @@ private:
 	{
 		const putf8string u8line(line);
 		m_fo.write(u8line.c_str(),
-				   static_cast<std::streamsize>(plib::strlen(u8line.c_str())));
+			static_cast<std::streamsize>(plib::strlen(u8line.c_str())));
 	}
 
 	std::size_t m_channels;
@@ -549,7 +548,7 @@ public:
 	};
 
 	tab_writer(std::ostream &fo, const std::vector<pstring> &channels,
-			   double start, double inc, std::size_t samples)
+		double start, double inc, std::size_t samples)
 		: m_last_time(0)
 		, m_next_time(start)
 		, m_fo(fo)
@@ -589,7 +588,7 @@ private:
 	{
 		const putf8string u8line(line);
 		m_fo.write(u8line.c_str(),
-				   static_cast<std::streamsize>(plib::strlen(u8line.c_str())));
+			static_cast<std::streamsize>(plib::strlen(u8line.c_str())));
 	}
 
 	double m_last_time;
@@ -690,20 +689,19 @@ void nlwav_app::convert_wav(std::ostream &output, wav_t::format fmt)
 	double dt = plib::reciprocal(static_cast<double>(opt_rate()));
 	auto   num_channels = m_in_streams.size();
 
-	auto wo = plib::make_unique<wav_writer, arena>(
-		output, opt_out() != "-", fmt, num_channels, opt_rate(), opt_amp());
-	auto ago = plib::make_unique<aggregator, arena>(
-		num_channels, dt,
+	auto wo = plib::make_unique<wav_writer, arena>(output, opt_out() != "-",
+		fmt, num_channels, opt_rate(), opt_amp());
+	auto ago = plib::make_unique<aggregator, arena>(num_channels, dt,
 		aggregator::callback_type(&wav_writer::process, wo.get()));
-	auto fgo_hp = plib::make_unique<filter_hp, arena>(
-		opt_highpass(), opt_hp_boost(), num_channels,
+	auto fgo_hp = plib::make_unique<filter_hp, arena>(opt_highpass(),
+		opt_hp_boost(), num_channels,
 		filter_hp::callback_type(&aggregator::process, ago.get()));
-	auto fgo_lp = plib::make_unique<filter_lp, arena>(
-		opt_lowpass(), num_channels,
+	auto fgo_lp = plib::make_unique<filter_lp, arena>(opt_lowpass(),
+		num_channels,
 		filter_lp::callback_type(&filter_hp::process, fgo_hp.get()));
 
 	auto top_cb = log_processor::callback_type(&filter_lp::process,
-											   fgo_lp.get());
+		fgo_lp.get());
 
 	log_processor lp(num_channels, top_cb);
 
@@ -745,8 +743,8 @@ void nlwav_app::convert_vcd(std::ostream &output, vcd_writer::format_e format)
 void nlwav_app::convert_tab(std::ostream &output)
 {
 
-	auto wo = plib::make_unique<tab_writer, arena>(
-		output, opt_args(), opt_start(), opt_inc(), opt_samples());
+	auto wo = plib::make_unique<tab_writer, arena>(output, opt_args(),
+		opt_start(), opt_inc(), opt_samples());
 	log_processor::callback_type lp_cb(&tab_writer::process, wo.get());
 
 	log_processor lp(m_in_streams.size(), lp_cb);
@@ -757,7 +755,7 @@ void nlwav_app::convert_tab(std::ostream &output)
 pstring nlwav_app::usage()
 {
 	return help("Convert netlist log files into wav files.\n",
-				"nlwav [OPTION] ... [FILE] ...");
+		"nlwav [OPTION] ... [FILE] ...");
 }
 
 template <typename F>
@@ -767,8 +765,7 @@ static void open_ostream_and_exec(const pstring &fname, bool binary, F func)
 	{
 		// FIXME: binary depends on format!
 		plib::ofstream output_stream(plib::filesystem::u8path(fname),
-									 binary ? (std::ios::out | std::ios::binary)
-											: std::ios::out);
+			binary ? (std::ios::out | std::ios::binary) : std::ios::out);
 		if (output_stream.fail())
 			throw plib::file_open_e(fname);
 		output_stream.imbue(std::locale::classic());
@@ -791,34 +788,32 @@ void nlwav_app::convert(const pstring &output_file)
 	{
 		case 0:
 			open_ostream_and_exec(output_file, true,
-								  [this](std::ostream &output)
-								  { convert_wav(output, wav_t::s16); });
+				[this](std::ostream &output)
+				{ convert_wav(output, wav_t::s16); });
 			break;
 		case 1:
 			open_ostream_and_exec(output_file, true,
-								  [this](std::ostream &output)
-								  { convert_wav(output, wav_t::s32); });
+				[this](std::ostream &output)
+				{ convert_wav(output, wav_t::s32); });
 			break;
 		case 2:
 			open_ostream_and_exec(output_file, true,
-								  [this](std::ostream &output)
-								  { convert_wav(output, wav_t::f32); });
+				[this](std::ostream &output)
+				{ convert_wav(output, wav_t::f32); });
 			break;
 		case 3:
 			open_ostream_and_exec(output_file, false,
-								  [this](std::ostream &output)
-								  { convert_vcd(output, vcd_writer::ANALOG); });
+				[this](std::ostream &output)
+				{ convert_vcd(output, vcd_writer::ANALOG); });
 			break;
 		case 4:
 			open_ostream_and_exec(output_file, false,
-								  [this](std::ostream &output) {
-									  convert_vcd(output, vcd_writer::DIGITAL);
-								  });
+				[this](std::ostream &output)
+				{ convert_vcd(output, vcd_writer::DIGITAL); });
 			break;
 		case 5:
 			open_ostream_and_exec(output_file, false,
-								  [this](std::ostream &output)
-								  { convert_tab(output); });
+				[this](std::ostream &output) { convert_tab(output); });
 			break;
 		default:
 			// tease compiler - can't happen

@@ -108,7 +108,7 @@ public:                                                                        \
 #define NETLIB_TIMESTEPI()                                                     \
 public:                                                                        \
 	virtual void time_step(detail::time_step_type ts_type,                     \
-						   nl_fptype              step) noexcept override
+		nl_fptype                                 step) noexcept override
 
 /// \brief Used to implement the body of the time stepping code.
 ///
@@ -120,7 +120,7 @@ public:                                                                        \
 ///
 #define NETLIB_TIMESTEP(cname)                                                 \
 	void NETLIB_NAME(cname)::time_step(detail::time_step_type ts_type,         \
-									   nl_fptype              step) noexcept
+		nl_fptype                                             step) noexcept
 
 //#define NETLIB_DELEGATE(name) nl_delegate(&this_type :: name, this)
 #define NETLIB_DELEGATE(name)                                                  \
@@ -128,7 +128,7 @@ public:                                                                        \
 
 #define NETLIB_DELEGATE_NOOP()                                                 \
 	nl_delegate(&core_device_t::handler_noop,                                  \
-				static_cast<core_device_t *>(this))
+		static_cast<core_device_t *>(this))
 
 #define NETLIB_UPDATE_TERMINALSI()                                             \
 	virtual void update_terminals() noexcept override

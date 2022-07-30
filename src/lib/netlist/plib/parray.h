@@ -37,8 +37,8 @@ namespace plib {
 	struct parray_traits<FT, 0, ARENA>
 	{
 		static constexpr std::size_t ABS() noexcept { return 0; }
-		using allocator_type = typename ARENA::template allocator_type<
-			FT, PALIGN_VECTOROPT>;
+		using allocator_type = typename ARENA::template allocator_type<FT,
+			PALIGN_VECTOROPT>;
 		// using container = typename std::vector<FT, arena_allocator<mempool,
 		// FT, 64>>;
 		using container = typename std::vector<FT, allocator_type>;
@@ -85,15 +85,15 @@ namespace plib {
 
 		template <int X = SIZE>
 		parray(size_type size, const FT &val,
-			   std::enable_if_t<(X == 0), int> = 0)
+			std::enable_if_t<(X == 0), int> = 0)
 			: m_a(size, val)
 			, m_size(size)
 		{
 		}
 
 		template <int X = SIZE>
-		parray(size_type size,
-			   std::enable_if_t<(X != 0), int> = 0) noexcept(false)
+		parray(size_type size, std::enable_if_t<(X != 0), int> = 0) noexcept(
+			false)
 			: m_size(size)
 		{
 			if ((SIZE < 0 && size > SIZEABS())
@@ -104,7 +104,7 @@ namespace plib {
 
 		template <int X = SIZE>
 		parray(size_type size, const FT &val,
-			   std::enable_if_t<(X != 0), int> = 0) noexcept(false)
+			std::enable_if_t<(X != 0), int> = 0) noexcept(false)
 			: m_size(size)
 		{
 			if ((SIZE < 0 && size > SIZEABS())
@@ -131,8 +131,7 @@ namespace plib {
 		{
 		}
 
-		parray &operator=(
-			const parray &
+		parray &operator=(const parray &
 				rhs) noexcept // NOLINT(bugprone-unhandled-self-assignment, cert-oop54-cpp)
 		{
 			if (this == &rhs)

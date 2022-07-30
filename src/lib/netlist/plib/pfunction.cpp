@@ -19,17 +19,17 @@
 namespace plib {
 
 	PERRMSGV(MF_FUNCTION_UNKNOWN_TOKEN, 2,
-			 "pfunction: unknown/misformatted token <{1}> in <{2}>")
+		"pfunction: unknown/misformatted token <{1}> in <{2}>")
 	PERRMSGV(MF_FUNCTION_STACK_UNDERFLOW, 2,
-			 "pfunction: stack underflow on token <{1}> in <{2}>")
+		"pfunction: stack underflow on token <{1}> in <{2}>")
 	PERRMSGV(MF_FUNCTION_STACK_OVERFLOW, 2,
-			 "pfunction: stack overflow on token <{1}> in <{2}>")
+		"pfunction: stack overflow on token <{1}> in <{2}>")
 	PERRMSGV(MF_FUNCTION_PARENTHESIS_INEQUALITY, 2,
-			 "pfunction: parenthesis inequality on token <{1}> in <{2}>")
+		"pfunction: parenthesis inequality on token <{1}> in <{2}>")
 	PERRMSGV(MF_FUNCTION_STACK_UNEQUAL_ONE, 2,
-			 "pfunction: stack count {1} different to one on <{2}>")
+		"pfunction: stack count {1} different to one on <{2}>")
 	PERRMSGV(MF_FUNCTION_STACK_UNDERFLOW_INFIX, 1,
-			 "pfunction: stack underflow during infix parsing of: <{1}>")
+		"pfunction: stack underflow during infix parsing of: <{1}>")
 
 	static constexpr const std::size_t MAX_STACK = 32;
 
@@ -103,8 +103,8 @@ namespace plib {
 	}
 
 	template <typename NT>
-	void pfunction<NT>::compile(const pstring          &expr,
-								const inputs_container &inputs) noexcept(false)
+	void pfunction<NT>::compile(const pstring &expr,
+		const inputs_container                &inputs) noexcept(false)
 	{
 		if (plib::startsWith(expr, "rpn:"))
 			compile_postfix(expr.substr(4), inputs);
@@ -113,17 +113,16 @@ namespace plib {
 	}
 
 	template <typename NT>
-	void pfunction<NT>::compile_postfix(
-		const pstring &expr, const inputs_container &inputs) noexcept(false)
+	void pfunction<NT>::compile_postfix(const pstring &expr,
+		const inputs_container                        &inputs) noexcept(false)
 	{
 		std::vector<pstring> cmds(plib::psplit(expr, ' '));
 		compile_postfix(inputs, cmds, expr);
 	}
 
 	template <typename NT>
-	void pfunction<NT>::compile_postfix(const inputs_container     &inputs,
-										const std::vector<pstring> &cmds,
-										const pstring &expr) noexcept(false)
+	void pfunction<NT>::compile_postfix(const inputs_container &inputs,
+		const std::vector<pstring> &cmds, const pstring &expr) noexcept(false)
 	{
 		m_precompiled.clear();
 		int stk = 0;
@@ -215,12 +214,12 @@ namespace plib {
 	}
 
 	template <typename NT>
-	void pfunction<NT>::compile_infix(const pstring          &expr,
-									  const inputs_container &inputs)
+	void pfunction<NT>::compile_infix(const pstring &expr,
+		const inputs_container                      &inputs)
 	{
 		// Shunting-yard infix parsing
-		std::vector<pstring> sep = {"(", ")",  ",",  "*",  "/",  "+", "-",
-									"^", "<=", ">=", "==", "!=", "<", ">"};
+		std::vector<pstring> sep = {"(", ")", ",", "*", "/", "+", "-", "^",
+			"<=", ">=", "==", "!=", "<", ">"};
 		std::vector<pstring> step1_v(
 			plib::psplit(plib::replace_all(expr, " ", ""), sep));
 		std::stack<pstring>  op_stack;
@@ -445,8 +444,7 @@ namespace plib {
 				n -= 3;                                                        \
 				ptr++;                                                         \
 				std::copy(m_precompiled.begin() + (ptr + 1),                   \
-						  m_precompiled.end(),                                 \
-						  m_precompiled.begin() + (ptr - 2));                  \
+					m_precompiled.end(), m_precompiled.begin() + (ptr - 2));   \
 				ptr -= 2;                                                      \
 			}                                                                  \
 			else                                                               \
@@ -462,8 +460,7 @@ namespace plib {
 				m_precompiled[ptr - 2] = rpn_inst(EXPR);                       \
 				n -= 2;                                                        \
 				std::copy(m_precompiled.begin() + (ptr + 1),                   \
-						  m_precompiled.end(),                                 \
-						  m_precompiled.begin() + (ptr - 1));                  \
+					m_precompiled.end(), m_precompiled.begin() + (ptr - 1));   \
 				ptr--;                                                         \
 			}                                                                  \
 			else                                                               \
@@ -480,7 +477,7 @@ namespace plib {
 				n -= 1;                                                        \
 				ptr--;                                                         \
 				std::copy(m_precompiled.begin() + (ptr + 1),                   \
-						  m_precompiled.end(), m_precompiled.begin() + (ptr)); \
+					m_precompiled.end(), m_precompiled.begin() + (ptr));       \
 			}                                                                  \
 			else                                                               \
 			{                                                                  \

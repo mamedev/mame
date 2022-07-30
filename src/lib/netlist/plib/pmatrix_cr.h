@@ -134,8 +134,8 @@ namespace plib {
 		}
 
 		template <typename M>
-		void build_from_fill_mat(
-			const M &f, std::size_t max_fill = FILL_INFINITY - 1,
+		void build_from_fill_mat(const M &f,
+			std::size_t                   max_fill = FILL_INFINITY - 1,
 			std::size_t band_width = FILL_INFINITY) noexcept(false)
 		{
 			C nz = 0;
@@ -310,7 +310,7 @@ namespace plib {
 						// if (fill[k][col] < FILL_INFINITY)
 						{
 							auto f = std::min(fill[row][col],
-											  1 + fill[row][k] + fill[k][col]);
+								1 + fill[row][k] + fill[k][col]);
 							if (f < base_type::FILL_INFINITY)
 							{
 								if (f > fill_max)
@@ -383,8 +383,8 @@ namespace plib {
 			// printf("omp: %ld %d %d\n", m_ge_par.size(), nz_num,
 			// (int)m_ge_par[m_ge_par.size()-2].size());
 			for (auto l = 0UL; l < m_ge_par.size(); l++)
-				plib::omp::for_static(
-					base_type::nz_num, 0UL, m_ge_par[l].size(),
+				plib::omp::for_static(base_type::nz_num, 0UL,
+					m_ge_par[l].size(),
 					[this, &RHS, &l](unsigned ll)
 					{
 						auto &i = m_ge_par[l][ll];
@@ -565,7 +565,7 @@ namespace plib {
 							 j++)
 						{
 							auto f = std::min(fill[i][j],
-											  1 + fill[i][k] + fill[k][j]);
+								1 + fill[i][k] + fill[k][j]);
 							if (f <= ilup)
 								fill[i][j] = f;
 						}

@@ -30,12 +30,12 @@ namespace plib {
 	template <typename BASEARENA, std::size_t MINALIGN = PALIGN_MIN_SIZE>
 	class mempool_arena
 		: public arena_base<mempool_arena<BASEARENA, MINALIGN>, MINALIGN, false,
-							false>
+			  false>
 	{
 	public:
 		using size_type = typename BASEARENA::size_type;
 		using base_type = arena_base<mempool_arena<BASEARENA, MINALIGN>,
-									 MINALIGN, false, false>;
+			MINALIGN, false, false>;
 
 		template <class T>
 		using base_allocator_type = typename BASEARENA::template allocator_type<
@@ -66,8 +66,7 @@ namespace plib {
 				//::operator delete(m_data_allocated);
 				// delete [] m_data_allocated;
 				m_mempool.base_arena().deallocate(m_data_allocated,
-												  mempool_arena::block_align(),
-												  m_bytes_allocated);
+					mempool_arena::block_align(), m_bytes_allocated);
 			}
 
 			block(const block &) = delete;
@@ -122,7 +121,7 @@ namespace plib {
 		using info_allocator_type = typename BASEARENA::template allocator_type<
 			info_type>;
 		std::unordered_map<void *, info, std::hash<void *>, std::equal_to<>,
-						   info_allocator_type>
+			info_allocator_type>
 			m_info;
 
 		plib::arena_vector<BASEARENA, block *> m_blocks;
@@ -145,7 +144,7 @@ namespace plib {
 			{
 				plib::perrlogger("Found {} info blocks\n", m_info.size());
 				plib::perrlogger("Found block with {} dangling allocations\n",
-								 b->m_num_alloc);
+					b->m_num_alloc);
 			}
 			detail::free<0>(base_arena(), b);
 		}
@@ -194,8 +193,8 @@ namespace plib {
 	}
 
 	template <typename BASEARENA, std::size_t MINALIGN>
-	void mempool_arena<BASEARENA, MINALIGN>::deallocate(
-		void *ptr, [[maybe_unused]] std::size_t alignment, size_t size) noexcept
+	void mempool_arena<BASEARENA, MINALIGN>::deallocate(void *ptr,
+		[[maybe_unused]] std::size_t alignment, size_t size) noexcept
 	{
 		auto it = m_info.find(ptr);
 		if (it == m_info.end())
@@ -205,7 +204,7 @@ namespace plib {
 			plib::terminate("mempool::free - double free was called");
 		if (it->second.m_orig_size != size)
 			plib::perrlogger("Size mismatch original {} vs {}\n",
-							 it->second.m_orig_size, size);
+				it->second.m_orig_size, size);
 
 		mempool_arena &mp = b->m_mempool;
 		b->m_num_alloc--;
@@ -224,7 +223,7 @@ namespace plib {
 
 	template <typename BASEARENA, std::size_t MINALIGN>
 	mempool_arena<BASEARENA, MINALIGN>::block::block(mempool_arena &mp,
-													 size_type      min_bytes)
+		size_type                                                   min_bytes)
 		: m_num_alloc(0)
 		, m_cur(0)
 		, m_data(nullptr)
@@ -234,15 +233,15 @@ namespace plib {
 		m_free = min_bytes;
 		m_bytes_allocated
 			= (min_bytes
-			   + mempool_arena::
-				   block_align()); // - 1); // & ~(mp.m_min_align - 1);
+				+ mempool_arena::
+					block_align()); // - 1); // & ~(mp.m_min_align - 1);
 		// NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
 		// m_data_allocated = new std::uint8_t[alloc_bytes];
 		m_data_allocated = static_cast<std::uint8_t *>(mp.base_arena().allocate(
 			mempool_arena::block_align(), m_bytes_allocated));
 		void *r = m_data_allocated;
 		std::align(mempool_arena::block_align(), min_bytes, r,
-				   m_bytes_allocated);
+			m_bytes_allocated);
 		m_data = reinterpret_cast<std::uint8_t *>(
 			r); // NOLINT(cppcoreguidelines-pro-type-reinterpret
 	}

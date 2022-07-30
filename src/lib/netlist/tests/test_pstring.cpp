@@ -15,7 +15,7 @@
 PTEST(pstring, conversion)
 {
 	PEXPECT_EQ(putf8string("Общая ком"),
-			   putf8string(putf16string(putf8string("Общая ком"))));
+		putf8string(putf16string(putf8string("Общая ком"))));
 	PEXPECT_EQ(putf8string("Общая ком"),
-			   putf8string(putf16string("Общая ком")));
+		putf8string(putf16string("Общая ком")));
 }

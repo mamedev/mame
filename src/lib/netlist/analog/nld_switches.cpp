@@ -32,8 +32,8 @@ namespace netlist::analog {
 		NETLIB_RESETI() { m_R().set_R(R_OFF); }
 		NETLIB_UPDATE_PARAMI()
 		{
-			m_R().change_state([this]()
-							   { m_R().set_R(m_POS() ? R_ON : R_OFF); });
+			m_R().change_state(
+				[this]() { m_R().set_R(m_POS() ? R_ON : R_OFF); });
 		}
 
 	private:

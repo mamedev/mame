@@ -27,7 +27,7 @@ namespace netlist {
 	{
 	public:
 		analog_t(core_device_t &dev, const pstring &aname, state_e state,
-				 nl_delegate delegate);
+			nl_delegate delegate);
 
 		const analog_net_t &net() const noexcept
 		{
@@ -57,12 +57,12 @@ namespace netlist {
 		/// \param aname name of this terminal
 		/// \param other_terminal pointer to the sibling terminal
 		terminal_t(core_device_t &dev, const pstring &aname,
-				   terminal_t *other_terminal, nl_delegate delegate);
+			terminal_t *other_terminal, nl_delegate delegate);
 
 		terminal_t(core_device_t &dev, const pstring &aname,
-				   terminal_t                        *other_terminal,
-				   const std::array<terminal_t *, 2> &splitter_terms,
-				   nl_delegate                        delegate);
+			terminal_t                        *other_terminal,
+			const std::array<terminal_t *, 2> &splitter_terms,
+			nl_delegate                        delegate);
 
 		/// \brief Returns voltage of connected net
 		///
@@ -107,8 +107,8 @@ namespace netlist {
 	public:
 		/// \brief Constructor
 		analog_input_t(core_device_t &dev,     //!< owning device
-					   const pstring &aname,   //!< name of terminal
-					   nl_delegate    delegate //!< delegate
+			const pstring            &aname,   //!< name of terminal
+			nl_delegate               delegate //!< delegate
 		);
 
 		/// \brief returns voltage at terminal.
@@ -169,7 +169,7 @@ namespace netlist {
 	/// @param I Current flowing into terminal I
 	///
 	inline void terminal_t::set_gt_go_I(nl_fptype GT, nl_fptype GO,
-										nl_fptype I) const noexcept
+		nl_fptype I) const noexcept
 	{
 		// Check for rail nets ...
 		if (m_go != nullptr)

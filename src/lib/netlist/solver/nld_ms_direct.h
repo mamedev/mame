@@ -25,11 +25,9 @@ namespace netlist::solver {
 	public:
 		using float_type = FT;
 
-		matrix_solver_direct_t(devices::nld_solver               &main_solver,
-							   const pstring                     &name,
-							   const matrix_solver_t::net_list_t &nets,
-							   const solver::solver_parameters_t *params,
-							   std::size_t                        size);
+		matrix_solver_direct_t(devices::nld_solver &main_solver,
+			const pstring &name, const matrix_solver_t::net_list_t &nets,
+			const solver::solver_parameters_t *params, std::size_t size);
 
 		void reset() override { matrix_solver_t::reset(); }
 
@@ -37,10 +35,10 @@ namespace netlist::solver {
 		const std::size_t m_pitch;
 
 	protected:
-		static constexpr const std::size_t SIZEABS = plib::parray<
-			FT, SIZE>::SIZEABS();
+		static constexpr const std::size_t SIZEABS = plib::parray<FT,
+			SIZE>::SIZEABS();
 		static constexpr const std::size_t m_pitch_ABS = (((SIZEABS + 0) + 7)
-														  / 8)
+															 / 8)
 														 * 8;
 
 		void upstream_solve_non_dynamic() override;

@@ -98,8 +98,8 @@ namespace netlist {
 	class source_token_t : public source_netlist_t
 	{
 	public:
-		source_token_t(const pstring                 &name,
-					   const parser_t::token_store_t &store)
+		source_token_t(const pstring      &name,
+			const parser_t::token_store_t &store)
 			: m_store(store)
 			, m_name(name)
 		{

@@ -31,13 +31,11 @@ namespace netlist::solver {
 		using base_type = matrix_solver_ext_t<FT, SIZE>;
 		using fptype = typename base_type::fptype;
 
-		matrix_solver_GCR_t(devices::nld_solver               &main_solver,
-							const pstring                     &name,
-							const matrix_solver_t::net_list_t &nets,
-							const solver::solver_parameters_t *params,
-							const std::size_t                  size)
+		matrix_solver_GCR_t(devices::nld_solver &main_solver,
+			const pstring &name, const matrix_solver_t::net_list_t &nets,
+			const solver::solver_parameters_t *params, const std::size_t size)
 			: matrix_solver_ext_t<FT, SIZE>(main_solver, name, nets, params,
-											size)
+				size)
 			, mat(this->m_arena,
 				  static_cast<typename mat_type::index_type>(size))
 			, m_proc()
@@ -92,8 +90,8 @@ namespace netlist::solver {
 				"Post elimination occupancy ratio: {2} Ops: {1}", gr.second,
 				static_cast<fptype>(mat.nz_num) / static_cast<fptype>(iN * iN));
 			this->state().log().verbose(" Pre elimination occupancy ratio: {1}",
-										static_cast<fptype>(raw_elements)
-											/ static_cast<fptype>(iN * iN));
+				static_cast<fptype>(raw_elements)
+					/ static_cast<fptype>(iN * iN));
 
 			// FIXME: Move me
 			//
@@ -122,11 +120,11 @@ namespace netlist::solver {
 
 	private:
 		using mat_index_type = typename plib::pmatrix_cr<arena_type, FT,
-														 SIZE>::index_type;
+			SIZE>::index_type;
 
 		template <typename T>
 		void stream_if_not_yet_done(plib::putf8_fmt_writer &strm, T &A,
-									std::size_t i)
+			std::size_t i)
 		{
 			const pstring fptype(fp_constants<FT>::name());
 			if (!A[i].empty())
@@ -140,7 +138,7 @@ namespace netlist::solver {
 
 		mat_type mat;
 		plib::dynamic_library::function<void, FT *, fptype *, fptype *,
-										fptype *, fptype **>
+			fptype *, fptype **>
 			m_proc;
 	};
 
@@ -174,22 +172,22 @@ namespace netlist::solver {
 
 			//# auto gtot_t = std::accumulate(gt, gt + term_count, plib::constants<FT>::zero());
 			//# *tcr_r[railstart] = static_cast<FT>(gtot_t); //mat.A[mat.diag[k]] += gtot_t;
-			std::size_t pd = std::size_t(this->m_mat_ptr[k][net.rail_start()]
-										 - &this->mat.A[0]);
+			std::size_t pd = std::size_t(
+				this->m_mat_ptr[k][net.rail_start()] - &this->mat.A[0]);
 
 #if COMPRESSED
 			// pstring terms = plib::pfmt("m_A{1} = gt[{2}]")(pd,
 			// this->m_gtn.data_index(k,0));
-			pstring terms = plib::pfmt("gt[{2}]")(pd,
-												  this->m_gtn.data_index(k, 0));
+			pstring terms = plib::pfmt(
+				"gt[{2}]")(pd, this->m_gtn.data_index(k, 0));
 			for (std::size_t i = 1; i < net.count(); i++)
 				terms += plib::pfmt(" + gt[{1}]")(this->m_gtn.data_index(k, i));
 
 			A[pd] = terms; // strm("\t{1};\n", terms);
 			// auto RHS_t(std::accumulate(Idr, Idr + term_count,
 			// plib::constants<FT>::zero()));
-			terms = plib::pfmt("{1} RHS{2} = Idr[{3}]")(
-				fptype, k, this->m_Idrn.data_index(k, 0));
+			terms = plib::pfmt("{1} RHS{2} = Idr[{3}]")(fptype, k,
+				this->m_Idrn.data_index(k, 0));
 			for (std::size_t i = 1; i < net.count(); i++)
 				terms += plib::pfmt(" + Idr[{1}]")(
 					this->m_Idrn.data_index(k, i));
@@ -197,37 +195,37 @@ namespace netlist::solver {
 			//   RHS_t +=  (- go[i]) * *cnV[i];
 
 			for (std::size_t i = net.rail_start(); i < net.count(); i++)
-				terms += plib::pfmt(" - go[{1}] * *cnV[{2}]")(
-					this->m_gonn.data_index(k, i),
+				terms += plib::pfmt(
+					" - go[{1}] * *cnV[{2}]")(this->m_gonn.data_index(k, i),
 					this->m_connected_net_Vn.data_index(k, i));
 
 			strm("\t{1};\n", terms);
 #else
 			for (std::size_t i = 0; i < net.count(); i++)
 				strm("\tm_A{1} += gt[{2}];\n", pd,
-					 this->m_gtn.data_index(k, i));
+					this->m_gtn.data_index(k, i));
 			// for (std::size_t i = 0; i < rail_start; i++)
 			//   *tcr_r[i]       += static_cast<FT>(go[i]);
 			for (std::size_t i = 0; i < net.rail_start(); i++)
 			{
 				auto p = this->m_mat_ptr[k][i] - &this->mat.A[0];
 				strm("\tm_A{1} += go[{2}];\n", p,
-					 this->m_gonn.data_index(k, i));
+					this->m_gonn.data_index(k, i));
 			}
 			// auto RHS_t(std::accumulate(Idr, Idr + term_count,
 			// plib::constants<FT>::zero()));
 			strm("\t{1} RHS{2} = Idr[{3}];\n", fptype, k,
-				 this->m_Idrn.data_index(k, 0));
+				this->m_Idrn.data_index(k, 0));
 			for (std::size_t i = 1; i < net.count(); i++)
 				strm("\tRHS{1} += Idr[{2}];\n", k,
-					 this->m_Idrn.data_index(k, i));
+					this->m_Idrn.data_index(k, i));
 			// for (std::size_t i = rail_start; i < term_count; i++)
 			//   RHS_t +=  (- go[i]) * *cnV[i];
 
 			for (std::size_t i = net.rail_start(); i < net.count(); i++)
 				strm("\tRHS{1} -= go[{2}] * *cnV[{3}];\n", k,
-					 this->m_gonn.data_index(k, i),
-					 this->m_connected_net_Vn.data_index(k, i));
+					this->m_gonn.data_index(k, i),
+					this->m_connected_net_Vn.data_index(k, i));
 
 #endif
 		}
@@ -237,8 +235,8 @@ namespace netlist::solver {
 			auto &net = this->m_terms[k];
 			for (std::size_t i = 0; i < net.rail_start(); i++)
 			{
-				std::size_t p = std::size_t(this->m_mat_ptr[k][i]
-											- &this->mat.A[0]);
+				std::size_t p = std::size_t(
+					this->m_mat_ptr[k][i] - &this->mat.A[0]);
 				if (!A[p].empty())
 					A[p] += " + ";
 				A[p] += plib::pfmt("go[{1}]")(this->m_gonn.data_index(k, i));
@@ -268,7 +266,7 @@ namespace netlist::solver {
 				{
 					stream_if_not_yet_done(strm, A, pi);
 					strm("\tconst {1} f{2} = 1.0{3} / m_A{4};\n", fptype, i,
-						 fp_suffix, pi);
+						fp_suffix, pi);
 				}
 				pi++;
 				const std::size_t pi_end = mat.row_idx[i + 1];
@@ -290,10 +288,10 @@ namespace netlist::solver {
 					if ((!COMPRESSED) || nzbd_count > 1) // keep code comparable
 														 // to previous versions
 						strm("\tconst {1} f{2}_{3} = -f{4} * m_A{5};\n", fptype,
-							 i, j, i, pj);
+							i, j, i, pj);
 					else
 						strm("\tconst {1} f{2}_{3} = - m_A{4} / m_A{5};\n",
-							 fptype, i, j, pj, pi - 1);
+							fptype, i, j, pj, pi - 1);
 					pj++;
 
 					// subtract row i from j
@@ -319,7 +317,7 @@ namespace netlist::solver {
 		//#new_V[iN - 1] = RHS[iN - 1] / mat.A[mat.diag[iN - 1]];
 		stream_if_not_yet_done(strm, A, mat.diagonal[iN - 1]);
 		strm("\tV[{1}] = RHS{2} / m_A{3};\n", iN - 1, iN - 1,
-			 mat.diagonal[iN - 1]);
+			mat.diagonal[iN - 1]);
 		for (std::size_t j = iN - 1; j-- > 0;)
 		{
 #if COMPRESSED
@@ -329,8 +327,8 @@ namespace netlist::solver {
 			{
 				stream_if_not_yet_done(strm, A, pk);
 				tmp = tmp
-					  + plib::pfmt(" + m_A{2} * V[{3}]")(j, pk,
-														 mat.col_idx[pk]);
+					  + plib::pfmt(
+						  " + m_A{2} * V[{3}]")(j, pk, mat.col_idx[pk]);
 			}
 
 			stream_if_not_yet_done(strm, A, mat.diagonal[j]);
@@ -344,7 +342,7 @@ namespace netlist::solver {
 				// tmp.substr(3)); strm("\tV[{1}] = (RHS{1} - tmp{1}) /
 				// m_A{2};\n", j, mat.diagonal[j]);
 				strm("\tV[{1}] = (RHS{1} - ({2})) / m_A{3};\n", j,
-					 tmp.substr(3), mat.diagonal[j]);
+					tmp.substr(3), mat.diagonal[j]);
 			}
 #else
 			strm("\t{1} tmp{2} = 0.0{3};\n", fptype, j, fp_suffix);
@@ -354,7 +352,7 @@ namespace netlist::solver {
 				strm("\ttmp{1} += m_A{2} * V[{3}];\n", j, pk, mat.col_idx[pk]);
 			}
 			strm("\tV[{1}] = (RHS{1} - tmp{1}) / m_A{4};\n", j, j, j,
-				 mat.diagonal[j]);
+				mat.diagonal[j]);
 #endif
 		}
 	}
@@ -372,7 +370,7 @@ namespace netlist::solver {
 		//#std::hash<typename std::remove_const<std::remove_reference<decltype(t.str())>::type>::type> h;
 		return plib::pfmt("nl_gcr_{1}_{2}_{3}_{4:x}")(mat.nz_num)(
 			str_fptype)(str_floattype)(plib::hash<uint64_t>(t.str().c_str(),
-															t.str().size()));
+			t.str().size()));
 	}
 
 	template <typename FT, int SIZE>
@@ -410,7 +408,7 @@ namespace netlist::solver {
 		if (m_proc.resolved())
 		{
 			m_proc(&this->m_new_V[0], this->m_gonn.data(), this->m_gtn.data(),
-				   this->m_Idrn.data(), this->m_connected_net_Vn.data());
+				this->m_Idrn.data(), this->m_connected_net_Vn.data());
 		}
 		else
 		{

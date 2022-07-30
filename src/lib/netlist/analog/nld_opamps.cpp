@@ -169,9 +169,9 @@ namespace netlist::analog {
 			{
 
 				create_and_register_sub_device(*this, "DN", m_DN,
-											   "D(IS=1e-15 N=1)");
+					"D(IS=1e-15 N=1)");
 				create_and_register_sub_device(*this, "DP", m_DP,
-											   "D(IS=1e-15 N=1)");
+					"D(IS=1e-15 N=1)");
 
 				connect("DP.K", "VH");
 				connect("VL", "DN.A");
@@ -191,8 +191,8 @@ namespace netlist::analog {
 			const nl_fptype cVt = nlconst::np_VT(nlconst::one()); // * m_n;
 			const nl_fptype cId = m_modacc.m_DAB;                 // 3 mA
 			const nl_fptype cVd = cVt
-								  * plib::log(cId / nlconst::np_Is()
-											  + nlconst::one());
+								  * plib::log(
+									  cId / nlconst::np_Is() + nlconst::one());
 
 			m_VH.push(m_VCC() - m_modacc.m_VLH - cVd);
 			m_VL.push(m_GND() + m_modacc.m_VLL + cVd);

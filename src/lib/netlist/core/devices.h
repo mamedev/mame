@@ -66,9 +66,9 @@ namespace netlist::devices {
 
 		explicit nld_power_pins(device_t &owner)
 			: m_VCC(owner, owner.logic_family()->vcc_pin(),
-					NETLIB_DELEGATE(noop))
+				NETLIB_DELEGATE(noop))
 			, m_GND(owner, owner.logic_family()->gnd_pin(),
-					NETLIB_DELEGATE(noop))
+				  NETLIB_DELEGATE(noop))
 		{
 		}
 
@@ -80,7 +80,7 @@ namespace netlist::devices {
 
 		// Some devices like the 74LS629 have two pairs of supply pins.
 		explicit nld_power_pins(device_t &owner, const pstring &vcc,
-								const pstring &gnd)
+			const pstring &gnd)
 			: m_VCC(owner, vcc, NETLIB_DELEGATE(noop))
 			, m_GND(owner, gnd, NETLIB_DELEGATE(noop))
 		{
@@ -88,7 +88,7 @@ namespace netlist::devices {
 
 		// Some devices like the 74LS629 have two pairs of supply pins.
 		explicit nld_power_pins(device_t &owner, const pstring &vcc,
-								const pstring &gnd, nl_delegate delegate)
+			const pstring &gnd, nl_delegate delegate)
 			: m_VCC(owner, vcc, delegate)
 			, m_GND(owner, gnd, delegate)
 		{

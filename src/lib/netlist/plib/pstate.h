@@ -56,9 +56,8 @@ namespace plib {
 		static datatype_t datatype()
 		{
 			return datatype_t(sizeof(T),
-							  plib::is_integral<T>::value
-								  || std::is_enum<T>::value,
-							  plib::is_floating_point<T>::value);
+				plib::is_integral<T>::value || std::is_enum<T>::value,
+				plib::is_floating_point<T>::value);
 		}
 
 		struct callback_t
@@ -83,7 +82,7 @@ namespace plib {
 			using list_t = std::vector<entry_t>;
 
 			entry_t(const pstring &item_name, const datatype_t &dt,
-					const void *owner, const std::size_t count, void *ptr)
+				const void *owner, const std::size_t count, void *ptr)
 				: m_name(item_name)
 				, m_dt(dt)
 				, m_owner(owner)
@@ -94,7 +93,7 @@ namespace plib {
 			}
 
 			entry_t(const pstring &item_name, const void *owner,
-					callback_t *callback)
+				callback_t *callback)
 				: m_name(item_name)
 				, m_dt(datatype_t(true))
 				, m_owner(owner)
@@ -125,7 +124,7 @@ namespace plib {
 		struct saver_t
 		{
 			saver_t(state_manager_t &sm, const void *owner,
-					const pstring &member_name)
+				const pstring &member_name)
 				: m_sm(sm)
 				, m_owner(owner)
 				, m_member_name(member_name)
@@ -136,7 +135,7 @@ namespace plib {
 			void save_item(XS &some_state, const pstring &item_name)
 			{
 				m_sm.save_item(m_owner, some_state,
-							   m_member_name + "." + item_name);
+					m_member_name + "." + item_name);
 			}
 
 			state_manager_t &m_sm;
@@ -151,8 +150,7 @@ namespace plib {
 		}
 
 		template <typename C, std::size_t N>
-		void save_item(
-			const void *owner, C (&state)[N],
+		void save_item(const void *owner, C (&state)[N],
 			const pstring &
 				item_name) // NOLINT(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
 		{
@@ -161,28 +159,27 @@ namespace plib {
 
 		template <typename C>
 		void save_item(const void *owner, C *state, const pstring &item_name,
-					   const std::size_t count)
+			const std::size_t count)
 		{
 			save_state_ptr(owner, item_name, datatype<C>(), count, state);
 		}
 
 		template <typename C, typename A>
 		void save_item(const void *owner, std::vector<C, A> &v,
-					   const pstring &item_name)
+			const pstring &item_name)
 		{
 			save_state_ptr(owner, item_name, datatype<C>(), v.size(), v.data());
 		}
 
 		template <typename C, std::size_t N>
 		void save_item(const void *owner, std::array<C, N> &a,
-					   const pstring &item_name)
+			const pstring &item_name)
 		{
 			save_state_ptr(owner, item_name, datatype<C>(), N, a.data());
 		}
 
-		void
-		save_state_ptr(const void *owner, const pstring &item_name,
-					   const datatype_t &dt, const std::size_t count, void *ptr)
+		void save_state_ptr(const void *owner, const pstring &item_name,
+			const datatype_t &dt, const std::size_t count, void *ptr)
 		{
 			m_save.emplace_back(item_name, dt, owner, count, ptr);
 		}
@@ -231,7 +228,7 @@ namespace plib {
 		std::enable_if_t<plib::is_integral<C>::value || std::is_enum<C>::value
 						 || plib::is_floating_point<C>::value>
 		save_item_dispatch(const void *owner, C &state,
-						   const pstring &item_name)
+			const pstring &item_name)
 		{
 			save_state_ptr(owner, item_name, datatype<C>(), 1, &state);
 		}
@@ -240,7 +237,7 @@ namespace plib {
 		std::enable_if_t<!(plib::is_integral<C>::value || std::is_enum<C>::value
 						   || plib::is_floating_point<C>::value)>
 		save_item_dispatch(const void *owner, C &state,
-						   const pstring &item_name)
+			const pstring &item_name)
 		{
 			saver_t sav(*this, owner, item_name);
 			state.save_state(sav);
@@ -252,7 +249,7 @@ namespace plib {
 
 	template <>
 	inline void state_manager_t::save_item(const void *owner, callback_t &state,
-										   const pstring &item_name)
+		const pstring &item_name)
 	{
 		m_custom.emplace_back(item_name, owner, &state);
 		state.register_state(*this, item_name);

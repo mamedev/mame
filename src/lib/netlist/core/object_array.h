@@ -29,11 +29,11 @@ namespace netlist {
 		// object_array_base_t(D &dev, const std::initializer_list<const char *>
 		// &names, Args&&... args)
 		object_array_base_t(D &dev, std::array<const char *, N> &&names,
-							Args &&...args)
+			Args &&...args)
 		{
 			for (std::size_t i = 0; i < N; i++)
 				this->emplace_back(dev, pstring(names[i]),
-								   std::forward<Args>(args)...);
+					std::forward<Args>(args)...);
 		}
 
 		template <class D>
@@ -45,16 +45,16 @@ namespace netlist {
 
 		template <class D, typename... Args>
 		object_array_base_t(D &dev, std::size_t offset, const pstring &fmt,
-							Args &&...args)
+			Args &&...args)
 		{
 			for (std::size_t i = 0; i < N; i++)
 				this->emplace_back(dev, formatted(fmt, i + offset),
-								   std::forward<Args>(args)...);
+					std::forward<Args>(args)...);
 		}
 
 		template <class D>
 		object_array_base_t(D &dev, std::size_t offset, const pstring &fmt,
-							nl_delegate delegate)
+			nl_delegate delegate)
 		{
 			for (std::size_t i = 0; i < N; i++)
 				this->emplace_back(dev, formatted(fmt, i + offset), delegate);
@@ -62,7 +62,7 @@ namespace netlist {
 
 		template <class D>
 		object_array_base_t(D &dev, std::size_t offset, std::size_t output_mask,
-							const pstring &fmt)
+			const pstring &fmt)
 		{
 			for (std::size_t i = 0; i < N; i++)
 			{
@@ -102,8 +102,7 @@ namespace netlist {
 
 		template <class D, std::size_t ND>
 		object_array_t(D &dev, std::size_t offset, std::size_t output_mask,
-					   const pstring                &fmt,
-					   std::array<nl_delegate, ND> &&delegates)
+			const pstring &fmt, std::array<nl_delegate, ND> &&delegates)
 		{
 			static_assert(N <= ND, "initializer_list size mismatch");
 			std::size_t i = 0;
@@ -223,7 +222,7 @@ namespace netlist {
 		}
 
 		void set_tristate(netlist_sig_t v, netlist_time ts_off_on,
-						  netlist_time ts_on_off) noexcept
+			netlist_time ts_on_off) noexcept
 		{
 			for (std::size_t i = 0; i < N; i++)
 				(*this)[i].set_tristate(v, ts_off_on, ts_on_off);
@@ -262,7 +261,7 @@ namespace netlist {
 		}
 
 		void set_tristate(netlist_sig_t v, netlist_time ts_off_on,
-						  netlist_time ts_on_off) noexcept
+			netlist_time ts_on_off) noexcept
 		{
 			for (std::size_t i = 0; i < N; i++)
 				(*this)[i].set_tristate(v, ts_off_on, ts_on_off);

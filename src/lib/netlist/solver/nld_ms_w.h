@@ -66,11 +66,10 @@ namespace netlist::solver {
 		static constexpr const std::size_t storage_N = 100;
 
 		matrix_solver_w_t(devices::nld_solver &main_solver, const pstring &name,
-						  const matrix_solver_t::net_list_t &nets,
-						  const solver_parameters_t         *params,
-						  const std::size_t                  size)
+			const matrix_solver_t::net_list_t &nets,
+			const solver_parameters_t *params, const std::size_t size)
 			: matrix_solver_ext_t<FT, SIZE>(main_solver, name, nets, params,
-											size)
+				size)
 			, m_cnt(0)
 		{
 			this->build_mat_ptr(m_A);
@@ -313,8 +312,8 @@ namespace netlist::solver {
 							float_type       *pj = &H[j][i + 1];
 							const float_type *pi = &H[i][i + 1];
 							for (unsigned k = 0; k < row_count - i - 1; k++)
+								// H[j][k] += f1 * H[i][k];
 								pj[k] += f1 * pi[k];
-							// H[j][k] += f1 * H[i][k];
 							w[j] += f1 * w[i];
 						}
 					}
@@ -327,8 +326,8 @@ namespace netlist::solver {
 					const float_type *pj = &H[j][j + 1];
 					const float_type *tj = &t[j + 1];
 					for (unsigned k = 0; k < row_count - j - 1; k++)
+						// tmp += H[j][k] * t[k];
 						tmp += pj[k] * tj[k];
-					// tmp += H[j][k] * t[k];
 					t[j] = (w[j] - tmp) / H[j][j];
 				}
 
@@ -357,8 +356,7 @@ namespace netlist::solver {
 				}
 				if (plib::abs(tmp - RHS(i)) > static_cast<float_type>(1e-6))
 					plib::perrlogger("{} failed on row {}: {} RHS: {}\n",
-									 this->name(), i, plib::abs(tmp - RHS(i)),
-									 RHS(i));
+						this->name(), i, plib::abs(tmp - RHS(i)), RHS(i));
 			}
 	}
 

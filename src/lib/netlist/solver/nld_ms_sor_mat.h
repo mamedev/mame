@@ -29,15 +29,13 @@ namespace netlist::solver {
 	public:
 		using float_type = FT;
 
-		matrix_solver_SOR_mat_t(devices::nld_solver               &main_solver,
-								const pstring                     &name,
-								const matrix_solver_t::net_list_t &nets,
-								const solver_parameters_t         *params,
-								std::size_t                        size)
+		matrix_solver_SOR_mat_t(devices::nld_solver &main_solver,
+			const pstring &name, const matrix_solver_t::net_list_t &nets,
+			const solver_parameters_t *params, std::size_t size)
 			: matrix_solver_direct_t<FT, SIZE>(main_solver, name, nets, params,
-											   size)
+				size)
 			, m_omega(*this, "m_omega",
-					  static_cast<float_type>(params->m_gs_sor))
+				  static_cast<float_type>(params->m_gs_sor))
 		{
 		}
 

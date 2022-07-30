@@ -34,8 +34,8 @@ namespace plib {
 	/// so that it can be used with the C++11 random environment
 	///
 	template <typename T, std::size_t w, std::size_t N, std::size_t m,
-			  std::size_t r, T a, std::size_t u, T d, std::size_t s, T b,
-			  std::size_t t, T c, std::size_t l, T f>
+		std::size_t r, T a, std::size_t u, T d, std::size_t s, T b,
+		std::size_t t, T c, std::size_t l, T f>
 	class mersenne_twister_t
 	{
 	public:
@@ -108,8 +108,8 @@ namespace plib {
 
 			for (std::size_t i = 0; i < N; i++)
 			{
-				const T x((m_mt[i] & upper_mask)
-						  + (m_mt[(i + 1) % N] & lower_mask));
+				const T x(
+					(m_mt[i] & upper_mask) + (m_mt[(i + 1) % N] & lower_mask));
 				const T xA((x >> 1) ^ ((x & 1) ? a : 0));
 				m_mt[i] = m_mt[(i + m) % N] ^ xA;
 			}
@@ -122,7 +122,7 @@ namespace plib {
 
 	template <typename FT, typename T>
 	FT normalize_uniform(T &p, FT m = constants<FT>::one(),
-						 FT b = constants<FT>::zero()) noexcept
+		FT b = constants<FT>::zero()) noexcept
 	{
 		constexpr const FT mmin(narrow_cast<FT>(T::min()));
 		constexpr const FT mmax(narrow_cast<FT>(T::max()));
@@ -144,7 +144,7 @@ namespace plib {
 		{
 			// get -1 to 1
 			return normalize_uniform(p, constants<FT>::two(),
-									 constants<FT>::one())
+					   constants<FT>::one())
 				   * constants<FT>::sqrt3() * m_stddev;
 		}
 
@@ -197,9 +197,9 @@ namespace plib {
 				do
 				{
 					v1 = normalize_uniform(p, constants<FT>::two(),
-										   constants<FT>::one()); // [-1..1[
+						constants<FT>::one()); // [-1..1[
 					v2 = normalize_uniform(p, constants<FT>::two(),
-										   constants<FT>::one()); // [-1..1[
+						constants<FT>::one()); // [-1..1[
 					s = v1 * v1 + v2 * v2;
 				} while (s >= constants<FT>::one());
 				if (s == constants<FT>::zero())
@@ -229,10 +229,10 @@ namespace plib {
 		FT                  m_stddev;
 	};
 
-	using mt19937_64 = mersenne_twister_t<
-		uint_fast64_t, 64, 312, 156, 31, 0xb5026f5aa96619e9ULL, 29,
-		0x5555555555555555ULL, 17, 0x71d67fffeda60000ULL, 37,
-		0xfff7eee000000000ULL, 43, 6364136223846793005ULL>;
+	using mt19937_64 = mersenne_twister_t<uint_fast64_t, 64, 312, 156, 31,
+		0xb5026f5aa96619e9ULL, 29, 0x5555555555555555ULL, 17,
+		0x71d67fffeda60000ULL, 37, 0xfff7eee000000000ULL, 43,
+		6364136223846793005ULL>;
 
 } // namespace plib
 

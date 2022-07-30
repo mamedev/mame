@@ -107,8 +107,8 @@ namespace plib {
 
 		/// \brief Constructor with compile
 		///
-		pfunction(const pstring          &expr,
-				  const inputs_container &inputs = inputs_container())
+		pfunction(const pstring    &expr,
+			const inputs_container &inputs = inputs_container())
 			: m_lfsr(0xace1U) // NOLINT
 		{
 			compile(expr, inputs);
@@ -139,18 +139,18 @@ namespace plib {
 		/// \param expr Reverse polish notation expression, e.g. "A B + 1.3 /"
 		/// \param inputs Vector of input variables, e.g. {"A","B"}
 		///
-		void compile_postfix(const pstring          &expr,
-							 const inputs_container &inputs
-							 = inputs_container()) noexcept(false);
+		void compile_postfix(const pstring &expr,
+			const inputs_container         &inputs
+			= inputs_container()) noexcept(false);
 
 		/// \brief Compile an infix expression
 		///
 		/// \param expr Infix expression, e.g. "(A+B)/1.3"
 		/// \param inputs Vector of input variables, e.g. {"A","B"}
 		///
-		void compile_infix(const pstring          &expr,
-						   const inputs_container &inputs
-						   = inputs_container()) noexcept(false);
+		void compile_infix(const pstring &expr,
+			const inputs_container       &inputs
+			= inputs_container()) noexcept(false);
 
 		/// \brief Evaluate the expression
 		///
@@ -168,9 +168,8 @@ namespace plib {
 
 	private:
 		void compress();
-		void
-		compile_postfix(const inputs_container     &inputs,
-						const std::vector<pstring> &cmds, const pstring &expr);
+		void compile_postfix(const inputs_container &inputs,
+			const std::vector<pstring> &cmds, const pstring &expr);
 
 		std::vector<rpn_inst> m_precompiled; //!< precompiled expression
 

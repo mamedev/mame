@@ -100,7 +100,7 @@
 
 #define TRUTH_TABLE(cname, in, out, params)                                    \
 	void NETLIST_NAME(cname##_impl)(netlist::nlparse_t & setup,                \
-									netlist::tt_desc & desc);                  \
+		netlist::tt_desc & desc);                                              \
 	static void NETLIST_NAME(cname)(netlist::nlparse_t & setup)                \
 	{                                                                          \
 		netlist::tt_desc desc{#cname, in, out, "", {}};                        \
@@ -171,23 +171,23 @@ namespace netlist {
 		/// \param alias the alias to be qualified
 		/// \param points_to the pin aliased
 		void register_alias(detail::alias_type type, const pstring &alias,
-							const pstring &points_to);
+			const pstring &points_to);
 
 		/// \brief Register an aliases where alias and references are fully qualified names
 		/// \param type the alias type see \ref alias_type
 		/// \param alias the alias to be qualified
 		/// \param points_to the pin aliased
 		void register_fqn_alias(detail::alias_type type, const pstring &alias,
-								const pstring &points_to);
+			const pstring &points_to);
 
 		void register_dip_alias_arr(const pstring &terms);
 
 		// last argument only needed by nltool
 		void register_dev(const pstring &classname, const pstring &name,
-						  const std::vector<pstring> &params_and_connections,
-						  factory::element_t **factory_element = nullptr);
-		void register_dev(const pstring                      &classname,
-						  std::initializer_list<const char *> more_parameters);
+			const std::vector<pstring> &params_and_connections,
+			factory::element_t        **factory_element = nullptr);
+		void register_dev(const pstring        &classname,
+			std::initializer_list<const char *> more_parameters);
 		void register_dev(const pstring &classname, const pstring &name)
 		{
 			register_dev(classname, name, std::vector<pstring>());
@@ -215,10 +215,10 @@ namespace netlist {
 		}
 
 		void register_lib_entry(const pstring &name, const pstring &def_params,
-								plib::source_location &&loc);
+			plib::source_location &&loc);
 
 		void register_frontier(const pstring &attach, const pstring &r_IN,
-							   const pstring &r_OUT);
+			const pstring &r_OUT);
 
 		// register a source
 		template <typename S, typename... Args>
@@ -230,7 +230,7 @@ namespace netlist {
 		void register_source_proc(const pstring &name, nlsetup_func func);
 
 		void truth_table_create(tt_desc &desc, const pstring &def_params,
-								plib::source_location &&loc);
+			plib::source_location &&loc);
 
 		// include other files
 
@@ -244,7 +244,7 @@ namespace netlist {
 		// FIXME: used by source_t - need a different approach at some time
 		bool parse_stream(plib::istream_uptr &&in_stream, const pstring &name);
 		bool parse_tokens(const plib::detail::token_store_t &tokens,
-						  const pstring                     &name);
+			const pstring                                   &name);
 
 		template <typename S, typename... Args>
 		void add_include(Args &&...args)

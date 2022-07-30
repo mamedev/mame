@@ -83,10 +83,9 @@ namespace plib {
 		template <typename T, typename O>
 		constexpr T narrow_cast(O &&v) noexcept
 		{
-			static_assert(
-				plib::is_arithmetic<T>::value
-					&& std::is_convertible<std::remove_reference_t<O>,
-										   T>::value,
+			static_assert(plib::is_arithmetic<T>::value
+							  && std::is_convertible<std::remove_reference_t<O>,
+								  T>::value,
 				"narrow cast expects conversion between arithmetic types");
 			return static_cast<T>(std::forward<O>(v));
 		}
@@ -101,10 +100,9 @@ namespace plib {
 		template <typename T, typename O>
 		inline T narrow(O &&v) noexcept
 		{
-			static_assert(
-				plib::is_arithmetic<T>::value
-					&& std::is_convertible<std::remove_reference_t<O>,
-										   T>::value,
+			static_assert(plib::is_arithmetic<T>::value
+							  && std::is_convertible<std::remove_reference_t<O>,
+								  T>::value,
 				"narrow cast expects conversion between arithmetic types");
 
 			const auto val = static_cast<T>(std::forward<O>(v));

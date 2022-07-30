@@ -21,8 +21,7 @@
 		LIB_DECL(decl_##nic)                                                   \
 	}
 
-namespace netlist::devices
-{
+namespace netlist::devices {
 
 	void initialize_factory(factory::list_t &factory)
 	{

@@ -15,7 +15,7 @@ namespace plib {
 	// ----------------------------------------------------------------------------------------
 
 	ppreprocessor::ppreprocessor(psource_collection_t &sources,
-								 defines_map_type     *defines)
+		defines_map_type                              *defines)
 		: m_sources(sources)
 		, m_if_flag(0)
 		, m_if_seen(0)
@@ -56,15 +56,15 @@ namespace plib {
 		pstring s("");
 		pstring trail("                 from ");
 		pstring trail_first("In file included from ");
-		pstring e = plib::pfmt("{1}:{2}:0: error: {3}\n")(
-			m_stack.back().m_name, m_stack.back().m_lineno, err);
+		pstring e = plib::pfmt("{1}:{2}:0: error: {3}\n")(m_stack.back().m_name,
+			m_stack.back().m_lineno, err);
 		m_stack.pop_back();
 		while (!m_stack.empty())
 		{
 			if (m_stack.size() == 1)
 				trail = trail_first;
 			s = plib::pfmt("{1}{2}:{3}:0\n{4}")(trail, m_stack.back().m_name,
-												m_stack.back().m_lineno, s);
+				m_stack.back().m_lineno, s);
 			m_stack.pop_back();
 		}
 		throw pexception("\n" + s + e + " " + m_line + "\n");
@@ -226,9 +226,8 @@ namespace plib {
 		return (idx != m_defines.end()) ? &idx->second : nullptr;
 	}
 
-	ppreprocessor::string_list
-	ppreprocessor::tokenize(const pstring &str, const string_list &sep,
-							bool remove_ws, bool concat)
+	ppreprocessor::string_list ppreprocessor::tokenize(const pstring &str,
+		const string_list &sep, bool remove_ws, bool concat)
 	{
 		const pstring STR = "\"";
 		string_list   tmp_ret;
@@ -316,8 +315,8 @@ namespace plib {
 		do
 		{
 			repeat = false;
-			simple_iter<ppreprocessor> elements(
-				this, tokenize(resolved_str, m_expr_sep, false, true));
+			simple_iter<ppreprocessor> elements(this,
+				tokenize(resolved_str, m_expr_sep, false, true));
 			resolved_str = "";
 			while (!elements.eod())
 			{
@@ -363,10 +362,9 @@ namespace plib {
 					if (def->m_params.size() != rep.size())
 						error(pfmt("Expected {1} parameters, got {2}")(
 							def->m_params.size(), rep.size()));
-					simple_iter<ppreprocessor> r(
-						this,
+					simple_iter<ppreprocessor> r(this,
 						tokenize(def->m_replace, m_expr_sep, false, false));
-					bool stringify_next = false;
+					bool                       stringify_next = false;
 					while (!r.eod())
 					{
 						token = r.next();
@@ -405,7 +403,7 @@ namespace plib {
 	}
 
 	static pstring cat_remainder(const std::vector<pstring> &elems,
-								 std::size_t start, const pstring &sep)
+		std::size_t start, const pstring &sep)
 	{
 		pstring ret("");
 		for (std::size_t i = start; i < elems.size(); i++)
@@ -543,8 +541,8 @@ namespace plib {
 				if (m_if_flag == 0)
 				{
 					lt = resolve_macros(lt);
-					simple_iter<ppreprocessor> t(
-						this, tokenize(lt.substr(3), m_expr_sep, true, true));
+					simple_iter<ppreprocessor> t(this,
+						tokenize(lt.substr(3), m_expr_sep, true, true));
 					auto val = narrow_cast<int>(expression(t, 255));
 					t.skip_ws();
 					if (!t.eod())
@@ -599,8 +597,8 @@ namespace plib {
 				{
 					// m_if_flag ^= (1 << m_if_level);
 					lt = resolve_macros(lt);
-					simple_iter<ppreprocessor> t(
-						this, tokenize(lt.substr(5), m_expr_sep, true, true));
+					simple_iter<ppreprocessor> t(this,
+						tokenize(lt.substr(5), m_expr_sep, true, true));
 					auto val = narrow_cast<int>(expression(t, 255));
 					t.skip_ws();
 					if (!t.eod())
@@ -641,7 +639,7 @@ namespace plib {
 						{
 							m_stack.emplace_back(
 								input_context(include_stream.release_stream(),
-											  plib::util::path(l), l));
+									plib::util::path(l), l));
 						}
 						else
 						{
@@ -650,7 +648,7 @@ namespace plib {
 							{
 								m_stack.emplace_back(
 									input_context(strm.release_stream(),
-												  plib::util::path(arg), arg));
+										plib::util::path(arg), arg));
 							}
 							else
 								error("include not found:" + arg);
@@ -677,9 +675,9 @@ namespace plib {
 				{
 					if (lti.size() < 2)
 						error("define needs at least one argument");
-					simple_iter<ppreprocessor> args(
-						this, tokenize(lt.substr(8), m_expr_sep, false, false));
-					pstring n = args.next();
+					simple_iter<ppreprocessor> args(this,
+						tokenize(lt.substr(8), m_expr_sep, false, false));
+					pstring                    n = args.next();
 					if (!is_valid_token(n))
 						error("define expected identifier");
 					auto *previous_define = get_define(n);
@@ -734,9 +732,9 @@ namespace plib {
 				{
 					if (lti.size() < 2)
 						error("undef needs at least one argument");
-					simple_iter<ppreprocessor> args(
-						this, tokenize(lt.substr(7), m_expr_sep, false, false));
-					pstring n = args.next();
+					simple_iter<ppreprocessor> args(this,
+						tokenize(lt.substr(7), m_expr_sep, false, false));
+					pstring                    n = args.next();
 					if (!is_valid_token(n))
 						error("undef expected identifier");
 					m_defines.erase(n);
@@ -791,7 +789,7 @@ namespace plib {
 			if (!m_stack.empty())
 			{
 				line_marker = pfmt("# {1} \"{2}\" 2\n")(m_stack.back().m_lineno,
-														m_stack.back().m_name);
+					m_stack.back().m_name);
 				push_out(line_marker);
 			}
 		}

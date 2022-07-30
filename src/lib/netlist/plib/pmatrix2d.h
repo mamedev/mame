@@ -22,8 +22,8 @@ namespace plib {
 	public:
 		using size_type = std::size_t;
 		using arena_type = A;
-		using allocator_type = typename A::template allocator_type<
-			T, PALIGN_VECTOROPT>;
+		using allocator_type = typename A::template allocator_type<T,
+			PALIGN_VECTOROPT>;
 
 		static constexpr const size_type align_size = align_traits<
 			allocator_type>::align_size;
@@ -145,8 +145,8 @@ namespace plib {
 		using value_type = T;
 		using arena_type = A;
 
-		using allocator_type = typename A::template allocator_type<
-			T, PALIGN_VECTOROPT>;
+		using allocator_type = typename A::template allocator_type<T,
+			PALIGN_VECTOROPT>;
 
 		static constexpr const size_type align_size = align_traits<
 			allocator_type>::align_size;

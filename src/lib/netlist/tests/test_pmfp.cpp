@@ -76,6 +76,6 @@ PTEST(test_compile, compile)
 #endif
 #if defined(__EMSCRIPTEN__)
 	PEXPECT_EQ(int(plib::ppmf_internal_selector::value),
-			   int(plib::ppmf_type::INTERNAL_ARM));
+		int(plib::ppmf_type::INTERNAL_ARM));
 #endif
 }
