@@ -103,6 +103,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/input/input_sdlcommon.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_sdlcommon.h",
 		MAME_DIR .. "src/osd/modules/input/input_x11.cpp",
+		MAME_DIR .. "src/osd/modules/input/input_evdev.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_windows.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_windows.h",
 		MAME_DIR .. "src/osd/modules/input/input_xinput.cpp",
