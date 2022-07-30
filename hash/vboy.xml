@@ -59,7 +59,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="alt_title" value="ギャラクティック・ピンボール"/>
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="0x100000" width="32">
-				<rom name="galactic pinball (japan, usa).bin" size="0x100000" crc="c9710a36" sha1="93a25abf4f86e71a49c1c3a470140bb40cb693d6" />
+				<rom name="vue-vgpj-0.u1" size="0x100000" crc="c9710a36" sha1="93a25abf4f86e71a49c1c3a470140bb40cb693d6" />
 			</dataarea>
 			<dataarea name="sram" size="0x2000" width="8" />
 		</part>
@@ -74,7 +74,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="release" value="199511xx"/>
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="0x200000" width="32">
-				<rom name="golf (usa).bin" size="0x200000" crc="2199af41" sha1="23ce3c174789cdd306497d86cb2c4e76ba8b06e5" />
+				<rom name="vue-vvge-0.u1" size="0x200000" crc="2199af41" sha1="23ce3c174789cdd306497d86cb2c4e76ba8b06e5" />
 			</dataarea>
 		</part>
 	</software>
@@ -166,7 +166,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="alt_title" value="マリオズテニス"/>
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="0x80000" width="32">
-				<rom name="mario's tennis (japan, usa).bin" size="0x80000" crc="7ce7460d" sha1="5162f7fa9e3eae4338c53ccba641ba080c768754" />
+				<rom name="vue-vmtj-0.u1" size="0x80000" crc="7ce7460d" sha1="5162f7fa9e3eae4338c53ccba641ba080c768754" />
 			</dataarea>
 		</part>
 	</software>
@@ -224,7 +224,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="release" value="19950814"/>
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="0x100000" width="32">
-				<rom name="red alarm (usa).bin" size="0x100000" crc="aa10a7b4" sha1="494fa60cb8997880b4e8cd3270b21d6c2768a48a" />
+				<rom name="vue-vree-0.u1" size="0x100000" crc="aa10a7b4" sha1="494fa60cb8997880b4e8cd3270b21d6c2768a48a" />
 			</dataarea>
 		</part>
 	</software>
@@ -311,7 +311,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="alt_title" value="テレロボクサー"/>
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="0x100000" width="32">
-				<rom name="teleroboxer (japan, usa).bin" size="0x100000" crc="36103000" sha1="c59e020f9674774c5cbc022317ebba0eb1d744f7" />
+				<rom name="vue-vtbj-0.u1" size="0x100000" crc="36103000" sha1="c59e020f9674774c5cbc022317ebba0eb1d744f7" />
 			</dataarea>
 			<dataarea name="sram" size="0x2000" width="8" />
 		</part>
@@ -377,7 +377,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="release" value="19951201"/>
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="0x100000" width="32">
-				<rom name="vertical force (usa).bin" size="0x100000" crc="4c32ba5e" sha1="38f9008f60b09deef1151d46b905b090a0338200" />
+				<rom name="vue-vh3e-0.u1" size="0x100000" crc="4c32ba5e" sha1="38f9008f60b09deef1151d46b905b090a0338200" />
 			</dataarea>
 		</part>
 	</software>
@@ -419,6 +419,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="developer" value="J-Wing"/>
 		<info name="serial" value="VUE-VJVJ-JPN"/>
 		<info name="release" value="19951208"/>
+		<info name="alt_title" value="バーチャルラボ"/>
 		<part name="cart" interface="vboy_cart">
 			<feature name="pcb" value="VUE-AA-01" />
 			<feature name="u1" value="U1 PRG" />
@@ -437,7 +438,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="release" value="19950911"/>
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="0x100000" width="32">
-				<rom name="virtual league baseball (usa).bin" size="0x100000" crc="736b40d6" sha1="266fe615ee3df1160a20b456824699f16810fa28" />
+				<rom name="vue-vvpe-0.u1" size="0x100000" crc="736b40d6" sha1="266fe615ee3df1160a20b456824699f16810fa28" />
 			</dataarea>
 		</part>
 	</software>
@@ -467,7 +468,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="alt_title" value="V・テトリス"/>
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="0x80000" width="32">
-				<rom name="v-tetris (japan).bin" size="0x80000" crc="3ccb67ae" sha1="ff7d4dfc467e6e0d3fe8517102132a65a9d17589" />
+				<rom name="vue-vtrj-0.u1" size="0x80000" crc="3ccb67ae" sha1="ff7d4dfc467e6e0d3fe8517102132a65a9d17589" />
 			</dataarea>
 		</part>
 	</software>
@@ -482,7 +483,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="alt_title" value="バーチャルボーイ ワリオランド アワゾンの秘宝"/>
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="0x200000" width="32">
-				<rom name="virtual boy wario land (japan, usa).bin" size="0x200000" crc="133e9372" sha1="274c328fbd904f20e69172ab826bf8f94ced1bdb" />
+				<rom name="vue-vwcj-0.u1" size="0x200000" crc="133e9372" sha1="274c328fbd904f20e69172ab826bf8f94ced1bdb" />
 			</dataarea>
 			<dataarea name="sram" size="0x2000" width="8" />
 		</part>
@@ -497,7 +498,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="release" value="19951221"/>
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="0x200000" width="32">
-				<rom name="waterworld (usa).bin" size="0x200000" crc="82a95e51" sha1="dcc46484bd0acab0ac1ea178f425a0f5ccfb8dc2" />
+				<rom name="vue-vwee-0.u1" size="0x200000" crc="82a95e51" sha1="dcc46484bd0acab0ac1ea178f425a0f5ccfb8dc2" />
 			</dataarea>
 		</part>
 	</software>
