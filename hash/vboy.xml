@@ -30,6 +30,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 			<dataarea name="rom" size="0x100000" width="32">
 				<rom name="vue-vpbe-0.u1" size="0x100000" crc="bb71b522" sha1="5177015a91442e56bd76af39447bca365e06c272" />
 			</dataarea>
+			<dataarea name="sram" size="0x2000" width="8" />
 		</part>
 	</software>
 
@@ -60,6 +61,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 			<dataarea name="rom" size="0x100000" width="32">
 				<rom name="galactic pinball (japan, usa).bin" size="0x100000" crc="c9710a36" sha1="93a25abf4f86e71a49c1c3a470140bb40cb693d6" />
 			</dataarea>
+			<dataarea name="sram" size="0x2000" width="8" />
 		</part>
 	</software>
 
@@ -74,7 +76,6 @@ According to Planet Virtual Boy, the following undumped protos exist
 			<dataarea name="rom" size="0x200000" width="32">
 				<rom name="golf (usa).bin" size="0x200000" crc="2199af41" sha1="23ce3c174789cdd306497d86cb2c4e76ba8b06e5" />
 			</dataarea>
-			<dataarea name="sram" size="0x2000" width="8" />
 		</part>
 	</software>
 
@@ -255,6 +256,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 			<dataarea name="rom" size="0x100000" width="32">
 				<rom name="sd gundam - dimension war (japan).bin" size="0x100000" crc="44788197" sha1="1a67f6bdb45db46e22b8aadea754a68ad379ae29" />
 			</dataarea>
+			<dataarea name="sram" size="0x2000" width="8" />
 		</part>
 	</software>
 
@@ -407,7 +409,6 @@ According to Planet Virtual Boy, the following undumped protos exist
 			<dataarea name="rom" size="0x200000" width="32">
 				<rom name="t&amp;e virtual golf (japan).bin" size="0x200000" crc="6ba07915" sha1="c595285d42c69f14b2b418c1edfbe4a7f9a624b6" />
 			</dataarea>
-			<dataarea name="sram" size="0x2000" width="8" />
 		</part>
 	</software>
 
