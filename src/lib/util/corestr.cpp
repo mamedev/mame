@@ -148,13 +148,13 @@ void strreplacechr(std::string& str, char ch, char newch)
 
 std::string_view strtrimspace(std::string_view str)
 {
-	std::string_view str2 = strtrimleft(str, [](char c) { return !isspace(uint8_t(c)); });
-	return strtrimright(str2, [](char c) { return !isspace(uint8_t(c)); });
+	std::string_view str2 = strtrimleft(str, [] (char c) { return !isspace(uint8_t(c)); });
+	return strtrimright(str2, [] (char c) { return !isspace(uint8_t(c)); });
 }
 
 std::string_view strtrimrightspace(std::string_view str)
 {
-	return strtrimright(str, [](char c) { return !isspace(uint8_t(c)); });
+	return strtrimright(str, [] (char c) { return !isspace(uint8_t(c)); });
 }
 
 std::string strmakeupper(std::string_view str)

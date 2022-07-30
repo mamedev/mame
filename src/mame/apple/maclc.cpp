@@ -13,6 +13,12 @@
 
 #include "emu.h"
 
+#include "cuda.h"
+#include "egret.h"
+#include "macadb.h"
+#include "macscsi.h"
+#include "v8.h"
+
 #include "bus/nscsi/devices.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
@@ -23,15 +29,11 @@
 #include "machine/swim1.h"
 #include "machine/timer.h"
 #include "machine/z80scc.h"
-#include "cuda.h"
-#include "egret.h"
-#include "macadb.h"
-#include "macscsi.h"
-#include "v8.h"
 
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
+
 
 namespace {
 
