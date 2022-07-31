@@ -113,7 +113,7 @@ private:
 
 	int m_pen2;           // palette selector
 	int m_rg = 0b011;     // 0:320x200lo, 2:640:200hi, 3:256x192zx, 6:80x25txt
-	u8 m_border_bright;
+	u8 m_br3_mask;
 	tilemap_t *m_txt_tilemap = nullptr;
 
 	address_space *m_program;
@@ -154,7 +154,7 @@ void atm_state::atm_update_memory()
 
 void atm_state::atm_ula_w(offs_t offset, u8 data)
 {
-	m_border_bright = ~offset & 0x08;
+	m_br3_mask = ~offset & 0x08;
 	spectrum_128_state::spectrum_ula_w(offset, data);
 }
 
@@ -172,11 +172,10 @@ void atm_state::atm_port_ffff_w(offs_t offset, u8 data)
 		// Must read current ULA value (which is doesn't work now) from the BUS.
 		// Good enough as none-border case is too complicated and possibly none software uses it.
 		u8 pen = get_border_color(m_screen->hpos(), m_screen->vpos());
-		u8 ndata = ~data;
 		m_palette->set_pen_color(pen,
-			BIT(ndata, 1) ? 0xbf | (0x40 * BIT(ndata, 6)) : 0,
-			BIT(ndata, 4) ? 0xbf | (0x40 * BIT(ndata, 7)) : 0,
-			BIT(ndata, 0) ? 0xbf | (0x40 * BIT(ndata, 5)) : 0);
+			(BIT(~data, 1) * 0xaa) | (BIT(~data, 6) * 0x55),
+			(BIT(~data, 4) * 0xaa) | (BIT(~data, 7) * 0x55),
+			(BIT(~data, 0) * 0xaa) | (BIT(~data, 5) * 0x55));
 	}
 }
 
@@ -264,7 +263,7 @@ rectangle atm_state::get_screen_area()
 
 u8 atm_state::get_border_color(u16 hpos, u16 vpos)
 {
-	return m_border_bright | (m_port_fe_data & 0x07);
+	return m_br3_mask | (m_port_fe_data & 0x07);
 }
 
 void atm_state::atm_update_video_mode()
@@ -467,7 +466,7 @@ void atm_state::machine_reset()
 	m_port_7ffd_data = 0;
 	m_port_1ffd_data = -1;
 
-	m_border_bright = 0;
+	m_br3_mask = 0;
 	atm_port_ff77_w(0x4000, 3); // CPM=0(on), PEN=0(off), PEN2=1(off); vmode: zx
 }
 
