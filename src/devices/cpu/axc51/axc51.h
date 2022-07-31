@@ -271,6 +271,11 @@ protected:
 	void xrl_a_r(uint8_t r);
 	void illegal(uint8_t r);
 
+	void axc51_extended_a5(uint8_t r);
+	void extended_a5_0e();
+	void extended_a5_0f();
+	void extended_a5_d0();
+	void extended_a5_d1();
 
 	/* Internal address in SFR of registers */
 	enum
@@ -403,12 +408,76 @@ protected:
 		AXC51_UARTCON    = 0xfd,
 		AXC51_UARTBAUD   = 0xfe,
 		AXC51_UARTDATA   = 0xff,
+
+		// XSFR
+		AXC51_PUP0 = 0x3010,
+		AXC51_PUP1 = 0x3011,
+		AXC51_PUP2 = 0x3012,
+		AXC51_PUP3 = 0x3013,
+		AXC51_PUP4 = 0x3014,
+		AXC51_PDN0 = 0x3015,
+		AXC51_PDN1 = 0x3016,
+		AXC51_PDN2 = 0x3017,
+		AXC51_PDN3 = 0x3018,
+		AXC51_PDN4 = 0x3019,
+
+		AXC51_TMR1CNTL = 0x3020, // Timer 1 Counter (low)
+		AXC51_TMR1CNTH = 0x3021, // Timer 1 Counter (high)
+		AXC51_TMR1PRL  = 0x3022, // Timer 1 Period (low)
+		AXC51_TMR1PRH  = 0x3023, // Timer 1 Period (high)
+		AXC51_TMR1PWML = 0x3024, // Timer 1 Duty (low)
+		AXC51_TMR1PWMH = 0x3025, // Timer 1 Duty (high)
+
+		AXC51_TMR2CNTL = 0x3030, // Timer 2 Counter (low)
+		AXC51_TMR2CNTH = 0x3031, // Timer 2 Counter (high)
+		AXC51_TMR2PRL  = 0x3032, // Timer 2 Period (low)
+		AXC51_TMR2PRH  = 0x3033, // Timer 2 Period (high)
+		AXC51_TMR2PWML = 0x3034, // Timer 2 Duty (low)
+		AXC51_TMR2PWMH = 0x3035, // Timer 2 Duty (high)
+
+		AXC51_ADCBAUD  = 0x3040, // ARADC Baud
+
+		AXC51_USBEP0ADL = 0x3050,
+		AXC51_USBEP0ADH = 0x3051,
+		AXC51_USBEP1RXADL = 0x3052,
+		AXC51_USBEP1RXADH = 0x3053,
+		AXC51_USBEP1TXADL = 0x3054,
+		AXC51_USBEP1TXADH = 0x3055,
+		AXC51_USBEP2RXADL = 0x3056,
+		AXC51_USBEP2RXADH = 0x3057,
+		AXC51_USBEP2TXADL = 0x3058,
+		AXC51_USBEP2TXADH = 0x3059,
+
+		AXC51_SFSCON = 0x3060,
+		AXC51_SFSPID = 0x3061,
+		AXC51_SFSCNTH = 0x3062,
+		AXC51_SFSCNTL = 0x3063,
+
+		AXC51_DACPTR = 0x3070, // DAC DMA Pointer
+		AXC51_DACCNT = 0x3071, // DAC DMA Counter
 	};
 
 	enum
 	{
+		// always at 8000
 		V_RESET = 0x000,    /* power on address */
-		V_IE0   = 0x003,    /* External Interrupt 0 */
+		// below can be at 4000 or 8000 (although don't make sense for internal ROM at 8000?)
+		V_TIMER0     = 0x003,  // IE0.0   IP0.0
+		V_TIMER1     = 0x00b,  // IE0.1   IP0.1
+		V_TIMER2     = 0x013,  // IE0.2   IP0.2
+		V_TIMER3     = 0x01b,  // IE0.3   IP0.3
+		V_USB        = 0x023,  // IE0.4   IP0.4
+		V_SPI        = 0x02b,  // IE0.5   IP0.5
+		V_SDC        = 0x033,  // IE0.6   IP0.6
+		V_SOFT       = 0x03b,  // IE2.4   IP0.7  IE2 is the 'encrypt' register
+		V_HUFFEMPTY  = 0x043,  // IE1.0   IP1.0
+		V_IDCT       = 0x04b,  // IE1.1   IP1.1
+		V_YUV2RGB    = 0x053,  // IE1.2   IP1.2
+		V_PORT       = 0x05b,  // IE1.3   IP1.3
+		V_WDT_LVD    = 0x063,  // IE1.4   IP1.4  Watchdog also needs to be enabled with IE2.5? LVD with LVDCON.5?
+		V_IRTCC_UART = 0x06b,  // IE1.5   IP1.5
+		V_DAC        = 0x073,  // IE1.6   IP1.6
+		V_SFS_INT    = 0x07b,  // IE1.7   IP1.7
 	};
 
 };
