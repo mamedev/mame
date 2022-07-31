@@ -189,6 +189,7 @@ mainboard8_device::mainboard8_device(const machine_config &mconfig, const char *
 	m_p3grom0(*owner, TI998_GLIB30_TAG),
 	m_p3grom1(*owner, TI998_GLIB31_TAG),
 	m_p3grom2(*owner, TI998_GLIB32_TAG),
+	m_tms9901(*owner, TI998_TMS9901_TAG),
 	m_sgrom_idle(true),
 	m_tsgrom_idle(true),
 	m_p8grom_idle(true),
@@ -382,6 +383,10 @@ void mainboard8_device::setaddress(offs_t offset, uint8_t busctrl)
 	// Save the logical address
 	m_logical_address = offset;
 	m_physical_address = 0;
+
+	// Trigger the 9901's clock if S0=1
+	if ((offset & 0x0020) != 0)
+		m_tms9901->update_clock();
 
 	// In TI's bit order, A14 is the second line from the right side (2^1)
 	m_A14_set = ((m_logical_address & 2)!=0); // Needed for clock_in

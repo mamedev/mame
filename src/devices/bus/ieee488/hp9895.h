@@ -29,7 +29,6 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device-level overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -87,6 +86,20 @@ private:
 	// Floppy drive interface
 	void floppy_ready_cb(floppy_image_device *floppy , int state);
 
+	TIMER_CALLBACK_MEMBER(timeout_timer_tick);
+	TIMER_CALLBACK_MEMBER(byte_timer_tick);
+	TIMER_CALLBACK_MEMBER(half_bit_timer_tick);
+
+	uint8_t get_switches2(void) const;
+	attotime get_half_bit_cell_period(void) const;
+	floppy_image_device *get_write_device(void) const;
+	void preset_crc(void);
+	void update_crc(bool bit);
+	bool shift_sr(uint8_t& sr , bool input_bit);
+	void get_next_transition(const attotime& from_when , attotime& edge);
+	void read_bit(bool crc_upd);
+	void write_bit(bool data_bit , bool clock_bit);
+
 	void z80_io_map(address_map &map);
 	void z80_program_map(address_map &map);
 
@@ -123,16 +136,6 @@ private:
 
 	// PLL
 	fdc_pll_t m_pll;
-
-	uint8_t get_switches2(void) const;
-	attotime get_half_bit_cell_period(void) const;
-	floppy_image_device *get_write_device(void) const;
-	void preset_crc(void);
-	void update_crc(bool bit);
-	bool shift_sr(uint8_t& sr , bool input_bit);
-	void get_next_transition(const attotime& from_when , attotime& edge);
-	void read_bit(bool crc_upd);
-	void write_bit(bool data_bit , bool clock_bit);
 };
 
 // device type definition

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders: kmg, Fabio Priuli
+// copyright-holders:kmg
 /***********************************************************************************************************
 
 
@@ -33,11 +33,15 @@ DEFINE_DEVICE_TYPE(NES_900218,      nes_900218_device,      "nes_900218",      "
 DEFINE_DEVICE_TYPE(NES_AX40G,       nes_ax40g_device,       "nes_ax40g",       "NES Cart UNL-AX-40G PCB")
 DEFINE_DEVICE_TYPE(NES_AX5705,      nes_ax5705_device,      "nes_ax5705",      "NES Cart AX5705 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_830506C, nes_bmc_830506c_device, "nes_bmc_830506c", "NES Cart BMC 830506C PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_831128C, nes_bmc_831128c_device, "nes_bmc_831128c", "NES Cart BMC 831128C PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_KL06,    nes_bmc_kl06_device,    "nes_bmc_kl06",    "NES Cart BMC KL-06 PCB")
 DEFINE_DEVICE_TYPE(NES_CITYFIGHT,   nes_cityfight_device,   "nes_cityfight",   "NES Cart City Fighter PCB")
 DEFINE_DEVICE_TYPE(NES_SHUIGUAN,    nes_shuiguan_device,    "nes_shuiguan",    "NES Cart Shui Guan Pipe Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_T230,        nes_t230_device,        "nes_t230",        "NES Cart T-230 PCB")
 DEFINE_DEVICE_TYPE(NES_TF1201,      nes_tf1201_device,      "nes_tf1201",      "NES Cart UNL-TF1201 PCB")
 DEFINE_DEVICE_TYPE(NES_TH21311,     nes_th21311_device,     "nes_th21311",     "NES Cart UNL-TH2131-1 PCB")
+DEFINE_DEVICE_TYPE(NES_WAIXING_SGZ, nes_waixing_sgz_device, "nes_waixing_sgz", "NES Cart Waixing San Guo Zhi PCB")
+DEFINE_DEVICE_TYPE(NES_HENGG_SHJY3, nes_hengg_shjy3_device, "nes_hengg_shjy3", "NES Cart Henggedianzi Shen Hua Jian Yun III PCB")
 
 
 nes_2yudb_device::nes_2yudb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -62,6 +66,16 @@ nes_ax5705_device::nes_ax5705_device(const machine_config &mconfig, const char *
 
 nes_bmc_830506c_device::nes_bmc_830506c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_konami_vrc4_device(mconfig, NES_BMC_830506C, tag, owner, clock), m_outer(0)
+{
+}
+
+nes_bmc_831128c_device::nes_bmc_831128c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_konami_vrc4_device(mconfig, NES_BMC_831128C, tag, owner, clock), m_reg(0)
+{
+}
+
+nes_bmc_kl06_device::nes_bmc_kl06_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_konami_vrc4_device(mconfig, NES_BMC_KL06, tag, owner, clock), m_reg(0)
 {
 }
 
@@ -90,6 +104,21 @@ nes_th21311_device::nes_th21311_device(const machine_config &mconfig, const char
 {
 }
 
+nes_waixing_sgz_device::nes_waixing_sgz_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 chr_match)
+	: nes_konami_vrc4_device(mconfig, type, tag, owner, clock), m_chr_match(chr_match)
+{
+}
+
+nes_waixing_sgz_device::nes_waixing_sgz_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_waixing_sgz_device(mconfig, NES_WAIXING_SGZ, tag, owner, clock, 0x06)
+{
+}
+
+nes_hengg_shjy3_device::nes_hengg_shjy3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_waixing_sgz_device(mconfig, NES_HENGG_SHJY3, tag, owner, clock, 0x04)
+{
+}
+
 
 
 void nes_2yudb_device::device_start()
@@ -111,7 +140,7 @@ void nes_2yudb_device::pcb_reset()
 void nes_900218_device::device_start()
 {
 	nes_konami_vrc2_device::device_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_900218_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -163,6 +192,36 @@ void nes_bmc_830506c_device::pcb_reset()
 	nes_konami_vrc4_device::pcb_reset();
 }
 
+void nes_bmc_831128c_device::device_start()
+{
+	nes_konami_vrc4_device::device_start();
+	save_item(NAME(m_reg));
+}
+
+void nes_bmc_831128c_device::pcb_reset()
+{
+	nes_konami_vrc4_device::pcb_reset();
+
+	m_reg = 0;
+	prg32((m_prg_chunks >> 1) - 1);
+}
+
+void nes_bmc_kl06_device::device_start()
+{
+	nes_konami_vrc4_device::device_start();
+	save_item(NAME(m_reg));
+
+	// VRC4 pins 3 and 4
+	m_vrc_ls_prg_a = 3;  // A1
+	m_vrc_ls_prg_b = 2;  // A0
+}
+
+void nes_bmc_kl06_device::pcb_reset()
+{
+	m_reg = 0;
+	nes_konami_vrc4_device::pcb_reset();
+}
+
 void nes_cityfight_device::device_start()
 {
 	nes_konami_vrc4_device::device_start();
@@ -209,7 +268,7 @@ void nes_tf1201_device::device_start()
 void nes_th21311_device::device_start()
 {
 	nes_konami_vrc2_device::device_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_th21311_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -227,6 +286,19 @@ void nes_th21311_device::pcb_reset()
 	m_irq_enable = 0;
 	m_irq_count = 0;
 	m_irq_latch = 0;
+}
+
+void nes_waixing_sgz_device::device_start()
+{
+	nes_konami_vrc4_device::device_start();
+	save_item(NAME(m_chr_mask));
+	save_item(NAME(m_chr_match));
+
+	m_chr_mask = 0xfe;
+
+	// VRC4 pins 3 and 4
+	m_vrc_ls_prg_a = 3;  // A3
+	m_vrc_ls_prg_b = 2;  // A2
 }
 
 
@@ -250,15 +322,12 @@ void nes_th21311_device::pcb_reset()
 
  -------------------------------------------------*/
 
-void nes_900218_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_900218_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
+	if (m_irq_enable)
 	{
-		if (m_irq_enable)
-		{
-			m_irq_count++;
-			set_irq_line(BIT(m_irq_count, 10) ? ASSERT_LINE : CLEAR_LINE);
-		}
+		m_irq_count++;
+		set_irq_line(BIT(m_irq_count, 10) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -370,7 +439,7 @@ void nes_cityfight_device::write_h(offs_t offset, u8 data)
 		case 0x0800:
 			break;  // PRG banking at $8000 ignored
 		case 0x1000:
-			prg32((data >> 2) & 0x03);
+			prg32(BIT(data, 2, 2));
 			if (!(offset & 3))  // $9000 is also VRC4 mirroring
 				nes_konami_vrc4_device::write_h(offset, data);
 			break;
@@ -508,18 +577,15 @@ void nes_tf1201_device::irq_ack_w()
 
  -------------------------------------------------*/
 
-void nes_th21311_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_th21311_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
+	if (m_irq_enable)
 	{
-		if (m_irq_enable)
-		{
-			m_irq_count = (m_irq_count + 1) & 0xfff; // 12-bit counter
-			if (m_irq_count == 0x800)
-				m_irq_latch--;
-			if (!m_irq_latch && m_irq_count < 0x800)
-				set_irq_line(ASSERT_LINE);
-		}
+		m_irq_count = (m_irq_count + 1) & 0xfff; // 12-bit counter
+		if (m_irq_count == 0x800)
+			m_irq_latch--;
+		if (!m_irq_latch && m_irq_count < 0x800)
+			set_irq_line(ASSERT_LINE);
 	}
 }
 
@@ -548,6 +614,57 @@ void nes_th21311_device::write_h(offs_t offset, u8 data)
 		nes_konami_vrc2_device::write_h(offset, data);
 }
 
+/*-------------------------------------------------
+
+ Waixing San Guo Zhi Board, Henggedianzi UNL-SHJY3
+
+ Games: San Guo Zhi (mapper 252), several Chinese
+ hacks of Dragon Ball games (mapper 253)
+
+ VRC4 clones that substitute 2K of CHRRAM in place for
+ two of the standard 1K CHRROM pages. Unusually this is
+ done by a GAL looking at certain address bits of the
+ PPU's address space, as the PPU writes pattern tables.
+
+ iNES: mapper 252 and mapper 253
+
+ In MAME: Supported.
+
+ TODO: Why does Sanguozhi flicker every second or two?
+
+ -------------------------------------------------*/
+
+void nes_waixing_sgz_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("waixing_sgz write_h, offset: %04x, data: %02x\n", offset, data));
+
+	nes_konami_vrc4_device::write_h(offset, data);
+
+	for (int bank = 0; bank < 8; bank++)
+		if ((m_mmc_vrom_bank[bank] & m_chr_mask) == m_chr_match)
+			chr1_x(bank, m_mmc_vrom_bank[bank] & 1, CHRRAM);
+}
+
+void nes_waixing_sgz_device::chr_w(offs_t offset, u8 data)
+{
+	device_nes_cart_interface::chr_w(offset, data);
+
+	switch (m_mmc_vrom_bank[BIT(offset, 10, 3)])
+	{
+		case 0x88:
+			m_chr_mask = 0xfc;
+			m_chr_match = 0x4c;
+			break;
+		case 0xc2:
+			m_chr_mask = 0xfe;
+			m_chr_match = 0x7c;
+			break;
+		case 0xc8:
+			m_chr_mask = 0xfe;
+			m_chr_match = 0x04;
+			break;
+	}
+}
 
 /*-------------------------------------------------
 
@@ -614,5 +731,130 @@ void nes_bmc_830506c_device::write_h(offs_t offset, u8 data)
 		u8 bank = ((offset >> 12) - 3) * 2 + BIT(offset, m_vrc_ls_prg_a);
 		m_outer = (m_mmc_vrom_bank[bank] & 0x180) >> 3;
 		set_prg();
+	}
+}
+
+/*-------------------------------------------------
+
+ Board BMC-831128C
+
+ Games: 1995 New Series Super 2 in 1
+
+ Weird clone that seems to be part Konami VRC4 (IRQ),
+ and part Sunsoft FME-7 (banking/mirroring).
+
+ NES 2.0: mapper 528
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+
+u8 nes_bmc_831128c_device::read_m(offs_t offset)
+{
+// LOG_MMC(("bmc_831128c read_m, offset: %04x, data: %02x\n", offset, data));
+
+	if (m_reg == 1)
+		return device_nes_cart_interface::read_m(offset);
+	else
+		return m_prg[(m_reg * 0x2000 + offset) & (m_prg_size - 1)];
+}
+
+void nes_bmc_831128c_device::write_m(offs_t offset, u8 data)
+{
+// LOG_MMC(("bmc_831128c write_m, offset: %04x, data: %02x\n", offset, data));
+
+	if (m_reg == 1)
+		device_nes_cart_interface::write_m(offset, data);
+}
+
+void nes_bmc_831128c_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_831128c write_h, offset: %04x, data: %02x\n", offset, data));
+
+	u8 page = offset >> 12;
+	if (page != 2 && page != 4)  // ignore writes except $Axxx and $Cxxx
+		return;
+
+	int outer = BIT(offset, 14) << 4;
+	prg16_cdef(outer ? m_prg_chunks - 1 : 7);
+
+	u8 reg = offset & 0x0f;
+	switch (reg)
+	{
+		case 0x0: case 0x1: case 0x2: case 0x3:
+		case 0x4: case 0x5: case 0x6: case 0x7:
+			chr1_x(reg, (outer << 4) | data, m_chr_source);
+			break;
+		case 0x8:
+			m_reg = data;
+			break;
+		case 0x9:
+		case 0xa:
+			prg8_x(reg - 9, outer + (data & (outer | 0x0f)));
+			break;
+		// case 0xb: do nothing
+		case 0xc:
+			set_mirror(data);
+			break;
+		case 0xd:
+			irq_ctrl_w(data);
+			break;
+		case 0xe:
+			irq_ack_w();
+			break;
+		case 0xf:
+			m_irq_count_latch = data;
+			break;
+	}
+}
+
+/*-------------------------------------------------
+
+ Board BMC-KL-06
+
+ Games: 1993 New 860 in 1 Over-Valued Golden Version Games
+
+ VRC4 clone with banking for multicart menu.
+
+ NES 2.0: mapper 447
+
+ In MAME: Supported.
+
+ TODO: There must be jumper settings since this is
+ showing up as a 1650 in 1.
+
+ -------------------------------------------------*/
+
+void nes_bmc_kl06_device::set_prg()
+{
+	u8 outer = (m_reg & 0x03) << 4;
+
+	if (BIT(m_reg, 2))
+	{
+		u8 bank_lo = outer | m_mmc_prg_bank[0];
+		u8 bank_hi = outer | m_mmc_prg_bank[1];
+		u8 mode = ~m_reg & 0x02;
+		prg8_89(bank_lo & ~mode);
+		prg8_ab(bank_hi & ~mode);
+		prg8_cd(bank_lo | mode);
+		prg8_ef(bank_hi | mode);
+	}
+	else
+		nes_konami_vrc4_device::set_prg(outer, 0x0f);
+}
+
+void nes_bmc_kl06_device::write_m(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_kl06 write_m, offset: %04x, data: %02x\n", offset, data));
+
+	// 2K RAM for Crisis Force overlays control register
+	nes_konami_vrc4_device::write_m(offset, data);
+
+	if (!(m_reg & 1))  // lock bit
+	{
+		m_reg = offset;
+		set_prg();
+		set_chr();
 	}
 }

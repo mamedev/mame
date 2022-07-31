@@ -12,8 +12,8 @@
 class ipf_format : public floppy_image_format_t
 {
 public:
-	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
-	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) override;
+	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const override;
 
 	virtual const char *name() const override;
 	virtual const char *description() const override;
@@ -88,6 +88,6 @@ private:
 	};
 };
 
-extern const floppy_format_type FLOPPY_IPF_FORMAT;
+extern const ipf_format FLOPPY_IPF_FORMAT;
 
 #endif // MAME_FORMATS_IPF_DSK_H

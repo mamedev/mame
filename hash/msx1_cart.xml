@@ -8124,7 +8124,7 @@ kept for now until finding out what those bytes affect...
 	</software>
 
 	<software name="mitsumgt">
-		<description>Mitsume Ga Tooru - The Three-Eyed One Comes Here (Jpn)</description>
+		<description>Mitsume ga Tooru - The Three-Eyed One Comes Here (Jpn)</description>
 		<year>1989</year>
 		<publisher>Natsume</publisher>
 		<info name="serial" value="NP-003" />
@@ -10341,7 +10341,7 @@ kept for now until finding out what those bytes affect...
 			<feature name="mapper" value="KONAMI-SCC" />
 			<dataarea name="rom" size="32768">
 				<!-- Original Dump from an 39SF010 flashrom - 128kb Image.  32KB Rom file cropped out of image after discarding unused area (FF)
-				<rom name="roc'n rope.bin" size="131072" crc="a71c2009" sha1="4429fe7090953dd509feccafd87ea4e8deb6360f" offset="0" />  -->
+				<rom name="roc'n rope.bin" size="131072" crc="a71c2009" sha1="4429fe7090953dd509feccafd87ea4e8deb6360f" offset="0" /> -->
 				<rom name="roc'n rope.rom" size="32768" crc="c0c32c3e" sha1="74b2dbb51437b531ca78c314d666aabe0fd2e177" offset="0" />
 			</dataarea>
 		</part>

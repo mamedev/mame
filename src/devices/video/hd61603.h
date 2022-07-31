@@ -47,6 +47,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	u8 m_count = 0;

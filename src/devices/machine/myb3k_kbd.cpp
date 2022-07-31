@@ -124,7 +124,6 @@
 #include "emu.h"
 #include "myb3k_kbd.h"
 
-//#define LOG_GENERAL (1U << 0) //defined in logmacro.h already
 #define LOG_MOD     (1U << 1)
 #define LOG_BYTES   (1U << 2)
 
@@ -356,13 +355,16 @@ ioport_constructor myb3k_keyboard_device::device_input_ports() const
 void myb3k_keyboard_device::device_start()
 {
 	m_keyboard_cb.resolve();
+	m_scan_timer = timer_alloc(FUNC(myb3k_keyboard_device::scan_keys), this);
+	m_first_byte_timer = timer_alloc(FUNC(myb3k_keyboard_device::send_first_byte), this);
+	m_second_byte_timer = timer_alloc(FUNC(myb3k_keyboard_device::send_second_byte), this);
 }
 
 void myb3k_keyboard_device::device_reset()
 {
 	m_modifier_keys = 0;
 	memset(m_io_kbd_state, 0, sizeof(m_io_kbd_state));
-	timer_set(attotime::from_msec(100), TIMER_ID_SCAN_KEYS);
+	m_scan_timer->adjust(attotime::from_msec(100));
 	m_modifier_keys = 0;
 }
 
@@ -391,7 +393,7 @@ void myb3k_keyboard_device::key_changed(int x, int y, bool pressed)
 		(y & 0x7);
 }
 
-void myb3k_keyboard_device::scan_keys()
+TIMER_CALLBACK_MEMBER(myb3k_keyboard_device::scan_keys)
 {
 	// Iterate over all columns (m_x)
 	// and for each column iterate over all rows (m_y)
@@ -408,7 +410,7 @@ void myb3k_keyboard_device::scan_keys()
 				update_modifiers(m_y, bit);
 			}
 
-			timer_set(attotime::from_msec(3), TIMER_ID_FIRST_BYTE);
+			m_first_byte_timer->adjust(attotime::from_msec(3));
 			wait_for_timer = true;
 		}
 
@@ -420,7 +422,7 @@ void myb3k_keyboard_device::scan_keys()
 				m_y = 0;
 				// Done scanning the matrix. Now sleep for a while,
 				// then start scanning again. Scan ~50 times per second.
-				timer_set(attotime::from_msec(20), TIMER_ID_SCAN_KEYS);
+				m_scan_timer->adjust(attotime::from_msec(20));
 				wait_for_timer = true;
 				// (The final switch x=11 y=7 is not electrically connected.
 				// Thus if we get here, then there can be no key changed
@@ -456,31 +458,24 @@ void myb3k_keyboard_device::update_modifiers(int y, bool down)
 	m_modifier_keys = (m_modifier_keys & mask) | (down?bit:0);
 }
 
-void myb3k_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(myb3k_keyboard_device::send_first_byte)
 {
-	switch (id)
-	{
-	case TIMER_ID_SCAN_KEYS:
-		scan_keys();
-		break;
+	LOGBYTES("FIRST_BYTE %02x %s (with modifiers %s%s%s%s%s)\n", m_first_byte,
+		   (m_first_byte&MYB3K_KEY_ON)?"Pressed":"Released",
+		   (m_first_byte&MYB3K_KEY_CTRL)?"CTRL ":"",
+		   (m_first_byte&MYB3K_KEY_GRAPH)?"GRAPH ":"",
+		   (m_first_byte&MYB3K_KEY_LSHIFT)?"LSHIFT ":"",
+		   (m_first_byte&MYB3K_KEY_RSHIFT)?"RSHIFT ":"",
+		   (m_first_byte&MYB3K_KEY_CAP)?"CAP ":"");
+	send_byte(m_first_byte);
+	m_second_byte_timer->adjust(attotime::from_msec(3));
+}
 
-	case TIMER_ID_FIRST_BYTE:
-		LOGBYTES("FIRST_BYTE %02x %s (with modifiers %s%s%s%s%s)\n", m_first_byte,
-			   (m_first_byte&MYB3K_KEY_ON)?"Pressed":"Released",
-			   (m_first_byte&MYB3K_KEY_CTRL)?"CTRL ":"",
-			   (m_first_byte&MYB3K_KEY_GRAPH)?"GRAPH ":"",
-			   (m_first_byte&MYB3K_KEY_LSHIFT)?"LSHIFT ":"",
-			   (m_first_byte&MYB3K_KEY_RSHIFT)?"RSHIFT ":"",
-			   (m_first_byte&MYB3K_KEY_CAP)?"CAP ":"");
-		send_byte(m_first_byte);
-		timer_set(attotime::from_msec(3), TIMER_ID_SECOND_BYTE);
-		break;
-	case TIMER_ID_SECOND_BYTE:
-		LOGBYTES("SECOND_BYTE %02x x=%d y=%d \n\n\n", m_second_byte, (m_second_byte >> 3)&0xf, (m_second_byte)&0x7);
-		send_byte(m_second_byte);
-		timer_set(attotime::from_msec(10), TIMER_ID_SCAN_KEYS);
-		break;
-	}
+TIMER_CALLBACK_MEMBER(myb3k_keyboard_device::send_second_byte)
+{
+	LOGBYTES("SECOND_BYTE %02x x=%d y=%d \n\n\n", m_second_byte, (m_second_byte >> 3)&0xf, (m_second_byte)&0x7);
+	send_byte(m_second_byte);
+	m_scan_timer->adjust(attotime::from_msec(10));
 }
 
 stepone_keyboard_device::stepone_keyboard_device(

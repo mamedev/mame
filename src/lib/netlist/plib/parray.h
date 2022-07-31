@@ -11,6 +11,7 @@
 #include "palloc.h"
 #include "pconfig.h"
 #include "pexception.h"
+#include "pfmtlog.h"
 
 #include <array>
 #include <memory>
@@ -22,14 +23,14 @@
 namespace plib {
 
 	template <typename FT, int SIZE, typename ARENA>
-	struct sizeabs
+	struct parray_traits
 	{
 		static constexpr std::size_t ABS() noexcept { return (SIZE < 0) ? narrow_cast<std::size_t>(0 - SIZE) : narrow_cast<std::size_t>(SIZE); }
 		using container = typename std::array<FT, ABS()> ;
 	};
 
 	template <typename FT, typename ARENA>
-	struct sizeabs<FT, 0, ARENA>
+	struct parray_traits<FT, 0, ARENA>
 	{
 		static constexpr std::size_t ABS() noexcept { return 0; }
 		using allocator_type = typename ARENA::template allocator_type<FT, PALIGN_VECTOROPT>;
@@ -52,13 +53,13 @@ namespace plib {
 	/// I consider > 10% performance difference to be a use case.
 	///
 
-	template <typename FT, int SIZE, typename ARENA = aligned_arena>
+	template <typename FT, int SIZE, typename ARENA = aligned_arena<>>
 	struct parray
 	{
 	public:
-		static constexpr std::size_t SIZEABS() noexcept { return sizeabs<FT, SIZE, ARENA>::ABS(); }
+		static constexpr std::size_t SIZEABS() noexcept { return parray_traits<FT, SIZE, ARENA>::ABS(); }
 
-		using base_type = typename sizeabs<FT, SIZE, ARENA>::container;
+		using base_type = typename parray_traits<FT, SIZE, ARENA>::container;
 		using size_type = typename base_type::size_type;
 		using value_type = FT;
 		using reference =  FT &;
@@ -122,13 +123,13 @@ namespace plib {
 
 		~parray() noexcept = default;
 
-		base_type &as_base() noexcept { return m_a; }
+		constexpr base_type &as_base() noexcept { return m_a; }
 
 		constexpr size_type size() const noexcept { return SIZE <= 0 ? m_size : SIZEABS(); }
 
 		constexpr size_type max_size() const noexcept { return base_type::max_size(); }
 
-		bool empty() const noexcept { return size() == 0; }
+		constexpr bool empty() const noexcept { return size() == 0; }
 
 		constexpr reference operator[](size_type i) noexcept
 		{
@@ -139,8 +140,8 @@ namespace plib {
 			return m_a[i];
 		}
 
-		pointer data() noexcept { return m_a.data(); }
-		const_pointer data() const noexcept { return m_a.data(); }
+		constexpr pointer data() noexcept { return m_a.data(); }
+		constexpr const_pointer data() const noexcept { return m_a.data(); }
 
 	private:
 		PALIGNAS_VECTOROPT()

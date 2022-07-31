@@ -117,7 +117,7 @@ void upd71071_device::device_start()
 	m_dma_write_cb.resolve_all_safe();
 	m_out_dack_cb.resolve_all_safe();
 	for (auto &elem : m_timer)
-		elem = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd71071_device::dma_transfer_timer), this));
+		elem = timer_alloc(FUNC(upd71071_device::dma_transfer_timer), this);
 	m_selected_channel = 0;
 
 	m_reg.device_control = 0;

@@ -139,7 +139,7 @@ namespace plib
 	}
 
 	template<typename T, typename V>
-	T vec_maxabs(const V & v) noexcept
+	T vec_max_abs(const V & v) noexcept
 	{
 		const std::size_t n(v.size());
 		T ret(plib::constants<T>::zero());

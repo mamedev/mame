@@ -79,8 +79,8 @@ void wozfdc_device::device_start()
 {
 	m_rom_p6 = machine().root_device().memregion(this->subtag(DISKII_P6_REGION).c_str())->base();
 
-	timer = timer_alloc(0);
-	delay_timer = timer_alloc(1);
+	timer = timer_alloc(FUNC(wozfdc_device::generic_tick), this);
+	delay_timer = timer_alloc(FUNC(wozfdc_device::delayed_tick), this);
 
 	save_item(NAME(last_6502_write));
 	save_item(NAME(mode_write));
@@ -178,12 +178,18 @@ void appleiii_fdc_device::device_reset()
 	enable1 = 1;
 }
 
-void wozfdc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(wozfdc_device::generic_tick)
+{
+	if(active)
+		lss_sync();
+}
+
+TIMER_CALLBACK_MEMBER(wozfdc_device::delayed_tick)
 {
 	if(active)
 		lss_sync();
 
-	if(id == 1 && active == MODE_DELAY) {
+	if(active == MODE_DELAY) {
 		if(floppy)
 			floppy->mon_w(true);
 		active = MODE_IDLE;

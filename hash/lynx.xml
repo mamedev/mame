@@ -913,7 +913,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="robotron">
-		<description>Robotron 2084 (Euro, USA)</description>
+		<description>Robotron: 2084 (Euro, USA)</description>
 		<year>1991</year>
 		<publisher>Williams Entertainment</publisher>
 		<info name="serial" value="PT5003" />
@@ -921,6 +921,18 @@ Known undumped prototypes:
 			<feature name="granularity" value="512"/>
 			<dataarea name="rom" size="131072">
 				<rom name="robotron 2084 (euro, usa).bin" size="131072" crc="7a6049b5" sha1="04048aa47c0ff99647608d4d1ccf48ba881a0f89" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robotronp" cloneof="robotron">
+		<description>Robotron: 2084 (prototype)</description>
+		<year>1991</year>
+		<publisher>Williams Entertainment</publisher>
+		<part name="cart" interface="lynx_cart">
+			<feature name="granularity" value="512"/>
+			<dataarea name="rom" size="131072">
+				<rom name="robotron 2084.u2" size="131072" crc="6e7b014f" sha1="d9d112806aa11e6d6a7b995c726079daf494b5cd" />
 			</dataarea>
 		</part>
 	</software>
@@ -1172,24 +1184,26 @@ Known undumped prototypes:
 		</part>
 	</software>
 
-	<software name="yastuna1" supported="no"> <!-- Stops with a 'INSERT GAME' screen -->
+	<software name="yastuna1">
 		<description>Yastuna Vol.1 - The Alchemy of Cubes</description>
 		<year>2008</year>
 		<publisher>Fadest</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="yastuna1.lnx" size="262208" crc="a87ed55e" sha1="2c311788def1e4ec7d5adc64e2fbb44c851861e8" />
+			<feature name="granularity" value="1024"/>
+			<dataarea name="rom" size="0x40000">
+				<rom name="yastuna1.bin" size="0x40000" crc="a6fe24af" sha1="78ab610f29e97b111cfe4c48b681a416d5e79d42" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="yastuna2" supported="no"> <!-- Stops with a 'INSERT GAME' screen -->
+	<software name="yastuna2">
 		<description>Yastuna Vol.2 - The Space Incident</description>
 		<year>2008</year>
 		<publisher>Fadest</publisher>
 		<part name="cart" interface="lynx_cart">
-			<dataarea name="rom" size="262208">
-				<rom name="yastuna2.lnx" size="262208" crc="658929e1" sha1="4be4ba20a495c5b865e2512d0194d31185b016c5" />
+			<feature name="granularity" value="1024"/>
+			<dataarea name="rom" size="0x40000">
+				<rom name="yastuna2.bin" size="0x40000" crc="6b09d810" sha1="e38728654920868905e2a7b1e98985acaa9d21ae" />
 			</dataarea>
 		</part>
 	</software>

@@ -40,6 +40,7 @@ DEFINE_DEVICE_TYPE(SEGA8_ROM_NEMESIS,      sega8_nemesis_device,      "sega8_nem
 DEFINE_DEVICE_TYPE(SEGA8_ROM_JANGGUN,      sega8_janggun_device,      "sega8_janggun",     "SMS Janggun Cart")
 DEFINE_DEVICE_TYPE(SEGA8_ROM_HICOM,        sega8_hicom_device,        "sega8_hicom",       "SMS Hi-Com Carts")
 DEFINE_DEVICE_TYPE(SEGA8_ROM_KOREAN,       sega8_korean_device,       "sega8_korean",      "SMS Korean Carts")
+DEFINE_DEVICE_TYPE(SEGA8_ROM_KOREAN_188,   sega8_korean_188_device,   "sega8_korean_188",  "SMS Korean 188 in 1 Multicart")
 DEFINE_DEVICE_TYPE(SEGA8_ROM_KOREAN_NB,    sega8_korean_nb_device,    "sega8_korean_nb",   "SMS Korean No-Bank Mapper Carts")
 DEFINE_DEVICE_TYPE(SEGA8_ROM_SEOJIN,       sega8_seojin_device,       "sega8_seojin",      "SMS Seo Jin Multi-cart")
 DEFINE_DEVICE_TYPE(SEGA8_ROM_X_TERMINATOR, sega8_x_terminator_device, "sega8_x_terminator", "GG X-Terminator")
@@ -178,6 +179,13 @@ sega8_korean_device::sega8_korean_device(const machine_config &mconfig, const ch
 }
 
 
+sega8_korean_188_device::sega8_korean_188_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: sega8_rom_device(mconfig, SEGA8_ROM_KOREAN_188, tag, owner, clock)
+	, m_rom_bank_base(0)
+{
+}
+
+
 sega8_korean_nb_device::sega8_korean_nb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sega8_rom_device(mconfig, SEGA8_ROM_KOREAN_NB, tag, owner, clock)
 {
@@ -258,6 +266,7 @@ void sega8_codemasters_device::device_reset()
 	m_ram_enabled = 0;
 }
 
+
 void sega8_4pak_device::device_start()
 {
 	save_item(NAME(m_rom_bank_base));
@@ -282,6 +291,17 @@ void sega8_zemina_device::device_reset()
 {
 	m_ram_base = 0;
 	m_ram_enabled = 0;
+}
+
+
+void sega8_korean_188_device::device_start()
+{
+	save_item(NAME(m_rom_bank_base));
+}
+
+void sega8_korean_188_device::device_reset()
+{
+	m_rom_bank_base = 0;
 }
 
 
@@ -989,6 +1009,36 @@ void sega8_korean_device::write_cart(offs_t offset, uint8_t data)
 	if (offset == 0xa000)
 		m_rom_bank_base[2] = data % m_rom_page_count;
 }
+
+
+/*-------------------------------------------------
+
+ Korean Game 188 multicart,
+ writes to 0x2000 switch 8K banks at 0x4000-0xbfff
+
+ TODO: figure out why menu #s 6, 13, etc don't load.
+ Add dumps of other compatible multicarts.
+
+ -------------------------------------------------*/
+
+u8 sega8_korean_188_device::read_cart(offs_t offset)
+{
+	if (offset < 0x4000)
+		return m_rom[offset];
+	else
+	{
+		int bank = m_rom_bank_base ^ 0x1f;
+		bank %= m_rom_page_count * 2;
+		return m_rom[bank * 0x2000 + offset - 0x4000];
+	}
+}
+
+void sega8_korean_188_device::write_cart(offs_t offset, u8 data)
+{
+	if ((offset & 0x6000) == 0x2000)
+		m_rom_bank_base = data;
+}
+
 
 /*-------------------------------------------------
 

@@ -30,17 +30,17 @@ const char *opd_format::extensions() const
 	return "opd,opu";
 }
 
-int opd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int opd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	int const type = find_size(io, form_factor, variants);
 
 	if (type != -1)
-		return 90;
+		return FIFID_SIZE;
 
 	return 0;
 }
 
-int opd_format::get_image_offset(const format &f, int head, int track)
+int opd_format::get_image_offset(const format &f, int head, int track) const
 {
 	return (f.track_count * head + track) * compute_track_size(f);
 }
@@ -59,4 +59,4 @@ const opd_format::format opd_format::formats[] =
 };
 
 
-const floppy_format_type FLOPPY_OPD_FORMAT = &floppy_image_format_creator<opd_format>;
+const opd_format FLOPPY_OPD_FORMAT;

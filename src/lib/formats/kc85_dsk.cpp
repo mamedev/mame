@@ -58,4 +58,4 @@ const kc85_format::format kc85_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_KC85_FORMAT = &floppy_image_format_creator<kc85_format>;
+const kc85_format FLOPPY_KC85_FORMAT;

@@ -152,7 +152,6 @@ enum : u8 {
 
 #define DIVISOR PRESCALER[data & 0x07]
 
-
 const u16 mc68901_device::INT_MASK_GPIO[] =
 {
 	IR_GPIP_0, IR_GPIP_1, IR_GPIP_2, IR_GPIP_3,
@@ -230,34 +229,34 @@ inline void mc68901_device::rx_error()
 	}
 }
 
-inline void mc68901_device::timer_count(int index)
+TIMER_CALLBACK_MEMBER(mc68901_device::timer_count)
 {
-	if (m_tmc[index] == 0x01)
+	if (m_tmc[param] == 0x01)
 	{
 		/* toggle timer output signal */
-		m_to[index] = !m_to[index];
+		m_to[param] = !m_to[param];
 
-		switch (index)
+		switch (param)
 		{
-		case TIMER_A:   m_out_tao_cb(m_to[index]);    break;
-		case TIMER_B:   m_out_tbo_cb(m_to[index]);    break;
-		case TIMER_C:   m_out_tco_cb(m_to[index]);    break;
-		case TIMER_D:   m_out_tdo_cb(m_to[index]);    break;
+		case TIMER_A:   m_out_tao_cb(m_to[param]);    break;
+		case TIMER_B:   m_out_tbo_cb(m_to[param]);    break;
+		case TIMER_C:   m_out_tco_cb(m_to[param]);    break;
+		case TIMER_D:   m_out_tdo_cb(m_to[param]);    break;
 		}
 
-		if (m_ier & INT_MASK_TIMER[index])
+		if (m_ier & INT_MASK_TIMER[param])
 		{
 			/* signal timer elapsed interrupt */
-			take_interrupt(INT_MASK_TIMER[index]);
+			take_interrupt(INT_MASK_TIMER[param]);
 		}
 
 		/* load main counter */
-		m_tmc[index] = m_tdr[index];
+		m_tmc[param] = m_tdr[param];
 	}
 	else
 	{
 		/* count down */
-		m_tmc[index]--;
+		m_tmc[param]--;
 	}
 }
 
@@ -406,10 +405,10 @@ void mc68901_device::device_start()
 	m_iack_chain_cb.resolve();
 
 	/* create the timers */
-	m_timer[TIMER_A] = timer_alloc(TIMER_A);
-	m_timer[TIMER_B] = timer_alloc(TIMER_B);
-	m_timer[TIMER_C] = timer_alloc(TIMER_C);
-	m_timer[TIMER_D] = timer_alloc(TIMER_D);
+	m_timer[TIMER_A] = timer_alloc(FUNC(mc68901_device::timer_count), this);
+	m_timer[TIMER_B] = timer_alloc(FUNC(mc68901_device::timer_count), this);
+	m_timer[TIMER_C] = timer_alloc(FUNC(mc68901_device::timer_count), this);
+	m_timer[TIMER_D] = timer_alloc(FUNC(mc68901_device::timer_count), this);
 
 	/* register for state saving */
 	save_item(NAME(m_gpip));
@@ -496,17 +495,6 @@ void mc68901_device::device_reset()
 	write(REGISTER_UCR, 0);
 
 	set_so(true);
-}
-
-
-//-------------------------------------------------
-//  device_timer - handler timer events
-//-------------------------------------------------
-
-void mc68901_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	if(id >= TIMER_A && id <= TIMER_D)
-		timer_count(id);
 }
 
 
@@ -696,7 +684,7 @@ void mc68901_device::write(offs_t offset, u8 data)
 			{
 				int divisor = PRESCALER[m_tacr & 0x07];
 				LOG("MC68901 Timer A Delay Mode : %u Prescale\n", divisor);
-				m_timer[TIMER_A]->adjust(attotime::from_hz(m_timer_clock / divisor), 0, attotime::from_hz(m_timer_clock / divisor));
+				m_timer[TIMER_A]->adjust(attotime::from_hz(m_timer_clock / divisor), TIMER_A, attotime::from_hz(m_timer_clock / divisor));
 			}
 			break;
 
@@ -712,12 +700,8 @@ void mc68901_device::write(offs_t offset, u8 data)
 		case TCR_TIMER_PULSE_64:
 		case TCR_TIMER_PULSE_100:
 		case TCR_TIMER_PULSE_200:
-			{
-				int divisor = PRESCALER[m_tacr & 0x07];
-				LOG("MC68901 Timer A Pulse Width Mode : %u Prescale\n", divisor);
-				m_timer[TIMER_A]->adjust(attotime::never, 0, attotime::from_hz(m_timer_clock / divisor));
-				m_timer[TIMER_A]->enable(false);
-			}
+			LOG("MC68901 Timer A Pulse Width Mode\n");
+			m_timer[TIMER_A]->adjust(attotime::never);
 			break;
 		}
 
@@ -749,9 +733,9 @@ void mc68901_device::write(offs_t offset, u8 data)
 		case TCR_TIMER_DELAY_100:
 		case TCR_TIMER_DELAY_200:
 			{
-			int divisor = PRESCALER[m_tbcr & 0x07];
-			LOG("MC68901 Timer B Delay Mode : %u Prescale\n", divisor);
-			m_timer[TIMER_B]->adjust(attotime::from_hz(m_timer_clock / divisor), 0, attotime::from_hz(m_timer_clock / divisor));
+				int divisor = PRESCALER[m_tbcr & 0x07];
+				LOG("MC68901 Timer B Delay Mode : %u Prescale\n", divisor);
+				m_timer[TIMER_B]->adjust(attotime::from_hz(m_timer_clock / divisor), TIMER_B, attotime::from_hz(m_timer_clock / divisor));
 			}
 			break;
 
@@ -767,12 +751,8 @@ void mc68901_device::write(offs_t offset, u8 data)
 		case TCR_TIMER_PULSE_64:
 		case TCR_TIMER_PULSE_100:
 		case TCR_TIMER_PULSE_200:
-			{
-			int divisor = PRESCALER[m_tbcr & 0x07];
-			LOG("MC68901 Timer B Pulse Width Mode : %u Prescale\n", DIVISOR);
-			m_timer[TIMER_B]->adjust(attotime::never, 0, attotime::from_hz(m_timer_clock / divisor));
-			m_timer[TIMER_B]->enable(false);
-			}
+			LOG("MC68901 Timer B Pulse Width Mode\n");
+			m_timer[TIMER_B]->adjust(attotime::never);
 			break;
 		}
 
@@ -806,7 +786,7 @@ void mc68901_device::write(offs_t offset, u8 data)
 			{
 				int divisor = PRESCALER[m_tcdcr & 0x07];
 				LOG("MC68901 Timer D Delay Mode : %u Prescale\n", divisor);
-				m_timer[TIMER_D]->adjust(attotime::from_hz(m_timer_clock / divisor), 0, attotime::from_hz(m_timer_clock / divisor));
+				m_timer[TIMER_D]->adjust(attotime::from_hz(m_timer_clock / divisor), TIMER_D, attotime::from_hz(m_timer_clock / divisor));
 			}
 			break;
 		}
@@ -828,7 +808,7 @@ void mc68901_device::write(offs_t offset, u8 data)
 			{
 				int divisor = PRESCALER[(m_tcdcr >> 4) & 0x07];
 				LOG("MC68901 Timer C Delay Mode : %u Prescale\n", divisor);
-				m_timer[TIMER_C]->adjust(attotime::from_hz(m_timer_clock / divisor), 0, attotime::from_hz(m_timer_clock / divisor));
+				m_timer[TIMER_C]->adjust(attotime::from_hz(m_timer_clock / divisor), TIMER_C, attotime::from_hz(m_timer_clock / divisor));
 			}
 			break;
 		}

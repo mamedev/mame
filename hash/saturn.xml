@@ -101,9 +101,9 @@ license:CC0
 	  Angelique Special 2 (Japan) [T-7627G]                                                 | ########MISSING########
 	  Angelique Special 2 (Japan) (Premium Box) [T-7638G]                                   |  @@
 	  Another Memories (Japan) [T-38001G]                                                   | (amemorie)
-	  Aponashi Girls: Olympos (Japan) (Shokai Gentei Cell Ga Package A) [T-4304G]           | - are these the same disc as the B package?
-	  Aponashi Girls: Olympos (Japan) (Shokai Gentei Cell Ga Package B) [T-4306G]           | (olympos)
-	  Aponashi Girls: Olympos (Japan) (Shokai Gentei Cell Ga Package C) [T-4307G]           | - are these the same disc as the B package?
+	  Aponashi Girls: Olympos (Japan) (Shokai Gentei Cel-ga Package A) [T-4304G]           | - are these the same disc as the B package?
+	  Aponashi Girls: Olympos (Japan) (Shokai Gentei Cel-ga Package B) [T-4306G]           | (olympos)
+	  Aponashi Girls: Olympos (Japan) (Shokai Gentei Cel-ga Package C) [T-4307G]           | - are these the same disc as the B package?
 	  Aqua-World Umibi Monogatari (Japan) [T-30301G]                                        | (aquawld)
 	  AquaZone Desktop Life (Japan) [T-24001G]                                              | (aquazone)
 	  AquaZone Option Disc Series 1 Angel Fish (Japan) [T-24002G]                           | (aquaopt1)
@@ -257,7 +257,7 @@ license:CC0
 	  Dead or Alive (Japan) (Gentei Seisan Ban) [T-3604G]                                   |  @@
 	  Deadalus (Japan) [GS-9008]                                                            | (deadalus)
 	  Death Crimson (Japan) [T-23202G]                                                      | (deathcri)
-	  Death Throttle: Kakuzetsu Toshi Kara no Dasshutsu (Japan) [T-26403G]                  | (deaththr)        playable?
+	  Death Throttle: Kakuzetsu Toshi kara no Dasshutsu (Japan) [T-26403G]                  | (deaththr)        playable?
 	  DeathMask (Japan) [T-22701G]                                                          | (deathmsk)
 	  DecAthlete (Japan) [GS-9096]                                                          | (decathltj)
 	  DecAthlete (Japan) (Satakore) [GS-9150]                                               | (decathltjsa)
@@ -1027,7 +1027,7 @@ license:CC0
 	  Seifuku Densetsu: Pretty Fighter X (Japan) [T-15001G]                                 | (prettyx)
 	  Seikai Risshiden: Yoi Kuni Yoi Seiji (Japan) [T-1805G]                                | (seikairi)
 	  Seireki 1999: Pharoah no Fukkatsu (Japan) [T-18001G]                                  | (seireki)
-	  Sekai no Shasou Kara I Swiss-hen: Alps Tozantetsudou no Tabi (Japan) [T-32201G]       | (swisshen)
+	  Sekai no Shasou kara I Swiss-hen: Alps Tozantetsudou no Tabi (Japan) [T-32201G]       | (swisshen)
 	  Sengoku Blade: Sengoku Ace Episode II (Japan) [T-14410G]                              | (sengblad)
 	  Senken Kikyouden (Japan) [T-37401G]                                                   | (senken)
 	  Senkutsu Katsuryu Taisen: Chaos Seed (Japan) [T-30902G]                               | (chaossd)
@@ -1230,7 +1230,7 @@ license:CC0
 	  Thunder Force V (Japan) (Special Pack) [T-1812G]                                      |  @@
 	  Thunder Storm & Road Blaster (Japan) [T-20701G]                                       | (tstrmrbl)
 	  Thunderhawk II (Japan) [T-6006G]                                                      | (thawk2j)
-	  Tilk: Aoi Umi Kara Kita Shoujo (Japan) [T-32508G]                                     | (tilk)
+	  Tilk: Aoi Umi kara Kita Shoujo (Japan) [T-32508G]                                     | (tilk)
 	  Time Bokan Series: Bokan to Ippatsu! Doronboo Kanpekiban (Japan) [T-20607G]           | (timeboka)
 	  Time Commando (Japan) [T-8129G]                                                       | (timecomm)
 	  Time Gal & Ninja Hayate (Japan) [T-20702G]                                            | (tgalninh)
@@ -2751,7 +2751,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Ayakashi Ninden Kunoichiban Plus (Japan) (Disc 1)... -->
 	<software name="ankplsa" cloneof="ankpls" supported="no">
-		<description>Ayakashi Ninden Kunoichiban Plus (Jpn, Alt Disc 1)</description>
+		<description>Ayakashi Ninden Kunoichiban Plus (Jpn, alt disc 1)</description>
 		<year>1998</year>
 		<publisher>Shoeisha</publisher>
 		<info name="serial" value="T-21512G"/>
@@ -2801,7 +2801,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Baku Baku Animal - Sekai Shiiku Gakari Senshuken (Japan) (Rev A)... -->
 	<software name="bakubakuj" cloneof="bakubaku" supported="no">
-		<description>Baku Baku Animal - Sekai Shiiku Gakari Senshuken (Jpn, Rev. A)</description>
+		<description>Baku Baku Animal - Sekai Shiiku Gakari Senshuken (Jpn, rev. A)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9040"/>
@@ -2817,7 +2817,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Bakuretsu Hunter (Japan) (Disc 2) (Omake CD)... -->
 	<software name="bakhunta" cloneof="bakhunt" supported="no">
-		<description>Bakuretsu Hunter (Jpn, Alt Omake CD)</description>
+		<description>Bakuretsu Hunter (Jpn, alt Omake CD)</description>
 		<year>1996</year>
 		<publisher>I'Max</publisher>
 		<info name="serial" value="T-22402G"/>
@@ -3202,9 +3202,9 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Conveni 2, The - Zenkoku Chain Tenkai da! (Japan)... -->
+	<!-- Identifying Conveni 2, The - Zenkoku Chain Tenkai Da! (Japan)... -->
 	<software name="conveni2" supported="no">
-		<description>The Conveni 2 - Zenkoku Chain Tenkai da! (Jpn)</description>
+		<description>The Conveni 2 - Zenkoku Chain Tenkai Da! (Jpn)</description>
 		<year>1998</year>
 		<publisher>Human</publisher>
 		<info name="serial" value="T-4317G"/>
@@ -3615,7 +3615,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Digital Dance Mix Vol.1 - Namie Amuro (Japan) (Rev A) (11M)... -->
 	<software name="digidanc" supported="no">
-		<description>Digital Dance Mix Vol. 1 - Namie Amuro (Jpn, Rev. A, 11M)</description>
+		<description>Digital Dance Mix Vol. 1 - Namie Amuro (Jpn, rev. A, 11M)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9133"/>
@@ -3885,7 +3885,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying DX Jinsei Game (Japan) (Rev B)... -->
 	<software name="dxjinsei" supported="no">
-		<description>DX Jinsei Game (Jpn, Rev. B)</description>
+		<description>DX Jinsei Game (Jpn, rev. B)</description>
 		<year>1995</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="T-10302G"/>
@@ -4165,7 +4165,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Fighting Vipers (Japan) (Rev A)... -->
 	<software name="fvipersj" cloneof="fvipers" supported="no">
-		<description>Fighting Vipers (Jpn, Rev. A)</description>
+		<description>Fighting Vipers (Jpn, rev. A)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9101"/>
@@ -4181,7 +4181,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Fighting Vipers (Japan) (Rev C)... -->
 	<software name="fvipersja" cloneof="fvipers" supported="no">
-		<description>Fighting Vipers (Jpn, Rev. C)</description>
+		<description>Fighting Vipers (Jpn, rev. C)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9101"/>
@@ -4477,7 +4477,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Stop BGMs sound playback during gameplay in both games, [CD-Block] uses curfad filter rejection -->
 	<software name="gokuparo" cloneof="parodius" supported="no">
-		<description>Gokujou Parodius Da! Deluxe Pack (Jpn, Rev. A)</description>
+		<description>Gokujou Parodius Da! Deluxe Pack (Jpn, rev. A)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-9501G (VS003-J1)"/>
@@ -4588,7 +4588,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Hangs on Sega logo with [CD-Block] keeps looping with command 0x51 (regression) -->
 	<software name="granddm" supported="no">
-		<description>Grandia - Digital Museum (Jpn, Rev. A)</description>
+		<description>Grandia - Digital Museum (Jpn, rev. A)</description>
 		<year>1998</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-4512G"/>
@@ -4668,7 +4668,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!--  Doesn't read file ID of "Illust Gallery" / "Charactor Index" / ending(s?), [CD-Block] doesn't read root directory properly -->
+	<!-- Doesn't read file ID of "Illust Gallery" / "Charactor Index" / ending(s?), [CD-Block] doesn't read root directory properly -->
 	<software name="gunbird" supported="no">
 		<description>Gunbird (Jpn)</description>
 		<year>1995</year>
@@ -4769,7 +4769,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Houma Hunter Lime Perfect Collection (Japan) (Disc 2)... -->
 	<software name="hhuntpca" cloneof="hhuntpc" supported="no">
-		<description>Houma Hunter Lime Perfect Collection (Jpn, Alt)</description>
+		<description>Houma Hunter Lime Perfect Collection (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Asmik</publisher>
 		<info name="serial" value="T-2001G"/>
@@ -4858,7 +4858,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying J. League Pro Soccer Club wo Tsukurou! (Japan) (Rev A)... -->
 	<software name="jltsuk" supported="no">
-		<description>J. League Pro Soccer Club wo Tsukurou! (Jpn, Rev. A)</description>
+		<description>J. League Pro Soccer Club wo Tsukurou! (Jpn, rev. A)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9034"/>
@@ -4874,7 +4874,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying J. League Pro Soccer Club wo Tsukurou! (Japan) (Rev B)... -->
 	<software name="jltsuka" cloneof="jltsuk" supported="no">
-		<description>J. League Pro Soccer Club wo Tsukurou! (Jpn, Rev. B)</description>
+		<description>J. League Pro Soccer Club wo Tsukurou! (Jpn, rev. B)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9034"/>
@@ -4954,7 +4954,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying J. League Pro Soccer Club wo Tsukurou! 2 (Japan) (Rev C) (32M)... -->
 	<software name="jltsuk2c" cloneof="jltsuk2" supported="no">
-		<description>J. League Pro Soccer Club wo Tsukurou! 2 (Jpn, Rev. C, 32M)</description>
+		<description>J. League Pro Soccer Club wo Tsukurou! 2 (Jpn, rev. C, 32M)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9168"/>
@@ -5126,7 +5126,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Kanzen Chuukei Pro Yakyuu Greatest Nine (Japan) (Rev A)... -->
 	<software name="gninea" cloneof="gnine" supported="no">
-		<description>Kanzen Chuukei Pro Yakyuu Greatest Nine (Jpn, Rev. A)</description>
+		<description>Kanzen Chuukei Pro Yakyuu Greatest Nine (Jpn, rev. A)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9017"/>
@@ -5142,7 +5142,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Kanzen Chuukei Pro Yakyuu Greatest Nine (Japan) (Rev B)... -->
 	<software name="gnineb" cloneof="gnine" supported="no">
-		<description>Kanzen Chuukei Pro Yakyuu Greatest Nine (Jpn, Rev B)</description>
+		<description>Kanzen Chuukei Pro Yakyuu Greatest Nine (Jpn, rev. B)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9017"/>
@@ -5736,7 +5736,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Mahjong Doukyuusei Special (Japan) (Disc 1) (Genteiban)... -->
 	<software name="mjdokyspgena" cloneof="mjdokysp" supported="no">
-		<description>Mahjong Doukyuusei Special (Jpn, Genteiban, Alt)</description>
+		<description>Mahjong Doukyuusei Special (Jpn, Genteiban, alt)</description>
 		<year>1996</year>
 		<publisher>Make Software</publisher>
 		<info name="serial" value="T-25302G"/>
@@ -6072,7 +6072,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Neon Genesis - Evangelion - Koutetsu no Girlfriend (Japan) (Disc 1)... -->
 	<!-- Identifying Neon Genesis - Evangelion - Koutetsu no Girlfriend (Japan) (Disc 2)... -->
 	<software name="shinevgfa" cloneof="shinevgf" supported="no">
-		<description>Neon Genesis: Evangelion - Koutetsu no Girlfriend (Jpn, Alt)</description>
+		<description>Neon Genesis: Evangelion - Koutetsu no Girlfriend (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9194"/>
@@ -6093,7 +6093,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Neon Genesis Evangelion - Digital Card Library (Japan)... -->
 	<software name="shinevdca" cloneof="shinevdc" supported="no">
-		<description>Neon Genesis Evangelion - Digital Card Library (Jpn, Alt)</description>
+		<description>Neon Genesis Evangelion - Digital Card Library (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9159"/>
@@ -6221,7 +6221,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Noon (Japan) (Rev A)... -->
 	<software name="noon" supported="no">
-		<description>Noon (Jpn, Rev. A)</description>
+		<description>Noon (Jpn, rev. A)</description>
 		<year>1998</year>
 		<publisher>MicroCabin</publisher>
 		<info name="serial" value="T-5206G"/>
@@ -6457,7 +6457,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Prikura - Princess Clara Daisakusen (Japan)... -->
 	<software name="purikuraa" cloneof="purikura" supported="no">
-		<description>Purikura - Princess Clara Daisakusen (Jpn, Alt)</description>
+		<description>Purikura - Princess Clara Daisakusen (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="T-14409G"/>
@@ -6505,7 +6505,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Pro Yakyuu Greatest Nine '97 (Japan) (Rev A)... -->
 	<software name="gnine97a" cloneof="gnine97" supported="no">
-		<description>Pro Yakyuu Greatest Nine '97 (Jpn, Rev. A)</description>
+		<description>Pro Yakyuu Greatest Nine '97 (Jpn, rev. A)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9139"/>
@@ -6521,7 +6521,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Pro Yakyuu Greatest Nine '97 - Make Miracle (Japan)... -->
 	<software name="gnine97ma" cloneof="gnine97m" supported="no">
-		<description>Pro Yakyuu Greatest Nine '97 - Make Miracle (Jpn, Alt)</description>
+		<description>Pro Yakyuu Greatest Nine '97 - Make Miracle (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9171"/>
@@ -6537,7 +6537,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Pro Yakyuu Greatest Nine '98 (Japan) (Rev B)... -->
 	<software name="gnine98a" cloneof="gnine98" supported="no">
-		<description>Pro Yakyuu Greatest Nine '98 (Jpn, Rev. B)</description>
+		<description>Pro Yakyuu Greatest Nine '98 (Jpn, rev. B)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9185"/>
@@ -6553,7 +6553,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Pro Yakyuu Greatest Nine '98 - Summer Action (Japan)... -->
 	<software name="gnine98sa" cloneof="gnine98s" supported="no">
-		<description>Pro Yakyuu Greatest Nine '98 - Summer Action (Jpn, Alt)</description>
+		<description>Pro Yakyuu Greatest Nine '98 - Summer Action (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9202"/>
@@ -6569,7 +6569,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Pro Yakyuu Team mo Tsukurou! (Japan) (Rev B)... -->
 	<software name="proyakts" supported="no">
-		<description>Pro Yakyuu Team mo Tsukurou! (Jpn, Rev. B)</description>
+		<description>Pro Yakyuu Team mo Tsukurou! (Jpn, rev. B)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9165"/>
@@ -6681,7 +6681,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Quiz Nanairo Dreams - Nijiirochou no Kiseki (Japan) (Rev A)... -->
 	<software name="qndream" supported="no">
-		<description>Quiz Nanairo Dreams - Nijiirochou no Kiseki (Jpn, Rev. A)</description>
+		<description>Quiz Nanairo Dreams - Nijiirochou no Kiseki (Jpn, rev. A)</description>
 		<year>1997</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="T-1220G"/>
@@ -8531,7 +8531,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Tantei Jinguuji Saburou - Yume no Owari ni (Japan)... -->
 	<software name="tjsyumowa" cloneof="tjsyumow" supported="no">
-		<description>Tantei Jinguuji Saburou - Yume no Owari ni (Jpn, Alt)</description>
+		<description>Tantei Jinguuji Saburou - Yume no Owari ni (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Data East</publisher>
 		<info name="serial" value="T-1316G"/>
@@ -9567,7 +9567,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying 3x3 Eyes (Disc 1 of 3) (JAP) (DW0422)... -->
 	<software name="3x3eyesa" cloneof="3x3eyes" supported="no">
-		<description>3x3 Eyes - Kyuusei Koushu S (Jpn, Alt Disc 1)</description>
+		<description>3x3 Eyes - Kyuusei Koushu S (Jpn, alt disc 1)</description>
 		<year>1996</year>
 		<publisher>Nihon Create</publisher>
 		<info name="serial" value="T-21301G"/>
@@ -9584,7 +9584,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Airs Adventure (JAP) (DW0400)... -->
 	<software name="airsadveb" cloneof="airsadve" supported="no">
-		<description>Airs Adventure (Jpn, Alt 2)</description>
+		<description>Airs Adventure (Jpn, alt 2)</description>
 		<year>1996</year>
 		<publisher>Game Studio</publisher>
 		<info name="serial" value="T-20301G"/>
@@ -9648,7 +9648,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Alien Trilogy (JAP) (DW0569)... -->
 	<software name="alientrija" cloneof="alientri" supported="no">
-		<description>Alien Trilogy (Jpn, Alt)</description>
+		<description>Alien Trilogy (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Acclaim Japan</publisher>
 		<info name="serial" value="T-8113G"/>
@@ -9696,7 +9696,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Assault Suit Leynos 2 (JAP) (DW0195)... -->
 	<software name="leynos2a" cloneof="leynos2" supported="no">
-		<description>Assault Suit Leynos 2 (Jpn, Alt)</description>
+		<description>Assault Suit Leynos 2 (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>NCS</publisher>
 		<info name="serial" value="T-2501G"/>
@@ -9744,7 +9744,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Atelier Marie v1.3 (JAP) (DW0352)... -->
 	<software name="marie13a" cloneof="marie13" supported="no">
-		<description>Marie no Atelier Ver. 1.3 - Salburg no Renkinjutsushi (Jpn, Alt)</description>
+		<description>Marie no Atelier Ver. 1.3 - Salburg no Renkinjutsushi (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="T-15033G"/>
@@ -9763,7 +9763,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Azel Panzer Dragoon RPG (Disc 3 of 4) (JAP) (DW0309)... -->
 	<!-- Identifying Azel Panzer Dragoon RPG (Disc 4 of 4) (JAP) (DW0309)... -->
 	<software name="azelpanza" cloneof="panzsaga" supported="no"> <!-- (DW0309) -->
-		<description>Azel - Panzer Dragoon RPG (Jpn, Alt)</description>
+		<description>Azel - Panzer Dragoon RPG (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9076"/>
@@ -9855,7 +9855,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Biohazard (JAP) (DW0300)... -->
 	<software name="biohaza" cloneof="revil" supported="no">
-		<description>Bio Hazard (Jpn, Alt)</description>
+		<description>Bio Hazard (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="T-1219G"/>
@@ -9903,7 +9903,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Burning Rangers (JAP) (DW0339)... -->
 	<software name="burningrja" cloneof="burningr" supported="no">
-		<description>Burning Rangers (Jpn, Alt)</description>
+		<description>Burning Rangers (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9174"/>
@@ -9934,7 +9934,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Capcom Generation 2 (JAP) (DW0281)... -->
 	<software name="capgen2a" cloneof="capgen2" supported="no">
-		<description>Capcom Generation - Dai-2-shuu - Makai to Kishi (Jpn, Alt)</description>
+		<description>Capcom Generation - Dai-2-shuu - Makai to Kishi (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="T-1233G"/>
@@ -9950,7 +9950,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Cat the Ripper (JAP) (DW0614)... -->
 	<software name="catripa" cloneof="catrip" supported="no">
-		<description>Cat the Ripper - 13-ninme no Tanteishi (Jpn, Alt)</description>
+		<description>Cat the Ripper - 13-ninme no Tanteishi (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Tonkin House</publisher>
 		<info name="serial" value="T-35701G"/>
@@ -9983,7 +9983,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Choujikuu Yousai Macross (Disc 1 of 2) (JAP) (DW0183)... -->
 	<!-- Identifying Choujikuu Yousai Macross (Disc 2 of 2) (JAP) (DW0183)... -->
 	<software name="macrossa" cloneof="macross" supported="no">
-		<description>Choujikuu Yousai Macross - Ai Oboete Imasu ka (Jpn, Alt)</description>
+		<description>Choujikuu Yousai Macross - Ai Oboete Imasu ka (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Bandai Visual</publisher>
 		<info name="serial" value="T-23403G"/>
@@ -10085,7 +10085,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying D no Shokutaku (Disc 1 of 2) (JAP) (DW0511)... -->
 	<!-- Identifying D no Shokutaku (Disc 2 of 2) (JAP) (DW0511)... -->
 	<software name="dja" cloneof="d" supported="no">
-		<description>D no Shokutaku (Jpn, Alt)</description>
+		<description>D no Shokutaku (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Acclaim Japan</publisher>
 		<info name="serial" value="T-8101G"/>
@@ -10138,7 +10138,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Dark Savior (JAP) (DW0579)... -->
 	<software name="darksavja" cloneof="darksav" supported="no">
-		<description>Dark Savior (Jpn, Alt)</description>
+		<description>Dark Savior (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Climax</publisher>
 		<info name="serial" value="T-22101G"/>
@@ -10250,7 +10250,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Deep Fear (Disc 1 of 2) (JAP) (DW0638)... -->
 	<!-- Identifying Deep Fear (Disc 2 of 2) (JAP) (DW0638)... -->
 	<software name="deepfearja" cloneof="deepfear" supported="no">
-		<description>Deep Fear (Jpn, Alt)</description>
+		<description>Deep Fear (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9189"/>
@@ -10271,7 +10271,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Densetsu no Ogre Battle (JAP) (DW0433)... -->
 	<software name="ogrebatla" cloneof="ogrebatl" supported="no">
-		<description>Densetsu no Ogre Battle (Jpn, Alt)</description>
+		<description>Densetsu no Ogre Battle (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Riverhill Software</publisher>
 		<info name="serial" value="T-5305G"/>
@@ -10326,7 +10326,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Devil Summoner Soul Hackers (Disc 1 of 2) (JAP) (DW0483)... -->
 	<!-- Identifying Devil Summoner Soul Hackers (Disc 2 of 2) (JAP) (DW0483)... -->
 	<software name="dsumsoula" cloneof="dsumsoul" supported="no">
-		<description>Devil Summoner - Soul Hackers (Jpn, Alt)</description>
+		<description>Devil Summoner - Soul Hackers (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="T-14420G"/>
@@ -10425,7 +10425,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying DonPachi (JAP) (DW0635)... -->
 	<software name="donpachia" cloneof="donpachi" supported="no">
-		<description>DonPachi (Jpn, Alt)</description>
+		<description>DonPachi (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="T-14405G"/>
@@ -10475,7 +10475,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Doukyuusei 2 (Disc 1 of 2) (JAP) (DW0307)... -->
 	<!-- Identifying Doukyuusei 2 (Disc 2 of 2) (JAP) (DW0307)... -->
 	<software name="dokyuse2a" cloneof="dokyuse2" supported="no">
-		<description>Doukyuusei 2 (Jpn, Alt)</description>
+		<description>Doukyuusei 2 (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>NEC Interchannel</publisher>
 		<info name="serial" value="T-20104G"/>
@@ -10496,7 +10496,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Dragon Ball Z - Shinbutohden (JAP) (DW0102)... -->
 	<software name="dbzsbutoa" cloneof="dbzsbuto" supported="no">
-		<description>Dragon Ball Z - Shin Butouden (Jpn, Alt)</description>
+		<description>Dragon Ball Z - Shin Butouden (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="T-13302G"/>
@@ -10552,7 +10552,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Dynamite Deka (JAP) (DW0062)... -->
 	<software name="dnmtdekaa" cloneof="diehard" supported="no">
-		<description>Dynamite Deka (Jpn, Alt)</description>
+		<description>Dynamite Deka (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9122"/>
@@ -10641,7 +10641,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Enemy Zero (Disc 2 of 4) (JAP) (DW0512)... -->
 	<!-- Identifying Enemy Zero (Disc 3 of 4) (JAP) (DW0512)... -->
 	<software name="enemy0ja" cloneof="enemy0" supported="no">
-		<description>Enemy Zero (Jpn, Alt)</description>
+		<description>Enemy Zero (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Warp</publisher>
 		<info name="serial" value="T-30001G"/>
@@ -10703,7 +10703,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Fantasy Zone (JAP) (DW0427)... -->
 	<software name="fantzonea" cloneof="fantzone" supported="no">
-		<description>Sega Ages - Fantasy Zone (Jpn, Alt)</description>
+		<description>Sega Ages - Fantasy Zone (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9136"/>
@@ -10735,7 +10735,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Fighters Megamix (JAP) (DW0015)... -->
 	<software name="fightmixja" cloneof="fightmix" supported="no">
-		<description>Fighters Megamix (Jpn, Alt)</description>
+		<description>Fighters Megamix (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9126"/>
@@ -10936,7 +10936,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Gals Panic SS (JAP) (DW0158)... -->
 	<software name="gpanicssa" cloneof="gpanicss" supported="no">
-		<description>Gals Panic SS (Jpn, Alt)</description>
+		<description>Gals Panic SS (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>MYCOM</publisher>
 		<info name="serial" value="T-29002G"/>
@@ -11059,7 +11059,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Girl Doll Toy (JAP) (DW0601)... -->
 	<software name="girldolla" cloneof="girldoll" supported="no">
-		<description>Girl Doll Toy - Tamashii wo Kudasai (Jpn, Alt)</description>
+		<description>Girl Doll Toy - Tamashii wo Kudasai (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Xuse</publisher>
 		<info name="serial" value="T-37002G"/>
@@ -11106,7 +11106,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Gradius Deluxe Pack (JAP) (DW0174)... -->
 	<software name="gradiusda" cloneof="gradiusd" supported="no">
-		<description>Gradius Deluxe Pack (Jpn, Alt)</description>
+		<description>Gradius Deluxe Pack (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-9509G (VS033-J1)"/>
@@ -11144,7 +11144,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Grandia Digital Museum (JAP) (DW0054)... -->
 	<software name="granddmb" cloneof="granddm" supported="no">
-		<description>Grandia - Digital Museum (Jpn, Alt)</description>
+		<description>Grandia - Digital Museum (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-4512G"/>
@@ -11175,7 +11175,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Guardian Force (JAP) (DW0204)... -->
 	<software name="grdnfrcea" cloneof="grdnfrce" supported="no">
-		<description>Guardian Force (Jpn, Alt)</description>
+		<description>Guardian Force (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Success</publisher>
 		<info name="serial" value="T-9905G"/>
@@ -11191,7 +11191,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Guardian Heroes (JAP) (DW0524)... -->
 	<software name="guardherja" cloneof="guardher" supported="no">
-		<description>Guardian Heroes (Jpn, Alt)</description>
+		<description>Guardian Heroes (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9031"/>
@@ -11207,7 +11207,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Gunbird (JAP) (DW0188)... -->
 	<software name="gunbirda" cloneof="gunbird" supported="no">
-		<description>Gunbird (Jpn, Alt)</description>
+		<description>Gunbird (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="T-14402G"/>
@@ -11223,7 +11223,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Gungriffon - The Eurasian Conflict (JAP) (DW0557)... -->
 	<software name="gungriffja" cloneof="gungriff" supported="no">
-		<description>Gungriffon - The Eurasian Conflict (Jpn, Alt)</description>
+		<description>Gungriffon - The Eurasian Conflict (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-4502G"/>
@@ -11254,7 +11254,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Gussun Oyoyo S (JAP) (DW0632)... -->
 	<software name="gussuna" cloneof="gussun" supported="no">
-		<description>Gussun Oyoyo S (Jpn, Alt)</description>
+		<description>Gussun Oyoyo S (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Xing</publisher>
 		<info name="serial" value="T-26101G"/>
@@ -11270,7 +11270,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Hanagumi Taisen Columns (JAP) (DW0216)... -->
 	<software name="hanacolsa" cloneof="hanacols" supported="no">
-		<description>Sakura Taisen - Hanagumi Taisen Columns (Jpn, Alt)</description>
+		<description>Sakura Taisen - Hanagumi Taisen Columns (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9138"/>
@@ -11426,7 +11426,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying J.League Victory Goal '96 (JAP) (DW0608)... -->
 	<software name="jlv96a" cloneof="jlv96" supported="no">
-		<description>J. League Victory Goal '96 (Jpn, Alt)</description>
+		<description>J. League Victory Goal '96 (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9048"/>
@@ -11489,7 +11489,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Kidou Senshi Gundam Gaiden I Senritsu no Blue (JAP) (DW0636)... -->
 	<software name="gundg1a" cloneof="gundg1" supported="no">
-		<description>Kidou Senshi Gundam Gaiden I - Senritsu no Blue (Jpn, Alt)</description>
+		<description>Kidou Senshi Gundam Gaiden I - Senritsu no Blue (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="T-13307G"/>
@@ -11536,7 +11536,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Kidou Senshi Z Gundam ~Zenpen Zeta no Kodou~ (JAP) (DW0626)... -->
 	<software name="zgundzena" cloneof="zgundzen" supported="no">
-		<description>Kidou Senshi Z Gundam - Zenpen Zeta no Kodou (Jpn, Alt)</description>
+		<description>Kidou Senshi Z Gundam - Zenpen Zeta no Kodou (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="T-13315G"/>
@@ -11724,7 +11724,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Last Bronx (Disc 1 of 2) (JAP) (DW0293)... -->
 	<!-- Identifying Last Bronx (Disc 2 of 2) (JAP) (DW0293)... -->
 	<software name="lastbrnxja" cloneof="lastbrnx" supported="no">
-		<description>Last Bronx (Jpn, Alt)</description>
+		<description>Last Bronx (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9152"/>
@@ -11768,7 +11768,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Lunar 2 - Eternal Blue (Disc 1 of 2) (JAP) (DW0391)... -->
 	<!-- Identifying Lunar 2 - Eternal Blue (Disc 2 of 2) (JAP) (DW0391)... -->
 	<software name="lunar2a" cloneof="lunar2" supported="no">
-		<description>Lunar 2 - Eternal Blue (Jpn, Alt)</description>
+		<description>Lunar 2 - Eternal Blue (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Kadokawa Shoten</publisher>
 		<info name="serial" value="T-27906G"/>
@@ -11836,7 +11836,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Lupin III Pyramid no Kenja (JAP) (DW0344)... -->
 	<software name="lupinpya" cloneof="lupinpy" supported="no">
-		<description>Lupin Sansei - Pyramid no Kenja (Jpn, Alt)</description>
+		<description>Lupin Sansei - Pyramid no Kenja (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Asmik</publisher>
 		<info name="serial" value="T-2004G"/>
@@ -11852,7 +11852,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying m [emu] ~Kimi wo Tsutaete~ (JAP) (DW0454)... -->
 	<software name="memukimia" cloneof="memukimi" supported="no">
-		<description>m [emu] - Kimi wo Tsutaete (Jpn, Alt)</description>
+		<description>m [emu] - Kimi wo Tsutaete (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Nexus Interact</publisher>
 		<info name="serial" value="T-31202G"/>
@@ -11915,7 +11915,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Manx TT Super Bike (JAP) (DW0435)... -->
 	<software name="manxttja" cloneof="manxtt" supported="no">
-		<description>Manx TT Super Bike (Jpn, Alt)</description>
+		<description>Manx TT Super Bike (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9102"/>
@@ -11946,7 +11946,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Marvel Super Heroes (JAP) (DW0482)... -->
 	<software name="mshja" cloneof="msh" supported="no">
-		<description>Marvel Super Heroes (Jpn, Alt)</description>
+		<description>Marvel Super Heroes (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="T-1215G"/>
@@ -12130,7 +12130,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Mr. Bones (Disc 1 of 2) (JAP) (DW0424)... -->
 	<!-- Identifying Mr. Bones (Disc 2 of 2) (JAP) (DW0424)... -->
 	<software name="mrbonesja" cloneof="mrbones" supported="no">
-		<description>Mr. Bones (Jpn, Alt)</description>
+		<description>Mr. Bones (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9127"/>
@@ -12182,7 +12182,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Nights Into Dreams... (JAP) (DW0443)... -->
 	<software name="nightsja" cloneof="nights" supported="no">
-		<description>NiGHTS into Dreams... (Jpn, Alt)</description>
+		<description>NiGHTS into Dreams... (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9046"/>
@@ -12198,7 +12198,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Nihon Daihyou Chimu no Kantoku Ninarou! Sekaihatsu Soccer (JAP) (DW0586)... -->
 	<software name="soccrrpga" cloneof="soccrrpg" supported="no">
-		<description>Nihon Daihyou Team no Kantoku ni Naruu! Sekaihatsu Soccer RPG (Jpn, Alt)</description>
+		<description>Nihon Daihyou Team no Kantoku ni Naruu! Sekaihatsu Soccer RPG (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Enix</publisher>
 		<info name="serial" value="T-35504G"/>
@@ -12260,7 +12260,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Nonomura Byouin no Hitobito (JAP) (DW0609)... -->
 	<software name="nonomuraa" cloneof="nonomura" supported="no">
-		<description>Nonomura Byouin no Hitobito (Jpn, Alt)</description>
+		<description>Nonomura Byouin no Hitobito (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Elf</publisher>
 		<info name="serial" value="T-28001G"/>
@@ -12276,7 +12276,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Outlaws of the Lost Dynasty (JAP) (DW0445)... -->
 	<software name="suikoenba" cloneof="darkleg" supported="no">
-		<description>Suiko Enbu - Outlaws of the Lost Dynasty (Jpn, Alt)</description>
+		<description>Suiko Enbu - Outlaws of the Lost Dynasty (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Data East</publisher>
 		<info name="serial" value="T-1302G"/>
@@ -12323,7 +12323,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Panzer Dragoon Zwei (JAP) (DW0438)... -->
 	<software name="panzer2ja" cloneof="panzer2" supported="no">
-		<description>Panzer Dragoon Zwei (Jpn, Alt)</description>
+		<description>Panzer Dragoon Zwei (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9049"/>
@@ -12397,7 +12397,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Pocket Fighter (JAP) (DW0021)... -->
 	<software name="pfghta" cloneof="pfght" supported="no">
-		<description>Pocket Fighter (Jpn, Alt)</description>
+		<description>Pocket Fighter (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="T-1230G"/>
@@ -12415,7 +12415,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Policenauts (Disc 2 of 3) (JAP) (DW0319)... -->
 	<!-- Identifying Policenauts (Disc 3 of 3) (JAP) (DW0319)... -->
 	<software name="policenaa" cloneof="policena" supported="no">
-		<description>Policenauts (Jpn, Alt)</description>
+		<description>Policenauts (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-9510G (VS028-J1)"/>
@@ -12441,7 +12441,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Pro Yakyuu Team mo Tsukurou! (JAP) (DW0634)... -->
 	<software name="proyaktsb" cloneof="proyakts" supported="no">
-		<description>Pro Yakyuu Team mo Tsukurou! (Jpn, Alt)</description>
+		<description>Pro Yakyuu Team mo Tsukurou! (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9165"/>
@@ -12457,7 +12457,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Pulirula Arcade Gears (JAP) (DW0395)... -->
 	<software name="pulirulaa" cloneof="pulirula" supported="no">
-		<description>Arcade Gears Vol. 1 - Pu Li Ru La (Jpn, Alt)</description>
+		<description>Arcade Gears Vol. 1 - Pu Li Ru La (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Xing</publisher>
 		<info name="serial" value="T-26106G"/>
@@ -12537,7 +12537,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Quo Vadis (JAP) (DW0560)... -->
 	<software name="quovadisa" cloneof="quovadis" supported="no">
-		<description>QuoVadis (Jpn, Alt)</description>
+		<description>QuoVadis (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Glams</publisher>
 		<info name="serial" value="T-17401G"/>
@@ -12569,7 +12569,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Radiant Silvergun (JAP) (DW0166)... -->
 	<software name="rsguna" cloneof="rsgun" supported="no">
-		<description>Radiant Silvergun (Jpn, Alt)</description>
+		<description>Radiant Silvergun (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>ESP</publisher>
 		<info name="serial" value="T-32902G"/>
@@ -12585,7 +12585,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Ragnagard (JAP) (DW0580)... -->
 	<software name="ragnagrda" cloneof="ragnagrd" supported="no">
-		<description>Shin Ou Ken (Jpn, Alt)</description>
+		<description>Shin Ou Ken (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="T-3113G"/>
@@ -12602,7 +12602,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Rampo (Disc 1 of 2) (JAP) (DW0418)... -->
 	<!-- Identifying Rampo (Disc 2 of 2) (JAP) (DW0418)... -->
 	<software name="rampoa" cloneof="rampo" supported="no">
-		<description>Rampo (Jpn, Alt)</description>
+		<description>Rampo (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9011"/>
@@ -12642,7 +12642,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Real Sound Kaze No Regret (Disc 3 of 4) (DW0386) (JAP) (DW0386)... -->
 	<!-- Identifying Real Sound Kaze No Regret (Disc 4 of 4) (DW0386) (JAP) (DW0386)... -->
 	<software name="kazeregra" cloneof="kazeregr" supported="no">
-		<description>Real Sound - Kaze no Regret (Jpn, Alt)</description>
+		<description>Real Sound - Kaze no Regret (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Warp</publisher>
 		<info name="serial" value="T-30002G"/>
@@ -12690,7 +12690,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Sakura Taisen (Disc 1 of 2) (JAP) (DW0317)... -->
 	<!-- Identifying Sakura Taisen (Disc 2 of 2) (JAP) (DW0317)... -->
 	<software name="sakurata" cloneof="sakurat" supported="no">
-		<description>Sakura Taisen (Jpn, Alt)</description>
+		<description>Sakura Taisen (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9037"/>
@@ -12713,7 +12713,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Sakura Taisen 2 (Disc 2 of 3) (JAP) (DW0561)... -->
 	<!-- Identifying Sakura Taisen 2 (Disc 3 of 3) (JAP) (DW0561)... -->
 	<software name="sakurat2a" cloneof="sakurat2" supported="no">
-		<description>Sakura Taisen 2 - Kimi, Shini Tamou Kotonakare (Jpn, Alt)</description>
+		<description>Sakura Taisen 2 - Kimi, Shini Tamou Kotonakare (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9198"/>
@@ -12770,7 +12770,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Samurai Spirits Amakusa Kourin (JAP) (DW0141)... -->
 	<software name="samsho4a" cloneof="samsho4" supported="no">
-		<description>Samurai Spirits - Amakusa Kourin (Jpn, Alt)</description>
+		<description>Samurai Spirits - Amakusa Kourin (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="T-3116G"/>
@@ -12787,7 +12787,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Saturn Bomberman (JAP) (DW0444)... -->
 	<software name="satbombmja" cloneof="satbombm" supported="no">
-		<description>Saturn Bomberman (Jpn, Alt)</description>
+		<description>Saturn Bomberman (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="T-14302G"/>
@@ -12880,7 +12880,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Sega Rally Championship (JAP) (DW0442)... -->
 	<software name="srallycja" cloneof="srallyc" supported="no">
-		<description>Sega Rally Championship (Jpn, Alt)</description>
+		<description>Sega Rally Championship (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9047"/>
@@ -12911,7 +12911,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Sega Touring Car Championship (JAP) (DW0436)... -->
 	<software name="stccja" cloneof="stcc" supported="no">
-		<description>Sega Touring Car Championship (Jpn, Alt)</description>
+		<description>Sega Touring Car Championship (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9164"/>
@@ -12943,7 +12943,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Black screen, [CD-Block] doesn't read root directory properly -->
 	<software name="sengblada" cloneof="sengblad" supported="no">
-		<description>Sengoku Blade - Sengoku Ace Episode II (Jpn, Alt)</description>
+		<description>Sengoku Blade - Sengoku Ace Episode II (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="T-14410G"/>
@@ -12995,7 +12995,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Shining Force III - Scenario 3 (JAP) (DW0250)... -->
 	<software name="shinf3s3a" cloneof="shinf3s3" supported="no">
-		<description>Shining Force III - Scenario 3 - Hyouheki no Jashinguu (Jpn, Alt)</description>
+		<description>Shining Force III - Scenario 3 - Hyouheki no Jashinguu (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9203"/>
@@ -13043,7 +13043,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Shinpi No Sekai El-Hazard (Shokai Tokuten Genteiban) (JAP) (DW0605)... -->
 	<software name="elhazardb" cloneof="elhazard" supported="no">
-		<description>Shinpi no Sekai El-Hazard (Jpn, Shokai Tokuten Genteiban, Alt)</description>
+		<description>Shinpi no Sekai El-Hazard (Jpn, Shokai Tokuten Genteiban, alt)</description>
 		<year>1996</year>
 		<publisher>Pioneer LDC</publisher>
 		<info name="serial" value="T-22202G"/>
@@ -13059,7 +13059,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Shinseiki Evangelion (JAP) (DW0542)... -->
 	<software name="shineva" cloneof="shinev" supported="no">
-		<description>Shinseiki Evangelion (Jpn, Alt)</description>
+		<description>Shinseiki Evangelion (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9051"/>
@@ -13075,7 +13075,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Shinseiki Evangelion 2nd Impression (JAP) (DW0545)... -->
 	<software name="shinev2ib" cloneof="shinev2i" supported="no">
-		<description>Shinseiki Evangelion - 2nd Impression (Jpn, Alt)</description>
+		<description>Shinseiki Evangelion - 2nd Impression (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9129"/>
@@ -13129,7 +13129,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Shinsetsu Samurai Spirits Bushidou Retsuden (JAP) (DW0434)... -->
 	<software name="samsprpga" cloneof="samsprpg" supported="no">
-		<description>Shinsetsu Samurai Spirits - Bushidou Retsuden (Jpn, Alt)</description>
+		<description>Shinsetsu Samurai Spirits - Bushidou Retsuden (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="T-3112G"/>
@@ -13145,7 +13145,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Shippuu Mahou Daisakusen (JAP) (DW0181)... -->
 	<software name="mahoudaia" cloneof="mahoudai" supported="no">
-		<description>Shippuu Mahou Daisakusen - Kingdom Grandprix (Jpn, Alt)</description>
+		<description>Shippuu Mahou Daisakusen - Kingdom Grandprix (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>GAGA Communications</publisher>
 		<info name="serial" value="T-18506G"/>
@@ -13176,7 +13176,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Snatcher ~Cyber Punk Adventure~ (JAP) (DW0359)... -->
 	<software name="snatchera" cloneof="snatcher" supported="no">
-		<description>Snatcher - Cyber Punk Adventure (Jpn, Alt)</description>
+		<description>Snatcher - Cyber Punk Adventure (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-9508G (VS013-J1)"/>
@@ -13239,7 +13239,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Sonic R (JAP) (DW0019)... -->
 	<software name="sonicrja" cloneof="sonicr" supported="no">
-		<description>Sonic R (Jpn, Alt)</description>
+		<description>Sonic R (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9170"/>
@@ -13255,7 +13255,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Sotsugyou II Neo Generation ~ Graduation II (JAP) (DW0416)... -->
 	<software name="sotsugy2b" cloneof="sotsugy2" supported="no">
-		<description>Sotsugyou II - Neo Generation (Jpn, Alt)</description>
+		<description>Sotsugyou II - Neo Generation (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Riverhill Software</publisher>
 		<info name="serial" value="T-5301G"/>
@@ -13272,7 +13272,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Sound Novel Machi (Disc 1 of 2) (JAP) (DW0481)... -->
 	<!-- Identifying Sound Novel Machi (Disc 2 of 2) (JAP) (DW0481)... -->
 	<software name="machia" cloneof="machi" supported="no">
-		<description>Sound Novel Machi (Jpn, Alt)</description>
+		<description>Sound Novel Machi (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Chun Soft</publisher>
 		<info name="serial" value="T-34001G"/>
@@ -13309,7 +13309,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Steamgear Mash (JAP) (DW0426)... -->
 	<software name="steamgeaa" cloneof="steamgea" supported="no">
-		<description>SteamGear Mash (Jpn, Alt)</description>
+		<description>SteamGear Mash (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="T-10301G"/>
@@ -13340,7 +13340,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Street Fighter Collection (Disc 1 of 2) (JAP) (DW0036)... -->
 	<software name="sf2ja" cloneof="sf2" supported="no">
-		<description>Street Fighter 2 (Street Fighter Collection Disc 1) (Jpn, Alt)</description>
+		<description>Street Fighter 2 (Street Fighter Collection Disc 1) (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="T-1223G"/>
@@ -13356,7 +13356,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Street Fighter Collection (Disc 2 of 2) (JAP) (DW0036)... -->
 	<software name="sfz2da" cloneof="sfa2d" supported="no">
-		<description>Street Fighter Zero 2 Dash (Street Fighter Collection Disc 2) (Jpn, Alt)</description>
+		<description>Street Fighter Zero 2 Dash (Street Fighter Collection Disc 2) (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="T-1223G"/>
@@ -13388,7 +13388,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Street Fighter Zero 2 (JAP) (DW0078)... -->
 	<software name="sfz2a" cloneof="sfa2" supported="no">
-		<description>Street Fighter Zero 2 (Jpn, Alt)</description>
+		<description>Street Fighter Zero 2 (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="T-1212G"/>
@@ -13419,7 +13419,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Street Fighter Zero 3 (JAP) (DW0037)... -->
 	<software name="sfz3a" cloneof="sfz3" supported="no">
-		<description>Street Fighter Zero 3 (Jpn, Alt)</description>
+		<description>Street Fighter Zero 3 (Jpn, alt)</description>
 		<year>1999</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="T-1247G"/>
@@ -13436,7 +13436,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Strikers 1945 (JAP) (DW0178)... -->
 	<software name="s1945a" cloneof="s1945" supported="no">
-		<description>Strikers 1945 (Jpn, Alt)</description>
+		<description>Strikers 1945 (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="T-14407G"/>
@@ -13807,7 +13807,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Tengai Makyou Dai - The Apocalypse IV (Disc 1 of 2) (JAP) (DW0262)... -->
 	<!-- Identifying Tengai Makyou Dai - The Apocalypse IV (Disc 2 of 2) (JAP) (DW0262)... -->
 	<software name="tengaimaa" cloneof="tengaima" supported="no">
-		<description>Tengai Makyou - Daishi no Mokushiroku - The Apocalypse IV (Jpn, Alt)</description>
+		<description>Tengai Makyou - Daishi no Mokushiroku - The Apocalypse IV (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="T-14301G"/>
@@ -13828,7 +13828,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Terra Phantastica (JAP) (DW0372)... -->
 	<software name="terraphaa" cloneof="terrapha" supported="no">
-		<description>Terra Phantastica (Jpn, Alt)</description>
+		<description>Terra Phantastica (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9054"/>
@@ -13844,7 +13844,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Tetris Plus (JAP) (DW0429)... -->
 	<software name="tetrispja" cloneof="tetrisp" supported="no">
-		<description>Tetris Plus (Jpn, Alt)</description>
+		<description>Tetris Plus (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="T-5708G"/>
@@ -13876,7 +13876,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Thunder Force V (JAP) (DW0136)... -->
 	<software name="tf5a" cloneof="tf5" supported="no">
-		<description>Thunder Force V (Jpn, Alt)</description>
+		<description>Thunder Force V (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Technosoft</publisher>
 		<info name="serial" value="T-1811G"/>
@@ -13892,7 +13892,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Toh Shin Den S (JAP) (DW0479)... -->
 	<software name="toshimixja" cloneof="toshimix" supported="no">
-		<description>Toushinden S (Jpn, Alt)</description>
+		<description>Toushinden S (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9078"/>
@@ -13908,7 +13908,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Tokimeki - Fujisaki Shiori (JAP) (DW0606)... -->
 	<software name="tokimfuja" cloneof="tokimfuj" supported="no">
-		<description>Tokimeki Memorial Selection - Fujisaki Shiori (Jpn, Alt)</description>
+		<description>Tokimeki Memorial Selection - Fujisaki Shiori (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-9517G (VS056-J1)"/>
@@ -13924,7 +13924,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Tokimeki - Nijiiro no Seisyun (JAP) (DW0604)... -->
 	<software name="tokimdv1a" cloneof="tokimdv1" supported="no">
-		<description>Tokimeki Memorial Drama Series Vol. 1 - Nijiiro no Seishun (Jpn, Alt)</description>
+		<description>Tokimeki Memorial Drama Series Vol. 1 - Nijiiro no Seishun (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-9522G (VS069-J1)"/>
@@ -13940,7 +13940,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Tomb Raiders (JAP) (DW0441)... -->
 	<software name="traidja" cloneof="traid" supported="no">
-		<description>Tomb Raiders (Jpn, Alt)</description>
+		<description>Tomb Raiders (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Victor Interactive</publisher>
 		<info name="serial" value="T-6010G"/>
@@ -13986,7 +13986,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Tryrush Deppy (JAP) (DW0430)... -->
 	<software name="tryrushda" cloneof="tryrushd" supported="no">
-		<description>Tryrush Deppy (Jpn, Alt)</description>
+		<description>Tryrush Deppy (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Nihon Create</publisher>
 		<info name="serial" value="T-21302G"/>
@@ -14034,7 +14034,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Vampire Hunter (JAP) (DW0020)... -->
 	<software name="vhuntc" cloneof="nwarr" supported="no">
-		<description>Vampire Hunter - Darkstalkers' Revenge (Jpn, Alt)</description>
+		<description>Vampire Hunter - Darkstalkers' Revenge (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="T-1202G"/>
@@ -14065,7 +14065,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Vampire Savior (JAP) (DW0133)... -->
 	<software name="vsava" cloneof="vsav" supported="no">
-		<description>Vampire Savior (Jpn, Alt)</description>
+		<description>Vampire Savior (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="T-1228G"/>
@@ -14097,7 +14097,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Victory Goal '97 (JAP) (DW0589)... -->
 	<software name="jlv97a" cloneof="jlv97" supported="no">
-		<description>J. League Victory Goal '97 (Jpn, Alt)</description>
+		<description>J. League Victory Goal '97 (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9140"/>
@@ -14161,7 +14161,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Virtua Fighter (JAP) (DW0607)... -->
 	<software name="vfja" cloneof="vf" supported="no">
-		<description>Virtua Fighter (Jpn, Alt)</description>
+		<description>Virtua Fighter (Jpn, alt)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9001"/>
@@ -14177,7 +14177,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Virtua Fighter 2 (JAP) (DW0447)... -->
 	<software name="vf2jb" cloneof="vf2" supported="no">
-		<description>Virtua Fighter 2 (Jpn, Alt)</description>
+		<description>Virtua Fighter 2 (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9079"/>
@@ -14415,7 +14415,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Virtual Volleyball (JAP) (DW0600)... -->
 	<software name="vvollya" cloneof="vvolly" supported="no">
-		<description>Virtual Volleyball (Jpn, Alt)</description>
+		<description>Virtual Volleyball (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="T-15005G"/>
@@ -14449,7 +14449,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Virus (Disc 2 of 3) (JAP) (DW0296)... -->
 	<!-- Identifying Virus (Disc 3 of 3) (JAP) (DW0296)... -->
 	<software name="virusa" cloneof="virus" supported="no">
-		<description>Virus (Jpn, Alt)</description>
+		<description>Virus (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="T-14304G"/>
@@ -14497,7 +14497,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Whizz (JAP) (DW0538)... -->
 	<software name="whizzja" cloneof="whizz" supported="no">
-		<description>Whizz (Jpn, Alt)</description>
+		<description>Whizz (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>B-Factory</publisher>
 		<info name="serial" value="T-36102G"/>
@@ -14513,7 +14513,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Willy Wombat (JAP) (DW0630)... -->
 	<software name="willywoma" cloneof="willywom" supported="no">
-		<description>Willy Wombat (Jpn, Alt)</description>
+		<description>Willy Wombat (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="T-14306G"/>
@@ -14560,7 +14560,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Wizard's Harmony (JAP) (DW0388)... -->
 	<software name="wizharma" cloneof="wizharm" supported="no">
-		<description>Wizard's Harmony (Jpn, Alt)</description>
+		<description>Wizard's Harmony (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Arc System Works</publisher>
 		<info name="serial" value="T-22001G"/>
@@ -14608,7 +14608,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying World Advanced Daisenryaku (JAP) (DW0425)... -->
 	<software name="wada" cloneof="ironstrm" supported="no">
-		<description>World Advanced Daisenryaku - Koutetsu no Senpuu (Jpn, Alt)</description>
+		<description>World Advanced Daisenryaku - Koutetsu no Senpuu (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9025"/>
@@ -14640,7 +14640,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying World Series Baseball 2 (JAP) (DW0612)... -->
 	<software name="wsb2ja" cloneof="wsb2" supported="no">
-		<description>World Series Baseball II (Jpn, Alt)</description>
+		<description>World Series Baseball II (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9120"/>
@@ -14715,7 +14715,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying 2do Arukotoha Sand-R (T-6802G)... -->
 	<software name="sandra" cloneof="sandr" supported="no">
-		<description>2do Arukotoha Sand-R (Jpn, Alt)</description>
+		<description>2do Arukotoha Sand-R (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>CRI</publisher>
 		<info name="serial" value="T-6802G"/>
@@ -14871,7 +14871,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Ai Shogi (J) (T-18602G)... -->
 	<software name="aishogia" cloneof="aishogi" supported="no">
-		<description>AI Shougi (Jpn, Alt)</description>
+		<description>AI Shougi (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Soft Bank</publisher>
 		<info name="serial" value="T-18602G"/>
@@ -14887,7 +14887,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Airs Adventure (T-20301G)... -->
 	<software name="airsadvea" cloneof="airsadve" supported="no">
-		<description>Airs Adventure (Jpn, Alt)</description>
+		<description>Airs Adventure (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Game Studio</publisher>
 		<info name="serial" value="T-20301G"/>
@@ -14919,7 +14919,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Alien Trilogy (T-8113G)... -->
 	<software name="alientrijb" cloneof="alientri" supported="no">
-		<description>Alien Trilogy (Jpn, Alt 2)</description>
+		<description>Alien Trilogy (Jpn, alt 2)</description>
 		<year>1996</year>
 		<publisher>Acclaim Japan</publisher>
 		<info name="serial" value="T-8113G"/>
@@ -14935,7 +14935,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Black screen, enables [SCU] Timer 1 -->
 	<software name="aitd2ja" cloneof="aitd2" supported="no">
-		<description>Alone in the Dark 2 (Jpn, Alt)</description>
+		<description>Alone in the Dark 2 (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Electronic Arts Victor</publisher>
 		<info name="serial" value="T-10602G"/>
@@ -14967,7 +14967,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying America Oudan Ultra Quiz (J) (T-6004G)... -->
 	<software name="amoudana" cloneof="amoudan" supported="no">
-		<description>America Oudan Ultra Quiz (Jpn, Alt)</description>
+		<description>America Oudan Ultra Quiz (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-6004G"/>
@@ -14999,7 +14999,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying AnEarth Fantasy Stories - The First Volume (T-27801G)... -->
 	<software name="aneartha" cloneof="anearth" supported="no">
-		<description>AnEarth Fantasy Stories - The First Volume (Jpn, Alt)</description>
+		<description>AnEarth Fantasy Stories - The First Volume (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Media Works</publisher>
 		<info name="serial" value="T-27801G"/>
@@ -15080,7 +15080,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Aquazone - Desktop Life (J) (T-24001G)... -->
 	<software name="aquazonea" cloneof="aquazone" supported="no">
-		<description>Aquazone - Desktop Life (Jpn, Alt)</description>
+		<description>Aquazone - Desktop Life (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Open Book 9003</publisher>
 		<info name="serial" value="T-24001G"/>
@@ -15096,7 +15096,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Arcana Strikes (T-10311G)... -->
 	<software name="acstrikea" cloneof="acstrike" supported="no">
-		<description>Arcana Strikes (Jpn, Alt)</description>
+		<description>Arcana Strikes (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="T-10311G"/>
@@ -15169,7 +15169,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Azel Panzer Dragoon RPG Disc 3 (GS-9076)... -->
 	<!-- Identifying Azel Panzer Dragoon RPG Disc 4 (GS-9076)... -->
 	<software name="azelpanzjb" cloneof="panzsaga" supported="no">
-		<description>Azel - Panzer Dragoon RPG (Jpn, Alt 2)</description>
+		<description>Azel - Panzer Dragoon RPG (Jpn, alt 2)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9076"/>
@@ -15260,7 +15260,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Baroque (T-33901G)... -->
 	<software name="baroquea" cloneof="baroque" supported="no">
-		<description>Baroque (Jpn, Alt)</description>
+		<description>Baroque (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>ESP</publisher>
 		<info name="serial" value="T-33901G"/>
@@ -15276,7 +15276,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Baroque Report CD Data File (610-6848)... -->
 	<software name="baroquerepa" cloneof="baroque" supported="no">
-		<description>Baroque Report CD Data File (Jpn, Alt)</description>
+		<description>Baroque Report CD Data File (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>ESP</publisher>
 		<info name="serial" value="610-6848"/>
@@ -15307,7 +15307,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Battle Monsters (T-18701G)... -->
 	<software name="btlmonstja" cloneof="btlmonst" supported="no">
-		<description>Battle Monsters (Jpn, Alt)</description>
+		<description>Battle Monsters (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Naxat Soft</publisher>
 		<info name="serial" value="T-18701G"/>
@@ -15339,7 +15339,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Hangs at Sega logo, uses [SMPC] command 0x0e via BIOS and SLEEP (expecting NMI to be unconditionally requested?) -->
 	<software name="bigichiga" cloneof="bigichig" supported="no">
-		<description>Big Ichigeki! Pachi-Slot Daikouryaku (Jpn, Alt)</description>
+		<description>Big Ichigeki! Pachi-Slot Daikouryaku (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>ASK Kodansha</publisher>
 		<info name="serial" value="T-16704G"/>
@@ -15466,7 +15466,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Blam Machinehead (T-7015G)... -->
 	<software name="blamja" cloneof="blam" supported="no">
-		<description>Blam! Machinehead (Jpn, Alt)</description>
+		<description>Blam! Machinehead (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-7015G"/>
@@ -15499,7 +15499,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Blue Chicago Blues Disc 1 (J) (T-5302G)... -->
 	<!-- Identifying Blue Chicago Blues Disc 2 (J) (T-5302G)... -->
 	<software name="jbharolda" cloneof="jbharold" supported="no">
-		<description>J.B. Harold - Blue Chicago Blues (Jpn, Alt)</description>
+		<description>J.B. Harold - Blue Chicago Blues (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Riverhill Software</publisher>
 		<info name="serial" value="T-5302G"/>
@@ -15686,7 +15686,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Chaos Control (T-7002G)... -->
 	<software name="chaosconja" cloneof="chaoscon" supported="no">
-		<description>Chaos Control (Jpn, Alt)</description>
+		<description>Chaos Control (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-7002G"/>
@@ -15704,7 +15704,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Black screen after FMV with -drc option -->
 	<!-- In-game speech and redbook audio are off-sync [CD-Block] -->
 	<software name="cpuzldama" cloneof="cpuzldam" supported="no">
-		<description>Chibi Maruko-Chan no Taisen Puzzledama (Jpn, Alt)</description>
+		<description>Chibi Maruko-Chan no Taisen Puzzledama (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-9507G (VS026-J1)"/>
@@ -15721,7 +15721,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Choujikuu Yousei Macross - Ai Oboete Imasu ka Disc 1 (T-23403G)... -->
 	<!-- Identifying Choujikuu Yousei Macross - Ai Oboete Imasu ka Disc 2 (T-23403G)... -->
 	<software name="macrossb" cloneof="macross" supported="no">
-		<description>Choujikuu Yousai Macross - Ai Oboete Imasu ka (Jpn, Alt 2)</description>
+		<description>Choujikuu Yousai Macross - Ai Oboete Imasu ka (Jpn, alt 2)</description>
 		<year>1997</year>
 		<publisher>Bandai Visual</publisher>
 		<info name="serial" value="T-23403G"/>
@@ -15758,7 +15758,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying ClockWerx (T-22302G)... -->
 	<software name="clockwrxa" cloneof="clockwrx" supported="no">
-		<description>ClockWerx (Jpn, Alt)</description>
+		<description>ClockWerx (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Tokuma Shoten</publisher>
 		<info name="serial" value="T-22302G"/>
@@ -15790,7 +15790,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Clockwork Knight - Pepperouchau no Daibouken Joukan (GS-9004)... -->
 	<software name="cknightja" cloneof="cknight" supported="no">
-		<description>Clockwork Knight - Pepperouchau no Daibouken Joukan (Jpn, Alt)</description>
+		<description>Clockwork Knight - Pepperouchau no Daibouken Joukan (Jpn, alt)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9004"/>
@@ -15947,7 +15947,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Cube Battler - Debugger Shouhen (T-21004G)... -->
 	<software name="cubeshoua" cloneof="cubeshou" supported="no">
-		<description>Cube Battler - Story of Shou (Jpn, Alt)</description>
+		<description>Cube Battler - Story of Shou (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Yanoman Games</publisher>
 		<info name="serial" value="T-21004G"/>
@@ -16059,7 +16059,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Daina Airan (T-4503G)... -->
 	<software name="dinoisla" cloneof="dinoisl" supported="no">
-		<description>Daina Airan (Jpn, Alt)</description>
+		<description>Daina Airan (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-4503G"/>
@@ -16092,7 +16092,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Daisuki Disc 1 (T-18510G)... -->
 	<!-- Identifying Daisuki Disc 2 (T-18510G)... -->
 	<software name="daisukia" cloneof="daisuki" supported="no">
-		<description>Daisuki (Jpn, Alt)</description>
+		<description>Daisuki (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>GAGA Communications</publisher>
 		<info name="serial" value="T-18510G"/>
@@ -16145,7 +16145,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Dark Savior (T-22101G)... -->
 	<software name="darksavjb" cloneof="darksav" supported="no">
-		<description>Dark Savior (Jpn, Alt 2)</description>
+		<description>Dark Savior (Jpn, alt 2)</description>
 		<year>1996</year>
 		<publisher>Climax</publisher>
 		<info name="serial" value="T-22101G"/>
@@ -16161,7 +16161,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Dark Seed 2 (J) (T-36101)... -->
 	<software name="darksed2a" cloneof="darksed2" supported="no">
-		<description>Darkseed II (Jpn, Alt)</description>
+		<description>Darkseed II (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>B-Factory</publisher>
 		<info name="serial" value="T-36101G"/>
@@ -16177,7 +16177,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Daytona USA Circuit Edition (GS-9100)... -->
 	<software name="daytonceja" cloneof="daytonce" supported="no">
-		<description>Daytona USA - Circuit Edition (Jpn, Alt)</description>
+		<description>Daytona USA - Circuit Edition (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9100"/>
@@ -16193,7 +16193,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Deadalus (GS-9008)... -->
 	<software name="deadalusa" cloneof="robotica" supported="no">
-		<description>Deadalus (Jpn, Alt)</description>
+		<description>Deadalus (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9008"/>
@@ -16374,7 +16374,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Densetsu no Ogre Battle (T-5305G)... -->
 	<software name="ogrebatlb" cloneof="ogrebatl" supported="no">
-		<description>Densetsu no Ogre Battle (Jpn, Alt 2)</description>
+		<description>Densetsu no Ogre Battle (Jpn, alt 2)</description>
 		<year>1996</year>
 		<publisher>Riverhill Software</publisher>
 		<info name="serial" value="T-5305G"/>
@@ -16406,7 +16406,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Derby Analist (T-20505G)... -->
 	<software name="derbyanaa" cloneof="derbyana" supported="no">
-		<description>Derby Analyst (Jpn, Alt)</description>
+		<description>Derby Analyst (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Media Entertainment</publisher>
 		<info name="serial" value="T-20505G"/>
@@ -16438,7 +16438,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Detana Twinbee Yahho ! Deluxe Pack (T-9505G)... -->
 	<software name="tbyahhoda" cloneof="tbyahhod" supported="no">
-		<description>Detana Twinbee Yahoo! Deluxe Pack (Jpn, Alt)</description>
+		<description>Detana Twinbee Yahoo! Deluxe Pack (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-9505G (VS012-J1)"/>
@@ -16470,7 +16470,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Devil Summoner Soul Hackers - Ronde Otamashi You Sample Ban (610-6704)... -->
 	<software name="dsumsoulda" cloneof="dsumsoul" supported="no">
-		<description>Devil Summoner - Soul Hackers &amp; Ronde - Otamashi You Sample Ban (Jpn, Alt)</description>
+		<description>Devil Summoner - Soul Hackers &amp; Ronde - Otamashi You Sample Ban (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="610-6704"/>
@@ -16485,7 +16485,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Digital Ange - Dennou Tenshi SS (T-33003G)... -->
 	<software name="digiangea" cloneof="digiange" supported="no">
-		<description>Digital Ange - Dennou Tenshi SS (Jpn, Alt)</description>
+		<description>Digital Ange - Dennou Tenshi SS (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Tokuma Shoten</publisher>
 		<info name="serial" value="T-33003G"/>
@@ -16501,7 +16501,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Digital Dance Mix Vol 1 - Namie Amuro (GS-9133)... -->
 	<software name="digidancb" cloneof="digidanc" supported="no">
-		<description>Digital Dance Mix Vol. 1 - Namie Amuro (Jpn, Alt)</description>
+		<description>Digital Dance Mix Vol. 1 - Namie Amuro (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9133"/>
@@ -16533,7 +16533,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Digital Pinball Last Gladiators (T-18901G)... -->
 	<software name="digipinja" cloneof="digipin" supported="no">
-		<description>Digital Pinball - Last Gladiators (Jpn, Alt)</description>
+		<description>Digital Pinball - Last Gladiators (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Kaze</publisher>
 		<info name="serial" value="T-18901G"/>
@@ -16565,7 +16565,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying DJ Wars (T-18807G)... -->
 	<software name="djwarsa" cloneof="djwars" supported="no">
-		<description>DJ Wars (Jpn, Alt)</description>
+		<description>DJ Wars (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Spike</publisher>
 		<info name="serial" value="T-18807G"/>
@@ -16582,7 +16582,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Doukoku Soshite Disc 1 (T-1315G)... -->
 	<!-- Identifying Doukoku Soshite Audio Disc (T-1315G)... -->
 	<software name="doukokusa" cloneof="doukokus" supported="no">
-		<description>Doukoku Soshite... (Jpn, Alt)</description>
+		<description>Doukoku Soshite... (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Data East</publisher>
 		<info name="serial" value="T-1315G"/>
@@ -16603,7 +16603,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Doukyuusei - If (T-20102G)... -->
 	<software name="dokyuifa" cloneof="dokyuif" supported="no">
-		<description>Doukyuusei If (Jpn, Alt)</description>
+		<description>Doukyuusei If (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>NEC Interchannel</publisher>
 		<info name="serial" value="T-20102G"/>
@@ -16620,7 +16620,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Doukyuusei 2 Disc 1 (T-20104G)... -->
 	<!-- Identifying Doukyuusei 2 Disc 2 (T-20104G)... -->
 	<software name="dokyuse2b" cloneof="dokyuse2" supported="no">
-		<description>Doukyuusei 2 (Jpn, Alt 2)</description>
+		<description>Doukyuusei 2 (Jpn, alt 2)</description>
 		<year>1997</year>
 		<publisher>NEC Interchannel</publisher>
 		<info name="serial" value="T-20104G"/>
@@ -16641,7 +16641,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Dragon Force (GS-9028)... -->
 	<software name="dragnfrcjb" cloneof="dragnfrc" supported="no">
-		<description>Dragon Force (Jpn, Alt)</description>
+		<description>Dragon Force (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9028"/>
@@ -16769,7 +16769,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying DX Nippon Tokkyuu Ryokou Game (T-10306G)... -->
 	<software name="traveljpa" cloneof="traveljp" supported="no">
-		<description>DX Nippon Tokkyuu Ryokou Game - Let's Travel in Japan (Jpn, Alt)</description>
+		<description>DX Nippon Tokkyuu Ryokou Game - Let's Travel in Japan (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="T-10306G"/>
@@ -16802,7 +16802,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Eberouge Disc 1 (T-10309G)... -->
 	<!-- Identifying Eberouge Disc 2 (T-10309G)... -->
 	<software name="eberougea" cloneof="eberouge" supported="no">
-		<description>Eberouge (Jpn, Alt)</description>
+		<description>Eberouge (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="T-10309G"/>
@@ -16887,7 +16887,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Emit Vol 2 - Inochigake no Tabi (T-7603G)... -->
 	<software name="emit2a" cloneof="emit2" supported="no">
-		<description>Emit Vol. 2 - Inochigake no Tabi (Jpn, Alt)</description>
+		<description>Emit Vol. 2 - Inochigake no Tabi (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="T-7603G"/>
@@ -16906,7 +16906,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Enemy Zero Disc 3 (T-30001G)... -->
 	<!-- Identifying Enemy Zero Disc 4 (T-30001G)... -->
 	<software name="enemy0jb" cloneof="enemy0" supported="no">
-		<description>Enemy Zero (Jpn, Alt 2)</description>
+		<description>Enemy Zero (Jpn, alt 2)</description>
 		<year>1996</year>
 		<publisher>Warp</publisher>
 		<info name="serial" value="T-30001G"/>
@@ -16969,7 +16969,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Fantasy Zone (GS-9136)... -->
 	<software name="fantzoneb" cloneof="fantzone" supported="no">
-		<description>Sega Ages - Fantasy Zone (Jpn, Alt 2)</description>
+		<description>Sega Ages - Fantasy Zone (Jpn, alt 2)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9136"/>
@@ -17001,7 +17001,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Fighters Megamix (GS-9126)... -->
 	<software name="fightmixjb" cloneof="fightmix" supported="no">
-		<description>Fighters Megamix (Jpn, Alt 2)</description>
+		<description>Fighters Megamix (Jpn, alt 2)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9126"/>
@@ -17039,7 +17039,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Find Love 2 - The Prologue (T-34604G)... -->
 	<software name="flove2pra" cloneof="flove2pr" supported="no">
-		<description>Find Love 2 - The Prologue (Jpn, Alt)</description>
+		<description>Find Love 2 - The Prologue (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Daiki</publisher>
 		<info name="serial" value="T-34604G"/>
@@ -17055,7 +17055,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Fire Pro Gaiden Blazing Tornado (T-4302G)... -->
 	<software name="blaztorna" cloneof="blaztorn" supported="no">
-		<description>Fire Pro Gaiden Blazing Tornado (Jpn, Alt)</description>
+		<description>Fire Pro Gaiden Blazing Tornado (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Human</publisher>
 		<info name="serial" value="T-4302G"/>
@@ -17071,7 +17071,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Fishing Koshien (J) (T-24901G)... -->
 	<software name="fishka" cloneof="fishk" supported="no">
-		<description>Fishing Koushien (Jpn, Alt)</description>
+		<description>Fishing Koushien (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>King Records</publisher>
 		<info name="serial" value="T-24901G"/>
@@ -17109,7 +17109,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- TODO: check all games in it -->
 	<software name="flshssoha" cloneof="flshssoh" supported="no">
-		<description>Flash Sega Saturn - Ochikadzuki-hen (Jpn, Alt)</description>
+		<description>Flash Sega Saturn - Ochikadzuki-hen (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="610-6166-99"/>
@@ -17231,7 +17231,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Free Talk Studio - Mari no Kimamanao Shaberi (Blue Case) (T-20504G)... -->
 	<!-- Identifying Free Talk Studio - Mari no Kimamanao Shaberi (Red Case) (T-20506G)... -->
 	<software name="freetalka" cloneof="freetalk" supported="no">
-		<description>Free Talk Studio - Mari no Kimamanao Shaberi (Jpn, Alt)</description>
+		<description>Free Talk Studio - Mari no Kimamanao Shaberi (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Media Entertainment</publisher>
 		<info name="serial" value="T-20504G (blue) ~ T-20506G (red)"/>
@@ -17248,7 +17248,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Friends - Seishun no Kagayaki Disc 1 (T-20109G)... -->
 	<!-- Identifying Friends - Seishun no Kagayaki Disc 2 (T-20109G)... -->
 	<software name="friendsa" cloneof="friends" supported="no">
-		<description>Friends - Seishun no Kagayaki (Jpn, Alt)</description>
+		<description>Friends - Seishun no Kagayaki (Jpn, alt)</description>
 		<year>1999</year>
 		<publisher>NEC Interchannel</publisher>
 		<info name="serial" value="T-20109G"/>
@@ -17350,7 +17350,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<software name="fushangla" cloneof="fushangl" supported="no">
-		<description>Fushigi no Kuni no Angelique (Jpn, Alt)</description>
+		<description>Fushigi no Kuni no Angelique (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="T-7634G"/>
@@ -17366,7 +17366,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Fuusui Sensei (T-21701G)... -->
 	<software name="fengshuia" cloneof="fengshui" supported="no">
-		<description>Fuusui Sensei - Feng-Shui Master (Jpn, Alt)</description>
+		<description>Fuusui Sensei - Feng-Shui Master (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Hakuhodo</publisher>
 		<info name="serial" value="T-21701G"/>
@@ -17383,7 +17383,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Initial FMV skips a lot (still uses [CD-Block] fnum reject but works here?) -->
 	<!-- Options menu has corrupt background layer, [VDP2] VRAM linescroll wraparound? -->
 	<software name="gakkokaia" cloneof="gakkokai" supported="no">
-		<description>Gakkou no Kaidan (Jpn, Alt)</description>
+		<description>Gakkou no Kaidan (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9026"/>
@@ -17415,7 +17415,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Game Basic For Sega Saturn Disc 1 (T-2111G)... -->
 	<software name="gamebasa" cloneof="gamebas" supported="no">
-		<description>Game Basic for SegaSaturn (Jpn, Alt)</description>
+		<description>Game Basic for SegaSaturn (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>ASCII</publisher>
 		<info name="serial" value="T-2111G"/>
@@ -17508,7 +17508,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Game-Ware (T-17002G-T)... -->
 	<software name="gwarea" cloneof="gware" supported="no">
-		<description>Game-Ware (Jpn, Alt)</description>
+		<description>Game-Ware (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>General Entertainment</publisher>
 		<info name="serial" value="T-17002G"/>
@@ -17524,7 +17524,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Game-Ware Vol 2 (T-17003G)... -->
 	<software name="gware2a" cloneof="gware2" supported="no">
-		<description>Game-Ware 2 (Jpn, Alt)</description>
+		<description>Game-Ware 2 (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>General Entertainment</publisher>
 		<info name="serial" value="T-17003G"/>
@@ -17541,7 +17541,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Game Ware Volume 5 Disc 1 (T-17006G)... -->
 	<!-- Identifying Game Ware Volume 5 Disc 2 (T-17006G)... -->
 	<software name="gware5a" cloneof="gware5" supported="no">
-		<description>Game-Ware 5 (Jpn, Alt)</description>
+		<description>Game-Ware 5 (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>General Entertainment</publisher>
 		<info name="serial" value="T-17006G"/>
@@ -17562,7 +17562,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Garou Densetsu 3 - Haruka Naru Tataki (T-3102G)... -->
 	<software name="fatfury3a" cloneof="fatfury3" supported="no">
-		<description>Garou Densetsu 3 - Harukanaru Tatakai (Jpn, Alt)</description>
+		<description>Garou Densetsu 3 - Harukanaru Tatakai (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="T-3102G"/>
@@ -17645,7 +17645,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Gensou Suikoden (T-9525G)... -->
 	<software name="gensousua" cloneof="gensousu" supported="no">
-		<description>Gensou Suikoden (Jpn, Alt)</description>
+		<description>Gensou Suikoden (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-9525G (VS005-J1)"/>
@@ -17741,7 +17741,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Godzilla - Rettoushinkan (GS-9050)... -->
 	<software name="godzillaa" cloneof="godzilla" supported="no">
-		<description>Godzilla - Rettoushinkan (Jpn, Alt)</description>
+		<description>Godzilla - Rettoushinkan (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9050"/>
@@ -17774,7 +17774,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Golden Axe The Duel (GS-9041)... -->
 	<software name="gaxeduelja" cloneof="gaxeduel" supported="no">
-		<description>Golden Axe - The Duel (Jpn, Alt)</description>
+		<description>Golden Axe - The Duel (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9041"/>
@@ -17790,7 +17790,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Gotha (J) (GS-9009)... -->
 	<software name="gothaa" cloneof="gotha" supported="no">
-		<description>Gotha - Ismailia Seneki (Jpn, Alt)</description>
+		<description>Gotha - Ismailia Seneki (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9009"/>
@@ -17806,7 +17806,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Gotha 2 (J) (T-7608G)... -->
 	<software name="gotha2a" cloneof="zendor" supported="no">
-		<description>Gotha II - Tenkuu no Kishi (Jpn, Alt)</description>
+		<description>Gotha II - Tenkuu no Kishi (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="T-7608G"/>
@@ -17854,7 +17854,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Greatest Nine '96 (J) (GS-9086)... -->
 	<software name="gnine96a" cloneof="gnine96" supported="no">
-		<description>Greatest Nine '96 (Jpn, Alt)</description>
+		<description>Greatest Nine '96 (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9086"/>
@@ -18297,7 +18297,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying J League Pro Soccer Club 2 (J) (GS-9168)... -->
 	<software name="jltsuk2e" cloneof="jltsuk2" supported="no">
-		<description>J. League Pro Soccer Club wo Tsukurou! 2 (Jpn, Alt)</description>
+		<description>J. League Pro Soccer Club wo Tsukurou! 2 (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9168"/>
@@ -18313,7 +18313,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying J League Pro Soccer Club Wo Tsukurou (J) (GS-9034)... -->
 	<software name="jltsuke" cloneof="jltsuk" supported="no">
-		<description>J. League Pro Soccer Club wo Tsukurou! (Jpn, Alt)</description>
+		<description>J. League Pro Soccer Club wo Tsukurou! (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9034"/>
@@ -18329,7 +18329,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying J League Victory Goal 96 (GS-9048)... -->
 	<software name="jlv96b" cloneof="jlv96" supported="no">
-		<description>J. League Victory Goal '96 (Jpn, Alt 2)</description>
+		<description>J. League Victory Goal '96 (Jpn, alt 2)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9048"/>
@@ -18345,7 +18345,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying J League Victory Goal 97 (GS-9140)... -->
 	<software name="jlv97b" cloneof="jlv97" supported="no">
-		<description>J. League Victory Goal '97 (Jpn, Alt 2)</description>
+		<description>J. League Victory Goal '97 (Jpn, alt 2)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9140"/>
@@ -18456,7 +18456,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Joshikousei no Houkago Pukunpa (T-16802G)... -->
 	<software name="pukunpaa" cloneof="pukunpa" supported="no">
-		<description>Pukunpa - Joshikousei no Houkago... (Jpn, Alt)</description>
+		<description>Pukunpa - Joshikousei no Houkago... (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Athena</publisher>
 		<info name="serial" value="T-16802G"/>
@@ -18488,7 +18488,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Jung Rhythm (T-16607G)... -->
 	<software name="jungrhyta" cloneof="jungrhyt" supported="no">
-		<description>Jung Rhythm (Jpn, Alt)</description>
+		<description>Jung Rhythm (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Altron</publisher>
 		<info name="serial" value="T-16607G"/>
@@ -18770,7 +18770,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Lifescape Seimei 40 Okunen Harukana Tabi Disc 1 (T-26405G)... -->
 	<!-- Identifying Lifescape Seimei 40 Okunen Harukana Tabi Disc 2 (T-26405G)... -->
 	<software name="lifescapa" cloneof="lifescap" supported="no">
-		<description>Lifescape - Seimei 40 Okunen Haruka na Tabi (Jpn, Alt)</description>
+		<description>Lifescape - Seimei 40 Okunen Haruka na Tabi (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Media Quest</publisher>
 		<info name="serial" value="T-26405G"/>
@@ -18807,7 +18807,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Logic Puzzle Rainbow Town (T-4303G)... -->
 	<software name="logicpuza" cloneof="logicpuz" supported="no">
-		<description>Logic Puzzle - Rainbow Town (Jpn, Alt)</description>
+		<description>Logic Puzzle - Rainbow Town (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Human</publisher>
 		<info name="serial" value="T-4303G"/>
@@ -18861,7 +18861,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Mahou Kishi Rayearth (GS-9058)... -->
 	<software name="rayearthja" cloneof="rayearth" supported="no">
-		<description>Mahou Kishi Rayearth (Jpn, Alt)</description>
+		<description>Mahou Kishi Rayearth (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9058"/>
@@ -18996,7 +18996,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Mr Bones Disc 1 (GS-9127)... -->
 	<!-- Identifying Mr Bones Disc 2 (GS-9127)... -->
 	<software name="mrbonesjb" cloneof="mrbones" supported="no">
-		<description>Mr. Bones (Jpn, Alt 2)</description>
+		<description>Mr. Bones (Jpn, alt 2)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9127"/>
@@ -19113,7 +19113,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying NiGHTS into Dreams (GS-9046)... -->
 	<software name="nightsjb" cloneof="nights" supported="no">
-		<description>NiGHTS into Dreams... (Jpn, Alt 2)</description>
+		<description>NiGHTS into Dreams... (Jpn, alt 2)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9046"/>
@@ -19161,7 +19161,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Nobunaga no Yabou Returns (T-7614G)... -->
 	<software name="nobureta" cloneof="noburet" supported="no">
-		<description>Nobunaga no Yabou Returns (Jpn, Alt)</description>
+		<description>Nobunaga no Yabou Returns (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="T-7614G"/>
@@ -19177,7 +19177,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Nobunaga no Yabou Tenshouki (T-7605G)... -->
 	<software name="nobutensa" cloneof="nobutens" supported="no">
-		<description>Nobunaga no Yabou Tenshouki (Jpn, Alt)</description>
+		<description>Nobunaga no Yabou Tenshouki (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="T-7605G"/>
@@ -19606,7 +19606,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Puzzle Bobble 2X (T-1106G)... -->
 	<software name="pbobbl2xb" cloneof="bam2" supported="no">
-		<description>Puzzle Bobble 2X (Jpn, Alt)</description>
+		<description>Puzzle Bobble 2X (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="T-1106G"/>
@@ -19622,7 +19622,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying QuoVadis (T-17401G)... -->
 	<software name="quovadisb" cloneof="quovadis" supported="no">
-		<description>QuoVadis (Jpn, Alt 2)</description>
+		<description>QuoVadis (Jpn, alt 2)</description>
 		<year>1995</year>
 		<publisher>Glams</publisher>
 		<info name="serial" value="T-17401G"/>
@@ -19654,7 +19654,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Race Drivin (T-4802G)... -->
 	<software name="racedriva" cloneof="racedriv" supported="no">
-		<description>Race Drivin' (Jpn, Alt)</description>
+		<description>Race Drivin' (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Time Warner Interactive</publisher>
 		<info name="serial" value="T-4802G"/>
@@ -19670,7 +19670,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Real Bout Garou Densetsu Special (T-3117G)... -->
 	<software name="rbffsb" cloneof="rbffs" supported="no">
-		<description>Real Bout Garou Densetsu Special (Jpn, Alt)</description>
+		<description>Real Bout Garou Densetsu Special (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="T-3117G"/>
@@ -19837,7 +19837,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Sakura Taisen 2 - Kimi Shini Tamou Kotonakare Tokubetsu Ban (610-6864)... -->
 	<software name="sakurat2tba" cloneof="sakurat2" supported="no">
-		<description>Sakura Taisen 2 - Kimi, Shini Tamou Kotonakare Tokubetsu-ban (Jpn, Alt)</description>
+		<description>Sakura Taisen 2 - Kimi, Shini Tamou Kotonakare Tokubetsu-ban (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="610-6864"/>
@@ -19934,7 +19934,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Saturn Bomberman (T-14302G)... -->
 	<software name="satbombmjb" cloneof="satbombm" supported="no">
-		<description>Saturn Bomberman (Jpn, Alt 2)</description>
+		<description>Saturn Bomberman (Jpn, alt 2)</description>
 		<year>1996</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="T-14302G"/>
@@ -20046,7 +20046,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Sega Ages Memorial Selection Volume 2 (GS-9163)... -->
 	<software name="samem2a" cloneof="samem2" supported="no">
-		<description>Sega Ages - Memorial Selection Vol. 2 (Jpn, Alt)</description>
+		<description>Sega Ages - Memorial Selection Vol. 2 (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9163"/>
@@ -20078,7 +20078,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Sega Touring Car Championship (GS-9164)... -->
 	<software name="stccjb" cloneof="stcc" supported="no">
-		<description>Sega Touring Car Championship (Jpn, Alt 2)</description>
+		<description>Sega Touring Car Championship (Jpn, alt 2)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9164"/>
@@ -20142,7 +20142,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Shanghai - Haonri no Choujou (T-1505G)... -->
 	<software name="shangbanb" cloneof="shanghtt" supported="no">
-		<description>Shanghai - Banri no Choujou (Jpn, Alt)</description>
+		<description>Shanghai - Banri no Choujou (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="T-1505G"/>
@@ -20190,7 +20190,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Shin Megami Tensai Devil Summoner - Azuma Zensho (T-14406G)... -->
 	<software name="shinmtaza" cloneof="shinmtaz" supported="no">
-		<description>Shin Megami Tensei - Devil Summoner - Akuma Zensho (Jpn, Alt)</description>
+		<description>Shin Megami Tensei - Devil Summoner - Akuma Zensho (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="T-14406G"/>
@@ -20250,7 +20250,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Shining the Holy Arc (T-33101G)... -->
 	<software name="shinholyja" cloneof="shinholy" supported="no">
-		<description>Shining the Holy Ark (Jpn, Alt)</description>
+		<description>Shining the Holy Ark (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Camelot</publisher>
 		<info name="serial" value="T-33101G"/>
@@ -20282,7 +20282,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Shinsetsu Samurai Spirits Bushidou Retsuden (T-3112G)... -->
 	<software name="samsprpgb" cloneof="samsprpg" supported="no">
-		<description>Shinsetsu Samurai Spirits - Bushidou Retsuden (Jpn, Alt 2)</description>
+		<description>Shinsetsu Samurai Spirits - Bushidou Retsuden (Jpn, alt 2)</description>
 		<year>1997</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="T-3112G"/>
@@ -20367,7 +20367,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Sky Target (GS-9103)... -->
 	<software name="skytargtja" cloneof="skytargt" supported="no">
-		<description>Sky Target (Jpn, Alt)</description>
+		<description>Sky Target (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9103"/>
@@ -20447,7 +20447,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Sotsugyou Crossworld (T-10503G)... -->
 	<software name="sotsuxwa" cloneof="sotsuxw" supported="no">
-		<description>Sotsugyou Crossworld (Jpn, Alt)</description>
+		<description>Sotsugyou Crossworld (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Shogakukan</publisher>
 		<info name="serial" value="T-10503G"/>
@@ -20463,7 +20463,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Space Invaders (T-1107G)... -->
 	<software name="spaceinva" cloneof="spaceinv" supported="no">
-		<description>Space Invaders (Jpn, Alt)</description>
+		<description>Space Invaders (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="T-1107G"/>
@@ -20575,7 +20575,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Street Fighter Zero 2 (T-1212G)... -->
 	<software name="sfz2b" cloneof="sfa2" supported="no">
-		<description>Street Fighter Zero 2 (Jpn, Alt 2)</description>
+		<description>Street Fighter Zero 2 (Jpn, alt 2)</description>
 		<year>1996</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="T-1212G"/>
@@ -20668,7 +20668,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Syouryu Sangoku Engi (J) (T-15009G)... -->
 	<software name="shoryusea" cloneof="shoryuse" supported="no">
-		<description>Shouryuu Sangoku Engi (Jpn, Alt)</description>
+		<description>Shouryuu Sangoku Engi (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="T-15009G"/>
@@ -20684,7 +20684,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Syukudai ga Tant-R (GS-9042)... -->
 	<software name="tantra" cloneof="tantr" supported="no">
-		<description>Sega Ages - Shukudai ga Tant-R (Jpn, Alt)</description>
+		<description>Sega Ages - Shukudai ga Tant-R (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9042"/>
@@ -20700,7 +20700,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Syutokou Battle 97 (T-15019G)... -->
 	<software name="sbatl97a" cloneof="sbatl97" supported="no">
-		<description>Drift King Shutokou Battle '97 - Tsuchiya Keiichi &amp; Bandou Masaaki (Jpn, Alt)</description>
+		<description>Drift King Shutokou Battle '97 - Tsuchiya Keiichi &amp; Bandou Masaaki (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="T-15019G"/>
@@ -20841,7 +20841,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Techno Motor (T-37601G)... -->
 	<software name="technomoa" cloneof="technomo" supported="no">
-		<description>Techno Motor (Jpn, Alt)</description>
+		<description>Techno Motor (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Denshi Media</publisher>
 		<info name="serial" value="T-37601G"/>
@@ -20995,7 +20995,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying The Conveni 2 - Zenkoku Chain Tenkai da (T-4317G)... -->
 	<software name="conveni2a" cloneof="conveni2" supported="no">
-		<description>The Conveni 2 - Zenkoku Chain Tenkai da! (Jpn, Alt)</description>
+		<description>The Conveni 2 - Zenkoku Chain Tenkai Da! (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Human</publisher>
 		<info name="serial" value="T-4317G"/>
@@ -21045,7 +21045,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying The King of Boxing (T-6001G)... -->
 	<software name="kingboxa" cloneof="vicboxin" supported="no">
-		<description>The King of Boxing (Jpn, Alt)</description>
+		<description>The King of Boxing (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-6001G"/>
@@ -21074,7 +21074,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying The King of Fighters '96 (T-3108G)... -->
 	<software name="kof96c" cloneof="kof96" supported="no">
-		<description>The King of Fighters '96 (Jpn, Alt)</description>
+		<description>The King of Fighters '96 (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="T-3108G"/>
@@ -21185,7 +21185,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying The Tower (J) (T-21601G)... -->
 	<software name="towera" cloneof="tower" supported="no">
-		<description>The Tower (Jpn, Alt)</description>
+		<description>The Tower (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Open Book</publisher>
 		<info name="serial" value="T-21601G"/>
@@ -21233,7 +21233,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Thunder Storm &amp; Road Blaster Disc 1 (T-20701G)... -->
 	<software name="tstrmrbla" cloneof="tstrmrbl" supported="no">
-		<description>Interactive Movie Action - Thunder Storm &amp; Road Blaster Disc 1 (Jpn, Alt)</description>
+		<description>Interactive Movie Action - Thunder Storm &amp; Road Blaster Disc 1 (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Ecseco Development</publisher>
 		<info name="serial" value="T-20701G"/>
@@ -21326,7 +21326,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Tokimeki Memorial Forever With You (T-9504G)... -->
 	<software name="tokimfwya" cloneof="tokimfwy" supported="no">
-		<description>Tokimeki Memorial - Forever with You (Jpn, Alt)</description>
+		<description>Tokimeki Memorial - Forever with You (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-9504G (VS009-J1)"/>
@@ -21342,7 +21342,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Tokimeki Memorial Selection Fujisaki Shiori (T-9517G)... -->
 	<software name="tokimfujb" cloneof="tokimfuj" supported="no">
-		<description>Tokimeki Memorial Selection - Fujisaki Shiori (Jpn, Alt 2)</description>
+		<description>Tokimeki Memorial Selection - Fujisaki Shiori (Jpn, alt 2)</description>
 		<year>1997</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-9517G (VS056-J1)"/>
@@ -21358,7 +21358,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Tokimeki Memorial Taisen Tokkaedama (T-9524G)... -->
 	<software name="tokimtkda" cloneof="tokimtkd" supported="no">
-		<description>Tokimeki Memorial Taisen Tokkae-dama (Jpn, Alt)</description>
+		<description>Tokimeki Memorial Taisen Tokkae-dama (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-9524G (VS067-J1)"/>
@@ -21434,7 +21434,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Tomb Raiders (T-6010G)... -->
 	<software name="traidjb" cloneof="traid" supported="no">
-		<description>Tomb Raiders (Jpn, Alt 2)</description>
+		<description>Tomb Raiders (Jpn, alt 2)</description>
 		<year>1997</year>
 		<publisher>Victor Interactive</publisher>
 		<info name="serial" value="T-6010G"/>
@@ -21450,7 +21450,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Touge King the Spirits (T-14401G)... -->
 	<software name="tougea" cloneof="highvelo" supported="no">
-		<description>Touge King - The Spirits (Jpn, Alt)</description>
+		<description>Touge King - The Spirits (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="T-14401G"/>
@@ -21514,7 +21514,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Turfwind 96 - Taketoyo Kyousou Uma Ikusei Game (T-5707G)... -->
 	<software name="turfwinda" cloneof="turfwind" supported="no">
-		<description>Turf Wind '96 - Take Yutaka Kyousouba Ikusei Game (Jpn, Alt)</description>
+		<description>Turf Wind '96 - Take Yutaka Kyousouba Ikusei Game (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="T-5707G"/>
@@ -21681,7 +21681,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Victory Goal (GS-9002)... -->
 	<software name="vgoala" cloneof="vgoal" supported="no">
-		<description>Victory Goal (Jpn, Alt)</description>
+		<description>Victory Goal (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9002"/>
@@ -21713,7 +21713,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Virtua Cop (GS-9060)... -->
 	<software name="vcopjb" cloneof="vcop" supported="no">
-		<description>Virtua Cop (Jpn, Alt 2)</description>
+		<description>Virtua Cop (Jpn, alt 2)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9060"/>
@@ -21729,7 +21729,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Virtua Cop 2 (GS-9097)... -->
 	<software name="vcop2jc" cloneof="vcop2" supported="no">
-		<description>Virtua Cop 2 (Jpn, Alt 2)</description>
+		<description>Virtua Cop 2 (Jpn, alt 2)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9097"/>
@@ -21745,7 +21745,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Virtua Fighter (J) (GS-9001)... -->
 	<software name="vfjc" cloneof="vf" supported="no">
-		<description>Virtua Fighter (Jpn, Alt 3)</description>
+		<description>Virtua Fighter (Jpn, alt 3)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9001"/>
@@ -21761,7 +21761,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Virtua Fighter CG Portrait Series The Final Dural (GS-9073)... -->
 	<software name="vfportfa" cloneof="vfportf" supported="no">
-		<description>Virtua Fighter CG Portrait Series The Final Dural (Jpn, Alt)</description>
+		<description>Virtua Fighter CG Portrait Series The Final Dural (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9073"/>
@@ -21792,7 +21792,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Virtua Fighter Kids (GS-9098)... -->
 	<software name="vfkidsja" cloneof="vfkids" supported="no">
-		<description>Virtua Fighter Kids (Jpn, Alt)</description>
+		<description>Virtua Fighter Kids (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9098"/>
@@ -21808,7 +21808,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Virtua Fighter Remix (GS-9039)... -->
 	<software name="vfremixjd" cloneof="vfremix" supported="no">
-		<description>Virtua Fighter Remix (Jpn, Alt 4)</description>
+		<description>Virtua Fighter Remix (Jpn, alt 4)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9039"/>
@@ -21888,7 +21888,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Virtual Volleyball (T-15005G)... -->
 	<software name="vvollyb" cloneof="vvolly" supported="no">
-		<description>Virtual Volleyball (Jpn, Alt 2)</description>
+		<description>Virtual Volleyball (Jpn, alt 2)</description>
 		<year>1995</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="T-15005G"/>
@@ -21965,7 +21965,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying WanChai Connection Disc 1 (J) (GS-9007)... -->
 	<!-- Identifying WanChai Connection Disc 2 (J) (GS-9007)... -->
 	<software name="wanchaia" cloneof="wanchai" supported="no">
-		<description>WanChai Connection (Jpn, Alt)</description>
+		<description>WanChai Connection (Jpn, alt)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9007"/>
@@ -22003,7 +22003,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Wangan Dead Heat Plus Real Arrange Disc 1 (T-9103G)... -->
 	<!-- Identifying Wangan Dead Heat Plus Real Arrange Disc 2 (T-9103G)... -->
 	<software name="wanganraa" cloneof="wanganra" supported="no">
-		<description>Wangan Dead Heat + Real Arrange (Jpn, Alt)</description>
+		<description>Wangan Dead Heat + Real Arrange (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Pack-In Soft</publisher>
 		<info name="serial" value="T-9103G"/>
@@ -22056,7 +22056,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Willy Wombat (T-14306G)... -->
 	<software name="willywomb" cloneof="willywom" supported="no">
-		<description>Willy Wombat (Jpn, Alt 2)</description>
+		<description>Willy Wombat (Jpn, alt 2)</description>
 		<year>1997</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="T-14306G"/>
@@ -22104,7 +22104,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Winter Heat (GS-9177)... -->
 	<software name="winterhtja" cloneof="winterht" supported="no">
-		<description>Winter Heat (Jpn, Alt)</description>
+		<description>Winter Heat (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9177"/>
@@ -22120,7 +22120,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Winter Heat (JP)... -->
 	<software name="winterhtjb" cloneof="winterht" supported="no">
-		<description>Winter Heat (Jpn, Alt 2)</description>
+		<description>Winter Heat (Jpn, alt 2)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9177"/>
@@ -22174,7 +22174,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Wizards Harmony (T-22001G)... -->
 	<software name="wizharmb" cloneof="wizharm" supported="no">
-		<description>Wizard's Harmony (Jpn, Alt 2)</description>
+		<description>Wizard's Harmony (Jpn, alt 2)</description>
 		<year>1995</year>
 		<publisher>Arc System Works</publisher>
 		<info name="serial" value="T-22001G"/>
@@ -22222,7 +22222,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying World Cup 98 France - Road to Win (GS-9196)... -->
 	<software name="wc98a" cloneof="wc98" supported="no">
-		<description>World Cup France '98 - Road to Win (Jpn, Alt)</description>
+		<description>World Cup France '98 - Road to Win (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9196"/>
@@ -22238,7 +22238,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying World Cup Golf (J) (T-7301G)... -->
 	<software name="wcgolfja" cloneof="wcgolf" supported="no">
-		<description>World Cup Golf - In Hyatt Dorado Beach (Jpn, Alt)</description>
+		<description>World Cup Golf - In Hyatt Dorado Beach (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Coconuts Japan</publisher>
 		<info name="serial" value="T-7301G"/>
@@ -22254,7 +22254,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying World Heroes Perfect (T-3103G)... -->
 	<software name="whpa" cloneof="whp" supported="no">
-		<description>World Heroes Perfect (Jpn, Alt)</description>
+		<description>World Heroes Perfect (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="T-3103G"/>
@@ -22270,7 +22270,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying World Series Baseball 2 (J) (GS-9120G)... -->
 	<software name="wsb2jb" cloneof="wsb2" supported="no">
-		<description>World Series Baseball II (Jpn, Alt 2)</description>
+		<description>World Series Baseball II (Jpn, alt 2)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9120"/>
@@ -22318,7 +22318,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying X-Men Children of the Atom (T-1203G)... -->
 	<software name="xmcotaja" cloneof="xmcota" supported="no">
-		<description>X-Men - Children of the Atom (Jpn, Alt)</description>
+		<description>X-Men - Children of the Atom (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="T-1203G"/>
@@ -22431,7 +22431,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Zanma Chou Okugi Valhollian (T-38201G)... -->
 	<software name="valhollia" cloneof="valholli" supported="no">
-		<description>Zanma Chou Ougi Valhollian (Jpn, Alt)</description>
+		<description>Zanma Chou Ougi Valhollian (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>K and P</publisher>
 		<info name="serial" value="T-38201G"/>
@@ -22463,7 +22463,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Zap! Snowboarding Trix (T-7502G)... -->
 	<software name="zapa" cloneof="zap" supported="no">
-		<description>Zap! Snowboarding Trix (Jpn, Alt)</description>
+		<description>Zap! Snowboarding Trix (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="T-7502G"/>
@@ -22479,7 +22479,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Zen Nihon Pro Wres Featuring Virtua (GS-9158)... -->
 	<software name="znpwfvb" cloneof="znpwfv" supported="no">
-		<description>Zen Nihon Pro Wres Featuring Virtua (Jpn, Alt)</description>
+		<description>Zen Nihon Pro Wres Featuring Virtua (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9158"/>
@@ -22631,7 +22631,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Blue Breaker - Ken Yori mo Hohoemi wo (T-4314G)... -->
 	<software name="bluebrkra" cloneof="bluebrkr" supported="no">
-		<description>Blue Breaker - Ken Yori mo Hohoemi wo (Jpn, Alt)</description>
+		<description>Blue Breaker - Ken Yori mo Hohoemi wo (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Human</publisher>
 		<info name="serial" value="T-4314G"/>
@@ -22647,7 +22647,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Christmas Nights Into Dreams Touki Genteiban (610-6431)... -->
 	<software name="xmasnighja" cloneof="xmasnigh" supported="no">
-		<description>Christmas NiGHTS Into Dreams... (Jpn, Touki Genteiban, Alt)</description>
+		<description>Christmas NiGHTS Into Dreams... (Jpn, Touki Genteiban, alt)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="610-6431"/>
@@ -22663,7 +22663,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying D no Shokutaku Disc 1 (T-8101G)... -->
 	<!-- Identifying D no Shokutaku Disc 2 (T-8101G)... -->
 	<software name="djb" cloneof="d" supported="no">
-		<description>D no Shokutaku (Jpn, Alt 2)</description>
+		<description>D no Shokutaku (Jpn, alt 2)</description>
 		<year>1995</year>
 		<publisher>Acclaim Japan</publisher>
 		<info name="serial" value="T-8101G"/>
@@ -22732,7 +22732,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Dennou Senki Virtual-On (GS-9099)... -->
 	<software name="vonja" cloneof="von" supported="no">
-		<description>Dennou Senki Virtual-On (Jpn, Alt)</description>
+		<description>Dennou Senki Virtual-On (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9099"/>
@@ -22749,7 +22749,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Desire Disc 1 (T-15031G)... -->
 	<!-- Identifying Desire Disc 2 (T-15031G)... -->
 	<software name="desirea" cloneof="desire" supported="no">
-		<description>Desire (Jpn, Alt)</description>
+		<description>Desire (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="T-15031G"/>
@@ -22786,7 +22786,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Devil Summoner Soul Hackers Disc 1 (T-14420G)... -->
 	<software name="dsumsoulb" cloneof="dsumsoul" supported="no">
-		<description>Devil Summoner - Soul Hackers (Jpn, Alt 2)</description>
+		<description>Devil Summoner - Soul Hackers (Jpn, alt 2)</description>
 		<year>1997</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="T-14420G"/>
@@ -22823,7 +22823,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Dynamite Deka (GS-9122)... -->
 	<software name="dnmtdekab" cloneof="diehard" supported="no">
-		<description>Dynamite Deka (Jpn, Alt 2)</description>
+		<description>Dynamite Deka (Jpn, alt 2)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9122"/>
@@ -22903,7 +22903,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Fighting Vipers (GS-9101)... -->
 	<software name="fvipersjd" cloneof="fvipers" supported="no">
-		<description>Fighting Vipers (Jpn, Alt)</description>
+		<description>Fighting Vipers (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9101"/>
@@ -22935,7 +22935,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Gakkou no Kowai Uwasa Hanako San Ga Kita (J) (T-1205G)... -->
 	<software name="gakkokowa" cloneof="gakkokow" supported="no">
-		<description>Gakkou no Kowai Uwasa - Hanako-san ga Kita!! (Jpn, Alt)</description>
+		<description>Gakkou no Kowai Uwasa - Hanako-san ga Kita!! (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="T-1205G"/>
@@ -22967,7 +22967,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Ghen War (T-7004G)... -->
 	<software name="ghenwarja" cloneof="ghenwar" supported="no">
-		<description>Ghen War (Jpn, Alt)</description>
+		<description>Ghen War (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-7004G"/>
@@ -23150,7 +23150,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Gungriffon - The Eurasin Conflict (T-4502G)... -->
 	<software name="gungriffjb" cloneof="gungriff" supported="no">
-		<description>Gungriffon - The Eurasian Conflict (Jpn, Alt 2)</description>
+		<description>Gungriffon - The Eurasian Conflict (Jpn, alt 2)</description>
 		<year>1996</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-4502G"/>
@@ -23216,7 +23216,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Henry Explorers (T-9518G)... -->
 	<software name="henryexpa" cloneof="cryptklr" supported="no">
-		<description>Henry Explorers (Jpn, Alt)</description>
+		<description>Henry Explorers (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-9518G (VS044-J1)"/>
@@ -23497,7 +23497,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Mini CD, [CD-Block] doesn't playback in driver, expected length of 13:54 matches  -->
+	<!-- Mini CD, [CD-Block] doesn't playback in driver, expected length of 13:54 matches -->
 	<!-- TODO: comes with T-16703G main disc, according to http://redump.org/disc/9318/ should be same as T-16705G-01 minus the changed serial -->
 	<software name="fromancra" cloneof="fromancr" supported="no">
 		<description>Idol Mahjong Final Romance R Mini Drama CD (Jpn)</description>
@@ -23568,7 +23568,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Jikuu Tantei DD Disc 1 (J) (T-2103G)... -->
 	<!-- Identifying Jikuu Tantei DD Disc 2 (J) (T-2103G)... -->
 	<software name="jikudraca" cloneof="jikudrac" supported="no">
-		<description>Jikuu Tantei DD - Dracula Detective - Maboroshi no Lorelei (Jpn, Alt)</description>
+		<description>Jikuu Tantei DD - Dracula Detective - Maboroshi no Lorelei (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>ASCII</publisher>
 		<info name="serial" value="T-2103G"/>
@@ -23605,7 +23605,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Jissen Pachi-Slot Hisshouhou 3 (J) (T-2401G)... -->
 	<software name="jpslot3a" cloneof="jpslot3" supported="no">
-		<description>Jissen! Pachi-Slot Hisshouhou! 3 (Jpn, Alt)</description>
+		<description>Jissen! Pachi-Slot Hisshouhou! 3 (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Sammy</publisher>
 		<info name="serial" value="T-2401G"/>
@@ -23621,7 +23621,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Kaitei Daisensou - Torppedoes armed and ready (T-15006G)... -->
 	<software name="inthuntja" cloneof="inthunt" supported="no">
-		<description>Kaitei Daisensou (Jpn, Alt)</description>
+		<description>Kaitei Daisensou (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="T-15006G"/>
@@ -23669,7 +23669,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Kamen Rider - Sakusen File 1 (T-14101G)... -->
 	<software name="kamenrida" cloneof="kamenrid" supported="no">
-		<description>Kamen Rider - Sakusen File 1 (Jpn, Alt)</description>
+		<description>Kamen Rider - Sakusen File 1 (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Toei Video</publisher>
 		<info name="serial" value="T-14101G"/>
@@ -23717,7 +23717,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Kidou Senshi Gundam (T-13303G)... -->
 	<software name="gundama" cloneof="gundam" supported="no">
-		<description>Kidou Senshi Gundam (Jpn, Alt)</description>
+		<description>Kidou Senshi Gundam (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="T-13303G"/>
@@ -23749,7 +23749,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Kidou Senshi Gundam Gihren no Yabou (J) (T-13327G)... -->
 	<software name="gundgihra" cloneof="gundgihr" supported="no">
-		<description>Kidou Senshi Gundam - Gihren no Yabou (Jpn, Alt)</description>
+		<description>Kidou Senshi Gundam - Gihren no Yabou (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="T-13330G, T-13327G"/>
@@ -23796,7 +23796,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Kindaichi Shounen no  Jikenbo (J) (T-14315G)... -->
 	<software name="kindajika" cloneof="kindajik" supported="no">
-		<description>Kindaichi Shounen no Jikenbo - Hoshimitou Kanashimi no Fukushuuki (Jpn, Alt)</description>
+		<description>Kindaichi Shounen no Jikenbo - Hoshimitou Kanashimi no Fukushuuki (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="T-14315G"/>
@@ -23861,7 +23861,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Kuusou Kagaku Sekai Gulliver Boy Disc 1 (T-14303G)... -->
 	<!-- Identifying Kuusou Kagaku Sekai Gulliver Boy Disc 2 (T-14303G)... -->
 	<software name="gullivera" cloneof="gulliver" supported="no">
-		<description>Kuusou Kagaku Sekai Gulliver Boy (Jpn, Alt)</description>
+		<description>Kuusou Kagaku Sekai Gulliver Boy (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="T-14303G"/>
@@ -23882,7 +23882,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Kyuukyoku Tiger II Plus (T-18715G)... -->
 	<software name="ktiger2pa" cloneof="ktiger2p" supported="no">
-		<description>Kyuukyoku Tiger II Plus (Jpn, Alt)</description>
+		<description>Kyuukyoku Tiger II Plus (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Naxat Soft</publisher>
 		<info name="serial" value="T-18715G"/>
@@ -23899,7 +23899,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Last Bronx Disc 1 (GS-9152)... -->
 	<!-- Identifying Last Bronx Disc 2 (GS-9152)... -->
 	<software name="lastbrnxjb" cloneof="lastbrnx" supported="no">
-		<description>Last Bronx (Jpn, Alt 2)</description>
+		<description>Last Bronx (Jpn, alt 2)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9152"/>
@@ -23920,7 +23920,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Linkle Liver Story (GS-9055)... -->
 	<software name="linklea" cloneof="linkle" supported="no">
-		<description>Linkle Liver Story (Jpn, Alt)</description>
+		<description>Linkle Liver Story (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9055"/>
@@ -23968,7 +23968,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Lunar Silver Star Story (T-27901G)... -->
 	<software name="lunarb" cloneof="lunar" supported="no">
-		<description>Lunar - Silver Star Story (Jpn, Alt)</description>
+		<description>Lunar - Silver Star Story (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Kadokawa Shoten</publisher>
 		<info name="serial" value="T-27901G"/>
@@ -23984,7 +23984,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Lunar Silver Star Story MPEG Ban (T-27904G)... -->
 	<software name="lunarmpga" cloneof="lunar" supported="no">
-		<description>Lunar - Silver Star Story Complete - MPEG-ban (Jpn, Alt)</description>
+		<description>Lunar - Silver Star Story Complete - MPEG-ban (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Kadokawa Shoten</publisher>
 		<info name="serial" value="T-27904G"/>
@@ -24000,7 +24000,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Lupin the 3rd - Pyramid no Kenja (T-2004G)... -->
 	<software name="lupinpyb" cloneof="lupinpy" supported="no">
-		<description>Lupin Sansei - Pyramid no Kenja (Jpn, Alt 2)</description>
+		<description>Lupin Sansei - Pyramid no Kenja (Jpn, alt 2)</description>
 		<year>1998</year>
 		<publisher>Asmik</publisher>
 		<info name="serial" value="T-2004G"/>
@@ -24162,7 +24162,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Maajan Gokuu Tenjiku (T-10601G)... -->
 	<software name="mjgokuua" cloneof="mjgokuu" supported="no">
-		<description>Mahjong Gokuu Tenjiku (Jpn, Alt)</description>
+		<description>Mahjong Gokuu Tenjiku (Jpn, alt)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts Victor</publisher>
 		<info name="serial" value="T-10601G"/>
@@ -24259,7 +24259,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Maajankyou Jidai Cebu Island 96 Disc 1 (J) (T-2204G)... -->
 	<!-- Identifying Maajankyou Jidai Cebu Island 96 Disc 2 (J) (T-2204G)... -->
 	<software name="mjcebu96a" cloneof="mjcebu96" supported="no">
-		<description>Mahjong-kyou Jidai Cebu Island '96 (Jpn, Alt)</description>
+		<description>Mahjong-kyou Jidai Cebu Island '96 (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Micronet</publisher>
 		<info name="serial" value="T-2204G"/>
@@ -24312,7 +24312,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Magical Drop 2 (GS-9104)... -->
 	<software name="magdrop2a" cloneof="magdrop2" supported="no">
-		<description>Magical Drop 2 (Jpn, Alt)</description>
+		<description>Magical Drop 2 (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9104"/>
@@ -24376,7 +24376,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Mahoutsukai ni Naru Houhou (T-32510G)... -->
 	<software name="mahoutsua" cloneof="mahoutsu" supported="no">
-		<description>Mahoutsukai ni Naru Houhou (Jpn, Alt)</description>
+		<description>Mahoutsukai ni Naru Houhou (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>TGL</publisher>
 		<info name="serial" value="T-32510G"/>
@@ -24414,7 +24414,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Marie no Atelier Ver 1_3 - Salburg no Renkinjutsushi (T-15033G)... -->
 	<software name="marie13b" cloneof="marie13" supported="no">
-		<description>Marie no Atelier Ver. 1.3 - Salburg no Renkinjutsushi (Jpn, Alt 2)</description>
+		<description>Marie no Atelier Ver. 1.3 - Salburg no Renkinjutsushi (Jpn, alt 2)</description>
 		<year>1997</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="T-15033G"/>
@@ -24430,7 +24430,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Marvel Super Heroes Vs Street Fighter (T-1239G)... -->
 	<software name="mshvssfa" cloneof="mshvssf" supported="no">
-		<description>Marvel Super Heroes vs. Street Fighter (Jpn, Alt)</description>
+		<description>Marvel Super Heroes vs. Street Fighter (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="T-1239G"/>
@@ -24577,7 +24577,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Mighty Hits (T-16604G)... -->
 	<software name="mightyhija" cloneof="mightyhi" supported="no">
-		<description>Mighty Hits (Jpn, Alt)</description>
+		<description>Mighty Hits (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Altron</publisher>
 		<info name="serial" value="T-16604G"/>
@@ -24609,7 +24609,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Momotarou Douchuki (J) (T-14309G)... -->
 	<software name="momotaroa" cloneof="momotaro" supported="no">
-		<description>Momotarou Douchuuki (Jpn, Alt)</description>
+		<description>Momotarou Douchuuki (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="T-14309G"/>
@@ -24627,7 +24627,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Moon Cradle Disc 2 (J) (T-9109G)... -->
 	<!-- Identifying Moon Cradle Disc 3 (J) (T-9109G)... -->
 	<software name="mcradlea" cloneof="mcradle" supported="no">
-		<description>Moon Cradle (Jpn, Alt)</description>
+		<description>Moon Cradle (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Pack-In Soft</publisher>
 		<info name="serial" value="T-9109G"/>
@@ -24669,7 +24669,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Mujinto R (J) (T-28901G)... -->
 	<software name="mujintoua" cloneof="mujintou" supported="no">
-		<description>Mujintou Monogatari R - Futari no Love Love Island (Jpn, Alt)</description>
+		<description>Mujintou Monogatari R - Futari no Love Love Island (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>KSS</publisher>
 		<info name="serial" value="T-28901G"/>
@@ -24758,7 +24758,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Nanatsu no Hikan Disc 2 (J) (T-7616G)... -->
 	<!-- Identifying Nanatsu no Hikan Disc 3 (J) (T-7616G)... -->
 	<software name="nanatsuha" cloneof="nanatsuh" supported="no">
-		<description>Nanatsu no Hikan (Jpn, Alt)</description>
+		<description>Nanatsu no Hikan (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="T-7616G"/>
@@ -24784,7 +24784,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Neon Genesis Evangelion (J) (GS-9051)... -->
 	<software name="shinevb" cloneof="shinev" supported="no">
-		<description>Shinseiki Evangelion (Jpn, Alt 2)</description>
+		<description>Shinseiki Evangelion (Jpn, alt 2)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9051"/>
@@ -24801,7 +24801,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Neon Genesis Evangelion Iron Maiden Disc 1 (J) (GS-9194)... -->
 	<!-- Identifying Neon Genesis Evangelion Iron Maiden Disc 2 (J) (GS-9194)... -->
 	<software name="shinevgfb" cloneof="shinevgf" supported="no">
-		<description>Neon Genesis: Evangelion - Koutetsu no Girlfriend (Jpn, Alt 2)</description>
+		<description>Neon Genesis: Evangelion - Koutetsu no Girlfriend (Jpn, alt 2)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9194"/>
@@ -24906,9 +24906,9 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying No-appointment Gals Olympos (Shokai Gentei Cell Ga Package B) (T-4306G)... -->
+	<!-- Identifying No-appointment Gals Olympos (Shokai Gentei Cel-ga Package B) (T-4306G)... -->
 	<software name="olympos" supported="no">
-		<description>Apo Nashi Gals Olympos (Jpn, Shokai Gentei Cell Ga Package B)</description>
+		<description>Apo Nashi Gals Olympos (Jpn, Shokai Gentei Cel-ga Package B)</description>
 		<year>1996</year>
 		<publisher>Human</publisher>
 		<info name="serial" value="T-4306G"/>
@@ -24917,14 +24917,14 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="no-appointment gals olympos (shokai gentei cell ga package b) (t-4306g)" sha1="1a474ca547a4e9909824b22d4156c8fba483e156" />
+				<disk name="no-appointment gals olympos (shokai gentei cel-ga package b) (t-4306g)" sha1="1a474ca547a4e9909824b22d4156c8fba483e156" />
 			</diskarea>
 		</part>
 	</software>
 
 	<!-- Identifying Nobunaganoyabou Sengokugunyuuden (J) (T-7658G)... -->
 	<software name="nobusga" cloneof="nobusg" supported="no">
-		<description>Nobunaga no Yabou - Sengoku Gunyuuden (Jpn, Alt)</description>
+		<description>Nobunaga no Yabou - Sengoku Gunyuuden (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="T-7658G"/>
@@ -24984,7 +24984,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Olympic Soccer (T-7304G)... -->
 	<software name="olympsocja" cloneof="olympsoc" supported="no">
-		<description>Olympic Soccer (Jpn, Alt)</description>
+		<description>Olympic Soccer (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Coconuts Japan</publisher>
 		<info name="serial" value="T-7304G"/>
@@ -25143,7 +25143,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Pro Yakyu Team mo Tsukurou (J) (GS-9165)... -->
 	<software name="proyaktsc" cloneof="proyakts" supported="no">
-		<description>Pro Yakyuu Team mo Tsukurou! (Jpn, Alt 2)</description>
+		<description>Pro Yakyuu Team mo Tsukurou! (Jpn, alt 2)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9165"/>
@@ -25175,7 +25175,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Puyo Puyo Tsuu (T-6601G)... -->
 	<software name="puyopuy2b" cloneof="puyopuy2" supported="no">
-		<description>Puyo Puyo Tsuu (Jpn, Alt 2)</description>
+		<description>Puyo Puyo Tsuu (Jpn, alt 2)</description>
 		<year>1995</year>
 		<publisher>Compile</publisher>
 		<info name="serial" value="T-6601G"/>
@@ -25230,7 +25230,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Rampo Disc 1 (GS-9011)... -->
 	<!-- Identifying Rampo Disc 2 (GS-9011)... -->
 	<software name="rampob" cloneof="rampo" supported="no">
-		<description>Rampo (Jpn, Alt 2)</description>
+		<description>Rampo (Jpn, alt 2)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9011"/>
@@ -25250,7 +25250,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Real Maajan Adventure Umi-He - Summer Waltz (T-16511G)... -->
 	<software name="mjadventa" cloneof="mjadvent" supported="no">
-		<description>Real Mahjong Adventure - Umi-he - Summer Waltz (Jpn, Alt)</description>
+		<description>Real Mahjong Adventure - Umi-he - Summer Waltz (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Seta</publisher>
 		<info name="serial" value="T-16511G"/>
@@ -25269,7 +25269,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Real Sound - Kaze no Regret Disc 3 (T-30002G)... -->
 	<!-- Identifying Real Sound - Kaze no Regret Disc 4 (T-30002G)... -->
 	<software name="kazeregrb" cloneof="kazeregr" supported="no">
-		<description>Real Sound - Kaze no Regret (Jpn, Alt 2)</description>
+		<description>Real Sound - Kaze no Regret (Jpn, alt 2)</description>
 		<year>1997</year>
 		<publisher>Warp</publisher>
 		<info name="serial" value="T-30002G"/>
@@ -25332,7 +25332,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Riglordsaga (J) (GS-9021)... -->
 	<software name="riglordb" cloneof="mystaria" supported="no">
-		<description>Riglordsaga (Jpn, Alt)</description>
+		<description>Riglordsaga (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9021"/>
@@ -25348,7 +25348,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Riglordsaga 2 (J) (GS-9084)... -->
 	<software name="riglord2a" cloneof="riglord2" supported="no">
-		<description>Riglordsaga 2 (Jpn, Alt)</description>
+		<description>Riglordsaga 2 (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9084"/>
@@ -25398,7 +25398,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying RMJ The Mystery Hospital (T-13322G)... -->
 	<software name="rmja" cloneof="rmj" supported="no">
-		<description>R?MJ - The Mystery Hospital (Jpn, Alt)</description>
+		<description>R?MJ - The Mystery Hospital (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="T-13322G"/>
@@ -25431,7 +25431,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Ronde Disc 1 (T-14415G)... -->
 	<!-- Identifying Ronde Disc 2 (T-14415G)... -->
 	<software name="rondea" cloneof="ronde" supported="no">
-		<description>Ronde (Jpn, Alt)</description>
+		<description>Ronde (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="T-14415G"/>
@@ -25534,7 +25534,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Sangokushi Eiketsuden (J) (T-7613G)... -->
 	<software name="sangoeika" cloneof="sangoeik" supported="no">
-		<description>Sangokushi - Eiketsuden (Jpn, Alt)</description>
+		<description>Sangokushi - Eiketsuden (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="T-7613G"/>
@@ -25566,7 +25566,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Sangokushi Koumeiden (J) (T-7629G)... -->
 	<software name="sangokoua" cloneof="sangokou" supported="no">
-		<description>Sangokushi - Koumeiden (Jpn, Alt)</description>
+		<description>Sangokushi - Koumeiden (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="T-7629G"/>
@@ -25630,7 +25630,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Sega Rally Championship (GS-9047)... -->
 	<software name="srallycjb" cloneof="srallyc" supported="no">
-		<description>Sega Rally Championship (Jpn, Alt 2)</description>
+		<description>Sega Rally Championship (Jpn, alt 2)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9047"/>
@@ -25661,7 +25661,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Sega Worldwide Soccer 98 (GS-9187)... -->
 	<software name="wwsoc98ja" cloneof="wwsoc98" supported="no">
-		<description>Sega Worldwide Soccer '98 (Jpn, Alt)</description>
+		<description>Sega Worldwide Soccer '98 (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9187"/>
@@ -25709,7 +25709,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying She'sn (J) (T-19717G)... -->
 	<software name="shesna" cloneof="shesn" supported="no">
-		<description>She'sn (Jpn, Alt)</description>
+		<description>She'sn (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>KID</publisher>
 		<info name="serial" value="T-19717G"/>
@@ -25757,7 +25757,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Shin Megami Tensei Devil Summoner (T-14403G)... -->
 	<software name="shinmtdsb" cloneof="shinmtds" supported="no">
-		<description>Shin Megami Tensei - Devil Summoner (Jpn, Alt)</description>
+		<description>Shin Megami Tensei - Devil Summoner (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="T-14403G"/>
@@ -25773,7 +25773,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Shining Wisdom (GS-9057)... -->
 	<software name="shinwisdjb" cloneof="shinwisd" supported="no">
-		<description>Shining Wisdom (Jpn, Alt 2)</description>
+		<description>Shining Wisdom (Jpn, alt 2)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9057"/>
@@ -25806,7 +25806,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Shinseiki Evangelion 2nd Impression Disc 1 (GS-9129)... -->
 	<!-- Identifying Shinseiki Evangelion 2nd Impression Audio Disc (GS-9129)... -->
 	<software name="shinev2ic" cloneof="shinev2i" supported="no">
-		<description>Shinseiki Evangelion - 2nd Impression (Jpn, Alt 2)</description>
+		<description>Shinseiki Evangelion - 2nd Impression (Jpn, alt 2)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9129"/>
@@ -25827,7 +25827,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Shinsetsu Yumemiyakata (J) (GS-9005)... -->
 	<software name="shinsetsa" cloneof="hidsouls" supported="no">
-		<description>Shinsetsu Yumemi Yakata - Tobira no Oku ni Darekaga... (Jpn, Alt)</description>
+		<description>Shinsetsu Yumemi Yakata - Tobira no Oku ni Darekaga... (Jpn, alt)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9005"/>
@@ -25875,7 +25875,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Side Pocket 2 - Densetsu no Hustler (T-1301G)... -->
 	<software name="sidepkt2a" cloneof="mfpool" supported="no">
-		<description>Side Pocket 2 - Densetsu no Hustler (Jpn, Alt)</description>
+		<description>Side Pocket 2 - Densetsu no Hustler (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Data East</publisher>
 		<info name="serial" value="T-1301G"/>
@@ -25939,7 +25939,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Sotsugyou 2 Neo Generation (J) (T-5301G)... -->
 	<software name="sotsugy2c" cloneof="sotsugy2" supported="no">
-		<description>Sotsugyou II - Neo Generation (Jpn, Alt 2)</description>
+		<description>Sotsugyou II - Neo Generation (Jpn, alt 2)</description>
 		<year>1995</year>
 		<publisher>Riverhill Software</publisher>
 		<info name="serial" value="T-5301G"/>
@@ -25956,7 +25956,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Sound Novel Machi Disc 1 (J) (T-34001G)... -->
 	<!-- Identifying Sound Novel Machi Disc 2 (J) (T-34001G)... -->
 	<software name="machib" cloneof="machi" supported="no">
-		<description>Sound Novel Machi (Jpn, Alt 2)</description>
+		<description>Sound Novel Machi (Jpn, alt 2)</description>
 		<year>1998</year>
 		<publisher>Chun Soft</publisher>
 		<info name="serial" value="T-34001G"/>
@@ -25993,7 +25993,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Stakes Winner (J) (T-3107G)... -->
 	<software name="stakewina" cloneof="stakewin" supported="no">
-		<description>Stakes Winner - GI Kanzen Seiha e no Michi (Jpn, Alt)</description>
+		<description>Stakes Winner - GI Kanzen Seiha e no Michi (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="T-3107G"/>
@@ -26041,7 +26041,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Street Fighter Zero (J) (T-1206G)... -->
 	<software name="sfzc" cloneof="sfa" supported="no">
-		<description>Street Fighter Zero (Jpn, Alt 2)</description>
+		<description>Street Fighter Zero (Jpn, alt 2)</description>
 		<year>1996</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="T-1206G"/>
@@ -26233,7 +26233,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Tactics Ogre (T-5306G)... -->
 	<software name="tactogrea" cloneof="tactogre" supported="no">
-		<description>Tactics Ogre (Jpn, Alt)</description>
+		<description>Tactics Ogre (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Riverhill Software</publisher>
 		<info name="serial" value="T-5306G"/>
@@ -26281,7 +26281,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Takuramakan - Tonkou Denki (T-25102G)... -->
 	<software name="takuramaa" cloneof="takurama" supported="no">
-		<description>Takuramakan - Tonkou Denki (Jpn, Alt)</description>
+		<description>Takuramakan - Tonkou Denki (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Patra</publisher>
 		<info name="serial" value="T-25102G"/>
@@ -26373,7 +26373,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Terra Phantastica (GS-9054)... -->
 	<software name="terraphab" cloneof="terrapha" supported="no">
-		<description>Terra Phantastica (Jpn, Alt 2)</description>
+		<description>Terra Phantastica (Jpn, alt 2)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9054"/>
@@ -26389,7 +26389,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying The Conveni - Ano Machi wo Dokusen Seyo (T-4310G)... -->
 	<software name="convenia" cloneof="conveni" supported="no">
-		<description>The Conveni! - Ano Machi wo Dokusen Seyo (Jpn, Alt)</description>
+		<description>The Conveni! - Ano Machi wo Dokusen Seyo (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Human</publisher>
 		<info name="serial" value="T-4310G"/>
@@ -26405,7 +26405,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying The Horde (T-15902G)... -->
 	<software name="hordeja" cloneof="horde" supported="no">
-		<description>The Horde (Jpn, Alt)</description>
+		<description>The Horde (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>BMG Victor</publisher>
 		<info name="serial" value="T-15902G"/>
@@ -26507,7 +26507,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Tokimeki Memorial Taisen Pazurudama (T-9512G)... -->
 	<software name="tokimpzda" cloneof="tokimpzd" supported="no">
-		<description>Tokimeki Memorial Taisen Puzzle-dama (Jpn, Alt)</description>
+		<description>Tokimeki Memorial Taisen Puzzle-dama (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-9512G (VS036-J1)"/>
@@ -26567,7 +26567,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Vampire Hunter - Darkstalkers Revenge (T-1202G)... -->
 	<software name="vhuntd" cloneof="nwarr" supported="no">
-		<description>Vampire Hunter - Darkstalkers' Revenge (Jpn, Alt 2)</description>
+		<description>Vampire Hunter - Darkstalkers' Revenge (Jpn, alt 2)</description>
 		<year>1996</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="T-1202G"/>
@@ -26583,7 +26583,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Vandal Hearts (J) (T-9526G)... -->
 	<software name="vandalha" cloneof="vandalh" supported="no">
-		<description>Vandal Hearts - Ushinawareta Kodai Bunmei (Jpn, Alt)</description>
+		<description>Vandal Hearts - Ushinawareta Kodai Bunmei (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-9526G (VS040-J1)"/>
@@ -26599,7 +26599,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Virtua Fighter 2 (GS-9079)... -->
 	<software name="vf2jc" cloneof="vf2" supported="no">
-		<description>Virtua Fighter 2 (Jpn, Alt 3)</description>
+		<description>Virtua Fighter 2 (Jpn, alt 3)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9079"/>
@@ -26671,7 +26671,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Virus Disc 2 (J) (T-14304G)... -->
 	<!-- Identifying Virus Disc 3 (J) (T-14304G)... -->
 	<software name="virusb" cloneof="virus" supported="no">
-		<description>Virus (Jpn, Alt 2)</description>
+		<description>Virus (Jpn, alt 2)</description>
 		<year>1997</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="T-14304G"/>
@@ -26713,7 +26713,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Winning Post 2 (J) (T-7612G)... -->
 	<software name="winpost2a" cloneof="winpost" supported="no">
-		<description>Winning Post 2 (Jpn, Alt)</description>
+		<description>Winning Post 2 (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="T-7612G"/>
@@ -26729,7 +26729,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Winning Post 2 Final 97 (J) (T-7647G)... -->
 	<software name="wpost297a" cloneof="wpost297" supported="no">
-		<description>Winning Post 2 - Final '97 (Jpn, Alt)</description>
+		<description>Winning Post 2 - Final '97 (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="T-7647G"/>
@@ -26745,7 +26745,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Winning Post 2 Program 96 (J) (T-7620G)... -->
 	<software name="wpost296a" cloneof="wpost296" supported="no">
-		<description>Winning Post 2 - Program '96 (Jpn, Alt)</description>
+		<description>Winning Post 2 - Program '96 (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="T-7620G"/>
@@ -26815,7 +26815,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Yoshimoto Maajan Club (J) (T-20403G)... -->
 	<software name="yoshimja" cloneof="yoshimj" supported="no">
-		<description>Yoshimoto Mahjong Club (Jpn, Alt)</description>
+		<description>Yoshimoto Mahjong Club (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Psikyo</publisher>
 		<info name="serial" value="T-20403G"/>
@@ -26959,7 +26959,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying 6 Inch My Darling (T-19721G)... -->
 	<software name="6inchmyda" cloneof="6inchmyd" supported="no">
-		<description>6 Inch My Darling (Jpn, Alt)</description>
+		<description>6 Inch My Darling (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>KID</publisher>
 		<info name="serial" value="T-19721G"/>
@@ -27039,7 +27039,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Gaia Breeder T-34801G... -->
 	<software name="gaiabreda" cloneof="gaiabred" supported="no">
-		<description>Gaia Breeder (Jpn, Alt)</description>
+		<description>Gaia Breeder (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Aspect</publisher>
 		<info name="serial" value="T-34801G"/>
@@ -27159,7 +27159,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Kouryuu Sangoku Engi (T-26104G)... -->
 	<software name="kouryuua" cloneof="kouryuu" supported="no">
-		<description>Kouryuu Sangoku Engi (Jpn, Alt)</description>
+		<description>Kouryuu Sangoku Engi (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Xing</publisher>
 		<info name="serial" value="T-26104G"/>
@@ -27191,7 +27191,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Making of Night Truth 2 (T-20205G)... -->
 	<software name="ntruthm2a" cloneof="ntruthm2" supported="no">
-		<description>Nightruth - Explanation of the Paranormal - Making of Nightruth II - Voice Selection (Jpn, Alt)</description>
+		<description>Nightruth - Explanation of the Paranormal - Making of Nightruth II - Voice Selection (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Varie</publisher>
 		<info name="serial" value="T-20205G"/>
@@ -27255,7 +27255,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Mobile Suit Z Gundam - Zenpen Zeta no Kodou (T-13315G)... -->
 	<software name="zgundzenb" cloneof="zgundzen" supported="no">
-		<description>Kidou Senshi Z Gundam - Zenpen Zeta no Kodou (Jpn, Alt 2)</description>
+		<description>Kidou Senshi Z Gundam - Zenpen Zeta no Kodou (Jpn, alt 2)</description>
 		<year>1997</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="T-13315G"/>
@@ -27271,7 +27271,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying NFL Quarterback Club 96 (J) (T-8105G)... -->
 	<software name="nflqb96ja" cloneof="nflqb96" supported="no">
-		<description>NFL Quarterback Club '96 (Jpn, Alt)</description>
+		<description>NFL Quarterback Club '96 (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Acclaim Japan</publisher>
 		<info name="serial" value="T-8105G"/>
@@ -27350,7 +27350,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Nippon Daihyou Team no Kantoku Ninarou Soccer RPG (T-35504G)... -->
 	<software name="soccrrpgb" cloneof="soccrrpg" supported="no">
-		<description>Nihon Daihyou Team no Kantoku ni Naruu! Sekaihatsu Soccer RPG (Jpn, Alt 2)</description>
+		<description>Nihon Daihyou Team no Kantoku ni Naruu! Sekaihatsu Soccer RPG (Jpn, alt 2)</description>
 		<year>1998</year>
 		<publisher>Enix</publisher>
 		<info name="serial" value="T-35504G"/>
@@ -27382,7 +27382,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Nonomura Byouin no Hitobito (J) (T-28001G)... -->
 	<software name="nonomurab" cloneof="nonomura" supported="no">
-		<description>Nonomura Byouin no Hitobito (Jpn, Alt 2)</description>
+		<description>Nonomura Byouin no Hitobito (Jpn, alt 2)</description>
 		<year>1996</year>
 		<publisher>Elf</publisher>
 		<info name="serial" value="T-28001G"/>
@@ -27398,7 +27398,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Ochiga Designer Tsukutte pon T-9108G... -->
 	<software name="odesigna" cloneof="odesign" supported="no">
-		<description>Ochige Designer Tsukutte Pon! (Jpn, Alt)</description>
+		<description>Ochige Designer Tsukutte Pon! (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Pack-In Soft</publisher>
 		<info name="serial" value="T-9108G"/>
@@ -27430,7 +27430,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Panzer Dragoon Zwei (GS-9049)... -->
 	<software name="panzer2jb" cloneof="panzer2" supported="no">
-		<description>Panzer Dragoon Zwei (Jpn, Alt 2)</description>
+		<description>Panzer Dragoon Zwei (Jpn, alt 2)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9049"/>
@@ -27477,7 +27477,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Puyo Puyo Sun (T-6603G)... -->
 	<software name="puyosuna" cloneof="puyosun" supported="no">
-		<description>Puyo Puyo Sun (Jpn, Alt)</description>
+		<description>Puyo Puyo Sun (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Compile</publisher>
 		<info name="serial" value="T-6603G"/>
@@ -27493,7 +27493,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Pyon Pyon Kyaruru no Maajan Hiyori (T-31101G)... -->
 	<software name="pyonpyona" cloneof="pyonpyon" supported="no">
-		<description>Pyon Pyon Kyaruru no Mahjong Hiyori (Jpn, Alt)</description>
+		<description>Pyon Pyon Kyaruru no Mahjong Hiyori (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Natsume</publisher>
 		<info name="serial" value="T-31101G"/>
@@ -27509,7 +27509,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Quiz Narairo Dreams (T-1220G)... -->
 	<software name="qndreamc" cloneof="qndream" supported="no">
-		<description>Quiz Nanairo Dreams - Nijiirochou no Kiseki (Jpn, Alt)</description>
+		<description>Quiz Nanairo Dreams - Nijiirochou no Kiseki (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="T-1220G"/>
@@ -27591,7 +27591,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Ryuuteki Gosennen (J) (T-15025G)... -->
 	<software name="ryuutekia" cloneof="ryuuteki" supported="no">
-		<description>Ryuuteki Gosennen - Dragons Of China (Jpn, Alt)</description>
+		<description>Ryuuteki Gosennen - Dragons Of China (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="T-15025G"/>
@@ -27607,7 +27607,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Sakura Taisen Hanagumi Tsushin (J) (GS-9134)... -->
 	<software name="hanatsusa" cloneof="hanatsus" supported="no">
-		<description>Sakura Taisen - Hanagumi Tsuushin (Jpn, Alt)</description>
+		<description>Sakura Taisen - Hanagumi Tsuushin (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9134"/>
@@ -27656,7 +27656,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Sentimental Graffiti Disc 1 (T-20106G)... -->
 	<!-- Identifying Sentimental Graffiti Disc 2 (T-20106G)... -->
 	<software name="sentgrafa" cloneof="sentgraf" supported="no">
-		<description>Sentimental Graffiti (Jpn, Alt)</description>
+		<description>Sentimental Graffiti (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>NEC Interchannel</publisher>
 		<info name="serial" value="T-20106G"/>
@@ -27757,7 +27757,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Slayers Royale (JAP) (T-27903G)... -->
 	<software name="slayersra" cloneof="slayersr" supported="no">
-		<description>Slayers Royal (Jpn, Alt)</description>
+		<description>Slayers Royal (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Kadokawa Shoten</publisher>
 		<info name="serial" value="T-27903G"/>
@@ -27790,7 +27790,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Suchie-Pai Adventure Doki Doki Nightmare Disc 1 (T-5713G)... -->
 	<!-- Identifying Suchie-Pai Adventure Doki Doki Nightmare Disc 2 (T-5713G)... -->
 	<software name="suchiadva" cloneof="suchiadv" supported="no">
-		<description>Suchie-Pai Adventure - Doki Doki Nightmare (Jpn, Alt)</description>
+		<description>Suchie-Pai Adventure - Doki Doki Nightmare (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="T-5713G"/>
@@ -27827,7 +27827,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Thor - Seireioukiden (GS-9053)... -->
 	<software name="thor2jb" cloneof="thor2" supported="no">
-		<description>Thor - Seireioukiden (Jpn, Alt)</description>
+		<description>Thor - Seireioukiden (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9053"/>
@@ -28245,7 +28245,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Assault Rigs... -->
 	<software name="assrigsa" cloneof="assrigs" supported="no">
-		<description>Assault Rigs (Jpn, Alt)</description>
+		<description>Assault Rigs (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Soft Bank</publisher>
 		<info name="serial" value="T-18606G"/>
@@ -28261,7 +28261,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying BioHazard... -->
 	<software name="biohazb" cloneof="revil" supported="no">
-		<description>Bio Hazard (Jpn, Alt 2)</description>
+		<description>Bio Hazard (Jpn, alt 2)</description>
 		<year>1997</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="T-1219G"/>
@@ -28411,7 +28411,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying CleopatraFortune... -->
 	<software name="cleopatra" cloneof="cleopatr" supported="no">
-		<description>Cleopatra Fortune (Jpn, Alt)</description>
+		<description>Cleopatra Fortune (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="T-1108G"/>
@@ -28475,7 +28475,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Culdcept... -->
 	<software name="culdcepta" cloneof="culdcept" supported="no">
-		<description>Culdcept (Jpn, Alt)</description>
+		<description>Culdcept (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Omiya Soft</publisher>
 		<info name="serial" value="T-31401G"/>
@@ -28491,7 +28491,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying DinosaurIslandYokokuHen... -->
 	<software name="dinoislyokoa" cloneof="dinoisl" supported="no">
-		<description>Daina Airan - Yokoku-hen (Jpn, Alt)</description>
+		<description>Daina Airan - Yokoku-hen (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-4505G"/>
@@ -28539,7 +28539,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying DarkSavior... -->
 	<software name="darksavjc" cloneof="darksav" supported="no">
-		<description>Dark Savior (Jpn, Alt 3)</description>
+		<description>Dark Savior (Jpn, alt 3)</description>
 		<year>1996</year>
 		<publisher>Climax</publisher>
 		<info name="serial" value="T-22101G"/>
@@ -28642,7 +28642,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying GalActHeroism... -->
 	<software name="gaheroa" cloneof="gahero" supported="no">
-		<description>Eiyuu Shigan - Gal Act Heroism (Jpn, Alt)</description>
+		<description>Eiyuu Shigan - Gal Act Heroism (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>MicroCabin</publisher>
 		<info name="serial" value="T-5204G"/>
@@ -28712,7 +28712,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Farland Story... -->
 	<software name="farlanda" cloneof="farland" supported="no">
-		<description>Farland Story - Habou no Mai (Jpn, Alt)</description>
+		<description>Farland Story - Habou no Mai (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>TGL</publisher>
 		<info name="serial" value="T-32505G"/>
@@ -28793,7 +28793,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying GalaxyFrauleinYunaMikaAkitakaIllustWorks2... -->
 	<software name="goillus2a" cloneof="goillus2" supported="no">
-		<description>Ginga Ojousama Densetsu Yuna Akitaka Mika IllustWorks 2 (Jpn, Alt)</description>
+		<description>Ginga Ojousama Densetsu Yuna Akitaka Mika IllustWorks 2 (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="T-14323G"/>
@@ -28950,7 +28950,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Jinzou Ningen Hakaider - Last Judgement (GS-9088)... -->
 	<software name="lastjudga" cloneof="lastjudg" supported="no">
-		<description>Jinzou Ningen Hakaider - Last Judgement (Jpn, Alt)</description>
+		<description>Jinzou Ningen Hakaider - Last Judgement (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9088"/>
@@ -29030,7 +29030,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Madou Monogatari... -->
 	<software name="madouma" cloneof="madoum" supported="no">
-		<description>Madou Monogatari (Jpn, Alt)</description>
+		<description>Madou Monogatari (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Compile</publisher>
 		<info name="serial" value="T-6607G"/>
@@ -29436,7 +29436,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying CastleOfIllusion... -->
 	<software name="mickdnlda" cloneof="mickdnld" supported="no">
-		<description>Sega Ages - I Love Mickey Mouse - Fushigi no Oshiro Daibouken &amp; I Love Donald Duck - Georgia Ou no Hihou (Jpn, Alt)</description>
+		<description>Sega Ages - I Love Mickey Mouse - Fushigi no Oshiro Daibouken &amp; I Love Donald Duck - Georgia Ou no Hihou (Jpn, alt)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9179"/>
@@ -29482,9 +29482,9 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Sekai no Shasou Kara 1 Swiss Hen - Alps Tozantetsudou no Tabi (T-32201G)... -->
+	<!-- Identifying Sekai no Shasou kara 1 Swiss Hen - Alps Tozantetsudou no Tabi (T-32201G)... -->
 	<software name="swisshen" supported="no">
-		<description>Sekai no Shasou Kara 1 Swiss-hen - Alps Tozantetsudou no Tabi (Jpn)</description>
+		<description>Sekai no Shasou kara 1 Swiss-hen - Alps Tozantetsudou no Tabi (Jpn)</description>
 		<year>1996</year>
 		<publisher>Fujitsu</publisher>
 		<info name="serial" value="T-32201G"/>
@@ -29547,7 +29547,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying TAROMARU... -->
 	<software name="shinreija" cloneof="shinreij" supported="no">
-		<description>Shinrei Jusatsushi Taroumaru (Jpn, Alt)</description>
+		<description>Shinrei Jusatsushi Taroumaru (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Time Warner Interactive</publisher>
 		<info name="serial" value="T-4804G"/>
@@ -29633,7 +29633,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying sonic extreme beta... -->
 	<software name="sonicext" supported="no">
-		<description>Sonic Extreme (Prototype)</description>
+		<description>Sonic Extreme (prototype)</description>
 		<year>199?</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
@@ -29728,7 +29728,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Street Fighter 2 Movie Disc1 (T-1204G)... -->
 	<!-- Identifying Street Fighter 2 Movie Disc2 (T-1204G)... -->
 	<software name="sf2mova" cloneof="sf2mov" supported="no">
-		<description>Street Fighter II Movie (Jpn, Alt)</description>
+		<description>Street Fighter II Movie (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="T-1204G"/>
@@ -29829,7 +29829,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying TENCHI_MUYO_DISK1... -->
 	<software name="tenchtoua" cloneof="tenchtou" supported="no">
-		<description>Tenchi Muyou! Toukou Muyou - Aniraji Collection (Jpn, Alt)</description>
+		<description>Tenchi Muyou! Toukou Muyou - Aniraji Collection (Jpn, alt)</description>
 		<year>1997</year>
 		<publisher>Xing</publisher>
 		<info name="serial" value="T-26103G"/>
@@ -30310,7 +30310,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Atlantis - The Lost Tales v1.200 (1998)(Sega)(PAL)(M3)(Disc 1 of 2)[!]... -->
 	<!-- Identifying Atlantis - The Lost Tales v1.200 (1998)(Sega)(PAL)(M3)(Disc 2 of 2)[!]... -->
 	<software name="atlantis" supported="no">
-		<description>Atlantis - The Lost Tales (Euro)</description>
+		<description>Atlantis: The Lost Tales (Euro)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81091-50"/>
@@ -30330,7 +30330,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying 0691-Atlantis-fre-cd1... -->
 	<!-- Identifying 0691-Atlantis-fre-cd2... -->
 	<software name="atlantisf" cloneof="atlantis" supported="no">
-		<description>Atlantis - Secrets d'un monde oublié (Fra)</description>
+		<description>Atlantis : Secrets d'un monde oublié (Fra)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81091-09"/>
@@ -31914,7 +31914,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Jonah Lomu Rugby v1.100 (1997)(Sports Master)(PAL)(M4)[!]... -->
 	<software name="lomu" supported="no">
 		<description>Jonah Lomu Rugby (Euro)</description>
-		<!-- or is it  Jonah Lomu Rugby (United Kingdom) [T-12003H-05]  -->
+		<!-- or is it  Jonah Lomu Rugby (United Kingdom) [T-12003H-05] -->
 		<year>1997</year>
 		<publisher>Sports Master</publisher>
 		<info name="serial" value="T-12003H-50"/>
@@ -33810,7 +33810,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying ULTIMATE_MORTAL_KOMBAT_3... -->
 	<software name="umk3a" cloneof="umk3" supported="no">
-		<description>Ultimate Mortal Kombat 3 (Euro, Alt)</description>
+		<description>Ultimate Mortal Kombat 3 (Euro, alt)</description>
 		<year>1996</year>
 		<publisher>GT Interactive</publisher>
 		<info name="serial" value="T-25403H-50?"/>
@@ -34288,7 +34288,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Gremlin Demo Disk EUR [610-6384-01] - By Madroms... -->
 	<software name="gremlinda" cloneof="gremlind" supported="no">
-		<description>Gremlin Demo Disk (Euro, Alt)</description>
+		<description>Gremlin Demo Disk (Euro, alt)</description>
 		<year>1996</year>
 		<publisher>Gremlin</publisher>
 		<info name="serial" value="610-6384-01"/>
@@ -34302,7 +34302,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying IMPACT_RACING_demo... -->
 	<software name="impactrcd" cloneof="impactrc" supported="no">
-		<description>Impact Racing (Euro, Demo)</description>
+		<description>Impact Racing (Euro, demo)</description>
 		<year>1997</year>
 		<publisher>JVC</publisher>
 		<info name="serial" value="610-9008-50"/>
@@ -34316,7 +34316,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Panzer Dragoon Demo (E)... -->
 	<software name="panzerd" cloneof="panzer" supported="no">
-		<description>Panzer Dragoon Demo (Euro)</description>
+		<description>Panzer Dragoon (Euro, demo)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81018-50"/>
@@ -34330,7 +34330,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Pinball Graffiti Demo (E)... -->
 	<software name="pinbgrafd" cloneof="pinbgraf" supported="no">
-		<description>Pinball Graffiti Demo (Euro)</description>
+		<description>Pinball Graffiti (Euro, demo)</description>
 		<year>1997</year>
 		<publisher>JVC</publisher>
 		<info name="serial" value="610-6493"/>
@@ -34526,7 +34526,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Swagman Demo EUR [610-6529] - By Madroms... -->
 	<software name="swagmand" cloneof="swagman" supported="no">
-		<description>SwagMan Demo (Euro)</description>
+		<description>SwagMan (Euro, demo)</description>
 		<year>1995</year>
 		<publisher>Eidos</publisher>
 		<info name="serial" value="610-6529"/>
@@ -34554,7 +34554,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying VICTORYBOXING_demo... -->
 	<software name="vicboxind" cloneof="vicboxin" supported="no">
-		<description>Victory Boxing (Euro, Demo)</description>
+		<description>Victory Boxing (Euro, demo)</description>
 		<year>1996</year>
 		<publisher>JVC</publisher>
 		<info name="serial" value="ST-6005H"/>
@@ -34596,7 +34596,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Winter Heat Demo Disc (E)... -->
 	<software name="winterhtd" cloneof="winterht" supported="no">
-		<description>Winter Heat Demo Disc (Euro)</description>
+		<description>Winter Heat (Euro, demo disc)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81125-50"/>
@@ -34610,7 +34610,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Wrestle Mania - The Arcade Game Demo Disc (E)... -->
 	<software name="wwfagd" cloneof="wwfag" supported="no">
-		<description>WWF WrestleMania - The Arcade Game (Euro, Demo)</description>
+		<description>WWF WrestleMania - The Arcade Game (Euro, demo)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8112H-50"/>
@@ -38096,7 +38096,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying Virtua Fighter Remix v0.003 (1995)(Sega)(NTSC)(US)[!]... -->
-	<!--  [81049] / [81027] ?? -->
+	<!-- [81049] / [81027] ?? -->
 	<software name="vfremixu" cloneof="vfremix" supported="no">
 		<description>Virtua Fighter Remix</description>
 		<year>1995</year>
@@ -38402,7 +38402,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying dw-sat-0840-Deep_Fear_Prototype-usa-cd1... -->
 	<!-- Identifying dw-sat-0840-Deep_Fear_Prototype-usa-cd2... -->
 	<software name="deepfearu" cloneof="deepfear" supported="no">
-		<description>Deep Fear (USA, Prototype)</description>
+		<description>Deep Fear (USA, prototype)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -38420,7 +38420,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying dw-sat-0841-Rebellion_Beta-uni... -->
 	<software name="rebel" supported="no">
-		<description>Rebellion (USA, Prototype)</description>
+		<description>Rebellion (USA, prototype)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -38591,7 +38591,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying major damage 14-06-1996... -->
 	<software name="majordama" cloneof="majordam" supported="no">
-		<description>Major Damage (USA, Prototype 19960614)</description>
+		<description>Major Damage (USA, prototype 19960614)</description>
 		<year>1996</year>
 		<publisher>Capcom</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -38605,7 +38605,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying major damage 15-07-1996... -->
 	<software name="majordam" supported="no">
-		<description>Major Damage (USA, Prototype 19960715)</description>
+		<description>Major Damage (USA, prototype 19960715)</description>
 		<year>1996</year>
 		<publisher>Capcom</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -38639,7 +38639,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying chill... -->
 	<software name="chill" supported="no">
-		<description>Chill (Euro, Prototype 19980119)</description>
+		<description>Chill (Euro, prototype 19980119)</description>
 		<year>1998</year>
 		<publisher>Eidos?</publisher>
 		<info name="serial" value="T-7616H-50?"/>
@@ -38673,7 +38673,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying werewolf... -->
 	<software name="werewolf" supported="no">
-		<description>Werewolf (Prototype, Internal Date 19940801 Creation Date 19941111 Modification Date 19960628)</description>
+		<description>Werewolf (prototype, internal date 19940801 creation date 19941111 modification date 19960628)</description>
 		<year>199?</year>
 		<publisher>Capcom</publisher>
 		<part name="cdrom" interface="sat_cdrom">
@@ -38685,7 +38685,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- just seems to be an alt read of the above? info is identical? -->
 	<software name="werewolfa" cloneof="werewolf" supported="no">
-		<description>Werewolf (Prototype, Internal Date 19940801 Creation Date 19941111 Modification Date 19960628, Alt)</description>
+		<description>Werewolf (prototype, internal date 19940801 creation date 19941111 modification date 19960628, alt)</description>
 		<year>199?</year>
 		<publisher>Capcom</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -38719,7 +38719,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying vc2alpha... -->
 	<software name="vcop2p" cloneof="vcop2" supported="no">
-		<description>Virtua Cop 2 (Euro, Prototype 19951020)</description>
+		<description>Virtua Cop 2 (Euro, prototype 19951020)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -38751,7 +38751,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying return_fire... -->
 	<software name="returnfi" supported="no">
-		<description>Return Fire (Prototype)</description>
+		<description>Return Fire (prototype)</description>
 		<year>199?</year>
 		<publisher>Williams</publisher>
 		<part name="cdrom" interface="sat_cdrom">
@@ -38781,7 +38781,7 @@ Olympic Soccer (Fra) T-7904H-09
 	-->
 	<!-- Identifying nightse3... -->
 	<software name="nightse3" cloneof="nights" supported="no">
-		<description>NiGHTS - into Dreams... (E3 Demo)</description>
+		<description>NiGHTS - into Dreams... (E3 demo)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U,NTSC-J"/>
@@ -38813,7 +38813,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Three_Dirty_Dwarves_CD-1-1_MK8103300_V0.003_04171996_[JUT]... -->
 	<software name="3dwarvesp" cloneof="3dwarves" supported="no">
-		<description>Three Dirty Dwarves (Prototype 19960417)</description>
+		<description>Three Dirty Dwarves (prototype 19960417)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U,NTSC-J"/>
@@ -38844,7 +38844,7 @@ Olympic Soccer (Fra) T-7904H-09
 	-->
 	<!-- Identifying ejim2beta... -->
 	<software name="ejim2p" cloneof="ejim2" supported="no">
-		<description>Earthworm Jim 2 (Prototype 19951229)</description>
+		<description>Earthworm Jim 2 (prototype 19951229)</description>
 		<year>1996</year>
 		<publisher>Playmates Interactive</publisher>
 		<part name="cdrom" interface="sat_cdrom">
@@ -38856,7 +38856,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Crypt Killer (Prototype - Jan 8, 1997)... -->
 	<software name="cryptklrp" cloneof="cryptklr" supported="no">
-		<description>Crypt Killer (Prototype 19970108)</description>
+		<description>Crypt Killer (prototype 19970108)</description>
 		<year>1997</year>
 		<publisher>Konami</publisher>
 		<part name="cdrom" interface="sat_cdrom">
@@ -38868,7 +38868,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Duke Nukem (Prototype - Sep 18, 1997)... -->
 	<software name="dukenk3dp" cloneof="dukenk3d" supported="no">
-		<description>Duke Nukem 3D (Prototype 19970918)</description>
+		<description>Duke Nukem 3D (prototype 19970918)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="sat_cdrom">
@@ -38880,7 +38880,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Fighters Megamix (Prototype - Apr 08, 1997)... -->
 	<software name="fightmixp" cloneof="fightmix" supported="no">
-		<description>Fighters Megamix (Prototype 19970408)</description>
+		<description>Fighters Megamix (prototype 19970408)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="sat_cdrom">
@@ -38892,7 +38892,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Fighting Vipers (Prototype - Sep 06, 1996)... -->
 	<software name="fvipersp" cloneof="fvipers" supported="no">
-		<description>Fighting Vipers (Prototype 19960906)</description>
+		<description>Fighting Vipers (prototype 19960906)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="sat_cdrom">
@@ -38904,7 +38904,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Loaded (Prototype - Sep 3, 1996)... -->
 	<software name="loadedp" cloneof="loaded" supported="no">
-		<description>Loaded (Prototype 19960903)</description>
+		<description>Loaded (prototype 19960903)</description>
 		<year>1996</year>
 		<publisher>Interplay</publisher>
 		<part name="cdrom" interface="sat_cdrom">
@@ -38917,7 +38917,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Panzer Dragoon Saga (Prototype - Dec 30, 1997) (Disc 3)... -->
 	<!-- Identifying Panzer Dragoon Saga (Prototype - Dec 30, 1997) (Disc 4)... -->
 	<software name="panzsagap1" cloneof="panzsaga" supported="no">
-		<description>Panzer Dragoon Saga (Discs 3&amp;4, Prototype 19971230)</description>
+		<description>Panzer Dragoon Saga (discs 3&amp;4, prototype 19971230)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 
@@ -38936,7 +38936,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Panzer Dragoon Saga (Prototype - Dec 22, 1997) (Disc 1)... -->
 	<software name="panzsagap2" cloneof="panzsaga" supported="no">
-		<description>Panzer Dragoon Saga (Disc 1, Prototype 19971222)</description>
+		<description>Panzer Dragoon Saga (disc 1, prototype 19971222)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="sat_cdrom">
@@ -38951,7 +38951,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Panzer Dragoon Saga (Prototype - Nov 30, 1997) (Disc 2)... -->
 	<!-- Identifying Panzer Dragoon Saga (Prototype - Nov 30, 1997) (Disc 3)... -->
 	<software name="panzsagap3" cloneof="panzsaga" supported="no">
-		<description>Panzer Dragoon Saga (Discs 1&amp;2&amp;3, Prototype 19971130)</description>
+		<description>Panzer Dragoon Saga (discs 1&amp;2&amp;3, prototype 19971130)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="sat_cdrom">
@@ -38974,7 +38974,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Panzer Dragoon Zwei (Prototype Preview - Feb 02, 1996)... -->
 	<software name="panzer2p" cloneof="panzer2" supported="no">
-		<description>Panzer Dragoon II Zwei (Prototype Preview 19960202)</description>
+		<description>Panzer Dragoon II Zwei (prototype preview 19960202)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="sat_cdrom">
@@ -38986,7 +38986,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Primal Rage (Prototype - Feb 12, 1996)... -->
 	<software name="primalp" cloneof="primal" supported="no">
-		<description>Primal Rage (Prototype 19960212)</description>
+		<description>Primal Rage (prototype 19960212)</description>
 		<year>1996</year>
 		<publisher>Time Warner Interactive</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -38999,7 +38999,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Sega Rally Championship (Prototype - Oct 31, 1995)... -->
 	<software name="srallycp" cloneof="srallyc" supported="no">
-		<description>Sega Rally Championship (Prototype 19951031)</description>
+		<description>Sega Rally Championship (prototype 19951031)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="sat_cdrom">
@@ -39023,7 +39023,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Slam N' Jam 96 (Prototype - Feb 1, 1996)... -->
 	<software name="slamnjamp" cloneof="slamnjam" supported="no">
-		<description>Slam 'n Jam '96 featuring Magic &amp; Kareem (Prototype 19960201)</description>
+		<description>Slam 'n Jam '96 featuring Magic &amp; Kareem (prototype 19960201)</description>
 		<year>1996</year>
 		<publisher>Crystal Dynamics</publisher>
 		<part name="cdrom" interface="sat_cdrom">
@@ -39035,7 +39035,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Sonic 3D (Tech Demo - Oct 08)... -->
 	<software name="sonic3dtd" cloneof="sonic3d" supported="no">
-		<description>Sonic 3D (Tech Demo Oct 08)</description>
+		<description>Sonic 3D (tech demo Oct 08)</description>
 		<year>1996?</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="sat_cdrom">
@@ -39047,7 +39047,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Ultimate Mortal Kombat 3 (Prototype - Feb 07, 1996)... -->
 	<software name="umk3p" cloneof="umk3" supported="no">
-		<description>Ultimate Mortal Kombat 3 (Prototype 19960207)</description>
+		<description>Ultimate Mortal Kombat 3 (prototype 19960207)</description>
 		<year>1996</year>
 		<publisher>Midway</publisher>
 		<part name="cdrom" interface="sat_cdrom">
@@ -39059,7 +39059,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Judgement Force (Prototype - Nov 26, 1996)... -->
 	<software name="judgefrc" supported="no">
-		<description>Judgement Force (Prototype 19961126)</description>
+		<description>Judgement Force (prototype 19961126)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="sat_cdrom">
@@ -39073,7 +39073,7 @@ Olympic Soccer (Fra) T-7904H-09
 	   the 'ISRC 904002100272' metadata line after 'TRACK 24 AUDIO' being ommitted from the cuesheet, we don't
 	   store that information -->
 	<software name="raymanp" supported="no"> <!-- the header lists 19950424, but elsewhere there are date stamps of 19950720 -->
-		<description>Rayman (Prototype 19950720)</description>
+		<description>Rayman (prototype 19950720)</description>
 		<year>1995</year>
 		<publisher>Ubi Soft</publisher>
 		<part name="cdrom" interface="sat_cdrom">

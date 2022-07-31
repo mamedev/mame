@@ -351,17 +351,14 @@ void tms9928a_device::register_write(u8 data)
 	}
 }
 
-void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(tms9928a_device::clock_grom)
 {
-	// Handle GROM clock if present
-	if (id==GROMCLK)
-	{
-		// Pulse it
-		m_out_gromclk_cb(ASSERT_LINE);
-		m_out_gromclk_cb(CLEAR_LINE);
-		return;
-	}
+	m_out_gromclk_cb(ASSERT_LINE);
+	m_out_gromclk_cb(CLEAR_LINE);
+}
 
+TIMER_CALLBACK_MEMBER(tms9928a_device::update_line)
+{
 	int raw_vpos = screen().vpos();
 	int vpos = raw_vpos * m_vertical_size / screen().height();
 	uint16_t BackColour = m_Regs[7] & 15;
@@ -737,8 +734,8 @@ void tms9928a_device::device_start()
 	/* back bitmap */
 	m_tmpbmp.allocate(m_total_horz, TOTAL_VERT_PAL);
 
-	m_line_timer = timer_alloc(TIMER_LINE);
-	m_gromclk_timer = timer_alloc(GROMCLK);
+	m_line_timer = timer_alloc(FUNC(tms9928a_device::update_line), this);
+	m_gromclk_timer = timer_alloc(FUNC(tms9928a_device::clock_grom), this);
 
 	m_INT = 1; // force initial update
 

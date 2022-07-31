@@ -365,7 +365,7 @@ void dmg_ppu_device::common_start()
 	m_vram = make_unique_clear<uint8_t[]>(m_vram_size);
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(dmg_ppu_device::videoptr_restore), this));
-	m_lcd_timer = timer_alloc();
+	m_lcd_timer = timer_alloc(FUNC(dmg_ppu_device::update_tick), this);
 
 	m_program_space = &m_lr35902->space(AS_PROGRAM);
 
@@ -1917,7 +1917,7 @@ void dmg_ppu_device::increment_scanline()
 }
 
 
-void dmg_ppu_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(dmg_ppu_device::update_tick)
 {
 	update_state();
 }

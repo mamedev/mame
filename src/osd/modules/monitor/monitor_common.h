@@ -7,7 +7,7 @@
 #ifndef __MONITOR_COMMON_H__
 #define __MONITOR_COMMON_H__
 
-#include "modules/lib/osdobj_common.h"
+#include "monitor_module.h"
 #include <map>
 
 //============================================================

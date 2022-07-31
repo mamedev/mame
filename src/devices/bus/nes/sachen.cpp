@@ -9,8 +9,8 @@
  Here we emulate the following PCBs
 
  * Sachen SA-009 [mapper 160]
- * Sachen SA-0036 [mapper 148]
- * Sachen SA-0037 [mapper 149]
+ * Sachen SA-0036 [mapper 149]
+ * Sachen SA-0037 [mapper 148]
  * Sachen SA-72007 [mapper 145]
  * Sachen SA-72008 [mapper 133]
  * Sachen TCA-01 [mapper 143]
@@ -20,10 +20,6 @@
  * Sachen 3014 [mapper 533]
  * Sachen Discrete PCBs [mapper 150 & 243]
  * Sachen 8259 [mapper 141 (A), 138 (B), 139 (C), 137 (D)]
-
- Known issues on specific mappers:
-
- * 133 Qi Wang starts with corrupted graphics (ingame seems better)
 
 
  ***********************************************************************************************************/
@@ -69,7 +65,7 @@ nes_sachen_sa009_device::nes_sachen_sa009_device(const machine_config &mconfig, 
 {
 }
 
-nes_sachen_sa0036_device::nes_sachen_sa0036_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_sachen_sa0036_device::nes_sachen_sa0036_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_SACHEN_SA0036, tag, owner, clock)
 {
 }
@@ -157,88 +153,10 @@ nes_sachen_8259d_device::nes_sachen_8259d_device(const machine_config &mconfig, 
 
 
 
-void nes_sachen_sa009_device::device_start()
-{
-	common_start();
-}
-
-void nes_sachen_sa009_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_sachen_sa0036_device::device_start()
-{
-	common_start();
-}
-
-void nes_sachen_sa0036_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_sachen_sa0037_device::device_start()
-{
-	common_start();
-}
-
-void nes_sachen_sa0037_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_sachen_sa72007_device::device_start()
-{
-	common_start();
-}
-
-void nes_sachen_sa72007_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_sachen_sa72008_device::device_start()
-{
-	common_start();
-}
-
-void nes_sachen_sa72008_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_sachen_tca01_device::device_start()
-{
-	common_start();
-}
-
 void nes_sachen_tca01_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(1);
-	chr8(0, m_chr_source);
-}
-
-void nes_sachen_tcu01_device::device_start()
-{
-	common_start();
-}
-
-void nes_sachen_tcu01_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
 	chr8(0, m_chr_source);
 }
 
@@ -250,7 +168,6 @@ void nes_sachen_tcu02_device::device_start()
 
 void nes_sachen_tcu02_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
 	chr8(0, m_chr_source);
 
@@ -280,7 +197,6 @@ void nes_sachen_74x374_device::device_start()
 
 void nes_sachen_74x374_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
 	chr8(0, m_chr_source);
 
@@ -297,7 +213,6 @@ void nes_sachen_8259a_device::device_start()
 
 void nes_sachen_8259a_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
 	chr8(0, m_chr_source);
 	set_nt_mirroring(PPU_MIRROR_VERT);
@@ -308,7 +223,6 @@ void nes_sachen_8259a_device::pcb_reset()
 
 void nes_sachen_8259d_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
 	chr8(m_vrom_chunks - 1, CHRROM);
 	set_nt_mirroring(PPU_MIRROR_VERT);
@@ -351,13 +265,16 @@ void nes_sachen_sa009_device::write_l(offs_t offset, uint8_t data)
 
  iNES: mapper 149
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_sachen_sa0036_device::write_h(offs_t offset, uint8_t data)
+void nes_sachen_sa0036_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("sa0036 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	// this pcb is subject to bus conflict
+	data = account_bus_conflict(offset, data);
 
 	chr8(data >> 7, CHRROM);
 }
@@ -365,16 +282,17 @@ void nes_sachen_sa0036_device::write_h(offs_t offset, uint8_t data)
 /*-------------------------------------------------
 
  Sachen SA0037 bootleg boards
+ Tengen 800008 board
 
- Games: Mahjong World, Shisen Mahjong
+ Games: Mahjong World, Shisen Mahjong, Tengen Tetris
 
  iNES: mapper 148
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_sachen_sa0037_device::write_h(offs_t offset, uint8_t data)
+void nes_sachen_sa0037_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("sa0037 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -467,7 +385,7 @@ void nes_sachen_tcu01_device::write_l(offs_t offset, uint8_t data)
 
 	if ((offset & 0x103) == 0x002)
 	{
-		prg32(((data >> 6) & 0x02) | ((data >> 2) & 0x01));
+		prg32(bitswap<2>(data, 7, 2));
 		chr8(data >> 3, CHRROM);
 	}
 }
@@ -628,7 +546,7 @@ void nes_sachen_74x374_device::write_l(offs_t offset, uint8_t data)
 					chr8(m_mmc_vrom_bank, CHRROM);
 					break;
 				case 0x07:
-					set_mirror((data >> 1) & 0x03);
+					set_mirror(BIT(data, 1, 2));
 					break;
 				default:
 					break;

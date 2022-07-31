@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(Z88CART_SLOT, z88cart_slot_device, "z88cart_slot", "Z88 Cartr
 
 
 //**************************************************************************
-//    Z88 cartridges Interface
+//    Z88 Cartridge Interface
 //**************************************************************************
 
 //-------------------------------------------------
@@ -76,22 +76,19 @@ void z88cart_slot_device::device_start()
 	// resolve callbacks
 	m_out_flp_cb.resolve_safe();
 
-	m_flp_timer = timer_alloc(TIMER_FLP_CLEAR);
+	m_flp_timer = timer_alloc(FUNC(z88cart_slot_device::close_flap), this);
 	m_flp_timer->reset();
 }
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  close_flap
 //-------------------------------------------------
 
-void z88cart_slot_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(z88cart_slot_device::close_flap)
 {
-	if (id == TIMER_FLP_CLEAR)
-	{
-		// close the flap
-		m_out_flp_cb(CLEAR_LINE);
-	}
+	// close the flap
+	m_out_flp_cb(CLEAR_LINE);
 }
 
 /*-------------------------------------------------
@@ -126,7 +123,7 @@ image_init_result z88cart_slot_device::call_load()
 	// open the flap
 	m_out_flp_cb(ASSERT_LINE);
 
-	// setup the timer for close the flap
+	// setup the timer to close the flap
 	m_flp_timer->adjust(CLOSE_FLAP_TIME);
 
 	return image_init_result::PASS;
@@ -151,7 +148,7 @@ void z88cart_slot_device::call_unload()
 	// open the flap
 	m_out_flp_cb(ASSERT_LINE);
 
-	// setup the timer for close the flap
+	// setup the timer to close the flap
 	m_flp_timer->adjust(CLOSE_FLAP_TIME);
 }
 
@@ -162,6 +159,24 @@ void z88cart_slot_device::call_unload()
 
 std::string z88cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
+	// select the correct slot device for the ROM size
+	if (hook.image_file())
+	{
+		uint64_t size;
+		std::error_condition err = hook.image_file()->length(size);
+
+		if (!err)
+		{
+			if (size <= 0x8000)     return std::string("32krom");
+			if (size <= 0x20000)    return std::string("128krom");
+			if (size <= 0x40000)    return std::string("256krom");
+			if (size <= 0x100000)   return std::string("1024kflash");
+			fatalerror("%s: unsupported ROM size 0x%06x", tag(), size);
+		}
+		else
+			fatalerror("%s: %s:%d %s\n", tag(), err.category().name(), err.value(), err.message());
+	}
+
 	return software_get_default_slot("128krom");
 }
 
@@ -187,6 +202,16 @@ void z88cart_slot_device::write(offs_t offset, uint8_t data)
 {
 	if (m_cart)
 		m_cart->write(offset, data);
+}
+
+/*-------------------------------------------------
+    set EPROM programming voltage to slot 3
+-------------------------------------------------*/
+
+void z88cart_slot_device::vpp_w(int state)
+{
+	if (m_cart)
+		m_cart->vpp_w(state);
 }
 
 

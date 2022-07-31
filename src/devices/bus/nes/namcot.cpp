@@ -98,7 +98,6 @@ void nes_namcot3433_device::device_start()
 
 void nes_namcot3433_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(m_prg_chunks - 2);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
@@ -114,7 +113,6 @@ void nes_namcot3446_device::device_start()
 
 void nes_namcot3446_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
@@ -131,7 +129,6 @@ void nes_namcot3425_device::device_start()
 
 void nes_namcot3425_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
@@ -143,7 +140,7 @@ void nes_namcot3425_device::pcb_reset()
 void nes_namcot340_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_namcot340_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -156,7 +153,6 @@ void nes_namcot340_device::device_start()
 
 void nes_namcot340_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
@@ -169,7 +165,7 @@ void nes_namcot340_device::pcb_reset()
 void nes_namcot175_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_namcot175_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -183,7 +179,6 @@ void nes_namcot175_device::device_start()
 
 void nes_namcot175_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
@@ -197,7 +192,7 @@ void nes_namcot175_device::pcb_reset()
 void nes_namcot163_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_namcot163_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -231,7 +226,6 @@ void nes_namcot163_device::device_start()
 
 void nes_namcot163_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
@@ -403,17 +397,14 @@ void nes_namcot3425_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_namcot340_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_namcot340_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
+	if (m_irq_enable)
 	{
-		if (m_irq_enable)
-		{
-			if (m_irq_count == 0x7fff)  // counter does not wrap to 0!
-				set_irq_line(ASSERT_LINE);
-			else
-				m_irq_count++;
-		}
+		if (m_irq_count == 0x7fff)  // counter does not wrap to 0!
+			set_irq_line(ASSERT_LINE);
+		else
+			m_irq_count++;
 	}
 }
 
@@ -448,7 +439,7 @@ uint8_t nes_namcot340_device::n340_loread(offs_t offset)
 			set_irq_line(CLEAR_LINE); // FIXME: unreachable
 			[[fallthrough]];
 		case 0x1800:
-			return (m_irq_count >> 8) & 0xff;
+			return m_irq_count >> 8;
 			set_irq_line(CLEAR_LINE); // FIXME: unreachable
 			[[fallthrough]];
 		default:
@@ -466,7 +457,7 @@ void nes_namcot340_device::n340_hiwrite(offs_t offset, uint8_t data)
 		case 0x1000: case 0x1800:
 		case 0x2000: case 0x2800:
 		case 0x3000: case 0x3800:
-			chr1_x(offset / 0x800, data, CHRROM);
+			chr1_x(offset >> 11, data, CHRROM);
 			break;
 		case 0x4000:
 			// no cart found with wram, so it is not clear if this could work as in Namcot-175...
@@ -524,7 +515,7 @@ uint8_t nes_namcot175_device::read_m(offs_t offset)
 	if (!m_battery.empty() && !m_wram_protect)
 		return m_battery[offset & (m_battery.size() - 1)];
 
-	return get_open_bus();   // open bus
+	return get_open_bus();
 }
 
 void nes_namcot175_device::write_m(offs_t offset, uint8_t data)
@@ -605,13 +596,13 @@ uint8_t nes_namcot163_device::read_m(offs_t offset)
 	if (!m_battery.empty() && offset < m_battery.size())
 		return m_battery[offset & (m_battery.size() - 1)];
 
-	return get_open_bus();   // open bus
+	return get_open_bus();
 }
 
 void nes_namcot163_device::write_m(offs_t offset, uint8_t data)
 {
 	// the pcb can separately protect each 2KB chunk of the external wram from writes
-	int bank = (offset & 0x1800) >> 11;
+	int bank = BIT(offset, 11, 2);
 	if (!m_battery.empty() && !BIT(m_wram_protect, bank))
 		m_battery[offset & (m_battery.size() - 1)] = data;
 }
@@ -656,7 +647,6 @@ void nes_namcot163_device::set_mirror(uint8_t page, uint8_t data)
 
 void nes_namcot163_device::write_h(offs_t offset, uint8_t data)
 {
-	int page;
 	LOG_MMC(("namcot163 write_h, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x7800)
@@ -666,14 +656,13 @@ void nes_namcot163_device::write_h(offs_t offset, uint8_t data)
 		case 0x2000: case 0x2800:
 		case 0x3000: case 0x3800:
 			m_chr_bank = data;
-			chr1_x(offset / 0x800, m_chr_bank, CHRROM);
+			chr1_x(offset >> 11, m_chr_bank, CHRROM);
 			break;
 		case 0x4000:
 		case 0x4800:
 		case 0x5000:
 		case 0x5800:
-			page = (offset & 0x1800) >> 11;
-			set_mirror(page, data);
+			set_mirror(BIT(offset, 11, 2), data);
 			break;
 		case 0x6000:
 			m_namco163snd->disable_w((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);

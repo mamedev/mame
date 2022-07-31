@@ -213,7 +213,7 @@ ioport_constructor a2bus_parprn_device::device_input_ports() const
 
 void a2bus_parprn_device::device_start()
 {
-	m_strobe_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a2bus_parprn_device::update_strobe), this));
+	m_strobe_timer = timer_alloc(FUNC(a2bus_parprn_device::update_strobe), this);
 
 	save_item(NAME(m_next_strobe));
 	save_item(NAME(m_ack_latch));

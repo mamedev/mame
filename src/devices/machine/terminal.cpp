@@ -346,7 +346,7 @@ void generic_terminal_device::device_add_mconfig(machine_config &config)
 void generic_terminal_device::device_start()
 {
 	m_buffer = std::make_unique<uint8_t []>(m_width * m_height);
-	m_bell_timer = timer_alloc(BELL_TIMER_ID);
+	m_bell_timer = timer_alloc(FUNC(generic_terminal_device::bell_off), this);
 	m_keyboard_cb.resolve();
 	save_pointer(NAME(m_buffer), m_width * m_height);
 	save_item(NAME(m_x_pos));
@@ -361,14 +361,9 @@ void generic_terminal_device::device_reset()
 	m_framecnt = 0;
 }
 
-void generic_terminal_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(generic_terminal_device::bell_off)
 {
-	switch (id)
-	{
-	case BELL_TIMER_ID:
-		m_beeper->set_state(0);
-		break;
-	}
+	m_beeper->set_state(0);
 }
 
 /*

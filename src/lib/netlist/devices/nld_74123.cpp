@@ -117,10 +117,10 @@ namespace netlist::devices {
 		//, m_power_pins(*this)
 		{
 
-			register_subalias(pstring(D::gnd()), "RN.2");
-			register_subalias(pstring(D::vcc()), "RP.1");
-			register_subalias("C",   "RN.2");
-			register_subalias("RC",  "RN.1");
+			register_sub_alias(pstring(D::gnd()), "RN.2");
+			register_sub_alias(pstring(D::vcc()), "RP.1");
+			register_sub_alias("C",   "RN.2");
+			register_sub_alias("RC",  "RN.1");
 
 			connect("_RP_Q", "RP.I");
 			connect("_RN_Q", "RN.I");
@@ -128,8 +128,8 @@ namespace netlist::devices {
 			connect("RN.1", "RP.2");
 			connect("_CV", "RN.1");
 
-			m_RP.m_RON.set(D::RI());
-			m_RN.m_RON.set(D::RI());
+			m_RP().m_RON.set(D::RI());
+			m_RN().m_RON.set(D::RI());
 		}
 
 		NETLIB_HANDLERI(ab_clear)
@@ -169,7 +169,7 @@ namespace netlist::devices {
 		{
 			if (m_state == 1)
 			{
-				const nl_fptype vLow = m_KP * m_RP.P()();
+				const nl_fptype vLow = m_KP * m_RP().P()();
 				if (m_CV() < vLow)
 				{
 					m_RN_Q.push(0, NLTIME_FROM_NS(10)); // R_OFF
@@ -178,7 +178,7 @@ namespace netlist::devices {
 			}
 			if (m_state == 2)
 			{
-				const nl_fptype vHigh = (nlconst::one() - m_KP) * m_RP.P()();
+				const nl_fptype vHigh = (nlconst::one() - m_KP) * m_RP().P()();
 				if (m_CV() > vHigh)
 				{
 					m_RP_Q.push(0, NLTIME_FROM_NS(10)); // R_OFF
@@ -192,8 +192,8 @@ namespace netlist::devices {
 
 		NETLIB_RESETI()
 		{
-			m_RP.reset();
-			m_RN.reset();
+			m_RP().reset();
+			m_RN().reset();
 
 			//m_RP.set_R(R_OFF);
 			//m_RN.set_R(R_OFF);
@@ -250,7 +250,7 @@ namespace netlist::devices {
 		{
 			return ((in[0]() ^ 1) | (in[1]() ^ 1)) & in[2](); // (~A1 | ~A2) & B
 		}
-		template<typename T> static constexpr netlist_sig_t clear(const T &in) { plib::unused_var(in); return 1;}
+		template<typename T> static constexpr netlist_sig_t clear([[maybe_unused]] const T &in) { return 1; }
 	};
 
 	struct desc_9602 : public desc_74123

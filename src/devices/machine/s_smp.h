@@ -31,7 +31,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_clock_changed() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(update_timers);
 
 	// device_memory_interface configuration
 	virtual space_config_vector memory_space_config() const override;
@@ -56,10 +57,6 @@ private:
 	u8 io_r(offs_t offset);
 	void io_w(offs_t offset, u8 data);
 
-	enum
-	{
-		TIMER_TICK_ID = 1
-	};
 	/* timers */
 	emu_timer             *m_tick_timer;
 	bool                  m_timer_enabled[3];

@@ -96,57 +96,60 @@ WRITE_LINE_MEMBER(acorn_bmu_device::scl_w)
 			{
 				if (m_scl)
 				{
-					switch (m_state)
-					{
-					case STATE_DEVSEL:
-						m_devsel = m_shift;
-
-						if ((m_devsel & 0xfe) != m_slave_address)
-						{
-							LOGMASKED(LOG_DATA, "devsel %02x: not this device\n", m_devsel);
-							m_state = STATE_IDLE;
-						}
-						else if ((m_devsel & 1) == 0)
-						{
-							LOGMASKED(LOG_DATA, "devsel %02x: write\n", m_devsel);
-							m_state = STATE_REGISTER;
-						}
-						else
-						{
-							LOGMASKED(LOG_DATA, "devsel %02x: read\n", m_devsel);
-							m_state = STATE_DATAOUT;
-						}
-						break;
-
-					case STATE_REGISTER:
-						m_register = m_shift;
-
-						LOGMASKED(LOG_DATA, "register %02x\n", m_register);
-
-						m_state = STATE_DATAIN;
-						break;
-
-					case STATE_DATAIN:
-						LOGMASKED(LOG_DATA, "register[ %02x ] <- %02x\n", m_register, m_shift);
-
-						switch (m_register)
-						{
-						case BMU_CHARGE_ESTIMATE:
-							m_estimate = m_shift;
-							break;
-						}
-
-						m_register++;
-						break;
-					}
-
 					m_bits++;
 				}
 				else
 				{
 					if (m_bits == 8)
 					{
-						m_sdar = 0;
+						switch (m_state)
+						{
+						case STATE_DEVSEL:
+							m_devsel = m_shift;
+
+							if ((m_devsel & 0xfe) != m_slave_address)
+							{
+								LOGMASKED(LOG_DATA, "devsel %02x: not this device\n", m_devsel);
+								m_state = STATE_IDLE;
+							}
+							else if ((m_devsel & 1) == 0)
+							{
+								LOGMASKED(LOG_DATA, "devsel %02x: write\n", m_devsel);
+								m_state = STATE_REGISTER;
+							}
+							else
+							{
+								LOGMASKED(LOG_DATA, "devsel %02x: read\n", m_devsel);
+								m_state = STATE_READSELACK;
+							}
+							break;
+
+						case STATE_REGISTER:
+							m_register = m_shift;
+
+							LOGMASKED(LOG_DATA, "register %02x\n", m_register);
+
+							m_state = STATE_DATAIN;
+							break;
+
+						case STATE_DATAIN:
+							LOGMASKED(LOG_DATA, "register[ %02x ] <- %02x\n", m_register, m_shift);
+
+							switch (m_register)
+							{
+							case BMU_CHARGE_ESTIMATE:
+								m_estimate = m_shift;
+								break;
+							}
+
+							m_register++;
+							break;
+						}
+
+						if( m_state != STATE_IDLE )
+						{
+							m_sdar = 0 ;
+						}
 					}
 					else
 					{
@@ -157,10 +160,19 @@ WRITE_LINE_MEMBER(acorn_bmu_device::scl_w)
 			}
 			break;
 
+		case STATE_READSELACK:
+			m_bits = 0;
+			m_state = STATE_DATAOUT;
+			break;
+
 		case STATE_DATAOUT:
 			if (m_bits < 8)
 			{
 				if (m_scl)
+				{
+					m_bits++;
+				}
+				else
 				{
 					if (m_bits == 0)
 					{
@@ -194,7 +206,6 @@ WRITE_LINE_MEMBER(acorn_bmu_device::scl_w)
 					m_sdar = (m_shift >> 7) & 1;
 
 					m_shift = (m_shift << 1) & 0xff;
-					m_bits++;
 				}
 			}
 			else
@@ -207,18 +218,11 @@ WRITE_LINE_MEMBER(acorn_bmu_device::scl_w)
 						m_state = STATE_IDLE;
 					}
 
-					m_bits++;
+					m_bits = 0;
 				}
 				else
 				{
-					if (m_bits == 8)
-					{
-						m_sdar = 1;
-					}
-					else
-					{
-						m_bits = 0;
-					}
+					m_sdar = 1;
 				}
 			}
 			break;

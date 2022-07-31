@@ -3,9 +3,9 @@
 license:CC0
 -->
 <hashfile>
-	<!-- This MESS HASH file was auto-generated from Cowering's GoodNES database (V3.14)
-	     for the exclusive use of MESS.  This source is known to contain bad headers,
-	     though some have been fixed here.  Keep this notice intact if editing this file  -->
+	<!-- This MAME HASH file was auto-generated from Cowering's GoodNES database (V3.14)
+	     for the exclusive use of MAME.  This source is known to contain bad headers,
+	     though some have been fixed here.  Keep this notice intact if editing this file -->
 
 	<hash crc32="ba58ed29" sha1="56fe858d1035dce4b68520f457a0858bae7bb16d" name="'89 Dennou Kyuusei Uranai (J)">
 		<status>GoodNES Verified Image</status>

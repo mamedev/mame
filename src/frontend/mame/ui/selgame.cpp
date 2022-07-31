@@ -164,7 +164,7 @@ void menu_select_game::menu_activated()
 
 void menu_select_game::handle(event const *ev)
 {
-	if (!m_prev_selected)
+	if (!m_prev_selected && item_count() > 0)
 		m_prev_selected = item(0).ref();
 
 	// if I have to select software, force software list submenu
@@ -438,11 +438,11 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 	if (stack_has_special_main_menu())
 	{
 		item_append(menu_item_type::SEPARATOR, 0);
-		item_append(_("Configure Options"), 0, (void *)(uintptr_t)CONF_OPTS);
-		item_append(_("Configure Machine"), 0, (void *)(uintptr_t)CONF_MACHINE);
+		item_append(_("General Settings"), 0, (void *)(uintptr_t)CONF_OPTS);
+		item_append(_("System Settings"), 0, (void *)(uintptr_t)CONF_MACHINE);
 		skip_main_items = 3;
 
-		if (m_prev_selected && !have_prev_selected)
+		if (m_prev_selected && !have_prev_selected && item_count() > 0)
 			m_prev_selected = item(0).ref();
 	}
 	else
@@ -1055,7 +1055,7 @@ void menu_select_game::get_selection(ui_software_info const *&software, ui_syste
 
 void menu_select_game::make_topbox_text(std::string &line0, std::string &line1, std::string &line2) const
 {
-	line0 = string_format(_("%1$s %2$s ( %3$d / %4$d machines (%5$d BIOS) )"),
+	line0 = string_format(_("%1$s %2$s ( %3$d / %4$d systems (%5$d BIOS) )"),
 			emulator_info::get_appname(),
 			bare_build_version,
 			m_available_items,

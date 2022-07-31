@@ -10,7 +10,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "h8.h"
 #include "h8_dma.h"
 #include "h8_dtc.h"
@@ -26,6 +25,7 @@ h8_device::h8_device(const machine_config &mconfig, device_type type, const char
 	mode_advanced = false;
 	mode_a20 = false;
 	has_exr = false;
+	has_mac = false;
 	mac_saturating = false;
 	has_trace = false;
 	has_hc = true;

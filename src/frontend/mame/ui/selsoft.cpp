@@ -397,7 +397,7 @@ menu_select_software::~menu_select_software()
 
 void menu_select_software::handle(event const *ev)
 {
-	if (m_prev_selected == nullptr)
+	if (m_prev_selected == nullptr && item_count() > 0)
 		m_prev_selected = item(0).ref();
 
 	// FIXME: everything above here used run before events were processed
@@ -704,7 +704,7 @@ void menu_select_software::make_topbox_text(std::string &line0, std::string &lin
 	// determine the text for the header
 	int vis_item = !m_search.empty() ? m_available_items : (m_available_items - 1);
 	line0 = string_format(_("%1$s %2$s ( %3$d / %4$d software packages )"), emulator_info::get_appname(), bare_build_version, vis_item, m_data->swinfo().size() - 1);
-	line1 = string_format(_("Driver: \"%1$s\" software list "), m_system.description);
+	line1 = string_format(_("System: \"%1$s\" software list "), m_system.description);
 
 	software_filter const *const it(m_data->current_filter());
 	char const *const filter(it ? it->filter_text() : nullptr);

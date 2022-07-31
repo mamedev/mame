@@ -86,12 +86,12 @@ license:CC0
 		<text string="H"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 
-	<element name="text_l3"><text string="[K]"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_l4"><text string="[Q]"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_l5"><text string="[R]"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_l6"><text string="[B]"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_l7"><text string="[N]"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_l8"><text string="[P]"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_p1"><image file="chess/wk.svg"><color alpha="0.79" /></image></element>
+	<element name="text_p2"><image file="chess/wq.svg"><color alpha="0.79" /></image></element>
+	<element name="text_p3"><image file="chess/wr.svg"><color alpha="0.79" /></image></element>
+	<element name="text_p4"><image file="chess/wb.svg"><color alpha="0.79" /></image></element>
+	<element name="text_p5"><image file="chess/wn.svg"><color alpha="0.79" /></image></element>
+	<element name="text_p6"><image file="chess/wp.svg"><color alpha="0.79" /></image></element>
 
 	<element name="text_r1"><text string="RE"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_r2"><text string="CL"><color red="0.81" green="0.8" blue="0.79" /></text></element>
@@ -409,8 +409,7 @@ license:CC0
 
 		<group ref="sb_ui"><bounds x="-12" y="3" width="10" height="80" /></group>
 
-	<!-- chessboard coords -->
-
+		<!-- chessboard coords -->
 		<element ref="text_8"><bounds x="0.2" y="7"  width="2" height="2" /></element>
 		<element ref="text_7"><bounds x="0.2" y="17" width="2" height="2" /></element>
 		<element ref="text_6"><bounds x="0.2" y="27" width="2" height="2" /></element>
@@ -429,14 +428,13 @@ license:CC0
 		<element ref="text_g"><bounds x="67.5" y="84.5" width="2" height="2" /></element>
 		<element ref="text_h"><bounds x="77.5" y="84.5" width="2" height="2" /></element>
 
-	<!-- right side -->
-
-		<element ref="text_l3"><bounds x="90.6" y="32.4" width="4" height="2" /></element>
-		<element ref="text_l4"><bounds x="90.6" y="38.9" width="4" height="2" /></element>
-		<element ref="text_l5"><bounds x="90.6" y="45.4" width="4" height="2" /></element>
-		<element ref="text_l6"><bounds x="90.6" y="51.9" width="4" height="2" /></element>
-		<element ref="text_l7"><bounds x="90.6" y="58.4" width="4" height="2" /></element>
-		<element ref="text_l8"><bounds x="90.6" y="64.9" width="4" height="2" /></element>
+		<!-- right side -->
+		<element ref="text_p1"><bounds x="91.25" y="32.2" width="2.5" height="2.5" /></element>
+		<element ref="text_p2"><bounds x="91.25" y="38.7" width="2.5" height="2.5" /></element>
+		<element ref="text_p3"><bounds x="91.25" y="45.2" width="2.5" height="2.5" /></element>
+		<element ref="text_p4"><bounds x="91.25" y="51.7" width="2.5" height="2.5" /></element>
+		<element ref="text_p5"><bounds x="91.25" y="58.2" width="2.5" height="2.5" /></element>
+		<element ref="text_p6"><bounds x="91.25" y="64.7" width="2.5" height="2.5" /></element>
 
 		<element ref="text_r1"><bounds x="93.25" y="19.0" width="4" height="2" /></element>
 		<element ref="text_r2"><bounds x="93.25" y="25.5" width="4" height="2" /></element>

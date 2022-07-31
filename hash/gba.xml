@@ -2374,7 +2374,7 @@ license:CC0
 	</software>
 
 	<software name="basstsur">
-		<description>Bass Tsuri Shiyouze! - Tournament wa Senryaku da! (Jpn)</description>
+		<description>Bass Tsuri Shiyouze! - Tournament wa Senryaku Da! (Jpn)</description>
 		<year>2002</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-AZBJ-JPN (RK320-J1)"/>
@@ -33164,7 +33164,7 @@ license:CC0
 	</software>
 
 	<software name="sugarsug">
-		<description>Sugar Sugar Rune - Heart Ga Ippai! Moegi Gakuen (Jpn)</description>
+		<description>Sugar Sugar Rune - Heart ga Ippai! Moegi Gakuen (Jpn)</description>
 		<year>2005</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="AGB-B4LJ-JPN"/>
@@ -34626,7 +34626,7 @@ license:CC0
 	</software>
 
 	<software name="tantgqmk">
-		<description>Tantei Gakuen Q - Meitantei wa Kimi da! (Jpn)</description>
+		<description>Tantei Gakuen Q - Meitantei wa Kimi Da! (Jpn)</description>
 		<year>2003</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-BTQJ-JPN (RK333-J1)"/>
@@ -38067,8 +38067,20 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Released by the developer as a digital download on the web. -->
 	<software name="worldreb">
+		<description>World Reborn (USA)</description>
+		<year>2015</year>
+		<publisher>Piko Interactive</publisher>
+		<info name="release" value="20151106"/>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="world reborn.bin" size="4194304" crc="eefb32ff" sha1="c7ec2f8d7d3dec40a893cdfe2a41a8ed43ed71c4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Released by the developer as a digital download on the web. -->
+	<software name="worldrebp" cloneof="worldreb">
 		<description>World Reborn (USA, prototype)</description>
 		<year>2004</year>
 		<publisher>Destination Software</publisher>

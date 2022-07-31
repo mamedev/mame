@@ -13,6 +13,7 @@ documentation for your platform of choice.
     ui
     defaultkeys
     mamemenus
+    assetsearch
     frontends
     aboutromsets
     commonissues

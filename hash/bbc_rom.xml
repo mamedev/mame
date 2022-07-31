@@ -4608,7 +4608,7 @@ license:CC0
 		<year>1983</year>
 		<publisher>Electronequip</publisher>
 		<part name="rom1" interface="bbc_rom">
-			<dataarea name="rom" size="v">
+			<dataarea name="rom" size="8192">
 				<rom name="EpsonFX80-1.00.rom" size="8192" crc="60ff9be7" sha1="b9cc33e67033c6b59f9113672ca4f84dea774769"/>
 			</dataarea>
 		</part>
@@ -5631,6 +5631,42 @@ license:CC0
 		<part name="rom" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="I2C-3.1B.rom" size="16384" crc="d6514889" sha1="2f602e4de90903d63ab0b028d0d94b2572bad25d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ibos114" cloneof="ibos">
+		<description>Integra-B OS 1.14</description>
+		<year>1988</year>
+		<publisher>Computech</publisher>
+		<info name="usage" value="Requires Integra-B" />
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="IBOS-1.14.rom" size="16384" crc="d05ce376" sha1="b2b7fc3258936296f83d720759caacba5378edec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ibos120" cloneof="ibos">
+		<description>Integra-B OS 1.20</description>
+		<year>1989</year>
+		<publisher>Computech</publisher>
+		<info name="usage" value="Requires Integra-B" />
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="IBOS-1.20.rom" size="16384" crc="52b1b8c4" sha1="0f5b2a5bee23808b34eab2f027f7c1e77395c782"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ibos">
+		<description>Integra-B OS 1.20 (Y2K patched)</description>
+		<year>1989</year>
+		<publisher>Computech</publisher>
+		<info name="usage" value="Requires Integra-B" />
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="IBOS-1.20-Y2K.rom" size="16384" crc="21e7a2c2" sha1="d5ff79da2243aabd363ee26a1e7ad546657fdeb5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6750,6 +6786,19 @@ license:CC0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="Chameleon256-2.00.rom" size="8192" crc="6a582d2f" sha1="1e1536941bd84e2e809da62850035c1584781cb3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="memexb20">
+		<description>Memex-B20 2.2</description>
+		<year>1984</year>
+		<publisher>Memex</publisher>
+		<info name="usage" value="Requires Memex-B20" />
+		<sharedfeat name="compatibility" value="B"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Memex-B20-2.2.rom" size="8192" crc="98ee8eb6" sha1="aad311797e204b0b69450460f8b4605409c31ddd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9125,20 +9174,20 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="sideaid128" supported="no">
-		<description>SideAid128</description>
+	<software name="sideaid128">
+		<description>SideAid128 1.03</description>
 		<year>1988</year>
 		<publisher>Computer and Technical Services</publisher>
 		<info name="usage" value="Requires Solidisk TwoMeg128" />
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="SideAid128-1.03.rom" size="16384" crc="48d1035c" sha1="9fc1952e856f0b08c8623e8502d8560ebecfb0ed" status="baddump"/>
+				<rom name="SideAid128-1.03.rom" size="16384" crc="bc40dd93" sha1="9b1bba805e6b4a59f3c4f53e2962bf3e675190c5"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="sideaid256" supported="no">
-		<description>SideAid256</description>
+		<description>SideAid256 1.05</description>
 		<year>1988</year>
 		<publisher>Computer and Technical Services</publisher>
 		<info name="usage" value="Requires Solidisk FourMeg256" />
@@ -11474,6 +11523,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="vidiedit">
+		<description>VidiEditor 1.2</description>
+		<year>1987</year>
+		<publisher>Black-Hole Soft</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="VidiEditor-1.2.rom" size="8192" crc="582fdf65" sha1="a22c27bcf16bb1546c96bc43b9a86669502964b1"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="vidifix">
 		<description>Vidifix 1.5 (Dut)</description>
 		<year>1984</year>
@@ -11584,6 +11644,22 @@ license:CC0
 			<feature name="slot" value="palqst" />
 			<dataarea name="rom" size="32768">
 				<rom name="ProRangeViewPrinterDriver-1.00.rom" size="32768" crc="f5e0183a" sha1="f71030f9535667af41aa521d242438c32ebd4081"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pipedream" cloneof="viewpro">
+		<description>PipeDream 0.2</description>
+		<year>1986</year>
+		<publisher>Colton Software</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="PipeDream-0.2.rom" size="16384" crc="18b1f47d" sha1="c4fd0a3447e08f16da36bda7c41d680d206a1b79"/>
+			</dataarea>
+		</part>
+		<part name="rom2" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="PipeSlave-0.2.rom" size="16384" crc="987f3a37" sha1="60714bab56f6d29b3a1eefe21a6f7d7d8fa93c90"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11716,7 +11792,7 @@ license:CC0
 		</part>
 	</software>
 
-		<software name="viewstor11" cloneof="viewstor">
+	<software name="viewstor11" cloneof="viewstor">
 		<description>ViewStore 1.1</description>
 		<year>1985</year>
 		<publisher>Acornsoft</publisher>
@@ -11728,7 +11804,7 @@ license:CC0
 		</part>
 	</software>
 
-		<software name="viewstor12" cloneof="viewstor">
+	<software name="viewstor12" cloneof="viewstor">
 		<description>ViewStore 1.2</description>
 		<year>1985</year>
 		<publisher>Acornsoft</publisher>
@@ -11740,7 +11816,7 @@ license:CC0
 		</part>
 	</software>
 
-		<software name="viewstor">
+	<software name="viewstor">
 		<description>ViewStore 1.5</description>
 		<year>1985</year>
 		<publisher>Acornsoft</publisher>
@@ -12497,6 +12573,41 @@ license:CC0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="ZNOS-1.01.rom" size="8192" crc="a660728f" sha1="fe6b2986355d7be30bbbdc695fb51f16774f8503"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Unofficial game conversions to ROM/RFS -->
+
+	<software name="chuckie">
+		<description>Chuckie Egg (unofficial ROM)</description>
+		<year>1983</year>
+		<publisher>A&amp;F Software</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="ChuckieEgg.rom" size="16384" crc="4fd618d4" sha1="6e90ede8258542534ead8e3c1684b6e1751ac7ca"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frak">
+		<description>Frak! (unofficial ROM)</description>
+		<year>1984</year>
+		<publisher>Aardvark</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Frak.rom" size="16384" crc="bbf504e7" sha1="8fd8a3c2ad90048428e440ced0693cbc233a8b0b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="killergo">
+		<description>Killer Gorilla (unofficial ROM)</description>
+		<year>1984</year>
+		<publisher>Micro Power</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="KillerGorilla.rom" size="16384" crc="7dae2b07" sha1="27d53f91621da8d90c88cbfdbd5940eaeeb02902"/>
 			</dataarea>
 		</part>
 	</software>

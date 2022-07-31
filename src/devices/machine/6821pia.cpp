@@ -13,12 +13,13 @@
 //  MACROS
 //**************************************************************************
 
-#define LOG_GENERAL 0x01
-#define LOG_SETUP   0x02
-#define LOG_CA1     0x08
+#define LOG_SETUP   (1 << 1U)
+#define LOG_CA1     (1 << 2U)
 
 //#define VERBOSE (LOG_SETUP | LOG_GENERAL | LOG_CA1)
 //#define LOG_OUTPUT_STREAM std::cout
+
+#define VERBOSE (0)
 
 #include "logmacro.h"
 #define LOGSETUP(...) LOGMASKED(LOG_SETUP,   __VA_ARGS__)
@@ -54,7 +55,7 @@ pia6821_device::pia6821_device(const machine_config &mconfig, const char *tag, d
 		m_cb2_handler(*this),
 		m_irqa_handler(*this),
 		m_irqb_handler(*this), m_in_a(0),
-		m_in_ca1(0), m_in_ca2(0), m_out_a(0), m_a_input_overrides_output_mask(0), m_out_ca2(0), m_ddr_a(0),
+		m_in_ca1(true), m_in_ca2(true), m_out_a(0), m_a_input_overrides_output_mask(0), m_out_ca2(0), m_ddr_a(0),
 		m_ctl_a(0), m_irq_a1(false), m_irq_a2(false),
 		m_irq_a_state(0), m_in_b(0),
 		m_in_cb1(0), m_in_cb2(0), m_out_b(0), m_out_cb2(0), m_last_out_cb2_z(0), m_ddr_b(0),
@@ -100,19 +101,11 @@ void pia6821_device::device_start()
 {
 	m_in_a = 0xff;
 	m_in_b = 0;
-	m_in_ca1 = true;
-	m_in_ca2 = true;
-	m_in_cb1 = 0;
-	m_in_cb2 = 0;
 	m_in_a_pushed = false;
 	m_out_a_needs_pulled = false;
-	m_in_ca1_pushed = false;
-	m_in_ca2_pushed = false;
 	m_out_ca2_needs_pulled = false;
 	m_in_b_pushed = false;
 	m_out_b_needs_pulled = false;
-	m_in_cb1_pushed = false;
-	m_in_cb2_pushed = false;
 	m_out_cb2_needs_pulled = false;
 	m_logged_port_a_not_connected = false;
 	m_logged_port_b_not_connected = false;
@@ -851,7 +844,7 @@ void pia6821_device::write(offs_t offset, uint8_t data)
 		break;
 
 	case 0x01:
-		control_a_w( data);
+		control_a_w(data);
 		break;
 
 	case 0x02:

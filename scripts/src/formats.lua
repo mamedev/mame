@@ -1874,6 +1874,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/tim011_dsk.h,FORMATS["TIM011_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "TIM011_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/tim011_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/tim011_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/trd_dsk.h,FORMATS["TRD_DSK"] = true
 --------------------------------------------------
 
@@ -2121,6 +2133,18 @@ if opt_tool(FORMATS, "FS_ORIC_JASMIN") then
 	files {
 		MAME_DIR.. "src/lib/formats/fs_oric_jasmin.cpp",
 		MAME_DIR.. "src/lib/formats/fs_oric_jasmin.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/fs_cbmdos.h,FORMATS["FS_CBMDOS"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "FS_CBMDOS") then
+	files {
+		MAME_DIR.. "src/lib/formats/fs_cbmdos.cpp",
+		MAME_DIR.. "src/lib/formats/fs_cbmdos.h",
 	}
 end
 

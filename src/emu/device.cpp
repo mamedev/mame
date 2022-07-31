@@ -365,7 +365,7 @@ void device_t::reset()
 //  unscaled clock
 //-------------------------------------------------
 
-void device_t::set_unscaled_clock(u32 clock)
+void device_t::set_unscaled_clock(u32 clock, bool sync_on_new_clock_domain)
 {
 	// do nothing if no actual change
 	if (clock == m_unscaled_clock)
@@ -381,7 +381,7 @@ void device_t::set_unscaled_clock(u32 clock)
 
 	// if the device has already started, make sure it knows about the new clock
 	if (m_started)
-		notify_clock_changed();
+		notify_clock_changed(sync_on_new_clock_domain);
 }
 
 
@@ -456,28 +456,6 @@ u64 device_t::attotime_to_clocks(const attotime &duration) const noexcept
 		return 0;
 	else
 		return mulu_32x32(duration.seconds(), m_clock) + u64(duration.attoseconds()) / u64(m_attoseconds_per_clock);
-}
-
-
-//-------------------------------------------------
-//  timer_alloc - allocate a timer for our device
-//  callback
-//-------------------------------------------------
-
-emu_timer *device_t::timer_alloc(device_timer_id id)
-{
-	return machine().scheduler().timer_alloc(*this, id);
-}
-
-
-//-------------------------------------------------
-//  timer_set - set a temporary timer that will
-//  call our device callback
-//-------------------------------------------------
-
-void device_t::timer_set(const attotime &duration, device_timer_id id, int param)
-{
-	machine().scheduler().timer_set(duration, *this, id, param);
 }
 
 
@@ -716,11 +694,11 @@ void device_t::post_load()
 //  that the clock has changed
 //-------------------------------------------------
 
-void device_t::notify_clock_changed()
+void device_t::notify_clock_changed(bool sync_on_new_clock_domain)
 {
 	// first notify interfaces
 	for (device_interface &intf : interfaces())
-		intf.interface_clock_changed();
+		intf.interface_clock_changed(sync_on_new_clock_domain);
 
 	// then notify the device
 	device_clock_changed();
@@ -876,17 +854,6 @@ void device_t::device_clock_changed()
 //-------------------------------------------------
 
 void device_t::device_debug_setup()
-{
-	// do nothing by default
-}
-
-
-//-------------------------------------------------
-//  device_timer - called whenever a device timer
-//  fires
-//-------------------------------------------------
-
-void device_t::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	// do nothing by default
 }
@@ -1202,7 +1169,7 @@ void device_interface::interface_post_load()
 //  implementation
 //-------------------------------------------------
 
-void device_interface::interface_clock_changed()
+void device_interface::interface_clock_changed(bool sync_on_new_clock_domain)
 {
 	// do nothing by default
 }

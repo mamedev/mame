@@ -59,8 +59,8 @@ void ics2115_device::device_start()
 
 	space(0).cache(m_cache);
 
-	m_timer[0].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ics2115_device::timer_cb_0),this));
-	m_timer[1].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ics2115_device::timer_cb_1),this));
+	m_timer[0].timer = timer_alloc(FUNC(ics2115_device::timer_cb_0), this);
+	m_timer[1].timer = timer_alloc(FUNC(ics2115_device::timer_cb_1), this);
 	m_stream = stream_alloc(0, 2, clock() / (32 * 32));
 
 	m_irq_cb.resolve_safe();
@@ -1087,33 +1087,32 @@ void ics2115_device::recalc_irq()
 
 TIMER_CALLBACK_MEMBER( ics2115_device::timer_cb_0 )
 {
-	m_irq_pending |= 1 << 0;
-	recalc_irq();
+	if (!(m_irq_pending & (1 << 0)))
+	{
+		m_irq_pending |= 1 << 0;
+		recalc_irq();
+	}
 }
 
 TIMER_CALLBACK_MEMBER( ics2115_device::timer_cb_1 )
 {
-	m_irq_pending |= 1 << 1;
-	recalc_irq();
+	if (!(m_irq_pending & (1 << 1)))
+	{
+		m_irq_pending |= 1 << 1;
+		recalc_irq();
+	}
 }
 
 void ics2115_device::recalc_timer(int timer)
 {
-	//Old regression-based formula (minus constant)
-	//u64 period = m_timer[timer].preset * (m_timer[timer].scale << 16) / 60;
-
-	//New formula based on O.Galibert's reverse engineering of ICS2115 card firmware
-	// TODO : Related to input clock?
 	u64 period  = ((m_timer[timer].scale & 0x1f) + 1) * (m_timer[timer].preset + 1);
-	period = (period << (4 + (m_timer[timer].scale >> 5)))*78125/2646;
+	period = period << (4 + (m_timer[timer].scale >> 5));
 
 	if (m_timer[timer].period != period)
 	{
+		attotime tp = attotime::from_ticks(period, clock());
+		logerror("Timer %d period %dns (%dHz)\n", timer, int(tp.as_double()*1e9), int(1/tp.as_double()));
 		m_timer[timer].period = period;
-		// Adjust the timer lengths
-		if (period) // Reset the length
-			m_timer[timer].timer->adjust(attotime::from_nsec(period), 0, attotime::from_nsec(period));
-		else // Kill the timer if length == 0
-			m_timer[timer].timer->adjust(attotime::never);
+		m_timer[timer].timer->adjust(tp, 0, tp);
 	}
 }

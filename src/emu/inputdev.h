@@ -13,28 +13,12 @@
 
 #pragma once
 
-
-//**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-// relative devices return ~512 units per onscreen pixel
-constexpr s32 INPUT_RELATIVE_PER_PIXEL = 512;
-
-// absolute devices return values between -65536 and +65536
-constexpr s32 INPUT_ABSOLUTE_MIN = -65536;
-constexpr s32 INPUT_ABSOLUTE_MAX = 65536;
-
-// invalid memory value for axis polling
-constexpr s32 INVALID_AXIS_VALUE = 0x7fffffff;
+#include "interface/inputman.h"
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-// callback for getting the value of an item on a device
-typedef s32 (*item_get_state_func)(void *device_internal, void *item_internal);
 
 // ======================> joystick_map
 
@@ -88,6 +72,8 @@ private:
 class input_device_item
 {
 public:
+	using item_get_state_func = osd::input_device::item_get_state_func;
+
 	virtual ~input_device_item();
 
 	// getters
@@ -133,7 +119,7 @@ protected:
 // ======================> input_device
 
 // a logical device of a given class that can provide input
-class input_device
+class input_device : public osd::input_device
 {
 	friend class input_class;
 
@@ -159,7 +145,7 @@ public:
 	void set_devindex(int devindex) { m_devindex = devindex; }
 
 	// item management
-	input_item_id add_item(std::string_view name, input_item_id itemid, item_get_state_func getstate, void *internal = nullptr);
+	virtual input_item_id add_item(std::string_view name, input_item_id itemid, item_get_state_func getstate, void *internal) override;
 
 	// helpers
 	s32 adjust_absolute(s32 value) const { return adjust_absolute_value(value); }

@@ -1127,7 +1127,7 @@ public:
 
   //! Tests whether the callee must adjust SP before returning (X86-STDCALL only)
   inline bool hasCalleeStackCleanup() const noexcept { return _calleeStackCleanup != 0; }
-  //! Returns home many bytes of the stack the the callee must adjust before returning (X86-STDCALL only)
+  //! Returns home many bytes of the stack the callee must adjust before returning (X86-STDCALL only)
   inline uint32_t calleeStackCleanup() const noexcept { return _calleeStackCleanup; }
 
   //! Returns call stack alignment.

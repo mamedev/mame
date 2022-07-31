@@ -88,7 +88,7 @@ protected:
 		bool   length_counting;
 		bool   length_enabled;
 		/* Mode 1, 2, 3 */
-		uint64_t cycles_left;
+		int64_t cycles_left;
 		int8_t   duty;
 		/* Mode 1, 2, 4 */
 		bool   envelope_enabled;

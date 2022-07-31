@@ -390,7 +390,7 @@ void wd33c9x_base_device::device_start()
 {
 	m_irq_cb.resolve_safe();
 	m_drq_cb.resolve_safe();
-	m_timer = timer_alloc(0);
+	m_timer = timer_alloc(FUNC(wd33c9x_base_device::update_step), this);
 	save_item(NAME(m_addr));
 	save_item(NAME(m_regs));
 	save_item(NAME(m_command_length));
@@ -443,10 +443,10 @@ void wd33c9x_base_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - device-specific timer handler
+//  update_step -
 //-------------------------------------------------
 
-void wd33c9x_base_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
+TIMER_CALLBACK_MEMBER(wd33c9x_base_device::update_step)
 {
 	step(true);
 }

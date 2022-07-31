@@ -49,7 +49,6 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
@@ -57,13 +56,6 @@ protected:
 	virtual uint8_t read_c0nx(uint8_t offset) override;
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
 	virtual uint8_t read_cnxx(uint8_t offset) override;
-
-	enum
-	{
-		TIMER_ID_LSS = 0,
-		TIMER_ID_SEEK,
-		TIMER_ID_MOTOR
-	};
 
 	required_device<i8255_device> m_d14;
 	required_device<i8255_device> m_d15;
@@ -76,7 +68,9 @@ private:
 	attotime cycles_to_time(uint64_t cycles);
 
 	void lss_start();
-	void lss_sync();
+	TIMER_CALLBACK_MEMBER(lss_sync);
+
+	TIMER_CALLBACK_MEMBER(motor_off);
 
 	floppy_image_device *floppy;
 	int active, bits;

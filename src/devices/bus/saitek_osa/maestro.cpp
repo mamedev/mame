@@ -26,7 +26,6 @@ higher speed versions, they overclocked the CPU. And if the CPU couldn't
 handle the overclock well enough, they went for a slightly lower speed XTAL.
 
 TODO:
-- does not work if cpu speed is 4MHz
 - cpu clock divider after writing to 0x2000/0x2200
 
 ***************************************************************************/
@@ -103,36 +102,44 @@ ROM_START( maestro )
 
 	// B (Maestro only)
 	ROM_SYSTEM_BIOS(0, "b1", "Maestro B (set 1)")
-	ROMX_LOAD("m6c_807c_u2.u2", 0x0000, 0x8000, CRC(57c34b4d) SHA1(1f436687f90b1afd4646e90d5617cf05c4465c98), ROM_BIOS(0))
+	ROMX_LOAD("m6c_807e_u2.u2", 0x0000, 0x8000, CRC(a6b11715) SHA1(18e086353d9122034f78bcd75ef5b3462c5983ac), ROM_BIOS(0))
 	ROMX_LOAD("b6c_721_u3.u3",  0x8000, 0x8000, CRC(b1e57023) SHA1(6cec5cdc0bf4f8ac88afb0397fcb4738136b0431), ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS(1, "b2", "Maestro B (set 2)")
-	ROMX_LOAD("m6c_807e_u2.u2", 0x0000, 0x8000, CRC(a6b11715) SHA1(18e086353d9122034f78bcd75ef5b3462c5983ac), ROM_BIOS(1))
+	ROMX_LOAD("m6c_807c_u2.u2", 0x0000, 0x8000, CRC(57c34b4d) SHA1(1f436687f90b1afd4646e90d5617cf05c4465c98), ROM_BIOS(1))
 	ROMX_LOAD("b6c_721_u3.u3",  0x8000, 0x8000, CRC(b1e57023) SHA1(6cec5cdc0bf4f8ac88afb0397fcb4738136b0431), ROM_BIOS(1))
 
 	// C (C and above are shared Maestro/Analyst)
-	ROM_SYSTEM_BIOS(2, "c", "Maestro C")
+	ROM_SYSTEM_BIOS(2, "c1", "Maestro C (set 1)")
 	ROMX_LOAD("m6l_b30d_u2.u2", 0x0000, 0x8000, CRC(bb10e15c) SHA1(7b0fb987c49da76a03b46c80d2b4eacaa785ee75), ROM_BIOS(2))
 	ROMX_LOAD("b6c_721_u3.u3",  0x8000, 0x8000, CRC(b1e57023) SHA1(6cec5cdc0bf4f8ac88afb0397fcb4738136b0431), ROM_BIOS(2))
 
-	// D
-	ROM_SYSTEM_BIOS(3, "d1", "Maestro D (set 1)")
-	ROMX_LOAD("ma3_714a_u2.u2", 0x0000, 0x8000, CRC(435e1e30) SHA1(0d82df7c40443cb341dacebdf65f33c3e03bce70), ROM_BIOS(3))
-	ROMX_LOAD("b6m_b15_u3.u3",  0x8000, 0x8000, CRC(6155de90) SHA1(bb5cdf061dde2d1dc7925d455891c3ade1d274e3), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS(3, "c2", "Maestro C (set 2)")
+	ROMX_LOAD("m6l_b30b_u2.u2", 0x0000, 0x8000, CRC(4b5026d7) SHA1(9715a0220c1bd3456480104f1c7ae61cbf1a1d73), ROM_BIOS(3))
+	ROMX_LOAD("b6c_721_u3.u3",  0x8000, 0x8000, CRC(b1e57023) SHA1(6cec5cdc0bf4f8ac88afb0397fcb4738136b0431), ROM_BIOS(3))
 
-	ROM_SYSTEM_BIOS(4, "d2", "Maestro D (set 2)")
-	ROMX_LOAD("ma3_714a_u2.u2", 0x0000, 0x8000, CRC(435e1e30) SHA1(0d82df7c40443cb341dacebdf65f33c3e03bce70), ROM_BIOS(4))
-	ROMX_LOAD("b6m_629_u3.u3",  0x8000, 0x8000, CRC(15e7b1f1) SHA1(d2a757114f13c6141d74a15671aa06b675304b4a), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(4, "c3", "Maestro C (set 3)")
+	ROMX_LOAD("m6l_b25_u2.u2",  0x0000, 0x8000, CRC(217ae56c) SHA1(27ec80d0f82723c2710e2ccb477705934a4c2119), ROM_BIOS(4))
+	ROMX_LOAD("b6c_721_u3.u3",  0x8000, 0x8000, CRC(b1e57023) SHA1(6cec5cdc0bf4f8ac88afb0397fcb4738136b0431), ROM_BIOS(4))
+
+	// D
+	ROM_SYSTEM_BIOS(5, "d1", "Maestro D (set 1)")
+	ROMX_LOAD("ma3_714a_u2.u2", 0x0000, 0x8000, CRC(435e1e30) SHA1(0d82df7c40443cb341dacebdf65f33c3e03bce70), ROM_BIOS(5))
+	ROMX_LOAD("b6m_b15_u3.u3",  0x8000, 0x8000, CRC(6155de90) SHA1(bb5cdf061dde2d1dc7925d455891c3ade1d274e3), ROM_BIOS(5))
+
+	ROM_SYSTEM_BIOS(6, "d2", "Maestro D (set 2)")
+	ROMX_LOAD("ma3_714a_u2.u2", 0x0000, 0x8000, CRC(435e1e30) SHA1(0d82df7c40443cb341dacebdf65f33c3e03bce70), ROM_BIOS(6))
+	ROMX_LOAD("b6m_629_u3.u3",  0x8000, 0x8000, CRC(15e7b1f1) SHA1(d2a757114f13c6141d74a15671aa06b675304b4a), ROM_BIOS(6))
 
 	// D+
-	ROM_SYSTEM_BIOS(5, "dp", "Maestro D+")
-	ROMX_LOAD("m6m_625_u2.u2",  0x0000, 0x8000, CRC(aa7b5cfd) SHA1(e909108fdace633a519fecf0b9876fe6a46b2067), ROM_BIOS(5))
-	ROMX_LOAD("b6m_614_u3.u3",  0x8000, 0x8000, CRC(eff75543) SHA1(d7c1b3824bc87d5ffada6f5c8c72a8b292ff3d46), ROM_BIOS(5))
+	ROM_SYSTEM_BIOS(7, "dp", "Maestro D+")
+	ROMX_LOAD("m6m_625_u2.u2",  0x0000, 0x8000, CRC(aa7b5cfd) SHA1(e909108fdace633a519fecf0b9876fe6a46b2067), ROM_BIOS(7))
+	ROMX_LOAD("b6m_614_u3.u3",  0x8000, 0x8000, CRC(eff75543) SHA1(d7c1b3824bc87d5ffada6f5c8c72a8b292ff3d46), ROM_BIOS(7))
 
 	// D++
-	ROM_SYSTEM_BIOS(6, "dpp", "Maestro D++")
-	ROMX_LOAD("d++_u2.u2",      0x0000, 0x8000, CRC(48ef032c) SHA1(d336cb2096780b4d3bcceda0d2ed1246e780cd8d), ROM_BIOS(6))
-	ROMX_LOAD("b6m_614_u3.u3",  0x8000, 0x8000, CRC(eff75543) SHA1(d7c1b3824bc87d5ffada6f5c8c72a8b292ff3d46), ROM_BIOS(6))
+	ROM_SYSTEM_BIOS(8, "dpp", "Maestro D++")
+	ROMX_LOAD("d++_u2.u2",      0x0000, 0x8000, CRC(48ef032c) SHA1(d336cb2096780b4d3bcceda0d2ed1246e780cd8d), ROM_BIOS(8))
+	ROMX_LOAD("b6m_614_u3.u3",  0x8000, 0x8000, CRC(eff75543) SHA1(d7c1b3824bc87d5ffada6f5c8c72a8b292ff3d46), ROM_BIOS(8))
 ROM_END
 
 ROM_START( analyst )
@@ -146,28 +153,36 @@ ROM_START( analyst )
 	ROMX_LOAD("b6c_721_u3.u3",  0x8000, 0x8000, CRC(b1e57023) SHA1(6cec5cdc0bf4f8ac88afb0397fcb4738136b0431), ROM_BIOS(0))
 
 	// C (C and above are shared Maestro/Analyst)
-	ROM_SYSTEM_BIOS(1, "c", "Analyst C")
+	ROM_SYSTEM_BIOS(1, "c1", "Analyst C (set 1)")
 	ROMX_LOAD("m6l_b30d_u2.u2", 0x0000, 0x8000, CRC(bb10e15c) SHA1(7b0fb987c49da76a03b46c80d2b4eacaa785ee75), ROM_BIOS(1))
 	ROMX_LOAD("b6c_721_u3.u3",  0x8000, 0x8000, CRC(b1e57023) SHA1(6cec5cdc0bf4f8ac88afb0397fcb4738136b0431), ROM_BIOS(1))
 
-	// D
-	ROM_SYSTEM_BIOS(2, "d1", "Analyst D (set 1)")
-	ROMX_LOAD("ma3_714a_u2.u2", 0x0000, 0x8000, CRC(435e1e30) SHA1(0d82df7c40443cb341dacebdf65f33c3e03bce70), ROM_BIOS(2))
-	ROMX_LOAD("b6m_b15_u3.u3",  0x8000, 0x8000, CRC(6155de90) SHA1(bb5cdf061dde2d1dc7925d455891c3ade1d274e3), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(2, "c2", "Analyst C (set 2)")
+	ROMX_LOAD("m6l_b30b_u2.u2", 0x0000, 0x8000, CRC(4b5026d7) SHA1(9715a0220c1bd3456480104f1c7ae61cbf1a1d73), ROM_BIOS(2))
+	ROMX_LOAD("b6c_721_u3.u3",  0x8000, 0x8000, CRC(b1e57023) SHA1(6cec5cdc0bf4f8ac88afb0397fcb4738136b0431), ROM_BIOS(2))
 
-	ROM_SYSTEM_BIOS(3, "d2", "Analyst D (set 2)")
-	ROMX_LOAD("ma3_714a_u2.u2", 0x0000, 0x8000, CRC(435e1e30) SHA1(0d82df7c40443cb341dacebdf65f33c3e03bce70), ROM_BIOS(3))
-	ROMX_LOAD("b6m_629_u3.u3",  0x8000, 0x8000, CRC(15e7b1f1) SHA1(d2a757114f13c6141d74a15671aa06b675304b4a), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS(3, "c3", "Analyst C (set 3)")
+	ROMX_LOAD("m6l_b25_u2.u2",  0x0000, 0x8000, CRC(217ae56c) SHA1(27ec80d0f82723c2710e2ccb477705934a4c2119), ROM_BIOS(3))
+	ROMX_LOAD("b6c_721_u3.u3",  0x8000, 0x8000, CRC(b1e57023) SHA1(6cec5cdc0bf4f8ac88afb0397fcb4738136b0431), ROM_BIOS(3))
+
+	// D
+	ROM_SYSTEM_BIOS(4, "d1", "Analyst D (set 1)")
+	ROMX_LOAD("ma3_714a_u2.u2", 0x0000, 0x8000, CRC(435e1e30) SHA1(0d82df7c40443cb341dacebdf65f33c3e03bce70), ROM_BIOS(4))
+	ROMX_LOAD("b6m_b15_u3.u3",  0x8000, 0x8000, CRC(6155de90) SHA1(bb5cdf061dde2d1dc7925d455891c3ade1d274e3), ROM_BIOS(4))
+
+	ROM_SYSTEM_BIOS(5, "d2", "Analyst D (set 2)")
+	ROMX_LOAD("ma3_714a_u2.u2", 0x0000, 0x8000, CRC(435e1e30) SHA1(0d82df7c40443cb341dacebdf65f33c3e03bce70), ROM_BIOS(5))
+	ROMX_LOAD("b6m_629_u3.u3",  0x8000, 0x8000, CRC(15e7b1f1) SHA1(d2a757114f13c6141d74a15671aa06b675304b4a), ROM_BIOS(5))
 
 	// D+
-	ROM_SYSTEM_BIOS(4, "dp", "Analyst D+")
-	ROMX_LOAD("m6m_625_u2.u2",  0x0000, 0x8000, CRC(aa7b5cfd) SHA1(e909108fdace633a519fecf0b9876fe6a46b2067), ROM_BIOS(4))
-	ROMX_LOAD("b6m_614_u3.u3",  0x8000, 0x8000, CRC(eff75543) SHA1(d7c1b3824bc87d5ffada6f5c8c72a8b292ff3d46), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(6, "dp", "Analyst D+")
+	ROMX_LOAD("m6m_625_u2.u2",  0x0000, 0x8000, CRC(aa7b5cfd) SHA1(e909108fdace633a519fecf0b9876fe6a46b2067), ROM_BIOS(6))
+	ROMX_LOAD("b6m_614_u3.u3",  0x8000, 0x8000, CRC(eff75543) SHA1(d7c1b3824bc87d5ffada6f5c8c72a8b292ff3d46), ROM_BIOS(6))
 
 	// D++
-	ROM_SYSTEM_BIOS(5, "dpp", "Analyst D++")
-	ROMX_LOAD("d++_u2.u2",      0x0000, 0x8000, CRC(48ef032c) SHA1(d336cb2096780b4d3bcceda0d2ed1246e780cd8d), ROM_BIOS(5))
-	ROMX_LOAD("b6m_614_u3.u3",  0x8000, 0x8000, CRC(eff75543) SHA1(d7c1b3824bc87d5ffada6f5c8c72a8b292ff3d46), ROM_BIOS(5))
+	ROM_SYSTEM_BIOS(7, "dpp", "Analyst D++")
+	ROMX_LOAD("d++_u2.u2",      0x0000, 0x8000, CRC(48ef032c) SHA1(d336cb2096780b4d3bcceda0d2ed1246e780cd8d), ROM_BIOS(7))
+	ROMX_LOAD("b6m_614_u3.u3",  0x8000, 0x8000, CRC(eff75543) SHA1(d7c1b3824bc87d5ffada6f5c8c72a8b292ff3d46), ROM_BIOS(7))
 ROM_END
 
 const tiny_rom_entry *saitekosa_maestro_device::device_rom_region() const
@@ -223,7 +238,6 @@ void saitekosa_analyst_device::device_add_mconfig(machine_config &config)
 
 	// video hardware
 	HD44780(config, m_lcd, 0);
-	m_lcd->set_lcd_size(2, 8);
 }
 
 
@@ -284,7 +298,7 @@ void saitekosa_maestro_device::control_w(u8 data)
 
 u8 saitekosa_maestro_device::ack_r()
 {
-	// d6: ?
+	// d6: _Vcc
 	// d7: ACK-P
 	return m_expansion->ack_state() ? 0x80 : 0x00;
 }

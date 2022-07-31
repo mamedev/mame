@@ -285,12 +285,12 @@ void mos7360_device::device_start()
 	m_read_k.resolve_safe(0xff);
 
 	// allocate timers
-	m_timer1 = timer_alloc(TIMER_ID_1);
-	m_timer2 = timer_alloc(TIMER_ID_2);
-	m_timer3 = timer_alloc(TIMER_ID_3);
-	m_line_timer = timer_alloc(TIMER_LINE);
+	m_timer[TIMER_ID_1] = timer_alloc(FUNC(mos7360_device::timer_expired), this);
+	m_timer[TIMER_ID_2] = timer_alloc(FUNC(mos7360_device::timer_expired), this);
+	m_timer[TIMER_ID_3] = timer_alloc(FUNC(mos7360_device::timer_expired), this);
+	m_line_timer = timer_alloc(FUNC(mos7360_device::raster_interrupt_gen), this);
 	m_line_timer->adjust(screen().scan_period(), 0, screen().scan_period());
-	m_frame_timer = timer_alloc(TIMER_FRAME);
+	m_frame_timer = timer_alloc(FUNC(mos7360_device::frame_interrupt_gen), this);
 	m_frame_timer->adjust(screen().frame_period(), 0, screen().frame_period());
 
 	// allocate screen bitmap
@@ -340,9 +340,7 @@ void mos7360_device::device_start()
 	save_item(NAME(m_rom));
 	save_item(NAME(m_frame_count));
 	save_item(NAME(m_lines));
-	save_item(NAME(m_timer1_active));
-	save_item(NAME(m_timer2_active));
-	save_item(NAME(m_timer3_active));
+	save_item(NAME(m_timer_active));
 	save_item(NAME(m_cursor1));
 	save_item(NAME(m_chargenaddr));
 	save_item(NAME(m_bitmapaddr));
@@ -382,8 +380,10 @@ void mos7360_device::device_reset()
 	m_rom = 1;  // FIXME: at start should be RAM or ROM? old c16 code set it to ROM at init: is it correct?
 
 	m_lines = TED7360_LINES;
-	m_chargenaddr = m_bitmapaddr = m_videoaddr = 0;
-	m_timer1_active = m_timer2_active = m_timer3_active = 0;
+	m_chargenaddr = 0;
+	m_bitmapaddr = 0;
+	m_videoaddr = 0;
+	std::fill(std::begin(m_timer_active), std::end(m_timer_active), false);
 	m_cursor1 = 0;
 
 	m_rasterline = 0;
@@ -416,40 +416,25 @@ void mos7360_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  timer_expired -
 //-------------------------------------------------
 
-void mos7360_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(mos7360_device::timer_expired)
 {
-	switch (id)
+	static const uint8_t s_irq_values[3] = { 0x08, 0x10, 0x40 };
+
+	if (param == TIMER_ID_1)
 	{
-	case TIMER_ID_1:
-		// proved by digisound of several intros like eoroidpro
-		m_timer1->adjust(clocks_to_attotime(TIMER1), 1);
-		m_timer1_active = 1;
-		set_interrupt(0x08);
-		break;
-
-	case TIMER_ID_2:
-		m_timer2->adjust(clocks_to_attotime(0x10000), 2);
-		m_timer2_active = 1;
-		set_interrupt(0x10);
-		break;
-
-	case TIMER_ID_3:
-		m_timer3->adjust(clocks_to_attotime(0x10000), 3);
-		m_timer3_active = 1;
-		set_interrupt(0x40);
-		break;
-
-	case TIMER_LINE:
-		raster_interrupt_gen();
-		break;
-
-	case TIMER_FRAME:
-		frame_interrupt_gen();
-		break;
+		// proven by digital sound of several intros like eoroidpro
+		m_timer[param]->adjust(clocks_to_attotime(TIMER1), param);
 	}
+	else
+	{
+		m_timer[param]->adjust(clocks_to_attotime(0x10000), param);
+	}
+
+	m_timer_active[param] = true;
+	set_interrupt(s_irq_values[param]);
 }
 
 
@@ -825,22 +810,22 @@ uint8_t mos7360_device::read(offs_t offset, int &cs0, int &cs1)
 	switch (offset)
 	{
 	case 0xff00:
-		val = attotime_to_clocks(m_timer1->remaining()) & 0xff;
+		val = attotime_to_clocks(m_timer[0]->remaining()) & 0xff;
 		break;
 	case 0xff01:
-		val = attotime_to_clocks(m_timer1->remaining()) >> 8;
+		val = attotime_to_clocks(m_timer[0]->remaining()) >> 8;
 		break;
 	case 0xff02:
-		val = attotime_to_clocks(m_timer2->remaining()) & 0xff;
+		val = attotime_to_clocks(m_timer[1]->remaining()) & 0xff;
 		break;
 	case 0xff03:
-		val = attotime_to_clocks(m_timer2->remaining()) >> 8;
+		val = attotime_to_clocks(m_timer[1]->remaining()) >> 8;
 		break;
 	case 0xff04:
-		val = attotime_to_clocks(m_timer3->remaining()) & 0xff;
+		val = attotime_to_clocks(m_timer[2]->remaining()) & 0xff;
 		break;
 	case 0xff05:
-		val = attotime_to_clocks(m_timer3->remaining()) >> 8;
+		val = attotime_to_clocks(m_timer[2]->remaining()) >> 8;
 		break;
 	case 0xff07:
 		val = (m_reg[offset & 0x1f] & ~0x40);
@@ -922,45 +907,45 @@ void mos7360_device::write(offs_t offset, uint8_t data, int &cs0, int &cs1)
 	case 0xff00:                        /* stop timer 1 */
 		m_reg[offset & 0x1f] = data;
 
-		if (m_timer1_active)
+		if (m_timer_active[0])
 		{
-			m_reg[1] = attotime_to_clocks(m_timer1->remaining()) >> 8;
-			m_timer1->reset();
-			m_timer1_active = 0;
+			m_reg[1] = attotime_to_clocks(m_timer[0]->remaining()) >> 8;
+			m_timer[0]->reset();
+			m_timer_active[0] = false;
 		}
 		break;
 	case 0xff01:                        /* start timer 1 */
 		m_reg[offset & 0x1f] = data;
-		m_timer1->adjust(clocks_to_attotime(TIMER1), 1);
-		m_timer1_active = 1;
+		m_timer[0]->adjust(clocks_to_attotime(TIMER1), TIMER_ID_1);
+		m_timer_active[0] = true;
 		break;
 	case 0xff02:                        /* stop timer 2 */
 		m_reg[offset & 0x1f] = data;
-		if (m_timer2_active)
+		if (m_timer_active[1])
 		{
-			m_reg[3] = attotime_to_clocks(m_timer2->remaining()) >> 8;
-			m_timer2->reset();
-			m_timer2_active = 0;
+			m_reg[3] = attotime_to_clocks(m_timer[1]->remaining()) >> 8;
+			m_timer[1]->reset();
+			m_timer_active[1] = false;
 		}
 		break;
 	case 0xff03:                        /* start timer 2 */
 		m_reg[offset & 0x1f] = data;
-		m_timer2->adjust(clocks_to_attotime(TIMER2), 2);
-		m_timer2_active = 1;
+		m_timer[1]->adjust(clocks_to_attotime(TIMER2), TIMER_ID_2);
+		m_timer_active[1] = true;
 		break;
 	case 0xff04:                        /* stop timer 3 */
 		m_reg[offset & 0x1f] = data;
-		if (m_timer3_active)
+		if (m_timer_active[2])
 		{
-			m_reg[5] = attotime_to_clocks(m_timer3->remaining()) >> 8;
-			m_timer3->reset();
-			m_timer3_active = 0;
+			m_reg[5] = attotime_to_clocks(m_timer[2]->remaining()) >> 8;
+			m_timer[2]->reset();
+			m_timer_active[2] = false;
 		}
 		break;
 	case 0xff05:                        /* start timer 3 */
 		m_reg[offset & 0x1f] = data;
-		m_timer3->adjust(clocks_to_attotime(TIMER3), 3);
-		m_timer3_active = 1;
+		m_timer[2]->adjust(clocks_to_attotime(TIMER3), TIMER_ID_2);
+		m_timer_active[2] = true;
 		break;
 	case 0xff06:
 		if (m_reg[offset & 0x1f] != data)
@@ -1145,7 +1130,7 @@ uint32_t mos7360_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
-void mos7360_device::frame_interrupt_gen()
+TIMER_CALLBACK_MEMBER(mos7360_device::frame_interrupt_gen)
 {
 	if ((m_reg[0x1f] & 0xf) >= 0x0f)
 	{
@@ -1158,7 +1143,7 @@ void mos7360_device::frame_interrupt_gen()
 		m_reg[0x1f]++;
 }
 
-void mos7360_device::raster_interrupt_gen()
+TIMER_CALLBACK_MEMBER(mos7360_device::raster_interrupt_gen)
 {
 	m_rasterline++;
 	m_rastertime = machine().time().as_double();

@@ -12,8 +12,9 @@
 
 #pragma once
 
-
 #include "ctrl.h"
+#include "zapper_sensor.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -28,7 +29,8 @@ public:
 	// construction/destruction
 	nes_zapper_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual u8 read_bit34() override;
+	virtual u8 read_exp(offs_t offset) override;
 
 protected:
 	// construction/destruction
@@ -36,11 +38,11 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-
-	virtual u8 read_bit34() override;
-	virtual u8 read_exp(offs_t offset) override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
+	required_device<nes_zapper_sensor_device> m_sensor;
 	required_ioport m_lightx;
 	required_ioport m_lighty;
 	required_ioport m_trigger;
@@ -55,14 +57,13 @@ public:
 	// construction/destruction
 	nes_bandaihs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual u8 read_exp(offs_t offset) override;
+	virtual void write(u8 data) override;
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-
-	virtual u8 read_exp(offs_t offset) override;
-	virtual void write(u8 data) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	required_ioport m_joypad;
@@ -71,7 +72,7 @@ private:
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(NES_ZAPPER,   nes_zapper_device)
+DECLARE_DEVICE_TYPE(NES_ZAPPER, nes_zapper_device)
 DECLARE_DEVICE_TYPE(NES_BANDAIHS, nes_bandaihs_device)
 
 #endif // MAME_BUS_NES_CTRL_ZAPPER

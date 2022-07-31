@@ -812,7 +812,7 @@ void ide_hdd_device::device_start()
 	ata_mass_storage_device::device_start();
 
 	/* create a timer for timing status */
-	m_last_status_timer = timer_alloc(TID_NULL);
+	m_last_status_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 }
 
 //-------------------------------------------------
@@ -821,28 +821,28 @@ void ide_hdd_device::device_start()
 
 void ide_hdd_device::device_reset()
 {
-	m_handle = m_image->get_chd_file();
 	m_disk = m_image->get_hard_disk_file();
 
 	if (m_disk != nullptr && !m_can_identify_device)
 	{
-		const hard_disk_info *hdinfo = hard_disk_get_info(m_disk);
-		if (hdinfo->sectorbytes == IDE_DISK_SECTOR_SIZE)
+		const auto &hdinfo = m_disk->get_info();
+		if (hdinfo.sectorbytes == IDE_DISK_SECTOR_SIZE)
 		{
-			m_num_cylinders = hdinfo->cylinders;
-			m_num_sectors = hdinfo->sectors;
-			m_num_heads = hdinfo->heads;
+			m_num_cylinders = hdinfo.cylinders;
+			m_num_sectors = hdinfo.sectors;
+			m_num_heads = hdinfo.heads;
 			if (PRINTF_IDE_COMMANDS) osd_printf_debug("CHS: %u %u %u\n", m_num_cylinders, m_num_heads, m_num_sectors);
 			osd_printf_debug("CHS: %u %u %u\n", m_num_cylinders, m_num_heads, m_num_sectors);
 		}
 
 		// build the features page
-		uint32_t metalength;
-		if (m_handle && !m_handle->read_metadata(HARD_DISK_IDENT_METADATA_TAG, 0, &m_buffer[0], 512, metalength))
+		std::vector<u8> ident;
+		m_disk->get_inquiry_data(ident);
+		if (ident.size() == 512)
 		{
 			for( int w = 0; w < 256; w++ )
 			{
-				m_identify_buffer[w] = (m_buffer[(w * 2) + 1] << 8) | m_buffer[w * 2];
+				m_identify_buffer[w] = (ident[(w * 2) + 1] << 8) | ident[w * 2];
 			}
 		}
 		else
@@ -876,4 +876,80 @@ uint8_t ide_hdd_device::calculate_status()
 void ide_hdd_device::device_add_mconfig(machine_config &config)
 {
 	HARDDISK(config, "image", "ide_hdd");
+}
+
+//**************************************************************************
+//  ATA COMPACTFLASH CARD DEVICE
+//**************************************************************************
+
+// device type definition
+DEFINE_DEVICE_TYPE(ATA_CF, ide_cf_device, "atacf", "ATA CompactFlash Card")
+
+//-------------------------------------------------
+//  ide_cf_device - constructor
+//-------------------------------------------------
+
+ide_cf_device::ide_cf_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ide_hdd_device(mconfig, ATA_CF, tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+void ide_cf_device::device_add_mconfig(machine_config &config)
+{
+	HARDDISK(config, "image", "ata_cf");
+}
+
+//-------------------------------------------------
+//  ide_build_identify_device
+//-------------------------------------------------
+
+void ide_cf_device::ide_build_identify_device()
+{
+	memset(m_identify_buffer, 0, sizeof(m_identify_buffer));
+	int total_sectors = m_num_cylinders * m_num_heads * m_num_sectors;
+
+	/* basic geometry */
+	m_identify_buffer[0] = 0x848a;                     /*  0: configuration bits */
+	m_identify_buffer[1] = m_num_cylinders;            /*  1: logical cylinders */
+	m_identify_buffer[2] = 0;                          /*  2: reserved */
+	m_identify_buffer[3] = m_num_heads;                /*  3: logical heads */
+	m_identify_buffer[4] = 0;                          /*  4: number of unformatted bytes per track */
+	m_identify_buffer[5] = 0;                          /*  5: number of unformatted bytes per sector */
+	m_identify_buffer[6] = m_num_sectors;              /*  6: logical sectors per logical track */
+	m_identify_buffer[7] = total_sectors >> 16;        /*  7: number of sectors per card MSW */
+	m_identify_buffer[8] = total_sectors & 0xffff;     /*  8: number of sectors per card LSW  */
+	m_identify_buffer[9] = 0;                          /*  9: vendor-specific */
+	swap_strncpy(&m_identify_buffer[10],               /* 10-19: serial number */
+			"00000000000000000000", 10);
+	m_identify_buffer[20] = 0;                         /* 20: buffer type */
+	m_identify_buffer[21] = 0;                         /* 21: buffer size in 512 byte increments */
+	m_identify_buffer[22] = 4;                         /* 22: # of vendor-specific bytes on read/write long commands */
+	swap_strncpy(&m_identify_buffer[23],               /* 23-26: firmware revision */
+			"1.0", 4);
+	swap_strncpy(&m_identify_buffer[27],               /* 27-46: model number */
+			"MAME Compressed CompactFlash", 20);
+	m_identify_buffer[47] = 0x0001;                    /* 47: read/write multiple support */
+	m_identify_buffer[48] = 0;                         /* 48: double word not supported */
+	m_identify_buffer[49] = 0x0200;                    /* 49: capabilities */
+	m_identify_buffer[50] = 0;                         /* 50: reserved */
+	m_identify_buffer[51] = 0x0200;                    /* 51: PIO data transfer cycle timing mode */
+	m_identify_buffer[52] = 0x0000;                    /* 52: single word DMA transfer cycle timing mode */
+	m_identify_buffer[53] = 0x0003;                    /* 53: translation parameters are valid */
+	m_identify_buffer[54] = m_num_cylinders;           /* 54: number of current logical cylinders */
+	m_identify_buffer[55] = m_num_heads;               /* 55: number of current logical heads */
+	m_identify_buffer[56] = m_num_sectors;             /* 56: number of current logical sectors per track */
+	m_identify_buffer[57] = total_sectors & 0xffff;    /* 57-58: current capacity in sectors */
+	m_identify_buffer[58] = total_sectors >> 16;
+	m_identify_buffer[59] = 0;                         /* 59: multiple sector timing */
+	m_identify_buffer[60] = total_sectors & 0xffff;    /* 60-61: total user addressable sectors for LBA mode */
+	m_identify_buffer[61] = total_sectors >> 16;
+	m_identify_buffer[62] = 0x00;                      /* 62-127: reserved */
+	m_identify_buffer[128] = 0x00;                     /* 128: security status */
+	m_identify_buffer[129] = 0x00;                     /* 129-159: vendor specific */
+	m_identify_buffer[160] = 0x00;                     /* 160:  Power requirement description*/
+	m_identify_buffer[161] = 0x00;                     /* 161-255: reserved */
 }

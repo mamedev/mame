@@ -84,6 +84,8 @@ protected:
 	memory_access<12, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
 	memory_access< 8, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 	int     m_icount;
+	int     m_wasldi;
+	int     m_waslbl;
 
 	u8        m_A;        //!< Accumulator A(4:1)
 	u8        m_X;        //!< X register X(4:1)
@@ -98,7 +100,6 @@ protected:
 	u8        m_FF2;      //!< Flip-flop 2
 	u8        m_I1;        //!< Most recent instruction I(8:1)
 	u8        m_I2;       //!< Most recent parameter I2(8:1)
-	u8        m_Ip;       //!< Previous instruction I(8:1)
 
 	//! return memory at address B(12:1)
 	inline u8 M();

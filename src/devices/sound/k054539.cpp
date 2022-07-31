@@ -106,13 +106,12 @@ void k054539_device::keyoff(int channel)
 
 void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-#define VOL_CAP 1.80
+	static constexpr double VOL_CAP = 1.80;
 
 	static const int16_t dpcm[16] = {
-		0 * 0x100,     1 * 0x100,   4 * 0x100,   9 * 0x100,  16 * 0x100, 25 * 0x100, 36 * 0x100, 49 * 0x100,
-		-64 * 0x100, -49 * 0x100, -36 * 0x100, -25 * 0x100, -16 * 0x100, -9 * 0x100, -4 * 0x100, -1 * 0x100
+		0 * 0x100,   1 * 0x100,   2 * 0x100,   4 * 0x100,  8 * 0x100, 16 * 0x100, 32 * 0x100, 64 * 0x100,
+		0 * 0x100, -64 * 0x100, -32 * 0x100, -16 * 0x100, -8 * 0x100, -4 * 0x100, -2 * 0x100, -1 * 0x100
 	};
-
 
 	int16_t *rbase = (int16_t *)&ram[0];
 
@@ -307,7 +306,7 @@ void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_
 }
 
 
-void k054539_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(k054539_device::call_timer_handler)
 {
 	if (regs[0x22f] & 0x20)
 		m_timer_handler(m_timer_state ^= 1);
@@ -507,7 +506,7 @@ u8 k054539_device::read(offs_t offset)
 
 void k054539_device::device_start()
 {
-	m_timer = timer_alloc(0);
+	m_timer = timer_alloc(FUNC(k054539_device::call_timer_handler), this);
 
 	// resolve / bind callbacks
 	m_timer_handler.resolve_safe();
@@ -565,4 +564,3 @@ void k054539_device::rom_bank_updated()
 {
 	stream->update();
 }
-

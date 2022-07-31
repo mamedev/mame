@@ -80,7 +80,7 @@ void kbdc8042_device::device_start()
 	m_speaker = 0;
 	m_offset1 = 0;
 
-	m_update_timer = timer_alloc(TIMER_UPDATE);
+	m_update_timer = timer_alloc(FUNC(kbdc8042_device::update_timer), this);
 	m_update_timer->adjust(attotime::never);
 }
 
@@ -221,16 +221,14 @@ void kbdc8042_device::at_8042_clear_keyboard_received()
 	m_input_buffer_full_mouse_cb(0);
 	m_keyboard.received = 0;
 	m_mouse.received = 0;
+	m_data = 0;
 }
 
-void kbdc8042_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(kbdc8042_device::update_timer)
 {
-	if (id == TIMER_UPDATE)
-	{
-		at_8042_check_keyboard();
-		if (m_mouse.on)
-			at_8042_check_mouse();
-	}
+	at_8042_check_keyboard();
+	if (m_mouse.on)
+		at_8042_check_mouse();
 }
 
 void kbdc8042_device::mouse_enqueue(uint8_t value)

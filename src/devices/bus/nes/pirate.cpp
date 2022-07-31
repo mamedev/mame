@@ -18,7 +18,6 @@
 #include "pirate.h"
 
 #include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE
-#include "screen.h"
 
 
 #ifdef NES_PCB_DEBUG
@@ -48,12 +47,12 @@ DEFINE_DEVICE_TYPE(NES_43272,       nes_43272_device,       "nes_43272",       "
 DEFINE_DEVICE_TYPE(NES_EH8813A,     nes_eh8813a_device,     "nes_eh8813a",     "NES Cart UNL-EH8813A PCB")
 
 
-nes_agci_device::nes_agci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_agci_device::nes_agci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_AGCI_50282, tag, owner, clock)
 {
 }
 
-nes_dreamtech_device::nes_dreamtech_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_dreamtech_device::nes_dreamtech_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_DREAMTECH01, tag, owner, clock)
 {
 }
@@ -73,7 +72,7 @@ nes_magseries_device::nes_magseries_device(const machine_config &mconfig, const 
 {
 }
 
-nes_daou306_device::nes_daou306_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_daou306_device::nes_daou306_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_DAOU306, tag, owner, clock)
 {
 }
@@ -111,29 +110,10 @@ nes_eh8813a_device::nes_eh8813a_device(const machine_config &mconfig, const char
 
 
 
-void nes_agci_device::device_start()
-{
-	common_start();
-}
-
-void nes_agci_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_dreamtech_device::device_start()
-{
-	common_start();
-}
-
 void nes_dreamtech_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(8);
-	chr8(0, m_chr_source);
 }
 
 void nes_fukutake_device::device_start()
@@ -147,7 +127,6 @@ void nes_fukutake_device::device_start()
 
 void nes_fukutake_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(0);
 	chr8(0, m_chr_source);
@@ -181,23 +160,24 @@ void nes_daou306_device::device_start()
 
 void nes_daou306_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(m_prg_chunks - 2);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
 	set_nt_mirroring(PPU_MIRROR_LOW);
 
-	memset(m_reg, 0, sizeof(m_reg));
+	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
 }
 
-void nes_xiaozy_device::device_start()
+void nes_cc21_device::pcb_reset()
 {
-	common_start();
+	prg32(0);
+	chr4_0(0, CHRROM);
+	chr4_4(0, CHRROM);
+	set_nt_mirroring(PPU_MIRROR_LOW);
 }
 
 void nes_xiaozy_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32((m_prg_chunks - 1) >> 1);
 	chr8(0, m_chr_source);
 }
@@ -210,7 +190,6 @@ void nes_edu2k_device::device_start()
 
 void nes_edu2k_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
 	chr8(0, m_chr_source);
 
@@ -246,7 +225,6 @@ void nes_43272_device::device_start()
 
 void nes_43272_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32((m_prg_chunks - 1) >> 1);
 	chr8(0, m_chr_source);
 
@@ -285,17 +263,17 @@ void nes_eh8813a_device::pcb_reset()
 
  iNES: mapper 144
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_agci_device::write_h(offs_t offset, uint8_t data)
+void nes_agci_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("agci write_h, offset: %04x, data: %02x\n", offset, data));
 
 	// this pcb is subject to bus conflict
-	uint8_t temp = account_bus_conflict(offset, 0xff);
-	data = (data & temp) | (temp & 1);
+	// bit 0 is always determined by the ROM value at the offset due to a resistor on the board
+	data = account_bus_conflict(offset, data | 1);
 
 	chr8(data >> 4, CHRROM);
 	prg32(data);
@@ -313,12 +291,12 @@ void nes_agci_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_dreamtech_device::write_l(offs_t offset, uint8_t data)
+void nes_dreamtech_device::write_l(offs_t offset, u8 data)
 {
 	LOG_MMC(("dreamtech write_l, offset: %04x, data: %02x\n", offset, data));
-	offset += 0x100;
 
-	if (offset == 0x1020)   /* 0x5020 */
+	offset += 0x100;
+	if (offset >= 0x1000)
 		prg16_89ab(data);
 }
 
@@ -394,7 +372,7 @@ uint8_t nes_fukutake_device::read_m(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_futuremedia_device::hblank_irq(int scanline, int vblank, int blanked)
+void nes_futuremedia_device::hblank_irq(int scanline, bool vblank, bool blanked)
 {
 	//  if (scanline < ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE)
 	{
@@ -479,70 +457,28 @@ void nes_magseries_device::write_h(offs_t offset, u8 data)
 
  iNES: mapper 156
 
- In MESS: Supported.
+ In MAME: Supported.
 
  Notes: Metal Force and Buzz & Waldog only use the first 4
  regs and no mirroring. Janggun ui Adeul uses all features
 
  -------------------------------------------------*/
 
-void nes_daou306_device::write_h(offs_t offset, uint8_t data)
+void nes_daou306_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("daou306 write_h, offset: %04x, data: %02x\n", offset, data));
-	int reg = BIT(offset, 2) ? 8 : 0;
 
-	switch (offset)
+	if (offset >= 0x4000 && offset < 0x4010)
 	{
-		case 0x4000:
-		case 0x4004:
-			m_reg[reg + 0] = data;
-			chr1_0(m_reg[0] | (m_reg[8] << 8), CHRROM);
-			break;
-		case 0x4001:
-		case 0x4005:
-			m_reg[reg + 1] = data;
-			chr1_1(m_reg[1] | (m_reg[9] << 8), CHRROM);
-			break;
-		case 0x4002:
-		case 0x4006:
-			m_reg[reg + 2] = data;
-			chr1_2(m_reg[2] | (m_reg[10] << 8), CHRROM);
-			break;
-		case 0x4003:
-		case 0x4007:
-			m_reg[reg + 3] = data;
-			chr1_3(m_reg[3] | (m_reg[11] << 8), CHRROM);
-			break;
-		case 0x4008:
-		case 0x400c:
-			m_reg[reg + 4] = data;
-			chr1_4(m_reg[4] | (m_reg[12] << 8), CHRROM);
-			break;
-		case 0x4009:
-		case 0x400d:
-			m_reg[reg + 5] = data;
-			chr1_5(m_reg[5] | (m_reg[13] << 8), CHRROM);
-			break;
-		case 0x400a:
-		case 0x400e:
-			m_reg[reg + 6] = data;
-			chr1_6(m_reg[6] | (m_reg[14] << 8), CHRROM);
-			break;
-		case 0x400b:
-		case 0x400f:
-			m_reg[reg + 7] = data;
-			chr1_7(m_reg[7] | (m_reg[15] << 8), CHRROM);
-			break;
-		case 0x4010:
-			prg16_89ab(data);
-			break;
-		case 0x4014:
-			if (data & 1)
-				set_nt_mirroring(PPU_MIRROR_HORZ);
-			else
-				set_nt_mirroring(PPU_MIRROR_VERT);
-			break;
+		int reg = bitswap<4>(offset, 2, 3, 1, 0);
+		m_reg[reg] = data;
+		reg &= 0x07;
+		chr1_x(reg, m_reg[reg] | (m_reg[reg | 8] << 8), CHRROM);
 	}
+	else if (offset == 0x4010)
+		prg16_89ab(data);
+	else if (offset == 0x4014)
+		set_nt_mirroring(data & 1 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 /*-------------------------------------------------
@@ -607,7 +543,7 @@ void nes_edu2k_device::write_h(offs_t offset, uint8_t data)
 	LOG_MMC(("edu2k write_h, offset: %04x, data: %02x\n", offset, data));
 
 	prg32(data & 0x1f);
-	m_latch = (data & 0xc0) >> 6;
+	m_latch = BIT(data, 6, 2);
 }
 
 void nes_edu2k_device::write_m(offs_t offset, uint8_t data)
@@ -641,7 +577,7 @@ uint8_t nes_edu2k_device::read_m(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_jy830623c_device::hblank_irq(int scanline, int vblank, int blanked)
+void nes_jy830623c_device::hblank_irq(int scanline, bool vblank, bool blanked)
 {
 	if (scanline < ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE)
 	{
@@ -722,7 +658,7 @@ void nes_43272_device::write_h(offs_t offset, uint8_t data)
 	LOG_MMC(("unl_43272 write_h, offset: %04x, data: %02x\n", offset, data));
 
 	if ((m_latch & 0x81) == 0x81)
-		prg32((m_latch & 0x38) >> 3);
+		prg32(BIT(m_latch, 3, 3));
 
 	m_latch = offset & 0xffff;
 }
@@ -797,7 +733,6 @@ void nes_fujiya_device::device_start()
 
 void nes_fujiya_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(0);
 	chr8(0, m_chr_source);
@@ -820,8 +755,8 @@ uint8_t nes_fujiya_device::read_m(offs_t offset)
 	offset += 0x6000;
 
 	if (offset == 0x7001 || offset == 0x7777)
-		return m_latch | ((offset >> 8) & 0x7f);
+		return m_latch | (BIT(offset, 8, 7));
 
-	return get_open_bus();  // open bus
+	return get_open_bus();
 }
 #endif

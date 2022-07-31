@@ -56,6 +56,8 @@ menu_audit::menu_audit(mame_ui_manager &mui, render_container &container)
 	, m_phase(phase::CONFIRMATION)
 	, m_fast(true)
 {
+	set_heading(_("Audit Media"));
+
 	std::string filename(emulator_info::get_configname());
 	filename += "_avail.ini";
 	m_prompt = util::string_format(_("Results will be saved to %1$s"), filename);
@@ -96,7 +98,7 @@ void menu_audit::custom_render(void *selectedref, float top, float bottom, float
 			std::size_t const total(m_fast ? m_unavailable : m_availablesorted.size());
 			std::ostringstream text;
 			util::stream_format(text,
-					_("Auditing media for machine %2$u of %3$u...\n%1$s"),
+					_("Auditing media for system %2$u of %3$u...\n%1$s"),
 					system ? std::string_view(system->description) : std::string_view(),
 					(std::min)(audited + 1, total),
 					total);
@@ -134,8 +136,8 @@ bool menu_audit::custom_ui_cancel()
 void menu_audit::populate(float &customtop, float &custombottom)
 {
 	if (m_unavailable && (m_availablesorted.size() != m_unavailable))
-		item_append(util::string_format(_("Audit media for %1$u machines marked unavailable"), m_unavailable), 0, ITEMREF_START_FAST);
-	item_append(util::string_format(_("Audit media for all %1$u machines"), m_availablesorted.size()), 0, ITEMREF_START_FULL);
+		item_append(util::string_format(_("Audit media for %1$u systems marked unavailable"), m_unavailable), 0, ITEMREF_START_FAST);
+	item_append(util::string_format(_("Audit media for all %1$u systems"), m_availablesorted.size()), 0, ITEMREF_START_FULL);
 	item_append(menu_item_type::SEPARATOR, 0);
 	custombottom = (ui().get_line_height() * 1.0f) + (ui().box_tb_border() * 3.0f);
 }

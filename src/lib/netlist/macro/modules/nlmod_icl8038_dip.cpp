@@ -8,6 +8,7 @@
 //
 
 NETLIST_START(ICL8038_DIP)
+{
 	VCVS(VI, 1)
 	CCCS(CI1, -1)
 	CCCS(CI2, 2)
@@ -52,10 +53,10 @@ NETLIST_START(ICL8038_DIP)
 
 	ALIAS(11, VI.ON) // GND
 	ALIAS(9, V_SQR.OP) // Square out
-	ALIAS(3, VO.OP) // Triag out
+	ALIAS(3, VO.OP) // Triangle out
 	ALIAS(8, VI.IP) // VC
 	ALIAS(4, CI1.IP) // R1
 	ALIAS(5, CI2.IP) // R2
 	ALIAS(10, VO.IP) // C1
 	ALIAS(6, COMP.VCC) // V+
-NETLIST_END()
+}

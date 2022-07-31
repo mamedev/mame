@@ -479,7 +479,7 @@ public:
 	{
 		osd_printf_verbose("Lightgun: Begin initialization\n");
 
-		devmap_init(machine, &m_lightgun_map, SDLOPTION_LIGHTGUNINDEX, 8, "Lightgun mapping");
+		m_lightgun_map.init(machine, SDLOPTION_LIGHTGUNINDEX, 8, "Lightgun mapping");
 
 		x11_event_manager::instance().initialize();
 		m_display = x11_event_manager::instance().display();
@@ -538,9 +538,9 @@ public:
 			osd_printf_verbose("Device %i: Registered %i events.\n", static_cast<int>(info->id), events_registered);
 
 			// register ourself to handle events from event manager
-			int event_types[] = { motion_type, button_press_type, button_release_type };
+			int const event_types[] = { motion_type, button_press_type, button_release_type };
 			osd_printf_verbose("Events types to register: motion:%d, press:%d, release:%d\n", motion_type, button_press_type, button_release_type);
-			x11_event_manager::instance().subscribe(event_types, std::size(event_types), this);
+			x11_event_manager::instance().subscribe(event_types, this);
 		}
 
 		osd_printf_verbose("Lightgun: End initialization\n");
@@ -582,14 +582,14 @@ public:
 		}
 
 		// Figure out which lightgun this event id destined for
-		auto target_device = std::find_if(devicelist()->begin(), devicelist()->end(), [deviceid](auto &device)
+		auto target_device = std::find_if(devicelist().begin(), devicelist().end(), [deviceid](auto &device)
 		{
 			std::unique_ptr<device_info> &ptr = device;
 			return downcast<x11_input_device*>(ptr.get())->x11_state.deviceid == deviceid;
 		});
 
 		// If we find a matching lightgun, dispatch the event to the lightgun
-		if (target_device != devicelist()->end())
+		if (target_device != devicelist().end())
 		{
 			downcast<x11_input_device*>((*target_device).get())->queue_events(&xevent, 1);
 		}
@@ -604,7 +604,7 @@ private:
 			{
 				char tempname[20];
 				snprintf(tempname, std::size(tempname), "NC%d", index);
-				return &devicelist()->create_device<x11_lightgun_device>(machine, tempname, tempname, *this);
+				return &devicelist().create_device<x11_lightgun_device>(machine, tempname, tempname, *this);
 			}
 			else
 			{
@@ -612,7 +612,7 @@ private:
 			}
 		}
 
-		return &devicelist()->create_device<x11_lightgun_device>(machine, std::string(m_lightgun_map.map[index].name), std::string(m_lightgun_map.map[index].name), *this);
+		return &devicelist().create_device<x11_lightgun_device>(machine, std::string(m_lightgun_map.map[index].name), std::string(m_lightgun_map.map[index].name), *this);
 	}
 
 	void add_lightgun_buttons(XAnyClassPtr first_info_class, int num_classes, x11_lightgun_device &devinfo) const

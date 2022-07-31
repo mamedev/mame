@@ -94,7 +94,8 @@ private:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(fsm_tick);
 
 	devcb_read8 m_dio_read_func;
 	devcb_write8 m_dio_write_func;
@@ -239,12 +240,6 @@ private:
 	int m_c_state;
 
 	// Timers
-	enum {
-		SH_DELAY_TMR_ID,
-		AH_DELAY_TMR_ID,
-		C_DELAY_TMR_ID
-	};
-
 	emu_timer *m_sh_dly_timer;
 	emu_timer *m_ah_dly_timer;
 	emu_timer *m_c_dly_timer;

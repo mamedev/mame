@@ -27,7 +27,6 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device-level overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -56,6 +55,9 @@ private:
 	void set_irq_w(uint8_t data);
 	uint8_t clr_inten_r();
 	void clr_inten_w(uint8_t data);
+
+	TIMER_CALLBACK_MEMBER(msec_tick);
+	TIMER_CALLBACK_MEMBER(clock_tick);
 
 	void np_io_map(address_map &map);
 	void np_program_map(address_map &map);

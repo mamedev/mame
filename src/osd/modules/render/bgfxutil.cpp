@@ -7,10 +7,10 @@
 //============================================================
 
 // MAMEOS headers
-#include "emu.h"
 #include "bgfxutil.h"
 #include "copyutil.h"
 
+#include "emucore.h"
 #include "render.h"
 
 

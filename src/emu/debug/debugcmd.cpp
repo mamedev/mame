@@ -234,6 +234,9 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("gtime",     CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_go_time, this, _1));
 	m_console.register_command("gt",        CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_go_time, this, _1));
 	m_console.register_command("gp",        CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_go_privilege, this, _1));
+	m_console.register_command("gbt",       CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_go_branch, this, true, _1));
+	m_console.register_command("gbf",       CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_go_branch, this, false, _1));
+	m_console.register_command("gni",       CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_go_next_instruction, this, _1));
 	m_console.register_command("next",      CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_next, this, _1));
 	m_console.register_command("n",         CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_next, this, _1));
 	m_console.register_command("focus",     CMDFLAG_NONE, 1, 1, std::bind(&debugger_commands::execute_focus, this, _1));
@@ -242,6 +245,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("suspend",   CMDFLAG_NONE, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_suspend, this, _1));
 	m_console.register_command("resume",    CMDFLAG_NONE, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_resume, this, _1));
 	m_console.register_command("cpulist",   CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_cpulist, this, _1));
+	m_console.register_command("time",      CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_time, this, _1));
 
 	m_console.register_command("comadd",    CMDFLAG_NONE, 1, 2, std::bind(&debugger_commands::execute_comment_add, this, _1));
 	m_console.register_command("//",        CMDFLAG_NONE, 1, 2, std::bind(&debugger_commands::execute_comment_add, this, _1));
@@ -1052,7 +1056,7 @@ bool debugger_commands::mini_printf(std::ostream &stream, std::string_view forma
 						m_console.printf("Not enough parameters for format!\n");
 						return false;
 					}
-					util::stream_format(stream, "%c", char(*param));
+					stream << char(*param);
 					param++;
 					params--;
 					break;
@@ -1115,7 +1119,7 @@ void debugger_commands::execute_printf(const std::vector<std::string> &params)
 	/* then do a printf */
 	std::ostringstream buffer;
 	if (mini_printf(buffer, params[0], params.size() - 1, &values[1]))
-		m_console.printf("%s\n", buffer.str());
+		m_console.printf("%s\n", std::move(buffer).str());
 }
 
 
@@ -1134,7 +1138,7 @@ void debugger_commands::execute_logerror(const std::vector<std::string> &params)
 	/* then do a printf */
 	std::ostringstream buffer;
 	if (mini_printf(buffer, params[0], params.size() - 1, &values[1]))
-		m_machine.logerror("%s", buffer.str());
+		m_machine.logerror("%s", std::move(buffer).str());
 }
 
 
@@ -1153,7 +1157,7 @@ void debugger_commands::execute_tracelog(const std::vector<std::string> &params)
 	/* then do a printf */
 	std::ostringstream buffer;
 	if (mini_printf(buffer, params[0], params.size() - 1, &values[1]))
-		m_console.get_visible_cpu()->debug()->trace_printf("%s", buffer.str().c_str());
+		m_console.get_visible_cpu()->debug()->trace_printf("%s", std::move(buffer).str().c_str());
 }
 
 
@@ -1189,7 +1193,7 @@ void debugger_commands::execute_tracesym(const std::vector<std::string> &params)
 	// then do a printf
 	std::ostringstream buffer;
 	if (mini_printf(buffer, format.str(), params.size(), values))
-		m_console.get_visible_cpu()->debug()->trace_printf("%s", buffer.str().c_str());
+		m_console.get_visible_cpu()->debug()->trace_printf("%s", std::move(buffer).str().c_str());
 }
 
 
@@ -1355,6 +1359,62 @@ void debugger_commands::execute_go_privilege(const std::vector<std::string> &par
 
 	m_console.get_visible_cpu()->debug()->go_privilege((condition.is_empty()) ? "1" : condition.original_string());
 }
+
+
+/*-------------------------------------------------
+    execute_go_branch - execute gbt or gbf command
+-------------------------------------------------*/
+
+void debugger_commands::execute_go_branch(bool sense, const std::vector<std::string> &params)
+{
+	parsed_expression condition(m_console.visible_symtable());
+	if (params.size() > 0 && !debug_command_parameter_expression(params[0], condition))
+		return;
+
+	m_console.get_visible_cpu()->debug()->go_branch(sense, (condition.is_empty()) ? "1" : condition.original_string());
+}
+
+
+/*-------------------------------------------------
+    execute_go_next_instruction - execute gni command
+-------------------------------------------------*/
+
+void debugger_commands::execute_go_next_instruction(const std::vector<std::string> &params)
+{
+	u64 count = 1;
+	static constexpr u64 MAX_COUNT = 512;
+
+	// if we have a parameter, use it instead */
+	if (params.size() > 0 && !validate_number_parameter(params[0], count))
+		return;
+	if (count == 0)
+		return;
+	if (count > MAX_COUNT)
+	{
+		m_console.printf("Too many instructions (must be %d or fewer)\n", MAX_COUNT);
+		return;
+	}
+
+	device_state_interface *stateintf;
+	device_t *cpu = m_machine.debugger().console().get_visible_cpu();
+	if (!cpu->interface(stateintf))
+	{
+		m_console.printf("No state interface available for %s\n", cpu->name());
+		return;
+	}
+	u32 pc = stateintf->pcbase();
+
+	debug_disasm_buffer buffer(*cpu);
+	while (count-- != 0)
+	{
+		// disassemble the current instruction and get the length
+		u32 result = buffer.disassemble_info(pc);
+		pc = buffer.next_pc_wrap(pc, result & util::disasm_interface::LENGTHMASK);
+	}
+
+	cpu->debug()->go(pc);
+}
+
 
 /*-------------------------------------------------
     execute_next - execute the next command
@@ -1616,6 +1676,15 @@ void debugger_commands::execute_cpulist(const std::vector<std::string> &params)
 		if (exec.device().interface(state) && state->state_find_entry(STATE_GENPCBASE) != nullptr)
 			m_console.printf("[%s%d] %s\n", &exec.device() == m_console.get_visible_cpu() ? "*" : "", index++, exec.device().tag());
 	}
+}
+
+//-------------------------------------------------
+//  execute_time - execute the time command
+//-------------------------------------------------
+
+void debugger_commands::execute_time(const std::vector<std::string> &params)
+{
+	m_console.printf("%s\n", m_machine.time().as_string());
 }
 
 /*-------------------------------------------------

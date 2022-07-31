@@ -3496,7 +3496,7 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 	</software>
 
 	<software name="deja">
-		<description>De・Ja</description>
+		<description>De·Ja</description>
 		<year>1990</year>
 		<publisher>エルフ (Elf)</publisher>
 		<info name="release" value="19901005" />
@@ -27848,7 +27848,7 @@ sold through Takeru vending machines -->
 	</software>
 
 	<software name="momotar2">
-		<description>Momotarou II Ohimesama Ga Ippai</description>
+		<description>Momotarou II Ohimesama ga Ippai</description>
 		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Todo2" />
@@ -30392,7 +30392,7 @@ sold through Takeru vending machines -->
 	</software>
 
 	<software name="souhoutv">
-		<!--  there also exists a bootable version, but it has been made for emulator usage... -->
+		<!-- there also exists a bootable version, but it has been made for emulator usage... -->
 		<description>Souhou Blue Phoenix Taste Version</description>
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>

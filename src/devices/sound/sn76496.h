@@ -27,25 +27,15 @@ public:
 	DECLARE_READ_LINE_MEMBER( ready_r ) { return m_ready_state ? 1 : 0; }
 
 protected:
-	sn76496_base_device(
-			const machine_config &mconfig,
-			device_type type,
-			const char *tag,
-			int feedbackmask,
-			int noisetap1,
-			int noisetap2,
-			bool negate,
-			bool stereo,
-			int clockdivider,
-			bool ncr,
-			bool sega,
-			device_t *owner,
-			uint32_t clock);
+	sn76496_base_device(const machine_config &mconfig, device_type type, const char *tag,
+			int feedbackmask, int noisetap1, int noisetap2, bool negate, bool stereo, int clockdivider,
+			bool ncr, bool sega, device_t *owner, uint32_t clock);
 
-	virtual void    device_start() override;
-	virtual void    device_clock_changed() override;
-	virtual void    device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	virtual void device_start() override;
+	virtual void device_clock_changed() override;
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+
+	TIMER_CALLBACK_MEMBER(delayed_ready);
 
 private:
 	inline bool     in_noise_mode();

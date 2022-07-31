@@ -14,7 +14,9 @@
 #ifndef __DRAWBGFX_INPUT_PAIR__
 #define __DRAWBGFX_INPUT_PAIR__
 
+#include <memory>
 #include <string>
+#include <vector>
 
 #include "../frontend/mame/ui/menuitem.h"
 

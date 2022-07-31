@@ -215,6 +215,19 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		</part>
 	</software>
 
+<!-- Doesn't work on standard 7800 due to missing encryption signature? -->
+	<software name="diagtestp" cloneof="diagtest" supported="no">
+		<description>7800 Pro System Diagnostic Test (prototype)</description>
+		<year>198?</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="16384">
+				<rom name="testcart.bin" size="16384" crc="729dd769" sha1="ea4df28c6bedc09f7013013f257c984aed9b5319" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aceofaceu" cloneof="aceoface">
 		<description>Ace of Aces (NTSC)</description>
 		<year>1988</year>
@@ -875,6 +888,21 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="foodfght.bin" size="32768" crc="e64a5cde" sha1="3f5f42d5aaf6ccd4979658a1387aac5933549357"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="foodfup" cloneof="foodf">
+		<description>Food Fight (NTSC, prototype)</description>
+		<year>1984</year>
+		<publisher>Atari</publisher>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="ff lo 8 8-16-84 029e.u2" size="0x4000" crc="47d02bb1" sha1="48539447a5a247c57faadd7236281844609e8fc0" offset="0x0000"/>
+				<rom name="ff hi e 8-16-84 845f.u1" size="0x2000" crc="ea1f5502" sha1="fa2fa3c5aa20ebd5f55d8182dadc822bdbba1ac5" offset="0x4000"/>
+				<rom size="0x2000" offset="0x6000" loadflag="reload"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1770,6 +1798,20 @@ almost nothing like the prototype.
 		</part>
 	</software>
 
+<!-- This allegedly is a 7800 BIOS that ended up on a cartridge. As a cartridge it doesn't run on real hardware? -->
+	<software name="polepos2p" cloneof="polepos2" supported="no">
+		<description>Pole Position II (prototype)</description>
+		<year>198?</year>
+		<publisher>Atari / Namco</publisher>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="ppii lo.u2" size="0x4000" crc="ba6d7560" sha1="ae00f45eefd37d39ac26092b2a2c82d252714582" offset="0x0000"/>
+				<rom name="pole position ii hi.u1" size="0x4000" crc="547b7906" sha1="f7122f917a37d176960e81bdb0d68e8877cfa5e6" offset="0x4000"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rampage">
 		<description>Rampage (NTSC)</description>
 		<year>1989</year>
@@ -2247,7 +2289,7 @@ almost nothing like the prototype.
      e.g. no sound in bobsled ans ski jump games!
      Dump is confirmed from multiple carts, and it was probably used in
      some erlier production run, until they found out the mistake and
-     replaced it with the complete version  -->
+     replaced it with the complete version -->
 	<software name="wingameso" cloneof="wingames">
 		<description>Winter Games (NTSC, Older?)</description>
 		<year>1987</year>
@@ -2302,6 +2344,20 @@ almost nothing like the prototype.
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="xevious.bin" size="32768" crc="75fc124f" sha1="1d4f0335b152239553534fcbbacdca273802e3bd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xeviousup" cloneof="xevious">
+		<description>Xevious (NTSC, prototype)</description>
+		<year>1984</year>
+		<publisher>Atari / Namco</publisher>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="xevious 5-10 lo.u2" size="0x4000" crc="b154c59a" sha1="b94959e60e84c97dabc002f39f03c781376c35f7" offset="0x0000"/>
+				<rom name="xevious 5-10 hi.u1" size="0x4000" crc="9d3622b5" sha1="5cc9585f8c3f5dd0106990fde24883756868f437" offset="0x4000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2372,7 +2428,7 @@ almost nothing like the prototype.
 	<!-- XM board enhanced -->
 	<!-- from http://atariage.com/forums/topic/204250-donkey-kong-xm-pre-order-and-demo/ -->
 
-	<!-- these ones are listed as 'working in MESS' but are apparently the only images that work on real hardware too -->
+	<!-- these ones are listed as 'working in MAME' but are apparently the only images that work on real hardware too -->
 	<software name="dkongxm">
 		<description>Donkey Kong (PAL, Demo, XM enhanced, V1.2)</description>
 		<year>2012</year>
@@ -2436,32 +2492,32 @@ almost nothing like the prototype.
 
 	<!-- an older version? sound is broken, did it work on the real hardware? -->
 	<software name="dkongxmo" cloneof="dkongxm" supported="no">
-			<description>Donkey Kong (PAL, Demo, XM enhanced, older)</description>
-			<year>2012</year>
-			<publisher>&lt;homebrew&gt;</publisher>
-			<info name="programmer" value="TEP392" />
-			<sharedfeat name="compatibility" value="PAL"/>
-			<part name="cart" interface="a7800_cart">
-				<feature name="slot" value="a78_sg9" />
-				<dataarea name="rom" size="147456">
-					<rom name="dkxm_final_demo_pal.bin" size="147456" crc="d362712e" sha1="118c462d6698bd23c378785f80062fdd7d65ca00"/>
-				</dataarea>
-			</part>
-		</software>
+		<description>Donkey Kong (PAL, Demo, XM enhanced, older)</description>
+		<year>2012</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="programmer" value="TEP392" />
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_sg9" />
+			<dataarea name="rom" size="147456">
+				<rom name="dkxm_final_demo_pal.bin" size="147456" crc="d362712e" sha1="118c462d6698bd23c378785f80062fdd7d65ca00"/>
+			</dataarea>
+		</part>
+	</software>
 
-		<software name="dkongxmou" cloneof="dkongxm" supported="no">
-			<description>Donkey Kong (NTSC, Demo, XM enhanced, older)</description>
-			<year>2012</year>
-			<publisher>&lt;homebrew&gt;</publisher>
-			<info name="programmer" value="TEP392" />
-			<sharedfeat name="compatibility" value="NTSC"/>
-			<part name="cart" interface="a7800_cart">
-				<feature name="slot" value="a78_sg9" />
-				<dataarea name="rom" size="147456">
-					<rom name="dkxm_final_demo_ntsc.bin" size="147456" crc="6e170055" sha1="f4da231312da06ff9e8af5681b5013b14886b455"/>
-				</dataarea>
-			</part>
-		</software>
+	<software name="dkongxmou" cloneof="dkongxm" supported="no">
+		<description>Donkey Kong (NTSC, Demo, XM enhanced, older)</description>
+		<year>2012</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="programmer" value="TEP392" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_sg9" />
+			<dataarea name="rom" size="147456">
+				<rom name="dkxm_final_demo_ntsc.bin" size="147456" crc="6e170055" sha1="f4da231312da06ff9e8af5681b5013b14886b455"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<!-- this one is meant to detect PAL / NTSC and runs on an A7800 CC2 development board, without sound? based off older code? -->
 	<software name="dkongxmcc" cloneof="dkongxm" supported="no">

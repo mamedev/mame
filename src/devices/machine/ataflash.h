@@ -30,7 +30,7 @@ protected:
 	uint8_t calculate_status() override { return ata_hle_device::calculate_status(); }
 
 private:
-	uint8_t m_cis[512];
+	std::vector<uint8_t> m_cis;
 	uint8_t m_configuration_option;
 	uint8_t m_configuration_and_status;
 	uint8_t m_pin_replacement;
@@ -53,7 +53,7 @@ protected:
 	virtual bool is_ready() override;
 
 private:
-	uint8_t m_key[5];
+	std::vector<uint8_t> m_key;
 	uint16_t m_locked;
 };
 
@@ -75,7 +75,7 @@ protected:
 	static const int IDE_COMMAND_TAITO_GNET_UNLOCK_2 = 0xfc;
 
 private:
-	uint8_t m_key[5];
+	std::vector<uint8_t> m_key;
 	bool m_locked;
 };
 
@@ -95,7 +95,7 @@ protected:
 	static constexpr int IDE_COMMAND_TAITO_COMPACT_FLASH_UNLOCK = 0x0f;
 
 private:
-	uint8_t m_key[5];
+	std::vector<uint8_t> m_key;
 	bool m_locked;
 };
 

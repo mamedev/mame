@@ -51,11 +51,11 @@ struct td0dsk_tag
 };
 
 struct tdlzhuf {
-	uint16_t r,
-					bufcnt,bufndx,bufpos,  // string buffer
+	uint16_t r = 0,
+					bufcnt = 0, bufndx = 0, bufpos = 0,  // string buffer
 				// the following to allow block reads from input in next_word()
-					ibufcnt,ibufndx; // input buffer counters
-	uint8_t  inbuf[BUFSZ];    // input buffer
+					ibufcnt = 0, ibufndx = 0; // input buffer counters
+	uint8_t  inbuf[BUFSZ]{};    // input buffer
 };
 
 
@@ -808,7 +808,7 @@ const char *td0_format::extensions() const
 	return "td0";
 }
 
-int td0_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int td0_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	size_t actual;
 	uint8_t h[7];
@@ -816,12 +816,12 @@ int td0_format::identify(util::random_read &io, uint32_t form_factor, const std:
 	io.read_at(0, h, 7, actual);
 	if(((h[0] == 'T') && (h[1] == 'D')) || ((h[0] == 't') && (h[1] == 'd')))
 	{
-		return 100;
+		return FIFID_SIGN;
 	}
 	return 0;
 }
 
-bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	size_t actual;
 	int track_count = 0;
@@ -1023,14 +1023,9 @@ bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 }
 
 
-bool td0_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
-{
-	return false;
-}
-
 bool td0_format::supports_save() const
 {
 	return false;
 }
 
-const floppy_format_type FLOPPY_TD0_FORMAT = &floppy_image_format_creator<td0_format>;
+const td0_format FLOPPY_TD0_FORMAT;

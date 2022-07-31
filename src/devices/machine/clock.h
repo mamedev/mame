@@ -26,13 +26,12 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override { output(); }
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_clock_changed() override { reinit(); }
 
-private:
-	static constexpr device_timer_id TID_CLOCK_INIT = 0;
-	static constexpr device_timer_id TID_CLOCK_TICK = 1;
+	TIMER_CALLBACK_MEMBER(clock_init);
+	TIMER_CALLBACK_MEMBER(clock_tick);
 
+private:
 	void reinit();
 	void output();
 

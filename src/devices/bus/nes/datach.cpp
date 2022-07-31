@@ -231,8 +231,8 @@ nes_datach_device::nes_datach_device(const machine_config &mconfig, const char *
 void nes_datach_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
-	serial_timer = timer_alloc(TIMER_SERIAL);
+	irq_timer = timer_alloc(FUNC(nes_datach_device::irq_timer_tick), this);
+	serial_timer = timer_alloc(FUNC(nes_datach_device::serial_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 	serial_timer->adjust(attotime::zero, 0, clocks_to_attotime(1000));
 
@@ -243,7 +243,6 @@ void nes_datach_device::device_start()
 
 void nes_datach_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
@@ -378,32 +377,34 @@ void nes_datach_device::device_add_mconfig(machine_config &config)
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  irq_timer_tick - handle IRQ timer
 //-------------------------------------------------
 
-void nes_datach_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_datach_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
+	if (m_irq_enable)
 	{
-		if (m_irq_enable)
-		{
-			// 16bit counter, IRQ fired when the counter goes from 1 to 0
-			// after firing, the counter is *not* reloaded, but next clock
-			// counter wraps around from 0 to 0xffff
-			if (!m_irq_count)
-				m_irq_count = 0xffff;
-			else
-				m_irq_count--;
+		// 16bit counter, IRQ fired when the counter goes from 1 to 0
+		// after firing, the counter is *not* reloaded, but next clock
+		// counter wraps around from 0 to 0xffff
+		if (!m_irq_count)
+			m_irq_count = 0xffff;
+		else
+			m_irq_count--;
 
-			if (!m_irq_count)
-			{
-				set_irq_line(ASSERT_LINE);
-				m_irq_enable = 0;
-			}
+		if (!m_irq_count)
+		{
+			set_irq_line(ASSERT_LINE);
+			m_irq_enable = 0;
 		}
 	}
-	if (id == TIMER_SERIAL)
-	{
-		m_datach_latch = (m_reader->read_pixel() << 3);
-	}
+}
+
+//-------------------------------------------------
+//  serial_tick - tick in a serial bit
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(nes_datach_device::serial_tick)
+{
+	m_datach_latch = (m_reader->read_pixel() << 3);
 }

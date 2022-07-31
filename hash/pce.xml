@@ -1871,7 +1871,7 @@ license:CC0
 	</software>
 
 	<software name="proyak89">
-		<description>Kore Ga Pro Yakyuu '89</description>
+		<description>Kore ga Pro Yakyuu '89</description>
 		<year>1989</year>
 		<publisher>Intec</publisher>
 		<info name="serial" value="IG89002"/>
@@ -1885,7 +1885,7 @@ license:CC0
 	</software>
 
 	<software name="proyak90">
-		<description>Kore Ga Pro Yakyuu '90</description>
+		<description>Kore ga Pro Yakyuu '90</description>
 		<year>1990</year>
 		<publisher>Intec</publisher>
 		<info name="serial" value="IG90001"/>
@@ -2125,7 +2125,7 @@ license:CC0
 	</software>
 
 	<software name="wataru">
-		<description>Majin Eiyuu Den Wataru</description>
+		<description>Mashin Eiyuuden Wataru</description>
 		<year>1988</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="HC63012"/>
@@ -2765,7 +2765,7 @@ license:CC0
 	</software>
 
 	<software name="parodius">
-		<description>Parodius da! - Shinwa Kara Owarai He</description>
+		<description>Parodius Da! - Shinwa kara Owarai e</description>
 		<year>1992</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="KM92003"/>

@@ -89,7 +89,7 @@ void s_smp_device::device_start()
 	space(AS_DATA).specific(m_data);
 	space(AS_DATA).cache(m_dcache);
 
-	m_tick_timer = timer_alloc(TIMER_TICK_ID);
+	m_tick_timer = timer_alloc(FUNC(s_smp_device::update_timers), this);
 
 	save_item(NAME(m_timer_enabled));
 	save_item(NAME(m_subcounter));
@@ -179,11 +179,8 @@ inline void s_smp_device::update_timer_tick(u8 which)
 	}
 }
 
-void s_smp_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(s_smp_device::update_timers)
 {
-	if (id != TIMER_TICK_ID)
-		throw emu_fatalerror("Unknown id in s_smp_device::device_timer");
-
 	for (int ch = 0; ch < 3; ch++)
 		update_timer_tick(ch);
 }

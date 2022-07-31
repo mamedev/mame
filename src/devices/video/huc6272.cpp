@@ -453,8 +453,9 @@ void huc6272_device::write(offs_t offset, uint32_t data)
 					m_adpcm.playing[i] = BIT(data, i);
 					if (!m_adpcm.playing[i])
 					{
-						m_adpcm.input[i] = -1;
+						m_adpcm.input[i] = 0;
 						m_adpcm.pos[i] = 0;
+						m_adpcm.nibble[i] = 32;
 					}
 					else
 					{
@@ -504,6 +505,8 @@ void huc6272_device::write(offs_t offset, uint32_t data)
 	}
 }
 
+// TODO: clearly written in blind faith
+// (interrupt_update fns are untested by the BIOS main menu)
 uint8_t huc6272_device::adpcm_update(int chan)
 {
 	if (!m_adpcm.playing[chan])
@@ -513,7 +516,11 @@ uint8_t huc6272_device::adpcm_update(int chan)
 	m_adpcm.pos[chan]++;
 	if (m_adpcm.pos[chan] >= rate)
 	{
-		if (m_adpcm.input[chan] == -1)
+		m_adpcm.nibble[chan] += 4;
+		if (m_adpcm.nibble[chan] >= 32)
+			m_adpcm.nibble[chan] = 0;
+
+		if (m_adpcm.nibble[chan] == 0)
 		{
 			m_adpcm.input[chan] = read_dword(((m_page_setting & 0x1000) << 6) | m_adpcm.addr[chan]);
 			m_adpcm.addr[chan] = (m_adpcm.addr[chan] & 0x20000) | ((m_adpcm.addr[chan] + 1) & 0x1ffff);
@@ -535,7 +542,7 @@ uint8_t huc6272_device::adpcm_update(int chan)
 					interrupt_update();
 				}
 
-				if (BIT(m_adpcm.control[chan],0)) // Ring Buffer
+				if (BIT(m_adpcm.control[chan], 0)) // Ring Buffer
 				{
 					m_adpcm.addr[chan] = m_adpcm.start[chan];
 				}
@@ -545,14 +552,9 @@ uint8_t huc6272_device::adpcm_update(int chan)
 					return 0;
 				}
 			}
-			m_adpcm.nibble[chan] = 0;
+			//m_adpcm.nibble[chan] = 0;
 		}
-		else
-		{
-			m_adpcm.nibble[chan] += 4;
-			if (m_adpcm.nibble[chan] >= 28)
-				m_adpcm.input[chan] = -1;
-		}
+
 		m_adpcm.pos[chan] = 0;
 	}
 

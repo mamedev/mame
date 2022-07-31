@@ -94,7 +94,6 @@ protected:
 	virtual void device_post_load() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual space_config_vector memory_space_config() const override;
@@ -116,7 +115,6 @@ protected:
 	virtual void select_sprites(int line);
 	virtual void sprite_collision(int line, int sprite_col_x);
 	virtual void sprite_count_overflow(int line, int sprite_index);
-	virtual void draw_scanline(int pixel_offset_x, int pixel_plot_y, int line);
 	virtual void blit_scanline(int *line_buffer, int *priority_selected, int pixel_offset_x, int pixel_plot_y, int line);
 	virtual void draw_leftmost_pixels_mode4(int *line_buffer, int *priority_selected, int fine_x_scroll, int palette_selected, int tile_line);
 	virtual u16 name_row_mode4(u16 row);
@@ -124,7 +122,14 @@ protected:
 	virtual u16 tile2_select_mode4(u16 tile_number);
 	virtual u8 sprite_attribute_extra_offset_mode4(u8 offset);
 	virtual u8 sprite_tile_select_mode4(u8 tile_number);
-	void process_line_timer();
+	TIMER_CALLBACK_MEMBER(process_line_timer);
+	TIMER_CALLBACK_MEMBER(eol_flag_check);
+	TIMER_CALLBACK_MEMBER(draw_lborder);
+	TIMER_CALLBACK_MEMBER(draw_rborder);
+	TIMER_CALLBACK_MEMBER(trigger_hint);
+	TIMER_CALLBACK_MEMBER(trigger_vint);
+	TIMER_CALLBACK_MEMBER(update_nmi);
+	TIMER_CALLBACK_MEMBER(draw_scanline);
 	void draw_scanline_mode4(int *line_buffer, int *priority_selected, int line);
 	void draw_sprites_mode4(int *line_buffer, int *priority_selected, int line);
 	void draw_sprites_tms9918_mode(int *line_buffer, int line);
@@ -197,16 +202,6 @@ protected:
 	emu_timer        *m_pending_flags_timer;
 
 	const address_space_config  m_space_config;
-
-	/* Timers */
-	static constexpr device_timer_id TIMER_LINE = 0;
-	static constexpr device_timer_id TIMER_DRAW = 1;
-	static constexpr device_timer_id TIMER_LBORDER = 2;
-	static constexpr device_timer_id TIMER_RBORDER = 3;
-	static constexpr device_timer_id TIMER_HINT = 4;
-	static constexpr device_timer_id TIMER_VINT = 5;
-	static constexpr device_timer_id TIMER_NMI = 6;
-	static constexpr device_timer_id TIMER_FLAGS = 7;
 
 	required_device<palette_device> m_palette_lut;
 	required_device<sn76496_base_device> m_snsnd;

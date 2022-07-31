@@ -13,7 +13,6 @@
 #include "emu.h"
 #include "ccpu.h"
 #include "ccpudasm.h"
-#include "debugger.h"
 
 
 DEFINE_DEVICE_TYPE(CCPU, ccpu_cpu_device, "ccpu", "Cinematronics CPU")

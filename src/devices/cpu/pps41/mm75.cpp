@@ -10,7 +10,7 @@
 #include "mm75.h"
 
 
-DEFINE_DEVICE_TYPE(MM75, mm75_device, "mm75", "Rockwell MM75") // stripped-down MM76 (no serial i/o, less pins)
+DEFINE_DEVICE_TYPE(MM75, mm75_device, "mm75", "Rockwell MM75 A7500") // stripped-down MM76 (no serial i/o, less pins)
 
 
 // constructor

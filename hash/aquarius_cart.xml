@@ -27,7 +27,7 @@ X-6203 : Chess
 	<software name="addtot">
 		<description>Advanced Dungeons and Dragons: Treasure of Tarmin</description>
 		<year>1983</year>
-		<publisher>Mattel</publisher>
+		<publisher>Mattel Electronics</publisher>
 		<info name="serial" value="4023" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
@@ -64,7 +64,7 @@ X-6203 : Chess
 	<software name="astrsmah">
 		<description>Astrosmash</description>
 		<year>1983</year>
-		<publisher>Mattel</publisher>
+		<publisher>Mattel Electronics</publisher>
 		<info name="serial" value="4003" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
@@ -76,7 +76,7 @@ X-6203 : Chess
 	<software name="biorhtms">
 		<description>Biorhythms</description>
 		<year>1983</year>
-		<publisher>Mattel</publisher>
+		<publisher>Mattel Electronics</publisher>
 		<info name="serial" value="4673" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
@@ -145,10 +145,46 @@ X-6203 : Chess
 		</part>
 	</software>
 
+	<software name="bombc">
+		<description>Bomb Catcher II (16K)</description>
+		<year>2021</year>
+		<publisher>Cronosoft</publisher>
+		<info name="author" value="Roy Templeman"/>
+		<part name="cart" interface="aquarius_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="bombc16.rom" size="0x4000" crc="67ee7d94" sha1="fe8965ced847bfacd9420204604bf585ff3f03fc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bombc8" cloneof="bombc">
+		<description>Bomb Catcher II (8K)</description>
+		<year>2021</year>
+		<publisher>Cronosoft</publisher>
+		<info name="author" value="Roy Templeman"/>
+		<part name="cart" interface="aquarius_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="bombc8k.rom" size="0x4000" crc="056c2848" sha1="858aa69f32900e1ffcf4449997de40a06a5cde7c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bombc4" cloneof="bombc">
+		<description>Bomb Catcher II (4K)</description>
+		<year>2021</year>
+		<publisher>Cronosoft</publisher>
+		<info name="author" value="Roy Templeman"/>
+		<part name="cart" interface="aquarius_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="bombc4k.rom" size="0x4000" crc="e865cfbd" sha1="6c9cb93e3904cb0cf02860a58baaa387622189fa"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="btime">
 		<description>Burgertime</description>
 		<year>1983</year>
-		<publisher>Mattel</publisher>
+		<publisher>Mattel Electronics</publisher>
 		<info name="serial" value="4653" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
@@ -160,7 +196,7 @@ X-6203 : Chess
 	<software name="chess">
 		<description>Chess</description>
 		<year>1983</year>
-		<publisher>Mattel</publisher>
+		<publisher>Mattel Electronics</publisher>
 		<info name="serial" value="4594" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
@@ -184,7 +220,7 @@ X-6203 : Chess
 	<software name="fileform">
 		<description>FileForm</description>
 		<year>1983</year>
-		<publisher>Mattel</publisher>
+		<publisher>Mattel Electronics</publisher>
 		<info name="serial" value="4177" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
@@ -196,7 +232,7 @@ X-6203 : Chess
 	<software name="finform">
 		<description>FinForm</description>
 		<year>1983</year>
-		<publisher>Mattel</publisher>
+		<publisher>Mattel Electronics</publisher>
 		<info name="serial" value="4178" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
@@ -208,7 +244,7 @@ X-6203 : Chess
 	<software name="logo">
 		<description>LOGO</description>
 		<year>1983</year>
-		<publisher>Mattel</publisher>
+		<publisher>Mattel Electronics</publisher>
 		<info name="serial" value="4391" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
@@ -220,7 +256,7 @@ X-6203 : Chess
 	<software name="demo">
 		<description>Demonstration</description>
 		<year>1983</year>
-		<publisher>Mattel</publisher>
+		<publisher>Mattel Electronics</publisher>
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
 				<rom name="demo.bin" size="0x4000" crc="bb922570" sha1="049efcd7771c3108e4ba6ed60434f8237fb60307"/>
@@ -231,7 +267,7 @@ X-6203 : Chess
 	<software name="melchase">
 		<description>Melody Chase</description>
 		<year>1983</year>
-		<publisher>Mattel</publisher>
+		<publisher>Mattel Electronics</publisher>
 		<info name="serial" value="4652" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
@@ -254,7 +290,7 @@ X-6203 : Chess
 	<software name="nstalker">
 		<description>Night Stalker</description>
 		<year>1983</year>
-		<publisher>Mattel</publisher>
+		<publisher>Mattel Electronics</publisher>
 		<info name="serial" value="4595" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
@@ -266,7 +302,7 @@ X-6203 : Chess
 	<software name="shark">
 		<description>Shark! (prototype)</description>
 		<year>1983</year>
-		<publisher>Mattel</publisher>
+		<publisher>Mattel Electronics</publisher>
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
 				<rom name="shark.bin" size="0x4000" crc="ee805a79" sha1="ddcc085699c3862ad41155e7f1a7b72396129cc5"/>
@@ -277,7 +313,7 @@ X-6203 : Chess
 	<software name="snafu">
 		<description>Snafu</description>
 		<year>1983</year>
-		<publisher>Mattel</publisher>
+		<publisher>Mattel Electronics</publisher>
 		<info name="serial" value="4028" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
@@ -289,7 +325,7 @@ X-6203 : Chess
 	<software name="speller">
 		<description>Space Speller</description>
 		<year>1983</year>
-		<publisher>Mattel</publisher>
+		<publisher>Mattel Electronics</publisher>
 		<info name="serial" value="4682" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
@@ -301,7 +337,7 @@ X-6203 : Chess
 	<software name="tron">
 		<description>TRON Deadly Discs</description>
 		<year>1983</year>
-		<publisher>Mattel</publisher>
+		<publisher>Mattel Electronics</publisher>
 		<info name="serial" value="4024" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
@@ -313,7 +349,7 @@ X-6203 : Chess
 	<software name="utopia">
 		<description>Utopia</description>
 		<year>1983</year>
-		<publisher>Mattel</publisher>
+		<publisher>Mattel Electronics</publisher>
 		<info name="serial" value="4596" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
@@ -336,7 +372,7 @@ X-6203 : Chess
 	<software name="zeroin">
 		<description>Zero-In</description>
 		<year>1983</year>
-		<publisher>Mattel</publisher>
+		<publisher>Mattel Electronics</publisher>
 		<info name="serial" value="4895C" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x2000">
@@ -353,7 +389,7 @@ X-6203 : Chess
 		<publisher>Ron Koenig</publisher>
 		<part name="cart" interface="aquarius_cart">
 			<!--<feature name="slot" value="c1541" />-->
-			<dataarea name="rom" size="0x8000">
+			<dataarea name="rom" size="0x4000">
 				<rom name="1541os.bin" size="0x4000" crc="6cd611e8" sha1="b2c3eabaadf21b463653f0e2bcf7b70c4a13fc39"/>
 			</dataarea>
 		</part>
@@ -362,7 +398,7 @@ X-6203 : Chess
 	<software name="modem" supported="no">
 		<description>Modem Terminal Software</description>
 		<year>1983</year>
-		<publisher>Mattel</publisher>
+		<publisher>Mattel Electronics</publisher>
 		<info name="usage" value="Modem required" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">

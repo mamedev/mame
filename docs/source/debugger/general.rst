@@ -41,6 +41,8 @@ General Debugger Commands
     save a screen snapshot
 :ref:`debugger-command-source`
     read commands from file and executes them one by one
+:ref:`debugger-command-time`
+    prints the current machine time to the console
 :ref:`debugger-command-quit`
     exit the debugger and end the emulation session
 
@@ -540,6 +542,21 @@ Examples:
 
 ``source break_and_trace.cmd``
     Reads and executes debugger commands from **break_and_trace.cmd**.
+
+Back to :ref:`debugger-general-list`
+
+
+.. _debugger-command-time:
+
+time
+----
+
+Prints the total elapsed emulated time to the debugger console.
+
+Examples:
+
+``time``
+    Prints the elapsed emulated time.
 
 Back to :ref:`debugger-general-list`
 

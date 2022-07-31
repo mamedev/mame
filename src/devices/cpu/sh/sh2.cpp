@@ -96,7 +96,6 @@
 #include "sh2.h"
 #include "sh2comn.h"
 #include "sh_dasm.h"
-#include "debugger.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -515,15 +514,15 @@ void sh2_device::device_start()
 {
 	sh_common_execution::device_start();
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sh2_device::sh2_timer_callback), this));
+	m_timer = timer_alloc(FUNC(sh2_device::sh2_timer_callback), this);
 	m_timer->adjust(attotime::never);
-	m_wdtimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sh2_device::sh2_wdtimer_callback), this));
+	m_wdtimer = timer_alloc(FUNC(sh2_device::sh2_wdtimer_callback), this);
 	m_wdtimer->adjust(attotime::never);
 
-	m_dma_current_active_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sh2_device::sh2_dma_current_active_callback), this));
+	m_dma_current_active_timer[0] = timer_alloc(FUNC(sh2_device::sh2_dma_current_active_callback), this);
 	m_dma_current_active_timer[0]->adjust(attotime::never);
 
-	m_dma_current_active_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sh2_device::sh2_dma_current_active_callback), this));
+	m_dma_current_active_timer[1] = timer_alloc(FUNC(sh2_device::sh2_dma_current_active_callback), this);
 	m_dma_current_active_timer[1]->adjust(attotime::never);
 
 	/* resolve callbacks */
@@ -861,7 +860,6 @@ void sh2_device::sh2_exception(const char *message, int irqline)
 #include "sh2.h"
 #include "sh2comn.h"
 #include "cpu/drcumlsh.h"
-#include "debugger.h"
 
 
 const opcode_desc* sh2_device::get_desclist(offs_t pc)

@@ -114,8 +114,8 @@ void sensorboard_device::device_start()
 		m_out_count.resolve();
 	}
 
-	m_undotimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sensorboard_device::undo_tick),this));
-	m_sensortimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sensorboard_device::sensor_off),this));
+	m_undotimer = timer_alloc(FUNC(sensorboard_device::undo_tick), this);
+	m_sensortimer = timer_alloc(FUNC(sensorboard_device::sensor_off), this);
 	cancel_sensor();
 
 	u16 wmask = ~((1 << m_width) - 1);
@@ -319,6 +319,9 @@ u16 sensorboard_device::read_rank(u8 y, bool reverse)
 
 void sensorboard_device::refresh()
 {
+	if (machine().phase() < machine_phase::RESET)
+		return;
+
 	bool custom_out = !m_custom_output_cb.isnull();
 
 	// output spawn icons

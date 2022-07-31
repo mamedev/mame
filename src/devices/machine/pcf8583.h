@@ -88,7 +88,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_rtc_interface overrides
 	virtual bool rtc_feature_y2k() const override { return true; }
@@ -99,6 +98,8 @@ protected:
 	virtual void nvram_default() override;
 	virtual bool nvram_read(util::read_stream &file) override;
 	virtual bool nvram_write(util::write_stream &file) override;
+
+	TIMER_CALLBACK_MEMBER(clock_tick);
 
 private:
 	static constexpr uint8_t PCF8583_SLAVE_ADDRESS = 0xa0;
@@ -127,8 +128,6 @@ private:
 	{
 		CONTROL_STOP_BIT = 7
 	};
-
-	static const device_timer_id TIMER_TICK = 0;
 
 	// get/set date
 	uint8_t get_date_year()             { return (m_data[REG_YEAR_DATE] >> 6) & 3; }
@@ -166,7 +165,7 @@ private:
 	bool m_irq;
 	emu_timer * m_timer;
 
-	enum { STATE_IDLE, STATE_DEVSEL, STATE_REGISTER, STATE_DATAIN, STATE_DATAOUT };
+	enum { STATE_IDLE, STATE_DEVSEL, STATE_REGISTER, STATE_DATAIN, STATE_DATAOUT, STATE_READSELACK };
 };
 
 // device type definition

@@ -118,7 +118,7 @@ void tms0970_cpu_device::write_o_output(u8 index)
 {
 	m_o_index = index;
 	m_o = m_spla->read(index);
-	m_write_o(0, m_o & m_o_mask, 0xffff);
+	m_write_o(m_o & m_o_mask);
 }
 
 
@@ -135,5 +135,5 @@ void tms0970_cpu_device::op_tdo()
 {
 	// TDO: transfer digits to output
 	write_o_output(m_a & 0x7);
-	m_write_r(0, m_r & m_r_mask, 0xffff);
+	m_write_r(m_r & m_r_mask);
 }

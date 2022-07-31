@@ -17,6 +17,13 @@
 
 namespace plib {
 
+	PERRMSGV(MF_FUNCTION_UNKNOWN_TOKEN,          2, "pfunction: unknown/misformatted token <{1}> in <{2}>")
+	PERRMSGV(MF_FUNCTION_STACK_UNDERFLOW,        2, "pfunction: stack underflow on token <{1}> in <{2}>")
+	PERRMSGV(MF_FUNCTION_STACK_OVERFLOW,         2, "pfunction: stack overflow on token <{1}> in <{2}>")
+	PERRMSGV(MF_FUNCTION_PARENTHESIS_INEQUALITY, 2, "pfunction: parenthesis inequality on token <{1}> in <{2}>")
+	PERRMSGV(MF_FUNCTION_STACK_UNEQUAL_ONE,      2, "pfunction: stack count {1} different to one on <{2}>")
+	PERRMSGV(MF_FUNCTION_STACK_UNDERFLOW_INFIX,  1, "pfunction: stack underflow during infix parsing of: <{1}>")
+
 	static constexpr const std::size_t MAX_STACK = 32;
 
 	struct pcmd_t
@@ -71,18 +78,18 @@ namespace plib {
 			{ "G", narrow_cast<F>( 1e9) }, // NOLINT: Giga
 			{ "M", narrow_cast<F>( 1e6) }, // NOLINT: Mega
 			{ "k", narrow_cast<F>( 1e3) }, // NOLINT: Kilo
-			{ "h", narrow_cast<F>( 1e2) }, // NOLINT: Hekto
-			//{ "da", narrow_cast<F>(1e1) }, // NOLINT: Deka
-			{ "d", narrow_cast<F>(1e-1) }, // NOLINT: Dezi
-			{ "c", narrow_cast<F>(1e-2) }, // NOLINT: Zenti
+			{ "h", narrow_cast<F>( 1e2) }, // NOLINT: Hecto
+			//{ "da", narrow_cast<F>(1e1) }, // NOLINT: Deca
+			{ "d", narrow_cast<F>(1e-1) }, // NOLINT: Deci
+			{ "c", narrow_cast<F>(1e-2) }, // NOLINT: Centi
 			{ "m", narrow_cast<F>(1e-3) }, // NOLINT: Milli
-			{ "μ", narrow_cast<F>(1e-6) }, // NOLINT: Mikro
+			{ "μ", narrow_cast<F>(1e-6) }, // NOLINT: Micro
 			{ "n", narrow_cast<F>(1e-9) }, // NOLINT: Nano
-			{ "p", narrow_cast<F>(1e-12) }, // NOLINT: Piko
+			{ "p", narrow_cast<F>(1e-12) }, // NOLINT: Pico
 			{ "f", narrow_cast<F>(1e-15) }, // NOLINT: Femto
 			{ "a", narrow_cast<F>(1e-18) }, // NOLINT: Atto
 			{ "z", narrow_cast<F>(1e-21) }, // NOLINT: Zepto
-			{ "y", narrow_cast<F>(1e-24) }, // NOLINT: Yokto
+			{ "y", narrow_cast<F>(1e-24) }, // NOLINT: Yocto
 		};
 		return units_si_stat;
 	}
@@ -141,20 +148,20 @@ namespace plib {
 					else
 						rc = rpn_inst(plib::pstonum_ne<NT>(plib::left(cmd, cmd.length()-1), err) * r->second);
 					if (err)
-						throw pexception(plib::pfmt("pfunction: unknown/misformatted token <{1}> in <{2}>")(cmd)(expr));
+						throw pexception(MF_FUNCTION_UNKNOWN_TOKEN(cmd, expr));
 					stk += 1;
 				}
 			}
 			if (stk < 1)
-				throw pexception(plib::pfmt("pfunction: stack underflow on token <{1}> in <{2}>")(cmd)(expr));
+				throw pexception(MF_FUNCTION_STACK_UNDERFLOW(cmd, expr));
 			if (stk >= narrow_cast<int>(MAX_STACK))
-				throw pexception(plib::pfmt("pfunction: stack overflow on token <{1}> in <{2}>")(cmd)(expr));
+				throw pexception(MF_FUNCTION_STACK_OVERFLOW(cmd, expr));
 			if (rc.cmd() == LP || rc.cmd() == RP)
-				throw pexception(plib::pfmt("pfunction: parenthesis inequality on token <{1}> in <{2}>")(cmd)(expr));
+				throw pexception(MF_FUNCTION_PARENTHESIS_INEQUALITY(cmd, expr));
 			m_precompiled.push_back(rc);
 		}
 		if (stk != 1)
-			throw pexception(plib::pfmt("pfunction: stack count {1} different to one on <{2}>")(stk, expr));
+			throw pexception(MF_FUNCTION_STACK_UNEQUAL_ONE(stk, expr));
 		compress();
 	}
 
@@ -187,7 +194,7 @@ namespace plib {
 	static pstring pop_check(std::stack<pstring> &stk, const pstring &expr) noexcept(false)
 	{
 		if (stk.empty())
-			throw pexception(plib::pfmt("pfunction: stack underflow during infix parsing of: <{1}>")(expr));
+			throw pexception(MF_FUNCTION_STACK_UNDERFLOW_INFIX(expr));
 		pstring res = stk.top();
 		stk.pop();
 		return res;

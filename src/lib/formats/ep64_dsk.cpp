@@ -38,4 +38,4 @@ const ep64_format::format ep64_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_EP64_FORMAT = &floppy_image_format_creator<ep64_format>;
+const ep64_format FLOPPY_EP64_FORMAT;

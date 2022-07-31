@@ -564,11 +564,17 @@ offs_t cr16b_disassembler::disassemble(std::ostream &stream, offs_t pc, const cr
 		if ((opcode & 0x000e) == 0x000e && (opcode & 0x01e0) != 0x01e0)
 		{
 			if ((opcode & 0x01e0) == 0x01c0)
+			{
 				stream << "br      ";
+				format_pc_disp17(stream, pc, u32(opcode & 0x0010) << 12 | opcodes.r16(pc + 2));
+				return 4 | SUPPORTED;
+			}
 			else
+			{
 				util::stream_format(stream, "b%s     ", s_cc[(opcode & 0x01e0) >> 5]);
-			format_pc_disp17(stream, pc, u32(opcode & 0x0010) << 12 | opcodes.r16(pc + 2));
-			return 4 | SUPPORTED;
+				format_pc_disp17(stream, pc, u32(opcode & 0x0010) << 12 | opcodes.r16(pc + 2));
+				return 4 | STEP_COND | SUPPORTED;
+			}
 		}
 		else
 		{
@@ -579,15 +585,18 @@ offs_t cr16b_disassembler::disassemble(std::ostream &stream, offs_t pc, const cr
 	case 0x1401: case 0x3401:
 		// Compare and branch group
 		if (m_arch == cr16_arch::CR16A)
+		{
 			stream << "res";
+			return 2 | SUPPORTED;
+		}
 		else
 		{
 			util::stream_format(stream, "b%s%c%c   ", BIT(opcode, 7) ? "ne" : "eq", BIT(opcode, 6) ? '1' : '0', BIT(opcode, 13) ? 'w' : 'b');
 			format_reg(stream, (opcode & 0x0120) >> 5);
 			stream << ", ";
 			format_pc_disp5(stream, pc, opcode & 0x001e);
+			return 2 | STEP_COND | SUPPORTED;
 		}
-		return 2 | SUPPORTED;
 
 	case 0x1600:
 		// Jump and link to large address
@@ -610,7 +619,7 @@ offs_t cr16b_disassembler::disassemble(std::ostream &stream, offs_t pc, const cr
 			else
 				util::stream_format(stream, "j%s     ", s_cc[(opcode & 0x01e0) >> 5]);
 			format_rpair(stream, (opcode & 0x001e) >> 1);
-			return 2 | (opcode == 0x17db ? STEP_OUT : 0) | SUPPORTED;
+			return 2 | ((opcode & 0x001e) == 0x001a ? STEP_OUT : 0) | ((opcode & 0x01e0) != 0x01c0 ? STEP_COND : 0) | SUPPORTED;
 		}
 		else
 		{
@@ -728,14 +737,23 @@ offs_t cr16b_disassembler::disassemble(std::ostream &stream, offs_t pc, const cr
 		if ((opcode & 0x01e0) != 0x01e0)
 		{
 			if ((opcode & 0x01e0) == 0x01c0)
+			{
 				stream << "br      ";
+				format_pc_disp9(stream, pc, (opcode & 0x1e00) >> 4 | (opcode & 0x001e));
+				return 2 | SUPPORTED;
+			}
 			else
+			{
 				util::stream_format(stream, "b%s     ", s_cc[(opcode & 0x01e0) >> 5]);
-			format_pc_disp9(stream, pc, (opcode & 0x1e00) >> 4 | (opcode & 0x001e));
+				format_pc_disp9(stream, pc, (opcode & 0x1e00) >> 4 | (opcode & 0x001e));
+				return 2 | STEP_COND | SUPPORTED;
+			}
 		}
 		else
+		{
 			stream << "res";
-		return 2 | SUPPORTED;
+			return 2 | SUPPORTED;
+		}
 
 	case 0x4001: case 0x6001:
 		util::stream_format(stream, "add%c    ", BIT(opcode, 13) ? 'w' : 'b');
@@ -808,7 +826,7 @@ offs_t cr16b_disassembler::disassemble(std::ostream &stream, offs_t pc, const cr
 			else
 				util::stream_format(stream, "j%s     ", s_cc[(opcode & 0x01e0) >> 5]);
 			format_reg(stream, (opcode & 0x001e) >> 1);
-			return 2 | (opcode == 0x55dd ? STEP_OUT : 0) | SUPPORTED;
+			return 2 | ((opcode & 0x001e) == 0x001c ? STEP_OUT : 0) | ((opcode & 0x01e0) != 0x01c0 ? STEP_COND : 0) | SUPPORTED;
 		}
 		else
 		{
@@ -941,11 +959,17 @@ offs_t cr16b_disassembler::disassemble(std::ostream &stream, offs_t pc, const cr
 		if ((opcode & 0x01e0) != 0x01e0 && m_arch != cr16_arch::CR16A)
 		{
 			if ((opcode & 0x01e0) == 0x01c0)
+			{
 				stream << "br      ";
+				format_pc_disp21(stream, pc, u32(opcode & 0x000e) << 16 | u32(opcode & 0x0010) << 12 | opcodes.r16(pc + 2));
+				return 4 | SUPPORTED;
+			}
 			else
+			{
 				util::stream_format(stream, "b%s     ", s_cc[(opcode & 0x01e0) >> 5]);
-			format_pc_disp21(stream, pc, u32(opcode & 0x000e) << 16 | u32(opcode & 0x0010) << 12 | opcodes.r16(pc + 2));
-			return 4 | SUPPORTED;
+				format_pc_disp21(stream, pc, u32(opcode & 0x000e) << 16 | u32(opcode & 0x0010) << 12 | opcodes.r16(pc + 2));
+				return 4 | STEP_COND | SUPPORTED;
+			}
 		}
 		else
 		{

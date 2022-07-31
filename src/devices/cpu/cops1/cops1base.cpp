@@ -10,9 +10,9 @@ It was only briefly on the market and was quickly superceded by the
 2nd "COPS": the COP400 series.
 
 Short list of MCU types:
-- MM5781+MM5782: 2KB ROM, 160 nybbles RAM
-- MM5799: 1.5KB ROM, 96 nybbles RAM
-- MM57140: 640 bytes ROM(10 bytes inaccessible?), 55 nybbles RAM
+- MM5781+MM5782: 2KB ROM, 160 nibbles RAM
+- MM5799: 1.5KB ROM, 96 nibbles RAM
+- MM57140: 640 bytes ROM(10 bytes inaccessible?), 55 nibbles RAM
 
 Note that not every "MM57" chip is a generic MCU, there are plenty other chips,
 mostly for calculators. For example MM5780 for the Quiz Kid, the decap of that
@@ -32,8 +32,6 @@ TODO:
 
 #include "emu.h"
 #include "cops1base.h"
-
-#include "debugger.h"
 
 
 cops1_base_device::cops1_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
@@ -59,12 +57,6 @@ cops1_base_device::cops1_base_device(const machine_config &mconfig, device_type 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-
-enum
-{
-	COPS1_PC=1, COPS1_SA, COPS1_SB,
-	COPS1_A, COPS1_C, COPS1_H, COPS1_B, COPS1_F
-};
 
 void cops1_base_device::device_start()
 {
@@ -125,15 +117,16 @@ void cops1_base_device::device_start()
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%03X").noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_prev_pc).formatstr("%03X").noshow();
 
-	state_add(COPS1_PC, "PC", m_pc).formatstr("%03X");
-	state_add(COPS1_SA, "SA", m_sa).formatstr("%03X");
-	state_add(COPS1_SB, "SB", m_sb).formatstr("%03X");
+	m_state_count = 0;
+	state_add(++m_state_count, "PC", m_pc).formatstr("%03X"); // 1
+	state_add(++m_state_count, "SA", m_sa).formatstr("%03X"); // 2
+	state_add(++m_state_count, "SB", m_sb).formatstr("%03X"); // 3
 
-	state_add(COPS1_A, "A", m_a).formatstr("%01X");
-	state_add(COPS1_C, "C", m_c).formatstr("%01X");
-	state_add(COPS1_H, "H", m_h).formatstr("%01X");
-	state_add(COPS1_B, "B", m_b).formatstr("%02X");
-	state_add(COPS1_F, "F", m_f).formatstr("%01X");
+	state_add(++m_state_count, "A", m_a).formatstr("%01X"); // 4
+	state_add(++m_state_count, "C", m_c).formatstr("%01X"); // 5
+	state_add(++m_state_count, "H", m_h).formatstr("%01X"); // 6
+	state_add(++m_state_count, "B", m_b).formatstr("%02X"); // 7
+	state_add(++m_state_count, "F", m_f).formatstr("%01X"); // 8
 
 	set_icountptr(m_icount);
 }

@@ -25,7 +25,9 @@ u8 sm500_device::get_digit()
 		0xb, 0x9, 0x7, 0xf, 0xd, 0xe, 0xe, 0xb, 0xf, 0xf, 0x4, 0x0, 0xd, 0xe, 0x4, 0x0
 	};
 
-	return lut_digits[m_cn << 4 | m_acc] | (~m_cn & m_mx);
+	// row select is from BP d3 (aka CN flag)
+	u8 sel = BIT(m_bp, 3);
+	return lut_digits[sel << 4 | m_acc] | (~sel & m_mx);
 }
 
 
@@ -109,13 +111,6 @@ void sm500_device::op_trs()
 
 
 // Data transfer instructions
-
-void sm500_device::op_atbp()
-{
-	// ATBP: same as SM510, and set CN with ACC3
-	sm510_base_device::op_atbp();
-	m_cn = m_acc >> 3 & 1;
-}
 
 void sm500_device::op_ptw()
 {
@@ -206,5 +201,5 @@ void sm500_device::op_smf()
 void sm500_device::op_comcn()
 {
 	// COMCN: complement CN flag
-	m_cn ^= 1;
+	m_bp ^= 8;
 }

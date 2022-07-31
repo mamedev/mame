@@ -44,6 +44,7 @@ protected:
 
 	virtual void clock_melody() override;
 	virtual void init_melody() override;
+	virtual u16 melody_step_mask() { return 0x7f; }
 };
 
 class sm512_device : public sm511_device

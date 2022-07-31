@@ -39,7 +39,7 @@ private:
 };
 #endif
 
-pfmt::rtype pfmt::setfmt(std::stringstream &strm, char32_t cfmt_spec)
+pfmt::rtype pfmt::set_format(std::stringstream &strm, char32_t char_format)
 {
 	pstring fmt;
 	pstring search("{");
@@ -92,18 +92,18 @@ pfmt::rtype pfmt::setfmt(std::stringstream &strm, char32_t cfmt_spec)
 		// a.b format here ...
 		char32_t pend(0);
 		int width(0);
-		if (!fmt.empty() && pstring("duxofge").find(static_cast<pstring::value_type>(cfmt_spec)) != pstring::npos)
+		if (!fmt.empty() && pstring("duxofge").find(static_cast<pstring::value_type>(char_format)) != pstring::npos)
 		{
 			//pend = static_cast<char32_t>(fmt.at(fmt.size() - 1));
 			pend = plib::right(fmt, 1).at(0);
 			if (pstring("duxofge").find(static_cast<pstring::value_type>(pend)) == pstring::npos)
-				pend = cfmt_spec;
+				pend = char_format;
 			else
 				fmt = plib::left(fmt, fmt.length() - 1);
 		}
 		else
 			// FIXME: Error
-			pend = cfmt_spec;
+			pend = char_format;
 
 		auto pdot(fmt.find('.'));
 

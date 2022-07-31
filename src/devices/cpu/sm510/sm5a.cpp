@@ -12,7 +12,6 @@
 #include "emu.h"
 #include "sm5a.h"
 #include "sm510d.h"
-#include "debugger.h"
 
 
 // MCU types
@@ -30,26 +29,22 @@ void sm5a_device::program_1_8k(address_map &map)
 
 void sm5a_device::data_5x13x4(address_map &map)
 {
-	map(0x00, 0x0b).ram();
-	map(0x0c, 0x0c).ram().mirror(0x03);
-	map(0x10, 0x1b).ram();
-	map(0x1c, 0x1c).ram().mirror(0x03);
-	map(0x20, 0x2b).ram();
-	map(0x2c, 0x2c).ram().mirror(0x03);
-	map(0x30, 0x3b).ram();
-	map(0x3c, 0x3c).ram().mirror(0x03);
-	map(0x40, 0x4b).ram().mirror(0x30);
-	map(0x4c, 0x4c).ram().mirror(0x33);
+	map(0x00, 0x7f).rw(FUNC(sm5a_device::mirror_r), FUNC(sm5a_device::mirror_w)); // d,e,f -> c
+	map(0x00, 0x0c).ram();
+	map(0x10, 0x1c).ram();
+	map(0x20, 0x2c).ram();
+	map(0x30, 0x3c).ram();
+	map(0x40, 0x4c).ram().mirror(0x30);
 }
 
 
 // device definitions
-sm5a_device::sm5a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	sm5a_device(mconfig, SM5A, tag, owner, clock, 1 /* stack levels */, 9 /* o group pins */, 11 /* prg width */, address_map_constructor(FUNC(sm5a_device::program_1_8k), this), 7 /* data width */, address_map_constructor(FUNC(sm5a_device::data_5x13x4), this))
-{ }
-
 sm5a_device::sm5a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_pins, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
 	sm500_device(mconfig, type, tag, owner, clock, stack_levels, o_pins, prgwidth, program, datawidth, data)
+{ }
+
+sm5a_device::sm5a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	sm5a_device(mconfig, SM5A, tag, owner, clock, 1 /* stack levels */, 9 /* o group pins */, 11 /* prg width */, address_map_constructor(FUNC(sm5a_device::program_1_8k), this), 7 /* data width */, address_map_constructor(FUNC(sm5a_device::data_5x13x4), this))
 { }
 
 sm5l_device::sm5l_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :

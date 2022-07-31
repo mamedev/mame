@@ -121,6 +121,8 @@ private:
 	void execute_go_exception(const std::vector<std::string> &params);
 	void execute_go_time(const std::vector<std::string> &params);
 	void execute_go_privilege(const std::vector<std::string> &params);
+	void execute_go_branch(bool sense, const std::vector<std::string> &params);
+	void execute_go_next_instruction(const std::vector<std::string> &params);
 	void execute_focus(const std::vector<std::string> &params);
 	void execute_ignore(const std::vector<std::string> &params);
 	void execute_observe(const std::vector<std::string> &params);
@@ -128,6 +130,7 @@ private:
 	void execute_resume(const std::vector<std::string> &params);
 	void execute_next(const std::vector<std::string> &params);
 	void execute_cpulist(const std::vector<std::string> &params);
+	void execute_time(const std::vector<std::string> &params);
 	void execute_comment_add(const std::vector<std::string> &params);
 	void execute_comment_del(const std::vector<std::string> &params);
 	void execute_comment_save(const std::vector<std::string> &params);

@@ -30,6 +30,7 @@ newoption {
 		{ "netbsd",        "NetBSD"                },
 		{ "netbsd-clang",  "NetBSD (clang compiler)"},
 		{ "openbsd",       "OpenBSD"                },
+		{ "openbsd-clang", "OpenBSD (clang compiler)"},
 		{ "osx",           "OSX (GCC compiler)"     },
 		{ "osx-clang",     "OSX (Clang compiler)"   },
 		{ "solaris",       "Solaris"                },
@@ -134,6 +135,10 @@ function toolchain(_buildDir, _subDir)
 
 		if "openbsd" == _OPTIONS["gcc"] then
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-openbsd")
+		end
+
+		if "openbsd-clang" == _OPTIONS["gcc"] then
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-openbsd-clang")
 		end
 
 		if "linux-gcc" == _OPTIONS["gcc"] then

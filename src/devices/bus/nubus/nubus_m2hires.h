@@ -28,11 +28,12 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	TIMER_CALLBACK_MEMBER(vbl_tick);
 
 private:
 	uint32_t m2hires_r(offs_t offset, uint32_t mem_mask = ~0);
@@ -42,8 +43,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	std::vector<uint8_t> m_vram;
-	uint32_t *m_vram32;
+	std::vector<uint32_t> m_vram;
 	uint32_t m_mode, m_vbl_disable, m_toggle;
 	uint32_t m_palette[256], m_colors[3], m_count, m_clutoffs;
 	emu_timer *m_timer;

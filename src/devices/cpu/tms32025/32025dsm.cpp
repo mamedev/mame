@@ -37,9 +37,9 @@
 #include <stdexcept>
 
 
-const char *const tms32025_disassembler::arith[8] = { "*", "*-", "*+", "??", "BR0-", "*0-", "*0+", "*BR0+" } ;
-const char *const tms32025_disassembler::nextar[16] = { "", "", "", "", "", "", "", "", ",AR0", ",AR1", ",AR2", ",AR3", ",AR4", ",AR5", ",AR6", ",AR7" } ;
-const char *const tms32025_disassembler::cmpmode[4] = { "0 (ARx = AR0)" , "1 (ARx < AR0)" , "2 (ARx > AR0)" , "3 (ARx <> AR0)" } ;
+const char *const tms32025_disassembler::arith[8] = { "*", "*-", "*+", "??", "BR0-", "*0-", "*0+", "*BR0+" };
+const char *const tms32025_disassembler::nextar[16] = { "", "", "", "", "", "", "", "", ",AR0", ",AR1", ",AR2", ",AR3", ",AR4", ",AR5", ",AR6", ",AR7" };
+const char *const tms32025_disassembler::cmpmode[4] = { "0 (ARx = AR0)" , "1 (ARx < AR0)" , "2 (ARx > AR0)" , "3 (ARx <> AR0)" };
 
 
 const char *const tms32025_disassembler::TMS32025Formats[] = {
@@ -440,6 +440,8 @@ offs_t tms32025_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 		flags = STEP_OVER;
 	else if (!strncmp(cp, "ret", 3))
 		flags = STEP_OUT;
+	else if ((code & 0xfe000000) == 0x5e000000 || (code >= 0xf0000000 && code < 0xfc000000))
+		flags = STEP_COND;
 
 	while (*cp)
 	{

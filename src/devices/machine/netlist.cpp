@@ -11,14 +11,11 @@
 #include "emu.h"
 #include "netlist.h"
 
-#include "netlist/nl_base.h"
 #include "netlist/nl_setup.h"
 #include "netlist/nl_factory.h"
 #include "netlist/nl_parser.h"
 #include "netlist/nl_interface.h"
 
-#include "netlist/plib/palloc.h"
-#include "netlist/plib/pmempool.h"
 #include "netlist/plib/pdynlib.h"
 #include "netlist/plib/pstonum.h"
 
@@ -68,7 +65,7 @@ DEFINE_DEVICE_TYPE(NETLIST_STREAM_OUTPUT, netlist_mame_stream_output_device, "nl
 // Special netlist extension devices  ....
 // ----------------------------------------------------------------------------------------
 
-extern const plib::dynlib_static_sym nl_static_solver_syms[];
+extern const plib::static_library::symbol nl_static_solver_syms[];
 
 static netlist::netlist_time_ext nltime_from_attotime(attotime t)
 {
@@ -77,13 +74,70 @@ static netlist::netlist_time_ext nltime_from_attotime(attotime t)
 	return nlmtime;
 }
 
-#if 0
-static attotime attotime_from_nltime(netlist::netlist_time_ext t)
+void netlist_log_csv<1>::open(running_machine &machine, const std::string &name)
 {
-	return attotime(t.as_raw() / netlist::netlist_time_ext::resolution(),
-		(t.as_raw() % netlist::netlist_time_ext::resolution()) * (ATTOSECONDS_PER_SECOND / netlist::netlist_time_ext::resolution()));
+	m_csv_file = fopen(name.c_str(), "wb");
+	m_machine = &machine;
 }
-#endif
+
+void netlist_log_csv<1>::close()
+{
+	if (m_csv_file != nullptr)
+	{
+		log_flush();
+		fclose(m_csv_file);
+	}
+}
+
+void netlist_log_csv<1>::log_add(char const* param, double value, bool isfloat)
+{
+	// skip if no file
+	if (m_csv_file == nullptr)
+		return;
+
+	// make a new entry
+	buffer_entry entry = { (*m_machine).scheduler().time(), isfloat, value, param };
+
+	// flush out half of the old entries if we hit the buffer limit
+	if (m_buffer.size() >= MAX_BUFFER_ENTRIES)
+		log_flush(MAX_BUFFER_ENTRIES / 2);
+
+	// fast common case: if we go at the end, just push_back
+	if (m_buffer.size() == 0 || entry.time >= m_buffer.back().time)
+	{
+		m_buffer.push_back(entry);
+		return;
+	}
+
+	// find our place in the queue
+	for (auto cur = m_buffer.rbegin(); cur != m_buffer.rend(); cur++)
+		if (entry.time >= cur->time)
+		{
+			m_buffer.insert(cur.base(), entry);
+			return;
+		}
+
+	// if we're too early, drop this entry rather than risk putting an out-of-order
+	// entry after the last one we flushed
+}
+
+void netlist_log_csv<1>::log_flush(int count)
+{
+	if (m_csv_file == nullptr)
+		return;
+	if (count > m_buffer.size())
+		count = m_buffer.size();
+	while (count--)
+	{
+		auto &entry = m_buffer.front();
+		if (entry.isfloat)
+			fprintf(m_csv_file, "%s,%s,%f\n", entry.time.as_string(), entry.string, entry.value);
+		else
+			fprintf(m_csv_file, "%s,%s,%d\n", entry.time.as_string(), entry.string, int(entry.value));
+		m_buffer.pop_front();
+	}
+}
+
 
 class netlist_mame_device::netlist_mame_t : public netlist::netlist_state_t
 {
@@ -286,20 +340,18 @@ void netlist_mame_device::register_memregion_source(netlist::nlparse_t &parser, 
 
 void netlist_mame_analog_input_device::write(const double val)
 {
-	m_value_for_device_timer = val * m_mult + m_offset;
-	if (m_value_for_device_timer != (*m_param)())
+	m_value_to_sync = val * m_mult + m_offset;
+	if (m_value_to_sync != (*m_param)())
 	{
-		synchronize();
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(netlist_mame_analog_input_device::sync_callback), this));
 	}
 }
 
-void netlist_mame_analog_input_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(netlist_mame_analog_input_device::sync_callback)
 {
 	update_to_current_time();
-#if NETLIST_CREATE_CSV
-	nl_owner().log_add(m_param_name, m_value_for_device_timer, true);
-#endif
-	m_param->set(m_value_for_device_timer);
+	nl_owner().log_csv().log_add(m_param_name, m_value_to_sync, true);
+	m_param->set(m_value_to_sync);
 }
 
 void netlist_mame_int_input_device::write(const uint32_t val)
@@ -308,7 +360,7 @@ void netlist_mame_int_input_device::write(const uint32_t val)
 	if (v != (*m_param)())
 	{
 		LOGDEBUG("write %s\n", this->tag());
-		synchronize(0, v);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(netlist_mame_int_input_device::sync_callback), this), v);
 }
 }
 
@@ -318,29 +370,25 @@ void netlist_mame_logic_input_device::write(const uint32_t val)
 	if (v != (*m_param)())
 	{
 		LOGDEBUG("write %s\n", this->tag());
-		synchronize(0, v);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(netlist_mame_logic_input_device::sync_callback), this), v);
 	}
 }
 
-void netlist_mame_int_input_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(netlist_mame_int_input_device::sync_callback)
 {
 	update_to_current_time();
-#if NETLIST_CREATE_CSV
-	nl_owner().log_add(m_param_name, param, false);
-#endif
+	nl_owner().log_csv().log_add(m_param_name, param, false);
 	m_param->set(param);
 }
 
-void netlist_mame_logic_input_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(netlist_mame_logic_input_device::sync_callback)
 {
 	update_to_current_time();
-#if NETLIST_CREATE_CSV
-	nl_owner().log_add(m_param_name, param, false);
-#endif
+	nl_owner().log_csv().log_add(m_param_name, param, false);
 	m_param->set(param);
 }
 
-void netlist_mame_ram_pointer_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(netlist_mame_ram_pointer_device::sync_callback)
 {
 	m_data = (*m_param)();
 }
@@ -374,56 +422,6 @@ void netlist_mame_sub_interface::set_mult_offset(const double mult, const double
 	m_offset = offset;
 }
 
-#if NETLIST_CREATE_CSV
-void netlist_mame_device::log_add(char const* param, double value, bool isfloat)
-{
-	// skip if no file
-	if (m_csv_file == nullptr)
-		return;
-
-	// make a new entry
-	buffer_entry entry = { machine().scheduler().time(), isfloat, value, param };
-
-	// flush out half of the old entries if we hit the buffer limit
-	if (m_buffer.size() >= MAX_BUFFER_ENTRIES)
-		log_flush(MAX_BUFFER_ENTRIES / 2);
-
-	// fast common case: if we go at the end, just push_back
-	if (m_buffer.size() == 0 || entry.time >= m_buffer.back().time)
-	{
-		m_buffer.push_back(entry);
-		return;
-	}
-
-	// find our place in the queue
-	for (auto cur = m_buffer.rbegin(); cur != m_buffer.rend(); cur++)
-		if (entry.time >= cur->time)
-		{
-			m_buffer.insert(cur.base(), entry);
-			return;
-		}
-
-	// if we're too early, drop this entry rather than risk putting an out-of-order
-	// entry after the last one we flushed
-}
-
-void netlist_mame_device::log_flush(int count)
-{
-	if (m_csv_file == nullptr)
-		return;
-	if (count > m_buffer.size())
-		count = m_buffer.size();
-	while (count--)
-	{
-		auto &entry = m_buffer.front();
-		if (entry.isfloat)
-			fprintf(m_csv_file, "%s,%s,%f\n", entry.time.as_string(), entry.string, entry.value);
-		else
-			fprintf(m_csv_file, "%s,%s,%d\n", entry.time.as_string(), entry.string, int(entry.value));
-		m_buffer.pop_front();
-	}
-}
-#endif
 
 netlist_mame_analog_input_device::netlist_mame_analog_input_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *param_name)
 	: device_t(mconfig, NETLIST_ANALOG_INPUT, tag, owner, 0)
@@ -431,7 +429,7 @@ netlist_mame_analog_input_device::netlist_mame_analog_input_device(const machine
 	, m_param(nullptr)
 	, m_auto_port(true)
 	, m_param_name(param_name)
-	, m_value_for_device_timer(0)
+	, m_value_to_sync(0)
 {
 }
 
@@ -441,7 +439,7 @@ netlist_mame_analog_input_device::netlist_mame_analog_input_device(const machine
 	, m_param(nullptr)
 	, m_auto_port(true)
 	, m_param_name("")
-	, m_value_for_device_timer(0)
+	, m_value_to_sync(0)
 {
 }
 
@@ -497,7 +495,7 @@ void netlist_mame_analog_output_device::custom_netlist_additions(netlist::nlpars
 	pstring dname = pstring("OUT_") + pin;
 
 	parser.register_dev(dname, dname);
-	parser.register_link(dname + ".IN", pin);
+	parser.register_connection(dname + ".IN", pin);
 }
 
 void netlist_mame_analog_output_device::pre_parse_action(netlist::nlparse_t &parser)
@@ -547,7 +545,7 @@ void netlist_mame_logic_output_device::custom_netlist_additions(netlist::nlparse
 	pstring dname = pstring("OUT_") + pin;
 
 	parser.register_dev(dname, dname);
-	parser.register_link(dname + ".IN", pin);
+	parser.register_connection(dname + ".IN", pin);
 }
 
 void netlist_mame_logic_output_device::pre_parse_action(netlist::nlparse_t &parser)
@@ -814,10 +812,6 @@ void netlist_mame_stream_output_device::device_start()
 void netlist_mame_stream_output_device::device_reset()
 {
 	LOGDEVCALLS("reset %s\n", name());
-#if 0
-	m_cur = 0.0;
-	m_last_buffer_time = netlist::netlist_time_ext::zero();
-#endif
 }
 
 void netlist_mame_stream_output_device::sound_update_fill(write_stream_view &target)
@@ -855,7 +849,7 @@ void netlist_mame_stream_output_device::custom_netlist_additions(netlist::nlpars
 	pstring dname = plib::pfmt("STREAM_OUT_{1}")(m_channel);
 
 	parser.register_dev(dname, dname);
-	parser.register_link(dname + ".IN", pstring(m_out_name));
+	parser.register_connection(dname + ".IN", pstring(m_out_name));
 }
 
 void netlist_mame_stream_output_device::process(netlist::netlist_time_ext tim, netlist::nl_fptype val)
@@ -989,7 +983,7 @@ std::unique_ptr<netlist::netlist_state_t> netlist_mame_device::base_validity_che
 			plib::plog_delegate(&validity_logger::log, &logger));
 		// enable validation mode
 
-		lnetlist->set_static_solver_lib(std::make_unique<plib::dynlib_static>(nullptr));
+		lnetlist->set_static_solver_lib(std::make_unique<plib::static_library>(nullptr));
 
 		common_dev_start(lnetlist.get());
 		lnetlist->setup().prepare_to_run();
@@ -1037,7 +1031,7 @@ void netlist_mame_device::device_start_common()
 {
 	m_netlist = std::make_unique<netlist_mame_t>(*this, "netlist");
 
-	m_netlist->set_static_solver_lib(std::make_unique<plib::dynlib_static>(nl_static_solver_syms));
+	m_netlist->set_static_solver_lib(std::make_unique<plib::static_library>(nl_static_solver_syms));
 
 	if (!machine().options().verbose())
 	{
@@ -1051,15 +1045,13 @@ void netlist_mame_device::device_start_common()
 
 	m_device_reset_called = false;
 
-#if NETLIST_CREATE_CSV
 	std::string name = machine().system().name;
 	name += tag();
 	for (int index = 0; index < name.size(); index++)
 		if (name[index] == ':')
 			name[index] = '_';
 	name += ".csv";
-	m_csv_file = fopen(name.c_str(), "wb");
-#endif
+	log_csv().open(machine(), name);
 
 	LOGDEVCALLS("device_start exit\n");
 }
@@ -1097,13 +1089,7 @@ void netlist_mame_device::device_stop()
 	LOGDEVCALLS("device_stop\n");
 	if (m_netlist)
 		netlist().exec().stop();
-#if NETLIST_CREATE_CSV
-	if (m_csv_file != nullptr)
-	{
-		log_flush();
-		fclose(m_csv_file);
-	}
-#endif
+	log_csv().close();
 }
 
 void netlist_mame_device::device_post_load()
@@ -1261,6 +1247,16 @@ uint64_t netlist_mame_cpu_device::execute_clocks_to_cycles(uint64_t clocks) cons
 uint64_t netlist_mame_cpu_device::execute_cycles_to_clocks(uint64_t cycles) const noexcept
 {
 	return cycles;
+}
+
+netlist::netlist_time_ext netlist_mame_cpu_device::nltime_ext_from_clocks(unsigned c) const noexcept
+{
+	return (m_div * c).shr(MDIV_SHIFT);
+}
+
+netlist::netlist_time netlist_mame_cpu_device::nltime_from_clocks(unsigned c) const noexcept
+{
+	return static_cast<netlist::netlist_time>((m_div * c).shr(MDIV_SHIFT));
 }
 
 void netlist_mame_cpu_device::execute_run()

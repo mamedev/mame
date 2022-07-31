@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "emucore.h"
 #include "render.h"
 
 #include "modules/osdwindow.h"

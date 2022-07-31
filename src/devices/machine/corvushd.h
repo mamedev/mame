@@ -37,16 +37,12 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(process_timeout);
+	TIMER_CALLBACK_MEMBER(complete_function);
 
 private:
 	static constexpr unsigned MAX_COMMAND_SIZE = 4096;   // The maximum size of a command packet (the controller only has 5K of RAM...)
-
-	enum
-	{
-		TIMER_TIMEOUT,
-		TIMER_COMMAND
-	};
 
 	// Sector addressing scheme for Rev B/H drives used in various commands (Called a DADR in the docs)
 	struct dadr_t {
@@ -56,18 +52,22 @@ private:
 	};
 
 	uint8_t   m_status;             // Controller status byte (DIRECTION + BUSY/READY)
+
 	// Prep mode
 	bool    m_prep_mode;          // Whether the controller is in Prep Mode or not
 	uint8_t   m_prep_drv;           // If in prep mode, Corvus drive id (1..15) being prepped
+
 	// Physical drive info
 	uint8_t   m_sectors_per_track;  // Number of sectors per track for this drive
 	uint8_t   m_tracks_per_cylinder;// Number of tracks per cylinder (heads)
 	uint16_t  m_cylinders_per_drive;// Number of cylinders per drive
+
 	// Command Processing
 	uint16_t  m_offset;             // Current offset into raw_data buffer
 	bool    m_awaiting_modifier;  // We've received a two-byte command and we're waiting for the mod
 	uint16_t  m_recv_bytes;         // Number of bytes expected to be received from Host
 	uint16_t  m_xmit_bytes;         // Number of bytes expected to be transmitted to host
+
 	// Timing-related values
 	uint16_t  m_last_cylinder;      // Last cylinder accessed - for calculating seek times
 	uint32_t  m_delay;              // Delay in microseconds for callback

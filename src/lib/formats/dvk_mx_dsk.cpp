@@ -113,7 +113,7 @@ void dvk_mx_format::find_size(util::random_read &io, uint8_t &track_count, uint8
 	}
 }
 
-int dvk_mx_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int dvk_mx_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t track_count, head_count, sector_count;
 
@@ -126,16 +126,16 @@ int dvk_mx_format::identify(util::random_read &io, uint32_t form_factor, const s
 		io.read_at(512, sectdata, 512, actual);
 		// check value in RT-11 home block.  see src/tools/imgtool/modules/rt11.cpp
 		if (pick_integer_le(sectdata, 0724, 2) == 6)
-			return 100;
+			return FIFID_SIGN|FIFID_SIZE;
 		else
-			return 75;
+			return FIFID_SIZE;
 
 	}
 
 	return 0;
 }
 
-bool dvk_mx_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool dvk_mx_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	uint8_t track_count, head_count, sector_count;
 
@@ -181,4 +181,4 @@ bool dvk_mx_format::load(util::random_read &io, uint32_t form_factor, const std:
 	return true;
 }
 
-const floppy_format_type FLOPPY_DVK_MX_FORMAT = &floppy_image_format_creator<dvk_mx_format>;
+const dvk_mx_format FLOPPY_DVK_MX_FORMAT;

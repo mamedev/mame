@@ -17,12 +17,6 @@ public:
 	nes_sachen_sa009_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void write_l(offs_t offset, uint8_t data) override;
-
-	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
 
@@ -32,15 +26,9 @@ class nes_sachen_sa0036_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_sachen_sa0036_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_sachen_sa0036_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_h(offs_t offset, uint8_t data) override;
-
-	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
+	virtual void write_h(offs_t offset, u8 data) override;
 };
 
 
@@ -50,15 +38,9 @@ class nes_sachen_sa0037_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_sachen_sa0037_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_sachen_sa0037_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_h(offs_t offset, uint8_t data) override;
-
-	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
+	virtual void write_h(offs_t offset, u8 data) override;
 };
 
 
@@ -71,12 +53,6 @@ public:
 	nes_sachen_sa72007_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void write_l(offs_t offset, uint8_t data) override;
-
-	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
 
@@ -89,12 +65,6 @@ public:
 	nes_sachen_sa72008_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void write_l(offs_t offset, uint8_t data) override;
-
-	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
 
@@ -109,10 +79,6 @@ public:
 	virtual uint8_t read_l(offs_t offset) override;
 
 	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
 
@@ -127,12 +93,6 @@ public:
 	virtual void write_l(offs_t offset, uint8_t data) override;
 	virtual void write_m(offs_t offset, uint8_t data) override { write_l((offset + 0x100) & 0xfff, data); }
 	virtual void write_h(offs_t offset, uint8_t data) override { write_l((offset + 0x100) & 0xfff, data); }
-
-	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
 
@@ -224,7 +184,6 @@ public:
 	// construction/destruction
 	nes_sachen_74x374_alt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
 	virtual uint8_t read_l(offs_t offset) override { return 0xff; }   // no read_l here
 	virtual void write_l(offs_t offset, uint8_t data) override;
 };

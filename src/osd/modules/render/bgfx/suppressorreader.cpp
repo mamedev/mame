@@ -6,9 +6,6 @@
 //
 //============================================================
 
-#include "emu.h"
-#include <string>
-
 #include "suppressorreader.h"
 
 #include "suppressor.h"

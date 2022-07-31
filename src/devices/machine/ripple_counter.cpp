@@ -94,7 +94,7 @@ void ripple_counter_device::device_resolve_objects()
 void ripple_counter_device::device_start()
 {
 	// initialize timers
-	m_count_timer = timer_alloc(TIMER_COUNT);
+	m_count_timer = timer_alloc(FUNC(ripple_counter_device::advance_counter), this);
 
 	// register internal state
 	save_item(NAME(m_count));
@@ -174,16 +174,10 @@ WRITE_LINE_MEMBER(ripple_counter_device::reset_w)
 
 
 //-------------------------------------------------
-//  device_timer - called whenever a device timer
-//  fires
+//  advance_counter -
 //-------------------------------------------------
 
-void ripple_counter_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(ripple_counter_device::advance_counter)
 {
-	switch (id)
-	{
-	case TIMER_COUNT:
-		set_count((m_count + 1) & m_count_mask);
-		break;
-	}
+	set_count((m_count + 1) & m_count_mask);
 }

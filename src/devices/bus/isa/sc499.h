@@ -66,7 +66,6 @@ private:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -76,7 +75,6 @@ private:
 	virtual void eop_w(int state) override;
 
 	std::string cpu_context() const;
-	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const;
 
 	void tape_status_clear(uint16_t value);
 	void tape_status_set(uint16_t value);
@@ -107,6 +105,8 @@ private:
 	void write_block();
 	int block_is_filemark();
 	void block_set_filemark();
+
+	TIMER_CALLBACK_MEMBER(timer_func);
 
 	uint8_t m_data;
 	uint8_t m_command;

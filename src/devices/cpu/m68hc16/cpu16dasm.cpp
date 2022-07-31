@@ -9,6 +9,10 @@
     the 8-bit direct mode no longer exists. The use of PC+6 as the base
     for relative jump destinations is an artifact of pipelining.
 
+    For whatever reason, Motorola's assembler chose to retain LSL, LSLA,
+    LSLB, etc. as mnemonic aliases for ASL, ASLA, ASLB and so on, but
+    eliminated BHS and BLO as alternate mnemonics for BCC and BCS.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -38,8 +42,8 @@ const cpu16_disassembler::opcode_info cpu16_disassembler::s_opinfo[4][256] =
 		{ "", cpu16_disassembler::mode::UND, 0 },
 		{ "bclr", cpu16_disassembler::mode::BIT, 0 },
 		{ "bset", cpu16_disassembler::mode::BIT, 0 },
-		{ "brclr", cpu16_disassembler::mode::BIT, 0 },
-		{ "brset", cpu16_disassembler::mode::BIT, 0 },
+		{ "brclr", cpu16_disassembler::mode::BIT, STEP_COND },
+		{ "brset", cpu16_disassembler::mode::BIT, STEP_COND },
 		{ "rol", cpu16_disassembler::mode::IND, 0 },
 		{ "asr", cpu16_disassembler::mode::IND, 0 },
 		{ "ror", cpu16_disassembler::mode::IND, 0 },
@@ -56,8 +60,8 @@ const cpu16_disassembler::opcode_info cpu16_disassembler::s_opinfo[4][256] =
 		{ "", cpu16_disassembler::mode::UND, 0 }, // actually prebyte for page 1
 		{ "bclr", cpu16_disassembler::mode::BIT, 0 },
 		{ "bset", cpu16_disassembler::mode::BIT, 0 },
-		{ "brclr", cpu16_disassembler::mode::BIT, 0 },
-		{ "brset", cpu16_disassembler::mode::BIT, 0 },
+		{ "brclr", cpu16_disassembler::mode::BIT, STEP_COND },
+		{ "brset", cpu16_disassembler::mode::BIT, STEP_COND },
 		{ "rol", cpu16_disassembler::mode::IND, 0 },
 		{ "asr", cpu16_disassembler::mode::IND, 0 },
 		{ "ror", cpu16_disassembler::mode::IND, 0 },
@@ -74,8 +78,8 @@ const cpu16_disassembler::opcode_info cpu16_disassembler::s_opinfo[4][256] =
 		{ "", cpu16_disassembler::mode::UND, 0 }, // actually prebyte for page 2
 		{ "bclr", cpu16_disassembler::mode::BIT, 0 },
 		{ "bset", cpu16_disassembler::mode::BIT, 0 },
-		{ "brclr", cpu16_disassembler::mode::BIT, 0 },
-		{ "brset", cpu16_disassembler::mode::BIT, 0 },
+		{ "brclr", cpu16_disassembler::mode::BIT, STEP_COND },
+		{ "brset", cpu16_disassembler::mode::BIT, STEP_COND },
 		{ "rol", cpu16_disassembler::mode::IND, 0 },
 		{ "asr", cpu16_disassembler::mode::IND, 0 },
 		{ "ror", cpu16_disassembler::mode::IND, 0 },
@@ -92,8 +96,8 @@ const cpu16_disassembler::opcode_info cpu16_disassembler::s_opinfo[4][256] =
 		{ "", cpu16_disassembler::mode::UND, 0 }, // actually prebyte for page 3
 		{ "bclr", cpu16_disassembler::mode::BIT, 0 },
 		{ "bset", cpu16_disassembler::mode::BIT, 0 },
-		{ "brclr", cpu16_disassembler::mode::BIT, 0 },
-		{ "brset", cpu16_disassembler::mode::BIT, 0 },
+		{ "brclr", cpu16_disassembler::mode::BIT, STEP_COND },
+		{ "brset", cpu16_disassembler::mode::BIT, STEP_COND },
 		{ "aix", cpu16_disassembler::mode::IMMS, 0 },
 		{ "aiy", cpu16_disassembler::mode::IMMS, 0 },
 		{ "aiz", cpu16_disassembler::mode::IMMS, 0 },
@@ -183,7 +187,7 @@ const cpu16_disassembler::opcode_info cpu16_disassembler::s_opinfo[4][256] =
 		{ "cpd", cpu16_disassembler::mode::IND, 0 },
 		{ "jsr", cpu16_disassembler::mode::IND20, STEP_OVER },
 		{ "std", cpu16_disassembler::mode::IND, 0 },
-		{ "brset", cpu16_disassembler::mode::BIT, 0 },
+		{ "brset", cpu16_disassembler::mode::BIT, STEP_COND },
 		{ "stx", cpu16_disassembler::mode::IND, 0 },
 		{ "sty", cpu16_disassembler::mode::IND, 0 },
 		{ "stz", cpu16_disassembler::mode::IND, 0 },
@@ -201,7 +205,7 @@ const cpu16_disassembler::opcode_info cpu16_disassembler::s_opinfo[4][256] =
 		{ "cpd", cpu16_disassembler::mode::IND, 0 },
 		{ "jsr", cpu16_disassembler::mode::IND20, STEP_OVER },
 		{ "std", cpu16_disassembler::mode::IND, 0 },
-		{ "brset", cpu16_disassembler::mode::BIT, 0 },
+		{ "brset", cpu16_disassembler::mode::BIT, STEP_COND },
 		{ "stx", cpu16_disassembler::mode::IND, 0 },
 		{ "sty", cpu16_disassembler::mode::IND, 0 },
 		{ "stz", cpu16_disassembler::mode::IND, 0 },
@@ -219,7 +223,7 @@ const cpu16_disassembler::opcode_info cpu16_disassembler::s_opinfo[4][256] =
 		{ "cpd", cpu16_disassembler::mode::IND, 0 },
 		{ "jsr", cpu16_disassembler::mode::IND20, STEP_OVER },
 		{ "std", cpu16_disassembler::mode::IND, 0 },
-		{ "brset", cpu16_disassembler::mode::BIT, 0 },
+		{ "brset", cpu16_disassembler::mode::BIT, STEP_COND },
 		{ "stx", cpu16_disassembler::mode::IND, 0 },
 		{ "sty", cpu16_disassembler::mode::IND, 0 },
 		{ "stz", cpu16_disassembler::mode::IND, 0 },
@@ -228,20 +232,20 @@ const cpu16_disassembler::opcode_info cpu16_disassembler::s_opinfo[4][256] =
 		// BX
 		{ "bra", cpu16_disassembler::mode::REL, 0 },
 		{ "brn", cpu16_disassembler::mode::REL, 0 },
-		{ "bhi", cpu16_disassembler::mode::REL, 0 },
-		{ "bls", cpu16_disassembler::mode::REL, 0 },
-		{ "bcc", cpu16_disassembler::mode::REL, 0 },
-		{ "bcs", cpu16_disassembler::mode::REL, 0 },
-		{ "bne", cpu16_disassembler::mode::REL, 0 },
-		{ "beq", cpu16_disassembler::mode::REL, 0 },
-		{ "bvc", cpu16_disassembler::mode::REL, 0 },
-		{ "bvs", cpu16_disassembler::mode::REL, 0 },
-		{ "bpl", cpu16_disassembler::mode::REL, 0 },
-		{ "bmi", cpu16_disassembler::mode::REL, 0 },
-		{ "bge", cpu16_disassembler::mode::REL, 0 },
-		{ "blt", cpu16_disassembler::mode::REL, 0 },
-		{ "bgt", cpu16_disassembler::mode::REL, 0 },
-		{ "ble", cpu16_disassembler::mode::REL, 0 },
+		{ "bhi", cpu16_disassembler::mode::REL, STEP_COND },
+		{ "bls", cpu16_disassembler::mode::REL, STEP_COND },
+		{ "bcc", cpu16_disassembler::mode::REL, STEP_COND },
+		{ "bcs", cpu16_disassembler::mode::REL, STEP_COND },
+		{ "bne", cpu16_disassembler::mode::REL, STEP_COND },
+		{ "beq", cpu16_disassembler::mode::REL, STEP_COND },
+		{ "bvc", cpu16_disassembler::mode::REL, STEP_COND },
+		{ "bvs", cpu16_disassembler::mode::REL, STEP_COND },
+		{ "bpl", cpu16_disassembler::mode::REL, STEP_COND },
+		{ "bmi", cpu16_disassembler::mode::REL, STEP_COND },
+		{ "bge", cpu16_disassembler::mode::REL, STEP_COND },
+		{ "blt", cpu16_disassembler::mode::REL, STEP_COND },
+		{ "bgt", cpu16_disassembler::mode::REL, STEP_COND },
+		{ "ble", cpu16_disassembler::mode::REL, STEP_COND },
 
 		// CX
 		{ "subb", cpu16_disassembler::mode::IND, 0 },
@@ -255,7 +259,7 @@ const cpu16_disassembler::opcode_info cpu16_disassembler::s_opinfo[4][256] =
 		{ "cmpb", cpu16_disassembler::mode::IND, 0 },
 		{ "bitb", cpu16_disassembler::mode::IND, 0 },
 		{ "stab", cpu16_disassembler::mode::IND, 0 },
-		{ "brclr", cpu16_disassembler::mode::BIT, 0 },
+		{ "brclr", cpu16_disassembler::mode::BIT, STEP_COND },
 		{ "ldx", cpu16_disassembler::mode::IND, 0 },
 		{ "ldy", cpu16_disassembler::mode::IND, 0 },
 		{ "ldz", cpu16_disassembler::mode::IND, 0 },
@@ -273,7 +277,7 @@ const cpu16_disassembler::opcode_info cpu16_disassembler::s_opinfo[4][256] =
 		{ "cmpb", cpu16_disassembler::mode::IND, 0 },
 		{ "bitb", cpu16_disassembler::mode::IND, 0 },
 		{ "stab", cpu16_disassembler::mode::IND, 0 },
-		{ "brclr", cpu16_disassembler::mode::BIT, 0 },
+		{ "brclr", cpu16_disassembler::mode::BIT, STEP_COND },
 		{ "ldx", cpu16_disassembler::mode::IND, 0 },
 		{ "ldy", cpu16_disassembler::mode::IND, 0 },
 		{ "ldz", cpu16_disassembler::mode::IND, 0 },
@@ -291,7 +295,7 @@ const cpu16_disassembler::opcode_info cpu16_disassembler::s_opinfo[4][256] =
 		{ "cmpb", cpu16_disassembler::mode::IND, 0 },
 		{ "bitb", cpu16_disassembler::mode::IND, 0 },
 		{ "stab", cpu16_disassembler::mode::IND, 0 },
-		{ "brclr", cpu16_disassembler::mode::BIT, 0 },
+		{ "brclr", cpu16_disassembler::mode::BIT, STEP_COND },
 		{ "ldx", cpu16_disassembler::mode::IND, 0 },
 		{ "ldy", cpu16_disassembler::mode::IND, 0 },
 		{ "ldz", cpu16_disassembler::mode::IND, 0 },
@@ -361,8 +365,8 @@ const cpu16_disassembler::opcode_info cpu16_disassembler::s_opinfo[4][256] =
 		{ "clr", cpu16_disassembler::mode::IND, 0 },
 		{ "tst", cpu16_disassembler::mode::IND, 0 },
 		{ "", cpu16_disassembler::mode::UND, 0 },
-		{ "bclr", cpu16_disassembler::mode::IND, 0 },
-		{ "bset", cpu16_disassembler::mode::IND, 0 },
+		{ "bclr", cpu16_disassembler::mode::BIT, 0 },
+		{ "bset", cpu16_disassembler::mode::BIT, 0 },
 		{ "", cpu16_disassembler::mode::UND, 0 },
 		{ "", cpu16_disassembler::mode::UND, 0 },
 		{ "rol", cpu16_disassembler::mode::IND, 0 },
@@ -804,10 +808,10 @@ const cpu16_disassembler::opcode_info cpu16_disassembler::s_opinfo[4][256] =
 		{ "", cpu16_disassembler::mode::UND, 0 },
 
 		// 27BX
-		{ "ldhi", cpu16_disassembler::mode::EXT, 0 },
+		{ "ldhi", cpu16_disassembler::mode::INH, 0 },
 		{ "tedm", cpu16_disassembler::mode::INH, 0 },
 		{ "tem", cpu16_disassembler::mode::INH, 0 },
-		{ "tmexd", cpu16_disassembler::mode::INH, 0 },
+		{ "tmxed", cpu16_disassembler::mode::INH, 0 },
 		{ "tmer", cpu16_disassembler::mode::INH, 0 },
 		{ "tmet", cpu16_disassembler::mode::INH, 0 },
 		{ "aslm", cpu16_disassembler::mode::INH, 0 },
@@ -951,7 +955,7 @@ const cpu16_disassembler::opcode_info cpu16_disassembler::s_opinfo[4][256] =
 		// 373X
 		{ "sube", cpu16_disassembler::mode::IMM, 0 },
 		{ "adde", cpu16_disassembler::mode::IMM, 0 },
-		{ "sbcd", cpu16_disassembler::mode::IMM, 0 },
+		{ "sbce", cpu16_disassembler::mode::IMM, 0 },
 		{ "adce", cpu16_disassembler::mode::IMM, 0 },
 		{ "eore", cpu16_disassembler::mode::IMM, 0 },
 		{ "lde", cpu16_disassembler::mode::IMM, 0 },
@@ -1366,7 +1370,7 @@ offs_t cpu16_disassembler::disassemble(std::ostream &stream, offs_t pc, const cp
 		{
 			const u16 operand = opcodes.r16(pc + 2);
 			format_index8(stream, operand >> 8, 'x' + BIT(opcode, 12, 2));
-			util::stream_format(stream, ", #$%02X, $%04X", opcode & 0x00ff, (pc + 6 + s8(operand & 0x00ff)) & 0xfffff);
+			util::stream_format(stream, ", #$%02X, $%05X", opcode & 0x00ff, (pc + 6 + s8(operand & 0x00ff)) & 0xfffff);
 			return 4 | SUPPORTED | info.m_flags;
 		}
 		else
@@ -1378,7 +1382,7 @@ offs_t cpu16_disassembler::disassemble(std::ostream &stream, offs_t pc, const cp
 			util::stream_format(stream, ", #$%02X", opcode & 0x00ff);
 			if (BIT(opcode, 9))
 			{
-				util::stream_format(stream, ", $%04X", (pc + 6 + s16(opcodes.r16(pc + 4))) & 0xfffff);
+				util::stream_format(stream, ", $%05X", (pc + 6 + s16(opcodes.r16(pc + 4))) & 0xfffff);
 				return 6 | SUPPORTED | info.m_flags;
 			}
 			else
