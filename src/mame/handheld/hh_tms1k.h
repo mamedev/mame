@@ -65,7 +65,7 @@ protected:
 	u8 read_rotated_inputs(int columns, u8 rowmask = 0xf);
 	virtual DECLARE_WRITE_LINE_MEMBER(auto_power_off);
 	virtual void power_off();
-	void set_power(bool state);
+	virtual void set_power(bool state);
 	void switch_change(int sel, u32 mask, bool next);
 };
 

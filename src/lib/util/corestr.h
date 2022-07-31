@@ -53,23 +53,17 @@ int core_strwildcmp(const char *sp1, const char *sp2);
 bool core_iswildstr(const char *sp);
 
 /* trim functions */
-template<typename TPred>
-std::string_view strtrimleft(std::string_view str, TPred pred)
+template <typename TPred>
+std::string_view strtrimleft(std::string_view str, TPred &&pred)
 {
-	std::string_view::iterator start = std::find_if(
-		str.begin(),
-		str.end(),
-		pred);
-	return str.substr(start - str.begin(), str.end() - start);
+	auto const start = std::find_if(str.begin(), str.end(), pred);
+	return str.substr(start - str.begin());
 }
 
-template<typename TPred>
-std::string_view strtrimright(std::string_view str, TPred pred)
+template <typename TPred>
+std::string_view strtrimright(std::string_view str, TPred &&pred)
 {
-	std::string_view::reverse_iterator end = std::find_if(
-		str.rbegin(),
-		str.rend(),
-		pred);
+	auto const end = std::find_if(str.rbegin(), str.rend(), pred);
 	return str.substr(0, str.size() - (end - str.rbegin()));
 }
 

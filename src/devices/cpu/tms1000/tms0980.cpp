@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(TMS0980, tms0980_cpu_device, "tms0980", "Texas Instruments TM
 // TMS1980 is a TMS0980 with a TMS1x00 style opla
 // - RAM, ROM, and main instructions PLAs is the same as TMS0980
 // - one of the microinstructions redirects to a RSTR instruction, like on TMS0270
-// - 32-term inverted output PLA above the RAM, 7 bits! (rotate opla 270 degrees)
+// - 32-term output PLA above the RAM, 7 bits! (rotate opla 270 degrees)
 DEFINE_DEVICE_TYPE(TMS1980, tms1980_cpu_device, "tms1980", "Texas Instruments TMS1980") // 28-pin DIP, 7 O pins, 10 R pins, high voltage
 
 
@@ -185,7 +185,7 @@ void tms0980_cpu_device::read_opcode()
 // i/o handling
 u8 tms0980_cpu_device::read_k_input()
 {
-	u8 k = m_read_k(0, 0xff) & 0x1f;
+	u8 k = m_read_k() & 0x1f;
 	u8 k3 = (k & 0x10) ? 3: 0; // the K3 line is simply K1|K2
 	return (k & 0xf) | k3;
 }

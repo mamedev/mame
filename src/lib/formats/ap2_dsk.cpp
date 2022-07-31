@@ -663,10 +663,6 @@ int a2_16sect_format::identify(util::random_read &io, uint32_t form_factor, cons
 	{
 		prodos_order = true;
 	}
-	else if (!memcmp("PRODOS", &sector_data[0x40], 6))
-	{
-		prodos_order = true;
-	}
 
 	return FIFID_SIZE | (m_prodos_order == prodos_order ? FIFID_HINT : 0);
 }

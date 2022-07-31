@@ -168,8 +168,8 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  *MP6061   TMS0970   1979, Texas Instruments Electronic Digital Thermostat (from patent, the one in MAME didn't have a label)
  @MP6100A  TMS0980   1979, Ideal Electronic Detective
  @MP6101B  TMS0980   1979, Parker Brothers Stop Thief
- *MP6354   ?         1982, Tsukuda The Dracula (? note: 40-pin, VFD-capable)
- *MP6361   ?         1983, <unknown> Defender Strikes (? note: VFD-capable)
+ *MP6354   TMS1375   1982, Tsukuda The Dracula
+ *MP6361   TMS1375?  1983, <unknown> Defender Strikes
  @MP7302   TMS1400   1980, Tiger Deluxe Football with Instant Replay
  @MP7304   TMS1400   1982, Tiger 7 in 1 Sports Stadium (model 7-555)
  @MP7313   TMS1400   1980, Parker Brothers Bank Shot
@@ -387,7 +387,6 @@ INPUT_CHANGED_MEMBER(hh_tms1k_state::reset_button)
 INPUT_CHANGED_MEMBER(hh_tms1k_state::power_button)
 {
 	set_power((bool)param);
-	m_maincpu->set_input_line(INPUT_LINE_RESET, m_power_on ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER(hh_tms1k_state::auto_power_off)
@@ -400,13 +399,17 @@ WRITE_LINE_MEMBER(hh_tms1k_state::auto_power_off)
 void hh_tms1k_state::power_off()
 {
 	set_power(false);
-	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 void hh_tms1k_state::set_power(bool state)
 {
 	m_power_on = state;
+	m_maincpu->set_input_line(INPUT_LINE_RESET, m_power_on ? CLEAR_LINE : ASSERT_LINE);
+
 	m_out_power = state ? 1 : 0;
+
+	if (m_display && !m_power_on)
+		m_display->clear();
 }
 
 
@@ -423,7 +426,7 @@ namespace {
 
   A-One LSI Match Number
   * PCB label: PT-204 "Pair Card"
-  * TMS1000NLL MP0163 (die label 1000B, MP0163)
+  * TMS1000NLL MP0163 (die label: 1000B, MP0163)
   * 2x2-digit 7seg LED displays + 3 LEDs, 1-bit sound
 
   A-One was a subsidiary of Bandai? The PCB serial PT-xxx is same, and the font
@@ -568,7 +571,7 @@ ROM_END
 
   A-One LSI Arrange Ball
   * PCB label: Kaken, PT-249
-  * TMS1000NLL MP0166 (die label 1000B, MP0166)
+  * TMS1000NLL MP0166 (die label: 1000B, MP0166)
   * 2-digit 7seg LED display + 22 LEDs, 1-bit sound
 
   known releases:
@@ -845,7 +848,7 @@ ROM_END
 /***************************************************************************
 
   Bandai System Control Car: Cheetah 「システムコントロールカー チーター」
-  * TMS1000NLL MP0915 (die label 1000B, MP0915)
+  * TMS1000NLL MP0915 (die label: 1000B, MP0915)
   * 2 motors (one for back axis, one for steering), no sound
 
   It's a programmable buggy, like Big Track but much simpler. To add a command
@@ -981,7 +984,7 @@ ROM_END
 /***************************************************************************
 
   Bandai TC7: Air Traffic Control
-  * TMS1100 MCU, label MP1311 (die label 1100E, MP1311)
+  * TMS1100 MCU, label MP1311 (die label: 1100E, MP1311)
   * 4-digit 7seg LED display, 40 other LEDs, 1-bit sound
 
   It is a very complicated game, refer to the manual on how to play.
@@ -1108,7 +1111,7 @@ ROM_END
 
   Canon Palmtronic F-31, Canon Canola L813, Toshiba BC-8111B, Toshiba BC-8018B,
   Triumph-Adler 81 SN, Silver-Reed 8J, more
-  * TMS1040 MCU label TMS1045NL (die label 1040A, 1045)
+  * TMS1040 MCU label TMS1045NL (die label: 1040A, 1045)
   * 9-digit cyan VFD display (leftmost may be custom)
 
   TMS1045NL is a versatile calculator chip for 3rd party manufacturers, used
@@ -1276,7 +1279,7 @@ ROM_END
 
   Canon Palmtronic MD-8 (Multi 8) / Canon Canola MD 810
   * PCB label: Canon EHI-0115-03
-  * TMS1070 MCU label TMC1079 (die label 1070B, 1079A)
+  * TMS1070 MCU label TMC1079 (die label: 1070B, 1079A)
   * 2-line cyan VFD display, each 9-digit 7seg + 1 custom (label 20-ST-22)
 
   The only difference between MD-8 and MD 810 is the form factor. The latter
@@ -2005,11 +2008,11 @@ ROM_END
 /***************************************************************************
 
   Coleco Head to Head: Electronic Basketball (model 2150)
-  * TMS1000NLL MP3320A (die label 1000E MP3320A)
+  * TMS1000NLL MP3320A (die label: 1000E, MP3320A)
   * 2-digit 7seg LED display, LED grid display, 1-bit sound
 
   Coleco Head to Head: Electronic Hockey (model 2160)
-  * TMS1000NLL E MP3321A (die label 1000E MP3321A)
+  * TMS1000NLL E MP3321A (die label: 1000E, MP3321A)
   * same PCB/hardware as above
 
   Unlike the COP420 version(see hh_cop400.cpp driver), each game has its own MCU.
@@ -2209,7 +2212,7 @@ ROM_END
 
   Coleco Head to Head: Electronic Baseball (model 2180)
   * PCB labels: Coleco rev C 73891/2
-  * TMS1170NLN MP1525-N2 (die label MP1525)
+  * TMS1170NLN MP1525-N2 (die label: 1170A, MP1525)
   * 9-digit cyan VFD display, and other LEDs behind bezel, 1-bit sound
 
   known releases:
@@ -2357,7 +2360,7 @@ ROM_END
 /***************************************************************************
 
   Coleco Head to Head: Electronic Boxing (model 2190)
-  * TMS1100NLL M34018-N2 (die label M34018)
+  * TMS1100NLL M34018-N2 (die label: 1100E, M34018)
   * 2-digit 7seg LED display, LED grid display, 1-bit sound
 
   This appears to be the last game of Coleco's Head to Head series.
@@ -2484,7 +2487,7 @@ ROM_END
 /***************************************************************************
 
   Coleco Quiz Wiz Challenger
-  * TMS1000NLL M32001-N2 (die label 1000E, M32001)
+  * TMS1000NLL M32001-N2 (die label: 1000E, M32001)
   * 4 7seg LEDs, 17 other LEDs, 1-bit sound
 
   This is a 4-player version of Quiz Wiz, a multiple choice quiz game.
@@ -2679,7 +2682,7 @@ ROM_END
 /***************************************************************************
 
   Coleco Total Control 4
-  * TMS1400NLL MP7334-N2 (die label MP7334)
+  * TMS1400NLL MP7334-N2 (die label: TMS1400, MP7334)
   * 2x2-digit 7seg LED display + 4 LEDs, LED grid display, 1-bit sound
 
   This is a head to head electronic tabletop LED-display sports console.
@@ -2870,7 +2873,7 @@ ROM_END
 
   Concept 2000 Mr. Mus-I-Cal (model 560)
   * PCB label: CONCEPT 2000 ITE 556
-  * TMS1000NLL MP3206 (die label 1000C, MP3206)
+  * TMS1000NLL MP3206 (die label: 1000C, MP3206)
   * 9-digit 7seg LED display(one custom digit), 1-bit sound
 
   It's a simple 4-function calculator, and plays music tones too.
@@ -3008,7 +3011,7 @@ ROM_END
 
   Conic Electronic Basketball
   * PCB label: CONIC 101-006
-  * TMS1000NLL MP0907 (die label 1000B MP0907)
+  * TMS1000NLL MP0907 (die label: 1000B MP0907)
   * DS8871N, 2 7seg LEDs, 30 other LEDs, 1-bit sound
 
   There are 3 known versions of Conic Basketball: MP0910(101-003) and
@@ -3540,7 +3543,7 @@ ROM_END
   Conic Electronic I.Q.
   * PCB labels: main: CONIC 101-037 (other side: HG-15, 11*00198*00), button PCB:
     CONIC 102-001, led PCB: CONIC 100-003 REV A itac
-  * TMS1000NLL MP0908 (die label 1000B, MP0908)
+  * TMS1000NLL MP0908 (die label: 1000B, MP0908)
   * 2 7seg LEDs, 30 other LEDs, 1-bit sound
 
   This is a peg solitaire game, with random start position.
@@ -3802,7 +3805,7 @@ ROM_END
 /***************************************************************************
 
   Entex (Electronic) Soccer
-  * TMS1000NL MP0158 (die label 1000B, MP0158)
+  * TMS1000NL MP0158 (die label: 1000B, MP0158)
   * 2 7seg LEDs, 30 other LEDs, 1-bit sound
 
   known releases:
@@ -3923,7 +3926,7 @@ ROM_END
 /***************************************************************************
 
   Entex (Electronic) Baseball (1)
-  * TMS1000NLP MP0914 (die label MP0914A)
+  * TMS1000NLP MP0914 (die label: 1000B, MP0914A)
   * 1 7seg LED, and other LEDs behind bezel, 1-bit sound
 
   This is a handheld LED baseball game. One player controls the batter, the CPU
@@ -4211,7 +4214,7 @@ ROM_END
 
   Entex (Electronic) Baseball 3
   * PCB label: ZENY
-  * TMS1100NLL 6007 MP1204 (rev. E!) (die label MP1204)
+  * TMS1100NLL 6007 MP1204 (rev. E!) (die label: MP1204)
   * 2*SN75492N LED display driver
   * 4 7seg LEDs, and other LEDs behind bezel, 1-bit sound
 
@@ -4395,7 +4398,7 @@ ROM_END
 /***************************************************************************
 
   Entex Space Battle
-  * TMS1000 EN-6004 MP0920 (die label 1000B, MP0920)
+  * TMS1000 EN-6004 MP0920 (die label: 1000B, MP0920)
   * 2 7seg LEDs, and other LEDs behind bezel, 1-bit sound
 
   The Japanese version was published by Gakken, same name.
@@ -4521,7 +4524,7 @@ ROM_END
 /***************************************************************************
 
   Entex Blast It
-  * TMS1000 MP0230 (die label 1000B, MP0230)
+  * TMS1000 MP0230 (die label: 1000B, MP0230)
   * 3 7seg LEDs, 49 other LEDs (both under an overlay mask), 1-bit sound
 
 ***************************************************************************/
@@ -4754,7 +4757,7 @@ ROM_END
 /***************************************************************************
 
   Entex Color Football 4
-  * TMS1670 6009 MP7551 (die label MP7551)
+  * TMS1670 6009 MP7551 (die label: TMS1400, MP7551)
   * 9-digit cyan VFD display, 60 red and green LEDs behind mask, 1-bit sound
 
   Another version exist, one with a LED(red) 7seg display.
@@ -4894,7 +4897,7 @@ ROM_END
 /***************************************************************************
 
   Entex (Electronic) Basketball 2
-  * TMS1100 6010 MP1218 (die label MP1218)
+  * TMS1100 6010 MP1218 (die label: 1100B, MP1218)
   * 4 7seg LEDs, and other LEDs behind bezel, 1-bit sound
 
   led translation table: led zz from game PCB = MAME y.x:
@@ -5031,7 +5034,7 @@ ROM_END
 /***************************************************************************
 
   Entex Raise The Devil
-  * TMS1100 MP1221 (die label same)
+  * TMS1100 MP1221 (die label: 1100B, MP1221)
   * 4 7seg LEDs(rightmost one unused), and other LEDs behind bezel, 1-bit sound
 
   Entex Black Knight (licensed handheld version of Williams' pinball game)
@@ -5376,7 +5379,7 @@ ROM_END
 
   Fonas 2 Player Baseball
   * PCB label: CA-014 (probably Cassia)
-  * TMS1000NLL MP0154 (die label 1000B, MP0154)
+  * TMS1000NLL MP0154 (die label: 1000B, MP0154)
   * 4 7seg LEDs, 37 other LEDs, 1-bit sound
 
   known releases:
@@ -5664,7 +5667,7 @@ ROM_END
 
   Gakken Poker
   * PCB label: POKER. gakken
-  * TMS1370 MP2105 (die label same)
+  * TMS1370 MP2105 (die label: 1170, MP2105)
   * 11-digit cyan VFD display Itron FG1114B, oscillator sound
 
   known releases:
@@ -5819,7 +5822,7 @@ ROM_END
 
   Gakken Jackpot: Gin Rummy & Black Jack
   * PCB label: gakken
-  * TMS1670 MPF553 (die label same)
+  * TMS1670 MPF553 (die label: TMS1400, MPF553)
   * 11-digit cyan VFD display Itron FG1114B, oscillator sound
 
   known releases:
@@ -6071,7 +6074,7 @@ ROM_END
 /***************************************************************************
 
   Gakken Invader 1000
-  * TMS1370 MP2139 (die label 1170 MP2139)
+  * TMS1370 MP2139 (die label: 1170 MP2139)
   * cyan/red VFD display Futaba DM-25Z 2D, 1-bit sound
 
   known releases:
@@ -6198,7 +6201,7 @@ ROM_END
 /***************************************************************************
 
   Gakken Invader 2000
-  * TMS1370(28 pins) MP1604 (die label 1370A MP1604)
+  * TMS1370(28 pins) MP1604 (die label: 1370A MP1604)
   * TMS1024 I/O expander
   * cyan/red/green VFD display, 1-bit sound
 
@@ -6342,7 +6345,7 @@ ROM_END
 /***************************************************************************
 
   Gakken FX-Micom R-165
-  * TMS1100 MCU, label MP1312 (die label MP1312A)
+  * TMS1100 MCU, label MP1312 (die label: 1100E, MP1312A)
   * 1 7seg led, 6 other leds, 1-bit sound
 
   This is a simple educational home computer. Refer to the extensive manual
@@ -6493,7 +6496,7 @@ ROM_END
 /***************************************************************************
 
   Ideal Electronic Detective
-  * TMS0980NLL MP6100A (die label 0980B-00)
+  * TMS0980NLL MP6100A (die label: 0980B-00)
   * 10-digit 7seg LED display, 2-level sound
 
   hardware (and concept) is very similar to Parker Brothers Stop Thief
@@ -6641,7 +6644,7 @@ ROM_END
 /***************************************************************************
 
   Kenner Star Wars - Electronic Battle Command
-  * TMS1100 MCU, label MP3438A (die label 1100B, MP3438A)
+  * TMS1100 MCU, label MP3438A (die label: 1100B, MP3438A)
   * 4x4 LED grid display + 2 separate LEDs and 2-digit 7segs, 1-bit sound
 
   This is a small tabletop space-dogfighting game. To start the game,
@@ -6792,7 +6795,7 @@ ROM_END
 /***************************************************************************
 
   Kenner Live Action Football
-  * TMS1100NLL MCU, label MP3489-N2 (die label 1100E, MP3489)
+  * TMS1100NLL MCU, label MP3489-N2 (die label: 1100E, MP3489)
   * 6-digit 7seg LED display, other LEDs under overlay, 1-bit sound
 
   The LEDs are inside reflective domes, with an overlay mask on top of that.
@@ -6940,7 +6943,7 @@ ROM_END
 /***************************************************************************
 
   Kosmos Astro
-  * TMS1470NLHL MP1133 (die label TMS1400 MP1133)
+  * TMS1470NLHL MP1133 (die label: TMS1400 MP1133)
   * 9-digit 7seg VFD display + 8 LEDs(4 green, 4 yellow), no sound
 
   This is an astrological calculator, and also supports 4-function
@@ -7248,7 +7251,7 @@ ROM_END
 
   Mattel Thoroughbred Horse Race Analyzer
   * PCB label: 1670-4619D
-  * TMS1100NLL MP3491-N2 (die label 1100E MP3491)
+  * TMS1100NLL MP3491-N2 (die label: 1100E MP3491)
   * HLCD0569, 67-segment LCD panel, no sound
 
   This handheld is not a toy, read the manual for more information. In short,
@@ -7412,7 +7415,7 @@ ROM_END
 /***************************************************************************
 
   Mattel Dungeons & Dragons - Computer Labyrinth Game
-  * TMS1100 M34012-N2LL (die label M34012)
+  * TMS1100 M34012-N2LL (die label: 1100E, M34012)
   * 72 buttons, no LEDs, 1-bit sound
 
   This is an electronic board game. It requires markers and wall pieces to play.
@@ -7605,7 +7608,7 @@ ROM_END
 /***************************************************************************
 
   Milton Bradley Comp IV
-  * TMC0904NL CP0904A (die label 4A0970D-04A)
+  * TMC0904NL CP0904A (die label: 4A0970D-04A)
   * 10 LEDs behind bezel, no sound
 
   This is small tabletop Mastermind game; a code-breaking game where the player
@@ -7725,7 +7728,7 @@ ROM_END
 
   Milton Bradley Electronic Battleship (1977 version, model 4750A)
   * PCB label: 4750A
-  * TMS1000NL MP3201 (die label 1000C, MP3201)
+  * TMS1000NL MP3201 (die label: 1000C, MP3201)
   * LM324N, MC14016CP/TP4016AN, NE555P, discrete sound
   * 4 sliding buttons, light bulb
 
@@ -7891,7 +7894,7 @@ ROM_END
 
   Milton Bradley Electronic Battleship (1977 version, model 4750B)
   * PCB label: MB 4750B
-  * TMS1000NLL MP3208 (die label 1000C, MP3208)
+  * TMS1000NLL MP3208 (die label: 1000C, MP3208)
   * SN75494N (acting as inverters), SN76477 sound
   * 4 sliding buttons, light bulb
 
@@ -8023,7 +8026,7 @@ ROM_END
 /***************************************************************************
 
   Milton Bradley Simon (model 4850), created by Ralph Baer
-  * TMS1000 (die label MP3226), or MP3300 (die label 1000C, MP3300)
+  * TMS1000 (die label: 1000C, MP3226), or MP3300 (die label: 1000C, MP3300)
   * DS75494 Hex digit LED driver, 4 big lamps, 1-bit sound
 
   known revisions:
@@ -8158,7 +8161,7 @@ ROM_END
 /***************************************************************************
 
   Milton Bradley Super Simon
-  * TMS1100 MP3476NLL (die label MP3476)
+  * TMS1100 MP3476NLL (die label: 1100E, MP3476)
   * 8 big lamps(2 turn on at same time), 1-bit sound
 
   The semi-squel to Simon, not as popular. It includes more game variations
@@ -8317,7 +8320,7 @@ ROM_END
 /***************************************************************************
 
   Milton Bradley Big Trak
-  * TMS1000NLL MP3301A or MP3301ANLL E (rev. E!) (die label 1000E MP3301)
+  * TMS1000NLL MP3301A or MP3301ANLL E (rev. E!) (die label: 1000E MP3301)
   * SN75494N Hex digit LED driver, 1 lamp, 3-level sound
   * gearbox with magnetic clutch, 1 IR led+sensor, 2 motors(middle wheels)
   * 24-button keypad, ext in/out ports
@@ -8539,8 +8542,8 @@ ROM_END
 /***************************************************************************
 
   Milton Bradley Dark Tower
-  * TMS1400NLL MP7332-N1.U1(Rev. B) or MP7332-N2LL(Rev. C) (die label MP7332)
-    (assume same ROM contents between revisions)
+  * TMS1400NLL MP7332-N1.U1(Rev. B) or MP7332-N2LL(Rev. C) (die label:
+    TMS1400, MP7332) (assume same ROM contents between revisions)
   * SN75494N MOS-to-LED digit driver
   * motorized rotating reel + lightsensor, 1bit-sound
 
@@ -8785,7 +8788,7 @@ ROM_END
 /***************************************************************************
 
   Milton Bradley Electronic Arcade Mania
-  * TMS1100 M34078A-N2LL (die label 1100G, M34078A)
+  * TMS1100 M34078A-N2LL (die label: 1100G, M34078A)
   * 9 LEDs, 3-bit sound
 
   This is a board game. The mini arcade machine is the emulated part here.
@@ -8910,7 +8913,7 @@ ROM_END
 /***************************************************************************
 
   Parker Brothers Code Name: Sector, by Bob Doyle
-  * TMS0970 MCU, MP0905BNL ZA0379 (die label 0970F-05B)
+  * TMS0970 MCU, MP0905BNL ZA0379 (die label: 4A0970F-05B)
   * 6-digit 7seg LED display + 4 LEDs for compass, no sound
 
   This is a tabletop submarine pursuit game. A grid board and small toy
@@ -9176,7 +9179,7 @@ ROM_END
 /***************************************************************************
 
   Parker Brothers Master Merlin
-  * TMS1400 MP7351-N2LL (die label 1400CR MP7351)
+  * TMS1400 MP7351-N2LL (die label: 1400CR MP7351)
   * 11 LEDs behind buttons, 3-level sound
 
   The TMS1400CR MCU has the same pinout as a standard TMS1100. The hardware
@@ -9248,7 +9251,7 @@ ROM_END
 /***************************************************************************
 
   Parker Brothers Electronic Master Mind
-  * TMS1000NLL MP3200 (die label 1000E, MP3200)
+  * TMS1000NLL MP3200 (die label: 1000E, MP3200)
   * 5 red leds, 5 green leds
 
   This is a board game, it came with 4 plug boards and a lot of colored pegs.
@@ -9366,7 +9369,7 @@ ROM_END
 /***************************************************************************
 
   Parker Brothers Stop Thief, by Bob Doyle
-  * TMS0980NLL MP6101B (die label 0980B-01A)
+  * TMS0980NLL MP6101B (die label: 0980B-01A)
   * 3-digit 7seg LED display, 6-level sound
 
   Stop Thief is actually a board game, the electronic device emulated here
@@ -9512,7 +9515,7 @@ ROM_END
 /***************************************************************************
 
   Parker Brothers Bank Shot (known as Cue Ball in the UK), by Garry Kitchen
-  * TMS1400NLL MP7313-N2 (die label MP7313)
+  * TMS1400NLL MP7313-N2 (die label: TMS1400, MP7313)
   * LED grid display, 1-bit sound
 
   Bank Shot is an electronic pool game. To select a game, repeatedly press
@@ -9643,7 +9646,7 @@ ROM_END
 /***************************************************************************
 
   Parker Brothers Split Second
-  * TMS1400NLL MP7314-N2 (die label MP7314)
+  * TMS1400NLL MP7314-N2 (die label: TMS1400, MP7314)
   * LED grid display(default round LEDs, and rectangular shape ones), 1-bit sound
 
   This is an electronic handheld reflex gaming device, it's straightforward
@@ -9776,7 +9779,7 @@ ROM_END
 
   Parker Brothers Lost Treasure - The Electronic Deep-Sea Diving Game,
   Featuring The Electronic Dive-Control Center
-  * TMS1100 M34038-NLL (die label 1100E, M34038)
+  * TMS1100 M34038-NLL (die label: 1100E, M34038)
   * 11 LEDs, 4-bit sound
 
   This is a board game. The electronic accessory is the emulated part here.
@@ -10051,7 +10054,7 @@ ROM_END
 
   Tandy Championship Football (model 60-2150)
   * PCB label: CYG-316
-  * TMS1100NLL MP1193 (die label 1100B, MP1193)
+  * TMS1100NLL MP1193 (die label: 1100B, MP1193)
   * 7-digit 7seg LED display + LED grid, 1-bit sound
 
   Another clone of Mattel Football II. The original manufacturer is unknown, but
@@ -10422,7 +10425,7 @@ ROM_END
 /***************************************************************************
 
   Tandy(Radio Shack division) Monkey See (1982 version)
-  * TMS1000 MP0271 (die label 1000E, MP0271), only half of ROM space used
+  * TMS1000 MP0271 (die label: 1000E, MP0271), only half of ROM space used
   * 2 LEDs(one red, one green), 1-bit sound
 
   This is the TMS1000 version, the one from 1977 has a MM5780.
@@ -10546,7 +10549,7 @@ ROM_END
 
   Tandy 3 in 1 Sports Arena (model 60-2178)
   * PCB label: HP-804
-  * TMS1100 (just a datestamp label (8331), die label 1100B MP1231)
+  * TMS1100 (just a datestamp label (8331), die label: 1100B MP1231)
   * 2x2-digit 7seg LED display + 47 other LEDs, 1-bit sound
 
   For Tandy Sports Arena (model 60-2158), see cmsport, this is a different game.
@@ -10712,7 +10715,7 @@ ROM_END
 /***************************************************************************
 
   Telesensory Systems, Inc.(TSI) Speech+
-  * TMS1000 MCU, label TMS1007NL (die label 1000B, 1007A)
+  * TMS1000 MCU, label TMS1007NL (die label: 1000B, 1007A)
   * TSI S14001A speech chip, GI S14007-A 2KB maskrom for samples
   * 9-digit 7seg LED display
 
@@ -10879,11 +10882,11 @@ ROM_END
 /***************************************************************************
 
   TI SR-16 (1974, first consumer product with TMS1000 series MCU)
-  * TMS1000 MCU label TMS1001NL (die label 1000, 1001A)
+  * TMS1000 MCU label TMS1001NL (die label: 1000, 1001A)
   * 12-digit 7seg LED display
 
   TI SR-16 II (1975 version)
-  * TMS1000 MCU label TMS1016NL (die label 1000B, 1016A)
+  * TMS1000 MCU label TMS1016NL (die label: 1000B, 1016A)
   * notes: cost-reduced 'sequel', [10^x] was removed, and [pi] was added.
 
 ***************************************************************************/
@@ -11119,11 +11122,11 @@ ROM_END
 /***************************************************************************
 
   TI-1250/TI-1200 (1975 version), Spirit of '76
-  * TMS0950 MCU label TMC0952NL, K0952 (die label 0950A 0952)
+  * TMS0950 MCU label TMC0952NL, K0952 (die label: 0950A 0952)
   * 9-digit 7seg LED display
 
   TI-1250/TI-1200 (1976 version), TI-1400, TI-1450, TI-1205, TI-1255, LADY 1200, ABLE
-  * TMS0970 MCU label TMS0972NL ZA0348, JP0972A (die label 0970D-72A)
+  * TMS0970 MCU label TMS0972NL ZA0348, JP0972A (die label: 0970D-72A)
   * 8-digit 7seg LED display, or 9 digits with leftmost unused
 
   As seen listed above, the basic 4-function TMS0972 calculator MCU was used
@@ -11135,7 +11138,7 @@ ROM_END
   available buttons.
 
   TI-1270
-  * TMS0970 MCU label TMC0974NL ZA0355, DP0974A (die label 0970D-74A)
+  * TMS0970 MCU label TMC0974NL ZA0355, DP0974A (die label: 0970D-74A)
   * 8-digit 7seg LED display
   * notes: almost same hardware as TMS0972 TI-1250, minor scientific functions
 
@@ -11316,7 +11319,7 @@ ROM_END
 /***************************************************************************
 
   TI-2550 III, TI-1650/TI-1600, TI-1265 (they have the same chip)
-  * TMS1040 MCU label TMS1043NL ZA0352 (die label 1040A, 1043A)
+  * TMS1040 MCU label TMS1043NL ZA0352 (die label: 1040A, 1043A)
   * 9-digit cyan VFD display
 
   Only the TI-2550 III has the top button row (RV, SQRT, etc).
@@ -11449,7 +11452,7 @@ ROM_END
 /***************************************************************************
 
   TI-5100, more (see below)
-  * TMS1070 MCU label TMS1073NL or TMC1073NL (die label 1070B, 1073)
+  * TMS1070 MCU label TMS1073NL or TMC1073NL (die label: 1070B, 1073)
   * 11-digit 7seg VFD (1 custom digit)
 
   This chip was also used in 3rd-party calculators, such as Toshiba BC-1015,
@@ -11603,7 +11606,7 @@ ROM_END
   TMC098x series Majestic-line calculators
 
   TI-30, SR-40, TI-15(less buttons) and several by Koh-I-Noor
-  * TMS0980 MCU label TMC0981NL (die label 0980B-81F)
+  * TMS0980 MCU label TMC0981NL (die label: 0980B-81F)
   * 9-digit 7seg LED display
 
   Of note is a peripheral by Schoenherr, called the Braillotron. It acts as
@@ -11612,10 +11615,10 @@ ROM_END
   the original LED display to a 25-pin D-Sub connector.
 
   TI Business Analyst, TI Business Analyst-I, TI Money Manager, TI-31, TI-41
-  * TMS0980 MCU label TMC0982NL (die label 0980B-82F)
+  * TMS0980 MCU label TMC0982NL (die label: 0980B-82F)
 
   TI Programmer
-  * TMS0980 MCU label ZA0675NL, JP0983AT (die label 0980B-83)
+  * TMS0980 MCU label ZA0675NL, JP0983AT (die label: 0980B-83)
 
 ***************************************************************************/
 
@@ -11905,7 +11908,7 @@ ROM_END
 /***************************************************************************
 
   TI-1000 (1977 version)
-  * TMS1990 MCU label TMC1991NL (die label 1991-91A)
+  * TMS1990 MCU label TMC1991NL (die label: 1991-91A)
   * 8-digit 7seg LED display
 
   TI-1000 (1978 version)
@@ -12024,7 +12027,7 @@ ROM_END
 /***************************************************************************
 
   TI WIZ-A-TRON
-  * TMS0970 MCU label TMC0907NL ZA0379, DP0907BS (die label 0970F-07B)
+  * TMS0970 MCU label TMC0907NL ZA0379, DP0907BS (die label: 0970F-07B)
   * 9-digit 7seg LED display(one custom digit)
 
 ***************************************************************************/
@@ -12143,7 +12146,7 @@ ROM_END
 /***************************************************************************
 
   TI Little Professor (1976 version)
-  * TMS0970 MCU label TMS0975NL ZA0356, GP0975CS (die label 0970D-75C)
+  * TMS0970 MCU label TMS0975NL ZA0356, GP0975CS (die label: 0970D-75C)
   * 9-digit 7seg LED display(one custom digit)
 
   The hardware is nearly identical to Wiz-A-Tron (or vice versa, since this
@@ -12230,7 +12233,7 @@ ROM_END
 /***************************************************************************
 
   TI Little Professor (1978 version)
-  * TMS1990 MCU label TMC1993NL (die label 1990C-c3C)
+  * TMS1990 MCU label TMC1993NL (die label: 1990C-c3C)
   * 9-digit 7seg LED display(one custom digit)
 
   1978 re-release, with on/off and level select on buttons instead of
@@ -12358,8 +12361,8 @@ ROM_END
 /***************************************************************************
 
   TI-1680, TI-2550-IV
-  * TMS1980 MCU label TMC1981NL (die label 1980A 81F)
-  * TMC0999NL 256x4 RAM (die label 0999B)
+  * TMS1980 MCU label TMC1981NL (die label: 1980A 81F)
+  * TMC0999NL 256x4 RAM (die label: 0999B)
   * 9-digit cyan VFD display(leftmost digit is custom)
 
   The extra RAM is for scrolling back through calculations. For some reason,
@@ -12505,7 +12508,7 @@ ROM_END
 /***************************************************************************
 
   TI DataMan
-  * TMS1980 MCU label TMC1982NL (die label 1980A 82B)
+  * TMS1980 MCU label TMC1982NL (die label: 1980A 82B)
   * 10-digit cyan VFD display(3 digits are custom)
 
 ***************************************************************************/
@@ -12635,7 +12638,7 @@ ROM_END
 /***************************************************************************
 
   TI Math Marvel
-  * TMS1980 MCU label TMC1986A-NL (die label 1980A 86A)
+  * TMS1980 MCU label TMC1986A-NL (die label: 1980A 86A)
   * 9-digit cyan VFD display(2 digits are custom), 1-bit sound
 
   This is the same hardware as DataMan, with R8 connected to a piezo.
@@ -12811,7 +12814,7 @@ ROM_END
 /***************************************************************************
 
   Texas Instruments Electronic Digital Thermostat
-  * TMS0970 MCU, label TMS0970NLL TMC0910B (die label 0970F-10E)
+  * TMS0970 MCU, label TMS0970NLL TMC0910B (die label: 0970F-10E)
   * 9-digit 7seg LED display, only 4 used
   * temperature sensor, heat/cool/fan outputs
 
@@ -12974,7 +12977,7 @@ ROM_END
 
   Tiger Sub Wars (model 7-490)
   * PCB label: CSG201A(main), CSG201B(leds)
-  * TMS1200N2LL MP3352 (die label 1000C, MP3352)
+  * TMS1200N2LL MP3352 (die label: 1000C, MP3352)
   * 4-digit 7seg LED display + 55 other LEDs, 1-bit sound
 
   Tiger/Yeno also published an LCD handheld called Sub Wars, it's not related.
@@ -13072,7 +13075,7 @@ ROM_END
 /***************************************************************************
 
   Tiger Playmaker: Hockey, Soccer, Basketball (model 7-540 or 7-540A)
-  * TMS1100 MP1215 (die label 1100B MP1215)
+  * TMS1100 MP1215 (die label: 1100B MP1215)
   * 2-digit 7seg LED display + 40 other LEDs, 1-bit sound
 
   The games are on playcards(Tiger calls them that), the hardware detects which
@@ -13236,7 +13239,7 @@ ROM_END
 /***************************************************************************
 
   Tiger Deluxe Football with Instant Replay (model 7-550)
-  * TMS1400NLL MP7302 (die label TMS1400 MP7302)
+  * TMS1400NLL MP7302 (die label: TMS1400 MP7302)
   * 4-digit 7seg LED display, 80 red/green LEDs, 1-bit sound
 
   According to the manual, player 1 is green, player 2 is red. But when
@@ -13369,7 +13372,7 @@ ROM_END
 
   Tiger Electronics Copy Cat (model 7-520)
   * PCB label: CC REV B
-  * TMS1000 MCU, label 69-11513 MP0919 (die label MP0919)
+  * TMS1000 MCU, label 69-11513 MP0919 (die label: 1000B, MP0919)
   * 4 LEDs, 1-bit sound
 
   known releases:
@@ -13489,7 +13492,7 @@ ROM_END
 
   Tiger Electronics Copy Cat (model 7-522)
   * PCB label: WS 8107-1
-  * TMS1730 MCU, label MP3005N (die label 1700 MP3005)
+  * TMS1730 MCU, label MP3005N (die label: 1700 MP3005)
   * 4 LEDs, 1-bit sound
 
   This is a simplified rerelease of Copy Cat, 10(!) years later. The gameplay
@@ -13580,7 +13583,7 @@ ROM_END
 /***************************************************************************
 
   Tiger Ditto (model 7-530)
-  * TMS1700 MCU, label MP1801-N2LL (die label 1700 MP1801)
+  * TMS1700 MCU, label MP1801-N2LL (die label: 1700 MP1801)
   * 4 LEDs, 1-bit sound
 
   known releases:
@@ -13667,7 +13670,7 @@ ROM_END
 /***************************************************************************
 
   Tiger 7 in 1 Sports Stadium (model 7-555)
-  * TMS1400 MP7304 (die label TMS1400 MP7304A)
+  * TMS1400 MP7304 (die label: TMS1400 MP7304A)
   * 2x2-digit 7seg LED display + 39 other LEDs, 1-bit sound
 
   This handheld includes 7 games: 1: Basketball, 2: Hockey, 3: Soccer,
@@ -13799,7 +13802,7 @@ ROM_END
 
   Tomy(tronics) Break Up (manufactured in Japan)
   * PCB label: TOMY B.O.
-  * TMS1040 MP2726 TOMY WIPE (die label MP2726A)
+  * TMS1040 MP2726 TOMY WIPE (die label: 1040B, MP2726A)
   * TMS1025N2LL I/O expander
   * 2-digit 7seg display, 46 other leds, 1-bit sound
 
@@ -14000,7 +14003,7 @@ ROM_END
 
   Tomy Power House Pinball
   * PCB label: TOMY P-B
-  * TMS1100 MP1180 TOMY PINB (die label MP1180)
+  * TMS1100 MP1180 TOMY PINB (die label: 1100B, MP1180)
   * 3 7seg LEDs, and other LEDs behind bezel, 1-bit sound
 
   known releases:
@@ -14280,7 +14283,7 @@ ROM_END
 /***************************************************************************
 
   Vulcan XL 25
-  * TMS1000SLC MP4486A (die label 1000C/, MP4486A)
+  * TMS1000SLC MP4486A (die label: 1000C/, MP4486A)
   * 28 LEDs, 1-bit sound
 
   This game is the same logic puzzle as Tiger's Lights Out, except that

@@ -15803,10 +15803,10 @@ cmpacman                        //
 cmpacmana                       //
 cmpacmanb                       //
 cmtetris                        //
-cmtetrsa                        //
-cmtetrsb                        //
-cmtetrsc                        //
-cmtetrsd                        //
+cmtetrisa                       //
+cmtetrisb                       //
+cmtetrisc                       //
+cmtetrisd                       //
 cmv4                            // (c) 1992 Dyna Electronics
 cmv4a                           // (c) 1992 Dyna Electronics
 cmv801                          // (c) 198? Corsica
@@ -41755,7 +41755,7 @@ vocaid                          //
 @source:handheld/tispellb.cpp
 mrchalgr                        //
 spellb                          //
-spellb79                        //
+spellba                         //
 
 @source:apple/tk2000.cpp
 mpf2                            // Multitech MPF-II
@@ -42546,6 +42546,7 @@ superten                        // (c) 1988
 usg182                          // (c) 1989
 usg185                          // (c) 1990
 usg187c                         // (c) 1991
+usg211c                         // (c) 1991
 usg32                           // (c) 1987
 usg82                           // (c) 1988
 usg83x                          // (c) 1988

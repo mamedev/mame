@@ -18,13 +18,9 @@
 
 class v8_device :  public device_t
 {
-	friend class eagle_device;
-	friend class spice_device;
-
 public:
 	// construction/destruction
 	v8_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-	v8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// interface routines
 	auto pb4_callback() { return write_pb4.bind(); }
@@ -47,38 +43,46 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(scc_irq_w);
 
 protected:
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<asc_device> m_asc;
+
+	std::unique_ptr<u32 []> m_vram;
+
+	u8 m_pseudovia_regs[256];
+	u32 *m_ram_ptr;
+
+	v8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
+	virtual u8 pseudovia_r(offs_t offset);
+
 private:
 	devcb_write_line write_pb4, write_pb5, write_cb2, write_hdsel, write_hmmu_enable;
 	devcb_read_line read_pb3;
 
-	required_device<cpu_device> m_maincpu;
 	optional_ioport m_montype;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
 	required_device<via6522_device> m_via1;
-	required_device<asc_device> m_asc;
 	required_region_ptr<u32> m_rom;
 
-	std::unique_ptr<u32[]> m_vram;
 	emu_timer *m_6015_timer;
 	int m_via_interrupt, m_via2_interrupt, m_scc_interrupt, m_last_taken_interrupt;
-	u8 m_pseudovia_regs[256], m_pseudovia_ier, m_pseudovia_ifr;
+	u8 m_pseudovia_ier, m_pseudovia_ifr;
 	u8 m_pal_address, m_pal_idx, m_pal_control, m_pal_colkey;
 	bool m_overlay;
-	u32 *m_ram_ptr, *m_rom_ptr;
-	u32 m_ram_size, m_rom_size;
+	u32 m_ram_size;
 
 	bool m_baseIs4M;
+
 	u32 rom_switch_r(offs_t offset);
 	void ram_size(u8 config);
 
-	virtual u8 pseudovia_r(offs_t offset);
 	void pseudovia_w(offs_t offset, u8 data);
 	void pseudovia_recalc_irqs();
 
@@ -139,12 +143,13 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
+	floppy_image_device *m_cur_floppy = nullptr;
+	int m_hdsel;
+
 	u8 via_in_a() override;
 	virtual void via_out_a(u8 data) override;
 	u8 pseudovia_r(offs_t offset) override;
 	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
-	floppy_image_device *m_cur_floppy = nullptr;
-	int m_hdsel;
 
 	void phases_w(u8 phases);
 	void devsel_w(u8 devsel);

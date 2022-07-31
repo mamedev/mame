@@ -271,7 +271,6 @@ protected:
 
 	u32 m_o_mask;
 	u32 m_r_mask;
-	u32 m_k_mask;
 	u32 m_pc_mask;
 	u32 m_x_mask;
 
