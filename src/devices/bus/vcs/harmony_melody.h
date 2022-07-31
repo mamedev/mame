@@ -11,7 +11,7 @@
 
 // ======================> a26_rom_harmony_device
 
-class a26_rom_harmony_device : public a26_rom_f6_device
+class a26_rom_harmony_device : public a26_rom_base_device
 {
 public:
 	a26_rom_harmony_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -31,6 +31,7 @@ private:
 	void harmony_arm7_map(address_map &map);
 
 	required_device<lpc210x_device> m_cpu;
+	uint8_t m_base_bank;
 };
 
 
