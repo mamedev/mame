@@ -41,6 +41,7 @@ public:
 
 	void program_internal(address_map &map);
 	void data_internal(address_map &map);
+
 protected:
 	// construction/destruction
 	axc51base_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features = 0);
@@ -89,6 +90,11 @@ protected:
 
 	uint8_t   m_forced_inputs[4];   /* allow read even if configured as output */
 
+	uint8_t* m_spiptr;
+	size_t m_spisize;
+
+	uint32_t m_spiaddr;
+
 	// JB-related hacks
 	uint8_t m_last_op;
 	uint8_t m_last_bit;
@@ -110,9 +116,11 @@ protected:
 	required_shared_ptr<uint8_t> m_sfr_ram;           /* 128 SFR - these are in 0x80 - 0xFF */
 	required_shared_ptr<uint8_t> m_scratchpad;        /* 128 RAM (8031/51) + 128 RAM in second bank (8032/52) */
 
+	uint8_t m_uid[4];
+
 	/* SFR Callbacks */
-	virtual void sfr_write(size_t offset, uint8_t data);
-	virtual uint8_t sfr_read(size_t offset);
+	void sfr_write(size_t offset, uint8_t data);
+	uint8_t sfr_read(size_t offset);
 
 	/* Memory spaces */
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_program;
@@ -136,7 +144,7 @@ protected:
 	void clear_current_irq();
 	uint8_t r_acc();
 	uint8_t r_psw();
-	virtual offs_t external_ram_iaddr(offs_t offset, offs_t mem_mask);
+	offs_t external_ram_iaddr(offs_t offset, offs_t mem_mask);
 	uint8_t iram_read(size_t offset);
 	void iram_write(size_t offset, uint8_t data);
 	void push_pc();
@@ -158,6 +166,19 @@ protected:
 	void execute_op(uint8_t op);
 	void check_irqs();
 	void burn_cycles(int cycles);
+
+	uint8_t spicon_r();
+	uint8_t spibuf_r();
+	uint8_t dpcon_r();
+
+	void spidmaadr_w(uint8_t data);
+	void spidmacnt_w(uint8_t data);
+
+	void spicon_w(uint8_t data);
+	void spibuf_w(uint8_t data);
+	void spibaud_w(uint8_t data);
+	void dpcon_w(uint8_t data);
+
 	void acall(uint8_t r);
 	void add_a_byte(uint8_t r);
 	void add_a_mem(uint8_t r);
@@ -504,28 +525,6 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	void ax208_internal_program_mem(address_map &map);
-
-	virtual void sfr_write(size_t offset, uint8_t data) override;
-	virtual uint8_t sfr_read(size_t offset) override;
-
-	uint8_t spicon_r();
-	uint8_t spibuf_r();
-	uint8_t dpcon_r();
-
-	void spidmaadr_w(uint8_t data);
-	void spidmacnt_w(uint8_t data);
-
-	void spicon_w(uint8_t data);
-	void spibuf_w(uint8_t data);
-	void spibaud_w(uint8_t data);
-	void dpcon_w(uint8_t data);
-
-	uint8_t* m_spiptr;
-	size_t m_spisize;
-
-	uint32_t m_spiaddr;
-
-	virtual offs_t external_ram_iaddr(offs_t offset, offs_t mem_mask) override;
 };
 
 class ax208p_cpu_device : public ax208_cpu_device
