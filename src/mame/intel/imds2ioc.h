@@ -67,7 +67,6 @@ private:
 	void pio_port_p2_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pio_lpt_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(pio_lpt_busy_w);
-	DECLARE_WRITE_LINE_MEMBER(pio_lpt_select_w);
 
 	I8275_DRAW_CHARACTER_MEMBER(crtc_display_pixels);
 
