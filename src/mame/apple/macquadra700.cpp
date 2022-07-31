@@ -991,7 +991,7 @@ void macquadra_state::macqd700(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	ASC(config, m_easc, 22.5792_MHz_XTAL, asc_device::asc_type::EASC);
-//  m_easc->irqf_callback().set(FUNC(macquadra_state::mac_asc_irq));
+	m_easc->irqf_callback().set(m_via2, FUNC(via6522_device::write_cb1)).invert();
 	m_easc->add_route(0, "lspeaker", 1.0);
 	m_easc->add_route(1, "rspeaker", 1.0);
 
