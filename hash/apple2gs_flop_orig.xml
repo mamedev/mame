@@ -3875,4 +3875,60 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="spaceabd">
+		<description>Space Ace (Brutal Deluxe)</description>
+		<year>2022</year>
+		<publisher>Brutal Deluxe Software</publisher>
+		<info name="release" value="2022-7-30"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!--  Apple IIgs version by Antoine Vignau and Olivier Zardini -->
+		<!--  After booting your Apple IIgs with a system disk, or autobooting from a hard drive, insert Space Ace disk #1 and double click the SpaceAce icon to begin the game. -->
+		<!--  To install Space Ace on a hard drive, create a SpaceAce folder on your hard drive and copy the content of the 7 disks into it. To run Space Ace from your hard drive, double click on the SpaceAce directory icon on your hard drive then double click on the SpaceAce Icon. -->
+		<!--  System Requirements: Apple IIgs ROM 01/3 with 1 MB RAM, one 3.5" disk drive, System 5.0.4 -->
+		<!--  Recommended: Apple IIgs ROM 01/3 with 4 MB RAM, accelerator card, hard drive, System 6.0.1 -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="819200">
+				<rom name="SpaceAce_D1.po" size="819200" crc="36f48ba8" sha1="8f58a1a6b4d7122613a2dad03d9583e0c8c791f3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="819200">
+				<rom name="SpaceAce_D2.po" size="819200" crc="2d3ab12e" sha1="2b16f899a275890542a6efc7671c17b511274212"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="819200">
+				<rom name="SpaceAce_D3.po" size="819200" crc="c6c3a29c" sha1="c075156cabd2161bd63d6ba59053ede0407a0799"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="819200">
+				<rom name="SpaceAce_D4.po" size="819200" crc="a8d7481e" sha1="84db1d97926a58f80c38fc7214356c946c05d6d8"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5"/>
+			<dataarea name="flop" size="819200">
+				<rom name="SpaceAce_D5.po" size="819200" crc="3a5267a3" sha1="8deaffef0a2a534f27a4a23dbdfa8fef729f1ce1"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6"/>
+			<dataarea name="flop" size="819200">
+				<rom name="SpaceAce_D6.po" size="819200" crc="5f6f718c" sha1="1c63b2ea1b4a9f6abb731902626d2d8214236d65"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 7"/>
+			<dataarea name="flop" size="819200">
+				<rom name="SpaceAce_D7.po" size="819200" crc="0e008ad0" sha1="5fc83bd0ddbfa94a5c27db3665fd171348afb0ec"/>
+			</dataarea>
+		</part>
+	</software>	
+	
 </softwarelist>
