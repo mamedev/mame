@@ -75,9 +75,9 @@ a26_rom_2k_4k_device::a26_rom_2k_4k_device(const machine_config &mconfig, const 
 void a26_rom_2k_4k_device::install_memory_handlers(address_space *space)
 {
 	if (m_rom_size < 0x1000)
-		space->install_rom(0x1000, 0x17ff, 0x800, m_rom);
+		space->install_rom(0x1000, 0x17ff, 0x800, get_rom_base());
 	else
-		space->install_rom(0x1000, 0x1fff, m_rom);
+		space->install_rom(0x1000, 0x1fff, get_rom_base());
 }
 
 
