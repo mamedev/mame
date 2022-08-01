@@ -1628,6 +1628,11 @@ void axc51base_cpu_device::device_reset()
 	m_uart.smod_div = 0;
 
 	m_recalc_parity = 0;
+
+	m_spi_state = 0;
+	m_spiaddr = 0;
+	m_spi_dma_addr = 0;
+
 }
 
 
@@ -1720,8 +1725,52 @@ uint8_t axc51base_cpu_device::spibuf_r()
 
 void axc51base_cpu_device::spibuf_w(uint8_t data)
 {
+	enum
+	{
+		READY_FOR_COMMAND = 0x00,
+		READY_FOR_ADDRESS2 = 0x01,
+		READY_FOR_ADDRESS1 = 0x02,
+		READY_FOR_ADDRESS0 = 0x03,
+	};
+
 	logerror("%s: sfr_write AXC51_SPIBUF %02x\n", machine().describe_context(), data);
 	m_sfr_regs[AXC51_SPIBUF - 0x80] = data;
+
+	if (((m_sfr_regs[AXC51_SPICON - 0x80]) & 0x20) == 0x00) // Send to SPI
+	{
+	switch (m_spi_state)
+	{
+	case READY_FOR_COMMAND:
+		if (data == 0x03)
+		{
+			// set read mode
+			logerror("SPI Read Command\n");
+			m_spi_state = READY_FOR_ADDRESS2;
+		}
+		else if (data == 0x05)
+		{
+			logerror("SPI Status Command\n");
+		}
+
+		break;
+
+	case READY_FOR_ADDRESS2:
+		m_spiaddr = (m_spiaddr & 0x00ffff) | (data << 16);
+		m_spi_state = READY_FOR_ADDRESS1;
+		break;
+
+	case READY_FOR_ADDRESS1:
+		m_spiaddr = (m_spiaddr & 0xff00ff) | (data << 8);
+		m_spi_state = READY_FOR_ADDRESS0;
+		break;
+
+	case READY_FOR_ADDRESS0:
+		m_spiaddr = (m_spiaddr & 0xffff00) | (data);
+		m_spi_state = READY_FOR_COMMAND;
+		logerror("SPI Address set to %08x\n", m_spiaddr);
+		break;
+	}
+	}
 }
 
 void axc51base_cpu_device::spibaud_w(uint8_t data)
@@ -1741,12 +1790,27 @@ void axc51base_cpu_device::spidmaadr_w(uint8_t data)
 {
 	logerror("%s: sfr_write AXC51_SPIDMAADR %02x\n", machine().describe_context(), data);
 	m_sfr_regs[AXC51_SPIDMAADR - 0x80] = data;
+
+	m_spi_dma_addr <<= 8;
+	m_spi_dma_addr = (m_spi_dma_addr & 0xff00) | data;
+
 }
 
 void axc51base_cpu_device::spidmacnt_w(uint8_t data)
 {
-	logerror("%s: sfr_write AXC51_SPIDMACNT %02x\n", machine().describe_context(), data);
+	logerror("%s: sfr_write AXC51_SPIDMACNT %02x (and trigger)\n", machine().describe_context(), data);
 	m_sfr_regs[AXC51_SPIDMACNT - 0x80] = data;
+
+	if (((m_sfr_regs[AXC51_SPICON - 0x80]) & 0x20) == 0x20) // Read from SPI
+	{
+		logerror("attempting to do DMA from SPI source address %08x destination address %04x count %04x\n", m_spiaddr, m_spi_dma_addr, (data + 1) * 2);
+
+		for (int i = 0; i < (data + 1) * 2; i++)
+		{
+			uint8_t romdat = m_spiptr[m_spiaddr++];
+			m_io.write_byte(m_spi_dma_addr++, romdat); // is this the correct destination space?
+		}
+	}
 }
 
 ROM_START( ax208 ) // assume all production ax208 chips use this internal ROM
@@ -1763,8 +1827,6 @@ void ax208_cpu_device::device_reset()
 {
 	axc51base_cpu_device::device_reset();
 	set_state_int(AXC51_PC, 0x8000);
-
-	m_spiaddr = 0;
 }
 
 
