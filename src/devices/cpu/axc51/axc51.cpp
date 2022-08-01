@@ -1807,7 +1807,7 @@ AXC51_SPICON (at 0xd8)
 uint8_t axc51base_cpu_device::spicon_r()
 {
 	uint8_t result = m_sfr_regs[AXC51_SPICON - 0x80] | 0x80;
-	logerror("%s: sfr_read AXC51_SPICON %02x\n", machine().describe_context(), result);
+//	logerror("%s: sfr_read AXC51_SPICON %02x\n", machine().describe_context(), result);
 	return result;
 }
 
@@ -1837,7 +1837,7 @@ uint8_t axc51base_cpu_device::uartsta_r()
 
 void axc51base_cpu_device::spicon_w(uint8_t data)
 {
-	logerror("%s: sfr_write AXC51_SPICON %02x\n", machine().describe_context(), data);
+//	logerror("%s: sfr_write AXC51_SPICON %02x\n", machine().describe_context(), data);
 
 	m_sfr_regs[AXC51_SPICON - 0x80] = data;
 }
@@ -1854,16 +1854,9 @@ uint8_t axc51base_cpu_device::spibuf_r()
 {
 	// HACK while we figure things out
 
-	if (state_int(AXC51_PC) == 0x8910)
-	{
-		logerror("%s: sfr_read AXC51_SPIBUF (reading from %08x)\n", machine().describe_context(), m_spiaddr);
+	logerror("%s: sfr_read AXC51_SPIBUF %02x\n", machine().describe_context(), m_spilatch);
 
-		return m_spiptr[m_spiaddr++];
-	}
-
-	logerror("%s: sfr_read AXC51_SPIBUF\n", machine().describe_context());
-
-	return machine().rand();
+	return m_spilatch;
 	//return m_sfr_regs[AXC51_SPIBUF - 0x80];
 }
 
@@ -1877,45 +1870,70 @@ void axc51base_cpu_device::spibuf_w(uint8_t data)
 		READY_FOR_ADDRESS2 = 0x01,
 		READY_FOR_ADDRESS1 = 0x02,
 		READY_FOR_ADDRESS0 = 0x03,
+		READY_FOR_READ = 0x04,
 	};
 
-	logerror("%s: sfr_write AXC51_SPIBUF %02x\n", machine().describe_context(), data);
 	m_sfr_regs[AXC51_SPIBUF - 0x80] = data;
 
 	if (((m_sfr_regs[AXC51_SPICON - 0x80]) & 0x20) == 0x00) // Send to SPI
 	{
-	switch (m_spi_state)
-	{
-	case READY_FOR_COMMAND:
-		if (data == 0x03)
+		logerror("%s: sfr_write AXC51_SPIBUF %02x\n", machine().describe_context(), data);
+
+		switch (m_spi_state)
 		{
-			// set read mode
-			logerror("SPI Read Command\n");
-			m_spi_state = READY_FOR_ADDRESS2;
+		case READY_FOR_COMMAND:
+		case READY_FOR_READ:
+			if (data == 0x03)
+			{
+				// set read mode
+				logerror("SPI Read Command\n");
+				m_spi_state = READY_FOR_ADDRESS2;
+			}
+			else if (data == 0x05)
+			{
+				logerror("SPI Status Command\n");
+			}
+			else if (data == 0x0b)
+			{
+				logerror("SPI Fast Read Command\n");
+			}
+			else
+			{
+				logerror("SPI unknown Command\n");
+			}
+
+			break;
+
+		case READY_FOR_ADDRESS2:
+			m_spiaddr = (m_spiaddr & 0x00ffff) | (data << 16);
+			m_spi_state = READY_FOR_ADDRESS1;
+			break;
+
+		case READY_FOR_ADDRESS1:
+			m_spiaddr = (m_spiaddr & 0xff00ff) | (data << 8);
+			m_spi_state = READY_FOR_ADDRESS0;
+			break;
+
+		case READY_FOR_ADDRESS0:
+			m_spiaddr = (m_spiaddr & 0xffff00) | (data);
+			m_spi_state = READY_FOR_READ;
+			logerror("SPI Address set to %08x\n", m_spiaddr);
+			break;
 		}
-		else if (data == 0x05)
-		{
-			logerror("SPI Status Command\n");
-		}
-
-		break;
-
-	case READY_FOR_ADDRESS2:
-		m_spiaddr = (m_spiaddr & 0x00ffff) | (data << 16);
-		m_spi_state = READY_FOR_ADDRESS1;
-		break;
-
-	case READY_FOR_ADDRESS1:
-		m_spiaddr = (m_spiaddr & 0xff00ff) | (data << 8);
-		m_spi_state = READY_FOR_ADDRESS0;
-		break;
-
-	case READY_FOR_ADDRESS0:
-		m_spiaddr = (m_spiaddr & 0xffff00) | (data);
-		m_spi_state = READY_FOR_COMMAND;
-		logerror("SPI Address set to %08x\n", m_spiaddr);
-		break;
 	}
+	else
+	{
+		if (m_spi_state == READY_FOR_READ)
+		{
+			m_spilatch = m_spiptr[m_spiaddr++];
+			logerror("%s: sfr_write AXC51_SPIBUF (clock read, latching in %02x)\n", machine().describe_context(), m_spilatch);			
+		}
+		else
+		{
+			logerror("%s: sfr_write AXC51_SPIBUF (clock read)\n", machine().describe_context(), m_spi_state);			
+			m_spi_state = 0x00;
+		}
+
 	}
 }
 

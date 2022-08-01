@@ -92,6 +92,7 @@ protected:
 	uint32_t m_spiaddr;
 	uint8_t m_spi_state;
 	uint16_t m_spi_dma_addr;
+	uint8_t m_spilatch;
 
 	// JB-related hacks
 	uint8_t m_last_op;
