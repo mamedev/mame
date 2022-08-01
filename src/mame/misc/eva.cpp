@@ -64,7 +64,7 @@ private:
 
 	u8 read_k();
 	void write_o(u16 data);
-	void write_r(u16 data);
+	void write_r(u32 data);
 };
 
 class eva24_state : public base_state
@@ -125,7 +125,7 @@ void eva24_state::write_d(u8 data)
 
 // EVA-11
 
-void eva11_state::write_r(u16 data)
+void eva11_state::write_r(u32 data)
 {
 	// R7: TMS5100 PDC pin
 	m_tms5100->pdc_w(data >> 7 & 1);

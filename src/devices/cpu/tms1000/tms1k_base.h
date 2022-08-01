@@ -223,7 +223,7 @@ protected:
 	u8 m_ca;        // chapter address register
 	u8 m_cb;        // chapter buffer register
 	u16 m_cs;       // chapter subroutine register(s)
-	u16 m_r;
+	u32 m_r;
 	u16 m_o;
 	u8 m_cki_bus;
 	u8 m_c4;
@@ -262,7 +262,7 @@ protected:
 	const u16 *m_output_pla_table;
 	devcb_read8 m_read_k;
 	devcb_write16 m_write_o;
-	devcb_write16 m_write_r;
+	devcb_write32 m_write_r;
 	devcb_write_line m_power_off;
 	devcb_read8 m_read_ctl;
 	devcb_write8 m_write_ctl;

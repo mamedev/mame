@@ -53,7 +53,7 @@ protected:
 	output_finder<> m_out_power; // power state, eg. led
 
 	// misc common
-	u16 m_r = 0U;                        // MCU R-pins data
+	u32 m_r = 0U;                        // MCU R-pins data
 	u16 m_o = 0U;                        // MCU O-pins data
 	u32 m_inp_mux = 0U;                  // multiplexed inputs mask
 	bool m_power_on = false;

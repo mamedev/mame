@@ -89,7 +89,7 @@ private:
 
 	u8 main_read_k();
 	void main_write_o(u16 data);
-	void main_write_r(u16 data);
+	void main_write_r(u32 data);
 
 	u8 rev1_ctl_r();
 	void rev1_ctl_w(u8 data);
@@ -98,7 +98,7 @@ private:
 	void sub_write_r(u16 data);
 
 	void rev2_write_o(u16 data);
-	void rev2_write_r(u16 data);
+	void rev2_write_r(u32 data);
 
 	virtual void machine_start() override;
 };
@@ -149,7 +149,7 @@ void tispellb_state::main_write_o(u16 data)
 	update_display();
 }
 
-void tispellb_state::main_write_r(u16 data)
+void tispellb_state::main_write_r(u32 data)
 {
 	// R0-R6: input mux
 	// R0-R7: select digit
@@ -219,7 +219,7 @@ void tispellb_state::rev2_write_o(u16 data)
 	main_write_o(data & 0x6fff);
 }
 
-void tispellb_state::rev2_write_r(u16 data)
+void tispellb_state::rev2_write_r(u32 data)
 {
 	// R12: TMC0355 CS
 	// R4: TMC0355 M1

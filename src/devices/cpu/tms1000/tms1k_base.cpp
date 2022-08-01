@@ -519,7 +519,7 @@ void tms1k_base_device::op_clo()
 void tms1k_base_device::op_ldx()
 {
 	// LDX: load X register with (x_bits) constant
-	m_x = m_c4 >> (4-m_x_bits);
+	m_x = m_c4 >> (4 - m_x_bits);
 }
 
 void tms1k_base_device::op_comx()

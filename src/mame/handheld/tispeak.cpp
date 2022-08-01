@@ -500,18 +500,18 @@ private:
 	u8 snspell_read_k();
 	void snmath_write_o(u16 data);
 	void snspell_write_o(u16 data);
-	void snspell_write_r(u16 data);
-	void lantrans_write_r(u16 data);
+	void snspell_write_r(u32 data);
+	void lantrans_write_r(u32 data);
 
 	u8 snspellc_read_k();
 	void snspellc_write_o(u16 data);
-	void snspellc_write_r(u16 data);
+	void snspellc_write_r(u32 data);
 	u8 tntell_read_k();
 
 	void k28_update_display(u8 old, u8 data);
 	u8 k28_read_k();
 	void k28_write_o(u16 data);
-	void k28_write_r(u16 data);
+	void k28_write_r(u32 data);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
@@ -620,7 +620,7 @@ void tispeak_state::update_display()
 	m_display->matrix(m_grid & gridmask, m_plate);
 }
 
-void tispeak_state::snspell_write_r(u16 data)
+void tispeak_state::snspell_write_r(u32 data)
 {
 	// R0-R7: input mux and select digit (+R8 if the device has 9 digits)
 	// R15: filament on
@@ -665,7 +665,7 @@ void tispeak_state::snmath_write_o(u16 data)
 
 // lantrans specific
 
-void tispeak_state::lantrans_write_r(u16 data)
+void tispeak_state::lantrans_write_r(u32 data)
 {
 	// same as default, except R13 is used for an extra digit
 	m_r = m_inp_mux = data;
@@ -676,7 +676,7 @@ void tispeak_state::lantrans_write_r(u16 data)
 
 // snspellc specific
 
-void tispeak_state::snspellc_write_r(u16 data)
+void tispeak_state::snspellc_write_r(u32 data)
 {
 	// R0-R8: input mux
 	m_inp_mux = data;
@@ -765,7 +765,7 @@ void tispeak_state::k28_update_display(u8 old, u8 data)
 	// ?
 }
 
-void tispeak_state::k28_write_r(u16 data)
+void tispeak_state::k28_write_r(u32 data)
 {
 	// R1234: TMS5100 CTL8421
 	u16 r = bitswap<5>(data,0,1,2,3,4) | (data & ~0x1f);
