@@ -881,10 +881,54 @@ void axc51base_cpu_device::extended_a5_0e()
 	case 0x60: case 0x61: case 0x62: case 0x63: case 0x64: case 0x65: case 0x66: case 0x67: case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f:
 	case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77: case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
 	{
+		// 	fatalerror("%s: ADD16 ER%01x, ER%01x, ER%01x", machine().describe_context(), p, n, m);
+
 		uint8_t p = (prm2 & 0x30) >> 4;
 		uint8_t n = (prm2 & 0x0c) >> 2;
 		uint8_t m = (prm2 & 0x03) >> 0;
-		fatalerror("%s: ADD16 ER%01x, ER%01x, ER%01x", machine().describe_context(), p, n, m);
+
+		uint16_t val;
+
+		switch (n)
+		{
+		case 0x00: val = (ER0); break;
+		case 0x01: val = (ER1); break;
+		case 0x02: val = (ER2); break;
+		case 0x03: val = (ER3); break;
+		}
+
+		uint16_t val2;
+
+		switch (m)
+		{
+		case 0x00: val2 = (ER0); break;
+		case 0x01: val2 = (ER1); break;
+		case 0x02: val2 = (ER2); break;
+		case 0x03: val2 = (ER3); break;
+		}
+
+		uint32_t res = val + val2 + (GET_EC);
+
+		if (res & 0xffff0000)
+			SET_EC(1);
+		else
+			SET_EC(0);
+
+		res &= 0xffff;
+
+		if (!res)
+			SET_EZ(1);
+		else
+			SET_EZ(0);
+
+		switch (p)
+		{
+			case 0x00: SET_EP0(res); break;
+			case 0x01: SET_EP1(res); break;
+			case 0x02: SET_EP2(res); break;
+			case 0x03: SET_EP3(res); break;
+		}
+
 		break;
 	}
 
@@ -1680,11 +1724,11 @@ void axc51base_cpu_device::state_string_export(const device_state_entry &entry, 
 			str = string_format("%c%c%c%c%c%c%c%c",
 				PSW & 0x80 ? 'C':'.',
 				PSW & 0x40 ? 'A':'.',
-				PSW & 0x20 ? 'EC':'.',
+				PSW & 0x20 ? 'c':'.', // EC
 				PSW & 0x10 ? '0':'.',
 				PSW & 0x08 ? '1':'.',
 				PSW & 0x04 ? 'V':'.',
-				PSW & 0x02 ? 'EZ':'.',
+				PSW & 0x02 ? 'z':'.', // EZ
 				PSW & 0x01 ? 'P':'.');
 			break;
 	}
