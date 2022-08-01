@@ -495,8 +495,13 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 	switch (prm)
 	{
 	case 0x00:
-		fatalerror("%s: INCDP0", machine().describe_context());
+	{
+		// INCDP0
+		// (always affects DP0, ignores DPSEL)
+		uint16_t dptr = (DPTR)+1;
+		SET_DPTR(dptr);
 		break;
+	}
 
 	case 0x01:
 		fatalerror("%s: INCDP1", machine().describe_context());
@@ -1422,6 +1427,9 @@ void axc51base_cpu_device::sfr_write(size_t offset, uint8_t data)
 		case AXC51_GP7: // 0xb5
 			break;
 
+		case AXC51_P4: // 0xb4
+			break;
+
 		case AXC51_DPCON: dpcon_w(data); return; // 0x86
 
 		case AXC51_DBASE: // 0x9b
@@ -1778,6 +1786,19 @@ void axc51base_cpu_device::spibaud_w(uint8_t data)
 	logerror("%s: sfr_write AXC51_SPIBAUD %02x\n", machine().describe_context(), data);
 	m_sfr_regs[AXC51_SPIBAUD - 0x80] = data;
 }
+
+/*
+AXC51_DPCON (at 0x86)
+
+7  IA   01 = vector base 0x4003, 10 = vector base 0x8003, 00/11 invalid
+6  IA
+5  DPID0  DPTR0 increase direction control, 0 = increase, 1 = decrease
+4  DPID1  DPTR1 increase direction control, 0 = increase, 1 = descrese
+3  DPAID  DPTR auto increase enable
+2  DPTSL  DPSEL auto-toggle enable (0 = no auto toggle, 1 = auto toggle)
+1  ---
+0  DPSEL  DPTR Select (0 = use DPTR0, 1 = use DPTR1)
+*/
 
 void axc51base_cpu_device::dpcon_w(uint8_t data)
 {
