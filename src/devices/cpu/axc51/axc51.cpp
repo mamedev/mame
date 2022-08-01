@@ -734,10 +734,34 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 
 	case 0x90: case 0x91: case 0x92: case 0x93: case 0x94: case 0x95: case 0x96: case 0x97: case 0x98: case 0x99: case 0x9a: case 0x9b: case 0x9c: case 0x9d: case 0x9e: case 0x9f:
 	{
+		// fatalerror("%s: MOV16 ER%01x, ER%01x", machine().describe_context(), n, m);
+
 		uint8_t n = (prm & 0x0c) >> 2;
 		uint8_t m = (prm & 0x03) >> 0;
 
-		fatalerror("%s: MOV16 ER%01x, ER%01x", machine().describe_context(), n, m);
+		uint16_t val;
+
+		switch (m)
+		{
+		case 0x00: val = (ER0); break;
+		case 0x01: val = (ER1); break;
+		case 0x02: val = (ER2); break;
+		case 0x03: val = (ER3); break;
+		}
+
+		switch (n)
+		{
+		case 0x00: SET_EP0(val); break;
+		case 0x01: SET_EP1(val); break;
+		case 0x02: SET_EP2(val); break;
+		case 0x03: SET_EP3(val); break;
+		}
+
+		if (!val)
+			SET_EZ(1);
+		else
+			SET_EZ(0);
+
 		break;
 	}
 
@@ -787,10 +811,10 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 
 		switch (n)
 		{
-			case 0x00: SET_EP0(val); break;
-			case 0x01: SET_EP1(val); break;
-			case 0x02: SET_EP2(val); break;
-			case 0x03: SET_EP3(val); break;
+		case 0x00: SET_EP0(val); break;
+		case 0x01: SET_EP1(val); break;
+		case 0x02: SET_EP2(val); break;
+		case 0x03: SET_EP3(val); break;
 		}
 		break;
 	}
@@ -923,10 +947,10 @@ void axc51base_cpu_device::extended_a5_0e()
 
 		switch (p)
 		{
-			case 0x00: SET_EP0(res); break;
-			case 0x01: SET_EP1(res); break;
-			case 0x02: SET_EP2(res); break;
-			case 0x03: SET_EP3(res); break;
+		case 0x00: SET_EP0(res); break;
+		case 0x01: SET_EP1(res); break;
+		case 0x02: SET_EP2(res); break;
+		case 0x03: SET_EP3(res); break;
 		}
 
 		break;
