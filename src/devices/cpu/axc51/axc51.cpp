@@ -1896,6 +1896,7 @@ void axc51base_cpu_device::spibuf_w(uint8_t data)
 			else if (data == 0x0b)
 			{
 				logerror("SPI Fast Read Command\n");
+				m_spi_state = READY_FOR_ADDRESS2;
 			}
 			else
 			{
@@ -2012,7 +2013,7 @@ void axc51base_cpu_device::spidmacnt_w(uint8_t data)
 
 	if (((m_sfr_regs[AXC51_SPICON - 0x80]) & 0x20) == 0x20) // Read from SPI
 	{
-		logerror("attempting to do DMA from SPI source address %08x destination address %04x count %04x\n", m_spiaddr, m_spi_dma_addr, (data + 1) * 2);
+		logerror("attempting to do *READ* DMA from SPI source address %08x destination address %04x count %04x\n", m_spiaddr, m_spi_dma_addr, (data + 1) * 2);
 
 		for (int i = 0; i < (data + 1) * 2; i++)
 		{
@@ -2021,6 +2022,17 @@ void axc51base_cpu_device::spidmacnt_w(uint8_t data)
 			//uint8_t romdat = m_spiptr[m_spiaddr++];
 			m_io.write_byte(m_spi_dma_addr++, romdat); // is this the correct destination space?
 		}
+	}
+	else
+	{
+		logerror("attempting to do *WRITE* DMA source address (RAM) %04x count %04x\n", m_spi_dma_addr, (data + 1) * 2);
+		// 4 bytes will be written instead of 3 when setting the DMA address this way, but the 4th byte always seems to be 0xff which is ignored by our code
+		for (int i = 0; i < (data + 1) * 2; i++)
+		{
+			uint8_t ramdat = m_io.read_byte(m_spi_dma_addr++);
+			spibuf_w(ramdat);
+		}
+
 	}
 }
 
