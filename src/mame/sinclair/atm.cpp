@@ -13,7 +13,6 @@ TODO:
 	* ATM2+ (compare to ATM2) has only 1M RAM vs 512K
 	* Mem masks are hardcoded to 1M RAM, 64K ROM
 	* CMOS
-	* COVOX
 	* better handling of SHADOW ports
 	* validate screen timings
 
@@ -25,6 +24,7 @@ TODO:
 
 #include "tilemap.h"
 #include "beta_m.h"
+#include "bus/centronics/ctronics.h"
 #include "sound/ay8910.h"
 
 namespace {
@@ -56,6 +56,7 @@ public:
 		, m_bank_view3(*this, "bank_view3")
 		, m_bank_rom(*this, "bank_rom%u", 0U)
 		, m_beta(*this, BETA_DISK_TAG)
+		, m_centronics(*this, "centronics")
 		, m_palette(*this, "palette")
 		, m_gfxdecode(*this, "gfxdecode")
 	{ }
@@ -102,6 +103,7 @@ private:
 	memory_view m_bank_view3;
 	required_memory_bank_array<4> m_bank_rom;
 	required_device<beta_disk_device> m_beta;
+	required_device<centronics_device> m_centronics;
 	required_device<device_palette_interface> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 
@@ -429,6 +431,7 @@ void atm_state::atm_io(address_map &map)
 	map(0x00ff, 0x00ff).mirror(0xff00).r(m_beta, FUNC(beta_disk_device::state_r));
 	map(0x00ff, 0x00ff).mirror(0xff00).w(FUNC(atm_state::atm_port_ffff_w));
 	map(0x00f6, 0x00f6).select(0xff08).rw(FUNC(atm_state::spectrum_ula_r), FUNC(atm_state::atm_ula_w));
+	map(0x00fb, 0x00fb).mirror(0xff00).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x00fd, 0x00fd).mirror(0xff00).w(FUNC(atm_state::atm_port_7ffd_w));
 	map(0x0077, 0x0077).select(0xff00).w(FUNC(atm_state::atm_port_ff77_w));
 	map(0x007b, 0x007b).mirror(0xff00).r(FUNC(atm_state::atm_port_ff7b_r));
@@ -536,6 +539,10 @@ void atm_state::atm(machine_config &config)
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_atm);
 
 	BETA_DISK(config, m_beta, 0);
+
+	CENTRONICS(config, m_centronics, centronics_devices, "covox");
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	config.device_remove("exp");
 }
