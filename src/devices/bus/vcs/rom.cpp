@@ -492,7 +492,7 @@ a26_rom_e7_device::a26_rom_e7_device(const machine_config &mconfig, const char *
 	: a26_rom_base_device(mconfig, A26_ROM_E7, tag, owner, clock)
 	, m_rom_bank(*this, "rom_bank")
 	, m_lo_ram_bank(*this, "low_ram")
-	, m_hi_ram_bank(*this, "high_raw")
+	, m_hi_ram_bank(*this, "high_ram")
 	, m_view(*this, "view")
 {
 }
