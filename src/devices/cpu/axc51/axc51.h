@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Steve Ellenoff, Manuel Abadia, Couriersud
+// copyright-holders:Steve Ellenoff, Manuel Abadia, Couriersud, David Haywood
 
 #ifndef MAME_CPU_AXC51_AXC51_H
 #define MAME_CPU_AXC51_AXC51_H
@@ -18,11 +18,6 @@ enum
 {
 	AXC51_INT0_LINE = 0,    /* P3.2: External Interrupt 0 */
 	AXC51_INT1_LINE,        /* P3.3: External Interrupt 1 */
-	AXC51_RX_LINE,          /* P3.0: Serial Port Receive Line */
-	AXC51_T0_LINE,          /* P3,4: Timer 0 External Input */
-	AXC51_T1_LINE,          /* P3.5: Timer 1 External Input */
-	AXC51_T2_LINE,          /* P1.0: Timer 2 External Input */
-	AXC51_T2EX_LINE,        /* P1.1: Timer 2 Capture Reload Trigger */
 };
 
 
@@ -41,11 +36,12 @@ public:
 
 	void program_internal(address_map &map);
 	void data_internal(address_map &map);
+	void io_internal(address_map &map);
 
 protected:
 	// construction/destruction
 	axc51base_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features = 0);
-	axc51base_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map, address_map_constructor data_map, int program_width, int data_width, uint8_t features = 0);
+	axc51base_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map, address_map_constructor data_map, address_map_constructor io_map, int program_width, int data_width, uint8_t features = 0);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -95,6 +91,7 @@ protected:
 
 	uint32_t m_spiaddr;
 
+
 	// JB-related hacks
 	uint8_t m_last_op;
 	uint8_t m_last_bit;
@@ -113,8 +110,9 @@ protected:
 	} m_uart;            /* internal uart */
 
 	/* Internal Ram */
-	required_shared_ptr<uint8_t> m_sfr_ram;           /* 128 SFR - these are in 0x80 - 0xFF */
+	uint8_t m_sfr_regs[128];
 	required_shared_ptr<uint8_t> m_scratchpad;        /* 128 RAM (8031/51) + 128 RAM in second bank (8032/52) */
+	required_shared_ptr<uint8_t> m_mainram;
 
 	uint8_t m_uid[4];
 
@@ -124,7 +122,7 @@ protected:
 
 	/* Memory spaces */
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_program;
-	memory_access< 9, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
+	memory_access<11, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
 	memory_access<17, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 
 	devcb_read8::array<4> m_port_in_cb;
@@ -139,8 +137,13 @@ protected:
 
 	static const uint8_t axc51_cycles[256];
 
-	uint8_t iram_iread(offs_t a);
-	void iram_iwrite(offs_t a, uint8_t d);
+	uint8_t iram_indirect_read(offs_t a);
+	void iram_indirect_write(offs_t a, uint8_t d);
+
+	uint8_t iram_indirect_read_dbase(offs_t a);
+	void iram_indirect_write_dbase(offs_t a, uint8_t d);
+
+
 	void clear_current_irq();
 	uint8_t r_acc();
 	uint8_t r_psw();
@@ -170,6 +173,7 @@ protected:
 	uint8_t spicon_r();
 	uint8_t spibuf_r();
 	uint8_t dpcon_r();
+	uint8_t uartsta_r();
 
 	void spidmaadr_w(uint8_t data);
 	void spidmacnt_w(uint8_t data);

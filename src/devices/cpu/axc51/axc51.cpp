@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Steve Ellenoff, Manuel Abadia, Couriersud
+// copyright-holders:Steve Ellenoff, Manuel Abadia, Couriersud, David Haywood
 
 /*
 	This is currently mostly copied from the mcs51 core
@@ -46,31 +46,38 @@ DEFINE_DEVICE_TYPE(AX208P, ax208p_cpu_device, "ax208p", "AppoTech AX208 (AXC51-C
 
 void axc51base_cpu_device::program_internal(address_map &map)
 {
+	map(0x4000, 0x6fff).ram().share("mainram");
 }
 
 void axc51base_cpu_device::data_internal(address_map &map)
 {
-	map(0x0000, 0x00ff).ram().share("scratchpad");
-	map(0x0100, 0x01ff).ram().share("sfr_ram"); /* SFR */
+	map(0x0000, 0x03ff).ram().share("scratchpad"); // DRAM?
 }
 
 void ax208_cpu_device::ax208_internal_program_mem(address_map &map)
 {
+	map(0x4000, 0x6fff).ram().share("mainram");
 	map(0x8000, 0x9fff).rom().region("rom", 0); // this can only be read from code running within the same region
 }
 
+void axc51base_cpu_device::io_internal(address_map& map)
+{
+	map(0x0000, 0x03ff).ram();// .share("scratchpad");
+	map(0x4000, 0x6fff).ram().share("mainram");
+}
 
-axc51base_cpu_device::axc51base_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map, address_map_constructor data_map, int program_width, int data_width, uint8_t features)
+
+axc51base_cpu_device::axc51base_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map, address_map_constructor data_map, address_map_constructor io_map, int program_width, int data_width, uint8_t features)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, program_map)
-	, m_data_config("data", ENDIANNESS_LITTLE, 8, 9, 0, data_map)
-	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
+	, m_data_config("data", ENDIANNESS_LITTLE, 8, 11, 0, data_map)
+	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0, io_map)
 	, m_pc(0)
 	, m_features(features)
 	, m_rom_size(program_width > 0 ? 1 << program_width : 0)
 	, m_num_interrupts(5)
-	, m_sfr_ram(*this, "sfr_ram")
 	, m_scratchpad(*this, "scratchpad")
+	, m_mainram(*this, "mainram")
 	, m_port_in_cb(*this)
 	, m_port_out_cb(*this)
 	, m_serial_tx_cb(*this)
@@ -81,6 +88,9 @@ axc51base_cpu_device::axc51base_cpu_device(const machine_config &mconfig, device
 	for (auto & elem : m_forced_inputs)
 		elem = 0;
 
+	for (int i = 0; i < 0x80; i++)
+		m_sfr_regs[i] = 0x00;
+
 	m_uid[0] = 0x00; // not used?
 	m_uid[1] = 0x00; // used in RTC / USB code?
 	m_uid[2] = 0x91; // used in crypt code?
@@ -89,7 +99,7 @@ axc51base_cpu_device::axc51base_cpu_device(const machine_config &mconfig, device
 
 
 axc51base_cpu_device::axc51base_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features)
-	: axc51base_cpu_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(axc51base_cpu_device::program_internal), this), address_map_constructor(FUNC(axc51base_cpu_device::data_internal), this), program_width, data_width, features)
+	: axc51base_cpu_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(axc51base_cpu_device::program_internal), this), address_map_constructor(FUNC(axc51base_cpu_device::data_internal), this), address_map_constructor(FUNC(axc51base_cpu_device::io_internal), this),  program_width, data_width, features)
 {
 }
 
@@ -126,11 +136,20 @@ device_memory_interface::space_config_vector axc51base_cpu_device::memory_space_
 
 /* Read/Write a byte from/to the Internal RAM indirectly */
 /* (called from indirect addressing)                     */
-uint8_t axc51base_cpu_device::iram_iread(offs_t a) { return m_data.read_byte(a); }
-void axc51base_cpu_device::iram_iwrite(offs_t a, uint8_t d) { m_data.write_byte(a, d); }
+/* these go through DBASE register on axc51 (at least stack accesses) */
+uint8_t axc51base_cpu_device::iram_indirect_read(offs_t a) { return m_data.read_byte(a); }
+void axc51base_cpu_device::iram_indirect_write(offs_t a, uint8_t d) { m_data.write_byte(a, d); }
 
-#define IRAM_IR(a)      iram_iread(a)
-#define IRAM_IW(a, d)   iram_iwrite(a, d)
+uint8_t axc51base_cpu_device::iram_indirect_read_dbase(offs_t a) { return m_data.read_byte((m_sfr_regs[AXC51_DBASE - 0x80] * 4) + a); }
+void axc51base_cpu_device::iram_indirect_write_dbase(offs_t a, uint8_t d) { m_data.write_byte((m_sfr_regs[AXC51_DBASE - 0x80] * 4) + a, d); }
+
+
+#define IRAM_INDIRECT_R(a)      iram_indirect_read(a)
+#define IRAM_INDIRECT_W(a, d)   iram_indirect_write(a, d)
+
+#define IRAM_INDIRECT_R_DBASE(a)      iram_indirect_read_dbase(a)
+#define IRAM_INDIRECT_W_DBASE(a, d)   iram_indirect_write_dbase(a, d)
+
 
 /* Form an Address to Read/Write to External RAM indirectly */
 /* (called from indirect addressing)                        */
@@ -151,7 +170,7 @@ void axc51base_cpu_device::iram_iwrite(offs_t a, uint8_t d) { m_data.write_byte(
 /* SFR Registers - These are accessed directly for speed on read */
 /* Read accessors                                                */
 
-#define SFR_A(a)        m_sfr_ram[(a)]
+#define SFR_A(a)        m_sfr_regs[(a)]
 #define SET_SFR_A(a,v)  do { SFR_A(a) = (v); } while (0)
 
 #define ACC         SFR_A(ADDR_ACC)
@@ -297,18 +316,18 @@ void axc51base_cpu_device::iram_write(size_t offset, uint8_t data)
 void axc51base_cpu_device::push_pc()
 {
 	uint8_t tmpSP = SP+1;                     //Grab and Increment Stack Pointer
-	IRAM_IW(tmpSP, (PC & 0xff));                //Store low byte of PC to Internal Ram (Use IRAM_IW to store stack above 128 bytes)
+	IRAM_INDIRECT_W_DBASE(tmpSP, (PC & 0xff));                //Store low byte of PC to Internal Ram (Use IRAM_INDIRECT_W to store stack above 128 bytes)
 	tmpSP++;                                    // ""
 	SP = tmpSP;                             // ""
-	IRAM_IW(tmpSP, ( (PC & 0xff00) >> 8));      //Store hi byte of PC to next address in Internal Ram (Use IRAM_IW to store stack above 128 bytes)
+	IRAM_INDIRECT_W_DBASE(tmpSP, ( (PC & 0xff00) >> 8));      //Store hi byte of PC to next address in Internal Ram (Use IRAM_INDIRECT_W to store stack above 128 bytes)
 }
 
 /*Pop the current PC off the stack and into the pc*/
 void axc51base_cpu_device::pop_pc()
 {
 	uint8_t tmpSP = SP;                           //Grab Stack Pointer
-	PC = (IRAM_IR(tmpSP--) & 0xff) << 8;        //Store hi byte to PC (must use IRAM_IR to access stack pointing above 128 bytes)
-	PC = PC | IRAM_IR(tmpSP--);                 //Store lo byte to PC (must use IRAM_IR to access stack pointing above 128 bytes)
+	PC = (IRAM_INDIRECT_R_DBASE(tmpSP--) & 0xff) << 8;        //Store hi byte to PC (must use IRAM_INDIRECT_R to access stack pointing above 128 bytes)
+	PC = PC | IRAM_INDIRECT_R_DBASE(tmpSP--);                 //Store lo byte to PC (must use IRAM_INDIRECT_R to access stack pointing above 128 bytes)
 	SP = tmpSP;                             //Decrement Stack Pointer
 }
 
@@ -1397,18 +1416,25 @@ void axc51base_cpu_device::sfr_write(size_t offset, uint8_t data)
 
 		case AXC51_DPCON: dpcon_w(data); return; // 0x86
 
+		case AXC51_DBASE: // 0x9b
+			logerror("%s: setting DBASE to %02x\n", machine().describe_context(), data );
+			m_sfr_regs[AXC51_DBASE - 0x80] = data;
+			return;
+
+
 		case AXC51_SPIDMAADR: spidmaadr_w(data); return; // 0xd6
 		case AXC51_SPIDMACNT: spidmacnt_w(data); return; // 0xd7
 		case AXC51_SPICON: spicon_w(data); return; // 0xd8
 		case AXC51_SPIBUF: spibuf_w(data); return; // 0xd9
 		case AXC51_SPIBAUD: spibaud_w(data); return; // 0xda
 
+
 		default:
-			LOG(("axc51 '%s': attemping to write to an invalid/non-implemented SFR address: %x at 0x%04x, data=%x\n", tag(), (uint32_t)offset,PC,data));
+			LOG(("%s: attemping to write to an invalid/non-implemented SFR address: %02x  data=%02x\n", machine().describe_context(), (uint32_t)offset, data));
 			/* no write in this case according to manual */
 			return;
 	}
-	m_data.write_byte((size_t)offset | 0x100, data);
+	m_sfr_regs[offset - 0x80] = data;
 }
 
 uint8_t axc51base_cpu_device::sfr_read(size_t offset)
@@ -1434,7 +1460,7 @@ uint8_t axc51base_cpu_device::sfr_read(size_t offset)
 		case ADDR_PCON:
 		case ADDR_IE:
 		case ADDR_IP:
-			return m_data.read_byte((size_t) offset | 0x100);
+			return m_sfr_regs[offset-0x80];
 
 		case AXC51_DPCON: // 0x86
 			return dpcon_r();
@@ -1453,6 +1479,8 @@ uint8_t axc51base_cpu_device::sfr_read(size_t offset)
 		case AXC51_UID2: return m_uid[2]; // 0xe4
 		case AXC51_UID3: return m_uid[3]; // 0xe5
 
+		case AXC51_UARTSTA: // 0xfc
+			return uartsta_r();
 
 		/* Illegal or non-implemented sfr */
 		default:
@@ -1490,6 +1518,7 @@ void axc51base_cpu_device::device_start()
 	save_item(NAME(m_uart.rx_clk));
 	save_item(NAME(m_uart.tx_clk));
 	save_item(NAME(m_uart.delay_cycles));
+	save_item(NAME(m_sfr_regs));
 
 	state_add( AXC51_PC,  "PC", m_pc).formatstr("%04X");
 	state_add( AXC51_SP,  "SP", SP).formatstr("%02X");
@@ -1609,15 +1638,40 @@ AXC51_SPICON (at 0xd8)
 
 uint8_t axc51base_cpu_device::spicon_r()
 {
-	uint8_t result = m_data.read_byte((size_t)AXC51_SPICON | 0x100) | 0x80;
+	uint8_t result = m_sfr_regs[AXC51_SPICON - 0x80] | 0x80;
 	logerror("%s: sfr_read AXC51_SPICON %02x\n", machine().describe_context(), result);
 	return result;
 }
 
+/*
+
+AXC51_UARTSTA (at 0xfc)
+
+7 UTRXNB      (9th bit of data of RX buffer)   
+6 FEF         (0 = stop bit was 1 in last frame,  1 = stop bit was 0)
+5 RXIF        (0 = receive not done, 1 = done)
+4 TXIF        (0 = transmit not done, 1 = done)
+3 ---
+2 ---
+1 ---
+0 PSEL        (UART port / pin select)
+
+*/
+
+uint8_t axc51base_cpu_device::uartsta_r()
+{
+	//uint8_t result = m_sfr_regs[AXC51_UARTSTA - 0x80];
+	uint8_t result = 0x30;
+	logerror("%s: sfr_read AXC51_UARTSTA %02x\n", machine().describe_context(), result);
+	return result;
+}
+
+
 void axc51base_cpu_device::spicon_w(uint8_t data)
 {
 	logerror("%s: sfr_write AXC51_SPICON %02x\n", machine().describe_context(), data);
-	m_data.write_byte((size_t)AXC51_SPICON | 0x100, data);
+
+	m_sfr_regs[AXC51_SPICON - 0x80] = data;
 }
 
 
@@ -1625,7 +1679,7 @@ void axc51base_cpu_device::spicon_w(uint8_t data)
 uint8_t axc51base_cpu_device::dpcon_r()
 {
 	logerror("%s: sfr_read AXC51_DPCON\n", machine().describe_context());
-	return m_data.read_byte((size_t)AXC51_DPCON | 0x100);
+	return m_sfr_regs[AXC51_DPCON - 0x80];
 }
 
 uint8_t axc51base_cpu_device::spibuf_r()
@@ -1642,7 +1696,7 @@ uint8_t axc51base_cpu_device::spibuf_r()
 	logerror("%s: sfr_read AXC51_SPIBUF\n", machine().describe_context());
 
 	return machine().rand();
-	//return m_data.read_byte((size_t)AXC51_SPIBUF | 0x100);
+	//return m_sfr_regs[AXC51_SPIBUF - 0x80];
 }
 
 
@@ -1650,32 +1704,32 @@ uint8_t axc51base_cpu_device::spibuf_r()
 void axc51base_cpu_device::spibuf_w(uint8_t data)
 {
 	logerror("%s: sfr_write AXC51_SPIBUF %02x\n", machine().describe_context(), data);
-	m_data.write_byte((size_t)AXC51_SPIBUF | 0x100, data);
+	m_sfr_regs[AXC51_SPIBUF - 0x80] = data;
 }
 
 void axc51base_cpu_device::spibaud_w(uint8_t data)
 {
 	logerror("%s: sfr_write AXC51_SPIBAUD %02x\n", machine().describe_context(), data);
-	m_data.write_byte((size_t)AXC51_SPIBAUD | 0x100, data);
+	m_sfr_regs[AXC51_SPIBAUD - 0x80] = data;
 }
 
 void axc51base_cpu_device::dpcon_w(uint8_t data)
 {
 	logerror("%s: sfr_write AXC51_DPCON %02x\n", machine().describe_context(), data);
-	m_data.write_byte((size_t)AXC51_DPCON | 0x100, data);
+	m_sfr_regs[AXC51_DPCON - 0x80] = data;
 }
 
 
 void axc51base_cpu_device::spidmaadr_w(uint8_t data)
 {
 	logerror("%s: sfr_write AXC51_SPIDMAADR %02x\n", machine().describe_context(), data);
-	m_data.write_byte((size_t)AXC51_SPIDMAADR | 0x100, data);
+	m_sfr_regs[AXC51_SPIDMAADR - 0x80] = data;
 }
 
 void axc51base_cpu_device::spidmacnt_w(uint8_t data)
 {
 	logerror("%s: sfr_write AXC51_SPIDMACNT %02x\n", machine().describe_context(), data);
-	m_data.write_byte((size_t)AXC51_SPIDMACNT | 0x100, data);
+	m_sfr_regs[AXC51_SPIDMACNT - 0x80] = data;
 }
 
 ROM_START( ax208 ) // assume all production ax208 chips use this internal ROM
@@ -1700,7 +1754,7 @@ void ax208_cpu_device::device_reset()
 // AX208 (specific CPU)
 
 ax208_cpu_device::ax208_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: axc51base_cpu_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(ax208_cpu_device::ax208_internal_program_mem), this), address_map_constructor(FUNC(ax208_cpu_device::data_internal), this), 0, 8)
+	: axc51base_cpu_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(ax208_cpu_device::ax208_internal_program_mem), this), address_map_constructor(FUNC(ax208_cpu_device::data_internal), this), address_map_constructor(FUNC(axc51base_cpu_device::io_internal), this), 0, 8)
 {
 }
 

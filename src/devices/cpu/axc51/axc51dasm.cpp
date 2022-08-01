@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Steve Ellenoff
+// copyright-holders:Steve Ellenoff, David Haywood
 
 #include "emu.h"
 #include "axc51dasm.h"

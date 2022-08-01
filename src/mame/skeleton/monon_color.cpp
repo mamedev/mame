@@ -29,8 +29,7 @@ public:
 		m_cart(*this, "cartslot"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_mainram(*this, "mainram")
+		m_palette(*this, "palette")
 	{ }
 
 	void monon_color(machine_config &config);
@@ -48,12 +47,8 @@ private:
 	required_device<ax208_cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<uint8_t> m_mainram;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-
-	void monon_color_map(address_map &map);
-	void monon_color_io_map(address_map &map);
 };
 
 void monon_color_state::machine_start()
@@ -96,26 +91,12 @@ uint32_t monon_color_state::screen_update(screen_device &screen, bitmap_ind16 &b
 static INPUT_PORTS_START( monon_color )
 INPUT_PORTS_END
 
-void monon_color_state::monon_color_map(address_map &map)
-{
-	map(0x4000, 0x6fff).ram().share("mainram");
-//	map(0x9000, 0x9fff).rom() // internal to CPU
-}
 
-
-void monon_color_state::monon_color_io_map(address_map& map)
-{
-	map(0x0000, 0x00ff).ram();
-
-	map(0x4000, 0x6fff).ram().share("mainram");
-}
 
 void monon_color_state::monon_color(machine_config &config)
 {
 	/* basic machine hardware */
 	AX208(config, m_maincpu, 96000000); // (8051 / MCS51 derived) incomplete core!
-	m_maincpu->set_addrmap(AS_PROGRAM, &monon_color_state::monon_color_map);
-	m_maincpu->set_addrmap(AS_IO, &monon_color_state::monon_color_io_map);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

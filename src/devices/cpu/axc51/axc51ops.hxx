@@ -37,7 +37,7 @@ OPHANDLER( add_a_mem )
 //ADD A, @R0/@R1                            /* 1: 0010 011i */
 OPHANDLER( add_a_ir )
 {
-	uint8_t data = IRAM_IR(R_REG(r));         //Grab data from memory pointed to by R0 or R1
+	uint8_t data = IRAM_INDIRECT_R(R_REG(r));         //Grab data from memory pointed to by R0 or R1
 	uint8_t result = ACC + data;          //Add data to accumulator
 	DO_ADD_FLAGS(ACC,data,0);               //Set Flags
 	SET_ACC(result);                        //Store 8 bit result of addtion in ACC
@@ -74,7 +74,7 @@ OPHANDLER( addc_a_mem )
 //ADDC A, @R0/@R1                           /* 1: 0011 011i */
 OPHANDLER( addc_a_ir )
 {
-	uint8_t data = IRAM_IR(R_REG(r));         //Grab data from memory pointed to by R0 or R1
+	uint8_t data = IRAM_INDIRECT_R(R_REG(r));         //Grab data from memory pointed to by R0 or R1
 	uint8_t result = ACC + data + GET_CY; //Add data + carry flag to accumulator
 	DO_ADD_FLAGS(ACC,data,GET_CY);      //Set Flags
 	SET_ACC(result);                        //Store 8 bit result of addtion in ACC
@@ -132,7 +132,7 @@ OPHANDLER( anl_a_mem )
 //ANL A, @RO/@R1                            /* 1: 0101 011i */
 OPHANDLER( anl_a_ir )
 {
-	uint8_t data = IRAM_IR(R_REG(r));         //Grab data from address R0 or R1 points to
+	uint8_t data = IRAM_INDIRECT_R(R_REG(r));         //Grab data from address R0 or R1 points to
 	SET_ACC(ACC & data);                //Set ACC to value of ACC Logical AND with Data
 }
 
@@ -198,7 +198,7 @@ OPHANDLER( cjne_ir_byte )
 {
 	uint8_t data = ROP_ARG(PC++);             //Grab data
 	int8_t rel_addr = ROP_ARG(PC++);          //Grab relative code address
-	uint8_t srcdata = IRAM_IR(R_REG(r));      //Grab value pointed to by R0 or R1
+	uint8_t srcdata = IRAM_INDIRECT_R(R_REG(r));      //Grab value pointed to by R0 or R1
 
 	if(srcdata != data)                     //Jump if values are not equal
 	{
@@ -304,8 +304,8 @@ OPHANDLER( dec_mem )
 //DEC @R0/@R1                               /* 1: 0001 011i */
 OPHANDLER( dec_ir )
 {
-	uint8_t data = IRAM_IR(R_REG(r));
-	IRAM_IW(R_REG(r),data-1);
+	uint8_t data = IRAM_INDIRECT_R(R_REG(r));
+	IRAM_INDIRECT_W(R_REG(r),data-1);
 }
 
 //DEC R0 to R7                              /* 1: 0001 1rrr */
@@ -377,8 +377,8 @@ OPHANDLER( inc_mem )
 //INC @R0/@R1                               /* 1: 0000 011i */
 OPHANDLER( inc_ir )
 {
-	uint8_t data = IRAM_IR(R_REG(r));
-	IRAM_IW(R_REG(r),data+1);
+	uint8_t data = IRAM_INDIRECT_R(R_REG(r));
+	IRAM_INDIRECT_W(R_REG(r),data+1);
 }
 
 //INC R0 to R7                              /* 1: 0000 1rrr */
@@ -510,7 +510,7 @@ OPHANDLER( mov_a_mem )
 //MOV A,@RO/@R1                             /* 1: 1110 011i */
 OPHANDLER( mov_a_ir )
 {
-	SET_ACC(IRAM_IR(R_REG(r)));             //Store contents of address pointed by R0 or R1 to ACC
+	SET_ACC(IRAM_INDIRECT_R(R_REG(r)));             //Store contents of address pointed by R0 or R1 to ACC
 }
 
 //MOV A,R0 to R7                            /* 1: 1110 1rrr */
@@ -541,7 +541,7 @@ OPHANDLER( mov_mem_mem )
 OPHANDLER( mov_ir_byte )
 {
 	uint8_t data = ROP_ARG(PC++);             //Grab data
-	IRAM_IW(R_REG(r),data);                 //Store data to address pointed by R0 or R1
+	IRAM_INDIRECT_W(R_REG(r),data);                 //Store data to address pointed by R0 or R1
 }
 
 //MOV R0 to R7, #data                       /* 1: 0111 1rrr */
@@ -555,7 +555,7 @@ OPHANDLER( mov_r_byte )
 OPHANDLER( mov_mem_ir )
 {
 	uint8_t addr = ROP_ARG(PC++);             //Grab data address
-	IRAM_W(addr,IRAM_IR(R_REG(r)));         //Store contents pointed to by R0 or R1 to data address
+	IRAM_W(addr,IRAM_INDIRECT_R(R_REG(r)));         //Store contents pointed to by R0 or R1 to data address
 }
 
 //MOV data addr,R0 to R7                    /* 1: 1000 1rrr */
@@ -585,7 +585,7 @@ OPHANDLER( mov_bitaddr_c )
 OPHANDLER( mov_ir_mem )
 {
 	uint8_t addr = ROP_ARG(PC++);             //Grab data address
-	IRAM_IW(R_REG(r),IRAM_R(addr));         //Store data from data address to address pointed to by R0 or R1
+	IRAM_INDIRECT_W(R_REG(r),IRAM_R(addr));         //Store data from data address to address pointed to by R0 or R1
 }
 
 //MOV R0 to R7, data addr                   /* 1: 1010 1rrr */
@@ -605,7 +605,7 @@ OPHANDLER( mov_mem_a )
 //MOV @R0/@R1, A                            /* 1: 1111 011i */
 OPHANDLER( mov_ir_a )
 {
-	IRAM_IW(R_REG(r),ACC);                  //Store A to location pointed to by R0 or R1
+	IRAM_INDIRECT_W(R_REG(r),ACC);                  //Store A to location pointed to by R0 or R1
 }
 
 //MOV R0 to R7, A                           /* 1: 1111 1rrr */
@@ -725,7 +725,7 @@ OPHANDLER( orl_a_mem )
 //ORL A, @RO/@R1                            /* 1: 0100 011i */
 OPHANDLER( orl_a_ir )
 {
-	uint8_t data = IRAM_IR(R_REG(r));         //Grab data from address R0 or R1 points to
+	uint8_t data = IRAM_INDIRECT_R(R_REG(r));         //Grab data from address R0 or R1 points to
 	SET_ACC(ACC | data);                //Set ACC to value of ACC Logical OR with Data
 }
 
@@ -759,8 +759,8 @@ OPHANDLER( orl_c_nbitaddr )
 OPHANDLER( pop )
 {
 	uint8_t addr = ROP_ARG(PC++);             //Grab data address
-	IRAM_W(addr, IRAM_IR(SP));              //Store to contents of data addr, data pointed to by Stack - IRAM_IR needed to access upper 128 bytes of stack
-	//IRAM_IW(addr, IRAM_IR(R_SP));         //Store to contents of data addr, data pointed to by Stack - doesn't work, sfr's are not restored this way and it's not an indirect access anyway
+	IRAM_W(addr, IRAM_INDIRECT_R_DBASE(SP));              //Store to contents of data addr, data pointed to by Stack - IRAM_INDIRECT_R needed to access upper 128 bytes of stack
+	//IRAM_INDIRECT_W(addr, IRAM_INDIRECT_R(R_SP));         //Store to contents of data addr, data pointed to by Stack - doesn't work, sfr's are not restored this way and it's not an indirect access anyway
 	SP = SP-1;                              //Decrement SP
 }
 
@@ -770,7 +770,7 @@ OPHANDLER( push )
 	uint8_t addr = ROP_ARG(PC++);             //Grab data address
 	uint8_t tmpSP = SP+1;                 //Grab and Increment Stack Pointer
 	SP = tmpSP;                         // ""
-	IRAM_IW(tmpSP, IRAM_R(addr));           //Store to stack contents of data address - IRAM_IW needed to store to upper 128 bytes of stack, however, can't use IRAM_IR because that won't store the sfrs and it's not an indirect access anyway
+	IRAM_INDIRECT_W_DBASE(tmpSP, IRAM_R(addr));           //Store to stack contents of data address - IRAM_INDIRECT_W needed to store to upper 128 bytes of stack, however, can't use IRAM_INDIRECT_R because that won't store the sfrs and it's not an indirect access anyway
 }
 
 //RET                                       /* 1: 0010 0010 */
@@ -867,7 +867,7 @@ OPHANDLER( subb_a_mem )
 //SUBB A, @R0/@R1                           /* 1: 1001 011i */
 OPHANDLER( subb_a_ir )
 {
-	uint8_t data = IRAM_IR(R_REG(r));         //Grab data from memory pointed to by R0 or R1
+	uint8_t data = IRAM_INDIRECT_R(R_REG(r));         //Grab data from memory pointed to by R0 or R1
 	uint8_t result = ACC - data - GET_CY; //Subtract data & carry flag from accumulator
 	DO_SUB_FLAGS(ACC,data,GET_CY);      //Set Flags
 	SET_ACC(result);                        //Store 8 bit result of addtion in ACC
@@ -904,10 +904,10 @@ OPHANDLER( xch_a_mem )
 //XCH A, @RO/@R1                            /* 1: 1100 011i */
 OPHANDLER( xch_a_ir )
 {
-	uint8_t data = IRAM_IR(R_REG(r));         //Grab data pointed to by R0 or R1
+	uint8_t data = IRAM_INDIRECT_R(R_REG(r));         //Grab data pointed to by R0 or R1
 	uint8_t oldACC = ACC;                 //Hold value of ACC
 	SET_ACC(data);                      //Sets ACC to data
-	IRAM_IW(R_REG(r),oldACC);                    //Sets data address to old value of ACC
+	IRAM_INDIRECT_W(R_REG(r),oldACC);                    //Sets data address to old value of ACC
 }
 
 //XCH A, RO to R7                           /* 1: 1100 1rrr */
@@ -923,7 +923,7 @@ OPHANDLER( xch_a_r )
 OPHANDLER( xchd_a_ir )
 {
 	uint8_t acc, ir_data;
-	ir_data = IRAM_IR(R_REG(r));                //Grab data pointed to by R0 or R1
+	ir_data = IRAM_INDIRECT_R(R_REG(r));                //Grab data pointed to by R0 or R1
 	acc = ACC;                          //Grab ACC value
 	SET_ACC( (acc & 0xf0) | (ir_data & 0x0f) );     //Set ACC to lower nibble of data pointed to by R0 or R1
 	IRAM_W(R_REG(r), (ir_data & 0xf0) | (acc & 0x0f) ); //Set data pointed to by R0 or R1 to lower nibble of ACC
@@ -964,7 +964,7 @@ OPHANDLER( xrl_a_mem )
 //XRL A, @R0/@R1                            /* 1: 0110 011i */
 OPHANDLER( xrl_a_ir )
 {
-	uint8_t data = IRAM_IR(R_REG(r));         //Grab data from address R0 or R1 points to
+	uint8_t data = IRAM_INDIRECT_R(R_REG(r));         //Grab data from address R0 or R1 points to
 	SET_ACC(ACC ^ data);                //Set ACC to value of ACC Logical XOR with Data
 }
 
