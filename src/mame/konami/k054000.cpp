@@ -23,7 +23,7 @@
 
     The fun part is that game doesn't even access the chip at all during gameplay
     (or at least not until stage 6, where game disallows continues) while the specific
-    "delta" registers are instead challenged by Vendetta OTG attacks (cfr. MT#06393, MT#07839).
+    "delta" registers are instead challenged by Vendetta OTG attacks (cfr. MT06393, MT07839).
 
 **************************************************************************************************/
 
