@@ -146,11 +146,11 @@ k051960_device::k051960_device(const machine_config &mconfig, const char *tag, d
 	, m_irq_handler(*this)
 	, m_firq_handler(*this)
 	, m_nmi_handler(*this)
-	, m_vreg_contrast_handler(*this)
 	, m_romoffset(0)
 	, m_spriteflip(false)
 	, m_readroms(false)
 	, m_shadow_config(0)
+	, m_inv_shadow(false)
 	, m_nmi_enabled(false)
 {
 }
@@ -174,6 +174,11 @@ void k051960_device::set_plane_order(int order)
 		default:
 			fatalerror("Unknown plane_order\n");
 	}
+}
+
+void k051960_device::set_shadow_inv(bool inv)
+{
+	m_inv_shadow = inv;
 }
 
 //-------------------------------------------------
@@ -210,13 +215,13 @@ void k051960_device::device_start()
 	m_irq_handler.resolve_safe();
 	m_firq_handler.resolve_safe();
 	m_nmi_handler.resolve_safe();
-	m_vreg_contrast_handler.resolve_safe();
 
 	// register for save states
 	save_item(NAME(m_romoffset));
 	save_item(NAME(m_spriteflip));
 	save_item(NAME(m_readroms));
 	save_item(NAME(m_shadow_config));
+	save_item(NAME(m_inv_shadow));
 	save_item(NAME(m_nmi_enabled));
 	save_item(NAME(m_spriterombank));
 	save_pointer(NAME(m_ram), 0x400);
@@ -232,6 +237,7 @@ void k051960_device::device_reset()
 	m_spriteflip = false;
 	m_readroms = false;
 	m_shadow_config = 0;
+	m_inv_shadow = false;
 	m_nmi_enabled = false;
 
 	m_spriterombank[0] = 0;
@@ -392,7 +398,7 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 	int sortedlist[NUM_SPRITES];
 	uint8_t drawmode_table[256];
 
-	memset(drawmode_table, BIT(m_shadow_config, 0) ? DRAWMODE_SHADOW : DRAWMODE_SOURCE, sizeof(drawmode_table));
+	memset(drawmode_table, (BIT(m_shadow_config, 0) ^ m_inv_shadow) ? DRAWMODE_SHADOW : DRAWMODE_SOURCE, sizeof(drawmode_table));
 	drawmode_table[0] = DRAWMODE_NONE;
 
 	for (offs = 0; offs < NUM_SPRITES; offs++)
@@ -436,7 +442,7 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 		code = m_ram[offs + 2] + ((m_ram[offs + 1] & 0x1f) << 8);
 		color = m_ram[offs + 3] & 0xff;
 		pri = 0;
-		shadow = !BIT(m_shadow_config, 2) && (BIT(m_shadow_config, 1) || BIT(color, 7));
+		shadow = (!BIT(m_shadow_config, 2) && (BIT(m_shadow_config, 1) || BIT(color, 7))) ^ BIT(m_shadow_config, 0);
 		m_k051960_cb(&code, &color, &pri, &shadow);
 
 		if (max_priority != -1)
@@ -471,8 +477,8 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 			flipy = !flipy;
 		}
 
-		drawmode_table[gfx(0)->granularity() - 1] = (shadow && !BIT(m_shadow_config, 0)) ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
-
+		drawmode_table[gfx(0)->granularity() - 1] = (shadow ^ m_inv_shadow) ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
+		
 		if (zoomx == 0x10000 && zoomy == 0x10000)
 		{
 			int sx, sy;

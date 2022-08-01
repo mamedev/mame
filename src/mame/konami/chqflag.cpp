@@ -77,17 +77,25 @@ void chqflag_state::chqflag_vreg_w(uint8_t data)
 	 * 0x88 is for when night shows up (max amount of highlight)
 	 * 0x08 is used at dawn after 0x88 state
 	 * The shadow part looks ugly when rain starts/ends pouring (-> black colored with a setting of 0x00),
-	 * the reference shows dimmed background when this event occurs (which is handled via reg 1 bit 0 of k051960 device),
+	 * the reference shows dimmed background when this event occurs,
 	 * might be actually disabling the shadow here (-> setting 1.0f instead).
 	 *
 	 * TODO: true values aren't known, also shadow_factors table probably scales towards zero instead (game doesn't use those)
 	 */
-	const double shadow_factors[4] = {0.8, 1.33, 1.66, 2.0 };
-	const double highlight_factors[4] = {1.0, 1.33, 1.66, 2.0 };
-	uint8_t shadow_value = ((data & 0x80) >> 6) | ((data & 0x08) >> 3);
+	const double shadow_factors[4] = {0.8, 1.0, 1.33, 1.66};
+	uint8_t shadow_value = (data & 0x08) >> 3;
+	uint8_t shadow_setting = (data & 0x80) >> 7;
+	
+	m_k051960->set_shadow_inv(shadow_setting);
 
-	m_palette->set_shadow_factor(m_last_vreg != 0 ? highlight_factors[shadow_value] : shadow_factors[shadow_value] );
+	m_palette->set_shadow_factor(shadow_factors[(shadow_setting << 1) + shadow_value]);
 
+	if (shadow_setting != m_last_vreg)
+	{
+		m_last_vreg = shadow_setting;
+		update_background_shadows(shadow_setting);
+	}
+	
 	#if 0
 	if ((data & 0x80) != m_last_vreg)
 	{
@@ -304,18 +312,6 @@ inline void chqflag_state::update_background_shadows(uint8_t data)
 		m_palette->set_pen_contrast(i, brt);
 }
 
-
-WRITE_LINE_MEMBER(chqflag_state::background_brt_w)
-{
-//  popmessage("%d",state);
-
-	if (state != m_last_vreg)
-	{
-		m_last_vreg = state;
-		update_background_shadows(state);
-	}
-}
-
 void chqflag_state::chqflag(machine_config &config)
 {
 	/* basic machine hardware */
@@ -348,7 +344,6 @@ void chqflag_state::chqflag(machine_config &config)
 	m_k051960->set_sprite_callback(FUNC(chqflag_state::sprite_callback));
 	m_k051960->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 	m_k051960->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	m_k051960->vreg_contrast_handler().set(FUNC(chqflag_state::background_brt_w));
 
 	K051316(config, m_k051316[0], 0);
 	m_k051316[0]->set_palette(m_palette);
