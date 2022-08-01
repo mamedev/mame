@@ -759,7 +759,7 @@ OPHANDLER( orl_c_nbitaddr )
 OPHANDLER( pop )
 {
 	uint8_t addr = ROP_ARG(PC++);             //Grab data address
-	IRAM_W(addr, IRAM_INDIRECT_R_DBASE(SP));              //Store to contents of data addr, data pointed to by Stack - IRAM_INDIRECT_R needed to access upper 128 bytes of stack
+	IRAM_W(addr, IRAM_INDIRECT_R(SP));              //Store to contents of data addr, data pointed to by Stack - IRAM_INDIRECT_R needed to access upper 128 bytes of stack
 	//IRAM_INDIRECT_W(addr, IRAM_INDIRECT_R(R_SP));         //Store to contents of data addr, data pointed to by Stack - doesn't work, sfr's are not restored this way and it's not an indirect access anyway
 	SP = SP-1;                              //Decrement SP
 }
@@ -770,7 +770,7 @@ OPHANDLER( push )
 	uint8_t addr = ROP_ARG(PC++);             //Grab data address
 	uint8_t tmpSP = SP+1;                 //Grab and Increment Stack Pointer
 	SP = tmpSP;                         // ""
-	IRAM_INDIRECT_W_DBASE(tmpSP, IRAM_R(addr));           //Store to stack contents of data address - IRAM_INDIRECT_W needed to store to upper 128 bytes of stack, however, can't use IRAM_INDIRECT_R because that won't store the sfrs and it's not an indirect access anyway
+	IRAM_INDIRECT_W(tmpSP, IRAM_R(addr));           //Store to stack contents of data address - IRAM_INDIRECT_W needed to store to upper 128 bytes of stack, however, can't use IRAM_INDIRECT_R because that won't store the sfrs and it's not an indirect access anyway
 }
 
 //RET                                       /* 1: 0010 0010 */

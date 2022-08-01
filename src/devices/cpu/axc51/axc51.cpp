@@ -137,18 +137,17 @@ device_memory_interface::space_config_vector axc51base_cpu_device::memory_space_
 /* Read/Write a byte from/to the Internal RAM indirectly */
 /* (called from indirect addressing)                     */
 /* these go through DBASE register on axc51 (at least stack accesses) */
-uint8_t axc51base_cpu_device::iram_indirect_read(offs_t a) { return m_data.read_byte(a); }
-void axc51base_cpu_device::iram_indirect_write(offs_t a, uint8_t d) { m_data.write_byte(a, d); }
+//uint8_t axc51base_cpu_device::iram_indirect_read(offs_t a) { return m_data.read_byte(a); }
+//void axc51base_cpu_device::iram_indirect_write(offs_t a, uint8_t d) { m_data.write_byte(a, d); }
+uint8_t axc51base_cpu_device::iram_indirect_read(offs_t a) { return m_data.read_byte((m_sfr_regs[AXC51_DBASE - 0x80] * 4) + a); }
+void axc51base_cpu_device::iram_indirect_write(offs_t a, uint8_t d) { m_data.write_byte((m_sfr_regs[AXC51_DBASE - 0x80] * 4) + a, d); }
 
-uint8_t axc51base_cpu_device::iram_indirect_read_dbase(offs_t a) { return m_data.read_byte((m_sfr_regs[AXC51_DBASE - 0x80] * 4) + a); }
-void axc51base_cpu_device::iram_indirect_write_dbase(offs_t a, uint8_t d) { m_data.write_byte((m_sfr_regs[AXC51_DBASE - 0x80] * 4) + a, d); }
 
 
 #define IRAM_INDIRECT_R(a)      iram_indirect_read(a)
 #define IRAM_INDIRECT_W(a, d)   iram_indirect_write(a, d)
 
-#define IRAM_INDIRECT_R_DBASE(a)      iram_indirect_read_dbase(a)
-#define IRAM_INDIRECT_W_DBASE(a, d)   iram_indirect_write_dbase(a, d)
+
 
 
 /* Form an Address to Read/Write to External RAM indirectly */
@@ -316,18 +315,18 @@ void axc51base_cpu_device::iram_write(size_t offset, uint8_t data)
 void axc51base_cpu_device::push_pc()
 {
 	uint8_t tmpSP = SP+1;                     //Grab and Increment Stack Pointer
-	IRAM_INDIRECT_W_DBASE(tmpSP, (PC & 0xff));                //Store low byte of PC to Internal Ram (Use IRAM_INDIRECT_W to store stack above 128 bytes)
+	IRAM_INDIRECT_W(tmpSP, (PC & 0xff));                //Store low byte of PC to Internal Ram (Use IRAM_INDIRECT_W to store stack above 128 bytes)
 	tmpSP++;                                    // ""
 	SP = tmpSP;                             // ""
-	IRAM_INDIRECT_W_DBASE(tmpSP, ( (PC & 0xff00) >> 8));      //Store hi byte of PC to next address in Internal Ram (Use IRAM_INDIRECT_W to store stack above 128 bytes)
+	IRAM_INDIRECT_W(tmpSP, ( (PC & 0xff00) >> 8));      //Store hi byte of PC to next address in Internal Ram (Use IRAM_INDIRECT_W to store stack above 128 bytes)
 }
 
 /*Pop the current PC off the stack and into the pc*/
 void axc51base_cpu_device::pop_pc()
 {
 	uint8_t tmpSP = SP;                           //Grab Stack Pointer
-	PC = (IRAM_INDIRECT_R_DBASE(tmpSP--) & 0xff) << 8;        //Store hi byte to PC (must use IRAM_INDIRECT_R to access stack pointing above 128 bytes)
-	PC = PC | IRAM_INDIRECT_R_DBASE(tmpSP--);                 //Store lo byte to PC (must use IRAM_INDIRECT_R to access stack pointing above 128 bytes)
+	PC = (IRAM_INDIRECT_R(tmpSP--) & 0xff) << 8;        //Store hi byte to PC (must use IRAM_INDIRECT_R to access stack pointing above 128 bytes)
+	PC = PC | IRAM_INDIRECT_R(tmpSP--);                 //Store lo byte to PC (must use IRAM_INDIRECT_R to access stack pointing above 128 bytes)
 	SP = tmpSP;                             //Decrement Stack Pointer
 }
 

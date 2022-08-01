@@ -140,10 +140,6 @@ protected:
 	uint8_t iram_indirect_read(offs_t a);
 	void iram_indirect_write(offs_t a, uint8_t d);
 
-	uint8_t iram_indirect_read_dbase(offs_t a);
-	void iram_indirect_write_dbase(offs_t a, uint8_t d);
-
-
 	void clear_current_irq();
 	uint8_t r_acc();
 	uint8_t r_psw();
