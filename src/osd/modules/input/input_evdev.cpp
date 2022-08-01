@@ -294,6 +294,12 @@ public:
 		reset();
 	}
 
+	~evdev_device()
+	{
+		if(fd >= 0)
+			close(fd);
+	}
+
 	void start(int dirfd)
 	{
 		int numkeys = 0;
@@ -588,10 +594,6 @@ public:
 
 	void exit(void) override
 	{
-		if(fd >= 0) {
-			close(fd);
-			fd = -1;
-		}
 	}
 
 	void before_poll(running_machine& machine) override
