@@ -35,28 +35,23 @@ void tms1100_cpu_device::data_128x4(address_map &map)
 // device definitions
 tms1100_cpu_device::tms1100_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: tms1100_cpu_device(mconfig, TMS1100, tag, owner, clock, 8 /* o pins */, 11 /* r pins */, 6 /* pc bits */, 8 /* byte width */, 3 /* x width */, 11 /* prg width */, address_map_constructor(FUNC(tms1100_cpu_device::program_11bit_8), this), 7 /* data width */, address_map_constructor(FUNC(tms1100_cpu_device::data_128x4), this))
-{
-}
+{ }
 
 tms1100_cpu_device::tms1100_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
 	: tms1000_cpu_device(mconfig, type, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, prgwidth, program, datawidth, data)
-{
-}
+{ }
 
 tms1170_cpu_device::tms1170_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: tms1100_cpu_device(mconfig, TMS1170, tag, owner, clock, 8, 11, 6, 8, 3, 11, address_map_constructor(FUNC(tms1170_cpu_device::program_11bit_8), this), 7, address_map_constructor(FUNC(tms1170_cpu_device::data_128x4), this))
-{
-}
+{ }
 
 tms1300_cpu_device::tms1300_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: tms1100_cpu_device(mconfig, TMS1300, tag, owner, clock, 8, 16, 6, 8, 3, 11, address_map_constructor(FUNC(tms1300_cpu_device::program_11bit_8), this), 7, address_map_constructor(FUNC(tms1300_cpu_device::data_128x4), this))
-{
-}
+{ }
 
 tms1370_cpu_device::tms1370_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: tms1100_cpu_device(mconfig, TMS1370, tag, owner, clock, 8, 16, 6, 8, 3, 11, address_map_constructor(FUNC(tms1370_cpu_device::program_11bit_8), this), 7, address_map_constructor(FUNC(tms1370_cpu_device::data_128x4), this))
-{
-}
+{ }
 
 
 // disasm
@@ -83,14 +78,14 @@ void tms1100_cpu_device::device_reset()
 // opcode deviations
 void tms1100_cpu_device::op_setr()
 {
-	// SETR: same, but X register MSB must be clear
-	if (~m_x & (1 << (m_x_bits-1)))
-		tms1k_base_device::op_setr();
+	// SETR: supports 5-bit index with X register MSB
+	m_r = m_r | (1 << (BIT(m_x, m_x_bits - 1) << 4 | m_y));
+	m_write_r(m_r & m_r_mask);
 }
 
 void tms1100_cpu_device::op_rstr()
 {
-	// RSTR: same, but X register MSB must be clear
-	if (~m_x & (1 << (m_x_bits-1)))
-		tms1k_base_device::op_rstr();
+	// RSTR: supports 5-bit index with X register MSB
+	m_r = m_r & ~(1 << (BIT(m_x, m_x_bits - 1) << 4 | m_y));
+	m_write_r(m_r & m_r_mask);
 }

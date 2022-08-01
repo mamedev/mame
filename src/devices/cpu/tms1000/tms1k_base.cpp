@@ -94,8 +94,7 @@ tms1k_base_device::tms1k_base_device(const machine_config &mconfig, device_type 
 	, m_write_ctl(*this)
 	, m_write_pdc(*this)
 	, m_decode_micro(*this)
-{
-}
+{ }
 
 // disasm
 void tms1k_base_device::state_string_export(const device_state_entry &entry, std::string &str) const
