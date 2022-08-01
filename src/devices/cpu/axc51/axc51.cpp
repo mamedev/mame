@@ -1411,6 +1411,15 @@ void axc51base_cpu_device::sfr_write(size_t offset, uint8_t data)
 		case ADDR_DPH:
 		case ADDR_PCON:
 		case ADDR_IE:
+
+		case AXC51_GP0: // 0xa1
+		case AXC51_GP1: // 0xa2
+		case AXC51_GP2: // 0xa3
+		case AXC51_GP3: // 0xa4
+		case AXC51_GP4: // 0xb1
+		case AXC51_GP5: // 0xb2
+		case AXC51_GP6: // 0xb3
+		case AXC51_GP7: // 0xb5
 			break;
 
 		case AXC51_DPCON: dpcon_w(data); return; // 0x86
@@ -1459,6 +1468,15 @@ uint8_t axc51base_cpu_device::sfr_read(size_t offset)
 		case ADDR_PCON:
 		case ADDR_IE:
 		case ADDR_IP:
+
+		case AXC51_GP0: // 0xa1
+		case AXC51_GP1: // 0xa2
+		case AXC51_GP2: // 0xa3
+		case AXC51_GP3: // 0xa4
+		case AXC51_GP4: // 0xb1
+		case AXC51_GP5: // 0xb2
+		case AXC51_GP6: // 0xb3
+		case AXC51_GP7: // 0xb5
 			return m_sfr_regs[offset-0x80];
 
 		case AXC51_DPCON: // 0x86
