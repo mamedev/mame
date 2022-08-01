@@ -52,8 +52,7 @@ protected:
 
 private:
 	void command(u8 data);
-	void chain(unsigned const c);
-	void operate(s32 param);
+	template <unsigned Channel> void operate(s32 param);
 	void complete(unsigned const c, u16 status);
 	void interrupt();
 
@@ -68,8 +67,7 @@ private:
 	bool m_eop_in_state;
 
 	// chip-level registers
-	u8 m_master_mode;
-	u16 m_chain_control;
+	u8 m_mode;
 	u8 m_pointer;
 	u16 m_temporary;
 
@@ -86,12 +84,17 @@ private:
 
 		u32 address(u16 &aru, u16 &arl, int delta = 0);
 
-		u8 read_byte(bool flip = false);
-		void write_byte(u8 data, bool flip = false);
-		u16 read_word(bool flip = false);
-		void write_word(u16 data, bool flip = false);
+		u8 read_byte(unsigned &cycles, bool flip = false);
+		void write_byte(u8 data, unsigned &cycles, bool flip = false);
+		u16 read_word(unsigned &cycles, bool flip = false);
+		void write_word(u16 data, unsigned &cycles, bool flip = false);
 
 		void interrupt(bool assert);
+		void chain();
+		void reload();
+
+		void log_mode(unsigned mask, bool high = false) const;
+		void log_addr(unsigned mask, const char *const name, u16 aru, u16 arl) const;
 
 		am9516_device &udc;
 
@@ -121,6 +124,8 @@ private:
 		u16 cml = 0;     // channel mode low
 		u16 cmh = 0;     // channel mode high
 		u8 iv = 0;       // interrupt vector
+
+		unsigned const wait_states[4] = { 0, 1, 2, 4 };
 	}
 	m_channel[2];
 };
