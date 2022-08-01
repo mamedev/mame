@@ -121,11 +121,10 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	uint8_t read(offs_t offset);
 	void trigger_bank();
 	void switch_bank(uint8_t data);
 
-	uint8_t m_base_bank;
+	memory_bank_creator m_bank;
 	bool m_trigger_on_next_access;
 	bool m_ignore_first_read;
 };
@@ -164,7 +163,6 @@ public:
 
 protected:
 	virtual void device_reset() override;
-	uint8_t read_hi(offs_t offset);
 	void select_bank(offs_t offset, uint8_t data);
 
 	memory_bank_creator m_bank;
@@ -204,7 +202,7 @@ public:
 
 protected:
 	virtual void device_reset() override;
-	void switch_bank(offs_t offset, uint8_t data);
+	void switch_rom_bank(offs_t offset, uint8_t data);
 	void switch_ram_bank(offs_t offset, uint8_t data);
 
 	memory_bank_creator m_rom_bank;
@@ -239,9 +237,6 @@ public:
 	a26_rom_cv_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void install_memory_handlers(address_space *space) override;
-
-protected:
-	uint8_t read(offs_t offset);
 };
 
 
@@ -309,7 +304,6 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	uint8_t read(offs_t offset);
 
 	memory_bank_creator m_bank;
 	uint8_t m_current_game;
@@ -328,7 +322,6 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	uint8_t read(offs_t offset);
 	void switch_bank(offs_t offset, uint8_t data);
 
 	memory_bank_creator m_bank;
@@ -364,8 +357,8 @@ public:
 	virtual void install_memory_handlers(address_space *space) override;
 
 private:
-	void change_bank(offs_t offset);
-	uint8_t read(offs_t offset);
+	void change_bank1(offs_t offset);
+	void change_bank2(offs_t offset);
 
 	memory_bank_creator m_bank;
 };

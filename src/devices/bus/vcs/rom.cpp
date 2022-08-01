@@ -218,11 +218,8 @@ void a26_rom_fa_device::install_memory_handlers(address_space *space)
 	space->install_write_handler(0x1ff8, 0x1ffa, write8sm_delegate(*this, FUNC(a26_rom_fa_device::switch_bank)));
 	space->install_read_tap(0x1ff8, 0x1ffa, "bank",
 			[this] (offs_t address, u8 &, u8) { if (!machine().side_effects_disabled()) switch_bank(address - 0x1ff8, 0); });
-	if (is_ram_present(0x100))
-	{
-		space->install_read_handler(0x1100, 0x11ff, read8sm_delegate(*this, FUNC(a26_rom_fa_device::read_ram)));
-		space->install_write_handler(0x1000, 0x10ff, write8sm_delegate(*this, FUNC(a26_rom_fa_device::write_ram)));
-	}
+	space->install_read_handler(0x1100, 0x11ff, read8sm_delegate(*this, FUNC(a26_rom_fa_device::read_ram)));
+	space->install_write_handler(0x1000, 0x10ff, write8sm_delegate(*this, FUNC(a26_rom_fa_device::write_ram)));
 }
 
 
@@ -238,20 +235,21 @@ void a26_rom_fa_device::install_memory_handlers(address_space *space)
 
 a26_rom_fe_device::a26_rom_fe_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: a26_rom_base_device(mconfig, A26_ROM_FE, tag, owner, clock)
-	, m_base_bank(0)
-	, m_trigger_on_next_access(0)
+	, m_bank(*this, "bank")
+	, m_trigger_on_next_access(false)
+	, m_ignore_first_read(true)
 {
 }
 
 void a26_rom_fe_device::device_start()
 {
-	save_item(NAME(m_base_bank));
 	save_item(NAME(m_trigger_on_next_access));
+	save_item(NAME(m_ignore_first_read));
 }
 
 void a26_rom_fe_device::device_reset()
 {
-	m_base_bank = 0;
+	m_bank->set_entry(0);
 	m_trigger_on_next_access = false;
 	// During cpu startup, before reading the boot vector a read from $01fe occurs
 	m_ignore_first_read = true;
@@ -259,11 +257,15 @@ void a26_rom_fe_device::device_reset()
 
 void a26_rom_fe_device::install_memory_handlers(address_space *space)
 {
-	space->install_read_handler(0x1000, 0x1fff, read8sm_delegate(*this, FUNC(a26_rom_fe_device::read)));
+	m_bank->configure_entries(0, 8, get_rom_base(), 0x1000);
+
+	space->install_read_bank(0x1000, 0x1fff, m_bank);
 	space->install_readwrite_tap(0x1fe, 0x1fe, "trigger_bank",
 			[this] (offs_t, u8 &, u8) { if (!machine().side_effects_disabled()) trigger_bank(); },
 			[this] (offs_t, u8 &, u8) { if (!machine().side_effects_disabled()) trigger_bank(); });
-	space->install_read_tap(0x1ff, 0x1ff, "switch_bank",
+	space->install_read_tap(0x1ff, 0x1ff, "switch_bank1",
+			[this] (offs_t, u8 &data, u8) { if (!machine().side_effects_disabled()) switch_bank(data); });
+	space->install_read_tap(0x1000, 0x1fff, "switch_bank2",
 			[this] (offs_t, u8 &data, u8) { if (!machine().side_effects_disabled()) switch_bank(data); });
 }
 
@@ -279,23 +281,11 @@ void a26_rom_fe_device::install_memory_handlers(address_space *space)
 
  */
 
-uint8_t a26_rom_fe_device::read(offs_t offset)
-{
-	uint8_t const data = m_rom[offset + (m_base_bank * 0x1000)];
-
-	if (!machine().side_effects_disabled())
-	{
-		switch_bank(data);
-	}
-
-	return data;
-}
-
 void a26_rom_fe_device::switch_bank(uint8_t data)
 {
 	if (m_trigger_on_next_access)
 	{
-		m_base_bank = BIT(data, 5) ? 0 : 1;
+		m_bank->set_entry(BIT(data, 5) ? 0 : 1);
 		m_trigger_on_next_access = false;
 	}
 }
@@ -529,15 +519,15 @@ void a26_rom_e7_device::install_memory_handlers(address_space *space)
 	space->install_rom(0x1800, 0x1fff, get_rom_base() + 7 * 0x800);
 	space->install_write_bank(0x1800, 0x18ff, m_hi_ram_bank);
 	space->install_read_bank(0x1900, 0x19ff, m_hi_ram_bank);
-	space->install_write_handler(0x1fe0, 0x1fe7, write8sm_delegate(*this, FUNC(a26_rom_e7_device::switch_bank)));
+	space->install_write_handler(0x1fe0, 0x1fe7, write8sm_delegate(*this, FUNC(a26_rom_e7_device::switch_rom_bank)));
 	space->install_read_tap(0x1fe0, 0x1fe7, "rom_bank",
-			[this] (offs_t address, u8 &, u8) { if (!machine().side_effects_disabled()) switch_bank(address - 0x1fe0, 0); });
+			[this] (offs_t address, u8 &, u8) { if (!machine().side_effects_disabled()) switch_rom_bank(address - 0x1fe0, 0); });
 	space->install_write_handler(0x1fe8, 0x1feb, write8sm_delegate(*this, FUNC(a26_rom_e7_device::switch_ram_bank)));
 	space->install_read_tap(0x1fe8, 0x1feb, "ram_bank",
 			[this] (offs_t address, u8 &, u8) { if (!machine().side_effects_disabled()) switch_ram_bank(address - 0x1fe8, 0); });
 }
 
-void a26_rom_e7_device::switch_bank(offs_t offset, uint8_t data)
+void a26_rom_e7_device::switch_rom_bank(offs_t offset, uint8_t data)
 {
 	m_view.select(offset == 0x07 ? 1 : 0);
 	m_rom_bank->set_entry(offset);
@@ -606,17 +596,9 @@ a26_rom_cv_device::a26_rom_cv_device(const machine_config &mconfig, const char *
 
 void a26_rom_cv_device::install_memory_handlers(address_space *space)
 {
-	space->install_read_handler(0x1000, 0x17ff, 0, 0x0800, 0, read8sm_delegate(*this, FUNC(a26_rom_cv_device::read)));
-	if (is_ram_present(0x400))
-	{
-		space->install_read_handler(0x1000, 0x13ff, read8sm_delegate(*this, FUNC(a26_rom_cv_device::read_ram)));
-		space->install_write_handler(0x1400, 0x17ff, write8sm_delegate(*this, FUNC(a26_rom_cv_device::write_ram)));
-	}
-}
-
-uint8_t a26_rom_cv_device::read(offs_t offset)
-{
-	return m_rom[offset];
+	space->install_rom(0x1000, 0x17ff, 0x0800, get_rom_base());
+	space->install_read_handler(0x1000, 0x13ff, read8sm_delegate(*this, FUNC(a26_rom_cv_device::read_ram)));
+	space->install_write_handler(0x1400, 0x17ff, write8sm_delegate(*this, FUNC(a26_rom_cv_device::write_ram)));
 }
 
 
@@ -877,35 +859,37 @@ void a26_rom_x07_device::install_memory_handlers(address_space *space)
 	m_bank->configure_entries(0, 16, get_rom_base(), 0x1000);
 
 	space->install_read_bank(0x1000, 0x1fff, m_bank);
-	space->install_readwrite_tap(0x0000, 0x0fff, "bank",
-		[this] (offs_t offset, u8 &, u8) { if (!machine().side_effects_disabled()) change_bank(offset); },
-		[this] (offs_t offset, u8 &, u8) { if (!machine().side_effects_disabled()) change_bank(offset); });
-}
-
-void a26_rom_x07_device::change_bank(offs_t offset)
-{
-	/*
-	A13           A0
-	----------------
-	0 1xxx nnnn 1101
-	*/
-	if ((offset & 0x180f) == 0x080d)
-		m_bank->set_entry((offset >> 4) & 0x0f);
-
 	/*
 	A13           A0
 	----------------
 	0 0xxx 0nxx xxxx
 	*/
-	if ((offset & 0x1880) == 0x0000)
+	space->install_readwrite_tap(0x0000, 0x0000, 0x077f, "bank1",
+		[this] (offs_t address, u8 &, u8) { if (!machine().side_effects_disabled()) change_bank1(address); },
+		[this] (offs_t address, u8 &, u8) { if (!machine().side_effects_disabled()) change_bank1(address); });
+	/*
+	A13           A0
+	----------------
+	0 1xxx nnnn 1101
+	*/
+	space->install_readwrite_tap(0x080d, 0x080d, 0x07f0, "bank2",
+		[this] (offs_t address, u8 &, u8) { if (!machine().side_effects_disabled()) change_bank2(address); },
+		[this] (offs_t address, u8 &, u8) { if (!machine().side_effects_disabled()) change_bank2(address); });
+}
+
+void a26_rom_x07_device::change_bank1(offs_t address)
+{
+	// only has an effect if bank is already 14 or 15
+	if (m_bank->entry() >= 14)
 	{
-		// only has an effect if bank is already 14 or 15
-		if (m_bank->entry() >= 14)
-		{
-			if (offset & 0x0040)
-				m_bank->set_entry(15);
-			else
-				m_bank->set_entry(14);
-		}
+		if (address & 0x0040)
+			m_bank->set_entry(15);
+		else
+			m_bank->set_entry(14);
 	}
+}
+
+void a26_rom_x07_device::change_bank2(offs_t address)
+{
+	m_bank->set_entry((address >> 4) & 0x0f);
 }
