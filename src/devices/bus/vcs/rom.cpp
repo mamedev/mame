@@ -392,6 +392,7 @@ void a26_rom_3f_device::install_memory_handlers(address_space *space)
 	m_bank->configure_entries(0, get_rom_size() / 0x800, get_rom_base(), 0x800);
 
 	space->install_read_bank(0x1000, 0x17ff, m_bank);
+	// last bank
 	space->install_rom(0x1800, 0x1fff, get_rom_base() + m_bank_mask * 0x800);
 	space->install_write_tap(0x00, 0x3f, "bank",
 			[this] (offs_t offset, u8 &data, u8) { if (!machine().side_effects_disabled()) select_bank(offset, data); });
@@ -596,7 +597,7 @@ a26_rom_cv_device::a26_rom_cv_device(const machine_config &mconfig, const char *
 
 void a26_rom_cv_device::install_memory_handlers(address_space *space)
 {
-	space->install_rom(0x1000, 0x17ff, 0x0800, get_rom_base());
+	space->install_rom(0x1000, 0x17ff, 0x800, get_rom_base());
 	space->install_read_handler(0x1000, 0x13ff, read8sm_delegate(*this, FUNC(a26_rom_cv_device::read_ram)));
 	space->install_write_handler(0x1400, 0x17ff, write8sm_delegate(*this, FUNC(a26_rom_cv_device::write_ram)));
 }
