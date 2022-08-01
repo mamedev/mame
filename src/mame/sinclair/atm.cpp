@@ -57,7 +57,6 @@ public:
 		, m_beta(*this, BETA_DISK_TAG)
 		, m_centronics(*this, "centronics")
 		, m_palette(*this, "palette")
-		, m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	void atm(machine_config &config);
@@ -101,7 +100,6 @@ private:
 	required_device<beta_disk_device> m_beta;
 	required_device<centronics_device> m_centronics;
 	required_device<device_palette_interface> m_palette;
-	required_device<gfxdecode_device> m_gfxdecode;
 
 	int m_pen;            // PEN - extended memory manager
 	int m_cpm;
@@ -492,7 +490,6 @@ GFXDECODE_END
 void atm_state::atm(machine_config &config)
 {
 	spectrum_128(config);
-	m_ram->set_default_size("1M").set_extra_options("128K,256K,512K,1M");
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &atm_state::atm_mem);
 	m_maincpu->set_addrmap(AS_IO, &atm_state::atm_io);
@@ -514,6 +511,9 @@ void atm_state::atm(machine_config &config)
 void atm_state::atmtb2(machine_config &config)
 {
 	atm(config);
+
+	// 1M in ATM2+ only. TODO mem masks for custom size
+	m_ram->set_default_size("1M");//.set_extra_options("128K,256K,512K,1M");
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_atmtb2);
 }
 
@@ -565,6 +565,6 @@ ROM_END
 
 
 /*    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT      CLASS      INIT        COMPANY     FULLNAME              FLAGS */
-COMP( 1991, atm,     spec128, 0,      atm,     spec_plus, atm_state, empty_init, "MicroART", "ATM-Turbo (ATM-CP)", MACHINE_NOT_WORKING)
-COMP( 1992, atmtb2,  spec128, 0,      atmtb2,  spec_plus, atm_state, empty_init, "MicroART", "ATM-Turbo 2",        MACHINE_IS_INCOMPLETE)
+COMP( 1991, atm,     spec128, 0,      atm,     spec_plus, atm_state, empty_init, "MicroART", "ATM-Turbo (ATM-CP)", MACHINE_IS_INCOMPLETE)
+COMP( 1992, atmtb2,  spec128, 0,      atmtb2,  spec_plus, atm_state, empty_init, "MicroART", "ATM-Turbo 2",        0)
 //COMP( 1993, atmtb2p, spec128, 0,      atmtb2p, spec_plus, atm_state, empty_init, "MicroART", "ATM-Turbo 2+",       MACHINE_NOT_WORKING) // only supports 1M RAM vs. 512K in atmtb2
