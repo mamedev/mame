@@ -391,6 +391,21 @@ OPHANDLER( inc_r )
 //INC DPTR                                  /* 1: 1010 0011 */
 OPHANDLER( inc_dptr )
 {
+	//if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x08) // auto-increment enabled (not used here)
+	//{
+	//	fatalerror("inc_dptr with auto-inc");
+	//}
+
+	if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x04) // auto-toggle enabled
+	{
+		fatalerror("inc_dptr with auto-toggle");
+	}
+
+	if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x01) // DPTR1 enabled
+	{
+		fatalerror("inc_dptr with DPTR1");
+	}
+
 	uint16_t dptr = (DPTR)+1;
 	SET_DPTR(dptr);
 }
@@ -430,6 +445,22 @@ OPHANDLER( jc )
 //JMP @A+DPTR                               /* 1: 0111 0011 */
 OPHANDLER( jmp_iadptr )
 {
+	// not listed as being affected by auto-inc or auto-toggle?
+	if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x08) // auto-increment enabled
+	{
+		fatalerror("jmp_iadptr with auto-inc");
+	}
+
+	if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x04) // auto-toggle enabled
+	{
+		fatalerror("jmp_iadptr with auto-toggle");
+	}
+
+	if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x01) // DPTR enabled
+	{
+		fatalerror("jmp_iadptr with DPTR1");
+	}
+
 	PC = ACC + DPTR;
 }
 
@@ -568,6 +599,21 @@ OPHANDLER( mov_mem_r )
 //MOV DPTR, #data16                         /* 1: 1001 0000 */
 OPHANDLER( mov_dptr_byte )
 {
+	//if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x08) // auto-increment enabled (not used here)
+	//{
+	//	fatalerror("mov_dptr_byte with auto-inc");
+	//}
+
+	if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x04) // auto-toggle enabled
+	{
+		fatalerror("mov_dptr_byte with auto-toggle");
+	}
+
+	if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x01) // DPTR enabled
+	{
+		fatalerror("mov_dptr_byte with DPTR1");
+	}
+
 	uint8_t data_hi, data_lo;
 	data_hi = ROP_ARG(PC++);                //Grab hi byte
 	data_lo = ROP_ARG(PC++);                //Grab lo byte
@@ -632,6 +678,21 @@ OPHANDLER( mov_c_bitaddr )
 //MOVC A, @A + DPTR                         /* 1: 1001 0011 */
 OPHANDLER( movc_a_iadptr )
 {
+	if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x08) // auto-increment enabled
+	{
+		fatalerror("movc_a_iadptr with auto-inc");
+	}
+
+	if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x04) // auto-toggle enabled
+	{
+		fatalerror("movc_a_iadptr with auto-toggle");
+	}
+
+	if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x01) // DPTR1 enabled
+	{
+		fatalerror("movc_a_iadptr with DPTR1");
+	}
+
 	uint8_t data;
 	data = CODEMEM_R(ACC + DPTR);           //Move a byte from CODE(Program) Memory and store to ACC
 	SET_ACC(data);
@@ -642,8 +703,57 @@ OPHANDLER( movc_a_iadptr )
 OPHANDLER( movx_a_idptr )
 {
 //  uint8_t byte = DATAMEM_R(R_DPTR);         //Grab 1 byte from External DATA memory pointed to by dptr
-	uint32_t addr = ERAM_ADDR(DPTR, 0xFFFF);
+	uint32_t addr;
+
+	if ((m_sfr_regs[AXC51_DPCON - 0x80] & 0x01) == 0x00) // use DPTR0
+	{
+		addr = ERAM_ADDR(DPTR, 0xFFFF);
+	}
+	else
+	{
+		addr = ERAM_ADDR(DPTR1, 0xFFFF);
+	}
+
 	uint8_t byte = DATAMEM_R(addr);           //Grab 1 byte from External DATA memory pointed to by dptr
+
+	if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x08) // auto-increment enabled
+	{
+		if ((m_sfr_regs[AXC51_DPCON - 0x80] & 0x01) == 0x00) // use DPTR0
+		{
+			if ((m_sfr_regs[AXC51_DPCON - 0x80] & 0x20) == 0x00) // DPID0  DPTR0 increase direction control
+			{
+				uint16_t dptr = (DPTR)+1;
+				SET_DPTR(dptr);
+			}
+			else
+			{
+				uint16_t dptr = (DPTR)-1;
+				SET_DPTR(dptr);
+			}
+		}
+		else // use DPTR1
+		{
+			if ((m_sfr_regs[AXC51_DPCON - 0x80] & 0x10) == 0x00) // DPID1  DPTR1 increase direction control
+			{
+				// decrement
+				uint16_t dptr = (DPTR1)+1;
+				SET_DPTR1(dptr);
+			}
+			else
+			{
+				// decrement
+				uint16_t dptr = (DPTR1)-1;
+				SET_DPTR1(dptr);
+			}
+		}
+	}
+
+	if ((m_sfr_regs[AXC51_DPCON - 0x80] & 0x04) == 0x04)
+	{
+		// auto toggle DPR
+		m_sfr_regs[AXC51_DPCON - 0x80] ^= 0x01;
+	}
+
 	SET_ACC(byte);                      //Store to ACC
 }
 
@@ -660,6 +770,21 @@ OPHANDLER( movx_a_ir )
 //(Move A to External Ram 16 bit address)
 OPHANDLER( movx_idptr_a )
 {
+	if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x08) // auto-increment enabled
+	{
+		fatalerror("movx_idptr_a with auto-inc");
+	}
+
+	if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x04) // auto-toggle enabled
+	{
+		fatalerror("movx_idptr_a with auto-toggle");
+	}
+
+	if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x01) // DPTR enabled
+	{
+		fatalerror("movx_idptr_a with DPTR1");
+	}
+
 //  DATAMEM_W(R_DPTR, ACC);               //Store ACC to External DATA memory address pointed to by DPTR
 	uint32_t addr = ERAM_ADDR(DPTR, 0xFFFF);
 	DATAMEM_W(addr, ACC);               //Store ACC to External DATA memory address pointed to by DPTR

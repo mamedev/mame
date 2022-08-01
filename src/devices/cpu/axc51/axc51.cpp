@@ -62,8 +62,10 @@ void ax208_cpu_device::ax208_internal_program_mem(address_map &map)
 
 void axc51base_cpu_device::io_internal(address_map& map)
 {
-	map(0x0000, 0x03ff).ram();// .share("scratchpad");
+	map(0x0000, 0x03ff).ram(); // .share("scratchpad");
+//	map(0x3000, 0x3fff).ram(); // XSFRs
 	map(0x4000, 0x6fff).ram().share("mainram");
+	map(0x7000, 0x77ff).ram(); // JPEG RAM
 }
 
 
@@ -188,8 +190,15 @@ void axc51base_cpu_device::iram_indirect_write(offs_t a, uint8_t d) { m_data.wri
 #define IP          SFR_A(ADDR_IP)
 #define B           SFR_A(ADDR_B)
 
+#define DPL1         SFR_A(AXC51_DPL1)
+#define DPH1         SFR_A(AXC51_DPH1)
+
+
 #define R_REG(r)    m_scratchpad[(r) | (PSW & 0x18)]
 #define DPTR        ((DPH<<8) | DPL)
+
+#define DPTR1        ((DPH1<<8) | DPL1)
+
 
 /* WRITE accessors */
 
@@ -210,6 +219,9 @@ void axc51base_cpu_device::iram_indirect_write(offs_t a, uint8_t d) { m_data.wri
 #define SET_REG(r, v)   do { m_scratchpad[(r) | (PSW & 0x18)] = (v); } while (0)
 
 #define SET_DPTR(n)     do { DPH = ((n) >> 8) & 0xff; DPL = (n) & 0xff; } while (0)
+
+#define SET_DPTR1(n)     do { DPH1 = ((n) >> 8) & 0xff; DPL1 = (n) & 0xff; } while (0)
+
 
 /* Macros for Setting Flags */
 #define SET_X(R, v) do { R = (v);} while (0)
