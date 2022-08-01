@@ -170,7 +170,7 @@ void axc51base_cpu_device::iram_indirect_write_dbase(offs_t a, uint8_t d) { m_da
 /* SFR Registers - These are accessed directly for speed on read */
 /* Read accessors                                                */
 
-#define SFR_A(a)        m_sfr_regs[(a)]
+#define SFR_A(a)        m_sfr_regs[(a-0x80)]
 #define SET_SFR_A(a,v)  do { SFR_A(a) = (v); } while (0)
 
 #define ACC         SFR_A(ADDR_ACC)
