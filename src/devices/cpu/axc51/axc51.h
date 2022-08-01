@@ -179,6 +179,7 @@ protected:
 	void spibuf_w(uint8_t data);
 	void spibaud_w(uint8_t data);
 	void dpcon_w(uint8_t data);
+	void ie2crypt_w(uint8_t data);
 
 	void acall(uint8_t r);
 	void add_a_byte(uint8_t r);

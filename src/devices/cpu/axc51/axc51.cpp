@@ -1461,6 +1461,10 @@ void axc51base_cpu_device::sfr_write(size_t offset, uint8_t data)
 		case AXC51_P4: // 0xb4
 			break;
 
+		case AXC51_IE2CRPT: // 0x95 controls automatic encryption
+			ie2crypt_w(data);
+			return;
+
 		case AXC51_DPCON: dpcon_w(data); return; // 0x86
 
 		case AXC51_DBASE: // 0x9b
@@ -1528,6 +1532,10 @@ uint8_t axc51base_cpu_device::sfr_read(size_t offset)
 		case AXC51_ER31: // 0xed
 		case AXC51_ER8:  // 0xee
 			return m_sfr_regs[offset-0x80];
+
+		case AXC51_IE2CRPT: // 0x95 controls automatic encryption
+			return m_sfr_regs[offset-0x80];
+
 
 		case AXC51_DPCON: // 0x86
 			return dpcon_r();
@@ -1847,6 +1855,38 @@ void axc51base_cpu_device::dpcon_w(uint8_t data)
 	logerror("%s: sfr_write AXC51_DPCON %02x\n", machine().describe_context(), data);
 	m_sfr_regs[AXC51_DPCON - 0x80] = data;
 }
+
+/*
+AXC51_IE2CRPT (at 0x95)
+
+7  ----
+6  ----
+5  wdt_int_enable
+4  soft_int
+3  sd_do_crypt
+2  sd_di_crypt
+1  spi_do_crypt
+0  spi_di_crypt
+
+*/
+
+void axc51base_cpu_device::ie2crypt_w(uint8_t data)
+{
+	logerror("%s: sfr_write AXC51_IE2CRPT %02x\n", machine().describe_context(), data);
+	m_sfr_regs[AXC51_IE2CRPT - 0x80] = data;
+
+	if (data & 0x03)
+	{
+		logerror("SPI encryption turned on!\n");
+	}
+
+	if (data & 0x0c)
+	{
+		logerror("SD Card encryption turned on!\n");
+	}
+}
+
+
 
 
 void axc51base_cpu_device::spidmaadr_w(uint8_t data)
