@@ -51,8 +51,6 @@
 #include "emu.h"
 #include "snes_slot.h"
 
-#include <cctype>
-
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -1178,9 +1176,9 @@ void base_sns_cart_slot_device::chip_write(offs_t offset, uint8_t data)
 /* We use this to convert the company_id in the header to int value to be passed in companies[] */
 static int char_to_int_conv( char id )
 {
-	if (isdigit(id))
+	if (id >= '0' && id <= '9')
 		return id - '0';
-	else if (isxdigit(id) && isupper(id))
+	else if (id >= 'A' && id <= 'F')
 		return id - 'A' + 0x0a;
 	else
 		return 0;
