@@ -24,10 +24,7 @@ DEFINE_DEVICE_TYPE(HLCD0488, hlcd0488_device, "hlcd0488", "Hughes HLCD 0488 LCD 
 hlcd0488_device::hlcd0488_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, HLCD0488, tag, owner, clock),
 	m_write_cols(*this)
-{
-	memset(m_latch, 0, 8);
-	memset(m_hold, 0, 8);
-}
+{ }
 
 
 //-------------------------------------------------
@@ -38,6 +35,16 @@ void hlcd0488_device::device_start()
 {
 	m_write_cols.resolve_safe();
 	m_sync_timer = timer_alloc(FUNC(hlcd0488_device::sync_update), this);
+
+	// zerofill
+	m_latch_pulse = 0;
+	m_latch_pulse_prev = 0;
+	m_data_clk = 0;
+	m_data_clk_prev = 0;
+	m_data = 0;
+	m_count = 0;
+	std::fill_n(m_latch, std::size(m_latch), 0);
+	std::fill_n(m_hold, std::size(m_hold), 0);
 
 	// register for savestates
 	save_item(NAME(m_latch_pulse));

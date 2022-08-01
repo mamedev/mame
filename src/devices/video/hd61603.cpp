@@ -38,6 +38,12 @@ void hd61603_device::device_start()
 	// resolve callbacks
 	m_write_segs.resolve_safe();
 
+	// zerofill
+	m_blank = 0;
+	m_count = 0;
+	m_data = 0;
+	m_ram = 0;
+
 	// register for savestates
 	save_item(NAME(m_blank));
 	save_item(NAME(m_count));
