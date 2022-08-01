@@ -643,7 +643,19 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 
 	if ( firststop && !m_initialized )
 	{
-		m_maincpu = m_machine->root_device().subdevice(":maincpu");
+		// find the "main" CPU, which is the first CPU (gdbstub doesn't seem to have any notion of switching CPUs)
+		for (device_t &device : device_enumerator(m_machine->root_device()))
+		{
+			auto *cpu = dynamic_cast<cpu_device *>(&device);
+			if (cpu)
+			{
+				m_maincpu = cpu;
+				break;
+			}
+		}
+		if (!m_maincpu)
+			fatalerror("gdbstub: cannot find any CPUs\n");
+
 		const char *cpuname = m_maincpu->shortname();
 		auto it = gdb_register_maps.find(cpuname);
 		if ( it == gdb_register_maps.end() )
