@@ -80,19 +80,18 @@ void tms0270_cpu_device::device_reset()
 // i/o handling
 void tms0270_cpu_device::dynamic_output()
 {
-	// R11: TMS5100 CTL port direction (0=read from TMS5100, 1=write to TMS5100)
-	m_ctl_dir = BIT(m_r, 11);
-
 	// R12: chip select (off=display via OPLA, on=TMS5100 via ACC/CKB)
 	m_chipsel = BIT(m_r, 12);
 
 	if (m_chipsel)
 	{
+		// R11: TMS5100 CTL port direction (0=read from TMS5100, 1=write to TMS5100)
+		m_ctl_dir = BIT(m_r, 11);
+
 		// ACC via SEG G,B,C,D: TMS5100 CTL pins
-		u8 ctl_out = (m_ctl_dir) ? m_a : m_read_ctl() & 0xf;
-		if (m_ctl_out != ctl_out)
+		if (m_ctl_dir && m_ctl_out != m_a)
 		{
-			m_ctl_out = ctl_out;
+			m_ctl_out = m_a;
 			m_write_ctl(m_ctl_out);
 		}
 

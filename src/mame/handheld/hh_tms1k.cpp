@@ -110,6 +110,8 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP1525   TMS1170   1980, Coleco Head to Head: Electronic Baseball
  @MP1604   TMS1370   1982, Gakken Invader 2000/Tandy Cosmic Fire Away 3000
  @MP1801   TMS1700   1981, Tiger Ditto/Tandy Pocket Repeat (model 60-2152)
+ *MP2012   TMS1300   1977, Atari Europe Hit Parade 144 (jukebox) (have decap/dump)
+ *MP2032   TMS1300   1980, Atari Europe unknown (jukebox)
  @MP2105   TMS1370   1979, Gakken/Entex Poker (6005)
  @MP2110   TMS1370   1980, Gakken Invader/Tandy Fire Away
  @MP2139   TMS1370   1981, Gakken Galaxy Invader 1000/Tandy Cosmic 1000 Fire Away
@@ -168,8 +170,8 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  *MP6061   TMS0970   1979, Texas Instruments Electronic Digital Thermostat (from patent, the one in MAME didn't have a label)
  @MP6100A  TMS0980   1979, Ideal Electronic Detective
  @MP6101B  TMS0980   1979, Parker Brothers Stop Thief
- *MP6354   TMS1375   1982, Tsukuda The Dracula
- *MP6361   TMS1375?  1983, <unknown> Defender Strikes
+ *MP6354   TMS1475   1982, Tsukuda The Dracula
+ *MP6361   TMS1475?  1983, <unknown> Defender Strikes
  @MP7302   TMS1400   1980, Tiger Deluxe Football with Instant Replay
  @MP7304   TMS1400   1982, Tiger 7 in 1 Sports Stadium (model 7-555)
  @MP7313   TMS1400   1980, Parker Brothers Bank Shot
@@ -5945,7 +5947,7 @@ ROM_END
 
   Gakken Invader
   * PCB label: GAKKEN, INVADER, KS-00779
-  * TMS1370 MP2110
+  * TMS1370 MP2110 (die label: 1370, MP2110)
   * cyan VFD display Itron? CP5008A, 1-bit sound
 
   known releases:
@@ -6201,7 +6203,7 @@ ROM_END
 /***************************************************************************
 
   Gakken Invader 2000
-  * TMS1370(28 pins) MP1604 (die label: 1370A MP1604)
+  * TMS1370(28 pins) MP1604 (die label: 1370A, MP1604)
   * TMS1024 I/O expander
   * cyan/red/green VFD display, 1-bit sound
 
@@ -7608,7 +7610,7 @@ ROM_END
 /***************************************************************************
 
   Milton Bradley Comp IV
-  * TMC0904NL CP0904A (die label: 4A0970D-04A)
+  * TMC0904NL CP0904A (die label: 0970D-04A)
   * 10 LEDs behind bezel, no sound
 
   This is small tabletop Mastermind game; a code-breaking game where the player
@@ -8913,7 +8915,7 @@ ROM_END
 /***************************************************************************
 
   Parker Brothers Code Name: Sector, by Bob Doyle
-  * TMS0970 MCU, MP0905BNL ZA0379 (die label: 4A0970F-05B)
+  * TMS0970 MCU, MP0905BNL ZA0379 (die label: 0970F-05B)
   * 6-digit 7seg LED display + 4 LEDs for compass, no sound
 
   This is a tabletop submarine pursuit game. A grid board and small toy

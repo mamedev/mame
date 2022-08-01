@@ -12,6 +12,7 @@ for new game, B for empty board, or C for continue.
 
 TODO:
 - cncchess sound is wrong, it should be a long dual-tone alarm sound
+- is Tryom CC-700 a hack of cmpchess? it does the L, bP thing at start too
 
 BTANB:
 - cmpchess/cmpchess2 accepts illegal moves (Conic fixed that)
