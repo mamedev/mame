@@ -195,11 +195,27 @@ void axc51base_cpu_device::iram_indirect_write(offs_t a, uint8_t d) { m_data.wri
 #define DPH1         SFR_A(AXC51_DPH1)
 
 
+#define ER00         SFR_A(AXC51_ER00)
+#define ER01         SFR_A(AXC51_ER01)
+
+#define ER10         SFR_A(AXC51_ER10)
+#define ER11         SFR_A(AXC51_ER11)
+
+#define ER20         SFR_A(AXC51_ER20)
+#define ER21         SFR_A(AXC51_ER21)
+
+#define ER30         SFR_A(AXC51_ER30)
+#define ER31         SFR_A(AXC51_ER31)
+
 #define R_REG(r)    m_scratchpad[(r) | (PSW & 0x18)]
 #define DPTR        ((DPH<<8) | DPL)
 
 #define DPTR1        ((DPH1<<8) | DPL1)
 
+#define ER0       ((ER00<<8) | ER01)
+#define ER1       ((ER10<<8) | ER11)
+#define ER2       ((ER20<<8) | ER21)
+#define ER3       ((ER30<<8) | ER31)
 
 /* WRITE accessors */
 
@@ -223,15 +239,20 @@ void axc51base_cpu_device::iram_indirect_write(offs_t a, uint8_t d) { m_data.wri
 
 #define SET_DPTR1(n)     do { DPH1 = ((n) >> 8) & 0xff; DPL1 = (n) & 0xff; } while (0)
 
+#define SET_EP0(n)     do { ER01 = ((n) >> 8) & 0xff; ER00 = (n) & 0xff; } while (0)
+#define SET_EP1(n)     do { ER11 = ((n) >> 8) & 0xff; ER10 = (n) & 0xff; } while (0)
+#define SET_EP2(n)     do { ER21 = ((n) >> 8) & 0xff; ER20 = (n) & 0xff; } while (0)
+#define SET_EP3(n)     do { ER31 = ((n) >> 8) & 0xff; ER30 = (n) & 0xff; } while (0)
 
 /* Macros for Setting Flags */
 #define SET_X(R, v) do { R = (v);} while (0)
 
 #define SET_CY(n)       SET_PSW((PSW & 0x7f) | (n<<7))  //Carry Flag
 #define SET_AC(n)       SET_PSW((PSW & 0xbf) | (n<<6))  //Aux.Carry Flag
-#define SET_FO(n)       SET_PSW((PSW & 0xdf) | (n<<5))  //User Flag
+#define SET_EC(n)       SET_PSW((PSW & 0xdf) | (n<<5))  //Extended Instruction Carry Flag EC (not FO)
 #define SET_RS(n)       SET_PSW((PSW & 0xe7) | (n<<3))  //R Bank Select
 #define SET_OV(n)       SET_PSW((PSW & 0xfb) | (n<<2))  //Overflow Flag
+#define SET_EZ(n)       SET_PSW((PSW & 0xfd) | (n<<1))  //Extended Instruction Zero Flag EZ
 #define SET_P(n)        SET_PSW((PSW & 0xfe) | (n<<0))  //Parity Flag
 
 #define SET_BIT(R, n, v) do { R = (R & ~(1<<(n))) | ((v) << (n));} while (0)
@@ -248,9 +269,10 @@ void axc51base_cpu_device::iram_indirect_write(offs_t a, uint8_t d) { m_data.wri
 
 #define GET_CY          GET_BIT(PSW, 7)
 #define GET_AC          GET_BIT(PSW, 6)
-#define GET_FO          GET_BIT(PSW, 5)
+#define GET_EC          GET_BIT(PSW, 5) //Extended Instruction Carry Flag EC (not FO)
 #define GET_RS          GET_BIT(PSW, 3)
 #define GET_OV          GET_BIT(PSW, 2)
+#define GET_EZ          GET_BIT(PSW, 1) //Extended Instruction Zero Flag EZ
 #define GET_P           GET_BIT(PSW, 0)
 
 #define GET_EA          GET_BIT(IE, 7)
@@ -533,7 +555,7 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 		// ADDDP0
 		// (always affects DP0, ignores DPSEL)
 		uint16_t increment = (B) | ((R8) << 8);
-		logerror("ADDDP0 with increment %04x\n", increment);
+		logerror("%s: ADDDP0 with increment %04x\n", machine().describe_context(), increment);
 		uint16_t dptr = (DPTR)+increment;
 		SET_DPTR(dptr);
 		break;
@@ -746,8 +768,30 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 
 	case 0xc1: case 0xc5: case 0xc9: case 0xcd:
 	{
+		//	fatalerror("%s: ROTL16 ER%01x, ER8", machine().describe_context(), n);
+
 		uint8_t n = (prm & 0x0c) >> 2;
-		fatalerror("%s: ROTL16 ER%01x, ER8", machine().describe_context(), n);
+
+		uint16_t val;
+
+		switch (n)
+		{
+		case 0x00: val = (ER0); break;
+		case 0x01: val = (ER1); break;
+		case 0x02: val = (ER2); break;
+		case 0x03: val = (ER3); break;
+		}
+		uint8_t shift = (R8);
+
+		val = (val << shift) | (val >> (16 - shift));
+
+		switch (n)
+		{
+			case 0x00: SET_EP0(val); break;
+			case 0x01: SET_EP1(val); break;
+			case 0x02: SET_EP2(val); break;
+			case 0x03: SET_EP3(val); break;
+		}
 		break;
 	}
 
@@ -1458,8 +1502,8 @@ void axc51base_cpu_device::sfr_write(size_t offset, uint8_t data)
 		case AXC51_ER8:  // 0xee
 			break;
 
-		case AXC51_P4: // 0xb4
-			break;
+	//	case AXC51_P4: // 0xb4
+	//		break;
 
 		case AXC51_IE2CRPT: // 0x95 controls automatic encryption
 			ie2crypt_w(data);
@@ -1636,11 +1680,11 @@ void axc51base_cpu_device::state_string_export(const device_state_entry &entry, 
 			str = string_format("%c%c%c%c%c%c%c%c",
 				PSW & 0x80 ? 'C':'.',
 				PSW & 0x40 ? 'A':'.',
-				PSW & 0x20 ? 'F':'.',
+				PSW & 0x20 ? 'EC':'.',
 				PSW & 0x10 ? '0':'.',
 				PSW & 0x08 ? '1':'.',
 				PSW & 0x04 ? 'V':'.',
-				PSW & 0x02 ? '?':'.',
+				PSW & 0x02 ? 'EZ':'.',
 				PSW & 0x01 ? 'P':'.');
 			break;
 	}
