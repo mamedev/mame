@@ -476,7 +476,7 @@ public:
 
 			ioctl(ed, EVIOCGBIT(0, sizeof(evbits)), &evbits);
 
-			if(evbits & (1<<EV_KEY)) { // has keys or buttons
+			if(evbits & (1<<EV_KEY)) {
 				memset(bits, 0, sizeof(bits));
 				ioctl(ed, EVIOCGBIT(EV_KEY, OCTETS_FOR(KEY_MAX)), dev[dnum].buttons);
 				for(int i=0; dev[dnum].type==EVDEV_NONE && i<KEY_MAX; i++)
@@ -486,11 +486,13 @@ public:
 								dev[dnum].type = EVDEV_KEYBOARD;
 								break;
 							case BTN_MOUSE:
-								dev[dnum].type = EVDEV_MOUSE;
+								if(evbits & (1<<EV_REL))
+									dev[dnum].type = EVDEV_MOUSE;
 								break;
 							case BTN_GAMEPAD:
 							case BTN_JOYSTICK:
-								dev[dnum].type = EVDEV_JOYSTICK;
+								if(evbits & (1<<EV_ABS))
+									dev[dnum].type = EVDEV_JOYSTICK;
 								break;
 						}
 			}
@@ -505,7 +507,7 @@ public:
 					dev[dnum].type = EVDEV_GENERIC;
 			}
 
-			const char* const dname[] = { 0, "keyboard", "mouse", "joystick", "generic device" };
+			const char* const dname[] = { 0, "keyboard", "mouse", "joystick", "generic HID device" };
 
 			if(dev[dnum].type != EVDEV_NONE) {
 				dev[dnum].num = dnum;
@@ -539,14 +541,24 @@ public:
 		int  devindex[8] = { -1, -1, -1, -1, -1, -1, -1, -1 };
 
 		// first try to map explicitly requested devices
+		// this _specifically_ allows matching against type since
+		// one might want to treat something that looks like a joystick
+		// as a mouse, or map a generic or unusual HID that nevertheless
+		// provides buttons or axes.
 		for(int dev=0; dev<8; dev++) {
 			sprintf(defname, "%s%d", devmap, dev+1);
-			int i;
-			for(i = evdev.max_dev-1; i >= 0; --i) {
-			}
-			devindex[dev] = i;
+			const char* dev_name = machine.options().value(defname);
+			if (dev_name && *dev_name && strcmp(dev_name, OSDOPTVAL_AUTO))
+				for(int i=0; i<evdev.max_dev; i++) {
+					if(!strcmp(dev_name, evdev.dev[i].name) || !strcmp(dev_name, evdev.dev[i].id)) {
+						devindex[dev] = i;
+						break;
+					}
+				}
 		}
-		// then try to map all unmapped matching devices
+		// then try to map all unmapped matching devices that look
+		// like the correct type (so remaining mice are mapped as such
+		// and so on)
 		if(type != EVDEV_NONE) {
 			for(int i=0; i<evdev.max_dev; i++) {
 				if(evdev.dev[i].type == type) {
@@ -565,7 +577,7 @@ public:
 				}
 			}
 		}
-		// create all mapped devices
+		// create devices that ended up mapped
 		for(int i=0; i<8; i++)
 			if(devindex[i] >= 0) {
 				auto& dev = evdev.dev[devindex[i]];
@@ -576,6 +588,10 @@ public:
 
 	void exit(void) override
 	{
+		if(fd >= 0) {
+			close(fd);
+			fd = -1;
+		}
 	}
 
 	void before_poll(running_machine& machine) override
