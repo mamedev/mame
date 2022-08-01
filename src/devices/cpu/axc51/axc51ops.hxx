@@ -770,23 +770,54 @@ OPHANDLER( movx_a_ir )
 //(Move A to External Ram 16 bit address)
 OPHANDLER( movx_idptr_a )
 {
+	uint32_t addr;
+	if ((m_sfr_regs[AXC51_DPCON - 0x80] & 0x01) == 0x00) // use DPTR0
+	{
+		addr = ERAM_ADDR(DPTR, 0xFFFF);
+	}
+	else
+	{
+		addr = ERAM_ADDR(DPTR1, 0xFFFF);
+	}
+
 	if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x08) // auto-increment enabled
 	{
-		fatalerror("movx_idptr_a with auto-inc");
+		if ((m_sfr_regs[AXC51_DPCON - 0x80] & 0x01) == 0x00) // use DPTR0
+		{
+			if ((m_sfr_regs[AXC51_DPCON - 0x80] & 0x20) == 0x00) // DPID0  DPTR0 increase direction control
+			{
+				uint16_t dptr = (DPTR)+1;
+				SET_DPTR(dptr);
+			}
+			else
+			{
+				uint16_t dptr = (DPTR)-1;
+				SET_DPTR(dptr);
+			}
+		}
+		else // use DPTR1
+		{
+			if ((m_sfr_regs[AXC51_DPCON - 0x80] & 0x10) == 0x00) // DPID1  DPTR1 increase direction control
+			{
+				// decrement
+				uint16_t dptr = (DPTR1)+1;
+				SET_DPTR1(dptr);
+			}
+			else
+			{
+				// decrement
+				uint16_t dptr = (DPTR1)-1;
+				SET_DPTR1(dptr);
+			}
+		}
 	}
 
-	if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x04) // auto-toggle enabled
+	if ((m_sfr_regs[AXC51_DPCON - 0x80] & 0x04) == 0x04)
 	{
-		fatalerror("movx_idptr_a with auto-toggle");
+		// auto toggle DPR
+		m_sfr_regs[AXC51_DPCON - 0x80] ^= 0x01;
 	}
 
-	if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x01) // DPTR enabled
-	{
-		fatalerror("movx_idptr_a with DPTR1");
-	}
-
-//  DATAMEM_W(R_DPTR, ACC);               //Store ACC to External DATA memory address pointed to by DPTR
-	uint32_t addr = ERAM_ADDR(DPTR, 0xFFFF);
 	DATAMEM_W(addr, ACC);               //Store ACC to External DATA memory address pointed to by DPTR
 }
 

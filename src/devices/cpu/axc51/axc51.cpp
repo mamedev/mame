@@ -189,6 +189,7 @@ void axc51base_cpu_device::iram_indirect_write(offs_t a, uint8_t d) { m_data.wri
 #define IE          SFR_A(ADDR_IE)
 #define IP          SFR_A(ADDR_IP)
 #define B           SFR_A(ADDR_B)
+#define R8          SFR_A(AXC51_ER8)
 
 #define DPL1         SFR_A(AXC51_DPL1)
 #define DPH1         SFR_A(AXC51_DPH1)
@@ -528,8 +529,15 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 		break;
 
 	case 0x04:
-		fatalerror("%s: ADDDP0", machine().describe_context());
+	{
+		// ADDDP0
+		// (always affects DP0, ignores DPSEL)
+		uint16_t increment = (B) | ((R8) << 8);
+		logerror("ADDDP0 with increment %04x\n", increment);
+		uint16_t dptr = (DPTR)+increment;
+		SET_DPTR(dptr);
 		break;
+	}
 
 	case 0x05:
 		fatalerror("%s: ADDDP1", machine().describe_context());
@@ -1439,6 +1447,17 @@ void axc51base_cpu_device::sfr_write(size_t offset, uint8_t data)
 		case AXC51_GP7: // 0xb5
 			break;
 
+		case AXC51_ER00: // 0xe6
+		case AXC51_ER01: // 0xe7
+		case AXC51_ER10: // 0xe8
+		case AXC51_ER11: // 0xe9
+		case AXC51_ER20: // 0xea
+		case AXC51_ER21: // 0xeb
+		case AXC51_ER30: // 0xec
+		case AXC51_ER31: // 0xed
+		case AXC51_ER8:  // 0xee
+			break;
+
 		case AXC51_P4: // 0xb4
 			break;
 
@@ -1497,6 +1516,17 @@ uint8_t axc51base_cpu_device::sfr_read(size_t offset)
 		case AXC51_GP5: // 0xb2
 		case AXC51_GP6: // 0xb3
 		case AXC51_GP7: // 0xb5
+			return m_sfr_regs[offset-0x80];
+
+		case AXC51_ER00: // 0xe6
+		case AXC51_ER01: // 0xe7
+		case AXC51_ER10: // 0xe8
+		case AXC51_ER11: // 0xe9
+		case AXC51_ER20: // 0xea
+		case AXC51_ER21: // 0xeb
+		case AXC51_ER30: // 0xec
+		case AXC51_ER31: // 0xed
+		case AXC51_ER8:  // 0xee
 			return m_sfr_regs[offset-0x80];
 
 		case AXC51_DPCON: // 0x86
