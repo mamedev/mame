@@ -2016,7 +2016,9 @@ void axc51base_cpu_device::spidmacnt_w(uint8_t data)
 
 		for (int i = 0; i < (data + 1) * 2; i++)
 		{
-			uint8_t romdat = m_spiptr[m_spiaddr++];
+			spibuf_w(0x00); // clock
+			uint8_t romdat = spibuf_r();
+			//uint8_t romdat = m_spiptr[m_spiaddr++];
 			m_io.write_byte(m_spi_dma_addr++, romdat); // is this the correct destination space?
 		}
 	}
