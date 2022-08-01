@@ -22,7 +22,6 @@ TODO:
 #include "spec128.h"
 #include "specpls3.h"
 
-#include "tilemap.h"
 #include "beta_m.h"
 #include "bus/centronics/ctronics.h"
 #include "sound/ay8910.h"
@@ -74,9 +73,6 @@ protected:
 	void spectrum_update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 private:
-	u8 atm_port_ff7b_r(offs_t offset);
-	u8 atm_port_ffdf_r(offs_t offset);
-	u8 atm_port_fff7_r(offs_t offset);
 	u8 beta_neutral_r(offs_t offset);
 	u8 beta_enable_r(offs_t offset);
 	u8 beta_disable_r(offs_t offset);
@@ -107,16 +103,13 @@ private:
 	required_device<device_palette_interface> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	TILE_GET_INFO_MEMBER(get_tile_info_txt);
-
 	int m_pen;            // PEN - extended memory manager
 	int m_cpm;
 	u8 m_pages_map[2][4]; // map: 0,1
 
 	int m_pen2;           // palette selector
 	int m_rg = 0b011;     // 0:320x200lo, 2:640:200hi, 3:256x192zx, 6:80x25txt
-	u8 m_br3_mask;
-	tilemap_t *m_txt_tilemap = nullptr;
+	int m_br3;
 
 	address_space *m_program;
 };
@@ -156,7 +149,7 @@ void atm_state::atm_update_memory()
 
 void atm_state::atm_ula_w(offs_t offset, u8 data)
 {
-	m_br3_mask = ~offset & 0x08;
+	m_br3 = ~offset & 0x08;
 	spectrum_128_state::spectrum_ula_w(offset, data);
 }
 
@@ -179,11 +172,6 @@ void atm_state::atm_port_ffff_w(offs_t offset, u8 data)
 			(BIT(~data, 4) * 0xaa) | (BIT(~data, 7) * 0x55),
 			(BIT(~data, 0) * 0xaa) | (BIT(~data, 5) * 0x55));
 	}
-}
-
-u8 atm_state::atm_port_ff7b_r(offs_t offset)
-{
-	return 0xff;
 }
 
 void atm_state::atm_port_7ffd_w(offs_t offset, u8 data)
@@ -220,11 +208,6 @@ void atm_state::atm_port_ff77_w(offs_t offset, u8 data)
 	}
 }
 
-u8 atm_state::atm_port_fff7_r(offs_t offset)
-{
-	return 0xff;
-}
-
 void atm_state::atm_port_fff7_w(offs_t offset, u8 data)
 {
 	if (!SHADOW)
@@ -236,11 +219,6 @@ void atm_state::atm_port_fff7_w(offs_t offset, u8 data)
 	LOGMEM("PEN%s.%s = %X %s%d: %02X\n", (page | DOS7FFD_MASK) ? "+" : "!", BIT(m_port_7ffd_data, 4), data, (page & RAM_MASK) ? "RAM" : "ROM", bank, page & 0x3f);
 	PEN_PAGE(bank) = page;
 	atm_update_memory();
-}
-
-u8 atm_state::atm_port_ffdf_r(offs_t offset)
-{
-	return 0xff;
 }
 
 rectangle atm_state::get_screen_area()
@@ -265,16 +243,17 @@ rectangle atm_state::get_screen_area()
 
 u8 atm_state::get_border_color(u16 hpos, u16 vpos)
 {
-	return m_br3_mask | (m_port_fe_data & 0x07);
+	return m_br3 | (m_port_fe_data & 0x07);
 }
 
 void atm_state::atm_update_video_mode()
 {
 	bool zx_scale = BIT(m_rg, 0);
 	bool double_width = BIT(m_rg, 1) && !zx_scale;
-	u8 border_x = (48 - (32 * !zx_scale)) << double_width;
+	u8 border_x = (40 - (32 * !zx_scale)) << double_width;
+	u8 border_y = (40 - (4 * !zx_scale));
 	rectangle scr = get_screen_area();
-	m_screen->configure(448 << double_width, 320, {scr.left() - border_x, scr.right() + border_x, scr.top() - 48, scr.bottom() + 48}, m_screen->frame_period().as_attoseconds());
+	m_screen->configure(448 << double_width, 312, {scr.left() - border_x, scr.right() + border_x, scr.top() - border_y, scr.bottom() + border_y}, m_screen->frame_period().as_attoseconds());
 	LOGVIDEO("Video mode: %d\n", m_rg);
 
 	//spectrum_palette(m_palette);
@@ -434,9 +413,7 @@ void atm_state::atm_io(address_map &map)
 	map(0x00fb, 0x00fb).mirror(0xff00).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x00fd, 0x00fd).mirror(0xff00).w(FUNC(atm_state::atm_port_7ffd_w));
 	map(0x0077, 0x0077).select(0xff00).w(FUNC(atm_state::atm_port_ff77_w));
-	map(0x007b, 0x007b).mirror(0xff00).r(FUNC(atm_state::atm_port_ff7b_r));
-	map(0x00f7, 0x00f7).select(0xff00).rw(FUNC(atm_state::atm_port_fff7_r), FUNC(atm_state::atm_port_fff7_w));
-	map(0x00df, 0x00df).mirror(0xff00).r(FUNC(atm_state::atm_port_ffdf_r));
+	map(0x00f7, 0x00f7).select(0xff00).w(FUNC(atm_state::atm_port_fff7_w));
 	map(0x8000, 0x8000).mirror(0x3ffd).w("ay8912", FUNC(ay8910_device::data_w));
 	map(0xc000, 0xc000).mirror(0x3ffd).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 }
@@ -469,7 +446,7 @@ void atm_state::machine_reset()
 	m_port_7ffd_data = 0;
 	m_port_1ffd_data = -1;
 
-	m_br3_mask = 0;
+	m_br3 = 0;
 	atm_port_ff77_w(0x4000, 3); // CPM=0(on), PEN=0(off), PEN2=1(off); vmode: zx
 }
 
@@ -478,8 +455,6 @@ void atm_state::video_start()
 	spectrum_state::video_start();
 	m_screen_location = m_ram->pointer() + (5 << 14);
 	m_contention_pattern = {};
-
-	m_txt_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(atm_state::get_tile_info_txt)), TILEMAP_SCAN_ROWS, 8, 8, 128, 40);
 }
 
 /* F4 Character Displayer */
@@ -514,17 +489,6 @@ static GFXDECODE_START( gfx_atmtb2 )
 	GFXDECODE_ENTRY( "maincpu", 0x13d00, spectrum_charlayout, 7, 1 )
 GFXDECODE_END
 
-TILE_GET_INFO_MEMBER(atm_state::get_tile_info_txt)
-{
-	u8 col = (tile_index % tilemap.cols()) >> 1;
-	u8 row = tile_index / tilemap.cols();
-	u8 *symb_location = m_screen_location + 0x1c0 + col + (row * (tilemap.cols() >> 1));
-	if (tile_index & 1)
-		symb_location += 0x2000;
-
-	tileinfo.set(0, *symb_location, 0, 0);
-}
-
 void atm_state::atm(machine_config &config)
 {
 	spectrum_128(config);
@@ -535,7 +499,7 @@ void atm_state::atm(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &atm_state::atm_switch);
 	m_maincpu->nomreq_cb().set_nop();
 
-	m_screen->set_raw(X1_128_SINCLAIR / 5, 448, 320, {get_screen_area().left() - 48, get_screen_area().right() + 48, get_screen_area().top() - 48, get_screen_area().bottom() + 48});
+	m_screen->set_raw(X1_128_SINCLAIR / 5, 448, 312, {get_screen_area().left() - 40, get_screen_area().right() + 40, get_screen_area().top() - 40, get_screen_area().bottom() + 40});
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_atm);
 
 	BETA_DISK(config, m_beta, 0);
