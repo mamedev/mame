@@ -143,16 +143,6 @@ elseif _OPTIONS["targetos"]=="linux" then
 			backtick(pkgconfigcmd() .. " --cflags Qt5Widgets"),
 		}
 	end
-	if _OPTIONS["NO_USE_EVDEV"]=="1" then
-		defines {
-			"USE_EVDEV=0",
-		}
-	else
-		defines {
-			"USE_EVDEV=1",
-		}
-	end
-
 elseif _OPTIONS["targetos"]=="macosx" then
 	defines {
 		"SDLMAME_MACOSX",
@@ -162,6 +152,16 @@ elseif _OPTIONS["targetos"]=="freebsd" then
 	buildoptions {
 		-- /usr/local/include is not considered a system include director on FreeBSD.  GL.h resides there and throws warnings
 		"-isystem /usr/local/include",
+	}
+end
+
+if _OPTIONS["NO_USE_EVDEV"]=="1" or _OPTIONS["targetos"]~="linux" then
+	defines {
+		"USE_EVDEV=0",
+	}
+else
+	defines {
+		"USE_EVDEV=1",
 	}
 end
 
