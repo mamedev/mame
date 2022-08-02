@@ -11,7 +11,7 @@
 #include "input_module.h"
 #include "modules/osdmodule.h"
 
-#if defined(SDLMAME_SDL2) && defined(SDLMAME_LINUX)
+#if (USE_EVDEV)
 
 #include <cctype>
 #include <cstddef>
@@ -31,8 +31,15 @@
 #include "../../sdl/osdsdl.h"
 #include "input_sdlcommon.h"
 
+#if defined(SDLMAME_LINUX)
+
 #include <linux/version.h>
 #include <linux/input.h>
+
+#else
+// FreeBSD is known to have the evdev interface, but I have no way
+// of testing it.
+#endif
 
 #include <sys/types.h>
 #include <fcntl.h>
@@ -259,15 +266,18 @@ enum device_type {
 
 
 #define OCTETS_FOR(n) ((n+7)>>3)
+
+class evdev_device;
 struct evdev_device_info
 {
+	evdev_device* mapped;
 	char name[64];
 	char id[32];
 	device_type type;
-	unsigned char	num;
-	unsigned char	buttons[OCTETS_FOR(KEY_MAX)];
-	unsigned char	relaxes[OCTETS_FOR(REL_MAX)];
-	unsigned char	absaxes[OCTETS_FOR(ABS_MAX)];
+	unsigned char num;
+	unsigned char buttons[OCTETS_FOR(KEY_MAX)];
+	unsigned char relaxes[OCTETS_FOR(REL_MAX)];
+	unsigned char absaxes[OCTETS_FOR(ABS_MAX)];
 };
 
 
@@ -412,8 +422,8 @@ private:
 
 public:
 	int  devinput;
-	evdev_device_info	dev[MAX_EVDEV_DEVICES]; // 640k should be enough for anyone
-	int			max_dev;
+	evdev_device_info dev[MAX_EVDEV_DEVICES]; // 640k should be enough for anyone
+	int max_dev;
 
 public:
 	evdev_input(): initialized(false)
@@ -432,8 +442,10 @@ public:
 		}
 
 		max_dev = 0;
-		for(int i=0; i<MAX_EVDEV_DEVICES; i++)
+		for(int i=0; i<MAX_EVDEV_DEVICES; i++) {
+			dev[i].mapped = 0;
 			dev[i].type = EVDEV_NONE;
+		}
 
 		DIR* idir = fdopendir(devinput);
 		while(idir) {
@@ -537,13 +549,12 @@ public:
 	{
 	}
 
-	void input_setup(running_machine& machine, const char* devname, input_device_class deviceclass, device_type type, const char* devmap)
+	void input_setup(running_machine& machine, const char* devname, input_device_class deviceclass, device_type type, const char* map_option)
 	{
 		evdev.init();
 
 		osd_printf_verbose("evdev: Setting up %s devices\n", devname);
 
-		char defname[20];
 		int  devindex[8] = { -1, -1, -1, -1, -1, -1, -1, -1 };
 
 		// first try to map explicitly requested devices
@@ -551,34 +562,55 @@ public:
 		// one might want to treat something that looks like a joystick
 		// as a mouse, or map a generic or unusual HID that nevertheless
 		// provides buttons or axes.
-		for(int dev=0; dev<8; dev++) {
-			sprintf(defname, "%s%d", devmap, dev+1);
-			const char* dev_name = machine.options().value(defname);
-			if (dev_name && *dev_name && strcmp(dev_name, OSDOPTVAL_AUTO))
-				for(int i=0; i<evdev.max_dev; i++) {
-					if(!strcmp(dev_name, evdev.dev[i].name) || !strcmp(dev_name, evdev.dev[i].id)) {
-						devindex[dev] = i;
-						break;
+		const char* map_option_text = machine.options().value(map_option);
+		if(map_option_text && *map_option_text) {
+			char split_options[strlen(map_option_text)+1];
+			char* opt = split_options;
+
+			strcpy(split_options, map_option_text);
+
+			for(int dev=0; *opt && dev<8; dev++) {
+				char* end = opt;
+				while(*end && *end!=',')
+					end++;
+				if(*end == ',')
+					*end++ = '\0';
+				if (*opt && strcmp(opt, OSDOPTVAL_AUTO)) {
+					int dn = -1;
+					// allow explit use of eventNN
+					if(!strncmp(opt, "event", 5) && opt[5]) {
+						char* endp = 0;
+						dn = strtol(opt+5, &endp, 10);
+						if(*endp)
+							dn = -1;
 					}
+
+					if(dn < 0)
+						for(int i=0; i<evdev.max_dev; i++) {
+						if(!strcmp(opt, evdev.dev[i].name) || !strcmp(opt, evdev.dev[i].id)) {
+							dn = i;
+							break;
+						}
+					}
+					if(dn>=0 && dn<evdev.max_dev && !evdev.dev[dn].mapped)
+						devindex[dev] = dn;
 				}
+				opt = end;
+			}
 		}
 		// then try to map all unmapped matching devices that look
 		// like the correct type (so remaining mice are mapped as such
 		// and so on)
 		if(type != EVDEV_NONE) {
 			for(int i=0; i<evdev.max_dev; i++) {
-				if(evdev.dev[i].type == type) {
-					int absent = 1;
+				if(evdev.dev[i].type==type && !evdev.dev[i].mapped) {
 					int free = -1;
-					for(int di=0; di<8; di++) {
-						if(devindex[di]<0 && free<0)
+					for(int di=0; di<8; di++)
+						if(devindex[di]<0) {
 							free = di;
-						if(devindex[di]==i) {
-							absent = 0;
 							break;
 						}
-					}
-					if(absent && free>=0)
+					if(free>=0)
 						devindex[free] = i;
 				}
 			}
@@ -619,7 +651,7 @@ public:
 
 	void input_init(running_machine& machine) override
 	{
-		input_setup(machine, "Keyboard", DEVICE_CLASS_KEYBOARD, EVDEV_KEYBOARD, SDLOPTION_KEYBINDEX);
+		input_setup(machine, "Keyboard", DEVICE_CLASS_KEYBOARD, EVDEV_KEYBOARD, SDLOPTION_KEYBOARD_DEV);
 	}
 
 };
@@ -633,7 +665,7 @@ public:
 
 	void input_init(running_machine& machine) override
 	{
-		input_setup(machine, "Mouse", DEVICE_CLASS_MOUSE, EVDEV_MOUSE, SDLOPTION_MOUSEINDEX);
+		input_setup(machine, "Mouse", DEVICE_CLASS_MOUSE, EVDEV_MOUSE, SDLOPTION_MOUSE_DEV);
 	}
 };
 
@@ -646,7 +678,7 @@ public:
 
 	void input_init(running_machine& machine) override
 	{
-		input_setup(machine, "Joystick", DEVICE_CLASS_JOYSTICK, EVDEV_JOYSTICK, SDLOPTION_JOYINDEX);
+		input_setup(machine, "Joystick", DEVICE_CLASS_JOYSTICK, EVDEV_JOYSTICK, SDLOPTION_JOYSTICK_DEV);
 	}
 };
 
@@ -659,21 +691,21 @@ public:
 
 	void input_init(running_machine& machine) override
 	{
-		input_setup(machine, "Lightgun", DEVICE_CLASS_LIGHTGUN, EVDEV_NONE, SDLOPTION_LIGHTGUNINDEX);
+		input_setup(machine, "Lightgun", DEVICE_CLASS_LIGHTGUN, EVDEV_NONE, SDLOPTION_LIGHTGUN_DEV);
 	}
 };
 
 
 } // anonymous namespace
 
-#else // defined(SDLMAME_SDL2) && defined(SDLMAME_LINUX)
+#else // (USE_EVDEV)
 
 MODULE_NOT_SUPPORTED(evdev_keyboard_module, OSD_KEYBOARDINPUT_PROVIDER, "evdev")
 MODULE_NOT_SUPPORTED(evdev_mouse_module,    OSD_MOUSEINPUT_PROVIDER,    "evdev")
 MODULE_NOT_SUPPORTED(evdev_joystick_module, OSD_JOYSTICKINPUT_PROVIDER, "evdev")
 MODULE_NOT_SUPPORTED(evdev_lightgun_module, OSD_LIGHTGUNINPUT_PROVIDER, "evdev")
 
-#endif //  defined(SDLMAME_SDL2) && !defined(SDLMAME_WIN32) && defined(USE_XINPUT) && USE_XINPUT
+#endif // (USE_EVDEV)
 
 MODULE_DEFINITION(KEYBOARDINPUT_EVDEV, evdev_keyboard_module)
 MODULE_DEFINITION(MOUSEINPUT_EVDEV,    evdev_mouse_module)
