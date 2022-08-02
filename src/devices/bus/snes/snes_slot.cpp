@@ -1176,26 +1176,12 @@ void base_sns_cart_slot_device::chip_write(offs_t offset, uint8_t data)
 /* We use this to convert the company_id in the header to int value to be passed in companies[] */
 static int char_to_int_conv( char id )
 {
-	int value;
-
-	if (id == '1') value = 0x01;
-	else if (id == '2') value = 0x02;
-	else if (id == '3') value = 0x03;
-	else if (id == '4') value = 0x04;
-	else if (id == '5') value = 0x05;
-	else if (id == '6') value = 0x06;
-	else if (id == '7') value = 0x07;
-	else if (id == '8') value = 0x08;
-	else if (id == '9') value = 0x09;
-	else if (id == 'A') value = 0x0a;
-	else if (id == 'B') value = 0x0b;
-	else if (id == 'C') value = 0x0c;
-	else if (id == 'D') value = 0x0d;
-	else if (id == 'E') value = 0x0e;
-	else if (id == 'F') value = 0x0f;
-	else value = 0x00;
-
-	return value;
+	if (id >= '0' && id <= '9')
+		return id - '0';
+	else if (id >= 'A' && id <= 'F')
+		return id - 'A' + 0x0a;
+	else
+		return 0;
 }
 
 #define UNK  "UNKNOWN"
@@ -1403,10 +1389,10 @@ void base_sns_cart_slot_device::internal_header_logging(uint8_t *ROM, uint32_t l
 		logerror( "\tCountry:       Unknown [%d]\n", ROM[hilo_mode + 0x19]);
 	logerror( "\tLicense:       %s [%X]\n", companies[ROM[hilo_mode + 0x1a]], ROM[hilo_mode + 0x1a]);
 	logerror( "\tVersion:       1.%d\n", ROM[hilo_mode + 0x1b]);
-	logerror( "\tInv Checksum:  %X %X\n", ROM[hilo_mode + 0x1d], ROM[hilo_mode + 0x1c]);
-	logerror( "\tChecksum:      %X %X\n", ROM[hilo_mode + 0x1f], ROM[hilo_mode + 0x1e]);
-	logerror( "\tNMI Address:   %2X%2Xh\n", ROM[hilo_mode + 0x3b], ROM[hilo_mode + 0x3a]);
-	logerror( "\tStart Address: %2X%2Xh\n\n", ROM[hilo_mode + 0x3d], ROM[hilo_mode + 0x3c]);
+	logerror( "\tInv Checksum:  %02X%02Xh\n", ROM[hilo_mode + 0x1d], ROM[hilo_mode + 0x1c]);
+	logerror( "\tChecksum:      %02X%02Xh\n", ROM[hilo_mode + 0x1f], ROM[hilo_mode + 0x1e]);
+	logerror( "\tNMI Address:   %02X%02Xh\n", ROM[hilo_mode + 0x3b], ROM[hilo_mode + 0x3a]);
+	logerror( "\tStart Address: %02X%02Xh\n\n", ROM[hilo_mode + 0x3d], ROM[hilo_mode + 0x3c]);
 
 	logerror( "\tMode: %d\n", type);
 }
