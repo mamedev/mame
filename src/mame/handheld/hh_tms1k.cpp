@@ -55,6 +55,7 @@ TODO:
 - tithermos temperature sensor comparator (right now just the digital clock works)
 - is alphie(patent) the same as the final version?
 - is starwbcp the same as MP3438? (starwbc is MP3438A)
+- add SVG for tdracula
 
 ============================================================================
 
@@ -170,7 +171,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  *MP6061   TMS0970   1979, Texas Instruments Electronic Digital Thermostat (from patent, the one in MAME didn't have a label)
  @MP6100A  TMS0980   1979, Ideal Electronic Detective
  @MP6101B  TMS0980   1979, Parker Brothers Stop Thief
- *MP6354   TMS1475   1982, Tsukuda The Dracula
+ @MP6354   TMS1475   1982, Tsukuda The Dracula
  *MP6361   TMS1475?  1983, <unknown> Defender Strikes
  @MP7302   TMS1400   1980, Tiger Deluxe Football with Instant Replay
  @MP7304   TMS1400   1982, Tiger 7 in 1 Sports Stadium (model 7-555)
@@ -310,7 +311,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "xl25.lh" // clickable
 #include "zodiac.lh" // clickable
 
-//#include "hh_tms1k_test.lh" // common test-layout - use external artwork
+#include "hh_tms1k_test.lh" // common test-layout - use external artwork
 
 
 // machine_start/reset
@@ -2684,7 +2685,7 @@ ROM_END
 /***************************************************************************
 
   Coleco Total Control 4
-  * TMS1400NLL MP7334-N2 (die label: TMS1400, MP7334)
+  * TMS1400NLL MP7334-N2 (die label: TMS1400, MP7334, 28L 01D D000 R000)
   * 2x2-digit 7seg LED display + 4 LEDs, LED grid display, 1-bit sound
 
   This is a head to head electronic tabletop LED-display sports console.
@@ -3013,7 +3014,7 @@ ROM_END
 
   Conic Electronic Basketball
   * PCB label: CONIC 101-006
-  * TMS1000NLL MP0907 (die label: 1000B MP0907)
+  * TMS1000NLL MP0907 (die label: 1000B, MP0907)
   * DS8871N, 2 7seg LEDs, 30 other LEDs, 1-bit sound
 
   There are 3 known versions of Conic Basketball: MP0910(101-003) and
@@ -4759,7 +4760,7 @@ ROM_END
 /***************************************************************************
 
   Entex Color Football 4
-  * TMS1670 6009 MP7551 (die label: TMS1400, MP7551)
+  * TMS1670 6009 MP7551 (die label: TMS1400, MP7551, 40H 01D D000 R000)
   * 9-digit cyan VFD display, 60 red and green LEDs behind mask, 1-bit sound
 
   Another version exist, one with a LED(red) 7seg display.
@@ -5824,7 +5825,7 @@ ROM_END
 
   Gakken Jackpot: Gin Rummy & Black Jack
   * PCB label: gakken
-  * TMS1670 MPF553 (die label: TMS1400, MPF553)
+  * TMS1670 MPF553 (die label: TMS1400, MPF553, 40H 01D D000 R000)
   * 11-digit cyan VFD display Itron FG1114B, oscillator sound
 
   known releases:
@@ -6076,7 +6077,7 @@ ROM_END
 /***************************************************************************
 
   Gakken Invader 1000
-  * TMS1370 MP2139 (die label: 1170 MP2139)
+  * TMS1370 MP2139 (die label: 1170, MP2139)
   * cyan/red VFD display Futaba DM-25Z 2D, 1-bit sound
 
   known releases:
@@ -6945,7 +6946,7 @@ ROM_END
 /***************************************************************************
 
   Kosmos Astro
-  * TMS1470NLHL MP1133 (die label: TMS1400 MP1133)
+  * TMS1470NLHL MP1133 (die label: TMS1400, MP1133, 28H 01D D000 R000)
   * 9-digit 7seg VFD display + 8 LEDs(4 green, 4 yellow), no sound
 
   This is an astrological calculator, and also supports 4-function
@@ -7253,7 +7254,7 @@ ROM_END
 
   Mattel Thoroughbred Horse Race Analyzer
   * PCB label: 1670-4619D
-  * TMS1100NLL MP3491-N2 (die label: 1100E MP3491)
+  * TMS1100NLL MP3491-N2 (die label: 1100E, MP3491)
   * HLCD0569, 67-segment LCD panel, no sound
 
   This handheld is not a toy, read the manual for more information. In short,
@@ -8322,7 +8323,7 @@ ROM_END
 /***************************************************************************
 
   Milton Bradley Big Trak
-  * TMS1000NLL MP3301A or MP3301ANLL E (rev. E!) (die label: 1000E MP3301)
+  * TMS1000NLL MP3301A or MP3301ANLL E (rev. E!) (die label: 1000E, MP3301)
   * SN75494N Hex digit LED driver, 1 lamp, 3-level sound
   * gearbox with magnetic clutch, 1 IR led+sensor, 2 motors(middle wheels)
   * 24-button keypad, ext in/out ports
@@ -8545,7 +8546,7 @@ ROM_END
 
   Milton Bradley Dark Tower
   * TMS1400NLL MP7332-N1.U1(Rev. B) or MP7332-N2LL(Rev. C) (die label:
-    TMS1400, MP7332) (assume same ROM contents between revisions)
+    TMS1400, MP7332, 28L 01D D100 R100) (assume same ROM between revisions)
   * SN75494N MOS-to-LED digit driver
   * motorized rotating reel + lightsensor, 1bit-sound
 
@@ -9181,7 +9182,7 @@ ROM_END
 /***************************************************************************
 
   Parker Brothers Master Merlin
-  * TMS1400 MP7351-N2LL (die label: 1400CR MP7351)
+  * TMS1400 MP7351-N2LL (die label: 1400CR, MP7351)
   * 11 LEDs behind buttons, 3-level sound
 
   The TMS1400CR MCU has the same pinout as a standard TMS1100. The hardware
@@ -9517,7 +9518,7 @@ ROM_END
 /***************************************************************************
 
   Parker Brothers Bank Shot (known as Cue Ball in the UK), by Garry Kitchen
-  * TMS1400NLL MP7313-N2 (die label: TMS1400, MP7313)
+  * TMS1400NLL MP7313-N2 (die label: TMS1400, MP7313, 28L 01D D000 R000)
   * LED grid display, 1-bit sound
 
   Bank Shot is an electronic pool game. To select a game, repeatedly press
@@ -9648,7 +9649,7 @@ ROM_END
 /***************************************************************************
 
   Parker Brothers Split Second
-  * TMS1400NLL MP7314-N2 (die label: TMS1400, MP7314)
+  * TMS1400NLL MP7314-N2 (die label: TMS1400, MP7314, 28L 01D D000 R000)
   * LED grid display(default round LEDs, and rectangular shape ones), 1-bit sound
 
   This is an electronic handheld reflex gaming device, it's straightforward
@@ -10551,7 +10552,7 @@ ROM_END
 
   Tandy 3 in 1 Sports Arena (model 60-2178)
   * PCB label: HP-804
-  * TMS1100 (just a datestamp label (8331), die label: 1100B MP1231)
+  * TMS1100 (just a datestamp label (8331), die label: 1100B, MP1231)
   * 2x2-digit 7seg LED display + 47 other LEDs, 1-bit sound
 
   For Tandy Sports Arena (model 60-2158), see cmsport, this is a different game.
@@ -13077,7 +13078,7 @@ ROM_END
 /***************************************************************************
 
   Tiger Playmaker: Hockey, Soccer, Basketball (model 7-540 or 7-540A)
-  * TMS1100 MP1215 (die label: 1100B MP1215)
+  * TMS1100 MP1215 (die label: 1100B, MP1215)
   * 2-digit 7seg LED display + 40 other LEDs, 1-bit sound
 
   The games are on playcards(Tiger calls them that), the hardware detects which
@@ -13241,7 +13242,7 @@ ROM_END
 /***************************************************************************
 
   Tiger Deluxe Football with Instant Replay (model 7-550)
-  * TMS1400NLL MP7302 (die label: TMS1400 MP7302)
+  * TMS1400NLL MP7302 (die label: TMS1400, MP7302, 28L 01D D000 R000)
   * 4-digit 7seg LED display, 80 red/green LEDs, 1-bit sound
 
   According to the manual, player 1 is green, player 2 is red. But when
@@ -13494,7 +13495,7 @@ ROM_END
 
   Tiger Electronics Copy Cat (model 7-522)
   * PCB label: WS 8107-1
-  * TMS1730 MCU, label MP3005N (die label: 1700 MP3005)
+  * TMS1730 MCU, label MP3005N (die label: 1700, MP3005)
   * 4 LEDs, 1-bit sound
 
   This is a simplified rerelease of Copy Cat, 10(!) years later. The gameplay
@@ -13585,7 +13586,7 @@ ROM_END
 /***************************************************************************
 
   Tiger Ditto (model 7-530)
-  * TMS1700 MCU, label MP1801-N2LL (die label: 1700 MP1801)
+  * TMS1700 MCU, label MP1801-N2LL (die label: 1700, MP1801)
   * 4 LEDs, 1-bit sound
 
   known releases:
@@ -13672,7 +13673,7 @@ ROM_END
 /***************************************************************************
 
   Tiger 7 in 1 Sports Stadium (model 7-555)
-  * TMS1400 MP7304 (die label: TMS1400 MP7304A)
+  * TMS1400 MP7304 (die label: TMS1400, MP7304A, 28L 01D D000 R300)
   * 2x2-digit 7seg LED display + 39 other LEDs, 1-bit sound
 
   This handheld includes 7 games: 1: Basketball, 2: Hockey, 3: Soccer,
@@ -14128,6 +14129,128 @@ ROM_START( phpball )
 	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_phpball_output.pla", 0, 365, CRC(87e67aaf) SHA1(ebc7bae1352f39173f1bf0dc10cdc6f635dedab4) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Tsukuda The Dracula
+  * PCB label: TOFL-001A / B
+  * TMS1475 MP6354 (die label: TMS1175 /TMS1475, MP6354, 40H-PASS-0900-R300-0)
+    note: no TMS1xxx label on MCU, PCB says "TMS1375L" but that can't be right
+  * cyan/red/green VFD display NEC FIP11AM32T no. 2-8, 1-bit sound
+
+  known releases:
+  - Japan: The Dracula, published by Tsukuda
+  - France: Dracula/The Dracula, published by Euro Toy
+
+***************************************************************************/
+
+class tdracula_state : public hh_tms1k_state
+{
+public:
+	tdracula_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void tdracula(machine_config &config);
+
+private:
+	void update_display();
+	void write_r(u32 data);
+	void write_o(u16 data);
+	u8 read_k();
+};
+
+// handlers
+
+void tdracula_state::update_display()
+{
+	m_display->matrix(m_grid, m_plate);
+}
+
+void tdracula_state::write_r(u32 data)
+{
+	// R15: speaker out
+	m_speaker->level_w(BIT(data, 15));
+
+	// R20,R21: input mux
+	m_inp_mux = data >> 20 & 3;
+
+	// R0-R10: VFD grid
+	// R11-R14, R16-R20: VFD plate
+	m_grid = data & 0x7ff;
+	m_plate = (m_plate & 0xff) | (data >> 3 & 0xf00) | (data >> 4 & 0x1f000);
+	update_display();
+}
+
+void tdracula_state::write_o(u16 data)
+{
+	// O0-O7: VFD plate
+	m_plate = (m_plate & ~0xff) | bitswap<8>(data,0,1,2,3,4,5,6,7);
+	update_display();
+}
+
+u8 tdracula_state::read_k()
+{
+	// K: multiplexed inputs
+	return read_inputs(2);
+}
+
+// config
+
+static INPUT_PORTS_START( tdracula )
+	PORT_START("IN.0") // R20
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START )
+	PORT_CONFNAME( 0x02, 0x00, "Factory Test" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x08, 0x00, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x08, "2" )
+
+	PORT_START("IN.1") // R21
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+INPUT_PORTS_END
+
+void tdracula_state::tdracula(machine_config &config)
+{
+	// basic machine hardware
+	TMS1475(config, m_maincpu, 500000); // approximation - RC osc. R=43K, C=47pF
+	m_maincpu->k().set(FUNC(tdracula_state::read_k));
+	m_maincpu->r().set(FUNC(tdracula_state::write_r));
+	m_maincpu->o().set(FUNC(tdracula_state::write_o));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(11, 17);
+	config.set_default_layout(layout_hh_tms1k_test);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( tdracula )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mp6354", 0x0000, 0x1000, CRC(e69299e0) SHA1(e73e674a5e659b4c3df390d271847761fffb5874) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 557, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1400_tdracula_output.pla", 0, 557, CRC(52e2258e) SHA1(3dcbef72d2309aeb2375041522acd1a879b9e881) )
+
+	ROM_REGION( 100000, "screen", 0)
+	ROM_LOAD( "tdracula.svg", 0, 100000, NO_DUMP )
 ROM_END
 
 
@@ -14596,6 +14719,8 @@ CONS( 1982, t7in1ss,    0,         0, t7in1ss,   t7in1ss,   t7in1ss_state,   emp
 
 CONS( 1979, tbreakup,   0,         0, tbreakup,  tbreakup,  tbreakup_state,  empty_init, "Tomy", "Break Up (Tomy)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, phpball,    0,         0, phpball,   phpball,   phpball_state,   empty_init, "Tomy", "Power House Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+
+CONS( 1982, tdracula,   0,         0, tdracula,  tdracula,  tdracula_state,  empty_init, "Tsukuda", "The Dracula (Tsukuda)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 CONS( 1980, ssports4,   0,         0, ssports4,  ssports4,  ssports4_state,  empty_init, "U.S. Games", "Super Sports-4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 

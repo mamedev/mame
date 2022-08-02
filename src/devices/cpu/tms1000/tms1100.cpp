@@ -78,14 +78,17 @@ void tms1100_cpu_device::device_reset()
 // opcode deviations
 void tms1100_cpu_device::op_setr()
 {
-	// SETR: supports 5-bit index with X register MSB
-	m_r = m_r | (1 << (BIT(m_x, m_x_bits - 1) << 4 | m_y));
+	// SETR: supports 5-bit index with X MSB (used when it has more than 16 R pins)
+	// TMS1100 manual simply says that X must be less than 4
+	u8 index = BIT(m_x, m_x_bits - 1) << 4 | m_y;
+	m_r = m_r | (1 << index);
 	m_write_r(m_r & m_r_mask);
 }
 
 void tms1100_cpu_device::op_rstr()
 {
-	// RSTR: supports 5-bit index with X register MSB
-	m_r = m_r & ~(1 << (BIT(m_x, m_x_bits - 1) << 4 | m_y));
+	// RSTR: see SETR
+	u8 index = BIT(m_x, m_x_bits - 1) << 4 | m_y;
+	m_r = m_r & ~(1 << index);
 	m_write_r(m_r & m_r_mask);
 }
