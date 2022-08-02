@@ -210,6 +210,25 @@ void am9516_device::device_start()
 		ch.flyby_byte_w.resolve_safe();
 		ch.flyby_word_r.resolve_safe(0);
 		ch.flyby_word_w.resolve_safe();
+
+		ch.cabl = 0;
+		ch.babl = 0;
+		ch.caal = 0;
+		ch.baal = 0;
+		ch.cabu = 0;
+		ch.babu = 0;
+		ch.caau = 0;
+		ch.baau = 0;
+		ch.cal = 0;
+		ch.cau = 0;
+		ch.status = 0;
+		ch.coc = 0;
+		ch.boc = 0;
+		ch.pattern = 0;
+		ch.mask = 0;
+		ch.cml = 0;
+		ch.cmh = 0;
+		ch.iv = 0;
 	}
 
 	m_channel[0].is = 0;

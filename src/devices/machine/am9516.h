@@ -103,27 +103,27 @@ private:
 		devcb_read16 flyby_word_r;
 		devcb_write16 flyby_word_w;
 
-		emu_timer *run = nullptr;
+		emu_timer *run;
 
-		u16 cabl = 0;    // current address b lower
-		u16 babl = 0;    // base address b lower
-		u16 caal = 0;    // current address a lower
-		u16 baal = 0;    // base address a lower
-		u16 cabu = 0;    // current address b upper
-		u16 babu = 0;    // base address b upper
-		u16 caau = 0;    // current address a upper
-		u16 baau = 0;    // base address a upper
-		u16 cal = 0;     // chain address lower
-		u16 cau = 0;     // chain address upper
-		u16 is = 0;      // interrupt save
-		u16 status = 0;  // status
-		u16 coc = 0;     // current operation count
-		u16 boc = 0;     // base operation count
-		u16 pattern = 0; // pattern
-		u16 mask = 0;    // mask
-		u16 cml = 0;     // channel mode low
-		u16 cmh = 0;     // channel mode high
-		u8 iv = 0;       // interrupt vector
+		u16 cabl;    // current address b lower
+		u16 babl;    // base address b lower
+		u16 caal;    // current address a lower
+		u16 baal;    // base address a lower
+		u16 cabu;    // current address b upper
+		u16 babu;    // base address b upper
+		u16 caau;    // current address a upper
+		u16 baau;    // base address a upper
+		u16 cal;     // chain address lower
+		u16 cau;     // chain address upper
+		u16 is;      // interrupt save
+		u16 status;  // status
+		u16 coc;     // current operation count
+		u16 boc;     // base operation count
+		u16 pattern; // pattern
+		u16 mask;    // mask
+		u16 cml;     // channel mode low
+		u16 cmh;     // channel mode high
+		u8 iv;       // interrupt vector
 
 		unsigned const wait_states[4] = { 0, 1, 2, 4 };
 	}
