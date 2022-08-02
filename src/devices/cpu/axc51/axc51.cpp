@@ -62,7 +62,7 @@ void ax208_cpu_device::ax208_internal_program_mem(address_map &map)
 
 void axc51base_cpu_device::io_internal(address_map& map)
 {
-	map(0x0000, 0x03ff).ram(); // .share("scratchpad");
+	map(0x0000, 0x03ff).ram().share("scratchpad");
 //	map(0x3000, 0x3fff).ram(); // XSFRs
 	map(0x4000, 0x6fff).ram().share("mainram");
 	map(0x7000, 0x77ff).ram(); // JPEG RAM
@@ -555,7 +555,7 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 		// ADDDP0
 		// (always affects DP0, ignores DPSEL)
 		uint16_t increment = (B) | ((R8) << 8);
-		logerror("%s: ADDDP0 with increment %04x\n", machine().describe_context(), increment);
+		//logerror("%s: ADDDP0 with increment %04x\n", machine().describe_context(), increment);
 		uint16_t dptr = (DPTR)+increment;
 		SET_DPTR(dptr);
 		break;
