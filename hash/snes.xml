@@ -1701,6 +1701,36 @@ Beyond that last category are the roms waiting to be classified.
 		</part>
 	</software>
 
+	<software name="issdxp" cloneof="issdx">
+		<!-- 64history.net -->
+		<description>International Superstar Soccer Deluxe (Euro, prototype)</description>
+		<year>1995</year>
+		<publisher>Konami</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-4PV5B-01" />
+			<feature name="u1" value="U1 EPROM [D27C8001D-15]" />
+			<feature name="u2" value="U2 EPROM [D27C8001D-15]" />
+			<feature name="u3" value="U3 EPROM" /> <!-- empty socket -->
+			<feature name="u4" value="U4 EPROM" /> <!-- empty socket -->
+			<feature name="u5" value="U5 SRAM [LH5268AF-10PLL]" />
+			<feature name="u6" value="U6 PLD [EP330-15CN]" />
+			<feature name="u7" value="U7 74LS157 [SN74LS157N]" />
+			<feature name="u8" value="U8 CIC" />
+			<feature name="lockout" value="D413B 9513 B" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-UKV" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="048 1.u1" size="0x100000" crc="3e99ba90" sha1="0f25ed508720dab7246778194324defb9e6510a6" offset="0x000000" />
+				<rom name="048 2.u2" size="0x100000" crc="227750d5" sha1="b82b1f74489b6747270d191dbd9121b8540e0c49" offset="0x100000" />
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mtitlep" cloneof="mtitle">
 		<!-- snescentral.com -->
 		<!-- Notes: identical to the final release except it has full save capability -->
@@ -1803,6 +1833,85 @@ Beyond that last category are the roms waiting to be classified.
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="524288">
 				<rom name="jeff's shoot'em up.u1" size="524288" crc="1b2087e6" sha1="b4239dc2be8b2b8d82e2700e395c2c1311b5da5c" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jigsawp" cloneof="pieces">
+		<!-- 64history.net -->
+		<description>Jigsaw Party (Japan, prototype)</description>
+		<year>1994</year>
+		<publisher>Hori</publisher>
+		<info name="alt_title" value="ジグソーパ～ティ～" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2P3B-01" />
+			<feature name="u1" value="U1 EPROM(J) [TC574000AD-120]" />
+			<feature name="u2" value="U2 EPROM(J) [TC574000AD-120]" />
+			<feature name="u3" value="U3 SRAM [LH5164D-10L]" />
+			<feature name="u4" value="U4 74F139" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="lockout" value="D411 C147 06BA" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="u1" size="0x80000" crc="04a18414" sha1="66278d1e3099591057528e24d72747f948e2f421" offset="0x00000" />
+				<rom name="u2" size="0x80000" crc="85eaf1a1" sha1="caa2fe1704dd0686323be765c5bb55573f665f54" offset="0x80000" />
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="joemac2up1" cloneof="joemac3">
+		<!-- 64history.net -->
+		<description>Joe &amp; Mac 2 - Lost in the Tropics (USA, prototype, alt)</description>
+		<year>1994</year>
+		<publisher>Data East</publisher>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2P3B-01" />
+			<feature name="u1" value="U1 EPROM(J) [TC574000AD-120]" />
+			<feature name="u2" value="U2 EPROM(J) [TC574000D-120]" />
+			<feature name="u3" value="U3 SRAM" /> <!-- label: Joe Mac 2 -->
+			<feature name="u4" value="U4 74F139" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="lockout" value="D411 9222 CB" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="east.u1" size="0x80000" crc="3c9709e2" sha1="345c03ae57d12d5aa8e6904bd553b6cacfa3d8ea" offset="0x00000" />
+				<rom name="data.u2" size="0x80000" crc="eb005195" sha1="b9e2b548799b48ce7b81fb73e1c95903dc2a78ec" offset="0x80000" />
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jparkup" cloneof="jpark">
+		<!-- 64history.net -->
+		<description>Jurassic Park (USA, prototype)</description>
+		<year>1993</year>
+		<publisher>Ocean</publisher>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-4PV5B-01" />
+			<feature name="u1" value="U1 EPROM [TC574000D-120]" />
+			<feature name="u2" value="U2 EPROM [TC574000D-120]" />
+			<feature name="u3" value="U3 EPROM [TC574000D-120]" />
+			<feature name="u4" value="U4 EPROM [TC574000D-120]" />
+			<feature name="u5" value="U5 SRAM" /> <!-- empty socket -->
+			<feature name="u6" value="U6 PLD [EP330-15CN]" />
+			<feature name="u7" value="U7 74LS157 [SN74LS157N]" />
+			<feature name="u8" value="U8 CIC" />
+			<feature name="lockout" value="D411A 9229 BA" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="no shell" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="u1" size="0x80000" crc="c8e73f3c" sha1="303d0eab705fe8a038aec68c1ddfa1496e067f9e" offset="0x000000" />
+				<rom name="u2" size="0x80000" crc="acc48ef9" sha1="4709834f23762689a80344e23bc1579f3f9895a6" offset="0x080000" />
+				<rom name="u3" size="0x80000" crc="f639f1e4" sha1="8d9800936ed599820a52053f564689f2b14aa53b" offset="0x100000" />
+				<rom name="jurassic park.u4" size="0x80000" crc="e5f5f0dd" sha1="c8768f0b67fd00d95b13f9f907dfa30efcc8dffa" offset="0x180000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3841,6 +3950,36 @@ Beyond that last category are the roms waiting to be classified.
         </part>
     </software>
 -->
+
+	<software name="unirallyp" cloneof="unirally">
+		<!-- 64history.net -->
+		<description>Unirally (Euro, prototype)</description>
+		<year>1994</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-4PV5B-01" />
+			<feature name="u1" value="U1 EPROM" />
+			<feature name="u2" value="U2 EPROM" />
+			<feature name="u3" value="U3 EPROM" />
+			<feature name="u4" value="U4 EPROM" />
+			<feature name="u5" value="U5 SRAM [LH5164D-10L]" />
+			<feature name="u6" value="U6 PLD [EP330-15CN]" />
+			<feature name="u7" value="U7 74LS157 [SN74LS157N]" />
+			<feature name="u8" value="U8 CIC" />
+			<feature name="lockout" value="D413A 9227 C" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="no shell" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="pal.u1" size="0x80000" crc="c754cd37" sha1="53a2ab3e681704bbe5afcf8a9b407e827fc947f4" offset="0x000000" />
+				<rom name="unirally.u2" size="0x80000" crc="7614b74e" sha1="abbb46e4df0e64cd7f7ff65277dd01f2099d1d44" offset="0x080000" />
+				<rom name="u3" size="0x80000" crc="0f011c0d" sha1="f761d83f1dbbf46fd9988005c62921b26c6edd28" offset="0x100000" />
+				<rom name="u4" size="0x80000" crc="b218924a" sha1="d93a5bbf06688a8e4caae757c2ba74b3ee0bd146" offset="0x180000" />
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="venomup" cloneof="venom">
 		<!-- 64history.net -->
