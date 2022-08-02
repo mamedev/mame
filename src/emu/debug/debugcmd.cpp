@@ -1707,7 +1707,7 @@ void debugger_commands::execute_comment_add(const std::vector<std::string_view> 
 	}
 
 	// Now try adding the comment
-	std::string text(params[1]);
+	std::string const text(params[1]);
 	cpu->debug()->comment_add(address, text.c_str(), 0x00ff0000);
 	cpu->machine().debug_view().update_all(DVT_DISASSEMBLY);
 }
@@ -2318,7 +2318,7 @@ void debugger_commands::execute_save(int spacenum, const std::vector<std::string
 	endoffset++;
 
 	// open the file
-	std::string filename(params[0]);
+	std::string const filename(params[0]);
 	FILE *const f = fopen(filename.c_str(), "wb");
 	if (!f)
 	{
@@ -2411,7 +2411,7 @@ void debugger_commands::execute_saveregion(const std::vector<std::string_view> &
 		length = region->bytes() - offset;
 
 	/* open the file */
-	std::string filename(params[0]);
+	std::string const filename(params[0]);
 	FILE *f = fopen(filename.c_str(), "wb");
 	if (!f)
 	{
@@ -2442,8 +2442,8 @@ void debugger_commands::execute_load(int spacenum, const std::vector<std::string
 
 	// open the file
 	std::ifstream f;
-	std::string fname(params[0]);
-	f.open(fname.c_str(), std::ifstream::in | std::ifstream::binary);
+	std::string const fname(params[0]);
+	f.open(fname, std::ifstream::in | std::ifstream::binary);
 	if (f.fail())
 	{
 		m_console.printf("Error opening file '%s'\n", params[0]);
@@ -3770,8 +3770,7 @@ void debugger_commands::execute_trace(const std::vector<std::string_view> &param
 	if (params.size() > 2)
 	{
 		std::stringstream stream;
-		std::string flagparam(params[2]);
-		stream.str(flagparam);
+		stream.str(std::string(params[2]));
 
 		std::string flag;
 		while (std::getline(stream, flag, '|'))
@@ -3812,7 +3811,7 @@ void debugger_commands::execute_trace(const std::vector<std::string_view> &param
 	}
 
 	// do it
- 	cpu->debug()->trace(f, trace_over, detect_loops, logerror, action.c_str());
+	cpu->debug()->trace(f, trace_over, detect_loops, logerror, action.c_str());
 	if (f)
 		m_console.printf("Tracing CPU '%s' to file %s\n", cpu->tag(), filename);
 	else
