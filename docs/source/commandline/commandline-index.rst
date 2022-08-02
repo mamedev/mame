@@ -414,6 +414,14 @@ SDL Joystick Mapping
 
 | :ref:`sixaxis <mame-scommandline-sixaxis>`
 
+SDL Event Device Mapping
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+| :ref:`keyboard_dev <mame-scommandline-evdev>`
+| :ref:`joystick_dev <mame-scommandline-evdev>`
+| :ref:`mouse_dev <mame-scommandline-evdev>`
+| :ref:`lightgun_dev <mame-scommandline-evdev>`
+
 
 SDL Lightgun Mapping
 ~~~~~~~~~~~~~~~~~~~~
