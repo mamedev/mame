@@ -41,7 +41,7 @@ license:CC0
 		<rom name="7th Guest, The (1994)(Philips)(EU)(Disc 2 of 2)(Track 7 of 7)[!][The Music, Die Musik][CD-Audio].wav" size="43220396" crc="c1cd9d61" md5="753db136ab8921e581799ce0fc2f5ff8"/>
 		<rom name="7th Guest, The (1994)(Philips)(EU)(Disc 2 of 2)[!][The Music, Die Musik][CD-Audio].cue" size="1246" crc="255b6643" md5="b7d4c344bb67aca09f91c8d3d356578e"/>
 		-->
-		<description>The 7th Guest (Euro)[DVC][8110033V113 50404169 02]</description>
+		<description>The 7th Guest (Euro)[8110033V113 50404169 02]</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -73,7 +73,7 @@ license:CC0
 		<rom name="7th Guest, The (1994)(Philips)(EU)(Disc 2 of 2)(Track 7 of 7)[!][The Music, Die Musik][CD-Audio].wav" size="43220396" crc="c1cd9d61" md5="753db136ab8921e581799ce0fc2f5ff8"/>
 		<rom name="7th Guest, The (1994)(Philips)(EU)(Disc 2 of 2)[!][The Music, Die Musik][CD-Audio].cue" size="1246" crc="255b6643" md5="b7d4c344bb67aca09f91c8d3d356578e"/>
 		-->
-		<description>The 7th Guest (Euro)[DVC][8111033V113 50404169 01]</description>
+		<description>The 7th Guest (Euro)[8111033V113 50404169 01]</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -105,7 +105,7 @@ license:CC0
 		<rom name="7th Guest, The (1994)(Philips)(EU)(Disc 2 of 2)(Track 7 of 7)[!][The Music, Die Musik][CD-Audio].wav" size="43220396" crc="c1cd9d61" md5="753db136ab8921e581799ce0fc2f5ff8"/>
 		<rom name="7th Guest, The (1994)(Philips)(EU)(Disc 2 of 2)[!][The Music, Die Musik][CD-Audio].cue" size="1246" crc="255b6643" md5="b7d4c344bb67aca09f91c8d3d356578e"/>
 		-->
-		<description>The 7th Guest (Germany)[DVC]</description>
+		<description>The 7th Guest (Germany)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -137,7 +137,7 @@ license:CC0
 		<rom name="7th Guest, The (1994)(Philips)(FR)(Disc 1 of 2)[Le Jeu][DVC].iso" size="725182752" crc="b986898d" md5="aaacf2d3121fefbef2dbe160b91503f6"/>
 		<rom name="7th Guest, The (1994)(Philips)(FR)(Disc 1 of 2)[Le Jeu][DVC].cue" size="149" crc="c6824247" md5="0b4be404b30b97ad3ae0517bfb0411bd"/>
 		-->
-		<description>The 7th Guest (France)[DVC]</description>
+		<description>The 7th Guest (France)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -386,7 +386,7 @@ license:CC0
 		<rom name="Atlantis - The Last Resort v1.11 (1996)(Philips)(EU)[DVC].iso" size="598172400" crc="afa266cc" md5="b54e17fa8d07ada25ba9dd0c9216113f"/>
 		<rom name="Atlantis - The Last Resort v1.11 (1996)(Philips)(EU)[DVC].cue" size="146" crc="8706a12a" md5="569b273e9bf98bbd6835801970a3a9d3"/>
 		-->
-		<description>Atlantis - The Last Resort v1.11 (Euro)[DVC]</description>
+		<description>Atlantis - The Last Resort v1.11 (Euro)</description>
 		<year>1996</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -451,7 +451,7 @@ license:CC0
 		<rom name="Brain Dead 13 v1.07 (1997)(Philips)(EU)[DVC].iso" size="728964768" crc="32748463" md5="b82bd1a979e2709a5d189ae5bfa204bb"/>
 		<rom name="Brain Dead 13 v1.07 (1997)(Philips)(EU)[DVC].cue" size="133" crc="e2f6fe96" md5="fa7e8e2609f3a93c4db3889cdbc9fb9a"/>
 		-->
-		<description>Brain Dead 13 v1.07 (Euro)[DVC]</description>
+		<description>Brain Dead 13 v1.07 (Euro)</description>
 		<year>1997</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -548,7 +548,7 @@ license:CC0
 		<rom name="Caesars World of Boxing (1993)(Philips)(EU)[!][DVC].iso" size="592701648" crc="25334277" md5="5d649bdebfe61c76a577fd4c513f7caf"/>
 		<rom name="Caesars World of Boxing (1993)(Philips)(EU)[!][DVC].cue" size="140" crc="46308319" md5="3a031fb92e58c28eb33fcc921c510a93"/>
 		-->
-		<description>Caesars World of Boxing (Euro)[DVC]</description>
+		<description>Caesars World of Boxing (Euro)</description>
 		<year>1993</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -645,7 +645,7 @@ license:CC0
 		<rom name="Centurion (1995)(Philips)(NL)[DVC].iso" size="652680000" crc="77bbbf79" md5="5cfbcd608410598c513657d7495654c3"/>
 		<rom name="Centurion (1995)(Philips)(NL)[DVC].cue" size="123" crc="6f3087b8" md5="327dbe010737f6e50c78799ea5c226a2"/>
 		-->
-		<description>Centurion (Netherlands)[DVC]</description>
+		<description>Centurion (Netherlands)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -662,7 +662,7 @@ license:CC0
 		<rom name="Chaos Control v1.15 (1995)(Philips)(EU)[!][DVC].iso" size="487040400" crc="e1b0c5c0" md5="ff6996caf6f7c93f6fad489f5abca411"/>
 		<rom name="Chaos Control v1.15 (1995)(Philips)(EU)[!][DVC].cue" size="136" crc="e51449a5" md5="d469d1292e434615a3d1905338007d1b"/>
 		-->
-		<description>Chaos Control v1.15 (Euro)[DVC]</description>
+		<description>Chaos Control v1.15 (Euro)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -679,7 +679,7 @@ license:CC0
 		<rom name="Chaos Control v1.15 (1995)(Philips)(FR)[DVC].iso" size="487395552" crc="a2741721" md5="b4fe9c8fa914e9ad614ec63af96356d3"/>
 		<rom name="Chaos Control v1.15 (1995)(Philips)(FR)[DVC].cue" size="133" crc="abfeb0f0" md5="13928d8b61ff8ae758f32d925e4db0a2"/>
 		-->
-		<description>Chaos Control v1.15 (France)[DVC]</description>
+		<description>Chaos Control v1.15 (France)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -696,7 +696,7 @@ license:CC0
 		<rom name="Chaos Control v1.15 (1995)(Philips)(DE)[!][DVC].iso" size="487393200" crc="98e92db4" md5="781ac8d6b9e3615aef9cef6bca6bda5b"/>
 		<rom name="Chaos Control v1.15 (1995)(Philips)(DE)[!][DVC].cue" size="136" crc="767c0ba6" md5="8f48330dac70ff350654220e0121dcf2"/>
 		-->
-		<description>Chaos Control v1.15 (Germany)[DVC]</description>
+		<description>Chaos Control v1.15 (Germany)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -713,7 +713,7 @@ license:CC0
 		<rom name="Chaos Control v1.15 (1995)(Philips)(US)[DVC].iso" size="487393200" crc="a0595d1c" md5="5996ddf519de7c5d4d9b0bf06ab70d5e"/>
 		<rom name="Chaos Control v1.15 (1995)(Philips)(US)[DVC].cue" size="133" crc="6c9561ab" md5="32c1cb1f1b00c9ac7de26cc65061b58b"/>
 		-->
-		<description>Chaos Control v1.15 (USA)[DVC]</description>
+		<description>Chaos Control v1.15 (USA)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -730,7 +730,7 @@ license:CC0
 		<rom name="Christmas Country (1996)(Creative Media)(EU)[DVC].iso" size="81325104" crc="f485d11c" md5="9927cfdf6ee2678a59f25981bd29cd70"/>
 		<rom name="Christmas Country (1996)(Creative Media)(EU)[DVC].cue" size="138" crc="d1ddd55f" md5="db39a4d704a5e715aca1a68548ea7c0c"/>
 		-->
-		<description>Christmas Country (Euro)[DVC]</description>
+		<description>Christmas Country (Euro)</description>
 		<year>1996</year>
 		<publisher>Creative Media</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -747,7 +747,7 @@ license:CC0
 		<rom name="Christmas Crisis (1995)(DIMA - Philips)(EU)[!][DVC].iso" size="301114800" crc="b97c8fb9" md5="674ba5195273ce53fee9064ae0871f35"/>
 		<rom name="Christmas Crisis (1995)(DIMA - Philips)(EU)[!][DVC].cue" size="140" crc="eb0a6fd0" md5="17e4b818d09af8dac37672f0afab6eaf"/>
 		-->
-		<description>Christmas Crisis (Euro)[DVC]</description>
+		<description>Christmas Crisis (Euro)</description>
 		<year>1995</year>
 		<publisher>DIMA ~ Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -764,7 +764,7 @@ license:CC0
 		<rom name="Cluedo (1994)(Philips)(EU)[DVC].iso" size="661147200" crc="102cab6d" md5="7ce520717147b5cbe36195d39dd26f6c"/>
 		<rom name="Cluedo (1994)(Philips)(EU)[DVC].cue" size="120" crc="6c6c489c" md5="4946a2d62f350e27cc52eac34d473e50"/>
 		-->
-		<description>Cluedo (Euro)[DVC]</description>
+		<description>Cluedo (Euro)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -781,7 +781,7 @@ license:CC0
 		<rom name="Clue (1994)(Philips)(US)[DVC].iso" size="661500000" crc="1b980d24" md5="330221597b61181b2668890d33d66852"/>
 		<rom name="Clue (1994)(Philips)(US)[DVC].cue" size="118" crc="089bdaba" md5="226c48e9c063e1a479a5250228c48603"/>
 		-->
-		<description>Clue (USA)[DVC]</description>
+		<description>Clue (USA)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -798,7 +798,7 @@ license:CC0
 		<rom name="Cluedo - The Mysteries Continue (1995)(Philips)(EU)[DVC].iso" size="653914800" crc="961f45aa" md5="20ec20dc5cbf2091ba10f73e575e28a3"/>
 		<rom name="Cluedo - The Mysteries Continue (1995)(Philips)(EU)[DVC].cue" size="145" crc="3bc990c5" md5="b0da4499d6e542c290ba910f3b123cf6"/>
 		-->
-		<description>Cluedo - The Mysteries Continue (Euro)[DVC]</description>
+		<description>Cluedo - The Mysteries Continue (Euro)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -833,7 +833,7 @@ license:CC0
 		<rom name="Creature Shock (1996)(Philips - Virgin)(EU)(Disc 2 of 2)[DVC].iso" size="717418800" crc="b961f290" md5="6a2623a321d508393af170dc0e699054"/>
 		<rom name="Creature Shock (1996)(Philips - Virgin)(EU)(Disc 2 of 2)[DVC].cue" size="150" crc="6c4a55a6" md5="4ffad371663999cda9a4d61c8fb69a16"/>
 		-->
-		<description>Creature Shock (Euro)[DVC]</description>
+		<description>Creature Shock (Euro)</description>
 		<year>1996</year>
 		<publisher>Philips ~ Virgin</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -919,7 +919,7 @@ license:CC0
 		<rom name="Dragon's Lair (1994)(Philips)(EU)[!][DVC].iso" size="343098000" crc="1d095d3c" md5="9b37b7d8fbc7cb4b7b5cf6979a3db4e0"/>
 		<rom name="Dragon's Lair (1994)(Philips)(EU)[!][DVC].cue" size="130" crc="ab5e4418" md5="a0826523caa61ece818d05fca4568852"/>
 		-->
-		<description>Dragon's Lair (Euro)[DVC]</description>
+		<description>Dragon's Lair (Euro)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -936,7 +936,7 @@ license:CC0
 		<rom name="Dragon's Lair (1994)(Philips)(US)[!][DVC].iso" size="343450800" crc="2476d338" md5="9a827ee811e508d217122daa19813fdd"/>
 		<rom name="Dragon's Lair (1994)(Philips)(US)[!][DVC].cue" size="130" crc="4fcf41b9" md5="b58e837a8a834492534e861e5d872e23"/>
 		-->
-		<description>Dragon's Lair (USA)[DVC]</description>
+		<description>Dragon's Lair (USA)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -969,7 +969,7 @@ license:CC0
 		<rom name="Dragon's Lair II - Time Warp (1994)(Philips)(US)[!][DVC][13920805 02].iso" size="541724400" crc="ef3f1bae" md5="9e92307552829ccd78c024cf1321f342"/>
 		<rom name="Dragon's Lair II - Time Warp (1994)(Philips)(US)[!][DVC][13920805 02].cue" size="158" crc="0360e28f" md5="7ee708c3c70f3cf90ad3ef97aa7dca69"/>
 		-->
-		<description>Dragon's Lair II - Time Warp (USA)[DVC][13920805 02]</description>
+		<description>Dragon's Lair II - Time Warp (USA)[13920805 02]</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -986,7 +986,7 @@ license:CC0
 		<rom name="Dragon's Lair II - Time Warp (1994)(Philips)(US)[DVC][13920805 01].iso" size="541724400" crc="3de1ea0a" md5="1d1a0b55d2dabc8ade73f3d60178422e"/>
 		<rom name="Dragon's Lair II - Time Warp (1994)(Philips)(US)[DVC][13920805 01].cue" size="155" crc="a5fb684e" md5="2ef9707eb8dcbfda1b7b6ea2d65d527f"/>
 		-->
-		<description>Dragon's Lair II - Time Warp (USA)[DVC][13920805 01]</description>
+		<description>Dragon's Lair II - Time Warp (USA)[13920805 01]</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -1003,7 +1003,7 @@ license:CC0
 		<rom name="Drug Wars (1996)(Philips)(EU)[DVC].iso" size="355269600" crc="7fe17c09" md5="081a5aedc0a20e48d344393342f239aa"/>
 		<rom name="Drug Wars (1996)(Philips)(EU)[DVC].cue" size="123" crc="abfe7f57" md5="79b02860fdf5965c8fda74268afc5d47"/>
 		-->
-		<description>Drug Wars (Euro)[DVC]</description>
+		<description>Drug Wars (Euro)</description>
 		<year>1996</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -1228,7 +1228,7 @@ license:CC0
 		<rom name="Guignols de l'Info, Les - Le jeu! (1996)(CANAL+ - Philips)(FR)[DVC].iso" size="711955104" crc="2e51ccbb" md5="dcc83715a12081b3aa6aacb447ab3314"/>
 		<rom name="Guignols de l'Info, Les - Le jeu! (1996)(CANAL+ - Philips)(FR)[DVC].cue" size="156" crc="9259a34c" md5="db71924c1146437f8b572e20c8bf5cdc"/>
 		-->
-		<description>Les Guignols de l'Info - Le Jeu! (France)[DVC]</description>
+		<description>Les Guignols de l'Info - Le Jeu! (France)</description>
 		<year>1996</year>
 		<publisher>CANAL+ ~ Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -1645,7 +1645,7 @@ license:CC0
 		<rom name="Kingdom - Shadoan (1996)(Philips)(EU)[!][DVC].iso" size="764141280" crc="04c59103" md5="a75ce8cf25ced8dc3fdcfee91867362c"/>
 		<rom name="Kingdom - Shadoan (1996)(Philips)(EU)[!][DVC].cue" size="134" crc="5e24f8f3" md5="0431327c49427a1ec7dde1ceecdd9e4d"/>
 		-->
-		<description>Kingdom - Shadoan (Euro)[DVC]</description>
+		<description>Kingdom - Shadoan (Euro)</description>
 		<year>1996</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -1662,7 +1662,7 @@ license:CC0
 		<rom name="Kingdom - The Far Reaches (1995)(Philips)(US)[!][DVC].iso" size="675870720" crc="7da8143b" md5="0e8f27625642137ca97fbbb9ab3fab89"/>
 		<rom name="Kingdom - The Far Reaches (1995)(Philips)(US)[!][DVC].cue" size="142" crc="e250bc59" md5="6f8469681107a2ce459eca3caece3f8b"/>
 		-->
-		<description>Kingdom - The Far Reaches (USA)[DVC]</description>
+		<description>Kingdom - The Far Reaches (USA)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -1695,7 +1695,7 @@ license:CC0
 		<rom name="Labyrinth of Crete (1995)(Philips)(EU)[DVC].iso" size="507331104" crc="f1a9bbce" md5="a8077543759dc2c9e9043ac0f6846a4a"/>
 		<rom name="Labyrinth of Crete (1995)(Philips)(EU)[DVC].cue" size="132" crc="b02dc638" md5="390788263a53c94b83fa814b47013f27"/>
 		-->
-		<description>Labyrinth of Crete (Euro)[DVC]</description>
+		<description>Labyrinth of Crete (Euro)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -1873,7 +1873,7 @@ license:CC0
 		<rom name="Litil Divil (1994)(Philips)(EU)[!][DVC].iso" size="578944800" crc="4250912d" md5="e1a87a3d9ff9b11a0845be1777a32c24"/>
 		<rom name="Litil Divil (1994)(Philips)(EU)[!][DVC].cue" size="128" crc="6933897d" md5="6211059288ff0bd73e0a5b2ee4d4e119"/>
 		-->
-		<description>Litil Divil (Euro)[DVC]</description>
+		<description>Litil Divil (Euro)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -1890,7 +1890,7 @@ license:CC0
 		<rom name="Litil Divil (1994)(Philips)(US)[!][DVC].iso" size="579297600" crc="17055940" md5="6d3e3b9921793d82e6dca15c939a66c7"/>
 		<rom name="Litil Divil (1994)(Philips)(US)[!][DVC].cue" size="128" crc="c1bf1a54" md5="8190ea9ddc4a07880c9c372613f49dfd"/>
 		-->
-		<description>Litil Divil (USA)[DVC]</description>
+		<description>Litil Divil (USA)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -1923,7 +1923,7 @@ license:CC0
 		<rom name="Lost Eden (1995)(Philips)(EU)[!][DVC].iso" size="760813200" crc="c5d53d49" md5="5d1f8602f0db52d3c39f3bcfe689ac56"/>
 		<rom name="Lost Eden (1995)(Philips)(EU)[!][DVC].cue" size="126" crc="0c41540f" md5="224892cca685786ddb33006452fcdea2"/>
 		-->
-		<description>Lost Eden (Euro)[DVC]</description>
+		<description>Lost Eden (Euro)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -1940,7 +1940,7 @@ license:CC0
 		<rom name="Lost Eden (1995)(Philips)(DE)[!][DVC].iso" size="768222000" crc="728c4c48" md5="134c324e4e288c30d65930e08937f2cc"/>
 		<rom name="Lost Eden (1995)(Philips)(DE)[!][DVC].cue" size="126" crc="8e1c510a" md5="0fdfbd52a1522fa2af7f90d7787b0771"/>
 		-->
-		<description>Lost Eden (Germany)[DVC]</description>
+		<description>Lost Eden (Germany)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -1957,7 +1957,7 @@ license:CC0
 		<rom name="Lost Eden (1995)(Philips)(NL)(M4)[!][DVC].iso" size="760636800" crc="ac80c308" md5="06f340e6a34a751822839e27538c0249"/>
 		<rom name="Lost Eden (1995)(Philips)(NL)(M4)[!][DVC].cue" size="130" crc="0d5bdc07" md5="cf4713b425456f2df002c1727fc17b02"/>
 		-->
-		<description>Lost Eden (Netherlands)[DVC]</description>
+		<description>Lost Eden (Netherlands)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -1974,7 +1974,7 @@ license:CC0
 		<rom name="Lost Ride, The (1998)(Philips)(EU)[DVC].iso" size="299355504" crc="9fb543ed" md5="c35db1ef0919fa20406220e12ee48e0e"/>
 		<rom name="Lost Ride, The (1998)(Philips)(EU)[DVC].cue" size="128" crc="212c79c1" md5="0660faee78a7b901d78cff3a17fd2219"/>
 		-->
-		<description>The Lost Ride (Euro)[DVC]</description>
+		<description>The Lost Ride (Euro)</description>
 		<year>1998</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -1991,7 +1991,7 @@ license:CC0
 		<rom name="Mad Dog II - the Lost Gold (1995)(Philips)(EU)[DVC].iso" size="345344160" crc="0654dab0" md5="6ccbcb8222893e21319b9707922a2de6"/>
 		<rom name="Mad Dog II - the Lost Gold (1995)(Philips)(EU)[DVC].cue" size="140" crc="63321173" md5="10fb64470e93dd665d5e242cb07f04d8"/>
 		-->
-		<description>Mad Dog II - The Lost Gold (Euro)[DVC]</description>
+		<description>Mad Dog II - The Lost Gold (Euro)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -2008,7 +2008,7 @@ license:CC0
 		<rom name="Mad Dog 2 - le Tresor Perdu (1996)(Philips)(FR)[DVC].iso" size="351036000" crc="e739c62a" md5="3b22a3992b7e59635d4d7d0637a5a150"/>
 		<rom name="Mad Dog 2 - le Tresor Perdu (1996)(Philips)(FR)[DVC].cue" size="141" crc="13a2a411" md5="5197f303dac362a80b14785d77e2efc7"/>
 		-->
-		<description>Mad Dog 2 - Le Tresor Perdu (France)[DVC]</description>
+		<description>Mad Dog 2 - Le Tresor Perdu (France)</description>
 		<year>1996</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -2025,7 +2025,7 @@ license:CC0
 		<rom name="Mad Dog McCree (1994)(Philips)(EU)[!][DVC].iso" size="459797184" crc="8718894d" md5="22398305e2a1da0719431e561746f881"/>
 		<rom name="Mad Dog McCree (1994)(Philips)(EU)[!][DVC].cue" size="131" crc="86cecc68" md5="6dfc53147c3c20954a51132112bdbb96"/>
 		-->
-		<description>Mad Dog McCree (Euro)[DVC]</description>
+		<description>Mad Dog McCree (Euro)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -2042,7 +2042,7 @@ license:CC0
 		<rom name="Mad Dog McCree (1994)(Philips)(US)[DVC][05820818 N01].iso" size="460145280" crc="3a6f046f" md5="d1d634a1334fdb0f06be34af87a68702"/>
 		<rom name="Mad Dog McCree (1994)(Philips)(US)[DVC][05820818 N01].cue" size="142" crc="eb9e8ab0" md5="c195ee2c1d1c45a11e9864c6ee3646de"/>
 		-->
-		<description>Mad Dog McCree (USA)[DVC][05820818 N01]</description>
+		<description>Mad Dog McCree (USA)[05820818 N01]</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -2059,7 +2059,7 @@ license:CC0
 		<rom name="Mad Dog McCree (1994)(Philips)(US)[DVC][05820826 01].iso" size="460145280" crc="2d69679c" md5="d4f14f6d2d7122fbf7a2302d23961d42"/>
 		<rom name="Mad Dog McCree (1994)(Philips)(US)[DVC][05820826 01].cue" size="141" crc="17b0ab15" md5="f5aa70bd1f0dd37edef15712d65febf7"/>
 		-->
-		<description>Mad Dog McCree (USA)[DVC][05820826 01]</description>
+		<description>Mad Dog McCree (USA)[05820826 01]</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -2092,7 +2092,7 @@ license:CC0
 		<rom name="Making the Grade v0.90 (1994)(Philips)(EU)[pre-release][DVC].iso" size="746701200" crc="9e05bb27" md5="f9fd6acc2dbf2cfbf1d7c39660a855f7"/>
 		<rom name="Making the Grade v0.90 (1994)(Philips)(EU)[pre-release][DVC].cue" size="149" crc="3854464d" md5="4593a9ebf00835c59c4b71b464c06aa0"/>
 		-->
-		<description>Making the Grade v0.90 (Euro, pre-release)[DVC]</description>
+		<description>Making the Grade v0.90 (Euro, pre-release)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -2159,7 +2159,7 @@ license:CC0
 		<rom name="Master Labyrinth v1.06 (1995)(Pack-In-Video)(EU)[DVC].iso" size="686019600" crc="ac7a7b27" md5="7d331f64c9c0dfa70c1b32e0a24d4c8e"/>
 		<rom name="Master Labyrinth v1.06 (1995)(Pack-In-Video)(EU)[DVC].cue" size="142" crc="74737f6f" md5="8a89de65ceebe5fb12286c46ff138df0"/>
 		-->
-		<description>Master Labyrinth v1.06 (Euro)[DVC]</description>
+		<description>Master Labyrinth v1.06 (Euro)</description>
 		<year>1995</year>
 		<publisher>Pack-In Video</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -2272,7 +2272,7 @@ license:CC0
 		<rom name="Mutant Rampage - Bodyslam (1994)(Philips)(EU)[!][DVC].iso" size="660888480" crc="294e1d5e" md5="d97d9b4a672708cf9a6e18be7f1e3349"/>
 		<rom name="Mutant Rampage - Bodyslam (1994)(Philips)(EU)[!][DVC].cue" size="142" crc="8d7e02ea" md5="282250ca5b4a35854c408a02742fba61"/>
 		-->
-		<description>Mutant Rampage - Bodyslam (Euro)[DVC]</description>
+		<description>Mutant Rampage - Bodyslam (Euro)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -2289,7 +2289,7 @@ license:CC0
 		<rom name="Mutant Rampage - Bodyslam (1994)(Philips)(US)[DVC].iso" size="661241280" crc="408f4330" md5="9b7caf8d43937d1c4ab89a13591b14fa"/>
 		<rom name="Mutant Rampage - Bodyslam (1994)(Philips)(US)[DVC].cue" size="139" crc="33c3acc9" md5="a7ad44260e841878b9735e82abfd0b0e"/>
 		-->
-		<description>Mutant Rampage - Bodyslam (USA)[DVC]</description>
+		<description>Mutant Rampage - Bodyslam (USA)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -2402,7 +2402,7 @@ license:CC0
 		<rom name="NFL Hall of Fame Football (1994)(Philips)(EU)[!][DVC].iso" size="770515200" crc="866f0304" md5="0985e6f3addefdfd9dfeaae68a13f211"/>
 		<rom name="NFL Hall of Fame Football (1994)(Philips)(EU)[!][DVC].cue" size="142" crc="03691268" md5="9f5ffa8dff4aaea2128a20ddda1235df"/>
 		-->
-		<description>NFL Hall of Fame Football (Euro)[DVC]</description>
+		<description>NFL Hall of Fame Football (Euro)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -2611,7 +2611,7 @@ license:CC0
 		<rom name="Rise of the Robots (1995)(Philips)(EU)[!][DVC].iso" size="305877600" crc="ae6a3fe4" md5="3c18191ff226d4cb7d281b5505b01762"/>
 		<rom name="Rise of the Robots (1995)(Philips)(EU)[!][DVC].cue" size="135" crc="fd521d09" md5="8433fa9da591c2a109d7d9ee3b5dce01"/>
 		-->
-		<description>Rise of the Robots (Euro)[DVC]</description>
+		<description>Rise of the Robots (Euro)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -2772,7 +2772,7 @@ license:CC0
 		<rom name="Space Ace (1994)(Philips)(EU)[!][DVC].iso" size="455112000" crc="50eae148" md5="3e94ed78689a7894b78dc7a9f280d8cc"/>
 		<rom name="Space Ace (1994)(Philips)(EU)[!][DVC].cue" size="126" crc="5be74642" md5="b1dfcc5b3536123de55df9aac4186cc0"/>
 		-->
-		<description>Space Ace (Euro)[DVC]</description>
+		<description>Space Ace (Euro)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -2789,7 +2789,7 @@ license:CC0
 		<rom name="Space Ace (1994)(Philips)(US)[!][DVC].iso" size="455464800" crc="ac8515f2" md5="50bc0d56c61386ac26835ddce1cf5b96"/>
 		<rom name="Space Ace (1994)(Philips)(US)[!][DVC].cue" size="126" crc="b1e1c2d0" md5="ae2721e534ac5ee3524b2a60219e5ccf"/>
 		-->
-		<description>Space Ace (USA)[DVC]</description>
+		<description>Space Ace (USA)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -2918,7 +2918,7 @@ license:CC0
 		<rom name="Tetsuo Gaiden (1997)(New Frontier)(EU)[DVC].iso" size="179227104" crc="88918656" md5="bccbe53d222e3c3ba8bfbc3ca0791bb4"/>
 		<rom name="Tetsuo Gaiden (1997)(New Frontier)(EU)[DVC].cue" size="132" crc="c20cebfa" md5="0317960e2d54881a67f8cf68a02ca11c"/>
 		-->
-		<description>Tetsuo Gaiden (Euro)[DVC]</description>
+		<description>Tetsuo Gaiden (Euro)</description>
 		<year>1997</year>
 		<publisher>New Frontier</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -2956,7 +2956,7 @@ license:CC0
 		<rom name="Thunder in Paradise (1995)(Philips)(EU)(Disc 2 of 2)(Track 4 of 4)[!][The Episode][DVC].iso" size="705282480" crc="1783c937" md5="13e4ddceb72920dfdf48f12be9056bbe"/>
 		<rom name="Thunder in Paradise (1995)(Philips)(EU)(Disc 2 of 2)[!][The Episode][DVC].cue" size="698" crc="225a39e2" md5="abdc4a2bbff5b70609891725081456d7"/>
 		-->
-		<description>Thunder in Paradise (Euro)[DVC]</description>
+		<description>Thunder in Paradise (Euro)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -2985,7 +2985,7 @@ license:CC0
 		<rom name="Thunder in Paradise (1995)(Philips)(US)(Disc 2 of 2)(Track 4 of 4)[!][The Episode][DVC].iso" size="709857120" crc="a448c8ba" md5="6387a95a6b0cb3e82b5838b20d1e585f"/>
 		<rom name="Thunder in Paradise (1995)(Philips)(US)(Disc 2 of 2)[!][The Episode][DVC].cue" size="698" crc="816a1a0c" md5="a1935ebbd3eb453e2a129d88c289c59d"/>
 		-->
-		<description>Thunder in Paradise (USA)[DVC]</description>
+		<description>Thunder in Paradise (USA)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -3014,7 +3014,7 @@ license:CC0
 		<rom name="Thunder in Paradise (1996)(Philips)(DE)(Disc 1 of 2)[Das Spiel][DVC].iso" size="764870400" crc="0c860e3c" md5="9bfdbbad2631d1a58a82aedabea347b5"/>
 		<rom name="Thunder in Paradise (1996)(Philips)(DE)(Disc 1 of 2)[Das Spiel][DVC].cue" size="157" crc="65cc06ad" md5="a757f65607fb21bce4cac95c62d6986e"/>
 		-->
-		<description>Thunder in Paradise (Germany)[DVC]</description>
+		<description>Thunder in Paradise (Germany)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -3071,7 +3071,7 @@ license:CC0
 		<rom name="Ultra CD-i Soccer (1997)(Philips)(EU)[DVC].iso" size="18522000" crc="cd1bf857" md5="f78e506c613d249329ff65fc9dcfd3b0"/>
 		<rom name="Ultra CD-i Soccer (1997)(Philips)(EU)[DVC].cue" size="131" crc="4deaf83e" md5="11746e2a93744feed71fd662d80e9897"/>
 		-->
-		<description>Ultra CD-i Soccer (Euro)[DVC]</description>
+		<description>Ultra CD-i Soccer (Euro)</description>
 		<year>1997</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -3153,7 +3153,7 @@ license:CC0
 		<rom name="Voetbal v1.04 (1994)(Philips)(NL)[DVC].iso" size="766458000" crc="e26ad47f" md5="f4cac8185326c248e510c3bd65496a55"/>
 		<rom name="Voetbal v1.04 (1994)(Philips)(NL)[DVC].cue" size="127" crc="65c7a8fb" md5="0efca0738e2ab63487ec23bb560701ef"/>
 		-->
-		<description>Voetbal v1.04 (Netherlands)[DVC]</description>
+		<description>Voetbal v1.04 (Netherlands)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -3303,7 +3303,7 @@ license:CC0
 		<rom name="Who Shot Johnny Rock (1995)(Philips)(EU)[DVC].iso" size="347649120" crc="15f3ed92" md5="6a4357a8dbfffd33f5f622f2e2813440"/>
 		<rom name="Who Shot Johnny Rock (1995)(Philips)(EU)[DVC].cue" size="134" crc="5fbe3c7c" md5="dcc2749ec4452768c1d0c74147653ee8"/>
 		-->
-		<description>Who Shot Johnny Rock (Euro)[DVC]</description>
+		<description>Who Shot Johnny Rock (Euro)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -3320,7 +3320,7 @@ license:CC0
 		<rom name="Who Shot Johnny Rock (1995)(Philips)(US)[DVC].iso" size="348001920" crc="dff73cff" md5="7edb61abb311bec170721fcf366191f5"/>
 		<rom name="Who Shot Johnny Rock (1995)(Philips)(US)[DVC].cue" size="134" crc="46f7fa83" md5="0d4eece1e39b3f799bd9524aa963284a"/>
 		-->
-		<description>Who Shot Johnny Rock (USA)[DVC]</description>
+		<description>Who Shot Johnny Rock (USA)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -3369,7 +3369,7 @@ license:CC0
 		<rom name="World Cup Golf (1995)(Philips)(EU)[!][DVC].iso" size="744231600" crc="1b672a8a" md5="6c1eb9cca72cd7874b8f8282340e78e5"/>
 		<rom name="World Cup Golf (1995)(Philips)(EU)[!][DVC].cue" size="131" crc="6465e717" md5="3fffb5634d0ba1013f3843ef5fc56358"/>
 		-->
-		<description>World Cup Golf (Euro)[DVC]</description>
+		<description>World Cup Golf (Euro)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -3386,7 +3386,7 @@ license:CC0
 		<rom name="Zaak van Sam, De - Interactieve Detective (1997)(NOB-Interactive)(NL)[DVC].iso" size="691843152" crc="fe875ec5" md5="93bf0e301ed6e62d73cc7d428750c515"/>
 		<rom name="Zaak van Sam, De - Interactieve Detective (1997)(NOB-Interactive)(NL)[DVC].cue" size="163" crc="ddcb3b18" md5="8bef0498047574bbf644eb32ac3dcb6e"/>
 		-->
-		<description>De Zaak van Sam - Interactieve Detective (Netherlands)[DVC]</description>
+		<description>De Zaak van Sam - Interactieve Detective (Netherlands)</description>
 		<year>1997</year>
 		<publisher>NOB-Interactive</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -3598,7 +3598,7 @@ license:CC0
 		<rom name="1995 - All the News and Views (1995)(Philips)(EU)[!][DVC].iso" size="663092304" crc="76edd8db" md5="1a4432e7acbb1a6d856bbe21a1105dc6"/>
 		<rom name="1995 - All the News and Views (1995)(Philips)(EU)[!][DVC].cue" size="146" crc="019b1a22" md5="33bb25df4dd1855723a62eb3cbbdce8d"/>
 		-->
-		<description>1995 - All the News and Views (Euro)[DVC]</description>
+		<description>1995 - All the News and Views (Euro)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -3664,7 +3664,7 @@ license:CC0
 		<rom name="A Night in Nylon City (1995)(ICDI - Sofidoc)(EU)[DVC].iso" size="594115200" crc="aff7bfad" md5="e4d0735688cde2117250bb3769028d0b"/>
 		<rom name="A Night in Nylon City (1995)(ICDI - Sofidoc)(EU)[DVC].cue" size="142" crc="c6f02fcb" md5="6d19080f00339b0d6ab0832ce0758924"/>
 		-->
-		<description>A Night in Nylon City (Euro)[DVC]</description>
+		<description>A Night in Nylon City (Euro)</description>
 		<year>1995</year>
 		<publisher>ICDI ~ Sofidoc</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -3745,7 +3745,7 @@ license:CC0
 		<rom name="Accent Health - Information for Healthy Living - January 2004 - General CDi 1-04 (2004)(CNN)(US)[DVC].iso" size="645275904" crc="33bb3215" md5="fe00a0a69b2a76272065fa71881afd25"/>
 		<rom name="Accent Health - Information for Healthy Living - January 2004 - General CDi 1-04 (2004)(CNN)(US)[DVC].cue" size="190" crc="0648f046" md5="c1cd30670de98e93ab5b0d48816f8797"/>
 		-->
-		<description>Accent Health - Information for Healthy Living - January 2004 - General CDi 1-04 (USA)[DVC]</description>
+		<description>Accent Health - Information for Healthy Living - January 2004 - General CDi 1-04 (USA)</description>
 		<year>2004</year>
 		<publisher>CNN</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -3762,7 +3762,7 @@ license:CC0
 		<rom name="Accent Health - Information for Healthy Living - November 2004 - 50 + Silver CDi 1104 (2004)(CNN)(US)[DVC].iso" size="622520304" crc="5363bc00" md5="7ed29523018a53c055c8d4baebce7ec5"/>
 		<rom name="Accent Health - Information for Healthy Living - November 2004 - 50 + Silver CDi 1104 (2004)(CNN)(US)[DVC].cue" size="195" crc="2474ed9f" md5="c13b9e73859ca4fabec8c8622875d6f8"/>
 		-->
-		<description>Accent Health - Information for Healthy Living - November 2004 - 50 + Silver CDi 1104 (USA)[DVC]</description>
+		<description>Accent Health - Information for Healthy Living - November 2004 - 50 + Silver CDi 1104 (USA)</description>
 		<year>2004</year>
 		<publisher>CNN</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -3779,7 +3779,7 @@ license:CC0
 		<rom name="Accent Health - Information for Healthy Living - November 2004 - General CDi 11-04 (2004)(CNN)(US)[DVC].iso" size="609643104" crc="4b5fd9ec" md5="ef32feccb82f7764b54701113baa42b7"/>
 		<rom name="Accent Health - Information for Healthy Living - November 2004 - General CDi 11-04 (2004)(CNN)(US)[DVC].cue" size="192" crc="c6b7b5df" md5="0803ab44b9f3d94593cd2011275bfd08"/>
 		-->
-		<description>Accent Health - Information for Healthy Living - November 2004 - General CDi 11-04 (USA)[DVC]</description>
+		<description>Accent Health - Information for Healthy Living - November 2004 - General CDi 11-04 (USA)</description>
 		<year>2004</year>
 		<publisher>CNN</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -3796,7 +3796,7 @@ license:CC0
 		<rom name="Accent Health - Information for Healthy Living - October 2004 - General CDi 10-04 (2004)(CNN)(US)[DVC].iso" size="616699104" crc="558d0e4e" md5="93c7719c4cfd5de2fc3e479bdc461f9f"/>
 		<rom name="Accent Health - Information for Healthy Living - October 2004 - General CDi 10-04 (2004)(CNN)(US)[DVC].cue" size="191" crc="cbe56100" md5="070cf94e5a6cb66c032eb1329dd3bf6d"/>
 		-->
-		<description>Accent Health - Information for Healthy Living - October 2004 - General CDi 10-04 (USA)[DVC]</description>
+		<description>Accent Health - Information for Healthy Living - October 2004 - General CDi 10-04 (USA)</description>
 		<year>2004</year>
 		<publisher>CNN</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -3909,7 +3909,7 @@ license:CC0
 		<rom name="AIMS - A First Look at Birds (1995)(AIMS Multimedia)(US)[DVC].iso" size="194040000" crc="d05f2deb" md5="3d4a6b48de44bf6e1a9a72142fba9298"/>
 		<rom name="AIMS - A First Look at Birds (1995)(AIMS Multimedia)(US)[DVC].cue" size="150" crc="4b8ad760" md5="c51359888b926cfe81c460f300c641f7"/>
 		-->
-		<description>AIMS - A First Look at Birds [DVC]</description>
+		<description>AIMS - A First Look at Birds</description>
 		<year>1995</year>
 		<publisher>AIMS Multimedia</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -3926,7 +3926,7 @@ license:CC0
 		<rom name="AIMS - A First Look at Mammals (1995)(AIMS Multimedia)(US)[DVC].iso" size="191570400" crc="10f4fa2c" md5="8c76e9bc604a2862dd20aab9e05050c4"/>
 		<rom name="AIMS - A First Look at Mammals (1995)(AIMS Multimedia)(US)[DVC].cue" size="152" crc="33e5cf6b" md5="fb189111a1b2ae785f93f759bb7994a0"/>
 		-->
-		<description>AIMS - A First Look at Mammals (USA)[DVC]</description>
+		<description>AIMS - A First Look at Mammals (USA)</description>
 		<year>1995</year>
 		<publisher>AIMS Multimedia</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -3943,7 +3943,7 @@ license:CC0
 		<rom name="AIMS - A First Look at Trees (1995)(AIMS Multimedia)(US)[DVC].iso" size="182221200" crc="76ff33da" md5="cc5e004220590f7c474cf9611db5e0c3"/>
 		<rom name="AIMS - A First Look at Trees (1995)(AIMS Multimedia)(US)[DVC].cue" size="150" crc="cc672f40" md5="521511efc5ab82738042abf651c2ce9b"/>
 		-->
-		<description>AIMS - A First Look at Trees (USA)[DVC]</description>
+		<description>AIMS - A First Look at Trees (USA)</description>
 		<year>1995</year>
 		<publisher>AIMS Multimedia</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -3960,7 +3960,7 @@ license:CC0
 		<rom name="AIMS - Animal Communities (1995)(AIMS Multimedia)(US)[DVC].iso" size="204094800" crc="a4477b82" md5="f30aa32f1e193222ea178a943e82f958"/>
 		<rom name="AIMS - Animal Communities (1995)(AIMS Multimedia)(US)[DVC].cue" size="147" crc="c439dc7b" md5="59f53be08a64d9a442244fdf96613033"/>
 		-->
-		<description>AIMS - Animal Communities (USA)[DVC]</description>
+		<description>AIMS - Animal Communities (USA)</description>
 		<year>1995</year>
 		<publisher>AIMS Multimedia</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -3977,7 +3977,7 @@ license:CC0
 		<rom name="AIMS - Animal Life in a Tidepool (1995)(AIMS Multimedia)(US)[DVC].iso" size="180633600" crc="20a9e660" md5="c291451a953e243cc2481776e966b147"/>
 		<rom name="AIMS - Animal Life in a Tidepool (1995)(AIMS Multimedia)(US)[DVC].cue" size="154" crc="72233411" md5="d2ccdab142e099709e4ccb4edeb5aee3"/>
 		-->
-		<description>AIMS - Animal Life in a Tidepool (USA)[DVC]</description>
+		<description>AIMS - Animal Life in a Tidepool (USA)</description>
 		<year>1995</year>
 		<publisher>AIMS Multimedia</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -3994,7 +3994,7 @@ license:CC0
 		<rom name="AIMS - Beavers and How they Live (1995)(AIMS Multimedia)(US)[DVC].iso" size="237787200" crc="4f005d3e" md5="f71389482b336a11a52e7bfd1dc6f636"/>
 		<rom name="AIMS - Beavers and How they Live (1995)(AIMS Multimedia)(US)[DVC].cue" size="154" crc="34feb957" md5="623fa30e0825c0078ac33a00b5de497d"/>
 		-->
-		<description>AIMS - Beavers and How they Live (USA)[DVC]</description>
+		<description>AIMS - Beavers and How they Live (USA)</description>
 		<year>1995</year>
 		<publisher>AIMS Multimedia</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -4011,7 +4011,7 @@ license:CC0
 		<rom name="AIMS - Bees and How they Live (1995)(AIMS Multimedia)(US)[DVC].iso" size="219265200" crc="9be3b9e0" md5="0ac966530320465c29316859fd1d7af2"/>
 		<rom name="AIMS - Bees and How they Live (1995)(AIMS Multimedia)(US)[DVC].cue" size="151" crc="1055149a" md5="94e8ab1abbe9cbe2031c76b6f0c73ce0"/>
 		-->
-		<description>AIMS - Bees and How they Live (USA)[DVC]</description>
+		<description>AIMS - Bees and How they Live (USA)</description>
 		<year>1995</year>
 		<publisher>AIMS Multimedia</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -4028,7 +4028,7 @@ license:CC0
 		<rom name="AIMS - Ecosystems - Nature in Balance (1995)(AIMS Multimedia)(US)[DVC].iso" size="187866000" crc="bdfa07c4" md5="666feecdb84a21ba4b3c137ff892a749"/>
 		<rom name="AIMS - Ecosystems - Nature in Balance (1995)(AIMS Multimedia)(US)[DVC].cue" size="159" crc="9a3d74d0" md5="84bb129ae60af161945acd4241f28cf8"/>
 		-->
-		<description>AIMS - Ecosystems - Nature in Balance (USA)[DVC]</description>
+		<description>AIMS - Ecosystems - Nature in Balance (USA)</description>
 		<year>1995</year>
 		<publisher>AIMS Multimedia</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -4045,7 +4045,7 @@ license:CC0
 		<rom name="AIMS - Evolution - Change Through Natural Selection (1995)(AIMS Multimedia)(US)[DVC].iso" size="228438000" crc="865808ee" md5="edc0c6e9d29d4dbb726c58e201a3876f"/>
 		<rom name="AIMS - Evolution - Change Through Natural Selection (1995)(AIMS Multimedia)(US)[DVC].cue" size="173" crc="895e8b80" md5="83d1e602e2242cabf1f1fdc642741b02"/>
 		-->
-		<description>AIMS - Evolution - Change Through Natural Selection (USA)[DVC]</description>
+		<description>AIMS - Evolution - Change Through Natural Selection (USA)</description>
 		<year>1995</year>
 		<publisher>AIMS Multimedia</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -4062,7 +4062,7 @@ license:CC0
 		<rom name="AIMS - Exploring our Solar System (1995)(AIMS Multimedia)(US)[DVC].iso" size="244666800" crc="2fb4f799" md5="440be3895d8c90e96b278320ee92a8f0"/>
 		<rom name="AIMS - Exploring our Solar System (1995)(AIMS Multimedia)(US)[DVC].cue" size="155" crc="ac23a74c" md5="801a4f8a28168d8e5731ba60cb19ef55"/>
 		-->
-		<description>AIMS - Exploring our Solar System (USA)[DVC]</description>
+		<description>AIMS - Exploring our Solar System (USA)</description>
 		<year>1995</year>
 		<publisher>AIMS Multimedia</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -4079,7 +4079,7 @@ license:CC0
 		<rom name="AIMS - Frogs and How they Live (1995)(AIMS Multimedia)(US)[DVC].iso" size="200743200" crc="dabff4bf" md5="ea2208b47ed9a9e1b7b640cebf0ed440"/>
 		<rom name="AIMS - Frogs and How they Live (1995)(AIMS Multimedia)(US)[DVC].cue" size="152" crc="3eabe7b2" md5="c7dc1410e23c90531417e9887bfad014"/>
 		-->
-		<description>AIMS - Frogs and How they Live (USA)[DVC]</description>
+		<description>AIMS - Frogs and How they Live (USA)</description>
 		<year>1995</year>
 		<publisher>AIMS Multimedia</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -4096,7 +4096,7 @@ license:CC0
 		<rom name="AIMS - How Animals Survive (1995)(AIMS Multimedia)(US)[DVC].iso" size="219441600" crc="22d7064a" md5="7881f0f96cad4c10eb177025bc294461"/>
 		<rom name="AIMS - How Animals Survive (1995)(AIMS Multimedia)(US)[DVC].cue" size="148" crc="c1944ad3" md5="c615c57b3b4e0e307da72460287b4381"/>
 		-->
-		<description>AIMS - How Animals Survive (USA)[DVC]</description>
+		<description>AIMS - How Animals Survive (USA)</description>
 		<year>1995</year>
 		<publisher>AIMS Multimedia</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -4113,7 +4113,7 @@ license:CC0
 		<rom name="AIMS - How we Classify Animals (1995)(AIMS Multimedia)(US)[DVC].iso" size="208328400" crc="023295df" md5="b079d804b02f4a4e1917558698cbe859"/>
 		<rom name="AIMS - How we Classify Animals (1995)(AIMS Multimedia)(US)[DVC].cue" size="152" crc="ef415601" md5="a970cfc4fb0ad42a923cd515bc8d2551"/>
 		-->
-		<description>AIMS - How we Classify Animals (USA)[DVC]</description>
+		<description>AIMS - How we Classify Animals (USA)</description>
 		<year>1995</year>
 		<publisher>AIMS Multimedia</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -4130,7 +4130,7 @@ license:CC0
 		<rom name="AIMS - Insects Reproduction and Metamorphosis (1995)(AIMS Multimedia)(US)[DVC].iso" size="255780000" crc="4fdb3c0c" md5="74f89c427bd35b61625acfac9569fc7f"/>
 		<rom name="AIMS - Insects Reproduction and Metamorphosis (1995)(AIMS Multimedia)(US)[DVC].cue" size="167" crc="91542912" md5="fee979a3ddadb016d8e4989aa893232a"/>
 		-->
-		<description>AIMS - Insects Reproduction and Metamorphosis (USA)[DVC]</description>
+		<description>AIMS - Insects Reproduction and Metamorphosis (USA)</description>
 		<year>1995</year>
 		<publisher>AIMS Multimedia</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -4147,7 +4147,7 @@ license:CC0
 		<rom name="AIMS - Learning About Ecology (1995)(AIMS Multimedia)(US)[DVC].iso" size="191394000" crc="c83aeb9c" md5="5079096e9e91691a99ddaaf86f5c9c3e"/>
 		<rom name="AIMS - Learning About Ecology (1995)(AIMS Multimedia)(US)[DVC].cue" size="151" crc="a3497726" md5="0c9de34c3f034ba8df5998c282912249"/>
 		-->
-		<description>AIMS - Learning About Ecology (USA)[DVC]</description>
+		<description>AIMS - Learning About Ecology (USA)</description>
 		<year>1995</year>
 		<publisher>AIMS Multimedia</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -4164,7 +4164,7 @@ license:CC0
 		<rom name="AIMS - Temperature, Pressure and Humidity (1995)(AIMS Multimedia)(US)[DVC].iso" size="199332000" crc="f5fa6118" md5="dfecf601128f32ac77e09756b48f47b7"/>
 		<rom name="AIMS - Temperature, Pressure and Humidity (1995)(AIMS Multimedia)(US)[DVC].cue" size="163" crc="5de93e5c" md5="1855045d37670cd5b4fe5e3725650170"/>
 		-->
-		<description>AIMS - Temperature, Pressure and Humidity (USA)[DVC]</description>
+		<description>AIMS - Temperature, Pressure and Humidity (USA)</description>
 		<year>1995</year>
 		<publisher>AIMS Multimedia</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -4181,7 +4181,7 @@ license:CC0
 		<rom name="AIMS - The Civil War - Four Years of War and it's Aftermath (1995)(AIMS Multimedia)(US)[DVC].iso" size="277124400" crc="f0b3c3a8" md5="19e74ac00be19442e282a2e678ba45c5"/>
 		<rom name="AIMS - The Civil War - Four Years of War and it's Aftermath (1995)(AIMS Multimedia)(US)[DVC].cue" size="181" crc="875b333f" md5="8c5b691f8038148246ba35d473f6f3f3"/>
 		-->
-		<description>AIMS - The Civil War - Four Years of War and its Aftermath (USA)[DVC]</description>
+		<description>AIMS - The Civil War - Four Years of War and its Aftermath (USA)</description>
 		<year>1995</year>
 		<publisher>AIMS Multimedia</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -4198,7 +4198,7 @@ license:CC0
 		<rom name="AIMS - The Civil War - The South Secedes and War Begins (1995)(AIMS Multimedia)(US)[DVC].iso" size="247665600" crc="4a0ce200" md5="b7cedbe01d83aa7445d6e55d48f0c8e1"/>
 		<rom name="AIMS - The Civil War - The South Secedes and War Begins (1995)(AIMS Multimedia)(US)[DVC].cue" size="177" crc="e62aa55e" md5="7fed34eb5574b0fa1d61b139c5f00472"/>
 		-->
-		<description>AIMS - The Civil War - The South Secedes and War Begins (USA)[DVC]</description>
+		<description>AIMS - The Civil War - The South Secedes and War Begins (USA)</description>
 		<year>1995</year>
 		<publisher>AIMS Multimedia</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -4215,7 +4215,7 @@ license:CC0
 		<rom name="AIMS - Winds, Fronts and Storms (1995)(AIMS Multimedia)(US)[DVC].iso" size="221029200" crc="7c079fd5" md5="a344e896e02c83643e6adef08d5c49ec"/>
 		<rom name="AIMS - Winds, Fronts and Storms (1995)(AIMS Multimedia)(US)[DVC].cue" size="153" crc="1f91383f" md5="8bd9e03fd4faf601542c38e37ad4749e"/>
 		-->
-		<description>AIMS - Winds, Fronts and Storms (USA)[DVC]</description>
+		<description>AIMS - Winds, Fronts and Storms (USA)</description>
 		<year>1995</year>
 		<publisher>AIMS Multimedia</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -4296,7 +4296,7 @@ license:CC0
 		<rom name="Andrew Lloyd Webber - The Premiere Collection Encore (1993)(Philips - PolyGram)(PAL)(EU)[!][DVC].iso" size="626572800" crc="baa61bed" md5="44e82d69a8101f33c54898f3a0d9ad4a"/>
 		<rom name="Andrew Lloyd Webber - The Premiere Collection Encore (1993)(Philips - PolyGram)(PAL)(EU)[!][DVC].cue" size="185" crc="4b08709a" md5="e43857c51c69cc0a1ca6272f0aac2503"/>
 		-->
-		<description>Andrew Lloyd Webber - The Premiere Collection Encore (Euro)[DVC]</description>
+		<description>Andrew Lloyd Webber - The Premiere Collection Encore (Euro)</description>
 		<year>1993</year>
 		<publisher>Philips ~ PolyGram</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -4313,7 +4313,7 @@ license:CC0
 		<rom name="Andrew Lloyd Webber - The Premiere Collection Encore (1993)(Philips - PolyGram)(US)[DVC].iso" size="622515600" crc="ab681274" md5="f76f0df0e87f354df52b7f672929af08"/>
 		<rom name="Andrew Lloyd Webber - The Premiere Collection Encore (1993)(Philips - PolyGram)(US)[DVC].cue" size="177" crc="acdd79ca" md5="f3eb5d4d6c838b831d15dc2fadaa258d"/>
 		-->
-		<description>Andrew Lloyd Webber - The Premiere Collection Encore (USA)[DVC]</description>
+		<description>Andrew Lloyd Webber - The Premiere Collection Encore (USA)</description>
 		<year>1993</year>
 		<publisher>Philips ~ PolyGram</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -4362,7 +4362,7 @@ license:CC0
 		<rom name="Around Atlanta - The Olympic City (1996)(Philips)(EU)[DVC].iso" size="634158000" crc="c0506ae4" md5="3989d89ed466e4e7a94e4b12a342dd2d"/>
 		<rom name="Around Atlanta - The Olympic City (1996)(Philips)(EU)[DVC].cue" size="147" crc="95e65dfb" md5="ff3e5b6517ad491f9c5c96e3d8bc2ce5"/>
 		-->
-		<description>Around Atlanta - The Olympic City (Euro)[DVC]</description>
+		<description>Around Atlanta - The Olympic City (Euro)</description>
 		<year>1996</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -4587,7 +4587,7 @@ license:CC0
 		<rom name="Bertelsmann Universal Lexikon (1995)(Pathe - Philips)(DE)[!][DVC].iso" size="776983200" crc="a2724fbc" md5="370de8a16494241462c4b54881de32d9"/>
 		<rom name="Bertelsmann Universal Lexikon (1995)(Pathe - Philips)(DE)[!][DVC].cue" size="154" crc="25047121" md5="7b3a3878585980ce5ab872b01b58358c"/>
 		-->
-		<description>Bertelsmann Universal Lexikon (Germany)[DVC]</description>
+		<description>Bertelsmann Universal Lexikon (Germany)</description>
 		<year>1995</year>
 		<publisher>Pathe ~ Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -4620,7 +4620,7 @@ license:CC0
 		<rom name="Best of Baby Songs, The - Featuring the songs of Hop Palmer (1993)(Philips)(US)[DVC].iso" size="571183200" crc="47eec089" md5="480351d20594d62a427d1499496179ed"/>
 		<rom name="Best of Baby Songs, The - Featuring the songs of Hop Palmer (1993)(Philips)(US)[DVC].cue" size="173" crc="d0838eb1" md5="7511dfb1bf6d85e6c2251df1b89bf03f"/>
 		-->
-		<description>The Best of Baby Songs - Featuring the Songs of Hop Palmer (USA)[DVC]</description>
+		<description>The Best of Baby Songs - Featuring the Songs of Hop Palmer (USA)</description>
 		<year>1993</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -4653,7 +4653,7 @@ license:CC0
 		<rom name="Best Of Manfred Deix Vol. 1, The (1994)(Philips)(AT)[DVC].iso" size="461109600" crc="c5e7f489" md5="a55b2df550a41914eab660899edf4172"/>
 		<rom name="Best Of Manfred Deix Vol. 1, The (1994)(Philips)(AT)[DVC].cue" size="146" crc="585d0360" md5="2ff82dcdc8ee6baa96e4b83e8639ef37"/>
 		-->
-		<description>The Best Of Manfred Deix Vol. 1 (Aut)[DVC]</description>
+		<description>The Best Of Manfred Deix Vol. 1 (Austria)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -4859,7 +4859,7 @@ license:CC0
 		<rom name="CD-i Demonstratie Disc - Fall 1996 - Spring 1997 (1996)(Philips)(NL)(Track 19 of 19)[!][DVC].iso" size="14605920" crc="afa27ed4" md5="0d8f96398fed57acfe8a0607daa80a38"/>
 		<rom name="CD-i Demonstratie Disc - Fall 1996 - Spring 1997 (1996)(Philips)(NL)[!][DVC].cue" size="3403" crc="a3a4d59e" md5="e611e8ea7d996acd21faf06f426215b6"/>
 		-->
-		<description>CD-i Demonstratie Disc - Fall 1996 - Spring 1997 (Netherlands)[DVC]</description>
+		<description>CD-i Demonstratie Disc - Fall 1996 - Spring 1997 (Netherlands)</description>
 		<year>1996</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -4988,7 +4988,7 @@ license:CC0
 		<rom name="CD-Online - Issue 01 - Internet on TV (1995)(CD-Online)(EU)[DVC].iso" size="770167104" crc="1d881af1" md5="1c5cccfccdf2e9b5ea5511b746958d37"/>
 		<rom name="CD-Online - Issue 01 - Internet on TV (1995)(CD-Online)(EU)[DVC].cue" size="153" crc="59816b23" md5="5bcdc9e887e8786c15c0184aa9c65279"/>
 		-->
-		<description>CD-Online - Issue 01 - Internet on TV (Euro)[DVC]</description>
+		<description>CD-Online - Issue 01 - Internet on TV (Euro)</description>
 		<year>1995</year>
 		<publisher>CD-Online</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -5005,7 +5005,7 @@ license:CC0
 		<rom name="CD-Online - Issue 02 - The Internet Game Issue (1996)(CD-Online)(EU)[DVC].iso" size="700670208" crc="1c678370" md5="bae8292855e491914c1e0e3752014a63"/>
 		<rom name="CD-Online - Issue 02 - The Internet Game Issue (1996)(CD-Online)(EU)[DVC].cue" size="162" crc="b92882b2" md5="244438f2d03a9b472d56999fa927b6d1"/>
 		-->
-		<description>CD-Online - Issue 02 - The Internet Game Issue (Euro)[DVC]</description>
+		<description>CD-Online - Issue 02 - The Internet Game Issue (Euro)</description>
 		<year>1996</year>
 		<publisher>CD-Online</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -5022,7 +5022,7 @@ license:CC0
 		<rom name="CD-Online Disc 97-10 (1997)(CD-Online)(EU)(M3)[DVC].iso" size="653213904" crc="c5b6ef47" md5="183794664159bb4864f668766308594f"/>
 		<rom name="CD-Online Disc 97-10 (1997)(CD-Online)(EU)(M3)[DVC].cue" size="140" crc="41bdaeda" md5="82399da73c1ce69e5b9827007af466ef"/>
 		-->
-		<description>CD-Online Disc 97-10 (Euro)[DVC]</description>
+		<description>CD-Online Disc 97-10 (Euro)</description>
 		<year>1997</year>
 		<publisher>CD-Online</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -5292,7 +5292,7 @@ license:CC0
 		<rom name="Cosmopolitan Interactive - Tonetics (1995)(Philips)(US)(Track 45 of 45)[DVC].iso" size="1601712" crc="82c5f88e" md5="b7dd0f21c143545c6aa5872c821e993b"/>
 		<rom name="Cosmopolitan Interactive - Tonetics (1995)(Philips)(US)[DVC].cue" size="7337" crc="492b28bb" md5="251729665c3f6e63a2221e0704e5f3d1"/>
 		-->
-		<description>Cosmopolitan Interactive - Tonetics (USA)[DVC]</description>
+		<description>Cosmopolitan Interactive - Tonetics (USA)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -5389,7 +5389,7 @@ license:CC0
 		<rom name="Dansen! (1996)(Philips)(NL)[!][DVC].iso" size="622162800" crc="a95f2c9c" md5="644b204f7fbf353c055e015b5f654fa0"/>
 		<rom name="Dansen! (1996)(Philips)(NL)[!][DVC].cue" size="124" crc="4a67c0cd" md5="ea02376b2326c38f60a257428bf2d47e"/>
 		-->
-		<description>Dansen! (Netherlands)[DVC]</description>
+		<description>Dansen! (Netherlands)</description>
 		<year>1996</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -5422,7 +5422,7 @@ license:CC0
 		<rom name="Destination Great Britain - Central and Northern England (1994)(World of Wonders)(US)[DVC].iso" size="649333104" crc="3870e124" md5="865e329ec0dd75ddcc30f0297d23d6b7"/>
 		<rom name="Destination Great Britain - Central and Northern England (1994)(World of Wonders)(US)[DVC].cue" size="179" crc="8f545fab" md5="04ff34101b6d6b56ec4b95254cdab69a"/>
 		-->
-		<description>Destination Great Britain - Central and Northern England (USA)[DVC]</description>
+		<description>Destination Great Britain - Central and Northern England (USA)</description>
 		<year>1994</year>
 		<publisher>World of Wonders</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -5439,7 +5439,7 @@ license:CC0
 		<rom name="Destination Great Britain - England's West Country (1994)(World of Wonders)(US)[DVC].iso" size="541199904" crc="3b2cbde0" md5="bfabd6159d7ff206781f43f31bd2d30b"/>
 		<rom name="Destination Great Britain - England's West Country (1994)(World of Wonders)(US)[DVC].cue" size="173" crc="6788d43e" md5="96e699a0987fdd8978e7438d6b4c4a07"/>
 		-->
-		<description>Destination Great Britain - England's West Country (USA)[DVC]</description>
+		<description>Destination Great Britain - England's West Country (USA)</description>
 		<year>1994</year>
 		<publisher>World of Wonders</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -5456,7 +5456,7 @@ license:CC0
 		<rom name="Destination Great Britain - London & Southern England (1995)(World of Wonders)(US)[DVC].iso" size="596942304" crc="2a4933e2" md5="35b65342228bed8b6d14bee9748adc29"/>
 		<rom name="Destination Great Britain - London & Southern England (1995)(World of Wonders)(US)[DVC].cue" size="176" crc="3ef01162" md5="77376f87001464ab399f4860912b4194"/>
 		-->
-		<description>Destination Great Britain - London &amp; Southern England (USA)[DVC]</description>
+		<description>Destination Great Britain - London &amp; Southern England (USA)</description>
 		<year>1995</year>
 		<publisher>World of Wonders</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -5473,7 +5473,7 @@ license:CC0
 		<rom name="Destination Great Britain - Wales (1994)(World of Wonders)(US)[DVC].iso" size="659211504" crc="679e4bf7" md5="cb1d266f2844866707b53add457a803a"/>
 		<rom name="Destination Great Britain - Wales (1994)(World of Wonders)(US)[DVC].cue" size="156" crc="2a808fa1" md5="9f6caebd9fa40523583b416360342975"/>
 		-->
-		<description>Destination Great Britain - Wales (USA)[DVC]</description>
+		<description>Destination Great Britain - Wales (USA)</description>
 		<year>1994</year>
 		<publisher>World of Wonders</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -5522,7 +5522,7 @@ license:CC0
 		<rom name="Dit Was 1994 - Wereldnieuws Overzicht (1995)(Philips)(NL)[!][DVC].iso" size="505562400" crc="104f1a60" md5="bc9081baed779b34eb81b27aac5ee6a2"/>
 		<rom name="Dit Was 1994 - Wereldnieuws Overzicht (1995)(Philips)(NL)[!][DVC].cue" size="154" crc="01fa4b7c" md5="0b96b43a9261cc852362535806842339"/>
 		-->
-		<description>Dit Was 1994 - Wereldnieuws Overzicht (Netherlands)[DVC]</description>
+		<description>Dit Was 1994 - Wereldnieuws Overzicht (Netherlands)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -5539,7 +5539,7 @@ license:CC0
 		<rom name="Dit Was 1995 - Wereldnieuws Overzicht (1996)(Philips)(NL)[DVC].iso" size="663621504" crc="e65fad70" md5="7cbb70bcc8033bd6eee8ef821c5801e2"/>
 		<rom name="Dit Was 1995 - Wereldnieuws Overzicht (1996)(Philips)(NL)[DVC].cue" size="151" crc="457f6a95" md5="afe4a3bdab95d288790a92535c347998"/>
 		-->
-		<description>Dit Was 1995 - Wereldnieuws Overzicht (Netherlands)[DVC]</description>
+		<description>Dit Was 1995 - Wereldnieuws Overzicht (Netherlands)</description>
 		<year>1996</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -5719,7 +5719,7 @@ license:CC0
 		<rom name="Eric Clapton - The Cream Of Eric Clapton (1994)(Philips - PolyGram)(PAL)(EU)(Disc 2 of 2)[DVC].iso" size="324928800" crc="3f34a336" md5="12d5f1fe47a6cb686752de1e28c55633"/>
 		<rom name="Eric Clapton - The Cream Of Eric Clapton (1994)(Philips - PolyGram)(PAL)(EU)(Disc 2 of 2)[DVC].cue" size="183" crc="fa99efc4" md5="21bcdf65d53d1b16b1f7eeb68d1d8452"/>
 		-->
-		<description>Eric Clapton - The Cream Of Eric Clapton (Euro)[DVC]</description>
+		<description>Eric Clapton - The Cream Of Eric Clapton (Euro)</description>
 		<year>1994</year>
 		<publisher>Philips ~ PolyGram</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -5838,7 +5838,7 @@ license:CC0
 		<rom name="Filmmaand, de - Highlights-Previews-Filmclips (1995-05)(Philips)(NL)(Track 2 of 2)[a][DVC].iso" size="320629344" crc="7c383b45" md5="084ac15d21fe93dc171a4ca32816f958"/>
 		<rom name="Filmmaand, de - Highlights-Previews-Filmclips (1995-05)(Philips)(NL)[a][DVC].cue" size="356" crc="60ab42eb" md5="355cbdd036a0a64e3c0010d71481c4e7"/>
 		-->
-		<description>De Filmmaand - Highlights-Previews-Filmclips (Netherlands, alt)[DVC]</description>
+		<description>De Filmmaand - Highlights-Previews-Filmclips (Netherlands, alt)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -5856,7 +5856,7 @@ license:CC0
 		<rom name="Filmmaand, de - Highlights-Previews-Filmclips (1995-05)(Philips)(NL)(Track 2 of 2)[DVC].iso" size="320629344" crc="42831457" md5="fb91b597fe7d6f978cbff1f8b3760ea7"/>
 		<rom name="Filmmaand, de - Highlights-Previews-Filmclips (1995-05)(Philips)(NL)[DVC].cue" size="350" crc="e26e6137" md5="d48cc645b033b767d8afd0f521a8e7ba"/>
 		-->
-		<description>De Filmmaand - Highlights-Previews-Filmclips (Netherlands)[DVC]</description>
+		<description>De Filmmaand - Highlights-Previews-Filmclips (Netherlands)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -5944,7 +5944,7 @@ license:CC0
 		<rom name="Football - l'histoire, les regles, les vedettes, le jeu de penalties v1.04 (1994)(Philips)(FR)[!][DVC].iso" size="764517600" crc="1895810b" md5="98d026bb71ab819b96d20c50af14bac0"/>
 		<rom name="Football - l'histoire, les regles, les vedettes, le jeu de penalties v1.04 (1994)(Philips)(FR)[!][DVC].cue" size="191" crc="7d6b44cd" md5="b0980f1f51f71cdc28745ce867c85184"/>
 		-->
-		<description>Football - L'histoire, les regles, les vedettes, le jeu de penalties v1.04 (France)[DVC]</description>
+		<description>Football - L'histoire, les regles, les vedettes, le jeu de penalties v1.04 (France)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -6216,7 +6216,7 @@ license:CC0
 		<rom name="Great American Golf 2 (1994)(Xdra)(EU)[DVC].iso" size="491450400" crc="5d02ac06" md5="4d055435319cd9beab75af127d44fd51"/>
 		<rom name="Great American Golf 2 (1994)(Xdra)(EU)[DVC].cue" size="132" crc="ef1005ce" md5="36ff4af2ff9a1d5fefc36b90c83baa5b"/>
 		-->
-		<description>Great American Golf 2 (Euro)[DVC]</description>
+		<description>Great American Golf 2 (Euro)</description>
 		<year>1994</year>
 		<publisher>Xdra</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -6411,7 +6411,7 @@ license:CC0
 		<rom name="Henri Des - Les Betises (1993)(Philips)(FR)[DVC].iso" size="665557200" crc="645ec304" md5="60878a55974a9d755364bc1bfd091ee4"/>
 		<rom name="Henri Des - Les Betises (1993)(Philips)(FR)[DVC].cue" size="137" crc="86a8ff06" md5="309a3412d89c63612d04a455a0cfdcff"/>
 		-->
-		<description>Henri Des - Les Betises (France)[DVC]</description>
+		<description>Henri Des - Les Betises (France)</description>
 		<year>1993</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -6577,7 +6577,7 @@ license:CC0
 		<rom name="Hondenliefde (1995)(AVRO)(NL)[DVC].iso" size="738057600" crc="2e4a7424" md5="ee2e613a3a140a790a9ae3150dc832a7"/>
 		<rom name="Hondenliefde (1995)(AVRO)(NL)[DVC].cue" size="123" crc="e0d93f18" md5="82bb06397cbba8e7e23666e1883289c3"/>
 		-->
-		<description>Hondenliefde (Netherlands)[DVC]</description>
+		<description>Hondenliefde (Netherlands)</description>
 		<year>1995</year>
 		<publisher>AVRO</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -6675,7 +6675,7 @@ license:CC0
 		<rom name="ik, mik, Letterland - een leesavontuur met maan roos vis (1996)(Philips)(NL)[!][DVC].iso" size="679144704" crc="7c5681db" md5="bd97aa35f752542f333578ae875850d7"/>
 		<rom name="ik, mik, Letterland - een leesavontuur met maan roos vis (1996)(Philips)(NL)[!][DVC].cue" size="173" crc="74bf1ec2" md5="f57850e3ef257752b6aa46613cc0fa43"/>
 		-->
-		<description>Ik, Mik, Letterland - een leesavontuur met maan roos vis (Netherlands)[DVC]</description>
+		<description>Ik, Mik, Letterland - een leesavontuur met maan roos vis (Netherlands)</description>
 		<year>1996</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -6695,7 +6695,7 @@ license:CC0
 		<rom name="Imagination in Motion - A New Era in 3D Chill Out Video (1996)(AIMS Multimedia)(EU)(Track 4 of 4)[DVC].iso" size="58705920" crc="91e0b664" md5="3e52fb9bd80b8683cfa918ff2702d48c"/>
 		<rom name="Imagination in Motion - A New Era in 3D Chill Out Video (1996)(AIMS Multimedia)(EU)[DVC].cue" size="758" crc="1a35ce39" md5="0421bbd0873598fd5ba79a22f090bd11"/>
 		-->
-		<description>Imagination in Motion - A New Era in 3D Chill Out Video (Euro)[DVC]</description>
+		<description>Imagination in Motion - A New Era in 3D Chill Out Video (Euro)</description>
 		<year>1996</year>
 		<publisher>AIMS Multimedia</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -6712,7 +6712,7 @@ license:CC0
 		<rom name="Interactive Math - Decimals v1.0 (1994)(Gulliver Ritchie Associates)(US)[DVC].iso" size="676498704" crc="6cbc3692" md5="fa424cc6500cafb222ab87ca47c7285e"/>
 		<rom name="Interactive Math - Decimals v1.0 (1994)(Gulliver Ritchie Associates)(US)[DVC].cue" size="166" crc="e742cc7d" md5="be0f4ef9b69ac964070d8aec12f72c91"/>
 		-->
-		<description>Interactive Math - Decimals v1.0 (USA)[DVC]</description>
+		<description>Interactive Math - Decimals v1.0 (USA)</description>
 		<year>1994</year>
 		<publisher>Gulliver Ritchie Associates</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -6745,7 +6745,7 @@ license:CC0
 		<rom name="Internetten op je TV! - Demo Disc (1996)(Philips)(NL)[!][DVC][8140154].iso" size="263899104" crc="03bcac37" md5="b24dfb9727382b32bcf40b2fb5c669a6"/>
 		<rom name="Internetten op je TV! - Demo Disc (1996)(Philips)(NL)[!][DVC][8140154].cue" size="159" crc="1e6175c9" md5="f8ed81ba517ab5f9013401db362e6b5c"/>
 		-->
-		<description>Internetten op je TV! - Demo Disc (Netherlands)[DVC][8140154]</description>
+		<description>Internetten op je TV! - Demo Disc (Netherlands)[8140154]</description>
 		<year>1996</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -6762,7 +6762,7 @@ license:CC0
 		<rom name="Internetten op je TV! - Demo Disc (1996)(Philips)(NL)[DVC][8100330].iso" size="335164704" crc="a97dfe80" md5="d33a215410666d1d542429244b7e69a9"/>
 		<rom name="Internetten op je TV! - Demo Disc (1996)(Philips)(NL)[DVC][8100330].cue" size="156" crc="16c58550" md5="455bbe5ab2afb0f84710b4fbc6f80c42"/>
 		-->
-		<description>Internetten op je TV! - Demo Disc (Netherlands)[DVC][8100330]</description>
+		<description>Internetten op je TV! - Demo Disc (Netherlands)[8100330]</description>
 		<year>1996</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -6829,7 +6829,7 @@ license:CC0
 		<rom name="Journal interactif '94 et Le Jeu des Stars de l'info, Le (1995)(Philips)(FR)(Disc 2 of 2)[Jeu des Stars de l'info][DVC].iso" size="539007840" crc="a2c48358" md5="175424ae9404e89f783ca412816bc33a"/>
 		<rom name="Journal interactif '94 et Le Jeu des Stars de l'info, Le (1995)(Philips)(FR)(Disc 2 of 2)[Jeu des Stars de l'info][DVC].cue" size="208" crc="1fe6bd65" md5="7d304a34c8401e34eb367fcb65d6197c"/>
 		-->
-		<description>Le Journal Interactif '94 et Le Jeu des Stars de l'info (France)[DVC]</description>
+		<description>Le Journal Interactif '94 et Le Jeu des Stars de l'info (France)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -6855,7 +6855,7 @@ license:CC0
 		<rom name="Journal interactif 1995 et Le Jeu des Stars de l'info, Le (1995)(Philips)(FR)(Disc 2 of 2)[Jeu des Stars de l'info][DVC].iso" size="608048448" crc="21396e5d" md5="4309e3df225e17bbb0ecd3b266939e61"/>
 		<rom name="Journal interactif 1995 et Le Jeu des Stars de l'info, Le (1995)(Philips)(FR)(Disc 2 of 2)[Jeu des Stars de l'info][DVC].cue" size="209" crc="032d4128" md5="bb224f39feeea2a0eebb8b40fbe3aa27"/>
 		-->
-		<description>Le Journal interactif 1995 et Le Jeu des Stars de l'info (France)[DVC]</description>
+		<description>Le Journal interactif 1995 et Le Jeu des Stars de l'info (France)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -6879,7 +6879,7 @@ license:CC0
 		<rom name="Joy of Sex, The v3.01 (1994)(Philips)(US)[DVC].iso" size="735411600" crc="e323ffb3" md5="ca7148ec8ed8d55b724e9e248afc81ea"/>
 		<rom name="Joy of Sex, The v3.01 (1994)(Philips)(US)[DVC].cue" size="135" crc="e9814a4d" md5="b65b45f80c2cc7a62ed2420d62bb6671"/>
 		-->
-		<description>The Joy of Sex v3.01 (USA)[DVC]</description>
+		<description>The Joy of Sex v3.01 (USA)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -6896,7 +6896,7 @@ license:CC0
 		<rom name="Joy of Sex, The v3.03 (1993)(Philips)(EU)[!][DVC].iso" size="725886000" crc="fbcd7f45" md5="8e7ccf5080a4a46652c22594f05d009d"/>
 		<rom name="Joy of Sex, The v3.03 (1993)(Philips)(EU)[!][DVC].cue" size="138" crc="20b33050" md5="a169eee09d8c458b50e975ada2fcf909"/>
 		-->
-		<description>The Joy of Sex v3.03 (Euro)[DVC]</description>
+		<description>The Joy of Sex v3.03 (Euro)</description>
 		<year>1993</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -7009,7 +7009,7 @@ license:CC0
 		<rom name="Kathy Smith - Personal Trainer (1995)(Philips)(EU)[DVC].iso" size="758872800" crc="8b0ab266" md5="df05aaebae641fc006321a2a4da3155c"/>
 		<rom name="Kathy Smith - Personal Trainer (1995)(Philips)(EU)[DVC].cue" size="144" crc="238a8d68" md5="041d1fe22cc0aadc127fb797bc887222"/>
 		-->
-		<description>Kathy Smith - Personal Trainer (Euro)[DVC]</description>
+		<description>Kathy Smith - Personal Trainer (Euro)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -7026,7 +7026,7 @@ license:CC0
 		<rom name="Kathy Smith - Personal Trainer (1995)(Philips)(US)[DVC].iso" size="759225600" crc="6a473663" md5="36db197dd654e993d0baaf0418fc4e29"/>
 		<rom name="Kathy Smith - Personal Trainer (1995)(Philips)(US)[DVC].cue" size="144" crc="5f80455f" md5="450fe2b5c76e2751a3e3603d44b1de20"/>
 		-->
-		<description>Kathy Smith - Personal Trainer (USA)[DVC]</description>
+		<description>Kathy Smith - Personal Trainer (USA)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -7045,7 +7045,7 @@ license:CC0
 		<rom name="Keep The Faith - An Evening with Bon Jovi (1993)(Philips - PolyGram)(PAL)(EU)(Disc 2 of 2)[!][DVC].iso" size="475398000" crc="d08590b1" md5="ff516b9a99ba31ccc97098ec1032cd01"/>
 		<rom name="Keep The Faith - An Evening with Bon Jovi (1993)(Philips - PolyGram)(PAL)(EU)(Disc 2 of 2)[!][DVC].cue" size="187" crc="d0df535e" md5="381b17a7a19d8225e8ea80da8d78c5c7"/>
 		-->
-		<description>Keep The Faith - An Evening with Bon Jovi (Euro)[DVC]</description>
+		<description>Keep The Faith - An Evening with Bon Jovi (Euro)</description>
 		<year>1993</year>
 		<publisher>Philips ~ PolyGram</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -7080,7 +7080,7 @@ license:CC0
 		<rom name="Kinderdisc met het complete verhaal ijsbeer in de tropen, De (1995)(Philips)(NL)(Track 14 of 14)[DVC].iso" size="22275792" crc="4cc3ebf4" md5="79dd38c21bcbe5aa3ae2d9fa06014766"/>
 		<rom name="Kinderdisc met het complete verhaal ijsbeer in de tropen, De (1995)(Philips)(NL)[DVC].cue" size="2634" crc="5e5517b2" md5="30f073fc2c193f6c5feae9bb36c31a05"/>
 		-->
-		<description>De Kinderdisc met het complete verhaal ijsbeer in de tropen (Netherlands)[DVC]</description>
+		<description>De Kinderdisc met het complete verhaal ijsbeer in de tropen (Netherlands)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -7097,7 +7097,7 @@ license:CC0
 		<rom name="Kinderdisc met het complete verhaal ijsbeer in de tropen, De (1995)(Philips)(NL)[a][DVC].iso" size="433678224" crc="12b01104" md5="b8b8cd2b2874542f108ea9c901b2147f"/>
 		<rom name="Kinderdisc met het complete verhaal ijsbeer in de tropen, De (1995)(Philips)(NL)[a][DVC].cue" size="177" crc="852f5506" md5="f95bc7573c14301f735cbcf669d7dc08"/>
 		-->
-		<description>De Kinderdisc met het complete verhaal ijsbeer in de tropen (Netherlands, alt)[DVC]</description>
+		<description>De Kinderdisc met het complete verhaal ijsbeer in de tropen (Netherlands, alt)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -7473,7 +7473,7 @@ license:CC0
 		<rom name="Live Without Monty Python (1994)(Philips)(EU)[DVC].iso" size="622162800" crc="1cd371ab" md5="98a9cfa0c859af66160601ecaad8f115"/>
 		<rom name="Live Without Monty Python (1994)(Philips)(EU)[DVC].cue" size="139" crc="df1cccc2" md5="e227a2a66ebbc8ab642a60c07b4f2041"/>
 		-->
-		<description>Live Without Monty Python (Euro)[DVC]</description>
+		<description>Live Without Monty Python (Euro)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -7490,7 +7490,7 @@ license:CC0
 		<rom name="Live Without Monty Python (1994)(Philips)(US)[DVC].iso" size="622515600" crc="c7c6745a" md5="daead227eaa446c239c9b3979da08ca6"/>
 		<rom name="Live Without Monty Python (1994)(Philips)(US)[DVC].cue" size="139" crc="a31604f5" md5="8147428690d510a25887c6323e84b478"/>
 		-->
-		<description>Live Without Monty Python (USA)[DVC]</description>
+		<description>Live Without Monty Python (USA)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -7509,7 +7509,7 @@ license:CC0
 		<rom name="Loving for a Lifetime (1995)(Extraware - Interlance - Meteor Film)(EU)(Disc 2 of 2)[DVC].iso" size="609462000" crc="f1d5d97b" md5="84d67eeaababced08d6ac681c7b97e45"/>
 		<rom name="Loving for a Lifetime (1995)(Extraware - Interlance - Meteor Film)(EU)(Disc 2 of 2)[DVC].cue" size="177" crc="e8e356ff" md5="d85faebdeeca9b455f9aba71b962b2a7"/>
 		-->
-		<description>Loving for a Lifetime (Euro)[DVC]</description>
+		<description>Loving for a Lifetime (Euro)</description>
 		<year>1994</year>
 		<publisher>Extraware ~ Interlance ~ Meteor Film</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -7618,7 +7618,7 @@ license:CC0
 		<rom name="Mathtrak K1 (1994)(InterROM)(US)[DVC].iso" size="679144704" crc="db8cb38d" md5="b5dab88b6d93f5a1937a64f4262606e1"/>
 		<rom name="Mathtrak K1 (1994)(InterROM)(US)[DVC].cue" size="126" crc="e7194abd" md5="f4023053b903dadf1a22bb360ecb6332"/>
 		-->
-		<description>Mathtrak K1 (USA)[DVC]</description>
+		<description>Mathtrak K1 (USA)</description>
 		<year>1994</year>
 		<publisher>InterROM</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -7635,7 +7635,7 @@ license:CC0
 		<rom name="Mathtrak K2 (1994)(InterROM)(US)[DVC].iso" size="566777904" crc="cc1ccb05" md5="5e12996d2b2ca4ddabd957e80ae3410f"/>
 		<rom name="Mathtrak K2 (1994)(InterROM)(US)[DVC].cue" size="126" crc="ca6f0860" md5="34180a459d0ec80b54927576029f125f"/>
 		-->
-		<description>Mathtrak K2 (USA)[DVC]</description>
+		<description>Mathtrak K2 (USA)</description>
 		<year>1994</year>
 		<publisher>InterROM</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -7780,7 +7780,7 @@ license:CC0
 		<rom name="Monty Python's Invasion from the Planet Skyron (1995)(Philips)(EU)[DVC].iso" size="514029600" crc="ca8a2b5c" md5="21c28cb5892b63c1e440c35e64eba4d8"/>
 		<rom name="Monty Python's Invasion from the Planet Skyron (1995)(Philips)(EU)[DVC].cue" size="160" crc="799dd692" md5="6028812f886d468e024f07d08bb8e3af"/>
 		-->
-		<description>Monty Python's Invasion from the Planet Skyron (Euro)[DVC]</description>
+		<description>Monty Python's Invasion from the Planet Skyron (Euro)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -7797,7 +7797,7 @@ license:CC0
 		<rom name="Monty Python's More Naughty Bits (1994)(Philips)(EU)(M4)[DVC].iso" size="697662000" crc="12f148fb" md5="cfe839d863da468c78c1e4c99d1cd720"/>
 		<rom name="Monty Python's More Naughty Bits (1994)(Philips)(EU)(M4)[DVC].cue" size="150" crc="613d4b0c" md5="7eb85a7d60eee339efacc95650df0a7b"/>
 		-->
-		<description>Monty Python's More Naughty Bits (Euro)[DVC]</description>
+		<description>Monty Python's More Naughty Bits (Euro)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -7814,7 +7814,7 @@ license:CC0
 		<rom name="Monty Python's More Naughty Bits (1995)(Daedalus)(US)(M4)[!][DVC].iso" size="698014800" crc="df586c75" md5="dfda4b8fbe7f3b36ae7b7a17677da944"/>
 		<rom name="Monty Python's More Naughty Bits (1995)(Daedalus)(US)(M4)[!][DVC].cue" size="154" crc="35f0db4e" md5="d16a54d8a57257971f0dac0a45254427"/>
 		-->
-		<description>Monty Python's More Naughty Bits (USA)[DVC]</description>
+		<description>Monty Python's More Naughty Bits (USA)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -7911,7 +7911,7 @@ license:CC0
 		<rom name="Muzzy - Learn French the Fun Way (1994)(Philips)(EU)[DVC].iso" size="790801200" crc="bde33c63" md5="53391588340386aa04d12b66d9ec353f"/>
 		<rom name="Muzzy - Learn French the Fun Way (1994)(Philips)(EU)[DVC].cue" size="146" crc="6b286d17" md5="3bad10f96ba56ee6050cb627db7e47aa"/>
 		-->
-		<description>Muzzy - Learn French the Fun Way (Euro)[DVC]</description>
+		<description>Muzzy - Learn French the Fun Way (Euro)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -7928,7 +7928,7 @@ license:CC0
 		<rom name="Muzzy - Learn French the Fun Way (1994)(Philips)(US)[DVC].iso" size="791154000" crc="3e6e6811" md5="707adb70b906774a20e1db126bf792d2"/>
 		<rom name="Muzzy - Learn French the Fun Way (1994)(Philips)(US)[DVC].cue" size="146" crc="1722a520" md5="127a720f2d2fac2aacc15c7b1c6cd799"/>
 		-->
-		<description>Muzzy - Learn French the Fun Way (USA)[DVC]</description>
+		<description>Muzzy - Learn French the Fun Way (USA)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -7961,7 +7961,7 @@ license:CC0
 		<rom name="Nederlands Elftal Compleet - Alles over de Europese Kampioenschappen (1996)(Philips)(NL)[!][DVC].iso" size="412604304" crc="9b6721c0" md5="7f9a0b4437aab75cf6be9a0403d6fcd9"/>
 		<rom name="Nederlands Elftal Compleet - Alles over de Europese Kampioenschappen (1996)(Philips)(NL)[!][DVC].cue" size="185" crc="b036513f" md5="bf183b2b3dc218d87f6260e00efbbb30"/>
 		-->
-		<description>Nederlands Elftal Compleet - Alles over de Europese Kampioenschappen (Netherlands)[DVC]</description>
+		<description>Nederlands Elftal Compleet - Alles over de Europese Kampioenschappen (Netherlands)</description>
 		<year>1996</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -7978,7 +7978,7 @@ license:CC0
 		<rom name="Nederlands Film Festival '95 - 15 Jaar Gouden Kalf (1995)(Philips)(NL)[!][DVC].iso" size="656384400" crc="1deb6f0b" md5="96bcf12e593ea75818fcf93be7a9a130"/>
 		<rom name="Nederlands Film Festival '95 - 15 Jaar Gouden Kalf (1995)(Philips)(NL)[!][DVC].cue" size="167" crc="4e69ef64" md5="8f87565b5575987c490be3d1c3372dbd"/>
 		-->
-		<description>Nederlands Film Festival '95 - 15 Jaar Gouden Kalf (Netherlands)[DVC]</description>
+		<description>Nederlands Film Festival '95 - 15 Jaar Gouden Kalf (Netherlands)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -8091,7 +8091,7 @@ license:CC0
 		<rom name="Ontdek het onbekende Nederland - Nederland-Waterland v1.0 (1995)(Philips)(NL)[!][DVC].iso" size="782326944" crc="4a462f44" md5="135cc121785c8dbfdfb5754cd499d397"/>
 		<rom name="Ontdek het onbekende Nederland - Nederland-Waterland v1.0 (1995)(Philips)(NL)[!][DVC].cue" size="174" crc="fecee438" md5="aa4f126db78efa41823fc209fa30c9ad"/>
 		-->
-		<description>Ontdek het onbekende Nederland - Nederland-Waterland v1.0 (Netherlands)[DVC]</description>
+		<description>Ontdek het onbekende Nederland - Nederland-Waterland v1.0 (Netherlands)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -8249,7 +8249,7 @@ license:CC0
 		<rom name="Philips Demo CD (1995)(Philips)(NL)[DVC].iso" size="480341904" crc="943e2626" md5="3dc70410549dda8082b72391afb1f33b"/>
 		<rom name="Philips Demo CD (1995)(Philips)(NL)[DVC].cue" size="129" crc="0f953d7b" md5="e43f1c26eeace19e3ddf9c10e8f0d221"/>
 		-->
-		<description>Philips Demo CD (Netherlands)[DVC]</description>
+		<description>Philips Demo CD (Netherlands)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -8283,7 +8283,7 @@ license:CC0
 		<rom name="Philips Media Interactieve Encyclopedie (1995)(Philips)(NL)[!][aka Standaard Interactieve Encyclopedie][DVC].iso" size="778453200" crc="d50b5aab" md5="a17c2d05e36a8fc6a4dc20ae973c1aab"/>
 		<rom name="Philips Media Interactieve Encyclopedie (1995)(Philips)(NL)[!][aka Standaard Interactieve Encyclopedie][DVC].cue" size="197" crc="af763a46" md5="2419495b4beeaa9afac8f9ddd779bb2c"/>
 		-->
-		<description>Philips Media Interactieve Encyclopedie (Netherlands)[DVC]</description>
+		<description>Philips Media Interactieve Encyclopedie (Netherlands)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -8300,7 +8300,7 @@ license:CC0
 		<rom name="Philips Media Interactieve Encyclopedie - Demonstratie - Exemplaar (1995)(Philips)(NL)[!][aka Standaard Interactieve Encyclopedie][DVC].iso" size="122774400" crc="e9476980" md5="1a1deffb5afcd2f068e9b4c47c5d5606"/>
 		<rom name="Philips Media Interactieve Encyclopedie - Demonstratie - Exemplaar (1995)(Philips)(NL)[!][aka Standaard Interactieve Encyclopedie][DVC].cue" size="224" crc="46e40e96" md5="0abc562ce869ef119a137d87518e7152"/>
 		-->
-		<description>Philips Media Interactieve Encyclopedie - Demonstratie - Exemplaar (Netherlands)[DVC]</description>
+		<description>Philips Media Interactieve Encyclopedie - Demonstratie - Exemplaar (Netherlands)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -8317,7 +8317,7 @@ license:CC0
 		<rom name="Philips Media Medische Encyclopedie (1996)(Philips)(NL)[!][DVC].iso" size="633633504" crc="590a15f4" md5="e026702bc43a0655d37229e556ba9cf9"/>
 		<rom name="Philips Media Medische Encyclopedie (1996)(Philips)(NL)[!][DVC].cue" size="152" crc="cc1f7be0" md5="0eb59e40bd2fdc90e42bb337ab66599f"/>
 		-->
-		<description>Philips Media Medische Encyclopedie (Netherlands)[DVC]</description>
+		<description>Philips Media Medische Encyclopedie (Netherlands)</description>
 		<year>1996</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -8366,7 +8366,7 @@ license:CC0
 		<rom name="Playboy - I Segreti Del Massaggio (1994)(Philips)(IT)[DVC].iso" size="667144800" crc="707ac483" md5="4786cd88b6c7b683e7a144984f22f7e1"/>
 		<rom name="Playboy - I Segreti Del Massaggio (1994)(Philips)(IT)[DVC].cue" size="147" crc="701d5ee9" md5="1272b0bfd5fb075f3d42b8204a82ce1e"/>
 		-->
-		<description>Playboy - I Segreti Del Massaggio (Italy)[DVC]</description>
+		<description>Playboy - I Segreti Del Massaggio (Italy)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -8383,7 +8383,7 @@ license:CC0
 		<rom name="Playboy's Complete Massage (1993)(Philips)(US)[!][DVC].iso" size="667674000" crc="3df205ee" md5="0aaa166ae5aa5ba7454c79e7bb28d3d4"/>
 		<rom name="Playboy's Complete Massage (1993)(Philips)(US)[!][DVC].cue" size="143" crc="ccd2cc32" md5="9874205981568e2259a18ad1e53bb3b5"/>
 		-->
-		<description>Playboy's Complete Massage (USA)[DVC]</description>
+		<description>Playboy's Complete Massage (USA)</description>
 		<year>1993</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -8512,7 +8512,7 @@ license:CC0
 		<rom name="Pyramid Adventures - Episode 1 - Treasures of the Lost Pyramid (1995)(Compact Disc Incorporated)(US)[!][DVC].iso" size="184707264" crc="41f63380" md5="892b6e7ba03d8e7d822d625e04392cc3"/>
 		<rom name="Pyramid Adventures - Episode 1 - Treasures of the Lost Pyramid (1995)(Compact Disc Incorporated)(US)[!][DVC].cue" size="197" crc="c0dc2578" md5="368667108b44b8a0ebcf396eaa1af9fc"/>
 		-->
-		<description>Pyramid Adventures - Episode 1 - Treasures of the Lost Pyramid (USA)[DVC]</description>
+		<description>Pyramid Adventures - Episode 1 - Treasures of the Lost Pyramid (USA)</description>
 		<year>1995</year>
 		<publisher>Compact Disc Incorporated</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -8565,7 +8565,7 @@ license:CC0
 		<rom name="Queen - Greatest Flix I & II (1994)(Queen Films)(EU)(Disc 2 of 2)(Track 17 of 17)[DVC].iso" size="12759600" crc="9bb04d7b" md5="d67e9322d3e8987ff026377c46a7d201"/>
 		<rom name="Queen - Greatest Flix I & II (1994)(Queen Films)(EU)(Disc 2 of 2)[DVC].cue" size="2943" crc="7b4b490e" md5="d0c196bda719adccc88bd3ba4236f58c"/>
 		-->
-		<description>Queen - Greatest Flix I &amp; II (Euro)[DVC]</description>
+		<description>Queen - Greatest Flix I &amp; II (Euro)</description>
 		<year>1994</year>
 		<publisher>Queen Films</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -9006,7 +9006,7 @@ license:CC0
 		<rom name="Rio '88 - Tina Turner (1988)(Philips - PolyGram)(PAL)(EU)(Disc 2 of 2)[!][DVC].iso" size="434649600" crc="0b775a59" md5="65bab2e5e13eb09c78435df73aba838b"/>
 		<rom name="Rio '88 - Tina Turner (1988)(Philips - PolyGram)(PAL)(EU)(Disc 2 of 2)[!][DVC].cue" size="167" crc="3f2da204" md5="a2e6c44c006904a29dfcad878bd5e8c7"/>
 		-->
-		<description>Rio '88 - Tina Turner (Euro)[DVC]</description>
+		<description>Rio '88 - Tina Turner (Euro)</description>
 		<year>19??</year>
 		<publisher>Philips ~ PolyGram</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -9221,7 +9221,7 @@ license:CC0
 		<rom name="Sciamo con Alberto Tomba - Let's Go Skiing With Alberto Tomba (1994)(Philips - VideoRAI)(EU)(en-it)[DVC][8100236V103 50461390 01].iso" size="672436800" crc="e776557b" md5="c60da8ee8a805a96d07a8d726917d348"/>
 		<rom name="Sciamo con Alberto Tomba - Let's Go Skiing With Alberto Tomba (1994)(Philips - VideoRAI)(EU)(en-it)[DVC][8100236V103 50461390 01].cue" size="218" crc="a0ee188f" md5="629bb20055b509de3d2549993e85b1b6"/>
 		-->
-		<description>Sciamo con Alberto Tomba - Let's Go Skiing With Alberto Tomba (Euro)[DVC][8100236V103 50461390 01]</description>
+		<description>Sciamo con Alberto Tomba - Let's Go Skiing With Alberto Tomba (Euro)[8100236V103 50461390 01]</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -9238,7 +9238,7 @@ license:CC0
 		<rom name="Sciamo con Alberto Tomba - Let's Go Skiing With Alberto Tomba (1994)(Philips - VideoRAI)(EU)(en-it)[DVC][991953100049 1445-A].iso" size="668556000" crc="6685600a" md5="31384eed3beddbb5e2cc1eadcfbacc80"/>
 		<rom name="Sciamo con Alberto Tomba - Let's Go Skiing With Alberto Tomba (1994)(Philips - VideoRAI)(EU)(en-it)[DVC][991953100049 1445-A].cue" size="214" crc="5105e95e" md5="e943b6d86b28aea60e3b899e96570705"/>
 		-->
-		<description>Sciamo con Alberto Tomba - Let's Go Skiing With Alberto Tomba (Euro)[DVC][991953100049 1445-A]</description>
+		<description>Sciamo con Alberto Tomba - Let's Go Skiing With Alberto Tomba (Euro)[991953100049 1445-A]</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -9255,7 +9255,7 @@ license:CC0
 		<rom name="Shari Lewis - Lamb Chop's Play-Along! - Action Songs (1993)(Philips)(US)[DVC].iso" size="324399600" crc="b1e011c4" md5="081e3326210f9ca0d12288d885a252ac"/>
 		<rom name="Shari Lewis - Lamb Chop's Play-Along! - Action Songs (1993)(Philips)(US)[DVC].cue" size="166" crc="7664970b" md5="ca4a5de325fbea76535858e10e2bac98"/>
 		-->
-		<description>Shari Lewis - Lamb Chop's Play-Along! - Action Songs (USA)[DVC]</description>
+		<description>Shari Lewis - Lamb Chop's Play-Along! - Action Songs (USA)</description>
 		<year>1993</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -9496,7 +9496,7 @@ license:CC0
 		<rom name="Sting - Ten Summoner's Tales (1994)(Philips)(EU)[!][DVC].iso" size="592527600" crc="2493087a" md5="1cc135eba7ae512d621dbbdeb3495889"/>
 		<rom name="Sting - Ten Summoner's Tales (1994)(Philips)(EU)[!][DVC].cue" size="145" crc="3364a87c" md5="4645cc539f49b4dd63de78a5076aa7e9"/>
 		-->
-		<description>Sting - Ten Summoner's Tales (Euro)[DVC]</description>
+		<description>Sting - Ten Summoner's Tales (Euro)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -9661,7 +9661,7 @@ license:CC0
 		<rom name="Tennis Our Way (1994)(Philips)(US)(Disc 3 of 3)[DVC].iso" size="591998400" crc="d61ca670" md5="a4c451da7795184ad662cc8bb94b6a35"/>
 		<rom name="Tennis Our Way (1994)(Philips)(US)(Disc 3 of 3)[DVC].cue" size="141" crc="53b1cd77" md5="5bb15b7ca57582fefce488729103310c"/>
 		-->
-		<description>Tennis Our Way (USA)[DVC]</description>
+		<description>Tennis Our Way (USA)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -9688,7 +9688,7 @@ license:CC0
 		<rom name="Thumbelina (1995)(Philips)(EU)[DVC].iso" size="474339600" crc="241f4e0e" md5="8cdc5e912448c42481df38cdef54081d"/>
 		<rom name="Thumbelina (1995)(Philips)(EU)[DVC].cue" size="124" crc="509e8a7a" md5="aaf250e69a6a1e938a119206b0a538b2"/>
 		-->
-		<description>Thumbelina (Euro)[DVC]</description>
+		<description>Thumbelina (Euro)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -10042,7 +10042,7 @@ license:CC0
 		<rom name="Total Euro 96 (1996)(Philips)(EU)[DVC].iso" size="463760304" crc="7a833180" md5="726d6bec7f6b837a4d65fc8e9ab5db2b"/>
 		<rom name="Total Euro 96 (1996)(Philips)(EU)[DVC].cue" size="127" crc="497df348" md5="da153a49e1649c9ca80f55c674c2a879"/>
 		-->
-		<description>Total Euro 96 (Euro)[DVC]</description>
+		<description>Total Euro 96 (Euro)</description>
 		<year>1996</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -10123,7 +10123,7 @@ license:CC0
 		<rom name="UEFA Champions League (1995)(Philips)(DE)[Season 1995-96][DVC].iso" size="745819200" crc="f53b199d" md5="7c2d7f1ea101f2acf581b603a1a624db"/>
 		<rom name="UEFA Champions League (1995)(Philips)(DE)[Season 1995-96][DVC].cue" size="151" crc="f6a8f958" md5="7acd6cdac087657496ea2d205abab0c8"/>
 		-->
-		<description>UEFA Champions League (Germany)[DVC]</description>
+		<description>UEFA Champions League (Germany)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -10140,7 +10140,7 @@ license:CC0
 		<rom name="UEFA Champions League (1995)(Philips)(NL)[Season 1995-96][DVC].iso" size="746524800" crc="c24f73c4" md5="5cf401eb670034c66530df38aaa0884b"/>
 		<rom name="UEFA Champions League (1995)(Philips)(NL)[Season 1995-96][DVC].cue" size="151" crc="75d258c8" md5="5e0618a47ccd7e62af502dcee13fd566"/>
 		-->
-		<description>UEFA Champions League (Netherlands)[DVC]</description>
+		<description>UEFA Champions League (Netherlands)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -10273,7 +10273,7 @@ license:CC0
 		<rom name="Video CD - Music Sampler (1995)(Philips - PolyGram)(EU)(Track 2 of 2)[DVC].iso" size="281033424" crc="d0f97e26" md5="ba6cad467a488b3b93a7f5835352ee25"/>
 		<rom name="Video CD - Music Sampler (1995)(Philips - PolyGram)(EU)[DVC].cue" size="324" crc="69694f23" md5="359e11f69ce734f53fdc2ce5892d5feb"/>
 		-->
-		<description>Video CD - Music Sampler (Euro)[DVC]</description>
+		<description>Video CD - Music Sampler (Euro)</description>
 		<year>1995</year>
 		<publisher>Philips ~ PolyGram</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -10450,7 +10450,7 @@ license:CC0
 		<rom name="World Tours - Egypt (1996)(Educational Management Group)(US)[DVC].iso" size="693604800" crc="bd8a56ea" md5="7efc49a81139b795c3f7800611ae2d23"/>
 		<rom name="World Tours - Egypt (1996)(Educational Management Group)(US)[DVC].cue" size="154" crc="658e505f" md5="86f17242d38025190126410229ff14f3"/>
 		-->
-		<description>World Tours - Egypt (USA)[DVC]</description>
+		<description>World Tours - Egypt (USA)</description>
 		<year>1996</year>
 		<publisher>Educational Management Group</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -10467,7 +10467,7 @@ license:CC0
 		<rom name="World Tours - Hong Kong (1995)(Educational Management Group)(US)[DVC].iso" size="656539632" crc="30d87227" md5="fa6a7ce6444059923ff7724181e97c5f"/>
 		<rom name="World Tours - Hong Kong (1995)(Educational Management Group)(US)[DVC].cue" size="158" crc="b845dfff" md5="9696ae5f8e9b044d52f6b0aaa3db15de"/>
 		-->
-		<description>World Tours - Hong Kong (USA)[DVC]</description>
+		<description>World Tours - Hong Kong (USA)</description>
 		<year>1995</year>
 		<publisher>Educational Management Group</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -10484,7 +10484,7 @@ license:CC0
 		<rom name="World Tours - New Zealand (1995)(Educational Management Group)(US)[DVC].iso" size="689371200" crc="0b84bbaf" md5="eef978704e8c9a40367986135f796706"/>
 		<rom name="World Tours - New Zealand (1995)(Educational Management Group)(US)[DVC].cue" size="160" crc="4d01da27" md5="47ee0baccae809eb1fcfcb83e715bdd3"/>
 		-->
-		<description>World Tours - New Zealand (USA)[DVC]</description>
+		<description>World Tours - New Zealand (USA)</description>
 		<year>1995</year>
 		<publisher>Educational Management Group</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -10501,7 +10501,7 @@ license:CC0
 		<rom name="World Tours - Pacific Islands (1996)(Educational Management Group)(US)[DVC].iso" size="768222000" crc="8db85a06" md5="d1b262d859cd64305789303cb6f8c04a"/>
 		<rom name="World Tours - Pacific Islands (1996)(Educational Management Group)(US)[DVC].cue" size="164" crc="5b671ba7" md5="46cadc91f12673a60262ef7021ee735f"/>
 		-->
-		<description>World Tours - Pacific Islands (USA)[DVC]</description>
+		<description>World Tours - Pacific Islands (USA)</description>
 		<year>1996</year>
 		<publisher>Educational Management Group</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -10518,7 +10518,7 @@ license:CC0
 		<rom name="World Tours - The Amazon Rainforest (1995)(Educational Management Group)(US)[DVC].iso" size="664322400" crc="f7da23b0" md5="16d9d147f67176022897b236db53fafd"/>
 		<rom name="World Tours - The Amazon Rainforest (1995)(Educational Management Group)(US)[DVC].cue" size="170" crc="44769423" md5="53052d210bc334bd9e32325ea52c4d26"/>
 		-->
-		<description>World Tours - The Amazon Rainforest (USA)[DVC]</description>
+		<description>World Tours - The Amazon Rainforest (USA)</description>
 		<year>1995</year>
 		<publisher>Educational Management Group</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -10535,7 +10535,7 @@ license:CC0
 		<rom name="World Tours - West Africa (1994)(Educational Management Group)(US)[DVC].iso" size="645099504" crc="89c51331" md5="891f31076c8992789e116fd2859ebfb1"/>
 		<rom name="World Tours - West Africa (1994)(Educational Management Group)(US)[DVC].cue" size="160" crc="a0e7e62b" md5="7669c3f883d109dc187c8cd045050f3f"/>
 		-->
-		<description>World Tours - West Africa (USA)[DVC]</description>
+		<description>World Tours - West Africa (USA)</description>
 		<year>1994</year>
 		<publisher>Educational Management Group</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -10552,7 +10552,7 @@ license:CC0
 		<rom name="Xplora 1 - Peter Gabriel's Secret World (1995)(Philips)(EU)[!][DVC].iso" size="721770000" crc="998c9e66" md5="d3378df2317b3e385d7cc62b22be9caa"/>
 		<rom name="Xplora 1 - Peter Gabriel's Secret World (1995)(Philips)(EU)[!][DVC].cue" size="156" crc="24023846" md5="6516d34b088d69736d3a257071178ec6"/>
 		-->
-		<description>Xplora 1 - Peter Gabriel's Secret World (Euro)[DVC]</description>
+		<description>Xplora 1 - Peter Gabriel's Secret World (Euro)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -10673,7 +10673,7 @@ license:CC0
 		<rom name="voyeur ii (v1.04)(11-06-96)(testing-beta)(access code 3333) (disc2).bin" size="595354704" crc="8024edf4" sha1="ba86e8850304afb918e2a4c7411e8648b3f90a4a" offset="0" />
 		<rom name="voyeur ii (v1.04)(11-06-96)(testing-beta)(access code 3333) (disc2).cue" size="133" crc="7cc698ee" sha1="3622939d9c37f43749907cc964cc4738e58ad3b7" offset="0" />
 		-->
-		<description>Voyeur II (Prototype v1.04, 19960611)[DVC]</description>
+		<description>Voyeur II (Prototype v1.04, 19960611)</description>
 		<year>1996</year>
 		<publisher>Philips</publisher>
 		<info name="usage" value="Access code 3333" />
