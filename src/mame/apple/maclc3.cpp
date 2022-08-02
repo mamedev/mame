@@ -29,6 +29,7 @@
 #include "egret.h"
 #include "macadb.h"
 #include "macscsi.h"
+#include "mactoolbox.h"
 #include "sonora.h"
 
 #include "emupal.h"
@@ -213,6 +214,7 @@ INPUT_PORTS_END
 void macvail_state::maclc3_base(machine_config &config)
 {
 	M68030(config, m_maincpu, 25000000);
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("4M");

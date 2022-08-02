@@ -11,7 +11,9 @@
 
 #include "emu.h"
 
+#include "macadb.h"
 #include "macrtc.h"
+#include "mactoolbox.h"
 
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/cards.h"
@@ -20,7 +22,6 @@
 #include "machine/6522via.h"
 #include "machine/applefdintf.h"
 #include "machine/dp83932c.h"
-#include "macadb.h"
 #include "machine/ncr5390.h"
 #include "machine/nscsi_bus.h"
 #include "machine/ram.h"
@@ -912,6 +913,7 @@ void macquadra_state::macqd700(machine_config &config)
 	/* basic machine hardware */
 	M68040(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &macquadra_state::quadra700_map);
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(75.08);
