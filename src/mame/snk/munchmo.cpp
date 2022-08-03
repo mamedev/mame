@@ -127,10 +127,12 @@ void munchmo_state::palette(palette_device &palette) const
 
 	for (int i = 0; i < palette.entries(); i++)
 	{
+		int bit0, bit1, bit2;
+
 		// red component
-		int bit0 = BIT(color_prom[i], 0);
-		int bit1 = BIT(color_prom[i], 1);
-		int bit2 = BIT(color_prom[i], 2);
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
 		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		// green component
@@ -171,7 +173,7 @@ void munchmo_state::video_start()
 
 void munchmo_state::draw_status(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gfx_element *gfx = m_gfxdecode->gfx(0);
+	gfx_element *const gfx = m_gfxdecode->gfx(0);
 
 	for (int row = 0; row < 4; row++)
 	{
@@ -198,13 +200,13 @@ void munchmo_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipr
 {
 // ROM B1.2C contains 256 tilemaps defining 4x4 configurations of the tiles in ROM B2.2B
 
-	gfx_element *gfx = m_gfxdecode->gfx(1);
+	gfx_element *const gfx = m_gfxdecode->gfx(1);
 
 	for (int offs = 0; offs < 0x100; offs++)
 	{
-		int sy = (offs % 16) * 32;
-		int sx = (offs / 16) * 32;
-		int tile_number = m_videoram[offs];
+		int const sy = (offs % 16) * 32;
+		int const sx = (offs / 16) * 32;
+		int const tile_number = m_videoram[offs];
 
 		for (int row = 0; row < 4; row++)
 		{
@@ -219,32 +221,30 @@ void munchmo_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipr
 		}
 	}
 
-	{
-		int scrollx = -(m_vreg[2] *2 + (m_vreg[3] >> 7)) - 64 - 128 - 16;
-		int scrolly = 0;
+	int const scrollx = -(m_vreg[2] *2 + (m_vreg[3] >> 7)) - 64 - 128 - 16;
+	int const scrolly = 0;
 
-		copyscrollbitmap(bitmap, *m_tmpbitmap, 1, &scrollx, 1, &scrolly, cliprect);
-	}
+	copyscrollbitmap(bitmap, *m_tmpbitmap, 1, &scrollx, 1, &scrolly, cliprect);
 }
 
 void munchmo_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int scroll = m_vreg[2];
-	int flags = m_vreg[3];                           //   XB??????
-	int xadjust = - 128 - 16 - ((flags & 0x80) ? 1 : 0);
-	int bank = (flags & 0x40) ? 1 : 0;
-	gfx_element *gfx = m_gfxdecode->gfx(2 + bank);
-	int color_base = m_palette_bank * 4 + 3;
-	int firstsprite = m_vreg[0] & 0x3f;
+	int const scroll = m_vreg[2];
+	int const flags = m_vreg[3];                            //   XB??????
+	int const xadjust = - 128 - 16 - ((flags & 0x80) ? 1 : 0);
+	int const bank = (flags & 0x40) ? 1 : 0;
+	gfx_element *const gfx = m_gfxdecode->gfx(2 + bank);
+	int const color_base = m_palette_bank * 4 + 3;
+	int const firstsprite = m_vreg[0] & 0x3f;
 	for (int i = firstsprite; i < firstsprite + 0x40; i++)
 	{
 		for (int j = 0; j < 8; j++)
 		{
-			int offs = (j << 6) | (i & 0x3f);
-			int tile_number = m_sprite_tile[offs];       //   ETTTTTTT
-			int attributes = m_sprite_attr[offs];        //   XYYYYYCC
-			int sx = m_sprite_xpos[offs];                //   XXXXXXX?
-			int sy = (offs >> 6) << 5;                  // Y YY------
+			int const offs = (j << 6) | (i & 0x3f);
+			int const tile_number = m_sprite_tile[offs];    //   ETTTTTTT
+			int const attributes = m_sprite_attr[offs];     //   XYYYYYCC
+			int sx = m_sprite_xpos[offs];                   //   XXXXXXX?
+			int sy = (offs >> 6) << 5;                      // Y YY------
 			sy += (attributes >> 2) & 0x1f;
 			if (attributes & 0x80)
 			{
@@ -253,7 +253,7 @@ void munchmo_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 					gfx->transpen(bitmap, cliprect,
 					0x7f - (tile_number & 0x7f),
 					color_base - (attributes & 0x03),
-					0, 0,                            // no flip
+					0, 0,                                   // no flip
 					sx, sy, 7);
 			}
 		}

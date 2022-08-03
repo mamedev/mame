@@ -36,7 +36,7 @@ protected:
 
 private:
 	// state specific to interface with TMS5100
-	u16  m_r_prev;
+	u32  m_r_prev;
 	u8   m_chipsel;
 	u8   m_ctl_out;
 	u8   m_ctl_dir;

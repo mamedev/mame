@@ -46,8 +46,13 @@ ioport_constructor a26_rom_cm_device::device_input_ports() const
 }
 
 
+void a26_rom_cm_device::install_memory_handlers(address_space *space)
+{
+	space->install_read_handler(0x1000, 0x1fff, read8sm_delegate(*this, FUNC(a26_rom_cm_device::read)));
+}
 
-uint8_t a26_rom_cm_device::read_rom(offs_t offset)
+
+uint8_t a26_rom_cm_device::read(offs_t offset)
 {
 	return m_rom[offset + (m_base_bank * 0x1000)];
 }

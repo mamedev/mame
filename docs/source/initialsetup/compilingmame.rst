@@ -12,44 +12,67 @@ All Platforms
   support building with GCC version 7.2 or later and clang version 6 or
   later.  MAME should run with GNU libstdc++ version 7.2 or later.
 
-* Whenever you are changing build parameters, (such as switching between
-  a SDL-based build and a native Windows renderer one, or adding tools
-  to the compile list) you need to run a **make REGENIE=1** to allow the
-  settings to be regenerated.  Failure to do this will cause you very
+* Whenever you are changing build parameters, (for example changing
+  optimisation settings, or adding tools to the compile list), or system
+  drivers sources are added, removed, or renamed, the project files need
+  to be regenerated.  You can do this by adding **REGENIE=1** to the
+  make arguments, or updating the modification time of the makefile (for
+  example using the **touch** command).  Failure to do this may cause
   difficult to troubleshoot problems.
 
 * If you want to add various additional tools to the compile, such as
   *chdman*, add a **TOOLS=1** to your make command, like
   **make REGENIE=1 TOOLS=1**
 
-* You can do driver specific builds by using *SOURCES=<driver>* in your
-  make command.  For instance, building Pac-Man by itself would be
-  **make SOURCES=src/mame/drivers/pacman.cpp REGENIE=1** including the
-  necessary *REGENIE* for rebuilding the settings.
+* You can build an emulator for a subset of the systems supported by
+  MAME by using *SOURCES=<driver>,...* in your make command.  For
+  example
+  **make SUBTARGET=pacem SOURCES=src/mame/pacman/pacman.cpp REGENIE=1**
+  would build an emulator called *pacem* including the system drivers
+  from the source file pacman.cpp (*REGENIE=1* is specified to ensure
+  project files are regenerated).  You can specify folders to include
+  their entire contents, and you can separate multiple files/folders
+  with commas.  You can also omit the *src/mame/* prefix in many cases.
 
-* Speeding up the compilation can be done by using more cores from your
-  CPU.  This is done with the **-j** parameter.  *Note: a good number to
-  start with is the total number of CPU cores in your system plus one.
-  An excessive number of concurrent jobs may increase compilation time.
-  The optimal number depends on many factors, including number of CPU
-  cores, available RAM, disk and filesystem performance, and memory
-  bandwidth.* For instance, **make -j5** is a good starting point on a
-  system with a quad-core CPU.
+  If you encounter linking errors after changing the included sources,
+  delete the static libraries for the subtarget from the build folder.
+  For the previous example on Windows using GCC, these would be in
+  *build/mingw-gcc/bin/x64/Release/mame_pacem* by default.
+
+* On a system with multiple CPU cores, compilation can be sped up by
+  compiling multiple source files in parallel.  This is done with the
+  **-j** parameter.  For instance, **make -j5** is a good starting point
+  on a system with a quad-core CPU.
+
+  *Note: a good number to start with is the total number of CPU cores
+  in your system plus one.  An excessive number of concurrent jobs will
+  increase compilation time, particularly if the compiler jobs exhaust
+  available memory.  The optimal number depends on many factors,
+  including number of CPU cores, available RAM, disk and filesystem
+  performance, and memory bandwidth.*
 
 * Debugging information can be added to a compile using *SYMBOLS=1*
   though most users will not want or need to use this.  This increases
-  compile time and disk space used.
+  compile time and disk space used.  Note that a full build of MAME
+  including internal debugging symbols will exceed the maximum size for
+  an executable on Windows, and will not be possible to run without
+  first stripping the symbols.
 
 Putting all of these together, we get a couple of examples:
-
-Rebuilding MAME for just the Pac-Man driver, with tools, on a quad-core
-(e.g. i5 or i7) machine::
-
-    make SOURCES=src/mame/drivers/pacman.cpp TOOLS=1 REGENIE=1 -j5
 
 Rebuilding MAME on a dual-core (e.g. i3 or laptop i5) machine::
 
     make -j3
+
+Rebuilding MAME for just the Pac-Man and Galaxian families of systems,
+with tools, on a quad-core (e.g. i5 or i7) machine::
+
+    make SUBTARGET=pacem SOURCES=src/mame/pacman,src/mame/galaxian TOOLS=1 REGENIE=1 -j5
+
+Rebuilding MAME for just the Apple II systems, compiling up to six
+sources in parallel::
+
+    make SUBTARGET=appulator SOURCES=apple/apple2.cpp,apple/apple2e.cpp,apple/apple2gs.cpp REGENIE=1 -j6
 
 
 .. _compiling-windows:
@@ -470,160 +493,193 @@ Overall build options
 ~~~~~~~~~~~~~~~~~~~~~
 
 PREFIX_MAKEFILE
-   Name of a makefile to include for additional options if found (defaults to
-   **useroptions.mak**).  May be useful if you want to quickly switch between
-   different build configurations.
+    Name of a makefile to include for additional options if found (defaults to
+    **useroptions.mak**).  May be useful if you want to quickly switch between
+    different build configurations.
 BUILDDIR
-   Set to change the name of the subfolder used for project files, generated
-   sources, object files, and intermediate libraries (defaults to **build**).
+    Set to change the name of the subfolder used for project files, generated
+    sources, object files, and intermediate libraries (defaults to **build**).
 REGENIE
-   Set to **1** to force project files to be regenerated.
+    Set to **1** to force project files to be regenerated.
 VERBOSE
-   Set to **1** to show full commands when using GNU make as the build tool.
-   This option applies immediately without needing regenerate project files.
+    Set to **1** to show full commands when using GNU make as the build tool.
+    This option applies immediately without needing regenerate project files.
 IGNORE_GIT
-   Set to **1** to skip the working tree scan and not attempt to embed a git
-   revision description in the version string.
+    Set to **1** to skip the working tree scan and not attempt to embed a git
+    revision description in the version string.
 
 Tool locations
 ~~~~~~~~~~~~~~
 
 OVERRIDE_CC
-   Set the C/Objective-C compiler command.  (This sets the target C compiler
-   command when cross-compiling.)
+    Set the C/Objective-C compiler command.  (This sets the target C compiler
+    command when cross-compiling.)
 OVERRIDE_CXX
-   Set the C++/Objective-C++ compiler command.  (This sets the target C++
-   compiler command when cross-compiling.)
+    Set the C++/Objective-C++ compiler command.  (This sets the target C++
+    compiler command when cross-compiling.)
 OVERRIDE_LD
-   Set the linker command.  This is often not necessary or useful because the C
-   or C++ compiler command is used to invoke the linker.  (This sets the target
-   linker command when cross-compiling.)
+    Set the linker command.  This is often not necessary or useful because the C
+    or C++ compiler command is used to invoke the linker.  (This sets the target
+    linker command when cross-compiling.)
 PYTHON_EXECUTABLE
-   Set the Python interpreter command.  You need Python 3.2 or later to build
-   MAME.
+    Set the Python interpreter command.  You need Python 3.2 or later to build
+    MAME.
 CROSS_BUILD
-   Set to **1** to use separate host and target compilers and linkers, as
-   required for cross-compilation.  In this case, **OVERRIDE_CC**,
-   **OVERRIDE_CXX** and **OVERRIDE_LD** set the target C compiler, C++ compiler
-   and linker commands, while **CC**, **CXX** and **LD** set the host C
-   compiler, C++ compiler and linker commands.
+    Set to **1** to use separate host and target compilers and linkers, as
+    required for cross-compilation.  In this case, **OVERRIDE_CC**,
+    **OVERRIDE_CXX** and **OVERRIDE_LD** set the target C compiler, C++ compiler
+    and linker commands, while **CC**, **CXX** and **LD** set the host C
+    compiler, C++ compiler and linker commands.
+
+Including subsets of supported systems
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+SUBTARGET
+    Set emulator subtarget to build.  Some pre-defined subtargets are provided,
+    using Lua scripts in *scripts/target/mame* and system driver filter files in
+    *src/mame*.  User-defined substargets can be created using the **SOURCES**
+    or **SOURCEFILTER** option.
+SOURCES
+    Specify system driver source files and/or folders to include.  Usually used
+    in conjunction with the **SUBTARGET** option.  Separate multiple
+    files/folders with commas.
+SOURCEFILTER
+    Specify a system driver filter file.  Usually used in conjunction with the
+    **SUBTARGET** option.  The filter file can specify source files to include
+    system drivers from, and individual system drivers to include or exclude.
+    There are some example system driver filter files in the *src/mame* folder.
 
 Optional features
 ~~~~~~~~~~~~~~~~~
 
 TOOLS
-   Set to **1** to build additional tools along with the emulator, including
-   **unidasm**, **chdman**, **romcmp**, and **srcclean**.
+    Set to **1** to build additional tools along with the emulator, including
+    **unidasm**, **chdman**, **romcmp**, and **srcclean**.
+NO_OPENGL
+    Set to **1** to disable building the OpenGL video output module.
 NO_USE_PORTAUDIO
-   Set to **1** to disable building the PortAudio sound output module.
+    Set to **1** to disable building the PortAudio sound output module and the
+    PortAudio library.
+NO_USE_PULSEAUDIO
+    Set to **1** to disable building the PulseAudio sound output module on
+    Linux.
+USE_TAPTUN
+    Set to **1** to include the tap/tun network module, or set to **0** to
+    disable building the tap/tun network module.  The tap/tun network module is
+    included by default on Windows and Linux.
+USE_PCAP
+    Set to **1** to include the pcap network module, or set to **0** to disable
+    building the pcap network module.  The pcap network module is included by
+    default on macOS and NetBSD.
 USE_QTDEBUG
-   Set to **1** to include the Qt debugger on platforms where it’s not built by
-   default (e.g. Windows or macOS), or to **0** to disable it.  You’ll need to
-   install Qt development libraries and tools to build the Qt debugger.  The
-   process depends on the platform.
+    Set to **1** to include the Qt debugger on platforms where it’s not built by
+    default (e.g. Windows or macOS), or to **0** to disable it.  You’ll need to
+    install Qt development libraries and tools to build the Qt debugger.  The
+    process depends on the platform.
 
 Compilation options
 ~~~~~~~~~~~~~~~~~~~
 
 NOWERROR
-   Set to **1** to disable treating compiler warnings as errors.  This may be
-   needed in marginally supported configurations.
+    Set to **1** to disable treating compiler warnings as errors.  This may be
+    needed in marginally supported configurations.
 DEPRECATED
-   Set to **0** to disable deprecation warnings (note that deprecation warnings
-   are not treated as errors).
+    Set to **0** to disable deprecation warnings (note that deprecation warnings
+    are not treated as errors).
 DEBUG
-   Set to **1** to enable runtime assertion checks and additional diagnostics.
-   Note that this has a performance cost, and is most useful for developers.
+    Set to **1** to enable runtime assertion checks and additional diagnostics.
+    Note that this has a performance cost, and is most useful for developers.
 OPTIMIZE
-   Set optimisation level.  The default is **3** to favour performance at the
-   expense of larger executable size.  Set to **0** to disable optimisation (can
-   make debugging easier), **1** for basic optimisation that doesn’t have a
-   space/speed trade-off and doesn’t have a large impact on compile time, **2**
-   to enable most optimisation that improves performance and reduces size, or
-   **s** to enable only optimisations that generally don’t increase executable
-   size.  The exact set of supported values depends on your compiler.
+    Set optimisation level.  The default is **3** to favour performance at the
+    expense of larger executable size.  Set to **0** to disable optimisation
+    (can make debugging easier), **1** for basic optimisation that doesn’t have
+    a space/speed trade-off and doesn’t have a large impact on compile time,
+    **2** to enable most optimisation that improves performance and reduces
+    size, or **s** to enable only optimisations that generally don’t increase
+    executable size.  The exact set of supported values depends on your
+    compiler.
 SYMBOLS
-   Set to **1** to include additional debugging symbols over the default for the
-   target platform (many target platforms include function name symbols by
-   default).
+    Set to **1** to include additional debugging symbols over the default for
+    the target platform (many target platforms include function name symbols by
+    default).
 SYMLEVEL
-   Numeric value that controls the level of detail in debugging symbols.  Higher
-   numbers make debugging easier at the cost of increased build time and
-   executable size.  The supported values depend on your compiler.  For GCC and
-   similar compilers, **1** includes line number tables and external variables,
-   **2** also includes local variables, and **3** also includes macro
-   definitions.
+    Numeric value that controls the level of detail in debugging symbols.
+    Higher numbers make debugging easier at the cost of increased build time and
+    executable size.  The supported values depend on your compiler.  For GCC and
+    similar compilers, **1** includes line number tables and external variables,
+    **2** also includes local variables, and **3** also includes macro
+    definitions.
 ARCHOPTS
-   Additional command-line options to pass to the compiler and linker.  This is
-   useful for supplying code generation or ABI options, for example to enable
-   support for optional CPU features.
+    Additional command-line options to pass to the compiler and linker.  This is
+    useful for supplying code generation or ABI options, for example to enable
+    support for optional CPU features.
 ARCHOPTS_C
-   Additional command-line options to pass to the compiler when compiling C
-   source files.
+    Additional command-line options to pass to the compiler when compiling C
+    source files.
 ARCHOPTS_CXX
-   Additional command-line options to pass to the compiler when compiling C++
-   source files.
+    Additional command-line options to pass to the compiler when compiling C++
+    source files.
 ARCHOPTS_OBJC
-   Additional command-line options to pass to the compiler when compiling
-   Objective-C source files.
+    Additional command-line options to pass to the compiler when compiling
+    Objective-C source files.
 ARCHOPTS_OBJCXX
-   Additional command-line options to pass to the compiler when compiling
-   Objective-C++ source files.
+    Additional command-line options to pass to the compiler when compiling
+    Objective-C++ source files.
 
 Library/framework locations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 SDL_INSTALL_ROOT
-   SDL installation root directory for shared library style SDL.
+    SDL installation root directory for shared library style SDL.
 SDL_FRAMEWORK_PATH
-   Search path for SDL framework.
+    Search path for SDL framework.
 USE_LIBSDL
-   Set to **1** to use shared library style SDL on targets where framework is
-   default.
+    Set to **1** to use shared library style SDL on targets where framework is
+    default.
 USE_SYSTEM_LIB_ASIO
-   Set to **1** to prefer the system installation of the Asio C++ asynchronous
-   I/O library over the version provided with the MAME source.
+    Set to **1** to prefer the system installation of the Asio C++ asynchronous
+    I/O library over the version provided with the MAME source.
 USE_SYSTEM_LIB_EXPAT
-   Set to **1** to prefer the system installation of the Expat XML parser
-   library over the version provided with the MAME source.
+    Set to **1** to prefer the system installation of the Expat XML parser
+    library over the version provided with the MAME source.
 USE_SYSTEM_LIB_ZLIB
-   Set to **1** to prefer the system installation of the zlib data compression
-   library over the version provided with the MAME source.
+    Set to **1** to prefer the system installation of the zlib data compression
+    library over the version provided with the MAME source.
 USE_SYSTEM_LIB_JPEG
-   Set to **1** to prefer the system installation of the libjpeg image
-   compression library over the version provided with the MAME source.
+    Set to **1** to prefer the system installation of the libjpeg image
+    compression library over the version provided with the MAME source.
 USE_SYSTEM_LIB_FLAC
-   Set to **1** to prefer the system installation of the libFLAC audio
-   compression library over the version provided with the MAME source.
+    Set to **1** to prefer the system installation of the libFLAC audio
+    compression library over the version provided with the MAME source.
 USE_SYSTEM_LIB_LUA
-   Set to **1** to prefer the system installation of the embedded Lua
-   interpreter over the version provided with the MAME source.
+    Set to **1** to prefer the system installation of the embedded Lua
+    interpreter over the version provided with the MAME source.
 USE_SYSTEM_LIB_SQLITE3
-   Set to **1** to prefer the system installation of the SQLITE embedded
-   database engine over the version provided with the MAME source.
+    Set to **1** to prefer the system installation of the SQLITE embedded
+    database engine over the version provided with the MAME source.
 USE_SYSTEM_LIB_PORTMIDI
-   Set to **1** to prefer the system installation of the PortMidi library over
-   the version provided with the MAME source.
+    Set to **1** to prefer the system installation of the PortMidi library over
+    the version provided with the MAME source.
 USE_SYSTEM_LIB_PORTAUDIO
-   Set to **1** to prefer the system installation of the PortAudio library over
-   the version provided with the MAME source.
+    Set to **1** to prefer the system installation of the PortAudio library over
+    the version provided with the MAME source.
 USE_BUNDLED_LIB_SDL2
-   Set to **1** to prefer the version of SDL provided with the MAME source over
-   the system installation.  (This is enabled by default for Visual Studio and
-   Android builds.  For other configurations, the system installation of SDL is
-   preferred.)
+    Set to **1** to prefer the version of SDL provided with the MAME source over
+    the system installation.  (This is enabled by default for Visual Studio and
+    Android builds.  For other configurations, the system installation of SDL is
+    preferred.)
 USE_SYSTEM_LIB_UTF8PROC
-   Set to **1** to prefer the system installation of the Julia utf8proc library
-   over the version provided with the MAME source.
+    Set to **1** to prefer the system installation of the Julia utf8proc library
+    over the version provided with the MAME source.
 USE_SYSTEM_LIB_GLM
-   Set to **1** to prefer the system installation of the GLM OpenGL Mathematics
-   library over the version provided with the MAME source.
+    Set to **1** to prefer the system installation of the GLM OpenGL Mathematics
+    library over the version provided with the MAME source.
 USE_SYSTEM_LIB_RAPIDJSON
-   Set to **1** to prefer the system installation of the Tencent RapidJSON
-   library over the version provided with the MAME source.
+    Set to **1** to prefer the system installation of the Tencent RapidJSON
+    library over the version provided with the MAME source.
 USE_SYSTEM_LIB_PUGIXML
-   Set to **1** to prefer the system installation of the pugixml library over
-   the version provided with the MAME source.
+    Set to **1** to prefer the system installation of the pugixml library over
+    the version provided with the MAME source.
 
 
 .. _compiling-issues:

@@ -32,6 +32,7 @@
 #include "rmnimbus.h"
 
 #include "debugger.h"
+#include "debug/debugcmd.h"
 #include "debug/debugcon.h"
 
 #include <functional>
@@ -623,12 +624,13 @@ void rmnimbus_state::change_palette(uint8_t bank, uint16_t colours)
 	}
 }
 
-void rmnimbus_state::video_debug(const std::vector<std::string> &params)
+void rmnimbus_state::video_debug(const std::vector<std::string_view> &params)
 {
 	if (params.size() > 0)
 	{
-		int temp;
-		sscanf(params[0].c_str(), "%d", &temp);
+		uint64_t temp;
+		if (!machine().debugger().commands().validate_number_parameter(params[0], temp))
+			return;
 		m_debug_video = temp;
 	}
 	else

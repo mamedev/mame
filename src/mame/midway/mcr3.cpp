@@ -107,6 +107,7 @@
 #include "mcr3.h"
 
 #include "machine/nvram.h"
+#include "machine/rescap.h"
 
 #include "speaker.h"
 
@@ -396,7 +397,7 @@ uint8_t mcrsc_csd_state::spyhunt_ip1_r()
 uint8_t mcrsc_csd_state::spyhunt_ip2_r()
 {
 	/* multiplexed steering wheel/gas pedal */
-	return ioport(m_input_mux ? "ssio:IP2.ALT" : "ssio:IP2")->read();
+	return m_analog_inputs[m_input_mux]->read();
 }
 
 
@@ -406,7 +407,9 @@ void mcrsc_csd_state::spyhunt_op4_w(uint8_t data)
 	/* (and for toggling the lamps and muxing the analog inputs) */
 
 	/* mux select is in bit 7 */
-	m_input_mux = (data >> 7) & 1;
+	m_input_mux = BIT(data, 7);
+	m_adc->rd_w(BIT(data, 6));
+	m_adc->wr_w(BIT(data, 6));
 
 	/*
 	    Lamp Driver:
@@ -445,9 +448,9 @@ uint8_t mcrsc_csd_state::turbotag_ip2_r()
 {
 	/* multiplexed steering wheel/gas pedal */
 	if (m_input_mux)
-		return ioport("ssio:IP2.ALT")->read();
+		return m_analog_inputs[1]->read();
 
-	return ioport("ssio:IP2")->read() + 5 * (m_screen->frame_number() & 1);
+	return m_analog_inputs[0]->read() + 5 * (m_screen->frame_number() & 1);
 }
 
 
@@ -1198,6 +1201,21 @@ void mcrsc_csd_state::mcrsc_csd(machine_config &config)
 	m_lamplatch->q_out_cb<5>().set_output("lamp5");
 	m_lamplatch->q_out_cb<6>().set_output("lamp6");
 	m_lamplatch->q_out_cb<7>().set_output("lamp7");
+
+	ADC0804(config, m_adc, RES_K(10), CAP_P(150)); // U2 on Absolute Position Board
+	m_adc->set_rd_mode(adc0804_device::RD_BITBANGED);
+}
+
+void mcrsc_csd_state::spyhunt(machine_config &config)
+{
+	mcrsc_csd(config);
+	m_adc->vin_callback().set(FUNC(mcrsc_csd_state::spyhunt_ip2_r));
+}
+
+void mcrsc_csd_state::turbotag(machine_config &config)
+{
+	mcrsc_csd(config);
+	m_adc->vin_callback().set(FUNC(mcrsc_csd_state::turbotag_ip2_r));
 }
 
 
@@ -1627,7 +1645,7 @@ void mcrsc_csd_state::init_spyhunt()
 {
 	mcr_common_init();
 	m_ssio->set_custom_input(1, 0x60, *this, FUNC(mcrsc_csd_state::spyhunt_ip1_r));
-	m_ssio->set_custom_input(2, 0xff, *this, FUNC(mcrsc_csd_state::spyhunt_ip2_r));
+	m_ssio->set_custom_input(2, 0xff, *m_adc, FUNC(adc0804_device::read));
 	m_ssio->set_custom_output(4, 0xff, *this, FUNC(mcrsc_csd_state::spyhunt_op4_w));
 
 	m_spyhunt_sprite_color_mask = 0x00;
@@ -1649,7 +1667,7 @@ void mcrsc_csd_state::init_turbotag()
 {
 	mcr_common_init();
 	m_ssio->set_custom_input(1, 0x60, *this, FUNC(mcrsc_csd_state::spyhunt_ip1_r));
-	m_ssio->set_custom_input(2, 0xff, *this, FUNC(mcrsc_csd_state::turbotag_ip2_r));
+	m_ssio->set_custom_input(2, 0xff, *m_adc, FUNC(adc0804_device::read));
 	m_ssio->set_custom_output(4, 0xff, *this, FUNC(mcrsc_csd_state::spyhunt_op4_w));
 
 	m_spyhunt_sprite_color_mask = 0x00;
@@ -1680,7 +1698,7 @@ GAME(  1986, powerdrv, 0,        mono_sg,   powerdrv, mcr3_state, init_powerdrv,
 GAME(  1987, stargrds, 0,        mono_sg,   stargrds, mcr3_state, init_stargrds, ROT0,  "Bally Midway", "Star Guards", MACHINE_SUPPORTS_SAVE )
 
 /* MCR scrolling games */
-GAMEL( 1983, spyhunt,  0,        mcrsc_csd, spyhunt,  mcrsc_csd_state, init_spyhunt,  ROT90, "Bally Midway", "Spy Hunter", MACHINE_SUPPORTS_SAVE, layout_spyhunt )
-GAMEL( 1983, spyhuntp, spyhunt,  mcrsc_csd, spyhunt,  mcrsc_csd_state, init_spyhunt,  ROT90, "Bally Midway (Playtronic license)", "Spy Hunter (Playtronic license)", MACHINE_SUPPORTS_SAVE, layout_spyhunt )
+GAMEL( 1983, spyhunt,  0,        spyhunt,   spyhunt,  mcrsc_csd_state, init_spyhunt,  ROT90, "Bally Midway", "Spy Hunter", MACHINE_SUPPORTS_SAVE, layout_spyhunt )
+GAMEL( 1983, spyhuntp, spyhunt,  spyhunt,   spyhunt,  mcrsc_csd_state, init_spyhunt,  ROT90, "Bally Midway (Playtronic license)", "Spy Hunter (Playtronic license)", MACHINE_SUPPORTS_SAVE, layout_spyhunt )
 GAME(  1984, crater,   0,        mcrscroll, crater,   mcr3_state,      init_crater,   ORIENTATION_FLIP_X, "Bally Midway", "Crater Raider", MACHINE_SUPPORTS_SAVE )
-GAMEL( 1985, turbotag, 0,        mcrsc_csd, turbotag, mcrsc_csd_state, init_turbotag, ROT90, "Bally Midway", "Turbo Tag (prototype)", MACHINE_SUPPORTS_SAVE, layout_turbotag )
+GAMEL( 1985, turbotag, 0,        turbotag,  turbotag, mcrsc_csd_state, init_turbotag, ROT90, "Bally Midway", "Turbo Tag (prototype)", MACHINE_SUPPORTS_SAVE, layout_turbotag )

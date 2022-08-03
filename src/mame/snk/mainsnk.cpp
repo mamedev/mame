@@ -186,10 +186,12 @@ void mainsnk_state::palette(palette_device &palette) const
 
 	for (int i = 0; i < num_colors; i++)
 	{
-		int bit0 = BIT(color_prom[i + 2*num_colors], 3);
-		int bit1 = BIT(color_prom[i], 1);
-		int bit2 = BIT(color_prom[i], 2);
-		int bit3 = BIT(color_prom[i], 3);
+		int bit0, bit1, bit2, bit3;
+
+		bit0 = BIT(color_prom[i + 2*num_colors], 3);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		bit3 = BIT(color_prom[i], 3);
 		int const r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		bit0 = BIT(color_prom[i + 2*num_colors], 2);

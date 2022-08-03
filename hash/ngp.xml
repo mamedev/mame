@@ -106,8 +106,9 @@ NEOP00060 Dokodemo Mahjong
 		<info name="release" value="19981028 (JPN)" />
 		<info name="alt_title" value="ポケットスポーツシリーズ ポケットテニス" />
 		<part name="cart" interface="ngp_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="pocket tennis - pocket sports series (japan, europe) (en,ja).bin" size="524288" crc="89410850" sha1="59602e44c631a00b2db53196204a4bc22ccd7025" offset="000000" />
+			<dataarea name="rom" size="0x80000">
+				<!-- bad dump with crc 89410850 and 0x00 padding instead of 0xff padding also exists -->
+				<rom name="pocket tennis - pocket sports series (japan, europe) (en,ja).bin" size="0x80000" crc="4b1eed05" sha1="67826f4c8e488938f7e1b26e331f79ebf0aa2565" />
 			</dataarea>
 		</part>
 	</software>

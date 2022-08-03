@@ -36,8 +36,7 @@ void tp0320_cpu_device::data_192x4(address_map &map)
 // device definitions
 tp0320_cpu_device::tp0320_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: tms0980_cpu_device(mconfig, TP0320, tag, owner, clock, 7 /* o pins */, 10 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 11 /* prg width */, address_map_constructor(FUNC(tp0320_cpu_device::program_11bit_9), this), 8 /* data width */, address_map_constructor(FUNC(tp0320_cpu_device::data_192x4), this))
-{
-}
+{ }
 
 
 // machine configs

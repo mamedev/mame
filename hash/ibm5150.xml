@@ -1264,7 +1264,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="kingqst" supported="no">
-		<description>King's Quest (cracked)</description>
+		<description>King's Quest (PC Booter release, cracked)</description>
 		<year>1984</year>
 		<publisher>IBM</publisher>
 		<info name="developer" value="Sierra On-Line" />
@@ -1732,6 +1732,18 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
 				<rom name="pac-man.img" size="163840" crc="812d0781" sha1="2d8db209e663263af134226e2d805abb9d4aa5c6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacmantm">
+		<description>Pac-Man (Thunder Mountain release)</description>
+		<year>1988</year>
+		<publisher>Thunder Mountain</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="38224">
+				<rom name="Pac-Man [Thunder Mountain] [1988] [5.25DD].td0" size="38224" crc="3ce9b079" sha1="14b6f646807630d0e916ed0209baaf0b2ed3c67f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5897,17 +5909,17 @@ has been replaced with an all-zero block. -->
 		<publisher>Microsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="disk1.img" size="368640" crc="136579c0" sha1="dc50472d5355b7c29fab0361c262ef83dde6a2ea"/>
+				<rom name="disk1 (alt).img" size="368640" crc="136579c0" sha1="dc50472d5355b7c29fab0361c262ef83dde6a2ea"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="disk2.img" size="368640" crc="c5e7e32f" sha1="c03f03494271bbdfb8865efa79bf8f5b5061b233"/>
+				<rom name="disk2 (alt).img" size="368640" crc="c5e7e32f" sha1="c03f03494271bbdfb8865efa79bf8f5b5061b233"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="disk3.img" size="368640" crc="9a7366fe" sha1="e56a8fb2732a258bd50465c596ff5e16b53afae3"/>
+				<rom name="disk3 (alt).img" size="368640" crc="9a7366fe" sha1="e56a8fb2732a258bd50465c596ff5e16b53afae3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7911,6 +7923,90 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Death Knights of Krynn [SSI] [1992] [3.5DD] [Disk 1 of 1].img" size="737280" crc="17d70b72" sha1="05f3442254e1c750549d23fb191fbe48142efb08"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drgnstrk">
+		<description>Advanced Dungeons &amp; Dragons - DragonStrike (v1.2)</description>
+		<year>1990</year>
+		<publisher>SSI</publisher>
+		<info name="developer" value="Westwood Associates" />
+		<info name="version" value="1.2" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="DragonStrike (v1.2) [SSI] [1990] [5.25DD] [Disk 1 of 4].img" size="368640" crc="376cc6e4" sha1="878b61c532e3bbce2bb5aea79497bfcbe0efaf2f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="DragonStrike (v1.2) [SSI] [1990] [5.25DD] [Disk 2 of 4].img" size="368640" crc="a985af7d" sha1="28443a14d072f56f3b1b2e2668e5975ff290532b"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="DragonStrike (v1.2) [SSI] [1990] [5.25DD] [Disk 3 of 4].img" size="368640" crc="75b5e9be" sha1="c010110044b3b4e1e5bf5c6c796c1ba8c7cad0d7"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="DragonStrike (v1.2) [SSI] [1990] [5.25DD] [Disk 4 of 4].img" size="368640" crc="2b7d460d" sha1="8e9fc7392c6d7b7de8c623c8ad015399a36d598f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drgnstrka" cloneof="drgnstrk">
+		<description>Advanced Dungeons &amp; Dragons - DragonStrike (v1.0)</description>
+		<year>1990</year>
+		<publisher>SSI</publisher>
+		<info name="developer" value="Westwood Associates" />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="DragonStrike (v1.0) [SSI] [1990] [5.25DD] [Disk 1 of 4].img" size="368640" crc="9b558856" sha1="047db55b0ca2e5e8df78c2c81886208cc1b8dd81"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="DragonStrike (v1.0) [SSI] [1990] [5.25DD] [Disk 2 of 4].img" size="368640" crc="03f54f0e" sha1="79ca48d302c428aacfd311354ecf2f3c1687c16c"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="DragonStrike (v1.0) [SSI] [1990] [5.25DD] [Disk 3 of 4].img" size="368640" crc="e32a01da" sha1="da0930ab4edf03fadeab40311ba9beb25f76729d"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="DragonStrike (v1.0) [SSI] [1990] [5.25DD] [Disk 4 of 4].img" size="368640" crc="b343e058" sha1="c2d8bb7348a79a742488fa12f5f2c1e3a837e22a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drgnstrkb" cloneof="drgnstrk">
+		<description>Advanced Dungeons &amp; Dragons - DragonStrike (v1.1)</description>
+		<year>1990</year>
+		<publisher>SSI</publisher>
+		<info name="developer" value="Westwood Associates" />
+		<info name="version" value="1.1" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="DragonStrike (v1.1) [SSI] [1990] [5.25DD] [Disk 1 of 4].img" size="368640" crc="b68f7377" sha1="f48fbae2e8f145a5ccfe67bb37c3d8d6348018a2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="DragonStrike (v1.1) [SSI] [1990] [5.25DD] [Disk 2 of 4].img" size="368640" crc="a985af7d" sha1="28443a14d072f56f3b1b2e2668e5975ff290532b"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="DragonStrike (v1.1) [SSI] [1990] [5.25DD] [Disk 3 of 4].img" size="368640" crc="75b5e9be" sha1="c010110044b3b4e1e5bf5c6c796c1ba8c7cad0d7"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="DragonStrike (v1.1) [SSI] [1990] [5.25DD] [Disk 4 of 4].img" size="368640" crc="2b7d460d" sha1="8e9fc7392c6d7b7de8c623c8ad015399a36d598f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11174,7 +11270,29 @@ has been replaced with an all-zero block. -->
 		<info name="developer" value="Manley &amp; Associates, Inc" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Home Alone [Capstone] [1991] [3.5].img" size="737280" crc="4cb8e8c4" sha1="27929ce82de6cbfaa5e45ce3afcde086efe8244a"/>
+				<rom name="Home Alone [Capstone] [1991] [3.5DD] [Disk 1 of 1].img" size="737280" crc="a2d89384" sha1="07f7546e3d1082ea2e94e485db792c8e04e8658f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="homealn2">
+		<description>Home Alone 2: Lost in New York</description>
+		<year>1992</year>
+		<publisher>Capstone</publisher>
+		<info name="developer" value="Manley &amp; Associates, Inc" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Home Alone 2 [Capstone] [1992] [3.5DD] [Disk 1 of 3].img" size="737280" crc="fdca251d" sha1="12b765a38bbf7757c4db9c087bbd34a477270293"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Home Alone 2 [Capstone] [1992] [3.5DD] [Disk 2 of 3].img" size="737280" crc="20746bb9" sha1="4f1c826182497c0bea2140e615cd0437fd05197d"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Home Alone 2 [Capstone] [1992] [3.5DD] [Disk 3 of 3].img" size="737280" crc="d00095cd" sha1="fb0da176945d880db44f386c8b23928b1309eac3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11726,6 +11844,24 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="King's Bounty [New World Computing] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="6252780c" sha1="081db3433ce4e5860bf13092457000b664324c2d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kingqstd" supported="no">
+		<description>King's Quest (DOS release)</description>
+		<year>1987</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<part name="flop1" interface="floppy_5_25">
+			<!-- Copy-protected key disk -->
+			<dataarea name="flop" size="2873168">
+				<rom name="King's Quest [Sierra] [1987] [5.25DD] [Disk 1 of 2].mfm" size="2873168" crc="89662da9" sha1="ffa69b494eaa5edd2a5f32ee16a39a3e7a146bce"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="King's Quest [Sierra] [1987] [5.25DD] [Disk 2 of 2].img" size="368640" crc="7524a18f" sha1="726577c03b919aa8ce278d769b3a11eb70f5c444"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13435,12 +13571,20 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="overnet">
-		<description>Over the Net</description>
+		<description>Over the Net!</description>
 		<year>1991</year>
-		<publisher>Genias</publisher>
+		<publisher>Merit Software</publisher>
+		<info name="developer" value="Genias" />
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - VGA/MCGA" />
 			<dataarea name="flop" size = "737280">
-				<rom name="Over the Net (1991)(Genias).dsk" size="737280" crc="71e8f2d0" sha1="e2b758f7484e602d6ac5b7375b46591f5f7230ee"/>
+				<rom name="Over The Net [Merit Software] [1991] [3.5DD] [Disk 1 of 2].img" size="737280" crc="65f2cd46" sha1="f84f5411296e07b29c5ca418d86c7aee235e853e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Hercules/CGA/EGA" />
+			<dataarea name="flop" size = "737280">
+				<rom name="Over The Net [Merit Software] [1991] [3.5DD] [Disk 2 of 2].img" size="737280" crc="07c9aa99" sha1="17c6c7b0cea815f176b9d99653c7c9d4f4241904"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14266,6 +14410,19 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Secret Agent [Apogee Software] [1992] [3.5DD] [Disk 1 of 1].img" size="737280" crc="d7e85d89" sha1="f9e1ff73e40f28bf7b9eec7e78406d9063892e24"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="secretagsw" cloneof="secretag">
+		<description>Secret Agent (shareware, The $5 Computer Software Store - Wiz Technology release)</description>
+		<year>1993</year>
+		<publisher>Wiz Technology</publisher>
+		<info name="developer" value="Apogee Software" />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Secret Agent (shareware) [Wiz Technology] [1993] [3.5DD] [Disk 1 of 1].img" size="737280" crc="598832f3" sha1="bd3020c23f5ee27b4eaf2ce3646d8006595c54bc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15654,6 +15811,17 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Teenage Mutant Hero Turtles - The Coin-Op [Image Works] [1991] [3.5DD] [Disk 2 of 2].img" size="737280" crc="a9a418bf" sha1="2cddbacdb027d39f888845f78e7610ac601c7c22"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tempdeat">
+		<description>Temple of Death (PC Disk Quarterly #9)</description>
+		<year>1991</year>
+		<publisher>I.B. Mafazette</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Temple of Death [I.B. Mafazette] [1990] [5.25DD] [Disk 1 of 1].img" size="368640" crc="7ae4a39e" sha1="805dc8539ff8edeca61a13405ee58c6fe92e07e2"/>
 			</dataarea>
 		</part>
 	</software>

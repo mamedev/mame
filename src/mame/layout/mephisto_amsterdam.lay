@@ -4,6 +4,25 @@ license:CC0
 -->
 <mamelayout version="2">
 
+<!-- luascript (-plugin layout), for pressing 2 buttons simultaneously -->
+
+	<script><![CDATA[
+		local layout = {}
+		local prev_state = 0
+
+		function layout.frame()
+			local cur_state = machine.ioport.ports[":CLICKABLE"]:read() & 1
+			if cur_state ~= prev_state then
+				machine.ioport.ports[":RESET"]:field(0x01):set_value(cur_state)
+				machine.ioport.ports[":RESET"]:field(0x02):set_value(cur_state)
+			end
+			prev_state = cur_state
+		end
+
+		return layout
+	]]></script>
+
+
 <!-- define elements -->
 
 	<element name="led" defstate="0">
@@ -25,22 +44,26 @@ license:CC0
 		</rect>
 	</element>
 
-	<element name="text_1"> <rect><color red="0.56" green="0.33" blue="0.12" /></rect>    <text string="1"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
-	<element name="text_2"> <rect><color red="0.56" green="0.33" blue="0.12" /></rect>    <text string="2"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
-	<element name="text_3"> <rect><color red="0.56" green="0.33" blue="0.12" /></rect>    <text string="3"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
-	<element name="text_4"> <rect><color red="0.56" green="0.33" blue="0.12" /></rect>    <text string="4"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
-	<element name="text_5"> <rect><color red="0.56" green="0.33" blue="0.12" /></rect>    <text string="5"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
-	<element name="text_6"> <rect><color red="0.56" green="0.33" blue="0.12" /></rect>    <text string="6"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
-	<element name="text_7"> <rect><color red="0.56" green="0.33" blue="0.12" /></rect>    <text string="7"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
-	<element name="text_8"> <rect><color red="0.56" green="0.33" blue="0.12" /></rect>    <text string="8"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
-	<element name="text_a"> <rect><color red="0.56" green="0.33" blue="0.12" /></rect>    <text string="A"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
-	<element name="text_b"> <rect><color red="0.56" green="0.33" blue="0.12" /></rect>    <text string="B"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
-	<element name="text_c"> <rect><color red="0.56" green="0.33" blue="0.12" /></rect>    <text string="C"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
-	<element name="text_d"> <rect><color red="0.56" green="0.33" blue="0.12" /></rect>    <text string="D"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
-	<element name="text_e"> <rect><color red="0.56" green="0.33" blue="0.12" /></rect>    <text string="E"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
-	<element name="text_f"> <rect><color red="0.56" green="0.33" blue="0.12" /></rect>    <text string="F"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
-	<element name="text_g"> <rect><color red="0.56" green="0.33" blue="0.12" /></rect>    <text string="G"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
-	<element name="text_h"> <rect><color red="0.56" green="0.33" blue="0.12" /></rect>    <text string="H"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="nothing" defstate="0">
+		<rect><color alpha="0" /></rect>
+	</element>
+
+	<element name="text_1"><rect><color red="0.56" green="0.33" blue="0.12" /></rect><text string="1"><color red="0.87" green="0.87" blue="0.84" /></text></element>
+	<element name="text_2"><rect><color red="0.56" green="0.33" blue="0.12" /></rect><text string="2"><color red="0.87" green="0.87" blue="0.84" /></text></element>
+	<element name="text_3"><rect><color red="0.56" green="0.33" blue="0.12" /></rect><text string="3"><color red="0.87" green="0.87" blue="0.84" /></text></element>
+	<element name="text_4"><rect><color red="0.56" green="0.33" blue="0.12" /></rect><text string="4"><color red="0.87" green="0.87" blue="0.84" /></text></element>
+	<element name="text_5"><rect><color red="0.56" green="0.33" blue="0.12" /></rect><text string="5"><color red="0.87" green="0.87" blue="0.84" /></text></element>
+	<element name="text_6"><rect><color red="0.56" green="0.33" blue="0.12" /></rect><text string="6"><color red="0.87" green="0.87" blue="0.84" /></text></element>
+	<element name="text_7"><rect><color red="0.56" green="0.33" blue="0.12" /></rect><text string="7"><color red="0.87" green="0.87" blue="0.84" /></text></element>
+	<element name="text_8"><rect><color red="0.56" green="0.33" blue="0.12" /></rect><text string="8"><color red="0.87" green="0.87" blue="0.84" /></text></element>
+	<element name="text_a"><rect><color red="0.56" green="0.33" blue="0.12" /></rect><text string="A"><color red="0.87" green="0.87" blue="0.84" /></text></element>
+	<element name="text_b"><rect><color red="0.56" green="0.33" blue="0.12" /></rect><text string="B"><color red="0.87" green="0.87" blue="0.84" /></text></element>
+	<element name="text_c"><rect><color red="0.56" green="0.33" blue="0.12" /></rect><text string="C"><color red="0.87" green="0.87" blue="0.84" /></text></element>
+	<element name="text_d"><rect><color red="0.56" green="0.33" blue="0.12" /></rect><text string="D"><color red="0.87" green="0.87" blue="0.84" /></text></element>
+	<element name="text_e"><rect><color red="0.56" green="0.33" blue="0.12" /></rect><text string="E"><color red="0.87" green="0.87" blue="0.84" /></text></element>
+	<element name="text_f"><rect><color red="0.56" green="0.33" blue="0.12" /></rect><text string="F"><color red="0.87" green="0.87" blue="0.84" /></text></element>
+	<element name="text_g"><rect><color red="0.56" green="0.33" blue="0.12" /></rect><text string="G"><color red="0.87" green="0.87" blue="0.84" /></text></element>
+	<element name="text_h"><rect><color red="0.56" green="0.33" blue="0.12" /></rect><text string="H"><color red="0.87" green="0.87" blue="0.84" /></text></element>
 
 
 <!-- sb board -->
@@ -384,42 +407,47 @@ license:CC0
 
 <!-- buttons -->
 
-	<element name="gray"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect></element>
+	<element name="gray"><rect><color red="0.25" green="0.25" blue="0.25" /></rect></element>
 	<element name="white"><rect><color red="0.95" green="0.95" blue="0.95" /></rect></element>
+
+	<element name="blackw">
+		<rect><bounds x="0" y="0" width="1" height="1" /><color red="0.95" green="0.95" blue="0.95" /></rect>
+		<rect><bounds x="0.15" y="0.15" width="0.7" height="0.7" /><color red="0.25" green="0.25" blue="0.25" /></rect>
+	</element>
 
 	<element name="keys" defstate="0">
 		<rect state="1"><color red="0.0" green="0.0" blue="0.0" /></rect>
 	</element>
 
-	<element name="text_info"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="INFO"><color red="0.95" green="0.95" blue="0.95" /></text> </element>
-	<element name="text_pos">  <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="POS"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
-	<element name="text_lev">  <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="LEV"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
-	<element name="text_mem">  <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="MEM"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
-	<element name="text_cl">   <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="CL">  <color red="0.95" green="0.95" blue="0.95" /></text> </element>
-	<element name="text_ent">  <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="ENT"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
-	<element name="text_res">  <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="RES"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
+	<element name="text_info"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string=" INFO"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_pos"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="POS">  <color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_lev"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="LEV">  <color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_mem"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="MEM">  <color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_cl">  <rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="CL">   <color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_ent"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="ENT">  <color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_res"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="RES">  <color red="0.95" green="0.95" blue="0.95" /></text></element>
 
-	<element name="text_a1"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="A"><color red="0.95" green="0.95" blue="0.95" /></text> </element>
-	<element name="text_b2"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="B"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
-	<element name="text_c3"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="C"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
-	<element name="text_d4"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="D"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
-	<element name="text_e5"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="E"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
-	<element name="text_f6"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="F"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
-	<element name="text_g7"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="G"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
-	<element name="text_h8"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="H"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
-	<element name="text_l9"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="&#x2190;"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
-	<element name="text_r0"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="&#x2192;"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
+	<element name="text_a1"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="A"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_b2"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="B"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_c3"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="C"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_d4"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="D"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_e5"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="E"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_f6"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="F"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_g7"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="G"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_h8"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="H"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_l9"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="&#x2190;"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_r0"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="&#x2192;"><color red="0.95" green="0.95" blue="0.95" /></text></element>
 
-	<element name="text_1a"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="1"><color red="0.95" green="0.95" blue="0.95" /></text> </element>
-	<element name="text_2b"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="2"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
-	<element name="text_3c"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="3"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
-	<element name="text_4d"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="4"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
-	<element name="text_5e"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="5"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
-	<element name="text_6f"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="6"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
-	<element name="text_7g"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="7"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
-	<element name="text_8h"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="8"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
-	<element name="text_9l"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="9"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
-	<element name="text_0r"> <rect><color red="0.25" green="0.25" blue="0.25" /></rect>    <text string="0"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
+	<element name="text_1a"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="1"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_2b"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="2"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_3c"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="3"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_4d"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="4"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_5e"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="5"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_6f"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="6"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_7g"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="7"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_8h"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="8"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_9l"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="9"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_0r"><rect><color red="0.25" green="0.25" blue="0.25" /></rect><text string="0"><color red="0.95" green="0.95" blue="0.95" /></text></element>
 
 	<element name="text_p1"><image file="chess/wk.svg"><color alpha="0.95" /></image></element>
 	<element name="text_p2"><image file="chess/wq.svg"><color alpha="0.95" /></image></element>
@@ -431,35 +459,35 @@ license:CC0
 	<group name="buttons">
 		<bounds x="69" y="93" width="29" height="14" />
 
-		<element ref="gray"><bounds x="69"  y="93" width="4" height="4" /></element>
-		<element ref="gray"><bounds x="74"  y="93" width="4" height="4" /></element>
-		<element ref="gray"><bounds x="79"  y="93" width="4" height="4" /></element>
-		<element ref="gray"><bounds x="84"  y="93" width="4" height="4" /></element>
-		<element ref="gray"><bounds x="89"  y="93" width="4" height="4" /></element>
-		<element ref="gray"><bounds x="94"  y="93" width="4" height="4" /></element>
+		<element ref="gray"><bounds x="69" y="93" width="4" height="4" /></element>
+		<element ref="gray"><bounds x="74" y="93" width="4" height="4" /></element>
+		<element ref="gray"><bounds x="79" y="93" width="4" height="4" /></element>
+		<element ref="gray"><bounds x="84" y="93" width="4" height="4" /></element>
+		<element ref="gray"><bounds x="89" y="93" width="4" height="4" /></element>
+		<element ref="gray"><bounds x="94" y="93" width="4" height="4" /></element>
 
-		<element ref="gray"><bounds x="69"  y="98" width="4" height="4" /></element>
-		<element ref="gray"><bounds x="74"  y="98" width="4" height="4" /></element>
-		<element ref="gray"><bounds x="79"  y="98" width="4" height="4" /></element>
-		<element ref="gray"><bounds x="84"  y="98" width="4" height="4" /></element>
-		<element ref="gray"><bounds x="89"  y="98" width="4" height="4" /></element>
-		<element ref="gray"><bounds x="94"  y="98" width="4" height="4" /></element>
+		<element ref="gray"><bounds x="69" y="98" width="4" height="4" /></element>
+		<element ref="gray"><bounds x="74" y="98" width="4" height="4" /></element>
+		<element ref="gray"><bounds x="79" y="98" width="4" height="4" /></element>
+		<element ref="gray"><bounds x="84" y="98" width="4" height="4" /></element>
+		<element ref="gray"><bounds x="89" y="98" width="4" height="4" /></element>
+		<element ref="gray"><bounds x="94" y="98" width="4" height="4" /></element>
 
-		<element ref="gray"><bounds x="69"  y="103" width="4" height="4" /></element>
-		<element ref="gray"><bounds x="74"  y="103" width="4" height="4" /></element>
-		<element ref="gray"><bounds x="79"  y="103" width="4" height="4" /></element>
-		<element ref="gray"><bounds x="84"  y="103" width="4" height="4" /></element>
-		<element ref="gray"><bounds x="89"  y="103" width="4" height="4" /></element>
-		<element ref="gray"><bounds x="94"  y="103" width="4" height="4" /></element>
+		<element ref="gray"><bounds x="69" y="103" width="4" height="4" /></element>
+		<element ref="gray"><bounds x="74" y="103" width="4" height="4" /></element>
+		<element ref="gray"><bounds x="79" y="103" width="4" height="4" /></element>
+		<element ref="gray"><bounds x="84" y="103" width="4" height="4" /></element>
+		<element ref="gray"><bounds x="89" y="103" width="4" height="4" /></element>
+		<element ref="gray"><bounds x="94" y="103" width="4" height="4" /></element>
 
-		<element ref="text_info"><bounds x="69.3" y="94" width="3.67" height="2.2" /></element>
-		<element ref="text_pos"> <bounds x="74.3" y="94" width="3.67" height="2.2" /></element>
-		<element ref="text_lev"> <bounds x="79.3" y="94" width="3.67" height="2.2" /></element>
-		<element ref="text_mem"> <bounds x="84.3" y="94" width="3.67" height="2.2" /></element>
-		<element ref="text_cl">  <bounds x="89.3" y="94" width="3.67" height="2.2" /></element>
-		<element ref="text_ent"> <bounds x="94.3" y="94" width="3.67" height="2.2" /></element>
-		<element ref="text_res"> <bounds x="69.3" y="104" width="3.67" height="2.2" /></element>
-		<element ref="text_res"> <bounds x="74.3" y="104" width="3.67" height="2.2" /></element>
+		<element ref="text_info"><bounds x="69" y="94"  width="4" height="2.2" /></element>
+		<element ref="text_pos"> <bounds x="74" y="94"  width="4" height="2.2" /></element>
+		<element ref="text_lev"> <bounds x="79" y="94"  width="4" height="2.2" /></element>
+		<element ref="text_mem"> <bounds x="84" y="94"  width="4" height="2.2" /></element>
+		<element ref="text_cl">  <bounds x="89" y="94"  width="4" height="2.2" /></element>
+		<element ref="text_ent"> <bounds x="94" y="94"  width="4" height="2.2" /></element>
+		<element ref="text_res"> <bounds x="69" y="104" width="4" height="2.2" /></element>
+		<element ref="text_res"> <bounds x="74" y="104" width="4" height="2.2" /></element>
 
 		<element ref="text_a1"><bounds x="69" y="98" width="2" height="2.2" /></element>
 		<element ref="text_b2"><bounds x="74" y="98" width="2" height="2.2" /></element>
@@ -483,72 +511,38 @@ license:CC0
 		<element ref="text_9l"><bounds x="91" y="104.5" width="1.97" height="2.2" /></element>
 		<element ref="text_0r"><bounds x="96" y="104.5" width="1.97" height="2.2" /></element>
 
-		<element ref="text_p6" ><bounds x="76" y="98" width="1.8" height="1.7" /></element>
-		<element ref="text_p5" ><bounds x="81" y="98" width="1.8" height="1.7" /></element>
-		<element ref="text_p4" ><bounds x="86" y="98" width="1.8" height="1.7" /></element>
-		<element ref="text_p3" ><bounds x="91" y="98" width="1.8" height="1.7" /></element>
-		<element ref="text_p2" ><bounds x="96" y="98" width="1.8" height="1.7" /></element>
-		<element ref="text_p1" ><bounds x="81" y="103" width="1.8" height="1.7" /></element>
-		<element ref="white"><bounds x="89.5" y="105.1" width="1.3" height="1.3" /></element>
-		<element ref="gray"><bounds x="89.7" y="105.3" width="0.9" height="0.9" /></element>
+		<element ref="text_p6"><bounds x="76" y="98"  width="1.8" height="1.7" /></element>
+		<element ref="text_p5"><bounds x="81" y="98"  width="1.8" height="1.7" /></element>
+		<element ref="text_p4"><bounds x="86" y="98"  width="1.8" height="1.7" /></element>
+		<element ref="text_p3"><bounds x="91" y="98"  width="1.8" height="1.7" /></element>
+		<element ref="text_p2"><bounds x="96" y="98"  width="1.8" height="1.7" /></element>
+		<element ref="text_p1"><bounds x="81" y="103" width="1.8" height="1.7" /></element>
+		<element ref="blackw"><bounds x="89.5" y="105.1" width="1.3" height="1.3" /></element>
 		<element ref="white"><bounds x="94.5" y="105.1" width="1.3" height="1.3" /></element>
 
-		<element ref="keys" inputtag="KEY.0" inputmask="0x01">    <!-- INFO -->
-			<bounds x="69"  y="93" width="4" height="4" /><color alpha="0.25" />
-		</element>
-		<element ref="keys" inputtag="KEY.0" inputmask="0x02">    <!-- POS -->
-			<bounds x="74"  y="93" width="4" height="4" /><color alpha="0.25" />
-		</element>
-		<element ref="keys" inputtag="KEY.0" inputmask="0x04">    <!-- LEV -->
-			<bounds x="79"  y="93" width="4" height="4" /><color alpha="0.25" />
-		</element>
-		<element ref="keys" inputtag="KEY.0" inputmask="0x08">    <!-- MEM -->
-			<bounds x="84"  y="93" width="4" height="4" /><color alpha="0.25" />
-		</element>
-		<element ref="keys" inputtag="KEY.0" inputmask="0x10">    <!-- CL -->
-			<bounds x="89"  y="93" width="4" height="4" /><color alpha="0.25" />
-		</element>
-		<element ref="keys" inputtag="KEY.0" inputmask="0x20">    <!-- ENT -->
-			<bounds x="94"  y="93" width="4" height="4" /><color alpha="0.25" />
-		</element>
+		<element ref="keys" inputtag="KEY.0" inputmask="0x01"><bounds x="69" y="93" width="4" height="4" /><color alpha="0.25" /></element>
+		<element ref="keys" inputtag="KEY.0" inputmask="0x02"><bounds x="74" y="93" width="4" height="4" /><color alpha="0.25" /></element>
+		<element ref="keys" inputtag="KEY.0" inputmask="0x04"><bounds x="79" y="93" width="4" height="4" /><color alpha="0.25" /></element>
+		<element ref="keys" inputtag="KEY.0" inputmask="0x08"><bounds x="84" y="93" width="4" height="4" /><color alpha="0.25" /></element>
+		<element ref="keys" inputtag="KEY.0" inputmask="0x10"><bounds x="89" y="93" width="4" height="4" /><color alpha="0.25" /></element>
+		<element ref="keys" inputtag="KEY.0" inputmask="0x20"><bounds x="94" y="93" width="4" height="4" /><color alpha="0.25" /></element>
 
-		<element ref="keys" inputtag="KEY.1" inputmask="0x01">    <!-- A1 -->
-			<bounds x="69"  y="98" width="4" height="4" /><color alpha="0.25" />
-		</element>
-		<element ref="keys" inputtag="KEY.1" inputmask="0x02">    <!-- B2 -->
-			<bounds x="74"  y="98" width="4" height="4" /><color alpha="0.25" />
-		</element>
-		<element ref="keys" inputtag="KEY.1" inputmask="0x04">    <!-- C3 -->
-			<bounds x="79"  y="98" width="4" height="4" /><color alpha="0.25" />
-		</element>
-		<element ref="keys" inputtag="KEY.1" inputmask="0x08">    <!-- D4 -->
-			<bounds x="84"  y="98" width="4" height="4" /><color alpha="0.25" />
-		</element>
-		<element ref="keys" inputtag="KEY.1" inputmask="0x10">    <!-- E5 -->
-			<bounds x="89"  y="98" width="4" height="4" /><color alpha="0.25" />
-		</element>
-		<element ref="keys" inputtag="KEY.1" inputmask="0x20">    <!-- F6 -->
-			<bounds x="94"  y="98" width="4" height="4" /><color alpha="0.25" />
-		</element>
+		<element ref="keys" inputtag="KEY.1" inputmask="0x01"><bounds x="69" y="98" width="4" height="4" /><color alpha="0.25" /></element>
+		<element ref="keys" inputtag="KEY.1" inputmask="0x02"><bounds x="74" y="98" width="4" height="4" /><color alpha="0.25" /></element>
+		<element ref="keys" inputtag="KEY.1" inputmask="0x04"><bounds x="79" y="98" width="4" height="4" /><color alpha="0.25" /></element>
+		<element ref="keys" inputtag="KEY.1" inputmask="0x08"><bounds x="84" y="98" width="4" height="4" /><color alpha="0.25" /></element>
+		<element ref="keys" inputtag="KEY.1" inputmask="0x10"><bounds x="89" y="98" width="4" height="4" /><color alpha="0.25" /></element>
+		<element ref="keys" inputtag="KEY.1" inputmask="0x20"><bounds x="94" y="98" width="4" height="4" /><color alpha="0.25" /></element>
 
-		<element ref="keys" inputtag="RESET" inputmask="0x01">    <!-- RES -->
-			<bounds x="69"  y="103" width="4" height="4" /><color alpha="0.25" />
-		</element>
-		<element ref="keys" inputtag="RESET" inputmask="0x02">    <!-- RES -->
-			<bounds x="74"  y="103" width="4" height="4" /><color alpha="0.25" />
-		</element>
-		<element ref="keys" inputtag="KEY.0" inputmask="0x40">    <!-- G7 -->
-			<bounds x="79"  y="103" width="4" height="4" /><color alpha="0.25" />
-		</element>
-		<element ref="keys" inputtag="KEY.0" inputmask="0x80">    <!-- H8 -->
-			<bounds x="84"  y="103" width="4" height="4" /><color alpha="0.25" />
-		</element>
-		<element ref="keys" inputtag="KEY.1" inputmask="0x40">    <!-- 9 -->
-			<bounds x="89"  y="103" width="4" height="4" /><color alpha="0.25" />
-		</element>
-		<element ref="keys" inputtag="KEY.1" inputmask="0x80">    <!-- 0 -->
-			<bounds x="94"  y="103" width="4" height="4" /><color alpha="0.25" />
-		</element>
+		<element ref="nothing" inputtag="CLICKABLE" inputmask="0x01"><bounds x="69" y="103" width="4" height="4" /></element>
+		<element ref="nothing" inputtag="CLICKABLE" inputmask="0x01"><bounds x="74" y="103" width="4" height="4" /></element>
+		<element ref="keys" inputtag="RESET" inputmask="0x01"><bounds x="69" y="103" width="4" height="4" /><color alpha="0.25" /></element>
+		<element ref="keys" inputtag="RESET" inputmask="0x02"><bounds x="74" y="103" width="4" height="4" /><color alpha="0.25" /></element>
+
+		<element ref="keys" inputtag="KEY.0" inputmask="0x40"><bounds x="79" y="103" width="4" height="4" /><color alpha="0.25" /></element>
+		<element ref="keys" inputtag="KEY.0" inputmask="0x80"><bounds x="84" y="103" width="4" height="4" /><color alpha="0.25" /></element>
+		<element ref="keys" inputtag="KEY.1" inputmask="0x40"><bounds x="89" y="103" width="4" height="4" /><color alpha="0.25" /></element>
+		<element ref="keys" inputtag="KEY.1" inputmask="0x80"><bounds x="94" y="103" width="4" height="4" /><color alpha="0.25" /></element>
 	</group>
 
 

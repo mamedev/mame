@@ -48740,7 +48740,7 @@ license:CC0
 		<year>19831983</year>
 		<publisher>Software Publishing Corporation</publisher>
 		<info name="release" value="2022-06-28"/>
-        <!-- Due to programming errors, this version works best on an unenhanced Apple //e -->
+		<info name="usage" value="Due to programming errors, this version works best on an unenhanced Apple //e"/>
 		<!--"PFS Graph" is a 1983 productivity program developed and distributed by Software Publishing Corporation. This version is dated 1983-01-12 according to file metadata. Due to programming errors, this version works best on an unenhanced Apple //e. It is preserved here for the first time.-->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -48755,7 +48755,7 @@ license:CC0
 		<year>19841984</year>
 		<publisher>Software Publishing Corporation</publisher>
 		<info name="release" value="2022-06-28"/>
-        <!-- Due to programming errors, this version works best on an unenhanced Apple //e -->
+		<info name="usage" value="Due to programming errors, this version works best on an unenhanced Apple //e"/>
 		<!--"PFS Graph" is a 1984 productivity program developed and distributed by Software Publishing Corporation. This version is dated 1984-01-31 according to file metadata. Due to programming errors, this version works best on an unenhanced Apple //e. It is preserved here for the first time.-->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -49045,7 +49045,7 @@ license:CC0
 		<year>1982</year>
 		<publisher>Software Publishing Corporation</publisher>
 		<info name="release" value="2022-06-30"/>
-        <!-- Due to programming errors unrelated to the copy protection, this version works best on an unenhanced Apple //e -->
+		<info name="usage" value="Due to programming errors unrelated to the copy protection, this version works best on an unenhanced Apple //e"/>
 		<!--"PFS Report" is a 1982 productivity program developed and distributed by Software Publishing Corporation. This version is dated 1982-01-14 according to file metadata, although the main menu says 1983. Due to programming errors unrelated to the copy protection, this version works best on an unenhanced Apple //e. It is preserved here for the first time.-->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -49095,7 +49095,7 @@ license:CC0
 		<year>1982</year>
 		<publisher>Control Data</publisher>
 		<info name="release" value="2022-06-30"/>
-        <!-- Due to programming errors unrelated to the copy protection, this disk works best on an Apple ][+ or an unenhanced Apple //e. Later models will crash when you try to view a word list. -->
+		<info name="usage" value="Due to programming errors unrelated to the copy protection, this disk works best on an Apple ][+ or an unenhanced Apple //e. Later models will crash when you try to view a word list."/>
 		<!--"German Vocabulary for Shopping Use" is a 1982 educational program developed and distributed by Control Data. Due to programming errors unrelated to the copy protection, this disk works best on an Apple ][+ or an unenhanced Apple //e. Later models will crash when you try to view a word list. It is preserved here for the first time.-->
 
 		<part name="flop1" interface="floppy_5_25">

@@ -89,7 +89,13 @@ void tasc_sb30_device::device_start()
 
 	m_data_out.resolve_safe();
 
-	std::fill(std::begin(m_squares), std::end(m_squares), 0);
+	// zerofill
+	m_data0 = 0;
+	m_data1 = 0;
+	m_output = 0;
+	m_scan_pending = false;
+	m_pos = 0;
+	std::fill_n(m_squares, std::size(m_squares), 0);
 
 	// register for savestates
 	save_item(NAME(m_data0));

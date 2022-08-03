@@ -233,116 +233,112 @@ public:
 	void init_cmi2x();
 
 	// CPU card
-	DECLARE_WRITE_LINE_MEMBER( q133_acia_irq );
-	DECLARE_WRITE_LINE_MEMBER( q133_ptm_irq_w );
-	void i8214_cpu1_w(uint8_t data);
-	void i8214_cpu2_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( maincpu1_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( maincpu2_irq0_w );
-	DECLARE_WRITE_LINE_MEMBER( i8214_1_int_w );
-	DECLARE_WRITE_LINE_MEMBER( i8214_2_int_w );
-	DECLARE_WRITE_LINE_MEMBER( i8214_3_int_w );
-	DECLARE_WRITE_LINE_MEMBER( i8214_3_enlg );
-	uint8_t shared_ram_r(offs_t offset);
-	void shared_ram_w(offs_t offset, uint8_t data);
-	template<int CpuNum> uint8_t perr_r(offs_t offset);
-	template<int CpuNum> void perr_w(offs_t offset, uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(q133_acia_irq);
+	void i8214_cpu1_w(u8 data);
+	void i8214_cpu2_w(u8 data);
+	DECLARE_WRITE_LINE_MEMBER(maincpu2_irq0_w);
+	DECLARE_WRITE_LINE_MEMBER(i8214_1_int_w);
+	DECLARE_WRITE_LINE_MEMBER(i8214_2_int_w);
+	DECLARE_WRITE_LINE_MEMBER(i8214_3_int_w);
+	DECLARE_WRITE_LINE_MEMBER(i8214_3_enlg);
+	u8 shared_ram_r(offs_t offset);
+	void shared_ram_w(offs_t offset, u8 data);
+	template<int CpuNum> u8 perr_r(offs_t offset);
+	template<int CpuNum> void perr_w(offs_t offset, u8 data);
 
-	uint16_t m_aic_ad565_in[16]{};
-	uint8_t m_aic_mux_latch = 0;
+	u16 m_aic_ad565_in[16]{};
+	u8 m_aic_mux_latch = 0;
 
-	uint8_t aic_ad574_r();
-	template<int Dac> void aic_dac_w(uint8_t data);
-	void aic_mux_latch_w(uint8_t data);
-	void aic_ad565_msb_w(uint8_t data);
-	void aic_ad565_lsb_w(uint8_t data);
+	u8 aic_ad574_r();
+	template<int Dac> void aic_dac_w(u8 data);
+	void aic_mux_latch_w(u8 data);
+	void aic_ad565_msb_w(u8 data);
+	void aic_ad565_lsb_w(u8 data);
 
-	uint8_t q133_1_porta_r();
-	void q133_1_porta_w(uint8_t data);
-	void q133_1_portb_w(uint8_t data);
+	u8 q133_1_porta_r();
+	void q133_1_porta_w(u8 data);
+	void q133_1_portb_w(u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER( cmi_iix_vblank );
-	IRQ_CALLBACK_MEMBER( cpu1_interrupt_callback );
-	IRQ_CALLBACK_MEMBER( cpu2_interrupt_callback );
+	DECLARE_WRITE_LINE_MEMBER(cmi_iix_vblank);
+	IRQ_CALLBACK_MEMBER(cpu1_interrupt_callback);
+	IRQ_CALLBACK_MEMBER(cpu2_interrupt_callback);
 
 	// Video-related
-	uint8_t video_r(offs_t offset);
-	uint8_t lightpen_r(offs_t offset);
-	uint8_t pia_q219_b_r();
-	void video_w(offs_t offset, uint8_t data);
-	void vscroll_w(uint8_t data);
-	void video_attr_w(uint8_t data);
+	u8 video_r(offs_t offset);
+	u8 lightpen_r(offs_t offset);
+	u8 pia_q219_b_r();
+	void video_w(offs_t offset, u8 data);
+	void vscroll_w(u8 data);
+	void video_attr_w(u8 data);
 
-	uint8_t vram_r(offs_t offset);
-	void vram_w(offs_t offset, uint8_t data);
+	u8 vram_r(offs_t offset);
+	void vram_w(offs_t offset, u8 data);
 
-	template <int CpuNum, uint16_t base> uint8_t ram_range_r(offs_t offset);
-	template <int CpuNum, uint16_t base> void ram_range_w(offs_t offset, uint8_t data);
-	template <int CpuNum> uint8_t vram_range_r(offs_t offset);
-	template <int CpuNum> void vram_range_w(offs_t offset, uint8_t data);
-	template <int CpuNum> uint8_t cards_range_r(offs_t offset);
-	template <int CpuNum> void cards_range_w(offs_t offset, uint8_t data);
-	template <int CpuNum> uint8_t periphs_range_r(offs_t offset);
-	template <int CpuNum> void periphs_range_w(offs_t offset, uint8_t data);
+	template <int CpuNum, u16 base> u8 ram_range_r(offs_t offset);
+	template <int CpuNum, u16 base> void ram_range_w(offs_t offset, u8 data);
+	template <int CpuNum> u8 vram_range_r(offs_t offset);
+	template <int CpuNum> void vram_range_w(offs_t offset, u8 data);
+	template <int CpuNum> u8 cards_range_r(offs_t offset);
+	template <int CpuNum> void cards_range_w(offs_t offset, u8 data);
+	template <int CpuNum> u8 periphs_range_r(offs_t offset);
+	template <int CpuNum> void periphs_range_w(offs_t offset, u8 data);
 
-	uint8_t tvt_r();
-	void tvt_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER( pia_q219_irqa );
-	DECLARE_WRITE_LINE_MEMBER( pia_q219_irqb );
-	DECLARE_WRITE_LINE_MEMBER( ptm_q219_irq );
-	uint32_t screen_update_cmi2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u8 tvt_r();
+	void tvt_w(u8 data);
+	DECLARE_WRITE_LINE_MEMBER(pia_q219_irqa);
+	DECLARE_WRITE_LINE_MEMBER(pia_q219_irqb);
+	DECLARE_WRITE_LINE_MEMBER(ptm_q219_irq);
+	u32 screen_update_cmi2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// Memory mapping
-	template<int CpuNum> uint8_t rom_r(offs_t offset);
-	void map_ram_w(offs_t offset, uint8_t data);
-	template<int CpuNum> uint8_t vector_r(offs_t offset);
-	template<int CpuNum> uint8_t map_r();
-	template<int CpuNum> void map_w(uint8_t data);
-	uint8_t atomic_r();
-	void cpufunc_w(uint8_t data);
-	uint8_t parity_r(offs_t offset);
-	void mapsel_w(offs_t offset, uint8_t data);
-	template<int CpuNum> uint8_t irq_ram_r(offs_t offset);
-	template<int CpuNum> void irq_ram_w(offs_t offset, uint8_t data);
-	template<int CpuNum> uint8_t scratch_ram_r(offs_t offset);
-	template<int CpuNum> void scratch_ram_w(offs_t offset, uint8_t data);
-	template<int CpuNum> uint8_t scratch_ram_fa_r(offs_t offset);
-	template<int CpuNum> void scratch_ram_fa_w(offs_t offset, uint8_t data);
+	template<int CpuNum> u8 rom_r(offs_t offset);
+	void map_ram_w(offs_t offset, u8 data);
+	template<int CpuNum> u8 vector_r(offs_t offset);
+	template<int CpuNum> u8 map_r();
+	template<int CpuNum> void map_w(u8 data);
+	u8 atomic_r();
+	void cpufunc_w(u8 data);
+	u8 parity_r(offs_t offset);
+	void mapsel_w(offs_t offset, u8 data);
+	template<int CpuNum> u8 irq_ram_r(offs_t offset);
+	template<int CpuNum> void irq_ram_w(offs_t offset, u8 data);
+	template<int CpuNum> u8 scratch_ram_r(offs_t offset);
+	template<int CpuNum> void scratch_ram_w(offs_t offset, u8 data);
+	template<int CpuNum> u8 scratch_ram_fa_r(offs_t offset);
+	template<int CpuNum> void scratch_ram_fa_w(offs_t offset, u8 data);
 
 	// MIDI/SMPTE
-	void midi_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t midi_dma_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER( midi_ptm0_c3_w );
-	DECLARE_WRITE_LINE_MEMBER( midi_ptm_irq );
-	DECLARE_WRITE_LINE_MEMBER( midi_acia_irq );
-	void midi_latch_w(uint8_t data);
+	void midi_dma_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 midi_dma_r(offs_t offset);
+	DECLARE_WRITE_LINE_MEMBER(midi_ptm0_c3_w);
+	void midi_latch_w(u8 data);
 
 	// Floppy
-	void fdc_w(offs_t offset, uint8_t data);
-	uint8_t fdc_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER( wd1791_irq );
-	DECLARE_WRITE_LINE_MEMBER( wd1791_drq );
+	void fdc_w(offs_t offset, u8 data);
+	u8 fdc_r(offs_t offset);
+	DECLARE_WRITE_LINE_MEMBER(wd1791_irq);
+	DECLARE_WRITE_LINE_MEMBER(wd1791_drq);
 
 	// Master card
-	uint8_t cmi02_r(offs_t offset);
-	void cmi02_w(offs_t offset, uint8_t data);
-	void cmi02_chsel_w(uint8_t data);
-	uint8_t cmi02_chsel_r();
-	void master_tune_w(uint8_t data);
-	uint8_t master_tune_r();
-	DECLARE_WRITE_LINE_MEMBER( cmi02_ptm_irq );
-	DECLARE_WRITE_LINE_MEMBER( cmi02_ptm_o2 );
-	DECLARE_WRITE_LINE_MEMBER( cmi02_pia2_irqa_w );
-	DECLARE_WRITE_LINE_MEMBER( cmi02_pia2_cb2_w );
+	u8 cmi02_r(offs_t offset);
+	void cmi02_w(offs_t offset, u8 data);
+	void cmi02_chsel_w(u8 data);
+	u8 cmi02_chsel_r();
+	void master_tune_w(u8 data);
+	u8 master_tune_r();
+	DECLARE_WRITE_LINE_MEMBER(cmi02_ptm_irq);
+	DECLARE_WRITE_LINE_MEMBER(cmi02_ptm_o2);
+	DECLARE_WRITE_LINE_MEMBER(cmi02_pia2_irqa_w);
+	DECLARE_WRITE_LINE_MEMBER(cmi02_pia2_cb2_w);
 
-	uint8_t cmi07_r();
-	void cmi07_w(uint8_t data);
+	u8 cmi07_r();
+	void cmi07_w(u8 data);
 
-	DECLARE_WRITE_LINE_MEMBER( msm5832_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( cmi07_irq );
-	DECLARE_WRITE_LINE_MEMBER( q133_acia_clock );
+	DECLARE_WRITE_LINE_MEMBER(msm5832_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(cmi07_irq);
+	DECLARE_WRITE_LINE_MEMBER(q133_acia_clock);
 
-	template<int Channel> DECLARE_WRITE_LINE_MEMBER( channel_irq );
+	template<int Channel> DECLARE_WRITE_LINE_MEMBER(channel_irq);
 
 	void cmi2x(machine_config &config);
 	void cmi07cpu_map(address_map &map);
@@ -394,7 +390,7 @@ protected:
 	required_ioport m_lp_y_port;
 	required_ioport m_lp_touch_port;
 
-	required_shared_ptr<uint8_t> m_cmi07_ram;
+	required_shared_ptr<u8> m_cmi07_ram;
 
 	required_device_array<address_map_bank_device, 2> m_cpu_periphs;
 
@@ -406,13 +402,13 @@ private:
 	emu_timer *m_hblank_timer = nullptr;
 	emu_timer *m_jam_timeout_timer = nullptr;
 
-	uint8_t m_video_data = 0;
+	u8 m_video_data = 0;
 
 	// Memory
 	TIMER_CALLBACK_MEMBER(switch_map);
 	TIMER_CALLBACK_MEMBER(jam_timeout);
-	bool map_is_active(int cpunum, int map, uint8_t *map_info);
-	void update_address_space(int cpunum, uint8_t mapinfo);
+	bool map_is_active(int cpunum, int map, u8 *map_info);
+	void update_address_space(int cpunum, u8 mapinfo);
 
 	// Video
 	TIMER_CALLBACK_MEMBER(hblank);
@@ -420,57 +416,57 @@ private:
 
 	// Floppy
 	void dma_fdc_rom();
-	void write_fdc_ctrl(uint8_t data);
+	void write_fdc_ctrl(u8 data);
 	void fdc_dma_transfer();
 
 	// Q133 CPU Card
-	uint8_t *m_q133_rom = nullptr;
+	u8 *m_q133_rom = nullptr;
 
-	uint16_t  m_int_state[2]{};
-	uint8_t   m_lp_int = 0;
-	uint8_t   m_hp_int = 0;
-	std::unique_ptr<uint8_t[]>    m_shared_ram;
-	std::unique_ptr<uint8_t[]>    m_scratch_ram[2];
+	u16  m_int_state[2]{};
+	u8   m_lp_int = 0;
+	u8   m_hp_int = 0;
+	std::unique_ptr<u8[]>    m_shared_ram;
+	std::unique_ptr<u8[]>    m_scratch_ram[2];
 
 	/* Memory management */
-	uint8_t   m_map_sel[16]{};
-	std::unique_ptr<uint8_t[]>    m_map_ram[2];
-	std::unique_ptr<uint8_t[]>    m_q256_ram[2];
-	uint8_t   m_map_ram_latch = 0;
+	u8   m_map_sel[16]{};
+	std::unique_ptr<u8[]>    m_map_ram[2];
+	std::unique_ptr<u8[]>    m_q256_ram[2];
+	u8   m_map_ram_latch = 0;
 	int     m_cpu_active_space[2]{};
 	int     m_cpu_map_switch[2]{};
-	uint8_t m_curr_mapinfo[2]{};
-	uint8_t m_irq_address[2][2]{};
+	u8 m_curr_mapinfo[2]{};
+	u8 m_irq_address[2][2]{};
 	int     m_m6809_bs_hack_cnt[2]{};
 
 	/* Q219 lightpen/graphics card */
-	std::unique_ptr<uint8_t[]>    m_video_ram;
-	uint16_t  m_x_pos = 0;
-	uint8_t   m_y_pos = 0;
-	uint16_t  m_lp_x = 0;
-	uint8_t   m_lp_y = 0;
-	uint8_t   m_q219_b_touch = 0;
+	std::unique_ptr<u8[]>    m_video_ram;
+	u16  m_x_pos = 0;
+	u8   m_y_pos = 0;
+	u16  m_lp_x = 0;
+	u8   m_lp_y = 0;
+	u8   m_q219_b_touch = 0;
 
 	/* QFC9 floppy disk controller card */
-	uint8_t * m_qfc9_region_ptr = 0;
+	u8 * m_qfc9_region_ptr = 0;
 	int       m_fdc_drq = 0;
-	uint8_t   m_fdc_addr = 0;
-	uint8_t   m_fdc_ctrl = 0;
-	uint8_t   m_fdc_status = 0;
+	u8   m_fdc_addr = 0;
+	u8   m_fdc_ctrl = 0;
+	u8   m_fdc_status = 0;
 	PAIR      m_fdc_dma_addr{};
 	PAIR      m_fdc_dma_cnt{};
 
 	/* CMI-07 */
-	uint8_t   m_cmi07_ctrl = 0;
+	u8   m_cmi07_ctrl = 0;
 	bool      m_cmi07_base_enable[2]{};
-	uint16_t  m_cmi07_base_addr = 0;
+	u16  m_cmi07_base_addr = 0;
 
-	uint8_t   m_msm5832_addr = 0;
+	u8   m_msm5832_addr = 0;
 
 	// Master card (CMI-02)
 	int       m_cmi02_ptm_irq = 0;
-	uint8_t   m_cmi02_pia_chsel = 0;
-	uint8_t   m_master_tune = 0;
+	u8   m_cmi02_pia_chsel = 0;
+	u8   m_master_tune = 0;
 };
 
 /**************************************
@@ -479,20 +475,20 @@ private:
  *
  *************************************/
 
-uint32_t cmi_state::screen_update_cmi2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 cmi_state::screen_update_cmi2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *pen = m_palette->pens();
-	uint8_t y_scroll = m_q219_pia->a_output();
-	uint8_t invert = BIT(~m_q219_pia->b_output(), 3);
+	u8 y_scroll = m_q219_pia->a_output();
+	u8 invert = BIT(~m_q219_pia->b_output(), 3);
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		uint8_t *src = &m_video_ram[(512/8) * ((y + y_scroll) & 0xff)];
-		uint32_t *dest = &bitmap.pix(y, cliprect.min_x);
+		u8 *src = &m_video_ram[(512/8) * ((y + y_scroll) & 0xff)];
+		u32 *dest = &bitmap.pix(y, cliprect.min_x);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 8)
 		{
-			uint8_t data = *src++;
+			u8 data = *src++;
 
 			/* Store 8 pixels */
 			for (int i = 0; i < 8; ++i)
@@ -561,7 +557,7 @@ template void cmi_state::update_video_pos<-1,  0, true>();
 
 template <int Y, int X, bool ByteSize> void cmi_state::update_video_pos()
 {
-	uint8_t *video_addr = &m_video_ram[m_y_pos * (512 / 8) + (m_x_pos / 8)];
+	u8 *video_addr = &m_video_ram[m_y_pos * (512 / 8) + (m_x_pos / 8)];
 
 	if (ByteSize)
 	{
@@ -579,7 +575,7 @@ template <int Y, int X, bool ByteSize> void cmi_state::update_video_pos()
 	m_x_pos = (m_x_pos + X) & 0x1ff;
 }
 
-uint8_t cmi_state::video_r(offs_t offset)
+u8 cmi_state::video_r(offs_t offset)
 {
 	if (machine().side_effects_disabled())
 		return m_video_data;
@@ -606,7 +602,7 @@ uint8_t cmi_state::video_r(offs_t offset)
 	return m_video_data;
 }
 
-uint8_t cmi_state::lightpen_r(offs_t offset)
+u8 cmi_state::lightpen_r(offs_t offset)
 {
 	if (offset & 2)
 		return m_lp_y;
@@ -614,13 +610,13 @@ uint8_t cmi_state::lightpen_r(offs_t offset)
 		return m_lp_x >> 1;
 }
 
-uint8_t cmi_state::pia_q219_b_r()
+u8 cmi_state::pia_q219_b_r()
 {
 	return ((m_lp_x << 7) & 0x80) | m_q219_b_touch;
 }
 
 
-void cmi_state::video_w(offs_t offset, uint8_t data)
+void cmi_state::video_w(offs_t offset, u8 data)
 {
 	m_video_data = data;
 
@@ -642,17 +638,17 @@ void cmi_state::video_w(offs_t offset, uint8_t data)
 	}
 }
 
-void cmi_state::vscroll_w(uint8_t data)
+void cmi_state::vscroll_w(u8 data)
 {
 	// TODO: Partial updates. Also, this should be done through a PIA
 }
 
-void cmi_state::video_attr_w(uint8_t data)
+void cmi_state::video_attr_w(u8 data)
 {
 	// TODO
 }
 
-void cmi_state::tvt_w(uint8_t data)
+void cmi_state::tvt_w(u8 data)
 {
 	if ((data >= 0x20 && data <= 0x7e) || data == 0x0a || data == 0x0d)
 	{
@@ -660,17 +656,17 @@ void cmi_state::tvt_w(uint8_t data)
 	}
 }
 
-uint8_t cmi_state::tvt_r()
+u8 cmi_state::tvt_r()
 {
 	return 0;
 }
 
-void cmi_state::vram_w(offs_t offset, uint8_t data)
+void cmi_state::vram_w(offs_t offset, u8 data)
 {
 	m_video_ram[offset] = data;
 }
 
-uint8_t cmi_state::vram_r(offs_t offset)
+u8 cmi_state::vram_r(offs_t offset)
 {
 	if (machine().side_effects_disabled())
 		return m_video_ram[offset];
@@ -686,38 +682,38 @@ uint8_t cmi_state::vram_r(offs_t offset)
 
 /* Memory handling */
 
-template<int CpuNum> uint8_t cmi_state::rom_r(offs_t offset)
+template<int CpuNum> u8 cmi_state::rom_r(offs_t offset)
 {
-	uint16_t base = (CpuNum ? 0x1000 : 0x2000);
-	return *(((uint8_t *)m_q133_region->base()) + base + offset);
+	u16 base = (CpuNum ? 0x1000 : 0x2000);
+	return *(((u8 *)m_q133_region->base()) + base + offset);
 }
 
-template<int CpuNum> uint8_t cmi_state::perr_r(offs_t offset)
+template<int CpuNum> u8 cmi_state::perr_r(offs_t offset)
 {
 	m_maincpu2_irq0_merger->in_w<1>(1);
 
-	const uint8_t page = offset >> 11;
-	const uint8_t mapinfo = m_curr_mapinfo[CpuNum];
-	const uint8_t page_info = m_map_ram[0][((mapinfo & 0x1f) << PAGE_SHIFT) + page];
-	const uint8_t data = m_q256_ram[0][(page_info & 0x7f) * PAGE_SIZE + (offset & 0x7ff)];
+	const u8 page = offset >> 11;
+	const u8 mapinfo = m_curr_mapinfo[CpuNum];
+	const u8 page_info = m_map_ram[0][((mapinfo & 0x1f) << PAGE_SHIFT) + page];
+	const u8 data = m_q256_ram[0][(page_info & 0x7f) * PAGE_SIZE + (offset & 0x7ff)];
 	return data;
 }
 
-template<int CpuNum> void cmi_state::perr_w(offs_t offset, uint8_t data)
+template<int CpuNum> void cmi_state::perr_w(offs_t offset, u8 data)
 {
-	const uint8_t page = offset >> 11;
-	const uint8_t mapinfo = m_curr_mapinfo[CpuNum];
-	const uint8_t page_info = m_map_ram[0][((mapinfo & 0x1f) << PAGE_SHIFT) + page];
+	const u8 page = offset >> 11;
+	const u8 mapinfo = m_curr_mapinfo[CpuNum];
+	const u8 page_info = m_map_ram[0][((mapinfo & 0x1f) << PAGE_SHIFT) + page];
 	m_q256_ram[0][(page_info & 0x7f) * PAGE_SIZE + (offset & 0x7ff)] = data;
 }
 
-template <int CpuNum, uint16_t base> uint8_t cmi_state::ram_range_r(offs_t offset)
+template <int CpuNum, u16 base> u8 cmi_state::ram_range_r(offs_t offset)
 {
-	const uint16_t addr = base + offset;
-	const uint8_t mapinfo = m_curr_mapinfo[CpuNum];
+	const u16 addr = base + offset;
+	const u8 mapinfo = m_curr_mapinfo[CpuNum];
 	const bool perr_en = BIT(mapinfo, 6);
-	const uint8_t page = addr >> 11;
-	const uint8_t page_info = m_map_ram[0][((mapinfo & 0x1f) << PAGE_SHIFT) + page];
+	const u8 page = addr >> 11;
+	const u8 page_info = m_map_ram[0][((mapinfo & 0x1f) << PAGE_SHIFT) + page];
 
 	if (m_cmi07_base_enable[CpuNum] && (addr & 0xc000) == m_cmi07_base_addr)
 	{
@@ -730,20 +726,20 @@ template <int CpuNum, uint16_t base> uint8_t cmi_state::ram_range_r(offs_t offse
 	}
 	else if (BIT(page_info, 7))
 	{
-		const uint32_t ram_base = (page_info & 0x7f) << 11;
+		const u32 ram_base = (page_info & 0x7f) << 11;
 		return m_q256_ram[0][ram_base | (addr & 0x7ff)];
 	}
 
 	return 0x00;
 }
 
-template <int CpuNum, uint16_t base> void cmi_state::ram_range_w(offs_t offset, uint8_t data)
+template <int CpuNum, u16 base> void cmi_state::ram_range_w(offs_t offset, u8 data)
 {
-	const uint16_t addr = base + offset;
-	const uint8_t mapinfo = m_curr_mapinfo[CpuNum];
+	const u16 addr = base + offset;
+	const u8 mapinfo = m_curr_mapinfo[CpuNum];
 	const bool perr_en = BIT(mapinfo, 6);
-	const uint8_t page = addr >> 11;
-	const uint8_t page_info = m_map_ram[0][((mapinfo & 0x1f) << PAGE_SHIFT) + page];
+	const u8 page = addr >> 11;
+	const u8 page_info = m_map_ram[0][((mapinfo & 0x1f) << PAGE_SHIFT) + page];
 
 	if (m_cmi07_base_enable[CpuNum] && (addr & 0xc000) == m_cmi07_base_addr)
 	{
@@ -757,23 +753,23 @@ template <int CpuNum, uint16_t base> void cmi_state::ram_range_w(offs_t offset, 
 	}
 	else if (BIT(page_info, 7))
 	{
-		const uint32_t ram_base = (page_info & 0x7f) << 11;
+		const u32 ram_base = (page_info & 0x7f) << 11;
 		m_q256_ram[0][ram_base | (addr & 0x7ff)] = data;
 	}
 }
 
-template <int CpuNum> uint8_t cmi_state::vram_range_r(offs_t offset)
+template <int CpuNum> u8 cmi_state::vram_range_r(offs_t offset)
 {
-	const uint8_t mapinfo = m_curr_mapinfo[CpuNum];
+	const u8 mapinfo = m_curr_mapinfo[CpuNum];
 	if (!BIT(mapinfo, 5))
 	{
 		return vram_r(offset);
 	}
 	else
 	{
-		const uint16_t address = 0x8000 + offset;
-		const uint8_t page = (offset >> 11) + 16;
-		const uint8_t page_info = m_map_ram[0][((mapinfo & 0x1f) << PAGE_SHIFT) + page];
+		const u16 address = 0x8000 + offset;
+		const u8 page = (offset >> 11) + 16;
+		const u8 page_info = m_map_ram[0][((mapinfo & 0x1f) << PAGE_SHIFT) + page];
 
 		if (m_cmi07_base_enable[CpuNum] && (address & 0xc000) == m_cmi07_base_addr)
 		{
@@ -782,7 +778,7 @@ template <int CpuNum> uint8_t cmi_state::vram_range_r(offs_t offset)
 
 		if (BIT(page_info, 7))
 		{
-			const uint32_t ram_base = (page_info & 0x7f) << 11;
+			const u32 ram_base = (page_info & 0x7f) << 11;
 			return m_q256_ram[0][ram_base | (offset & 0x7ff)];
 		}
 	}
@@ -790,18 +786,18 @@ template <int CpuNum> uint8_t cmi_state::vram_range_r(offs_t offset)
 	return 0x00;
 }
 
-template <int CpuNum> void cmi_state::vram_range_w(offs_t offset, uint8_t data)
+template <int CpuNum> void cmi_state::vram_range_w(offs_t offset, u8 data)
 {
-	const uint8_t mapinfo = m_curr_mapinfo[CpuNum];
+	const u8 mapinfo = m_curr_mapinfo[CpuNum];
 	if (!BIT(mapinfo, 5))
 	{
 		vram_w(offset, data);
 	}
 	else
 	{
-		const uint16_t address = 0x8000 + offset;
-		const uint8_t page = (offset >> 11) + 16;
-		const uint8_t page_info = m_map_ram[0][((mapinfo & 0x1f) << PAGE_SHIFT) + page];
+		const u16 address = 0x8000 + offset;
+		const u8 page = (offset >> 11) + 16;
+		const u8 page_info = m_map_ram[0][((mapinfo & 0x1f) << PAGE_SHIFT) + page];
 
 		if (m_cmi07_base_enable[CpuNum] && (address & 0xc000) == m_cmi07_base_addr)
 		{
@@ -811,68 +807,68 @@ template <int CpuNum> void cmi_state::vram_range_w(offs_t offset, uint8_t data)
 
 		if (BIT(page_info, 7))
 		{
-			const uint32_t ram_base = (page_info & 0x7f) << 11;
+			const u32 ram_base = (page_info & 0x7f) << 11;
 			m_q256_ram[0][ram_base | (offset & 0x7ff)] = data;
 		}
 	}
 }
 
-template <int CpuNum> uint8_t cmi_state::cards_range_r(offs_t offset)
+template <int CpuNum> u8 cmi_state::cards_range_r(offs_t offset)
 {
-	const uint8_t mapinfo = m_curr_mapinfo[CpuNum];
+	const u8 mapinfo = m_curr_mapinfo[CpuNum];
 	if (!BIT(mapinfo, 7) && offset < 0x40)
 	{
 		return cmi02_r(offset);
 	}
 	else
 	{
-		const uint8_t page = (offset >> 11) + 28;
-		const uint8_t page_info = m_map_ram[0][((mapinfo & 0x1f) << PAGE_SHIFT) + page];
+		const u8 page = (offset >> 11) + 28;
+		const u8 page_info = m_map_ram[0][((mapinfo & 0x1f) << PAGE_SHIFT) + page];
 
 		if (BIT(page_info, 7))
 		{
-			const uint32_t ram_base = (page_info & 0x7f) << 11;
+			const u32 ram_base = (page_info & 0x7f) << 11;
 			return m_q256_ram[0][ram_base | (offset & 0x7ff)];
 		}
 	}
 	return 0x00;
 }
 
-template <int CpuNum> void cmi_state::cards_range_w(offs_t offset, uint8_t data)
+template <int CpuNum> void cmi_state::cards_range_w(offs_t offset, u8 data)
 {
-	const uint8_t mapinfo = m_curr_mapinfo[CpuNum];
+	const u8 mapinfo = m_curr_mapinfo[CpuNum];
 	if (!BIT(mapinfo, 7) && offset < 0x40)
 	{
 		cmi02_w(offset, data);
 	}
 	else
 	{
-		const uint8_t page = (offset >> 11) + 28;
-		const uint8_t page_info = m_map_ram[0][((mapinfo & 0x1f) << PAGE_SHIFT) + page];
+		const u8 page = (offset >> 11) + 28;
+		const u8 page_info = m_map_ram[0][((mapinfo & 0x1f) << PAGE_SHIFT) + page];
 
 		if (BIT(page_info, 7))
 		{
-			const uint32_t ram_base = (page_info & 0x7f) << 11;
+			const u32 ram_base = (page_info & 0x7f) << 11;
 			m_q256_ram[0][ram_base | (offset & 0x7ff)] = data;
 		}
 	}
 }
 
-template <int CpuNum> uint8_t cmi_state::periphs_range_r(offs_t offset)
+template <int CpuNum> u8 cmi_state::periphs_range_r(offs_t offset)
 {
-	const uint8_t mapinfo = m_curr_mapinfo[CpuNum];
+	const u8 mapinfo = m_curr_mapinfo[CpuNum];
 	if (!BIT(mapinfo, 7))
 	{
 		return m_cpu_periphs[CpuNum]->read8(offset);
 	}
 	else
 	{
-		const uint8_t page = (offset >> 11) + 30;
-		const uint8_t page_info = m_map_ram[0][((mapinfo & 0x1f) << PAGE_SHIFT) + page];
+		const u8 page = (offset >> 11) + 30;
+		const u8 page_info = m_map_ram[0][((mapinfo & 0x1f) << PAGE_SHIFT) + page];
 
 		if (BIT(page_info, 7))
 		{
-			const uint32_t ram_base = (page_info & 0x7f) << 11;
+			const u32 ram_base = (page_info & 0x7f) << 11;
 			return m_q256_ram[0][ram_base | (offset & 0x7ff)];
 		}
 	}
@@ -880,27 +876,27 @@ template <int CpuNum> uint8_t cmi_state::periphs_range_r(offs_t offset)
 	return 0x00;
 }
 
-template <int CpuNum> void cmi_state::periphs_range_w(offs_t offset, uint8_t data)
+template <int CpuNum> void cmi_state::periphs_range_w(offs_t offset, u8 data)
 {
-	const uint8_t mapinfo = m_curr_mapinfo[CpuNum];
+	const u8 mapinfo = m_curr_mapinfo[CpuNum];
 	if (!BIT(mapinfo, 7))
 	{
 		m_cpu_periphs[CpuNum]->write8(offset, data);
 	}
 	else
 	{
-		const uint8_t page = (offset >> 11) + 30;
-		const uint8_t page_info = m_map_ram[0][((mapinfo & 0x1f) << PAGE_SHIFT) + page];
+		const u8 page = (offset >> 11) + 30;
+		const u8 page_info = m_map_ram[0][((mapinfo & 0x1f) << PAGE_SHIFT) + page];
 
 		if (BIT(page_info, 7))
 		{
-			const uint32_t ram_base = (page_info & 0x7f) << 11;
+			const u32 ram_base = (page_info & 0x7f) << 11;
 			m_q256_ram[0][ram_base | (offset & 0x7ff)] = data;
 		}
 	}
 }
 
-void cmi_state::map_ram_w(offs_t offset, uint8_t data)
+void cmi_state::map_ram_w(offs_t offset, u8 data)
 {
 	if ((offset & 1) == 0)
 	{
@@ -908,7 +904,7 @@ void cmi_state::map_ram_w(offs_t offset, uint8_t data)
 	}
 	else
 	{
-		uint8_t map_info;
+		u8 map_info;
 		int map = (offset >> 6);
 		int page_enable = ((m_map_ram_latch & 0x80) && (0 == (m_map_ram_latch & 7))) ? 0x80 : 0;
 
@@ -923,22 +919,22 @@ void cmi_state::map_ram_w(offs_t offset, uint8_t data)
 	}
 }
 
-template<int CpuNum> uint8_t cmi_state::vector_r(offs_t offset)
+template<int CpuNum> u8 cmi_state::vector_r(offs_t offset)
 {
 	return m_q133_rom[(CpuNum ? 0xbfe : 0xffe) + offset];
 }
 
-template<int CpuNum> uint8_t cmi_state::map_r()
+template<int CpuNum> u8 cmi_state::map_r()
 {
 	return (m_cpu_active_space[1] << 2) | (m_cpu_active_space[0] << 1) | CpuNum;
 }
 
-template<int CpuNum> void cmi_state::map_w(uint8_t data)
+template<int CpuNum> void cmi_state::map_w(u8 data)
 {
 	m_map_switch_timer->adjust(attotime::from_ticks(data & 0xf, M6809_CLOCK), CpuNum);
 }
 
-template<int CpuNum> uint8_t cmi_state::irq_ram_r(offs_t offset)
+template<int CpuNum> u8 cmi_state::irq_ram_r(offs_t offset)
 {
 	if (machine().side_effects_disabled())
 		return m_scratch_ram[CpuNum][0xf8 + offset];
@@ -952,7 +948,7 @@ template<int CpuNum> uint8_t cmi_state::irq_ram_r(offs_t offset)
 	return m_scratch_ram[CpuNum][0xf8 + offset];
 }
 
-template<int CpuNum> void cmi_state::irq_ram_w(offs_t offset, uint8_t data)
+template<int CpuNum> void cmi_state::irq_ram_w(offs_t offset, u8 data)
 {
 	m_scratch_ram[CpuNum][0xf8 + offset] = data;
 }
@@ -960,7 +956,7 @@ template<int CpuNum> void cmi_state::irq_ram_w(offs_t offset, uint8_t data)
 TIMER_CALLBACK_MEMBER(cmi_state::switch_map)
 {
 	m_cpu_active_space[param] = m_cpu_map_switch[param];
-	uint8_t map_info = (m_cpu_map_switch[param] == MAPPING_A) ?
+	u8 map_info = (m_cpu_map_switch[param] == MAPPING_A) ?
 					 m_map_sel[param ? MAPSEL_P2_A : MAPSEL_P1_A] :
 					 m_map_sel[param ? MAPSEL_P2_B : MAPSEL_P1_B];
 	update_address_space(param, map_info);
@@ -973,14 +969,14 @@ TIMER_CALLBACK_MEMBER(cmi_state::jam_timeout)
 	m_jam_timeout_timer->adjust(attotime::never);
 }
 
-uint8_t cmi_state::atomic_r()
+u8 cmi_state::atomic_r()
 {
 	// TODO
 	//osd_printf_debug("atomic access\n");
 	return 0;
 }
 
-void cmi_state::cpufunc_w(uint8_t data)
+void cmi_state::cpufunc_w(u8 data)
 {
 	int cpunum = data & 1;
 	int idx = data & 6;
@@ -1002,14 +998,14 @@ void cmi_state::cpufunc_w(uint8_t data)
 	}
 }
 
-uint8_t cmi_state::parity_r(offs_t offset)
+u8 cmi_state::parity_r(offs_t offset)
 {
 	m_maincpu2_irq0_merger->in_w<1>(0);
 	LOG("%s: parity_r %04x\n", machine().describe_context(), offset);
 	return 0xff;
 }
 
-void cmi_state::mapsel_w(offs_t offset, uint8_t data)
+void cmi_state::mapsel_w(offs_t offset, u8 data)
 {
 	LOG("%s: mapsel_w: %02x = %02x\n", machine().describe_context(), offset, data);
 
@@ -1029,7 +1025,7 @@ void cmi_state::mapsel_w(offs_t offset, uint8_t data)
 
 
 
-void cmi_state::midi_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void cmi_state::midi_dma_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	address_space *cmi_space = ((offset & 0x8000) ? m_cpu2space : m_cpu1space);
 	offset &= 0x7fff;
@@ -1040,34 +1036,25 @@ void cmi_state::midi_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		cmi_space->write_byte(offset * 2, data >> 8);
 }
 
-uint16_t cmi_state::midi_dma_r(offs_t offset)
+u16 cmi_state::midi_dma_r(offs_t offset)
 {
 	address_space *cmi_space = ((offset & 0x8000) ? m_cpu2space : m_cpu1space);
 	offset &= 0x7fff;
-	return cmi_space->read_word(offset * 2);
+	const u16 data = cmi_space->read_word(offset * 2);
+	return data;
 }
 
-WRITE_LINE_MEMBER( cmi_state::midi_ptm0_c3_w )
+WRITE_LINE_MEMBER(cmi_state::midi_ptm0_c3_w)
 {
 	m_midi_ptm[1]->set_clock(0, state);
 	m_midi_ptm[1]->set_clock(1, state);
 	m_midi_ptm[1]->set_clock(2, state);
 }
 
-WRITE_LINE_MEMBER( cmi_state::midi_ptm_irq )
+void cmi_state::midi_latch_w(u8 data)
 {
-	m_midicpu->set_input_line(M68K_IRQ_2, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-WRITE_LINE_MEMBER( cmi_state::midi_acia_irq )
-{
-	m_midicpu->set_input_line(M68K_IRQ_3, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-void cmi_state::midi_latch_w(uint8_t data)
-{
-	const uint8_t bit_offset = data & 0x7;
-	const uint8_t bit_value = BIT(data, 3);
+	const u8 bit_offset = data & 0x7;
+	const u8 bit_value = BIT(data, 3);
 	switch (bit_offset)
 	{
 	case 0x00: // /INT1
@@ -1164,7 +1151,7 @@ template <int CpuNum> void cmi_state::cpu_periphs_map(address_map &map)
 	map(0x0c88, 0x0c8b).rw(m_q133_acia[2], FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x0c8c, 0x0c8f).rw(m_q133_acia[3], FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x0c90, 0x0c97).rw(m_q133_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
-	//map(0x0ca0, 0x0ca0).w(FUNC(cmi_state::midi_latch_w));
+	map(0x0ca0, 0x0ca0).w(FUNC(cmi_state::midi_latch_w));
 	map(0x0cbc, 0x0cbc).rw(FUNC(cmi_state::cmi07_r), FUNC(cmi_state::cmi07_w));
 	map(0x0cc0, 0x0cc3).r(FUNC(cmi_state::lightpen_r));
 	map(0x0cc4, 0x0cc7).rw(m_q219_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
@@ -1195,27 +1182,27 @@ static INPUT_PORTS_START( cmi2x )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME ( "Lightpen Touch" ) PORT_CODE( MOUSECODE_BUTTON1 )
 INPUT_PORTS_END
 
-template <int CpuNum> uint8_t cmi_state::scratch_ram_r(offs_t offset)
+template <int CpuNum> u8 cmi_state::scratch_ram_r(offs_t offset)
 {
 	return m_scratch_ram[CpuNum][offset];
 }
 
-template <int CpuNum> void cmi_state::scratch_ram_w(offs_t offset, uint8_t data)
+template <int CpuNum> void cmi_state::scratch_ram_w(offs_t offset, u8 data)
 {
 	m_scratch_ram[CpuNum][offset] = data;
 }
 
-template <int CpuNum> uint8_t cmi_state::scratch_ram_fa_r(offs_t offset)
+template <int CpuNum> u8 cmi_state::scratch_ram_fa_r(offs_t offset)
 {
 	return m_scratch_ram[CpuNum][0xfa + offset];
 }
 
-template <int CpuNum> void cmi_state::scratch_ram_fa_w(offs_t offset, uint8_t data)
+template <int CpuNum> void cmi_state::scratch_ram_fa_w(offs_t offset, u8 data)
 {
 	m_scratch_ram[CpuNum][0xfa + offset] = data;
 }
 
-bool cmi_state::map_is_active(int cpunum, int map, uint8_t *map_info)
+bool cmi_state::map_is_active(int cpunum, int map, u8 *map_info)
 {
 	if (m_cpu_active_space[cpunum] == MAPPING_A)
 	{
@@ -1235,12 +1222,12 @@ bool cmi_state::map_is_active(int cpunum, int map, uint8_t *map_info)
 	return false;
 }
 
-void cmi_state::update_address_space(int cpunum, uint8_t mapinfo)
+void cmi_state::update_address_space(int cpunum, u8 mapinfo)
 {
 	m_curr_mapinfo[cpunum] = mapinfo;
 }
 
-void cmi_state::cmi07_w(uint8_t data)
+void cmi_state::cmi07_w(u8 data)
 {
 	LOG("%s: cmi07_w: %02x\n", machine().describe_context(), data);
 
@@ -1249,7 +1236,7 @@ void cmi_state::cmi07_w(uint8_t data)
 		return;
 	}
 
-	const uint8_t prev = m_cmi07_ctrl;
+	const u8 prev = m_cmi07_ctrl;
 	m_cmi07_ctrl = data;
 
 	m_cmi07_base_enable[0] = BIT(data, 6) && (data & 0x30);
@@ -1262,7 +1249,7 @@ void cmi_state::cmi07_w(uint8_t data)
 	m_cmi07cpu->set_input_line(INPUT_LINE_HALT,  BIT(data, 3) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* We need to update the address spaces */
-	uint8_t map_info = (m_cpu_active_space[0] == MAPPING_A) ? m_map_sel[MAPSEL_P1_A] : m_map_sel[MAPSEL_P1_B];
+	u8 map_info = (m_cpu_active_space[0] == MAPPING_A) ? m_map_sel[MAPSEL_P1_A] : m_map_sel[MAPSEL_P1_B];
 	update_address_space(0, map_info);
 
 	/* CPU 2 space is untouched by this update */
@@ -1273,15 +1260,10 @@ void cmi_state::cmi07_w(uint8_t data)
 	update_address_space(1, map_info);
 }
 
-uint8_t cmi_state::cmi07_r()
+u8 cmi_state::cmi07_r()
 {
 	LOG("%s: cmi07_r: %02x\n", machine().describe_context(), 0xff);
 	return 0xff;
-}
-
-WRITE_LINE_MEMBER( cmi_state::q133_ptm_irq_w )
-{
-	m_maincpu2_irq0_merger->in_w<0>(state);
 }
 
 WRITE_LINE_MEMBER( cmi_state::q133_acia_irq )
@@ -1299,11 +1281,11 @@ WRITE_LINE_MEMBER( cmi_state::q133_acia_irq )
 void cmi_state::dma_fdc_rom()
 {
 	/* DMA channel 1 is used*/
-	uint8_t map_info = m_map_sel[MAPSEL_P2_A_DMA1];
+	u8 map_info = m_map_sel[MAPSEL_P2_A_DMA1];
 	int map = map_info & 0x1f;
 	int addr = m_fdc_dma_addr.w.l & ~PAGE_MASK;
 	int page = addr / PAGE_SIZE;
-	uint8_t p_info = 0;
+	u8 p_info = 0;
 
 	/* Active low */
 	m_fdc_status &= ~FDC_STATUS_DRIVER_LOAD;
@@ -1333,7 +1315,7 @@ void cmi_state::dma_fdc_rom()
 	m_fdc_dma_cnt.w.l = 0;
 }
 
-void cmi_state::write_fdc_ctrl(uint8_t data)
+void cmi_state::write_fdc_ctrl(u8 data)
 {
 	int drive = data & 1;
 	int side = BIT(data, 5) ? 1 : 0;
@@ -1352,7 +1334,7 @@ void cmi_state::write_fdc_ctrl(uint8_t data)
 	m_fdc_ctrl = data;
 }
 
-void cmi_state::fdc_w(offs_t offset, uint8_t data)
+void cmi_state::fdc_w(offs_t offset, u8 data)
 {
 	if (offset == 0)
 	{
@@ -1375,7 +1357,7 @@ void cmi_state::fdc_w(offs_t offset, uint8_t data)
 		m_fdc_addr = data;
 }
 
-uint8_t cmi_state::fdc_r(offs_t offset)
+u8 cmi_state::fdc_r(offs_t offset)
 {
 	if (machine().side_effects_disabled())
 		return 0;
@@ -1398,7 +1380,7 @@ uint8_t cmi_state::fdc_r(offs_t offset)
 void cmi_state::fdc_dma_transfer()
 {
 	/* DMA channel 1 is used*/
-	uint8_t map_info = m_map_sel[MAPSEL_P2_A_DMA1];
+	u8 map_info = m_map_sel[MAPSEL_P2_A_DMA1];
 	int map = map_info & 0x1f;
 
 	int cpu_page = (m_fdc_dma_addr.w.l & ~PAGE_MASK) / PAGE_SIZE;
@@ -1419,7 +1401,7 @@ void cmi_state::fdc_dma_transfer()
 	if (!BIT(m_fdc_ctrl, 4))
 	{
 		/* Read a byte at a time */
-		uint8_t data = m_wd1791->data_r() ^ 0xff;
+		u8 data = m_wd1791->data_r() ^ 0xff;
 
 		if (m_fdc_dma_cnt.w.l == 0xffff)
 			return;
@@ -1445,7 +1427,7 @@ void cmi_state::fdc_dma_transfer()
 			return;
 
 		/* Write a byte at a time */
-		uint8_t data = 0;
+		u8 data = 0;
 
 		/* TODO: This should be stuck in a deferred write */
 		if (phys_page & 0x80)
@@ -1506,7 +1488,7 @@ WRITE_LINE_MEMBER( cmi_state::wd1791_drq )
 28 - 2B = PIA
 */
 
-void cmi_state::master_tune_w(uint8_t data)
+void cmi_state::master_tune_w(u8 data)
 {
 	m_master_tune = data;
 	double mfreq = ((0xf00 | data) * (MASTER_OSCILLATOR.dvalue() / 2.0)) / 4096.0;
@@ -1516,17 +1498,17 @@ void cmi_state::master_tune_w(uint8_t data)
 	}
 }
 
-uint8_t cmi_state::master_tune_r()
+u8 cmi_state::master_tune_r()
 {
 	return m_master_tune;
 }
 
-void cmi_state::cmi02_chsel_w(uint8_t data)
+void cmi_state::cmi02_chsel_w(u8 data)
 {
 	m_cmi02_pia_chsel = data;
 }
 
-uint8_t cmi_state::cmi02_chsel_r()
+u8 cmi_state::cmi02_chsel_r()
 {
 	return m_cmi02_pia_chsel;
 }
@@ -1556,7 +1538,7 @@ WRITE_LINE_MEMBER( cmi_state::cmi02_pia2_cb2_w )
 	m_cmi02_pia[1]->ca1_w(0);
 }
 
-uint8_t cmi_state::cmi02_r(offs_t offset)
+u8 cmi_state::cmi02_r(offs_t offset)
 {
 	if (machine().side_effects_disabled())
 		return 0;
@@ -1602,7 +1584,7 @@ uint8_t cmi_state::cmi02_r(offs_t offset)
 	}
 }
 
-void cmi_state::cmi02_w(offs_t offset, uint8_t data)
+void cmi_state::cmi02_w(offs_t offset, u8 data)
 {
 	if (offset <= 0x1f)
 	{
@@ -1660,7 +1642,7 @@ WRITE_LINE_MEMBER(cmi_state::channel_irq)
 	set_interrupt(CPU_1, ch_int_levels[Channel], state);
 }
 
-void cmi_state::i8214_cpu1_w(uint8_t data)
+void cmi_state::i8214_cpu1_w(u8 data)
 {
 	m_maincpu1_irq_merger->in_w<0>(0);
 	m_lp_int = 0;
@@ -1668,39 +1650,39 @@ void cmi_state::i8214_cpu1_w(uint8_t data)
 }
 
 
-void cmi_state::i8214_cpu2_w(uint8_t data)
+void cmi_state::i8214_cpu2_w(u8 data)
 {
 	LOG("%s: i8214_cpu2_w, clearing CPU2 IRQ line: %02x\n", machine().describe_context(), data);
 	m_maincpu2->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 	m_i8214[1]->b_sgs_w(~(data & 0xf));
 }
 
-uint8_t cmi_state::shared_ram_r(offs_t offset)
+u8 cmi_state::shared_ram_r(offs_t offset)
 {
 	return m_shared_ram[offset];
 }
 
-void cmi_state::shared_ram_w(offs_t offset, uint8_t data)
+void cmi_state::shared_ram_w(offs_t offset, u8 data)
 {
 	m_shared_ram[offset] = data;
 }
 
-uint8_t cmi_state::aic_ad574_r()
+u8 cmi_state::aic_ad574_r()
 {
 	const bool adca = BIT(m_aic_mux_latch, 5); // false - MSB, true - LSB
-	const uint16_t val = m_aic_ad565_in[m_aic_mux_latch & 0x07];
-	const uint8_t data = adca ? ((uint8_t)val) : (val >> 8);
+	const u16 val = m_aic_ad565_in[m_aic_mux_latch & 0x07];
+	const u8 data = adca ? ((u8)val) : (val >> 8);
 	LOG("%s: AIC AD574 read: %02x\n", machine().describe_context(), data);
 	return data;
 }
 
-template<int Dac> void cmi_state::aic_dac_w(uint8_t data)
+template<int Dac> void cmi_state::aic_dac_w(u8 data)
 {
 	LOG("%s: AIC DAC%d write: %02x\n", machine().describe_context(), Dac + 1, data);
 	// To Do
 }
 
-void cmi_state::aic_mux_latch_w(uint8_t data)
+void cmi_state::aic_mux_latch_w(u8 data)
 {
 	LOG("%s: AIC mux latch write: %02x\n", machine().describe_context(), data);
 	set_interrupt(CPU_1, IRQ_AIC_LEVEL, BIT(data, 7) ? ASSERT_LINE : CLEAR_LINE);
@@ -1720,14 +1702,14 @@ void cmi_state::aic_mux_latch_w(uint8_t data)
 	}
 }
 
-void cmi_state::aic_ad565_msb_w(uint8_t data)
+void cmi_state::aic_ad565_msb_w(u8 data)
 {
 	m_aic_ad565_in[m_aic_mux_latch & 0x07] &= 0x00ff;
-	m_aic_ad565_in[m_aic_mux_latch & 0x07] |= (uint16_t)data << 8;
+	m_aic_ad565_in[m_aic_mux_latch & 0x07] |= (u16)data << 8;
 	LOG("%s: AIC AD565 MSB write: %02x, input %04x\n", machine().describe_context(), data, m_aic_ad565_in[m_aic_mux_latch & 0x07]);
 }
 
-void cmi_state::aic_ad565_lsb_w(uint8_t data)
+void cmi_state::aic_ad565_lsb_w(u8 data)
 {
 	LOG("%s: AIC AD565 LSB write: %02x\n", machine().describe_context(), data);
 	m_aic_ad565_in[m_aic_mux_latch & 0x07] &= 0xff00;
@@ -1811,12 +1793,6 @@ void cmi_state::set_interrupt(int cpunum, int level, int state)
 	}
 }
 
-WRITE_LINE_MEMBER( cmi_state::maincpu1_irq_w )
-{
-	LOG("%s: maincpu1_irq_w: %d\n", machine().describe_context(), state);
-	m_maincpu1->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 WRITE_LINE_MEMBER( cmi_state::maincpu2_irq0_w )
 {
 	LOG("%s: maincpu2_irq0_w: %d\n", machine().describe_context(), state);
@@ -1889,7 +1865,7 @@ WRITE_LINE_MEMBER( cmi_state::pia_q219_irqb )
     IRQA/B = /RTINT?
 */
 
-uint8_t cmi_state::q133_1_porta_r()
+u8 cmi_state::q133_1_porta_r()
 {
 	if (BIT(m_q133_pia[0]->b_output(), 1))
 	{
@@ -1898,13 +1874,13 @@ uint8_t cmi_state::q133_1_porta_r()
 	return 0xff;
 }
 
-void cmi_state::q133_1_porta_w(uint8_t data)
+void cmi_state::q133_1_porta_w(u8 data)
 {
 	m_msm5832_addr = data & 0xf;
 	m_msm5832->address_w(data & 0x0f);
 }
 
-void cmi_state::q133_1_portb_w(uint8_t data)
+void cmi_state::q133_1_portb_w(u8 data)
 {
 	m_msm5832->hold_w(BIT(data, 0));
 	m_msm5832->read_w(BIT(data, 1));
@@ -1941,7 +1917,7 @@ void cmi_state::machine_reset()
 	m_cpu1space = &m_maincpu1->space(AS_PROGRAM);
 	m_cpu2space = &m_maincpu2->space(AS_PROGRAM);
 
-	m_qfc9_region_ptr = (uint8_t *)m_qfc9_region->base();
+	m_qfc9_region_ptr = (u8 *)m_qfc9_region->base();
 
 	m_int_state[0] = 0;
 	m_int_state[1] = 0;
@@ -2010,7 +1986,7 @@ void cmi_state::machine_reset()
 
 void cmi_state::machine_start()
 {
-	m_q133_rom = (uint8_t *)m_q133_region->base();
+	m_q133_rom = (u8 *)m_q133_region->base();
 
 	// allocate timers for the built-in two channel timer
 	m_map_switch_timer = timer_alloc(FUNC(cmi_state::switch_map), this);
@@ -2022,22 +1998,22 @@ void cmi_state::machine_start()
 	m_jam_timeout_timer->adjust(attotime::never);
 
 	/* Allocate 1kB memory mapping RAM */
-	m_map_ram[0] = std::make_unique<uint8_t[]>(0x400);
-	m_map_ram[1] = std::make_unique<uint8_t[]>(0x400);
+	m_map_ram[0] = std::make_unique<u8[]>(0x400);
+	m_map_ram[1] = std::make_unique<u8[]>(0x400);
 
 	/* Allocate 256kB for each Q256 RAM card */
-	m_q256_ram[0] = std::make_unique<uint8_t[]>(0x40000);
-	m_q256_ram[1] = std::make_unique<uint8_t[]>(0x40000);
+	m_q256_ram[0] = std::make_unique<u8[]>(0x40000);
+	m_q256_ram[1] = std::make_unique<u8[]>(0x40000);
 
 	/* Allocate 16kB video RAM */
-	m_video_ram = std::make_unique<uint8_t[]>(0x4000);
+	m_video_ram = std::make_unique<u8[]>(0x4000);
 
 	/* Allocate 512B shared RAM */
-	m_shared_ram = std::make_unique<uint8_t[]>(0x200);
+	m_shared_ram = std::make_unique<u8[]>(0x200);
 
 	/* Allocate 256B scratch RAM per CPU */
-	m_scratch_ram[0] = std::make_unique<uint8_t[]>(0x100);
-	m_scratch_ram[1] = std::make_unique<uint8_t[]>(0x100);
+	m_scratch_ram[0] = std::make_unique<u8[]>(0x100);
+	m_scratch_ram[1] = std::make_unique<u8[]>(0x100);
 
 	m_msm5832->cs_w(1);
 }
@@ -2101,7 +2077,7 @@ void cmi_state::cmi2x(machine_config &config)
 	m_i8214[2]->int_wr_callback().set(FUNC(cmi_state::i8214_3_int_w));
 	m_i8214[2]->enlg_wr_callback().set(FUNC(cmi_state::i8214_3_enlg));
 
-	INPUT_MERGER_ANY_HIGH(config, m_maincpu1_irq_merger).output_handler().set(FUNC(cmi_state::maincpu1_irq_w));
+	INPUT_MERGER_ANY_HIGH(config, m_maincpu1_irq_merger).output_handler().set_inputline(m_maincpu1, M6809_IRQ_LINE);
 	INPUT_MERGER_ANY_HIGH(config, m_maincpu2_irq0_merger).output_handler().set(FUNC(cmi_state::maincpu2_irq0_w));
 
 	PIA6821(config, m_q133_pia[0]);
@@ -2117,7 +2093,7 @@ void cmi_state::cmi2x(machine_config &config)
 
 	PTM6840(config, m_q133_ptm, SYSTEM_CAS_CLOCK);
 	m_q133_ptm->set_external_clocks(1024, 1, 111); // Third is todo
-	m_q133_ptm->irq_callback().set(FUNC(cmi_state::q133_ptm_irq_w));
+	m_q133_ptm->irq_callback().set(m_maincpu2_irq0_merger, FUNC(input_merger_any_high_device::in_w<0>));
 
 	PIA6821(config, m_q219_pia);
 	m_q219_pia->readpb_handler().set(FUNC(cmi_state::pia_q219_b_r));
@@ -2151,6 +2127,7 @@ void cmi_state::cmi2x(machine_config &config)
 
 	for (auto &acia : m_q133_acia)
 		MOS6551(config, acia, 1.8432_MHz_XTAL).set_xtal(1.8432_MHz_XTAL);
+
 	m_q133_acia[0]->irq_handler().set("q133_acia_irq", FUNC(input_merger_device::in_w<0>));
 	m_q133_acia[1]->irq_handler().set("q133_acia_irq", FUNC(input_merger_device::in_w<1>));
 	m_q133_acia[2]->irq_handler().set("q133_acia_irq", FUNC(input_merger_device::in_w<2>));
@@ -2187,6 +2164,15 @@ void cmi_state::cmi2x(machine_config &config)
 	//m_midi_ptm[1]->o2_callback().set(FUNC(cmi_state::midi_sync_out_2_w)); // SYNC OUT 2 per schematic
 	//m_midi_ptm[1]->o3_callback().set(FUNC(cmi_state::midi_sync_out_3_w)); // SYNC OUT 3 per schematic
 
+	clock_device &midi_clock(CLOCK(config, "midi_clock", 20_MHz_XTAL / 10));
+	midi_clock.signal_handler().set(m_midi_acia[0], FUNC(acia6850_device::write_rxc));
+	midi_clock.signal_handler().append(m_midi_acia[0], FUNC(acia6850_device::write_txc));
+	//midi_clock.signal_handler().append(m_midi_acia[1], FUNC(acia6850_device::write_rxc));
+	//midi_clock.signal_handler().append(m_midi_acia[1], FUNC(acia6850_device::write_txc));
+	//midi_clock.signal_handler().append(m_midi_acia[2], FUNC(acia6850_device::write_rxc));
+	//midi_clock.signal_handler().append(m_midi_acia[2], FUNC(acia6850_device::write_txc));
+	//midi_clock.signal_handler().append(m_midi_acia[3], FUNC(acia6850_device::write_txc));
+
 	for (int i = 0; i < 4; i++)
 	{
 		ACIA6850(config, m_midi_acia[i]);
@@ -2203,11 +2189,11 @@ void cmi_state::cmi2x(machine_config &config)
 		m_midi_in[i]->rxd_handler().set(m_midi_acia[i], FUNC(acia6850_device::write_rxd));
 	}
 
-	INPUT_MERGER_ANY_HIGH(config, "midi_ptm_irq").output_handler().set(FUNC(cmi_state::midi_ptm_irq));
+	INPUT_MERGER_ANY_HIGH(config, "midi_ptm_irq").output_handler().set_inputline(m_midicpu, M68K_IRQ_2);
 	m_midi_ptm[0]->irq_callback().set("midi_ptm_irq", FUNC(input_merger_device::in_w<0>));
 	m_midi_ptm[1]->irq_callback().set("midi_ptm_irq", FUNC(input_merger_device::in_w<1>));
 
-	INPUT_MERGER_ANY_HIGH(config, "midi_acia_irq").output_handler().set(FUNC(cmi_state::midi_acia_irq));
+	INPUT_MERGER_ANY_HIGH(config, "midi_acia_irq").output_handler().set_inputline(m_midicpu, M68K_IRQ_3);
 	m_midi_acia[0]->irq_handler().set("midi_acia_irq", FUNC(input_merger_device::in_w<0>));
 	m_midi_acia[1]->irq_handler().set("midi_acia_irq", FUNC(input_merger_device::in_w<1>));
 	m_midi_acia[2]->irq_handler().set("midi_acia_irq", FUNC(input_merger_device::in_w<2>));

@@ -47,7 +47,9 @@ void i3001_device::fc_w(uint8_t fc)
 		m_fo = true;
 		break;
 	}
-	m_fo_handler(m_fo);
+	if (!m_fo_handler.isnull()) {
+		m_fo_handler(m_fo);
+	}
 }
 
 WRITE_LINE_MEMBER(i3001_device::clk_w)
@@ -57,9 +59,9 @@ WRITE_LINE_MEMBER(i3001_device::clk_w)
 
 void i3001_device::device_start()
 {
-	m_fo_handler.resolve_safe();
-	m_px_handler.resolve_safe(0);
-	m_sx_handler.resolve_safe(0);
+	m_fo_handler.resolve();
+	m_px_handler.resolve();
+	m_sx_handler.resolve();
 
 	save_item(NAME(m_addr));
 	save_item(NAME(m_pr));
@@ -130,8 +132,8 @@ void i3001_device::update()
 		m_addr = pack_row_col((get_row(m_addr) & 0b11000) | 0b00100 | (m_ac & 0b00011) , 0b1100 | (m_pr & 0b0011));
 	} else {
 		// JPX
-		uint8_t px = m_px_handler() & 0b1111;
-		m_pr = m_sx_handler() & 0b1111;
+		uint8_t px = !m_px_handler.isnull() ? m_px_handler() & 0b1111 : 0;
+		m_pr = !m_sx_handler.isnull() ? m_sx_handler() & 0b1111 : 0;
 		m_addr = pack_row_col((get_row(m_addr) & 0b11100) | (m_ac & 0b00011) , px);
 	}
 }

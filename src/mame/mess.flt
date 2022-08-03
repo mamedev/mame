@@ -51,6 +51,7 @@ apple/lwriter.cpp
 apple/mac.cpp
 apple/mac128.cpp
 apple/maciivx.cpp
+apple/maclc.cpp
 apple/maclc3.cpp
 apple/macpci.cpp
 apple/macpdm.cpp
@@ -680,6 +681,7 @@ saitek/ssystem3.cpp
 saitek/stratos.cpp
 saitek/superstar.cpp
 samcoupe/samcoupe.cpp
+samsung/dvd-n5xx.cpp
 samsung/spc1000.cpp
 samsung/spc1500.cpp
 sanyo/mbc200.cpp

@@ -15803,10 +15803,10 @@ cmpacman                        //
 cmpacmana                       //
 cmpacmanb                       //
 cmtetris                        //
-cmtetrsa                        //
-cmtetrsb                        //
-cmtetrsc                        //
-cmtetrsd                        //
+cmtetrisa                       //
+cmtetrisb                       //
+cmtetrisc                       //
+cmtetrisd                       //
 cmv4                            // (c) 1992 Dyna Electronics
 cmv4a                           // (c) 1992 Dyna Electronics
 cmv801                          // (c) 198? Corsica
@@ -16826,7 +16826,6 @@ mathmarv                        // Texas Instruments
 mbdtower                        // Milton Bradley
 mdndclab                        // Mattel
 merlin                          // Parker Bros
-merlina                         // Parker Bros
 mmarvin                         // Entex
 mmerlin                         // Parker Bros
 monkeysee                       // Tandy Corporation
@@ -16858,6 +16857,7 @@ tc4                             // Coleco
 tc7atc                          // Bandai
 tcfball                         // Tandy Corporation
 tcfballa                        // Tandy Corporation
+tdracula                        // Tsukuda
 ti1000                          // Texas Instruments
 ti1250                          // Texas Instruments
 ti125076                        // Texas Instruments
@@ -17041,6 +17041,7 @@ nbapbp                          // GX778 (c)1998
 nbapbpa                         // GX778 (c)1998
 sscope                          // GX830 (c)1999
 sscope2                         // GX931 (c)2000
+sscope2e                        // GX931 (c)2000
 sscopea                         // GX830 (c)1999
 sscopeb                         // GX830 (c)1999
 sscopec                         // GX830 (c)1999
@@ -20729,8 +20730,6 @@ uccopsu                         // (c) 1992 Irem America (US)
 
 @source:apple/mac.cpp
 mac2fdhd                        // 1988 Apple Macintosh II (FDHD)
-maccclas                        // 1993 Apple Macintosh Color Classic
-macclas2                        // 1991 Apple Macintosh Classic II
 macii                           // 1987 Apple Macintosh II
 maciici                         // 1989 Apple Macintosh IIci
 maciicx                         // 1989 Apple Macintosh IIcx
@@ -20738,9 +20737,13 @@ maciifx                         // 1990 Apple Macintosh IIfx
 maciihmu                        // 1987 Apple Macintosh II (w/o 68851 MMU)
 maciisi                         // 1990 Apple Macintosh IIsi
 maciix                          // 1988 Apple Macintosh IIx
+macse30                         // 1989 Apple Macintosh SE/30
+
+@source:apple/maclc.cpp
 maclc                           // 1990 Apple Macintosh LC
 maclc2                          // 1991 Apple Macintosh LC II
-macse30                         // 1989 Apple Macintosh SE/30
+macclas2                        // 1991 Apple Macintosh Classic II
+maccclas                        // 1993 Apple Macintosh Color Classic
 
 @source:apple/maciivx.cpp
 maciivx                         // 1993 Apple Macintosh IIvx
@@ -20973,6 +20976,7 @@ mastboy                         // (c) 1991 - No Ref on the PCB
 mastboya                        // (c) 1991 - No Ref on the PCB
 mastboyi                        // (c) 1991 - No Ref on the PCB
 mastboyia                       // (c) 1991 - No Ref on the PCB
+mastboyib                       // (c) 1992 - No Ref on the PCB
 
 @source:gaelco/mastboyo.cpp
 mastboyo                        // (c) 1987 - No Ref on the PCB
@@ -39507,6 +39511,9 @@ spbactn                         // 9002 - (c) 1991 Tecmo
 spbactnj                        // 9002 - (c) 1991 Tecmo
 spbactnp                        // prototype
 
+@source:samsung/dvd-n5xx.cpp
+n501
+
 @source:samsung/spc1000.cpp
 spc1000                         //
 
@@ -41722,7 +41729,8 @@ uk2086                          // 1986 UK2086
 
 @source:handheld/tispeak.cpp
 k28m2                           // Tiger Electronics
-lantutor                        //
+lantrans                        //
+lantransp                       //
 snmath                          //
 snmatha                         //
 snmathp                         //
@@ -41749,7 +41757,7 @@ vocaid                          //
 @source:handheld/tispellb.cpp
 mrchalgr                        //
 spellb                          //
-spellb79                        //
+spellba                         //
 
 @source:apple/tk2000.cpp
 mpf2                            // Multitech MPF-II
@@ -42540,6 +42548,7 @@ superten                        // (c) 1988
 usg182                          // (c) 1989
 usg185                          // (c) 1990
 usg187c                         // (c) 1991
+usg211c                         // (c) 1991
 usg32                           // (c) 1987
 usg82                           // (c) 1988
 usg83x                          // (c) 1988

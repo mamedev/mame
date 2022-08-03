@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /*
 
-  TMS1000 family - TMS1400, TMS1470, TMS1600, TMS1670
+  TMS1000 family - TMS1400, TMS1470, TMS1475, TMS1600, TMS1670
 
 */
 
@@ -40,8 +40,20 @@ class tms1470_cpu_device : public tms1400_cpu_device
 {
 public:
 	tms1470_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	tms1470_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 };
 
+class tms1475_cpu_device : public tms1470_cpu_device
+{
+public:
+	tms1475_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual void op_setr() override { tms1100_cpu_device::op_setr(); }
+	virtual void op_rstr() override { tms1100_cpu_device::op_rstr(); }
+};
 
 class tms1600_cpu_device : public tms1400_cpu_device
 {
@@ -61,6 +73,7 @@ public:
 
 DECLARE_DEVICE_TYPE(TMS1400, tms1400_cpu_device)
 DECLARE_DEVICE_TYPE(TMS1470, tms1470_cpu_device)
+DECLARE_DEVICE_TYPE(TMS1475, tms1475_cpu_device)
 DECLARE_DEVICE_TYPE(TMS1600, tms1600_cpu_device)
 DECLARE_DEVICE_TYPE(TMS1670, tms1670_cpu_device)
 

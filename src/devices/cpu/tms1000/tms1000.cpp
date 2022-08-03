@@ -61,48 +61,39 @@ void tms1000_cpu_device::data_32x4(address_map &map)
 // device definitions
 tms1000_cpu_device::tms1000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: tms1000_cpu_device(mconfig, TMS1000, tag, owner, clock, 8 /* o pins */, 11 /* r pins */, 6 /* pc bits */, 8 /* byte width */, 2 /* x width */, 10 /* prg width */, address_map_constructor(FUNC(tms1000_cpu_device::program_10bit_8), this), 6 /* data width */, address_map_constructor(FUNC(tms1000_cpu_device::data_64x4), this))
-{
-}
+{ }
 
 tms1000_cpu_device::tms1000_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
 	: tms1k_base_device(mconfig, type, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, prgwidth, program, datawidth, data)
-{
-}
+{ }
 
 tms1070_cpu_device::tms1070_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: tms1000_cpu_device(mconfig, TMS1070, tag, owner, clock, 8, 11, 6, 8, 2, 10, address_map_constructor(FUNC(tms1070_cpu_device::program_10bit_8), this), 6, address_map_constructor(FUNC(tms1070_cpu_device::data_64x4), this))
-{
-}
+{ }
 
 tms1040_cpu_device::tms1040_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: tms1000_cpu_device(mconfig, TMS1040, tag, owner, clock, 8, 11, 6, 8, 2, 10, address_map_constructor(FUNC(tms1040_cpu_device::program_10bit_8), this), 6, address_map_constructor(FUNC(tms1040_cpu_device::data_64x4), this))
-{
-}
+{ }
 
 tms1200_cpu_device::tms1200_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: tms1000_cpu_device(mconfig, TMS1200, tag, owner, clock, 8, 13, 6, 8, 2, 10, address_map_constructor(FUNC(tms1200_cpu_device::program_10bit_8), this), 6, address_map_constructor(FUNC(tms1200_cpu_device::data_64x4), this))
-{
-}
+{ }
 
 tms1700_cpu_device::tms1700_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: tms1000_cpu_device(mconfig, TMS1700, tag, owner, clock, 8, 9, 6, 8, 2, 10, address_map_constructor(FUNC(tms1700_cpu_device::program_9bit_8), this), 6, address_map_constructor(FUNC(tms1700_cpu_device::data_32x4), this))
-{
-}
+{ }
 
 tms1730_cpu_device::tms1730_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: tms1000_cpu_device(mconfig, TMS1730, tag, owner, clock, 8, 9, 6, 8, 2, 10, address_map_constructor(FUNC(tms1730_cpu_device::program_9bit_8), this), 6, address_map_constructor(FUNC(tms1730_cpu_device::data_32x4), this))
-{
-}
+{ }
 
 mc141000_cpu_device::mc141000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: tms1000_cpu_device(mconfig, MC141000, tag, owner, clock, 8, 11, 6, 8, 2, 10, address_map_constructor(FUNC(mc141000_cpu_device::program_10bit_8), this), 6, address_map_constructor(FUNC(mc141000_cpu_device::data_64x4), this))
-{
-}
+{ }
 
 mc141200_cpu_device::mc141200_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: tms1000_cpu_device(mconfig, MC141200, tag, owner, clock, 8, 16, 6, 8, 2, 10, address_map_constructor(FUNC(mc141200_cpu_device::program_10bit_8), this), 6, address_map_constructor(FUNC(mc141200_cpu_device::data_64x4), this))
-{
-}
+{ }
 
 
 // machine configs

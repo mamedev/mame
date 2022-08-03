@@ -126,6 +126,7 @@ protected:
 	};
 
 	// statics
+	static const uint8_t lowres_font[];
 	static const uint8_t hires_font[128][12];
 
 	// callbacks

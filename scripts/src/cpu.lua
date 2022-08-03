@@ -1091,16 +1091,30 @@ if CPUS["MCS51"] then
 		MAME_DIR .. "src/devices/cpu/mcs51/mcs51.cpp",
 		MAME_DIR .. "src/devices/cpu/mcs51/mcs51.h",
 		MAME_DIR .. "src/devices/cpu/mcs51/mcs51ops.hxx",
-		MAME_DIR .. "src/devices/cpu/mcs51/axc51-core.cpp",
-		MAME_DIR .. "src/devices/cpu/mcs51/axc51-core.h",
 	}
 end
 
 if opt_tool(CPUS, "MCS51") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mcs51/mcs51dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mcs51/mcs51dasm.h")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mcs51/axc51-core_dasm.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mcs51/axc51-core_dasm.h")
+end
+
+--------------------------------------------------
+-- Appotech AXC-51 (extended Intel 8051)
+--@src/devices/cpu/axc51/axc51.h,CPUS["AXC51"] = true
+--------------------------------------------------
+
+if CPUS["AXC51"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/axc51/axc51.cpp",
+		MAME_DIR .. "src/devices/cpu/axc51/axc51.h",
+		MAME_DIR .. "src/devices/cpu/axc51/axc51ops.hxx",
+	}
+end
+
+if opt_tool(CPUS, "AXC51") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/axc51/axc51dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/acx51/axc51dasm.h")
 end
 
 --------------------------------------------------

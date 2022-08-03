@@ -176,7 +176,7 @@ std::pair<err_t, meta_data> vtech_impl::metadata(const std::vector<std::string> 
 	if(off == 0xffffffff)
 		return std::make_pair(ERR_NOT_FOUND, meta_data());
 
-	return std::make_pair(ERR_OK, file_metadata(bdir.rodata() + off));	
+	return std::make_pair(ERR_OK, file_metadata(bdir.rodata() + off));
 }
 
 err_t vtech_impl::metadata_change(const std::vector<std::string> &path, const meta_data &meta)

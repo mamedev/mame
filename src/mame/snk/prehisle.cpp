@@ -160,33 +160,11 @@ INPUT_PORTS_END
 
 /******************************************************************************/
 
-static const gfx_layout charlayout =
-{
-	8,8,    /* 8*8 characters */
-	RGN_FRAC(1,1),
-	4,      /* 4 bits per pixel */
-	{ STEP4(0,1) },
-	{ STEP8(0,4) },
-	{ STEP8(0,4*8) },
-	32*8    /* every char takes 32 consecutive bytes */
-};
-
-static const gfx_layout tilelayout =
-{
-	16,16,  /* 16*16 sprites */
-	RGN_FRAC(1,1),
-	4,  /* 4 bits per pixel */
-	{ STEP4(0,1) },
-	{ STEP8(0,4), STEP8(4*8*16,4) },
-	{ STEP16(0,4*8) },
-	128*8   /* every sprite takes 64 consecutive bytes */
-};
-
 static GFXDECODE_START( gfx_prehisle )
-	GFXDECODE_ENTRY( "chars",   0, charlayout,   0, 16 )
-	GFXDECODE_ENTRY( "bgtiles", 0, tilelayout, 768, 16 )
-	GFXDECODE_ENTRY( "fgtiles", 0, tilelayout, 512, 16 )
-	GFXDECODE_ENTRY( "sprites", 0, tilelayout, 256, 16 )
+	GFXDECODE_ENTRY( "chars",   0, gfx_8x8x4_packed_msb,                 0, 16 )
+	GFXDECODE_ENTRY( "bgtiles", 0, gfx_8x8x4_col_2x2_group_packed_msb, 768, 16 )
+	GFXDECODE_ENTRY( "fgtiles", 0, gfx_8x8x4_col_2x2_group_packed_msb, 512, 16 )
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_col_2x2_group_packed_msb, 256, 16 )
 GFXDECODE_END
 
 /******************************************************************************/
