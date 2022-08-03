@@ -112,8 +112,6 @@ private:
 	bool m_pen2;          // palette selector
 	u8 m_rg = 0b011;      // 0:320x200lo, 2:640:200hi, 3:256x192zx, 6:80x25txt
 	u8 m_br3;
-
-	address_space *m_program;
 };
 
 void atm_state::atm_update_memory()
@@ -354,7 +352,7 @@ void atm_state::atm_update_screen_tx(screen_device &screen, bitmap_ind16 &bitmap
 
 u8 atm_state::beta_neutral_r(offs_t offset)
 {
-	return m_program->read_byte(offset);
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
 u8 atm_state::beta_enable_r(offs_t offset)
@@ -366,7 +364,7 @@ u8 atm_state::beta_enable_r(offs_t offset)
 			atm_update_memory();
 		}
 	}
-	return m_program->read_byte(offset + 0x3d00);
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset + 0x3d00);
 }
 
 u8 atm_state::beta_disable_r(offs_t offset)
@@ -377,7 +375,7 @@ u8 atm_state::beta_disable_r(offs_t offset)
 			atm_update_memory();
 		}
 	}
-	return m_program->read_byte(offset + 0x4000);
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset + 0x4000);
 }
 
 void atm_state::atm_mem(address_map &map)
@@ -441,8 +439,6 @@ void atm_state::machine_start()
 	for (auto i = 0; i < 4; i++)
 		m_bank_rom[i]->configure_entries(0, 4*8, rom->base() + 0x10000, 0x4000);
 	m_bank_ram[0]->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
-
-	m_program = &m_maincpu->space(AS_PROGRAM);
 }
 
 void atm_state::machine_reset()
