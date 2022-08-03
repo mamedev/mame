@@ -638,7 +638,7 @@ WRITE_LINE_MEMBER(mappy_state::vblank_irq)
 
 void mappy_state::superpac_cpu1_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().w(FUNC(mappy_state::superpac_videoram_w)).share("videoram");  // video RAM
+	map(0x0000, 0x07ff).ram().w(FUNC(mappy_state::superpac_videoram_w)).share("videoram");
 	map(0x0800, 0x1fff).ram().share("spriteram");   // work RAM with embedded sprite RAM
 	map(0x2000, 0x2000).rw(FUNC(mappy_state::superpac_flipscreen_r), FUNC(mappy_state::superpac_flipscreen_w));
 	map(0x4000, 0x43ff).rw(m_namco_15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));   // shared RAM with the sound CPU
@@ -658,12 +658,12 @@ void mappy_state::phozon_cpu1_map(address_map &map)
 	map(0x4810, 0x481f).rw("namcoio_2", FUNC(namcoio_device::read), FUNC(namcoio_device::write));   // custom I/O chips interface
 	map(0x5000, 0x500f).w("mainlatch", FUNC(ls259_device::write_a0));   // various control bits
 	map(0x7000, 0x7000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x8000, 0xffff).rom();  // ROM
+	map(0x8000, 0xffff).rom();
 }
 
 void mappy_state::mappy_cpu1_map(address_map &map)
 {
-	map(0x0000, 0x0fff).ram().w(FUNC(mappy_state::mappy_videoram_w)).share("videoram"); // video RAM
+	map(0x0000, 0x0fff).ram().w(FUNC(mappy_state::mappy_videoram_w)).share("videoram");
 	map(0x1000, 0x27ff).ram().share("spriteram");   // work RAM with embedded sprite RAM
 	map(0x3800, 0x3fff).w(FUNC(mappy_state::mappy_scroll_w));   // scroll
 	map(0x4000, 0x43ff).rw(m_namco_15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));   // shared RAM with the sound CPU
@@ -671,7 +671,7 @@ void mappy_state::mappy_cpu1_map(address_map &map)
 	map(0x4810, 0x481f).rw("namcoio_2", FUNC(namcoio_device::read), FUNC(namcoio_device::write));   // custom I/O chips interface
 	map(0x5000, 0x500f).w("mainlatch", FUNC(ls259_device::write_a0));   // various control bits
 	map(0x8000, 0x8000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x8000, 0xffff).rom();  // ROM code (only a000-ffff in Mappy)
+	map(0x8000, 0xffff).rom();  // only a000-ffff in Mappy
 }
 
 void mappy_state::superpac_cpu2_map(address_map &map)
@@ -684,25 +684,25 @@ void mappy_state::superpac_cpu2_map(address_map &map)
 void mappy_state::phozon_cpu2_map(address_map &map)
 {
 	map(0x0000, 0x03ff).rw(m_namco_15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));   // shared RAM with the main CPU + sound registers
-	map(0xe000, 0xffff).rom();  // ROM
+	map(0xe000, 0xffff).rom();
 }
 
 void mappy_state::mappy_cpu2_map(address_map &map)
 {
 	map(0x0000, 0x03ff).rw(m_namco_15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));   // shared RAM with the main CPU (also sound registers)
 	map(0x2000, 0x200f).w("mainlatch", FUNC(ls259_device::write_a0));   // various control bits
-	map(0xe000, 0xffff).rom();  // ROM code
+	map(0xe000, 0xffff).rom();
 }
 
 
 // extra CPU only present in Phozon
 void mappy_state::phozon_cpu3_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().w(FUNC(mappy_state::superpac_videoram_w)).share("videoram");  // video RAM
+	map(0x0000, 0x07ff).ram().w(FUNC(mappy_state::superpac_videoram_w)).share("videoram");
 	map(0x0800, 0x1fff).ram().share("spriteram");   // shared RAM with CPU #2/sprite RAM
 	map(0x4000, 0x43ff).rw(m_namco_15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));   // shared RAM with CPU #2
-	map(0xa000, 0xa7ff).ram();  // RAM
-	map(0xe000, 0xffff).rom();  // ROM
+	map(0xa000, 0xa7ff).ram();
+	map(0xe000, 0xffff).rom();
 }
 
 
@@ -799,20 +799,20 @@ static INPUT_PORTS_START( superpac )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4,5,6")
-	PORT_DIPSETTING(    0x38, "30k & 100k Only" )       PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x30, "30k & 80k Only" )        PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x28, "30k & 120k Only" )       PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x20, "30k, 80k & Every 80k" )  PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x18, "30k, 100k & Every 100k" )    PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x10, "30k, 120k & Every 120k" )    PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x08, "30k Only" )          PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x38, "30k & 100k Only" )       PORT_CONDITION("DSW2",0xc0,EQUALS,0x00)
-	PORT_DIPSETTING(    0x30, "30k & 120k Only" )       PORT_CONDITION("DSW2",0xc0,EQUALS,0x00)
-	PORT_DIPSETTING(    0x28, "40k & 120k Only" )       PORT_CONDITION("DSW2",0xc0,EQUALS,0x00)
-	PORT_DIPSETTING(    0x20, "30k, 100k & Every 100k" )    PORT_CONDITION("DSW2",0xc0,EQUALS,0x00)
-	PORT_DIPSETTING(    0x18, "40k, 120k & Every 120k" )    PORT_CONDITION("DSW2",0xc0,EQUALS,0x00)
-	PORT_DIPSETTING(    0x10, "30k Only" )          PORT_CONDITION("DSW2",0xc0,EQUALS,0x00) // Manual shows 100k only, Test Mode shows 30k which is what we use
-	PORT_DIPSETTING(    0x08, "40k Only" )          PORT_CONDITION("DSW2",0xc0,EQUALS,0x00)
+	PORT_DIPSETTING(    0x38, "30k & 100k Only" )        PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x30, "30k & 80k Only" )         PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x28, "30k & 120k Only" )        PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x20, "30k, 80k & Every 80k" )   PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x18, "30k, 100k & Every 100k" ) PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x10, "30k, 120k & Every 120k" ) PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x08, "30k Only" )               PORT_CONDITION("DSW2",0xc0,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x38, "30k & 100k Only" )        PORT_CONDITION("DSW2",0xc0,EQUALS,0x00)
+	PORT_DIPSETTING(    0x30, "30k & 120k Only" )        PORT_CONDITION("DSW2",0xc0,EQUALS,0x00)
+	PORT_DIPSETTING(    0x28, "40k & 120k Only" )        PORT_CONDITION("DSW2",0xc0,EQUALS,0x00)
+	PORT_DIPSETTING(    0x20, "30k, 100k & Every 100k" ) PORT_CONDITION("DSW2",0xc0,EQUALS,0x00)
+	PORT_DIPSETTING(    0x18, "40k, 120k & Every 120k" ) PORT_CONDITION("DSW2",0xc0,EQUALS,0x00)
+	PORT_DIPSETTING(    0x10, "30k Only" )               PORT_CONDITION("DSW2",0xc0,EQUALS,0x00) // Manual shows 100k only, Test Mode shows 30k which is what we use
+	PORT_DIPSETTING(    0x08, "40k Only" )               PORT_CONDITION("DSW2",0xc0,EQUALS,0x00)
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(    0xc0, "3" )
@@ -838,20 +838,20 @@ static INPUT_PORTS_START( pacnpal )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPNAME( 0x38, 0x30, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:4,5,6")
-	PORT_DIPSETTING(    0x30, "20k, 70k & Every 70k" )  PORT_CONDITION("DSW1",0xc0,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x28, "30k, 100k & Every 80k" ) PORT_CONDITION("DSW1",0xc0,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x20, "20k & 70k Only" )        PORT_CONDITION("DSW1",0xc0,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x18, "30k & 70k Only" )        PORT_CONDITION("DSW1",0xc0,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x10, "30k & 80k Only" )        PORT_CONDITION("DSW1",0xc0,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x08, "30k & 100k Only" )       PORT_CONDITION("DSW1",0xc0,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x00, "30k Only" )          PORT_CONDITION("DSW1",0xc0,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x30, "30k, 80k & Every 80k" )  PORT_CONDITION("DSW1",0xc0,EQUALS,0x00)
-	PORT_DIPSETTING(    0x28, "40k, 100k & Every 100k" )    PORT_CONDITION("DSW1",0xc0,EQUALS,0x00)
-	PORT_DIPSETTING(    0x20, "30k & 80k Only" )        PORT_CONDITION("DSW1",0xc0,EQUALS,0x00)
-	PORT_DIPSETTING(    0x18, "30k & 100k Only" )       PORT_CONDITION("DSW1",0xc0,EQUALS,0x00)
-	PORT_DIPSETTING(    0x10, "40k & 120k Only" )       PORT_CONDITION("DSW1",0xc0,EQUALS,0x00)
-	PORT_DIPSETTING(    0x08, "30k Only" )          PORT_CONDITION("DSW1",0xc0,EQUALS,0x00)
-	PORT_DIPSETTING(    0x00, "40k Only" )          PORT_CONDITION("DSW1",0xc0,EQUALS,0x00)
+	PORT_DIPSETTING(    0x30, "20k, 70k & Every 70k" )   PORT_CONDITION("DSW1",0xc0,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x28, "30k, 100k & Every 80k" )  PORT_CONDITION("DSW1",0xc0,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x20, "20k & 70k Only" )         PORT_CONDITION("DSW1",0xc0,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x18, "30k & 70k Only" )         PORT_CONDITION("DSW1",0xc0,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x10, "30k & 80k Only" )         PORT_CONDITION("DSW1",0xc0,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x08, "30k & 100k Only" )        PORT_CONDITION("DSW1",0xc0,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x00, "30k Only" )               PORT_CONDITION("DSW1",0xc0,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x30, "30k, 80k & Every 80k" )   PORT_CONDITION("DSW1",0xc0,EQUALS,0x00)
+	PORT_DIPSETTING(    0x28, "40k, 100k & Every 100k" ) PORT_CONDITION("DSW1",0xc0,EQUALS,0x00)
+	PORT_DIPSETTING(    0x20, "30k & 80k Only" )         PORT_CONDITION("DSW1",0xc0,EQUALS,0x00)
+	PORT_DIPSETTING(    0x18, "30k & 100k Only" )        PORT_CONDITION("DSW1",0xc0,EQUALS,0x00)
+	PORT_DIPSETTING(    0x10, "40k & 120k Only" )        PORT_CONDITION("DSW1",0xc0,EQUALS,0x00)
+	PORT_DIPSETTING(    0x08, "30k Only" )               PORT_CONDITION("DSW1",0xc0,EQUALS,0x00)
+	PORT_DIPSETTING(    0x00, "40k Only" )               PORT_CONDITION("DSW1",0xc0,EQUALS,0x00)
 	PORT_DIPSETTING(    0x38, DEF_STR( None ) )
 	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0xc0, "1" )
@@ -977,20 +977,20 @@ static INPUT_PORTS_START( phozon )
 	PORT_DIPSETTING(    0x01, "1" ) // 1 on, 2 off
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPNAME( 0x62, 0x62, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4,3,5")
-	PORT_DIPSETTING(    0x62, "30k & 100k Only" )       PORT_CONDITION("DSW2",0x01,NOTEQUALS,0x00)
-//  PORT_DIPSETTING(    0x60, "30k & 100k Only" )       PORT_CONDITION("DSW2",0x01,NOTEQUALS,0x00)  // repeated
-	PORT_DIPSETTING(    0x42, "30k & 60k Only" )        PORT_CONDITION("DSW2",0x01,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x40, "20k, 80k & Every 80k" )  PORT_CONDITION("DSW2",0x01,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x22, "30k, 120k & Every 120k" )    PORT_CONDITION("DSW2",0x01,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x22, "20k & 80k Only" )        PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
-	PORT_DIPSETTING(    0x20, "30k Only" )          PORT_CONDITION("DSW2",0x01,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x02, "20k & 80k Only" )        PORT_CONDITION("DSW2",0x01,NOTEQUALS,0x00)
-	PORT_DIPSETTING(    0x62, "30k & 100k Only" )       PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
-//  PORT_DIPSETTING(    0x60, "30k & 100k Only" )       PORT_CONDITION("DSW2",0x01,EQUALS,0x00) // repeated
-	PORT_DIPSETTING(    0x42, "40k & 80k Only" )        PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
-	PORT_DIPSETTING(    0x40, "30k, 100k & Every 100k" )    PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
-	PORT_DIPSETTING(    0x20, "100k Only" )         PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
-	PORT_DIPSETTING(    0x02, "30k Only" )           PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
+	PORT_DIPSETTING(    0x62, "30k & 100k Only" )        PORT_CONDITION("DSW2",0x01,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x60, "30k & 100k Only" )        PORT_CONDITION("DSW2",0x01,NOTEQUALS,0x00)  // repeated
+	PORT_DIPSETTING(    0x42, "30k & 60k Only" )         PORT_CONDITION("DSW2",0x01,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x40, "20k, 80k & Every 80k" )   PORT_CONDITION("DSW2",0x01,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x22, "30k, 120k & Every 120k" ) PORT_CONDITION("DSW2",0x01,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x20, "30k Only" )               PORT_CONDITION("DSW2",0x01,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x02, "20k & 80k Only" )         PORT_CONDITION("DSW2",0x01,NOTEQUALS,0x00)
+	PORT_DIPSETTING(    0x62, "30k & 100k Only" )        PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
+	PORT_DIPSETTING(    0x60, "30k & 100k Only" )        PORT_CONDITION("DSW2",0x01,EQUALS,0x00) // repeated
+	PORT_DIPSETTING(    0x42, "40k & 80k Only" )         PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
+	PORT_DIPSETTING(    0x40, "30k, 100k & Every 100k" ) PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
+	PORT_DIPSETTING(    0x20, "100k Only" )              PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
+	PORT_DIPSETTING(    0x22, "20k & 80k Only" )         PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
+	PORT_DIPSETTING(    0x02, "30k Only" )               PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPNAME( 0x8c, 0x8c, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW2:6,8,7")
 	PORT_DIPSETTING(    0x8c, DEF_STR( 1C_1C ) )
