@@ -52,7 +52,7 @@ public:
 		, m_bank_view2(*this, "bank_view2")
 		, m_bank_view3(*this, "bank_view3")
 		, m_bank_rom(*this, "bank_rom%u", 0U)
-		, m_charrom(*this, "charrom")
+		, m_char_rom(*this, "charrom")
 		, m_beta(*this, BETA_DISK_TAG)
 		, m_centronics(*this, "centronics")
 		, m_palette(*this, "palette")
@@ -96,7 +96,7 @@ private:
 	memory_view m_bank_view2;
 	memory_view m_bank_view3;
 	required_memory_bank_array<4> m_bank_rom;
-	required_region_ptr<u8> m_charrom;
+	optional_region_ptr<u8> m_char_rom;
 
 	required_device<beta_disk_device> m_beta;
 	required_device<centronics_device> m_centronics;
@@ -326,7 +326,6 @@ void atm_state::atm_update_screen_hi(screen_device &screen, bitmap_ind16 &bitmap
 
 void atm_state::atm_update_screen_tx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 *font = memregion("charrom")->base();
 	for (u16 vpos = cliprect.top(); vpos <= cliprect.bottom(); vpos++)
 	{
 		u16 y = vpos - get_screen_area().top();
@@ -344,7 +343,7 @@ void atm_state::atm_update_screen_tx(screen_device &screen, bitmap_ind16 &bitmap
 			u8 fg = ((attr & 0x40) >> 3) | (attr & 0x07);
 			u8 bg = (((attr & 0x80) >> 1) | (attr & 0x38)) >> 3;
 
-			u8 chunk = *(font + (*symb_location << 3) + (y & 0x07));
+			u8 chunk = *(m_char_rom + (*symb_location << 3) + (y & 0x07));
 			for (u8 i = 0x80; i; i >>= 1)
 			{
 				bitmap.pix(vpos, hpos++) = (chunk & i) ? fg : bg;
