@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <thread>
 
 // MAME headers
 #include "emu.h"
@@ -37,6 +38,7 @@
 #include <fcntl.h>
 #include <dirent.h>
 #include <unistd.h>
+#include <poll.h>
 
 namespace {
 
@@ -263,11 +265,13 @@ constexpr size_t octets_for(unsigned int bits)
 }
 
 class evdev_device;
+class evdev_input;
+
 struct evdev_device_info
 {
 	std::string name;
 	std::string id;
-	evdev_device* mapped;
+	mutable evdev_device* mapped;
 	device_type type;
 	unsigned char buttons[octets_for(KEY_MAX)];
 	unsigned char relaxes[octets_for(REL_MAX)];
@@ -281,6 +285,7 @@ struct evdev_device_info
 
 class evdev_device: public device_info
 {
+	friend class evdev_input;
 private:
 	const evdev_device_info& info;
 	int fd;
@@ -305,6 +310,7 @@ public:
 
 	~evdev_device()
 	{
+		info.mapped = 0;
 		if(fd >= 0)
 			close(fd);
 	}
@@ -340,7 +346,7 @@ public:
 			}
 
 		if(fd < 0) {
-			fd = openat(dirfd, info.id.c_str(), O_RDONLY|O_NONBLOCK);
+			fd = openat(dirfd, info.id.c_str(), O_RDONLY);
 			if(fd < 0) {
 				osd_printf_warning("evdev: unable to open %s: %s\n", info.id.c_str(), strerror(errno));
 			}
@@ -369,37 +375,41 @@ public:
 						generic_axis_get_state<int32_t>, &absaxis[i].normalized);
 				}
 			}
+
+		info.mapped = this;
+	}
+
+	void fail(void)
+	{
+		osd_printf_warning("evdev: unable to read from device %s, disabling\n", info.id.c_str());
+		if(fd >= 0) {
+			close(fd);
+			fd = -1;
+		}
+		info.mapped = 0;
+	}
+
+	void process(const input_event* events, size_t num_events)
+	{
+		for(int i=0; i<num_events; i++) {
+			switch(events[i].type) {
+				case EV_KEY:
+					keystate[events[i].code] = (events[i].value>0)? 0x80: 0;
+					break;
+				case EV_REL:
+					relaxis[events[i].code] += events[i].value;
+					break;
+				case EV_ABS: {
+						auto& axis = absaxis[events[i].code];
+						axis.normalized = normalize_absolute_axis(events[i].value, axis.absinfo.minimum, axis.absinfo.maximum);
+					}
+					break;
+			}
+		}
 	}
 
 	void poll() override
 	{
-		static input_event ie[256]; // try to consume as many as possible at once
-		while(fd >= 0) {
-			ssize_t rd = read(fd, ie, 256*sizeof(input_event));
-			if(rd < 0) {
-				if(errno==EWOULDBLOCK || errno==EAGAIN)
-					return;
-				// cope with errors here
-			}
-			if(rd < sizeof(input_event))
-				return;
-			int nie = rd/sizeof(input_event);
-			for(int i=0; i<nie; i++) {
-				switch(ie[i].type) {
-					case EV_KEY:
-						keystate[ie[i].code] = (ie[i].value>0)? 0x80: 0;
-						break;
-					case EV_REL:
-						relaxis[ie[i].code] += ie[i].value;
-						break;
-					case EV_ABS: {
-						  auto& axis = absaxis[ie[i].code];
-						  axis.normalized = normalize_absolute_axis(ie[i].value, axis.absinfo.minimum, axis.absinfo.maximum);
-						}
-						break;
-				}
-			}
-		}
 	}
 
 	void reset() override
@@ -421,10 +431,95 @@ private:
 public:
 	std::vector<evdev_device_info> dev;
 	int device_dir_fd;
+	std::thread* reader_thread;
+	int reader_thread_pipe[2];
 
 public:
-	evdev_input(): initialized(false)
+	evdev_input(): initialized(false), device_dir_fd(-1), reader_thread(0)
 	{
+	}
+
+	~evdev_input()
+	{
+		if(initialized && reader_thread) {
+			write(reader_thread_pipe[1], "x", 1);
+			reader_thread->join();
+		}
+	}
+
+	static void reader_function(evdev_input* self)
+	{
+		self->do_reader_function();
+	}
+
+	void do_reader_function()
+	{
+		osd_printf_verbose("evdev: start monitoring devices\n");
+		std::vector<pollfd> poll_fd;
+		std::vector<evdev_device_info*> devices;
+		poll_fd.reserve(dev.size()+1);
+		devices.reserve(dev.size()+1);
+
+		for(;;) {
+			poll_fd.clear();
+			devices.clear();
+
+			devices.emplace_back();
+			poll_fd.emplace_back();
+			pollfd& pfd = poll_fd.back();
+			pfd.fd = reader_thread_pipe[0];
+			pfd.events = POLLIN;
+
+			for(auto& d : dev)
+				if(d.mapped && d.mapped->fd>=0) {
+					devices.emplace_back(&d);
+					poll_fd.emplace_back();
+					pollfd& pfd = poll_fd.back();
+					pfd.fd = d.mapped->fd;
+					pfd.events = POLLIN;
+				}
+
+			int result = poll(poll_fd.data(), poll_fd.size(), -1);
+			if(result < 0) {
+				osd_printf_warning("evdev: poll() failed: %s\n", strerror(errno));
+				continue;
+			}
+
+			if(result > 0 && (poll_fd[0].revents & POLLIN)) {
+				char octet;
+				if(read(reader_thread_pipe[0], &octet, 1)==1) {
+					if(octet == 'x')
+						break;
+					continue;
+				}
+			}
+
+			if(result != 0) {
+				input_event events[256];
+
+				for(int i=1; i<poll_fd.size(); i++) {
+					if(poll_fd[i].revents & (POLLERR|POLLHUP|POLLNVAL)) {
+						// file descriptor went away, did someone yank the device?
+						if(devices[i]->mapped)
+							devices[i]->mapped->fail();
+						continue;
+					}
+					if(poll_fd[i].revents & POLLIN) {
+						// we try to reduce the number of system calls by reading
+						// as many events as reasonable in one read() call
+						ssize_t rdlen = read(poll_fd[i].fd, events, 256*sizeof(input_event));
+						if(rdlen<0 && (errno==EWOULDBLOCK || errno==EAGAIN))
+							continue;
+						if(devices[i]->mapped) {
+							if(rdlen < sizeof(input_event))
+								devices[i]->mapped->fail();
+							else
+								devices[i]->mapped->process(events, rdlen/sizeof(input_event));
+						}
+					}
+				}
+			}
+		}
 	}
 
 	void init()
@@ -513,6 +608,19 @@ public:
 			osd_printf_verbose("evdev: found \"%s\" (%s)\n", device.name.c_str(), device.id.c_str());
 			close(ed);
 		}
+
+		if(dev.size() > 0)
+			pipe2(reader_thread_pipe, O_DIRECT);
+	}
+
+	void start()
+	{
+		if(initialized && dev.size() > 0) {
+			if(reader_thread)
+				write(reader_thread_pipe[1], "r", 1);
+			else
+				reader_thread = new std::thread(reader_function, this);
+		}
 	}
 
 };
@@ -542,6 +650,7 @@ public:
 						std::string(dev.name), std::string(dev.id),
 						*this, deviceclass, dev);
 					di.start(evdev.device_dir_fd);
+					evdev.start();
 				}
 			}
 		}
