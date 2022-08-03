@@ -19,6 +19,7 @@
 #include <memory>
 #include <queue>
 #include <string>
+#include <vector>
 #include <algorithm>
 
 // MAME headers
@@ -252,38 +253,45 @@ enum device_type {
 	EVDEV_KEYBOARD,
 	EVDEV_MOUSE,
 	EVDEV_JOYSTICK,
-	EVDEV_GENERIC,
+	EVDEV_LIGHTGUN,
 };
 
 
-#define OCTETS_FOR(n) ((n+7)>>3)
+constexpr size_t octets_for(unsigned int bits)
+{
+	return ((bits+7)>>3);
+}
 
 class evdev_device;
 struct evdev_device_info
 {
+	std::string name;
+	std::string id;
 	evdev_device* mapped;
-	char name[64];
-	char id[32];
 	device_type type;
-	unsigned char num;
-	unsigned char buttons[OCTETS_FOR(KEY_MAX)];
-	unsigned char relaxes[OCTETS_FOR(REL_MAX)];
-	unsigned char absaxes[OCTETS_FOR(ABS_MAX)];
+	unsigned char buttons[octets_for(KEY_MAX)];
+	unsigned char relaxes[octets_for(REL_MAX)];
+	unsigned char absaxes[octets_for(ABS_MAX)];
+
+	evdev_device_info(): mapped(0), type(EVDEV_NONE)
+	{
+	}
 };
 
 
 class evdev_device: public device_info
 {
 private:
-	// This is _way_ too conservative, but memory is cheap
 	const evdev_device_info& info;
-	int	fd;
+	int fd;
+
+	// This is _way_ too conservative, but memory is cheap
 	uint8_t	keystate[KEY_MAX];
 	int32_t	relaxis[REL_MAX];
 	struct {
 		int32_t	normalized;
 		input_absinfo absinfo;
-	}	absaxis[ABS_MAX];
+	} absaxis[ABS_MAX];
 
 public:
 	evdev_device(running_machine& machine, std::string&& name, std::string&& id, input_module& module,
@@ -332,11 +340,9 @@ public:
 			}
 
 		if(fd < 0) {
-			char fname[16];
-			snprintf(fname, 16, "event%d", info.num);
-			fd = openat(dirfd, fname, O_RDONLY|O_NONBLOCK);
+			fd = openat(dirfd, info.id.c_str(), O_RDONLY|O_NONBLOCK);
 			if(fd < 0) {
-				osd_printf_verbose("evdev: unable to open %s: %s\n", fname, strerror(errno));
+				osd_printf_warning("evdev: unable to open %s: %s\n", info.id.c_str(), strerror(errno));
 			}
 		}
 
@@ -365,7 +371,7 @@ public:
 			}
 	}
 
-	void poll(void) override
+	void poll() override
 	{
 		static input_event ie[256]; // try to consume as many as possible at once
 		while(fd >= 0) {
@@ -396,11 +402,12 @@ public:
 		}
 	}
 
-	void reset(void) override
+	void reset() override
 	{
-		memset(keystate, 0, KEY_MAX);
-		memset(relaxis, 0, REL_MAX*sizeof(int32_t));
-		memset(absaxis, 0, ABS_MAX*sizeof(absaxis[0]));
+		std::fill(std::begin(keystate), std::end(keystate), 0);
+		std::fill(std::begin(relaxis), std::end(relaxis), 0);
+		for(int i=0; i<ABS_MAX; i++)
+			absaxis[i].normalized = 0;
 	}
 };
 
@@ -412,118 +419,98 @@ private:
 	bool initialized;
 
 public:
-	int  devinput;
-	evdev_device_info dev[MAX_EVDEV_DEVICES]; // 640k should be enough for anyone
-	int max_dev;
+	std::vector<evdev_device_info> dev;
+	int device_dir_fd;
 
 public:
 	evdev_input(): initialized(false)
 	{
 	}
 
-	void init(void)
+	void init()
 	{
 		if(initialized)
 			return;
 		initialized = true;
-		osd_printf_verbose("evdev: enumerating devices\n");
-		devinput = open("/dev/input", O_RDONLY|O_CLOEXEC|O_DIRECTORY);
-		if(devinput < 0) {
+		osd_printf_verbose("evdev: Enumerating devices\n");
+		device_dir_fd = open("/dev/input/by-path", O_RDONLY|O_CLOEXEC|O_DIRECTORY);
+		if(device_dir_fd < 0) {
+			osd_printf_warning("evdev: unable to open device directory: %s\n", strerror(errno));
 			return;
 		}
 
-		max_dev = 0;
-		for(int i=0; i<MAX_EVDEV_DEVICES; i++) {
-			dev[i].mapped = 0;
-			dev[i].type = EVDEV_NONE;
-		}
-
-		DIR* idir = fdopendir(devinput);
+		DIR* idir = fdopendir(device_dir_fd);
 		while(idir) {
 			dirent* de = readdir(idir);
 			if(!de)
 				break;
-			if(strncmp(de->d_name, "event", 5))
+
+			char linkbuf[16];
+			ssize_t rl = readlinkat(device_dir_fd, de->d_name, linkbuf, sizeof(linkbuf)-1);
+			if(rl < 0)
 				continue;
-			int dnum = atoi(de->d_name+5);
-			if(dnum >= MAX_EVDEV_DEVICES) {
-				// too many to handle
+			linkbuf[rl] = 0;
+			if(strncmp(linkbuf, "../event", 8))
 				continue;
-			}
-			if(dnum < MAX_EVDEV_DEVICES) {
-				if(dev[dnum].type != EVDEV_NONE) {
-					// the same device twice?
-					continue;
-				}
-			}
-			int ed = openat(devinput, de->d_name, O_RDONLY);
+
+			int ed = openat(device_dir_fd, de->d_name, O_RDONLY);
 			if(ed < 0) {
-				osd_printf_verbose("evdev: unable to open de->d_name: %s\n", strerror(errno));
-				continue;
-			}
-			input_id iid;
-			if(ioctl(ed, EVIOCGID, &iid)<0) {
-				osd_printf_verbose("evdev: event%d doesn't looks usable\n", dnum);
-				close(ed);
-				continue;
-			} else
-				snprintf(dev[dnum].id, 32, "%hu:%04hx:%04hx", iid.bustype, iid.vendor, iid.product);
-
-			if(ioctl(ed, EVIOCGNAME(sizeof(dev[dnum].name)), dev[dnum].name)<0) {
-				osd_printf_verbose("evdev: event%d doesn't have a name\n", dnum);
-				close(ed);
+				osd_printf_warning("evdev: unable to open device '%s', ignored: %s\n", de->d_name, strerror(errno));
 				continue;
 			}
 
-			dev[dnum].type = EVDEV_NONE;
-			memset(dev[dnum].buttons, 0, OCTETS_FOR(KEY_MAX));
-			memset(dev[dnum].relaxes, 0, OCTETS_FOR(REL_MAX));
-			memset(dev[dnum].absaxes, 0, OCTETS_FOR(ABS_MAX));
+			char namebuf[64];
+			if(ioctl(ed, EVIOCGNAME(sizeof(namebuf)), namebuf)<0) {
+				// If the device doesn't report a name, use the evdev short link
+				// as its name "eventXX".  It's not _informative_ but it's
+				// distinctive enough
+				strncpy(namebuf, linkbuf+3, 63);
+				namebuf[63] = 0;
+			}
+
+			dev.emplace_back();
+			evdev_device_info& device = dev.back(); // C++17 would return back() from emplace_back()
+			
+			device.name = namebuf;
+			device.id = de->d_name;
+
+			std::fill(std::begin(device.buttons), std::end(device.buttons), 0);
+			std::fill(std::begin(device.relaxes), std::end(device.relaxes), 0);
+			std::fill(std::begin(device.absaxes), std::end(device.absaxes), 0);
 
 			unsigned long	evbits = 0;
-			unsigned char	bits[(KEY_MAX+7)>>3];
 
 			ioctl(ed, EVIOCGBIT(0, sizeof(evbits)), &evbits);
 
 			if(evbits & (1<<EV_KEY)) {
-				memset(bits, 0, sizeof(bits));
-				ioctl(ed, EVIOCGBIT(EV_KEY, OCTETS_FOR(KEY_MAX)), dev[dnum].buttons);
-				for(int i=0; dev[dnum].type==EVDEV_NONE && i<KEY_MAX; i++)
-					if(dev[dnum].buttons[i>>3] & (1<<(i&7)))
+				ioctl(ed, EVIOCGBIT(EV_KEY, octets_for(KEY_MAX)), device.buttons);
+				for(int i=0; device.type==EVDEV_NONE && i<KEY_MAX; i++)
+					if(device.buttons[i>>3] & (1<<(i&7)))
 						switch(i & ~15) {
 							case KEY_Q: // sane? heuristic
-								dev[dnum].type = EVDEV_KEYBOARD;
+								device.type = EVDEV_KEYBOARD;
 								break;
 							case BTN_MOUSE:
-								if(evbits & (1<<EV_REL))
-									dev[dnum].type = EVDEV_MOUSE;
+								device.type = EVDEV_MOUSE;
 								break;
 							case BTN_GAMEPAD:
 							case BTN_JOYSTICK:
-								if(evbits & (1<<EV_ABS))
-									dev[dnum].type = EVDEV_JOYSTICK;
+								device.type = EVDEV_JOYSTICK;
 								break;
 						}
 			}
 			if(evbits & (1<<EV_ABS)) {
-				ioctl(ed, EVIOCGBIT(EV_ABS, OCTETS_FOR(ABS_MAX)), dev[dnum].absaxes);
-				if(dev[dnum].type == EVDEV_NONE)
-					dev[dnum].type = EVDEV_GENERIC;
+				ioctl(ed, EVIOCGBIT(EV_ABS, octets_for(ABS_MAX)), device.absaxes);
+				if(device.type == EVDEV_NONE)
+					device.type = EVDEV_JOYSTICK;
 			}
 			if(evbits & (1<<EV_REL)) {
-				ioctl(ed, EVIOCGBIT(EV_REL, OCTETS_FOR(REL_MAX)), dev[dnum].relaxes);
-				if(dev[dnum].type == EVDEV_NONE)
-					dev[dnum].type = EVDEV_GENERIC;
+				ioctl(ed, EVIOCGBIT(EV_REL, octets_for(REL_MAX)), device.relaxes);
+				if(device.type == EVDEV_NONE)
+					device.type = EVDEV_MOUSE;
 			}
 
-			const char* const dname[] = { 0, "keyboard", "mouse", "joystick", "generic HID device" };
-
-			if(dev[dnum].type != EVDEV_NONE) {
-				dev[dnum].num = dnum;
-				if(max_dev <= dnum)
-					max_dev = dnum+1;
-				osd_printf_verbose("evdev: found %s (%s) \"%s\"\n", dname[dev[dnum].type], dev[dnum].id, dev[dnum].name);
-			}
+			osd_printf_verbose("evdev: found \"%s\" (%s)\n", device.name.c_str(), device.id.c_str());
 			close(ed);
 		}
 	}
@@ -549,17 +536,18 @@ public:
 		// Note: at this time, no lightgun devices can possibly be mapped because they
 		// pretend to be mice.  There may or may not be a mechanism to force it in the future.
 		if(type != EVDEV_NONE) {
-			for(int i=0; i<evdev.max_dev; i++) {
-				auto& dev = evdev.dev[i];
-				if(evdev.dev[i].type==type && !dev.mapped) {
-					auto& di = devicelist().create_device<evdev_device>(machine, dev.name, dev.id, *this, deviceclass, dev);
-					di.start(evdev.devinput);
+			for(auto& dev : evdev.dev) {
+				if(dev.type==type && !dev.mapped) {
+					auto& di = devicelist().create_device<evdev_device>(machine,
+						std::string(dev.name), std::string(dev.id),
+						*this, deviceclass, dev);
+					di.start(evdev.device_dir_fd);
 				}
 			}
 		}
 	}
 
-	void exit(void) override
+	void exit() override
 	{
 	}
 
@@ -580,7 +568,7 @@ evdev_input evdev_input_module::evdev;
 class evdev_keyboard_module: public evdev_input_module
 {
 public:
-	evdev_keyboard_module(void): evdev_input_module(OSD_KEYBOARDINPUT_PROVIDER)
+	evdev_keyboard_module(): evdev_input_module(OSD_KEYBOARDINPUT_PROVIDER)
 	{
 	}
 
@@ -594,7 +582,7 @@ public:
 class evdev_mouse_module: public evdev_input_module
 {
 public:
-	evdev_mouse_module(void): evdev_input_module(OSD_MOUSEINPUT_PROVIDER)
+	evdev_mouse_module(): evdev_input_module(OSD_MOUSEINPUT_PROVIDER)
 	{
 	}
 
@@ -607,7 +595,7 @@ public:
 class evdev_joystick_module: public evdev_input_module
 {
 public:
-	evdev_joystick_module(void): evdev_input_module(OSD_JOYSTICKINPUT_PROVIDER)
+	evdev_joystick_module(): evdev_input_module(OSD_JOYSTICKINPUT_PROVIDER)
 	{
 	}
 
@@ -620,13 +608,13 @@ public:
 class evdev_lightgun_module: public evdev_input_module
 {
 public:
-	evdev_lightgun_module(void): evdev_input_module(OSD_LIGHTGUNINPUT_PROVIDER)
+	evdev_lightgun_module(): evdev_input_module(OSD_LIGHTGUNINPUT_PROVIDER)
 	{
 	}
 
 	void input_init(running_machine& machine) override
 	{
-		input_setup(machine, "Lightgun", DEVICE_CLASS_LIGHTGUN, EVDEV_NONE);
+		input_setup(machine, "Lightgun", DEVICE_CLASS_LIGHTGUN, EVDEV_LIGHTGUN);
 	}
 };
 
