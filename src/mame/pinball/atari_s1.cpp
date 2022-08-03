@@ -655,7 +655,7 @@ ROM_START( aavenger )
 ROM_END
 
 // CPU: 006020-04
-ROM_START( 0x2000 )
+ROM_START( aavengera )
 	// No idea how these are meant to be loaded
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("020250.e7", 0x0000, 0x2000, CRC(f90c5600) SHA1(078be02c9600b2d6b96eee072c250139fb4d5076))
