@@ -96,14 +96,14 @@ private:
 	memory_view m_bank_view2;
 	memory_view m_bank_view3;
 	required_memory_bank_array<4> m_bank_rom;
-	optional_region_ptr<u8> m_char_rom;
+	optional_region_ptr<u8> m_char_rom; // required for ATM2, absent in ATM1
 
 	required_device<beta_disk_device> m_beta;
 	required_device<centronics_device> m_centronics;
 	required_device<device_palette_interface> m_palette;
 
 	bool is_shadow_active() { return m_beta->is_active(); }
-	u8 *pen_page(u8 bank) { return &m_pages_map[BIT(m_port_7ffd_data, 4)][bank]; }
+	u8 &pen_page(u8 bank) { return m_pages_map[BIT(m_port_7ffd_data, 4)][bank]; }
 
 	bool m_pen;           // PEN - extended memory manager
 	bool m_cpm;
@@ -121,7 +121,7 @@ void atm_state::atm_update_memory()
 	LOGMEM("7FFD.%d = %X:", BIT(m_port_7ffd_data, 4), (m_port_7ffd_data & 0x07));
 	for (auto bank = 0; bank < 4 ; bank++)
 	{
-		u8 page = *pen_page(bank);
+		u8 page = pen_page(bank);
 		if (!m_pen)
 			page = 3;
 
@@ -217,7 +217,7 @@ void atm_state::atm_port_fff7_w(offs_t offset, u8 data)
 	u8 page = (data & 0xc0) | (~data & 0x3f);
 
 	LOGMEM("PEN%s.%s = %X %s%d: %02X\n", (page | DOS7FFD_MASK) ? "+" : "!", BIT(m_port_7ffd_data, 4), data, (page & RAM_MASK) ? "RAM" : "ROM", bank, page & 0x3f);
-	*pen_page(bank) = page;
+	pen_page(bank) = page;
 	atm_update_memory();
 }
 
@@ -358,7 +358,7 @@ u8 atm_state::beta_neutral_r(offs_t offset)
 u8 atm_state::beta_enable_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled()) {
-		u8 page = *pen_page(0);
+		u8 page = pen_page(0);
 		if (!(page & RAM_MASK) && !is_shadow_active()) {
 			m_beta->enable();
 			atm_update_memory();
