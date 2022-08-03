@@ -11,7 +11,7 @@
 #include "input_module.h"
 #include "modules/osdmodule.h"
 
-#if defined(SDLMAME_SDL2) && (USE_EVDEV)
+#if (USE_EVDEV)
 
 #include <cctype>
 #include <cstddef>
@@ -28,18 +28,9 @@
 // MAMEOS headers
 #include "../lib/osdobj_common.h"
 #include "input_common.h"
-#include "../../sdl/osdsdl.h"
-#include "input_sdlcommon.h"
-
-#if defined(SDLMAME_LINUX)
 
 #include <linux/version.h>
 #include <linux/input.h>
-
-#else
-// FreeBSD is known to have the evdev interface, but I have no way
-// of testing it.
-#endif
 
 #include <sys/types.h>
 #include <fcntl.h>
@@ -549,79 +540,23 @@ public:
 	{
 	}
 
-	void input_setup(running_machine& machine, const char* devname, input_device_class deviceclass, device_type type, const char* map_option)
+	void input_setup(running_machine& machine, const char* devname, input_device_class deviceclass, device_type type)
 	{
 		evdev.init();
 
 		osd_printf_verbose("evdev: Setting up %s devices\n", devname);
 
-		int  devindex[8] = { -1, -1, -1, -1, -1, -1, -1, -1 };
-
-		// first try to map explicitly requested devices
-		// this _specifically_ allows matching against type since
-		// one might want to treat something that looks like a joystick
-		// as a mouse, or map a generic or unusual HID that nevertheless
-		// provides buttons or axes.
-		const char* map_option_text = machine.options().value(map_option);
-		if(map_option_text && *map_option_text) {
-			char split_options[strlen(map_option_text)+1];
-			char* opt = split_options;
-
-			strcpy(split_options, map_option_text);
-
-			for(int dev=0; *opt && dev<8; dev++) {
-				char* end = opt;
-				while(*end && *end!=',')
-					end++;
-				if(*end == ',')
-					*end++ = '\0';
-				if (*opt && strcmp(opt, OSDOPTVAL_AUTO)) {
-					int dn = -1;
-					// allow explit use of eventNN
-					if(!strncmp(opt, "event", 5) && opt[5]) {
-						char* endp = 0;
-						dn = strtol(opt+5, &endp, 10);
-						if(*endp)
-							dn = -1;
-					}
-
-					if(dn < 0)
-						for(int i=0; i<evdev.max_dev; i++) {
-						if(!strcmp(opt, evdev.dev[i].name) || !strcmp(opt, evdev.dev[i].id)) {
-							dn = i;
-							break;
-						}
-					}
-					if(dn>=0 && dn<evdev.max_dev && !evdev.dev[dn].mapped)
-						devindex[dev] = dn;
-				}
-				opt = end;
-			}
-		}
-		// then try to map all unmapped matching devices that look
-		// like the correct type (so remaining mice are mapped as such
-		// and so on)
+		// Note: at this time, no lightgun devices can possibly be mapped because they
+		// pretend to be mice.  There may or may not be a mechanism to force it in the future.
 		if(type != EVDEV_NONE) {
 			for(int i=0; i<evdev.max_dev; i++) {
-				if(evdev.dev[i].type==type && !evdev.dev[i].mapped) {
-					int free = -1;
-					for(int di=0; di<8; di++)
-						if(devindex[di]<0) {
-							free = di;
-							break;
-						}
-					if(free>=0)
-						devindex[free] = i;
+				auto& dev = evdev.dev[i];
+				if(evdev.dev[i].type==type && !dev.mapped) {
+					auto& di = devicelist().create_device<evdev_device>(machine, dev.name, dev.id, *this, deviceclass, dev);
+					di.start(evdev.devinput);
 				}
 			}
 		}
-		// create devices that ended up mapped
-		for(int i=0; i<8; i++)
-			if(devindex[i] >= 0) {
-				auto& dev = evdev.dev[devindex[i]];
-				auto& di = devicelist().create_device<evdev_device>(machine, dev.name, dev.id, *this, deviceclass, dev);
-				di.start(evdev.devinput);
-			}
 	}
 
 	void exit(void) override
@@ -651,7 +586,7 @@ public:
 
 	void input_init(running_machine& machine) override
 	{
-		input_setup(machine, "Keyboard", DEVICE_CLASS_KEYBOARD, EVDEV_KEYBOARD, SDLOPTION_KEYBOARD_DEV);
+		input_setup(machine, "Keyboard", DEVICE_CLASS_KEYBOARD, EVDEV_KEYBOARD);
 	}
 
 };
@@ -665,7 +600,7 @@ public:
 
 	void input_init(running_machine& machine) override
 	{
-		input_setup(machine, "Mouse", DEVICE_CLASS_MOUSE, EVDEV_MOUSE, SDLOPTION_MOUSE_DEV);
+		input_setup(machine, "Mouse", DEVICE_CLASS_MOUSE, EVDEV_MOUSE);
 	}
 };
 
@@ -678,7 +613,7 @@ public:
 
 	void input_init(running_machine& machine) override
 	{
-		input_setup(machine, "Joystick", DEVICE_CLASS_JOYSTICK, EVDEV_JOYSTICK, SDLOPTION_JOYSTICK_DEV);
+		input_setup(machine, "Joystick", DEVICE_CLASS_JOYSTICK, EVDEV_JOYSTICK);
 	}
 };
 
@@ -691,21 +626,21 @@ public:
 
 	void input_init(running_machine& machine) override
 	{
-		input_setup(machine, "Lightgun", DEVICE_CLASS_LIGHTGUN, EVDEV_NONE, SDLOPTION_LIGHTGUN_DEV);
+		input_setup(machine, "Lightgun", DEVICE_CLASS_LIGHTGUN, EVDEV_NONE);
 	}
 };
 
 
 } // anonymous namespace
 
-#else // defined(SDLMAME_SDL2) && (USE_EVDEV)
+#else // (USE_EVDEV)
 
 MODULE_NOT_SUPPORTED(evdev_keyboard_module, OSD_KEYBOARDINPUT_PROVIDER, "evdev")
 MODULE_NOT_SUPPORTED(evdev_mouse_module,    OSD_MOUSEINPUT_PROVIDER,    "evdev")
 MODULE_NOT_SUPPORTED(evdev_joystick_module, OSD_JOYSTICKINPUT_PROVIDER, "evdev")
 MODULE_NOT_SUPPORTED(evdev_lightgun_module, OSD_LIGHTGUNINPUT_PROVIDER, "evdev")
 
-#endif // defined(SDLMAME_SDL2) && (USE_EVDEV)
+#endif // (USE_EVDEV)
 
 MODULE_DEFINITION(KEYBOARDINPUT_EVDEV, evdev_keyboard_module)
 MODULE_DEFINITION(MOUSEINPUT_EVDEV,    evdev_mouse_module)

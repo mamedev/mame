@@ -32,13 +32,6 @@
 #define SDLOPTION_LIGHTGUNINDEX         "lightgun_index"
 #endif
 
-#if (USE_EVDEV)
-#define SDLOPTION_KEYBOARD_DEV          "keyboard_dev"
-#define SDLOPTION_JOYSTICK_DEV          "joystick_dev"
-#define SDLOPTION_MOUSE_DEV             "mouse_dev"
-#define SDLOPTION_LIGHTGUN_DEV          "lightgun_dev"
-#endif
-
 #define SDLOPTION_AUDIODRIVER           "audiodriver"
 #define SDLOPTION_VIDEODRIVER           "videodriver"
 #define SDLOPTION_RENDERDRIVER          "renderdriver"

@@ -105,14 +105,6 @@ const options_entry sdl_options::s_option_entries[] =
 	{ nullptr,                               nullptr,        core_options::option_type::HEADER,     "SDL JOYSTICK MAPPING" },
 	{ SDLOPTION_SIXAXIS,                     "0",            core_options::option_type::BOOLEAN,    "use special handling for PS3 Sixaxis controllers" },
 
-#if (USE_EVDEV)
-	{ nullptr,                              nullptr,         core_options::option_type::HEADER,     "SDL EVENT DEVICE MAPPING" },
-	{ SDLOPTION_KEYBOARD_DEV,               OSDOPTVAL_AUTO,  core_options::option_type::STRING,     "evdev devices to map as keyboards" },
-	{ SDLOPTION_JOYSTICK_DEV,               OSDOPTVAL_AUTO,  core_options::option_type::STRING,     "evdev devices to map as joysticks" },
-	{ SDLOPTION_MOUSE_DEV,                  OSDOPTVAL_AUTO,  core_options::option_type::STRING,     "evdev devices to map as mice" },
-	{ SDLOPTION_LIGHTGUN_DEV,               OSDOPTVAL_AUTO,  core_options::option_type::STRING,     "evdev devices to map as lightguns" },
-#endif
-
 #if (USE_XINPUT)
 	// lightgun mapping
 	{ nullptr,                               nullptr,        core_options::option_type::HEADER,     "SDL LIGHTGUN MAPPING" },

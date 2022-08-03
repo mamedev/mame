@@ -73,29 +73,6 @@ SDL Joystick Mapping
     Use special handling for PlayStation 3 SixAxis controllers. Default is OFF
     (**-nosixaxis**)
 
-SDL Event Device Mapping
-
-.. _mame-scommandline-evdev:
-
-|
-| **-keyboard_dev** *<name>*
-| **-joystick_dev** *<name>*
-| **-mouse_dev** *<name>*
-| **-lightgun_dev** *<name>*
-|
-
-    Map specific evdev device as inputs.  These options optionally take
-    multiple values, separated by commas, to map multiple devices of the
-    same type in a desired order.
-
-    Possible values are 'event*X*' (to map a specific event device), the
-    name of a device, the ID of a device, or '*auto*' to let mame map
-    remaining devices of that type in an arbitrary order.
-
-    The default is to map event device of each type in the order in which
-    the operating system presents them, except for lightguns which by
-    default maps no devices.
-
 
 SDL Lightgun Mapping
 --------------------
