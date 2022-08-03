@@ -46,7 +46,9 @@ Bingo Galaxy (satellite)                    837-14481    C            ROM  JP   
 Bingo Galaxy (satellite)                    837-14789    F*           ROM  JP     not used        AAFE-xxxxxxxxxxx, game is same as above
 Bingo Parade                                ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx, Medal
 Brick People / Block People                 834-14881                 ROM  ANY    253-5508-0558   AAFE-01F67905202, AAFE-01F68275202
+Dinosaur King                               834-14493                 no   JP     ???-????-????   AAFE-xxxxxxxxxxx
 Dinosaur King                               834-14493-01 D            ROM  US     253-5508-0408   AAFE-01D1132xxxx, AAFE-01D15924816
+Dinosaur King (tournament mode update)      834-14622                 no   JP     ???-????-????   AAFE-xxxxxxxxxxx
 Dinosaur King - Operation: Dinosaur Rescue  837-14434-91              ROM  US/EXP 253-5508-0408   AAFE-01A30164715, AAFE-01B92094811
 - // -                                      834-14662-01    MDA-C0021 CF                          AAFE-01B87574811
 Dinosaur King 2                             ???-?????                 no          253-5508-0408   AAFE-xxxxxxxxxxx
@@ -59,7 +61,9 @@ Issyouni Turbo Drive                        ???-?????                 no        
 Issyouni Wanwan (INW 2K7 1ST)               834-14747                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Issyouni Wanwan Waiwai Puppy (INW PUPPY)    834-14826       MDA-C0052 no          ???-????-????   AAFE-xxxxxxxxxxx
 King of Beetle: Battle Terminal             ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
+Kouchu ouja Mushiking Popo no boukenhen     834-14583                 no   JP     ???-????-????   AAFE-xxxxxxxxxxx
 Love & Berry 2K5 Spring/Summer              834-14535       MDA-C0003 no   JP     ???-????-????   AAFE-xxxxxxxxxxx
+Love & Berry 2K5 Autumn/Winter              834-14556                 no   JP     ???-????-????   AAFE-xxxxxxxxxxx
 Love & Berry Ver 1.003                      834-14661-02              ROM  EXP    253-5508-0446   AAFE-01D84934906
 Love & Berry Ver 2.000                      834-14661-02              ROM  EXP    253-5508-0446   AAFE-01D8493xxxx
 Love & Berry 3 EXP Ver 1.002                834-14661-01    MDA-C0042 CF   US/EXP 253-5508-0446   AAFE-01D64704904
