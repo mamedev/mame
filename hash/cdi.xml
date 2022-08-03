@@ -2055,8 +2055,8 @@ license:CC0
 		<description>Mad Dog McCree (USA)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
-		<sharedfeat name="compatibility" value="DVC" />
 		<info name="cd_matrix" value="05820818 N01" />
+		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
 				<disk name="mad dog mccree (1994)(philips)(us)[dvc][05820818 n01]" sha1="db80f64fc5942e8eedb4206f7c5e7c3a8fe6878e"/>
