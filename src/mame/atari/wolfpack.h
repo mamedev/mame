@@ -97,7 +97,7 @@ private:
 	uint8_t m_ship_h = 0;
 	uint8_t m_torpedo_pic = 0;
 	uint8_t m_ship_size = 0;
-	uint8_t m_ship_h_precess = 0;
+	uint8_t m_ship_h_process = 0;
 	uint8_t m_ship_pic = 0;
 	uint8_t m_torpedo_h = 0;
 	uint8_t m_torpedo_v = 0;
