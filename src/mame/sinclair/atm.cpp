@@ -97,6 +97,7 @@ private:
 	memory_view m_bank_view3;
 	required_memory_bank_array<4> m_bank_rom;
 	optional_region_ptr<u8> m_char_rom; // required for ATM2, absent in ATM1
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 
 	required_device<beta_disk_device> m_beta;
 	required_device<centronics_device> m_centronics;
@@ -352,7 +353,7 @@ void atm_state::atm_update_screen_tx(screen_device &screen, bitmap_ind16 &bitmap
 
 u8 atm_state::beta_neutral_r(offs_t offset)
 {
-	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+	return m_program.read_byte(offset);
 }
 
 u8 atm_state::beta_enable_r(offs_t offset)
@@ -364,7 +365,7 @@ u8 atm_state::beta_enable_r(offs_t offset)
 			atm_update_memory();
 		}
 	}
-	return m_maincpu->space(AS_PROGRAM).read_byte(offset + 0x3d00);
+	return m_program.read_byte(offset + 0x3d00);
 }
 
 u8 atm_state::beta_disable_r(offs_t offset)
@@ -375,7 +376,7 @@ u8 atm_state::beta_disable_r(offs_t offset)
 			atm_update_memory();
 		}
 	}
-	return m_maincpu->space(AS_PROGRAM).read_byte(offset + 0x4000);
+	return m_program.read_byte(offset + 0x4000);
 }
 
 void atm_state::atm_mem(address_map &map)
@@ -439,6 +440,8 @@ void atm_state::machine_start()
 	for (auto i = 0; i < 4; i++)
 		m_bank_rom[i]->configure_entries(0, 4*8, rom->base() + 0x10000, 0x4000);
 	m_bank_ram[0]->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
+
+	m_maincpu->space(AS_PROGRAM).specific(m_program);
 }
 
 void atm_state::machine_reset()
