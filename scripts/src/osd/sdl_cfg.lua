@@ -155,16 +155,6 @@ elseif _OPTIONS["targetos"]=="freebsd" then
 	}
 end
 
-if _OPTIONS["NO_USE_EVDEV"]=="1" or _OPTIONS["targetos"]~="linux" then
-	defines {
-		"USE_EVDEV=0",
-	}
-else
-	defines {
-		"USE_EVDEV=1",
-	}
-end
-
 configuration { "osx*" }
 	includedirs {
 		MAME_DIR .. "3rdparty/bx/include/compat/osx",

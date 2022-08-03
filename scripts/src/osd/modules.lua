@@ -527,6 +527,15 @@ end
 
 
 newoption {
+	trigger = "USE_EVDEV",
+	description = "Include event device input module",
+	allowed = {
+		{ "0",  "Don'tnclude event device input module", },
+		{ "1",  "Include event device input module", },
+	},
+}
+
+newoption {
 	trigger = "USE_TAPTUN",
 	description = "Include tap/tun network module",
 	allowed = {
@@ -640,6 +649,13 @@ newoption {
 	description = "QT lib location",
 }
 
+if not _OPTIONS["USE_EVDEV"] then
+	if _OPTIONS["targetos"]=="linux" then
+		_OPTIONS["USE_EVDEV"] = "1"
+	else
+		_OPTIONS["USE_EVDEV"] = "0"
+	end
+end
 
 if not _OPTIONS["USE_TAPTUN"] then
 	if _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="windows" then
