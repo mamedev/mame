@@ -11,7 +11,7 @@
 #include "input_module.h"
 #include "modules/osdmodule.h"
 
-#if (USE_EVDEV)
+#if defined(SDLMAME_SDL2) && (USE_EVDEV)
 
 #include <cctype>
 #include <cstddef>
@@ -698,14 +698,14 @@ public:
 
 } // anonymous namespace
 
-#else // (USE_EVDEV)
+#else // defined(SDLMAME_SDL2) && (USE_EVDEV)
 
 MODULE_NOT_SUPPORTED(evdev_keyboard_module, OSD_KEYBOARDINPUT_PROVIDER, "evdev")
 MODULE_NOT_SUPPORTED(evdev_mouse_module,    OSD_MOUSEINPUT_PROVIDER,    "evdev")
 MODULE_NOT_SUPPORTED(evdev_joystick_module, OSD_JOYSTICKINPUT_PROVIDER, "evdev")
 MODULE_NOT_SUPPORTED(evdev_lightgun_module, OSD_LIGHTGUNINPUT_PROVIDER, "evdev")
 
-#endif // (USE_EVDEV)
+#endif // defined(SDLMAME_SDL2) && (USE_EVDEV)
 
 MODULE_DEFINITION(KEYBOARDINPUT_EVDEV, evdev_keyboard_module)
 MODULE_DEFINITION(MOUSEINPUT_EVDEV,    evdev_mouse_module)
