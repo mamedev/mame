@@ -74,7 +74,7 @@ license:CC0
 		<rom name="7th Guest, The (1994)(Philips)(EU)(Disc 2 of 2)(Track 7 of 7)[!][The Music, Die Musik][CD-Audio].wav" size="43220396" crc="c1cd9d61" md5="753db136ab8921e581799ce0fc2f5ff8"/>
 		<rom name="7th Guest, The (1994)(Philips)(EU)(Disc 2 of 2)[!][The Music, Die Musik][CD-Audio].cue" size="1246" crc="255b6643" md5="b7d4c344bb67aca09f91c8d3d356578e"/>
 		-->
-		<description>The 7th Guest (Euro)</description>
+		<description>The 7th Guest (Euro, alt)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="8111033V113 50404169 01" />
@@ -584,7 +584,7 @@ license:CC0
 		<rom name="Caesars World of Boxing (1993)(Philips)(US)[18621217 03].iso" size="593056800" crc="2c1a1eac" md5="587fe0e72ed1a2bf3cf2569f3fa23d4a"/>
 		<rom name="Caesars World of Boxing (1993)(Philips)(US)[18621217 03].cue" size="145" crc="67714d08" md5="b523e5d77206c72e196d938ae644e800"/>
 		-->
-		<description>Caesars World of Boxing (USA)</description>
+		<description>Caesars World of Boxing (USA, alt)</description>
 		<year>1993</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="18621217 03" />
@@ -991,7 +991,7 @@ license:CC0
 		<rom name="Dragon's Lair II - Time Warp (1994)(Philips)(US)[DVC][13920805 01].iso" size="541724400" crc="3de1ea0a" md5="1d1a0b55d2dabc8ade73f3d60178422e"/>
 		<rom name="Dragon's Lair II - Time Warp (1994)(Philips)(US)[DVC][13920805 01].cue" size="155" crc="a5fb684e" md5="2ef9707eb8dcbfda1b7b6ea2d65d527f"/>
 		-->
-		<description>Dragon's Lair II - Time Warp (USA)</description>
+		<description>Dragon's Lair II - Time Warp (USA, alt)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="13920805 01" />
@@ -1332,7 +1332,7 @@ license:CC0
 		<rom name="Inca (1994)(Coktel Vision - Philips)(EU)(M4)[!][en-de-fr-nl][8100126V206 50399445 01].iso" size="620234160" crc="f4f2cda1" md5="ac269214a5f4c85c26f2a31f1f71f854"/>
 		<rom name="Inca (1994)(Coktel Vision - Philips)(EU)(M4)[!][en-de-fr-nl][8100126V206 50399445 01].cue" size="174" crc="9a4746f9" md5="2575e20a341efcbe383f1e115fcb836d"/>
 		-->
-		<description>Inca (Euro)</description>
+		<description>Inca (Euro, alt 1)</description>
 		<year>1994</year>
 		<publisher>Coktel Vision ~ Philips</publisher>
 		<info name="cd_matrix" value="8100126V206 50399445 01" />
@@ -1349,7 +1349,7 @@ license:CC0
 		<rom name="Inca (1994)(Coktel Vision - Philips)(EU)(M4)[!][es-fr-it-pt].iso" size="632245824" crc="79b58a14" md5="e7f94261cb0a7a957c16a8c7ac54e8a0"/>
 		<rom name="Inca (1994)(Coktel Vision - Philips)(EU)(M4)[!][es-fr-it-pt].cue" size="149" crc="0e67376d" md5="555754d8341d70f62651b28d220be9b7"/>
 		-->
-		<description>Inca (Euro)</description>
+		<description>Inca (Euro, alt 2)</description>
 		<year>1994</year>
 		<publisher>Coktel Vision ~ Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
@@ -1737,7 +1737,7 @@ license:CC0
 		<rom name="Laser Lords (1992)(Philips)(US)[3106900742 50273 097 01].iso" size="684326160" crc="e6a3da55" md5="af032244d76598c615241d759de0c25a"/>
 		<rom name="Laser Lords (1992)(Philips)(US)[3106900742 50273 097 01].cue" size="145" crc="360ffe22" md5="379d126446c4267c61a38a2692779fb0"/>
 		-->
-		<description>Laser Lords (USA)</description>
+		<description>Laser Lords (USA, alt)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="3106900742 50273 097 01" />
@@ -2070,7 +2070,7 @@ license:CC0
 		<rom name="Mad Dog McCree (1994)(Philips)(US)[DVC][05820826 01].iso" size="460145280" crc="2d69679c" md5="d4f14f6d2d7122fbf7a2302d23961d42"/>
 		<rom name="Mad Dog McCree (1994)(Philips)(US)[DVC][05820826 01].cue" size="141" crc="17b0ab15" md5="f5aa70bd1f0dd37edef15712d65febf7"/>
 		-->
-		<description>Mad Dog McCree (USA)</description>
+		<description>Mad Dog McCree (USA, alt)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="05820826 01" />
@@ -2560,7 +2560,7 @@ license:CC0
 		<rom name="Pinball (1992)(Philips)(US)[!][3106900342 50238 037 04].iso" size="88552800" crc="d2624005" md5="bcc182252239030542dc0b1d2a7c7e8d"/>
 		<rom name="Pinball (1992)(Philips)(US)[!][3106900342 50238 037 04].cue" size="144" crc="c0b3663b" md5="81cc5491ccd630e828cef995454950c0"/>
 		-->
-		<description>Pinball (USA)</description>
+		<description>Pinball (USA, alt)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="3106900342 50238 037 04" />
@@ -2610,7 +2610,7 @@ license:CC0
 		<rom name="Power Hitter (1993)(Philips)(US)[08120908 01].iso" size="396923520" crc="c747cdaa" md5="265f0e06cf492c517d42315adf48adf0"/>
 		<rom name="Power Hitter (1993)(Philips)(US)[08120908 01].cue" size="134" crc="957b5ea6" md5="be76e38f52195ca9af5444ee7395a01c"/>
 		-->
-		<description>Power Hitter (USA)</description>
+		<description>Power Hitter (USA, alt)</description>
 		<year>1993</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="08120908 01" />
@@ -2661,7 +2661,7 @@ license:CC0
 		<rom name="Sargon Chess (1992)(Philips)(US)[03020320 01].iso" size="396335520" crc="7c2b904b" md5="8a6d24ce2097ece8f4c52d9f99c48096"/>
 		<rom name="Sargon Chess (1992)(Philips)(US)[03020320 01].cue" size="134" crc="77704a4d" md5="510b4877211ef47713285be419281fbd"/>
 		-->
-		<description>Sargon Chess (USA)</description>
+		<description>Sargon Chess (USA, alt)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="03020320 01" />
@@ -3223,7 +3223,7 @@ license:CC0
 		<rom name="Voyeur ...don't get caught (1993)(Philips)(US)[adult, access code 3333][11220928 03].iso" size="788331600" crc="634bf6ee" md5="5c0b71ad35d0f6a503ce3ab9bc414a56"/>
 		<rom name="Voyeur ...don't get caught (1993)(Philips)(US)[adult, access code 3333][11220928 03].cue" size="173" crc="c79535c1" md5="e4caa5909ee5237c7a4a6d75832382d5"/>
 		-->
-		<description>Voyeur ...Don't Get Caught (USA)</description>
+		<description>Voyeur ...Don't Get Caught (USA, alt)</description>
 		<year>1993</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="11220928 03" />
@@ -3734,7 +3734,7 @@ license:CC0
 		<rom name="A Visit To Sesame Street - Numbers (1992)(Philips)(US)[3106900192 50239 141 01].iso" size="621186720" crc="5a292995" md5="7f1dac8342d80f3f0848b29b26aed859"/>
 		<rom name="A Visit To Sesame Street - Numbers (1992)(Philips)(US)[3106900192 50239 141 01].cue" size="168" crc="127575fe" md5="5124ed757fb9a4365a9be07ddd36659d"/>
 		-->
-		<description>A Visit To Sesame Street - Numbers (USA)</description>
+		<description>A Visit To Sesame Street - Numbers (USA, alt)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="3106900192 50239 141 01" />
@@ -4609,7 +4609,7 @@ license:CC0
 		<rom name="Bertelsmann Universal Lexikon (1995)(Pathe - Philips)(DE)[!][DVC].iso" size="776983200" crc="a2724fbc" md5="370de8a16494241462c4b54881de32d9"/>
 		<rom name="Bertelsmann Universal Lexikon (1995)(Pathe - Philips)(DE)[!][DVC].cue" size="154" crc="25047121" md5="7b3a3878585980ce5ab872b01b58358c"/>
 		-->
-		<description>Bertelsmann Universal Lexikon (Germany)</description>
+		<description>Bertelsmann Universal Lexikon (Germany, alt)</description>
 		<year>1995</year>
 		<publisher>Pathe ~ Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -4816,7 +4816,7 @@ license:CC0
 		<rom name="Cartoon Jukebox (1991)(Philips)(US)[310690001-2 50228 730 01].iso" size="505044960" crc="d2e7f30f" md5="7ed082c017cf40d24166689e26429367"/>
 		<rom name="Cartoon Jukebox (1991)(Philips)(US)[310690001-2 50228 730 01].cue" size="150" crc="e39ed7ca" md5="e2f59dda998c9d3bf4e2b5e15799992f"/>
 		-->
-		<description>Cartoon Jukebox (USA)</description>
+		<description>Cartoon Jukebox (USA, alt)</description>
 		<year>1991</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="310690001-2 50228 730 01" />
@@ -5113,7 +5113,7 @@ license:CC0
 		<rom name="Children's Musical Theatre (1992)(Philips)(US)[0082914 01].iso" size="569536800" crc="279fd119" md5="52e32c7a7076e6a07a650e25101aab4e"/>
 		<rom name="Children's Musical Theatre (1992)(Philips)(US)[0082914 01].cue" size="147" crc="7df3f349" md5="fdd2565f96d73d231c9a722921b46e47"/>
 		-->
-		<description>Children's Musical Theatre (USA)</description>
+		<description>Children's Musical Theatre (USA, alt 1)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="0082914 01" />
@@ -5130,7 +5130,7 @@ license:CC0
 		<rom name="Children's Musical Theatre (1992)(Philips)(US)[3106900082 50268 090 01].iso" size="628666080" crc="232729cb" md5="7dd671476ca00ab15525d08e6b36295d"/>
 		<rom name="Children's Musical Theatre (1992)(Philips)(US)[3106900082 50268 090 01].cue" size="160" crc="7cf4fec1" md5="df6c9047f1a400445ef0fab117c8b8aa"/>
 		-->
-		<description>Children's Musical Theatre (USA)</description>
+		<description>Children's Musical Theatre (USA, alt 2)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="3106900082 50268 090 01" />
@@ -5386,7 +5386,7 @@ license:CC0
 		<rom name="Create your own Caricature with Spitting Image (1992)(Philips)(EU)[8110001 50274 188 02].iso" size="384034560" crc="dcf8a4c9" md5="d86e05d75c85d8380da1873336e224af"/>
 		<rom name="Create your own Caricature with Spitting Image (1992)(Philips)(EU)[8110001 50274 188 02].cue" size="177" crc="8be57f93" md5="841133a30556b9bb0b0aa9fd58f98220"/>
 		-->
-		<description>Create your own Caricature with Spitting Image (Euro)</description>
+		<description>Create your own Caricature with Spitting Image (Euro, alt)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="8110001 50274 188 02" />
@@ -6138,7 +6138,7 @@ license:CC0
 		<rom name="Golden Oldies Jukebox (1991)(Philips)(US)[0062919 01].iso" size="625984800" crc="519c776b" md5="7b08fd8cd35dd7903dbfe07a2dda33e7"/>
 		<rom name="Golden Oldies Jukebox (1991)(Philips)(US)[0062919 01].cue" size="142" crc="780df72b" md5="139b5fb1c6d8d330d479758b15c70d7b"/>
 		-->
-		<description>Golden Oldies Jukebox (USA)</description>
+		<description>Golden Oldies Jukebox (USA, alt)</description>
 		<year>1991</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="0062919 01" />
@@ -6298,7 +6298,7 @@ license:CC0
 		<rom name="Harvest of the Sun - Vincent Van Gogh Revisited (1992)(Philips)(US)[310690028-2 50239 148 01].iso" size="615024480" crc="36c793bf" md5="1d4f740b02ccb7e947e26f4e6e93a002"/>
 		<rom name="Harvest of the Sun - Vincent Van Gogh Revisited (1992)(Philips)(US)[310690028-2 50239 148 01].cue" size="182" crc="3d62d564" md5="4f353f550b0ab9581ae3a5c91a490689"/>
 		-->
-		<description>Harvest of the Sun - Vincent Van Gogh Revisited (USA)</description>
+		<description>Harvest of the Sun - Vincent Van Gogh Revisited (USA, alt 1)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="310690028-2 50239 148 01" />
@@ -6315,7 +6315,7 @@ license:CC0
 		<rom name="Harvest of the Sun - Vincent Van Gogh Revisited (1992)(Philips)(US)[310690028-2 50239 148 02].iso" size="615024480" crc="02b0f13d" md5="543924ec2b979d02d51b503ee6155a08"/>
 		<rom name="Harvest of the Sun - Vincent Van Gogh Revisited (1992)(Philips)(US)[310690028-2 50239 148 02].cue" size="182" crc="3c3ff3b5" md5="321a485f137871874725ab38ffb59671"/>
 		-->
-		<description>Harvest of the Sun - Vincent Van Gogh Revisited (USA)</description>
+		<description>Harvest of the Sun - Vincent Van Gogh Revisited (USA, alt 2)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="310690028-2 50239 148 02" />
@@ -6645,13 +6645,30 @@ license:CC0
 		<rom name="How the Rhinoceros got his Skin (1992)(Philips)(US)(en-es)[3106900232 02!].iso" size="427064400" crc="0cef10ee" md5="d8746415866dac7cb7d3ed7bcf5f2012"/>
 		<rom name="How the Rhinoceros got his Skin (1992)(Philips)(US)(en-es)[3106900232 02!].cue" size="163" crc="05bfd2e3" md5="f9991c467d9247ceff1f6bde56682f7a"/>
 		-->
-		<description>How the Rhinoceros Got His Skin (USA)</description>
+		<description>How the Rhinoceros got his Skin (USA)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="3106900232 02!" />
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
 				<disk name="how the rhinoceros got his skin (1992)(philips)(us)(en-es)[3106900232 02]" sha1="fbffc12e6246c8ae26239e7c1933223a038b3684"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="rhinoa" cloneof="rhino">
+		<!--
+		Origin: TOSEC
+		<rom name="How the Rhinoceros got his Skin (1992)(Philips)(US)(en-es)[3106900232 50237 962 01].iso" size="427417200" crc="c848065a" md5="5bdd5c81e4da887628cae4566b0de5cd"/>
+		<rom name="How the Rhinoceros got his Skin (1992)(Philips)(US)(en-es)[3106900232 50237 962 01].cue" size="172" crc="02a6455a" md5="f05a7028096f61c657eea98445bf6b60"/>
+		-->
+		<description>How the Rhinoceros got his Skin (USA, alt)</description>
+		<year>1992</year>
+		<publisher>Philips</publisher>
+		<info name="cd_matrix" value="3106900232 50237 962 01" />
+		<part name="cdrom" interface="cdi_cdrom">
+			<diskarea name="cdrom">
+				<disk name="how the rhinoceros got his skin (1992)(philips)(us)(en-es)[3106900232 50237 962 01]" sha1="569fb461684ee8abd294e3feb4c8f6414784ce1b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6668,23 +6685,6 @@ license:CC0
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
 				<disk name="wie das rhinozeros zu seiner haut kam (1993)(philips)(de)" sha1="8d8943d2dc8a6d20a23d826537af34abe40eea21"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="rhinoa" cloneof="rhino">
-		<!--
-		Origin: TOSEC
-		<rom name="How the Rhinoceros got his Skin (1992)(Philips)(US)(en-es)[3106900232 50237 962 01].iso" size="427417200" crc="c848065a" md5="5bdd5c81e4da887628cae4566b0de5cd"/>
-		<rom name="How the Rhinoceros got his Skin (1992)(Philips)(US)(en-es)[3106900232 50237 962 01].cue" size="172" crc="02a6455a" md5="f05a7028096f61c657eea98445bf6b60"/>
-		-->
-		<description>How the Rhinoceros got his Skin (USA)</description>
-		<year>1992</year>
-		<publisher>Philips</publisher>
-		<info name="cd_matrix" value="3106900232 50237 962 01" />
-		<part name="cdrom" interface="cdi_cdrom">
-			<diskarea name="cdrom">
-				<disk name="how the rhinoceros got his skin (1992)(philips)(us)(en-es)[3106900232 50237 962 01]" sha1="569fb461684ee8abd294e3feb4c8f6414784ce1b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -6800,7 +6800,7 @@ license:CC0
 		<rom name="Internetten op je TV! - Demo Disc (1996)(Philips)(NL)[DVC][8100330].iso" size="335164704" crc="a97dfe80" md5="d33a215410666d1d542429244b7e69a9"/>
 		<rom name="Internetten op je TV! - Demo Disc (1996)(Philips)(NL)[DVC][8100330].cue" size="156" crc="16c58550" md5="455bbe5ab2afb0f84710b4fbc6f80c42"/>
 		-->
-		<description>Internetten op je TV! - Demo Disc (Netherlands)</description>
+		<description>Internetten op je TV! - Demo Disc (Netherlands, alt)</description>
 		<year>1996</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="8100330" />
@@ -7903,7 +7903,7 @@ license:CC0
 		<rom name="Mother Goose - Hidden Pictures (1991)(Philips)(US)[3106900152 50228 843 03].iso" size="275724960" crc="26e14371" md5="0ee1011bfca09da20a7373ed605c37c2"/>
 		<rom name="Mother Goose - Hidden Pictures (1991)(Philips)(US)[3106900152 50228 843 03].cue" size="164" crc="1eb24b63" md5="19540ff39f0564ece29acb03c2a8227b"/>
 		-->
-		<description>Mother Goose - Hidden Pictures (USA)</description>
+		<description>Mother Goose - Hidden Pictures (USA, alt)</description>
 		<year>1991</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="3106900152 50228 843 03" />
@@ -7937,7 +7937,7 @@ license:CC0
 		<rom name="Mother Goose - Rhymes to Color (1991)(Philips)(US)[MGRTC392 03!].iso" size="281087520" crc="365ad751" md5="af33b8e5b87a123044001addec1f075a"/>
 		<rom name="Mother Goose - Rhymes to Color (1991)(Philips)(US)[MGRTC392 03!].cue" size="153" crc="e2aa7475" md5="922fd382c7f573922bd0b234130aa973"/>
 		-->
-		<description>Mother Goose - Rhymes to Color (USA)</description>
+		<description>Mother Goose - Rhymes to Color (USA, alt)</description>
 		<year>1991</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="MGRTC392 03!" />
@@ -8664,7 +8664,7 @@ license:CC0
 		<rom name="Rand McNally's America - United States Atlas (1991)(Philips)(US)[3106900142 50239 896 01].iso" size="517792800" crc="4c82d035" md5="929ca146bba769a5f7e3b7c942a924d3"/>
 		<rom name="Rand McNally's America - United States Atlas (1991)(Philips)(US)[3106900142 50239 896 01].cue" size="178" crc="5a78a4a4" md5="25f99b97dd515ea51aa5e6542791f10a"/>
 		-->
-		<description>Rand McNally's America - United States Atlas (USA)</description>
+		<description>Rand McNally's America - United States Atlas (USA, alt)</description>
 		<year>1991</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="3106900142 50239 896 01" />
@@ -8730,7 +8730,7 @@ license:CC0
 		<rom name="Renaissance Gallery, The (1992)(Philips)(US)[!][310690 0442 50260 353 01].iso" size="634310880" crc="f9bdcd08" md5="73351106321f434dbb9982d489707d09"/>
 		<rom name="Renaissance Gallery, The (1992)(Philips)(US)[!][310690 0442 50260 353 01].cue" size="162" crc="a6cfd807" md5="e97cf911fc93670b0ea01c160910eba3"/>
 		-->
-		<description>The Renaissance Gallery (USA)</description>
+		<description>The Renaissance Gallery (USA, alt)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="310690 0442 50260 353 01" />
@@ -8764,7 +8764,7 @@ license:CC0
 		<rom name="Renaissance of Florence, The (1992)(Philips)(US)[310690036-2 50239 145 01].iso" size="648093600" crc="29877a2f" md5="2f6ffed3591254d2cdbfc61c7d7ae419"/>
 		<rom name="Renaissance of Florence, The (1992)(Philips)(US)[310690036-2 50239 145 01].cue" size="163" crc="6b49fc9b" md5="30d8a2b87c7c703e2ed7b0214ae384b0"/>
 		-->
-		<description>The Renaissance of Florence (USA)</description>
+		<description>The Renaissance of Florence (USA, alt)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="310690036-2 50239 145 01" />
@@ -8894,7 +8894,7 @@ license:CC0
 		<rom name="Rhythm Maker (1993)(Philips)(US)[17220409 02].iso" size="49674240" crc="4dab9b71" md5="21b53e6111ba4f89eff2dc343bce013f"/>
 		<rom name="Rhythm Maker (1993)(Philips)(US)[17220409 02].cue" size="134" crc="15696b6b" md5="57fec3987adcf90d7e1f71fa649d808e"/>
 		-->
-		<description>Rhythm Maker (USA)</description>
+		<description>Rhythm Maker (USA, alt)</description>
 		<year>1993</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="17220409 02" />
@@ -8992,7 +8992,7 @@ license:CC0
 		<rom name="Richard Scarry's Busiest Neighborhood Disc Ever! (1992)(Philips)(US)[03820201 01].iso" size="278006400" crc="2759e232" md5="270adb367a5afb589204a5dc07d00981"/>
 		<rom name="Richard Scarry's Busiest Neighborhood Disc Ever! (1992)(Philips)(US)[03820201 01].cue" size="170" crc="d69f6819" md5="7f9ae15062d5abcc192b6281444749d8"/>
 		-->
-		<description>Richard Scarry's Busiest Neighborhood Disc Ever! (USA)</description>
+		<description>Richard Scarry's Busiest Neighborhood Disc Ever! (USA, alt 1)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="03820201 01" />
@@ -9009,7 +9009,7 @@ license:CC0
 		<rom name="Richard Scarry's Busiest Neighborhood Disc Ever! (1992)(Philips)(US)[3106900382 50257 831 01].iso" size="276066000" crc="889224ab" md5="b053f5b6cd4707555eb9afb7305aa7c6"/>
 		<rom name="Richard Scarry's Busiest Neighborhood Disc Ever! (1992)(Philips)(US)[3106900382 50257 831 01].cue" size="182" crc="d8ec922a" md5="098aaa91c0945c6410d44256e2de8048"/>
 		-->
-		<description>Richard Scarry's Busiest Neighborhood Disc Ever! (USA)</description>
+		<description>Richard Scarry's Busiest Neighborhood Disc Ever! (USA, alt 2)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="3106900382 50257 831 01" />
@@ -9211,7 +9211,7 @@ license:CC0
 		<rom name="Sandy's Circus Avontuur (1992)(Philips)(NL)[8140008 50260 053 02].iso" size="487118016" crc="175b6ede" md5="39247c88dd72720df29ce2be96e374f2"/>
 		<rom name="Sandy's Circus Avontuur (1992)(Philips)(NL)[8140008 50260 053 02].cue" size="154" crc="0ff15773" md5="ded6ce487e32c5be49d3dce4b619a512"/>
 		-->
-		<description>Sandy's Circus Avontuur (Netherlands)</description>
+		<description>Sandy's Circus Avontuur (Netherlands, alt)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="8140008 50260 053 02" />
@@ -9295,7 +9295,7 @@ license:CC0
 		<rom name="Sciamo con Alberto Tomba - Let's Go Skiing With Alberto Tomba (1994)(Philips - VideoRAI)(EU)(en-it)[DVC][991953100049 1445-A].iso" size="668556000" crc="6685600a" md5="31384eed3beddbb5e2cc1eadcfbacc80"/>
 		<rom name="Sciamo con Alberto Tomba - Let's Go Skiing With Alberto Tomba (1994)(Philips - VideoRAI)(EU)(en-it)[DVC][991953100049 1445-A].cue" size="214" crc="5105e95e" md5="e943b6d86b28aea60e3b899e96570705"/>
 		-->
-		<description>Sciamo con Alberto Tomba - Let's Go Skiing With Alberto Tomba (Euro)</description>
+		<description>Sciamo con Alberto Tomba - Let's Go Skiing With Alberto Tomba (Euro, alt)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="991953100049 1445-A" />
@@ -9940,7 +9940,7 @@ license:CC0
 		<rom name="Time-Life - 35mm Photography (1991)(Philips)(US)[!][3106900642 01].iso" size="640143840" crc="a0291631" md5="06d1baf3082527d95e0aeffd305dfa77"/>
 		<rom name="Time-Life - 35mm Photography (1991)(Philips)(US)[!][3106900642 01].cue" size="155" crc="000a64d4" md5="e0050602c9dae71384e0b2246b18936c"/>
 		-->
-		<description>Time-Life - 35mm Photography (USA)</description>
+		<description>Time-Life - 35mm Photography (USA, alt)</description>
 		<year>1991</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="3106900642 01" />
@@ -10087,7 +10087,7 @@ license:CC0
 		<rom name="Tom le Maximagier v1.0 (1992)(Philips)(FR)(M3)[8120021V203 50262231 05].iso" size="189100800" crc="51eca1c0" md5="da9eda403461a719a642a660b41028c7"/>
 		<rom name="Tom le Maximagier v1.0 (1992)(Philips)(FR)(M3)[8120021V203 50262231 05].cue" size="160" crc="35d9008a" md5="652bf5460ae3fa75d5dced92e6286338"/>
 		-->
-		<description>Tom le Maximagier v1.0 (France)</description>
+		<description>Tom le Maximagier v1.0 (France, alt)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="8120021V203 50262231 05" />
@@ -10138,7 +10138,7 @@ license:CC0
 		<rom name="TR-I - No World Order (1993)(Philips)(US)[!][6902672 50378963 01].iso" size="751153536" crc="efb0c5e9" md5="0e21f270f9314a5e34b4c1b904f6df51"/>
 		<rom name="TR-I - No World Order (1993)(Philips)(US)[!][6902672 50378963 01].cue" size="154" crc="75842399" md5="d255ec6cadb72ced060a6d26c7003d4e"/>
 		-->
-		<description>TR-I - No World Order (USA)</description>
+		<description>TR-I - No World Order (USA, alt)</description>
 		<year>1993</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="6902672 50378963 01" />
@@ -10255,7 +10255,7 @@ license:CC0
 		<rom name="USA '94 - World Cup (1994)(Philips)(EU)(M3)[a][en-es-it][DVC enhanced][8100103V105 50404055 01].iso" size="651268800" crc="bb04b237" md5="6429d34ccaae6e40e66998fecaf34e42"/>
 		<rom name="USA '94 - World Cup (1994)(Philips)(EU)(M3)[a][en-es-it][DVC enhanced][8100103V105 50404055 01].cue" size="184" crc="e724e780" md5="e12b79bff784c8f2fda2e37d3f5c6602"/>
 		-->
-		<description>USA '94 - World Cup (Euro, English / Spanish / Italian, alt)[DVC enhanced]</description>
+		<description>USA '94 - World Cup (Euro, English / Spanish / Italian)[DVC enhanced]</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="8100103V105 50404055 01" />
@@ -10273,7 +10273,7 @@ license:CC0
 		<rom name="USA '94 - World Cup (1994)(Philips)(EU)(M3)[en-es-it][DVC enhanced][8100103V105 50404055 01].iso" size="651268800" crc="bfaa9d74" md5="9627ea7ef77f8d801e11077b4734c962"/>
 		<rom name="USA '94 - World Cup (1994)(Philips)(EU)(M3)[en-es-it][DVC enhanced][8100103V105 50404055 01].cue" size="181" crc="7a3851e5" md5="5aaa18fc8507f05c4939eff6e890c3c8"/>
 		-->
-		<description>USA '94 - World Cup (Euro, English / Spanish / Italian)[DVC enhanced]</description>
+		<description>USA '94 - World Cup (Euro, English / Spanish / Italian, alt)[DVC enhanced]</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<info name="cd_matrix" value="8100103V105 50404055 01" />
