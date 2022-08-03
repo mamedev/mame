@@ -297,6 +297,16 @@ function osdmodulesbuild()
 		}
 	end
 
+	if _OPTIONS["USE_EVDEV"]=="1" then
+		defines {
+			"USE_EVDEV=1",
+		}
+	else
+		defines {
+			"USE_EVDEV=0",
+		}
+	end
+
 	if _OPTIONS["USE_QTDEBUG"]=="1" then
 		defines {
 			"USE_QTDEBUG=1",
