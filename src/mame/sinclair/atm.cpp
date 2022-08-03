@@ -39,10 +39,8 @@ namespace {
 #define LOGVIDEO(...) LOGMASKED(LOG_VIDEO, __VA_ARGS__)
 #define LOGWARN(...)  LOGMASKED(LOG_WARN,  __VA_ARGS__)
 
-#define RAM_MASK 0x40
-#define DOS7FFD_MASK 0x80
-#define SHADOW m_beta->is_active()
-#define PEN_PAGE(bank) m_pages_map[BIT(m_port_7ffd_data, 4)][bank]
+static constexpr u8 RAM_MASK = 0x40;
+static constexpr u8 DOS7FFD_MASK = 0x80;
 
 class atm_state : public spectrum_128_state
 {
@@ -54,6 +52,7 @@ public:
 		, m_bank_view2(*this, "bank_view2")
 		, m_bank_view3(*this, "bank_view3")
 		, m_bank_rom(*this, "bank_rom%u", 0U)
+		, m_charrom(*this, "charrom")
 		, m_beta(*this, BETA_DISK_TAG)
 		, m_centronics(*this, "centronics")
 		, m_palette(*this, "palette")
@@ -97,17 +96,22 @@ private:
 	memory_view m_bank_view2;
 	memory_view m_bank_view3;
 	required_memory_bank_array<4> m_bank_rom;
+	required_region_ptr<u8> m_charrom;
+
 	required_device<beta_disk_device> m_beta;
 	required_device<centronics_device> m_centronics;
 	required_device<device_palette_interface> m_palette;
 
-	int m_pen;            // PEN - extended memory manager
-	int m_cpm;
+	bool is_shadow_active() { return m_beta->is_active(); }
+	u8 *pen_page(u8 bank) { return &m_pages_map[BIT(m_port_7ffd_data, 4)][bank]; }
+
+	bool m_pen;           // PEN - extended memory manager
+	bool m_cpm;
 	u8 m_pages_map[2][4]; // map: 0,1
 
-	int m_pen2;           // palette selector
-	int m_rg = 0b011;     // 0:320x200lo, 2:640:200hi, 3:256x192zx, 6:80x25txt
-	int m_br3;
+	bool m_pen2;          // palette selector
+	u8 m_rg = 0b011;      // 0:320x200lo, 2:640:200hi, 3:256x192zx, 6:80x25txt
+	u8 m_br3;
 
 	address_space *m_program;
 };
@@ -119,7 +123,7 @@ void atm_state::atm_update_memory()
 	LOGMEM("7FFD.%d = %X:", BIT(m_port_7ffd_data, 4), (m_port_7ffd_data & 0x07));
 	for (auto bank = 0; bank < 4 ; bank++)
 	{
-		u8 page = PEN_PAGE(bank);
+		u8 page = *pen_page(bank);
 		if (!m_pen)
 			page = 3;
 
@@ -135,7 +139,7 @@ void atm_state::atm_update_memory()
 		else
 		{
 			if ((page & DOS7FFD_MASK) && !BIT(page, 1))
-				page = (page & ~1) | SHADOW;
+				page = (page & ~1) | is_shadow_active();
 			page = page & 0x03; // TODO size dependent
 			m_bank_rom[bank]->set_entry(page);
 			views[bank].get().select(0);
@@ -153,7 +157,7 @@ void atm_state::atm_ula_w(offs_t offset, u8 data)
 
 void atm_state::atm_port_ffff_w(offs_t offset, u8 data)
 {
-	if(!SHADOW)
+	if(!is_shadow_active())
 		return;
 
 	if (m_pen2)
@@ -163,7 +167,7 @@ void atm_state::atm_port_ffff_w(offs_t offset, u8 data)
 	else
 	{
 		// Must read current ULA value (which is doesn't work now) from the BUS.
-		// Good enough as none-border case is too complicated and possibly none software uses it.
+		// Good enough as non-border case is too complicated and possibly no software uses it.
 		u8 pen = get_border_color(m_screen->hpos(), m_screen->vpos());
 		m_palette->set_pen_color(pen,
 			(BIT(~data, 1) * 0xaa) | (BIT(~data, 6) * 0x55),
@@ -187,7 +191,7 @@ void atm_state::atm_port_7ffd_w(offs_t offset, u8 data)
 
 void atm_state::atm_port_ff77_w(offs_t offset, u8 data)
 {
-	if (!SHADOW)
+	if (!is_shadow_active())
 		return;
 
 	m_pen = BIT(offset, 8);
@@ -208,14 +212,14 @@ void atm_state::atm_port_ff77_w(offs_t offset, u8 data)
 
 void atm_state::atm_port_fff7_w(offs_t offset, u8 data)
 {
-	if (!SHADOW)
+	if (!is_shadow_active())
 		return;
 
 	u8 bank = offset >> 14;
 	u8 page = (data & 0xc0) | (~data & 0x3f);
 
 	LOGMEM("PEN%s.%s = %X %s%d: %02X\n", (page | DOS7FFD_MASK) ? "+" : "!", BIT(m_port_7ffd_data, 4), data, (page & RAM_MASK) ? "RAM" : "ROM", bank, page & 0x3f);
-	PEN_PAGE(bank) = page;
+	*pen_page(bank) = page;
 	atm_update_memory();
 }
 
@@ -224,7 +228,6 @@ rectangle atm_state::get_screen_area()
 	switch (m_rg)
 	{
 		case 0b110: // 80x25txt
-			[[fallthrough]];
 		case 0b010: // 640x200
 			return rectangle { 208, 208 + 639, 76, 76 + 199 };
 			break;
@@ -232,7 +235,6 @@ rectangle atm_state::get_screen_area()
 			return rectangle { 104, 104 + 319, 76, 76 + 199 };
 			break;
 		case 0b011: // 256x192
-			[[fallthrough]];
 		default:
 			return rectangle { 136, 136 + 255, 80, 80 + 191 };
 			break;
@@ -270,8 +272,8 @@ void atm_state::spectrum_update_screen(screen_device &screen, bitmap_ind16 &bitm
 		case 0b000: // 320x200
 			atm_update_screen_lo(screen, bitmap, cliprect);
 			break;
-		//case 0b011: // 256x192 + unsupported
-		default:
+		case 0b011: // 256x192
+		default:    // + unsupported
 			spectrum_128_state::spectrum_update_screen(screen, bitmap, cliprect);
 			break;
 	}
@@ -358,9 +360,9 @@ u8 atm_state::beta_neutral_r(offs_t offset)
 
 u8 atm_state::beta_enable_r(offs_t offset)
 {
-	if (!(machine().side_effects_disabled())) {
-		u8 page = PEN_PAGE(0);
-		if (!(page & RAM_MASK) && !SHADOW) {
+	if (!machine().side_effects_disabled()) {
+		u8 page = *pen_page(0);
+		if (!(page & RAM_MASK) && !is_shadow_active()) {
 			m_beta->enable();
 			atm_update_memory();
 		}
@@ -370,8 +372,8 @@ u8 atm_state::beta_enable_r(offs_t offset)
 
 u8 atm_state::beta_disable_r(offs_t offset)
 {
-	if (!(machine().side_effects_disabled())) {
-		if (SHADOW && m_cpm) {
+	if (!machine().side_effects_disabled()) {
+		if (is_shadow_active() && m_cpm) {
 			m_beta->disable();
 			atm_update_memory();
 		}
@@ -427,6 +429,13 @@ void atm_state::atm_switch(address_map &map)
 void atm_state::machine_start()
 {
 	spectrum_128_state::machine_start();
+
+	save_item(NAME(m_pen));
+	save_item(NAME(m_cpm));
+	save_item(NAME(m_pages_map));
+	save_item(NAME(m_pen2));
+	save_item(NAME(m_rg));
+	save_item(NAME(m_br3));
 
 	// reconfigure ROMs
 	memory_region *rom = memregion("maincpu");
@@ -566,5 +575,5 @@ ROM_END
 
 /*    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT      CLASS      INIT        COMPANY     FULLNAME              FLAGS */
 COMP( 1991, atm,     spec128, 0,      atm,     spec_plus, atm_state, empty_init, "MicroART", "ATM-Turbo (ATM-CP)", MACHINE_IS_INCOMPLETE)
-COMP( 1992, atmtb2,  spec128, 0,      atmtb2,  spec_plus, atm_state, empty_init, "MicroART", "ATM-Turbo 2",        0)
+COMP( 1992, atmtb2,  spec128, 0,      atmtb2,  spec_plus, atm_state, empty_init, "MicroART", "ATM-Turbo 2",        MACHINE_SUPPORTS_SAVE)
 //COMP( 1993, atmtb2p, spec128, 0,      atmtb2p, spec_plus, atm_state, empty_init, "MicroART", "ATM-Turbo 2+",       MACHINE_NOT_WORKING) // only supports 1M RAM vs. 512K in atmtb2

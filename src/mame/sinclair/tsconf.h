@@ -14,10 +14,10 @@
 
 #include "beta_m.h"
 
-#include "glukrs_m.h"
+#include "glukrs.h"
 #include "machine/pckeybrd.h"
 #include "machine/spi_sdcard.h"
-#include "tsconfdma_m.h"
+#include "tsconfdma.h"
 
 #include "tilemap.h"
 

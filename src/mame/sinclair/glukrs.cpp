@@ -10,7 +10,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "glukrs_m.h"
+#include "glukrs.h"
 
 glukrs_device::glukrs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, GLUKRS, tag, owner, clock),
