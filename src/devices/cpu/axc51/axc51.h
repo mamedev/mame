@@ -145,6 +145,8 @@ protected:
 	void check_irqs();
 	void burn_cycles(int cycles);
 	uint32_t process_dptr_access();
+	uint32_t get_dptr0_with_autoinc(uint8_t auto_inc);
+	uint32_t get_dptr1_with_autoinc(uint8_t auto_inc);
 
 	uint8_t spicon_r();
 	uint8_t spibuf_r();
