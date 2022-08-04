@@ -95,18 +95,6 @@ void pce_pachinko_device::device_start()
 
 
 //-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void pce_pachinko_device::device_reset()
-{
-	m_counter = 0;
-	m_prev_sel = false;
-	m_prev_clr = false;
-}
-
-
-//-------------------------------------------------
 //  peripheral_r - joypad read
 //-------------------------------------------------
 

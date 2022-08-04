@@ -35,7 +35,6 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	// device_pce_control_port_interface overrides
 	virtual u8 peripheral_r() override;
