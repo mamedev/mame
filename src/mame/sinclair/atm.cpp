@@ -572,6 +572,6 @@ ROM_END
 
 
 /*    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT      CLASS      INIT        COMPANY     FULLNAME              FLAGS */
-COMP( 1991, atm,     spec128, 0,      atm,     spec_plus, atm_state, empty_init, "MicroART", "ATM-Turbo (ATM-CP)", MACHINE_IS_INCOMPLETE)
+COMP( 1991, atm,     spec128, 0,      atm,     spec_plus, atm_state, empty_init, "MicroART", "ATM-Turbo (ATM-CP)", MACHINE_NOT_WORKING)
 COMP( 1992, atmtb2,  spec128, 0,      atmtb2,  spec_plus, atm_state, empty_init, "MicroART", "ATM-Turbo 2",        MACHINE_SUPPORTS_SAVE)
 //COMP( 1993, atmtb2p, spec128, 0,      atmtb2p, spec_plus, atm_state, empty_init, "MicroART", "ATM-Turbo 2+",       MACHINE_NOT_WORKING) // only supports 1M RAM vs. 512K in atmtb2
