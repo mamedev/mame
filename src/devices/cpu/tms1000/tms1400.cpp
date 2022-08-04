@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "tms1400.h"
+#include "tms1k_dasm.h"
 
 // TMS1400 follows the TMS1100, it doubles the ROM size again (4 chapters of 16 pages), and adds a 3-level callstack
 // - rotate the view and mirror the OR-mask to get the proper layout of the mpla, the default is identical to tms1100
@@ -75,6 +76,13 @@ void tms1400_cpu_device::device_add_mconfig(machine_config &config)
 	// microinstructions PLA, output PLA
 	PLA(config, "mpla", 8, 16, 30).set_format(pla_device::FMT::BERKELEY);
 	PLA(config, "opla", 5, 8, 32).set_format(pla_device::FMT::BERKELEY);
+}
+
+
+// disasm
+std::unique_ptr<util::disasm_interface> tms1400_cpu_device::create_disassembler()
+{
+	return std::make_unique<tms1400_disassembler>();
 }
 
 

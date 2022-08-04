@@ -60,6 +60,7 @@ std::unique_ptr<util::disasm_interface> tms1100_cpu_device::create_disassembler(
 	return std::make_unique<tms1100_disassembler>();
 }
 
+
 // device_reset
 void tms1100_cpu_device::device_reset()
 {

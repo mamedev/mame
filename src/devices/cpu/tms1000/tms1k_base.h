@@ -176,12 +176,13 @@ protected:
 	virtual void dynamic_output() { ; } // not used by default
 	virtual void read_opcode();
 
+	virtual u8 stack_levels() { return 1; }
 	virtual void op_br();
 	virtual void op_call();
 	virtual void op_retn();
-	virtual void op_br3();
-	virtual void op_call3();
-	virtual void op_retn3();
+	virtual void op_br2();
+	virtual void op_call2();
+	virtual void op_retn2();
 
 	virtual void op_sbit();
 	virtual void op_rbit();

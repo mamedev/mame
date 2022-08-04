@@ -413,9 +413,9 @@ void tms1k_base_device::op_retn()
 }
 
 
-// TMS1400/TMS1000C 3-level stack version
+// TMS1400/TMS1000C multiple level stack version
 
-void tms1k_base_device::op_br3()
+void tms1k_base_device::op_br2()
 {
 	// BR/BL: conditional branch
 	if (m_status)
@@ -426,13 +426,14 @@ void tms1k_base_device::op_br3()
 	}
 }
 
-void tms1k_base_device::op_call3()
+void tms1k_base_device::op_call2()
 {
 	// CALL/CALLL: conditional call
 	if (m_status)
 	{
-		// mask clatch 3 bits (no need to mask others)
-		m_clatch = (m_clatch << 1 | 1) & 7;
+		// mask clatch bits (no need to mask others)
+		u8 smask = (1 << stack_levels()) - 1;
+		m_clatch = (m_clatch << 1 | 1) & smask;
 
 		m_sr = m_sr << m_pc_bits | m_pc;
 		m_pc = m_opcode & m_pc_mask;
@@ -450,7 +451,7 @@ void tms1k_base_device::op_call3()
 	}
 }
 
-void tms1k_base_device::op_retn3()
+void tms1k_base_device::op_retn2()
 {
 	// RETN: return from subroutine
 	if (m_clatch & 1)
@@ -531,7 +532,7 @@ void tms1k_base_device::op_comx8()
 {
 	// COMX8: complement MSB of X register
 	// note: on TMS1100, the mnemonic is simply called "COMX"
-	m_x ^= 1 << (m_x_bits-1);
+	m_x ^= 1 << (m_x_bits - 1);
 }
 
 void tms1k_base_device::op_ldp()
@@ -565,7 +566,7 @@ void tms1k_base_device::op_xda()
 {
 	// XDA: exchange DAM and A
 	// note: setting A to DAM is done with DMTP and AUTA during this instruction
-	m_ram_address |= (0x10 << (m_x_bits-1));
+	m_ram_address |= (0x10 << (m_x_bits - 1));
 }
 
 void tms1k_base_device::op_off()
@@ -620,7 +621,7 @@ void tms1k_base_device::execute_one()
 		dynamic_output();
 		set_cki_bus();
 		m_ram_in = m_data->read_byte(m_ram_address) & 0xf;
-		m_dam_in = m_data->read_byte(m_ram_address | (0x10 << (m_x_bits-1))) & 0xf;
+		m_dam_in = m_data->read_byte(m_ram_address | (0x10 << (m_x_bits - 1))) & 0xf;
 		m_p = 0;
 		m_n = 0;
 		m_carry_in = 0;
