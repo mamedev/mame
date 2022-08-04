@@ -925,7 +925,6 @@ void axc51base_cpu_device::sfr_write(size_t offset, uint8_t data)
 		case AXC51_TMR0CNT: // 0xf9
 		case AXC51_TMR0PR:  // 0xfa
 		case AXC51_TMR0PSR: // 0xfb
-		//	printf("%s: write to Timer0 Reg %02x %02x\n", machine().describe_context().c_str(), (uint32_t)offset, data);
 			break;
 
 		case AXC51_IE2CRPT: // 0x95 controls automatic encryption

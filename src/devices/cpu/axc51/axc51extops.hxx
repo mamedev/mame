@@ -96,7 +96,6 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 	case 0x08:
 	{
 		// INC2DP0
-		printf("Inc2\n");
 		uint16_t dptr = (DPTR0)+2;
 		SET_DPTR0(dptr);
 		break;
