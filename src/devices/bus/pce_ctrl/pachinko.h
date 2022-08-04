@@ -1,13 +1,13 @@
 // license:BSD-3-Clause
-// copyright-holders:cam900
+// copyright-holders:kmg
 /**********************************************************************
 
-    NEC PC Engine/TurboGrafx-16 Multi Tap emulation
+    NEC PC Engine Coconuts Japan CJPC-101 Pachinko Controller
 
 **********************************************************************/
 
-#ifndef MAME_BUS_PCE_CTRL_MULTITAP_H
-#define MAME_BUS_PCE_CTRL_MULTITAP_H
+#ifndef MAME_BUS_PCE_CTRL_PACHINKO_H
+#define MAME_BUS_PCE_CTRL_PACHINKO_H
 
 #pragma once
 
@@ -20,20 +20,21 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> pce_multitap_device
+// ======================> pce_pachinko_device
 
-class pce_multitap_device : public device_t,
+class pce_pachinko_device : public device_t,
 							public device_pce_control_port_interface
 {
 public:
 	// construction/destruction
-	pce_multitap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	pce_pachinko_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const override;
+
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	// device_pce_control_port_interface overrides
 	virtual u8 peripheral_r() override;
@@ -41,17 +42,20 @@ protected:
 	virtual void clr_w(int state) override;
 
 private:
-	// controller ports
-	required_device_array<pce_control_port_device, 5> m_subctrl_port;
+	// IO ports
+	required_ioport m_buttons;
+	required_ioport m_dpad;
+	required_ioport m_trigger;
 
 	// internal states
-	u8 m_port_sel; // select port to read
+	u8 m_counter;
 	bool m_prev_sel; // previous SEL pin state
+	bool m_prev_clr; // previous CLR pin state
 };
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(PCE_MULTITAP, pce_multitap_device)
+DECLARE_DEVICE_TYPE(PCE_PACHINKO, pce_pachinko_device)
 
 
-#endif // MAME_BUS_PCE_CTRL_MULTITAP_H
+#endif // MAME_BUS_PCE_CTRL_PACHINKO_H
