@@ -395,6 +395,59 @@ void axc51base_cpu_device::do_sub_flags(uint8_t a, uint8_t data, uint8_t c)
 	SET_OV((result1 < -128 || result1 > 127));
 }
 
+uint32_t axc51base_cpu_device::process_dptr_access()
+{
+	uint32_t addr;
+	if ((m_sfr_regs[AXC51_DPCON - 0x80] & 0x01) == 0x00) // use DPTR0
+	{
+		addr = external_ram_iaddr(DPTR0, 0xFFFF);
+	}
+	else
+	{
+		addr = external_ram_iaddr(DPTR1, 0xFFFF);
+	}
+
+	if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x08) // auto-increment enabled
+	{
+		if ((m_sfr_regs[AXC51_DPCON - 0x80] & 0x01) == 0x00) // use DPTR0
+		{
+			if ((m_sfr_regs[AXC51_DPCON - 0x80] & 0x20) == 0x00) // DPID0  DPTR0 increase direction control
+			{
+				uint16_t dptr = (DPTR0)+1;
+				SET_DPTR0(dptr);
+			}
+			else
+			{
+				uint16_t dptr = (DPTR0)-1;
+				SET_DPTR0(dptr);
+			}
+		}
+		else // use DPTR1
+		{
+			if ((m_sfr_regs[AXC51_DPCON - 0x80] & 0x10) == 0x00) // DPID1  DPTR1 increase direction control
+			{
+				// decrement
+				uint16_t dptr = (DPTR1)+1;
+				SET_DPTR1(dptr);
+			}
+			else
+			{
+				// decrement
+				uint16_t dptr = (DPTR1)-1;
+				SET_DPTR1(dptr);
+			}
+		}
+	}
+
+	if ((m_sfr_regs[AXC51_DPCON - 0x80] & 0x04) == 0x04)
+	{
+		// auto toggle DPR
+		m_sfr_regs[AXC51_DPCON - 0x80] ^= 0x01;
+	}
+
+	return addr;
+}
+
 void axc51base_cpu_device::transmit_receive(int source)
 {
 }

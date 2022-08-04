@@ -388,7 +388,7 @@ void axc51base_cpu_device::inc_r(uint8_t r)
 	SET_REG(r, data + 1);
 }
 
-//INC DPTR0                                  /* 1: 1010 0011 */
+//INC DPTR                                  /* 1: 1010 0011 */
 void axc51base_cpu_device::inc_dptr(uint8_t r)
 {
 	//if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x08) // auto-increment enabled (not used here)
@@ -442,7 +442,7 @@ void axc51base_cpu_device::jc(uint8_t r)
 	}
 }
 
-//JMP @A+DPTR0                               /* 1: 0111 0011 */
+//JMP @A+DPTR                               /* 1: 0111 0011 */
 void axc51base_cpu_device::jmp_iadptr(uint8_t r)
 {
 	// not listed as being affected by auto-inc or auto-toggle?
@@ -596,7 +596,7 @@ void axc51base_cpu_device::mov_mem_r(uint8_t r)
 	iram_write(addr,R_REG(r));                  //Store contents of R0 - R7 to data address
 }
 
-//MOV DPTR0, #data16                         /* 1: 1001 0000 */
+//MOV DPTR, #data16                         /* 1: 1001 0000 */
 void axc51base_cpu_device::mov_dptr_byte(uint8_t r)
 {
 	//if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x08) // auto-increment enabled (not used here)
@@ -675,7 +675,7 @@ void axc51base_cpu_device::mov_c_bitaddr(uint8_t r)
 	SET_CY( (bit_address_r(addr)) );                //Store Bit from Bit Address to Carry Flag
 }
 
-//MOVC A, @A + DPTR0                         /* 1: 1001 0011 */
+//MOVC A, @A + DPTR                         /* 1: 1001 0011 */
 void axc51base_cpu_device::movc_a_iadptr(uint8_t r)
 {
 	if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x08) // auto-increment enabled
@@ -698,61 +698,13 @@ void axc51base_cpu_device::movc_a_iadptr(uint8_t r)
 	SET_ACC(data);
 }
 
-//MOVX A,@DPTR0                              /* 1: 1110 0000 */
+//MOVX A,@DPTR                              /* 1: 1110 0000 */
 //(Move External Ram 16 bit address to A)
 void axc51base_cpu_device::movx_a_idptr(uint8_t r)
 {
-//  uint8_t byte = (uint8_t)m_io.read_byte(R_DPTR0);         //Grab 1 byte from External DATA memory pointed to by dptr
-	uint32_t addr;
-
-	if ((m_sfr_regs[AXC51_DPCON - 0x80] & 0x01) == 0x00) // use DPTR0
-	{
-		addr = external_ram_iaddr(DPTR0, 0xFFFF);
-	}
-	else
-	{
-		addr = external_ram_iaddr(DPTR1, 0xFFFF);
-	}
+	uint32_t addr = process_dptr_access();
 
 	uint8_t byte = (uint8_t)m_io.read_byte(addr);           //Grab 1 byte from External DATA memory pointed to by dptr
-
-	if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x08) // auto-increment enabled
-	{
-		if ((m_sfr_regs[AXC51_DPCON - 0x80] & 0x01) == 0x00) // use DPTR0
-		{
-			if ((m_sfr_regs[AXC51_DPCON - 0x80] & 0x20) == 0x00) // DPID0  DPTR0 increase direction control
-			{
-				uint16_t dptr = (DPTR0)+1;
-				SET_DPTR0(dptr);
-			}
-			else
-			{
-				uint16_t dptr = (DPTR0)-1;
-				SET_DPTR0(dptr);
-			}
-		}
-		else // use DPTR1
-		{
-			if ((m_sfr_regs[AXC51_DPCON - 0x80] & 0x10) == 0x00) // DPID1  DPTR1 increase direction control
-			{
-				// decrement
-				uint16_t dptr = (DPTR1)+1;
-				SET_DPTR1(dptr);
-			}
-			else
-			{
-				// decrement
-				uint16_t dptr = (DPTR1)-1;
-				SET_DPTR1(dptr);
-			}
-		}
-	}
-
-	if ((m_sfr_regs[AXC51_DPCON - 0x80] & 0x04) == 0x04)
-	{
-		// auto toggle DPR
-		m_sfr_regs[AXC51_DPCON - 0x80] ^= 0x01;
-	}
 
 	SET_ACC(byte);                      //Store to ACC
 }
@@ -766,58 +718,11 @@ void axc51base_cpu_device::movx_a_ir(uint8_t r)
 	SET_ACC(byte);                      //Store to ACC
 }
 
-//MOVX @DPTR0,A                              /* 1: 1111 0000 */
+//MOVX @DPTR,A                              /* 1: 1111 0000 */
 //(Move A to External Ram 16 bit address)
 void axc51base_cpu_device::movx_idptr_a(uint8_t r)
 {
-	uint32_t addr;
-	if ((m_sfr_regs[AXC51_DPCON - 0x80] & 0x01) == 0x00) // use DPTR0
-	{
-		addr = external_ram_iaddr(DPTR0, 0xFFFF);
-	}
-	else
-	{
-		addr = external_ram_iaddr(DPTR1, 0xFFFF);
-	}
-
-	if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x08) // auto-increment enabled
-	{
-		if ((m_sfr_regs[AXC51_DPCON - 0x80] & 0x01) == 0x00) // use DPTR0
-		{
-			if ((m_sfr_regs[AXC51_DPCON - 0x80] & 0x20) == 0x00) // DPID0  DPTR0 increase direction control
-			{
-				uint16_t dptr = (DPTR0)+1;
-				SET_DPTR0(dptr);
-			}
-			else
-			{
-				uint16_t dptr = (DPTR0)-1;
-				SET_DPTR0(dptr);
-			}
-		}
-		else // use DPTR1
-		{
-			if ((m_sfr_regs[AXC51_DPCON - 0x80] & 0x10) == 0x00) // DPID1  DPTR1 increase direction control
-			{
-				// decrement
-				uint16_t dptr = (DPTR1)+1;
-				SET_DPTR1(dptr);
-			}
-			else
-			{
-				// decrement
-				uint16_t dptr = (DPTR1)-1;
-				SET_DPTR1(dptr);
-			}
-		}
-	}
-
-	if ((m_sfr_regs[AXC51_DPCON - 0x80] & 0x04) == 0x04)
-	{
-		// auto toggle DPR
-		m_sfr_regs[AXC51_DPCON - 0x80] ^= 0x01;
-	}
-
+	uint32_t addr = process_dptr_access();
 	m_io.write_byte(addr, ACC);               //Store ACC to External DATA memory address pointed to by DPTR0
 }
 

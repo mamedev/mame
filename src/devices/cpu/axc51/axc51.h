@@ -144,6 +144,7 @@ protected:
 	void execute_op(uint8_t op);
 	void check_irqs();
 	void burn_cycles(int cycles);
+	uint32_t process_dptr_access();
 
 	uint8_t spicon_r();
 	uint8_t spibuf_r();
