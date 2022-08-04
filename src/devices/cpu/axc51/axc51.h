@@ -127,8 +127,8 @@ protected:
 	memory_access<11, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
 	memory_access<17, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 
-	devcb_read8::array<4> m_port_in_cb;
-	devcb_write8::array<4> m_port_out_cb;
+	devcb_read8::array<5> m_port_in_cb;
+	devcb_write8::array<5> m_port_out_cb;
 
 	/* Serial Port TX/RX Callbacks */
 	devcb_write8 m_serial_tx_cb;    //Call back function when sending data out of serial port
@@ -300,6 +300,10 @@ protected:
 	void extended_a5_0f();
 	void extended_a5_d0();
 	void extended_a5_d1();
+
+	uint8_t get_erx(int m);
+	void set_erx(int n, uint8_t val);
+	uint16_t get_dpt(int i);
 
 	/* Internal address in SFR of registers */
 	enum
@@ -503,7 +507,6 @@ protected:
 		V_DAC        = 0x073,  // IE1.6   IP1.6
 		V_SFS_INT    = 0x07b,  // IE1.7   IP1.7
 	};
-
 };
 
 

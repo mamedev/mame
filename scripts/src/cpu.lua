@@ -1109,6 +1109,7 @@ if CPUS["AXC51"] then
 		MAME_DIR .. "src/devices/cpu/axc51/axc51.cpp",
 		MAME_DIR .. "src/devices/cpu/axc51/axc51.h",
 		MAME_DIR .. "src/devices/cpu/axc51/axc51ops.hxx",
+		MAME_DIR .. "src/devices/cpu/axc51/axc51extops.hxx",
 	}
 end
 

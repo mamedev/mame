@@ -49,6 +49,12 @@ private:
 	required_device<palette_device> m_palette;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+
+	void out3_w(u8 data);
+	void out4_w(u8 data);
+
+	uint8_t buffer[256 * 256];
+	int bufpos = 0;
 };
 
 void monon_color_state::machine_start()
@@ -85,6 +91,17 @@ void monon_color_state::video_start()
 
 uint32_t monon_color_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	uint8_t* videoram = buffer;
+
+	for (int y = 0; y < 256; y++)
+	{
+		int count = (y * 256);
+		for(int x = 0; x < 256; x++)
+		{
+			uint8_t pixel = videoram[count++];
+			bitmap.pix(y, x) = pixel;
+		}
+	}
 	return 0;
 }
 
@@ -92,11 +109,26 @@ static INPUT_PORTS_START( monon_color )
 INPUT_PORTS_END
 
 
+void monon_color_state::out4_w(u8 data)
+{
+//	buffer[bufpos++] = data;
+//	if (bufpos == (256 * 256))
+//		bufpos = 0;
+}
+
+void monon_color_state::out3_w(u8 data)
+{
+	buffer[bufpos++] = data;
+	if (bufpos == (256 * 256))
+		bufpos = 0;
+}
 
 void monon_color_state::monon_color(machine_config &config)
 {
 	/* basic machine hardware */
 	AX208(config, m_maincpu, 96000000); // (8051 / MCS51 derived) incomplete core!
+	m_maincpu->port_out_cb<3>().set(FUNC(monon_color_state::out3_w));
+	m_maincpu->port_out_cb<4>().set(FUNC(monon_color_state::out4_w));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -104,7 +136,7 @@ void monon_color_state::monon_color(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_screen_update(FUNC(monon_color_state::screen_update));
 	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_entries(256);
