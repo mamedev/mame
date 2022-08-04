@@ -39,7 +39,6 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	virtual void video_start() override;
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -52,44 +51,18 @@ private:
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
+	u8 in2_r();
+	void out2_w(u8 data);
 	void out3_w(u8 data);
 	void out4_w(u8 data);
+
+	uint8_t m_out2state = 0;
 
 	uint32_t m_spiaddr = 0;
 	uint8_t m_spi_state = 0;
 	uint8_t m_spilatch = 0;
 	bool m_spidir = false;
 
-	uint8_t spibuf_r();
-	void spibuf_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(spidir_w);
-
-	uint8_t m_vidbuffer[256 * 256];
-	int bufpos = 0;
-};
-
-void monon_color_state::machine_start()
-{
-}
-
-uint8_t monon_color_state::spibuf_r()
-{
-	// HACK while we figure things out
-
-	logerror("%s: sfr_read AXC51_SPIBUF %02x\n", machine().describe_context(), m_spilatch);
-
-
-	return m_spilatch;
-	//return m_sfr_regs[AXC51_SPIBUF - 0x80];
-}
-
-WRITE_LINE_MEMBER(monon_color_state::spidir_w)
-{
-	m_spidir = state;
-}
-
-void monon_color_state::spibuf_w(uint8_t data)
-{
 	enum
 	{
 		READY_FOR_COMMAND = 0x00,
@@ -103,7 +76,48 @@ void monon_color_state::spibuf_w(uint8_t data)
 		READY_FOR_HSDUMMY = 0x07,
 
 		READY_FOR_READ = 0x08,
+		READY_FOR_STATUS_READ = 0x09,
 	};
+
+	uint8_t spibuf_r();
+	void spibuf_w(uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(spidir_w);
+
+	uint8_t m_vidbuffer[256 * 256];
+	int bufpos = 0;
+};
+
+void monon_color_state::machine_start()
+{
+	save_item(NAME(m_out2state));
+	save_item(NAME(m_spiaddr));
+	save_item(NAME(m_spi_state));
+	save_item(NAME(m_spilatch));
+	save_item(NAME(m_spidir));
+	save_item(NAME(m_vidbuffer));
+	save_item(NAME(bufpos));
+}
+
+uint8_t monon_color_state::spibuf_r()
+{
+//	if (!(m_out2state & 0x01))
+//		return 0x00;
+
+	logerror("%s: sfr_read AXC51_SPIBUF %02x\n", machine().describe_context(), m_spilatch);
+
+	return m_spilatch;
+}
+
+WRITE_LINE_MEMBER(monon_color_state::spidir_w)
+{
+	m_spidir = state;
+}
+
+void monon_color_state::spibuf_w(uint8_t data)
+{
+//	if (!(m_out2state & 0x01))
+//		return;
+
 
 	if (!m_spidir) // Send to SPI
 	{
@@ -112,7 +126,6 @@ void monon_color_state::spibuf_w(uint8_t data)
 		switch (m_spi_state)
 		{
 		case READY_FOR_COMMAND:
-		case READY_FOR_READ:
 			if (data == 0x03)
 			{
 				// set read mode
@@ -122,6 +135,7 @@ void monon_color_state::spibuf_w(uint8_t data)
 			else if (data == 0x05)
 			{
 				logerror("SPI Status Command\n");
+				m_spi_state = READY_FOR_STATUS_READ;
 			}
 			else if (data == 0x0b)
 			{
@@ -177,12 +191,17 @@ void monon_color_state::spibuf_w(uint8_t data)
 		if (m_spi_state == READY_FOR_READ)
 		{
 			m_spilatch = m_spiptr[m_spiaddr++];
-			logerror("%s: sfr_write AXC51_SPIBUF (clock read, latching in %02x)\n", machine().describe_context(), m_spilatch);			
+			logerror("%s: sfr_write AXC51_SPIBUF (clock read, data read latching in %02x)\n", machine().describe_context(), m_spilatch);			
+		}
+		else if (m_spi_state == READY_FOR_STATUS_READ)
+		{
+			m_spilatch = 0x00;
+			logerror("%s: sfr_write AXC51_SPIBUF (clock read, status read)\n", machine().describe_context(), m_spi_state);			
 		}
 		else
 		{
-			logerror("%s: sfr_write AXC51_SPIBUF (clock read)\n", machine().describe_context(), m_spi_state);			
-			m_spi_state = 0x00;
+			m_spilatch = 0x00;
+			logerror("%s: sfr_write AXC51_SPIBUF (unknown read, status read)\n", machine().describe_context(), m_spi_state);			
 		}
 	}
 }
@@ -205,11 +224,17 @@ void monon_color_state::machine_reset()
 	    201                              (3rd revision)
 	    202,203,204,205,301,302,303,304  (4th revision)
 	*/
+
+
+	m_out2state = 0;
+	m_spiaddr = 0;
+	m_spi_state = 0;
+	m_spilatch = 0;
+	m_spidir = false;
+	//m_vidbuffer[256 * 256];
+	bufpos = 0;
 }
 
-void monon_color_state::video_start()
-{
-}
 
 
 uint32_t monon_color_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -246,10 +271,34 @@ void monon_color_state::out3_w(u8 data)
 		bufpos = 0;
 }
 
+u8 monon_color_state::in2_r()
+{
+	return m_out2state;
+}
+
+void monon_color_state::out2_w(u8 data)
+{
+	if ((data & 0x01) != (m_out2state & 0x01))
+	{
+		if (data & 0x01)
+		{
+			logerror("low to high on port 2\n");
+			m_spi_state = READY_FOR_COMMAND;
+		}
+		else
+		{
+			logerror("high to low on port 2\n");
+		}
+	}
+	m_out2state = data;
+}
+
 void monon_color_state::monon_color(machine_config &config)
 {
 	/* basic machine hardware */
 	AX208(config, m_maincpu, 96000000); // (8051 / MCS51 derived) incomplete core!
+	m_maincpu->port_in_cb<2>().set(FUNC(monon_color_state::in2_r));
+	m_maincpu->port_out_cb<2>().set(FUNC(monon_color_state::out2_w));
 	m_maincpu->port_out_cb<3>().set(FUNC(monon_color_state::out3_w));
 	m_maincpu->port_out_cb<4>().set(FUNC(monon_color_state::out4_w));
 	m_maincpu->spi_in_cb().set(FUNC(monon_color_state::spibuf_r));
