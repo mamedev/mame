@@ -16,12 +16,13 @@ class a26_rom_harmony_device : public a26_rom_base_device
 public:
 	a26_rom_harmony_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-private:
-	virtual void device_reset() override;
+	virtual void install_memory_handlers(address_space *space) override;
 
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual void install_memory_handlers(address_space *space) override;
 
 private:
 	void check_bankswitch(offs_t offset);

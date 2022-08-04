@@ -181,13 +181,9 @@ public:
 
 protected:
 	virtual void device_reset() override;
-	void switch_bank0(offs_t offset, uint8_t data);
-	void switch_bank1(offs_t offset, uint8_t data);
-	void switch_bank2(offs_t offset, uint8_t data);
+	template <uint8_t Bank> void switch_bank(offs_t offset, uint8_t data);
 
-	memory_bank_creator m_bank0;
-	memory_bank_creator m_bank1;
-	memory_bank_creator m_bank2;
+	memory_bank_array_creator<3> m_bank;
 };
 
 

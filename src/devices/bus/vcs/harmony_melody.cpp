@@ -85,6 +85,12 @@ void a26_rom_harmony_device::device_add_mconfig(machine_config &config)
 	m_cpu->set_addrmap(AS_PROGRAM, &a26_rom_harmony_device::harmony_arm7_map);
 }
 
+
+void a26_rom_harmony_device::device_start()
+{
+	save_item(NAME(m_base_bank));
+}
+
 // actually if the ARM code is doing this and providing every opcode to the main CPU based
 // on bus activity then we shouldn't be doing and of this here (if the ROM is actually
 // the internal Flash rom of the ARM CPU then the A2600 CPU won't be able to see it directly
