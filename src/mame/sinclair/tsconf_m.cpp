@@ -154,27 +154,27 @@ void tsconf_state::spectrum_update_screen(screen_device &screen, bitmap_ind16 &b
 	}
 }
 
-void tsconf_state::tsconf_UpdateZxScreenBitmap(screen_device &screen_d, bitmap_ind16 &bitmap, const rectangle &screen)
+void tsconf_state::tsconf_UpdateZxScreenBitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u8 pal_offset = m_regs[PAL_SEL] << 4;
 	u8 *screen_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE]);
 	u8 *attrs_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE]) + 0x1800;
-	bool invert_attrs = u64(screen_d.frame_number() / m_frame_invert_count) & 1;
-	for (u16 vpos = screen.top(); vpos <= screen.bottom(); vpos++)
+	bool invert_attrs = u64(screen.frame_number() / m_frame_invert_count) & 1;
+	for (u16 vpos = cliprect.top(); vpos <= cliprect.bottom(); vpos++)
 	{
-		u16 hpos = screen.left();
+		u16 hpos = cliprect.left();
 		u16 x = hpos - get_screen_area().left();
 		u16 y = vpos - get_screen_area().top();
 		u8 *scr = &screen_location[((y & 7) << 8) | ((y & 0x38) << 2) | ((y & 0xc0) << 5) | (x >> 3)];
 		u8 *attr = &attrs_location[((y & 0xf8) << 2) | (x >> 3)];
 		u16 *pix = &(bitmap.pix(vpos, hpos));
-		while (hpos <= screen.right())
+		while (hpos <= cliprect.right())
 		{
 			u16 ink = pal_offset | ((*attr >> 3) & 0x08) | (*attr & 0x07);
 			u16 pap = pal_offset | ((*attr >> 3) & 0x0f);
 			u8 pix8 = (invert_attrs && (*attr & 0x80)) ? ~*scr : *scr;
 
-			for (u8 b = 0x80 >> (x & 0x07); b != 0 && hpos <= screen.right(); b >>= 1, x++, hpos++)
+			for (u8 b = 0x80 >> (x & 0x07); b != 0 && hpos <= cliprect.right(); b >>= 1, x++, hpos++)
 				*pix++ = (pix8 & b) ? ink : pap;
 			scr++;
 			attr++;
@@ -182,13 +182,13 @@ void tsconf_state::tsconf_UpdateZxScreenBitmap(screen_device &screen_d, bitmap_i
 	}
 }
 
-void tsconf_state::tsconf_UpdateTxtBitmap(bitmap_ind16 &bitmap, const rectangle &screen)
+void tsconf_state::tsconf_UpdateTxtBitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u8 *font_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE] ^ 0x01);
 	u8 pal_offset = m_regs[PAL_SEL] << 4;
-	for (u16 vpos = screen.top(); vpos <= screen.bottom(); vpos++)
+	for (u16 vpos = cliprect.top(); vpos <= cliprect.bottom(); vpos++)
 	{
-		u16 hpos = screen.left();
+		u16 hpos = cliprect.left();
 		u16 x = hpos - get_screen_area().left();
 		u16 y = vpos - get_screen_area().top();
 		u16 y_offset = (OFFS_512(G_Y_OFFS_L) + y) & 0x1ff;
@@ -196,28 +196,28 @@ void tsconf_state::tsconf_UpdateTxtBitmap(bitmap_ind16 &bitmap, const rectangle 
 		// TODO? u16 x_offset = OFFS_512(G_X_OFFS_L);
 		u8 *text_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE]) + (y_offset / 8 * 256 + x / 8);
 		u16 *pix = &(bitmap.pix(vpos, hpos));
-		while (hpos <= screen.right())
+		while (hpos <= cliprect.right())
 		{
 			u8 font_color = *(text_location + 128) & 0x0f;
 			u8 bg_color = (*(text_location + 128) & 0xf0) >> 4;
 			u8 char_x = *(font_location + (*text_location * 8) + (y_offset % 8));
-			for (u8 b = 0x80 >> (x & 0x07); b != 0 && hpos <= screen.right(); b >>= 1, x++, hpos++)
+			for (u8 b = 0x80 >> (x & 0x07); b != 0 && hpos <= cliprect.right(); b >>= 1, x++, hpos++)
 				*pix++ = pal_offset | ((char_x & b) ? font_color : bg_color);
 			text_location++;
 		}
 	}
 }
 
-void tsconf_state::tsconf_UpdateGfxBitmap(bitmap_ind16 &bitmap, const rectangle &screen)
+void tsconf_state::tsconf_UpdateGfxBitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u8 pal_offset = m_regs[PAL_SEL] << 4;
-	for (u16 vpos = screen.top(); vpos <= screen.bottom(); vpos++)
+	for (u16 vpos = cliprect.top(); vpos <= cliprect.bottom(); vpos++)
 	{
 		u16 y_offset = (0x200 + OFFS_512(G_Y_OFFS_L) + m_gfx_y_frame_offset + vpos) & 0x1ff;
-		u16 x_offset = (OFFS_512(G_X_OFFS_L) + (screen.left() - get_screen_area().left())) & 0x1ff;
+		u16 x_offset = (OFFS_512(G_X_OFFS_L) + (cliprect.left() - get_screen_area().left())) & 0x1ff;
 		u8 *video_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE]) + ((y_offset * 512 + x_offset) >> (2 - VM));
-		u16 *bm = &(bitmap.pix(vpos, screen.left()));
-		s16 width = screen.width();
+		u16 *bm = &(bitmap.pix(vpos, cliprect.left()));
+		s16 width = cliprect.width();
 		if (VM == VM_16C)
 		{
 			if (x_offset & 1)
