@@ -82,8 +82,6 @@ axc51base_cpu_device::axc51base_cpu_device(const machine_config &mconfig, device
 	, m_mainram(*this, "mainram")
 	, m_port_in_cb(*this)
 	, m_port_out_cb(*this)
-	, m_serial_tx_cb(*this)
-	, m_serial_rx_cb(*this)
 	, m_rtemp(0)
 {
 	/* default to standard cmos interfacing */
@@ -115,27 +113,6 @@ device_memory_interface::space_config_vector axc51base_cpu_device::memory_space_
 	};
 }
 
-
-/***************************************************************************
-    MACROS
-***************************************************************************/
-
-/* Read Opcode/Opcode Arguments from Program Code */
-#define ROP(pc)         m_program.read_byte(pc)
-#define ROP_ARG(pc)     m_program.read_byte(pc)
-
-/* Read a byte from External Code Memory (Usually Program Rom(s) Space) */
-#define CODEMEM_R(a)    (uint8_t)m_program.read_byte(a)
-
-/* Read/Write a byte from/to External Data Memory (Usually RAM or other I/O) */
-#define DATAMEM_R(a)    (uint8_t)m_io.read_byte(a)
-#define DATAMEM_W(a,v)  m_io.write_byte(a, v)
-
-/* Read/Write a byte from/to the Internal RAM */
-
-#define IRAM_R(a)       iram_read(a)
-#define IRAM_W(a, d)    iram_write(a, d)
-
 /* Read/Write a byte from/to the Internal RAM indirectly */
 /* (called from indirect addressing)                     */
 /* these go through DBASE register on axc51 (at least stack accesses) */
@@ -144,29 +121,9 @@ device_memory_interface::space_config_vector axc51base_cpu_device::memory_space_
 uint8_t axc51base_cpu_device::iram_indirect_read(offs_t a) { return m_data.read_byte((m_sfr_regs[AXC51_DBASE - 0x80] * 4) + a); }
 void axc51base_cpu_device::iram_indirect_write(offs_t a, uint8_t d) { m_data.write_byte((m_sfr_regs[AXC51_DBASE - 0x80] * 4) + a, d); }
 
-
-
-#define IRAM_INDIRECT_R(a)      iram_indirect_read(a)
-#define IRAM_INDIRECT_W(a, d)   iram_indirect_write(a, d)
-
-
-
-
-/* Form an Address to Read/Write to External RAM indirectly */
-/* (called from indirect addressing)                        */
-#define ERAM_ADDR(a,m)  external_ram_iaddr(a,m)
-
-/* Read/Write a bit from Bit Addressable Memory */
-#define BIT_R(a)        bit_address_r(a)
-#define BIT_W(a,v)      bit_address_w(a, v)
-
-
 /***************************************************************************
     SHORTCUTS
 ***************************************************************************/
-
-#define PPC     m_ppc
-#define PC      m_pc
 
 /* SFR Registers - These are accessed directly for speed on read */
 /* Read accessors                                                */
@@ -183,8 +140,8 @@ void axc51base_cpu_device::iram_indirect_write(offs_t a, uint8_t d) { m_data.wri
 #define P3          ((const uint8_t) SFR_A(ADDR_P3))
 
 #define SP          SFR_A(ADDR_SP)
-#define DPL         SFR_A(ADDR_DPL)
-#define DPH         SFR_A(ADDR_DPH)
+#define DPL0        SFR_A(ADDR_DPL0)
+#define DPH0        SFR_A(ADDR_DPH0)
 #define PCON        SFR_A(ADDR_PCON)
 #define IE          SFR_A(ADDR_IE)
 #define IP          SFR_A(ADDR_IP)
@@ -209,7 +166,7 @@ void axc51base_cpu_device::iram_indirect_write(offs_t a, uint8_t d) { m_data.wri
 
 #define R_REG(r)    m_scratchpad[(r) | (PSW & 0x18)]
 
-#define DPTR        ((DPH<<8) | DPL)
+#define DPTR0       ((DPH0<<8) | DPL0)
 #define DPTR1       ((DPH1<<8) | DPL1)
 
 #define ER0         ((ER00<<8) | ER01)
@@ -217,25 +174,19 @@ void axc51base_cpu_device::iram_indirect_write(offs_t a, uint8_t d) { m_data.wri
 #define ER2         ((ER20<<8) | ER21)
 #define ER3         ((ER30<<8) | ER31)
 
-/* WRITE accessors */
-
-/* Shortcuts */
-
 #define SET_PSW(v)  do { SFR_A(ADDR_PSW) = (v); SET_PARITY(); } while (0)
 #define SET_ACC(v)  do { SFR_A(ADDR_ACC) = (v); SET_PARITY(); } while (0)
 
 /* These trigger actions on modification and have to be written through SFR_W */
-#define SET_P0(v)   IRAM_W(ADDR_P0, v)
-#define SET_P1(v)   IRAM_W(ADDR_P1, v)
-#define SET_P2(v)   IRAM_W(ADDR_P2, v)
-#define SET_P3(v)   IRAM_W(ADDR_P3, v)
-
-
+#define SET_P0(v)   iram_write(ADDR_P0, v)
+#define SET_P1(v)   iram_write(ADDR_P1, v)
+#define SET_P2(v)   iram_write(ADDR_P2, v)
+#define SET_P3(v)   iram_write(ADDR_P3, v)
 
 /* No actions triggered on write */
 #define SET_REG(r, v)   do { m_scratchpad[(r) | (PSW & 0x18)] = (v); } while (0)
 
-#define SET_DPTR(n)     do { DPH = ((n) >> 8) & 0xff; DPL = (n) & 0xff; } while (0)
+#define SET_DPTR0(n)   do { DPH0 = ((n) >> 8) & 0xff; DPL0 = (n) & 0xff; } while (0)
 
 #define SET_DPTR1(n)    do { DPH1 = ((n) >> 8) & 0xff; DPL1 = (n) & 0xff; } while (0)
 
@@ -258,7 +209,6 @@ void axc51base_cpu_device::iram_indirect_write(offs_t a, uint8_t d) { m_data.wri
 #define SET_BIT(R, n, v) do { R = (R & ~(1<<(n))) | ((v) << (n));} while (0)
 #define GET_BIT(R, n) (((R)>>(n)) & 0x01)
 
-
 /* Macros for accessing flags */
 
 #define GET_CY          GET_BIT(PSW, 7)
@@ -278,21 +228,7 @@ void axc51base_cpu_device::iram_indirect_write(offs_t a, uint8_t d) { m_data.wri
 #define GET_T1IRQEN     GET_BIT(IE, 1)
 #define GET_T0IRQEN     GET_BIT(IE, 0)
 
-
-
-/*Add and Subtract Flag settings*/
-#define DO_ADD_FLAGS(a,d,c) do_add_flags(a, d, c)
-#define DO_SUB_FLAGS(a,d,c) do_sub_flags(a, d, c)
-
 #define SET_PARITY()    do {m_recalc_parity |= 1;} while (0)
-#define PUSH_PC()       push_pc()
-#define POP_PC()        pop_pc()
-
-/* Clear Current IRQ  */
-#define CLEAR_CURRENT_IRQ() clear_current_irq()
-
-
-/* Hold callback functions so they can be set by caller (before the cpu reset) */
 
 /***************************************************************************
     INLINE FUNCTIONS
@@ -345,18 +281,18 @@ void axc51base_cpu_device::iram_write(size_t offset, uint8_t data)
 void axc51base_cpu_device::push_pc()
 {
 	uint8_t tmpSP = SP+1;                     //Grab and Increment Stack Pointer
-	IRAM_INDIRECT_W(tmpSP, (PC & 0xff));                //Store low byte of PC to Internal Ram (Use IRAM_INDIRECT_W to store stack above 128 bytes)
+	iram_indirect_write(tmpSP, (m_pc & 0xff));                //Store low byte of PC to Internal Ram (Use iram_indirect_write to store stack above 128 bytes)
 	tmpSP++;                                    // ""
 	SP = tmpSP;                             // ""
-	IRAM_INDIRECT_W(tmpSP, ( (PC & 0xff00) >> 8));      //Store hi byte of PC to next address in Internal Ram (Use IRAM_INDIRECT_W to store stack above 128 bytes)
+	iram_indirect_write(tmpSP, ( (m_pc & 0xff00) >> 8));      //Store hi byte of PC to next address in Internal Ram (Use iram_indirect_write to store stack above 128 bytes)
 }
 
 /*Pop the current PC off the stack and into the pc*/
 void axc51base_cpu_device::pop_pc()
 {
 	uint8_t tmpSP = SP;                           //Grab Stack Pointer
-	PC = (IRAM_INDIRECT_R(tmpSP--) & 0xff) << 8;        //Store hi byte to PC (must use IRAM_INDIRECT_R to access stack pointing above 128 bytes)
-	PC = PC | IRAM_INDIRECT_R(tmpSP--);                 //Store lo byte to PC (must use IRAM_INDIRECT_R to access stack pointing above 128 bytes)
+	m_pc = (iram_indirect_read(tmpSP--) & 0xff) << 8;        //Store hi byte to PC (must use iram_indirect_read to access stack pointing above 128 bytes)
+	m_pc = m_pc | iram_indirect_read(tmpSP--);                 //Store lo byte to PC (must use iram_indirect_read to access stack pointing above 128 bytes)
 	SP = tmpSP;                             //Decrement Stack Pointer
 }
 
@@ -392,7 +328,7 @@ uint8_t axc51base_cpu_device::bit_address_r(uint8_t offset)
 		word = ( (offset & 0x78) >> 3) * distance + 0x20;
 		bit_pos = offset & 0x7;
 		mask = (0x1 << bit_pos);
-		return((IRAM_R(word) & mask) >> bit_pos);
+		return((iram_read(word) & mask) >> bit_pos);
 	}
 	//SFR bit addressable registers
 	else {
@@ -400,7 +336,7 @@ uint8_t axc51base_cpu_device::bit_address_r(uint8_t offset)
 		word = ( (offset & 0x78) >> 3) * distance + 0x80;
 		bit_pos = offset & 0x7;
 		mask = (0x1 << bit_pos);
-		return ((IRAM_R(word) & mask) >> bit_pos);
+		return ((iram_read(word) & mask) >> bit_pos);
 	}
 }
 
@@ -420,9 +356,9 @@ void axc51base_cpu_device::bit_address_w(uint8_t offset, uint8_t bit)
 		bit_pos = offset & 0x7;
 		bit = (bit & 0x1) << bit_pos;
 		mask = ~(1 << bit_pos) & 0xff;
-		result = IRAM_R(word) & mask;
+		result = iram_read(word) & mask;
 		result = result | bit;
-		IRAM_W(word, result);
+		iram_write(word, result);
 	}
 	/* SFR bit addressable registers */
 	else {
@@ -431,9 +367,9 @@ void axc51base_cpu_device::bit_address_w(uint8_t offset, uint8_t bit)
 		bit_pos = offset & 0x7;
 		bit = (bit & 0x1) << bit_pos;
 		mask = ~(1 << bit_pos) & 0xff;
-		result = IRAM_R(word) & mask;
+		result = iram_read(word) & mask;
 		result = result | bit;
-		IRAM_W(word, result);
+		iram_write(word, result);
 	}
 }
 
@@ -910,9 +846,9 @@ void axc51base_cpu_device::execute_run()
 	do
 	{
 		/* Read next opcode */
-		PPC = PC;
-		debugger_instruction_hook(PC);
-		op = m_program.read_byte(PC++);
+		m_ppc = m_pc;
+		debugger_instruction_hook(m_pc);
+		op = m_program.read_byte(m_pc++);
 
 		/* process opcode and count cycles */
 		m_inst_cycles = axc51_cycles[op];
@@ -946,8 +882,8 @@ void axc51base_cpu_device::sfr_write(size_t offset, uint8_t data)
 
 		case ADDR_B:
 		case ADDR_SP:
-		case ADDR_DPL:
-		case ADDR_DPH:
+		case ADDR_DPL0:
+		case ADDR_DPH0:
 		case ADDR_PCON:
 			break;
 
@@ -1035,8 +971,8 @@ uint8_t axc51base_cpu_device::sfr_read(size_t offset)
 		case ADDR_ACC:
 		case ADDR_B:
 		case ADDR_SP:
-		case ADDR_DPL:
-		case ADDR_DPH:
+		case ADDR_DPL0:
+		case ADDR_DPH0:
 		case ADDR_PCON:
 		case ADDR_IE:
 		case AXC51_IE1:
@@ -1093,7 +1029,7 @@ uint8_t axc51base_cpu_device::sfr_read(size_t offset)
 
 		/* Illegal or non-implemented sfr */
 		default:
-			LOG(("axc51 '%s': attemping to read an invalid/non-implemented SFR address: %x at 0x%04x\n", tag(), (uint32_t)offset,PC));
+			LOG(("axc51 '%s': attemping to read an invalid/non-implemented SFR address: %x at 0x%04x\n", tag(), (uint32_t)offset,m_pc));
 			/* according to the manual, the read may return random bits */
 			return 0xff;
 	}
@@ -1108,8 +1044,6 @@ void axc51base_cpu_device::device_start()
 
 	m_port_in_cb.resolve_all_safe(0xff);
 	m_port_out_cb.resolve_all_safe();
-	m_serial_rx_cb.resolve_safe(0);
-	m_serial_tx_cb.resolve_safe();
 
 	/* Save states */
 	save_item(NAME(m_ppc));
@@ -1121,12 +1055,6 @@ void axc51base_cpu_device::device_start()
 	save_item(NAME(m_recalc_parity) );
 	save_item(NAME(m_irq_prio) );
 	save_item(NAME(m_irq_active) );
-	save_item(NAME(m_uart.data_out));
-	save_item(NAME(m_uart.bits_to_send));
-	save_item(NAME(m_uart.smod_div));
-	save_item(NAME(m_uart.rx_clk));
-	save_item(NAME(m_uart.tx_clk));
-	save_item(NAME(m_uart.delay_cycles));
 	save_item(NAME(m_sfr_regs));
 
 	state_add( AXC51_PC,  "PC", m_pc).formatstr("%04X");
@@ -1134,9 +1062,9 @@ void axc51base_cpu_device::device_start()
 	state_add( AXC51_PSW, "PSW", PSW).formatstr("%02X");
 	state_add( AXC51_ACC, "A", ACC).formatstr("%02X");
 	state_add( AXC51_B,   "B", B).formatstr("%02X");
-	state_add<uint16_t>( AXC51_DPTR, "DPTR", [this](){ return DPTR; }, [this](uint16_t dp){ SET_DPTR(dp); }).formatstr("%04X");
-	state_add( AXC51_DPH, "DPH", DPH).noshow();
-	state_add( AXC51_DPL, "DPL", DPL).noshow();
+	state_add<uint16_t>( AXC51_DPTR0, "DPTR0", [this](){ return DPTR0; }, [this](uint16_t dp){ SET_DPTR0(dp); }).formatstr("%04X");
+	state_add( AXC51_DPH0, "DPH0", DPH0).noshow();
+	state_add( AXC51_DPL0, "DPL0", DPL0).noshow();
 	state_add( AXC51_IE,  "IE", IE).formatstr("%02X");
 	state_add( AXC51_IP,  "IP", IP).formatstr("%02X");
 	if (m_rom_size > 0)
@@ -1192,19 +1120,18 @@ void axc51base_cpu_device::device_reset()
 	m_last_bit = 0;
 
 	/* these are all defined reset states */
-	PPC = PC;
-	PC = 0;
+	m_ppc = m_pc;
+	m_pc = 0;
 	SP = 0x7;
 	SET_PSW(0);
 	SET_ACC(0);
-	DPH = 0;
-	DPL = 0;
+	DPH0 = 0;
+	DPL0 = 0;
 	B = 0;
 	IP = 0;
 	update_irq_prio(IP, 0);
 	IE = 0;
 	PCON = 0;
-
 
 	/* set the port configurations to all 1's */
 	SET_P3(0xff);
@@ -1212,19 +1139,11 @@ void axc51base_cpu_device::device_reset()
 	SET_P1(0xff);
 	SET_P0(0xff);
 
-	m_uart.data_out = 0;
-	m_uart.rx_clk = 0;
-	m_uart.tx_clk = 0;
-	m_uart.bits_to_send = 0;
-	m_uart.delay_cycles = 0;
-	m_uart.smod_div = 0;
-
 	m_recalc_parity = 0;
 
 	m_spi_state = 0;
 	m_spiaddr = 0;
 	m_spi_dma_addr = 0;
-
 }
 
 

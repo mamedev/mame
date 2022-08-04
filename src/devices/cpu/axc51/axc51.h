@@ -9,15 +9,9 @@
 
 enum
 {
-	AXC51_PC=1, AXC51_SP, AXC51_PSW, AXC51_ACC, AXC51_B, AXC51_DPTR, AXC51_DPH, AXC51_DPL, AXC51_IE, AXC51_IP,
+	AXC51_PC=1, AXC51_SP, AXC51_PSW, AXC51_ACC, AXC51_B, AXC51_DPTR0, AXC51_DPH0, AXC51_DPL0, AXC51_IE, AXC51_IP,
 	AXC51_P0, AXC51_P1, AXC51_P2, AXC51_P3,
 	AXC51_R0, AXC51_R1, AXC51_R2, AXC51_R3, AXC51_R4, AXC51_R5, AXC51_R6, AXC51_R7, AXC51_RB,
-};
-
-enum
-{
-	AXC51_INT0_LINE = 0,    /* P3.2: External Interrupt 0 */
-	AXC51_INT1_LINE,        /* P3.3: External Interrupt 1 */
 };
 
 
@@ -31,8 +25,6 @@ public:
 
 	template <unsigned N> auto port_in_cb() { return m_port_in_cb[N].bind(); }
 	template <unsigned N> auto port_out_cb() { return m_port_out_cb[N].bind(); }
-	auto serial_rx_cb() { return m_serial_rx_cb.bind(); }
-	auto serial_tx_cb() { return m_serial_tx_cb.bind(); }
 
 	void program_internal(address_map &map);
 	void data_internal(address_map &map);
@@ -100,17 +92,6 @@ protected:
 
 	int     m_icount;
 
-	struct axc51_uart
-	{
-		uint8_t   data_out;       //Data to send out
-		uint8_t   bits_to_send;   //How many bits left to send when transmitting out the serial port
-
-		int     smod_div;       /* signal divided by 2^SMOD */
-		int     rx_clk;         /* rx clock */
-		int     tx_clk;         /* tx clock */
-		uint8_t   delay_cycles;   //Gross Hack;
-	} m_uart;            /* internal uart */
-
 	/* Internal Ram */
 	uint8_t m_sfr_regs[128];
 	required_shared_ptr<uint8_t> m_scratchpad;        /* 128 RAM (8031/51) + 128 RAM in second bank (8032/52) */
@@ -129,10 +110,6 @@ protected:
 
 	devcb_read8::array<5> m_port_in_cb;
 	devcb_write8::array<5> m_port_out_cb;
-
-	/* Serial Port TX/RX Callbacks */
-	devcb_write8 m_serial_tx_cb;    //Call back function when sending data out of serial port
-	devcb_read8 m_serial_rx_cb;    //Call back function to retrieve data when receiving serial port data
 
 	// for the debugger
 	uint8_t m_rtemp;
@@ -310,8 +287,8 @@ protected:
 	{
 		ADDR_P0          = 0x80,
 		ADDR_SP          = 0x81, // SPL
-		ADDR_DPL         = 0x82, // DPL0
-		ADDR_DPH         = 0x83, // DPH0
+		ADDR_DPL0        = 0x82, // DPL00
+		ADDR_DPH0        = 0x83, // DPH00
 		AXC51_DPL1       = 0x84,
 		AXC51_DPH1       = 0x85,
 		AXC51_DPCON      = 0x86,

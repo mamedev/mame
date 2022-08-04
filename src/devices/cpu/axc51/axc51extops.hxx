@@ -28,7 +28,7 @@ uint16_t axc51base_cpu_device::get_dpt(int i)
 {
 	switch (i & 1)
 	{
-	case 0x00: return DPTR; break;
+	case 0x00: return DPTR0; break;
 	case 0x01: return DPTR1; break;
 	}
 	return 0x0000;
@@ -36,15 +36,15 @@ uint16_t axc51base_cpu_device::get_dpt(int i)
 
 void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 {
-	uint8_t prm = ROP_ARG(PC++);
+	uint8_t prm = m_program.read_byte(m_pc++);
 
 	switch (prm)
 	{
 	case 0x00:
 	{
 		// INCDP0
-		uint16_t dptr = (DPTR)+1;
-		SET_DPTR(dptr);
+		uint16_t dptr = (DPTR0)+1;
+		SET_DPTR0(dptr);
 		break;
 	}
 
@@ -59,8 +59,8 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 	case 0x02:
 	{
 		// DECDP0
-		uint16_t dptr = (DPTR)-1;
-		SET_DPTR(dptr);
+		uint16_t dptr = (DPTR0)-1;
+		SET_DPTR0(dptr);
 		break;
 	}
 
@@ -76,8 +76,8 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 	{
 		// ADDDP0
 		uint16_t increment = (B) | ((R8) << 8);
-		uint16_t dptr = (DPTR)+increment;
-		SET_DPTR(dptr);
+		uint16_t dptr = (DPTR0)+increment;
+		SET_DPTR0(dptr);
 		break;
 	}
 
@@ -97,8 +97,8 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 	{
 		// INC2DP0
 		printf("Inc2\n");
-		uint16_t dptr = (DPTR)+2;
-		SET_DPTR(dptr);
+		uint16_t dptr = (DPTR0)+2;
+		SET_DPTR0(dptr);
 		break;
 	}
 
@@ -266,14 +266,14 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 
 	case 0x82: case 0x83: case 0x86: case 0x87: case 0x8a: case 0x8b: case 0x8e: case 0x8f:
 	{
-		// MOV16 DPTRi, ERn
+		// MOV16 DPTR0i, ERn
 		uint8_t n = (prm & 0x0c) >> 2;
 		uint8_t i = (prm & 0x01) >> 0;
 
 		uint16_t dpt = get_dpt(i);
 		uint16_t val = get_erx(n);
 
-		DATAMEM_W(dpt, val);  
+		m_io.write_byte(dpt, val);  
 
 		break;
 	}
@@ -381,7 +381,7 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 
 void axc51base_cpu_device::extended_a5_0e()
 {
-	uint8_t prm2 = ROP_ARG(PC++);
+	uint8_t prm2 = m_program.read_byte(m_pc++);
 
 	switch (prm2)
 	{
@@ -451,7 +451,7 @@ void axc51base_cpu_device::extended_a5_0e()
 
 void axc51base_cpu_device::extended_a5_0f()
 {
-	uint8_t prm2 = ROP_ARG(PC++);
+	uint8_t prm2 = m_program.read_byte(m_pc++);
 
 	switch (prm2)
 	{
@@ -503,7 +503,7 @@ void axc51base_cpu_device::extended_a5_0f()
 
 void axc51base_cpu_device::extended_a5_d0()
 {
-	uint8_t prm2 = ROP_ARG(PC++);
+	uint8_t prm2 = m_program.read_byte(m_pc++);
 
 	switch (prm2)
 	{
@@ -554,7 +554,7 @@ void axc51base_cpu_device::extended_a5_d0()
 
 void axc51base_cpu_device::extended_a5_d1()
 {
-	uint8_t prm2 = ROP_ARG(PC++);
+	uint8_t prm2 = m_program.read_byte(m_pc++);
 
 	switch (prm2)
 	{
