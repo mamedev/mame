@@ -82,6 +82,9 @@ axc51base_cpu_device::axc51base_cpu_device(const machine_config &mconfig, device
 	, m_mainram(*this, "mainram")
 	, m_port_in_cb(*this)
 	, m_port_out_cb(*this)
+	, m_spi_in_cb(*this)
+	, m_spi_out_cb(*this)
+	, m_spi_out_dir_cb(*this)
 	, m_rtemp(0)
 {
 	/* default to standard cmos interfacing */
@@ -1096,6 +1099,10 @@ void axc51base_cpu_device::device_start()
 	m_port_in_cb.resolve_all_safe(0xff);
 	m_port_out_cb.resolve_all_safe();
 
+	m_spi_in_cb.resolve_safe(0xff);
+	m_spi_out_cb.resolve_safe();
+	m_spi_out_dir_cb.resolve_safe();
+
 	/* Save states */
 	save_item(NAME(m_ppc));
 	save_item(NAME(m_pc));
@@ -1192,8 +1199,6 @@ void axc51base_cpu_device::device_reset()
 
 	m_recalc_parity = 0;
 
-	m_spi_state = 0;
-	m_spiaddr = 0;
 	m_spi_dma_addr = 0;
 }
 
@@ -1256,6 +1261,7 @@ void axc51base_cpu_device::spicon_w(uint8_t data)
 //	logerror("%s: sfr_write AXC51_SPICON %02x\n", machine().describe_context(), data);
 
 	m_sfr_regs[AXC51_SPICON - 0x80] = data;
+	m_spi_out_dir_cb((data & 0x20) ? true : false);
 }
 
 
@@ -1268,90 +1274,14 @@ uint8_t axc51base_cpu_device::dpcon_r()
 
 uint8_t axc51base_cpu_device::spibuf_r()
 {
-	// HACK while we figure things out
-
-	logerror("%s: sfr_read AXC51_SPIBUF %02x\n", machine().describe_context(), m_spilatch);
-
-	return m_spilatch;
-	//return m_sfr_regs[AXC51_SPIBUF - 0x80];
+	// TODO: encryption here (if enabled)
+	return m_spi_in_cb();
 }
-
-
 
 void axc51base_cpu_device::spibuf_w(uint8_t data)
 {
-	enum
-	{
-		READY_FOR_COMMAND = 0x00,
-		READY_FOR_ADDRESS2 = 0x01,
-		READY_FOR_ADDRESS1 = 0x02,
-		READY_FOR_ADDRESS0 = 0x03,
-		READY_FOR_READ = 0x04,
-	};
-
-	m_sfr_regs[AXC51_SPIBUF - 0x80] = data;
-
-	if (((m_sfr_regs[AXC51_SPICON - 0x80]) & 0x20) == 0x00) // Send to SPI
-	{
-		logerror("%s: sfr_write AXC51_SPIBUF %02x\n", machine().describe_context(), data);
-
-		switch (m_spi_state)
-		{
-		case READY_FOR_COMMAND:
-		case READY_FOR_READ:
-			if (data == 0x03)
-			{
-				// set read mode
-				logerror("SPI Read Command\n");
-				m_spi_state = READY_FOR_ADDRESS2;
-			}
-			else if (data == 0x05)
-			{
-				logerror("SPI Status Command\n");
-			}
-			else if (data == 0x0b)
-			{
-				logerror("SPI Fast Read Command\n");
-				m_spi_state = READY_FOR_ADDRESS2;
-			}
-			else
-			{
-				logerror("SPI unknown Command\n");
-			}
-
-			break;
-
-		case READY_FOR_ADDRESS2:
-			m_spiaddr = (m_spiaddr & 0x00ffff) | (data << 16);
-			m_spi_state = READY_FOR_ADDRESS1;
-			break;
-
-		case READY_FOR_ADDRESS1:
-			m_spiaddr = (m_spiaddr & 0xff00ff) | (data << 8);
-			m_spi_state = READY_FOR_ADDRESS0;
-			break;
-
-		case READY_FOR_ADDRESS0:
-			m_spiaddr = (m_spiaddr & 0xffff00) | (data);
-			m_spi_state = READY_FOR_READ;
-			logerror("SPI Address set to %08x\n", m_spiaddr);
-			break;
-		}
-	}
-	else
-	{
-		if (m_spi_state == READY_FOR_READ)
-		{
-			m_spilatch = m_spiptr[m_spiaddr++];
-			logerror("%s: sfr_write AXC51_SPIBUF (clock read, latching in %02x)\n", machine().describe_context(), m_spilatch);			
-		}
-		else
-		{
-			logerror("%s: sfr_write AXC51_SPIBUF (clock read)\n", machine().describe_context(), m_spi_state);			
-			m_spi_state = 0x00;
-		}
-
-	}
+	// TODO: encryption here (if enabled)
+	m_spi_out_cb(data);
 }
 
 void axc51base_cpu_device::spibaud_w(uint8_t data)
@@ -1429,13 +1359,12 @@ void axc51base_cpu_device::spidmacnt_w(uint8_t data)
 
 	if (((m_sfr_regs[AXC51_SPICON - 0x80]) & 0x20) == 0x20) // Read from SPI
 	{
-		logerror("attempting to do *READ* DMA from SPI source address %08x destination address %04x count %04x\n", m_spiaddr, m_spi_dma_addr, (data + 1) * 2);
+		logerror("attempting to do *READ* DMA from SPI destination address %04x count %04x\n", m_spi_dma_addr, (data + 1) * 2);
 
 		for (int i = 0; i < (data + 1) * 2; i++)
 		{
 			spibuf_w(0x00); // clock
 			uint8_t romdat = spibuf_r();
-			//uint8_t romdat = m_spiptr[m_spiaddr++];
 			m_io.write_byte(m_spi_dma_addr++, romdat); // is this the correct destination space?
 		}
 	}

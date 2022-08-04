@@ -26,6 +26,10 @@ public:
 	template <unsigned N> auto port_in_cb() { return m_port_in_cb[N].bind(); }
 	template <unsigned N> auto port_out_cb() { return m_port_out_cb[N].bind(); }
 
+	auto spi_in_cb() { return m_spi_in_cb.bind(); }
+	auto spi_out_cb() { return m_spi_out_cb.bind(); }
+	auto spi_out_dir_cb() { return m_spi_out_dir_cb.bind(); }
+
 	void program_internal(address_map &map);
 	void data_internal(address_map &map);
 	void io_internal(address_map &map);
@@ -78,13 +82,9 @@ protected:
 
 	uint8_t   m_forced_inputs[4];   /* allow read even if configured as output */
 
-	uint8_t* m_spiptr;
-	size_t m_spisize;
 
-	uint32_t m_spiaddr;
-	uint8_t m_spi_state;
 	uint16_t m_spi_dma_addr;
-	uint8_t m_spilatch;
+
 
 	// JB-related hacks
 	uint8_t m_last_op;
@@ -110,6 +110,11 @@ protected:
 
 	devcb_read8::array<5> m_port_in_cb;
 	devcb_write8::array<5> m_port_out_cb;
+
+	devcb_read8 m_spi_in_cb;
+	devcb_write8 m_spi_out_cb;
+	devcb_write_line m_spi_out_dir_cb;
+
 
 	// for the debugger
 	uint8_t m_rtemp;
@@ -499,8 +504,6 @@ class ax208_cpu_device : public axc51base_cpu_device
 public:
 	// construction/destruction
 	ax208_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	void set_spi_ptr(uint8_t* ptr, size_t size) { m_spiptr = ptr; m_spisize = size; }
 
 protected:
 	ax208_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

@@ -29,7 +29,8 @@ public:
 		m_cart(*this, "cartslot"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_spiptr(*this, "flash")
 	{ }
 
 	void monon_color(machine_config &config);
@@ -47,13 +48,23 @@ private:
 	required_device<ax208_cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_region_ptr<uint8_t> m_spiptr;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void out3_w(u8 data);
 	void out4_w(u8 data);
 
-	uint8_t buffer[256 * 256];
+	uint32_t m_spiaddr = 0;
+	uint8_t m_spi_state = 0;
+	uint8_t m_spilatch = 0;
+	bool m_spidir = false;
+
+	uint8_t spibuf_r();
+	void spibuf_w(uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(spidir_w);
+
+	uint8_t m_vidbuffer[256 * 256];
 	int bufpos = 0;
 };
 
@@ -61,13 +72,125 @@ void monon_color_state::machine_start()
 {
 }
 
+uint8_t monon_color_state::spibuf_r()
+{
+	// HACK while we figure things out
+
+	logerror("%s: sfr_read AXC51_SPIBUF %02x\n", machine().describe_context(), m_spilatch);
+
+
+	return m_spilatch;
+	//return m_sfr_regs[AXC51_SPIBUF - 0x80];
+}
+
+WRITE_LINE_MEMBER(monon_color_state::spidir_w)
+{
+	m_spidir = state;
+}
+
+void monon_color_state::spibuf_w(uint8_t data)
+{
+	enum
+	{
+		READY_FOR_COMMAND = 0x00,
+		READY_FOR_ADDRESS2 = 0x01,
+		READY_FOR_ADDRESS1 = 0x02,
+		READY_FOR_ADDRESS0 = 0x03,
+
+		READY_FOR_HSADDRESS2 = 0x04,
+		READY_FOR_HSADDRESS1 = 0x05,
+		READY_FOR_HSADDRESS0 = 0x06,
+		READY_FOR_HSDUMMY = 0x07,
+
+		READY_FOR_READ = 0x08,
+	};
+
+	if (!m_spidir) // Send to SPI
+	{
+		logerror("%s: sfr_write AXC51_SPIBUF %02x\n", machine().describe_context(), data);
+
+		switch (m_spi_state)
+		{
+		case READY_FOR_COMMAND:
+		case READY_FOR_READ:
+			if (data == 0x03)
+			{
+				// set read mode
+				logerror("SPI Read Command\n");
+				m_spi_state = READY_FOR_ADDRESS2;
+			}
+			else if (data == 0x05)
+			{
+				logerror("SPI Status Command\n");
+			}
+			else if (data == 0x0b)
+			{
+				logerror("SPI Fast Read Command\n");
+				m_spi_state = READY_FOR_HSADDRESS2;
+			}
+			else
+			{
+				logerror("SPI unknown Command\n");
+			}
+
+			break;
+
+		case READY_FOR_ADDRESS2:
+			m_spiaddr = (m_spiaddr & 0x00ffff) | (data << 16);
+			m_spi_state = READY_FOR_ADDRESS1;
+			break;
+
+		case READY_FOR_ADDRESS1:
+			m_spiaddr = (m_spiaddr & 0xff00ff) | (data << 8);
+			m_spi_state = READY_FOR_ADDRESS0;
+			break;
+
+		case READY_FOR_ADDRESS0:
+			m_spiaddr = (m_spiaddr & 0xffff00) | (data);
+			m_spi_state = READY_FOR_READ;
+			logerror("SPI Address set to %08x\n", m_spiaddr);
+			break;
+
+		case READY_FOR_HSADDRESS2:
+			m_spiaddr = (m_spiaddr & 0x00ffff) | (data << 16);
+			m_spi_state = READY_FOR_HSADDRESS1;
+			break;
+
+		case READY_FOR_HSADDRESS1:
+			m_spiaddr = (m_spiaddr & 0xff00ff) | (data << 8);
+			m_spi_state = READY_FOR_HSADDRESS0;
+			break;
+
+		case READY_FOR_HSADDRESS0:
+			m_spiaddr = (m_spiaddr & 0xffff00) | (data);
+			m_spi_state = READY_FOR_HSDUMMY;
+			logerror("SPI Address set to %08x\n", m_spiaddr);
+			break;
+
+		case READY_FOR_HSDUMMY:
+			m_spi_state = READY_FOR_READ;
+			break;
+		}
+	}
+	else
+	{
+		if (m_spi_state == READY_FOR_READ)
+		{
+			m_spilatch = m_spiptr[m_spiaddr++];
+			logerror("%s: sfr_write AXC51_SPIBUF (clock read, latching in %02x)\n", machine().describe_context(), m_spilatch);			
+		}
+		else
+		{
+			logerror("%s: sfr_write AXC51_SPIBUF (clock read)\n", machine().describe_context(), m_spi_state);			
+			m_spi_state = 0x00;
+		}
+	}
+}
+
 
 
 void monon_color_state::machine_reset()
 {
-	m_maincpu->set_spi_ptr(memregion("flash")->base(), memregion("flash")->bytes() );
-
-
 	/*  block starting at e000 in flash is not code? (or encrypted?)
 	    no code to map at 0x9000 in address space (possible BIOS?)
 	    no code in flash ROM past the first 64kb(?) which is basically the same on all games, must be some kind of script interpreter? J2ME maybe?
@@ -91,7 +214,7 @@ void monon_color_state::video_start()
 
 uint32_t monon_color_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t* videoram = buffer;
+	uint8_t* videoram = m_vidbuffer;
 
 	for (int y = 0; y < 256; y++)
 	{
@@ -111,14 +234,14 @@ INPUT_PORTS_END
 
 void monon_color_state::out4_w(u8 data)
 {
-//	buffer[bufpos++] = data;
+//	m_vidbuffer[bufpos++] = data;
 //	if (bufpos == (256 * 256))
 //		bufpos = 0;
 }
 
 void monon_color_state::out3_w(u8 data)
 {
-	buffer[bufpos++] = data;
+	m_vidbuffer[bufpos++] = data;
 	if (bufpos == (256 * 256))
 		bufpos = 0;
 }
@@ -129,6 +252,11 @@ void monon_color_state::monon_color(machine_config &config)
 	AX208(config, m_maincpu, 96000000); // (8051 / MCS51 derived) incomplete core!
 	m_maincpu->port_out_cb<3>().set(FUNC(monon_color_state::out3_w));
 	m_maincpu->port_out_cb<4>().set(FUNC(monon_color_state::out4_w));
+	m_maincpu->spi_in_cb().set(FUNC(monon_color_state::spibuf_r));
+	m_maincpu->spi_out_cb().set(FUNC(monon_color_state::spibuf_w));
+	m_maincpu->spi_out_dir_cb().set(FUNC(monon_color_state::spidir_w));
+
+	
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
