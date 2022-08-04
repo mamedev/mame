@@ -55,7 +55,6 @@ TODO:
 - tithermos temperature sensor comparator (right now just the digital clock works)
 - is alphie(patent) the same as the final version?
 - is starwbcp the same as MP3438? (starwbc is MP3438A)
-- add SVG for tdracula
 
 ============================================================================
 
@@ -298,6 +297,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "tc7atc.lh"
 #include "tcfball.lh"
 #include "tcfballa.lh"
+#include "tdracula.lh"
 #include "ti1250.lh"
 #include "ti1270.lh"
 #include "ti1680.lh"
@@ -311,7 +311,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "xl25.lh" // clickable
 #include "zodiac.lh" // clickable
 
-#include "hh_tms1k_test.lh" // common test-layout - use external artwork
+//#include "hh_tms1k_test.lh" // common test-layout - use external artwork
 
 
 // machine_start/reset
@@ -14229,8 +14229,13 @@ void tdracula_state::tdracula(machine_config &config)
 	m_maincpu->o().set(FUNC(tdracula_state::write_o));
 
 	// video hardware
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(478, 1080);
+	screen.set_visarea_full();
+
 	PWM_DISPLAY(config, m_display).set_size(11, 17);
-	config.set_default_layout(layout_hh_tms1k_test);
+	config.set_default_layout(layout_tdracula);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -14249,8 +14254,8 @@ ROM_START( tdracula )
 	ROM_REGION( 557, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1400_tdracula_output.pla", 0, 557, CRC(52e2258e) SHA1(3dcbef72d2309aeb2375041522acd1a879b9e881) )
 
-	ROM_REGION( 100000, "screen", 0)
-	ROM_LOAD( "tdracula.svg", 0, 100000, NO_DUMP )
+	ROM_REGION( 416612, "screen", 0)
+	ROM_LOAD( "tdracula.svg", 0, 416612, CRC(71b5e164) SHA1(357528d5df7433609931cd9f9a2e5d56fbd29774) )
 ROM_END
 
 
@@ -14720,7 +14725,7 @@ CONS( 1982, t7in1ss,    0,         0, t7in1ss,   t7in1ss,   t7in1ss_state,   emp
 CONS( 1979, tbreakup,   0,         0, tbreakup,  tbreakup,  tbreakup_state,  empty_init, "Tomy", "Break Up (Tomy)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, phpball,    0,         0, phpball,   phpball,   phpball_state,   empty_init, "Tomy", "Power House Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
-CONS( 1982, tdracula,   0,         0, tdracula,  tdracula,  tdracula_state,  empty_init, "Tsukuda", "The Dracula (Tsukuda)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1982, tdracula,   0,         0, tdracula,  tdracula,  tdracula_state,  empty_init, "Tsukuda", "The Dracula (Tsukuda)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1980, ssports4,   0,         0, ssports4,  ssports4,  ssports4_state,  empty_init, "U.S. Games", "Super Sports-4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
