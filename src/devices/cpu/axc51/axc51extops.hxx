@@ -296,10 +296,20 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 
 	case 0xa0: case 0xa1: case 0xa2: case 0xa3: case 0xa4: case 0xa5: case 0xa6: case 0xa7: case 0xa8: case 0xa9: case 0xaa: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf:
 	{
+		// MUL16 ERn, ERm;
+
 		uint8_t n = (prm & 0x0c) >> 2;
 		uint8_t m = (prm & 0x03) >> 0;
 
-		fatalerror("%s: MUL16 ER%01x, ER%01x", machine().describe_context(), n, m);
+		int32_t a = (int16_t)get_erx(n);
+		int32_t b = (int16_t)get_erx(m);
+
+		int32_t res = a * b;
+		uint32_t res2 = (uint32_t)res;
+
+		set_erx(n, (res2 >> 16));
+		set_erx(m, (res2 & 0xffff));
+
 		break;
 	}
 
@@ -332,8 +342,14 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 
 	case 0xc2: case 0xc6: case 0xca: case 0xce:
 	{
+		// SHIFTL ERn, ER8
 		uint8_t n = (prm & 0x0c) >> 2;
-		fatalerror("%s: SHIFTL ER%01x, ER8", machine().describe_context(), n);
+
+		uint16_t val = get_erx(n);
+		uint8_t shift = (ER8) & 0xf;
+
+		val = val >> shift;
+		set_erx(n, val);
 		break;
 	}
 
