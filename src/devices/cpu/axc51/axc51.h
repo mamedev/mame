@@ -21,11 +21,6 @@ enum
 class axc51base_cpu_device : public cpu_device
 {
 public:
-	/* At least CMOS devices may be forced to read from ports configured as output.
-	 * All you need is a low impedance output connect to the port.
-	 */
-	void set_port_forced_input(uint8_t port, uint8_t forced_input) { m_forced_inputs[port] = forced_input; }
-
 	template <unsigned N> auto port_in_cb() { return m_port_in_cb[N].bind(); }
 	template <unsigned N> auto port_out_cb() { return m_port_out_cb[N].bind(); }
 
@@ -83,9 +78,6 @@ protected:
 	uint8_t   m_irq_active;         /* mask which irq levels are serviced */
 	uint8_t   m_irq_prio[8];        /* interrupt priority */
 
-	uint8_t   m_forced_inputs[4];   /* allow read even if configured as output */
-
-
 	uint16_t m_spi_dma_addr;
 
 
@@ -97,7 +89,8 @@ protected:
 
 	/* Internal Ram */
 	uint8_t m_sfr_regs[128];
-	required_shared_ptr<uint8_t> m_scratchpad;        /* 128 RAM (8031/51) + 128 RAM in second bank (8032/52) */
+	uint8_t m_xsfr_regs[128];
+	required_shared_ptr<uint8_t> m_scratchpad;    
 	required_shared_ptr<uint8_t> m_mainram;
 
 	uint8_t m_uid[4];
@@ -155,6 +148,11 @@ protected:
 	uint32_t process_dptr_access();
 	uint32_t get_dptr0_with_autoinc(uint8_t auto_inc);
 	uint32_t get_dptr1_with_autoinc(uint8_t auto_inc);
+	uint8_t xsfr_read(offs_t offset);
+	void xsfr_write(offs_t offset, uint8_t data);
+
+	uint8_t read_port(int i);
+	void write_port(int i, uint8_t data);
 
 	uint8_t spicon_r();
 	uint8_t spibuf_r();
@@ -436,6 +434,11 @@ protected:
 		AXC51_PDN2 = 0x3017,
 		AXC51_PDN3 = 0x3018,
 		AXC51_PDN4 = 0x3019,
+		AXC51_PHD0 = 0x301a,
+		AXC51_PHD1 = 0x301b,
+		AXC51_PHD2 = 0x301c,
+		AXC51_PHD3 = 0x301d,
+		AXC51_PHD4 = 0x301e,
 
 		AXC51_TMR1CNTL = 0x3020, // Timer 1 Counter (low)
 		AXC51_TMR1CNTH = 0x3021, // Timer 1 Counter (high)
@@ -495,9 +498,6 @@ protected:
 		V_DAC        = 0x073,  // IE1.6   IP1.6
 		V_SFS_INT    = 0x07b,  // IE1.7   IP1.7
 	};
-
-	int irq_hack_ctr = 0;
-
 };
 
 

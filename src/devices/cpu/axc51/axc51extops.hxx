@@ -496,11 +496,31 @@ void axc51base_cpu_device::extended_a5_0f()
 	case 0x20: case 0x21: case 0x24: case 0x25: case 0x28: case 0x29: case 0x2c: case 0x2d:
 	case 0x30: case 0x31: case 0x34: case 0x35: case 0x38: case 0x39: case 0x3c: case 0x3d:
 	{
+		// SUB16 ERp, EDPi, ERn
+
 		uint8_t p = (prm2 & 0x30) >> 4;
 		uint8_t n = (prm2 & 0x0c) >> 2;
 		uint8_t i = (prm2 & 0x01) >> 0;
 
-		fatalerror("%s: SUB16 ER%01x, EDP%01x, ER%01x", machine().describe_context(), p, i, n);
+		uint16_t dpt = get_dpt(i);
+		uint16_t val = m_io.read_byte(dpt);
+		uint16_t val2 = get_erx(n);
+
+		uint32_t res = val - val2 - (GET_EC);
+		set_erx(p, res);
+
+		if (res & 0xffff0000)
+			SET_EC(1);
+		else
+			SET_EC(0);
+
+		res &= 0xffff;
+
+		if (!res)
+			SET_EZ(1);
+		else
+			SET_EZ(0);
+
 		break;
 	}
 

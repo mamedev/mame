@@ -1039,5 +1039,5 @@ void axc51base_cpu_device::xrl_a_r(uint8_t r)
 //illegal opcodes
 void axc51base_cpu_device::illegal(uint8_t r)
 {
-	LOG(("i8051 '%s': illegal opcode at 0x%03x: %02x\n", tag(), m_pc-1, r));
+	LOGMASKED(LOG_GENERAL,"i8051 '%s': illegal opcode at 0x%03x: %02x\n", tag(), m_pc-1, r);
 }
