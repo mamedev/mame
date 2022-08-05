@@ -190,10 +190,10 @@ void axc51base_cpu_device::iram_indirect_write(offs_t a, uint8_t d) { m_data.wri
 #define DPTR0       ((DPH0<<8) | DPL0)
 #define DPTR1       ((DPH1<<8) | DPL1)
 
-#define ER0         ((ER00<<8) | ER01)
-#define ER1         ((ER10<<8) | ER11)
-#define ER2         ((ER20<<8) | ER21)
-#define ER3         ((ER30<<8) | ER31)
+#define ER0         ((ER01<<8) | ER00)
+#define ER1         ((ER11<<8) | ER10)
+#define ER2         ((ER21<<8) | ER20)
+#define ER3         ((ER31<<8) | ER30)
 
 #define SET_PSW(v)  do { SFR_A(ADDR_PSW) = (v); SET_PARITY(); } while (0)
 #define SET_ACC(v)  do { SFR_A(ADDR_ACC) = (v); SET_PARITY(); } while (0)
@@ -211,10 +211,10 @@ void axc51base_cpu_device::iram_indirect_write(offs_t a, uint8_t d) { m_data.wri
 
 #define SET_DPTR1(n)    do { DPH1 = ((n) >> 8) & 0xff; DPL1 = (n) & 0xff; } while (0)
 
-#define SET_ER0(n)      do { ER00 = ((n) >> 8) & 0xff; ER01 = (n) & 0xff; } while (0)
-#define SET_ER1(n)      do { ER10 = ((n) >> 8) & 0xff; ER11 = (n) & 0xff; } while (0)
-#define SET_ER2(n)      do { ER20 = ((n) >> 8) & 0xff; ER21 = (n) & 0xff; } while (0)
-#define SET_ER3(n)      do { ER30 = ((n) >> 8) & 0xff; ER31 = (n) & 0xff; } while (0)
+#define SET_ER0(n)      do { ER01 = ((n) >> 8) & 0xff; ER00 = (n) & 0xff; } while (0)
+#define SET_ER1(n)      do { ER11 = ((n) >> 8) & 0xff; ER10 = (n) & 0xff; } while (0)
+#define SET_ER2(n)      do { ER21 = ((n) >> 8) & 0xff; ER20 = (n) & 0xff; } while (0)
+#define SET_ER3(n)      do { ER31 = ((n) >> 8) & 0xff; ER30 = (n) & 0xff; } while (0)
 
 #define SET_ER8(n)      do { ER8 = (n);} while (0)
 
@@ -980,7 +980,7 @@ void axc51base_cpu_device::xsfr_write(offs_t offset, uint8_t data)
 		break;
 
 	default:
-		LOGMASKED(LOG_GENERAL,"%s: writing to unhandler XSFR reg %04x data %02x\n", machine().describe_context(), offset + 0x3000, data);
+		LOGMASKED(LOG_GENERAL,"%s: writing to unhandled XSFR reg %04x data %02x\n", machine().describe_context(), offset + 0x3000, data);
 		break;
 
 	}
