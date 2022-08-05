@@ -102,9 +102,9 @@ private:
 	// TMS1100 interface
 	u8 tms1100_k_r();
 	void tms1100_o_w(u16 data);
-	void tms1100_r_w(u16 data);
+	void tms1100_r_w(u32 data);
 
-	u16 m_r = 0;
+	u32 m_r = 0;
 
 	// Intel 8021 interface
 	u8 i8021_p0_r();
@@ -306,7 +306,7 @@ void microvision_state::tms1100_o_w(u16 data)
 	m_lcd->data_w(data & 0xf);
 }
 
-void microvision_state::tms1100_r_w(u16 data)
+void microvision_state::tms1100_r_w(u32 data)
 {
 	// R2: charge paddle capacitor when high
 	if (~m_r & data & 4 && m_paddle_on)

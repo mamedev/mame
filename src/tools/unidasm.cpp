@@ -109,7 +109,7 @@ using util::BIT;
 #include "cpu/mcs40/mcs40dasm.h"
 #include "cpu/mcs48/mcs48dsm.h"
 #include "cpu/mcs51/mcs51dasm.h"
-#include "cpu/mcs51/axc51-core_dasm.h"
+#include "cpu/axc51/axc51dasm.h"
 #include "cpu/mcs96/i8x9xd.h"
 #include "cpu/mcs96/i8xc196d.h"
 #include "cpu/melps4/melps4d.h"
@@ -595,6 +595,9 @@ static const dasm_table_entry dasm_table[] =
 	{ "tms0980",         be,  0, []() -> util::disasm_interface * { return new tms0980_disassembler; } },
 	{ "tms1000",         le,  0, []() -> util::disasm_interface * { return new tms1000_disassembler; } },
 	{ "tms1100",         le,  0, []() -> util::disasm_interface * { return new tms1100_disassembler; } },
+	{ "tms1400",         le,  0, []() -> util::disasm_interface * { return new tms1400_disassembler; } },
+	{ "tms2100",         le,  0, []() -> util::disasm_interface * { return new tms2100_disassembler; } },
+	{ "tms2400",         le,  0, []() -> util::disasm_interface * { return new tms2400_disassembler; } },
 	{ "tms32010",        be, -1, []() -> util::disasm_interface * { return new tms32010_disassembler; } },
 	{ "tms32025",        be, -1, []() -> util::disasm_interface * { return new tms32025_disassembler; } },
 	{ "tms32031",        le, -2, []() -> util::disasm_interface * { return new tms32031_disassembler; } },

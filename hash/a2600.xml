@@ -39,19 +39,6 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
-	<software name="elfadven">
-		<description>Elf Adventure (prototype)</description>
-		<year>1983</year>
-		<publisher>Atari</publisher>
-		<info name="programmer" value="Warren Robinett" />
-		<sharedfeat name="compatibility" value="NTSC" />
-		<part name="cart" interface="a2600_cart">
-			<dataarea name="rom" size="4096">
-				<rom name="Elf Adventure.bin" size="4096" crc="91647218" sha1="93cf13c16d995c69c78085effb555f17105f8b01"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="ret2hh">
 		<description>Return to Haunted House (Flashback 2)</description>
 		<year>2005</year>
@@ -1244,6 +1231,17 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="astroblast (pal).bin" size="4096" crc="a1df435e" sha1="ab8af3c4e0d8858481f3e52b59b5040b18ceb4d7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astrchas">
+		<description>Astro Chase (prototype)</description>
+		<year>1983</year>
+		<publisher>Parker Bros</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="astro chase (10-25-1983) (parker brothers - first star software, alex leavens) (prototype).bin" size="4096" crc="322fa083" sha1="806947f2eefc60ab53c2b723d0156dacbe74ba24"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3236,36 +3234,48 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 
 	<software name="centiped">
 		<description>Centipede</description>
-		<year>1982</year>
+		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
-				<rom name="centipede (1982) (atari - gcc) (cx2676).bin" size="8192" crc="77396102" sha1="0b5914bc1526a9beaf54d7fd11408175cd8fcc72"/>
+				<rom name="centipede (1983) (atari - gcc) (cx2676).bin" size="8192" crc="77396102" sha1="0b5914bc1526a9beaf54d7fd11408175cd8fcc72"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="centipede" cloneof="centiped">
 		<description>Centipede (PAL)</description>
-		<year>1982</year>
+		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
-				<rom name="centipede (1982) (atari - gcc) (cx2676) (pal).bin" size="8192" crc="44d16280" sha1="1841ce27fc14cc2aa741d67e91f64f7924e3bf3e"/>
+				<rom name="centipede (1983) (atari - gcc) (cx2676) (pal).bin" size="8192" crc="44d16280" sha1="1841ce27fc14cc2aa741d67e91f64f7924e3bf3e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="centipedp" cloneof="centiped">
+		<description>Centipede (prototype)</description>
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_f8" />
+			<dataarea name="rom" size="8192">
+				<rom name="centipede (1983) (atari - gcc) (cx2676) (prototype).bin" size="8192" crc="ede91baa" sha1="f5509dcc68b65d2cb8e37443a96c013fc00e4955"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="centipedep" cloneof="centiped">
 		<description>Centipede (PAL) (prototype)</description>
-		<year>1982</year>
+		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
-				<rom name="centipede (1982) (atari - gcc) (cx2676) (prototype) (pal).bin" size="8192" crc="aae78b7f" sha1="c5ff64d7593f0d0103d6bb50a150e8a87d222ef3"/>
+				<rom name="centipede (1983) (atari - gcc) (cx2676) (prototype) (pal).bin" size="8192" crc="aae78b7f" sha1="c5ff64d7593f0d0103d6bb50a150e8a87d222ef3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4616,6 +4626,17 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 	</software>
 
 	<software name="defenderp" cloneof="defender">
+		<description>Defender (prototype 198111xx)</description>
+		<year>1981</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="defender (11-xx-1981) (atari, robert c. polaro, alan j. murphy - sears) (cx2609 - 49-75186) (prototype).bin" size="4096" crc="3e8156f8" sha1="af80726a5314fa705620b43375280f1873d6df3a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="defenderp1" cloneof="defender">
 		<description>Defender (prototype 19811030)</description>
 		<year>1981</year>
 		<publisher>Atari</publisher>
@@ -5633,6 +5654,45 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
+	<software name="elfadven">
+		<description>Elf Adventure (prototype 19830525)</description>
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<info name="programmer" value="Warren Robinett" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="elf adventure (05-25-83) (atari, warren robinett) (prototype).bin" size="4096" crc="91647218" sha1="93cf13c16d995c69c78085effb555f17105f8b01"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elfadven1" cloneof="elfadven">
+		<description>Elf Adventure (prototype 19830502)</description>
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<info name="programmer" value="Warren Robinett" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="elf adventure (05-02-83) (atari, warren robinett) (prototype).bin" size="4096" crc="0d6b598a" sha1="c5d0f915ff6c67d36086bcb540b286cc7d0788ab"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elfadven2" cloneof="elfadven">
+		<description>Elf Adventure (prototype 19830422)</description>
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<info name="programmer" value="Warren Robinett" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="elf adventure (04-22-83) (atari, warren robinett) (prototype).bin" size="4096" crc="90c11588" sha1="eebc75e449800e8a874adb3b971d23c29410f760"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eliladdr">
 		<description>Eli's Ladder</description>
 		<year>1982</year>
@@ -6285,6 +6345,17 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="frankenstein's monster (1983) (gameworld) (133-008) (pal).bin" size="4096" crc="0e6ce498" sha1="d3dfa61835b96aae6855f7caba0c456a2a9816a4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frankenmp" cloneof="frankenm">
+		<description>Frankenstein's Monster (prototype)</description>
+		<year>1982</year>
+		<publisher>Data Age</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="frankenstein's monster (1982) (data age, j. ray dettling) (112-008) (prototype).bin" size="4096" crc="057e5a92" sha1="4552ec40f67bb627cbc016344580f82e62357e41"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7023,6 +7094,17 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="gorf (1982) (cbs electronics, joe gaucher, alex leavens) (4l1751, 4l1752, 4l1753, 4l2275) (pal).bin" size="4096" crc="dee8e883" sha1="d530e73e3a44b91f0f2cf74c520edf1c258d07ce"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gorfp" cloneof="gorf">
+		<description>Gorf (prototype)</description>
+		<year>1982</year>
+		<publisher>CBS Electronics</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="gorf (1982) (cbs electronics - roklan, joe gaucher, dan kurczewski, alex leavens, kathy von) (m8776, m8793) (prototype).bin" size="4096" crc="3a7b15ff" sha1="642d1afc6cdac96bbf2908fe69119823d077ef77"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7915,6 +7997,18 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
+	<software name="joustp1" cloneof="joust">
+		<description>Joust (prototype 19830705)</description>
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_f8" />
+			<dataarea name="rom" size="8192">
+				<rom name="joust (07-05-1983) (atari - gcc, mike feinstein, kevin osborn) (cx2691) (prototype).bin" size="8192" crc="e88abe30" sha1="0794915da9bd29e7771734764ac867330ecf2e37"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jrpacman">
 		<description>Jr. Pac-Man</description>
 		<year>1984</year>
@@ -8118,6 +8212,18 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
 				<rom name="kangaroo (1983) (atari - gcc, kevin osborn) (cx2689, cx2689p) (pal).bin" size="8192" crc="b3b2a251" sha1="dac53b95626b68d3686430ccfda8c1a10946bad2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kangaroop" cloneof="kangaroo">
+		<description>Kangaroo (prototype 19830119)</description>
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_f8" />
+			<dataarea name="rom" size="8192">
+				<rom name="kangaroo (01-19-1983) (atari - gcc, kevin osborn) (cx2689) (prototype).bin" size="8192" crc="f292722e" sha1="8a0596e3e735f1bc518d74e7f545ede422754ef6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9700,6 +9806,17 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
+	<software name="missilep" cloneof="missile">
+		<description>Missile Command (prototype)</description>
+		<year>1981</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="missile command (1981) (atari, rob fulop - sears) (cx2638 - 49-75166) (prototype).bin" size="4096" crc="c7c0b5c6" sha1="405a67638f1fe80b2334fee1d3dfe8906586dc1a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="miss3000">
 		<description>Mission 3,000 A.D. - Mission 3000</description>
 		<year>1983</year>
@@ -9778,6 +9895,20 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="mole hunter (aka topy) (suntek) (ss-023) (pal).bin" size="4096" crc="0f45ee38" sha1="4dc2a1a78b1c237c4a7b9319494ad4d16383b1e4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monkeym">
+	<!-- This was eventually reworked and made into Grover's Music Maker -->
+		<description>Monkey Music (prototype 19820818)</description>
+		<year>1982</year>
+		<publisher>Atari</publisher>
+		<sharedfeat name="joyport1_default" value="keypad" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_f8" />
+			<dataarea name="rom" size="8192">
+				<rom name="monkey music (8-18-82).bin" size="8192" crc="264fd499" sha1="5ddb9c71a22b2973094a6142742d82c767e4aa3e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10129,7 +10260,31 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_e0" />
 			<dataarea name="rom" size="8192">
+				<!-- Is this a bad dump? ROM in Rom Hunter's collection has byte at address 0x1984 as 0xff. Here it is 0x40. -->
 				<rom name="mr. do's castle (1984) (parker brothers) (pb5820).bin" size="8192" crc="044735b9" sha1="330c2c67399e07c40f4101f9e18670fef070475e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="docastlep" cloneof="docastle">
+		<description>Mr. Do!'s Castle (later prototype)</description>
+		<year>1984</year>
+		<publisher>Parker Brothers</publisher>
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_e0" />
+			<dataarea name="rom" size="8192">
+				<rom name="mr. do's castle (1984) (parker brothers) (pb5820) (prototype).bin" size="8192" crc="df16293c" sha1="95baed46d83d92f1c8f2025a4367eba3932adf61"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="docastlep1" cloneof="docastle">
+		<description>Mr. Do!'s Castle (prototype 19840312)</description>
+		<year>1984</year>
+		<publisher>Parker Brothers</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="mr. do's castle (03-12-84) (parker brothers) (pb5820) (prototype) (4k).bin" size="4096" crc="1df5a192" sha1="9c455e8d781138ea8911746fd25ad9c109188fde"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11854,6 +12009,17 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
+	<software name="popeyep" cloneof="popeye">
+		<description>Popeye (prototype)</description>
+		<year>1983</year>
+		<publisher>Parker Brothers</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="popeye (1983) (parker brothers - roklan, joe gaucher) (pb5370) (prototype) (4k).bin" size="4096" crc="393e0590" sha1="fe336290bdc7b68fdf3b4bb960800dd0dd073eb6"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="porkys">
 		<description>Porky's</description>
 		<year>1983</year>
@@ -12282,6 +12448,18 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
 				<rom name="raiders of the lost ark (1982) (atari, jerome domurat, howard scott warshaw) (cx2659) (pal).bin" size="8192" crc="61110158" sha1="66803476a70a527741a35637b99bae3b7d20d00b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="raidersp" cloneof="raiders">
+		<description>Raiders of the Lost Ark (prototype 19820614)</description>
+		<year>1982</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_f8" />
+			<dataarea name="rom" size="8192">
+				<rom name="raiders of the lost ark (06-14-82) (atari, jerome domurat, howard scott warshaw) (cx2659) (prototype).bin" size="8192" crc="39af5048" sha1="e432cd6cf106ec686a661e80380ffc8bf1380871"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14189,6 +14367,17 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
+	<software name="solarfoxp" cloneof="solarfox">
+		<description>Solar Fox (prototype)</description>
+		<year>1983</year>
+		<publisher>CBS Electronics</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="solar fox (1983) (cbs electronics, bob curtiss) (4l 2487 5000) (prototype) (4k).bin" size="4096" crc="b996988a" sha1="d26181a137ad83fe99fbfca425b793e9fe7db132"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="solarstr">
 		<description>Solar Storm</description>
 		<year>1983</year>
@@ -14233,6 +14422,18 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 			<feature name="slot" value="a26_f6" />
 			<dataarea name="rom" size="16384">
 				<rom name="solaris (universe, the last starfighter) (1986) (atari, douglas neubauer) (cx26136) (pal).bin" size="16384" crc="b1e6acb6" sha1="260aac37ff3d6152209c24efe82669fe871a1342"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="solarisp" cloneof="solaris">
+		<description>Solaris (prototype)</description>
+		<year>1986</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_f6" />
+			<dataarea name="rom" size="16384">
+				<rom name="solaris (1986) (atari, douglas neubauer, mimi nyden) (cx26136) (prototype).bin" size="16384" crc="66f93d8c" sha1="5d703d25ef81c41372ba93cd72973e19fa138b87"/>
 			</dataarea>
 		</part>
 	</software>
@@ -17313,6 +17514,17 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
+	<software name="venturep" cloneof="venture">
+		<description>Venture (prototype)</description>
+		<year>1982</year>
+		<publisher>Coleco</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="venture (1982) (coleco, joseph biel) (2457) (prototype) (2k).bin" size="2048" crc="a2ba9f0a" sha1="71fc0cf5caad1ceac6c3923cfeb450b28a29a828"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="viagemes">
 		<description>Viagem Espacial</description>
 		<year>19??</year>
@@ -17838,6 +18050,17 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
+	<software name="wowp" cloneof="wow">
+		<description>Wizard of Wor (prototype)</description>
+		<year>1982</year>
+		<publisher>CBS Electronics</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="wizard of wor (1982) (cbs electronics - roklan, joe hellesen, joe wagner) (m8774, m8794) (prototype).bin" size="4096" crc="3b242fe5" sha1="43a7a5b2258697983f2f63550c25a0c9718cc9f1"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wordzap">
 		<description>Word Zapper</description>
 		<year>1982</year>
@@ -17984,6 +18207,18 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 	</software>
 
 	<software name="xevious">
+		<description>Xevious (prototype 19840118)</description>
+		<year>1984</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_f8" />
+			<dataarea name="rom" size="8192">
+				<rom name="xevious (01-18-1984) (atari, tod frye) (cx2695) (prototype).bin" size="8192" crc="f5802a6c" sha1="53f941cabf661a9ce763142b070571f6fd4c8820"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xevious1" cloneof="xevious">
 		<description>Xevious (prototype 19830802)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
@@ -17995,7 +18230,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
-	<software name="xevious1" cloneof="xevious">
+	<software name="xevious2" cloneof="xevious">
 		<description>Xevious (prototype 19830525)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>

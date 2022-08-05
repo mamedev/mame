@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(TMS0980, tms0980_cpu_device, "tms0980", "Texas Instruments TM
 // TMS1980 is a TMS0980 with a TMS1x00 style opla
 // - RAM, ROM, and main instructions PLAs is the same as TMS0980
 // - one of the microinstructions redirects to a RSTR instruction, like on TMS0270
-// - 32-term inverted output PLA above the RAM, 7 bits! (rotate opla 270 degrees)
+// - 32-term output PLA above the RAM, 7 bits! (rotate opla 270 degrees)
 DEFINE_DEVICE_TYPE(TMS1980, tms1980_cpu_device, "tms1980", "Texas Instruments TMS1980") // 28-pin DIP, 7 O pins, 10 R pins, high voltage
 
 
@@ -45,18 +45,15 @@ void tms0980_cpu_device::data_144x4(address_map &map)
 // device definitions
 tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: tms0980_cpu_device(mconfig, TMS0980, tag, owner, clock, 8 /* o pins */, 9 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 11 /* prg width */, address_map_constructor(FUNC(tms0980_cpu_device::program_11bit_9), this), 8 /* data width */, address_map_constructor(FUNC(tms0980_cpu_device::data_144x4), this))
-{
-}
+{ }
 
 tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
 	: tms0970_cpu_device(mconfig, type, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, prgwidth, program, datawidth, data)
-{
-}
+{ }
 
 tms1980_cpu_device::tms1980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: tms0980_cpu_device(mconfig, TMS1980, tag, owner, clock, 7, 10, 7, 9, 4, 11, address_map_constructor(FUNC(tms1980_cpu_device::program_11bit_9), this), 8, address_map_constructor(FUNC(tms1980_cpu_device::data_144x4), this))
-{
-}
+{ }
 
 
 // machine configs
@@ -185,7 +182,7 @@ void tms0980_cpu_device::read_opcode()
 // i/o handling
 u8 tms0980_cpu_device::read_k_input()
 {
-	u8 k = m_read_k(0, 0xff) & 0x1f;
+	u8 k = m_read_k() & 0x1f;
 	u8 k3 = (k & 0x10) ? 3: 0; // the K3 line is simply K1|K2
 	return (k & 0xf) | k3;
 }

@@ -58,6 +58,7 @@
 #include "joypad2.h"
 #include "joypad6.h"
 #include "multitap.h"
+#include "pachinko.h"
 
 
 
@@ -174,8 +175,8 @@ void pce_control_port_devices(device_slot_interface &device)
 	device.option_add("arcade_pad_6",  PCE_ARCADE_PAD_6);
 
 	device.option_add("multitap",      PCE_MULTITAP);
+	device.option_add("pachinko",      PCE_PACHINKO);
 	// 3 Button Joypad/Joysticks (ex: Avenue Pad 3)
-	// Pachinko Controller (CJPC-101)
 	// PC Engine Mouse (PI-PD10)
 	// Memory Base 128 (PI-AD19)
 	// etc...

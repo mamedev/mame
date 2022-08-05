@@ -78,7 +78,7 @@ private:
 	void hmcs40_write_d(u16 data);
 	u16 hmcs40_read_d();
 
-	void tms1k_write_r(u16 data);
+	void tms1k_write_r(u32 data);
 	void tms1k_write_o(u16 data);
 	u8 tms1k_read_k();
 };
@@ -222,7 +222,7 @@ u16 sag_state::hmcs40_read_d()
 
 // cartridge type 2: TMS1670
 
-void sag_state::tms1k_write_r(u16 data)
+void sag_state::tms1k_write_r(u32 data)
 {
 	// R0: speaker out
 	speaker_w(data & 1);

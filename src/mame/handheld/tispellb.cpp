@@ -9,13 +9,14 @@
 
   The Spelling B was introduced together with the Speak & Spell. It is a
   handheld educational toy with booklet. Two revisions of the hardware exist.
+  The words/indexes from the documentation are the same for each version.
   (* indicates not dumped)
 
   1st revision:
 
   Spelling B (US), 1978
-  - TMS0270 MCU TMC0272 (die label 0272A T0270B)
-  - TMS1980 MCU TMC1984 (die label 1980A 84A)
+  - TMS0270 MCU TMC0272 (die label: 0272A T0270B)
+  - TMS1980 MCU TMC1984 (die label: 1980A 84A)
   - 8-digit cyan VFD display (seen with and without apostrophe)
 
   Spelling ABC (UK), 1979: exact same hardware as US version
@@ -41,19 +42,13 @@
   - 1-bit sound
 
   Letterlogic (UK), 1980: exact same hardware as US Mr. Challenger
+  - note: stylized as "LETTERlogic", same for other language versions
 
   Letterlogic (France), 1980: different VSM
   - TMC0355 4KB VSM ROM CD2603*
 
   Letterlogic (Germany), 1980: different VSM
   - TMC0355 4KB VSM ROM CD2604*
-
-
-----------------------------------------------------------------------------
-
-  TODO:
-  - spellb fetches wrong word sometimes (on lv1 SPOON and ANT) - roms were doublechecked
-
 
 ***************************************************************************/
 
@@ -79,8 +74,6 @@ public:
 	void rev1(machine_config &config);
 	void rev2(machine_config &config);
 
-	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button) override;
-
 private:
 	// devices
 	optional_device<tms1k_base_device> m_subcpu;
@@ -90,13 +83,13 @@ private:
 	u16 m_sub_o = 0;
 	u16 m_sub_r = 0;
 
-	virtual void power_off() override;
+	virtual void set_power(bool state) override;
 	void power_subcpu();
 	void update_display();
 
 	u8 main_read_k();
 	void main_write_o(u16 data);
-	void main_write_r(u16 data);
+	void main_write_r(u32 data);
 
 	u8 rev1_ctl_r();
 	void rev1_ctl_w(u8 data);
@@ -105,7 +98,7 @@ private:
 	void sub_write_r(u16 data);
 
 	void rev2_write_o(u16 data);
-	void rev2_write_r(u16 data);
+	void rev2_write_r(u32 data);
 
 	virtual void machine_start() override;
 };
@@ -136,9 +129,9 @@ void tispellb_state::power_subcpu()
 		m_subcpu->set_input_line(INPUT_LINE_RESET, m_power_on ? CLEAR_LINE : ASSERT_LINE);
 }
 
-void tispellb_state::power_off()
+void tispellb_state::set_power(bool state)
 {
-	hh_tms1k_state::power_off();
+	hh_tms1k_state::set_power(state);
 	power_subcpu();
 }
 
@@ -156,19 +149,20 @@ void tispellb_state::main_write_o(u16 data)
 	update_display();
 }
 
-void tispellb_state::main_write_r(u16 data)
+void tispellb_state::main_write_r(u32 data)
 {
+	// R0-R6: input mux
+	// R0-R7: select digit
+	// R15: filament on
+	m_inp_mux = data & 0x7f;
+	m_grid = data & 0x80ff;
+	update_display();
+
 	// R13: power-off request, on falling edge
 	if (~data & m_r & 0x2000)
 		power_off();
 
-	// R0-R6: input mux
-	// R0-R7: select digit
-	// R15: filament on
 	m_r = data;
-	m_inp_mux = data & 0x7f;
-	m_grid = data & 0x80ff;
-	update_display();
 }
 
 u8 tispellb_state::main_read_k()
@@ -188,20 +182,23 @@ void tispellb_state::rev1_ctl_w(u8 data)
 
 u8 tispellb_state::sub_read_k()
 {
-	// sub K8421 <- main CTL3210
-	return m_rev1_ctl;
+	// sub K8421 <- main CTL3210 (does not use external CS)
+	if (m_r & 0x1000)
+		return m_sub_o | m_rev1_ctl;
+	else
+		return m_sub_o | (m_plate & 0xe) | (m_plate >> 6 & 1);
 }
 
 void tispellb_state::sub_write_o(u16 data)
 {
 	// sub O write data
-	m_sub_o = data;
+	m_sub_o = bitswap<4>(data,6,0,4,3);
 }
 
 u8 tispellb_state::rev1_ctl_r()
 {
 	// main CTL3210 <- sub O6043
-	return bitswap<4>(m_sub_o,6,0,4,3);
+	return m_sub_o;
 }
 
 void tispellb_state::sub_write_r(u16 data)
@@ -222,7 +219,7 @@ void tispellb_state::rev2_write_o(u16 data)
 	main_write_o(data & 0x6fff);
 }
 
-void tispellb_state::rev2_write_r(u16 data)
+void tispellb_state::rev2_write_r(u32 data)
 {
 	// R12: TMC0355 CS
 	// R4: TMC0355 M1
@@ -244,12 +241,6 @@ void tispellb_state::rev2_write_r(u16 data)
   Inputs
 
 ***************************************************************************/
-
-INPUT_CHANGED_MEMBER(tispellb_state::power_button)
-{
-	hh_tms1k_state::power_button(field, param, oldval, newval);
-	power_subcpu();
-}
 
 static INPUT_PORTS_START( spellb )
 	PORT_START("IN.0") // R0
@@ -392,6 +383,21 @@ void tispellb_state::rev2(machine_config &config)
 
 ROM_START( spellb )
 	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "tmc0274n2l", 0x0000, 0x1000, CRC(98e3bd32) SHA1(e79b59ac29b0183bf1ee8d84b2944450c5e5d8fb) )
+
+	ROM_REGION( 1246, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_REGION( 2127, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
+	ROM_REGION( 1246, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0270_spellb_output.pla", 0, 1246, CRC(b95e35e6) SHA1(430917486856c9e6c28af10ff3758242048096c4) )
+
+	ROM_REGION( 0x1000, "tms6100", 0 )
+	ROM_LOAD( "cd2602.vsm", 0x0000, 0x1000, CRC(dd1fff8c) SHA1(f1760b29aa50fc96a1538db814cc73289654ac25) )
+ROM_END
+
+ROM_START( spellba )
+	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "tmc0272nl", 0x0000, 0x1000, CRC(f90318ff) SHA1(7cff03fafbc66b0e07b3c70a513fbb0b11eef4ea) )
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
@@ -399,7 +405,7 @@ ROM_START( spellb )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
 	ROM_REGION( 1246, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0270_spellb_output.pla", 0, 1246, CRC(3e021cbd) SHA1(c9bdfe10601b8a5a70442fe4805e4bfed8bbed35) )
+	ROM_LOAD( "tms0270_spellba_output.pla", 0, 1246, CRC(3e021cbd) SHA1(c9bdfe10601b8a5a70442fe4805e4bfed8bbed35) )
 
 	ROM_REGION( 0x1000, "subcpu", 0 )
 	ROM_LOAD( "tmc1984nl", 0x0000, 0x1000, CRC(78c9c83a) SHA1(6307fe2a0228fd1b8d308fcaae1b8e856d40fe57) )
@@ -409,22 +415,7 @@ ROM_START( spellb )
 	ROM_REGION( 2127, "subcpu:mpla", 0 )
 	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
 	ROM_REGION( 525, "subcpu:opla", 0 )
-	ROM_LOAD( "tms1980_spellb_output.pla", 0, 525, CRC(1e26a719) SHA1(eb031aa216fe865bc9e40b070ca5de2b1509f13b) )
-ROM_END
-
-ROM_START( spellb79 )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "tmc0274n2l", 0x0000, 0x1000, CRC(98e3bd32) SHA1(e79b59ac29b0183bf1ee8d84b2944450c5e5d8fb) )
-
-	ROM_REGION( 1246, "maincpu:ipla", 0 )
-	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
-	ROM_REGION( 2127, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
-	ROM_REGION( 1246, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0270_spellb79_output.pla", 0, 1246, CRC(b95e35e6) SHA1(430917486856c9e6c28af10ff3758242048096c4) )
-
-	ROM_REGION( 0x1000, "tms6100", 0 )
-	ROM_LOAD( "cd2602.vsm", 0x0000, 0x1000, CRC(dd1fff8c) SHA1(f1760b29aa50fc96a1538db814cc73289654ac25) )
+	ROM_LOAD( "tms1980_spellba_output.pla", 0, 525, CRC(1e26a719) SHA1(eb031aa216fe865bc9e40b070ca5de2b1509f13b) )
 ROM_END
 
 
@@ -445,8 +436,8 @@ ROM_END
 
 
 
-//    YEAR  NAME      PARENT CMP MACHINE  INPUT     CLASS           INIT        COMPANY              FULLNAME                     FLAGS
-COMP( 1978, spellb,   0,      0, rev1,    spellb,   tispellb_state, empty_init, "Texas Instruments", "Spelling B (1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1979, spellb79, spellb, 0, rev2,    spellb,   tispellb_state, empty_init, "Texas Instruments", "Spelling B (1979 version)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT CMP MACHINE  INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+COMP( 1979, spellb,   0,      0, rev2,    spellb,   tispellb_state, empty_init, "Texas Instruments", "Spelling B (1979 version)", MACHINE_SUPPORTS_SAVE )
+COMP( 1978, spellba,  spellb, 0, rev1,    spellb,   tispellb_state, empty_init, "Texas Instruments", "Spelling B (1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-COMP( 1979, mrchalgr, 0,      0, rev2,    mrchalgr, tispellb_state, empty_init, "Texas Instruments", "Mr. Challenger",            MACHINE_SUPPORTS_SAVE )
+COMP( 1979, mrchalgr, 0,      0, rev2,    mrchalgr, tispellb_state, empty_init, "Texas Instruments", "Mr. Challenger", MACHINE_SUPPORTS_SAVE )

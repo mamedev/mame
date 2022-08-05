@@ -94,8 +94,7 @@ tms1k_base_device::tms1k_base_device(const machine_config &mconfig, device_type 
 	, m_write_ctl(*this)
 	, m_write_pdc(*this)
 	, m_decode_micro(*this)
-{
-}
+{ }
 
 // disasm
 void tms1k_base_device::state_string_export(const device_state_entry &entry, std::string &str) const
@@ -270,9 +269,9 @@ void tms1k_base_device::device_reset()
 
 	// clear outputs
 	m_r = 0;
-	m_write_r(0, m_r & m_r_mask, 0xffff);
+	m_write_r(m_r & m_r_mask);
 	write_o_output(0);
-	m_write_r(0, m_r & m_r_mask, 0xffff);
+	m_write_r(m_r & m_r_mask);
 	m_power_off(0);
 }
 
@@ -320,13 +319,13 @@ void tms1k_base_device::write_o_output(u8 index)
 	// a hardcoded table is supported if the output pla is unknown
 	m_o_index = index;
 	m_o = (m_output_pla_table == nullptr) ? m_opla->read(index) : m_output_pla_table[index];
-	m_write_o(0, m_o & m_o_mask, 0xffff);
+	m_write_o(m_o & m_o_mask);
 }
 
 u8 tms1k_base_device::read_k_input()
 {
 	// K1,2,4,8 (KC test pin is not emulated)
-	return m_read_k(0, 0xff) & 0xf;
+	return m_read_k() & 0xf;
 }
 
 void tms1k_base_device::set_cki_bus()
@@ -414,9 +413,9 @@ void tms1k_base_device::op_retn()
 }
 
 
-// TMS1400/TMS1000C 3-level stack version
+// TMS1400/TMS1000C multiple level stack version
 
-void tms1k_base_device::op_br3()
+void tms1k_base_device::op_br2()
 {
 	// BR/BL: conditional branch
 	if (m_status)
@@ -427,13 +426,14 @@ void tms1k_base_device::op_br3()
 	}
 }
 
-void tms1k_base_device::op_call3()
+void tms1k_base_device::op_call2()
 {
 	// CALL/CALLL: conditional call
 	if (m_status)
 	{
-		// mask clatch 3 bits (no need to mask others)
-		m_clatch = (m_clatch << 1 | 1) & 7;
+		// mask clatch bits (no need to mask others)
+		u8 smask = (1 << stack_levels()) - 1;
+		m_clatch = (m_clatch << 1 | 1) & smask;
 
 		m_sr = m_sr << m_pc_bits | m_pc;
 		m_pc = m_opcode & m_pc_mask;
@@ -451,7 +451,7 @@ void tms1k_base_device::op_call3()
 	}
 }
 
-void tms1k_base_device::op_retn3()
+void tms1k_base_device::op_retn2()
 {
 	// RETN: return from subroutine
 	if (m_clatch & 1)
@@ -494,14 +494,14 @@ void tms1k_base_device::op_setr()
 {
 	// SETR: set one R-output line
 	m_r = m_r | (1 << m_y);
-	m_write_r(0, m_r & m_r_mask, 0xffff);
+	m_write_r(m_r & m_r_mask);
 }
 
 void tms1k_base_device::op_rstr()
 {
 	// RSTR: reset one R-output line
 	m_r = m_r & ~(1 << m_y);
-	m_write_r(0, m_r & m_r_mask, 0xffff);
+	m_write_r(m_r & m_r_mask);
 }
 
 void tms1k_base_device::op_tdo()
@@ -519,7 +519,7 @@ void tms1k_base_device::op_clo()
 void tms1k_base_device::op_ldx()
 {
 	// LDX: load X register with (x_bits) constant
-	m_x = m_c4 >> (4-m_x_bits);
+	m_x = m_c4 >> (4 - m_x_bits);
 }
 
 void tms1k_base_device::op_comx()
@@ -532,7 +532,7 @@ void tms1k_base_device::op_comx8()
 {
 	// COMX8: complement MSB of X register
 	// note: on TMS1100, the mnemonic is simply called "COMX"
-	m_x ^= 1 << (m_x_bits-1);
+	m_x ^= 1 << (m_x_bits - 1);
 }
 
 void tms1k_base_device::op_ldp()
@@ -566,7 +566,7 @@ void tms1k_base_device::op_xda()
 {
 	// XDA: exchange DAM and A
 	// note: setting A to DAM is done with DMTP and AUTA during this instruction
-	m_ram_address |= (0x10 << (m_x_bits-1));
+	m_ram_address |= (0x10 << (m_x_bits - 1));
 }
 
 void tms1k_base_device::op_off()
@@ -621,7 +621,7 @@ void tms1k_base_device::execute_one()
 		dynamic_output();
 		set_cki_bus();
 		m_ram_in = m_data->read_byte(m_ram_address) & 0xf;
-		m_dam_in = m_data->read_byte(m_ram_address | (0x10 << (m_x_bits-1))) & 0xf;
+		m_dam_in = m_data->read_byte(m_ram_address | (0x10 << (m_x_bits - 1))) & 0xf;
 		m_p = 0;
 		m_n = 0;
 		m_carry_in = 0;

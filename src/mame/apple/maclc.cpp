@@ -13,6 +13,13 @@
 
 #include "emu.h"
 
+#include "cuda.h"
+#include "egret.h"
+#include "macadb.h"
+#include "macscsi.h"
+#include "mactoolbox.h"
+#include "v8.h"
+
 #include "bus/nscsi/devices.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
@@ -23,15 +30,11 @@
 #include "machine/swim1.h"
 #include "machine/timer.h"
 #include "machine/z80scc.h"
-#include "cuda.h"
-#include "egret.h"
-#include "macadb.h"
-#include "macscsi.h"
-#include "v8.h"
 
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
+
 
 namespace {
 
@@ -296,6 +299,7 @@ void maclc_state::maclc_base(machine_config &config)
 {
 	M68020HMMU(config, m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &maclc_state::maclc_map);
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	RAM(config, m_ram);
 
@@ -385,6 +389,7 @@ void maclc_state::maclc2(machine_config &config)
 
 	M68030(config.replace(), m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &maclc_state::maclc_map);
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	m_ram->set_default_size("4M");
 	m_ram->set_extra_options("6M,8M,10M");
@@ -397,6 +402,7 @@ void maclc_state::maccclas(machine_config &config)
 
 	M68030(config.replace(), m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &maclc_state::maccclassic_map);
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	config.device_remove("egret");
 	config.device_remove("fdc");
@@ -429,6 +435,7 @@ void maclc_state::macclas2(machine_config &config)
 
 	M68030(config.replace(), m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &maclc_state::maclc_map);
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	EAGLE(config.replace(), m_v8, C15M);
 	m_v8->set_maincpu_tag("maincpu");

@@ -75,16 +75,6 @@ public:
 	}
 
 protected:
-	struct dmac3_register_file
-	{
-		uint32_t csr = 0;     // Status register
-		uint32_t intr = 0;    // Interrupt status register
-		uint32_t length = 0;  // Transfer count register
-		uint32_t address = 0; // Starting byte address (APbus virtual or physical)
-		uint32_t conf = 0;    // Transaction configuration register
-		bool drq = false;     // TODO: Does the DMAC3 use INTR_DREQ as the DRQ?
-	} m_controllers[2];
-
 	// Bitmasks for DMAC3 registers
 	enum DMAC3_CSR_MASKS : uint32_t
 	{
@@ -106,15 +96,15 @@ protected:
 		INTR_EOP = 0x0100,
 		INTR_EOPIE = 0x0200, // End of operation interrupt enable
 		INTR_EOPI = 0x0400,
-		INTR_DREQ = 0x1000,  // Is this just DRQ? Or is this for triggering DMA requests to the host?
+		INTR_DREQ = 0x1000,  // Is this just DRQ?
 		INTR_DRQIE = 0x2000, // Interrupt on DRQ enable?
 		INTR_DRQI = 0x4000,
 		INTR_PERR = 0x8000,
 	};
 
-	// I'm not clear yet on what IPER, DERR, MPER are signalling
+	// It is not fully clear what IPER, DERR, MPER are signalling.
 	// NetBSD ignores IPER and MPER, but resets the DMAC if DERR is asserted during the interrupt routine
-	// DCEN and PCEN are set by NetBSD during attach (along with FASTACCESS)
+	// DCEN and PCEN are set by NetBSD during attach
 	enum DMAC3_CONF_MASKS : uint32_t
 	{
 		CONF_IPER = 0x8000,
@@ -127,6 +117,16 @@ protected:
 		CONF_SLOWACCESS = 0x0020, // SPIFI access mode (see NetBSD source code)
 		CONF_FASTACCESS = 0x0001, // DMAC3 access mode (see NetBSD source code)
 	};
+
+	struct dmac3_register_file
+	{
+		uint32_t csr = 0;     // Status register
+		uint32_t intr = 0;    // Interrupt status register
+		uint32_t length = 0;  // Transfer count register
+		uint32_t address = 0; // Starting byte address (APbus virtual or physical)
+		uint32_t conf = 0;    // Transaction configuration register
+		bool drq = false;     // TODO: Does the DMAC3 use INTR_DREQ as the DRQ?
+	} m_controllers[2];
 
 	// Connections to other devices
 	// TODO: DMAC3 probably transfers more than one byte at a time

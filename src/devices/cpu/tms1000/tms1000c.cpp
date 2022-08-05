@@ -26,8 +26,7 @@ DEFINE_DEVICE_TYPE(TMS1000C, tms1000c_cpu_device, "tms1000c", "Texas Instruments
 // device definitions
 tms1000c_cpu_device::tms1000c_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: tms1000_cpu_device(mconfig, TMS1000C, tag, owner, clock, 8 /* o pins */, 10 /* r pins */, 6 /* pc bits */, 8 /* byte width */, 2 /* x width */, 10 /* prg width */, address_map_constructor(FUNC(tms1000c_cpu_device::program_10bit_8), this), 6 /* data width */, address_map_constructor(FUNC(tms1000c_cpu_device::data_64x4), this))
-{
-}
+{ }
 
 
 // machine configs

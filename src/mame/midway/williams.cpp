@@ -3219,101 +3219,103 @@ ROM_START( playball )
 ROM_END
 
 
-ROM_START( blaster )
+ROM_START( blaster ) // 20 Level version - Each ROM label had an additional "PROTO5" or "PROTO6" sticker attached (verified on multiple PCBs)
 	ROM_REGION( 0x54000, "maincpu", 0 )
-	ROM_LOAD( "16.ic39",     0x0d000, 0x1000, CRC(54a40b21) SHA1(663c7b539e6f1f065a4ecae7bb0477c71951223f) )
-	ROM_LOAD( "13.ic27",     0x0e000, 0x2000, CRC(f4dae4c8) SHA1(211dcbe085a30419d649afe10ca7c4017d909bd7) )
+	ROM_LOAD( "proto6_blaster_3021_rom_16.ic39", 0x0d000, 0x1000, CRC(54a40b21) SHA1(663c7b539e6f1f065a4ecae7bb0477c71951223f) ) // labeled:  BLASTER   (3021) ROM 16   (c) 1983 WILLIAMS   ELECTRONICS, INC.   PROTO6
+	ROM_LOAD( "proto6_blaster_3021_rom_13.ic27", 0x0e000, 0x2000, CRC(f4dae4c8) SHA1(211dcbe085a30419d649afe10ca7c4017d909bd7) ) // labeled:  BLASTER   (3021) ROM 13   (c) 1983 WILLIAMS   ELECTRONICS, INC.   PROTO6
 
-	ROM_LOAD( "11.ic25",     0x10000, 0x2000, CRC(6371e62f) SHA1(dc4173d2ee88757a6ac0838acaee325eadc2c4fb) )
-	ROM_LOAD( "12.ic26",     0x12000, 0x2000, CRC(9804faac) SHA1(e61218fe190ad268af48d611d140d8f4cd38e4c7) )
-	ROM_LOAD( "17.ic41",     0x14000, 0x1000, CRC(bf96182f) SHA1(e25a02508eecf79ea1ae5d45278a60becc6c7dcc) )
+	ROM_LOAD( "proto6_blaster_3021_rom_11.ic25", 0x10000, 0x2000, CRC(6371e62f) SHA1(dc4173d2ee88757a6ac0838acaee325eadc2c4fb) ) // labeled:  BLASTER   (3021) ROM 11   (c) 1983 WILLIAMS   ELECTRONICS, INC.   PROTO6
+	ROM_LOAD( "proto6_blaster_3021_rom_12.ic26", 0x12000, 0x2000, CRC(9804faac) SHA1(e61218fe190ad268af48d611d140d8f4cd38e4c7) ) // labeled:  BLASTER   (3021) ROM 12   (c) 1983 WILLIAMS   ELECTRONICS, INC.   PROTO6
+	ROM_LOAD( "proto6_blaster_3021_rom_17.ic41", 0x14000, 0x1000, CRC(bf96182f) SHA1(e25a02508eecf79ea1ae5d45278a60becc6c7dcc) ) // labeled:  BLASTER   (3021) ROM 17   (c) 1983 WILLIAMS   ELECTRONICS, INC.   PROTO6
 
-	ROM_LOAD( "15.ic38",     0x18000, 0x4000, CRC(1ad146a4) SHA1(5ab3d9618023b59bc329a9eeef986901867a639b) )
-	ROM_LOAD( "8.ic20",      0x1c000, 0x4000, CRC(f110bbb0) SHA1(314dea232a3706509399348c7415f933c64cea1b) )
-	ROM_LOAD( "9.ic22",      0x20000, 0x4000, CRC(5c5b0f8a) SHA1(224f89c85b2b1ca511d006180b8d994fccbdfb6b) )
-	ROM_LOAD( "10.ic24",     0x24000, 0x4000, CRC(d47eb67f) SHA1(5dcde8be1a7b1927b90ffab3219dc47c5b2f20e4) )
-	ROM_LOAD( "6.ic13",      0x28000, 0x4000, CRC(47fc007e) SHA1(3a80b9b7ae460e9732f7c1cdd465a5b06ded970f) )
-	ROM_LOAD( "5.ic11",      0x2c000, 0x4000, CRC(15c1b94d) SHA1(5d97628541eb8933870c3ffd3646b7aaf8af6af5) )
-	ROM_LOAD( "14.ic35",     0x30000, 0x4000, CRC(aea6b846) SHA1(04cb4b5eb000471a0cec377a5236ac8c83529528) )
-	ROM_LOAD( "7.ic15",      0x34000, 0x4000, CRC(7a101181) SHA1(5f1581911ea7fe3e63ce1b9c50b1d3bf081dbf81) )
-	ROM_LOAD( "1.ic1",       0x38000, 0x4000, CRC(8d0ea9e7) SHA1(34f8e2e99748bed29285f7e4929bb920960ab03e) )
-	ROM_LOAD( "2.ic3",       0x3c000, 0x4000, CRC(03c4012c) SHA1(53f0adc91e5f1ac58b08b3a6d2de8de5a40bebab) )
-	ROM_LOAD( "4.ic7",       0x40000, 0x4000, CRC(fc9d39fb) SHA1(126d43a64471bbf4b40aeda8913d50e82d254f9c) )
-	ROM_LOAD( "3.ic6",       0x44000, 0x4000, CRC(253690fb) SHA1(06cb2ef95bb06b3618392e298aa690e1f75bc977) )
+	ROM_LOAD( "proto5_blaster_3021_rom_15.ic38", 0x18000, 0x4000, CRC(1ad146a4) SHA1(5ab3d9618023b59bc329a9eeef986901867a639b) ) // labeled:  BLASTER   (3021) ROM 15   (c) 1983 WILLIAMS   ELECTRONICS, INC.   PROTO5
+	ROM_LOAD( "proto5_blaster_3021_rom_8.ic20",  0x1c000, 0x4000, CRC(f110bbb0) SHA1(314dea232a3706509399348c7415f933c64cea1b) ) // labeled:  BLASTER   (3021) ROM 8   (c) 1983 WILLIAMS   ELECTRONICS, INC.   PROTO5
+	ROM_LOAD( "proto5_blaster_3021_rom_9.ic22",  0x20000, 0x4000, CRC(5c5b0f8a) SHA1(224f89c85b2b1ca511d006180b8d994fccbdfb6b) ) // labeled:  BLASTER   (3021) ROM 9   (c) 1983 WILLIAMS   ELECTRONICS, INC.   PROTO5
+	ROM_LOAD( "proto5_blaster_3021_rom_10.ic24", 0x24000, 0x4000, CRC(d47eb67f) SHA1(5dcde8be1a7b1927b90ffab3219dc47c5b2f20e4) ) // labeled:  BLASTER   (3021) ROM 10   (c) 1983 WILLIAMS   ELECTRONICS, INC.   PROTO5
+	ROM_LOAD( "proto5_blaster_3021_rom_6.ic13",  0x28000, 0x4000, CRC(47fc007e) SHA1(3a80b9b7ae460e9732f7c1cdd465a5b06ded970f) ) // labeled:  BLASTER   (3021) ROM 6   (c) 1983 WILLIAMS   ELECTRONICS, INC.   PROTO5
+	ROM_LOAD( "proto5_blaster_3021_rom_5.ic11",  0x2c000, 0x4000, CRC(15c1b94d) SHA1(5d97628541eb8933870c3ffd3646b7aaf8af6af5) ) // labeled:  BLASTER   (3021) ROM 5   (c) 1983 WILLIAMS   ELECTRONICS, INC.   PROTO5
+	ROM_LOAD( "proto5_blaster_3021_rom_14.ic35", 0x30000, 0x4000, CRC(aea6b846) SHA1(04cb4b5eb000471a0cec377a5236ac8c83529528) ) // labeled:  BLASTER   (3021) ROM 14   (c) 1983 WILLIAMS   ELECTRONICS, INC.   PROTO5
+	ROM_LOAD( "proto6_blaster_3021_rom_7.ic15",  0x34000, 0x4000, CRC(7a101181) SHA1(5f1581911ea7fe3e63ce1b9c50b1d3bf081dbf81) ) // labeled:  BLASTER   (3021) ROM 7   (c) 1983 WILLIAMS   ELECTRONICS, INC.   PROTO6
+	ROM_LOAD( "proto5_blaster_3021_rom_1.ic1",   0x38000, 0x4000, CRC(8d0ea9e7) SHA1(34f8e2e99748bed29285f7e4929bb920960ab03e) ) // labeled:  BLASTER   (3021) ROM 1   (c) 1983 WILLIAMS   ELECTRONICS, INC.   PROTO5
+	ROM_LOAD( "proto5_blaster_3021_rom_2.ic3",   0x3c000, 0x4000, CRC(03c4012c) SHA1(53f0adc91e5f1ac58b08b3a6d2de8de5a40bebab) ) // labeled:  BLASTER   (3021) ROM 2   (c) 1983 WILLIAMS   ELECTRONICS, INC.   PROTO5
+	ROM_LOAD( "proto6_blaster_3021_rom_4.ic7",   0x40000, 0x4000, CRC(fc9d39fb) SHA1(126d43a64471bbf4b40aeda8913d50e82d254f9c) ) // labeled:  BLASTER   (3021) ROM 4   (c) 1983 WILLIAMS   ELECTRONICS, INC.   PROTO6
+	ROM_LOAD( "proto6_blaster_3021_rom_3.ic6",   0x44000, 0x4000, CRC(253690fb) SHA1(06cb2ef95bb06b3618392e298aa690e1f75bc977) ) // labeled:  BLASTER   (3021) ROM 3   (c) 1983 WILLIAMS   ELECTRONICS, INC.   PROTO6
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "18.sb13",      0xf000, 0x1000, CRC(c33a3145) SHA1(6ffe2da7b70c0b576fbc1790a33eecdbb9ee3d02) )
-	ROM_REGION( 0x10000, "soundcpu_b", 0 )
-	ROM_LOAD( "18.sb10",      0xf000, 0x1000, CRC(c33a3145) SHA1(6ffe2da7b70c0b576fbc1790a33eecdbb9ee3d02) )
+	ROM_LOAD( "proto5_blaster_3021_rom_18.sb13", 0xf000, 0x1000, CRC(c33a3145) SHA1(6ffe2da7b70c0b576fbc1790a33eecdbb9ee3d02) ) // labeled:  BLASTER   (3021) ROM 18   (c) 1983 WILLIAMS   ELECTRONICS, INC.   PROTO5
 
-	ROM_REGION( 0x0c00, "proms", 0 )        // color & video-decoder PROM data
-	ROM_LOAD( "4.u42",        0x0800, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) )
-	ROM_LOAD( "6.u23",        0x0a00, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) )
-	ROM_LOAD( "blaster.col",  0x0000, 0x0800, CRC(bac50bc4) SHA1(80a48eb97c6f02703210d00498f9669c36e64326) )
+	ROM_REGION( 0x10000, "soundcpu_b", 0 )
+	ROM_LOAD( "proto5_blaster_3021_rom_18.sb10", 0xf000, 0x1000, CRC(c33a3145) SHA1(6ffe2da7b70c0b576fbc1790a33eecdbb9ee3d02) ) // labeled:  BLASTER   (3021) ROM 18   (c) 1983 WILLIAMS   ELECTRONICS, INC.   PROTO5
+
+	ROM_REGION( 0x0c00, "proms", 0 ) // color & video-decoder PROM data
+	ROM_LOAD( "decoder_rom_4.ic42",       0x0800, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // labeled:  Decoder Rom 4   (c) 1981 WILLIAMS   ELECTRONICS INC.   STD.729
+	ROM_LOAD( "video_decoder_rom_6.ic23", 0x0a00, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // labeled:  Video Decoder Rom 6   (c) 1981 WILLIAMS   ELECTRONICS INC.   STD.746
+	ROM_LOAD( "blaster.col",              0x0000, 0x0800, CRC(bac50bc4) SHA1(80a48eb97c6f02703210d00498f9669c36e64326) ) // A-5282-10426 at IC49 & IC50??
 ROM_END
 
-ROM_START( blastero )
+ROM_START( blastero ) // 30 Level version
 	ROM_REGION( 0x54000, "maincpu", 0 )
-	ROM_LOAD( "16.ic39",   0x0d000, 0x1000, CRC(2db032d2) SHA1(287769361639695b1c1ceae0fe6899d83b4575d5) ) // sldh
-	ROM_LOAD( "13.ic27",   0x0e000, 0x2000, CRC(c99213c7) SHA1(d1c1549c053de3d862d8ef3ebca02811ed289464) ) // sldh
+	ROM_LOAD( "proto5_blaster_3021_rom_16.ic39", 0x0d000, 0x1000, CRC(2db032d2) SHA1(287769361639695b1c1ceae0fe6899d83b4575d5) ) // assumed to be PROTO5 revision
+	ROM_LOAD( "proto5_blaster_3021_rom_13.ic27", 0x0e000, 0x2000, CRC(c99213c7) SHA1(d1c1549c053de3d862d8ef3ebca02811ed289464) ) // assumed to be PROTO5 revision
 
-	ROM_LOAD( "11.ic25",   0x10000, 0x2000, CRC(bc2d7eda) SHA1(831e9ecb75b143f9770eab1939136092a29e64f7) ) // sldh
-	ROM_LOAD( "12.ic26",   0x12000, 0x2000, CRC(8a215017) SHA1(ee9233134907c03f7a1221d9daa84fe047c2db94) ) // sldh
-	ROM_LOAD( "17.ic41",   0x14000, 0x1000, CRC(b308f0e5) SHA1(262e25be40dff66e65a0fe34c9d013a750b90876) ) // sldh
+	ROM_LOAD( "proto5_blaster_3021_rom_11.ic25", 0x10000, 0x2000, CRC(bc2d7eda) SHA1(831e9ecb75b143f9770eab1939136092a29e64f7) ) // assumed to be PROTO5 revision
+	ROM_LOAD( "proto5_blaster_3021_rom_12.ic26", 0x12000, 0x2000, CRC(8a215017) SHA1(ee9233134907c03f7a1221d9daa84fe047c2db94) ) // assumed to be PROTO5 revision
+	ROM_LOAD( "proto5_blaster_3021_rom_17.ic41", 0x14000, 0x1000, CRC(b308f0e5) SHA1(262e25be40dff66e65a0fe34c9d013a750b90876) ) // assumed to be PROTO5 revision
 
-	ROM_LOAD( "15.ic38",   0x18000, 0x4000, CRC(1ad146a4) SHA1(5ab3d9618023b59bc329a9eeef986901867a639b) )
-	ROM_LOAD( "8.ic20",    0x1c000, 0x4000, CRC(f110bbb0) SHA1(314dea232a3706509399348c7415f933c64cea1b) )
-	ROM_LOAD( "9.ic22",    0x20000, 0x4000, CRC(5c5b0f8a) SHA1(224f89c85b2b1ca511d006180b8d994fccbdfb6b) )
-	ROM_LOAD( "10.ic24",   0x24000, 0x4000, CRC(d47eb67f) SHA1(5dcde8be1a7b1927b90ffab3219dc47c5b2f20e4) )
-	ROM_LOAD( "6.ic13",    0x28000, 0x4000, CRC(47fc007e) SHA1(3a80b9b7ae460e9732f7c1cdd465a5b06ded970f) )
-	ROM_LOAD( "5.ic11",    0x2c000, 0x4000, CRC(15c1b94d) SHA1(5d97628541eb8933870c3ffd3646b7aaf8af6af5) )
-	ROM_LOAD( "14.ic35",   0x30000, 0x4000, CRC(aea6b846) SHA1(04cb4b5eb000471a0cec377a5236ac8c83529528) )
-	ROM_LOAD( "7.ic15",    0x34000, 0x4000, CRC(a1c4db77) SHA1(7a878d44b6ca7444ecbb6c8f75e5e91de149daf3) ) // sldh
-	ROM_LOAD( "1.ic1",     0x38000, 0x4000, CRC(8d0ea9e7) SHA1(34f8e2e99748bed29285f7e4929bb920960ab03e) )
-	ROM_LOAD( "2.ic3",     0x3c000, 0x4000, CRC(03c4012c) SHA1(53f0adc91e5f1ac58b08b3a6d2de8de5a40bebab) )
-	ROM_LOAD( "4.ic7",     0x40000, 0x4000, CRC(39d2a32c) SHA1(33707877e841ef86a11b47ffabddce7f3d2a7030) ) // sldh
-	ROM_LOAD( "3.ic6",     0x44000, 0x4000, CRC(054c9f1c) SHA1(c21e3493f1ae506ab9fd28ed9ecc67d3305e9d7a) ) // sldh
+	ROM_LOAD( "proto5_blaster_3021_rom_15.ic38", 0x18000, 0x4000, CRC(1ad146a4) SHA1(5ab3d9618023b59bc329a9eeef986901867a639b) )
+	ROM_LOAD( "proto5_blaster_3021_rom_8.ic20",  0x1c000, 0x4000, CRC(f110bbb0) SHA1(314dea232a3706509399348c7415f933c64cea1b) )
+	ROM_LOAD( "proto5_blaster_3021_rom_9.ic22",  0x20000, 0x4000, CRC(5c5b0f8a) SHA1(224f89c85b2b1ca511d006180b8d994fccbdfb6b) )
+	ROM_LOAD( "proto5_blaster_3021_rom_10.ic24", 0x24000, 0x4000, CRC(d47eb67f) SHA1(5dcde8be1a7b1927b90ffab3219dc47c5b2f20e4) )
+	ROM_LOAD( "proto5_blaster_3021_rom_6.ic13",  0x28000, 0x4000, CRC(47fc007e) SHA1(3a80b9b7ae460e9732f7c1cdd465a5b06ded970f) )
+	ROM_LOAD( "proto5_blaster_3021_rom_5.ic11",  0x2c000, 0x4000, CRC(15c1b94d) SHA1(5d97628541eb8933870c3ffd3646b7aaf8af6af5) )
+	ROM_LOAD( "proto5_blaster_3021_rom_14.ic35", 0x30000, 0x4000, CRC(aea6b846) SHA1(04cb4b5eb000471a0cec377a5236ac8c83529528) )
+	ROM_LOAD( "proto5_blaster_3021_rom_7.ic15",  0x34000, 0x4000, CRC(a1c4db77) SHA1(7a878d44b6ca7444ecbb6c8f75e5e91de149daf3) ) // assumed to be PROTO5 revision
+	ROM_LOAD( "proto5_blaster_3021_rom_1.ic1",   0x38000, 0x4000, CRC(8d0ea9e7) SHA1(34f8e2e99748bed29285f7e4929bb920960ab03e) )
+	ROM_LOAD( "proto5_blaster_3021_rom_2.ic3",   0x3c000, 0x4000, CRC(03c4012c) SHA1(53f0adc91e5f1ac58b08b3a6d2de8de5a40bebab) )
+	ROM_LOAD( "proto5_blaster_3021_rom_4.ic7",   0x40000, 0x4000, CRC(39d2a32c) SHA1(33707877e841ef86a11b47ffabddce7f3d2a7030) ) // assumed to be PROTO5 revision
+	ROM_LOAD( "proto5_blaster_3021_rom_3.ic6",   0x44000, 0x4000, CRC(054c9f1c) SHA1(c21e3493f1ae506ab9fd28ed9ecc67d3305e9d7a) ) // assumed to be PROTO5 revision
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "18.sb13",      0xf000, 0x1000, CRC(c33a3145) SHA1(6ffe2da7b70c0b576fbc1790a33eecdbb9ee3d02) )
-	ROM_REGION( 0x10000, "soundcpu_b", 0 )
-	ROM_LOAD( "18.sb10",      0xf000, 0x1000, CRC(c33a3145) SHA1(6ffe2da7b70c0b576fbc1790a33eecdbb9ee3d02) )
+	ROM_LOAD( "proto5_blaster_3021_rom_18.sb13", 0xf000, 0x1000, CRC(c33a3145) SHA1(6ffe2da7b70c0b576fbc1790a33eecdbb9ee3d02) ) // labeled:  BLASTER   (3021) ROM 18   (c) 1983 WILLIAMS   ELECTRONICS, INC.   PROTO5
 
-	ROM_REGION( 0x0c00, "proms", 0 )        // color & video-decoder PROM data
-	ROM_LOAD( "4.u42",        0x0800, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) )
-	ROM_LOAD( "6.u23",        0x0a00, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) )
-	ROM_LOAD( "blaster.col",  0x0000, 0x0800, CRC(bac50bc4) SHA1(80a48eb97c6f02703210d00498f9669c36e64326) )
+	ROM_REGION( 0x10000, "soundcpu_b", 0 )
+	ROM_LOAD( "proto5_blaster_3021_rom_18.sb10", 0xf000, 0x1000, CRC(c33a3145) SHA1(6ffe2da7b70c0b576fbc1790a33eecdbb9ee3d02) ) // labeled:  BLASTER   (3021) ROM 18   (c) 1983 WILLIAMS   ELECTRONICS, INC.   PROTO5
+
+	ROM_REGION( 0x0c00, "proms", 0 ) // color & video-decoder PROM data
+	ROM_LOAD( "decoder_rom_4.ic42",       0x0800, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // labeled:  Decoder Rom 4   (c) 1981 WILLIAMS   ELECTRONICS INC.   STD.729
+	ROM_LOAD( "video_decoder_rom_6.ic23", 0x0a00, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // labeled:  Video Decoder Rom 6   (c) 1981 WILLIAMS   ELECTRONICS INC.   STD.746
+	ROM_LOAD( "blaster.col",              0x0000, 0x0800, CRC(bac50bc4) SHA1(80a48eb97c6f02703210d00498f9669c36e64326) ) // A-5282-10426 at IC49 & IC50??
 ROM_END
 
-ROM_START( blasterkit )
+ROM_START( blasterkit ) // 20 Level version with single sound board & mono sound
 	ROM_REGION( 0x54000, "maincpu", 0 )
-	ROM_LOAD( "blastkit.16",  0x0d000, 0x1000, CRC(414b2abf) SHA1(2bde972d225d6e93e44751f542cee584d57f7983) )
-	ROM_LOAD( "blastkit.13",  0x0e000, 0x2000, CRC(9c64db76) SHA1(c14508cb2f964af93631779db3adaa960fcc7559) )
+	ROM_LOAD( "blastkit_rom_16.ic39", 0x0d000, 0x1000, CRC(414b2abf) SHA1(2bde972d225d6e93e44751f542cee584d57f7983) ) // unique to this set
+	ROM_LOAD( "blastkit_rom_13.ic27", 0x0e000, 0x2000, CRC(9c64db76) SHA1(c14508cb2f964af93631779db3adaa960fcc7559) ) // unique to this set
 
-	ROM_LOAD( "blastkit.11",  0x10000, 0x2000, CRC(b7df4914) SHA1(81f7a89dfde06c160f2c8974eec701f2298ec434) )
-	ROM_LOAD( "blastkit.12",  0x12000, 0x2000, CRC(8b1e26ab) SHA1(7d30800a9302f5a83792499d8df536693d01f75d) )
-	ROM_LOAD( "blastkit.17",  0x14000, 0x1000, CRC(577d1e9a) SHA1(0064124a65490e0473dfb0081ec28b7ee43a04b5) )
+	ROM_LOAD( "blastkit_rom_11.ic25", 0x10000, 0x2000, CRC(b7df4914) SHA1(81f7a89dfde06c160f2c8974eec701f2298ec434) ) // unique to this set
+	ROM_LOAD( "blastkit_rom_12.ic26", 0x12000, 0x2000, CRC(8b1e26ab) SHA1(7d30800a9302f5a83792499d8df536693d01f75d) ) // unique to this set
+	ROM_LOAD( "blastkit_rom_17.ic41", 0x14000, 0x1000, CRC(577d1e9a) SHA1(0064124a65490e0473dfb0081ec28b7ee43a04b5) ) // unique to this set
 
-	ROM_LOAD( "blastkit.15",  0x18000, 0x4000, CRC(1ad146a4) SHA1(5ab3d9618023b59bc329a9eeef986901867a639b) )
-	ROM_LOAD( "blastkit.8",   0x1c000, 0x4000, CRC(f110bbb0) SHA1(314dea232a3706509399348c7415f933c64cea1b) )
-	ROM_LOAD( "blastkit.9",   0x20000, 0x4000, CRC(5c5b0f8a) SHA1(224f89c85b2b1ca511d006180b8d994fccbdfb6b) )
-	ROM_LOAD( "blastkit.10",  0x24000, 0x4000, CRC(d47eb67f) SHA1(5dcde8be1a7b1927b90ffab3219dc47c5b2f20e4) )
-	ROM_LOAD( "blastkit.6",   0x28000, 0x4000, CRC(47fc007e) SHA1(3a80b9b7ae460e9732f7c1cdd465a5b06ded970f) )
-	ROM_LOAD( "blastkit.5",   0x2c000, 0x4000, CRC(15c1b94d) SHA1(5d97628541eb8933870c3ffd3646b7aaf8af6af5) )
-	ROM_LOAD( "blastkit.14",  0x30000, 0x4000, CRC(aea6b846) SHA1(04cb4b5eb000471a0cec377a5236ac8c83529528) )
-	ROM_LOAD( "blastkit.7",   0x34000, 0x4000, CRC(6fcc2153) SHA1(00e7b6846c15400315d94e2c7d1c99b1a737c285) )
-	ROM_LOAD( "blastkit.1",   0x38000, 0x4000, CRC(8d0ea9e7) SHA1(34f8e2e99748bed29285f7e4929bb920960ab03e) )
-	ROM_LOAD( "blastkit.2",   0x3c000, 0x4000, CRC(03c4012c) SHA1(53f0adc91e5f1ac58b08b3a6d2de8de5a40bebab) )
-	ROM_LOAD( "blastkit.4",   0x40000, 0x4000, CRC(f80e9ff5) SHA1(e232d96b6e07c7b4240fa4dd2cb9be4745a1be4b) )
-	ROM_LOAD( "blastkit.3",   0x44000, 0x4000, CRC(20e851f9) SHA1(efc288ef0333812a6282f22aade8e43e9a827533) )
+	ROM_LOAD( "blastkit_rom_15.ic38", 0x18000, 0x4000, CRC(1ad146a4) SHA1(5ab3d9618023b59bc329a9eeef986901867a639b) )
+	ROM_LOAD( "blastkit_rom_8.ic20",  0x1c000, 0x4000, CRC(f110bbb0) SHA1(314dea232a3706509399348c7415f933c64cea1b) )
+	ROM_LOAD( "blastkit_rom_9.ic22",  0x20000, 0x4000, CRC(5c5b0f8a) SHA1(224f89c85b2b1ca511d006180b8d994fccbdfb6b) )
+	ROM_LOAD( "blastkit_rom_10.ic24", 0x24000, 0x4000, CRC(d47eb67f) SHA1(5dcde8be1a7b1927b90ffab3219dc47c5b2f20e4) )
+	ROM_LOAD( "blastkit_rom_6.ic13",  0x28000, 0x4000, CRC(47fc007e) SHA1(3a80b9b7ae460e9732f7c1cdd465a5b06ded970f) )
+	ROM_LOAD( "blastkit_rom_5.ic11",  0x2c000, 0x4000, CRC(15c1b94d) SHA1(5d97628541eb8933870c3ffd3646b7aaf8af6af5) )
+	ROM_LOAD( "blastkit_rom_14.ic35", 0x30000, 0x4000, CRC(aea6b846) SHA1(04cb4b5eb000471a0cec377a5236ac8c83529528) )
+	ROM_LOAD( "blastkit_rom_7.ic15",  0x34000, 0x4000, CRC(6fcc2153) SHA1(00e7b6846c15400315d94e2c7d1c99b1a737c285) ) // unique to this set
+	ROM_LOAD( "blastkit_rom_1.ic1",   0x38000, 0x4000, CRC(8d0ea9e7) SHA1(34f8e2e99748bed29285f7e4929bb920960ab03e) )
+	ROM_LOAD( "blastkit_rom_2.ic3",   0x3c000, 0x4000, CRC(03c4012c) SHA1(53f0adc91e5f1ac58b08b3a6d2de8de5a40bebab) )
+	ROM_LOAD( "blastkit_rom_4.ic7",   0x40000, 0x4000, CRC(f80e9ff5) SHA1(e232d96b6e07c7b4240fa4dd2cb9be4745a1be4b) ) // unique to this set
+	ROM_LOAD( "blastkit_rom_3.ic6",   0x44000, 0x4000, CRC(20e851f9) SHA1(efc288ef0333812a6282f22aade8e43e9a827533) ) // unique to this set
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "blastkit.18", 0xf000, 0x1000, CRC(c33a3145) SHA1(6ffe2da7b70c0b576fbc1790a33eecdbb9ee3d02) )
+	ROM_LOAD( "blastkit_rom_18", 0xf000, 0x1000, CRC(c33a3145) SHA1(6ffe2da7b70c0b576fbc1790a33eecdbb9ee3d02) )
 
-	ROM_REGION( 0x0c00, "proms", 0 )        // color & video-decoder PROM data
-	ROM_LOAD( "4.u42",        0x0800, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) )
-	ROM_LOAD( "6.u23",        0x0a00, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) )
-	ROM_LOAD( "blaster.col",  0x0000, 0x0800, CRC(bac50bc4) SHA1(80a48eb97c6f02703210d00498f9669c36e64326) )
+	ROM_REGION( 0x0c00, "proms", 0 ) // color & video-decoder PROM data
+	ROM_LOAD( "decoder_rom_4.ic42",       0x0800, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // labeled:  Decoder Rom 4   (c) 1981 WILLIAMS   ELECTRONICS INC.   STD.729
+	ROM_LOAD( "video_decoder_rom_6.ic23", 0x0a00, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) ) // labeled:  Video Decoder Rom 6   (c) 1981 WILLIAMS   ELECTRONICS INC.   STD.746
+	ROM_LOAD( "blaster.col",              0x0000, 0x0800, CRC(bac50bc4) SHA1(80a48eb97c6f02703210d00498f9669c36e64326) ) // A-5282-10426 at IC49 & IC50??
 ROM_END
 
 
@@ -3892,9 +3894,9 @@ GAME( 1982, sinistarp,  sinistar, sinistar,       sinistar, sinistar_state,     
 
 GAME( 1983, playball,   0,        playball,       playball, playball_state,       empty_init,    ROT270, "Williams", "PlayBall! (prototype)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, blaster,    0,        blaster,        blaster,  blaster_state,        empty_init,    ROT0,   "Williams / Vid Kidz", "Blaster",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1983, blastero,   blaster,  blaster,        blaster,  blaster_state,        empty_init,    ROT0,   "Williams / Vid Kidz", "Blaster (location test)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1983, blasterkit, blaster,  blastkit,       blastkit, blaster_state,        empty_init,    ROT0,   "Williams / Vid Kidz", "Blaster (conversion kit)", MACHINE_SUPPORTS_SAVE ) // mono sound
+GAME( 1983, blaster,    0,        blaster,        blaster,  blaster_state,        empty_init,    ROT0,   "Williams / Vid Kidz", "Blaster",                  MACHINE_SUPPORTS_SAVE ) // 20 levels - stereo sound
+GAME( 1983, blastero,   blaster,  blaster,        blaster,  blaster_state,        empty_init,    ROT0,   "Williams / Vid Kidz", "Blaster (location test)",  MACHINE_SUPPORTS_SAVE ) // 30 levels - stereo sound
+GAME( 1983, blasterkit, blaster,  blastkit,       blastkit, blaster_state,        empty_init,    ROT0,   "Williams / Vid Kidz", "Blaster (conversion kit)", MACHINE_SUPPORTS_SAVE ) // 20 levels - mono sound
 
 GAME( 1985, spdball,    0,        spdball,        spdball,  spdball_state,        empty_init,    ROT0,   "Williams", "Speed Ball - Contest at Neonworld (prototype)", MACHINE_SUPPORTS_SAVE )
 

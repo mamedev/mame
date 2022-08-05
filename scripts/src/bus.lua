@@ -53,6 +53,8 @@ if (BUSES["A800"]~=null) then
 		MAME_DIR .. "src/devices/bus/a800/rom.h",
 		MAME_DIR .. "src/devices/bus/a800/oss.cpp",
 		MAME_DIR .. "src/devices/bus/a800/oss.h",
+		MAME_DIR .. "src/devices/bus/a800/rtime8.cpp",
+		MAME_DIR .. "src/devices/bus/a800/rtime8.h",
 		MAME_DIR .. "src/devices/bus/a800/sparta.cpp",
 		MAME_DIR .. "src/devices/bus/a800/sparta.h",
 	}
@@ -4901,6 +4903,8 @@ if (BUSES["PCE_CTRL"]~=null) then
 		MAME_DIR .. "src/devices/bus/pce_ctrl/joypad6.h",
 		MAME_DIR .. "src/devices/bus/pce_ctrl/multitap.cpp",
 		MAME_DIR .. "src/devices/bus/pce_ctrl/multitap.h",
+		MAME_DIR .. "src/devices/bus/pce_ctrl/pachinko.cpp",
+		MAME_DIR .. "src/devices/bus/pce_ctrl/pachinko.h",
 	}
 end
 

@@ -136,6 +136,11 @@ template<int HighBits, int Width, int AddrShift> u16 handler_entry_write_dispatc
 	return dispatch_write_flags<Level, Width, AddrShift>(HIGHMASK, offset, data, mem_mask, m_a_dispatch);
 }
 
+template<int HighBits, int Width, int AddrShift> u16 handler_entry_write_dispatch<HighBits, Width, AddrShift>::lookup_flags(offs_t offset, uX mem_mask) const
+{
+	return dispatch_lookup_write_flags<Level, Width, AddrShift>(HIGHMASK, offset, mem_mask, m_a_dispatch);
+}
+
 template<int HighBits, int Width, int AddrShift> void *handler_entry_write_dispatch<HighBits, Width, AddrShift>::get_ptr(offs_t offset) const
 {
 	return m_a_dispatch[(offset & HIGHMASK) >> LowBits]->get_ptr(offset);

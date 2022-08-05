@@ -150,7 +150,7 @@ TIMER_CALLBACK_MEMBER(dmac3_device::irq_check)
 		newIrq |= (intr & INTR_EOPI) && (intr & INTR_EOPIE); // End-of-operation interrupt
 		newIrq |= (intr & INTR_DRQI) && (intr & INTR_DRQIE); // DRQ interrupt (?)
 		newIrq |= (intr & INTR_TCI) && (intr & INTR_TCIE);   // Transfer count interrupt (?)
-		newIrq |= (intr & INTR_PERR);                        // XXX DREQ, EOP?
+		newIrq |= (intr & INTR_PERR);                        // TODO: DREQ, EOP?
 	}
 
 	if (m_irq != newIrq)
@@ -213,7 +213,7 @@ TIMER_CALLBACK_MEMBER(dmac3_device::dma_check)
 			// In fact, NEWS-OS gets confused if EOPI is set but the SPIFI hasn't actually completed the transfer.
 			// As such, for now at least, this driver doesn't set this flag to avoid disturbing the interrupt
 			// handlers. More investigation and experimentation will be required for accurate emulation of this bit.
-			// m_controllers[controller].intr |= INTR_EOPI;
+			// TODO: m_controllers[controller].intr |= INTR_EOPI;
 			m_irq_check->adjust(attotime::zero);
 		}
 

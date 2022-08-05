@@ -45,8 +45,8 @@ private:
 	required_device_array<pce_control_port_device, 5> m_subctrl_port;
 
 	// internal states
-	u8 m_port_sel = 0; // select port to read
-	bool m_prev_sel = false; // previous SEL pin state
+	u8 m_port_sel; // select port to read
+	bool m_prev_sel; // previous SEL pin state
 };
 
 

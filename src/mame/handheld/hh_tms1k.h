@@ -53,7 +53,7 @@ protected:
 	output_finder<> m_out_power; // power state, eg. led
 
 	// misc common
-	u16 m_r = 0U;                        // MCU R-pins data
+	u32 m_r = 0U;                        // MCU R-pins data
 	u16 m_o = 0U;                        // MCU O-pins data
 	u32 m_inp_mux = 0U;                  // multiplexed inputs mask
 	bool m_power_on = false;
@@ -65,7 +65,7 @@ protected:
 	u8 read_rotated_inputs(int columns, u8 rowmask = 0xf);
 	virtual DECLARE_WRITE_LINE_MEMBER(auto_power_off);
 	virtual void power_off();
-	void set_power(bool state);
+	virtual void set_power(bool state);
 	void switch_change(int sel, u32 mask, bool next);
 };
 

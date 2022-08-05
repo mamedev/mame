@@ -80,9 +80,9 @@ private:
 
 // methods
 std::string_view strtrimright_cbm(std::string_view str);
-template<size_t N> std::string_view strtrimright_cbm(const char(&str)[N]);
+template<size_t N> std::string_view strtrimright_cbm(const char (&str)[N]);
 
-};
+} // anonymous namespace
 
 
 //-------------------------------------------------
@@ -473,4 +473,4 @@ u8 impl::block_iterator::size() const
 	return m_track != 0x00 ? 254 : m_sector - 1;
 }
 
-}
+} // anonymous namespace
