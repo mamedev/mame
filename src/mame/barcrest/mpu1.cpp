@@ -310,13 +310,13 @@ TIMER_CALLBACK_MEMBER( mpu1_state::reel_move )
 static INPUT_PORTS_START( mpu1_inputs )
 	PORT_START("IN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_POKER_CANCEL ) PORT_NAME("Cancel")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_POKER_CANCEL )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Refill Key") PORT_TOGGLE
 
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("5p") PORT_CHANGED_MEMBER(DEVICE_SELF, mpu1_state, coin_input, 0) PORT_IMPULSE(2)
@@ -406,9 +406,9 @@ void mpu1_state::machine_reset()
 
 void mpu1_state::mpu1(machine_config &config)
 {
-	M6800(config, m_maincpu, 1_MHz_XTAL); /* On MPU1, the clock comes from a multivibrator circuit varying somewhere around 1 MHz from
-	                                         board to board. This results in for example slightly different sound pitch across machines.
-	                                         MPU2 replaced this with a crystal for a stable clock, which I'm using here. */
+	M6800(config, m_maincpu, 1'000'000); /* On MPU1, the clock comes from a multivibrator circuit varying somewhere around 1 MHz from
+	                                        board to board. This results in for example slightly different sound pitch across machines.
+	                                        I've set a stable 1 MHz clock here, which is also the case on MPU2. */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpu1_state::mpu1_map);
 
 	TIMER(config, "nmi").configure_periodic(FUNC(mpu1_state::nmi), attotime::from_hz(100)); // From AC zero crossing detector
