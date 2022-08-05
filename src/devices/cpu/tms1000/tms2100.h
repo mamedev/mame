@@ -66,18 +66,13 @@ public:
 	tms2100_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	tms2100_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map);
+	tms2100_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map);
 
 	// overrides
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-
-	virtual u8 stack_levels() override { return 4; } // 4-level stack
-	virtual void op_br() override { op_br2(); } // "
-	virtual void op_call() override { op_call2(); } // "
-	virtual void op_retn() override { op_retn2(); } // "
 };
 
 class tms2170_cpu_device : public tms2100_cpu_device
@@ -92,7 +87,7 @@ public:
 	tms2300_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	tms2300_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map);
+	tms2300_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map);
 };
 
 class tms2370_cpu_device : public tms2300_cpu_device

@@ -24,27 +24,27 @@ DEFINE_DEVICE_TYPE(TMS2370, tms2370_cpu_device, "tms2370", "Texas Instruments TM
 
 // device definitions
 tms2100_cpu_device::tms2100_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	tms2100_cpu_device(mconfig, TMS2100, tag, owner, clock, 8 /* o pins */, 7 /* r pins */, 6 /* pc bits */, 8 /* byte width */, 3 /* x width */, 11 /* rom width */, address_map_constructor(FUNC(tms2100_cpu_device::rom_11bit), this), 7 /* ram width */, address_map_constructor(FUNC(tms2100_cpu_device::ram_7bit), this))
+	tms2100_cpu_device(mconfig, TMS2100, tag, owner, clock, 8 /* o pins */, 7 /* r pins */, 6 /* pc bits */, 8 /* byte width */, 3 /* x width */, 4 /* stack levels */, 11 /* rom width */, address_map_constructor(FUNC(tms2100_cpu_device::rom_11bit), this), 7 /* ram width */, address_map_constructor(FUNC(tms2100_cpu_device::ram_7bit), this))
 { }
 
-tms2100_cpu_device::tms2100_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map) :
-	tms1100_cpu_device(mconfig, type, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, rom_width, rom_map, ram_width, ram_map)
+tms2100_cpu_device::tms2100_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map) :
+	tms1100_cpu_device(mconfig, type, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, stack_levels, rom_width, rom_map, ram_width, ram_map)
 { }
 
 tms2170_cpu_device::tms2170_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	tms2100_cpu_device(mconfig, TMS2170, tag, owner, clock, 8, 6, 6, 8, 3, 11, address_map_constructor(FUNC(tms2170_cpu_device::rom_11bit), this), 7, address_map_constructor(FUNC(tms2170_cpu_device::ram_7bit), this))
+	tms2100_cpu_device(mconfig, TMS2170, tag, owner, clock, 8, 6, 6, 8, 3, 4, 11, address_map_constructor(FUNC(tms2170_cpu_device::rom_11bit), this), 7, address_map_constructor(FUNC(tms2170_cpu_device::ram_7bit), this))
 { }
 
 tms2300_cpu_device::tms2300_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	tms2300_cpu_device(mconfig, TMS2300, tag, owner, clock, 8, 15, 6, 8, 3, 11, address_map_constructor(FUNC(tms2300_cpu_device::rom_11bit), this), 7, address_map_constructor(FUNC(tms2300_cpu_device::ram_7bit), this))
+	tms2300_cpu_device(mconfig, TMS2300, tag, owner, clock, 8, 15, 6, 8, 3, 4, 11, address_map_constructor(FUNC(tms2300_cpu_device::rom_11bit), this), 7, address_map_constructor(FUNC(tms2300_cpu_device::ram_7bit), this))
 { }
 
-tms2300_cpu_device::tms2300_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map) :
-	tms2100_cpu_device(mconfig, type, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, rom_width, rom_map, ram_width, ram_map)
+tms2300_cpu_device::tms2300_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map) :
+	tms2100_cpu_device(mconfig, type, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, stack_levels, rom_width, rom_map, ram_width, ram_map)
 { }
 
 tms2370_cpu_device::tms2370_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	tms2300_cpu_device(mconfig, TMS2370, tag, owner, clock, 8, 14, 6, 8, 3, 11, address_map_constructor(FUNC(tms2370_cpu_device::rom_11bit), this), 7, address_map_constructor(FUNC(tms2370_cpu_device::ram_7bit), this))
+	tms2300_cpu_device(mconfig, TMS2370, tag, owner, clock, 8, 14, 6, 8, 3, 4, 11, address_map_constructor(FUNC(tms2370_cpu_device::rom_11bit), this), 7, address_map_constructor(FUNC(tms2370_cpu_device::ram_7bit), this))
 { }
 
 

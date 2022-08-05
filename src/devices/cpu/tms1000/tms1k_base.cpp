@@ -71,7 +71,7 @@ unknown cycle: CME, SSE, SSS
 #include "emu.h"
 #include "tms1k_base.h"
 
-tms1k_base_device::tms1k_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map) :
+tms1k_base_device::tms1k_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_BIG, byte_bits > 8 ? 16 : 8, rom_width, byte_bits > 8 ? -1 : 0, rom_map),
 	m_data_config("data", ENDIANNESS_BIG, 8, ram_width, 0, ram_map),
@@ -85,6 +85,7 @@ tms1k_base_device::tms1k_base_device(const machine_config &mconfig, device_type 
 	m_pc_bits(pc_bits),
 	m_byte_bits(byte_bits),
 	m_x_bits(x_bits),
+	m_stack_levels(stack_levels),
 	m_output_pla_table(nullptr),
 	m_read_k(*this),
 	m_write_o(*this),
@@ -398,110 +399,112 @@ void tms1k_base_device::set_cki_bus()
 
 // handle branches:
 
-// TMS1000/common
-// note: add(latch) and bl(branch latch) are specific to 0980 series,
-// c(chapter) bits are specific to 1100(and 1400) series
+// add(latch) and bl(branch latch) are specific to 0980 series, c(chapter) bits are specific to 1100(and 1400) series
+// TMS1400 and up and the CMOS chips have multiple stack levels, branches work a bit differently
 
 void tms1k_base_device::op_br()
 {
 	// BR/BL: conditional branch
-	if (m_status)
+	if (m_stack_levels == 1)
 	{
-		if (m_clatch == 0)
-			m_pa = m_pb;
-		m_ca = m_cb;
-		m_pc = m_opcode & m_pc_mask;
+		if (m_status)
+		{
+			if (m_clatch == 0)
+				m_pa = m_pb;
+
+			m_ca = m_cb;
+			m_pc = m_opcode & m_pc_mask;
+		}
+	}
+	else
+	{
+		if (m_status)
+		{
+			m_pa = m_pb; // don't care about clatch
+			m_ca = m_cb;
+			m_pc = m_opcode & m_pc_mask;
+		}
 	}
 }
 
 void tms1k_base_device::op_call()
 {
 	// CALL/CALLL: conditional call
-	if (m_status)
+	if (m_stack_levels == 1)
 	{
-		u8 prev_pa = m_pa;
-
-		if (m_clatch == 0)
+		if (m_status)
 		{
-			m_clatch = 1;
-			m_sr = m_pc;
-			m_pa = m_pb;
-			m_cs = m_ca;
+			u8 prev_pa = m_pa;
+
+			if (!m_clatch)
+			{
+				m_clatch = 1;
+				m_sr = m_pc;
+				m_pa = m_pb;
+				m_cs = m_ca;
+			}
+
+			m_ca = m_cb;
+			m_pb = prev_pa;
+			m_pc = m_opcode & m_pc_mask;
 		}
-		m_ca = m_cb;
-		m_pb = prev_pa;
-		m_pc = m_opcode & m_pc_mask;
+	}
+	else
+	{
+		if (m_status)
+		{
+			// mask clatch bits (no need to mask others)
+			u8 smask = (1 << m_stack_levels) - 1;
+			m_clatch = (m_clatch << 1 | 1) & smask;
+
+			m_sr = m_sr << m_pc_bits | m_pc;
+			m_pc = m_opcode & m_pc_mask;
+
+			m_ps = m_ps << 4 | m_pa;
+			m_pa = m_pb;
+
+			m_cs = m_cs << 2 | m_ca;
+			m_ca = m_cb;
+		}
+		else
+		{
+			m_pb = m_pa;
+			m_cb = m_ca;
+		}
 	}
 }
 
 void tms1k_base_device::op_retn()
 {
 	// RETN: return from subroutine
-	if (m_clatch == 1)
+	if (m_stack_levels == 1)
 	{
-		m_clatch = 0;
-		m_pc = m_sr;
-		m_ca = m_cs;
-	}
-	m_add = 0;
-	m_bl = 0;
-	m_pa = m_pb;
-}
+		if (m_clatch)
+		{
+			m_clatch = 0;
+			m_pc = m_sr;
+			m_ca = m_cs;
+		}
 
-
-// TMS1400/TMS1000C multiple level stack version
-
-void tms1k_base_device::op_br2()
-{
-	// BR/BL: conditional branch
-	if (m_status)
-	{
-		m_pa = m_pb; // don't care about clatch
-		m_ca = m_cb;
-		m_pc = m_opcode & m_pc_mask;
-	}
-}
-
-void tms1k_base_device::op_call2()
-{
-	// CALL/CALLL: conditional call
-	if (m_status)
-	{
-		// mask clatch bits (no need to mask others)
-		u8 smask = (1 << stack_levels()) - 1;
-		m_clatch = (m_clatch << 1 | 1) & smask;
-
-		m_sr = m_sr << m_pc_bits | m_pc;
-		m_pc = m_opcode & m_pc_mask;
-
-		m_ps = m_ps << 4 | m_pa;
+		m_add = 0;
+		m_bl = 0;
 		m_pa = m_pb;
-
-		m_cs = m_cs << 2 | m_ca;
-		m_ca = m_cb;
 	}
 	else
 	{
-		m_pb = m_pa;
-		m_cb = m_ca;
-	}
-}
+		if (m_clatch & 1)
+		{
+			m_clatch >>= 1;
 
-void tms1k_base_device::op_retn2()
-{
-	// RETN: return from subroutine
-	if (m_clatch & 1)
-	{
-		m_clatch >>= 1;
+			m_pc = m_sr & m_pc_mask;
+			m_sr >>= m_pc_bits;
 
-		m_pc = m_sr & m_pc_mask;
-		m_sr >>= m_pc_bits;
+			m_pa = m_pb = m_ps & 0xf;
+			m_ps >>= 4;
 
-		m_pa = m_pb = m_ps & 0xf;
-		m_ps >>= 4;
-
-		m_ca = m_cb = m_cs & 3;
-		m_cs >>= 2;
+			m_ca = m_cb = m_cs & 3;
+			m_cs >>= 2;
+		}
 	}
 }
 

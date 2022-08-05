@@ -22,7 +22,7 @@ DEFINE_DEVICE_TYPE(TMS0270, tms0270_cpu_device, "tms0270", "Texas Instruments TM
 
 // device definitions
 tms0270_cpu_device::tms0270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	tms0980_cpu_device(mconfig, TMS0270, tag, owner, clock, 16 /* o pins */, 16 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 11 /* rom width */, address_map_constructor(FUNC(tms0270_cpu_device::rom_11bit), this), 8 /* ram width */, address_map_constructor(FUNC(tms0270_cpu_device::ram_144x4), this))
+	tms0980_cpu_device(mconfig, TMS0270, tag, owner, clock, 16 /* o pins */, 16 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 1 /* stack levels */, 11 /* rom width */, address_map_constructor(FUNC(tms0270_cpu_device::rom_11bit), this), 8 /* ram width */, address_map_constructor(FUNC(tms0270_cpu_device::ram_144x4), this))
 { }
 
 
