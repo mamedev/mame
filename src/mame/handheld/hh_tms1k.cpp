@@ -55,6 +55,7 @@ TODO:
 - tithermos temperature sensor comparator (right now just the digital clock works)
 - is alphie(patent) the same as the final version?
 - is starwbcp the same as MP3438? (starwbc is MP3438A)
+- tgpachi is not working: incomplete MCU emulation, no SVG
 
 ============================================================================
 
@@ -184,7 +185,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MPF553   TMS1670   1980, Gakken/Entex Jackpot: Gin Rummy & Black Jack (6008) (note: assume F to be a misprint)
   MP7573   TMS1670   1981, Entex Select-A-Game cartridge: Football 4 -> entex/sag.cpp
  *M30026   TMS2370   1983, Yaesu FT-757 Display Unit part
- *M95041   TMS2670   1983, Tsukuda Game Pachinko (have decap, missing MCU emulation)
+ @M95041   TMS2670   1983, Tsukuda Game Pachinko
 
   inconsistent:
 
@@ -311,7 +312,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "xl25.lh" // clickable
 #include "zodiac.lh" // clickable
 
-//#include "hh_tms1k_test.lh" // common test-layout - use external artwork
+#include "hh_tms1k_test.lh" // common test-layout - use external artwork
 
 
 // machine_start/reset
@@ -14264,6 +14265,101 @@ ROM_END
 
 /***************************************************************************
 
+  Tsukuda Game Pachinko
+  * PCB label: TOFL003
+  * TMS2670 M95041 (die label: TMS2400, M95041, 40H-01D-ND02-PHI0032-TTL O300-R300)
+  * TMS1024 I/O expander
+  * cyan/red/green VFD display NEC FIP9AM31T no. 21-84, 1-bit sound
+
+***************************************************************************/
+
+class tgpachi_state : public hh_tms1k_state
+{
+public:
+	tgpachi_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag),
+		m_expander(*this, "expander")
+	{ }
+
+	void tgpachi(machine_config &config);
+
+private:
+	required_device<tms1024_device> m_expander;
+	void expander_w(offs_t offset, u8 data);
+
+	virtual void write_r(u32 data);
+	virtual void write_o(u16 data);
+};
+
+// handlers
+
+void tgpachi_state::expander_w(offs_t offset, u8 data)
+{
+}
+
+void tgpachi_state::write_r(u32 data)
+{
+}
+
+void tgpachi_state::write_o(u16 data)
+{
+}
+
+// config
+
+static INPUT_PORTS_START( tgpachi )
+	PORT_START("IN.0") // K
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // Slot
+INPUT_PORTS_END
+
+void tgpachi_state::tgpachi(machine_config &config)
+{
+	// basic machine hardware
+	TMS2670(config, m_maincpu, 450000); // approximation - RC osc. R=47K, C=47pF
+	m_maincpu->k().set_ioport("IN.0");
+	m_maincpu->r().set(FUNC(tgpachi_state::write_r));
+	m_maincpu->o().set(FUNC(tgpachi_state::write_o));
+
+	TMS1024(config, m_expander).set_ms(1); // MS tied high
+	m_expander->write_port4_callback().set(FUNC(tgpachi_state::expander_w));
+	m_expander->write_port5_callback().set(FUNC(tgpachi_state::expander_w));
+	m_expander->write_port6_callback().set(FUNC(tgpachi_state::expander_w));
+	m_expander->write_port7_callback().set(FUNC(tgpachi_state::expander_w));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(8, 20);
+	config.set_default_layout(layout_hh_tms1k_test);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( tgpachi )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "m95041", 0x0000, 0x1000, CRC(18b39629) SHA1(46bbe2028717ab4a1ca92f45496f7636e1c81fcf) )
+
+	ROM_REGION( 759, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms2100_common1_micro.pla", 0, 759, CRC(4a60382f) SHA1(f66ed530ca3869367fc7afacd0b985d555781ba2) )
+	ROM_REGION( 557, "maincpu:opla", 0 )
+	ROM_LOAD( "tms2100_tgpachi_output.pla", 0, 557, CRC(90849b91) SHA1(ed19444b655c48bbf2a662478d46c045d900080d) )
+
+	ROM_REGION( 100000, "screen", 0)
+	ROM_LOAD( "tgpachi.svg", 0, 100000, NO_DUMP )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   U.S. Games Super Sports-4
   * TMS1100 MP1219 (no decap)
   * 4 7seg LEDs, 49 other LEDs, 1-bit sound
@@ -14726,6 +14822,7 @@ CONS( 1979, tbreakup,   0,         0, tbreakup,  tbreakup,  tbreakup_state,  emp
 CONS( 1980, phpball,    0,         0, phpball,   phpball,   phpball_state,   empty_init, "Tomy", "Power House Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 CONS( 1982, tdracula,   0,         0, tdracula,  tdracula,  tdracula_state,  empty_init, "Tsukuda", "The Dracula (Tsukuda)", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, tgpachi,    0,         0, tgpachi,   tgpachi,   tgpachi_state,   empty_init, "Tsukuda", "Game Pachinko", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 CONS( 1980, ssports4,   0,         0, ssports4,  ssports4,  ssports4_state,  empty_init, "U.S. Games", "Super Sports-4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
