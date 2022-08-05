@@ -20,37 +20,25 @@ DEFINE_DEVICE_TYPE(TMS1300, tms1300_cpu_device, "tms1300", "Texas Instruments TM
 DEFINE_DEVICE_TYPE(TMS1370, tms1370_cpu_device, "tms1370", "Texas Instruments TMS1370") // high voltage version, also seen in 28-pin package(some O/R pins unavailable)
 
 
-// internal memory maps
-void tms1100_cpu_device::program_11bit_8(address_map &map)
-{
-	map(0x000, 0x7ff).rom();
-}
-
-void tms1100_cpu_device::data_128x4(address_map &map)
-{
-	map(0x00, 0x7f).ram();
-}
-
-
 // device definitions
-tms1100_cpu_device::tms1100_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms1100_cpu_device(mconfig, TMS1100, tag, owner, clock, 8 /* o pins */, 11 /* r pins */, 6 /* pc bits */, 8 /* byte width */, 3 /* x width */, 11 /* prg width */, address_map_constructor(FUNC(tms1100_cpu_device::program_11bit_8), this), 7 /* data width */, address_map_constructor(FUNC(tms1100_cpu_device::data_128x4), this))
+tms1100_cpu_device::tms1100_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	tms1100_cpu_device(mconfig, TMS1100, tag, owner, clock, 8 /* o pins */, 11 /* r pins */, 6 /* pc bits */, 8 /* byte width */, 3 /* x width */, 11 /* rom width */, address_map_constructor(FUNC(tms1100_cpu_device::rom_11bit), this), 7 /* ram width */, address_map_constructor(FUNC(tms1100_cpu_device::ram_7bit), this))
 { }
 
-tms1100_cpu_device::tms1100_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
-	: tms1000_cpu_device(mconfig, type, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, prgwidth, program, datawidth, data)
+tms1100_cpu_device::tms1100_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map) :
+	tms1000_cpu_device(mconfig, type, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, rom_width, rom_map, ram_width, ram_map)
 { }
 
-tms1170_cpu_device::tms1170_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms1100_cpu_device(mconfig, TMS1170, tag, owner, clock, 8, 11, 6, 8, 3, 11, address_map_constructor(FUNC(tms1170_cpu_device::program_11bit_8), this), 7, address_map_constructor(FUNC(tms1170_cpu_device::data_128x4), this))
+tms1170_cpu_device::tms1170_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	tms1100_cpu_device(mconfig, TMS1170, tag, owner, clock, 8, 11, 6, 8, 3, 11, address_map_constructor(FUNC(tms1170_cpu_device::rom_11bit), this), 7, address_map_constructor(FUNC(tms1170_cpu_device::ram_7bit), this))
 { }
 
-tms1300_cpu_device::tms1300_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms1100_cpu_device(mconfig, TMS1300, tag, owner, clock, 8, 16, 6, 8, 3, 11, address_map_constructor(FUNC(tms1300_cpu_device::program_11bit_8), this), 7, address_map_constructor(FUNC(tms1300_cpu_device::data_128x4), this))
+tms1300_cpu_device::tms1300_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	tms1100_cpu_device(mconfig, TMS1300, tag, owner, clock, 8, 16, 6, 8, 3, 11, address_map_constructor(FUNC(tms1300_cpu_device::rom_11bit), this), 7, address_map_constructor(FUNC(tms1300_cpu_device::ram_7bit), this))
 { }
 
-tms1370_cpu_device::tms1370_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms1100_cpu_device(mconfig, TMS1370, tag, owner, clock, 8, 16, 6, 8, 3, 11, address_map_constructor(FUNC(tms1370_cpu_device::program_11bit_8), this), 7, address_map_constructor(FUNC(tms1370_cpu_device::data_128x4), this))
+tms1370_cpu_device::tms1370_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	tms1100_cpu_device(mconfig, TMS1370, tag, owner, clock, 8, 16, 6, 8, 3, 11, address_map_constructor(FUNC(tms1370_cpu_device::rom_11bit), this), 7, address_map_constructor(FUNC(tms1370_cpu_device::ram_7bit), this))
 { }
 
 

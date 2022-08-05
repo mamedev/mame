@@ -71,29 +71,29 @@ unknown cycle: CME, SSE, SSS
 #include "emu.h"
 #include "tms1k_base.h"
 
-tms1k_base_device::tms1k_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
-	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_BIG, byte_bits > 8 ? 16 : 8, prgwidth, byte_bits > 8 ? -1 : 0, program)
-	, m_data_config("data", ENDIANNESS_BIG, 8, datawidth, 0, data)
-	, m_mpla(*this, "mpla")
-	, m_ipla(*this, "ipla")
-	, m_opla(*this, "opla")
-	, m_opla_b(*this, "opla_b")
-	, m_spla(*this, "spla")
-	, m_o_pins(o_pins)
-	, m_r_pins(r_pins)
-	, m_pc_bits(pc_bits)
-	, m_byte_bits(byte_bits)
-	, m_x_bits(x_bits)
-	, m_output_pla_table(nullptr)
-	, m_read_k(*this)
-	, m_write_o(*this)
-	, m_write_r(*this)
-	, m_power_off(*this)
-	, m_read_ctl(*this)
-	, m_write_ctl(*this)
-	, m_write_pdc(*this)
-	, m_decode_micro(*this)
+tms1k_base_device::tms1k_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map) :
+	cpu_device(mconfig, type, tag, owner, clock),
+	m_program_config("program", ENDIANNESS_BIG, byte_bits > 8 ? 16 : 8, rom_width, byte_bits > 8 ? -1 : 0, rom_map),
+	m_data_config("data", ENDIANNESS_BIG, 8, ram_width, 0, ram_map),
+	m_mpla(*this, "mpla"),
+	m_ipla(*this, "ipla"),
+	m_opla(*this, "opla"),
+	m_opla_b(*this, "opla_b"),
+	m_spla(*this, "spla"),
+	m_o_pins(o_pins),
+	m_r_pins(r_pins),
+	m_pc_bits(pc_bits),
+	m_byte_bits(byte_bits),
+	m_x_bits(x_bits),
+	m_output_pla_table(nullptr),
+	m_read_k(*this),
+	m_write_o(*this),
+	m_write_r(*this),
+	m_power_off(*this),
+	m_read_ctl(*this),
+	m_write_ctl(*this),
+	m_write_pdc(*this),
+	m_decode_micro(*this)
 { }
 
 // disasm
@@ -273,6 +273,42 @@ void tms1k_base_device::device_reset()
 	write_o_output(0);
 	m_write_r(m_r & m_r_mask);
 	m_power_off(0);
+}
+
+
+
+//-------------------------------------------------
+//  common internal memory maps
+//-------------------------------------------------
+
+void tms1k_base_device::rom_10bit(address_map &map)
+{
+	map(0x000, 0x3ff).rom();
+}
+
+void tms1k_base_device::rom_11bit(address_map &map)
+{
+	map(0x000, 0x7ff).rom();
+}
+
+void tms1k_base_device::rom_12bit(address_map &map)
+{
+	map(0x000, 0xfff).rom();
+}
+
+void tms1k_base_device::ram_6bit(address_map &map)
+{
+	map(0x00, 0x3f).ram();
+}
+
+void tms1k_base_device::ram_7bit(address_map &map)
+{
+	map(0x00, 0x7f).ram();
+}
+
+void tms1k_base_device::ram_8bit(address_map &map)
+{
+	map(0x00, 0xff).ram();
 }
 
 

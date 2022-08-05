@@ -51,7 +51,7 @@ public:
 
 protected:
 	// construction/destruction
-	tms1k_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+	tms1k_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -126,6 +126,13 @@ protected:
 		F_SEAC  = (1<<19),
 		F_XDA   = (1<<20)
 	};
+
+	void rom_10bit(address_map &map);
+	void rom_11bit(address_map &map);
+	void rom_12bit(address_map &map);
+	void ram_6bit(address_map &map);
+	void ram_7bit(address_map &map);
+	void ram_8bit(address_map &map);
 
 	void next_pc();
 
