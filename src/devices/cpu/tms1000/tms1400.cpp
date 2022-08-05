@@ -17,7 +17,7 @@
 // - rotate the view and mirror the OR-mask to get the proper layout of the mpla, the default is identical to tms1100
 // - the opla size is increased from 20 to 32 terms
 DEFINE_DEVICE_TYPE(TMS1400, tms1400_cpu_device, "tms1400", "Texas Instruments TMS1400") // 28-pin DIP, 11 R pins (TMS1400CR is same, but with TMS1100 pinout)
-DEFINE_DEVICE_TYPE(TMS1470, tms1470_cpu_device, "tms1470", "Texas Instruments TMS1470") // high voltage version, 1 R pin removed for Vdd
+DEFINE_DEVICE_TYPE(TMS1470, tms1470_cpu_device, "tms1470", "Texas Instruments TMS1470") // high voltage version, 1 R pin removed for Vpp
 DEFINE_DEVICE_TYPE(TMS1475, tms1475_cpu_device, "tms1475", "Texas Instruments TMS1475") // 40-pin DIP, 22 R pins
 
 // TMS1600 adds more I/O to the TMS1400, input pins are doubled with added L1,2,4,8

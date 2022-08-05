@@ -33,6 +33,8 @@
    INIT 13 |           | 16 K4
      K1 14 |___________| 15 K2
 
+  note: TMS1470 changes R10 to Vpp, and should otherwise be the same as TMS1400
+
 */
 
 

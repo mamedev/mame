@@ -2409,6 +2409,8 @@ end
 --@src/devices/cpu/tms1000/tms1000c.h,CPUS["TMS1000"] = true
 --@src/devices/cpu/tms1000/tms1100.h,CPUS["TMS1000"] = true
 --@src/devices/cpu/tms1000/tms1400.h,CPUS["TMS1000"] = true
+--@src/devices/cpu/tms1000/tms2100.h,CPUS["TMS1000"] = true
+--@src/devices/cpu/tms1000/tms2400.h,CPUS["TMS1000"] = true
 --@src/devices/cpu/tms1000/tms0970.h,CPUS["TMS1000"] = true
 --@src/devices/cpu/tms1000/tms0980.h,CPUS["TMS1000"] = true
 --@src/devices/cpu/tms1000/tms0270.h,CPUS["TMS1000"] = true
@@ -2427,6 +2429,10 @@ if CPUS["TMS1000"] then
 		MAME_DIR .. "src/devices/cpu/tms1000/tms1100.h",
 		MAME_DIR .. "src/devices/cpu/tms1000/tms1400.cpp",
 		MAME_DIR .. "src/devices/cpu/tms1000/tms1400.h",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms2100.cpp",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms2100.h",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms2400.cpp",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms2400.h",
 		MAME_DIR .. "src/devices/cpu/tms1000/tms0970.cpp",
 		MAME_DIR .. "src/devices/cpu/tms1000/tms0970.h",
 		MAME_DIR .. "src/devices/cpu/tms1000/tms0980.cpp",
