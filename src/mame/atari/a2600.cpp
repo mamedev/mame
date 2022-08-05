@@ -727,7 +727,7 @@ ROM_END
 
 #define rom_a2600p rom_a2600
 
-ROM_START( a2600_pop )
+ROM_START(a2600_pop)
 	ROM_REGION(0x30000, "maincpu", 0)
 	// Boot/Game selection
 	ROM_LOAD("136003_101.c6", 0x000, 0x800, CRC(9d3cfba6) SHA1(b84c34aaedd84fca30b6e8223ee062439acf4fe0))
@@ -801,18 +801,18 @@ ROM_START( a2600_pop )
 	// empty slots f1, j1, k1, l1, m1 ?
 ROM_END
 
-ROM_START( tvboyii )
-	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
+ROM_START(tvboyii)
+	ROM_REGION(0x2000, "maincpu", ROMREGION_ERASEFF)
 
-	ROM_REGION( 0x80000, "mainrom", 0 )
-	ROM_LOAD( "hy23400p.bin", 0x00000, 0x80000, CRC(f8485173) SHA1(cafbaa0c5437f192cb4fb49f9a672846aa038870) )
+	ROM_REGION(0x80000, "mainrom", 0)
+	ROM_LOAD("hy23400p.bin", 0x00000, 0x80000, CRC(f8485173) SHA1(cafbaa0c5437f192cb4fb49f9a672846aa038870))
 ROM_END
 
 ROM_START( stvboy )
-	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION(0x2000, "maincpu", ROMREGION_ERASEFF)
 
-	ROM_REGION( 0x80000, "mainrom", 0 )
-	ROM_LOAD( "supertvboy.bin", 0x00000, 0x80000, CRC(af2e73e8) SHA1(04b9ddc3b30b0e5b81b9f868d455e902a0151491) )
+	ROM_REGION(0x80000, "mainrom", 0)
+	ROM_LOAD("supertvboy.bin", 0x00000, 0x80000, CRC(af2e73e8) SHA1(04b9ddc3b30b0e5b81b9f868d455e902a0151491))
 ROM_END
 
 } // anonymous namespace
