@@ -495,6 +495,9 @@ protected:
 		V_DAC        = 0x073,  // IE1.6   IP1.6
 		V_SFS_INT    = 0x07b,  // IE1.7   IP1.7
 	};
+
+	int irq_hack_ctr = 0;
+
 };
 
 

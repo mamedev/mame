@@ -151,8 +151,17 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 
 	case 0x12: case 0x16: case 0x1a: case 0x1e:
 	{
+		// INC16 ERn
 		uint8_t n = (prm & 0x0c) >> 2;
-		fatalerror("%s: INC16 ER%01x", machine().describe_context(), n);
+
+		uint16_t val = get_erx(n);
+		val = val + 1;
+		set_erx(n, val);
+
+		if (!val)
+			SET_EZ(1);
+		else
+			SET_EZ(0);
 		break;
 	}
 
@@ -256,16 +265,27 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 
 	case 0x80: case 0x81: case 0x84: case 0x85: case 0x88: case 0x89: case 0x8c: case 0x8d:
 	{
+		// MOV16 ERn, DPTRi
+
 		uint8_t n = (prm & 0x0c) >> 2;
 		uint8_t i = (prm & 0x01) >> 0;
 
-		fatalerror("%s: MOV16 ER%01x, EDP%01x", machine().describe_context(), n, i);
+		uint16_t dpt = get_dpt(i);
+		uint16_t val = m_io.read_byte(dpt);
+
+		set_erx(n, val);
+
+		if (!val)
+			SET_EZ(1);
+		else
+			SET_EZ(0);
+
 		break;
 	}
 
 	case 0x82: case 0x83: case 0x86: case 0x87: case 0x8a: case 0x8b: case 0x8e: case 0x8f:
 	{
-		// MOV16 DPTR0i, ERn
+		// MOV16 DPTRi, ERn
 		uint8_t n = (prm & 0x0c) >> 2;
 		uint8_t i = (prm & 0x01) >> 0;
 
@@ -502,10 +522,29 @@ void axc51base_cpu_device::extended_a5_0f()
 	case 0x60: case 0x61: case 0x62: case 0x63: case 0x64: case 0x65: case 0x66: case 0x67: case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f:
 	case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77: case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
 	{
+		// SUB16 ERp, ERn, ERm
+
 		uint8_t p = (prm2 & 0x30) >> 4;
 		uint8_t n = (prm2 & 0x0c) >> 2;
 		uint8_t m = (prm2 & 0x03) >> 0;
-		fatalerror("%s: SUB16 ER%01x, ER%01x, ER%01x", machine().describe_context(), p, n, m);
+
+		uint16_t val = get_erx(n);
+		uint16_t val2 = get_erx(m);
+		uint32_t res = val - val2 - (GET_EC);
+		set_erx(p, res);
+
+		if (res & 0xffff0000)
+			SET_EC(1);
+		else
+			SET_EC(0);
+
+		res &= 0xffff;
+
+		if (!res)
+			SET_EZ(1);
+		else
+			SET_EZ(0);
+
 		break;
 	}
 

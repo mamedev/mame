@@ -881,6 +881,44 @@ const uint8_t axc51base_cpu_device::axc51_cycles[256] = {
 
 void axc51base_cpu_device::check_irqs()
 {
+	irq_hack_ctr++;
+
+	if (irq_hack_ctr == 2000)
+	{
+		irq_hack_ctr = 0;
+	}
+	else
+	{
+		return;
+	}
+
+	if (!GET_EA)
+		return;
+
+	if (!GET_T0IRQEN)
+		return;
+
+	int base;
+
+	switch (m_sfr_regs[AXC51_DPCON - 0x80] & 0xc0)
+	{
+	case 0x00:
+	case 0xc0:
+		return; // invalid
+
+	case 0x80:
+		return;
+		//base = 0x8000;
+		//break;
+
+	case 0x40:
+		base = 0x4000;
+		break;
+	}
+	
+	push_pc();
+	m_pc = base + 0x0003;
+
 }
 
 void axc51base_cpu_device::burn_cycles(int cycles)
@@ -947,84 +985,90 @@ void axc51base_cpu_device::sfr_write(size_t offset, uint8_t data)
 
 	switch (offset)
 	{
-		case ADDR_P0:   m_port_out_cb[0](data);             break;
-		case ADDR_P1:   m_port_out_cb[1](data);             break;
-		case ADDR_P2:   m_port_out_cb[2](data);             break;
-		case ADDR_P3:   m_port_out_cb[3](data);             break;
-		case ADDR_PSW:  SET_PARITY();                       break;
-		case ADDR_ACC:  SET_PARITY();                       break;
-		case ADDR_IP:   update_irq_prio(data, 0);  break;
+	case ADDR_P0:   m_port_out_cb[0](data);             break;
+	case ADDR_P1:   m_port_out_cb[1](data);             break;
+	case ADDR_P2:   m_port_out_cb[2](data);             break;
+	case ADDR_P3:   m_port_out_cb[3](data);             break;
+	case ADDR_PSW:  SET_PARITY();                       break;
+	case ADDR_ACC:  SET_PARITY();                       break;
+	case ADDR_IP:   update_irq_prio(data, 0);  break;
 
-		case ADDR_B:
-		case ADDR_SP:
-		case ADDR_DPL0:
-		case ADDR_DPH0:
-		case ADDR_PCON:
-			break;
+	case ADDR_B:
+	case ADDR_SP:
+	case ADDR_DPL0:
+	case ADDR_DPH0:
+	case ADDR_PCON:
+		break;
 
-		case ADDR_IE:
-			break;
+	case AXC51_DPL1: // 0x84
+	case AXC51_DPH1: // 0x85
+		break;
 
-		case AXC51_IE1:
-			break;
+	case ADDR_IE:
+		//	printf("ie %02x\n", data);
+		break;
 
-		case AXC51_GP0: // 0xa1
-		case AXC51_GP1: // 0xa2
-		case AXC51_GP2: // 0xa3
-		case AXC51_GP3: // 0xa4
-		case AXC51_GP4: // 0xb1
-		case AXC51_GP5: // 0xb2
-		case AXC51_GP6: // 0xb3
-		case AXC51_GP7: // 0xb5
-			break;
+	case AXC51_IE1:
+		//	printf("======== ie1 %02x\n", data);
+		break;
 
-		case AXC51_ER00: // 0xe6
-		case AXC51_ER01: // 0xe7
-		case AXC51_ER10: // 0xe8
-		case AXC51_ER11: // 0xe9
-		case AXC51_ER20: // 0xea
-		case AXC51_ER21: // 0xeb
-		case AXC51_ER30: // 0xec
-		case AXC51_ER31: // 0xed
-		case AXC51_ER8:  // 0xee
-			break;
+	case AXC51_GP0: // 0xa1
+	case AXC51_GP1: // 0xa2
+	case AXC51_GP2: // 0xa3
+	case AXC51_GP3: // 0xa4
+	case AXC51_GP4: // 0xb1
+	case AXC51_GP5: // 0xb2
+	case AXC51_GP6: // 0xb3
+	case AXC51_GP7: // 0xb5
+		break;
 
-		case AXC51_P4: // 0xb4
-			m_port_out_cb[4](data);
-			break;
+	case AXC51_ER00: // 0xe6
+	case AXC51_ER01: // 0xe7
+	case AXC51_ER10: // 0xe8
+	case AXC51_ER11: // 0xe9
+	case AXC51_ER20: // 0xea
+	case AXC51_ER21: // 0xeb
+	case AXC51_ER30: // 0xec
+	case AXC51_ER31: // 0xed
+	case AXC51_ER8:  // 0xee
+		break;
 
-		case AXC51_P3DIR: // 0xbd
-			break;
+	case AXC51_P4: // 0xb4
+		m_port_out_cb[4](data);
+		break;
 
-		case AXC51_TMR0CON: // 0xf8
-		case AXC51_TMR0CNT: // 0xf9
-		case AXC51_TMR0PR:  // 0xfa
-		case AXC51_TMR0PSR: // 0xfb
-			break;
+	case AXC51_P3DIR: // 0xbd
+		break;
 
-		case AXC51_IE2CRPT: // 0x95 controls automatic encryption
-			ie2crypt_w(data);
-			return;
+	case AXC51_TMR0CON: // 0xf8
+	case AXC51_TMR0CNT: // 0xf9
+	case AXC51_TMR0PR:  // 0xfa
+	case AXC51_TMR0PSR: // 0xfb
+		break;
 
-		case AXC51_DPCON: dpcon_w(data); return; // 0x86
+	case AXC51_IE2CRPT: // 0x95 controls automatic encryption
+		ie2crypt_w(data);
+		return;
 
-		case AXC51_DBASE: // 0x9b
-			logerror("%s: setting DBASE to %02x\n", machine().describe_context(), data );
-			m_sfr_regs[AXC51_DBASE - 0x80] = data;
-			return;
+	case AXC51_DPCON: dpcon_w(data); return; // 0x86
 
-
-		case AXC51_SPIDMAADR: spidmaadr_w(data); return; // 0xd6
-		case AXC51_SPIDMACNT: spidmacnt_w(data); return; // 0xd7
-		case AXC51_SPICON: spicon_w(data); return; // 0xd8
-		case AXC51_SPIBUF: spibuf_w(data); return; // 0xd9
-		case AXC51_SPIBAUD: spibaud_w(data); return; // 0xda
+	case AXC51_DBASE: // 0x9b
+		logerror("%s: setting DBASE to %02x\n", machine().describe_context(), data);
+		m_sfr_regs[AXC51_DBASE - 0x80] = data;
+		return;
 
 
-		default:
-			LOG(("%s: attemping to write to an invalid/non-implemented SFR address: %02x  data=%02x\n", machine().describe_context(), (uint32_t)offset, data));
-			/* no write in this case according to manual */
-			return;
+	case AXC51_SPIDMAADR: spidmaadr_w(data); return; // 0xd6
+	case AXC51_SPIDMACNT: spidmacnt_w(data); return; // 0xd7
+	case AXC51_SPICON: spicon_w(data); return; // 0xd8
+	case AXC51_SPIBUF: spibuf_w(data); return; // 0xd9
+	case AXC51_SPIBAUD: spibaud_w(data); return; // 0xda
+
+
+	default:
+		LOG(("%s: attemping to write to an invalid/non-implemented SFR address: %02x  data=%02x\n", machine().describe_context(), (uint32_t)offset, data));
+		/* no write in this case according to manual */
+		return;
 	}
 	m_sfr_regs[offset - 0x80] = data;
 }
@@ -1036,79 +1080,82 @@ uint8_t axc51base_cpu_device::sfr_read(size_t offset)
 	switch (offset)
 	{
 		/* Move to memory map */
-		case ADDR_P0:   return (P0 | m_forced_inputs[0]) & m_port_in_cb[0]();
-		case ADDR_P1:   return (P1 | m_forced_inputs[1]) & m_port_in_cb[1]();
-		case ADDR_P2:   return (P2 | m_forced_inputs[2]) & m_port_in_cb[2]();
-		case ADDR_P3:   return (P3 | m_forced_inputs[3]) & m_port_in_cb[3]();
+	case ADDR_P0:   return machine().rand();// (P0 | m_forced_inputs[0])& m_port_in_cb[0]();
+	case ADDR_P1:   return machine().rand(); // (P1 | m_forced_inputs[1]) & m_port_in_cb[1]();
+	case ADDR_P2:   return machine().rand(); // (P2 | m_forced_inputs[2]) & m_port_in_cb[2]();
+	case ADDR_P3:   return machine().rand(); // (P3 | m_forced_inputs[3]) & m_port_in_cb[3]();
 
-		case ADDR_PSW:
-		case ADDR_ACC:
-		case ADDR_B:
-		case ADDR_SP:
-		case ADDR_DPL0:
-		case ADDR_DPH0:
-		case ADDR_PCON:
-		case ADDR_IE:
-		case AXC51_IE1:
+	case ADDR_PSW:
+	case ADDR_ACC:
+	case ADDR_B:
+	case ADDR_SP:
+	case ADDR_DPL0:
+	case ADDR_DPH0:
+	case ADDR_PCON:
+	case ADDR_IE:
+	case AXC51_IE1:
 
-		case ADDR_IP:
+	case AXC51_DPL1: // 0x84
+	case AXC51_DPH1: // 0x85
 
-		case AXC51_GP0: // 0xa1
-		case AXC51_GP1: // 0xa2
-		case AXC51_GP2: // 0xa3
-		case AXC51_GP3: // 0xa4
-		case AXC51_GP4: // 0xb1
-		case AXC51_GP5: // 0xb2
-		case AXC51_GP6: // 0xb3
-		case AXC51_GP7: // 0xb5
+	case ADDR_IP:
 
-		case AXC51_ER00: // 0xe6
-		case AXC51_ER01: // 0xe7
-		case AXC51_ER10: // 0xe8
-		case AXC51_ER11: // 0xe9
-		case AXC51_ER20: // 0xea
-		case AXC51_ER21: // 0xeb
-		case AXC51_ER30: // 0xec
-		case AXC51_ER31: // 0xed
-		case AXC51_ER8:  // 0xee
+	case AXC51_GP0: // 0xa1
+	case AXC51_GP1: // 0xa2
+	case AXC51_GP2: // 0xa3
+	case AXC51_GP3: // 0xa4
+	case AXC51_GP4: // 0xb1
+	case AXC51_GP5: // 0xb2
+	case AXC51_GP6: // 0xb3
+	case AXC51_GP7: // 0xb5
 
-		case AXC51_TMR0CON: // 0xf8
-		case AXC51_TMR0CNT: // 0xf9
-		case AXC51_TMR0PR:  // 0xfa
-		case AXC51_TMR0PSR: // 0xfb
+	case AXC51_ER00: // 0xe6
+	case AXC51_ER01: // 0xe7
+	case AXC51_ER10: // 0xe8
+	case AXC51_ER11: // 0xe9
+	case AXC51_ER20: // 0xea
+	case AXC51_ER21: // 0xeb
+	case AXC51_ER30: // 0xec
+	case AXC51_ER31: // 0xed
+	case AXC51_ER8:  // 0xee
 
-		case AXC51_IE2CRPT: // 0x95 controls automatic encryption
-			return m_sfr_regs[offset-0x80];
+	case AXC51_TMR0CON: // 0xf8
+	case AXC51_TMR0CNT: // 0xf9
+	case AXC51_TMR0PR:  // 0xfa
+	case AXC51_TMR0PSR: // 0xfb
+
+	case AXC51_IE2CRPT: // 0x95 controls automatic encryption
+		return m_sfr_regs[offset - 0x80];
 
 
-		case AXC51_DPCON: // 0x86
-			return dpcon_r();
+	case AXC51_DPCON: // 0x86
+		return dpcon_r();
 
-		case AXC51_IRTCON: // 0x9f
-			return machine().rand();
+	case AXC51_IRTCON: // 0x9f
+		return machine().rand();
 
-		case AXC51_SPICON: // 0xd8
-			return spicon_r();
+	case AXC51_SPICON: // 0xd8
+		return spicon_r();
 
-		case AXC51_SPIBUF: // 0xd9
-			return spibuf_r();
+	case AXC51_SPIBUF: // 0xd9
+		return spibuf_r();
 
-		case AXC51_UID0: return m_uid[0]; // 0xe2 Chip-ID, can only be read from code in internal area?
-		case AXC51_UID1: return m_uid[1]; // 0xe3
-		case AXC51_UID2: return m_uid[2]; // 0xe4
-		case AXC51_UID3: return m_uid[3]; // 0xe5
+	case AXC51_UID0: return m_uid[0]; // 0xe2 Chip-ID, can only be read from code in internal area?
+	case AXC51_UID1: return m_uid[1]; // 0xe3
+	case AXC51_UID2: return m_uid[2]; // 0xe4
+	case AXC51_UID3: return m_uid[3]; // 0xe5
 
-		case AXC51_LFSRFIFO: // 0xf6
-			return machine().rand();
+	case AXC51_LFSRFIFO: // 0xf6
+		return machine().rand();
 
-		case AXC51_UARTSTA: // 0xfc
-			return uartsta_r();
+	case AXC51_UARTSTA: // 0xfc
+		return uartsta_r();
 
 		/* Illegal or non-implemented sfr */
-		default:
-			LOG(("axc51 '%s': attemping to read an invalid/non-implemented SFR address: %x at 0x%04x\n", tag(), (uint32_t)offset,m_pc));
-			/* according to the manual, the read may return random bits */
-			return 0xff;
+	default:
+		LOG(("axc51 '%s': attemping to read an invalid/non-implemented SFR address: %x at 0x%04x\n", tag(), (uint32_t)offset, m_pc));
+		/* according to the manual, the read may return random bits */
+		return 0xff;
 	}
 }
 
