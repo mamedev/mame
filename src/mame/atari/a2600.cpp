@@ -189,8 +189,6 @@ public:
 		m_cartslot(*this, "cartslot")
 	{ }
 
-	using a2600_base_state::a2600_mem;
-
 	void a2600(machine_config &config);
 	void a2600p(machine_config &config);
 
