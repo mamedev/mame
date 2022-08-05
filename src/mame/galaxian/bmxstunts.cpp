@@ -297,5 +297,5 @@ void bmxstunts_state::init_bmxstunts()
 } // Anonymous namespace
 
 
-GAME( 1991, bmxstunts,  0,         bmxstunts, bmxstunts, bmxstunts_state, init_bmxstunts, ROT90, "Jetsoft", "BMX Stunts (set 1)", MACHINE_IS_SKELETON )
-GAME( 1993, bmxstuntsa, bmxstunts, bmxstunts, bmxstunts, bmxstunts_state, init_bmxstunts, ROT90, "Jetsoft", "BMX Stunts (set 2)", MACHINE_IS_SKELETON )
+GAME( 198?, bmxstunts,  0,         bmxstunts, bmxstunts, bmxstunts_state, init_bmxstunts, ROT90, "Jetsoft", "BMX Stunts (set 1)", MACHINE_IS_SKELETON )
+GAME( 198?, bmxstuntsa, bmxstunts, bmxstunts, bmxstunts, bmxstunts_state, init_bmxstunts, ROT90, "Jetsoft", "BMX Stunts (set 2)", MACHINE_IS_SKELETON )
