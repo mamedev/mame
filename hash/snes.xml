@@ -5949,7 +5949,7 @@ more investigation needed...
 		</part>
 	</software>
 
-	<software name="tonymeolp" cloneof="worldsoc">
+	<software name="tonymeolp" cloneof="tonymeol">
 		<!-- nesworld.com -->
 		<!-- retrogamesuk -->
 		<!-- Notes: the second chip is probably corrupt -->
@@ -32591,7 +32591,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="worldsocj" cloneof="worldsoc">
+	<software name="worldsocj" cloneof="striker">
 		<description>World Soccer (Japan)</description>
 		<year>1993</year>
 		<publisher>Coconuts Japan Entertainment</publisher>
@@ -39918,7 +39918,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="cantona">
+	<software name="cantona" cloneof="striker">
 		<description>Eric Cantona Football Challenge (France)</description>
 		<year>1993</year>
 		<publisher>Elite Systems</publisher>
@@ -53957,7 +53957,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
-	<software name="ramosruy" cloneof="worldsoc">
+	<software name="ramosruy" cloneof="tonymeol">
 		<description>Ramos Ruy no World Wide Soccer (Japan)</description>
 		<year>1994</year>
 		<publisher>Pack-In-Video</publisher>
@@ -58799,7 +58799,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
-	<software name="suprcopa" cloneof="worldsoc">
+	<software name="suprcopa" cloneof="tonymeol">
 		<description>Super Copa (Brazil)</description>
 		<year>1994</year>
 		<publisher>American Softworks Company</publisher>
@@ -62787,7 +62787,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
-	<software name="tonymeol" cloneof="worldsoc">
+	<software name="tonymeol">
 		<description>Tony Meola's Sidekicks Soccer (USA)</description>
 		<year>1993</year>
 		<publisher>Electro Brain</publisher>
@@ -65291,19 +65291,19 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
-	<software name="worldsoc">
-		<description>World Soccer (Euro)</description>
+	<software name="worldsoc" cloneof="tonymeol">
+		<description>World Soccer (Euro, prototype)</description>
 		<year>1993</year>
 		<publisher>Electro Brain</publisher>
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="world soccer (europe).sfc" size="1048576" crc="ab7d2076" sha1="1e4ede70e1fd15e68f9698386fe443a3a80f89d7" offset="0x000000" />
+				<rom name="world soccer (europe) (proto).sfc" size="1048576" crc="ab7d2076" sha1="1e4ede70e1fd15e68f9698386fe443a3a80f89d7" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="worldsocu" cloneof="worldsoc">
+	<software name="worldsocu" cloneof="striker">
 		<description>World Soccer 94 - Road to Glory (USA)</description>
 		<year>1993</year>
 		<publisher>Atlus</publisher>
