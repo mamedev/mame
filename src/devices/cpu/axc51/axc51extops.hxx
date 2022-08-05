@@ -17,10 +17,10 @@ void axc51base_cpu_device::set_erx(int n, uint8_t val)
 {
 	switch (n & 3)
 	{
-	case 0x00: SET_EP0(val); break;
-	case 0x01: SET_EP1(val); break;
-	case 0x02: SET_EP2(val); break;
-	case 0x03: SET_EP3(val); break;
+	case 0x00: SET_ER0(val); break;
+	case 0x01: SET_ER1(val); break;
+	case 0x02: SET_ER2(val); break;
+	case 0x03: SET_ER3(val); break;
 	}
 }
 
@@ -75,7 +75,7 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 	case 0x04:
 	{
 		// ADDDP0
-		uint16_t increment = (B) | ((R8) << 8);
+		uint16_t increment = (B) | ((ER8) << 8);
 		uint16_t dptr = (DPTR0)+increment;
 		SET_DPTR0(dptr);
 		break;
@@ -121,7 +121,7 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 	{
 		// ROTL8 EACC, ER8
 		uint8_t acc = ACC;
-		uint8_t shift = (R8) & 0x7;
+		uint8_t shift = (ER8) & 0x7;
 		acc = (acc << shift) | (acc >> (8 - shift));
 		SET_ACC(acc);
 		break;
@@ -324,7 +324,7 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 		// ROTL16 ERn, ER8
 		uint8_t n = (prm & 0x0c) >> 2;
 		uint16_t val = get_erx(n);
-		uint8_t shift = (R8) & 0xf;
+		uint8_t shift = (ER8) & 0xf;
 		val = (val << shift) | (val >> (16 - shift));
 		set_erx(n, val);
 		break;

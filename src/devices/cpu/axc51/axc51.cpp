@@ -149,7 +149,7 @@ void axc51base_cpu_device::iram_indirect_write(offs_t a, uint8_t d) { m_data.wri
 #define IE          SFR_A(ADDR_IE)
 #define IP          SFR_A(ADDR_IP)
 #define B           SFR_A(ADDR_B)
-#define R8          SFR_A(AXC51_ER8)
+#define ER8         SFR_A(AXC51_ER8)
 
 #define DPL1        SFR_A(AXC51_DPL1)
 #define DPH1        SFR_A(AXC51_DPH1)
@@ -166,6 +166,15 @@ void axc51base_cpu_device::iram_indirect_write(offs_t a, uint8_t d) { m_data.wri
 
 #define ER30        SFR_A(AXC51_ER30)
 #define ER31        SFR_A(AXC51_ER31)
+
+#define GP0         SFR_A(AXC51_GP0)
+#define GP1         SFR_A(AXC51_GP1)
+#define GP2         SFR_A(AXC51_GP2)
+#define GP3         SFR_A(AXC51_GP3)
+#define GP4         SFR_A(AXC51_GP4)
+#define GP5         SFR_A(AXC51_GP5)
+#define GP6         SFR_A(AXC51_GP6)
+#define GP7         SFR_A(AXC51_GP7)
 
 #define R_REG(r)    m_scratchpad[(r) | (PSW & 0x18)]
 
@@ -189,14 +198,25 @@ void axc51base_cpu_device::iram_indirect_write(offs_t a, uint8_t d) { m_data.wri
 /* No actions triggered on write */
 #define SET_REG(r, v)   do { m_scratchpad[(r) | (PSW & 0x18)] = (v); } while (0)
 
-#define SET_DPTR0(n)   do { DPH0 = ((n) >> 8) & 0xff; DPL0 = (n) & 0xff; } while (0)
+#define SET_DPTR0(n)    do { DPH0 = ((n) >> 8) & 0xff; DPL0 = (n) & 0xff; } while (0)
 
 #define SET_DPTR1(n)    do { DPH1 = ((n) >> 8) & 0xff; DPL1 = (n) & 0xff; } while (0)
 
-#define SET_EP0(n)      do { ER01 = ((n) >> 8) & 0xff; ER00 = (n) & 0xff; } while (0)
-#define SET_EP1(n)      do { ER11 = ((n) >> 8) & 0xff; ER10 = (n) & 0xff; } while (0)
-#define SET_EP2(n)      do { ER21 = ((n) >> 8) & 0xff; ER20 = (n) & 0xff; } while (0)
-#define SET_EP3(n)      do { ER31 = ((n) >> 8) & 0xff; ER30 = (n) & 0xff; } while (0)
+#define SET_ER0(n)      do { ER01 = ((n) >> 8) & 0xff; ER00 = (n) & 0xff; } while (0)
+#define SET_ER1(n)      do { ER11 = ((n) >> 8) & 0xff; ER10 = (n) & 0xff; } while (0)
+#define SET_ER2(n)      do { ER21 = ((n) >> 8) & 0xff; ER20 = (n) & 0xff; } while (0)
+#define SET_ER3(n)      do { ER31 = ((n) >> 8) & 0xff; ER30 = (n) & 0xff; } while (0)
+
+#define SET_ER8(n)      do { ER8 = (n);} while (0)
+
+#define SET_GP0(n)      do { GP0 = (n);} while (0)
+#define SET_GP1(n)      do { GP1 = (n);} while (0)
+#define SET_GP2(n)      do { GP2 = (n);} while (0)
+#define SET_GP3(n)      do { GP3 = (n);} while (0)
+#define SET_GP4(n)      do { GP4 = (n);} while (0)
+#define SET_GP5(n)      do { GP5 = (n);} while (0)
+#define SET_GP6(n)      do { GP6 = (n);} while (0)
+#define SET_GP7(n)      do { GP7 = (n);} while (0)
 
 /* Macros for Setting Flags */
 #define SET_X(R, v) do { R = (v);} while (0)
@@ -1078,6 +1098,9 @@ uint8_t axc51base_cpu_device::sfr_read(size_t offset)
 		case AXC51_UID2: return m_uid[2]; // 0xe4
 		case AXC51_UID3: return m_uid[3]; // 0xe5
 
+		case AXC51_LFSRFIFO: // 0xf6
+			return machine().rand();
+
 		case AXC51_UARTSTA: // 0xfc
 			return uartsta_r();
 
@@ -1121,6 +1144,7 @@ void axc51base_cpu_device::device_start()
 	state_add( AXC51_ACC, "A", ACC).formatstr("%02X");
 	state_add( AXC51_B,   "B", B).formatstr("%02X");
 	state_add<uint16_t>( AXC51_DPTR0, "DPTR0", [this](){ return DPTR0; }, [this](uint16_t dp){ SET_DPTR0(dp); }).formatstr("%04X");
+	state_add<uint16_t>( AXC51_DPTR1, "DPTR1", [this](){ return DPTR1; }, [this](uint16_t dp){ SET_DPTR1(dp); }).formatstr("%04X");
 	state_add( AXC51_DPH0, "DPH0", DPH0).noshow();
 	state_add( AXC51_DPL0, "DPL0", DPL0).noshow();
 	state_add( AXC51_IE,  "IE", IE).formatstr("%02X");
@@ -1139,6 +1163,23 @@ void axc51base_cpu_device::device_start()
 	state_add<uint8_t>( AXC51_R6,  "R6", [this](){ return R_REG(6); }, [this](uint8_t r){ SET_REG(6, r); }).formatstr("%02X");
 	state_add<uint8_t>( AXC51_R7,  "R7", [this](){ return R_REG(7); }, [this](uint8_t r){ SET_REG(7, r); }).formatstr("%02X");
 	state_add<uint8_t>( AXC51_RB,  "RB", [this](){ return (PSW & 0x18)>>3; }, [this](uint8_t rb){ SET_RS(rb); }).mask(0x03).formatstr("%02X");
+
+	state_add<uint16_t>( AXC51_ER0, "ER0", [this](){ return ER0; }, [this](uint16_t dp){ SET_ER0(dp); }).formatstr("%04X");
+	state_add<uint16_t>( AXC51_ER1, "ER1", [this](){ return ER1; }, [this](uint16_t dp){ SET_ER1(dp); }).formatstr("%04X");
+	state_add<uint16_t>( AXC51_ER2, "ER2", [this](){ return ER2; }, [this](uint16_t dp){ SET_ER2(dp); }).formatstr("%04X");
+	state_add<uint16_t>( AXC51_ER3, "ER3", [this](){ return ER3; }, [this](uint16_t dp){ SET_ER3(dp); }).formatstr("%04X");
+
+	state_add<uint8_t>( AXC51_REG_ER8, "ER8", [this](){ return ER8; }, [this](uint8_t r){ SET_ER8(r); }).formatstr("%02X");
+
+	state_add<uint8_t>( AXC51_REG_GP0, "GP0", [this](){ return GP0; }, [this](uint8_t r){ SET_GP0(r); }).formatstr("%02X");
+	state_add<uint8_t>( AXC51_REG_GP1, "GP1", [this](){ return GP1; }, [this](uint8_t r){ SET_GP1(r); }).formatstr("%02X");
+	state_add<uint8_t>( AXC51_REG_GP2, "GP2", [this](){ return GP2; }, [this](uint8_t r){ SET_GP2(r); }).formatstr("%02X");
+	state_add<uint8_t>( AXC51_REG_GP3, "GP3", [this](){ return GP3; }, [this](uint8_t r){ SET_GP3(r); }).formatstr("%02X");
+	state_add<uint8_t>( AXC51_REG_GP4, "GP4", [this](){ return GP4; }, [this](uint8_t r){ SET_GP4(r); }).formatstr("%02X");
+	state_add<uint8_t>( AXC51_REG_GP5, "GP5", [this](){ return GP5; }, [this](uint8_t r){ SET_GP5(r); }).formatstr("%02X");
+	state_add<uint8_t>( AXC51_REG_GP6, "GP6", [this](){ return GP6; }, [this](uint8_t r){ SET_GP6(r); }).formatstr("%02X");
+	state_add<uint8_t>( AXC51_REG_GP7, "GP7", [this](){ return GP7; }, [this](uint8_t r){ SET_GP7(r); }).formatstr("%02X");
+
 
 
 	state_add( STATE_GENPC, "GENPC", m_pc ).noshow();
@@ -1275,7 +1316,11 @@ uint8_t axc51base_cpu_device::dpcon_r()
 uint8_t axc51base_cpu_device::spibuf_r()
 {
 	// TODO: encryption here (if enabled)
-	return m_spi_in_cb();
+	uint8_t ret = m_spi_in_cb();
+	if (m_sfr_regs[AXC51_IE2CRPT - 0x80] & 0x03)
+		ret = machine().rand();
+
+	return ret;
 }
 
 void axc51base_cpu_device::spibuf_w(uint8_t data)
