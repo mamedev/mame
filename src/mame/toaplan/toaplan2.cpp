@@ -5591,6 +5591,28 @@ ROM_START( bgareggabla )
 	ROM_LOAD( "rom5.bin", 0x000000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
 ROM_END
 
+ROM_START( bgareggablj ) // fixed on Japanese region
+	ROM_REGION( 0x100000, "maincpu", 0 )            // Main 68K code
+	ROM_LOAD16_WORD_SWAP( "sys.bin", 0x000000, 0x100000, CRC(b2a1225f) SHA1(dda00aa5e7ce3f39bb0eebbcd9500ef22a5d74d3) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(                                0x100000 )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )            // Sound Z80 code + bank
+	ROM_LOAD( "snd.bin", 0x00000, 0x20000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
+
+	ROM_REGION( 0x800000, "gp9001_0", 0 )
+	ROM_LOAD( "322_2.bin",  0x000000, 0x400000, CRC(37fe48ed) SHA1(ded5d13c33b4582310cdfb3dd52c052f741c00c5) ) // == rom4.bin+rom3.bin
+	ROM_LOAD( "322_1.bin",  0x400000, 0x400000, CRC(5a06c031) SHA1(ee241ff90117cec1f33ab163601a9d5c75609739) ) // == rom2.bin+rom1.bin
+
+	ROM_REGION( 0x008000, "text", 0 )
+	ROM_LOAD( "text.bin", 0x00000, 0x08000, CRC(e67fd534) SHA1(987d0edffc2c243a13d4567319ea3d185eaadbf8) )
+
+	ROM_REGION( 0x010000, "user1", 0 ) // not graphics
+	ROM_LOAD( "base.bin", 0x00000, 0x08000, CRC(456dd16e) SHA1(84779ee64d3ea33ba1ba4dee39b504a81c6811a1) )
+
+	ROM_REGION( 0x100000, "oki1", 0 )        // ADPCM Samples
+	ROM_LOAD( "rom5.bin", 0x000000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
+ROM_END
+
 /*
    The region of Batrider is controlled by the first byte of rom prg0.u22
    only sets which have been dumped from original PCBs are supported
@@ -6113,6 +6135,7 @@ GAME( 1996, bgareggat2,  bgaregga, bgaregga,   bgaregga,   toaplan2_state, init_
 GAME( 1996, bgareggacn,  bgaregga, bgaregga,   bgareggacn, toaplan2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Denmark / China) (Tue Apr 2 1996)", MACHINE_SUPPORTS_SAVE ) // displays Type 2 only when set to Denmark
 GAME( 1996, bgareggabl,  bgaregga, bgareggabl, bgareggacn, toaplan2_state, init_bgaregga,   ROT270, "bootleg",            "1945 Part-2 (Chinese hack of Battle Garegga)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, bgareggabla, bgaregga, bgareggabl, bgareggacn, toaplan2_state, init_bgaregga,   ROT270, "bootleg",            "Lei Shen Zhuan Thunder Deity Biography (Chinese hack of Battle Garegga)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bgareggablj, bgaregga, bgareggabl, bgaregga,   toaplan2_state, init_bgaregga,   ROT270, "bootleg",            "Battle Garegga (Japan, bootleg) (Sat Feb 3 1996)", MACHINE_SUPPORTS_SAVE )
 
 // these are all based on Version B, even if only the Japan version states 'version B'
 GAME( 1998, batrider,    0,        batrider,   batrider,   toaplan2_state, init_batrider,   ROT270, "Raizing / Eighting", "Armed Police Batrider (Europe) (Fri Feb 13 1998)",           MACHINE_SUPPORTS_SAVE )
