@@ -9580,6 +9580,10 @@ bml3                            //
 bml3mk2                         //
 bml3mk5                         //
 
+@source:galaxian/bmxstunts.cpp
+bmxstunts
+bmxstuntsa
+
 @source:jaleco/bnstars.cpp
 bnstars1                        // (c) 1997
 
