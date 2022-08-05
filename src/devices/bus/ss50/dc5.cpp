@@ -34,6 +34,7 @@
 #include "formats/flex_dsk.h"
 #include "formats/os9_dsk.h"
 #include "formats/uniflex_dsk.h"
+#include "formats/cp68_dsk.h"
 
 class ss50_dc5_device : public device_t, public ss50_card_interface
 {
@@ -240,6 +241,7 @@ void ss50_dc5_device::floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
 	fr.add(FLOPPY_FLEX_FORMAT);
+	fr.add(FLOPPY_CP68_FORMAT);
 	fr.add(FLOPPY_OS9_FORMAT);
 	fr.add(FLOPPY_UNIFLEX_FORMAT);
 }
