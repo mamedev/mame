@@ -42,7 +42,7 @@ above expectations. TI continued to manufacture many products for this line.
     - VFD: NEC FIP8A5AR no. 3A
     - notes: keyboard has buttons instead of cheap membrane
 
-    Speak & Spell (US), 1979
+    Speak & Spell (US), 1980
     - MCU: TMC0271, label TMC0271H-N2L FDS (die label: T0270D 0271H)
     - TMS51xx: TMC0281
     - VSM(1/2): 16KB TMC0351N2L
@@ -50,14 +50,14 @@ above expectations. TI continued to manufacture many products for this line.
     - notes: fixed a funny bug with gibberish-talk when Module button is pressed
       with no module inserted, MCU ROM contents differs from 1978 version
 
-    Speak & Spell (US), 1980
-    - MCU: same as 1979 version
+    Speak & Spell (US), 1981
+    - MCU: same as 1980 version
     - TMS51xx: TMC0281D
     - VSM: 16KB CD2350(rev.A)
     - notes: only 1 VSM, meaning much smaller internal vocabulary
 
     Speak & Spell (Japan), 1980
-    - MCU: TMC0271 (assume same as US 1979 version)
+    - MCU: TMC0271 (assume same as US 1980 version)
     - TMS51xx: TMC0281
     - VSM(1/2): 16KB CD2321
     - VSM(2/2): 16KB CD2322
@@ -74,35 +74,34 @@ above expectations. TI continued to manufacture many products for this line.
            word 'butcher' took 3 days - I still don't know if it sounds right."
 
     Speak & Spell (UK), 1981
-    - MCU: TMC0271 (assume same as US 1979 version)
+    - MCU: TMC0271 (assume same as US 1980 version)
     - TMS51xx: CD2801
     - VSM: 16KB CD62175
     - VFD: some seen with the one from Speak & Math(!)
     - notes: this one has a dedicated voice actor
 
-    Speak & Spell (Spanish, prototype), 1981
+    Speak & Spell (Spanish, prototype), 1980
     - MCU: CD2701N2L P (die label: T0270D 2701)
     - TMS51xx: TMC0281 (die label: T0280A 0281)
     - VSM(1/2): 16KB CD2319
     - VSM(2/2): 16KB CD2320
     - VFD: 8 digits with 14 segments, DP and accent mark
 
-    Speak & Spell (France) "La Dictée Magique", 1980
+    Speak & Spell (France) "La Dictée Magique", 1981
     - MCU: CD2702, label CD2702AN2L (die label: TMC0270F 2702A)
     - TMS51xx: CD2801
     - VSM: 16KB CD2352
 
     Speak & Spell (Germany) "Buddy", 1980 (stylized as "buddy")
-    - MCU & TMS51xx: same as French 1980 version
+    - MCU & TMS51xx: same as French version
     - VSM(1/2): 16KB CD2345*
     - VSM(2/2): 16KB CD2346*
     - VFD: has umlaut instead of apostrophe
 
-    Speak & Spell (Italy) "Grillo Parlante", 1982
-    - MCU & TMS51xx: same as French 1980 version
+    Speak & Spell (Italy) "Grillo Parlante", 1983
+    - MCU & TMS51xx: same as French version
     - VSM: 16KB CD62190
     - VFD: same as Speak & Math
-    - notes: it appears that TI ran out of original snspell VFDs in the early 80s?
 
     Speak & Spell Compact (US), 1981
     - MCU: CD8011, label CD8011A-NL (die label: 1100B)
@@ -162,13 +161,13 @@ Speak & Math:
       of the TI employees in a hurry, the day before a demo. Apparently QA
       never found out and it ended up in the final product.
 
-    Speak & Math (US), 1981
+    Speak & Math (US), 1986
     - MCU: CD2708, label CD2708N2L (die label: TMC0270F 2708A)
     - TMS51xx: CD2801
     - VSM(1/2): 16KB CD2381
     - VSM(2/2): 4KB CD2614
 
-    Speak & Math 'Compact' (France) "Les Maths Magiques", 1986?
+    Speak & Math 'Compact' (France) "Les Maths Magiques", 1982
     - MCU: CP3447-NL* (TMS1100?)
     - TMS51xx: CD2801A
     - VSM: 16KB? CD62173*
@@ -1916,23 +1915,23 @@ ROM_END
 
 
 //    YEAR  NAME        PARENT   CMP MACHINE       INPUT       CLASS          INIT           COMPANY, FULLNAME, FLAGS
-COMP( 1979, snspell,    0,        0, sns_tmc0281,  snspell,    tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (US, 1979 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1980, snspell,    0,        0, sns_tmc0281,  snspell,    tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (US, 1980 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1978, snspellua,  snspell,  0, sns_tmc0281,  snspell,    tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (US, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1980, snspellub,  snspell,  0, sns_tmc0281d, snspell,    tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (US, 1980 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // less speech data
+COMP( 1981, snspellub,  snspell,  0, sns_tmc0281d, snspell,    tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (US, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // less speech data
 COMP( 1978, snspellp,   snspell,  0, sns_tmc0281,  snspell,    tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (US, patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1978, snspelluk,  snspell,  0, sns_tmc0281,  snspell,    tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (UK, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1981, snspelluka, snspell,  0, sns_cd2801,   snspell,    tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (UK, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // less speech data
-COMP( 1979, snspelljp,  snspell,  0, sns_tmc0281,  snspell,    tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // speaks English
-COMP( 1981, snspellsp,  snspell,  0, snspellsp,    snspellsp,  tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (Spanish, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1980, snspellfr,  snspell,  0, sns_cd2801,   snspellfr,  tispeak_state, init_snspell,  "Texas Instruments", u8"La Dictée Magique (France)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1982, snspellit,  snspell,  0, snspellit,    snspellit,  tispeak_state, init_snspell,  "Texas Instruments / Clementoni", "Grillo Parlante (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1980, snspelljp,  snspell,  0, sns_tmc0281,  snspell,    tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // speaks English
+COMP( 1980, snspellsp,  snspell,  0, snspellsp,    snspellsp,  tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (Spanish, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1981, snspellfr,  snspell,  0, sns_cd2801,   snspellfr,  tispeak_state, init_snspell,  "Texas Instruments", u8"La Dictée Magique (France)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1983, snspellit,  snspell,  0, snspellit,    snspellit,  tispeak_state, init_snspell,  "Texas Instruments / Clementoni", "Grillo Parlante (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
 COMP( 1982, snspellc,   0,        0, snspellc,     snspellc,   tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell Compact (US, 1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1981, snspellca,  snspellc, 0, snspellc,     snspellc,   tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell Compact (US, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1982, snspellcuk, snspellc, 0, snspellcuk,   snspellcuk, tispeak_state, init_snspell,  "Texas Instruments", "Speak & Write (UK)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
 COMP( 1980, snmath,     0,        0, snmath,       snmath,     tispeak_state, empty_init,    "Texas Instruments", "Speak & Math (US, 1980 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1981, snmatha,    snmath,   0, snmath,       snmath,     tispeak_state, empty_init,    "Texas Instruments", "Speak & Math (US, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // less speech data
+COMP( 1986, snmatha,    snmath,   0, snmath,       snmath,     tispeak_state, empty_init,    "Texas Instruments", "Speak & Math (US, 1986 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // less speech data
 COMP( 1980, snmathp,    snmath,   0, snmath,       snmath,     tispeak_state, empty_init,    "Texas Instruments", "Speak & Math (US, patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IS_INCOMPLETE )
 
 COMP( 1980, snread,     0,        0, snread,       snread,     tispeak_state, init_snspell,  "Texas Instruments", "Speak & Read (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

@@ -14,6 +14,30 @@
 #include "tms0970.h"
 
 
+// pinout reference
+
+/*
+            ____   ____
+     R2  1 |*   \_/    | 28 R3
+     R1  2 |           | 27 R4
+     R0  3 |           | 26 R5
+      ?  4 |           | 25 R6
+    Vdd  5 |           | 24 R7
+     K3  6 |           | 23 R8
+     K8  7 |  TMS0980  | 22 ?
+     K4  8 |           | 21 ?
+     K2  9 |           | 20 Vss
+     K1 10 |           | 19 ?
+     O7 11 |           | 18 O0
+     O6 12 |           | 17 O1
+     O5 13 |           | 16 O2
+     O4 14 |___________| 15 O3
+
+  note: TMS0980 official pin names for R0-R8 is D9-D1, O0-O7 is S(A-G,DP)
+
+*/
+
+
 class tms0980_cpu_device : public tms0970_cpu_device
 {
 public:
