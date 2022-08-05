@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-uint8_t axc51base_cpu_device::get_erx(int m)
+uint16_t axc51base_cpu_device::get_erx(int m)
 {
 	switch (m & 3)
 	{
@@ -13,7 +13,7 @@ uint8_t axc51base_cpu_device::get_erx(int m)
 	return 0;
 }
 
-void axc51base_cpu_device::set_erx(int n, uint8_t val)
+void axc51base_cpu_device::set_erx(int n, uint16_t val)
 {
 	switch (n & 3)
 	{

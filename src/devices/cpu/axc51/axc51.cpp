@@ -202,10 +202,10 @@ void axc51base_cpu_device::iram_indirect_write(offs_t a, uint8_t d) { m_data.wri
 
 #define SET_DPTR1(n)    do { DPH1 = ((n) >> 8) & 0xff; DPL1 = (n) & 0xff; } while (0)
 
-#define SET_ER0(n)      do { ER01 = ((n) >> 8) & 0xff; ER00 = (n) & 0xff; } while (0)
-#define SET_ER1(n)      do { ER11 = ((n) >> 8) & 0xff; ER10 = (n) & 0xff; } while (0)
-#define SET_ER2(n)      do { ER21 = ((n) >> 8) & 0xff; ER20 = (n) & 0xff; } while (0)
-#define SET_ER3(n)      do { ER31 = ((n) >> 8) & 0xff; ER30 = (n) & 0xff; } while (0)
+#define SET_ER0(n)      do { ER00 = ((n) >> 8) & 0xff; ER01 = (n) & 0xff; } while (0)
+#define SET_ER1(n)      do { ER10 = ((n) >> 8) & 0xff; ER11 = (n) & 0xff; } while (0)
+#define SET_ER2(n)      do { ER20 = ((n) >> 8) & 0xff; ER21 = (n) & 0xff; } while (0)
+#define SET_ER3(n)      do { ER30 = ((n) >> 8) & 0xff; ER31 = (n) & 0xff; } while (0)
 
 #define SET_ER8(n)      do { ER8 = (n);} while (0)
 

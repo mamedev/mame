@@ -289,8 +289,8 @@ protected:
 	void extended_a5_d0();
 	void extended_a5_d1();
 
-	uint8_t get_erx(int m);
-	void set_erx(int n, uint8_t val);
+	uint16_t get_erx(int m);
+	void set_erx(int n, uint16_t val);
 	uint16_t get_dpt(int i);
 
 	/* Internal address in SFR of registers */
