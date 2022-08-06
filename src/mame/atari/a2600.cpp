@@ -125,7 +125,6 @@ E1 Prog ROM 42 DEMON/DIAMOND (CX2615)
 
 namespace {
 
-static constexpr auto MASTER_CLOCK_NTSC = 3.579575_MHz_XTAL;
 static constexpr auto MASTER_CLOCK_PAL  = 3.546894_MHz_XTAL;
 
 static const uint16_t supported_screen_heights[4] = { 262, 312, 328, 342 };
@@ -152,7 +151,7 @@ protected:
 
 	void a2600_mem(address_map &map);
 
-	void a2600_base_ntsc(machine_config &config);
+	void a2600_base_ntsc(machine_config &config, XTAL xtal);
 	void a2600_base_pal(machine_config &config);
 
 	void switch_A_w(uint8_t data);
@@ -605,10 +604,10 @@ void a2600_state::a2600_cartslot(machine_config &config)
 	SOFTWARE_LIST(config, "cass_list").set_original("a2600_cass");
 }
 
-void a2600_base_state::a2600_base_ntsc(machine_config &config)
+void a2600_base_state::a2600_base_ntsc(machine_config &config, XTAL xtal)
 {
 	/* basic machine hardware */
-	M6507(config, m_maincpu, MASTER_CLOCK_NTSC / 3);
+	M6507(config, m_maincpu, xtal / 3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &a2600_base_state::a2600_mem);
 
 	/* video hardware */
@@ -618,23 +617,23 @@ void a2600_base_state::a2600_base_ntsc(machine_config &config)
 	m_tia->vsync_callback().set(FUNC(a2600_state::a2600_tia_vsync_callback));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(MASTER_CLOCK_NTSC, 228, 26, 26 + 160 + 16, 262, 24 , 24 + 192 + 31);
+	m_screen->set_raw(xtal, 228, 26, 26 + 160 + 16, 262, 24 , 24 + 192 + 31);
 	m_screen->set_screen_update("tia_video", FUNC(tia_video_device::screen_update));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	TIA(config, "tia", MASTER_CLOCK_NTSC/114).add_route(ALL_OUTPUTS, "mono", 0.90);
+	TIA(config, "tia", xtal/114).add_route(ALL_OUTPUTS, "mono", 0.90);
 
 	/* devices */
 #if USE_NEW_RIOT
-	MOS6532_NEW(config, m_riot, MASTER_CLOCK_NTSC / 3);
+	MOS6532_NEW(config, m_riot, xtal / 3);
 	m_riot->pa_rd_callback().set(FUNC(a2600_state::switch_A_r));
 	m_riot->pa_wr_callback().set(FUNC(a2600_state::switch_A_w));
 	m_riot->pb_rd_callback().set_ioport("SWB");
 	m_riot->pb_wr_callback().set(FUNC(a2600_state::switch_B_w));
 	m_riot->irq_wr_callback().set(FUNC(a2600_state::irq_callback));
 #else
-	RIOT6532(config, m_riot, MASTER_CLOCK_NTSC / 3);
+	RIOT6532(config, m_riot, xtal / 3);
 	m_riot->in_pa_callback().set(FUNC(a2600_state::switch_A_r));
 	m_riot->out_pa_callback().set(FUNC(a2600_state::switch_A_w));
 	m_riot->in_pb_callback().set_ioport("SWB");
@@ -691,7 +690,7 @@ void a2600_base_state::a2600_base_pal(machine_config &config)
 
 void a2600_state::a2600(machine_config &config)
 {
-	a2600_base_ntsc(config);
+	a2600_base_ntsc(config, 3.579575_MHz_XTAL);
 	a2600_cartslot(config);
 	subdevice<software_list_device>("cart_list")->set_filter("NTSC");
 }
@@ -707,7 +706,7 @@ void a2600_state::a2600p(machine_config &config)
 
 void a2600_pop_state::a2600_pop(machine_config &config)
 {
-	a2600_base_ntsc(config);
+	a2600_base_ntsc(config, 3.579545_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &a2600_pop_state::memory_map);
 }
 
