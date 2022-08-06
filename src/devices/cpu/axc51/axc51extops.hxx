@@ -106,16 +106,26 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 		break;
 
 	case 0x0a:
-		fatalerror("%s: DEC2DP0", machine().describe_context());
+	{
+		// DEC2DP0
+		uint16_t dptr = (DPTR0)-2;
+		SET_DPTR0(dptr);
 		break;
+	}
 
 	case 0x0b:
 		fatalerror("%s: DEC2DP1", machine().describe_context());
 		break;
 
 	case 0x0c:
-		fatalerror("%s: ROTR8 EACC, ER8", machine().describe_context());
+	{
+		// ROTR8 EACC, ER8
+		uint8_t acc = ACC;
+		uint8_t shift = (ER8) & 0x7;
+		acc = (acc >> shift) | (acc << (8 - shift));
+		SET_ACC(acc);
 		break;
+	}
 
 	case 0x0d:
 	{
@@ -344,8 +354,12 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 
 	case 0xc0: case 0xc4: case 0xc8: case 0xcc:
 	{
+		// ROTR16 ERn, ER8
 		uint8_t n = (prm & 0x0c) >> 2;
-		fatalerror("%s: ROTR16 ER%01x, ER8", machine().describe_context(), n);
+		uint16_t val = get_erx(n);
+		uint8_t shift = (ER8) & 0xf;
+		val = (val >> shift) | (val << (16 - shift));
+		set_erx(n, val);
 		break;
 	}
 
@@ -529,11 +543,31 @@ void axc51base_cpu_device::extended_a5_0f()
 	case 0x22: case 0x23: case 0x26: case 0x27: case 0x2a: case 0x2b: case 0x2e: case 0x2f:
 	case 0x32: case 0x33: case 0x36: case 0x37: case 0x3a: case 0x3b: case 0x3e: case 0x3f:
 	{
+		// SUB16 EDPi, ERn, ERp;
 		uint8_t p = (prm2 & 0x30) >> 4;
 		uint8_t n = (prm2 & 0x0c) >> 2;
 		uint8_t i = (prm2 & 0x01) >> 0;
 
-		fatalerror("%s: SUB16 EDP%01x, ER%01x, ER%01x", machine().describe_context(), i, n, p);
+		uint16_t val = get_erx(n);
+		uint16_t val2 = get_erx(p);
+		uint16_t dpt = get_dpt(i);
+		uint32_t res = val - val2 - (GET_EC);
+
+		m_io.write_byte(dpt, res);  
+
+		// unsure if this sets flags
+		if (res & 0xffff0000)
+			SET_EC(1);
+		else
+			SET_EC(0);
+
+		res &= 0xffff;
+
+		if (!res)
+			SET_EZ(1);
+		else
+			SET_EZ(0);
+
 		break;
 	}
 
@@ -553,6 +587,7 @@ void axc51base_cpu_device::extended_a5_0f()
 		uint32_t res = val - val2 - (GET_EC);
 		set_erx(p, res);
 
+		// unsure if this sets flags
 		if (res & 0xffff0000)
 			SET_EC(1);
 		else

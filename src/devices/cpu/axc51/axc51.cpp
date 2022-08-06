@@ -31,7 +31,7 @@
 #define LOG_GENERAL  (1U <<  1)
 #define LOG_PORTS    (1U <<  2)
 
-#define VERBOSE     (LOG_GENERAL)
+#define VERBOSE     (0)
 
 #include "logmacro.h"
 
