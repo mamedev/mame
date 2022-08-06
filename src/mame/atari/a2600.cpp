@@ -12,6 +12,7 @@ TODO:
   Systema TV Boy
 
 TODO:
+- Most TV boy unit did not have joystick ports but a builtin D-pad
 - Find, dump and add the other devices (TV Boy, Super TV Boy)
 - Add NTSC variant
 
