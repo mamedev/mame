@@ -126,8 +126,6 @@ E1 Prog ROM 42 DEMON/DIAMOND (CX2615)
 
 namespace {
 
-static constexpr auto MASTER_CLOCK_PAL  = 3.546894_MHz_XTAL;
-
 static const uint16_t supported_screen_heights[4] = { 262, 312, 328, 342 };
 
 
