@@ -137,15 +137,6 @@ protected:
 	void bit_address_w(uint8_t offset, uint8_t bit);
 	void do_add_flags(uint8_t a, uint8_t data, uint8_t c);
 	void do_sub_flags(uint8_t a, uint8_t data, uint8_t c);
-	void transmit_receive(int source);
-	void update_timer_t0(int cycles);
-	void update_timer_t1(int cycles);
-	void update_timer_t2(int cycles);
-	void update_timers(int cycles);
-	void serial_transmit(uint8_t data);
-	void serial_receive();
-	void update_serial(int cycles);
-	void update_irq_prio(uint8_t ipl, uint8_t iph);
 	void execute_op(uint8_t op);
 	void check_irqs();
 	void burn_cycles(int cycles);
@@ -503,9 +494,17 @@ protected:
 		V_SFS_INT    = 0x07b,  // IE1.7   IP1.7
 	};
 
-	int irq_hack_ctr = 0;
-	int irq_hack_ctr2 = 0;
+	uint16_t get_irq_base();
 
+	TIMER_CALLBACK_MEMBER(timer0_cb);
+	TIMER_CALLBACK_MEMBER(dactimer_cb);
+
+	bool m_timer0irq = false;
+	bool m_dactimerirq = false;
+
+
+	emu_timer *m_timer0;
+	emu_timer *m_dactimer;
 };
 
 

@@ -265,17 +265,6 @@ void axc51base_cpu_device::iram_indirect_write(offs_t a, uint8_t d) { m_data.wri
 
 void axc51base_cpu_device::clear_current_irq()
 {
-	if (m_cur_irq_prio >= 0)
-		m_irq_active &= ~(1 << m_cur_irq_prio);
-	if (m_irq_active & 4)
-		m_cur_irq_prio = 2;
-	else if (m_irq_active & 2)
-		m_cur_irq_prio = 1;
-	else if (m_irq_active & 1)
-		m_cur_irq_prio = 0;
-	else
-		m_cur_irq_prio = -1;
-
 	LOGMASKED(LOG_UNSORTED, "clear irq\n");
 }
 
@@ -475,55 +464,6 @@ uint32_t axc51base_cpu_device::process_dptr_access()
 	}
 
 	return addr;
-}
-
-void axc51base_cpu_device::transmit_receive(int source)
-{
-}
-
-void axc51base_cpu_device::update_timer_t0(int cycles)
-{
-}
-
-
-
-void axc51base_cpu_device::update_timer_t1(int cycles)
-{
-}
-
-void axc51base_cpu_device::update_timer_t2(int cycles)
-{
-}
-
-void axc51base_cpu_device::update_timers(int cycles)
-{
-	while (cycles--)
-	{
-		update_timer_t0(1);
-		update_timer_t1(1);
-	}
-}
-
-void axc51base_cpu_device::serial_transmit(uint8_t data)
-{
-}
-
-void axc51base_cpu_device::serial_receive()
-{
-}
-
-/* Check and update status of serial port */
-void axc51base_cpu_device::update_serial(int cycles)
-{
-	while (--cycles>=0)
-		transmit_receive(0);
-}
-
-/* Check and update status of serial port */
-void axc51base_cpu_device::update_irq_prio(uint8_t ipl, uint8_t iph)
-{
-	for (int i=0; i<8; i++)
-		m_irq_prio[i] = ((ipl >> i) & 1) | (((iph >>i ) & 1) << 1);
 }
 
 
@@ -885,69 +825,80 @@ const uint8_t axc51base_cpu_device::axc51_cycles[256] = {
 	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 };
 
-
-void axc51base_cpu_device::check_irqs()
+uint16_t axc51base_cpu_device::get_irq_base()
 {
-	irq_hack_ctr++;
-	irq_hack_ctr2++;
-
-	if (!GET_EA)
-		return;
-
-	int base;
+	int base = 0;
 
 	switch (m_sfr_regs[AXC51_DPCON - 0x80] & 0xc0)
 	{
 	case 0x00:
 	case 0xc0:
-		return; // invalid
+		base = 0; // invalid
+		break;
 
 	case 0x80:
-		return;
-		//base = 0x8000;
-		//break;
+		base = 0x8000;
+		break;
 
 	case 0x40:
 		base = 0x4000;
 		break;
 	}
 
-	if (irq_hack_ctr >= 100000)
-	{
-		irq_hack_ctr = 0;
+	return base;
+}
 
-		if (!GET_T0IRQEN)
-			return;
-	
-		push_pc();
-		m_pc = base + 0x0003;
+TIMER_CALLBACK_MEMBER(axc51base_cpu_device::timer0_cb)
+{
+	// TODO: this logic is not correct
 
+	m_timer0irq = true;
+}
+
+TIMER_CALLBACK_MEMBER(axc51base_cpu_device::dactimer_cb)
+{
+	// TODO: this logic is not correct
+
+	m_dactimerirq = true;
+}
+
+
+void axc51base_cpu_device::check_irqs()
+{
+	// TODO: this logic is not correct
+
+	if (!GET_EA)
 		return;
+
+	uint16_t base = get_irq_base();
+
+	if (!base)
+		return;
+
+	if (m_timer0irq)
+	{
+		if (GET_T0IRQEN)
+		{
+			push_pc();
+			m_pc = base + V_TIMER0;
+			m_timer0irq = false;
+		}
 	}
-
-	if (irq_hack_ctr2 >= 2000)
+	else if (m_dactimerirq)
 	{
-		irq_hack_ctr2 = 0;
-
-		if (!GET_DMAIRQEN)
-			return;
-	
-		push_pc();
-		m_pc = base + 0x0073;
-
-		return;
+		if (GET_DMAIRQEN)
+		{
+			push_pc();
+			m_pc = base + V_DAC;
+			m_dactimerirq = false;
+		}
 	}
 
 }
 
+
 void axc51base_cpu_device::burn_cycles(int cycles)
 {
-	/* Update Timer (if any timers are running) */
-	update_timers(cycles);
-
-	/* Update Serial (only for mode 0) */
-	update_serial(cycles);
-
 	/* check_irqs */
 	check_irqs();
 }
@@ -1051,7 +1002,7 @@ void axc51base_cpu_device::sfr_write(size_t offset, uint8_t data)
 	case ADDR_P3:   write_port(3, data);       break;
 	case ADDR_PSW:  SET_PARITY();              break;
 	case ADDR_ACC:  SET_PARITY();              break;
-	case ADDR_IP:   update_irq_prio(data, 0);  break;
+	case ADDR_IP:   break;
 
 	case ADDR_B:
 	case ADDR_SP:
@@ -1304,11 +1255,8 @@ void axc51base_cpu_device::device_start()
 	save_item(NAME(m_pc));
 	save_item(NAME(m_last_op));
 	save_item(NAME(m_last_bit));
-	save_item(NAME(m_cur_irq_prio) );
 	save_item(NAME(m_last_line_state) );
 	save_item(NAME(m_recalc_parity) );
-	save_item(NAME(m_irq_prio) );
-	save_item(NAME(m_irq_active) );
 	save_item(NAME(m_sfr_regs));
 	save_item(NAME(m_xsfr_regs));
 
@@ -1361,6 +1309,10 @@ void axc51base_cpu_device::device_start()
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_rtemp).formatstr("%8s").noshow();
 
 	set_icountptr(m_icount);
+
+	m_timer0 = timer_alloc(FUNC(axc51base_cpu_device::timer0_cb), this);
+	m_dactimer = timer_alloc(FUNC(axc51base_cpu_device::dactimer_cb), this);
+
 }
 
 void axc51base_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
@@ -1387,8 +1339,6 @@ void axc51base_cpu_device::device_reset()
 	m_last_line_state = 0;
 
 	/* Flag as NO IRQ in Progress */
-	m_irq_active = 0;
-	m_cur_irq_prio = -1;
 	m_last_op = 0;
 	m_last_bit = 0;
 
@@ -1402,7 +1352,6 @@ void axc51base_cpu_device::device_reset()
 	DPL0 = 0;
 	B = 0;
 	IP = 0;
-	update_irq_prio(IP, 0);
 	IE = 0;
 	PCON = 0;
 
@@ -1415,6 +1364,13 @@ void axc51base_cpu_device::device_reset()
 	m_recalc_parity = 0;
 
 	m_spi_dma_addr = 0;
+
+//	m_timer0->adjust(attotime::never);
+//	m_dactimer->adjust(attotime::never);
+
+
+	m_timer0->adjust(attotime::from_hz(36000), 0, attotime::from_hz(36000));
+	m_dactimer->adjust(attotime::from_hz(8000), 0, attotime::from_hz(8000));
 }
 
 
