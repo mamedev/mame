@@ -403,11 +403,15 @@ void axc51base_cpu_device::inc_dptr(uint8_t r)
 
 	if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x01) // DPTR1 enabled
 	{
-		fatalerror("inc_dptr with DPTR1");
+		uint16_t dptr = (DPTR1)+1;
+		SET_DPTR1(dptr);
+	}
+	else
+	{
+		uint16_t dptr = (DPTR0)+1;
+		SET_DPTR0(dptr);
 	}
 
-	uint16_t dptr = (DPTR0)+1;
-	SET_DPTR0(dptr);
 }
 
 //JB  bit addr, code addr                   /* 1: 0010 0000 */
@@ -609,15 +613,18 @@ void axc51base_cpu_device::mov_dptr_byte(uint8_t r)
 		fatalerror("mov_dptr_byte with auto-toggle");
 	}
 
-	if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x01) // DPTR0 enabled
-	{
-		fatalerror("mov_dptr_byte with DPTR1");
-	}
-
 	uint8_t data_hi, data_lo;
 	data_hi = m_program.read_byte(m_pc++);                //Grab hi byte
 	data_lo = m_program.read_byte(m_pc++);                //Grab lo byte
-	SET_DPTR0((uint16_t)((data_hi<<8)|data_lo));   //Store to DPTR0
+
+	if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x01) // DPTR1 enabled
+	{
+		SET_DPTR1((uint16_t)((data_hi << 8) | data_lo));   //Store to DPTR1
+	}
+	else
+	{
+		SET_DPTR0((uint16_t)((data_hi << 8) | data_lo));   //Store to DPTR0
+	}
 }
 
 //MOV bit addr, C                           /* 1: 1001 0010 */

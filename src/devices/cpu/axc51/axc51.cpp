@@ -1,14 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Steve Ellenoff, Manuel Abadia, Couriersud, David Haywood
 
-/*
-	This is currently mostly copied from the mcs51 core
-	but as the axc51 has many differences, it will eventually
-	diverge more greatly.  For now assume a lot of what is here
-	is still incorrect.
-
-*/
-
 /*****************************************************************************
 
     AXC51-CORE / AX208 SoC (AppoTech Inc.)
@@ -28,10 +20,11 @@
 #include "axc51.h"
 #include "axc51dasm.h"
 
-#define LOG_GENERAL  (1U <<  1)
-#define LOG_PORTS    (1U <<  2)
+#define LOG_UNSORTED  (1U <<  1)
+#define LOG_PORTS     (1U <<  2)
+#define LOG_UNHANDLED (1U <<  3)
 
-#define VERBOSE     (0)
+#define VERBOSE     (LOG_UNHANDLED)
 
 #include "logmacro.h"
 
@@ -283,7 +276,7 @@ void axc51base_cpu_device::clear_current_irq()
 	else
 		m_cur_irq_prio = -1;
 
-	LOGMASKED(LOG_GENERAL, "New: %d %02x\n", m_cur_irq_prio, m_irq_active);
+	LOGMASKED(LOG_UNSORTED, "clear irq\n");
 }
 
 uint8_t axc51base_cpu_device::r_acc() { return SFR_A(ADDR_ACC); }
@@ -1004,6 +997,9 @@ void axc51base_cpu_device::execute_run()
 uint8_t axc51base_cpu_device::xsfr_read(offs_t offset)
 {
 	offset &= 0x7f;
+
+	LOGMASKED(LOG_UNHANDLED,"%s: reading unhandled XSFR reg %04x\n", machine().describe_context(), offset + 0x3000);
+
 	return m_xsfr_regs[offset];
 }
 
@@ -1034,7 +1030,7 @@ void axc51base_cpu_device::xsfr_write(offs_t offset, uint8_t data)
 		break;
 
 	default:
-		LOGMASKED(LOG_GENERAL,"%s: writing to unhandled XSFR reg %04x data %02x\n", machine().describe_context(), offset + 0x3000, data);
+		LOGMASKED(LOG_UNHANDLED,"%s: writing to unhandled XSFR reg %04x data %02x\n", machine().describe_context(), offset + 0x3000, data);
 		break;
 
 	}
@@ -1127,7 +1123,7 @@ void axc51base_cpu_device::sfr_write(size_t offset, uint8_t data)
 	case AXC51_DPCON: dpcon_w(data); return; // 0x86
 
 	case AXC51_DBASE: // 0x9b
-		LOGMASKED(LOG_GENERAL,"%s: setting DBASE to %02x\n", machine().describe_context(), data);
+		LOGMASKED(LOG_UNSORTED,"%s: setting DBASE to %02x\n", machine().describe_context(), data);
 		m_sfr_regs[AXC51_DBASE - 0x80] = data;
 		return;
 
@@ -1140,7 +1136,7 @@ void axc51base_cpu_device::sfr_write(size_t offset, uint8_t data)
 
 
 	default:
-		LOGMASKED(LOG_GENERAL,"%s: attemping to write to an invalid/non-implemented SFR address: %02x  data=%02x\n", machine().describe_context(), (uint32_t)offset, data);
+		LOGMASKED(LOG_UNHANDLED,"%s: attemping to write to an invalid/non-implemented SFR address: %02x  data=%02x\n", machine().describe_context(), (uint32_t)offset, data);
 		/* no write in this case according to manual */
 		return;
 	}
@@ -1282,7 +1278,7 @@ uint8_t axc51base_cpu_device::sfr_read(size_t offset)
 
 		/* Illegal or non-implemented sfr */
 	default:
-		LOGMASKED(LOG_GENERAL,"axc51 '%s': attemping to read an invalid/non-implemented SFR address: %x at 0x%04x\n", tag(), (uint32_t)offset, m_pc);
+		LOGMASKED(LOG_UNSORTED,"%s: attemping to read an invalid/non-implemented SFR address: %02x\n", machine().describe_context(), (uint32_t)offset);
 		/* according to the manual, the read may return random bits */
 		return 0xff;
 	}
@@ -1447,7 +1443,7 @@ AXC51_SPICON (at 0xd8)
 uint8_t axc51base_cpu_device::spicon_r()
 {
 	uint8_t result = m_sfr_regs[AXC51_SPICON - 0x80] | 0x80;
-//	LOGMASKED(LOG_GENERAL,"%s: sfr_read AXC51_SPICON %02x\n", machine().describe_context(), result);
+//	LOGMASKED(LOG_UNSORTED,"%s: sfr_read AXC51_SPICON %02x\n", machine().describe_context(), result);
 	return result;
 }
 
@@ -1470,14 +1466,14 @@ uint8_t axc51base_cpu_device::uartsta_r()
 {
 	//uint8_t result = m_sfr_regs[AXC51_UARTSTA - 0x80];
 	uint8_t result = 0x30;
-	LOGMASKED(LOG_GENERAL, "%s: sfr_read AXC51_UARTSTA %02x\n", machine().describe_context(), result);
+	LOGMASKED(LOG_UNSORTED, "%s: sfr_read AXC51_UARTSTA %02x\n", machine().describe_context(), result);
 	return result;
 }
 
 
 void axc51base_cpu_device::spicon_w(uint8_t data)
 {
-//	LOGMASKED(LOG_GENERAL,"%s: sfr_write AXC51_SPICON %02x\n", machine().describe_context(), data);
+//	LOGMASKED(LOG_UNSORTED,"%s: sfr_write AXC51_SPICON %02x\n", machine().describe_context(), data);
 
 	m_sfr_regs[AXC51_SPICON - 0x80] = data;
 	m_spi_out_dir_cb((data & 0x20) ? true : false);
@@ -1487,7 +1483,7 @@ void axc51base_cpu_device::spicon_w(uint8_t data)
 
 uint8_t axc51base_cpu_device::dpcon_r()
 {
-	LOGMASKED(LOG_GENERAL,"%s: sfr_read AXC51_DPCON\n", machine().describe_context());
+	LOGMASKED(LOG_UNSORTED,"%s: sfr_read AXC51_DPCON\n", machine().describe_context());
 	return m_sfr_regs[AXC51_DPCON - 0x80];
 }
 
@@ -1509,7 +1505,7 @@ void axc51base_cpu_device::spibuf_w(uint8_t data)
 
 void axc51base_cpu_device::spibaud_w(uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL,"%s: sfr_write AXC51_SPIBAUD %02x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_UNSORTED,"%s: sfr_write AXC51_SPIBAUD %02x\n", machine().describe_context(), data);
 	m_sfr_regs[AXC51_SPIBAUD - 0x80] = data;
 }
 
@@ -1528,7 +1524,7 @@ AXC51_DPCON (at 0x86)
 
 void axc51base_cpu_device::dpcon_w(uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL,"%s: sfr_write AXC51_DPCON %02x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_UNSORTED,"%s: sfr_write AXC51_DPCON %02x\n", machine().describe_context(), data);
 	m_sfr_regs[AXC51_DPCON - 0x80] = data;
 }
 
@@ -1548,17 +1544,17 @@ AXC51_IE2CRPT (at 0x95)
 
 void axc51base_cpu_device::ie2crypt_w(uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL,"%s: sfr_write AXC51_IE2CRPT %02x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_UNSORTED,"%s: sfr_write AXC51_IE2CRPT %02x\n", machine().describe_context(), data);
 	m_sfr_regs[AXC51_IE2CRPT - 0x80] = data;
 
 	if (data & 0x03)
 	{
-		LOGMASKED(LOG_GENERAL,"SPI encryption turned on!\n");
+		LOGMASKED(LOG_UNSORTED,"SPI encryption turned on!\n");
 	}
 
 	if (data & 0x0c)
 	{
-		LOGMASKED(LOG_GENERAL,"SD Card encryption turned on!\n");
+		LOGMASKED(LOG_UNSORTED,"SD Card encryption turned on!\n");
 	}
 }
 
@@ -1567,7 +1563,7 @@ void axc51base_cpu_device::ie2crypt_w(uint8_t data)
 
 void axc51base_cpu_device::spidmaadr_w(uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL,"%s: sfr_write AXC51_SPIDMAADR %02x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_UNSORTED,"%s: sfr_write AXC51_SPIDMAADR %02x\n", machine().describe_context(), data);
 	m_sfr_regs[AXC51_SPIDMAADR - 0x80] = data;
 
 	m_spi_dma_addr <<= 8;
@@ -1577,12 +1573,12 @@ void axc51base_cpu_device::spidmaadr_w(uint8_t data)
 
 void axc51base_cpu_device::spidmacnt_w(uint8_t data)
 {
-	LOGMASKED(LOG_GENERAL,"%s: sfr_write AXC51_SPIDMACNT %02x (and trigger)\n", machine().describe_context(), data);
+	LOGMASKED(LOG_UNSORTED,"%s: sfr_write AXC51_SPIDMACNT %02x (and trigger)\n", machine().describe_context(), data);
 	m_sfr_regs[AXC51_SPIDMACNT - 0x80] = data;
 
 	if (((m_sfr_regs[AXC51_SPICON - 0x80]) & 0x20) == 0x20) // Read from SPI
 	{
-		LOGMASKED(LOG_GENERAL,"attempting to do *READ* DMA from SPI destination address %04x count %04x\n", m_spi_dma_addr, (data + 1) * 2);
+		LOGMASKED(LOG_UNSORTED,"attempting to do *READ* DMA from SPI destination address %04x count %04x\n", m_spi_dma_addr, (data + 1) * 2);
 
 		for (int i = 0; i < (data + 1) * 2; i++)
 		{
@@ -1593,7 +1589,7 @@ void axc51base_cpu_device::spidmacnt_w(uint8_t data)
 	}
 	else
 	{
-		LOGMASKED(LOG_GENERAL,"attempting to do *WRITE* DMA source address (RAM) %04x count %04x\n", m_spi_dma_addr, (data + 1) * 2);
+		LOGMASKED(LOG_UNSORTED,"attempting to do *WRITE* DMA source address (RAM) %04x count %04x\n", m_spi_dma_addr, (data + 1) * 2);
 		// 4 bytes will be written instead of 3 when setting the DMA address this way, but the 4th byte always seems to be 0xff which is ignored by our code
 		for (int i = 0; i < (data + 1) * 2; i++)
 		{
