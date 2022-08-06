@@ -5086,6 +5086,57 @@ more investigation needed...
 		</part>
 	</software>
 
+	<software name="hercules" supported="no">
+		<!-- Notes: PlayStation bootleg that was also released as Hercules 2 on the Mega Drive -->
+		<description>Hercules (pirate)</description>
+		<year>1999?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom_tekken2" /> <!-- incorrect, but boots -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="hercules.sfc" size="0x200000" crc="45874d3d" sha1="3e5d077c4ca1bb85f13cf12cc4432569b069b454" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
+	<software name="herculesh" cloneof="hercules">
+		<description>Hercules (pirate, hacked)</description>
+		<year>1999?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="hercules-crack.sfc" size="0x200000" crc="aa9504c4" sha1="464f6fe19409e2721374ed1aea8bc59eda59ce7a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kof98" supported="no">
+		<description>The King of Fighters '98 (pirate)</description>
+		<year>199?</year>
+		<publisher>DVS Electronic Co.</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom_poke" /> <!-- incorrect, so protection must be different from kof2000 -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="kof98.sfc" size="0x200000" crc="6c303fc9" sha1="3729e177d524385309e2a21d7e8923f01f1a3632" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
+	<software name="kof98h" cloneof="kof98">
+		<description>The King of Fighters '98 (pirate, hacked)</description>
+		<year>199?</year>
+		<publisher>DVS Electronic Co.</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="kof98-crack.sfc" size="0x200000" crc="41d93387" sha1="5e14269f797bf8aeb80141d71827780ae4abd0cf" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kof2000">
 	<!-- Protection notes: write latch byte to 88xxxx, then reads back BITSWAP8(latch,0,6,7,1,2,3,4,5) from 80xxxx -->
 		<!-- single cartridge source: d4s -->
@@ -5109,6 +5160,32 @@ more investigation needed...
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="3145728">
 				<rom name="the king of fighters 2000 (cracked).sfc"  size="3145728" crc="ee339f08" sha1="ac7a8d84635240e1fe7e8ef4199db823c63b7d9a" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mshvsf" cloneof="xmvsf" supported="no">
+		<description>Marvel Super Heroes Vs. Street Fighter (pirate)</description>
+		<!-- Notes: Title screen variant of X-Men Vs. Street Fighter pirate -->
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom_poke" /> <!-- incorrect, so protection must be different from xmvsf -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="marvel.sfc" size="0x200000" crc="cdb590e4" sha1="beff879c0e2c277448648cc4312185ca903fe8d2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
+	<software name="mshvsfh" cloneof="xmvsf">
+		<description>Marvel Super Heroes Vs. Street Fighter (pirate, hacked)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="marvel-crack.sfc" size="0x200000" crc="05f60d4a" sha1="446a285dae305ce0a6a752805b4d648ce10bfabd" />
 			</dataarea>
 		</part>
 	</software>
@@ -5249,6 +5326,31 @@ more investigation needed...
 		</part>
 	</software>
 
+	<software name="squirrel">
+		<description>Squirrel (pirate)</description>
+		<year>1999?</year>
+		<publisher>DVS Electronic Co.?</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom_poke" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="squirrel-4mbit.sfc" size="0x200000" crc="bad1d9b8" sha1="4a88cdfbfefeaf79df9ebfd1974b16a1571dbce1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
+	<software name="squirrelh" cloneof="squirrel">
+		<description>Squirrel (pirate, hacked)</description>
+		<year>1999?</year>
+		<publisher>DVS Electronic Co.?</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="squirrel-crack.sfc" size="0x200000" crc="82ae070b" sha1="bbf8b45cc26613a626ac67b8abb6dd88b8b7954f" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sfex">
 		<!-- single cartridge source: d4s -->
 		<description>Street Fighter EX Plus α (Asia)</description>
@@ -5337,7 +5439,7 @@ more investigation needed...
 		</part>
 	</software>
 
-	<software name="xmensf">
+	<software name="xmvsf">
 	<!-- Protection notes: write latch byte to 88xxxx, then reads back BITSWAP8(latch,0,6,7,1,2,3,4,5) from 80xxxx -->
 		<!-- single cartridge source: d4s -->
 		<description>X-Men vs. Street Fighter (Asia)</description>
@@ -5357,7 +5459,7 @@ more investigation needed...
 	</software>
 
 	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
-	<software name="xmensfh" cloneof="xmensf">
+	<software name="xmvsfh" cloneof="xmvsf">
 		<description>X-Men vs. Street Fighter (Asia, cracked)</description>
 		<year>1996</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
