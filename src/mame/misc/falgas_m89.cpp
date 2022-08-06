@@ -210,7 +210,7 @@ void falgasm89_state::falgasm89(machine_config &config)
 
 void falgasm89_video_state::falgasm89_video(machine_config &config)
 {
-	falgasm89_state::falgasm89(config);
+	falgasm89(config);
 
 	I8085A(config, m_videocpu, 6_MHz_XTAL); // OKI M80C85A-2
 
