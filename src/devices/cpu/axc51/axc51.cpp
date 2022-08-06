@@ -88,6 +88,7 @@ axc51base_cpu_device::axc51base_cpu_device(const machine_config &mconfig, device
 	, m_mainram(*this, "mainram")
 	, m_port_in_cb(*this)
 	, m_port_out_cb(*this)
+	, m_dac_out_cb(*this)
 	, m_spi_in_cb(*this)
 	, m_spi_out_cb(*this)
 	, m_spi_out_dir_cb(*this)
@@ -156,6 +157,7 @@ void axc51base_cpu_device::iram_indirect_write(offs_t a, uint8_t d) { m_data.wri
 #define DPH0        SFR_A(ADDR_DPH0)
 #define PCON        SFR_A(ADDR_PCON)
 #define IE          SFR_A(ADDR_IE)
+#define IE1         SFR_A(AXC51_IE1)
 #define IP          SFR_A(ADDR_IP)
 #define B           SFR_A(ADDR_B)
 #define ER8         SFR_A(AXC51_ER8)
@@ -250,6 +252,8 @@ void axc51base_cpu_device::iram_indirect_write(offs_t a, uint8_t d) { m_data.wri
 #define GET_OV          GET_BIT(PSW, 2)
 #define GET_EZ          GET_BIT(PSW, 1) //Extended Instruction Zero Flag EZ
 #define GET_P           GET_BIT(PSW, 0)
+
+#define GET_DMAIRQEN    GET_BIT(IE1, 6)
 
 #define GET_EA          GET_BIT(IE, 7)
 #define GET_SDCIRQEN    GET_BIT(IE, 6)
@@ -891,6 +895,56 @@ const uint8_t axc51base_cpu_device::axc51_cycles[256] = {
 
 void axc51base_cpu_device::check_irqs()
 {
+	irq_hack_ctr++;
+	irq_hack_ctr2++;
+
+	if (!GET_EA)
+		return;
+
+	int base;
+
+	switch (m_sfr_regs[AXC51_DPCON - 0x80] & 0xc0)
+	{
+	case 0x00:
+	case 0xc0:
+		return; // invalid
+
+	case 0x80:
+		return;
+		//base = 0x8000;
+		//break;
+
+	case 0x40:
+		base = 0x4000;
+		break;
+	}
+
+	if (irq_hack_ctr >= 100000)
+	{
+		irq_hack_ctr = 0;
+
+		if (!GET_T0IRQEN)
+			return;
+	
+		push_pc();
+		m_pc = base + 0x0003;
+
+		return;
+	}
+
+	if (irq_hack_ctr2 >= 2000)
+	{
+		irq_hack_ctr2 = 0;
+
+		if (!GET_DMAIRQEN)
+			return;
+	
+		push_pc();
+		m_pc = base + 0x0073;
+
+		return;
+	}
+
 }
 
 void axc51base_cpu_device::burn_cycles(int cycles)
@@ -1030,6 +1084,14 @@ void axc51base_cpu_device::sfr_write(size_t offset, uint8_t data)
 	case AXC51_GP5: // 0xb2
 	case AXC51_GP6: // 0xb3
 	case AXC51_GP7: // 0xb5
+		break;
+
+	case AXC51_DACLCH: // 0xa6
+		m_dac_out_cb[0](data);
+		break;
+
+	case AXC51_DACRCH: // 0xa7
+		m_dac_out_cb[1](data);
 		break;
 
 	case AXC51_P0DIR: // 0xba
@@ -1235,6 +1297,7 @@ void axc51base_cpu_device::device_start()
 
 	m_port_in_cb.resolve_all_safe(0xff);
 	m_port_out_cb.resolve_all_safe();
+	m_dac_out_cb.resolve_all_safe();
 
 	m_spi_in_cb.resolve_safe(0xff);
 	m_spi_out_cb.resolve_safe();

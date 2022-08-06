@@ -20,6 +20,7 @@
 #include "speaker.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "sound/dac.h"
 
 class monon_color_state : public driver_device
 {
@@ -30,6 +31,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_dac(*this, "dac"),
 		m_spiptr(*this, "flash")
 	{ }
 
@@ -47,14 +49,29 @@ private:
 	required_device<ax208_cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<dac_8bit_r2r_twos_complement_device> m_dac;
 	required_region_ptr<uint8_t> m_spiptr;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
+	u8 in0_r();
+	u8 in1_r();
 	u8 in2_r();
+	u8 in3_r();
+	u8 in4_r();
+	void out0_w(u8 data);
+	void out1_w(u8 data);
 	void out2_w(u8 data);
 	void out3_w(u8 data);
 	void out4_w(u8 data);
+
+	uint8_t read_from_video_device();
+	void write_to_video_device(u8 data);
+
+	void dacout0_w(u8 data);
+	void dacout1_w(u8 data);
+
+	int m_dacbyte = 0;
 
 	uint8_t m_out2state = 0;
 
@@ -62,6 +79,11 @@ private:
 	uint8_t m_spi_state = 0;
 	uint8_t m_spilatch = 0;
 	bool m_spidir = false;
+
+	uint8_t m_out4data = 0;
+	uint8_t m_out3data = 0;
+	uint8_t m_out1data = 0;
+	uint8_t m_out0data = 0;
 
 	enum
 	{
@@ -83,8 +105,9 @@ private:
 	void spibuf_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(spidir_w);
 
-	uint8_t m_vidbuffer[256 * 256];
+	uint8_t m_vidbuffer[360 * 240];
 	int bufpos = 0;
+	uint8_t blah[0x20];
 };
 
 void monon_color_state::machine_start()
@@ -96,6 +119,12 @@ void monon_color_state::machine_start()
 	save_item(NAME(m_spidir));
 	save_item(NAME(m_vidbuffer));
 	save_item(NAME(bufpos));
+
+	for (int i = 0; i < 0x20; i++)
+		blah[i] = 0x00;
+
+	for (int i = 0; i < 360 * 240; i++)
+		m_vidbuffer[i] = 0x00;
 }
 
 uint8_t monon_color_state::spibuf_r()
@@ -103,7 +132,7 @@ uint8_t monon_color_state::spibuf_r()
 //	if (!(m_out2state & 0x01))
 //		return 0x00;
 
-	logerror("%s: sfr_read AXC51_SPIBUF %02x\n", machine().describe_context(), m_spilatch);
+	//logerror("%s: sfr_read AXC51_SPIBUF %02x\n", machine().describe_context(), m_spilatch);
 
 	return m_spilatch;
 }
@@ -121,7 +150,7 @@ void monon_color_state::spibuf_w(uint8_t data)
 
 	if (!m_spidir) // Send to SPI
 	{
-		logerror("%s: sfr_write AXC51_SPIBUF %02x\n", machine().describe_context(), data);
+		//logerror("%s: sfr_write AXC51_SPIBUF %02x\n", machine().describe_context(), data);
 
 		switch (m_spi_state)
 		{
@@ -129,17 +158,17 @@ void monon_color_state::spibuf_w(uint8_t data)
 			if (data == 0x03)
 			{
 				// set read mode
-				logerror("SPI Read Command\n");
+			//	logerror("SPI Read Command\n");
 				m_spi_state = READY_FOR_ADDRESS2;
 			}
 			else if (data == 0x05)
 			{
-				logerror("SPI Status Command\n");
+			//	logerror("SPI Status Command\n");
 				m_spi_state = READY_FOR_STATUS_READ;
 			}
 			else if (data == 0x0b)
 			{
-				logerror("SPI Fast Read Command\n");
+			//	logerror("SPI Fast Read Command\n");
 				m_spi_state = READY_FOR_HSADDRESS2;
 			}
 			else
@@ -178,7 +207,7 @@ void monon_color_state::spibuf_w(uint8_t data)
 		case READY_FOR_HSADDRESS0:
 			m_spiaddr = (m_spiaddr & 0xffff00) | (data);
 			m_spi_state = READY_FOR_HSDUMMY;
-			logerror("SPI Address set to %08x\n", m_spiaddr);
+			logerror("SPI HS Address set to %08x\n", m_spiaddr);
 			break;
 
 		case READY_FOR_HSDUMMY:
@@ -191,17 +220,17 @@ void monon_color_state::spibuf_w(uint8_t data)
 		if (m_spi_state == READY_FOR_READ)
 		{
 			m_spilatch = m_spiptr[m_spiaddr++];
-			logerror("%s: sfr_write AXC51_SPIBUF (clock read, data read latching in %02x)\n", machine().describe_context(), m_spilatch);			
+		//	logerror("%s: sfr_write AXC51_SPIBUF (clock read, data read latching in %02x)\n", machine().describe_context(), m_spilatch);			
 		}
 		else if (m_spi_state == READY_FOR_STATUS_READ)
 		{
 			m_spilatch = 0x00;
-			logerror("%s: sfr_write AXC51_SPIBUF (clock read, status read)\n", machine().describe_context(), m_spi_state);			
+		//	logerror("%s: sfr_write AXC51_SPIBUF (clock read, status read)\n", machine().describe_context(), m_spi_state);			
 		}
 		else
 		{
 			m_spilatch = 0x00;
-			logerror("%s: sfr_write AXC51_SPIBUF (unknown read, status read)\n", machine().describe_context(), m_spi_state);			
+		//	logerror("%s: sfr_write AXC51_SPIBUF (unknown read, status read)\n", machine().describe_context(), m_spi_state);			
 		}
 	}
 }
@@ -241,10 +270,10 @@ uint32_t monon_color_state::screen_update(screen_device &screen, bitmap_ind16 &b
 {
 	uint8_t* videoram = m_vidbuffer;
 
-	for (int y = 0; y < 256; y++)
+	for (int y = 0; y < 240; y++)
 	{
-		int count = (y * 256);
-		for(int x = 0; x < 256; x++)
+		int count = (y * 360);
+		for(int x = 0; x < 360; x++)
 		{
 			uint8_t pixel = videoram[count++];
 			bitmap.pix(y, x) = pixel;
@@ -254,26 +283,182 @@ uint32_t monon_color_state::screen_update(screen_device &screen, bitmap_ind16 &b
 }
 
 static INPUT_PORTS_START( monon_color )
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x0001, 0x0001, "0" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x0001, 0x0001, "1" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x0001, 0x0001, "2" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("IN4")
+	PORT_DIPNAME( 0x0001, 0x0001, "4" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
-void monon_color_state::out4_w(u8 data)
+
+
+
+u8 monon_color_state::in0_r()
 {
-//	m_vidbuffer[bufpos++] = data;
-//	if (bufpos == (256 * 256))
-//		bufpos = 0;
+	return machine().rand();// ioport("IN0")->read();
 }
 
-void monon_color_state::out3_w(u8 data)
+u8 monon_color_state::in1_r()
 {
-	m_vidbuffer[bufpos++] = data;
-	if (bufpos == (256 * 256))
-		bufpos = 0;
+	return ioport("IN1")->read();
 }
 
 u8 monon_color_state::in2_r()
 {
-	return m_out2state;
+	return ioport("IN2")->read();
+}
+
+u8 monon_color_state::in3_r()
+{
+	return m_out3data;
+}
+
+u8 monon_color_state::in4_r()
+{
+	return ioport("IN4")->read();
+}
+
+void monon_color_state::dacout0_w(u8 data)
+{
+	//printf("%s: dacout0_w %02x\n", machine().describe_context().c_str(), data);
+	m_dacbyte ^= 1;
+
+	if (m_dacbyte == 1)
+		m_dac->write(data);
+}
+
+void monon_color_state::dacout1_w(u8 data)
+{
+	printf("%s: dacout1_w %02x\n", machine().describe_context().c_str(), data);
+}
+
+
+
+void monon_color_state::out0_w(u8 data)
+{
+	m_out0data = data;
+}
+
+void monon_color_state::out1_w(u8 data)
+{
+	//logerror("out1 %02x\n", data);
+
+	// out1 goes e5, e5, e7, e7 when WRITING a byte to the video device
+	//        or e3, e3, e7, e7 when READING a byte from the video device
+	//
+	// presumably this actually causes the data from P3 to be written to the
+	// device, or data from the device to be latched in P3
+
+	if ((m_out1data == 0xe5) && (data == 0xe7))
+	{
+		write_to_video_device(m_out3data);
+	}
+	else if ((m_out1data == 0xe3) && (data == 0xe7))
+	{
+		m_out3data = read_from_video_device();
+	}
+
+	m_out1data = data;
+
 }
 
 void monon_color_state::out2_w(u8 data)
@@ -282,44 +467,186 @@ void monon_color_state::out2_w(u8 data)
 	{
 		if (data & 0x01)
 		{
-			logerror("low to high on port 2\n");
+		//	logerror("low to high on port 2\n");
 			m_spi_state = READY_FOR_COMMAND;
 		}
 		else
 		{
-			logerror("high to low on port 2\n");
+		//	logerror("high to low on port 2\n");
 		}
 	}
 	m_out2state = data;
 }
 
+uint8_t monon_color_state::read_from_video_device()
+{
+	if ((m_out0data != 0x00) && (m_out0data != 0x1b) && (m_out0data != 0x0a) && (m_out0data != 0x0c) && (m_out0data != 0x17) && (m_out0data != 0x1f) && (m_out0data != 0xff))
+	{
+		fatalerror("unknown out when using in");
+	}
+
+	return 0x00;
+}
+
+void monon_color_state::write_to_video_device(u8 data)
+{
+
+/*
+
+startup only
+
+out3 data 00 (out0 b0)
+out3 data 00 (out0 b0)
+out3 data dc (out0 10)
+out3 data 32 (out0 18)
+out3 data dc (out0 14)
+out3 data c0 (out0 0b)
+out3 data 00 (out0 07)
+out3 data 00 (out0 0f)
+out3 data 00 (out0 0d)
+out3 data c0 (out0 0a)
+out3 data 00 (out0 0f)
+out3 data 00 (out0 07)
+out3 data 00 (out0 0b)
+
+*/
+	// these are 2 pairs of read/write codepaths before accessing the video device
+	// one of them sets port 4 to be 0x03, the other sets it to be 0x09
+	// are there multiple devices?
+
+	if (m_out4data == 0x03)
+	{
+
+		if (m_out0data < 0x20)
+		{
+			blah[m_out0data] = data;
+		}
+
+		popmessage("%02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x | %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n", blah[0x00], blah[0x01], blah[0x02], blah[0x03], blah[0x04], blah[0x05], blah[0x06], blah[0x07], blah[0x08], blah[0x09], blah[0x0a], blah[0x0b], blah[0x0c], blah[0x0d], blah[0x0e], blah[0x0f],
+			blah[0x10], blah[0x11], blah[0x12], blah[0x13], blah[0x14], blah[0x15], blah[0x16], blah[0x17], blah[0x18], blah[0x19], blah[0x1a], blah[0x1b], blah[0x1c], blah[0x1d], blah[0x1e], blah[0x1f]);
+
+
+		/*
+		if (m_out0data == 0x17) // not much after startup
+			return;
+
+		if (m_out0data == 0x09)
+			return;
+
+		if (m_out0data == 0x0c) // more interesting
+			return;
+
+		if (m_out0data == 0x1b)
+			return;
+
+		if (m_out0data == 0x1c) // main port?
+			return;
+
+		if (m_out0data == 0x02)
+			return;
+
+		if (m_out0data == 0x12)
+			return;
+
+		if (m_out0data == 0x11)
+			return;
+
+		if (m_out0data == 0x1e)
+			return;
+
+		if (m_out0data == 0x01)
+			return;
+
+		if (m_out0data == 0x1a)
+			return;
+
+		if (m_out0data == 0x16)
+			return;
+
+		if (m_out0data == 0x0e)
+			return;
+
+		if (m_out0data == 0x1f)
+			return;
+
+		if (m_out0data == 0x00)
+			return;
+
+		if (m_out0data == 0x04)
+			return;
+
+		if (m_out0data == 0x08)
+			return;
+		*/
+
+		//printf("out3 data %02x (out0 %02x)\n", data, m_out0data);
+
+		{
+			m_vidbuffer[bufpos++] = data;
+			if (bufpos == (360 * 240))
+				bufpos = 0;
+		}
+	}
+	else if (m_out4data == 0x09)
+	{
+
+	}
+	else
+	{
+		fatalerror("write to port 3 with unknown port 4 state %02x\n", m_out4data);
+	}
+}
+
+
+
+void monon_color_state::out3_w(u8 data)
+{
+	m_out3data = data;
+}
+
+void monon_color_state::out4_w(u8 data)
+{
+	m_out4data = data;
+}
+
+
 void monon_color_state::monon_color(machine_config &config)
 {
 	/* basic machine hardware */
 	AX208(config, m_maincpu, 96000000); // (8051 / MCS51 derived) incomplete core!
+	m_maincpu->port_in_cb<0>().set(FUNC(monon_color_state::in0_r));
+	m_maincpu->port_in_cb<1>().set(FUNC(monon_color_state::in1_r));
 	m_maincpu->port_in_cb<2>().set(FUNC(monon_color_state::in2_r));
+	m_maincpu->port_in_cb<3>().set(FUNC(monon_color_state::in3_r));
+	m_maincpu->port_in_cb<4>().set(FUNC(monon_color_state::in4_r));
+	m_maincpu->port_out_cb<0>().set(FUNC(monon_color_state::out0_w));
+	m_maincpu->port_out_cb<1>().set(FUNC(monon_color_state::out1_w));
 	m_maincpu->port_out_cb<2>().set(FUNC(monon_color_state::out2_w));
 	m_maincpu->port_out_cb<3>().set(FUNC(monon_color_state::out3_w));
 	m_maincpu->port_out_cb<4>().set(FUNC(monon_color_state::out4_w));
 	m_maincpu->spi_in_cb().set(FUNC(monon_color_state::spibuf_r));
 	m_maincpu->spi_out_cb().set(FUNC(monon_color_state::spibuf_w));
 	m_maincpu->spi_out_dir_cb().set(FUNC(monon_color_state::spidir_w));
+	m_maincpu->dac_out_cb<0>().set(FUNC(monon_color_state::dacout0_w));
+	m_maincpu->dac_out_cb<1>().set(FUNC(monon_color_state::dacout1_w));
 
-	
+
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_screen_update(FUNC(monon_color_state::screen_update));
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
+	m_screen->set_size(360, 240);
+	m_screen->set_visarea(0*8, 360-1, 0*8, 240-1);
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_entries(256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
+
+	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.500); 
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "monon_color_cart", "bin"));
 	cartslot.set_width(GENERIC_ROM8_WIDTH);

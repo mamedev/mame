@@ -24,6 +24,9 @@ public:
 	template <unsigned N> auto port_in_cb() { return m_port_in_cb[N].bind(); }
 	template <unsigned N> auto port_out_cb() { return m_port_out_cb[N].bind(); }
 
+	template <unsigned N> auto dac_out_cb() { return m_dac_out_cb[N].bind(); }
+
+
 	auto spi_in_cb() { return m_spi_in_cb.bind(); }
 	auto spi_out_cb() { return m_spi_out_cb.bind(); }
 	auto spi_out_dir_cb() { return m_spi_out_dir_cb.bind(); }
@@ -106,6 +109,7 @@ protected:
 
 	devcb_read8::array<5> m_port_in_cb;
 	devcb_write8::array<5> m_port_out_cb;
+	devcb_write8::array<2> m_dac_out_cb;
 
 	devcb_read8 m_spi_in_cb;
 	devcb_write8 m_spi_out_cb;
@@ -498,6 +502,10 @@ protected:
 		V_DAC        = 0x073,  // IE1.6   IP1.6
 		V_SFS_INT    = 0x07b,  // IE1.7   IP1.7
 	};
+
+	int irq_hack_ctr = 0;
+	int irq_hack_ctr2 = 0;
+
 };
 
 
