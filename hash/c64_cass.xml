@@ -15830,6 +15830,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="v" supported="no"> <!-- game loads to the title screen but crashes once player has started a game -->
+		<description>V</description>
+		<year>1985</year>
+		<publisher>Ocean</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="483637">
+				<rom name="V.tap" size="483637" crc="471b5707" sha1="5446cdf3483308290653cd5f6ee85e8ed1d88241"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="vampire">
 		<description>Vampire</description>
 		<year>1987</year>
@@ -15922,6 +15934,26 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="vigilant">
+		<description>Vigilante</description>
+		<year>1989</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="741802">
+				<rom name="Vigilante_Side_1.tap" size="741802" crc="0baa74ee" sha1="2377d196ee4a0fdd129afa5a5095c4820a7d1b82"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="865040">
+				<rom name="Vigilante_Side_2.tap" size="865040" crc="211278c3" sha1="70dfb287106691ea2a6f7759893e88554ff7c932"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="thevindc">
 		<description>The Vindicator</description>
 		<year>1990</year>
@@ -15934,6 +15966,42 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="thevindci" cloneof="thevindc">
+		<description>The Vindicator! (Imagine)</description>
+		<year>1988</year>
+		<publisher>Imagine</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1508734">
+				<rom name="Vindicator,_The.tap" size="1508734" crc="478c03db" sha1="5ac3c43eda6bff8f6860a8106712b72f0d890e0f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="war" supported="no"> <!-- game partially loads and stops with only "W.A.R" text displayed -->
+		<description>W.A.R</description>
+		<year>1986</year>
+		<publisher>Martech</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="687530">
+				<rom name="W.A.R.tap" size="687530" crc="17db7a6f" sha1="83ce737e7066560c697a417f11195c9a0760f641"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wgtrhyme" supported="no"> <!-- tape loads but doesn't run (remains stuck showing light blue screen) -->
+		<description>Wallie goes to Rhymeland</description>
+		<year>1984</year>
+		<publisher>Inteceptor Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="544664">
+				<rom name="Wallie_goes_to_Rhymeland.tap" size="544664" crc="9a508b26" sha1="5485fd6f64dba79dbf7686f35c64fa58dce363c0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wander3d">
 		<description>Wanderer 3D</description>
 		<year>1990</year>
@@ -15942,6 +16010,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="732427">
 				<rom name="Wanderer_3D.tap" size="732427" crc="5cfce431" sha1="f7fb4417e9cdf880f260d9e87f9ae84e1b74e4e4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wander3de" cloneof="wander3d">
+		<description>Wanderer 3D (Elite Systems)</description>
+		<year>1988</year>
+		<publisher>Elite Systems</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="533540">
+				<rom name="Wanderer_3D.tap" size="533540" crc="76c019c8" sha1="990d6a0d4af9587871bf4240d7048a4b9dc47529"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15994,6 +16074,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="watrpolo">
+		<description>Water Polo</description>
+		<year>1987</year>
+		<publisher>Gremlin Graphics</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="639132">
+				<rom name="Water_Polo.tap" size="639132" crc="402d8dc7" sha1="bc7057510f8a95942326bbfd3eb23970598e010f"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="explfist">
 		<description>Way of the Exploding Fist</description>
 		<year>1988</year>
@@ -16002,6 +16094,79 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="479718">
 				<rom name="Way_of_the_Exploding_Fist.tap" size="479718" crc="540fa725" sha1="58950f8706a52603794e4eeb8eb35cadfee2a2e0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="explfistm" cloneof="explfist">
+		<description>The Way of the Exploding Fist (Micropool)</description>
+		<year>198?</year>
+		<publisher>Micropool</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="678749">
+				<rom name="Way_of_the_Exploding_Fist,_The.tap" size="678749" crc="0b105094" sha1="b65f31baddbc9a9afb4cc54b1b1d4122474042f9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="explfistmh" cloneof="explfist" supported="no"> <!-- tape loads but doesn't run (remains stuck showing light blue screen) -->
+		<description>The Way of the Exploding Fist (Melbourne House)</description>
+		<year>1985</year>
+		<publisher>Melbourne House</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="596605">
+				<rom name="Way_of_the_Exploding_Fist,_The.tap" size="596605" crc="042fa26e" sha1="9b6428b9decbf7cd5596895b0da92900732513c8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="westbank">
+		<description>West Bank</description>
+		<year>1986</year>
+		<publisher>Gremlin Graphics</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="560715">
+				<rom name="West_Bank.tap" size="560715" crc="18f0d1ef" sha1="aeb78a33cd10c85e5c664b5e302e755ea0986990"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="westgame">
+		<description>Western Games</description>
+		<year>1987</year>
+		<publisher>Magic Bytes</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="2751862">
+				<rom name="Western_Games.tap" size="2751862" crc="d4cec048" sha1="634006a1a24dd04992433101fce8431abd7844ac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wheelwal">
+		<description>Wheelin' Wallie</description>
+		<year>1984</year>
+		<publisher>Interceptor Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="2303732">
+				<rom name="Wheelin'_Wallie.tap" size="2303732" crc="ff439263" sha1="a9e86d0b4817bf550184f68f1ff88726d7c9db17"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ger1985">
+		<description>Germany 1985: When Superpowers Collide</description>
+		<year>1986</year>
+		<publisher>Transatlantic Simulations</publisher>
+		<info name="alt_title" value="Germany 1985"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="626078">
+				<rom name="When_Superpowers_Collide_-_Germany_1985.tap" size="626078" crc="940c64e9" sha1="9608deec860177d29966a831e347ceda6f32196a"/>
 			</dataarea>
 		</part>
 	</software>
