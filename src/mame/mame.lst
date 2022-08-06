@@ -9580,10 +9580,6 @@ bml3                            //
 bml3mk2                         //
 bml3mk5                         //
 
-@source:galaxian/bmxstunts.cpp
-bmxstunts
-bmxstuntsa
-
 @source:jaleco/bnstars.cpp
 bnstars1                        // (c) 1997
 
@@ -14644,6 +14640,8 @@ bagmanm2                        // (c) 1984 Valadon Automation / GIB
 bagmanmc                        // bootleg
 batman2                         // bootleg
 blkhole                         // TDS (Tokyo Denshi Sekkei) & MINTS
+bmxstunts                       // (c) 1985 Jetsoft
+bmxstuntsa                      // (c) 1985 Jetsoft
 bomber                          //
 bongo                           // (c) 1983 Jetsoft
 calipso                         // (c) 1982 Tago

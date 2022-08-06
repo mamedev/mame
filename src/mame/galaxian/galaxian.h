@@ -196,6 +196,7 @@ public:
 	void init_mimonkey();
 	void init_mimonkeyb();
 	void init_victoryc();
+	void init_bmxstunts();
 
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	void galaxian_palette(palette_device &palette);
@@ -315,6 +316,7 @@ public:
 	void mimonkey(machine_config &config);
 	void mimonscr(machine_config &config);
 	void galartic(machine_config &config);
+	void bmxstunts(machine_config &config);
 
 	template <int Mask> CUSTOM_INPUT_MEMBER(ckongg_coinage_r);
 	template <int Mask> DECLARE_READ_LINE_MEMBER(ckongs_coinage_r);
@@ -335,6 +337,7 @@ protected:
 	void astroamb_map(address_map &map);
 	void bongo_map(address_map &map);
 	void bongo_io_map(address_map &map);
+	void bmxstunts_map(address_map& map);
 	void checkmaj_sound_map(address_map &map);
 	void checkman_sound_map(address_map &map);
 	void checkman_sound_portmap(address_map &map);
