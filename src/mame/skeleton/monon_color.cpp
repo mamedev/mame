@@ -106,8 +106,11 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(spidir_w);
 
 	uint8_t m_vidbuffer[360 * 240];
-	int bufpos = 0;
-	uint8_t blah[0x20];
+	int m_bufpos = 0;
+	uint8_t m_storeregs0[0x20];
+	uint8_t m_storeregs1[0x20];
+
+
 };
 
 void monon_color_state::machine_start()
@@ -118,13 +121,11 @@ void monon_color_state::machine_start()
 	save_item(NAME(m_spilatch));
 	save_item(NAME(m_spidir));
 	save_item(NAME(m_vidbuffer));
-	save_item(NAME(bufpos));
+	save_item(NAME(m_bufpos));
 
-	for (int i = 0; i < 0x20; i++)
-		blah[i] = 0x00;
-
-	for (int i = 0; i < 360 * 240; i++)
-		m_vidbuffer[i] = 0x00;
+	std::fill(std::begin(m_storeregs0), std::end(m_storeregs0), 0);
+	std::fill(std::begin(m_storeregs1), std::end(m_storeregs1), 0);
+	std::fill(std::begin(m_vidbuffer), std::end(m_vidbuffer), 0);
 }
 
 uint8_t monon_color_state::spibuf_r()
@@ -261,7 +262,7 @@ void monon_color_state::machine_reset()
 	m_spilatch = 0;
 	m_spidir = false;
 	//m_vidbuffer[256 * 256];
-	bufpos = 0;
+	m_bufpos = 0;
 }
 
 
@@ -419,7 +420,7 @@ u8 monon_color_state::in4_r()
 
 void monon_color_state::dacout0_w(u8 data)
 {
-	//printf("%s: dacout0_w %02x\n", machine().describe_context().c_str(), data);
+	//logerror("%s: dacout0_w %02x\n", machine().describe_context().c_str(), data);
 	m_dacbyte ^= 1;
 
 	if (m_dacbyte == 1)
@@ -428,7 +429,7 @@ void monon_color_state::dacout0_w(u8 data)
 
 void monon_color_state::dacout1_w(u8 data)
 {
-	printf("%s: dacout1_w %02x\n", machine().describe_context().c_str(), data);
+	logerror("%s: dacout1_w %02x\n", machine().describe_context().c_str(), data);
 }
 
 
@@ -516,15 +517,18 @@ out3 data 00 (out0 0b)
 
 	if (m_out4data == 0x03)
 	{
-
 		if (m_out0data < 0x20)
 		{
-			blah[m_out0data] = data;
+			if (m_out0data >= 0x10) // when out4data is 0x03 registers(?) used are also always >= 0x10?
+				m_storeregs0[m_out0data] = data;
+			else
+			{
+				logerror("out4 mode is 0x03, m_out0data is <0x10  %02x\n", m_out0data);
+			}
 		}
 
-		popmessage("%02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x | %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n", blah[0x00], blah[0x01], blah[0x02], blah[0x03], blah[0x04], blah[0x05], blah[0x06], blah[0x07], blah[0x08], blah[0x09], blah[0x0a], blah[0x0b], blah[0x0c], blah[0x0d], blah[0x0e], blah[0x0f],
-			blah[0x10], blah[0x11], blah[0x12], blah[0x13], blah[0x14], blah[0x15], blah[0x16], blah[0x17], blah[0x18], blah[0x19], blah[0x1a], blah[0x1b], blah[0x1c], blah[0x1d], blah[0x1e], blah[0x1f]);
-
+		popmessage("%02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x | %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n", m_storeregs0[0x00], m_storeregs0[0x01], m_storeregs0[0x02], m_storeregs0[0x03], m_storeregs0[0x04], m_storeregs0[0x05], m_storeregs0[0x06], m_storeregs0[0x07], m_storeregs0[0x08], m_storeregs0[0x09], m_storeregs0[0x0a], m_storeregs0[0x0b], m_storeregs0[0x0c], m_storeregs0[0x0d], m_storeregs0[0x0e], m_storeregs0[0x0f],
+			m_storeregs0[0x10], m_storeregs0[0x11], m_storeregs0[0x12], m_storeregs0[0x13], m_storeregs0[0x14], m_storeregs0[0x15], m_storeregs0[0x16], m_storeregs0[0x17], m_storeregs0[0x18], m_storeregs0[0x19], m_storeregs0[0x1a], m_storeregs0[0x1b], m_storeregs0[0x1c], m_storeregs0[0x1d], m_storeregs0[0x1e], m_storeregs0[0x1f]);
 
 		/*
 		if (m_out0data == 0x17) // not much after startup
@@ -579,17 +583,23 @@ out3 data 00 (out0 0b)
 			return;
 		*/
 
-		//printf("out3 data %02x (out0 %02x)\n", data, m_out0data);
-
 		{
-			m_vidbuffer[bufpos++] = data;
-			if (bufpos == (360 * 240))
-				bufpos = 0;
+			m_vidbuffer[m_bufpos++] = data;
+			if (m_bufpos == (360 * 240))
+				m_bufpos = 0;
 		}
 	}
 	else if (m_out4data == 0x09)
 	{
-
+		if (m_out0data < 0x20)
+		{
+			if (m_out0data < 0x10) // when out4data is 0x09 registers(?) used are also always < 0x10?
+				m_storeregs1[m_out0data] = data;
+			else
+			{
+				logerror("out4 mode is 0x09, m_out0data is >=0x10  %02x\n", m_out0data);
+			}
+		}
 	}
 	else
 	{
