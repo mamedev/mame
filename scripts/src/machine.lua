@@ -4823,6 +4823,19 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/spifi3.h,MACHINES["SPIFI3"] = true
+---------------------------------------------------
+
+if (MACHINES["SPIFI3"]~=null) then
+	MACHINES["NSCSI"] = true
+	files {
+		MAME_DIR .. "src/devices/machine/spifi3.cpp",
+		MAME_DIR .. "src/devices/machine/spifi3.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/applefdintf.h,MACHINES["APPLE_FDINTF"] = true
 ---------------------------------------------------
 if (MACHINES["APPLE_FDINTF"]~=null) then
@@ -4939,28 +4952,6 @@ if (MACHINES["NS32082"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/ns32082.cpp",
 		MAME_DIR .. "src/devices/machine/ns32082.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/tsconfdma.h,MACHINES["TSCONF_DMA"] = true
----------------------------------------------------
-if (MACHINES["TSCONF_DMA"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/tsconfdma.cpp",
-		MAME_DIR .. "src/devices/machine/tsconfdma.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/glukrs.h,MACHINES["GLUKRS"] = true
----------------------------------------------------
-if (MACHINES["GLUKRS"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/glukrs.cpp",
-		MAME_DIR .. "src/devices/machine/glukrs.h",
 	}
 end
 

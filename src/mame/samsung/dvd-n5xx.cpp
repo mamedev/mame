@@ -272,7 +272,7 @@ INPUT_PORTS_END
 void n5xx_state::n501(machine_config &config)
 {
 	// basic machine hardware
-	TMP95C061(config, m_maincpu, 20_MHz_XTAL); // actually
+	TMP95C061(config, m_maincpu, 20_MHz_XTAL); // actually TMP91C219F
 	m_maincpu->set_addrmap(AS_PROGRAM, &n5xx_state::main_map);
 
 	// video hardware
@@ -321,4 +321,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST( 2001, n501, 0, 0, n501, n501, n5xx_state, empty_init, "Samsung", "DVD-N501", MACHINE_IS_SKELETON )
+SYST( 2001, n501, 0, 0, n501, n501, n5xx_state, empty_init, "Samsung", "Samsung NUON Enhanced DVD Player / DVD-N501", MACHINE_IS_SKELETON )

@@ -47,9 +47,9 @@ protected:
 private:
 	void refresh_output();
 
-	int m_data = 0;
-	int m_cp = 0;
-	u16 m_shift = 0xff;
+	int m_data;
+	int m_cp;
+	u16 m_shift;
 
 	// callbacks
 	devcb_write16 m_write_output;

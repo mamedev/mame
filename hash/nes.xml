@@ -16716,19 +16716,18 @@ license:CC0
 		<description>Hiryuu no Ken Special - Fighting Wars (Japan, prototype)</description>
 		<year>1991</year>
 		<publisher>Culture Brain</publisher>
+		<info name="serial" value="CBF-4N"/> <!-- cart has black and white traced version of release label, including serial -->
+		<info name="alt_title" value="飛龍の拳スペシャル ファイティングウォーズ"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
-			<feature name="pcb" value="HVC-SKEPROM" />
+			<feature name="pcb_model" value="HVC-SKEPROM-01" />
 			<feature name="mmc1_type" value="MMC1B2" />
 			<dataarea name="prg" size="131072">
-				<rom name="prg" size="131072" crc="770c360a" sha1="5c38f60a98ac8452206562c7eea2c18bd66e2c57" offset="00000" />
-			</dataarea> <!-- real label: カルチヤ prg -->
+				<rom name="culture.prg" size="131072" crc="770c360a" sha1="5c38f60a98ac8452206562c7eea2c18bd66e2c57" offset="00000" />
+			</dataarea> <!-- real label: カルチャ PRG -->
 			<dataarea name="chr" size="131072">
-				<rom name="chr" size="131072" crc="5482f0c6" sha1="f92a4fa4635a66a82a4e5b64f893075993df1181" offset="00000" />
-			</dataarea> <!-- real label: カルチヤ chr -->
-			<!-- 128k WRAM on cartridge -->
-			<dataarea name="wram" size="131072">
-			</dataarea>
+				<rom name="culture.chr" size="131072" crc="5482f0c6" sha1="f92a4fa4635a66a82a4e5b64f893075993df1181" offset="00000" />
+			</dataarea> <!-- real label: カルチャ CHR -->
 		</part>
 	</software>
 
@@ -47052,6 +47051,22 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="family trainer 6 - manhattan police (japan).prg" size="131072" crc="10bb8f9a" sha1="686ad5223d0d0f9150fd3262f1808a4209324dd6" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Dump may have come from a reproduction cart and may have been modified -->
+	<software name="fightsim" cloneof="hiryuksp">
+		<description>Fighting Simulator - World Champ (USA, prototype)</description>
+		<year>1992</year>
+		<publisher>Culture Brain</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<dataarea name="prg" size="131072">
+				<rom name="fighting simulator world champ (usa prototype).prg" size="131072" crc="007067ab" sha1="fe50e575f7e940884c6666a77e777172bf76f7d9" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="fighting simulator world champ (usa prototype).chr" size="131072" crc="364b0e33" sha1="7dacd78d13b88f36be8d31e47c6bda803d1edae3" />
 			</dataarea>
 		</part>
 	</software>

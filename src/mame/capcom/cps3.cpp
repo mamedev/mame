@@ -62,8 +62,8 @@ Warzard                                              1996  WZD96a00F  CP300000G 
 Warzard                                                    WZD96a00F  CP300000G  JAPAN   X          CAP-WZD000  CAP-WZD-5   CAP-WZD-5    961121
 Red Earth                                                  WZD96aA0F  CP3000B0G  EUROPE  X          CAP-WZD0A0  CAP-WZD-3   CAP-WZD-3    961023
 Red Earth                                                  WZD96aA0F  CP3000B0G  EUROPE  X          CAP-WZD0A0  CAP-WZD-5   CAP-WZD-5    961121
-Red Earth                                                  WZD96aA0F  CP3000C0G  ASIA*       X      CAP-WZD0A0  CAP-WZD-3   CAP-WZD-3    961023
-Red Earth                                                  WZD96aA0F  CP3000C0G  ASIA*       x      CAP-WZD0A0  CAP-WZD-5   CAP-WZD-5    961121
+Red Earth                                                  WZD96aA0F  CP3000C0G  ASIA        X      CAP-WZD0A0  CAP-WZD-3   CAP-WZD-3    961023
+Red Earth                                                  WZD96aA0F  CP3000C0G  ASIA        X      CAP-WZD0A0  CAP-WZD-5   CAP-WZD-5    961121
 Red Earth                                                  WZD96aA0F  CP3000H0G  MEXICO* X          CAP-WZD0A0  CAP-WZD-3   CAP-WZD-3    961023
 Red Earth                                                  WZD96aA0F  CP3000H0G  MEXICO* X          CAP-WZD0A0  CAP-WZD-5   CAP-WZD-5    961121
 Red Earth                                                  WZD96aA0F  CP3000U0G  USA*    X          CAP-WZD0A0  CAP-WZD-3   CAP-WZD-3    961023
@@ -2898,6 +2898,113 @@ ROM_END
 
 /* NO CD sets - use NO CD BIOS roms - don't require the CD image to boot */
 
+ROM_START( redearthn )
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
+	ROM_LOAD( "redearth_asia_nocd.29f400.u2", 0x000000, 0x080000, CRC(7a4f0851) SHA1(660ca716960ec761038e5ad4de636be13b0dddd8) ) // this is a different VERSION of the bios compared to other sets, not just an alt region code
+
+	ROM_REGION( 0x200000, "simm1.0", 0 )
+	ROM_LOAD( "redearth-simm1.0", 0x00000, 0x200000, CRC(cad468f8) SHA1(b3aa4f7d3fae84e8821417ccde9528d3eda2b7a6) )
+	ROM_REGION( 0x200000, "simm1.1", 0 )
+	ROM_LOAD( "redearth-simm1.1", 0x00000, 0x200000, CRC(e9721d89) SHA1(5c63d10bdbce52d50b6dde14d4a0f1369383d656) )
+	ROM_REGION( 0x200000, "simm1.2", 0 )
+	ROM_LOAD( "redearth-simm1.2", 0x00000, 0x200000, CRC(2889ec98) SHA1(a94310eb4777f908d87e9d90969db8504b4140ff) )
+	ROM_REGION( 0x200000, "simm1.3", 0 )
+	ROM_LOAD( "redearth-simm1.3", 0x00000, 0x200000, CRC(5a6cd148) SHA1(d65c6e8378a91828474a16a3bbcd13c4b3b15f13) )
+
+	ROM_REGION( 0x200000, "simm3.0", 0 )
+	ROM_LOAD( "redearth-simm3.0", 0x00000, 0x200000, CRC(83350cc5) SHA1(922b1abf80a4a89f35279b66311a7369d3965bd0) )
+	ROM_REGION( 0x200000, "simm3.1", 0 )
+	ROM_LOAD( "redearth-simm3.1", 0x00000, 0x200000, CRC(56734de6) SHA1(75699fa6efe5bec335e4b02e15b3c45726b68fa8) )
+	ROM_REGION( 0x200000, "simm3.2", 0 )
+	ROM_LOAD( "redearth-simm3.2", 0x00000, 0x200000, CRC(800ea0f1) SHA1(33871ab56dc1cd24441389d53e43fb8e43b149d9) )
+	ROM_REGION( 0x200000, "simm3.3", 0 )
+	ROM_LOAD( "redearth-simm3.3", 0x00000, 0x200000, CRC(97e9146c) SHA1(ab7744709615081440bee72f4080d6fd5b938668) )
+	ROM_REGION( 0x200000, "simm3.4", 0 )
+	ROM_LOAD( "redearth-simm3.4", 0x00000, 0x200000, CRC(0cb1d648) SHA1(7042a590c2b7ec55323062127e254da3cdc790a1) )
+	ROM_REGION( 0x200000, "simm3.5", 0 )
+	ROM_LOAD( "redearth-simm3.5", 0x00000, 0x200000, CRC(7a1099f0) SHA1(c6a92ec86eb24485f1db530e0e78f647e8432231) )
+	ROM_REGION( 0x200000, "simm3.6", 0 )
+	ROM_LOAD( "redearth-simm3.6", 0x00000, 0x200000, CRC(aeff8f54) SHA1(fd760e237c2e5fb2da45e32a1c12fd3defb4c3e4) )
+	ROM_REGION( 0x200000, "simm3.7", 0 )
+	ROM_LOAD( "redearth-simm3.7", 0x00000, 0x200000, CRC(f770acd0) SHA1(4b3ccb6f91568f95f04ede6c574144918d131201) )
+
+	ROM_REGION( 0x200000, "simm4.0", 0 )
+	ROM_LOAD( "redearth-simm4.0", 0x00000, 0x200000, CRC(301e56f2) SHA1(4847d971bff70a2aeed4599e1201c7ec9677da60) )
+	ROM_REGION( 0x200000, "simm4.1", 0 )
+	ROM_LOAD( "redearth-simm4.1", 0x00000, 0x200000, CRC(2048e103) SHA1(b21f95b05cd99749bd3f25cc71b2671c2026847b) )
+	ROM_REGION( 0x200000, "simm4.2", 0 )
+	ROM_LOAD( "redearth-simm4.2", 0x00000, 0x200000, CRC(c9433455) SHA1(63a269d76bac332c2e991d0f6a20c35e0e88680a) )
+	ROM_REGION( 0x200000, "simm4.3", 0 )
+	ROM_LOAD( "redearth-simm4.3", 0x00000, 0x200000, CRC(c02171a8) SHA1(2e9228729b27a6113d9f2e42af310a834979f714) )
+	ROM_REGION( 0x200000, "simm4.4", 0 )
+	ROM_LOAD( "redearth-simm4.4", 0x00000, 0x200000, CRC(2ddbf276) SHA1(b232baaa8edc8db18f8a3bdcc2d38fe984a94a34) )
+	ROM_REGION( 0x200000, "simm4.5", 0 )
+	ROM_LOAD( "redearth-simm4.5", 0x00000, 0x200000, CRC(fea820a6) SHA1(55ee8ef95751f5a509fb126513e1b2a70a3414e5) )
+	ROM_REGION( 0x200000, "simm4.6", 0 )
+	ROM_LOAD( "redearth-simm4.6", 0x00000, 0x200000, CRC(c7528df1) SHA1(aa312f80c2d7759d18d1aa8d416cf932b2850824) )
+	ROM_REGION( 0x200000, "simm4.7", 0 )
+	ROM_LOAD( "redearth-simm4.7", 0x00000, 0x200000, CRC(2449cf3b) SHA1(c60d8042136d74e547f668ad787cae529c42eed9) )
+
+	ROM_REGION( 0x200000, "simm5.0", 0 )
+	ROM_LOAD( "redearth-simm5.0", 0x00000, 0x200000, CRC(424451b9) SHA1(250fb92254c9e7ff5bc8dbeea5872f8a771dc9bd) )
+	ROM_REGION( 0x200000, "simm5.1", 0 )
+	ROM_LOAD( "redearth-simm5.1", 0x00000, 0x200000, CRC(9b8cb56b) SHA1(2ff1081dc99bb7c2f1e036f4c112137c96b83d23) )
+ROM_END
+
+ROM_START( redearthnr1 )
+	ROM_REGION32_BE( 0x080000, "bios", 0 )
+	ROM_LOAD( "redearth_asia_nocd.29f400.u2", 0x000000, 0x080000, CRC(7a4f0851) SHA1(660ca716960ec761038e5ad4de636be13b0dddd8) ) // this is a different VERSION of the bios compared to other sets, not just an alt region code
+
+	ROM_REGION( 0x200000, "simm1.0", 0 )
+	ROM_LOAD( "redearthr1-simm1.0", 0x00000, 0x200000, CRC(65bac346) SHA1(6f4ba0c2cae91a37fc97bea5fc8a50aaf6ca6513) )
+	ROM_REGION( 0x200000, "simm1.1", 0 )
+	ROM_LOAD( "redearthr1-simm1.1", 0x00000, 0x200000, CRC(a8ec4aae) SHA1(0012cb6ba630ddd74958f7759de34706bf919338) )
+	ROM_REGION( 0x200000, "simm1.2", 0 )
+	ROM_LOAD( "redearthr1-simm1.2", 0x00000, 0x200000, CRC(2caf8995) SHA1(ca012b6dec0481b043edf9c7e931bd952ec74ebb) )
+	ROM_REGION( 0x200000, "simm1.3", 0 )
+	ROM_LOAD( "redearthr1-simm1.3", 0x00000, 0x200000, CRC(13ebc21d) SHA1(465bdea0633526a8bf07b35495a5311c8bf213d5) )
+
+	ROM_REGION( 0x200000, "simm3.0", 0 )
+	ROM_LOAD( "redearth-simm3.0", 0x00000, 0x200000, CRC(83350cc5) SHA1(922b1abf80a4a89f35279b66311a7369d3965bd0) )
+	ROM_REGION( 0x200000, "simm3.1", 0 )
+	ROM_LOAD( "redearth-simm3.1", 0x00000, 0x200000, CRC(56734de6) SHA1(75699fa6efe5bec335e4b02e15b3c45726b68fa8) )
+	ROM_REGION( 0x200000, "simm3.2", 0 )
+	ROM_LOAD( "redearth-simm3.2", 0x00000, 0x200000, CRC(800ea0f1) SHA1(33871ab56dc1cd24441389d53e43fb8e43b149d9) )
+	ROM_REGION( 0x200000, "simm3.3", 0 )
+	ROM_LOAD( "redearth-simm3.3", 0x00000, 0x200000, CRC(97e9146c) SHA1(ab7744709615081440bee72f4080d6fd5b938668) )
+	ROM_REGION( 0x200000, "simm3.4", 0 )
+	ROM_LOAD( "redearth-simm3.4", 0x00000, 0x200000, CRC(0cb1d648) SHA1(7042a590c2b7ec55323062127e254da3cdc790a1) )
+	ROM_REGION( 0x200000, "simm3.5", 0 )
+	ROM_LOAD( "redearth-simm3.5", 0x00000, 0x200000, CRC(7a1099f0) SHA1(c6a92ec86eb24485f1db530e0e78f647e8432231) )
+	ROM_REGION( 0x200000, "simm3.6", 0 )
+	ROM_LOAD( "redearth-simm3.6", 0x00000, 0x200000, CRC(aeff8f54) SHA1(fd760e237c2e5fb2da45e32a1c12fd3defb4c3e4) )
+	ROM_REGION( 0x200000, "simm3.7", 0 )
+	ROM_LOAD( "redearth-simm3.7", 0x00000, 0x200000, CRC(f770acd0) SHA1(4b3ccb6f91568f95f04ede6c574144918d131201) )
+
+	ROM_REGION( 0x200000, "simm4.0", 0 )
+	ROM_LOAD( "redearth-simm4.0", 0x00000, 0x200000, CRC(301e56f2) SHA1(4847d971bff70a2aeed4599e1201c7ec9677da60) )
+	ROM_REGION( 0x200000, "simm4.1", 0 )
+	ROM_LOAD( "redearth-simm4.1", 0x00000, 0x200000, CRC(2048e103) SHA1(b21f95b05cd99749bd3f25cc71b2671c2026847b) )
+	ROM_REGION( 0x200000, "simm4.2", 0 )
+	ROM_LOAD( "redearth-simm4.2", 0x00000, 0x200000, CRC(c9433455) SHA1(63a269d76bac332c2e991d0f6a20c35e0e88680a) )
+	ROM_REGION( 0x200000, "simm4.3", 0 )
+	ROM_LOAD( "redearth-simm4.3", 0x00000, 0x200000, CRC(c02171a8) SHA1(2e9228729b27a6113d9f2e42af310a834979f714) )
+	ROM_REGION( 0x200000, "simm4.4", 0 )
+	ROM_LOAD( "redearth-simm4.4", 0x00000, 0x200000, CRC(2ddbf276) SHA1(b232baaa8edc8db18f8a3bdcc2d38fe984a94a34) )
+	ROM_REGION( 0x200000, "simm4.5", 0 )
+	ROM_LOAD( "redearth-simm4.5", 0x00000, 0x200000, CRC(fea820a6) SHA1(55ee8ef95751f5a509fb126513e1b2a70a3414e5) )
+	ROM_REGION( 0x200000, "simm4.6", 0 )
+	ROM_LOAD( "redearth-simm4.6", 0x00000, 0x200000, CRC(c7528df1) SHA1(aa312f80c2d7759d18d1aa8d416cf932b2850824) )
+	ROM_REGION( 0x200000, "simm4.7", 0 )
+	ROM_LOAD( "redearth-simm4.7", 0x00000, 0x200000, CRC(2449cf3b) SHA1(c60d8042136d74e547f668ad787cae529c42eed9) )
+
+	ROM_REGION( 0x200000, "simm5.0", 0 )
+	ROM_LOAD( "redearth-simm5.0", 0x00000, 0x200000, CRC(424451b9) SHA1(250fb92254c9e7ff5bc8dbeea5872f8a771dc9bd) )
+	ROM_REGION( 0x200000, "simm5.1", 0 )
+	ROM_LOAD( "redearth-simm5.1", 0x00000, 0x200000, CRC(9b8cb56b) SHA1(2ff1081dc99bb7c2f1e036f4c112137c96b83d23) )
+ROM_END
+
+
 ROM_START( sfiiin )
 	ROM_REGION32_BE( 0x080000, "bios", 0 )
 	ROM_LOAD( "sfiii_asia_nocd.29f400.u2", 0x000000, 0x080000, CRC(ca2b715f) SHA1(86319987f9af4afd272a2488e73de8382743cb37) ) // this is a different VERSION of the bios compared to all other sets, not just an alt region code
@@ -3955,10 +4062,12 @@ ROM_END
 // 961121
 GAME( 1996, redearth,    0,        redearth, cps3_re,   cps3_state, init_redearth, ROT0, "Capcom", "Red Earth (Euro 961121)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, warzard,     redearth, redearth, cps3_re,   cps3_state, init_redearth, ROT0, "Capcom", "Warzard (Japan 961121)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, redearthn,   redearth, redearth, cps3_re,   cps3_state, init_redearth, ROT0, "Capcom", "Red Earth (Asia 961121, NO CD)", MACHINE_SUPPORTS_SAVE )
 
 // 961023
 GAME( 1996, redearthr1,  redearth, redearth, cps3_re,   cps3_state, init_redearth, ROT0, "Capcom", "Red Earth (Euro 961023)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, warzardr1,   redearth, redearth, cps3_re,   cps3_state, init_redearth, ROT0, "Capcom", "Warzard (Japan 961023)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, redearthnr1, redearth, redearth, cps3_re,   cps3_state, init_redearth, ROT0, "Capcom", "Red Earth (Asia 961023, NO CD)", MACHINE_SUPPORTS_SAVE )
 
 /* Street Fighter III: New Generation */
 

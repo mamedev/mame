@@ -1919,6 +1919,7 @@ void a400_state::setup_cart(a800_cart_slot_device *slot)
 	m_cart_disabled = 0;
 	m_last_offs = -1;
 
+	// FIXME: this driver should not have to differentiate between cartridge types
 	if (slot->exists())
 	{
 		switch (slot->get_cart_type())
@@ -2001,6 +2002,13 @@ void a400_state::setup_cart(a800_cart_slot_device *slot)
 			m_maincpu->space(AS_PROGRAM).unmap_write(0x6000, 0xbfff);
 			break;
 		}
+	}
+	else if (slot->get_card_device() != nullptr)
+	{
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8sm_delegate(*slot, FUNC(a800_cart_slot_device::read_80xx)));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xbfff, write8sm_delegate(*slot, FUNC(a800_cart_slot_device::write_80xx)));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xd500, 0xd5ff, read8sm_delegate(*slot, FUNC(a800_cart_slot_device::read_d5xx)));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0xd500, 0xd5ff, write8sm_delegate(*slot, FUNC(a800_cart_slot_device::write_d5xx)));
 	}
 }
 

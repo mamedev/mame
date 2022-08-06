@@ -46,15 +46,15 @@ protected:
 	// button handlers
 	void buttonset_update();
 
-	// internal states
-	u8 m_counter = 0; // buttonset select, autofire counter (74xx163 QA-QB pin)
-	bool m_prev_clr = false; // previous CLR pin state
-
 	// devices
 	required_device_array<ls157_device, 3> m_muxer;
 
 	// IO ports
 	required_ioport m_joypad_mode;
+
+	// internal states
+	u8 m_counter; // buttonset select, autofire counter (74xx163 QA-QB pin)
+	bool m_prev_clr; // previous CLR pin state
 };
 
 
@@ -66,12 +66,12 @@ public:
 	// construction/destruction
 	pce_avenue_pad_6_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
-
 protected:
 	// construction/destruction
 	pce_avenue_pad_6_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const override;
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -92,6 +92,7 @@ public:
 	// construction/destruction
 	pce_arcade_pad_6_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+protected:
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
 };

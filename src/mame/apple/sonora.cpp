@@ -78,6 +78,7 @@ void sonora_device::device_add_mconfig(machine_config &config)
 	ASC(config, m_asc, C15M, asc_device::asc_type::SONORA);
 	m_asc->add_route(0, "lspeaker", 1.0);
 	m_asc->add_route(1, "rspeaker", 1.0);
+	m_asc->irqf_callback().set(FUNC(sonora_device::asc_irq));
 
 	SWIM2(config, m_fdc, C15M);
 	m_fdc->devsel_cb().set(FUNC(sonora_device::devsel_w));
@@ -298,6 +299,20 @@ WRITE_LINE_MEMBER(sonora_device::vbl_w)
 
 	if (m_pseudovia_regs[0x12] & 0x40)
 	{
+		pseudovia_recalc_irqs();
+	}
+}
+
+WRITE_LINE_MEMBER(sonora_device::asc_irq)
+{
+	if (state == ASSERT_LINE)
+	{
+		m_pseudovia_regs[3] |= 0x10; // any VIA 2 interrupt | sound interrupt
+		pseudovia_recalc_irqs();
+	}
+	else
+	{
+		m_pseudovia_regs[3] &= ~0x10;
 		pseudovia_recalc_irqs();
 	}
 }

@@ -11,7 +11,9 @@
 
 #include "emu.h"
 
+#include "macadb.h"
 #include "macrtc.h"
+#include "mactoolbox.h"
 
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/cards.h"
@@ -20,7 +22,6 @@
 #include "machine/6522via.h"
 #include "machine/applefdintf.h"
 #include "machine/dp83932c.h"
-#include "macadb.h"
 #include "machine/ncr5390.h"
 #include "machine/nscsi_bus.h"
 #include "machine/ram.h"
@@ -912,6 +913,7 @@ void macquadra_state::macqd700(machine_config &config)
 	/* basic machine hardware */
 	M68040(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &macquadra_state::quadra700_map);
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(75.08);
@@ -991,7 +993,7 @@ void macquadra_state::macqd700(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	ASC(config, m_easc, 22.5792_MHz_XTAL, asc_device::asc_type::EASC);
-//  m_easc->irqf_callback().set(FUNC(macquadra_state::mac_asc_irq));
+	m_easc->irqf_callback().set(m_via2, FUNC(via6522_device::write_cb1)).invert();
 	m_easc->add_route(0, "lspeaker", 1.0);
 	m_easc->add_route(1, "rspeaker", 1.0);
 

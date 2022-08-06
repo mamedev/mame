@@ -84,8 +84,8 @@ protected:
 
 	bitmap_ind16 m_tmp_bitmap;
 
-	int m_offset_x = 0;
-	int m_offset_y = 0;
+	int m_offset_x;
+	int m_offset_y;
 
 	struct
 	{

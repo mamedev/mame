@@ -55,6 +55,7 @@ TODO:
 - tithermos temperature sensor comparator (right now just the digital clock works)
 - is alphie(patent) the same as the final version?
 - is starwbcp the same as MP3438? (starwbc is MP3438A)
+- tgpachi is not working: incomplete MCU emulation, no SVG
 
 ============================================================================
 
@@ -110,6 +111,8 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP1525   TMS1170   1980, Coleco Head to Head: Electronic Baseball
  @MP1604   TMS1370   1982, Gakken Invader 2000/Tandy Cosmic Fire Away 3000
  @MP1801   TMS1700   1981, Tiger Ditto/Tandy Pocket Repeat (model 60-2152)
+ *MP2012   TMS1300   1977, Atari Europe Hit Parade 144 (jukebox) (have decap/dump)
+ *MP2032   TMS1300   1980, Atari Europe unknown (jukebox)
  @MP2105   TMS1370   1979, Gakken/Entex Poker (6005)
  @MP2110   TMS1370   1980, Gakken Invader/Tandy Fire Away
  @MP2139   TMS1370   1981, Gakken Galaxy Invader 1000/Tandy Cosmic 1000 Fire Away
@@ -168,8 +171,8 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  *MP6061   TMS0970   1979, Texas Instruments Electronic Digital Thermostat (from patent, the one in MAME didn't have a label)
  @MP6100A  TMS0980   1979, Ideal Electronic Detective
  @MP6101B  TMS0980   1979, Parker Brothers Stop Thief
- *MP6354   ?         1982, Tsukuda The Dracula (? note: 40-pin, VFD-capable)
- *MP6361   ?         1983, <unknown> Defender Strikes (? note: VFD-capable)
+ @MP6354   TMS1475   1982, Tsukuda The Dracula
+ *MP6361   TMS1475?  1983, <unknown> Defender Strikes
  @MP7302   TMS1400   1980, Tiger Deluxe Football with Instant Replay
  @MP7304   TMS1400   1982, Tiger 7 in 1 Sports Stadium (model 7-555)
  @MP7313   TMS1400   1980, Parker Brothers Bank Shot
@@ -182,7 +185,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MPF553   TMS1670   1980, Gakken/Entex Jackpot: Gin Rummy & Black Jack (6008) (note: assume F to be a misprint)
   MP7573   TMS1670   1981, Entex Select-A-Game cartridge: Football 4 -> entex/sag.cpp
  *M30026   TMS2370   1983, Yaesu FT-757 Display Unit part
- *M95041   TMS2670   1983, Tsukuda Game Pachinko (have decap, missing MCU emulation)
+ @M95041   TMS2670   1983, Tsukuda Game Pachinko
 
   inconsistent:
 
@@ -295,6 +298,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "tc7atc.lh"
 #include "tcfball.lh"
 #include "tcfballa.lh"
+#include "tdracula.lh"
 #include "ti1250.lh"
 #include "ti1270.lh"
 #include "ti1680.lh"
@@ -308,7 +312,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "xl25.lh" // clickable
 #include "zodiac.lh" // clickable
 
-//#include "hh_tms1k_test.lh" // common test-layout - use external artwork
+#include "hh_tms1k_test.lh" // common test-layout - use external artwork
 
 
 // machine_start/reset
@@ -387,7 +391,6 @@ INPUT_CHANGED_MEMBER(hh_tms1k_state::reset_button)
 INPUT_CHANGED_MEMBER(hh_tms1k_state::power_button)
 {
 	set_power((bool)param);
-	m_maincpu->set_input_line(INPUT_LINE_RESET, m_power_on ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER(hh_tms1k_state::auto_power_off)
@@ -400,13 +403,17 @@ WRITE_LINE_MEMBER(hh_tms1k_state::auto_power_off)
 void hh_tms1k_state::power_off()
 {
 	set_power(false);
-	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 void hh_tms1k_state::set_power(bool state)
 {
 	m_power_on = state;
+	m_maincpu->set_input_line(INPUT_LINE_RESET, m_power_on ? CLEAR_LINE : ASSERT_LINE);
+
 	m_out_power = state ? 1 : 0;
+
+	if (m_display && !m_power_on)
+		m_display->clear();
 }
 
 
@@ -423,7 +430,7 @@ namespace {
 
   A-One LSI Match Number
   * PCB label: PT-204 "Pair Card"
-  * TMS1000NLL MP0163 (die label 1000B, MP0163)
+  * TMS1000NLL MP0163 (die label: 1000B, MP0163)
   * 2x2-digit 7seg LED displays + 3 LEDs, 1-bit sound
 
   A-One was a subsidiary of Bandai? The PCB serial PT-xxx is same, and the font
@@ -447,7 +454,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -459,7 +466,7 @@ void matchnum_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-void matchnum_state::write_r(u16 data)
+void matchnum_state::write_r(u32 data)
 {
 	// R3-R5,R8-R10: input mux
 	m_inp_mux = (data >> 3 & 7) | (data >> 5 & 0x38);
@@ -531,9 +538,9 @@ void matchnum_state::matchnum(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 325000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(matchnum_state::read_k));
-	m_maincpu->r().set(FUNC(matchnum_state::write_r));
-	m_maincpu->o().set(FUNC(matchnum_state::write_o));
+	m_maincpu->read_k().set(FUNC(matchnum_state::read_k));
+	m_maincpu->write_r().set(FUNC(matchnum_state::write_r));
+	m_maincpu->write_o().set(FUNC(matchnum_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4, 8);
@@ -568,7 +575,7 @@ ROM_END
 
   A-One LSI Arrange Ball
   * PCB label: Kaken, PT-249
-  * TMS1000NLL MP0166 (die label 1000B, MP0166)
+  * TMS1000NLL MP0166 (die label: 1000B, MP0166)
   * 2-digit 7seg LED display + 22 LEDs, 1-bit sound
 
   known releases:
@@ -590,7 +597,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -602,7 +609,7 @@ void arrball_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-void arrball_state::write_r(u16 data)
+void arrball_state::write_r(u32 data)
 {
 	// R8: input mux (always set)
 	m_inp_mux = data >> 8 & 1;
@@ -644,9 +651,9 @@ void arrball_state::arrball(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 325000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(arrball_state::read_k));
-	m_maincpu->r().set(FUNC(arrball_state::write_r));
-	m_maincpu->o().set(FUNC(arrball_state::write_o));
+	m_maincpu->read_k().set(FUNC(arrball_state::read_k));
+	m_maincpu->write_r().set(FUNC(arrball_state::write_r));
+	m_maincpu->write_o().set(FUNC(arrball_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(7, 7);
@@ -712,7 +719,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -724,7 +731,7 @@ void mathmagi_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-void mathmagi_state::write_r(u16 data)
+void mathmagi_state::write_r(u32 data)
 {
 	// R3,R5-R7,R9,R10: input mux
 	m_inp_mux = (data >> 3 & 1) | (data >> 4 & 0xe) | (data >> 5 & 0x30);
@@ -814,9 +821,9 @@ void mathmagi_state::mathmagi(machine_config &config)
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 175000); // approximation - RC osc. R=68K, C=82pF
 	m_maincpu->set_output_pla(mathmagi_output_pla);
-	m_maincpu->k().set(FUNC(mathmagi_state::read_k));
-	m_maincpu->r().set(FUNC(mathmagi_state::write_r));
-	m_maincpu->o().set(FUNC(mathmagi_state::write_o));
+	m_maincpu->read_k().set(FUNC(mathmagi_state::read_k));
+	m_maincpu->write_r().set(FUNC(mathmagi_state::write_r));
+	m_maincpu->write_o().set(FUNC(mathmagi_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(11, 7);
@@ -845,7 +852,7 @@ ROM_END
 /***************************************************************************
 
   Bandai System Control Car: Cheetah 「システムコントロールカー チーター」
-  * TMS1000NLL MP0915 (die label 1000B, MP0915)
+  * TMS1000NLL MP0915 (die label: 1000B, MP0915)
   * 2 motors (one for back axis, one for steering), no sound
 
   It's a programmable buggy, like Big Track but much simpler. To add a command
@@ -876,7 +883,7 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 
@@ -895,7 +902,7 @@ void bcheetah_state::machine_start()
 
 // handlers
 
-void bcheetah_state::write_r(u16 data)
+void bcheetah_state::write_r(u32 data)
 {
 	// R0-R4: input mux
 	// R5,R6: tied to K4??
@@ -953,9 +960,9 @@ void bcheetah_state::bcheetah(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 100000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(bcheetah_state::read_k));
-	m_maincpu->r().set(FUNC(bcheetah_state::write_r));
-	m_maincpu->o().set(FUNC(bcheetah_state::write_o));
+	m_maincpu->read_k().set(FUNC(bcheetah_state::read_k));
+	m_maincpu->write_r().set(FUNC(bcheetah_state::write_r));
+	m_maincpu->write_o().set(FUNC(bcheetah_state::write_o));
 
 	config.set_default_layout(layout_bcheetah);
 
@@ -981,7 +988,7 @@ ROM_END
 /***************************************************************************
 
   Bandai TC7: Air Traffic Control
-  * TMS1100 MCU, label MP1311 (die label 1100E, MP1311)
+  * TMS1100 MCU, label MP1311 (die label: 1100E, MP1311)
   * 4-digit 7seg LED display, 40 other LEDs, 1-bit sound
 
   It is a very complicated game, refer to the manual on how to play.
@@ -999,7 +1006,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -1011,7 +1018,7 @@ void tc7atc_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-void tc7atc_state::write_r(u16 data)
+void tc7atc_state::write_r(u32 data)
 {
 	// R5: speaker out
 	m_speaker->level_w(BIT(data, 5));
@@ -1073,9 +1080,9 @@ void tc7atc_state::tc7atc(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=68K, C=47pF
-	m_maincpu->k().set(FUNC(tc7atc_state::read_k));
-	m_maincpu->r().set(FUNC(tc7atc_state::write_r));
-	m_maincpu->o().set(FUNC(tc7atc_state::write_o));
+	m_maincpu->read_k().set(FUNC(tc7atc_state::read_k));
+	m_maincpu->write_r().set(FUNC(tc7atc_state::write_r));
+	m_maincpu->write_o().set(FUNC(tc7atc_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
@@ -1108,7 +1115,7 @@ ROM_END
 
   Canon Palmtronic F-31, Canon Canola L813, Toshiba BC-8111B, Toshiba BC-8018B,
   Triumph-Adler 81 SN, Silver-Reed 8J, more
-  * TMS1040 MCU label TMS1045NL (die label 1040A, 1045)
+  * TMS1040 MCU label TMS1045NL (die label: 1040A, 1045)
   * 9-digit cyan VFD display (leftmost may be custom)
 
   TMS1045NL is a versatile calculator chip for 3rd party manufacturers, used
@@ -1130,7 +1137,7 @@ public:
 private:
 	void update_display();
 	void write_o(u16 data);
-	void write_r(u16 data);
+	void write_r(u32 data);
 	u8 read_k();
 };
 
@@ -1141,7 +1148,7 @@ void palmf31_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-void palmf31_state::write_r(u16 data)
+void palmf31_state::write_r(u32 data)
 {
 	// R0-R8: select digit, input mux
 	m_r = m_inp_mux = data;
@@ -1244,9 +1251,9 @@ void palmf31_state::palmf31(machine_config &config)
 {
 	// basic machine hardware
 	TMS1040(config, m_maincpu, 250000); // approximation
-	m_maincpu->k().set(FUNC(palmf31_state::read_k));
-	m_maincpu->o().set(FUNC(palmf31_state::write_o));
-	m_maincpu->r().set(FUNC(palmf31_state::write_r));
+	m_maincpu->read_k().set(FUNC(palmf31_state::read_k));
+	m_maincpu->write_o().set(FUNC(palmf31_state::write_o));
+	m_maincpu->write_r().set(FUNC(palmf31_state::write_r));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
@@ -1276,7 +1283,7 @@ ROM_END
 
   Canon Palmtronic MD-8 (Multi 8) / Canon Canola MD 810
   * PCB label: Canon EHI-0115-03
-  * TMS1070 MCU label TMC1079 (die label 1070B, 1079A)
+  * TMS1070 MCU label TMC1079 (die label: 1070B, 1079A)
   * 2-line cyan VFD display, each 9-digit 7seg + 1 custom (label 20-ST-22)
 
   The only difference between MD-8 and MD 810 is the form factor. The latter
@@ -1296,7 +1303,7 @@ public:
 private:
 	void update_display();
 	void write_o(u16 data);
-	void write_r(u16 data);
+	void write_r(u32 data);
 	u8 read_k();
 };
 
@@ -1313,7 +1320,7 @@ void palmmd8_state::update_display()
 	m_display->matrix((sel & mask) | m, m_o);
 }
 
-void palmmd8_state::write_r(u16 data)
+void palmmd8_state::write_r(u32 data)
 {
 	// R0-R10: input mux, select digit
 	m_r = m_inp_mux = data;
@@ -1412,9 +1419,9 @@ void palmmd8_state::palmmd8(machine_config &config)
 {
 	// basic machine hardware
 	TMS1070(config, m_maincpu, 250000); // approximation - RC osc. R=56K, C=68pf
-	m_maincpu->k().set(FUNC(palmmd8_state::read_k));
-	m_maincpu->o().set(FUNC(palmmd8_state::write_o));
-	m_maincpu->r().set(FUNC(palmmd8_state::write_r));
+	m_maincpu->read_k().set(FUNC(palmmd8_state::read_k));
+	m_maincpu->write_o().set(FUNC(palmmd8_state::write_o));
+	m_maincpu->write_r().set(FUNC(palmmd8_state::write_r));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(21, 8);
@@ -1463,7 +1470,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -1475,7 +1482,7 @@ void amaztron_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-void amaztron_state::write_r(u16 data)
+void amaztron_state::write_r(u32 data)
 {
 	// R0-R5: input mux
 	m_inp_mux = data & 0x3f;
@@ -1555,9 +1562,9 @@ void amaztron_state::amaztron(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 300000); // approximation - RC osc. R=33K?, C=100pF
-	m_maincpu->k().set(FUNC(amaztron_state::read_k));
-	m_maincpu->r().set(FUNC(amaztron_state::write_r));
-	m_maincpu->o().set(FUNC(amaztron_state::write_o));
+	m_maincpu->read_k().set(FUNC(amaztron_state::read_k));
+	m_maincpu->write_r().set(FUNC(amaztron_state::write_r));
+	m_maincpu->write_o().set(FUNC(amaztron_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4, 7);
@@ -1608,7 +1615,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -1620,7 +1627,7 @@ void zodiac_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-void zodiac_state::write_r(u16 data)
+void zodiac_state::write_r(u32 data)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -1711,9 +1718,9 @@ void zodiac_state::zodiac(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 500000); // approximation - RC osc. R=18K, C=100pF
-	m_maincpu->k().set(FUNC(zodiac_state::read_k));
-	m_maincpu->r().set(FUNC(zodiac_state::write_r));
-	m_maincpu->o().set(FUNC(zodiac_state::write_o));
+	m_maincpu->read_k().set(FUNC(zodiac_state::read_k));
+	m_maincpu->write_r().set(FUNC(zodiac_state::write_r));
+	m_maincpu->write_o().set(FUNC(zodiac_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
@@ -1768,7 +1775,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -1785,7 +1792,7 @@ void cqback_state::update_display()
 	m_display->matrix(m_r & 0x1ff, seg);
 }
 
-void cqback_state::write_r(u16 data)
+void cqback_state::write_r(u32 data)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -1840,9 +1847,9 @@ void cqback_state::cqback(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 310000); // approximation - RC osc. R=33K, C=100pF
-	m_maincpu->k().set(FUNC(cqback_state::read_k));
-	m_maincpu->r().set(FUNC(cqback_state::write_r));
-	m_maincpu->o().set(FUNC(cqback_state::write_o));
+	m_maincpu->read_k().set(FUNC(cqback_state::read_k));
+	m_maincpu->write_r().set(FUNC(cqback_state::write_r));
+	m_maincpu->write_o().set(FUNC(cqback_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 11);
@@ -1898,7 +1905,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -1910,7 +1917,7 @@ void h2hfootb_state::update_display()
 	m_display->matrix(m_r & 0x1ff, m_o | (m_r >> 1 & 0x100));
 }
 
-void h2hfootb_state::write_r(u16 data)
+void h2hfootb_state::write_r(u32 data)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -1970,9 +1977,9 @@ void h2hfootb_state::h2hfootb(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 310000); // approximation - RC osc. R=39K, C=100pF
-	m_maincpu->k().set(FUNC(h2hfootb_state::read_k));
-	m_maincpu->r().set(FUNC(h2hfootb_state::write_r));
-	m_maincpu->o().set(FUNC(h2hfootb_state::write_o));
+	m_maincpu->read_k().set(FUNC(h2hfootb_state::read_k));
+	m_maincpu->write_r().set(FUNC(h2hfootb_state::write_r));
+	m_maincpu->write_o().set(FUNC(h2hfootb_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 9);
@@ -2005,11 +2012,11 @@ ROM_END
 /***************************************************************************
 
   Coleco Head to Head: Electronic Basketball (model 2150)
-  * TMS1000NLL MP3320A (die label 1000E MP3320A)
+  * TMS1000NLL MP3320A (die label: 1000E, MP3320A)
   * 2-digit 7seg LED display, LED grid display, 1-bit sound
 
   Coleco Head to Head: Electronic Hockey (model 2160)
-  * TMS1000NLL E MP3321A (die label 1000E MP3321A)
+  * TMS1000NLL E MP3321A (die label: 1000E, MP3321A)
   * same PCB/hardware as above
 
   Unlike the COP420 version(see hh_cop400.cpp driver), each game has its own MCU.
@@ -2038,7 +2045,7 @@ private:
 	attotime m_cap_charge = attotime::zero;
 
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -2070,7 +2077,7 @@ void h2hbaskb_state::update_display()
 	m_display->matrix(sel, m_o);
 }
 
-void h2hbaskb_state::write_r(u16 data)
+void h2hbaskb_state::write_r(u32 data)
 {
 	// R0-R3: input mux
 	m_inp_mux = (data & 0xf);
@@ -2156,9 +2163,9 @@ void h2hbaskb_state::h2hbaskb(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 375000); // approximation - RC osc. R=43K, C=100pF
-	m_maincpu->k().set(FUNC(h2hbaskb_state::read_k));
-	m_maincpu->r().set(FUNC(h2hbaskb_state::write_r));
-	m_maincpu->o().set(FUNC(h2hbaskb_state::write_o));
+	m_maincpu->read_k().set(FUNC(h2hbaskb_state::read_k));
+	m_maincpu->write_r().set(FUNC(h2hbaskb_state::write_r));
+	m_maincpu->write_o().set(FUNC(h2hbaskb_state::write_o));
 
 	TIMER(config, "cap_empty").configure_generic(FUNC(h2hbaskb_state::cap_empty_callback));
 
@@ -2209,7 +2216,7 @@ ROM_END
 
   Coleco Head to Head: Electronic Baseball (model 2180)
   * PCB labels: Coleco rev C 73891/2
-  * TMS1170NLN MP1525-N2 (die label MP1525)
+  * TMS1170NLN MP1525-N2 (die label: 1170A, MP1525)
   * 9-digit cyan VFD display, and other LEDs behind bezel, 1-bit sound
 
   known releases:
@@ -2235,7 +2242,7 @@ protected:
 private:
 	void set_clock();
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -2260,7 +2267,7 @@ void h2hbaseb_state::update_display()
 	m_display->matrix((m_r & 0xff) | (m_r >> 1 & 0x100), (m_r & 0x100) | m_o);
 }
 
-void h2hbaseb_state::write_r(u16 data)
+void h2hbaseb_state::write_r(u32 data)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -2323,9 +2330,9 @@ void h2hbaseb_state::h2hbaseb(machine_config &config)
 {
 	// basic machine hardware
 	TMS1170(config, m_maincpu, 350000); // see set_clock
-	m_maincpu->k().set(FUNC(h2hbaseb_state::read_k));
-	m_maincpu->r().set(FUNC(h2hbaseb_state::write_r));
-	m_maincpu->o().set(FUNC(h2hbaseb_state::write_o));
+	m_maincpu->read_k().set(FUNC(h2hbaseb_state::read_k));
+	m_maincpu->write_r().set(FUNC(h2hbaseb_state::write_r));
+	m_maincpu->write_o().set(FUNC(h2hbaseb_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 9);
@@ -2357,7 +2364,7 @@ ROM_END
 /***************************************************************************
 
   Coleco Head to Head: Electronic Boxing (model 2190)
-  * TMS1100NLL M34018-N2 (die label M34018)
+  * TMS1100NLL M34018-N2 (die label: 1100E, M34018)
   * 2-digit 7seg LED display, LED grid display, 1-bit sound
 
   This appears to be the last game of Coleco's Head to Head series.
@@ -2375,7 +2382,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -2387,7 +2394,7 @@ void h2hboxing_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-void h2hboxing_state::write_r(u16 data)
+void h2hboxing_state::write_r(u32 data)
 {
 	// R0-R4: input mux
 	m_inp_mux = data & 0x1f;
@@ -2450,9 +2457,9 @@ void h2hboxing_state::h2hboxing(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=39K, C=100pF
-	m_maincpu->k().set(FUNC(h2hboxing_state::read_k));
-	m_maincpu->r().set(FUNC(h2hboxing_state::write_r));
-	m_maincpu->o().set(FUNC(h2hboxing_state::write_o));
+	m_maincpu->read_k().set(FUNC(h2hboxing_state::read_k));
+	m_maincpu->write_r().set(FUNC(h2hboxing_state::write_r));
+	m_maincpu->write_o().set(FUNC(h2hboxing_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(11, 8);
@@ -2484,7 +2491,7 @@ ROM_END
 /***************************************************************************
 
   Coleco Quiz Wiz Challenger
-  * TMS1000NLL M32001-N2 (die label 1000E, M32001)
+  * TMS1000NLL M32001-N2 (die label: 1000E, M32001)
   * 4 7seg LEDs, 17 other LEDs, 1-bit sound
 
   This is a 4-player version of Quiz Wiz, a multiple choice quiz game.
@@ -2523,7 +2530,7 @@ private:
 	u16 m_pinout = 0x07; // cartridge R pins
 
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -2566,7 +2573,7 @@ void quizwizc_state::update_display()
 	m_display->matrix(m_r | 0x400, m_o);
 }
 
-void quizwizc_state::write_r(u16 data)
+void quizwizc_state::write_r(u32 data)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -2639,9 +2646,9 @@ void quizwizc_state::quizwizc(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 300000); // approximation - RC osc. R=43K, C=100pF
-	m_maincpu->k().set(FUNC(quizwizc_state::read_k));
-	m_maincpu->r().set(FUNC(quizwizc_state::write_r));
-	m_maincpu->o().set(FUNC(quizwizc_state::write_o));
+	m_maincpu->read_k().set(FUNC(quizwizc_state::read_k));
+	m_maincpu->write_r().set(FUNC(quizwizc_state::write_r));
+	m_maincpu->write_o().set(FUNC(quizwizc_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10+1, 8);
@@ -2679,7 +2686,7 @@ ROM_END
 /***************************************************************************
 
   Coleco Total Control 4
-  * TMS1400NLL MP7334-N2 (die label MP7334)
+  * TMS1400NLL MP7334-N2 (die label: TMS1400, MP7334, 28L 01D D000 R000)
   * 2x2-digit 7seg LED display + 4 LEDs, LED grid display, 1-bit sound
 
   This is a head to head electronic tabletop LED-display sports console.
@@ -2718,7 +2725,7 @@ private:
 	u8 m_pinout = 0xf; // cartridge K pins
 
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -2754,7 +2761,7 @@ void tc4_state::update_display()
 	m_display->matrix(m_r, (m_o | (m_r << 2 & 0x100)));
 }
 
-void tc4_state::write_r(u16 data)
+void tc4_state::write_r(u32 data)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -2827,9 +2834,9 @@ void tc4_state::tc4(machine_config &config)
 {
 	// basic machine hardware
 	TMS1400(config, m_maincpu, 450000); // approximation - RC osc. R=27.3K, C=100pF
-	m_maincpu->k().set(FUNC(tc4_state::read_k));
-	m_maincpu->r().set(FUNC(tc4_state::write_r));
-	m_maincpu->o().set(FUNC(tc4_state::write_o));
+	m_maincpu->read_k().set(FUNC(tc4_state::read_k));
+	m_maincpu->write_r().set(FUNC(tc4_state::write_r));
+	m_maincpu->write_o().set(FUNC(tc4_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 9);
@@ -2870,7 +2877,7 @@ ROM_END
 
   Concept 2000 Mr. Mus-I-Cal (model 560)
   * PCB label: CONCEPT 2000 ITE 556
-  * TMS1000NLL MP3206 (die label 1000C, MP3206)
+  * TMS1000NLL MP3206 (die label: 1000C, MP3206)
   * 9-digit 7seg LED display(one custom digit), 1-bit sound
 
   It's a simple 4-function calculator, and plays music tones too.
@@ -2889,7 +2896,7 @@ public:
 protected:
 	void update_display();
 	virtual void write_o(u16 data);
-	virtual void write_r(u16 data);
+	virtual void write_r(u32 data);
 	virtual u8 read_k();
 };
 
@@ -2900,7 +2907,7 @@ void mrmusical_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-void mrmusical_state::write_r(u16 data)
+void mrmusical_state::write_r(u32 data)
 {
 	// R10: speaker out (there's a speaker off-on switch)
 	m_speaker->level_w(m_inputs[6]->read() & BIT(data, 10));
@@ -2972,9 +2979,9 @@ void mrmusical_state::mrmusical(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 300000); // approximation - RC osc. R=33K, C=100pF
-	m_maincpu->k().set(FUNC(mrmusical_state::read_k));
-	m_maincpu->o().set(FUNC(mrmusical_state::write_o));
-	m_maincpu->r().set(FUNC(mrmusical_state::write_r));
+	m_maincpu->read_k().set(FUNC(mrmusical_state::read_k));
+	m_maincpu->write_o().set(FUNC(mrmusical_state::write_o));
+	m_maincpu->write_r().set(FUNC(mrmusical_state::write_r));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
@@ -3008,7 +3015,7 @@ ROM_END
 
   Conic Electronic Basketball
   * PCB label: CONIC 101-006
-  * TMS1000NLL MP0907 (die label 1000B MP0907)
+  * TMS1000NLL MP0907 (die label: 1000B, MP0907)
   * DS8871N, 2 7seg LEDs, 30 other LEDs, 1-bit sound
 
   There are 3 known versions of Conic Basketball: MP0910(101-003) and
@@ -3031,7 +3038,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -3043,7 +3050,7 @@ void cnbaskb_state::update_display()
 	m_display->matrix(m_r & 0x1fc, m_o);
 }
 
-void cnbaskb_state::write_r(u16 data)
+void cnbaskb_state::write_r(u32 data)
 {
 	// R9: speaker out
 	m_speaker->level_w(data >> 9 & 1);
@@ -3097,9 +3104,9 @@ void cnbaskb_state::cnbaskb(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 375000); // approximation - RC osc. R=39K, C=47pF
-	m_maincpu->k().set(FUNC(cnbaskb_state::read_k));
-	m_maincpu->r().set(FUNC(cnbaskb_state::write_r));
-	m_maincpu->o().set(FUNC(cnbaskb_state::write_o));
+	m_maincpu->read_k().set(FUNC(cnbaskb_state::read_k));
+	m_maincpu->write_r().set(FUNC(cnbaskb_state::write_r));
+	m_maincpu->write_o().set(FUNC(cnbaskb_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
@@ -3158,7 +3165,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -3170,7 +3177,7 @@ void cmsport_state::update_display()
 	m_display->matrix(m_r & ~0x80, m_o);
 }
 
-void cmsport_state::write_r(u16 data)
+void cmsport_state::write_r(u32 data)
 {
 	// R7: speaker out
 	m_speaker->level_w(data >> 7 & 1);
@@ -3226,9 +3233,9 @@ void cmsport_state::cmsport(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(cmsport_state::read_k));
-	m_maincpu->r().set(FUNC(cmsport_state::write_r));
-	m_maincpu->o().set(FUNC(cmsport_state::write_o));
+	m_maincpu->read_k().set(FUNC(cmsport_state::read_k));
+	m_maincpu->write_r().set(FUNC(cmsport_state::write_r));
+	m_maincpu->write_o().set(FUNC(cmsport_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
@@ -3293,7 +3300,7 @@ private:
 	void ds8874_output_w(u16 data);
 
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -3311,7 +3318,7 @@ void cnfball_state::ds8874_output_w(u16 data)
 	update_display();
 }
 
-void cnfball_state::write_r(u16 data)
+void cnfball_state::write_r(u32 data)
 {
 	// R5,R8: N/C
 	// R6,R7: speaker out
@@ -3365,9 +3372,9 @@ void cnfball_state::cnfball(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 350000); // approximation - RC osc. R=39K, C=47pF
-	m_maincpu->k().set(FUNC(cnfball_state::read_k));
-	m_maincpu->r().set(FUNC(cnfball_state::write_r));
-	m_maincpu->o().set(FUNC(cnfball_state::write_o));
+	m_maincpu->read_k().set(FUNC(cnfball_state::read_k));
+	m_maincpu->write_r().set(FUNC(cnfball_state::write_r));
+	m_maincpu->write_o().set(FUNC(cnfball_state::write_o));
 
 	// video hardware
 	DS8874(config, m_ds8874).write_output().set(FUNC(cnfball_state::ds8874_output_w));
@@ -3428,7 +3435,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -3445,7 +3452,7 @@ void cnfball2_state::update_display()
 	m_display->matrix(m_r >> 2 & 0x1ff, seg);
 }
 
-void cnfball2_state::write_r(u16 data)
+void cnfball2_state::write_r(u32 data)
 {
 	// R0: speaker out
 	m_speaker->level_w(data & 1);
@@ -3501,9 +3508,9 @@ void cnfball2_state::cnfball2(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 325000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(cnfball2_state::read_k));
-	m_maincpu->r().set(FUNC(cnfball2_state::write_r));
-	m_maincpu->o().set(FUNC(cnfball2_state::write_o));
+	m_maincpu->read_k().set(FUNC(cnfball2_state::read_k));
+	m_maincpu->write_r().set(FUNC(cnfball2_state::write_r));
+	m_maincpu->write_o().set(FUNC(cnfball2_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 11);
@@ -3540,7 +3547,7 @@ ROM_END
   Conic Electronic I.Q.
   * PCB labels: main: CONIC 101-037 (other side: HG-15, 11*00198*00), button PCB:
     CONIC 102-001, led PCB: CONIC 100-003 REV A itac
-  * TMS1000NLL MP0908 (die label 1000B, MP0908)
+  * TMS1000NLL MP0908 (die label: 1000B, MP0908)
   * 2 7seg LEDs, 30 other LEDs, 1-bit sound
 
   This is a peg solitaire game, with random start position.
@@ -3562,7 +3569,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -3574,7 +3581,7 @@ void eleciq_state::update_display()
 	m_display->matrix(m_r & ~1, m_o);
 }
 
-void eleciq_state::write_r(u16 data)
+void eleciq_state::write_r(u32 data)
 {
 	// R0: speaker out
 	m_speaker->level_w(data & 1);
@@ -3652,9 +3659,9 @@ void eleciq_state::eleciq(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 325000); // approximation - RC osc. R=47K, C=50pF
-	m_maincpu->k().set(FUNC(eleciq_state::read_k));
-	m_maincpu->r().set(FUNC(eleciq_state::write_r));
-	m_maincpu->o().set(FUNC(eleciq_state::write_o));
+	m_maincpu->read_k().set(FUNC(eleciq_state::read_k));
+	m_maincpu->write_r().set(FUNC(eleciq_state::write_r));
+	m_maincpu->write_o().set(FUNC(eleciq_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
@@ -3705,14 +3712,14 @@ public:
 	void qfire(machine_config &config);
 
 private:
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
 
 // handlers
 
-void qfire_state::write_r(u16 data)
+void qfire_state::write_r(u32 data)
 {
 	// R1,R2,R5: input mux
 	m_inp_mux = (data >> 1 & 3) | (data >> 3 & 4);
@@ -3768,9 +3775,9 @@ void qfire_state::qfire(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 375000); // approximation - RC osc. R=39K, C=47pF
-	m_maincpu->k().set(FUNC(qfire_state::read_k));
-	m_maincpu->r().set(FUNC(qfire_state::write_r));
-	m_maincpu->o().set(FUNC(qfire_state::write_o));
+	m_maincpu->read_k().set(FUNC(qfire_state::read_k));
+	m_maincpu->write_r().set(FUNC(qfire_state::write_r));
+	m_maincpu->write_o().set(FUNC(qfire_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(3, 7);
@@ -3802,7 +3809,7 @@ ROM_END
 /***************************************************************************
 
   Entex (Electronic) Soccer
-  * TMS1000NL MP0158 (die label 1000B, MP0158)
+  * TMS1000NL MP0158 (die label: 1000B, MP0158)
   * 2 7seg LEDs, 30 other LEDs, 1-bit sound
 
   known releases:
@@ -3822,7 +3829,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -3834,7 +3841,7 @@ void esoccer_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-void esoccer_state::write_r(u16 data)
+void esoccer_state::write_r(u32 data)
 {
 	// R0-R2: input mux
 	m_inp_mux = data & 7;
@@ -3888,9 +3895,9 @@ void esoccer_state::esoccer(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 475000); // approximation - RC osc. R=47K, C=33pF
-	m_maincpu->k().set(FUNC(esoccer_state::read_k));
-	m_maincpu->r().set(FUNC(esoccer_state::write_r));
-	m_maincpu->o().set(FUNC(esoccer_state::write_o));
+	m_maincpu->read_k().set(FUNC(esoccer_state::read_k));
+	m_maincpu->write_r().set(FUNC(esoccer_state::write_r));
+	m_maincpu->write_o().set(FUNC(esoccer_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 7);
@@ -3923,7 +3930,7 @@ ROM_END
 /***************************************************************************
 
   Entex (Electronic) Baseball (1)
-  * TMS1000NLP MP0914 (die label MP0914A)
+  * TMS1000NLP MP0914 (die label: 1000B, MP0914A)
   * 1 7seg LED, and other LEDs behind bezel, 1-bit sound
 
   This is a handheld LED baseball game. One player controls the batter, the CPU
@@ -3962,7 +3969,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -3974,7 +3981,7 @@ void ebball_state::update_display()
 	m_display->matrix(m_r, ~m_o);
 }
 
-void ebball_state::write_r(u16 data)
+void ebball_state::write_r(u32 data)
 {
 	// R1-R5: input mux
 	m_inp_mux = data >> 1 & 0x1f;
@@ -4038,9 +4045,9 @@ void ebball_state::ebball(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 375000); // approximation - RC osc. R=43K, C=47pF
-	m_maincpu->k().set(FUNC(ebball_state::read_k));
-	m_maincpu->r().set(FUNC(ebball_state::write_r));
-	m_maincpu->o().set(FUNC(ebball_state::write_o));
+	m_maincpu->read_k().set(FUNC(ebball_state::read_k));
+	m_maincpu->write_r().set(FUNC(ebball_state::write_r));
+	m_maincpu->write_o().set(FUNC(ebball_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
@@ -4107,7 +4114,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -4119,7 +4126,7 @@ void ebball2_state::update_display()
 	m_display->matrix(m_r ^ 0x7f, ~m_o);
 }
 
-void ebball2_state::write_r(u16 data)
+void ebball2_state::write_r(u32 data)
 {
 	// R3-R6: input mux
 	m_inp_mux = data >> 3 & 0xf;
@@ -4176,9 +4183,9 @@ void ebball2_state::ebball2(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(ebball2_state::read_k));
-	m_maincpu->r().set(FUNC(ebball2_state::write_r));
-	m_maincpu->o().set(FUNC(ebball2_state::write_o));
+	m_maincpu->read_k().set(FUNC(ebball2_state::read_k));
+	m_maincpu->write_r().set(FUNC(ebball2_state::write_r));
+	m_maincpu->write_o().set(FUNC(ebball2_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
@@ -4211,7 +4218,7 @@ ROM_END
 
   Entex (Electronic) Baseball 3
   * PCB label: ZENY
-  * TMS1100NLL 6007 MP1204 (rev. E!) (die label MP1204)
+  * TMS1100NLL 6007 MP1204 (rev. E!) (die label: MP1204)
   * 2*SN75492N LED display driver
   * 4 7seg LEDs, and other LEDs behind bezel, 1-bit sound
 
@@ -4256,7 +4263,7 @@ protected:
 private:
 	void set_clock();
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -4287,7 +4294,7 @@ void ebball3_state::update_display()
 	m_display->write_row(11, ((m_display->read_row(4) & 0x10) | (m_display->read_row(7) & 0x01)) << 1);
 }
 
-void ebball3_state::write_r(u16 data)
+void ebball3_state::write_r(u32 data)
 {
 	// R0-R2: input mux
 	m_inp_mux = data & 7;
@@ -4360,9 +4367,9 @@ void ebball3_state::ebball3(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 340000); // see set_clock
-	m_maincpu->k().set(FUNC(ebball3_state::read_k));
-	m_maincpu->r().set(FUNC(ebball3_state::write_r));
-	m_maincpu->o().set(FUNC(ebball3_state::write_o));
+	m_maincpu->read_k().set(FUNC(ebball3_state::read_k));
+	m_maincpu->write_r().set(FUNC(ebball3_state::write_r));
+	m_maincpu->write_o().set(FUNC(ebball3_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10+2, 7);
@@ -4395,7 +4402,7 @@ ROM_END
 /***************************************************************************
 
   Entex Space Battle
-  * TMS1000 EN-6004 MP0920 (die label 1000B, MP0920)
+  * TMS1000 EN-6004 MP0920 (die label: 1000B, MP0920)
   * 2 7seg LEDs, and other LEDs behind bezel, 1-bit sound
 
   The Japanese version was published by Gakken, same name.
@@ -4426,7 +4433,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -4438,7 +4445,7 @@ void esbattle_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-void esbattle_state::write_r(u16 data)
+void esbattle_state::write_r(u32 data)
 {
 	// R0,R1: input mux
 	m_inp_mux = data & 3;
@@ -4487,9 +4494,9 @@ void esbattle_state::esbattle(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 450000); // approximation - RC osc. R=47K, C=33pF
-	m_maincpu->k().set(FUNC(esbattle_state::read_k));
-	m_maincpu->r().set(FUNC(esbattle_state::write_r));
-	m_maincpu->o().set(FUNC(esbattle_state::write_o));
+	m_maincpu->read_k().set(FUNC(esbattle_state::read_k));
+	m_maincpu->write_r().set(FUNC(esbattle_state::write_r));
+	m_maincpu->write_o().set(FUNC(esbattle_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
@@ -4521,7 +4528,7 @@ ROM_END
 /***************************************************************************
 
   Entex Blast It
-  * TMS1000 MP0230 (die label 1000B, MP0230)
+  * TMS1000 MP0230 (die label: 1000B, MP0230)
   * 3 7seg LEDs, 49 other LEDs (both under an overlay mask), 1-bit sound
 
 ***************************************************************************/
@@ -4537,7 +4544,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -4549,7 +4556,7 @@ void blastit_state::update_display()
 	m_display->matrix(m_r >> 1, m_o);
 }
 
-void blastit_state::write_r(u16 data)
+void blastit_state::write_r(u32 data)
 {
 	// R3: input mux
 	m_inp_mux = data >> 3 & 1;
@@ -4592,9 +4599,9 @@ void blastit_state::blastit(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 425000); // approximation - RC osc. R=47K, C=33pF
-	m_maincpu->k().set(FUNC(blastit_state::read_k));
-	m_maincpu->r().set(FUNC(blastit_state::write_r));
-	m_maincpu->o().set(FUNC(blastit_state::write_o));
+	m_maincpu->read_k().set(FUNC(blastit_state::read_k));
+	m_maincpu->write_r().set(FUNC(blastit_state::write_r));
+	m_maincpu->write_o().set(FUNC(blastit_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 7);
@@ -4652,7 +4659,7 @@ protected:
 private:
 	void set_clock();
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 };
 
@@ -4677,7 +4684,7 @@ void einvader_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-void einvader_state::write_r(u16 data)
+void einvader_state::write_r(u32 data)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -4711,9 +4718,9 @@ void einvader_state::einvader(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 320000); // see set_clock
-	m_maincpu->k().set_ioport("IN.0");
-	m_maincpu->r().set(FUNC(einvader_state::write_r));
-	m_maincpu->o().set(FUNC(einvader_state::write_o));
+	m_maincpu->read_k().set_ioport("IN.0");
+	m_maincpu->write_r().set(FUNC(einvader_state::write_r));
+	m_maincpu->write_o().set(FUNC(einvader_state::write_o));
 
 	// video hardware
 	screen_device &mask(SCREEN(config, "mask", SCREEN_TYPE_SVG));
@@ -4754,7 +4761,7 @@ ROM_END
 /***************************************************************************
 
   Entex Color Football 4
-  * TMS1670 6009 MP7551 (die label MP7551)
+  * TMS1670 6009 MP7551 (die label: TMS1400, MP7551, 40H 01D D000 R000)
   * 9-digit cyan VFD display, 60 red and green LEDs behind mask, 1-bit sound
 
   Another version exist, one with a LED(red) 7seg display.
@@ -4772,7 +4779,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -4784,7 +4791,7 @@ void efootb4_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-void efootb4_state::write_r(u16 data)
+void efootb4_state::write_r(u32 data)
 {
 	// R0-R4: input mux
 	m_inp_mux = data & 0x1f;
@@ -4852,9 +4859,9 @@ void efootb4_state::efootb4(machine_config &config)
 {
 	// basic machine hardware
 	TMS1670(config, m_maincpu, 400000); // approximation - RC osc. R=42K, C=47pF
-	m_maincpu->k().set(FUNC(efootb4_state::read_k));
-	m_maincpu->r().set(FUNC(efootb4_state::write_r));
-	m_maincpu->o().set(FUNC(efootb4_state::write_o));
+	m_maincpu->read_k().set(FUNC(efootb4_state::read_k));
+	m_maincpu->write_r().set(FUNC(efootb4_state::write_r));
+	m_maincpu->write_o().set(FUNC(efootb4_state::write_o));
 
 	// video hardware
 	screen_device &mask(SCREEN(config, "mask", SCREEN_TYPE_SVG));
@@ -4894,7 +4901,7 @@ ROM_END
 /***************************************************************************
 
   Entex (Electronic) Basketball 2
-  * TMS1100 6010 MP1218 (die label MP1218)
+  * TMS1100 6010 MP1218 (die label: 1100B, MP1218)
   * 4 7seg LEDs, and other LEDs behind bezel, 1-bit sound
 
   led translation table: led zz from game PCB = MAME y.x:
@@ -4922,7 +4929,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -4934,7 +4941,7 @@ void ebaskb2_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-void ebaskb2_state::write_r(u16 data)
+void ebaskb2_state::write_r(u32 data)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -4996,9 +5003,9 @@ void ebaskb2_state::ebaskb2(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 360000); // approximation - RC osc. R=33K, C=82pF
-	m_maincpu->k().set(FUNC(ebaskb2_state::read_k));
-	m_maincpu->r().set(FUNC(ebaskb2_state::write_r));
-	m_maincpu->o().set(FUNC(ebaskb2_state::write_o));
+	m_maincpu->read_k().set(FUNC(ebaskb2_state::read_k));
+	m_maincpu->write_r().set(FUNC(ebaskb2_state::write_r));
+	m_maincpu->write_o().set(FUNC(ebaskb2_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 7);
@@ -5031,7 +5038,7 @@ ROM_END
 /***************************************************************************
 
   Entex Raise The Devil
-  * TMS1100 MP1221 (die label same)
+  * TMS1100 MP1221 (die label: 1100B, MP1221)
   * 4 7seg LEDs(rightmost one unused), and other LEDs behind bezel, 1-bit sound
 
   Entex Black Knight (licensed handheld version of Williams' pinball game)
@@ -5074,7 +5081,7 @@ protected:
 private:
 	void set_clock();
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -5103,7 +5110,7 @@ void raisedvl_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-void raisedvl_state::write_r(u16 data)
+void raisedvl_state::write_r(u32 data)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -5152,9 +5159,9 @@ void raisedvl_state::raisedvl(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 350000); // see set_clock
-	m_maincpu->k().set(FUNC(raisedvl_state::read_k));
-	m_maincpu->r().set(FUNC(raisedvl_state::write_r));
-	m_maincpu->o().set(FUNC(raisedvl_state::write_o));
+	m_maincpu->read_k().set(FUNC(raisedvl_state::read_k));
+	m_maincpu->write_r().set(FUNC(raisedvl_state::write_r));
+	m_maincpu->write_o().set(FUNC(raisedvl_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 7);
@@ -5230,7 +5237,7 @@ private:
 	required_device<timer_device> m_speed_timer;
 
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 
@@ -5261,7 +5268,7 @@ void mmarvin_state::update_display()
 	m_display->matrix(m_r, (m_o << 1 & 0x100) | (m_r & 0x80) | digit);
 }
 
-void mmarvin_state::write_r(u16 data)
+void mmarvin_state::write_r(u32 data)
 {
 	// R2-R5: input mux
 	m_inp_mux = data >> 2 & 0xf;
@@ -5334,9 +5341,9 @@ void mmarvin_state::mmarvin(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 300000); // approximation - RC osc. R=51K, C=47pF
-	m_maincpu->k().set(FUNC(mmarvin_state::read_k));
-	m_maincpu->r().set(FUNC(mmarvin_state::write_r));
-	m_maincpu->o().set(FUNC(mmarvin_state::write_o));
+	m_maincpu->read_k().set(FUNC(mmarvin_state::read_k));
+	m_maincpu->write_r().set(FUNC(mmarvin_state::write_r));
+	m_maincpu->write_o().set(FUNC(mmarvin_state::write_o));
 
 	TIMER(config, "speed").configure_generic(nullptr);
 
@@ -5376,7 +5383,7 @@ ROM_END
 
   Fonas 2 Player Baseball
   * PCB label: CA-014 (probably Cassia)
-  * TMS1000NLL MP0154 (die label 1000B, MP0154)
+  * TMS1000NLL MP0154 (die label: 1000B, MP0154)
   * 4 7seg LEDs, 37 other LEDs, 1-bit sound
 
   known releases:
@@ -5410,7 +5417,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -5422,7 +5429,7 @@ void f2pbball_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-void f2pbball_state::write_r(u16 data)
+void f2pbball_state::write_r(u32 data)
 {
 	// R4,R9,R10: input mux
 	m_inp_mux = (data >> 4 & 1) | (data >> 8 & 6);
@@ -5480,9 +5487,9 @@ void f2pbball_state::f2pbball(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 325000); // approximation - RC osc. R=51K, C=39pF
-	m_maincpu->k().set(FUNC(f2pbball_state::read_k));
-	m_maincpu->r().set(FUNC(f2pbball_state::write_r));
-	m_maincpu->o().set(FUNC(f2pbball_state::write_o));
+	m_maincpu->read_k().set(FUNC(f2pbball_state::read_k));
+	m_maincpu->write_r().set(FUNC(f2pbball_state::write_r));
+	m_maincpu->write_o().set(FUNC(f2pbball_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
@@ -5541,7 +5548,7 @@ protected:
 private:
 	void set_clock();
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -5565,7 +5572,7 @@ void f3in1_state::update_display()
 	m_display->matrix(m_r & ~0x20, m_o);
 }
 
-void f3in1_state::write_r(u16 data)
+void f3in1_state::write_r(u32 data)
 {
 	// R0-R2,R4: input mux
 	m_inp_mux = (data & 7) | (data >> 1 & 8);
@@ -5628,9 +5635,9 @@ void f3in1_state::f3in1(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 300000); // see set_clock
-	m_maincpu->k().set(FUNC(f3in1_state::read_k));
-	m_maincpu->r().set(FUNC(f3in1_state::write_r));
-	m_maincpu->o().set(FUNC(f3in1_state::write_o));
+	m_maincpu->read_k().set(FUNC(f3in1_state::read_k));
+	m_maincpu->write_r().set(FUNC(f3in1_state::write_r));
+	m_maincpu->write_o().set(FUNC(f3in1_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
@@ -5664,7 +5671,7 @@ ROM_END
 
   Gakken Poker
   * PCB label: POKER. gakken
-  * TMS1370 MP2105 (die label same)
+  * TMS1370 MP2105 (die label: 1170, MP2105)
   * 11-digit cyan VFD display Itron FG1114B, oscillator sound
 
   known releases:
@@ -5687,7 +5694,7 @@ protected:
 	required_device<beep_device> m_beeper;
 
 	void update_display();
-	virtual void write_r(u16 data);
+	virtual void write_r(u32 data);
 	virtual void write_o(u16 data);
 	virtual u8 read_k();
 };
@@ -5700,7 +5707,7 @@ void gpoker_state::update_display()
 	m_display->matrix(m_r & 0x7ff, segs | (m_r >> 3 & 0xf00));
 }
 
-void gpoker_state::write_r(u16 data)
+void gpoker_state::write_r(u32 data)
 {
 	// R15: enable beeper
 	m_beeper->set_state(data >> 15 & 1);
@@ -5784,9 +5791,9 @@ void gpoker_state::gpoker(machine_config &config)
 {
 	// basic machine hardware
 	TMS1370(config, m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(gpoker_state::read_k));
-	m_maincpu->r().set(FUNC(gpoker_state::write_r));
-	m_maincpu->o().set(FUNC(gpoker_state::write_o));
+	m_maincpu->read_k().set(FUNC(gpoker_state::read_k));
+	m_maincpu->write_r().set(FUNC(gpoker_state::write_r));
+	m_maincpu->write_o().set(FUNC(gpoker_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(11, 14);
@@ -5819,7 +5826,7 @@ ROM_END
 
   Gakken Jackpot: Gin Rummy & Black Jack
   * PCB label: gakken
-  * TMS1670 MPF553 (die label same)
+  * TMS1670 MPF553 (die label: TMS1400, MPF553, 40H 01D D000 R000)
   * 11-digit cyan VFD display Itron FG1114B, oscillator sound
 
   known releases:
@@ -5838,12 +5845,12 @@ public:
 	void gjackpot(machine_config &config);
 
 private:
-	virtual void write_r(u16 data) override;
+	virtual void write_r(u32 data) override;
 };
 
 // handlers
 
-void gjackpot_state::write_r(u16 data)
+void gjackpot_state::write_r(u32 data)
 {
 	// same as gpoker, only input mux msb is R10 instead of R6
 	gpoker_state::write_r(data);
@@ -5915,9 +5922,9 @@ void gjackpot_state::gjackpot(machine_config &config)
 
 	// basic machine hardware
 	TMS1670(config.replace(), m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(gjackpot_state::read_k));
-	m_maincpu->r().set(FUNC(gjackpot_state::write_r));
-	m_maincpu->o().set(FUNC(gjackpot_state::write_o));
+	m_maincpu->read_k().set(FUNC(gjackpot_state::read_k));
+	m_maincpu->write_r().set(FUNC(gjackpot_state::write_r));
+	m_maincpu->write_o().set(FUNC(gjackpot_state::write_o));
 
 	config.set_default_layout(layout_gjackpot);
 }
@@ -5942,7 +5949,7 @@ ROM_END
 
   Gakken Invader
   * PCB label: GAKKEN, INVADER, KS-00779
-  * TMS1370 MP2110
+  * TMS1370 MP2110 (die label: 1370, MP2110)
   * cyan VFD display Itron? CP5008A, 1-bit sound
 
   known releases:
@@ -5967,7 +5974,7 @@ public:
 
 private:
 	void update_display();
-	virtual void write_r(u16 data);
+	virtual void write_r(u32 data);
 	virtual void write_o(u16 data);
 	virtual u8 read_k();
 };
@@ -5979,7 +5986,7 @@ void ginv_state::update_display()
 	m_display->matrix(m_grid, m_plate);
 }
 
-void ginv_state::write_r(u16 data)
+void ginv_state::write_r(u32 data)
 {
 	// R9,R10: input mux
 	m_inp_mux = data >> 9 & 3;
@@ -6031,9 +6038,9 @@ void ginv_state::ginv(machine_config &config)
 {
 	// basic machine hardware
 	TMS1370(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(ginv_state::read_k));
-	m_maincpu->r().set(FUNC(ginv_state::write_r));
-	m_maincpu->o().set(FUNC(ginv_state::write_o));
+	m_maincpu->read_k().set(FUNC(ginv_state::read_k));
+	m_maincpu->write_r().set(FUNC(ginv_state::write_r));
+	m_maincpu->write_o().set(FUNC(ginv_state::write_o));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
@@ -6071,7 +6078,7 @@ ROM_END
 /***************************************************************************
 
   Gakken Invader 1000
-  * TMS1370 MP2139 (die label 1170 MP2139)
+  * TMS1370 MP2139 (die label: 1170, MP2139)
   * cyan/red VFD display Futaba DM-25Z 2D, 1-bit sound
 
   known releases:
@@ -6093,7 +6100,7 @@ public:
 
 private:
 	void update_display();
-	virtual void write_r(u16 data);
+	virtual void write_r(u32 data);
 	virtual void write_o(u16 data);
 	virtual u8 read_k();
 };
@@ -6107,7 +6114,7 @@ void ginv1000_state::update_display()
 	m_display->matrix(grid, plate);
 }
 
-void ginv1000_state::write_r(u16 data)
+void ginv1000_state::write_r(u32 data)
 {
 	// R0: speaker out
 	m_speaker->level_w(data & 1);
@@ -6158,9 +6165,9 @@ void ginv1000_state::ginv1000(machine_config &config)
 {
 	// basic machine hardware
 	TMS1370(config, m_maincpu, 350000); // approximation
-	m_maincpu->k().set(FUNC(ginv1000_state::read_k));
-	m_maincpu->r().set(FUNC(ginv1000_state::write_r));
-	m_maincpu->o().set(FUNC(ginv1000_state::write_o));
+	m_maincpu->read_k().set(FUNC(ginv1000_state::read_k));
+	m_maincpu->write_r().set(FUNC(ginv1000_state::write_r));
+	m_maincpu->write_o().set(FUNC(ginv1000_state::write_o));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
@@ -6198,7 +6205,7 @@ ROM_END
 /***************************************************************************
 
   Gakken Invader 2000
-  * TMS1370(28 pins) MP1604 (die label 1370A MP1604)
+  * TMS1370(28 pins) MP1604 (die label: 1370A, MP1604)
   * TMS1024 I/O expander
   * cyan/red/green VFD display, 1-bit sound
 
@@ -6224,7 +6231,7 @@ private:
 	void expander_w(offs_t offset, u8 data);
 
 	void update_display();
-	virtual void write_r(u16 data);
+	virtual void write_r(u32 data);
 	virtual void write_o(u16 data);
 	virtual u8 read_k();
 };
@@ -6244,7 +6251,7 @@ void ginv2000_state::expander_w(offs_t offset, u8 data)
 	update_display();
 }
 
-void ginv2000_state::write_r(u16 data)
+void ginv2000_state::write_r(u32 data)
 {
 	// R0: speaker out
 	m_speaker->level_w(data & 1);
@@ -6296,9 +6303,9 @@ void ginv2000_state::ginv2000(machine_config &config)
 {
 	// basic machine hardware
 	TMS1370(config, m_maincpu, 425000); // approximation - RC osc. R=36K, C=47pF
-	m_maincpu->k().set(FUNC(ginv2000_state::read_k));
-	m_maincpu->r().set(FUNC(ginv2000_state::write_r));
-	m_maincpu->o().set(FUNC(ginv2000_state::write_o));
+	m_maincpu->read_k().set(FUNC(ginv2000_state::read_k));
+	m_maincpu->write_r().set(FUNC(ginv2000_state::write_r));
+	m_maincpu->write_o().set(FUNC(ginv2000_state::write_o));
 
 	TMS1024(config, m_expander).set_ms(1); // MS tied high
 	m_expander->write_port4_callback().set(FUNC(ginv2000_state::expander_w));
@@ -6342,7 +6349,7 @@ ROM_END
 /***************************************************************************
 
   Gakken FX-Micom R-165
-  * TMS1100 MCU, label MP1312 (die label MP1312A)
+  * TMS1100 MCU, label MP1312 (die label: 1100E, MP1312A)
   * 1 7seg led, 6 other leds, 1-bit sound
 
   This is a simple educational home computer. Refer to the extensive manual
@@ -6368,7 +6375,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -6384,7 +6391,7 @@ void fxmcr165_state::update_display()
 	m_display->write_row(1, m_r >> 4 & 0x7f);
 }
 
-void fxmcr165_state::write_r(u16 data)
+void fxmcr165_state::write_r(u32 data)
 {
 	// R0-R3: input mux low
 	m_inp_mux = (m_inp_mux & 0x10) | (data & 0xf);
@@ -6459,9 +6466,9 @@ void fxmcr165_state::fxmcr165(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 400_kHz_XTAL);
-	m_maincpu->k().set(FUNC(fxmcr165_state::read_k));
-	m_maincpu->r().set(FUNC(fxmcr165_state::write_r));
-	m_maincpu->o().set(FUNC(fxmcr165_state::write_o));
+	m_maincpu->read_k().set(FUNC(fxmcr165_state::read_k));
+	m_maincpu->write_r().set(FUNC(fxmcr165_state::write_r));
+	m_maincpu->write_o().set(FUNC(fxmcr165_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1+1, 7);
@@ -6493,7 +6500,7 @@ ROM_END
 /***************************************************************************
 
   Ideal Electronic Detective
-  * TMS0980NLL MP6100A (die label 0980B-00)
+  * TMS0980NLL MP6100A (die label: 0980B-00)
   * 10-digit 7seg LED display, 2-level sound
 
   hardware (and concept) is very similar to Parker Brothers Stop Thief
@@ -6515,14 +6522,14 @@ public:
 	void elecdet(machine_config &config);
 
 private:
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
 
 // handlers
 
-void elecdet_state::write_r(u16 data)
+void elecdet_state::write_r(u32 data)
 {
 	// R7,R8(tied together): speaker out
 	m_speaker->level_w((m_o & 0x80) ? population_count_32(data >> 7 & 3) : 0);
@@ -6600,9 +6607,9 @@ void elecdet_state::elecdet(machine_config &config)
 {
 	// basic machine hardware
 	TMS0980(config, m_maincpu, 425000); // approximation
-	m_maincpu->k().set(FUNC(elecdet_state::read_k));
-	m_maincpu->r().set(FUNC(elecdet_state::write_r));
-	m_maincpu->o().set(FUNC(elecdet_state::write_o));
+	m_maincpu->read_k().set(FUNC(elecdet_state::read_k));
+	m_maincpu->write_r().set(FUNC(elecdet_state::write_r));
+	m_maincpu->write_o().set(FUNC(elecdet_state::write_o));
 	m_maincpu->power_off().set(FUNC(elecdet_state::auto_power_off));
 
 	// video hardware
@@ -6641,7 +6648,7 @@ ROM_END
 /***************************************************************************
 
   Kenner Star Wars - Electronic Battle Command
-  * TMS1100 MCU, label MP3438A (die label 1100B, MP3438A)
+  * TMS1100 MCU, label MP3438A (die label: 1100B, MP3438A)
   * 4x4 LED grid display + 2 separate LEDs and 2-digit 7segs, 1-bit sound
 
   This is a small tabletop space-dogfighting game. To start the game,
@@ -6661,7 +6668,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -6673,7 +6680,7 @@ void starwbc_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-void starwbc_state::write_r(u16 data)
+void starwbc_state::write_r(u32 data)
 {
 	// R0,R1,R3,R5,R7: input mux
 	m_inp_mux = (data & 3) | (data >> 1 & 4) | (data >> 2 & 8) | (data >> 3 & 0x10);
@@ -6748,9 +6755,9 @@ void starwbc_state::starwbc(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=51K, C=47pF
-	m_maincpu->k().set(FUNC(starwbc_state::read_k));
-	m_maincpu->r().set(FUNC(starwbc_state::write_r));
-	m_maincpu->o().set(FUNC(starwbc_state::write_o));
+	m_maincpu->read_k().set(FUNC(starwbc_state::read_k));
+	m_maincpu->write_r().set(FUNC(starwbc_state::write_r));
+	m_maincpu->write_o().set(FUNC(starwbc_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
@@ -6792,7 +6799,7 @@ ROM_END
 /***************************************************************************
 
   Kenner Live Action Football
-  * TMS1100NLL MCU, label MP3489-N2 (die label 1100E, MP3489)
+  * TMS1100NLL MCU, label MP3489-N2 (die label: 1100E, MP3489)
   * 6-digit 7seg LED display, other LEDs under overlay, 1-bit sound
 
   The LEDs are inside reflective domes, with an overlay mask on top of that.
@@ -6816,7 +6823,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -6830,7 +6837,7 @@ void liveafb_state::update_display()
 	m_display->matrix(d | l << 6 | BIT(m_r, 6) << 10 | BIT(m_r, 8, 3) << 11, m_o | (m_r << 4 & 0x300));
 }
 
-void liveafb_state::write_r(u16 data)
+void liveafb_state::write_r(u32 data)
 {
 	// R0-R3: input mux
 	m_inp_mux = data & 0xf;
@@ -6897,9 +6904,9 @@ void liveafb_state::liveafb(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=33K, C=100pF
-	m_maincpu->k().set(FUNC(liveafb_state::read_k));
-	m_maincpu->r().set(FUNC(liveafb_state::write_r));
-	m_maincpu->o().set(FUNC(liveafb_state::write_o));
+	m_maincpu->read_k().set(FUNC(liveafb_state::read_k));
+	m_maincpu->write_r().set(FUNC(liveafb_state::write_r));
+	m_maincpu->write_o().set(FUNC(liveafb_state::write_o));
 
 	// video hardware
 	screen_device &mask(SCREEN(config, "mask", SCREEN_TYPE_SVG));
@@ -6940,7 +6947,7 @@ ROM_END
 /***************************************************************************
 
   Kosmos Astro
-  * TMS1470NLHL MP1133 (die label TMS1400 MP1133)
+  * TMS1470NLHL MP1133 (die label: TMS1400, MP1133, 28H 01D D000 R000)
   * 9-digit 7seg VFD display + 8 LEDs(4 green, 4 yellow), no sound
 
   This is an astrological calculator, and also supports 4-function
@@ -6959,7 +6966,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -6971,7 +6978,7 @@ void astro_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-void astro_state::write_r(u16 data)
+void astro_state::write_r(u32 data)
 {
 	// R0-R7: input mux
 	m_inp_mux = data & 0xff;
@@ -7048,9 +7055,9 @@ void astro_state::astro(machine_config &config)
 {
 	// basic machine hardware
 	TMS1470(config, m_maincpu, 450000); // approximation - RC osc. R=4.7K, C=33pF
-	m_maincpu->k().set(FUNC(astro_state::read_k));
-	m_maincpu->r().set(FUNC(astro_state::write_r));
-	m_maincpu->o().set(FUNC(astro_state::write_o));
+	m_maincpu->read_k().set(FUNC(astro_state::read_k));
+	m_maincpu->write_r().set(FUNC(astro_state::write_r));
+	m_maincpu->write_o().set(FUNC(astro_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
@@ -7113,7 +7120,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -7137,7 +7144,7 @@ void elecbowl_state::update_display()
 	m_display->write_row(4, m_display->read_element(6, 7) ? 6 : 0);
 }
 
-void elecbowl_state::write_r(u16 data)
+void elecbowl_state::write_r(u32 data)
 {
 	// R5-R7,R10: input mux
 	m_inp_mux = (data >> 5 & 7) | (data >> 7 & 8);
@@ -7212,9 +7219,9 @@ void elecbowl_state::elecbowl(machine_config &config)
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=33K, C=100pF
 	m_maincpu->set_output_pla(elecbowl_output_pla);
-	m_maincpu->k().set(FUNC(elecbowl_state::read_k));
-	m_maincpu->r().set(FUNC(elecbowl_state::write_r));
-	m_maincpu->o().set(FUNC(elecbowl_state::write_o));
+	m_maincpu->read_k().set(FUNC(elecbowl_state::read_k));
+	m_maincpu->write_r().set(FUNC(elecbowl_state::write_r));
+	m_maincpu->write_o().set(FUNC(elecbowl_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(7, 8);
@@ -7248,7 +7255,7 @@ ROM_END
 
   Mattel Thoroughbred Horse Race Analyzer
   * PCB label: 1670-4619D
-  * TMS1100NLL MP3491-N2 (die label 1100E MP3491)
+  * TMS1100NLL MP3491-N2 (die label: 1100E, MP3491)
   * HLCD0569, 67-segment LCD panel, no sound
 
   This handheld is not a toy, read the manual for more information. In short,
@@ -7273,7 +7280,7 @@ private:
 	required_device<hlcd0569_device> m_lcd;
 
 	void lcd_output_w(offs_t offset, u32 data);
-	void write_r(u16 data);
+	void write_r(u32 data);
 	u8 read_k();
 };
 
@@ -7293,7 +7300,7 @@ void horseran_state::lcd_output_w(offs_t offset, u32 data)
 		m_display->write_row(3 + (offset << 1 | i), bitswap<8>(data >> (4+8*i),7,3,5,2,0,1,4,6) & 0x7f);
 }
 
-void horseran_state::write_r(u16 data)
+void horseran_state::write_r(u32 data)
 {
 	// R0: HLCD0569 clock
 	// R1: HLCD0569 data in
@@ -7379,8 +7386,8 @@ void horseran_state::horseran(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 300000); // approximation - RC osc. R=56K, C=47pF
-	m_maincpu->k().set(FUNC(horseran_state::read_k));
-	m_maincpu->r().set(FUNC(horseran_state::write_r));
+	m_maincpu->read_k().set(FUNC(horseran_state::read_k));
+	m_maincpu->write_r().set(FUNC(horseran_state::write_r));
 
 	// video hardware
 	HLCD0569(config, m_lcd, 1100); // C=0.022uF
@@ -7412,7 +7419,7 @@ ROM_END
 /***************************************************************************
 
   Mattel Dungeons & Dragons - Computer Labyrinth Game
-  * TMS1100 M34012-N2LL (die label M34012)
+  * TMS1100 M34012-N2LL (die label: 1100E, M34012)
   * 72 buttons, no LEDs, 1-bit sound
 
   This is an electronic board game. It requires markers and wall pieces to play.
@@ -7430,14 +7437,14 @@ public:
 	void mdndclab(machine_config &config);
 
 private:
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
 
 // handlers
 
-void mdndclab_state::write_r(u16 data)
+void mdndclab_state::write_r(u32 data)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -7574,9 +7581,9 @@ void mdndclab_state::mdndclab(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 475000); // approximation - RC osc. R=27K, C=100pF
-	m_maincpu->k().set(FUNC(mdndclab_state::read_k));
-	m_maincpu->r().set(FUNC(mdndclab_state::write_r));
-	m_maincpu->o().set(FUNC(mdndclab_state::write_o));
+	m_maincpu->read_k().set(FUNC(mdndclab_state::read_k));
+	m_maincpu->write_r().set(FUNC(mdndclab_state::write_r));
+	m_maincpu->write_o().set(FUNC(mdndclab_state::write_o));
 
 	config.set_default_layout(layout_mdndclab); // playing board
 
@@ -7605,7 +7612,7 @@ ROM_END
 /***************************************************************************
 
   Milton Bradley Comp IV
-  * TMC0904NL CP0904A (die label 4A0970D-04A)
+  * TMC0904NL CP0904A (die label: 0970D-04A)
   * 10 LEDs behind bezel, no sound
 
   This is small tabletop Mastermind game; a code-breaking game where the player
@@ -7630,14 +7637,14 @@ public:
 	void comp4(machine_config &config);
 
 private:
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
 
 // handlers
 
-void comp4_state::write_r(u16 data)
+void comp4_state::write_r(u32 data)
 {
 	// leds:
 	// R4    R9
@@ -7690,9 +7697,9 @@ void comp4_state::comp4(machine_config &config)
 {
 	// basic machine hardware
 	TMS0970(config, m_maincpu, 250000); // approximation
-	m_maincpu->k().set(FUNC(comp4_state::read_k));
-	m_maincpu->r().set(FUNC(comp4_state::write_r));
-	m_maincpu->o().set(FUNC(comp4_state::write_o));
+	m_maincpu->read_k().set(FUNC(comp4_state::read_k));
+	m_maincpu->write_r().set(FUNC(comp4_state::write_r));
+	m_maincpu->write_o().set(FUNC(comp4_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 11);
@@ -7725,7 +7732,7 @@ ROM_END
 
   Milton Bradley Electronic Battleship (1977 version, model 4750A)
   * PCB label: 4750A
-  * TMS1000NL MP3201 (die label 1000C, MP3201)
+  * TMS1000NL MP3201 (die label: 1000C, MP3201)
   * LM324N, MC14016CP/TP4016AN, NE555P, discrete sound
   * 4 sliding buttons, light bulb
 
@@ -7752,14 +7759,14 @@ public:
 	void bship(machine_config &config);
 
 private:
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
 
 // handlers
 
-void bship_state::write_r(u16 data)
+void bship_state::write_r(u32 data)
 {
 	// R0-R10: input mux
 	m_inp_mux = data;
@@ -7859,9 +7866,9 @@ void bship_state::bship(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 200000); // approximation - RC osc. R=100K, C=47pF
-	m_maincpu->k().set(FUNC(bship_state::read_k));
-	m_maincpu->r().set(FUNC(bship_state::write_r));
-	m_maincpu->o().set(FUNC(bship_state::write_o));
+	m_maincpu->read_k().set(FUNC(bship_state::read_k));
+	m_maincpu->write_r().set(FUNC(bship_state::write_r));
+	m_maincpu->write_o().set(FUNC(bship_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 1);
@@ -7891,7 +7898,7 @@ ROM_END
 
   Milton Bradley Electronic Battleship (1977 version, model 4750B)
   * PCB label: MB 4750B
-  * TMS1000NLL MP3208 (die label 1000C, MP3208)
+  * TMS1000NLL MP3208 (die label: 1000C, MP3208)
   * SN75494N (acting as inverters), SN76477 sound
   * 4 sliding buttons, light bulb
 
@@ -7912,14 +7919,14 @@ public:
 private:
 	required_device<sn76477_device> m_sn;
 
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
 
 // handlers
 
-void bshipb_state::write_r(u16 data)
+void bshipb_state::write_r(u32 data)
 {
 	// R0-R10: input mux
 	m_inp_mux = data;
@@ -7977,9 +7984,9 @@ void bshipb_state::bshipb(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 200000); // approximation - RC osc. R=100K, C=47pF
-	m_maincpu->k().set(FUNC(bshipb_state::read_k));
-	m_maincpu->r().set(FUNC(bshipb_state::write_r));
-	m_maincpu->o().set(FUNC(bshipb_state::write_o));
+	m_maincpu->read_k().set(FUNC(bshipb_state::read_k));
+	m_maincpu->write_r().set(FUNC(bshipb_state::write_r));
+	m_maincpu->write_o().set(FUNC(bshipb_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 1);
@@ -8023,7 +8030,7 @@ ROM_END
 /***************************************************************************
 
   Milton Bradley Simon (model 4850), created by Ralph Baer
-  * TMS1000 (die label MP3226), or MP3300 (die label 1000C, MP3300)
+  * TMS1000 (die label: 1000C, MP3226), or MP3300 (die label: 1000C, MP3300)
   * DS75494 Hex digit LED driver, 4 big lamps, 1-bit sound
 
   known revisions:
@@ -8046,13 +8053,13 @@ public:
 	void simon(machine_config &config);
 
 private:
-	void write_r(u16 data);
+	void write_r(u32 data);
 	u8 read_k();
 };
 
 // handlers
 
-void simon_state::write_r(u16 data)
+void simon_state::write_r(u32 data)
 {
 	// R4-R8 go through an 75494 IC first:
 	// R4 -> 75494 IN6 -> green lamp
@@ -8116,8 +8123,8 @@ void simon_state::simon(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 325000); // approximation - RC osc. R=33K, C=100pF
-	m_maincpu->k().set(FUNC(simon_state::read_k));
-	m_maincpu->r().set(FUNC(simon_state::write_r));
+	m_maincpu->read_k().set(FUNC(simon_state::read_k));
+	m_maincpu->write_r().set(FUNC(simon_state::write_r));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 4);
@@ -8158,7 +8165,7 @@ ROM_END
 /***************************************************************************
 
   Milton Bradley Super Simon
-  * TMS1100 MP3476NLL (die label MP3476)
+  * TMS1100 MP3476NLL (die label: 1100E, MP3476)
   * 8 big lamps(2 turn on at same time), 1-bit sound
 
   The semi-squel to Simon, not as popular. It includes more game variations
@@ -8182,7 +8189,7 @@ protected:
 
 private:
 	void set_clock();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	u8 read_k();
 };
 
@@ -8204,7 +8211,7 @@ void ssimon_state::set_clock()
 	m_maincpu->set_unscaled_clock((inp & 2) ? 400000 : ((inp & 1) ? 275000 : 200000));
 }
 
-void ssimon_state::write_r(u16 data)
+void ssimon_state::write_r(u32 data)
 {
 	// R0-R3,R9,R10: input mux
 	m_inp_mux = (data & 0xf) | (data >> 5 & 0x30);
@@ -8285,8 +8292,8 @@ void ssimon_state::ssimon(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 275000); // see set_clock
-	m_maincpu->k().set(FUNC(ssimon_state::read_k));
-	m_maincpu->r().set(FUNC(ssimon_state::write_r));
+	m_maincpu->read_k().set(FUNC(ssimon_state::read_k));
+	m_maincpu->write_r().set(FUNC(ssimon_state::write_r));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 4);
@@ -8317,7 +8324,7 @@ ROM_END
 /***************************************************************************
 
   Milton Bradley Big Trak
-  * TMS1000NLL MP3301A or MP3301ANLL E (rev. E!) (die label 1000E MP3301)
+  * TMS1000NLL MP3301A or MP3301ANLL E (rev. E!) (die label: 1000E, MP3301)
   * SN75494N Hex digit LED driver, 1 lamp, 3-level sound
   * gearbox with magnetic clutch, 1 IR led+sensor, 2 motors(middle wheels)
   * 24-button keypad, ext in/out ports
@@ -8350,7 +8357,7 @@ protected:
 
 private:
 	void update_speaker();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 
@@ -8400,7 +8407,7 @@ void bigtrak_state::update_speaker()
 	m_speaker->level_w(population_count_32(data));
 }
 
-void bigtrak_state::write_r(u16 data)
+void bigtrak_state::write_r(u32 data)
 {
 	// R0-R5,R8: input mux (keypad, ext in enable)
 	m_inp_mux = (data & 0x3f) | (data >> 2 & 0x40);
@@ -8502,9 +8509,9 @@ void bigtrak_state::bigtrak(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 200000); // approximation - RC osc. R=83K, C=100pF
-	m_maincpu->k().set(FUNC(bigtrak_state::read_k));
-	m_maincpu->r().set(FUNC(bigtrak_state::write_r));
-	m_maincpu->o().set(FUNC(bigtrak_state::write_o));
+	m_maincpu->read_k().set(FUNC(bigtrak_state::read_k));
+	m_maincpu->write_r().set(FUNC(bigtrak_state::write_r));
+	m_maincpu->write_o().set(FUNC(bigtrak_state::write_o));
 
 	TIMER(config, "gearbox").configure_periodic(FUNC(bigtrak_state::gearbox_sim_tick), attotime::from_msec(1));
 
@@ -8539,8 +8546,8 @@ ROM_END
 /***************************************************************************
 
   Milton Bradley Dark Tower
-  * TMS1400NLL MP7332-N1.U1(Rev. B) or MP7332-N2LL(Rev. C) (die label MP7332)
-    (assume same ROM contents between revisions)
+  * TMS1400NLL MP7332-N1.U1(Rev. B) or MP7332-N2LL(Rev. C) (die label:
+    TMS1400, MP7332, 28L 01D D100 R100) (assume same ROM between revisions)
   * SN75494N MOS-to-LED digit driver
   * motorized rotating reel + lightsensor, 1bit-sound
 
@@ -8586,7 +8593,7 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(motor_sim_tick);
 
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -8668,7 +8675,7 @@ void mbdtower_state::update_display()
 	}
 }
 
-void mbdtower_state::write_r(u16 data)
+void mbdtower_state::write_r(u32 data)
 {
 	// R0-R2: input mux
 	m_inp_mux = data & 7;
@@ -8749,9 +8756,9 @@ void mbdtower_state::mbdtower(machine_config &config)
 {
 	// basic machine hardware
 	TMS1400(config, m_maincpu, 425000); // approximation - RC osc. R=43K, C=56pF
-	m_maincpu->k().set(FUNC(mbdtower_state::read_k));
-	m_maincpu->r().set(FUNC(mbdtower_state::write_r));
-	m_maincpu->o().set(FUNC(mbdtower_state::write_o));
+	m_maincpu->read_k().set(FUNC(mbdtower_state::read_k));
+	m_maincpu->write_r().set(FUNC(mbdtower_state::write_r));
+	m_maincpu->write_o().set(FUNC(mbdtower_state::write_o));
 
 	TIMER(config, "tower_motor").configure_periodic(FUNC(mbdtower_state::motor_sim_tick), attotime::from_msec(3500/0x80)); // ~3.5sec for a full rotation
 
@@ -8785,7 +8792,7 @@ ROM_END
 /***************************************************************************
 
   Milton Bradley Electronic Arcade Mania
-  * TMS1100 M34078A-N2LL (die label 1100G, M34078A)
+  * TMS1100 M34078A-N2LL (die label: 1100G, M34078A)
   * 9 LEDs, 3-bit sound
 
   This is a board game. The mini arcade machine is the emulated part here.
@@ -8803,14 +8810,14 @@ public:
 	void arcmania(machine_config &config);
 
 private:
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
 
 // handlers
 
-void arcmania_state::write_r(u16 data)
+void arcmania_state::write_r(u32 data)
 {
 	// R1-R9: leds
 	m_display->matrix(1, data >> 1);
@@ -8875,9 +8882,9 @@ void arcmania_state::arcmania(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 250000); // approximation - RC osc. R=56K, C=100pF
-	m_maincpu->k().set(FUNC(arcmania_state::read_k));
-	m_maincpu->r().set(FUNC(arcmania_state::write_r));
-	m_maincpu->o().set(FUNC(arcmania_state::write_o));
+	m_maincpu->read_k().set(FUNC(arcmania_state::read_k));
+	m_maincpu->write_r().set(FUNC(arcmania_state::write_r));
+	m_maincpu->write_o().set(FUNC(arcmania_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 9);
@@ -8910,7 +8917,7 @@ ROM_END
 /***************************************************************************
 
   Parker Brothers Code Name: Sector, by Bob Doyle
-  * TMS0970 MCU, MP0905BNL ZA0379 (die label 0970F-05B)
+  * TMS0970 MCU, MP0905BNL ZA0379 (die label: 0970F-05B)
   * 6-digit 7seg LED display + 4 LEDs for compass, no sound
 
   This is a tabletop submarine pursuit game. A grid board and small toy
@@ -8929,14 +8936,14 @@ public:
 	void cnsector(machine_config &config);
 
 private:
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
 
 // handlers
 
-void cnsector_state::write_r(u16 data)
+void cnsector_state::write_r(u32 data)
 {
 	// R0-R5: select digit
 	// R6-R9: direction leds
@@ -9009,9 +9016,9 @@ void cnsector_state::cnsector(machine_config &config)
 {
 	// basic machine hardware
 	TMS0970(config, m_maincpu, 250000); // approximation
-	m_maincpu->k().set(FUNC(cnsector_state::read_k));
-	m_maincpu->r().set(FUNC(cnsector_state::write_r));
-	m_maincpu->o().set(FUNC(cnsector_state::write_o));
+	m_maincpu->read_k().set(FUNC(cnsector_state::read_k));
+	m_maincpu->write_r().set(FUNC(cnsector_state::write_r));
+	m_maincpu->write_o().set(FUNC(cnsector_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
@@ -9073,14 +9080,14 @@ public:
 	void merlin(machine_config &config);
 
 protected:
-	virtual void write_r(u16 data);
+	virtual void write_r(u32 data);
 	virtual void write_o(u16 data);
 	virtual u8 read_k();
 };
 
 // handlers
 
-void merlin_state::write_r(u16 data)
+void merlin_state::write_r(u32 data)
 {
 	/* leds:
 
@@ -9141,9 +9148,9 @@ void merlin_state::merlin(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=33K, C=100pF
-	m_maincpu->k().set(FUNC(merlin_state::read_k));
-	m_maincpu->r().set(FUNC(merlin_state::write_r));
-	m_maincpu->o().set(FUNC(merlin_state::write_o));
+	m_maincpu->read_k().set(FUNC(merlin_state::read_k));
+	m_maincpu->write_r().set(FUNC(merlin_state::write_r));
+	m_maincpu->write_o().set(FUNC(merlin_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 11);
@@ -9176,7 +9183,7 @@ ROM_END
 /***************************************************************************
 
   Parker Brothers Master Merlin
-  * TMS1400 MP7351-N2LL (die label 1400CR MP7351)
+  * TMS1400 MP7351-N2LL (die label: 1400CR, MP7351)
   * 11 LEDs behind buttons, 3-level sound
 
   The TMS1400CR MCU has the same pinout as a standard TMS1100. The hardware
@@ -9222,9 +9229,9 @@ void mmerlin_state::mmerlin(machine_config &config)
 
 	// basic machine hardware
 	TMS1400(config.replace(), m_maincpu, 425000); // approximation - RC osc. R=30K, C=100pF
-	m_maincpu->k().set(FUNC(mmerlin_state::read_k));
-	m_maincpu->r().set(FUNC(mmerlin_state::write_r));
-	m_maincpu->o().set(FUNC(mmerlin_state::write_o));
+	m_maincpu->read_k().set(FUNC(mmerlin_state::read_k));
+	m_maincpu->write_r().set(FUNC(mmerlin_state::write_r));
+	m_maincpu->write_o().set(FUNC(mmerlin_state::write_o));
 
 	config.set_default_layout(layout_mmerlin);
 }
@@ -9248,7 +9255,7 @@ ROM_END
 /***************************************************************************
 
   Parker Brothers Electronic Master Mind
-  * TMS1000NLL MP3200 (die label 1000E, MP3200)
+  * TMS1000NLL MP3200 (die label: 1000E, MP3200)
   * 5 red leds, 5 green leds
 
   This is a board game, it came with 4 plug boards and a lot of colored pegs.
@@ -9267,14 +9274,14 @@ public:
 	void pbmastm(machine_config &config);
 
 private:
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
 
 // handlers
 
-void pbmastm_state::write_r(u16 data)
+void pbmastm_state::write_r(u32 data)
 {
 	// R1-R10: leds (direct)
 	m_display->matrix(1, data >> 1);
@@ -9336,9 +9343,9 @@ void pbmastm_state::pbmastm(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 300000); // approximation - RC osc. R=56K, C=47pF
-	m_maincpu->k().set(FUNC(pbmastm_state::read_k));
-	m_maincpu->r().set(FUNC(pbmastm_state::write_r));
-	m_maincpu->o().set(FUNC(pbmastm_state::write_o));
+	m_maincpu->read_k().set(FUNC(pbmastm_state::read_k));
+	m_maincpu->write_r().set(FUNC(pbmastm_state::write_r));
+	m_maincpu->write_o().set(FUNC(pbmastm_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 10);
@@ -9366,7 +9373,7 @@ ROM_END
 /***************************************************************************
 
   Parker Brothers Stop Thief, by Bob Doyle
-  * TMS0980NLL MP6101B (die label 0980B-01A)
+  * TMS0980NLL MP6101B (die label: 0980B-01A)
   * 3-digit 7seg LED display, 6-level sound
 
   Stop Thief is actually a board game, the electronic device emulated here
@@ -9386,14 +9393,14 @@ public:
 	void stopthief(machine_config &config);
 
 private:
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
 
 // handlers
 
-void stopthief_state::write_r(u16 data)
+void stopthief_state::write_r(u32 data)
 {
 	// R0-R2: select digit
 	m_display->matrix(data & 7, bitswap<8>(m_o,3,5,2,1,4,0,6,7) & 0x7f);
@@ -9457,9 +9464,9 @@ void stopthief_state::stopthief(machine_config &config)
 {
 	// basic machine hardware
 	TMS0980(config, m_maincpu, 425000); // approximation
-	m_maincpu->k().set(FUNC(stopthief_state::read_k));
-	m_maincpu->r().set(FUNC(stopthief_state::write_r));
-	m_maincpu->o().set(FUNC(stopthief_state::write_o));
+	m_maincpu->read_k().set(FUNC(stopthief_state::read_k));
+	m_maincpu->write_r().set(FUNC(stopthief_state::write_r));
+	m_maincpu->write_o().set(FUNC(stopthief_state::write_o));
 	m_maincpu->power_off().set(FUNC(stopthief_state::auto_power_off));
 
 	// video hardware
@@ -9512,7 +9519,7 @@ ROM_END
 /***************************************************************************
 
   Parker Brothers Bank Shot (known as Cue Ball in the UK), by Garry Kitchen
-  * TMS1400NLL MP7313-N2 (die label MP7313)
+  * TMS1400NLL MP7313-N2 (die label: TMS1400, MP7313, 28L 01D D000 R000)
   * LED grid display, 1-bit sound
 
   Bank Shot is an electronic pool game. To select a game, repeatedly press
@@ -9539,7 +9546,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -9551,7 +9558,7 @@ void bankshot_state::update_display()
 	m_display->matrix(m_r & ~3, m_o);
 }
 
-void bankshot_state::write_r(u16 data)
+void bankshot_state::write_r(u32 data)
 {
 	// R0: speaker out
 	m_speaker->level_w(data & 1);
@@ -9609,9 +9616,9 @@ void bankshot_state::bankshot(machine_config &config)
 {
 	// basic machine hardware
 	TMS1400(config, m_maincpu, 475000); // approximation - RC osc. R=24K, C=100pF
-	m_maincpu->k().set(FUNC(bankshot_state::read_k));
-	m_maincpu->r().set(FUNC(bankshot_state::write_r));
-	m_maincpu->o().set(FUNC(bankshot_state::write_o));
+	m_maincpu->read_k().set(FUNC(bankshot_state::read_k));
+	m_maincpu->write_r().set(FUNC(bankshot_state::write_r));
+	m_maincpu->write_o().set(FUNC(bankshot_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(11, 8);
@@ -9643,7 +9650,7 @@ ROM_END
 /***************************************************************************
 
   Parker Brothers Split Second
-  * TMS1400NLL MP7314-N2 (die label MP7314)
+  * TMS1400NLL MP7314-N2 (die label: TMS1400, MP7314, 28L 01D D000 R000)
   * LED grid display(default round LEDs, and rectangular shape ones), 1-bit sound
 
   This is an electronic handheld reflex gaming device, it's straightforward
@@ -9683,7 +9690,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -9695,7 +9702,7 @@ void splitsec_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-void splitsec_state::write_r(u16 data)
+void splitsec_state::write_r(u32 data)
 {
 	// R8: speaker out
 	m_speaker->level_w(data >> 8 & 1);
@@ -9742,9 +9749,9 @@ void splitsec_state::splitsec(machine_config &config)
 {
 	// basic machine hardware
 	TMS1400(config, m_maincpu, 475000); // approximation - RC osc. R=24K, C=100pF
-	m_maincpu->k().set(FUNC(splitsec_state::read_k));
-	m_maincpu->r().set(FUNC(splitsec_state::write_r));
-	m_maincpu->o().set(FUNC(splitsec_state::write_o));
+	m_maincpu->read_k().set(FUNC(splitsec_state::read_k));
+	m_maincpu->write_r().set(FUNC(splitsec_state::write_r));
+	m_maincpu->write_o().set(FUNC(splitsec_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8, 7);
@@ -9776,7 +9783,7 @@ ROM_END
 
   Parker Brothers Lost Treasure - The Electronic Deep-Sea Diving Game,
   Featuring The Electronic Dive-Control Center
-  * TMS1100 M34038-NLL (die label 1100E, M34038)
+  * TMS1100 M34038-NLL (die label: 1100E, M34038)
   * 11 LEDs, 4-bit sound
 
   This is a board game. The electronic accessory is the emulated part here.
@@ -9793,14 +9800,14 @@ public:
 	void lostreas(machine_config &config);
 
 private:
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
 
 // handlers
 
-void lostreas_state::write_r(u16 data)
+void lostreas_state::write_r(u32 data)
 {
 	// R0-R10: leds
 	m_display->matrix(1, data);
@@ -9869,9 +9876,9 @@ void lostreas_state::lostreas(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 425000); // approximation - RC osc. R=39K, C=47pF
-	m_maincpu->k().set(FUNC(lostreas_state::read_k));
-	m_maincpu->r().set(FUNC(lostreas_state::write_r));
-	m_maincpu->o().set(FUNC(lostreas_state::write_o));
+	m_maincpu->read_k().set(FUNC(lostreas_state::read_k));
+	m_maincpu->write_r().set(FUNC(lostreas_state::write_r));
+	m_maincpu->write_o().set(FUNC(lostreas_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 11);
@@ -9933,14 +9940,14 @@ public:
 	void alphie(machine_config &config);
 
 private:
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
 
 // handlers
 
-void alphie_state::write_r(u16 data)
+void alphie_state::write_r(u32 data)
 {
 	// R1-R5, input mux (using d5 for Vss)
 	m_inp_mux = (data >> 1 & 0x1f) | 0x20;
@@ -10017,9 +10024,9 @@ void alphie_state::alphie(machine_config &config)
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 350000); // approximation
 	m_maincpu->set_output_pla(alphie_output_pla);
-	m_maincpu->k().set(FUNC(alphie_state::read_k));
-	m_maincpu->r().set(FUNC(alphie_state::write_r));
-	m_maincpu->o().set(FUNC(alphie_state::write_o));
+	m_maincpu->read_k().set(FUNC(alphie_state::read_k));
+	m_maincpu->write_r().set(FUNC(alphie_state::write_r));
+	m_maincpu->write_o().set(FUNC(alphie_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 5);
@@ -10051,7 +10058,7 @@ ROM_END
 
   Tandy Championship Football (model 60-2150)
   * PCB label: CYG-316
-  * TMS1100NLL MP1193 (die label 1100B, MP1193)
+  * TMS1100NLL MP1193 (die label: 1100B, MP1193)
   * 7-digit 7seg LED display + LED grid, 1-bit sound
 
   Another clone of Mattel Football II. The original manufacturer is unknown, but
@@ -10070,7 +10077,7 @@ public:
 
 protected:
 	void update_display();
-	virtual void write_r(u16 data);
+	virtual void write_r(u32 data);
 	virtual void write_o(u16 data);
 	virtual u8 read_k();
 };
@@ -10086,7 +10093,7 @@ void tcfball_state::update_display()
 	m_display->matrix(sel, m_o);
 }
 
-void tcfball_state::write_r(u16 data)
+void tcfball_state::write_r(u32 data)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -10139,9 +10146,9 @@ void tcfball_state::tcfball(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 375000); // approximation - RC osc. R=56K, C=24pF
-	m_maincpu->k().set(FUNC(tcfball_state::read_k));
-	m_maincpu->r().set(FUNC(tcfball_state::write_r));
-	m_maincpu->o().set(FUNC(tcfball_state::write_o));
+	m_maincpu->read_k().set(FUNC(tcfball_state::read_k));
+	m_maincpu->write_r().set(FUNC(tcfball_state::write_r));
+	m_maincpu->write_o().set(FUNC(tcfball_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(11, 8);
@@ -10278,7 +10285,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -10290,7 +10297,7 @@ void tandy12_state::update_display()
 	m_display->matrix(1, (m_o << 1 & 0x1fe) | (m_r << 9 & 0x1e00));
 }
 
-void tandy12_state::write_r(u16 data)
+void tandy12_state::write_r(u32 data)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -10389,9 +10396,9 @@ void tandy12_state::tandy12(machine_config &config)
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 400000); // approximation - RC osc. R=39K, C=47pF
 	m_maincpu->set_output_pla(tandy12_output_pla);
-	m_maincpu->k().set(FUNC(tandy12_state::read_k));
-	m_maincpu->r().set(FUNC(tandy12_state::write_r));
-	m_maincpu->o().set(FUNC(tandy12_state::write_o));
+	m_maincpu->read_k().set(FUNC(tandy12_state::read_k));
+	m_maincpu->write_r().set(FUNC(tandy12_state::write_r));
+	m_maincpu->write_o().set(FUNC(tandy12_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 13);
@@ -10422,7 +10429,7 @@ ROM_END
 /***************************************************************************
 
   Tandy(Radio Shack division) Monkey See (1982 version)
-  * TMS1000 MP0271 (die label 1000E, MP0271), only half of ROM space used
+  * TMS1000 MP0271 (die label: 1000E, MP0271), only half of ROM space used
   * 2 LEDs(one red, one green), 1-bit sound
 
   This is the TMS1000 version, the one from 1977 has a MM5780.
@@ -10445,14 +10452,14 @@ public:
 	void monkeysee(machine_config &config);
 
 private:
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
 
 // handlers
 
-void monkeysee_state::write_r(u16 data)
+void monkeysee_state::write_r(u32 data)
 {
 	// R0-R4: input mux
 	m_inp_mux = data & 0x1f;
@@ -10512,9 +10519,9 @@ void monkeysee_state::monkeysee(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 250000); // approximation - RC osc. R=68K, C=47pF
-	m_maincpu->k().set(FUNC(monkeysee_state::read_k));
-	m_maincpu->r().set(FUNC(monkeysee_state::write_r));
-	m_maincpu->o().set(FUNC(monkeysee_state::write_o));
+	m_maincpu->read_k().set(FUNC(monkeysee_state::read_k));
+	m_maincpu->write_r().set(FUNC(monkeysee_state::write_r));
+	m_maincpu->write_o().set(FUNC(monkeysee_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 2);
@@ -10546,7 +10553,7 @@ ROM_END
 
   Tandy 3 in 1 Sports Arena (model 60-2178)
   * PCB label: HP-804
-  * TMS1100 (just a datestamp label (8331), die label 1100B MP1231)
+  * TMS1100 (just a datestamp label (8331), die label: 1100B, MP1231)
   * 2x2-digit 7seg LED display + 47 other LEDs, 1-bit sound
 
   For Tandy Sports Arena (model 60-2158), see cmsport, this is a different game.
@@ -10571,7 +10578,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -10583,7 +10590,7 @@ void t3in1sa_state::update_display()
 	m_display->matrix(m_r, m_o | (m_r << 6 & 0x100));
 }
 
-void t3in1sa_state::write_r(u16 data)
+void t3in1sa_state::write_r(u32 data)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -10677,9 +10684,9 @@ void t3in1sa_state::t3in1sa(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(t3in1sa_state::read_k));
-	m_maincpu->r().set(FUNC(t3in1sa_state::write_r));
-	m_maincpu->o().set(FUNC(t3in1sa_state::write_o));
+	m_maincpu->read_k().set(FUNC(t3in1sa_state::read_k));
+	m_maincpu->write_r().set(FUNC(t3in1sa_state::write_r));
+	m_maincpu->write_o().set(FUNC(t3in1sa_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 9);
@@ -10712,7 +10719,7 @@ ROM_END
 /***************************************************************************
 
   Telesensory Systems, Inc.(TSI) Speech+
-  * TMS1000 MCU, label TMS1007NL (die label 1000B, 1007A)
+  * TMS1000 MCU, label TMS1007NL (die label: 1000B, 1007A)
   * TSI S14001A speech chip, GI S14007-A 2KB maskrom for samples
   * 9-digit 7seg LED display
 
@@ -10736,7 +10743,7 @@ private:
 	required_device<s14001a_device> m_speech;
 
 	void update_display();
-	virtual void write_r(u16 data);
+	virtual void write_r(u32 data);
 	virtual void write_o(u16 data);
 	virtual u8 read_k();
 };
@@ -10748,7 +10755,7 @@ void speechp_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-void speechp_state::write_r(u16 data)
+void speechp_state::write_r(u32 data)
 {
 	// R5-R9: TSI C0-C5
 	m_speech->data_w(data >> 5 & 0x3f);
@@ -10842,9 +10849,9 @@ void speechp_state::speechp(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 400000); // approximation - RC osc. R=39K, C=47pF
-	m_maincpu->k().set(FUNC(speechp_state::read_k));
-	m_maincpu->r().set(FUNC(speechp_state::write_r));
-	m_maincpu->o().set(FUNC(speechp_state::write_o));
+	m_maincpu->read_k().set(FUNC(speechp_state::read_k));
+	m_maincpu->write_r().set(FUNC(speechp_state::write_r));
+	m_maincpu->write_o().set(FUNC(speechp_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
@@ -10879,11 +10886,11 @@ ROM_END
 /***************************************************************************
 
   TI SR-16 (1974, first consumer product with TMS1000 series MCU)
-  * TMS1000 MCU label TMS1001NL (die label 1000, 1001A)
+  * TMS1000 MCU label TMS1001NL (die label: 1000, 1001A)
   * 12-digit 7seg LED display
 
   TI SR-16 II (1975 version)
-  * TMS1000 MCU label TMS1016NL (die label 1000B, 1016A)
+  * TMS1000 MCU label TMS1016NL (die label: 1000B, 1016A)
   * notes: cost-reduced 'sequel', [10^x] was removed, and [pi] was added.
 
 ***************************************************************************/
@@ -10900,7 +10907,7 @@ public:
 private:
 	void update_display();
 	void write_o(u16 data);
-	void write_r(u16 data);
+	void write_r(u32 data);
 	u8 read_k();
 };
 
@@ -10916,7 +10923,7 @@ void tisr16_state::update_display()
 	m_display->write_row(10, r10 & 0x40);
 }
 
-void tisr16_state::write_r(u16 data)
+void tisr16_state::write_r(u32 data)
 {
 	// R0-R10: input mux, select digit
 	m_r = m_inp_mux = data;
@@ -11078,9 +11085,9 @@ void tisr16_state::tisr16(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 300000); // approximation - RC osc. R=43K, C=68pf (note: tisr16ii MCU RC osc. is different: R=30K, C=100pf, same freq)
-	m_maincpu->k().set(FUNC(tisr16_state::read_k));
-	m_maincpu->o().set(FUNC(tisr16_state::write_o));
-	m_maincpu->r().set(FUNC(tisr16_state::write_r));
+	m_maincpu->read_k().set(FUNC(tisr16_state::read_k));
+	m_maincpu->write_o().set(FUNC(tisr16_state::write_o));
+	m_maincpu->write_r().set(FUNC(tisr16_state::write_r));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(12, 8);
@@ -11119,11 +11126,11 @@ ROM_END
 /***************************************************************************
 
   TI-1250/TI-1200 (1975 version), Spirit of '76
-  * TMS0950 MCU label TMC0952NL, K0952 (die label 0950A 0952)
+  * TMS0950 MCU label TMC0952NL, K0952 (die label: 0950A 0952)
   * 9-digit 7seg LED display
 
   TI-1250/TI-1200 (1976 version), TI-1400, TI-1450, TI-1205, TI-1255, LADY 1200, ABLE
-  * TMS0970 MCU label TMS0972NL ZA0348, JP0972A (die label 0970D-72A)
+  * TMS0970 MCU label TMS0972NL ZA0348, JP0972A (die label: 0970D-72A)
   * 8-digit 7seg LED display, or 9 digits with leftmost unused
 
   As seen listed above, the basic 4-function TMS0972 calculator MCU was used
@@ -11135,7 +11142,7 @@ ROM_END
   available buttons.
 
   TI-1270
-  * TMS0970 MCU label TMC0974NL ZA0355, DP0974A (die label 0970D-74A)
+  * TMS0970 MCU label TMC0974NL ZA0355, DP0974A (die label: 0970D-74A)
   * 8-digit 7seg LED display
   * notes: almost same hardware as TMS0972 TI-1250, minor scientific functions
 
@@ -11153,13 +11160,13 @@ public:
 
 private:
 	void write_o(u16 data);
-	void write_r(u16 data);
+	void write_r(u32 data);
 	u8 read_k();
 };
 
 // handlers
 
-void ti1250_state::write_r(u16 data)
+void ti1250_state::write_r(u32 data)
 {
 	// R0-R8: select digit
 	m_display->matrix(data, m_o);
@@ -11241,9 +11248,9 @@ void ti1250_state::ti1250(machine_config &config)
 {
 	// basic machine hardware
 	TMS0950(config, m_maincpu, 200000); // approximation - RC osc. R=68K, C=68pf
-	m_maincpu->k().set(FUNC(ti1250_state::read_k));
-	m_maincpu->o().set(FUNC(ti1250_state::write_o));
-	m_maincpu->r().set(FUNC(ti1250_state::write_r));
+	m_maincpu->read_k().set(FUNC(ti1250_state::read_k));
+	m_maincpu->write_o().set(FUNC(ti1250_state::write_o));
+	m_maincpu->write_r().set(FUNC(ti1250_state::write_r));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
@@ -11260,9 +11267,9 @@ void ti1250_state::ti1270(machine_config &config)
 
 	// basic machine hardware
 	TMS0970(config.replace(), m_maincpu, 250000); // approximation
-	m_maincpu->k().set(FUNC(ti1250_state::read_k));
-	m_maincpu->o().set(FUNC(ti1250_state::write_o));
-	m_maincpu->r().set(FUNC(ti1250_state::write_r));
+	m_maincpu->read_k().set(FUNC(ti1250_state::read_k));
+	m_maincpu->write_o().set(FUNC(ti1250_state::write_o));
+	m_maincpu->write_r().set(FUNC(ti1250_state::write_r));
 
 	config.set_default_layout(layout_ti1270);
 }
@@ -11316,7 +11323,7 @@ ROM_END
 /***************************************************************************
 
   TI-2550 III, TI-1650/TI-1600, TI-1265 (they have the same chip)
-  * TMS1040 MCU label TMS1043NL ZA0352 (die label 1040A, 1043A)
+  * TMS1040 MCU label TMS1043NL ZA0352 (die label: 1040A, 1043A)
   * 9-digit cyan VFD display
 
   Only the TI-2550 III has the top button row (RV, SQRT, etc).
@@ -11336,7 +11343,7 @@ public:
 private:
 	void update_display();
 	void write_o(u16 data);
-	void write_r(u16 data);
+	void write_r(u32 data);
 	u8 read_k();
 };
 
@@ -11347,7 +11354,7 @@ void ti25503_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-void ti25503_state::write_r(u16 data)
+void ti25503_state::write_r(u32 data)
 {
 	// R0-R6: input mux
 	// R0-R8: select digit
@@ -11418,9 +11425,9 @@ void ti25503_state::ti25503(machine_config &config)
 {
 	// basic machine hardware
 	TMS1040(config, m_maincpu, 250000); // approximation
-	m_maincpu->k().set(FUNC(ti25503_state::read_k));
-	m_maincpu->o().set(FUNC(ti25503_state::write_o));
-	m_maincpu->r().set(FUNC(ti25503_state::write_r));
+	m_maincpu->read_k().set(FUNC(ti25503_state::read_k));
+	m_maincpu->write_o().set(FUNC(ti25503_state::write_o));
+	m_maincpu->write_r().set(FUNC(ti25503_state::write_r));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
@@ -11449,7 +11456,7 @@ ROM_END
 /***************************************************************************
 
   TI-5100, more (see below)
-  * TMS1070 MCU label TMS1073NL or TMC1073NL (die label 1070B, 1073)
+  * TMS1070 MCU label TMS1073NL or TMC1073NL (die label: 1070B, 1073)
   * 11-digit 7seg VFD (1 custom digit)
 
   This chip was also used in 3rd-party calculators, such as Toshiba BC-1015,
@@ -11470,7 +11477,7 @@ public:
 private:
 	void update_display();
 	void write_o(u16 data);
-	void write_r(u16 data);
+	void write_r(u32 data);
 	u8 read_k();
 };
 
@@ -11482,7 +11489,7 @@ void ti5100_state::update_display()
 	m_display->matrix(m_r, (m_r >> 2 & 0x100) | m_o);
 }
 
-void ti5100_state::write_r(u16 data)
+void ti5100_state::write_r(u32 data)
 {
 	// R0-R10: input mux, select digit
 	m_r = m_inp_mux = data;
@@ -11570,9 +11577,9 @@ void ti5100_state::ti5100(machine_config &config)
 {
 	// basic machine hardware
 	TMS1070(config, m_maincpu, 250000); // approximation
-	m_maincpu->k().set(FUNC(ti5100_state::read_k));
-	m_maincpu->o().set(FUNC(ti5100_state::write_o));
-	m_maincpu->r().set(FUNC(ti5100_state::write_r));
+	m_maincpu->read_k().set(FUNC(ti5100_state::read_k));
+	m_maincpu->write_o().set(FUNC(ti5100_state::write_o));
+	m_maincpu->write_r().set(FUNC(ti5100_state::write_r));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(11, 9);
@@ -11603,7 +11610,7 @@ ROM_END
   TMC098x series Majestic-line calculators
 
   TI-30, SR-40, TI-15(less buttons) and several by Koh-I-Noor
-  * TMS0980 MCU label TMC0981NL (die label 0980B-81F)
+  * TMS0980 MCU label TMC0981NL (die label: 0980B-81F)
   * 9-digit 7seg LED display
 
   Of note is a peripheral by Schoenherr, called the Braillotron. It acts as
@@ -11612,10 +11619,10 @@ ROM_END
   the original LED display to a 25-pin D-Sub connector.
 
   TI Business Analyst, TI Business Analyst-I, TI Money Manager, TI-31, TI-41
-  * TMS0980 MCU label TMC0982NL (die label 0980B-82F)
+  * TMS0980 MCU label TMC0982NL (die label: 0980B-82F)
 
   TI Programmer
-  * TMS0980 MCU label ZA0675NL, JP0983AT (die label 0980B-83)
+  * TMS0980 MCU label ZA0675NL, JP0983AT (die label: 0980B-83)
 
 ***************************************************************************/
 
@@ -11630,13 +11637,13 @@ public:
 
 private:
 	void write_o(u16 data);
-	void write_r(u16 data);
+	void write_r(u32 data);
 	u8 read_k();
 };
 
 // handlers
 
-void ti30_state::write_r(u16 data)
+void ti30_state::write_r(u32 data)
 {
 	// R0-R8: select digit
 	m_display->matrix(data, m_o);
@@ -11840,9 +11847,9 @@ void ti30_state::ti30(machine_config &config)
 {
 	// basic machine hardware
 	TMS0980(config, m_maincpu, 400000); // guessed
-	m_maincpu->k().set(FUNC(ti30_state::read_k));
-	m_maincpu->o().set(FUNC(ti30_state::write_o));
-	m_maincpu->r().set(FUNC(ti30_state::write_r));
+	m_maincpu->read_k().set(FUNC(ti30_state::read_k));
+	m_maincpu->write_o().set(FUNC(ti30_state::write_o));
+	m_maincpu->write_r().set(FUNC(ti30_state::write_r));
 	m_maincpu->power_off().set(FUNC(ti30_state::auto_power_off));
 
 	// video hardware
@@ -11905,7 +11912,7 @@ ROM_END
 /***************************************************************************
 
   TI-1000 (1977 version)
-  * TMS1990 MCU label TMC1991NL (die label 1991-91A)
+  * TMS1990 MCU label TMC1991NL (die label: 1991-91A)
   * 8-digit 7seg LED display
 
   TI-1000 (1978 version)
@@ -11924,13 +11931,13 @@ public:
 
 private:
 	void write_o(u16 data);
-	void write_r(u16 data);
+	void write_r(u32 data);
 	u8 read_k();
 };
 
 // handlers
 
-void ti1000_state::write_r(u16 data)
+void ti1000_state::write_r(u32 data)
 {
 	// R0-R7: select digit
 	m_display->matrix(data, m_o);
@@ -11989,9 +11996,9 @@ void ti1000_state::ti1000(machine_config &config)
 {
 	// basic machine hardware
 	TMS1990(config, m_maincpu, 250000); // approximation
-	m_maincpu->k().set(FUNC(ti1000_state::read_k));
-	m_maincpu->o().set(FUNC(ti1000_state::write_o));
-	m_maincpu->r().set(FUNC(ti1000_state::write_r));
+	m_maincpu->read_k().set(FUNC(ti1000_state::read_k));
+	m_maincpu->write_o().set(FUNC(ti1000_state::write_o));
+	m_maincpu->write_r().set(FUNC(ti1000_state::write_r));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8, 8);
@@ -12024,7 +12031,7 @@ ROM_END
 /***************************************************************************
 
   TI WIZ-A-TRON
-  * TMS0970 MCU label TMC0907NL ZA0379, DP0907BS (die label 0970F-07B)
+  * TMS0970 MCU label TMC0907NL ZA0379, DP0907BS (die label: 0970F-07B)
   * 9-digit 7seg LED display(one custom digit)
 
 ***************************************************************************/
@@ -12040,13 +12047,13 @@ public:
 
 protected:
 	virtual void write_o(u16 data);
-	virtual void write_r(u16 data);
+	virtual void write_r(u32 data);
 	virtual u8 read_k();
 };
 
 // handlers
 
-void wizatron_state::write_r(u16 data)
+void wizatron_state::write_r(u32 data)
 {
 	// R0-R8: select digit
 
@@ -12107,9 +12114,9 @@ void wizatron_state::wizatron(machine_config &config)
 {
 	// basic machine hardware
 	TMS0970(config, m_maincpu, 250000); // approximation
-	m_maincpu->k().set(FUNC(wizatron_state::read_k));
-	m_maincpu->o().set(FUNC(wizatron_state::write_o));
-	m_maincpu->r().set(FUNC(wizatron_state::write_r));
+	m_maincpu->read_k().set(FUNC(wizatron_state::read_k));
+	m_maincpu->write_o().set(FUNC(wizatron_state::write_o));
+	m_maincpu->write_r().set(FUNC(wizatron_state::write_r));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
@@ -12143,7 +12150,7 @@ ROM_END
 /***************************************************************************
 
   TI Little Professor (1976 version)
-  * TMS0970 MCU label TMS0975NL ZA0356, GP0975CS (die label 0970D-75C)
+  * TMS0970 MCU label TMS0975NL ZA0356, GP0975CS (die label: 0970D-75C)
   * 9-digit 7seg LED display(one custom digit)
 
   The hardware is nearly identical to Wiz-A-Tron (or vice versa, since this
@@ -12203,8 +12210,8 @@ void lilprof_state::lilprof(machine_config &config)
 	wizatron(config);
 
 	// basic machine hardware
-	m_maincpu->k().set(FUNC(lilprof_state::read_k));
-	m_maincpu->o().set(FUNC(lilprof_state::write_o));
+	m_maincpu->read_k().set(FUNC(lilprof_state::read_k));
+	m_maincpu->write_o().set(FUNC(lilprof_state::write_o));
 }
 
 // roms
@@ -12230,7 +12237,7 @@ ROM_END
 /***************************************************************************
 
   TI Little Professor (1978 version)
-  * TMS1990 MCU label TMC1993NL (die label 1990C-c3C)
+  * TMS1990 MCU label TMC1993NL (die label: 1990C-c3C)
   * 9-digit 7seg LED display(one custom digit)
 
   1978 re-release, with on/off and level select on buttons instead of
@@ -12249,13 +12256,13 @@ public:
 
 private:
 	void write_o(u16 data);
-	void write_r(u16 data);
+	void write_r(u32 data);
 	u8 read_k();
 };
 
 // handlers
 
-void lilprof78_state::write_r(u16 data)
+void lilprof78_state::write_r(u32 data)
 {
 	// update leds state
 	u8 seg = bitswap<8>(m_o,7,4,3,2,1,0,6,5) & 0x7f;
@@ -12323,9 +12330,9 @@ void lilprof78_state::lilprof78(machine_config &config)
 {
 	// basic machine hardware
 	TMS1990(config, m_maincpu, 250000); // approximation
-	m_maincpu->k().set(FUNC(lilprof78_state::read_k));
-	m_maincpu->o().set(FUNC(lilprof78_state::write_o));
-	m_maincpu->r().set(FUNC(lilprof78_state::write_r));
+	m_maincpu->read_k().set(FUNC(lilprof78_state::read_k));
+	m_maincpu->write_o().set(FUNC(lilprof78_state::write_o));
+	m_maincpu->write_r().set(FUNC(lilprof78_state::write_r));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
@@ -12358,8 +12365,8 @@ ROM_END
 /***************************************************************************
 
   TI-1680, TI-2550-IV
-  * TMS1980 MCU label TMC1981NL (die label 1980A 81F)
-  * TMC0999NL 256x4 RAM (die label 0999B)
+  * TMS1980 MCU label TMC1981NL (die label: 1980A 81F)
+  * TMC0999NL 256x4 RAM (die label: 0999B)
   * 9-digit cyan VFD display(leftmost digit is custom)
 
   The extra RAM is for scrolling back through calculations. For some reason,
@@ -12382,7 +12389,7 @@ private:
 
 	virtual void update_display();
 	virtual void write_o(u16 data);
-	virtual void write_r(u16 data);
+	virtual void write_r(u32 data);
 	virtual u8 read_k();
 };
 
@@ -12394,7 +12401,7 @@ void ti1680_state::update_display()
 	m_display->matrix(m_r & 0x1ff, m_o | (m_r >> 2 & 0x80) | (m_r << 5 & 0x100));
 }
 
-void ti1680_state::write_r(u16 data)
+void ti1680_state::write_r(u32 data)
 {
 	// R8,R0,R5,R6: TMC0999 data inputs
 	// R2,R4+R1/R7: TMC0999 control pins
@@ -12469,9 +12476,9 @@ void ti1680_state::ti1680(machine_config &config)
 {
 	// basic machine hardware
 	TMS1980(config, m_maincpu, 300000); // approximation
-	m_maincpu->k().set(FUNC(ti1680_state::read_k));
-	m_maincpu->o().set(FUNC(ti1680_state::write_o));
-	m_maincpu->r().set(FUNC(ti1680_state::write_r));
+	m_maincpu->read_k().set(FUNC(ti1680_state::read_k));
+	m_maincpu->write_o().set(FUNC(ti1680_state::write_o));
+	m_maincpu->write_r().set(FUNC(ti1680_state::write_r));
 	m_maincpu->power_off().set(FUNC(ti1680_state::auto_power_off));
 
 	TMC0999(config, m_ram);
@@ -12505,7 +12512,7 @@ ROM_END
 /***************************************************************************
 
   TI DataMan
-  * TMS1980 MCU label TMC1982NL (die label 1980A 82B)
+  * TMS1980 MCU label TMC1982NL (die label: 1980A 82B)
   * 10-digit cyan VFD display(3 digits are custom)
 
 ***************************************************************************/
@@ -12522,7 +12529,7 @@ public:
 protected:
 	virtual void update_display();
 	virtual void write_o(u16 data);
-	virtual void write_r(u16 data);
+	virtual void write_r(u32 data);
 	virtual u8 read_k();
 };
 
@@ -12534,7 +12541,7 @@ void dataman_state::update_display()
 	m_display->matrix(m_r & 0x1ff, m_o | (m_r >> 2 & 0x80));
 }
 
-void dataman_state::write_r(u16 data)
+void dataman_state::write_r(u32 data)
 {
 	// R0-R4: input mux
 	// R0-R8: select digit
@@ -12601,9 +12608,9 @@ void dataman_state::dataman(machine_config &config)
 {
 	// basic machine hardware
 	TMS1980(config, m_maincpu, 300000); // patent says 300kHz
-	m_maincpu->k().set(FUNC(dataman_state::read_k));
-	m_maincpu->o().set(FUNC(dataman_state::write_o));
-	m_maincpu->r().set(FUNC(dataman_state::write_r));
+	m_maincpu->read_k().set(FUNC(dataman_state::read_k));
+	m_maincpu->write_o().set(FUNC(dataman_state::write_o));
+	m_maincpu->write_r().set(FUNC(dataman_state::write_r));
 	m_maincpu->power_off().set(FUNC(dataman_state::auto_power_off));
 
 	// video hardware
@@ -12635,7 +12642,7 @@ ROM_END
 /***************************************************************************
 
   TI Math Marvel
-  * TMS1980 MCU label TMC1986A-NL (die label 1980A 86A)
+  * TMS1980 MCU label TMC1986A-NL (die label: 1980A 86A)
   * 9-digit cyan VFD display(2 digits are custom), 1-bit sound
 
   This is the same hardware as DataMan, with R8 connected to a piezo.
@@ -12652,12 +12659,12 @@ public:
 	void mathmarv(machine_config &config);
 
 private:
-	virtual void write_r(u16 data) override;
+	virtual void write_r(u32 data) override;
 };
 
 // handlers
 
-void mathmarv_state::write_r(u16 data)
+void mathmarv_state::write_r(u32 data)
 {
 	// R8: speaker out
 	m_speaker->level_w(data >> 8 & 1);
@@ -12687,7 +12694,7 @@ void mathmarv_state::mathmarv(machine_config &config)
 	dataman(config);
 
 	// basic machine hardware
-	m_maincpu->r().set(FUNC(mathmarv_state::write_r));
+	m_maincpu->write_r().set(FUNC(mathmarv_state::write_r));
 
 	config.set_default_layout(layout_mathmarv);
 
@@ -12741,14 +12748,14 @@ public:
 	void timaze(machine_config &config);
 
 private:
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
 
 // handlers
 
-void timaze_state::write_r(u16 data)
+void timaze_state::write_r(u32 data)
 {
 	// R0: input mux
 	m_inp_mux = data & 1;
@@ -12780,9 +12787,9 @@ void timaze_state::timaze(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 200000); // approximation - RC osc. R=80K, C=27pF
-	m_maincpu->k().set(FUNC(timaze_state::read_k));
-	m_maincpu->r().set(FUNC(timaze_state::write_r));
-	m_maincpu->o().set(FUNC(timaze_state::write_o));
+	m_maincpu->read_k().set(FUNC(timaze_state::read_k));
+	m_maincpu->write_r().set(FUNC(timaze_state::write_r));
+	m_maincpu->write_o().set(FUNC(timaze_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 8);
@@ -12811,7 +12818,7 @@ ROM_END
 /***************************************************************************
 
   Texas Instruments Electronic Digital Thermostat
-  * TMS0970 MCU, label TMS0970NLL TMC0910B (die label 0970F-10E)
+  * TMS0970 MCU, label TMS0970NLL TMC0910B (die label: 0970F-10E)
   * 9-digit 7seg LED display, only 4 used
   * temperature sensor, heat/cool/fan outputs
 
@@ -12833,14 +12840,14 @@ public:
 private:
 	required_device<clock_device> m_60hz;
 
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
 
 // handlers
 
-void tithermos_state::write_r(u16 data)
+void tithermos_state::write_r(u32 data)
 {
 	// D1-D4: select digit
 	m_display->matrix(data, m_o);
@@ -12936,9 +12943,9 @@ void tithermos_state::tithermos(machine_config &config)
 {
 	// basic machine hardware
 	TMS0970(config, m_maincpu, 250000); // approximation
-	m_maincpu->k().set(FUNC(tithermos_state::read_k));
-	m_maincpu->r().set(FUNC(tithermos_state::write_r));
-	m_maincpu->o().set(FUNC(tithermos_state::write_o));
+	m_maincpu->read_k().set(FUNC(tithermos_state::read_k));
+	m_maincpu->write_r().set(FUNC(tithermos_state::write_r));
+	m_maincpu->write_o().set(FUNC(tithermos_state::write_o));
 
 	CLOCK(config, "ac_line", 60);
 
@@ -12974,7 +12981,7 @@ ROM_END
 
   Tiger Sub Wars (model 7-490)
   * PCB label: CSG201A(main), CSG201B(leds)
-  * TMS1200N2LL MP3352 (die label 1000C, MP3352)
+  * TMS1200N2LL MP3352 (die label: 1000C, MP3352)
   * 4-digit 7seg LED display + 55 other LEDs, 1-bit sound
 
   Tiger/Yeno also published an LCD handheld called Sub Wars, it's not related.
@@ -12995,7 +13002,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 };
 
@@ -13006,7 +13013,7 @@ void subwars_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-void subwars_state::write_r(u16 data)
+void subwars_state::write_r(u32 data)
 {
 	// R0-R3: digit select
 	// R4-R12: led select
@@ -13038,9 +13045,9 @@ void subwars_state::subwars(machine_config &config)
 {
 	// basic machine hardware
 	TMS1200(config, m_maincpu, 550000); // approximation - RC osc. R=24K, C=47pF
-	m_maincpu->k().set_ioport("IN.0");
-	m_maincpu->r().set(FUNC(subwars_state::write_r));
-	m_maincpu->o().set(FUNC(subwars_state::write_o));
+	m_maincpu->read_k().set_ioport("IN.0");
+	m_maincpu->write_r().set(FUNC(subwars_state::write_r));
+	m_maincpu->write_o().set(FUNC(subwars_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(13, 7);
@@ -13072,7 +13079,7 @@ ROM_END
 /***************************************************************************
 
   Tiger Playmaker: Hockey, Soccer, Basketball (model 7-540 or 7-540A)
-  * TMS1100 MP1215 (die label 1100B MP1215)
+  * TMS1100 MP1215 (die label: 1100B, MP1215)
   * 2-digit 7seg LED display + 40 other LEDs, 1-bit sound
 
   The games are on playcards(Tiger calls them that), the hardware detects which
@@ -13106,7 +13113,7 @@ private:
 	u8 m_notch = 0; // cartridge K1/K2
 
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -13141,7 +13148,7 @@ void playmaker_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-void playmaker_state::write_r(u16 data)
+void playmaker_state::write_r(u32 data)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -13194,9 +13201,9 @@ void playmaker_state::playmaker(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 375000); // approximation - RC osc. R=20K, C=250pF
-	m_maincpu->k().set(FUNC(playmaker_state::read_k));
-	m_maincpu->r().set(FUNC(playmaker_state::write_r));
-	m_maincpu->o().set(FUNC(playmaker_state::write_o));
+	m_maincpu->read_k().set(FUNC(playmaker_state::read_k));
+	m_maincpu->write_r().set(FUNC(playmaker_state::write_r));
+	m_maincpu->write_o().set(FUNC(playmaker_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 7);
@@ -13236,7 +13243,7 @@ ROM_END
 /***************************************************************************
 
   Tiger Deluxe Football with Instant Replay (model 7-550)
-  * TMS1400NLL MP7302 (die label TMS1400 MP7302)
+  * TMS1400NLL MP7302 (die label: TMS1400, MP7302, 28L 01D D000 R000)
   * 4-digit 7seg LED display, 80 red/green LEDs, 1-bit sound
 
   According to the manual, player 1 is green, player 2 is red. But when
@@ -13259,7 +13266,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -13274,7 +13281,7 @@ void dxfootb_state::update_display()
 	m_display->matrix((m_r & g1) | (m_r << 7 & g2), m_o);
 }
 
-void dxfootb_state::write_r(u16 data)
+void dxfootb_state::write_r(u32 data)
 {
 	// R9,R10: speaker out
 	m_speaker->level_w(data >> 9 & 3);
@@ -13332,9 +13339,9 @@ void dxfootb_state::dxfootb(machine_config &config)
 {
 	// basic machine hardware
 	TMS1400(config, m_maincpu, 425000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(dxfootb_state::read_k));
-	m_maincpu->r().set(FUNC(dxfootb_state::write_r));
-	m_maincpu->o().set(FUNC(dxfootb_state::write_o));
+	m_maincpu->read_k().set(FUNC(dxfootb_state::read_k));
+	m_maincpu->write_r().set(FUNC(dxfootb_state::write_r));
+	m_maincpu->write_o().set(FUNC(dxfootb_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(7+7, 8);
@@ -13369,7 +13376,7 @@ ROM_END
 
   Tiger Electronics Copy Cat (model 7-520)
   * PCB label: CC REV B
-  * TMS1000 MCU, label 69-11513 MP0919 (die label MP0919)
+  * TMS1000 MCU, label 69-11513 MP0919 (die label: 1000B, MP0919)
   * 4 LEDs, 1-bit sound
 
   known releases:
@@ -13389,14 +13396,14 @@ public:
 	void copycat(machine_config &config);
 
 private:
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
 
 // handlers
 
-void copycat_state::write_r(u16 data)
+void copycat_state::write_r(u32 data)
 {
 	// R0-R3: leds
 	m_display->matrix(1, data & 0xf);
@@ -13453,9 +13460,9 @@ void copycat_state::copycat(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 320000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(copycat_state::read_k));
-	m_maincpu->r().set(FUNC(copycat_state::write_r));
-	m_maincpu->o().set(FUNC(copycat_state::write_o));
+	m_maincpu->read_k().set(FUNC(copycat_state::read_k));
+	m_maincpu->write_r().set(FUNC(copycat_state::write_r));
+	m_maincpu->write_o().set(FUNC(copycat_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 4);
@@ -13489,7 +13496,7 @@ ROM_END
 
   Tiger Electronics Copy Cat (model 7-522)
   * PCB label: WS 8107-1
-  * TMS1730 MCU, label MP3005N (die label 1700 MP3005)
+  * TMS1730 MCU, label MP3005N (die label: 1700, MP3005)
   * 4 LEDs, 1-bit sound
 
   This is a simplified rerelease of Copy Cat, 10(!) years later. The gameplay
@@ -13513,13 +13520,13 @@ public:
 	void copycatm2(machine_config &config);
 
 private:
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 };
 
 // handlers
 
-void copycatm2_state::write_r(u16 data)
+void copycatm2_state::write_r(u32 data)
 {
 	// R1-R4: leds
 	m_display->matrix(1, data >> 1 & 0xf);
@@ -13545,9 +13552,9 @@ void copycatm2_state::copycatm2(machine_config &config)
 {
 	// basic machine hardware
 	TMS1730(config, m_maincpu, 275000); // approximation - RC osc. R=100K, C=47pF
-	m_maincpu->k().set_ioport("IN.0");
-	m_maincpu->r().set(FUNC(copycatm2_state::write_r));
-	m_maincpu->o().set(FUNC(copycatm2_state::write_o));
+	m_maincpu->read_k().set_ioport("IN.0");
+	m_maincpu->write_r().set(FUNC(copycatm2_state::write_r));
+	m_maincpu->write_o().set(FUNC(copycatm2_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 4);
@@ -13580,7 +13587,7 @@ ROM_END
 /***************************************************************************
 
   Tiger Ditto (model 7-530)
-  * TMS1700 MCU, label MP1801-N2LL (die label 1700 MP1801)
+  * TMS1700 MCU, label MP1801-N2LL (die label: 1700, MP1801)
   * 4 LEDs, 1-bit sound
 
   known releases:
@@ -13600,13 +13607,13 @@ public:
 	void ditto(machine_config &config);
 
 private:
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 };
 
 // handlers
 
-void ditto_state::write_r(u16 data)
+void ditto_state::write_r(u32 data)
 {
 	// R0-R3: leds
 	m_display->matrix(1, data & 0xf);
@@ -13632,9 +13639,9 @@ void ditto_state::ditto(machine_config &config)
 {
 	// basic machine hardware
 	TMS1700(config, m_maincpu, 275000); // approximation - RC osc. R=100K, C=47pF
-	m_maincpu->k().set_ioport("IN.0");
-	m_maincpu->r().set(FUNC(ditto_state::write_r));
-	m_maincpu->o().set(FUNC(ditto_state::write_o));
+	m_maincpu->read_k().set_ioport("IN.0");
+	m_maincpu->write_r().set(FUNC(ditto_state::write_r));
+	m_maincpu->write_o().set(FUNC(ditto_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 4);
@@ -13667,7 +13674,7 @@ ROM_END
 /***************************************************************************
 
   Tiger 7 in 1 Sports Stadium (model 7-555)
-  * TMS1400 MP7304 (die label TMS1400 MP7304A)
+  * TMS1400 MP7304 (die label: TMS1400, MP7304A, 28L 01D D000 R300)
   * 2x2-digit 7seg LED display + 39 other LEDs, 1-bit sound
 
   This handheld includes 7 games: 1: Basketball, 2: Hockey, 3: Soccer,
@@ -13691,7 +13698,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -13703,7 +13710,7 @@ void t7in1ss_state::update_display()
 	m_display->matrix(m_r, m_o);
 }
 
-void t7in1ss_state::write_r(u16 data)
+void t7in1ss_state::write_r(u32 data)
 {
 	// R9: speaker out
 	m_speaker->level_w(data >> 9 & 1);
@@ -13763,9 +13770,9 @@ void t7in1ss_state::t7in1ss(machine_config &config)
 {
 	// basic machine hardware
 	TMS1400(config, m_maincpu, 425000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(t7in1ss_state::read_k));
-	m_maincpu->r().set(FUNC(t7in1ss_state::write_r));
-	m_maincpu->o().set(FUNC(t7in1ss_state::write_o));
+	m_maincpu->read_k().set(FUNC(t7in1ss_state::read_k));
+	m_maincpu->write_r().set(FUNC(t7in1ss_state::write_r));
+	m_maincpu->write_o().set(FUNC(t7in1ss_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
@@ -13799,7 +13806,7 @@ ROM_END
 
   Tomy(tronics) Break Up (manufactured in Japan)
   * PCB label: TOMY B.O.
-  * TMS1040 MP2726 TOMY WIPE (die label MP2726A)
+  * TMS1040 MP2726 TOMY WIPE (die label: 1040B, MP2726A)
   * TMS1025N2LL I/O expander
   * 2-digit 7seg display, 46 other leds, 1-bit sound
 
@@ -13853,7 +13860,7 @@ private:
 
 	void set_clock();
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -13897,7 +13904,7 @@ void tbreakup_state::expander_w(offs_t offset, u8 data)
 	m_exp_port[offset] = data;
 }
 
-void tbreakup_state::write_r(u16 data)
+void tbreakup_state::write_r(u32 data)
 {
 	// R6: speaker out
 	m_speaker->level_w(data >> 6 & 1);
@@ -13956,9 +13963,9 @@ void tbreakup_state::tbreakup(machine_config &config)
 {
 	// basic machine hardware
 	TMS1040(config, m_maincpu, 325000); // see set_clock
-	m_maincpu->k().set(FUNC(tbreakup_state::read_k));
-	m_maincpu->r().set(FUNC(tbreakup_state::write_r));
-	m_maincpu->o().set(FUNC(tbreakup_state::write_o));
+	m_maincpu->read_k().set(FUNC(tbreakup_state::read_k));
+	m_maincpu->write_r().set(FUNC(tbreakup_state::write_r));
+	m_maincpu->write_o().set(FUNC(tbreakup_state::write_o));
 
 	TMS1025(config, m_expander).set_ms(1); // MS tied high
 	m_expander->write_port1_callback().set(FUNC(tbreakup_state::expander_w));
@@ -14000,7 +14007,7 @@ ROM_END
 
   Tomy Power House Pinball
   * PCB label: TOMY P-B
-  * TMS1100 MP1180 TOMY PINB (die label MP1180)
+  * TMS1100 MP1180 TOMY PINB (die label: 1100B, MP1180)
   * 3 7seg LEDs, and other LEDs behind bezel, 1-bit sound
 
   known releases:
@@ -14038,7 +14045,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -14053,7 +14060,7 @@ void phpball_state::update_display()
 	m_display->matrix((m_r & 0x1ff) | in1, m_o);
 }
 
-void phpball_state::write_r(u16 data)
+void phpball_state::write_r(u32 data)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -14098,9 +14105,9 @@ void phpball_state::phpball(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(phpball_state::read_k));
-	m_maincpu->r().set(FUNC(phpball_state::write_r));
-	m_maincpu->o().set(FUNC(phpball_state::write_o));
+	m_maincpu->read_k().set(FUNC(phpball_state::read_k));
+	m_maincpu->write_r().set(FUNC(phpball_state::write_r));
+	m_maincpu->write_o().set(FUNC(phpball_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(11, 7);
@@ -14123,6 +14130,256 @@ ROM_START( phpball )
 	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_phpball_output.pla", 0, 365, CRC(87e67aaf) SHA1(ebc7bae1352f39173f1bf0dc10cdc6f635dedab4) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Tsukuda The Dracula
+  * PCB label: TOFL-001A / B
+  * TMS1475 MP6354 (die label: TMS1175 /TMS1475, MP6354, 40H-PASS-0900-R300-0)
+    note: no TMS1xxx label on MCU, PCB says "TMS1375L" but that can't be right
+  * cyan/red/green VFD display NEC FIP11AM32T no. 2-8, 1-bit sound
+
+  known releases:
+  - Japan: The Dracula, published by Tsukuda
+  - France: Dracula/The Dracula, published by Euro Toy
+
+***************************************************************************/
+
+class tdracula_state : public hh_tms1k_state
+{
+public:
+	tdracula_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void tdracula(machine_config &config);
+
+private:
+	void update_display();
+	void write_r(u32 data);
+	void write_o(u16 data);
+	u8 read_k();
+};
+
+// handlers
+
+void tdracula_state::update_display()
+{
+	m_display->matrix(m_grid, m_plate);
+}
+
+void tdracula_state::write_r(u32 data)
+{
+	// R15: speaker out
+	m_speaker->level_w(BIT(data, 15));
+
+	// R20,R21: input mux
+	m_inp_mux = data >> 20 & 3;
+
+	// R0-R10: VFD grid
+	// R11-R14, R16-R20: VFD plate
+	m_grid = data & 0x7ff;
+	m_plate = (m_plate & 0xff) | (data >> 3 & 0xf00) | (data >> 4 & 0x1f000);
+	update_display();
+}
+
+void tdracula_state::write_o(u16 data)
+{
+	// O0-O7: VFD plate
+	m_plate = (m_plate & ~0xff) | bitswap<8>(data,0,1,2,3,4,5,6,7);
+	update_display();
+}
+
+u8 tdracula_state::read_k()
+{
+	// K: multiplexed inputs
+	return read_inputs(2);
+}
+
+// config
+
+static INPUT_PORTS_START( tdracula )
+	PORT_START("IN.0") // R20
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START )
+	PORT_CONFNAME( 0x02, 0x00, "Factory Test" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x08, 0x00, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x08, "2" )
+
+	PORT_START("IN.1") // R21
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+INPUT_PORTS_END
+
+void tdracula_state::tdracula(machine_config &config)
+{
+	// basic machine hardware
+	TMS1475(config, m_maincpu, 500000); // approximation - RC osc. R=43K, C=47pF
+	m_maincpu->read_k().set(FUNC(tdracula_state::read_k));
+	m_maincpu->write_r().set(FUNC(tdracula_state::write_r));
+	m_maincpu->write_o().set(FUNC(tdracula_state::write_o));
+
+	// video hardware
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(478, 1080);
+	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(11, 17);
+	config.set_default_layout(layout_tdracula);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( tdracula )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mp6354", 0x0000, 0x1000, CRC(e69299e0) SHA1(e73e674a5e659b4c3df390d271847761fffb5874) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 557, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1400_tdracula_output.pla", 0, 557, CRC(52e2258e) SHA1(3dcbef72d2309aeb2375041522acd1a879b9e881) )
+
+	ROM_REGION( 416612, "screen", 0)
+	ROM_LOAD( "tdracula.svg", 0, 416612, CRC(71b5e164) SHA1(357528d5df7433609931cd9f9a2e5d56fbd29774) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Tsukuda Game Pachinko
+  * PCB label: TOFL003
+  * TMS2670 M95041 (die label: TMS2400, M95041, 40H-01D-ND02-PHI0032-TTL O300-R300)
+  * TMS1024 I/O expander
+  * cyan/red/green VFD display NEC FIP9AM31T no. 21-84, 2-bit sound
+
+***************************************************************************/
+
+class tgpachi_state : public hh_tms1k_state
+{
+public:
+	tgpachi_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag),
+		m_expander(*this, "expander")
+	{ }
+
+	void tgpachi(machine_config &config);
+
+private:
+	required_device<tms1024_device> m_expander;
+	void expander_w(offs_t offset, u8 data);
+
+	void update_display();
+	virtual void write_r(u32 data);
+	virtual void write_o(u16 data);
+};
+
+// handlers
+
+void tgpachi_state::update_display()
+{
+	m_display->matrix(m_grid, m_plate);
+}
+
+void tgpachi_state::expander_w(offs_t offset, u8 data)
+{
+	// TMS1024 port 4-7: VFD plate
+	int shift = (offset - tms1024_device::PORT4) * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+	update_display();
+}
+
+void tgpachi_state::write_r(u32 data)
+{
+	// R9,R10: TMS1024 S0,S1 (S2 forced high)
+	// R8: TMS1024 STD
+	m_expander->write_s((data >> 9 & 3) | 4);
+	m_expander->write_std(BIT(data, 8));
+
+	// R0-R7: VFD grid
+	// R11: 1 more VFD plate
+	m_grid = data & 0xff;
+	m_plate = (m_plate & 0xfffff) | (BIT(data, 11) << 20);
+	update_display();
+
+	// R13,R14: speaker out
+}
+
+void tgpachi_state::write_o(u16 data)
+{
+	// O0-O3: TMS1024 H1-H4 + VFD plate
+	m_expander->write_h(data & 0xf);
+	m_plate = (m_plate & ~0xf0000) | (data << 16 & 0xf0000);
+	update_display();
+}
+
+// config
+
+static INPUT_PORTS_START( tgpachi )
+	PORT_START("IN.0") // K
+	PORT_CONFNAME( 0x01, 0x00, "Factory Test" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // Slot
+INPUT_PORTS_END
+
+void tgpachi_state::tgpachi(machine_config &config)
+{
+	// basic machine hardware
+	TMS2670(config, m_maincpu, 450000); // approximation - RC osc. R=47K, C=47pF
+	m_maincpu->read_k().set_ioport("IN.0");
+	m_maincpu->write_r().set(FUNC(tgpachi_state::write_r));
+	m_maincpu->write_o().set(FUNC(tgpachi_state::write_o));
+
+	TMS1024(config, m_expander).set_ms(1); // MS tied high
+	m_expander->write_port4_callback().set(FUNC(tgpachi_state::expander_w));
+	m_expander->write_port5_callback().set(FUNC(tgpachi_state::expander_w));
+	m_expander->write_port6_callback().set(FUNC(tgpachi_state::expander_w));
+	m_expander->write_port7_callback().set(FUNC(tgpachi_state::expander_w));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(8, 21);
+	config.set_default_layout(layout_hh_tms1k_test);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( tgpachi )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "m95041", 0x0000, 0x1000, CRC(18b39629) SHA1(46bbe2028717ab4a1ca92f45496f7636e1c81fcf) )
+
+	ROM_REGION( 759, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms2100_common1_micro.pla", 0, 759, CRC(4a60382f) SHA1(f66ed530ca3869367fc7afacd0b985d555781ba2) )
+	ROM_REGION( 557, "maincpu:opla", 0 )
+	ROM_LOAD( "tms2100_tgpachi_output.pla", 0, 557, CRC(90849b91) SHA1(ed19444b655c48bbf2a662478d46c045d900080d) )
+
+	ROM_REGION( 100000, "screen", 0)
+	ROM_LOAD( "tgpachi.svg", 0, 100000, NO_DUMP )
 ROM_END
 
 
@@ -14155,7 +14412,7 @@ public:
 
 private:
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -14168,7 +14425,7 @@ void ssports4_state::update_display()
 	m_display->matrix(m_r, m_o | (m_r << 6 & 0x100));
 }
 
-void ssports4_state::write_r(u16 data)
+void ssports4_state::write_r(u32 data)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -14242,9 +14499,9 @@ void ssports4_state::ssports4(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(ssports4_state::read_k));
-	m_maincpu->r().set(FUNC(ssports4_state::write_r));
-	m_maincpu->o().set(FUNC(ssports4_state::write_o));
+	m_maincpu->read_k().set(FUNC(ssports4_state::read_k));
+	m_maincpu->write_r().set(FUNC(ssports4_state::write_r));
+	m_maincpu->write_o().set(FUNC(ssports4_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 9);
@@ -14280,7 +14537,7 @@ ROM_END
 /***************************************************************************
 
   Vulcan XL 25
-  * TMS1000SLC MP4486A (die label 1000C/, MP4486A)
+  * TMS1000SLC MP4486A (die label: 1000C/, MP4486A)
   * 28 LEDs, 1-bit sound
 
   This game is the same logic puzzle as Tiger's Lights Out, except that
@@ -14305,7 +14562,7 @@ protected:
 private:
 	void update_halt();
 	void update_display();
-	void write_r(u16 data);
+	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
 };
@@ -14330,7 +14587,7 @@ void xl25_state::update_display()
 	m_display->matrix(m_r, m_o >> 1);
 }
 
-void xl25_state::write_r(u16 data)
+void xl25_state::write_r(u32 data)
 {
 	// R0-R9: input mux, led select
 	m_inp_mux = data;
@@ -14426,9 +14683,9 @@ void xl25_state::xl25(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000C(config, m_maincpu, 300000); // approximation - RC osc. R=5.6K, C=47pF
-	m_maincpu->k().set(FUNC(xl25_state::read_k));
-	m_maincpu->r().set(FUNC(xl25_state::write_r));
-	m_maincpu->o().set(FUNC(xl25_state::write_o));
+	m_maincpu->read_k().set(FUNC(xl25_state::read_k));
+	m_maincpu->write_r().set(FUNC(xl25_state::write_r));
+	m_maincpu->write_o().set(FUNC(xl25_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 3);
@@ -14591,6 +14848,9 @@ CONS( 1982, t7in1ss,    0,         0, t7in1ss,   t7in1ss,   t7in1ss_state,   emp
 
 CONS( 1979, tbreakup,   0,         0, tbreakup,  tbreakup,  tbreakup_state,  empty_init, "Tomy", "Break Up (Tomy)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, phpball,    0,         0, phpball,   phpball,   phpball_state,   empty_init, "Tomy", "Power House Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+
+CONS( 1982, tdracula,   0,         0, tdracula,  tdracula,  tdracula_state,  empty_init, "Tsukuda", "The Dracula (Tsukuda)", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, tgpachi,    0,         0, tgpachi,   tgpachi,   tgpachi_state,   empty_init, "Tsukuda", "Game Pachinko", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 CONS( 1980, ssports4,   0,         0, ssports4,  ssports4,  ssports4_state,  empty_init, "U.S. Games", "Super Sports-4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 

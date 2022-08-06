@@ -862,17 +862,17 @@ bool arm7_cpu_device::translate_vaddr_to_paddr(offs_t &vaddr, const int flags)
 	}
 }
 
-void arm7_cpu_device::translate_insn_command(const std::vector<std::string> &params)
+void arm7_cpu_device::translate_insn_command(const std::vector<std::string_view> &params)
 {
 	translate_command(params, TRANSLATE_FETCH);
 }
 
-void arm7_cpu_device::translate_data_command(const std::vector<std::string> &params)
+void arm7_cpu_device::translate_data_command(const std::vector<std::string_view> &params)
 {
 	translate_command(params, TRANSLATE_READ);
 }
 
-void arm7_cpu_device::translate_command(const std::vector<std::string> &params, int intention)
+void arm7_cpu_device::translate_command(const std::vector<std::string_view> &params, int intention)
 {
 	uint64_t vaddr;
 

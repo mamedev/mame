@@ -16,6 +16,7 @@
 #include "mac.h"
 
 #include "macadb.h"
+#include "mactoolbox.h"
 
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/cards.h"
@@ -618,7 +619,7 @@ void mac_state::macii(machine_config &config, bool cpu, asc_device::asc_type asc
 	{
 		M68020PMMU(config, m_maincpu, C15M);
 		m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macii_map);
-		m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
+		m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 	}
 
 	PALETTE(config, m_palette).set_entries(256);
@@ -650,7 +651,7 @@ void mac_state::maciihmu(machine_config &config)
 
 	M68020HMMU(config, m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macii_map);
-	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 }
 
 void mac_state::maciihd(machine_config &config)
@@ -673,7 +674,7 @@ void mac_state::maciifx(machine_config &config)
 	/* basic machine hardware */
 	M68030(config, m_maincpu, 40000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maciifx_map);
-	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	add_asc(config, asc_device::asc_type::ASC);
 	add_base_devices(config, true, 1);
@@ -732,7 +733,7 @@ void mac_state::maciix(machine_config &config, bool nubus_bank1, bool nubus_bank
 
 	M68030(config, m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macii_map);
-	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	SWIM1(config.replace(), m_fdc, C15M);
 	m_fdc->phases_cb().set(FUNC(mac_state::phases_w));
@@ -757,7 +758,7 @@ void mac_state::macse30(machine_config &config)
 {
 	M68030(config, m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macse30_map);
-	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -798,7 +799,7 @@ void mac_state::maciici(machine_config &config)
 
 	M68030(config, m_maincpu, 25000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maciici_map);
-	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
@@ -819,7 +820,7 @@ void mac_state::maciisi(machine_config &config)
 
 	M68030(config, m_maincpu, 20000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maciici_map);
-	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);

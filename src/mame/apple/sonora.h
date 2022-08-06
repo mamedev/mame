@@ -89,6 +89,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(via_out_cb2);
 	DECLARE_WRITE_LINE_MEMBER(via1_irq);
 	DECLARE_WRITE_LINE_MEMBER(via2_irq);
+	DECLARE_WRITE_LINE_MEMBER(asc_irq);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
 
 	void phases_w(uint8_t phases);

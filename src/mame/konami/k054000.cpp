@@ -9,9 +9,8 @@
     happened. It has no access to gfx data, it only does arithmetical operations
     on the parameters.
 
-    TODO:
-    - Thunder Cross II POST checks of this chip, we currently bypass that with a ROM patch in
-      driver. It literally tests the chip in an unit test fashion:
+    Thunder Cross II POST checks of this chip.
+	It literally tests the chip in an unit test fashion:
       1. zeroing all ports;
       2. test that status returns 0;
       3. ping ACX reg 0 with 0xff;
@@ -21,18 +20,10 @@
       7. ping ACX reg 1 with 0xff;
       8. test status = 1;
       9. rinse and repeat until all registers are exausted.
-      Assertion eventually fails when testing the "delta" registers:
 
-      ACX ffffffff|ACY ffffff00|AAX 01 AAY 01
-      BCX ffffff00|BCY ffffff00|BAX 01 BAY 01
-      Result: actual 0 (yes), expected 1 (no)
-
-      The fun part is that game doesn't even access the chip at all during gameplay
-      (or at least not until stage 6, where game disallows continues) while the specific
-      "delta" registers are instead challenged by Vendetta OTG attacks (cfr. MT#06393, MT#07839).
-      We currently pay the technical debt inside thndrx2 itself, by notifying that "14D" returns
-      bad but still making it to boot anyway while marking these games with MUP.
-      Any attempt to fix it here without real HW tests goes into wild speculations unfortunately.
+    The fun part is that game doesn't even access the chip at all during gameplay
+    (or at least not until stage 6, where game disallows continues) while the specific
+    "delta" registers are instead challenged by Vendetta OTG attacks (cfr. MT06393, MT07839).
 
 **************************************************************************************************/
 
@@ -100,13 +91,13 @@ void k054000_device::device_reset()
 Memory map:
 00      unused
 01-03 W A center X
-04    W A delta correction X?
+04    W A delta correction X
 05      unused
 06    W A semiaxis X
 07    W A semiaxis Y
 08      unused
 09-0b W A center Y
-0c    W A delta correction Y?
+0c    W A delta correction Y
 0d      unused
 0e    W B semiaxis X
 0f    W B semiaxis Y
@@ -120,41 +111,46 @@ void k054000_device::map(address_map &map)
 {
 	map.unmap_value_low();
 	map(0x01, 0x04).w(FUNC(k054000_device::acx_w));
-	map(0x06, 0x06).lw8(NAME([this] (u8 data) { m_Aax = data + 1; }));
-	map(0x07, 0x07).lw8(NAME([this] (u8 data) { m_Aay = data + 1; }));
+	map(0x06, 0x06).lw8(NAME([this] (u8 data) { m_Aax = data; }));
+	map(0x07, 0x07).lw8(NAME([this] (u8 data) { m_Aay = data; }));
 	map(0x09, 0x0c).w(FUNC(k054000_device::acy_w));
 
-	map(0x0e, 0x0e).lw8(NAME([this] (u8 data) { m_Bax = data + 1; }));
-	map(0x0f, 0x0f).lw8(NAME([this] (u8 data) { m_Bay = data + 1; }));
+	map(0x0e, 0x0e).lw8(NAME([this] (u8 data) { m_Bax = data; }));
+	map(0x0f, 0x0f).lw8(NAME([this] (u8 data) { m_Bay = data; }));
 	map(0x11, 0x13).w(FUNC(k054000_device::bcy_w));
 	map(0x15, 0x17).w(FUNC(k054000_device::bcx_w));
 
 	map(0x18, 0x18).r(FUNC(k054000_device::status_r));
 }
 
-inline int k054000_device::convert_raw_to_result(u8 *buf)
+inline int k054000_device::convert_raw_to_result_delta(u8 *buf)
 {
 	int res = (buf[0] << 16) | (buf[1] << 8) | buf[2];
-	//if (buf[0] & 0x80)
-	//  res = (0x1000000 - res);
-	// last value in the buffer is used as OTG correction in Vendetta
+	
+	// Last value in the buffer is used as OTG correction in Vendetta
 	if (buf[3] & 0x80)
 		res -= (0x100 - buf[3]);
 	else
 		res += buf[3];
+	
 	return res;
+}
+
+inline int k054000_device::convert_raw_to_result(u8 *buf)
+{
+	return (buf[0] << 16) | (buf[1] << 8) | buf[2];
 }
 
 void k054000_device::acx_w(offs_t offset, u8 data)
 {
 	m_raw_Acx[offset] = data;
-	m_Acx = convert_raw_to_result(m_raw_Acx);
+	m_Acx = convert_raw_to_result_delta(m_raw_Acx);
 }
 
 void k054000_device::acy_w(offs_t offset, u8 data)
 {
 	m_raw_Acy[offset] = data;
-	m_Acy = convert_raw_to_result(m_raw_Acy);
+	m_Acy = convert_raw_to_result_delta(m_raw_Acy);
 }
 
 void k054000_device::bcx_w(offs_t offset, u8 data)
@@ -169,21 +165,28 @@ void k054000_device::bcy_w(offs_t offset, u8 data)
 	m_Bcy = convert_raw_to_result(m_raw_Bcy);
 }
 
-u8 k054000_device::status_r()
+u8 k054000_device::axis_check(u32 m_Ac, u32 m_Bc, u32 m_Aa, u32 m_Ba)
 {
 	u8 res = 0;
-
-	if (m_Acx + m_Aax < m_Bcx - m_Bax)
+	s32 sub = m_Ac - m_Bc;
+	
+	// MSB check
+	if ((sub > 511) || (sub <= -1024))
 		res |= 1;
-
-	if (m_Bcx + m_Bax < m_Acx - m_Aax)
+	
+	// LSB check
+	if ((abs(sub) & 0x1ff) > ((m_Aa + m_Ba) & 0x1ff))
 		res |= 1;
+	
+	return res;
+}
 
-	if (m_Acy + m_Aay < m_Bcy - m_Bay)
-		res |= 1;
-
-	if (m_Bcy + m_Bay < m_Acy - m_Aay)
-		res |= 1;
+u8 k054000_device::status_r()
+{
+	u8 res;
+	
+	res = axis_check(m_Acx, m_Bcx, m_Aax, m_Bax);
+	res |= axis_check(m_Acy, m_Bcy, m_Aay, m_Bay);
 
 	if (LIVE_HITBOX_VIEW)
 		logerror(print_hitbox_state(res));

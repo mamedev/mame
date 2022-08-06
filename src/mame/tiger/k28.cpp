@@ -13,7 +13,7 @@ Tiger Electronics K28: Talking Learning Computer (model 7-230/7-231)
 3 models exist:
 - 7-230: darkblue case, toy-ish looks
 - 7-231: gray case, hardware is the same
-- 7-232: this one is completely different hw --> driver tispeak.cpp
+- 7-232: this one is completely different hw --> driver handheld/tispeak.cpp
 
 TODO:
 - external module support (no dumps yet)

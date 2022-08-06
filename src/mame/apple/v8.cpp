@@ -115,34 +115,35 @@ void v8_device::device_add_mconfig(machine_config &config)
 	ASC(config, m_asc, C15M, asc_device::asc_type::V8);
 	m_asc->add_route(0, "lspeaker", 1.0);
 	m_asc->add_route(1, "rspeaker", 1.0);
+	m_asc->irqf_callback().set(FUNC(v8_device::asc_irq));
 }
 
 //-------------------------------------------------
 //  v8_device - constructor
 //-------------------------------------------------
 
-v8_device::v8_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: v8_device(mconfig, V8, tag, owner, clock)
+v8_device::v8_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	v8_device(mconfig, V8, tag, owner, clock)
 {
 }
 
-v8_device::v8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, type, tag, owner, clock),
-	  write_pb4(*this),
-	  write_pb5(*this),
-	  write_cb2(*this),
-	  write_hdsel(*this),
-	  write_hmmu_enable(*this),
-	  read_pb3(*this),
-	  m_maincpu(*this, finder_base::DUMMY_TAG),
-	  m_montype(*this, "MONTYPE"),
-	  m_screen(*this, "screen"),
-	  m_palette(*this, "palette"),
-	  m_via1(*this, "via1"),
-	  m_asc(*this, "asc"),
-	  m_rom(*this, finder_base::DUMMY_TAG),
-	  m_overlay(false),
-	  m_baseIs4M(false)
+v8_device::v8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	m_maincpu(*this, finder_base::DUMMY_TAG),
+	m_screen(*this, "screen"),
+	m_palette(*this, "palette"),
+	m_asc(*this, "asc"),
+	write_pb4(*this),
+	write_pb5(*this),
+	write_cb2(*this),
+	write_hdsel(*this),
+	write_hmmu_enable(*this),
+	read_pb3(*this),
+	m_montype(*this, "MONTYPE"),
+	m_via1(*this, "via1"),
+	m_rom(*this, finder_base::DUMMY_TAG),
+	m_overlay(false),
+	m_baseIs4M(false)
 {
 }
 
@@ -178,9 +179,6 @@ void v8_device::device_start()
 	save_item(NAME(m_pal_colkey));
 	save_item(NAME(m_overlay));
 
-	m_rom_ptr = &m_rom[0];
-	m_rom_size = m_rom.length() << 2;
-
 	m_pseudovia_ier = m_pseudovia_ifr = 0;
 	m_pal_address = m_pal_idx = m_pal_control = m_pal_colkey = 0;
 }
@@ -211,12 +209,12 @@ void v8_device::device_reset()
 
 	// put ROM mirror at 0
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	const u32 memory_size = std::min((u32)0x3fffff, m_rom_size);
+	const u32 memory_size = std::min<u32>(0x3fffff, m_rom.length() << 2);
 	const u32 memory_end = memory_size - 1;
 	offs_t memory_mirror = memory_end & ~(memory_size - 1);
 
 	space.unmap_write(0x00000000, memory_end);
-	space.install_rom(0x00000000, memory_end & ~memory_mirror, memory_mirror, m_rom_ptr);
+	space.install_rom(0x00000000, memory_end & ~memory_mirror, memory_mirror, &m_rom[0]);
 }
 
 u32 v8_device::rom_switch_r(offs_t offset)
@@ -228,7 +226,7 @@ u32 v8_device::rom_switch_r(offs_t offset)
 		m_overlay = false;
 	}
 
-	return m_rom_ptr[offset & ((m_rom_size - 1) >> 2)];
+	return m_rom[offset & (m_rom.length() - 1)];
 }
 
 void v8_device::set_ram_info(u32 *ram, u32 size)
@@ -328,6 +326,20 @@ WRITE_LINE_MEMBER(v8_device::vbl_w)
 
 	if (m_pseudovia_regs[0x12] & 0x40)
 	{
+		pseudovia_recalc_irqs();
+	}
+}
+
+WRITE_LINE_MEMBER(v8_device::asc_irq)
+{
+	if (state == ASSERT_LINE)
+	{
+		m_pseudovia_regs[3] |= 0x10; // any VIA 2 interrupt | sound interrupt
+		pseudovia_recalc_irqs();
+	}
+	else
+	{
+		m_pseudovia_regs[3] &= ~0x10;
 		pseudovia_recalc_irqs();
 	}
 }
@@ -862,6 +874,7 @@ void eagle_device::device_add_mconfig(machine_config &config)
 	ASC(config.replace(), m_asc, C15M, asc_device::asc_type::EAGLE);
 	m_asc->add_route(0, "lspeaker", 1.0);
 	m_asc->add_route(1, "rspeaker", 1.0);
+	m_asc->irqf_callback().set(FUNC(eagle_device::asc_irq));
 }
 
 eagle_device::eagle_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -941,6 +954,7 @@ void spice_device::device_add_mconfig(machine_config &config)
 	ASC(config.replace(), m_asc, C15M, asc_device::asc_type::SONORA);
 	m_asc->add_route(0, "lspeaker", 1.0);
 	m_asc->add_route(1, "rspeaker", 1.0);
+	m_asc->irqf_callback().set(FUNC(spice_device::asc_irq));
 
 	SWIM2(config, m_fdc, C15M);
 	m_fdc->devsel_cb().set(FUNC(spice_device::devsel_w));

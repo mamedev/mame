@@ -15,6 +15,11 @@ template<int Width, int AddrShift> std::pair<typename emu::detail::handler_entry
 	return std::pair<uX, u16>(m_base[((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift)], this->m_flags);
 }
 
+template<int Width, int AddrShift> u16 handler_entry_read_memory<Width, AddrShift>::lookup_flags(offs_t offset, uX mem_mask) const
+{
+	return this->m_flags;
+}
+
 template<int Width, int AddrShift> void *handler_entry_read_memory<Width, AddrShift>::get_ptr(offs_t offset) const
 {
 	return m_base + (((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift));
@@ -36,6 +41,11 @@ template<int Width, int AddrShift> u16 handler_entry_write_memory<Width, AddrShi
 {
 	offs_t off = ((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift);
 	m_base[off] = (m_base[off] & ~mem_mask) | (data & mem_mask);
+	return this->m_flags;
+}
+
+template<int Width, int AddrShift> u16 handler_entry_write_memory<Width, AddrShift>::lookup_flags(offs_t offset, uX mem_mask) const
+{
 	return this->m_flags;
 }
 
@@ -74,6 +84,11 @@ template<int Width, int AddrShift> std::pair<typename emu::detail::handler_entry
 	return std::pair<uX, u16>(static_cast<uX *>(m_bank.base())[((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift)], this->m_flags);
 }
 
+template<int Width, int AddrShift> u16 handler_entry_read_memory_bank<Width, AddrShift>::lookup_flags(offs_t offset, uX mem_mask) const
+{
+	return this->m_flags;
+}
+
 template<int Width, int AddrShift> void *handler_entry_read_memory_bank<Width, AddrShift>::get_ptr(offs_t offset) const
 {
 	return static_cast<uX *>(m_bank.base()) + (((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift));
@@ -95,6 +110,11 @@ template<int Width, int AddrShift> u16 handler_entry_write_memory_bank<Width, Ad
 {
 	offs_t off = ((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift);
 	static_cast<uX *>(m_bank.base())[off] = (static_cast<uX *>(m_bank.base())[off] & ~mem_mask) | (data & mem_mask);
+	return this->m_flags;
+}
+
+template<int Width, int AddrShift> u16 handler_entry_write_memory_bank<Width, AddrShift>::lookup_flags(offs_t offset, uX mem_mask) const
+{
 	return this->m_flags;
 }
 

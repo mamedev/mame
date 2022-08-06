@@ -371,10 +371,10 @@ private:
 		m_ata_int = param;
 	}
 
-	void debug_help_command(const std::vector<std::string> &params);
-	void debug_commands(const std::vector<std::string> &params);
+	void debug_help_command(const std::vector<std::string_view> &params);
+	void debug_commands(const std::vector<std::string_view> &params);
 
-	void dump_task_command(const std::vector<std::string> &params);
+	void dump_task_command(const std::vector<std::string_view> &params);
 };
 
 
@@ -1485,7 +1485,7 @@ void konamim2_state::init_hellngt()
  *
  *************************************/
 
-void konamim2_state::debug_help_command(const std::vector<std::string> &params)
+void konamim2_state::debug_help_command(const std::vector<std::string_view> &params)
 {
 	debugger_console &con = machine().debugger().console();
 
@@ -1494,7 +1494,7 @@ void konamim2_state::debug_help_command(const std::vector<std::string> &params)
 	con.printf("  konm2 dump_dspp,<address> -- Dump DSPP object at <address>\n");
 }
 
-void konamim2_state::debug_commands(const std::vector<std::string> &params)
+void konamim2_state::debug_commands(const std::vector<std::string_view> &params)
 {
 	if (params.size() < 1)
 		return;
@@ -1507,7 +1507,7 @@ void konamim2_state::debug_commands(const std::vector<std::string> &params)
 		subdevice<dspp_device>("bda:dspp")->dump_state();
 }
 
-void konamim2_state::dump_task_command(const std::vector<std::string> &params)
+void konamim2_state::dump_task_command(const std::vector<std::string_view> &params)
 {
 	typedef uint32_t   Item;
 	typedef uint32_t   m2ptr;

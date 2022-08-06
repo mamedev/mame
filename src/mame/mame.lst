@@ -284,6 +284,8 @@ tvpoker                         // (c) 197? A-1 Supply
 a2600                           // Atari 2600
 a2600p                          // Atari 2600 PAL
 a2600_pop                       // Atari 2600 Point of Purchase Display
+stvboy
+tvboyii                         //
 
 @source:robotron/a5105.cpp
 a5105                           //
@@ -11523,6 +11525,8 @@ jojou                           // 28/01/1999 (c) 1998 (USA)
 jojour1                         // 08/01/1999 (c) 1998 (USA)
 jojour2                         // 02/12/1998 (c) 1998 (USA)
 redearth                        // 21/11/1996 (c) 1996 (Euro)
+redearthn                       // 21/11/1996 (c) 1996 (Asia)
+redearthnr1                     // 23/10/1996 (c) 1996 (Asia)
 redearthr1                      // 23/10/1996 (c) 1996 (Euro)
 sfiii                           // 04/02/1997 (c) 1997 (Euro)
 sfiii2                          // 30/09/1997 (c) 1997 (USA)
@@ -13880,6 +13884,7 @@ ts28                            // 1983
 
 @source:misc/falgas_m89.cpp
 cbully                          // (c) 1991 Falgas
+rmontecarlo                     // (c) 1991 Falgas
 
 @source:nintendo/famibox.cpp
 famibox                         // 1986
@@ -14638,6 +14643,8 @@ bagmanm2                        // (c) 1984 Valadon Automation / GIB
 bagmanmc                        // bootleg
 batman2                         // bootleg
 blkhole                         // TDS (Tokyo Denshi Sekkei) & MINTS
+bmxstunts                       // (c) 1985 Jetsoft
+bmxstuntsa                      // (c) 1985 Jetsoft
 bomber                          //
 bongo                           // (c) 1983 Jetsoft
 calipso                         // (c) 1982 Tago
@@ -15803,10 +15810,10 @@ cmpacman                        //
 cmpacmana                       //
 cmpacmanb                       //
 cmtetris                        //
-cmtetrsa                        //
-cmtetrsb                        //
-cmtetrsc                        //
-cmtetrsd                        //
+cmtetrisa                       //
+cmtetrisb                       //
+cmtetrisc                       //
+cmtetrisd                       //
 cmv4                            // (c) 1992 Dyna Electronics
 cmv4a                           // (c) 1992 Dyna Electronics
 cmv801                          // (c) 198? Corsica
@@ -16857,6 +16864,8 @@ tc4                             // Coleco
 tc7atc                          // Bandai
 tcfball                         // Tandy Corporation
 tcfballa                        // Tandy Corporation
+tdracula                        // Tsukuda
+tgpachi                         // Tsukuda
 ti1000                          // Texas Instruments
 ti1250                          // Texas Instruments
 ti125076                        // Texas Instruments
@@ -19176,7 +19185,6 @@ j_ewnd                          //
 j_ews                           // Each Way Shuffle (JPM)
 j_ewsa                          //
 j_ewsb                          //
-j_ewsbl                         //
 j_ewsdlx                        // Each Way Shuffle Deluxe (CTL)
 j_goldn2                        // Golden 2's (CTL)
 j_la                            // Lucky Aces
@@ -19193,6 +19201,8 @@ j_plus2                         // Plus 2 (CTL)
 j_ssh                           // Silver Shuffle (CTL)
 j_sup2p                         // Super 2p Shuffle (MDM)
 j_super2                        // Super 2
+j_supsh                         // Super Shuffle (Louth Coin)
+j_supsha                        //
 j_ts                            // Two Step (JPM)
 
 @source:jpm/jpmsys5.cpp
@@ -20975,6 +20985,7 @@ mastboy                         // (c) 1991 - No Ref on the PCB
 mastboya                        // (c) 1991 - No Ref on the PCB
 mastboyi                        // (c) 1991 - No Ref on the PCB
 mastboyia                       // (c) 1991 - No Ref on the PCB
+mastboyib                       // (c) 1992 - No Ref on the PCB
 
 @source:gaelco/mastboyo.cpp
 mastboyo                        // (c) 1987 - No Ref on the PCB
@@ -24353,6 +24364,14 @@ fruitstb                        // 199? Webak
 fruitstba                       // 1997 Webak
 fruitstbb                       // 1997 Webak
 fruitstbc                       // 1997 Webak
+
+@source:barcrest/mpu1.cpp
+m_bappl2                        // Big Apple (Leisure Games)
+m_bapple                        //
+m_gndgit                        // Golden Nudge It (Barcrest)
+m_lndg                          // Lucky Nudge (Leisure Games)
+m_mtchit                        // Match It (Barcrest)
+m_mtchup                        // Match Up (Barcrest)
 
 @source:barcrest/mpu2.cpp
 m2hilite                        // Hi-Lights (Barcrest) (MPU2)
@@ -41727,6 +41746,7 @@ uk2086                          // 1986 UK2086
 
 @source:handheld/tispeak.cpp
 k28m2                           // Tiger Electronics
+lanteach                        //
 lantrans                        //
 lantransp                       //
 snmath                          //
@@ -41755,7 +41775,7 @@ vocaid                          //
 @source:handheld/tispellb.cpp
 mrchalgr                        //
 spellb                          //
-spellb79                        //
+spellba                         //
 
 @source:apple/tk2000.cpp
 mpf2                            // Multitech MPF-II
@@ -41983,8 +42003,10 @@ bbakraidja                      // (c) 1999 8ing
 bgaregga                        // (c) 1996 Raizing/8ing
 bgareggabl                      // hack
 bgareggabla                     // hack
+bgareggablj                     // hack
 bgareggacn                      // (c) 1996 Raizing/8ing
 bgareggahk                      // (c) 1996 Raizing/8ing
+bgareggak                       // (c) 1996 Raizing/8ing
 bgaregganv                      // (c) 1996 Raizing/8ing
 bgareggat                       // (c) 1996 Raizing/8ing
 bgareggat2                      // (c) 1996 Raizing/8ing
@@ -42373,10 +42395,6 @@ tv965                           //
 tv990                           // 1992? TeleVideo
 tv995                           // 1994 TeleVideo
 
-@source:atari/tvboy.cpp
-stvboy
-tvboyii                         //
-
 @source:videoton/tvc.cpp
 tvc64                           //
 tvc64p                          //
@@ -42546,6 +42564,7 @@ superten                        // (c) 1988
 usg182                          // (c) 1989
 usg185                          // (c) 1990
 usg187c                         // (c) 1991
+usg211c                         // (c) 1991
 usg32                           // (c) 1987
 usg82                           // (c) 1988
 usg83x                          // (c) 1988
