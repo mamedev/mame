@@ -365,7 +365,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="elktrgld">
+	<software name="elktrgld" supported="no"> <!-- title screen works but crashes at start of any track -->
 		<!-- Flippy disk, c64 version on side A -->
 		<description>Elektra Glide</description>
 		<year>1986</year>
