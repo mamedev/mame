@@ -330,6 +330,7 @@ gaelco/targeth.cpp
 gaelco/thoop2.cpp
 gaelco/wrally.cpp
 gaelco/xorworld.cpp
+galaxian/bmxstunts.cpp
 galaxian/dambustr.cpp
 galaxian/fastfred.cpp
 galaxian/galaxian.cpp

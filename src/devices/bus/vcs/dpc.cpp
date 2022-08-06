@@ -243,11 +243,6 @@ a26_rom_dpc_device::a26_rom_dpc_device(const machine_config &mconfig, const char
 //  mapper specific start/reset
 //-------------------------------------------------
 
-void a26_rom_dpc_device::device_reset()
-{
-	m_base_bank = 0;
-}
-
 void a26_rom_dpc_device::setup_addon_ptr(uint8_t *ptr)
 {
 	m_dpc->set_display_data(ptr);
@@ -261,22 +256,7 @@ void a26_rom_dpc_device::device_add_mconfig(machine_config &config)
 
 void a26_rom_dpc_device::install_memory_handlers(address_space *space)
 {
-	space->install_read_handler(0x1000, 0x1fff, read8sm_delegate(*this, FUNC(a26_rom_dpc_device::read)));
-	space->install_write_handler(0x1000, 0x1fff, write8sm_delegate(*this, FUNC(a26_rom_dpc_device::write)));
-}
-
-uint8_t a26_rom_dpc_device::read(offs_t offset)
-{
-	if (offset < 0x40)
-		return m_dpc->read(offset);
-	else
-		return a26_rom_f8_device::read(offset);
-}
-
-void a26_rom_dpc_device::write(offs_t offset, uint8_t data)
-{
-	if (offset >= 0x40 && offset < 0x80)
-		m_dpc->write(offset, data);
-	else
-		a26_rom_f8_device::write(offset, data);
+	a26_rom_f8_device::install_memory_handlers(space);
+	space->install_read_handler(0x1000, 0x103f, read8sm_delegate(m_dpc, FUNC(dpc_device::read)));
+	space->install_write_handler(0x1040, 0x107f, write8sm_delegate(m_dpc, FUNC(dpc_device::write)));
 }

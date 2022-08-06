@@ -17,47 +17,6 @@
 #include "machine/pla.h"
 
 
-// pinout reference
-
-/*
-            ____   ____                         ____   ____
-     R8  1 |*   \_/    | 28 R7           R0  1 |*   \_/    | 28 Vss
-     R9  2 |           | 27 R6           R1  2 |           | 27 OSC2
-    R10  3 |           | 26 R5           R2  3 |           | 26 OSC1
-    Vdd  4 |           | 25 R4           R3  4 |           | 25 O0
-     K1  5 |           | 24 R3           R4  5 |           | 24 O1
-     K2  6 |  TMS1000  | 23 R2           R5  6 |           | 23 O2
-     K4  7 |  TMS1070  | 22 R1           R6  7 |  TMS1400  | 22 O3
-     K8  8 |  TMS1100  | 21 R0           R7  8 |           | 21 O4
-   INIT  9 |  TMS1170  | 20 Vss          R8  9 |           | 20 O5
-     O7 10 |           | 19 OSC2         R9 10 |           | 19 O6
-     O6 11 |           | 18 OSC1        R10 11 |           | 18 O7
-     O5 12 |           | 17 O0          Vdd 12 |           | 17 K8
-     O4 13 |           | 16 O1         INIT 13 |           | 16 K4
-     O3 14 |___________| 15 O2           K1 14 |___________| 15 K2
-
-
-            ____   ____
-     R2  1 |*   \_/    | 28 R3
-     R1  2 |           | 27 R4
-     R0  3 |           | 26 R5
-      ?  4 |           | 25 R6
-    Vdd  5 |           | 24 R7
-     K3  6 |           | 23 R8
-     K8  7 |  TMS0980  | 22 ?
-     K4  8 |           | 21 ?
-     K2  9 |           | 20 Vss
-     K1 10 |           | 19 ?
-     O7 11 |           | 18 O0
-     O6 12 |           | 17 O1
-     O5 13 |           | 16 O2
-     O4 14 |___________| 15 O3
-
-  note: TMS0980 official pin names for R0-R8 is D9-D1, O0-O7 is S(A-G,DP)
-
-*/
-
-
 class tms1k_base_device : public cpu_device
 {
 public:
@@ -92,7 +51,7 @@ public:
 
 protected:
 	// construction/destruction
-	tms1k_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+	tms1k_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -168,6 +127,13 @@ protected:
 		F_XDA   = (1<<20)
 	};
 
+	void rom_10bit(address_map &map);
+	void rom_11bit(address_map &map);
+	void rom_12bit(address_map &map);
+	void ram_6bit(address_map &map);
+	void ram_7bit(address_map &map);
+	void ram_8bit(address_map &map);
+
 	void next_pc();
 
 	virtual void write_o_output(u8 index);
@@ -176,13 +142,9 @@ protected:
 	virtual void dynamic_output() { ; } // not used by default
 	virtual void read_opcode();
 
-	virtual u8 stack_levels() { return 1; }
 	virtual void op_br();
 	virtual void op_call();
 	virtual void op_retn();
-	virtual void op_br2();
-	virtual void op_call2();
-	virtual void op_retn2();
 
 	virtual void op_sbit();
 	virtual void op_rbit();
@@ -213,36 +175,36 @@ protected:
 	optional_memory_region m_opla_b; // binary dump of output PLA, in place of PLA file
 	optional_device<pla_device> m_spla;
 
-	u8 m_pc;        // 6 or 7-bit program counter
-	u32 m_sr;       // 6 or 7-bit subroutine return register(s)
-	u8 m_pa;        // 4-bit page address register
-	u8 m_pb;        // 4-bit page buffer register
-	u16 m_ps;       // 4-bit page subroutine register(s)
-	u8 m_a;         // 4-bit accumulator
-	u8 m_x;         // 2,3,or 4-bit RAM X register
-	u8 m_y;         // 4-bit RAM Y register
-	u8 m_ca;        // chapter address register
-	u8 m_cb;        // chapter buffer register
-	u16 m_cs;       // chapter subroutine register(s)
+	u8 m_pc;            // 6 or 7-bit program counter
+	u32 m_sr;           // 6 or 7-bit subroutine return register(s)
+	u8 m_pa;            // 4-bit page address register
+	u8 m_pb;            // 4-bit page buffer register
+	u16 m_ps;           // 4-bit page subroutine register(s)
+	u8 m_a;             // 4-bit accumulator
+	u8 m_x;             // 2,3,or 4-bit RAM X register
+	u8 m_y;             // 4-bit RAM Y register
+	u8 m_ca;            // chapter address register
+	u8 m_cb;            // chapter buffer register
+	u16 m_cs;           // chapter subroutine register(s)
 	u32 m_r;
 	u16 m_o;
 	u8 m_cki_bus;
 	u8 m_c4;
-	u8 m_p;         // 4-bit adder p(lus)-input
-	u8 m_n;         // 4-bit adder n(egative)-input
-	u8 m_adder_out; // adder result
-	u8 m_carry_in;  // adder carry-in bit
-	u8 m_carry_out; // adder carry-out bit
+	u8 m_p;             // 4-bit adder p(lus)-input
+	u8 m_n;             // 4-bit adder n(egative)-input
+	u8 m_adder_out;     // adder result
+	u8 m_carry_in;      // adder carry-in bit
+	u8 m_carry_out;     // adder carry-out bit
 	u8 m_status;
 	u8 m_status_latch;
-	u8 m_eac;       // end around carry bit
-	u8 m_clatch;    // call latch bit(s)
-	u8 m_add;       // add latch bit
-	u8 m_bl;        // branch latch bit
+	u8 m_eac;           // end around carry bit
+	u8 m_clatch;        // call latch bit(s)
+	u8 m_add;           // add latch bit
+	u8 m_bl;            // branch latch bit
 
 	u8 m_ram_in;
 	u8 m_dam_in;
-	int m_ram_out;  // signed!
+	int m_ram_out;      // signed!
 	u8 m_ram_address;
 	u16 m_rom_address;
 	u16 m_opcode;
@@ -251,11 +213,12 @@ protected:
 	int m_subcycle;
 	u8 m_o_index;
 
-	u8 m_o_pins;    // how many O pins
-	u8 m_r_pins;    // how many R pins
-	u8 m_pc_bits;   // how many program counter bits
-	u8 m_byte_bits; // how many bits per 'byte'
-	u8 m_x_bits;    // how many X register bits
+	u8 m_o_pins;        // how many O pins
+	u8 m_r_pins;        // how many R pins
+	u8 m_pc_bits;       // how many program counter bits
+	u8 m_byte_bits;     // how many bits per 'byte'
+	u8 m_x_bits;        // how many X register bits
+	u8 m_stack_levels;  // number of stack levels (max 4)
 
 	address_space *m_program;
 	address_space *m_data;

@@ -13,7 +13,7 @@
 
 // ======================> a26_rom_cm_device
 
-class a26_rom_cm_device : public a26_rom_f6_device
+class a26_rom_cm_device : public a26_rom_base_device
 {
 public:
 	// construction/destruction
@@ -25,9 +25,9 @@ public:
 	virtual void install_memory_handlers(address_space *space) override;
 
 protected:
-	virtual void device_start() override;
 	virtual void device_reset() override;
-	uint8_t read(offs_t offset);
+
+	memory_bank_creator m_bank;
 };
 
 

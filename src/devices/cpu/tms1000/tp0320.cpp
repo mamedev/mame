@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(TP0320, tp0320_cpu_device, "tp0320", "Texas Instruments TP032
 
 
 // internal memory maps
-void tp0320_cpu_device::data_192x4(address_map &map)
+void tp0320_cpu_device::ram_192x4(address_map &map)
 {
 	map(0x00, 0x7f).ram();
 	map(0x80, 0xbf).ram().mirror(0x40); // DAM
@@ -34,8 +34,8 @@ void tp0320_cpu_device::data_192x4(address_map &map)
 
 
 // device definitions
-tp0320_cpu_device::tp0320_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms0980_cpu_device(mconfig, TP0320, tag, owner, clock, 7 /* o pins */, 10 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 11 /* prg width */, address_map_constructor(FUNC(tp0320_cpu_device::program_11bit_9), this), 8 /* data width */, address_map_constructor(FUNC(tp0320_cpu_device::data_192x4), this))
+tp0320_cpu_device::tp0320_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	tms0980_cpu_device(mconfig, TP0320, tag, owner, clock, 7 /* o pins */, 10 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 1 /* stack levels */, 11 /* rom width */, address_map_constructor(FUNC(tp0320_cpu_device::rom_11bit), this), 8 /* ram width */, address_map_constructor(FUNC(tp0320_cpu_device::ram_192x4), this))
 { }
 
 

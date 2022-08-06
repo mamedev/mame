@@ -9580,6 +9580,10 @@ bml3                            //
 bml3mk2                         //
 bml3mk5                         //
 
+@source:galaxian/bmxstunts.cpp
+bmxstunts
+bmxstuntsa
+
 @source:jaleco/bnstars.cpp
 bnstars1                        // (c) 1997
 
@@ -16860,6 +16864,7 @@ tc7atc                          // Bandai
 tcfball                         // Tandy Corporation
 tcfballa                        // Tandy Corporation
 tdracula                        // Tsukuda
+tgpachi                         // Tsukuda
 ti1000                          // Texas Instruments
 ti1250                          // Texas Instruments
 ti125076                        // Texas Instruments
@@ -41990,8 +41995,10 @@ bbakraidja                      // (c) 1999 8ing
 bgaregga                        // (c) 1996 Raizing/8ing
 bgareggabl                      // hack
 bgareggabla                     // hack
+bgareggablj                     // hack
 bgareggacn                      // (c) 1996 Raizing/8ing
 bgareggahk                      // (c) 1996 Raizing/8ing
+bgareggak                       // (c) 1996 Raizing/8ing
 bgaregganv                      // (c) 1996 Raizing/8ing
 bgareggat                       // (c) 1996 Raizing/8ing
 bgareggat2                      // (c) 1996 Raizing/8ing
