@@ -258,5 +258,5 @@ void tms0980_cpu_device::op_sbl()
 void tms1980_cpu_device::op_tdo()
 {
 	// TDO: transfer accumulator and status(not status_latch!) to O-output
-	write_o_output(m_status << 4 | m_a);
+	write_o_reg(m_status << 4 | m_a);
 }

@@ -22,7 +22,11 @@ Extra functions are controlled with the R register (not mapped to pins):
 - R24: enable interrupts
 
 TODO:
-- x
+- timer interrupt
+- external interrupt (INT pin)
+- event counter (EC1 pin)
+- R0-R3 I/O, TRA opcode
+- A/D converter, TADM opcode
 
 */
 
@@ -106,6 +110,14 @@ void tms2100_cpu_device::device_reset()
 	m_fixed_decode[0x26] = F_TAC;
 	m_fixed_decode[0x73] = F_TCA;
 	m_fixed_decode[0x7b] = F_TRA;
+}
+
+
+// i/o handling
+u8 tms2100_cpu_device::read_k_input()
+{
+	// select K/J port with R16
+	return (BIT(m_r, 16) ? m_read_j() : m_read_k()) & 0xf;
 }
 
 

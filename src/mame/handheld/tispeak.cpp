@@ -1329,9 +1329,9 @@ void tispeak_state::snmath(machine_config &config)
 {
 	// basic machine hardware
 	TMS0270(config, m_maincpu, MASTER_CLOCK/2);
-	m_maincpu->k().set(FUNC(tispeak_state::snspell_read_k));
-	m_maincpu->o().set(FUNC(tispeak_state::snmath_write_o));
-	m_maincpu->r().set(FUNC(tispeak_state::snspell_write_r));
+	m_maincpu->read_k().set(FUNC(tispeak_state::snspell_read_k));
+	m_maincpu->write_o().set(FUNC(tispeak_state::snmath_write_o));
+	m_maincpu->write_r().set(FUNC(tispeak_state::snspell_write_r));
 
 	m_maincpu->read_ctl().set("tms5100", FUNC(tms5110_device::ctl_r));
 	m_maincpu->write_ctl().set("tms5100", FUNC(tms5110_device::ctl_w));
@@ -1356,7 +1356,7 @@ void tispeak_state::sns_cd2801(machine_config &config)
 	snmath(config);
 
 	// basic machine hardware
-	m_maincpu->o().set(FUNC(tispeak_state::snspell_write_o));
+	m_maincpu->write_o().set(FUNC(tispeak_state::snspell_write_o));
 
 	config.set_default_layout(layout_snspell);
 
@@ -1407,7 +1407,7 @@ void tispeak_state::snread(machine_config &config)
 	snmath(config);
 
 	// basic machine hardware
-	m_maincpu->o().set(FUNC(tispeak_state::snspell_write_o));
+	m_maincpu->write_o().set(FUNC(tispeak_state::snspell_write_o));
 
 	config.set_default_layout(layout_snread);
 
@@ -1424,8 +1424,8 @@ void tispeak_state::lantrans(machine_config &config)
 	snmath(config);
 
 	// basic machine hardware
-	m_maincpu->o().set(FUNC(tispeak_state::snspell_write_o));
-	m_maincpu->r().set(FUNC(tispeak_state::lantrans_write_r));
+	m_maincpu->write_o().set(FUNC(tispeak_state::snspell_write_o));
+	m_maincpu->write_r().set(FUNC(tispeak_state::lantrans_write_r));
 
 	config.set_default_layout(layout_snread);
 
@@ -1458,9 +1458,9 @@ void tispeak_state::snspellc(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, MASTER_CLOCK/2);
-	m_maincpu->k().set(FUNC(tispeak_state::snspellc_read_k));
-	m_maincpu->o().set(FUNC(tispeak_state::snspellc_write_o));
-	m_maincpu->r().set(FUNC(tispeak_state::snspellc_write_r));
+	m_maincpu->read_k().set(FUNC(tispeak_state::snspellc_read_k));
+	m_maincpu->write_o().set(FUNC(tispeak_state::snspellc_write_o));
+	m_maincpu->write_r().set(FUNC(tispeak_state::snspellc_write_r));
 
 	// no visual feedback!
 
@@ -1492,9 +1492,9 @@ void tispeak_state::vocaid(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, MASTER_CLOCK/2);
-	m_maincpu->k().set(FUNC(tispeak_state::tntell_read_k));
-	m_maincpu->o().set(FUNC(tispeak_state::snspellc_write_o));
-	m_maincpu->r().set(FUNC(tispeak_state::snspellc_write_r));
+	m_maincpu->read_k().set(FUNC(tispeak_state::tntell_read_k));
+	m_maincpu->write_o().set(FUNC(tispeak_state::snspellc_write_o));
+	m_maincpu->write_r().set(FUNC(tispeak_state::snspellc_write_r));
 
 	TIMER(config, "ol_timer").configure_periodic(FUNC(tispeak_state::tntell_get_overlay), attotime::from_msec(50));
 	config.set_default_layout(layout_tntell);
@@ -1523,9 +1523,9 @@ void tispeak_state::k28m2(machine_config &config)
 {
 	// basic machine hardware
 	TMS1400(config, m_maincpu, MASTER_CLOCK/2);
-	m_maincpu->k().set(FUNC(tispeak_state::k28_read_k));
-	m_maincpu->o().set(FUNC(tispeak_state::k28_write_o));
-	m_maincpu->r().set(FUNC(tispeak_state::k28_write_r));
+	m_maincpu->read_k().set(FUNC(tispeak_state::k28_read_k));
+	m_maincpu->write_o().set(FUNC(tispeak_state::k28_write_o));
+	m_maincpu->write_r().set(FUNC(tispeak_state::k28_write_r));
 
 	config.set_default_layout(layout_k28m2);
 

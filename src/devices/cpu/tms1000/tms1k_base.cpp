@@ -86,14 +86,16 @@ tms1k_base_device::tms1k_base_device(const machine_config &mconfig, device_type 
 	m_byte_bits(byte_bits),
 	m_x_bits(x_bits),
 	m_stack_levels(stack_levels),
-	m_output_pla_table(nullptr),
 	m_read_k(*this),
 	m_write_o(*this),
 	m_write_r(*this),
+	m_read_j(*this),
+	m_read_r(*this),
 	m_power_off(*this),
 	m_read_ctl(*this),
 	m_write_ctl(*this),
 	m_write_pdc(*this),
+	m_output_pla_table(nullptr),
 	m_decode_micro(*this)
 { }
 
@@ -140,6 +142,8 @@ void tms1k_base_device::device_start()
 	m_read_k.resolve_safe(0);
 	m_write_o.resolve_safe();
 	m_write_r.resolve_safe();
+	m_read_j.resolve_safe(0);
+	m_read_r.resolve_safe(0);
 	m_power_off.resolve_safe();
 	m_read_ctl.resolve_safe(0);
 	m_write_ctl.resolve_safe();
@@ -281,9 +285,9 @@ void tms1k_base_device::device_reset()
 
 	// clear outputs
 	m_r = 0;
-	m_write_r(m_r & m_r_mask);
-	write_o_output(0);
-	m_write_r(m_r & m_r_mask);
+	write_r_output(0);
+	write_o_reg(0);
+	write_r_output(0);
 	m_power_off(0);
 }
 
@@ -362,18 +366,12 @@ void tms1k_base_device::read_opcode()
 //  i/o handling
 //-------------------------------------------------
 
-void tms1k_base_device::write_o_output(u8 index)
+void tms1k_base_device::write_o_reg(u8 index)
 {
 	// a hardcoded table is supported if the output pla is unknown
 	m_o_index = index;
 	m_o = (m_output_pla_table == nullptr) ? m_opla->read(index) : m_output_pla_table[index];
-	m_write_o(m_o & m_o_mask);
-}
-
-u8 tms1k_base_device::read_k_input()
-{
-	// K1,2,4,8 (KC test pin is not emulated)
-	return m_read_k() & 0xf;
+	write_o_output(m_o);
 }
 
 void tms1k_base_device::set_cki_bus()
@@ -544,26 +542,26 @@ void tms1k_base_device::op_setr()
 {
 	// SETR: set one R-output line
 	m_r = m_r | (1 << m_y);
-	m_write_r(m_r & m_r_mask);
+	write_r_output(m_r);
 }
 
 void tms1k_base_device::op_rstr()
 {
 	// RSTR: reset one R-output line
 	m_r = m_r & ~(1 << m_y);
-	m_write_r(m_r & m_r_mask);
+	write_r_output(m_r);
 }
 
 void tms1k_base_device::op_tdo()
 {
-	// TDO: transfer accumulator and status latch to O-output
-	write_o_output(m_status_latch << 4 | m_a);
+	// TDO: transfer accumulator and status latch to O-register
+	write_o_reg(m_status_latch << 4 | m_a);
 }
 
 void tms1k_base_device::op_clo()
 {
-	// CLO: clear O-output
-	write_o_output(0);
+	// CLO: clear O-register
+	write_o_reg(0);
 }
 
 void tms1k_base_device::op_ldx()

@@ -80,7 +80,7 @@ void tms1100_cpu_device::op_setr()
 	// TMS1100 manual simply says that X must be less than 4
 	u8 index = BIT(m_x, m_x_bits - 1) << 4 | m_y;
 	m_r = m_r | (1 << index);
-	m_write_r(m_r & m_r_mask);
+	write_r_output(m_r);
 }
 
 void tms1100_cpu_device::op_rstr()
@@ -88,5 +88,5 @@ void tms1100_cpu_device::op_rstr()
 	// RSTR: see SETR
 	u8 index = BIT(m_x, m_x_bits - 1) << 4 | m_y;
 	m_r = m_r & ~(1 << index);
-	m_write_r(m_r & m_r_mask);
+	write_r_output(m_r);
 }

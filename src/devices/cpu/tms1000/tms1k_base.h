@@ -20,14 +20,14 @@
 class tms1k_base_device : public cpu_device
 {
 public:
-	// K input pins
-	auto k() { return m_read_k.bind(); }
+	// common handlers
+	auto read_k() { return m_read_k.bind(); } // K input pins
+	auto write_o() { return m_write_o.bind(); } // O/Segment output pins
+	auto write_r() { return m_write_r.bind(); } // R output pins (also called D on some chips)
 
-	// O/Segment output pins
-	auto o() { return m_write_o.bind(); }
-
-	// R output pins (also called D on some chips)
-	auto r() { return m_write_r.bind(); }
+	// TMS2100 handlers
+	auto read_j() { return m_read_j.bind(); } // J input pins
+	auto read_r() { return m_read_r.bind(); } // R0-R3 input pins
 
 	// OFF request on TMS0980 and up
 	auto power_off() { return m_power_off.bind(); }
@@ -144,8 +144,10 @@ protected:
 
 	void next_pc();
 
-	virtual void write_o_output(u8 index);
-	virtual u8 read_k_input();
+	virtual void write_o_reg(u8 index);
+	virtual void write_o_output(u16 data) { m_write_o(data & m_o_mask); }
+	virtual void write_r_output(u32 data) { m_write_r(data & m_r_mask); }
+	virtual u8 read_k_input() { return m_read_k() & 0xf; }
 	virtual void set_cki_bus();
 	virtual void dynamic_output() { ; } // not used by default
 	virtual void read_opcode();
@@ -240,14 +242,20 @@ protected:
 	address_space *m_program;
 	address_space *m_data;
 
-	const u16 *m_output_pla_table;
 	devcb_read8 m_read_k;
 	devcb_write16 m_write_o;
 	devcb_write32 m_write_r;
+
+	devcb_read8 m_read_j;
+	devcb_read8 m_read_r;
+
 	devcb_write_line m_power_off;
+
 	devcb_read8 m_read_ctl;
 	devcb_write8 m_write_ctl;
 	devcb_write_line m_write_pdc;
+
+	const u16 *m_output_pla_table;
 	devcb_read32 m_decode_micro;
 
 	u32 m_o_mask;

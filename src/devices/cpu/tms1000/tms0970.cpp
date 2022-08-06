@@ -113,11 +113,11 @@ void tms0970_cpu_device::device_reset()
 
 
 // i/o handling
-void tms0970_cpu_device::write_o_output(u8 index)
+void tms0970_cpu_device::write_o_reg(u8 index)
 {
 	m_o_index = index;
 	m_o = m_spla->read(index);
-	m_write_o(m_o & m_o_mask);
+	write_o_output(m_o);
 }
 
 
@@ -133,6 +133,6 @@ void tms0970_cpu_device::op_setr()
 void tms0970_cpu_device::op_tdo()
 {
 	// TDO: transfer digits to output
-	write_o_output(m_a & 0x7);
-	m_write_r(m_r & m_r_mask);
+	write_o_reg(m_a & 0x7);
+	write_r_output(m_r);
 }

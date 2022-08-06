@@ -75,6 +75,8 @@ protected:
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
+	virtual u8 read_k_input() override;
+
 	virtual void op_tax() override;
 	virtual void op_tra() override;
 	virtual void op_tac() override;

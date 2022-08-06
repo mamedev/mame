@@ -4,10 +4,7 @@
 
   TMS1000 family - TMS2400, TMS2470, TMS2600, TMS2670
 
-TMS2400 is a TMS2100 with twice more memory (kind of like TMS1400 is to TMS1100)
-
-TODO:
-- x
+TMS2400 is a TMS2100 with twice more memory (kind of how TMS1400 is to TMS1100)
 
 */
 
@@ -70,7 +67,7 @@ void tms2400_cpu_device::device_reset()
 // opcode deviations
 void tms2400_cpu_device::op_ldx()
 {
-	// LDX: value is still 3 bit even though X is 4 bit
+	// LDX: value is still 3-bit even though X is 4-bit
 	tms2100_cpu_device::op_ldx();
 	m_x >>= 1;
 }

@@ -110,7 +110,7 @@ void tms0270_cpu_device::dynamic_output()
 		// standard O-output
 		if (m_o_latch != m_o_latch_prev)
 		{
-			write_o_output(m_o_latch);
+			write_o_reg(m_o_latch);
 			m_o_latch_prev = m_o_latch;
 		}
 	}
@@ -118,7 +118,7 @@ void tms0270_cpu_device::dynamic_output()
 	// standard R-output
 	if (m_r != m_r_prev)
 	{
-		m_write_r(m_r & m_r_mask);
+		write_r_output(m_r);
 		m_r_prev = m_r;
 	}
 }

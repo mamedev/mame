@@ -313,9 +313,9 @@ void sag_state::sag(machine_config &config)
 	m_hmcs40_cpu->read_d().set(FUNC(sag_state::hmcs40_read_d));
 
 	TMS1670(config, m_tms1k_cpu, 0);
-	m_tms1k_cpu->k().set(FUNC(sag_state::tms1k_read_k));
-	m_tms1k_cpu->r().set(FUNC(sag_state::tms1k_write_r));
-	m_tms1k_cpu->o().set(FUNC(sag_state::tms1k_write_o));
+	m_tms1k_cpu->read_k().set(FUNC(sag_state::tms1k_read_k));
+	m_tms1k_cpu->write_r().set(FUNC(sag_state::tms1k_write_r));
+	m_tms1k_cpu->write_o().set(FUNC(sag_state::tms1k_write_o));
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(8+6, 14);
