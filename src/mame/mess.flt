@@ -70,7 +70,6 @@ atari/atari400.cpp
 atari/atarist.cpp
 atari/lynx.cpp
 atari/pofo.cpp
-atari/tvboy.cpp
 att/att3b2.cpp
 att/att4425.cpp
 att/att610.cpp
