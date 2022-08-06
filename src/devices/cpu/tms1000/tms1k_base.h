@@ -119,12 +119,20 @@ protected:
 		F_TDO   = (1<<13),
 		F_TPC   = (1<<14),
 
-		F_OFF   = (1<<15),
-		F_REAC  = (1<<16),
-		F_SAL   = (1<<17),
-		F_SBL   = (1<<18),
-		F_SEAC  = (1<<19),
-		F_XDA   = (1<<20)
+		F_TAX   = (1<<15),
+		F_TXA   = (1<<16),
+		F_TRA   = (1<<17),
+		F_TAC   = (1<<18),
+		F_TCA   = (1<<19),
+		F_TADM  = (1<<20),
+		F_TMA   = (1<<21),
+
+		F_OFF   = (1<<22),
+		F_REAC  = (1<<23),
+		F_SAL   = (1<<24),
+		F_SBL   = (1<<25),
+		F_SEAC  = (1<<26),
+		F_XDA   = (1<<27)
 	};
 
 	void rom_10bit(address_map &map);
@@ -159,12 +167,21 @@ protected:
 
 	virtual void op_comc();
 	virtual void op_tpc();
-	virtual void op_xda();
-	virtual void op_off();
-	virtual void op_seac();
-	virtual void op_reac();
-	virtual void op_sal();
-	virtual void op_sbl();
+
+	virtual void op_tax() { ; }
+	virtual void op_txa() { ; }
+	virtual void op_tra() { ; }
+	virtual void op_tac() { ; }
+	virtual void op_tca() { ; }
+	virtual void op_tadm() { ; }
+	virtual void op_tma() { ; }
+
+	virtual void op_xda() { ; }
+	virtual void op_off() { ; }
+	virtual void op_seac() { ; }
+	virtual void op_reac() { ; }
+	virtual void op_sal() { ; }
+	virtual void op_sbl() { ; }
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;

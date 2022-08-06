@@ -14269,7 +14269,7 @@ ROM_END
   * PCB label: TOFL003
   * TMS2670 M95041 (die label: TMS2400, M95041, 40H-01D-ND02-PHI0032-TTL O300-R300)
   * TMS1024 I/O expander
-  * cyan/red/green VFD display NEC FIP9AM31T no. 21-84, 1-bit sound
+  * cyan/red/green VFD display NEC FIP9AM31T no. 21-84, 2-bit sound
 
 ***************************************************************************/
 
@@ -14287,29 +14287,57 @@ private:
 	required_device<tms1024_device> m_expander;
 	void expander_w(offs_t offset, u8 data);
 
+	void update_display();
 	virtual void write_r(u32 data);
 	virtual void write_o(u16 data);
 };
 
 // handlers
 
+void tgpachi_state::update_display()
+{
+	m_display->matrix(m_grid, m_plate);
+}
+
 void tgpachi_state::expander_w(offs_t offset, u8 data)
 {
+	// TMS1024 port 4-7: VFD plate
+	int shift = (offset - tms1024_device::PORT4) * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+	update_display();
 }
 
 void tgpachi_state::write_r(u32 data)
 {
+	// R9,R10: TMS1024 S0,S1 (S2 forced high)
+	// R8: TMS1024 STD
+	m_expander->write_s((data >> 9 & 3) | 4);
+	m_expander->write_std(BIT(data, 8));
+
+	// R0-R7: VFD grid
+	// R11: 1 more VFD plate
+	m_grid = data & 0xff;
+	m_plate = (m_plate & 0xfffff) | (BIT(data, 11) << 20);
+	update_display();
+
+	// R13,R14: speaker out
 }
 
 void tgpachi_state::write_o(u16 data)
 {
+	// O0-O3: TMS1024 H1-H4 + VFD plate
+	m_expander->write_h(data & 0xf);
+	m_plate = (m_plate & ~0xf0000) | (data << 16 & 0xf0000);
+	update_display();
 }
 
 // config
 
 static INPUT_PORTS_START( tgpachi )
 	PORT_START("IN.0") // K
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x01, 0x00, "Factory Test" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // Slot
@@ -14330,7 +14358,7 @@ void tgpachi_state::tgpachi(machine_config &config)
 	m_expander->write_port7_callback().set(FUNC(tgpachi_state::expander_w));
 
 	// video hardware
-	PWM_DISPLAY(config, m_display).set_size(8, 20);
+	PWM_DISPLAY(config, m_display).set_size(8, 21);
 	config.set_default_layout(layout_hh_tms1k_test);
 
 	// sound hardware

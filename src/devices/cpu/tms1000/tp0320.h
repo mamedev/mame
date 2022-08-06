@@ -23,8 +23,6 @@ protected:
 	void ram_192x4(address_map &map);
 
 	// overrides
-	//virtual void device_start() override;
-
 	virtual u32 decode_fixed(u16 op) override { return 0; } // not yet
 	virtual u32 decode_micro(u8 sel) override;
 	virtual void device_reset() override;

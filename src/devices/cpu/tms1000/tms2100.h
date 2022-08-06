@@ -69,10 +69,21 @@ protected:
 	tms2100_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map);
 
 	// overrides
+	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+	virtual void op_tax() override;
+	virtual void op_tra() override;
+	virtual void op_tac() override;
+	virtual void op_tca() override;
+	virtual void op_tadm() override;
+	virtual void op_tma() override;
+
+	u8 m_ac2;           // 4-bit storage register, or R0-R3 output latch
+	u8 m_ivr;           // initial value register
 };
 
 class tms2170_cpu_device : public tms2100_cpu_device

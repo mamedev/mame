@@ -28,6 +28,7 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	virtual void op_ldx() override;
+	virtual void op_txa() override;
 };
 
 class tms2470_cpu_device : public tms2400_cpu_device

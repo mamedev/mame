@@ -63,6 +63,12 @@ protected:
 	virtual void read_opcode() override;
 
 	virtual void op_comx() override;
+	virtual void op_xda() override;
+	virtual void op_off() override;
+	virtual void op_seac() override;
+	virtual void op_reac() override;
+	virtual void op_sal() override;
+	virtual void op_sbl() override;
 };
 
 class tms1980_cpu_device : public tms0980_cpu_device
