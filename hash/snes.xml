@@ -5035,7 +5035,7 @@ more investigation needed...
 		</part>
 	</software>
 
-	<software name="digimon"> <!-- TODO: source -->
+	<software name="digimon" supported="no"> <!-- TODO: source -->
 	<!-- Protection notes: write latch byte to 88xxxx, then reads back BITSWAP8(latch,0,6,7,1,2,3,4,5) from 80xxxx -->
 		<description>Digimon Adventure</description>
 		<year>199?</year>
@@ -5086,13 +5086,13 @@ more investigation needed...
 		</part>
 	</software>
 
-	<software name="hercules" supported="no">
+	<software name="hercules" supported="partial">
 		<!-- Notes: PlayStation bootleg that was also released as Hercules 2 on the Mega Drive -->
 		<description>Hercules (pirate)</description>
 		<year>1999?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom_tekken2" /> <!-- incorrect, but boots -->
+			<feature name="slot" value="lorom_sbld" />
 			<dataarea name="rom" size="0x200000">
 				<rom name="hercules.sfc" size="0x200000" crc="45874d3d" sha1="3e5d077c4ca1bb85f13cf12cc4432569b069b454" />
 			</dataarea>
@@ -5326,7 +5326,7 @@ more investigation needed...
 		</part>
 	</software>
 
-	<software name="squirrel">
+	<software name="squirrel" supported="partial">
 		<description>Squirrel (pirate)</description>
 		<year>1999?</year>
 		<publisher>DVS Electronic Co.?</publisher>
