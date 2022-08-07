@@ -756,10 +756,9 @@ public:
 
 protected:
 	void msx_base(machine_config &config, XTAL xtal, int cpu_divider);
-	void msx1_base(machine_config &config);
+	template<typename VDPType> void msx1_no_cartlist(VDPType &vdp_type, machine_config &config);
 	template<typename VDPType> void msx1(VDPType &vdp_type, machine_config &config);
 
-	void msx1_cartlist(machine_config &config);
 	void msx1_floplist(machine_config &config);
 	void msx_fd1793(machine_config &config);
 	void msx_wd2793_force_ready(machine_config &config);
@@ -2222,11 +2221,6 @@ WRITE_LINE_MEMBER(msx2_state::turbo_w)
 #define MSX_VISIBLE_YBORDER_PIXELS  24
 
 
-void msx_state::msx1_cartlist(machine_config &config)
-{
-	SOFTWARE_LIST(config, "cart_list").set_original("msx1_cart");
-}
-
 void msx_state::msx1_floplist(machine_config &config)
 {
 	SOFTWARE_LIST(config, "flop_list").set_original("msx1_flop");
@@ -2386,7 +2380,8 @@ void msx_state::msx_base(machine_config &config, XTAL xtal, int cpu_divider)
 	m_cassette->set_interface("msx_cass");
 }
 
-void msx_state::msx1_base(machine_config &config)
+template<typename VDPType>
+void msx_state::msx1_no_cartlist(VDPType &vdp_type, machine_config &config)
 {
 	msx_base(config, 10.738635_MHz_XTAL, 3);
 
@@ -2395,18 +2390,19 @@ void msx_state::msx1_base(machine_config &config)
 
 	// Software lists
 	SOFTWARE_LIST(config, "cass_list").set_original("msx1_cass");
-}
-
-
-template<typename VDPType>
-void msx_state::msx1(VDPType &vdp_type, machine_config &config)
-{
-	msx1_base(config);
 
 	vdp_type(config, m_tms9928a, 10.738635_MHz_XTAL);
 	m_tms9928a->set_screen(m_screen);
 	m_tms9928a->set_vram_size(0x4000);
 	m_tms9928a->int_callback().set(m_mainirq, FUNC(input_merger_device::in_w<0>));
+}
+
+template<typename VDPType>
+void msx_state::msx1(VDPType &vdp_type, machine_config &config)
+{
+	msx1_no_cartlist(vdp_type, config);
+
+	SOFTWARE_LIST(config, "cart_list").set_original("msx1_cart");
 }
 
 
@@ -2494,8 +2490,6 @@ void msx_state::ax150(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 2, 2); /* 32KB RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Al Alamiah AX-170 */
@@ -2520,8 +2514,6 @@ void msx_state::ax170(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 0, 4); /* 64KB RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Canon V-8 */
@@ -2542,8 +2534,6 @@ void msx_state::canonv8(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 3, 1).force_start_address(0xe000);   /* 8KB RAM */
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Canon V-10 */
@@ -2564,8 +2554,6 @@ void msx_state::canonv10(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 3, 1);   /* 16KB RAM */
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Canon V-20 */
@@ -2588,8 +2576,6 @@ void msx_state::canonv20(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Canon V-20E */
@@ -2638,8 +2624,6 @@ void msx_state::mx10(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1); // 16KB RAM
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Casio MX-15 */
@@ -2661,8 +2645,6 @@ void msx_state::mx15(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_cartridge_slot<3>(config, MSX_SLOT_CARTRIDGE, "cartslot3", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Casio MX-101 */
@@ -2682,8 +2664,6 @@ void msx_state::mx101(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1); // 16KB RAM
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Casio PV-7 */
@@ -2708,8 +2688,6 @@ void msx_state::pv7(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1).force_start_address(0xe000);   /* 8KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Casio PV-16 */
@@ -2730,8 +2708,6 @@ void msx_state::pv16(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1);   /* 16KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Daewoo CPC-88 */
@@ -2755,8 +2731,6 @@ void msx_state::cpc88(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);   /* 64KB RAM */
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Daewoo DPC-100 */
@@ -2779,8 +2753,6 @@ void msx_state::dpc100(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 3, 1);   /* 16KB RAM */
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Daewoo DPC-180 */
@@ -2803,8 +2775,6 @@ void msx_state::dpc180(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 2, 2);   /* 32KB RAM */
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Daewoo DPC-200 */
@@ -2827,8 +2797,6 @@ void msx_state::dpc200(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Daewoo DPC-200E */
@@ -2849,8 +2817,6 @@ void msx_state::dpc200e(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Daewoo Zemmix CPC-50A */
@@ -2873,8 +2839,6 @@ void msx_state::cpc50a(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 3, 1).force_start_address(0xe000);  /* 8KB RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Daewoo Zemmix CPC-50B */
@@ -2897,8 +2861,6 @@ void msx_state::cpc50b(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 3, 1);  /* 16KB RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Daewoo Zemmix CPC-51 */
@@ -2921,8 +2883,6 @@ void msx_state::cpc51(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);  /* 64KB RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Dragon MSX-64 */
@@ -2944,8 +2904,6 @@ void msx_state::dgnmsx(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Fenner DPC-200 */
@@ -2966,8 +2924,6 @@ void msx_state::fdpc200(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Fenner FPC-500 */
@@ -2988,8 +2944,6 @@ void msx_state::fpc500(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Fenner SPC-800 */
@@ -3011,8 +2965,6 @@ void msx_state::fspc800(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Frael Bruc 100-1 */
@@ -3033,8 +2985,6 @@ void msx_state::bruc100(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x10000);   /* 64KB RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Fujitsu FM-X */
@@ -3056,8 +3006,6 @@ void msx_state::fmx(machine_config &config)
 	// Fujitsu expansion slot #1 in slot 1
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	// Fijutsu expansion slot #2 in slot 3
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Goldstar FC-80U */
@@ -3081,8 +3029,6 @@ void msx_state::gsfc80u(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Goldstar FC-200 */
@@ -3104,8 +3050,6 @@ void msx_state::gsfc200(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Goldstar GFC-1080 */
@@ -3128,8 +3072,6 @@ void msx_state::gfc1080(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4); // 64KB RAM
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Goldstar GFC-1080A */
@@ -3152,8 +3094,6 @@ void msx_state::gfc1080a(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4); // 64KB RAM
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Gradiente Expert 1.0 */
@@ -3174,8 +3114,6 @@ void msx_state::expert10(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Gradiente Expert 1.1 */
@@ -3195,8 +3133,6 @@ void msx_state::expert11(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Gradiente Expert 1.3 */
@@ -3216,8 +3152,6 @@ void msx_state::expert13(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 2, 0, 0, 4).set_total_size(0x10000);   /* 64KB Mapper RAM */
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Gradiente Expert DDPlus */
@@ -3244,8 +3178,6 @@ void msx_state::expertdp(machine_config &config)
 	msx_mb8877a(config);
 	msx_1_35_dd_drive(config);
 	msx1_floplist(config);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Gradiente Expert Plus */
@@ -3269,8 +3201,6 @@ void msx_state::expertpl(machine_config &config)
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
 	add_internal_slot(config, MSX_SLOT_ROM, "demo", 3, 3, 2, 1, "maincpu", 0x8000);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Hitachi MB-H2 */
@@ -3294,8 +3224,6 @@ void msx_state::mbh2(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4); // 64KB RAM
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Hitachi MB-H25 */
@@ -3316,8 +3244,6 @@ void msx_state::mbh25(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 2, 2); // 32KB RAM
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Hitachi MB-H50 */
@@ -3339,8 +3265,6 @@ void msx_state::mbh50(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4); // 64KB RAM
-
-	msx1_cartlist(config);
 }
 
 /* MSX - JVC HC-7GB */
@@ -3361,8 +3285,6 @@ void msx_state::jvchc7gb(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Mitsubishi ML-F48 */
@@ -3383,8 +3305,6 @@ void msx_state::mlf48(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 2, 2); // 32KB RAM
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Mitsubishi ML-F80 */
@@ -3405,8 +3325,6 @@ void msx_state::mlf80(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Mitsubishi ML-F110 */
@@ -3427,8 +3345,6 @@ void msx_state::mlf110(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 3, 1); // 16KB RAM
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Mitsubishi ML-F120 */
@@ -3451,8 +3367,6 @@ void msx_state::mlf120(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 2, 2); // 32KB RAM
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Mitsubishi ML-FX1 */
@@ -3473,8 +3387,6 @@ void msx_state::mlfx1(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 0, 4);  /* 64KB RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - National CF-1200 */
@@ -3495,8 +3407,6 @@ void msx_state::cf1200(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1);   /* 16KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - National CF-2000 */
@@ -3517,8 +3427,6 @@ void msx_state::cf2000(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1);   /* 16KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - National CF-2700 */
@@ -3538,8 +3446,6 @@ void msx_state::cf2700(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 2, 2);   /* 32KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - National CF-3000 */
@@ -3560,8 +3466,6 @@ void msx_state::cf3000(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - National CF-3300 */
@@ -3587,8 +3491,6 @@ void msx_state::cf3300(machine_config &config)
 	msx_mb8877a(config);
 	msx_1_35_ssdd_drive(config);
 	msx1_floplist(config);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - National FS-1300 */
@@ -3609,8 +3511,6 @@ void msx_state::fs1300(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - National FS-4000 */
@@ -3638,8 +3538,6 @@ void msx_state::fs4000(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "word", 3, 0, 0, 2, "maincpu", 0x8000);
 	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 1, 1, 2, "maincpu", 0x10000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 0, 4);  /* 64KB RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - National FS-4000 (Alt) */
@@ -3667,8 +3565,6 @@ void msx_state::fs4000a(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "word", 3, 0, 0, 2, "maincpu", 0x8000);
 	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 1, 1, 2, "maincpu", 0x10000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 0, 4);  /* 64KB RAM */
-
-	msx1_cartlist(config);
 }
 
 /*MSX - Olympia PHC-2*/
@@ -3689,8 +3585,6 @@ void msx_state::phc2(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Olympia PHC-28 */
@@ -3711,8 +3605,6 @@ void msx_state::phc28(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 2, 2);   /* 32KB RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Panasonic CF-2700G */
@@ -3733,8 +3625,6 @@ void msx_state::cf2700g(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  /* 64KB?? RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Perfect Perfect1 */
@@ -3757,8 +3647,6 @@ void msx_state::perfect1(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "arab", 0, 1, 0, 4, "maincpu", 0x8000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 2, 0, 4); // 64KB RAM
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Philips NMS-801 */
@@ -3770,7 +3658,7 @@ ROM_END
 
 void msx_state::nms801(machine_config &config)
 {
-	msx1(TMS9929A, config);
+	msx1_no_cartlist(TMS9929A, config);
 	// AY8910
 	// FDC: None, 0 drives
 	// 0 Cartridge slots
@@ -3799,8 +3687,6 @@ void msx_state::vg8000(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 3, 1);   /* 16KB RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Philips VG-8010 */
@@ -3822,8 +3708,6 @@ void msx_state::vg8010(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 2, 2);   /* 32KB RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Philips VG-8010F */
@@ -3845,8 +3729,6 @@ void msx_state::vg8010f(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 2, 2);   /* 32KB RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Philips VG-8020-00 */
@@ -3867,8 +3749,6 @@ void msx_state::vg802000(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Philips VG-8020-20 */
@@ -3890,8 +3770,6 @@ void msx_state::vg802020(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x10000);   /* 64KB Mapper RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Philips VG-8020F */
@@ -3913,8 +3791,6 @@ void msx_state::vg8020f(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 0, 4);  /* 64KB?? RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Pioneer PX-7 */
@@ -3958,8 +3834,6 @@ void msx_state::piopx7(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_ROM, "rom2", 2, 0, 1, 1, "maincpu", 0x8000);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Pioneer PX-7UK */
@@ -3984,8 +3858,6 @@ void msx_state::piopx7uk(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_ROM, "rom2", 2, 0, 1, 1, "maincpu", 0x8000);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Pioneer PX-V60 */
@@ -4009,8 +3881,6 @@ void msx_state::piopxv60(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_ROM, "rom2", 2, 0, 1, 1, "maincpu", 0x8000);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Samsung SPC-800 */
@@ -4033,8 +3903,6 @@ void msx_state::spc800(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);  /* 64KB?? RAM */
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Sanyo MPC-64 */
@@ -4055,8 +3923,6 @@ void msx_state::mpc64(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Sanyo MPC-100 */
@@ -4077,8 +3943,6 @@ void msx_state::mpc100(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Sanyo MPC-200 */
@@ -4101,8 +3965,6 @@ void msx_state::mpc200(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4); // 64KB RAM
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Sanyo MPC-200SP */
@@ -4123,8 +3985,6 @@ void msx_state::mpc200sp(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4); // 64KB RAM
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Sanyo PHC-28L */
@@ -4145,8 +4005,6 @@ void msx_state::phc28l(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Sanyo PHC-28S */
@@ -4167,8 +4025,6 @@ void msx_state::phc28s(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 2, 2);   /* 32KB RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Sanyo Wavy MPC-10 */
@@ -4189,8 +4045,6 @@ void msx_state::mpc10(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 2, 2);   /* 32KB RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Sharp Epcom HotBit 1.1 */
@@ -4211,8 +4065,6 @@ void msx_state::hotbit11(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Sharp Epcom HotBit 1.2 */
@@ -4233,8 +4085,6 @@ void msx_state::hotbit12(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Sharp Epcom HotBit 1.3b */
@@ -4255,8 +4105,6 @@ void msx_state::hotbi13b(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x10000);   /* 64KB Mapper RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Sharp Epcom HotBit 1.3p */
@@ -4277,8 +4125,6 @@ void msx_state::hotbi13p(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x10000);   /* 64KB Mapper RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Sony HB-10 */
@@ -4302,8 +4148,6 @@ void msx_state::hb10(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 3, 1);  /* 16KB? RAM */
 
 	MSX_S1985(config, "s1985", 0);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Sony HB-10P */
@@ -4326,8 +4170,6 @@ void msx_state::hb10p(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Sony HB-20P */
@@ -4349,8 +4191,6 @@ void msx_state::hb20p(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Sony HB-201 */
@@ -4374,8 +4214,6 @@ void msx_state::hb201(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Sony HB-201P */
@@ -4398,8 +4236,6 @@ void msx_state::hb201p(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Sony HB-501P */
@@ -4420,8 +4256,6 @@ void msx_state::hb501p(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Sony HB-55 (Version 1) */
@@ -4444,8 +4278,6 @@ void msx_state::hb55(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1);   /* 16KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Sony HB-55D */
@@ -4468,8 +4300,6 @@ void msx_state::hb55d(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 3, 1);   /* 16KB RAM */
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Sony HB-55P */
@@ -4493,8 +4323,6 @@ void msx_state::hb55p(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 3, 1);   /* 16KB RAM */
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Sony HB-75D */
@@ -4517,8 +4345,6 @@ void msx_state::hb75d(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Sony HB-75P */
@@ -4542,8 +4368,6 @@ void msx_state::hb75p(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Sony HB-101P */
@@ -4566,8 +4390,6 @@ void msx_state::hb101p(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_ROM, "note", 3, 0, 1, 1, "maincpu", 0x8000);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Sony HB-701FD */
@@ -4595,8 +4417,6 @@ void msx_state::hb701fd(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_ssdd_drive(config);
 	msx1_floplist(config);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Spectravideo SVI-728 */
@@ -4619,8 +4439,6 @@ void msx_state::svi728(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot", 2, 0, msx_cart, nullptr);
 //  MSX_LAYOUT_SLOT (3, 0, 1, 1, DISK_ROM2, 0x4000, 0x8000)
 //  MSX_LAYOUT_SLOT (3, 1, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Spectravideo SVI-738 */
@@ -4652,8 +4470,6 @@ void msx_state::svi738(machine_config &config)
 	msx_fd1793(config);
 	msx_1_35_ssdd_drive(config);
 	msx1_floplist(config);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Spectravideo SVI-738 Arabic */
@@ -4687,8 +4503,6 @@ void msx_state::svi738ar(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_ssdd_drive(config);
 	msx1_floplist(config);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Spectravideo SVI-738 Danish */
@@ -4720,8 +4534,6 @@ void msx_state::svi738dk(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_ssdd_drive(config);
 	msx1_floplist(config);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Spectravideo SVI-738 Spanish */
@@ -4753,8 +4565,6 @@ void msx_state::svi738sp(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_ssdd_drive(config);
 	msx1_floplist(config);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Spectravideo SVI-738 Swedish */
@@ -4786,8 +4596,6 @@ void msx_state::svi738sw(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_ssdd_drive(config);
 	msx1_floplist(config);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Spectravideo SVI-738 Poland*/
@@ -4819,8 +4627,6 @@ void msx_state::svi738pl(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_ssdd_drive(config);
 	msx1_floplist(config);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Talent DPC-200 */
@@ -4841,8 +4647,6 @@ void msx_state::tadpc200(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Talent DPC-200A */
@@ -4863,8 +4667,6 @@ void msx_state::tadpc20a(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Toshiba HX-10 */
@@ -4886,8 +4688,6 @@ void msx_state::hx10(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);  /* 64KB RAM */
 	//MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)    // Expansion slot
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Toshiba HX-10D */
@@ -4908,8 +4708,6 @@ void msx_state::hx10d(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);   /* 64KB RAM */
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Toshiba HX-10DP */
@@ -4930,8 +4728,6 @@ void msx_state::hx10dp(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);   /* 64KB RAM */
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Toshiba HX-10E */
@@ -4952,8 +4748,6 @@ void msx_state::hx10e(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);   /* 64KB RAM */
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Toshiba HX-10F */
@@ -4974,8 +4768,6 @@ void msx_state::hx10f(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);   /* 64KB RAM */
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Toshiba HX-10S */
@@ -4996,8 +4788,6 @@ void msx_state::hx10s(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 3, 1);   /* 16KB RAM */
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Toshiba HX-10SA */
@@ -5018,8 +4808,6 @@ void msx_state::hx10sa(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);   /* 64KB RAM */
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Toshiba HX-20 */
@@ -5044,8 +4832,6 @@ void msx_state::hx20(machine_config &config)
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram2", 3, 0, 2, 2);   /* 32KB RAM */
 	add_internal_slot(config, MSX_SLOT_ROM, "word", 3, 3, 1, 2, "maincpu", 0x8000);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Toshiba HX-20I */
@@ -5070,8 +4856,6 @@ void msx_state::hx20i(machine_config &config)
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram2", 3, 0, 2, 2);   /* 32KB RAM */
 	add_internal_slot(config, MSX_SLOT_ROM, "word", 3, 3, 1, 2, "maincpu", 0x8000);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Toshiba HX-21 */
@@ -5097,8 +4881,6 @@ void msx_state::hx21(machine_config &config)
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram2", 3, 0, 0, 4);   /* 64KB RAM */
 	add_internal_slot(config, MSX_SLOT_ROM, "word", 3, 3, 1, 2, "maincpu", 0x8000);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Toshiba HX-21I */
@@ -5122,8 +4904,6 @@ void msx_state::hx21i(machine_config &config)
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram2", 3, 0, 2, 2);   /* 32KB RAM */
 	add_internal_slot(config, MSX_SLOT_ROM, "word", 3, 3, 1, 2, "maincpu", 0x8000);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Toshiba HX-22 */
@@ -5150,8 +4930,6 @@ void msx_state::hx22(machine_config &config)
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram2", 3, 0, 0, 4);   /* 64KB RAM */
 	add_internal_slot(config, MSX_SLOT_ROM, "word", 3, 3, 1, 2, "maincpu", 0x8000);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Toshiba HX-22I */
@@ -5177,8 +4955,6 @@ void msx_state::hx22i(machine_config &config)
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram2", 3, 0, 2, 2);   /* 32KB RAM */
 	add_internal_slot(config, MSX_SLOT_ROM, "word", 3, 3, 1, 2, "maincpu", 0x8000);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Victor HC-5 */
@@ -5199,8 +4975,6 @@ void msx_state::hc5(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 3, 1); // 16KB or 32KB RAM ?
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Victor HC-6 */
@@ -5221,8 +4995,6 @@ void msx_state::hc6(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 2, 2); // 32KB RAM
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Victor HC-7 */
@@ -5243,8 +5015,6 @@ void msx_state::hc7(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4); // 64KB RAM
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Yamaha CX5F (with SFG01) */
@@ -5267,8 +5037,6 @@ void msx_state::cx5f1(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 2, 2); // 32KB RAM
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 2, 0, msx_yamaha_60pin, "sfg01");
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Yamaha CX5F (with SFG05) */
@@ -5291,8 +5059,6 @@ void msx_state::cx5f(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, 0, msx_yamaha_60pin, "sfg05");
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 2, 2); // 32KB RAM
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Yamaha CX5M / Yamaha CX5M-2 */
@@ -5315,8 +5081,6 @@ void msx_state::cx5m(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, 0, msx_yamaha_60pin, "sfg01");
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Yamaha CX5M-128 */
@@ -5342,8 +5106,6 @@ void msx_state::cx5m128(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "yrm", 3, 1, 1, 1, "maincpu", 0x14000); /* YRM-502 */
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000);   /* 128KB Mapper RAM */
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, 3, msx_yamaha_60pin, "sfg05");
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Yamaha CX5MII */
@@ -5367,8 +5129,6 @@ void msx_state::cx5m2(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "ext", 3, 0, 1, 1, "maincpu", 0x8000);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x10000);   /* 64KB Mapper RAM */
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, 3, msx_yamaha_60pin, "sfg05");
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Yamaha YIS303 */
@@ -5391,8 +5151,6 @@ void msx_state::yis303(machine_config &config)
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_ROM, "fillff", 3, 0, 0, 3, "maincpu", 0x0000);   /* Fill FF */
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 3, 1);   /* 16KB RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Yamaha YIS503 */
@@ -5415,8 +5173,6 @@ void msx_state::yis503(machine_config &config)
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_ROM, "fillff", 3, 0, 0, 3, "maincpu", 0x0000);   /* Fill FF */
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 2, 2);   /* 32KB RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Yamaha YIS503F */
@@ -5437,8 +5193,6 @@ void msx_state::yis503f(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB?? RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Yamaha YIS503II */
@@ -5459,8 +5213,6 @@ void msx_state::yis503ii(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Yamaha YIS503IIR Russian */
@@ -5492,8 +5244,6 @@ void msx_state::y503iir(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
 	msx1_floplist(config);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Yamaha YIS503IIR Estonian */
@@ -5522,8 +5272,6 @@ void msx_state::y503iir2(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
 	msx1_floplist(config);
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Yamaha YIS503M */
@@ -5545,8 +5293,6 @@ void msx_state::yis503m(machine_config &config)
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, 0, msx_yamaha_60pin, "sfg05");
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 2, 2);   /* 32KB RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Yashica YC-64 */
@@ -5566,8 +5312,6 @@ void msx_state::yc64(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
-
-	msx1_cartlist(config);
 }
 
 /* MSX - Yeno MX64 */
@@ -5588,8 +5332,6 @@ void msx_state::mx64(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx1_cartlist(config);
 }
 
 
