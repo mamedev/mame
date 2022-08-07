@@ -756,8 +756,7 @@ public:
 
 protected:
 	void msx_base(machine_config &config, XTAL xtal, int cpu_divider);
-	template<typename VDPType> void msx1_no_cartlist(VDPType &vdp_type, machine_config &config);
-	template<typename VDPType> void msx1(VDPType &vdp_type, machine_config &config);
+	template<typename VDPType> void msx1(VDPType &vdp_type, machine_config &config, bool has_cartlist = true);
 
 	void msx1_floplist(machine_config &config);
 	void msx_fd1793(machine_config &config);
@@ -867,6 +866,9 @@ protected:
 	required_ioport_array<2> m_io_mouse;
 	required_ioport_array<6> m_io_key;
 	output_finder<2> m_leds;
+
+	static constexpr bool HAS_CARTLIST = true;
+	static constexpr bool NO_CARTLIST = false;
 
 private:
 	void memory_map_all();
@@ -1029,13 +1031,12 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	void msx2_base(machine_config &config);
-	void msx2(machine_config &config);
+	void msx2_base(machine_config &config, bool has_cartlist = true);
+	void msx2(machine_config &config, bool has_cartlist = true);
+	void msx2_pal(machine_config &config, bool has_cartlist = true);
 	void msx2plus(machine_config &config);
-	void msx2_pal(machine_config &config);
 	void turbor(machine_config &config);
 
-	void msx2_cartlist(machine_config &config);
 	void msx2_floplist(machine_config &config);
 	void msx2plus_floplist(machine_config &config);
 	void msxr_floplist(machine_config &config);
@@ -2226,12 +2227,6 @@ void msx_state::msx1_floplist(machine_config &config)
 	SOFTWARE_LIST(config, "flop_list").set_original("msx1_flop");
 }
 
-void msx2_state::msx2_cartlist(machine_config &config)
-{
-	SOFTWARE_LIST(config, "cart_list").set_original("msx2_cart");
-	SOFTWARE_LIST(config, "msx1_crt_l").set_compatible("msx1_cart");
-}
-
 void msx2_state::msx2_floplist(machine_config &config)
 {
 	SOFTWARE_LIST(config, "flop_list").set_original("msx2_flop");
@@ -2381,7 +2376,7 @@ void msx_state::msx_base(machine_config &config, XTAL xtal, int cpu_divider)
 }
 
 template<typename VDPType>
-void msx_state::msx1_no_cartlist(VDPType &vdp_type, machine_config &config)
+void msx_state::msx1(VDPType &vdp_type, machine_config &config, bool has_cartlist)
 {
 	msx_base(config, 10.738635_MHz_XTAL, 3);
 
@@ -2395,18 +2390,13 @@ void msx_state::msx1_no_cartlist(VDPType &vdp_type, machine_config &config)
 	m_tms9928a->set_screen(m_screen);
 	m_tms9928a->set_vram_size(0x4000);
 	m_tms9928a->int_callback().set(m_mainirq, FUNC(input_merger_device::in_w<0>));
-}
 
-template<typename VDPType>
-void msx_state::msx1(VDPType &vdp_type, machine_config &config)
-{
-	msx1_no_cartlist(vdp_type, config);
-
-	SOFTWARE_LIST(config, "cart_list").set_original("msx1_cart");
+	if (has_cartlist)
+		SOFTWARE_LIST(config, "cart_list").set_original("msx1_cart");
 }
 
 
-void msx2_state::msx2_base(machine_config &config)
+void msx2_state::msx2_base(machine_config &config, bool has_cartlist)
 {
 	msx_base(config, 21.477272_MHz_XTAL, 6);
 
@@ -2416,11 +2406,17 @@ void msx2_state::msx2_base(machine_config &config)
 	// Software lists
 	SOFTWARE_LIST(config, "cass_list").set_original("msx2_cass");
 	SOFTWARE_LIST(config, "msx1_cas_l").set_compatible("msx1_cass");
+
+	if (has_cartlist)
+	{
+		SOFTWARE_LIST(config, "cart_list").set_original("msx2_cart");
+		SOFTWARE_LIST(config, "msx1_crt_l").set_compatible("msx1_cart");
+	}
 }
 
-void msx2_state::msx2(machine_config &config)
+void msx2_state::msx2(machine_config &config, bool has_cartlist)
 {
-	msx2_base(config);
+	msx2_base(config, has_cartlist);
 
 	m_maincpu->set_addrmap(AS_IO, &msx2_state::msx2_io_map);
 
@@ -2432,9 +2428,16 @@ void msx2_state::msx2(machine_config &config)
 }
 
 
+void msx2_state::msx2_pal(machine_config &config, bool has_cartlist)
+{
+	msx2(config, has_cartlist);
+	m_v9938->set_screen_pal(m_screen);
+}
+
+
 void msx2_state::msx2plus(machine_config &config)
 {
-	msx2_base(config);
+	msx2_base(config, true);
 
 	m_maincpu->set_addrmap(AS_IO, &msx2_state::msx2plus_io_map);
 
@@ -2443,13 +2446,6 @@ void msx2_state::msx2plus(machine_config &config)
 	m_v9958->set_screen_ntsc(m_screen);
 	m_v9958->set_vram_size(0x20000);
 	m_v9958->int_cb().set(m_mainirq, FUNC(input_merger_device::in_w<0>));
-}
-
-
-void msx2_state::msx2_pal(machine_config &config)
-{
-	msx2(config);
-	m_v9938->set_screen_pal(m_screen);
 }
 
 void msx2_state::turbor(machine_config &config)
@@ -3658,7 +3654,7 @@ ROM_END
 
 void msx_state::nms801(machine_config &config)
 {
-	msx1_no_cartlist(TMS9929A, config);
+	msx1(TMS9929A, config, NO_CARTLIST);
 	// AY8910
 	// FDC: None, 0 drives
 	// 0 Cartridge slots
@@ -5369,8 +5365,6 @@ void msx2_state::ax350(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Al Alamiah AX-370 */
@@ -5405,8 +5399,6 @@ void msx2_state::ax370(machine_config &config)
 	msx_tc8566af(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Canon V-25 */
@@ -5435,8 +5427,6 @@ void msx2_state::canonv25(machine_config &config)
 	MSX_S1985(config, "s1985", 0);
 
 	msx2_64kb_vram(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Canon V-30 */
@@ -5468,8 +5458,6 @@ void msx2_state::canonv30(machine_config &config)
 	msx_wd2793(config);
 	msx_2_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Canon V-30F */
@@ -5501,8 +5489,6 @@ void msx2_state::canonv30f(machine_config &config)
 	msx_wd2793(config);
 	msx_2_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Daewoo CPC-300 */
@@ -5530,8 +5516,6 @@ void msx2_state::cpc300(machine_config &config)
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
 
 	MSX_S1985(config, "s1985", 0);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Daewoo CPC-300E */
@@ -5559,8 +5543,6 @@ void msx2_state::cpc300e(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "ext", 0, 3, 0, 2, "maincpu", 0x8000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Daewoo CPC-330K */
@@ -5590,8 +5572,6 @@ void msx2_state::cpc330k(machine_config &config)
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
 
 	MSX_S1985(config, "s1985", 0);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Daewoo CPC-400 */
@@ -5625,8 +5605,6 @@ void msx2_state::cpc400(machine_config &config)
 	msx_mb8877a(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Daewoo CPC-400S */
@@ -5663,8 +5641,6 @@ void msx2_state::cpc400s(machine_config &config)
 	msx_mb8877a(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Daewoo Zemmix CPC-61 */
@@ -5696,8 +5672,6 @@ void msx2_state::cpc61(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 
 	MSX_S1985(config, "s1985", 0);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Daewoo Zemmix CPG-120 Normal */
@@ -5735,8 +5709,6 @@ void msx2_state::cpg120(machine_config &config)
 	MSX_S1985(config, "s1985", 0);
 
 	msx_ym2413(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Daewoo Zemmic CPG-120 Turbo */
@@ -5770,8 +5742,6 @@ void msx2_state::fpc900(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Gradiente Expert 2.0 */
@@ -5802,8 +5772,6 @@ void msx2_state::expert20(machine_config &config)
 	msx_microsol(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Hitachi MB-H70 */
@@ -5840,8 +5808,6 @@ void msx2_state::mbh70(machine_config &config)
 	msx_wd2793(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Kawai KMC-5000 */
@@ -5878,8 +5844,6 @@ void msx2_state::kmc5000(machine_config &config)
 	msx_tc8566af(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Mitsubishi ML-G1 */
@@ -5907,8 +5871,6 @@ void msx2_state::mlg1(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "paint", 3, 3, 0, 2, "maincpu", 0xc000);
 
 	MSX_S1985(config, "s1985", 0);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Mitsubishi ML-G3 */
@@ -5942,8 +5904,6 @@ void msx2_state::mlg3(machine_config &config)
 	msx_wd2793(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Mitsubishi ML-G10 */
@@ -5972,8 +5932,6 @@ void msx2_state::mlg10(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000); // 64KB or 128KB Mapper RAM?
 
 	MSX_S1985(config, "s1985", 0);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Mitsubishi ML-G30 Model 1/Model 2 */
@@ -6005,8 +5963,6 @@ void msx2_state::mlg30(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - National FS-4500 */
@@ -6056,8 +6012,6 @@ void msx2_state::fs4500(machine_config &config)
 	MSX_S1985(config, "s1985", 0);
 
 	MSX_MATSUSHITA(config, "matsushita", 0);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - National FS-4600 */
@@ -6104,8 +6058,6 @@ void msx2_state::fs4600(machine_config &config)
 	msx_mb8877a(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - National FS-4700 */
@@ -6161,8 +6113,6 @@ void msx2_state::fs4700(machine_config &config)
 	msx_mb8877a(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - National FS-5000 */
@@ -6205,8 +6155,6 @@ void msx2_state::fs5000(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_2_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - National FS-5500F2*/
@@ -6255,8 +6203,6 @@ void msx2_state::fs5500f1(machine_config &config)
 	msx_mb8877a(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - National FS-5500F2*/
@@ -6305,8 +6251,6 @@ void msx2_state::fs5500f2(machine_config &config)
 	msx_mb8877a(config);
 	msx_2_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Panasonic FS-A1 */
@@ -6333,8 +6277,6 @@ void msx2_state::fsa1(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "ext", 3, 1, 0, 1, "maincpu", 0x8000);
 	add_internal_slot(config, MSX_SLOT_ROM, "desk1", 3, 2, 1, 2, "maincpu", 0x10000);
 	add_internal_slot(config, MSX_SLOT_ROM, "desk2", 3, 3, 1, 2, "maincpu", 0x18000);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Panasonic FS-A1 (a) */
@@ -6361,8 +6303,6 @@ void msx2_state::fsa1a(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "ext", 3, 1, 0, 1, "maincpu", 0x8000);
 	add_internal_slot(config, MSX_SLOT_ROM, "desk1", 3, 2, 1, 2, "maincpu", 0xc000);
 	add_internal_slot(config, MSX_SLOT_ROM, "desk2", 3, 3, 1, 2, "maincpu", 0x14000);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Panasonic FS-A1F */
@@ -6398,8 +6338,6 @@ void msx2_state::fsa1f(machine_config &config)
 	msx_tc8566af(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Panasonic FS-A1FM */
@@ -6439,8 +6377,6 @@ void msx2_state::fsa1fm(machine_config &config)
 	msx_tc8566af(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Panasonic FS-A1MK2 */
@@ -6469,8 +6405,6 @@ void msx2_state::fsa1mk2(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "coc1", 3, 1, 1, 2, "maincpu", 0xc000);
 	add_internal_slot(config, MSX_SLOT_ROM, "coc2", 3, 2, 1, 1, "maincpu", 0x14000);
 	add_internal_slot(config, MSX_SLOT_ROM, "coc3", 3, 3, 1, 2, "maincpu", 0x18000);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Philips NMS-8220 - 2 possible sets (/00 /16) */
@@ -6496,8 +6430,6 @@ void msx2_state::nms8220(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "ext", 3, 0, 0, 1, "maincpu", 0x8000);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x10000).set_ramio_bits(0xf8);   /* 64KB Mapper RAM */
 	add_internal_slot(config, MSX_SLOT_ROM, "pen", 3, 3, 1, 1, "maincpu", 0xc000);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Philips NMS-8220 (a) */
@@ -6523,8 +6455,6 @@ void msx2_state::nms8220a(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "ext", 3, 0, 0, 1, "maincpu", 0x8000);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x10000).set_ramio_bits(0xf8);   /* 64KB Mapper RAM */
 	add_internal_slot(config, MSX_SLOT_ROM, "pen", 3, 3, 1, 1, "maincpu", 0xc000);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Philips NMS-8245 - 2 possible sets (/00 /16) */
@@ -6556,8 +6486,6 @@ void msx2_state::nms8245(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Philips NMS-8245F */
@@ -6586,8 +6514,6 @@ void msx2_state::nms8245f(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Philips NMS-8250 */
@@ -6618,8 +6544,6 @@ void msx2_state::nms8250(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Philips NMS-8250F */
@@ -6649,8 +6573,6 @@ void msx2_state::nms8250f(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Philips NMS-8250J */
@@ -6682,8 +6604,6 @@ void msx2_state::nms8250j(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Philips NMS-8255 */
@@ -6713,8 +6633,6 @@ void msx2_state::nms8255(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_2_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Philips NMS-8255F */
@@ -6744,8 +6662,6 @@ void msx2_state::nms8255f(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_2_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Philips NMS-8260 */
@@ -6778,8 +6694,6 @@ void msx2_state::nms8260(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Philips NMS-8270 - Not confirmed to exist yet */
@@ -6810,8 +6724,6 @@ void msx2_state::nms8280(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_2_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Philips NMS-8280F */
@@ -6840,8 +6752,6 @@ void msx2_state::nms8280f(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_2_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Philips NMS-8280G */
@@ -6870,8 +6780,6 @@ void msx2_state::nms8280g(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_2_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Philips VG-8230 (u11 - exp, u12 - basic, u13 - disk */
@@ -6901,8 +6809,6 @@ void msx2_state::vg8230(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_ssdd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Philips VG-8230J */
@@ -6934,8 +6840,6 @@ void msx2_state::vg8230j(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_ssdd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Philips VG-8235 3 psosible basic and ext roms (/00 /02 /19) */
@@ -6965,8 +6869,6 @@ void msx2_state::vg8235(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_ssdd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Philips VG-8235F */
@@ -6996,8 +6898,6 @@ void msx2_state::vg8235f(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_ssdd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Philips VG-8240 */
@@ -7026,8 +6926,6 @@ void msx2_state::vg8240(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Sanyo MPC-2300 */
@@ -7050,8 +6948,6 @@ void msx2_state::mpc2300(machine_config &config)
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x20000);   /* 128KB?? Mapper RAM */
 	add_internal_slot(config, MSX_SLOT_ROM, "ext", 3, 1, 0, 1, "maincpu", 0x8000);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Sanyo MPC-2500FD */
@@ -7081,8 +6977,6 @@ void msx2_state::mpc2500f(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Sanyo Wavy MPC-25FD */
@@ -7111,8 +7005,6 @@ void msx2_state::mpc25fd(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Sanyo Wavy MPC-27 */
@@ -7145,8 +7037,6 @@ void msx2_state::mpc27(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Sanyo Wavy PHC-23 = PHC-23J(B)*/
@@ -7172,8 +7062,6 @@ void msx2_state::phc23(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 0, 4);  /* 64KB RAM */
 
 	MSX_S1985(config, "s1985", 0);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Sanyo Wavy PHC-55FD2 */
@@ -7205,8 +7093,6 @@ void msx2_state::phc55fd2(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_2_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Sanyo Wavy PHC-77 */
@@ -7244,8 +7130,6 @@ void msx2_state::phc77(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Sharp Epcom HotBit 2.0 */
@@ -7276,8 +7160,6 @@ void msx2_state::hotbit20(machine_config &config)
 	msx_microsol(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Sony HB-F1 */
@@ -7306,8 +7188,6 @@ void msx2_state::hbf1(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "note2", 3, 1, 1, 2, "maincpu", 0x10000);
 	add_internal_slot(config, MSX_SLOT_ROM, "note3", 3, 2, 1, 2, "maincpu", 0x18000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 3, 0, 4);  /* 64KB RAM */
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Sony HB-F1II */
@@ -7336,8 +7216,6 @@ void msx2_state::hbf12(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "note2", 3, 1, 1, 2, "maincpu", 0x10000);
 	add_internal_slot(config, MSX_SLOT_ROM, "note3", 3, 2, 1, 2, "maincpu", 0x18000);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 3, 0, 4).set_total_size(0x10000).set_ramio_bits(0x80);   /* 64KB Mapper RAM */
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Sony HB-F1XD */
@@ -7369,8 +7247,6 @@ void msx2_state::hbf1xd(machine_config &config)
 	msx_wd2793(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Sony HB-F1XDMK2 */
@@ -7399,8 +7275,6 @@ void msx2_state::hbf1xdm2(machine_config &config)
 	msx_wd2793(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Sony HB-F5 */
@@ -7425,8 +7299,6 @@ void msx2_state::hbf5(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 0, 2, 0, 4).set_total_size(0x10000);   /* 64KB?? Mapper RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Sony HB-F500 */
@@ -7459,8 +7331,6 @@ void msx2_state::hbf500(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Sony HB-F500F */
@@ -7490,8 +7360,6 @@ void msx2_state::hbf500f(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram2", 0, 2, 0, 2);   /* 32KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Sony HB-F500P */
@@ -7522,8 +7390,6 @@ void msx2_state::hbf500p(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_ROM, "empty", 3, 0, 0, 4, "maincpu", 0xc000);     // Empty? or is this the 3rd cartridge/expansion slot ?
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Sony HB-F700D */
@@ -7554,8 +7420,6 @@ void msx2_state::hbf700d(machine_config &config)
 	msx_wd2793(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Sony HB-F700F */
@@ -7583,8 +7447,6 @@ void msx2_state::hbf700f(machine_config &config)
 	msx_wd2793(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Sony HB-F700P */
@@ -7615,8 +7477,6 @@ void msx2_state::hbf700p(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Sony HB-F700S */
@@ -7644,8 +7504,6 @@ void msx2_state::hbf700s(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Sony HB-F900 */
@@ -7679,8 +7537,6 @@ void msx2_state::hbf900(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_2_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Sony HB-F900 (a) */
@@ -7714,8 +7570,6 @@ void msx2_state::hbf900a(machine_config &config)
 	msx_wd2793(config);
 	msx_2_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Sony HB-F9P */
@@ -7743,8 +7597,6 @@ void msx2_state::hbf9p(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000).set_ramio_bits(0x80);   /* 128KB Mapper RAM */
 
 	MSX_S1985(config, "s1985", 0);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Sony HB-F9P Russian */
@@ -7770,8 +7622,6 @@ void msx2_state::hbf9pr(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000);   /* 128KB Mapper RAM */
 
 	MSX_S1985(config, "s1985", 0);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Sony HB-F9S */
@@ -7799,8 +7649,6 @@ void msx2_state::hbf9s(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000).set_ramio_bits(0x80);   /* 128KB Mapper RAM */
 
 	MSX_S1985(config, "s1985", 0);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Sony HB-G900AP */
@@ -7839,8 +7687,6 @@ void msx2_state::hbg900ap(machine_config &config)
 	msx_wd2793(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Sony HB-G900P - 3x 32KB ROMs */
@@ -7873,8 +7719,6 @@ void msx2_state::hbg900p(machine_config &config)
 	msx_wd2793(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Talent TPC-310 */
@@ -7908,8 +7752,6 @@ void msx2_state::tpc310(machine_config &config)
 	msx_mb8877a(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Talent TPP-311 */
@@ -7923,7 +7765,7 @@ ROM_END
 
 void msx2_state::tpp311(machine_config &config)
 {
-	msx2_pal(config);
+	msx2_pal(config, NO_CARTLIST);
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 0 Cartridge slots?
@@ -7964,8 +7806,6 @@ void msx2_state::tps312(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "planlow", 3, 2, 0, 1, "maincpu", 0x10000);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 3, msx_cart, nullptr);
 
-	msx2_cartlist(config);
-
 	msx2_64kb_vram(config);
 }
 
@@ -7994,8 +7834,6 @@ void msx2_state::hx23(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "ext", 3, 1, 0, 1, "maincpu", 0x8000);
 	add_internal_slot(config, MSX_SLOT_ROM, "word", 3, 3, 1, 2, "maincpu", 0xc000);
 
-	msx2_cartlist(config);
-
 	msx2_64kb_vram(config);
 }
 
@@ -8021,8 +7859,6 @@ void msx2_state::hx23f(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x20000).set_ramio_bits(0x80);   /* 128KB Mapper RAM */
 	add_internal_slot(config, MSX_SLOT_ROM, "ext", 3, 1, 0, 1, "maincpu", 0x8000);
 	add_internal_slot(config, MSX_SLOT_ROM, "word", 3, 3, 1, 2, "maincpu", 0xc000);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Toshiba HX-23I */
@@ -8050,8 +7886,6 @@ void msx2_state::hx23i(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "word", 3, 3, 1, 2, "maincpu", 0xc000);
 
 	MSX_S1985(config, "s1985", 0);
-
-	msx2_cartlist(config);
 }
 
 /* MSX@ - Toshiba HX-33 */
@@ -8085,8 +7919,6 @@ void msx2_state::hx33(machine_config &config)
 	MSX_S1985(config, "s1985", 0);
 
 	msx2_64kb_vram(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX@ - Toshiba HX-34 */
@@ -8125,8 +7957,6 @@ void msx2_state::hx34(machine_config &config)
 	msx_wd2793(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX@ - Toshiba HX-34I */
@@ -8162,8 +7992,6 @@ void msx2_state::hx34i(machine_config &config)
 	msx_wd2793(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Toshiba FS-TM1 */
@@ -8193,8 +8021,6 @@ void msx2_state::fstm1(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "desk2", 3, 3, 1, 2, "maincpu", 0x14000);
 
 	MSX_S1985(config, "s1985", 0);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Victor HC-90 */
@@ -8232,8 +8058,6 @@ void msx2_state::victhc90(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Victor HC-95 */
@@ -8271,8 +8095,6 @@ void msx2_state::victhc95(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_2_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Victor HC-95A */
@@ -8311,8 +8133,6 @@ void msx2_state::victhc95a(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_2_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Yamaha CX7M */
@@ -8336,8 +8156,6 @@ void msx2_state::cx7m(machine_config &config)
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x10000).set_ramio_bits(0x80);   /* 64KB Mapper RAM */
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, 3, msx_yamaha_60pin, "sfg05");
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Yamaha CX7M/128 */
@@ -8363,8 +8181,6 @@ void msx2_state::cx7m128(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "yrm502", 3, 1, 1, 1, "maincpu", 0xc000);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000).set_ramio_bits(0x80);   /* 128KB Mapper RAM */
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, 3, msx_yamaha_60pin, "sfg05");
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Yamaha YIS-503 III R */
@@ -8397,8 +8213,6 @@ void msx2_state::y503iiir(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Yamaha YIS-503 III R Estonian */
@@ -8431,8 +8245,6 @@ void msx2_state::y503iiire(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Yamaha YIS604 */
@@ -8460,8 +8272,6 @@ void msx2_state::yis60464(machine_config &config)
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x10000); // 64KB Mapper RAM
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, 3, msx_yamaha_60pin, "sfg05");
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Yamaha YIS604/128 */
@@ -8491,8 +8301,6 @@ void msx2_state::yis604(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "yrm502", 3, 1, 1, 1, "maincpu", 0xc000);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x10000); // 64KB Mapper RAM
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, 3, msx_yamaha_60pin, "sfg05");
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Yamaha YIS-805/128 */
@@ -8528,8 +8336,6 @@ void msx2_state::y805128(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Yamaha YIS-805R2/128 */
@@ -8564,8 +8370,6 @@ void msx2_state::y805128r2(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Yamaha YIS-805R2/128 Estonian */
@@ -8600,8 +8404,6 @@ void msx2_state::y805128r2e(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2 - Yamaha YIS-805/256 */
@@ -8637,8 +8439,6 @@ void msx2_state::y805256(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
 	msx2_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /********************************  MSX 2+ **********************************/
@@ -8675,8 +8475,6 @@ void msx2_state::expert3i(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
 	msx2plus_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2+ - Ciel Expert 3 Turbo */
@@ -8713,8 +8511,6 @@ void msx2_state::expert3t(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
 	msx2plus_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2+ - Gradiente Expert AC88+ */
@@ -8747,8 +8543,6 @@ void msx2_state::expertac(machine_config &config)
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
 	msx2plus_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2+ - Gradiente Expert DDX+ */
@@ -8781,8 +8575,6 @@ void msx2_state::expertdx(machine_config &config)
 	msx_tc8566af(config);
 	msx_1_35_dd_drive(config);
 	msx2plus_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2+ - Panasonic FS-A1FX */
@@ -8823,8 +8615,6 @@ void msx2_state::fsa1fx(machine_config &config)
 	msx_tc8566af(config);
 	msx_1_35_dd_drive(config);
 	msx2plus_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2+ - Panasonic FS-A1WSX */
@@ -8871,8 +8661,6 @@ void msx2_state::fsa1wsx(machine_config &config)
 	msx_tc8566af(config);
 	msx_1_35_dd_drive(config);
 	msx2plus_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2+ - Panasonic FS-A1WX */
@@ -8919,8 +8707,6 @@ void msx2_state::fsa1wx(machine_config &config)
 	msx_tc8566af(config);
 	msx_1_35_dd_drive(config);
 	msx2plus_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2+ - Panasonic FS-A1WX (a) */
@@ -8965,8 +8751,6 @@ void msx2_state::fsa1wxa(machine_config &config)
 	msx_tc8566af(config);
 	msx_1_35_dd_drive(config);
 	msx2plus_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2+ - Sanyo Wavy PHC-35J */
@@ -8996,8 +8780,6 @@ void msx2_state::phc35j(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 1, 1, 2, "maincpu", 0xc000);
 
 	MSX_SYSTEMFLAGS(config, "sysflags", m_maincpu, 0xff);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2+ - Sanyo Wavy PHC-70FD1 */
@@ -9040,8 +8822,6 @@ void msx2_state::phc70fd(machine_config &config)
 	msx_tc8566af(config);
 	msx_1_35_dd_drive(config);
 	msx2plus_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2+ - Sanyo Wavy PHC-70FD2 */
@@ -9083,8 +8863,6 @@ void msx2_state::phc70fd2(machine_config &config)
 	msx_tc8566af(config);
 	msx_2_35_dd_drive(config);
 	msx2plus_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2+ - Sony HB-F1XDJ */
@@ -9130,8 +8908,6 @@ void msx2_state::hbf1xdj(machine_config &config)
 	msx_wd2793(config);
 	msx_1_35_dd_drive(config);
 	msx2plus_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2+ - Sony HB-F1XV */
@@ -9177,8 +8953,6 @@ void msx2_state::hbf1xv(machine_config &config)
 	msx_wd2793(config);
 	msx_1_35_dd_drive(config);
 	msx2plus_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX2+ - Sony HB-F9S+ */
@@ -9207,8 +8981,6 @@ void msx2_state::hbf9sp(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x10000);   /* 64KB?? Mapper RAM */
 
 	MSX_SYSTEMFLAGS(config, "sysflags", m_maincpu, 0x00);
-
-	msx2_cartlist(config);
 }
 
 /* MSX Turbo-R - Panasonic FS-A1GT */
@@ -9252,8 +9024,6 @@ void msx2_state::fsa1gt(machine_config &config)
 	msx_tc8566af(config);
 	msx_1_35_dd_drive(config);
 	msxr_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 /* MSX Turbo-R - Panasonic FS-A1ST */
@@ -9296,8 +9066,6 @@ void msx2_state::fsa1st(machine_config &config)
 	msx_tc8566af(config);
 	msx_1_35_dd_drive(config);
 	msxr_floplist(config);
-
-	msx2_cartlist(config);
 }
 
 } // anonymous namespace
