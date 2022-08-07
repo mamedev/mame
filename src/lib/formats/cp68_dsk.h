@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
-// copyright-holders:Barry Rodewald
+// copyright-holders:Barry Rodewald, Michael R. Furman
 /*
  * cp68_dsk.h
  *
- *  Created on: 24/06/2014
+ *  Created on: 02/08/2022
  */
 #ifndef MAME_FORMATS_CP68_DSK_H
 #define MAME_FORMATS_CP68_DSK_H
@@ -24,23 +24,6 @@ public:
 	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
 	virtual int find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
 	virtual const wd177x_format::format &get_track_format(const format &f, int head, int track) const override;
-
-private:
-	struct sysinfo_sector_cp68
-	{
-		uint8_t unused1[122]{};
-		uint8_t link_start_track = 0;
-		uint8_t link_start_sector = 0;
-		uint8_t link_end_track = 0;
-		uint8_t link_end_sector = 0;
-		uint8_t fc_start_track = 0;
-		uint8_t fc_start_sector = 0;
-	};
-
-	static const format formats[];
-	static const format formats_head1[];
-	static const format formats_track0[];
-	static const format formats_head1_track0[];
 };
 
 extern const cp68_format FLOPPY_CP68_FORMAT;

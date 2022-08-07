@@ -1,11 +1,12 @@
-// license:BSD-3-Clause copyright-holders:Barry Rodewald, 68bit
+// license:BSD-3-Clause copyright-holders:Barry Rodewald, 68bit, Michael R. Furman
 /*
- * cp68_dsk.c  -  CP68 compatible disk images
+ * cp68_dsk.cpp  -  CP68 compatible disk images
  *
  *  Created on: 02/08/2022
  *
  * This CP68 floppy disk image support leverages the wd177x_format support with
- * the few differences handled by format variations.
+ * the few differences handled by format variations.  This format is based off
+ * flex_dsk.cpp with the necessary changes for the CP/68 disk format.
  *
  * The CP68 Disk format is as follows:
  *
@@ -50,8 +51,30 @@
 
 #include "ioprocs.h"
 
+namespace
+{
+	class cp68_formats : public wd177x_format
+	{
+	public:
+		struct sysinfo_sector_cp68
+		{
+			uint8_t unused1[122]{};
+			uint8_t link_start_track = 0;
+			uint8_t link_start_sector = 0;
+			uint8_t link_end_track = 0;
+			uint8_t link_end_sector = 0;
+			uint8_t fc_start_track = 0;
+			uint8_t fc_start_sector = 0;
+		};
 
-cp68_format::cp68_format() : wd177x_format(formats)
+		static const format formats[];
+		static const format formats_head1[];
+		static const format formats_track0[];
+		static const format formats_head1_track0[];
+	};
+}
+
+cp68_format::cp68_format() : wd177x_format(cp68_formats::formats)
 {
 }
 
@@ -62,7 +85,7 @@ const char *cp68_format::name() const
 
 const char *cp68_format::description() const
 {
-	return "CP68 compatible disk image";
+	return "CP/68 compatible disk image";
 }
 
 const char *cp68_format::extensions() const
@@ -87,11 +110,14 @@ int cp68_format::find_size(util::random_read &io, uint32_t form_factor, const st
 		return -1;
 
 	uint8_t boot0[128];
-	sysinfo_sector_cp68 info;
+	cp68_formats::sysinfo_sector_cp68 info;
 	size_t actual;
+	std::error_condition ec;
 
 	// Look at the boot sector.
-	io.read_at(128 * 0, &boot0, sizeof(boot0), actual);
+	ec = io.read_at(128 * 0, &boot0, sizeof(boot0), actual);
+	if (ec || actual == 0)
+		return -1;
 	uint8_t boot0_sector_id = 1;
 	//  uint8_t boot1_sector_id = 2;
 
@@ -105,11 +131,13 @@ int cp68_format::find_size(util::random_read &io, uint32_t form_factor, const st
 		boot0_sector_id = 0;
 	}
 
-	for (int i=0; formats[i].form_factor; i++) {
-		const format &f = formats[i];
+	for (int i=0; cp68_formats::formats[i].form_factor; i++) {
+		const format &f = cp68_formats::formats[i];
 		
 		// Look at the system information sector.
-		io.read_at(f.sector_base_size * 2, &info, sizeof(struct sysinfo_sector_cp68), actual);
+		ec = io.read_at(f.sector_base_size * 2, &info, sizeof(struct cp68_formats::sysinfo_sector_cp68), actual);
+		if (ec || actual == 0)
+			continue;
 
 		LOG_FORMATS("CP68 floppy dsk: size %d bytes, %d total sectors, %d remaining bytes, expected form factor %x\n", (uint32_t)size, (uint32_t)size / f.sector_base_size, (uint32_t)size % f.sector_base_size, form_factor);
 
@@ -144,7 +172,7 @@ int cp68_format::find_size(util::random_read &io, uint32_t form_factor, const st
 			continue;
 
 		// Check that the boot sector ID matches.
-		const format &ft0 = formats_track0[i];
+		const format &ft0 = cp68_formats::formats_track0[i];
 		if (ft0.form_factor) {
 			// There is a specialized track 0 format.
 			if (ft0.sector_base_id == -1) {
@@ -175,8 +203,8 @@ const wd177x_format::format &cp68_format::get_track_format(const format &f, int 
 {
 	int n = -1;
 
-	for (int i = 0; formats[i].form_factor; i++) {
-		if (&formats[i] == &f) {
+	for (int i = 0; cp68_formats::formats[i].form_factor; i++) {
+		if (&cp68_formats::formats[i] == &f) {
 			n = i;
 			break;
 		}
@@ -199,7 +227,7 @@ const wd177x_format::format &cp68_format::get_track_format(const format &f, int 
 
 	if (track > 0) {
 		if (head == 1) {
-			const format &fh1 = formats_head1[n];
+			const format &fh1 = cp68_formats::formats_head1[n];
 			if (!fh1.form_factor) {
 				LOG_FORMATS("Error expected a head 1 format\n");
 				return f;
@@ -212,11 +240,11 @@ const wd177x_format::format &cp68_format::get_track_format(const format &f, int 
 	// Track 0
 
 	if (head == 1) {
-		const format &fh1t0 = formats_head1_track0[n];
+		const format &fh1t0 = cp68_formats::formats_head1_track0[n];
 		if (fh1t0.form_factor) {
 			return fh1t0;
 		}
-		const format &fh1 = formats_head1[n];
+		const format &fh1 = cp68_formats::formats_head1[n];
 		if (fh1.form_factor) {
 			return fh1;
 		}
@@ -226,7 +254,7 @@ const wd177x_format::format &cp68_format::get_track_format(const format &f, int 
 
 	// Head 0
 
-	const format &ft0 = formats_track0[n];
+	const format &ft0 = cp68_formats::formats_track0[n];
 	if (ft0.form_factor) {
 		return ft0;
 	}
@@ -235,7 +263,7 @@ const wd177x_format::format &cp68_format::get_track_format(const format &f, int 
 }
 
 
-const cp68_format::format cp68_format::formats[] = {
+const cp68_formats::format cp68_formats::formats[] = {
 	{ // 0 87.5K 5 1/4 inch single density cp68 1.0 format three boot sectors
 		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
 		4000, 18, 35, 1, 128, {}, -1, {1, 6, 11, 16, 3, 8, 13, 18, 5, 10, 15, 2, 7, 12, 17, 4, 9, 14}, 8, 11, 11
@@ -243,13 +271,13 @@ const cp68_format::format cp68_format::formats[] = {
 	{}
 };
 
-const cp68_format::format cp68_format::formats_head1[] = {
+const cp68_formats::format cp68_formats::formats_head1[] = {
 	{ // 0 87.5K 5 1/4 inch single density cp68 1.0 format three boot sectors
 	},
 	{}
 };
 
-const cp68_format::format cp68_format::formats_track0[] = {
+const cp68_formats::format cp68_formats::formats_track0[] = {
 	{ // 0 87.5K 5 1/4 inch single density cp68 1.0 format three boot sectors
 		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
 		4000, 18, 35, 1, 128, {}, -1, {0, 6, 11, 16, 2, 8, 13, 18, 5, 10, 15, 1, 7, 12, 17, 4, 9, 14}, 8, 11, 11
@@ -257,7 +285,7 @@ const cp68_format::format cp68_format::formats_track0[] = {
 	{}
 };
 
-const cp68_format::format cp68_format::formats_head1_track0[] = {
+const cp68_formats::format cp68_formats::formats_head1_track0[] = {
 	{ // 0 87.5K 5 1/4 inch single density cp68 1.0 format three boot sectors
 	},
 	{}

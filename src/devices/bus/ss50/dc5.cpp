@@ -31,10 +31,10 @@
 #include "dc5.h"
 #include "machine/wd_fdc.h"
 #include "imagedev/floppy.h"
+#include "formats/cp68_dsk.h"
 #include "formats/flex_dsk.h"
 #include "formats/os9_dsk.h"
 #include "formats/uniflex_dsk.h"
-#include "formats/cp68_dsk.h"
 
 class ss50_dc5_device : public device_t, public ss50_card_interface
 {
