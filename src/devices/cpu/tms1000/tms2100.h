@@ -72,11 +72,20 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_clock_changed() override { reset_prescaler(); }
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual u8 read_k_input() override;
+	virtual void read_opcode() override;
+	void interrupt();
+	TIMER_CALLBACK_MEMBER(prescaler_timeout);
+	void reset_prescaler();
 
+	virtual u8 read_k_input() override;
+	virtual void write_r_output(u32 data) override;
+
+	virtual void op_call() override;
+	virtual void op_retn() override;
 	virtual void op_tax() override;
 	virtual void op_tra() override;
 	virtual void op_tac() override;
@@ -84,8 +93,26 @@ protected:
 	virtual void op_tadm() override;
 	virtual void op_tma() override;
 
+	emu_timer *m_prescaler;
+
+	// internal state
 	u8 m_ac2;           // 4-bit storage register, or R0-R3 output latch
-	u8 m_ivr;           // initial value register
+	u8 m_ivr;           // 8-bit initial value register
+	u8 m_dec;           // 8-bit decrementer counter
+	u8 m_il;            // interrupt latch(es)
+	bool m_int_pending;
+	u32 m_r_prev;
+
+	// interrupt stack
+	u8 m_pb_save;
+	u8 m_cb_save;
+	u8 m_a_save;
+	u8 m_ac2_save;
+	u8 m_x_save;
+	u8 m_y_save;
+	u8 m_s_save;
+	u8 m_sl_save;
+	u8 m_o_save;
 };
 
 class tms2170_cpu_device : public tms2100_cpu_device

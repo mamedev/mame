@@ -55,7 +55,7 @@ TODO:
 - tithermos temperature sensor comparator (right now just the digital clock works)
 - is alphie(patent) the same as the final version?
 - is starwbcp the same as MP3438? (starwbc is MP3438A)
-- tgpachi is not working: incomplete MCU emulation, no SVG
+- add SVG for tgpachi
 
 ============================================================================
 
@@ -14269,7 +14269,7 @@ ROM_END
   * PCB label: TOFL003
   * TMS2670 M95041 (die label: TMS2400, M95041, 40H-01D-ND02-PHI0032-TTL O300-R300)
   * TMS1024 I/O expander
-  * cyan/red/green VFD display NEC FIP9AM31T no. 21-84, 2-bit sound
+  * cyan/red/green VFD display NEC FIP9AM31T no. 21-84, 1-bit sound
 
 ***************************************************************************/
 
@@ -14309,6 +14309,9 @@ void tgpachi_state::expander_w(offs_t offset, u8 data)
 
 void tgpachi_state::write_r(u32 data)
 {
+	// R13: speaker out
+	m_speaker->level_w(BIT(data, 13));
+
 	// R9,R10: TMS1024 S0,S1 (S2 forced high)
 	// R8: TMS1024 STD
 	m_expander->write_s((data >> 9 & 3) | 4);
@@ -14319,8 +14322,6 @@ void tgpachi_state::write_r(u32 data)
 	m_grid = data & 0xff;
 	m_plate = (m_plate & 0xfffff) | (BIT(data, 11) << 20);
 	update_display();
-
-	// R13,R14: speaker out
 }
 
 void tgpachi_state::write_o(u16 data)
@@ -14341,6 +14342,12 @@ static INPUT_PORTS_START( tgpachi )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // Slot
+
+	PORT_START("IN.1") // J
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x08, 0x00, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x08, "2" )
 INPUT_PORTS_END
 
 void tgpachi_state::tgpachi(machine_config &config)
@@ -14348,6 +14355,7 @@ void tgpachi_state::tgpachi(machine_config &config)
 	// basic machine hardware
 	TMS2670(config, m_maincpu, 450000); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->read_k().set_ioport("IN.0");
+	m_maincpu->read_j().set_ioport("IN.1");
 	m_maincpu->write_r().set(FUNC(tgpachi_state::write_r));
 	m_maincpu->write_o().set(FUNC(tgpachi_state::write_o));
 
