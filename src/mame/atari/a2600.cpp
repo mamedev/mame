@@ -851,5 +851,5 @@ GAME( 198?, a2600_pop, 0,      a2600_pop, a2600_pop, a2600_pop_state, empty_init
 
 // Clones
 CONS( 199?, tvboy,   0,     0,      tvboy,   tvboy, tvboy_state,  empty_init, "Systema?", "TV Boy (PAL)",       MACHINE_SUPPORTS_SAVE ) // It's unknown what unit this came from. It could be Akor instead?
-CONS( 199?, tvboyii, 0,     0,      tvboy,   tvboy, tvboy_state,  empty_init, "Systema",  "TV Boy II (PAL)",    MACHINE_SUPPORTS_SAVE )
+CONS( 199?, tvboyii, tvboy, 0,      tvboy,   tvboy, tvboy_state,  empty_init, "Systema",  "TV Boy II (PAL)",    MACHINE_SUPPORTS_SAVE )
 CONS( 1995, stvboy,  0,     0,      tvboy,   tvboy, tvboy_state,  empty_init, "Akor",     "Super TV Boy (PAL)", MACHINE_SUPPORTS_SAVE )
