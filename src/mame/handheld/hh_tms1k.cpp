@@ -117,7 +117,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP2110   TMS1370   1980, Gakken Invader/Tandy Fire Away
  @MP2139   TMS1370   1981, Gakken Galaxy Invader 1000/Tandy Cosmic 1000 Fire Away
  @MP2726   TMS1040   1979, Tomy Break Up
- *MP2788   TMS1070?  1980, Bandai Flight Time (? note: VFD-capable)
+ *MP2788   TMS1040?  1980, Bandai Flight Time (? note: VFD-capable)
  @MP3005   TMS1730   1989, Tiger Copy Cat (model 7-522)
  @MP3200   TMS1000   1978, Parker Brothers Electronic Master Mind
  @MP3201   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750A)
@@ -14191,7 +14191,7 @@ void tdracula_state::write_r(u32 data)
 void tdracula_state::write_o(u16 data)
 {
 	// O0-O7: VFD plate
-	m_plate = (m_plate & ~0xff) | bitswap<8>(data,0,1,2,3,4,5,6,7);
+	m_plate = (m_plate & ~0xff) | data;
 	update_display();
 }
 
@@ -14253,7 +14253,7 @@ ROM_START( tdracula )
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
 	ROM_REGION( 557, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1400_tdracula_output.pla", 0, 557, CRC(52e2258e) SHA1(3dcbef72d2309aeb2375041522acd1a879b9e881) )
+	ROM_LOAD( "tms1400_tdracula_output.pla", 0, 557, CRC(54408672) SHA1(8fdc6910a27c22c1df2cadeb25c74118d5774481) )
 
 	ROM_REGION( 416612, "screen", 0)
 	ROM_LOAD( "tdracula.svg", 0, 416612, CRC(71b5e164) SHA1(357528d5df7433609931cd9f9a2e5d56fbd29774) )
@@ -14270,6 +14270,10 @@ ROM_END
   * TMS2670 M95041 (die label: TMS2400, M95041, 40H-01D-ND02-PHI0032-TTL O300-R300)
   * TMS1024 I/O expander
   * cyan/red/green VFD display NEC FIP9AM31T no. 21-84, 1-bit sound
+
+  Two versions are known, one with a red trigger button and blue slot button,
+  and one with a blue trigger button and red slot button. The game itself is
+  assumed to be the same.
 
 ***************************************************************************/
 
