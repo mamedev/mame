@@ -200,7 +200,7 @@ license:CC0
 	</software>
 
 	<software name="pilewndra" cloneof="pilewndr">
-		<description>Pile Wonder (Alt)</description>
+		<description>Pile Wonder (alt)</description>
 		<year>1993</year>
 		<publisher>Commin</publisher>
 		<info name="serial" value="CB010/MD010" />
