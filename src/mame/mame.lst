@@ -285,6 +285,7 @@ a2600                           // Atari 2600
 a2600p                          // Atari 2600 PAL
 a2600_pop                       // Atari 2600 Point of Purchase Display
 stvboy
+tvboy                           //
 tvboyii                         //
 
 @source:robotron/a5105.cpp

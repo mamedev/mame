@@ -12,9 +12,11 @@ TODO:
   Systema TV Boy
 
 TODO:
-- The TV-boy II and Super TV-Boy units did not have joystick ports but a builtin D-pad
-- Find, dump and add the other devices (TV Boy, Super TV Boy)
-- Add NTSC variant
+- The TV Boy II and Super TV Boy units did not have joystick ports but a builtin D-pad
+- Find, dump and add the other variants. There are many. Systema and Akor released PAL TV Boys.
+  NICS released NTSC TV Boys in the US and Japan. The US NICS unit is also seen with the name Mega-Game.
+  Mega Boy WS-11 is another rebranded model.
+  There's also the TV Boy 3, Portable Walkiecom PTG-2600, Compact Master Boy, Game Link 2001, etc.
 
 
   Atari A2600 Point of Purchase Display Unit
@@ -258,7 +260,7 @@ public:
 		, m_rom(*this, "mainrom")
 	{ }
 
-	void tvboyii(machine_config &config);
+	void tvboy(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -267,7 +269,6 @@ protected:
 private:
 	void bank_write(offs_t offset, uint8_t data);
 
-	void rom_map(address_map &map);
 	void tvboy_mem(address_map &map);
 
 	required_memory_bank m_crom;
@@ -569,6 +570,15 @@ static INPUT_PORTS_START(a2600_pop)
 	PORT_DIPSETTING(0x08, "Infinite")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( tvboy )
+	PORT_INCLUDE( a2600 )
+
+	PORT_MODIFY("SWB")
+	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) // No TV Type switch, hard coded to Color
+	PORT_BIT ( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED ) // No Left Diff. switch, hard coded to B
+	PORT_BIT ( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) // No Right Diff. switch, hard coded to B
+INPUT_PORTS_END
+
 
 static void a2600_cart(device_slot_interface &device)
 {
@@ -715,7 +725,7 @@ void a2600_pop_state::a2600_pop(machine_config &config)
 }
 
 
-void tvboy_state::tvboyii(machine_config &config)
+void tvboy_state::tvboy(machine_config &config)
 {
 	a2600_base_pal(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tvboy_state::tvboy_mem);
@@ -802,10 +812,21 @@ ROM_START(a2600_pop)
 	// empty slots f1, j1, k1, l1, m1 ?
 ROM_END
 
+ROM_START(tvboy)
+	ROM_REGION(0x2000, "maincpu", ROMREGION_ERASEFF)
+
+	ROM_REGION(0x80000, "mainrom", 0)
+	ROM_LOAD("tvboy.bin", 0x00000, 0x80000, CRC(2f3d1d52) SHA1(fb26778434fade4cec28f82c53db4cc2f23b8b2b))
+ROM_END
+
 ROM_START(tvboyii)
 	ROM_REGION(0x2000, "maincpu", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x80000, "mainrom", 0)
+	// Games 57, 64, and 119 differ from tvboy with crc 2f3d1d52.
+	/* Game 29, Enduro, differs only in one LDA instruction at 0x179 (and then some shifted code).
+	   Here the LDA uses zero page while the original ROM and all other known versions use absolute addressing.
+	   Does this cause a timing issue? It appears bugged in MAME. Does it work on hardware? */
 	ROM_LOAD("hy23400p.bin", 0x00000, 0x80000, CRC(f8485173) SHA1(cafbaa0c5437f192cb4fb49f9a672846aa038870))
 ROM_END
 
@@ -813,13 +834,14 @@ ROM_START( stvboy )
 	ROM_REGION(0x2000, "maincpu", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x80000, "mainrom", 0)
+	// Only game 91 differs from tvboyii with crc f8485173. Otherwise the dumps are identical. Game 29, Enduro, has the same issue mentioned above.
 	ROM_LOAD("supertvboy.bin", 0x00000, 0x80000, CRC(af2e73e8) SHA1(04b9ddc3b30b0e5b81b9f868d455e902a0151491))
 ROM_END
 
 } // anonymous namespace
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY     FULLNAME */
-CONS( 1977, a2600,  0,      0,      a2600,   a2600, a2600_state,  empty_init, "Atari",    "Atari 2600 (NTSC)" , MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY     FULLNAME
+CONS( 1977, a2600,  0,      0,      a2600,   a2600, a2600_state,  empty_init, "Atari",    "Atari 2600 (NTSC)",  MACHINE_SUPPORTS_SAVE )
 CONS( 1978, a2600p, a2600,  0,      a2600p,  a2600, a2600p_state, empty_init, "Atari",    "Atari 2600 (PAL)",   MACHINE_SUPPORTS_SAVE )
 
 // Released in 1981/1982
@@ -828,5 +850,6 @@ CONS( 1978, a2600p, a2600,  0,      a2600p,  a2600, a2600p_state, empty_init, "A
 GAME( 198?, a2600_pop, 0,      a2600_pop, a2600_pop, a2600_pop_state, empty_init, ROT0, "Atari",    "Atari 2600 Point of Purchase Display",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 // Clones
-CONS( 199?, tvboyii, 0,      0,      tvboyii, a2600, tvboy_state, empty_init, "Systema", "TV Boy II (PAL)" ,    MACHINE_SUPPORTS_SAVE )
-CONS( 1995, stvboy,  0,      0,      tvboyii, a2600, tvboy_state, empty_init, "Akor",    "Super TV Boy (PAL)" , MACHINE_SUPPORTS_SAVE )
+CONS( 199?, tvboy,   0,     0,      tvboy,   tvboy, tvboy_state,  empty_init, "Systema?", "TV Boy (PAL)",       MACHINE_SUPPORTS_SAVE ) // It's unknown what unit this came from. It could be Akor instead?
+CONS( 199?, tvboyii, tvboy, 0,      tvboy,   tvboy, tvboy_state,  empty_init, "Systema",  "TV Boy II (PAL)",    MACHINE_SUPPORTS_SAVE )
+CONS( 1995, stvboy,  0,     0,      tvboy,   tvboy, tvboy_state,  empty_init, "Akor",     "Super TV Boy (PAL)", MACHINE_SUPPORTS_SAVE )
