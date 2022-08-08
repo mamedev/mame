@@ -72,12 +72,12 @@ void tsconf_state::tsconf_update_bank0()
 
 	if (W0_RAM)
 	{
-		m_banks[0]->set_entry(page0);
+		m_bank_ram[0]->set_entry(page0);
 		m_bank0_rom.disable();
 	}
 	else
 	{
-		m_banks[4]->set_entry(page0 & 0x1f);
+		m_bank_rom[0]->set_entry(page0 & 0x1f);
 		m_bank0_rom.select(0);
 	}
 }
@@ -508,15 +508,15 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 		break;
 
 	case PAGE1:
-		m_banks[1]->set_entry(data);
+		m_bank_ram[1]->set_entry(data);
 		break;
 
 	case PAGE2:
-		m_banks[2]->set_entry(data);
+		m_bank_ram[2]->set_entry(data);
 		break;
 
 	case PAGE3:
-		m_banks[3]->set_entry(data);
+		m_bank_ram[3]->set_entry(data);
 		break;
 
 	case DMAS_ADDRESS_L:
@@ -811,30 +811,32 @@ TIMER_CALLBACK_MEMBER(tsconf_state::irq_scanline)
 
 u8 tsconf_state::beta_neutral_r(offs_t offset)
 {
-	return m_program->read_byte(offset);
+	return m_program.read_byte(offset);
 }
 
 u8 tsconf_state::beta_enable_r(offs_t offset)
 {
-	if (!W0_RAM && m_banks[4]->entry() == 3)
-	{
-		if (m_beta->started() /*&& !m_beta->is_active()*/)
+	if (!(machine().side_effects_disabled())) {
+		if (!W0_RAM && m_bank_rom[0]->entry() == 3)
 		{
-			m_beta->enable();
-			tsconf_update_bank0();
+			if (m_beta->started() && !m_beta->is_active())
+			{
+				m_beta->enable();
+				tsconf_update_bank0();
+			}
 		}
 	}
-
-	return m_program->read_byte(offset + 0x3d00);
+	return m_program.read_byte(offset + 0x3d00);
 }
 
 u8 tsconf_state::beta_disable_r(offs_t offset)
 {
-	if (m_beta->started() && m_beta->is_active())
-	{
-		m_beta->disable();
-		tsconf_update_bank0();
+	if (!(machine().side_effects_disabled())) {
+		if (m_beta->started() && m_beta->is_active())
+		{
+			m_beta->disable();
+			tsconf_update_bank0();
+		}
 	}
-
-	return m_program->read_byte(offset + 0x4000);
+	return m_program.read_byte(offset + 0x4000);
 }
