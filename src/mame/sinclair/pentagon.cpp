@@ -46,6 +46,7 @@ private:
 	void pentagon_switch(address_map &map);
 	void pentagon_update_memory();
 
+	bool m_pent1024_ext_memory = false;
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 	required_device<beta_disk_device> m_beta;
 };
@@ -56,19 +57,12 @@ void pentagon_state::pentagon_update_memory()
 	m_screen_location = m_ram->pointer() + ((BIT(m_port_7ffd_data, 3) ? 7 : 5) << 14);
 
 	m_bank_ram[3]->set_entry(m_port_7ffd_data & 0x07);
-	if (strcmp(machine().system().name, "pent1024") == 0)
+	if (m_pent1024_ext_memory)
 		// currently 512Kb ram expansion supported
 		m_bank_ram[3]->set_entry(m_bank_ram[3]->entry() | ((m_port_7ffd_data & 0xc0) >> 3));
 
 	if (m_beta->started() && m_beta->is_active() && !BIT(m_port_7ffd_data, 4))
-	{
-		/* GLUK */
-		m_bank_rom[0]->set_entry(
-			strcmp(machine().system().name, "pent1024") == 0
-			? 2
-			: BIT(m_port_7ffd_data, 4)
-		);
-	}
+		m_bank_rom[0]->set_entry(m_pent1024_ext_memory ? 2 /* GLUK */ : BIT(m_port_7ffd_data, 4));
 	else
 		/* ROM switching */
 		m_bank_rom[0]->set_entry(BIT(m_port_7ffd_data, 4));
@@ -156,13 +150,13 @@ void pentagon_state::machine_start()
 	m_bank_rom[0]->configure_entries(3, 1, memregion("beta:beta")->base(), 0x4000);
 	m_maincpu->space(AS_PROGRAM).specific(m_program);
 
-	if(strcmp(machine().system().name, "pent1024") == 0)
+	if(m_pent1024_ext_memory)
 		m_bank_rom[0]->configure_entries(2, 1, memregion("maincpu")->base() + 0x18000, 0x4000);
 }
 
 void pentagon_state::machine_reset()
 {
-	if (m_beta->started() && strcmp(machine().system().name, "pent1024") == 0)
+	if (m_beta->started() && m_pent1024_ext_memory)
 		m_beta->enable();
 
 	m_port_7ffd_data = 0;
@@ -195,6 +189,7 @@ GFXDECODE_END
 void pentagon_state::pentagon(machine_config &config)
 {
 	spectrum_128(config);
+	m_pent1024_ext_memory = false;
 
 	m_maincpu->set_clock(14_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pentagon_state::pentagon_mem);
@@ -227,6 +222,7 @@ void pentagon_state::pent1024(machine_config &config)
 {
 	pentagon(config);
 	/* internal ram */
+	m_pent1024_ext_memory = true;
 	m_ram->set_default_size("1024K");
 }
 
