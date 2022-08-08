@@ -21,10 +21,6 @@ class pentagon_state : public spectrum_128_state
 public:
 	pentagon_state(const machine_config &mconfig, device_type type, const char *tag)
 		: spectrum_128_state(mconfig, type, tag)
-		, m_bank1(*this, "bank1")
-		, m_bank2(*this, "bank2")
-		, m_bank3(*this, "bank3")
-		, m_bank4(*this, "bank4")
 		, m_beta(*this, BETA_DISK_TAG)
 	{ }
 
@@ -39,85 +35,53 @@ protected:
 private:
 	rectangle get_screen_area() override;
 
-	void pentagon_port_7ffd_w(uint8_t data);
-	void pentagon_scr_w(offs_t offset, uint8_t data);
-	void pentagon_scr2_w(offs_t offset, uint8_t data);
-	uint8_t beta_neutral_r(offs_t offset);
-	uint8_t beta_enable_r(offs_t offset);
-	uint8_t beta_disable_r(offs_t offset);
+	u8 beta_neutral_r(offs_t offset);
+	u8 beta_enable_r(offs_t offset);
+	u8 beta_disable_r(offs_t offset);
 	INTERRUPT_GEN_MEMBER(pentagon_interrupt);
+	void port_7ffd_w(offs_t offset, u8 data);
+
 	void pentagon_io(address_map &map);
 	void pentagon_mem(address_map &map);
 	void pentagon_switch(address_map &map);
-
 	void pentagon_update_memory();
 
-	required_memory_bank m_bank1;
-	required_memory_bank m_bank2;
-	required_memory_bank m_bank3;
-	required_memory_bank m_bank4;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 	required_device<beta_disk_device> m_beta;
-
-	address_space *m_program;
-	uint8_t *m_p_ram;
-	uint16_t m_rom_selection;
 };
 
 void pentagon_state::pentagon_update_memory()
 {
-	uint8_t *messram = m_ram->pointer();
-	m_screen_location = messram + ((m_port_7ffd_data & 8) ? (7<<14) : (5<<14));
+	m_screen->update_now();
+	m_screen_location = m_ram->pointer() + ((BIT(m_port_7ffd_data, 3) ? 7 : 5) << 14);
 
-	if (strcmp(machine().system().name, "pent1024") != 0)
-		m_bank4->set_base(messram + ((m_port_7ffd_data & 0x07) * 0x4000));
-	else
+	m_bank_ram[3]->set_entry(m_port_7ffd_data & 0x07);
+	if (strcmp(machine().system().name, "pent1024") == 0)
 		// currently 512Kb ram expansion supported
-		m_bank4->set_base(messram + (((m_port_7ffd_data & 0x07) | ((m_port_7ffd_data & 0xc0) >> 3)) * 0x4000));
+		m_bank_ram[3]->set_entry(m_bank_ram[3]->entry() | ((m_port_7ffd_data & 0xc0) >> 3));
 
-	if (m_beta->started() && m_beta->is_active() && !( m_port_7ffd_data & 0x10 ) )
+	if (m_beta->started() && m_beta->is_active() && !BIT(m_port_7ffd_data, 4))
 	{
 		/* GLUK */
-		if (strcmp(machine().system().name, "pent1024")==0)
-			m_rom_selection = 2;
-		else
-			m_rom_selection = BIT(m_port_7ffd_data, 4);
+		m_bank_rom[0]->set_entry(
+			strcmp(machine().system().name, "pent1024") == 0
+			? 2
+			: BIT(m_port_7ffd_data, 4)
+		);
 	}
 	else
 		/* ROM switching */
-		m_rom_selection = BIT(m_port_7ffd_data, 4);
-
-	/* rom 0 is 128K rom, rom 1 is 48 BASIC */
-	m_bank1->set_base(&m_p_ram[0x10000 + (m_rom_selection<<14)]);
+		m_bank_rom[0]->set_entry(BIT(m_port_7ffd_data, 4));
 }
 
-void pentagon_state::pentagon_port_7ffd_w(uint8_t data)
+void pentagon_state::port_7ffd_w(offs_t offset, u8 data)
 {
 	/* disable paging */
 	if (m_port_7ffd_data & 0x20)
 		return;
 
-	if ((m_port_7ffd_data ^ data) & 0x08)
-		m_screen->update_now();
-
-	/* store new state */
 	m_port_7ffd_data = data;
-
-	/* update memory */
 	pentagon_update_memory();
-}
-
-void pentagon_state::pentagon_scr_w(offs_t offset, uint8_t data)
-{
-	m_screen->update_now();
-	*((uint8_t*)m_bank2->base() + offset) = data;
-}
-
-void pentagon_state::pentagon_scr2_w(offs_t offset, uint8_t data)
-{
-	if ((m_port_7ffd_data & 0x0f) == 0x0f || (m_port_7ffd_data & 0x0f) == 5)
-		m_screen->update_now();
-
-	*((uint8_t*)m_bank4->base() + offset) = data;
 }
 
 rectangle pentagon_state::get_screen_area()
@@ -127,54 +91,48 @@ rectangle pentagon_state::get_screen_area()
 
 INTERRUPT_GEN_MEMBER(pentagon_state::pentagon_interrupt)
 {
-	m_irq_on_timer->adjust(m_screen->time_until_pos(0) + /*???*/ m_maincpu->clocks_to_attotime(3));
+	m_irq_on_timer->adjust(m_maincpu->clocks_to_attotime(3));
 }
 
-uint8_t pentagon_state::beta_neutral_r(offs_t offset)
+u8 pentagon_state::beta_neutral_r(offs_t offset)
 {
-	return m_program->read_byte(offset);
+	return m_program.read_byte(offset);
 }
 
-uint8_t pentagon_state::beta_enable_r(offs_t offset)
+u8 pentagon_state::beta_enable_r(offs_t offset)
 {
 	if (!(machine().side_effects_disabled())) {
-		if (m_rom_selection == 1) {
-			m_rom_selection = 3;
-			if (m_beta->started()) {
-				m_beta->enable();
-				m_bank1->set_base(memregion("beta:beta")->base());
-			}
+		if (m_beta->started() && m_bank_rom[0]->entry() == 1) {
+			m_beta->enable();
+			m_bank_rom[0]->set_entry(3);
 		}
 	}
-
-	return m_program->read_byte(offset + 0x3d00);
+	return m_program.read_byte(offset + 0x3d00);
 }
 
-uint8_t pentagon_state::beta_disable_r(offs_t offset)
+u8 pentagon_state::beta_disable_r(offs_t offset)
 {
 	if (!(machine().side_effects_disabled())) {
 		if (m_beta->started() && m_beta->is_active()) {
-			m_rom_selection = BIT(m_port_7ffd_data, 4);
 			m_beta->disable();
-			m_bank1->set_base(&m_p_ram[0x10000 + (m_rom_selection << 14)]);
+			m_bank_rom[0]->set_entry(BIT(m_port_7ffd_data, 4));
 		}
 	}
-
-	return m_program->read_byte(offset + 0x4000);
+	return m_program.read_byte(offset + 0x4000);
 }
 
 void pentagon_state::pentagon_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).bankr("bank1");
-	map(0x4000, 0x7fff).bankrw("bank2");
-	map(0x8000, 0xbfff).bankrw("bank3");
-	map(0xc000, 0xffff).bankrw("bank4");
+	map(0x0000, 0x3fff).bankr(m_bank_rom[0]);
+	map(0x4000, 0x7fff).bankr(m_bank_ram[1]).w(FUNC(pentagon_state::spectrum_128_ram_w<1>));
+	map(0x8000, 0xbfff).bankrw(m_bank_ram[2]);
+	map(0xc000, 0xffff).bankr(m_bank_ram[3]).w(FUNC(pentagon_state::spectrum_128_ram_w<3>));
 }
 
 void pentagon_state::pentagon_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x0000).mirror(0x7ffd).w(FUNC(pentagon_state::pentagon_port_7ffd_w));  // (A15 | A1) == 0
+	map(0x0000, 0x0000).mirror(0x7ffd).w(FUNC(pentagon_state::port_7ffd_w));  // (A15 | A1) == 0
 	map(0x001f, 0x001f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::status_r), FUNC(beta_disk_device::command_w));
 	map(0x003f, 0x003f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::track_r), FUNC(beta_disk_device::track_w));
 	map(0x005f, 0x005f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::sector_r), FUNC(beta_disk_device::sector_w));
@@ -195,33 +153,17 @@ void pentagon_state::pentagon_switch(address_map &map)
 void pentagon_state::machine_start()
 {
 	spectrum_128_state::machine_start();
+	m_bank_rom[0]->configure_entries(3, 1, memregion("beta:beta")->base(), 0x4000);
+	m_maincpu->space(AS_PROGRAM).specific(m_program);
 
-	m_rom_selection = 0;
-
-	save_item(NAME(m_rom_selection));
+	if(strcmp(machine().system().name, "pent1024") == 0)
+		m_bank_rom[0]->configure_entries(2, 1, memregion("maincpu")->base() + 0x18000, 0x4000);
 }
 
 void pentagon_state::machine_reset()
 {
-	uint8_t *messram = m_ram->pointer();
-	m_program = &m_maincpu->space(AS_PROGRAM);
-	m_p_ram = memregion("maincpu")->base();
-
-	m_program->install_write_handler(0x4000, 0x5aff, write8sm_delegate(*this, FUNC(pentagon_state::pentagon_scr_w)));
-	m_program->install_write_handler(0xc000, 0xdaff, write8sm_delegate(*this, FUNC(pentagon_state::pentagon_scr2_w)));
-
-	if (m_beta->started())
-	{
-		if (strcmp(machine().system().name, "pent1024")==0)
-			m_beta->enable();
-	}
-	memset(messram,0,128*1024);
-
-	/* Bank 5 is always in 0x4000 - 0x7fff */
-	m_bank2->set_base(messram + (5<<14));
-
-	/* Bank 2 is always in 0x8000 - 0xbfff */
-	m_bank3->set_base(messram + (2<<14));
+	if (m_beta->started() && strcmp(machine().system().name, "pent1024") == 0)
+		m_beta->enable();
 
 	m_port_7ffd_data = 0;
 	m_port_1ffd_data = -1;
@@ -236,33 +178,35 @@ void pentagon_state::video_start()
 
 static const gfx_layout spectrum_charlayout =
 {
-	8, 8,           /* 8 x 8 characters */
-	96,             /* 96 characters */
-	1,              /* 1 bits per pixel */
-	{ 0 },          /* no bitplanes */
-	{STEP8(0, 1)},  /* x offsets */
-	{STEP8(0, 8)},  /* y offsets */
-	8*8             /* every char takes 8 bytes */
+	8, 8,            // 8 x 8 characters
+	96,              // 96 characters
+	1,               // 1 bits per pixel
+	{ 0 },           // no bitplanes
+	{ STEP8(0, 1) }, // x offsets
+	{ STEP8(0, 8) }, // y offsets
+	8 * 8            // every char takes 8 bytes
 };
 
 static GFXDECODE_START( gfx_pentagon )
-	GFXDECODE_ENTRY( "maincpu", 0x17d00, spectrum_charlayout, 7, 8 )
+	GFXDECODE_ENTRY( "maincpu", 0x17d00, spectrum_charlayout, 7, 1 )
 GFXDECODE_END
 
 
 void pentagon_state::pentagon(machine_config &config)
 {
 	spectrum_128(config);
+
 	m_maincpu->set_clock(14_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pentagon_state::pentagon_mem);
 	m_maincpu->set_addrmap(AS_IO, &pentagon_state::pentagon_io);
 	m_maincpu->set_addrmap(AS_OPCODES, &pentagon_state::pentagon_switch);
 	m_maincpu->set_vblank_int("screen", FUNC(pentagon_state::pentagon_interrupt));
+	m_maincpu->nomreq_cb().set_nop();
 
 	m_screen->set_raw(14_MHz_XTAL / 2, 448, 320, {get_screen_area().left() - 48, get_screen_area().right() + 48, get_screen_area().top() - 48, get_screen_area().bottom() + 48});
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_pentagon);
 
 	BETA_DISK(config, m_beta, 0);
-	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_pentagon);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
