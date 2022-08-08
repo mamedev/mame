@@ -5,12 +5,10 @@ license:CC0
 -->
 <mamelayout version="2">
 	<element name="matrixlamp">
-		<rect state ="0">
-			<bounds x="0" y="0" width="7" height="7" />
+		<rect state="0">
 			<color red="0.7" green="0.7" blue="0.7" />
 		</rect>
-		<rect state ="1">
-			<bounds x="0" y="0" width="7" height="7" />
+		<rect state="1">
 			<color red="0.95" green="0.95" blue="0.43" />
 		</rect>
 	</element>
@@ -27,173 +25,139 @@ license:CC0
 	<element name="text_credits">
 		<text string="Credits">
 			<color red="1.0" green="1.0" blue="1.0"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="text_bonus">
 		<text string="Bonus">
 			<color red="1.0" green="1.0" blue="1.0"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_melon">
 		<text string="Melon" state="0">
 			<color red="0.25" green="0.25" blue="0.25"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 		<text string="Melon" state="1">
 			<color red="1.0" green="1.0" blue="1.0"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_pear">
 		<text string="Pear" state="0">
 			<color red="0.25" green="0.25" blue="0.25"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 		<text string="Pear" state="1">
 			<color red="1.0" green="1.0" blue="1.0"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_grapes">
 		<text string="Grapes" state="0">
 			<color red="0.25" green="0.25" blue="0.25"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 		<text string="Grapes" state="1">
 			<color red="1.0" green="1.0" blue="1.0"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_bell">
 		<text string="Bell" state="0">
 			<color red="0.25" green="0.25" blue="0.25"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 		<text string="Bell" state="1">
 			<color red="1.0" green="1.0" blue="1.0"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_plum">
 		<text string="Plum" state="0">
 			<color red="0.25" green="0.25" blue="0.25"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 		<text string="Plum" state="1">
 			<color red="1.0" green="1.0" blue="1.0"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_orange">
 		<text string="Orange" state="0">
 			<color red="0.25" green="0.25" blue="0.25"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 		<text string="Orange" state="1">
 			<color red="1.0" green="1.0" blue="1.0"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_lemon">
 		<text string="Lemon" state="0">
 			<color red="0.25" green="0.25" blue="0.25"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 		<text string="Lemon" state="1">
 			<color red="1.0" green="1.0" blue="1.0"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_arrow">
 		<text string="->" state="0">
 			<color red="0.25" green="0.25" blue="0.25"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 		<text string="->" state="1">
 			<color red="1.0" green="1.0" blue="1.0"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_5credits">
 		<text string="5 Credits" state="0">
 			<color red="0.25" green="0.25" blue="0.25"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 		<text string="5 Credits" state="1">
 			<color red="1.0" green="1.0" blue="1.0"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_10credits">
 		<text string="10 Credits" state="0">
 			<color red="0.25" green="0.25" blue="0.25"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 		<text string="10 Credits" state="1">
 			<color red="1.0" green="1.0" blue="1.0"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_20credits">
 		<text string="20 Credits" state="0">
 			<color red="0.25" green="0.25" blue="0.25"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 		<text string="20 Credits" state="1">
 			<color red="1.0" green="1.0" blue="1.0"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_4bonus">
 		<text string="4 Bonus Pts" state="0">
 			<color red="0.25" green="0.25" blue="0.25"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 		<text string="4 Bonus Pts" state="1">
 			<color red="1.0" green="1.0" blue="1.0"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_8bonus">
 		<text string="8 Bonus Pts" state="0">
 			<color red="0.25" green="0.25" blue="0.25"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 		<text string="8 Bonus Pts" state="1">
 			<color red="1.0" green="1.0" blue="1.0"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_16bonus">
 		<text string="16 Bonus Pts" state="0">
 			<color red="0.25" green="0.25" blue="0.25"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 		<text string="16 Bonus Pts" state="1">
 			<color red="1.0" green="1.0" blue="1.0"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_double">
 		<text string="Double" state="0">
 			<color red="0.25" green="0.25" blue="0.25"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 		<text string="Double" state="1">
 			<color red="1.0" green="1.0" blue="1.0"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_nothing">
 		<text string="Nothing" state="0">
 			<color red="0.25" green="0.25" blue="0.25"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 		<text string="Nothing" state="1">
 			<color red="1.0" green="1.0" blue="1.0"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="Reel 1">

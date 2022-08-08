@@ -4,12 +4,10 @@ license:CC0
 -->
 <mamelayout version="2">
 	<element name="matrixlamp">
-		<rect state ="0">
-			<bounds x="0" y="0" width="11" height="11" />
+		<rect state="0">
 			<color red="0.7" green="0.7" blue="0.7" />
 		</rect>
-		<rect state ="1">
-			<bounds x="0" y="0" width="11" height="11" />
+		<rect state="1">
 			<color red="0.95" green="0.95" blue="0.43" />
 		</rect>
 	</element>
