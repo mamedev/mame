@@ -2650,9 +2650,10 @@ void vs_dual_state::vsdual(machine_config &config)
 	m_ppu2->int_callback().set_inputline(m_subcpu, INPUT_LINE_NMI);
 
 	// sound hardware
-	SPEAKER(config, "mono").front_center();
-	maincpu.add_route(ALL_OUTPUTS, "mono", 0.50);
-	subcpu.add_route(ALL_OUTPUTS, "mono", 0.50);
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	maincpu.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	subcpu.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 }
 
 void vs_dual_state::vsdual_pi(machine_config &config)
@@ -2666,14 +2667,14 @@ void vs_dual_state::vsdual_pi(machine_config &config)
 
 void vs_smbbl_state::vs_smbbl(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M6502(config, m_maincpu, XTAL(16'000'000)/8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vs_smbbl_state::vsnes_cpu1_bootleg_map);
 
 	Z80(config, m_subcpu, XTAL(16'000'000)/8); // Z8400APS-Z80CPU
 	m_subcpu->set_addrmap(AS_PROGRAM, &vs_smbbl_state::vsnes_bootleg_z80_map);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen1(SCREEN(config, "screen1", SCREEN_TYPE_RASTER));
 	screen1.set_refresh_hz(56.69);
 	screen1.set_size(32*8, 280);
@@ -2686,7 +2687,7 @@ void vs_smbbl_state::vs_smbbl(machine_config &config)
 	m_ppu1->set_screen("screen1");
 	m_ppu1->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	SN76489(config, "sn1", XTAL(16'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.50); // one runs at 2 MHz, other runs at 4 MHz
