@@ -44521,26 +44521,6 @@ We should eventually add it to MAME as a separate driver with a NES CPU and a GB
 		</part>
 	</software>
 
-<!-- This might be the dump of the bios. Investigate... -->
-	<software name="myctv">
-		<description>My Computer TV C1 (Japan)</description>
-		<year>1983</year>
-		<publisher>Sharp</publisher>
-		<info name="alt_title" value="マイコンピュータテレビC1"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="nrom" />
-			<feature name="pcb" value="NES-NROM-128" />
-			<feature name="mirroring" value="horizontal" />
-			<dataarea name="chr" size="8192">
-				<rom name="my computer tv c1 (j).chr" size="8192" crc="9cba4524" sha1="2bd833f8049bf7a14ce337c3cde35f2140242a18" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="32768">
-				<rom name="my computer tv c1 (j).prg" size="16384" crc="7fd48dad" sha1="08af18a6d42e5ab2a288e347ab1fd4bc52441d71" offset="00000" status="baddump" />
-				<rom size="16384" offset="0x4000" loadflag="reload" />
-			</dataarea>
-		</part>
-	</software>
-
 <!-- from cah4e3 -->
 	<software name="kbtrans">
 		<description>Keyboard Transformer (Rus)</description>
