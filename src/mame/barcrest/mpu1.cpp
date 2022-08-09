@@ -510,9 +510,9 @@ ROM_END
 
 #define GAME_FLAGS MACHINE_NOT_WORKING|MACHINE_MECHANICAL|MACHINE_REQUIRES_ARTWORK|MACHINE_SUPPORTS_SAVE
 
-GAMEL(1978,  m_gndgit,  0,        mpu1, m_gndgit,  mpu1_state, empty_init, ROT0, "Barcrest", "Golden Nudge It (Barcrest) (MPU1) (5p Stake, £1 Jackpot)", GAME_FLAGS, layout_m_gndgit )
-GAMEL(1979,  m_mtchit,  0,        mpu1, m_mtchit,  mpu1_state, empty_init, ROT0, "Barcrest", "Match It (Barcrest) (MPU1) (5p Stake, £1 Jackpot)", GAME_FLAGS, layout_m_mtchit )
-GAMEL(1981,  m_mtchup,  0,        mpu1, m_mtchup,  mpu1_state, empty_init, ROT0, "Barcrest", "Match Up (Barcrest) (MPU1) (10p Stake, £2 Jackpot)", GAME_FLAGS, layout_m_mtchup )
-GAMEL(1980?, m_lndg,    0,        mpu1_lg, m_lndg,  mpu1_state, empty_init, ROT0, "Leisure Games", "Lucky Nudge (Leisure Games) (MPU1) (5p Stake, £1 Jackpot)", GAME_FLAGS, layout_m_lndg )
-GAMEL(1980?, m_bapple,  0,        mpu1_lg, m_lndg,  mpu1_state, empty_init, ROT0, "Leisure Games", "Big Apple (Leisure Games) (MPU1) (5p Stake, £1 Jackpot)", GAME_FLAGS, layout_m_bapple )
-GAMEL(1981?, m_bappl2,  0,        mpu1_lg, m_lndg,  mpu1_state, empty_init, ROT0, "Leisure Games", "Big Apple (Leisure Games) (MPU1) (5p Stake, £2 Jackpot)", GAME_FLAGS, layout_m_bappl2 ) // Remade version with different sounds etc.
+GAMEL(1978,  m_gndgit,  0,        mpu1, m_gndgit,  mpu1_state, empty_init, ROT0, "Barcrest", u8"Golden Nudge It (Barcrest) (MPU1) (5p Stake, £1 Jackpot)", GAME_FLAGS, layout_m_gndgit )
+GAMEL(1979,  m_mtchit,  0,        mpu1, m_mtchit,  mpu1_state, empty_init, ROT0, "Barcrest", u8"Match It (Barcrest) (MPU1) (5p Stake, £1 Jackpot)", GAME_FLAGS, layout_m_mtchit )
+GAMEL(1981,  m_mtchup,  0,        mpu1, m_mtchup,  mpu1_state, empty_init, ROT0, "Barcrest", u8"Match Up (Barcrest) (MPU1) (10p Stake, £2 Jackpot)", GAME_FLAGS, layout_m_mtchup )
+GAMEL(1980?, m_lndg,    0,        mpu1_lg, m_lndg,  mpu1_state, empty_init, ROT0, "Leisure Games", u8"Lucky Nudge (Leisure Games) (MPU1) (5p Stake, £1 Jackpot)", GAME_FLAGS, layout_m_lndg )
+GAMEL(1980?, m_bapple,  0,        mpu1_lg, m_lndg,  mpu1_state, empty_init, ROT0, "Leisure Games", u8"Big Apple (Leisure Games) (MPU1) (5p Stake, £1 Jackpot)", GAME_FLAGS, layout_m_bapple )
+GAMEL(1981?, m_bappl2,  0,        mpu1_lg, m_lndg,  mpu1_state, empty_init, ROT0, "Leisure Games", u8"Big Apple (Leisure Games) (MPU1) (5p Stake, £2 Jackpot)", GAME_FLAGS, layout_m_bappl2 ) // Remade version with different sounds etc.
