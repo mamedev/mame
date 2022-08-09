@@ -7776,10 +7776,10 @@ void galaxian_state::bmxstunts(machine_config &config)
 {
 	galaxian_base(config);
 
-	M6502(config.replace(), m_maincpu, 3'072'000); // TODO: verify clock
+	M6502(config.replace(), m_maincpu, 3'072'000); // TODO: verify clock, actually 6502A
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::bmxstunts_map);
 
-	SN76489(config, "snsnd", 3'072'000).add_route(ALL_OUTPUTS, "speaker", 0.5); // TODO: verify clock
+	SN76489A(config, "snsnd", 3'072'000).add_route(ALL_OUTPUTS, "speaker", 0.5); // TODO: verify clock, actually SN76489AN
 }
 
 void galaxian_state::ckongg(machine_config &config)
@@ -12283,9 +12283,9 @@ ROM_END
 /*
 BMX Stunts by Jetsoft on Galaxian bootleg PCB.
 
-6502A CPU in epoxy block with one 6331 prom (not dumped)
+6502A CPU in epoxy block with one 6331 PROM (not dumped)
 One 74LS74 and one 74LS273 logic.
-One SN76489 Digital Complex Sound Generator.
+One SN76489AN Digital Complex Sound Generator.
 There was a wire lead coming out of the epoxy and soldered
 to the sound/amplifier section on the PCB.
 
@@ -12295,7 +12295,7 @@ this riser board has eight sockets instead of the normal five and
 is printed with the words "MOON PROGRAM", was possibly a bootleg
 Moon Cresta PCB before conversion to BMX Stunts.
 
-Color prom is unique to this game and doesn't match any others.
+Color PROM is unique to this game and doesn't match any others.
 
 Main program EPROMs are all 2716 type by different manufacturers.
 Graphics ROMs are 2732 EPROMs soldered directly to the main PCB
@@ -12358,7 +12358,7 @@ ROM_START( bmxstuntsa )
 	ROM_LOAD16_WORD_SWAP( "b-mx.8", 0x3800, 0x0800, CRC(8bc26d4d) SHA1(c01be14d7cd402a524b61bd845c1ae6b09967bfa) ) // bmx8.pr8  99.267578%
 
 	ROM_REGION( 0x2000, "gfx1", 0 ) // not dumped for this set, taken from above
-	ROM_LOAD( "bmxh.1h", 0x0000, 0x1000, BAD_DUMP CRC(b049f648) SHA1(06c5a8b15f876cb6e4798cb5f8b1351cc6c12877) ) // 1ST AND 2ND HALF IDENTICAL)
+	ROM_LOAD( "bmxh.1h", 0x0000, 0x1000, BAD_DUMP CRC(b049f648) SHA1(06c5a8b15f876cb6e4798cb5f8b1351cc6c12877) ) // 1ST AND 2ND HALF IDENTICAL
 	ROM_LOAD( "bmxl.1l", 0x1000, 0x1000, BAD_DUMP CRC(a0f44f47) SHA1(b9d40ff82bb90125f0d9ad2d9590ddd7cc600805) )
 
 	ROM_REGION( 0x0020, "proms", 0 ) // not dumped for this set, taken from above
@@ -15985,7 +15985,7 @@ GAME( 1982, guttangt,    locomotn, guttangt,   guttangt,   guttangt_state, init_
 GAME( 1982, guttangts3,  locomotn, guttangts3, guttangt,   guttangt_state, init_guttangts3, ROT90,  "bootleg (Sede 3)",                "Guttang Gottong (Sede 3 bootleg on Galaxian hardware)", MACHINE_SUPPORTS_SAVE ) // still has Konami copyright on screen
 
 
-// Basic hardware with epoxy block containing a M6502, SN76489, PROM and logic
+// Basic hardware with epoxy block containing a 6502A, SN76489AN, PROM and logic
 GAME( 1985, bmxstunts,  0,         bmxstunts, bmxstunts,   galaxian_state, init_bmxstunts,  ROT90,  "Jetsoft",                         "BMX Stunts (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // not working due to bad program ROMs
 GAME( 1985, bmxstuntsa, bmxstunts, bmxstunts, bmxstunts,   galaxian_state, init_bmxstunts,  ROT90,  "Jetsoft",                         "BMX Stunts (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // could be considered working if not for bad GFX and sound
 
