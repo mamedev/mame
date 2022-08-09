@@ -224,11 +224,9 @@ public:
 
 	void grmatch(machine_config &config);
 
-	void driver_init() override;
-
 protected:
-	void machine_start() override;
-	void machine_reset() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	void palette_w(uint8_t data);
 	void xscroll_w(uint8_t data);

@@ -78,7 +78,7 @@ void z80ne_state::init_z80ne()
 	save_state_vars();
 }
 
-void z80netf_state::driver_init()
+void z80netf_state::driver_start()
 {
 	save_state_vars();
 
