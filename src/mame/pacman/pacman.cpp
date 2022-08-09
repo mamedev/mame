@@ -8274,7 +8274,7 @@ GAME( 1981, pacgal,     mspacman, woodpek,  mspacman, pacman_state,  empty_init,
 GAME( 1981, mspacpls,   mspacman, woodpek,  mspacman, pacman_state,  empty_init,    ROT90,  "hack",                                  "Ms. Pac-Man Plus",                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1992, mschamp,    mspacman, mschamp,  mschamp,  pacman_state,  init_mschamp,  ROT90,  "hack",                                  "Ms. Pacman Champion Edition / Zola-Puc Gal",       MACHINE_SUPPORTS_SAVE ) // Rayglo version
 GAME( 1995, mschamps,   mspacman, mschamp,  mschamp,  pacman_state,  init_mschamp,  ROT90,  "hack",                                  "Ms. Pacman Champion Edition / Super Zola-Puc Gal", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mspacpl2,   mspacman, woodpek,  mspacman, pacman_state,  init_mspacpl2, ROT90, "hack",                                  "Miss Packman Plus", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacpl2,   mspacman, woodpek,  mspacman, pacman_state,  init_mspacpl2, ROT90,  "hack",                                  "Miss Packman Plus",                                MACHINE_SUPPORTS_SAVE )
 
 // These bootlegs have MADE IN GREECE clearly visible and etched into the PCBs. They were very common in Spain with several operators having their own versions.
 // Based on the PCBs and copyright dates shown they  were produced late 80s / early 90s. Usually they run a version of Ms. Pacman, but were sometimes converted back to regular Pac-Man
