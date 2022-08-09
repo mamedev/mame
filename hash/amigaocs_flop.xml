@@ -27803,7 +27803,7 @@ ATK test: failed
 
 	<software name="kickoff2a1200" cloneof="kickoff2" supported="no">
 		<!-- SPS (CAPS) release 761 -->
-		<description>Kick Off 2 (Euro, v1.4e,  A1200 Boot Disk)</description>
+		<description>Kick Off 2 (Euro, v1.4e, A1200 Boot Disk)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>

@@ -11755,12 +11755,12 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="literary fragment (disc 1 of 2)  (jpn) (dw0311)" sha1="262198f1a11ee0ec6326ed297d48a9f9cb74220c" />
+				<disk name="literary fragment (disc 1 of 2) (jpn) (dw0311)" sha1="262198f1a11ee0ec6326ed297d48a9f9cb74220c" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="literary fragment (disc 2 of 2)  (jpn) (dw0311)" sha1="1eed92b57b2e4b88132e6a9bd664f8fb1344a3b7" />
+				<disk name="literary fragment (disc 2 of 2) (jpn) (dw0311)" sha1="1eed92b57b2e4b88132e6a9bd664f8fb1344a3b7" />
 			</diskarea>
 		</part>
 	</software>
@@ -11939,7 +11939,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="maria  hibaihin (jpn) (dw0905)" sha1="66e65d682cb319bfa9017e38bf135e81aec02e96" />
+				<disk name="maria hibaihin (jpn) (dw0905)" sha1="66e65d682cb319bfa9017e38bf135e81aec02e96" />
 			</diskarea>
 		</part>
 	</software>
@@ -16447,7 +16447,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="detana twinbee yahho  deluxe pack (t-9505g)" sha1="29b400fe6415db5dcba45b4c420fff24197f3284" />
+				<disk name="detana twinbee yahho deluxe pack (t-9505g)" sha1="29b400fe6415db5dcba45b4c420fff24197f3284" />
 			</diskarea>
 		</part>
 	</software>
@@ -18614,7 +18614,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Koden Koureijjyutsu  Hyaku Monogatari - Hontoni Atta Kowai Hanashi (Satakore) Disc 1 (T-14324G)... -->
 	<!-- Identifying Koden Koureijjyutsu  Hyaku Monogatari - Hontoni Atta Kowai Hanashi (Satakore) Disc 2 (T-14324G)... -->
 	<software name="koden" supported="no">
-		<description>Koden Koureijjyutsu  Hyaku Monogatari - Hontoni Atta Kowai Hanashi (Jpn, Satakore)</description>
+		<description>Koden Koureijjyutsu Hyaku Monogatari - Hontoni Atta Kowai Hanashi (Jpn, Satakore)</description>
 		<year>1998</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="T-14324G"/>
@@ -18623,12 +18623,12 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="koden koureijjyutsu  hyaku monogatari - hontoni atta kowai hanashi (satakore) disc 1 (t-14324g)" sha1="4a7920d95cab3ea9234c0a54f364020ba328f980" />
+				<disk name="koden koureijjyutsu hyaku monogatari - hontoni atta kowai hanashi (satakore) disc 1 (t-14324g)" sha1="4a7920d95cab3ea9234c0a54f364020ba328f980" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="koden koureijjyutsu  hyaku monogatari - hontoni atta kowai hanashi (satakore) disc 2 (t-14324g)" sha1="48cb3c216397b3444f479980f7fab0b49283afa9" />
+				<disk name="koden koureijjyutsu hyaku monogatari - hontoni atta kowai hanashi (satakore) disc 2 (t-14324g)" sha1="48cb3c216397b3444f479980f7fab0b49283afa9" />
 			</diskarea>
 		</part>
 	</software>
@@ -23805,7 +23805,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="kindaichi shounen no  jikenbo (j) (t-14315g)" sha1="a5f0c91bcb24a84d9517c11dd956e4243db1e8af" />
+				<disk name="kindaichi shounen no jikenbo (j) (t-14315g)" sha1="a5f0c91bcb24a84d9517c11dd956e4243db1e8af" />
 			</diskarea>
 		</part>
 	</software>
@@ -27000,7 +27000,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="blue seed  kushinada hirokuden (gs-9014)" sha1="d472ad046ced23bafe40090c1fc353f6ae2fe4fc" />
+				<disk name="blue seed kushinada hirokuden (gs-9014)" sha1="d472ad046ced23bafe40090c1fc353f6ae2fe4fc" />
 			</diskarea>
 		</part>
 	</software>

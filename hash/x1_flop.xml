@@ -3007,7 +3007,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 		<info name="alt_title" value="闘氣王"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="to ky o  disk1.d88" size="348848" crc="3a0aa58c" sha1="bd0dcfa082897ba47969e223fb5ad56dd7845ef4"/>
+				<rom name="to ky o disk1.d88" size="348848" crc="3a0aa58c" sha1="bd0dcfa082897ba47969e223fb5ad56dd7845ef4"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">

@@ -9261,7 +9261,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
-	<software name="lotusg" cloneof="lotus"  supported="no"> <!-- game loads to side 2 but gets stuck continuosuly loading (game never starts) -->
+	<software name="lotusg" cloneof="lotus" supported="no"> <!-- game loads to side 2 but gets stuck continuosuly loading (game never starts) -->
 		<description>Lotus Esprit Turbo Challenge (Gremlin Graphics)</description>
 		<year>1990</year>
 		<publisher>Gremlin Graphics</publisher>
@@ -10839,7 +10839,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
-	<software name="paperboye"  cloneof="paperboy">
+	<software name="paperboye" cloneof="paperboy">
 		<description>Paperboy (Elite Systems)</description>
 		<year>1986</year>
 		<publisher>Elite Systems</publisher>

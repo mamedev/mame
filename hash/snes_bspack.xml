@@ -3708,7 +3708,7 @@ license:CC0
 
 			<feature name="slot" value="bsmempak" />
 			<dataarea name="rom" size="1048576">
-				<rom name="bs bokujo  monogatari da-2-wa (japan).bs" size="1048576" crc="0bf62746" sha1="2f15cf736d7370646cfbd825e6d66efa0e6deb04" offset="0x000000" />
+				<rom name="bs bokujo monogatari da-2-wa (japan).bs" size="1048576" crc="0bf62746" sha1="2f15cf736d7370646cfbd825e6d66efa0e6deb04" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3723,7 +3723,7 @@ license:CC0
 
 			<feature name="slot" value="bsmempak" />
 			<dataarea name="rom" size="1048576">
-				<rom name="bs bokujo  monogatari dai-4-wa (japan).bs" size="1048576" crc="f384b235" sha1="6011df3c53de919fcf2e6fd104d5ea1b7a0cb3d6" offset="0x000000" />
+				<rom name="bs bokujo monogatari dai-4-wa (japan).bs" size="1048576" crc="f384b235" sha1="6011df3c53de919fcf2e6fd104d5ea1b7a0cb3d6" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>

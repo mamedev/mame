@@ -7714,7 +7714,7 @@ license:CC0
 			<!-- Generic developer board, RAM and battery not used for this game -->
 			<feature name="pcb" value="DMG-MBC1 MULTICHECKER-01" />
 			<feature name="u1" value="U1HC00" />
-			<feature name="u2" value="U2 28PSOCKET [CXK5864PN-15LL]"  />
+			<feature name="u2" value="U2 28PSOCKET [CXK5864PN-15LL]" />
 			<feature name="u3" value="U2 32PSOCKET [HN27C301AG-17]" />
 			<feature name="u4" value="U2 32PSOCKET [HN27C301AG-17]" />
 			<feature name="u5" value="U5 MBC1 [DMG MBC1A]" />

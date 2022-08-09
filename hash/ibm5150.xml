@@ -5410,12 +5410,12 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="version" value="6.0" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="[PC] DR DOS  6.00 Business Update FR [5.25DD] [Disk 1 of 2].img" size="368640" crc="747dfe34" sha1="fc1b19f48ceb4a7c8c5e912582c6eb8889c231fb"/>
+				<rom name="[PC] DR DOS 6.00 Business Update FR [5.25DD] [Disk 1 of 2].img" size="368640" crc="747dfe34" sha1="fc1b19f48ceb4a7c8c5e912582c6eb8889c231fb"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="[PC] DR DOS  6.00 Business Update FR [5.25DD] [Disk 2 of 2].img" size="368640" crc="02a45926" sha1="88a93294606904c2aac270c81d401ee90cd1ad6f"/>
+				<rom name="[PC] DR DOS 6.00 Business Update FR [5.25DD] [Disk 2 of 2].img" size="368640" crc="02a45926" sha1="88a93294606904c2aac270c81d401ee90cd1ad6f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5427,7 +5427,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="version" value="6.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="[PC] DR DOS  6.00 Business Update FR [3.5DD] [Disk 1 of 1].img" size="737280" crc="ce6fe2d7" sha1="684b4a184557b5932ea3c97146b483827e4a6d4d"/>
+				<rom name="[PC] DR DOS 6.00 Business Update FR [3.5DD] [Disk 1 of 1].img" size="737280" crc="ce6fe2d7" sha1="684b4a184557b5932ea3c97146b483827e4a6d4d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9596,52 +9596,52 @@ has been replaced with an all-zero block. -->
 		<info name="version" value="1.000.046" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [5.25DD] [Disk 01 of 10].img" size="368640" crc="c2c2801b" sha1="95118dac5ee6232413e282397f047f70c2a5ca95"/>
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989] [5.25DD] [Disk 01 of 10].img" size="368640" crc="c2c2801b" sha1="95118dac5ee6232413e282397f047f70c2a5ca95"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [5.25DD] [Disk 02 of 10].img" size="368640" crc="793af3e9" sha1="37cc73635c32a6a23934676d9c04e40b17be48b9"/>
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989] [5.25DD] [Disk 02 of 10].img" size="368640" crc="793af3e9" sha1="37cc73635c32a6a23934676d9c04e40b17be48b9"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [5.25DD] [Disk 03 of 10].img" size="368640" crc="f0db56de" sha1="6b1e5624a63cb98896da397084242f9b7e11f6fd"/>
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989] [5.25DD] [Disk 03 of 10].img" size="368640" crc="f0db56de" sha1="6b1e5624a63cb98896da397084242f9b7e11f6fd"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [5.25DD] [Disk 04 of 10].img" size="368640" crc="b50d5d25" sha1="14901e38dddf7fda09f5ba70de016584ef988d21"/>
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989] [5.25DD] [Disk 04 of 10].img" size="368640" crc="b50d5d25" sha1="14901e38dddf7fda09f5ba70de016584ef988d21"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [5.25DD] [Disk 05 of 10].img" size="368640" crc="c25e531d" sha1="d2c4a8439d396a1eaea1ad8cd3b533071a8bb69f"/>
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989] [5.25DD] [Disk 05 of 10].img" size="368640" crc="c25e531d" sha1="d2c4a8439d396a1eaea1ad8cd3b533071a8bb69f"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [5.25DD] [Disk 06 of 10].img" size="368640" crc="f19693f3" sha1="9fcee8c6dbcc6e9b10e8582aaddcb774608a3e84"/>
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989] [5.25DD] [Disk 06 of 10].img" size="368640" crc="f19693f3" sha1="9fcee8c6dbcc6e9b10e8582aaddcb774608a3e84"/>
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [5.25DD] [Disk 07 of 10].img" size="368640" crc="eec57cd1" sha1="a8468d3c8505fa80e71f658356e7ce3387877699"/>
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989] [5.25DD] [Disk 07 of 10].img" size="368640" crc="eec57cd1" sha1="a8468d3c8505fa80e71f658356e7ce3387877699"/>
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [5.25DD] [Disk 08 of 10].img" size="368640" crc="ee0c8b6f" sha1="17284ab1dd6e45cc3c968d35a3e5e2785071e153"/>
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989] [5.25DD] [Disk 08 of 10].img" size="368640" crc="ee0c8b6f" sha1="17284ab1dd6e45cc3c968d35a3e5e2785071e153"/>
 			</dataarea>
 		</part>
 		<part name="flop9" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [5.25DD] [Disk 09 of 10].img" size="368640" crc="b8badbd5" sha1="5b5fac0fa5acdbe4d9c987e992afe6526db0edbb"/>
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989] [5.25DD] [Disk 09 of 10].img" size="368640" crc="b8badbd5" sha1="5b5fac0fa5acdbe4d9c987e992afe6526db0edbb"/>
 			</dataarea>
 		</part>
 		<part name="flop10" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [5.25DD] [Disk 10 of 10].img" size="368640" crc="77d189bd" sha1="6a51026779cf8c2495e04195fe2d15708bf40f51"/>
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989] [5.25DD] [Disk 10 of 10].img" size="368640" crc="77d189bd" sha1="6a51026779cf8c2495e04195fe2d15708bf40f51"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9654,22 +9654,22 @@ has been replaced with an all-zero block. -->
 		<info name="version" value="1.000.046" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [3.5DD] [Disk 1 of 4].img" size="737280" crc="d3f80650" sha1="e4119b36a02230acf42498879ab7570a183f35b4"/>
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989] [3.5DD] [Disk 1 of 4].img" size="737280" crc="d3f80650" sha1="e4119b36a02230acf42498879ab7570a183f35b4"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [3.5DD] [Disk 2 of 4].img" size="737280" crc="61663864" sha1="02865bc61fe45a8031c608ec7c76ef9f05ac8ae3"/>
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989] [3.5DD] [Disk 2 of 4].img" size="737280" crc="61663864" sha1="02865bc61fe45a8031c608ec7c76ef9f05ac8ae3"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [3.5DD] [Disk 3 of 4].img" size="737280" crc="1e6c2f9b" sha1="95f5673450c7f81d296887506e7109b45d022b32"/>
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989] [3.5DD] [Disk 3 of 4].img" size="737280" crc="1e6c2f9b" sha1="95f5673450c7f81d296887506e7109b45d022b32"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [3.5DD] [Disk 4 of 4].img" size="737280" crc="a35399e0" sha1="da4d4814782be5a14429c193e66993764a1cd0cc"/>
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989] [3.5DD] [Disk 4 of 4].img" size="737280" crc="a35399e0" sha1="da4d4814782be5a14429c193e66993764a1cd0cc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13554,7 +13554,7 @@ has been replaced with an all-zero block. -->
 		<publisher>Sega</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="[PC] Outrun [3.5DD]  [Disk 1 of 1].img" size="737280" crc="5bf4afae" sha1="f189136da8ac284cfb3bf06b402328cd827a42a2"/>
+				<rom name="[PC] Outrun [3.5DD] [Disk 1 of 1].img" size="737280" crc="5bf4afae" sha1="f189136da8ac284cfb3bf06b402328cd827a42a2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13565,7 +13565,7 @@ has been replaced with an all-zero block. -->
 		<publisher>Kixx</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Outrun (Kixx release) [Sega] [1989] [3.5DD]  [Disk 1 of 1].img" size="737280" crc="55bf00de" sha1="b48e9536263481ac283149c3ab679e9369027729"/>
+				<rom name="Outrun (Kixx release) [Sega] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="55bf00de" sha1="b48e9536263481ac283149c3ab679e9369027729"/>
 			</dataarea>
 		</part>
 	</software>
