@@ -355,7 +355,11 @@ void spectrum_state::spectrum_ula_w(offs_t offset, uint8_t data)
 	if ((Changed & (1<<4))!=0) m_speaker->level_w(BIT(data, 4));
 
 	/* write cassette data */
-	if ((Changed & (1<<3))!=0) m_cassette->output((data & (1<<3)) ? -1.0 : +1.0);
+	if ((Changed & (1<<3))!=0)
+	{
+		m_speaker->level_w(BIT(data, 3));
+		m_cassette->output((data & (1<<3)) ? -1.0 : +1.0);
+	}
 
 	// Some exp devices use ula port unused bits 5-7:
 	// Beta v2/3/plus use bit 7, Beta clones use bits 6 and 7
