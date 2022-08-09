@@ -8837,15 +8837,6 @@ void galaxian_state::init_bmxstunts()
 {
 	init_galaxian();
 
-	uint8_t *rom = memregion("maincpu")->base();
-
-	std::vector<uint8_t> buffer(0x4000);
-
-	memcpy(&buffer[0], rom, 0x4000);
-
-	for (int i = 0; i < 0x4000; i++)
-		rom[i] = buffer[i ^ 0x01];
-
 	m_irq_line = 0;
 }
 
@@ -12323,14 +12314,14 @@ chaneman 7/31/2022
 
 ROM_START( bmxstunts )
 	ROM_REGION( 0x4000, "maincpu", 0 ) // 5 and 7 might be corrupted
-	ROM_LOAD( "bmx1.pr1", 0x0000, 0x0800, CRC(cf3061f1) SHA1(e229a2a09b56332359c3f87953acb07c4c7d3abb) )
-	ROM_LOAD( "bmx2.pr2", 0x0800, 0x0800, CRC(f145e09d) SHA1(8d3f379dbb5ec9304aa61d99cac003dfb8050485) )
-	ROM_LOAD( "bmx3.pr3", 0x1000, 0x0800, CRC(ea415c49) SHA1(eb55b4b24ef4e04f5c2873ad7fef2dce891cefef) )
-	ROM_LOAD( "bmx4.pr4", 0x1800, 0x0800, CRC(62bdd971) SHA1(864e787d66f6deb7fa545c475d4feb551e095bf2) )
-	ROM_LOAD( "bmx5.pr5", 0x2000, 0x0800, BAD_DUMP CRC(b7ae2316) SHA1(17aa542fe8d4f729758f8b21bc667bf756b481b5) )
-	ROM_LOAD( "bmx6.pr6", 0x2800, 0x0800, CRC(ba9b1a69) SHA1(b17964b31435809ce174f2680f7b463658794220) )
-	ROM_LOAD( "bmx7.pr7", 0x3000, 0x0800, BAD_DUMP CRC(32636839) SHA1(6371c929b7b3a819dad70b672bc3ca5c3c5c9ced) )
-	ROM_LOAD( "bmx8.pr8", 0x3800, 0x0800, CRC(fe1052ee) SHA1(f8bcaaecc3dfd10c70cbd9a49b778232ba9e697b) )
+	ROM_LOAD16_WORD_SWAP( "bmx1.pr1", 0x0000, 0x0800, CRC(cf3061f1) SHA1(e229a2a09b56332359c3f87953acb07c4c7d3abb) )
+	ROM_LOAD16_WORD_SWAP( "bmx2.pr2", 0x0800, 0x0800, CRC(f145e09d) SHA1(8d3f379dbb5ec9304aa61d99cac003dfb8050485) )
+	ROM_LOAD16_WORD_SWAP( "bmx3.pr3", 0x1000, 0x0800, CRC(ea415c49) SHA1(eb55b4b24ef4e04f5c2873ad7fef2dce891cefef) )
+	ROM_LOAD16_WORD_SWAP( "bmx4.pr4", 0x1800, 0x0800, CRC(62bdd971) SHA1(864e787d66f6deb7fa545c475d4feb551e095bf2) )
+	ROM_LOAD16_WORD_SWAP( "bmx5.pr5", 0x2000, 0x0800, BAD_DUMP CRC(b7ae2316) SHA1(17aa542fe8d4f729758f8b21bc667bf756b481b5) )
+	ROM_LOAD16_WORD_SWAP( "bmx6.pr6", 0x2800, 0x0800, CRC(ba9b1a69) SHA1(b17964b31435809ce174f2680f7b463658794220) )
+	ROM_LOAD16_WORD_SWAP( "bmx7.pr7", 0x3000, 0x0800, BAD_DUMP CRC(32636839) SHA1(6371c929b7b3a819dad70b672bc3ca5c3c5c9ced) )
+	ROM_LOAD16_WORD_SWAP( "bmx8.pr8", 0x3800, 0x0800, CRC(fe1052ee) SHA1(f8bcaaecc3dfd10c70cbd9a49b778232ba9e697b) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 ) // possibly slightly corrupted (see tile viewer), plus 1h is probably a bad dump (bikes aren't found anywhere)
 	ROM_LOAD( "bmxh.1h", 0x0000, 0x1000, CRC(b049f648) SHA1(06c5a8b15f876cb6e4798cb5f8b1351cc6c12877) ) // 1ST AND 2ND HALF IDENTICAL
@@ -12357,14 +12348,14 @@ has a potted block in the CPU socket...
 
 ROM_START( bmxstuntsa )
 	ROM_REGION( 0x4000, "maincpu", 0 )
-	ROM_LOAD( "b-m.1", 0x0000, 0x0800, CRC(cf3061f1) SHA1(e229a2a09b56332359c3f87953acb07c4c7d3abb) )
-	ROM_LOAD( "b-mx.2", 0x0800, 0x0800, CRC(f145e09d) SHA1(8d3f379dbb5ec9304aa61d99cac003dfb8050485) )
-	ROM_LOAD( "b-mx.3", 0x1000, 0x0800, CRC(ea415c49) SHA1(eb55b4b24ef4e04f5c2873ad7fef2dce891cefef) )
-	ROM_LOAD( "b-mx.4", 0x1800, 0x0800, CRC(62bdd971) SHA1(864e787d66f6deb7fa545c475d4feb551e095bf2) )
-	ROM_LOAD( "b-mx.5", 0x2000, 0x0800, CRC(9fa3d4e3) SHA1(61973d99d68790e36112bdaa893fb9406f8d46ca) ) // bmx5.pr5  51.074219%
-	ROM_LOAD( "b-mx.6", 0x2800, 0x0800, CRC(ba9b1a69) SHA1(b17964b31435809ce174f2680f7b463658794220) )
-	ROM_LOAD( "b-mx.7", 0x3000, 0x0800, CRC(fa34441a) SHA1(f1591ef81c4fc9c3cd1b9eb96d945d53051a3ea7) ) // bmx7.pr7  58.740234%
-	ROM_LOAD( "b-mx.8", 0x3800, 0x0800, CRC(8bc26d4d) SHA1(c01be14d7cd402a524b61bd845c1ae6b09967bfa) ) // bmx8.pr8  99.267578%
+	ROM_LOAD16_WORD_SWAP( "b-mx.1", 0x0000, 0x0800, CRC(cf3061f1) SHA1(e229a2a09b56332359c3f87953acb07c4c7d3abb) )
+	ROM_LOAD16_WORD_SWAP( "b-mx.2", 0x0800, 0x0800, CRC(f145e09d) SHA1(8d3f379dbb5ec9304aa61d99cac003dfb8050485) )
+	ROM_LOAD16_WORD_SWAP( "b-mx.3", 0x1000, 0x0800, CRC(ea415c49) SHA1(eb55b4b24ef4e04f5c2873ad7fef2dce891cefef) )
+	ROM_LOAD16_WORD_SWAP( "b-mx.4", 0x1800, 0x0800, CRC(62bdd971) SHA1(864e787d66f6deb7fa545c475d4feb551e095bf2) )
+	ROM_LOAD16_WORD_SWAP( "b-mx.5", 0x2000, 0x0800, CRC(9fa3d4e3) SHA1(61973d99d68790e36112bdaa893fb9406f8d46ca) ) // bmx5.pr5  51.074219%
+	ROM_LOAD16_WORD_SWAP( "b-mx.6", 0x2800, 0x0800, CRC(ba9b1a69) SHA1(b17964b31435809ce174f2680f7b463658794220) )
+	ROM_LOAD16_WORD_SWAP( "b-mx.7", 0x3000, 0x0800, CRC(fa34441a) SHA1(f1591ef81c4fc9c3cd1b9eb96d945d53051a3ea7) ) // bmx7.pr7  58.740234%
+	ROM_LOAD16_WORD_SWAP( "b-mx.8", 0x3800, 0x0800, CRC(8bc26d4d) SHA1(c01be14d7cd402a524b61bd845c1ae6b09967bfa) ) // bmx8.pr8  99.267578%
 
 	ROM_REGION( 0x2000, "gfx1", 0 ) // not dumped for this set, taken from above
 	ROM_LOAD( "bmxh.1h", 0x0000, 0x1000, BAD_DUMP CRC(b049f648) SHA1(06c5a8b15f876cb6e4798cb5f8b1351cc6c12877) ) // 1ST AND 2ND HALF IDENTICAL)
