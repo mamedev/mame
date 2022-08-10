@@ -331,4 +331,4 @@ ROM_END
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT      CLASS           INIT        COMPANY             FULLNAME           FLAGS
 COMP( 1991, pentagon, spec128, 0,      pentagon, spec_plus, pentagon_state, empty_init, "Vladimir Drozdov", "Pentagon 128K",   0 )
-COMP( 2005, pent1024, spec128, 0,      pentagon, spec_plus, pent1024_state, empty_init, "Alex Zhabin",      "Pentagon 1024SL", 0 )
+COMP( 2005, pent1024, spec128, 0,      pent1024, spec_plus, pent1024_state, empty_init, "Alex Zhabin",      "Pentagon 1024SL", 0 )
