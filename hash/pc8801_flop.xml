@@ -4563,7 +4563,7 @@ ExtractDisk  [04]"Disk 2          " -> "battle gorilla_04.d88"
 	<!-- Hangs at HARD. DOS loader -->
 	<!-- FDC stalls [tries to scan for missing CHRN=(00 00 01 06)] -->
 	<software name="bshashms1" cloneof="bshashms" supported="no">
-		<description>Bishoujo Shashinkan  - Moving School (alt?)</description>
+		<description>Bishoujo Shashinkan - Moving School (alt?)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="美少女写真館 -ムービング・スクール-"/>
@@ -5328,7 +5328,7 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="348848">
-				<rom name="burning point  (disk 1).d88" size="348848" crc="eec09f66" sha1="47f01ef6587857f11fbceae50aa776daf39873ca"/>
+				<rom name="burning point (disk 1).d88" size="348848" crc="eec09f66" sha1="47f01ef6587857f11fbceae50aa776daf39873ca"/>
 			</dataarea>
 		</part>
 
@@ -14080,7 +14080,7 @@ ExtractDisk  [04]"Data Disk    " -> "formula cms_04.d88"
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Data (Map)" />
 			<dataarea name="flop" size="415840">
-				<rom name="gokudo jintori (data  - map).d88" size="415840" crc="b3e5d6b9" sha1="ecc6115143032f8b5cdf6403529e1e7db072d15a"/>
+				<rom name="gokudo jintori (data - map).d88" size="415840" crc="b3e5d6b9" sha1="ecc6115143032f8b5cdf6403529e1e7db072d15a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -32692,14 +32692,14 @@ ExtractDisk  [02]"A DISK          " -> "sorcerian music library_02.d88"
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Mephius" />
 			<dataarea name="flop" size="348832">
-				<rom name="star arthur densetsu i wakuse  mephius(patched works through the end) (mephius).d88" size="348832" crc="b56aba12" sha1="cb83839cc8fa3bff301c63c0f7e263d6f2e66c7e"/>
+				<rom name="star arthur densetsu i wakuse mephius(patched works through the end) (mephius).d88" size="348832" crc="b56aba12" sha1="cb83839cc8fa3bff301c63c0f7e263d6f2e66c7e"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="User Disk" />
 			<dataarea name="flop" size="348848">
-				<rom name="star arthur densetsu i wakuse  mephius(patched works through the end) (user disk).d88" size="348848" crc="46131f10" sha1="c32cdf24341ca3ea61a5331abee38c6ff364b39d"/>
+				<rom name="star arthur densetsu i wakuse mephius(patched works through the end) (user disk).d88" size="348848" crc="46131f10" sha1="c32cdf24341ca3ea61a5331abee38c6ff364b39d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -33215,7 +33215,7 @@ ExtractDisk  [02]"A DISK          " -> "sorcerian music library_02.d88"
 
 	<!-- [Incorrect layout on track 0 head 0, expected_size=100000, current_size=103616] -->
 	<software name="suiryus2" supported="no">
-		<description>Suiryushi II -  Wadatsumi no Hikari Koto</description>
+		<description>Suiryushi II - Wadatsumi no Hikari Koto</description>
 		<year>1989</year>
 		<publisher>しゃんばら (Shanbara)</publisher>
 		<!-- PC8801mk2SR -->
@@ -33262,7 +33262,7 @@ ExtractDisk  [02]"A DISK          " -> "sorcerian music library_02.d88"
 
 	<!-- [Incorrect layout on track 0 head 0, expected_size=100000, current_size=103616] -->
 	<software name="suiryus2a" cloneof="suiryus2" supported="no">
-		<description>Suiryushi II -  Wadatsumi no Hikari Koto (alt User Disk)</description>
+		<description>Suiryushi II - Wadatsumi no Hikari Koto (alt User Disk)</description>
 		<year>1989</year>
 		<publisher>しゃんばら (Shanbara)</publisher>
 		<!-- PC8801mk2SR -->
@@ -36352,7 +36352,7 @@ ExtractDisk  [02]"PROGRAM        " -> "transylvania_02.d88"
 	</software>
 
 	<software name="ultima3">
-		<description>Ultima III  - Exodus</description>
+		<description>Ultima III - Exodus</description>
 		<year>1989</year>
 		<publisher>ポニカ (Pony Canyon)</publisher>
 		<!-- PC8801mk2SR -->
@@ -36389,7 +36389,7 @@ ExtractDisk  [02]"ｼﾅﾘｵﾃﾞｨｽｸ      " -> "ultima 3(ponyca)_02.d88
 ExtractDisk  [03]"ﾕｰｻﾞｰｼｽﾃﾑﾃﾞｨｽｸ  " -> "ultima 3(ponyca)_03.d88"
 -->
 	<software name="ultima3a" cloneof="ultima3">
-		<description>Ultima III  - Exodus (alt)</description>
+		<description>Ultima III - Exodus (alt)</description>
 		<year>1989</year>
 		<publisher>ポニカ (Pony Canyon)</publisher>
 		<!-- PC8801mk2SR -->
@@ -36419,7 +36419,7 @@ ExtractDisk  [03]"ﾕｰｻﾞｰｼｽﾃﾑﾃﾞｨｽｸ  " -> "ultima 3(pon
 
 <!-- does this contain correct programs?? also flop2 & 3 seem equal except for header... -->
 	<software name="ultima3b" cloneof="ultima3">
-		<description>Ultima III  - Exodus (Bad?)</description>
+		<description>Ultima III - Exodus (Bad?)</description>
 		<year>1989</year>
 		<publisher>ポニカ (Pony Canyon)</publisher>
 		<!-- PC8801mk2SR -->
@@ -57138,7 +57138,7 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="filemda"  cloneof="filemst">
+	<software name="filemda" cloneof="filemst">
 		<description>The File Master - diskA</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57149,7 +57149,7 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="filemdb"  cloneof="filemst">
+	<software name="filemdb" cloneof="filemst">
 		<description>The File Master - diskB</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57160,7 +57160,7 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="filemdc"  cloneof="filemst">
+	<software name="filemdc" cloneof="filemst">
 		<description>The File Master - diskC</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57171,7 +57171,7 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="filemdd"  cloneof="filemst">
+	<software name="filemdd" cloneof="filemst">
 		<description>The File Master - diskD</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57182,7 +57182,7 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="filemde"  cloneof="filemst">
+	<software name="filemde" cloneof="filemst">
 		<description>The File Master - diskE</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57193,7 +57193,7 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="filemdf"  cloneof="filemst">
+	<software name="filemdf" cloneof="filemst">
 		<description>The File Master - diskF</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57204,7 +57204,7 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="filemdg"  cloneof="filemst">
+	<software name="filemdg" cloneof="filemst">
 		<description>The File Master - diskG</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57217,7 +57217,7 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 
 	<!-- Prints "THE FILE MASTER data disk" then hangs -->
 	<!-- FDC stalls [Never clears HALT state] -->
-	<software name="filemdh"  cloneof="filemst" supported="no">
+	<software name="filemdh" cloneof="filemst" supported="no">
 		<description>The File Master - diskH</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57228,7 +57228,7 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="filemdi"  cloneof="filemst">
+	<software name="filemdi" cloneof="filemst">
 		<description>The File Master - diskI</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57239,7 +57239,7 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="filemdj"  cloneof="filemst">
+	<software name="filemdj" cloneof="filemst">
 		<description>The File Master - diskJ</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57250,7 +57250,7 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="filemdk"  cloneof="filemst">
+	<software name="filemdk" cloneof="filemst">
 		<description>The File Master - diskK</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57261,7 +57261,7 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="filemdl"  cloneof="filemst">
+	<software name="filemdl" cloneof="filemst">
 		<description>The File Master - diskL</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57272,7 +57272,7 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="filemdm"  cloneof="filemst">
+	<software name="filemdm" cloneof="filemst">
 		<description>The File Master - diskM</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57283,7 +57283,7 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="filemnice"  cloneof="filemst">
+	<software name="filemnice" cloneof="filemst">
 		<description>The File Master NICE</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57294,7 +57294,7 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="filemp8b"  cloneof="filemst">
+	<software name="filemp8b" cloneof="filemst">
 		<description>The File Master P8B</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57305,7 +57305,7 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="filemp8n"  cloneof="filemst">
+	<software name="filemp8n" cloneof="filemst">
 		<description>The File Master P8N</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57316,7 +57316,7 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="filemsys"  cloneof="filemst">
+	<software name="filemsys" cloneof="filemst">
 		<description>The File Master System</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57345,7 +57345,7 @@ ExtractDisk  [12]"TFM_Parameter_7 " -> "the file master (ver1.1) & hot file expr
 ExtractDisk  [13]"TFM_Param_8_NEW " -> "the file master (ver1.1) & hot file express_13.d88" b3f914c5
 ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file express_14.d88"
 -->
-	<software name="filemsta"  cloneof="filemst">
+	<software name="filemsta" cloneof="filemst">
 		<description>The File Master v1.1 (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57357,7 +57357,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		</part>
 	</software>
 
-	<software name="filemstoto"  cloneof="filemst">
+	<software name="filemstoto" cloneof="filemst">
 		<description>The File Master - Otokuyou</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57369,7 +57369,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		</part>
 	</software>
 
-	<software name="filemstp3"  cloneof="filemst">
+	<software name="filemstp3" cloneof="filemst">
 		<description>The File Master - Parameter 3</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57380,7 +57380,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		</part>
 	</software>
 
-	<software name="filemstp7"  cloneof="filemst">
+	<software name="filemstp7" cloneof="filemst">
 		<description>The File Master - Parameter 7</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57392,7 +57392,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 	</software>
 
 <!-- Alt version of P8N?? -->
-	<software name="filemstp8"  cloneof="filemst">
+	<software name="filemstp8" cloneof="filemst">
 		<description>The File Master - Parameter 8 New</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57414,7 +57414,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		</part>
 	</software>
 
-	<software name="filemstf01"  cloneof="filemst">
+	<software name="filemstf01" cloneof="filemst">
 		<description>The File Master 88 Filer 1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57425,7 +57425,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		</part>
 	</software>
 
-	<software name="filemstf02"  cloneof="filemst">
+	<software name="filemstf02" cloneof="filemst">
 		<description>The File Master 88 Filer 2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57436,7 +57436,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		</part>
 	</software>
 
-	<software name="filemstf03"  cloneof="filemst">
+	<software name="filemstf03" cloneof="filemst">
 		<description>The File Master 88 Filer 3</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57447,7 +57447,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		</part>
 	</software>
 
-	<software name="filemstf04"  cloneof="filemst">
+	<software name="filemstf04" cloneof="filemst">
 		<description>The File Master 88 Filer 4</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57458,7 +57458,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		</part>
 	</software>
 
-	<software name="filemstf05"  cloneof="filemst">
+	<software name="filemstf05" cloneof="filemst">
 		<description>The File Master 88 Filer 5</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57469,7 +57469,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		</part>
 	</software>
 
-	<software name="filemstf06"  cloneof="filemst">
+	<software name="filemstf06" cloneof="filemst">
 		<description>The File Master 88 Filer 6</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57480,7 +57480,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		</part>
 	</software>
 
-	<software name="filemstf07"  cloneof="filemst">
+	<software name="filemstf07" cloneof="filemst">
 		<description>The File Master 88 Filer 7</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57491,7 +57491,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		</part>
 	</software>
 
-	<software name="filemstf08"  cloneof="filemst">
+	<software name="filemstf08" cloneof="filemst">
 		<description>The File Master 88 Filer 8</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57502,7 +57502,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		</part>
 	</software>
 
-	<software name="filemstf09"  cloneof="filemst">
+	<software name="filemstf09" cloneof="filemst">
 		<description>The File Master 88 Filer 9</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57513,7 +57513,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		</part>
 	</software>
 
-	<software name="filemstf10"  cloneof="filemst">
+	<software name="filemstf10" cloneof="filemst">
 		<description>The File Master 88 Filer 10</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57524,7 +57524,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		</part>
 	</software>
 
-	<software name="filemstf11"  cloneof="filemst">
+	<software name="filemstf11" cloneof="filemst">
 		<description>The File Master 88 Filer 11</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57535,7 +57535,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		</part>
 	</software>
 
-	<software name="filemstf12"  cloneof="filemst">
+	<software name="filemstf12" cloneof="filemst">
 		<description>The File Master 88 Filer 12</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57559,7 +57559,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
     </software>
  -->
 
-	<software name="filemstf14"  cloneof="filemst">
+	<software name="filemstf14" cloneof="filemst">
 		<description>The File Master 88 Filer 14</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
