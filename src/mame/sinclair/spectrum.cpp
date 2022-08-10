@@ -811,7 +811,7 @@ void spectrum_state::spectrum_common(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
-	static const double speaker_levels[4] = { 0.0, 0.66, 0.33, 1.0 };
+	static const double speaker_levels[4] = { 0.0, 0.33, 0.66, 1.0 };
 	m_speaker->set_levels(4, speaker_levels);
 
 	/* expansion port */
