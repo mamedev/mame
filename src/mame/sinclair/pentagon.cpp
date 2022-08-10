@@ -24,13 +24,15 @@ public:
 		, m_beta(*this, BETA_DISK_TAG)
 	{ }
 
-	void pent1024(machine_config &config);
 	void pentagon(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+	virtual void pentagon_update_memory();
+
+	required_device<beta_disk_device> m_beta;
 
 private:
 	rectangle get_screen_area() override;
@@ -44,11 +46,23 @@ private:
 	void pentagon_io(address_map &map);
 	void pentagon_mem(address_map &map);
 	void pentagon_switch(address_map &map);
-	void pentagon_update_memory();
 
-	bool m_pent1024_ext_memory = false;
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
-	required_device<beta_disk_device> m_beta;
+};
+
+class pent1024_state : public pentagon_state
+{
+public:
+	pent1024_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pentagon_state(mconfig, type, tag)
+	{ }
+
+	void pent1024(machine_config &config);
+
+protected:
+	void machine_start() override;
+	void machine_reset() override;
+	void pentagon_update_memory() override;
 };
 
 void pentagon_state::pentagon_update_memory()
@@ -57,15 +71,7 @@ void pentagon_state::pentagon_update_memory()
 	m_screen_location = m_ram->pointer() + ((BIT(m_port_7ffd_data, 3) ? 7 : 5) << 14);
 
 	m_bank_ram[3]->set_entry(m_port_7ffd_data & 0x07);
-	if (m_pent1024_ext_memory)
-		// currently 512Kb ram expansion supported
-		m_bank_ram[3]->set_entry(m_bank_ram[3]->entry() | ((m_port_7ffd_data & 0xc0) >> 3));
-
-	if (m_beta->started() && m_beta->is_active() && !BIT(m_port_7ffd_data, 4))
-		m_bank_rom[0]->set_entry(m_pent1024_ext_memory ? 2 /* GLUK */ : BIT(m_port_7ffd_data, 4));
-	else
-		/* ROM switching */
-		m_bank_rom[0]->set_entry(BIT(m_port_7ffd_data, 4));
+	m_bank_rom[0]->set_entry(BIT(m_port_7ffd_data, 4));
 }
 
 void pentagon_state::port_7ffd_w(offs_t offset, u8 data)
@@ -96,7 +102,7 @@ u8 pentagon_state::beta_neutral_r(offs_t offset)
 u8 pentagon_state::beta_enable_r(offs_t offset)
 {
 	if (!(machine().side_effects_disabled())) {
-		if (m_beta->started() && m_bank_rom[0]->entry() == 1) {
+		if (m_bank_rom[0]->entry() == 1) {
 			m_beta->enable();
 			m_bank_rom[0]->set_entry(3);
 		}
@@ -107,7 +113,7 @@ u8 pentagon_state::beta_enable_r(offs_t offset)
 u8 pentagon_state::beta_disable_r(offs_t offset)
 {
 	if (!(machine().side_effects_disabled())) {
-		if (m_beta->started() && m_beta->is_active()) {
+		if (m_beta->is_active()) {
 			m_beta->disable();
 			m_bank_rom[0]->set_entry(BIT(m_port_7ffd_data, 4));
 		}
@@ -149,16 +155,10 @@ void pentagon_state::machine_start()
 	spectrum_128_state::machine_start();
 	m_bank_rom[0]->configure_entries(3, 1, memregion("beta:beta")->base(), 0x4000);
 	m_maincpu->space(AS_PROGRAM).specific(m_program);
-
-	if(m_pent1024_ext_memory)
-		m_bank_rom[0]->configure_entries(2, 1, memregion("maincpu")->base() + 0x18000, 0x4000);
 }
 
 void pentagon_state::machine_reset()
 {
-	if (m_beta->started() && m_pent1024_ext_memory)
-		m_beta->enable();
-
 	m_port_7ffd_data = 0;
 	m_port_1ffd_data = -1;
 	pentagon_update_memory();
@@ -189,7 +189,6 @@ GFXDECODE_END
 void pentagon_state::pentagon(machine_config &config)
 {
 	spectrum_128(config);
-	m_pent1024_ext_memory = false;
 
 	m_maincpu->set_clock(14_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pentagon_state::pentagon_mem);
@@ -218,13 +217,40 @@ void pentagon_state::pentagon(machine_config &config)
 	SOFTWARE_LIST(config, "betadisc_list").set_original("spectrum_betadisc_flop");
 }
 
-void pentagon_state::pent1024(machine_config &config)
+
+//-------------------------------------------------
+//  Pentagon 1024
+//-------------------------------------------------
+
+void pent1024_state::pent1024(machine_config &config)
 {
 	pentagon(config);
-	/* internal ram */
-	m_pent1024_ext_memory = true;
 	m_ram->set_default_size("1024K");
 }
+
+void pent1024_state::machine_start()
+{
+	pentagon_state::machine_start();
+	m_bank_rom[0]->configure_entries(2, 1, memregion("maincpu")->base() + 0x18000, 0x4000);
+}
+
+void pent1024_state::machine_reset()
+{
+	m_beta->enable();
+	m_bank_rom[0]->set_entry(3);
+
+	pentagon_state::machine_reset();
+}
+
+void pent1024_state::pentagon_update_memory()
+{
+	pentagon_state::pentagon_update_memory();
+
+	m_bank_ram[3]->set_entry(m_bank_ram[3]->entry() | ((m_port_7ffd_data & 0xc0) >> 3));
+	if (m_beta->is_active() && !BIT(m_port_7ffd_data, 4))
+		m_bank_rom[0]->set_entry(2);
+}
+
 
 /***************************************************************************
 
@@ -305,4 +331,4 @@ ROM_END
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT      CLASS           INIT        COMPANY             FULLNAME           FLAGS
 COMP( 1991, pentagon, spec128, 0,      pentagon, spec_plus, pentagon_state, empty_init, "Vladimir Drozdov", "Pentagon 128K",   0 )
-COMP( 2005, pent1024, spec128, 0,      pent1024, spec_plus, pentagon_state, empty_init, "Alex Zhabin",      "Pentagon 1024SL", 0 )
+COMP( 2005, pent1024, spec128, 0,      pentagon, spec_plus, pent1024_state, empty_init, "Alex Zhabin",      "Pentagon 1024SL", 0 )
