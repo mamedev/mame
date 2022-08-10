@@ -346,20 +346,16 @@ void spectrum_state::spectrum_ula_w(offs_t offset, uint8_t data)
 	if (is_contended(offset)) content_early();
 	content_early(1);
 
-	unsigned char Changed = m_port_fe_data^data;
+	u8 changed = m_port_fe_data ^ data;
 
 	/* border colour changed? */
-	if ((Changed & 0x07)!=0) m_screen->update_now();
+	if (changed & 0x07) m_screen->update_now();
 
 	/* DAC output state */
-	if ((Changed & (1<<4))!=0) m_speaker->level_w(BIT(data, 4));
+	if (changed & 0x18) m_speaker->level_w(BIT(data, 3, 2));
 
 	/* write cassette data */
-	if ((Changed & (1<<3))!=0)
-	{
-		m_speaker->level_w(BIT(data, 3));
-		m_cassette->output((data & (1<<3)) ? -1.0 : +1.0);
-	}
+	if (BIT(changed, 3)) m_cassette->output(BIT(data, 3) ? -1.0 : +1.0);
 
 	// Some exp devices use ula port unused bits 5-7:
 	// Beta v2/3/plus use bit 7, Beta clones use bits 6 and 7
@@ -811,7 +807,9 @@ void spectrum_state::spectrum_common(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
+	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
+	m_speaker->set_levels(4, speaker_levels);
 
 	/* expansion port */
 	SPECTRUM_EXPANSION_SLOT(config, m_exp, spectrum_expansion_devices, "kempjoy");
