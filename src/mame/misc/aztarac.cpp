@@ -16,13 +16,215 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "aztarac.h"
 
+#include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
+#include "machine/x2212.h"
 #include "sound/ay8910.h"
+#include "video/vector.h"
+
+#include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
+class aztarac_state : public driver_device
+{
+public:
+	aztarac_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_nvram(*this, "nvram"),
+		m_vector(*this, "vector"),
+		m_screen(*this, "screen"),
+		m_soundlatch(*this, "soundlatch"),
+		m_vectorram(*this, "vectorram"),
+		m_sticky(*this, "STICKY"),
+		m_stickz(*this, "STICKZ") { }
+
+	void aztarac(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<x2212_device> m_nvram;
+	required_device<vector_device> m_vector;
+	required_device<screen_device> m_screen;
+	required_device<generic_latch_8_device> m_soundlatch;
+
+	required_shared_ptr<uint16_t> m_vectorram;
+
+	required_ioport m_sticky;
+	required_ioport m_stickz;
+
+	uint8_t m_sound_status = 0;
+	uint32_t m_xcenter = 0;
+	uint32_t m_ycenter = 0;
+
+	void nvram_store_w(uint16_t data);
+	uint16_t joystick_r();
+	void ubr_w(uint8_t data);
+	uint8_t sound_r();
+	void sound_w(uint8_t data);
+	uint8_t snd_command_r();
+	uint8_t snd_status_r();
+	void snd_status_w(uint8_t data);
+
+	DECLARE_WRITE_LINE_MEMBER(video_interrupt);
+	INTERRUPT_GEN_MEMBER(snd_timed_irq);
+
+	inline void read_vectorram(int addr, int *x, int *y, int *c);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
+};
+
+
+// audio
+
+uint8_t aztarac_state::sound_r()
+{
+	return m_sound_status & 0x01;
+}
+
+void aztarac_state::sound_w(uint8_t data)
+{
+	m_soundlatch->write(data);
+	m_sound_status ^= 0x21;
+	if (m_sound_status & 0x20)
+		m_audiocpu->set_input_line(0, HOLD_LINE);
+}
+
+uint8_t aztarac_state::snd_command_r()
+{
+	m_sound_status |= 0x01;
+	m_sound_status &= ~0x20;
+	return m_soundlatch->read();
+}
+
+uint8_t aztarac_state::snd_status_r()
+{
+	return m_sound_status & ~0x01;
+}
+
+void aztarac_state::snd_status_w(uint8_t data)
+{
+	m_sound_status &= ~0x10;
+}
+
+INTERRUPT_GEN_MEMBER(aztarac_state::snd_timed_irq)
+{
+	m_sound_status ^= 0x10;
+
+	if (m_sound_status & 0x10)
+		device.execute().set_input_line(0,HOLD_LINE);
+}
+
+
+// video
+
+#define AVECTOR(x, y, color, intensity) \
+m_vector->add_point(m_xcenter + ((x) << 16), m_ycenter - ((y) << 16), color, intensity)
+
+
+
+WRITE_LINE_MEMBER(aztarac_state::video_interrupt)
+{
+	if (state)
+		m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
+}
+
+inline void aztarac_state::read_vectorram(int addr, int *x, int *y, int *c)
+{
+	*c = m_vectorram[addr] & 0xffff;
+	*x = m_vectorram[addr + 0x800] & 0x03ff;
+	*y = m_vectorram[addr + 0x1000] & 0x03ff;
+	if (*x & 0x200) *x |= 0xfffffc00;
+	if (*y & 0x200) *y |= 0xfffffc00;
+}
+
+void aztarac_state::ubr_w(uint8_t data)
+{
+	int x, y, c, intensity, xoffset, yoffset, color;
+	int defaddr, objaddr = 0, ndefs;
+
+	m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
+
+	if (data) // data is the global intensity (always 0xff in Aztarac).
+	{
+		m_vector->clear_list();
+
+		while (1)
+		{
+			read_vectorram(objaddr, &xoffset, &yoffset, &c);
+			objaddr++;
+
+			if (c & 0x4000)
+				break;
+
+			if ((c & 0x2000) == 0)
+			{
+				defaddr = (c >> 1) & 0x7ff;
+				AVECTOR(xoffset, yoffset, 0, 0);
+
+				read_vectorram(defaddr, &x, &ndefs, &c);
+				ndefs++;
+
+				if (c & 0xff00)
+				{
+					// latch color only once
+					intensity = (c >> 8);
+					color = vector_device::color222(c & 0x3f);
+					while (ndefs--)
+					{
+						defaddr++;
+						read_vectorram(defaddr, &x, &y, &c);
+						if ((c & 0xff00) == 0)
+							AVECTOR(x + xoffset, y + yoffset, 0, 0);
+						else
+							AVECTOR(x + xoffset, y + yoffset, color, intensity);
+					}
+				}
+				else
+				{
+					// latch color for every definition
+					while (ndefs--)
+					{
+						defaddr++;
+						read_vectorram(defaddr, &x, &y, &c);
+						color = vector_device::color222(c & 0x3f);
+						AVECTOR(x + xoffset, y + yoffset, color, c >> 8);
+					}
+				}
+			}
+		}
+	}
+}
+
+
+void aztarac_state::video_start()
+{
+	const rectangle &visarea = m_screen->visible_area();
+
+	int xmin = visarea.min_x;
+	int ymin = visarea.min_y;
+	int xmax = visarea.max_x;
+	int ymax = visarea.max_y;
+
+	m_xcenter = ((xmax + xmin) / 2) << 16;
+	m_ycenter = ((ymax + ymin) / 2) << 16;
+}
+
+
+// machine
 
 /*************************************
  *
@@ -65,8 +267,8 @@ void aztarac_state::nvram_store_w(uint16_t data)
 
 uint16_t aztarac_state::joystick_r()
 {
-	return (((ioport("STICKZ")->read() - 0xf) << 8) |
-			((ioport("STICKY")->read() - 0xf) & 0xff));
+	return (((m_stickz->read() - 0xf) << 8) |
+			((m_sticky->read() - 0xf) & 0xff));
 }
 
 
@@ -84,10 +286,10 @@ void aztarac_state::main_map(address_map &map)
 	map(0x022000, 0x0221ff).rw(m_nvram, FUNC(x2212_device::read), FUNC(x2212_device::write)).umask16(0x00ff);
 	map(0x027000, 0x027001).r(FUNC(aztarac_state::joystick_r));
 	map(0x027004, 0x027005).portr("INPUTS");
-	map(0x027008, 0x027009).rw(FUNC(aztarac_state::sound_r), FUNC(aztarac_state::sound_w));
+	map(0x027009, 0x027009).rw(FUNC(aztarac_state::sound_r), FUNC(aztarac_state::sound_w));
 	map(0x02700c, 0x02700d).portr("DIAL");
 	map(0x02700e, 0x02700f).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-	map(0xff8000, 0xffafff).ram().share("vectorram");
+	map(0xff8000, 0xffafff).ram().share(m_vectorram);
 	map(0xffb000, 0xffb001).nopr();
 	map(0xffb001, 0xffb001).w(FUNC(aztarac_state::ubr_w));
 	map(0xffe000, 0xffffff).ram();
@@ -123,10 +325,10 @@ void aztarac_state::sound_map(address_map &map)
 
 static INPUT_PORTS_START( aztarac )
 	PORT_START("STICKZ")
-	PORT_BIT( 0x1f, 0xf, IPT_AD_STICK_Z ) PORT_MINMAX(0,0x1e) PORT_SENSITIVITY(100) PORT_KEYDELTA(1)
+	PORT_BIT( 0x1f, 0xf, IPT_AD_STICK_Z ) PORT_MINMAX(0, 0x1e) PORT_SENSITIVITY(100) PORT_KEYDELTA(1)
 
 	PORT_START("STICKY")
-	PORT_BIT( 0x1f, 0xf, IPT_AD_STICK_Y ) PORT_MINMAX(0,0x1e) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_REVERSE
+	PORT_BIT( 0x1f, 0xf, IPT_AD_STICK_Y ) PORT_MINMAX(0, 0x1e) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_REVERSE
 
 	PORT_START("DIAL")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE
@@ -152,7 +354,7 @@ INPUT_PORTS_END
 
 void aztarac_state::aztarac(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	m68000_device &maincpu(M68000(config, m_maincpu, 16_MHz_XTAL / 2));
 	maincpu.set_addrmap(AS_PROGRAM, &aztarac_state::main_map);
 	maincpu.set_cpu_space(AS_PROGRAM);
@@ -165,7 +367,7 @@ void aztarac_state::aztarac(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	/* video hardware */
+	// video hardware
 	VECTOR(config, m_vector, 0);
 	SCREEN(config, m_screen, SCREEN_TYPE_VECTOR);
 	m_screen->set_refresh_hz(40);
@@ -174,7 +376,7 @@ void aztarac_state::aztarac(machine_config &config)
 	m_screen->set_screen_update("vector", FUNC(vector_device::screen_update));
 	m_screen->screen_vblank().set(FUNC(aztarac_state::video_interrupt));
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
@@ -215,12 +417,13 @@ ROM_START( aztarac )
 	ROM_LOAD( "c.j4", 0x0000, 0x1000, CRC(e897dfcd) SHA1(750df3d08512d8098a13ec62677831efa164c126) )
 	ROM_LOAD( "d.j3", 0x1000, 0x1000, CRC(4016de77) SHA1(7232ec003f1b9d3623d762f3270108a1d1837846) )
 
-	ROM_REGION( 0x3000, "proms", 0 ) /* not hooked up */
+	ROM_REGION( 0x3000, "proms", 0 ) // not hooked up
 	ROM_LOAD( "l5.l5", 0x0000, 0x0020, CRC(317fb438) SHA1(3130e1dbde06228707ba46ae85d8df8cc8f32b67) )
 	ROM_LOAD( "k8.k8", 0x0000, 0x1000, CRC(596ad8d9) SHA1(7e2d2d3e02712911ef5ef55d1df5740f6ec28bcb) )
 	ROM_LOAD( "k9.k9", 0x0000, 0x1000, CRC(b8544823) SHA1(78ff1fcb7e640929765533592015cfccef690179) )
 ROM_END
 
+} // anonymous namespace
 
 
 /*************************************
