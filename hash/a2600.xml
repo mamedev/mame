@@ -1508,7 +1508,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>Bank Heist</description>
 		<year>1983</year>
 		<publisher>20th Century Fox</publisher>
-		<info name="serial" value="11012 " />
+		<info name="serial" value="11012" />
 		<info name="programmer" value="Bill Aspromonte" />
 		<sharedfeat name="compatibility" value="NTSC" />
 		<part name="cart" interface="a2600_cart">

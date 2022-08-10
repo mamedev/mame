@@ -3793,7 +3793,7 @@ license:CC0
 		<publisher>Taito</publisher>
 		<info name="serial" value="TP02006"/>
 		<info name="release" value="19900126"/>
-		<info name="alt_title" value="タイトーチェイスH. Q. "/>
+		<info name="alt_title" value="タイトーチェイスH.Q."/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
 				<rom name="taito chase h.q. (japan).pce" size="393216" crc="6f4fd790" sha1="f4cd413a1f87027194b7cadfbaaa714c137e877f" />

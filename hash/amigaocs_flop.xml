@@ -28435,7 +28435,7 @@ ATK test: OK
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Startup Disk " />
+			<feature name="part_id" value="Startup Disk" />
 			<dataarea name="flop" size="1049612">
 				<rom name="king's quest v - absence makes the heart go yonder (europe) (v1.000.000) (startup disk).ipf" size="1049612" crc="2639e123" sha1="38f4317102cd65bf336069f636f2db3ac2a2369c"/>
 			</dataarea>
@@ -29374,7 +29374,7 @@ ATK test: C:0 H:U Bad
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="StartUp Disk " />
+			<feature name="part_id" value="StartUp Disk" />
 			<dataarea name="flop" size="1049612">
 				<rom name="legend of robin hood, the - conquests of the longbow (europe) (v1.000) (startup disk).ipf" size="1049612" crc="f531d078" sha1="0ea0fb16865d6082291de7dd42b0e56883bc725c"/>
 			</dataarea>

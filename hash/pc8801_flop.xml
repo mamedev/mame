@@ -2443,7 +2443,7 @@ ExtractDisk  [02]"SAGA#1          " -> "adventure land_02.d88"
 	</software>
 
 	<!-- hangs at Starcraft logo -->
-	<!-- FDC stalls [Finds a CHRN=(11 01 0a 01) but fails scan ID?]  -->
+	<!-- FDC stalls [Finds a CHRN=(11 01 0a 01) but fails scan ID?] -->
 	<software name="amazongta" cloneof="amazongt" supported="no">
 		<description>Amazon Gakujutsu Tanken (alt)</description>
 		<year>1984</year>
@@ -4563,7 +4563,7 @@ ExtractDisk  [04]"Disk 2          " -> "battle gorilla_04.d88"
 	<!-- Hangs at HARD. DOS loader -->
 	<!-- FDC stalls [tries to scan for missing CHRN=(00 00 01 06)] -->
 	<software name="bshashms1" cloneof="bshashms" supported="no">
-		<description>Bishoujo Shashinkan  - Moving School (alt?)</description>
+		<description>Bishoujo Shashinkan - Moving School (alt?)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="美少女写真館 -ムービング・スクール-"/>
@@ -14080,7 +14080,7 @@ ExtractDisk  [04]"Data Disk    " -> "formula cms_04.d88"
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Data (Map)" />
 			<dataarea name="flop" size="415840">
-				<rom name="gokudo jintori (data  - map).d88" size="415840" crc="b3e5d6b9" sha1="ecc6115143032f8b5cdf6403529e1e7db072d15a"/>
+				<rom name="gokudo jintori (data - map).d88" size="415840" crc="b3e5d6b9" sha1="ecc6115143032f8b5cdf6403529e1e7db072d15a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -33215,7 +33215,7 @@ ExtractDisk  [02]"A DISK          " -> "sorcerian music library_02.d88"
 
 	<!-- [Incorrect layout on track 0 head 0, expected_size=100000, current_size=103616] -->
 	<software name="suiryus2" supported="no">
-		<description>Suiryushi II -  Wadatsumi no Hikari Koto</description>
+		<description>Suiryushi II - Wadatsumi no Hikari Koto</description>
 		<year>1989</year>
 		<publisher>しゃんばら (Shanbara)</publisher>
 		<!-- PC8801mk2SR -->
@@ -33262,7 +33262,7 @@ ExtractDisk  [02]"A DISK          " -> "sorcerian music library_02.d88"
 
 	<!-- [Incorrect layout on track 0 head 0, expected_size=100000, current_size=103616] -->
 	<software name="suiryus2a" cloneof="suiryus2" supported="no">
-		<description>Suiryushi II -  Wadatsumi no Hikari Koto (alt User Disk)</description>
+		<description>Suiryushi II - Wadatsumi no Hikari Koto (alt User Disk)</description>
 		<year>1989</year>
 		<publisher>しゃんばら (Shanbara)</publisher>
 		<!-- PC8801mk2SR -->
@@ -36352,7 +36352,7 @@ ExtractDisk  [02]"PROGRAM        " -> "transylvania_02.d88"
 	</software>
 
 	<software name="ultima3">
-		<description>Ultima III  - Exodus</description>
+		<description>Ultima III - Exodus</description>
 		<year>1989</year>
 		<publisher>ポニカ (Pony Canyon)</publisher>
 		<!-- PC8801mk2SR -->
@@ -36389,7 +36389,7 @@ ExtractDisk  [02]"ｼﾅﾘｵﾃﾞｨｽｸ      " -> "ultima 3(ponyca)_02.d88
 ExtractDisk  [03]"ﾕｰｻﾞｰｼｽﾃﾑﾃﾞｨｽｸ  " -> "ultima 3(ponyca)_03.d88"
 -->
 	<software name="ultima3a" cloneof="ultima3">
-		<description>Ultima III  - Exodus (alt)</description>
+		<description>Ultima III - Exodus (alt)</description>
 		<year>1989</year>
 		<publisher>ポニカ (Pony Canyon)</publisher>
 		<!-- PC8801mk2SR -->
@@ -36419,7 +36419,7 @@ ExtractDisk  [03]"ﾕｰｻﾞｰｼｽﾃﾑﾃﾞｨｽｸ  " -> "ultima 3(pon
 
 <!-- does this contain correct programs?? also flop2 & 3 seem equal except for header... -->
 	<software name="ultima3b" cloneof="ultima3">
-		<description>Ultima III  - Exodus (Bad?)</description>
+		<description>Ultima III - Exodus (Bad?)</description>
 		<year>1989</year>
 		<publisher>ポニカ (Pony Canyon)</publisher>
 		<!-- PC8801mk2SR -->
@@ -48292,7 +48292,7 @@ ExtractDisk  [09]"第4集 B     " -> "jam vol.1 (alt)_09.d88"
 		<description>Chili Tomato</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<!-- TODO: does it really not work on MA 4MHz? Keeps spinning at BASIC otherwise  -->
+		<!-- TODO: does it really not work on MA 4MHz? Keeps spinning at BASIC otherwise -->
 		<info name="usage" value="Set 8MHz mode on a PC8801MA+"/>
 
 		<part name="flop1" interface="floppy_5_25">

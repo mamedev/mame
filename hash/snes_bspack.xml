@@ -3747,7 +3747,7 @@ license:CC0
 		<description>Kouryaku Casino Bar Nichiyoubi &amp; 2/24 Game Tora no Ooana Special (0224)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="攻略カジノバー ルーレット +  ゲーム虎の大穴スペシャル 2/24" />
+		<info name="alt_title" value="攻略カジノバー ルーレット + ゲーム虎の大穴スペシャル 2/24" />
 		<part name="cart" interface="bspack">
 
 			<feature name="slot" value="bsmempak" />

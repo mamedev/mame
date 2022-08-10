@@ -10694,7 +10694,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4004"/>
-		<info name="release" value="19890210 "/>
+		<info name="release" value="19890210"/>
 		<info name="alt_title" value="アレックスキッド 天空魔城 ~ Alex Kidd - Tenkuu Majou (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="262144">

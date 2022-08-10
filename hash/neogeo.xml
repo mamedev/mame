@@ -4785,7 +4785,7 @@ license:CC0
 	</software>
 
 	<software name="stakwindev" cloneof="stakwin" supported="no">
-		<description>Stakes Winner / Stakes Winner - GI Kinzen  Seiha e no Michi (early development board)</description>
+		<description>Stakes Winner / Stakes Winner - GI Kinzen Seiha e no Michi (early development board)</description>
 		<year>1995</year>
 		<publisher>Saurus</publisher>
 		<info name="alt_title" value="ステークスウィナー"/>

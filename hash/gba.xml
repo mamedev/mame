@@ -934,7 +934,7 @@ license:CC0
 		<description>Aleck Bordon Adventure - Tower &amp; Shaft Advance (Jpn)</description>
 		<year>2004</year>
 		<publisher>Aruze</publisher>
-		<info name="serial" value="AGB-BABJ "/>
+		<info name="serial" value="AGB-BABJ"/>
 		<info name="release" value="20041126"/>
 		<info name="alt_title" value="アレックボードンアドベンチャー タワー&amp;シャフト アドバンス"/>
 		<part name="cart" interface="gba_cart">
@@ -3731,7 +3731,7 @@ license:CC0
 		<description>Bouken-ou Beet - Busters Road (Jpn)</description>
 		<year>2004</year>
 		<publisher>Bandai</publisher>
-		<info name="serial" value="AGB-BOVJ "/>
+		<info name="serial" value="AGB-BOVJ"/>
 		<info name="release" value="20050120"/>
 		<info name="alt_title" value="冒険王ビィト バスターズロード"/>
 		<part name="cart" interface="gba_cart">
@@ -16941,7 +16941,7 @@ license:CC0
 		<publisher>Culture Brain</publisher>
 		<info name="serial" value="AGB-BKGJ-JPN"/>
 		<info name="release" value="20030926"/>
-		<info name="alt_title" value="かわいいペット ゲームギャラリー "/>
+		<info name="alt_title" value="かわいいペット ゲームギャラリー"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom" />
 			<dataarea name="rom" size="8388608">
@@ -22435,7 +22435,7 @@ license:CC0
 		<publisher>Success</publisher>
 		<info name="serial" value="AGB-BSGJ-JPN"/>
 		<info name="release" value="20040924"/>
-		<info name="alt_title" value="みんなのソフトシリーズ みんなの将棋 "/>
+		<info name="alt_title" value="みんなのソフトシリーズ みんなの将棋"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
@@ -22450,7 +22450,7 @@ license:CC0
 		<publisher>Success</publisher>
 		<info name="serial" value="AGB-BSGJ-JPN"/>
 		<info name="release" value="20040924"/>
-		<info name="alt_title" value="みんなのソフトシリーズ みんなの将棋 "/>
+		<info name="alt_title" value="みんなのソフトシリーズ みんなの将棋"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
