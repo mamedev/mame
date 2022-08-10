@@ -3566,15 +3566,15 @@ Beyond that last category are the roms waiting to be classified.
 		<part name="cart" interface="snes_cart">
 			<feature name="enhancement" value="GSU-2" />
 			<feature name="pcb" value="SHVC-4RB3B7S-RE-01" />
-			<feature name="u1"  value="U1 16M ROM-EMU" />
-			<feature name="u2"  value="U2 ?M EPROM" />
-			<feature name="u3"  value="U3 4M EPROM" />
-			<feature name="u4"  value="U4 4M EPROM" />
-			<feature name="u5"  value="U5 1M SRAM" />
-			<feature name="u6"  value="U6 64K SRAM" />
-			<feature name="u7"  value="U7 GSU-2 112P" />
-			<feature name="u8"  value="U8 ALS541" />
-			<feature name="u9"  value="U9 ALS541" />
+			<feature name="u1" value="U1 16M ROM-EMU" />
+			<feature name="u2" value="U2 ?M EPROM" />
+			<feature name="u3" value="U3 4M EPROM" />
+			<feature name="u4" value="U4 4M EPROM" />
+			<feature name="u5" value="U5 1M SRAM" />
+			<feature name="u6" value="U6 64K SRAM" />
+			<feature name="u7" value="U7 GSU-2 112P" />
+			<feature name="u8" value="U8 ALS541" />
+			<feature name="u9" value="U9 ALS541" />
 			<feature name="u10" value="U10 ALS1244" />
 			<feature name="u11" value="U11 LS139" />
 			<feature name="u12" value="U12 MM1134" />
@@ -5842,7 +5842,7 @@ more investigation needed...
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="sm choukyoushi hitomi vol. 3 (japan) (alt 1) (unl) [b].sfc" size="1048576" crc="92e6d22f" sha1="cfed5026f490dcd3a9848c5499d4f6f010bab880" offset="0x000000"  status="baddump" />
+				<rom name="sm choukyoushi hitomi vol. 3 (japan) (alt 1) (unl) [b].sfc" size="1048576" crc="92e6d22f" sha1="cfed5026f490dcd3a9848c5499d4f6f010bab880" offset="0x000000" status="baddump" />
 			</dataarea>
 			<dataarea name="nvram" size="2048">
 			</dataarea>
