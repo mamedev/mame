@@ -26213,7 +26213,7 @@ license:CC0
 			<feature name="pcb" value="TAITO-CNROM" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
-				<rom name="pp pp x3-007" size="32768" crc="9ff0f634" sha1="d9c50e04d01c9d9c94460b71b449ff6c5c6c39d6" offset="00000" />
+				<rom name="pp  pp x3-007" size="32768" crc="9ff0f634" sha1="d9c50e04d01c9d9c94460b71b449ff6c5c6c39d6" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="32768">
 				<rom name="c c c c x3-008" size="32768" crc="23e2279e" sha1="63ba9ff2040654bf2fc2dca5521839170234cc32" offset="00000" />

@@ -3512,18 +3512,18 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Detana Twinbee Yahoo! Deluxe Pack (Japan) (3M)... -->
+	<!-- Identifying Detana Twinbee Yahho! Deluxe Pack (Japan) (3M)... -->
 	<software name="tbyahhod" supported="no">
-		<description>Detana Twinbee Yahoo! Deluxe Pack (Jpn, 3M)</description>
+		<description>Detana Twinbee Yahho! Deluxe Pack (Jpn, 3M)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-9505G (VS012-J1)"/>
 		<info name="release" value="19950929"/>
-		<info name="alt_title" value="出たなツインビーヤッホー! DELUXE PACK"/>
+		<info name="alt_title" value="出たなツインビーヤッホー！ DELUXE PACK"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="detana twinbee yahoo deluxe pack (japan) (3m)" sha1="eba96093ca1030f0d6cafb34c64567ec91851684" />
+				<disk name="detana twinbee yahho  deluxe pack (japan) (3m)" sha1="eba96093ca1030f0d6cafb34c64567ec91851684" />
 			</diskarea>
 		</part>
 	</software>
@@ -16438,16 +16438,16 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Detana Twinbee Yahho ! Deluxe Pack (T-9505G)... -->
 	<software name="tbyahhoda" cloneof="tbyahhod" supported="no">
-		<description>Detana Twinbee Yahoo! Deluxe Pack (Jpn, alt)</description>
+		<description>Detana Twinbee Yahho! Deluxe Pack (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-9505G (VS012-J1)"/>
 		<info name="release" value="19950929"/>
-		<info name="alt_title" value="出たなツインビーヤッホー! DELUXE PACK"/>
+		<info name="alt_title" value="出たなツインビーヤッホー！ DELUXE PACK"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="detana twinbee yahho deluxe pack (t-9505g)" sha1="29b400fe6415db5dcba45b4c420fff24197f3284" />
+				<disk name="detana twinbee yahho  deluxe pack (t-9505g)" sha1="29b400fe6415db5dcba45b4c420fff24197f3284" />
 			</diskarea>
 		</part>
 	</software>
@@ -18614,7 +18614,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Koden Koureijjyutsu  Hyaku Monogatari - Hontoni Atta Kowai Hanashi (Satakore) Disc 1 (T-14324G)... -->
 	<!-- Identifying Koden Koureijjyutsu  Hyaku Monogatari - Hontoni Atta Kowai Hanashi (Satakore) Disc 2 (T-14324G)... -->
 	<software name="koden" supported="no">
-		<description>Koden Koureijjyutsu Hyaku Monogatari - Hontoni Atta Kowai Hanashi (Jpn, Satakore)</description>
+		<description>Koden Koureijjyutsu: Hyaku Monogatari - Hontoni Atta Kowai Hanashi (Jpn, Satakore)</description>
 		<year>1998</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="T-14324G"/>
@@ -18623,12 +18623,12 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="koden koureijjyutsu hyaku monogatari - hontoni atta kowai hanashi (satakore) disc 1 (t-14324g)" sha1="4a7920d95cab3ea9234c0a54f364020ba328f980" />
+				<disk name="koden koureijjyutsu  hyaku monogatari - hontoni atta kowai hanashi (satakore) disc 1 (t-14324g)" sha1="4a7920d95cab3ea9234c0a54f364020ba328f980" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="koden koureijjyutsu hyaku monogatari - hontoni atta kowai hanashi (satakore) disc 2 (t-14324g)" sha1="48cb3c216397b3444f479980f7fab0b49283afa9" />
+				<disk name="koden koureijjyutsu  hyaku monogatari - hontoni atta kowai hanashi (satakore) disc 2 (t-14324g)" sha1="48cb3c216397b3444f479980f7fab0b49283afa9" />
 			</diskarea>
 		</part>
 	</software>
