@@ -12,18 +12,16 @@
 
 ***************************************************************************/
 
-
-//#define VIDEO_PRINTS
-
-
 #include "emu.h"
-#include "cpu/axc51/axc51.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "cpu/axc51/axc51.h"
 #include "sound/dac.h"
 
 class monon_color_state : public driver_device
@@ -46,10 +44,25 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 private:
+	enum
+	{
+		READY_FOR_COMMAND = 0x00,
+		READY_FOR_ADDRESS2 = 0x01,
+		READY_FOR_ADDRESS1 = 0x02,
+		READY_FOR_ADDRESS0 = 0x03,
+
+		READY_FOR_HSADDRESS2 = 0x04,
+		READY_FOR_HSADDRESS1 = 0x05,
+		READY_FOR_HSADDRESS0 = 0x06,
+		READY_FOR_HSDUMMY = 0x07,
+
+		READY_FOR_READ = 0x08,
+		READY_FOR_STATUS_READ = 0x09,
+	};
+
 	required_device<generic_slot_device> m_cart;
 	required_device<ax208_cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -77,6 +90,18 @@ private:
 	void dacout0_w(uint8_t data);
 	void dacout1_w(uint8_t data);
 
+	uint8_t spibuf_r();
+	void spibuf_w(uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(spidir_w);
+
+	void do_draw_inner(int pal_to_use, int start, int step, int pixmask, int amount);
+	void do_draw(int amount, int pal_to_use);
+	void do_palette(int amount, int pal_to_use);
+
+	rgb_t m_vidbuffer[320 * 240];
+	int16_t m_bufpos_y;
+	uint32_t m_bufpos_x;
+	uint8_t m_storeregs[0x20];
 	uint8_t m_dacbyte;
 
 	uint8_t m_out2state;
@@ -92,41 +117,6 @@ private:
 	uint8_t m_out0data;
 
 	uint8_t m_curpal[0x100 * 3][0x100];
-
-	int m_spireadssincelast = 0;
-	bool m_spibufhasbeenread = false;
-
-	enum
-	{
-		READY_FOR_COMMAND = 0x00,
-		READY_FOR_ADDRESS2 = 0x01,
-		READY_FOR_ADDRESS1 = 0x02,
-		READY_FOR_ADDRESS0 = 0x03,
-
-		READY_FOR_HSADDRESS2 = 0x04,
-		READY_FOR_HSADDRESS1 = 0x05,
-		READY_FOR_HSADDRESS0 = 0x06,
-		READY_FOR_HSDUMMY = 0x07,
-
-		READY_FOR_READ = 0x08,
-		READY_FOR_STATUS_READ = 0x09,
-	};
-
-	uint8_t spibuf_r();
-	void spibuf_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(spidir_w);
-
-	rgb_t m_vidbuffer[320 * 240];
-	int m_bufpos_y;
-	uint32_t m_bufpos_x;
-
-	uint8_t m_storeregs[0x20];
-	void do_draw_inner(int pal_to_use, int start, int step, int pixmask, int amount);
-	void do_draw(int amount, int pal_to_use);
-	void do_palette(int amount, int pal_to_use);
-#ifdef HEAT_MAP_DEBUG
-	uint8_t m_flashheat[0x1000000];
-#endif
 };
 
 void monon_color_state::machine_start()
@@ -146,26 +136,11 @@ void monon_color_state::machine_start()
 	save_item(NAME(m_bufpos_y));
 
 	save_item(NAME(m_storeregs));
-#ifdef HEAT_MAP_DEBUG
-	std::fill(std::begin(m_flashheat), std::end(m_flashheat), 0);
-#endif
 }
 
 uint8_t monon_color_state::spibuf_r()
 {
-//	if (m_out2state & 0x01)
-//		return 0x00;
-
-//	if (m_spibufhasbeenread == true)
-//		logerror("%s: reading SPI buffer without any new value being set!\n", machine().describe_context().c_str());
-
-	//logerror("%s: sfr_read AXC51_SPIBUF %02x\n", machine().describe_context(), m_spilatch);
 	uint8_t ret = m_spilatch;
-//	m_spilatch = 0x00;
-
-	m_spibufhasbeenread = true;
-
-
 	return ret;
 }
 
@@ -176,37 +151,23 @@ WRITE_LINE_MEMBER(monon_color_state::spidir_w)
 
 void monon_color_state::spibuf_w(uint8_t data)
 {
-//	if (m_out2state & 0x01)
-//		return;
-
 	if (!m_spidir) // Send to SPI
 	{
-		//logerror("%s: sfr_write AXC51_SPIBUF %02x in mode %d\n", machine().describe_context(), data, (int)m_spi_state);
-
 		switch (m_spi_state)
 		{
 		case READY_FOR_COMMAND:
 			if (data == 0x03)
 			{
-				// set read mode
-			//	logerror("SPI Read Command\n");
 				m_spi_state = READY_FOR_ADDRESS2;
 			}
 			else if (data == 0x05)
 			{
-			//	logerror("SPI Status Command\n");
 				m_spi_state = READY_FOR_STATUS_READ;
 			}
 			else if (data == 0x0b)
 			{
-			//	logerror("SPI Fast Read Command\n");
 				m_spi_state = READY_FOR_HSADDRESS2;
 			}
-			else
-			{
-				//logerror("SPI unknown Command\n");
-			}
-
 			break;
 
 		case READY_FOR_ADDRESS2:
@@ -223,21 +184,6 @@ void monon_color_state::spibuf_w(uint8_t data)
 			m_spiaddr = (m_spiaddr & 0xffff00) | (data);
 			m_spi_state = READY_FOR_READ;
 			m_spidir = 1;
-			/*
-			if (m_spireadssincelast == 0)
-				logerror("<>.>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>no CPU SPI reads took place before next change! (must be direct VDP access?)\n");
-			else
-				logerror("<>.>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>%04x SPI reads took place before next change!\n", m_spireadssincelast);
-
-			if (m_spiaddr < 0xa000)
-				logerror("<>.>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n########################### DON'T CARE, CODE TRANSFERS ################################################# SPI Address set to %08x\n", m_spiaddr);
-			else
-				logerror("<>.>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\nSPI Address set to %08x\n", m_spiaddr);
-			*/
-#ifdef HEAT_MAP_DEBUG
-			m_flashheat[m_spiaddr & 0xffffff] = 0xcc;
-#endif
-			m_spireadssincelast = 0;
 			break;
 
 		case READY_FOR_HSADDRESS2:
@@ -253,27 +199,6 @@ void monon_color_state::spibuf_w(uint8_t data)
 		case READY_FOR_HSADDRESS0:
 			m_spiaddr = (m_spiaddr & 0xffff00) | (data);
 			m_spi_state = READY_FOR_HSDUMMY;
-
-			//if (m_spiaddr == 0x0755edc)
-			//	machine().debug_break();
-
-			//if (m_spiaddr == (0x0755edc + 0x0202))
-			//	machine().debug_break();
-			/*
-			if (m_spireadssincelast == 0)
-				logerror("<>.>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>no CPU SPI reads took place before next change! (must be direct VDP access?)\n");
-			else
-				logerror("<>.>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>%04x SPI reads took place before next change!\n", m_spireadssincelast);
-
-			if (m_spiaddr < 0xa000)
-				logerror("<>.>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n########################### DON'T CARE, CODE TRANSFERS ################################################# SPI High Speed Address set to %08x\n", m_spiaddr);
-			else
-				logerror("<>.>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\nSPI High Speed Address set to %08x\n", m_spiaddr);
-			*/
-#ifdef HEAT_MAP_DEBUG
-			m_flashheat[m_spiaddr& 0xffffff] = 0x33;
-#endif
-			m_spireadssincelast = 0;
 			break;
 
 		case READY_FOR_HSDUMMY:
@@ -285,39 +210,17 @@ void monon_color_state::spibuf_w(uint8_t data)
 	}
 	else
 	{
-	//	if (m_spiaddr>=0xa000)
-	//		logerror("%s: sfr_write AXC51_SPIBUF (READ INTO TO LATCH) (dummy byte %02x)\n", machine().describe_context(), data);
-
 		if (m_spi_state == READY_FOR_READ)
 		{
-
-		//	if (m_spiaddr>=0xa000)
-		//		logerror("read from SPI ADDRESS %08x data %02x\n", m_spiaddr, m_spiptr[m_spiaddr]);
-
-			m_spireadssincelast++;
-
-#ifdef HEAT_MAP_DEBUG
-			m_flashheat[m_spiaddr] = 0xff;// m_spiptr[m_spiaddr];
-#endif
-
 			m_spilatch = m_spiptr[(m_spiaddr++)& 0xffffff];
-			m_spibufhasbeenread = false;
-
-		//	logerror("%s: sfr_write AXC51_SPIBUF (clock read, data read latching in %02x)\n", machine().describe_context(), m_spilatch);			
 		}
 		else if (m_spi_state == READY_FOR_STATUS_READ)
 		{
 			m_spilatch = 0x00;
-			m_spibufhasbeenread = false;
-
-
-		//	logerror("%s: sfr_write AXC51_SPIBUF (clock read, status read)\n", machine().describe_context(), m_spi_state);			
 		}
 		else
 		{
 			m_spilatch = 0x00;
-			m_spibufhasbeenread = false;
-		//	logerror("%s: sfr_write AXC51_SPIBUF (unknown read, status read)\n", machine().describe_context(), m_spi_state);			
 		}
 	}
 }
@@ -373,18 +276,6 @@ uint32_t monon_color_state::screen_update(screen_device &screen, bitmap_rgb32 &b
 			bitmap.pix(y, x) = pixel;
 		}
 	}
-
-#ifdef HEAT_MAP_DEBUG
-	{
-		FILE *fp;
-		fp=fopen("heatmapx", "w+b");
-		if (fp)
-		{
-			fwrite(m_flashheat, 0x1000000/2, 1, fp);
-			fclose(fp);
-		}
-	}
-#endif
 
 	return 0;
 }
@@ -493,9 +384,6 @@ static INPUT_PORTS_START( monon_color )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-
-
-
 uint8_t monon_color_state::in0_r()
 {
 	return m_debugin[0]->read();
@@ -523,7 +411,6 @@ uint8_t monon_color_state::in4_r()
 
 void monon_color_state::dacout0_w(uint8_t data)
 {
-	//logerror("%s: dacout0_w %02x\n", machine().describe_context().c_str(), data);
 	m_dacbyte ^= 1;
 
 	if (m_dacbyte == 1)
@@ -532,7 +419,7 @@ void monon_color_state::dacout0_w(uint8_t data)
 
 void monon_color_state::dacout1_w(uint8_t data)
 {
-	//logerror("%s: dacout1_w %02x\n", machine().describe_context().c_str(), data);
+	// mono sound, not used?
 }
 
 
@@ -544,8 +431,6 @@ void monon_color_state::out0_w(uint8_t data)
 
 void monon_color_state::out1_w(uint8_t data)
 {
-	//logerror("out1 %02x\n", data);
-
 	// out1 goes e5, e5, e7, e7 when WRITING a byte to the video device
 	//        or e3, e3, e7, e7 when READING a byte from the video device
 	//
@@ -571,13 +456,11 @@ void monon_color_state::out2_w(uint8_t data)
 	{
 		if (data & 0x01)
 		{
-		//	logerror("low to high on port 2\n");
+			// nothing?
 		}
 		else
 		{
-		//	logerror("high to low on port 2\n");
 			m_spi_state = READY_FOR_COMMAND;
-
 		}
 	}
 	m_out2state = data;
@@ -585,22 +468,8 @@ void monon_color_state::out2_w(uint8_t data)
 
 uint8_t monon_color_state::read_from_video_device()
 {
-
-#ifdef VIDEO_PRINTS
-	if (m_out0data >= 0x10) 
-		printf("%s: ***************************************** video read m_out0data %02x\n", machine().describe_context().c_str(), m_out0data);
-	else
-		printf("%s: ########################## video read m_out0data %02x\n", machine().describe_context().c_str(), m_out0data);
-#endif
-
-	if ((m_out0data != 0x00) && (m_out0data != 0x1b) && (m_out0data != 0x0a) && (m_out0data != 0x0c) && (m_out0data != 0x17) && (m_out0data != 0x1f) && (m_out0data != 0xff))
-	{
-		fatalerror("unknown out when using in");
-	}
-
-
 	if (m_out0data == 0x0c)
-		return 0xff ^ 0x02; // m_storeregs[0x0c] & 0xfd
+		return 0xff ^ 0x02;
 
 	if (m_out0data == 0x1b)
 		return 0x00;
@@ -608,13 +477,14 @@ uint8_t monon_color_state::read_from_video_device()
 	if (m_out0data == 0x17)
 		return 0x00;
 
-	return 0x00;// machine().rand();
+	return 0x00;
 }
 
 void monon_color_state::do_draw_inner(int pal_to_use, int start, int step, int pixmask, int amount)
 {
 	int yadjust = (m_storeregs[0x16] << 8) | m_storeregs[0x1a];
 	yadjust >>= 7;
+	yadjust -= 8;
 
 	for (int i = 0; i < amount; i++)
 	{
@@ -623,7 +493,8 @@ void monon_color_state::do_draw_inner(int pal_to_use, int start, int step, int p
 
 		for (int i = start; i >= 0; i -= step)
 		{
-			int real_ypos = m_bufpos_y; real_ypos -= yadjust;
+			int real_ypos = m_bufpos_y;
+			real_ypos -= yadjust;
 			if ((real_ypos >= 0) && (real_ypos < 240))
 			{
 				uint8_t pixx = (pix >> i) & pixmask;
@@ -641,56 +512,26 @@ void monon_color_state::do_draw(int amount, int pal_to_use)
 {
 	if (m_storeregs[0x12] == 0x13)  // 8bpp mode
 	{
-#ifdef VIDEO_PRINTS
-		printf("<>.>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 8bpp transfer direct to VDP? %02x bytes? @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n", amount);
-#endif
 		do_draw_inner(pal_to_use, 0, 1, 0xff, amount);
 	}
 	else if (m_storeregs[0x12] == 0x12) // 4bpp mode
 	{
-
-#ifdef VIDEO_PRINTS
-		printf("<>.>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>4bpp transfer direct to VDP? %02x bytes? @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n", amount);
-#endif
 		do_draw_inner(pal_to_use, 4, 4, 0xf, amount);	
 	}
 	else if (m_storeregs[0x12] == 0x11) // 2bpp mode
 	{
-
-#ifdef VIDEO_PRINTS
-		printf("<>.>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2bpp transfer direct to VDP? %02x bytes? @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n", amount);
-#endif
 		do_draw_inner(pal_to_use, 6, 2, 0x3, amount);	
 	}
 	else if (m_storeregs[0x12] == 0x10)  // 1bpp mode
 	{
-#ifdef VIDEO_PRINTS
-		printf("<>.>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>1bpp transfer direct to VDP? %02x bytes? @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n", amount);
-#endif
 		do_draw_inner(pal_to_use, 7, 1, 1, amount);	
-	}
-	else 
-	{
-#ifdef VIDEO_PRINTS
-		printf("<>.>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>unknown transfer direct to VDP? %02x bytes? @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n", amount);
-#endif				
 	}
 
 	m_bufpos_y = 239;
-#ifdef HEAT_MAP_DEBUG
-	for (int i = 0; i < amount; i++)
-	{
-		m_flashheat[(m_spiaddr + i) & 0xffffff] = m_spiptr[(m_spiaddr + i) & 0xffffff];
-	}
-#endif
 }
 
 void monon_color_state::do_palette(int amount, int pal_to_use)
 {
-#ifdef VIDEO_PRINTS
-	printf("<>.>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>A palette transfer (%02x bytes?) was requested direct to VDP ====================================================================================\n", amount);
-#endif
-
 	for (int i = 0; i < amount; i++)
 	{
 		spibuf_w(0x00); // clock
@@ -698,76 +539,21 @@ void monon_color_state::do_palette(int amount, int pal_to_use)
 
 		m_curpal[i][pal_to_use] = romdat;
 	}
-
-#ifdef HEAT_MAP_DEBUG
-	for (int i = 0; i < amount; i++)
-	{
-		m_flashheat[(m_spiaddr + i) & 0xffffff] = m_spiptr[(m_spiaddr + i) & 0xffffff];
-	}
-#endif
 }
 
 
 void monon_color_state::write_to_video_device(uint8_t data)
 {
-	//bool trigger_transfer = false;
-
-#ifdef VIDEO_PRINTS
-	if (m_out0data == 0x01)
-		printf("==== video write m_out0data %02x data %02x (set transfer length upper)\n", m_out0data, data); // used when transfering 8bpp palettes
-	else if (m_out0data == 0x0c)
-		printf("==== video write m_out0data %02x data %02x (trigger transfer?)\n", m_out0data, data);
-	else if (m_out0data == 0x0e)
-		printf("==== video write m_out0data %02x data %02x (set transfer length lower)\n", m_out0data, data);
-	else if (m_out0data == 0x11)
-		printf("---------- video write m_out0data %02x data %02x (setting palette select of gfx for next transfer!)\n", m_out0data, data);
-	else if (m_out0data == 0x12)
-		printf("---------- video write m_out0data %02x data %02x (setting BPP of gfx for next transfer!)\n", m_out0data, data);
-	else if (m_out0data == 0x1b)
-		printf("--------~@'@@@@@@@@@@@@@@@@@@@@@-- video write m_out0data %02x data %02x\n", m_out0data, data);
-	else
-		printf("==######################== video write m_out0data %02x data %02x\n", m_out0data, data);
-	
-#endif
-
-	/*
-
-	startup only
-
-	out3 data 00 (out0 b0)
-	out3 data 00 (out0 b0)
-	out3 data dc (out0 10)
-	out3 data 32 (out0 18)
-	out3 data dc (out0 14)
-	out3 data c0 (out0 0b)
-	out3 data 00 (out0 07)
-	out3 data 00 (out0 0f)
-	out3 data 00 (out0 0d)
-	out3 data c0 (out0 0a)
-	out3 data 00 (out0 0f)
-	out3 data 00 (out0 07)
-	out3 data 00 (out0 0b)
-
-	*/
-
-	// these are 2 pairs of read/write codepaths before accessing the video device
-	// one of them sets port 4 to be 0x03, the other sets it to be 0x09
-	// are there multiple devices?
-
 	if (m_out4data == 0x03)
 	{
 		if (m_out0data < 0x20)
 		{
 			if (m_out0data >= 0x10) // when out4data is 0x03 registers(?) used are also always >= 0x10?
 				m_storeregs[m_out0data] = data;
-			else
-			{
-				//logerror("out4 mode is 0x03, m_out0data is <0x10  %02x\n", m_out0data);
-			}
 		}
 
-		popmessage("%02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x | %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n", m_storeregs[0x00], m_storeregs[0x01], m_storeregs[0x02], m_storeregs[0x03], m_storeregs[0x04], m_storeregs[0x05], m_storeregs[0x06], m_storeregs[0x07], m_storeregs[0x08], m_storeregs[0x09], m_storeregs[0x0a], m_storeregs[0x0b], m_storeregs[0x0c], m_storeregs[0x0d], m_storeregs[0x0e], m_storeregs[0x0f],
-			m_storeregs[0x10], m_storeregs[0x11], m_storeregs[0x12], m_storeregs[0x13], m_storeregs[0x14], m_storeregs[0x15], m_storeregs[0x16], m_storeregs[0x17], m_storeregs[0x18], m_storeregs[0x19], m_storeregs[0x1a], m_storeregs[0x1b], m_storeregs[0x1c], m_storeregs[0x1d], m_storeregs[0x1e], m_storeregs[0x1f]);
+	//	popmessage("%02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x | %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n", m_storeregs[0x00], m_storeregs[0x01], m_storeregs[0x02], m_storeregs[0x03], m_storeregs[0x04], m_storeregs[0x05], m_storeregs[0x06], m_storeregs[0x07], m_storeregs[0x08], m_storeregs[0x09], m_storeregs[0x0a], m_storeregs[0x0b], m_storeregs[0x0c], m_storeregs[0x0d], m_storeregs[0x0e], m_storeregs[0x0f],
+	//		m_storeregs[0x10], m_storeregs[0x11], m_storeregs[0x12], m_storeregs[0x13], m_storeregs[0x14], m_storeregs[0x15], m_storeregs[0x16], m_storeregs[0x17], m_storeregs[0x18], m_storeregs[0x19], m_storeregs[0x1a], m_storeregs[0x1b], m_storeregs[0x1c], m_storeregs[0x1d], m_storeregs[0x1e], m_storeregs[0x1f]);
 
 	}
 	else if (m_out4data == 0x09)
@@ -776,62 +562,34 @@ void monon_color_state::write_to_video_device(uint8_t data)
 		{
 			if (m_out0data < 0x10) // when out4data is 0x09 registers(?) used are also always < 0x10?
 			{
-				if (m_out0data == 0x02)
-				{
-					if ((m_storeregs[m_out0data] & 0x20) != (data & 0x20))
-					{
-						// or 0x20 is 'enable SPI access' ?
-						// sometimes a transfer will happen with it set, then another without it
-						// which just results in reading invalid data.
-						
-						//	if (data & 0x20)
-						//		trigger_transfer = true;
-					}
-				}
 				m_storeregs[m_out0data] = data;
-			}
-			else
-			{
-#ifdef VIDEO_PRINTS
-				printf("out4 mode is 0x09, m_out0data is >=0x10  %02x\n", m_out0data);
-#endif
 			}
 		}
 	}
-	else
-	{
-		fatalerror("write to port 3 with unknown port 4 state %02x\n", m_out4data);
-	}
 
-	if (m_out0data == 0x16)
-	{
-#ifdef VIDEO_PRINTS
-		printf("<>.>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> set vertical shift to %02x%02x\n", m_storeregs[0x16], m_storeregs[0x1a]);
-#endif
-	}
 
 	if (m_out0data == 0x1b)
 	{
 		if (data == 0x81)
 		{
 			m_bufpos_x++;
-			//printf("next column of data!\n");
 
 			if (m_bufpos_x == 320)
 			{
 				m_bufpos_x = 0;
-				//printf("next frame of data!\n");
 			}
 
 			m_bufpos_y = 239;
 		}
-		else
-		{
-			//printf("unknown 1b write %02x!\n", data);
-		}
 	}
 
-	// the broken repeating backgrounds are always drawn with m_storeregs[0x1c] == 0x11)
+	// The broken repeating backgrounds are always drawn with m_storeregs[0x1c] == 0x11)
+	// this indicates the VDP could take care of them, but to do so it would need the
+	// line data, which is processed by the CPU instead, so it must cause something else
+	//
+	// The repeat happens every 64 line columns (so 5 copies of the background over the
+	// 320 wide screen) but there doesn't seem to be anything special about the code
+	// after each 64th line column either?!
 
 	if (m_out0data == 0x0c)
 	{
@@ -861,22 +619,11 @@ void monon_color_state::write_to_video_device(uint8_t data)
 					{
 					//	do_draw(amount, pal_to_use);	
 					}
-					else
-					{
-						//printf("unknown data mode %02x\n", data);
-					}
 				}
-			}
-			else
-			{
-			//	if (m_storeregs[0x1c] != 0x0a)
-			//		printf("unknown 1c mode %02x\n", m_storeregs[0x1c]);
 			}
 		}
 	}
 }
-
-
 
 void monon_color_state::out3_w(uint8_t data)
 {
@@ -887,7 +634,6 @@ void monon_color_state::out4_w(uint8_t data)
 {
 	m_out4data = data;
 }
-
 
 void monon_color_state::monon_color(machine_config &config)
 {
@@ -908,8 +654,6 @@ void monon_color_state::monon_color(machine_config &config)
 	m_maincpu->spi_out_dir_cb().set(FUNC(monon_color_state::spidir_w));
 	m_maincpu->dac_out_cb<0>().set(FUNC(monon_color_state::dacout0_w));
 	m_maincpu->dac_out_cb<1>().set(FUNC(monon_color_state::dacout1_w));
-
-
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -950,8 +694,6 @@ DEVICE_IMAGE_LOAD_MEMBER( monon_color_state::cart_load )
 
 ROM_START( mononcol )
 	ROM_REGION( 0x1000000, "flash", ROMREGION_ERASE00 )
-
-
 ROM_END
 
 CONS( 2014, mononcol,    0,          0,  monon_color,  monon_color,    monon_color_state, empty_init,    "M&D",   "Monon Color", MACHINE_IS_SKELETON )

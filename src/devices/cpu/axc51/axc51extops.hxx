@@ -1,6 +1,29 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
+void axc51base_cpu_device::do_ez_flags(uint16_t val)
+{
+	if (!val)
+		SET_EZ(1);
+	else
+		SET_EZ(0);
+}
+
+void axc51base_cpu_device::do_ec_ez_flags(uint32_t res)
+{
+	if (res & 0xffff0000)
+		SET_EC(1);
+	else
+		SET_EC(0);
+
+	res &= 0xffff;
+
+	if (!res)
+		SET_EZ(1);
+	else
+		SET_EZ(0);
+}
+
 uint16_t axc51base_cpu_device::get_erx(int m)
 {
 	switch (m & 3)
@@ -79,8 +102,6 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 		uint16_t dptr = (DPTR0)+increment;
 		SET_DPTR0(dptr);
 
-	//	logerror("%s: ADDDP0 with %04x (new dptr0 is %04x)\n", machine().describe_context().c_str(), increment, dptr);
-
 		break;
 	}
 
@@ -128,9 +149,6 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 		uint8_t newacc = (acc >> shift) | (acc << (8 - shift));
 		SET_ACC(newacc);
 
-	//	logerror("ROTR8 with %02x %02x results %04x\n", acc, shift, newacc);
-
-
 		break;
 	}
 
@@ -141,8 +159,6 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 		uint8_t shift = (ER8) & 0x7;
 		uint8_t newacc = (acc << shift) | (acc >> (8 - shift));
 		SET_ACC(newacc);
-
-	//	logerror("ROTL8 with %02x %02x results %04x\n", acc, shift, newacc);
 
 		break;
 	}
@@ -178,10 +194,8 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 		val = val + 1;
 		set_erx(n, val);
 
-		if (!val)
-			SET_EZ(1);
-		else
-			SET_EZ(0);
+		do_ez_flags(val);
+
 		break;
 	}
 
@@ -194,10 +208,7 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 		val = val - 1;
 		set_erx(n, val);
 
-		if (!val)
-			SET_EZ(1);
-		else
-			SET_EZ(0);
+		do_ez_flags(val);
 
 		break;
 	}
@@ -295,10 +306,7 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 
 		set_erx(n, val);
 
-		if (!val)
-			SET_EZ(1);
-		else
-			SET_EZ(0);
+		do_ez_flags(val);
 
 		break;
 	}
@@ -314,12 +322,7 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 
 		m_io.write_byte(dpt, val);  
 
-#if 1
-		if (!val)
-			SET_EZ(1);
-		else
-			SET_EZ(0);
-#endif
+		do_ez_flags(val);
 
 		break;
 	}
@@ -333,10 +336,7 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 		uint16_t val = get_erx(m);
 		set_erx(n, val);
 
-		if (!val)
-			SET_EZ(1);
-		else
-			SET_EZ(0);
+		do_ez_flags(val);
 
 		break;
 	}
@@ -351,16 +351,8 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 		int16_t a = (int16_t)get_erx(n);
 		int16_t b = (int16_t)get_erx(m);
 
-	//	if (a & 0x8000)
-	//		printf("a is signed\n");
-
-	//	if (b & 0x8000)
-	//		printf("b is signed\n");
-
 		int32_t res = a * b;
 		uint32_t res2 = (uint32_t)res;
-
-		//logerror("MUL16 with %04x %04x results %08x\n", a, b, res2);
 
 		set_erx(n, (res2 >> 16));
 		set_erx(m, (res2 & 0xffff));
@@ -386,9 +378,6 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 		uint16_t newval = (val >> shift) | (val << (16 - shift));
 		set_erx(n, newval);
 
-	//	logerror("ROTR16 with %04x %02x results %04x\n", val, shift, newval);
-
-
 		break;
 	}
 
@@ -400,8 +389,6 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 		uint8_t shift = (ER8) & 0xf;
 		uint16_t newval = (val << shift) | (val >> (16 - shift));
 		set_erx(n, newval);
-
-		//logerror("%s: ROTL16 with %04x %02x results %04x\n", machine().describe_context().c_str(), val, shift, newval);
 
 		break;
 	}
@@ -416,8 +403,6 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 
 		uint16_t newval = val >> shift;
 		set_erx(n, newval);
-
-	//	logerror("SHIFTL with %04x %02x results %04x\n", val, shift, newval);
 
 		break;
 	}
@@ -512,21 +497,7 @@ void axc51base_cpu_device::extended_a5_0e()
 		uint32_t res = val + val2 + (GET_EC);
 		set_erx(p, res);
 
-	//	logerror("ADD16 ERp, ERn, ERm  %04x %04x %08x\n", val, val2, res);
-
-#if 1
-		if (res & 0xffff0000)
-			SET_EC(1);
-		else
-			SET_EC(0);
-
-		res &= 0xffff;
-
-		if (!res)
-			SET_EZ(1);
-		else
-			SET_EZ(0);
-#endif
+		do_ec_ez_flags(res);
 
 		break;
 	}
@@ -562,21 +533,8 @@ void axc51base_cpu_device::extended_a5_0f()
 		uint32_t res = val - val2 - (GET_EC);
 		set_erx(p, res);
 
-	//	logerror("SUB16 ERp, EDPi, ERn  (%04x) %04x %04x %08x\n", dpt, val, val2, res);
+		do_ec_ez_flags(res);
 
-#if 1
-		if (res & 0xffff0000)
-			SET_EC(1);
-		else
-			SET_EC(0);
-
-		res &= 0xffff;
-
-		if (!res)
-			SET_EZ(1);
-		else
-			SET_EZ(0);
-#endif
 		break;
 	}
 
@@ -595,23 +553,10 @@ void axc51base_cpu_device::extended_a5_0f()
 		uint16_t dpt = get_dpt(i);
 		uint32_t res = val - val2 - (GET_EC);
 
-	//	logerror("SUB16 EDPi, ERn, ERp   (%04x) %04x %04x %08x\n", dpt, val, val2, res);
-
 		m_io.write_byte(dpt, res);  
-#if 1
-		// unsure if this sets flags
-		if (res & 0xffff0000)
-			SET_EC(1);
-		else
-			SET_EC(0);
 
-		res &= 0xffff;
+		do_ec_ez_flags(res);
 
-		if (!res)
-			SET_EZ(1);
-		else
-			SET_EZ(0);
-#endif
 		break;
 	}
 
@@ -631,21 +576,8 @@ void axc51base_cpu_device::extended_a5_0f()
 		uint32_t res = val - val2 - (GET_EC);
 		set_erx(p, res);
 
-	//	logerror("SUB16 ERp, ERn, ERm   %04x %04x %08x\n", val, val2, res);
-#if 1
-		// unsure if this sets flags
-		if (res & 0xffff0000)
-			SET_EC(1);
-		else
-			SET_EC(0);
+		do_ec_ez_flags(res);
 
-		res &= 0xffff;
-
-		if (!res)
-			SET_EZ(1);
-		else
-			SET_EZ(0);
-#endif
 		break;
 	}
 

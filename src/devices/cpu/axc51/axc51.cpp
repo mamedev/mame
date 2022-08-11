@@ -59,28 +59,13 @@ void ax208_cpu_device::ax208_internal_program_mem(address_map &map)
 	map(0x8000, 0x9fff).rom().region("rom", 0); // this can only be read from code running within the same region
 }
 
-uint8_t axc51base_cpu_device::table_read(offs_t offset)
-{
-	uint8_t ret = m_mainram[0x74D + offset];
-
-	if (!machine().side_effects_disabled())
-	{
-	//	logerror("%s: read possible jump table, offset %04x (%04x) data %02x (jump table read)\n", machine().describe_context().c_str(), offset / 3, offset + 0x74D, ret);
-	}
-
-	return ret;
-}
-
 void axc51base_cpu_device::io_internal(address_map& map)
 {
 	map(0x0000, 0x03ff).ram().share("scratchpad");
 	map(0x3000, 0x3fff).rw(FUNC(axc51base_cpu_device::xsfr_read), FUNC(axc51base_cpu_device::xsfr_write)); 
 	map(0x4000, 0x6fff).ram().share("mainram");
 
-	//map(0x474D, 0x48F9).r(FUNC(axc51base_cpu_device::table_read)); // overlay for the jump table used by the ingame script interpretor, so we can log it
 	map(0x7000, 0x77ff).ram(); // JPEG RAM
-
-	//map(0xe000, 0xe0ff).ram();
 }
 
 
@@ -134,8 +119,6 @@ device_memory_interface::space_config_vector axc51base_cpu_device::memory_space_
 /* Read/Write a byte from/to the Internal RAM indirectly */
 /* (called from indirect addressing)                     */
 /* these go through DBASE register on axc51 (at least stack accesses) */
-//uint8_t axc51base_cpu_device::iram_indirect_read(offs_t a) { return m_data.read_byte(a); }
-//void axc51base_cpu_device::iram_indirect_write(offs_t a, uint8_t d) { m_data.write_byte(a, d); }
 uint8_t axc51base_cpu_device::iram_indirect_read(offs_t a) { return m_data.read_byte((m_sfr_regs[AXC51_DBASE - 0x80] * 4) + a); }
 void axc51base_cpu_device::iram_indirect_write(offs_t a, uint8_t d) { m_data.write_byte((m_sfr_regs[AXC51_DBASE - 0x80] * 4) + a, d); }
 
@@ -281,7 +264,7 @@ void axc51base_cpu_device::iram_indirect_write(offs_t a, uint8_t d) { m_data.wri
 
 void axc51base_cpu_device::clear_current_irq()
 {
-//	logerror("clear irq\n");
+	LOGMASKED(LOG_UNHANDLED,"clear irq\n");
 }
 
 uint8_t axc51base_cpu_device::r_acc() { return SFR_A(ADDR_ACC); }
@@ -1020,11 +1003,9 @@ void axc51base_cpu_device::sfr_write(size_t offset, uint8_t data)
 		break;
 
 	case ADDR_IE:
-		//	logerror("ie %02x\n", data);
 		break;
 
 	case AXC51_IE1:
-		//	logerror("======== ie1 %02x\n", data);
 		break;
 
 	case AXC51_GP0: // 0xa1
@@ -1078,7 +1059,6 @@ void axc51base_cpu_device::sfr_write(size_t offset, uint8_t data)
 	case AXC51_DPCON: dpcon_w(data); return; // 0x86
 
 	case AXC51_DBASE: // 0x9b
-	//	logerror("%s: setting DBASE to %02x\n", machine().describe_context().c_str(), data);
 		m_sfr_regs[AXC51_DBASE - 0x80] = data;
 		return;
 
@@ -1146,9 +1126,6 @@ void axc51base_cpu_device::write_port(int i, uint8_t data)
 
 uint8_t axc51base_cpu_device::sfr_read(size_t offset)
 {
-//	logerror("%s: attemping to read an invalid/non-implemented SFR address: %02x\n", machine().describe_context().c_str(), (uint32_t)offset);
-
-
 	assert(offset >= 0x80 && offset <= 0xff);
 
 	switch (offset)
@@ -1487,11 +1464,7 @@ AXC51_DPCON (at 0x86)
 
 void axc51base_cpu_device::dpcon_w(uint8_t data)
 {
-//	logerror("%s: sfr_write AXC51_DPCON %02x\n", machine().describe_context().c_str(), data);
 	m_sfr_regs[AXC51_DPCON - 0x80] = data;
-
-	//if (data & 0x04)
-	//	logerror("%s: toggle mode on\n", machine().describe_context().c_str());
 }
 
 /*
@@ -1529,7 +1502,6 @@ void axc51base_cpu_device::ie2crypt_w(uint8_t data)
 
 void axc51base_cpu_device::spidmaadr_w(uint8_t data)
 {
-//	logerror("%s: sfr_write AXC51_SPIDMAADR %02x\n", machine().describe_context().c_str(), data);
 	m_sfr_regs[AXC51_SPIDMAADR - 0x80] = data;
 
 	m_spi_dma_addr <<= 8;
@@ -1539,13 +1511,10 @@ void axc51base_cpu_device::spidmaadr_w(uint8_t data)
 
 void axc51base_cpu_device::spidmacnt_w(uint8_t data)
 {
-//	logerror("%s: sfr_write AXC51_SPIDMACNT %02x (and trigger)\n", machine().describe_context().c_str(), data);
 	m_sfr_regs[AXC51_SPIDMACNT - 0x80] = data;
 
 	if (((m_sfr_regs[AXC51_SPICON - 0x80]) & 0x20) == 0x20) // Read from SPI
 	{
-//		logerror("attempting to do *READ* DMA from SPI destination address %04x count %04x\n", m_spi_dma_addr, (data + 1) * 2);
-
 		for (int i = 0; i < (data + 1) * 2; i++)
 		{
 			spibuf_w(0x00); // clock
@@ -1555,8 +1524,6 @@ void axc51base_cpu_device::spidmacnt_w(uint8_t data)
 	}
 	else
 	{
-//		logerror("attempting to do *WRITE* DMA source address (RAM) %04x count %04x\n", m_spi_dma_addr, (data + 1) * 2);
-		// 4 bytes will be written instead of 3 when setting the DMA address this way, but the 4th byte always seems to be 0xff which is ignored by our code
 		for (int i = 0; i < (data + 1) * 2; i++)
 		{
 			uint8_t ramdat = m_io.read_byte(m_spi_dma_addr++);
