@@ -146,6 +146,8 @@ protected:
 	uint8_t xsfr_read(offs_t offset);
 	void xsfr_write(offs_t offset, uint8_t data);
 
+	uint8_t table_read(offs_t offset);
+
 	uint8_t read_port(int i);
 	void write_port(int i, uint8_t data);
 

@@ -24,7 +24,7 @@
 #define LOG_PORTS     (1U <<  2)
 #define LOG_UNHANDLED (1U <<  3)
 
-#define VERBOSE     (LOG_UNHANDLED)
+#define VERBOSE     (0)
 
 #include "logmacro.h"
 
@@ -59,12 +59,28 @@ void ax208_cpu_device::ax208_internal_program_mem(address_map &map)
 	map(0x8000, 0x9fff).rom().region("rom", 0); // this can only be read from code running within the same region
 }
 
+uint8_t axc51base_cpu_device::table_read(offs_t offset)
+{
+	uint8_t ret = m_mainram[0x74D + offset];
+
+	if (!machine().side_effects_disabled())
+	{
+	//	logerror("%s: read possible jump table, offset %04x (%04x) data %02x (jump table read)\n", machine().describe_context().c_str(), offset / 3, offset + 0x74D, ret);
+	}
+
+	return ret;
+}
+
 void axc51base_cpu_device::io_internal(address_map& map)
 {
 	map(0x0000, 0x03ff).ram().share("scratchpad");
 	map(0x3000, 0x3fff).rw(FUNC(axc51base_cpu_device::xsfr_read), FUNC(axc51base_cpu_device::xsfr_write)); 
 	map(0x4000, 0x6fff).ram().share("mainram");
+
+	//map(0x474D, 0x48F9).r(FUNC(axc51base_cpu_device::table_read)); // overlay for the jump table used by the ingame script interpretor, so we can log it
 	map(0x7000, 0x77ff).ram(); // JPEG RAM
+
+	//map(0xe000, 0xe0ff).ram();
 }
 
 
@@ -265,7 +281,7 @@ void axc51base_cpu_device::iram_indirect_write(offs_t a, uint8_t d) { m_data.wri
 
 void axc51base_cpu_device::clear_current_irq()
 {
-	LOGMASKED(LOG_UNSORTED, "clear irq\n");
+//	logerror("clear irq\n");
 }
 
 uint8_t axc51base_cpu_device::r_acc() { return SFR_A(ADDR_ACC); }
@@ -276,7 +292,7 @@ uint8_t axc51base_cpu_device::r_psw() { return SFR_A(ADDR_PSW); }
 offs_t axc51base_cpu_device::external_ram_iaddr(offs_t offset, offs_t mem_mask)
 {
 	if (mem_mask == 0x00ff)
-		return (offset & mem_mask);
+		return (offset & mem_mask) | 0x000;
 
 	return offset;
 }
@@ -875,33 +891,22 @@ void axc51base_cpu_device::check_irqs()
 	if (!base)
 		return;
 
-	if (m_timer0irq)
+	if (m_timer0irq && GET_T0IRQEN)
 	{
-		if (GET_T0IRQEN)
-		{
-			push_pc();
-			m_pc = base + V_TIMER0;
-			m_timer0irq = false;
-		}
+		push_pc();
+		m_pc = base + V_TIMER0;
+		m_timer0irq = false;
 	}
-	else if (m_dactimerirq)
+	else if (m_dactimerirq && GET_DMAIRQEN)
 	{
-		if (GET_DMAIRQEN)
-		{
-			push_pc();
-			m_pc = base + V_DAC;
-			m_dactimerirq = false;
-		}
+		push_pc();
+		m_pc = base + V_DAC;
+		m_dactimerirq = false;
 	}
-
 }
 
 
-void axc51base_cpu_device::burn_cycles(int cycles)
-{
-	/* check_irqs */
-	check_irqs();
-}
+
 
 void axc51base_cpu_device::execute_set_input(int irqline, int state)
 {
@@ -924,7 +929,6 @@ void axc51base_cpu_device::execute_run()
 	check_irqs();
 
 	m_icount -= m_inst_cycles;
-	burn_cycles(m_inst_cycles);
 
 	do
 	{
@@ -940,7 +944,7 @@ void axc51base_cpu_device::execute_run()
 		/* burn the cycles */
 		m_icount -= m_inst_cycles;
 
-		burn_cycles(m_inst_cycles);
+		check_irqs();
 
 	} while( m_icount > 0 );
 }
@@ -1016,11 +1020,11 @@ void axc51base_cpu_device::sfr_write(size_t offset, uint8_t data)
 		break;
 
 	case ADDR_IE:
-		//	printf("ie %02x\n", data);
+		//	logerror("ie %02x\n", data);
 		break;
 
 	case AXC51_IE1:
-		//	printf("======== ie1 %02x\n", data);
+		//	logerror("======== ie1 %02x\n", data);
 		break;
 
 	case AXC51_GP0: // 0xa1
@@ -1074,7 +1078,7 @@ void axc51base_cpu_device::sfr_write(size_t offset, uint8_t data)
 	case AXC51_DPCON: dpcon_w(data); return; // 0x86
 
 	case AXC51_DBASE: // 0x9b
-		LOGMASKED(LOG_UNSORTED,"%s: setting DBASE to %02x\n", machine().describe_context(), data);
+	//	logerror("%s: setting DBASE to %02x\n", machine().describe_context().c_str(), data);
 		m_sfr_regs[AXC51_DBASE - 0x80] = data;
 		return;
 
@@ -1142,6 +1146,9 @@ void axc51base_cpu_device::write_port(int i, uint8_t data)
 
 uint8_t axc51base_cpu_device::sfr_read(size_t offset)
 {
+//	logerror("%s: attemping to read an invalid/non-implemented SFR address: %02x\n", machine().describe_context().c_str(), (uint32_t)offset);
+
+
 	assert(offset >= 0x80 && offset <= 0xff);
 
 	switch (offset)
@@ -1208,7 +1215,7 @@ uint8_t axc51base_cpu_device::sfr_read(size_t offset)
 		return dpcon_r();
 
 	case AXC51_IRTCON: // 0x9f
-		return machine().rand();
+		return 0x00;// machine().rand();
 
 	case AXC51_SPICON: // 0xd8
 		return spicon_r();
@@ -1222,14 +1229,14 @@ uint8_t axc51base_cpu_device::sfr_read(size_t offset)
 	case AXC51_UID3: return m_uid[3]; // 0xe5
 
 	case AXC51_LFSRFIFO: // 0xf6
-		return machine().rand();
+		return 0x00;// machine().rand();
 
 	case AXC51_UARTSTA: // 0xfc
 		return uartsta_r();
 
 		/* Illegal or non-implemented sfr */
 	default:
-		LOGMASKED(LOG_UNSORTED,"%s: attemping to read an invalid/non-implemented SFR address: %02x\n", machine().describe_context(), (uint32_t)offset);
+		LOGMASKED(LOG_UNHANDLED,"%s: attemping to read an invalid/non-implemented SFR address: %02x\n", machine().describe_context(), (uint32_t)offset);
 		/* according to the manual, the read may return random bits */
 		return 0xff;
 	}
@@ -1369,7 +1376,7 @@ void axc51base_cpu_device::device_reset()
 //	m_dactimer->adjust(attotime::never);
 
 
-	m_timer0->adjust(attotime::from_hz(36000), 0, attotime::from_hz(36000));
+	m_timer0->adjust(attotime::from_hz(120), 0, attotime::from_hz(120));
 	m_dactimer->adjust(attotime::from_hz(8000), 0, attotime::from_hz(8000));
 }
 
@@ -1480,8 +1487,11 @@ AXC51_DPCON (at 0x86)
 
 void axc51base_cpu_device::dpcon_w(uint8_t data)
 {
-	LOGMASKED(LOG_UNSORTED,"%s: sfr_write AXC51_DPCON %02x\n", machine().describe_context(), data);
+//	logerror("%s: sfr_write AXC51_DPCON %02x\n", machine().describe_context().c_str(), data);
 	m_sfr_regs[AXC51_DPCON - 0x80] = data;
+
+	//if (data & 0x04)
+	//	logerror("%s: toggle mode on\n", machine().describe_context().c_str());
 }
 
 /*
@@ -1519,7 +1529,7 @@ void axc51base_cpu_device::ie2crypt_w(uint8_t data)
 
 void axc51base_cpu_device::spidmaadr_w(uint8_t data)
 {
-	LOGMASKED(LOG_UNSORTED,"%s: sfr_write AXC51_SPIDMAADR %02x\n", machine().describe_context(), data);
+//	logerror("%s: sfr_write AXC51_SPIDMAADR %02x\n", machine().describe_context().c_str(), data);
 	m_sfr_regs[AXC51_SPIDMAADR - 0x80] = data;
 
 	m_spi_dma_addr <<= 8;
@@ -1529,12 +1539,12 @@ void axc51base_cpu_device::spidmaadr_w(uint8_t data)
 
 void axc51base_cpu_device::spidmacnt_w(uint8_t data)
 {
-	LOGMASKED(LOG_UNSORTED,"%s: sfr_write AXC51_SPIDMACNT %02x (and trigger)\n", machine().describe_context(), data);
+//	logerror("%s: sfr_write AXC51_SPIDMACNT %02x (and trigger)\n", machine().describe_context().c_str(), data);
 	m_sfr_regs[AXC51_SPIDMACNT - 0x80] = data;
 
 	if (((m_sfr_regs[AXC51_SPICON - 0x80]) & 0x20) == 0x20) // Read from SPI
 	{
-		LOGMASKED(LOG_UNSORTED,"attempting to do *READ* DMA from SPI destination address %04x count %04x\n", m_spi_dma_addr, (data + 1) * 2);
+//		logerror("attempting to do *READ* DMA from SPI destination address %04x count %04x\n", m_spi_dma_addr, (data + 1) * 2);
 
 		for (int i = 0; i < (data + 1) * 2; i++)
 		{
@@ -1545,7 +1555,7 @@ void axc51base_cpu_device::spidmacnt_w(uint8_t data)
 	}
 	else
 	{
-		LOGMASKED(LOG_UNSORTED,"attempting to do *WRITE* DMA source address (RAM) %04x count %04x\n", m_spi_dma_addr, (data + 1) * 2);
+//		logerror("attempting to do *WRITE* DMA source address (RAM) %04x count %04x\n", m_spi_dma_addr, (data + 1) * 2);
 		// 4 bytes will be written instead of 3 when setting the DMA address this way, but the 4th byte always seems to be 0xff which is ignored by our code
 		for (int i = 0; i < (data + 1) * 2; i++)
 		{
