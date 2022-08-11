@@ -229,7 +229,7 @@ notes:
 
 - mspacpls: This romset is hacked.  mspacatk.2 is more commonly known as the "cheat chip" and is used on bootleg
   ms pacs  in place of boot2. It was created circa 1997 by Doc Cutlip and allows turbo speed and invulnerability.
-  mspacatk.5 and .6 contain the decoded maze data for ms pac plus.  The maze data was obtained from the mspacpl2
+  mspacatk.5 and .6 contain the decoded maze data for ms pac plus.  The maze data was obtained from the mspackpls
   romset.
 
 - pacgal:  This is a common hack found on make trax and other boards.  Mostly they use 4k eproms but Make Trax allows
@@ -5970,7 +5970,7 @@ ROM_END
 // The auxiliary board contains a Z80, a PAL with "MTS" handwritten on it, and 3 2764 eproms labelled "E",
 // "F", and "H". The eproms have data bits 3 and 4 swapped, and the PAL scrambles the addressing in 0x0800
 // chunks.
-ROM_START( mspacpl2 )
+ROM_START( mspackpls )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom-h.bin",    0x0000, 0x0800, CRC(88c89824) SHA1(8fa49483864c79c50b4734896fc7bd3cc6531afb) )
 	ROM_CONTINUE(             0x8800, 0x0800 )
@@ -8201,7 +8201,7 @@ void mspactwin_state::init_mspactwin()
 	}
 }
 
-void pacman_state::init_mspacpl2()
+void pacman_state::init_mspackpls()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -8255,26 +8255,26 @@ GAME( 1980, pacmanug, puckman,  pacman,   pacman,   pacman_state,  empty_init,  
 
 GAME( 1982, pacplus,  0,        pacman,   pacman,   pacman_state,  init_pacplus,  ROT90,  "Namco (Midway license)", "Pac-Man Plus", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1981, mspacman,   0,        mspacman, mspacman, pacman_state,  init_mspacman, ROT90,  "Midway / General Computer Corporation", "Ms. Pac-Man",                                      MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mspacmnf,   mspacman, mspacman, mspacman, pacman_state,  init_mspacman, ROT90,  "hack",                                  "Ms. Pac-Man (speedup hack)",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mspacmat,   mspacman, mspacman, mspacman, pacman_state,  init_mspacman, ROT90,  "hack",                                  "Ms. Pac Attack",                                   MACHINE_SUPPORTS_SAVE )
-GAME( 1989, msheartb,   mspacman, mspacman, mspacman, pacman_state,  init_mspacman, ROT90,  "hack (Two-Bit Score)",                  "Ms. Pac-Man Heart Burn",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1981, pacgal2,    mspacman, mspacman, mspacman, pacman_state,  init_mspacman, ROT90,  "bootleg",                               "Pac-Gal (set 2)",                                  MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mspacmancr, mspacman, mspacman, mspacman, pacman_state,  init_mspacman, ROT90,  "bootleg",                               "Ms. Pac-Man (bootleg on Crush Roller Hardware)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mspacmab,   mspacman, woodpek,  mspacman, pacman_state,  empty_init,    ROT90,  "bootleg",                               "Ms. Pac-Man (bootleg, set 1)",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mspacmab2,  mspacman, woodpek,  mspacman, pacman_state,  empty_init,    ROT90,  "bootleg",                               "Ms. Pac-Man (bootleg, set 2)",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mspacmab4,  mspacman, woodpek,  mspacman, pacman_state,  empty_init,    ROT90,  "bootleg",                               "Ms. Pac-Man (bootleg, set 4)",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mspacmbe,   mspacman, woodpek,  mspacman, pacman_state,  init_mspacmbe, ROT90,  "bootleg",                               "Ms. Pac-Man (bootleg, encrypted)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mspacmbmc,  mspacman, woodpek,  mspacman, pacman_state,  empty_init,    ROT90,  "bootleg (Marti Colls)",                 "Ms. Pac-Man (Marti Colls bootleg)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mspacmbn,   mspacman, woodpek,  mspacman, pacman_state,  init_pengomc1, ROT90,  "bootleg (Novatronic)",                  "Ms. Pac-Man (Novatronic bootleg)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mspacmanlai,mspacman, woodpek,  mspacman, pacman_state,  empty_init,    ROT90,  "bootleg (Leisure and Allied)",          "Ms. Pac-Man (Leisure and Allied bootleg)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mspacii,    mspacman, mspacii,  mspacman, pacman_state,  init_mspacii,  ROT90,  "bootleg (Orca)",                        "Ms. Pac-Man II (Orca bootleg set 1)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mspacii2,   mspacman, mspacii,  mspacman, pacman_state,  init_mspacii,  ROT90,  "bootleg (Orca)",                        "Ms. Pac-Man II (Orca bootleg set 2)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1981, pacgal,     mspacman, woodpek,  mspacman, pacman_state,  empty_init,    ROT90,  "hack",                                  "Pac-Gal (set 1)",                                  MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mspacpls,   mspacman, woodpek,  mspacman, pacman_state,  empty_init,    ROT90,  "hack",                                  "Ms. Pac-Man Plus",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mschamp,    mspacman, mschamp,  mschamp,  pacman_state,  init_mschamp,  ROT90,  "hack",                                  "Ms. Pacman Champion Edition / Zola-Puc Gal",       MACHINE_SUPPORTS_SAVE ) // Rayglo version
-GAME( 1995, mschamps,   mspacman, mschamp,  mschamp,  pacman_state,  init_mschamp,  ROT90,  "hack",                                  "Ms. Pacman Champion Edition / Super Zola-Puc Gal", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mspacpl2,   mspacman, woodpek,  mspacman, pacman_state,  init_mspacpl2, ROT90,  "hack",                                  "Miss Packman Plus",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacman,   0,        mspacman, mspacman, pacman_state,  init_mspacman,  ROT90,  "Midway / General Computer Corporation", "Ms. Pac-Man",                                      MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacmnf,   mspacman, mspacman, mspacman, pacman_state,  init_mspacman,  ROT90,  "hack",                                  "Ms. Pac-Man (speedup hack)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacmat,   mspacman, mspacman, mspacman, pacman_state,  init_mspacman,  ROT90,  "hack",                                  "Ms. Pac Attack",                                   MACHINE_SUPPORTS_SAVE )
+GAME( 1989, msheartb,   mspacman, mspacman, mspacman, pacman_state,  init_mspacman,  ROT90,  "hack (Two-Bit Score)",                  "Ms. Pac-Man Heart Burn",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pacgal2,    mspacman, mspacman, mspacman, pacman_state,  init_mspacman,  ROT90,  "bootleg",                               "Pac-Gal (set 2)",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacmancr, mspacman, mspacman, mspacman, pacman_state,  init_mspacman,  ROT90,  "bootleg",                               "Ms. Pac-Man (bootleg on Crush Roller Hardware)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacmab,   mspacman, woodpek,  mspacman, pacman_state,  empty_init,     ROT90,  "bootleg",                               "Ms. Pac-Man (bootleg, set 1)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacmab2,  mspacman, woodpek,  mspacman, pacman_state,  empty_init,     ROT90,  "bootleg",                               "Ms. Pac-Man (bootleg, set 2)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacmab4,  mspacman, woodpek,  mspacman, pacman_state,  empty_init,     ROT90,  "bootleg",                               "Ms. Pac-Man (bootleg, set 4)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacmbe,   mspacman, woodpek,  mspacman, pacman_state,  init_mspacmbe,  ROT90,  "bootleg",                               "Ms. Pac-Man (bootleg, encrypted)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mspacmbmc,  mspacman, woodpek,  mspacman, pacman_state,  empty_init,     ROT90,  "bootleg (Marti Colls)",                 "Ms. Pac-Man (Marti Colls bootleg)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacmbn,   mspacman, woodpek,  mspacman, pacman_state,  init_pengomc1,  ROT90,  "bootleg (Novatronic)",                  "Ms. Pac-Man (Novatronic bootleg)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mspacmanlai,mspacman, woodpek,  mspacman, pacman_state,  empty_init,     ROT90,  "bootleg (Leisure and Allied)",          "Ms. Pac-Man (Leisure and Allied bootleg)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacii,    mspacman, mspacii,  mspacman, pacman_state,  init_mspacii,   ROT90,  "bootleg (Orca)",                        "Ms. Pac-Man II (Orca bootleg set 1)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacii2,   mspacman, mspacii,  mspacman, pacman_state,  init_mspacii,   ROT90,  "bootleg (Orca)",                        "Ms. Pac-Man II (Orca bootleg set 2)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pacgal,     mspacman, woodpek,  mspacman, pacman_state,  empty_init,     ROT90,  "hack",                                  "Pac-Gal (set 1)",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacpls,   mspacman, woodpek,  mspacman, pacman_state,  empty_init,     ROT90,  "hack",                                  "Ms. Pac-Man Plus",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mschamp,    mspacman, mschamp,  mschamp,  pacman_state,  init_mschamp,   ROT90,  "hack",                                  "Ms. Pacman Champion Edition / Zola-Puc Gal",       MACHINE_SUPPORTS_SAVE ) // Rayglo version
+GAME( 1995, mschamps,   mspacman, mschamp,  mschamp,  pacman_state,  init_mschamp,   ROT90,  "hack",                                  "Ms. Pacman Champion Edition / Super Zola-Puc Gal", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspackpls,  mspacman, woodpek,  mspacman, pacman_state,  init_mspackpls, ROT90,  "hack",                                  "Miss Packman Plus",                                MACHINE_SUPPORTS_SAVE )
 
 // These bootlegs have MADE IN GREECE clearly visible and etched into the PCBs. They were very common in Spain with several operators having their own versions.
 // Based on the PCBs and copyright dates shown they  were produced late 80s / early 90s. Usually they run a version of Ms. Pacman, but were sometimes converted back to regular Pac-Man
