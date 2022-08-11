@@ -1577,18 +1577,18 @@ ROM_START( pc_smb3 )    /* Super Mario Bros 3 */
 	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(e48f4945) SHA1(66fe537cfe540317d6194847321ce4a9bdf0bba4) )
 ROM_END
 
-ROM_START( pc_gntlt )   /* Gauntlet */
+ROM_START( pc_gntlt )   // Gauntlet
 	BIOS_CPU
-	ROM_LOAD( "u3gl",    0x0c000, 0x2000, CRC(57575b92) SHA1(7ac633f253496f353d388bef30e6ec74a3d18814) ) /* extra bios code for this game */
+	ROM_LOAD( "u3gl",    0x0c000, 0x2000, CRC(57575b92) SHA1(7ac633f253496f353d388bef30e6ec74a3d18814) ) // extra bios code for this game
 	BIOS_GFX
 
 	ROM_REGION( 0x20000, "prg", 0 )
-	ROM_LOAD( "gl-0.prg",0x00000, 0x20000, CRC(b19c48a5) SHA1(4ba8674cec6fa8b0b4d96a7b00d4883a9e58a0a9) )   /* banked */
+	ROM_LOAD( "nes-gl-0 prg",0x00000, 0x20000, CRC(834d1924) SHA1(e1d8553a0deaf3bb17c9ea798ec52f2723db3aea) )   // banked
 
-	ROM_REGION( 0x010000, "gfx2", 0 )   /* cart gfx */
-	ROM_LOAD( "gl-0.chr", 0x00000, 0x10000, CRC(22af8849) SHA1(01054943c1d069f5f535e93f969a5b6bfb958e0b) )
+	ROM_REGION( 0x010000, "gfx2", 0 )   // cart gfx
+	ROM_LOAD( "nes-gl-0 chr", 0x00000, 0x10000, CRC(26d819a2) SHA1(1e5eec5beb976f79373e589186382c337ed6e84a) )
 
-	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_REGION( 0x10, "rp5h01", 0 ) // rp5h01 data
 	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(ba7f2e13) SHA1(8b9ee3b18bcb4b258a46d1c900b18a9cb2594046) )
 ROM_END
 
@@ -1919,13 +1919,13 @@ GAME( 1991, pc_ttoon, playch10, playch10_g, playch10, playch10_state, init_pcgbo
 
 // variant with 4 screen mirror
 GAME( 1990, pc_radr2, playch10, playch10_g, playch10, playch10_state, init_pcgboard_type2, ROT0, "Square (Nintendo of America license)", "Rad Racer II (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1985, pc_gntlt, playch10, playch10_g, playch10, playch10_state, init_pcgboard_type2, ROT0, "Atari / Tengen (Nintendo of America license)", "Gauntlet (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1985, pc_gntlt, playch10, playch10_g, playch10, playch10_state, init_pcgboard_type2, ROT0, "Atari / Tengen (Nintendo of America license)", "Gauntlet (PlayChoice-10)", 0 )
 
 // H-Board Games
 GAME( 1988, pc_pinbt, playch10, playch10_h, playch10, playch10_state, init_pchboard, ROT0, "Rare (Nintendo of America license)",       "PinBot (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
 
 // i-Board Games
-GAME( 1989, pc_cshwk, playch10, playch10_i, playch10, playch10_state, init_pciboard, ROT0, "Rare (Nintendo of America license)",       "Captain Sky Hawk (PlayChoice-10)", 0 )
+GAME( 1989, pc_cshwk, playch10, playch10_i, playch10, playch10_state, init_pciboard, ROT0, "Rare (Nintendo of America license)",       "Captain Sky Hawk (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS ) // severe graphics glitches on second level
 GAME( 1990, pc_sjetm, playch10, playch10_i, playch10, playch10_state, init_pciboard, ROT0, "Rare",                                     "Solar Jetman (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
 
 // K-Board Games
