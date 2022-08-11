@@ -1743,25 +1743,21 @@ bool a2_woz_format::load(util::random_read &io, uint32_t form_factor, const std:
 				uint32_t boff = (uint32_t)r16(img, trks_off + 0) * 512;
 				uint32_t track_size = r32(img, trks_off + 4);
 
-				// Ticks are 125ns, e.g. 8000000 ticks per second
-				static const int ticks_per_speed_zone[5] = {
-					60 * 8000000 / 394,
-					60 * 8000000 / 429,
-					60 * 8000000 / 472,
-					60 * 8000000 / 525,
-					60 * 8000000 / 590
-				};
+				uint32_t total_ticks = 0;
+				for(uint32_t i=0; i != track_size; i++)
+					total_ticks += img[boff+i];
 
-				uint32_t total_ticks = is_35 ? ticks_per_speed_zone[trkid / (2*16)] : 60 * 8000000 / 300;
-
+				// Assume there is always a pulse at index, and it's
+				// the last one in the stream
 				std::vector<uint32_t> &buf = image->get_buffer(track, head, subtrack);
+				buf.push_back(floppy_image::MG_F | 0);
 				uint32_t cpos = 0;
 				for(uint32_t i=0; i != track_size; i++) {
 					uint8_t step = img[boff+i];
 					cpos += step;
-					if(step != 0xff)
+					if(step != 0xff && i != track_size-1)
 						buf.push_back(floppy_image::MG_F | uint64_t(cpos)*200000000/total_ticks);
-				}				
+				}
 
 			} else if(idx != 0xff) {
 				uint32_t trks_off = off_trks + (idx * 8);
