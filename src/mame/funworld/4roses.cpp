@@ -195,7 +195,7 @@ public:
 	{
 	}
 
-	void driver_init() override;
+	void driver_init();
 	void _4roses(machine_config &config);
 
 protected:
@@ -216,7 +216,7 @@ public:
 	{
 	}
 
-	void driver_init() override;
+	void driver_init();
 	void rugby(machine_config &config);
 
 private:

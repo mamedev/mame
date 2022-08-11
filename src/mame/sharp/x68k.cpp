@@ -1543,7 +1543,7 @@ void x68k_state::machine_start()
 	m_led_state = 0;
 }
 
-void x68k_state::driver_init()
+void x68k_state::driver_start()
 {
 	unsigned char* rom = memregion("maincpu")->base();
 	unsigned char* user2 = memregion("user2")->base();
@@ -1577,16 +1577,16 @@ void x68k_state::driver_init()
 	save_item(NAME(m_spritereg));
 }
 
-void x68ksupr_state::driver_init()
+void x68ksupr_state::driver_start()
 {
-	x68k_state::driver_init();
+	x68k_state::driver_start();
 	m_sysport.cputype = 0xfe; // 68000, 16MHz
 	m_is_32bit = false;
 }
 
-void x68030_state::driver_init()
+void x68030_state::driver_start()
 {
-	x68k_state::driver_init();
+	x68k_state::driver_start();
 	m_sysport.cputype = 0xdc; // 68030, 25MHz
 	m_is_32bit = true;
 }

@@ -55,7 +55,7 @@ TODO:
 - tithermos temperature sensor comparator (right now just the digital clock works)
 - is alphie(patent) the same as the final version?
 - is starwbcp the same as MP3438? (starwbc is MP3438A)
-- tgpachi is not working: incomplete MCU emulation, no SVG
+- add SVG for tgpachi
 
 ============================================================================
 
@@ -117,7 +117,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP2110   TMS1370   1980, Gakken Invader/Tandy Fire Away
  @MP2139   TMS1370   1981, Gakken Galaxy Invader 1000/Tandy Cosmic 1000 Fire Away
  @MP2726   TMS1040   1979, Tomy Break Up
- *MP2788   TMS1070?  1980, Bandai Flight Time (? note: VFD-capable)
+ *MP2788   TMS1040?  1980, Bandai Flight Time (? note: VFD-capable)
  @MP3005   TMS1730   1989, Tiger Copy Cat (model 7-522)
  @MP3200   TMS1000   1978, Parker Brothers Electronic Master Mind
  @MP3201   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750A)
@@ -538,9 +538,9 @@ void matchnum_state::matchnum(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 325000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(matchnum_state::read_k));
-	m_maincpu->r().set(FUNC(matchnum_state::write_r));
-	m_maincpu->o().set(FUNC(matchnum_state::write_o));
+	m_maincpu->read_k().set(FUNC(matchnum_state::read_k));
+	m_maincpu->write_r().set(FUNC(matchnum_state::write_r));
+	m_maincpu->write_o().set(FUNC(matchnum_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4, 8);
@@ -651,9 +651,9 @@ void arrball_state::arrball(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 325000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(arrball_state::read_k));
-	m_maincpu->r().set(FUNC(arrball_state::write_r));
-	m_maincpu->o().set(FUNC(arrball_state::write_o));
+	m_maincpu->read_k().set(FUNC(arrball_state::read_k));
+	m_maincpu->write_r().set(FUNC(arrball_state::write_r));
+	m_maincpu->write_o().set(FUNC(arrball_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(7, 7);
@@ -821,9 +821,9 @@ void mathmagi_state::mathmagi(machine_config &config)
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 175000); // approximation - RC osc. R=68K, C=82pF
 	m_maincpu->set_output_pla(mathmagi_output_pla);
-	m_maincpu->k().set(FUNC(mathmagi_state::read_k));
-	m_maincpu->r().set(FUNC(mathmagi_state::write_r));
-	m_maincpu->o().set(FUNC(mathmagi_state::write_o));
+	m_maincpu->read_k().set(FUNC(mathmagi_state::read_k));
+	m_maincpu->write_r().set(FUNC(mathmagi_state::write_r));
+	m_maincpu->write_o().set(FUNC(mathmagi_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(11, 7);
@@ -960,9 +960,9 @@ void bcheetah_state::bcheetah(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 100000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(bcheetah_state::read_k));
-	m_maincpu->r().set(FUNC(bcheetah_state::write_r));
-	m_maincpu->o().set(FUNC(bcheetah_state::write_o));
+	m_maincpu->read_k().set(FUNC(bcheetah_state::read_k));
+	m_maincpu->write_r().set(FUNC(bcheetah_state::write_r));
+	m_maincpu->write_o().set(FUNC(bcheetah_state::write_o));
 
 	config.set_default_layout(layout_bcheetah);
 
@@ -1080,9 +1080,9 @@ void tc7atc_state::tc7atc(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=68K, C=47pF
-	m_maincpu->k().set(FUNC(tc7atc_state::read_k));
-	m_maincpu->r().set(FUNC(tc7atc_state::write_r));
-	m_maincpu->o().set(FUNC(tc7atc_state::write_o));
+	m_maincpu->read_k().set(FUNC(tc7atc_state::read_k));
+	m_maincpu->write_r().set(FUNC(tc7atc_state::write_r));
+	m_maincpu->write_o().set(FUNC(tc7atc_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
@@ -1251,9 +1251,9 @@ void palmf31_state::palmf31(machine_config &config)
 {
 	// basic machine hardware
 	TMS1040(config, m_maincpu, 250000); // approximation
-	m_maincpu->k().set(FUNC(palmf31_state::read_k));
-	m_maincpu->o().set(FUNC(palmf31_state::write_o));
-	m_maincpu->r().set(FUNC(palmf31_state::write_r));
+	m_maincpu->read_k().set(FUNC(palmf31_state::read_k));
+	m_maincpu->write_o().set(FUNC(palmf31_state::write_o));
+	m_maincpu->write_r().set(FUNC(palmf31_state::write_r));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
@@ -1419,9 +1419,9 @@ void palmmd8_state::palmmd8(machine_config &config)
 {
 	// basic machine hardware
 	TMS1070(config, m_maincpu, 250000); // approximation - RC osc. R=56K, C=68pf
-	m_maincpu->k().set(FUNC(palmmd8_state::read_k));
-	m_maincpu->o().set(FUNC(palmmd8_state::write_o));
-	m_maincpu->r().set(FUNC(palmmd8_state::write_r));
+	m_maincpu->read_k().set(FUNC(palmmd8_state::read_k));
+	m_maincpu->write_o().set(FUNC(palmmd8_state::write_o));
+	m_maincpu->write_r().set(FUNC(palmmd8_state::write_r));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(21, 8);
@@ -1562,9 +1562,9 @@ void amaztron_state::amaztron(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 300000); // approximation - RC osc. R=33K?, C=100pF
-	m_maincpu->k().set(FUNC(amaztron_state::read_k));
-	m_maincpu->r().set(FUNC(amaztron_state::write_r));
-	m_maincpu->o().set(FUNC(amaztron_state::write_o));
+	m_maincpu->read_k().set(FUNC(amaztron_state::read_k));
+	m_maincpu->write_r().set(FUNC(amaztron_state::write_r));
+	m_maincpu->write_o().set(FUNC(amaztron_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4, 7);
@@ -1718,9 +1718,9 @@ void zodiac_state::zodiac(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 500000); // approximation - RC osc. R=18K, C=100pF
-	m_maincpu->k().set(FUNC(zodiac_state::read_k));
-	m_maincpu->r().set(FUNC(zodiac_state::write_r));
-	m_maincpu->o().set(FUNC(zodiac_state::write_o));
+	m_maincpu->read_k().set(FUNC(zodiac_state::read_k));
+	m_maincpu->write_r().set(FUNC(zodiac_state::write_r));
+	m_maincpu->write_o().set(FUNC(zodiac_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
@@ -1847,9 +1847,9 @@ void cqback_state::cqback(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 310000); // approximation - RC osc. R=33K, C=100pF
-	m_maincpu->k().set(FUNC(cqback_state::read_k));
-	m_maincpu->r().set(FUNC(cqback_state::write_r));
-	m_maincpu->o().set(FUNC(cqback_state::write_o));
+	m_maincpu->read_k().set(FUNC(cqback_state::read_k));
+	m_maincpu->write_r().set(FUNC(cqback_state::write_r));
+	m_maincpu->write_o().set(FUNC(cqback_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 11);
@@ -1977,9 +1977,9 @@ void h2hfootb_state::h2hfootb(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 310000); // approximation - RC osc. R=39K, C=100pF
-	m_maincpu->k().set(FUNC(h2hfootb_state::read_k));
-	m_maincpu->r().set(FUNC(h2hfootb_state::write_r));
-	m_maincpu->o().set(FUNC(h2hfootb_state::write_o));
+	m_maincpu->read_k().set(FUNC(h2hfootb_state::read_k));
+	m_maincpu->write_r().set(FUNC(h2hfootb_state::write_r));
+	m_maincpu->write_o().set(FUNC(h2hfootb_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 9);
@@ -2163,9 +2163,9 @@ void h2hbaskb_state::h2hbaskb(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 375000); // approximation - RC osc. R=43K, C=100pF
-	m_maincpu->k().set(FUNC(h2hbaskb_state::read_k));
-	m_maincpu->r().set(FUNC(h2hbaskb_state::write_r));
-	m_maincpu->o().set(FUNC(h2hbaskb_state::write_o));
+	m_maincpu->read_k().set(FUNC(h2hbaskb_state::read_k));
+	m_maincpu->write_r().set(FUNC(h2hbaskb_state::write_r));
+	m_maincpu->write_o().set(FUNC(h2hbaskb_state::write_o));
 
 	TIMER(config, "cap_empty").configure_generic(FUNC(h2hbaskb_state::cap_empty_callback));
 
@@ -2330,9 +2330,9 @@ void h2hbaseb_state::h2hbaseb(machine_config &config)
 {
 	// basic machine hardware
 	TMS1170(config, m_maincpu, 350000); // see set_clock
-	m_maincpu->k().set(FUNC(h2hbaseb_state::read_k));
-	m_maincpu->r().set(FUNC(h2hbaseb_state::write_r));
-	m_maincpu->o().set(FUNC(h2hbaseb_state::write_o));
+	m_maincpu->read_k().set(FUNC(h2hbaseb_state::read_k));
+	m_maincpu->write_r().set(FUNC(h2hbaseb_state::write_r));
+	m_maincpu->write_o().set(FUNC(h2hbaseb_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 9);
@@ -2457,9 +2457,9 @@ void h2hboxing_state::h2hboxing(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=39K, C=100pF
-	m_maincpu->k().set(FUNC(h2hboxing_state::read_k));
-	m_maincpu->r().set(FUNC(h2hboxing_state::write_r));
-	m_maincpu->o().set(FUNC(h2hboxing_state::write_o));
+	m_maincpu->read_k().set(FUNC(h2hboxing_state::read_k));
+	m_maincpu->write_r().set(FUNC(h2hboxing_state::write_r));
+	m_maincpu->write_o().set(FUNC(h2hboxing_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(11, 8);
@@ -2646,9 +2646,9 @@ void quizwizc_state::quizwizc(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 300000); // approximation - RC osc. R=43K, C=100pF
-	m_maincpu->k().set(FUNC(quizwizc_state::read_k));
-	m_maincpu->r().set(FUNC(quizwizc_state::write_r));
-	m_maincpu->o().set(FUNC(quizwizc_state::write_o));
+	m_maincpu->read_k().set(FUNC(quizwizc_state::read_k));
+	m_maincpu->write_r().set(FUNC(quizwizc_state::write_r));
+	m_maincpu->write_o().set(FUNC(quizwizc_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10+1, 8);
@@ -2834,9 +2834,9 @@ void tc4_state::tc4(machine_config &config)
 {
 	// basic machine hardware
 	TMS1400(config, m_maincpu, 450000); // approximation - RC osc. R=27.3K, C=100pF
-	m_maincpu->k().set(FUNC(tc4_state::read_k));
-	m_maincpu->r().set(FUNC(tc4_state::write_r));
-	m_maincpu->o().set(FUNC(tc4_state::write_o));
+	m_maincpu->read_k().set(FUNC(tc4_state::read_k));
+	m_maincpu->write_r().set(FUNC(tc4_state::write_r));
+	m_maincpu->write_o().set(FUNC(tc4_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 9);
@@ -2979,9 +2979,9 @@ void mrmusical_state::mrmusical(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 300000); // approximation - RC osc. R=33K, C=100pF
-	m_maincpu->k().set(FUNC(mrmusical_state::read_k));
-	m_maincpu->o().set(FUNC(mrmusical_state::write_o));
-	m_maincpu->r().set(FUNC(mrmusical_state::write_r));
+	m_maincpu->read_k().set(FUNC(mrmusical_state::read_k));
+	m_maincpu->write_o().set(FUNC(mrmusical_state::write_o));
+	m_maincpu->write_r().set(FUNC(mrmusical_state::write_r));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
@@ -3104,9 +3104,9 @@ void cnbaskb_state::cnbaskb(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 375000); // approximation - RC osc. R=39K, C=47pF
-	m_maincpu->k().set(FUNC(cnbaskb_state::read_k));
-	m_maincpu->r().set(FUNC(cnbaskb_state::write_r));
-	m_maincpu->o().set(FUNC(cnbaskb_state::write_o));
+	m_maincpu->read_k().set(FUNC(cnbaskb_state::read_k));
+	m_maincpu->write_r().set(FUNC(cnbaskb_state::write_r));
+	m_maincpu->write_o().set(FUNC(cnbaskb_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
@@ -3233,9 +3233,9 @@ void cmsport_state::cmsport(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(cmsport_state::read_k));
-	m_maincpu->r().set(FUNC(cmsport_state::write_r));
-	m_maincpu->o().set(FUNC(cmsport_state::write_o));
+	m_maincpu->read_k().set(FUNC(cmsport_state::read_k));
+	m_maincpu->write_r().set(FUNC(cmsport_state::write_r));
+	m_maincpu->write_o().set(FUNC(cmsport_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
@@ -3372,9 +3372,9 @@ void cnfball_state::cnfball(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 350000); // approximation - RC osc. R=39K, C=47pF
-	m_maincpu->k().set(FUNC(cnfball_state::read_k));
-	m_maincpu->r().set(FUNC(cnfball_state::write_r));
-	m_maincpu->o().set(FUNC(cnfball_state::write_o));
+	m_maincpu->read_k().set(FUNC(cnfball_state::read_k));
+	m_maincpu->write_r().set(FUNC(cnfball_state::write_r));
+	m_maincpu->write_o().set(FUNC(cnfball_state::write_o));
 
 	// video hardware
 	DS8874(config, m_ds8874).write_output().set(FUNC(cnfball_state::ds8874_output_w));
@@ -3508,9 +3508,9 @@ void cnfball2_state::cnfball2(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 325000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(cnfball2_state::read_k));
-	m_maincpu->r().set(FUNC(cnfball2_state::write_r));
-	m_maincpu->o().set(FUNC(cnfball2_state::write_o));
+	m_maincpu->read_k().set(FUNC(cnfball2_state::read_k));
+	m_maincpu->write_r().set(FUNC(cnfball2_state::write_r));
+	m_maincpu->write_o().set(FUNC(cnfball2_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 11);
@@ -3659,9 +3659,9 @@ void eleciq_state::eleciq(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 325000); // approximation - RC osc. R=47K, C=50pF
-	m_maincpu->k().set(FUNC(eleciq_state::read_k));
-	m_maincpu->r().set(FUNC(eleciq_state::write_r));
-	m_maincpu->o().set(FUNC(eleciq_state::write_o));
+	m_maincpu->read_k().set(FUNC(eleciq_state::read_k));
+	m_maincpu->write_r().set(FUNC(eleciq_state::write_r));
+	m_maincpu->write_o().set(FUNC(eleciq_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
@@ -3775,9 +3775,9 @@ void qfire_state::qfire(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 375000); // approximation - RC osc. R=39K, C=47pF
-	m_maincpu->k().set(FUNC(qfire_state::read_k));
-	m_maincpu->r().set(FUNC(qfire_state::write_r));
-	m_maincpu->o().set(FUNC(qfire_state::write_o));
+	m_maincpu->read_k().set(FUNC(qfire_state::read_k));
+	m_maincpu->write_r().set(FUNC(qfire_state::write_r));
+	m_maincpu->write_o().set(FUNC(qfire_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(3, 7);
@@ -3895,9 +3895,9 @@ void esoccer_state::esoccer(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 475000); // approximation - RC osc. R=47K, C=33pF
-	m_maincpu->k().set(FUNC(esoccer_state::read_k));
-	m_maincpu->r().set(FUNC(esoccer_state::write_r));
-	m_maincpu->o().set(FUNC(esoccer_state::write_o));
+	m_maincpu->read_k().set(FUNC(esoccer_state::read_k));
+	m_maincpu->write_r().set(FUNC(esoccer_state::write_r));
+	m_maincpu->write_o().set(FUNC(esoccer_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 7);
@@ -4045,9 +4045,9 @@ void ebball_state::ebball(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 375000); // approximation - RC osc. R=43K, C=47pF
-	m_maincpu->k().set(FUNC(ebball_state::read_k));
-	m_maincpu->r().set(FUNC(ebball_state::write_r));
-	m_maincpu->o().set(FUNC(ebball_state::write_o));
+	m_maincpu->read_k().set(FUNC(ebball_state::read_k));
+	m_maincpu->write_r().set(FUNC(ebball_state::write_r));
+	m_maincpu->write_o().set(FUNC(ebball_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
@@ -4183,9 +4183,9 @@ void ebball2_state::ebball2(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(ebball2_state::read_k));
-	m_maincpu->r().set(FUNC(ebball2_state::write_r));
-	m_maincpu->o().set(FUNC(ebball2_state::write_o));
+	m_maincpu->read_k().set(FUNC(ebball2_state::read_k));
+	m_maincpu->write_r().set(FUNC(ebball2_state::write_r));
+	m_maincpu->write_o().set(FUNC(ebball2_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
@@ -4367,9 +4367,9 @@ void ebball3_state::ebball3(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 340000); // see set_clock
-	m_maincpu->k().set(FUNC(ebball3_state::read_k));
-	m_maincpu->r().set(FUNC(ebball3_state::write_r));
-	m_maincpu->o().set(FUNC(ebball3_state::write_o));
+	m_maincpu->read_k().set(FUNC(ebball3_state::read_k));
+	m_maincpu->write_r().set(FUNC(ebball3_state::write_r));
+	m_maincpu->write_o().set(FUNC(ebball3_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10+2, 7);
@@ -4494,9 +4494,9 @@ void esbattle_state::esbattle(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 450000); // approximation - RC osc. R=47K, C=33pF
-	m_maincpu->k().set(FUNC(esbattle_state::read_k));
-	m_maincpu->r().set(FUNC(esbattle_state::write_r));
-	m_maincpu->o().set(FUNC(esbattle_state::write_o));
+	m_maincpu->read_k().set(FUNC(esbattle_state::read_k));
+	m_maincpu->write_r().set(FUNC(esbattle_state::write_r));
+	m_maincpu->write_o().set(FUNC(esbattle_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
@@ -4599,9 +4599,9 @@ void blastit_state::blastit(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 425000); // approximation - RC osc. R=47K, C=33pF
-	m_maincpu->k().set(FUNC(blastit_state::read_k));
-	m_maincpu->r().set(FUNC(blastit_state::write_r));
-	m_maincpu->o().set(FUNC(blastit_state::write_o));
+	m_maincpu->read_k().set(FUNC(blastit_state::read_k));
+	m_maincpu->write_r().set(FUNC(blastit_state::write_r));
+	m_maincpu->write_o().set(FUNC(blastit_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 7);
@@ -4718,9 +4718,9 @@ void einvader_state::einvader(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 320000); // see set_clock
-	m_maincpu->k().set_ioport("IN.0");
-	m_maincpu->r().set(FUNC(einvader_state::write_r));
-	m_maincpu->o().set(FUNC(einvader_state::write_o));
+	m_maincpu->read_k().set_ioport("IN.0");
+	m_maincpu->write_r().set(FUNC(einvader_state::write_r));
+	m_maincpu->write_o().set(FUNC(einvader_state::write_o));
 
 	// video hardware
 	screen_device &mask(SCREEN(config, "mask", SCREEN_TYPE_SVG));
@@ -4859,9 +4859,9 @@ void efootb4_state::efootb4(machine_config &config)
 {
 	// basic machine hardware
 	TMS1670(config, m_maincpu, 400000); // approximation - RC osc. R=42K, C=47pF
-	m_maincpu->k().set(FUNC(efootb4_state::read_k));
-	m_maincpu->r().set(FUNC(efootb4_state::write_r));
-	m_maincpu->o().set(FUNC(efootb4_state::write_o));
+	m_maincpu->read_k().set(FUNC(efootb4_state::read_k));
+	m_maincpu->write_r().set(FUNC(efootb4_state::write_r));
+	m_maincpu->write_o().set(FUNC(efootb4_state::write_o));
 
 	// video hardware
 	screen_device &mask(SCREEN(config, "mask", SCREEN_TYPE_SVG));
@@ -5003,9 +5003,9 @@ void ebaskb2_state::ebaskb2(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 360000); // approximation - RC osc. R=33K, C=82pF
-	m_maincpu->k().set(FUNC(ebaskb2_state::read_k));
-	m_maincpu->r().set(FUNC(ebaskb2_state::write_r));
-	m_maincpu->o().set(FUNC(ebaskb2_state::write_o));
+	m_maincpu->read_k().set(FUNC(ebaskb2_state::read_k));
+	m_maincpu->write_r().set(FUNC(ebaskb2_state::write_r));
+	m_maincpu->write_o().set(FUNC(ebaskb2_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 7);
@@ -5159,9 +5159,9 @@ void raisedvl_state::raisedvl(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 350000); // see set_clock
-	m_maincpu->k().set(FUNC(raisedvl_state::read_k));
-	m_maincpu->r().set(FUNC(raisedvl_state::write_r));
-	m_maincpu->o().set(FUNC(raisedvl_state::write_o));
+	m_maincpu->read_k().set(FUNC(raisedvl_state::read_k));
+	m_maincpu->write_r().set(FUNC(raisedvl_state::write_r));
+	m_maincpu->write_o().set(FUNC(raisedvl_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 7);
@@ -5341,9 +5341,9 @@ void mmarvin_state::mmarvin(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 300000); // approximation - RC osc. R=51K, C=47pF
-	m_maincpu->k().set(FUNC(mmarvin_state::read_k));
-	m_maincpu->r().set(FUNC(mmarvin_state::write_r));
-	m_maincpu->o().set(FUNC(mmarvin_state::write_o));
+	m_maincpu->read_k().set(FUNC(mmarvin_state::read_k));
+	m_maincpu->write_r().set(FUNC(mmarvin_state::write_r));
+	m_maincpu->write_o().set(FUNC(mmarvin_state::write_o));
 
 	TIMER(config, "speed").configure_generic(nullptr);
 
@@ -5487,9 +5487,9 @@ void f2pbball_state::f2pbball(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 325000); // approximation - RC osc. R=51K, C=39pF
-	m_maincpu->k().set(FUNC(f2pbball_state::read_k));
-	m_maincpu->r().set(FUNC(f2pbball_state::write_r));
-	m_maincpu->o().set(FUNC(f2pbball_state::write_o));
+	m_maincpu->read_k().set(FUNC(f2pbball_state::read_k));
+	m_maincpu->write_r().set(FUNC(f2pbball_state::write_r));
+	m_maincpu->write_o().set(FUNC(f2pbball_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
@@ -5635,9 +5635,9 @@ void f3in1_state::f3in1(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 300000); // see set_clock
-	m_maincpu->k().set(FUNC(f3in1_state::read_k));
-	m_maincpu->r().set(FUNC(f3in1_state::write_r));
-	m_maincpu->o().set(FUNC(f3in1_state::write_o));
+	m_maincpu->read_k().set(FUNC(f3in1_state::read_k));
+	m_maincpu->write_r().set(FUNC(f3in1_state::write_r));
+	m_maincpu->write_o().set(FUNC(f3in1_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
@@ -5791,9 +5791,9 @@ void gpoker_state::gpoker(machine_config &config)
 {
 	// basic machine hardware
 	TMS1370(config, m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(gpoker_state::read_k));
-	m_maincpu->r().set(FUNC(gpoker_state::write_r));
-	m_maincpu->o().set(FUNC(gpoker_state::write_o));
+	m_maincpu->read_k().set(FUNC(gpoker_state::read_k));
+	m_maincpu->write_r().set(FUNC(gpoker_state::write_r));
+	m_maincpu->write_o().set(FUNC(gpoker_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(11, 14);
@@ -5922,9 +5922,9 @@ void gjackpot_state::gjackpot(machine_config &config)
 
 	// basic machine hardware
 	TMS1670(config.replace(), m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(gjackpot_state::read_k));
-	m_maincpu->r().set(FUNC(gjackpot_state::write_r));
-	m_maincpu->o().set(FUNC(gjackpot_state::write_o));
+	m_maincpu->read_k().set(FUNC(gjackpot_state::read_k));
+	m_maincpu->write_r().set(FUNC(gjackpot_state::write_r));
+	m_maincpu->write_o().set(FUNC(gjackpot_state::write_o));
 
 	config.set_default_layout(layout_gjackpot);
 }
@@ -6038,9 +6038,9 @@ void ginv_state::ginv(machine_config &config)
 {
 	// basic machine hardware
 	TMS1370(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(ginv_state::read_k));
-	m_maincpu->r().set(FUNC(ginv_state::write_r));
-	m_maincpu->o().set(FUNC(ginv_state::write_o));
+	m_maincpu->read_k().set(FUNC(ginv_state::read_k));
+	m_maincpu->write_r().set(FUNC(ginv_state::write_r));
+	m_maincpu->write_o().set(FUNC(ginv_state::write_o));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
@@ -6165,9 +6165,9 @@ void ginv1000_state::ginv1000(machine_config &config)
 {
 	// basic machine hardware
 	TMS1370(config, m_maincpu, 350000); // approximation
-	m_maincpu->k().set(FUNC(ginv1000_state::read_k));
-	m_maincpu->r().set(FUNC(ginv1000_state::write_r));
-	m_maincpu->o().set(FUNC(ginv1000_state::write_o));
+	m_maincpu->read_k().set(FUNC(ginv1000_state::read_k));
+	m_maincpu->write_r().set(FUNC(ginv1000_state::write_r));
+	m_maincpu->write_o().set(FUNC(ginv1000_state::write_o));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
@@ -6303,9 +6303,9 @@ void ginv2000_state::ginv2000(machine_config &config)
 {
 	// basic machine hardware
 	TMS1370(config, m_maincpu, 425000); // approximation - RC osc. R=36K, C=47pF
-	m_maincpu->k().set(FUNC(ginv2000_state::read_k));
-	m_maincpu->r().set(FUNC(ginv2000_state::write_r));
-	m_maincpu->o().set(FUNC(ginv2000_state::write_o));
+	m_maincpu->read_k().set(FUNC(ginv2000_state::read_k));
+	m_maincpu->write_r().set(FUNC(ginv2000_state::write_r));
+	m_maincpu->write_o().set(FUNC(ginv2000_state::write_o));
 
 	TMS1024(config, m_expander).set_ms(1); // MS tied high
 	m_expander->write_port4_callback().set(FUNC(ginv2000_state::expander_w));
@@ -6466,9 +6466,9 @@ void fxmcr165_state::fxmcr165(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 400_kHz_XTAL);
-	m_maincpu->k().set(FUNC(fxmcr165_state::read_k));
-	m_maincpu->r().set(FUNC(fxmcr165_state::write_r));
-	m_maincpu->o().set(FUNC(fxmcr165_state::write_o));
+	m_maincpu->read_k().set(FUNC(fxmcr165_state::read_k));
+	m_maincpu->write_r().set(FUNC(fxmcr165_state::write_r));
+	m_maincpu->write_o().set(FUNC(fxmcr165_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1+1, 7);
@@ -6607,9 +6607,9 @@ void elecdet_state::elecdet(machine_config &config)
 {
 	// basic machine hardware
 	TMS0980(config, m_maincpu, 425000); // approximation
-	m_maincpu->k().set(FUNC(elecdet_state::read_k));
-	m_maincpu->r().set(FUNC(elecdet_state::write_r));
-	m_maincpu->o().set(FUNC(elecdet_state::write_o));
+	m_maincpu->read_k().set(FUNC(elecdet_state::read_k));
+	m_maincpu->write_r().set(FUNC(elecdet_state::write_r));
+	m_maincpu->write_o().set(FUNC(elecdet_state::write_o));
 	m_maincpu->power_off().set(FUNC(elecdet_state::auto_power_off));
 
 	// video hardware
@@ -6755,9 +6755,9 @@ void starwbc_state::starwbc(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=51K, C=47pF
-	m_maincpu->k().set(FUNC(starwbc_state::read_k));
-	m_maincpu->r().set(FUNC(starwbc_state::write_r));
-	m_maincpu->o().set(FUNC(starwbc_state::write_o));
+	m_maincpu->read_k().set(FUNC(starwbc_state::read_k));
+	m_maincpu->write_r().set(FUNC(starwbc_state::write_r));
+	m_maincpu->write_o().set(FUNC(starwbc_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
@@ -6904,9 +6904,9 @@ void liveafb_state::liveafb(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=33K, C=100pF
-	m_maincpu->k().set(FUNC(liveafb_state::read_k));
-	m_maincpu->r().set(FUNC(liveafb_state::write_r));
-	m_maincpu->o().set(FUNC(liveafb_state::write_o));
+	m_maincpu->read_k().set(FUNC(liveafb_state::read_k));
+	m_maincpu->write_r().set(FUNC(liveafb_state::write_r));
+	m_maincpu->write_o().set(FUNC(liveafb_state::write_o));
 
 	// video hardware
 	screen_device &mask(SCREEN(config, "mask", SCREEN_TYPE_SVG));
@@ -7055,9 +7055,9 @@ void astro_state::astro(machine_config &config)
 {
 	// basic machine hardware
 	TMS1470(config, m_maincpu, 450000); // approximation - RC osc. R=4.7K, C=33pF
-	m_maincpu->k().set(FUNC(astro_state::read_k));
-	m_maincpu->r().set(FUNC(astro_state::write_r));
-	m_maincpu->o().set(FUNC(astro_state::write_o));
+	m_maincpu->read_k().set(FUNC(astro_state::read_k));
+	m_maincpu->write_r().set(FUNC(astro_state::write_r));
+	m_maincpu->write_o().set(FUNC(astro_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
@@ -7219,9 +7219,9 @@ void elecbowl_state::elecbowl(machine_config &config)
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=33K, C=100pF
 	m_maincpu->set_output_pla(elecbowl_output_pla);
-	m_maincpu->k().set(FUNC(elecbowl_state::read_k));
-	m_maincpu->r().set(FUNC(elecbowl_state::write_r));
-	m_maincpu->o().set(FUNC(elecbowl_state::write_o));
+	m_maincpu->read_k().set(FUNC(elecbowl_state::read_k));
+	m_maincpu->write_r().set(FUNC(elecbowl_state::write_r));
+	m_maincpu->write_o().set(FUNC(elecbowl_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(7, 8);
@@ -7386,8 +7386,8 @@ void horseran_state::horseran(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 300000); // approximation - RC osc. R=56K, C=47pF
-	m_maincpu->k().set(FUNC(horseran_state::read_k));
-	m_maincpu->r().set(FUNC(horseran_state::write_r));
+	m_maincpu->read_k().set(FUNC(horseran_state::read_k));
+	m_maincpu->write_r().set(FUNC(horseran_state::write_r));
 
 	// video hardware
 	HLCD0569(config, m_lcd, 1100); // C=0.022uF
@@ -7581,9 +7581,9 @@ void mdndclab_state::mdndclab(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 475000); // approximation - RC osc. R=27K, C=100pF
-	m_maincpu->k().set(FUNC(mdndclab_state::read_k));
-	m_maincpu->r().set(FUNC(mdndclab_state::write_r));
-	m_maincpu->o().set(FUNC(mdndclab_state::write_o));
+	m_maincpu->read_k().set(FUNC(mdndclab_state::read_k));
+	m_maincpu->write_r().set(FUNC(mdndclab_state::write_r));
+	m_maincpu->write_o().set(FUNC(mdndclab_state::write_o));
 
 	config.set_default_layout(layout_mdndclab); // playing board
 
@@ -7697,9 +7697,9 @@ void comp4_state::comp4(machine_config &config)
 {
 	// basic machine hardware
 	TMS0970(config, m_maincpu, 250000); // approximation
-	m_maincpu->k().set(FUNC(comp4_state::read_k));
-	m_maincpu->r().set(FUNC(comp4_state::write_r));
-	m_maincpu->o().set(FUNC(comp4_state::write_o));
+	m_maincpu->read_k().set(FUNC(comp4_state::read_k));
+	m_maincpu->write_r().set(FUNC(comp4_state::write_r));
+	m_maincpu->write_o().set(FUNC(comp4_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 11);
@@ -7866,9 +7866,9 @@ void bship_state::bship(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 200000); // approximation - RC osc. R=100K, C=47pF
-	m_maincpu->k().set(FUNC(bship_state::read_k));
-	m_maincpu->r().set(FUNC(bship_state::write_r));
-	m_maincpu->o().set(FUNC(bship_state::write_o));
+	m_maincpu->read_k().set(FUNC(bship_state::read_k));
+	m_maincpu->write_r().set(FUNC(bship_state::write_r));
+	m_maincpu->write_o().set(FUNC(bship_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 1);
@@ -7984,9 +7984,9 @@ void bshipb_state::bshipb(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 200000); // approximation - RC osc. R=100K, C=47pF
-	m_maincpu->k().set(FUNC(bshipb_state::read_k));
-	m_maincpu->r().set(FUNC(bshipb_state::write_r));
-	m_maincpu->o().set(FUNC(bshipb_state::write_o));
+	m_maincpu->read_k().set(FUNC(bshipb_state::read_k));
+	m_maincpu->write_r().set(FUNC(bshipb_state::write_r));
+	m_maincpu->write_o().set(FUNC(bshipb_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 1);
@@ -8123,8 +8123,8 @@ void simon_state::simon(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 325000); // approximation - RC osc. R=33K, C=100pF
-	m_maincpu->k().set(FUNC(simon_state::read_k));
-	m_maincpu->r().set(FUNC(simon_state::write_r));
+	m_maincpu->read_k().set(FUNC(simon_state::read_k));
+	m_maincpu->write_r().set(FUNC(simon_state::write_r));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 4);
@@ -8292,8 +8292,8 @@ void ssimon_state::ssimon(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 275000); // see set_clock
-	m_maincpu->k().set(FUNC(ssimon_state::read_k));
-	m_maincpu->r().set(FUNC(ssimon_state::write_r));
+	m_maincpu->read_k().set(FUNC(ssimon_state::read_k));
+	m_maincpu->write_r().set(FUNC(ssimon_state::write_r));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 4);
@@ -8509,9 +8509,9 @@ void bigtrak_state::bigtrak(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 200000); // approximation - RC osc. R=83K, C=100pF
-	m_maincpu->k().set(FUNC(bigtrak_state::read_k));
-	m_maincpu->r().set(FUNC(bigtrak_state::write_r));
-	m_maincpu->o().set(FUNC(bigtrak_state::write_o));
+	m_maincpu->read_k().set(FUNC(bigtrak_state::read_k));
+	m_maincpu->write_r().set(FUNC(bigtrak_state::write_r));
+	m_maincpu->write_o().set(FUNC(bigtrak_state::write_o));
 
 	TIMER(config, "gearbox").configure_periodic(FUNC(bigtrak_state::gearbox_sim_tick), attotime::from_msec(1));
 
@@ -8756,9 +8756,9 @@ void mbdtower_state::mbdtower(machine_config &config)
 {
 	// basic machine hardware
 	TMS1400(config, m_maincpu, 425000); // approximation - RC osc. R=43K, C=56pF
-	m_maincpu->k().set(FUNC(mbdtower_state::read_k));
-	m_maincpu->r().set(FUNC(mbdtower_state::write_r));
-	m_maincpu->o().set(FUNC(mbdtower_state::write_o));
+	m_maincpu->read_k().set(FUNC(mbdtower_state::read_k));
+	m_maincpu->write_r().set(FUNC(mbdtower_state::write_r));
+	m_maincpu->write_o().set(FUNC(mbdtower_state::write_o));
 
 	TIMER(config, "tower_motor").configure_periodic(FUNC(mbdtower_state::motor_sim_tick), attotime::from_msec(3500/0x80)); // ~3.5sec for a full rotation
 
@@ -8882,9 +8882,9 @@ void arcmania_state::arcmania(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 250000); // approximation - RC osc. R=56K, C=100pF
-	m_maincpu->k().set(FUNC(arcmania_state::read_k));
-	m_maincpu->r().set(FUNC(arcmania_state::write_r));
-	m_maincpu->o().set(FUNC(arcmania_state::write_o));
+	m_maincpu->read_k().set(FUNC(arcmania_state::read_k));
+	m_maincpu->write_r().set(FUNC(arcmania_state::write_r));
+	m_maincpu->write_o().set(FUNC(arcmania_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 9);
@@ -9016,9 +9016,9 @@ void cnsector_state::cnsector(machine_config &config)
 {
 	// basic machine hardware
 	TMS0970(config, m_maincpu, 250000); // approximation
-	m_maincpu->k().set(FUNC(cnsector_state::read_k));
-	m_maincpu->r().set(FUNC(cnsector_state::write_r));
-	m_maincpu->o().set(FUNC(cnsector_state::write_o));
+	m_maincpu->read_k().set(FUNC(cnsector_state::read_k));
+	m_maincpu->write_r().set(FUNC(cnsector_state::write_r));
+	m_maincpu->write_o().set(FUNC(cnsector_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
@@ -9148,9 +9148,9 @@ void merlin_state::merlin(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=33K, C=100pF
-	m_maincpu->k().set(FUNC(merlin_state::read_k));
-	m_maincpu->r().set(FUNC(merlin_state::write_r));
-	m_maincpu->o().set(FUNC(merlin_state::write_o));
+	m_maincpu->read_k().set(FUNC(merlin_state::read_k));
+	m_maincpu->write_r().set(FUNC(merlin_state::write_r));
+	m_maincpu->write_o().set(FUNC(merlin_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 11);
@@ -9229,9 +9229,9 @@ void mmerlin_state::mmerlin(machine_config &config)
 
 	// basic machine hardware
 	TMS1400(config.replace(), m_maincpu, 425000); // approximation - RC osc. R=30K, C=100pF
-	m_maincpu->k().set(FUNC(mmerlin_state::read_k));
-	m_maincpu->r().set(FUNC(mmerlin_state::write_r));
-	m_maincpu->o().set(FUNC(mmerlin_state::write_o));
+	m_maincpu->read_k().set(FUNC(mmerlin_state::read_k));
+	m_maincpu->write_r().set(FUNC(mmerlin_state::write_r));
+	m_maincpu->write_o().set(FUNC(mmerlin_state::write_o));
 
 	config.set_default_layout(layout_mmerlin);
 }
@@ -9343,9 +9343,9 @@ void pbmastm_state::pbmastm(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 300000); // approximation - RC osc. R=56K, C=47pF
-	m_maincpu->k().set(FUNC(pbmastm_state::read_k));
-	m_maincpu->r().set(FUNC(pbmastm_state::write_r));
-	m_maincpu->o().set(FUNC(pbmastm_state::write_o));
+	m_maincpu->read_k().set(FUNC(pbmastm_state::read_k));
+	m_maincpu->write_r().set(FUNC(pbmastm_state::write_r));
+	m_maincpu->write_o().set(FUNC(pbmastm_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 10);
@@ -9464,9 +9464,9 @@ void stopthief_state::stopthief(machine_config &config)
 {
 	// basic machine hardware
 	TMS0980(config, m_maincpu, 425000); // approximation
-	m_maincpu->k().set(FUNC(stopthief_state::read_k));
-	m_maincpu->r().set(FUNC(stopthief_state::write_r));
-	m_maincpu->o().set(FUNC(stopthief_state::write_o));
+	m_maincpu->read_k().set(FUNC(stopthief_state::read_k));
+	m_maincpu->write_r().set(FUNC(stopthief_state::write_r));
+	m_maincpu->write_o().set(FUNC(stopthief_state::write_o));
 	m_maincpu->power_off().set(FUNC(stopthief_state::auto_power_off));
 
 	// video hardware
@@ -9616,9 +9616,9 @@ void bankshot_state::bankshot(machine_config &config)
 {
 	// basic machine hardware
 	TMS1400(config, m_maincpu, 475000); // approximation - RC osc. R=24K, C=100pF
-	m_maincpu->k().set(FUNC(bankshot_state::read_k));
-	m_maincpu->r().set(FUNC(bankshot_state::write_r));
-	m_maincpu->o().set(FUNC(bankshot_state::write_o));
+	m_maincpu->read_k().set(FUNC(bankshot_state::read_k));
+	m_maincpu->write_r().set(FUNC(bankshot_state::write_r));
+	m_maincpu->write_o().set(FUNC(bankshot_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(11, 8);
@@ -9749,9 +9749,9 @@ void splitsec_state::splitsec(machine_config &config)
 {
 	// basic machine hardware
 	TMS1400(config, m_maincpu, 475000); // approximation - RC osc. R=24K, C=100pF
-	m_maincpu->k().set(FUNC(splitsec_state::read_k));
-	m_maincpu->r().set(FUNC(splitsec_state::write_r));
-	m_maincpu->o().set(FUNC(splitsec_state::write_o));
+	m_maincpu->read_k().set(FUNC(splitsec_state::read_k));
+	m_maincpu->write_r().set(FUNC(splitsec_state::write_r));
+	m_maincpu->write_o().set(FUNC(splitsec_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8, 7);
@@ -9876,9 +9876,9 @@ void lostreas_state::lostreas(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 425000); // approximation - RC osc. R=39K, C=47pF
-	m_maincpu->k().set(FUNC(lostreas_state::read_k));
-	m_maincpu->r().set(FUNC(lostreas_state::write_r));
-	m_maincpu->o().set(FUNC(lostreas_state::write_o));
+	m_maincpu->read_k().set(FUNC(lostreas_state::read_k));
+	m_maincpu->write_r().set(FUNC(lostreas_state::write_r));
+	m_maincpu->write_o().set(FUNC(lostreas_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 11);
@@ -10024,9 +10024,9 @@ void alphie_state::alphie(machine_config &config)
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 350000); // approximation
 	m_maincpu->set_output_pla(alphie_output_pla);
-	m_maincpu->k().set(FUNC(alphie_state::read_k));
-	m_maincpu->r().set(FUNC(alphie_state::write_r));
-	m_maincpu->o().set(FUNC(alphie_state::write_o));
+	m_maincpu->read_k().set(FUNC(alphie_state::read_k));
+	m_maincpu->write_r().set(FUNC(alphie_state::write_r));
+	m_maincpu->write_o().set(FUNC(alphie_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 5);
@@ -10146,9 +10146,9 @@ void tcfball_state::tcfball(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 375000); // approximation - RC osc. R=56K, C=24pF
-	m_maincpu->k().set(FUNC(tcfball_state::read_k));
-	m_maincpu->r().set(FUNC(tcfball_state::write_r));
-	m_maincpu->o().set(FUNC(tcfball_state::write_o));
+	m_maincpu->read_k().set(FUNC(tcfball_state::read_k));
+	m_maincpu->write_r().set(FUNC(tcfball_state::write_r));
+	m_maincpu->write_o().set(FUNC(tcfball_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(11, 8);
@@ -10396,9 +10396,9 @@ void tandy12_state::tandy12(machine_config &config)
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 400000); // approximation - RC osc. R=39K, C=47pF
 	m_maincpu->set_output_pla(tandy12_output_pla);
-	m_maincpu->k().set(FUNC(tandy12_state::read_k));
-	m_maincpu->r().set(FUNC(tandy12_state::write_r));
-	m_maincpu->o().set(FUNC(tandy12_state::write_o));
+	m_maincpu->read_k().set(FUNC(tandy12_state::read_k));
+	m_maincpu->write_r().set(FUNC(tandy12_state::write_r));
+	m_maincpu->write_o().set(FUNC(tandy12_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 13);
@@ -10519,9 +10519,9 @@ void monkeysee_state::monkeysee(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 250000); // approximation - RC osc. R=68K, C=47pF
-	m_maincpu->k().set(FUNC(monkeysee_state::read_k));
-	m_maincpu->r().set(FUNC(monkeysee_state::write_r));
-	m_maincpu->o().set(FUNC(monkeysee_state::write_o));
+	m_maincpu->read_k().set(FUNC(monkeysee_state::read_k));
+	m_maincpu->write_r().set(FUNC(monkeysee_state::write_r));
+	m_maincpu->write_o().set(FUNC(monkeysee_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 2);
@@ -10684,9 +10684,9 @@ void t3in1sa_state::t3in1sa(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(t3in1sa_state::read_k));
-	m_maincpu->r().set(FUNC(t3in1sa_state::write_r));
-	m_maincpu->o().set(FUNC(t3in1sa_state::write_o));
+	m_maincpu->read_k().set(FUNC(t3in1sa_state::read_k));
+	m_maincpu->write_r().set(FUNC(t3in1sa_state::write_r));
+	m_maincpu->write_o().set(FUNC(t3in1sa_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 9);
@@ -10849,9 +10849,9 @@ void speechp_state::speechp(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 400000); // approximation - RC osc. R=39K, C=47pF
-	m_maincpu->k().set(FUNC(speechp_state::read_k));
-	m_maincpu->r().set(FUNC(speechp_state::write_r));
-	m_maincpu->o().set(FUNC(speechp_state::write_o));
+	m_maincpu->read_k().set(FUNC(speechp_state::read_k));
+	m_maincpu->write_r().set(FUNC(speechp_state::write_r));
+	m_maincpu->write_o().set(FUNC(speechp_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
@@ -11085,9 +11085,9 @@ void tisr16_state::tisr16(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 300000); // approximation - RC osc. R=43K, C=68pf (note: tisr16ii MCU RC osc. is different: R=30K, C=100pf, same freq)
-	m_maincpu->k().set(FUNC(tisr16_state::read_k));
-	m_maincpu->o().set(FUNC(tisr16_state::write_o));
-	m_maincpu->r().set(FUNC(tisr16_state::write_r));
+	m_maincpu->read_k().set(FUNC(tisr16_state::read_k));
+	m_maincpu->write_o().set(FUNC(tisr16_state::write_o));
+	m_maincpu->write_r().set(FUNC(tisr16_state::write_r));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(12, 8);
@@ -11248,9 +11248,9 @@ void ti1250_state::ti1250(machine_config &config)
 {
 	// basic machine hardware
 	TMS0950(config, m_maincpu, 200000); // approximation - RC osc. R=68K, C=68pf
-	m_maincpu->k().set(FUNC(ti1250_state::read_k));
-	m_maincpu->o().set(FUNC(ti1250_state::write_o));
-	m_maincpu->r().set(FUNC(ti1250_state::write_r));
+	m_maincpu->read_k().set(FUNC(ti1250_state::read_k));
+	m_maincpu->write_o().set(FUNC(ti1250_state::write_o));
+	m_maincpu->write_r().set(FUNC(ti1250_state::write_r));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
@@ -11267,9 +11267,9 @@ void ti1250_state::ti1270(machine_config &config)
 
 	// basic machine hardware
 	TMS0970(config.replace(), m_maincpu, 250000); // approximation
-	m_maincpu->k().set(FUNC(ti1250_state::read_k));
-	m_maincpu->o().set(FUNC(ti1250_state::write_o));
-	m_maincpu->r().set(FUNC(ti1250_state::write_r));
+	m_maincpu->read_k().set(FUNC(ti1250_state::read_k));
+	m_maincpu->write_o().set(FUNC(ti1250_state::write_o));
+	m_maincpu->write_r().set(FUNC(ti1250_state::write_r));
 
 	config.set_default_layout(layout_ti1270);
 }
@@ -11425,9 +11425,9 @@ void ti25503_state::ti25503(machine_config &config)
 {
 	// basic machine hardware
 	TMS1040(config, m_maincpu, 250000); // approximation
-	m_maincpu->k().set(FUNC(ti25503_state::read_k));
-	m_maincpu->o().set(FUNC(ti25503_state::write_o));
-	m_maincpu->r().set(FUNC(ti25503_state::write_r));
+	m_maincpu->read_k().set(FUNC(ti25503_state::read_k));
+	m_maincpu->write_o().set(FUNC(ti25503_state::write_o));
+	m_maincpu->write_r().set(FUNC(ti25503_state::write_r));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
@@ -11577,9 +11577,9 @@ void ti5100_state::ti5100(machine_config &config)
 {
 	// basic machine hardware
 	TMS1070(config, m_maincpu, 250000); // approximation
-	m_maincpu->k().set(FUNC(ti5100_state::read_k));
-	m_maincpu->o().set(FUNC(ti5100_state::write_o));
-	m_maincpu->r().set(FUNC(ti5100_state::write_r));
+	m_maincpu->read_k().set(FUNC(ti5100_state::read_k));
+	m_maincpu->write_o().set(FUNC(ti5100_state::write_o));
+	m_maincpu->write_r().set(FUNC(ti5100_state::write_r));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(11, 9);
@@ -11847,9 +11847,9 @@ void ti30_state::ti30(machine_config &config)
 {
 	// basic machine hardware
 	TMS0980(config, m_maincpu, 400000); // guessed
-	m_maincpu->k().set(FUNC(ti30_state::read_k));
-	m_maincpu->o().set(FUNC(ti30_state::write_o));
-	m_maincpu->r().set(FUNC(ti30_state::write_r));
+	m_maincpu->read_k().set(FUNC(ti30_state::read_k));
+	m_maincpu->write_o().set(FUNC(ti30_state::write_o));
+	m_maincpu->write_r().set(FUNC(ti30_state::write_r));
 	m_maincpu->power_off().set(FUNC(ti30_state::auto_power_off));
 
 	// video hardware
@@ -11996,9 +11996,9 @@ void ti1000_state::ti1000(machine_config &config)
 {
 	// basic machine hardware
 	TMS1990(config, m_maincpu, 250000); // approximation
-	m_maincpu->k().set(FUNC(ti1000_state::read_k));
-	m_maincpu->o().set(FUNC(ti1000_state::write_o));
-	m_maincpu->r().set(FUNC(ti1000_state::write_r));
+	m_maincpu->read_k().set(FUNC(ti1000_state::read_k));
+	m_maincpu->write_o().set(FUNC(ti1000_state::write_o));
+	m_maincpu->write_r().set(FUNC(ti1000_state::write_r));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8, 8);
@@ -12114,9 +12114,9 @@ void wizatron_state::wizatron(machine_config &config)
 {
 	// basic machine hardware
 	TMS0970(config, m_maincpu, 250000); // approximation
-	m_maincpu->k().set(FUNC(wizatron_state::read_k));
-	m_maincpu->o().set(FUNC(wizatron_state::write_o));
-	m_maincpu->r().set(FUNC(wizatron_state::write_r));
+	m_maincpu->read_k().set(FUNC(wizatron_state::read_k));
+	m_maincpu->write_o().set(FUNC(wizatron_state::write_o));
+	m_maincpu->write_r().set(FUNC(wizatron_state::write_r));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
@@ -12210,8 +12210,8 @@ void lilprof_state::lilprof(machine_config &config)
 	wizatron(config);
 
 	// basic machine hardware
-	m_maincpu->k().set(FUNC(lilprof_state::read_k));
-	m_maincpu->o().set(FUNC(lilprof_state::write_o));
+	m_maincpu->read_k().set(FUNC(lilprof_state::read_k));
+	m_maincpu->write_o().set(FUNC(lilprof_state::write_o));
 }
 
 // roms
@@ -12330,9 +12330,9 @@ void lilprof78_state::lilprof78(machine_config &config)
 {
 	// basic machine hardware
 	TMS1990(config, m_maincpu, 250000); // approximation
-	m_maincpu->k().set(FUNC(lilprof78_state::read_k));
-	m_maincpu->o().set(FUNC(lilprof78_state::write_o));
-	m_maincpu->r().set(FUNC(lilprof78_state::write_r));
+	m_maincpu->read_k().set(FUNC(lilprof78_state::read_k));
+	m_maincpu->write_o().set(FUNC(lilprof78_state::write_o));
+	m_maincpu->write_r().set(FUNC(lilprof78_state::write_r));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
@@ -12476,9 +12476,9 @@ void ti1680_state::ti1680(machine_config &config)
 {
 	// basic machine hardware
 	TMS1980(config, m_maincpu, 300000); // approximation
-	m_maincpu->k().set(FUNC(ti1680_state::read_k));
-	m_maincpu->o().set(FUNC(ti1680_state::write_o));
-	m_maincpu->r().set(FUNC(ti1680_state::write_r));
+	m_maincpu->read_k().set(FUNC(ti1680_state::read_k));
+	m_maincpu->write_o().set(FUNC(ti1680_state::write_o));
+	m_maincpu->write_r().set(FUNC(ti1680_state::write_r));
 	m_maincpu->power_off().set(FUNC(ti1680_state::auto_power_off));
 
 	TMC0999(config, m_ram);
@@ -12608,9 +12608,9 @@ void dataman_state::dataman(machine_config &config)
 {
 	// basic machine hardware
 	TMS1980(config, m_maincpu, 300000); // patent says 300kHz
-	m_maincpu->k().set(FUNC(dataman_state::read_k));
-	m_maincpu->o().set(FUNC(dataman_state::write_o));
-	m_maincpu->r().set(FUNC(dataman_state::write_r));
+	m_maincpu->read_k().set(FUNC(dataman_state::read_k));
+	m_maincpu->write_o().set(FUNC(dataman_state::write_o));
+	m_maincpu->write_r().set(FUNC(dataman_state::write_r));
 	m_maincpu->power_off().set(FUNC(dataman_state::auto_power_off));
 
 	// video hardware
@@ -12694,7 +12694,7 @@ void mathmarv_state::mathmarv(machine_config &config)
 	dataman(config);
 
 	// basic machine hardware
-	m_maincpu->r().set(FUNC(mathmarv_state::write_r));
+	m_maincpu->write_r().set(FUNC(mathmarv_state::write_r));
 
 	config.set_default_layout(layout_mathmarv);
 
@@ -12787,9 +12787,9 @@ void timaze_state::timaze(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 200000); // approximation - RC osc. R=80K, C=27pF
-	m_maincpu->k().set(FUNC(timaze_state::read_k));
-	m_maincpu->r().set(FUNC(timaze_state::write_r));
-	m_maincpu->o().set(FUNC(timaze_state::write_o));
+	m_maincpu->read_k().set(FUNC(timaze_state::read_k));
+	m_maincpu->write_r().set(FUNC(timaze_state::write_r));
+	m_maincpu->write_o().set(FUNC(timaze_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 8);
@@ -12943,9 +12943,9 @@ void tithermos_state::tithermos(machine_config &config)
 {
 	// basic machine hardware
 	TMS0970(config, m_maincpu, 250000); // approximation
-	m_maincpu->k().set(FUNC(tithermos_state::read_k));
-	m_maincpu->r().set(FUNC(tithermos_state::write_r));
-	m_maincpu->o().set(FUNC(tithermos_state::write_o));
+	m_maincpu->read_k().set(FUNC(tithermos_state::read_k));
+	m_maincpu->write_r().set(FUNC(tithermos_state::write_r));
+	m_maincpu->write_o().set(FUNC(tithermos_state::write_o));
 
 	CLOCK(config, "ac_line", 60);
 
@@ -13045,9 +13045,9 @@ void subwars_state::subwars(machine_config &config)
 {
 	// basic machine hardware
 	TMS1200(config, m_maincpu, 550000); // approximation - RC osc. R=24K, C=47pF
-	m_maincpu->k().set_ioport("IN.0");
-	m_maincpu->r().set(FUNC(subwars_state::write_r));
-	m_maincpu->o().set(FUNC(subwars_state::write_o));
+	m_maincpu->read_k().set_ioport("IN.0");
+	m_maincpu->write_r().set(FUNC(subwars_state::write_r));
+	m_maincpu->write_o().set(FUNC(subwars_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(13, 7);
@@ -13201,9 +13201,9 @@ void playmaker_state::playmaker(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 375000); // approximation - RC osc. R=20K, C=250pF
-	m_maincpu->k().set(FUNC(playmaker_state::read_k));
-	m_maincpu->r().set(FUNC(playmaker_state::write_r));
-	m_maincpu->o().set(FUNC(playmaker_state::write_o));
+	m_maincpu->read_k().set(FUNC(playmaker_state::read_k));
+	m_maincpu->write_r().set(FUNC(playmaker_state::write_r));
+	m_maincpu->write_o().set(FUNC(playmaker_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 7);
@@ -13339,9 +13339,9 @@ void dxfootb_state::dxfootb(machine_config &config)
 {
 	// basic machine hardware
 	TMS1400(config, m_maincpu, 425000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(dxfootb_state::read_k));
-	m_maincpu->r().set(FUNC(dxfootb_state::write_r));
-	m_maincpu->o().set(FUNC(dxfootb_state::write_o));
+	m_maincpu->read_k().set(FUNC(dxfootb_state::read_k));
+	m_maincpu->write_r().set(FUNC(dxfootb_state::write_r));
+	m_maincpu->write_o().set(FUNC(dxfootb_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(7+7, 8);
@@ -13460,9 +13460,9 @@ void copycat_state::copycat(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000(config, m_maincpu, 320000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(copycat_state::read_k));
-	m_maincpu->r().set(FUNC(copycat_state::write_r));
-	m_maincpu->o().set(FUNC(copycat_state::write_o));
+	m_maincpu->read_k().set(FUNC(copycat_state::read_k));
+	m_maincpu->write_r().set(FUNC(copycat_state::write_r));
+	m_maincpu->write_o().set(FUNC(copycat_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 4);
@@ -13552,9 +13552,9 @@ void copycatm2_state::copycatm2(machine_config &config)
 {
 	// basic machine hardware
 	TMS1730(config, m_maincpu, 275000); // approximation - RC osc. R=100K, C=47pF
-	m_maincpu->k().set_ioport("IN.0");
-	m_maincpu->r().set(FUNC(copycatm2_state::write_r));
-	m_maincpu->o().set(FUNC(copycatm2_state::write_o));
+	m_maincpu->read_k().set_ioport("IN.0");
+	m_maincpu->write_r().set(FUNC(copycatm2_state::write_r));
+	m_maincpu->write_o().set(FUNC(copycatm2_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 4);
@@ -13639,9 +13639,9 @@ void ditto_state::ditto(machine_config &config)
 {
 	// basic machine hardware
 	TMS1700(config, m_maincpu, 275000); // approximation - RC osc. R=100K, C=47pF
-	m_maincpu->k().set_ioport("IN.0");
-	m_maincpu->r().set(FUNC(ditto_state::write_r));
-	m_maincpu->o().set(FUNC(ditto_state::write_o));
+	m_maincpu->read_k().set_ioport("IN.0");
+	m_maincpu->write_r().set(FUNC(ditto_state::write_r));
+	m_maincpu->write_o().set(FUNC(ditto_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 4);
@@ -13770,9 +13770,9 @@ void t7in1ss_state::t7in1ss(machine_config &config)
 {
 	// basic machine hardware
 	TMS1400(config, m_maincpu, 425000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(t7in1ss_state::read_k));
-	m_maincpu->r().set(FUNC(t7in1ss_state::write_r));
-	m_maincpu->o().set(FUNC(t7in1ss_state::write_o));
+	m_maincpu->read_k().set(FUNC(t7in1ss_state::read_k));
+	m_maincpu->write_r().set(FUNC(t7in1ss_state::write_r));
+	m_maincpu->write_o().set(FUNC(t7in1ss_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
@@ -13963,9 +13963,9 @@ void tbreakup_state::tbreakup(machine_config &config)
 {
 	// basic machine hardware
 	TMS1040(config, m_maincpu, 325000); // see set_clock
-	m_maincpu->k().set(FUNC(tbreakup_state::read_k));
-	m_maincpu->r().set(FUNC(tbreakup_state::write_r));
-	m_maincpu->o().set(FUNC(tbreakup_state::write_o));
+	m_maincpu->read_k().set(FUNC(tbreakup_state::read_k));
+	m_maincpu->write_r().set(FUNC(tbreakup_state::write_r));
+	m_maincpu->write_o().set(FUNC(tbreakup_state::write_o));
 
 	TMS1025(config, m_expander).set_ms(1); // MS tied high
 	m_expander->write_port1_callback().set(FUNC(tbreakup_state::expander_w));
@@ -14105,9 +14105,9 @@ void phpball_state::phpball(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(phpball_state::read_k));
-	m_maincpu->r().set(FUNC(phpball_state::write_r));
-	m_maincpu->o().set(FUNC(phpball_state::write_o));
+	m_maincpu->read_k().set(FUNC(phpball_state::read_k));
+	m_maincpu->write_r().set(FUNC(phpball_state::write_r));
+	m_maincpu->write_o().set(FUNC(phpball_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(11, 7);
@@ -14191,7 +14191,7 @@ void tdracula_state::write_r(u32 data)
 void tdracula_state::write_o(u16 data)
 {
 	// O0-O7: VFD plate
-	m_plate = (m_plate & ~0xff) | bitswap<8>(data,0,1,2,3,4,5,6,7);
+	m_plate = (m_plate & ~0xff) | data;
 	update_display();
 }
 
@@ -14225,9 +14225,9 @@ void tdracula_state::tdracula(machine_config &config)
 {
 	// basic machine hardware
 	TMS1475(config, m_maincpu, 500000); // approximation - RC osc. R=43K, C=47pF
-	m_maincpu->k().set(FUNC(tdracula_state::read_k));
-	m_maincpu->r().set(FUNC(tdracula_state::write_r));
-	m_maincpu->o().set(FUNC(tdracula_state::write_o));
+	m_maincpu->read_k().set(FUNC(tdracula_state::read_k));
+	m_maincpu->write_r().set(FUNC(tdracula_state::write_r));
+	m_maincpu->write_o().set(FUNC(tdracula_state::write_o));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
@@ -14253,7 +14253,7 @@ ROM_START( tdracula )
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
 	ROM_REGION( 557, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1400_tdracula_output.pla", 0, 557, CRC(52e2258e) SHA1(3dcbef72d2309aeb2375041522acd1a879b9e881) )
+	ROM_LOAD( "tms1400_tdracula_output.pla", 0, 557, CRC(54408672) SHA1(8fdc6910a27c22c1df2cadeb25c74118d5774481) )
 
 	ROM_REGION( 416612, "screen", 0)
 	ROM_LOAD( "tdracula.svg", 0, 416612, CRC(71b5e164) SHA1(357528d5df7433609931cd9f9a2e5d56fbd29774) )
@@ -14271,6 +14271,10 @@ ROM_END
   * TMS1024 I/O expander
   * cyan/red/green VFD display NEC FIP9AM31T no. 21-84, 1-bit sound
 
+  Two versions are known, one with a red trigger button and blue slot button,
+  and one with a blue trigger button and red slot button. The game itself is
+  assumed to be the same.
+
 ***************************************************************************/
 
 class tgpachi_state : public hh_tms1k_state
@@ -14287,41 +14291,77 @@ private:
 	required_device<tms1024_device> m_expander;
 	void expander_w(offs_t offset, u8 data);
 
+	void update_display();
 	virtual void write_r(u32 data);
 	virtual void write_o(u16 data);
 };
 
 // handlers
 
+void tgpachi_state::update_display()
+{
+	m_display->matrix(m_grid, m_plate);
+}
+
 void tgpachi_state::expander_w(offs_t offset, u8 data)
 {
+	// TMS1024 port 4-7: VFD plate
+	int shift = (offset - tms1024_device::PORT4) * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+	update_display();
 }
 
 void tgpachi_state::write_r(u32 data)
 {
+	// R13: speaker out
+	m_speaker->level_w(BIT(data, 13));
+
+	// R9,R10: TMS1024 S0,S1 (S2 forced high)
+	// R8: TMS1024 STD
+	m_expander->write_s((data >> 9 & 3) | 4);
+	m_expander->write_std(BIT(data, 8));
+
+	// R0-R7: VFD grid
+	// R11: 1 more VFD plate
+	m_grid = data & 0xff;
+	m_plate = (m_plate & 0xfffff) | (BIT(data, 11) << 20);
+	update_display();
 }
 
 void tgpachi_state::write_o(u16 data)
 {
+	// O0-O3: TMS1024 H1-H4 + VFD plate
+	m_expander->write_h(data & 0xf);
+	m_plate = (m_plate & ~0xf0000) | (data << 16 & 0xf0000);
+	update_display();
 }
 
 // config
 
 static INPUT_PORTS_START( tgpachi )
 	PORT_START("IN.0") // K
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x01, 0x00, "Factory Test" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // Slot
+
+	PORT_START("IN.1") // J
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x08, 0x00, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x08, "2" )
 INPUT_PORTS_END
 
 void tgpachi_state::tgpachi(machine_config &config)
 {
 	// basic machine hardware
 	TMS2670(config, m_maincpu, 450000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set_ioport("IN.0");
-	m_maincpu->r().set(FUNC(tgpachi_state::write_r));
-	m_maincpu->o().set(FUNC(tgpachi_state::write_o));
+	m_maincpu->read_k().set_ioport("IN.0");
+	m_maincpu->read_j().set_ioport("IN.1");
+	m_maincpu->write_r().set(FUNC(tgpachi_state::write_r));
+	m_maincpu->write_o().set(FUNC(tgpachi_state::write_o));
 
 	TMS1024(config, m_expander).set_ms(1); // MS tied high
 	m_expander->write_port4_callback().set(FUNC(tgpachi_state::expander_w));
@@ -14330,7 +14370,7 @@ void tgpachi_state::tgpachi(machine_config &config)
 	m_expander->write_port7_callback().set(FUNC(tgpachi_state::expander_w));
 
 	// video hardware
-	PWM_DISPLAY(config, m_display).set_size(8, 20);
+	PWM_DISPLAY(config, m_display).set_size(8, 21);
 	config.set_default_layout(layout_hh_tms1k_test);
 
 	// sound hardware
@@ -14471,9 +14511,9 @@ void ssports4_state::ssports4(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(ssports4_state::read_k));
-	m_maincpu->r().set(FUNC(ssports4_state::write_r));
-	m_maincpu->o().set(FUNC(ssports4_state::write_o));
+	m_maincpu->read_k().set(FUNC(ssports4_state::read_k));
+	m_maincpu->write_r().set(FUNC(ssports4_state::write_r));
+	m_maincpu->write_o().set(FUNC(ssports4_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 9);
@@ -14655,9 +14695,9 @@ void xl25_state::xl25(machine_config &config)
 {
 	// basic machine hardware
 	TMS1000C(config, m_maincpu, 300000); // approximation - RC osc. R=5.6K, C=47pF
-	m_maincpu->k().set(FUNC(xl25_state::read_k));
-	m_maincpu->r().set(FUNC(xl25_state::write_r));
-	m_maincpu->o().set(FUNC(xl25_state::write_o));
+	m_maincpu->read_k().set(FUNC(xl25_state::read_k));
+	m_maincpu->write_r().set(FUNC(xl25_state::write_r));
+	m_maincpu->write_o().set(FUNC(xl25_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 3);

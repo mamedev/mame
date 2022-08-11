@@ -10726,7 +10726,7 @@ license:CC0
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="riddle of the maze (v2.01)(27-01-94)(testing - phase 2)"  sha1="77b129103e5053618de4773ad938e204ac5afb18"/>
+				<disk name="riddle of the maze (v2.01)(27-01-94)(testing - phase 2)" sha1="77b129103e5053618de4773ad938e204ac5afb18"/>
 			</diskarea>
 		</part>
 	</software>
@@ -10747,12 +10747,12 @@ license:CC0
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom1" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="voyeur ii (v1.04)(11-06-96)(testing-beta)(access code 3333) (disc1)"  sha1="9dfffd6736dbb85fa5317000af9f42f98aad4a20"/>
+				<disk name="voyeur ii (v1.04)(11-06-96)(testing-beta)(access code 3333) (disc1)" sha1="9dfffd6736dbb85fa5317000af9f42f98aad4a20"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="voyeur ii (v1.04)(11-06-96)(testing-beta)(access code 3333) (disc2)"  sha1="534bb7e695d98450edc206b79291200cb554cc6d"/>
+				<disk name="voyeur ii (v1.04)(11-06-96)(testing-beta)(access code 3333) (disc2)" sha1="534bb7e695d98450edc206b79291200cb554cc6d"/>
 			</diskarea>
 		</part>
 	</software>

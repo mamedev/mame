@@ -14020,7 +14020,7 @@ HOMEBREW
 	</software>
 
 	<software name="finalgfx">
-		<description>Final Graphics (Ger,  v2.0)</description>
+		<description>Final Graphics (Ger, v2.0)</description>
 		<year>1989</year>
 		<publisher>H.S.H. Computer</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -15058,7 +15058,7 @@ HOMEBREW
 		<info name="developer" value="Anma" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="pentaro odyssey  - the revenge.dsk" size="737280" crc="c9513751" sha1="a463eaec03210f8cce72df597f7513f1c59f610f"/>
+				<rom name="pentaro odyssey - the revenge.dsk" size="737280" crc="c9513751" sha1="a463eaec03210f8cce72df597f7513f1c59f610f"/>
 			</dataarea>
 		</part>
 	</software>

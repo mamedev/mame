@@ -63,6 +63,12 @@ protected:
 	virtual void read_opcode() override;
 
 	virtual void op_comx() override;
+	virtual void op_xda() override;
+	virtual void op_off() override;
+	virtual void op_seac() override;
+	virtual void op_reac() override;
+	virtual void op_sal() override;
+	virtual void op_sbl() override;
 };
 
 class tms1980_cpu_device : public tms0980_cpu_device
@@ -74,7 +80,7 @@ protected:
 	// overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual void write_o_output(u8 index) override { tms1k_base_device::write_o_output(index); }
+	virtual void write_o_reg(u8 index) override { tms1k_base_device::write_o_reg(index); }
 
 	virtual void op_setr() override { tms1k_base_device::op_setr(); }
 	virtual void op_tdo() override;

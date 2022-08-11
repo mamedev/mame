@@ -1077,7 +1077,7 @@ license:CC0
 		<publisher>Digital Research</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="disk1.img" size="368640" crc="8d7af99e" sha1="1622b1bd5cfc777625d92129b5cb2c2176d4b624"  status="baddump"/>
+				<rom name="disk1.img" size="368640" crc="8d7af99e" sha1="1622b1bd5cfc777625d92129b5cb2c2176d4b624" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1090,12 +1090,12 @@ license:CC0
 		<publisher>GST Computer Systems</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="disk1.img" size="368640" crc="705c06b4" sha1="1ec20a62ce21f48349e18026dd1f3de015c94cb4"  status="baddump"/>
+				<rom name="disk1.img" size="368640" crc="705c06b4" sha1="1ec20a62ce21f48349e18026dd1f3de015c94cb4" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="disk2.img" size="368640" crc="a3a926a1" sha1="8c08c47394685abfffdd5af731256b96fb8dace7"  status="baddump"/>
+				<rom name="disk2.img" size="368640" crc="a3a926a1" sha1="8c08c47394685abfffdd5af731256b96fb8dace7" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1107,27 +1107,27 @@ license:CC0
 		<publisher>GeoWorks</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk1.img" size="1474560" crc="4935d991" sha1="752f39f19d5a26307eb9c07339763c95447f8616"  status="baddump"/>
+				<rom name="disk1.img" size="1474560" crc="4935d991" sha1="752f39f19d5a26307eb9c07339763c95447f8616" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk2.img" size="1474560" crc="e72b697b" sha1="353b0e9979ef94181e3e1745a6a7e3f097092dfd"  status="baddump"/>
+				<rom name="disk2.img" size="1474560" crc="e72b697b" sha1="353b0e9979ef94181e3e1745a6a7e3f097092dfd" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk3.img" size="1474560" crc="b15e719a" sha1="a5838a09c018875db116986e3074a9c403544c75"  status="baddump"/>
+				<rom name="disk3.img" size="1474560" crc="b15e719a" sha1="a5838a09c018875db116986e3074a9c403544c75" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk4.img" size="1474560" crc="49856628" sha1="25b1b3477a7bd31423b6e3901a1d4c1c1069467b"  status="baddump"/>
+				<rom name="disk4.img" size="1474560" crc="49856628" sha1="25b1b3477a7bd31423b6e3901a1d4c1c1069467b" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk5.img" size="1474560" crc="370f711c" sha1="b7ef83e7f99a563f39c04c0190a9d8ac1f5193d0"  status="baddump"/>
+				<rom name="disk5.img" size="1474560" crc="370f711c" sha1="b7ef83e7f99a563f39c04c0190a9d8ac1f5193d0" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4753,43 +4753,43 @@ license:CC0
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Setup Disk 2"/>
 			<dataarea name="flop" size="1474560">
-				<rom name="Microsoft Windows NT 3.5 Workstation - Setup Disk  2.img" size="1474560" crc="2f2ea481" sha1="acb5302c356e1b80bd1b9a6c07900f3dca150b8c"/>
+				<rom name="Microsoft Windows NT 3.5 Workstation - Setup Disk 2.img" size="1474560" crc="2f2ea481" sha1="acb5302c356e1b80bd1b9a6c07900f3dca150b8c"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Setup Disk 3"/>
 			<dataarea name="flop" size="1474560">
-				<rom name="Microsoft Windows NT 3.5 Workstation - Setup Disk  3.img" size="1474560" crc="6a984754" sha1="a7352cabb3b4e81bacec2538b60b67085e066924"/>
+				<rom name="Microsoft Windows NT 3.5 Workstation - Setup Disk 3.img" size="1474560" crc="6a984754" sha1="a7352cabb3b4e81bacec2538b60b67085e066924"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="1720320">
-				<rom name="Microsoft Windows NT 3.5 Workstation - Setup Disk  4.img" size="1720320" crc="2f2bbd88" sha1="960236864fc214a02ba8fd7443010440376af595"/>
+				<rom name="Microsoft Windows NT 3.5 Workstation - Setup Disk 4.img" size="1720320" crc="2f2bbd88" sha1="960236864fc214a02ba8fd7443010440376af595"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size="1720320">
-				<rom name="Microsoft Windows NT 3.5 Workstation - Setup Disk  5.img" size="1720320" crc="c490aa52" sha1="a18fb3f10a09735c005549a72adb9b137633538c"/>
+				<rom name="Microsoft Windows NT 3.5 Workstation - Setup Disk 5.img" size="1720320" crc="c490aa52" sha1="a18fb3f10a09735c005549a72adb9b137633538c"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
 			<dataarea name="flop" size="1720320">
-				<rom name="Microsoft Windows NT 3.5 Workstation - Setup Disk  6.img" size="1720320" crc="5da093bb" sha1="73f0314a9ab444c0d393981f219e61a62d5aa98f"/>
+				<rom name="Microsoft Windows NT 3.5 Workstation - Setup Disk 6.img" size="1720320" crc="5da093bb" sha1="73f0314a9ab444c0d393981f219e61a62d5aa98f"/>
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_3_5">
 			<dataarea name="flop" size="1720320">
-				<rom name="Microsoft Windows NT 3.5 Workstation - Setup Disk  7.img" size="1720320" crc="ee2af451" sha1="aec1042c0f2f0161505f228c1c3beb76e4a07dc1"/>
+				<rom name="Microsoft Windows NT 3.5 Workstation - Setup Disk 7.img" size="1720320" crc="ee2af451" sha1="aec1042c0f2f0161505f228c1c3beb76e4a07dc1"/>
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_3_5">
 			<dataarea name="flop" size="1720320">
-				<rom name="Microsoft Windows NT 3.5 Workstation - Setup Disk  8.img" size="1720320" crc="1b1cf6a1" sha1="8c1e7761221f2d354677f6e4ee8010c8ca6844ad"/>
+				<rom name="Microsoft Windows NT 3.5 Workstation - Setup Disk 8.img" size="1720320" crc="1b1cf6a1" sha1="8c1e7761221f2d354677f6e4ee8010c8ca6844ad"/>
 			</dataarea>
 		</part>
 		<part name="flop9" interface="floppy_3_5">
 			<dataarea name="flop" size="1720320">
-				<rom name="Microsoft Windows NT 3.5 Workstation - Setup Disk  9.img" size="1720320" crc="080f5c9d" sha1="6c8852ffd3fb9a154ee02a43f189f48a09d30f4b"/>
+				<rom name="Microsoft Windows NT 3.5 Workstation - Setup Disk 9.img" size="1720320" crc="080f5c9d" sha1="6c8852ffd3fb9a154ee02a43f189f48a09d30f4b"/>
 			</dataarea>
 		</part>
 
@@ -10666,7 +10666,7 @@ license:CC0
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="The Beverly Hillbillies [Capstone] [1993]  [3.5HD] [Disk 3 of 3].img" size="1474560" crc="034bc286" sha1="64c713beaa747360c09129400369feca14ff034f"/>
+				<rom name="The Beverly Hillbillies [Capstone] [1993] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="034bc286" sha1="64c713beaa747360c09129400369feca14ff034f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11290,12 +11290,12 @@ license:CC0
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="DZone 1.0  #1.img" size="1474560" crc="ae5fd791" sha1="42d16ed62ce3781405ebc0304eafc7bc3f0c0ea0"/>
+				<rom name="DZone 1.0 #1.img" size="1474560" crc="ae5fd791" sha1="42d16ed62ce3781405ebc0304eafc7bc3f0c0ea0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="DZone 1.0  #2.img" size="737280" crc="7d146e94" sha1="b0fad9e41cc85e28fb5aa0fd8e06b452d1953cc0"/>
+				<rom name="DZone 1.0 #2.img" size="737280" crc="7d146e94" sha1="b0fad9e41cc85e28fb5aa0fd8e06b452d1953cc0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11307,17 +11307,17 @@ license:CC0
 		<info name="version" value="1.3a" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="DZone 1.3a  #1.img" size="1474560" crc="1d3944ae" sha1="6a3aa137bc3e5e5798e00fb79d8feaef56c834ee"/>
+				<rom name="DZone 1.3a #1.img" size="1474560" crc="1d3944ae" sha1="6a3aa137bc3e5e5798e00fb79d8feaef56c834ee"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="DZone 1.3a  #2.img" size="1474560" crc="f8192965" sha1="97a128e1d03f91b0752fa7f9346d03cb5c1712d9"/>
+				<rom name="DZone 1.3a #2.img" size="1474560" crc="f8192965" sha1="97a128e1d03f91b0752fa7f9346d03cb5c1712d9"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="DZone 1.3a  #3.img" size="1474560" crc="38719ef4" sha1="de87338c3a7d8af5b7aca8626a5d6d77db83ccbd"/>
+				<rom name="DZone 1.3a #3.img" size="1474560" crc="38719ef4" sha1="de87338c3a7d8af5b7aca8626a5d6d77db83ccbd"/>
 			</dataarea>
 		</part>
 	</software>

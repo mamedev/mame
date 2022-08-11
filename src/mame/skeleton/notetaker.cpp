@@ -146,7 +146,7 @@ public:
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void driver_init() override;
+	virtual void driver_start() override;
 
 	void iop_io(address_map &map);
 	void iop_mem(address_map &map);
@@ -897,7 +897,7 @@ void notetaker_state::notetakr(machine_config &config)
 	DAC1200(config, m_dac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
 }
 
-void notetaker_state::driver_init()
+void notetaker_state::driver_start()
 {
 	// descramble the rom; the whole thing is a gigantic scrambled mess either to ease
 	// interfacing with older xerox technologies which used A0 and D0 as the MSB bits

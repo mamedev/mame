@@ -2460,7 +2460,7 @@ almost nothing like the prototype.
 	<!-- these are listed as 'with HSC emulation' and are designed for the prosystem emulator, they simulate some of the HSC features -->
 	<!-- remove them? -->
 
-	<software name="dkongxmps"  cloneof="dkongxm" supported="no">
+	<software name="dkongxmps" cloneof="dkongxm" supported="no">
 		<description>Donkey Kong (PAL, Demo, XM enhanced, V1.2, for prosystem emulator)</description>
 		<year>2012</year>
 		<publisher>&lt;homebrew&gt;</publisher>

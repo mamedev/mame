@@ -43,15 +43,15 @@
      K1  7 |           | 34 R5
      K2  8 |           | 33 R4
      K4  9 |           | 32 R3
-     K8 10 |  TMS1300  | 31 R1
-   INIT 11 |           | 30 R0
-     O7 12 |           | 29 Vss
-     NC 13 |           | 28 OSC2
-     NC 14 |           | 27 OSC1
-     NC 15 |           | 26 O0
-     O6 16 |           | 25 O1
-     O5 17 |           | 24 O2
-     O4 18 |           | 23 NC
+     K8 10 |  TMS1300  | 31 R2
+   INIT 11 |  TMS1370  | 30 R1
+     O7 12 |           | 29 R0
+     NC 13 |           | 28 Vss
+     NC 14 |           | 27 OSC2
+     NC 15 |           | 26 OSC1
+     O6 16 |           | 25 O0
+     O5 17 |           | 24 O1
+     O4 18 |           | 23 O2
      O3 19 |           | 22 NC
      NC 20 |___________| 21 NC
 
@@ -69,6 +69,7 @@ protected:
 	tms1100_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map);
 
 	// overrides
+	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;

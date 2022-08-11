@@ -328,16 +328,16 @@ void tispellb_state::rev1(machine_config &config)
 {
 	// basic machine hardware
 	TMS0270(config, m_maincpu, 350000); // approximation
-	m_maincpu->k().set(FUNC(tispellb_state::main_read_k));
-	m_maincpu->o().set(FUNC(tispellb_state::main_write_o));
-	m_maincpu->r().set(FUNC(tispellb_state::main_write_r));
+	m_maincpu->read_k().set(FUNC(tispellb_state::main_read_k));
+	m_maincpu->write_o().set(FUNC(tispellb_state::main_write_o));
+	m_maincpu->write_r().set(FUNC(tispellb_state::main_write_r));
 	m_maincpu->read_ctl().set(FUNC(tispellb_state::rev1_ctl_r));
 	m_maincpu->write_ctl().set(FUNC(tispellb_state::rev1_ctl_w));
 
 	TMS1980(config, m_subcpu, 350000); // approximation
-	m_subcpu->k().set(FUNC(tispellb_state::sub_read_k));
-	m_subcpu->o().set(FUNC(tispellb_state::sub_write_o));
-	m_subcpu->r().set(FUNC(tispellb_state::sub_write_r));
+	m_subcpu->read_k().set(FUNC(tispellb_state::sub_read_k));
+	m_subcpu->write_o().set(FUNC(tispellb_state::sub_write_o));
+	m_subcpu->write_r().set(FUNC(tispellb_state::sub_write_r));
 
 	config.set_perfect_quantum(m_maincpu);
 
@@ -354,9 +354,9 @@ void tispellb_state::rev2(machine_config &config)
 {
 	// basic machine hardware
 	TMS0270(config, m_maincpu, 350000); // approximation
-	m_maincpu->k().set(FUNC(tispellb_state::main_read_k));
-	m_maincpu->o().set(FUNC(tispellb_state::rev2_write_o));
-	m_maincpu->r().set(FUNC(tispellb_state::rev2_write_r));
+	m_maincpu->read_k().set(FUNC(tispellb_state::main_read_k));
+	m_maincpu->write_o().set(FUNC(tispellb_state::rev2_write_o));
+	m_maincpu->write_r().set(FUNC(tispellb_state::rev2_write_r));
 	m_maincpu->read_ctl().set(m_tms6100, FUNC(tms6100_device::data_r));
 	m_maincpu->write_ctl().set(m_tms6100, FUNC(tms6100_device::add_w));
 

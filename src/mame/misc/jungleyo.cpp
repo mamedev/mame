@@ -414,17 +414,6 @@ static INPUT_PORTS_START( jungleyo )
 INPUT_PORTS_END
 
 
-static const gfx_layout jungleyo_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	8,
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	{ STEP8(0,8*8) },
-	8*64
-};
-
 static const gfx_layout jungleyo16_layout =
 {
 	8,32,
@@ -438,8 +427,8 @@ static const gfx_layout jungleyo16_layout =
 
 static GFXDECODE_START( gfx_jungleyo )
 	GFXDECODE_ENTRY( "reelgfx", 0, jungleyo16_layout,   0x4000, 0x40  )
-	GFXDECODE_ENTRY( "gfx2",    0, jungleyo_layout,     0x2000, 0x20  )
-	GFXDECODE_ENTRY( "gfx3",    0, jungleyo_layout,     0x0000, 0x20  )
+	GFXDECODE_ENTRY( "gfx2",    0, gfx_8x8x8_raw,       0x2000, 0x20  )
+	GFXDECODE_ENTRY( "gfx3",    0, gfx_8x8x8_raw,       0x0000, 0x20  )
 GFXDECODE_END
 
 

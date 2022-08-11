@@ -21981,7 +21981,7 @@ license:CC0
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
 				<rom name="cgb-btgp-0.u1" size="2097152" crc="2c27c61f" sha1="300fe89f98711853bee86ccd81481d55b5097b2d"/>
-				</dataarea>
+			</dataarea>
 		</part>
 	</software>
 

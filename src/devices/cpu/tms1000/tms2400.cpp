@@ -4,8 +4,7 @@
 
   TMS1000 family - TMS2400, TMS2470, TMS2600, TMS2670
 
-  TODO:
-  - x
+TMS2400 is a TMS2100 with twice more memory (kind of how TMS1400 is to TMS1100)
 
 */
 
@@ -13,14 +12,14 @@
 #include "tms2400.h"
 #include "tms1k_dasm.h"
 
-// TMS2400 is a TMS2100 with twice more memory (kind of like TMS1400 is to TMS1100)
+
+// device definitions
 DEFINE_DEVICE_TYPE(TMS2400, tms2400_cpu_device, "tms2400", "Texas Instruments TMS2400") // 28-pin DIP, 7 R pins
 DEFINE_DEVICE_TYPE(TMS2470, tms2470_cpu_device, "tms2470", "Texas Instruments TMS2470") // high voltage version, 1 R pin removed for Vpp
 DEFINE_DEVICE_TYPE(TMS2600, tms2600_cpu_device, "tms2600", "Texas Instruments TMS2600") // 40-pin DIP, 15 R pins, J pins
 DEFINE_DEVICE_TYPE(TMS2670, tms2670_cpu_device, "tms2670", "Texas Instruments TMS2670") // high voltage version, 1 R pin removed for Vpp
 
 
-// device definitions
 tms2400_cpu_device::tms2400_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	tms2400_cpu_device(mconfig, TMS2400, tag, owner, clock, 8 /* o pins */, 7 /* r pins */, 6 /* pc bits */, 8 /* byte width */, 4 /* x width */, 4 /* stack levels */, 12 /* rom width */, address_map_constructor(FUNC(tms2400_cpu_device::rom_12bit), this), 8 /* ram width */, address_map_constructor(FUNC(tms2400_cpu_device::ram_8bit), this))
 { }
@@ -60,13 +59,21 @@ void tms2400_cpu_device::device_reset()
 
 	// changed/added fixed instructions
 	m_fixed_decode[0x0b] = F_TPC;
+	m_fixed_decode[0x75] = F_COMX8;
+	m_fixed_decode[0x7d] = F_TXA;
 }
 
 
 // opcode deviations
 void tms2400_cpu_device::op_ldx()
 {
-	// LDX: value is still 3 bit even though X is 4 bit
+	// LDX: value is still 3-bit even though X is 4-bit
 	tms2100_cpu_device::op_ldx();
 	m_x >>= 1;
+}
+
+void tms2400_cpu_device::op_txa()
+{
+	// TXA: transfer X register to accumulator
+	m_a = m_x;
 }

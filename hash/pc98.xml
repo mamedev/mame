@@ -3578,7 +3578,7 @@ TODO:
 	<software name="aggregat">
 		<description>Aggregate</description>
 		<year>1994</year>
-		<publisher>ジャパンホームビデオ  (Japan Home Video)</publisher>
+		<publisher>ジャパンホームビデオ (Japan Home Video)</publisher>
 		<info name="alt_title" value="アグレガード" />
 		<info name="release" value="19941021" />
 		<part name="flop1" interface="floppy_5_25">
@@ -14374,7 +14374,7 @@ TODO:
 		<!-- Origin: Neo Kobe Collection -->
 		<description>Desert Dragoon - Sabaku no Ryuukihei</description>
 		<year>1993</year>
-		<publisher>ジャパンホームビデオ  (Japan Home Video)</publisher>
+		<publisher>ジャパンホームビデオ (Japan Home Video)</publisher>
 		<info name="alt_title" value="デザートドラグーン ～砂漠の竜騎兵～" />
 		<info name="release" value="19930709" />
 		<info name="usage" value="Has manual copy protection" />
@@ -17452,7 +17452,7 @@ TODO:
 	<software name="duel" supported="partial">
 		<description>Duel</description>
 		<year>1990</year>
-		<publisher>呉ソフトウエア工房  (KSK)</publisher>
+		<publisher>呉ソフトウエア工房 (KSK)</publisher>
 		<info name="alt_title" value="デュエル" />
 		<info name="release" value="19900512" />
 		<part name="flop1" interface="floppy_5_25">
@@ -17479,7 +17479,7 @@ TODO:
 		<!-- Origin: Neo Kobe Collection -->
 		<description>Duel - Kawanakajima Scenario</description>
 		<year>1991</year>
-		<publisher>呉ソフトウエア工房  (KSK)</publisher>
+		<publisher>呉ソフトウエア工房 (KSK)</publisher>
 		<info name="alt_title" value="デュエル 川中島シナリオ" />
 		<info name="release" value="19910720" />
 		<info name="usage" value="Expansion disk for Duel. Boot from the original Duel opening disk, then switch to the character/map disks from this set when prompted" />
@@ -17501,7 +17501,7 @@ TODO:
 		<!-- Origin: Neo Kobe Collection -->
 		<description>Duel Succession</description>
 		<year>1996</year>
-		<publisher>呉ソフトウエア工房  (KSK)</publisher>
+		<publisher>呉ソフトウエア工房 (KSK)</publisher>
 		<info name="alt_title" value="デュエル・サクセション" />
 		<info name="release" value="19960323" />
 		<info name="usage" value="Requires HDD installation. Run DSINST.EXE from DOS." />
@@ -19979,7 +19979,7 @@ TODO:
 	<software name="fqueen">
 		<description>First Queen</description>
 		<year>1988</year>
-		<publisher>呉ソフトウエア工房  (KSK)</publisher>
+		<publisher>呉ソフトウエア工房 (KSK)</publisher>
 		<info name="alt_title" value="ファーストクィーン" />
 		<info name="release" value="198812xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -19999,7 +19999,7 @@ TODO:
 	<software name="fqueena" cloneof="fqueen">
 		<description>First Queen (Alt)</description>
 		<year>1988</year>
-		<publisher>呉ソフトウエア工房  (KSK)</publisher>
+		<publisher>呉ソフトウエア工房 (KSK)</publisher>
 		<info name="alt_title" value="ファーストクィーン" />
 		<info name="release" value="198812xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -20019,7 +20019,7 @@ TODO:
 	<software name="fqueen2">
 		<description>First Queen II - Sabaku no Joou</description>
 		<year>1990</year>
-		<publisher>呉ソフトウエア工房  (KSK)</publisher>
+		<publisher>呉ソフトウエア工房 (KSK)</publisher>
 		<info name="alt_title" value="ファーストクィーン２ 砂漠の女王" />
 		<info name="release" value="19901217" />
 		<part name="flop1" interface="floppy_5_25">
@@ -20045,7 +20045,7 @@ TODO:
 	<software name="fqueen3">
 		<description>First Queen III</description>
 		<year>1993</year>
-		<publisher>呉ソフトウエア工房  (KSK)</publisher>
+		<publisher>呉ソフトウエア工房 (KSK)</publisher>
 		<info name="alt_title" value="ファーストクィーン３" />
 		<info name="release" value="19930702" />
 		<part name="flop1" interface="floppy_5_25">
@@ -20071,7 +20071,7 @@ TODO:
 	<software name="fqueen4">
 		<description>First Queen IV - Varcia Senki</description>
 		<year>1994</year>
-		<publisher>呉ソフトウエア工房  (KSK)</publisher>
+		<publisher>呉ソフトウエア工房 (KSK)</publisher>
 		<info name="alt_title" value="ファーストクィーン４ バルシア戦記" />
 		<info name="release" value="19940610" />
 		<part name="flop1" interface="floppy_5_25">
@@ -23576,7 +23576,7 @@ TODO:
 	<software name="headqrt" supported="no">
 		<description>Headquarters - America no Akumu</description>
 		<year>1994</year>
-		<publisher>アルゴラボ  算法研究所 (Algolab)</publisher>
+		<publisher>アルゴラボ 算法研究所 (Algolab)</publisher>
 		<info name="alt_title" value="ヘッドクォーターズ アメリカの悪夢" />
 		<info name="release" value="19940520" />
 		<part name="flop1" interface="floppy_5_25">
@@ -41168,7 +41168,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	<software name="sotsugyo">
 		<description>Sotsugyou - Graduation</description>
 		<year>1992</year>
-		<publisher>ジャパンホームビデオ  (Japan Home Video)</publisher>
+		<publisher>ジャパンホームビデオ (Japan Home Video)</publisher>
 		<info name="alt_title" value="卒業 －グラデュエーション－" />
 		<info name="release" value="19920625" />
 		<part name="flop1" interface="floppy_5_25">
@@ -42171,13 +42171,13 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
-				<rom name="surper  pink sox 3+ (1994)(wendy magazine) disk_a.fdi" size="1265664" crc="590de4c5" sha1="c0d91c756bf09510e3b61e94bb4da2abf865238b" offset="0" />
+				<rom name="surper pink sox 3+ (1994)(wendy magazine) disk_a.fdi" size="1265664" crc="590de4c5" sha1="c0d91c756bf09510e3b61e94bb4da2abf865238b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1265664">
-				<rom name="surper  pink sox 3+ (1994)(wendy magazine) disk_b.fdi" size="1265664" crc="9686f731" sha1="56abecf83a4101c4993166320cadd3c08ef55f8c" offset="0" />
+				<rom name="surper pink sox 3+ (1994)(wendy magazine) disk_b.fdi" size="1265664" crc="9686f731" sha1="56abecf83a4101c4993166320cadd3c08ef55f8c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -52276,7 +52276,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	<software name="kawanaka" supported="no">
 		<description>Kawanakajima Ibunroku</description>
 		<year>1992</year>
-		<publisher>呉ソフトウエア工房  (KSK)</publisher>
+		<publisher>呉ソフトウエア工房 (KSK)</publisher>
 		<info name="alt_title" value="川中島異聞録" />
 		<info name="release" value="19920327" />
 		<part name="flop1" interface="floppy_5_25">
@@ -52727,7 +52727,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	<software name="localba" supported="yes">
 		<description>Locus Alba</description>
 		<year>1995</year>
-		<publisher>アルゴラボ  算法研究所 (Algolab)</publisher>
+		<publisher>アルゴラボ 算法研究所 (Algolab)</publisher>
 		<info name="alt_title" value="ロクス・アルバ" />
 		<info name="release" value="19950421" />
 		<info name="usage" value="Needs a DOS install from HDD, run LAINST.BAT" />
@@ -52754,7 +52754,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	<software name="localbag" supported="no">
 		<description>Locus Alba Gaiden</description>
 		<year>1995</year>
-		<publisher>アルゴラボ  算法研究所 (Algolab)</publisher>
+		<publisher>アルゴラボ 算法研究所 (Algolab)</publisher>
 		<info name="alt_title" value="ロクス・アルバ外伝" />
 		<info name="release" value="19960126" />
 		<part name="flop1" interface="floppy_5_25">

@@ -13,7 +13,7 @@ license:CC0
 		<info name="serial" value="09845-65516" />
 
 		<part name="rom" interface="hp9845b_rom">
-			<feature name="base" value="0x091000"  />
+			<feature name="base" value="0x091000" />
 			<dataarea name="rom" size="0x4000" width="16" endianness="big">
 				<rom name="09845-65516-11_10-revb-mass_storage.bin" size="0x2000" crc="1cc55094" sha1="d0ffa8e5da9483f3ab2802a1a7092eddd40cddc0" offset="0x0000" />
 				<rom name="09845-65516-11_20-revb-mass_storage.bin" size="0x2000" crc="b95ac9de" sha1="6263f5849f7789d3d47cbbf4c249c256d2d50b7b" offset="0x2000" />
@@ -28,7 +28,7 @@ license:CC0
 		<info name="serial" value="09845-65516" />
 
 		<part name="rom" interface="hp9845b_rom">
-			<feature name="base" value="0x091000"  />
+			<feature name="base" value="0x091000" />
 			<dataarea name="rom" size="0x4000" width="16" endianness="big">
 				<rom name="09845-65516-11_10-revc-mass_storage.bin" size="0x2000" crc="1cc55094" sha1="d0ffa8e5da9483f3ab2802a1a7092eddd40cddc0" offset="0x0000" />
 				<rom name="09845-65516-11_20-revc-mass_storage.bin" size="0x2000" crc="20025674" sha1="84adabc8b620c208cac1b9e7a88cf20f4fbf83a3" offset="0x2000" />
@@ -43,7 +43,7 @@ license:CC0
 		<info name="serial" value="09845-65516" />
 
 		<part name="rom" interface="hp9845b_rom">
-			<feature name="base" value="0x091000"  />
+			<feature name="base" value="0x091000" />
 			<dataarea name="rom" size="0x6000" width="16" endianness="big">
 				<rom name="09845-65516-11_10-revd-mass_storage.bin" size="0x2000" crc="1cc55094" sha1="d0ffa8e5da9483f3ab2802a1a7092eddd40cddc0" offset="0x0000" />
 				<rom name="09845-65516-11_20-revd-mass_storage.bin" size="0x2000" crc="20025674" sha1="84adabc8b620c208cac1b9e7a88cf20f4fbf83a3" offset="0x2000" />
@@ -59,7 +59,7 @@ license:CC0
 		<info name="serial" value="09845-65517" />
 
 		<part name="rom" interface="hp9845b_rom">
-			<feature name="base" value="0x073000"  />
+			<feature name="base" value="0x073000" />
 			<dataarea name="rom" size="0x4000" width="16" endianness="big">
 				<rom name="09845-65517-07_30-revb-graphics.bin" size="0x2000" crc="00f49b6e" sha1="81bcab408ea72e0ab3756226184adbb5966e2e65" offset="0x0000" />
 				<rom name="09845-65517-07_40-revb-graphics.bin" size="0x2000" crc="511d6c82" sha1="4546767a92d3059dc47fe6a9ca8a5db0fdcda904" offset="0x2000" />
@@ -75,7 +75,7 @@ license:CC0
 
 		<part name="rom" interface="hp9845b_rom">
 			<!-- Correct BSC is probably 0x0b (or ROM wouldn't belong to LPU)-->
-			<feature name="base" value="0x0b5000"  />
+			<feature name="base" value="0x0b5000" />
 			<dataarea name="rom" size="0x4000" width="16" endianness="big">
 				<rom name="09845-65518-11_50-reva-io_lpu.bin" size="0x2000" crc="98bd769e" sha1="8c28f838982d1b77f5b5dfd0923869bcff755a78" offset="0x0000" />
 				<rom name="09845-65518-11_60-reva-io_lpu.bin" size="0x2000" crc="4fc249f8" sha1="cb80e382eb456d6bead110077536564c1a170071" offset="0x2000" />
@@ -90,7 +90,7 @@ license:CC0
 		<info name="serial" value="09845-65518" />
 
 		<part name="rom" interface="hp9845b_rom">
-			<feature name="base" value="0x0b5000"  />
+			<feature name="base" value="0x0b5000" />
 			<dataarea name="rom" size="0x4000" width="16" endianness="big">
 				<rom name="09845-65518-13_50-revb-io_lpu.bin" size="0x2000" crc="3d642769" sha1="18e41b9d6c39c26f42d197ef455b4085b936b3da" offset="0x0000" />
 				<rom name="09845-65518-13_60-revb-io_lpu.bin" size="0x2000" crc="4fc249f8" sha1="cb80e382eb456d6bead110077536564c1a170071" offset="0x2000" />
@@ -105,7 +105,7 @@ license:CC0
 		<info name="serial" value="09845-65519" />
 
 		<part name="rom" interface="hp9845b_rom">
-			<feature name="base" value="0x094000"  />
+			<feature name="base" value="0x094000" />
 			<dataarea name="rom" size="0x4000" width="16" endianness="big">
 				<rom name="09845-65519-09_40-revb-io_ppu.bin" size="0x2000" crc="fb49c7d8" sha1="f2e4f196a4fb3859081495e1be7062afc7769544" offset="0x0000" />
 				<rom name="09845-65519-09_50-revb-io_ppu.bin" size="0x2000" crc="861a77c6" sha1="6f419275d2cf13daa9345ea55e03d5ad15e438a7" offset="0x2000" />
@@ -119,7 +119,7 @@ license:CC0
 		<publisher>Hewlett-Packard</publisher>
 
 		<part name="ppu_rom" interface="hp9845b_rom">
-			<feature name="base" value="0x094000"  />
+			<feature name="base" value="0x094000" />
 			<dataarea name="rom" size="0x4000" width="16" endianness="big">
 				<rom name="09845-65519-09_40-revb-io_ppu.bin" size="0x2000" crc="fb49c7d8" sha1="f2e4f196a4fb3859081495e1be7062afc7769544" offset="0x0000" />
 				<rom name="09845-65519-09_50-revb-io_ppu.bin" size="0x2000" crc="861a77c6" sha1="6f419275d2cf13daa9345ea55e03d5ad15e438a7" offset="0x2000" />
@@ -127,7 +127,7 @@ license:CC0
 		</part>
 
 		<part name="lpu_rom" interface="hp9845b_rom">
-			<feature name="base" value="0x0b5000"  />
+			<feature name="base" value="0x0b5000" />
 			<dataarea name="rom" size="0x4000" width="16" endianness="big">
 				<rom name="09845-65518-13_50-revb-io_lpu.bin" size="0x2000" crc="3d642769" sha1="18e41b9d6c39c26f42d197ef455b4085b936b3da" offset="0x0000" />
 				<rom name="09845-65518-13_60-revb-io_lpu.bin" size="0x2000" crc="4fc249f8" sha1="cb80e382eb456d6bead110077536564c1a170071" offset="0x2000" />
@@ -143,7 +143,7 @@ license:CC0
 		<info name="serial" value="09845-65519" />
 
 		<part name="rom" interface="hp9845b_rom">
-			<feature name="base" value="0x094000"  />
+			<feature name="base" value="0x094000" />
 			<dataarea name="rom" size="0x4000" width="16" endianness="big">
 				<rom name="09845-65519-11_40-revc-io_ppu.bin" size="0x2000" crc="de2d5b1e" sha1="1b14e77de85eba555f576bddc5f5a84ae741875b" offset="0x0000" />
 				<rom name="09845-65519-11_50-revc-io_ppu.bin" size="0x2000" crc="861a77c6" sha1="6f419275d2cf13daa9345ea55e03d5ad15e438a7" offset="0x2000" />
@@ -158,7 +158,7 @@ license:CC0
 		<info name="serial" value="09845-65521" />
 
 		<part name="rom" interface="hp9845b_rom">
-			<feature name="base" value="0x0b1000"  />
+			<feature name="base" value="0x0b1000" />
 			<dataarea name="rom" size="0x2000" width="16" endianness="big">
 				<rom name="09845-65521-13_10-reva-advanced_programming.bin" size="0x2000" crc="c39a193e" sha1="0193fa7308c58469517973b1425c966460283b37" offset="0x0000" />
 			</dataarea>
@@ -172,7 +172,7 @@ license:CC0
 		<info name="serial" value="09845-65524" />
 
 		<part name="rom" interface="hp9845b_rom">
-			<feature name="base" value="0x0f4000"  />
+			<feature name="base" value="0x0f4000" />
 			<dataarea name="rom" size="0x4000" width="16" endianness="big">
 				<rom name="09845-65524-17_40-reva-assembly_execution.bin" size="0x2000" crc="ff91e559" sha1="52d8d1d535cf1cd39a1e794115f94dced545d1af" offset="0x0000" />
 				<rom name="09845-65524-17_50-reva-assembly_execution.bin" size="0x2000" crc="52d8c5b4" sha1="c015fbdc14d9dd2eb5f23cb9e03412fb05b81e42" offset="0x2000" />
@@ -187,7 +187,7 @@ license:CC0
 		<info name="serial" value="09845-65525" />
 
 		<part name="rom" interface="hp9845b_rom">
-			<feature name="base" value="0x0f4000"  />
+			<feature name="base" value="0x0f4000" />
 			<dataarea name="rom" size="0x8000" width="16" endianness="big">
 				<rom name="09845-65525-17_40-reva-assembly_execution_and_development.bin" size="0x2000" crc="ff91e559" sha1="52d8d1d535cf1cd39a1e794115f94dced545d1af" offset="0x0000" />
 				<rom name="09845-65525-17_50-reva-assembly_execution_and_development.bin" size="0x2000" crc="52d8c5b4" sha1="c015fbdc14d9dd2eb5f23cb9e03412fb05b81e42" offset="0x2000" />
@@ -246,7 +246,7 @@ license:CC0
 		<info name="serial" value="09845-65528" />
 
 		<part name="rom" interface="hp9845b_rom">
-			<feature name="base" value="0x0f3000"  />
+			<feature name="base" value="0x0f3000" />
 			<dataarea name="rom" size="0x2000" width="16" endianness="big">
 				<rom name="09845-65528-17_30-reva-structured_programming.bin" size="0x2000" crc="f2829f93" sha1="74d760eb1ff57e3c9e8deee131d4d56bf4ef0b05" offset="0x0000" />
 			</dataarea>
@@ -279,7 +279,7 @@ license:CC0
 		<info name="serial" value="09845-66520" />
 
 		<part name="rom" interface="hp9845b_rom">
-			<feature name="base" value="0x250000"  />
+			<feature name="base" value="0x250000" />
 			<dataarea name="rom" size="0x4000" width="16" endianness="big">
 				<rom name="09845-66520-45_00-test_rom.bin" size="0x2000" crc="95a5b299" sha1="ef362f8fe0049ba4bb483aca873812ceaa4c8d7c" offset="0x0000" />
 				<rom name="09845-66520-45_10-test_rom.bin" size="0x2000" crc="257e4c66" sha1="4443ca1e7b9565c290e3c2f743602bdf64d0cae0" offset="0x2000" />
@@ -294,7 +294,7 @@ license:CC0
 		<info name="serial" value="09845-67965" />
 
 		<part name="rom" interface="hp9845b_rom">
-			<feature name="base" value="0x110000"  />
+			<feature name="base" value="0x110000" />
 			<dataarea name="rom" size="0x8000" width="16" endianness="big">
 				<rom name="09845-67965-21_00-reva-basic_data_comm_async.bin" size="0x2000" crc="cc82edcd" sha1="cb89c3e31609c73db5c4d9d99d91acd914b1f11f" offset="0x0000" />
 				<rom name="09845-67965-21_10-reva-basic_data_comm_async.bin" size="0x2000" crc="f0dda2fb" sha1="46e0330215a20a281b66b16140dcfbef37510519" offset="0x2000" />
@@ -311,7 +311,7 @@ license:CC0
 		<info name="serial" value="09845-67986" />
 
 		<part name="rom" interface="hp9845b_rom">
-			<feature name="base" value="0x114000"  />
+			<feature name="base" value="0x114000" />
 			<dataarea name="rom" size="0x4000" width="16" endianness="big">
 				<rom name="09845-67986-21_40_rje_datacom_bisync.bin" size="0x2000" crc="59123e07" sha1="3baf9066bca2307633dabac4b4873c6f2030c529" offset="0x0000" />
 				<rom name="09845-67986-21_50_rje_datacom_bisync.bin" size="0x2000" crc="a753991a" sha1="33a8a059d212a4ee3a656f3c11a0d8cdaeb64c3a" offset="0x2000" />
@@ -326,7 +326,7 @@ license:CC0
 		<info name="serial" value="98770-65501" />
 
 		<part name="rom" interface="hp9845b_rom">
-			<feature name="base" value="0x073000"  />
+			<feature name="base" value="0x073000" />
 			<dataarea name="rom" size="0x8000" width="16" endianness="big">
 				<rom name="98770-65501-07_30-revd-color_graphics.bin" size="0x2000" crc="012d729e" sha1="f2a6a25bfaff7aecabdc608bc07613a10641ccce" offset="0x0000" />
 				<rom name="98770-65501-07_40-revd-color_graphics.bin" size="0x2000" crc="656799f5" sha1="0ba3f9018eed8c385f600fc78b70e4ce903e5233" offset="0x2000" />
@@ -343,7 +343,7 @@ license:CC0
 		<info name="serial" value="98770-65501" />
 
 		<part name="rom" interface="hp9845b_rom">
-			<feature name="base" value="0x072000"  />
+			<feature name="base" value="0x072000" />
 			<dataarea name="rom" size="0xa000" width="16" endianness="big">
 				<rom name="98780-65501-07_20-reva-enhancend_graphics.bin" size="0x2000" crc="57598821" sha1="cb6e46d7226bee5c3cbe33176c44adc64477e5c2" offset="0x0000" />
 				<rom name="98780-65501-07_30-reva-enhancend_graphics.bin" size="0x2000" crc="19278727" sha1="3321cf18005f90db39992b31224697b62ab4682b" offset="0x2000" />
@@ -361,7 +361,7 @@ license:CC0
 		<info name="serial" value="98780-65501" />
 
 		<part name="rom" interface="hp9845b_rom">
-			<feature name="base" value="0x072000"  />
+			<feature name="base" value="0x072000" />
 			<dataarea name="rom" size="0xa000" width="16" endianness="big">
 				<rom name="98780-65501-07_20-revb-enhancend_graphics.bin" size="0x2000" crc="57598821" sha1="cb6e46d7226bee5c3cbe33176c44adc64477e5c2" offset="0x0000" />
 				<rom name="98780-65501-07_30-revb-enhancend_graphics.bin" size="0x2000" crc="19278727" sha1="3321cf18005f90db39992b31224697b62ab4682b" offset="0x2000" />
@@ -378,9 +378,9 @@ license:CC0
 		<publisher>Structured Software Systems</publisher>
 
 		<part name="rom" interface="hp9845b_rom">
-			<feature name="base" value="0x0d1000"  />
+			<feature name="base" value="0x0d1000" />
 			<dataarea name="rom" size="0x2000" width="16" endianness="big">
-				<rom name="831010-15_10-RevA-Structured_Software_Systems_Mass_Storage.bin" size="0x2000" crc="bc875ee0" sha1="e82dd5c1b826eb80cd323cefe1d8a19fa4733952" offset="0x0000"  />
+				<rom name="831010-15_10-RevA-Structured_Software_Systems_Mass_Storage.bin" size="0x2000" crc="bc875ee0" sha1="e82dd5c1b826eb80cd323cefe1d8a19fa4733952" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>

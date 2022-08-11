@@ -26,7 +26,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual void write_o_output(u8 index) override;
+	virtual void write_o_reg(u8 index) override;
 
 	virtual void op_setr() override;
 	virtual void op_tdo() override;

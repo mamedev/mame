@@ -28,7 +28,6 @@ public:
 	tsconf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: spectrum_128_state(mconfig, type, tag),
 		  m_bank0_rom(*this, "bank0_rom"),
-		  m_banks(*this, "bank%u", 0U),
 		  m_keyboard(*this, "pc_keyboard"),
 		  m_beta(*this, BETA_DISK_TAG),
 		  m_dma(*this, "dma"),
@@ -191,9 +190,8 @@ private:
 	std::map<tsconf_regs, u8> m_scanline_delayed_regs_update;
 	u8 m_regs[0x100];
 
-	address_space *m_program = nullptr;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 	memory_view m_bank0_rom;
-	required_memory_bank_array<5> m_banks; // 0..3 - RAM, 4 - ROM
 
 	required_device<at_keyboard_device> m_keyboard;
 

@@ -4,8 +4,10 @@
 
   TMS1000 family - TMS1100, TMS1170, TMS1300, TMS1370
 
-  TODO:
-  - add TMS1100C when needed
+TMS1100 is nearly the same as TMS1000, some different opcodes, and with double the RAM and ROM
+
+TODO:
+- add TMS1100C when needed
 
 */
 
@@ -13,14 +15,14 @@
 #include "tms1100.h"
 #include "tms1k_dasm.h"
 
-// TMS1100 is nearly the same as TMS1000, some different opcodes, and with double the RAM and ROM
+
+// device definitions
 DEFINE_DEVICE_TYPE(TMS1100, tms1100_cpu_device, "tms1100", "Texas Instruments TMS1100") // 28-pin DIP, 11 R pins
 DEFINE_DEVICE_TYPE(TMS1170, tms1170_cpu_device, "tms1170", "Texas Instruments TMS1170") // high voltage version
 DEFINE_DEVICE_TYPE(TMS1300, tms1300_cpu_device, "tms1300", "Texas Instruments TMS1300") // 40-pin DIP, 16 R pins
 DEFINE_DEVICE_TYPE(TMS1370, tms1370_cpu_device, "tms1370", "Texas Instruments TMS1370") // high voltage version, also seen in 28-pin package(some O/R pins unavailable)
 
 
-// device definitions
 tms1100_cpu_device::tms1100_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	tms1100_cpu_device(mconfig, TMS1100, tag, owner, clock, 8 /* o pins */, 11 /* r pins */, 6 /* pc bits */, 8 /* byte width */, 3 /* x width */, 1 /* stack levels */, 11 /* rom width */, address_map_constructor(FUNC(tms1100_cpu_device::rom_11bit), this), 7 /* ram width */, address_map_constructor(FUNC(tms1100_cpu_device::ram_7bit), this))
 { }
@@ -49,7 +51,14 @@ std::unique_ptr<util::disasm_interface> tms1100_cpu_device::create_disassembler(
 }
 
 
-// device_reset
+// device_start/reset
+void tms1100_cpu_device::device_start()
+{
+	tms1000_cpu_device::device_start();
+
+	state_add(++m_state_count, "CB", m_cb).formatstr("%01X"); // 8
+}
+
 void tms1100_cpu_device::device_reset()
 {
 	tms1000_cpu_device::device_reset();
@@ -71,7 +80,7 @@ void tms1100_cpu_device::op_setr()
 	// TMS1100 manual simply says that X must be less than 4
 	u8 index = BIT(m_x, m_x_bits - 1) << 4 | m_y;
 	m_r = m_r | (1 << index);
-	m_write_r(m_r & m_r_mask);
+	write_r_output(m_r);
 }
 
 void tms1100_cpu_device::op_rstr()
@@ -79,5 +88,5 @@ void tms1100_cpu_device::op_rstr()
 	// RSTR: see SETR
 	u8 index = BIT(m_x, m_x_bits - 1) << 4 | m_y;
 	m_r = m_r & ~(1 << index);
-	m_write_r(m_r & m_r_mask);
+	write_r_output(m_r);
 }

@@ -135,22 +135,26 @@ u8 scorpion_state::beta_neutral_r(offs_t offset)
 
 u8 scorpion_state::beta_enable_r(offs_t offset)
 {
-	if (m_maincpu->total_cycles() & 1) m_maincpu->eat_cycles(1);
+	if (!(machine().side_effects_disabled())) {
+		if (m_maincpu->total_cycles() & 1) m_maincpu->eat_cycles(1);
 
-	if (m_beta->started() && m_bank_rom[0]->entry() == 1) {
-		m_beta->enable();
-		m_bank_rom[0]->set_entry(3);
+		if (m_beta->started() && m_bank_rom[0]->entry() == 1) {
+			m_beta->enable();
+			m_bank_rom[0]->set_entry(3);
+		}
 	}
 	return m_program->read_byte(offset + 0x3d00);
 }
 
 u8 scorpion_state::beta_disable_r(offs_t offset)
 {
-	if (m_maincpu->total_cycles() & 1) m_maincpu->eat_cycles(1);
+	if (!(machine().side_effects_disabled())) {
+		if (m_maincpu->total_cycles() & 1) m_maincpu->eat_cycles(1);
 
-	if (m_beta->started() && m_beta->is_active()) {
-		m_beta->disable();
-		m_bank_rom[0]->set_entry(BIT(m_port_7ffd_data, 4));
+		if (m_beta->started() && m_beta->is_active()) {
+			m_beta->disable();
+			m_bank_rom[0]->set_entry(BIT(m_port_7ffd_data, 4));
+		}
 	}
 	return m_program->read_byte(offset + 0x4000);
 }

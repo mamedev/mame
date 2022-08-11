@@ -197,9 +197,9 @@ void eva11_state::eva(machine_config &config)
 {
 	/* basic machine hardware */
 	TMS1000(config, m_maincpu, 640_kHz_XTAL/2); // from TMS5110A CPU CK
-	m_maincpu->k().set(FUNC(eva11_state::read_k));
-	m_maincpu->o().set(FUNC(eva11_state::write_o));
-	m_maincpu->r().set(FUNC(eva11_state::write_r));
+	m_maincpu->read_k().set(FUNC(eva11_state::read_k));
+	m_maincpu->write_o().set(FUNC(eva11_state::write_o));
+	m_maincpu->write_r().set(FUNC(eva11_state::write_r));
 
 	eva_sound(config);
 }

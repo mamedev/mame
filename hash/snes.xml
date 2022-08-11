@@ -5842,7 +5842,7 @@ more investigation needed...
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="sm choukyoushi hitomi vol. 3 (japan) (alt 1) (unl) [b].sfc" size="1048576" crc="92e6d22f" sha1="cfed5026f490dcd3a9848c5499d4f6f010bab880" offset="0x000000"  status="baddump" />
+				<rom name="sm choukyoushi hitomi vol. 3 (japan) (alt 1) (unl) [b].sfc" size="1048576" crc="92e6d22f" sha1="cfed5026f490dcd3a9848c5499d4f6f010bab880" offset="0x000000" status="baddump" />
 			</dataarea>
 			<dataarea name="nvram" size="2048">
 			</dataarea>

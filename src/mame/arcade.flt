@@ -122,6 +122,7 @@ atlus/bowltry.cpp
 atlus/ohmygod.cpp
 atlus/patapata.cpp
 atlus/rallypnt.cpp
+barcrest/mpu1.cpp
 barcrest/mpu2.cpp
 barcrest/mpu3.cpp
 barcrest/mpu4avan.cpp
@@ -330,7 +331,6 @@ gaelco/targeth.cpp
 gaelco/thoop2.cpp
 gaelco/wrally.cpp
 gaelco/xorworld.cpp
-galaxian/bmxstunts.cpp
 galaxian/dambustr.cpp
 galaxian/fastfred.cpp
 galaxian/galaxian.cpp

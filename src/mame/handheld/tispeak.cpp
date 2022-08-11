@@ -35,7 +35,7 @@ Wiz-A-Tron or Little Professor. But the popularity of this product was much
 above expectations. TI continued to manufacture many products for this line.
 
     Speak & Spell (US), 1978
-    - MCU: TMC0271, label TMC0271NL DBS (die label: T0270B 0271B)
+    - MCU: TMC0271, label TMC0271NL DBS (die label: T0270B, 0271B)
     - TMS51xx: TMC0281
     - VSM(1/2): 16KB TMC0351NL
     - VSM(2/2): 16KB TMC0352NL
@@ -43,7 +43,7 @@ above expectations. TI continued to manufacture many products for this line.
     - notes: keyboard has buttons instead of cheap membrane
 
     Speak & Spell (US), 1980
-    - MCU: TMC0271, label TMC0271H-N2L FDS (die label: T0270D 0271H)
+    - MCU: TMC0271, label TMC0271H-N2L FDS (die label: T0270D, 0271H)
     - TMS51xx: TMC0281
     - VSM(1/2): 16KB TMC0351N2L
     - VSM(2/2): 16KB TMC0352N2L
@@ -81,14 +81,14 @@ above expectations. TI continued to manufacture many products for this line.
     - notes: this one has a dedicated voice actor
 
     Speak & Spell (Spanish, prototype), 1980
-    - MCU: CD2701N2L P (die label: T0270D 2701)
+    - MCU: CD2701N2L P (die label: T0270D, 2701)
     - TMS51xx: TMC0281 (die label: T0280A 0281)
     - VSM(1/2): 16KB CD2319
     - VSM(2/2): 16KB CD2320
     - VFD: 8 digits with 14 segments, DP and accent mark
 
     Speak & Spell (France) "La Dictée Magique", 1981
-    - MCU: CD2702, label CD2702AN2L (die label: TMC0270F 2702A)
+    - MCU: CD2702, label CD2702AN2L (die label: TMC0270F, 2702A)
     - TMS51xx: CD2801
     - VSM: 16KB CD2352
 
@@ -151,7 +151,7 @@ Note that they are interchangeable, eg. you can use a French module on a US Spea
 Speak & Math:
 
     Speak & Math (US), 1980 (renamed to "Speak & Maths" in UK, but is the same product)
-    - MCU: CD2704, label CD2704B-N2L (die label: TMC0270F 2704B) - 2nd revision?(mid-1982)
+    - MCU: CD2704, label CD2704B-N2L (die label: TMC0270F, 2704B) - 2nd revision?(mid-1982)
     - TMS51xx: CD2801
     - VSM(1/2): 16KB CD2392
     - VSM(2/2): 16KB CD2393
@@ -162,7 +162,7 @@ Speak & Math:
       never found out and it ended up in the final product.
 
     Speak & Math (US), 1986
-    - MCU: CD2708, label CD2708N2L (die label: TMC0270F 2708A)
+    - MCU: CD2708, label CD2708N2L (die label: TMC0270F, 2708A)
     - TMS51xx: CD2801
     - VSM(1/2): 16KB CD2381
     - VSM(2/2): 4KB CD2614
@@ -178,7 +178,7 @@ Speak & Math:
 Speak & Read:
 
     Speak & Read (US), 1980
-    - MCU: CD2705, label CD2705B-N2L (die label: TMC0270E 2705B) - 2nd revision?(late-1981)
+    - MCU: CD2705, label CD2705B-N2L (die label: TMC0270E, 2705B) - 2nd revision?(late-1981)
     - TMS51xx: CD2801
     - VSM(1/2): 16KB CD2394(rev.A)
     - VSM(2/2): 16KB CD2395(rev.A)
@@ -200,7 +200,7 @@ Speak & Read modules:
 Touch & Tell:
 
     Touch & Tell (US), 1981
-    - MCU: CD8012, label CD8012NL (die label: 1100G CD8012)
+    - MCU: CD8012, label CD8012NL (die label: 1100G, CD8012)
     - TMS51xx: CD2802
     - VSM: 4KB CD2610
     - notes: MCU is TMS1100 instead of TMS0270. CD8010 is seen in some devices
@@ -329,7 +329,7 @@ Initially sold as Language Translator, renamed to Language Tutor a year later.
 It was rebranded from translator to a 'language aid'.
 
     Language Translator (US), 1979
-    - MCU: TMC0275 (die label: T0270D 0275B)
+    - MCU: TMC0275 (die label: T0270D, 0275B)
     - TMS51xx: CD2801 (die label: T0280B 2801)
     - VFD: Itron FG106A2
     - notes: external module is required (see below)
@@ -370,15 +370,16 @@ Language Translator modules:
 Language Teacher:
 
 A cost-reduced version of the translator. Similar PCB, the speaker was removed.
-Modules require less ROMs due to missing speech data.
+Modules require less ROMs due to missing speech data. Translator/Teacher modules
+are not interchangeable.
 
     Language Teacher (US), 1980
-    - MCU: TMC0270N2LP CD2706*
+    - MCU: TMC0270N2LP CD2706 (die label: T0270D, 2706)
     - other: see Language Translator
 
 Language Teacher modules (only 1 known released):
 
-    - German for Travel: VSM: 16KB CD3509*
+    - German For Travel: VSM: 16KB CD3509
 
 
 Other manufacturers:
@@ -490,6 +491,7 @@ public:
 	void tntell(machine_config &config);
 	void vocaid(machine_config &config);
 	void lantrans(machine_config &config);
+	void lanteach(machine_config &config);
 	void k28m2(machine_config &config);
 
 private:
@@ -1327,9 +1329,9 @@ void tispeak_state::snmath(machine_config &config)
 {
 	// basic machine hardware
 	TMS0270(config, m_maincpu, MASTER_CLOCK/2);
-	m_maincpu->k().set(FUNC(tispeak_state::snspell_read_k));
-	m_maincpu->o().set(FUNC(tispeak_state::snmath_write_o));
-	m_maincpu->r().set(FUNC(tispeak_state::snspell_write_r));
+	m_maincpu->read_k().set(FUNC(tispeak_state::snspell_read_k));
+	m_maincpu->write_o().set(FUNC(tispeak_state::snmath_write_o));
+	m_maincpu->write_r().set(FUNC(tispeak_state::snspell_write_r));
 
 	m_maincpu->read_ctl().set("tms5100", FUNC(tms5110_device::ctl_r));
 	m_maincpu->write_ctl().set("tms5100", FUNC(tms5110_device::ctl_w));
@@ -1354,12 +1356,12 @@ void tispeak_state::sns_cd2801(machine_config &config)
 	snmath(config);
 
 	// basic machine hardware
-	m_maincpu->o().set(FUNC(tispeak_state::snspell_write_o));
+	m_maincpu->write_o().set(FUNC(tispeak_state::snspell_write_o));
 
 	config.set_default_layout(layout_snspell);
 
 	// cartridge
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "snspell", "vsm");
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "snspell", "vsm,bin");
 	m_cart->set_device_load(FUNC(tispeak_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("snspell");
@@ -1405,12 +1407,12 @@ void tispeak_state::snread(machine_config &config)
 	snmath(config);
 
 	// basic machine hardware
-	m_maincpu->o().set(FUNC(tispeak_state::snspell_write_o));
+	m_maincpu->write_o().set(FUNC(tispeak_state::snspell_write_o));
 
 	config.set_default_layout(layout_snread);
 
 	// cartridge
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "snread", "vsm");
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "snread", "vsm,bin");
 	m_cart->set_device_load(FUNC(tispeak_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("snread");
@@ -1422,8 +1424,8 @@ void tispeak_state::lantrans(machine_config &config)
 	snmath(config);
 
 	// basic machine hardware
-	m_maincpu->o().set(FUNC(tispeak_state::snspell_write_o));
-	m_maincpu->r().set(FUNC(tispeak_state::lantrans_write_r));
+	m_maincpu->write_o().set(FUNC(tispeak_state::snspell_write_o));
+	m_maincpu->write_r().set(FUNC(tispeak_state::lantrans_write_r));
 
 	config.set_default_layout(layout_snread);
 
@@ -1435,14 +1437,30 @@ void tispeak_state::lantrans(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("lantrans");
 }
 
+void tispeak_state::lanteach(machine_config &config)
+{
+	lantrans(config);
+
+	// cartridge
+	GENERIC_CARTSLOT(config.replace(), m_cart, generic_plain_slot, "lanteach", "vsm,bin");
+	m_cart->set_must_be_loaded(true);
+	m_cart->set_device_load(FUNC(tispeak_state::cart_load));
+
+	SOFTWARE_LIST(config.replace(), "cart_list").set_original("lanteach");
+
+	// sound hardware
+	m_tms5100->reset_routes();
+	config.device_remove("mono");
+}
+
 
 void tispeak_state::snspellc(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, MASTER_CLOCK/2);
-	m_maincpu->k().set(FUNC(tispeak_state::snspellc_read_k));
-	m_maincpu->o().set(FUNC(tispeak_state::snspellc_write_o));
-	m_maincpu->r().set(FUNC(tispeak_state::snspellc_write_r));
+	m_maincpu->read_k().set(FUNC(tispeak_state::snspellc_read_k));
+	m_maincpu->write_o().set(FUNC(tispeak_state::snspellc_write_o));
+	m_maincpu->write_r().set(FUNC(tispeak_state::snspellc_write_r));
 
 	// no visual feedback!
 
@@ -1454,7 +1472,7 @@ void tispeak_state::snspellc(machine_config &config)
 	tms5110_route(config);
 
 	// cartridge
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "snspell", "vsm");
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "snspell", "vsm,bin");
 	m_cart->set_device_load(FUNC(tispeak_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("snspell");
@@ -1474,9 +1492,9 @@ void tispeak_state::vocaid(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, MASTER_CLOCK/2);
-	m_maincpu->k().set(FUNC(tispeak_state::tntell_read_k));
-	m_maincpu->o().set(FUNC(tispeak_state::snspellc_write_o));
-	m_maincpu->r().set(FUNC(tispeak_state::snspellc_write_r));
+	m_maincpu->read_k().set(FUNC(tispeak_state::tntell_read_k));
+	m_maincpu->write_o().set(FUNC(tispeak_state::snspellc_write_o));
+	m_maincpu->write_r().set(FUNC(tispeak_state::snspellc_write_r));
 
 	TIMER(config, "ol_timer").configure_periodic(FUNC(tispeak_state::tntell_get_overlay), attotime::from_msec(50));
 	config.set_default_layout(layout_tntell);
@@ -1494,7 +1512,7 @@ void tispeak_state::tntell(machine_config &config)
 	vocaid(config);
 
 	// cartridge
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "tntell", "vsm");
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "tntell", "vsm,bin");
 	m_cart->set_device_load(FUNC(tispeak_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("tntell");
@@ -1505,9 +1523,9 @@ void tispeak_state::k28m2(machine_config &config)
 {
 	// basic machine hardware
 	TMS1400(config, m_maincpu, MASTER_CLOCK/2);
-	m_maincpu->k().set(FUNC(tispeak_state::k28_read_k));
-	m_maincpu->o().set(FUNC(tispeak_state::k28_write_o));
-	m_maincpu->r().set(FUNC(tispeak_state::k28_write_r));
+	m_maincpu->read_k().set(FUNC(tispeak_state::k28_read_k));
+	m_maincpu->write_o().set(FUNC(tispeak_state::k28_write_o));
+	m_maincpu->write_r().set(FUNC(tispeak_state::k28_write_r));
 
 	config.set_default_layout(layout_k28m2);
 
@@ -1519,7 +1537,7 @@ void tispeak_state::k28m2(machine_config &config)
 	tms5110_route(config);
 
 	// cartridge
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "k28m2", "vsm");
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "k28m2", "vsm,bin");
 	m_cart->set_device_load(FUNC(tispeak_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("k28m2");
@@ -1829,6 +1847,20 @@ ROM_START( lantransp )
 	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // cartridge area
 ROM_END
 
+ROM_START( lanteach )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "cd2706", 0x0000, 0x1000, CRC(4eca02d7) SHA1(1b13b7679b868c6c978d3047b01a372abfd7f01a) )
+
+	ROM_REGION( 1246, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_REGION( 2127, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
+	ROM_REGION( 1246, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0270_cd2706_output.pla", 0, 1246, CRC(c290b20f) SHA1(377205266b2b8932d06abd98a6071ea75eec834e) )
+
+	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // cartridge area
+ROM_END
+
 
 ROM_START( tntell )
 	ROM_REGION( 0x0800, "maincpu", 0 )
@@ -1938,6 +1970,8 @@ COMP( 1980, snread,     0,        0, snread,       snread,     tispeak_state, in
 
 COMP( 1979, lantrans,   0,        0, lantrans,     lantrans,   tispeak_state, init_lantrans, "Texas Instruments", "Language Translator", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1979, lantransp,  lantrans, 0, lantrans,     lantrans,   tispeak_state, init_lantrans, "Texas Instruments", "Language Translator (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+
+COMP( 1980, lanteach,   0,        0, lanteach,     lantrans,   tispeak_state, init_lantrans, "Texas Instruments", "Language Teacher", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 COMP( 1981, tntell,     0,        0, tntell,       tntell,     tispeak_state, init_tntell,   "Texas Instruments", "Touch & Tell (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK | MACHINE_REQUIRES_ARTWORK )
 COMP( 1980, tntellp,    tntell,   0, tntell,       tntell,     tispeak_state, init_tntell,   "Texas Instruments", "Touch & Tell (US, patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )

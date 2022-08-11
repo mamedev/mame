@@ -96,13 +96,13 @@ TILE_GET_INFO_MEMBER(tsconf_state::get_tile_info_16c)
 
 void tsconf_state::tsconf_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).bankr(m_banks[0]).w(FUNC(tsconf_state::tsconf_bank_w<0>));
+	map(0x0000, 0x3fff).bankr(m_bank_ram[0]).w(FUNC(tsconf_state::tsconf_bank_w<0>));
 	map(0x0000, 0x3fff).view(m_bank0_rom);
-	m_bank0_rom[0](0x0000, 0x3fff).bankr(m_banks[4]);
+	m_bank0_rom[0](0x0000, 0x3fff).bankr(m_bank_rom[0]);
 
-	map(0x4000, 0x7fff).bankr(m_banks[1]).w(FUNC(tsconf_state::tsconf_bank_w<1>));
-	map(0x8000, 0xbfff).bankr(m_banks[2]).w(FUNC(tsconf_state::tsconf_bank_w<2>));
-	map(0xc000, 0xffff).bankr(m_banks[3]).w(FUNC(tsconf_state::tsconf_bank_w<3>));
+	map(0x4000, 0x7fff).bankr(m_bank_ram[1]).w(FUNC(tsconf_state::tsconf_bank_w<1>));
+	map(0x8000, 0xbfff).bankr(m_bank_ram[2]).w(FUNC(tsconf_state::tsconf_bank_w<2>));
+	map(0xc000, 0xffff).bankr(m_bank_ram[3]).w(FUNC(tsconf_state::tsconf_bank_w<3>));
 }
 
 void tsconf_state::tsconf_io(address_map &map)
@@ -199,20 +199,21 @@ void tsconf_state::video_start()
 
 void tsconf_state::machine_start()
 {
-	for (auto i = 0; i < 4; i++)
-		m_banks[i]->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
-
-	memory_region *rom = memregion("maincpu");
-	m_banks[4]->configure_entries(0, rom->bytes() / 0x4000, rom->base(), 0x4000);
+	spectrum_128_state::machine_start();
+	m_maincpu->space(AS_PROGRAM).specific(m_program);
 
 	save_item(NAME(m_regs));
 	// TODO save'm'all!
+
+	// reconfigure ROMs
+	memory_region *rom = memregion("maincpu");
+	m_bank_rom[0]->configure_entries(0, rom->bytes() / 0x4000, rom->base(), 0x4000);
+	m_bank_ram[0]->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
 }
 
 void tsconf_state::machine_reset()
 {
 	m_bank0_rom.select(0);
-	m_program = &m_maincpu->space(AS_PROGRAM);
 
 	m_port_f7_ext = DISABLED;
 
@@ -298,6 +299,9 @@ void tsconf_state::tsconf(machine_config &config)
 	RAM(config, m_sfile).set_default_size("512").set_default_value(0); // 85*6
 
 	AT_KEYB(config, m_keyboard, pc_keyboard_device::KEYBOARD_TYPE::AT, 3);
+
+	SOFTWARE_LIST(config, "betadisc_list_pent").set_original("spectrum_betadisc_flop");
+	SOFTWARE_LIST(config, "betadisc_list_tsconf").set_original("tsconf_betadisc_flop");
 }
 
 ROM_START(tsconf)
@@ -306,4 +310,4 @@ ROM_START(tsconf)
 ROM_END
 
 //    YEAR  NAME    PARENT      COMPAT  MACHINE     INPUT       CLASS           INIT        COMPANY             FULLNAME                            FLAGS
-COMP( 2011, tsconf, spec128,    0,      tsconf,     spec_plus,  tsconf_state,   empty_init, "NedoPC, TS-Labs",  "ZX Evolution TS-Configuration",    MACHINE_IS_INCOMPLETE)
+COMP( 2011, tsconf, spec128,    0,      tsconf,     spec_plus,  tsconf_state,   empty_init, "NedoPC, TS-Labs",  "ZX Evolution TS-Configuration",    0)

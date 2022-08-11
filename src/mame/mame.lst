@@ -284,6 +284,9 @@ tvpoker                         // (c) 197? A-1 Supply
 a2600                           // Atari 2600
 a2600p                          // Atari 2600 PAL
 a2600_pop                       // Atari 2600 Point of Purchase Display
+stvboy
+tvboy                           //
+tvboyii                         //
 
 @source:robotron/a5105.cpp
 a5105                           //
@@ -9580,10 +9583,6 @@ bml3                            //
 bml3mk2                         //
 bml3mk5                         //
 
-@source:galaxian/bmxstunts.cpp
-bmxstunts
-bmxstuntsa
-
 @source:jaleco/bnstars.cpp
 bnstars1                        // (c) 1997
 
@@ -13886,6 +13885,7 @@ ts28                            // 1983
 
 @source:misc/falgas_m89.cpp
 cbully                          // (c) 1991 Falgas
+rmontecarlo                     // (c) 1991 Falgas
 
 @source:nintendo/famibox.cpp
 famibox                         // 1986
@@ -14644,6 +14644,8 @@ bagmanm2                        // (c) 1984 Valadon Automation / GIB
 bagmanmc                        // bootleg
 batman2                         // bootleg
 blkhole                         // TDS (Tokyo Denshi Sekkei) & MINTS
+bmxstunts                       // (c) 1985 Jetsoft
+bmxstuntsa                      // (c) 1985 Jetsoft
 bomber                          //
 bongo                           // (c) 1983 Jetsoft
 calipso                         // (c) 1982 Tago
@@ -19184,10 +19186,10 @@ j_ewnd                          //
 j_ews                           // Each Way Shuffle (JPM)
 j_ewsa                          //
 j_ewsb                          //
-j_ewsbl                         //
 j_ewsdlx                        // Each Way Shuffle Deluxe (CTL)
 j_goldn2                        // Golden 2's (CTL)
 j_la                            // Lucky Aces
+j_lal                           // Lite a Line (JPM)
 j_lan                           // Lite A Nudge (JPM)
 j_lana                          //
 j_lanb                          //
@@ -19201,6 +19203,8 @@ j_plus2                         // Plus 2 (CTL)
 j_ssh                           // Silver Shuffle (CTL)
 j_sup2p                         // Super 2p Shuffle (MDM)
 j_super2                        // Super 2
+j_supsh                         // Super Shuffle (Louth Coin)
+j_supsha                        //
 j_ts                            // Two Step (JPM)
 
 @source:jpm/jpmsys5.cpp
@@ -24362,6 +24366,14 @@ fruitstb                        // 199? Webak
 fruitstba                       // 1997 Webak
 fruitstbb                       // 1997 Webak
 fruitstbc                       // 1997 Webak
+
+@source:barcrest/mpu1.cpp
+m_bappl2                        // Big Apple (Leisure Games)
+m_bapple                        //
+m_gndgit                        // Golden Nudge It (Barcrest)
+m_lndg                          // Lucky Nudge (Leisure Games)
+m_mtchit                        // Match It (Barcrest)
+m_mtchup                        // Match Up (Barcrest)
 
 @source:barcrest/mpu2.cpp
 m2hilite                        // Hi-Lights (Barcrest) (MPU2)
@@ -41739,6 +41751,7 @@ uk2086                          // 1986 UK2086
 
 @source:handheld/tispeak.cpp
 k28m2                           // Tiger Electronics
+lanteach                        //
 lantrans                        //
 lantransp                       //
 snmath                          //
@@ -42386,10 +42399,6 @@ tv965                           //
 @source:televideo/tv990.cpp
 tv990                           // 1992? TeleVideo
 tv995                           // 1994 TeleVideo
-
-@source:atari/tvboy.cpp
-stvboy
-tvboyii                         //
 
 @source:videoton/tvc.cpp
 tvc64                           //

@@ -1876,7 +1876,7 @@ license:CC0
 	</software>
 
 	<software name="026disk" supported="no">
-		<description>AUTOLOAD DOS &amp; MODEM 3/30/84, NONWORKING DOS - SD?, NORTHSTAR, IN 3/26/84</description>
+		<description>AUTOLOAD DOS &amp; MODEM 3/30/84, NONWORKING DOS - SD?,   NORTHSTAR, IN 3/26/84</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -1900,7 +1900,7 @@ license:CC0
 	</software>
 
 	<software name="028disk" supported="no">
-		<description>AUTOLOAD DOS &amp; BASIC, LOAD MENU   NORTHSTAR, PRIME BACK-UP, 3/24/84</description>
+		<description>AUTOLOAD DOS &amp; BASIC, LOAD MENU NORTHSTAR, PRIME BACK-UP, 3/24/84</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -2020,7 +2020,7 @@ license:CC0
 	</software>
 
 	<software name="038disk" supported="no">
-		<description>DOS &amp; BASIC &amp; CF, MRP DEMO - JOBS   DRIVE #1, IN 8/30/84</description>
+		<description>DOS &amp; BASIC &amp; CF, MRP DEMO - JOBS DRIVE #1,   IN 8/30/84</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -2152,7 +2152,7 @@ license:CC0
 	</software>
 
 	<software name="049disk" supported="no">
-		<description>SYNCBUSTER   COPY 1, IN 4/12/87</description>
+		<description>SYNCBUSTER COPY 1,   IN 4/12/87</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -2164,7 +2164,7 @@ license:CC0
 	</software>
 
 	<software name="050disk" supported="no">
-		<description>NSUG #7, GAME PACK, N*TREK, MEMSET 40959</description>
+		<description>NSUG #7, GAME PACK, N*TREK, MEMSET  40959</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -2224,7 +2224,7 @@ license:CC0
 	</software>
 
 	<software name="055disk" supported="no">
-		<description>NSUG #14, GAME PACK, (MEMSET  40959)</description>
+		<description>NSUG #14, GAME PACK, (MEMSET 40959)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 

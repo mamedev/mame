@@ -34399,7 +34399,7 @@ license:CC0
 	</software>
 
 	<software name="takchala" cloneof="takchal">
-		<description>Tak - The Great Juju Challenge (Euro,  English / French / German / Dutch)</description>
+		<description>Tak - The Great Juju Challenge (Euro, English / French / German / Dutch)</description>
 		<year>2006</year>
 		<publisher>THQ</publisher>
 		<part name="cart" interface="gba_cart">
@@ -35196,7 +35196,7 @@ license:CC0
 	</software>
 
 	<software name="twoods">
-		<description>Tiger Woods PGA Tour Golf (Euro,  English / French / German / Italian / Spanish)</description>
+		<description>Tiger Woods PGA Tour Golf (Euro, English / French / German / Italian / Spanish)</description>
 		<year>2002</year>
 		<publisher>Digital Worldwide</publisher>
 		<part name="cart" interface="gba_cart">
@@ -40137,7 +40137,7 @@ license:CC0
 	</software>
 
 	<software name="2matchb">
-		<description>2 Game Pack! - Matchbox Missions: Emergency Response + Air, Land  &amp; Sea Rescue (Euro)</description>
+		<description>2 Game Pack! - Matchbox Missions: Emergency Response + Air, Land &amp; Sea Rescue (Euro)</description>
 		<year>2006</year>
 		<publisher>Zoo Digital Publishing</publisher>
 		<info name="serial" value="AGB-BB4P"/>
@@ -40280,7 +40280,7 @@ license:CC0
 	</software>
 
 	<software name="2pferpn">
-		<description>Pferd &amp; Pony 2 in 1: Pferd &amp; Pony - Mein Pferdehof  + Pferd &amp; Pony - Lass Uns Reiten 2 (Ger)</description>
+		<description>Pferd &amp; Pony 2 in 1: Pferd &amp; Pony - Mein Pferdehof + Pferd &amp; Pony - Lass Uns Reiten 2 (Ger)</description>
 		<year>2006?</year>
 		<publisher>dtp Entertainment</publisher>
 		<part name="cart" interface="gba_cart">
@@ -41636,7 +41636,7 @@ license:CC0
 	</software>
 
 	<software name="crashad4">
-		<description>Crash Advance IV  (unlicensed) (protection hacked)</description>
+		<description>Crash Advance IV (unlicensed) (protection hacked)</description>
 		<year>200?</year>
 		<publisher>Sintax</publisher>
 		<part name="cart" interface="gba_cart">

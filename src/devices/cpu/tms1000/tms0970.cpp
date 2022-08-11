@@ -4,28 +4,31 @@
 
   TMS1000 family - TMS0950, TMS0970, TMS1990
 
+TMS0950 is a TMS1000 with a TMS0980 style opla, it was quickly succeeded by the TMS0970
+- RAM, ROM, microinstructions is the same as TMS1000
+- 10-term inverted output PLA and segment PLA on the top-left
+
+TMS0970 is a stripped-down version of the TMS0980, itself acting more like a TMS1000
+- RAM and ROM is the same as TMS1000
+- main instructions PLAs at the top half, to the right of the midline
+  * see TMS0980 notes, except that the fixed instruction list differs:
+    RETN, SETR, RBIT, SBIT, LDX, COMX, TDO, ..., redir(----0-00), LDP
+- 32-term microinstructions PLA between the RAM and ROM, supporting 15 microinstructions
+- 16-term inverted output PLA and segment PLA above the RAM (rotate opla 90 degrees)
+
 */
 
 #include "emu.h"
 #include "tms0970.h"
 
-// TMS0950 is a TMS1000 with a TMS0980 style opla, it was quickly succeeded by the TMS0970
-// - RAM, ROM, microinstructions is the same as TMS1000
-// - 10-term inverted output PLA and segment PLA on the top-left
+
+// device definitions
 DEFINE_DEVICE_TYPE(TMS0950, tms0950_cpu_device, "tms0950", "Texas Instruments TMS0950") // 28-pin DIP, 8 O pins, 11? R pins
 
-// TMS0970 is a stripped-down version of the TMS0980, itself acting more like a TMS1000
-// - RAM and ROM is the same as TMS1000
-// - main instructions PLAs at the top half, to the right of the midline
-//   * see TMS0980 notes, except that the fixed instruction list differs:
-//     RETN, SETR, RBIT, SBIT, LDX, COMX, TDO, ..., redir(----0-00), LDP
-// - 32-term microinstructions PLA between the RAM and ROM, supporting 15 microinstructions
-// - 16-term inverted output PLA and segment PLA above the RAM (rotate opla 90 degrees)
 DEFINE_DEVICE_TYPE(TMS0970, tms0970_cpu_device, "tms0970", "Texas Instruments TMS0970") // 28-pin DIP, 11 R pins (note: pinout may slightly differ from chip to chip)
 DEFINE_DEVICE_TYPE(TMS1990, tms1990_cpu_device, "tms1990", "Texas Instruments TMS1990") // 28-pin DIP, ? R pins..
 
 
-// device definitions
 tms0970_cpu_device::tms0970_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	tms0970_cpu_device(mconfig, TMS0970, tag, owner, clock, 8 /* o pins */, 11 /* r pins */, 6 /* pc bits */, 8 /* byte width */, 2 /* x width */, 1 /* stack levels */, 10 /* rom width */, address_map_constructor(FUNC(tms0970_cpu_device::rom_10bit), this), 6 /* ram width */, address_map_constructor(FUNC(tms0970_cpu_device::ram_6bit), this))
 { }
@@ -110,11 +113,11 @@ void tms0970_cpu_device::device_reset()
 
 
 // i/o handling
-void tms0970_cpu_device::write_o_output(u8 index)
+void tms0970_cpu_device::write_o_reg(u8 index)
 {
 	m_o_index = index;
 	m_o = m_spla->read(index);
-	m_write_o(m_o & m_o_mask);
+	write_o_output(m_o);
 }
 
 
@@ -130,6 +133,6 @@ void tms0970_cpu_device::op_setr()
 void tms0970_cpu_device::op_tdo()
 {
 	// TDO: transfer digits to output
-	write_o_output(m_a & 0x7);
-	m_write_r(m_r & m_r_mask);
+	write_o_reg(m_a & 0x7);
+	write_r_output(m_r);
 }

@@ -86,14 +86,17 @@ tms1k_base_device::tms1k_base_device(const machine_config &mconfig, device_type 
 	m_byte_bits(byte_bits),
 	m_x_bits(x_bits),
 	m_stack_levels(stack_levels),
-	m_output_pla_table(nullptr),
+	m_option_dec_div(0),
 	m_read_k(*this),
 	m_write_o(*this),
 	m_write_r(*this),
+	m_read_j(*this),
+	m_read_r(*this),
 	m_power_off(*this),
 	m_read_ctl(*this),
 	m_write_ctl(*this),
 	m_write_pdc(*this),
+	m_output_pla_table(nullptr),
 	m_decode_micro(*this)
 { }
 
@@ -105,6 +108,18 @@ void tms1k_base_device::state_string_export(const device_state_entry &entry, std
 		case STATE_GENPC:
 		case STATE_GENPCBASE:
 			str = string_format("%03X", m_rom_address << ((m_byte_bits > 8) ? 1 : 0));
+			break;
+
+		case STATE_GENFLAGS:
+			// not a single flags register, first 3 are TMS0980-family
+			str = string_format("%c%c%c %c%c%c",
+				m_bl           ? 'B':'b',
+				m_add          ? 'A':'a',
+				m_eac          ? 'E':'e',
+				(m_clatch & 1) ? 'C':'c',
+				m_status       ? 'S':'s',
+				m_status_latch ? 'L':'l'
+			);
 			break;
 	}
 }
@@ -128,6 +143,8 @@ void tms1k_base_device::device_start()
 	m_read_k.resolve_safe(0);
 	m_write_o.resolve_safe();
 	m_write_r.resolve_safe();
+	m_read_j.resolve_safe(0);
+	m_read_r.resolve_safe(0);
 	m_power_off.resolve_safe();
 	m_read_ctl.resolve_safe(0);
 	m_write_ctl.resolve_safe();
@@ -218,7 +235,7 @@ void tms1k_base_device::device_start()
 	// register state for debugger
 	state_add(STATE_GENPC, "GENPC", m_rom_address).formatstr("%03X").noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_rom_address).formatstr("%03X").noshow();
-	state_add(STATE_GENFLAGS, "GENFLAGS", m_sr).formatstr("%8s").noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_status).formatstr("%7s").noshow();
 
 	m_state_count = 0;
 	state_add(++m_state_count, "PC", m_pc).formatstr("%02X"); // 1
@@ -228,7 +245,6 @@ void tms1k_base_device::device_start()
 	state_add(++m_state_count, "A", m_a).formatstr("%01X"); // 5
 	state_add(++m_state_count, "X", m_x).formatstr("%01X"); // 6
 	state_add(++m_state_count, "Y", m_y).formatstr("%01X"); // 7
-	state_add(++m_state_count, "STATUS", m_status).formatstr("%01X"); // 8
 
 	set_icountptr(m_icount);
 }
@@ -270,9 +286,9 @@ void tms1k_base_device::device_reset()
 
 	// clear outputs
 	m_r = 0;
-	m_write_r(m_r & m_r_mask);
-	write_o_output(0);
-	m_write_r(m_r & m_r_mask);
+	write_r_output(0);
+	write_o_reg(0);
+	write_r_output(0);
 	m_power_off(0);
 }
 
@@ -351,18 +367,12 @@ void tms1k_base_device::read_opcode()
 //  i/o handling
 //-------------------------------------------------
 
-void tms1k_base_device::write_o_output(u8 index)
+void tms1k_base_device::write_o_reg(u8 index)
 {
 	// a hardcoded table is supported if the output pla is unknown
 	m_o_index = index;
 	m_o = (m_output_pla_table == nullptr) ? m_opla->read(index) : m_output_pla_table[index];
-	m_write_o(m_o & m_o_mask);
-}
-
-u8 tms1k_base_device::read_k_input()
-{
-	// K1,2,4,8 (KC test pin is not emulated)
-	return m_read_k() & 0xf;
+	write_o_output(m_o);
 }
 
 void tms1k_base_device::set_cki_bus()
@@ -533,26 +543,26 @@ void tms1k_base_device::op_setr()
 {
 	// SETR: set one R-output line
 	m_r = m_r | (1 << m_y);
-	m_write_r(m_r & m_r_mask);
+	write_r_output(m_r);
 }
 
 void tms1k_base_device::op_rstr()
 {
 	// RSTR: reset one R-output line
 	m_r = m_r & ~(1 << m_y);
-	m_write_r(m_r & m_r_mask);
+	write_r_output(m_r);
 }
 
 void tms1k_base_device::op_tdo()
 {
-	// TDO: transfer accumulator and status latch to O-output
-	write_o_output(m_status_latch << 4 | m_a);
+	// TDO: transfer accumulator and status latch to O-register
+	write_o_reg(m_status_latch << 4 | m_a);
 }
 
 void tms1k_base_device::op_clo()
 {
-	// CLO: clear O-output
-	write_o_output(0);
+	// CLO: clear O-register
+	write_o_reg(0);
 }
 
 void tms1k_base_device::op_ldx()
@@ -580,62 +590,16 @@ void tms1k_base_device::op_ldp()
 	m_pb = m_c4;
 }
 
-
-// TMS1100-specific
-
 void tms1k_base_device::op_comc()
 {
 	// COMC: complement chapter buffer
 	m_cb ^= 1;
 }
 
-
-// TMS1400-specific
-
 void tms1k_base_device::op_tpc()
 {
 	// TPC: transfer page buffer to chapter buffer
 	m_cb = m_pb & 3;
-}
-
-
-// TMS0980-specific (and possibly child classes)
-
-void tms1k_base_device::op_xda()
-{
-	// XDA: exchange DAM and A
-	// note: setting A to DAM is done with DMTP and AUTA during this instruction
-	m_ram_address |= (0x10 << (m_x_bits - 1));
-}
-
-void tms1k_base_device::op_off()
-{
-	// OFF: request auto power-off
-	m_power_off(1);
-}
-
-void tms1k_base_device::op_seac()
-{
-	// SEAC: set end around carry
-	m_eac = 1;
-}
-
-void tms1k_base_device::op_reac()
-{
-	// REAC: reset end around carry
-	m_eac = 0;
-}
-
-void tms1k_base_device::op_sal()
-{
-	// SAL: set add latch (reset is done with RETN)
-	m_add = 1;
-}
-
-void tms1k_base_device::op_sbl()
-{
-	// SBL: set branch latch (reset is done with RETN)
-	m_bl = 1;
 }
 
 
@@ -732,6 +696,10 @@ void tms1k_base_device::execute_one()
 		if (m_fixed & F_LDP)   op_ldp();
 		if (m_fixed & F_COMC)  op_comc();
 		if (m_fixed & F_TPC)   op_tpc();
+		if (m_fixed & F_TAX)   op_tax();
+		if (m_fixed & F_TAC)   op_tac();
+		if (m_fixed & F_TADM)  op_tadm();
+		if (m_fixed & F_TMA)   op_tma();
 		if (m_fixed & F_OFF)   op_off();
 		if (m_fixed & F_SEAC)  op_seac();
 		if (m_fixed & F_REAC)  op_reac();
@@ -757,6 +725,11 @@ void tms1k_base_device::execute_one()
 		if (m_micro & M_AUTA)  m_a = m_adder_out & 0xf;
 		if (m_micro & M_AUTY)  m_y = m_adder_out & 0xf;
 		if (m_micro & M_STSL)  m_status_latch = m_status;
+
+		// fixed opcodes with accumulator as destination
+		if (m_fixed & F_TXA)   op_txa();
+		if (m_fixed & F_TRA)   op_tra();
+		if (m_fixed & F_TCA)   op_tca();
 
 		// fetch: update pc, ram address 2/2
 		read_opcode();

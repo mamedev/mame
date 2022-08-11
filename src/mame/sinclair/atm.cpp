@@ -11,7 +11,7 @@ NOTES:
 TODO:
 	* ports read
 	* ATM2+ (compare to ATM2) has only 1M RAM vs 512K
-	* Mem masks are hardcoded to 1M RAM, 64K ROM
+	* Mem masks are hardcoded to 1M RAM
 	* CMOS
 	* better handling of SHADOW ports
 	* validate screen timings
@@ -39,8 +39,9 @@ namespace {
 #define LOGVIDEO(...) LOGMASKED(LOG_VIDEO, __VA_ARGS__)
 #define LOGWARN(...)  LOGMASKED(LOG_WARN,  __VA_ARGS__)
 
-static constexpr u8 RAM_MASK = 0x40;
-static constexpr u8 DOS7FFD_MASK = 0x80;
+static constexpr u8 ROM_MASK = 0x7;
+static constexpr u8 PEN_RAM_MASK = 0x40;
+static constexpr u8 PEN_DOS7FFD_MASK = 0x80;
 
 class atm_state : public spectrum_128_state
 {
@@ -124,11 +125,11 @@ void atm_state::atm_update_memory()
 	{
 		u8 page = pen_page(bank);
 		if (!m_pen)
-			page = 3;
+			page = ROM_MASK;
 
-		if (page & RAM_MASK)
+		if (page & PEN_RAM_MASK)
 		{
-			if (page & DOS7FFD_MASK)
+			if (page & PEN_DOS7FFD_MASK)
 				page = (page & 0xf8) | (m_port_7ffd_data & 0x07);
 			page = page & 0x3f; // TODO size dependent
 			m_bank_ram[bank]->set_entry(page);
@@ -137,9 +138,9 @@ void atm_state::atm_update_memory()
 		}
 		else
 		{
-			if ((page & DOS7FFD_MASK) && !BIT(page, 1))
+			if ((page & PEN_DOS7FFD_MASK) && !BIT(page, 1))
 				page = (page & ~1) | is_shadow_active();
-			page = page & 0x03; // TODO size dependent
+			page = page & ROM_MASK;
 			m_bank_rom[bank]->set_entry(page);
 			views[bank].get().select(0);
 			LOGMEM(" RO(%X>%X)", m_bank_rom[bank]->entry(), page);
@@ -217,7 +218,7 @@ void atm_state::atm_port_fff7_w(offs_t offset, u8 data)
 	u8 bank = offset >> 14;
 	u8 page = (data & 0xc0) | (~data & 0x3f);
 
-	LOGMEM("PEN%s.%s = %X %s%d: %02X\n", (page | DOS7FFD_MASK) ? "+" : "!", BIT(m_port_7ffd_data, 4), data, (page & RAM_MASK) ? "RAM" : "ROM", bank, page & 0x3f);
+	LOGMEM("PEN%s.%s = %X %s%d: %02X\n", (page | PEN_DOS7FFD_MASK) ? "+" : "!", BIT(m_port_7ffd_data, 4), data, (page & PEN_RAM_MASK) ? "RAM" : "ROM", bank, page & 0x3f);
 	pen_page(bank) = page;
 	atm_update_memory();
 }
@@ -360,7 +361,7 @@ u8 atm_state::beta_enable_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled()) {
 		u8 page = pen_page(0);
-		if (!(page & RAM_MASK) && !is_shadow_active()) {
+		if (!(page & PEN_RAM_MASK) && !is_shadow_active()) {
 			m_beta->enable();
 			atm_update_memory();
 		}
@@ -438,7 +439,7 @@ void atm_state::machine_start()
 	// reconfigure ROMs
 	memory_region *rom = memregion("maincpu");
 	for (auto i = 0; i < 4; i++)
-		m_bank_rom[i]->configure_entries(0, 4*8, rom->base() + 0x10000, 0x4000);
+		m_bank_rom[i]->configure_entries(0, 8, rom->base() + 0x10000, 0x4000);
 	m_bank_ram[0]->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
 
 	m_maincpu->space(AS_PROGRAM).specific(m_program);
@@ -532,37 +533,40 @@ void atm_state::atmtb2(machine_config &config)
 ***************************************************************************/
 
 ROM_START( atm )
-	ROM_REGION(0x020000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x030000, "maincpu", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS(0, "v1", "v.1.03")
-	ROMX_LOAD( "atm103.rom", 0x010000, 0x10000, CRC(4912e249) SHA1(a4adff05bb215dd126c47201b36956115b8fed76), ROM_BIOS(0))
+	ROMX_LOAD( "atm103.rom", 0x020000, 0x10000, CRC(4912e249) SHA1(a4adff05bb215dd126c47201b36956115b8fed76), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v2", "v.1.06 joined")
-	ROMX_LOAD( "atm106.rom", 0x010000, 0x10000, CRC(75350b37) SHA1(2afc9994f026645c74b6c4b35bcee2e0bc0d6edc), ROM_BIOS(1))
+	ROMX_LOAD( "atm106.rom", 0x020000, 0x10000, CRC(75350b37) SHA1(2afc9994f026645c74b6c4b35bcee2e0bc0d6edc), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "v3", "v.1.06")
-	ROMX_LOAD( "atm106-1.rom", 0x010000, 0x4000, CRC(658c98f1) SHA1(1ec694795aa6cac10147e58f38a9db0bdf7ed89b), ROM_BIOS(2))
-	ROMX_LOAD( "atm106-2.rom", 0x014000, 0x4000, CRC(8fe367f9) SHA1(56de8fd39061663b9c315b74fd3c31acddae279c), ROM_BIOS(2))
-	ROMX_LOAD( "atm106-3.rom", 0x018000, 0x4000, CRC(124ad9e0) SHA1(d07fcdeca892ee80494d286ea9ea5bf3928a1aca), ROM_BIOS(2))
-	ROMX_LOAD( "atm106-4.rom", 0x01c000, 0x4000, CRC(f352f2ab) SHA1(6045500ab01be708cef62327e9821b4a358a4673), ROM_BIOS(2))
+	ROMX_LOAD( "atm106-1.rom", 0x020000, 0x4000, CRC(658c98f1) SHA1(1ec694795aa6cac10147e58f38a9db0bdf7ed89b), ROM_BIOS(2))
+	ROMX_LOAD( "atm106-2.rom", 0x024000, 0x4000, CRC(8fe367f9) SHA1(56de8fd39061663b9c315b74fd3c31acddae279c), ROM_BIOS(2))
+	ROMX_LOAD( "atm106-3.rom", 0x028000, 0x4000, CRC(124ad9e0) SHA1(d07fcdeca892ee80494d286ea9ea5bf3928a1aca), ROM_BIOS(2))
+	ROMX_LOAD( "atm106-4.rom", 0x02c000, 0x4000, CRC(f352f2ab) SHA1(6045500ab01be708cef62327e9821b4a358a4673), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "v4", "v.1.03rs")
-	ROMX_LOAD( "atm103rs.rom", 0x010000, 0x10000, CRC(cdec1dfb) SHA1(08190807c6b110cb2e657d8e7d0ad18668915375), ROM_BIOS(3))
+	ROMX_LOAD( "atm103rs.rom", 0x020000, 0x10000, CRC(cdec1dfb) SHA1(08190807c6b110cb2e657d8e7d0ad18668915375), ROM_BIOS(3))
 ROM_END
 
 ROM_START( atmtb2 )
-	ROM_REGION(0x020000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x030000, "maincpu", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS(0, "v1", "v.1.07.12 joined")
-	ROMX_LOAD( "atmtb2.rom",   0x010000, 0x10000,CRC(05218c26) SHA1(71ed9864e7aa85131de97cf1e53dc152e7c79488), ROM_BIOS(0))
+	ROMX_LOAD( "atmtb2.rom",   0x020000, 0x10000,CRC(05218c26) SHA1(71ed9864e7aa85131de97cf1e53dc152e7c79488), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v2", "v.1.07.12")
-	ROMX_LOAD( "atmtb2-1.rom", 0x010000, 0x4000, CRC(658c98f1) SHA1(1ec694795aa6cac10147e58f38a9db0bdf7ed89b), ROM_BIOS(1))
-	ROMX_LOAD( "atmtb2-2.rom", 0x014000, 0x4000, CRC(bc3f6b2b) SHA1(afa9df63857141fef270e2c97e12d2edc60cf919), ROM_BIOS(1))
-	ROMX_LOAD( "atmtb2-3.rom", 0x018000, 0x4000, CRC(124ad9e0) SHA1(d07fcdeca892ee80494d286ea9ea5bf3928a1aca), ROM_BIOS(1))
-	ROMX_LOAD( "atmtb2-4.rom", 0x01c000, 0x4000, CRC(5869d8c4) SHA1(c3e198138f528ac4a8dff3c76cd289fd4713abff), ROM_BIOS(1))
+	ROMX_LOAD( "atmtb2-1.rom", 0x020000, 0x4000, CRC(658c98f1) SHA1(1ec694795aa6cac10147e58f38a9db0bdf7ed89b), ROM_BIOS(1))
+	ROMX_LOAD( "atmtb2-2.rom", 0x024000, 0x4000, CRC(bc3f6b2b) SHA1(afa9df63857141fef270e2c97e12d2edc60cf919), ROM_BIOS(1))
+	ROMX_LOAD( "atmtb2-3.rom", 0x028000, 0x4000, CRC(124ad9e0) SHA1(d07fcdeca892ee80494d286ea9ea5bf3928a1aca), ROM_BIOS(1))
+	ROMX_LOAD( "atmtb2-4.rom", 0x02c000, 0x4000, CRC(5869d8c4) SHA1(c3e198138f528ac4a8dff3c76cd289fd4713abff), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "v3", "v.1.07.13")
-	ROMX_LOAD( "atmtb213.rom", 0x010000, 0x10000, CRC(34a91d53) SHA1(8f0af0f3c0ff1644535f20545c73d01576d6e52f), ROM_BIOS(2))
+	ROMX_LOAD( "atmtb213.rom", 0x020000, 0x10000, CRC(34a91d53) SHA1(8f0af0f3c0ff1644535f20545c73d01576d6e52f), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(3, "v4", "eXtra v1.37 XT")
+	ROMX_LOAD( "atmtb2x37xt.rom", 0x010000, 0x20000, CRC(e5ef44d9) SHA1(3fbb9ace7cb031e7365c19e4f8b67ed366e24064), ROM_BIOS(3))
 
 	ROM_REGION(0x01000, "keyboard", ROMREGION_ERASEFF)
 	// XT Keyboard
 	ROM_LOAD( "rf2ve3.rom",  0x0000, 0x0580, CRC(35e0f9ec) SHA1(adcf14758fab8472cfa0167af7e8326c66416416))
 	// AT Keyboard
 	ROM_LOAD( "rfat710.rom", 0x0600, 0x0680, CRC(03734365) SHA1(6cb6311727fad9bc4ccb18919c3c39b37529b8e6))
+
 	ROM_REGION(0x08000, "charrom", ROMREGION_ERASEFF)
 	// Char gen rom
 	ROM_LOAD( "sgen.rom", 0x0000, 0x0800, CRC(1f4387d6) SHA1(93b3774dc8a486643a1bdd48c606b0c84fa0e22b))

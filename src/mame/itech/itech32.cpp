@@ -4851,7 +4851,7 @@ void itech32_state::init_bloodstm()
 }
 
 
-void drivedge_state::driver_init()
+void drivedge_state::driver_start()
 {
 	init_program_rom();
 	m_vram_height = 1024;
@@ -4997,7 +4997,7 @@ void itech32_state::init_gt3d()
 }
 
 
-void shoottv_state::driver_init()
+void shoottv_state::driver_start()
 {
 	init_program_rom();
 	m_vram_height = 1024;

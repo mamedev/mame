@@ -20,14 +20,15 @@
 class tms1k_base_device : public cpu_device
 {
 public:
-	// K input pins
-	auto k() { return m_read_k.bind(); }
+	// common handlers
+	auto read_k() { return m_read_k.bind(); } // K input pins
+	auto write_o() { return m_write_o.bind(); } // O/Segment output pins
+	auto write_r() { return m_write_r.bind(); } // R output pins (also called D on some chips)
 
-	// O/Segment output pins
-	auto o() { return m_write_o.bind(); }
-
-	// R output pins (also called D on some chips)
-	auto r() { return m_write_r.bind(); }
+	// TMS2100 handlers
+	auto read_j() { return m_read_j.bind(); } // J input pins
+	auto read_r() { return m_read_r.bind(); } // R0-R3 input pins
+	auto &set_option_dec_div(u8 div) { m_option_dec_div = div; return *this; }
 
 	// OFF request on TMS0980 and up
 	auto power_off() { return m_power_off.bind(); }
@@ -119,12 +120,20 @@ protected:
 		F_TDO   = (1<<13),
 		F_TPC   = (1<<14),
 
-		F_OFF   = (1<<15),
-		F_REAC  = (1<<16),
-		F_SAL   = (1<<17),
-		F_SBL   = (1<<18),
-		F_SEAC  = (1<<19),
-		F_XDA   = (1<<20)
+		F_TAX   = (1<<15),
+		F_TXA   = (1<<16),
+		F_TRA   = (1<<17),
+		F_TAC   = (1<<18),
+		F_TCA   = (1<<19),
+		F_TADM  = (1<<20),
+		F_TMA   = (1<<21),
+
+		F_OFF   = (1<<22),
+		F_REAC  = (1<<23),
+		F_SAL   = (1<<24),
+		F_SBL   = (1<<25),
+		F_SEAC  = (1<<26),
+		F_XDA   = (1<<27)
 	};
 
 	void rom_10bit(address_map &map);
@@ -136,8 +145,10 @@ protected:
 
 	void next_pc();
 
-	virtual void write_o_output(u8 index);
-	virtual u8 read_k_input();
+	virtual void write_o_reg(u8 index);
+	virtual void write_o_output(u16 data) { m_write_o(data & m_o_mask); }
+	virtual void write_r_output(u32 data) { m_write_r(data & m_r_mask); }
+	virtual u8 read_k_input() { return m_read_k() & 0xf; }
 	virtual void set_cki_bus();
 	virtual void dynamic_output() { ; } // not used by default
 	virtual void read_opcode();
@@ -159,15 +170,26 @@ protected:
 
 	virtual void op_comc();
 	virtual void op_tpc();
-	virtual void op_xda();
-	virtual void op_off();
-	virtual void op_seac();
-	virtual void op_reac();
-	virtual void op_sal();
-	virtual void op_sbl();
+
+	virtual void op_tax() { ; }
+	virtual void op_txa() { ; }
+	virtual void op_tra() { ; }
+	virtual void op_tac() { ; }
+	virtual void op_tca() { ; }
+	virtual void op_tadm() { ; }
+	virtual void op_tma() { ; }
+
+	virtual void op_xda() { ; }
+	virtual void op_off() { ; }
+	virtual void op_seac() { ; }
+	virtual void op_reac() { ; }
+	virtual void op_sal() { ; }
+	virtual void op_sbl() { ; }
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
+	address_space *m_program;
+	address_space *m_data;
 
 	optional_device<pla_device> m_mpla;
 	optional_device<pla_device> m_ipla;
@@ -175,6 +197,7 @@ protected:
 	optional_memory_region m_opla_b; // binary dump of output PLA, in place of PLA file
 	optional_device<pla_device> m_spla;
 
+	// internal state
 	u8 m_pc;            // 6 or 7-bit program counter
 	u32 m_sr;           // 6 or 7-bit subroutine return register(s)
 	u8 m_pa;            // 4-bit page address register
@@ -213,6 +236,7 @@ protected:
 	int m_subcycle;
 	u8 m_o_index;
 
+	// fixed settings or mask options
 	u8 m_o_pins;        // how many O pins
 	u8 m_r_pins;        // how many R pins
 	u8 m_pc_bits;       // how many program counter bits
@@ -220,23 +244,29 @@ protected:
 	u8 m_x_bits;        // how many X register bits
 	u8 m_stack_levels;  // number of stack levels (max 4)
 
-	address_space *m_program;
-	address_space *m_data;
-
-	const u16 *m_output_pla_table;
-	devcb_read8 m_read_k;
-	devcb_write16 m_write_o;
-	devcb_write32 m_write_r;
-	devcb_write_line m_power_off;
-	devcb_read8 m_read_ctl;
-	devcb_write8 m_write_ctl;
-	devcb_write_line m_write_pdc;
-	devcb_read32 m_decode_micro;
-
 	u32 m_o_mask;
 	u32 m_r_mask;
 	u32 m_pc_mask;
 	u32 m_x_mask;
+
+	u8 m_option_dec_div;
+
+	// i/o handlers
+	devcb_read8 m_read_k;
+	devcb_write16 m_write_o;
+	devcb_write32 m_write_r;
+
+	devcb_read8 m_read_j;
+	devcb_read8 m_read_r;
+
+	devcb_write_line m_power_off;
+
+	devcb_read8 m_read_ctl;
+	devcb_write8 m_write_ctl;
+	devcb_write_line m_write_pdc;
+
+	const u16 *m_output_pla_table;
+	devcb_read32 m_decode_micro;
 
 	int m_icount;
 	int m_state_count;
