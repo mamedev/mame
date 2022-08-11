@@ -836,8 +836,6 @@ void monon_color_state::write_to_video_device(uint8_t data)
 
 	if ((m_out0data == 0x0c))
 	{
-		printf("m_out0data with data %02x\n", data);
-
 		if (m_storeregs[0x02] == 0x20)
 		{
 			if (((m_storeregs[0x1c] == 0x01) || (m_storeregs[0x1c] == 0x11)))
