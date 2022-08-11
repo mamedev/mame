@@ -91,8 +91,6 @@ private:
 	uint8_t m_out1data;
 	uint8_t m_out0data;
 
-	uint8_t m_cdata;
-
 	uint8_t m_curpal[0x100 * 3][0x100];
 
 	int m_spireadssincelast = 0;
@@ -835,7 +833,7 @@ void monon_color_state::write_to_video_device(uint8_t data)
 
 	// the broken repeating backgrounds are always drawn with m_storeregs[0x1c] == 0x11)
 
-	if ((m_out0data == 0x0c))
+	if (m_out0data == 0x0c)
 	{
 		if (m_storeregs[0x02] == 0x20)
 		{
