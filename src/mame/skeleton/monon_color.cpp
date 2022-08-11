@@ -98,6 +98,7 @@ private:
 	void do_draw(int amount, int pal_to_use);
 	void do_palette(int amount, int pal_to_use);
 
+	rgb_t m_linebuf[240];
 	rgb_t m_vidbuffer[320 * 240];
 	int16_t m_bufpos_y;
 	uint32_t m_bufpos_x;
@@ -131,6 +132,7 @@ void monon_color_state::machine_start()
 	save_item(NAME(m_out3data));
 	save_item(NAME(m_out1data));
 	save_item(NAME(m_out0data));
+	save_item(NAME(m_linebuf));
 	save_item(NAME(m_vidbuffer));
 	save_item(NAME(m_bufpos_x));
 	save_item(NAME(m_bufpos_y));
@@ -258,6 +260,7 @@ void monon_color_state::machine_reset()
 	m_bufpos_y = 239;
 
 	std::fill(std::begin(m_storeregs), std::end(m_storeregs), 0);
+	std::fill(std::begin(m_linebuf), std::end(m_linebuf), 0);	
 	std::fill(std::begin(m_vidbuffer), std::end(m_vidbuffer), 0);
 }
 
@@ -456,6 +459,7 @@ void monon_color_state::out2_w(uint8_t data)
 	{
 		if (data & 0x01)
 		{
+
 			// nothing?
 		}
 		else
@@ -501,7 +505,7 @@ void monon_color_state::do_draw_inner(int pal_to_use, int start, int step, int p
 				rgb_t rgb = rgb_t(m_curpal[(pixx * 3) + 2][pal_to_use], m_curpal[(pixx * 3) + 1][pal_to_use], m_curpal[(pixx * 3) + 0][pal_to_use]);
 				if (rgb != rgb_t(0xdc, 0x32, 0xdc)) // magic transparency colour?!
 				{
-					m_vidbuffer[(real_ypos * 320) + m_bufpos_x] = rgb;
+					m_linebuf[real_ypos] = rgb;
 				}
 				m_bufpos_y--;
 			}
@@ -572,6 +576,10 @@ void monon_color_state::write_to_video_device(uint8_t data)
 	{
 		if (data == 0x81)
 		{
+			// assume there's some kind of line column buffer, the exact swap trigger is unknown
+			for (int i = 0; i < 240; i++)
+				m_vidbuffer[(i * 320) + m_bufpos_x] = m_linebuf[i];
+
 			m_bufpos_x++;
 
 			if (m_bufpos_x == 320)
@@ -599,12 +607,12 @@ void monon_color_state::write_to_video_device(uint8_t data)
 			{
 				uint16_t amount = m_storeregs[0x0e] | (m_storeregs[0x01] << 8);
 
-				if (amount != 0x00)
+				//if (amount != 0x00)
 				{
 					int pal_to_use = m_storeregs[0x11];
 
 					// d4/d6 are odd-even columns
-					// d0/d2 are odd-even columns, after frame data?
+					// d0/d2 are odd-even columns, after frame data? (writing them seems conditional on something else?)
 					// da/de are palettes? (maybe bit 0x04 is just ignored here, these aren't column specific)
 
 					if ((data == 0xde) || (data == 0xda))
@@ -615,10 +623,10 @@ void monon_color_state::write_to_video_device(uint8_t data)
 					{
 						do_draw(amount, pal_to_use);	
 					}
-					else if ((data == 0xd0) || (data == 0xd4))
-					{
+					//else if ((data == 0xd0) || (data == 0xd4))
+					//{
 					//	do_draw(amount, pal_to_use);	
-					}
+					//}
 				}
 			}
 		}
