@@ -689,9 +689,10 @@ void monon_color_state::do_draw(int amount, int pal_to_use)
 
 void monon_color_state::do_palette(int amount, int pal_to_use)
 {
-//#ifdef VIDEO_PRINTS
+#ifdef VIDEO_PRINTS
 	printf("<>.>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>A palette transfer (%02x bytes?) was requested direct to VDP ====================================================================================\n", amount);
-//#endif
+#endif
+
 	for (int i = 0; i < amount; i++)
 	{
 		spibuf_w(0x00); // clock
