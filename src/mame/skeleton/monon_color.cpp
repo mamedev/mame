@@ -123,10 +123,12 @@ private:
 	uint32_t m_bufpos_x;
 
 	uint8_t m_storeregs[0x20];
+	void do_draw_inner(int pal_to_use, int start, int step, int pixmask, int amount);
 	void do_draw(int amount, int pal_to_use);
 	void do_palette(int amount, int pal_to_use);
-
+#ifdef HEAT_MAP_DEBUG
 	uint8_t m_flashheat[0x1000000];
+#endif
 };
 
 void monon_color_state::machine_start()
@@ -146,9 +148,9 @@ void monon_color_state::machine_start()
 	save_item(NAME(m_bufpos_y));
 
 	save_item(NAME(m_storeregs));
-
+#ifdef HEAT_MAP_DEBUG
 	std::fill(std::begin(m_flashheat), std::end(m_flashheat), 0);
-
+#endif
 }
 
 uint8_t monon_color_state::spibuf_r()
@@ -234,8 +236,9 @@ void monon_color_state::spibuf_w(uint8_t data)
 			else
 				logerror("<>.>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\nSPI Address set to %08x\n", m_spiaddr);
 			*/
+#ifdef HEAT_MAP_DEBUG
 			m_flashheat[m_spiaddr & 0xffffff] = 0xcc;
-
+#endif
 			m_spireadssincelast = 0;
 			break;
 
@@ -269,8 +272,9 @@ void monon_color_state::spibuf_w(uint8_t data)
 			else
 				logerror("<>.>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\nSPI High Speed Address set to %08x\n", m_spiaddr);
 			*/
+#ifdef HEAT_MAP_DEBUG
 			m_flashheat[m_spiaddr& 0xffffff] = 0x33;
-
+#endif
 			m_spireadssincelast = 0;
 			break;
 
@@ -288,16 +292,15 @@ void monon_color_state::spibuf_w(uint8_t data)
 
 		if (m_spi_state == READY_FOR_READ)
 		{
-			//uint8_t heat = m_flashheat[m_spiaddr];
-			//if (heat < 0xff)
-			//	m_flashheat[m_spiaddr]++;
 
 		//	if (m_spiaddr>=0xa000)
 		//		logerror("read from SPI ADDRESS %08x data %02x\n", m_spiaddr, m_spiptr[m_spiaddr]);
 
 			m_spireadssincelast++;
 
+#ifdef HEAT_MAP_DEBUG
 			m_flashheat[m_spiaddr] = 0xff;// m_spiptr[m_spiaddr];
+#endif
 
 			m_spilatch = m_spiptr[(m_spiaddr++)& 0xffffff];
 			m_spibufhasbeenread = false;
@@ -373,6 +376,7 @@ uint32_t monon_color_state::screen_update(screen_device &screen, bitmap_rgb32 &b
 		}
 	}
 
+#ifdef HEAT_MAP_DEBUG
 	{
 		FILE *fp;
 		fp=fopen("heatmapx", "w+b");
@@ -382,6 +386,7 @@ uint32_t monon_color_state::screen_update(screen_device &screen, bitmap_rgb32 &b
 			fclose(fp);
 		}
 	}
+#endif
 
 	return 0;
 }
@@ -608,188 +613,99 @@ uint8_t monon_color_state::read_from_video_device()
 	return 0x00;// machine().rand();
 }
 
-void monon_color_state::do_draw(int amount, int pal_to_use)
+void monon_color_state::do_draw_inner(int pal_to_use, int start, int step, int pixmask, int amount)
 {
-	int yadjust = (m_storeregs[0x16] * 2);
+	int yadjust = (m_storeregs[0x16] << 8) | m_storeregs[0x1a];
+	yadjust >>= 7;
 
-	//m_storeregs[0x12] == 0x10 // 1bpp?
-	//m_storeregs[0x12] == 0x11 // 2bpp?
-
-	if (m_storeregs[0x12] == 0x13)  // 8bpp mode?
+	for (int i = 0; i < amount; i++)
 	{
+		spibuf_w(0x00); // clock
+		uint8_t pix = spibuf_r();
 
-#ifdef VIDEO_PRINTS
-		printf("<>.>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 8bpp transfer direct to VDP? %02x bytes? @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n", amount);
-#endif
-		for (int i = 0; i < amount; i++)
+		for (int i = start; i >= 0; i -= step)
 		{
-			//	if (i < 240)
+			int real_ypos = m_bufpos_y; real_ypos -= yadjust;
+			if ((real_ypos >= 0) && (real_ypos < 240))
 			{
-
-				uint8_t pix = m_spiptr[(m_spiaddr + i) & 0xffffff];
-
-				uint8_t pixx;
-
-				int real_ypos;
-				int pixmask = 0xff;
-
-				for (int i = 0; i >= 0; i--)
+				uint8_t pixx = (pix >> i) & pixmask;
+				rgb_t rgb = rgb_t(m_curpal[(pixx * 3) + 2][pal_to_use], m_curpal[(pixx * 3) + 1][pal_to_use], m_curpal[(pixx * 3) + 0][pal_to_use]);
+				if (rgb != rgb_t(0xdc, 0x32, 0xdc)) // magic transparency colour?!
 				{
-					real_ypos = m_bufpos_y; real_ypos -= yadjust;
-					if ((real_ypos >= 0) && (real_ypos < 240))
-					{
-						pixx = (pix >> i) & pixmask;
-						rgb_t rgb = rgb_t(m_curpal[(pixx * 3) + 2][pal_to_use], m_curpal[(pixx * 3) + 1][pal_to_use], m_curpal[(pixx * 3) + 0][pal_to_use]);
-						if (rgb != rgb_t(0xdc, 0x32, 0xdc)) // magic transparency colour?!
-						{
-							m_vidbuffer[(real_ypos * 320) + m_bufpos_x] = rgb;
-						}
-						m_bufpos_y--;
-					}
+					m_vidbuffer[(real_ypos * 320) + m_bufpos_x] = rgb;
 				}
-
+				m_bufpos_y--;
 			}
 		}
 	}
-	else if (m_storeregs[0x12] == 0x12)
+}
+void monon_color_state::do_draw(int amount, int pal_to_use)
+{
+	if (m_storeregs[0x12] == 0x13)  // 8bpp mode
+	{
+#ifdef VIDEO_PRINTS
+		printf("<>.>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 8bpp transfer direct to VDP? %02x bytes? @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n", amount);
+#endif
+		do_draw_inner(pal_to_use, 0, 1, 0xff, amount);
+	}
+	else if (m_storeregs[0x12] == 0x12) // 4bpp mode
 	{
 
 #ifdef VIDEO_PRINTS
 		printf("<>.>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>4bpp transfer direct to VDP? %02x bytes? @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n", amount);
 #endif
-		for (int i = 0; i < amount; i++)
-		{
-			//	if (i < 240 / 2)
-			{
-
-				uint8_t pix = m_spiptr[(m_spiaddr + i) & 0xffffff];
-
-				uint8_t pixx;
-
-				int real_ypos;
-				int pixmask = 0xf;
-
-				for (int i = 4; i >= 0; i -= 4)
-				{
-					real_ypos = m_bufpos_y; real_ypos -= yadjust;
-					if ((real_ypos >= 0) && (real_ypos < 240))
-					{
-						pixx = (pix >> i) & pixmask;
-						rgb_t rgb = rgb_t(m_curpal[(pixx * 3) + 2][pal_to_use], m_curpal[(pixx * 3) + 1][pal_to_use], m_curpal[(pixx * 3) + 0][pal_to_use]);
-						if (rgb != rgb_t(0xdc, 0x32, 0xdc)) // magic transparency colour?!
-						{
-							m_vidbuffer[(real_ypos * 320) + m_bufpos_x] = rgb;
-						}
-						m_bufpos_y--;
-					}
-				}
-			}
-		}
+		do_draw_inner(pal_to_use, 4, 4, 0xf, amount);	
 	}
-	else if (m_storeregs[0x12] == 0x11)
+	else if (m_storeregs[0x12] == 0x11) // 2bpp mode
 	{
 
 #ifdef VIDEO_PRINTS
 		printf("<>.>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>2bpp transfer direct to VDP? %02x bytes? @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n", amount);
 #endif
-		for (int i = 0; i < amount; i++)
-		{
-			if (1)
-			{
-
-				uint8_t pix = m_spiptr[(m_spiaddr + i) & 0xffffff];
-
-				uint8_t pixx;
-
-				int real_ypos;
-				int pixmask = 0x3;
-
-				for (int i = 6; i >= 0; i -= 2)
-				{
-					real_ypos = m_bufpos_y; real_ypos -= yadjust;
-					if ((real_ypos >= 0) && (real_ypos < 240))
-					{
-						pixx = (pix >> i) & pixmask;
-						rgb_t rgb = rgb_t(m_curpal[(pixx * 3) + 2][pal_to_use], m_curpal[(pixx * 3) + 1][pal_to_use], m_curpal[(pixx * 3) + 0][pal_to_use]);
-						if (rgb != rgb_t(0xdc, 0x32, 0xdc)) // magic transparency colour?!
-						{
-							m_vidbuffer[(real_ypos * 320) + m_bufpos_x] = rgb;
-						}
-						m_bufpos_y--;
-					}
-				}
-			}
-		}
+		do_draw_inner(pal_to_use, 6, 2, 0x3, amount);	
 	}
-	else if (m_storeregs[0x12] == 0x10)
+	else if (m_storeregs[0x12] == 0x10)  // 1bpp mode
 	{
-
 #ifdef VIDEO_PRINTS
 		printf("<>.>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>1bpp transfer direct to VDP? %02x bytes? @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n", amount);
 #endif
-
-		for (int i = 0; i < amount; i++)
-		{
-			//	if (i < 240 / 2)
-			{
-
-				uint8_t pix = m_spiptr[(m_spiaddr + i) & 0xffffff];
-
-				uint8_t pixx;
-
-				int real_ypos;
-				int pixmask = 1;
-
-				for (int i = 7; i >= 0; i--)
-				{
-					real_ypos = m_bufpos_y; real_ypos -= yadjust;
-					if ((real_ypos >= 0) && (real_ypos < 240))
-					{
-						pixx = (pix >> i) & pixmask;
-						rgb_t rgb = rgb_t(m_curpal[(pixx * 3) + 2][pal_to_use], m_curpal[(pixx * 3) + 1][pal_to_use], m_curpal[(pixx * 3) + 0][pal_to_use]);
-						if (rgb != rgb_t(0xdc, 0x32, 0xdc)) // magic transparency colour?!
-						{
-							m_vidbuffer[(real_ypos * 320) + m_bufpos_x] = rgb;
-						}
-						m_bufpos_y--;
-					}
-				}
-
-			}
-		}
+		do_draw_inner(pal_to_use, 7, 1, 1, amount);	
 	}
-	else
+	else 
 	{
-
-
 #ifdef VIDEO_PRINTS
 		printf("<>.>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>unknown transfer direct to VDP? %02x bytes? @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n", amount);
 #endif				
 	}
 
 	m_bufpos_y = 239;
-
+#ifdef HEAT_MAP_DEBUG
 	for (int i = 0; i < amount; i++)
 	{
 		m_flashheat[(m_spiaddr + i) & 0xffffff] = m_spiptr[(m_spiaddr + i) & 0xffffff];
 	}
+#endif
 }
 
 void monon_color_state::do_palette(int amount, int pal_to_use)
 {
-#ifdef VIDEO_PRINTS
-	printf("<>.>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>A palette transfer (0x30 bytes?) was requested direct to VDP ====================================================================================\n");
-#endif
+//#ifdef VIDEO_PRINTS
+	printf("<>.>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>A palette transfer (%02x bytes?) was requested direct to VDP ====================================================================================\n", amount);
+//#endif
 	for (int i = 0; i < amount; i++)
 	{
-		m_curpal[i][pal_to_use] = m_spiptr[(m_spiaddr++)];
+		spibuf_w(0x00); // clock
+		uint8_t romdat = spibuf_r();
+
+		m_curpal[i][pal_to_use] = romdat;
 	}
 
-
+#ifdef HEAT_MAP_DEBUG
 	for (int i = 0; i < amount; i++)
 	{
 		m_flashheat[(m_spiaddr + i) & 0xffffff] = m_spiptr[(m_spiaddr + i) & 0xffffff];
 	}
+#endif
 }
 
 
@@ -798,25 +714,21 @@ void monon_color_state::write_to_video_device(uint8_t data)
 	//bool trigger_transfer = false;
 
 #ifdef VIDEO_PRINTS
-	if (m_out0data >= 0x10)
-	{
-		
-		if (m_out0data == 0x1b)
-			printf("--------~@'@@@@@@@@@@@@@@@@@@@@@-- video write m_out0data %02x data %02x\n", m_out0data, data);
-		else if (m_out0data == 0x12)
-			printf("---------- video write m_out0data %02x data %02x (setting BPP of gfx for next transfer!)\n", m_out0data, data);
-		else
-			printf("---------- video write m_out0data %02x data %02x\n", m_out0data, data);
-	}
+	if (m_out0data == 0x01)
+		printf("==== video write m_out0data %02x data %02x (set transfer length upper)\n", m_out0data, data); // used when transfering 8bpp palettes
+	else if (m_out0data == 0x0c)
+		printf("==== video write m_out0data %02x data %02x (trigger transfer?)\n", m_out0data, data);
+	else if (m_out0data == 0x0e)
+		printf("==== video write m_out0data %02x data %02x (set transfer length lower)\n", m_out0data, data);
+	else if (m_out0data == 0x11)
+		printf("---------- video write m_out0data %02x data %02x (setting palette select of gfx for next transfer!)\n", m_out0data, data);
+	else if (m_out0data == 0x12)
+		printf("---------- video write m_out0data %02x data %02x (setting BPP of gfx for next transfer!)\n", m_out0data, data);
+	else if (m_out0data == 0x1b)
+		printf("--------~@'@@@@@@@@@@@@@@@@@@@@@-- video write m_out0data %02x data %02x\n", m_out0data, data);
 	else
-	{
-		if (m_out0data == 0x0e)
-			printf("==== video write m_out0data %02x data %02x (set transfer length)\n", m_out0data, data);
-		else if (m_out0data == 0x0c)
-			printf("==== video write m_out0data %02x data %02x (trigger transfer?)\n", m_out0data, data);
-		else
-			printf("==== video write m_out0data %02x data %02x\n", m_out0data, data);
-	}
+		printf("==######################== video write m_out0data %02x data %02x\n", m_out0data, data);
+	
 #endif
 
 	/*
@@ -895,7 +807,7 @@ void monon_color_state::write_to_video_device(uint8_t data)
 	if (m_out0data == 0x16)
 	{
 #ifdef VIDEO_PRINTS
-		printf("<>.>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>maybe set VDP address to %02x%02x\n", m_storeregs[0x16], m_storeregs[0x1a]);
+		printf("<>.>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> set vertical shift to %02x%02x\n", m_storeregs[0x16], m_storeregs[0x1a]);
 #endif
 	}
 
@@ -904,11 +816,19 @@ void monon_color_state::write_to_video_device(uint8_t data)
 		if (data == 0x81)
 		{
 			m_bufpos_x++;
+			//printf("next column of data!\n");
 
 			if (m_bufpos_x == 320)
+			{
 				m_bufpos_x = 0;
+				//printf("next frame of data!\n");
+			}
 
 			m_bufpos_y = 239;
+		}
+		else
+		{
+			//printf("unknown 1b write %02x!\n", data);
 		}
 	}
 
@@ -916,26 +836,33 @@ void monon_color_state::write_to_video_device(uint8_t data)
 
 	if ((m_out0data == 0x0c))
 	{
+		printf("m_out0data with data %02x\n", data);
+
 		if (m_storeregs[0x02] == 0x20)
 		{
 			if (((m_storeregs[0x1c] == 0x01) || (m_storeregs[0x1c] == 0x11)))
 			{
-				uint8_t amount = m_storeregs[0x0e];
+				uint16_t amount = m_storeregs[0x0e] | (m_storeregs[0x01] << 8);
 
 				if (amount != 0x00)
 				{
 					int pal_to_use = m_storeregs[0x11];
 
 					// d4/d6 are odd-even columns
-					// d0/d2 are odd-even columns
-					// da/de are palettes?
+					// d0/d2 are odd-even columns, after frame data?
+					// da/de are palettes? (maybe bit 0x04 is just ignored here, these aren't column specific)
+
 					if ((data == 0xde) || (data == 0xda))
 					{
 						do_palette(amount, pal_to_use);
 					}
-					else if ((data == 0xd0) || (data == 0xd2) || (data == 0xd4) || (data == 0xd6))
+					else if ((data == 0xd2) || (data == 0xd6))
 					{
 						do_draw(amount, pal_to_use);	
+					}
+					else if ((data == 0xd0) || (data == 0xd4))
+					{
+					//	do_draw(amount, pal_to_use);	
 					}
 					else
 					{
