@@ -624,6 +624,22 @@ void monon_color_state::write_to_video_device(uint8_t data)
 		}
 	}
 
+	// it uploads some colours at startup (and sometimes changes values using this during the game)
+	// it is unclear how the address of 0x8e relates to palette entries 0x400+
+	// these seem to be used for the 1bpp text see purcfs name entry, lolfight stats
+	if (m_out0data == 0x00)
+	{
+		if (m_storeregs[0x04] == 0x8e)
+		{
+			int addressx = (m_storeregs[0x08]++);
+			int address = addressx + 0x400 * 3;
+			m_curpal[address] = data;
+			int entry = address / 3;
+			m_palette->set_pen_color(entry, rgb_t(m_curpal[(entry * 3) + 2], m_curpal[(entry * 3) + 1],	m_curpal[(entry * 3) + 0]));
+		}
+
+	}
+
 	if (m_out0data == 0x1b)
 	{
 		if (data == 0x81)
@@ -679,7 +695,7 @@ void monon_color_state::write_to_video_device(uint8_t data)
 					else if ((data == 0xd2) || (data == 0xd6))
 					{
 						if (m_storeregs[0x02] == 0x20)
-							do_draw(amount, pal_to_use);	
+							do_draw(amount, pal_to_use);
 					}
 					else if ((data == 0xd0) || (data == 0xd4))
 					{
