@@ -1104,7 +1104,7 @@ Beyond that last category are the roms waiting to be classified.
 		</part>
 	</software>
 
-	<software name="dsp1demo" supported="no"> <!-- possibly corrupt -->
+	<software name="dsp1demo">
 		<!-- nintendoplayer.com -->
 		<description>DSP1 Tech Demo (USA, prototype)</description>
 		<year>1992</year>
@@ -1114,7 +1114,7 @@ Beyond that last category are the roms waiting to be classified.
 			<feature name="enhancement" value="DSP1" />
 			<feature name="pcb" value="SHVC-2Q5B-03" />
 			<feature name="u1" value="U1 4/2/1M EPROM(J)" />
-			<feature name="u2" value="U2 4/2/1M EPROM(J)" /><!-- empty socket -->
+			<feature name="u2" value="U2 4/2/1M EPROM(J)" /> <!-- empty socket -->
 			<feature name="u3" value="U3 256/64K SRAM" /> <!-- empty socket -->
 			<feature name="u4" value="U4 D77C25/P25" /> <!-- Nintendo DSP1 Chip 065 9250HX012 -->
 			<feature name="u5" value="U5 74F138" />
