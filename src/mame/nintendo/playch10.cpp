@@ -692,6 +692,15 @@ void playch10_state::machine_start()
 
 	m_vrom = m_vrom_region ? m_vrom_region->base() : nullptr;
 
+	// sanity check: make sure PRG/CHR sizes are powers of 2 and big enough
+	int len = memregion("prg")->bytes();
+	assert(!(len & (len - 1)) && len >= 0x8000);
+	if (m_vrom)
+	{
+		len = m_vrom_region->bytes();
+		assert(!(len & (len - 1)) && len >= 0x2000);
+	}
+
 	// allocate 2K of nametable ram here
 	// this is on the main board and does not belong to the cart board
 	m_nt_ram = std::make_unique<u8[]>(0x800);
@@ -908,13 +917,6 @@ void playch10_state::pc10_set_mirroring(int mirroring)
 	}
 }
 
-/* SIZE MAPPINGS *\
- * old       new *
- * 512         8 *
- * 256         4 *
- * 128         2 *
- *  64         1 *
-\*****************/
 
 void playch10_state::pc10_set_videorom_bank(int first, int count, int bank, int size)
 {
