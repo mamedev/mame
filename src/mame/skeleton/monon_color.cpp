@@ -24,6 +24,13 @@
 #include "cpu/axc51/axc51.h"
 #include "sound/dac.h"
 
+#define LOG_VDP (1U <<  1)
+
+//#define VERBOSE     (LOG_VDP)
+#define VERBOSE     (0)
+
+#include "logmacro.h"
+
 class monon_color_state : public driver_device
 {
 public:
@@ -429,7 +436,7 @@ void monon_color_state::dacout1_w(uint8_t data)
 
 void monon_color_state::out0_w(uint8_t data)
 {
-	m_out0data = data;
+	m_out0data = data & 0x1f;
 }
 
 void monon_color_state::out1_w(uint8_t data)
@@ -472,6 +479,8 @@ void monon_color_state::out2_w(uint8_t data)
 
 uint8_t monon_color_state::read_from_video_device()
 {
+	LOGMASKED(LOG_VDP,"%s: read_from_video_device (m_out0data is %02x)\n", machine().describe_context(), m_out0data);
+
 	if (m_out0data == 0x0c)
 		return 0xff ^ 0x02;
 
@@ -548,6 +557,44 @@ void monon_color_state::do_palette(int amount, int pal_to_use)
 
 void monon_color_state::write_to_video_device(uint8_t data)
 {
+	static const char* names[] =
+	{
+		"(Direct Data?)", // Direct Data port, after setting 0x8 / 0x04 ? writes basic 'maximum intensity' R/G/B palettes here on startup
+		"(Transfer Size MSB)",
+		"(Allow/Disallow SPI Access?)",
+		"(unknown 0x03)",
+		"(Direct VRAM Address Select MSB?)",
+		"(unknown 0x05)",
+		"(unknown 0x06)",
+		"(unknown 0x07)",
+		"(Direct VRAM Address Select LSB?)",
+		"(unknown 0x09 but used)", // used during some line operations
+		"(unknown 0x0a)",
+		"(unknown 0x0b)",
+		"(Trigger Transfer/Mode)",
+		"(unknown 0x0d)",
+		"(Transfer Size LSB)",
+		"(unknown 0x0f)",
+		"(Configure Magic Trans Pen B?)", // on startup
+		"(Palette Select?)",
+		"(BPP Select)",
+		"(unknown 0x13)",
+		"(Configure Magic Trans Pen R?)", // on startup
+		"(unknown 0x15)",
+		"(Y Adjust MSB)",
+		"(used 0x17)", // some kind of command / data? (writes a 320x240 set of 00 here at startup, followed by a 0x1f 'clock' write every time?)
+		"(Configure Magic Trans Pen G?)", // on startup
+		"(unknown 0x19)",
+		"(Y Adjust LSB)",
+		"(Column Advance+More?)",
+		"(Layer Select?)",
+		"(unknown 0x1d)",
+		"(Extra Palette Select?)", // written when there is text on the screen (that currently renders with incorrect palette?) some kind of extra base select (LSB?) in 1bpp mode? maybe for palettes directly uploaded at startup
+		"(Clock for 0x17?)", // clock for 0x17? always writes after reading / writing 0x1f?
+	};
+
+	LOGMASKED(LOG_VDP,"%s: write_to_video_device (m_out0data is %02x) %s (data is %02x)\n", machine().describe_context(), m_out0data, names[m_out0data], data);
+
 	if (m_out4data == 0x03)
 	{
 		if (m_out0data < 0x20)
@@ -571,7 +618,6 @@ void monon_color_state::write_to_video_device(uint8_t data)
 		}
 	}
 
-
 	if (m_out0data == 0x1b)
 	{
 		if (data == 0x81)
@@ -580,10 +626,12 @@ void monon_color_state::write_to_video_device(uint8_t data)
 			for (int i = 0; i < 240; i++)
 				m_vidbuffer[(i * 320) + m_bufpos_x] = m_linebuf[i];
 
+			LOGMASKED(LOG_VDP,"Finished Column %d\n", m_bufpos_x);
 			m_bufpos_x++;
 
 			if (m_bufpos_x == 320)
 			{
+				LOGMASKED(LOG_VDP,"------------------------------------------------------------------------------------------------\n");
 				m_bufpos_x = 0;
 			}
 
