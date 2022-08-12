@@ -389,7 +389,7 @@ Tiger Electronics K28 (model 7-232) Sold in Hong Kong, distributed in US as:
 - Sears: Talkatron - Learning Computer
 
 1981 K28 models 7-230 and 7-231 are on different hardware, showing a different
-keyboard, VFD display, and use the SC-01 speech chip. --> driver tiger/k28.cpp
+keyboard, VFD, and use the SC-01 speech chip. --> driver tiger/k28.cpp
 
     K28 model 7-232 (HK), 1985
     - MCU: TMS1400 MP7324 (die label: TMS1400, MP7324, 28L 01D D000 R100)

@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+
+	<element name="yellow"><rect><color red="1.0" green="1.0" blue="0.5" /></rect></element>
+	<element name="blue"><rect><color red="0.8" green="0.8" blue="1.0" /></rect></element>
+
+	<view name="Internal Layout">
+		<screen index="0"><bounds x="0" y="0" width="300" height="1080" /></screen>
+
+		<collection name="Color Overlay (Layer 1)">
+			<element ref="yellow" blend="multiply"><bounds x="0" y="0" width="300" height="290" /></element>
+			<element ref="yellow" blend="multiply"><bounds x="0" y="935" width="300" height="145" /></element>
+		</collection>
+		<collection name="Color Overlay (Layer 2)">
+			<element ref="blue" blend="multiply"><bounds x="0" y="0" width="300" height="1080" /></element>
+		</collection>
+	</view>
+
+</mamelayout>

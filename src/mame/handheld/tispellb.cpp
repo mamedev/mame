@@ -17,7 +17,7 @@
   Spelling B (US), 1978
   - TMS0270 MCU TMC0272 (die label: 0272A T0270B)
   - TMS1980 MCU TMC1984 (die label: 1980A 84A)
-  - 8-digit cyan VFD display (seen with and without apostrophe)
+  - 8-digit cyan VFD (seen with and without apostrophe)
 
   Spelling ABC (UK), 1979: exact same hardware as US version
 
@@ -26,7 +26,7 @@
   Spelling B (US), 1979
   - TMS0270 MCU TMC0274
   - TMC0355 4KB VSM ROM CD2602
-  - 8-digit cyan VFD display
+  - 8-digit cyan VFD
   - 1-bit sound (indicated by a music note symbol on the top-right of the casing)
   - note: much rarer than the 1978 version, not much luck finding one on eBay
 
@@ -38,7 +38,7 @@
   Mr. Challenger (US), 1979
   - TMS0270 MCU TMC0273
   - TMC0355 4KB VSM ROM CD2601
-  - 8-digit cyan VFD display
+  - 8-digit cyan VFD
   - 1-bit sound
 
   Letterlogic (UK), 1980: exact same hardware as US Mr. Challenger
