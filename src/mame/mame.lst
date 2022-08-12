@@ -11661,7 +11661,10 @@ ct486                           // 1993? 486 with CS4031
 megatrix
 
 @source:casio/ctk551.cpp
+ap10                            //
 ctk551                          //
+ctk601                          //
+gz70sp                          //
 
 @source:casio/ctk2000.cpp
 ctk2100                         //

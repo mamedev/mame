@@ -44,6 +44,14 @@ const s8 gt913_sound_device::sample_7_to_8[128] =
 	-16, -15, -14, -13, -12, -11, -10,  -9,  -8,  -7,  -6,  -5,  -4,  -3,  -2,  -1
 };
 
+// based on SW-10 softsynth
+const u16 gt913_sound_device::volume_ramp[17] =
+{
+	0x0000, 0x00fa, 0x0231, 0x03b5, 0x0596, 0x07ee, 0x0ad8, 0x0e78,
+	0x12fa, 0x1897, 0x1f93, 0x2843, 0x3313, 0x4087, 0x5143, 0x6617,
+	0x8000
+};
+
 gt913_sound_device::gt913_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, GT913_SOUND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
@@ -77,10 +85,10 @@ void gt913_sound_device::device_start()
 	save_item(STRUCT_MEMBER(m_voices, m_sample_next));
 	save_item(STRUCT_MEMBER(m_voices, m_exp));
 
+	save_item(STRUCT_MEMBER(m_voices, m_volume_data));
 	save_item(STRUCT_MEMBER(m_voices, m_volume_current));
 	save_item(STRUCT_MEMBER(m_voices, m_volume_target));
 	save_item(STRUCT_MEMBER(m_voices, m_volume_rate));
-	save_item(STRUCT_MEMBER(m_voices, m_volume_end));
 
 	save_item(STRUCT_MEMBER(m_voices, m_balance));
 	save_item(STRUCT_MEMBER(m_voices, m_gain));
@@ -102,12 +110,13 @@ void gt913_sound_device::sound_stream_update(sound_stream& stream, std::vector<r
 
 		for (auto& voice : m_voices)
 		{
+			update_envelope(voice);
 			if (voice.m_enable)
 				mix_sample(voice, left, right);
 		}
 
-		outputs[0].put_int_clamp(i, (left * m_gain) >> 26, 32678);
-		outputs[1].put_int_clamp(i, (right * m_gain) >> 26, 32768);
+		outputs[0].put_int_clamp(i, (left * m_gain) >> 27, 32678);
+		outputs[1].put_int_clamp(i, (right * m_gain) >> 27, 32768);
 	}
 }
 
@@ -120,13 +129,27 @@ void gt913_sound_device::mix_sample(voice_t& voice, s64& left, s64& right)
 {
 	// update sample position
 	voice.m_addr_frac += voice.m_pitch;
-	while (voice.m_addr_frac >= (1 << 25))
+	while (voice.m_enable && voice.m_addr_frac >= (1 << 25))
 	{
 		voice.m_addr_frac -= (1 << 25);
 		update_sample(voice);
 	}
 
-	// update volume envelope
+	// interpolate, apply envelope + channel gain, and mix into output
+	const u8 step = (voice.m_addr_frac >> 22) & 7;
+
+	const u8 env = (voice.m_volume_current >> 27);
+	const u16 env_step = (voice.m_volume_current >> 16) & 0x7ff;
+	const u32 env_level = (u32)volume_ramp[env] + (((volume_ramp[env + 1] - volume_ramp[env]) * env_step) >> 11);
+
+	const s64 sample = ((s64)voice.m_sample + (voice.m_sample_next * step / 8)) * voice.m_gain * env_level;
+
+	left  += sample * voice.m_balance[0];
+	right += sample * voice.m_balance[1];
+}
+
+void gt913_sound_device::update_envelope(voice_t& voice)
+{
 	if (voice.m_volume_target > voice.m_volume_current
 		&& (voice.m_volume_target - voice.m_volume_current) > voice.m_volume_rate)
 	{
@@ -141,37 +164,42 @@ void gt913_sound_device::mix_sample(voice_t& voice, s64& left, s64& right)
 	{
 		voice.m_volume_current = voice.m_volume_target;
 	}
-
-	// interpolate, apply envelope + channel gain, and mix into output
-	const u8 step = (voice.m_addr_frac >> 22) & 7;
-	const u8 env = (voice.m_volume_current >> 24);
-	/*
-	the current envelope level effects amplitude non-linearly, just apply the value twice
-	(this hardware family is branded as "A² (A-Square) Sound Source" in some of Casio's
-	promotional materials, possibly for this reason?)
-	*/
-	const s64 sample = ((s64)voice.m_sample + (voice.m_sample_next * step / 8)) * voice.m_gain * env * env;
-
-	left  += sample * voice.m_balance[0];
-	right += sample * voice.m_balance[1];
 }
 
 void gt913_sound_device::update_sample(voice_t& voice)
 {
 	voice.m_sample += voice.m_sample_next;
 
-	if (voice.m_addr_current == (voice.m_addr_loop | 1))
+	if (voice.m_addr_current >= voice.m_addr_end)
 	{
+		if (voice.m_addr_loop == voice.m_addr_end)
+		{
+			voice.m_enable = false;
+			return;
+		}
+
+		voice.m_addr_current = voice.m_addr_loop;
 		/*
 		The last 12 bytes of each sample are a table containing five sample and exponent value pairs
 		for the data words immediately after the loop point. The first pair corresponds to what the
-		sample and exponent value will be _after_ processing the first word after the loop,
+		sample and exponent value will be _after_ processing the first 16-bit word after the loop,
 		so once we've reached that point, use those values to reload the current sample and exponent
 		*/
 		const u32 addr_loop_data = (voice.m_addr_end + 1) & ~1;
 
 		voice.m_sample_next = read_word(addr_loop_data) - voice.m_sample;
 		voice.m_exp = read_word(addr_loop_data + 10) & 7;
+
+		if (!BIT(voice.m_addr_current, 0))
+		{
+			/*
+			the loop data represents the state after applying both samples in a 16-bit word,
+			so if we're looping to the first of the two samples, compensate for the second one
+			*/
+			const u16 word = read_word(voice.m_addr_current);
+			const s16 delta = sample_7_to_8[word >> 9];
+			voice.m_sample_next -= delta * (1 << voice.m_exp);
+		}
 	}
 	else
 	{
@@ -192,18 +220,10 @@ void gt913_sound_device::update_sample(voice_t& voice)
 		{
 			delta = sample_7_to_8[word >> 9];
 		}
-
 		voice.m_sample_next = delta * (1 << voice.m_exp);
 	}
 
 	voice.m_addr_current++;
-	if (voice.m_addr_current == voice.m_addr_end)
-	{
-		voice.m_addr_current = voice.m_addr_loop;
-
-		if (voice.m_addr_loop == voice.m_addr_end)
-			voice.m_enable = false;
-	}
 }
 
 void gt913_sound_device::data_w(offs_t offset, u16 data)
@@ -236,7 +256,7 @@ void gt913_sound_device::command_w(u16 data)
 	}
 
 	auto& voice = m_voices[voicenum];
-	if (voicecmd == 0x0008)
+	if (voicecmd == 0x0008) // voice data write commands
 	{
 		/*
 		sample start addresses seem to need to be word-aligned to decode properly
@@ -245,19 +265,19 @@ void gt913_sound_device::command_w(u16 data)
 		may loop badly or even become noticeably detuned
 		TODO: is the LSB of start addresses supposed to indicate something else, then?
 		*/
-		voice.m_addr_start = (m_data[1] | (m_data[2] << 16)) & 0x1ffffe;
+		voice.m_addr_start = (m_data[1] | (m_data[2] << 16)) & 0x3ffffe;
 	}
 	else if (voicecmd == 0x0000)
 	{
-		voice.m_addr_end = (m_data[0] | (m_data[1] << 16)) & 0x1fffff;
+		voice.m_addr_end = (m_data[0] | (m_data[1] << 16)) & 0x3fffff;
 	}
 	else if (voicecmd == 0x2000)
 	{
-		voice.m_addr_loop = (m_data[0] | (m_data[1] << 16)) & 0x1fffff;
+		voice.m_addr_loop = (m_data[0] | (m_data[1] << 16)) & 0x3fffff;
 	}
 	else if (voicecmd == 0x200a)
 	{
-		/* TODO: what does bit 4 of data[2] do? ctk551 sets it unconditionally */
+		/* TODO: what does bit 3 of data[2] do? ctk551 sets it unconditionally */
 		voice.m_exp = m_data[2] & 7;
 	}
 	else if (voicecmd == 0x200b)
@@ -267,11 +287,11 @@ void gt913_sound_device::command_w(u16 data)
 		{
 			voice.m_addr_current = voice.m_addr_start;
 			voice.m_addr_frac = 0;
-			voice.m_sample = 0;
+			voice.m_volume_current = 0;
+			voice.m_sample = voice.m_sample_next = 0;
 		}
 
 		voice.m_enable = enable;
-		voice.m_volume_end &= enable;
 	}
 	else if (voicecmd == 0x4004)
 	{
@@ -296,54 +316,57 @@ void gt913_sound_device::command_w(u16 data)
 	}
 	else if (voicecmd == 0x6007)
 	{
-		logerror("voice %u volume %u rate %u\n", voicenum, (m_data[0] >> 8), m_data[0] & 0xff);
-		/*
-		only set a new volume level/rate if we haven't previously indicated the end of an envelope,
-		unless the new level also has the high bit set. otherwise, a timer irq may try to update the
-		normal envelope while other code is trying to force a note off
-		*/
-		const bool end = BIT(m_data[0], 15);
-		if (!voice.m_volume_end || end)
-		{
-			voice.m_volume_end = end;
+	//	logerror("voice %u volume %u rate %u\n", voicenum, (m_data[0] >> 8), m_data[0] & 0xff);
 
-			voice.m_volume_target = (m_data[0] & 0x7f00) << 16;
-			/*
-			In addition to volume levels applying non-linearly, envelope rates
-			are also non-linear. Unfortunately, with the ctk-551's limited patch set and
-			lack of editing features, figuring out the correct behavior isn't easy.
-			This is essentially a rough estimate until a higher-end model (ctk-601 series, etc)
-			can be dumped and used for more detailed testing.
-			*/
-			const u8 x = m_data[0] & 0xff;
-			if (x >= 127)
-				voice.m_volume_rate = x << 21;
-			else if (x >= 63)
-				voice.m_volume_rate = x << 16;
-			else if (x >= 47)
-				voice.m_volume_rate = x << 14;
-			else if (x >= 31)
-				voice.m_volume_rate = x << 11;
-			else if (x >= 23)
-				voice.m_volume_rate = x << 9;
-			else if (x >= 15)
-				voice.m_volume_rate = x << 7;
-			else
-				voice.m_volume_rate = x << 5;
+		voice.m_volume_data = m_data[0];
+		voice.m_volume_target = (m_data[0] & 0x7f00) << 16;
+
+		// referenced from the SW-10 softsynth
+		u8 base = m_data[0] & 0xff;
+		u8 shift = base >> 5;
+		switch (shift)
+		{
+		case 0:
+			shift = base >> 2;
+			base &= 3;
+			break;
+
+		case 1:
+			shift = 8;
+			base &= 0x1f;
+			break;
+
+		default:
+			shift += 6;
+			base = (base & 0x1f) | 0x20;
+			break;
 		}
+		/*
+		this part is less certain - the overall rate needs adjusting based on
+		the sample rate difference between this and the softsynth.
+		it's probably not exact, but it sounds okay
+		*/
+		voice.m_volume_rate = (base * 3) << (shift + 5);
 	}
-	else if (voicecmd == 0x2028)
+	else if (voicecmd == 0x2028) // voice data read commands
 	{
 		/*
-		ctk551 issues this command and then reads the voice's current volume from data0
-		to determine if it's time to start the next part of the volume envelope or not.
+		data0 is used to determine if it's time to start the next part of the volume envelope or not
 		*/
-		m_data[0] = voice.m_enable ? (voice.m_volume_current >> 16) : 0;
+		m_data[0] = voice.m_volume_current >> 16;
 		/*
-		data1 is used to read consecutive output sample and detect zero crossings when
+		data1 is used to read consecutive output samples and detect zero crossings when
 		applying volume or expression changes to a MIDI channel
 		*/
 		m_data[1] = voice.m_sample;
+	}
+	else if (voicecmd == 0x6020)
+	{
+		/*
+		AP-10 sometimes issues this command, then clears the low byte of data0,
+		and then issues command 0x6007 with the result (to pause an envelope?)
+		*/
+		m_data[0] = voice.m_volume_data;
 	}
 	else
 	{
