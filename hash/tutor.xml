@@ -85,7 +85,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		<description>4-nin Mahjan (Jpn, set 1)</description>
 		<year>1984</year>
 		<publisher>Tomy</publisher>
-		<info name="alt_title" value="四人麻雀 "/>
+		<info name="alt_title" value="四人麻雀"/>
 		<info name="serial" value="021E"/>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="0x4000">
@@ -98,7 +98,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		<description>4-nin Mahjan (Jpn, set 2)</description>
 		<year>1984</year>
 		<publisher>Tomy</publisher>
-		<info name="alt_title" value="四人麻雀 "/>
+		<info name="alt_title" value="四人麻雀"/>
 		<info name="serial" value="021E"/>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="0x4000">

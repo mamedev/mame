@@ -31,7 +31,7 @@ license:CC0
 		<description>A-1 Pichi Pichi Pitch vol.1 (Japan)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="ぴちぴちピッチ vol.1 " />
+		<info name="alt_title" value="ぴちぴちピッチ vol.1" />
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24c08_epitch"/>
 			<dataarea name="rom" size="0x200000">
@@ -44,7 +44,7 @@ license:CC0
 		<description>A-3 Pichi Pichi Pitch vol.3 (Japan)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="ぴちぴちピッチ vol.3 " />
+		<info name="alt_title" value="ぴちぴちピッチ vol.3" />
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24c08_epitch"/>
 			<dataarea name="rom" size="0x200000">
@@ -57,7 +57,7 @@ license:CC0
 		<description>A-4 Pichi Pichi Pitch Pure Dai 1-shō (Japan)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="ぴちぴちピッチ ピュア第1章 " />
+		<info name="alt_title" value="ぴちぴちピッチ ピュア第1章" />
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24c08_epitch"/>
 			<dataarea name="rom" size="0x200000">
@@ -82,7 +82,7 @@ license:CC0
 		<description>A-6 Pichi Pichi Pitch Pure Dai 2-shō (Japan)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="ぴちぴちピッチ ピュア第2章 " />
+		<info name="alt_title" value="ぴちぴちピッチ ピュア第2章" />
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24c08_epitch"/>
 			<dataarea name="rom" size="0x200000">
@@ -95,7 +95,7 @@ license:CC0
 		<description>A-7 Pichi Pichi Pitch Pure Dai 3-shō (Japan)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
-		<info name="alt_title" value="ぴちぴちピッチ ピュア第3章 " />
+		<info name="alt_title" value="ぴちぴちピッチ ピュア第3章" />
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24c08_epitch"/>
 			<dataarea name="rom" size="0x200000">

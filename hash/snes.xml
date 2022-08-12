@@ -6215,7 +6215,7 @@ more investigation needed...
 			<feature name="pcb" value="SHVC-1A3B-01" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 64K SRAM" />
-			<feature name="u3" value="U374LS139 " />
+			<feature name="u3" value="U374LS139" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="lockout" value="" />
 			<feature name="battery" value="BATT CR2032" />
@@ -8064,7 +8064,7 @@ more investigation needed...
 		<description>Battle Dodge Ball II (Japan)</description>
 		<year>1993</year>
 		<publisher>Banpresto</publisher>
-		<info name="serial" value="SHVC-D2 " />
+		<info name="serial" value="SHVC-D2" />
 		<info name="release" value="19930723" />
 		<info name="alt_title" value="バトルドッジボールII" />
 		<part name="cart" interface="snes_cart">
@@ -10250,7 +10250,7 @@ more investigation needed...
 		<description>Chrono Trigger (Japan)</description>
 		<year>1995</year>
 		<publisher>Square</publisher>
-		<info name="serial" value="SHVC-ACTJ-JPN " />
+		<info name="serial" value="SHVC-ACTJ-JPN" />
 		<info name="release" value="19950311" />
 		<info name="alt_title" value="クロノ・トリガー" />
 		<part name="cart" interface="snes_cart">
@@ -10276,7 +10276,7 @@ more investigation needed...
 		<description>Chrono Trigger (Japan, alt)</description>
 		<year>1995</year>
 		<publisher>Square</publisher>
-		<info name="serial" value="SHVC-ACTJ-JPN " />
+		<info name="serial" value="SHVC-ACTJ-JPN" />
 		<info name="release" value="19950311" />
 		<info name="alt_title" value="クロノ・トリガー" />
 		<part name="cart" interface="snes_cart">
@@ -13724,7 +13724,7 @@ more investigation needed...
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<feature name="slot" value="hirom" />
-			<dataarea name="rom" size="3145728 ">
+			<dataarea name="rom" size="3145728">
 				<rom name="shvc-f6-0 p1.u1" size="1048576" crc="bfc35e36" sha1="579cca6fd6c0b4f8d3489ba115d6bd51a745a16a" offset="0x000000" />
 				<rom name="shvc-f6-0 p2.u2" size="1048576" crc="82736bb1" sha1="1931269554c4aebbd4d250c881cd15906347062d" offset="0x100000" />
 				<rom name="shvc-f6-0 p3.u3" size="1048576" crc="38a398a2" sha1="b28c6b17b2b027831b70a3dcc0156e84209da2d0" offset="0x200000" />
@@ -19239,7 +19239,7 @@ more investigation needed...
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BM4J-JPN" />
 		<info name="release" value="19981204" />
-		<info name="alt_title" value="ミニ四駆 レッツ&amp;ゴー!! POWER WGP2 " />
+		<info name="alt_title" value="ミニ四駆 レッツ&amp;ゴー!! POWER WGP2" />
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-1J3M-20" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
@@ -19839,7 +19839,7 @@ more investigation needed...
 		<description>NBA Jam - Tournament Edition (Euro)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<info name="serial" value="SNSP-AJTP-EUR " />
+		<info name="serial" value="SNSP-AJTP-EUR" />
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-BA1M-01" />
 			<feature name="u1" value="U1 P0" />
@@ -21582,7 +21582,7 @@ more investigation needed...
 			<feature name="pcb" value="SHVC-1A3B-01" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 64K SRAM" />
-			<feature name="u3" value="U3 74LS139 " />
+			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="lockout" value="" />
 			<feature name="battery" value="BATT CR2032" />
@@ -23304,7 +23304,7 @@ more investigation needed...
 			<feature name="pcb" value="SHVC-1B3B-01" />
 			<feature name="u1" value="U1 MASKROM(N)" />
 			<feature name="u2" value="U2 64K SRAM" />
-			<feature name="u3" value="U3µPD77C25 " /> <!-- DSP3 -->
+			<feature name="u3" value="U3µPD77C25" /> <!-- DSP3 -->
 			<feature name="u4" value="U4 74LS139" />
 			<feature name="u5" value="U5 74HCU04" />
 			<feature name="u6" value="U6 CIC" />
@@ -23675,7 +23675,7 @@ more investigation needed...
 		<description>Sensible Soccer - European Champions (Euro)</description>
 		<year>1992</year>
 		<publisher>Renegade Software</publisher>
-		<info name="serial" value="SNSP-8S-FAH " />
+		<info name="serial" value="SNSP-8S-FAH" />
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-1A3M-10" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
@@ -24659,7 +24659,7 @@ more investigation needed...
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BT" />
 		<info name="release" value="19930621" />
-		<info name="alt_title" value="スペースバズーカ " />
+		<info name="alt_title" value="スペースバズーカ" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-1A0N-10" />
@@ -25532,7 +25532,7 @@ more investigation needed...
 			<feature name="u1" value="U1 P0" />
 			<feature name="u2" value="U2 P1" />
 			<feature name="u3" value="U3 64K SRAM" />
-			<feature name="u4" value="U4 µPD77C25 " /> <!-- DSP1 A -->
+			<feature name="u4" value="U4 µPD77C25" /> <!-- DSP1 A -->
 			<feature name="u5" value="U5 74LS139" />
 			<feature name="u6" value="U6 74HCU04" />
 			<feature name="u7" value="U7 CIC" />
@@ -36553,7 +36553,7 @@ List of unclassified roms
 		<publisher>KSS</publisher>
 		<info name="serial" value="SHVC-A3QJ-JPN" />
 		<info name="release" value="19960329" />
-		<info name="alt_title" value="美少女レスラー列伝   ブリザード Yuki 乱入!!" />
+		<info name="alt_title" value="美少女レスラー列伝 ブリザード Yuki 乱入!!" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2621440">
@@ -42916,7 +42916,7 @@ List of unclassified roms
 		<description>Heian Fuuunden (Japan)</description>
 		<year>1995</year>
 		<publisher>KSS</publisher>
-		<info name="serial" value="SHVC-AKHJ " />
+		<info name="serial" value="SHVC-AKHJ" />
 		<info name="release" value="19950929" />
 		<info name="alt_title" value="平安風雲伝" />
 		<part name="cart" interface="snes_cart">
@@ -49444,7 +49444,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<publisher>Takara</publisher>
 		<info name="serial" value="SHVC-QP" />
 		<info name="release" value="19931022" />
-		<info name="alt_title" value="ミラクルガールズ ともみとみかげの不思議世界の大冒険  " />
+		<info name="alt_title" value="ミラクルガールズ ともみとみかげの不思議世界の大冒険" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="1048576">
@@ -50869,7 +50869,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<year>1996</year>
 		<publisher>Nichibutsu</publisher>
 		<info name="serial" value="SHVC-AECJ-JPN" />
-		<info name="release" value="19961129 " />
+		<info name="release" value="19961129" />
 		<info name="alt_title" value="ニチブツコレクション1 攻略カジノバー, 祗園花" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
@@ -61500,7 +61500,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<publisher>Quest</publisher>
 		<info name="serial" value="SHVC-AO7J-JPN" />
 		<info name="release" value="19951006" />
-		<info name="alt_title" value="タクティクスオウカ " />
+		<info name="alt_title" value="タクティクスオウカ" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="3145728">
@@ -61517,7 +61517,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<publisher>Quest</publisher>
 		<info name="serial" value="SHVC-AO7J-JPN" />
 		<info name="release" value="19951006" />
-		<info name="alt_title" value="タクティクスオウカ " />
+		<info name="alt_title" value="タクティクスオウカ" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="3145728">
@@ -61534,7 +61534,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<publisher>Quest</publisher>
 		<info name="serial" value="SHVC-AO7J-JPN" />
 		<info name="release" value="19951006" />
-		<info name="alt_title" value="タクティクスオウカ " />
+		<info name="alt_title" value="タクティクスオウカ" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="3145728">

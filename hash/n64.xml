@@ -13324,7 +13324,7 @@ clips onto the player's ear.
 		<description>Violence Killer - Turok New Generation (Japan)</description>
 		<year>1999</year>
 		<publisher>Media Factory</publisher>
-		<info name="serial" value="NUS-NT2J-JPN "/>
+		<info name="serial" value="NUS-NT2J-JPN"/>
 		<info name="release" value="19990618"/>
 		<info name="alt_title" value="バイオレンスキラーTUROK NEW GENERATION"/>
 		<part name="cart" interface="n64_cart">

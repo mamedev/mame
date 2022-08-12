@@ -1588,7 +1588,7 @@ TODO:
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A - Dict Std + System 2 "/>
+			<feature name="part_id" value="Disk A - Dict Std + System 2"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="taro4_2_dict_std_+_system2.fdi" size="1265664" crc="8b92a740" sha1="ab6c4167714baa620acbd47625d6c997a3fb036d" offset="0" />
 			</dataarea>
@@ -1797,7 +1797,7 @@ TODO:
 		<description>Chanko Nabe</description>
 		<year>19??</year>
 		<publisher>ウエストサイド (WestSide)</publisher>
-		<info name="alt_title" value="ちゃんこ鍋 " />
+		<info name="alt_title" value="ちゃんこ鍋" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1334720">
@@ -49415,7 +49415,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<description>Zan - Kagerou no Jidai</description>
 		<year>1989</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
-		<info name="alt_title" value="斬 陽炎の時代 " />
+		<info name="alt_title" value="斬 陽炎の時代" />
 		<info name="release" value="19891117" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System"/>
@@ -49442,7 +49442,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<description>Zan - Kagerou no Jidai (Alt?)</description>
 		<year>1989</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
-		<info name="alt_title" value="斬 陽炎の時代 " />
+		<info name="alt_title" value="斬 陽炎の時代" />
 		<info name="release" value="19891117" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System"/>
@@ -56811,7 +56811,7 @@ SPACE EMPIRE
 		<publisher>フォア・ナイン (Fournine)</publisher>
 		<info name="alt_title" value="えんじぇる☆ないと ～闇夜を翔ける天使たちの物語～" />
 		<info name="release" value="19960426" />
-		<info name="usage" value="Boot DOS, insert disk B, and run INSTHD.EXE. " />
+		<info name="usage" value="Boot DOS, insert disk B, and run INSTHD.EXE." />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1069052">
@@ -69256,7 +69256,7 @@ doujin?!?
 		<description>Gassen Sekigahara (Incomplete)</description>
 		<year>1995</year>
 		<publisher>アートディンク (Artdink)</publisher>
-		<info name="alt_title" value="合戦関ヶ原 " />
+		<info name="alt_title" value="合戦関ヶ原" />
 		<info name="release" value="19950602" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
