@@ -2794,7 +2794,7 @@ Compiled by K1W1
 
 	<software name="jawbrek2">
 		<description>Jawbreaker II</description>
-		<!-- The title screen says "Jawbreaker (c) 1980", however this actually is Jawbreaker II from 1982, as seen on the box (not in all releases though). -->
+		<!-- The title screen says “Jawbreaker (c) 1980”, however this actually is Jawbreaker II from 1982, as seen on the box (not in all releases though). -->
 		<year>1982</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="serial" value="JBL-202" />
