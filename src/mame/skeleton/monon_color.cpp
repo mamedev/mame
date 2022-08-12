@@ -124,7 +124,7 @@ private:
 	uint8_t m_out1data;
 	uint8_t m_out0data;
 
-	uint8_t m_curpal[0x100 * 3][0x100];
+	uint8_t m_curpal[0x800 * 3];
 };
 
 void monon_color_state::machine_start()
@@ -143,7 +143,7 @@ void monon_color_state::machine_start()
 	save_item(NAME(m_vidbuffer));
 	save_item(NAME(m_bufpos_x));
 	save_item(NAME(m_bufpos_y));
-
+	save_item(NAME(m_curpal));
 	save_item(NAME(m_storeregs));
 }
 
@@ -504,6 +504,7 @@ void monon_color_state::do_draw_inner(int pal_to_use, int start, int step, int p
 		spibuf_w(0x00); // clock
 		uint8_t pix = spibuf_r();
 
+
 		for (int i = start; i >= 0; i -= step)
 		{
 			int real_ypos = m_bufpos_y;
@@ -511,7 +512,7 @@ void monon_color_state::do_draw_inner(int pal_to_use, int start, int step, int p
 			if ((real_ypos >= 0) && (real_ypos < 240))
 			{
 				uint8_t pixx = (pix >> i) & pixmask;
-				rgb_t rgb = rgb_t(m_curpal[(pixx * 3) + 2][pal_to_use], m_curpal[(pixx * 3) + 1][pal_to_use], m_curpal[(pixx * 3) + 0][pal_to_use]);
+				rgb_t rgb = rgb_t(m_curpal[((pixx+pal_to_use) * 3) + 2], m_curpal[((pixx+pal_to_use) * 3) + 1], m_curpal[((pixx+pal_to_use) * 3) + 0]);
 				if (rgb != rgb_t(0xdc, 0x32, 0xdc)) // magic transparency colour?!
 				{
 					m_linebuf[real_ypos] = rgb;
@@ -550,9 +551,14 @@ void monon_color_state::do_palette(int amount, int pal_to_use)
 		spibuf_w(0x00); // clock
 		uint8_t romdat = spibuf_r();
 
-		m_curpal[i][pal_to_use] = romdat;
+		int address = i + pal_to_use * 3;
+		m_curpal[address] = romdat;
+		int entry = address / 3;
+
+		m_palette->set_pen_color(entry, rgb_t(m_curpal[(entry * 3) + 2], m_curpal[(entry * 3) + 1],	m_curpal[(entry * 3) + 0]));
 	}
 }
+
 
 
 void monon_color_state::write_to_video_device(uint8_t data)
@@ -655,8 +661,12 @@ void monon_color_state::write_to_video_device(uint8_t data)
 
 				//if (amount != 0x00)
 				{
-					int pal_to_use = m_storeregs[0x11];
+					int pal_to_use = (m_storeregs[0x11]<<8) | m_storeregs[0x1e];
 
+					pal_to_use >>= 5;
+					pal_to_use &= 0x7ff;
+
+	
 					// d4/d6 are odd-even columns
 					// d0/d2 are odd-even columns, after frame data? (writing them seems conditional on something else?)
 					// da/de are palettes? (maybe bit 0x04 is just ignored here, these aren't column specific)
@@ -721,7 +731,7 @@ void monon_color_state::monon_color(machine_config &config)
 	m_screen->set_size(320, 240);
 	m_screen->set_visarea(0*8, 320-1, 0*8, 240-1);
 
-	PALETTE(config, m_palette).set_entries(256);
+	PALETTE(config, m_palette).set_entries(0x800);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
