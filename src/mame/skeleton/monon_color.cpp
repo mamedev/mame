@@ -622,9 +622,7 @@ void monon_color_state::write_to_video_device(uint8_t data)
 	{
 		if (data == 0x81)
 		{
-			// assume there's some kind of line column buffer, the exact swap trigger is unknown
-			for (int i = 0; i < 240; i++)
-				m_vidbuffer[(i * 320) + m_bufpos_x] = m_linebuf[i];
+
 
 			LOGMASKED(LOG_VDP,"Finished Column %d\n", m_bufpos_x);
 			m_bufpos_x++;
@@ -649,9 +647,9 @@ void monon_color_state::write_to_video_device(uint8_t data)
 
 	if (m_out0data == 0x0c)
 	{
-		if (m_storeregs[0x02] == 0x20)
+		
 		{
-			if (((m_storeregs[0x1c] == 0x01) || (m_storeregs[0x1c] == 0x11)))
+			if ((m_storeregs[0x1c] == 0x0a) || (m_storeregs[0x1c] == 0x01) || (m_storeregs[0x1c] == 0x11))
 			{
 				uint16_t amount = m_storeregs[0x0e] | (m_storeregs[0x01] << 8);
 
@@ -665,16 +663,20 @@ void monon_color_state::write_to_video_device(uint8_t data)
 
 					if ((data == 0xde) || (data == 0xda))
 					{
-						do_palette(amount, pal_to_use);
+						if (m_storeregs[0x02] == 0x20)
+							do_palette(amount, pal_to_use);
 					}
 					else if ((data == 0xd2) || (data == 0xd6))
 					{
-						do_draw(amount, pal_to_use);	
+						if (m_storeregs[0x02] == 0x20)
+							do_draw(amount, pal_to_use);	
 					}
-					//else if ((data == 0xd0) || (data == 0xd4))
-					//{
-					//	do_draw(amount, pal_to_use);	
-					//}
+					else if ((data == 0xd0) || (data == 0xd4))
+					{
+						// assume there's some kind of line column buffer, the exact swap trigger is unknown
+						for (int i = 0; i < 240; i++)
+							m_vidbuffer[(i * 320) + m_bufpos_x] = m_linebuf[i];
+					}
 				}
 			}
 		}
