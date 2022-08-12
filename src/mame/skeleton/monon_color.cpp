@@ -563,7 +563,7 @@ void monon_color_state::do_palette(int amount, int pal_to_use)
 
 void monon_color_state::write_to_video_device(uint8_t data)
 {
-	static const char* names[] =
+	static const char* const names[] =
 	{
 		"(Direct Data?)", // Direct Data port, after setting 0x8 / 0x04 ? writes basic 'maximum intensity' R/G/B palettes here on startup
 		"(Transfer Size MSB)",
