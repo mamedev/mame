@@ -168,6 +168,7 @@ public:
 	void init_maketrax();
 	void init_drivfrcp();
 	void init_mspacmbe();
+	void init_mspackpls();
 	void init_ponpoko();
 	void init_eyes();
 	void init_woodpek();
