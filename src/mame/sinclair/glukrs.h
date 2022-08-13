@@ -15,17 +15,26 @@ class glukrs_device : public device_t,
 public:
 	glukrs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 32'768);
 
-	u8 read(offs_t address);
-	void write(offs_t address, u8 data);
+	void enable() { m_glukrs_active = true; };
+	void disable() { m_glukrs_active = false; };
+	bool is_active() { return m_glukrs_active; };
+	u8 address_r() { return m_glukrs_active ? m_address : 0xff; }
+	void address_w(u8 address) { if (m_glukrs_active) m_address = address; };
+	u8 data_r() { return m_glukrs_active ? m_cmos[m_address] : 0xff; };
+	void data_w(u8 data) { if (m_glukrs_active) { m_cmos[m_address] = data; } }
 
 	TIMER_CALLBACK_MEMBER(timer_callback);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
+	void device_add_mconfig(machine_config &config) override;
+	void device_start() override;
+	void device_reset() override;
+	void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
 
 private:
+	bool m_glukrs_active;
+	u8 m_address;
+
 	u8 m_cmos[0x100];
 	required_device<nvram_device> m_nvram;
 	emu_timer *m_timer;

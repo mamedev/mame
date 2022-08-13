@@ -24,20 +24,18 @@ void glukrs_device::device_add_mconfig(machine_config &config)
 
 void glukrs_device::device_start()
 {
+	save_item(NAME(m_glukrs_active));
+	save_item(NAME(m_address));
+
   m_nvram->set_base(&m_cmos, sizeof(m_cmos));
 
   m_timer = timer_alloc(FUNC(glukrs_device::timer_callback), this);
   m_timer->adjust(attotime::from_hz(clock() / XTAL(32'768)), 0, attotime::from_hz(clock() / XTAL(32'768)));
 }
 
-u8 glukrs_device::read(offs_t address)
+void glukrs_device::device_reset()
 {
-  return m_cmos[address];
-}
-
-void glukrs_device::write(offs_t address, u8 data)
-{
-  m_cmos[address] = data;
+  m_glukrs_active = false;
 }
 
 void glukrs_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)

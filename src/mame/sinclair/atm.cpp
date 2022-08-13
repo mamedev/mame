@@ -12,7 +12,6 @@ TODO:
 	* ports read
 	* ATM2+ (compare to ATM2) has only 1M RAM vs 512K
 	* Mem masks are hardcoded to 1M RAM
-	* CMOS
 	* better handling of SHADOW ports
 	* validate screen timings
 
@@ -23,6 +22,7 @@ TODO:
 #include "specpls3.h"
 
 #include "beta_m.h"
+#include "glukrs.h"
 #include "bus/centronics/ctronics.h"
 #include "sound/ay8910.h"
 
@@ -56,6 +56,7 @@ public:
 		, m_char_rom(*this, "charrom")
 		, m_beta(*this, BETA_DISK_TAG)
 		, m_centronics(*this, "centronics")
+		, m_glukrs(*this, "glukrs")
 		, m_palette(*this, "palette")
 	{ }
 
@@ -102,6 +103,7 @@ private:
 
 	required_device<beta_disk_device> m_beta;
 	required_device<centronics_device> m_centronics;
+	required_device<glukrs_device> m_glukrs;
 	required_device<device_palette_interface> m_palette;
 
 	bool is_shadow_active() { return m_beta->is_active(); }
@@ -214,6 +216,11 @@ void atm_state::atm_port_fff7_w(offs_t offset, u8 data)
 {
 	if (!is_shadow_active())
 		return;
+
+	if (BIT(data, 7))
+		m_glukrs->enable();
+	else
+		m_glukrs->disable();
 
 	u8 bank = offset >> 14;
 	u8 page = (data & 0xc0) | (~data & 0x3f);
@@ -413,6 +420,11 @@ void atm_state::atm_io(address_map &map)
 	map(0x00fd, 0x00fd).mirror(0xff00).w(FUNC(atm_state::atm_port_7ffd_w));
 	map(0x0077, 0x0077).select(0xff00).w(FUNC(atm_state::atm_port_ff77_w));
 	map(0x00f7, 0x00f7).select(0xff00).w(FUNC(atm_state::atm_port_fff7_w));
+	map(0xdff7, 0xdff7).w(m_glukrs, FUNC(glukrs_device::address_w));
+	map(0xdef7, 0xdef7).w(m_glukrs, FUNC(glukrs_device::address_w)); // TODO shadow only
+	map(0xbff7, 0xbff7).rw(m_glukrs, FUNC(glukrs_device::data_r), FUNC(glukrs_device::data_w));
+	map(0xbef7, 0xbef7).rw(m_glukrs, FUNC(glukrs_device::data_r), FUNC(glukrs_device::data_w)); // TODO shadow only
+	map(0xfadf, 0xfadf).mirror(0x0500).nopr(); // TODO 0xfadf, 0xfbdf, 0xffdf Kempston Mouse
 	map(0x8000, 0x8000).mirror(0x3ffd).w("ay8912", FUNC(ay8910_device::data_w));
 	map(0xc000, 0xc000).mirror(0x3ffd).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 }
@@ -448,6 +460,7 @@ void atm_state::machine_start()
 void atm_state::machine_reset()
 {
 	m_beta->enable();
+	m_glukrs->disable();
 
 	m_port_7ffd_data = 0;
 	m_port_1ffd_data = -1;
@@ -508,6 +521,7 @@ void atm_state::atm(machine_config &config)
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_atm);
 
 	BETA_DISK(config, m_beta, 0);
+	GLUKRS(config, m_glukrs);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "covox");
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
