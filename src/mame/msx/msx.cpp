@@ -746,6 +746,7 @@ public:
 	void cx5m2(machine_config &config);
 	void spc800(machine_config &config);
 	void canonv20(machine_config &config);
+	void canonv20e(machine_config &config);
 	void hb20p(machine_config &config);
 	void mbh25(machine_config &config);
 	void fs4000(machine_config &config);
@@ -2504,7 +2505,7 @@ void msx2_state::msx2plus(machine_config &config)
 	{
 		SOFTWARE_LIST(config, "flop_list").set_original("msx2p_flop");
 		SOFTWARE_LIST(config, "msx2_flp_l").set_compatible("msx2_flop");
-		SOFTWARE_LIST(config, "msx1_flp_l").set_compatible("msx1_flop");    // maybe not?
+		SOFTWARE_LIST(config, "msx1_flp_l").set_compatible("msx1_flop");
 	}
 }
 
@@ -2533,8 +2534,8 @@ void msx2_state::turbor(machine_config &config)
 	{
 		SOFTWARE_LIST(config, "flop_list").set_original("msxr_flop");
 		SOFTWARE_LIST(config, "msx2p_flp_l").set_compatible("msx2p_flop");
-		SOFTWARE_LIST(config, "msx2_flp_l").set_compatible("msx2_flop");    // maybe not?
-		SOFTWARE_LIST(config, "msx1_flp_l").set_compatible("msx1_flop");    // maybe not?
+		SOFTWARE_LIST(config, "msx2_flp_l").set_compatible("msx2_flop");
+		SOFTWARE_LIST(config, "msx1_flp_l").set_compatible("msx1_flop");
 	}
 }
 
@@ -2578,7 +2579,6 @@ ROM_START (ax170)
 	ROM_LOAD("ax170arab.rom", 0x8000, 0x8000, CRC(339cd1aa) SHA1(0287b2ec897b9196788cd9f10c99e1487d7adbbb))
 ROM_END
 
-
 void msx_state::ax170(machine_config &config)
 {
 	// AY8910/YM2149?
@@ -2595,6 +2595,56 @@ void msx_state::ax170(machine_config &config)
 	msx1(TMS9929A, config);
 }
 
+
+/* MSX - Al Fateh 100 - rebranded Sakhr / Al Alamiah AX-170, dump needed to verify */
+
+/* MSX - Al Fateh 123 - rebranded Sakhr / Al Alamiah AX-230, dump needed to verify */
+
+/* MSX - AVT DPC-200 */
+// GSS Z8400A PS cpu
+// AY-3-8910
+// FDC: None, 0 drives
+// 1 Cartridge slot
+// 1 Expansion slot
+// add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+// add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  /* 64KB RAM */
+// add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
+// expansion in slot #3
+
+
+/* MSX - AVT FC-200 - probably same as Goldstar FC-80, dump needed to verify */
+
+
+/* MSX - Bawareth Perfect MSX1 (DPC-200CD) */
+
+ROM_START(perfect1)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("perfect1bios.rom", 0x0000, 0x8000, CRC(a317e6b4) SHA1(e998f0c441f4f1800ef44e42cd1659150206cf79))
+	ROM_LOAD("cpc-200bw_v1_0", 0x8000, 0x8000, CRC(d6373270) SHA1(29a9169b605b5881e4a15fcfd65209a4e8679285))
+ROM_END
+
+void msx_state::perfect1(machine_config &config)
+{
+	// 2 different firmwares
+	// 1987 - English & Arabic
+	// 1990 - Arabic only
+	// GSS Z8400A PS cpu
+	// AY-3-8910
+	// TMS9219
+	// DW64MX1
+	// FDC: None, 0 dribes
+	// 1 Cartridge slot
+
+	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "arab", 0, 1, 1, 2, "maincpu", 0x8000);
+	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 2, 0, 4); // 64KB RAM
+	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
+	// expansion slot in slot #2
+
+	msx1(TMS9129, config);
+}
+
+
 /* MSX - Canon V-8 */
 
 ROM_START(canonv8)
@@ -2604,17 +2654,20 @@ ROM_END
 
 void msx_state::canonv8(machine_config &config)
 {
-	// AY8910/YM2149??
+	// NEC D780C cpu
+	// YM2149 in S3527
 	// FDC: None, 0 drives
-	// 2 Cartridge slots
+	// 1 Cartridge slots
+	// No printer port
 
 	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 3, 1).force_start_address(0xe000);   /* 8KB RAM */
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
+	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 3, 1);
 
-	msx1(TMS9928A, config);
+	m_hw_def.has_printer_port(false);
+	msx1(TMS9118, config);
 }
+
 
 /* MSX - Canon V-10 */
 
@@ -2625,16 +2678,17 @@ ROM_END
 
 void msx_state::canonv10(machine_config &config)
 {
-	// AY8910/YM2149?
+	// Zilog Z80A
+	// YM2149
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
 	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1);   /* 16KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 3, 1);   /* 16KB RAM */
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
+	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 
-	msx1(TMS9929A, config);
+	msx1(TMS9918A, config);
 }
 
 /* MSX - Canon V-20 */
@@ -2646,7 +2700,32 @@ ROM_END
 
 void msx_state::canonv20(machine_config &config)
 {
-	// XTAL: 1431818(Z80/PSG) + 10.6875(VDP)
+	// NEC D780C cpu
+	// XTAL: 14.31818(Z80/PSG) + 10.6875(VDP)
+	// YM2149
+	// TMS9918ANL
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
+
+	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
+	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
+	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
+
+	msx1(TMS9918A, config);
+}
+
+/* MSX - Canon V-20E */
+
+ROM_START(canonv20e)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD("3256m67-5a3_z-2_uk.u20", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
+ROM_END
+
+void msx_state::canonv20e(machine_config &config)
+{
+	// Zilog Z8400A PS Z80A cpu
+	// XTAL: 14.31818(Z80/PSG) + 10.6875(VDP)
 	// YM2149
 	// TMS9929ANL
 	// FDC: None, 0 drives
@@ -2654,18 +2733,11 @@ void msx_state::canonv20(machine_config &config)
 
 	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);  /* 64KB RAM */
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
+	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
+	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
 
 	msx1(TMS9929A, config);
 }
-
-/* MSX - Canon V-20E */
-
-ROM_START(canonv20e)
-	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD("v20ebios.rom", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
-ROM_END
 
 /* MSX - Canon V-20F */
 
@@ -2692,20 +2764,22 @@ ROM_END
 
 ROM_START(mx10)
 	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD( "mx10bios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
+	ROM_LOAD("3256d19-5k3_z-1.g2", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
 ROM_END
 
 void msx_state::mx10(machine_config &config)
 {
-	// FDC: None, 0 drives
-	// 2? Cartridge slots
 	// Z80: uPD780C-1
+	// AY-3-8910
+	// FDC: None, 0 drives
+	// 1 Cartridge slot
+	// 1 Expansion slot for KB-10 to add a printer port and 2 more cartridge slots
 
 	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1); // 16KB RAM
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 
+	m_hw_def.has_cassette(false).has_printer_port(false);
 	msx1(TMS9118, config);
 }
 
@@ -2718,16 +2792,17 @@ ROM_END
 
 void msx_state::mx15(machine_config &config)
 {
-	// FDC: None, 0 drives
-	// 3 Cartridge slots
+	// AY-3-8910
 	// T6950
+	// FDC: None, 0 drives
+	// 1 Cartridge slot
+	// 1 Expansion slot for KB-15 to add a printer port and 2 more cartridge slots
 
 	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1); // 16KB RAM
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
-	add_cartridge_slot<3>(config, MSX_SLOT_CARTRIDGE, "cartslot3", 3, 0, msx_cart, nullptr);
 
+	m_hw_def.has_printer_port(false);
 	msx1(TMS9928A, config);
 }
 
@@ -2735,20 +2810,23 @@ void msx_state::mx15(machine_config &config)
 
 ROM_START(mx101)
 	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD("mx101bios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
+	ROM_LOAD("3256d19-5k3_z-1", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
 ROM_END
 
 void msx_state::mx101(machine_config &config)
 {
+	// Z80: uPD780C-1
+	// AY-3-8910
 	// FDC: None, 0 drives
-	// 2? Cartridge slots
+	// 1 Cartridge slots
+	// 1 Expansion slot for KB-10 to add a printer port and 2 more cartridge slots
 
 	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1); // 16KB RAM
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 
-	msx1(TMS9928A, config);
+	m_hw_def.has_cassette(false).has_printer_port(false);
+	msx1(TMS9118, config);
 }
 
 /* MSX - Casio PV-7 */
@@ -2762,18 +2840,17 @@ void msx_state::pv7(machine_config &config)
 {
 	// AY8910?
 	// FDC: None, 0 drives
-	// 1 Cartridge slot + expansion slot, or 2 cartridge slots?
-	// By adding a Casio KB-7 2 additional cartridge slots become available and 8KB extra RAM?
-	// No cassette port
+	// 1 Cartridge slot
+	// Non-standard cassette port
 	// No printer port
+	// 1 Expansion slot for KB-7 to add a printer port, 2 more cartridge slots, and 8KB RAM
 	// Z80: uPD780C-1
 
 	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1).force_start_address(0xe000);   /* 8KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 
-	m_hw_def.has_cassette(false).has_printer_port(false);
+	m_hw_def.has_printer_port(false);
 	msx1(TMS9118, config);
 }
 
@@ -2781,15 +2858,17 @@ void msx_state::pv7(machine_config &config)
 
 ROM_START(pv16)
 	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD("pv16.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
+	ROM_LOAD("3256d19-5k3_z-1", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
 ROM_END
 
 void msx_state::pv16(machine_config &config)
 {
-	// AY8910
+	// NEC UPD780C
+	// AY-3-8910
 	// FDC: None, 0 drives
 	// 1 Cartridge slot
 	// No printer port
+	// 1 Expansion slot for KB-7 to add a printer port, 2 more cartridge slots, and 8KB RAM
 
 	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1);   /* 16KB RAM */
@@ -2798,6 +2877,8 @@ void msx_state::pv16(machine_config &config)
 	m_hw_def.has_printer_port(false);
 	msx1(TMS9118, config);
 }
+
+/* MSX - CE-TEC MPC-80, German version of Daewoo DPC-200, dump needed to verify */
 
 /* MSX - Daewoo CPC-88 */
 
@@ -3760,28 +3841,6 @@ void msx_state::cf2700g(machine_config &config)
 	msx1(TMS9929A, config);
 }
 
-/* MSX - Perfect Perfect1 */
-
-ROM_START(perfect1)
-	ROM_REGION(0x18000, "maincpu", 0)
-	ROM_LOAD("perfect1bios.rom", 0x0000, 0x8000, CRC(a317e6b4) SHA1(e998f0c441f4f1800ef44e42cd1659150206cf79))
-	ROM_LOAD("perfect1arab.rom", 0x8000, 0x8000, CRC(6db04a4d) SHA1(01012a0e2738708861f66b6921b2e2108f2edb54))
-	ROM_RELOAD(0x10000, 0x8000)
-ROM_END
-
-void msx_state::perfect1(machine_config &config)
-{
-	// AY8910/YM2149?
-	// FDC: None, 0 dribes
-	// 1 Cartridge slot
-
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
-	add_internal_slot(config, MSX_SLOT_ROM, "arab", 0, 1, 0, 4, "maincpu", 0x8000);
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 2, 0, 4); // 64KB RAM
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-
-	msx1(TMS9929A, config);
-}
 
 /* MSX - Philips NMS-801 */
 
@@ -9214,10 +9273,10 @@ COMP(1986, ax170,      0,        0,     ax170,      msx,      msx_state, empty_i
 COMP(1983, canonv8,    0,        0,     canonv8,    msx,      msx_state, empty_init, "Canon", "V-8 (MSX1)", 0)
 COMP(1983, canonv10,   canonv20, 0,     canonv10,   msx,      msx_state, empty_init, "Canon", "V-10 (MSX1)", 0)
 COMP(1983, canonv20,   0,        0,     canonv20,   msx,      msx_state, empty_init, "Canon", "V-20 (MSX1)", 0)
-COMP(1983, canonv20e,  canonv20, 0,     canonv20,   msx,      msx_state, empty_init, "Canon", "V-20E (MSX1)", 0) // Different Euro keyboard layout?
-COMP(1983, canonv20f,  canonv20, 0,     canonv20,   msx,      msx_state, empty_init, "Canon", "V-20F (MSX1)", 0) // Different French keyboard layout?
-COMP(1983, canonv20g,  canonv20, 0,     canonv20,   msx,      msx_state, empty_init, "Canon", "V-20G (MSX1)", 0) // Different German keyboard layout?
-COMP(1983, canonv20s,  canonv20, 0,     canonv20,   msx,      msx_state, empty_init, "Canon", "V-20S (MSX1)", 0) // Different Spanish keyboard layout?
+COMP(1983, canonv20e,  canonv20, 0,     canonv20e,  msx,      msx_state, empty_init, "Canon", "V-20E (MSX1)", 0) // Different Euro keyboard layout?
+COMP(1983, canonv20f,  canonv20, 0,     canonv20e,  msx,      msx_state, empty_init, "Canon", "V-20F (MSX1)", 0) // Different French keyboard layout?
+COMP(1983, canonv20g,  canonv20, 0,     canonv20e,  msx,      msx_state, empty_init, "Canon", "V-20G (MSX1)", 0) // Different German keyboard layout?
+COMP(1983, canonv20s,  canonv20, 0,     canonv20e,  msx,      msx_state, empty_init, "Canon", "V-20S (MSX1)", 0) // Different Spanish keyboard layout?
 COMP(1984, mx10,       0,        0,     mx10,       msx,      msx_state, empty_init, "Casio", "MX-10 (MSX1)", 0)
 COMP(1984, mx101,      mx10,     0,     mx101,      msx,      msx_state, empty_init, "Casio", "MX-101 (MSX1)", 0)
 COMP(1984, mx15,       mx10,     0,     mx15,       msx,      msx_state, empty_init, "Casio", "MX-15 (MSX1)", 0)
