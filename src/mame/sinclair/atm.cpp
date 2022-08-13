@@ -125,10 +125,7 @@ void atm_state::atm_update_memory()
 	LOGMEM("7FFD.%d = %X:", BIT(m_port_7ffd_data, 4), (m_port_7ffd_data & 0x07));
 	for (auto bank = 0; bank < 4 ; bank++)
 	{
-		u8 page = pen_page(bank);
-		if (!m_pen)
-			page = ROM_MASK;
-
+		u8 page = m_pen ? pen_page(bank) : ROM_MASK;
 		if (page & PEN_RAM_MASK)
 		{
 			if (page & PEN_DOS7FFD_MASK)
@@ -391,19 +388,19 @@ void atm_state::atm_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).bankrw(m_bank_ram[0]);
 	map(0x0000, 0x3fff).view(m_bank_view0);
-	m_bank_view0[0](0x0000, 0x3fff).bankr(m_bank_rom[0]);
+	m_bank_view0[0](0x0000, 0x3fff).bankr(m_bank_rom[0]).nopw();
 
 	map(0x4000, 0x7fff).bankrw(m_bank_ram[1]);
 	map(0x4000, 0x7fff).view(m_bank_view1);
-	m_bank_view1[0](0x4000, 0x7fff).bankr(m_bank_rom[1]);
+	m_bank_view1[0](0x4000, 0x7fff).bankr(m_bank_rom[1]).nopw();
 
 	map(0x8000, 0xbfff).bankrw(m_bank_ram[2]);
 	map(0x8000, 0xbfff).view(m_bank_view2);
-	m_bank_view2[0](0x8000, 0xbfff).bankr(m_bank_rom[2]);
+	m_bank_view2[0](0x8000, 0xbfff).bankr(m_bank_rom[2]).nopw();
 
 	map(0xc000, 0xffff).bankrw(m_bank_ram[3]);
 	map(0xc000, 0xffff).view(m_bank_view3);
-	m_bank_view3[0](0xc000, 0xffff).bankr(m_bank_rom[3]);
+	m_bank_view3[0](0xc000, 0xffff).bankr(m_bank_rom[3]).nopw();
 }
 
 void atm_state::atm_io(address_map &map)
