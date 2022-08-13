@@ -215,7 +215,7 @@ void tsconf_state::machine_reset()
 {
 	m_bank0_rom.select(0);
 
-	m_port_f7_ext = DISABLED;
+	m_glukrs->disable();
 
 	m_scanline_delayed_regs_update = {};
 	m_regs[V_CONFIG] = 0x00;        // 00000000
