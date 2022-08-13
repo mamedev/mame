@@ -69,8 +69,6 @@
  *   - 16x NEC D482235G5 Dual Port Graphics Buffers: not emulated
  *   - Brooktree Bt468KG220 RAMDAC: not emulated
  *
- *  ~2GB HD image that plays well with the NEWS-OS installer: `chdman createhd -o test.chd -s 2088960000`
- *
  *  Known issues:
  *  - Monitor ROM command `ss -r` doesn't show most register values. Not sure what mechanism the APmonitor uses to get the register dump.
  *    (TLB dump is also broken, but unlike the register dump, the TLB dump is broken on the real NWS-5000X too.
@@ -647,15 +645,11 @@ void news_r4k_state::cpu_map(address_map &map)
  */
 void news_r4k_state::cpu_map_main_memory(address_map &map)
 {
-	// After spending some quality time with the monitor ROM in the debugger, I did find that
-	// only enabling 0x2000000-0x3ffffff after a certain point in the boot process allowed the
-	// monitor ROM to initialize and complete memtest fully.
-	// This works for the monitor ROM, NEWS-OS kernel, and NetBSD kernel.
+	// The mapping mechanism was determined experimentally and only supports the 64MB configuration for now.
+	// This works for the monitor ROM, NEWS-OS kernel, and NetBSD kernel but will not work with other amounts of RAM.
 	map(0x0, 0x7ffffff).rw(FUNC(news_r4k_state::ram_r), FUNC(news_r4k_state::ram_w));
 
 	// Not 100% sure where the below lives on the system. This seems to be related to memory and perhaps APbus init.
-	// This was all developed by inspecting a real NWS-5000X.
-	// Hopefully, we will be able to determine more about this over time.
 	map(0x14400000, 0x14400003).lr32(NAME([](offs_t offset)
 										  { return 0x0; }));
 	map(0x14400004, 0x14400007).lr32(NAME([](offs_t offset)
@@ -888,50 +882,46 @@ void news_r4k_state::led_state_w(offs_t offset, uint32_t data)
 /*
  * apbus_virt_to_phys
  *
- * Maps a given virtual APbus address to a physical address. See the below comment for more information.
+ * The APbus has its own virtual->physical addressing scheme. Like the CPU's TLB, the host OS
+ * is responsible for populating the APbus TLB. The `apbus_pte` struct defines what each entry looks like. Note that to avoid
+ * bit-order dependencies and other platform-specific stuff, in this implementation, valid, coherent, pad2, and pfnum are
+ * separate variables, but the actual register is packed like this:
+ *
+ * 0x xxxx xxxx xxxx xxxx
+ *   |   pad   |  entry  |
+ *
+ * Entry is packed as follows:
+ * 0b    x      x     xxxxxxxxxx xxxxxxxxxxxxxxxxxxxx
+ *    |valid|coherent|    pad2  |       pfnum        |
+ *
+ * The APbus requires RAM to hold the TLB. On the NWS-5000X, this is 128KiB starting at physical address 0x14c20000 (and goes to 0x14c3ffff)
+ *
+ * For example, the monitor ROM populates the PTEs as follows in response to a `dl` command.
+ * Addr       PTE1             PTE2
+ * 0x14c20000 0000000080103ff5 0000000080103ff6
+ *
+ * It also loads the `address` register of the DMAC3 with 0xd60.
+ *
+ * This will cause the consuming ASIC (in this case, the DMAC3) to start mapping from virtual address 0xd60 to physical address 0x3ff5d60.
+ * If the address register goes beyond 0xFFF, bit 12 will increment. This will increase the page number so the virtual address will be
+ * 0x1000, and will cause the DMAC to use the next PTE (in this case, the next sequential page, 0x3ff6000).
+ *
+ * NetBSD splits the mapping RAM into two sections, one for each DMAC3 controller. If the OS does not keep track, the ASICs
+ * could end up in a configuration that would cause them to overwrite each other's data. NEWS-OS makes even more extensive
+ * use of APbus DMA, including the WSC-SONIC3 for network DMA.
+ *
+ * Another note: NetBSD mentions that the `pad2` section of the register is 10 bits. However, this might not be fully accurate.
+ * On the NWS-5000X, the physical address bus is 36 bits because it has an R4400SC. The 32nd bit is sometimes set, depending
+ * on the virtual address being used (maybe it goes to the memory controller). It doesn't impact the normal operation of the
+ * computer, but does mean that the `pad2` section might only be 6 bits, not 10 bits.
  */
 uint32_t news_r4k_state::apbus_virt_to_phys(uint32_t v_address)
 {
-	/*
-	 * The APbus has its own virtual->physical addressing scheme. Like the CPU's TLB, the host OS
-	 * is responsible for populating the APbus TLB. The `apbus_pte` struct defines what each entry looks like. Note that to avoid
-	 * bit-order dependencies and other platform-specific stuff, in this implementation, valid, coherent, pad2, and pfnum are
-	 * separate variables, but the actual register is packed like this:
-	 *
-	 * 0x xxxx xxxx xxxx xxxx
-	 *   |   pad   |  entry  |
-	 *
-	 * Entry is packed as follows:
-	 * 0b    x      x     xxxxxxxxxx xxxxxxxxxxxxxxxxxxxx
-	 *    |valid|coherent|    pad2  |       pfnum        |
-	 *
-	 * The APbus requires RAM to hold the TLB. On the NWS-5000X, this is 128KiB starting at physical address 0x14c20000 (and goes to 0x14c3ffff)
-	 *
-	 * For example, the monitor ROM populates the PTEs as follows in response to a `dl` command.
-	 * Addr       PTE1             PTE2
-	 * 0x14c20000 0000000080103ff5 0000000080103ff6
-	 *
-	 * It also loads the `address` register of the DMAC3 with 0xd60.
-	 *
-	 * This will cause the consuming ASIC (in this case, the DMAC3) to start mapping from virtual address 0xd60 to physical address 0x3ff5d60.
-	 * If the address register goes beyond 0xFFF, bit 12 will increment. This will increase the page number so the virtual address will be
-	 * 0x1000, and will cause the DMAC to use the next PTE (in this case, the next sequential page, 0x3ff6000).
-	 *
-	 * NetBSD splits the mapping RAM into two sections, one for each DMAC3 controller. If the OS does not keep track, the ASICs
-	 * could end up in a configuration that would cause them to overwrite each other's data. NEWS-OS makes even more extensive
-	 * use of APbus DMA, including the WSC-SONIC3 for network DMA.
-	 *
-	 * Another note: NetBSD mentions that the `pad2` section of the register is 10 bits. However, this might not be fully accurate.
-	 * On the NWS-5000X, the physical address bus is 36 bits because it has an R4400SC. The 32nd bit is sometimes set, depending
-	 * on the virtual address being used (maybe it goes to the memory controller). It doesn't impact the normal operation of the
-	 * computer, but does mean that the `pad2` section might only be 6 bits, not 10 bits.
-	 */
-
 	// Convert page number to PTE address and read raw PTE data from the APbus DMA mapping RAM
 	uint32_t apbus_page_address = APBUS_DMA_MAP_ADDRESS + 8 * (v_address >> 12);
 	if (apbus_page_address >= (APBUS_DMA_MAP_ADDRESS + APBUS_DMA_MAP_RAM_SIZE))
 	{
-		fatalerror("APbus address decoder ran past the bounds of the DMA map RAM!");
+		fatalerror("%s: APbus address decoder ran past the bounds of the DMA map RAM!", tag());
 	}
 
 	uint64_t raw_pte = m_cpu->space(0).read_qword(apbus_page_address);
@@ -943,11 +933,11 @@ uint32_t news_r4k_state::apbus_virt_to_phys(uint32_t v_address)
 	pte.pad2 = (raw_pte & ENTRY_PAD) >> ENTRY_PAD_SHIFT;
 	pte.pfnum = raw_pte & ENTRY_PFNUM;
 
-	// This might be able to trigger some kind of interrupt - for now, we'll mark it as a fatal error, but this can be improved for sure.
-	// My suspicion is that this would trigger INT4 based on the NetBSD source.
+	// This might be able to trigger some kind of interrupt - for now, treat as a fatal error.
+	// However, based on the NetBSD source, this would likely trigger INT4.
 	if (!pte.valid)
 	{
-		fatalerror("APbus DMA TLB out of universe! Raw PTE (v_address = 0x%x, page_address = 0x%x): 0x%x\n", v_address, apbus_page_address, raw_pte);
+		fatalerror("%s: APbus DMA referenced invalid entry! Raw PTE (v_address = 0x%x, page_address = 0x%x): 0x%x\n", tag(), v_address, apbus_page_address, raw_pte);
 	}
 
 	// Since the entry is valid, use it to calculate the physical address
