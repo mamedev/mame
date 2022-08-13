@@ -772,7 +772,7 @@ void monon_color_state::out4_w(uint8_t data)
 void monon_color_state::monon_color(machine_config &config)
 {
 	/* basic machine hardware */
-	AX208(config, m_maincpu, 96000000); // (8051 / MCS51 derived) incomplete core!
+	AX208(config, m_maincpu, 96000000/2);
 	m_maincpu->port_in_cb<0>().set(FUNC(monon_color_state::in0_r));
 	m_maincpu->port_in_cb<1>().set(FUNC(monon_color_state::in1_r));
 	m_maincpu->port_in_cb<2>().set(FUNC(monon_color_state::in2_r));
