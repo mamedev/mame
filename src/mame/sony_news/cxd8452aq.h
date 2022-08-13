@@ -70,9 +70,10 @@ protected:
 	bool m_irq = false;
 	emu_timer *m_irq_check;
 
-	// APbus DMA
+	// Bus/DMA related members
 	device_delegate<uint32_t(uint32_t)> m_apbus_virt_to_phys_callback;
 	required_address_space m_bus;
+	memory_access<64, 3, 0, ENDIANNESS_BIG>::cache m_net_cache;
 	emu_timer *m_dma_check;
 
 	// Bus configuration

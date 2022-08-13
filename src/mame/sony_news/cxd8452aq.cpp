@@ -73,6 +73,7 @@ void cxd8452aq_device::sonic_bus_map(address_map &map)
 
 void cxd8452aq_device::device_start()
 {
+	m_bus->cache(m_net_cache);
 	m_irq_handler.resolve_safe();
 	m_apbus_virt_to_phys_callback.resolve();
 	m_irq_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cxd8452aq_device::irq_check), this));
@@ -252,7 +253,7 @@ TIMER_CALLBACK_MEMBER(cxd8452aq_device::dma_check)
 		// Move byte from SONIC RAM to main memory
 		uint8_t data = space(0).read_byte(m_sonic3_reg.rx_sonic_address & 0xffff);
 		LOGMASKED(LOG_DATA, "sonic3.rx(0x%x -> 0x%x, data=0x%x)\n", m_sonic3_reg.rx_sonic_address, m_sonic3_reg.rx_host_address, data);
-		m_bus->write_byte(m_apbus_virt_to_phys_callback(m_sonic3_reg.rx_host_address), data);
+		m_net_cache.write_byte(m_apbus_virt_to_phys_callback(m_sonic3_reg.rx_host_address), data);
 		m_sonic3_reg.rx_count -= 1;
 		m_sonic3_reg.rx_sonic_address += 1;
 		m_sonic3_reg.rx_host_address += 1;
@@ -269,7 +270,7 @@ TIMER_CALLBACK_MEMBER(cxd8452aq_device::dma_check)
 	if (txDmaActive)
 	{
 		// Move byte from main memory to SONIC RAM
-		uint8_t data = m_bus->read_byte(m_apbus_virt_to_phys_callback(m_sonic3_reg.tx_host_address));
+		uint8_t data = m_net_cache.read_byte(m_apbus_virt_to_phys_callback(m_sonic3_reg.tx_host_address));
 		LOGMASKED(LOG_DATA, "sonic3.tx(0x%x -> 0x%x, data=0x%x)\n", m_sonic3_reg.tx_host_address, m_sonic3_reg.tx_sonic_address, data);
 		space(0).write_byte(m_sonic3_reg.tx_sonic_address & 0xffff, data);
 		m_sonic3_reg.tx_count -= 1;
