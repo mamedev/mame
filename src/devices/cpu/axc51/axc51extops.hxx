@@ -302,7 +302,7 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 		uint8_t i = (prm & 0x01) >> 0;
 
 		uint16_t dpt = get_dpt(i);
-		uint16_t val = m_io.read_byte(dpt);
+		uint16_t val = m_io.read_word(dpt);
 
 		set_erx(n, val);
 
@@ -320,7 +320,7 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 		uint16_t dpt = get_dpt(i);
 		uint16_t val = get_erx(n);
 
-		m_io.write_byte(dpt, val);  
+		m_io.write_word(dpt, val);  
 
 		do_ez_flags(val);
 
@@ -527,7 +527,7 @@ void axc51base_cpu_device::extended_a5_0f()
 		uint8_t i = (prm2 & 0x01) >> 0;
 
 		uint16_t dpt = get_dpt(i);
-		uint16_t val = m_io.read_byte(dpt);
+		uint16_t val = m_io.read_word(dpt);
 		uint16_t val2 = get_erx(n);
 
 		uint32_t res = val - val2 - (GET_EC);
@@ -553,7 +553,7 @@ void axc51base_cpu_device::extended_a5_0f()
 		uint16_t dpt = get_dpt(i);
 		uint32_t res = val - val2 - (GET_EC);
 
-		m_io.write_byte(dpt, res);  
+		m_io.write_word(dpt, res);  
 
 		do_ec_ez_flags(res);
 
