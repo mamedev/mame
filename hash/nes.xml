@@ -11492,17 +11492,19 @@ license:CC0
 	</software>
 
 	<software name="f15cws" cloneof="f15cw">
-		<description>F15 City War (Spa)</description>
+		<description>F15 City War (Spain)</description>
 		<year>1990</year>
 		<publisher>Gluk Video</publisher>
+		<info name="serial" value="MGC-006"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="nina006" />
+			<feature name="slot" value="txc_strikew" />
+			<feature name="pcb_model" value="TXC 01-22000-400" />
 			<feature name="mirroring" value="horizontal" />
-			<dataarea name="chr" size="32768">
-				<rom name="1.chr" size="32768" crc="c470fadc" sha1="ab8634df0bdce15934291e66fea0c1ce4d69835c" offset="00000" />
-			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="f15 city war (spain) (gluk video) (unl).prg" size="32768" crc="8406ed8b" sha1="08ba83615527eff4b4c971a195c574127fd5f716" offset="00000" status="baddump" />
+				<rom name="04-00611-000.u1" size="32768" crc="8406ed8b" sha1="08ba83615527eff4b4c971a195c574127fd5f716" />
+			</dataarea>
+			<dataarea name="chr" size="32768">
+				<rom name="04-00611-010.u2" size="32768" crc="c470fadc" sha1="ab8634df0bdce15934291e66fea0c1ce4d69835c" />
 			</dataarea>
 		</part>
 	</software>
@@ -29936,18 +29938,19 @@ license:CC0
 	</software>
 
 	<software name="puzzles" cloneof="puzzle">
-		<description>Puzzle (Spa)</description>
-		<year>1990?</year>
+		<description>Puzzle (Spain)</description>
+		<year>1990</year>
 		<publisher>Gluk Video</publisher>
+		<info name="serial" value="MGC-007"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="nina006" />
-			<feature name="pcb" value="AVE-NINA-03" />
+			<feature name="slot" value="txc_strikew" />
+			<feature name="pcb_model" value="TXC 01-22000-400" />
 			<feature name="mirroring" value="horizontal" />
-			<dataarea name="chr" size="32768">
-				<rom name="puzzle (spain) (gluk video) (unl).chr" size="32768" crc="6e7fcd59" sha1="ec36c47e143b47ccaae2b0a82047337d59ea169e" offset="00000" status="baddump" />
-			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="puzzle (spain) (gluk video) (unl).prg" size="32768" crc="78dbbc07" sha1="1e61985360265db50dff716b1c1e72f0958ca53c" offset="00000" status="baddump" />
+				<rom name="04-00721-000.u1" size="32768" crc="78dbbc07" sha1="1e61985360265db50dff716b1c1e72f0958ca53c" />
+			</dataarea>
+			<dataarea name="chr" size="32768">
+				<rom name="04-00721-010.u2" size="32768" crc="6e7fcd59" sha1="ec36c47e143b47ccaae2b0a82047337d59ea169e" />
 			</dataarea>
 		</part>
 	</software>
@@ -56329,38 +56332,39 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 	<!-- From GoodNES -->
 	<software name="strikwlf" supported="no"> <!-- crashes right before first boss -->
-		<description>Strike Wolf (Taiwan)</description>
-		<year>19??</year>
-		<publisher>TXC Corp</publisher>
-		<info name="serial" value="MGC-014"/>
+		<description>Strike Wolf (Spain, Taiwan)</description>
+		<year>1992</year>
+		<publisher>Gluk Video / TXC Corp</publisher>
+		<info name="serial" value="MGC-014 (TXC)"/>
+		<info name="serial" value="VJ-002-C (Gluk)"/>
+		<info name="alt_title" value="Comando De Lobos"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txc_strikew" />
-			<feature name="pcb" value="TXC-STRIKEWOLF" />
+			<feature name="pcb_model" value="TXC 01-22000-400" />
 			<feature name="mirroring" value="vertical" />
-			<dataarea name="chr" size="131072">
-				<rom name="strike wolf (mgc-014).chr" size="131072" crc="06b9a5d2" sha1="f5623278dc2a57fdbdcdf2aefe2713efc964cca8" offset="00000" status="baddump" />
-			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="strike wolf (mgc-014).prg" size="131072" crc="3e7abb2a" sha1="dd253b75a3e5c474d8d3b1c8ce50d6c5c57e7005" offset="00000" status="baddump" />
+				<rom name="04-prg01-000.u1" size="131072" crc="3e7abb2a" sha1="dd253b75a3e5c474d8d3b1c8ce50d6c5c57e7005" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="04-pat01-000.u2" size="131072" crc="06b9a5d2" sha1="f5623278dc2a57fdbdcdf2aefe2713efc964cca8" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="policemn">
 		<description>Policeman (Spain, Taiwan)</description>
-		<year>19??</year>
+		<year>1992</year>
 		<publisher>Gluk Video / TXC Corp</publisher>
 		<info name="serial" value="MGC-015"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txc_strikew" />
-			<feature name="pcb" value="TXC-STRIKEWOLF" />
+			<feature name="pcb_model" value="TXC 01-22000-400" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="bus_conflict" value="no" />
-			<dataarea name="chr" size="65536">
-				<rom name="policeman (mgc-015).chr" size="65536" crc="f73ee39e" sha1="0142d357b7a8e38c720bef9a13250da76dbc0738" offset="00000" status="baddump" />
-			</dataarea>
 			<dataarea name="prg" size="65536">
-				<rom name="policeman (mgc-015).prg" size="65536" crc="65fe1590" sha1="be06c1c9c76bf270e83e98f6c5a79ff4d5589c59" offset="00000" status="baddump" />
+				<rom name="04-01512-000.u1" size="65536" crc="65fe1590" sha1="be06c1c9c76bf270e83e98f6c5a79ff4d5589c59" />
+			</dataarea>
+			<dataarea name="chr" size="65536">
+				<rom name="04-01512-010.u2" size="65536" crc="f73ee39e" sha1="0142d357b7a8e38c720bef9a13250da76dbc0738" />
 			</dataarea>
 		</part>
 	</software>
@@ -67049,20 +67053,20 @@ We don't include these hacks because they were not burned into real carts nor so
 	</software>
 
 	<software name="venicebvs" cloneof="venicebv">
-		<description>Venice Beach Volleyball (Spa)</description>
-		<year>19??</year>
+		<description>Venice Beach Volleyball (Spain)</description>
+		<year>1991</year>
 		<publisher>Gluk Video</publisher>
 		<info name="serial" value="MGC10-B"/>
 		<info name="alt_title" value="Volleyball (on the cart label)"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="nina006" />
-			<feature name="pcb" value="TXC-74*138/175" />
+			<feature name="slot" value="txc_strikew" />
+			<feature name="pcb_model" value="TXC 01-22000-400" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
-				<rom name="04-01021-010" size="32768" crc="42812dae" sha1="99c14bf5b80eafc0d94d966d4de21cea7b6df1d3" offset="00000" />
+				<rom name="04-01021-000.u1" size="32768" crc="42812dae" sha1="99c14bf5b80eafc0d94d966d4de21cea7b6df1d3" />
 			</dataarea>
 			<dataarea name="chr" size="32768">
-				<rom name="04-01021-000" size="32768" crc="382e6a7b" sha1="9c344a8ced4073a95ef35e10dfc49a38389d2b11" offset="00000" />
+				<rom name="04-01021-010.u2" size="32768" crc="382e6a7b" sha1="9c344a8ced4073a95ef35e10dfc49a38389d2b11" />
 			</dataarea>
 		</part>
 	</software>
