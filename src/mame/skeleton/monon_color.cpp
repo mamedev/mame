@@ -25,9 +25,10 @@
 #include "sound/dac.h"
 
 #define LOG_VDP (1U <<  1)
+#define LOG_SPI (1U <<  2)
 
 //#define VERBOSE     (LOG_VDP)
-#define VERBOSE     (0)
+#define VERBOSE     (LOG_SPI)
 
 #include "logmacro.h"
 
@@ -66,8 +67,13 @@ private:
 		READY_FOR_HSADDRESS0 = 0x06,
 		READY_FOR_HSDUMMY = 0x07,
 
-		READY_FOR_READ = 0x08,
-		READY_FOR_STATUS_READ = 0x09,
+		READY_FOR_WRITEADDRESS2 = 0x08,
+		READY_FOR_WRITEADDRESS1 = 0x09,
+		READY_FOR_WRITEADDRESS0 = 0x0a,
+		READY_FOR_WRITE = 0x0b,
+
+		READY_FOR_READ = 0x0c,
+		READY_FOR_STATUS_READ = 0x0d,
 	};
 
 	required_device<generic_slot_device> m_cart;
@@ -177,7 +183,50 @@ void monon_color_state::spibuf_w(uint8_t data)
 			{
 				m_spi_state = READY_FOR_HSADDRESS2;
 			}
+			else if (data == 0x06)
+			{
+				// write enable
+				m_spi_state = READY_FOR_COMMAND;
+			}
+			else if (data == 0x04)
+			{
+				// write disable
+				m_spi_state = READY_FOR_COMMAND;
+			}
+			else if (data == 0x02)
+			{
+				// page program
+				m_spi_state = READY_FOR_WRITEADDRESS2;
+			}
+			else
+			{
+				fatalerror( "SPI set to unknown mode %02x\n", data);
+			}
 			break;
+
+		case READY_FOR_WRITEADDRESS2:
+			m_spiaddr = (m_spiaddr & 0x00ffff) | (data << 16);
+			m_spi_state = READY_FOR_WRITEADDRESS1;
+			break;
+
+		case READY_FOR_WRITEADDRESS1:
+			m_spiaddr = (m_spiaddr & 0xff00ff) | (data << 8);
+			m_spi_state = READY_FOR_WRITEADDRESS0;
+			break;
+
+		case READY_FOR_WRITEADDRESS0:
+			m_spiaddr = (m_spiaddr & 0xffff00) | (data);
+			m_spi_state = READY_FOR_WRITE;
+			LOGMASKED(LOG_SPI, "SPI set to page WRITE mode with address %08x\n", m_spiaddr);
+			break;
+
+		case READY_FOR_WRITE:
+			LOGMASKED(LOG_SPI, "Write SPI data %02x\n", data);
+
+			m_spiptr[(m_spiaddr++) & 0xffffff] = data;
+
+			break;
+
 
 		case READY_FOR_ADDRESS2:
 			m_spiaddr = (m_spiaddr & 0x00ffff) | (data << 16);
@@ -193,6 +242,7 @@ void monon_color_state::spibuf_w(uint8_t data)
 			m_spiaddr = (m_spiaddr & 0xffff00) | (data);
 			m_spi_state = READY_FOR_READ;
 			m_spidir = 1;
+			LOGMASKED(LOG_SPI, "SPI set to READ mode with address %08x\n", m_spiaddr);
 			break;
 
 		case READY_FOR_HSADDRESS2:
@@ -213,7 +263,7 @@ void monon_color_state::spibuf_w(uint8_t data)
 		case READY_FOR_HSDUMMY:
 			m_spi_state = READY_FOR_READ;
 			m_spidir = 1;
-
+			LOGMASKED(LOG_SPI, "SPI set to High Speed READ mode with address %08x\n", m_spiaddr);
 			break;
 		}
 	}
