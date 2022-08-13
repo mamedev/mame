@@ -427,7 +427,7 @@ void news_r4k_state::machine_common(machine_config &config)
 
 	SCC85230(config, m_escc, 9.8304_MHz_XTAL);
 
-	RS232_PORT(config, m_serial[0], default_rs232_devices, "pty");
+	RS232_PORT(config, m_serial[0], default_rs232_devices, "terminal");
 	m_serial[0]->cts_handler().set(m_escc, FUNC(z80scc_device::ctsa_w));
 	m_serial[0]->dcd_handler().set(m_escc, FUNC(z80scc_device::dcda_w));
 	m_serial[0]->rxd_handler().set(m_escc, FUNC(z80scc_device::rxa_w));
