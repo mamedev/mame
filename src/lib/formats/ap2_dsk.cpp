@@ -1747,17 +1747,17 @@ bool a2_woz_format::load(util::random_read &io, uint32_t form_factor, const std:
 				for(uint32_t i=0; i != track_size; i++)
 					total_ticks += img[boff+i];
 
-				// Assumptions: track starts at index, there's no flux
-				// change at index, there's no flux change at the end
-
+				// Assume there is always a pulse at index, and it's
+				// the last one in the stream
 				std::vector<uint32_t> &buf = image->get_buffer(track, head, subtrack);
+				buf.push_back(floppy_image::MG_F | 0);
 				uint32_t cpos = 0;
 				for(uint32_t i=0; i != track_size; i++) {
 					uint8_t step = img[boff+i];
 					cpos += step;
 					if(step != 0xff && i != track_size-1)
-						buf.push_back(uint64_t(cpos)*200000000/total_ticks);
-				}				
+						buf.push_back(floppy_image::MG_F | uint64_t(cpos)*200000000/total_ticks);
+				}
 
 			} else if(idx != 0xff) {
 				uint32_t trks_off = off_trks + (idx * 8);

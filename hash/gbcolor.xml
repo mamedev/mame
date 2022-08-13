@@ -3799,7 +3799,7 @@ license:CC0
 		<publisher>Konami</publisher>
 		<info name="serial" value="CGB-BDGJ-JPN (RK209-J1)"/>
 		<info name="release" value="20000803"/>
-		<info name="alt_title" value="ダンスダンスレボリューションGB "/>
+		<info name="alt_title" value="ダンスダンスレボリューションGB"/>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A09-01" />
@@ -7660,7 +7660,7 @@ license:CC0
 		<description>Gyouten Ningen Batseelor - Doctor Guy no Yabou (Japan)</description>
 		<year>2001</year>
 		<publisher>Konami</publisher>
-		<info name="serial" value="CGB-BB6J-JPN (RK266-J1) "/>
+		<info name="serial" value="CGB-BB6J-JPN (RK266-J1)"/>
 		<info name="release" value="20011101"/>
 		<info name="alt_title" value="仰天人間バトシーラー ドクトル・ガイの野望"/>
 		<sharedfeat name="compatibility" value="GBC"/>
@@ -7932,7 +7932,7 @@ license:CC0
 		<publisher>TDK Core</publisher>
 		<info name="serial" value="CGB-B87J-JPN"/>
 		<info name="release" value="20010727"/>
-		<info name="alt_title" value="花より男子  アナザーラブストーリー"/>
+		<info name="alt_title" value="花より男子 アナザーラブストーリー"/>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A08-10" />
@@ -9609,7 +9609,7 @@ license:CC0
 		<publisher>Culture Brain</publisher>
 		<info name="serial" value="DMG-AKHJ-JPN"/>
 		<info name="release" value="19990409"/>
-		<info name="alt_title" value="加藤一二三 九段の 将棋教室 "/>
+		<info name="alt_title" value="加藤一二三 九段の 将棋教室"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc5" />
@@ -25135,7 +25135,7 @@ license:CC0
 		<publisher>Sintax</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_licheng" />
-			<dataarea name="rom"  size="4194304">
+			<dataarea name="rom" size="4194304">
 				<rom name="e mo cheng dx (sintax) (unl).bin" size="4194304" crc="5c388c6d" sha1="7919fe7b54a5bc53ebacc13dd338be9e841dadf7" offset="0" />
 			</dataarea>
 			<dataarea name="nvram" size="32768">
@@ -25703,7 +25703,7 @@ license:CC0
 		<publisher>Sintax</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
-			<dataarea name="rom"  size="2097152">
+			<dataarea name="rom" size="2097152">
 				<rom name="digimon crystal ii (unlicensed, english) [raw dump].bin" size="2097152" crc="685e76df" sha1="4e981044ac3a40d7a9cd63b79d5982b4b4e670a5" offset="0" />
 			</dataarea>
 			<dataarea name="nvram" size="32768">
@@ -25718,7 +25718,7 @@ license:CC0
 		<info name="alt_title" value="老夫子傳奇"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
-			<dataarea name="rom"  size="2097152">
+			<dataarea name="rom" size="2097152">
 				<rom name="lao fuzi chuanqi (unlicensed, chinese) [raw dump].bin" size="2097152" crc="aeca45be" sha1="b7193fcb8b9b8958a2522be0d1a3874cffc1e1db" offset="0" />
 			</dataarea>
 			<dataarea name="nvram" size="32768">
@@ -25733,7 +25733,7 @@ license:CC0
 		<info name="alt_title" value="越南戰役X-深入敵後"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
-			<dataarea name="rom"  size="2097152">
+			<dataarea name="rom" size="2097152">
 				<rom name="yuenan zhanyi x - shenru dihou (unlicensed, chinese) [raw dump].bin" size="2097152" crc="602951a6" sha1="6703e9f68b989c976e93bd2eb63f884ceaff63f1" offset="0" />
 			</dataarea>
 			<dataarea name="nvram" size="32768">
@@ -25748,7 +25748,7 @@ license:CC0
 		<info name="alt_title" value="七龍珠Z3"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
-			<dataarea name="rom"  size="2097152">
+			<dataarea name="rom" size="2097152">
 				<rom name="qi long zhu z 3 (dragon ball - advance adventure) (unlicensed, chinese) [raw dump].bin" size="2097152" crc="ccfdd63a" sha1="4f3b63cd11522b6fb291661f4d918601d95138e0" offset="0" />
 			</dataarea>
 			<dataarea name="nvram" size="32768">

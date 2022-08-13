@@ -6258,7 +6258,7 @@ license:CC0
 		<year>1991</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="DMG-EAA" />
-		<info name="release" value="19910809 " />
+		<info name="release" value="19910809" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="0x10000">

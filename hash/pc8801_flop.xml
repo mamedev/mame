@@ -2443,7 +2443,7 @@ ExtractDisk  [02]"SAGA#1          " -> "adventure land_02.d88"
 	</software>
 
 	<!-- hangs at Starcraft logo -->
-	<!-- FDC stalls [Finds a CHRN=(11 01 0a 01) but fails scan ID?]  -->
+	<!-- FDC stalls [Finds a CHRN=(11 01 0a 01) but fails scan ID?] -->
 	<software name="amazongta" cloneof="amazongt" supported="no">
 		<description>Amazon Gakujutsu Tanken (alt)</description>
 		<year>1984</year>
@@ -48292,7 +48292,7 @@ ExtractDisk  [09]"第4集 B     " -> "jam vol.1 (alt)_09.d88"
 		<description>Chili Tomato</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<!-- TODO: does it really not work on MA 4MHz? Keeps spinning at BASIC otherwise  -->
+		<!-- TODO: does it really not work on MA 4MHz? Keeps spinning at BASIC otherwise -->
 		<info name="usage" value="Set 8MHz mode on a PC8801MA+"/>
 
 		<part name="flop1" interface="floppy_5_25">

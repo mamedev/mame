@@ -11661,7 +11661,10 @@ ct486                           // 1993? 486 with CS4031
 megatrix
 
 @source:casio/ctk551.cpp
+ap10                            //
 ctk551                          //
+ctk601                          //
+gz70sp                          //
 
 @source:casio/ctk2000.cpp
 ctk2100                         //
@@ -33317,6 +33320,7 @@ dendy2                          // Dendy Classic 2 (Russian import of IQ-502 fam
 sb486                           // Subor/Xiao Ba Wang SB-486
 drpcjr                          // Bung Doctor PC Jr
 famicom                         // Nintendo Family Computer (a.k.a. Famicom)
+famitvc1                        // Sharp My Computer Terebi C1
 famitwin                        // Sharp Famicom Twin System
 fds                             // Nintendo Family Computer (a.k.a. Famicom) + Disk System add-on
 gchinatv                        // Golden China TV Game Centre (Chinese famiclone)
@@ -34172,6 +34176,7 @@ mspacmbmc                       // bootleg (Marti Colls / Falgas)
 mspacmbn                        // bootleg
 mspacmnf                        // hack
 mspacpls                        // hack
+mspackpls                       // hack
 mspactwin                       // (c) 1992 SUSILU
 newpuc2                         // hack
 newpuc2b                        // hack

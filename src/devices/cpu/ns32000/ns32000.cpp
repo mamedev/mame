@@ -991,11 +991,15 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						SP -= 4;
 						mem_write<u32>(ST_ODT, SP, m_pc + bytes);
 
-						tex = top(SIZE_D, m_mod + 4) + top(SIZE_W, link_base + index * 4) * 2 + top(SIZE_W, SP) + top(SIZE_D, SP) + top(SIZE_D, u16(desc)) * 2 + 16;
+						u16 const mod = u16(desc);
+						u32 const sb = mem_read<u32>(ST_ODT, mod + 0);
+						u32 const pc = mem_read<u32>(ST_ODT, mod + 8) + (desc >> 16);
 
-						m_mod = u16(desc);
-						m_sb = mem_read<u32>(ST_ODT, m_mod + 0);
-						m_pc = mem_read<u32>(ST_ODT, m_mod + 8) + (desc >> 16);
+						tex = top(SIZE_D, m_mod + 4) + top(SIZE_W, link_base + index * 4) * 2 + top(SIZE_W, SP) + top(SIZE_D, SP) + top(SIZE_D, mod) * 2 + 16;
+
+						m_pc = pc;
+						m_mod = mod;
+						m_sb = sb;
 						m_sequential = false;
 					}
 					break;
@@ -1005,13 +1009,17 @@ template <int Width> void ns32000_device<Width>::execute_run()
 					{
 						s32 const constant = displacement(bytes);
 
-						m_pc = mem_read<u32>(ST_ODT, SP);
+						u32 const pc = mem_read<u32>(ST_ODT, SP);
 						SP += 4;
-						m_mod = mem_read<u16>(ST_ODT, SP);
+						u16 const mod = mem_read<u16>(ST_ODT, SP);
 						SP += 4;
+						u32 const sb = mem_read<u32>(ST_ODT, mod);
 
-						m_sb = mem_read<u32>(ST_ODT, m_mod + 0);
-						tex = top(SIZE_D, SP) + top(SIZE_W, SP) + top(SIZE_D, SP) + 2;
+						tex = top(SIZE_D, SP) + top(SIZE_W, SP) + top(SIZE_D, mod) + 2;
+
+						m_pc = pc;
+						m_mod = mod;
+						m_sb = sb;
 						SP += constant;
 						m_sequential = false;
 					}
@@ -1023,19 +1031,22 @@ template <int Width> void ns32000_device<Width>::execute_run()
 					{
 						s32 const constant = displacement(bytes);
 
-						u32 &sp(SP);
-						m_pc = mem_read<u32>(ST_ODT, sp);
-						sp += 4;
-						m_mod = mem_read<u16>(ST_ODT, sp);
-						sp += 2;
-						m_psr = mem_read<u16>(ST_ODT, sp) & PSR_MSK;
-						sp += 2;
+						u32 const pc = mem_read<u32>(ST_ODT, SP);
+						SP += 4;
+						u16 const mod = mem_read<u16>(ST_ODT, SP);
+						SP += 2;
+						u16 const psr = mem_read<u16>(ST_ODT, SP) & PSR_MSK;
+						SP += 2;
+						u32 const sb = mem_read<u32>(ST_ODT, mod);
 
-						m_sb = mem_read<u32>(ST_ODT, m_mod);
+						tex = top(SIZE_D, SP) + top(SIZE_W, SP) * 2 + top(SIZE_D, mod) + 35;
 
+						m_pc = pc;
+						m_mod = mod;
+						m_psr = psr;
+						m_sb = sb;
 						SP += constant;
 						m_sequential = false;
-						tex = top(SIZE_D, sp) + top(SIZE_W, sp) * 2 + top(SIZE_D, m_mod) + 35;
 					}
 					else
 						interrupt(ILL, m_pc);
@@ -1059,20 +1070,23 @@ template <int Width> void ns32000_device<Width>::execute_run()
 							}
 						}
 
-						u32 &sp(SP);
-						m_pc = mem_read<u32>(ST_ODT, sp);
-						sp += 2;
-						mem_read<u16>(ST_ODT, sp);
-						sp += 2;
-						m_mod = mem_read<u16>(ST_ODT, sp);
-						sp += 2;
-						m_psr = mem_read<u16>(ST_ODT, sp) & PSR_MSK;
-						sp += 2;
+						u32 const pc = mem_read<u32>(ST_ODT, SP);
+						SP += 2;
+						mem_read<u16>(ST_ODT, SP);
+						SP += 2;
+						u16 const mod = mem_read<u16>(ST_ODT, SP);
+						SP += 2;
+						u16 const psr = mem_read<u16>(ST_ODT, SP) & PSR_MSK;
+						SP += 2;
+						u32 const sb = mem_read<u32>(ST_ODT, mod);
 
-						m_sb = mem_read<u32>(ST_ODT, m_mod);
+						tex = top(SIZE_B) + top(SIZE_W, SP) * 3 + top(SIZE_D) * 3 + 39;
+
+						m_pc = pc;
+						m_mod = mod;
+						m_psr = psr;
+						m_sb = sb;
 						m_sequential = false;
-
-						tex = top(SIZE_B) + top(SIZE_W) * 3 + top(SIZE_D) * 3 + 39;
 					}
 					else
 						interrupt(ILL, m_pc);
@@ -1122,8 +1136,8 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 						SP -= 4;
 						mem_write<u32>(ST_ODT, SP, m_fp);
+						u32 const fp = SP;
 						tex = top(SIZE_D, SP) + 18;
-						m_fp = SP;
 						SP -= constant;
 
 						for (unsigned i = 0; i < 8; i++)
@@ -1135,6 +1149,8 @@ template <int Width> void ns32000_device<Width>::execute_run()
 								tex += top(SIZE_D, SP) + 4;
 							}
 						}
+
+						m_fp = fp;
 					}
 					break;
 				case 0x9:
@@ -1420,12 +1436,15 @@ template <int Width> void ns32000_device<Width>::execute_run()
 							mem_write<u32>(ST_ODT, SP, m_pc + bytes);
 
 							u32 const desc = mem_read<u32>(ST_ODT, address);
+							u16 const mod = u16(desc);
+							u32 const sb = mem_read<u32>(ST_ODT, mod + 0);
+							u32 const pc = mem_read<u32>(ST_ODT, mod + 8) + (desc >> 16);
 
-							m_mod = u16(desc);
-							m_sb = mem_read<u32>(ST_ODT, m_mod + 0);
-							m_pc = mem_read<u32>(ST_ODT, m_mod + 8) + (desc >> 16);
+							tex = mode[0].tea + top(SIZE_W, address) * 3 + top(SIZE_D, mod) * 3 + 13;
 
-							tex = mode[0].tea + top(SIZE_W, address) * 3 + top(SIZE_D, m_mod) * 3 + 13;
+							m_pc = pc;
+							m_mod = mod;
+							m_sb = sb;
 							m_sequential = false;
 						}
 						else
@@ -3339,9 +3358,6 @@ template <int Width> void ns32000_device<Width>::execute_run()
 								mode[0].addr();
 								decode(mode, bytes);
 
-								// dummy read
-								mem_read<u8>(ST_ODT, ea(mode[0]), true);
-
 								u16 const status = slave(opbyte, opword, mode[0], mode[1]);
 								if (!(status & ns32000_slave_interface::SLAVE_Q))
 								{
@@ -3363,9 +3379,6 @@ template <int Width> void ns32000_device<Width>::execute_run()
 							{
 								mode[0].addr();
 								decode(mode, bytes);
-
-								// dummy read
-								mem_read<u8>(ST_ODT, ea(mode[0]), true);
 
 								u16 const status = slave(opbyte, opword, mode[0], mode[1]);
 								if (!(status & ns32000_slave_interface::SLAVE_Q))
@@ -3491,7 +3504,7 @@ template <int Width> device_memory_interface::space_config_vector ns32000_device
 
 template <int Width> bool ns32000_device<Width>::memory_translate(int spacenum, int intention, offs_t &address)
 {
-	return !m_mmu || m_mmu->translate(space(spacenum), spacenum, address, intention & TRANSLATE_USER_MASK, intention & TRANSLATE_WRITE, false, intention & TRANSLATE_DEBUG_MASK) == ns32000_mmu_interface::COMPLETE;
+	return !m_mmu || m_mmu->translate(space(spacenum), spacenum, address, m_psr & PSR_U, intention & TRANSLATE_WRITE, false, intention & TRANSLATE_DEBUG_MASK) == ns32000_mmu_interface::COMPLETE;
 }
 
 template <int Width> std::unique_ptr<util::disasm_interface> ns32000_device<Width>::create_disassembler()
@@ -3559,6 +3572,16 @@ template <int Width> u16 ns32000_device<Width>::slave_slow(ns32000_slow_slave_in
 			slave.write_op(u16(data >> 48));
 			break;
 		}
+	}
+	else if (op1.access == ADDR)
+	{
+		u32 const data = ea(op1);
+
+		slave.write_op(u16(data >> 0));
+		slave.write_op(u16(data >> 16));
+
+		// single-byte memory read cycle
+		mem_read<u8>(ST_ODT, data, true);
 	}
 
 	if ((op2.access == READ || op2.access == RMW) && !(op2.type == REG && op2.slave))
@@ -3639,6 +3662,15 @@ template <int Width> u16 ns32000_device<Width>::slave_fast(ns32000_fast_slave_in
 			slave.write(u32(data >> 32));
 			break;
 		}
+	}
+	else if (op1.access == ADDR)
+	{
+		u32 const data = ea(op1);
+
+		slave.write(u32(data));
+
+		// single-byte memory read cycle
+		mem_read<u8>(ST_ODT, data, true);
 	}
 
 	if ((op2.access == READ || op2.access == RMW) && !(op2.type == REG && op2.slave))

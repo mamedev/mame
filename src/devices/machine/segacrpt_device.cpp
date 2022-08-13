@@ -109,7 +109,7 @@
   315-5013      Super Zaxxon            used Zaxxon for known plaintext attack
   315-5014      Buck Rogers / Zoom 909  unencrypted version available
   315-5015      Super Locomotive
-  315-5018      Yamato
+  315-5018      Yamato                  seems to have been copied by Falcon for Falcons Wild - World Wide Poker
   ???-????      Top Roller              same key as Yamato
   315-5028      Sindbad Mystery
   315-5030      Up'n Down               unencrypted version available

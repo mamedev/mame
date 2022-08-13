@@ -68,6 +68,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 --------------------------------------------------------------------
  @CP0904A  TMS0970   1977, Milton Bradley Comp IV
  @MP0905B  TMS0970   1977, Parker Brothers Codename Sector
+ *MP0027   TMS1000   1977, Chromatronics Chroma-Chime
  *MP0057   TMS1000   1978, APH Student Speech+ (same ROM contents as TSI Speech+?)
  @MP0154   TMS1000   1979, Fonas 2 Player Baseball
  @MP0158   TMS1000   1979, Entex Soccer (6003)
@@ -75,6 +76,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP0166   TMS1000   1980, A-One Arrange Ball/LJN Computer Impulse/Tandy Zingo (model 60-2123)
  @MP0168   TMS1000   1979, Conic Multisport/Tandy Sports Arena (model 60-2158)
  @MP0170   TMS1000   1979, Conic Football
+ *MP0171   TMS1000   1979, Tomy Soccer
  *MP0220   TMS1000   1980, Tomy Teacher
  @MP0230   TMS1000   1980, Entex Blast It (6015)
  @MP0271   TMS1000   1982, Radio Shack Monkey See
@@ -106,7 +108,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP1231   TMS1100   1984, Tandy 3 in 1 Sports Arena (model 60-2178)
  @MP1296   TMS1100   1982, Entex Black Knight Pinball (6081)
  @MP1311   TMS1100   1981, Bandai TC7: Air Traffic Control
- @MP1312   TMS1100   1983, Gakken FX-Micom R-165/Radio Shack Science Fair Microcomputer Trainer
+ @MP1312   TMS1100   1981, Gakken FX-Micom R-165/Radio Shack Science Fair Microcomputer Trainer
  *MP1359   TMS1100?  1985, Capsela CRC2000
  @MP1525   TMS1170   1980, Coleco Head to Head: Electronic Baseball
  @MP1604   TMS1370   1982, Gakken Invader 2000/Tandy Cosmic Fire Away 3000
@@ -125,11 +127,14 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  *MP3207   TMS1000   1978, Concept 2000 Lite 'n Learn: Electronic Organ (model 554)
  @MP3208   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750B)
  @MP3226   TMS1000   1978, Milton Bradley Simon (Rev A)
+ *MP3228   TMS1000   1979, Texas Instruments melody chip
  *MP3232   TMS1000   1979, Fonas 2 Player Baseball (no "MP" on chip label)
  @MP3260   TMS1000   1979, Electroplay Quickfire
  @MP3300   TMS1000   1979, Milton Bradley Simon (Rev F)
  @MP3301A  TMS1000   1979, Milton Bradley Big Trak
+ *MP3310   TMS1000   1979, Texas Instruments melody chip
  *MP3312   TMS1000   1980, Nathan Mega 10000
+ *MP3318   TMS1000   1979, Texas Instruments melody chip
  @MP3320A  TMS1000   1979, Coleco Head to Head: Electronic Basketball
  @MP3321A  TMS1000   1979, Coleco Head to Head: Electronic Hockey
  @MP3352   TMS1200   1979, Tiger Sub Wars (model 7-490)
@@ -1116,7 +1121,7 @@ ROM_END
   Canon Palmtronic F-31, Canon Canola L813, Toshiba BC-8111B, Toshiba BC-8018B,
   Triumph-Adler 81 SN, Silver-Reed 8J, more
   * TMS1040 MCU label TMS1045NL (die label: 1040A, 1045)
-  * 9-digit cyan VFD display (leftmost may be custom)
+  * 9-digit cyan VFD (leftmost may be custom)
 
   TMS1045NL is a versatile calculator chip for 3rd party manufacturers, used
   by Canon, Toshiba, and several smaller companies. It doesn't look like it
@@ -1284,7 +1289,7 @@ ROM_END
   Canon Palmtronic MD-8 (Multi 8) / Canon Canola MD 810
   * PCB label: Canon EHI-0115-03
   * TMS1070 MCU label TMC1079 (die label: 1070B, 1079A)
-  * 2-line cyan VFD display, each 9-digit 7seg + 1 custom (label 20-ST-22)
+  * 2-line cyan VFD, each 9-digit 7seg + 1 custom (label 20-ST-22)
 
   The only difference between MD-8 and MD 810 is the form factor. The latter
   is a tabletop calculator.
@@ -2217,7 +2222,7 @@ ROM_END
   Coleco Head to Head: Electronic Baseball (model 2180)
   * PCB labels: Coleco rev C 73891/2
   * TMS1170NLN MP1525-N2 (die label: 1170A, MP1525)
-  * 9-digit cyan VFD display, and other LEDs behind bezel, 1-bit sound
+  * 9-digit cyan VFD, and other LEDs behind bezel, 1-bit sound
 
   known releases:
   - USA: Head to Head: Electronic Baseball, published by Coleco
@@ -4762,7 +4767,7 @@ ROM_END
 
   Entex Color Football 4
   * TMS1670 6009 MP7551 (die label: TMS1400, MP7551, 40H 01D D000 R000)
-  * 9-digit cyan VFD display, 60 red and green LEDs behind mask, 1-bit sound
+  * 9-digit cyan VFD, 60 red and green LEDs behind mask, 1-bit sound
 
   Another version exist, one with a LED(red) 7seg display.
 
@@ -5672,7 +5677,7 @@ ROM_END
   Gakken Poker
   * PCB label: POKER. gakken
   * TMS1370 MP2105 (die label: 1170, MP2105)
-  * 11-digit cyan VFD display Itron FG1114B, oscillator sound
+  * 11-digit cyan VFD Itron FG1114B, oscillator sound
 
   known releases:
   - Japan: Poker, published by Gakken
@@ -5827,7 +5832,7 @@ ROM_END
   Gakken Jackpot: Gin Rummy & Black Jack
   * PCB label: gakken
   * TMS1670 MPF553 (die label: TMS1400, MPF553, 40H 01D D000 R000)
-  * 11-digit cyan VFD display Itron FG1114B, oscillator sound
+  * 11-digit cyan VFD Itron FG1114B, oscillator sound
 
   known releases:
   - Japan: Jackpot(?), published by Gakken
@@ -5950,7 +5955,7 @@ ROM_END
   Gakken Invader
   * PCB label: GAKKEN, INVADER, KS-00779
   * TMS1370 MP2110 (die label: 1370, MP2110)
-  * cyan VFD display Itron? CP5008A, 1-bit sound
+  * cyan VFD Itron? CP5008A, 1-bit sound
 
   known releases:
   - World: Invader, published by Gakken
@@ -6068,7 +6073,7 @@ ROM_START( ginv )
 	ROM_LOAD( "tms1100_ginv_output.pla", 0, 365, CRC(6e33a24e) SHA1(cdf7ecf12ddd3863e6301e20fe80f9737db429e5) )
 
 	ROM_REGION( 142959, "screen", 0)
-	ROM_LOAD( "ginv.svg", 0, 142959, CRC(b0dc9bac) SHA1(18f8cc51a432d14f08fdf766275222f3ed184d89) )
+	ROM_LOAD( "ginv.svg", 0, 142959, CRC(36a04f56) SHA1(a81c80e51d0a9d2855bf026236a257cf771be35c) )
 ROM_END
 
 
@@ -6079,7 +6084,7 @@ ROM_END
 
   Gakken Invader 1000
   * TMS1370 MP2139 (die label: 1170, MP2139)
-  * cyan/red VFD display Futaba DM-25Z 2D, 1-bit sound
+  * cyan/red VFD Futaba DM-25Z 2D, 1-bit sound
 
   known releases:
   - World: Galaxy Invader 1000, published by Gakken
@@ -6109,9 +6114,7 @@ private:
 
 void ginv1000_state::update_display()
 {
-	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,9,8,7);
-	u16 plate = bitswap<16>(m_plate,15,14,13,12,3,4,7,8,9,10,11,2,6,5,1,0);
-	m_display->matrix(grid, plate);
+	m_display->matrix(m_grid, m_plate);
 }
 
 void ginv1000_state::write_r(u32 data)
@@ -6194,8 +6197,8 @@ ROM_START( ginv1000 )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_ginv1000_output.pla", 0, 365, CRC(b0a5dc41) SHA1(d94746ec48661998173e7f60ccc7c96e56b3484e) )
 
-	ROM_REGION( 227224, "screen", 0)
-	ROM_LOAD( "ginv1000.svg", 0, 227224, CRC(f220711a) SHA1(729ad85fb9d9853a77c45b5ed072f10ede7649c4) )
+	ROM_REGION( 227219, "screen", 0)
+	ROM_LOAD( "ginv1000.svg", 0, 227219, CRC(4b21599a) SHA1(fbb728e44e504ab2169e0ee491a9ff3a231a717c) )
 ROM_END
 
 
@@ -6207,7 +6210,7 @@ ROM_END
   Gakken Invader 2000
   * TMS1370(28 pins) MP1604 (die label: 1370A, MP1604)
   * TMS1024 I/O expander
-  * cyan/red/green VFD display, 1-bit sound
+  * cyan/red/green VFD, 1-bit sound
 
   known releases:
   - World: Invader 2000, published by Gakken
@@ -6339,7 +6342,7 @@ ROM_START( ginv2000 )
 	ROM_LOAD( "tms1100_ginv2000_output.pla", 0, 365, CRC(520bb003) SHA1(1640ae54f8dcc257e0ad0cbe0281b38fcbd8da35) )
 
 	ROM_REGION( 374443, "screen", 0)
-	ROM_LOAD( "ginv2000.svg", 0, 374443, CRC(a4ce1e6d) SHA1(57d9ff05d634a8d495b9d544a2a959790cd10b6b) )
+	ROM_LOAD( "ginv2000.svg", 0, 374443, CRC(7fb7ac44) SHA1(3cb0cd453433fd65afcdf0e206c79c83b9687913) )
 ROM_END
 
 
@@ -6948,7 +6951,7 @@ ROM_END
 
   Kosmos Astro
   * TMS1470NLHL MP1133 (die label: TMS1400, MP1133, 28H 01D D000 R000)
-  * 9-digit 7seg VFD display + 8 LEDs(4 green, 4 yellow), no sound
+  * 9-digit 7seg VFD + 8 LEDs(4 green, 4 yellow), no sound
 
   This is an astrological calculator, and also supports 4-function
   calculations. Refer to the official manual on how to use this device.
@@ -11324,7 +11327,7 @@ ROM_END
 
   TI-2550 III, TI-1650/TI-1600, TI-1265 (they have the same chip)
   * TMS1040 MCU label TMS1043NL ZA0352 (die label: 1040A, 1043A)
-  * 9-digit cyan VFD display
+  * 9-digit cyan VFD
 
   Only the TI-2550 III has the top button row (RV, SQRT, etc).
   TI-1600 doesn't have the memory buttons.
@@ -12367,7 +12370,7 @@ ROM_END
   TI-1680, TI-2550-IV
   * TMS1980 MCU label TMC1981NL (die label: 1980A 81F)
   * TMC0999NL 256x4 RAM (die label: 0999B)
-  * 9-digit cyan VFD display(leftmost digit is custom)
+  * 9-digit cyan VFD(leftmost digit is custom)
 
   The extra RAM is for scrolling back through calculations. For some reason,
   TI-2550-IV has the same hardware, this makes it very different from II and III.
@@ -12513,7 +12516,7 @@ ROM_END
 
   TI DataMan
   * TMS1980 MCU label TMC1982NL (die label: 1980A 82B)
-  * 10-digit cyan VFD display(3 digits are custom)
+  * 10-digit cyan VFD(3 digits are custom)
 
 ***************************************************************************/
 
@@ -12643,7 +12646,7 @@ ROM_END
 
   TI Math Marvel
   * TMS1980 MCU label TMC1986A-NL (die label: 1980A 86A)
-  * 9-digit cyan VFD display(2 digits are custom), 1-bit sound
+  * 9-digit cyan VFD(2 digits are custom), 1-bit sound
 
   This is the same hardware as DataMan, with R8 connected to a piezo.
 
@@ -14142,7 +14145,7 @@ ROM_END
   * PCB label: TOFL-001A / B
   * TMS1475 MP6354 (die label: TMS1175 /TMS1475, MP6354, 40H-PASS-0900-R300-0)
     note: no TMS1xxx label on MCU, PCB says "TMS1375L" but that can't be right
-  * cyan/red/green VFD display NEC FIP11AM32T no. 2-8, 1-bit sound
+  * cyan/red/green VFD NEC FIP11AM32T no. 2-8, 1-bit sound
 
   known releases:
   - Japan: The Dracula, published by Tsukuda
@@ -14256,7 +14259,7 @@ ROM_START( tdracula )
 	ROM_LOAD( "tms1400_tdracula_output.pla", 0, 557, CRC(54408672) SHA1(8fdc6910a27c22c1df2cadeb25c74118d5774481) )
 
 	ROM_REGION( 416612, "screen", 0)
-	ROM_LOAD( "tdracula.svg", 0, 416612, CRC(71b5e164) SHA1(357528d5df7433609931cd9f9a2e5d56fbd29774) )
+	ROM_LOAD( "tdracula.svg", 0, 416612, CRC(b4e723dc) SHA1(7d90aa92755727fc21f3b2913cd5d86f8594ea20) )
 ROM_END
 
 
@@ -14269,7 +14272,7 @@ ROM_END
   * PCB label: TOFL003
   * TMS2670 M95041 (die label: TMS2400, M95041, 40H-01D-ND02-PHI0032-TTL O300-R300)
   * TMS1024 I/O expander
-  * cyan/red/green VFD display NEC FIP9AM31T no. 21-84, 1-bit sound
+  * cyan/red/green VFD NEC FIP9AM31T no. 21-84, 1-bit sound
 
   Two versions are known, one with a red trigger button and blue slot button,
   and one with a blue trigger button and red slot button. The game itself is
@@ -14785,7 +14788,7 @@ CONS( 1980, gjackpot,   0,         0, gjackpot,  gjackpot,  gjackpot_state,  emp
 CONS( 1980, ginv,       0,         0, ginv,      ginv,      ginv_state,      empty_init, "Gakken", "Invader (Gakken, cyan version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, ginv1000,   0,         0, ginv1000,  ginv1000,  ginv1000_state,  empty_init, "Gakken", "Galaxy Invader 1000", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, ginv2000,   0,         0, ginv2000,  ginv2000,  ginv2000_state,  empty_init, "Gakken", "Invader 2000", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, fxmcr165,   0,         0, fxmcr165,  fxmcr165,  fxmcr165_state,  empty_init, "Gakken", "FX-Micom R-165", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1981, fxmcr165,   0,         0, fxmcr165,  fxmcr165,  fxmcr165_state,  empty_init, "Gakken", "FX-Micom R-165", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1979, elecdet,    0,         0, elecdet,   elecdet,   elecdet_state,   empty_init, "Ideal Toy Corporation", "Electronic Detective", MACHINE_SUPPORTS_SAVE ) // ***
 

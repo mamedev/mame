@@ -51860,7 +51860,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>2000</year>
 		<publisher>Media Entertainment</publisher>
 		<info name="serial" value="SLPS-03108" />
-		<info name="release" value="20001228 " />
+		<info name="release" value="20001228" />
 		<info name="alt_title" value="パチスロ帝王〜バトルナイト・アトランチスドーム〜"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">

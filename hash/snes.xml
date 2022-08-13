@@ -363,7 +363,7 @@ Beyond that last category are the roms waiting to be classified.
 <!-- Pending
 
     <software name="srobot3rc" cloneof="srobot3">
-        <description>Dai-3-ji Super Robot Taisen (Jpn, Rev. C)</description>
+        <description>Dai-3-ji Super Robot Taisen (Japan, Rev. C)</description>
         <year>1993</year>
         <publisher>Banpresto</publisher>
         <info name="serial" value="SHVC-RT" />
@@ -392,7 +392,7 @@ Beyond that last category are the roms waiting to be classified.
     </software>
 
     <software name="ggoemon3ra" cloneof="ggoemon3">
-        <description>Ganbare Goemon 3 - Shishi Juurokubee no Karakuri Manjigatame (Jpn, Rev. A)</description>
+        <description>Ganbare Goemon 3 - Shishi Juurokubee no Karakuri Manjigatame (Japan, Rev. A)</description>
         <year>1994</year>
         <publisher>Konami</publisher>
         <info name="serial" value="SHVC-2U" />
@@ -419,7 +419,7 @@ Beyond that last category are the roms waiting to be classified.
     </software>
 
     <software name="shinkoukra" cloneof="shinkouk">
-        <description>Shinchou Kouki (Jpn, Rev. A)</description>
+        <description>Shinchou Kouki (Japan, Rev. A)</description>
         <year>1993</year>
         <publisher>Yanoman Games</publisher>
         <info name="serial" value="SHVC-NT" />
@@ -445,7 +445,7 @@ Beyond that last category are the roms waiting to be classified.
     </software>
 
     <software name="tsukiko1" cloneof="tsukiko">
-        <description>Tsukikomori (Jpn, v1.1, NP)</description>
+        <description>Tsukikomori (Japan, v1.1, NP)</description>
         <year>1996</year>
         <publisher>Banpresto</publisher>
         <info name="serial" value="SHVC-A7MJ-JPN" />
@@ -683,7 +683,7 @@ Beyond that last category are the roms waiting to be classified.
 <!--
     <software name="biometalup" cloneof="biometal">
         <!- - retrogamesuk - ->
-        <description>BioMetal (USA, Prototype 19930716)</description>
+        <description>BioMetal (USA, prototype 19930716)</description>
         <year>1993</year>
         <publisher>Activision</publisher>
         <part name="cart" interface="snes_cart">
@@ -733,7 +733,7 @@ Beyond that last category are the roms waiting to be classified.
 <!--
     <software name="brainiesup" cloneof="brainies">
         <!- - retrogamesuk - ->
-        <description>The Brainies (USA, Prototype 19930522)</description>
+        <description>The Brainies (USA, prototype 19930522)</description>
         <year>1996</year>
         <publisher>Titus</publisher>
         <info name="release" value="199604xx" />
@@ -918,7 +918,7 @@ Beyond that last category are the roms waiting to be classified.
 <!--
     <software name="clocktowpa" cloneof="clocktow">
         <!- -  Laurent - ->
-        <description>Clock Tower (Jpn, Prototype with 3 sample games)</description>
+        <description>Clock Tower (Japan, prototype with 3 sample games)</description>
         <year>1995</year>
         <publisher>Human Entertainment</publisher>
         <part name="cart" interface="snes_cart">
@@ -1104,7 +1104,7 @@ Beyond that last category are the roms waiting to be classified.
 		</part>
 	</software>
 
-	<software name="dsp1demo" supported="no"> <!-- possibly corrupt -->
+	<software name="dsp1demo">
 		<!-- nintendoplayer.com -->
 		<description>DSP1 Tech Demo (USA, prototype)</description>
 		<year>1992</year>
@@ -1114,7 +1114,7 @@ Beyond that last category are the roms waiting to be classified.
 			<feature name="enhancement" value="DSP1" />
 			<feature name="pcb" value="SHVC-2Q5B-03" />
 			<feature name="u1" value="U1 4/2/1M EPROM(J)" />
-			<feature name="u2" value="U2 4/2/1M EPROM(J)" /><!-- empty socket -->
+			<feature name="u2" value="U2 4/2/1M EPROM(J)" /> <!-- empty socket -->
 			<feature name="u3" value="U3 256/64K SRAM" /> <!-- empty socket -->
 			<feature name="u4" value="U4 D77C25/P25" /> <!-- Nintendo DSP1 Chip 065 9250HX012 -->
 			<feature name="u5" value="U5 74F138" />
@@ -1793,7 +1793,7 @@ Beyond that last category are the roms waiting to be classified.
 <!--
     <software name="jammitp" cloneof="jammit">
         <!- - retrogamesuk - ->
-        <description>Jammit (USA, Prototype 19940301)</description>
+        <description>Jammit (USA, prototype 19940301)</description>
         <year>1994</year>
         <publisher>GTE Entertainment</publisher>
         <part name="cart" interface="snes_cart">
@@ -2123,7 +2123,7 @@ Beyond that last category are the roms waiting to be classified.
 <!--
     <software name="mickeyucp" cloneof="mickeyuc">
         <!- - retrogamesuk - ->
-        <description>Mickey's Ultimate Challenge (USA, Prototype 19931103)</description>
+        <description>Mickey's Ultimate Challenge (USA, prototype 19931103)</description>
         <year>1994</year>
         <publisher>Hi Tech Expressions</publisher>
         <part name="cart" interface="snes_cart">
@@ -2353,7 +2353,7 @@ Beyond that last category are the roms waiting to be classified.
 <!--
     <software name="natschwrp" cloneof="natschwr">
         <!- - retrogamesuk - ->
-        <description>Natsume Championship Wrestling (USA, Prototype)</description>
+        <description>Natsume Championship Wrestling (USA, prototype)</description>
         <year>1994</year>
         <publisher>Natsume</publisher>
         <part name="cart" interface="snes_cart">
@@ -2447,7 +2447,7 @@ Beyond that last category are the roms waiting to be classified.
 <!--
     <software name="nflqb96up2" cloneof="nflqb96">
         <!- - retrogamesuk - ->
-        <description>NFL Quarterback Club 96 (USA, Alternate Prototype?)</description>
+        <description>NFL Quarterback Club 96 (USA, alternate prototype?)</description>
         <year>1995</year>
         <publisher>Acclaim Entertainment</publisher>
         <part name="cart" interface="snes_cart">
@@ -2544,7 +2544,7 @@ Beyond that last category are the roms waiting to be classified.
 <!--
     <software name="pilotwinp" cloneof="pilotwin">
         <!- - Van Halen - ->
-        <description>Pilotwings (Jpn, Prototype 19901025)</description>
+        <description>Pilotwings (Japan, prototype 19901025)</description>
         <year>1990</year>
         <publisher>Nintendo</publisher>
         <part name="cart" interface="snes_cart">
@@ -3059,7 +3059,7 @@ Beyond that last category are the roms waiting to be classified.
 <!--
     <software name="speedyup2" cloneof="speedy">
         <!- - retrogamesuk - ->
-        <description>Speedy Gonzales in Los Gatos Bandidos (USA, Prototype 19950125)</description>
+        <description>Speedy Gonzales in Los Gatos Bandidos (USA, prototype 19950125)</description>
         <year>1995</year>
         <publisher></publisher>
         <part name="cart" interface="snes_cart">
@@ -3253,7 +3253,7 @@ Beyond that last category are the roms waiting to be classified.
 <!--
     <software name="sbombmn2j" cloneof="sbombmn2">
         <!- - Retrology - ->
-        <description>Super Bomberman 2 (Jpn, Prototype)</description>
+        <description>Super Bomberman 2 (Japan, prototype)</description>
         <year>1994</year>
         <publisher>Hudson</publisher>
         <info name="alt_title" value="スーパーボンバーマン2" />
@@ -3487,7 +3487,7 @@ Beyond that last category are the roms waiting to be classified.
     <software name="smkartupa" cloneof="smkart">
         <!- - Van Halen - ->
         <!- - Notes: this earlier prototype has a lot more memory than the final release - ->
-        <description>Super Mario Kart (USA, Prototype)</description>
+        <description>Super Mario Kart (USA, prototype)</description>
         <year>1992</year>
         <publisher>Nintendo</publisher>
         <info name="release" value="1992" />
@@ -3625,7 +3625,7 @@ Beyond that last category are the roms waiting to be classified.
 <!--
     <software name="spinbalup" cloneof="spinbal">
         <!- - retrogamesuk - ->
-        <description>Super Pinball - Behind the Mask (USA, Prototype)</description>
+        <description>Super Pinball - Behind the Mask (USA, prototype)</description>
         <year>1994</year>
         <publisher>Nintendo</publisher>
         <part name="cart" interface="snes_cart">
@@ -3707,7 +3707,7 @@ Beyond that last category are the roms waiting to be classified.
 <!--
     <software name="suprsokop" cloneof="suprsoko">
         <!- - retrogamesuk - ->
-        <description>Super Soukoban (Jpn?, Prototype)</description>
+        <description>Super Soukoban (Japan?, prototype)</description>
         <year>1993</year>
         <publisher>Pack-In-Video</publisher>
         <info name="alt_title" value="スーパー倉庫番" />
@@ -3928,7 +3928,7 @@ Beyond that last category are the roms waiting to be classified.
 <!--
     <software name="ultramanj" cloneof="ultraman">
         <!- - retrogamesuk - ->
-        <description>Ultraman (Jpn)</description>
+        <description>Ultraman (Japan)</description>
         <year>1991</year>
         <publisher>Bandai</publisher>
         <info name="alt_title" value="ウルトラマン" />
@@ -4461,7 +4461,7 @@ Beyond that last category are the roms waiting to be classified.
 	<software name="mickmack">
 		<!-- Notes: not much is known about this prototype, but it was shown during the Winter 1993 CES
 		        the header was likely hacked with a bbs phone number -->
-		<description>Mick &amp; Mack as the Global Gladiators (USA, prototype Hacked)</description>
+		<description>Mick &amp; Mack as the Global Gladiators (USA, prototype, hacked)</description>
 		<year>1993</year>
 		<publisher>Virgin Games</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -5035,7 +5035,7 @@ more investigation needed...
 		</part>
 	</software>
 
-	<software name="digimon"> <!-- TODO: source -->
+	<software name="digimon" supported="no"> <!-- TODO: source -->
 	<!-- Protection notes: write latch byte to 88xxxx, then reads back BITSWAP8(latch,0,6,7,1,2,3,4,5) from 80xxxx -->
 		<description>Digimon Adventure</description>
 		<year>199?</year>
@@ -5086,6 +5086,57 @@ more investigation needed...
 		</part>
 	</software>
 
+	<software name="hercules" supported="partial">
+		<!-- Notes: PlayStation bootleg that was also released as Hercules 2 on the Mega Drive -->
+		<description>Hercules (pirate)</description>
+		<year>1999?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom_sbld" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="hercules.sfc" size="0x200000" crc="45874d3d" sha1="3e5d077c4ca1bb85f13cf12cc4432569b069b454" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
+	<software name="herculesh" cloneof="hercules">
+		<description>Hercules (pirate, hacked)</description>
+		<year>1999?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="hercules-crack.sfc" size="0x200000" crc="aa9504c4" sha1="464f6fe19409e2721374ed1aea8bc59eda59ce7a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kof98" supported="no">
+		<description>The King of Fighters '98 (pirate)</description>
+		<year>199?</year>
+		<publisher>DVS Electronic Co.</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom_poke" /> <!-- incorrect, so protection must be different from kof2000 -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="kof98.sfc" size="0x200000" crc="6c303fc9" sha1="3729e177d524385309e2a21d7e8923f01f1a3632" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
+	<software name="kof98h" cloneof="kof98">
+		<description>The King of Fighters '98 (pirate, hacked)</description>
+		<year>199?</year>
+		<publisher>DVS Electronic Co.</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="kof98-crack.sfc" size="0x200000" crc="41d93387" sha1="5e14269f797bf8aeb80141d71827780ae4abd0cf" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kof2000">
 	<!-- Protection notes: write latch byte to 88xxxx, then reads back BITSWAP8(latch,0,6,7,1,2,3,4,5) from 80xxxx -->
 		<!-- single cartridge source: d4s -->
@@ -5109,6 +5160,32 @@ more investigation needed...
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="3145728">
 				<rom name="the king of fighters 2000 (cracked).sfc"  size="3145728" crc="ee339f08" sha1="ac7a8d84635240e1fe7e8ef4199db823c63b7d9a" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mshvsf" cloneof="xmvsf" supported="no">
+		<description>Marvel Super Heroes Vs. Street Fighter (pirate)</description>
+		<!-- Notes: Title screen variant of X-Men Vs. Street Fighter pirate -->
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom_poke" /> <!-- incorrect, so protection must be different from xmvsf -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="marvel.sfc" size="0x200000" crc="cdb590e4" sha1="beff879c0e2c277448648cc4312185ca903fe8d2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
+	<software name="mshvsfh" cloneof="xmvsf">
+		<description>Marvel Super Heroes Vs. Street Fighter (pirate, hacked)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="marvel-crack.sfc" size="0x200000" crc="05f60d4a" sha1="446a285dae305ce0a6a752805b4d648ce10bfabd" />
 			</dataarea>
 		</part>
 	</software>
@@ -5249,6 +5326,31 @@ more investigation needed...
 		</part>
 	</software>
 
+	<software name="squirrel" supported="partial">
+		<description>Squirrel (pirate)</description>
+		<year>1999?</year>
+		<publisher>DVS Electronic Co.?</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom_poke" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="squirrel-4mbit.sfc" size="0x200000" crc="bad1d9b8" sha1="4a88cdfbfefeaf79df9ebfd1974b16a1571dbce1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
+	<software name="squirrelh" cloneof="squirrel">
+		<description>Squirrel (pirate, hacked)</description>
+		<year>1999?</year>
+		<publisher>DVS Electronic Co.?</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="squirrel-crack.sfc" size="0x200000" crc="82ae070b" sha1="bbf8b45cc26613a626ac67b8abb6dd88b8b7954f" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sfex">
 		<!-- single cartridge source: d4s -->
 		<description>Street Fighter EX Plus α (Asia)</description>
@@ -5298,7 +5400,7 @@ more investigation needed...
 
 	<software name="sup20hab" supported="partial">
 		<!-- single cartridge source: d4s -->
-		<description>Super 20 Hab (Kor)</description>
+		<description>Super 20 Hab (Korea)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<info name="alt_title" value="슈퍼20합" />
@@ -5337,7 +5439,7 @@ more investigation needed...
 		</part>
 	</software>
 
-	<software name="xmensf">
+	<software name="xmvsf">
 	<!-- Protection notes: write latch byte to 88xxxx, then reads back BITSWAP8(latch,0,6,7,1,2,3,4,5) from 80xxxx -->
 		<!-- single cartridge source: d4s -->
 		<description>X-Men vs. Street Fighter (Asia)</description>
@@ -5357,7 +5459,7 @@ more investigation needed...
 	</software>
 
 	<!-- Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
-	<software name="xmensfh" cloneof="xmensf">
+	<software name="xmvsfh" cloneof="xmvsf">
 		<description>X-Men vs. Street Fighter (Asia, cracked)</description>
 		<year>1996</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
@@ -5395,7 +5497,7 @@ more investigation needed...
 
 	<!-- Notes: this game has to be redumped without the intro!!!! -->
 	<software name="futarg" cloneof="issdx">
-		<description>Futbol Argentino '96 (Hacked)</description>
+		<description>Futbol Argentino '96 (hacked)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -5620,7 +5722,7 @@ more investigation needed...
         <!- - Jackhead - ->
         <!- - Notes: the first and second eproms are permanently corrupt (redumping isn't going to help)
                       and the third eprom is good; it appears all bad bytes have a ROM adress of $xx:xx00 - ->
-        <description>Estpolis Denki II (Jpn, Prototype)</description>
+        <description>Estpolis Denki II (Japan, prototype)</description>
         <year>1994</year>
         <publisher>Taito</publisher>
         <info name="serial" value="" />
@@ -6215,7 +6317,7 @@ more investigation needed...
 			<feature name="pcb" value="SHVC-1A3B-01" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 64K SRAM" />
-			<feature name="u3" value="U374LS139 " />
+			<feature name="u3" value="U374LS139" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="lockout" value="" />
 			<feature name="battery" value="BATT CR2032" />
@@ -8064,7 +8166,7 @@ more investigation needed...
 		<description>Battle Dodge Ball II (Japan)</description>
 		<year>1993</year>
 		<publisher>Banpresto</publisher>
-		<info name="serial" value="SHVC-D2 " />
+		<info name="serial" value="SHVC-D2" />
 		<info name="release" value="19930723" />
 		<info name="alt_title" value="バトルドッジボールII" />
 		<part name="cart" interface="snes_cart">
@@ -10250,7 +10352,7 @@ more investigation needed...
 		<description>Chrono Trigger (Japan)</description>
 		<year>1995</year>
 		<publisher>Square</publisher>
-		<info name="serial" value="SHVC-ACTJ-JPN " />
+		<info name="serial" value="SHVC-ACTJ-JPN" />
 		<info name="release" value="19950311" />
 		<info name="alt_title" value="クロノ・トリガー" />
 		<part name="cart" interface="snes_cart">
@@ -10276,7 +10378,7 @@ more investigation needed...
 		<description>Chrono Trigger (Japan, alt)</description>
 		<year>1995</year>
 		<publisher>Square</publisher>
-		<info name="serial" value="SHVC-ACTJ-JPN " />
+		<info name="serial" value="SHVC-ACTJ-JPN" />
 		<info name="release" value="19950311" />
 		<info name="alt_title" value="クロノ・トリガー" />
 		<part name="cart" interface="snes_cart">
@@ -13724,7 +13826,7 @@ more investigation needed...
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<feature name="slot" value="hirom" />
-			<dataarea name="rom" size="3145728 ">
+			<dataarea name="rom" size="3145728">
 				<rom name="shvc-f6-0 p1.u1" size="1048576" crc="bfc35e36" sha1="579cca6fd6c0b4f8d3489ba115d6bd51a745a16a" offset="0x000000" />
 				<rom name="shvc-f6-0 p2.u2" size="1048576" crc="82736bb1" sha1="1931269554c4aebbd4d250c881cd15906347062d" offset="0x100000" />
 				<rom name="shvc-f6-0 p3.u3" size="1048576" crc="38a398a2" sha1="b28c6b17b2b027831b70a3dcc0156e84209da2d0" offset="0x200000" />
@@ -17815,7 +17917,7 @@ more investigation needed...
 	</software>
 
 	<software name="zelda3c" cloneof="zelda3">
-		<description>The Legend of Zelda - A Link to the Past (Can)</description>
+		<description>The Legend of Zelda - A Link to the Past (Canada)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SNS-ZF-CAN-1" />
@@ -19239,7 +19341,7 @@ more investigation needed...
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BM4J-JPN" />
 		<info name="release" value="19981204" />
-		<info name="alt_title" value="ミニ四駆 レッツ&amp;ゴー!! POWER WGP2 " />
+		<info name="alt_title" value="ミニ四駆 レッツ&amp;ゴー!! POWER WGP2" />
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-1J3M-20" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
@@ -19839,7 +19941,7 @@ more investigation needed...
 		<description>NBA Jam - Tournament Edition (Euro)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<info name="serial" value="SNSP-AJTP-EUR " />
+		<info name="serial" value="SNSP-AJTP-EUR" />
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-BA1M-01" />
 			<feature name="u1" value="U1 P0" />
@@ -20314,7 +20416,7 @@ more investigation needed...
 		<publisher>ASK Kodansha</publisher>
 		<info name="serial" value="SHVC-NN" />
 		<info name="release" value="19940429" />
-		<info name="alt_title" value="ナイスDEショット 3Dゴルフシミュレーション ~ Nice de Shot - 3D Golf Simulation (Jpn)" />
+		<info name="alt_title" value="ナイスDEショット 3Dゴルフシミュレーション ~ Nice de Shot - 3D Golf Simulation (Japan)" />
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-2A3M-10" />
 			<feature name="u1" value="U1 P0" />
@@ -21582,7 +21684,7 @@ more investigation needed...
 			<feature name="pcb" value="SHVC-1A3B-01" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 64K SRAM" />
-			<feature name="u3" value="U3 74LS139 " />
+			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
 			<feature name="lockout" value="" />
 			<feature name="battery" value="BATT CR2032" />
@@ -23304,7 +23406,7 @@ more investigation needed...
 			<feature name="pcb" value="SHVC-1B3B-01" />
 			<feature name="u1" value="U1 MASKROM(N)" />
 			<feature name="u2" value="U2 64K SRAM" />
-			<feature name="u3" value="U3µPD77C25 " /> <!-- DSP3 -->
+			<feature name="u3" value="U3µPD77C25" /> <!-- DSP3 -->
 			<feature name="u4" value="U4 74LS139" />
 			<feature name="u5" value="U5 74HCU04" />
 			<feature name="u6" value="U6 CIC" />
@@ -23675,7 +23777,7 @@ more investigation needed...
 		<description>Sensible Soccer - European Champions (Euro)</description>
 		<year>1992</year>
 		<publisher>Renegade Software</publisher>
-		<info name="serial" value="SNSP-8S-FAH " />
+		<info name="serial" value="SNSP-8S-FAH" />
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-1A3M-10" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
@@ -24659,7 +24761,7 @@ more investigation needed...
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-BT" />
 		<info name="release" value="19930621" />
-		<info name="alt_title" value="スペースバズーカ " />
+		<info name="alt_title" value="スペースバズーカ" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-1A0N-10" />
@@ -25532,7 +25634,7 @@ more investigation needed...
 			<feature name="u1" value="U1 P0" />
 			<feature name="u2" value="U2 P1" />
 			<feature name="u3" value="U3 64K SRAM" />
-			<feature name="u4" value="U4 µPD77C25 " /> <!-- DSP1 A -->
+			<feature name="u4" value="U4 µPD77C25" /> <!-- DSP1 A -->
 			<feature name="u5" value="U5 74LS139" />
 			<feature name="u6" value="U6 74HCU04" />
 			<feature name="u7" value="U7 CIC" />
@@ -34597,7 +34699,7 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="sbig2">
-		<description>Super Big 2 (Chi)</description>
+		<description>Super Big 2 (China)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -36553,7 +36655,7 @@ List of unclassified roms
 		<publisher>KSS</publisher>
 		<info name="serial" value="SHVC-A3QJ-JPN" />
 		<info name="release" value="19960329" />
-		<info name="alt_title" value="美少女レスラー列伝   ブリザード Yuki 乱入!!" />
+		<info name="alt_title" value="美少女レスラー列伝 ブリザード Yuki 乱入!!" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2621440">
@@ -39122,7 +39224,7 @@ List of unclassified roms
 	</software>
 
 	<software name="dbzchom">
-		<description>Dragon Ball Z - Chomutujeon (Kor)</description>
+		<description>Dragon Ball Z - Chomutujeon (Korea)</description>
 		<year>1994?</year>
 		<publisher>Bandai?</publisher>
 		<sharedfeat name="compatibility" value="NTSC"/>
@@ -42666,7 +42768,7 @@ List of unclassified roms
 	</software>
 
 	<software name="hanguk" cloneof="basload2">
-		<description>Hanguk Pro Yagu (Kor)</description>
+		<description>Hanguk Pro Yagu (Korea)</description>
 		<year>1994?</year>
 		<publisher>Hyundai</publisher>
 		<sharedfeat name="compatibility" value="NTSC"/>
@@ -42916,7 +43018,7 @@ List of unclassified roms
 		<description>Heian Fuuunden (Japan)</description>
 		<year>1995</year>
 		<publisher>KSS</publisher>
-		<info name="serial" value="SHVC-AKHJ " />
+		<info name="serial" value="SHVC-AKHJ" />
 		<info name="release" value="19950929" />
 		<info name="alt_title" value="平安風雲伝" />
 		<part name="cart" interface="snes_cart">
@@ -43719,7 +43821,7 @@ List of unclassified roms
 		<publisher>Altron</publisher>
 		<info name="serial" value="SHVC-RO" />
 		<info name="release" value="19931001" />
-		<info name="alt_title" value="レッド・オクトーバー ~ Red October (Jpn)" />
+		<info name="alt_title" value="レッド・オクトーバー ~ Red October (Japan)" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="524288">
@@ -47676,7 +47778,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="lufia2n" cloneof="lufia2">
-		<description>Lufia (Ned)</description>
+		<description>Lufia (Netherlands)</description>
 		<year>1996</year>
 		<publisher>Natsume</publisher>
 		<part name="cart" interface="snes_cart">
@@ -49444,7 +49546,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<publisher>Takara</publisher>
 		<info name="serial" value="SHVC-QP" />
 		<info name="release" value="19931022" />
-		<info name="alt_title" value="ミラクルガールズ ともみとみかげの不思議世界の大冒険  " />
+		<info name="alt_title" value="ミラクルガールズ ともみとみかげの不思議世界の大冒険" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="1048576">
@@ -50869,7 +50971,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<year>1996</year>
 		<publisher>Nichibutsu</publisher>
 		<info name="serial" value="SHVC-AECJ-JPN" />
-		<info name="release" value="19961129 " />
+		<info name="release" value="19961129" />
 		<info name="alt_title" value="ニチブツコレクション1 攻略カジノバー, 祗園花" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
@@ -57424,7 +57526,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 <!-- removed for now since however interesting it may be, it is still homebrew material,
      keeping it here quoted in case we'd want to reintegrate it for some reason
     <software name="starfox2a" cloneof="starfox2">
-        <description>Star Fox 2 (Jpn, Hack)</description>
+        <description>Star Fox 2 (Japan, hack)</description>
         <year>1995</year>
         <publisher>&lt;homebrew&gt;</publisher>
         <part name="cart" interface="snes_cart">
@@ -61500,7 +61602,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<publisher>Quest</publisher>
 		<info name="serial" value="SHVC-AO7J-JPN" />
 		<info name="release" value="19951006" />
-		<info name="alt_title" value="タクティクスオウカ " />
+		<info name="alt_title" value="タクティクスオウカ" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="3145728">
@@ -61517,7 +61619,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<publisher>Quest</publisher>
 		<info name="serial" value="SHVC-AO7J-JPN" />
 		<info name="release" value="19951006" />
-		<info name="alt_title" value="タクティクスオウカ " />
+		<info name="alt_title" value="タクティクスオウカ" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="3145728">
@@ -61534,7 +61636,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<publisher>Quest</publisher>
 		<info name="serial" value="SHVC-AO7J-JPN" />
 		<info name="release" value="19951006" />
-		<info name="alt_title" value="タクティクスオウカ " />
+		<info name="alt_title" value="タクティクスオウカ" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="3145728">
@@ -61580,7 +61682,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="taekwonk" cloneof="taekwon">
-		<description>Taekwon-Do (Kor)</description>
+		<description>Taekwon-Do (Korea)</description>
 		<year>1994?</year>
 		<publisher>Human Entertainment?</publisher>
 		<part name="cart" interface="snes_cart">
@@ -61942,7 +62044,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="tecmonbaa" cloneof="tecmonba">
-		<description>Tecmo Super NBA Basketball (Aus)</description>
+		<description>Tecmo Super NBA Basketball (Australia)</description>
 		<year>1993</year>
 		<publisher>Tecmo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -61982,7 +62084,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="tmnttfa" cloneof="tmnttf">
-		<description>Teenage Mutant Ninja Turtles - Tournament Fighters (Aus)</description>
+		<description>Teenage Mutant Ninja Turtles - Tournament Fighters (Australia)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="snes_cart">
@@ -62006,7 +62108,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="tmnt4a" cloneof="tmnt4">
-		<description>Teenage Mutant Ninja Turtles IV - Turtles in Time (Aus)</description>
+		<description>Teenage Mutant Ninja Turtles IV - Turtles in Time (Australia)</description>
 		<year>1992</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="snes_cart">

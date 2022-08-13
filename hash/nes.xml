@@ -41528,7 +41528,7 @@ license:CC0
 		<description>Urban Champion (World)</description>
 		<year>1984</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="HVC-UC, NES-UC-(USA/CAN), NES-UC-FRA "/>
+		<info name="serial" value="HVC-UC, NES-UC-(USA/CAN), NES-UC-FRA"/>
 		<info name="release" value="19841114 (JPN), 198606xx (USA), 1986? (EUR)"/>
 		<info name="alt_title" value="アーバンチャンピオン"/>
 		<part name="cart" interface="nes_cart">
@@ -44517,26 +44517,6 @@ We should eventually add it to MAME as a separate driver with a NES CPU and a GB
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
 				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- This might be the dump of the bios. Investigate... -->
-	<software name="myctv">
-		<description>My Computer TV C1 (Japan)</description>
-		<year>1983</year>
-		<publisher>Sharp</publisher>
-		<info name="alt_title" value="マイコンピュータテレビC1"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="nrom" />
-			<feature name="pcb" value="NES-NROM-128" />
-			<feature name="mirroring" value="horizontal" />
-			<dataarea name="chr" size="8192">
-				<rom name="my computer tv c1 (j).chr" size="8192" crc="9cba4524" sha1="2bd833f8049bf7a14ce337c3cde35f2140242a18" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="32768">
-				<rom name="my computer tv c1 (j).prg" size="16384" crc="7fd48dad" sha1="08af18a6d42e5ab2a288e347ab1fd4bc52441d71" offset="00000" status="baddump" />
-				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -49481,7 +49461,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Technos</publisher>
 		<info name="serial" value="TJC-BR"/>
 		<info name="release" value="19931217"/>
-		<info name="alt_title" value="熱血!すとりーとバスケット がんばれ  ダンクヒーローズ"/>
+		<info name="alt_title" value="熱血!すとりーとバスケット がんばれ ダンクヒーローズ"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
@@ -57545,7 +57525,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>1997</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1064"/>
-		<info name="alt_title" value="七龙珠 (Dragonball) "/>
+		<info name="alt_title" value="七龙珠 (Dragonball)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hengg_shjy3" />
 			<feature name="pcb" value="UNL-SHJY3" /> <!-- Chinese dump uses Mapper 253, another image found uses Mapper 251? -->
@@ -58115,7 +58095,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1098"/>   <!-- some source labeled this as es-1096, but then tszone has dumped Qi Long Zhu Z Wai Zhuan above as es-1096! -->
-		<info name="alt_title" value="塞尔达传说-三神之力 ~ sài ěr dá chuánshuō-sān shén zhī lì "/>
+		<info name="alt_title" value="塞尔达传说-三神之力 ~ sài ěr dá chuánshuō-sān shén zhī lì"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="fs304" />
 			<feature name="pcb" value="UNL-FS304" />
@@ -59258,7 +59238,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ010"/>
-		<info name="alt_title" value="口袋钻石 ~  Pokémon Diamond"/>
+		<info name="alt_title" value="口袋钻石 ~ Pokémon Diamond"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nanjing" />
 			<feature name="pcb" value="UNL-NANJING" />
@@ -60008,7 +59988,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ050 (or NJ033?)"/>
-		<info name="alt_title" value="红楼梦 ~  A Dream of Red Mansions"/>
+		<info name="alt_title" value="红楼梦 ~ A Dream of Red Mansions"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
@@ -62899,7 +62879,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<description>Ying Xiong Chuan Qi (China)</description>
 		<year>19??</year>
 		<publisher>XingXing</publisher>
-		<info name="alt_title" value="英雄传奇 (Hero Legend?) "/>
+		<info name="alt_title" value="英雄传奇 (Hero Legend?)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" /> <!-- Maybe Waixing Type J -->
