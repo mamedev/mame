@@ -28,7 +28,7 @@
 #define LOG_SPI (1U <<  2)
 
 //#define VERBOSE     (LOG_VDP)
-#define VERBOSE     (LOG_SPI)
+#define VERBOSE     (0)
 
 #include "logmacro.h"
 
@@ -554,7 +554,6 @@ void monon_color_state::do_draw_inner(int pal_to_use, int start, int step, int p
 		spibuf_w(0x00); // clock
 		uint8_t pix = spibuf_r();
 
-
 		for (int i = start; i >= 0; i -= step)
 		{
 			int real_ypos = m_bufpos_y;
@@ -567,8 +566,8 @@ void monon_color_state::do_draw_inner(int pal_to_use, int start, int step, int p
 				{
 					m_linebuf[real_ypos] = rgb;
 				}
-				m_bufpos_y--;
 			}
+			m_bufpos_y--;
 		}
 	}
 }
