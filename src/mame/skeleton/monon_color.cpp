@@ -545,6 +545,7 @@ uint8_t monon_color_state::read_from_video_device()
 
 void monon_color_state::do_draw_inner(int pal_to_use, int start, int step, int pixmask, int amount)
 {
+	uint8_t blend = (m_storeregs[0x09] & 0x3f)<<2;
 	int yadjust = (m_storeregs[0x16] << 8) | m_storeregs[0x1a];
 	yadjust >>= 7;
 	yadjust -= 8;
@@ -561,10 +562,28 @@ void monon_color_state::do_draw_inner(int pal_to_use, int start, int step, int p
 			if ((real_ypos >= 0) && (real_ypos < 240))
 			{
 				uint8_t pixx = (pix >> i) & pixmask;
-				rgb_t rgb = rgb_t(m_curpal[((pixx+pal_to_use) * 3) + 2], m_curpal[((pixx+pal_to_use) * 3) + 1], m_curpal[((pixx+pal_to_use) * 3) + 0]);
+				uint8_t newr = m_curpal[((pixx + pal_to_use) * 3) + 2];
+				uint8_t newg = m_curpal[((pixx + pal_to_use) * 3) + 1];
+				uint8_t newb = m_curpal[((pixx + pal_to_use) * 3) + 0];
+				rgb_t rgb = rgb_t(newr, newg, newb);
+
 				if (rgb != rgb_t(0xdc, 0x32, 0xdc)) // magic transparency colour?!
 				{
-					m_linebuf[real_ypos] = rgb;
+
+					if (blend != 0x00)
+					{
+						rgb_t behind = m_linebuf[real_ypos];
+						behind.scale8(0xff - blend);
+						rgb.scale8(blend);
+
+						rgb += behind;
+						m_linebuf[real_ypos] = rgb;
+					}
+					else
+					{
+						m_linebuf[real_ypos] = rgb;
+						
+					}
 				}
 			}
 			m_bufpos_y--;
@@ -745,6 +764,8 @@ void monon_color_state::write_to_video_device(uint8_t data)
 					{
 						if (m_storeregs[0x02] == 0x20)
 							do_draw(amount, pal_to_use);
+
+						m_storeregs[0x09] = 0x00;
 					}
 					else if ((data == 0xd0) || (data == 0xd4))
 					{
