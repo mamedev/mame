@@ -639,7 +639,7 @@ void monon_color_state::write_to_video_device(uint8_t data)
 {
 	static const char* const names[] =
 	{
-		"(Direct Data?)", // Direct Data port, after setting 0x8 / 0x04 ? writes basic 'maximum intensity' R/G/B palettes here on startup
+		"(Direct Data)", // Direct Data port, after setting 0x8 / 0x04 ? writes basic 'maximum intensity' R/G/B palettes here on startup
 		"(Transfer Size MSB)",
 		"(Allow/Disallow SPI Access?)",
 		"(unknown 0x03)",
@@ -648,7 +648,7 @@ void monon_color_state::write_to_video_device(uint8_t data)
 		"(unknown 0x06)",
 		"(unknown 0x07)",
 		"(Direct VRAM Address Select LSB?)",
-		"(unknown 0x09 but used)", // used during some line operations
+		"(Blend level, when enabled)",
 		"(unknown 0x0a)",
 		"(unknown 0x0b)",
 		"(Trigger Transfer/Mode)",
@@ -656,7 +656,7 @@ void monon_color_state::write_to_video_device(uint8_t data)
 		"(Transfer Size LSB)",
 		"(unknown 0x0f)",
 		"(Configure Magic Trans Pen B?)", // on startup
-		"(Palette Select?)",
+		"(Palette Select)",
 		"(BPP Select)",
 		"(unknown 0x13)",
 		"(Configure Magic Trans Pen R?)", // on startup
@@ -667,9 +667,9 @@ void monon_color_state::write_to_video_device(uint8_t data)
 		"(unknown 0x19)",
 		"(Y Adjust LSB)",
 		"(Column Advance+More?)",
-		"(Layer Select?)",
+		"(Draw Mode, alpha enable, trans pen disable?)",
 		"(unknown 0x1d)",
-		"(Extra Palette Select?)", // written when there is text on the screen (that currently renders with incorrect palette?) some kind of extra base select (LSB?) in 1bpp mode? maybe for palettes directly uploaded at startup
+		"(Extra Palette Select?)", // written when there is text on the screen some kind of extra base select (LSB?) in 1bpp mode? seems to be for palettes directly uploaded at startup
 		"(Clock for 0x17?)", // clock for 0x17? always writes after reading / writing 0x1f?
 	};
 
@@ -773,6 +773,14 @@ void monon_color_state::write_to_video_device(uint8_t data)
 						m_vidbuffer[(i * 320) + m_bufpos_x] = m_linebuf[i];
 				}
 			}
+		}
+		else if (m_storeregs[0x1c] == 0x00)
+		{
+
+		}
+		else
+		{
+			fatalerror("m_storeregs[0x1c] set to unknown value %02x while drawing\n", m_storeregs[0x1c]);
 		}
 	}
 }
