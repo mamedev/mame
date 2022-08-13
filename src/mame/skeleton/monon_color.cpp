@@ -545,7 +545,13 @@ uint8_t monon_color_state::read_from_video_device()
 
 void monon_color_state::do_draw_inner(int pal_to_use, int start, int step, int pixmask, int amount)
 {
-	uint8_t blend = (m_storeregs[0x09] & 0x3f)<<2;
+	uint8_t blend;
+
+	if (m_storeregs[0x1c] == 0x0a) // see drgnbma main character, doesn't set this, expects solid
+		blend = (m_storeregs[0x09] & 0x3f) << 2;
+	else
+		blend = 0;
+
 	int yadjust = (m_storeregs[0x16] << 8) | m_storeregs[0x1a];
 	yadjust >>= 7;
 	yadjust -= 8;
@@ -667,7 +673,7 @@ void monon_color_state::write_to_video_device(uint8_t data)
 		"(Clock for 0x17?)", // clock for 0x17? always writes after reading / writing 0x1f?
 	};
 
-	LOGMASKED(LOG_VDP,"%s: write_to_video_device (m_out0data is %02x) %s (data is %02x)\n", machine().describe_context(), m_out0data, names[m_out0data], data);
+	LOGMASKED(LOG_VDP, "%s: write_to_video_device (m_out0data is %02x) %s (data is %02x)\n", machine().describe_context(), m_out0data, names[m_out0data], data);
 
 	if (m_out4data == 0x03)
 	{
@@ -677,8 +683,8 @@ void monon_color_state::write_to_video_device(uint8_t data)
 				m_storeregs[m_out0data] = data;
 		}
 
-	//	popmessage("%02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x | %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n", m_storeregs[0x00], m_storeregs[0x01], m_storeregs[0x02], m_storeregs[0x03], m_storeregs[0x04], m_storeregs[0x05], m_storeregs[0x06], m_storeregs[0x07], m_storeregs[0x08], m_storeregs[0x09], m_storeregs[0x0a], m_storeregs[0x0b], m_storeregs[0x0c], m_storeregs[0x0d], m_storeregs[0x0e], m_storeregs[0x0f],
-	//		m_storeregs[0x10], m_storeregs[0x11], m_storeregs[0x12], m_storeregs[0x13], m_storeregs[0x14], m_storeregs[0x15], m_storeregs[0x16], m_storeregs[0x17], m_storeregs[0x18], m_storeregs[0x19], m_storeregs[0x1a], m_storeregs[0x1b], m_storeregs[0x1c], m_storeregs[0x1d], m_storeregs[0x1e], m_storeregs[0x1f]);
+		//	popmessage("%02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x | %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n", m_storeregs[0x00], m_storeregs[0x01], m_storeregs[0x02], m_storeregs[0x03], m_storeregs[0x04], m_storeregs[0x05], m_storeregs[0x06], m_storeregs[0x07], m_storeregs[0x08], m_storeregs[0x09], m_storeregs[0x0a], m_storeregs[0x0b], m_storeregs[0x0c], m_storeregs[0x0d], m_storeregs[0x0e], m_storeregs[0x0f],
+		//		m_storeregs[0x10], m_storeregs[0x11], m_storeregs[0x12], m_storeregs[0x13], m_storeregs[0x14], m_storeregs[0x15], m_storeregs[0x16], m_storeregs[0x17], m_storeregs[0x18], m_storeregs[0x19], m_storeregs[0x1a], m_storeregs[0x1b], m_storeregs[0x1c], m_storeregs[0x1d], m_storeregs[0x1e], m_storeregs[0x1f]);
 
 	}
 	else if (m_out4data == 0x09)
@@ -703,7 +709,7 @@ void monon_color_state::write_to_video_device(uint8_t data)
 			int address = addressx + 0x400 * 3;
 			m_curpal[address] = data;
 			int entry = address / 3;
-			m_palette->set_pen_color(entry, rgb_t(m_curpal[(entry * 3) + 2], m_curpal[(entry * 3) + 1],	m_curpal[(entry * 3) + 0]));
+			m_palette->set_pen_color(entry, rgb_t(m_curpal[(entry * 3) + 2], m_curpal[(entry * 3) + 1], m_curpal[(entry * 3) + 0]));
 		}
 
 	}
@@ -714,12 +720,12 @@ void monon_color_state::write_to_video_device(uint8_t data)
 		{
 
 
-			LOGMASKED(LOG_VDP,"Finished Column %d\n", m_bufpos_x);
+			LOGMASKED(LOG_VDP, "Finished Column %d\n", m_bufpos_x);
 			m_bufpos_x++;
 
 			if (m_bufpos_x == 320)
 			{
-				LOGMASKED(LOG_VDP,"------------------------------------------------------------------------------------------------\n");
+				LOGMASKED(LOG_VDP, "------------------------------------------------------------------------------------------------\n");
 				m_bufpos_x = 0;
 			}
 
@@ -727,52 +733,44 @@ void monon_color_state::write_to_video_device(uint8_t data)
 		}
 	}
 
-	// The broken repeating backgrounds are always drawn with m_storeregs[0x1c] == 0x11)
-	// this indicates the VDP could take care of them, but to do so it would need the
-	// line data, which is processed by the CPU instead, so it must cause something else
-	//
-	// The repeat happens every 64 line columns (so 5 copies of the background over the
-	// 320 wide screen) but there doesn't seem to be anything special about the code
-	// after each 64th line column either?!
+	//  (m_storeregs[0x1c] == 0x11) backgrounds (maybe no trans pen?)
+	//  (m_storeregs[0x1c] == 0x01) most elements
+	//  (m_storeregs[0x1c] == 0x0a) blended elements
 
 	if (m_out0data == 0x0c)
 	{
-		
+		if ((m_storeregs[0x1c] == 0x0a) || (m_storeregs[0x1c] == 0x01) || (m_storeregs[0x1c] == 0x11))
 		{
-			if ((m_storeregs[0x1c] == 0x0a) || (m_storeregs[0x1c] == 0x01) || (m_storeregs[0x1c] == 0x11))
+			uint16_t amount = m_storeregs[0x0e] | (m_storeregs[0x01] << 8);
+
+			//if (amount != 0x00)
 			{
-				uint16_t amount = m_storeregs[0x0e] | (m_storeregs[0x01] << 8);
+				int pal_to_use = (m_storeregs[0x11] << 8) | m_storeregs[0x1e];
 
-				//if (amount != 0x00)
+				pal_to_use >>= 5;
+				pal_to_use &= 0x7ff;
+
+
+				// d4/d6 are odd-even columns
+				// d0/d2 are odd-even columns, after frame data? (writing them seems conditional on something else?)
+				// da/de are palettes? (maybe bit 0x04 is just ignored here, these aren't column specific)
+
+				if ((data == 0xde) || (data == 0xda))
 				{
-					int pal_to_use = (m_storeregs[0x11]<<8) | m_storeregs[0x1e];
+					if (m_storeregs[0x02] == 0x20)
+						do_palette(amount, pal_to_use);
+				}
+				else if ((data == 0xd2) || (data == 0xd6))
+				{
+					if (m_storeregs[0x02] == 0x20)
+						do_draw(amount, pal_to_use);
 
-					pal_to_use >>= 5;
-					pal_to_use &= 0x7ff;
-
-	
-					// d4/d6 are odd-even columns
-					// d0/d2 are odd-even columns, after frame data? (writing them seems conditional on something else?)
-					// da/de are palettes? (maybe bit 0x04 is just ignored here, these aren't column specific)
-
-					if ((data == 0xde) || (data == 0xda))
-					{
-						if (m_storeregs[0x02] == 0x20)
-							do_palette(amount, pal_to_use);
-					}
-					else if ((data == 0xd2) || (data == 0xd6))
-					{
-						if (m_storeregs[0x02] == 0x20)
-							do_draw(amount, pal_to_use);
-
-						m_storeregs[0x09] = 0x00;
-					}
-					else if ((data == 0xd0) || (data == 0xd4))
-					{
-						// assume there's some kind of line column buffer, the exact swap trigger is unknown
-						for (int i = 0; i < 240; i++)
-							m_vidbuffer[(i * 320) + m_bufpos_x] = m_linebuf[i];
-					}
+				}
+				else if ((data == 0xd0) || (data == 0xd4))
+				{
+					// assume there's some kind of line column buffer, the exact swap trigger is unknown
+					for (int i = 0; i < 240; i++)
+						m_vidbuffer[(i * 320) + m_bufpos_x] = m_linebuf[i];
 				}
 			}
 		}
