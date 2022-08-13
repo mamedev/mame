@@ -10,12 +10,6 @@ References:
 - opcode decoding by Tatsuyuki Satoh, Olivier Galibert, Kevin Horton, Lord Nightmare
   (verified a while later after new documentation was found)
 
-TODO:
-- How the stack works, is probably m_stack_levels+1 program counters, and
-  an index pointing to the current program counter. Then push/pop simply
-  decrements/increments the index. The way it is implemented right now
-  behaves the same.
-
 */
 
 #include "emu.h"
@@ -214,7 +208,6 @@ void hmcs40_cpu_device::device_start()
 
 	// zerofill
 	memset(m_stack, 0, sizeof(m_stack));
-	m_sp = 0;
 	m_op = 0;
 	m_prev_op = 0;
 	m_i = 0;
@@ -244,7 +237,6 @@ void hmcs40_cpu_device::device_start()
 
 	// register for savestates
 	save_item(NAME(m_stack));
-	save_item(NAME(m_sp));
 	save_item(NAME(m_op));
 	save_item(NAME(m_prev_op));
 	save_item(NAME(m_i));
@@ -566,8 +558,8 @@ void hmcs40_cpu_device::execute_run()
 		m_prev_op = m_op;
 		m_prev_pc = m_pc;
 
-		// check/handle interrupt, but not in the middle of a long jump
-		if (m_ie && (m_iri || m_irt) && (m_prev_op & 0x3e0) != 0x340)
+		// check/handle interrupt, but not after LPU/BR/CAL
+		if (m_ie && (m_iri || m_irt) && (m_prev_op & 0x3e0) != 0x340 && (m_prev_op & 0x1c0) != 0x1c0)
 			do_interrupt();
 
 		// fetch next opcode
@@ -575,6 +567,7 @@ void hmcs40_cpu_device::execute_run()
 		m_op = m_program->read_word(m_pc) & 0x3ff;
 		m_i = bitswap<4>(m_op,0,1,2,3); // reversed bit-order for 4-bit immediate param (except for XAMR)
 		increment_pc();
+		cycle();
 
 		// handle opcode
 		switch (m_op)
@@ -805,7 +798,5 @@ void hmcs40_cpu_device::execute_run()
 			default:
 				op_illegal(); break;
 		} /* big switch */
-
-		cycle();
 	}
 }

@@ -147,7 +147,6 @@ protected:
 	u16 m_polarity;     // i/o polarity (pmos vs cmos)
 	int m_stack_levels; // number of callstack levels
 	u16 m_stack[4];     // max 4
-	int m_sp;           // internal 'stackpointer'
 	u16 m_op;           // current opcode
 	u16 m_prev_op;
 	u8 m_i;             // 4-bit immediate opcode param
@@ -188,7 +187,6 @@ protected:
 
 	u8 ram_r();
 	void ram_w(u8 data);
-	void exc_stack();
 	void pop_stack();
 	void push_stack();
 

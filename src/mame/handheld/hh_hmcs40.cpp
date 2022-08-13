@@ -107,9 +107,6 @@ ROM source notes when dumped from another model, but confident it's the same:
 
 TODO:
 - cgalaxn discrete sound (alien attacking sound effect)
-- gckong glitchy jump on 1st level (rarely happens), caused by MCU stack overflow.
-  It can be tested by jumping up repeatedly at the start position under the ladder,
-  if the glitch happens there, you can jump onto the 2nd floor.
 - epacman2 booting the game in demo mode, pacman should take the shortest route to
   the upper-left power pill: mcu cycle/interrupt timing related
 - kevtris's HMCS40 ROM dumps are incomplete, missing MCU factory test code from
@@ -1420,7 +1417,7 @@ ROM_START( bbtime )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 461598, "screen", 0)
-	ROM_LOAD( "bbtime.svg", 0, 461598, BAD_DUMP CRC(1fb7b0b8) SHA1(bf938aa1c3c5032daba064a51d5b234bb9e512f5) )
+	ROM_LOAD( "bbtime.svg", 0, 461598, BAD_DUMP CRC(297f30de) SHA1(a5f38cd9c5d5ba9392c5d57ac85ecc2782b6ae7a) )
 ROM_END
 
 
@@ -2730,7 +2727,7 @@ u8 cpacman_state::input_r()
 
 static INPUT_PORTS_START( cpacman )
 	PORT_START("IN.0") // D13 port R0x
-	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Difficulty ) )
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -3108,7 +3105,7 @@ static INPUT_PORTS_START( epacman2 )
 
 	PORT_START("IN.3") // D4 port R0x
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_CONFNAME( 0x02, 0x02, DEF_STR( Difficulty ) )
+	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
 	PORT_CONFNAME( 0x0c, 0x04, DEF_STR( Players ) )
@@ -3282,7 +3279,7 @@ ROM_END
 
   Entex Turtles (manufactured in Japan)
   * PCB label: 560359
-  * Hitachi QFP HD38820A43 MCU
+  * Hitachi QFP HD38820A43 MCU, speed adjustable by knob
   * COP411L sub MCU for sound, label COP411L-KED/N
   * cyan/red/green VFD NEC FIP15BM32T
 
@@ -3484,10 +3481,12 @@ ROM_END
 
   Entex Stargate (manufactured in Japan)
   * PCB label: 5603521/31
-  * Hitachi QFP HD38820A42 MCU
+  * Hitachi QFP HD38820A42 MCU, speed adjustable by knob
   * COP411L sub MCU for sound, label ~/B8236 COP411L-KEC/N, volume control
   * cyan/red/green VFD NEC FIP15AM32T (EL628-003) no. 2-421
   * color overlay: bottom row: red
+
+  BTANB: when changing direction, player bullets remain and become obstacles
 
 ***************************************************************************/
 
@@ -3549,11 +3548,11 @@ static INPUT_PORTS_START( estargte )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.4") // D5 INT0/1
-	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Players ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, 0)
-	PORT_CONFSETTING(    0x00, "0 (Demo)" ) // yes, same value as 1-player, hold the Inviso button at boot to enter demo mode
+	PORT_CONFNAME( 0x11, 0x00, DEF_STR( Players ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, 0)
+	PORT_CONFSETTING(    0x10, "0 (Demo)" ) // yes, same value as 1-player, hold the Inviso button at boot to enter demo mode
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
-	PORT_CONFNAME( 0x02, 0x02, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, 0)
+	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, 0)
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
 
