@@ -532,6 +532,7 @@ PCB Layouts missing
 #include "bus/msx_slot/slot.h"
 #include "bus/msx_slot/rom.h"
 #include "bus/msx_slot/ram.h"
+#include "bus/msx_slot/bruc100.h"
 #include "bus/msx_slot/cartridge.h"
 #include "bus/msx_slot/ram_mm.h"
 #include "bus/msx_slot/disk.h"
@@ -701,6 +702,7 @@ public:
 	void mx15(machine_config &config);
 	void expert13(machine_config &config);
 	void bruc100(machine_config &config);
+	void bruc100a(machine_config &config);
 	void hx21(machine_config &config);
 	void cf3300(machine_config &config);
 	void cx5f1(machine_config &config);
@@ -918,6 +920,29 @@ private:
 };
 
 
+class bruc100_state : public msx_state
+{
+public:
+	bruc100_state(const machine_config &mconfig, device_type type, const char *tag)
+		: msx_state(mconfig, type, tag)
+		, m_bruc100_firm(*this, "firm")
+	{
+	}
+
+	void bruc100(machine_config &config);
+	void bruc100a(machine_config &config);
+
+private:
+	required_device<msx_slot_bruc100_device> m_bruc100_firm;
+
+	void io_map(address_map &map);
+	void port90_w(uint8_t data)
+	{
+		m_bruc100_firm->select_bank(BIT(data, 7));
+		m_cent_ctrl_out->write(data);
+	}
+};
+
 class msx2_state : public msx_state
 {
 public:
@@ -1107,6 +1132,12 @@ void msx_state::msx_io_map(address_map &map)
 	// 0xfc - 0xff : Memory mapper I/O ports. I/O handlers will be installed if a memory mapper is present in a system
 }
 
+
+void bruc100_state::io_map(address_map &map)
+{
+	msx_io_map(map);
+	map(0x90, 0x90).w(FUNC(bruc100_state::port90_w));
+}
 
 void msx2_state::msx2_io_map(address_map &map)
 {
@@ -2880,6 +2911,8 @@ void msx_state::pv16(machine_config &config)
 
 /* MSX - CE-TEC MPC-80, German version of Daewoo DPC-200, dump needed to verify */
 
+/* MSX - Daewoo CPC-200 */
+
 /* MSX - Daewoo CPC-88 */
 
 ROM_START(cpc88)
@@ -2891,16 +2924,17 @@ ROM_END
 
 void msx_state::cpc88(machine_config &config)
 {
-	// AY8910/YM2149?
+	// AY-3-8910A
+	// TMS9928A ?
 	// FDC: None, 0 drives
-	// 2? Cartridge slots
+	// 0 Cartridge slots
+	// Expansion slot allows addition of cartridge slots
 
 	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
 	add_internal_slot(config, MSX_SLOT_ROM, "han", 0, 0, 2, 1, "maincpu", 0x8000);
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);   /* 64KB RAM */
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
 
+	m_hw_def.has_printer_port(false);
 	msx1(TMS9928A, config);
 }
 
@@ -2909,22 +2943,25 @@ void msx_state::cpc88(machine_config &config)
 ROM_START(dpc100)
 	ROM_REGION(0xc000, "maincpu", 0)
 	ROM_LOAD("100bios.rom", 0x0000, 0x8000, CRC(3ab0cd3b) SHA1(171b587bd5a947a13f3114120b6e7baca3b57d78))
+	// should be 0x2000?
 	ROM_LOAD("100han.rom",  0x8000, 0x4000, CRC(97478efb) SHA1(4421fa2504cbce18f7c84b5ea97f04e017007f07))
 ROM_END
 
 void msx_state::dpc100(machine_config &config)
 {
-	// AY8910/YM2149?
+	// GSS Z8400A PS
+	// AY-3-8910A
 	// FDC: None, 0 drives
-	// 2 Cartridge slots
+	// 1 Cartridge slot
+	// 1 Expansion slot
 
 	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
 	add_internal_slot(config, MSX_SLOT_ROM, "han", 0, 0, 2, 1, "maincpu", 0x8000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 3, 1);   /* 16KB RAM */
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
+	// expansion slot is in slot #3
 
-	msx1(TMS9928A, config);
+	msx1(TMS9918A, config);
 }
 
 /* MSX - Daewoo DPC-180 */
@@ -2932,22 +2969,24 @@ void msx_state::dpc100(machine_config &config)
 ROM_START(dpc180)
 	ROM_REGION(0xc000, "maincpu", 0)
 	ROM_LOAD("180bios.rom", 0x0000, 0x8000, CRC(3ab0cd3b) SHA1(171b587bd5a947a13f3114120b6e7baca3b57d78))
+	// should be 0x2000?
 	ROM_LOAD("180han.rom",  0x8000, 0x4000, CRC(97478efb) SHA1(4421fa2504cbce18f7c84b5ea97f04e017007f07))
 ROM_END
 
 void msx_state::dpc180(machine_config &config)
 {
-	// AY8910/YM2149?
+	// AY-3-8910A
 	// FDC: None, 0 drives
-	// 2 Cartridge slots
+	// 1 Cartridge slot
+	// 1 Expansion slot
 
 	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
 	add_internal_slot(config, MSX_SLOT_ROM, "han", 0, 0, 2, 1, "maincpu", 0x8000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 2, 2);   /* 32KB RAM */
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
+	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);   /* 64KB RAM */
+	// Expansion slot is in slot #3
 
-	msx1(TMS9928A, config);
+	msx1(TMS9918A, config);
 }
 
 /* MSX - Daewoo DPC-200 */
@@ -2955,22 +2994,25 @@ void msx_state::dpc180(machine_config &config)
 ROM_START(dpc200)
 	ROM_REGION(0xc000, "maincpu", 0)
 	ROM_LOAD("200bios.rom", 0x0000, 0x8000, CRC(3ab0cd3b) SHA1(171b587bd5a947a13f3114120b6e7baca3b57d78))
+	// should be 0x2000?
 	ROM_LOAD("200han.rom",  0x8000, 0x4000, CRC(97478efb) SHA1(4421fa2504cbce18f7c84b5ea97f04e017007f07))
 ROM_END
 
 void msx_state::dpc200(machine_config &config)
 {
-	// AY8910/YM2149?
+	// GSS Z8400A PS cpu
+	// AY-3-8910A
 	// FDC: None, 0 drives
-	// 2 Cartridge slots
+	// 1 Cartridge slot
+	// 1 Expansion slot
 
 	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
 	add_internal_slot(config, MSX_SLOT_ROM, "han", 0, 0, 2, 1, "maincpu", 0x8000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);  /* 64KB RAM */
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
+	// Expansion slot is in slot #3
 
-	msx1(TMS9928A, config);
+	msx1(TMS9918A, config);
 }
 
 /* MSX - Daewoo DPC-200E */
@@ -2982,28 +3024,35 @@ ROM_END
 
 void msx_state::dpc200e(machine_config &config)
 {
-	// AY8910
+	// AY-3-8910
 	// FDC: None, 0 drives
-	// 2 Cartridge slots
+	// 1 Cartridge slot
+	// 1 Expansion slot
 
 	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
+	// Expansion slot is in slot #3
 
-	msx1(TMS9929A, config);
+	msx1(TMS9129, config);
 }
+
+/* MSX - Daewoo Zemmix CPC-50 */
 
 /* MSX - Daewoo Zemmix CPC-50A */
 
 ROM_START(cpc50a)
 	ROM_REGION(0x8000, "maincpu", 0)
+	// HM6264LP-15 / U0422880 (ic4)
+	// GMCE? VER1.01 (ic5)
 	ROM_LOAD("50abios.rom", 0x0000, 0x8000, CRC(c3a868ef) SHA1(a08a940aa87313509e00bc5ac7494d53d8e03492))
 ROM_END
 
 void msx_state::cpc50a(machine_config &config)
 {
+	// NEC uPD780C cpu
 	// AY-3-8910A
+	// DW64MX1
 	// FDC: None, 0 drives
 	// 1 Cartridge slot
 	// No keyboard
@@ -3028,6 +3077,7 @@ ROM_END
 void msx_state::cpc50b(machine_config &config)
 {
 	// AY-3-8910A
+	// DW64MX1
 	// FDC: None, 0 drives
 	// 1 Cartridge slot
 	// No keyboard
@@ -3047,13 +3097,16 @@ void msx_state::cpc50b(machine_config &config)
 
 ROM_START(cpc51)
 	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD("51bios.rom", 0x0000, 0x8000, CRC(c3a868ef) SHA1(a08a940aa87313509e00bc5ac7494d53d8e03492))
+	// Sticker: CPC-51 V 1.01 (ic05)
+	ROM_LOAD("cpc-51_v_1_01.ic05", 0x0000, 0x8000, CRC(c3a868ef) SHA1(a08a940aa87313509e00bc5ac7494d53d8e03492))
 ROM_END
 
 void msx_state::cpc51(machine_config &config)
 {
-	// AY8910/YM2149?
+	// GSS Z8400A PS cpu
+	// AY-3-8910A
 	// FDC: None, 0 drives
+	// DW64MX1
 	// 1 Cartridge slot
 	// No keyboard, just a keyboard connector
 	// No cassette port
@@ -3068,6 +3121,8 @@ void msx_state::cpc51(machine_config &config)
 	msx1(TMS9118, config);
 }
 
+/* MSX - Daewoo Zemmix DTX-1493FW */
+
 /* MSX - Dragon MSX-64 */
 
 ROM_START(dgnmsx)
@@ -3078,7 +3133,8 @@ ROM_END
 
 void msx_state::dgnmsx(machine_config &config)
 {
-	// AY8910
+	// Sharp LH0080A cpu
+	// AY-3-8910
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
@@ -3087,8 +3143,15 @@ void msx_state::dgnmsx(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
 
-	msx1(TMS9929A, config);
+	msx1(TMS9129, config);
 }
+
+/* MSX - Dynadata DPC-200 */
+// GSS Z8400A PS
+// AY-3-8910A
+// 1 Cartridge slot
+// 1 Expansion slot
+// TMS9929A
 
 /* MSX - Fenner DPC-200 */
 
@@ -3099,14 +3162,15 @@ ROM_END
 
 void msx_state::fdpc200(machine_config &config)
 {
-	// AY8910
+	// AY-3-8910
 	// FDC: None, 0 drives
-	// 2 Cartridge slots
+	// 1 Cartridge slot
+	// 1 Expansion slot
 
 	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
+	// Expansion slot
 
 	msx1(TMS9929A, config);
 }
@@ -3120,14 +3184,16 @@ ROM_END
 
 void msx_state::fpc500(machine_config &config)
 {
-	// AY8910?
+	// AY-3-8910
+	// T6950 vdp
+	// T7775 msx engine
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
 	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  /* 64KB RAM */
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
+	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
+	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
+	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
 
 	msx1(TMS9929A, config);
 }
@@ -3136,64 +3202,106 @@ void msx_state::fpc500(machine_config &config)
 
 ROM_START(fspc800)
 	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD("spc800bios.rom", 0x0000, 0x8000, CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db))
+	ROM_LOAD("spc800bios.u7", 0x0000, 0x8000, CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db))
 ROM_END
 
 void msx_state::fspc800(machine_config &config)
 {
-	// AY8910?
+	// GSS Z8400A
+	// AY-3-8910A
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
-	// Z80: GSS Z8400APS
 
 	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  /* 64KB RAM */
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
+	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
+	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
+	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
 
-	msx1(TMS9929A, config);
+	msx1(TMS9129, config);
 }
 
 /* MSX - Frael Bruc 100-1 */
 
 ROM_START(bruc100)
-	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD("bruc100-1bios.rom", 0x0000, 0x8000, CRC(c7bc4298) SHA1(3abca440cba16ac5e162b602557d30169f77adab))
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("v1_1_mcl", 0x0000, 0x8000, CRC(c7bc4298) SHA1(3abca440cba16ac5e162b602557d30169f77adab))
+	ROM_LOAD("f_v1_0", 0x8000, 0x2000, CRC(707a62b6) SHA1(e4ffe02abbda17986cb161c332e9e54d24fd053c))
+	ROM_RELOAD(0xa000, 0x2000)
 ROM_END
 
-void msx_state::bruc100(machine_config &config)
+void bruc100_state::bruc100(machine_config &config)
 {
-	// AY8910/YM2149?
+	// AY-3-8910
 	// FDC: None, 0 drives
-	// 2 Cartridge slots?
+	// Non-standard cassette port
+	// 0 Cartridge slots
+	// 1 Expansion slot
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
+	add_internal_slot(config, MSX_SLOT_BRUC100, "firm", 0, 0, 0, 2, "maincpu", 0x0000);
+	// Expansion slot
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x10000);   /* 64KB RAM */
 
-	msx1(TMS9929A, config);
+	msx1(TMS9129, config);
+	m_maincpu->set_addrmap(AS_IO, &bruc100_state::io_map);
 }
+
+/* MSX - Frael Bruc 100-2 */
+ROM_START(bruc100a)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("bruc100-2bios.rom", 0x0000, 0x8000, CRC(24464a7b) SHA1(88611b54cdbb79aa5380570f3dfef8b3a1cc2057))
+	// v1.3
+	ROM_SYSTEM_BIOS(0, "v13", "v1.3 firmware")
+	ROMX_LOAD("bruc100_2_firmware1.3.rom", 0x8000, 0x8000, CRC(286fd001) SHA1(85ab6946950d4e329d5703b5defcce46cd96a50e), ROM_BIOS(0))
+	// v1.2
+	ROM_SYSTEM_BIOS(1, "v12", "v1.2 firmware")
+	ROMX_LOAD("c_v1_2.u8", 0x8000, 0x8000, CRC(de12f81d) SHA1(f92d3aaa314808b7a9a14c40871d24f0d558ea00), ROM_BIOS(1))
+	// v1.1
+	ROM_SYSTEM_BIOS(2, "v11", "v1.1 firmware")
+	// Firmware 1.1 - 8kb bootlogo rom (mirrored to 2000-3fff)
+	ROMX_LOAD("bruc100_2_firmware1.2.rom", 0x8000, 0x2000, CRC(54d60863) SHA1(b4c9a06054cda5fd31311a79cc06e6f018cf828f), ROM_BIOS(2))
+	ROMX_LOAD("bruc100_2_firmware1.2.rom", 0xa000, 0x2000, CRC(54d60863) SHA1(b4c9a06054cda5fd31311a79cc06e6f018cf828f), ROM_BIOS(2))
+ROM_END
+
+void bruc100_state::bruc100a(machine_config &config)
+{
+	// AY-3-8910
+	// FDC: None, 0 drives
+	// Non-standard cassette port
+	// 1 Cartridge slot
+	// 1 Expansion slot
+
+	add_internal_slot(config, MSX_SLOT_BRUC100, "firm", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 1, 0, 0, 4).set_total_size(0x10000);   /* 64KB RAM */
+	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
+	// Expansion slot
+
+	msx1(TMS9129, config);
+	m_maincpu->set_addrmap(AS_IO, &bruc100_state::io_map);
+}
+
 
 /* MSX - Fujitsu FM-X */
 
 ROM_START(fmx)
 	ROM_REGION(0x8000, "maincpu", 0)
+	// mb62h010 ?
 	ROM_LOAD("fmxbios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
 ROM_END
 
 void msx_state::fmx(machine_config &config)
 {
-	// AY8910/YM2149?
+	// 21.4772Mhz
+	// AY-3-8910A
 	// FDC: None, 0 drives
-	// 1 Cartridge slot, 2 "Fujitsu expansion slots
+	// 1 Cartridge slot
+	// 1 "Fujitsu expansion" slot for MB22450 (to connect FM-X to FM7) or MB22451 (printer port + 16KB ram)
 
 	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1); // 16KB RAM
 	// Fujitsu expansion slot #1 in slot 1
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
-	// Fijutsu expansion slot #2 in slot 3
 
+	m_hw_def.has_printer_port(false);
 	msx1(TMS9928A, config);
 }
 
@@ -9294,7 +9402,8 @@ COMP(1985, dgnmsx,     0,        0,     dgnmsx,     msx,      msx_state, empty_i
 COMP(1983, fdpc200,    0,        0,     fdpc200,    msx,      msx_state, empty_init, "Fenner", "DPC-200 (Italy) (MSX1)", 0)
 COMP(1984, fpc500,     0,        0,     fpc500,     msx,      msx_state, empty_init, "Fenner", "FPC-500 (Italy) (MSX1)", 0)
 COMP(1986, fspc800,    0,        0,     fspc800,    msx,      msx_state, empty_init, "Fenner", "SPC-800 (Italy) (MSX1)", 0)
-COMP(1984, bruc100,    0,        0,     bruc100,    msx,      msx_state, empty_init, "Frael", "Bruc 100-1 (MSX1)", 0)
+COMP(1984, bruc100,    0,        0,     bruc100,    msx,      bruc100_state, empty_init, "Frael", "Bruc 100-1 (MSX1)", 0)
+COMP(1984, bruc100a,   bruc100,  0,     bruc100a,   msx,      bruc100_state, empty_init, "Frael", "Bruc 100-2 (MSX1)", 0)
 COMP(1983, fmx,        0,        0,     fmx,        msxjp,    msx_state, empty_init, "Fujitsu", "FM-X (MSX1)", 0)
 COMP(1984, gsfc80u,    0,        0,     gsfc80u,    msxkr,    msx_state, empty_init, "Goldstar", "FC-80U (MSX1)", 0)
 COMP(1983, gsfc200,    0,        0,     gsfc200,    msx,      msx_state, empty_init, "Goldstar", "FC-200 (MSX1)", 0)
