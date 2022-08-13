@@ -460,6 +460,7 @@ void atm_state::machine_start()
 void atm_state::machine_reset()
 {
 	m_beta->enable();
+	m_glukrs->disable();
 
 	m_port_7ffd_data = 0;
 	m_port_1ffd_data = -1;
