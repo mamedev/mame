@@ -685,7 +685,7 @@ void tsconf_state::tsconf_port_f7_w(offs_t offset, u8 data)
 				case PS2KEYBOARDS_LOG:
 					break;
 				default:
-					logerror("Gluk extention not supported %x\n", m_glukrs->address_r());
+					logerror("Gluk extention not supported %x\n", m_port_f7_ext);
 					break;
 				}
 				for (u8 i = 0; i < 0xf; i++)
