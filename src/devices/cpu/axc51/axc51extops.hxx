@@ -424,8 +424,11 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 
 	case 0xd2: case 0xd6: case 0xda: case 0xde:
 	{
+		// SWAP16 ERn
 		uint8_t n = (prm & 0x0c) >> 2;
-		fatalerror("%s: SWAP16 ER%01x", machine().describe_context(), n);
+		uint16_t val = get_erx(n);
+		uint16_t newval = (val << 8) | (val >> 8);
+		set_erx(n, newval);
 		break;
 	}
 
