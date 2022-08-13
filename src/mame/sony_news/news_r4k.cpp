@@ -91,14 +91,7 @@
 
 #include "emu.h"
 
-// r4000.h has all of the features needed for this driver to function. mips3 isn't there yet because the DRC makes it harder to implement the scache stuff
-#define NO_MIPS3
-#ifndef NO_MIPS3
-#include "cpu/mips/mips3.h"
-#else
 #include "cpu/mips/r4000.h"
-#endif
-
 #include "machine/ram.h"
 #include "machine/timekpr.h"
 #include "dmac3.h"
@@ -165,29 +158,6 @@ public:
 	void init_nws5000x();
 
 protected:
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	// address maps
-	void cpu_map(address_map &map);
-	void sonic3_map(address_map &map);
-	void cpu_map_main_memory(address_map &map);
-	void cpu_map_debug(address_map &map);
-
-	// machine config
-	void machine_common(machine_config &config);
-
-	// machine init
-	void init_common();
-
-	// Interrupts
-	// See news5000 section of https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/include/adrsmap.h
-	void inten_w(offs_t offset, uint32_t data);
-	uint32_t inten_r(offs_t offset);
-	uint32_t intst_r(offs_t offset);
-	void intclr_w(offs_t offset, uint32_t data);
-	void generic_irq_w(uint32_t irq, uint32_t mask, int state);
 
 	enum irq0_number : uint32_t
 	{
@@ -217,28 +187,55 @@ protected:
 		APBUS = 0x01
 	};
 
-	template <irq0_number Number>
-	void irq_w(int state) { generic_irq_w(0, Number, state); }
-	template <irq1_number Number>
-	void irq_w(int state) { generic_irq_w(1, Number, state); }
-	template <irq2_number Number>
-	void irq_w(int state) { generic_irq_w(2, Number, state); }
-	template <irq4_number Number>
-	void irq_w(int state) { generic_irq_w(4, Number, state); }
-	void int_check();
+	enum escc_channel
+	{
+		CHA,
+		CHB
+	};
 
-#ifndef NO_MIPS3
-	const int interrupt_map[6] = {MIPS3_IRQ0, MIPS3_IRQ1, MIPS3_IRQ2, MIPS3_IRQ3, MIPS3_IRQ4, MIPS3_IRQ5};
-#else
-	const int interrupt_map[6] = {0, 1, 2, 3, 4, 5};
-#endif
+	enum APBUS_PTE_MASKS
+	{
+		ENTRY_VALID = 0x80000000,
+		ENTRY_COHERENT = 0x40000000,
+		ENTRY_PAD = 0x3FF00000,
+		ENTRY_PAD_SHIFT = 20,
+		ENTRY_PFNUM = 0xFFFFF
+	};
+
+	// APbus DMA page table entry structure
+	// See https://github.com/NetBSD/src/blob/faa527952534272f8f4737347d9fc8c38e070c9c/sys/arch/newsmips/apbus/dmac3reg.h#L71
+	struct apbus_pte
+	{
+		// Unused
+		uint32_t pad;
+		// Entry is OK to use
+		bool valid;
+		// DMA coherence enabled (don't care for emulation??)
+		bool coherent;
+		// Unused
+		uint32_t pad2;
+		// Page number (upper 20 bits of physical address)
+		uint32_t pfnum;
+	};
+
+	// Interrupts and other platform state
+	bool m_ram_map_shift = false;
+	bool m_int_state[6] = {false, false, false, false, false, false};
+	uint32_t m_inten[6] = {0, 0, 0, 0, 0, 0};
+	uint32_t m_intst[6] = {0, 0, 0, 0, 0, 0};
+	uint32_t escc1_int_status = 0;
+
+	// Freerun timer (1us period)
+	// NetBSD source code corroborates the period (https://github.com/NetBSD/src/blob/229cf3aa2cda57ba5f0c244a75ae83090e59c716/sys/arch/newsmips/newsmips/news5000.c#L259)
+	emu_timer *m_freerun_timer;
+	uint32_t m_freerun_timer_val;
+
+	// Hardware timer TIMER0 (10ms period)
+	// TODO: Is this programmable somehow? 100Hz is what the NetBSD kernel expects.
+	emu_timer *m_timer0_timer;
 
 	// MIPS R4400 CPU
-#ifndef NO_MIPS3
-	required_device<r4400scbe_device> m_cpu;
-#else
 	required_device<r4400_device> m_cpu;
-#endif
 
 	// Memory
 	required_device<ram_device> m_ram;
@@ -280,97 +277,6 @@ protected:
 	// Front panel
 	required_ioport m_dip_switch;
 	output_finder<6> m_led;
-	const std::string LED_MAP[6] = {"LED_POWER", "LED_DISK", "LED_FLOPPY", "LED_SEC", "LED_NET", "LED_CD"};
-	void led_state_w(offs_t offset, uint32_t data);
-	uint64_t front_panel_r(offs_t offset);
-	
-	// Interrupts and other platform state
-	bool m_int_state[6] = {false, false, false, false, false, false};
-	uint32_t m_inten[6] = {0, 0, 0, 0, 0, 0};
-	uint32_t m_intst[6] = {0, 0, 0, 0, 0, 0};
-	uint32_t escc1_int_status = 0;
-
-	// Freerun timer (1us period)
-	// NetBSD source code corroborates the period (https://github.com/NetBSD/src/blob/229cf3aa2cda57ba5f0c244a75ae83090e59c716/sys/arch/newsmips/newsmips/news5000.c#L259)
-	emu_timer *m_freerun_timer;
-	uint32_t m_freerun_timer_val;
-	TIMER_CALLBACK_MEMBER(freerun_clock);
-	uint32_t freerun_r(offs_t offset);
-	void freerun_w(offs_t offset, uint32_t data);
-
-	// Hardware timer TIMER0 (10ms period)
-	// TODO: Is this programmable somehow? 100Hz is what the NetBSD kernel expects.
-	emu_timer *m_timer0_timer;
-	TIMER_CALLBACK_MEMBER(timer0_clock);
-	void timer0_w(offs_t offset, uint32_t data);
-
-	// APbus control (should be split into a device eventually)
-	uint8_t apbus_cmd_r(offs_t offset);
-	void apbus_cmd_w(offs_t offset, uint32_t data);
-	uint32_t apbus_virt_to_phys(uint32_t v_address);
-	std::map<offs_t, std::string> m_apbus_cmd_decoder
-	{
-		{0xc, "INTMSK"},    // Interrupt mask
-		{0x14, "INSTST"},   // Interrupt status
-		{0x1c, "BER_ADDR"}, // Bus error address
-		{0x34, "CFG_CTRL"}, // config control
-		{0x5c, "DER_A"},    // DMA error address
-		{0x6c, "DER_S"},    // DMA error slot
-		{0x84, "DMA"}       // unmapped DMA coherency (?)
-	};
-
-	// APbus DMA page table entry structure
-	// See https://github.com/NetBSD/src/blob/faa527952534272f8f4737347d9fc8c38e070c9c/sys/arch/newsmips/apbus/dmac3reg.h#L71
-	struct apbus_pte
-	{
-		// Unused
-		uint32_t pad;
-		// Entry is OK to use
-		bool valid;
-		// DMA coherence enabled (don't care for emulation??)
-		bool coherent;
-		// Unused
-		uint32_t pad2;
-		// Page number (upper 20 bits of physical address)
-		uint32_t pfnum;
-	};
-
-	enum APBUS_PTE_MASKS
-	{
-		ENTRY_VALID = 0x80000000,
-		ENTRY_COHERENT = 0x40000000,
-		ENTRY_PAD = 0x3FF00000,
-		ENTRY_PAD_SHIFT = 20,
-		ENTRY_PFNUM = 0xFFFFF
-	};
-
-	// Other platform hardware emulation methods
-	uint32_t bus_error();
-
-	// RAM accessors
-	bool m_map_shift = false;
-	uint8_t ram_r(offs_t offset);
-	void ram_w(offs_t offset, uint8_t data);
-
-	// CXD8421Q glue logic and secondary control for the ESCC
-	// This belongs in a separate device if the other features are ever implemented.
-	enum escc_channel
-	{
-		CHA,
-		CHB
-	};
-
-	// Direct channel access
-	uint32_t escc_ch_read(escc_channel channel, offs_t offset);
-	void escc_ch_write(escc_channel channel, offs_t offset, uint32_t data);
-	template <escc_channel Channel>
-	uint32_t escc_ch_read(offs_t offset) { return escc_ch_read(Channel, offset); }
-	template <escc_channel Channel>
-	void escc_ch_write(offs_t offset, uint32_t data) { escc_ch_write(Channel, offset, data); }
-
-	// ESCC-related interrupts (probably lives on the CXD8421Q)
-	uint32_t escc1_int_status_r(offs_t offset);
-	void escc1_int_status_w(offs_t offset, uint32_t data);
 
 	// Constants
 	static constexpr uint32_t ICACHE_SIZE = 0x4000;
@@ -381,6 +287,80 @@ protected:
 	static constexpr uint32_t APBUS_DMA_MAP_ADDRESS = 0x14c20000;
 	static constexpr uint32_t APBUS_DMA_MAP_RAM_SIZE = 0x20000; // 128 kibibytes
 	const char *MAIN_MEMORY_DEFAULT = "64M";
+	const int interrupt_map[6] = {0, 1, 2, 3, 4, 5};
+
+	const std::string_view LED_MAP[6] = {"LED_POWER", "LED_DISK", "LED_FLOPPY", "LED_SEC", "LED_NET", "LED_CD"};
+	std::map<offs_t, std::string_view> m_apbus_cmd_decoder
+	{
+		{0x0c, "INTMSK"},   // Interrupt mask
+		{0x14, "INSTST"},   // Interrupt status
+		{0x1c, "BER_ADDR"}, // Bus error address
+		{0x34, "CFG_CTRL"}, // config control
+		{0x5c, "DER_A"},    // DMA error address
+		{0x6c, "DER_S"},    // DMA error slot
+		{0x84, "DMA"}       // unmapped DMA coherency (?)
+	};
+
+	// driver_device overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void machine_common(machine_config &config);
+	void init_common();
+
+	// address maps
+	void cpu_map(address_map &map);
+	void sonic3_map(address_map &map);
+	void cpu_map_main_memory(address_map &map);
+	void cpu_map_debug(address_map &map);
+
+	// Interrupts
+	// See news5000 section of https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/include/adrsmap.h
+	void inten_w(offs_t offset, uint32_t data);
+	uint32_t inten_r(offs_t offset);
+	uint32_t intst_r(offs_t offset);
+	void intclr_w(offs_t offset, uint32_t data);
+	void generic_irq_w(uint32_t irq, uint32_t mask, int state);
+
+	template <irq0_number Number>
+	void irq_w(int state) { generic_irq_w(0, Number, state); }
+	template <irq1_number Number>
+	void irq_w(int state) { generic_irq_w(1, Number, state); }
+	template <irq2_number Number>
+	void irq_w(int state) { generic_irq_w(2, Number, state); }
+	template <irq4_number Number>
+	void irq_w(int state) { generic_irq_w(4, Number, state); }
+	void int_check();
+
+	void led_state_w(offs_t offset, uint32_t data);
+	uint64_t front_panel_r(offs_t offset);
+	
+	TIMER_CALLBACK_MEMBER(freerun_clock);
+	uint32_t freerun_r(offs_t offset);
+	void freerun_w(offs_t offset, uint32_t data);
+
+	TIMER_CALLBACK_MEMBER(timer0_clock);
+	void timer0_w(offs_t offset, uint32_t data);
+
+	// APbus control (should be split into a device eventually)
+	uint8_t apbus_cmd_r(offs_t offset);
+	void apbus_cmd_w(offs_t offset, uint32_t data);
+	uint32_t apbus_virt_to_phys(uint32_t v_address);
+
+	// RAM accessors
+	uint8_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint8_t data);
+
+	// CXD8421Q glue logic and secondary control for the ESCC
+	// This belongs in a separate device if the other features are ever implemented.
+	uint32_t escc1_int_status_r(offs_t offset);
+	void escc1_int_status_w(offs_t offset, uint32_t data);
+	uint32_t escc_ch_read(escc_channel channel, offs_t offset);
+	void escc_ch_write(escc_channel channel, offs_t offset, uint32_t data);
+	template <escc_channel Channel>
+	uint32_t escc_ch_read(offs_t offset) { return escc_ch_read(Channel, offset); }
+	template <escc_channel Channel>
+	void escc_ch_write(offs_t offset, uint32_t data) { escc_ch_write(Channel, offset, data); }
 };
 
 /*
@@ -401,17 +381,8 @@ static void news_scsi_devices(device_slot_interface &device)
  */
 void news_r4k_state::machine_common(machine_config &config)
 {
-#ifndef NO_MIPS3
-	R4400SCBE(config, m_cpu, 75_MHz_XTAL);
-	m_cpu->set_force_no_drc(true);
-	m_cpu->set_icache_size(ICACHE_SIZE);
-	m_cpu->set_dcache_size(DCACHE_SIZE);
-	m_cpu->set_secondary_cache_line_size(0x40); // because config[23:22] = 0b10
-	m_cpu->set_system_clock((75_MHz_XTAL).value() / 3); // because config[30:28] = 0b001
-#else
+	// TODO: clock divisor support (config[30:28] = 0xb001) in r4000.cpp
 	R4400(config, m_cpu, 75_MHz_XTAL, true, SCACHE_SIZE, 0x40);
-#endif
-
 	m_cpu->set_addrmap(AS_PROGRAM, &news_r4k_state::cpu_map);
 
 	RAM(config, m_ram);
@@ -697,12 +668,12 @@ void news_r4k_state::cpu_map_main_memory(address_map &map)
 					   if (data == 0x10001)
 					   {
 						   LOGMASKED(LOG_GENERAL, "Enabling RAM map shift!\n");
-						   m_map_shift = true;
+						   m_ram_map_shift = true;
 					   }
 					   else
 					   {
 						   LOGMASKED(LOG_GENERAL, "Disabling RAM map shift!\n");
-						   m_map_shift = false;
+						   m_ram_map_shift = false;
 					   }
 				   }));
 }
@@ -782,11 +753,11 @@ void news_r4k_state::sonic3_map(address_map &map)
 uint8_t news_r4k_state::ram_r(offs_t offset)
 {
 	uint8_t result = 0xff;
-	if ((offset <= 0x1ffffff) || (m_map_shift && offset <= 0x3ffffff))
+	if ((offset <= 0x1ffffff) || (m_ram_map_shift && offset <= 0x3ffffff))
 	{
 		result = m_ram->read(offset);
 	}
-	else if (!m_map_shift && offset >= 0x7f00000) // upper 32MB before it is mapped into contiguous space
+	else if (!m_ram_map_shift && offset >= 0x7f00000) // upper 32MB before it is mapped into contiguous space
 	{
 		result = m_ram->read(offset - 0x5f00000);
 	}
@@ -805,11 +776,11 @@ uint8_t news_r4k_state::ram_r(offs_t offset)
  */
 void news_r4k_state::ram_w(offs_t offset, uint8_t data)
 {
-	if ((offset <= 0x1ffffff) || (m_map_shift && offset <= 0x3ffffff))
+	if ((offset <= 0x1ffffff) || (m_ram_map_shift && offset <= 0x3ffffff))
 	{
 		m_ram->write(offset, data);
 	}
-	else if (!m_map_shift && offset >= 0x7f00000) // upper 32MB before it is mapped into contiguous space
+	else if (!m_ram_map_shift && offset >= 0x7f00000) // upper 32MB before it is mapped into contiguous space
 	{
 		m_ram->write(offset - 0x5f00000, data);
 	}
@@ -909,7 +880,7 @@ void news_r4k_state::led_state_w(offs_t offset, uint32_t data)
 {
 	if (m_led[offset] != data)
 	{
-		LOGMASKED(LOG_LED, LED_MAP[offset] + ": " + (data ? "ON" : "OFF") + "\n");
+		LOGMASKED(LOG_LED, "%s: %s\n", LED_MAP[offset], data ? "ON" : "OFF");
 		m_led[offset] = data;
 	}
 }
@@ -1157,22 +1128,6 @@ void news_r4k_state::int_check()
 			m_cpu->set_input_line(interrupt_map[i], state ? 1 : 0);
 		}
 	}
-}
-
-/*
- * bus_error
- *
- * Allows ranges that trigger bus errors to be mapped.
- */
-uint32_t news_r4k_state::bus_error()
-{
-	LOGMASKED(LOG_GENERAL, "bus_error: address access caused bus error\n");
-#ifndef NO_MIPS3 // Is there a mips3.h device equivalent?
-	LOGMASKED(LOG_GENERAL, "bus_error: not implemented for this CPU type\n");
-#else
-	m_cpu->bus_error();
-#endif
-	return 0;
 }
 
 /*
