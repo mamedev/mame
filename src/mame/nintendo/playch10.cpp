@@ -693,7 +693,7 @@ void playch10_state::machine_start()
 	m_vrom = m_vrom_region ? m_vrom_region->base() : nullptr;
 
 	// sanity check: make sure PRG/CHR sizes are powers of 2 and big enough
-	int len = memregion("prg")->bytes();
+	[[maybe_unused]] int len = memregion("prg")->bytes();
 	assert(!(len & (len - 1)) && len >= 0x8000);
 	if (m_vrom)
 	{
