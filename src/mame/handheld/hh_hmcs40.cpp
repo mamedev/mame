@@ -107,11 +107,9 @@ ROM source notes when dumped from another model, but confident it's the same:
 
 TODO:
 - cgalaxn discrete sound (alien attacking sound effect)
-- gckong glitchy jump on 1st level (rarely happens), caused by MCU stack overflow.
-  It can be tested by jumping up repeatedly at the start position under the ladder,
-  if the glitch happens there, you can jump onto the 2nd floor.
-- epacman2 booting the game in demo mode, pacman should take the shortest route to
-  the upper-left power pill: mcu cycle/interrupt timing related
+- epacman2 booting the game in demo mode, pacman should take the shortest route
+  to the upper-left power pill, followed by going to the top-right power pill:
+  mcu cycle/interrupt timing related
 - kevtris's HMCS40 ROM dumps are incomplete, missing MCU factory test code from
   the 2nd half of the ROM, none of the games access it though and it's impossible
   to execute unless the chip is in testmode.
@@ -1028,7 +1026,7 @@ ROM_START( bzaxxon )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 521091, "screen", 0)
-	ROM_LOAD( "bzaxxon.svg", 0, 521091, BAD_DUMP CRC(e17a51dd) SHA1(47b042a0e58f602f7c6e12223956a5087ed73bb2) )
+	ROM_LOAD( "bzaxxon.svg", 0, 521091, BAD_DUMP CRC(3df4c10b) SHA1(804cabe09d11bf79592e25615fd6914ef0d337d8) )
 ROM_END
 
 
@@ -1291,7 +1289,7 @@ ROM_START( bpengo )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 565069, "screen", 0)
-	ROM_LOAD( "bpengo.svg", 0, 565069, CRC(07b5ad44) SHA1(2c95024d42a95b2d136e0545d65bc823d53f19c4) )
+	ROM_LOAD( "bpengo.svg", 0, 565069, CRC(29ad1525) SHA1(9ed56ff7bfbf70ead9bd7921f46d86f4b96ee9df) )
 ROM_END
 
 
@@ -1420,7 +1418,7 @@ ROM_START( bbtime )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 461598, "screen", 0)
-	ROM_LOAD( "bbtime.svg", 0, 461598, BAD_DUMP CRC(1fb7b0b8) SHA1(bf938aa1c3c5032daba064a51d5b234bb9e512f5) )
+	ROM_LOAD( "bbtime.svg", 0, 461598, BAD_DUMP CRC(297f30de) SHA1(a5f38cd9c5d5ba9392c5d57ac85ecc2782b6ae7a) )
 ROM_END
 
 
@@ -1623,7 +1621,7 @@ ROM_START( bdoramon )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 624751, "screen", 0)
-	ROM_LOAD( "bdoramon.svg", 0, 624751, CRC(0a4001dc) SHA1(afd46ef328a0ae839d19bffc0a19162b782c89b9) )
+	ROM_LOAD( "bdoramon.svg", 0, 624751, CRC(fc6ae4e4) SHA1(a9bd544a8753435bdfb8f06285aa799c47c9ff24) )
 ROM_END
 
 
@@ -1837,7 +1835,7 @@ ROM_START( bultrman )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 405725, "screen", 0)
-	ROM_LOAD( "bultrman.svg", 0, 405725, CRC(40a1acdb) SHA1(705a4ef23196ceef2973965fa33369293eacd7ab) )
+	ROM_LOAD( "bultrman.svg", 0, 405725, CRC(dfbe1dd2) SHA1(193ad1138bc0b8596c42517ade3dd128bacd587e) )
 ROM_END
 
 
@@ -2730,7 +2728,7 @@ u8 cpacman_state::input_r()
 
 static INPUT_PORTS_START( cpacman )
 	PORT_START("IN.0") // D13 port R0x
-	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Difficulty ) )
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -3108,7 +3106,7 @@ static INPUT_PORTS_START( epacman2 )
 
 	PORT_START("IN.3") // D4 port R0x
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_CONFNAME( 0x02, 0x02, DEF_STR( Difficulty ) )
+	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
 	PORT_CONFNAME( 0x0c, 0x04, DEF_STR( Players ) )
@@ -3282,7 +3280,7 @@ ROM_END
 
   Entex Turtles (manufactured in Japan)
   * PCB label: 560359
-  * Hitachi QFP HD38820A43 MCU
+  * Hitachi QFP HD38820A43 MCU, speed adjustable by knob
   * COP411L sub MCU for sound, label COP411L-KED/N
   * cyan/red/green VFD NEC FIP15BM32T
 
@@ -3299,12 +3297,15 @@ public:
 	void eturtles(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int(); }
+	DECLARE_INPUT_CHANGED_MEMBER(game_speed) { set_clock(); }
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	required_device<cop411_cpu_device> m_audiocpu;
 
+	void set_clock();
 	void update_int();
 	virtual void update_display();
 	void plate_w(offs_t offset, u8 data);
@@ -3324,7 +3325,19 @@ void eturtles_state::machine_start()
 	save_item(NAME(m_cop_irq));
 }
 
+void eturtles_state::machine_reset()
+{
+	hh_hmcs40_state::machine_reset();
+	set_clock();
+}
+
 // handlers: maincpu side
+
+void eturtles_state::set_clock()
+{
+	// maincpu clock is controlled by game speed knob, range is around 150kHz
+	m_maincpu->set_unscaled_clock(m_inputs[6]->read() * 1500 + 325000);
+}
 
 void eturtles_state::update_display()
 {
@@ -3425,12 +3438,15 @@ static INPUT_PORTS_START( eturtles )
 	PORT_CONFSETTING(    0x02, "0 (Demo)" )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
+
+	PORT_START("IN.6")
+	PORT_ADJUSTER(50, "Game Speed") PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, game_speed, 0)
 INPUT_PORTS_END
 
 void eturtles_state::eturtles(machine_config &config)
 {
 	// basic machine hardware
-	HD38820(config, m_maincpu, 400000); // approximation
+	HD38820(config, m_maincpu, 400000); // see set_clock
 	m_maincpu->write_r<0>().set(FUNC(eturtles_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(eturtles_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(eturtles_state::plate_w));
@@ -3472,8 +3488,8 @@ ROM_START( eturtles )
 	ROM_REGION( 0x0200, "audiocpu", 0 )
 	ROM_LOAD( "cop411l-ked_n", 0x0000, 0x0200, CRC(503d26e9) SHA1(a53d24d62195bfbceff2e4a43199846e0950aef6) )
 
-	ROM_REGION( 1027614, "screen", 0)
-	ROM_LOAD( "eturtles.svg", 0, 1027614, CRC(0f77eeab) SHA1(903d5e22bd83e63725ebe914914682370e978a71) )
+	ROM_REGION( 1027549, "screen", 0)
+	ROM_LOAD( "eturtles.svg", 0, 1027549, CRC(34c16de6) SHA1(039be17b2df4beecab637cebbe48c3e3b3c2797e) )
 ROM_END
 
 
@@ -3484,10 +3500,12 @@ ROM_END
 
   Entex Stargate (manufactured in Japan)
   * PCB label: 5603521/31
-  * Hitachi QFP HD38820A42 MCU
+  * Hitachi QFP HD38820A42 MCU, speed adjustable by knob
   * COP411L sub MCU for sound, label ~/B8236 COP411L-KEC/N, volume control
   * cyan/red/green VFD NEC FIP15AM32T (EL628-003) no. 2-421
   * color overlay: bottom row: red
+
+  BTANB: when changing direction, player bullets remain and become obstacles
 
 ***************************************************************************/
 
@@ -3532,39 +3550,41 @@ void estargte_state::cop_vol_w(u8 data)
 // config
 
 static INPUT_PORTS_START( estargte )
-	PORT_START("IN.0") // D1 INT0/1
+	PORT_INCLUDE( eturtles )
+
+	PORT_MODIFY("IN.0") // D1 INT0/1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, 0) PORT_NAME("Inviso")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, 0) PORT_NAME("Smart Bomb")
 
-	PORT_START("IN.1") // D2 INT0/1
+	PORT_MODIFY("IN.1") // D2 INT0/1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, 0) PORT_NAME("Fire")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, 0) PORT_NAME("Change Direction")
 
-	PORT_START("IN.2") // D3 INT0/1
+	PORT_MODIFY("IN.2") // D3 INT0/1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, 0)
 
-	PORT_START("IN.3") // D4 INT0/1
+	PORT_MODIFY("IN.3") // D4 INT0/1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, 0) PORT_NAME("Thrust")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("IN.4") // D5 INT0/1
-	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Players ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, 0)
-	PORT_CONFSETTING(    0x00, "0 (Demo)" ) // yes, same value as 1-player, hold the Inviso button at boot to enter demo mode
+	PORT_MODIFY("IN.4") // D5 INT0/1
+	PORT_CONFNAME( 0x11, 0x00, DEF_STR( Players ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, 0)
+	PORT_CONFSETTING(    0x10, "0 (Demo)" ) // yes, same value as 1-player, hold the Inviso button at boot to enter demo mode
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
-	PORT_CONFNAME( 0x02, 0x02, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, 0)
+	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, 0)
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
 
-	PORT_START("IN.5") // D6 INT0/1
+	PORT_MODIFY("IN.5") // D6 INT0/1
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 void estargte_state::estargte(machine_config &config)
 {
 	// basic machine hardware
-	HD38820(config, m_maincpu, 400000); // approximation
+	HD38820(config, m_maincpu, 400000); // see set_clock
 	m_maincpu->write_r<0>().set(FUNC(estargte_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(estargte_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(estargte_state::plate_w));
@@ -3867,7 +3887,7 @@ ROM_START( gckong )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 346544, "screen", 0)
-	ROM_LOAD( "gckong.svg", 0, 346544, CRC(f6722d7b) SHA1(2d9ec994b51020d7d24cb8f36e047ee760801a23) )
+	ROM_LOAD( "gckong.svg", 0, 346544, CRC(a0885a76) SHA1(654b170f276e58f9a13d3a873efc12b574e377cf) )
 ROM_END
 
 
@@ -4015,6 +4035,8 @@ ROM_END
   Gakken Defender
   * Hitachi HD38820L53 MCU (SDIP)
   * cyan/red/green VFD
+
+  Entex Defender is possibly the same game, but with a cyan/red VFD.
 
 ***************************************************************************/
 
@@ -5028,7 +5050,7 @@ ROM_START( kingman )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 396312, "screen", 0)
-	ROM_LOAD( "kingman.svg", 0, 396312, CRC(4861d8f3) SHA1(50eea8128dd261e4e9dd4db7e5bb6512c4460472) )
+	ROM_LOAD( "kingman.svg", 0, 396312, CRC(025f8b94) SHA1(af679a5d487248a17f2d2d2a8953d2165eca346e) )
 ROM_END
 
 

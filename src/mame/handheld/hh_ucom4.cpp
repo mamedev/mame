@@ -69,8 +69,12 @@ VFD colors used in MAME SVGs:
 - #80fff8: cyan (multi color VFD, relatively the brightest)
 - #ff4820: red
 - #50ff30: green
-- #4038ff: blue
+- #4840ff: blue
 - #ffff48: yellow
+
+It's hard to determine if a game is supposed to have yellow instead of green,
+since after decades passed, all the colors fade. It probably has a larger
+effect when a color is a mixture of 2 phosphors.
 
 Color overlays are mostly handled in the SVG, since it's often not possible
 getting the right color when doing it in a .lay file (eg. changing cpacman
@@ -1050,7 +1054,7 @@ ROM_START( bcclimbr )
 	ROM_LOAD( "d553c-170", 0x0000, 0x0800, CRC(fc2eabdb) SHA1(0f5cc854be7fdf105d9bd2114659d40c65f9d782) )
 
 	ROM_REGION( 219983, "screen", 0)
-	ROM_LOAD( "bcclimbr.svg", 0, 219983, CRC(02994933) SHA1(e1b650a70c6010cb78c84088e1bde2413682823b) )
+	ROM_LOAD( "bcclimbr.svg", 0, 219983, CRC(92c83961) SHA1(208b4c63c6aecd90acb15d9767fa1cf3aed835fb) )
 ROM_END
 
 

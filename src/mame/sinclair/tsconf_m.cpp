@@ -640,13 +640,9 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 u8 tsconf_state::tsconf_port_f7_r(offs_t offset)
 {
 	// BFF7
-	u8 data = 0xff;
-	if (m_port_f7_ext == PS2KEYBOARDS_LOG && m_port_f7_gluk_reg == 0xf0)
-		data = m_keyboard->read();
-	else if (m_port_f7_ext != DISABLED)
-		data = m_glukrs->read(m_port_f7_gluk_reg);
-
-	return data;
+	return  (m_port_f7_ext == PS2KEYBOARDS_LOG && m_glukrs->address_r() == 0xf0)
+		? m_keyboard->read()
+		: m_glukrs->data_r();
 }
 
 void tsconf_state::tsconf_port_f7_w(offs_t offset, u8 data)
@@ -654,18 +650,23 @@ void tsconf_state::tsconf_port_f7_w(offs_t offset, u8 data)
 	auto m_l = offset >> 12;
 	if (m_l == 6) // EF
 	{
-		m_port_f7_ext = (data & 0x80) ? CONF_VERSION : DISABLED;
+		m_glukrs->disable();
+		if (BIT(data, 7))
+		{
+			m_glukrs->enable();
+			m_port_f7_ext = CONF_VERSION;
+		}
 	}
-	else if (m_port_f7_ext != DISABLED)
+	else if (m_glukrs->is_active())
 	{
 		if (m_l == 5) // DF
 		{
 			// 0x0E..0xEF
-			m_port_f7_gluk_reg = data;
+			m_glukrs->address_w(data);
 		}
 		else if (m_l == 3) // BF
 		{
-			if (m_port_f7_gluk_reg == 0xf0)
+			if (m_glukrs->address_r() == 0xf0)
 			{
 				u8 m_fx[0xf] = {0xff};
 				m_port_f7_ext = static_cast<gluk_ext>(data);
@@ -684,17 +685,19 @@ void tsconf_state::tsconf_port_f7_w(offs_t offset, u8 data)
 				case PS2KEYBOARDS_LOG:
 					break;
 				default:
-					logerror("Gluk extention not supported %x\n", m_port_f7_gluk_reg);
+					logerror("Gluk extention not supported %x\n", m_port_f7_ext);
 					break;
 				}
 				for (u8 i = 0; i < 0xf; i++)
 				{
-					m_glukrs->write(0xf0 + i, m_fx[i]);
+					m_glukrs->address_w(0xf0 + i);
+					m_glukrs->data_w(m_fx[i]);
 				}
+				m_glukrs->address_w(0xf0);
 			}
 			else
 			{
-				m_glukrs->write(m_port_f7_gluk_reg, data);
+				m_glukrs->data_w(data);
 			}
 		}
 	}

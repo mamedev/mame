@@ -62,8 +62,6 @@ private:
 		RDCFG = 0x03,
 		CONFIG = 0x0e,
 		SPIFL = 0x10,
-
-		DISABLED = 0xff
 	};
 
 	enum tilemaps : u8
@@ -203,7 +201,6 @@ private:
 
 	required_device<glukrs_device> m_glukrs;
 	gluk_ext m_port_f7_ext{};
-	u8 m_port_f7_gluk_reg = 0;
 
 	s16 m_gfx_y_frame_offset = 0;
 	required_device<device_palette_interface> m_palette;

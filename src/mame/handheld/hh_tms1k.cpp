@@ -14272,7 +14272,7 @@ ROM_END
   * PCB label: TOFL003
   * TMS2670 M95041 (die label: TMS2400, M95041, 40H-01D-ND02-PHI0032-TTL O300-R300)
   * TMS1024 I/O expander
-  * cyan/red/green VFD NEC FIP9AM31T no. 21-84, 1-bit sound
+  * cyan/red/yellow VFD NEC FIP9AM31T no. 21-84, 1-bit sound
 
   Two versions are known, one with a red trigger button and blue slot button,
   and one with a blue trigger button and red slot button. The game itself is
