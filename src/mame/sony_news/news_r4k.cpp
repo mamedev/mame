@@ -75,6 +75,7 @@
  *     Use the `mp` monitor command instead for a working version that shows the TLB correctly, both on real hardware and in emulation)
  *  - Reboot/halt+boot fails because the ESCC FIFO isn't reset properly. For now, the emulator must be hard reset.
  *    It prints out a message (`esccf0: ai->ai_addr points AProm`) and then tries to allocate and use a different FIFO (which fails)
+ *  - The NetBSD installer has some weird issues (selects SCSI ID 0 regardless of the ID, some serial weirdness that NEWS-OS doesn't have, etc)
  *
  *  TODO (in no particular order):
  *  - More complete floppy support (only supports floppy boot at the moment)
