@@ -107,8 +107,9 @@ ROM source notes when dumped from another model, but confident it's the same:
 
 TODO:
 - cgalaxn discrete sound (alien attacking sound effect)
-- epacman2 booting the game in demo mode, pacman should take the shortest route to
-  the upper-left power pill: mcu cycle/interrupt timing related
+- epacman2 booting the game in demo mode, pacman should take the shortest route
+  to the upper-left power pill, followed by going to the top-right power pill:
+  mcu cycle/interrupt timing related
 - kevtris's HMCS40 ROM dumps are incomplete, missing MCU factory test code from
   the 2nd half of the ROM, none of the games access it though and it's impossible
   to execute unless the chip is in testmode.
@@ -3296,12 +3297,15 @@ public:
 	void eturtles(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int(); }
+	DECLARE_INPUT_CHANGED_MEMBER(game_speed) { set_clock(); }
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	required_device<cop411_cpu_device> m_audiocpu;
 
+	void set_clock();
 	void update_int();
 	virtual void update_display();
 	void plate_w(offs_t offset, u8 data);
@@ -3321,7 +3325,19 @@ void eturtles_state::machine_start()
 	save_item(NAME(m_cop_irq));
 }
 
+void eturtles_state::machine_reset()
+{
+	hh_hmcs40_state::machine_reset();
+	set_clock();
+}
+
 // handlers: maincpu side
+
+void eturtles_state::set_clock()
+{
+	// maincpu clock is controlled by game speed knob, range is around 150kHz
+	m_maincpu->set_unscaled_clock(m_inputs[6]->read() * 1500 + 325000);
+}
 
 void eturtles_state::update_display()
 {
@@ -3422,12 +3438,15 @@ static INPUT_PORTS_START( eturtles )
 	PORT_CONFSETTING(    0x02, "0 (Demo)" )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
+
+	PORT_START("IN.6")
+	PORT_ADJUSTER(50, "Game Speed") PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, game_speed, 0)
 INPUT_PORTS_END
 
 void eturtles_state::eturtles(machine_config &config)
 {
 	// basic machine hardware
-	HD38820(config, m_maincpu, 400000); // approximation
+	HD38820(config, m_maincpu, 400000); // see set_clock
 	m_maincpu->write_r<0>().set(FUNC(eturtles_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(eturtles_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(eturtles_state::plate_w));
@@ -3469,8 +3488,8 @@ ROM_START( eturtles )
 	ROM_REGION( 0x0200, "audiocpu", 0 )
 	ROM_LOAD( "cop411l-ked_n", 0x0000, 0x0200, CRC(503d26e9) SHA1(a53d24d62195bfbceff2e4a43199846e0950aef6) )
 
-	ROM_REGION( 1027614, "screen", 0)
-	ROM_LOAD( "eturtles.svg", 0, 1027614, CRC(0f77eeab) SHA1(903d5e22bd83e63725ebe914914682370e978a71) )
+	ROM_REGION( 1027549, "screen", 0)
+	ROM_LOAD( "eturtles.svg", 0, 1027549, CRC(34c16de6) SHA1(039be17b2df4beecab637cebbe48c3e3b3c2797e) )
 ROM_END
 
 
@@ -3531,23 +3550,25 @@ void estargte_state::cop_vol_w(u8 data)
 // config
 
 static INPUT_PORTS_START( estargte )
-	PORT_START("IN.0") // D1 INT0/1
+	PORT_INCLUDE( eturtles )
+
+	PORT_MODIFY("IN.0") // D1 INT0/1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, 0) PORT_NAME("Inviso")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, 0) PORT_NAME("Smart Bomb")
 
-	PORT_START("IN.1") // D2 INT0/1
+	PORT_MODIFY("IN.1") // D2 INT0/1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, 0) PORT_NAME("Fire")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, 0) PORT_NAME("Change Direction")
 
-	PORT_START("IN.2") // D3 INT0/1
+	PORT_MODIFY("IN.2") // D3 INT0/1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, 0)
 
-	PORT_START("IN.3") // D4 INT0/1
+	PORT_MODIFY("IN.3") // D4 INT0/1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, 0) PORT_NAME("Thrust")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("IN.4") // D5 INT0/1
+	PORT_MODIFY("IN.4") // D5 INT0/1
 	PORT_CONFNAME( 0x11, 0x00, DEF_STR( Players ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, 0)
 	PORT_CONFSETTING(    0x10, "0 (Demo)" ) // yes, same value as 1-player, hold the Inviso button at boot to enter demo mode
 	PORT_CONFSETTING(    0x00, "1" )
@@ -3556,14 +3577,14 @@ static INPUT_PORTS_START( estargte )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
 
-	PORT_START("IN.5") // D6 INT0/1
+	PORT_MODIFY("IN.5") // D6 INT0/1
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 void estargte_state::estargte(machine_config &config)
 {
 	// basic machine hardware
-	HD38820(config, m_maincpu, 400000); // approximation
+	HD38820(config, m_maincpu, 400000); // see set_clock
 	m_maincpu->write_r<0>().set(FUNC(estargte_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(estargte_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(estargte_state::plate_w));
@@ -4014,6 +4035,8 @@ ROM_END
   Gakken Defender
   * Hitachi HD38820L53 MCU (SDIP)
   * cyan/red/green VFD
+
+  Entex Defender is possibly the same game, but with a cyan/red VFD.
 
 ***************************************************************************/
 

@@ -153,6 +153,7 @@ protected:
 	int m_eint_line;    // which input_line caused an interrupt
 	int m_halt;         // internal HLT state
 	u8 m_prescaler;     // internal timer prescaler
+	bool m_block_int;   // block interrupt on next cycle
 
 	u16 m_pc;           // Program Counter
 	u16 m_prev_pc;

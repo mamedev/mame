@@ -10,6 +10,11 @@ References:
 - opcode decoding by Tatsuyuki Satoh, Olivier Galibert, Kevin Horton, Lord Nightmare
   (verified a while later after new documentation was found)
 
+TODO:
+- Which opcodes block interrupt on next cycle? LPU is obvious, and Gakken Crazy Kong
+  (VFD tabletop game) locks up if CAL doesn't do it. Maybe BR? But that's a
+  dangerous assumption since tight infinite loops wouldn't work right anymore.
+
 */
 
 #include "emu.h"
@@ -232,6 +237,7 @@ void hmcs40_cpu_device::device_start()
 	memset(m_if, 0, sizeof(m_if));
 	m_tf = 0;
 	memset(m_int, 0, sizeof(m_int));
+	m_block_int = false;
 	memset(m_r, 0, sizeof(m_r));
 	m_d = 0;
 
@@ -262,7 +268,7 @@ void hmcs40_cpu_device::device_start()
 	save_item(NAME(m_if));
 	save_item(NAME(m_tf));
 	save_item(NAME(m_int));
-
+	save_item(NAME(m_block_int));
 	save_item(NAME(m_r));
 	save_item(NAME(m_d));
 
@@ -558,9 +564,10 @@ void hmcs40_cpu_device::execute_run()
 		m_prev_op = m_op;
 		m_prev_pc = m_pc;
 
-		// check/handle interrupt, but not after LPU/BR/CAL
-		if (m_ie && (m_iri || m_irt) && (m_prev_op & 0x3e0) != 0x340 && (m_prev_op & 0x1c0) != 0x1c0)
+		// check/handle interrupt
+		if (m_ie && (m_iri || m_irt) && !m_block_int)
 			do_interrupt();
+		m_block_int = false;
 
 		// fetch next opcode
 		debugger_instruction_hook(m_pc);

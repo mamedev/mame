@@ -452,6 +452,7 @@ void hmcs40_cpu_device::op_cal()
 	// CAL a: Subroutine Jump on Status 1
 	if (m_s)
 	{
+		m_block_int = true;
 		push_stack();
 		m_pc = m_op & 0x3f; // short calls default to page 0
 	}
@@ -463,7 +464,10 @@ void hmcs40_cpu_device::op_lpu()
 {
 	// LPU u: Load Program Counter Upper on Status 1
 	if (m_s)
+	{
+		m_block_int = true;
 		m_page = m_op & 0x1f;
+	}
 	else
 		m_op |= 0x400; // indicate unhandled LPU
 }
