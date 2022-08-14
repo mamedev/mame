@@ -222,6 +222,7 @@ protected:
 	uint32_t m_inten[6] = {0, 0, 0, 0, 0, 0};
 	uint32_t m_intst[6] = {0, 0, 0, 0, 0, 0};
 	uint32_t escc1_int_status = 0;
+	memory_access<64, 3, 0, ENDIANNESS_BIG>::cache m_main_cache;
 
 	// Freerun timer (1us period)
 	// NetBSD source code corroborates the period (https://github.com/NetBSD/src/blob/229cf3aa2cda57ba5f0c244a75ae83090e59c716/sys/arch/newsmips/newsmips/news5000.c#L259)
@@ -803,6 +804,9 @@ void news_r4k_state::machine_start()
 	// Allocate hardware timers
 	m_freerun_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r4k_state::freerun_clock), this));
 	m_timer0_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r4k_state::timer0_clock), this));
+
+	// Cache for main bus access (APbus address translation)
+	m_cpu->space(0).cache(m_main_cache);
 }
 
 /*
@@ -924,7 +928,7 @@ uint32_t news_r4k_state::apbus_virt_to_phys(uint32_t v_address)
 		fatalerror("%s: APbus address decoder ran past the bounds of the DMA map RAM!", tag());
 	}
 
-	uint64_t raw_pte = m_cpu->space(0).read_qword(apbus_page_address);
+	uint64_t raw_pte = m_main_cache.read_qword(apbus_page_address);
 
 	// Marshal raw data to struct
 	apbus_pte pte;
