@@ -21777,12 +21777,12 @@ Disk 2 includes: "Krusty's Super Funhouse (demo)", "Subwar 2050 (demo)", "Graham
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="PC Gamer (Vol. 01 Nº 01 - December 1993) [Future] [1993] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="e92ac224" sha1="4fab08e30ff3a13a259018dd207e7ea4263892a9"/>
+				<rom name="PC Gamer (Vol.01 N.01 - December 1993) [Future] [1993] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="e92ac224" sha1="4fab08e30ff3a13a259018dd207e7ea4263892a9"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="PC Gamer (Vol. 01 Nº 01 - December 1993) [Future] [1993] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="a4ab6e55" sha1="01dbdbfc2e8ca500b705cba0ec4f0e923618aa74"/>
+				<rom name="PC Gamer (Vol.01 N.01 - December 1993) [Future] [1993] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="a4ab6e55" sha1="01dbdbfc2e8ca500b705cba0ec4f0e923618aa74"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21795,7 +21795,7 @@ Disk 2 includes: "Krusty's Super Funhouse (demo)", "Subwar 2050 (demo)", "Graham
 		<notes>Disk includes: "Terminator: Rampage (demo)"</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="PC Gamer (Vol. 01 Nº 02 - January 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="cda7e234" sha1="8eb289edfbc32bce318be6e549a980a3568d6a1e"/>
+				<rom name="PC Gamer (Vol.01 N.02 - January 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="cda7e234" sha1="8eb289edfbc32bce318be6e549a980a3568d6a1e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21807,7 +21807,7 @@ Disk 2 includes: "Krusty's Super Funhouse (demo)", "Subwar 2050 (demo)", "Graham
 		<notes>Disk includes: "NFL Coaches Club Football! (demo)"</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="PC Gamer (Vol. 01 Nº 03 - February 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="8144a298" sha1="70c831b469690413dc03eacfccd05c28530a8556"/>
+				<rom name="PC Gamer (Vol.01 N.03 - February 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="8144a298" sha1="70c831b469690413dc03eacfccd05c28530a8556"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21819,7 +21819,7 @@ Disk 2 includes: "Krusty's Super Funhouse (demo)", "Subwar 2050 (demo)", "Graham
 		<notes>Disk 1 includes: "Sid &amp; Al's Incredible Toons (demo)"</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="PC Gamer (Vol. 01 Nº 04 - March 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="77718485" sha1="59404805c54565dbc744d04afa048702344334cc"/>
+				<rom name="PC Gamer (Vol.01 N.04 - March 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="77718485" sha1="59404805c54565dbc744d04afa048702344334cc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21834,12 +21834,12 @@ Disk 2 includes: "DragonSphere (demo)"
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="PC Gamer (Vol. 01 Nº 05 - April 1994) [Future] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="ad8cc33b" sha1="1b4fe82dcc85338675ab2faa1b35588266e9e32f"/>
+				<rom name="PC Gamer (Vol.01 N.05 - April 1994) [Future] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="ad8cc33b" sha1="1b4fe82dcc85338675ab2faa1b35588266e9e32f"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="PC Gamer (Vol. 01 Nº 05 - April 1994) [Future] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="11265b52" sha1="7a860562efb188641f9f6af8ce8c907e003a61c8"/>
+				<rom name="PC Gamer (Vol.01 N.05 - April 1994) [Future] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="11265b52" sha1="7a860562efb188641f9f6af8ce8c907e003a61c8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21854,12 +21854,12 @@ Disk 2 includes: "Star Hammer (demo)", "Slicks'N'Slides (demo)", "Doom Party Pac
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="PC Gamer (Vol. 01 Nº 07 - June 1994) [Future] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="14119f8f" sha1="ec12488229b55d7cf0919ee8eda6fa18c4bc8e6c"/>
+				<rom name="PC Gamer (Vol.01 N.07 - June 1994) [Future] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="14119f8f" sha1="ec12488229b55d7cf0919ee8eda6fa18c4bc8e6c"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="PC Gamer (Vol. 01 Nº 07 - June 1994) [Future] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="ad355643" sha1="7520cd900a480606b4746665eb26d9a9927d22e4"/>
+				<rom name="PC Gamer (Vol.01 N.07 - June 1994) [Future] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="ad355643" sha1="7520cd900a480606b4746665eb26d9a9927d22e4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21875,12 +21875,12 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="PC Gamer (Vol. 02 Nº 10 - September 1995) [Future] [1995] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="b683ecef" sha1="0a8ba56b5578744e721dffc55bdc9a0b7d99398c" status="baddump"/>
+				<rom name="PC Gamer (Vol.02 N.10 - September 1995) [Future] [1995] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="b683ecef" sha1="0a8ba56b5578744e721dffc55bdc9a0b7d99398c" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="PC Gamer (Vol. 02 Nº 10 - September 1995) [Future] [1995] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="f082cb04" sha1="524281ab7c46c007cf3d24e0818c48c7b37b81c0" status="baddump"/>
+				<rom name="PC Gamer (Vol.02 N.10 - September 1995) [Future] [1995] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="f082cb04" sha1="524281ab7c46c007cf3d24e0818c48c7b37b81c0" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21894,7 +21894,7 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<notes>Disk includes: "Theme Park (demo)"</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="PC Gamer US (Vol. 01 Nº 01 - May-June 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="f8b77e7c" sha1="ae5d4e92269e5100724620a5ef7250917efb65e7"/>
+				<rom name="PC Gamer US (Vol.01 N.01 - May-June 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="f8b77e7c" sha1="ae5d4e92269e5100724620a5ef7250917efb65e7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21906,7 +21906,7 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<notes>Disk includes: "Detroit (demo)"</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="PC Gamer US (Vol. 01 Nº 03 - August 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="6ccf97f5" sha1="77cbe83d386f86b392948e8b44d8a1fd349be548"/>
+				<rom name="PC Gamer US (Vol.01 N.03 - August 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="6ccf97f5" sha1="77cbe83d386f86b392948e8b44d8a1fd349be548"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21918,7 +21918,7 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<notes>Disk includes: "CyClones (demo)"</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="PC Gamer US (Vol. 01 Nº 04 - September 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="682267ce" sha1="9d848bf6b48411a1ccaf611e3f0fcce08270315e"/>
+				<rom name="PC Gamer US (Vol.01 N.04 - September 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="682267ce" sha1="9d848bf6b48411a1ccaf611e3f0fcce08270315e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21930,7 +21930,7 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<notes>Disk includes: "Blackthorne (demo)"</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="PC Gamer US (Vol. 01 Nº 06 - November 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="44ebe165" sha1="acbca88be7c17798e6e00fe7587a976fda53ed54" status="baddump"/>
+				<rom name="PC Gamer US (Vol.01 N.06 - November 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="44ebe165" sha1="acbca88be7c17798e6e00fe7587a976fda53ed54" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21942,7 +21942,7 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<notes>Disk includes: "The Incredible Machine 2 (demo)"</notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="PC Gamer US (Vol. 02 Nº 03 - March 1995) [Future] [1995] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="427f7100" sha1="79c390edc51d4041de514ec8faf71716536c9702"/>
+				<rom name="PC Gamer US (Vol.02 N.03 - March 1995) [Future] [1995] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="427f7100" sha1="79c390edc51d4041de514ec8faf71716536c9702"/>
 			</dataarea>
 		</part>
 	</software>
