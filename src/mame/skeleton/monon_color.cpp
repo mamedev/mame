@@ -43,7 +43,8 @@ public:
 		m_palette(*this, "palette"),
 		m_dac(*this, "dac"),
 		m_spiptr(*this, "flash"),
-		m_debugin(*this, "DEBUG%u", 0U)
+		m_debugin(*this, "DEBUG%u", 0U),
+		m_controls(*this, "CONTROLS%u", 0U)
 	{ }
 
 	void monon_color(machine_config &config);
@@ -83,6 +84,7 @@ private:
 	required_device<dac_8bit_r2r_twos_complement_device> m_dac;
 	required_region_ptr<uint8_t> m_spiptr;
 	required_ioport_array<4> m_debugin;
+	required_ioport_array<4> m_controls;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
@@ -96,6 +98,8 @@ private:
 	void out2_w(uint8_t data);
 	void out3_w(uint8_t data);
 	void out4_w(uint8_t data);
+
+	uint8_t read_current_inputs();
 
 	uint8_t read_from_video_device();
 	void write_to_video_device(uint8_t data);
@@ -342,7 +346,7 @@ uint32_t monon_color_state::screen_update(screen_device &screen, bitmap_rgb32 &b
 
 static INPUT_PORTS_START( monon_color )
 	PORT_START("DEBUG0") // Port 0
-	PORT_DIPNAME( 0x01, 0x01, "DEBUG0" )
+	PORT_DIPNAME( 0x01, 0x01, "PORT0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -354,12 +358,8 @@ static INPUT_PORTS_START( monon_color )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) // input related (read bits here)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) // input related (read bits here)
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -368,7 +368,7 @@ static INPUT_PORTS_START( monon_color )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DEBUG1") // Port 1
-	PORT_DIPNAME( 0x01, 0x01, "DEBUG1" )
+	PORT_DIPNAME( 0x01, 0x01, "PORT1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -377,12 +377,8 @@ static INPUT_PORTS_START( monon_color )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // input related (mux select bits here)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // input related (mux select bits here)
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -394,13 +390,13 @@ static INPUT_PORTS_START( monon_color )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DEBUG2") // Port 2
-	PORT_DIPNAME( 0x01, 0x01, "DEBUG2" )
+	PORT_DIPNAME( 0x01, 0x01, "PORT2" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) // not directly a button, inputs are read across multiple ports and multiplexed, see fixed bank code in purcfs 5D10
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) // input related (read bits here)
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -418,15 +414,13 @@ static INPUT_PORTS_START( monon_color )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DEBUG3") // Port 4
-	PORT_DIPNAME( 0x01, 0x01, "DEBUG3" )
+	PORT_DIPNAME( 0x01, 0x01, "PORT4" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )  // input related (enables reading?)
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -442,21 +436,95 @@ static INPUT_PORTS_START( monon_color )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("CONTROLS0")
+	PORT_BIT( 0x001, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x004, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+
+	PORT_START("CONTROLS1")
+	PORT_BIT( 0x001, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Right Trigger")
+
+	PORT_START("CONTROLS2")
+	PORT_BIT( 0x001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x004, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Left Trigger")
+
+	PORT_START("CONTROLS3")
+	PORT_BIT( 0x001, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Menu")
+	PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Pause")
+	PORT_BIT( 0x004, IP_ACTIVE_HIGH, IPT_UNUSED )
+
 INPUT_PORTS_END
+
+/*
+	muxselect = p1 & 0x18;
+
+	0x30 input bits in p0
+	0x04 input bits in p2
+
+	0x04 in port 4 combine inputs?
+*/
+
+uint8_t monon_color_state::read_current_inputs()
+{
+	uint8_t iomux = (m_out1data & 0x18) >> 3;
+
+	if ((m_out4data & 0x04) == 0x00)
+	{
+		if (iomux == 0x00)
+		{
+			uint8_t in = (m_controls[0]->read() | m_controls[1]->read() | m_controls[2]->read() | m_controls[3]->read()) ^ 0x7;
+			return in;
+		}
+		else if (iomux == 0x01)
+		{
+			return m_controls[0]->read() ^ 0x7;
+		}
+		else if (iomux == 0x02)
+		{
+			return m_controls[1]->read() ^ 0x7;
+		}
+		else if (iomux == 0x03)
+		{
+			return m_controls[2]->read() ^ 0x7;
+		}
+	}
+	else
+	{
+		return m_controls[3]->read() ^ 0x7;
+	}
+
+	return 0x00;
+}
 
 uint8_t monon_color_state::in0_r()
 {
-	return m_debugin[0]->read();
+	uint8_t in = read_current_inputs();
+	uint8_t ret = m_debugin[0]->read() & 0xcf;
+	if (in & 0x01) ret |= 0x10;
+	if (in & 0x02) ret |= 0x20;
+
+	return ret;
 }
 
 uint8_t monon_color_state::in1_r()
 {
-	return m_debugin[1]->read();
+	uint8_t ret = m_debugin[1]->read() & 0xe7;
+	ret |= m_out1data & 0x18;
+
+	return ret;
 }
 
 uint8_t monon_color_state::in2_r()
 {
-	return m_debugin[2]->read();
+	uint8_t in = read_current_inputs();
+	uint8_t ret = m_debugin[2]->read() & 0xfb;
+	if (in & 0x04) ret |= 0x04;
+
+	return ret;
 }
 
 uint8_t monon_color_state::in3_r()
@@ -466,7 +534,9 @@ uint8_t monon_color_state::in3_r()
 
 uint8_t monon_color_state::in4_r()
 {
-	return m_debugin[3]->read();
+	uint8_t ret = m_debugin[3]->read() & 0xfb;
+	ret |= m_out4data & 0x04;
+	return ret;
 }
 
 void monon_color_state::dacout0_w(uint8_t data)
@@ -711,15 +781,12 @@ void monon_color_state::write_to_video_device(uint8_t data)
 			int entry = address / 3;
 			m_palette->set_pen_color(entry, rgb_t(m_curpal[(entry * 3) + 2], m_curpal[(entry * 3) + 1], m_curpal[(entry * 3) + 0]));
 		}
-
 	}
 
 	if (m_out0data == 0x1b)
 	{
 		if (data == 0x81)
 		{
-
-
 			LOGMASKED(LOG_VDP, "Finished Column %d\n", m_bufpos_x);
 			m_bufpos_x++;
 
