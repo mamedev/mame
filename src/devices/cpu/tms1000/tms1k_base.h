@@ -28,6 +28,7 @@ public:
 	// TMS2100 handlers
 	auto read_j() { return m_read_j.bind(); } // J input pins
 	auto read_r() { return m_read_r.bind(); } // R0-R3 input pins
+	auto &set_option_dec_div(u8 div) { m_option_dec_div = div; return *this; }
 
 	// OFF request on TMS0980 and up
 	auto power_off() { return m_power_off.bind(); }
@@ -187,6 +188,8 @@ protected:
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
+	address_space *m_program;
+	address_space *m_data;
 
 	optional_device<pla_device> m_mpla;
 	optional_device<pla_device> m_ipla;
@@ -194,6 +197,7 @@ protected:
 	optional_memory_region m_opla_b; // binary dump of output PLA, in place of PLA file
 	optional_device<pla_device> m_spla;
 
+	// internal state
 	u8 m_pc;            // 6 or 7-bit program counter
 	u32 m_sr;           // 6 or 7-bit subroutine return register(s)
 	u8 m_pa;            // 4-bit page address register
@@ -232,6 +236,7 @@ protected:
 	int m_subcycle;
 	u8 m_o_index;
 
+	// fixed settings or mask options
 	u8 m_o_pins;        // how many O pins
 	u8 m_r_pins;        // how many R pins
 	u8 m_pc_bits;       // how many program counter bits
@@ -239,9 +244,14 @@ protected:
 	u8 m_x_bits;        // how many X register bits
 	u8 m_stack_levels;  // number of stack levels (max 4)
 
-	address_space *m_program;
-	address_space *m_data;
+	u32 m_o_mask;
+	u32 m_r_mask;
+	u32 m_pc_mask;
+	u32 m_x_mask;
 
+	u8 m_option_dec_div;
+
+	// i/o handlers
 	devcb_read8 m_read_k;
 	devcb_write16 m_write_o;
 	devcb_write32 m_write_r;
@@ -257,11 +267,6 @@ protected:
 
 	const u16 *m_output_pla_table;
 	devcb_read32 m_decode_micro;
-
-	u32 m_o_mask;
-	u32 m_r_mask;
-	u32 m_pc_mask;
-	u32 m_x_mask;
 
 	int m_icount;
 	int m_state_count;

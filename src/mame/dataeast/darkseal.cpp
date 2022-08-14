@@ -57,7 +57,7 @@ public:
 
 	void darkseal(machine_config &config);
 
-	virtual void driver_init() override;
+	void driver_init();
 
 private:
 	void irq_ack_w(uint16_t data);

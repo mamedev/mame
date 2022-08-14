@@ -8585,7 +8585,7 @@ void funworld_state::init_jolycdig()
 }
 
 
-void intergames_state::driver_init()
+void intergames_state::driver_start()
 {
 	// NOP'ing some values in ROM space to avoid the hardware error.
 

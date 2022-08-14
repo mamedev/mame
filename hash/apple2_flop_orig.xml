@@ -11177,7 +11177,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It requires a 64K Apple II+ or later. -->
 
-			<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="234791">
 				<rom name="murder on the mississippi side a.woz" size="234791" crc="5b615fa1" sha1="c6d9bbff02f896b4bdac6dec1adf9bf52ae92cda" />

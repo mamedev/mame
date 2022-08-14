@@ -1692,11 +1692,17 @@ bool a2_woz_format::load(util::random_read &io, uint32_t form_factor, const std:
 		return false;
 
 	uint32_t info_vers = r8(img, off_info + 0);
-
-	if((info_vers != 1) && (info_vers != 2))
+	if(info_vers < 1 || info_vers > 3)
 		return false;
 
+	uint16_t off_flux = info_vers < 3 ? 0 : r16(img, off_info + 46);
+	uint16_t flux_size = info_vers < 3 ? 0 : r16(img, off_info + 48);
+
+	if(!flux_size)
+		off_flux = 0;
+
 	bool is_35 = r8(img, off_info + 1) == 2;
+
 	if((form_factor == floppy_image::FF_35 && !is_35) || (form_factor == floppy_image::FF_525 && is_35))
 		return false;
 
@@ -1708,7 +1714,6 @@ bool a2_woz_format::load(util::random_read &io, uint32_t form_factor, const std:
 		image->set_form_variant(floppy_image::FF_525, floppy_image::SSSD);
 
 	if (woz_vers == 1) {
-
 		for (unsigned int trkid = 0; trkid != limit; trkid++) {
 			int head = is_35 && trkid >= 80 ? 1 : 0;
 			int track = is_35 ? trkid % 80 : trkid / 4;
@@ -1731,7 +1736,30 @@ bool a2_woz_format::load(util::random_read &io, uint32_t form_factor, const std:
 			int subtrack = is_35 ? 0 : trkid & 3;
 
 			uint8_t idx = r8(img, off_tmap + trkid);
-			if(idx != 0xff) {
+			uint8_t fidx = off_flux ? r8(img, off_flux*512 + 8 + trkid) : 0xff;
+
+			if(fidx != 0xff) {
+				uint32_t trks_off = off_trks + (fidx * 8);
+				uint32_t boff = (uint32_t)r16(img, trks_off + 0) * 512;
+				uint32_t track_size = r32(img, trks_off + 4);
+
+				uint32_t total_ticks = 0;
+				for(uint32_t i=0; i != track_size; i++)
+					total_ticks += img[boff+i];
+
+				// Assume there is always a pulse at index, and it's
+				// the last one in the stream
+				std::vector<uint32_t> &buf = image->get_buffer(track, head, subtrack);
+				buf.push_back(floppy_image::MG_F | 0);
+				uint32_t cpos = 0;
+				for(uint32_t i=0; i != track_size; i++) {
+					uint8_t step = img[boff+i];
+					cpos += step;
+					if(step != 0xff && i != track_size-1)
+						buf.push_back(floppy_image::MG_F | uint64_t(cpos)*200000000/total_ticks);
+				}
+
+			} else if(idx != 0xff) {
 				uint32_t trks_off = off_trks + (idx * 8);
 
 				uint32_t boff = (uint32_t)r16(img, trks_off + 0) * 512;

@@ -86,6 +86,7 @@ tms1k_base_device::tms1k_base_device(const machine_config &mconfig, device_type 
 	m_byte_bits(byte_bits),
 	m_x_bits(x_bits),
 	m_stack_levels(stack_levels),
+	m_option_dec_div(0),
 	m_read_k(*this),
 	m_write_o(*this),
 	m_write_r(*this),

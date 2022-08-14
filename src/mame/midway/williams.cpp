@@ -1594,6 +1594,9 @@ void defender_state::defender(machine_config &config)
 	ADDRESS_MAP_BANK(config, m_bankc000).set_map(&defender_state::bankc000_map).set_options(ENDIANNESS_BIG, 8, 16, 0x1000);
 
 	m_screen->set_visarea(12, 304-1, 7, 247-1);
+
+	m_blitter_config = WILLIAMS_BLITTER_NONE;
+	m_blitter_clip_address = 0x0000;
 }
 
 
@@ -1602,6 +1605,22 @@ void defender_state::jin(machine_config &config)  // needs a different screen si
 	defender(config);
 	// basic machine hardware
 	m_screen->set_visarea(0, 315, 7, 247-1);
+}
+
+
+void williams_state::stargate(machine_config &config)
+{
+	williams_base(config);
+	m_blitter_config = WILLIAMS_BLITTER_NONE;
+	m_blitter_clip_address = 0x0000;
+}
+
+
+void williams_state::robotron(machine_config &config)
+{
+	williams_base(config);
+	m_blitter_config = WILLIAMS_BLITTER_SC1;
+	m_blitter_clip_address = 0xc000;
 }
 
 
@@ -1630,6 +1649,22 @@ void williams_muxed_state::williams_muxed(machine_config &config)
 }
 
 
+void williams_muxed_state::joust(machine_config &config)
+{
+	williams_muxed(config);
+	m_blitter_config = WILLIAMS_BLITTER_SC1;
+	m_blitter_clip_address = 0xc000;
+}
+
+
+void williams_muxed_state::splat(machine_config &config)
+{
+	williams_muxed(config);
+	m_blitter_config = WILLIAMS_BLITTER_SC2;
+	m_blitter_clip_address = 0xc000;
+}
+
+
 void spdball_state::spdball(machine_config &config)
 {
 	williams_base(config);
@@ -1641,6 +1676,9 @@ void spdball_state::spdball(machine_config &config)
 	PIA6821(config, m_pia[3], 0);
 	m_pia[3]->readpa_handler().set_ioport("IN3");
 	m_pia[3]->readpb_handler().set_ioport("IN4");
+
+	m_blitter_config = WILLIAMS_BLITTER_SC1;
+	m_blitter_clip_address = 0xc000;
 }
 
 
@@ -1655,6 +1693,9 @@ void williams_state::lottofun(machine_config &config)
 	m_pia[0]->ca2_handler().set(FUNC(williams_state::lottofun_coin_lock_w));
 
 	TICKET_DISPENSER(config, "ticket", attotime::from_msec(70), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH);
+
+	m_blitter_config = WILLIAMS_BLITTER_SC1;
+	m_blitter_clip_address = 0xc000;
 }
 
 
@@ -1673,6 +1714,9 @@ void sinistar_state::sinistar(machine_config &config)
 
 	m_pia[2]->ca2_handler().set("cvsd", FUNC(hc55516_device::digit_w));
 	m_pia[2]->cb2_handler().set("cvsd", FUNC(hc55516_device::clock_w));
+
+	m_blitter_config = WILLIAMS_BLITTER_SC1;
+	m_blitter_clip_address = 0x7400;
 }
 
 
@@ -1682,6 +1726,9 @@ void bubbles_state::bubbles(machine_config &config)  // has a full 8-bit NVRAM e
 
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &bubbles_state::main_map);
+
+	m_blitter_config = WILLIAMS_BLITTER_SC1;
+	m_blitter_clip_address = 0xc000;
 }
 
 
@@ -1702,6 +1749,9 @@ void playball_state::playball(machine_config &config)
 
 	m_pia[2]->ca2_handler().set("cvsd", FUNC(hc55516_device::digit_w));
 	m_pia[2]->cb2_handler().set("cvsd", FUNC(hc55516_device::clock_w));
+
+	m_blitter_config = WILLIAMS_BLITTER_SC1;
+	m_blitter_clip_address = 0xc000;
 }
 
 
@@ -1724,6 +1774,9 @@ void blaster_state::blastkit(machine_config &config)
 	LS157_X2(config, m_muxa, 0);
 	m_muxa->a_in_callback().set_ioport("IN3");
 	m_muxa->b_in_callback().set(FUNC(williams_state::port_0_49way_r));
+
+	m_blitter_config = WILLIAMS_BLITTER_SC2;
+	m_blitter_clip_address = 0x9700;
 }
 
 
@@ -1825,6 +1878,9 @@ void williams2_state::williams2_base(machine_config &config)
 	m_pia[2]->ca2_handler().set(m_pia[1], FUNC(pia6821_device::cb1_w));
 	m_pia[2]->irqa_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<0>));
 	m_pia[2]->irqb_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<1>));
+
+	m_blitter_config = WILLIAMS_BLITTER_SC2;
+	m_blitter_clip_address = 0x9000;
 }
 
 
@@ -3674,18 +3730,9 @@ ROM_END
  *
  *************************************/
 
-void defender_state::driver_init()
-{
-	m_blitter_config = WILLIAMS_BLITTER_NONE;
-	m_blitter_clip_address = 0x0000;
-}
-
-
-void defndjeu_state::driver_init()
+void defndjeu_state::driver_start()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	m_blitter_config = WILLIAMS_BLITTER_NONE;
-	m_blitter_clip_address = 0x0000;
 
 	// apply simple decryption by swapping bits 0 and 7
 	for (int i = 0xd000; i < 0x19000; i++)
@@ -3693,139 +3740,15 @@ void defndjeu_state::driver_init()
 }
 
 
-void mayday_state::driver_init()
+void mayday_state::driver_start()
 {
-	m_blitter_config = WILLIAMS_BLITTER_NONE;
-	m_blitter_clip_address = 0x0000;
 	m_protection = m_videoram + 0xa190;
-}
-
-
-
-/*************************************
- *
- *  Standard hardware driver init
- *
- *************************************/
-
-void williams_state::init_stargate()
-{
-	m_blitter_config = WILLIAMS_BLITTER_NONE;
-	m_blitter_clip_address = 0x0000;
-}
-
-
-void williams_state::init_robotron()
-{
-	m_blitter_config = WILLIAMS_BLITTER_SC1;
-	m_blitter_clip_address = 0xc000;
-}
-
-
-void williams_muxed_state::init_joust()
-{
-	m_blitter_config = WILLIAMS_BLITTER_SC1;
-	m_blitter_clip_address = 0xc000;
-}
-
-
-void bubbles_state::driver_init()
-{
-	m_blitter_config = WILLIAMS_BLITTER_SC1;
-	m_blitter_clip_address = 0xc000;
-}
-
-
-void williams_muxed_state::init_splat()
-{
-	m_blitter_config = WILLIAMS_BLITTER_SC2;
-	m_blitter_clip_address = 0xc000;
-}
-
-
-void sinistar_state::driver_init()
-{
-	m_blitter_config = WILLIAMS_BLITTER_SC1;
-	m_blitter_clip_address = 0x7400;
-}
-
-
-void playball_state::driver_init()
-{
-	m_blitter_config = WILLIAMS_BLITTER_SC1;
-	m_blitter_clip_address = 0xc000;
-}
-
-
-void blaster_state::driver_init()
-{
-	m_blitter_config = WILLIAMS_BLITTER_SC2;
-	m_blitter_clip_address = 0x9700;
-}
-
-
-void spdball_state::driver_init()
-{
-	m_blitter_config = WILLIAMS_BLITTER_SC1;
-	m_blitter_clip_address = 0xc000;
 }
 
 
 void williams_muxed_state::init_alienar()
 {
-	m_blitter_config = WILLIAMS_BLITTER_SC1;
-	m_blitter_clip_address = 0xc000;
 	m_maincpu->space(AS_PROGRAM).nop_write(0xcbff, 0xcbff);
-}
-
-
-void williams_muxed_state::init_alienaru()
-{
-	m_blitter_config = WILLIAMS_BLITTER_SC1;
-	m_blitter_clip_address = 0xc000;
-	m_maincpu->space(AS_PROGRAM).nop_write(0xcbff, 0xcbff);
-}
-
-
-void williams_state::init_lottofun()
-{
-	m_blitter_config = WILLIAMS_BLITTER_SC1;
-	m_blitter_clip_address = 0xc000;
-}
-
-
-
-/*************************************
- *
- *  2nd gen hardware driver init
- *
- *************************************/
-
-void mysticm_state::driver_init()
-{
-	m_blitter_config = WILLIAMS_BLITTER_SC2;
-	m_blitter_clip_address = 0x9000;
-}
-
-
-void tshoot_state::driver_init()
-{
-	m_blitter_config = WILLIAMS_BLITTER_SC2;
-	m_blitter_clip_address = 0x9000;
-}
-
-
-void inferno_state::driver_init()
-{
-	m_blitter_config = WILLIAMS_BLITTER_SC2;
-	m_blitter_clip_address = 0x9000;
-}
-
-
-void joust2_state::driver_init()
-{
-	m_blitter_config = WILLIAMS_BLITTER_SC2;
-	m_blitter_clip_address = 0x9000;
 }
 
 
@@ -3867,26 +3790,26 @@ GAME( 1982, jin,        0,        jin,            jin,      defender_state,     
 
 
 // Standard Williams hardware
-GAME( 1981, stargate,   0,        williams_base,  stargate, williams_state,       init_stargate, ROT0,   "Williams / Vid Kidz", "Stargate", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, stargate,   0,        stargate,       stargate, williams_state,       empty_init,    ROT0,   "Williams / Vid Kidz", "Stargate", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, robotron,   0,        williams_base,  robotron, williams_state,       init_robotron, ROT0,   "Williams / Vid Kidz",                   "Robotron: 2084 (Solid Blue label)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1982, robotronyo, robotron, williams_base,  robotron, williams_state,       init_robotron, ROT0,   "Williams / Vid Kidz",                   "Robotron: 2084 (Yellow/Orange label)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, robotronun, robotron, williams_base,  robotron, williams_state,       init_robotron, ROT0,   "Williams / Vid Kidz (Unidesa license)", "Robotron: 2084 (Unidesa license)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1982, robotron,   0,        robotron,       robotron, williams_state,       empty_init,    ROT0,   "Williams / Vid Kidz",                   "Robotron: 2084 (Solid Blue label)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1982, robotronyo, robotron, robotron,       robotron, williams_state,       empty_init,    ROT0,   "Williams / Vid Kidz",                   "Robotron: 2084 (Yellow/Orange label)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, robotronun, robotron, robotron,       robotron, williams_state,       empty_init,    ROT0,   "Williams / Vid Kidz (Unidesa license)", "Robotron: 2084 (Unidesa license)",     MACHINE_SUPPORTS_SAVE )
 
 // the 3 below are all noteworthy hacks of the Solid BLue set
-GAME( 1987, robotron87, robotron, williams_base,  robotron, williams_state,       init_robotron, ROT0,   "hack", "Robotron: 2084 (1987 'shot-in-the-corner' bugfix)", MACHINE_SUPPORTS_SAVE ) // fixes a reset bug.
-GAME( 2012, robotron12, robotron, williams_base,  robotron, williams_state,       init_robotron, ROT0,   "hack", "Robotron: 2084 (2012 'wave 201 start' hack)",       MACHINE_SUPPORTS_SAVE ) // includes sitc bug fix, used for competitive play.
-GAME( 2015, robotrontd, robotron, williams_base,  robotron, williams_state,       init_robotron, ROT0,   "hack", "Robotron: 2084 (2015 'tie-die V2' hack)",           MACHINE_SUPPORTS_SAVE ) // inc. sitc fix, mods by some of the original developers, see backstory here http://www.robotron2084guidebook.com/gameplay/raceto100million/robo2k14_tie-die-romset/  (I guess there's a tie-die V1 before it was released to the public?)
+GAME( 1987, robotron87, robotron, robotron,       robotron, williams_state,       empty_init,    ROT0,   "hack", "Robotron: 2084 (1987 'shot-in-the-corner' bugfix)", MACHINE_SUPPORTS_SAVE ) // fixes a reset bug.
+GAME( 2012, robotron12, robotron, robotron,       robotron, williams_state,       empty_init,    ROT0,   "hack", "Robotron: 2084 (2012 'wave 201 start' hack)",       MACHINE_SUPPORTS_SAVE ) // includes sitc bug fix, used for competitive play.
+GAME( 2015, robotrontd, robotron, robotron,       robotron, williams_state,       empty_init,    ROT0,   "hack", "Robotron: 2084 (2015 'tie-die V2' hack)",           MACHINE_SUPPORTS_SAVE ) // inc. sitc fix, mods by some of the original developers, see backstory here http://www.robotron2084guidebook.com/gameplay/raceto100million/robo2k14_tie-die-romset/  (I guess there's a tie-die V1 before it was released to the public?)
 
-GAME( 1982, joust,      0,        williams_muxed, joust,    williams_muxed_state, init_joust,    ROT0,   "Williams", "Joust (Green label)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, joustr,     joust,    williams_muxed, joust,    williams_muxed_state, init_joust,    ROT0,   "Williams", "Joust (Red label)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1982, jousty,     joust,    williams_muxed, joust,    williams_muxed_state, init_joust,    ROT0,   "Williams", "Joust (Yellow label)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, joust,      0,        joust,          joust,    williams_muxed_state, empty_init,    ROT0,   "Williams", "Joust (Green label)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, joustr,     joust,    joust,          joust,    williams_muxed_state, empty_init,    ROT0,   "Williams", "Joust (Red label)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1982, jousty,     joust,    joust,          joust,    williams_muxed_state, empty_init,    ROT0,   "Williams", "Joust (Yellow label)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, bubbles,    0,        bubbles,        bubbles,  bubbles_state,        empty_init,    ROT0,   "Williams", "Bubbles", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, bubblesr,   bubbles,  bubbles,        bubbles,  bubbles_state,        empty_init,    ROT0,   "Williams", "Bubbles (Solid Red label)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1982, bubblesp,   bubbles,  bubbles,        bubbles,  bubbles_state,        empty_init,    ROT0,   "Williams", "Bubbles (prototype version)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, splat,      0,        williams_muxed, splat,    williams_muxed_state, init_splat,    ROT0,   "Williams", "Splat!", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, splat,      0,        splat,          splat,    williams_muxed_state, empty_init,    ROT0,   "Williams", "Splat!", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, sinistar,   0,        sinistar,       sinistar, sinistar_state,       empty_init,    ROT270, "Williams", "Sinistar (revision 3)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1982, sinistar2,  sinistar, sinistar,       sinistar, sinistar_state,       empty_init,    ROT270, "Williams", "Sinistar (revision 2)",        MACHINE_SUPPORTS_SAVE )
@@ -3900,10 +3823,10 @@ GAME( 1983, blasterkit, blaster,  blastkit,       blastkit, blaster_state,      
 
 GAME( 1985, spdball,    0,        spdball,        spdball,  spdball_state,        empty_init,    ROT0,   "Williams", "Speed Ball - Contest at Neonworld (prototype)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, alienar,    0,        williams_muxed, alienar,  williams_muxed_state, init_alienar,  ROT0,   "Duncan Brown", "Alien Arena",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1985, alienaru,   alienar,  williams_muxed, alienar,  williams_muxed_state, init_alienaru, ROT0,   "Duncan Brown", "Alien Arena (Stargate upgrade)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, alienar,    0,        joust,          alienar,  williams_muxed_state, init_alienar,  ROT0,   "Duncan Brown", "Alien Arena",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1985, alienaru,   alienar,  joust,          alienar,  williams_muxed_state, init_alienar,  ROT0,   "Duncan Brown", "Alien Arena (Stargate upgrade)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, lottofun,   0,        lottofun,       lottofun, williams_state,       init_lottofun, ROT0,   "H.A.R. Management", "Lotto Fun", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, lottofun,   0,        lottofun,       lottofun, williams_state,       empty_init,    ROT0,   "H.A.R. Management", "Lotto Fun", MACHINE_SUPPORTS_SAVE )
 
 
 // 2nd Generation Williams hardware with tilemaps

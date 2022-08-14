@@ -8769,7 +8769,7 @@ void zombraid_state::machine_start()
 void zombraid_state::zombraid(machine_config &config)
 {
 	gundhara(config);
-	driver_device::static_set_callback(config.root_device(), driver_device::CB_MACHINE_START, driver_callback_delegate());
+	MCFG_MACHINE_START_REMOVE()
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &zombraid_state::zombraid_map);

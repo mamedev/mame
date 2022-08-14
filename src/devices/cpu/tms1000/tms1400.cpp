@@ -5,12 +5,14 @@
   TMS1000 family - TMS1400, TMS1470, TMS1475, TMS1600, TMS1670
 
 TMS1400 follows the TMS1100, it doubles the ROM size again (4 chapters of 16 pages), and adds a 3-level callstack
-- rotate the view and mirror the OR-mask to get the proper layout of the mpla, the default is identical to tms1100
+- rotate the view and mirror the OR-mask to get the proper layout of the mpla, the default is identical to TMS1100
 - the opla size is increased from 20 to 32 terms
 
+TMS1475 adds more R pins (indexed from X MSB)
+- opla OR order appears to be flipped: O7-O0
+
 TMS1600 adds more I/O to the TMS1400, input pins are doubled with added L1,2,4,8
-- rotate the view and mirror the OR-mask to get the proper layout of the mpla, the default is identical to tms1100
-- the opla size is increased from 20 to 32 terms
+- mpla and opla are the same as TMS1400
 
 TODO:
 - emulate TMS1600 L-pins

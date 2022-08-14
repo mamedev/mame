@@ -3464,13 +3464,11 @@ void xevious_state::init_xevios()
 }
 
 
-void battles_state::driver_init()
+void battles_state::driver_start()
 {
 	/* replace the Namco I/O handlers with interface to the 4th CPU */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x7000, 0x700f, read8sm_delegate(*this, FUNC(battles_state::customio_data0_r)), write8sm_delegate(*this, FUNC(battles_state::customio_data0_w)));
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x7100, 0x7100, read8smo_delegate(*this, FUNC(battles_state::customio0_r)), write8smo_delegate(*this, FUNC(battles_state::customio0_w)));
-
-	init_xevious();
 }
 
 
@@ -3509,7 +3507,7 @@ GAME( 1984, gatsbee,   galaga,  gatsbee, gatsbee,  galaga_state,  init_galaga,  
 GAME( 1981, nebulbee,  galaga,  galagab, galaga,   galaga_state,  init_galaga,  ROT90,  "bootleg", "Nebulous Bee", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
 GAME( 1982, xevios,    xevious, xevious, xevious,  xevious_state, init_xevios,  ROT90,  "bootleg", "Xevios", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, battles,   xevious, battles, xevious,  battles_state, driver_init,  ROT90,  "bootleg", "Battles (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, battles,   xevious, battles, xevious,  battles_state, init_xevious, ROT90,  "bootleg", "Battles (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, battles2,  xevious, xevious, xevious,  xevious_state, init_xevios,  ROT90,  "bootleg", "Battles (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, dzigzag,   digdug,  dzigzag, digdug,   digdug_state,  empty_init,   ROT90,  "bootleg", "Zig Zag (Dig Dug hardware)", MACHINE_SUPPORTS_SAVE )

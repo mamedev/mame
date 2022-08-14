@@ -4206,7 +4206,7 @@ license:CC0
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3">
-			<feature name="part_id" value="Side B: Dr. Jekyll and Mr. Hyde  "/>
+			<feature name="part_id" value="Side B: Dr. Jekyll and Mr. Hyde"/>
 			<dataarea name="flop" size="194816">
 				<rom name="double classic (1988)(zenobi)(side b).dsk" size="194816" crc="a92e7e19" sha1="4e7aeebbe48f81534ac6e8e6d3d64b8e08500c7a"/>
 			</dataarea>

@@ -648,6 +648,10 @@ void grmatch_state::machine_start()
 {
 	itech8_state::machine_start();
 
+	save_item(NAME(m_palcontrol));
+	save_item(NAME(m_xscroll));
+	save_item(NAME(m_palette));
+
 	m_palette_timer = timer_alloc(FUNC(grmatch_state::palette_update), this);
 }
 
@@ -2674,13 +2678,6 @@ ROM_END
 void itech8_state::init_invbank()
 {
 	m_bankxor = 1;
-}
-
-void grmatch_state::driver_init()
-{
-	save_item(NAME(m_palcontrol));
-	save_item(NAME(m_xscroll));
-	save_item(NAME(m_palette));
 }
 
 

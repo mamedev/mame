@@ -41,7 +41,7 @@ public:
 	rp5c01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto out_alarm_callback() { return m_out_alarm_cb.bind(); }
-	void remove_battery() { m_battery_backed = false; }
+	void remove_battery() { m_battery_backed = false; nvram_enable_backup(false); }
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
@@ -64,7 +64,6 @@ protected:
 	virtual void nvram_default() override;
 	virtual bool nvram_read(util::read_stream &file) override;
 	virtual bool nvram_write(util::write_stream &file) override;
-	virtual bool nvram_can_write() override { return m_battery_backed; }
 
 	TIMER_CALLBACK_MEMBER(advance_1hz_clock);
 	TIMER_CALLBACK_MEMBER(advance_16hz_clock);

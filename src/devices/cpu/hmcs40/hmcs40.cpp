@@ -11,10 +11,9 @@ References:
   (verified a while later after new documentation was found)
 
 TODO:
-- How the stack works, is probably m_stack_levels+1 program counters, and
-  an index pointing to the current program counter. Then push/pop simply
-  decrements/increments the index. The way it is implemented right now
-  behaves the same.
+- Which opcodes block interrupt on next cycle? LPU is obvious, and Gakken Crazy Kong
+  (VFD tabletop game) locks up if CAL doesn't do it. Maybe BR? But that's a
+  dangerous assumption since tight infinite loops wouldn't work right anymore.
 
 */
 
@@ -214,7 +213,6 @@ void hmcs40_cpu_device::device_start()
 
 	// zerofill
 	memset(m_stack, 0, sizeof(m_stack));
-	m_sp = 0;
 	m_op = 0;
 	m_prev_op = 0;
 	m_i = 0;
@@ -239,12 +237,12 @@ void hmcs40_cpu_device::device_start()
 	memset(m_if, 0, sizeof(m_if));
 	m_tf = 0;
 	memset(m_int, 0, sizeof(m_int));
+	m_block_int = false;
 	memset(m_r, 0, sizeof(m_r));
 	m_d = 0;
 
 	// register for savestates
 	save_item(NAME(m_stack));
-	save_item(NAME(m_sp));
 	save_item(NAME(m_op));
 	save_item(NAME(m_prev_op));
 	save_item(NAME(m_i));
@@ -270,7 +268,7 @@ void hmcs40_cpu_device::device_start()
 	save_item(NAME(m_if));
 	save_item(NAME(m_tf));
 	save_item(NAME(m_int));
-
+	save_item(NAME(m_block_int));
 	save_item(NAME(m_r));
 	save_item(NAME(m_d));
 
@@ -566,15 +564,17 @@ void hmcs40_cpu_device::execute_run()
 		m_prev_op = m_op;
 		m_prev_pc = m_pc;
 
-		// check/handle interrupt, but not in the middle of a long jump
-		if (m_ie && (m_iri || m_irt) && (m_prev_op & 0x3e0) != 0x340)
+		// check/handle interrupt
+		if (m_ie && (m_iri || m_irt) && !m_block_int)
 			do_interrupt();
+		m_block_int = false;
 
 		// fetch next opcode
 		debugger_instruction_hook(m_pc);
 		m_op = m_program->read_word(m_pc) & 0x3ff;
 		m_i = bitswap<4>(m_op,0,1,2,3); // reversed bit-order for 4-bit immediate param (except for XAMR)
 		increment_pc();
+		cycle();
 
 		// handle opcode
 		switch (m_op)
@@ -805,7 +805,5 @@ void hmcs40_cpu_device::execute_run()
 			default:
 				op_illegal(); break;
 		} /* big switch */
-
-		cycle();
 	}
 }

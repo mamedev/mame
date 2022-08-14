@@ -234,7 +234,7 @@ ROM_END
 
   Invicta Electronic Master Mind
   * MM75 MCU (label MM75 A7525-11, die label A7525)
-  * 9-digit 7seg VFD display (Futaba 9-ST)
+  * 9-digit 7seg VFD (Futaba 9-ST)
 
   Invicta Super-Sonic Electronic Master Mind
   * MM75 MCU (label A7539-12, die label A7539)
@@ -509,7 +509,7 @@ ROM_END
   M.E.M. Belgium Memoquiz
   * PCB label: MEMOQUIZ MO3
   * MM75 MCU (label M7505 A7505-12, die label A7505)
-  * 9-digit 7seg VFD display, no sound
+  * 9-digit 7seg VFD, no sound
 
   It's a Mastermind game, not as straightforward as Invicta's version.
   To start, press the "?" button to generate a new code, then try to guess it,
@@ -1138,7 +1138,7 @@ private:
 
 void mwcfootb_state::update_display()
 {
-	m_display->matrix(m_grid, bitswap<19>(m_plate, 19,18,17,16, 11,10,9,8,15,14,13,12, 2,3,1,0,6,5,4));
+	m_display->matrix(m_grid, m_plate);
 }
 
 // maincpu side
@@ -1162,8 +1162,8 @@ u16 mwcfootb_state::main_read_d()
 
 void mwcfootb_state::main_write_r(u16 data)
 {
-	// RIO1-RIO7: vfd plate 0-6
-	m_plate = (m_plate & 0xfff00) | (~data & 0x7f);
+	// RIO1-RIO7: vfd plate (7segs)
+	m_plate = (m_plate & 0xfff00) | bitswap<7>(~data,2,3,1,0,6,5,4);
 	update_display();
 
 	// RIO8: speaker out
@@ -1180,7 +1180,7 @@ u8 mwcfootb_state::main_read_p()
 
 void mwcfootb_state::sub_write_d(u16 data)
 {
-	// DIO0-DIO3: vfd plate 15-18
+	// DIO0-DIO3: vfd plate
 	m_plate = (m_plate & 0x0ffff) | (data << 16 & 0xf0000);
 	update_display();
 
@@ -1190,7 +1190,7 @@ void mwcfootb_state::sub_write_d(u16 data)
 
 void mwcfootb_state::sub_write_r(u16 data)
 {
-	// RIO1-RIO8: vfd plate 7-14
+	// RIO1-RIO8: vfd plate
 	m_plate = (m_plate & 0xf00ff) | (~data << 8 & 0xff00);
 	update_display();
 }
@@ -1270,7 +1270,7 @@ void mwcfootb_state::mwcfootb(machine_config &config)
 	screen.set_size(1920, 571);
 	screen.set_visarea_full();
 
-	PWM_DISPLAY(config, m_display).set_size(8, 19);
+	PWM_DISPLAY(config, m_display).set_size(8, 20);
 	m_display->set_segmask(0x7f, 0x7f);
 	config.set_default_layout(layout_mwcfootb);
 
@@ -1289,8 +1289,8 @@ ROM_START( mwcfootb )
 	ROM_REGION( 0x0800, "subcpu", 0 )
 	ROM_LOAD( "mm78_a78c7-12", 0x0000, 0x0800, CRC(b991d06e) SHA1(1f801b5cd7214f7378ae3f19799b84a9dc5bba4e) )
 
-	ROM_REGION( 248486, "screen", 0)
-	ROM_LOAD( "mwcfootb.svg", 0, 248486, CRC(03d17b85) SHA1(c877316c0c7923432235655d810fea8d714a4b31) )
+	ROM_REGION( 248494, "screen", 0)
+	ROM_LOAD( "mwcfootb.svg", 0, 248494, CRC(1000d65a) SHA1(22fddd8f5c1c75da90a6a911db5b2c967aeaa19e) )
 ROM_END
 
 

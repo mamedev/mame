@@ -4529,7 +4529,7 @@ kept for now until finding out what those bytes affect...
 		<info name="alt_title" value="エクセリオン" />
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="exerion (japan) (alt 2).rom" size="16417" crc="369cb84e" sha1="8ecc34ebff9d37c0fe9560cfdc53a052cff3d1ab" status="baddump"  offset="0" />
+				<rom name="exerion (japan) (alt 2).rom" size="16417" crc="369cb84e" sha1="8ecc34ebff9d37c0fe9560cfdc53a052cff3d1ab" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
