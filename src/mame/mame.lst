@@ -31222,6 +31222,7 @@ cf1200                          // 1984 MSX Japan
 cf2000                          // 1983 MSX Japan
 cf2700                          // 1984 MSX Japan
 cf2700g                         //
+cf2700uk                        //
 cf3000                          // 1984 MSX Japan
 cf3300                          // 1985 MSX Japan
 cpc300                          // 1986 MSX2 Korea
@@ -31351,10 +31352,13 @@ hx34                            //
 hx34i                           //
 jvchc7gb                        //
 kmc5000                         //
+mbh1                            // 1983 MSX1
+mbh1e                           // 1984 MSX1
 mbh2                            //
 mbh25                           //
 mbh50                           //
 mbh70                           //
+ml8000                          // 1983 MSX1
 mlf110                          //
 mlf120                          //
 mlf48                           //
