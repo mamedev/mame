@@ -73,7 +73,8 @@ protected:
 	// Bus/DMA related members
 	device_delegate<uint32_t(uint32_t)> m_apbus_virt_to_phys_callback;
 	required_address_space m_bus;
-	memory_access<64, 3, 0, ENDIANNESS_BIG>::cache m_net_cache;
+	memory_access<64, 3, 0, ENDIANNESS_BIG>::cache m_main_cache;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::cache m_net_cache;
 	emu_timer *m_dma_check;
 
 	// Bus configuration
