@@ -802,6 +802,35 @@ ROM_START( trvmstrc )
 	ROM_LOAD( "jaleco.7", 0x1c000, 0x4000, CRC(bf654110) SHA1(5229f5e6973a04c53572ea94c14d79a238c0e90f) )
 ROM_END
 
+ROM_START( trvmstrd ) // JALECO NB8201 + NB8202 PCBs + ENERDYNE riser board for the questions' ROMs. All labels hand-written
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ic30",   0x0000, 0x1000, CRC(9a80c5a7) SHA1(d8094572b946527a652f9b978a17f0a8a7acbddb) )
+	ROM_LOAD( "ic28",   0x1000, 0x1000, CRC(70322d65) SHA1(498102236390f2e15444943e0fff8a53f37db083) )
+	ROM_LOAD( "ic26",   0x2000, 0x1000, CRC(31dfa9cf) SHA1(007c6ef2381ce9e707932c66a451805cec342eeb) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "ic44",     0x0000, 0x1000, CRC(dac8cff7) SHA1(21da2b2ceb4a726d03b2e49a2df75ca66b89a197) )
+	ROM_LOAD( "ic46",     0x1000, 0x1000, CRC(a97ab879) SHA1(67b86d056896f10e0c055fb58c97341cf75c3d17) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "ic48",     0x0000, 0x1000, CRC(79952015) SHA1(8407c2bab476a60d945d82201f01bf59ae9e0dad) )
+	ROM_LOAD( "ic50",     0x1000, 0x1000, CRC(f09da428) SHA1(092d0eea41c8bbd48d7a3aff54c15f85262b21ff) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "ic64",     0x0000, 0x0100, CRC(e9915da8) SHA1(7c64ea76e39eaff724179d52ff5482df363fcf56) )  // palette low & high bits
+	ROM_RELOAD(           0x0100, 0x0100 )
+
+	ROM_REGION( 0x20000, "user1", 0 )   // Questions ROMs
+	ROM_LOAD( "rock_lo.u2",        0x00000, 0x4000, CRC(ec1df27b) SHA1(95f32b366123742a4576aef272209c8d59cc6b0a) )
+	ROM_LOAD( "rock_hi.u1",        0x04000, 0x4000, CRC(8a4eccc9) SHA1(e3a03f511a84b3321a59f9e9672da27b96931713) )
+	ROM_LOAD( "history_geo_lo.u4", 0x08000, 0x4000, CRC(15686fb3) SHA1(aa0a61fda9dccdecfecf5289a6bdc0a2bf7f36ff) )
+	ROM_LOAD( "history_geo_hi.u3", 0x0c000, 0x4000, CRC(86bb748f) SHA1(b24633cb09ed5a3911d063166b3e066ca8be68e8) )
+	ROM_LOAD( "sports_lo.u6",      0x10000, 0x4000, CRC(d5317b26) SHA1(8d93cf9c15b25687f224e01f332f53cac3180b83) )
+	ROM_LOAD( "sports_hi.u5",      0x14000, 0x4000, CRC(9f706db2) SHA1(171b5c490bd576d33355cfd3cd4d1b0c5cb90e00) )
+	ROM_LOAD( "earlytv_lo.u8",     0x18000, 0x4000, CRC(dbfce45f) SHA1(5d96186c96dee810b0ef63964cb3614fd486aefa) )
+	ROM_LOAD( "earlytv_hi.u7",     0x1c000, 0x4000, CRC(c8f5a02d) SHA1(8a566f83f9bd39ab508085af942957a7ed941813) )
+ROM_END
+
 /* These 'Trivia Genius' roms were found on a Naughty Boy pcb, factory?-retooled somewhat to use 8 2732s instead of 16 2716s. The pcb is a real Naughty Boy PCB, with Jaleco markings. Latest chip datecodes on the PCB are from 85 (on the two proms) but the other chips are dated 81 and 82 (which makes sense if they're formerly naughty boy pcbs).
 This may be a hacked/bootlegged version of trivia master, hacked to run on a naughty boy pcb, or (if ALL versions of trivia master ran on naughty boy pcbs) may be a 'second source bootleg', a bootleg of the trivia master naughty boy conversion.
 */
@@ -893,4 +922,5 @@ GAME( 1985, trvmstr,   0,        naughtyb, trvmstr,  naughtyb_state, init_trvmst
 GAME( 1985, trvmstra,  trvmstr,  naughtyb, trvmstr,  naughtyb_state, init_trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, trvmstrb,  trvmstr,  naughtyb, trvmstr,  naughtyb_state, init_trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, trvmstrc,  trvmstr,  naughtyb, trvmstr,  naughtyb_state, init_trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvmstrd,  trvmstr,  naughtyb, trvmstr,  naughtyb_state, init_trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 5)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, trvgns,    trvmstr,  naughtyb, trvmstr,  naughtyb_state, init_trvmstr,  ROT90, "bootleg", "Trivia Genius", MACHINE_SUPPORTS_SAVE )
