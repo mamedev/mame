@@ -55,7 +55,6 @@ TODO:
 - tithermos temperature sensor comparator (right now just the digital clock works)
 - is alphie(patent) the same as the final version?
 - is starwbcp the same as MP3438? (starwbc is MP3438A)
-- add SVG for tgpachi
 
 ============================================================================
 
@@ -317,7 +316,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "xl25.lh" // clickable
 #include "zodiac.lh" // clickable
 
-#include "hh_tms1k_test.lh" // common test-layout - use external artwork
+//#include "hh_tms1k_test.lh" // common test-layout - use external artwork
 
 
 // machine_start/reset
@@ -14373,8 +14372,12 @@ void tgpachi_state::tgpachi(machine_config &config)
 	m_expander->write_port7_callback().set(FUNC(tgpachi_state::expander_w));
 
 	// video hardware
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(503, 1080);
+	screen.set_visarea_full();
+
 	PWM_DISPLAY(config, m_display).set_size(8, 21);
-	config.set_default_layout(layout_hh_tms1k_test);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -14393,8 +14396,8 @@ ROM_START( tgpachi )
 	ROM_REGION( 557, "maincpu:opla", 0 )
 	ROM_LOAD( "tms2100_tgpachi_output.pla", 0, 557, CRC(90849b91) SHA1(ed19444b655c48bbf2a662478d46c045d900080d) )
 
-	ROM_REGION( 100000, "screen", 0)
-	ROM_LOAD( "tgpachi.svg", 0, 100000, NO_DUMP )
+	ROM_REGION( 140540, "screen", 0)
+	ROM_LOAD( "tgpachi.svg", 0, 140540, CRC(438906cf) SHA1(c5d1a1d877e8abcd19fd3e1f0cdf3f8fd0d5a9ef) )
 ROM_END
 
 
@@ -14865,7 +14868,7 @@ CONS( 1979, tbreakup,   0,         0, tbreakup,  tbreakup,  tbreakup_state,  emp
 CONS( 1980, phpball,    0,         0, phpball,   phpball,   phpball_state,   empty_init, "Tomy", "Power House Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 CONS( 1982, tdracula,   0,         0, tdracula,  tdracula,  tdracula_state,  empty_init, "Tsukuda", "The Dracula (Tsukuda)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, tgpachi,    0,         0, tgpachi,   tgpachi,   tgpachi_state,   empty_init, "Tsukuda", "Game Pachinko", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1983, tgpachi,    0,         0, tgpachi,   tgpachi,   tgpachi_state,   empty_init, "Tsukuda", "Game Pachinko", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1980, ssports4,   0,         0, ssports4,  ssports4,  ssports4_state,  empty_init, "U.S. Games", "Super Sports-4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
