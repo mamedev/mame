@@ -1428,7 +1428,8 @@ Lose Hole   -1  -2
 	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )
 INPUT_PORTS_END
 
-/* Same as 'golf', but 4 start buttons */
+// Same as 'golf', but 4 start buttons
+// FIXME: since UniSystems only have P1/P2 start buttons this implies the golf4s versions are for DualSystem only
 static INPUT_PORTS_START( golf4s )
 	PORT_INCLUDE( golf )
 
@@ -3630,10 +3631,10 @@ GAME( 1986, suprmriobl2,    suprmrio,      vs_smbbl,      suprmrio, vs_smbbl_sta
 GAME( 1988, skatekds,       suprmrio,      vsnes,         suprmrio, vs_uni_state,   init_vsnormal, ROT0, "hack (Two-Bit Score)",   "Vs. Skate Kids. (Graphic hack of Super Mario Bros.)",      0 )
 GAME( 1985, vsskykid,       0,             vsnes,         vsskykid, vs_uni_state,   init_vs108,    ROT0, "Namco",                  "Vs. Super SkyKid",                                         0 )
 GAME( 1987, tkoboxng,       0,             vsnes,         tkoboxng, vs_uni_state,   init_tkoboxng, ROT0, "Namco / Data East USA",  "Vs. T.K.O. Boxing",                                        0 )
-GAME( 1984, smgolf,         0,             vsnes,         golf4s,   vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Men Version, set GF4-2 F)",       0 )
-GAME( 1984, smgolfb,        smgolf,        vsnes,         golf,     vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Men Version, set GF4-2 ?)",       0 )
+GAME( 1984, smgolf,         0,             vsnes,         golf,     vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Men Version, set GF4-2 F)",       0 )
+GAME( 1984, smgolfb,        smgolf,        vsnes,         golf4s,   vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Men Version, set GF4-2 ?)",       0 )
 GAME( 1984, smgolfj,        smgolf,        vsnes,         golf,     vs_uni_state,   init_vsnormal, ROT0, "Nintendo Co., Ltd.",     "Vs. Stroke & Match Golf (Men Version) (Japan, set GF3 B)", 0 )
-GAME( 1984, ladygolfe,      smgolf,        vsnes,         golf,     vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Ladies Version, set LG4 E)",      0 )
+GAME( 1984, ladygolfe,      smgolf,        vsnes,         golf4s,   vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Ladies Version, set LG4 E)",      0 )
 GAME( 1984, ladygolf,       smgolf,        vsnes,         golf,     vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Ladies Version, set LG4 ?)",      0 )
 GAME( 1984, vspinbal,       0,             vsnes,         vspinbal, vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Pinball (US, set PN4 E-1)",                            0 )
 GAME( 1984, vspinbalj,      vspinbal,      vsnes,         vspinblj, vs_uni_state,   init_vsnormal, ROT0, "Nintendo Co., Ltd.",     "Vs. Pinball (Japan, set PN3 B)",                           0 )
