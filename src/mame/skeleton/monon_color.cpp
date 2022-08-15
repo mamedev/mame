@@ -59,6 +59,7 @@ private:
 	enum
 	{
 		READY_FOR_COMMAND = 0x00,
+
 		READY_FOR_ADDRESS2 = 0x01,
 		READY_FOR_ADDRESS1 = 0x02,
 		READY_FOR_ADDRESS0 = 0x03,
@@ -71,10 +72,15 @@ private:
 		READY_FOR_WRITEADDRESS2 = 0x08,
 		READY_FOR_WRITEADDRESS1 = 0x09,
 		READY_FOR_WRITEADDRESS0 = 0x0a,
-		READY_FOR_WRITE = 0x0b,
 
-		READY_FOR_READ = 0x0c,
-		READY_FOR_STATUS_READ = 0x0d,
+		READY_FOR_SECTORERASEADDRESS2 = 0x0b,
+		READY_FOR_SECTORERASEADDRESS1 = 0x0c,
+		READY_FOR_SECTORERASEADDRESS0 = 0x0d,
+
+		READY_FOR_WRITE = 0x0e,
+
+		READY_FOR_READ = 0x0f,
+		READY_FOR_STATUS_READ = 0x10,
 	};
 
 	required_device<generic_slot_device> m_cart;
@@ -202,6 +208,11 @@ void monon_color_state::spibuf_w(uint8_t data)
 				// page program
 				m_spi_state = READY_FOR_WRITEADDRESS2;
 			}
+			else if (data == 0x20)
+			{
+				// erase 4k sector
+				m_spi_state = READY_FOR_COMMAND;
+			}
 			else
 			{
 				fatalerror( "SPI set to unknown mode %02x\n", data);
@@ -269,6 +280,22 @@ void monon_color_state::spibuf_w(uint8_t data)
 			m_spidir = 1;
 			LOGMASKED(LOG_SPI, "SPI set to High Speed READ mode with address %08x\n", m_spiaddr);
 			break;
+
+		case READY_FOR_SECTORERASEADDRESS2:
+			m_spiaddr = (m_spiaddr & 0x00ffff) | (data << 16);
+			m_spi_state = READY_FOR_SECTORERASEADDRESS1;
+			break;
+
+		case READY_FOR_SECTORERASEADDRESS1:
+			m_spiaddr = (m_spiaddr & 0xff00ff) | (data << 8);
+			m_spi_state = READY_FOR_SECTORERASEADDRESS0;
+			break;
+
+		case READY_FOR_SECTORERASEADDRESS0:
+			m_spiaddr = (m_spiaddr & 0xffff00) | (data);
+			LOGMASKED(LOG_SPI, "SPI set to Erase Sector with address %08x\n", m_spiaddr);
+			break;
+
 		}
 	}
 	else
@@ -802,11 +829,12 @@ void monon_color_state::write_to_video_device(uint8_t data)
 
 	//  (m_storeregs[0x1c] == 0x11) backgrounds (maybe no trans pen?)
 	//  (m_storeregs[0x1c] == 0x01) most elements
+	//  (m_storeregs[0x1c] == 0x00) some elements in purceb and zombhunt
 	//  (m_storeregs[0x1c] == 0x0a) blended elements
 
 	if (m_out0data == 0x0c)
 	{
-		if ((m_storeregs[0x1c] == 0x0a) || (m_storeregs[0x1c] == 0x01) || (m_storeregs[0x1c] == 0x11))
+		if ((m_storeregs[0x1c] == 0x00) || (m_storeregs[0x1c] == 0x0a) || (m_storeregs[0x1c] == 0x01) || (m_storeregs[0x1c] == 0x11))
 		{
 			uint16_t amount = m_storeregs[0x0e] | (m_storeregs[0x01] << 8);
 
@@ -840,10 +868,6 @@ void monon_color_state::write_to_video_device(uint8_t data)
 						m_vidbuffer[(i * 320) + m_bufpos_x] = m_linebuf[i];
 				}
 			}
-		}
-		else if (m_storeregs[0x1c] == 0x00)
-		{
-
 		}
 		else
 		{

@@ -23,6 +23,9 @@
 #define LOG_UNSORTED  (1U <<  1)
 #define LOG_PORTS     (1U <<  2)
 #define LOG_UNHANDLED (1U <<  3)
+#define LOG_UNHANDLED_XSFR (1U <<  4)
+
+
 
 #define VERBOSE     (0)
 
@@ -936,7 +939,7 @@ uint8_t axc51base_cpu_device::xsfr_read(offs_t offset)
 {
 	offset &= 0x7f;
 
-	LOGMASKED(LOG_UNHANDLED,"%s: reading unhandled XSFR reg %04x\n", machine().describe_context(), offset + 0x3000);
+	LOGMASKED(LOG_UNHANDLED_XSFR,"%s: reading unhandled XSFR reg %04x\n", machine().describe_context(), offset + 0x3000);
 
 	return m_xsfr_regs[offset];
 }
@@ -968,7 +971,7 @@ void axc51base_cpu_device::xsfr_write(offs_t offset, uint8_t data)
 		break;
 
 	default:
-		LOGMASKED(LOG_UNHANDLED,"%s: writing to unhandled XSFR reg %04x data %02x\n", machine().describe_context(), offset + 0x3000, data);
+		LOGMASKED(LOG_UNHANDLED_XSFR,"%s: writing to unhandled XSFR reg %04x data %02x\n", machine().describe_context(), offset + 0x3000, data);
 		break;
 
 	}
