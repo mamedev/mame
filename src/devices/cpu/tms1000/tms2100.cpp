@@ -22,7 +22,6 @@ Extra functions are controlled with the R register (not mapped to pins):
 - R24: enable interrupts
 
 TODO:
-- event counter (EC1 pin)
 - R0-R3 I/O, TRA opcode
 - A/D converter, TADM opcode
 - what happens if decrementer is loaded when IVR is 0?
@@ -95,9 +94,10 @@ void tms2100_cpu_device::device_start()
 	m_ivr = 0xff;
 	m_dec = 0xff;
 	m_il = 0;
-	m_int_pin = 0;
 	m_int_pending = false;
 	m_r_prev = 0;
+	m_int_pin = 0;
+	m_ec1_pin = 0;
 
 	m_pb_save = 0;
 	m_cb_save = 0;
@@ -114,9 +114,10 @@ void tms2100_cpu_device::device_start()
 	save_item(NAME(m_ivr));
 	save_item(NAME(m_dec));
 	save_item(NAME(m_il));
-	save_item(NAME(m_int_pin));
 	save_item(NAME(m_int_pending));
 	save_item(NAME(m_r_prev));
+	save_item(NAME(m_int_pin));
+	save_item(NAME(m_ec1_pin));
 
 	save_item(NAME(m_pb_save));
 	save_item(NAME(m_cb_save));
@@ -151,15 +152,30 @@ void tms2100_cpu_device::device_reset()
 // interrupt/timer
 void tms2100_cpu_device::execute_set_input(int line, int state)
 {
-	if (line == TMS2100_INPUT_LINE_INT)
+	switch (line)
 	{
-		if (state && !m_int_pin)
-		{
-			// load decrementer if it's not counting
-			if (BIT(m_r, 15) && m_dec == 0xff)
-				m_dec = m_ivr;
-		}
-		m_int_pin = state;
+		case TMS2100_INPUT_LINE_INT:
+			if (state && !m_int_pin)
+			{
+				// load decrementer if it's not counting
+				if (BIT(m_r, 15) && m_dec == 0xff)
+					m_dec = m_ivr;
+			}
+			m_int_pin = state;
+			break;
+
+		case TMS2100_INPUT_LINE_EC1:
+			if (state && !m_ec1_pin)
+			{
+				// clock decrementer if event counter is enabled
+				if (BIT(m_r, 18))
+					clock_decrementer();
+			}
+			m_ec1_pin = state;
+			break;
+
+		default:
+			break;
 	}
 }
 
