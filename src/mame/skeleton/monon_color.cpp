@@ -10,6 +10,32 @@
    uses AX208 CPU (custom 8051 @ 96Mhz with single cycle instructions, extended '16 bit' opcodes + integrated video, jpeg decoder etc.)
    https://docplayer.net/52724058-Ax208-product-specification.html
 
+   Emulation Notes:
+
+   The Monon makes very little use of many of the AX208 features, for example
+
+   - Encryption is only enabled once, for a throw-away transfer that is never
+   checked.
+   - JPEG RAM is simply used for extra RAM.
+   - USB support not used
+   - SD card support not used
+   - Most IRQ levels not used
+   - Onboard LCDC not used
+
+   While the SFX used by each game are done through the AX208 DAC the music
+   is not.
+
+   Instead the music is supplied by a glob in each cartridge, which differs
+   for each game.  This glob is assumed to be a self-contained MCU, responding
+   to music requests.  Swapping the game ROM onto a different cartridge
+   results in incorrect music, or silence, and in some cases hangs if you go
+   into the volume adjustment menu.
+
+   There is currently no way of reading the music data from this glob, nor
+   has the exact die underneath it been identified.
+
+   Games save data directly to the SPI ROM in the 0x50000-0x5ffff region
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -32,29 +58,175 @@
 
 #include "logmacro.h"
 
-class monon_color_state : public driver_device
+
+class monon_cart_spi_device : public device_t
 {
 public:
-	monon_color_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_cart(*this, "cartslot"),
-		m_maincpu(*this, "maincpu"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_dac(*this, "dac"),
-		m_spiptr(*this, "flash"),
-		m_debugin(*this, "DEBUG%u", 0U),
-		m_controls(*this, "CONTROLS%u", 0U)
-	{ }
+	monon_cart_spi_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
-	void monon_color(machine_config &config);
+	void set_rom_ptr(uint8_t* rom) { m_spiptr = rom; }
+
+	uint8_t read()
+	{
+		return m_spilatch;
+	}
+
+	void set_ready()
+	{
+		m_spi_state = READY_FOR_COMMAND;
+	}
+
+	DECLARE_WRITE_LINE_MEMBER(dir_w)
+	{
+		m_spidir = state;
+	}
+
+	void write(uint8_t data)
+	{
+		if (!m_spidir) // Send to SPI
+		{
+			switch (m_spi_state)
+			{
+			case READY_FOR_COMMAND:
+				if (data == 0x03)
+				{
+					m_spi_state = READY_FOR_ADDRESS2;
+				}
+				else if (data == 0x05)
+				{
+					m_spi_state = READY_FOR_STATUS_READ;
+				}
+				else if (data == 0x0b)
+				{
+					m_spi_state = READY_FOR_HSADDRESS2;
+				}
+				else if (data == 0x06)
+				{
+					// write enable
+					m_spi_state = READY_FOR_COMMAND;
+				}
+				else if (data == 0x04)
+				{
+					// write disable
+					m_spi_state = READY_FOR_COMMAND;
+				}
+				else if (data == 0x02)
+				{
+					// page program
+					m_spi_state = READY_FOR_WRITEADDRESS2;
+				}
+				else if (data == 0x20)
+				{
+					// erase 4k sector
+					m_spi_state = READY_FOR_COMMAND;
+				}
+				else
+				{
+					fatalerror("SPI set to unknown mode %02x\n", data);
+				}
+				break;
+
+			case READY_FOR_WRITEADDRESS2:
+				m_spiaddr = (m_spiaddr & 0x00ffff) | (data << 16);
+				m_spi_state = READY_FOR_WRITEADDRESS1;
+				break;
+
+			case READY_FOR_WRITEADDRESS1:
+				m_spiaddr = (m_spiaddr & 0xff00ff) | (data << 8);
+				m_spi_state = READY_FOR_WRITEADDRESS0;
+				break;
+
+			case READY_FOR_WRITEADDRESS0:
+				m_spiaddr = (m_spiaddr & 0xffff00) | (data);
+				m_spi_state = READY_FOR_WRITE;
+				LOGMASKED(LOG_SPI, "SPI set to page WRITE mode with address %08x\n", m_spiaddr);
+				break;
+
+			case READY_FOR_WRITE:
+				LOGMASKED(LOG_SPI, "Write SPI data %02x\n", data);
+
+				m_spiptr[(m_spiaddr++) & 0xffffff] = data;
+
+				break;
+
+
+			case READY_FOR_ADDRESS2:
+				m_spiaddr = (m_spiaddr & 0x00ffff) | (data << 16);
+				m_spi_state = READY_FOR_ADDRESS1;
+				break;
+
+			case READY_FOR_ADDRESS1:
+				m_spiaddr = (m_spiaddr & 0xff00ff) | (data << 8);
+				m_spi_state = READY_FOR_ADDRESS0;
+				break;
+
+			case READY_FOR_ADDRESS0:
+				m_spiaddr = (m_spiaddr & 0xffff00) | (data);
+				m_spi_state = READY_FOR_READ;
+				m_spidir = 1;
+				LOGMASKED(LOG_SPI, "SPI set to READ mode with address %08x\n", m_spiaddr);
+				break;
+
+			case READY_FOR_HSADDRESS2:
+				m_spiaddr = (m_spiaddr & 0x00ffff) | (data << 16);
+				m_spi_state = READY_FOR_HSADDRESS1;
+				break;
+
+			case READY_FOR_HSADDRESS1:
+				m_spiaddr = (m_spiaddr & 0xff00ff) | (data << 8);
+				m_spi_state = READY_FOR_HSADDRESS0;
+				break;
+
+			case READY_FOR_HSADDRESS0:
+				m_spiaddr = (m_spiaddr & 0xffff00) | (data);
+				m_spi_state = READY_FOR_HSDUMMY;
+				break;
+
+			case READY_FOR_HSDUMMY:
+				m_spi_state = READY_FOR_READ;
+				m_spidir = 1;
+				LOGMASKED(LOG_SPI, "SPI set to High Speed READ mode with address %08x\n", m_spiaddr);
+				break;
+
+			case READY_FOR_SECTORERASEADDRESS2:
+				m_spiaddr = (m_spiaddr & 0x00ffff) | (data << 16);
+				m_spi_state = READY_FOR_SECTORERASEADDRESS1;
+				break;
+
+			case READY_FOR_SECTORERASEADDRESS1:
+				m_spiaddr = (m_spiaddr & 0xff00ff) | (data << 8);
+				m_spi_state = READY_FOR_SECTORERASEADDRESS0;
+				break;
+
+			case READY_FOR_SECTORERASEADDRESS0:
+				m_spiaddr = (m_spiaddr & 0xffff00) | (data);
+				LOGMASKED(LOG_SPI, "SPI set to Erase Sector with address %08x\n", m_spiaddr);
+				break;
+
+			}
+		}
+		else
+		{
+			if (m_spi_state == READY_FOR_READ)
+			{
+				m_spilatch = m_spiptr[(m_spiaddr++) & 0xffffff];
+			}
+			else if (m_spi_state == READY_FOR_STATUS_READ)
+			{
+				m_spilatch = 0x00;
+			}
+			else
+			{
+				m_spilatch = 0x00;
+			}
+		}
+	}
+
 protected:
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	// screen updates
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 private:
 	enum
 	{
@@ -83,6 +255,67 @@ private:
 		READY_FOR_STATUS_READ = 0x10,
 	};
 
+	uint32_t m_spiaddr;
+	uint8_t m_spi_state;
+	uint8_t m_spilatch;
+	bool m_spidir;
+
+	uint8_t* m_spiptr;
+};
+
+DECLARE_DEVICE_TYPE(MONON_CART_SPI, monon_cart_spi_device)
+
+DEFINE_DEVICE_TYPE(MONON_CART_SPI, monon_cart_spi_device, "monon_cart_spi", "Monon Cartridge SPI handling")
+
+monon_cart_spi_device::monon_cart_spi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, MONON_CART_SPI, tag, owner, clock)
+{
+}
+
+void monon_cart_spi_device::device_start()
+{
+	save_item(NAME(m_spiaddr));
+	save_item(NAME(m_spi_state));
+	save_item(NAME(m_spilatch));
+	save_item(NAME(m_spidir));
+}
+
+void monon_cart_spi_device::device_reset()
+{
+	m_spiaddr = 0;
+	m_spi_state = 0;
+	m_spilatch = 0;
+	m_spidir = false;
+}
+
+
+class monon_color_state : public driver_device
+{
+public:
+	monon_color_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_cart(*this, "cartslot"),
+		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_dac(*this, "dac"),
+		m_spiptr(*this, "flash"),
+		m_debugin(*this, "DEBUG%u", 0U),
+		m_controls(*this, "CONTROLS%u", 0U),
+		m_spi(*this, "spi")
+	{ }
+
+	void monon_color(machine_config &config);
+protected:
+	// driver_device overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	// screen updates
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+private:
+
+
 	required_device<generic_slot_device> m_cart;
 	required_device<ax208_cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -91,6 +324,7 @@ private:
 	required_region_ptr<uint8_t> m_spiptr;
 	required_ioport_array<4> m_debugin;
 	required_ioport_array<4> m_controls;
+	required_device<monon_cart_spi_device> m_spi;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
@@ -113,9 +347,21 @@ private:
 	void dacout0_w(uint8_t data);
 	void dacout1_w(uint8_t data);
 
-	uint8_t spibuf_r();
-	void spibuf_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(spidir_w);
+	uint8_t spibuf_r()
+	{
+		return 	m_spi->read();
+	}
+
+	DECLARE_WRITE_LINE_MEMBER(spidir_w)
+	{
+		m_spi->dir_w(state);
+	}
+
+	void spibuf_w(uint8_t data)
+	{
+		m_spi->write(data);
+	}
+
 
 	void do_draw_inner(int pal_to_use, int start, int step, int pixmask, int amount);
 	void do_draw(int amount, int pal_to_use);
@@ -128,15 +374,9 @@ private:
 	uint8_t m_storeregs[0x20];
 	uint8_t m_dacbyte;
 
-	uint8_t m_out2state;
-
-	uint32_t m_spiaddr;
-	uint8_t m_spi_state;
-	uint8_t m_spilatch;
-	bool m_spidir;
-
 	uint8_t m_out4data;
 	uint8_t m_out3data;
+	uint8_t m_out2data;
 	uint8_t m_out1data;
 	uint8_t m_out0data;
 
@@ -146,13 +386,9 @@ private:
 void monon_color_state::machine_start()
 {
 	save_item(NAME(m_dacbyte));
-	save_item(NAME(m_out2state));
-	save_item(NAME(m_spiaddr));
-	save_item(NAME(m_spi_state));
-	save_item(NAME(m_spilatch));
-	save_item(NAME(m_spidir));
 	save_item(NAME(m_out4data));
 	save_item(NAME(m_out3data));
+	save_item(NAME(m_out2data));
 	save_item(NAME(m_out1data));
 	save_item(NAME(m_out0data));
 	save_item(NAME(m_linebuf));
@@ -162,159 +398,6 @@ void monon_color_state::machine_start()
 	save_item(NAME(m_curpal));
 	save_item(NAME(m_storeregs));
 }
-
-uint8_t monon_color_state::spibuf_r()
-{
-	uint8_t ret = m_spilatch;
-	return ret;
-}
-
-WRITE_LINE_MEMBER(monon_color_state::spidir_w)
-{
-	m_spidir = state;
-}
-
-void monon_color_state::spibuf_w(uint8_t data)
-{
-	if (!m_spidir) // Send to SPI
-	{
-		switch (m_spi_state)
-		{
-		case READY_FOR_COMMAND:
-			if (data == 0x03)
-			{
-				m_spi_state = READY_FOR_ADDRESS2;
-			}
-			else if (data == 0x05)
-			{
-				m_spi_state = READY_FOR_STATUS_READ;
-			}
-			else if (data == 0x0b)
-			{
-				m_spi_state = READY_FOR_HSADDRESS2;
-			}
-			else if (data == 0x06)
-			{
-				// write enable
-				m_spi_state = READY_FOR_COMMAND;
-			}
-			else if (data == 0x04)
-			{
-				// write disable
-				m_spi_state = READY_FOR_COMMAND;
-			}
-			else if (data == 0x02)
-			{
-				// page program
-				m_spi_state = READY_FOR_WRITEADDRESS2;
-			}
-			else if (data == 0x20)
-			{
-				// erase 4k sector
-				m_spi_state = READY_FOR_COMMAND;
-			}
-			else
-			{
-				fatalerror( "SPI set to unknown mode %02x\n", data);
-			}
-			break;
-
-		case READY_FOR_WRITEADDRESS2:
-			m_spiaddr = (m_spiaddr & 0x00ffff) | (data << 16);
-			m_spi_state = READY_FOR_WRITEADDRESS1;
-			break;
-
-		case READY_FOR_WRITEADDRESS1:
-			m_spiaddr = (m_spiaddr & 0xff00ff) | (data << 8);
-			m_spi_state = READY_FOR_WRITEADDRESS0;
-			break;
-
-		case READY_FOR_WRITEADDRESS0:
-			m_spiaddr = (m_spiaddr & 0xffff00) | (data);
-			m_spi_state = READY_FOR_WRITE;
-			LOGMASKED(LOG_SPI, "SPI set to page WRITE mode with address %08x\n", m_spiaddr);
-			break;
-
-		case READY_FOR_WRITE:
-			LOGMASKED(LOG_SPI, "Write SPI data %02x\n", data);
-
-			m_spiptr[(m_spiaddr++) & 0xffffff] = data;
-
-			break;
-
-
-		case READY_FOR_ADDRESS2:
-			m_spiaddr = (m_spiaddr & 0x00ffff) | (data << 16);
-			m_spi_state = READY_FOR_ADDRESS1;
-			break;
-
-		case READY_FOR_ADDRESS1:
-			m_spiaddr = (m_spiaddr & 0xff00ff) | (data << 8);
-			m_spi_state = READY_FOR_ADDRESS0;
-			break;
-
-		case READY_FOR_ADDRESS0:
-			m_spiaddr = (m_spiaddr & 0xffff00) | (data);
-			m_spi_state = READY_FOR_READ;
-			m_spidir = 1;
-			LOGMASKED(LOG_SPI, "SPI set to READ mode with address %08x\n", m_spiaddr);
-			break;
-
-		case READY_FOR_HSADDRESS2:
-			m_spiaddr = (m_spiaddr & 0x00ffff) | (data << 16);
-			m_spi_state = READY_FOR_HSADDRESS1;
-			break;
-
-		case READY_FOR_HSADDRESS1:
-			m_spiaddr = (m_spiaddr & 0xff00ff) | (data << 8);
-			m_spi_state = READY_FOR_HSADDRESS0;
-			break;
-
-		case READY_FOR_HSADDRESS0:
-			m_spiaddr = (m_spiaddr & 0xffff00) | (data);
-			m_spi_state = READY_FOR_HSDUMMY;
-			break;
-
-		case READY_FOR_HSDUMMY:
-			m_spi_state = READY_FOR_READ;
-			m_spidir = 1;
-			LOGMASKED(LOG_SPI, "SPI set to High Speed READ mode with address %08x\n", m_spiaddr);
-			break;
-
-		case READY_FOR_SECTORERASEADDRESS2:
-			m_spiaddr = (m_spiaddr & 0x00ffff) | (data << 16);
-			m_spi_state = READY_FOR_SECTORERASEADDRESS1;
-			break;
-
-		case READY_FOR_SECTORERASEADDRESS1:
-			m_spiaddr = (m_spiaddr & 0xff00ff) | (data << 8);
-			m_spi_state = READY_FOR_SECTORERASEADDRESS0;
-			break;
-
-		case READY_FOR_SECTORERASEADDRESS0:
-			m_spiaddr = (m_spiaddr & 0xffff00) | (data);
-			LOGMASKED(LOG_SPI, "SPI set to Erase Sector with address %08x\n", m_spiaddr);
-			break;
-
-		}
-	}
-	else
-	{
-		if (m_spi_state == READY_FOR_READ)
-		{
-			m_spilatch = m_spiptr[(m_spiaddr++)& 0xffffff];
-		}
-		else if (m_spi_state == READY_FOR_STATUS_READ)
-		{
-			m_spilatch = 0x00;
-		}
-		else
-		{
-			m_spilatch = 0x00;
-		}
-	}
-}
-
 
 
 void monon_color_state::machine_reset()
@@ -333,13 +416,11 @@ void monon_color_state::machine_reset()
 	    201                              (3rd revision)
 	    202,203,204,205,301,302,303,304  (4th revision)
 	*/
+	m_spi->set_rom_ptr(m_spiptr);
 
 	m_dacbyte = 0;
-	m_out2state = 0;
-	m_spiaddr = 0;
-	m_spi_state = 0;
-	m_spilatch = 0;
-	m_spidir = false;
+	m_out2data = 0;
+
 	m_out4data = 0;
 	m_out3data = 0;
 	m_out1data = 0;
@@ -609,19 +690,18 @@ void monon_color_state::out1_w(uint8_t data)
 
 void monon_color_state::out2_w(uint8_t data)
 {
-	if ((data & 0x01) != (m_out2state & 0x01))
+	if ((data & 0x01) != (m_out2data & 0x01))
 	{
 		if (data & 0x01)
 		{
-
 			// nothing?
 		}
 		else
 		{
-			m_spi_state = READY_FOR_COMMAND;
+			m_spi->set_ready();
 		}
 	}
-	m_out2state = data;
+	m_out2data = data;
 }
 
 uint8_t monon_color_state::read_from_video_device()
@@ -925,6 +1005,8 @@ void monon_color_state::monon_color(machine_config &config)
 	cartslot.set_width(GENERIC_ROM8_WIDTH);
 	cartslot.set_device_load(FUNC(monon_color_state::cart_load));
 	cartslot.set_must_be_loaded(true);
+
+	MONON_CART_SPI(config, m_spi, 0);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("monon_color");
