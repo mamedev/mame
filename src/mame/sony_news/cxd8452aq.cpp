@@ -12,12 +12,11 @@
 #include "emu.h"
 #include "cxd8452aq.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_REGISTERS (1U << 1)
 #define LOG_INTERRUPT (1U << 2)
 #define LOG_DATA (1U << 3)
 
-#define SONIC3_DEBUG (LOG_GENERAL | LOG_INTERRUPT)
+#define SONIC3_DEBUG (LOG_REGISTERS | LOG_INTERRUPT)
 #define SONIC3_TRACE (SONIC3_DEBUG | LOG_DATA)
 
 #include "logmacro.h"
