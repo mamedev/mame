@@ -49,7 +49,7 @@ P Anime Champ                                         2000.12    GCA07 JA       
 P Bass Angler                                         1998.03    GE765 JA          765 JA A02
 P Bass Angler 2                                       1998.07    GC865 JA          865 JA A02
 K Dance Dance Revolution Karaoke MIX (DAM-DDR)        1999.11    GQ921 JB          921 JB B02
-K *Dance Dance Revolution Karaoke MIX (DAM-DDR) 2nd   2000.07
+K Dance Dance Revolution Karaoke MIX (DAM-DDR) 2nd    2000.07    GQ947 JA          947 JA A02
 A Dance Dance Revolution                              1998.09    GC845 JA          845 JA(missing)/UA A01 / 845 JA A02
 A Dance Dance Revolution Internet Ranking ver.        1998.11    GC845 JB          845 JB A01 / 845 JA/UA A02
 A Dance Dance Revolution 2ndMIX                       1999.01    GC895 JA          895 JA A02
