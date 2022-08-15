@@ -6784,7 +6784,7 @@ GAME( 1997, getbassur,    bassdx, model3_10,      bass,     model3_state,     in
 GAME( 1997, getbass,      bassdx,   getbass,      bass,     model3_state,     init_bass, ROT0, "Sega", "Get Bass: Sega Bass Fishing (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 /* Model 3 Step 1.5 */
-GAME( 1996, scud,              0,      scud,      scud,     model3_state,     init_scud, ROT0, "Sega", "Scud Race - Twin/DX (Export)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // No region specified or selectable
+GAME( 1996, scud,              0,      scud,      scud,     model3_state,     init_scud, ROT0, "Sega", "Scud Race / Sega Super GT - Twin/DX (Export)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // No region specified or selectable
 GAME( 1996, scuddx,         scud,      scud,      scud,     model3_state,     init_scud, ROT0, "Sega", "Scud Race / Sega Super GT - Deluxe (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Japan, USA, Export
 GAME( 1996, scudau,         scud,      scud,      scud,     model3_state,     init_scud, ROT0, "Sega", "Scud Race - Twin/DX (Australia)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, scudplus,       scud,      scud,      scud,     model3_state, init_scudplus, ROT0, "Sega", "Scud Race Plus / Sega Super GT Plus - Twin/DX (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Japan, USA, Export
