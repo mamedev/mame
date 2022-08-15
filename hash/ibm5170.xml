@@ -21735,8 +21735,12 @@ license:CC0
 		<year>1994</year>
 		<publisher>Future Publishing</publisher>
 		<notes>Disk 2 includes: "Ishar 3 (demo)", "The Pianist (demo)"</notes>
-		<!-- Disk 1 missing -->
 		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="PC Format (Issue 35 - August 1994) [Future] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" status="nodump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="PC Format (Issue 35 - August 1994) [Future] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="5d3283a0" sha1="fdaebf1eb5417777308a2239bb8c9bb31d24b44b"/>
 			</dataarea>
@@ -21751,14 +21755,18 @@ license:CC0
 Disk 2 includes: "Player Manager 2 (demo)""
 Disk 3 includes: "Media8or 2 (shareware)"
 ]]></notes>
-		<!-- Disk 1 missing -->
-		<!-- Disks are marked as "Bad Dump" because both have modified OEM ID -->
 		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="PC Format (Issue 48 - September 1995) [Future] [1995] [3.5HD] [Disk 1 of 3].img" size="1474560" status="nodump"/>
+			</dataarea>
+		</part>
+		<!-- Disks are marked as "Bad Dump" because both have modified OEM ID -->
+		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="PC Format (Issue 48 - September 1995) [Future] [1995] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="4ce4a648" sha1="cc20af2478e16c19987d9b32410e2fe5db459ae4" status="baddump" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
+		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="PC Format (Issue 48 - September 1995) [Future] [1995] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="5d3230d8" sha1="fb0ecf8c3cb81c013911a4b82267dc369888af73" status="baddump" />
 			</dataarea>
@@ -21768,7 +21776,7 @@ Disk 3 includes: "Media8or 2 (shareware)"
 	<!-- PC Gamer (UK) -->
 
 	<software name="pcg199312">
-		<description>PC Gamer (UK) (Vol. 01 Nº 01 - December 1993)</description>
+		<description>PC Gamer (UK) (Vol. 01 № 01 - December 1993)</description>
 		<year>1993</year>
 		<publisher>Future Publishing</publisher>
 		<notes><![CDATA[
@@ -21789,7 +21797,7 @@ Disk 2 includes: "Krusty's Super Funhouse (demo)", "Subwar 2050 (demo)", "Graham
 
 	<!-- The installation setup resets the machine -->
 	<software name="pcg199401" supported="no">
-		<description>PC Gamer (UK) (Vol. 01 Nº 02 - January 1994)</description>
+		<description>PC Gamer (UK) (Vol. 01 № 02 - January 1994)</description>
 		<year>1994</year>
 		<publisher>Future Publishing</publisher>
 		<notes>Disk includes: "Terminator: Rampage (demo)"</notes>
@@ -21801,7 +21809,7 @@ Disk 2 includes: "Krusty's Super Funhouse (demo)", "Subwar 2050 (demo)", "Graham
 	</software>
 
 	<software name="pcg199402">
-		<description>PC Gamer (UK) (Vol. 01 Nº 03 - February 1994)</description>
+		<description>PC Gamer (UK) (Vol. 01 № 03 - February 1994)</description>
 		<year>1994</year>
 		<publisher>Future Publishing</publisher>
 		<notes>Disk includes: "NFL Coaches Club Football! (demo)"</notes>
@@ -21813,7 +21821,7 @@ Disk 2 includes: "Krusty's Super Funhouse (demo)", "Subwar 2050 (demo)", "Graham
 	</software>
 
 	<software name="pcg199403">
-		<description>PC Gamer (UK) (Vol. 01 Nº 04 - March 1994)</description>
+		<description>PC Gamer (UK) (Vol. 01 № 04 - March 1994)</description>
 		<year>1994</year>
 		<publisher>Future Publishing</publisher>
 		<notes>Disk 1 includes: "Sid &amp; Al's Incredible Toons (demo)"</notes>
@@ -21825,7 +21833,7 @@ Disk 2 includes: "Krusty's Super Funhouse (demo)", "Subwar 2050 (demo)", "Graham
 	</software>
 
 	<software name="pcg199404">
-		<description>PC Gamer (UK) (Vol. 01 Nº 05 - April 1994)</description>
+		<description>PC Gamer (UK) (Vol. 01 № 05 - April 1994)</description>
 		<year>1994</year>
 		<publisher>Future Publishing</publisher>
 		<notes><![CDATA[
@@ -21845,7 +21853,7 @@ Disk 2 includes: "DragonSphere (demo)"
 	</software>
 
 	<software name="pcg199406">
-		<description>PC Gamer (UK) (Vol. 01 Nº 07 - June 1994)</description>
+		<description>PC Gamer (UK) (Vol. 01 № 07 - June 1994)</description>
 		<year>1994</year>
 		<publisher>Future Publishing</publisher>
 		<notes><![CDATA[
@@ -21866,7 +21874,7 @@ Disk 2 includes: "Star Hammer (demo)", "Slicks'N'Slides (demo)", "Doom Party Pac
 
 	<!-- Both disks have modified access files -->
 	<software name="pcg199509">
-		<description>PC Gamer (UK) (Vol. 02 Nº 10 - September 1995)</description>
+		<description>PC Gamer (UK) (Vol. 02 № 10 - September 1995)</description>
 		<year>1995</year>
 		<publisher>Future Publishing</publisher>
 		<notes><![CDATA[
@@ -21888,7 +21896,7 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 	<!-- PC Gamer (USA) -->
 
 	<software name="pcgus199405">
-		<description>PC Gamer (USA) (Vol. 01 Nº 01 - May-June 1994)</description>
+		<description>PC Gamer (USA) (Vol. 01 № 01 - May-June 1994)</description>
 		<year>1994</year>
 		<publisher>Future Publishing</publisher>
 		<notes>Disk includes: "Theme Park (demo)"</notes>
@@ -21900,7 +21908,7 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 	</software>
 
 	<software name="pcgus199408">
-		<description>PC Gamer (USA) (Vol. 01 Nº 03 - August 1994)</description>
+		<description>PC Gamer (USA) (Vol. 01 № 03 - August 1994)</description>
 		<year>1994</year>
 		<publisher>Future Publishing</publisher>
 		<notes>Disk includes: "Detroit (demo)"</notes>
@@ -21912,7 +21920,7 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 	</software>
 
 	<software name="pcgus199409">
-		<description>PC Gamer (USA) (Vol. 01 Nº 04 - September 1994)</description>
+		<description>PC Gamer (USA) (Vol. 01 № 04 - September 1994)</description>
 		<year>1994</year>
 		<publisher>Future Publishing</publisher>
 		<notes>Disk includes: "CyClones (demo)"</notes>
@@ -21924,7 +21932,7 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 	</software>
 
 	<software name="pcgus199411">
-		<description>PC Gamer (USA) (Vol. 01 Nº 06 - November 1994)</description>
+		<description>PC Gamer (USA) (Vol. 01 № 06 - November 1994)</description>
 		<year>1994</year>
 		<publisher>Future Publishing</publisher>
 		<notes>Disk includes: "Blackthorne (demo)"</notes>
@@ -21936,7 +21944,7 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 	</software>
 
 	<software name="pcgus199503">
-		<description>PC Gamer (USA) (Vol. 02 Nº 03 - March 1995)</description>
+		<description>PC Gamer (USA) (Vol. 02 № 03 - March 1995)</description>
 		<year>1995</year>
 		<publisher>Future Publishing</publisher>
 		<notes>Disk includes: "The Incredible Machine 2 (demo)"</notes>
@@ -22175,8 +22183,13 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<year>1993</year>
 		<publisher>EMAP Images</publisher>
 		<notes>Disk includes: "Ancients: Death Watch (demo)"</notes>
-		<!-- Missing Disk A -->
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="737280">
+				<rom name="PC Review (Issue 25 - November 1993) [EMAP] [1993] [3.5DD] [Disk 1 of 2].img" size="737280" status="nodump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="737280">
 				<rom name="PC Review (Issue 25 - November 1993) [EMAP] [1993] [3.5DD] [Disk 2 of 2].img" size="737280" crc="4a9a0844" sha1="c60ea6ad006b0fc23abc24fd45e6f19634a6f7c5"/>
