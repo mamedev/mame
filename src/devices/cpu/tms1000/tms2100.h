@@ -13,6 +13,11 @@
 
 #include "tms1100.h"
 
+enum
+{
+	TMS2100_INPUT_LINE_INT = 0
+};
+
 
 // pinout reference
 
@@ -74,12 +79,16 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_clock_changed() override { reset_prescaler(); }
 
+	virtual u32 execute_input_lines() const noexcept override { return 1; }
+	virtual void execute_set_input(int line, int state) override;
+
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual void read_opcode() override;
-	void interrupt();
+	void clock_decrementer();
 	TIMER_CALLBACK_MEMBER(prescaler_timeout);
 	void reset_prescaler();
+	virtual void read_opcode() override;
+	void interrupt();
 
 	virtual u8 read_k_input() override;
 	virtual void write_r_output(u32 data) override;
@@ -100,6 +109,7 @@ protected:
 	u8 m_ivr;           // 8-bit initial value register
 	u8 m_dec;           // 8-bit decrementer counter
 	u8 m_il;            // interrupt latch(es)
+	int m_int_pin;      // INT pin state
 	bool m_int_pending;
 	u32 m_r_prev;
 
