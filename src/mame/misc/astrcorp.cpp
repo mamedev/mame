@@ -19,7 +19,7 @@ OTHER:  EEPROM, Battery
 Year + Game             PCB ID         CPU                Video          Chips                                      Notes
 ------------------------------------------------------------------------------------------------------------------------------
 00  Show Hand           CHE-B50-4002A  MC68HC000FN12      ASTRO V01      pLSI1016-60LJ, ASTRO 0001B MCU? (28 pins)
-00  Wang Pai Dui J.     CHE-B50-4002A  MC68HC000FN12      ASTRO V01      pLSI1016,      MDT2020AP   MCU  (28 pins)
+00  Wangpai Duijue      CHE-B50-4002A  MC68HC000FN12      ASTRO V01      pLSI1016,      MDT2020AP   MCU  (28 pins)
 01  Magic Bomb (NB4.5)  None           ASTRO V03          ASTRO V02      pLSI1016                                   Encrypted
 02  Skill Drop GA       None           JX-1689F1028N      ASTRO V02      pLSI1016-60LJ
 02? Keno 21             ?              ASTRO V102?        ASTRO V05      ASTRO F02?                                 not dumped
@@ -105,7 +105,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	required_memory_region m_region_key;
+	required_region_ptr<u16> m_region_key;
 
 	u8 m_cs_state = CLEAR_LINE;
 	attotime m_last_cs_rising_edge_time = attotime::zero;
@@ -130,7 +130,6 @@ void astro_cpucode_device::device_start()
 
 void astro_cpucode_device::device_reset()
 {
-	m_cs_state = m_clk_state = CLEAR_LINE;
 	m_shift_register = 0;
 }
 
@@ -148,7 +147,7 @@ WRITE_LINE_MEMBER(astro_cpucode_device::cs_write)
 		{
 			m_last_cs_rising_edge_time = machine().time();
 			constexpr int shift = 11; // 0 1 10AAAAAA R
-			const u16 cpucode = m_region_key->base()[0] + (m_region_key->base()[1] << 8);
+			const u16 cpucode = *m_region_key;
 			m_shift_register = BIT(cpucode, shift, 16 - shift) | (BIT(cpucode, 0, shift) << (16 - shift));
 		}
 	}
@@ -179,6 +178,7 @@ public:
 		m_hopper(*this, "hopper"),
 		m_ticket(*this, "ticket"),
 		m_spriteram(*this, "spriteram"),
+		m_eeprom_out(*this, "EEPROM_OUT"),
 		m_can_flip_sprites(true),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
@@ -206,6 +206,9 @@ protected:
 
 	// memory pointers
 	required_shared_ptr<u16> m_spriteram;
+
+	// i/o ports
+	required_ioport m_eeprom_out;
 
 	// video-related
 	u8 m_screen_enable = 0;
@@ -256,6 +259,7 @@ public:
 
 private:
 	u16 video_flags_r();
+
 	void magibomb_base_map(address_map &map, u32 base_offs);
 	void magibomb_map(address_map &map);
 	void magibombb_map(address_map &map);
@@ -268,7 +272,8 @@ class zoo_state : public astrocorp_state
 public:
 	zoo_state(const machine_config &mconfig, device_type type, const char *tag) :
 		astrocorp_state(mconfig, type, tag),
-		m_cpucode(*this, "astro_cpucode")
+		m_cpucode(*this, "astro_cpucode"),
+		m_cpucode_out(*this, "CPUCODE_OUT")
 	{ }
 
 	void hacher(machine_config &config);
@@ -307,6 +312,8 @@ protected:
 
 private:
 	required_device<astro_cpucode_device> m_cpucode;
+
+	required_ioport m_cpucode_out;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_1_2_scanline_cb);
 
@@ -385,7 +392,7 @@ void astrocorp_state::video_start()
 void astrocorp_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const u16 *source = m_spriteram;
-	const u16 * const finish = m_spriteram + m_spriteram.bytes() / 2;
+	const u16 * const finish = m_spriteram + m_spriteram.length();
 
 	gfx_element * const gfx = m_gfxdecode->gfx(0);
 
@@ -460,7 +467,7 @@ void astrocorp_state::draw_sprites_w(offs_t offset, u16 data, u16 mem_mask)
 
 void astrocorp_state::eeprom_w(u8 data)
 {
-	ioport("EEPROM_OUT")->write(data, 0xff);
+	m_eeprom_out->write(data, 0xff);
 }
 
 void astrocorp_state::oki_bank_w(u8 data)
@@ -751,8 +758,8 @@ void magibomb_state::magibombf_map(address_map &map)
 
 void zoo_state::eeprom_w(u8 data)
 {
-	ioport("EEPROM_OUT")->write(data, 0xff);
-	ioport("CPUCODE_OUT")->write(data, 0xff);
+	m_eeprom_out->write(data, 0xff);
+	m_cpucode_out->write(data, 0xff);
 }
 
 void zoo_state::dinodino_map(address_map &map)
@@ -1313,7 +1320,7 @@ ROM_END
 
 /***************************************************************************
 
-Show Hand (China) - Wang Pai Dui Jue (王牌对決)
+Show Hand (China) - Wángpái Duìjué (王牌对决)
 Astro Corp, 199?
 
 PCB Layout
@@ -1368,7 +1375,7 @@ Skill Drop Georgia
 
 No specific PCB model or number....
 
-Astro V02 0022 160pin PQFP ("ASTRO02" silk-screened under chip)
+Astro V02 0022 160pin PQFP ("ASTRO02" silkscreened under chip)
 JX-1689F1028N GRC586.V5 (68K core, has direct connection to program roms)
 Lattice IspLSI 1016 60LJ socketed FPGA
 OKI 6295 clone chip (AD-65 or U6295)
@@ -1425,7 +1432,7 @@ ROM_START( skilldrp )
 	ROM_LOAD( "mx29f1610amc.u26", 0x000000, 0x200000, CRC(4fdac800) SHA1(bcafceb6c34866c474714347e23f9e819b5fcfa6) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "5-skill_drop.rom5", 0x00000, 0x80000, CRC(a479e06d) SHA1(ee690d39188b8a43652c4aa5bf8267c1f6632d2f) ) // No chip location just "ROM#5" silk-screened under socket
+	ROM_LOAD( "5-skill_drop.rom5", 0x00000, 0x80000, CRC(a479e06d) SHA1(ee690d39188b8a43652c4aa5bf8267c1f6632d2f) ) // No chip location just "ROM#5" silkscreened under socket
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "93c46.u6", 0x00, 0x80, CRC(01c4bc62) SHA1(49710d2dac73791b4019b1dc15e0b5159c6fbaef) ) // factory default
@@ -1439,7 +1446,7 @@ Speed Drop
 
 No specific PCB model or number, same as used for Skill Drop but with newer video chip
 
-Astro V05 0206 160pin PQFP ("ASTRO02" silk-screened under chip)
+Astro V05 0206 160pin PQFP ("ASTRO02" silkscreened under chip)
 JX-1689HP TA5265188 (68K core, has direct connection to program roms)
 Lattice IspLSI 1016 60LJ socketed FPGA
 OKI 6295 clone chip (AD-65 or U6295)
@@ -1501,7 +1508,7 @@ ROM_START( speeddrp )
 	ROM_LOAD( "mx29f1610amc.u26", 0x000000, 0x200000, CRC(baa0f728) SHA1(12f0e7689eb6555f86ac9a7272e8e119faa968e0) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "5_speed_drop.rom5", 0x00000, 0x80000, CRC(684bb8b5) SHA1(65276ce03da7be7275646f5a0d9d163eecb78190) ) // No chip location just "ROM#5" silk-screened under socket
+	ROM_LOAD( "5_speed_drop.rom5", 0x00000, 0x80000, CRC(684bb8b5) SHA1(65276ce03da7be7275646f5a0d9d163eecb78190) ) // No chip location just "ROM#5" silkscreened under socket
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "93c46.u6", 0x00, 0x80, CRC(6890534e) SHA1(a62893015e53c02551d57d0e1cce436b6df8d289) ) // factory default
@@ -1670,7 +1677,7 @@ ROM_END
 Win Win Bingo
 
 ASTRO M1.2 PCB:
- Astro V06 0430 160pin PQFP ("ASTRO02" silk-screened under chip)
+ Astro V06 0430 160pin PQFP ("ASTRO02" silkscreened under chip)
    Boards are known to have either Astro V06 0430 or Astro V07 0610
  Astro V102PX-006 at U10 (68K core, has direct connection to program roms)
  Astro F02 2005-09-17 socketed FPGA type chip (used for encryption?)
@@ -1816,7 +1823,7 @@ ROM_END
 Zoo by Astro
 
 ASTRO M1.1 PCB:
- Astro V06 0430 160pin PQFP ("ASTRO02" silk-screened under chip)
+ Astro V06 0430 160pin PQFP ("ASTRO02" silkscreened under chip)
  Astro V102PX-005 T042652846 at U10 (68K core, has direct connection to program roms)
  Astro F02 2005-02-18 socketed FPGA type chip (used for encryption?)
  OKI 6295 clone chip (AD-65 or U6295)
@@ -2416,7 +2423,7 @@ void astoneag_state::interleave_sprites_16x32()
 
 //     YEAR   NAME       PARENT    MACHINE    INPUTS     STATE            INIT            ROT   COMPANY        FULLNAME                                         FLAGS                                                  LAYOUT
 GAMEL( 2000,  showhand,  0,        showhand,  showhand,  astrocorp_state, init_showhand,  ROT0, "Astro Corp.", "Show Hand (Italy)",                             MACHINE_SUPPORTS_SAVE,                                 layout_showhand  )
-GAMEL( 2000,  showhanc,  showhand, showhanc,  showhanc,  astrocorp_state, init_showhanc,  ROT0, "Astro Corp.", "Wang Pai Dui Jue (China)",                      MACHINE_SUPPORTS_SAVE,                                 layout_showhanc  )
+GAMEL( 2000,  showhanc,  showhand, showhanc,  showhanc,  astrocorp_state, init_showhanc,  ROT0, "Astro Corp.", "Wangpai Duijue (China)",                        MACHINE_SUPPORTS_SAVE,                                 layout_showhanc  )
 GAMEL( 2002,  skilldrp,  0,        skilldrp,  skilldrp,  astrocorp_state, empty_init,     ROT0, "Astro Corp.", "Skill Drop Georgia (Ver. G1.0S, Sep 13 2002)",  MACHINE_SUPPORTS_SAVE,                                 layout_skilldrp  ) // Sep 13 2002 09:17:54
 GAMEL( 2003,  speeddrp,  0,        speeddrp,  skilldrp,  astrocorp_state, empty_init,     ROT0, "Astro Corp.", "Speed Drop (Ver. 1.06, Sep 3 2003)",            MACHINE_SUPPORTS_SAVE,                                 layout_skilldrp  ) // Sep  3 2003 16:01:26
 
