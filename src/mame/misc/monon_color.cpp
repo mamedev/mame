@@ -53,7 +53,6 @@
 #include "bus/mononcol/carts.h"
 
 #include "cpu/axc51/axc51.h"
-#include "machine/generic_spi_flash.h"
 #include "sound/dac.h"
 
 #define LOG_VDP (1U <<  1)

@@ -78,6 +78,6 @@ private:
 	size_t m_length;
 };
 
-DECLARE_DEVICE_TYPE(GENERIC_SPII_FLASH, generic_spi_flash_device)
+DECLARE_DEVICE_TYPE(GENERIC_SPI_FLASH, generic_spi_flash_device)
 
 #endif // MAME_MACHINE_GENERIC_SPI_FLASH_H
