@@ -93,10 +93,13 @@ const tiny_rom_entry *msx_cart_sfg01_device::device_rom_region() const
 
 ROM_START( msx_sfg05 )
 	ROM_REGION(0x8000, "sfg", 0)
-	ROM_SYSTEM_BIOS( 0, "sfg05", "SFG05 (original)" )
-	ROMX_LOAD( "sfg05.rom", 0x0, 0x8000, CRC(2425c279) SHA1(d956167e234f60ad916120437120f86fc8c3c321), ROM_BIOS(0) ) // correct label MIGHT be "yamaha__ym2301-23959.ic104" but this needs redump/verification
-	ROM_SYSTEM_BIOS( 1, "sfg05a", "SFG05 (SFG01 upgrade)" ) // SFG01 PCB, Yamaha official upgrade, has YM2151 instead of YM2164
-	ROMX_LOAD( "sfg05a.rom", 0x0, 0x8000, CRC(5bc237f8) SHA1(930338f45c08228108c0831cc4a26014c2674718), ROM_BIOS(1) ) // this came on a single eprom on a daughterboard on an SFG01 board which had been factory upgraded to SFG05
+	// Version string starts at $02BD
+	ROM_SYSTEM_BIOS(0, "m5.01.011", "SFG05 (original) M5.01.011")
+	ROMX_LOAD( "sfg05.rom", 0x0, 0x8000, CRC(2425c279) SHA1(d956167e234f60ad916120437120f86fc8c3c321), ROM_BIOS(0)) // correct label MIGHT be "yamaha__ym2301-23959.ic104" but this needs redump/verification
+	ROM_SYSTEM_BIOS(1, "m5.00.013", "SFG05 (SFG01 upgrade) M5.00.013") // SFG01 PCB, Yamaha official upgrade, has YM2151 instead of YM2164
+	ROMX_LOAD( "sfg05a.rom", 0x0, 0x8000, CRC(5bc237f8) SHA1(930338f45c08228108c0831cc4a26014c2674718), ROM_BIOS(1)) // this came on a single eprom on a daughterboard on an SFG01 board which had been factory upgraded to SFG05
+	ROM_SYSTEM_BIOS(2, "m5.00.011", "SFG05 M5.00.011") // Found in Sakhr AX-200M
+	ROMX_LOAD("sfg05_m5_00_011.rom", 0x0, 0x8000, BAD_DUMP CRC(9d5e20c9) SHA1(fcc385b90c65575e29fc009aa00b5120fc4c251a), ROM_BIOS(2)) // Still seems to have I/O reads at $7ff0 - $7fff
 ROM_END
 
 
