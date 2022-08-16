@@ -887,7 +887,7 @@ skeleton/mmd2.cpp
 skeleton/mod8.cpp
 skeleton/modellot.cpp
 skeleton/molecular.cpp
-skeleton/monon_color.cpp
+misc/monon_color.cpp
 skeleton/ms9540.cpp
 skeleton/mstation.cpp
 skeleton/mt735.cpp

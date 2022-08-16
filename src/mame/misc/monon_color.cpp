@@ -36,6 +36,10 @@
 
    Games save data directly to the SPI ROM in the 0x50000-0x5ffff region
 
+   Some games made use of either a card reader, or a badge reader on the
+   cartridge, this is not yet emulated.  The card reader was based on
+   barcode-like patterns, while the badge reader is reportedly an RFID device
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -775,4 +779,4 @@ void monon_color_state::monon_color(machine_config &config)
 ROM_START( mononcol )
 ROM_END
 
-CONS( 2014, mononcol,    0,          0,  monon_color,  monon_color,    monon_color_state, empty_init,    "M&D",   "Monon Color", MACHINE_IS_SKELETON )
+CONS( 2014, mononcol,    0,          0,  monon_color,  monon_color,    monon_color_state, empty_init,    "M&D",   "Monon Color", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
