@@ -95,6 +95,9 @@ Needed roms:
 - Walkure no Bouken          (by Namco, 1986)
 - Wild Gunman                (1984, light gun game)
 
+BTANB:
+    - Coin sound clipped when first coin is inserted in VS. Castlevania.
+
 TO DO:
     - Merge mapper implementations with playch10, NES, etc
     - Check others bits in coin counter
@@ -2205,8 +2208,10 @@ static INPUT_PORTS_START( vsskykid )
 //  PORT_DIPSETTING(    0xe0, "RP2C03" )
 INPUT_PORTS_END
 
+// In US Pinball both P1/P2 B buttons move left flipper, both A buttons move right flipper. All four operate the plunger.
+// In JP Pinball both P1 B/A buttons move left flipper, both P2 B/A move right flipper. Both A buttons operate the plunger.
 static INPUT_PORTS_START( vspinbal )
-	PORT_INCLUDE( vsnes )
+	PORT_INCLUDE( vsnes_rev )
 
 	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
 	PORT_DIPNAME( 0x07, 0x01, DEF_STR( Coinage ) )
@@ -2232,18 +2237,6 @@ static INPUT_PORTS_START( vspinbal )
 	PORT_DIPNAME( 0x80, 0x00, "Ball speed" )        PORT_DIPLOCATION("SW1:!8")
 	PORT_DIPSETTING(    0x00, "Slow" )
 	PORT_DIPSETTING(    0x80, "Fast" )
-INPUT_PORTS_END
-
-/* Same as 'vspinbal', but different buttons mapping */
-static INPUT_PORTS_START( vspinblj )
-	PORT_INCLUDE( vspinbal )
-
-	PORT_MODIFY("IN0")  /* IN0 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)        /* Right flipper */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
-
-	PORT_MODIFY("IN1")  /* IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)        /* Left flipper */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( goonies )
@@ -3639,7 +3632,7 @@ GAME( 1984, smgolfj,        smgolf,        vsnes,         golf,     vs_uni_state
 GAME( 1984, ladygolfe,      smgolf,        vsnes,         golf4s,   vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Ladies Version, set LG4 E)",      0 )
 GAME( 1984, ladygolf,       smgolf,        vsnes,         golf,     vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Ladies Version, set LG4 ?)",      0 )
 GAME( 1984, vspinbal,       0,             vsnes,         vspinbal, vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Pinball (US, set PN4 E-1)",                            0 )
-GAME( 1984, vspinbalj,      vspinbal,      vsnes,         vspinblj, vs_uni_state,   init_vsnormal, ROT0, "Nintendo Co., Ltd.",     "Vs. Pinball (Japan, set PN3 B)",                           0 )
+GAME( 1984, vspinbalj,      vspinbal,      vsnes,         vspinbal, vs_uni_state,   init_vsnormal, ROT0, "Nintendo Co., Ltd.",     "Vs. Pinball (Japan, set PN3 B)",                           0 )
 GAME( 1986, vsslalom,       0,             vsnes,         vsslalom, vs_uni_state,   init_vsnormal, ROT0, "Rare Coin-It Inc.",      "Vs. Slalom",                                               MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1985, vssoccer,       0,             vsnes,         vssoccer, vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Soccer (set SC4-2 A)",                                 0 )
 GAME( 1985, vssoccera,      vssoccer,      vsnes,         vssoccer, vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Soccer (set SC4-3 ?)",                                 0 )
