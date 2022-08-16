@@ -33,9 +33,9 @@
 #include "emu.h"
 #include "ds1207.h"
 
-#define LOG_LINES    (1U << 0)
-#define LOG_STATE    (1U << 1)
-#define LOG_DATA     (1U << 2)
+#define LOG_LINES    (1U << 1)
+#define LOG_STATE    (1U << 2)
+#define LOG_DATA     (1U << 3)
 
 //#define VERBOSE (LOG_LINES | LOG_STATE | LOG_DATA)
 #include "logmacro.h"
@@ -68,11 +68,11 @@ void ds1207_device::device_start()
 	new_state(STATE_STOP);
 	m_dqr = DQ_HIGH_IMPEDANCE;
 
-	memset(m_command, 0, sizeof(m_command));
-	memset(m_compare_register, 0, sizeof(m_compare_register));
+	std::fill_n(m_command, sizeof(m_command), 0);
+	std::fill_n(m_compare_register, sizeof(m_compare_register), 0);
 	m_last_update_time = 0;
 	m_startup_time = 0;
-	memset(m_day_clock, 0, sizeof(m_day_clock));
+	std::fill_n(m_day_clock, sizeof(m_day_clock), 0);
 
 	save_item(NAME(m_rst));
 	save_item(NAME(m_clk));
@@ -96,12 +96,12 @@ void ds1207_device::device_start()
 
 void ds1207_device::nvram_default()
 {
-	memset(m_unique_pattern, 0, sizeof(m_unique_pattern));
-	memset(m_identification, 0, sizeof(m_identification));
-	memset(m_security_match, 0, sizeof(m_security_match));
-	memset(m_secure_memory, 0, sizeof(m_secure_memory));
-	memset(m_days_left, 0, sizeof(m_days_left));
-	memset(m_start_time, 0, sizeof(m_start_time));
+	std::fill_n(m_unique_pattern, sizeof(m_unique_pattern), 0);
+	std::fill_n(m_identification, sizeof(m_identification), 0);
+	std::fill_n(m_security_match, sizeof(m_security_match), 0);
+	std::fill_n(m_secure_memory, sizeof(m_secure_memory), 0);
+	std::fill_n(m_days_left, sizeof(m_days_left), 0);
+	std::fill_n(m_start_time, sizeof(m_start_time), 0);
 	m_device_state = 0;
 
 	int expected_bytes = sizeof(m_unique_pattern) + sizeof(m_identification) + sizeof(m_security_match) + sizeof(m_secure_memory)
@@ -162,7 +162,7 @@ bool ds1207_device::nvram_write(util::write_stream &file)
 	return result;
 }
 
-void ds1207_device::new_state(int state)
+void ds1207_device::new_state(uint8_t state)
 {
 	m_state = state;
 	m_bit = 0;
@@ -172,8 +172,8 @@ void ds1207_device::writebit(uint8_t *buffer)
 {
 	if(m_clk)
 	{
-		int index = m_bit / 8;
-		int mask = 1 << (m_bit % 8);
+		uint16_t index = m_bit / 8;
+		uint8_t mask = 1 << (m_bit % 8);
 
 		if(m_dqw)
 		{
@@ -192,8 +192,8 @@ void ds1207_device::readbit(uint8_t *buffer)
 {
 	if(!m_clk)
 	{
-		int index = m_bit / 8;
-		int mask = 1 << (m_bit % 8);
+		uint16_t index = m_bit / 8;
+		uint8_t mask = 1 << (m_bit % 8);
 
 		if(buffer[ index ] & mask)
 		{
@@ -204,7 +204,6 @@ void ds1207_device::readbit(uint8_t *buffer)
 			m_dqr = 0;
 		}
 	}
-
 	else
 	{
 		m_bit++;
@@ -213,10 +212,11 @@ void ds1207_device::readbit(uint8_t *buffer)
 
 WRITE_LINE_MEMBER(ds1207_device::write_rst)
 {
-	if(m_rst != state)
+	const uint8_t this_state = state ? 1 : 0;
+	if(m_rst != this_state)
 	{
-		m_rst = state;
-		LOGLINES("%s: DS1270 rst=%d\n", machine().describe_context(),m_rst);
+		m_rst = this_state;
+		LOGLINES("%s: DS1270 rst=%d\n", machine().describe_context(), m_rst);
 
 		if(m_rst)
 		{
@@ -227,15 +227,15 @@ WRITE_LINE_MEMBER(ds1207_device::write_rst)
 			switch(m_state)
 			{
 				case STATE_WRITE_IDENTIFICATION:
-					LOGSTATE("%s: DS1270 reset during write identification (bit=%d)\n", machine().describe_context(), m_bit);
+					LOGSTATE("%s: DS1270 reset during write identification (bit=%u)\n", machine().describe_context(), m_bit);
 					break;
 
 				case STATE_WRITE_SECURITY_MATCH:
-					LOGSTATE("%s: DS1270 reset during write security match (bit=%d)\n", machine().describe_context(), m_bit);
+					LOGSTATE("%s: DS1270 reset during write security match (bit=%u)\n", machine().describe_context(), m_bit);
 					break;
 
 				case STATE_WRITE_SECURE_MEMORY:
-					LOGSTATE("%s: DS1270 reset during write secure memory (bit=%d)\n", machine().describe_context(), m_bit);
+					LOGSTATE("%s: DS1270 reset during write secure memory (bit=%u)\n", machine().describe_context(), m_bit);
 					break;
 			}
 
@@ -247,10 +247,11 @@ WRITE_LINE_MEMBER(ds1207_device::write_rst)
 
 WRITE_LINE_MEMBER(ds1207_device::write_clk)
 {
-	if(m_clk != state)
+	const uint8_t this_state = state ? 1 : 0;
+	if(m_clk != this_state)
 	{
-		m_clk = state;
-		LOGLINES("%s: DS1270 clk=%d (bit=%d)\n", machine().describe_context(), m_clk, m_bit);
+		m_clk = this_state;
+		LOGLINES("%s: DS1270 clk=%d (bit=%u)\n", machine().describe_context(), m_clk, m_bit);
 
 		if(m_clk)
 		{
@@ -492,11 +493,12 @@ WRITE_LINE_MEMBER(ds1207_device::write_clk)
 
 WRITE_LINE_MEMBER(ds1207_device::write_dq)
 {
-	if(m_dqw != state)
+	const uint8_t this_state = state ? 1 : 0;
+	if(m_dqw != this_state)
 	{
-		m_dqw = state;
+		m_dqw = this_state;
 
-		LOGLINES("%s: DS1270 dqw=%d\n", machine().describe_context(), m_dqw);
+		LOGLINES("%s: DS1270 dqw=%u\n", machine().describe_context(), m_dqw);
 	}
 }
 
@@ -508,7 +510,7 @@ READ_LINE_MEMBER(ds1207_device::read_dq)
 		return 0;
 	}
 
-	LOGLINES("%s: DS1270 dqr=%d (bit=%d)\n", machine().describe_context(), m_dqr, m_bit);
+	LOGLINES("%s: DS1270 dqr=%d (bit=%u)\n", machine().describe_context(), m_dqr, m_bit);
 	return m_dqr;
 }
 
@@ -516,14 +518,10 @@ void ds1207_device::adjust_time_into_day()
 {
 	if(!(m_device_state & DAYS_EXPIRED) && (m_device_state & OSC_ENABLED) && (m_device_state & OSC_RUNNING))
 	{
-		uint64_t day_clock;
-		uint64_t cur_time;
-		uint64_t diff_time;
-
-		day_clock = m_day_clock[ 0 ] | (m_day_clock[ 1 ] << 8) | (m_day_clock[ 2 ] << 16);
+		uint64_t day_clock = ((uint64_t)m_day_clock[ 0 ]) | (((uint64_t)m_day_clock[ 1 ]) << 8) | (((uint64_t)m_day_clock[ 2 ]) << 16);
 		
-		cur_time = machine().time().as_ticks(32768) / 2700;
-		diff_time = cur_time - m_last_update_time;
+		const uint64_t cur_time = machine().time().as_ticks(32768) / 2700;
+		const uint64_t diff_time = cur_time - m_last_update_time;
 		m_last_update_time = cur_time;
 
 		day_clock += diff_time;
@@ -541,62 +539,55 @@ void ds1207_device::adjust_time_into_day()
 
 void ds1207_device::adjust_days_left()
 {
-	uint64_t current_time, start_time, time_diff;
-	uint16_t days_elapsed, days_left;
-	uint32_t day_clock;
 	if(!(m_device_state & DAYS_EXPIRED) && (m_device_state & OSC_ENABLED) && (m_device_state & OSC_RUNNING))
 	{
-		current_time = m_startup_time + machine().time().as_ticks(1);
+		const uint64_t current_time = m_startup_time + machine().time().as_ticks(1);
 
-		start_time = 0;
+		uint64_t start_time = 0;
 
 		for(int i = 0; i < 8 ; i++)
 		{
 			start_time <<= 8;
 			start_time |= m_start_time[ 7 - i ];
 		}
-		
+
 		if(current_time > start_time)
 		{
-			time_diff = current_time - start_time;
-		}
-		else
-		{
-			time_diff = 0;
-		}
-		
-		days_elapsed = time_diff / (24*60*60);
+			uint64_t time_diff = current_time - start_time;
 
-		days_left = m_days_left[ 0 ] | (m_days_left[ 1 ] << 8);
+			const uint16_t days_elapsed = time_diff / (24*60*60);
 
-		time_diff %= (24*60*60);// seconds into day
-		
-		day_clock = (time_diff * 32768)/2700;// time into day
+			time_diff %= (24*60*60);// seconds into day
 
-		m_day_clock[ 0 ] = day_clock & 0xff;
-		m_day_clock[ 1 ] = (day_clock >> 8) & 0xff;
-		m_day_clock[ 2 ] = (day_clock >> 16) & 0xff;
+			const uint32_t day_clock = (time_diff * 32768)/2700;// time into day
 
-		if(days_elapsed > 0)
-		{
-			if(days_elapsed > days_left)
+			m_day_clock[ 0 ] = day_clock & 0xff;
+			m_day_clock[ 1 ] = (day_clock >> 8) & 0xff;
+			m_day_clock[ 2 ] = (day_clock >> 16) & 0xff;
+
+			if(days_elapsed > 0)
 			{
-				days_left = 0xffff;
-				m_device_state |= DAYS_EXPIRED;
-			}
-			else
-			{
-				days_left -= days_elapsed;
-			}
+				uint16_t days_left = m_days_left[ 0 ] | (m_days_left[ 1 ] << 8);
 
-			m_days_left[ 0 ] = days_left & 0xff;
-			m_days_left[ 1 ] = (days_left >> 8) & 0x1;
+				if(days_elapsed > days_left)
+				{
+					days_left = 0xffff;
+					m_device_state |= DAYS_EXPIRED;
+				}
+				else
+				{
+					days_left -= days_elapsed;
+				}
 
-			start_time += days_elapsed * 24 * 60 * 60;
+				m_days_left[ 0 ] = days_left & 0xff;
+				m_days_left[ 1 ] = (days_left >> 8) & 0x1;
 
-			for(int i = 0; i < 8 ; i++)
-			{
-				m_start_time[ i ] = (start_time >> (i * 8)) & 0xff;
+				start_time += days_elapsed * 24 * 60 * 60;
+
+				for(int i = 0; i < 8 ; i++)
+				{
+					m_start_time[ i ] = (start_time >> (i * 8)) & 0xff;
+				}
 			}
 		}
 	}
@@ -606,9 +597,7 @@ void ds1207_device::set_start_time()
 {
 	if(!(m_device_state & DAYS_EXPIRED) && m_device_state & OSC_ENABLED && !(m_device_state & OSC_RUNNING))
 	{
-		uint64_t current_time;
-
-		current_time = m_startup_time + machine().time().as_ticks(1);
+		const uint64_t current_time = m_startup_time + machine().time().as_ticks(1);
 
 		for(int i = 0; i < 8 ; i++)
 		{

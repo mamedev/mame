@@ -41,7 +41,7 @@ protected:
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
 
 private:
-	void new_state(int state);
+	void new_state(uint8_t state);
 	void writebit(uint8_t *buffer);
 	void readbit(uint8_t *buffer);
 	void set_start_time();
@@ -91,16 +91,16 @@ private:
 		DAYS_EXPIRED = 8
 	};
 
-	static const int DQ_HIGH_IMPEDANCE = -1;
+	static const int8_t DQ_HIGH_IMPEDANCE = -1;
 
 	optional_memory_region m_region;
 
-	int m_rst;
-	int m_clk;
-	int m_dqw;
-	int m_dqr;
-	int m_state;
-	int m_bit;
+	uint8_t m_rst;
+	uint8_t m_clk;
+	uint8_t m_dqw;
+	int8_t m_dqr;
+	uint8_t m_state;
+	uint16_t m_bit;
 	uint64_t m_startup_time;
 	uint64_t m_last_update_time;
 	uint8_t m_command[3];
