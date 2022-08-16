@@ -592,6 +592,7 @@ Derby Owners Club World Edition EX (Rev D)      840-0088C  22336D   7 (128Mb)  3
 Giga Wing 2                                     841-0014C  22270    5 (128Mb)  315-6319A  315-6213  317-5064-COM  ?
 Mobile Suit Gundam: Federation Vs. Zeon         841-0017C  23638   10 (128Mb)  315-6319A  315-6213  317-5070-COM  not present
 Moero! Justice Gakuen / Project Justice (Rev A) 841-0015C  23548A  11 (128Mb)  315-6319A  315-6213  317-5065-COM  present
+Moero! Justice Gakuen / Project Justice (Rev B) 841-0015C  23548B  11 (128Mb)  315-6319A  315-6213  317-5065-COM  present
 MushiKing The King Of Beetles 2004 Second (Jpn) 840-0152C  24241    5 (128Mb)  315-6319A  315-6213  not present   not present  requires 610-0669 barcode reader
 MushiKing The King Of Beetles 2005 First (Jpn)  840-0158C  24286    7 (128Mb)  315-6319A  315-6213  not present   not present  requires 610-0669 barcode reader
 Oinori-daimyoujin Matsuri                       840-0126B  24053    5 (128Mb)  315-6319A  315-6213  not present   not present  no cart, requires 837-14274 "G2 EXPANSION BD" (similar to hopper 837-14381 but with ARC NET chip)
@@ -10835,7 +10836,7 @@ void naomi_state::init_hotd2()
 /* 0013 */        GAME( 2000, ggx,       naomi,    naomim2, naomi,    naomi_state, init_naomi,    ROT0,   "Arc System Works",        "Guilty Gear X", GAME_FLAGS )
 /* 0014 */        GAME( 2000, gwing2,    naomi,    naomim2, naomi,    naomi_state, init_naomi,    ROT0,   "Takumi / Capcom",         "Giga Wing 2", GAME_FLAGS )
 /* 0015 */        GAME( 2000, pjustic,   naomi,    naomim2, naomi,    naomi_state, init_naomi,    ROT0,   "Capcom",                  "Project Justice / Moero! Justice Gakuen (Rev B)", GAME_FLAGS )
-/* 0015 */        GAME( 2000, pjustica,  naomi,    naomim2, naomi,    naomi_state, init_naomi,    ROT0,   "Capcom",                  "Project Justice / Moero! Justice Gakuen (Rev A)", GAME_FLAGS )
+/* 0015 */        GAME( 2000, pjustica,  pjustic,  naomim2, naomi,    naomi_state, init_naomi,    ROT0,   "Capcom",                  "Project Justice / Moero! Justice Gakuen (Rev A)", GAME_FLAGS )
 /* 0016 */        GAME( 2000, deathcoxo, deathcox, naomim2, hotd2,    naomi_state, init_naomi,    ROT0,   "Ecole Software",          "Death Crimson OX (Japan)", GAME_FLAGS )
 /* 0016 */        GAME( 2000, deathcoxj, deathcox, naomim2, hotd2,    naomi_state, init_naomi,    ROT0,   "Ecole Software",          "Death Crimson OX (Japan, Rev A)", GAME_FLAGS )
 /* 0016 */        GAME( 2000, deathcox,  naomi,    naomim2, hotd2,    naomi_state, init_naomi,    ROT0,   "Ecole Software",          "Death Crimson OX (USA)", GAME_FLAGS ) // possible location test or limited release
