@@ -1313,10 +1313,10 @@ void cdicdic_device::regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			uint16_t *ram = (uint16_t *)m_ram.get();
 			LOGMASKED(LOG_WRITES, "%s: cdic_w: DMA Control Register = %04x & %04x\n", machine().describe_context(), data, mem_mask);
 			LOGMASKED(LOG_WRITES, "%s: Memory address counter: %08x\n", machine().describe_context(), m_scc->dma().channel[0].memory_address_counter);
-			LOGMASKED(LOG_WRITES, "%s: Doing copy, transferring %04x bytes %s\n", machine().describe_context(), count * 2, (m_scc->dma().channel[0].operation_control & OCR_D) ? "to main RAM" : "to device RAM");
+			LOGMASKED(LOG_WRITES, "%s: Doing copy, transferring %04x bytes %s\n", machine().describe_context(), count * 2, (m_scc->dma().channel[0].operation_control & SCC68070_OCR_D) ? "to main RAM" : "to device RAM");
 			for (uint32_t index = start / 2; index < (start / 2 + count); index++)
 			{
-				if (m_scc->dma().channel[0].operation_control & OCR_D)
+				if (m_scc->dma().channel[0].operation_control & SCC68070_OCR_D)
 				{
 					m_memory_space->write_word(index * 2, ram[device_index++]);
 				}
