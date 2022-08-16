@@ -82,6 +82,7 @@ protected:
 
 	virtual u32 execute_input_lines() const noexcept override { return 2; }
 	virtual void execute_set_input(int line, int state) override;
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == TMS2100_INPUT_LINE_INT || inputnum == TMS2100_INPUT_LINE_EC1; }
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
