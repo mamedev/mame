@@ -15,7 +15,7 @@
   - UART;
   - hook-up pic16f84 when emulation available
   - hotslots, quingo: sets up 68070 timer chs 1 & 2, currently unsupported;
-  - bigdeal0: punts with an address error PC=0x60ea3a A2=$c71c38e3;
+  - bigdeal0: locks with 68070 continually executing address error exception
   - determine what drives int1_w. (It's rtc on boards with rtc) (Not all games use this)
   - Correct memory map - at the moment rom is mapped to several address spaces for
     all games. This is probably wrong.
@@ -95,10 +95,10 @@
   Press OWNER BOOK KEEPING to get past this and again when error appears later.
   Use HOLD3 to enter menu and CLEAR to get hidden test. Press HOLD5 for 5 secs
   will initialise machine.
-  
+
   magicarde/ea alarm when credit is added and credit is then cleared so can't be played.
   Needs further investigation.
-  
+
   Lucky7i shows !! FEHLER !! BITTE TECHNIKER RUFEN 4
   Press OWNER BOOK Keeping. Game enters test. Press HOLD 3 (Einstellungen)
   and then HOLD 5 (RAM RESET).
@@ -112,11 +112,9 @@
 
   magicle/hotslots/quingo/belslots fail on I2C BUS ERROR - protection device missing.
 
-  bigdeal0 crashes with excepiton errors in cpu core.
-
   puzzleme - appears to work. Amount of credit for each coin input is set by values
              in the eeprom but there doesn't appear to be any tests to set these.
-			 Is something missing on this game ?
+             Is something missing on this game ?
 
   magicardf, magicardw, unkte06 and lucky7i appear to work (but are they right?)
 
@@ -132,7 +130,7 @@
   ------------------------------------------------------------------------------------------------------
   V 2.1      | puzzleme                      | ESI1, 24C02, YM2149F, RTC added
   ------------------------------------------------------------------------------------------------------
-  V 2.2      | magicarde                     | 
+  V 2.2      | magicarde                     |
   ------------------------------------------------------------------------------------------------------
   V 4.0      | magicardj, magicardf, magicle | ESI1 replaced by ALTERA MAX EPM7128SQC100
              |                               | YM2149F replaced by YMZ284-D, MX29F1610 added
@@ -152,38 +150,38 @@
 
 *******************************************************************************
 
-				DS2401	   DS1207	EP		PROTECT	 PROT AVAIL		ELO TOUCH
-  magicard		NO			YES[3]	24c02	YES			NO
-  magicarda		NO			YES[3]	24c02	YES			NO
-  magicardb		NO			YES[2]	24c02?	YES			NO
-  magicarde		YES			YES[1]	24c02	16C54		YES
-  magicardea	YES			YES[1]	24c02	16C54		YES
-  magicardeb	YES			YES[1]	24c02?	YES			NO
-  magicardec	YES			NO		24c02?	YES			NO
-  magicardf		YES			NO		24c02	?? *1
-  magicardj		YES			NO ?	24c02	16F84		YES*
-  magicardw		NO ?		YES[2]	24c02?	16C54		YES
-  magicle		?			?		24c04	16F84		YES*		YES	
-  hotslots		?			?		24c02	YES			NO
-  quingo		?			?		24c04	YES			NO			YES
-  belslots		?			?		24c04	YES			NO			YES
-  bigdeal0		?			?		24c04	?
-  puzzleme		NO			NO		24c02	16C54		YES
-  unkte06		NO			YES[2]	24c02	16C56		YES
-  lucky7i					YES[3]	24c02	NO
-  unkpkr_w		NO			YES[2]	24c02	YES			NO
-  dallaspk		NO			YES[4]	24c02	YES			NO			protection via serial port ?
-  kajotcrd		YES			??		24c02	YES			NO
+                DS2401     DS1207   EP      PROTECT  PROT AVAIL     ELO TOUCH
+  magicard      NO          YES[3]  24c02   YES         NO
+  magicarda     NO          YES[3]  24c02   YES         NO
+  magicardb     NO          YES[2]  24c02?  YES         NO
+  magicarde     YES         YES[1]  24c02   16C54       YES
+  magicardea    YES         YES[1]  24c02   16C54       YES
+  magicardeb    YES         YES[1]  24c02?  YES         NO
+  magicardec    YES         NO      24c02?  YES         NO
+  magicardf     YES         NO      24c02   ?? *1
+  magicardj     YES         NO ?    24c02   16F84       YES*
+  magicardw     NO ?        YES[2]  24c02?  16C54       YES
+  magicle       ?           ?       24c04   16F84       YES*        YES
+  hotslots      ?           ?       24c02   YES         NO
+  quingo        ?           ?       24c04   YES         NO          YES
+  belslots      ?           ?       24c04   YES         NO          YES
+  bigdeal0      ?           ?       24c04   ?
+  puzzleme      NO          NO      24c02   16C54       YES
+  unkte06       NO          YES[2]  24c02   16C56       YES
+  lucky7i                   YES[3]  24c02   NO
+  unkpkr_w      NO          YES[2]  24c02   YES         NO
+  dallaspk      NO          YES[4]  24c02   YES         NO          protection via serial port ?
+  kajotcrd      YES         ??      24c02   YES         NO
 
   PIC16F84 emulation not available
-	
+
   [1] Use same signature
   [2] Use same signature
   [3] Use unique signature
   [4] Use unique signature, 8 byte identification value isn't validated by the game.
-  
+
   *1 Accesses I2C device 0x48 but fails. Game works anyway.
-  
+
 *******************************************************************************/
 
 #include "emu.h"
@@ -230,6 +228,8 @@ public:
 
 	void dram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	uint16_t dram_r(offs_t offset, uint16_t mem_mask);
+	void mcu_dram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t mcu_dram_r(offs_t offset, uint16_t mem_mask);
 	uint8_t pic_portb_r();
 	void pic_portb_w(offs_t offset, uint8_t data, uint8_t mask);
 	void output_w(offs_t offset, uint16_t data);
@@ -248,16 +248,21 @@ protected:
 
 	uint8_t m_sda_state;
 	uint8_t m_scl_state;
-	
+
 	void ramdac_map(address_map &map);
 
 	DECLARE_WRITE_LINE_MEMBER(scc66470_irq);
 	DECLARE_WRITE_LINE_MEMBER(cpu_i2c_scl);
 	DECLARE_WRITE_LINE_MEMBER(cpu_i2c_sda_write);
 	DECLARE_READ_LINE_MEMBER(cpu_i2c_sda_read);
-	
+
 	void update_sda(uint8_t device, uint8_t state);
 	void update_scl(uint8_t device, uint8_t state);
+
+private:
+	void scc66470_map(address_map &map);
+	std::unique_ptr<uint16_t[]>m_dram;
+
 };
 
 class magicard_state : public magicard_base_state
@@ -272,21 +277,21 @@ public:
 	void magicard_pic54(machine_config &config);
 	void magicard(machine_config &config);
 	void unkte06(machine_config &config);
-	
+
 protected:
 	virtual void machine_start() override;
 
 private:
 	required_device<nvram_device> m_nvram;
 	required_device<ds1207_device> m_ds1207;
-	
+
+	std::unique_ptr<uint8_t[]> m_nvram8;
+
 	void magicard_map(address_map &map);
 	uint8_t nvram_r(offs_t offset);
 	void nvram_w(offs_t offset, uint8_t data);
 	uint8_t read_ds1207(offs_t offset);
 	void write_ds1207(offs_t offset, uint8_t data);
-	
-	std::unique_ptr<uint8_t[]> m_nvram8;
 };
 
 class hotslots_state : public magicard_base_state
@@ -305,8 +310,6 @@ public:
 	void magicle(machine_config &config);
 	void puzzleme(machine_config &config);
 
-protected:
-
 private:
 	optional_device<ds2401_device> m_ds2401;
 	optional_device<ds1207_device> m_ds1207;
@@ -315,7 +318,7 @@ private:
 	void hotslots_map_base(address_map &map);
 	void hotslots_map(address_map &map);
 	void puzzleme_map(address_map &map);
-	
+
 	uint8_t read_ds1207_ds2401(offs_t offset);
 	void write_ds1207_ds2401(offs_t offset, uint8_t data);
 	void output_w(offs_t offset, uint16_t data);
@@ -325,6 +328,8 @@ private:
 
 void magicard_base_state::machine_start()
 {
+	m_dram = make_unique_clear<uint16_t[]>(0x80000/2);
+	save_pointer(NAME(m_dram), 0x80000/2);
 	save_item(NAME(m_sda_state));
 	save_item(NAME(m_scl_state));
 }
@@ -346,220 +351,51 @@ uint8_t magicard_state::nvram_r(offs_t offset)
 	return m_nvram8[ offset ];
 }
 
-void magicard_base_state::dram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void magicard_base_state::mcu_dram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(!machine().side_effects_disabled())
 	{
 		m_maincpu->eat_cycles(m_maincpu->attotime_to_cycles(attotime::from_ticks(m_scc66470->dram_dtack_cycles(), m_scc66470->clock())));
 	}
-	m_scc66470->dram_w(offset,data,mem_mask);
+	m_scc66470->dram_w(offset, data, mem_mask);
+}
+
+uint16_t magicard_base_state::mcu_dram_r(offs_t offset, uint16_t mem_mask)
+{
+	if(!machine().side_effects_disabled())
+	{
+		m_maincpu->eat_cycles(m_maincpu->attotime_to_cycles(attotime::from_ticks(m_scc66470->dram_dtack_cycles(), m_scc66470->clock())));
+	}
+	return m_scc66470->dram_r(offset);
+}
+
+void magicard_base_state::dram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_dram[offset]);
 }
 
 uint16_t magicard_base_state::dram_r(offs_t offset, uint16_t mem_mask)
 {
-	if(!machine().side_effects_disabled())
-	{
-		m_maincpu->eat_cycles(m_maincpu->attotime_to_cycles(attotime::from_ticks(m_scc66470->dram_dtack_cycles(), m_scc66470->clock())));
-	}
-	return m_scc66470->dram_r(offset, mem_mask);
+	return m_dram[ offset ] & mem_mask;
 }
 
-/*************************
-*     Video Hardware     *
-*************************/
-
-/*
-66470
-video and system controller
-19901219/wjvg
-*/
-/*
-TODO: check this register,doesn't seem to be 100% correct.
-1fffe0  csr = control and status register
-    w 00...... ........ DM = slow timing speed, normal dram mode
-    w 01...... ........ DM = fast timing speed, page dram mode
-    w 10...... ........ DM = fast timing speed, nibble dram mode
-    w 11...... ........ DM = slow timing speed, dual-port vram mode
-    w ..1..... ........ TD = 256/64 k dram's
-    w ...1.... ........ CG = enable character generator
-    w ....1... ........ DD = rom data acknowledge delay
-    w .....1.. ........ ED = early dtack
-    w ......0. ........ not used
-    w .......1 ........ BE  = enable bus error (watchdog timer)
-   r  ........ 1....... DA  = vertical display active
-   r  ........ .1...... FG  = set during frame grabbing (if fg in dcr set)
-   r  ........ ..xxx... not used
-   r  ........ .....1.. IT2 = intn active
-   r  ........ ......1. IT1 = pixac free and intn active
-   r  ........ .......1 BE  = bus error generated by watchdog timer
-*/
-
-/*63 at post test,6d all the time.*/
-//#define SCC_CSR_VREG    (m_pcab_vregs[0x00/2] & 0xffff)
-//#define SCC_CG_VREG     ((SCC_CSR_VREG & 0x10)>>4)
-
-/*
-1fffe2  dcr = display command register
-    w 1....... ........  DE = enable display
-    w .00..... ........  CF = 20   MHz (or 19.6608 MHz)
-    w .01..... ........  CF = 24   MHz
-    w .10..... ........  CF = 28.5 MHz
-    w .11..... ........  CF = 30   MHz
-    w ...1.... ........  FD = 60/50 Hz frame duration
-    w ....00.. ........  SM/SS = non-interlaced scan mode
-    w ....01.. ........  SM/SS = double frequency scan mode
-    w ....10.. ........  SM/SS = interlaced scan mode
-    w ....11.. ........  SM/SS = interlaced field repeat scan mode
-    w ......1. ........  LS = full screen/border
-    w .......1 ........  CM = logical/physical screen
-    w ........ 1.......  FG = 4/8 bits per pixel
-    w ........ .1......  DF = enable frame grabbing
-    w ........ ..00....  IC/DC = ICA and DCA inactive
-    w ........ ..01....  IC/DC = ICA active, reduced DCA mode (DCA sz=16 byts)
-    w ........ ..10....  IC/DC = ICA active, DCA inactive
-    w ........ ..11....  IC/DC = ICA active, DCA active (DCA size=64 bytes)
-    w ........ ....aaaa  VSR:H = video start address (MSB's)
-*/
-
-//#define SCC_DCR_VREG    (m_pcab_vregs[0x02/2] & 0xffff)
-//#define SCC_DE_VREG     ((SCC_DCR_VREG & 0x8000)>>15)
-//#define SCC_FG_VREG     ((SCC_DCR_VREG & 0x0080)>>7)
-//#define SCC_VSR_VREG_H  ((SCC_DCR_VREG & 0xf)>>0)
-
-/*
-1fffe4  vsr = video start register
-    w aaaaaaaa aaaaaaaa  VSR:L = video start address (LSB's)
-*/
-
-//#define SCC_VSR_VREG_L  (m_pcab_vregs[0x04/2] & 0xffff)
-//#define SCC_VSR_VREG    ((SCC_VSR_VREG_H)<<16) | (SCC_VSR_VREG_L)
-
-/*
-1fffe6  bcr = border colour register
-    w ........ nnnnnnnn  in 8 bit mode
-    w ........ nnnn....  in 4 bit mode
-*/
-/*
-(Note: not present on the original vreg listing)
-1fffe8 dcr2 = display command register 2
-    w x....... ........  not used
-    w .nn..... ........  OM = lower port of the video mode (with CM)
-    w ...1.... ........  ID = Indipendent DCA bit
-    w ....nn.. ........  MF = Mosaic Factor (2,4,8,16)
-    w ......nn ........  FT = File Type (0/1 = bitmap, 2 = RLE, 3 = Mosaic)
-    w ........ xxxx....  not used
-    w ........ ....aaaa  "data" (dunno the purpose...)
-*/
-//#define SCC_DCR2_VREG  (m_pcab_vregs[0x08/2] & 0xffff)
-
-/*
-(Note: not present on the original vreg listing)
-1fffea dcp = ???
-    w aaaaaaaa aaaaaa--  "data" (dunno the purpose...)
-    w -------- ------xx not used
-*/
-
-/*
-1fffec  swm = selective write mask register
-    w nnnnnnnn ........  mask
-*/
-/*
-1fffee  stm = selective mask register
-    w ........ nnnnnnnn  mask
-*/
-/*
-1ffff0  a = source register a
-    w nnnnnnnn nnnnnnnn  source
-*/
-//#define SCC_SRCA_VREG  (m_pcab_vregs[0x10/2] & 0xffff)
-
-/*
-1ffff2  b = destination register b
-   rw nnnnnnnn nnnnnnnn  destination
-*/
-
-//#define SCC_DSTB_VREG  (m_pcab_vregs[0x12/2] & 0xffff)
-
-/*
-1ffff4  pcr = pixac command register
-    w 1....... ........  4N  = 8/4 bits per pixel
-    w .1....00 ....x00.  COL = enable colour2 function
-    w .1....00 .....01.  COL = enable colour1 function
-    w .1...0.. .....10.  COL = enable bcolour2 function
-    w .1...0.. .....11.  COL = enable bcolour1 function
-    w ..1..000 ....x00.  EXC = enable exchange function
-    w ..1..000 .....01.  EXC = enable swap function
-    w ..1..000 .....10.  EXC = enable inverted exchange function
-    w ..1..000 .....11.  EXC = enable inverted swap function
-    w ...1..0. ....x00.  CPY = enable copy type b function
-    w ...1...0 ....x10.  CPY = enable copy type a function
-    w ...1..0. .....01.  CPY = enable patch type b function
-    w ...1...0 .....11.  CPY = enable patch type a function
-    w ....1000 .....00.  CMP = enable compare function
-    w ....1000 .....10.  CMP = enable compact function
-    w .....1.. ........  RTL = manipulate right to left
-    w ......1. ........  SHK = shrink picture by factor 2
-    w .......1 ........  ZOM = zoom picture by factor 2
-    w ........ nnnn....  LGF = logical function
-    w ........ 0000....  LGF = d=r
-    w ........ 0001....  LGF = d=~r
-    w ........ 0010....  LGF = d=0
-    w ........ 0011....  LGF = d=1
-    w ........ 0100....  LGF = d=~(d^r)
-    w ........ 0101....  LGF = d=d^r
-    w ........ 0110....  LGF = d=d&r
-    w ........ 0111....  LGF = d=~d&r
-    w ........ 1000....  LGF = d=~d&~r
-    w ........ 1001....  LGF = d=d&~r
-    w ........ 1010....  LGF = d=~d|r
-    w ........ 1011....  LGF = d=d|r
-    w ........ 1100....  LGF = d=d|~r
-    w ........ 1101....  LGF = d=~d|~r
-    w ........ 1110....  LGF = d=d
-    w ........ 1111....  LGF = d=~d
-    w ........ ....1...  INV = invert transparancy state of source bits
-    w ........ .....1..  BIT = copy:     enable copy type a
-    w ........ .....1..  BIT = colour:   enable bcolour/colour
-    w ........ .....1..  BIT = compare:  compact/compare
-    w ........ ......1.  TT  = perform transparancy test
-    w ........ .......0
-*/
-
-//#define SCC_PCR_VREG  (m_pcab_vregs[0x14/2] & 0xffff)
-
-/*
-1ffff6  mask = mask register
-    w ........ ....nnnn  mask nibbles/0
-*/
-/*
-1ffff8  shift = shift register
-    w ......nn ........  shift by .. during source alignment
-*/
-/*
-1ffffa  index = index register
-    w ........ ......nn  bcolour: use bit .. in the source word
-    w ........ ......nn  compact: nibble .. will hold the result
-*/
-/*
-1ffffc  fc/bc = foreground/background colour register
-    w nnnnnnnn ........  FC = foreground colour
-    w ........ nnnnnnnn  BC = background colour
-*/
-/*
-1ffffe  tc = transparent colour register
-    w nnnnnnnn ........  transparent colour
-*/
-
+void magicard_base_state::scc66470_map(address_map &map)
+{
+	map(0x00000, 0x7ffff).rw(FUNC(magicard_base_state::dram_r), FUNC(magicard_base_state::dram_w));
+}
 
 uint32_t magicard_base_state::screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int scanline = screen.vpos();
-	uint8_t *src = m_scc66470->line(scanline);
-	uint32_t *dest = &bitmap.pix(scanline);
-
-	for(int x = cliprect.min_x ; x <= cliprect.max_x ; x++)
+	if(cliprect.min_y == cliprect.max_y)
 	{
-		*dest++ = m_palette->pen(*src++);
+		uint8_t buffer[768];
+		m_scc66470->line(cliprect.min_y, buffer, sizeof(buffer));
+		uint32_t *dest = &bitmap.pix(cliprect.min_y);
+
+		for(int x = cliprect.min_x ; x <= cliprect.max_x ; x++)
+		{
+			*dest++ = m_palette->pen(buffer[ x ]);
+		}
 	}
 	return 0;
 }
@@ -642,12 +478,10 @@ void hotslots_state::output_w(offs_t offset, uint16_t data)
 
 void magicard_state::magicard_map(address_map &map)
 {
-//  map.global_mask(0x1fffff);
 	map(0x00000000, 0x001fffff).m(m_scc66470, FUNC(scc66470_device::map));
-	map(0x00000000, 0x0017ffff).rw(FUNC(magicard_base_state::dram_r), FUNC(magicard_base_state::dram_w));
+	map(0x00000000, 0x0017ffff).rw(FUNC(magicard_base_state::mcu_dram_r), FUNC(magicard_base_state::mcu_dram_w));
 	map(0x00180000, 0x001dffff).rom().region("maincpu", 0); // boot vectors point here
 	map(0x001e0000, 0x001e7fff).rw(FUNC(magicard_state::nvram_r), FUNC(magicard_state::nvram_w)).umask16(0x00ff);
-
 	map(0x00200000, 0x003fffff).rw(m_scc66470, FUNC(scc66470_device::ipa_r), FUNC(scc66470_device::ipa_w));
 	/* 001ffc00-001ffdff System I/O */
 	map(0x001ffc00, 0x001ffc01).portr("SW0");
@@ -657,20 +491,15 @@ void magicard_state::magicard_map(address_map &map)
 	map(0x001ffd03, 0x001ffd03).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x001ffd05, 0x001ffd05).w("ramdac", FUNC(ramdac_device::mask_w));
 	map(0x001ffd40, 0x001ffd43).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
-	map(0x001ffd80, 0x001ffd81).rw( FUNC(magicard_state::read_ds1207), FUNC(magicard_state::write_ds1207)).umask16(0x00ff);
+	map(0x001ffd80, 0x001ffd81).rw(FUNC(magicard_state::read_ds1207), FUNC(magicard_state::write_ds1207)).umask16(0x00ff);
 	map(0x001fff80, 0x001fffbf).ram(); //DRAM I/O, not accessed by this game, CD buffer?
 }
 
 // Different PAL mapping?
 void hotslots_state::hotslots_map_base(address_map &map)
 {
-//  map.global_mask(0x1fffff);
-	// puzzleme sets $0080000a as default reset vector, magicardf sets $00800078
-	// latter also will address error if we mirror with bank A by logic (i.e. .mirror(0x00a00000))
-	// we currently map it to B bank for now
-	//map(0x00000000, 0x001ffbff).mirror(0x00200000).ram().share("magicram");
 	map(0x00000000, 0x001fffff).m(m_scc66470, FUNC(scc66470_device::map));
-	map(0x00000000, 0x0017ffff).rw(FUNC (magicard_base_state::dram_r), FUNC (magicard_base_state::dram_w));
+	map(0x00000000, 0x0017ffff).rw(FUNC(magicard_base_state::mcu_dram_r), FUNC(magicard_base_state::mcu_dram_w));
 	map(0x00180000, 0x001ffbff).rom().region("maincpu", 0); // boot vectors point here
 	map(0x00200000, 0x003fffff).rw(m_scc66470, FUNC(scc66470_device::ipa_r), FUNC(scc66470_device::ipa_w));
 	map(0x00600000, 0x0067fbff).rom().region("maincpu", 0); // boot vectors point here
@@ -694,7 +523,7 @@ void hotslots_state::hotslots_map_base(address_map &map)
 void hotslots_state::hotslots_map(address_map &map)
 {
 	hotslots_map_base(map);
-	map(0x00419566, 0x00419567).rw( FUNC(hotslots_state::read_ds1207_ds2401), FUNC(hotslots_state::write_ds1207_ds2401)).umask16(0x00ff);
+	map(0x00419566, 0x00419567).rw(FUNC(hotslots_state::read_ds1207_ds2401), FUNC(hotslots_state::write_ds1207_ds2401)).umask16(0x00ff);
 }
 
 void hotslots_state::puzzleme_map(address_map &map)
@@ -724,26 +553,26 @@ static INPUT_PORTS_START( magicard )
 
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_BIT( 0x100, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Rental Book Keeping") PORT_TOGGLE
+	PORT_BIT( 0x100, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Rental Book Keeping") PORT_TOGGLE
 	PORT_BIT( 0x200, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Owner Book Keeping")
 
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Hold 4")
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2")
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3")
 
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Hopper Count") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Pay Out")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hopper Count") PORT_CODE(KEYCODE_W)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Accounting 3") PORT_TOGGLE
 
 	PORT_START("SW1")
-	PORT_DIPNAME( 0x80, 0x80, "Hopper" )					PORT_DIPLOCATION("DIP 1:1")
+	PORT_DIPNAME( 0x80, 0x80, "Hopper" )                    PORT_DIPLOCATION("DIP 1:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Hopper" )					PORT_DIPLOCATION("DIP 1:2")
+	PORT_DIPNAME( 0x40, 0x40, "Hopper" )                    PORT_DIPLOCATION("DIP 1:2")
 	PORT_DIPSETTING(    0x40, "Coin B" )
 	PORT_DIPSETTING(    0x00, "Coin A" )
 
-	PORT_DIPNAME( 0x38, 0x38, "Setting" )					PORT_DIPLOCATION("DIP 1:5,4,3")
+	PORT_DIPNAME( 0x38, 0x38, "Setting" )                   PORT_DIPLOCATION("DIP 1:5,4,3")
 	PORT_DIPSETTING(    0x38, "Austria 1" )
 	PORT_DIPSETTING(    0x30, "Austria 2" )
 	PORT_DIPSETTING(    0x18, "Tschech 1" )
@@ -753,24 +582,24 @@ static INPUT_PORTS_START( magicard )
 	PORT_DIPSETTING(    0x08, "Hungary 1" )
 	PORT_DIPSETTING(    0x00, "Hungary 2" )
 
-	PORT_DIPNAME( 0x04, 0x04, "Swap Coin Inputs" )			PORT_DIPLOCATION("DIP 1:6")
+	PORT_DIPNAME( 0x04, 0x04, "Swap Coin Inputs" )          PORT_DIPLOCATION("DIP 1:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x02, "Remote/Keyboard" )			PORT_DIPLOCATION("DIP 1:7")
+	PORT_DIPNAME( 0x02, 0x02, "Remote/Keyboard" )           PORT_DIPLOCATION("DIP 1:7")
 	PORT_DIPSETTING(    0x02, "Remote Switch" )
 	PORT_DIPSETTING(    0x00, "Keyboard" )
-	PORT_DIPNAME( 0x01, 0x01, "Keyboard Test" )				PORT_DIPLOCATION("DIP 1:8")
+	PORT_DIPNAME( 0x01, 0x01, "Keyboard Test" )             PORT_DIPLOCATION("DIP 1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON7 )     PORT_NAME("Hopper Full")     PORT_CODE(KEYCODE_A)  PORT_TOGGLE
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 )     PORT_NAME("Hopper Full")     PORT_CODE(KEYCODE_A)  PORT_TOGGLE
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )      // PORT_NAME("Reserve In 9")
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )      // PORT_NAME("Reserve In 8")
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED )      // PORT_NAME("Reserve In 7")
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )      // PORT_NAME("Reserve In 6")
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )      // PORT_NAME("Reserve In 5")
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) PORT_NAME("Door Switch")     PORT_TOGGLE
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON13 )    PORT_NAME("Clear Credit")    PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON4 )    PORT_NAME("Clear Credit")     PORT_CODE(KEYCODE_J)
 
 INPUT_PORTS_END
 
@@ -778,11 +607,11 @@ static INPUT_PORTS_START( magicarde )
 	PORT_INCLUDE( magicard )
 
 	PORT_MODIFY("SW1")
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON8 )     PORT_NAME("Alarm")           PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON9 )     PORT_NAME("Counter Control") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON7 )     PORT_NAME("Alarm")           PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON6 )     PORT_NAME("Counter Control") PORT_CODE(KEYCODE_D)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED )      // PORT_NAME("N/C 1")
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )      // PORT_NAME("N/C 2")
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON12 )    PORT_NAME("Clear coinCard")  PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON5 )     PORT_NAME("Clear coinCard")  PORT_CODE(KEYCODE_H)
 
 INPUT_PORTS_END
 
@@ -791,13 +620,13 @@ static INPUT_PORTS_START( puzzleme )
 
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Remote")
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON5 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("Clear")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_NAME("Clear")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Show All Book Keeping")
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Rental Book Keeping")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Rental Book Keeping")
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Owner Book Keeping")
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
@@ -836,46 +665,46 @@ static INPUT_PORTS_START( lucky7i )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Win Plan Scroll/Collect")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Einsatz")
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start/Gamble")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Rental Book Keeping")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Rental Book Keeping")
 
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("SW1")
-	PORT_DIPNAME( 0x80, 0x80, "Hopper" )					PORT_DIPLOCATION("DIP 1:1")
+	PORT_DIPNAME( 0x80, 0x80, "Hopper" )                    PORT_DIPLOCATION("DIP 1:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x40, 0x40, "Hopper-Wert" )				PORT_DIPLOCATION("DIP 1:2")
+	PORT_DIPNAME( 0x40, 0x40, "Hopper-Wert" )               PORT_DIPLOCATION("DIP 1:2")
 	PORT_DIPSETTING(    0x40, "10" )
 	PORT_DIPSETTING(    0x00, "5" )
 
-	PORT_DIPNAME( 0x08, 0x08, "Munzer1" )					PORT_DIPLOCATION("DIP 1:5")
+	PORT_DIPNAME( 0x08, 0x08, "Munzer1" )                   PORT_DIPLOCATION("DIP 1:5")
 	PORT_DIPSETTING(    0x08, "10" )
 	PORT_DIPSETTING(    0x00, "5" )
 
-	PORT_DIPNAME( 0x04, 0x04, "Munzer2" )					PORT_DIPLOCATION("DIP 1:6")
+	PORT_DIPNAME( 0x04, 0x04, "Munzer2" )                   PORT_DIPLOCATION("DIP 1:6")
 	PORT_DIPSETTING(    0x04, "10" )
 	PORT_DIPSETTING(    0x00, "5" )
 
-	PORT_DIPNAME( 0x02, 0x02, "Remote 1" )					PORT_DIPLOCATION("DIP 1:7")
+	PORT_DIPNAME( 0x02, 0x02, "Remote 1" )                  PORT_DIPLOCATION("DIP 1:7")
 	PORT_DIPSETTING(    0x02, "100" )
 	PORT_DIPSETTING(    0x00, "10" )
 
-	PORT_DIPNAME( 0x20, 0x20, "Remote 2" )					PORT_DIPLOCATION("DIP 1:3")
+	PORT_DIPNAME( 0x20, 0x20, "Remote 2" )                  PORT_DIPLOCATION("DIP 1:3")
 	PORT_DIPSETTING(    0x20, "100" )
 	PORT_DIPSETTING(    0x00, "50" )
 
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )			PORT_DIPLOCATION("DIP 1:4")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DIP 1:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )			PORT_DIPLOCATION("DIP 1:8")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DIP 1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Attendant Collect") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Attendant Collect") PORT_CODE(KEYCODE_A)
 
 INPUT_PORTS_END
 
@@ -883,35 +712,35 @@ static INPUT_PORTS_START( dallaspk )
 	PORT_INCLUDE( magicard )
 
 	PORT_MODIFY("SW1")
-	PORT_DIPNAME( 0x80, 0x80, "Hopper" )					PORT_DIPLOCATION("DIP 1:1")
+	PORT_DIPNAME( 0x80, 0x80, "Hopper" )                    PORT_DIPLOCATION("DIP 1:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x40, 0x40, "Hopper-Wert" )				PORT_DIPLOCATION("DIP 1:2")
+	PORT_DIPNAME( 0x40, 0x40, "Hopper-Wert" )               PORT_DIPLOCATION("DIP 1:2")
 	PORT_DIPSETTING(    0x40, "10" )
 	PORT_DIPSETTING(    0x00, "5" )
-	
-	PORT_DIPNAME( 0x08, 0x08, "Munzer1" )					PORT_DIPLOCATION("DIP 1:5")
+
+	PORT_DIPNAME( 0x08, 0x08, "Munzer1" )                   PORT_DIPLOCATION("DIP 1:5")
 	PORT_DIPSETTING(    0x08, "10" )
 	PORT_DIPSETTING(    0x00, "5" )
-	
-	PORT_DIPNAME( 0x04, 0x04, "Munzer2" )					PORT_DIPLOCATION("DIP 1:6")
+
+	PORT_DIPNAME( 0x04, 0x04, "Munzer2" )                   PORT_DIPLOCATION("DIP 1:6")
 	PORT_DIPSETTING(    0x04, "10" )
 	PORT_DIPSETTING(    0x00, "5" )
 
-	PORT_DIPNAME( 0x02, 0x02, "Remote 1" )					PORT_DIPLOCATION("DIP 1:7")
+	PORT_DIPNAME( 0x02, 0x02, "Remote 1" )                  PORT_DIPLOCATION("DIP 1:7")
 	PORT_DIPSETTING(    0x02, "100" )
 	PORT_DIPSETTING(    0x00, "10" )
 
-	PORT_DIPNAME( 0x20, 0x20, "Remote 2" )					PORT_DIPLOCATION("DIP 1:3")
+	PORT_DIPNAME( 0x20, 0x20, "Remote 2" )                  PORT_DIPLOCATION("DIP 1:3")
 	PORT_DIPSETTING(    0x20, "100" )
 	PORT_DIPSETTING(    0x00, "50" )
 
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )			PORT_DIPLOCATION("DIP 1:4")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DIP 1:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )			PORT_DIPLOCATION("DIP 1:8")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DIP 1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -921,9 +750,9 @@ static INPUT_PORTS_START( hotslots )
 	PORT_INCLUDE( magicard )
 
 	PORT_MODIFY("SW1")
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON8 )     PORT_NAME("Alarm")           PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON9 )     PORT_NAME("Counter Control") PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON12 )    PORT_NAME("Clear coinCard")  PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON5 )     PORT_NAME("Alarm")           PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON6 )     PORT_NAME("Counter Control") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON7 )     PORT_NAME("Clear coinCard")  PORT_CODE(KEYCODE_H)
 
 INPUT_PORTS_END
 
@@ -931,7 +760,7 @@ void magicard_base_state::machine_reset()
 {
 	uint16_t *src = (uint16_t*)memregion("maincpu")->base();
 	m_scc66470->set_vectors( src );
-	
+
 	m_sda_state = 0;
 	m_scl_state = 0;
 }
@@ -1010,7 +839,7 @@ void magicard_base_state::magicard_base(machine_config &config)
 	SCC68070(config, m_maincpu, CLOCK_C); /* SCC-68070 CCA84 */
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	
+
 	m_maincpu->i2c_scl_w().set(FUNC(magicard_base_state::cpu_i2c_scl));
 	m_maincpu->i2c_sda_w().set(FUNC(magicard_base_state::cpu_i2c_sda_write));
 	m_maincpu->i2c_sda_r().set(FUNC(magicard_base_state::cpu_i2c_sda_read));
@@ -1018,6 +847,7 @@ void magicard_base_state::magicard_base(machine_config &config)
 	m_screen->set_raw( CLOCK_A/2, 960, 0, 768, 312, 32, 312);
 	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
 	SCC66470(config,m_scc66470,CLOCK_A);
+	m_scc66470->set_addrmap(0, &magicard_base_state::scc66470_map);
 	m_scc66470->set_screen("screen");
 	m_scc66470->irq().set(FUNC(magicard_base_state::scc66470_irq));
 
@@ -1043,8 +873,7 @@ void magicard_state::magicard(machine_config &config)
 
 	SAA1099(config, "saa", CLOCK_B).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	I2C_24C02(config, m_i2cmem);
-	m_i2cmem->write_e0(1);
+	I2C_24C02(config, m_i2cmem).set_e0(1);
 
 	DS1207(config, "ds1207");
 }
@@ -1086,7 +915,7 @@ void hotslots_state::hotslots_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &hotslots_state::hotslots_map);
 
 	YMZ284(config, "ssg", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
-	
+
 	RTC72421(config, m_rtc, XTAL(32'768)).out_int_handler().set(FUNC(hotslots_state::cpu_int1));
 
 	DS2401(config, "serial_id");
@@ -1098,14 +927,13 @@ void hotslots_state::hotslots(machine_config &config)
 {
 	hotslots_base(config);
 
-	I2C_24C02(config, m_i2cmem);
-	m_i2cmem->write_e0(1);
+	I2C_24C02(config, m_i2cmem).set_e0(1);
 }
 
 void hotslots_state::hotslots_pic54(machine_config &config)
 {
 	hotslots(config);
-	
+
 	pic16c54_device &pic(PIC16C54(config, "pic16c54", 3686400)); // correct?
 	pic.read_b().set(FUNC(magicard_base_state::pic_portb_r));
 	pic.write_b().set(FUNC(magicard_base_state::pic_portb_w));
@@ -1115,8 +943,7 @@ void hotslots_state::magicle(machine_config &config)
 {
 	hotslots_base(config);
 
-	I2C_24C04(config, m_i2cmem);
-	m_i2cmem->write_e0(1);
+	I2C_24C04(config, m_i2cmem).set_e0(1);
 }
 
 void hotslots_state::puzzleme(machine_config &config)
@@ -1124,13 +951,12 @@ void hotslots_state::puzzleme(machine_config &config)
 	hotslots_base(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &hotslots_state::puzzleme_map);
-	
+
 	pic16c54_device &pic(PIC16C54(config, "pic16c54", 3686400)); // correct?
 	pic.read_b().set(FUNC(magicard_base_state::pic_portb_r));
 	pic.write_b().set(FUNC(magicard_base_state::pic_portb_w));
-	
-	I2C_24C02(config, m_i2cmem);
-	m_i2cmem->write_e0(1);
+
+	I2C_24C02(config, m_i2cmem).set_e0(1);
 
 	config.device_remove("serial_id");
 	config.device_remove("ds1207");
@@ -1406,7 +1232,7 @@ ROM_END
 
   Other components are unreadable
   in the PCB picture.
-  
+
 */
 ROM_START( magicardeb )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
@@ -1438,7 +1264,7 @@ ROM_END
 
   Other components are unreadable
   in the PCB picture.
-  
+
 */
 ROM_START( magicardec )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
@@ -1832,10 +1658,10 @@ ROM_END
   Impera.
 
   PCB layout:
-   ___________________________________________________________________________________________________________________________ 
+   ___________________________________________________________________________________________________________________________
   |                      ___    ___    ___    ___                                                                             |
   |    ___              |   |  |   |  |   |  |   |                                                                            |
-  |   | B |             | A |  | A |  | A |  | A |    ______________________________________                                  |____ 
+  |   | B |             | A |  | A |  | A |  | A |    ______________________________________                                  |____
   |   |___|    _____    |   |  |   |  |   |  |   |   |                                      |                                   ___|
   |           |  _  |   |___|  |___|  |___|  |___|   |               YAMAHA                 |                                   ___|
   |  _______  |BATTE|                                |               YM2149F                |                                   ___|
@@ -1844,14 +1670,14 @@ ROM_END
   |           |_____|   | M |  | M |  | M |  | M |                                                                              ___|
   |                     | P |  | P |  | P |  | P |           ___________________________           ______________      _____    ___|
   |   ____    ____      | T |  | T |  | T |  | T |          |                           |         |   ULN2803A   |    | O O |   ___|
-  |  |HY62|  |HY62|     | Y |  | Y |  | Y |  | Y |          |       KDA0476CN_66        |         |______________|    | O O |  ____| 
+  |  |HY62|  |HY62|     | Y |  | Y |  | Y |  | Y |          |       KDA0476CN_66        |         |______________|    | O O |  ____|
   |  |64AL|  |64AL|     |___|  |___|  |___|  |___|          |       KOREA    219    IC20|        ________________     | O O | |
   |  |J_10|  |J_10|                                         |___________________________|       |    74HC273N    |    | O O | |
   |  |    |  |    |                                                                             |________________|    | O O | |
   |  |____|  |____|                                        ___________           ____________    ________________     | O O | |
   |                                                       | 74HC04AP  |         |EMPTY SOCKET|  |    74HC245N    |    | O O | |
   |  _______   _______                                    |___________|         |____________|  |________________|    | O O | |
-  | |       | |       |   XTAL1                                                                                       |_____| |____ 
+  | |       | |       |   XTAL1                                                                                       |_____| |____
   | |       | |       |    _________________                 XTAL3                                 ______________        CON3   ___|
   | | EMPTY | | EMPTY |   |    IMPERA 8     |        _____    _____________     _____________     |  TD62083AP   |              ___|
   | | SOCKET| | SOCKET|   |     209751      |       |24C02|  |  PIC16C54   |   | HCF40106BE  |    |______________|              ___|
@@ -1874,7 +1700,7 @@ ROM_END
   | |       | |       |   |     324320      |                                                                                   ___|
   | |       | |       |   |   DfD9501V3 Y   |                                                                                   ___|
   | |       | |       |   |_________________|                                                                                   ___|
-  | |   IC21| |   IC21|                  IC1               ______________    _________                                         ____| 
+  | |   IC21| |   IC21|                  IC1               ______________    _________                                         ____|
   | |_______| |_______|                                   |  RTC 72421A  |  | DS1207  |                                       |
   | IMPERA BOARD REV V2.1                                 |______________|  |_________|                                       |
   |___________________________________________________________________________________________________________________________|
@@ -1906,16 +1732,16 @@ ROM_END
   PCB layout:
    ________________________________________________________________________________________________________________
   |                                                                                                                |
-  |      __________                          _____________               ___________        ___                    |                            
-  |     |  74LS04  |                        |LC324256BP-70|             |     C     |      |   |     ___           |__ 
-  |     |__________|                        |_____________|             |___________|      |EMP|    |. .|           __|           
+  |      __________                          _____________               ___________        ___                    |
+  |     |  74LS04  |                        |LC324256BP-70|             |     C     |      |   |     ___           |__
+  |     |__________|                        |_____________|             |___________|      |EMP|    |. .|           __|
   |                                          _____________                                 |TY |    |. .|           __|
   |            ____                         |LC324256BP-70|                                |   |    |. .|           __|
   |           | A  |                        |_____________|                                |SOC|    |. .|           __|
   |           |____|                         _____________                                 |KET|    |. .|           __|
   |                                         |LC324256BP-70|                                |___|    |. .|           __|
   |                                         |_____________|           __________________            |. .|           __|
-  |                                          _____________           |   ADV476KN35E    |           |. .|           __|    
+  |                                          _____________           |   ADV476KN35E    |           |. .|           __|
   |                                         |LC324256BP-70|          |                  |           |___|           __|
   | _______                                 |_____________|          |     OF19802.3    |                          |
   ||DS1207 |                                                         |__________________|                          |
@@ -1931,25 +1757,25 @@ ROM_END
   |  |   | |   |       |        |        |  DfD0922713 Y  |                                                         __|
   |  |___| |___|       |        |        |                |                                ___   ___                __|
   |                    | 9218A  |        |________________|              _____________    |   | |   |               __|
-  |   _______          |        |                                       |  74HC245N   |   |PC7| |ULN|               __|    
-  |  |       |         | KOREA  |                                       |_____________|   |4HC| |280|               __| 
+  |   _______          |        |                                       |  74HC245N   |   |PC7| |ULN|               __|
+  |  |       |         | KOREA  |                                       |_____________|   |4HC| |280|               __|
   |  |BATTERY|         |________|                                                         |273| |3A |               __|
   |  |       |                                                                            |P  | |   |               __|
   |  |_______|     ________   ________                                                    |   | |   |               __|
   |               |        | |        |                                                   |   | |   |               __|
   |               |        | |        |                                  _____________    |___| |___|               __|
-  |   ___         |        | |        |     XTAL1                       |  74HC245N   |    ___   ___                __|                                
+  |   ___         |        | |        |     XTAL1                       |  74HC245N   |    ___   ___                __|
   |  | B |        |        | |        |    __________________           |_____________|   |   | |   |               __|
   |  |___|        |        | |        |   |                  |                            |PC7| |ULN|               __|
   |               | EMPTY  | |        |   |    IMPERA 7      |                            |4HC| |280|               __|
   |               | SOCKET | |27C4002 |   |                  |                            |273| |3A |               __|
-  |               |        | |        |   |     230031       |           _____________    |P  | |   |               __|   
+  |               |        | |        |   |     230031       |           _____________    |P  | |   |               __|
   |   ___   ___   |        | |        |   |                  |          |  74HC245N   |   |   | |   |               __|
-  |  |   | |   |  |        | |        |   |   DfD9249V3 Y    |          |_____________|   |   | |   |               __|   
+  |  |   | |   |  |        | |        |   |   DfD9249V3 Y    |          |_____________|   |   | |   |               __|
   |  |PAL| |PAL|  |        | |        |   |                  |                            |___| |___|               __|
   |  |CE | |CE |  |        | |        |   |                  |                             __________               __|
   |  |   | |   |  |        | |        |   |                  |                            | CNY 74-4 |              __|
-  |  |   | |   |  |        | |        |   |__________________|           _____________    |__________|              __|                     
+  |  |   | |   |  |        | |        |   |__________________|           _____________    |__________|              __|
   |  |   | |   |  |        | |        |                                 |  74HC245N   |                             __|
   |  |   | |   |  |        | |        |                                 |_____________|                             __|
   |  |___| |___|  |________| |________|                                                    ___________              __|
@@ -1988,22 +1814,22 @@ ROM_END
   PCB layout:
    ________________________________________________________________________________________________________________
   |                                                                                                                |
-  |      __________                          _____________               ___________        ___                    |                            
-  |     |  74LS04  |                        |HY51C4256S-10|             |     C     |      |904|     ___           |__ 
-  |     |__________|                        |_____________|             |___________|      |9  |    |. .|           __|           
+  |      __________                          _____________               ___________        ___                    |
+  |     |  74LS04  |                        |HY51C4256S-10|             |     C     |      |904|     ___           |__
+  |     |__________|                        |_____________|             |___________|      |9  |    |. .|           __|
   |                                          _____________                                 |   |    |. .|           __|
   |            ____                         |HY51C4256S-10|                                |LT1|    |. .|           __|
   |           | A  |                        |_____________|                                |081|    |. .|           __|
   |           |____|                         _____________                                 |CN |    |. .|           __|
   |                                         |HY51C4256S-10|                                |___|    |. .|           __|
   |                                         |_____________|           __________________            |. .|           __|
-  |                                          _____________           |   ADV476KN35E    |           |. .|           __|    
+  |                                          _____________           |   ADV476KN35E    |           |. .|           __|
   |                                         |HY51C4256S-10|          |                  |           |___|           __|
   | _______                                 |_____________|          |     OF19802.3    |                          |
   ||DS1207 |                                                         |__________________|                          |
-  ||_______|                                                                                                       |                       
-  |         ___                       XTAL2                                                                        |   
-  |        |   |        ________          ________________                                                         |        
+  ||_______|                                                                                                       |
+  |         ___                       XTAL2                                                                        |
+  |        |   |        ________          ________________                                                         |
   |   ___  |PC7|       |        |        |                |                                                        |__
   |  |   | |4HC|       |        |        |    IMPERA 8    |                                                         __|
   |  |HEF| |273|       |HYUNDAI |        |                |                                                         __|
@@ -2013,25 +1839,25 @@ ROM_END
   |  |   | |   |       |        |        |  DTD9105I1 Y   |                                                         __|
   |  |___| |___|       |        |        |                |                                ___   ___                __|
   |                    | 9218A  |        |________________|              _____________    |   | |   |               __|
-  |   _______          |        |                                       |  74HC245AP  |   |PC7| |ULN|               __|    
-  |  |       |         | KOREA  |                                       |_____________|   |4HC| |280|               __| 
+  |   _______          |        |                                       |  74HC245AP  |   |PC7| |ULN|               __|
+  |  |       |         | KOREA  |                                       |_____________|   |4HC| |280|               __|
   |  |BATTERY|         |________|                                                         |273| |3A |               __|
   |  |       |                                                                            |AP | |   |               __|
   |  |_______|     ________   ________                                                    |   | |   |               __|
   |               |        | |        |                                                   |   | |   |               __|
   |               |        | |        |                                  _____________    |___| |___|               __|
-  |   ___         |        | |        |     XTAL1                       |  74HC245AP  |    ___   ___                __|                                
+  |   ___         |        | |        |     XTAL1                       |  74HC245AP  |    ___   ___                __|
   |  | B |        |        | |        |    __________________           |_____________|   |   | |   |               __|
   |  |___|        |        | |        |   |                  |                            |PC7| |ULN|               __|
   |               |        | |        |   |    IMPERA 7      |                            |4HC| |280|               __|
   |               |D27C210 | |D27C210 |   |                  |                            |273| |3A |               __|
-  |               |        | |        |   |     155200       |           _____________    |AP | |   |               __|   
+  |               |        | |        |   |     155200       |           _____________    |AP | |   |               __|
   |   ___   ___   |        | |        |   |                  |          |  74HC245AP  |   |   | |   |               __|
-  |  |   | |   |  |GAME-ROM| |        |   |   DfD9101V3 Y    |          |_____________|   |   | |   |               __|   
+  |  |   | |   |  |GAME-ROM| |        |   |   DfD9101V3 Y    |          |_____________|   |   | |   |               __|
   |  |PAL| |PAL|  | Lucky 7| |        |   |                  |                            |___| |___|               __|
   |  |16L| |16L|  |        | |        |   |                  |                             __________               __|
   |  |8  | |8  |  |VNr03-07| |        |   |                  |                            |  PC849   |              __|
-  |  |   | |   |  |Sum.D882| |        |   |__________________|           _____________    |__________|              __|                     
+  |  |   | |   |  |Sum.D882| |        |   |__________________|           _____________    |__________|              __|
   |  |   | |   |  |        | |        |                                 |  74HC245AP  |                             __|
   |  |   | |   |  |        | |        |                                 |_____________|                             __|
   |  |___| |___|  |________| |________|                                                    ___________              __|
@@ -2085,7 +1911,7 @@ ROM_END
   |                                                                                       |
   |           +--+                    +-------------+        +---------+                  |
   | +--+ +--+ |  |   +------+         |SCC 66470 CAB|        |PIC16C58 |                  |
-  | |  | |  | |  |   |LH5164|         |206880       |        +---------+                  +---+  
+  | |  | |  | |  |   |LH5164|         |206880       |        +---------+                  +---+
   | |B | |C | |D |   |D-10L |         |DfD9210I3 Y  |                                       --|
   | |  | |  | |  |   |      |         |             |                                       --|
   | |  | |  | |  |   |      |         | PHILIPS 1988|                                       --|
@@ -2226,7 +2052,7 @@ ROM_END
   Under the "DALLAS POKER CZ/V1 B" chip is a PC74HC273T chip soldered on the PCB.
   Under the "DALLAS POKER CZ/V1 P" chip is a MB8464A-10L chip soldered on the PCB.
 
-  Subboard: Looks like an 40PIN MCU or PIC...only four wires connect the subboard 
+  Subboard: Looks like an 40PIN MCU or PIC...only four wires connect the subboard
   with the mainboard. (GND & VCC and PIN21 and PIN22 from the 40pin-MCU/PIC)
 
 
@@ -2262,10 +2088,10 @@ ROM_END
   Amatic.
 
   PCB layout:
-   ___________________________________________________________________________________________________________________________ 
+   ___________________________________________________________________________________________________________________________
   |                      ___    ___    ___    ___                                                                             |
   |    ___              |   |  |   |  |   |  |   |                                                                            |
-  |   | B |             | A |  | A |  | A |  | A |    ______________________________________                                  |____ 
+  |   | B |             | A |  | A |  | A |  | A |    ______________________________________                                  |____
   |   |___|    _____    |   |  |   |  |   |  |   |   |                                      |                                   ___|
   |           |  _  |   |___|  |___|  |___|  |___|   |               YAMAHA                 |                                   ___|
   |  _______  |BATTE|                                |               YM2149F                |                                   ___|
@@ -2274,14 +2100,14 @@ ROM_END
   |           |_____|   | M |  | M |  | M |  | M |                                                                              ___|
   |                     | P |  | P |  | P |  | P |           ___________________________           ______________      _____    ___|
   |   ____    ____      | T |  | T |  | T |  | T |          |                           |         |   ULN2803A   |    | O O |   ___|
-  |  |HY62|  |HY62|     | Y |  | Y |  | Y |  | Y |          |       KDA0476CN_50        |         |______________|    | O O |  ____| 
+  |  |HY62|  |HY62|     | Y |  | Y |  | Y |  | Y |          |       KDA0476CN_50        |         |______________|    | O O |  ____|
   |  |64AL|  |64AL|     |___|  |___|  |___|  |___|          |       KOREA   332B    IC20|        ________________     | O O | |
   |  |J_10|  |J_10|                                         |___________________________|       |    74HC273N    |    | O O | |
   |  |    |  |    |                                                                             |________________|    | O O | |
   |  |____|  |____|                                        ___________           ____________    ________________     | O O | |
   |                                                       | 74HC04AP  |         |EMPTY SOCKET|  |    74HC245N    |    | O O | |
   |  _______   _______                                    |___________|         |____________|  |________________|    | O O | |
-  | |       | |       |   XTAL1                                                                                       |_____| |____ 
+  | |       | |       |   XTAL1                                                                                       |_____| |____
   | |       | |       |    _________________                 XTAL3                                 ______________        CON3   ___|
   | | EMPTY | | EMPTY |   |    IMPERA 8     |        _____    _____________     _____________     | EMPTY SOCKET |              ___|
   | | SOCKET| | SOCKET|   |     209751      |       |24C02|  | EMPTY SOCKET|   | EMPTY SOCKET|    |______________|              ___|
@@ -2304,7 +2130,7 @@ ROM_END
   | |       | |       |   |     288571      |                                                                                   ___|
   | |       | |       |   |   DfD9414V3 Y   |                                                                                   ___|
   | |       | |       |   |_________________|                                                                                   ___|
-  | |   IC22| |   IC21|                  IC1               ______________    _________                                         ____| 
+  | |   IC22| |   IC21|                  IC1               ______________    _________                                         ____|
   | |_______| |_______|                                   |  RTC 72421A  |  |  EMPTY  |                                       |
   | IMPERA BOARD REV V2.1                                 |______________|  |_________|                                       |
   |___________________________________________________________________________________________________________________________|
