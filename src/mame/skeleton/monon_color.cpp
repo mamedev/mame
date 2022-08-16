@@ -45,8 +45,9 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
+#include "bus/mononcol/slot.h"
+#include "bus/mononcol/carts.h"
+
 #include "cpu/axc51/axc51.h"
 #include "sound/dac.h"
 
@@ -316,7 +317,7 @@ protected:
 private:
 
 
-	required_device<generic_slot_device> m_cart;
+	required_device<mononcol_slot_device> m_cart;
 	required_device<ax208_cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -1001,8 +1002,8 @@ void monon_color_state::monon_color(machine_config &config)
 
 	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.500); // should this be in the AX208 device?
 
-	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "monon_color_cart", "bin"));
-	cartslot.set_width(GENERIC_ROM8_WIDTH);
+	mononcol_cartslot_device &cartslot(MONONCOL_CARTSLOT(config, "cartslot", mononcol_plain_slot, "monon_color_cart", "bin"));
+	cartslot.set_width(MONONCOL_ROM8_WIDTH);
 	cartslot.set_device_load(FUNC(monon_color_state::cart_load));
 	cartslot.set_must_be_loaded(true);
 
@@ -1017,7 +1018,7 @@ DEVICE_IMAGE_LOAD_MEMBER( monon_color_state::cart_load )
 	uint32_t size = m_cart->common_get_size("rom");
 	std::vector<uint8_t> temp;
 	temp.resize(size);
-	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->rom_alloc(size, MONONCOL_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(&temp[0], size, "rom");
 
 	memcpy(memregion("flash")->base(), &temp[0], size);
