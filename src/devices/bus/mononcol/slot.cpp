@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "slot.h"
 
-#define VERBOSE 1
+#define VERBOSE 0
 #include "logmacro.h"
 
 
@@ -23,37 +23,12 @@ DEFINE_DEVICE_TYPE(MONONCOL_CARTSLOT, mononcol_cartslot_device, "mononcol_cartsl
 device_mononcol_cart_interface::device_mononcol_cart_interface(machine_config const &mconfig, device_t &device) :
 	device_interface(device, "genslot"),
 	m_region(*this, DEVICE_SELF),
-	m_ram(),
 	m_rom(nullptr),
 	m_rom_size(0)
 {
 }
 
 device_mononcol_cart_interface::~device_mononcol_cart_interface()
-{
-}
-
-u8 device_mononcol_cart_interface::read_rom(offs_t offset)
-{
-	return 0xff;
-}
-
-u16 device_mononcol_cart_interface::read16_rom(offs_t offset, u16 mem_mask)
-{
-	return 0xffff;
-}
-
-u32 device_mononcol_cart_interface::read32_rom(offs_t offset, u32 mem_mask)
-{
-	return 0xffffffff;
-}
-
-u8 device_mononcol_cart_interface::read_ram(offs_t offset)
-{
-	return 0xff;
-}
-
-void device_mononcol_cart_interface::write_ram(offs_t offset, u8 data)
 {
 }
 
@@ -73,22 +48,11 @@ void device_mononcol_cart_interface::rom_alloc(u32 size, int width, endianness_t
 	device().logerror("Allocating %u byte ROM region with tag '%s' (width %d)\n", size, fulltag, width);
 	m_rom = device().machine().memory().region_alloc(fulltag.c_str(), size, width, endian)->base();
 	m_rom_size = size;
+
+
+
 }
 
-void device_mononcol_cart_interface::ram_alloc(u32 size)
-{
-	if (!m_ram.empty())
-	{
-		throw emu_fatalerror(
-				"%s: Request to allocate RAM when already allocated (allocated size %u, requested size %u)\n",
-				device().tag(),
-				m_ram.size(),
-				size);
-	}
-
-	device().logerror("Allocating %u bytes of RAM\n", size);
-	m_ram.resize(size);
-}
 
 
 //**************************************************************************
@@ -148,6 +112,9 @@ image_init_result mononcol_slot_device::call_load()
 
 			rom_alloc(len, m_width, m_endianness);
 			common_load_rom(get_rom_base(), len, "rom");
+
+			m_cart->set_spi_region(get_rom_base());
+			m_cart->set_spi_size(get_rom_size());
 
 			return image_init_result::PASS;
 		}
@@ -215,62 +182,4 @@ void mononcol_slot_device::common_load_rom(u8 *ROM, u32 len, char const *region)
 		fread(ROM, len);
 	else
 		memcpy(ROM, get_software_region(region), len);
-}
-
-/*-------------------------------------------------
- read_rom
- -------------------------------------------------*/
-
-u8 mononcol_slot_device::read_rom(offs_t offset)
-{
-	if (m_cart)
-		return m_cart->read_rom(offset);
-	else
-		return 0xff;
-}
-
-/*-------------------------------------------------
- read16_rom
- -------------------------------------------------*/
-
-u16 mononcol_slot_device::read16_rom(offs_t offset, u16 mem_mask)
-{
-	if (m_cart)
-		return m_cart->read16_rom(offset, mem_mask);
-	else
-		return 0xffff;
-}
-
-/*-------------------------------------------------
- read32_rom
- -------------------------------------------------*/
-
-u32 mononcol_slot_device::read32_rom(offs_t offset, u32 mem_mask)
-{
-	if (m_cart)
-		return m_cart->read32_rom(offset, mem_mask);
-	else
-		return 0xffffffff;
-}
-
-/*-------------------------------------------------
- read_ram
- -------------------------------------------------*/
-
-u8 mononcol_slot_device::read_ram(offs_t offset)
-{
-	if (m_cart)
-		return m_cart->read_ram(offset);
-	else
-		return 0xff;
-}
-
-/*-------------------------------------------------
- write_ram
- -------------------------------------------------*/
-
-void mononcol_slot_device::write_ram(offs_t offset, u8 data)
-{
-	if (m_cart)
-		m_cart->write_ram(offset, data);
 }

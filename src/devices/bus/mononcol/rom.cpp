@@ -18,6 +18,7 @@ mononcol_rom_device::mononcol_rom_device(const machine_config &mconfig, device_t
 
 mononcol_rom_plain_device::mononcol_rom_plain_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: mononcol_rom_device(mconfig, type, tag, owner, clock)
+	, m_spi(*this, "spi")
 {
 }
 
@@ -26,32 +27,8 @@ mononcol_rom_plain_device::mononcol_rom_plain_device(const machine_config &mconf
 {
 }
 
-/*-------------------------------------------------
- mapper specific handlers
- -------------------------------------------------*/
 
-uint8_t mononcol_rom_plain_device::read_rom(offs_t offset)
+void mononcol_rom_plain_device::device_add_mconfig(machine_config &config)
 {
-	if (offset < m_rom_size)
-		return m_rom[offset];
-	else
-		return 0xff;
-}
-
-uint16_t mononcol_rom_plain_device::read16_rom(offs_t offset, uint16_t mem_mask)
-{
-	uint16_t *ROM = (uint16_t *)m_rom;
-	if (offset < m_rom_size/2)
-		return ROM[offset];
-	else
-		return 0xffff;
-}
-
-uint32_t mononcol_rom_plain_device::read32_rom(offs_t offset, uint32_t mem_mask)
-{
-	uint32_t *ROM = (uint32_t *)m_rom;
-	if (offset < m_rom_size/4)
-		return ROM[offset];
-	else
-		return 0xffffffff;
+	GENERIC_SPII_FLASH(config, m_spi, 0);
 }

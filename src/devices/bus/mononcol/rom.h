@@ -7,6 +7,7 @@
 
 #include "slot.h"
 
+#include "machine/generic_spi_flash.h"
 
 // ======================> mononcol_rom_device
 
@@ -29,13 +30,22 @@ public:
 	// construction/destruction
 	mononcol_rom_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// reading and writing
-	virtual uint8_t read_rom(offs_t offset) override;
-	virtual uint16_t read16_rom(offs_t offset, uint16_t mem_mask) override;
-	virtual uint32_t read32_rom(offs_t offset, uint32_t mem_mask) override;
+	uint8_t read() override { return m_spi->read(); }
+	DECLARE_WRITE_LINE_MEMBER(dir_w) override { m_spi->dir_w(state); }
+	void write(uint8_t data) override { m_spi->write(data); }
+	void set_ready() override { m_spi->set_ready(); }
+	void set_spi_region(uint8_t* region) override { m_spi->set_rom_ptr(region); } 
+	void set_spi_size(size_t size) override { m_spi->set_rom_size(size); } 
+
 
 protected:
 	mononcol_rom_plain_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	required_device<generic_spi_flash_device> m_spi;
+
 };
 
 // device type definition

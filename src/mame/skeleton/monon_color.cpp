@@ -49,246 +49,15 @@
 #include "bus/mononcol/carts.h"
 
 #include "cpu/axc51/axc51.h"
+#include "machine/generic_spi_flash.h"
 #include "sound/dac.h"
 
 #define LOG_VDP (1U <<  1)
-#define LOG_SPI (1U <<  2)
 
 //#define VERBOSE     (LOG_VDP)
 #define VERBOSE     (0)
 
 #include "logmacro.h"
-
-
-class monon_cart_spi_device : public device_t
-{
-public:
-	monon_cart_spi_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
-
-	void set_rom_ptr(uint8_t* rom) { m_spiptr = rom; }
-
-	uint8_t read()
-	{
-		return m_spilatch;
-	}
-
-	void set_ready()
-	{
-		m_spi_state = READY_FOR_COMMAND;
-	}
-
-	DECLARE_WRITE_LINE_MEMBER(dir_w)
-	{
-		m_spidir = state;
-	}
-
-	void write(uint8_t data)
-	{
-		if (!m_spidir) // Send to SPI
-		{
-			switch (m_spi_state)
-			{
-			case READY_FOR_COMMAND:
-				if (data == 0x03)
-				{
-					m_spi_state = READY_FOR_ADDRESS2;
-				}
-				else if (data == 0x05)
-				{
-					m_spi_state = READY_FOR_STATUS_READ;
-				}
-				else if (data == 0x0b)
-				{
-					m_spi_state = READY_FOR_HSADDRESS2;
-				}
-				else if (data == 0x06)
-				{
-					// write enable
-					m_spi_state = READY_FOR_COMMAND;
-				}
-				else if (data == 0x04)
-				{
-					// write disable
-					m_spi_state = READY_FOR_COMMAND;
-				}
-				else if (data == 0x02)
-				{
-					// page program
-					m_spi_state = READY_FOR_WRITEADDRESS2;
-				}
-				else if (data == 0x20)
-				{
-					// erase 4k sector
-					m_spi_state = READY_FOR_COMMAND;
-				}
-				else
-				{
-					fatalerror("SPI set to unknown mode %02x\n", data);
-				}
-				break;
-
-			case READY_FOR_WRITEADDRESS2:
-				m_spiaddr = (m_spiaddr & 0x00ffff) | (data << 16);
-				m_spi_state = READY_FOR_WRITEADDRESS1;
-				break;
-
-			case READY_FOR_WRITEADDRESS1:
-				m_spiaddr = (m_spiaddr & 0xff00ff) | (data << 8);
-				m_spi_state = READY_FOR_WRITEADDRESS0;
-				break;
-
-			case READY_FOR_WRITEADDRESS0:
-				m_spiaddr = (m_spiaddr & 0xffff00) | (data);
-				m_spi_state = READY_FOR_WRITE;
-				LOGMASKED(LOG_SPI, "SPI set to page WRITE mode with address %08x\n", m_spiaddr);
-				break;
-
-			case READY_FOR_WRITE:
-				LOGMASKED(LOG_SPI, "Write SPI data %02x\n", data);
-
-				m_spiptr[(m_spiaddr++) & 0xffffff] = data;
-
-				break;
-
-
-			case READY_FOR_ADDRESS2:
-				m_spiaddr = (m_spiaddr & 0x00ffff) | (data << 16);
-				m_spi_state = READY_FOR_ADDRESS1;
-				break;
-
-			case READY_FOR_ADDRESS1:
-				m_spiaddr = (m_spiaddr & 0xff00ff) | (data << 8);
-				m_spi_state = READY_FOR_ADDRESS0;
-				break;
-
-			case READY_FOR_ADDRESS0:
-				m_spiaddr = (m_spiaddr & 0xffff00) | (data);
-				m_spi_state = READY_FOR_READ;
-				m_spidir = 1;
-				LOGMASKED(LOG_SPI, "SPI set to READ mode with address %08x\n", m_spiaddr);
-				break;
-
-			case READY_FOR_HSADDRESS2:
-				m_spiaddr = (m_spiaddr & 0x00ffff) | (data << 16);
-				m_spi_state = READY_FOR_HSADDRESS1;
-				break;
-
-			case READY_FOR_HSADDRESS1:
-				m_spiaddr = (m_spiaddr & 0xff00ff) | (data << 8);
-				m_spi_state = READY_FOR_HSADDRESS0;
-				break;
-
-			case READY_FOR_HSADDRESS0:
-				m_spiaddr = (m_spiaddr & 0xffff00) | (data);
-				m_spi_state = READY_FOR_HSDUMMY;
-				break;
-
-			case READY_FOR_HSDUMMY:
-				m_spi_state = READY_FOR_READ;
-				m_spidir = 1;
-				LOGMASKED(LOG_SPI, "SPI set to High Speed READ mode with address %08x\n", m_spiaddr);
-				break;
-
-			case READY_FOR_SECTORERASEADDRESS2:
-				m_spiaddr = (m_spiaddr & 0x00ffff) | (data << 16);
-				m_spi_state = READY_FOR_SECTORERASEADDRESS1;
-				break;
-
-			case READY_FOR_SECTORERASEADDRESS1:
-				m_spiaddr = (m_spiaddr & 0xff00ff) | (data << 8);
-				m_spi_state = READY_FOR_SECTORERASEADDRESS0;
-				break;
-
-			case READY_FOR_SECTORERASEADDRESS0:
-				m_spiaddr = (m_spiaddr & 0xffff00) | (data);
-				LOGMASKED(LOG_SPI, "SPI set to Erase Sector with address %08x\n", m_spiaddr);
-				break;
-
-			}
-		}
-		else
-		{
-			if (m_spi_state == READY_FOR_READ)
-			{
-				m_spilatch = m_spiptr[(m_spiaddr++) & 0xffffff];
-			}
-			else if (m_spi_state == READY_FOR_STATUS_READ)
-			{
-				m_spilatch = 0x00;
-			}
-			else
-			{
-				m_spilatch = 0x00;
-			}
-		}
-	}
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-private:
-	enum
-	{
-		READY_FOR_COMMAND = 0x00,
-
-		READY_FOR_ADDRESS2 = 0x01,
-		READY_FOR_ADDRESS1 = 0x02,
-		READY_FOR_ADDRESS0 = 0x03,
-
-		READY_FOR_HSADDRESS2 = 0x04,
-		READY_FOR_HSADDRESS1 = 0x05,
-		READY_FOR_HSADDRESS0 = 0x06,
-		READY_FOR_HSDUMMY = 0x07,
-
-		READY_FOR_WRITEADDRESS2 = 0x08,
-		READY_FOR_WRITEADDRESS1 = 0x09,
-		READY_FOR_WRITEADDRESS0 = 0x0a,
-
-		READY_FOR_SECTORERASEADDRESS2 = 0x0b,
-		READY_FOR_SECTORERASEADDRESS1 = 0x0c,
-		READY_FOR_SECTORERASEADDRESS0 = 0x0d,
-
-		READY_FOR_WRITE = 0x0e,
-
-		READY_FOR_READ = 0x0f,
-		READY_FOR_STATUS_READ = 0x10,
-	};
-
-	uint32_t m_spiaddr;
-	uint8_t m_spi_state;
-	uint8_t m_spilatch;
-	bool m_spidir;
-
-	uint8_t* m_spiptr;
-};
-
-DECLARE_DEVICE_TYPE(MONON_CART_SPI, monon_cart_spi_device)
-
-DEFINE_DEVICE_TYPE(MONON_CART_SPI, monon_cart_spi_device, "monon_cart_spi", "Monon Cartridge SPI handling")
-
-monon_cart_spi_device::monon_cart_spi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MONON_CART_SPI, tag, owner, clock)
-{
-}
-
-void monon_cart_spi_device::device_start()
-{
-	save_item(NAME(m_spiaddr));
-	save_item(NAME(m_spi_state));
-	save_item(NAME(m_spilatch));
-	save_item(NAME(m_spidir));
-}
-
-void monon_cart_spi_device::device_reset()
-{
-	m_spiaddr = 0;
-	m_spi_state = 0;
-	m_spilatch = 0;
-	m_spidir = false;
-}
-
 
 class monon_color_state : public driver_device
 {
@@ -300,10 +69,8 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_dac(*this, "dac"),
-		m_spiptr(*this, "flash"),
 		m_debugin(*this, "DEBUG%u", 0U),
-		m_controls(*this, "CONTROLS%u", 0U),
-		m_spi(*this, "spi")
+		m_controls(*this, "CONTROLS%u", 0U)
 	{ }
 
 	void monon_color(machine_config &config);
@@ -322,12 +89,8 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<dac_8bit_r2r_twos_complement_device> m_dac;
-	required_region_ptr<uint8_t> m_spiptr;
 	required_ioport_array<4> m_debugin;
 	required_ioport_array<4> m_controls;
-	required_device<monon_cart_spi_device> m_spi;
-
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	uint8_t in0_r();
 	uint8_t in1_r();
@@ -350,17 +113,17 @@ private:
 
 	uint8_t spibuf_r()
 	{
-		return 	m_spi->read();
+		return m_cart->read();
 	}
 
 	DECLARE_WRITE_LINE_MEMBER(spidir_w)
 	{
-		m_spi->dir_w(state);
+		m_cart->dir_w(state);
 	}
 
 	void spibuf_w(uint8_t data)
 	{
-		m_spi->write(data);
+		m_cart->write(data);
 	}
 
 
@@ -417,7 +180,6 @@ void monon_color_state::machine_reset()
 	    201                              (3rd revision)
 	    202,203,204,205,301,302,303,304  (4th revision)
 	*/
-	m_spi->set_rom_ptr(m_spiptr);
 
 	m_dacbyte = 0;
 	m_out2data = 0;
@@ -699,7 +461,7 @@ void monon_color_state::out2_w(uint8_t data)
 		}
 		else
 		{
-			m_spi->set_ready();
+			m_cart->set_ready();
 		}
 	}
 	m_out2data = data;
@@ -1004,30 +766,13 @@ void monon_color_state::monon_color(machine_config &config)
 
 	mononcol_cartslot_device &cartslot(MONONCOL_CARTSLOT(config, "cartslot", mononcol_plain_slot, "monon_color_cart", "bin"));
 	cartslot.set_width(MONONCOL_ROM8_WIDTH);
-	cartslot.set_device_load(FUNC(monon_color_state::cart_load));
 	cartslot.set_must_be_loaded(true);
-
-	MONON_CART_SPI(config, m_spi, 0);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("monon_color");
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( monon_color_state::cart_load )
-{
-	uint32_t size = m_cart->common_get_size("rom");
-	std::vector<uint8_t> temp;
-	temp.resize(size);
-	m_cart->rom_alloc(size, MONONCOL_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(&temp[0], size, "rom");
-
-	memcpy(memregion("flash")->base(), &temp[0], size);
-
-	return image_init_result::PASS;
-}
-
 ROM_START( mononcol )
-	ROM_REGION( 0x1000000, "flash", ROMREGION_ERASE00 )
 ROM_END
 
 CONS( 2014, mononcol,    0,          0,  monon_color,  monon_color,    monon_color_state, empty_init,    "M&D",   "Monon Color", MACHINE_IS_SKELETON )

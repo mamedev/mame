@@ -9,7 +9,6 @@
 
 #include <cassert>
 
-
 /***************************************************************************
  TYPE DEFINITIONS
  ***************************************************************************/
@@ -22,15 +21,7 @@ public:
 	virtual ~device_mononcol_cart_interface();
 
 	// reading and writing
-	virtual u8 read_rom(offs_t offset);
-	virtual u16 read16_rom(offs_t offset, u16 mem_mask);
-	virtual u32 read32_rom(offs_t offset, u32 mem_mask);
-
-	virtual u8 read_ram(offs_t offset);
-	virtual void write_ram(offs_t offset, u8 data);
-
 	virtual void rom_alloc(u32 size, int width, endianness_t end, char const *tag);
-	virtual void ram_alloc(u32 size);
 
 	u8 *get_rom_base()  { return m_rom; }
 	u32 get_rom_size() { return m_rom_size; }
@@ -38,10 +29,13 @@ public:
 	u8 *get_region_base()  { return m_region.found() ? m_region->base() : nullptr; }
 	u32 get_region_size() { return m_region.found() ? m_region->bytes() : 0U; }
 
-	u8 *get_ram_base() { return &m_ram[0]; }
-	u32 get_ram_size() { return m_ram.size(); }
+	virtual uint8_t read() { return 0x00; }
+	virtual DECLARE_WRITE_LINE_MEMBER(dir_w) { }
+	virtual void write(uint8_t data) { };
+	virtual void set_ready() { };
 
-	void save_ram() { device().save_item(NAME(m_ram)); }
+	virtual void set_spi_region(uint8_t* region) { }
+	virtual void set_spi_size(size_t size) { }
 
 protected:
 	device_mononcol_cart_interface(machine_config const &mconfig, device_t &device);
@@ -50,7 +44,6 @@ protected:
 	optional_memory_region  m_region;
 
 	// internal state
-	std::vector<u8> m_ram;
 	u8 *m_rom;
 	u32 m_rom_size;
 };
@@ -59,13 +52,9 @@ protected:
 enum
 {
 	MONONCOL_ROM8_WIDTH = 1,
-	MONONCOL_ROM16_WIDTH = 2,
-	MONONCOL_ROM32_WIDTH = 4
 };
 
 #define MONONCOL_ROM_REGION_TAG ":cart:rom"
-
-
 
 class mononcol_slot_device : public device_t,
 								public device_rom_image_interface,
@@ -96,16 +85,7 @@ public:
 	u32 common_get_size(char const *region);
 	void common_load_rom(u8 *ROM, u32 len, char const *region);
 
-	// reading and writing
-	virtual u8 read_rom(offs_t offset);
-	virtual u16 read16_rom(offs_t offset, u16 mem_mask = 0xffff);
-	virtual u32 read32_rom(offs_t offset, u32 mem_mask = 0xffffffff);
-
-	virtual u8 read_ram(offs_t offset);
-	virtual void write_ram(offs_t offset, u8 data);
-
 	virtual void rom_alloc(u32 size, int width, endianness_t end) { if (m_cart) m_cart->rom_alloc(size, width, end, tag()); }
-	virtual void ram_alloc(u32 size) { if (m_cart) m_cart->ram_alloc(size); }
 
 	u8* get_rom_base()
 	{
@@ -125,9 +105,30 @@ public:
 		else
 			return m_cart->get_rom_size();
 	}
-	u8 *get_ram_base() { return m_cart ? m_cart->get_ram_base() : nullptr; }
 
-	void save_ram() { if (m_cart && m_cart->get_ram_size()) m_cart->save_ram(); }
+	uint8_t read()
+	{
+		return m_cart->read();
+	}
+
+	DECLARE_WRITE_LINE_MEMBER(dir_w)
+	{
+		m_cart->dir_w(state);
+	}
+
+	void set_ready()
+	{
+		m_cart->set_ready();
+	}
+
+	void write(uint8_t data)
+	{
+		m_cart->write(data);
+	}
+
+	void set_spi_region(uint8_t* region) { m_cart->set_spi_region(region); }
+	void set_spi_size(size_t size) { m_cart->set_spi_size(size); }
+
 
 protected:
 	mononcol_slot_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
