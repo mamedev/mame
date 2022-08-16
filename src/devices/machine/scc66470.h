@@ -18,7 +18,7 @@
 
 // ======================> scc66470_device
 
-class scc66470_device : public device_t, public device_video_interface
+class scc66470_device : public device_t, public device_memory_interface, public device_video_interface
 {
 public:
 	auto irq()
@@ -32,27 +32,24 @@ public:
 	uint16_t ipa_r(offs_t offset, uint16_t mem_mask = ~0);
 	void ipa_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	bool display_enabled();
-	uint8_t *line(int line);
-	unsigned int width();
-	unsigned int height();
-	unsigned int total_height();
+	void line(int line, uint8_t *line_buffer, unsigned line_buffer_size);
+	unsigned width();
+	unsigned height();
+	unsigned total_height();
 	int dram_dtack_cycles();
 	void dram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t dram_r(offs_t offset, uint16_t mem_mask = ~0);
-
 	void map(address_map &map);
 	void set_vectors(uint16_t *src);
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual space_config_vector memory_space_config() const override;
 
 	devcb_write_line m_irqcallback;
 
-	uint8_t m_line_data[768];
 	uint32_t m_working_dcp;
-
-	std::unique_ptr<uint16_t[]> m_dram;
 
 	uint16_t m_csr;
 	uint16_t m_dcr;
@@ -74,11 +71,12 @@ protected:
 	uint8_t m_csr_r;
 
 private:
+	void scc66470_vram(address_map &map);
 	void set_vsr(uint32_t vsr);
 	void set_dcp(uint32_t dcp);
 	uint32_t get_vsr();
 	uint32_t get_dcp();
-	unsigned int border_width();
+	unsigned border_width();
 	int border_height();
 	void csr_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void dcr_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -101,11 +99,14 @@ private:
 	uint16_t reg_b_r(offs_t offset, uint16_t mem_mask = ~0);
 	int pixac_trigger();
 	void perform_pixac_op();
+	inline uint8_t dram_byte_r(offs_t offset);
 
 	TIMER_CALLBACK_MEMBER(process_ica);
 	TIMER_CALLBACK_MEMBER(process_dca);
 	emu_timer *m_ica_timer;
 	emu_timer *m_dca_timer;
+
+	const address_space_config m_space_config;
 };
 
 // device type definition

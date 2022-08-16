@@ -22,8 +22,6 @@
 #include "scc66470.h"
 #include "screen.h"
 
-#define DRAM_SIZE (1024*256*2)
-
 #define CSR_REG  (m_csr)
 #define DCR_REG  (m_dcr)
 #define DCR2_REG (m_dcr2)
@@ -92,13 +90,13 @@
 #define PIXAC_TT  1
 #define PIXAC_NI  0
 
-struct horizontal_settings_t
+struct horizontal_settings
 {
 	uint32_t pixels;
 	uint32_t border;
 };
 
-static const horizontal_settings_t h_table[] =
+static const horizontal_settings h_table[] =
 {
 	               //cf1 cf2 ss st
 	{ 512,  64 },  // 0   0   0  0
@@ -129,13 +127,15 @@ static const horizontal_settings_t h_table[] =
 DEFINE_DEVICE_TYPE(SCC66470, scc66470_device, "scc66470", "Philips SCC66470")
 
 //-------------------------------------------------
-//  tms320av110_device - constructor
+//  scc66470_device - constructor
 //-------------------------------------------------
 
 scc66470_device::scc66470_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 		: device_t(mconfig, SCC66470, tag, owner, clock),
+		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
-		m_irqcallback(*this)
+		m_irqcallback(*this),
+		m_space_config("videoram", ENDIANNESS_BIG, 16, 21, 0, address_map_constructor(FUNC(scc66470_device::scc66470_vram), this))
 {
 }
 
@@ -145,8 +145,6 @@ scc66470_device::scc66470_device(const machine_config &mconfig, const char *tag,
 
 void scc66470_device::device_start()
 {
-	m_dram = make_unique_clear<uint16_t[]>(DRAM_SIZE / 2);
-
 	m_irqcallback.resolve_safe();
 
 	m_ica_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(scc66470_device::process_ica), this));
@@ -171,7 +169,6 @@ void scc66470_device::device_start()
 	save_item(NAME(m_bc));
 	save_item(NAME(m_tc));
 	save_item(NAME(m_csr_r));
-	save_pointer(NAME(m_dram), DRAM_SIZE / 2);
 }
 
 //-------------------------------------------------
@@ -205,20 +202,45 @@ void scc66470_device::device_reset()
 	m_dca_timer->adjust(screen().time_until_pos(32, 784));
 }
 
+// default address map
+void scc66470_device::scc66470_vram(address_map &map)
+{
+	if(!has_configured_map(0))
+	{
+		map(0x00000000, 0x0017ffff).ram();
+	}
+}
+
+device_memory_interface::space_config_vector scc66470_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
+}
+
+
 void scc66470_device::set_vectors(uint16_t *src)
 {
-	std::copy_n(src, 4, m_dram.get());
+	for(int i = 0 ; i < 4 ; i++)
+	{
+		dram_w(i, *src++, 0xffff);
+	}
 }
 
 
 void scc66470_device::dram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA(m_dram.get() + offset);
+	space().write_word(offset<<1, data, mem_mask);
 }
 
 uint16_t scc66470_device::dram_r(offs_t offset, uint16_t mem_mask)
 {
-	return m_dram[offset] & mem_mask;
+	return space().read_word(offset<<1, mem_mask);
+}
+
+inline uint8_t scc66470_device::dram_byte_r(offs_t offset)
+{
+	return space().read_byte(offset);
 }
 
 void scc66470_device::csr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -439,11 +461,11 @@ void scc66470_device::perform_pixac_op()
 
 uint16_t scc66470_device::ipa_r(offs_t offset, uint16_t mem_mask)
 {
-	if(offset < DRAM_SIZE / 2)
+	if(offset < 0x180000 / 2)
 	{
 		if(pixac_trigger())
 		{
-			reg_b_w(0,	m_dram[ offset ], 0xffff);
+			reg_b_w(0, dram_r(offset, 0xffff), 0xffff);
 		}
 	}
 
@@ -452,11 +474,11 @@ uint16_t scc66470_device::ipa_r(offs_t offset, uint16_t mem_mask)
 
 void scc66470_device::ipa_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	if(offset < DRAM_SIZE / 2)
+	if(offset < 0x180000 / 2)
 	{
 		if(pixac_trigger())
 		{
-			m_dram[ offset ] = m_reg_b;
+			dram_w(offset, m_reg_b, 0xffff);
 		}
 	}
 }
@@ -495,129 +517,130 @@ void scc66470_device::set_dcp(uint32_t dcp)
 	m_dcp = dcp;
 }
 
-uint8_t *scc66470_device::line(int line)
+void scc66470_device::line(int line, uint8_t *line_buffer, unsigned line_buffer_size)
 {
-	if(display_enabled() && line >= (total_height() - height()))
+	if(line_buffer_size == width())
 	{
-		uint8_t bc = m_bcr;
-		unsigned char *dest = m_line_data;
-
-		if(BIT(DCR_REG, DCR_CM))  //4 bits/pixel
+		if(display_enabled() && line >= (total_height() - height()))
 		{
-			bc = bc >> 4;
-		}
+			uint8_t bc = m_bcr;
 
-		line -= total_height() - height();
-
-		if(line < border_height() || line >= (height() - border_height()))
-		{
-			std::fill_n(dest, width(), bc);
-
-			if(line == height() - 1)
+			if(BIT(DCR_REG, DCR_CM))  //4 bits/pixel
 			{
-				set_vsr(0);
+				bc = bc >> 4;
+			}
+
+			line -= total_height() - height();
+
+			if(line < border_height() || line >= (height() - border_height()))
+			{
+				std::fill_n(line_buffer, width(), bc);
+
+				if(line == height() - 1)
+				{
+					set_vsr(0);
+				}
+			}
+			else
+			{
+				unsigned vsr = get_vsr() & 0xfffff;
+
+				if(vsr)
+				{
+					line_buffer = std::fill_n(line_buffer, border_width(), bc);
+
+					if(BIT(DCR_REG, DCR_CM))  //4 bits/pixel
+					{
+						if(!BIT(DCR2_REG, DCR2_FT1))
+						{
+							for(int i = 0 ; i < width() - (border_width() * 2) ; i += 2)
+							{
+								uint8_t pixels = dram_byte_r(vsr++);
+								*line_buffer++ = (pixels >> 4) & 0x0f;
+								*line_buffer++ = (pixels) & 0x0f;
+								vsr &= 0xfffff;
+							}
+						}
+					}
+					else
+					{
+						if(!BIT(DCR2_REG, DCR2_FT1))
+						{
+							for(int i = 0 ; i < width() - (border_width() * 2) ; i += 2)
+							{
+								const uint8_t pixel = dram_byte_r(vsr++);
+								*line_buffer++ = pixel;
+								*line_buffer++ = pixel;
+								vsr &= 0xfffff;
+							}
+						}
+					}
+
+					std::fill_n(line_buffer, border_width(), bc);
+
+					if(BIT(DCR_REG, DCR_LS))
+					{
+						vsr = get_vsr() + 512;
+
+						if(BIT(DCR_REG, DCR_IC))
+						{
+							m_working_dcp = vsr - 64;
+						}
+						else
+						{
+							m_working_dcp = vsr - 16;
+						}
+					}
+					else
+					{
+						if(!BIT(DCR2_REG, DCR2_ID))
+						{
+							if(BIT(DCR_REG, DCR_DC))
+							{
+								m_working_dcp = vsr;
+
+								if(BIT(DCR_REG, DCR_IC))
+								{
+									vsr += 64;
+								}
+								else
+								{
+									vsr += 16;
+								}
+							}
+						}
+					}
+
+					set_vsr(vsr);
+				}
+				else
+				{
+					std::fill_n(line_buffer, line_buffer_size, 0);
+				}
 			}
 		}
 		else
 		{
-			uint8_t *src = reinterpret_cast<uint8_t *>(m_dram.get());
-			unsigned int vsr = get_vsr() & 0xfffff;
-
-			if(vsr)
-			{
-				std::fill_n(dest, border_width(), bc);
-				dest += border_width();
-
-				if(BIT(DCR_REG, DCR_CM))  //4 bits/pixel
-				{
-					if(!BIT(DCR2_REG, DCR2_FT1))
-					{
-						for(int i = 0 ; i < width() - (border_width() * 2) ; i += 2)
-						{
-							uint8_t pixels = src[ BYTE_XOR_BE(vsr) ];
-							vsr++;
-							*dest++ = (pixels >> 4) & 0x0f;
-							*dest++ = (pixels) & 0x0f;
-							vsr &= 0xfffff;
-						}
-					}
-				}
-				else
-				{
-					if(!BIT(DCR2_REG, DCR2_FT1))
-					{
-						for(int i = 0 ; i < width() - (border_width() * 2) ; i += 2)
-						{
-							*dest++ = src[ BYTE_XOR_BE(vsr) ];
-							*dest++ = src[ BYTE_XOR_BE(vsr) ];
-							vsr++;
-							vsr &= 0xfffff;
-						}
-					}
-				}
-
-				std::fill_n(dest, border_width(), bc);
-
-				if(BIT(DCR_REG, DCR_LS))
-				{
-					vsr = get_vsr() + 512;
-
-					if(BIT(DCR_REG, DCR_IC))
-					{
-						m_working_dcp = vsr - 64;
-					}
-					else
-					{
-						m_working_dcp = vsr - 16;
-					}
-				}
-				else
-				{
-					if(!BIT(DCR2_REG, DCR2_ID))
-					{
-						if(BIT(DCR_REG, DCR_DC))
-						{
-							m_working_dcp = vsr;
-
-							if(BIT(DCR_REG, DCR_IC))
-							{
-								vsr += 64;
-							}
-							else
-							{
-								vsr += 16;
-							}
-						}
-					}
-				}
-
-				set_vsr(vsr);
-			}
-			else
-			{
-				std::fill_n(m_line_data, sizeof(m_line_data), 0);
-			}
+			std::fill_n(line_buffer, line_buffer_size, 0);
 		}
 	}
 	else
 	{
-		std::fill_n(m_line_data, sizeof(m_line_data), 0);
+		std::fill_n(line_buffer, line_buffer_size, 0);
 	}
-
-	return m_line_data;
 }
 
 TIMER_CALLBACK_MEMBER(scc66470_device::process_ica)
 {
 	uint32_t ctrl = 0x400 / 2;
 
-	if((BIT(DCR_REG, DCR_IC) || BIT(DCR_REG, DCR_DC)) && m_dram[ ctrl ] != 0)
+	if((BIT(DCR_REG, DCR_IC) || BIT(DCR_REG, DCR_DC)) && dram_r(ctrl, 0xffff) != 0)
 	{
 		bool stop = false;
 		while(!stop)
 		{
-			uint16_t cmd = m_dram[ ctrl++ ];
-			uint16_t data = m_dram[ ctrl++ ];
+			uint16_t cmd = dram_r(ctrl++, 0xffff);
+			uint16_t data = dram_r(ctrl++, 0xffff);
 
 			ctrl &= 0xffffe;
 
@@ -719,8 +742,8 @@ TIMER_CALLBACK_MEMBER(scc66470_device::process_dca)
 
 		while(!stop && count)
 		{
-			uint16_t cmd = m_dram[ ctrl++ ];
-			uint16_t data = m_dram[ ctrl++ ];
+			uint16_t cmd = dram_r(ctrl++, 0xffff);
+			uint16_t data = dram_r(ctrl++, 0xffff);
 
 			ctrl &= 0xffffe;
 
@@ -824,7 +847,7 @@ TIMER_CALLBACK_MEMBER(scc66470_device::process_dca)
 	}
 }
 
-unsigned int scc66470_device::border_width()
+unsigned scc66470_device::border_width()
 {
 	const unsigned hoffset = (BIT(DCR_REG, DCR_CF1) << 3) | (BIT(DCR_REG, DCR_CF2) << 2) | (BIT(DCR_REG, DCR_SS) << 1) | BIT(CSR_REG, CSR_ST);
 	return h_table[ hoffset ].border / 2;
@@ -847,13 +870,13 @@ int scc66470_device::border_height()
 	return height;
 }
 
-unsigned int scc66470_device::width()
+unsigned scc66470_device::width()
 {
 	const unsigned hoffset = (BIT(DCR_REG, DCR_CF1) << 3) | (BIT(DCR_REG, DCR_CF2) << 2) | (BIT(DCR_REG, DCR_SS) << 1) | BIT(CSR_REG, CSR_ST);
 	return h_table[ hoffset ].pixels;
 }
 
-unsigned int scc66470_device::height()
+unsigned scc66470_device::height()
 {
 	if(BIT(DCR_REG, DCR_FD))
 	{
@@ -865,7 +888,7 @@ unsigned int scc66470_device::height()
 	}
 }
 
-unsigned int scc66470_device::total_height()
+unsigned scc66470_device::total_height()
 {
 	if(BIT(DCR_REG, DCR_FD))
 	{
