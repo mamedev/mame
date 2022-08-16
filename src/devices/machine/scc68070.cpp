@@ -45,27 +45,160 @@ TODO:
 //**************************************************************************
 // Register defines
 //**************************************************************************
-#define ICR_SEL 0x40
-#define ICR_ESO 0x08
-#define ICR_ACK 0x04
+enum isr_bits
+{
+	ISR_MST      =  0x80,                        // Master
+	ISR_TRX      =  0x40,                        // Transmitter
+	ISR_BB       =  0x20,                        // Busy
+	ISR_PIN      =  0x10,                        // No Pending Interrupt
+	ISR_AL       =  0x08,                        // Arbitration Lost
+	ISR_AAS      =  0x04,                        // Addressed As Slave
+	ISR_AD0      =  0x02,                        // Address Zero
+	ISR_LRB      =  0x01,                        // Last Received Bit
+	ISR_SSR_MASK =  (ISR_MST | ISR_TRX | ISR_BB),// Mask for detecting start/stop/restart
+	ISR_START    =  (ISR_MST | ISR_TRX | ISR_BB),// Start bit request
+	ISR_STOP     =  (ISR_MST | ISR_TRX)			// Stop bit request
+};
+
+enum umr_bits
+{
+	UMR_OM          = 0xc0,
+	UMR_OM_NORMAL   = 0x00,
+	UMR_OM_ECHO     = 0x40,
+	UMR_OM_LOOPBACK = 0x80,
+	UMR_OM_RLOOP    = 0xc0,
+	UMR_TXC         = 0x10,
+	UMR_PC          = 0x08,
+	UMR_P           = 0x04,
+	UMR_SB          = 0x02,
+	UMR_CL          = 0x01
+};
+
+enum usr_bits
+{
+	USR_RB          = 0x80,
+	USR_FE          = 0x40,
+	USR_PE          = 0x20,
+	USR_OE          = 0x10,
+	USR_TXEMT       = 0x08,
+	USR_TXRDY       = 0x04,
+	USR_RXRDY       = 0x01
+};
+
+enum tsr_bits
+{
+	TSR_OV0         = 0x80,
+	TSR_MA1         = 0x40,
+	TSR_CAP1        = 0x20,
+	TSR_OV1         = 0x10,
+	TSR_MA2         = 0x08,
+	TSR_CAP2        = 0x04,
+	TSR_OV2         = 0x02
+};
+
+enum tcr_bits
+{
+	TCR_E1          = 0xc0,
+	TCR_E1_NONE     = 0x00,
+	TCR_E1_RISING   = 0x40,
+	TCR_E1_FALLING  = 0x80,
+	TCR_E1_BOTH     = 0xc0,
+	TCR_M1          = 0x30,
+	TCR_M1_NONE     = 0x00,
+	TCR_M1_MATCH    = 0x10,
+	TCR_M1_CAPTURE  = 0x20,
+	TCR_M1_COUNT    = 0x30,
+	TCR_E2          = 0x0c,
+	TCR_E2_NONE     = 0x00,
+	TCR_E2_RISING   = 0x04,
+	TCR_E2_FALLING  = 0x08,
+	TCR_E2_BOTH     = 0x0c,
+	TCR_M2          = 0x03,
+	TCR_M2_NONE     = 0x00,
+	TCR_M2_MATCH    = 0x01,
+	TCR_M2_CAPTURE  = 0x02,
+	TCR_M2_COUNT    = 0x03
+};
+
+enum csr_bits
+{
+	CSR_COC         = 0x80,
+	CSR_NDT         = 0x20,
+	CSR_ERR         = 0x10,
+	CSR_CA          = 0x08
+};
+
+enum cer_bits
+{
+	CER_EC          = 0x1f,
+	CER_NONE        = 0x00,
+	CER_TIMING      = 0x02,
+	CER_BUSERR_MEM  = 0x09,
+	CER_BUSERR_DEV  = 0x0a,
+	CER_SOFT_ABORT  = 0x11
+};
+
+enum dcr1_bits
+{
+	DCR1_ERM        = 0x80,
+	DCR1_DT         = 0x30
+};
+
+enum dcr2_bits
+{
+	DCR2_ERM        = 0x80,
+	DCR2_DT         = 0x30,
+	DCR2_DS         = 0x08
+};
 
 
-#define I2C_IDLE				0
-#define I2C_TX_IN_PROGRESS		1
-#define I2C_RX_IN_PROGRESS		2
-#define I2C_RX_COMPLETE			3
-#define I2C_GET_ACK				4
-#define I2C_SEND_ACK			5
-#define I2C_SEND_ACK_AND_RX		6
-#define I2C_SEND_ACK_AND_STOP	7
-#define I2C_SEND_STOP			8
-#define I2C_CHANGED_TO_RX		9
-#define I2C_SEND_RESTART		10
+enum scr2_bits
+{
+	SCR2_MAC        = 0x0c,
+	SCR2_MAC_NONE   = 0x00,
+	SCR2_MAC_INC    = 0x04,
+	SCR2_DAC        = 0x03,
+	SCR2_DAC_NONE   = 0x00,
+	SCR2_DAC_INC    = 0x01
+};
 
-#define I2C_SCL_IDLE			0
-#define I2C_SCL_SET_0			1
-#define I2C_SCL_SET_1			2
-#define I2C_SCL_WAIT_1			3
+enum ccr_bits
+{
+	CCR_SO          = 0x80,
+	CCR_SA          = 0x10,
+	CCR_INE         = 0x08,
+	CCR_IPL         = 0x07
+};
+
+enum icr_bits
+{
+	ICR_SEL = 0x40,
+	ICR_ESO = 0x08,
+	ICR_ACK = 0x04
+};
+
+enum i2c_states
+{
+	I2C_IDLE = 0,
+	I2C_TX_IN_PROGRESS,
+	I2C_RX_IN_PROGRESS,
+	I2C_RX_COMPLETE,
+	I2C_GET_ACK,
+	I2C_SEND_ACK,
+	I2C_SEND_ACK_AND_RX,
+	I2C_SEND_ACK_AND_STOP,
+	I2C_SEND_STOP,
+	I2C_CHANGED_TO_RX,
+	I2C_SEND_RESTART
+};
+
+enum i2c_clock_states
+{
+	I2C_SCL_IDLE = 0,
+	I2C_SCL_SET_0,
+	I2C_SCL_SET_1,
+	I2C_SCL_WAIT_1,
+};
 
 
 // device type definition
@@ -752,7 +885,7 @@ uint8_t scc68070_device::idr_r()
 	}
 	else
 	{
-		m_i2c.sda_out_state = (m_i2c.control_register&ICR_ACK) ? false : true;
+		m_i2c.sda_out_state = (m_i2c.control_register & ICR_ACK) ? false : true;
 		m_i2c_sdaw_callback(m_i2c.sda_out_state);
 		
 		if (m_i2c.control_register & ICR_ACK)
@@ -907,7 +1040,7 @@ void scc68070_device::isr_w(uint8_t data)
 		}
 		else
 		{
-			if (data & ISR_PIN && !(m_i2c.status_register&ISR_PIN))
+			if (data & ISR_PIN && !(m_i2c.status_register & ISR_PIN))
 			{
 				if (m_i2c.state == I2C_CHANGED_TO_RX)
 				{
@@ -1030,7 +1163,7 @@ void scc68070_device::i2c_process_falling_scl()
 				if (BIT(m_i2c.data_register, 0))
 				{
 					m_i2c.status_register &= ~ISR_TRX;
-					if (!(m_i2c.status_register&ISR_LRB))
+					if (!(m_i2c.status_register & ISR_LRB))
 					{
 						m_i2c.state = I2C_CHANGED_TO_RX;
 					}
@@ -1103,7 +1236,7 @@ void scc68070_device::i2c_process_rising_scl()
 
 WRITE_LINE_MEMBER(scc68070_device::write_scl)
 {
-	if (m_i2c.status_register&ISR_MST)
+	if (m_i2c.status_register & ISR_MST)
 	{
 		if (m_i2c.scl_in_state != state && state)
 		{
