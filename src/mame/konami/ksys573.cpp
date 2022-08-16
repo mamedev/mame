@@ -93,9 +93,10 @@ P Fisherman's Bait 2                                  1998       GC865 UA       
 P Fisherman's Bait Marlin Challenge                   1999       GX889             889 AA/EA/JA/UA(needs redump)
 P Gachagachamp                                        1999.01    GQ877 JA          GE877-JA(PCMCIA card)
 P Great Bishi Bashi Champ                             2002.??    GBA48 JA          (no CD)
-A GUITARFREAKS                                        1999.02    GQ886 EA/JA/UA    886 ** C02
-A GUITARFREAKS 2ndMIX                                 1999.07    GQ883 JA          929 JB B02(needs redump)
-A *GUITARFREAKS 2ndMIX Link ver.                      1999.09
+A GUITARFREAKS                                        1999.02    GQ886 EA/JA/UA/AA 886 ** A02/C02/D02
+A GUITARFREAKS 2ndMIX                                 1999.07    GQ883 JA          883 ** A02
+A GUITARFREAKS 2ndMIX Link Kit 1                      1999.09    GE929 JA          929 JA A02
+A GUITARFREAKS 2ndMIX Link Kit 2                      1999.11    GC929 JB          929 JB B02
 D GUITARFREAKS 3rdMIX                                 2000.04    GE949 JA          949 JA C01 / 949 JA C02
 D GUITARFREAKS 4thMIX                                 2000.08    GEA24 JA          A24 JA A02
 D GUITARFREAKS 5thMIX                                 2001.03    GCA26 JA          A26 JA A02
@@ -107,7 +108,7 @@ N GUITARFREAKS 9thMIX                                 2003.04    GCC39 JA       
 N GUITARFREAKS 10thMIX                                2003.10    GCD10 JA          D10 JA A02
 N GUITARFREAKS 11thMIX                                2004.04
 G GunMania                                            2000.07    G?906 JA          (no CD)
-? *GunMania Zone Plus                                 2000.10
+? *GunMania Zone Plus                                 2000.10    GCA15 JA
 P Handle Champ                                        1997.12    GQ710 JA          (no CD)
 P Hyper Bishi Bashi Champ                             1998.07    GC876 EA          (no CD)
 P Hyper Bishi Bashi Champ - 2 Player                  1999.08    GC908 JA          908    A02
@@ -5061,6 +5062,46 @@ ROM_START( gtrfrksac )
 	DISK_IMAGE_READONLY( "886__c02", 0, BAD_DUMP SHA1(80293512c4b914ef98acb1bbc7e3a2ed944a0dad) )
 ROM_END
 
+ROM_START( gtrfrksea )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0000224, "cassette:game:eeprom", 0 )
+	ROM_LOAD( "gq886eac.u1",  0x000000, 0x000224, BAD_DUMP CRC(3b38dccf) SHA1(c313d025b4faed73ab021b76dbf0c51c9d701eb3) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "886__a02", 0, SHA1(f34f5678cfc0292e65e114480f167866664f4173) )
+ROM_END
+
+ROM_START( gtrfrksua )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0000224, "cassette:game:eeprom", 0 )
+	ROM_LOAD( "gq886uac.u1",  0x000000, 0x000224, BAD_DUMP CRC(29bb1ad5) SHA1(797ba61b6407fc0d0531e58129a9230e1484dc11) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "886__a02", 0, SHA1(f34f5678cfc0292e65e114480f167866664f4173) )
+ROM_END
+
+ROM_START( gtrfrksja )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0000224, "cassette:game:eeprom", 0 )
+	ROM_LOAD( "gq886jac.u1",  0x000000, 0x000224, BAD_DUMP CRC(2c7a64bd) SHA1(01bd46989a897dbd023603e5cabbd7deb85825ff) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "886__a02", 0, SHA1(f34f5678cfc0292e65e114480f167866664f4173) )
+ROM_END
+
+ROM_START( gtrfrksaa )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0000224, "cassette:game:eeprom", 0 )
+	ROM_LOAD( "gq886aac.u1",  0x000000, 0x000224, BAD_DUMP CRC(d220ae69) SHA1(dfdd29197222cb621b05f9b9091cff9a20cd846e) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "886__a02", 0, SHA1(f34f5678cfc0292e65e114480f167866664f4173) )
+ROM_END
+
 ROM_START( gtrfrk2m )
 	SYS573_BIOS_A
 
@@ -6254,6 +6295,10 @@ GAME( 1999, gtrfrksc,  gtrfrks,  gtrfrks,    gtrfrks,   ksys573_state, empty_ini
 GAME( 1999, gtrfrksuc, gtrfrks,  gtrfrks,    gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks (GQ886 VER. UAC)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, gtrfrksjc, gtrfrks,  gtrfrks,    gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks (GQ886 VER. JAC)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, gtrfrksac, gtrfrks,  gtrfrks,    gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks (GQ886 VER. AAC)", MACHINE_IMPERFECT_SOUND )
+GAME( 1999, gtrfrksea, gtrfrks,  gtrfrks,    gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks (GQ886 VER. EAA)", MACHINE_IMPERFECT_SOUND )
+GAME( 1999, gtrfrksua, gtrfrks,  gtrfrks,    gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks (GQ886 VER. UAA)", MACHINE_IMPERFECT_SOUND )
+GAME( 1999, gtrfrksja, gtrfrks,  gtrfrks,    gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks (GQ886 VER. JAA)", MACHINE_IMPERFECT_SOUND )
+GAME( 1999, gtrfrksaa, gtrfrks,  gtrfrks,    gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks (GQ886 VER. AAA)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, fbaitmc,   sys573,   fbaitbc,    fbaitmc,   ksys573_state, empty_init,    ROT0,  "Konami", "Fisherman's Bait - Marlin Challenge (GX889 VER. EA)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, fbaitmcu,  fbaitmc,  fbaitbc,    fbaitmc,   ksys573_state, empty_init,    ROT0,  "Konami", "Fisherman's Bait - Marlin Challenge (GX889 VER. UA)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, fbaitmcj,  fbaitmc,  fbaitbc,    fbaitmc,   ksys573_state, empty_init,    ROT0,  "Konami", "Fisherman's Bait - Marlin Challenge (GX889 VER. JA)", MACHINE_IMPERFECT_SOUND )
