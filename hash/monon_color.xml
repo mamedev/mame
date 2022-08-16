@@ -46,7 +46,7 @@ license:CC0
 		<publisher>M&amp;D</publisher>
 		<info name="alt_title" value="赛尔号：战神斗魂"/>
 		<part name="cart" interface="monon_color_cart">
-			<dataarea name="rom" size="0x1000000">
+			<dataarea name="rom" size="0x0800000">
 				<rom name="101.bin" size="0x0800000" crc="8fee70c4" sha1="ada5e0d25d704602423594d3e8db1acbbdf0d247"/>
 			</dataarea>
 		</part>
@@ -58,7 +58,7 @@ license:CC0
 		<publisher>M&amp;D</publisher>
 		<info name="alt_title" value="洛克王国-魔法阵"/>
 		<part name="cart" interface="monon_color_cart">
-			<dataarea name="rom" size="0x1000000">
+			<dataarea name="rom" size="0x0800000">
 				<rom name="102.bin" size="0x0800000" crc="1bff052f" sha1="c459f86fe60e3ea77c4005873b38c04b52447d47"/>
 			</dataarea>
 		</part>
@@ -70,7 +70,7 @@ license:CC0
 		<publisher>M&amp;D</publisher>
 		<info name="alt_title" value="机甲旋风-格斗大师"/>
 		<part name="cart" interface="monon_color_cart">
-			<dataarea name="rom" size="0x1000000">
+			<dataarea name="rom" size="0x0800000">
 				<rom name="103.bin" size="0x0800000" crc="e9c41a3b" sha1="6f9803235c30f521ee0936b63acad5b0a9b825ed"/>
 			</dataarea>
 		</part>
@@ -82,7 +82,7 @@ license:CC0
 		<publisher>M&amp;D</publisher>
 		<info name="alt_title" value="机甲旋风-格斗大师"/>
 		<part name="cart" interface="monon_color_cart">
-			<dataarea name="rom" size="0x1000000">
+			<dataarea name="rom" size="0x0800000">
 				<rom name="103_alt.bin" size="0x0800000" crc="ce65c15d" sha1="4623e0e6bca06642c536e267d2d009c541ef1e84"/>
 			</dataarea>
 		</part>
@@ -94,7 +94,7 @@ license:CC0
 		<publisher>M&amp;D</publisher>
 		<info name="alt_title" value="神魄-失落的遗迹"/>
 		<part name="cart" interface="monon_color_cart">
-			<dataarea name="rom" size="0x1000000">
+			<dataarea name="rom" size="0x0800000">
 				<rom name="104.bin" size="0x0800000" crc="57339d56" sha1="b3bb9ea5a713e58ac7564d3a9272a8d27b587496"/>
 			</dataarea>
 		</part>
@@ -106,7 +106,7 @@ license:CC0
 		<publisher>M&amp;D</publisher>
 		<info name="alt_title" value="赛尔号-能源大作战"/>
 		<part name="cart" interface="monon_color_cart">
-			<dataarea name="rom" size="0x1000000">
+			<dataarea name="rom" size="0x0400000">
 				<rom name="105.bin" size="0x0400000" crc="fd51cb0a" sha1="38dda18b48114a75f1d0fdf96a31f217d6584b30"/>
 			</dataarea>
 		</part>
@@ -118,7 +118,7 @@ license:CC0
 		<publisher>M&amp;D</publisher>
 		<info name="alt_title" value="钢铁侠-英雄反击战"/>
 		<part name="cart" interface="monon_color_cart">
-			<dataarea name="rom" size="0x1000000">
+			<dataarea name="rom" size="0x0800000">
 				<rom name="106.bin" size="0x0800000" crc="837e77fc" sha1="e9e560005ce12a1e2cdbfcb98b10df923102768a"/>
 			</dataarea>
 		</part>
@@ -202,7 +202,7 @@ license:CC0
 		<publisher>M&amp;D</publisher>
 		<info name="alt_title" value="逻辑拼一拼"/>
 		<part name="cart" interface="monon_color_cart">
-			<dataarea name="rom" size="0x1000000">
+			<dataarea name="rom" size="0x0400000">
 				<rom name="301.bin" size="0x0400000" crc="e13f48ba" sha1="dbcb52c52c8ae8e6897b981d76207b0bdd926753"/>
 			</dataarea>
 		</part>
@@ -214,7 +214,7 @@ license:CC0
 		<publisher>M&amp;D</publisher>
 		<info name="alt_title" value="喜羊羊与灰太狼-决战咩星"/>
 		<part name="cart" interface="monon_color_cart">
-			<dataarea name="rom" size="0x1000000">
+			<dataarea name="rom" size="0x0800000">
 				<rom name="302.bin" size="0x0800000" crc="3cd4190c" sha1="3d910389e345f2b6ac38fce3571d74fc8cbcfabb"/>
 			</dataarea>
 		</part>

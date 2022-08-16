@@ -97,7 +97,7 @@ void generic_spi_flash_device::write(uint8_t data)
 		case READY_FOR_WRITE:
 			LOGMASKED(LOG_SPI, "Write SPI data %02x\n", data);
 
-			m_spiptr[(m_spiaddr++) & 0xffffff] = data;
+			m_spiptr[(m_spiaddr++) & (m_length-1)] = data;
 
 			break;
 
@@ -161,7 +161,7 @@ void generic_spi_flash_device::write(uint8_t data)
 	{
 		if (m_spi_state == READY_FOR_READ)
 		{
-			m_spilatch = m_spiptr[(m_spiaddr++) & 0xffffff];
+			m_spilatch = m_spiptr[(m_spiaddr++) & (m_length-1)];
 		}
 		else if (m_spi_state == READY_FOR_STATUS_READ)
 		{
