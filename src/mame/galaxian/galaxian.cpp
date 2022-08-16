@@ -8858,12 +8858,16 @@ void galaxian_state::init_bigkonggx()
 
 	uint8_t *romdata = memregion("maincpu")->base();
 	int len = memregion("maincpu")->bytes();
-	uint8_t buf[len];
-	memcpy(buf, romdata, len);
 
 	// descramble the content of each 0x100 block
-	for (int i = 0; i < len; i++)
-		romdata[i] = buf[i ^ 0xff];
+	for (int i = 0; i < len; i += 256)
+	{
+		for (int j = 0; j < (256 / 2); j++)
+		{
+			using std::swap;
+			swap(romdata[i + j], romdata[i + (j ^ 0xff)]);
+		}
+	}
 }
 
 void fourplay_state::init_fourplay()
