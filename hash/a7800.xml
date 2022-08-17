@@ -2457,11 +2457,11 @@ almost nothing like the prototype.
 		</part>
 	</software>
 
-	<!-- these are listed as 'with HSC emulation' and are designed for the prosystem emulator, they simulate some of the HSC features -->
+	<!-- these are listed as 'with HSC emulation' and are designed for the ProSystem Emulator, they simulate some of the HSC features -->
 	<!-- remove them? -->
 
 	<software name="dkongxmps" cloneof="dkongxm" supported="no">
-		<description>Donkey Kong (PAL, demo, XM enhanced, V1.2, for prosystem emulator)</description>
+		<description>Donkey Kong (PAL, demo, XM enhanced, V1.2, for ProSystem Emulator)</description>
 		<year>2012</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="programmer" value="TEP392" />
@@ -2475,7 +2475,7 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="dkongxmups" cloneof="dkongxm" supported="no">
-		<description>Donkey Kong (NTSC, demo, XM enhanced, V1.2, for prosystem emulator)</description>
+		<description>Donkey Kong (NTSC, demo, XM enhanced, V1.2, for ProSystem Emulator)</description>
 		<year>2012</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="programmer" value="TEP392" />
