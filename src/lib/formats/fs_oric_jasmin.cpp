@@ -349,6 +349,7 @@ std::pair<err_t, meta_data> oric_jasmin_impl::metadata(const std::vector<std::st
 		return std::make_pair(ERR_NOT_FOUND, meta_data());
 
 	auto [bdir, off, sys] = file_find(path[0]);
+	std::ignore = sys;
 	if(!off)
 		return std::make_pair(ERR_NOT_FOUND, meta_data());
 
@@ -412,6 +413,7 @@ err_t oric_jasmin_impl::rename(const std::vector<std::string> &opath, const std:
 		return ERR_NOT_FOUND;
 
 	auto [bdir, off, sys] = file_find(opath[0]);
+	std::ignore = sys;
 	if(!off)
 		return ERR_NOT_FOUND;
 
