@@ -68,11 +68,11 @@ void ds1207_device::device_start()
 	new_state(STATE_STOP);
 	m_dqr = DQ_HIGH_IMPEDANCE;
 
-	std::fill_n(m_command, sizeof(m_command), 0);
-	std::fill_n(m_compare_register, sizeof(m_compare_register), 0);
+	std::fill_n(m_command, std::size(m_command), 0);
+	std::fill_n(m_compare_register, std::size(m_compare_register), 0);
 	m_last_update_time = 0;
 	m_startup_time = 0;
-	std::fill_n(m_day_clock, sizeof(m_day_clock), 0);
+	std::fill_n(m_day_clock, std::size(m_day_clock), 0);
 
 	save_item(NAME(m_rst));
 	save_item(NAME(m_clk));
@@ -96,12 +96,12 @@ void ds1207_device::device_start()
 
 void ds1207_device::nvram_default()
 {
-	std::fill_n(m_unique_pattern, sizeof(m_unique_pattern), 0);
-	std::fill_n(m_identification, sizeof(m_identification), 0);
-	std::fill_n(m_security_match, sizeof(m_security_match), 0);
-	std::fill_n(m_secure_memory, sizeof(m_secure_memory), 0);
-	std::fill_n(m_days_left, sizeof(m_days_left), 0);
-	std::fill_n(m_start_time, sizeof(m_start_time), 0);
+	std::fill_n(m_unique_pattern, std::size(m_unique_pattern), 0);
+	std::fill_n(m_identification, std::size(m_identification), 0);
+	std::fill_n(m_security_match, std::size(m_security_match), 0);
+	std::fill_n(m_secure_memory, std::size(m_secure_memory), 0);
+	std::fill_n(m_days_left, std::size(m_days_left), 0);
+	std::fill_n(m_start_time, std::size(m_start_time), 0);
 	m_device_state = 0;
 
 	int expected_bytes = sizeof(m_unique_pattern) + sizeof(m_identification) + sizeof(m_security_match) + sizeof(m_secure_memory)
