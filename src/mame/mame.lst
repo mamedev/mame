@@ -20392,7 +20392,7 @@ macxl                           // 1985 Apple Macintosh XL
 @source:tch/littlerb.cpp
 littlerb                        // (c) 1993 TCH
 
-@source:skeleton/lk3000.cpp
+@source:handheld/lk3000.cpp
 lk3000
 
 @source:taito/lkage.cpp
