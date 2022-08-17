@@ -663,7 +663,7 @@ static INPUT_PORTS_START( lucky7i )
 	PORT_MODIFY("SW0")
 
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Win Plan Scroll/Collect")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Einsatz")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Einsatz")
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start/Gamble")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Rental Book Keeping")
 
@@ -704,7 +704,7 @@ static INPUT_PORTS_START( lucky7i )
 
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Attendant Collect") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Attendant Collect") PORT_CODE(KEYCODE_A)
 
 INPUT_PORTS_END
 
@@ -837,22 +837,19 @@ READ_LINE_MEMBER(magicard_base_state::cpu_i2c_sda_read)
 void magicard_base_state::magicard_base(machine_config &config)
 {
 	SCC68070(config, m_maincpu, CLOCK_C); /* SCC-68070 CCA84 */
-
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-
 	m_maincpu->i2c_scl_w().set(FUNC(magicard_base_state::cpu_i2c_scl));
 	m_maincpu->i2c_sda_w().set(FUNC(magicard_base_state::cpu_i2c_sda_write));
 	m_maincpu->i2c_sda_r().set(FUNC(magicard_base_state::cpu_i2c_sda_read));
 
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw( CLOCK_A/2, 960, 0, 768, 312, 32, 312);
 	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
+	m_screen->set_screen_update(FUNC(magicard_base_state::screen_update_magicard));
+
 	SCC66470(config,m_scc66470,CLOCK_A);
 	m_scc66470->set_addrmap(0, &magicard_base_state::scc66470_map);
 	m_scc66470->set_screen("screen");
 	m_scc66470->irq().set(FUNC(magicard_base_state::scc66470_irq));
-
-	m_screen->set_screen_update(FUNC(magicard_base_state::screen_update_magicard));
-
 
 	PALETTE(config, m_palette).set_entries(0x100);
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
@@ -885,7 +882,6 @@ void magicard_state::magicard_pic54(machine_config &config)
 	pic16c54_device &pic(PIC16C54(config, "pic16c54", 3686400)); // correct?
 	pic.read_b().set(FUNC(magicard_base_state::pic_portb_r));
 	pic.write_b().set(FUNC(magicard_base_state::pic_portb_w));
-
 }
 
 void magicard_state::unkte06(machine_config &config)
