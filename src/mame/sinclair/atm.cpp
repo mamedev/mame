@@ -81,6 +81,7 @@ private:
 	void atm_port_ffff_w(offs_t offset, u8 data);
 	void atm_port_ff77_w(offs_t offset, u8 data);
 	void atm_port_fff7_w(offs_t offset, u8 data);
+	void atm_port_eff7_w(offs_t offset, u8 data);
 	void atm_port_7ffd_w(offs_t offset, u8 data);
 
 	void atm_io(address_map &map);
@@ -209,27 +210,26 @@ void atm_state::atm_port_ff77_w(offs_t offset, u8 data)
 	}
 }
 
+void atm_state::atm_port_eff7_w(offs_t offset, u8 data)
+{
+	m_maincpu->set_clock(X1_128_SINCLAIR / 10 * (1 << BIT(data, 4))); // 0 - 3.5MHz, 1 - 7MHz
+	if (BIT(data, 7))
+		m_glukrs->enable();
+	else
+		m_glukrs->disable();
+}
+
 void atm_state::atm_port_fff7_w(offs_t offset, u8 data)
 {
-	if (!is_shadow_active())
-	{
-		// BF
-		if ((offset >> 14) == 2) m_glukrs->data_w(data);
-		// EF only?
-		if (BIT(data, 7))
-			m_glukrs->enable();
-		else
-			m_glukrs->disable();
-	}
-	else
-	{
-		u8 bank = offset >> 14;
-		u8 page = (data & 0xc0) | (~data & 0x3f);
+	if(!is_shadow_active())
+		return;
 
-		LOGMEM("PEN%s.%s = %X %s%d: %02X\n", (page | PEN_DOS7FFD_MASK) ? "+" : "!", BIT(m_port_7ffd_data, 4), data, (page & PEN_RAM_MASK) ? "RAM" : "ROM", bank, page & 0x3f);
-		pen_page(bank) = page;
-		atm_update_memory();
-	}
+	u8 bank = offset >> 14;
+	u8 page = (data & 0xc0) | (~data & 0x3f);
+
+	LOGMEM("PEN%s.%s = %X %s%d: %02X\n", (page | PEN_DOS7FFD_MASK) ? "+" : "!", BIT(m_port_7ffd_data, 4), data, (page & PEN_RAM_MASK) ? "RAM" : "ROM", bank, page & 0x3f);
+	pen_page(bank) = page;
+	atm_update_memory();
 }
 
 rectangle atm_state::get_screen_area()
@@ -422,11 +422,10 @@ void atm_state::atm_io(address_map &map)
 	map(0x00fd, 0x00fd).mirror(0xff00).w(FUNC(atm_state::atm_port_7ffd_w));
 	map(0x0077, 0x0077).select(0xff00).w(FUNC(atm_state::atm_port_ff77_w));
 	map(0x00f7, 0x00f7).select(0xff00).w(FUNC(atm_state::atm_port_fff7_w));
-	// TODO address decoding for gluk must be re-validated
-	//map(0xdff7, 0xdff7).w(m_glukrs, FUNC(glukrs_device::address_w));
-	//map(0xdef7, 0xdef7).w(m_glukrs, FUNC(glukrs_device::address_w)); // TODO shadow only
-	//map(0xbff7, 0xbff7).r(m_glukrs, FUNC(glukrs_device::data_r));
-	//map(0xbef7, 0xbef7).rw(m_glukrs, FUNC(glukrs_device::data_r), FUNC(glukrs_device::data_w)); // TODO shadow only
+	map(0xeff7, 0xeff7).w(FUNC(atm_state::atm_port_eff7_w));
+	map(0xdef7, 0xdef7).mirror(0x0100).w(m_glukrs, FUNC(glukrs_device::address_w));
+	map(0xbff7, 0xbff7).r(m_glukrs, FUNC(glukrs_device::data_r));
+	map(0xbef7, 0xbef7).rw(m_glukrs, FUNC(glukrs_device::data_r), FUNC(glukrs_device::data_w));
 	map(0xfadf, 0xfadf).mirror(0x0500).nopr(); // TODO 0xfadf, 0xfbdf, 0xffdf Kempston Mouse
 	map(0x8000, 0x8000).mirror(0x3ffd).w("ay8912", FUNC(ay8910_device::data_w));
 	map(0xc000, 0xc000).mirror(0x3ffd).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
