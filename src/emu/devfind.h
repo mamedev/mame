@@ -1257,7 +1257,7 @@ public:
 	///   this pointer remains valid until resolution time.
 	/// \param [in] bytes Desired memory share length in bytes.
 	/// \param [in] endianness Desired endianness of the memory share.
-	memory_share_creator(device_t &base, char const *tag, size_t bytes, endianness_t endianness);
+	memory_share_creator(device_t &base, char const *tag, size_t bytes, endianness_t endianness = ENDIANNESS_LITTLE);
 
 	/// \brief Get target memory share base pointer
 	///

@@ -65,7 +65,7 @@ public:
 	sphinx40_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_nvram(*this, "nvram", 0x800, ENDIANNESS_BIG),
+		m_nvram(*this, "nvram", 0x800),
 		m_pia(*this, "pia"),
 		m_lcd(*this, "lcd"),
 		m_display(*this, "display"),
