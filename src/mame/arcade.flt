@@ -72,6 +72,7 @@ atari/foodf.cpp
 atari/gauntlet.cpp
 atari/gumrally.cpp
 atari/harddriv.cpp
+atari/hitparade.cpp
 atari/irobot.cpp
 atari/jaguar.cpp
 atari/jedi.cpp

@@ -112,8 +112,8 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP1525   TMS1170   1980, Coleco Head to Head: Electronic Baseball
  @MP1604   TMS1370   1982, Gakken Invader 2000/Tandy Cosmic Fire Away 3000
  @MP1801   TMS1700   1981, Tiger Ditto/Tandy Pocket Repeat (model 60-2152)
- *MP2012   TMS1300   1977, Atari Europe Hit Parade 144 (jukebox) (have decap/dump)
- *MP2032   TMS1300   1980, Atari Europe unknown (jukebox)
+  MP2012   TMS1300   1977, Atari Europe Hit Parade 144 (jukebox) -> atari/hitparade.cpp
+ *MP2032   TMS1300   1980, Atari Europe unknown (jukebox, same PCB as the other one)
  @MP2105   TMS1370   1979, Gakken/Entex Poker (6005)
  @MP2110   TMS1370   1980, Gakken Invader/Tandy Fire Away
  @MP2139   TMS1370   1981, Gakken Galaxy Invader 1000/Tandy Cosmic 1000 Fire Away
