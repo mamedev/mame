@@ -44,7 +44,7 @@ public:
 	hitpar_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_nvram(*this, "nvram", 0x200),
+		m_nvram(*this, "nvram", 0x200, ENDIANNESS_BIG),
 		m_display(*this, "display"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
@@ -117,9 +117,9 @@ u8 hitpar_state::read_k()
 	u8 data = 0;
 
 	// read RAM
-	if (BIT(data, 14))
+	if (BIT(m_r, 14))
 		data |= m_nvram[m_r & 0xff];
-	if (BIT(data, 15))
+	if (BIT(m_r, 15))
 		data |= m_nvram[(m_r & 0xff) | 0x100];
 
 	// read inputs
@@ -220,5 +220,5 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT CMP MACHINE  INPUT   STATE         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1977, hitpar,   0,      0, hitpar,  hitpar, hitpar_state, empty_init, "Atari Europe", "Hit Parade 108 / 144 / 160", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT MACHINE  INPUT   STATE         INIT        SCREEN  COMPANY, FULLNAME, FLAGS
+GAME( 1977, hitpar,   0,     hitpar,  hitpar, hitpar_state, empty_init, ROT0,   "Atari Europe", "Hit Parade 108 / 144 / 160", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
