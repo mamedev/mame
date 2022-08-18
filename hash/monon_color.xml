@@ -17,7 +17,7 @@ license:CC0
     Mech Cyclone: Fighting Masters                 Jī jiǎ xuànfēng-gédòu dàshī                 Y       Y            NO. 103     FTG             机甲旋风-格斗大师
     Zinba! : The lost relics                       Shén pò-shīluò de yíjī                      Y       Y            NO. 104     RPG             神魄-失落的遗迹
     Purcell: Energy Battle                         Sài ěr hào-néngyuán dà zuòzhàn              Y       Y            NO. 105     PUZ             赛尔号-能源大作战
-    Iron Man: Hero Strike                          Gāngtiě xiá-yīngxióng fǎnjí zhàn            Y       Y            No. 106     ACT             钢铁侠-英雄反击战
+    Iron Man: Hero Strike                          Gāngtiě xiá-yīngxióng fǎnjí zhàn            Y       Y            NO. 106     ACT             钢铁侠-英雄反击战
     Zombie Hunter                                  Jiāngshī lièrén                             Y       Y            NO. 107     ACT             僵尸猎人
     IELTS Adventure                                Yǎsī tǎ dà màoxiǎn                          N       Y            NO. 108     PUZ/EDU         雅思塔大冒险
     Ultimate Brain Power                           Nǎolì liánlián kàn                          N       Y            NO. 109     PUZ/EDU         脑力连连看
@@ -26,7 +26,7 @@ license:CC0
     Locke Kingdom RPG: Black Fire                  Luòkè wángguó-hēi zhī yán                   Y       Y            NO. 203     RPG             洛克王国-黑之炎
     Locke Kingdom: Card Wars                       Luòkè wángguó-kǎ pái zhàn jì                Y       Y            NO. 204     RPG             洛克王国-卡牌战纪
     Armor Warrior                                  Kǎijiǎ yǒngshì dàluàn dòu                   Y       Y            NO. 205     ACT             铠甲勇士大乱斗
-    Locke Kingdom: The King's Badge                Luòkè wángguó-wángzhě huīzhāng              N       Y            NO. 206     RPG             洛克王国-王者徽章
+    Locke Kingdom: The King's Badge                Luòkè wángguó-wángzhě huīzhāng              Y       Y            NO. 206     RPG             洛克王国-王者徽章
     Laboratory Mathematica Olympiad                Àoshù shíyàn shì                            N       Y            NO. 207     PUZ/EDU         奥数实验室
     Logic Fight                                    Luójí pīn yī pīn                            Y       Y            NO. 301     PUZ/EDU         逻辑拼一拼
     Pleasant goat and big big wolf's comet battle  Xǐyángyáng yǔ huītàiláng-juézhàn miē xīng   Y       Y            NO. 302     PUZ/EDU         喜羊羊与灰太狼-决战咩星
@@ -192,6 +192,19 @@ license:CC0
 		<part name="cart" interface="monon_color_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="205.bin" size="0x1000000" crc="6ac78f44" sha1="fef56b0db4b8e8ff08b5cffda561ef7377063aab"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- there is a second glob in the cartridge, presumably for the badge reader -->
+	<software name="lockbadg" supported="no"> <!-- Locke Kingdom: The King's Badge -->
+		<description>Luòkè wángguó-wángzhě huīzhāng</description>
+		<year>2015</year>
+		<publisher>M&amp;D</publisher>
+		<info name="alt_title" value="洛克王国-王者徽章"/>
+		<part name="cart" interface="monon_color_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="206.bin" size="0x1000000" crc="8cf5a3b6" sha1="608604f3701dfc7870ac24426c9bb6e5591d5f0a" />
 			</dataarea>
 		</part>
 	</software>
