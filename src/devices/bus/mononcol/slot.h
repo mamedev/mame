@@ -26,9 +26,6 @@ public:
 	u8 *get_rom_base()  { return m_rom; }
 	u32 get_rom_size() { return m_rom_size; }
 
-	u8 *get_region_base()  { return m_region.found() ? m_region->base() : nullptr; }
-	u32 get_region_size() { return m_region.found() ? m_region->bytes() : 0U; }
-
 	virtual uint8_t read() { return 0x00; }
 	virtual DECLARE_WRITE_LINE_MEMBER(dir_w) { }
 	virtual void write(uint8_t data) { };
@@ -39,9 +36,6 @@ public:
 
 protected:
 	device_mononcol_cart_interface(machine_config const &mconfig, device_t &device);
-
-	// this replaces m_rom for non-user configurable carts!
-	optional_memory_region  m_region;
 
 	// internal state
 	u8 *m_rom;

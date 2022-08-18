@@ -21,7 +21,6 @@ DEFINE_DEVICE_TYPE(MONONCOL_CARTSLOT, mononcol_cartslot_device, "mononcol_cartsl
 
 device_mononcol_cart_interface::device_mononcol_cart_interface(machine_config const &mconfig, device_t &device) :
 	device_interface(device, "genslot"),
-	m_region(*this, DEVICE_SELF),
 	m_rom(nullptr),
 	m_rom_size(0)
 {
