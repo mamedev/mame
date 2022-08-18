@@ -49,19 +49,24 @@ protected:
 };
 
 
-enum
-{
-	MONONCOL_ROM8_WIDTH = 1,
-};
-
 #define MONONCOL_ROM_REGION_TAG ":cart:rom"
 
-class mononcol_slot_device : public device_t,
+class mononcol_cartslot_device : public device_t,
 								public device_rom_image_interface,
 								public device_single_card_slot_interface<device_mononcol_cart_interface>
 {
 public:
-	virtual ~mononcol_slot_device();
+	template <typename T>
+	mononcol_cartslot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts)
+		: mononcol_cartslot_device(mconfig, tag, owner, u32(0))
+	{
+		opts(*this);
+		set_fixed(false);
+	}
+
+	mononcol_cartslot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+
+	virtual ~mononcol_cartslot_device();
 
 	template <typename... T> void set_device_load(T &&... args) { m_device_image_load.set(std::forward<T>(args)...); }
 	template <typename... T> void set_device_unload(T &&... args) { m_device_image_unload.set(std::forward<T>(args)...); }
@@ -121,7 +126,7 @@ public:
 
 
 protected:
-	mononcol_slot_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
+	mononcol_cartslot_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -134,23 +139,10 @@ protected:
 	device_mononcol_cart_interface *m_cart;
 	load_delegate m_device_image_load;
 	unload_delegate m_device_image_unload;
-};
-
-class mononcol_cartslot_device : public mononcol_slot_device
-{
-public:
-	template <typename T>
-	mononcol_cartslot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts)
-		: mononcol_cartslot_device(mconfig, tag, owner, u32(0))
-	{
-		opts(*this);
-		set_fixed(false);
-	}
-
-	mononcol_cartslot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 
 	virtual const char *image_type_name() const noexcept override { return "cartridge"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "cart"; }
+
 };
 
 

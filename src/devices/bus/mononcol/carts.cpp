@@ -1,11 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-/**********************************************************************
-
- Generic ROM / RAM socket slots
-
- **********************************************************************/
-
 
 #include "emu.h"
 #include "carts.h"

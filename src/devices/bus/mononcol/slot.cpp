@@ -47,25 +47,22 @@ void device_mononcol_cart_interface::rom_alloc(u32 size, int width, endianness_t
 	device().logerror("Allocating %u byte ROM region with tag '%s' (width %d)\n", size, fulltag, width);
 	m_rom = device().machine().memory().region_alloc(fulltag, size, width, endian)->base();
 	m_rom_size = size;
-
-
-
 }
 
 
 
 //**************************************************************************
-//  mononcol_slot_device
+//  mononcol_cartslot_device
 //**************************************************************************
 
-mononcol_slot_device::mononcol_slot_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock) :
+mononcol_cartslot_device::mononcol_cartslot_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_rom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_mononcol_cart_interface>(mconfig, *this),
 	m_interface(nullptr),
 	m_default_card("rom"),
 	m_extensions("bin"),
-	m_width(MONONCOL_ROM8_WIDTH),
+	m_width(1),
 	m_endianness(ENDIANNESS_LITTLE),
 	m_cart(nullptr),
 	m_device_image_load(*this),
@@ -75,15 +72,15 @@ mononcol_slot_device::mononcol_slot_device(machine_config const &mconfig, device
 
 
 mononcol_cartslot_device::mononcol_cartslot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	mononcol_slot_device(mconfig, MONONCOL_CARTSLOT, tag, owner, clock)
+	mononcol_cartslot_device(mconfig, MONONCOL_CARTSLOT, tag, owner, clock)
 {
 }
 
-mononcol_slot_device::~mononcol_slot_device()
+mononcol_cartslot_device::~mononcol_cartslot_device()
 {
 }
 
-void mononcol_slot_device::device_start()
+void mononcol_cartslot_device::device_start()
 {
 	m_cart = get_card_device();
 	m_device_image_load.resolve();
@@ -95,7 +92,7 @@ void mononcol_slot_device::device_start()
  call load
  -------------------------------------------------*/
 
-image_init_result mononcol_slot_device::call_load()
+image_init_result mononcol_cartslot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -123,7 +120,7 @@ image_init_result mononcol_slot_device::call_load()
  call_unload
  -------------------------------------------------*/
 
-void mononcol_slot_device::call_unload()
+void mononcol_cartslot_device::call_unload()
 {
 	if (!m_device_image_unload.isnull())
 		return m_device_image_unload(*this);
@@ -134,7 +131,7 @@ void mononcol_slot_device::call_unload()
  get default card software
  -------------------------------------------------*/
 
-std::string mononcol_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
+std::string mononcol_cartslot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
 	return software_get_default_slot(m_default_card);
 }
@@ -152,7 +149,7 @@ std::string mononcol_slot_device::get_default_card_software(get_default_card_sof
  for fullpath and for softlist
  -------------------------------------------------*/
 
-u32 mononcol_slot_device::common_get_size(char const *region)
+u32 mononcol_cartslot_device::common_get_size(char const *region)
 {
 	// if we are loading from softlist, you have to specify a region
 	assert(!loaded_through_softlist() || (region != nullptr));
@@ -165,7 +162,7 @@ u32 mononcol_slot_device::common_get_size(char const *region)
  for fullpath and for softlist
  -------------------------------------------------*/
 
-void mononcol_slot_device::common_load_rom(u8 *ROM, u32 len, char const *region)
+void mononcol_cartslot_device::common_load_rom(u8 *ROM, u32 len, char const *region)
 {
 	// basic sanity check
 	assert((ROM != nullptr) && (len > 0));

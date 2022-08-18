@@ -1,10 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-/**********************************************************************
-
-    Generic ROM/RAM socket slots
-
-**********************************************************************/
 
 #ifndef MAME_BUS_MONONCOL_CARTS_H
 #define MAME_BUS_MONONCOL_CARTS_H

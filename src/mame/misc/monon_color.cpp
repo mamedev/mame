@@ -93,7 +93,7 @@ protected:
 private:
 
 
-	required_device<mononcol_slot_device> m_cart;
+	required_device<mononcol_cartslot_device> m_cart;
 	required_device<ax208_cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -894,7 +894,7 @@ void monon_color_state::out4_w(uint8_t data)
 void monon_color_state::monon_color(machine_config &config)
 {
 	/* basic machine hardware */
-	AX208(config, m_maincpu, 96000000/2);
+	AX208(config, m_maincpu, 96000000/2); // divider is not correct, need to check if this is configured to run at full speed
 	m_maincpu->port_in_cb<0>().set(FUNC(monon_color_state::in0_r));
 	m_maincpu->port_in_cb<1>().set(FUNC(monon_color_state::in1_r));
 	m_maincpu->port_in_cb<2>().set(FUNC(monon_color_state::in2_r));
@@ -912,6 +912,9 @@ void monon_color_state::monon_color(machine_config &config)
 	m_maincpu->dac_out_cb<1>().set(FUNC(monon_color_state::dacout1_w));
 
 	/* video hardware */
+
+	// is this a 3:4 (true vertical) 240x320 screen rotated on its side?
+	// the scan direction for drawing is highly unusual
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(120);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -925,7 +928,7 @@ void monon_color_state::monon_color(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.500); // should this be in the AX208 device?
-
+	
 	mononcol_cartslot_device &cartslot(MONONCOL_CARTSLOT(config, "cartslot", mononcol_plain_slot));
 	cartslot.set_must_be_loaded(true);
 
