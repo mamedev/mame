@@ -12,7 +12,6 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(MONONCOL_SOCKET, mononcol_socket_device, "mononcol_socket", "Monon Color Socket")
 DEFINE_DEVICE_TYPE(MONONCOL_CARTSLOT, mononcol_cartslot_device, "mononcol_cartslot", "Monon Color Cartridge Slot")
 
 
@@ -46,7 +45,7 @@ void device_mononcol_cart_interface::rom_alloc(u32 size, int width, endianness_t
 	std::string fulltag(tag);
 	fulltag.append(MONONCOL_ROM_REGION_TAG);
 	device().logerror("Allocating %u byte ROM region with tag '%s' (width %d)\n", size, fulltag, width);
-	m_rom = device().machine().memory().region_alloc(fulltag.c_str(), size, width, endian)->base();
+	m_rom = device().machine().memory().region_alloc(fulltag, size, width, endian)->base();
 	m_rom_size = size;
 
 
@@ -74,10 +73,6 @@ mononcol_slot_device::mononcol_slot_device(machine_config const &mconfig, device
 {
 }
 
-mononcol_socket_device::mononcol_socket_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	mononcol_slot_device(mconfig, MONONCOL_SOCKET, tag, owner, clock)
-{
-}
 
 mononcol_cartslot_device::mononcol_cartslot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	mononcol_slot_device(mconfig, MONONCOL_CARTSLOT, tag, owner, clock)

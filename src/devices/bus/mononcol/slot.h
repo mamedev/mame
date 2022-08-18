@@ -66,18 +66,12 @@ public:
 	template <typename... T> void set_device_load(T &&... args) { m_device_image_load.set(std::forward<T>(args)...); }
 	template <typename... T> void set_device_unload(T &&... args) { m_device_image_unload.set(std::forward<T>(args)...); }
 
-	void set_interface(char const *interface) { m_interface = interface; }
-	void set_default_card(char const *def) { m_default_card = def; }
-	void set_extensions(char const *exts) { m_extensions = exts; }
-	void set_width(int width) { m_width = width; }
-	void set_endian(endianness_t end) { m_endianness = end; }
-
 	// device_image_interface implementation
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 	virtual bool is_reset_on_load() const noexcept override { return true; }
-	virtual char const *image_interface() const noexcept override { return m_interface; }
-	virtual char const *file_extensions() const noexcept override { return m_extensions; }
+	virtual char const *image_interface() const noexcept override { return "monon_color_cart"; }
+	virtual char const *file_extensions() const noexcept override { return "bin"; }
 
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
@@ -91,19 +85,15 @@ public:
 	{
 		if (!m_cart)
 			return nullptr;
-		else if (!user_loadable())
-			return m_cart->get_region_base();
-		else
-			return m_cart->get_rom_base();
+
+		return m_cart->get_rom_base();
 	}
 	u32 get_rom_size()
 	{
 		if (!m_cart)
 			return 0U;
-		else if (!user_loadable())
-			return m_cart->get_region_size();
-		else
-			return m_cart->get_rom_size();
+
+		return m_cart->get_rom_size();
 	}
 
 	uint8_t read()
@@ -146,38 +136,15 @@ protected:
 	unload_delegate m_device_image_unload;
 };
 
-class mononcol_socket_device : public mononcol_slot_device
-{
-public:
-	template <typename T>
-	mononcol_socket_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *intf, char const *exts = nullptr)
-		: mononcol_socket_device(mconfig, tag, owner, u32(0))
-	{
-		opts(*this);
-		set_fixed(false);
-		set_interface(intf);
-		if (exts)
-			set_extensions(exts);
-	}
-
-	mononcol_socket_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
-
-	virtual const char *image_type_name() const noexcept override { return "romimage"; }
-	virtual const char *image_brief_type_name() const noexcept override { return "rom"; }
-};
-
 class mononcol_cartslot_device : public mononcol_slot_device
 {
 public:
 	template <typename T>
-	mononcol_cartslot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *intf, char const *exts = nullptr)
+	mononcol_cartslot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts)
 		: mononcol_cartslot_device(mconfig, tag, owner, u32(0))
 	{
 		opts(*this);
 		set_fixed(false);
-		set_interface(intf);
-		if (exts)
-			set_extensions(exts);
 	}
 
 	mononcol_cartslot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
@@ -188,7 +155,6 @@ public:
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(MONONCOL_SOCKET, mononcol_socket_device)
 DECLARE_DEVICE_TYPE(MONONCOL_CARTSLOT, mononcol_cartslot_device)
 
 #endif // MAME_BUS_MONONCOL_SLOT_H

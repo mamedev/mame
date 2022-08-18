@@ -926,8 +926,7 @@ void monon_color_state::monon_color(machine_config &config)
 
 	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.500); // should this be in the AX208 device?
 
-	mononcol_cartslot_device &cartslot(MONONCOL_CARTSLOT(config, "cartslot", mononcol_plain_slot, "monon_color_cart", "bin"));
-	cartslot.set_width(MONONCOL_ROM8_WIDTH);
+	mononcol_cartslot_device &cartslot(MONONCOL_CARTSLOT(config, "cartslot", mononcol_plain_slot));
 	cartslot.set_must_be_loaded(true);
 
 	/* software lists */
