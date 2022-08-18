@@ -500,7 +500,7 @@ void monon_color_state::get_sound_command_bit(uint8_t bit)
 
 			if (m_sound_bitpos == 17)
 			{
-				//LOGMASKED(LOG_SOUNDMCUCOMMS, "%s: sent sound word %04x to MCU\n", machine().describe_context().c_str(), m_sound_latch);
+				//LOGMASKED(LOG_SOUNDMCUCOMMS, "%s: sent sound word %04x to MCU\n", machine().describe_context(), m_sound_latch);
 				m_sound_bitpos = 0;
 
 				switch (m_sound_latch & 0xf000)
@@ -512,12 +512,12 @@ void monon_color_state::get_sound_command_bit(uint8_t bit)
 					break;
 
 				case 0x2000:
-					LOGMASKED(LOG_SOUNDMCUCOMMS, "2-00x unknown %04x\n", m_sound_latch & 0x0fff); // written with 2001 before restoring muted sound
+					LOGMASKED(LOG_SOUNDMCUCOMMS, "2-00x play music %04x\n", m_sound_latch & 0x0fff);
 					m_sound_latch = 0;
 					break;
 
 				case 0x3000:
-					LOGMASKED(LOG_SOUNDMCUCOMMS, "3-000 stop all / mute %04x\n", m_sound_latch & 0x0fff);
+					LOGMASKED(LOG_SOUNDMCUCOMMS, "3-000 stop all %04x\n", m_sound_latch & 0x0fff);
 					m_sound_latch = 0;
 					break;
 
@@ -527,7 +527,8 @@ void monon_color_state::get_sound_command_bit(uint8_t bit)
 					break;
 
 				case 0xa000:
-					LOGMASKED(LOG_SOUNDMCUCOMMS, "a-xxx play? status return wanted %04x\n", m_sound_latch & 0x0fff);
+					// spams a variable amount of this between scenes, not consistent, waiting for something?
+					LOGMASKED(LOG_SOUNDMCUCOMMS, "a-xxx status return wanted %04x\n", m_sound_latch & 0x0fff);
 					m_sound_direction_iswrite = false;
 					m_sound_bits_in_needed = 9;
 					m_sound_latch = 0xff; // return an 8-bit value?
