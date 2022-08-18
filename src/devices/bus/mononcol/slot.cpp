@@ -58,11 +58,8 @@ mononcol_cartslot_device::mononcol_cartslot_device(machine_config const &mconfig
 	device_t(mconfig, type, tag, owner, clock),
 	device_rom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_mononcol_cart_interface>(mconfig, *this),
-	m_interface(nullptr),
 	m_default_card("rom"),
 	m_extensions("bin"),
-	m_width(1),
-	m_endianness(ENDIANNESS_LITTLE),
 	m_cart(nullptr),
 	m_device_image_load(*this),
 	m_device_image_unload(*this)
@@ -101,7 +98,7 @@ image_init_result mononcol_cartslot_device::call_load()
 		{
 			u32 len = common_get_size("rom");
 
-			rom_alloc(len, m_width, m_endianness);
+			rom_alloc(len, 1, ENDIANNESS_LITTLE);
 			common_load_rom(get_rom_base(), len, "rom");
 
 			m_cart->set_spi_region(get_rom_base());

@@ -125,11 +125,8 @@ protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 
-	char const *m_interface;
 	char const *m_default_card;
 	char const *m_extensions;
-	int m_width;
-	endianness_t m_endianness;
 	device_mononcol_cart_interface *m_cart;
 	load_delegate m_device_image_load;
 	unload_delegate m_device_image_unload;
