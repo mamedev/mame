@@ -10,6 +10,9 @@
 
 DEFINE_DEVICE_TYPE(MONONCOL_ROM_PLAIN,    mononcol_rom_plain_device,    "mononcol_rom_plain",    "Monon Color ROM cartridge")
 
+void mononcol_rom_device::device_start()
+{
+}
 
 mononcol_rom_device::mononcol_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock), device_mononcol_cart_interface(mconfig, *this)
