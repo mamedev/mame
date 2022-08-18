@@ -8861,13 +8861,7 @@ void galaxian_state::init_bigkonggx()
 
 	// descramble the content of each 0x100 block
 	for (int i = 0; i < len; i += 256)
-	{
-		for (int j = 0; j < (256 / 2); j++)
-		{
-			using std::swap;
-			swap(romdata[i + j], romdata[i + (j ^ 0xff)]);
-		}
-	}
+		std::reverse(&romdata[i], &romdata[i + 256]);
 }
 
 void fourplay_state::init_fourplay()
