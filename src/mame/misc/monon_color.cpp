@@ -125,6 +125,12 @@ private:
 		return m_cart->read();
 	}
 
+	uint8_t spibuf_direct_r()
+	{
+		m_lastspi = m_cart->read();
+		return m_lastspi;
+	}
+
 	DECLARE_WRITE_LINE_MEMBER(spidir_w)
 	{
 		m_cart->dir_w(state);
@@ -158,6 +164,8 @@ private:
 	uint8_t m_out2data;
 	uint8_t m_out1data;
 	uint8_t m_out0data;
+
+	uint8_t m_lastspi;
 
 	uint8_t m_curpal[0x800 * 3];
 };
@@ -488,6 +496,20 @@ void monon_color_state::get_sound_command_bit(uint8_t bit)
 		// first bit isn't part of the data? but isn't 0/1 depending on if it's a read/write eiter?
 		//LOGMASKED(LOG_SOUNDMCUCOMMS, "%s: started read/write command\n", machine().describe_context());
 		m_sound_bitpos++;
+
+		if (!m_sound_direction_iswrite)
+		{
+			// status reads want to return the last thing read by the CPU from the SPI
+			// how does this even work? the MCU is assumed to not have SPI access
+			// furthermore, it would have to read the same byte the CPU just read?
+			//
+			// if it doesn't get this, it will loop until by chance it gets the same
+			// value, which results in random delays (eg. when moving the volume
+			// slider from 0 to any other value)
+			m_sound_latch = m_lastspi;
+			//logerror("m_sound_latch set to %02x\n", m_sound_latch);
+
+		}
 	}
 	else
 	{
@@ -527,11 +549,12 @@ void monon_color_state::get_sound_command_bit(uint8_t bit)
 					break;
 
 				case 0xa000:
-					// spams a variable amount of this between scenes, not consistent, waiting for something?
+					// spams a variable amount of this between scenes
+					// waits for value from SPI ROM?! (always a value from the block e000 - efff)
+					// is this actually a 'read from SPI block e000-efff' command?
 					LOGMASKED(LOG_SOUNDMCUCOMMS, "a-xxx status return wanted %04x\n", m_sound_latch & 0x0fff);
 					m_sound_direction_iswrite = false;
 					m_sound_bits_in_needed = 9;
-					m_sound_latch = 0xff; // return an 8-bit value?
 					break;
 
 				default:
@@ -545,8 +568,8 @@ void monon_color_state::get_sound_command_bit(uint8_t bit)
 		}
 		else
 		{
-			m_sound_response_bit = m_sound_latch & 0x01;
-			m_sound_latch >>= 1;
+			m_sound_response_bit = (m_sound_latch & 0x80)>>7;
+			m_sound_latch <<= 1;
 
 			m_sound_bitpos++;
 
@@ -877,7 +900,7 @@ void monon_color_state::monon_color(machine_config &config)
 	m_maincpu->port_out_cb<2>().set(FUNC(monon_color_state::out2_w));
 	m_maincpu->port_out_cb<3>().set(FUNC(monon_color_state::out3_w));
 	m_maincpu->port_out_cb<4>().set(FUNC(monon_color_state::out4_w));
-	m_maincpu->spi_in_cb().set(FUNC(monon_color_state::spibuf_r));
+	m_maincpu->spi_in_cb().set(FUNC(monon_color_state::spibuf_direct_r));
 	m_maincpu->spi_out_cb().set(FUNC(monon_color_state::spibuf_w));
 	m_maincpu->spi_out_dir_cb().set(FUNC(monon_color_state::spidir_w));
 	m_maincpu->dac_out_cb<0>().set(FUNC(monon_color_state::dacout0_w));
