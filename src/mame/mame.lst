@@ -31204,6 +31204,9 @@ mstation                        //
 @source:msx/msx.cpp
 ax150                           //
 ax170                           //
+ax200                           //
+ax200m                          //
+ax230                           //
 ax350                           //
 ax370                           //
 bruc100                         //

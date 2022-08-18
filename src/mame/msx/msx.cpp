@@ -22,6 +22,7 @@
 **
 **
 ** Todo/known issues:
+** - ax230: Builtin games not emulated
 ** - piopx7/piopx7uk/piopxv60: Pioneer System Remote (home entertainment/Laserdisc control) not implemented
 ** - piopx7: Dump is from a PAL (EU/AU) machine, we have no known good dumps from JP or US NTSC machines
 ** - spc800: Haven't been able to test operation of the han rom yet
@@ -93,10 +94,6 @@
 This following list is probably incomplete. Corrections are welcome.
 Entries marked with * still need to be processed.
 
-Al Alamiah AX-150 - MSX1 - ax150
-Al Alamiah AX-170 - MSX1 - ax170
-Al Alamiah AX-350II - MSX2 - ax350
-Al Alamiah AX-370 - MSX2 - ax370
 *Ascii MSXPLAYer 2003
 *Ascii One Chip MSX
 Canon V-8 - MSX1 - canonv8
@@ -319,6 +316,16 @@ Notes:
 
 Pioneer PX-7UK - MSX1 - piopx7uk
 Pioneer PX-V60 - MSX1 - piopxv60
+*Sakhr AH-200 - MSX1
+*Sakhr AX-100 - MSX1
+Sakhr AX-150 - MSX1 - ax150
+Sakhr AX-170 - MSX1 - ax170
+Sakhr AX-200 (Arabic/English) - MSX1 - ax200
+*Sakhr AX-200 (Arabic/French) - MSX1
+Sakhr AX-200M - MSX1 - ax200m
+Sakhr AX-230 - MSX1 - ax230
+Sakhr AX-350II - MSX2 - ax350
+Sakhr AX-370 - MSX2 - ax370
 Samsung SPC-800 MSX1 - spc800
 Sanyo MPC-64 - MSX1 - mpc64
 Sanyo MPC-100 - MSX1 - mpc100
@@ -620,7 +627,6 @@ public:
 		, m_speaker(*this, "speaker")
 		, m_mainirq(*this, "mainirq")
 		, m_screen(*this, "screen")
-		, m_region_maincpu(*this, "maincpu")
 		, m_region_kanji(*this, "kanji")
 		, m_io_joy(*this, "JOY%u", 0U)
 		, m_io_dsw(*this, "DSW")
@@ -652,6 +658,7 @@ public:
 		m_empty_slot.set_io_space(m_maincpu, AS_IO);
 	}
 
+	void ax230(machine_config &config);
 	void hc6(machine_config &config);
 	void hb75d(machine_config &config);
 	void dpc100(machine_config &config);
@@ -789,8 +796,9 @@ public:
 	void fpc500(machine_config &config);
 
 protected:
-	void msx_base(machine_config &config, XTAL xtal, int cpu_divider);
+	template<typename AY8910Type> void msx_base(AY8910Type &ay8910_type, machine_config &config, XTAL xtal, int cpu_divider);
 	template<typename VDPType> void msx1(VDPType &vdp_type, machine_config &config);
+	template<typename VDPType, typename AY8910Type> void msx1(VDPType &vdp_type, AY8910Type &ay8910_type, machine_config &config);
 
 	void msx_fd1793(machine_config &config);
 	void msx_wd2793_force_ready(machine_config &config);
@@ -893,7 +901,6 @@ protected:
 	required_device<speaker_device> m_speaker;
 	required_device<input_merger_any_high_device> m_mainirq;
 	required_device<screen_device> m_screen;
-	required_memory_region m_region_maincpu;
 	optional_memory_region m_region_kanji;
 	required_ioport_array<2> m_io_joy;
 	required_ioport m_io_dsw;
@@ -952,6 +959,25 @@ private:
 		m_bruc100_firm->select_bank(BIT(data, 7));
 		m_cent_ctrl_out->write(data);
 	}
+};
+
+class msx1_v9938_state : public msx_state
+{
+public:
+	msx1_v9938_state(const machine_config &mconfig, device_type type, const char *tag)
+		: msx_state(mconfig, type, tag)
+		, m_v9938(*this, "v9938")
+	{
+	}
+
+	void ax200(machine_config &mconfig);
+	void ax200m(machine_config &mconfig);
+
+private:
+	template<typename AY8910Type> void msx1_v9938_pal(AY8910Type &ay8910_type, machine_config &config);
+	void io_map(address_map &map);
+
+	optional_device<v9938_device> m_v9938;
 };
 
 class msx2_state : public msx_state
@@ -1148,6 +1174,25 @@ void bruc100_state::io_map(address_map &map)
 {
 	msx_io_map(map);
 	map(0x90, 0x90).w(FUNC(bruc100_state::port90_w));
+}
+
+void msx1_v9938_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	// 0x7c - 0x7d : MSX-MUSIC/FM-PAC write port. Handlers will be installed if MSX-MUSIC is present in a system
+	if (m_hw_def.has_printer_port())
+	{
+		map(0x90, 0x90).r(m_cent_status_in, FUNC(input_buffer_device::read));
+		map(0x90, 0x90).w(m_cent_ctrl_out, FUNC(output_latch_device::write));
+		map(0x91, 0x91).w(m_cent_data_out, FUNC(output_latch_device::write));
+	}
+	map(0xa0, 0xa7).rw(m_ay8910, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
+	map(0xa8, 0xab).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x98, 0x9b).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
+	map(0xd8, 0xd9).w(FUNC(msx1_v9938_state::kanji_w));
+	map(0xd9, 0xd9).r(FUNC(msx1_v9938_state::kanji_r));
+	// 0xfc - 0xff : Memory mapper I/O ports. I/O handlers will be installed if a memory mapper is present in a system
 }
 
 void msx2_state::msx2_io_map(address_map &map)
@@ -2379,7 +2424,8 @@ void msx2_state::msx2_64kb_vram(machine_config &config)
 	m_v9938->set_vram_size(0x10000);
 }
 
-void msx_state::msx_base(machine_config &config, XTAL xtal, int cpu_divider)
+template<typename AY8910Type>
+void msx_state::msx_base(AY8910Type &ay8910_type, machine_config &config, XTAL xtal, int cpu_divider)
 {
 	// basic machine hardware
 	Z80(config, m_maincpu, xtal / cpu_divider);         // 3.579545 MHz
@@ -2400,7 +2446,7 @@ void msx_state::msx_base(machine_config &config, XTAL xtal, int cpu_divider)
 	SPEAKER(config, m_speaker).front_center();
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, m_speaker, 0.1);
 
-	AY8910(config, m_ay8910, xtal / cpu_divider / 2);
+	ay8910_type(config, m_ay8910, xtal / cpu_divider / 2);
 	m_ay8910->set_flags(AY8910_SINGLE_OUTPUT);
 	m_ay8910->port_a_read_callback().set(FUNC(msx2_state::psg_port_a_r));
 	m_ay8910->port_b_read_callback().set(FUNC(msx2_state::psg_port_b_r));
@@ -2436,7 +2482,13 @@ void msx_state::msx_base(machine_config &config, XTAL xtal, int cpu_divider)
 template<typename VDPType>
 void msx_state::msx1(VDPType &vdp_type, machine_config &config)
 {
-	msx_base(config, 10.738635_MHz_XTAL, 3);
+	msx1(vdp_type, AY8910, config);
+}
+
+template<typename VDPType, typename AY8910Type>
+void msx_state::msx1(VDPType &vdp_type, AY8910Type &ay8910_type, machine_config &config)
+{
+	msx_base(ay8910_type, config, 10.738635_MHz_XTAL, 3);
 
 	m_maincpu->set_addrmap(AS_IO, &msx_state::msx_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(msx_state::msx_interrupt)); /* Needed for mouse updates */
@@ -2463,9 +2515,23 @@ void msx_state::msx1(VDPType &vdp_type, machine_config &config)
 	}
 }
 
+template<typename AY8910Type>
+void msx1_v9938_state::msx1_v9938_pal(AY8910Type &ay8910_type, machine_config &config)
+{
+	msx_base(ay8910_type, config, 21.477272_MHz_XTAL, 6);
+
+	m_maincpu->set_addrmap(AS_IO, &msx1_v9938_state::io_map);
+
+	// video hardware
+	V9938(config, m_v9938, 21.477272_MHz_XTAL);
+	m_v9938->set_screen_pal(m_screen);
+	m_v9938->set_vram_size(0x4000);
+	m_v9938->int_cb().set(m_mainirq, FUNC(input_merger_device::in_w<0>));
+}
+
 void msx2_state::msx2_base(machine_config &config)
 {
-	msx_base(config, 21.477272_MHz_XTAL, 6);
+	msx_base(AY8910, config, 21.477272_MHz_XTAL, 6);
 
 	// real time clock
 	RP5C01(config, m_rtc, 32.768_kHz_XTAL);
@@ -2590,54 +2656,6 @@ void msx2_state::turbor(machine_config &config)
 
 /********************************  MSX 1 **********************************/
 
-/* MSX - Al Alamiah AX-150 */
-
-ROM_START(ax150)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("ax150bios.rom", 0x0000, 0x8000, CRC(bd95c436) SHA1(5e094fca95ab8e91873ee372a3f1239b9a48a48d))
-	ROM_LOAD("ax150arab.rom", 0x8000, 0x8000, CRC(339cd1aa) SHA1(0287b2ec897b9196788cd9f10c99e1487d7adbbb))
-ROM_END
-
-void msx_state::ax150(machine_config &config)
-{
-	// AY8910/YM2149?
-	// FDC: None, 0 drives
-	// 2 Cartridge slots
-
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
-	add_internal_slot(config, MSX_SLOT_ROM, "arab", 1, 0, 1, 2, "maincpu", 0x8000);
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 2, 2); /* 32KB RAM */
-
-	msx1(TMS9929A, config);
-}
-
-/* MSX - Al Alamiah AX-170 */
-
-ROM_START (ax170)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("ax170bios.rom", 0x0000, 0x8000, CRC(bd95c436) SHA1(5e094fca95ab8e91873ee372a3f1239b9a48a48d))
-	ROM_LOAD("ax170arab.rom", 0x8000, 0x8000, CRC(339cd1aa) SHA1(0287b2ec897b9196788cd9f10c99e1487d7adbbb))
-ROM_END
-
-void msx_state::ax170(machine_config &config)
-{
-	// AY8910/YM2149?
-	// FDC: None, 0 drives
-	// 2 Cartridge slots
-	// T7937 (in ax170mk2)
-
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
-	add_internal_slot(config, MSX_SLOT_ROM, "arab", 1, 0, 1, 2, "maincpu", 0x8000);
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 0, 4); /* 64KB RAM */
-
-	msx1(TMS9929A, config);
-}
-
-
 /* MSX - Al Fateh 100 - rebranded Sakhr / Al Alamiah AX-170, dump needed to verify */
 
 /* MSX - Al Fateh 123 - rebranded Sakhr / Al Alamiah AX-230, dump needed to verify */
@@ -2660,37 +2678,39 @@ void msx_state::ax170(machine_config &config)
 /* MSX - Bawareth Perfect MSX1 (DPC-200CD) */
 
 ROM_START(perfect1)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("perfect1bios.rom", 0x0000, 0x8000, CRC(a317e6b4) SHA1(e998f0c441f4f1800ef44e42cd1659150206cf79))
-	ROM_LOAD("cpc-200bw_v1_0", 0x8000, 0x8000, CRC(d6373270) SHA1(29a9169b605b5881e4a15fcfd65209a4e8679285))
+
+	ROM_REGION(0x8000, "firmware", 0)
+	ROM_SYSTEM_BIOS(0, "v1990", "1990 Firmware")
+	ROMX_LOAD("cpc-200bw_v1_0", 0x0000, 0x8000, CRC(d6373270) SHA1(29a9169b605b5881e4a15fcfd65209a4e8679285), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "v1987", "1987 Firmware (v3.21)")
+	ROMX_LOAD("perfect1arab.rom", 0x0000, 0x8000, CRC(6db04a4d) SHA1(01012a0e2738708861f66b6921b2e2108f2edb54), ROM_BIOS(1))
 ROM_END
 
 void msx_state::perfect1(machine_config &config)
 {
-	// 2 different firmwares
-	// 1987 - English & Arabic
-	// 1990 - Arabic only
 	// GSS Z8400A PS cpu
 	// AY-3-8910
-	// TMS9219
+	// TMS9129
 	// DW64MX1
 	// FDC: None, 0 dribes
 	// 1 Cartridge slot
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
-	add_internal_slot(config, MSX_SLOT_ROM, "arab", 0, 1, 1, 2, "maincpu", 0x8000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 0, 1, 1, 2, "firmware", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 2, 0, 4); // 64KB RAM
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	// expansion slot in slot #2
 
-	msx1(TMS9129, config);
+	msx1(TMS9129, AY8910, config);
 }
 
 
 /* MSX - Canon V-8 */
 
 ROM_START(canonv8)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("v8bios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
 ROM_END
 
@@ -2702,19 +2722,19 @@ void msx_state::canonv8(machine_config &config)
 	// 1 Cartridge slots
 	// No printer port
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 3, 1);
 
 	m_hw_def.has_printer_port(false);
-	msx1(TMS9118, config);
+	msx1(TMS9118, YM2149, config);
 }
 
 
 /* MSX - Canon V-10 */
 
 ROM_START(canonv10)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("v10bios.rom", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
 ROM_END
 
@@ -2725,18 +2745,18 @@ void msx_state::canonv10(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1);   /* 16KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 
-	msx1(TMS9918A, config);
+	msx1(TMS9918A, YM2149, config);
 }
 
 /* MSX - Canon V-20 */
 
 ROM_START(canonv20)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("v20bios.rom", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
 ROM_END
 
@@ -2749,18 +2769,18 @@ void msx_state::canonv20(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
 
-	msx1(TMS9918A, config);
+	msx1(TMS9918A, YM2149, config);
 }
 
 /* MSX - Canon V-20E */
 
 ROM_START(canonv20e)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("3256m67-5a3_z-2_uk.u20", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
 ROM_END
 
@@ -2773,39 +2793,39 @@ void msx_state::canonv20e(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
 
-	msx1(TMS9929A, config);
+	msx1(TMS9929A, YM2149, config);
 }
 
 /* MSX - Canon V-20F */
 
 ROM_START(canonv20f)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("v20fbios.rom", 0x0000, 0x8000, CRC(e0e894b7) SHA1(d99eebded5db5fce1e072d08e642c0909bc7efdd))
 ROM_END
 
 /* MSX - Canon V-20G */
 
 ROM_START(canonv20g)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("v20gbios.rom", 0x0000, 0x8000, CRC(d6e704ad) SHA1(d67be6d7d56d7229418f4e122f2ec27990db7d19))
 ROM_END
 
 /* MSX - Canon V-20S */
 
 ROM_START(canonv20s)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("v20sbios.rom", 0x0000, 0x8000, CRC(c72b186e) SHA1(9fb289ea5c11d497ee00703f64e82575d1c59923))
 ROM_END
 
 /* MSX - Casio MX-10 */
 
 ROM_START(mx10)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("3256d19-5k3_z-1.g2", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
 ROM_END
 
@@ -2817,18 +2837,18 @@ void msx_state::mx10(machine_config &config)
 	// 1 Cartridge slot
 	// 1 Expansion slot for KB-10 to add a printer port and 2 more cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1); // 16KB RAM
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 
 	m_hw_def.has_cassette(false).has_printer_port(false);
-	msx1(TMS9118, config);
+	msx1(TMS9118, AY8910, config);
 }
 
 /* MSX - Casio MX-15 */
 
 ROM_START(mx15)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("mx15bios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
 ROM_END
 
@@ -2840,18 +2860,18 @@ void msx_state::mx15(machine_config &config)
 	// 1 Cartridge slot
 	// 1 Expansion slot for KB-15 to add a printer port and 2 more cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1); // 16KB RAM
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 
 	m_hw_def.has_printer_port(false);
-	msx1(TMS9928A, config);
+	msx1(TMS9928A, AY8910, config);
 }
 
 /* MSX - Casio MX-101 */
 
 ROM_START(mx101)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("3256d19-5k3_z-1", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
 ROM_END
 
@@ -2863,18 +2883,18 @@ void msx_state::mx101(machine_config &config)
 	// 1 Cartridge slots
 	// 1 Expansion slot for KB-10 to add a printer port and 2 more cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1); // 16KB RAM
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 
 	m_hw_def.has_cassette(false).has_printer_port(false);
-	msx1(TMS9118, config);
+	msx1(TMS9118, AY8910, config);
 }
 
 /* MSX - Casio PV-7 */
 
 ROM_START(pv7)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("pv7bios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
 ROM_END
 
@@ -2888,7 +2908,7 @@ void msx_state::pv7(machine_config &config)
 	// 1 Expansion slot for KB-7 to add a printer port, 2 more cartridge slots, and 8KB RAM
 	// Z80: uPD780C-1
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1).force_start_address(0xe000);   /* 8KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 
@@ -2899,7 +2919,7 @@ void msx_state::pv7(machine_config &config)
 /* MSX - Casio PV-16 */
 
 ROM_START(pv16)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("3256d19-5k3_z-1", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
 ROM_END
 
@@ -2912,12 +2932,12 @@ void msx_state::pv16(machine_config &config)
 	// No printer port
 	// 1 Expansion slot for KB-7 to add a printer port, 2 more cartridge slots, and 8KB RAM
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1);   /* 16KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 
 	m_hw_def.has_printer_port(false);
-	msx1(TMS9118, config);
+	msx1(TMS9118, AY8910, config);
 }
 
 /* MSX - CE-TEC MPC-80, German version of Daewoo DPC-200, dump needed to verify */
@@ -2927,10 +2947,12 @@ void msx_state::pv16(machine_config &config)
 /* MSX - Daewoo CPC-88 */
 
 ROM_START(cpc88)
-	ROM_REGION(0xc000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("88bios.rom", 0x0000, 0x8000, CRC(3ab0cd3b) SHA1(171b587bd5a947a13f3114120b6e7baca3b57d78))
-	ROM_LOAD("88han.rom",  0x8000, 0x2000, CRC(938db440) SHA1(d41676fde0a3047792f93c4a41509b8749e55e74))
-	ROM_RELOAD(0xa000, 0x2000)
+
+	ROM_REGION(0x4000, "hangul", 0)
+	ROM_LOAD("88han.rom",  0x0000, 0x2000, CRC(938db440) SHA1(d41676fde0a3047792f93c4a41509b8749e55e74))
+	ROM_RELOAD(0x2000, 0x2000)
 ROM_END
 
 void msx_state::cpc88(machine_config &config)
@@ -2941,21 +2963,23 @@ void msx_state::cpc88(machine_config &config)
 	// 0 Cartridge slots
 	// Expansion slot allows addition of cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
-	add_internal_slot(config, MSX_SLOT_ROM, "han", 0, 0, 2, 1, "maincpu", 0x8000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "hangul", 0, 0, 2, 1, "hangul", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);   /* 64KB RAM */
 
 	m_hw_def.has_printer_port(false);
-	msx1(TMS9928A, config);
+	msx1(TMS9928A, AY8910, config);
 }
 
 /* MSX - Daewoo DPC-100 */
 
 ROM_START(dpc100)
-	ROM_REGION(0xc000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("100bios.rom", 0x0000, 0x8000, CRC(3ab0cd3b) SHA1(171b587bd5a947a13f3114120b6e7baca3b57d78))
+
+	ROM_REGION(0x4000, "hangul", 0)
 	// should be 0x2000?
-	ROM_LOAD("100han.rom",  0x8000, 0x4000, CRC(97478efb) SHA1(4421fa2504cbce18f7c84b5ea97f04e017007f07))
+	ROM_LOAD("100han.rom",  0x0000, 0x4000, CRC(97478efb) SHA1(4421fa2504cbce18f7c84b5ea97f04e017007f07))
 ROM_END
 
 void msx_state::dpc100(machine_config &config)
@@ -2966,22 +2990,24 @@ void msx_state::dpc100(machine_config &config)
 	// 1 Cartridge slot
 	// 1 Expansion slot
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
-	add_internal_slot(config, MSX_SLOT_ROM, "han", 0, 0, 2, 1, "maincpu", 0x8000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "hangul", 0, 0, 2, 1, "hangul", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 3, 1);   /* 16KB RAM */
 	// expansion slot is in slot #3
 
-	msx1(TMS9918A, config);
+	msx1(TMS9918A, AY8910, config);
 }
 
 /* MSX - Daewoo DPC-180 */
 
 ROM_START(dpc180)
-	ROM_REGION(0xc000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("180bios.rom", 0x0000, 0x8000, CRC(3ab0cd3b) SHA1(171b587bd5a947a13f3114120b6e7baca3b57d78))
+
+	ROM_REGION(0x4000, "hangul", 0)
 	// should be 0x2000?
-	ROM_LOAD("180han.rom",  0x8000, 0x4000, CRC(97478efb) SHA1(4421fa2504cbce18f7c84b5ea97f04e017007f07))
+	ROM_LOAD("180han.rom",  0x0000, 0x4000, CRC(97478efb) SHA1(4421fa2504cbce18f7c84b5ea97f04e017007f07))
 ROM_END
 
 void msx_state::dpc180(machine_config &config)
@@ -2991,22 +3017,24 @@ void msx_state::dpc180(machine_config &config)
 	// 1 Cartridge slot
 	// 1 Expansion slot
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
-	add_internal_slot(config, MSX_SLOT_ROM, "han", 0, 0, 2, 1, "maincpu", 0x8000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "hangul", 0, 0, 2, 1, "hangul", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);   /* 64KB RAM */
 	// Expansion slot is in slot #3
 
-	msx1(TMS9918A, config);
+	msx1(TMS9918A, AY8910, config);
 }
 
 /* MSX - Daewoo DPC-200 */
 
 ROM_START(dpc200)
-	ROM_REGION(0xc000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("200bios.rom", 0x0000, 0x8000, CRC(3ab0cd3b) SHA1(171b587bd5a947a13f3114120b6e7baca3b57d78))
+
+	ROM_REGION(0x4000, "hangul", 0)
 	// should be 0x2000?
-	ROM_LOAD("200han.rom",  0x8000, 0x4000, CRC(97478efb) SHA1(4421fa2504cbce18f7c84b5ea97f04e017007f07))
+	ROM_LOAD("200han.rom",  0x0000, 0x4000, CRC(97478efb) SHA1(4421fa2504cbce18f7c84b5ea97f04e017007f07))
 ROM_END
 
 void msx_state::dpc200(machine_config &config)
@@ -3017,19 +3045,19 @@ void msx_state::dpc200(machine_config &config)
 	// 1 Cartridge slot
 	// 1 Expansion slot
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
-	add_internal_slot(config, MSX_SLOT_ROM, "han", 0, 0, 2, 1, "maincpu", 0x8000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "hangul", 0, 0, 2, 1, "hangul", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);  /* 64KB RAM */
 	// Expansion slot is in slot #3
 
-	msx1(TMS9918A, config);
+	msx1(TMS9918A, AY8910, config);
 }
 
 /* MSX - Daewoo DPC-200E */
 
 ROM_START(dpc200e)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("dpc200ebios.rom", 0x0000, 0x8000, CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db))
 ROM_END
 
@@ -3040,12 +3068,12 @@ void msx_state::dpc200e(machine_config &config)
 	// 1 Cartridge slot
 	// 1 Expansion slot
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
 	// Expansion slot is in slot #3
 
-	msx1(TMS9129, config);
+	msx1(TMS9129, AY8910, config);
 }
 
 /* MSX - Daewoo Zemmix CPC-50 */
@@ -3053,7 +3081,7 @@ void msx_state::dpc200e(machine_config &config)
 /* MSX - Daewoo Zemmix CPC-50A */
 
 ROM_START(cpc50a)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	// HM6264LP-15 / U0422880 (ic4)
 	// GMCE? VER1.01 (ic5)
 	ROM_LOAD("50abios.rom", 0x0000, 0x8000, CRC(c3a868ef) SHA1(a08a940aa87313509e00bc5ac7494d53d8e03492))
@@ -3070,18 +3098,18 @@ void msx_state::cpc50a(machine_config &config)
 	// No cassette port
 	// No printer port
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 3, 1).force_start_address(0xe000);  /* 8KB RAM */
 
 	m_hw_def.has_cassette(false).has_printer_port(false);
-	msx1(TMS9118, config);
+	msx1(TMS9118, AY8910, config);
 }
 
 /* MSX - Daewoo Zemmix CPC-50B */
 
 ROM_START(cpc50b)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("50bbios.rom", 0x0000, 0x8000, CRC(c3a868ef) SHA1(a08a940aa87313509e00bc5ac7494d53d8e03492))
 ROM_END
 
@@ -3095,19 +3123,19 @@ void msx_state::cpc50b(machine_config &config)
 	// No cassette port
 	// No printer port
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 3, 1);  /* 16KB RAM */
 
 	m_hw_def.has_cassette(false)
 		.has_printer_port(false);
-	msx1(TMS9118, config);
+	msx1(TMS9118, AY8910, config);
 }
 
 /* MSX - Daewoo Zemmix CPC-51 */
 
 ROM_START(cpc51)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	// Sticker: CPC-51 V 1.01 (ic05)
 	ROM_LOAD("cpc-51_v_1_01.ic05", 0x0000, 0x8000, CRC(c3a868ef) SHA1(a08a940aa87313509e00bc5ac7494d53d8e03492))
 ROM_END
@@ -3123,13 +3151,13 @@ void msx_state::cpc51(machine_config &config)
 	// No cassette port
 	// No printer port
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);  /* 64KB RAM */
 
 	m_hw_def.has_cassette(false)
 		.has_printer_port(false);
-	msx1(TMS9118, config);
+	msx1(TMS9118, AY8910, config);
 }
 
 /* MSX - Daewoo Zemmix DTX-1493FW */
@@ -3137,7 +3165,7 @@ void msx_state::cpc51(machine_config &config)
 /* MSX - Dragon MSX-64 */
 
 ROM_START(dgnmsx)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("uk1msx048.ic37", 0x0000, 0x4000, CRC(24c198be) SHA1(7f8c94cb8913db32a696dec80ffc78e46693f1b7))
 	ROM_LOAD("uk2msx058.ic6",  0x4000, 0x4000, CRC(e516e7e5) SHA1(05fedd4b9bfcf4949020c79d32c4c3f03a54fb62))
 ROM_END
@@ -3149,12 +3177,12 @@ void msx_state::dgnmsx(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
 
-	msx1(TMS9129, config);
+	msx1(TMS9129, AY8910, config);
 }
 
 /* MSX - Dynadata DPC-200 */
@@ -3167,7 +3195,7 @@ void msx_state::dgnmsx(machine_config &config)
 /* MSX - Fenner DPC-200 */
 
 ROM_START(fdpc200)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("dpc200bios.rom", 0x0000, 0x8000, CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db))
 ROM_END
 
@@ -3178,18 +3206,18 @@ void msx_state::fdpc200(machine_config &config)
 	// 1 Cartridge slot
 	// 1 Expansion slot
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
 	// Expansion slot
 
-	msx1(TMS9929A, config);
+	msx1(TMS9929A, AY8910, config);
 }
 
 /* MSX - Fenner FPC-500 */
 
 ROM_START(fpc500)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("fpc500bios.rom", 0x0000, 0x8000, CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db))
 ROM_END
 
@@ -3201,18 +3229,18 @@ void msx_state::fpc500(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
 
-	msx1(TMS9929A, config);
+	msx1(TMS9929A, AY8910, config);
 }
 
 /* MSX - Fenner SPC-800 */
 
 ROM_START(fspc800)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("spc800bios.u7", 0x0000, 0x8000, CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db))
 ROM_END
 
@@ -3223,18 +3251,18 @@ void msx_state::fspc800(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
 
-	msx1(TMS9129, config);
+	msx1(TMS9129, AY8910, config);
 }
 
 /* MSX - Frael Bruc 100-1 */
 
 ROM_START(bruc100)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x10000, "mainrom", 0)
 	ROM_LOAD("v1_1_mcl", 0x0000, 0x8000, CRC(c7bc4298) SHA1(3abca440cba16ac5e162b602557d30169f77adab))
 	ROM_LOAD("f_v1_0", 0x8000, 0x2000, CRC(707a62b6) SHA1(e4ffe02abbda17986cb161c332e9e54d24fd053c))
 	ROM_RELOAD(0xa000, 0x2000)
@@ -3248,17 +3276,17 @@ void bruc100_state::bruc100(machine_config &config)
 	// 0 Cartridge slots
 	// 1 Expansion slot
 
-	add_internal_slot(config, MSX_SLOT_BRUC100, "firm", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_BRUC100, "firm", 0, 0, 0, 2, "mainrom", 0x0000);
 	// Expansion slot
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x10000);   /* 64KB RAM */
 
-	msx1(TMS9129, config);
+	msx1(TMS9129, AY8910, config);
 	m_maincpu->set_addrmap(AS_IO, &bruc100_state::io_map);
 }
 
 /* MSX - Frael Bruc 100-2 */
 ROM_START(bruc100a)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x10000, "mainrom", 0)
 	ROM_LOAD("bruc100-2bios.rom", 0x0000, 0x8000, CRC(24464a7b) SHA1(88611b54cdbb79aa5380570f3dfef8b3a1cc2057))
 	// v1.3
 	ROM_SYSTEM_BIOS(0, "v13", "v1.3 firmware")
@@ -3281,12 +3309,12 @@ void bruc100_state::bruc100a(machine_config &config)
 	// 1 Cartridge slot
 	// 1 Expansion slot
 
-	add_internal_slot(config, MSX_SLOT_BRUC100, "firm", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_BRUC100, "firm", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 1, 0, 0, 4).set_total_size(0x10000);   /* 64KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	// Expansion slot
 
-	msx1(TMS9129, config);
+	msx1(TMS9129, AY8910, config);
 	m_maincpu->set_addrmap(AS_IO, &bruc100_state::io_map);
 }
 
@@ -3294,7 +3322,7 @@ void bruc100_state::bruc100a(machine_config &config)
 /* MSX - Fujitsu FM-X */
 
 ROM_START(fmx)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	// mb62h010 ?
 	ROM_LOAD("fmxbios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
 ROM_END
@@ -3307,13 +3335,13 @@ void msx_state::fmx(machine_config &config)
 	// 1 Cartridge slot
 	// 1 "Fujitsu expansion" slot for MB22450 (to connect FM-X to FM7) or MB22451 (printer port + 16KB ram)
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1); // 16KB RAM
 	// Fujitsu expansion slot #1 in slot 1
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 
 	m_hw_def.has_printer_port(false);
-	msx1(TMS9928A, config);
+	msx1(TMS9928A, AY8910, config);
 }
 
 /* MSX - General PCT-50 */
@@ -3325,10 +3353,12 @@ void msx_state::fmx(machine_config &config)
 /* MSX - Goldstar FC-80U */
 
 ROM_START(gsfc80u)
-	ROM_REGION(0xc000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("fc80ubios.rom", 0x0000, 0x8000, CRC(3ab0cd3b) SHA1(171b587bd5a947a13f3114120b6e7baca3b57d78))
-	ROM_LOAD("fc80uhan.rom",  0x8000, 0x2000, CRC(0cdb8501) SHA1(58dbe73ae80c2c409e766c3ace730ecd7bec89d0))
-	ROM_RELOAD(0xa000, 0x2000)
+
+	ROM_REGION(0x4000, "hangul", 0)
+	ROM_LOAD("fc80uhan.rom",  0x0000, 0x2000, CRC(0cdb8501) SHA1(58dbe73ae80c2c409e766c3ace730ecd7bec89d0))
+	ROM_RELOAD(0x2000, 0x2000)
 ROM_END
 
 void msx_state::gsfc80u(machine_config &config)
@@ -3339,19 +3369,19 @@ void msx_state::gsfc80u(machine_config &config)
 	// 1 Expansion slot
 	// Hangul LED
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
-	add_internal_slot(config, MSX_SLOT_ROM, "han", 0, 0, 2, 1, "maincpu", 0x8000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "hangul", 0, 0, 2, 1, "hangul", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);  /* 64KB RAM */
 	// Expansion slot in slot #3
 
-	msx1(TMS9918A, config);
+	msx1(TMS9918A, AY8910, config);
 }
 
 /* MSX - Goldstar FC-200 */
 
 ROM_START(gsfc200)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("fc200bios.rom.u5a", 0x0000, 0x4000, CRC(61f473fb) SHA1(c425750bbb2ae1d278216b45029d303e37d8df2f))
 	ROM_LOAD("fc200bios.rom.u5b", 0x4000, 0x4000, CRC(1a99b1a1) SHA1(e18f72271b64693a2a2bc226e1b9ebd0448e07c0))
 ROM_END
@@ -3363,21 +3393,25 @@ void msx_state::gsfc200(machine_config &config)
 	// 1 Cartridge slot
 	// 1 Expansion slot
 
-	add_internal_slot(config, MSX_SLOT_ROM, "rom", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);  /* 64KB RAM */
 	// Expansion slot in slot #3
 
-	msx1(TMS9129, config);
+	msx1(TMS9129, AY8910, config);
 }
 
 /* MSX - Goldstar GFC-1080 */
 
 ROM_START(gfc1080)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("gfc1080bios.rom",     0x0000, 0x8000, CRC(d9cdd4a6) SHA1(6b0be712b9c95c1e912252ab5703e1c0bc457d9e))
-	ROM_LOAD("gfc1080han.rom",      0x8000, 0x4000, CRC(f209448c) SHA1(141b44212ba28e7d03e0b54126fedd9e0807dc42))
-	ROM_LOAD("gfc1080pasocalc.rom", 0xc000, 0x4000, CRC(4014f7ea) SHA1(a5581fa3ce10f90f15ba3dc53d57b02d6e4af172))
+
+	ROM_REGION(0x4000, "hangul", 0)
+	ROM_LOAD("gfc1080han.rom",      0x0000, 0x4000, CRC(f209448c) SHA1(141b44212ba28e7d03e0b54126fedd9e0807dc42))
+
+	ROM_REGION(0x4000, "pasocalc", 0)
+	ROM_LOAD("gfc1080pasocalc.rom", 0x0000, 0x4000, CRC(4014f7ea) SHA1(a5581fa3ce10f90f15ba3dc53d57b02d6e4af172))
 ROM_END
 
 void msx_state::gfc1080(machine_config &config)
@@ -3386,21 +3420,25 @@ void msx_state::gfc1080(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
 
-	add_internal_slot(config, MSX_SLOT_ROM, "rom", 0, 0, 0, 4, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "hangul", 0, 0, 2, 1, "hangul", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "pasocalc", 0, 0, 3, 1, "pasocalc", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4); // 64KB RAM
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
 
-	msx1(TMS9928A, config);
+	msx1(TMS9928A, AY8910, config);
 }
 
 /* MSX - Goldstar GFC-1080A */
 
 ROM_START(gfc1080a)
-	ROM_REGION(0xc000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("gfc1080abios.rom", 0x0000, 0x8000, CRC(3ab0cd3b) SHA1(171b587bd5a947a13f3114120b6e7baca3b57d78))
-	ROM_LOAD("gfc1080ahan.rom",  0x8000, 0x2000, CRC(0cdb8501) SHA1(58dbe73ae80c2c409e766c3ace730ecd7bec89d0))
-	ROM_RELOAD(0xa000, 0x2000)
+
+	ROM_REGION(0x4000, "hangul", 0)
+	ROM_LOAD("gfc1080ahan.rom",  0x0000, 0x2000, CRC(0cdb8501) SHA1(58dbe73ae80c2c409e766c3ace730ecd7bec89d0))
+	ROM_RELOAD(0x2000, 0x2000)
 ROM_END
 
 void msx_state::gfc1080a(machine_config &config)
@@ -3410,17 +3448,18 @@ void msx_state::gfc1080a(machine_config &config)
 	// 1 Cartridge slot
 	// 1 Expansion slot
 
-	add_internal_slot(config, MSX_SLOT_ROM, "rom", 0, 0, 0, 3, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "hangul", 0, 0, 2, 1, "hangul", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4); // 64KB RAM
 
-	msx1(TMS9918A, config);
+	msx1(TMS9918A, AY8910, config);
 }
 
 /* MSX - Gradiente Expert 1.3 - source? */
 
 ROM_START(expert13)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("expbios13.rom", 0x0000, 0x8000, CRC(5638bc38) SHA1(605f5af3f358c6811f54e0173bad908614a198c0))
 ROM_END
 
@@ -3430,19 +3469,21 @@ void msx_state::expert13(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 2, 0, 0, 4).set_total_size(0x10000);   /* 64KB Mapper RAM */
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
 
-	msx1(TMS9928A, config);
+	msx1(TMS9928A, AY8910, config);
 }
 
 /* MSX - Gradiente Expert DDPlus */
 ROM_START(expertdp)
-	ROM_REGION(0xc000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("eddpbios.rom", 0x0000, 0x8000, CRC(efb4b972) SHA1(d6720845928ee848cfa88a86accb067397685f02))
-	ROM_LOAD("eddpdisk.rom", 0x8000, 0x4000, CRC(549f1d90) SHA1(f1525de4e0b60a6687156c2a96f8a8b2044b6c56))
+
+	ROM_REGION(0x4000, "diskrom", 0)
+	ROM_LOAD("eddpdisk.rom", 0x0000, 0x4000, CRC(549f1d90) SHA1(f1525de4e0b60a6687156c2a96f8a8b2044b6c56))
 ROM_END
 
 void msx_state::expertdp(machine_config &config)
@@ -3455,23 +3496,25 @@ void msx_state::expertdp(machine_config &config)
 	// T6950 (integrated in T7937A)
 	// MSX Engine T7937A (also VDP)
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 3, 1, 2, "maincpu", 0x8000).set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "diskrom", 3, 3, 1, 2, "diskrom", 0x0000).set_tags("fdc", "fdc:0", "fdc:1");
 
 	msx_mb8877a(config);
 	msx_1_35_dd_drive(config);
-	msx1(TMS9928A, config);
+	msx1(TMS9928A, AY8910, config);
 }
 
 /* MSX - Gradiente Expert Plus */
 
 ROM_START(expertpl)
-	ROM_REGION(0xc000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("exppbios.rom", 0x0000, 0x8000, CRC(efb4b972) SHA1(d6720845928ee848cfa88a86accb067397685f02))
-	ROM_LOAD("exppdemo.rom", 0x8000, 0x4000, CRC(a9bbef64) SHA1(d4cea8c815f3eeabe0c6a1c845f902ec4318bf6b))
+
+	ROM_REGION(0x4000, "demo", 0)
+	ROM_LOAD("exppdemo.rom", 0x0000, 0x4000, CRC(a9bbef64) SHA1(d4cea8c815f3eeabe0c6a1c845f902ec4318bf6b))
 ROM_END
 
 void msx_state::expertpl(machine_config &config)
@@ -3481,19 +3524,19 @@ void msx_state::expertpl(machine_config &config)
 	// 2 Cartridge slots
 	// MSX Engine T7937A (with T6950 VDP and T7766A psg)
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
-	add_internal_slot(config, MSX_SLOT_ROM, "demo", 3, 3, 2, 1, "maincpu", 0x8000);
+	add_internal_slot(config, MSX_SLOT_ROM, "demo", 3, 3, 2, 1, "demo", 0x0000);
 
-	msx1(TMS9928A, config);
+	msx1(TMS9928A, AY8910, config);
 }
 
 /* MSX - Gradiente Expert XP-800 (1.0) */
 
 ROM_START(expert10)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("expbios.rom", 0x0000, 0x8000, CRC(07610d77) SHA1(ef3e010eb57e4476700a3bbff9d2119ab3acdf62))
 ROM_END
 
@@ -3505,18 +3548,18 @@ void msx_state::expert10(machine_config &config)
 	// non-standard printer port
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);  /* 64KB RAM */
 	// when no cartridge is inserted the expansion slot can be used in this slot
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
 
-	msx1(TMS9128, config);
+	msx1(TMS9128, AY8910, config);
 }
 
 /* MSX - Gradiente Expert XP-800 (1.1) / GPC-1 */
 ROM_START(expert11)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("expbios11.rom", 0x0000, 0x8000, CRC(efb4b972) SHA1(d6720845928ee848cfa88a86accb067397685f02))
 ROM_END
 
@@ -3526,21 +3569,23 @@ void msx_state::expert11(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);  /* 64KB RAM */
 	// when no cartridge is inserted the expansion slot can be used in this slot
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
 
-	msx1(TMS9128, config);
+	msx1(TMS9128, AY8910, config);
 }
 
 /* MSX - Hitachi MB-H1 */
 
 ROM_START(mbh1)
-	ROM_REGION(0xc000, "maincpu", 0)
+	ROM_REGION(0xc000, "mainrom", 0)
 	ROM_LOAD("mbh1bios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
-	ROM_LOAD("mbh1firm.rom", 0x8000, 0x2000, CRC(83f5662b) SHA1(3e005832138ffde8b1c36025754f81c2112b236d))
+
+	ROM_REGION(0x4000, "firmware", 0)
+	ROM_LOAD("mbh1firm.rom", 0x0000, 0x2000, CRC(83f5662b) SHA1(3e005832138ffde8b1c36025754f81c2112b236d))
 ROM_END
 
 void msx_state::mbh1(machine_config &config)
@@ -3551,19 +3596,19 @@ void msx_state::mbh1(machine_config &config)
 	// Speed controller (normal, slow 1, slow 2)
 	// Firmware should be bypassed when a cartridge is inserted
 
-	add_internal_slot(config, MSX_SLOT_ROM, "rom", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 2, 2); // 32KB RAM
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_ROM, "firm", 3, 0, 1, 1, "maincpu", 0x8000);
+	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 3, 0, 1, 1, "firmware", 0x0000);
 
-	msx1(TMS9918A, config);
+	msx1(TMS9918A, AY8910, config);
 }
 
 /* MSX - Hitachi MB-H1E */
 
 ROM_START(mbh1e)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("mbh1bios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
 ROM_END
 
@@ -3574,20 +3619,22 @@ void msx_state::mbh1e(machine_config &config)
 	// 2 Cartridge slots
 	// Speed controller (normal, slow 1, slow 2)
 
-	add_internal_slot(config, MSX_SLOT_ROM, "rom", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1); // 16KB RAM
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 
-	msx1(TMS9918A, config);
+	msx1(TMS9918A, AY8910, config);
 }
 
 /* MSX - Hitachi MB-H2 */
 
 ROM_START(mbh2)
-	ROM_REGION(0xc000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("mbh2bios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
-	ROM_LOAD("mbh2firm.rom", 0x8000, 0x4000, CRC(4f03c947) SHA1(e2140fa2e8e59090ecccf55b62323ea9dcc66d0b))
+
+	ROM_REGION(0x4000, "firmware", 0)
+	ROM_LOAD("mbh2firm.rom", 0x0000, 0x4000, CRC(4f03c947) SHA1(e2140fa2e8e59090ecccf55b62323ea9dcc66d0b))
 ROM_END
 
 void msx_state::mbh2(machine_config &config)
@@ -3598,12 +3645,13 @@ void msx_state::mbh2(machine_config &config)
 	// Builtin cassette player
 	// Speed controller (normal, slow 1, slow 2)
 
-	add_internal_slot(config, MSX_SLOT_ROM, "rom", 0, 0, 0, 3, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 0, 0, 2, 1, "firmware", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4); // 64KB RAM
 
-	msx1(TMS9928A, config);
+	msx1(TMS9928A, AY8910, config);
 }
 
 /* MSX - Hitachi MB-H21 */
@@ -3611,7 +3659,7 @@ void msx_state::mbh2(machine_config &config)
 /* MSX - Hitachi MB-H25 */
 
 ROM_START(mbh25)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("mbh25bios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
 ROM_END
 
@@ -3622,35 +3670,35 @@ void msx_state::mbh25(machine_config &config)
 	// 2 Cartridge slots
 	// Speed controller (normal, slow 1, slow 2)
 
-	add_internal_slot(config, MSX_SLOT_ROM, "rom", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 2, 2); // 32KB RAM
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 
-	msx1(TMS9118, config);
+	msx1(TMS9118, AY8910, config);
 }
 
 /* MSX - Hitachi MB-H50 */
 
 ROM_START(mbh50)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("mbh50bios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
 ROM_END
 
 void msx_state::mbh50(machine_config &config)
 {
-	// AY-3-8910 in S3527
+	// YM2149 in S3527
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 	// T6950A
 	// MSX-Engine S3527
 
-	add_internal_slot(config, MSX_SLOT_ROM, "rom", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 0, 4); // 64KB RAM
 
-	msx1(TMS9928A, config);
+	msx1(TMS9928A, YM2149, config);
 }
 
 /* MSX - Hitachi MB-H80 (unreleased) */
@@ -3660,7 +3708,7 @@ void msx_state::mbh50(machine_config &config)
 /* MSX - JVC HC-7E / HC-7GB (different power supplies) */
 
 ROM_START(jvchc7gb)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("hc7gbbios.rom", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
 ROM_END
 
@@ -3670,12 +3718,12 @@ void msx_state::jvchc7gb(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "rom", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
 
-	msx1(TMS9929A, config);
+	msx1(TMS9929A, AY8910, config);
 }
 
 /* MSX - Jotan Holland Bingo */
@@ -3685,7 +3733,7 @@ void msx_state::jvchc7gb(machine_config &config)
 /* MSX - Mitsubishi ML-8000 */
 
 ROM_START(ml8000)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	// Same contents as standard 32kb bios with sha1 302afb5d8be26c758309ca3df611ae69cced2821
 	// split across 4 eeproms
 	ROM_LOAD("1.ic56", 0x0000, 0x2000, BAD_DUMP CRC(782e39fd) SHA1(ad20865df0d33ee5379b69be984302fb85d74c5a)) // need verification
@@ -3701,17 +3749,17 @@ void msx_state::ml8000(machine_config &config)
 	// FDC: None, 0 drives
 	// 1 Cartridge slot
 
-	add_internal_slot(config, MSX_SLOT_ROM, "rom", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 2, 2); // 32KB RAM
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 
-	msx1(TMS9918A, config);
+	msx1(TMS9918A, AY8910, config);
 }
 
 /* MSX - Mitsubishi ML-F48 */
 
 ROM_START(mlf48)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	// hn613256p ?
 	ROM_LOAD("mlf48bios.ic2d", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e)) // needs verification
 ROM_END
@@ -3723,18 +3771,18 @@ void msx_state::mlf48(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 2, 2); // 32KB RAM
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
 
-	msx1(TMS9929A, config); // needs verification
+	msx1(TMS9929A, AY8910, config); // needs verification
 }
 
 /* MSX - Mitsubishi ML-F80 */
 
 ROM_START(mlf80)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	// 4j1 hn613256p m82 ?
 	ROM_LOAD("mlf80bios.ic2d", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
 ROM_END
@@ -3746,18 +3794,18 @@ void msx_state::mlf80(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
 
-	msx1(TMS9929A, config); // needs verification
+	msx1(TMS9929A, AY8910, config); // needs verification
 }
 
 /* MSX - Mitsubishi ML-F110 */
 
 ROM_START(mlf110)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("hn613256p.ic6d", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
 ROM_END
 
@@ -3768,20 +3816,22 @@ void msx_state::mlf110(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 3, 1); // 16KB RAM
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
 
-	msx1(TMS9918A, config);
+	msx1(TMS9918A, AY8910, config);
 }
 
 /* MSX - Mitsubishi ML-F120 / ML-F120D */
 
 ROM_START(mlf120)
-	ROM_REGION(0xc000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("hn613256p.ic6d", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
-	ROM_LOAD("t704p890h11.ic8d", 0x8000, 0x4000, CRC(4b5f3173) SHA1(21a9f60cb6370d0617ce54c42bb7d8e40a4ab560))
+
+	ROM_REGION(0x4000, "firmware", 0)
+	ROM_LOAD("t704p890h11.ic8d", 0x0000, 0x4000, CRC(4b5f3173) SHA1(21a9f60cb6370d0617ce54c42bb7d8e40a4ab560))
 ROM_END
 
 void msx_state::mlf120(machine_config &config)
@@ -3791,13 +3841,13 @@ void msx_state::mlf120(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slot
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 2, 2); // 32KB RAM
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_ROM, "firm", 3, 0, 1, 1, "maincpu", 0x8000);
+	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 3, 0, 1, 1, "firmware", 0x0000);
 
-	msx1(TMS9918A, config);
+	msx1(TMS9918A, AY8910, config);
 }
 
 /* MSX - Mitsubishi ML-F120D (functionality wise same as ML-F120 but with RGB out instead of composite)
@@ -3811,7 +3861,7 @@ AY-3-8910
 /* MSX - Mitsubishi ML-FX1 */
 
 ROM_START(mlfx1)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	// 5c1 hn613256p t21 t704p874h21-u
 	ROM_LOAD("mlfx1bios.ic6c", 0x0000, 0x8000, CRC(62867dce) SHA1(0cbe0df4af45e8f531e9c761403ac9e71808f20c))
 ROM_END
@@ -3824,12 +3874,12 @@ void msx_state::mlfx1(machine_config &config)
 	// 2 Cartridge slots
 	// MSX-Engine S3527
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 0, 4);  /* 64KB RAM */
 
-	msx1(TMS9929A, config);
+	msx1(TMS9929A, YM2149, config);
 }
 
 /* MSX - Mitsubishi ML-FX2 */
@@ -3839,7 +3889,7 @@ void msx_state::mlfx1(machine_config &config)
 /* MSX - National CF-1200 */
 
 ROM_START(cf1200)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("1200bios.rom", 0x0000, 0x8000, CRC(5ad03407) SHA1(c7a2c5baee6a9f0e1c6ee7d76944c0ab1886796c))
 ROM_END
 
@@ -3849,18 +3899,18 @@ void msx_state::cf1200(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1);   /* 16KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 
-	msx1(TMS9918A, config); // needs verification
+	msx1(TMS9918A, AY8910, config); // needs verification
 }
 
 /* MSX - National CF-2000 */
 
 ROM_START(cf2000)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("2000bios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
 ROM_END
 
@@ -3870,17 +3920,17 @@ void msx_state::cf2000(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1);   /* 16KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 
-	msx1(TMS9928A, config); // needs verification
+	msx1(TMS9928A, AY8910, config); // needs verification
 }
 
 /* MSX - National CF-2700 */
 ROM_START(cf2700)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("2700bios.rom.ic32", 0x0000, 0x8000, CRC(5ad03407) SHA1(c7a2c5baee6a9f0e1c6ee7d76944c0ab1886796c))
 ROM_END
 
@@ -3891,18 +3941,18 @@ void msx_state::cf2700(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 2, 2);   /* 32KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 
-	msx1(TMS9918A, config);
+	msx1(TMS9918A, AY8910, config);
 }
 
 /* MSX - National CF-3000 */
 
 ROM_START(cf3000)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("3000bios.rom", 0x0000, 0x8000, CRC(5ad03407) SHA1(c7a2c5baee6a9f0e1c6ee7d76944c0ab1886796c))
 ROM_END
 
@@ -3912,19 +3962,21 @@ void msx_state::cf3000(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
 
-	msx1(TMS9928A, config);
+	msx1(TMS9928A, AY8910, config);
 }
 
 /* MSX - National CF-3300 */
 ROM_START(cf3300)
-	ROM_REGION(0xc000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("3300bios.rom", 0x0000, 0x8000, CRC(5ad03407) SHA1(c7a2c5baee6a9f0e1c6ee7d76944c0ab1886796c))
-	ROM_LOAD("3300disk.rom", 0x8000, 0x4000, CRC(549f1d90) SHA1(f1525de4e0b60a6687156c2a96f8a8b2044b6c56))
+
+	ROM_REGION(0x4000, "diskrom", 0)
+	ROM_LOAD("3300disk.rom", 0x0000, 0x4000, CRC(549f1d90) SHA1(f1525de4e0b60a6687156c2a96f8a8b2044b6c56))
 ROM_END
 
 void msx_state::cf3300(machine_config &config)
@@ -3933,21 +3985,21 @@ void msx_state::cf3300(machine_config &config)
 	// FDC: mb8877a, 1 3.5" SSDD drive
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 1, 1, 2, "maincpu", 0x8000).set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "diskrom", 3, 1, 1, 2, "diskrom", 0x0000).set_tags("fdc", "fdc:0", "fdc:1");
 
 	msx_mb8877a(config);
 	msx_1_35_ssdd_drive(config);
-	msx1(TMS9928A, config);
+	msx1(TMS9928A, AY8910, config);
 }
 
 /* MSX - National FS-1300 */
 
 ROM_START(fs1300)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("1300bios.rom", 0x0000, 0x8000, CRC(5ad03407) SHA1(c7a2c5baee6a9f0e1c6ee7d76944c0ab1886796c))
 ROM_END
 
@@ -3957,21 +4009,25 @@ void msx_state::fs1300(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
 
-	msx1(TMS9918A, config);
+	msx1(TMS9918A, AY8910, config);
 }
 
 /* MSX - National FS-4000 */
 
 ROM_START(fs4000)
-	ROM_REGION(0x18000 ,"maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("4000bios.rom",  0x0000, 0x8000, CRC(071135e0) SHA1(df48902f5f12af8867ae1a87f255145f0e5e0774))
-	ROM_LOAD("4000word.rom",  0x8000, 0x8000, CRC(950b6c87) SHA1(931d6318774bd495a32ec3dabf8d0edfc9913324))
-	ROM_LOAD("4000kdr.rom",  0x10000, 0x8000, CRC(ebaa5a1e) SHA1(77bd67d5d10d459d343e79eafcd8e17eb0f209dd))
+
+	ROM_REGION(0x8000, "word", 0)
+	ROM_LOAD("4000word.rom",  0x0000, 0x8000, CRC(950b6c87) SHA1(931d6318774bd495a32ec3dabf8d0edfc9913324))
+
+	ROM_REGION(0x8000, "kdr", 0)
+	ROM_LOAD("4000kdr.rom",  0x0000, 0x8000, CRC(ebaa5a1e) SHA1(77bd67d5d10d459d343e79eafcd8e17eb0f209dd))
 
 	ROM_REGION(0x20000, "kanji", 0)
 	ROM_LOAD("4000kfn.rom", 0, 0x20000, CRC(956dc96d) SHA1(9ed3ab6d893632b9246e91b412cd5db519e7586b))
@@ -3984,23 +4040,27 @@ void msx_state::fs4000(machine_config &config)
 	// 2 Cartridge slots
 	// MSX-Engine S3527
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_ROM, "word", 3, 0, 0, 2, "maincpu", 0x8000);
-	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 1, 1, 2, "maincpu", 0x10000);
+	add_internal_slot(config, MSX_SLOT_ROM, "word", 3, 0, 0, 2, "word", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 1, 1, 2, "kdr", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 0, 4);  /* 64KB RAM */
 
-	msx1(TMS9128, config);
+	msx1(TMS9128, YM2149, config);
 }
 
 /* MSX - National FS-4000 (Alt) */
 
 ROM_START(fs4000a)
-	ROM_REGION(0x18000 ,"maincpu", 0)
+	ROM_REGION(0x8000 ,"mainrom", 0)
 	ROM_LOAD("4000bios.rom",  0x0000, 0x8000, CRC(071135e0) SHA1(df48902f5f12af8867ae1a87f255145f0e5e0774))
-	ROM_LOAD("4000wora.rom",  0x8000, 0x8000, CRC(52f4cdf7) SHA1(acbac3cb5b700254bed2cacc19fa54f1950f371d))
-	ROM_LOAD("4000kdra.rom", 0x10000, 0x8000, CRC(b2db6bf5) SHA1(3a9a942ed888dd641cddf8deada1879c454df3c6))
+
+	ROM_REGION(0x8000, "word", 0)
+	ROM_LOAD("4000wora.rom",  0x0000, 0x8000, CRC(52f4cdf7) SHA1(acbac3cb5b700254bed2cacc19fa54f1950f371d))
+
+	ROM_REGION(0x8000, "kdr", 0)
+	ROM_LOAD("4000kdra.rom", 0x0000, 0x8000, CRC(b2db6bf5) SHA1(3a9a942ed888dd641cddf8deada1879c454df3c6))
 
 	ROM_REGION(0x20000, "kanji", 0)
 	ROM_LOAD("4000kfn.rom", 0, 0x20000, CRC(956dc96d) SHA1(9ed3ab6d893632b9246e91b412cd5db519e7586b))
@@ -4013,14 +4073,14 @@ void msx_state::fs4000a(machine_config &config)
 	// 2 Cartridge slots
 	// MSX-Engine S3527
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_ROM, "word", 3, 0, 0, 2, "maincpu", 0x8000);
-	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 1, 1, 2, "maincpu", 0x10000);
+	add_internal_slot(config, MSX_SLOT_ROM, "word", 3, 0, 0, 2, "word", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 1, 1, 2, "kdr", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 0, 4);  /* 64KB RAM */
 
-	msx1(TMS9128, config);
+	msx1(TMS9128, YM2149, config);
 }
 
 /* MSX - Network DPC-200 */
@@ -4033,7 +4093,7 @@ void msx_state::fs4000a(machine_config &config)
 /* MSX - Olympia PHC-2 */
 
 ROM_START(phc2)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("r09256c-fra.ic8", 0x0000, 0x8000, CRC(d2110d66) SHA1(d3af963e2529662eae63f04a2530454685a1989f))
 ROM_END
 
@@ -4044,18 +4104,18 @@ void msx_state::phc2(machine_config &config)
 	// 1 Cartridge slot
 	// 1 Expansion slot
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
 	// Expansion slot in slot #3
 
-	msx1(TMS9129, config);
+	msx1(TMS9129, AY8910, config);
 }
 
 /* MSX - Olympia PHC-28 */
 
 ROM_START(phc28)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("phc28bios.rom", 0x0000, 0x8000, CRC(eceb2802) SHA1(195950173701abeb460a1a070d83466f3f53b337))
 ROM_END
 
@@ -4066,19 +4126,19 @@ void msx_state::phc28(machine_config &config)
 	// 2 Cartridge slots
 	// 1 Expansion slot
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 1, 3);   /* 16KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	// expansion slot
 
-	msx1(TMS9929A, config); // needs verification
+	msx1(TMS9929A, AY8910, config); // needs verification
 }
 
 /* MSX - Panasonic CF-2700 (Germany) */
 
 ROM_START(cf2700g)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	// mn23257rfa
 	ROM_LOAD("cf2700g.ic32", 0x0000, 0x8000, CRC(4aa194f4) SHA1(69bf27b610e11437dad1f7a1c37a63179a293d12))
 ROM_END
@@ -4090,18 +4150,18 @@ void msx_state::cf2700g(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
 
-	msx1(TMS9129, config);
+	msx1(TMS9129, AY8910, config);
 }
 
 /* MSX - Panasonic CF-2700 (UK) */
 
 ROM_START(cf2700uk)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	// mn23257rfa
 	ROM_LOAD("cf2700uk.ic32", 0x0000, 0x8000, CRC(15e503de) SHA1(5e6b1306a30bbb46af61487d1a3cc1b0a69004c3))
 ROM_END
@@ -4113,12 +4173,12 @@ void msx_state::cf2700uk(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
 
-	msx1(TMS9129, config);
+	msx1(TMS9129, AY8910, config);
 }
 
 /* MSX - Panasonic FS-3900 */
@@ -4134,7 +4194,7 @@ void msx_state::cf2700uk(machine_config &config)
 /* MSX - Philips NMS-801 */
 
 ROM_START(nms801)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("801bios.rom", 0x0000, 0x8000, CRC(fa089461) SHA1(21329398c0f350e330b353f45f21aa7ba338fc8d))
 ROM_END
 
@@ -4146,17 +4206,17 @@ void msx_state::nms801(machine_config &config)
 	// 0 Cartridge slots
 	// No printer port
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
 
 	m_hw_def.has_printer_port(false);
-	msx1(TMS9129, config);
+	msx1(TMS9129, AY8910, config);
 }
 
 /* MSX - Philips VG-8000 */
 
 ROM_START(vg8000)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("8000bios.rom", 0x0000, 0x8000, CRC(efd970b0) SHA1(42252cf87deeb58181a7bfec7c874190a1351779))
 ROM_END
 
@@ -4168,19 +4228,19 @@ void msx_state::vg8000(machine_config &config)
 	// 2 Cartridge slots
 	// No printer port
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1);   /* 16KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 
 	m_hw_def.has_printer_port(false);
-	msx1(TMS9129, config);
+	msx1(TMS9129, AY8910, config);
 }
 
 /* MSX - Philips VG-8010 / VG-8010/00 */
 
 ROM_START(vg8010)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("vg8000v1_0.663", 0x0000, 0x8000, CRC(efd970b0) SHA1(42252cf87deeb58181a7bfec7c874190a1351779))
 ROM_END
 
@@ -4192,19 +4252,19 @@ void msx_state::vg8010(machine_config &config)
 	// 2 Cartridge slots
 	// No printer port
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 2, 2);   /* 32KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 
 	m_hw_def.has_printer_port(false);
-	msx1(TMS9129, config);
+	msx1(TMS9129, AY8910, config);
 }
 
 /* MSX - Philips VG-8010F / VG-8010/19 */
 
 ROM_START(vg8010f)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("8010fbios.663", 0x0000, 0x8000, CRC(df57c9ca) SHA1(898630ad1497dc9a329580c682ee55c4bcb9c30c))
 ROM_END
 
@@ -4216,19 +4276,19 @@ void msx_state::vg8010f(machine_config &config)
 	// 2 Cartridge slots
 	// No printer port
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 2, 2);   /* 32KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 
 	m_hw_def.has_printer_port(false);
-	msx1(TMS9129, config);
+	msx1(TMS9129, AY8910, config);
 }
 
 /* MSX - Philips VG-8020-00 */
 
 ROM_START(vg802000)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("8020-00bios.rom", 0x0000, 0x8000, CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db))
 ROM_END
 
@@ -4238,18 +4298,18 @@ void msx_state::vg802000(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
 
-	msx1(TMS9929A, config);
+	msx1(TMS9929A, YM2149, config);
 }
 
 /* MSX - Philips VG-8020/19 / VG-8020F */
 
 ROM_START(vg8020f)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("8020-19bios.u11", 0x0000, 0x8000, CRC(70ce2d45) SHA1(ae4a6632d4456ef44603e72f5acd5bbcd6c0d124))
 ROM_END
 
@@ -4260,18 +4320,18 @@ void msx_state::vg8020f(machine_config &config)
 	// 2 Cartridge slots
 	// S-3527 MSX Engine
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x10000);   /* 64KB Mapper RAM */
 
-	msx1(TMS9929A, config);
+	msx1(TMS9929A, YM2149, config);
 }
 
 /* MSX - Philips VG-8020/20 */
 
 ROM_START(vg802020)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	// m38256-k5 z-4 int rev1
 	ROM_LOAD("8020-20bios.u11", 0x0000, 0x8000, CRC(a317e6b4) SHA1(e998f0c441f4f1800ef44e42cd1659150206cf79))
 ROM_END
@@ -4284,12 +4344,12 @@ void msx_state::vg802020(machine_config &config)
 	// 2 Cartridge slots
 	// S-3527 MSX Engine
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x10000);   /* 64KB Mapper RAM */
 
-	msx1(TMS9129, config);
+	msx1(TMS9129, YM2149, config);
 }
 
 /* MSX - Phonola VG-8000 (Italian market, mostly likely same as Philips VG-8000) */
@@ -4301,10 +4361,12 @@ void msx_state::vg802020(machine_config &config)
 /* MSX - Pioneer PX-7 */
 
 ROM_START(piopx7)
-	ROM_REGION(0xc000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("ym2301.ic12", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
-	ROM_LOAD("pd5031.ic13", 0x8000, 0x2000, CRC(91e0df72) SHA1(4f0102cdc27216fd9bcdb9663db728d2ccd8ca6d))
-	ROM_FILL(0xa000, 0x2000, 0x6e)
+
+	ROM_REGION(0x4000, "pbasic", 0)
+	ROM_LOAD("pd5031.ic13", 0x0000, 0x2000, CRC(91e0df72) SHA1(4f0102cdc27216fd9bcdb9663db728d2ccd8ca6d))
+	ROM_FILL(0x2000, 0x2000, 0x6e)
 ROM_END
 
 void msx_state::piopx7(machine_config &config)
@@ -4333,23 +4395,27 @@ void msx_state::piopx7(machine_config &config)
 	// Bit 0 R = INTEXV (interrupt available when external video signal OFF, reset on read)
 	// Bit 0 W = /OVERLAY (0 = superimpose, 1 = non-superimpose)
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 2, 2);   /* 32KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_ROM, "rom2", 2, 0, 1, 1, "maincpu", 0x8000);
+	add_internal_slot(config, MSX_SLOT_ROM, "pbasic", 2, 0, 1, 1, "pbasic", 0x0000);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
 
-	msx1(TMS9928A, config);
+	msx1(TMS9928A, AY8910, config);
 }
 
 /* MSX - Pioneer PX-7UK */
 
 ROM_START(piopx7uk)
-	ROM_REGION(0x14000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("px7ukbios.rom",   0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
-	ROM_LOAD("px7ukpbasic.rom", 0x8000, 0x2000, CRC(91e0df72) SHA1(4f0102cdc27216fd9bcdb9663db728d2ccd8ca6d))
-	ROM_FILL(0xa000, 0x2000, 0x6e)
-	ROM_LOAD("videoart.rom",    0xc000, 0x8000, CRC(0ba148dc) SHA1(b7b4e4cd40a856bb071976e6cf0f5e546fc86a78))
+
+	ROM_REGION(0x4000, "pbasic", 0)
+	ROM_LOAD("px7ukpbasic.rom", 0x0000, 0x2000, CRC(91e0df72) SHA1(4f0102cdc27216fd9bcdb9663db728d2ccd8ca6d))
+	ROM_FILL(0x2000, 0x2000, 0x6e)
+
+	ROM_REGION(0x8000, "videoart", 0)
+	ROM_LOAD("videoart.rom", 0x0000, 0x8000, CRC(0ba148dc) SHA1(b7b4e4cd40a856bb071976e6cf0f5e546fc86a78))
 ROM_END
 
 void msx_state::piopx7uk(machine_config &config)
@@ -4358,22 +4424,24 @@ void msx_state::piopx7uk(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 2, 2);   /* 32KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_ROM, "rom2", 2, 0, 1, 1, "maincpu", 0x8000);
+	add_internal_slot(config, MSX_SLOT_ROM, "pbasic", 2, 0, 1, 1, "pbasic", 0x0000);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
 
-	msx1(TMS9129, config);
+	msx1(TMS9129, YM2149, config);
 }
 
 /* MSX - Pioneer PX-V60 */
 
 ROM_START(piopxv60)
-	ROM_REGION(0xc000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("pxv60bios.rom",   0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
-	ROM_LOAD("pd5031.rom", 0x8000, 0x2000, CRC(91e0df72) SHA1(4f0102cdc27216fd9bcdb9663db728d2ccd8ca6d))
-	ROM_FILL(0xa000, 0x2000, 0x6E)
+
+	ROM_REGION(0x4000, "pbasic", 0)
+	ROM_LOAD("pd5031.rom", 0x0000, 0x2000, CRC(91e0df72) SHA1(4f0102cdc27216fd9bcdb9663db728d2ccd8ca6d))
+	ROM_FILL(0x2000, 0x2000, 0x6E)
 ROM_END
 
 void msx_state::piopxv60(machine_config &config)
@@ -4384,41 +4452,212 @@ void msx_state::piopxv60(machine_config &config)
 	// 2 Cartridge slots
 	// S3527
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 2, 2);   /* 32KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_ROM, "rom2", 2, 0, 1, 1, "maincpu", 0x8000);
+	add_internal_slot(config, MSX_SLOT_ROM, "pbasic", 2, 0, 1, 1, "pbasic", 0x0000);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
 
-	msx1(TMS9128, config);
+	msx1(TMS9128, YM2149, config);
 }
 
 /* MSX - Pioneer PX-V7 */
 
 /* MSX - Radiola MK 180 */
 
+/* MSX - Sakhr AH-200 */
+
+/* MSX - Sakhr AX-100 */
+
+/* MSX - Sakhr AX-150 */
+
+ROM_START(ax150)
+	ROM_REGION(0x8000, "mainrom", 0)
+	ROM_LOAD("ax150bios.rom", 0x0000, 0x8000, CRC(bd95c436) SHA1(5e094fca95ab8e91873ee372a3f1239b9a48a48d))
+
+	ROM_REGION(0x8000, "arabic", 0)
+	ROM_LOAD("ax150arab.rom", 0x0000, 0x8000, CRC(339cd1aa) SHA1(0287b2ec897b9196788cd9f10c99e1487d7adbbb))
+ROM_END
+
+void msx_state::ax150(machine_config &config)
+{
+	// YM2149 in S3527
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
+	// YM2220 (compatible with TMS9918)
+	// MSX-Engine S3527
+
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
+	add_internal_slot(config, MSX_SLOT_RAM, "ram1", 0, 0, 2, 2); /* 32KB RAM */
+	add_internal_slot(config, MSX_SLOT_ROM, "arabic", 0, 1, 1, 2, "arabic", 0x0000);
+	add_internal_slot(config, MSX_SLOT_RAM, "ram2", 0, 2, 0, 2); /* 32KB RAM */
+	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
+	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
+
+	msx1(TMS9918, YM2149, config);
+}
+
+/* MSX - Sakhr AX-170 */
+
+ROM_START (ax170)
+	ROM_REGION(0x8000, "mainrom", 0)
+	ROM_LOAD("ax170bios.rom", 0x0000, 0x8000, CRC(bd95c436) SHA1(5e094fca95ab8e91873ee372a3f1239b9a48a48d))
+
+	ROM_REGION(0x8000, "arabic", 0)
+	ROM_LOAD("ax170arab.rom", 0x0000, 0x8000, CRC(339cd1aa) SHA1(0287b2ec897b9196788cd9f10c99e1487d7adbbb))
+ROM_END
+
+void msx_state::ax170(machine_config &config)
+{
+	// AY-3-8910 in T7937
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
+	// T6950 in T7937
+	// T7937 (in ax170mk2)
+
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "arabic", 1, 0, 1, 2, "arabic", 0x0000);
+	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 2, msx_cart, nullptr);
+	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4); /* 64KB RAM */
+	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 3, msx_cart, nullptr);
+
+	msx1(TMS9929A, AY8910, config);
+}
+
+/* MSX - Sakhr AX-170F */
+
+/* MSX - Sakhr AX-200 (Arabic/English) */
+
+ROM_START (ax200)
+	ROM_REGION(0x8000, "mainrom", 0)
+	ROM_LOAD("ax200bios.rom", 0x0000, 0x8000, CRC(cae98b30) SHA1(079c018739c37485f3d64ef2145a0267fce6e20e))
+
+	ROM_REGION(0x8000, "arabic", 0)
+	ROM_LOAD("ax200arab.rom", 0x0000, 0x8000, CRC(b041e610) SHA1(7574cc5655805ea316011a8123b064917f06f83c))
+ROM_END
+
+void msx1_v9938_state::ax200(machine_config &config)
+{
+	// YM2149 in S3527
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
+	// V9938
+	// MSX Engine S3527
+
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
+	add_internal_slot(config, MSX_SLOT_RAM, "ram1", 0, 0, 2, 2); /* 32KB RAM */
+	add_internal_slot(config, MSX_SLOT_RAM, "ram2", 0, 2, 0, 2); /* 32KB RAM */
+	add_internal_slot(config, MSX_SLOT_ROM, "arabic", 0, 3, 1, 2, "arabic", 0x0000);
+	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 2, msx_cart, nullptr);
+	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 3, msx_cart, nullptr);
+	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, 0, msx_yamaha_60pin, nullptr);
+
+	msx1_v9938_pal(YM2149, config);
+}
+
+/* MSX - Sakhr AX-200 (Arabic/French) */
+
+/* MSX - Sakhr AX-200M (Arabic/English) */
+
+ROM_START (ax200m)
+	ROM_REGION(0x8000, "mainrom", 0)
+	ROM_LOAD("ax200bios.rom", 0x0000, 0x8000, CRC(cae98b30) SHA1(079c018739c37485f3d64ef2145a0267fce6e20e))
+
+	ROM_REGION(0x8000, "arabic", 0)
+	ROM_LOAD("ax200arab.rom", 0x0000, 0x8000, CRC(b041e610) SHA1(7574cc5655805ea316011a8123b064917f06f83c))
+ROM_END
+
+void msx1_v9938_state::ax200m(machine_config &config)
+{
+	// YM2149 in S3527
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
+	// V9938
+	// MSX Engine S3527
+
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
+	add_internal_slot(config, MSX_SLOT_RAM, "ram1", 0, 0, 2, 2); /* 32KB RAM */
+	add_internal_slot(config, MSX_SLOT_RAM, "ram2", 0, 2, 0, 2); /* 32KB RAM */
+	add_internal_slot(config, MSX_SLOT_ROM, "arabic", 0, 3, 1, 2, "arabic", 0x0000);
+	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 2, msx_cart, nullptr);
+	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 3, msx_cart, nullptr);
+	// Dumped unit had a SFG05 with version M5.00.011 rom
+	add_cartridge_slot<2>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, 0, msx_yamaha_60pin, "sfg05");
+
+	msx1_v9938_pal(YM2149, config);
+}
+
+/* MSX - Sakhr AX-230 */
+
+ROM_START (ax230)
+	ROM_REGION(0x20000, "mainrom", 0)
+	ROM_LOAD("qxxca0259.ic125", 0x0000, 0x20000, CRC(f1a3e650) SHA1(0340707c5de2310dcf5e569b7db4c6a6a5590cb7))
+
+	ROM_REGION(0x100000, "games", 0)
+	ROM_LOAD("qxxca0270.ic127", 0x00000, 0x100000, CRC(103c11c4) SHA1(620a209bdfdb65a22380031fce654bd1df61def2))
+ROM_END
+
+void msx_state::ax230(machine_config &config)
+{
+	// AY-3-8910 in T7937
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
+	// T6950 in T7937
+	// T7937
+
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
+	// TODO: is and if so, how is the rest of ic125 accessed?
+	add_internal_slot(config, MSX_SLOT_ROM, "arabic1", 1, 0, 1, 1, "mainrom", 0xc000);
+	add_internal_slot(config, MSX_SLOT_ROM, "arabic2", 1, 0, 2, 1, "mainrom", 0x8000);
+	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 2, msx_cart, nullptr);
+	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4); /* 64KB RAM */
+	// TODO: uses ascii8 mapper type?
+	add_internal_slot(config, MSX_SLOT_ROM, "games", 3, 3, 1, 2, "games", 0x0000);
+
+	msx1(TMS9918, AY8910, config);
+}
+
+/* MSX - Sakhr AX-330 */
+
+/* MSX - Sakhr AX-660 */
+
+/* MSX - Sakhr AX-990 */
+
+/* MSX - Salora MSX (prototypes) */
+
 /* MSX - Samsung SPC-800 */
 
 ROM_START(spc800)
-	ROM_REGION(0xc000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("spc800bios.rom", 0x0000, 0x8000, CRC(3ab0cd3b) SHA1(171b587bd5a947a13f3114120b6e7baca3b57d78))
-	ROM_LOAD("spc800han.rom",  0x8000, 0x4000, CRC(5ae2b013) SHA1(1e7616261a203580c1044205ad8766d104f1d874))
+
+	ROM_REGION(0x4000, "hangul", 0)
+	ROM_LOAD("spc800han.rom",  0x0000, 0x4000, CRC(5ae2b013) SHA1(1e7616261a203580c1044205ad8766d104f1d874))
 ROM_END
 
 void msx_state::spc800(machine_config &config)
 {
-	// AY8910/YM2149?
+	// AY-3-8910
 	// FDC: None, 0 drives
-	// 2 Cartridge slots?
+	// 1 Cartridge slot
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
-	add_internal_slot(config, MSX_SLOT_ROM, "han", 0, 0, 4, 1, "maincpu", 0x8000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "hangul", 0, 0, 2, 1, "hangul", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);  /* 64KB?? RAM */
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
+	// Expansion slot in slot #3
 
-	msx1(TMS9928A, config);
+	msx1(TMS9118, AY8910, config);
 }
+/* MSX - Sanno PHC-SPC */
+
+/* MSX - Sanno SPCmk-II */
+
+/* MSX - Sanno SPCmk-III */
+
+/* MSX - Sanyo MPC-1 / Wavy1 */
+
+/* MSX - Sanyo MPC-10 / Wavy10 */
 
 /* MSX - Sanyo MPC-64 */
 
@@ -9583,8 +9822,7 @@ void msx2_state::fsa1st(machine_config &config)
 
 /*   YEAR  NAME        PARENT    COMPAT MACHINE     INPUT     CLASS      INIT        COMPANY       FULLNAME */
 /* MSX1 */
-COMP(1986, ax150,      0,        0,     ax150,      msx,      msx_state, empty_init, "Al Alamiah", "AX-150 (Arabic) (MSX1)", 0)
-COMP(1986, ax170,      0,        0,     ax170,      msx,      msx_state, empty_init, "Al Alamiah", "AX-170 (Arabic) (MSX1)", 0)
+COMP(1986, perfect1,   0,        0,     perfect1,   msx,      msx_state, empty_init, "Bawareth", "Perfect1 (MSX1)", MACHINE_NOT_WORKING)
 COMP(1983, canonv8,    0,        0,     canonv8,    msx,      msx_state, empty_init, "Canon", "V-8 (MSX1)", 0)
 COMP(1983, canonv10,   canonv20, 0,     canonv10,   msx,      msx_state, empty_init, "Canon", "V-10 (MSX1)", 0)
 COMP(1983, canonv20,   0,        0,     canonv20,   msx,      msx_state, empty_init, "Canon", "V-20 (MSX1)", 0)
@@ -9647,7 +9885,6 @@ COMP(19??, phc28,      0,        0,     phc28,      msx,      msx_state, empty_i
 COMP(1984, cf2700g,    0,        0,     cf2700g,    msx,      msx_state, empty_init, "Panasonic", "CF-2700 (Germany) (MSX1)", 0)
 // should be qwerty with pound
 COMP(1984, cf2700uk,   0,        0,     cf2700uk,   msx,     msx_state, empty_init, "Panasonic", "CF-2700 (UK) (MSX1)", 0)
-COMP(198?, perfect1,   0,        0,     perfect1,   msx,      msx_state, empty_init, "Perfect", "Perfect1 (MSX1)", MACHINE_NOT_WORKING)
 COMP(1983, nms801,     0,        0,     nms801,     msx,      msx_state, empty_init, "Philips", "NMS-801 (MSX1)", 0)
 COMP(1984, vg8000,     vg8010,   0,     vg8000,     msx,      msx_state, empty_init, "Philips", "VG-8000 (MSX1)", 0)
 COMP(1984, vg8010,     0,        0,     vg8010,     msx,      msx_state, empty_init, "Philips", "VG-8010 / VG-8010/00 (MSX1)", 0)
@@ -9658,6 +9895,11 @@ COMP(1985, vg802020,   0,        0,     vg802020,   msx,      msx_state, empty_i
 COMP(1985, piopx7,     0,        0,     piopx7,     msx,      msx_state, empty_init, "Pioneer", "PX-07 Palcom (MSX1)", 0)
 COMP(1985, piopx7uk,   piopx7,   0,     piopx7uk,   msx,      msx_state, empty_init, "Pioneer", "PX-07UK Palcom (MSX1)", 0)
 COMP(1984, piopxv60,   piopx7,   0,     piopxv60,   msxjp,    msx_state, empty_init, "Pioneer", "PX-V60 (MSX1)", 0)
+COMP(1986, ax150,      0,        0,     ax150,      msx,      msx_state, empty_init, "Sakhr", "AX-150 (Arabic) (MSX1)", 0)
+COMP(1986, ax170,      0,        0,     ax170,      msx,      msx_state, empty_init, "Sakhr", "AX-170 (Arabic) (MSX1)", 0)
+COMP(1986, ax200,      0,        0,     ax200,      msx,      msx1_v9938_state, empty_init, "Sakhr", "AX-200 (Arabic/English) (MSX1)", 0)
+COMP(1986, ax200m,     ax200,    0,     ax200m,     msx,      msx1_v9938_state, empty_init, "Sakhr", "AX-200M (Arabic/English) (MSX1)", 0)
+COMP(1986, ax230,      0,        0,     ax230,      msx,      msx_state, empty_init, "Sakhr", "AX-230 (Arabic) (MSX1)", MACHINE_NOT_WORKING)
 COMP(19??, spc800,     0,        0,     spc800,     msx,      msx_state, empty_init, "Samsung", "SPC-800 (MSX1)", 0)
 COMP(1985, mpc64,      0,        0,     mpc64,      msxjp,    msx_state, empty_init, "Sanyo", "MPC-64 (MSX1)", 0)
 COMP(1985, mpc100,     0,        0,     mpc100,     msx,      msx_state, empty_init, "Sanyo", "MPC-100 (MSX1)", 0)
