@@ -82,7 +82,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_rom(*this, "maincpu"),
 		m_ram(*this, "ram"),
-		m_nvram(*this, "nvram", 0x20000, ENDIANNESS_LITTLE),
+		m_nvram(*this, "nvram", 0x20000),
 		m_lcd(*this, "lcd"),
 		m_smartboard(*this, "smartboard"),
 		m_speaker(*this, "speaker"),

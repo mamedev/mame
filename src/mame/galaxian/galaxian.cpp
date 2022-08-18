@@ -1946,6 +1946,12 @@ void galaxian_state::ckongg_map(address_map &map)
 	map(0xcc00, 0xcc00).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w("cust", FUNC(galaxian_sound_device::pitch_w));
 }
 
+void galaxian_state::bigkonggx_map(address_map &map)
+{
+	ckongg_map(map);
+	map(0xd400, 0xe3ff).rom();
+}
+
 // Memory map based on mooncrst_map according to Z80 code - seems to be good but needs further checking
 void galaxian_state::ckongmc_map(address_map &map)
 {
@@ -7788,6 +7794,12 @@ void galaxian_state::ckongg(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::ckongg_map);
 }
 
+void galaxian_state::bigkonggx(machine_config &config)
+{
+	galaxian(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::bigkonggx_map);
+}
+
 void galaxian_state::ckongmc(machine_config &config)
 {
 	mooncrst(config);
@@ -8838,6 +8850,24 @@ void galaxian_state::init_bmxstunts()
 	init_galaxian();
 
 	m_irq_line = 0;
+}
+
+void galaxian_state::init_bigkonggx()
+{
+	init_ckongs();
+
+	uint8_t *romdata = memregion("maincpu")->base();
+	int len = memregion("maincpu")->bytes();
+
+	// descramble the content of each 0x100 block
+	for (int i = 0; i < len; i += 256)
+	{
+		for (int j = 0; j < (256 / 2); j++)
+		{
+			using std::swap;
+			swap(romdata[i + j], romdata[i + (j ^ 0xff)]);
+		}
+	}
 }
 
 void fourplay_state::init_fourplay()
@@ -12411,9 +12441,9 @@ Notes:
 ROM_START( ckongg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "g_ck1.bin",     0x2400, 0x0400, CRC(a4323b94) SHA1(1fed47e1df5efa8f40585bedab07b60067edc2bb) )
-	ROM_CONTINUE(              0x1C00, 0x0400)
+	ROM_CONTINUE(              0x1c00, 0x0400)
 	ROM_CONTINUE(              0x4800, 0x0400)
-	ROM_CONTINUE(              0x0C00, 0x0400)
+	ROM_CONTINUE(              0x0c00, 0x0400)
 	ROM_LOAD( "ck2.bin",       0x4400, 0x0400, CRC(1e532996) SHA1(fe1feeca347fccd266925614a46c98cff683f5d3) )
 	ROM_CONTINUE(              0x0000, 0x0400)
 	ROM_CONTINUE(              0x1800, 0x0400)
@@ -12531,6 +12561,23 @@ ROM_START( ckonggx )
 
 	ROM_REGION( 0x0020, "proms", 0 ) // had the standard PROM and ugly colours
 	ROM_LOAD( "ckonggx__,6l.bpr",       0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+ROM_END
+
+
+ROM_START( bigkonggx )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gc1.a", 0x0000, 0x1000, CRC(4d7de80d) SHA1(16a9556700fc4a71a5ea06fb7530e07928058713) )
+	ROM_LOAD( "gc2.a", 0x1000, 0x1000, CRC(fda78222) SHA1(0cc69cbe5b72206cf4398e3ee535c0ec36f0e3f5) )
+	ROM_LOAD( "gc3.a", 0x2000, 0x1000, CRC(0f40ce30) SHA1(bfcdb180246ba5604d6a8fe32caba1a4651d9e7d) )
+	ROM_LOAD( "gc4.a", 0x3000, 0x1000, CRC(50b653c0) SHA1(3d4f7fb70bb561b3a240bbc6f33ff81c273de9a9) )
+	ROM_LOAD( "gc5.a", 0xd400, 0x1000, CRC(a67da7d2) SHA1(eed0cf04e17c52f11c0b182d06f8b0761b32c9e7) ) // unusual mapping, but seems to be what the code expects
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "gc.h1", 0x0000, 0x1000, CRC(7866d2cb) SHA1(62dd8b80bc0459c7337d8a8cb83e53b999e7f4a9) )
+	ROM_LOAD( "gc.k1", 0x1000, 0x1000, CRC(7311a101) SHA1(49d54c8b94cae4ba81d7a7684eaa4e87815bb4da) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "mmi6331.6l", 0x0000, 0x0020, CRC(7e0b79cb) SHA1(72ef3eb5f09e10c13dcf6fd568a6d16658055a16) )
 ROM_END
 
 
@@ -16127,6 +16174,7 @@ GAME( 1981, ckongmc2,    ckong,    ckongmc,    ckongmc2,   galaxian_state, init_
 GAME( 1981, ckonggx,     ckong,    ckongg,     ckonggx,    galaxian_state, init_ckonggx,    ROT90,  "bootleg",       "Crazy Kong (bootleg on Galaxian hardware, encrypted, set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, ckongcv,     ckong,    ckongg,     ckonggx,    galaxian_state, init_ckonggx,    ROT90,  "bootleg",       "Crazy Kong (bootleg on Galaxian hardware, encrypted, set 2)", MACHINE_NOT_WORKING )
 GAME( 1982, ckongis,     ckong,    ckongg,     ckonggx,    galaxian_state, init_ckonggx,    ROT90,  "bootleg",       "Crazy Kong (bootleg on Galaxian hardware, encrypted, set 3)", MACHINE_NOT_WORKING )
+GAME( 1981, bigkonggx,   ckong,    bigkonggx,  ckongg,     galaxian_state, init_bigkonggx,  ROT90,  "bootleg",       "Big Kong (Crazy Kong bootleg on Galaxian hardware)",          MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, bagmanmc,    bagman,   bagmanmc,   bagmanmc,   bagmanmc_state, init_bagmanmc,   ROT90,  "bootleg",       "Bagman (bootleg on Moon Cresta hardware, set 1)",             MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, bagmanm2,    bagman,   bagmanmc,   bagmanmc,   bagmanmc_state, init_bagmanmc,   ROT90,  "bootleg (GIB)", "Bagman (bootleg on Moon Cresta hardware, set 2)",             MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 

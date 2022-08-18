@@ -295,6 +295,7 @@ handheld/hh_rw5000.cpp
 handheld/hh_sm510.cpp
 handheld/hh_tms1k.cpp
 handheld/hh_ucom4.cpp
+handheld/lk3000.cpp
 handheld/monty.cpp
 handheld/rzone.cpp
 handheld/scrablex.cpp
@@ -863,7 +864,6 @@ skeleton/lee1220.cpp
 skeleton/lft.cpp
 skeleton/lg-dvd.cpp
 skeleton/lilith.cpp
-skeleton/lk3000.cpp
 skeleton/lms46.cpp
 skeleton/mccpm.cpp
 skeleton/mes.cpp

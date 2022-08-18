@@ -55,7 +55,6 @@ TODO:
 - tithermos temperature sensor comparator (right now just the digital clock works)
 - is alphie(patent) the same as the final version?
 - is starwbcp the same as MP3438? (starwbc is MP3438A)
-- add SVG for tgpachi
 
 ============================================================================
 
@@ -113,8 +112,8 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP1525   TMS1170   1980, Coleco Head to Head: Electronic Baseball
  @MP1604   TMS1370   1982, Gakken Invader 2000/Tandy Cosmic Fire Away 3000
  @MP1801   TMS1700   1981, Tiger Ditto/Tandy Pocket Repeat (model 60-2152)
- *MP2012   TMS1300   1977, Atari Europe Hit Parade 144 (jukebox) (have decap/dump)
- *MP2032   TMS1300   1980, Atari Europe unknown (jukebox)
+  MP2012   TMS1300   1977, Atari Europe Hit Parade 144 (jukebox) -> atari/hitparade.cpp
+ *MP2032   TMS1300   1980, Atari Europe unknown (jukebox, same PCB as the other one)
  @MP2105   TMS1370   1979, Gakken/Entex Poker (6005)
  @MP2110   TMS1370   1980, Gakken Invader/Tandy Fire Away
  @MP2139   TMS1370   1981, Gakken Galaxy Invader 1000/Tandy Cosmic 1000 Fire Away
@@ -317,7 +316,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "xl25.lh" // clickable
 #include "zodiac.lh" // clickable
 
-#include "hh_tms1k_test.lh" // common test-layout - use external artwork
+//#include "hh_tms1k_test.lh" // common test-layout - use external artwork
 
 
 // machine_start/reset
@@ -14272,7 +14271,7 @@ ROM_END
   * PCB label: TOFL003
   * TMS2670 M95041 (die label: TMS2400, M95041, 40H-01D-ND02-PHI0032-TTL O300-R300)
   * TMS1024 I/O expander
-  * cyan/red/yellow VFD NEC FIP9AM31T no. 21-84, 1-bit sound
+  * cyan/red/green VFD NEC FIP9AM31T no. 21-84, 1-bit sound
 
   Two versions are known, one with a red trigger button and blue slot button,
   and one with a blue trigger button and red slot button. The game itself is
@@ -14373,8 +14372,12 @@ void tgpachi_state::tgpachi(machine_config &config)
 	m_expander->write_port7_callback().set(FUNC(tgpachi_state::expander_w));
 
 	// video hardware
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(503, 1080);
+	screen.set_visarea_full();
+
 	PWM_DISPLAY(config, m_display).set_size(8, 21);
-	config.set_default_layout(layout_hh_tms1k_test);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -14393,8 +14396,8 @@ ROM_START( tgpachi )
 	ROM_REGION( 557, "maincpu:opla", 0 )
 	ROM_LOAD( "tms2100_tgpachi_output.pla", 0, 557, CRC(90849b91) SHA1(ed19444b655c48bbf2a662478d46c045d900080d) )
 
-	ROM_REGION( 100000, "screen", 0)
-	ROM_LOAD( "tgpachi.svg", 0, 100000, NO_DUMP )
+	ROM_REGION( 140540, "screen", 0)
+	ROM_LOAD( "tgpachi.svg", 0, 140540, CRC(95ad7b9f) SHA1(f2f5550ff6a406bcf8310674e55f1ab8ec21f5d2) )
 ROM_END
 
 
@@ -14865,7 +14868,7 @@ CONS( 1979, tbreakup,   0,         0, tbreakup,  tbreakup,  tbreakup_state,  emp
 CONS( 1980, phpball,    0,         0, phpball,   phpball,   phpball_state,   empty_init, "Tomy", "Power House Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 CONS( 1982, tdracula,   0,         0, tdracula,  tdracula,  tdracula_state,  empty_init, "Tsukuda", "The Dracula (Tsukuda)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, tgpachi,    0,         0, tgpachi,   tgpachi,   tgpachi_state,   empty_init, "Tsukuda", "Game Pachinko", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1983, tgpachi,    0,         0, tgpachi,   tgpachi,   tgpachi_state,   empty_init, "Tsukuda", "Game Pachinko", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1980, ssports4,   0,         0, ssports4,  ssports4,  ssports4_state,  empty_init, "U.S. Games", "Super Sports-4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 

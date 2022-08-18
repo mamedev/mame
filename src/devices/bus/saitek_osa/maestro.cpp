@@ -51,7 +51,7 @@ saitekosa_maestro_device::saitekosa_maestro_device(const machine_config &mconfig
 	device_t(mconfig, type, tag, owner, clock),
 	device_saitekosa_expansion_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
-	m_banked_ram(*this, "banked_ram", 0x2000, ENDIANNESS_LITTLE),
+	m_banked_ram(*this, "banked_ram", 0x2000),
 	m_rambank(*this, "rambank"),
 	m_rombank(*this, "rombank"),
 	m_extrom(*this, "extrom")

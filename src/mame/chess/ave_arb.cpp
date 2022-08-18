@@ -67,7 +67,7 @@ public:
 		m_display(*this, "display"),
 		m_board(*this, "board"),
 		m_via(*this, "via"),
-		m_extram(*this, "extram", 0x800, ENDIANNESS_LITTLE),
+		m_extram(*this, "extram", 0x800),
 		m_dac(*this, "dac"),
 		m_cart(*this, "cartslot"),
 		m_inputs(*this, "IN.%u", 0)
