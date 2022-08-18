@@ -89,10 +89,24 @@ uint32_t amstarz80_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 void amstarz80_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x17ff).rom();
+	map(0x1c00, 0x1cff).ram();
+	map(0x2000, 0x21ff).ram();
+	map(0x2400, 0x25ff).ram();
+	map(0x2800, 0x29ff).ram();
+	map(0x4000, 0x4000).portr("IN0");
+	map(0x4001, 0x4001).portr("IN1");
 }
 
 
 static INPUT_PORTS_START( holddraw )
+	PORT_START("IN0")
+	PORT_BIT(0x75, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN)
+	PORT_BIT(0x0a, IP_ACTIVE_HIGH, IPT_UNKNOWN)
+
+	PORT_START("IN1")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
 // 2x 8 dip banks
 // 1x 4 dip bank
 INPUT_PORTS_END
