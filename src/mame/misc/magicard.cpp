@@ -13,11 +13,11 @@
   - Verify RAM config on PCBs;
   - I/Os;
   - UART;
-  - hook-up pic16f84 when emulation available
+  - hook-up PIC16F84 when emulation available
   - hotslots, quingo: sets up 68070 timer chs 1 & 2, currently unsupported;
   - bigdeal0: locks with 68070 continually executing address error exception
-  - determine what drives int1_w. (It's rtc on boards with rtc) (Not all games use this)
-  - Correct memory map - at the moment rom is mapped to several address spaces for
+  - determine what drives int1_w. (It's RTC on boards with RTC) (Not all games use this)
+  - Correct memory map - at the moment ROM is mapped to several address spaces for
     all games. This is probably wrong.
   - dallaspk produces white noise after some sounds.
 
@@ -205,6 +205,8 @@
 #define CLOCK_B XTAL(8'000'000)
 #define CLOCK_C XTAL(19'660'800)
 
+namespace {
+
 enum
 {
 	I2C_CPU = 0,
@@ -226,6 +228,14 @@ public:
 
 	void magicard_base(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	uint32_t screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void ramdac_map(address_map &map);
+
 	void dram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	uint16_t dram_r(offs_t offset, uint16_t mem_mask);
 	void mcu_dram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
@@ -236,10 +246,14 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(cpu_int1);
 
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	uint32_t screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(scc66470_irq);
+	DECLARE_WRITE_LINE_MEMBER(cpu_i2c_scl);
+	DECLARE_WRITE_LINE_MEMBER(cpu_i2c_sda_write);
+	DECLARE_READ_LINE_MEMBER(cpu_i2c_sda_read);
+
+	void update_sda(uint8_t device, uint8_t state);
+	void update_scl(uint8_t device, uint8_t state);
+
 	required_device<scc68070_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -249,19 +263,10 @@ protected:
 	uint8_t m_sda_state;
 	uint8_t m_scl_state;
 
-	void ramdac_map(address_map &map);
-
-	DECLARE_WRITE_LINE_MEMBER(scc66470_irq);
-	DECLARE_WRITE_LINE_MEMBER(cpu_i2c_scl);
-	DECLARE_WRITE_LINE_MEMBER(cpu_i2c_sda_write);
-	DECLARE_READ_LINE_MEMBER(cpu_i2c_sda_read);
-
-	void update_sda(uint8_t device, uint8_t state);
-	void update_scl(uint8_t device, uint8_t state);
-
 private:
 	void scc66470_map(address_map &map);
-	std::unique_ptr<uint16_t[]>m_dram;
+
+	std::unique_ptr<uint16_t []> m_dram;
 
 };
 
@@ -282,16 +287,16 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	required_device<nvram_device> m_nvram;
-	required_device<ds1207_device> m_ds1207;
-
-	std::unique_ptr<uint8_t[]> m_nvram8;
-
 	void magicard_map(address_map &map);
 	uint8_t nvram_r(offs_t offset);
 	void nvram_w(offs_t offset, uint8_t data);
 	uint8_t read_ds1207(offs_t offset);
 	void write_ds1207(offs_t offset, uint8_t data);
+
+	required_device<nvram_device> m_nvram;
+	required_device<ds1207_device> m_ds1207;
+
+	std::unique_ptr<uint8_t[]> m_nvram8;
 };
 
 class hotslots_state : public magicard_base_state
@@ -311,10 +316,6 @@ public:
 	void puzzleme(machine_config &config);
 
 private:
-	optional_device<ds2401_device> m_ds2401;
-	optional_device<ds1207_device> m_ds1207;
-	required_device<rtc72421_device> m_rtc;
-
 	void hotslots_map_base(address_map &map);
 	void hotslots_map(address_map &map);
 	void puzzleme_map(address_map &map);
@@ -324,11 +325,15 @@ private:
 	void output_w(offs_t offset, uint16_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(cpu_int1);
+
+	optional_device<ds2401_device> m_ds2401;
+	optional_device<ds1207_device> m_ds1207;
+	required_device<rtc72421_device> m_rtc;
 };
 
 void magicard_base_state::machine_start()
 {
-	m_dram = make_unique_clear<uint16_t[]>(0x80000/2);
+	m_dram = make_unique_clear<uint16_t []>(0x80000/2);
 	save_pointer(NAME(m_dram), 0x80000/2);
 	save_item(NAME(m_sda_state));
 	save_item(NAME(m_scl_state));
@@ -337,7 +342,7 @@ void magicard_base_state::machine_start()
 void magicard_state::machine_start()
 {
 	magicard_base_state::machine_start();
-	m_nvram8 = std::make_unique<uint8_t[]>(16384);
+	m_nvram8 = std::make_unique<uint8_t []>(16384);
 	m_nvram->set_base(m_nvram8.get(),16384);
 }
 
@@ -479,14 +484,14 @@ void hotslots_state::output_w(offs_t offset, uint16_t data)
 void magicard_state::magicard_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).m(m_scc66470, FUNC(scc66470_device::map));
-	map(0x00000000, 0x0017ffff).rw(FUNC(magicard_base_state::mcu_dram_r), FUNC(magicard_base_state::mcu_dram_w));
+	map(0x00000000, 0x0017ffff).rw(FUNC(magicard_state::mcu_dram_r), FUNC(magicard_state::mcu_dram_w));
 	map(0x00180000, 0x001dffff).rom().region("maincpu", 0); // boot vectors point here
 	map(0x001e0000, 0x001e7fff).rw(FUNC(magicard_state::nvram_r), FUNC(magicard_state::nvram_w)).umask16(0x00ff);
 	map(0x00200000, 0x003fffff).rw(m_scc66470, FUNC(scc66470_device::ipa_r), FUNC(scc66470_device::ipa_w));
 	/* 001ffc00-001ffdff System I/O */
 	map(0x001ffc00, 0x001ffc01).portr("SW0");
 	map(0x001ffc40, 0x001ffc41).portr("SW1");
-	map(0x001ffc80, 0x001ffc81).w( FUNC(magicard_base_state::output_w));
+	map(0x001ffc80, 0x001ffc81).w( FUNC(magicard_state::output_w));
 	map(0x001ffd01, 0x001ffd01).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x001ffd03, 0x001ffd03).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x001ffd05, 0x001ffd05).w("ramdac", FUNC(ramdac_device::mask_w));
@@ -499,7 +504,7 @@ void magicard_state::magicard_map(address_map &map)
 void hotslots_state::hotslots_map_base(address_map &map)
 {
 	map(0x00000000, 0x001fffff).m(m_scc66470, FUNC(scc66470_device::map));
-	map(0x00000000, 0x0017ffff).rw(FUNC(magicard_base_state::mcu_dram_r), FUNC(magicard_base_state::mcu_dram_w));
+	map(0x00000000, 0x0017ffff).rw(FUNC(hotslots_state::mcu_dram_r), FUNC(hotslots_state::mcu_dram_w));
 	map(0x00180000, 0x001ffbff).rom().region("maincpu", 0); // boot vectors point here
 	map(0x00200000, 0x003fffff).rw(m_scc66470, FUNC(scc66470_device::ipa_r), FUNC(scc66470_device::ipa_w));
 	map(0x00600000, 0x0067fbff).rom().region("maincpu", 0); // boot vectors point here
@@ -540,29 +545,29 @@ static INPUT_PORTS_START( magicard )
 
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Remote 2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("Remote 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 )                      PORT_NAME("Remote 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN4 )                      PORT_NAME("Remote 1")
 
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Bet/Clear/Collect")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )                    PORT_NAME("Bet/Clear/Collect")
 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Hold 5")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
 
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_BIT( 0x100, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Rental Book Keeping") PORT_TOGGLE
-	PORT_BIT( 0x200, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Owner Book Keeping")
+	PORT_BIT( 0x100, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )   PORT_TOGGLE PORT_NAME("Rental Book Keeping")
+	PORT_BIT( 0x200, IP_ACTIVE_LOW, IPT_SERVICE1 )                  PORT_NAME("Owner Book Keeping")
 
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Hold 4")
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2")
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
 
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Pay Out")
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hopper Count") PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Accounting 3") PORT_TOGGLE
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )            PORT_NAME("Pay Out")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 )                  PORT_NAME("Hopper Count") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE3 )     PORT_TOGGLE PORT_NAME("Accounting 3")
 
 	PORT_START("SW1")
 	PORT_DIPNAME( 0x80, 0x80, "Hopper" )                    PORT_DIPLOCATION("DIP 1:1")
@@ -592,14 +597,14 @@ static INPUT_PORTS_START( magicard )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 )     PORT_NAME("Hopper Full")     PORT_CODE(KEYCODE_A)  PORT_TOGGLE
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )      // PORT_NAME("Reserve In 9")
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )      // PORT_NAME("Reserve In 8")
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED )      // PORT_NAME("Reserve In 7")
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )      // PORT_NAME("Reserve In 6")
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )      // PORT_NAME("Reserve In 5")
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) PORT_NAME("Door Switch")     PORT_TOGGLE
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON4 )    PORT_NAME("Clear Credit")     PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 )      PORT_TOGGLE PORT_NAME("Hopper Full")     PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )                   // PORT_NAME("Reserve In 9")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )                   // PORT_NAME("Reserve In 8")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED )                   // PORT_NAME("Reserve In 7")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )                   // PORT_NAME("Reserve In 6")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )                   // PORT_NAME("Reserve In 5")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )  PORT_TOGGLE PORT_NAME("Door Switch")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON4 )                  PORT_NAME("Clear Credit")    PORT_CODE(KEYCODE_J)
 
 INPUT_PORTS_END
 
@@ -619,15 +624,15 @@ static INPUT_PORTS_START( puzzleme )
 	PORT_START("SW0")
 
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Remote")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN3 )            PORT_NAME("Remote")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_NAME("Clear")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Show All Book Keeping")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MEMORY_RESET )     PORT_NAME("Clear")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE3 )         PORT_NAME("Show All Book Keeping")
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Rental Book Keeping")
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Owner Book Keeping")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )      PORT_NAME("Rental Book Keeping")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SERVICE1 )         PORT_NAME("Owner Book Keeping")
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
@@ -662,10 +667,10 @@ static INPUT_PORTS_START( lucky7i )
 
 	PORT_MODIFY("SW0")
 
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Win Plan Scroll/Collect")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Einsatz")
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start/Gamble")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Rental Book Keeping")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 )          PORT_NAME("Win Plan Scroll/Collect")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_BET )       PORT_NAME("Einsatz")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )           PORT_NAME("Start/Gamble")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )      PORT_NAME("Rental Book Keeping")
 
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -704,7 +709,7 @@ static INPUT_PORTS_START( lucky7i )
 
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Attendant Collect") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )    PORT_NAME("Attendant Collect")
 
 INPUT_PORTS_END
 
@@ -758,8 +763,8 @@ INPUT_PORTS_END
 
 void magicard_base_state::machine_reset()
 {
-	uint16_t *src = (uint16_t*)memregion("maincpu")->base();
-	m_scc66470->set_vectors( src );
+	uint16_t *const src = (uint16_t *)memregion("maincpu")->base();
+	m_scc66470->set_vectors(src);
 
 	m_sda_state = 0;
 	m_scl_state = 0;
@@ -777,7 +782,7 @@ WRITE_LINE_MEMBER(magicard_base_state::scc66470_irq)
 
 WRITE_LINE_MEMBER(magicard_base_state::cpu_int1)
 {
-	// todo: is this used by games on magicard hardware ?
+	// TODO: is this used by games on magicard hardware ?
 	m_maincpu->int1_w(1);
 	m_maincpu->int1_w(0);
 }
@@ -866,7 +871,7 @@ void magicard_state::magicard(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &magicard_state::magicard_map);
 
-	m_screen->screen_vblank().set(FUNC(magicard_base_state::cpu_int1));
+	m_screen->screen_vblank().set(FUNC(magicard_state::cpu_int1));
 
 	SAA1099(config, "saa", CLOCK_B).add_route(ALL_OUTPUTS, "mono", 1.0);
 
@@ -880,8 +885,8 @@ void magicard_state::magicard_pic54(machine_config &config)
 	magicard(config);
 
 	pic16c54_device &pic(PIC16C54(config, "pic16c54", 3686400)); // correct?
-	pic.read_b().set(FUNC(magicard_base_state::pic_portb_r));
-	pic.write_b().set(FUNC(magicard_base_state::pic_portb_w));
+	pic.read_b().set(FUNC(magicard_state::pic_portb_r));
+	pic.write_b().set(FUNC(magicard_state::pic_portb_w));
 }
 
 void magicard_state::unkte06(machine_config &config)
@@ -889,8 +894,8 @@ void magicard_state::unkte06(machine_config &config)
 	magicard(config);
 
 	pic16c56_device &pic(PIC16C56(config, "pic16c56", 3686400)); // correct?
-	pic.read_b().set(FUNC(magicard_base_state::pic_portb_r));
-	pic.write_b().set(FUNC(magicard_base_state::pic_portb_w));
+	pic.read_b().set(FUNC(magicard_state::pic_portb_r));
+	pic.write_b().set(FUNC(magicard_state::pic_portb_w));
 }
 
 uint8_t magicard_base_state::pic_portb_r()
@@ -931,8 +936,8 @@ void hotslots_state::hotslots_pic54(machine_config &config)
 	hotslots(config);
 
 	pic16c54_device &pic(PIC16C54(config, "pic16c54", 3686400)); // correct?
-	pic.read_b().set(FUNC(magicard_base_state::pic_portb_r));
-	pic.write_b().set(FUNC(magicard_base_state::pic_portb_w));
+	pic.read_b().set(FUNC(hotslots_state::pic_portb_r));
+	pic.write_b().set(FUNC(hotslots_state::pic_portb_w));
 }
 
 void hotslots_state::magicle(machine_config &config)
@@ -949,8 +954,8 @@ void hotslots_state::puzzleme(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &hotslots_state::puzzleme_map);
 
 	pic16c54_device &pic(PIC16C54(config, "pic16c54", 3686400)); // correct?
-	pic.read_b().set(FUNC(magicard_base_state::pic_portb_r));
-	pic.write_b().set(FUNC(magicard_base_state::pic_portb_w));
+	pic.read_b().set(FUNC(hotslots_state::pic_portb_r));
+	pic.write_b().set(FUNC(hotslots_state::pic_portb_w));
 
 	I2C_24C02(config, m_i2cmem).set_e0(1);
 
@@ -2150,6 +2155,8 @@ ROM_START( kajotcrd )
 	ROM_REGION(0x8, "serial_id", 0) /* serial number */
 	ROM_LOAD( "ds2401", 0x000000, 0x000008, BAD_DUMP CRC(3f87b999) SHA1(29649749d521ced9dc7ef1d0d6ddb9a8beea360f) ) // created to match game
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************

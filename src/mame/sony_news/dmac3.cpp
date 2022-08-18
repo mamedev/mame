@@ -17,8 +17,8 @@
 
 DEFINE_DEVICE_TYPE(DMAC3, dmac3_device, "dmac3", "Sony CXD8403Q DMAC3 DMA Controller")
 
-dmac3_device::dmac3_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, DMAC3, tag, owner, clock), m_bus(*this, finder_base::DUMMY_TAG, -1, 64),
+dmac3_device::dmac3_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, DMAC3, tag, owner, clock), m_bus(*this, finder_base::DUMMY_TAG, -1, 64),
 	m_irq_handler(*this),
 	m_dma_r(*this),
 	m_dma_w(*this),
