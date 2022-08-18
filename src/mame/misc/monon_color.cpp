@@ -38,7 +38,12 @@
 
    Some games made use of either a card reader, or a badge reader on the
    cartridge, this is not yet emulated.  The card reader was based on
-   barcode-like patterns, while the badge reader is reportedly an RFID device
+   barcode-like patterns, the badge reader looks to also be based on barcodes
+
+   AXC51_TMR1PWML / AXC51_TMR1PWMH (Timer 1 Duty Registers) in the AX208
+   core are responsible for screen brightness (can be adjusted in the pause
+   menu)  There's no Timer 1 IRQ Handler in the code, but presumably the LCD
+   is driven directly off the timer pins.
 
 ***************************************************************************/
 
@@ -129,6 +134,11 @@ private:
 		m_cart->write(data);
 	}
 
+	void get_sound_command_bit(uint8_t bit);
+	bool m_sound_direction;
+	uint16_t m_sound_latch;
+	uint8_t m_sound_bitpos;
+	uint8_t m_sound_response_bit;
 
 	void do_draw_inner(int pal_to_use, int start, int step, int pixmask, int amount);
 	void do_draw(int amount, int pal_to_use);
@@ -164,6 +174,11 @@ void monon_color_state::machine_start()
 	save_item(NAME(m_bufpos_y));
 	save_item(NAME(m_curpal));
 	save_item(NAME(m_storeregs));
+
+	save_item(NAME(m_sound_direction));
+	save_item(NAME(m_sound_latch));
+	save_item(NAME(m_sound_bitpos));
+	save_item(NAME(m_sound_response_bit));
 }
 
 
@@ -197,6 +212,11 @@ void monon_color_state::machine_reset()
 	std::fill(std::begin(m_storeregs), std::end(m_storeregs), 0);
 	std::fill(std::begin(m_linebuf), std::end(m_linebuf), 0);	
 	std::fill(std::begin(m_vidbuffer), std::end(m_vidbuffer), 0);
+
+	m_sound_direction = false;
+	m_sound_latch = 0;
+	m_sound_bitpos = 0;
+	m_sound_response_bit = 0;
 }
 
 
@@ -395,7 +415,8 @@ uint8_t monon_color_state::in1_r()
 uint8_t monon_color_state::in2_r()
 {
 	uint8_t in = read_current_inputs();
-	uint8_t ret = m_debugin[2]->read() & 0xfb;
+	uint8_t ret = m_out2data & 0x7b;
+	ret |= m_sound_response_bit << 7;
 	if (in & 0x04) ret |= 0x04;
 
 	return ret;
@@ -454,8 +475,68 @@ void monon_color_state::out1_w(uint8_t data)
 
 }
 
+void monon_color_state::get_sound_command_bit(uint8_t bit)
+{
+	bit &= 1;
+
+	if (m_sound_bitpos == 0)
+	{
+		if (bit == 1)
+		{
+			m_sound_direction = true;
+			m_sound_latch = 0;
+		}
+		else // this might be incorrect, code needs studying further
+		{
+			m_sound_direction = false;
+			m_sound_latch = 0; // status return?
+		}
+		m_sound_bitpos++;
+	}
+	else
+	{
+		if (m_sound_direction)
+		{
+			m_sound_latch = m_sound_latch << 1;
+			m_sound_latch |= bit;
+
+			m_sound_bitpos++;
+
+			if (m_sound_bitpos == 17)
+			{
+				logerror("%s: sent sound word %04x to MCU\n", machine().describe_context(), m_sound_latch);
+				m_sound_bitpos = 0;
+			}
+
+		}
+		else
+		{
+			m_sound_response_bit = m_sound_latch & 0x01;
+			m_sound_latch >>= 1;
+
+			m_sound_bitpos++;
+
+			if (m_sound_bitpos == 17)
+			{
+				logerror("%s: finished clocking in MCU response to read?\n", machine().describe_context());
+				m_sound_bitpos = 0;
+			}
+		}
+	}
+}
+
 void monon_color_state::out2_w(uint8_t data)
 {
+	// on the cartridge PCB the connections to the sound MCU glob are marked P21, P25 and P27
+	// This is where the signals go on the AX208 (Port 2 bit 1, Port 2 bit 5, Port 2 bit 7)
+
+	// m-C- --Ms
+
+	// m = from MCU serial data (in)
+	// C = clock MCU serial data (out)
+	// M = to MCU serial data (out)
+	// s = SPI Chip Enable / Reset?
+
 	if ((data & 0x01) != (m_out2data & 0x01))
 	{
 		if (data & 0x01)
@@ -467,6 +548,21 @@ void monon_color_state::out2_w(uint8_t data)
 			m_cart->set_ready();
 		}
 	}
+
+	if ((data & 0x20) != (m_out2data & 0x20))
+	{
+		if (data & 0x20)
+		{
+			// .. nothing
+		}
+		else
+		{
+			// sends m_out2data & 0x02 to external device / latches a read bit into m_out2data & 0x80
+			//logerror("%s: send / recieve sound MCU, bit written %d\n", machine().describe_context(), (data & 0x02) >> 1 );
+			get_sound_command_bit((data & 0x02) >> 1); 
+		}
+	}
+
 	m_out2data = data;
 }
 
