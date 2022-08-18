@@ -106,7 +106,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_rom(*this, "maincpu"),
-		m_nvram(*this, "nvram", 0x2000),
+		m_nvram(*this, "nvram", 0x2000, ENDIANNESS_BIG),
 		m_board(*this, "board"),
 		m_bav_busy(*this, "bav_busy"),
 		m_fake(*this, "FAKE")

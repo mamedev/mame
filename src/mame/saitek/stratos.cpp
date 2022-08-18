@@ -72,7 +72,7 @@ class stratos_state : public saitek_stratos_state
 public:
 	stratos_state(const machine_config &mconfig, device_type type, const char *tag) :
 		saitek_stratos_state(mconfig, type, tag),
-		m_banked_nvram(*this, "nvram.u7", 0x2000),
+		m_banked_nvram(*this, "nvram.u7", 0x2000, ENDIANNESS_LITTLE),
 		m_nvrambank(*this, "nvrambank"),
 		m_rombank(*this, "rombank"),
 		m_extrom(*this, "extrom"),

@@ -31,7 +31,7 @@ public:
 	berlin_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_nvram(*this, "nvram", 0x2000)
+		, m_nvram(*this, "nvram", 0x2000, ENDIANNESS_BIG)
 		, m_board(*this, "board")
 		, m_display(*this, "display")
 		, m_keys(*this, "KEY")

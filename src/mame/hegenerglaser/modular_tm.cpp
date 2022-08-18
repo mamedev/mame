@@ -62,7 +62,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_rom(*this, "maincpu"),
 		m_mainram(*this, "mainram"),
-		m_nvram(*this, "nvram", 0x2000),
+		m_nvram(*this, "nvram", 0x2000, ENDIANNESS_BIG),
 		m_disable_bootrom(*this, "disable_bootrom"),
 		m_fake(*this, "FAKE")
 	{ }
