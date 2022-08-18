@@ -61,6 +61,7 @@
 #include "sound/dac.h"
 
 #define LOG_VDP (1U <<  1)
+#define LOG_SOUNDMCUCOMMS (1U << 2)
 
 //#define VERBOSE     (LOG_VDP)
 #define VERBOSE     (0)
@@ -135,10 +136,11 @@ private:
 	}
 
 	void get_sound_command_bit(uint8_t bit);
-	bool m_sound_direction;
+	bool m_sound_direction_iswrite;
 	uint16_t m_sound_latch;
 	uint8_t m_sound_bitpos;
 	uint8_t m_sound_response_bit;
+	uint8_t m_sound_bits_in_needed;
 
 	void do_draw_inner(int pal_to_use, int start, int step, int pixmask, int amount);
 	void do_draw(int amount, int pal_to_use);
@@ -175,10 +177,11 @@ void monon_color_state::machine_start()
 	save_item(NAME(m_curpal));
 	save_item(NAME(m_storeregs));
 
-	save_item(NAME(m_sound_direction));
+	save_item(NAME(m_sound_direction_iswrite));
 	save_item(NAME(m_sound_latch));
 	save_item(NAME(m_sound_bitpos));
 	save_item(NAME(m_sound_response_bit));
+	save_item(NAME(m_sound_bits_in_needed));
 }
 
 
@@ -213,10 +216,11 @@ void monon_color_state::machine_reset()
 	std::fill(std::begin(m_linebuf), std::end(m_linebuf), 0);	
 	std::fill(std::begin(m_vidbuffer), std::end(m_vidbuffer), 0);
 
-	m_sound_direction = false;
+	m_sound_direction_iswrite = true;
 	m_sound_latch = 0;
 	m_sound_bitpos = 0;
 	m_sound_response_bit = 0;
+	m_sound_bits_in_needed = 0;
 }
 
 
@@ -481,21 +485,13 @@ void monon_color_state::get_sound_command_bit(uint8_t bit)
 
 	if (m_sound_bitpos == 0)
 	{
-		if (bit == 1)
-		{
-			m_sound_direction = true;
-			m_sound_latch = 0;
-		}
-		else // this might be incorrect, code needs studying further
-		{
-			m_sound_direction = false;
-			m_sound_latch = 0; // status return?
-		}
+		// first bit isn't part of the data? but isn't 0/1 depending on if it's a read/write eiter?
+		//LOGMASKED(LOG_SOUNDMCUCOMMS, "%s: started read/write command\n", machine().describe_context());
 		m_sound_bitpos++;
 	}
 	else
 	{
-		if (m_sound_direction)
+		if (m_sound_direction_iswrite)
 		{
 			m_sound_latch = m_sound_latch << 1;
 			m_sound_latch |= bit;
@@ -504,8 +500,55 @@ void monon_color_state::get_sound_command_bit(uint8_t bit)
 
 			if (m_sound_bitpos == 17)
 			{
-				logerror("%s: sent sound word %04x to MCU\n", machine().describe_context(), m_sound_latch);
+				//LOGMASKED(LOG_SOUNDMCUCOMMS, "%s: sent sound word %04x to MCU\n", machine().describe_context().c_str(), m_sound_latch);
 				m_sound_bitpos = 0;
+
+				switch (m_sound_latch & 0xf000)
+				{
+
+				case 0x0000:
+					LOGMASKED(LOG_SOUNDMCUCOMMS, "0-00x set volume to %04x\n", m_sound_latch & 0x0fff);
+					m_sound_latch = 0;
+					break;
+
+				case 0x2000:
+					LOGMASKED(LOG_SOUNDMCUCOMMS, "2-00x unknown %04x\n", m_sound_latch & 0x0fff); // written with 2001 before restoring muted sound
+					m_sound_latch = 0;
+					break;
+
+				case 0x3000:
+					LOGMASKED(LOG_SOUNDMCUCOMMS, "3-000 stop all / mute %04x\n", m_sound_latch & 0x0fff);
+					m_sound_latch = 0;
+					break;
+
+				case 0x4000:
+					LOGMASKED(LOG_SOUNDMCUCOMMS, "4-000 reset? %04x\n", m_sound_latch & 0x0fff);
+					m_sound_latch = 0;
+					break;
+
+				case 0xa000:
+					LOGMASKED(LOG_SOUNDMCUCOMMS, "a-xxx play? status return wanted %04x\n", m_sound_latch & 0x0fff);
+					m_sound_direction_iswrite = false;
+					m_sound_bits_in_needed = 9;
+					m_sound_latch = 0xff; // return an 8-bit value?
+					break;
+
+				default:
+					LOGMASKED(LOG_SOUNDMCUCOMMS, "x-xxx unknown MCU write %04x\n", m_sound_latch);
+					m_sound_latch = 0;
+					break;
+
+				}
+
+				if ((m_sound_latch == 0xa858) || (m_sound_latch == 0xa0b0))
+				{
+
+				}
+				else
+				{
+					m_sound_latch = 0; // not if we're reading
+				}
+
 			}
 
 		}
@@ -516,10 +559,11 @@ void monon_color_state::get_sound_command_bit(uint8_t bit)
 
 			m_sound_bitpos++;
 
-			if (m_sound_bitpos == 17)
+			if (m_sound_bitpos == m_sound_bits_in_needed)
 			{
-				logerror("%s: finished clocking in MCU response to read?\n", machine().describe_context());
+				//LOGMASKED(LOG_SOUNDMCUCOMMS, "%s: finished clocking in MCU response to read?\n", machine().describe_context());
 				m_sound_bitpos = 0;
+				m_sound_direction_iswrite = true;
 			}
 		}
 	}
@@ -558,7 +602,7 @@ void monon_color_state::out2_w(uint8_t data)
 		else
 		{
 			// sends m_out2data & 0x02 to external device / latches a read bit into m_out2data & 0x80
-			//logerror("%s: send / recieve sound MCU, bit written %d\n", machine().describe_context(), (data & 0x02) >> 1 );
+			//logerror("%s: send / recieve sound MCU, bit written %d\n", machine().describe_context(), (data & 0x02) >> 1);
 			get_sound_command_bit((data & 0x02) >> 1); 
 		}
 	}

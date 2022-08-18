@@ -172,6 +172,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- there is a second glob in the cartridge, presumably for the card reader -->
 	<software name="lockcard" supported="no"> <!-- 204 - Locke Kingdom: Card Wars -->
 		<description>Luòkè wángguó-kǎ pái zhàn jì</description>
 		<year>2015</year>
