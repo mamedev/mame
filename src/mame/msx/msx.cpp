@@ -4127,7 +4127,7 @@ void msx_state::phc28(machine_config &config)
 	// 1 Expansion slot
 
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 1, 3);   /* 16KB RAM */
+	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1);   /* 16KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	// expansion slot
