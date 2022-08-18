@@ -540,16 +540,6 @@ void monon_color_state::get_sound_command_bit(uint8_t bit)
 					break;
 
 				}
-
-				if ((m_sound_latch == 0xa858) || (m_sound_latch == 0xa0b0))
-				{
-
-				}
-				else
-				{
-					m_sound_latch = 0; // not if we're reading
-				}
-
 			}
 
 		}
