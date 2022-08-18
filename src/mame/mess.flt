@@ -1216,6 +1216,7 @@ vtech/laser3k.cpp
 vtech/lcmate2.cpp
 vtech/pc2000.cpp
 vtech/pc4.cpp
+vtech/phusion.cpp
 vtech/prestige.cpp
 vtech/socrates.cpp
 vtech/storio.cpp
