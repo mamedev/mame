@@ -506,6 +506,11 @@ void monon_color_state::get_sound_command_bit(uint8_t bit)
 			// if it doesn't get this, it will loop until by chance it gets the same
 			// value, which results in random delays (eg. when moving the volume
 			// slider from 0 to any other value)
+			//
+			// mechcycla (the game with the earliest firmware) will jump to an infinite
+			// loop if this is wrong, this doesn't happen with mechcycl, which uses a
+			// later firmware.
+
 			m_sound_latch = m_lastspi;
 			//logerror("m_sound_latch set to %02x\n", m_sound_latch);
 
