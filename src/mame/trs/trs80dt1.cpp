@@ -45,6 +45,8 @@ the printer data goes to B800 which is a spare address range in the real machine
 #include "speaker.h"
 
 
+namespace {
+
 class trs80dt1_state : public driver_device
 {
 public:
@@ -391,5 +393,6 @@ ROM_START( trs80dt1 )
 	ROM_LOAD( "8045716.u8",   0x0000, 0x0800, CRC(e2c5e59b) SHA1(0d571888d5f9fea4e565486ea8d3af8998ca46b1) )
 ROM_END
 
-COMP( 1982, trs80dt1, 0, 0, trs80dt1, trs80dt1, trs80dt1_state, empty_init, "Radio Shack", "TRS-80 DT-1 Data Terminal", MACHINE_SUPPORTS_SAVE )
+} // anonymous namespace
 
+COMP( 1982, trs80dt1, 0, 0, trs80dt1, trs80dt1, trs80dt1_state, empty_init, "Radio Shack", "TRS-80 DT-1 Data Terminal", MACHINE_SUPPORTS_SAVE )

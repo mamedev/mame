@@ -73,6 +73,8 @@
 
 #include "logmacro.h"
 
+namespace {
+
 // 14174 Control register bits definition
 enum
 {
@@ -117,10 +119,13 @@ public:
 		, m_modem(*this, "modem")
 		, m_serport(*this, "periinfo")
 		, m_io_kbd(*this, "Y%u", 0)
-		{
-		}
+	{
+	}
 
 	void minitel2(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	required_device<i80c32_device> m_maincpu;
@@ -129,6 +134,18 @@ private:
 	required_device<i2cmem_device> m_i2cmem;
 	required_device<rs232_port_device> m_modem;
 	required_device<rs232_port_device> m_serport;
+
+	required_ioport_array<16> m_io_kbd;
+
+	uint8_t port1 = 0, port3 = 0;
+
+	int keyboard_para_ser = 0;
+	uint8_t keyboard_x_row_reg = 0;
+
+	uint8_t last_ctrl_reg = 0;
+
+	int lineconnected = 0;
+	int tonedetect = 0;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(minitel_scanline);
 
@@ -145,21 +162,8 @@ private:
 	uint8_t ts9347_io_r(offs_t offset);
 	void ts9347_io_w(offs_t offset, uint8_t data);
 
-	void mem_io(address_map &map);
 	void mem_prg(address_map &map);
-
-	required_ioport_array<16> m_io_kbd;
-	virtual void machine_start() override;
-
-	uint8_t port1 = 0, port3 = 0;
-
-	int keyboard_para_ser = 0;
-	uint8_t keyboard_x_row_reg = 0;
-
-	uint8_t last_ctrl_reg = 0;
-
-	int lineconnected = 0;
-	int tonedetect = 0;
+	void mem_io(address_map &map);
 };
 
 void minitel_state::machine_start()
@@ -565,5 +569,7 @@ ROM_START( minitel2 )
 	ROM_REGION( 0x4000, "ts9347", 0 )
 	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )            // from dcvg5k
 ROM_END
+
+} // anonymous namespace
 
 COMP( 1989, minitel2, 0, 0, minitel2, minitel2, minitel_state, empty_init, "Philips", "Minitel 2", MACHINE_NO_SOUND )

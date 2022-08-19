@@ -170,13 +170,6 @@ Notes on floppy drive:
 #include "ibm6580.lh"
 
 
-#define I8086_TAG       "i8086"
-#define I8259A_TAG      "i8259"
-#define I8255A_TAG      "i8255a"
-#define I8253_TAG       "i8253"
-#define UPD765_TAG      "upd765"
-
-
 //#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
 #define LOG_KEYBOARD  (1U <<  1)
 #define LOG_DEBUG     (1U <<  2)
@@ -187,6 +180,11 @@ Notes on floppy drive:
 
 #define LOGKBD(...) LOGMASKED(LOG_KEYBOARD, __VA_ARGS__)
 #define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
+
+
+namespace {
+
+#define UPD765_TAG      "upd765"
 
 
 const uint8_t gfx_expand[16] = {
@@ -1032,8 +1030,8 @@ void ibm6580_state::ibm6580(machine_config &config)
 	UPD765A(config, m_fdc, 24_MHz_XTAL / 3, false, false);
 	m_fdc->intrq_wr_callback().set([this] (bool state) { m_floppy_intrq = state; });
 	m_fdc->drq_wr_callback().set(m_dma8257, FUNC(i8257_device::dreq0_w));
-	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", dw_floppies, "8sssd", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", dw_floppies, "8sssd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_drive[0], dw_floppies, "8sssd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_drive[1], dw_floppies, "8sssd", floppy_image_device::default_mfm_floppy_formats);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("ibm6580");
 }
@@ -1070,6 +1068,8 @@ ROM_START( ibm6580 )
 	ROM_REGION( 0x800, "mcu", 0 )
 	ROM_LOAD( "4430030_flp_8041.bin", 0x0000, 0x0400, CRC(2bb96799) SHA1(e30b0f2d790197f290858eab74ad5e151ded78c3))
 ROM_END
+
+} // anonymous namespace
 
 /* Driver */
 
