@@ -45,6 +45,9 @@
    menu)  There's no Timer 1 IRQ Handler in the code, but presumably the LCD
    is driven directly off the timer pins.
 
+   Some games can be linked via the Infared support provided by the AX208,
+   this is not currently supported.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -939,4 +942,4 @@ void monon_color_state::monon_color(machine_config &config)
 ROM_START( mononcol )
 ROM_END
 
-CONS( 2014, mononcol,    0,          0,  monon_color,  monon_color,    monon_color_state, empty_init,    "M&D",   "Monon Color", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2014, mononcol,    0,          0,  monon_color,  monon_color,    monon_color_state, empty_init,    "M&D",   "Monon Color", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

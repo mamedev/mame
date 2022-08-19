@@ -40,7 +40,7 @@ license:CC0
   (1) (Note: One known to exist in the wild, was supposedly bought at a thrift store. Based around Jackie Chan fighting)
 -->
 
-	<software name="purcfs" supported="no"> <!-- 101 - Purcell: Ares Fighting Spirit -->
+	<software name="purcfs"> <!-- 101 - Purcell: Ares Fighting Spirit -->
 		<description>Sài ěr hào: Zhànshén dòu hún</description>
 		<year>2014</year>
 		<publisher>M&amp;D</publisher>
@@ -52,7 +52,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="lockmagi" supported="no"> <!-- 102 - Locke Kingdom: Magic Array -->
+	<software name="lockmagi"> <!-- 102 - Locke Kingdom: Magic Array -->
 		<description>Luòkè wángguó-mófǎ zhèn</description>
 		<year>2014</year>
 		<publisher>M&amp;D</publisher>
@@ -64,7 +64,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mechcycl" supported="no"> <!-- 103 - Mech Cyclone: Fighting Masters -->
+	<software name="mechcycl"> <!-- 103 - Mech Cyclone: Fighting Masters -->
 		<description>Jī jiǎ xuànfēng-gédòu dàshī (set 1)</description>
 		<year>2014</year>
 		<publisher>M&amp;D</publisher>
@@ -76,7 +76,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mechcycla" cloneof="mechcycl" supported="no"> <!-- 103 - Mech Cyclone: Fighting Masters -->
+	<software name="mechcycla" cloneof="mechcycl"> <!-- 103 - Mech Cyclone: Fighting Masters -->
 		<description>Jī jiǎ xuànfēng-gédòu dàshī (set 2)</description>
 		<year>2014</year>
 		<publisher>M&amp;D</publisher>
@@ -88,7 +88,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="zinba" supported="no"> <!-- 104 - Zinba! : The lost relics -->
+	<software name="zinba"> <!-- 104 - Zinba! : The lost relics -->
 		<description>Shén pò-shīluò de yíjī</description>
 		<year>2014</year>
 		<publisher>M&amp;D</publisher>
@@ -100,7 +100,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="purceb" supported="no"> <!-- 105 - Purcell: Energy Battle -->
+	<software name="purceb"> <!-- 105 - Purcell: Energy Battle -->
 		<description>Sài ěr hào-néngyuán dà zuòzhàn</description>
 		<year>2014</year>
 		<publisher>M&amp;D</publisher>
@@ -112,7 +112,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ironmnhs" supported="no"> <!-- 106 - Iron Man: Hero Strike -->
+	<software name="ironmnhs"> <!-- 106 - Iron Man: Hero Strike -->
 		<description>Gāngtiě xiá-yīngxióng fǎnjí zhàn</description>
 		<year>2014</year>
 		<publisher>M&amp;D</publisher>
@@ -124,7 +124,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="zombhunt" supported="no"> <!-- 107 - Zombie Hunter -->
+	<software name="zombhunt"> <!-- 107 - Zombie Hunter -->
 		<description>Jiāngshī lièrén</description>
 		<year>2014</year>
 		<publisher>M&amp;D</publisher>
@@ -136,7 +136,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="lockba" supported="no"> <!-- 201 - Locke Kingdom: Big Adventure -->
+	<software name="lockba"> <!-- 201 - Locke Kingdom: Big Adventure -->
 		<description>Luòkè wángguó-dà màoxiǎn</description>
 		<year>2014</year>
 		<publisher>M&amp;D</publisher>
@@ -148,7 +148,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="lockice" supported="no"> <!-- 202 - Locke Kingdom RPG: Ice Blue -->
+	<software name="lockice"> <!-- 202 - Locke Kingdom RPG: Ice Blue -->
 		<description>Luòkè wángguó-bīng zhī lán</description>
 		<year>2014</year>
 		<publisher>M&amp;D</publisher>
@@ -160,7 +160,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="lockfire" supported="no"> <!-- 203 - Locke Kingdom RPG: Black Fire -->
+	<software name="lockfire"> <!-- 203 - Locke Kingdom RPG: Black Fire -->
 		<description>Luòkè wángguó-hēi zhī yán</description>
 		<year>2014</year>
 		<publisher>M&amp;D</publisher>
@@ -185,7 +185,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="armorwr" supported="no"> <!-- 205 - Armor Warrior -->
+	<software name="armorwr"> <!-- 205 - Armor Warrior -->
 		<description>Kǎijiǎ yǒngshì dàluàn dòu</description>
 		<year>2015</year>
 		<publisher>M&amp;D</publisher>
@@ -210,7 +210,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="logicft" supported="no"> <!-- 301 - Logic Fight -->
+	<software name="logicft"> <!-- 301 - Logic Fight -->
 		<description>Luójí pīn yī pīn</description>
 		<year>2015</year>
 		<publisher>M&amp;D</publisher>
@@ -222,7 +222,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="bigwolf" supported="no"> <!-- 302 - Pleasant goat and big big wolf's comet battle -->
+	<software name="bigwolf"> <!-- 302 - Pleasant goat and big big wolf's comet battle -->
 		<description>Xǐyángyáng yǔ huītàiláng-juézhàn miē xīng</description>
 		<year>2015</year>
 		<publisher>M&amp;D</publisher>
@@ -234,7 +234,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="drgnbma" supported="no"> <!-- 303 - Dragon Ball: The Martial Arts Conference -->
+	<software name="drgnbma"> <!-- 303 - Dragon Ball: The Martial Arts Conference -->
 		<description>Lóngzhū-wǔdào dàhuì</description>
 		<year>2015</year>
 		<publisher>M&amp;D</publisher>
@@ -246,7 +246,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="lolfight" supported="no"> <!-- 304 - League of Legends: The Ultimate Fight -->
+	<software name="lolfight"> <!-- 304 - League of Legends: The Ultimate Fight -->
 		<description>Yīngxióng liánméng-zhōngjí gédòu</description>
 		<year>2015</year>
 		<publisher>M&amp;D</publisher>
