@@ -43,9 +43,15 @@ void device_mononcol_cart_interface::rom_alloc(u32 size, int width, endianness_t
 
 	std::string fulltag(tag);
 	fulltag.append(MONONCOL_ROM_REGION_TAG);
+
 	device().logerror("Allocating %u byte ROM region with tag '%s' (width %d)\n", size, fulltag, width);
 	m_rom = device().machine().memory().region_alloc(fulltag, size, width, endian)->base();
 	m_rom_size = size;
+
+	if (!(m_rom_size && !(m_rom_size & (m_rom_size - 1))))
+	{
+		fatalerror("m_rom_size is NOT a power of 2");
+	}
 }
 
 
