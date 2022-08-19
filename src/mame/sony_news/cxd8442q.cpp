@@ -261,15 +261,12 @@ bool cxd8442q_device::apfifo_channel::dma_check()
 	}
 
 	// Check DRQ to see if the device is ready to give or receive data
-	bool stay_active;
+	bool stay_active = false;
 	if (drq)
 	{
 		stay_active = dma_cycle();
 	}
-	else
-	{
-		stay_active = true;
-	}
+
 	return stay_active;
 }
 

@@ -24,6 +24,7 @@ public:
 
 	void map(address_map &map);
 	void map_68k(address_map &map);
+	void map_apbus(address_map &map);
 
 protected:
 	// device_t overrides

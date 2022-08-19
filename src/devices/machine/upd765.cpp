@@ -53,6 +53,7 @@ DEFINE_DEVICE_TYPE(N82077AA,       n82077aa_device,       "n82077aa",       "Int
 DEFINE_DEVICE_TYPE(PC_FDC_SUPERIO, pc_fdc_superio_device, "pc_fdc_superio", "Winbond PC FDC Super I/O")
 DEFINE_DEVICE_TYPE(DP8473,         dp8473_device,         "dp8473",         "National Semiconductor DP8473 FDC")
 DEFINE_DEVICE_TYPE(PC8477A,        pc8477a_device,        "pc8477a",        "National Semiconductor PC8477A FDC")
+DEFINE_DEVICE_TYPE(PC8477B,        pc8477b_device,        "pc8477b",        "National Semiconductor PC8477B FDC")
 DEFINE_DEVICE_TYPE(WD37C65C,       wd37c65c_device,       "wd37c65c",       "Western Digital WD37C65C FDC")
 DEFINE_DEVICE_TYPE(MCS3201,        mcs3201_device,        "mcs3201",        "Motorola MCS3201 FDC")
 DEFINE_DEVICE_TYPE(TC8566AF,       tc8566af_device,       "tc8566af",       "Toshiba TC8566AF FDC")
@@ -137,6 +138,19 @@ void pc8477a_device::map(address_map &map)
 	map(0x4, 0x4).rw(FUNC(pc8477a_device::msr_r), FUNC(pc8477a_device::dsr_w));
 	map(0x5, 0x5).rw(FUNC(pc8477a_device::fifo_r), FUNC(pc8477a_device::fifo_w));
 	map(0x7, 0x7).rw(FUNC(pc8477a_device::dir_r), FUNC(pc8477a_device::ccr_w));
+}
+
+void pc8477b_device::map(address_map &map)
+{
+	if(mode != mode_t::AT) {
+		map(0x0, 0x0).r(FUNC(pc8477b_device::sra_r));
+		map(0x1, 0x1).r(FUNC(pc8477b_device::srb_r));
+	}
+	map(0x2, 0x2).rw(FUNC(pc8477b_device::dor_r), FUNC(pc8477b_device::dor_w));
+	map(0x3, 0x3).rw(FUNC(pc8477b_device::tdr_r), FUNC(pc8477b_device::tdr_w));
+	map(0x4, 0x4).rw(FUNC(pc8477b_device::msr_r), FUNC(pc8477b_device::dsr_w));
+	map(0x5, 0x5).rw(FUNC(pc8477b_device::fifo_r), FUNC(pc8477b_device::fifo_w));
+	map(0x7, 0x7).rw(FUNC(pc8477b_device::dir_r), FUNC(pc8477b_device::ccr_w));
 }
 
 void wd37c65c_device::map(address_map &map)
@@ -3145,6 +3159,15 @@ void dp8473_device::soft_reset()
 }
 
 pc8477a_device::pc8477a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ps2_fdc_device(mconfig, PC8477A, tag, owner, clock)
+{
+	ready_polled = true;
+	ready_connected = false;
+	select_connected = true;
+	select_multiplexed = false;
+	recalibrate_steps = 85; // TODO: may also be programmed as 255, 3925 or 4095 by (unemulated) mode command
+}
+
+pc8477b_device::pc8477b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ps2_fdc_device(mconfig, PC8477B, tag, owner, clock)
 {
 	ready_polled = true;
 	ready_connected = false;

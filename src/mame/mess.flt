@@ -991,6 +991,7 @@ sony/umatic.cpp
 sony_news/news_38xx.cpp
 sony_news/news_68k.cpp
 sony_news/news_r3k.cpp
+sony_news/news_r4k.cpp
 sord/m5.cpp
 stm/pp.cpp
 sun/sun1.cpp
