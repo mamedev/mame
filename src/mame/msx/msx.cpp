@@ -344,8 +344,7 @@ Sanyo Wavy PHC-55FD2 - MSX2 - phc55fd2
 Sanyo Wavy PHC-70FD1 - MSX2+ - phc70fd
 Sanyo Wavy PHC-70FD2 - MSX2+ - phc70fd2
 Sanyo Wavy PHC-77 - MSX2 - phc77
-Sharp Epcom HotBit 1.1 - MSX1 - hotbit11
-Sharp Epcom HotBit 1.2 - MSX1 - hotbit12
+Sharp Epcom HB-8000 (HotBit) - MSX1 - hb8000
 Sharp Epcom HotBit 1.3b - MSX1 - hotbi13b
 Sharp Epcom HotBit 1.3p - MSX1 - hotbi13p
 Sharp Epcom HotBit 2.0 - MSX2 - hotbit20
@@ -718,13 +717,12 @@ public:
 	void hb201(machine_config &config);
 	void hb501p(machine_config &config);
 	void hb701fd(machine_config &config);
+	void hb8000(machine_config &config);
 	void hc5(machine_config &config);
 	void hc6(machine_config &config);
 	void hc7(machine_config &config);
 	void hotbi13b(machine_config &config);
 	void hotbi13p(machine_config &config);
-	void hotbit12(machine_config &config);
-	void hotbit11(machine_config &config);
 	void hx10(machine_config &config);
 	void hx10d(machine_config &config);
 	void hx10dp(machine_config &config);
@@ -3760,7 +3758,7 @@ void msx_state::ml8000(machine_config &config)
 
 ROM_START(mlf48)
 	ROM_REGION(0x8000, "mainrom", 0)
-	// hn613256p ?
+	// 4j3 hn613256p m82 ?
 	ROM_LOAD("mlf48bios.ic2d", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e)) // needs verification
 ROM_END
 
@@ -3806,6 +3804,7 @@ void msx_state::mlf80(machine_config &config)
 
 ROM_START(mlf110)
 	ROM_REGION(0x8000, "mainrom", 0)
+	// 4j1 mn613256p d35
 	ROM_LOAD("hn613256p.ic6d", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
 ROM_END
 
@@ -3828,6 +3827,8 @@ void msx_state::mlf110(machine_config &config)
 
 ROM_START(mlf120)
 	ROM_REGION(0x8000, "mainrom", 0)
+	// 4k3 hn613256p d35 ?
+	// 904p874h11 ?
 	ROM_LOAD("hn613256p.ic6d", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
 
 	ROM_REGION(0x4000, "firmware", 0)
@@ -4662,72 +4663,74 @@ void msx_state::spc800(machine_config &config)
 /* MSX - Sanyo MPC-64 */
 
 ROM_START(mpc64)
-	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD("mpc64bios.rom", 0x0000, 0x8000, CRC(d6e704ad) SHA1(d67be6d7d56d7229418f4e122f2ec27990db7d19))
+	ROM_REGION(0x8000, "mainrom", 0)
+	// hn613256p t22 5c1 ?
+	ROM_LOAD("mpc64bios.ic111", 0x0000, 0x8000, CRC(d6e704ad) SHA1(d67be6d7d56d7229418f4e122f2ec27990db7d19)) // needs verification
 ROM_END
 
 void msx_state::mpc64(machine_config &config)
 {
-	// AY8910/YM2149?
+	// AY8910
 	// FDC: None, 0 drives
-	// 2 Cartridge slots?
+	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
 
-	msx1(TMS9928A, config);
+	msx1(TMS9928A, AY8910, config);
 }
 
 /* MSX - Sanyo MPC-100 */
 
 ROM_START(mpc100)
-	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD("mpc100bios.rom", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
+	ROM_REGION(0x8000, "mainrom", 0)
+	// hn613256p 4j1 ?
+	ROM_LOAD("mpc100bios.ic122", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e)) 
 ROM_END
 
 void msx_state::mpc100(machine_config &config)
 {
-	// AY8910/YM2149?
+	// AY8910
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
 
-	msx1(TMS9929A, config);
+	msx1(TMS9929A, AY8910, config);
 }
 
 /* MSX - Sanyo MPC-200 */
 
 ROM_START(mpc200)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("mpc200bios.rom", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
 ROM_END
 
 void msx_state::mpc200(machine_config &config)
 {
-	// AY8910/YM2149?
+	// AY8910
 	// FDC: None, 0 drives
-	// 2? Cartridge slots
+	// 2 Cartridge slots
 	// T6950
 	// T7775 MSX Engine
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4); // 64KB RAM
 
-	msx1(TMS9929A, config);
+	msx1(TMS9929A, AY8910, config);
 }
 
-/* MSX - Sanyo MPC-200SP */
+/* MSX - Sanyo MPC-200SP (same as Sanyo MPC-200 ?) */
 
 ROM_START(mpc200sp)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("mpcsp200bios.rom", 0x0000, 0x8000, CRC(bcd79900) SHA1(fc8c2b69351e60dc902add232032c2d69f00e41e))
 ROM_END
 
@@ -4737,19 +4740,20 @@ void msx_state::mpc200sp(machine_config &config)
 	// FDC: None, 0 drives
 	// 2? Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4); // 64KB RAM
 
-	msx1(TMS9929A, config);
+	msx1(TMS9929A, AY8910, config);
 }
 
 /* MSX - Sanyo PHC-28L */
 
 ROM_START(phc28l)
-	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD("28lbios.rom", 0x0000, 0x8000, CRC(d2110d66) SHA1(d3af963e2529662eae63f04a2530454685a1989f))
+	ROM_REGION(0x8000, "mainrom", 0)
+	// 5a1 hn613256p g42
+	ROM_LOAD("28lbios.ic20", 0x0000, 0x8000, CRC(d2110d66) SHA1(d3af963e2529662eae63f04a2530454685a1989f))
 ROM_END
 
 void msx_state::phc28l(machine_config &config)
@@ -4758,102 +4762,91 @@ void msx_state::phc28l(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
 
-	msx1(TMS9929A, config);
+	msx1(TMS9929A, YM2149, config);
 }
 
 /* MSX - Sanyo PHC-28S */
 
 ROM_START(phc28s)
-	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD("28sbios.rom", 0x0000, 0x8000, CRC(e5cf6b3c) SHA1(b1cce60ef61c058f5e42ef7ac635018d1a431168))
+	ROM_REGION(0x8000, "mainrom", 0)
+	// 4l1 hn613256p m74
+	ROM_LOAD("28sbios.ic2", 0x0000, 0x8000, CRC(e5cf6b3c) SHA1(b1cce60ef61c058f5e42ef7ac635018d1a431168))
 ROM_END
 
 void msx_state::phc28s(machine_config &config)
 {
-	// AY8910/YM2149?
+	// 10.738MHz and 3.574545MHz
+	// AY8910
 	// FDC: None, 0 drives
-	// 2 Cartridge slots?
+	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 2, 2);   /* 32KB RAM */
 
-	msx1(TMS9929A, config);
+	msx1(TMS9929A, AY8910, config);
 }
 
 /* MSX - Sanyo Wavy MPC-10 */
 
 ROM_START(mpc10)
-	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD("mpc10.rom", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
+	ROM_REGION(0x8000, "mainrom", 0)
+	// Split across 2 roms? (image hard to read)
+	// ic14? hn613256p d24 ?
+	// ic15? hn613256p d25 ?
+	ROM_LOAD("mpc10.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
 ROM_END
 
 void msx_state::mpc10(machine_config &config)
 {
-	// AY8910/YM2149?
+	// AY8910
 	// FDC: None, 0 drives
-	// 2 Cartridge slots?
+	// 1 Cartridge slot
+	// 1 Expansion slot
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
+	// Expansion slot in slot #2
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 2, 2);   /* 32KB RAM */
 
-	msx1(TMS9929A, config);
+	msx1(TMS9918, AY8910, config);
 }
 
-/* MSX - Sharp Epcom HotBit 1.1 */
+/* MSX - Sharp Epcom HB-8000 (HotBit) */
 
-ROM_START(hotbit11)
-	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD("hotbit11.rom", 0x0000, 0x8000, CRC(b6942694) SHA1(663f8c512d04d213fa616b0db5eefe3774012a4b))
+ROM_START(hb8000)
+	ROM_REGION(0x8000, "mainrom", 0)
+	ROM_SYSTEM_BIOS(0, "v12", "v1.2")
+	ROMX_LOAD("hotbit12.ic28", 0x0000, 0x8000, CRC(f59a4a0c) SHA1(9425815446d468058705bae545ffa13646744a87), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "v11", "v1.1")
+	ROMX_LOAD("hotbit11.ic28", 0x0000, 0x8000, CRC(b6942694) SHA1(663f8c512d04d213fa616b0db5eefe3774012a4b), ROM_BIOS(1))
+	// v1.0 missing
 ROM_END
 
-void msx_state::hotbit11(machine_config &config)
+void msx_state::hb8000(machine_config &config)
 {
-	// AY8910/YM2149?
+	// AY8910 and YM2149
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
 
-	msx1(TMS9128, config);
+	msx1(TMS9128, AY8910, config);
 }
 
-/* MSX - Sharp Epcom HotBit 1.2 */
-
-ROM_START(hotbit12)
-	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD("hotbit12.rom", 0x0000, 0x8000, CRC(f59a4a0c) SHA1(9425815446d468058705bae545ffa13646744a87))
-ROM_END
-
-void msx_state::hotbit12(machine_config &config)
-{
-	// AY8910/YM2149?
-	// FDC: None, 0 drives
-	// 2 Cartridge slots
-
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
-
-	msx1(TMS9128, config);
-}
-
-/* MSX - Sharp Epcom HotBit 1.3b */
+/* MSX - Sharp Epcom HB-8000 (HotBit 1.3b) */
 
 ROM_START(hotbi13b)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("hotbit13b.rom", 0x0000, 0x8000, CRC(7a19820e) SHA1(e0c2bfb078562d15acabc5831020a2370ea87052))
 ROM_END
 
@@ -4863,7 +4856,7 @@ void msx_state::hotbi13b(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x10000);   /* 64KB Mapper RAM */
@@ -4871,10 +4864,10 @@ void msx_state::hotbi13b(machine_config &config)
 	msx1(TMS9928A, config);
 }
 
-/* MSX - Sharp Epcom HotBit 1.3p */
+/* MSX - Sharp Epcom HB-8000 (HotBit 1.3p) */
 
 ROM_START(hotbi13p)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("hotbit13p.rom", 0x0000, 0x8000, CRC(150e239c) SHA1(942f9507d206cd8156f15601fe8032fcf0e3875b))
 ROM_END
 
@@ -4884,7 +4877,7 @@ void msx_state::hotbi13p(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x10000);   /* 64KB Mapper RAM */
@@ -9908,8 +9901,7 @@ COMP(1983, mpc200sp,   mpc200,   0,     mpc200sp,   msx,      msx_state, empty_i
 COMP(1983, phc28l,     0,        0,     phc28l,     msx,      msx_state, empty_init, "Sanyo", "PHC-28L (MSX1)", 0)
 COMP(1983, phc28s,     0,        0,     phc28s,     msx,      msx_state, empty_init, "Sanyo", "PHC-28S (MSX1)", 0)
 COMP(19??, mpc10,      0,        0,     mpc10,      msx,      msx_state, empty_init, "Sanyo", "Wavy MPC-10 (MSX1)", 0)
-COMP(1985, hotbit11,   hotbi13p, 0,     hotbit11,   hotbit,   msx_state, empty_init, "Sharp / Epcom", "HB-8000 Hotbit 1.1 (MSX1)", 0)
-COMP(1985, hotbit12,   hotbi13p, 0,     hotbit12,   hotbit,   msx_state, empty_init, "Sharp / Epcom", "HB-8000 Hotbit 1.2 (MSX1)", 0)
+COMP(1985, hb8000,     0,        0,     hb8000,     hotbit,   msx_state, empty_init, "Sharp / Epcom", "HB-8000 (Hotbit) (MSX1)", 0)
 COMP(1985, hotbi13b,   hotbi13p, 0,     hotbi13b,   hotbit,   msx_state, empty_init, "Sharp / Epcom", "HB-8000 Hotbit 1.3b (MSX1)", 0)
 COMP(1985, hotbi13p,   0,        0,     hotbi13p,   hotbit,   msx_state, empty_init, "Sharp / Epcom", "HB-8000 Hotbit 1.3p (MSX1)", 0)
 COMP(198?, hb10,       hb10p,    0,     hb10,       msxjp,    msx_state, empty_init, "Sony", "HB-10 (MSX1)", 0)
