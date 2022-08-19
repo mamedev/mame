@@ -90,25 +90,25 @@
 
 #include "emu.h"
 
-#include "cpu/mips/r4000.h"
-#include "machine/ram.h"
-#include "machine/timekpr.h"
-#include "dmac3.h"
-#include "news_hid.h"
-#include "machine/spifi3.h"
-#include "machine/upd765.h"
 #include "cxd8442q.h"
 #include "cxd8452aq.h"
-#include "machine/dp83932c.h"
-#include "machine/z80scc.h"
-#include "bus/rs232/rs232.h"
+#include "dmac3.h"
+#include "news_hid.h"
 
-#include "machine/nscsi_bus.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
+#include "bus/rs232/rs232.h"
+#include "cpu/mips/r4000.h"
+#include "machine/dp83932c.h"
+#include "machine/nscsi_bus.h"
+#include "machine/ram.h"
+#include "machine/spifi3.h"
+#include "machine/timekpr.h"
+#include "machine/upd765.h"
+#include "machine/z80scc.h"
 
-#include "imagedev/floppy.h"
 #include "formats/pc_dsk.h"
+#include "imagedev/floppy.h"
 
 #define LOG_GENERAL (1U << 0)
 #define LOG_INTERRUPT (1U << 1)
@@ -154,7 +154,6 @@ public:
 		  m_led(*this, "led%u", 0U) {}
 
 	void nws5000x(machine_config &config);
-	void init_nws5000x();
 
 protected:
 
@@ -286,10 +285,10 @@ protected:
 	static constexpr int TIMER0_FREQUENCY = 100;      // Hz
 	static constexpr uint32_t APBUS_DMA_MAP_ADDRESS = 0x14c20000;
 	static constexpr uint32_t APBUS_DMA_MAP_RAM_SIZE = 0x20000; // 128 kibibytes
-	const char *MAIN_MEMORY_DEFAULT = "64M";
-	const int interrupt_map[6] = {0, 1, 2, 3, 4, 5};
+	static constexpr const char* MAIN_MEMORY_DEFAULT = "64M";
+	static constexpr int interrupt_map[6] = {0, 1, 2, 3, 4, 5};
 
-	const std::string_view LED_MAP[6] = {"LED_POWER", "LED_DISK", "LED_FLOPPY", "LED_SEC", "LED_NET", "LED_CD"};
+	static constexpr std::string_view LED_MAP[6] = {"LED_POWER", "LED_DISK", "LED_FLOPPY", "LED_SEC", "LED_NET", "LED_CD"};
 	std::map<offs_t, std::string_view> m_apbus_cmd_decoder
 	{
 		{0x0c, "INTMSK"},   // Interrupt mask
@@ -306,7 +305,6 @@ protected:
 	virtual void machine_reset() override;
 
 	void machine_common(machine_config &config);
-	void init_common();
 
 	// address maps
 	void cpu_map(address_map &map);
@@ -845,20 +843,6 @@ void news_r4k_state::machine_reset()
 }
 
 /*
- * init_common
- *
- * Initialization method called when the machine first starts.
- */
-void news_r4k_state::init_common() {}
-
-/*
- * init_nws5000x
- *
- * Initialization method specific to the NWS-5000X emulation.
- */
-void news_r4k_state::init_nws5000x() { init_common(); }
-
-/*
  * front_panel_r
  *
  * Method to read the state of the front panel DIP switches.
@@ -1257,5 +1241,5 @@ ROM_LOAD("macrom.rom", 0x000, 0x400, CRC(22d384d2) SHA1(b78a2861310929e92f16deab
 ROM_END
 
 // Machine definitions
-//   YEAR  NAME      P  CM MACHINE   INPUT    CLASS           INIT           COMPANY FULLNAME                      FLAGS
-COMP(1994, nws5000x, 0, 0, nws5000x, nws5000, news_r4k_state, init_nws5000x, "Sony", "NET WORK STATION NWS-5000X", MACHINE_TYPE_COMPUTER | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+//   YEAR  NAME      P  CM MACHINE   INPUT    CLASS           INIT        COMPANY FULLNAME                      FLAGS
+COMP(1994, nws5000x, 0, 0, nws5000x, nws5000, news_r4k_state, empty_init, "Sony", "NET WORK STATION NWS-5000X", MACHINE_TYPE_COMPUTER | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
