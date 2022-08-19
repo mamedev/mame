@@ -99,6 +99,7 @@
 #include "bus/nscsi/hd.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/mips/r4000.h"
+#include "imagedev/floppy.h"
 #include "machine/dp83932c.h"
 #include "machine/nscsi_bus.h"
 #include "machine/ram.h"
@@ -108,9 +109,7 @@
 #include "machine/z80scc.h"
 
 #include "formats/pc_dsk.h"
-#include "imagedev/floppy.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_INTERRUPT (1U << 1)
 #define LOG_ALL_INTERRUPT (1U << 2)
 #define LOG_LED (1U << 3)
@@ -127,31 +126,35 @@
 
 #include "logmacro.h"
 
+namespace {
+
 class news_r4k_state : public driver_device
 {
 public:
-	news_r4k_state(machine_config const &mconfig, device_type type, char const *tag)
-		: driver_device(mconfig, type, tag),
-		  m_cpu(*this, "cpu"),
-		  m_ram(*this, "ram"),
-		  m_dma_ram(*this, "dmaram"),
-		  m_net_ram(*this, "netram"),
-		  m_rtc(*this, "rtc"),
-		  m_escc(*this, "escc"),
-		  m_serial(*this, "serial%u", 0U),
-		  m_fifo0(*this, "apfifo0"),
-		  m_fifo1(*this, "apfifo1"),
-		  m_sonic3(*this, "sonic3"),
-		  m_sonic(*this, "sonic"),
-		  m_fdc(*this, "fdc"),
-		  m_hid(*this, "hid"),
-		  m_dmac(*this, "dmac"),
-		  m_scsi0(*this, "scsi0:7:spifi3"),
-		  m_scsi1(*this, "scsi1:7:spifi3"),
-		  m_scsibus0(*this, "scsi0"),
-		  m_scsibus1(*this, "scsi1"),
-		  m_dip_switch(*this, "FRONT_PANEL"),
-		  m_led(*this, "led%u", 0U) {}
+	news_r4k_state(machine_config const &mconfig, device_type type, char const *tag) :
+		driver_device(mconfig, type, tag),
+		m_cpu(*this, "cpu"),
+		m_ram(*this, "ram"),
+		m_dma_ram(*this, "dmaram"),
+		m_net_ram(*this, "netram"),
+		m_rtc(*this, "rtc"),
+		m_escc(*this, "escc"),
+		m_serial(*this, "serial%u", 0U),
+		m_fifo0(*this, "apfifo0"),
+		m_fifo1(*this, "apfifo1"),
+		m_sonic3(*this, "sonic3"),
+		m_sonic(*this, "sonic"),
+		m_fdc(*this, "fdc"),
+		m_hid(*this, "hid"),
+		m_dmac(*this, "dmac"),
+		m_scsi0(*this, "scsi0:7:spifi3"),
+		m_scsi1(*this, "scsi1:7:spifi3"),
+		m_scsibus0(*this, "scsi0"),
+		m_scsibus1(*this, "scsi1"),
+		m_dip_switch(*this, "FRONT_PANEL"),
+		m_led(*this, "led%u", 0U)
+	{
+	}
 
 	void nws5000x(machine_config &config);
 
@@ -417,22 +420,27 @@ void news_r4k_state::machine_common(machine_config &config)
 	CXD8442Q(config, m_fifo1, 0);
 
 	// Reverse polarity for ESCC DMA signals
-	m_escc->out_dtra_callback().set([this](int status)
-									{ m_fifo1->drq_w<cxd8442q_device::fifo_channel_number::CH2>(!status); });
-	m_escc->out_wreqa_callback().set([this](int status)
-									 { m_fifo1->drq_w<cxd8442q_device::fifo_channel_number::CH3>(!status); });
-	m_fifo1->dma_w_cb<cxd8442q_device::fifo_channel_number::CH2>().set([this](uint32_t data)
-																   { m_escc->da_w(0, data); });
-	m_fifo1->dma_r_cb<cxd8442q_device::fifo_channel_number::CH3>().set([this]()
-																   { return m_escc->da_r(0); });
-	m_fifo1->out_int_callback().set([this](int status)
-									{
-										// Not sure if this is the actual mapping, or if sending any level 0 interrupt causes
-										// NEWS-OS to scan the ESCC and FIFO registers. It seems to work OK, but should be
-										// revisited if the exact details can be worked out.
-										generic_irq_w(0, 0x4, status);
-										escc1_int_status = status ? 0x8 : 0x0; // guess
-									});
+	m_escc->out_dtra_callback().set(
+			[this] (int status)
+			{ m_fifo1->drq_w<cxd8442q_device::fifo_channel_number::CH2>(!status); });
+	m_escc->out_wreqa_callback().set(
+			[this] (int status)
+			{ m_fifo1->drq_w<cxd8442q_device::fifo_channel_number::CH3>(!status); });
+	m_fifo1->dma_w_cb<cxd8442q_device::fifo_channel_number::CH2>().set(
+			[this] (uint32_t data)
+			{ m_escc->da_w(0, data); });
+	m_fifo1->dma_r_cb<cxd8442q_device::fifo_channel_number::CH3>().set(
+			[this] ()
+			{ return m_escc->da_r(0); });
+	m_fifo1->out_int_callback().set(
+			[this] (int status)
+			{
+				// Not sure if this is the actual mapping, or if sending any level 0 interrupt causes
+				// NEWS-OS to scan the ESCC and FIFO registers. It seems to work OK, but should be
+				// revisited if the exact details can be worked out.
+				generic_irq_w(0, 0x4, status);
+				escc1_int_status = status ? 0x8 : 0x0; // guess
+			});
 
 	CXD8452AQ(config, m_sonic3, 0);
 	m_sonic3->set_addrmap(0, &news_r4k_state::sonic3_map);
@@ -461,10 +469,12 @@ void news_r4k_state::machine_common(machine_config &config)
 
 	// Note - FDC IRQ might go through the FIFO first. Might need to be updated in the future.
 	m_fdc->intrq_wr_callback().set(FUNC(news_r4k_state::irq_w<irq0_number::FDC>));
-	m_fdc->drq_wr_callback().set([this](int status)
-								 { m_fifo0->drq_w<cxd8442q_device::fifo_channel_number::CH2>(status); });
-	m_fifo0->dma_r_cb<cxd8442q_device::fifo_channel_number::CH2>().set([this]()
-																   { return (uint32_t)(m_fdc->dma_r()); });
+	m_fdc->drq_wr_callback().set(
+			[this] (int status)
+			{ m_fifo0->drq_w<cxd8442q_device::fifo_channel_number::CH2>(status); });
+	m_fifo0->dma_r_cb<cxd8442q_device::fifo_channel_number::CH2>().set(
+			[this] ()
+			{ return uint32_t(m_fdc->dma_r()); });
 
 	DMAC3(config, m_dmac, 0);
 	m_dmac->set_apbus_address_translator(FUNC(news_r4k_state::apbus_virt_to_phys));
@@ -1227,19 +1237,21 @@ INPUT_PORTS_END
 
 ROM_START(nws5000x)
 
-ROM_REGION64_BE(0x40000, "mrom", 0)
-ROM_SYSTEM_BIOS(0, "nws5000x", "APbus System Monitor Release 3.201")
-ROMX_LOAD("mpu-33__ver3.201__1994_sony.rom", 0x00000, 0x40000, CRC(8a6ca2b7) SHA1(72d52e24a554c56938d69f7d279b2e65e284fd59), ROM_BIOS(0))
+	ROM_REGION64_BE(0x40000, "mrom", 0)
+	ROM_SYSTEM_BIOS(0, "nws5000x", "APbus System Monitor Release 3.201")
+	ROMX_LOAD("mpu-33__ver3.201__1994_sony.rom", 0x00000, 0x40000, CRC(8a6ca2b7) SHA1(72d52e24a554c56938d69f7d279b2e65e284fd59), ROM_BIOS(0))
 
-// idrom and macrom dumps include unmapped space that would ideally be umasked, but this is functionally the same.
-// Additionally, there is machine-specific information contained within each of these, so there are no "golden" full-chip hashes.
-ROM_REGION64_BE(0x400, "idrom", 0)
-ROM_LOAD("idrom.rom", 0x000, 0x400, CRC(28ff30c9) SHA1(288fd7d9133ac5e40d90a9b6e24db057cd6b05ad) BAD_DUMP)
+	// idrom and macrom dumps include unmapped space that would ideally be umasked, but this is functionally the same.
+	// Additionally, there is machine-specific information contained within each of these, so there are no "golden" full-chip hashes.
+	ROM_REGION64_BE(0x400, "idrom", 0)
+	ROM_LOAD("idrom.rom", 0x000, 0x400, CRC(28ff30c9) SHA1(288fd7d9133ac5e40d90a9b6e24db057cd6b05ad) BAD_DUMP)
 
-ROM_REGION64_BE(0x400, "macrom", 0)
-ROM_LOAD("macrom.rom", 0x000, 0x400, CRC(22d384d2) SHA1(b78a2861310929e92f16deab989ac51f9da3131a) BAD_DUMP)
+	ROM_REGION64_BE(0x400, "macrom", 0)
+	ROM_LOAD("macrom.rom", 0x000, 0x400, CRC(22d384d2) SHA1(b78a2861310929e92f16deab989ac51f9da3131a) BAD_DUMP)
 ROM_END
+
+} // anonymous namespace
 
 // Machine definitions
 //   YEAR  NAME      P  CM MACHINE   INPUT    CLASS           INIT        COMPANY FULLNAME                      FLAGS
-COMP(1994, nws5000x, 0, 0, nws5000x, nws5000, news_r4k_state, empty_init, "Sony", "NET WORK STATION NWS-5000X", MACHINE_TYPE_COMPUTER | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+COMP(1994, nws5000x, 0, 0, nws5000x, nws5000, news_r4k_state, empty_init, "Sony", "NET WORK STATION NWS-5000X", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
