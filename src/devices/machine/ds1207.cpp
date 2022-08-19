@@ -614,7 +614,7 @@ void ds1207_device::rtc_clock_updated(int year, int month, int day, int day_of_w
 	const int month_to_day_conversion[ 12 ] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
 
 	// put the seconds
-	uint64_t m_startup_time = second;
+	m_startup_time = second;
 
 	// put the minutes
 	m_startup_time += minute * 60;
