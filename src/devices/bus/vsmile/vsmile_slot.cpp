@@ -44,12 +44,12 @@ device_vsmile_cart_interface::~device_vsmile_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_vsmile_cart_interface::rom_alloc(uint32_t size, const char *tag)
+void device_vsmile_cart_interface::rom_alloc(uint32_t size)
 {
 	if (m_rom == nullptr)
 	{
 		// We always alloc 8MB of ROM region
-		m_rom = (uint16_t *)device().machine().memory().region_alloc(std::string(tag).append(VSMILE_SLOT_ROM_REGION_TAG).c_str(), size, 2, ENDIANNESS_BIG)->base();
+		m_rom = (uint16_t *)device().machine().memory().region_alloc(device().subtag("^cart:rom"), size, 2, ENDIANNESS_BIG)->base();
 		m_rom_size = size;
 	}
 }
@@ -143,7 +143,7 @@ image_init_result vsmile_cart_slot_device::call_load()
 			return image_init_result::FAIL;
 		}
 
-		m_cart->rom_alloc(size, tag());
+		m_cart->rom_alloc(size);
 		uint8_t *rom = (uint8_t *)m_cart->get_rom_base();
 
 		if (!loaded_through_softlist())
