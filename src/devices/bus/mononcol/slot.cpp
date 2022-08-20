@@ -30,7 +30,7 @@ device_mononcol_cart_interface::~device_mononcol_cart_interface()
 {
 }
 
-void device_mononcol_cart_interface::rom_alloc(u32 size, int width, endianness_t endian, char const *tag)
+void device_mononcol_cart_interface::rom_alloc(u32 size, int width, endianness_t endian)
 {
 	if (m_rom)
 	{
@@ -41,8 +41,7 @@ void device_mononcol_cart_interface::rom_alloc(u32 size, int width, endianness_t
 				size);
 	}
 
-	std::string fulltag(tag);
-	fulltag.append(MONONCOL_ROM_REGION_TAG);
+	std::string fulltag = device().subtag("^cart:rom");
 
 	device().logerror("Allocating %u byte ROM region with tag '%s' (width %d)\n", size, fulltag, width);
 	m_rom = device().machine().memory().region_alloc(fulltag, size, width, endian)->base();

@@ -21,7 +21,7 @@ public:
 	virtual ~device_mononcol_cart_interface();
 
 	// reading and writing
-	virtual void rom_alloc(u32 size, int width, endianness_t end, char const *tag);
+	virtual void rom_alloc(u32 size, int width, endianness_t end);
 
 	u8 *get_rom_base()  { return m_rom; }
 	u32 get_rom_size() { return m_rom_size; }
@@ -42,8 +42,6 @@ protected:
 	u32 m_rom_size;
 };
 
-
-#define MONONCOL_ROM_REGION_TAG ":cart:rom"
 
 class mononcol_cartslot_device : public device_t,
 								public device_rom_image_interface,
@@ -78,7 +76,7 @@ public:
 	u32 common_get_size(char const *region);
 	void common_load_rom(u8 *ROM, u32 len, char const *region);
 
-	virtual void rom_alloc(u32 size, int width, endianness_t end) { if (m_cart) m_cart->rom_alloc(size, width, end, tag()); }
+	virtual void rom_alloc(u32 size, int width, endianness_t end) { if (m_cart) m_cart->rom_alloc(size, width, end); }
 
 	u8* get_rom_base()
 	{
