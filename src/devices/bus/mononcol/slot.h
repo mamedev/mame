@@ -28,8 +28,8 @@ public:
 
 	virtual uint8_t read() { return 0x00; }
 	virtual DECLARE_WRITE_LINE_MEMBER(dir_w) { }
-	virtual void write(uint8_t data) { };
-	virtual void set_ready() { };
+	virtual void write(uint8_t data) { }
+	virtual void set_ready() { }
 
 	virtual void set_spi_region(uint8_t* region) { }
 	virtual void set_spi_size(size_t size) { }
