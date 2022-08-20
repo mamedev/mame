@@ -8,6 +8,83 @@
  Here we emulate carts with no RAM and simple bankswitch
 
 
+ TAMA5 Mapper (Used by Tamagotchi 3)
+ ============
+
+ Status: partially supported.
+
+ The TAMA5 mapper includes a special RTC chip which communicates through the
+ RAM area (0xA000-0xBFFF); most notably addresses 0xA000 and 0xA001 seem to
+ be used. In this setup 0xA001 acts like a control register and 0xA000 like
+ a data register.
+
+ Accepted values by the TAMA5 control register:
+ 0x00 - Writing to 0xA000 will set bits 3-0 for rom bank selection.
+ 0x01 - Writing to 0xA000 will set bits (7-?)4 for rom bank selection.
+
+ 0x04 - Bits 3-0 of the value to write
+ 0x05 - Bits 4-7 of the value to write
+ 0x06 - Address control hi
+        bit 0 - Bit 4 for the address
+        bit 3-1 - 000 - Write a byte to the 32 byte memory. The data to be
+                        written must be set in registers 0x04 (lo nibble) and
+                        0x05 (hi nibble).
+                - 001 - Read a byte from the 32 byte memory. The data read
+                        will be available in registers 0x0C (lo nibble) and
+                        0x0D (hi nibble).
+                - 010 - Unknown (occurs just after having started a game and
+                        entered a date) (execution at address 1A19)
+                - 011 - Unknown (not encountered yet)
+                - 100 - Unknown (occurs during booting a game; appears to be
+                        some kind of read command as it is followed by a read
+                        of the 0x0C register) (execution at address 1B5B)
+                - 101 - Unknown (not encountered yet)
+                - 110 - Unknown (not encountered yet)
+                - 111 - Unknown (not encountered yet)
+ 0x07 - Address control lo
+        bit 3-0 - bits 3-0 for the address
+
+ 0x0A - After writing this the lowest 2 bits of A000 determine whether the
+        TAMA5 chip is ready to accept the next command. If the lowest 2 bits
+        hold the value 01 then the TAMA5 chip is ready for the next command.
+
+ 0x0C - Reading from A000 will return bits 3-0 of the data
+ 0x0D - Reading from A000 will return bits 7-4 of the data
+
+ 0x04 - RTC controls? -> RTC/memory?
+ 0x05 - Write time/memomry?
+ 0x06 - RTC controls?
+ 0x07 - RTC controls?
+
+ Unknown sequences:
+ During booting a game (1B5B:
+ 04 <- 00, 06 <- 08, 07 <- 01, followed by read 0C
+ when value read from 0C equals 00 followed by the sequence:
+ 04 <- 01, 06 <- 08, 07 <- 01, followed by read 0C
+ the value read from 0C is checked for non-zero, don't know the consequences for either
+ yet.
+
+ Initialization after starting a game:
+ At address 1A19:
+ 06 <- 05, 07 <- 02, followed by read 0C, if != 0F => OK, otherwise do something.
+
+
+ Wisdom Tree mapper
+ ==================
+
+ The Wisdom Tree mapper is triggered by writes in the 0x0000-0x3FFF area. The
+ address written to determines the bank to switch in in the 0x000-0x7FFF address
+ space. This mapper uses 32KB sized banks.
+
+
+ TODO:
+ - YongYong mapper:
+   - During start there are 2 writes to 5000 and 5003, it is still unknown what these do.
+ - Story of La Sa Ma mapper:
+   - This should display the Gowin logo on boot on both DMG and CGB (Not implemented yet)
+ - ATV Racing/Rocket Games mapper:
+   - How did this overlay the official Nintendo logo at BIOS check time? (Some Sachen titles use a similar trick)
+
  ***********************************************************************************************************/
 
 

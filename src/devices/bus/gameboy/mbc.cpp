@@ -5,6 +5,178 @@
  Game Boy carts with MBC (Memory Bank Controller)
 
 
+ MBC1 Mapper
+ ===========
+
+ The MBC1 mapper has two modes: 2MB ROM/8KB RAM or 512KB ROM/32KB RAM.
+ Initially, the mapper operates in 2MB ROM/8KB RAM mode.
+
+ 0000-1FFF - Writing to this area enables (value 0x0A) or disables (not 0x0A) the
+             SRAM.
+ 2000-3FFF - Writing a value 0bXXXBBBBB into the 2000-3FFF memory area selects the
+             lower 5 bits of the ROM bank to select for the 4000-7FFF memory area.
+             If a value of 0bXXX00000 is written then this will autmatically be
+             changed to 0bXXX00001 by the mbc chip. Initial value 00.
+ 4000-5FFF - Writing a value 0bXXXXXXBB into the 4000-5FFF memory area either selects
+             the RAM bank to use or bits 6 and 7 for the ROM bank to use for the 4000-7FFF
+             memory area. This behaviour depends on the memory moddel chosen.
+             These address lines are fixed in mode 1 and switch depending on A14 in mode 0.
+             In mode 0 these will drive 0 when RB 00 is accessed (A14 low) or the value set
+             in 4000-5FFF when RB <> 00 is accessed (A14 high).
+             Switching between modes does not clear this register. Initial value 00.
+ 6000-7FFF - Writing a value 0bXXXXXXXB into the 6000-7FFF memory area switches the mode.
+             B=0 - 2MB ROM/8KB RAM mode
+             B=1 - 512KB ROM/32KB RAM mode
+
+ Regular ROM aliasing rules apply.
+
+
+ MBC2 Mapper
+ ===========
+
+ The MBC2 mapper includes 512x4bits of builtin RAM.
+
+ 0000-3FFF - Writing to this area enables (value 0bXXXX1010) or disables (any
+             other value than 0bXXXX1010) the RAM. In order to perform this
+             function bit 8 of the address must be reset, so usable areas are
+             0000-00FF, 0200-02FF, 0400-04FF, 0600-06FF, ..., 3E00-3EFF,
+ 0000-3FFF - Writing to this area selects the rom bank to appear at 4000-7FFF.
+             Only bits 3-0 are used to select the bank number. If a value of
+             0bXXXX0000 is written then this is automatically changed into
+             0bXXXX0001 by the mapper.
+             In order to perform the rom banking bit 8 of the address must be
+             set, so usable areas are 0100-01FF, 0300-03FF, 0500-05FF, 0700-
+             07FF,..., 3F00-3FFF,
+
+ Regular ROM aliasing rules apply.
+
+
+ MBC3 Mapper
+ ===========
+
+ The MBC3 mapper cartridges can include a RTC chip.
+
+ 0000-1FFF - Writing to this area enables (value 0x0A) or disables (not 0x0A) the
+             SRAM and RTC registers.
+ 2000-3FFF - Writing to this area selects the rom bank to appear at 4000-7FFF.
+             Bits 6-0 are used  to select the bank number. If a value of
+             0bX0000000 is written then this is autmatically changed into
+             0bX0000001 by the mapper.
+ 4000-5FFF - Writing to this area selects the RAM bank or the RTC register to
+             read.
+             XXXX00bb - Select RAM bank bb.
+             XXXX1rrr - Select RTC register rrr. Accepted values for rrr are:
+                        000 - Seconds (0x00-0x3B)
+                        001 - Minutes (0x00-0x3B)
+                        010 - Hours (0x00-0x17)
+                        011 - Bits 7-0 of the day counter
+                        100 - bit 0 - Bit 8 of the day counter
+                              bit 6 - Halt RTC timer ( 0 = timer active, 1 = halted)
+                              bit 7 - Day counter overflow flag
+ 6000-7FFF - Writing 0x00 followed by 0x01 latches the RTC data. This latching
+             method is used for reading the RTC registers.
+
+ Regular ROM aliasing rules apply.
+
+
+ MBC5 Mapper
+ ===========
+
+ 0000-1FFF - Writing to this area enables (0x0A) or disables (not 0x0A) the SRAM area.
+ 2000-2FFF - Writing to this area updates bits 7-0 of the ROM bank number to
+             appear at 4000-7FFF.
+ 3000-3FFF - Writing to this area updates bit 8 of the ROM bank number to appear
+             at 4000-7FFF.
+ 4000-5FFF - Writing to this area select the RAM bank number to use. If the
+             cartridge includes a Rumble Pack then bit 3 is used to control
+             rumble motor (0 - disable motor, 1 - enable motor).
+
+
+ MBC7 Mapper (Used by Kirby's Tilt n' Tumble, Command Master)
+ ===========
+
+ Status: Partial support (only ROM banking supported at the moment)
+
+ The MBC7 mapper has 0x0200(?) bytes of RAM built in.
+
+ 0000-1FFF - Probably enable/disable RAM
+             In order to use this area bit 12 of the address be set.
+             Values written: 00, 0A
+ 2000-2FFF - Writing to this area selects the ROM bank to appear at
+             4000-7FFF.
+             In order to use this area bit 12 of the address be set.
+             Values written: 01, 07, 01, 1C
+ 3000-3FFF - Unknown
+             In order to use this area bit 12 of the address be set.
+             Values written: 00
+ 4000-4FFF - Unknown
+             In order to use this area bit 12 of the address be set.
+             Values written: 00, 40, 3F
+
+
+ MMM01 mapper
+ ============
+
+ Used by: Momotarou Collection 2, Taito Pack
+
+ Status: not supported yet.
+
+ Momotarou Collection 2:
+
+ MOMOTARODENGEKI2, 0x00000, blocks 0x00 - 0x1F
+ 0x147: 01 04 00 00 33 00
+ MOMOTAROU GAIDEN, 0x80000, blocks 0x20 - 0x3F
+ 0x147: 06 03 00 00 18 00
+
+ When picking top option:
+ 3FFF <- 20
+ 5FFF <- 40
+ 7FFF <- 21
+ 1FFF <- 3A
+ 1FFF <- 7A
+
+ When picking bottom option:
+ 3FFF <- 00
+ 5FFF <- 01
+ 7FFF <- 01
+ 1FFF <- 3A
+ 1FFF <- 7A
+
+ Taito Pack (MMM01+RAM, 512KB, 64KB RAM):
+ 1st option (BUBBLE BOBBLE, blocks 0x10 - 0x17, MBC1+RAM, 128KB, 8KB RAM):
+   2000 <- 70  01110000  => starting block, 10000
+   6000 <- 30  00110000  => 8 blocks
+   4000 <- 70  01110000  => ???
+   0000 <- 40  01000000  => upper 3 bits determine lower 3 bits of starting block?
+
+ 2nd option (ELEVATOR ACTION, blocks 0x18 - 0x1B, MBC1, 64KB, 2KB RAM):
+   2000 <- 78  01111000  => starting block, 11000
+   6000 <- 38  00111000  => 4 blocks
+   4000 <- 70  01110000  => ???
+   0000 <- 40  01000000  => upper 3 bits determine lower 3 bits of starting block?
+
+ 3rd option (CHASE HQ, blocks 0x08 - 0x0F, MBC1+RAM, 128KB, 8KB RAM):
+   2000 <- 68  01101000  => starting block, 01000
+   6000 <- 30  00110000  => 8 blocks
+   4000 <- 70  01110000  => ???
+   0000 <- 40  01000000  => upper 3 bits determine lower 3 bits of starting block?
+
+ 4th option (SAGAIA, blocks 0x00 - 0x07, MBC1+RAM, 128KB, 8KB RAM):
+   2000 <- 60  01100000  => starting block, 00000
+   6000 <- 30  00110000  => 8 blocks
+   4000 <- 70  01110000  => ???
+   0000 <- 40  01000000  => upper 3 bits determine lower 3 bits of starting block?
+
+ Known:
+ The last 2 banks in a MMM01 dump are actually the starting banks for a MMM01 image.
+
+ 0000-1FFF => bit6 set => perform mapping
+
+ Possible mapping registers:
+ 1FFF - Enable RAM ???
+ 3FFF - xxxbbbbb - Bit0-5 of the rom bank to select at 0x4000-0x7FFF ?
+
+
  TODO: RTC runs too fast while in-game, in MBC-3 games... find the problem!
 
  ***********************************************************************************************************/
