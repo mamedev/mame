@@ -132,55 +132,51 @@ void axc51base_cpu_device::iram_indirect_write(offs_t a, uint8_t d) { m_data.wri
 /* SFR Registers - These are accessed directly for speed on read */
 /* Read accessors                                                */
 
-#define SFR_A(a)        m_sfr_regs[a]
-#define SET_SFR_A(a,v)  do { SFR_A(a) = (v); } while (0)
+#define SET_SFR_A(a,v)  do { m_sfr_regs[a] = (v); } while (0)
 
-#define XSFR_A(a)       m_xsfr_regs[a]
+#define ACC         m_sfr_regs[SFR_ACC]
+#define PSW         m_sfr_regs[SFR_PSW]
 
+#define P0          ((const uint8_t) m_sfr_regs[SFR_P0])
+#define P1          ((const uint8_t) m_sfr_regs[SFR_P1])
+#define P2          ((const uint8_t) m_sfr_regs[SFR_P2])
+#define P3          ((const uint8_t) m_sfr_regs[SFR_P3])
+#define P4          ((const uint8_t) m_sfr_regs[SFR_P4])
 
-#define ACC         SFR_A(SFR_ACC)
-#define PSW         SFR_A(SFR_PSW)
+#define SP          m_sfr_regs[SFR_SP]
+#define DPL0        m_sfr_regs[SFR_DPL0]
+#define DPH0        m_sfr_regs[SFR_DPH0]
+#define PCON        m_sfr_regs[SFR_PCON]
+#define IE          m_sfr_regs[SFR_IE]
+#define IE1         m_sfr_regs[SFR_IE1]
+#define IP          m_sfr_regs[SFR_IP]
+#define B           m_sfr_regs[SFR_B]
+#define ER8         m_sfr_regs[SFR_ER8]
 
-#define P0          ((const uint8_t) SFR_A(SFR_P0))
-#define P1          ((const uint8_t) SFR_A(SFR_P1))
-#define P2          ((const uint8_t) SFR_A(SFR_P2))
-#define P3          ((const uint8_t) SFR_A(SFR_P3))
-#define P4          ((const uint8_t) SFR_A(SFR_P4))
-
-#define SP          SFR_A(SFR_SP)
-#define DPL0        SFR_A(SFR_DPL0)
-#define DPH0        SFR_A(SFR_DPH0)
-#define PCON        SFR_A(SFR_PCON)
-#define IE          SFR_A(SFR_IE)
-#define IE1         SFR_A(SFR_IE1)
-#define IP          SFR_A(SFR_IP)
-#define B           SFR_A(SFR_B)
-#define ER8         SFR_A(SFR_ER8)
-
-#define DPL1        SFR_A(SFR_DPL1)
-#define DPH1        SFR_A(SFR_DPH1)
+#define DPL1        m_sfr_regs[SFR_DPL1]
+#define DPH1        m_sfr_regs[SFR_DPH1]
 
 
-#define ER00        SFR_A(SFR_ER00)
-#define ER01        SFR_A(SFR_ER01)
+#define ER00        m_sfr_regs[SFR_ER00]
+#define ER01        m_sfr_regs[SFR_ER01]
 
-#define ER10        SFR_A(SFR_ER10)
-#define ER11        SFR_A(SFR_ER11)
+#define ER10        m_sfr_regs[SFR_ER10]
+#define ER11        m_sfr_regs[SFR_ER11]
 
-#define ER20        SFR_A(SFR_ER20)
-#define ER21        SFR_A(SFR_ER21)
+#define ER20        m_sfr_regs[SFR_ER20]
+#define ER21        m_sfr_regs[SFR_ER21]
 
-#define ER30        SFR_A(SFR_ER30)
-#define ER31        SFR_A(SFR_ER31)
+#define ER30        m_sfr_regs[SFR_ER30]
+#define ER31        m_sfr_regs[SFR_ER31]
 
-#define GP0         SFR_A(SFR_GP0)
-#define GP1         SFR_A(SFR_GP1)
-#define GP2         SFR_A(SFR_GP2)
-#define GP3         SFR_A(SFR_GP3)
-#define GP4         SFR_A(SFR_GP4)
-#define GP5         SFR_A(SFR_GP5)
-#define GP6         SFR_A(SFR_GP6)
-#define GP7         SFR_A(SFR_GP7)
+#define GP0         m_sfr_regs[SFR_GP0]
+#define GP1         m_sfr_regs[SFR_GP1]
+#define GP2         m_sfr_regs[SFR_GP2]
+#define GP3         m_sfr_regs[SFR_GP3]
+#define GP4         m_sfr_regs[SFR_GP4]
+#define GP5         m_sfr_regs[SFR_GP5]
+#define GP6         m_sfr_regs[SFR_GP6]
+#define GP7         m_sfr_regs[SFR_GP7]
 
 #define R_REG(r)    m_scratchpad[(r) | (PSW & 0x18)]
 
@@ -192,8 +188,8 @@ void axc51base_cpu_device::iram_indirect_write(offs_t a, uint8_t d) { m_data.wri
 #define ER2         ((ER21<<8) | ER20)
 #define ER3         ((ER31<<8) | ER30)
 
-#define SET_PSW(v)  do { SFR_A(SFR_PSW) = (v); SET_PARITY(); } while (0)
-#define SET_ACC(v)  do { SFR_A(SFR_ACC) = (v); SET_PARITY(); } while (0)
+#define SET_PSW(v)  do { m_sfr_regs[SFR_PSW] = (v); SET_PARITY(); } while (0)
+#define SET_ACC(v)  do { m_sfr_regs[SFR_ACC] = (v); SET_PARITY(); } while (0)
 
 /* These trigger actions on modification and have to be written through SFR_W */
 #define SET_P0(v)   iram_write(SFR_P0, v)
@@ -270,9 +266,9 @@ void axc51base_cpu_device::clear_current_irq()
 	LOGMASKED(LOG_UNHANDLED,"clear irq\n");
 }
 
-uint8_t axc51base_cpu_device::r_acc() { return SFR_A(SFR_ACC); }
+uint8_t axc51base_cpu_device::r_acc() { return m_sfr_regs[SFR_ACC]; }
 
-uint8_t axc51base_cpu_device::r_psw() { return SFR_A(SFR_PSW); }
+uint8_t axc51base_cpu_device::r_psw() { return m_sfr_regs[SFR_PSW]; }
 
 
 offs_t axc51base_cpu_device::external_ram_iaddr(offs_t offset, offs_t mem_mask)
@@ -1093,11 +1089,11 @@ uint8_t axc51base_cpu_device::read_port(int i)
 
 	switch (i)
 	{
-	case 0: latched_out_data = P0; port_direction = SFR_A(SFR_P0DIR); pup = XSFR_A(XSFR_PUP0); pdn = XSFR_A(XSFR_PDN0); break;
-	case 1: latched_out_data = P1; port_direction = SFR_A(SFR_P1DIR); pup = XSFR_A(XSFR_PUP1); pdn = XSFR_A(XSFR_PDN1); break;
-	case 2: latched_out_data = P2; port_direction = SFR_A(SFR_P2DIR); pup = XSFR_A(XSFR_PUP2); pdn = XSFR_A(XSFR_PDN2); break;
-	case 3: latched_out_data = P3; port_direction = SFR_A(SFR_P3DIR); pup = XSFR_A(XSFR_PUP3); pdn = XSFR_A(XSFR_PDN3); break;
-	case 4: latched_out_data = P4; port_direction = SFR_A(SFR_P4DIR); pup = XSFR_A(XSFR_PUP4); pdn = XSFR_A(XSFR_PDN4); break;
+	case 0: latched_out_data = P0; port_direction = m_sfr_regs[SFR_P0DIR]; pup = m_xsfr_regs[XSFR_PUP0]; pdn = m_xsfr_regs[XSFR_PDN0]; break;
+	case 1: latched_out_data = P1; port_direction = m_sfr_regs[SFR_P1DIR]; pup = m_xsfr_regs[XSFR_PUP1]; pdn = m_xsfr_regs[XSFR_PDN1]; break;
+	case 2: latched_out_data = P2; port_direction = m_sfr_regs[SFR_P2DIR]; pup = m_xsfr_regs[XSFR_PUP2]; pdn = m_xsfr_regs[XSFR_PDN2]; break;
+	case 3: latched_out_data = P3; port_direction = m_sfr_regs[SFR_P3DIR]; pup = m_xsfr_regs[XSFR_PUP3]; pdn = m_xsfr_regs[XSFR_PDN3]; break;
+	case 4: latched_out_data = P4; port_direction = m_sfr_regs[SFR_P4DIR]; pup = m_xsfr_regs[XSFR_PUP4]; pdn = m_xsfr_regs[XSFR_PDN4]; break;
 	}
 
 	uint8_t incoming = m_port_in_cb[i]();
@@ -1114,11 +1110,11 @@ void axc51base_cpu_device::write_port(int i, uint8_t data)
 
 	switch (i)
 	{
-	case 0: port_direction = SFR_A(SFR_P0DIR); pup = XSFR_A(XSFR_PUP0); pdn = XSFR_A(XSFR_PDN0); break;
-	case 1: port_direction = SFR_A(SFR_P1DIR); pup = XSFR_A(XSFR_PUP1); pdn = XSFR_A(XSFR_PDN1); break;
-	case 2: port_direction = SFR_A(SFR_P2DIR); pup = XSFR_A(XSFR_PUP2); pdn = XSFR_A(XSFR_PDN2); break;
-	case 3: port_direction = SFR_A(SFR_P3DIR); pup = XSFR_A(XSFR_PUP3); pdn = XSFR_A(XSFR_PDN3); break;
-	case 4: port_direction = SFR_A(SFR_P4DIR); pup = XSFR_A(XSFR_PUP4); pdn = XSFR_A(XSFR_PDN4); break;
+	case 0: port_direction = m_sfr_regs[SFR_P0DIR]; pup = m_xsfr_regs[XSFR_PUP0]; pdn = m_xsfr_regs[XSFR_PDN0]; break;
+	case 1: port_direction = m_sfr_regs[SFR_P1DIR]; pup = m_xsfr_regs[XSFR_PUP1]; pdn = m_xsfr_regs[XSFR_PDN1]; break;
+	case 2: port_direction = m_sfr_regs[SFR_P2DIR]; pup = m_xsfr_regs[XSFR_PUP2]; pdn = m_xsfr_regs[XSFR_PDN2]; break;
+	case 3: port_direction = m_sfr_regs[SFR_P3DIR]; pup = m_xsfr_regs[XSFR_PUP3]; pdn = m_xsfr_regs[XSFR_PDN3]; break;
+	case 4: port_direction = m_sfr_regs[SFR_P4DIR]; pup = m_xsfr_regs[XSFR_PUP4]; pdn = m_xsfr_regs[XSFR_PDN4]; break;
 	}
 
 	LOGMASKED(LOG_PORTS,"%s: writing port %d with direction %02x pup %02x pdn %02x data %02x\n", machine().describe_context(), i, port_direction, pup, pdn, data);
