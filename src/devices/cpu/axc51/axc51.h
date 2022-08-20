@@ -1,58 +1,49 @@
 // license:BSD-3-Clause
-// copyright-holders:Steve Ellenoff, Manuel Abadia, Couriersud
+// copyright-holders:Steve Ellenoff, Manuel Abadia, Couriersud, David Haywood
 
-#ifndef MAME_CPU_AXC51_AXC51_H
-#define MAME_CPU_AXC51_AXC51_H
+#ifndef MAME_CPU_SFR_SFR_H
+#define MAME_CPU_SFR_SFR_H
 
 #pragma once
 
-
-enum
+// used for getting / setting current register state in debugger
+enum 
 {
-	AXC51_PC=1, AXC51_SP, AXC51_PSW, AXC51_ACC, AXC51_B, AXC51_DPTR, AXC51_DPH, AXC51_DPL, AXC51_IE, AXC51_IP,
-	AXC51_P0, AXC51_P1, AXC51_P2, AXC51_P3,
-	AXC51_R0, AXC51_R1, AXC51_R2, AXC51_R3, AXC51_R4, AXC51_R5, AXC51_R6, AXC51_R7, AXC51_RB,
-};
+	SFR_STATEREG_PC=1, SFR_STATEREG_SP, SFR_STATEREG_PSW, SFR_STATEREG_ACC, SFR_STATEREG_B, SFR_STATEREG_DPTR0, SFR_STATEREG_DPTR1, SFR_STATEREG_DPH0, SFR_STATEREG_DPL0, SFR_STATEREG_IE, SFR_STATEREG_IP,
+	SFR_STATEREG_P0, SFR_STATEREG_P1, SFR_STATEREG_P2, SFR_STATEREG_P3,
+	SFR_STATEREG_R0, SFR_STATEREG_R1, SFR_STATEREG_R2, SFR_STATEREG_R3, SFR_STATEREG_R4, SFR_STATEREG_R5, SFR_STATEREG_R6, SFR_STATEREG_R7, SFR_STATEREG_RB,
 
-enum
-{
-	AXC51_INT0_LINE = 0,    /* P3.2: External Interrupt 0 */
-	AXC51_INT1_LINE,        /* P3.3: External Interrupt 1 */
-	AXC51_RX_LINE,          /* P3.0: Serial Port Receive Line */
-	AXC51_T0_LINE,          /* P3,4: Timer 0 External Input */
-	AXC51_T1_LINE,          /* P3.5: Timer 1 External Input */
-	AXC51_T2_LINE,          /* P1.0: Timer 2 External Input */
-	AXC51_T2EX_LINE,        /* P1.1: Timer 2 Capture Reload Trigger */
+	SFR_STATEREG_ER0, SFR_STATEREG_ER1, SFR_STATEREG_ER2, SFR_STATEREG_ER3, SFR_ER8,
+	SFR_STATEREG_GP0, SFR_STATEREG_GP1, SFR_STATEREG_GP2, SFR_STATEREG_GP3, SFR_STATEREG_GP4, SFR_STATEREG_GP5, SFR_STATEREG_GP6, SFR_STATEREG_GP7, 
 };
-
 
 class axc51base_cpu_device : public cpu_device
 {
 public:
-	/* At least CMOS devices may be forced to read from ports configured as output.
-	 * All you need is a low impedance output connect to the port.
-	 */
-	void set_port_forced_input(uint8_t port, uint8_t forced_input) { m_forced_inputs[port] = forced_input; }
-
 	template <unsigned N> auto port_in_cb() { return m_port_in_cb[N].bind(); }
 	template <unsigned N> auto port_out_cb() { return m_port_out_cb[N].bind(); }
-	auto serial_rx_cb() { return m_serial_rx_cb.bind(); }
-	auto serial_tx_cb() { return m_serial_tx_cb.bind(); }
+
+	template <unsigned N> auto dac_out_cb() { return m_dac_out_cb[N].bind(); }
+
+
+	auto spi_in_cb() { return m_spi_in_cb.bind(); }
+	auto spi_out_cb() { return m_spi_out_cb.bind(); }
+	auto spi_out_dir_cb() { return m_spi_out_dir_cb.bind(); }
 
 	void program_internal(address_map &map);
 	void data_internal(address_map &map);
+	void io_internal(address_map &map);
+
 protected:
 	// construction/destruction
 	axc51base_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features = 0);
-	axc51base_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map, address_map_constructor data_map, int program_width, int data_width, uint8_t features = 0);
+	axc51base_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map, address_map_constructor data_map, address_map_constructor io_map, int program_width, int data_width, uint8_t features = 0);
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 12 - 1) / 12; }
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 12); }
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 20; }
 	virtual uint32_t execute_input_lines() const noexcept override { return 6; }
@@ -87,7 +78,8 @@ protected:
 	uint8_t   m_irq_active;         /* mask which irq levels are serviced */
 	uint8_t   m_irq_prio[8];        /* interrupt priority */
 
-	uint8_t   m_forced_inputs[4];   /* allow read even if configured as output */
+	uint16_t m_spi_dma_addr;
+
 
 	// JB-related hacks
 	uint8_t m_last_op;
@@ -95,48 +87,44 @@ protected:
 
 	int     m_icount;
 
-	struct axc51_uart
-	{
-		uint8_t   data_out;       //Data to send out
-		uint8_t   bits_to_send;   //How many bits left to send when transmitting out the serial port
-
-		int     smod_div;       /* signal divided by 2^SMOD */
-		int     rx_clk;         /* rx clock */
-		int     tx_clk;         /* tx clock */
-		uint8_t   delay_cycles;   //Gross Hack;
-	} m_uart;            /* internal uart */
-
 	/* Internal Ram */
-	required_shared_ptr<uint8_t> m_sfr_ram;           /* 128 SFR - these are in 0x80 - 0xFF */
-	required_shared_ptr<uint8_t> m_scratchpad;        /* 128 RAM (8031/51) + 128 RAM in second bank (8032/52) */
+	uint8_t m_sfr_regs[128];
+	uint8_t m_xsfr_regs[128];
+	required_shared_ptr<uint8_t> m_scratchpad;    
+	required_shared_ptr<uint8_t> m_mainram;
+
+	uint8_t m_uid[4];
 
 	/* SFR Callbacks */
-	virtual void sfr_write(size_t offset, uint8_t data);
-	virtual uint8_t sfr_read(size_t offset);
+	void sfr_write(size_t offset, uint8_t data);
+	uint8_t sfr_read(size_t offset);
 
 	/* Memory spaces */
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_program;
-	memory_access< 9, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
+	memory_access<11, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
 	memory_access<17, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 
-	devcb_read8::array<4> m_port_in_cb;
-	devcb_write8::array<4> m_port_out_cb;
+	devcb_read8::array<5> m_port_in_cb;
+	devcb_write8::array<5> m_port_out_cb;
+	devcb_write8::array<2> m_dac_out_cb;
 
-	/* Serial Port TX/RX Callbacks */
-	devcb_write8 m_serial_tx_cb;    //Call back function when sending data out of serial port
-	devcb_read8 m_serial_rx_cb;    //Call back function to retrieve data when receiving serial port data
+	devcb_read8 m_spi_in_cb;
+	devcb_write8 m_spi_out_cb;
+	devcb_write_line m_spi_out_dir_cb;
+
 
 	// for the debugger
 	uint8_t m_rtemp;
 
 	static const uint8_t axc51_cycles[256];
 
-	uint8_t iram_iread(offs_t a);
-	void iram_iwrite(offs_t a, uint8_t d);
+	uint8_t iram_indirect_read(offs_t a);
+	void iram_indirect_write(offs_t a, uint8_t d);
+
 	void clear_current_irq();
 	uint8_t r_acc();
 	uint8_t r_psw();
-	virtual offs_t external_ram_iaddr(offs_t offset, offs_t mem_mask);
+	offs_t external_ram_iaddr(offs_t offset, offs_t mem_mask);
 	uint8_t iram_read(size_t offset);
 	void iram_write(size_t offset, uint8_t data);
 	void push_pc();
@@ -146,18 +134,32 @@ protected:
 	void bit_address_w(uint8_t offset, uint8_t bit);
 	void do_add_flags(uint8_t a, uint8_t data, uint8_t c);
 	void do_sub_flags(uint8_t a, uint8_t data, uint8_t c);
-	void transmit_receive(int source);
-	void update_timer_t0(int cycles);
-	void update_timer_t1(int cycles);
-	void update_timer_t2(int cycles);
-	void update_timers(int cycles);
-	void serial_transmit(uint8_t data);
-	void serial_receive();
-	void update_serial(int cycles);
-	void update_irq_prio(uint8_t ipl, uint8_t iph);
 	void execute_op(uint8_t op);
 	void check_irqs();
 	void burn_cycles(int cycles);
+	uint32_t process_dptr_access();
+	uint32_t get_dptr0_with_autoinc(uint8_t auto_inc);
+	uint32_t get_dptr1_with_autoinc(uint8_t auto_inc);
+	uint8_t xsfr_read(offs_t offset);
+	void xsfr_write(offs_t offset, uint8_t data);
+
+	uint8_t read_port(int i);
+	void write_port(int i, uint8_t data);
+
+	uint8_t spicon_r();
+	uint8_t spibuf_r();
+	uint8_t dpcon_r();
+	uint8_t uartsta_r();
+
+	void spidmaadr_w(uint8_t data);
+	void spidmacnt_w(uint8_t data);
+
+	void spicon_w(uint8_t data);
+	void spibuf_w(uint8_t data);
+	void spibaud_w(uint8_t data);
+	void dpcon_w(uint8_t data);
+	void ie2crypt_w(uint8_t data);
+
 	void acall(uint8_t r);
 	void add_a_byte(uint8_t r);
 	void add_a_mem(uint8_t r);
@@ -271,146 +273,241 @@ protected:
 	void xrl_a_r(uint8_t r);
 	void illegal(uint8_t r);
 
+	void do_ez_flags(uint16_t val);
+	void do_ec_ez_flags(uint32_t res);
 
-	/* Internal address in SFR of registers */
+	void axc51_extended_a5(uint8_t r);
+	void extended_a5_0e();
+	void extended_a5_0f();
+	void extended_a5_d0();
+	void extended_a5_d1();
+
+	uint16_t get_erx(int m);
+	void set_erx(int n, uint16_t val);
+	uint16_t get_dpt(int i);
+
+	/* Internal address in SFR of registers, these map at 0x80, so SFR_P0 is at 0x80 etc. */
 	enum
 	{
-		ADDR_P0          = 0x80,
-		ADDR_SP          = 0x81, // SPL
-		ADDR_DPL         = 0x82, // DPL0
-		ADDR_DPH         = 0x83, // DPH0
-		AXC51_DPL1       = 0x84,
-		AXC51_DPH1       = 0x85,
-		AXC51_DPCON      = 0x86,
-		ADDR_PCON        = 0x87, // PCON0
-		AXC51_SDCON0     = 0x88, // not ADDR_TCON   = 0x88,
-		AXC51_SDCON1     = 0x89, // not ADDR_TMOD   = 0x89,
-		AXC51_SDCON2     = 0x8a, // not ADDR_TL0    = 0x8a,
-		AXC51_JPGCON4    = 0x8b, // not ADDR_TL1    = 0x8b,
-		AXC51_JPGCON3    = 0x8c, // not ADDR_TH0    = 0x8c,
-		AXC51_JPGCON2    = 0x8d, // not ADDR_TH1    = 0x8d,
-		AXC51_JPGCON1    = 0x8e,
-		AXC51_TRAP       = 0x8f,
-		ADDR_P1          = 0x90,
-		AXC51_SDBAUD     = 0x91,
-		AXC51_SDCPTR     = 0x92,
-		AXC51_SDDCNT     = 0x93,
-		AXC51_SDDPTR     = 0x94,
-		AXC51_IE2CRPT    = 0x95, // controls automatic encryption
-		AXC51_UARTBAUDH  = 0x96,
-		AXC51_PWKEN      = 0x97,
-		AXC51_PWKPND     = 0x98, // not ADDR_SCON   = 0x98,
-		AXC51_PWKEDGE    = 0x99, // not ADDR_SBUF   = 0x99,
-		AXC51_PIE0       = 0x9a,
-		AXC51_DBASE      = 0x9b,
-		AXC51_PCON1      = 0x9c,
-		AXC51_PIE1       = 0x9d,
-		AXC51_IRTDATA    = 0x9e,
-		AXC51_IRTCON     = 0x9f,
-		ADDR_P2          = 0xa0,
-		AXC51_GP0        = 0xa1,
-		AXC51_GP1        = 0xa2,
-		AXC51_GP2        = 0xa3,
-		AXC51_GP3        = 0xa4,
-		AXC51_DACCON     = 0xa5,
-		AXC51_DACLCH     = 0xa6,
-		AXC51_DACRCH     = 0xa7,
-		ADDR_IE          = 0xa8, // IE0
-		AXC51_IE1        = 0xa9,
-		AXC51_KEY0       = 0xaa,
-		AXC51_KEY1       = 0xab,
-		AXC51_TMR3CON    = 0xac,
-		AXC51_TMR3CNT    = 0xad,
-		AXC51_TMR3PR     = 0xae,
-		AXC51_TMR3PSR    = 0xaf,
-		ADDR_P3          = 0xb0,
-		AXC51_GP4        = 0xb1,
-		AXC51_GP5        = 0xb2,
-		AXC51_GP6        = 0xb3,
-		AXC51_P4         = 0xb4,
-		AXC51_GP7        = 0xb5,
-		AXC51_LCDCON     = 0xb6,
-		AXC51_PLLCON     = 0xb7,
-		ADDR_IP          = 0xb8, // IP0
-		AXC51_IP1        = 0xb9,
-		AXC51_P0DIR      = 0xba,
-		AXC51_P1DIR      = 0xbb,
-		AXC51_P2DIR      = 0xbc,
-		AXC51_P3DIR      = 0xbd,
-		AXC51_P4DIR      = 0xbe,
-		AXC51_LVDCON     = 0xbf,
-		AXC51_JPGCON0    = 0xc0,
-		AXC51_TMR2CON    = 0xc1,
-		AXC51_JPGCON9    = 0xc2,
-		AXC51_JPGCON5    = 0xc3,
-		AXC51_JPGCON6    = 0xc4,
-		AXC51_JPGCON7    = 0xc5,
-		AXC51_JPGCON8    = 0xc6,
-		AXC51_LCDPR      = 0xc7,
-		AXC51_LCDTCON    = 0xc8,
-		AXC51_USBCON0    = 0xc9,
-		AXC51_USBCON1    = 0xca,
-		AXC51_USBCON2    = 0xcb,
-		AXC51_USBDATA    = 0xcc,
-		AXC51_USBADR     = 0xcd,
-		AXC51_ILLEGAL    = 0xce,
-		AXC51_MICCON     = 0xcf,
-		ADDR_PSW         = 0xd0,
-		AXC51_PGCON      = 0xd1,
-		AXC51_ADCCON     = 0xd2,
-		AXC51_PCON2      = 0xd3,
-		AXC51_ADCDATAL   = 0xd4,
-		AXC51_ADCDATAH   = 0xd5,
-		AXC51_SPIDMAADR  = 0xd6,
-		AXC51_SPIDMACNT  = 0xd7,
-		AXC51_SPICON     = 0xd8,
-		AXC51_SPIBUF     = 0xd9,
-		AXC51_SPIBAUD    = 0xda,
-		AXC51_CLKCON     = 0xdb,
-		AXC51_CLKCON1    = 0xdc,
-		AXC51_USBDPDM    = 0xdd,
-		AXC51_LFSRPOLY0  = 0xde,
-		AXC51_LFSRPOLY1  = 0xdf,
-		ADDR_ACC         = 0xe0,
-		AXC51_TMR1CON    = 0xe1,
-		AXC51_UID0       = 0xe2,
-		AXC51_UID1       = 0xe3,
-		AXC51_UID2       = 0xe4,
-		AXC51_UID3       = 0xe5,
-		AXC51_ER00       = 0xe6,
-		AXC51_ER01       = 0xe7,
-		AXC51_ER10       = 0xe8,
-		AXC51_ER11       = 0xe9,
-		AXC51_ER20       = 0xea,
-		AXC51_ER21       = 0xeb,
-		AXC51_ER30       = 0xec,
-		AXC51_ER31       = 0xed,
-		AXC51_ER8        = 0xee,
-		AXC51_ILLEGAL2   = 0xef,
-		ADDR_B           = 0xf0,
-		AXC51_HUFFBUF    = 0xf1,
-		AXC51_HUFFSFT    = 0xf2,
-		AXC51_HUFFDCL    = 0xf3,
-		AXC51_HUFFDCH    = 0xf4,
-		AXC51_CRC        = 0xf5,
-		AXC51_LFSRFIFO   = 0xf6,
-		AXC51_WDTCON     = 0xf7,
-		AXC51_TMR0CON    = 0xf8,
-		AXC51_TMR0CNT    = 0xf9,
-		AXC51_TMR0PR     = 0xfa,
-		AXC51_TMR0PSR    = 0xfb,
-		AXC51_UARTSTA    = 0xfc,
-		AXC51_UARTCON    = 0xfd,
-		AXC51_UARTBAUD   = 0xfe,
-		AXC51_UARTDATA   = 0xff,
+		SFR_P0          = 0x00,
+		SFR_SP          = 0x01, // SPL
+		SFR_DPL0        = 0x02, // DPL00
+		SFR_DPH0        = 0x03, // DPH00
+		SFR_DPL1        = 0x04,
+		SFR_DPH1        = 0x05,
+		SFR_DPCON       = 0x06,
+		SFR_PCON        = 0x07, // PCON0
+		SFR_SDCON0      = 0x08, // not SFR_TCON
+		SFR_SDCON1      = 0x09, // not SFR_TMOD
+		SFR_SDCON2      = 0x0a, // not SFR_TL0
+		SFR_JPGCON4     = 0x0b, // not SFR_TL1
+		SFR_JPGCON3     = 0x0c, // not SFR_TH0
+		SFR_JPGCON2     = 0x0d, // not SFR_TH1
+		SFR_JPGCON1     = 0x0e,
+		SFR_TRAP        = 0x0f,
+		SFR_P1          = 0x10,
+		SFR_SDBAUD      = 0x11,
+		SFR_SDCPTR      = 0x12,
+		SFR_SDDCNT      = 0x13,
+		SFR_SDDPTR      = 0x14,
+		SFR_IE2CRPT     = 0x15, // controls automatic encryption
+		SFR_UARTBAUDH   = 0x16,
+		SFR_PWKEN       = 0x17,
+		SFR_PWKPND      = 0x18, // not SFR_SCON
+		SFR_PWKEDGE     = 0x19, // not SFR_SBUF
+		SFR_PIE0        = 0x1a,
+		SFR_DBASE       = 0x1b,
+		SFR_PCON1       = 0x1c,
+		SFR_PIE1        = 0x1d,
+		SFR_IRTDATA     = 0x1e,
+		SFR_IRTCON      = 0x1f,
+		SFR_P2          = 0x20,
+		SFR_GP0         = 0x21,
+		SFR_GP1         = 0x22,
+		SFR_GP2         = 0x23,
+		SFR_GP3         = 0x24,
+		SFR_DACCON      = 0x25,
+		SFR_DACLCH      = 0x26,
+		SFR_DACRCH      = 0x27,
+		SFR_IE          = 0x28, // IE0
+		SFR_IE1         = 0x29,
+		SFR_KEY0        = 0x2a,
+		SFR_KEY1        = 0x2b,
+		SFR_TMR3CON     = 0x2c,
+		SFR_TMR3CNT     = 0x2d,
+		SFR_TMR3PR      = 0x2e,
+		SFR_TMR3PSR     = 0x2f,
+		SFR_P3          = 0x30,
+		SFR_GP4         = 0x31,
+		SFR_GP5         = 0x32,
+		SFR_GP6         = 0x33,
+		SFR_P4          = 0x34,
+		SFR_GP7         = 0x35,
+		SFR_LCDCON      = 0x36,
+		SFR_PLLCON      = 0x37,
+		SFR_IP          = 0x38, // IP0
+		SFR_IP1         = 0x39,
+		SFR_P0DIR       = 0x3a,
+		SFR_P1DIR       = 0x3b,
+		SFR_P2DIR       = 0x3c,
+		SFR_P3DIR       = 0x3d,
+		SFR_P4DIR       = 0x3e,
+		SFR_LVDCON      = 0x3f,
+		SFR_JPGCON0     = 0x40,
+		SFR_TMR2CON     = 0x41,
+		SFR_JPGCON9     = 0x42,
+		SFR_JPGCON5     = 0x43,
+		SFR_JPGCON6     = 0x44,
+		SFR_JPGCON7     = 0x45,
+		SFR_JPGCON8     = 0x46,
+		SFR_LCDPR       = 0x47,
+		SFR_LCDTCON     = 0x48,
+		SFR_USBCON0     = 0x49,
+		SFR_USBCON1     = 0x4a,
+		SFR_USBCON2     = 0x4b,
+		SFR_USBDATA     = 0x4c,
+		SFR_USBADR      = 0x4d,
+		SFR_ILLEGAL     = 0x4e,
+		SFR_MICCON      = 0x4f,
+		SFR_PSW         = 0x50,
+		SFR_PGCON       = 0x51,
+		SFR_ADCCON      = 0x52,
+		SFR_PCON2       = 0x53,
+		SFR_ADCDATAL    = 0x54,
+		SFR_ADCDATAH    = 0x55,
+		SFR_SPIDMAADR   = 0x56,
+		SFR_SPIDMACNT   = 0x57,
+		SFR_SPICON      = 0x58,
+		SFR_SPIBUF      = 0x59,
+		SFR_SPIBAUD     = 0x5a,
+		SFR_CLKCON      = 0x5b,
+		SFR_CLKCON1     = 0x5c,
+		SFR_USBDPDM     = 0x5d,
+		SFR_LFSRPOLY0   = 0x5e,
+		SFR_LFSRPOLY1   = 0x5f,
+		SFR_ACC         = 0x60,
+		SFR_TMR1CON     = 0x61,
+		SFR_UID0        = 0x62,
+		SFR_UID1        = 0x63,
+		SFR_UID2        = 0x64,
+		SFR_UID3        = 0x65,
+		SFR_ER00        = 0x66,
+		SFR_ER01        = 0x67,
+		SFR_ER10        = 0x68,
+		SFR_ER11        = 0x69,
+		SFR_ER20        = 0x6a,
+		SFR_ER21        = 0x6b,
+		SFR_ER30        = 0x6c,
+		SFR_ER31        = 0x6d,
+		SFR_ER8         = 0x6e,
+		SFR_ILLEGAL2    = 0x6f,
+		SFR_B           = 0x70,
+		SFR_HUFFBUF     = 0x71,
+		SFR_HUFFSFT     = 0x72,
+		SFR_HUFFDCL     = 0x73,
+		SFR_HUFFDCH     = 0x74,
+		SFR_CRC         = 0x75,
+		SFR_LFSRFIFO    = 0x76,
+		SFR_WDTCON      = 0x77,
+		SFR_TMR0CON     = 0x78,
+		SFR_TMR0CNT     = 0x79,
+		SFR_TMR0PR      = 0x7a,
+		SFR_TMR0PSR     = 0x7b,
+		SFR_UARTSTA     = 0x7c,
+		SFR_UARTCON     = 0x7d,
+		SFR_UARTBAUD    = 0x7e,
+		SFR_UARTDATA    = 0x7f,
+	};
+
+	// XSFR regs map at 0x3000, so XSFR_PUP0 at is 0x3010 etc.
+	enum
+	{
+		XSFR_PUP0 = 0x10,
+		XSFR_PUP1 = 0x11,
+		XSFR_PUP2 = 0x12,
+		XSFR_PUP3 = 0x13,
+		XSFR_PUP4 = 0x14,
+		XSFR_PDN0 = 0x15,
+		XSFR_PDN1 = 0x16,
+		XSFR_PDN2 = 0x17,
+		XSFR_PDN3 = 0x18,
+		XSFR_PDN4 = 0x19,
+		XSFR_PHD0 = 0x1a,
+		XSFR_PHD1 = 0x1b,
+		XSFR_PHD2 = 0x1c,
+		XSFR_PHD3 = 0x1d,
+		XSFR_PHD4 = 0x1e,
+
+		XSFR_TMR1CNTL = 0x20, // Timer 1 Counter (low)
+		XSFR_TMR1CNTH = 0x21, // Timer 1 Counter (high)
+		XSFR_TMR1PRL  = 0x22, // Timer 1 Period (low)
+		XSFR_TMR1PRH  = 0x23, // Timer 1 Period (high)
+		XSFR_TMR1PWML = 0x24, // Timer 1 Duty (low)
+		XSFR_TMR1PWMH = 0x25, // Timer 1 Duty (high)
+
+		XSFR_TMR2CNTL = 0x30, // Timer 2 Counter (low)
+		XSFR_TMR2CNTH = 0x31, // Timer 2 Counter (high)
+		XSFR_TMR2PRL  = 0x32, // Timer 2 Period (low)
+		XSFR_TMR2PRH  = 0x33, // Timer 2 Period (high)
+		XSFR_TMR2PWML = 0x34, // Timer 2 Duty (low)
+		XSFR_TMR2PWMH = 0x35, // Timer 2 Duty (high)
+
+		XSFR_ADCBAUD  = 0x40, // ARADC Baud
+
+		XSFR_USBEP0ADL = 0x50,
+		XSFR_USBEP0ADH = 0x51,
+		XSFR_USBEP1RXADL = 0x52,
+		XSFR_USBEP1RXADH = 0x53,
+		XSFR_USBEP1TXADL = 0x54,
+		XSFR_USBEP1TXADH = 0x55,
+		XSFR_USBEP2RXADL = 0x56,
+		XSFR_USBEP2RXADH = 0x57,
+		XSFR_USBEP2TXADL = 0x58,
+		XSFR_USBEP2TXADH = 0x59,
+
+		XSFR_SFSCON = 0x60,
+		XSFR_SFSPID = 0x61,
+		XSFR_SFSCNTH = 0x62,
+		XSFR_SFSCNTL = 0x63,
+
+		XSFR_DACPTR = 0x70, // DAC DMA Pointer
+		XSFR_DACCNT = 0x71, // DAC DMA Counter
 	};
 
 	enum
 	{
+		// always at 8000
 		V_RESET = 0x000,    /* power on address */
-		V_IE0   = 0x003,    /* External Interrupt 0 */
+		// below can be at 4000 or 8000 (although don't make sense for internal ROM at 8000?)
+		V_TIMER0     = 0x003,  // IE0.0   IP0.0
+		V_TIMER1     = 0x00b,  // IE0.1   IP0.1
+		V_TIMER2     = 0x013,  // IE0.2   IP0.2
+		V_TIMER3     = 0x01b,  // IE0.3   IP0.3
+		V_USB        = 0x023,  // IE0.4   IP0.4
+		V_SPI        = 0x02b,  // IE0.5   IP0.5
+		V_SDC        = 0x033,  // IE0.6   IP0.6
+		V_SOFT       = 0x03b,  // IE2.4   IP0.7  IE2 is the 'encrypt' register
+		V_HUFFEMPTY  = 0x043,  // IE1.0   IP1.0
+		V_IDCT       = 0x04b,  // IE1.1   IP1.1
+		V_YUV2RGB    = 0x053,  // IE1.2   IP1.2
+		V_PORT       = 0x05b,  // IE1.3   IP1.3
+		V_WDT_LVD    = 0x063,  // IE1.4   IP1.4  Watchdog also needs to be enabled with IE2.5? LVD with LVDCON.5?
+		V_IRTCC_UART = 0x06b,  // IE1.5   IP1.5
+		V_DAC        = 0x073,  // IE1.6   IP1.6
+		V_SFS_INT    = 0x07b,  // IE1.7   IP1.7
 	};
 
+	uint16_t get_irq_base();
+
+	TIMER_CALLBACK_MEMBER(timer0_cb);
+	TIMER_CALLBACK_MEMBER(dactimer_cb);
+
+	bool m_timer0irq = false;
+	bool m_dactimerirq = false;
+
+
+	emu_timer *m_timer0;
+	emu_timer *m_dactimer;
 };
 
 
@@ -424,8 +521,6 @@ public:
 	// construction/destruction
 	ax208_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_spi_ptr(uint8_t* ptr, size_t size) { m_spiptr = ptr; m_spisize = size; }
-
 protected:
 	ax208_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -435,28 +530,6 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	void ax208_internal_program_mem(address_map &map);
-
-	virtual void sfr_write(size_t offset, uint8_t data) override;
-	virtual uint8_t sfr_read(size_t offset) override;
-
-	uint8_t spicon_r();
-	uint8_t spibuf_r();
-	uint8_t dpcon_r();
-
-	void spidmaadr_w(uint8_t data);
-	void spidmacnt_w(uint8_t data);
-
-	void spicon_w(uint8_t data);
-	void spibuf_w(uint8_t data);
-	void spibaud_w(uint8_t data);
-	void dpcon_w(uint8_t data);
-
-	uint8_t* m_spiptr;
-	size_t m_spisize;
-
-	uint32_t m_spiaddr;
-
-	virtual offs_t external_ram_iaddr(offs_t offset, offs_t mem_mask) override;
 };
 
 class ax208p_cpu_device : public ax208_cpu_device
@@ -470,4 +543,4 @@ protected:
 };
 
 
-#endif // MAME_CPU_AXC51_AXC51_H
+#endif // MAME_CPU_SFR_SFR_H

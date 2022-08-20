@@ -4,8 +4,10 @@
 license:CC0
 -->
 <softwarelist name="monon_color" description="M&amp;D Monon Color cartridges">
-  <!-- Cartridges contain a serial flash ROM, and an epoxy blob, it is not clear what is inside the blob.  Cartridges appear to work just fine if reprogrammed
-       with a different game.  Note, the current dumps might not be 'clean' as the games save data directly to the 0x50000 area of ROM. -->
+  <!-- Cartridges contain a serial flash ROM, and an epoxy blob.
+       The blob contains game specific music, assuming it to be an MCU
+	   
+       Note, games save data to 0x50000-0x6ffff, in an unused cart this area is always 0xff filled -->
 
   <!-- Known games list
 
@@ -15,7 +17,7 @@ license:CC0
     Mech Cyclone: Fighting Masters                 Jī jiǎ xuànfēng-gédòu dàshī                 Y       Y            NO. 103     FTG             机甲旋风-格斗大师
     Zinba! : The lost relics                       Shén pò-shīluò de yíjī                      Y       Y            NO. 104     RPG             神魄-失落的遗迹
     Purcell: Energy Battle                         Sài ěr hào-néngyuán dà zuòzhàn              Y       Y            NO. 105     PUZ             赛尔号-能源大作战
-    Iron Man: Hero Strike                          Gāngtiě xiá-yīngxióng fǎnjí zhàn            Y       Y            No. 106     ACT             钢铁侠-英雄反击战
+    Iron Man: Hero Strike                          Gāngtiě xiá-yīngxióng fǎnjí zhàn            Y       Y            NO. 106     ACT             钢铁侠-英雄反击战
     Zombie Hunter                                  Jiāngshī lièrén                             Y       Y            NO. 107     ACT             僵尸猎人
     IELTS Adventure                                Yǎsī tǎ dà màoxiǎn                          N       Y            NO. 108     PUZ/EDU         雅思塔大冒险
     Ultimate Brain Power                           Nǎolì liánlián kàn                          N       Y            NO. 109     PUZ/EDU         脑力连连看
@@ -24,7 +26,7 @@ license:CC0
     Locke Kingdom RPG: Black Fire                  Luòkè wángguó-hēi zhī yán                   Y       Y            NO. 203     RPG             洛克王国-黑之炎
     Locke Kingdom: Card Wars                       Luòkè wángguó-kǎ pái zhàn jì                Y       Y            NO. 204     RPG             洛克王国-卡牌战纪
     Armor Warrior                                  Kǎijiǎ yǒngshì dàluàn dòu                   Y       Y            NO. 205     ACT             铠甲勇士大乱斗
-    Locke Kingdom: The King's Badge                Luòkè wángguó-wángzhě huīzhāng              N       Y            NO. 206     RPG             洛克王国-王者徽章
+    Locke Kingdom: The King's Badge                Luòkè wángguó-wángzhě huīzhāng              Y       Y            NO. 206     RPG             洛克王国-王者徽章
     Laboratory Mathematica Olympiad                Àoshù shíyàn shì                            N       Y            NO. 207     PUZ/EDU         奥数实验室
     Logic Fight                                    Luójí pīn yī pīn                            Y       Y            NO. 301     PUZ/EDU         逻辑拼一拼
     Pleasant goat and big big wolf's comet battle  Xǐyángyáng yǔ huītàiláng-juézhàn miē xīng   Y       Y            NO. 302     PUZ/EDU         喜羊羊与灰太狼-决战咩星
@@ -38,206 +40,220 @@ license:CC0
   (1) (Note: One known to exist in the wild, was supposedly bought at a thrift store. Based around Jackie Chan fighting)
 -->
 
-	<software name="purcfs" supported="no"> <!-- 101 - Purcell: Ares Fighting Spirit -->
+	<software name="purcfs"> <!-- 101 - Purcell: Ares Fighting Spirit -->
 		<description>Sài ěr hào: Zhànshén dòu hún</description>
-		<year>2011</year>
+		<year>2014</year>
 		<publisher>M&amp;D</publisher>
 		<info name="alt_title" value="赛尔号：战神斗魂"/>
 		<part name="cart" interface="monon_color_cart">
-			<dataarea name="rom" size="0x1000000">
-				<rom name="101.bin" size="0x0800000" crc="7eced0cf" sha1="3e34abbaf1259094099f1587302dfbd84ffb8384" offset="0" />
+			<dataarea name="rom" size="0x0800000">
+				<rom name="101.bin" size="0x0800000" crc="8fee70c4" sha1="ada5e0d25d704602423594d3e8db1acbbdf0d247"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="lockmagi" supported="no"> <!-- 102 - Locke Kingdom: Magic Array -->
+	<software name="lockmagi"> <!-- 102 - Locke Kingdom: Magic Array -->
 		<description>Luòkè wángguó-mófǎ zhèn</description>
-		<year>2011</year>
+		<year>2014</year>
 		<publisher>M&amp;D</publisher>
 		<info name="alt_title" value="洛克王国-魔法阵"/>
 		<part name="cart" interface="monon_color_cart">
-			<dataarea name="rom" size="0x1000000">
-				<rom name="102.bin" size="0x0800000" crc="15ed170d" sha1="ce4832f57459acf01deae688c62d444cffaa271a" offset="0" />
+			<dataarea name="rom" size="0x0800000">
+				<rom name="102.bin" size="0x0800000" crc="1bff052f" sha1="c459f86fe60e3ea77c4005873b38c04b52447d47"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="mechcycl" supported="no"> <!-- 103 - Mech Cyclone: Fighting Masters -->
+	<software name="mechcycl"> <!-- 103 - Mech Cyclone: Fighting Masters -->
 		<description>Jī jiǎ xuànfēng-gédòu dàshī (set 1)</description>
-		<year>2011</year>
+		<year>2014</year>
 		<publisher>M&amp;D</publisher>
 		<info name="alt_title" value="机甲旋风-格斗大师"/>
 		<part name="cart" interface="monon_color_cart">
-			<dataarea name="rom" size="0x1000000">
-				<rom name="103.bin" size="0x0800000" crc="441d5f9d" sha1="2ec85c5225b7ed0291b13f5d3bc57a9ef0153b5e" offset="0" />
+			<dataarea name="rom" size="0x0800000">
+				<rom name="103.bin" size="0x0800000" crc="e9c41a3b" sha1="6f9803235c30f521ee0936b63acad5b0a9b825ed"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="mechcycla" cloneof="mechcycl" supported="no"> <!-- 103 - Mech Cyclone: Fighting Masters -->
+	<software name="mechcycla" cloneof="mechcycl"> <!-- 103 - Mech Cyclone: Fighting Masters -->
 		<description>Jī jiǎ xuànfēng-gédòu dàshī (set 2)</description>
-		<year>2011</year>
+		<year>2014</year>
 		<publisher>M&amp;D</publisher>
 		<info name="alt_title" value="机甲旋风-格斗大师"/>
 		<part name="cart" interface="monon_color_cart">
-			<dataarea name="rom" size="0x1000000">
-				<rom name="103_alt.bin" size="0x0800000" crc="63bc84fb" sha1="e90e5a60f15d7ebfb83976ccb0183ecc723b5eb4" offset="0" />
+			<dataarea name="rom" size="0x0800000">
+				<rom name="103_alt.bin" size="0x0800000" crc="ce65c15d" sha1="4623e0e6bca06642c536e267d2d009c541ef1e84"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="zinba" supported="no"> <!-- 104 - Zinba! : The lost relics -->
+	<software name="zinba"> <!-- 104 - Zinba! : The lost relics -->
 		<description>Shén pò-shīluò de yíjī</description>
-		<year>2011</year>
+		<year>2014</year>
 		<publisher>M&amp;D</publisher>
 		<info name="alt_title" value="神魄-失落的遗迹"/>
 		<part name="cart" interface="monon_color_cart">
-			<dataarea name="rom" size="0x1000000">
-				<rom name="104.bin" size="0x0800000" crc="e7fd791a" sha1="7572d11ce5fae30a01ebe1053d8632329249fba8" offset="0" />
+			<dataarea name="rom" size="0x0800000">
+				<rom name="104.bin" size="0x0800000" crc="57339d56" sha1="b3bb9ea5a713e58ac7564d3a9272a8d27b587496"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="purceb" supported="no"> <!-- 105 - Purcell: Energy Battle -->
+	<software name="purceb"> <!-- 105 - Purcell: Energy Battle -->
 		<description>Sài ěr hào-néngyuán dà zuòzhàn</description>
-		<year>2011</year>
+		<year>2014</year>
 		<publisher>M&amp;D</publisher>
 		<info name="alt_title" value="赛尔号-能源大作战"/>
 		<part name="cart" interface="monon_color_cart">
-			<dataarea name="rom" size="0x1000000">
-				<rom name="105.bin" size="0x0400000" crc="47b4a312" sha1="c4600ce39fd2301df3778afe896936d510cbbd5b" offset="0" />
+			<dataarea name="rom" size="0x0400000">
+				<rom name="105.bin" size="0x0400000" crc="fd51cb0a" sha1="38dda18b48114a75f1d0fdf96a31f217d6584b30"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="ironmnhs" supported="no"> <!-- 106 - Iron Man: Hero Strike -->
+	<software name="ironmnhs"> <!-- 106 - Iron Man: Hero Strike -->
 		<description>Gāngtiě xiá-yīngxióng fǎnjí zhàn</description>
-		<year>2011</year>
+		<year>2014</year>
 		<publisher>M&amp;D</publisher>
 		<info name="alt_title" value="钢铁侠-英雄反击战"/>
 		<part name="cart" interface="monon_color_cart">
-			<dataarea name="rom" size="0x1000000">
-				<rom name="106.bin" size="0x0800000" crc="68517eea" sha1="e262f5ac691d8a3e30232a6b51d9428b73b9e8e2" offset="0" />
+			<dataarea name="rom" size="0x0800000">
+				<rom name="106.bin" size="0x0800000" crc="837e77fc" sha1="e9e560005ce12a1e2cdbfcb98b10df923102768a"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="zombhunt" supported="no"> <!-- 107 - Zombie Hunter -->
+	<software name="zombhunt"> <!-- 107 - Zombie Hunter -->
 		<description>Jiāngshī lièrén</description>
-		<year>2011</year>
+		<year>2014</year>
 		<publisher>M&amp;D</publisher>
 		<info name="alt_title" value="僵尸猎人"/>
 		<part name="cart" interface="monon_color_cart">
 			<dataarea name="rom" size="0x1000000">
-				<rom name="107.bin" size="0x1000000" crc="cd9d372d" sha1="71b09bf181a5565e7cca4281def59364b270767e" offset="0" />
+				<rom name="107.bin" size="0x1000000" crc="817f3292" sha1="6ed2e65fce9daf6f53c523610be03630f5742284"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="lockba" supported="no"> <!-- 201 - Locke Kingdom: Big Adventure -->
+	<software name="lockba"> <!-- 201 - Locke Kingdom: Big Adventure -->
 		<description>Luòkè wángguó-dà màoxiǎn</description>
-		<year>2011</year>
+		<year>2014</year>
 		<publisher>M&amp;D</publisher>
 		<info name="alt_title" value="洛克王国-大冒险"/>
 		<part name="cart" interface="monon_color_cart">
 			<dataarea name="rom" size="0x1000000">
-				<rom name="201.bin" size="0x1000000" crc="cf52653e" sha1="96aa826821d20af3edfe0f8058e6158841b7bf08" offset="0" />
+				<rom name="201.bin" size="0x1000000" crc="f2561252" sha1="a7092d6b8ad0f3e224dbfc5879965f98b9d981f0"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="lockice" supported="no"> <!-- 202 - Locke Kingdom RPG: Ice Blue -->
+	<software name="lockice"> <!-- 202 - Locke Kingdom RPG: Ice Blue -->
 		<description>Luòkè wángguó-bīng zhī lán</description>
-		<year>2011</year>
+		<year>2014</year>
 		<publisher>M&amp;D</publisher>
 		<info name="alt_title" value="冰之蓝"/>
 		<part name="cart" interface="monon_color_cart">
 			<dataarea name="rom" size="0x1000000">
-				<rom name="202.bin" size="0x1000000" crc="554af334" sha1="94c54a7ad4828e95074ec341eef9278b552f655e" offset="0" />
+				<rom name="202.bin" size="0x1000000" crc="e5f1e94f" sha1="ca95171b8b01367f05156656397789c66f0e0ffb"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="lockfire" supported="no"> <!-- 203 - Locke Kingdom RPG: Black Fire -->
+	<software name="lockfire"> <!-- 203 - Locke Kingdom RPG: Black Fire -->
 		<description>Luòkè wángguó-hēi zhī yán</description>
-		<year>2011</year>
+		<year>2014</year>
 		<publisher>M&amp;D</publisher>
 		<info name="alt_title" value="洛克王国-黑之炎"/>
 		<part name="cart" interface="monon_color_cart">
 			<dataarea name="rom" size="0x1000000">
-				<rom name="203.bin" size="0x1000000" crc="8541d04e" sha1="5fa6edc852622f6c2cca07ec9c7f377bea020f9b" offset="0" />
+				<rom name="203.bin" size="0x1000000" crc="bb5d201f" sha1="ee57692fcb0271900d6ec6214820b32c2591ce74"/>
 			</dataarea>
 		</part>
 	</software>
 
+	<!-- there is a second glob in the cartridge, presumably for the card reader -->
 	<software name="lockcard" supported="no"> <!-- 204 - Locke Kingdom: Card Wars -->
 		<description>Luòkè wángguó-kǎ pái zhàn jì</description>
-		<year>2011</year>
+		<year>2015</year>
 		<publisher>M&amp;D</publisher>
 		<info name="alt_title" value="卡牌战纪"/>
 		<part name="cart" interface="monon_color_cart">
 			<dataarea name="rom" size="0x1000000">
-				<rom name="204.bin" size="0x1000000" crc="0015d25c" sha1="50de7d969bead2df60e8ea4051f8518dd8989633" offset="0" />
+				<rom name="204.bin" size="0x1000000" crc="0015d25c" sha1="50de7d969bead2df60e8ea4051f8518dd8989633"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="armorwr" supported="no"> <!-- 205 - Armor Warrior -->
+	<software name="armorwr"> <!-- 205 - Armor Warrior -->
 		<description>Kǎijiǎ yǒngshì dàluàn dòu</description>
-		<year>2011</year>
+		<year>2015</year>
 		<publisher>M&amp;D</publisher>
 		<info name="alt_title" value="铠甲勇士大乱斗"/>
 		<part name="cart" interface="monon_color_cart">
 			<dataarea name="rom" size="0x1000000">
-				<rom name="205.bin" size="0x1000000" crc="84d1224c" sha1="9c427031221dc69034275a359e87c0dda82ae295" offset="0" />
+				<rom name="205.bin" size="0x1000000" crc="6ac78f44" sha1="fef56b0db4b8e8ff08b5cffda561ef7377063aab"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="logicft" supported="no"> <!-- 301 - Logic Fight -->
+	<!-- there is a second glob in the cartridge, presumably for the badge reader -->
+	<software name="lockbadg" supported="no"> <!-- Locke Kingdom: The King's Badge -->
+		<description>Luòkè wángguó-wángzhě huīzhāng</description>
+		<year>2015</year>
+		<publisher>M&amp;D</publisher>
+		<info name="alt_title" value="洛克王国-王者徽章"/>
+		<part name="cart" interface="monon_color_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="206.bin" size="0x1000000" crc="8cf5a3b6" sha1="608604f3701dfc7870ac24426c9bb6e5591d5f0a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="logicft"> <!-- 301 - Logic Fight -->
 		<description>Luójí pīn yī pīn</description>
-		<year>2011</year>
+		<year>2015</year>
 		<publisher>M&amp;D</publisher>
 		<info name="alt_title" value="逻辑拼一拼"/>
 		<part name="cart" interface="monon_color_cart">
-			<dataarea name="rom" size="0x1000000">
-				<rom name="301.bin" size="0x0400000" crc="e8f19fdc" sha1="330980c975e3fafea9b3dda1b010fdd469100919" offset="0" />
+			<dataarea name="rom" size="0x0400000">
+				<rom name="301.bin" size="0x0400000" crc="e13f48ba" sha1="dbcb52c52c8ae8e6897b981d76207b0bdd926753"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="bigwolf" supported="no"> <!-- 302 - Pleasant goat and big big wolf's comet battle -->
+	<software name="bigwolf"> <!-- 302 - Pleasant goat and big big wolf's comet battle -->
 		<description>Xǐyángyáng yǔ huītàiláng-juézhàn miē xīng</description>
-		<year>2011</year>
+		<year>2015</year>
 		<publisher>M&amp;D</publisher>
 		<info name="alt_title" value="喜羊羊与灰太狼-决战咩星"/>
 		<part name="cart" interface="monon_color_cart">
-			<dataarea name="rom" size="0x1000000">
-				<rom name="302.bin" size="0x0800000" crc="3cd4190c" sha1="3d910389e345f2b6ac38fce3571d74fc8cbcfabb" offset="0" />
+			<dataarea name="rom" size="0x0800000">
+				<rom name="302.bin" size="0x0800000" crc="3cd4190c" sha1="3d910389e345f2b6ac38fce3571d74fc8cbcfabb"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="drgnbma" supported="no"> <!-- 303 - Dragon Ball: The Martial Arts Conference -->
+	<software name="drgnbma"> <!-- 303 - Dragon Ball: The Martial Arts Conference -->
 		<description>Lóngzhū-wǔdào dàhuì</description>
-		<year>2011</year>
+		<year>2015</year>
 		<publisher>M&amp;D</publisher>
 		<info name="alt_title" value="龙珠-武道大会"/>
 		<part name="cart" interface="monon_color_cart">
 			<dataarea name="rom" size="0x1000000">
-				<rom name="303.bin" size="0x1000000" crc="d5bd966e" sha1="792b22444a329d08520591e80599835d77f38b3c" offset="0" />
+				<rom name="303.bin" size="0x1000000" crc="9c65f7fb" sha1="41bdf33ac66df06229175e8f03500dcfa169dbbc"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="lolfight" supported="no"> <!-- 304 - League of Legends: The Ultimate Fight -->
+	<software name="lolfight"> <!-- 304 - League of Legends: The Ultimate Fight -->
 		<description>Yīngxióng liánméng-zhōngjí gédòu</description>
-		<year>2011</year>
+		<year>2015</year>
 		<publisher>M&amp;D</publisher>
 		<info name="alt_title" value="英雄联盟"/>
 		<part name="cart" interface="monon_color_cart">
 			<dataarea name="rom" size="0x1000000">
-				<rom name="304.bin" size="0x1000000" crc="e4833f82" sha1="877c28d188d19b882909b4b0934ce2f900d2ce30" offset="0" />
+				<rom name="304.bin" size="0x1000000" crc="df16649c" sha1="d545e6bac47fe29a3cca3eded687bafcb34b4a1b"/>
 			</dataarea>
 		</part>
 	</software>

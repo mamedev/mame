@@ -474,6 +474,7 @@ miltonbradley/vectrex.cpp
 mips/mips.cpp
 misc/3do.cpp
 misc/eva.cpp
+misc/monon_color.cpp
 mit/tx0.cpp
 mits/altair.cpp
 mits/mits680b.cpp
@@ -887,7 +888,6 @@ skeleton/mmd2.cpp
 skeleton/mod8.cpp
 skeleton/modellot.cpp
 skeleton/molecular.cpp
-skeleton/monon_color.cpp
 skeleton/ms9540.cpp
 skeleton/mstation.cpp
 skeleton/mt735.cpp

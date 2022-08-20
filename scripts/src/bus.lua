@@ -3274,6 +3274,23 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/generic/slot.h,BUSES["MONONCOL"] = true
+---------------------------------------------------
+
+if (BUSES["MONONCOL"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/mononcol/slot.cpp",
+		MAME_DIR .. "src/devices/bus/mononcol/slot.h",
+		MAME_DIR .. "src/devices/bus/mononcol/carts.cpp",
+		MAME_DIR .. "src/devices/bus/mononcol/carts.h",
+		MAME_DIR .. "src/devices/bus/mononcol/rom.cpp",
+		MAME_DIR .. "src/devices/bus/mononcol/rom.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/neogeo/slot.h,BUSES["NEOGEO"] = true
 ---------------------------------------------------
 

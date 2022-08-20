@@ -18,6 +18,7 @@
    (bkid218 cursor in test menu can't be moved in emulation, works on unit, why?)
 */
 
+// TODO: convert to use generic_spi_flash.cpp (but there seems to be some buffering of writes / reads?)
 
 #include "emu.h"
 
