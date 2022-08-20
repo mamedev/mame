@@ -1,12 +1,11 @@
 // license:BSD-3-Clause
-// copyright-holders:Luca Elia, Olivier Galibert, Ivan Vangelista
+// copyright-holders:Luca Elia, Olivier Galibert
 /*************************************************************************************************************
 
                                             -= Astro Corp. CGA Hardware =-
 
                                        driver by   Luca Elia (l.elia@tin.it)
                                    decryption by   Olivier Galibert
-                   additional decryption work by   Ivan Vangelista
 
 CPU:    68000
 GFX:    ASTRO V0x (seen with x = 1,2,5,6 or 7)
