@@ -1510,7 +1510,7 @@ YS-2118B
 |     9.u73 13.u79               PAL           |
 +----------------------------------------------+
 
-Notes (originaly for YS-2113, but should apply):
+Notes (originally for YS-2113, but should apply):
       68000 clock : 16.000MHz
       Z80 clock   : 4.000MHz (16/4)
       M6295 clock : 1.000MHz (16/16). Sample Rate = 1000000 / 132

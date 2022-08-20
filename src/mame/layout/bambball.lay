@@ -6,6 +6,8 @@ license:CC0
 
 <!-- define elements -->
 
+	<element name="green"><rect><color red="0.4" green="1.0" blue="0.4" /></rect></element>
+
 	<element name="basket">
 		<rect>
 			<color red="0.85" green="0.85" blue="0.85" />
@@ -44,10 +46,12 @@ license:CC0
 		<bounds left="8.3" right="107.6" top="5.8" bottom="37.9" />
 
 		<screen index="0"><bounds x="10" y="10" width="96" height="23.9" /></screen>
+		<collection name="Color Overlay">
+			<element ref="green" blend="multiply"><bounds x="10" y="10" width="96" height="23.9" /></element>
+		</collection>
 
-	<!-- baskets (simplified) -->
-
-		<collection name="Baskets">
+		<!-- baskets (simplified) -->
+		<collection name="Baskets Overlay">
 			<element ref="basket" blend="add">
 				<bounds x="8.3" y="13.7" width="6" height="3" />
 			</element>
@@ -57,8 +61,7 @@ license:CC0
 			</element>
 		</collection>
 
-	<!-- labels -->
-
+		<!-- labels -->
 		<collection name="Labels">
 			<element ref="text_1"><bounds x="11.1" y="6.2" width="5" height="3" /></element>
 			<element ref="text_2"><bounds x="22.2" y="6.2" width="5" height="3" /></element>

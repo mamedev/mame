@@ -11492,17 +11492,19 @@ license:CC0
 	</software>
 
 	<software name="f15cws" cloneof="f15cw">
-		<description>F15 City War (Spa)</description>
+		<description>F15 City War (Spain)</description>
 		<year>1990</year>
 		<publisher>Gluk Video</publisher>
+		<info name="serial" value="MGC-006"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="nina006" />
+			<feature name="slot" value="txc_strikew" />
+			<feature name="pcb_model" value="TXC 01-22000-400" />
 			<feature name="mirroring" value="horizontal" />
-			<dataarea name="chr" size="32768">
-				<rom name="1.chr" size="32768" crc="c470fadc" sha1="ab8634df0bdce15934291e66fea0c1ce4d69835c" offset="00000" />
-			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="f15 city war (spain) (gluk video) (unl).prg" size="32768" crc="8406ed8b" sha1="08ba83615527eff4b4c971a195c574127fd5f716" offset="00000" status="baddump" />
+				<rom name="04-00611-000.u1" size="32768" crc="8406ed8b" sha1="08ba83615527eff4b4c971a195c574127fd5f716" />
+			</dataarea>
+			<dataarea name="chr" size="32768">
+				<rom name="04-00611-010.u2" size="32768" crc="c470fadc" sha1="ab8634df0bdce15934291e66fea0c1ce4d69835c" />
 			</dataarea>
 		</part>
 	</software>
@@ -16716,19 +16718,18 @@ license:CC0
 		<description>Hiryuu no Ken Special - Fighting Wars (Japan, prototype)</description>
 		<year>1991</year>
 		<publisher>Culture Brain</publisher>
+		<info name="serial" value="CBF-4N"/> <!-- cart has black and white traced version of release label, including serial -->
+		<info name="alt_title" value="飛龍の拳スペシャル ファイティングウォーズ"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
-			<feature name="pcb" value="HVC-SKEPROM" />
+			<feature name="pcb_model" value="HVC-SKEPROM-01" />
 			<feature name="mmc1_type" value="MMC1B2" />
 			<dataarea name="prg" size="131072">
-				<rom name="prg" size="131072" crc="770c360a" sha1="5c38f60a98ac8452206562c7eea2c18bd66e2c57" offset="00000" />
-			</dataarea> <!-- real label: カルチヤ prg -->
+				<rom name="culture.prg" size="131072" crc="770c360a" sha1="5c38f60a98ac8452206562c7eea2c18bd66e2c57" offset="00000" />
+			</dataarea> <!-- real label: カルチャ PRG -->
 			<dataarea name="chr" size="131072">
-				<rom name="chr" size="131072" crc="5482f0c6" sha1="f92a4fa4635a66a82a4e5b64f893075993df1181" offset="00000" />
-			</dataarea> <!-- real label: カルチヤ chr -->
-			<!-- 128k WRAM on cartridge -->
-			<dataarea name="wram" size="131072">
-			</dataarea>
+				<rom name="culture.chr" size="131072" crc="5482f0c6" sha1="f92a4fa4635a66a82a4e5b64f893075993df1181" offset="00000" />
+			</dataarea> <!-- real label: カルチャ CHR -->
 		</part>
 	</software>
 
@@ -17637,10 +17638,10 @@ license:CC0
 			<feature name="mirroring" value="vertical" />
 			<feature name="peripheral" value="konami_hypershot" />
 			<dataarea name="prg" size="32768">
-				<rom name="800jx1p" size="32768" crc="db9418e8" sha1="91023417168e05ea9b63696ccca34355fc53011c" offset="00000"  />
+				<rom name="800jx1p" size="32768" crc="db9418e8" sha1="91023417168e05ea9b63696ccca34355fc53011c" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="16384">
-				<rom name="800jxc" size="16384" crc="ffc4eede" sha1="de7044078b3a11dac6dccfb43da8e50c5c880149" offset="00000"  />
+				<rom name="800jxc" size="16384" crc="ffc4eede" sha1="de7044078b3a11dac6dccfb43da8e50c5c880149" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -24704,7 +24705,7 @@ license:CC0
 				<rom name="0.prg" size="262144" crc="6701a19f" sha1="42e473b6e6244d336524e08a396eb2d44697f3f5" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
-				<rom name="0.chr" size="131072" crc="482e9eff" sha1="c2750a5a5f1fb87351cd78e2aacdfaf14d542151" offset="00000"  />
+				<rom name="0.chr" size="131072" crc="482e9eff" sha1="c2750a5a5f1fb87351cd78e2aacdfaf14d542151" offset="00000" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
@@ -29937,18 +29938,19 @@ license:CC0
 	</software>
 
 	<software name="puzzles" cloneof="puzzle">
-		<description>Puzzle (Spa)</description>
-		<year>1990?</year>
+		<description>Puzzle (Spain)</description>
+		<year>1990</year>
 		<publisher>Gluk Video</publisher>
+		<info name="serial" value="MGC-007"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="nina006" />
-			<feature name="pcb" value="AVE-NINA-03" />
+			<feature name="slot" value="txc_strikew" />
+			<feature name="pcb_model" value="TXC 01-22000-400" />
 			<feature name="mirroring" value="horizontal" />
-			<dataarea name="chr" size="32768">
-				<rom name="puzzle (spain) (gluk video) (unl).chr" size="32768" crc="6e7fcd59" sha1="ec36c47e143b47ccaae2b0a82047337d59ea169e" offset="00000" status="baddump" />
-			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="puzzle (spain) (gluk video) (unl).prg" size="32768" crc="78dbbc07" sha1="1e61985360265db50dff716b1c1e72f0958ca53c" offset="00000" status="baddump" />
+				<rom name="04-00721-000.u1" size="32768" crc="78dbbc07" sha1="1e61985360265db50dff716b1c1e72f0958ca53c" />
+			</dataarea>
+			<dataarea name="chr" size="32768">
+				<rom name="04-00721-010.u2" size="32768" crc="6e7fcd59" sha1="ec36c47e143b47ccaae2b0a82047337d59ea169e" />
 			</dataarea>
 		</part>
 	</software>
@@ -41517,10 +41519,10 @@ license:CC0
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1B3" />
 			<dataarea name="prg" size="131072">
-				<rom name="alt-u6-0 prg" size="131072" crc="903e36ad" sha1="42e5b6bad7c433c95ffef94a144b6a4ed4f47ab1" offset="00000"  />
+				<rom name="alt-u6-0 prg" size="131072" crc="903e36ad" sha1="42e5b6bad7c433c95ffef94a144b6a4ed4f47ab1" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
-				<rom name="alt-u6-0 chr" size="131072" crc="f52ec2ad" sha1="9e179507ac878e7362ccd03d369488105b8c1f40" offset="00000"  />
+				<rom name="alt-u6-0 chr" size="131072" crc="f52ec2ad" sha1="9e179507ac878e7362ccd03d369488105b8c1f40" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -41529,7 +41531,7 @@ license:CC0
 		<description>Urban Champion (World)</description>
 		<year>1984</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="HVC-UC, NES-UC-(USA/CAN), NES-UC-FRA "/>
+		<info name="serial" value="HVC-UC, NES-UC-(USA/CAN), NES-UC-FRA"/>
 		<info name="release" value="19841114 (JPN), 198606xx (USA), 1986? (EUR)"/>
 		<info name="alt_title" value="アーバンチャンピオン"/>
 		<part name="cart" interface="nes_cart">
@@ -44522,26 +44524,6 @@ We should eventually add it to MAME as a separate driver with a NES CPU and a GB
 		</part>
 	</software>
 
-<!-- This might be the dump of the bios. Investigate... -->
-	<software name="myctv">
-		<description>My Computer TV C1 (Japan)</description>
-		<year>1983</year>
-		<publisher>Sharp</publisher>
-		<info name="alt_title" value="マイコンピュータテレビC1"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="nrom" />
-			<feature name="pcb" value="NES-NROM-128" />
-			<feature name="mirroring" value="horizontal" />
-			<dataarea name="chr" size="8192">
-				<rom name="my computer tv c1 (j).chr" size="8192" crc="9cba4524" sha1="2bd833f8049bf7a14ce337c3cde35f2140242a18" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="32768">
-				<rom name="my computer tv c1 (j).prg" size="16384" crc="7fd48dad" sha1="08af18a6d42e5ab2a288e347ab1fd4bc52441d71" offset="00000" status="baddump" />
-				<rom size="16384" offset="0x4000" loadflag="reload" />
-			</dataarea>
-		</part>
-	</software>
-
 <!-- from cah4e3 -->
 	<software name="kbtrans">
 		<description>Keyboard Transformer (Rus)</description>
@@ -47056,6 +47038,22 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+<!-- Dump may have come from a reproduction cart and may have been modified -->
+	<software name="fightsim" cloneof="hiryuksp">
+		<description>Fighting Simulator - World Champ (USA, prototype)</description>
+		<year>1992</year>
+		<publisher>Culture Brain</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<dataarea name="prg" size="131072">
+				<rom name="fighting simulator world champ (usa prototype).prg" size="131072" crc="007067ab" sha1="fe50e575f7e940884c6666a77e777172bf76f7d9" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="fighting simulator world champ (usa prototype).chr" size="131072" crc="364b0e33" sha1="7dacd78d13b88f36be8d31e47c6bda803d1edae3" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ffantp" cloneof="ffant">
 		<description>Final Fantasy (USA, prototype)</description>
 		<year>1987</year>
@@ -49466,7 +49464,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Technos</publisher>
 		<info name="serial" value="TJC-BR"/>
 		<info name="release" value="19931217"/>
-		<info name="alt_title" value="熱血!すとりーとバスケット がんばれ  ダンクヒーローズ"/>
+		<info name="alt_title" value="熱血!すとりーとバスケット がんばれ ダンクヒーローズ"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
@@ -56334,38 +56332,39 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 	<!-- From GoodNES -->
 	<software name="strikwlf" supported="no"> <!-- crashes right before first boss -->
-		<description>Strike Wolf (Taiwan)</description>
-		<year>19??</year>
-		<publisher>TXC Corp</publisher>
-		<info name="serial" value="MGC-014"/>
+		<description>Strike Wolf (Spain, Taiwan)</description>
+		<year>1992</year>
+		<publisher>Gluk Video / TXC Corp</publisher>
+		<info name="serial" value="MGC-014 (TXC)"/>
+		<info name="serial" value="VJ-002-C (Gluk)"/>
+		<info name="alt_title" value="Comando De Lobos"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txc_strikew" />
-			<feature name="pcb" value="TXC-STRIKEWOLF" />
+			<feature name="pcb_model" value="TXC 01-22000-400" />
 			<feature name="mirroring" value="vertical" />
-			<dataarea name="chr" size="131072">
-				<rom name="strike wolf (mgc-014).chr" size="131072" crc="06b9a5d2" sha1="f5623278dc2a57fdbdcdf2aefe2713efc964cca8" offset="00000" status="baddump" />
-			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="strike wolf (mgc-014).prg" size="131072" crc="3e7abb2a" sha1="dd253b75a3e5c474d8d3b1c8ce50d6c5c57e7005" offset="00000" status="baddump" />
+				<rom name="04-prg01-000.u1" size="131072" crc="3e7abb2a" sha1="dd253b75a3e5c474d8d3b1c8ce50d6c5c57e7005" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="04-pat01-000.u2" size="131072" crc="06b9a5d2" sha1="f5623278dc2a57fdbdcdf2aefe2713efc964cca8" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="policemn">
 		<description>Policeman (Spain, Taiwan)</description>
-		<year>19??</year>
+		<year>1992</year>
 		<publisher>Gluk Video / TXC Corp</publisher>
 		<info name="serial" value="MGC-015"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txc_strikew" />
-			<feature name="pcb" value="TXC-STRIKEWOLF" />
+			<feature name="pcb_model" value="TXC 01-22000-400" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="bus_conflict" value="no" />
-			<dataarea name="chr" size="65536">
-				<rom name="policeman (mgc-015).chr" size="65536" crc="f73ee39e" sha1="0142d357b7a8e38c720bef9a13250da76dbc0738" offset="00000" status="baddump" />
-			</dataarea>
 			<dataarea name="prg" size="65536">
-				<rom name="policeman (mgc-015).prg" size="65536" crc="65fe1590" sha1="be06c1c9c76bf270e83e98f6c5a79ff4d5589c59" offset="00000" status="baddump" />
+				<rom name="04-01512-000.u1" size="65536" crc="65fe1590" sha1="be06c1c9c76bf270e83e98f6c5a79ff4d5589c59" />
+			</dataarea>
+			<dataarea name="chr" size="65536">
+				<rom name="04-01512-010.u2" size="65536" crc="f73ee39e" sha1="0142d357b7a8e38c720bef9a13250da76dbc0738" />
 			</dataarea>
 		</part>
 	</software>
@@ -57530,7 +57529,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>1997</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1064"/>
-		<info name="alt_title" value="七龙珠 (Dragonball) "/>
+		<info name="alt_title" value="七龙珠 (Dragonball)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hengg_shjy3" />
 			<feature name="pcb" value="UNL-SHJY3" /> <!-- Chinese dump uses Mapper 253, another image found uses Mapper 251? -->
@@ -58100,7 +58099,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1098"/>   <!-- some source labeled this as es-1096, but then tszone has dumped Qi Long Zhu Z Wai Zhuan above as es-1096! -->
-		<info name="alt_title" value="塞尔达传说-三神之力 ~ sài ěr dá chuánshuō-sān shén zhī lì "/>
+		<info name="alt_title" value="塞尔达传说-三神之力 ~ sài ěr dá chuánshuō-sān shén zhī lì"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="fs304" />
 			<feature name="pcb" value="UNL-FS304" />
@@ -59243,7 +59242,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ010"/>
-		<info name="alt_title" value="口袋钻石 ~  Pokémon Diamond"/>
+		<info name="alt_title" value="口袋钻石 ~ Pokémon Diamond"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nanjing" />
 			<feature name="pcb" value="UNL-NANJING" />
@@ -59993,7 +59992,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ050 (or NJ033?)"/>
-		<info name="alt_title" value="红楼梦 ~  A Dream of Red Mansions"/>
+		<info name="alt_title" value="红楼梦 ~ A Dream of Red Mansions"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
@@ -62884,7 +62883,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<description>Ying Xiong Chuan Qi (China)</description>
 		<year>19??</year>
 		<publisher>XingXing</publisher>
-		<info name="alt_title" value="英雄传奇 (Hero Legend?) "/>
+		<info name="alt_title" value="英雄传奇 (Hero Legend?)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" /> <!-- Maybe Waixing Type J -->
@@ -65391,7 +65390,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="gameinpp" supported="no">
-		<description>Gameinis  - PingPong (Asia)</description>
+		<description>Gameinis - PingPong (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -67054,20 +67053,20 @@ We don't include these hacks because they were not burned into real carts nor so
 	</software>
 
 	<software name="venicebvs" cloneof="venicebv">
-		<description>Venice Beach Volleyball (Spa)</description>
-		<year>19??</year>
+		<description>Venice Beach Volleyball (Spain)</description>
+		<year>1991</year>
 		<publisher>Gluk Video</publisher>
 		<info name="serial" value="MGC10-B"/>
 		<info name="alt_title" value="Volleyball (on the cart label)"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="nina006" />
-			<feature name="pcb" value="TXC-74*138/175" />
+			<feature name="slot" value="txc_strikew" />
+			<feature name="pcb_model" value="TXC 01-22000-400" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
-				<rom name="04-01021-010" size="32768" crc="42812dae" sha1="99c14bf5b80eafc0d94d966d4de21cea7b6df1d3" offset="00000" />
+				<rom name="04-01021-000.u1" size="32768" crc="42812dae" sha1="99c14bf5b80eafc0d94d966d4de21cea7b6df1d3" />
 			</dataarea>
 			<dataarea name="chr" size="32768">
-				<rom name="04-01021-000" size="32768" crc="382e6a7b" sha1="9c344a8ced4073a95ef35e10dfc49a38389d2b11" offset="00000" />
+				<rom name="04-01021-010.u2" size="32768" crc="382e6a7b" sha1="9c344a8ced4073a95ef35e10dfc49a38389d2b11" />
 			</dataarea>
 		</part>
 	</software>

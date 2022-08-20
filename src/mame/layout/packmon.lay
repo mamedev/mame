@@ -8,9 +8,9 @@ license:CC0
 
 	<element name="white"><rect><color red="0.85" green="0.85" blue="0.85" /></rect></element>
 
-	<element name="text_score"><text string="SCORE"><color red="0.95" green="0.95" blue="0.95" /></text></element>
-	<element name="text_warpl"><text string="&lt; WARP" align="1"><color red="0.95" green="0.95" blue="0.95" /></text></element>
-	<element name="text_warpr"><text string="WARP &gt;" align="1"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_score"><text string="SCORE"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="text_warpl"><text string="&lt; WARP" align="1"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="text_warpr"><text string="WARP &gt;" align="1"><color red="0.85" green="0.85" blue="0.85" /></text></element>
 
 
 <!-- build screen -->
@@ -23,7 +23,7 @@ license:CC0
 		<element ref="text_warpl"><bounds x="-0.7" y="14.7" width="10" height="2.2" /></element>
 		<element ref="text_warpr"><bounds x="49" y="14.7" width="10" height="2.2" /></element>
 
-	<!-- maze overlay -->
+		<!-- maze overlay -->
 
 		<!-- h1 -->
 		<element ref="white"><bounds x="6.3" y="-0.3" width="42.5" height="0.2" /></element>

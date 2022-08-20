@@ -39866,13 +39866,13 @@ license:CC0
 		<info name="release" value="2021-01-01"/>
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 - "/>
+			<feature name="part_id" value="Disk 1 - Program"/>
 			<dataarea name="flop" size="143360">
 				<rom name="playwriter - adventures in space (4am crack) disk 1 - program.dsk" size="143360" crc="5cec640f" sha1="bea9881dd3f32c6cd8f2f4525ccfc52ca1d48aff"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 - "/>
+			<feature name="part_id" value="Disk 2 - Story disk"/>
 			<dataarea name="flop" size="143360">
 				<rom name="playwriter - adventures in space (4am crack) disk 2 - story disk.dsk" size="143360" crc="0c9f5920" sha1="f169fcb1b2421663f0aeac1c1b7017b1c2b09ad1"/>
 			</dataarea>
@@ -42903,7 +42903,7 @@ license:CC0
 		<year>1985</year>
 		<publisher>Spectrum Holobyte</publisher>
 		<info name="release" value="2021-04-07"/>
-		<info name="programmer" value="J.A. Yandrofski, Timothy Reese, Paul Artlton, and Ed Dawson "/>
+		<info name="programmer" value="J.A. Yandrofski, Timothy Reese, Paul Artlton, and Ed Dawson"/>
 		<!--"GATO" is a 1985 simulation game developed by J.A. Yandrofski, Timothy Reese, Paul Artlton, and Ed Dawson, and distributed by Spectrum Holobyte. This is version 1.2.-->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -43102,7 +43102,7 @@ license:CC0
 		<year>1981</year>
 		<publisher>MECC</publisher>
 		<info name="release" value="2021-03-27"/>
-		<info name="programmer" value="Daniel M. Forde, James A. Henke, and David E. Laden "/>
+		<info name="programmer" value="Daniel M. Forde, James A. Henke, and David E. Laden"/>
 		<!--"Elementary Volume 11: Language Arts" is a 1981 educational program developed by Daniel M. Forde, James A. Henke, and David E. Laden, and distributed by MECC. This is version 1.1.-->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -43117,7 +43117,7 @@ license:CC0
 		<year>1980</year>
 		<publisher>MECC</publisher>
 		<info name="release" value="2021-03-27"/>
-		<info name="programmer" value="Daniel M. Forde, Scott Costello, R. Christiansen, David E. Laden, L. Dixson, S. Costello, J. Cook, L. Borry, and R. Alberti "/>
+		<info name="programmer" value="Daniel M. Forde, Scott Costello, R. Christiansen, David E. Laden, L. Dixson, S. Costello, J. Cook, L. Borry, and R. Alberti"/>
 		<!--"Elementary Volume 12: Language Arts (SIMS)" is a 1980 educational program developed by Daniel M. Forde, Scott Costello, R. Christiansen, David E. Laden, L. Dixson, S. Costello, J. Cook, L. Borry, and R. Alberti, and distributed by MECC. This is version 1.0.-->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -43132,7 +43132,7 @@ license:CC0
 		<year>1980</year>
 		<publisher>MECC</publisher>
 		<info name="release" value="2021-03-27"/>
-		<info name="programmer" value="Daniel M. Forde, Scott Costello, R. Christiansen, David E. Laden, L. Dixson, S. Costello, J. Cook, L. Borry, and R. Alberti "/>
+		<info name="programmer" value="Daniel M. Forde, Scott Costello, R. Christiansen, David E. Laden, L. Dixson, S. Costello, J. Cook, L. Borry, and R. Alberti"/>
 		<!--"Elementary Volume 12: Language Arts (SIMS)" is a 1980 educational program developed by Daniel M. Forde, Scott Costello, R. Christiansen, David E. Laden, L. Dixson, S. Costello, J. Cook, L. Borry, and R. Alberti, and distributed by MECC. This is version 2.0.-->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -43147,7 +43147,7 @@ license:CC0
 		<year>1981</year>
 		<publisher>MECC</publisher>
 		<info name="release" value="2021-03-27"/>
-		<info name="programmer" value="Tom Boe and Russ Erickson "/>
+		<info name="programmer" value="Tom Boe and Russ Erickson"/>
 		<!--"Mathematics Volume 2: Measurement" is a 1981 educational program developed by Tom Boe and Russ Erickson, and distributed by MECC. This is version 1.2.-->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -43191,7 +43191,7 @@ license:CC0
 		<year>1981</year>
 		<publisher>MECC</publisher>
 		<info name="release" value="2021-03-27"/>
-		<info name="programmer" value="Shane Mccarron and Todd Bailey "/>
+		<info name="programmer" value="Shane Mccarron and Todd Bailey"/>
 		<!--"Elementary Volume 13: Nutrition" is a 1981 educational program developed by Shane Mccarron and Todd Bailey, and distributed by MECC. This is version 1.0.-->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -43206,7 +43206,7 @@ license:CC0
 		<year>1981</year>
 		<publisher>MECC</publisher>
 		<info name="release" value="2021-03-27"/>
-		<info name="programmer" value="A. McCarthy and Darrel Ricke "/>
+		<info name="programmer" value="A. McCarthy and Darrel Ricke"/>
 		<!--"English Volume 1: Parts of Speech" is a 1981 educational program developed by A. McCarthy and Darrel Ricke, and distributed by MECC. This is version 1.3.-->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -43221,7 +43221,7 @@ license:CC0
 		<year>1981</year>
 		<publisher>MECC</publisher>
 		<info name="release" value="2021-03-27"/>
-		<info name="programmer" value="A. McCarthy and Darrel Ricke "/>
+		<info name="programmer" value="A. McCarthy and Darrel Ricke"/>
 		<!--"English Volume 1: Parts of Speech" is a 1981 educational program developed by A. McCarthy and Darrel Ricke, and distributed by MECC. This is version 1.4.-->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -43287,7 +43287,7 @@ license:CC0
 		<year>1982</year>
 		<publisher>MECC</publisher>
 		<info name="release" value="2021-03-28"/>
-		<info name="programmer" value="Shane McCarron and Craig W. Copley "/>
+		<info name="programmer" value="Shane McCarron and Craig W. Copley"/>
 		<!--"Health Maintenance Volume 2: Assessment" is a 1982 educational program developed by Shane McCarron and Craig W. Copley, and distributed by MECC. This is version 1.0.-->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -43486,7 +43486,7 @@ license:CC0
 		<year>1983</year>
 		<publisher>MECC</publisher>
 		<info name="release" value="2021-03-28"/>
-		<info name="programmer" value="H. Bill Way and Mike Boucher "/>
+		<info name="programmer" value="H. Bill Way and Mike Boucher"/>
 		<!--"Adventures with Fractions" is a 1983 educational program developed by H. Bill Way and Mike Boucher, and distributed by MECC. This is version 1.1.-->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -43557,7 +43557,7 @@ license:CC0
 		<year>1983</year>
 		<publisher>MECC</publisher>
 		<info name="release" value="2021-03-29"/>
-		<info name="programmer" value="H. Bill Way and Craig Solmonson "/>
+		<info name="programmer" value="H. Bill Way and Craig Solmonson"/>
 		<!--"The Friendly Computer" is a 1983 educational program developed by H. Bill Way and Craig Solmonson, and distributed by MECC. This is version 1.5.-->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -43621,7 +43621,7 @@ license:CC0
 		<year>1983</year>
 		<publisher>MECC</publisher>
 		<info name="release" value="2021-03-29"/>
-		<info name="programmer" value="Cynthia L. Schroeder and R. Philip Bouchard "/>
+		<info name="programmer" value="Cynthia L. Schroeder and R. Philip Bouchard"/>
 		<!--"Oh, Deer!" is a 1983 educational program developed by Cynthia L. Schroeder and R. Philip Bouchard, and distributed by MECC. This is version 1.1.-->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -43636,7 +43636,7 @@ license:CC0
 		<year>1983</year>
 		<publisher>MECC</publisher>
 		<info name="release" value="2021-03-29"/>
-		<info name="programmer" value="Lois Edwards and Russ Erickson "/>
+		<info name="programmer" value="Lois Edwards and Russ Erickson"/>
 		<!--"Problem-Solving Strategies" is a 1983 educational program developed by Lois Edwards and Russ Erickson, and distributed by MECC. This is version 1.0.-->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -43651,7 +43651,7 @@ license:CC0
 		<year>1983</year>
 		<publisher>MECC</publisher>
 		<info name="release" value="2021-03-29"/>
-		<info name="programmer" value="Lois Edwards and Russ Erickson "/>
+		<info name="programmer" value="Lois Edwards and Russ Erickson"/>
 		<!--"Problem-Solving Strategies" is a 1983 educational program developed by Lois Edwards and Russ Erickson, and distributed by MECC. This is version 1.3.-->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -43694,7 +43694,7 @@ license:CC0
 		<year>1983</year>
 		<publisher>MECC</publisher>
 		<info name="release" value="2021-03-29"/>
-		<info name="programmer" value="Frederick Steinmann and Peter Fuglstad "/>
+		<info name="programmer" value="Frederick Steinmann and Peter Fuglstad"/>
 		<!--"Early Addition" is a 1983 educational program developed by Frederick Steinmann and Peter Fuglstad, and distributed by MECC. This is version 1.1.-->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -43709,7 +43709,7 @@ license:CC0
 		<year>1983</year>
 		<publisher>MECC</publisher>
 		<info name="release" value="2021-03-29"/>
-		<info name="programmer" value="Frederick Steinmann and Peter Fuglstad "/>
+		<info name="programmer" value="Frederick Steinmann and Peter Fuglstad"/>
 		<!--"Early Addition" is a 1983 educational program developed by Frederick Steinmann and Peter Fuglstad, and distributed by MECC. This is version 1.3.-->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -43724,7 +43724,7 @@ license:CC0
 		<year>1983</year>
 		<publisher>MECC</publisher>
 		<info name="release" value="2021-03-29"/>
-		<info name="programmer" value="Wendell Ruotsi and Andy Hollenbeck "/>
+		<info name="programmer" value="Wendell Ruotsi and Andy Hollenbeck"/>
 		<!--"Experiencing Procedures" is a 1983 educational program developed by Wendell Ruotsi and Andy Hollenbeck, and distributed by MECC. This is version 1.0.-->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -43753,7 +43753,7 @@ license:CC0
 		<year>1983</year>
 		<publisher>MECC</publisher>
 		<info name="release" value="2021-03-29"/>
-		<info name="programmer" value="Jeff Jorgensen, Dan Pelowski, and Wendell Ruotsi "/>
+		<info name="programmer" value="Jeff Jorgensen, Dan Pelowski, and Wendell Ruotsi"/>
 		<!--"Processing Words" is a 1983 educational program developed by Jeff Jorgensen, Dan Pelowski, and Wendell Ruotsi, and distributed by MECC. This is version 1.0.-->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -43768,7 +43768,7 @@ license:CC0
 		<year>1983</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="release" value="2021-04-09"/>
-		<info name="programmer" value="Al Lowe, Mike Macchesney, Margaret Lowe, and Rae Lynn Macchesney "/>
+		<info name="programmer" value="Al Lowe, Mike Macchesney, Margaret Lowe, and Rae Lynn Macchesney"/>
 		<!--"Dragon's Keep" is a 1983 adventure game developed by Al Lowe, Mike Macchesney, Margaret Lowe, and Rae Lynn Macchesney, and distributed by Sierra On-Line. This update is dated 1984-06-05 according to program comments. It is preserved here for the first time.-->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -43783,7 +43783,7 @@ license:CC0
 		<year>1983</year>
 		<publisher>MECC</publisher>
 		<info name="release" value="2021-03-29"/>
-		<info name="programmer" value="Tim Heap and Seth A. Rosenblatt "/>
+		<info name="programmer" value="Tim Heap and Seth A. Rosenblatt"/>
 		<!--"Nutrition" is a 1983 educational program developed by Tim Heap and Seth A. Rosenblatt, and distributed by MECC. This is version 1.0.-->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -44082,7 +44082,7 @@ license:CC0
 		<year>1987</year>
 		<publisher>D.C. Heath</publisher>
 		<info name="release" value="2021-04-18"/>
-		<info name="programmer" value="Rob Shaver and Peter Andrews "/>
+		<info name="programmer" value="Rob Shaver and Peter Andrews"/>
 		<!--"Just Around The Block" is a 1987 educational game developed by Rob Shaver and Peter Andrews, and distributed by D.C. Heath. It is preserved here for the first time.-->
 
 		<part name="flop1" interface="floppy_5_25">

@@ -362,6 +362,7 @@ const double XTAL::known_xtals[] = {
 	 26'666'000, /* 26.666_MHz_XTAL        Imagetek I4220/I4300 */
 	 26'666'666, /* 26.666666_MHz_XTAL     Irem M92 but most use 27MHz */
 	 26'686'000, /* 26.686_MHz_XTAL        Typically used on 90's Taito PCBs to drive the custom chips */
+	 26'824'000, /* 26.824_MHz_XTAL        Astro Corp.'s Zoo */
 	 26'880'000, /* 26.88_MHz_XTAL         Roland RF5C36/SA-16 clock (30000 * 896) */
 	 26'989'200, /* 26.9892_MHz_XTAL       TeleVideo 965 */
 	 27'000'000, /* 27_MHz_XTAL            Some Banpresto games macrossp, Irem M92 and 90's Toaplan games */
@@ -472,6 +473,7 @@ const double XTAL::known_xtals[] = {
 	 72'000'000, /* 72_MHz_XTAL            Aristocrat MKV */
 	 72'576'000, /* 72.576_MHz_XTAL        Centipede, Millipede, Missile Command, Let's Go Bowling "Multipede" */
 	 73'728'000, /* 73.728_MHz_XTAL        Ms. Pac-Man/Galaga 20th Anniversary */
+	 75'000'000, /* 75_MHz_XTAL            Sony NEWS NWS-5000X */
 	 77'414'400, /* 77.4144_MHz_XTAL       NCD17c */
 	 80'000'000, /* 80_MHz_XTAL            ARM710 */
 	 87'183'360, /* 87.18336_MHz_XTAL      AT&T 630 MTG */
@@ -482,6 +484,7 @@ const double XTAL::known_xtals[] = {
 	101'491'200, /* 101.4912_MHz_XTAL      PSX-based Namco System 10 */
 	105'561'000, /* 105.561_MHz_XTAL       Sun cgsix */
 	108'108'000, /* 108.108_MHz_XTAL       HP 98550 high-res color card */
+	120'000'000, /* 120_MHz_XTAL           Astro Corp.'s Stone Age */
 	200'000'000  /* 200_MHz_XTAL           Base SH4 CPU (Naomi, Hikaru etc.) */
 };
 

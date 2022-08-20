@@ -20,11 +20,12 @@ known chips:
  @049     uPD552C  1981, Bambino Safari (ET-11)
  @054     uPD552C  1980, Epoch Invader From Space
 
- @031     uPD553C  1979, Bambino Superstar Football (ET-03)
+ @031     uPD553C  1979, Bambino Super Star Football (ET-03)
  @049     uPD553C  1979, Mego Mini-Vid: Break Free
  @055     uPD553C  1980, Bambino Space Laser Fight (ET-12)
  *073     uPD553C  1980, Sony ST-J75 FM Stereo Tuner
  @080     uPD553C  1980, Epoch Electronic Football
+ *084     uPD553C  1980, Bandai Gunfighter
  *102     uPD553C  1981, Bandai Block Out
  @153     uPD553C  1981, Epoch Galaxy II
  @160     uPD553C  1982, Tomy Pac Man (TN-08)
@@ -50,6 +51,7 @@ known chips:
 
   (* means undumped unless noted, @ denotes it's in this driver)
 
+============================================================================
 
 Commonly used VFD(vacuum fluorescent display) are by NEC or Futaba.
 
@@ -62,15 +64,28 @@ r = revision of the VFD
 c = custom display
 s = unique display part number
 
+VFD colors used in MAME SVGs:
+- #20ffe0: cyan (alone)
+- #80fff8: cyan (multi color VFD, relatively the brightest)
+- #ff4820: red
+- #50ff30: green
+- #4840ff: blue
+- #ffff48: yellow
+
+It's hard to determine if a game is supposed to have yellow instead of green,
+since after decades passed, all the colors fade. It probably has a larger
+effect when a color is a mixture of 2 phosphors.
+
+Color overlays are mostly handled in the SVG, since it's often not possible
+getting the right color when doing it in a .lay file (eg. changing cpacman
+cyan to yellow)
+
 ============================================================================
 
 ROM source notes when dumped from another publisher, but confident it's the same:
 - astrocmd: Tandy Astro Command
 - caveman: Tandy Caveman
 - grobot9: Mego Fabulous Fred
-
-TODO:
-- get rid of hardcoded color overlay from SVGs, use MAME internal artwork
 
 ***************************************************************************/
 
@@ -84,16 +99,19 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
-// internal artwork (complete)
+// internal artwork
+#include "alnchase.lh"
+#include "bmsafari.lh"
 #include "ctntune.lh" // clickable
 #include "efball.lh"
 #include "grobot9.lh" // clickable
 #include "mcompgin.lh"
 #include "mvbfree.lh"
+#include "splasfgt.lh"
 #include "tactix.lh" // clickable
-
-// internal artwork (bezel overlay)
+#include "tccombat.lh"
 #include "tmtennis.lh"
+#include "ufombs.lh"
 
 //#include "hh_ucom4_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
@@ -227,7 +245,7 @@ namespace {
   Bambino UFO Master-Blaster Station (manufactured in Japan)
   * PCB label: Emix Corp. ET-02
   * NEC uCOM-44 MCU, label EMIX D552C 017
-  * cyan VFD display Emix-101, with blue color overlay
+  * cyan VFD Emix-101, with blue window
 
   This is Bambino's first game, it is not known if ET-01 exists. Emix Corp.
   wasn't initially a toy company, the first release was through Tomy. Emix
@@ -261,9 +279,7 @@ private:
 
 void ufombs_state::update_display()
 {
-	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,3,2,1,0,4,5,6,7,8);
-	u16 plate = bitswap<16>(m_plate,15,14,13,12,11,7,10,6,9,5,8,4,0,1,2,3);
-	m_display->matrix(grid, plate);
+	m_display->matrix(m_grid, m_plate);
 }
 
 void ufombs_state::grid_w(offs_t offset, u8 data)
@@ -325,7 +341,8 @@ void ufombs_state::ufombs(machine_config &config)
 	screen.set_size(243, 1080);
 	screen.set_visarea_full();
 
-	PWM_DISPLAY(config, m_display).set_size(9, 10);
+	PWM_DISPLAY(config, m_display).set_size(9, 11);
+	config.set_default_layout(layout_ufombs);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -341,8 +358,8 @@ ROM_START( ufombs )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "d552c-017", 0x0000, 0x0400, CRC(0e208cb3) SHA1(57db6566916c94325e2b67ccb94b4ea3b233487d) )
 
-	ROM_REGION( 222395, "screen", 0)
-	ROM_LOAD( "ufombs.svg", 0, 222395, CRC(ae9fb93f) SHA1(165ea78eee93c503dbd277a56c41e3c63c534e38) )
+	ROM_REGION( 222402, "screen", 0)
+	ROM_LOAD( "ufombs.svg", 0, 222402, CRC(322c12d5) SHA1(221ea9f95af8ff30b0b83440a9f1b5302e25bce6) )
 ROM_END
 
 
@@ -351,12 +368,12 @@ ROM_END
 
 /***************************************************************************
 
-  Bambino Superstar Football (manufactured in Japan)
+  Bambino Super Star Football (manufactured in Japan)
   * PCB label: Emix Corp. ET-03
   * NEC uCOM-43 MCU, label D553C 031
-  * cyan VFD display Emix-102, with bezel
+  * cyan VFD Emix-102
 
-  The game was rereleased in 1982 as Classic Football (ET-0351), with an
+  The game was rereleased in 1982 as Football Classic (ET-0351), with an
   improved cyan/green/red VFD.
 
   Press the Kick button to start the game, an automatic sequence follows.
@@ -385,13 +402,12 @@ private:
 
 void ssfball_state::update_display()
 {
-	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,11,7,3,12,17,13,18,16,14,15,10,9,8,0,1,2,4,5,6);
-	m_display->matrix(m_grid, plate);
+	m_display->matrix(m_grid, m_plate);
 }
 
 void ssfball_state::grid_w(offs_t offset, u8 data)
 {
-	// C,D(,E3): vfd grid 0-7(,8)
+	// C,D(,E3): vfd grid
 	int shift = (offset - PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 	update_display();
@@ -409,7 +425,7 @@ void ssfball_state::plate_w(offs_t offset, u8 data)
 	m_inp_mux = (m_port[PORTF] >> 3 & 1) | (m_port[PORTG] >> 2 & 2);
 	m_speaker->level_w(m_inp_mux);
 
-	// E3: vfd grid 8
+	// E3: vfd grid
 	if (offset == PORTE)
 		grid_w(offset, data >> 3 & 1);
 	else
@@ -479,7 +495,7 @@ void ssfball_state::ssfball(machine_config &config)
 	screen.set_size(1920, 482);
 	screen.set_visarea_full();
 
-	PWM_DISPLAY(config, m_display).set_size(9, 16);
+	PWM_DISPLAY(config, m_display).set_size(9, 19);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -495,16 +511,16 @@ ROM_START( ssfball )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-031", 0x0000, 0x0800, CRC(ff5d91d0) SHA1(9b2c0ae45f1e3535108ee5fef8a9010e00c8d5c3) )
 
-	ROM_REGION( 331352, "screen", 0)
-	ROM_LOAD( "ssfball.svg", 0, 331352, CRC(10cffb85) SHA1(c875f73a323d976088ffa1bc19f7bc865d4aac62) )
+	ROM_REGION( 331365, "screen", 0)
+	ROM_LOAD( "ssfball.svg", 0, 331365, CRC(25685f1f) SHA1(61ff517c2d766dae49170c807e75f99333cf5c88) )
 ROM_END
 
 ROM_START( bmcfball )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-031", 0x0000, 0x0800, CRC(ff5d91d0) SHA1(9b2c0ae45f1e3535108ee5fef8a9010e00c8d5c3) )
 
-	ROM_REGION( 331352, "screen", 0)
-	ROM_LOAD( "bmcfball.svg", 0, 331352, CRC(43fbed1e) SHA1(28160e14b0879cd4dd9dab770c52c98f316ab653) )
+	ROM_REGION( 331365, "screen", 0)
+	ROM_LOAD( "bmcfball.svg", 0, 331365, CRC(15cbfc6e) SHA1(588078824e9ce27c397a536a2c6cd2b80142b50c) )
 ROM_END
 
 
@@ -516,7 +532,7 @@ ROM_END
   Bambino Kick The Goal Soccer
   * PCB label: Emix Corp. ET-10/08 (PCB is for 2 possible games)
   * NEC uCOM-44 MCU, label D552C 043
-  * cyan VFD display Emix-105, with bezel overlay
+  * cyan VFD Emix-105, with bezel overlay
 
   Press the Display button twice to start the game. Action won't start until
   player 1 presses one of the directional keys. In 2-player mode, player 2
@@ -544,8 +560,7 @@ private:
 
 void bmsoccer_state::update_display()
 {
-	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,11,7,3,12,17,13,18,16,14,15,8,4,0,9,5,1,10,6,2);
-	m_display->matrix(m_grid, plate);
+	m_display->matrix(m_grid, m_plate);
 }
 
 void bmsoccer_state::grid_w(offs_t offset, u8 data)
@@ -570,7 +585,7 @@ void bmsoccer_state::plate_w(offs_t offset, u8 data)
 	int shift = (offset - PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
-	// E3: grid 8
+	// E3: vfd grid
 	if (offset == PORTE)
 		grid_w(offset, data >> 3 & 1);
 	else
@@ -628,7 +643,7 @@ void bmsoccer_state::bmsoccer(machine_config &config)
 	screen.set_size(271, 1080);
 	screen.set_visarea_full();
 
-	PWM_DISPLAY(config, m_display).set_size(9, 16);
+	PWM_DISPLAY(config, m_display).set_size(9, 19);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -642,8 +657,8 @@ ROM_START( bmsoccer )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "d552c-043", 0x0000, 0x0400, CRC(10c2a4ea) SHA1(6ebca7d406e22ff7a8cd529579b55a700da487b4) )
 
-	ROM_REGION( 273796, "screen", 0)
-	ROM_LOAD( "bmsoccer.svg", 0, 273796, CRC(4c88d9f8) SHA1(b4b82f26a09f54cd0b6a9d1c1a46796fbfcb578a) )
+	ROM_REGION( 273809, "screen", 0)
+	ROM_LOAD( "bmsoccer.svg", 0, 273809, CRC(e9e29724) SHA1(58a505ed72952ba8e37fa15b493742f6af458eee) )
 ROM_END
 
 
@@ -655,7 +670,8 @@ ROM_END
   Bambino Safari (manufactured in Japan)
   * PCB label: Emix Corp. ET-11
   * NEC uCOM-44 MCU, label EMIX D552C 049
-  * cyan VFD display Emix-108
+  * cyan VFD Emix-108
+  * color overlay: green (optional)
 
 ***************************************************************************/
 
@@ -679,9 +695,7 @@ private:
 
 void bmsafari_state::update_display()
 {
-	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
-	u16 plate = bitswap<16>(m_plate,15,14,13,12,11,7,10,2,9,5,8,4,0,1,6,3);
-	m_display->matrix(grid, plate);
+	m_display->matrix(m_grid, m_plate);
 }
 
 void bmsafari_state::grid_w(offs_t offset, u8 data)
@@ -698,7 +712,7 @@ void bmsafari_state::plate_w(offs_t offset, u8 data)
 	int shift = (offset == PORTE) ? 8 : (offset - PORTH) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
-	// E3: grid 0
+	// E3: vfd grid
 	if (offset == PORTE)
 		grid_w(offset, data >> 3 & 1);
 	else
@@ -747,7 +761,8 @@ void bmsafari_state::bmsafari(machine_config &config)
 	screen.set_size(248, 1080);
 	screen.set_visarea_full();
 
-	PWM_DISPLAY(config, m_display).set_size(9, 10);
+	PWM_DISPLAY(config, m_display).set_size(9, 11);
+	config.set_default_layout(layout_bmsafari);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -761,8 +776,8 @@ ROM_START( bmsafari )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "d552c-049", 0x0000, 0x0400, CRC(82fa3cbe) SHA1(019e7ec784e977eba09997fc46af253054fb222c) )
 
-	ROM_REGION( 275386, "screen", 0)
-	ROM_LOAD( "bmsafari.svg", 0, 275386, CRC(c24badbc) SHA1(b191f34155d6d4e834e7c6fe715d4bb76198ad72) )
+	ROM_REGION( 275393, "screen", 0)
+	ROM_LOAD( "bmsafari.svg", 0, 275393, CRC(a6a91b41) SHA1(11e5db6d57e2206a18eca11894d91d7ae2d41544) )
 ROM_END
 
 
@@ -774,7 +789,7 @@ ROM_END
   Bambino Space Laser Fight (manufactured in Japan)
   * PCB label: Emix Corp. ET-12
   * NEC uCOM-43 MCU, label D553C 055
-  * cyan VFD display Emix-104, with blue or green color overlay
+  * cyan VFD Emix-104, with blue or transparent window
 
   This is basically a revamp of their earlier Boxing game (ET-06), case and
   buttons are exactly the same.
@@ -801,8 +816,7 @@ private:
 
 void splasfgt_state::update_display()
 {
-	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,18,17,13,1,0,8,6,0,10,11,14,15,16,9,5,7,4,2,3);
-	m_display->matrix(m_grid, plate);
+	m_display->matrix(m_grid, m_plate);
 }
 
 void splasfgt_state::grid_w(offs_t offset, u8 data)
@@ -814,7 +828,7 @@ void splasfgt_state::grid_w(offs_t offset, u8 data)
 	// G(grid 0-3): input mux
 	m_inp_mux = m_grid & 0xf;
 
-	// I2: vfd plate 6
+	// I2: vfd plate
 	if (offset == PORTI)
 		plate_w(4 + PORTC, data >> 2 & 1);
 	else
@@ -908,7 +922,8 @@ void splasfgt_state::splasfgt(machine_config &config)
 	screen.set_size(1920, 476);
 	screen.set_visarea_full();
 
-	PWM_DISPLAY(config, m_display).set_size(9, 16);
+	PWM_DISPLAY(config, m_display).set_size(9, 17);
+	config.set_default_layout(layout_splasfgt);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -925,7 +940,7 @@ ROM_START( splasfgt )
 	ROM_LOAD( "d553c-055", 0x0000, 0x0800, CRC(eb471fbd) SHA1(f06cfe567bf6f9ed4dcdc88acdcfad50cd370a02) )
 
 	ROM_REGION( 246609, "screen", 0)
-	ROM_LOAD( "splasfgt.svg", 0, 246609, CRC(365fae43) SHA1(344c120c2efa92ada9171047affac801a06cf303) )
+	ROM_LOAD( "splasfgt.svg", 0, 246609, CRC(df3270cc) SHA1(3bf059397728f6aca211ae55074fc7bc76fb9058) )
 ROM_END
 
 
@@ -937,7 +952,8 @@ ROM_END
   Bandai Crazy Climber (manufactured in Japan)
   * PCB labels: SM-020/SM-021
   * NEC uCOM-43 MCU, label D553C 170
-  * cyan/red/green VFD display NEC FIP6AM2-T no. 1-8 2, with partial color overlay and bezel
+  * cyan/red/green VFD NEC FIP6AM2-T no. 1-8 2
+  * color overlay: score/bird rows: pink
 
   known releases:
   - Japan: FL Crazy Climbing, published by Bandai
@@ -964,9 +980,7 @@ private:
 
 void bcclimbr_state::update_display()
 {
-	u8 grid = bitswap<8>(m_grid,7,6,0,1,2,3,4,5);
-	u32 plate = bitswap<24>(m_plate,23,22,21,20,16,17,18,19,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
-	m_display->matrix(grid, plate);
+	m_display->matrix(m_grid, m_plate);
 }
 
 void bcclimbr_state::grid_w(offs_t offset, u8 data)
@@ -983,7 +997,7 @@ void bcclimbr_state::grid_w(offs_t offset, u8 data)
 
 void bcclimbr_state::plate_w(offs_t offset, u8 data)
 {
-	// C,D,E,F: vfd plate
+	// C,D,E,F,G: vfd plate
 	int shift = (offset - PORTC) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	update_display();
@@ -1039,8 +1053,8 @@ ROM_START( bcclimbr )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-170", 0x0000, 0x0800, CRC(fc2eabdb) SHA1(0f5cc854be7fdf105d9bd2114659d40c65f9d782) )
 
-	ROM_REGION( 219971, "screen", 0)
-	ROM_LOAD( "bcclimbr.svg", 0, 219971, CRC(9c9102f4) SHA1(6a7e02fd1467a26c734b01724e23cef9e4917805) )
+	ROM_REGION( 219983, "screen", 0)
+	ROM_LOAD( "bcclimbr.svg", 0, 219983, CRC(92c83961) SHA1(208b4c63c6aecd90acb15d9767fa1cf3aed835fb) )
 ROM_END
 
 
@@ -1320,7 +1334,8 @@ ROM_END
   Epoch Invader From Space (manufactured in Japan)
   * PCB labels: 36010(A/B)
   * NEC uCOM-44 MCU, label D552C 054
-  * cyan VFD display NEC FIP9AM18T tube no. 0D, with color overlay
+  * cyan VFD NEC FIP9AM18T tube no. 0D
+  * color overlay: alien rows 1,2: blue, 3,4: yellow, 5: red
 
   known releases:
   - USA: Invader From Space, published by Epoch
@@ -1347,9 +1362,7 @@ private:
 
 void invspace_state::update_display()
 {
-	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,8,9,7,6,5,4,3,2,1,0);
-	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,9,14,13,8,15,11,10,7,11,3,2,6,10,1,5,9,0,4,8);
-	m_display->matrix(grid, plate);
+	m_display->matrix(m_grid, m_plate);
 }
 
 void invspace_state::grid_w(offs_t offset, u8 data)
@@ -1407,7 +1420,7 @@ void invspace_state::invspace(machine_config &config)
 	screen.set_size(289, 1080);
 	screen.set_visarea_full();
 
-	PWM_DISPLAY(config, m_display).set_size(9, 19);
+	PWM_DISPLAY(config, m_display).set_size(10, 16);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1421,8 +1434,8 @@ ROM_START( invspace )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "d552c-054", 0x0000, 0x0400, CRC(913d9c13) SHA1(f20edb5458e54d2f6d4e45e5d59efd87e05a6f3f) )
 
-	ROM_REGION( 110899, "screen", 0)
-	ROM_LOAD( "invspace.svg", 0, 110899, CRC(ae794333) SHA1(3552215389f02e4ef1d608f7dfc84f0499a78ee2) )
+	ROM_REGION( 110894, "screen", 0)
+	ROM_LOAD( "invspace.svg", 0, 110894, CRC(1ec324b8) SHA1(847621c7d6c10b254b715642d63efc9c30a701c1) )
 ROM_END
 
 
@@ -1434,7 +1447,7 @@ ROM_END
   Epoch Electronic Football (manufactured in Japan)
   * PCB labels: 36020(A/B/C)
   * NEC uCOM-43 MCU, label D553C 080
-  * cyan VFD display NEC FIP10AM15T tube no. 0F, with bezel overlay
+  * cyan VFD NEC FIP10AM15T tube no. 0F, with bezel overlay
 
   known releases:
   - USA: Electronic Football (aka Pro-Bowl Football), published by Epoch
@@ -1461,8 +1474,7 @@ private:
 
 void efball_state::update_display()
 {
-	u16 plate = bitswap<16>(m_plate,15,14,13,12,11,4,3,0,2,1,6,10,9,5,8,7);
-	m_display->matrix(m_grid, plate);
+	m_display->matrix(m_grid, m_plate);
 }
 
 void efball_state::grid_w(offs_t offset, u8 data)
@@ -1551,8 +1563,9 @@ ROM_END
   Epoch Galaxy II (manufactured in Japan)
   * PCB labels: 19096/96062
   * NEC uCOM-43 MCU, label D553C 153
-  * cyan/red VFD display NEC FIP10xM20T, with color overlay. x = multiple VFD
-    revisions exist, with different graphics: rev B no. 1-8, rev. D no. 2-21.
+  * cyan/red VFD NEC FIP10xM20T. x = multiple VFD revisions exist,
+    with different graphics: rev B no. 1-8, rev. D no. 2-21.
+  * color overlay: score: blue, top/bottom rows: yellow, row 2,3: red
 
   known releases:
   - USA: Galaxy II, published by Epoch
@@ -1581,9 +1594,7 @@ private:
 
 void galaxy2_state::update_display()
 {
-	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
-	u16 plate = bitswap<16>(m_plate,15,3,2,6,1,5,4,0,11,10,7,12,14,13,8,9);
-	m_display->matrix(grid, plate);
+	m_display->matrix(m_grid, m_plate);
 }
 
 void galaxy2_state::grid_w(offs_t offset, u8 data)
@@ -1666,15 +1677,15 @@ ROM_START( galaxy2 )
 	ROM_LOAD( "d553c-153.s01", 0x0000, 0x0800, CRC(70d552b3) SHA1(72d50647701cb4bf85ea947a149a317aaec0f52c) )
 
 	ROM_REGION( 325057, "screen", 0)
-	ROM_LOAD( "galaxy2d.svg", 0, 325057, CRC(b2d27a0e) SHA1(502ec22c324903ffe8ff235b9a3b8898dce17a64) )
+	ROM_LOAD( "galaxy2d.svg", 0, 325057, CRC(2b339550) SHA1(8094d8a395016caf8c18cc8cd0c64991432a1979) )
 ROM_END
 
 ROM_START( galaxy2b )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-153.s01", 0x0000, 0x0800, CRC(70d552b3) SHA1(72d50647701cb4bf85ea947a149a317aaec0f52c) )
 
-	ROM_REGION( 266377, "screen", 0)
-	ROM_LOAD( "galaxy2b.svg", 0, 266377, CRC(8633cebb) SHA1(6c41f5e918e1522eb55ef24270900a1b2477722b) )
+	ROM_REGION( 266375, "screen", 0)
+	ROM_LOAD( "galaxy2b.svg", 0, 266375, CRC(de06cb84) SHA1(20b3b4b78c9b6ee2e54bff149e770952b7378a4c) )
 ROM_END
 
 
@@ -1686,7 +1697,8 @@ ROM_END
   Epoch Astro Command (manufactured in Japan)
   * PCB labels: 96111/96112
   * NEC uCOM-43 MCU, label D553C 202
-  * cyan/red VFD display NEC FIP9AM20T no. 42-42, with color overlay + bezel
+  * cyan/red VFD NEC FIP9AM20T no. 42-42
+  * color overlay: right 3 columns: yellow, bottom row 6 columns: pink
 
   known releases:
   - Japan: Astro Command, published by Epoch
@@ -1714,9 +1726,7 @@ private:
 
 void astrocmd_state::update_display()
 {
-	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,8,4,5,6,7,0,1,2,3);
-	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,3,2,12,13,14,15,16,17,18,0,1,4,8,5,9,7,11,6,10);
-	m_display->matrix(grid, plate);
+	m_display->matrix(m_grid, m_plate);
 }
 
 void astrocmd_state::grid_w(offs_t offset, u8 data)
@@ -1738,7 +1748,7 @@ void astrocmd_state::plate_w(offs_t offset, u8 data)
 		// E2: speaker out
 		m_speaker->level_w(data >> 2 & 1);
 
-		// E3: vfd grid 8
+		// E3: vfd grid
 		grid_w(offset, data >> 3 & 1);
 	}
 	else
@@ -1781,7 +1791,7 @@ void astrocmd_state::astrocmd(machine_config &config)
 	screen.set_size(1920, 525);
 	screen.set_visarea_full();
 
-	PWM_DISPLAY(config, m_display).set_size(9, 17);
+	PWM_DISPLAY(config, m_display).set_size(9, 19);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1795,8 +1805,8 @@ ROM_START( astrocmd )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-202.s01", 0x0000, 0x0800, CRC(b4b34883) SHA1(6246d561c2df1f2124575d2ca671ef85b1819edd) )
 
-	ROM_REGION( 335362, "screen", 0)
-	ROM_LOAD( "astrocmd.svg", 0, 335362, CRC(fe2cd30f) SHA1(898a3d9afc5dca6c63ae28aed2c8530716ad1c45) )
+	ROM_REGION( 335380, "screen", 0)
+	ROM_LOAD( "astrocmd.svg", 0, 335380, CRC(270cd068) SHA1(0e17881e80c5c44b34a0dd55d7587f7834f2a942) )
 ROM_END
 
 
@@ -1808,7 +1818,7 @@ ROM_END
   Epoch Dracula (manufactured in Japan)
   * PCB label: 96121
   * NEC uCOM-43 MCU, label D553C 206
-  * cyan/red/green VFD display NEC FIP8BM20T no. 2-42
+  * cyan/red/green VFD NEC FIP8BM20T no. 2-42
 
   known releases:
   - Japan: Dracula House, yellow case, published by Epoch
@@ -1909,8 +1919,8 @@ ROM_START( edracula )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-206.s01", 0x0000, 0x0800, CRC(b524857b) SHA1(c1c89ed5dd4bb1e6e98462dc8fa5af2aa48d8ede) )
 
-	ROM_REGION( 794532, "screen", 0)
-	ROM_LOAD( "edracula.svg", 0, 794532, CRC(d20e018c) SHA1(7f70f1d373c034ec8c93e27b7e3371578ddaf61b) )
+	ROM_REGION( 793604, "screen", 0)
+	ROM_LOAD( "edracula.svg", 0, 793604, CRC(062bd9b0) SHA1(8c2194824cd537073c9757207f671c35bc8614f3) )
 ROM_END
 
 
@@ -2010,7 +2020,7 @@ ROM_END
   Mego Mini-Vid: Break Free (manufactured in Japan)
   * PCB label: Mego 79 rev F
   * NEC uCOM-43 MCU, label D553C 049
-  * cyan VFD display Futaba DM-4.5 91
+  * cyan VFD Futaba DM-4.5 91
 
 ***************************************************************************/
 
@@ -2034,9 +2044,7 @@ private:
 
 void mvbfree_state::update_display()
 {
-	u16 grid = bitswap<16>(m_grid,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
-	u16 plate = bitswap<16>(m_plate,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
-	m_display->matrix(grid, plate);
+	m_display->matrix(m_grid >> 2, m_plate);
 }
 
 void mvbfree_state::grid_w(offs_t offset, u8 data)
@@ -2045,7 +2053,7 @@ void mvbfree_state::grid_w(offs_t offset, u8 data)
 	int shift = (offset - PORTE) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 
-	// E01: plate 0,1
+	// E01: vfd plate
 	if (offset == PORTE)
 		plate_w(2 + PORTC, data & 3);
 	else
@@ -2098,7 +2106,7 @@ void mvbfree_state::mvbfree(machine_config &config)
 	m_maincpu->write_i().set(FUNC(mvbfree_state::speaker_w));
 
 	// video hardware
-	PWM_DISPLAY(config, m_display).set_size(14, 10);
+	PWM_DISPLAY(config, m_display).set_size(16, 10);
 	config.set_default_layout(layout_mvbfree);
 
 	// sound hardware
@@ -2248,10 +2256,14 @@ ROM_END
   Tomy(tronic) Cosmic Combat (manufactured in Japan)
   * PCB label: 2E1019-E01
   * NEC uCOM-44 MCU, label D552C 042
-  * cyan VFD display NEC FIP32AM18Y tube no. 0E, with color overlay
+  * cyan VFD NEC FIP32AM18Y tube no. 0E, with blue window
+  * color overlay: score/ufo/player: yellow (optional)
+
+  There's also a version with a different looking cyan/red VFD.
 
   known releases:
   - USA: Cosmic Combat, published by Tomy
+  - USA: UFO Attack, published by Tomy
   - Japan: Space Attack, published by Tomy
 
 ***************************************************************************/
@@ -2275,9 +2287,7 @@ private:
 
 void tccombat_state::update_display()
 {
-	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,8,3,2,1,0,7,6,5,4);
-	u32 plate = bitswap<24>(m_plate,23,22,21,20,11,15,3,10,14,2,9,13,1,0,12,8,15,1,5,0,3,7,2,6);
-	m_display->matrix(grid, plate);
+	m_display->matrix(m_grid, m_plate);
 }
 
 void tccombat_state::grid_w(offs_t offset, u8 data)
@@ -2331,7 +2341,8 @@ void tccombat_state::tccombat(machine_config &config)
 	screen.set_size(300, 1080);
 	screen.set_visarea_full();
 
-	PWM_DISPLAY(config, m_display).set_size(9, 20);
+	PWM_DISPLAY(config, m_display).set_size(9, 16);
+	config.set_default_layout(layout_tccombat);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -2345,8 +2356,8 @@ ROM_START( tccombat )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "d552c-042", 0x0000, 0x0400, CRC(d7b5cfeb) SHA1(a267be8e43b7740758eb0881b655b1cc8aec43da) )
 
-	ROM_REGION( 210960, "screen", 0)
-	ROM_LOAD( "tccombat.svg", 0, 210960, CRC(03e9eba6) SHA1(d558d3063da42dc7cc02b769bca06a3732418837) )
+	ROM_REGION( 210933, "screen", 0)
+	ROM_LOAD( "tccombat.svg", 0, 210933, CRC(73b4e4da) SHA1(f479b9667d0169e383a8513cff6be948fe87cc13) )
 ROM_END
 
 
@@ -2358,7 +2369,7 @@ ROM_END
   Tomy(tronic) Tennis (manufactured in Japan)
   * PCB label: TOMY TN-04 TENNIS
   * NEC uCOM-44 MCU, label D552C 048
-  * cyan VFD display NEC FIP11AM15T tube no. 0F, with overlay
+  * cyan VFD NEC FIP11AM15T tube no. 0F, with overlay
 
   The initial release of this game was in 1979, known as Pro-Tennis,
   it has a D553 instead of D552, with just a little over 50% ROM used.
@@ -2518,7 +2529,7 @@ ROM_START( tmtennis )
 	ROM_LOAD( "d552c-048", 0x0000, 0x0400, CRC(78702003) SHA1(4d427d4dbeed901770c682338867f58c7b54eee3) )
 
 	ROM_REGION( 204490, "screen", 0)
-	ROM_LOAD( "tmtennis.svg", 0, 204490, CRC(ed0086e9) SHA1(26a5b2f0a9cd70401187146e1495aee80020658b) )
+	ROM_LOAD( "tmtennis.svg", 0, 204490, CRC(b000e7cb) SHA1(d59962245107da28047d6e1dfab00fe9b398c3d0) )
 ROM_END
 
 
@@ -2530,7 +2541,7 @@ ROM_END
   Tomy(tronic) Pac-Man (manufactured in Japan)
   * PCB label: TN-08 2E108E01
   * NEC uCOM-43 MCU, label D553C 160
-  * cyan/red/green VFD display NEC FIP8AM18T no. 2-21
+  * cyan/red/green VFD NEC FIP8AM18T no. 2-21
   * bright yellow round casing
 
   known releases:
@@ -2563,9 +2574,7 @@ private:
 
 void tmpacman_state::update_display()
 {
-	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,6,7);
-	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,16,17,18,11,10,9,8,0,2,3,1,4,5,6,7,12,13,14,15) | 0x100;
-	m_display->matrix(grid, plate);
+	m_display->matrix(m_grid, m_plate);
 }
 
 void tmpacman_state::grid_w(offs_t offset, u8 data)
@@ -2638,8 +2647,8 @@ ROM_START( tmpacman )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-160", 0x0000, 0x0800, CRC(b21a8af7) SHA1(e3122be1873ce76a4067386bf250802776f0c2f9) )
 
-	ROM_REGION( 230216, "screen", 0)
-	ROM_LOAD( "tmpacman.svg", 0, 230216, CRC(2ab5c0f1) SHA1(b2b6482b03c28515dc76fd3d6034c8b7e6bf6efc) )
+	ROM_REGION( 230222, "screen", 0)
+	ROM_LOAD( "tmpacman.svg", 0, 230222, CRC(824160e5) SHA1(c3c88cb4a01a70b450fbef7e51eaeb2ffed7dc66) )
 ROM_END
 
 
@@ -2651,7 +2660,7 @@ ROM_END
   Tomy(tronic) Scramble (manufactured in Japan)
   * PCB label: TN-10 2E114E01
   * NEC uCOM-43 MCU, label D553C 192
-  * cyan/red/green VFD display NEC FIP10CM20T no. 2-41
+  * cyan/red/green VFD NEC FIP10CM20T no. 2-41
 
   known releases:
   - World: Scramble, published by Tomy
@@ -2680,8 +2689,7 @@ private:
 
 void tmscramb_state::update_display()
 {
-	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,18,17,3,15,2,14,1,13,16,0,12,8,4,9,5,10,6,11,7) | 0x400;
-	m_display->matrix(m_grid, plate);
+	m_display->matrix(m_grid, m_plate);
 }
 
 void tmscramb_state::grid_w(offs_t offset, u8 data)
@@ -2739,7 +2747,7 @@ void tmscramb_state::tmscramb(machine_config &config)
 	screen.set_size(1920, 556);
 	screen.set_visarea_full();
 
-	PWM_DISPLAY(config, m_display).set_size(10, 17);
+	PWM_DISPLAY(config, m_display).set_size(10, 16);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -2753,8 +2761,8 @@ ROM_START( tmscramb )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-192", 0x0000, 0x0800, CRC(00fcc501) SHA1(a7771e934bf8268c83f38c7ec0acc668836e0939) )
 
-	ROM_REGION( 243830, "screen", 0)
-	ROM_LOAD( "tmscramb.svg", 0, 243830, CRC(300b098a) SHA1(9fde58ac0f4e4cfea05301346cbf5b1ced9fe973) )
+	ROM_REGION( 243853, "screen", 0)
+	ROM_LOAD( "tmscramb.svg", 0, 243853, CRC(0c506407) SHA1(045a661dd5f8af1833fd17210fba398ec2805b41) )
 ROM_END
 
 
@@ -2766,7 +2774,7 @@ ROM_END
   Tomy(tronic) Caveman (manufactured in Japan)
   * PCB label: TN-12 2E114E03
   * NEC uCOM-43 MCU, label D553C 209
-  * cyan/red/green VFD display NEC FIP8AM20T no. 2-42
+  * cyan/red/green VFD NEC FIP8AM20T no. 2-42
 
   known releases:
   - World: Caveman, published by Tomy
@@ -2794,9 +2802,7 @@ private:
 
 void tcaveman_state::update_display()
 {
-	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,6,7);
-	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,10,11,5,6,7,8,0,9,2,18,17,16,3,15,14,13,12,4,1) | 0x40;
-	m_display->matrix(grid, plate);
+	m_display->matrix(m_grid, m_plate);
 }
 
 void tcaveman_state::grid_w(offs_t offset, u8 data)
@@ -2864,8 +2870,8 @@ ROM_START( tcaveman )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-209", 0x0000, 0x0800, CRC(d230d4b7) SHA1(2fb12b60410f5567c5e3afab7b8f5aa855d283be) )
 
-	ROM_REGION( 306952, "screen", 0)
-	ROM_LOAD( "tcaveman.svg", 0, 306952, CRC(a0588b14) SHA1(f67edf579963fc19bc7f9d268329cbc0230712d8) )
+	ROM_REGION( 306924, "screen", 0)
+	ROM_LOAD( "tcaveman.svg", 0, 306924, CRC(4e214216) SHA1(a42506d8f82ccad7598f91603e3b264ce700ca1e) )
 ROM_END
 
 
@@ -2877,7 +2883,8 @@ ROM_END
   Tomy Alien Chase (manufactured in Japan)
   * PCB label: TN-16 2E121B01
   * NEC uCOM-43 MCU, label D553C 258
-  * red/green VFD display NEC FIP9AM24T, with color overlay, 2-sided*
+  * red/green VFD NEC FIP9AM24T, 2-sided*
+  * color overlay: top row: green, bottom: blue, middle: pink, other: yellow
 
   *Player one views the VFD from the front (grid+filament side) while the
   opposite player views it from the back side (through the conductive traces),
@@ -2992,10 +2999,11 @@ void alnchase_state::alnchase(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
-	screen.set_size(365, 1080);
+	screen.set_size(362, 1080);
 	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(9, 17);
+	config.set_default_layout(layout_alnchase);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -3009,8 +3017,8 @@ ROM_START( alnchase )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-258", 0x0000, 0x0800, CRC(c5284ff5) SHA1(6a20aaacc9748f0e0335958f3cea482e36153704) )
 
-	ROM_REGION( 576864, "screen", 0)
-	ROM_LOAD( "alnchase.svg", 0, 576864, CRC(fe7c7078) SHA1(0d201eeaeb291ded14c0759d1d3d5b2491cf0792) )
+	ROM_REGION( 576555, "screen", 0)
+	ROM_LOAD( "alnchase.svg", 0, 576555, CRC(b2c1734b) SHA1(087e2fd66e978f9b3b10401dd0935b4b28a7823f) )
 ROM_END
 
 
@@ -3025,8 +3033,8 @@ ROM_END
 
 //    YEAR  NAME      PARENT   CMP MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
 CONS( 1979, ufombs,   0,        0, ufombs,   ufombs,   ufombs_state,   empty_init, "Bambino", "UFO Master-Blaster Station", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, ssfball,  0,        0, ssfball,  ssfball,  ssfball_state,  empty_init, "Bambino", "Superstar Football (Bambino)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, bmcfball, ssfball,  0, ssfball,  ssfball,  ssfball_state,  empty_init, "Bambino", "Classic Football (Bambino)", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, ssfball,  0,        0, ssfball,  ssfball,  ssfball_state,  empty_init, "Bambino", "Super Star Football (Bambino)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, bmcfball, ssfball,  0, ssfball,  ssfball,  ssfball_state,  empty_init, "Bambino", "Football Classic (Bambino)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, bmsoccer, 0,        0, bmsoccer, bmsoccer, bmsoccer_state, empty_init, "Bambino", "Kick The Goal Soccer", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, bmsafari, 0,        0, bmsafari, bmsafari, bmsafari_state, empty_init, "Bambino", "Safari (Bambino)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, splasfgt, 0,        0, splasfgt, splasfgt, splasfgt_state, empty_init, "Bambino", "Space Laser Fight", MACHINE_SUPPORTS_SAVE )

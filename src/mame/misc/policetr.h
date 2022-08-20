@@ -23,8 +23,6 @@ public:
 
 	void policetr(machine_config &config);
 
-	void driver_init() override;
-
 	DECLARE_READ_LINE_MEMBER(bsmt_status_r);
 
 protected:
@@ -47,8 +45,9 @@ protected:
 		m_speedup_pc(speedup_pc),
 		m_speedup_addr(speedup_addr) { }
 
-	void machine_start() override;
-	void video_start() override;
+	virtual void driver_start() override;
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 	void mem(address_map &map);
 

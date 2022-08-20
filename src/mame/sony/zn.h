@@ -210,7 +210,7 @@ public:
 	void nbajamex(machine_config &config);
 
 private:
-	virtual void driver_init() override;
+	virtual void driver_start() override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 

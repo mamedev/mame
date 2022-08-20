@@ -42,21 +42,160 @@ NOTE: PIC16C5x protection chip at 5A (UC02 as silkscreened on PCB)
 ***************************************************************************/
 
 #include "emu.h"
-#include "mosaic.h"
 
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "cpu/z180/z180.h"
 #include "sound/ymopn.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
+
+// configurable logging
+#define LOG_PICSIM     (1U <<  1)
+
+//#define VERBOSE (LOG_GENERAL | LOG_PICSIM)
+
+#include "logmacro.h"
+
+#define LOGPICSIM(...)     LOGMASKED(LOG_PICSIM,     __VA_ARGS__)
+
+
+namespace {
+
+class mosaic_state : public driver_device
+{
+public:
+	mosaic_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_fgvideoram(*this, "fgvideoram"),
+		m_bgvideoram(*this, "bgvideoram")
+	{ }
+
+	void mosaic(machine_config &config);
+	void gfire2(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+
+	// memory pointers
+	required_shared_ptr<uint8_t> m_fgvideoram;
+	required_shared_ptr<uint8_t> m_bgvideoram;
+
+	// video-related
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+
+	// misc
+	uint16_t m_prot_val = 0;
+
+	void protection_w(uint8_t data);
+	uint8_t protection_r();
+	void gfire2_protection_w(uint8_t data);
+	uint8_t gfire2_protection_r();
+	void fgvideoram_w(offs_t offset, uint8_t data);
+	void bgvideoram_w(offs_t offset, uint8_t data);
+
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void gfire2_io_map(address_map &map);
+	void gfire2_map(address_map &map);
+	void mosaic_io_map(address_map &map);
+	void mosaic_map(address_map &map);
+};
+
+
+// video
+
+/***************************************************************************
+
+  Callbacks for the TileMap code
+
+***************************************************************************/
+
+TILE_GET_INFO_MEMBER(mosaic_state::get_fg_tile_info)
+{
+	tile_index *= 2;
+	tileinfo.set(0,
+			m_fgvideoram[tile_index] + (m_fgvideoram[tile_index + 1] << 8),
+			0,
+			0);
+}
+
+TILE_GET_INFO_MEMBER(mosaic_state::get_bg_tile_info)
+{
+	tile_index *= 2;
+	tileinfo.set(1,
+			m_bgvideoram[tile_index] + (m_bgvideoram[tile_index + 1] << 8),
+			0,
+			0);
+}
+
+
+
+/***************************************************************************
+
+  Start the video hardware emulation.
+
+***************************************************************************/
+
+void mosaic_state::video_start()
+{
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mosaic_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mosaic_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+
+	m_fg_tilemap->set_transparent_pen(0xff);
+}
+
+
+/***************************************************************************
+
+  Memory handlers
+
+***************************************************************************/
+
+void mosaic_state::fgvideoram_w(offs_t offset, uint8_t data)
+{
+	m_fgvideoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset / 2);
+}
+
+void mosaic_state::bgvideoram_w(offs_t offset, uint8_t data)
+{
+	m_bgvideoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
+}
+
+
+
+uint32_t mosaic_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	return 0;
+}
+
+
+// machine
 
 void mosaic_state::protection_w(uint8_t data) // TODO: hook up PIC dump and remove this simulation (PIC dump contains the exact values in this jumptable)
 {
 	if (!BIT(data, 7))
 	{
-		/* simply increment given value */
+		// simply increment given value
 		m_prot_val = (data + 1) << 8;
 	}
 	else
@@ -78,9 +217,9 @@ void mosaic_state::protection_w(uint8_t data) // TODO: hook up PIC dump and remo
 
 uint8_t mosaic_state::protection_r()
 {
-	int res = (m_prot_val >> 8) & 0xff;
+	int const res = (m_prot_val >> 8) & 0xff;
 
-	logerror("%06x: protection_r %02x\n", m_maincpu->pc(), res);
+	LOGPICSIM("%06x: protection_r %02x\n", m_maincpu->pc(), res);
 
 	m_prot_val <<= 8;
 
@@ -89,12 +228,12 @@ uint8_t mosaic_state::protection_r()
 
 void mosaic_state::gfire2_protection_w(uint8_t data)
 {
-	logerror("%06x: protection_w %02x\n", m_maincpu->pc(), data);
+	LOGPICSIM("%06x: protection_w %02x\n", m_maincpu->pc(), data);
 
 	switch(data)
 	{
 		case 0x01:
-			/* written repeatedly; no effect?? */
+			// written repeatedly; no effect??
 			break;
 		case 0x02:
 			m_prot_val = 0x0a10;
@@ -116,7 +255,7 @@ void mosaic_state::gfire2_protection_w(uint8_t data)
 
 uint8_t mosaic_state::gfire2_protection_r()
 {
-	int res = m_prot_val & 0xff;
+	int const res = m_prot_val & 0xff;
 
 	m_prot_val >>= 8;
 
@@ -129,8 +268,8 @@ void mosaic_state::mosaic_map(address_map &map)
 {
 	map(0x00000, 0x0ffff).rom();
 	map(0x20000, 0x21fff).ram();
-	map(0x22000, 0x22fff).ram().w(FUNC(mosaic_state::bgvideoram_w)).share("bgvideoram");
-	map(0x23000, 0x23fff).ram().w(FUNC(mosaic_state::fgvideoram_w)).share("fgvideoram");
+	map(0x22000, 0x22fff).ram().w(FUNC(mosaic_state::bgvideoram_w)).share(m_bgvideoram);
+	map(0x23000, 0x23fff).ram().w(FUNC(mosaic_state::fgvideoram_w)).share(m_fgvideoram);
 	map(0x24000, 0x241ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 }
 
@@ -138,16 +277,16 @@ void mosaic_state::gfire2_map(address_map &map)
 {
 	map(0x00000, 0x0ffff).rom();
 	map(0x10000, 0x17fff).ram();
-	map(0x22000, 0x22fff).ram().w(FUNC(mosaic_state::bgvideoram_w)).share("bgvideoram");
-	map(0x23000, 0x23fff).ram().w(FUNC(mosaic_state::fgvideoram_w)).share("fgvideoram");
+	map(0x22000, 0x22fff).ram().w(FUNC(mosaic_state::bgvideoram_w)).share(m_bgvideoram);
+	map(0x23000, 0x23fff).ram().w(FUNC(mosaic_state::fgvideoram_w)).share(m_fgvideoram);
 	map(0x24000, 0x241ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 }
 
 void mosaic_state::mosaic_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x3f).nopw();    /* Z180 internal registers */
-	map(0x30, 0x30).nopr(); /* Z180 internal registers */
+	map(0x00, 0x3f).nopw();    // Z180 internal registers
+	map(0x30, 0x30).nopr(); // Z180 internal registers
 	map(0x70, 0x71).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0x72, 0x72).rw(FUNC(mosaic_state::protection_r), FUNC(mosaic_state::protection_w));
 	map(0x74, 0x74).portr("P1");
@@ -157,8 +296,8 @@ void mosaic_state::mosaic_io_map(address_map &map)
 void mosaic_state::gfire2_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x3f).nopw();    /* Z180 internal registers */
-	map(0x30, 0x30).nopr(); /* Z180 internal registers */
+	map(0x00, 0x3f).nopw();    // Z180 internal registers
+	map(0x30, 0x30).nopr(); // Z180 internal registers
 	map(0x70, 0x71).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0x72, 0x72).rw(FUNC(mosaic_state::gfire2_protection_r), FUNC(mosaic_state::gfire2_protection_w));
 	map(0x74, 0x74).portr("P1");
@@ -270,8 +409,8 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( gfx_mosaic )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "fgtiles", 0, charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "bgtiles", 0, charlayout, 0, 1 )
 GFXDECODE_END
 
 void mosaic_state::machine_start()
@@ -286,13 +425,13 @@ void mosaic_state::machine_reset()
 
 void mosaic_state::mosaic(machine_config &config)
 {
-	/* basic machine hardware */
-	HD64180RP(config, m_maincpu, XTAL(12'288'000));  /* 6.144MHz - Verified */
+	// basic machine hardware
+	HD64180RP(config, m_maincpu, XTAL(12'288'000));  // 6.144MHz - Verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &mosaic_state::mosaic_map);
 	m_maincpu->set_addrmap(AS_IO, &mosaic_state::mosaic_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(mosaic_state::irq0_line_hold));
 
-	PIC16C55(config, "pic", XTAL(12'288'000)/4);  /* 3.072MHz - Verified */
+	PIC16C55(config, "pic", XTAL(12'288'000) / 4);  // 3.072MHz - Verified
 	//read_a().set(FUNC(mosaic_state::));
 	//write_a().set(FUNC(mosaic_state::));
 	//read_b().set(FUNC(mosaic_state::));
@@ -300,7 +439,7 @@ void mosaic_state::mosaic(machine_config &config)
 	//read_c().set(FUNC(mosaic_state::));
 	//write_c().set(FUNC(mosaic_state::));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -313,10 +452,10 @@ void mosaic_state::mosaic(machine_config &config)
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 256);
 
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(14'318'181)/4)); /* 3.579545MHz - Verified */
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(14'318'181) / 4)); // 3.579545MHz - Verified
 	ymsnd.port_a_read_callback().set_ioport("DSW");
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
@@ -340,65 +479,66 @@ void mosaic_state::gfire2(machine_config &config)
 ***************************************************************************/
 
 ROM_START( mosaic )
-	ROM_REGION( 0x100000, "maincpu", 0 )    /* 1024k for Z180 address space */
-	ROM_LOAD( "9.ua02", 0x00000, 0x10000, CRC(5794dd39) SHA1(28784371f4ca561e3c0fb74d1f0a204f58ccdd3a) ) /* at PCB location 7F */
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 1024k for Z180 address space
+	ROM_LOAD( "9.ua02", 0x00000, 0x10000, CRC(5794dd39) SHA1(28784371f4ca561e3c0fb74d1f0a204f58ccdd3a) ) // at PCB location 7F
 
 	ROM_REGION( 0x400, "pic", 0 )
 	ROM_LOAD( "pic16c55.uc02",    0x000, 0x400, CRC(62d1d85d) SHA1(167e1f39e85f0bbecc4374f3975aa0c41173f070) ) // decapped, presumed to be 16C55
 
-	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD( "1.u505", 0x00000, 0x10000, CRC(05f4cc70) SHA1(367cfa716b5d24663efcd98a4a80bf02ef28f2f8) ) /* at PCB location 1L */
-	ROM_LOAD( "2.u506", 0x10000, 0x10000, CRC(78907875) SHA1(073b90e0303f7812e7e8f66bb798a7734cb36bb9) ) /* at PCB location 1K */
-	ROM_LOAD( "3.u507", 0x20000, 0x10000, CRC(f81294cd) SHA1(9bce627bbe3940769776121fb4296f92ac4c7d1a) ) /* at PCB location 1I */
-	ROM_LOAD( "4.u508", 0x30000, 0x10000, CRC(fff72536) SHA1(4fc5d0a79128dd49275bc4c4cc2dd7c587096fd8) ) /* at PCB location 1G */
+	ROM_REGION( 0x40000, "fgtiles", 0 )
+	ROM_LOAD( "1.u505", 0x00000, 0x10000, CRC(05f4cc70) SHA1(367cfa716b5d24663efcd98a4a80bf02ef28f2f8) ) // at PCB location 1L
+	ROM_LOAD( "2.u506", 0x10000, 0x10000, CRC(78907875) SHA1(073b90e0303f7812e7e8f66bb798a7734cb36bb9) ) // at PCB location 1K
+	ROM_LOAD( "3.u507", 0x20000, 0x10000, CRC(f81294cd) SHA1(9bce627bbe3940769776121fb4296f92ac4c7d1a) ) // at PCB location 1I
+	ROM_LOAD( "4.u508", 0x30000, 0x10000, CRC(fff72536) SHA1(4fc5d0a79128dd49275bc4c4cc2dd7c587096fd8) ) // at PCB location 1G
 
-	ROM_REGION( 0x40000, "gfx2", 0 )
-	ROM_LOAD( "5.u305", 0x00000, 0x10000, CRC(28513fbf) SHA1(e69051206cc3df470e7b2358c51cbbed294795f5) ) /* at PCB location 1F */
-	ROM_LOAD( "6.u306", 0x10000, 0x10000, CRC(1b8854c4) SHA1(d49df2565d9ccda403fafb9e219d3603776e3d34) ) /* at PCB location 1D */
-	ROM_LOAD( "7.u307", 0x20000, 0x10000, CRC(35674ac2) SHA1(6422a81034b6d34aefc8ca5d2926d3d3c3d7ff77) ) /* at PCB location 1C */
-	ROM_LOAD( "8.u308", 0x30000, 0x10000, CRC(6299c376) SHA1(eb64b20268c06c97c4201c8004a759b6de42fab6) ) /* at PCB location 1A */
+	ROM_REGION( 0x40000, "bgtiles", 0 )
+	ROM_LOAD( "5.u305", 0x00000, 0x10000, CRC(28513fbf) SHA1(e69051206cc3df470e7b2358c51cbbed294795f5) ) // at PCB location 1F
+	ROM_LOAD( "6.u306", 0x10000, 0x10000, CRC(1b8854c4) SHA1(d49df2565d9ccda403fafb9e219d3603776e3d34) ) // at PCB location 1D
+	ROM_LOAD( "7.u307", 0x20000, 0x10000, CRC(35674ac2) SHA1(6422a81034b6d34aefc8ca5d2926d3d3c3d7ff77) ) // at PCB location 1C
+	ROM_LOAD( "8.u308", 0x30000, 0x10000, CRC(6299c376) SHA1(eb64b20268c06c97c4201c8004a759b6de42fab6) ) // at PCB location 1A
 ROM_END
 
 ROM_START( mosaica )
-	ROM_REGION( 0x100000, "maincpu", 0 )    /* 1024k for Z180 address space */
-	ROM_LOAD( "mosaic_9.a02", 0x00000, 0x10000, CRC(ecb4f8aa) SHA1(e45c074bac92d1d079cf1bcc0a6a081beb3dbb8e) ) /* at PCB location 7F */
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 1024k for Z180 address space
+	ROM_LOAD( "mosaic_9.a02", 0x00000, 0x10000, CRC(ecb4f8aa) SHA1(e45c074bac92d1d079cf1bcc0a6a081beb3dbb8e) ) // at PCB location 7F
 
 	ROM_REGION( 0x400, "pic", 0 )
 	ROM_LOAD( "pic16c55.uc02",    0x000, 0x400, CRC(62d1d85d) SHA1(167e1f39e85f0bbecc4374f3975aa0c41173f070) ) // decapped, presumed to be 16C55
 
-	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD( "1.u505", 0x00000, 0x10000, CRC(05f4cc70) SHA1(367cfa716b5d24663efcd98a4a80bf02ef28f2f8) ) /* at PCB location 1L */
-	ROM_LOAD( "2.u506", 0x10000, 0x10000, CRC(78907875) SHA1(073b90e0303f7812e7e8f66bb798a7734cb36bb9) ) /* at PCB location 1K */
-	ROM_LOAD( "3.u507", 0x20000, 0x10000, CRC(f81294cd) SHA1(9bce627bbe3940769776121fb4296f92ac4c7d1a) ) /* at PCB location 1I */
-	ROM_LOAD( "4.u508", 0x30000, 0x10000, CRC(fff72536) SHA1(4fc5d0a79128dd49275bc4c4cc2dd7c587096fd8) ) /* at PCB location 1G */
+	ROM_REGION( 0x40000, "fgtiles", 0 )
+	ROM_LOAD( "1.u505", 0x00000, 0x10000, CRC(05f4cc70) SHA1(367cfa716b5d24663efcd98a4a80bf02ef28f2f8) ) // at PCB location 1L
+	ROM_LOAD( "2.u506", 0x10000, 0x10000, CRC(78907875) SHA1(073b90e0303f7812e7e8f66bb798a7734cb36bb9) ) // at PCB location 1K
+	ROM_LOAD( "3.u507", 0x20000, 0x10000, CRC(f81294cd) SHA1(9bce627bbe3940769776121fb4296f92ac4c7d1a) ) // at PCB location 1I
+	ROM_LOAD( "4.u508", 0x30000, 0x10000, CRC(fff72536) SHA1(4fc5d0a79128dd49275bc4c4cc2dd7c587096fd8) ) // at PCB location 1G
 
-	ROM_REGION( 0x40000, "gfx2", 0 )
-	ROM_LOAD( "5.u305", 0x00000, 0x10000, CRC(28513fbf) SHA1(e69051206cc3df470e7b2358c51cbbed294795f5) ) /* at PCB location 1F */
-	ROM_LOAD( "6.u306", 0x10000, 0x10000, CRC(1b8854c4) SHA1(d49df2565d9ccda403fafb9e219d3603776e3d34) ) /* at PCB location 1D */
-	ROM_LOAD( "7.u307", 0x20000, 0x10000, CRC(35674ac2) SHA1(6422a81034b6d34aefc8ca5d2926d3d3c3d7ff77) ) /* at PCB location 1C */
-	ROM_LOAD( "8.u308", 0x30000, 0x10000, CRC(6299c376) SHA1(eb64b20268c06c97c4201c8004a759b6de42fab6) ) /* at PCB location 1A */
+	ROM_REGION( 0x40000, "bgtiles", 0 )
+	ROM_LOAD( "5.u305", 0x00000, 0x10000, CRC(28513fbf) SHA1(e69051206cc3df470e7b2358c51cbbed294795f5) ) // at PCB location 1F
+	ROM_LOAD( "6.u306", 0x10000, 0x10000, CRC(1b8854c4) SHA1(d49df2565d9ccda403fafb9e219d3603776e3d34) ) // at PCB location 1D
+	ROM_LOAD( "7.u307", 0x20000, 0x10000, CRC(35674ac2) SHA1(6422a81034b6d34aefc8ca5d2926d3d3c3d7ff77) ) // at PCB location 1C
+	ROM_LOAD( "8.u308", 0x30000, 0x10000, CRC(6299c376) SHA1(eb64b20268c06c97c4201c8004a759b6de42fab6) ) // at PCB location 1A
 ROM_END
 
 ROM_START( gfire2 )
-	ROM_REGION( 0x100000, "maincpu", 0 )    /* 1024k for Z180 address space */
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 1024k for Z180 address space
 	ROM_LOAD( "goldf2_i.7e",         0x00000, 0x10000, CRC(a102f7d0) SHA1(cfde51d0e9e69e9653fdfd70d4e4f4649b662005) )
 
 	ROM_REGION( 0x400, "pic", 0 )
 	ROM_LOAD( "pic16c55.uc02",    0x000, 0x400, NO_DUMP ) // same sanded off chip as mosaic, verified on PCB pic
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x100000, "fgtiles", 0 )
 	ROM_LOAD( "goldf2_a.1k",         0x00000, 0x40000, CRC(1f086472) SHA1(c776a734869b6bab317627bd15457a9fb18e1159) )
 	ROM_LOAD( "goldf2_b.1j",         0x40000, 0x40000, CRC(edb0d40c) SHA1(624a71b42a2e6c7c55cf455395aa0ad9b3eaeb9e) )
 	ROM_LOAD( "goldf2_c.1i",         0x80000, 0x40000, CRC(d0ebd486) SHA1(ff2bfc84bc622b437913e1861f7acb373c7844c8) )
 	ROM_LOAD( "goldf2_d.1h",         0xc0000, 0x40000, CRC(2b56ae2c) SHA1(667f9093ed28ba1804583fb201c7e3b37f1a9927) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_REGION( 0x80000, "bgtiles", 0 )
 	ROM_LOAD( "goldf2_e.1e",         0x00000, 0x20000, CRC(61b8accd) SHA1(d6317b8b7ab33a2a78d388b87ddb8946e6c6df29) )
 	ROM_LOAD( "goldf2_f.1d",         0x20000, 0x20000, CRC(49f77e53) SHA1(6e7c8f86cb368bf1a32f02f72e7b418684c847dc) )
 	ROM_LOAD( "goldf2_g.1b",         0x40000, 0x20000, CRC(aa79f3bf) SHA1(c0b62f5de7e36ce1ef1de92ee6f63d8286815566) )
 	ROM_LOAD( "goldf2_h.1a",         0x60000, 0x20000, CRC(a3519259) SHA1(9e1edb50ade4a4ddcd628a897f6fa712075a888b) )
 ROM_END
 
+} // anonymous namespace
 
 
 GAME( 1990, mosaic,  0,      mosaic, mosaic, mosaic_state, empty_init, ROT0, "Space",                 "Mosaic",         MACHINE_SUPPORTS_SAVE )

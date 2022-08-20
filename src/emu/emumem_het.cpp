@@ -27,6 +27,11 @@ template<int Width, int AddrShift> std::pair<typename emu::detail::handler_entry
 	return pack;
 }
 
+template<int Width, int AddrShift> u16 handler_entry_read_tap<Width, AddrShift>::lookup_flags(offs_t offset, uX mem_mask) const
+{
+	return this->m_next->lookup_flags(offset, mem_mask);
+}
+
 template<int Width, int AddrShift> std::string handler_entry_read_tap<Width, AddrShift>::name() const
 {
 	return '(' + m_name + ") " + this->m_next->name();
@@ -57,6 +62,11 @@ template<int Width, int AddrShift> u16 handler_entry_write_tap<Width, AddrShift>
 
 	this->unref();
 	return flags;
+}
+
+template<int Width, int AddrShift> u16 handler_entry_write_tap<Width, AddrShift>::lookup_flags(offs_t offset, uX mem_mask) const
+{
+	return this->m_next->lookup_flags(offset, mem_mask);
 }
 
 template<int Width, int AddrShift> std::string handler_entry_write_tap<Width, AddrShift>::name() const

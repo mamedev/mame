@@ -52,7 +52,7 @@ Battleship and Turtles were announced but unreleased.
 		<year>1981</year>
 		<publisher>Entex</publisher>
 		<part name="cart" interface="sag_cart">
-			<dataarea name="rom" size="0x1000"> <!-- TMS1670 MCU, die label TMS1400, MP7573 -->
+			<dataarea name="rom" size="0x1000"> <!-- TMS1670 MCU (die label: TMS1400, MP7573, 40H 01D D000 R000) -->
 				<rom name="ftba_mp7573" size="0x1000" crc="b17dd9e3" sha1="9c9e7a56643233ef2adff7b68a6df19e6ca176c2" />
 			</dataarea>
 			<dataarea name="rom:mpla" size="867">

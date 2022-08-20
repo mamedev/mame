@@ -70,11 +70,10 @@ public:
 	{
 	}
 
-	void driver_init() override;
-
 	void battles(machine_config &config);
 
 protected:
+	virtual void driver_start() override;
 	virtual void machine_reset() override;
 
 private:

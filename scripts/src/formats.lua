@@ -901,6 +901,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/cp68_dsk.h,FORMATS["CP68_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "CP68_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/cp68_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/cp68_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/uniflex_dsk.h,FORMATS["UNIFLEX_DSK"] = true
 --------------------------------------------------
 

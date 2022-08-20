@@ -1168,7 +1168,9 @@ void psikyo_state::s1945(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &psikyo_state::gunbird_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &psikyo_state::s1945_sound_io_map);
 
-	PIC16C57(config, "mcu", 4_MHz_XTAL).set_disable();  // Internal ROM isn't dumped (there's one weirdly sized dump available from a Korean version, actually. TODO: verify it's good and hook it up)
+	/* Dumped by decapping on a Tengai PCB (and there's one weirdly sized dump available from a Korean version of Strikers 1945).
+	   TODO: verify it's good and hook it up. Verify if the same PIC dump works also on clones. */
+	PIC16C57(config, "mcu", 4_MHz_XTAL).set_disable();
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1761,62 +1763,72 @@ Chips:  PS2001B
         PS3204
         PS3305
 
-4-U59      security (PIC16C57; not dumped)
+4-U59      security (PIC16C57)
 
 ***************************************************************************/
 
 ROM_START( tengai )
-	ROM_REGION( 0x100000, "maincpu", 0 )        /* Main CPU Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )        // Main CPU Code
 	ROM_LOAD32_WORD_SWAP( "5-u40.bin", 0x000000, 0x080000, CRC(90088195) SHA1(8ec48d581ecd14b3dad36edc65d5a273324cf3c1) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "4-u41.bin", 0x000002, 0x080000, CRC(0d53196c) SHA1(454bb4695b13ce44ca5dac7c6d4142a8b9afa798) ) // 3&2
 
-	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
+	ROM_REGION( 0x020000, "audiocpu", 0 )       // Sound CPU Code
 	ROM_LOAD( "1-u63.bin", 0x00000, 0x20000, CRC(2025e387) SHA1(334b0eb3b416d46ccaadff3eee6f1abba63285fb) )
 
-	ROM_REGION( 0x001000, "mcu", 0 )       /* MCU */
-	ROM_LOAD( "4-u59.bin", 0x00000, 0x01000, NO_DUMP )
+	ROM_REGION( 0x001000, "mcu", 0 )       // MCU, not hooked up
+	/* PIC configuration:
+	     -User ID: 37EA
+	     -Watchdog Timer: unknown
+	     -Oscilator Mode: probably XT (unconfirmed)
+	*/
+	ROM_LOAD( "4.u59", 0x00000, 0x01000, CRC(e563b054) SHA1(7593389d35851a71a8af2e094ec7e55cd818743a) )
 
-	ROM_REGION( 0x600000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x600000, "gfx1", 0 )   // Sprites
 	ROM_LOAD( "u20.bin",  0x000000, 0x200000, CRC(ed42ef73) SHA1(74693fcc83a2654ddb18fd513d528033863d6116) )
 	ROM_LOAD( "u22.bin",  0x200000, 0x200000, CRC(8d21caee) SHA1(2a68af8b2be2158dcb152c434e91a75871478d41) )
 	ROM_LOAD( "u21.bin",  0x400000, 0x200000, CRC(efe34eed) SHA1(7891495b443a5acc7b2f17fe694584f6cb0afacc) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )   /* Layer 0 + 1 */
-	ROM_LOAD( "u34.bin",  0x000000, 0x400000, CRC(2a2e2eeb) SHA1(f1d99353c0affc5c908985e6f2a5724e5223cccc) ) /* four banks of 0x100000 */
+	ROM_REGION( 0x400000, "gfx2", 0 )   // Layer 0 + 1
+	ROM_LOAD( "u34.bin",  0x000000, 0x400000, CRC(2a2e2eeb) SHA1(f1d99353c0affc5c908985e6f2a5724e5223cccc) ) // four banks of 0x100000
 
-	ROM_REGION( 0x400000, "ymf", 0 )    /* Samples */
-	ROM_LOAD( "u61.bin",  0x000000, 0x200000, CRC(a63633c5) SHA1(89e75a40518926ebcc7d88dea86c01ba0bb496e5) )    // 8 bit signed pcm (16KHz)
+	ROM_REGION( 0x400000, "ymf", 0 )    // Samples
+	ROM_LOAD( "u61.bin",  0x000000, 0x200000, CRC(a63633c5) SHA1(89e75a40518926ebcc7d88dea86c01ba0bb496e5) ) // 8 bit signed pcm (16KHz)
 	ROM_LOAD( "u62.bin",  0x200000, 0x200000, CRC(3ad0c357) SHA1(35f78cfa2eafa93ab96b24e336f569ee84af06b6) )
 
-	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* Sprites LUT */
+	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  // Sprites LUT
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(681d7d55) SHA1(b0b28471440d747adbc4d22d1918f89f6ede1615) )
 
 ROM_END
 
 ROM_START( tengaij )
-	ROM_REGION( 0x100000, "maincpu", 0 )        /* Main CPU Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )        // Main CPU Code
 	ROM_LOAD32_WORD_SWAP( "2-u40.bin", 0x000000, 0x080000, CRC(ab6fe58a) SHA1(6687a3af192b3eab60d75ca286ebb8e0636297b5) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "3-u41.bin", 0x000002, 0x080000, CRC(02e42e39) SHA1(6cdb7b1cebab50c0a44cd60cd437f0e878ccac5c) ) // 3&2
 
-	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
+	ROM_REGION( 0x020000, "audiocpu", 0 )       // Sound CPU Code
 	ROM_LOAD( "1-u63.bin", 0x00000, 0x20000, CRC(2025e387) SHA1(334b0eb3b416d46ccaadff3eee6f1abba63285fb) )
 
-	ROM_REGION( 0x001000, "mcu", 0 )       /* MCU */
-	ROM_LOAD( "4-u59.bin", 0x00000, 0x01000, NO_DUMP )
+	ROM_REGION( 0x001000, "mcu", 0 )       // MCU, not hooked up
+	/* PIC configuration:
+	     -User ID: 37EA
+	     -Watchdog Timer: unknown
+	     -Oscilator Mode: probably XT (unconfirmed)
+	*/
+	ROM_LOAD( "4.u59", 0x00000, 0x01000, CRC(e563b054) SHA1(7593389d35851a71a8af2e094ec7e55cd818743a) ) // From a World PCB
 
-	ROM_REGION( 0x600000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x600000, "gfx1", 0 )   // Sprites
 	ROM_LOAD( "u20.bin",  0x000000, 0x200000, CRC(ed42ef73) SHA1(74693fcc83a2654ddb18fd513d528033863d6116) )
 	ROM_LOAD( "u22.bin",  0x200000, 0x200000, CRC(8d21caee) SHA1(2a68af8b2be2158dcb152c434e91a75871478d41) )
 	ROM_LOAD( "u21.bin",  0x400000, 0x200000, CRC(efe34eed) SHA1(7891495b443a5acc7b2f17fe694584f6cb0afacc) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )   /* Layer 0 + 1 */
-	ROM_LOAD( "u34.bin",  0x000000, 0x400000, CRC(2a2e2eeb) SHA1(f1d99353c0affc5c908985e6f2a5724e5223cccc) ) /* four banks of 0x100000 */
+	ROM_REGION( 0x400000, "gfx2", 0 )   // Layer 0 + 1
+	ROM_LOAD( "u34.bin",  0x000000, 0x400000, CRC(2a2e2eeb) SHA1(f1d99353c0affc5c908985e6f2a5724e5223cccc) ) // four banks of 0x100000
 
-	ROM_REGION( 0x400000, "ymf", 0 )    /* Samples */
-	ROM_LOAD( "u61.bin",  0x000000, 0x200000, CRC(a63633c5) SHA1(89e75a40518926ebcc7d88dea86c01ba0bb496e5) )    // 8 bit signed pcm (16KHz)
+	ROM_REGION( 0x400000, "ymf", 0 )    // Samples
+	ROM_LOAD( "u61.bin",  0x000000, 0x200000, CRC(a63633c5) SHA1(89e75a40518926ebcc7d88dea86c01ba0bb496e5) ) // 8 bit signed pcm (16KHz)
 	ROM_LOAD( "u62.bin",  0x200000, 0x200000, CRC(3ad0c357) SHA1(35f78cfa2eafa93ab96b24e336f569ee84af06b6) )
 
-	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* Sprites LUT */
+	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  // Sprites LUT
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(681d7d55) SHA1(b0b28471440d747adbc4d22d1918f89f6ede1615) )
 
 ROM_END

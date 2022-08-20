@@ -513,8 +513,8 @@
 
 
   Program is currently not working because seems to fill some zeropage registers and
-  check for existent values and changes... Maybe an external device is writting them.
-  This is NVRAM zone, so some values could be previously harcoded.
+  check for existent values and changes... Maybe an external device is writing them.
+  This is NVRAM zone, so some values could be previously hardcoded.
 
   Also seems to manipulate the stack pointer expecting different values, and some inputs
   combination entered to boot.
@@ -783,7 +783,7 @@
   the same places... Need to be traced from the scratch.
 
   Also CPU lines A14 & A15 should be traced to know the addressing
-  system accuratelly.
+  system accurately.
 
 
                                                      CPU  R6502AP (U6)
@@ -983,6 +983,7 @@
 #include "machine/6821pia.h"
 #include "machine/bankdev.h"
 #include "machine/nvram.h"
+#include "machine/segacrpt_device.h"
 #include "machine/timekpr.h"
 #include "sound/ay8910.h"
 #include "sound/discrete.h"
@@ -1042,7 +1043,6 @@ public:
 
 	void init_vkdlswwh();
 	void init_icp1db();
-	void init_flcnw();
 	void init_vkdlswwp();
 	void init_vkdlsww();
 	void init_vkdlsb();
@@ -1124,6 +1124,7 @@ private:
 	void wildcrdb_map(address_map &map);
 	void wildcrdb_mcu_io_map(address_map &map);
 	void wildcrdb_mcu_map(address_map &map);
+	void wildcrdb_mcu_decrypted_opcodes_map(address_map &map);
 	void witchcrd_falcon_map(address_map &map);
 	void witchcrd_map(address_map &map);
 	void super21p_map(address_map &map);
@@ -1772,20 +1773,27 @@ void goldnpkr_state::wildcrdb_map(address_map &map)
 	map(0x2000, 0x2000).portr("SW2");
 	map(0x2100, 0x2100).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x2101, 0x2101).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x2800, 0x2fff).ram();
+	map(0x2800, 0x2fff).ram().share("main_mcu_shared"); // TODO: verify it's the correct range
 	map(0x3000, 0x7fff).rom();
 }
 
 void goldnpkr_state::wildcrdb_mcu_map(address_map &map)
 {
-//  map.global_mask(0x3fff);
 	map(0x0000, 0x0fff).rom();
-	map(0x1000, 0x2fff).ram();
+	map(0x2000, 0x27ff).ram();
+	map(0x8000, 0x87ff).ram().share("main_mcu_shared"); // TODO: verify it's the correct range
+}
+
+void goldnpkr_state::wildcrdb_mcu_decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom().share("decrypted_opcodes");
 }
 
 void goldnpkr_state::wildcrdb_mcu_io_map(address_map &map)
 {
 	map.global_mask(0xff);
+
+	// map(0x00, 0x00).w() // TODO: what's this? alternates between 0x00 and 0x01
 }
 
 /*
@@ -4630,9 +4638,13 @@ void goldnpkr_state::wildcrdb(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::wildcrdb_map);
 
-	z80_device &mcu(Z80(config, "mcu", MASTER_CLOCK/4));    // guess
+	sega_315_5018_device &mcu(SEGA_315_5018(config, "mcu", MASTER_CLOCK / 8));    // guess
 	mcu.set_addrmap(AS_PROGRAM, &goldnpkr_state::wildcrdb_mcu_map);
 	mcu.set_addrmap(AS_IO, &goldnpkr_state::wildcrdb_mcu_io_map);
+	mcu.set_addrmap(AS_OPCODES, &goldnpkr_state::wildcrdb_mcu_decrypted_opcodes_map);
+	mcu.set_decrypted_tag(":decrypted_opcodes");
+	mcu.set_size(0x1000);
+	mcu.set_vblank_int("screen", FUNC(goldnpkr_state::irq0_line_hold));
 
 	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
 	m_pia[0]->writepb_handler().set(FUNC(goldnpkr_state::ay8910_control_w));
@@ -10681,7 +10693,8 @@ ROM_END
   extra RAM + ROM + encrypted 2nd CPU + AY8910.
 
   The encrypted 40-pin CPU is scratched,
-  and seems based on a Z80.
+  and seems a copy of Sega's 315-5018 Z80 based
+  encryption device.
 
 ***********************************************/
 ROM_START( falcnwldc )
@@ -11840,39 +11853,6 @@ ROM_END
 
 */
 
-/***********************************************
-
-  Falcon's Wild - World Wide Poker.
-  Encryption Notes...
-
-  - MCU seems to be Z80 family (see routines at 0x38).
-
-  - Bits involved: [x-x- x---]
-
-  - Some lines seems XOR'ed with a pair of values (0xA0 0x80)
-    (see offset 0020)
-
-  - From a XOR'ed program with 0xA0,
-    seems close to a bitswap (--x- x---)
-    (see strings at 0EE0 onward)
-
-***********************************************/
-
-void goldnpkr_state::init_flcnw()
-{
-	// Attempt to decrypt the MCU program (we're sooo close!)
-
-	uint8_t *ROM = memregion("mcu")->base();
-	int size = memregion("mcu")->bytes();
-	int start = 0x0000;
-
-	for (int i = start; i < size; i++)
-	{
-		ROM[i] = ROM[i] ^ 0xa0;
-		ROM[i] = bitswap<8>(ROM[i], 7, 6, 3, 4, 5, 2, 1, 0);
-	}
-}
-
 
 void goldnpkr_state::init_vkdlsa()
 {
@@ -12376,7 +12356,7 @@ GAMEL( 1991, goodluck,  bsuerte,  witchcrd, goodluck, goldnpkr_state, empty_init
 GAMEL( 1991, falcnwld,  0,        wildcard, wildcard, goldnpkr_state, empty_init,    ROT0,   "TVG",                      "Falcons Wild - Wild Card 1991 (TVG)",        0,                layout_goldnpkr )
 GAMEL( 1990, falcnwlda, falcnwld, wildcard, wildcard, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Falcons Wild - World Wide Poker (Video Klein, set 1)", 0,      layout_goldnpkr )
 GAMEL( 1990, falcnwldb, falcnwld, wildcard, wildcard, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Falcons Wild - World Wide Poker (Video Klein, set 2)", 0,      layout_goldnpkr )
-GAME(  1983, falcnwldc, falcnwld, wildcrdb, wildcard, goldnpkr_state, init_flcnw,    ROT0,   "Falcon",                   "Falcons Wild - World Wide Poker (Falcon original)",    MACHINE_NOT_WORKING )
+GAME(  1983, falcnwldc, falcnwld, wildcrdb, wildcard, goldnpkr_state, empty_init,    ROT0,   "Falcon",                   "Falcons Wild - World Wide Poker (Falcon original)",    MACHINE_NOT_WORKING ) // MCU hook up incomplete, currently game runs only after a soft reset. Then you can coin up but bet doesn't work
 
 GAME(  1987, super21p,  0,        super21p, super21p, goldnpkr_state, empty_init,    ROT0,   "Public MNG",               "Super 21",                                   MACHINE_IMPERFECT_COLORS )
 

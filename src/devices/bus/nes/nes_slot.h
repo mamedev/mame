@@ -205,9 +205,9 @@ public:
 	// hack until disk system is made modern!
 	virtual void disk_flip_side() { }
 
-	void prg_alloc(size_t size, const char *tag);
-	void vrom_alloc(size_t size, const char *tag);
-	void misc_rom_alloc(size_t size, const char *tag);
+	void prg_alloc(size_t size);
+	void vrom_alloc(size_t size);
+	void misc_rom_alloc(size_t size);
 	void prgram_alloc(size_t size);
 	void vram_alloc(size_t size);
 	void battery_alloc(size_t size);
@@ -453,14 +453,5 @@ protected:
 
 // device type definition
 DECLARE_DEVICE_TYPE(NES_CART_SLOT, nes_cart_slot_device)
-
-
-/***************************************************************************
- DEVICE CONFIGURATION MACROS
- ***************************************************************************/
-
-#define NESSLOT_PRGROM_REGION_TAG ":cart:prg_rom"
-#define NESSLOT_CHRROM_REGION_TAG ":cart:chr_rom"
-#define NESSLOT_MISC_ROM_REGION_TAG ":cart:misc_rom"
 
 #endif // MAME_BUS_NES_NES_SLOT_H

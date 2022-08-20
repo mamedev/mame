@@ -228,6 +228,39 @@ void nes_state::fds(machine_config &config)
 	config.device_remove("famibox_list");
 }
 
+MACHINE_RESET_MEMBER( nes_state, famitvc1 )
+{
+	// TODO: supposedly the C1 used the cartridge connector audio pins to detect
+	// the presence of a cart and picks the builtin ROM accordingly. If so, the C1
+	// should not support Famicom expansion audio chips.
+
+	// Reset the mapper variables. Will also mark the char-gen ram as dirty
+	if (m_cartslot->exists())
+	{
+		m_cartslot->pcb_reset();
+	}
+	else
+	{
+		m_maincpu->space(AS_PROGRAM).install_rom(0x8000, 0x9fff, 0x6000, memregion("canvas_prg")->base());
+		m_ppu->space(AS_PROGRAM).install_rom(0x0000, 0x1fff, memregion("canvas_chr")->base());
+	}
+
+	m_maincpu->reset();
+}
+
+void nes_state::famitvc1(machine_config &config)
+{
+	famicom(config);
+
+	MCFG_MACHINE_RESET_OVERRIDE( nes_state, famitvc1 )
+
+	PPU_2C03B(config.replace(), m_ppu);
+	m_ppu->set_cpu_tag(m_maincpu);
+	m_ppu->int_callback().set_inputline("maincpu", INPUT_LINE_NMI);
+
+	m_cartslot->set_must_be_loaded(false);
+}
+
 MACHINE_START_MEMBER( nes_state, famitwin )
 {
 	// start the base nes stuff
@@ -279,6 +312,17 @@ ROM_END
 
 ROM_START( famicom )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  // Main RAM
+ROM_END
+
+ROM_START( famitvc1 )
+	ROM_REGION( 0x2000, "canvas_prg", 0 )
+	ROM_LOAD( "ix0402ce.ic109", 0x0000, 0x2000, CRC(96456b13) SHA1(a4dcb3c4f2be5077f0d197e870a26414287ce189) ) // dump needs verified
+
+	ROM_REGION( 0x2000, "canvas_chr", 0 )
+	ROM_LOAD( "ix0403ce.ic110", 0x0000, 0x2000, CRC(9cba4524) SHA1(2bd833f8049bf7a14ce337c3cde35f2140242a18) ) // dump needs verified
+
+	ROM_REGION( 0xc0, "ppu:palette", 0 )
+	ROM_LOAD( "rp2c0x.pal", 0x00, 0xc0, CRC(48de65dc) SHA1(d10acafc8da9ff479c270ec01180cca61efe62f5) )
 ROM_END
 
 #define rom_fds rom_famicom
@@ -354,7 +398,8 @@ CONS( 198?, m82p,     nes,     0,      nespal,   nes,     nes_state, empty_init,
 
 // Famicom hardware
 CONS( 1983, famicom,  0,       nes,    famicom,  famicom, nes_state, init_famicom, "Nintendo",      "Famicom",                         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-CONS( 1983, fds,      famicom, 0,      fds,      famicom, nes_state, init_famicom, "Nintendo",      "Famicom (w/ Disk System add-on)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+CONS( 1983, famitvc1, famicom, 0,      famitvc1, famicom, nes_state, init_famicom, "Sharp",         "My Computer Terebi C1",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+CONS( 1986, fds,      famicom, 0,      fds,      famicom, nes_state, init_famicom, "Nintendo",      "Famicom (w/ Disk System add-on)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 CONS( 1986, famitwin, famicom, 0,      famitwin, famicom, nes_state, init_famicom, "Sharp",         "Famicom Twin",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 // Clone hardware

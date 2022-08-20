@@ -34,6 +34,7 @@
 #include "egret.h"
 #include "macadb.h"
 #include "macscsi.h"
+#include "mactoolbox.h"
 #include "vasp.h"
 
 #include "emupal.h"
@@ -359,6 +360,7 @@ void maciivx_state::maciivx(machine_config &config)
 {
 	M68030(config, m_maincpu, C32M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &maciivx_state::maciivx_map);
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	maciiv_base(config);
 
@@ -382,6 +384,7 @@ void maciivx_state::maciivi(machine_config &config)
 
 	M68030(config.replace(), m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &maciivx_state::maciivi_map);
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 }
 
 ROM_START(maciivx)

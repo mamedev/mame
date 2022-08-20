@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nathan Woods, Wilbert Pol
+// copyright-holders:Nathan Woods, Wilbert Pol, David Shah
 /***************************************************************************
 
   Atari VCS 2600 driver
@@ -7,6 +7,17 @@
 TODO:
 - Move the 2 32-in-1 rom dumps into their own driver
 - Add 128-in-1 driver
+
+
+  Systema TV Boy
+
+TODO:
+- The TV Boy II and Super TV Boy units did not have joystick ports but a builtin D-pad
+- Find, dump and add the other variants. There are many. Systema and Akor released PAL TV Boys.
+  NICS released NTSC TV Boys in the US and Japan. The US NICS unit is also seen with the name Mega-Game.
+  Mega Boy WS-11 is another rebranded model.
+  There's also the TV Boy 3, Portable Walkiecom PTG-2600, Compact Master Boy, Game Link 2001, etc.
+
 
   Atari A2600 Point of Purchase Display Unit
 
@@ -87,18 +98,182 @@ E1 Prog ROM 42 DEMON/DIAMOND (CX2615)
 
 #include "emu.h"
 
-#include "a2600.h"
 
+#include "bus/vcs/compumat.h"
+#include "bus/vcs/dpc.h"
+#include "bus/vcs/harmony_melody.h"
+#include "bus/vcs/rom.h"
+#include "bus/vcs/scharger.h"
+#include "bus/vcs/vcs_slot.h"
+#include "bus/vcs_ctrl/ctrl.h"
+#include "cpu/m6502/m6507.h"
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
+#include "sound/tiaintf.h"
 #include "speaker.h"
+#include "tia.h"
+
+#define USE_NEW_RIOT 0
+
+#if USE_NEW_RIOT
+#include "machine/mos6530n.h"
+#else
+#include "machine/6532riot.h"
+#endif
+
+//#define VERBOSE (LOG_GENERAL)
+#include "logmacro.h"
 
 
-static constexpr auto MASTER_CLOCK_NTSC = 3.579575_MHz_XTAL;
-static constexpr auto MASTER_CLOCK_PAL  = 3.546894_MHz_XTAL;
+namespace {
 
 static const uint16_t supported_screen_heights[4] = { 262, 312, 328, 342 };
+
+
+#define CONTROL1_TAG    "joyport1"
+#define CONTROL2_TAG    "joyport2"
+
+class a2600_base_state : public driver_device
+{
+protected:
+	a2600_base_state(const machine_config &mconfig, device_type type, const char *tag, XTAL xtal) :
+		driver_device(mconfig, type, tag),
+		m_riot_ram(*this, "riot_ram"),
+		m_tia(*this, "tia_video"),
+		m_maincpu(*this, "maincpu"),
+		m_riot(*this, "riot"),
+		m_joy1(*this, CONTROL1_TAG),
+		m_joy2(*this, CONTROL2_TAG),
+		m_screen(*this, "screen"),
+		m_xtal(xtal)
+	{ }
+
+	virtual void machine_start() override;
+
+	void a2600_mem(address_map &map);
+
+	void a2600_base_ntsc(machine_config &config);
+	void a2600_base_pal(machine_config &config);
+
+	void switch_A_w(uint8_t data);
+	uint8_t switch_A_r();
+	void switch_B_w(uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(irq_callback);
+	uint16_t a2600_read_input_port(offs_t offset);
+	uint8_t a2600_get_databus_contents(offs_t offset);
+	void a2600_tia_vsync_callback(uint16_t data);
+
+	required_shared_ptr<uint8_t> m_riot_ram;
+	required_device<tia_video_device> m_tia;
+	required_device<m6507_device> m_maincpu;
+#if USE_NEW_RIOT
+	required_device<mos6532_new_device> m_riot;
+#else
+	required_device<riot6532_device> m_riot;
+#endif
+	required_device<vcs_control_port_device> m_joy1;
+	required_device<vcs_control_port_device> m_joy2;
+	required_device<screen_device> m_screen;
+
+private:
+	uint16_t m_current_screen_height = 0U;
+	XTAL m_xtal;
+};
+
+
+class a2600_cons_state : public a2600_base_state
+{
+public:
+	a2600_cons_state(const machine_config &mconfig, device_type type, const char *tag, XTAL xtal) :
+		a2600_base_state(mconfig, type, tag, xtal),
+		m_cartslot(*this, "cartslot")
+	{ }
+
+protected:
+	void a2600_cartslot(machine_config &config);
+
+private:
+	required_device<vcs_cart_slot_device> m_cartslot;
+};
+
+
+class a2600_state : public a2600_cons_state
+{
+public:
+	a2600_state(const machine_config &mconfig, device_type type, const char *tag) :
+		a2600_cons_state(mconfig, type, tag, 3.579575_MHz_XTAL)
+	{ }
+
+	void a2600(machine_config &config);
+};
+
+
+class a2600p_state : public a2600_cons_state
+{
+public:
+	a2600p_state(const machine_config &mconfig, device_type type, const char *tag) :
+		a2600_cons_state(mconfig, type, tag, 3.546894_MHz_XTAL)
+	{ }
+
+	void a2600p(machine_config &config);
+};
+
+
+class a2600_pop_state : public a2600_base_state
+{
+public:
+	a2600_pop_state(const machine_config &mconfig, device_type type, const char *tag)
+		: a2600_base_state(mconfig, type, tag, 3.579545_MHz_XTAL)
+		, m_bank(*this, "bank")
+		, m_a8(*this, "A8")
+		, m_swb(*this, "SWB")
+	{ }
+
+	void a2600_pop(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	void memory_map(address_map &map);
+
+	uint8_t rom_switch_r(offs_t offset);
+	void rom_switch_w(offs_t offset, uint8_t data);
+	TIMER_CALLBACK_MEMBER(reset_timer_callback);
+	TIMER_CALLBACK_MEMBER(game_select_button_timer_callback);
+
+	required_memory_bank m_bank;
+	required_ioport m_a8;
+	required_ioport m_swb;
+	emu_timer *m_reset_timer = nullptr;
+	emu_timer *m_game_select_button_timer = nullptr;
+};
+
+class tvboy_state : public a2600_base_state
+{
+public:
+	tvboy_state(const machine_config &mconfig, device_type type, const char *tag)
+		: a2600_base_state(mconfig, type, tag, 3.546894_MHz_XTAL)
+		, m_crom(*this, "crom")
+		, m_rom(*this, "mainrom")
+	{ }
+
+	void tvboy(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	void bank_write(offs_t offset, uint8_t data);
+
+	void tvboy_mem(address_map &map);
+
+	required_memory_bank m_crom;
+	required_region_ptr<uint8_t> m_rom;
+};
 
 
 void a2600_base_state::a2600_mem(address_map &map) // 6507 has 13-bit address space, 0x0000 - 0x1fff
@@ -117,6 +292,13 @@ void a2600_pop_state::memory_map(address_map &map) // 6507 has 13-bit address sp
 	a2600_base_state::a2600_mem(map);
 	map(0x0800, 0x0800).rw(FUNC(a2600_pop_state::rom_switch_r), FUNC(a2600_pop_state::rom_switch_w));
 	map(0x1000, 0x1fff).bankr(m_bank);
+}
+
+void tvboy_state::tvboy_mem(address_map &map)
+{ // 6507 has 13-bit address space, 0x0000 - 0x1fff
+	a2600_base_state::a2600_mem(map);
+	map(0x1800, 0x1fff).w(FUNC(tvboy_state::bank_write));
+	map(0x1000, 0x1fff).bankr(m_crom);
 }
 
 
@@ -160,6 +342,12 @@ void a2600_pop_state::rom_switch_w(offs_t offset, uint8_t data)
 		}
 		m_reset_timer->adjust(reset_time);
 	}
+}
+
+void tvboy_state::bank_write(offs_t offset, uint8_t data)
+{
+	LOG("banking (?) write %04x, %02x\n", offset, data);
+	m_crom->set_entry(data);
 }
 
 
@@ -288,29 +476,14 @@ static const rectangle visarea[4] = {
 
 void a2600_base_state::a2600_tia_vsync_callback(uint16_t data)
 {
-	for ( int i = 0; i < std::size(supported_screen_heights); i++ )
+	for (int i = 0; i < std::size(supported_screen_heights); i++)
 	{
-		if ( data >= supported_screen_heights[i] - 3 && data <= supported_screen_heights[i] + 3 )
+		if (data >= supported_screen_heights[i] - 3 && data <= supported_screen_heights[i] + 3)
 		{
-			if ( supported_screen_heights[i] != m_current_screen_height )
+			if (supported_screen_heights[i] != m_current_screen_height)
 			{
 				m_current_screen_height = supported_screen_heights[i];
-//              m_screen->configure(228, m_current_screen_height, &visarea[i], HZ_TO_ATTOSECONDS( MASTER_CLOCK_NTSC ) * 228 * m_current_screen_height );
-			}
-		}
-	}
-}
-
-void a2600_base_state::a2600_tia_vsync_callback_pal(uint16_t data)
-{
-	for ( int i = 0; i < std::size(supported_screen_heights); i++ )
-	{
-		if ( data >= supported_screen_heights[i] - 3 && data <= supported_screen_heights[i] + 3 )
-		{
-			if ( supported_screen_heights[i] != m_current_screen_height )
-			{
-				m_current_screen_height = supported_screen_heights[i];
-//              m_screen->configure(228, m_current_screen_height, &visarea[i], HZ_TO_ATTOSECONDS( MASTER_CLOCK_PAL ) * 228 * m_current_screen_height );
+//              m_screen->configure(228, m_current_screen_height, visarea[i], HZ_TO_ATTOSECONDS(m_xtal) * 228 * m_current_screen_height);
 			}
 		}
 	}
@@ -324,6 +497,12 @@ void a2600_base_state::machine_start()
 	save_item(NAME(m_current_screen_height));
 }
 
+void tvboy_state::machine_start()
+{
+	a2600_base_state::machine_start();
+	m_crom->configure_entries(0, m_rom.bytes() / 0x1000, &m_rom[0], 0x1000);
+}
+
 void a2600_pop_state::machine_start()
 {
 	a2600_base_state::machine_start();
@@ -333,6 +512,12 @@ void a2600_pop_state::machine_start()
 	m_game_select_button_timer = timer_alloc(FUNC(a2600_pop_state::game_select_button_timer_callback), this);
 }
 
+
+void tvboy_state::machine_reset()
+{
+	m_crom->set_entry(0);
+	a2600_base_state::machine_reset();
+}
 
 void a2600_pop_state::machine_reset()
 {
@@ -362,7 +547,6 @@ static INPUT_PORTS_START( a2600 )
 	PORT_CONFSETTING(    0x00, "B" )
 INPUT_PORTS_END
 
-
 static INPUT_PORTS_START(a2600_pop)
 	PORT_START("SWB")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset Game") PORT_CODE(KEYCODE_2)
@@ -384,6 +568,15 @@ static INPUT_PORTS_START(a2600_pop)
 	PORT_DIPSETTING(0x02, "1 minute")
 	PORT_DIPSETTING(0x04, "30 seconds")
 	PORT_DIPSETTING(0x08, "Infinite")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tvboy )
+	PORT_INCLUDE( a2600 )
+
+	PORT_MODIFY("SWB")
+	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) // No TV Type switch, hard coded to Color
+	PORT_BIT ( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED ) // No Left Diff. switch, hard coded to B
+	PORT_BIT ( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) // No Right Diff. switch, hard coded to B
 INPUT_PORTS_END
 
 
@@ -415,7 +608,7 @@ static void a2600_cart(device_slot_interface &device)
 	device.option_add("a26_harmony",   A26_ROM_HARMONY);
 }
 
-void a2600_state::a2600_cartslot(machine_config &config)
+void a2600_cons_state::a2600_cartslot(machine_config &config)
 {
 	VCS_CART_SLOT(config, m_cartslot, a2600_cart, nullptr).set_must_be_loaded(true);
 	m_cartslot->set_address_space(m_maincpu, AS_PROGRAM);
@@ -428,7 +621,7 @@ void a2600_state::a2600_cartslot(machine_config &config)
 void a2600_base_state::a2600_base_ntsc(machine_config &config)
 {
 	/* basic machine hardware */
-	M6507(config, m_maincpu, MASTER_CLOCK_NTSC / 3);
+	M6507(config, m_maincpu, m_xtal / 3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &a2600_base_state::a2600_mem);
 
 	/* video hardware */
@@ -438,23 +631,65 @@ void a2600_base_state::a2600_base_ntsc(machine_config &config)
 	m_tia->vsync_callback().set(FUNC(a2600_state::a2600_tia_vsync_callback));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(MASTER_CLOCK_NTSC, 228, 26, 26 + 160 + 16, 262, 24 , 24 + 192 + 31);
+	m_screen->set_raw(m_xtal, 228, 26, 26 + 160 + 16, 262, 24 , 24 + 192 + 31);
 	m_screen->set_screen_update("tia_video", FUNC(tia_video_device::screen_update));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	TIA(config, "tia", MASTER_CLOCK_NTSC/114).add_route(ALL_OUTPUTS, "mono", 0.90);
+	TIA(config, "tia", m_xtal/114).add_route(ALL_OUTPUTS, "mono", 0.90);
 
 	/* devices */
 #if USE_NEW_RIOT
-	MOS6532_NEW(config, m_riot, MASTER_CLOCK_NTSC / 3);
+	MOS6532_NEW(config, m_riot, m_xtal / 3);
 	m_riot->pa_rd_callback().set(FUNC(a2600_state::switch_A_r));
 	m_riot->pa_wr_callback().set(FUNC(a2600_state::switch_A_w));
 	m_riot->pb_rd_callback().set_ioport("SWB");
 	m_riot->pb_wr_callback().set(FUNC(a2600_state::switch_B_w));
 	m_riot->irq_wr_callback().set(FUNC(a2600_state::irq_callback));
 #else
-	RIOT6532(config, m_riot, MASTER_CLOCK_NTSC / 3);
+	RIOT6532(config, m_riot, m_xtal / 3);
+	m_riot->in_pa_callback().set(FUNC(a2600_state::switch_A_r));
+	m_riot->out_pa_callback().set(FUNC(a2600_state::switch_A_w));
+	m_riot->in_pb_callback().set_ioport("SWB");
+	m_riot->out_pb_callback().set(FUNC(a2600_state::switch_B_w));
+	m_riot->irq_callback().set(FUNC(a2600_state::irq_callback));
+#endif
+
+	VCS_CONTROL_PORT(config, CONTROL1_TAG, vcs_control_port_devices, "joy");
+	VCS_CONTROL_PORT(config, CONTROL2_TAG, vcs_control_port_devices, "joy");
+}
+
+
+void a2600_base_state::a2600_base_pal(machine_config &config)
+{
+	/* basic machine hardware */
+	M6507(config, m_maincpu, m_xtal / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &a2600_state::a2600_mem);
+
+	/* video hardware */
+	TIA_PAL_VIDEO(config, m_tia, 0, "tia");
+	m_tia->read_input_port_callback().set(FUNC(a2600_state::a2600_read_input_port));
+	m_tia->databus_contents_callback().set(FUNC(a2600_state::a2600_get_databus_contents));
+	m_tia->vsync_callback().set(FUNC(a2600_state::a2600_tia_vsync_callback));
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(m_xtal, 228, 26, 26 + 160 + 16, 312, 32, 32 + 228 + 31);
+	m_screen->set_screen_update("tia_video", FUNC(tia_video_device::screen_update));
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	TIA(config, "tia", m_xtal/114).add_route(ALL_OUTPUTS, "mono", 0.90);
+
+	/* devices */
+#if USE_NEW_RIOT
+	MOS6532_NEW(config, m_riot, m_xtal / 3);
+	m_riot->pa_rd_callback().set(FUNC(a2600_state::switch_A_r));
+	m_riot->pa_wr_callback().set(FUNC(a2600_state::switch_A_w));
+	m_riot->pb_rd_callback().set_ioport("SWB");
+	m_riot->pb_wr_callback().set(FUNC(a2600_state::switch_B_w));
+	m_riot->irq_wr_callback().set(FUNC(a2600_state::irq_callback));
+#else
+	RIOT6532(config, m_riot, m_xtal / 3);
 	m_riot->in_pa_callback().set(FUNC(a2600_state::switch_A_r));
 	m_riot->out_pa_callback().set(FUNC(a2600_state::switch_A_w));
 	m_riot->in_pb_callback().set_ioport("SWB");
@@ -475,46 +710,9 @@ void a2600_state::a2600(machine_config &config)
 }
 
 
-void a2600_state::a2600p(machine_config &config)
+void a2600p_state::a2600p(machine_config &config)
 {
-	/* basic machine hardware */
-	M6507(config, m_maincpu, MASTER_CLOCK_PAL / 3);
-	m_maincpu->set_addrmap(AS_PROGRAM, &a2600_state::a2600_mem);
-
-	/* video hardware */
-	TIA_PAL_VIDEO(config, m_tia, 0, "tia");
-	m_tia->read_input_port_callback().set(FUNC(a2600_state::a2600_read_input_port));
-	m_tia->databus_contents_callback().set(FUNC(a2600_state::a2600_get_databus_contents));
-	m_tia->vsync_callback().set(FUNC(a2600_state::a2600_tia_vsync_callback_pal));
-
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(MASTER_CLOCK_PAL, 228, 26, 26 + 160 + 16, 312, 32, 32 + 228 + 31);
-	m_screen->set_screen_update("tia_video", FUNC(tia_video_device::screen_update));
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	TIA(config, "tia", MASTER_CLOCK_PAL/114).add_route(ALL_OUTPUTS, "mono", 0.90);
-
-	/* devices */
-#if USE_NEW_RIOT
-	MOS6532_NEW(config, m_riot, MASTER_CLOCK_PAL / 3);
-	m_riot->pa_rd_callback().set(FUNC(a2600_state::switch_A_r));
-	m_riot->pa_wr_callback().set(FUNC(a2600_state::switch_A_w));
-	m_riot->pb_rd_callback().set_ioport("SWB");
-	m_riot->pb_wr_callback().set(FUNC(a2600_state::switch_B_w));
-	m_riot->irq_wr_callback().set(FUNC(a2600_state::irq_callback));
-#else
-	RIOT6532(config, m_riot, MASTER_CLOCK_PAL / 3);
-	m_riot->in_pa_callback().set(FUNC(a2600_state::switch_A_r));
-	m_riot->out_pa_callback().set(FUNC(a2600_state::switch_A_w));
-	m_riot->in_pb_callback().set_ioport("SWB");
-	m_riot->out_pb_callback().set(FUNC(a2600_state::switch_B_w));
-	m_riot->irq_callback().set(FUNC(a2600_state::irq_callback));
-#endif
-
-	VCS_CONTROL_PORT(config, CONTROL1_TAG, vcs_control_port_devices, "joy");
-	VCS_CONTROL_PORT(config, CONTROL2_TAG, vcs_control_port_devices, "joy");
-
+	a2600_base_pal(config);
 	a2600_cartslot(config);
 	subdevice<software_list_device>("cart_list")->set_filter("PAL");
 }
@@ -527,13 +725,20 @@ void a2600_pop_state::a2600_pop(machine_config &config)
 }
 
 
+void tvboy_state::tvboy(machine_config &config)
+{
+	a2600_base_pal(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tvboy_state::tvboy_mem);
+}
+
+
 ROM_START(a2600)
 	ROM_REGION(0x2000, "maincpu", ROMREGION_ERASEFF)
 ROM_END
 
 #define rom_a2600p rom_a2600
 
-ROM_START( a2600_pop )
+ROM_START(a2600_pop)
 	ROM_REGION(0x30000, "maincpu", 0)
 	// Boot/Game selection
 	ROM_LOAD("136003_101.c6", 0x000, 0x800, CRC(9d3cfba6) SHA1(b84c34aaedd84fca30b6e8223ee062439acf4fe0))
@@ -607,12 +812,44 @@ ROM_START( a2600_pop )
 	// empty slots f1, j1, k1, l1, m1 ?
 ROM_END
 
+ROM_START(tvboy)
+	ROM_REGION(0x2000, "maincpu", ROMREGION_ERASEFF)
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY     FULLNAME */
-CONS( 1977, a2600,  0,      0,      a2600,   a2600, a2600_state, empty_init, "Atari",    "Atari 2600 (NTSC)" , MACHINE_SUPPORTS_SAVE )
-CONS( 1978, a2600p, a2600,  0,      a2600p,  a2600, a2600_state, empty_init, "Atari",    "Atari 2600 (PAL)",   MACHINE_SUPPORTS_SAVE )
+	ROM_REGION(0x80000, "mainrom", 0)
+	ROM_LOAD("tvboy.bin", 0x00000, 0x80000, CRC(2f3d1d52) SHA1(fb26778434fade4cec28f82c53db4cc2f23b8b2b))
+ROM_END
+
+ROM_START(tvboyii)
+	ROM_REGION(0x2000, "maincpu", ROMREGION_ERASEFF)
+
+	ROM_REGION(0x80000, "mainrom", 0)
+	// Games 57, 64, and 119 differ from tvboy with crc 2f3d1d52.
+	/* Game 29, Enduro, differs only in one LDA instruction at 0x179 (and then some shifted code).
+	   Here the LDA uses zero page while the original ROM and all other known versions use absolute addressing.
+	   Does this cause a timing issue? It appears bugged in MAME. Does it work on hardware? */
+	ROM_LOAD("hy23400p.bin", 0x00000, 0x80000, CRC(f8485173) SHA1(cafbaa0c5437f192cb4fb49f9a672846aa038870))
+ROM_END
+
+ROM_START( stvboy )
+	ROM_REGION(0x2000, "maincpu", ROMREGION_ERASEFF)
+
+	ROM_REGION(0x80000, "mainrom", 0)
+	// Only game 91 differs from tvboyii with crc f8485173. Otherwise the dumps are identical. Game 29, Enduro, has the same issue mentioned above.
+	ROM_LOAD("supertvboy.bin", 0x00000, 0x80000, CRC(af2e73e8) SHA1(04b9ddc3b30b0e5b81b9f868d455e902a0151491))
+ROM_END
+
+} // anonymous namespace
+
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY     FULLNAME
+CONS( 1977, a2600,  0,      0,      a2600,   a2600, a2600_state,  empty_init, "Atari",    "Atari 2600 (NTSC)",  MACHINE_SUPPORTS_SAVE )
+CONS( 1978, a2600p, a2600,  0,      a2600p,  a2600, a2600p_state, empty_init, "Atari",    "Atari 2600 (PAL)",   MACHINE_SUPPORTS_SAVE )
 
 // Released in 1981/1982
 // Games 35-42 are copyright 1982 and looking at the game list they seem to be
 // added later.
 GAME( 198?, a2600_pop, 0,      a2600_pop, a2600_pop, a2600_pop_state, empty_init, ROT0, "Atari",    "Atari 2600 Point of Purchase Display",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+
+// Clones
+CONS( 199?, tvboy,   0,     0,      tvboy,   tvboy, tvboy_state,  empty_init, "Systema?", "TV Boy (PAL)",       MACHINE_SUPPORTS_SAVE ) // It's unknown what unit this came from. It could be Akor instead?
+CONS( 199?, tvboyii, tvboy, 0,      tvboy,   tvboy, tvboy_state,  empty_init, "Systema",  "TV Boy II (PAL)",    MACHINE_SUPPORTS_SAVE )
+CONS( 1995, stvboy,  0,     0,      tvboy,   tvboy, tvboy_state,  empty_init, "Akor",     "Super TV Boy (PAL)", MACHINE_SUPPORTS_SAVE )
