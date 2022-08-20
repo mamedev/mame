@@ -33966,7 +33966,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="shinsend">
+<!-- Game crashes due to incorrect emulation of MMC1 reset writes. This happens when you select みる in the in-game command menu. -->
+	<software name="shinsend" supported="no">
 		<description>Shinsenden (Japan)</description>
 		<year>1989</year>
 		<publisher>Irem</publisher>
