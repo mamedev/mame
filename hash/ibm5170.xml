@@ -10975,6 +10975,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="classarc">
+		<description>Classics Arcade</description>
+		<year>1995</year>
+		<publisher>Impressions Software</publisher>
+		<notes>This pack includes: "Maze Craze", "Invaders", "Mine Trap", "Brick Buster", "Fighter Ace"</notes>
+		<info name="usage" value="Requires Windows 3.x" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Classics Arcade [Impressions] [1995] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="0c94a2a1" sha1="dc63331d32b4cd5a6927e1b9e84babb9a5a691f8"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="keen45">
 		<description>Commander Keen in Goodbye, Galaxy! (v1.4, EGA, 3.5")</description>
 		<year>1992</year>
@@ -13797,6 +13810,40 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Gods [Renegade Software] [1991] [3.5HD].img" size="1474560" crc="ac47d483" sha1="8c1767c96fc5b881a7145d6bcf68a75bf4281e66"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grdchess">
+		<description>Grandmaster Chess</description>
+		<year>1992</year>
+		<publisher>Capstone</publisher>
+		<info name="developer" value="Capstone Software" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Grandmaster Chess [Capstone] [1992] [5.25HD] [Disk 1 of 2].img" size="1228800" crc="350d276f" sha1="b91f8fa55f5638392a9ec691508344de97b4b9b7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Grandmaster Chess [Capstone] [1992] [5.25HD] [Disk 2 of 2].img" size="1228800" crc="621a555a" sha1="2399abefbb4897f3b5ddfd91d33caaaaaf21d98f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grdchessdx">
+		<description>Grandmaster Chess Deluxe</description>
+		<year>1993</year>
+		<publisher>Capstone</publisher>
+		<info name="developer" value="Capstone Software" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Grandmaster Chess Deluxe [Capstone] [1993] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="59997f01" sha1="4287f94d9f939a83e6001c16aaa59b2bc6e917ec"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Grandmaster Chess Deluxe [Capstone] [1993] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="5fdfbe9e" sha1="ea2e8bee41c5c2449cd5ca57ffc6f539c9ec0216"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16677,11 +16724,11 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Includes: Asteroids, Battlezone, Centipede, Missile Command, Tempest -->
 	<software name="msarcade">
 		<description>Microsoft Arcade</description>
 		<year>1993</year>
 		<publisher>Microsoft</publisher>
+		<notes>This pack includes: "Asteroids", "Battlezone", "Centipede", "Missile Command", "Tempest"</notes>
 		<info name="usage" value="Requires Windows 3.x" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -16690,11 +16737,11 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- This pack includes: Tetris, Minesweeper, Cruel, Golf, TicTactics, Taipei, Pegged, IdleWild -->
 	<software name="msentp1">
 		<description>Microsoft Entertainment Pack</description>
 		<year>1990</year>
 		<publisher>Microsoft</publisher>
+		<notes>This pack includes: "Tetris", "Minesweeper", "Cruel", "Golf", "TicTactics", "Taipei", "Pegged", "IdleWild"</notes>
 		<info name="usage" value="Requires Windows 3.x" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -16703,11 +16750,11 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- This pack includes: FreeCell, JigSawed, Pipe Dream, Rodent's Revenge, RattlerRace, Stones, Tut's Tomb, IdleWild -->
 	<software name="msentp2">
 		<description>Microsoft Entertainment Pack 2</description>
 		<year>1991</year>
 		<publisher>Microsoft</publisher>
+		<notes>This pack includes: "FreeCell", "JigSawed", "Pipe Dream", "Rodent's Revenge", "RattlerRace", "Stones", "Tut's Tomb", "IdleWild"</notes>
 		<info name="usage" value="Requires Windows 3.x" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -16721,11 +16768,11 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- This pack includes: Fuji Golf, Klotski, LifeGenesis, SkieFree, TetraVex, TriPeaks, WordZap, IdleWild -->
 	<software name="msentp3">
 		<description>Microsoft Entertainment Pack 3</description>
 		<year>1991</year>
 		<publisher>Microsoft</publisher>
+		<notes>This pack includes: "Fuji Golf", "Klotski", "LifeGenesis", "SkieFree", "TetraVex", "TriPeaks", "WordZap", "IdleWild"</notes>
 		<info name="usage" value="Requires Windows 3.x" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -16734,11 +16781,11 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- This pack includes: JezzBall, Maxwell's Maniac, Chip's Challenge, Dr. Black Jack, Tic Tac Drop, Go Figure!, Chess -->
 	<software name="msentp4">
 		<description>Microsoft Entertainment Pack 4</description>
 		<year>1992</year>
 		<publisher>Microsoft</publisher>
+		<notes>This pack includes: "JezzBall", "Maxwell's Maniac", "Chip's Challenge", "Dr. Black Jack", "Tic Tac Drop", "Go Figure!", "Chess"</notes>
 		<info name="usage" value="Requires Windows 3.x" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -17376,6 +17423,34 @@ license:CC0
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="737280">
 				<rom name="Nigel Mansell [Gremlin] [1993] [3.5DD] [Disk 2 of 2] [Disk B].img" size="737280" crc="9c80246e" sha1="38b2ab121dcbf9ede927724a998a10f88379c35c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nomad">
+		<description>Nomad</description>
+		<year>1994</year>
+		<publisher>GameTek</publisher>
+		<info name="developer" value="Intense! Interactive, Inc. / Papyrus Design Group, Inc." />
+		<info name="version" value="v1.01.00" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="nomad [GameTek] [1994] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="dd7a6e92" sha1="74e5a45c84e2d5133970c57148c191d3de6dd522"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="nomad [GameTek] [1994] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="04a550ad" sha1="e4f4912eba6e08bc1c5eace115bd2698ba4e539e"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="nomad [GameTek] [1994] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="239bca6a" sha1="cb673dae5e1fd532d2795d6e191a682c698c3f4f"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="nomad [GameTek] [1994] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="9c424b49" sha1="e172fc07c02b1776f95f206bfa44cff242c96ddb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21629,15 +21704,266 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- PC Gamer (Germany) -->
+	<!-- PC Format (UK) -->
+
+	<software name="pcf199309">
+		<description>PC Format (Issue 24 - September 1993)</description>
+		<year>1993</year>
+		<publisher>Future Publishing</publisher>
+		<notes>Disk includes: "The (even more) Incredible Machine (demo)", "Neopaint 2 (demo)"</notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="PC Format (Issue 24 - September 1993) [Future] [1993] [3.5DD] [Disk 1 of 1].img" size="737280" crc="d7dd77d6" sha1="4465f6ce0e7f44aed6ed390ce4023888956483d0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcf199311">
+		<description>PC Format (Issue 26 - November 1993)</description>
+		<year>1993</year>
+		<publisher>Future Publishing</publisher>
+		<notes>Disk includes: "Oscar (demo)", "Body Blows (demo)"</notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="PC Format (Issue 26 - November 1993) [Future] [1993] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="b6b50526" sha1="f1b79e348a57d5754530b8ae333f988b94c0f6f1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcf199408">
+		<description>PC Format (Issue 35 - August 1994)</description>
+		<year>1994</year>
+		<publisher>Future Publishing</publisher>
+		<notes>Disk 2 includes: "Ishar 3 (demo)", "The Pianist (demo)"</notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="PC Format (Issue 35 - August 1994) [Future] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" status="nodump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="PC Format (Issue 35 - August 1994) [Future] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="5d3283a0" sha1="fdaebf1eb5417777308a2239bb8c9bb31d24b44b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcf199509">
+		<description>PC Format (Issue 48 - September 1995)</description>
+		<year>1995</year>
+		<publisher>Future Publishing</publisher>
+		<notes><![CDATA[
+Disk 2 includes: "Player Manager 2 (demo)""
+Disk 3 includes: "Media8or 2 (shareware)"
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="PC Format (Issue 48 - September 1995) [Future] [1995] [3.5HD] [Disk 1 of 3].img" size="1474560" status="nodump"/>
+			</dataarea>
+		</part>
+		<!-- Disks are marked as "Bad Dump" because both have modified OEM ID -->
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="PC Format (Issue 48 - September 1995) [Future] [1995] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="4ce4a648" sha1="cc20af2478e16c19987d9b32410e2fe5db459ae4" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="PC Format (Issue 48 - September 1995) [Future] [1995] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="5d3230d8" sha1="fb0ecf8c3cb81c013911a4b82267dc369888af73" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- PC Gamer (UK) -->
+
+	<software name="pcg199312">
+		<description>PC Gamer (UK) (Vol. 01 № 01 - December 1993)</description>
+		<year>1993</year>
+		<publisher>Future Publishing</publisher>
+		<notes><![CDATA[
+Disk 1 includes: "Beneath a Steel Sky (demo)", "Micro Machines (demo)"
+Disk 2 includes: "Krusty's Super Funhouse (demo)", "Subwar 2050 (demo)", "Graham Gooch World Class Cricket (demo)"
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="PC Gamer (Vol.01 N.01 - December 1993) [Future] [1993] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="e92ac224" sha1="4fab08e30ff3a13a259018dd207e7ea4263892a9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="PC Gamer (Vol.01 N.01 - December 1993) [Future] [1993] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="a4ab6e55" sha1="01dbdbfc2e8ca500b705cba0ec4f0e923618aa74"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- The installation setup resets the machine -->
+	<software name="pcg199401" supported="no">
+		<description>PC Gamer (UK) (Vol. 01 № 02 - January 1994)</description>
+		<year>1994</year>
+		<publisher>Future Publishing</publisher>
+		<notes>Disk includes: "Terminator: Rampage (demo)"</notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="PC Gamer (Vol.01 N.02 - January 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="cda7e234" sha1="8eb289edfbc32bce318be6e549a980a3568d6a1e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcg199402">
+		<description>PC Gamer (UK) (Vol. 01 № 03 - February 1994)</description>
+		<year>1994</year>
+		<publisher>Future Publishing</publisher>
+		<notes>Disk includes: "NFL Coaches Club Football! (demo)"</notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="PC Gamer (Vol.01 N.03 - February 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="8144a298" sha1="70c831b469690413dc03eacfccd05c28530a8556"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcg199403">
+		<description>PC Gamer (UK) (Vol. 01 № 04 - March 1994)</description>
+		<year>1994</year>
+		<publisher>Future Publishing</publisher>
+		<notes>Disk 1 includes: "Sid &amp; Al's Incredible Toons (demo)"</notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="PC Gamer (Vol.01 N.04 - March 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="77718485" sha1="59404805c54565dbc744d04afa048702344334cc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcg199404">
+		<description>PC Gamer (UK) (Vol. 01 № 05 - April 1994)</description>
+		<year>1994</year>
+		<publisher>Future Publishing</publisher>
+		<notes><![CDATA[
+Disk 1 includes: "UFO - Enemy Unknown (demo)"
+Disk 2 includes: "DragonSphere (demo)"
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="PC Gamer (Vol.01 N.05 - April 1994) [Future] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="ad8cc33b" sha1="1b4fe82dcc85338675ab2faa1b35588266e9e32f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="PC Gamer (Vol.01 N.05 - April 1994) [Future] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="11265b52" sha1="7a860562efb188641f9f6af8ce8c907e003a61c8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcg199406">
+		<description>PC Gamer (UK) (Vol. 01 № 07 - June 1994)</description>
+		<year>1994</year>
+		<publisher>Future Publishing</publisher>
+		<notes><![CDATA[
+Disk 1 includes: "Theme Park (demo)"
+Disk 2 includes: "Star Hammer (demo)", "Slicks'N'Slides (demo)", "Doom Party Pack! (DOOM add-on)"
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="PC Gamer (Vol.01 N.07 - June 1994) [Future] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="14119f8f" sha1="ec12488229b55d7cf0919ee8eda6fa18c4bc8e6c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="PC Gamer (Vol.01 N.07 - June 1994) [Future] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="ad355643" sha1="7520cd900a480606b4746665eb26d9a9927d22e4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Both disks have modified access files -->
+	<software name="pcg199509">
+		<description>PC Gamer (UK) (Vol. 02 № 10 - September 1995)</description>
+		<year>1995</year>
+		<publisher>Future Publishing</publisher>
+		<notes><![CDATA[
+Disk 1 includes: "Pinball Illusions (demo)"
+Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX Spectrum)", "The BogeyMan"
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="PC Gamer (Vol.02 N.10 - September 1995) [Future] [1995] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="b683ecef" sha1="0a8ba56b5578744e721dffc55bdc9a0b7d99398c" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="PC Gamer (Vol.02 N.10 - September 1995) [Future] [1995] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="f082cb04" sha1="524281ab7c46c007cf3d24e0818c48c7b37b81c0" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- PC Gamer (USA) -->
+
+	<software name="pcgus199405">
+		<description>PC Gamer (USA) (Vol. 01 № 01 - May-June 1994)</description>
+		<year>1994</year>
+		<publisher>Future Publishing</publisher>
+		<notes>Disk includes: "Theme Park (demo)"</notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="PC Gamer US (Vol.01 N.01 - May-June 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="f8b77e7c" sha1="ae5d4e92269e5100724620a5ef7250917efb65e7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcgus199408">
+		<description>PC Gamer (USA) (Vol. 01 № 03 - August 1994)</description>
+		<year>1994</year>
+		<publisher>Future Publishing</publisher>
+		<notes>Disk includes: "Detroit (demo)"</notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="PC Gamer US (Vol.01 N.03 - August 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="6ccf97f5" sha1="77cbe83d386f86b392948e8b44d8a1fd349be548"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcgus199409">
+		<description>PC Gamer (USA) (Vol. 01 № 04 - September 1994)</description>
+		<year>1994</year>
+		<publisher>Future Publishing</publisher>
+		<notes>Disk includes: "CyClones (demo)"</notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="PC Gamer US (Vol.01 N.04 - September 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="682267ce" sha1="9d848bf6b48411a1ccaf611e3f0fcce08270315e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcgus199411">
+		<description>PC Gamer (USA) (Vol. 01 № 06 - November 1994)</description>
+		<year>1994</year>
+		<publisher>Future Publishing</publisher>
+		<notes>Disk includes: "Blackthorne (demo)"</notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="PC Gamer US (Vol.01 N.06 - November 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="44ebe165" sha1="acbca88be7c17798e6e00fe7587a976fda53ed54" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcgus199503">
+		<description>PC Gamer (USA) (Vol. 02 № 03 - March 1995)</description>
+		<year>1995</year>
+		<publisher>Future Publishing</publisher>
+		<notes>Disk includes: "The Incredible Machine 2 (demo)"</notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="PC Gamer US (Vol.02 N.03 - March 1995) [Future] [1995] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="427f7100" sha1="79c390edc51d4041de514ec8faf71716536c9702"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- PC Games (Germany) -->
 	<!-- October 1992 undumped
 	    <info name="Contents" value="Soul Magican / Atom Demo" />
 	-->
 
 	<software name="pcga9211">
-		<description>PC Games Coverdisk (November 1992) (German)</description>
+		<description>PC Games (coverdisk 1992/11 - November 1992) (Germany)</description>
 		<year>1992</year>
-		<publisher>PC Games</publisher>
+		<publisher>Computec</publisher>
 		<info name="contents" value="Gobliins 2 Demo" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -21651,9 +21977,9 @@ license:CC0
 	-->
 
 	<software name="pcga9301">
-		<description>PC Games Coverdisk (January 1993) (German)</description>
+		<description>PC Games (coverdisk 1993/01 - January 1993) (Germany)</description>
 		<year>1993</year>
-		<publisher>PC Games</publisher>
+		<publisher>Computec</publisher>
 		<info name="contents" value="History-Line 1914-1918 Demo" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -21663,9 +21989,9 @@ license:CC0
 	</software>
 
 	<software name="pcga9302">
-		<description>PC Games Coverdisk (February 1993) (German)</description>
+		<description>PC Games (coverdisk 1993/02 - February 1993) (Germany)</description>
 		<year>1993</year>
-		<publisher>PC Games</publisher>
+		<publisher>Computec</publisher>
 		<info name="contents" value="Oxyd Demo" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -21687,9 +22013,9 @@ license:CC0
 	-->
 
 	<software name="pcga9306">
-		<description>PC Games Coverdisk (June 1993) (German)</description>
+		<description>PC Games (coverdisk 1993/06 - June 1993) (Germany)</description>
 		<year>1993</year>
-		<publisher>PC Games</publisher>
+		<publisher>Computec</publisher>
 		<info name="contents" value="Skat 2010 Demo" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -21699,9 +22025,9 @@ license:CC0
 	</software>
 
 	<software name="pcga9307">
-		<description>PC Games Coverdisk (July 1993) (German)</description>
+		<description>PC Games (coverdisk 1993/07 - July 1993) (Germany)</description>
 		<year>1993</year>
-		<publisher>PC Games</publisher>
+		<publisher>Computec</publisher>
 		<info name="contents" value="Syndicate Demo" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -21711,9 +22037,9 @@ license:CC0
 	</software>
 
 	<software name="pcga9308">
-		<description>PC Games Coverdisk (August 1993) (German)</description>
+		<description>PC Games (coverdisk 1993/08 - August 1993) (Germany)</description>
 		<year>1993</year>
-		<publisher>PC Games</publisher>
+		<publisher>Computec</publisher>
 		<info name="contents" value="Pinball Dreams Demo" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -21727,9 +22053,9 @@ license:CC0
 	-->
 
 	<software name="pcga9310">
-		<description>PC Games Coverdisk (October 1993) (German)</description>
+		<description>PC Games (coverdisk 1993/10 - October 1993) (Germany)</description>
 		<year>1993</year>
-		<publisher>PC Games</publisher>
+		<publisher>Computec</publisher>
 		<info name="contents" value="The Lost Vikings Demo" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -21751,9 +22077,9 @@ license:CC0
 	-->
 
 	<software name="pcga9402">
-		<description>PC Games Coverdisk (February 1994) (German)</description>
+		<description>PC Games (coverdisk 1994/02 - February 1994) (Germany)</description>
 		<year>1993</year>
-		<publisher>PC Games</publisher>
+		<publisher>Computec</publisher>
 		<info name="contents" value="Magic Boy / Oxyd Magnum Demo" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -21767,9 +22093,9 @@ license:CC0
 	-->
 
 	<software name="pcga9404">
-		<description>PC Games Coverdisk (April 1994) (German)</description>
+		<description>PC Games (coverdisk 1994/04 - April 1994) (Germany)</description>
 		<year>1993</year>
-		<publisher>PC Games</publisher>
+		<publisher>Computec</publisher>
 		<info name="contents" value="Beneath a Steel Sky Demo" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -21779,9 +22105,9 @@ license:CC0
 	</software>
 
 	<software name="pcga9405">
-		<description>PC Games Coverdisk (May 1994) (German)</description>
+		<description>PC Games (coverdisk 1994/05 - May 1994) (Germany)</description>
 		<year>1993</year>
-		<publisher>PC Games</publisher>
+		<publisher>Computec</publisher>
 		<info name="contents" value="Mad News Demo" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -21791,9 +22117,9 @@ license:CC0
 	</software>
 
 	<software name="pcga9406">
-		<description>PC Games Coverdisk (June 1994) (German)</description>
+		<description>PC Games (coverdisk 1994/06 - June 1994) (Germany)</description>
 		<year>1993</year>
-		<publisher>PC Games</publisher>
+		<publisher>Computec</publisher>
 		<info name="contents" value="Die Siedler Demo" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -21827,13 +22153,46 @@ license:CC0
 	-->
 
 	<software name="pcga9501">
-		<description>PC Games Coverdisk (January 1995) (German)</description>
+		<description>PC Games (coverdisk 1995/01 - January 1995) (Germany)</description>
 		<year>1993</year>
-		<publisher>PC Games</publisher>
+		<publisher>Computec</publisher>
 		<info name="contents" value="Universe / Cheat it Demo" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames01-95.img" size="737280" crc="12e12534" sha1="091393557c281cc2e659b8fd089e9b98845a5dec" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- PC Review (UK) -->
+
+	<software name="pcr199205">
+		<description>PC Review (Issue 07 - May 1992)</description>
+		<year>1992</year>
+		<publisher>EMAP Images</publisher>
+		<notes>Disk includes: "Another World (demo)", "Time Lord (demo)", "Aces of the Pacific (preview pictures)"</notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="PC Review (Issue 07 - May 1992) [EMAP] [1992] [3.5DD] [Disk 1 of 1].img" size="737280" crc="f6db2032" sha1="82a5cb528c7e6ba08f0daf0e981119ec2ff16bc8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcr199311">
+		<description>PC Review (Issue 25 - November 1993)</description>
+		<year>1993</year>
+		<publisher>EMAP Images</publisher>
+		<notes>Disk includes: "Ancients: Death Watch (demo)"</notes>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="737280">
+				<rom name="PC Review (Issue 25 - November 1993) [EMAP] [1993] [3.5DD] [Disk 1 of 2].img" size="737280" status="nodump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="737280">
+				<rom name="PC Review (Issue 25 - November 1993) [EMAP] [1993] [3.5DD] [Disk 2 of 2].img" size="737280" crc="4a9a0844" sha1="c60ea6ad006b0fc23abc24fd45e6f19634a6f7c5"/>
 			</dataarea>
 		</part>
 	</software>

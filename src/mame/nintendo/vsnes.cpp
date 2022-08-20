@@ -83,8 +83,8 @@ Needed roms:
 - Family Stadium '88         (by Namco, 1988; sequel to RBI Baseball)
 - Family Tennis              (by Namco, 1987)
 - Head to Head Baseball      (ever finished/released?, by Nintendo, 1986)
-- Lionex                     (prototype by Sunsoft, 1987)
-- Madura no Tsubasa          (prototype by Sunsoft, 1987)
+- Lionex                     (prototype by Sun Electronics, 1986, DRGN-D board, unreleased dump exists)
+- The Wings of Madoola       (prototype by Sun Electronics, 1987, DRGN-D board, unreleased dump exists)
 - Pro Yakyuu Family Stadium  (by Namco, 1986; Japan version of RBI Baseball)
 - Quest of Ki                (by Namco/Game Studio, 1988)
 - Super Chinese              (by Namco/Culture Brain, 1988)
@@ -94,6 +94,9 @@ Needed roms:
 - Volleyball                 (1986)
 - Walkure no Bouken          (by Namco, 1986)
 - Wild Gunman                (1984, light gun game)
+
+BTANB:
+    - Coin sound clipped when first coin is inserted in VS. Castlevania.
 
 TO DO:
     - Merge mapper implementations with playch10, NES, etc
@@ -1428,7 +1431,8 @@ Lose Hole   -1  -2
 	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )
 INPUT_PORTS_END
 
-/* Same as 'golf', but 4 start buttons */
+// Same as 'golf', but 4 start buttons
+// FIXME: since UniSystems only have P1/P2 start buttons this implies the golf4s versions are for DualSystem only
 static INPUT_PORTS_START( golf4s )
 	PORT_INCLUDE( golf )
 
@@ -1474,10 +1478,10 @@ static INPUT_PORTS_START( vstennis )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( Free_Play ) )
 	PORT_DIPNAME( 0x18, 0x08, "Game Mode - Credits: 1VsC/2VsC/1Vs1/2Vs2" )  PORT_DIPLOCATION("SW2:!4,!5")
-	PORT_DIPSETTING(    0x00, "A - 1/1/1/1" )
-	PORT_DIPSETTING(    0x10, "B - 1/2/1/2" )
-	PORT_DIPSETTING(    0x08, "C - 2/2/2/2" )
-	PORT_DIPSETTING(    0x18, "D - 2/2/4/4" )
+	PORT_DIPSETTING(    0x00, "A - 1/1/2/2" )
+	PORT_DIPSETTING(    0x10, "B - 1/2/2/2" )
+	PORT_DIPSETTING(    0x08, "C - 1/1/2/4" )
+	PORT_DIPSETTING(    0x18, "D - 1/2/2/4" )
 	PORT_DIPNAME( 0x60, 0x00, "Rackets Per Game" )      PORT_DIPLOCATION("SW2:!6,!7")
 	PORT_DIPSETTING(    0x60, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
@@ -1664,55 +1668,6 @@ static INPUT_PORTS_START( vsbball )
 
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( vsbballj )
-	PORT_INCLUDE( vsnes_dual )
-
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
-	PORT_DIPNAME( 0x03, 0x02, "Player Defense Strength" )   PORT_DIPLOCATION("SW1:!1,!2")
-	PORT_DIPSETTING(    0x00, "Weak" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x03, "Strong" )
-	PORT_DIPNAME( 0x0c, 0x08, "Player Offense Strength" )   PORT_DIPLOCATION("SW1:!3,!4")
-	PORT_DIPSETTING(    0x00, "Weak" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x0c, "Strong" )
-	PORT_DIPNAME( 0x30, 0x20, "Computer Defense Strength" ) PORT_DIPLOCATION("SW1:!5,!6")
-	PORT_DIPSETTING(    0x00, "Weak" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x30, "Strong" )
-	PORT_DIPNAME( 0xc0, 0x80, "Computer Offense Strength" ) PORT_DIPLOCATION("SW1:!7,!8")
-	PORT_DIPSETTING(    0x00, "Weak" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0xc0, "Strong" )
-
-	PORT_START("DSW1")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
-	PORT_SERVICE( 0x01, IP_ACTIVE_HIGH )            PORT_DIPLOCATION("SW2:!1")
-	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW2:!2,!3")
-	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x38, 0x00, "Starting Points" )       PORT_DIPLOCATION("SW2:!4,!5,!6")
-	PORT_DIPSETTING(    0x00, "80 Pts" )
-	PORT_DIPSETTING(    0x20, "100 Pts" )
-	PORT_DIPSETTING(    0x10, "150 Pts" )
-	PORT_DIPSETTING(    0x30, "200 Pts" )
-	PORT_DIPSETTING(    0x08, "250 Pts" )
-	PORT_DIPSETTING(    0x28, "300 Pts" )
-	PORT_DIPSETTING(    0x18, "350 Pts" )
-	PORT_DIPSETTING(    0x38, "400 Pts" )
-	PORT_DIPNAME( 0x40, 0x00, "Bonus Play" )        PORT_DIPLOCATION("SW2:!7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:!8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-INPUT_PORTS_END
-
 /* iceclmrj has dual inputs reversed! */
 static INPUT_PORTS_START( iceclmrj )
 	PORT_INCLUDE( vsnes_dual_rev )
@@ -1852,7 +1807,9 @@ static INPUT_PORTS_START( cluclu )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( Free_Play ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:!4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW1:!5" )
+	PORT_DIPNAME( 0x10, 0x10, "Credits for 2 Players" ) PORT_DIPLOCATION("SW1:!5")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x10, "2" )
 	PORT_DIPNAME( 0x60, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!6,!7")
 	PORT_DIPSETTING(    0x60, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
@@ -2251,8 +2208,10 @@ static INPUT_PORTS_START( vsskykid )
 //  PORT_DIPSETTING(    0xe0, "RP2C03" )
 INPUT_PORTS_END
 
+// In US Pinball both P1/P2 B buttons move left flipper, both A buttons move right flipper. All four operate the plunger.
+// In JP Pinball both P1 B/A buttons move left flipper, both P2 B/A move right flipper. Both A buttons operate the plunger.
 static INPUT_PORTS_START( vspinbal )
-	PORT_INCLUDE( vsnes )
+	PORT_INCLUDE( vsnes_rev )
 
 	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
 	PORT_DIPNAME( 0x07, 0x01, DEF_STR( Coinage ) )
@@ -2278,18 +2237,6 @@ static INPUT_PORTS_START( vspinbal )
 	PORT_DIPNAME( 0x80, 0x00, "Ball speed" )        PORT_DIPLOCATION("SW1:!8")
 	PORT_DIPSETTING(    0x00, "Slow" )
 	PORT_DIPSETTING(    0x80, "Fast" )
-INPUT_PORTS_END
-
-/* Same as 'vspinbal', but different buttons mapping */
-static INPUT_PORTS_START( vspinblj )
-	PORT_INCLUDE( vspinbal )
-
-	PORT_MODIFY("IN0")  /* IN0 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)        /* Right flipper */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
-
-	PORT_MODIFY("IN1")  /* IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)        /* Left flipper */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( goonies )
@@ -2406,7 +2353,7 @@ static INPUT_PORTS_START( vsslalom )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( starlstr )
-	PORT_INCLUDE( vsnes_dual )
+	PORT_INCLUDE( vsnes )
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!1,!2")
@@ -2426,9 +2373,6 @@ static INPUT_PORTS_START( starlstr )
 	PORT_DIPSETTING(    0xa0, "RP2C04-0003" )
 //  PORT_DIPSETTING(    0xc0, "RP2C03" )
 	PORT_DIPSETTING(    0xe0, "RP2C04-0004" )
-
-	PORT_START("DSW1")  /* no DSW1? */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tkoboxng )
@@ -2530,9 +2474,13 @@ static INPUT_PORTS_START( supxevs )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x00, "SW1:!1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x00, "SW1:!2" )
+	PORT_START("DSW0")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:!1")
+	PORT_DIPSETTING(    0x00, "50000" ) // and every ?
+	PORT_DIPSETTING(    0x01, "70000" ) // and every ?
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!2")
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW1:!3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:!4" )
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!5,!6")
@@ -3682,13 +3630,13 @@ GAME( 1986, suprmriobl2,    suprmrio,      vs_smbbl,      suprmrio, vs_smbbl_sta
 GAME( 1988, skatekds,       suprmrio,      vsnes,         suprmrio, vs_uni_state,   init_vsnormal, ROT0, "hack (Two-Bit Score)",   "Vs. Skate Kids. (Graphic hack of Super Mario Bros.)",      0 )
 GAME( 1985, vsskykid,       0,             vsnes,         vsskykid, vs_uni_state,   init_vs108,    ROT0, "Namco",                  "Vs. Super SkyKid",                                         0 )
 GAME( 1987, tkoboxng,       0,             vsnes,         tkoboxng, vs_uni_state,   init_tkoboxng, ROT0, "Namco / Data East USA",  "Vs. T.K.O. Boxing",                                        0 )
-GAME( 1984, smgolf,         0,             vsnes,         golf4s,   vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Men Version, set GF4-2 F)",       0 )
-GAME( 1984, smgolfb,        smgolf,        vsnes,         golf,     vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Men Version, set GF4-2 ?)",       0 )
+GAME( 1984, smgolf,         0,             vsnes,         golf,     vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Men Version, set GF4-2 F)",       0 )
+GAME( 1984, smgolfb,        smgolf,        vsnes,         golf4s,   vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Men Version, set GF4-2 ?)",       0 )
 GAME( 1984, smgolfj,        smgolf,        vsnes,         golf,     vs_uni_state,   init_vsnormal, ROT0, "Nintendo Co., Ltd.",     "Vs. Stroke & Match Golf (Men Version) (Japan, set GF3 B)", 0 )
-GAME( 1984, ladygolfe,      smgolf,        vsnes,         golf,     vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Ladies Version, set LG4 E)",      0 )
+GAME( 1984, ladygolfe,      smgolf,        vsnes,         golf4s,   vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Ladies Version, set LG4 E)",      0 )
 GAME( 1984, ladygolf,       smgolf,        vsnes,         golf,     vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Ladies Version, set LG4 ?)",      0 )
 GAME( 1984, vspinbal,       0,             vsnes,         vspinbal, vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Pinball (US, set PN4 E-1)",                            0 )
-GAME( 1984, vspinbalj,      vspinbal,      vsnes,         vspinblj, vs_uni_state,   init_vsnormal, ROT0, "Nintendo Co., Ltd.",     "Vs. Pinball (Japan, set PN3 B)",                           0 )
+GAME( 1984, vspinbalj,      vspinbal,      vsnes,         vspinbal, vs_uni_state,   init_vsnormal, ROT0, "Nintendo Co., Ltd.",     "Vs. Pinball (Japan, set PN3 B)",                           0 )
 GAME( 1986, vsslalom,       0,             vsnes,         vsslalom, vs_uni_state,   init_vsnormal, ROT0, "Rare Coin-It Inc.",      "Vs. Slalom",                                               MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1985, vssoccer,       0,             vsnes,         vssoccer, vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Soccer (set SC4-2 A)",                                 0 )
 GAME( 1985, vssoccera,      vssoccer,      vsnes,         vssoccer, vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Soccer (set SC4-3 ?)",                                 0 )
@@ -3715,7 +3663,7 @@ GAME( 1984, wrecking,       0,             vsdual,        wrecking, vs_dual_stat
 GAME( 1984, balonfgt,       0,             vsdual,        balonfgt, vs_dual_state,  init_vsdual,   ROT0, "Nintendo",               "Vs. Balloon Fight (set BF4 A-3)",      0 )
 GAME( 1984, vsmahjng,       0,             vsdual,        vsmahjng, vs_dual_state,  init_vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Mahjong (Japan)",                  0 )
 GAME( 1984, vsbball,        0,             vsdual,        vsbball,  vs_dual_state,  init_vsdual,   ROT0, "Nintendo of America",    "Vs. Baseball (US, set BA E-1)",        0 )
-GAME( 1984, vsbballj,       vsbball,       vsdual,        vsbballj, vs_dual_state,  init_vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Baseball (Japan, set BA A-3)",     0 )
-GAME( 1984, vsbballja,      vsbball,       vsdual,        vsbballj, vs_dual_state,  init_vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Baseball (Japan, set BA A-2)",     0 )
-GAME( 1984, vsbballjb,      vsbball,       vsdual,        vsbballj, vs_dual_state,  init_vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Baseball (Japan, set BA A-1)",     0 )
+GAME( 1984, vsbballj,       vsbball,       vsdual,        vsbball,  vs_dual_state,  init_vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Baseball (Japan, set BA A-3)",     0 )
+GAME( 1984, vsbballja,      vsbball,       vsdual,        vsbball,  vs_dual_state,  init_vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Baseball (Japan, set BA A-2)",     0 )
+GAME( 1984, vsbballjb,      vsbball,       vsdual,        vsbball,  vs_dual_state,  init_vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Baseball (Japan, set BA A-1)",     0 )
 GAME( 1984, iceclmrd,       0,             vsdual,        iceclmrj, vs_dual_state,  init_vsdual,   ROT0, "Nintendo",               "Vs. Ice Climber Dual (set IC4-4 A-1)", 0 )

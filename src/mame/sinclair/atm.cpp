@@ -81,6 +81,7 @@ private:
 	void atm_port_ffff_w(offs_t offset, u8 data);
 	void atm_port_ff77_w(offs_t offset, u8 data);
 	void atm_port_fff7_w(offs_t offset, u8 data);
+	void atm_port_eff7_w(offs_t offset, u8 data);
 	void atm_port_7ffd_w(offs_t offset, u8 data);
 
 	void atm_io(address_map &map);
@@ -125,15 +126,12 @@ void atm_state::atm_update_memory()
 	LOGMEM("7FFD.%d = %X:", BIT(m_port_7ffd_data, 4), (m_port_7ffd_data & 0x07));
 	for (auto bank = 0; bank < 4 ; bank++)
 	{
-		u8 page = pen_page(bank);
-		if (!m_pen)
-			page = ROM_MASK;
-
+		u8 page = m_pen ? pen_page(bank) : ROM_MASK;
 		if (page & PEN_RAM_MASK)
 		{
 			if (page & PEN_DOS7FFD_MASK)
 				page = (page & 0xf8) | (m_port_7ffd_data & 0x07);
-			page = page & 0x3f; // TODO size dependent
+			page &= 0x3f; // TODO size dependent
 			m_bank_ram[bank]->set_entry(page);
 			views[bank].get().disable();
 			LOGMEM(" RA(%X>%X)", m_bank_ram[bank]->entry(), page);
@@ -142,7 +140,7 @@ void atm_state::atm_update_memory()
 		{
 			if ((page & PEN_DOS7FFD_MASK) && !BIT(page, 1))
 				page = (page & ~1) | is_shadow_active();
-			page = page & ROM_MASK;
+			page &= ROM_MASK;
 			m_bank_rom[bank]->set_entry(page);
 			views[bank].get().select(0);
 			LOGMEM(" RO(%X>%X)", m_bank_rom[bank]->entry(), page);
@@ -212,15 +210,19 @@ void atm_state::atm_port_ff77_w(offs_t offset, u8 data)
 	}
 }
 
-void atm_state::atm_port_fff7_w(offs_t offset, u8 data)
+void atm_state::atm_port_eff7_w(offs_t offset, u8 data)
 {
-	if (!is_shadow_active())
-		return;
-
+	m_maincpu->set_clock(X1_128_SINCLAIR / 10 * (1 << BIT(data, 4))); // 0 - 3.5MHz, 1 - 7MHz
 	if (BIT(data, 7))
 		m_glukrs->enable();
 	else
 		m_glukrs->disable();
+}
+
+void atm_state::atm_port_fff7_w(offs_t offset, u8 data)
+{
+	if(!is_shadow_active())
+		return;
 
 	u8 bank = offset >> 14;
 	u8 page = (data & 0xc0) | (~data & 0x3f);
@@ -391,19 +393,19 @@ void atm_state::atm_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).bankrw(m_bank_ram[0]);
 	map(0x0000, 0x3fff).view(m_bank_view0);
-	m_bank_view0[0](0x0000, 0x3fff).bankr(m_bank_rom[0]);
+	m_bank_view0[0](0x0000, 0x3fff).bankr(m_bank_rom[0]).nopw();
 
 	map(0x4000, 0x7fff).bankrw(m_bank_ram[1]);
 	map(0x4000, 0x7fff).view(m_bank_view1);
-	m_bank_view1[0](0x4000, 0x7fff).bankr(m_bank_rom[1]);
+	m_bank_view1[0](0x4000, 0x7fff).bankr(m_bank_rom[1]).nopw();
 
 	map(0x8000, 0xbfff).bankrw(m_bank_ram[2]);
 	map(0x8000, 0xbfff).view(m_bank_view2);
-	m_bank_view2[0](0x8000, 0xbfff).bankr(m_bank_rom[2]);
+	m_bank_view2[0](0x8000, 0xbfff).bankr(m_bank_rom[2]).nopw();
 
 	map(0xc000, 0xffff).bankrw(m_bank_ram[3]);
 	map(0xc000, 0xffff).view(m_bank_view3);
-	m_bank_view3[0](0xc000, 0xffff).bankr(m_bank_rom[3]);
+	m_bank_view3[0](0xc000, 0xffff).bankr(m_bank_rom[3]).nopw();
 }
 
 void atm_state::atm_io(address_map &map)
@@ -420,10 +422,10 @@ void atm_state::atm_io(address_map &map)
 	map(0x00fd, 0x00fd).mirror(0xff00).w(FUNC(atm_state::atm_port_7ffd_w));
 	map(0x0077, 0x0077).select(0xff00).w(FUNC(atm_state::atm_port_ff77_w));
 	map(0x00f7, 0x00f7).select(0xff00).w(FUNC(atm_state::atm_port_fff7_w));
-	map(0xdff7, 0xdff7).w(m_glukrs, FUNC(glukrs_device::address_w));
-	map(0xdef7, 0xdef7).w(m_glukrs, FUNC(glukrs_device::address_w)); // TODO shadow only
-	map(0xbff7, 0xbff7).rw(m_glukrs, FUNC(glukrs_device::data_r), FUNC(glukrs_device::data_w));
-	map(0xbef7, 0xbef7).rw(m_glukrs, FUNC(glukrs_device::data_r), FUNC(glukrs_device::data_w)); // TODO shadow only
+	map(0xeff7, 0xeff7).w(FUNC(atm_state::atm_port_eff7_w));
+	map(0xdef7, 0xdef7).mirror(0x0100).w(m_glukrs, FUNC(glukrs_device::address_w));
+	map(0xbff7, 0xbff7).r(m_glukrs, FUNC(glukrs_device::data_r));
+	map(0xbef7, 0xbef7).rw(m_glukrs, FUNC(glukrs_device::data_r), FUNC(glukrs_device::data_w));
 	map(0xfadf, 0xfadf).mirror(0x0500).nopr(); // TODO 0xfadf, 0xfbdf, 0xffdf Kempston Mouse
 	map(0x8000, 0x8000).mirror(0x3ffd).w("ay8912", FUNC(ay8910_device::data_w));
 	map(0xc000, 0xc000).mirror(0x3ffd).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));

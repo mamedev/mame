@@ -49,7 +49,7 @@ P Anime Champ                                         2000.12    GCA07 JA       
 P Bass Angler                                         1998.03    GE765 JA          765 JA A02
 P Bass Angler 2                                       1998.07    GC865 JA          865 JA A02
 K Dance Dance Revolution Karaoke MIX (DAM-DDR)        1999.11    GQ921 JB          921 JB B02
-K *Dance Dance Revolution Karaoke MIX (DAM-DDR) 2nd   2000.07
+K Dance Dance Revolution Karaoke MIX (DAM-DDR) 2nd    2000.07    GQ947 JA          947 JA A02
 A Dance Dance Revolution                              1998.09    GC845 JA          845 JA(missing)/UA A01 / 845 JA A02
 A Dance Dance Revolution Internet Ranking ver.        1998.11    GC845 JB          845 JB A01 / 845 JA/UA A02
 A Dance Dance Revolution 2ndMIX                       1999.01    GC895 JA          895 JA A02
@@ -93,9 +93,10 @@ P Fisherman's Bait 2                                  1998       GC865 UA       
 P Fisherman's Bait Marlin Challenge                   1999       GX889             889 AA/EA/JA/UA(needs redump)
 P Gachagachamp                                        1999.01    GQ877 JA          GE877-JA(PCMCIA card)
 P Great Bishi Bashi Champ                             2002.??    GBA48 JA          (no CD)
-A GUITARFREAKS                                        1999.02    GQ886 EA/JA/UA    886 ** C02
-A GUITARFREAKS 2ndMIX                                 1999.07    GQ883 JA          929 JB B02(needs redump)
-A *GUITARFREAKS 2ndMIX Link ver.                      1999.09
+A GUITARFREAKS                                        1999.02    GQ886 EA/JA/UA/AA 886 ** A02/C02/D02
+A GUITARFREAKS 2ndMIX                                 1999.07    GQ883 JA          883 ** A02
+A GUITARFREAKS 2ndMIX Link Kit 1                      1999.09    GE929 JA          929 JA A02
+A GUITARFREAKS 2ndMIX Link Kit 2                      1999.11    GC929 JB          929 JB B02
 D GUITARFREAKS 3rdMIX                                 2000.04    GE949 JA          949 JA C01 / 949 JA C02
 D GUITARFREAKS 4thMIX                                 2000.08    GEA24 JA          A24 JA A02
 D GUITARFREAKS 5thMIX                                 2001.03    GCA26 JA          A26 JA A02
@@ -107,7 +108,7 @@ N GUITARFREAKS 9thMIX                                 2003.04    GCC39 JA       
 N GUITARFREAKS 10thMIX                                2003.10    GCD10 JA          D10 JA A02
 N GUITARFREAKS 11thMIX                                2004.04
 G GunMania                                            2000.07    G?906 JA          (no CD)
-? *GunMania Zone Plus                                 2000.10
+? *GunMania Zone Plus                                 2000.10    GCA15 JA
 P Handle Champ                                        1997.12    GQ710 JA          (no CD)
 P Hyper Bishi Bashi Champ                             1998.07    GC876 EA          (no CD)
 P Hyper Bishi Bashi Champ - 2 Player                  1999.08    GC908 JA          908    A02
@@ -3890,6 +3891,19 @@ ROM_START( ddrkara )
 	DISK_IMAGE_READONLY( "921jbb02", 0, SHA1(32849007fe5527245a6cc2de38e73d60ae74eff0) )
 ROM_END
 
+ROM_START( ddrkara2 )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0000224, "cassette:game:eeprom", 0 )
+	ROM_LOAD( "gc947ja.u1", 0x000000, 0x000224, CRC(5bea7b68) SHA1(46d3ae1ffa97474cc2e91cb5982dcf4ca9cc9a1d) )
+
+	ROM_REGION( 0x000008, "cassette:game:id", 0 )
+	ROM_LOAD( "gc947ja.u6", 0x000000, 0x000008, CRC(6d76f4a9) SHA1(4fe5d9151ca0a0a67d64657c9a82776b928f429b) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "947jaa02", 0, SHA1(c1e9ad0386b52867bdabd550b95e1651d07d972c) )
+ROM_END
+
 ROM_START( ddr2m )
 	SYS573_BIOS_A
 
@@ -5046,6 +5060,46 @@ ROM_START( gtrfrksac )
 
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "886__c02", 0, BAD_DUMP SHA1(80293512c4b914ef98acb1bbc7e3a2ed944a0dad) )
+ROM_END
+
+ROM_START( gtrfrksea )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0000224, "cassette:game:eeprom", 0 )
+	ROM_LOAD( "gq886eac.u1",  0x000000, 0x000224, BAD_DUMP CRC(3b38dccf) SHA1(c313d025b4faed73ab021b76dbf0c51c9d701eb3) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "886__a02", 0, SHA1(f34f5678cfc0292e65e114480f167866664f4173) )
+ROM_END
+
+ROM_START( gtrfrksua )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0000224, "cassette:game:eeprom", 0 )
+	ROM_LOAD( "gq886uac.u1",  0x000000, 0x000224, BAD_DUMP CRC(29bb1ad5) SHA1(797ba61b6407fc0d0531e58129a9230e1484dc11) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "886__a02", 0, SHA1(f34f5678cfc0292e65e114480f167866664f4173) )
+ROM_END
+
+ROM_START( gtrfrksja )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0000224, "cassette:game:eeprom", 0 )
+	ROM_LOAD( "gq886jac.u1",  0x000000, 0x000224, BAD_DUMP CRC(2c7a64bd) SHA1(01bd46989a897dbd023603e5cabbd7deb85825ff) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "886__a02", 0, SHA1(f34f5678cfc0292e65e114480f167866664f4173) )
+ROM_END
+
+ROM_START( gtrfrksaa )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0000224, "cassette:game:eeprom", 0 )
+	ROM_LOAD( "gq886aac.u1",  0x000000, 0x000224, BAD_DUMP CRC(d220ae69) SHA1(dfdd29197222cb621b05f9b9091cff9a20cd846e) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "886__a02", 0, SHA1(f34f5678cfc0292e65e114480f167866664f4173) )
 ROM_END
 
 ROM_START( gtrfrk2m )
@@ -6226,7 +6280,7 @@ GAME( 1998, ddrj,      dstage,   ddr,        ddr,       ddr_state,     init_ddr,
 GAME( 1998, ddrja,     dstage,   ddr,        ddr,       ddr_state,     init_ddr,      ROT0,  "Konami", "Dance Dance Revolution (GC845 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1998, ddrjb,     dstage,   ddr,        ddr,       ddr_state,     init_ddr,      ROT0,  "Konami", "Dance Dance Revolution (GC845 VER. JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1999, ddra,      dstage,   ddr,        ddr,       ddr_state,     init_ddr,      ROT0,  "Konami", "Dance Dance Revolution (GN845 VER. AAA)", MACHINE_IMPERFECT_SOUND )
-GAME( 1999, ddrkara,   dstage,   ddrk,       ddrkara,   ddr_state,     init_ddr,      ROT0,  "Konami", "Dance Dance Revolution Karaoke Mix (GQ921 VER. JBB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, ddrkara,   sys573,   ddrk,       ddrkara,   ddr_state,     init_ddr,      ROT0,  "Konami", "Dance Dance Revolution Karaoke Mix (GQ921 VER. JBB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1998, fbait2bc,  sys573,   fbaitbc,    fbaitbc,   ksys573_state, empty_init,    ROT0,  "Konami", "Fisherman's Bait 2 - A Bass Challenge (GE865 VER. UAB)", MACHINE_IMPERFECT_SOUND )
 GAME( 1998, bassang2,  fbait2bc, fbaitbc,    fbaitbc,   ksys573_state, empty_init,    ROT0,  "Konami", "Bass Angler 2 (GE865 VER. JAA)", MACHINE_IMPERFECT_SOUND )
 GAME( 1998, hyperbbc,  sys573,   hyperbbc,   hyperbbc,  ksys573_state, init_hyperbbc, ROT0,  "Konami", "Hyper Bishi Bashi Champ (GQ876 VER. EAA)", MACHINE_IMPERFECT_SOUND )
@@ -6241,6 +6295,10 @@ GAME( 1999, gtrfrksc,  gtrfrks,  gtrfrks,    gtrfrks,   ksys573_state, empty_ini
 GAME( 1999, gtrfrksuc, gtrfrks,  gtrfrks,    gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks (GQ886 VER. UAC)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, gtrfrksjc, gtrfrks,  gtrfrks,    gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks (GQ886 VER. JAC)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, gtrfrksac, gtrfrks,  gtrfrks,    gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks (GQ886 VER. AAC)", MACHINE_IMPERFECT_SOUND )
+GAME( 1999, gtrfrksea, gtrfrks,  gtrfrks,    gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks (GQ886 VER. EAA)", MACHINE_IMPERFECT_SOUND )
+GAME( 1999, gtrfrksua, gtrfrks,  gtrfrks,    gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks (GQ886 VER. UAA)", MACHINE_IMPERFECT_SOUND )
+GAME( 1999, gtrfrksja, gtrfrks,  gtrfrks,    gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks (GQ886 VER. JAA)", MACHINE_IMPERFECT_SOUND )
+GAME( 1999, gtrfrksaa, gtrfrks,  gtrfrks,    gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks (GQ886 VER. AAA)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, fbaitmc,   sys573,   fbaitbc,    fbaitmc,   ksys573_state, empty_init,    ROT0,  "Konami", "Fisherman's Bait - Marlin Challenge (GX889 VER. EA)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, fbaitmcu,  fbaitmc,  fbaitbc,    fbaitmc,   ksys573_state, empty_init,    ROT0,  "Konami", "Fisherman's Bait - Marlin Challenge (GX889 VER. UA)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, fbaitmcj,  fbaitmc,  fbaitbc,    fbaitmc,   ksys573_state, empty_init,    ROT0,  "Konami", "Fisherman's Bait - Marlin Challenge (GX889 VER. JA)", MACHINE_IMPERFECT_SOUND )
@@ -6294,6 +6352,7 @@ GAMEL(2000, pnchmna,   fghtmn,   pnchmn,     pnchmn,    pnchmn_state,  init_pnch
 GAMEL(2000, fghtmnk,   fghtmn,   pnchmn,     pnchmn,    pnchmn_state,  init_pnchmn,   ROT0,  "Konami", "Fighting Mania (QG918 VER. KAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING, layout_pnchmn ) /* artwork/network */
 GAMEL(2000, fghtmnu,   fghtmn,   pnchmn,     pnchmn,    pnchmn_state,  init_pnchmn,   ROT0,  "Konami", "Fighting Mania (QG918 VER. UAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING, layout_pnchmn ) /* artwork/network */
 GAME( 2000, dsem,      sys573,   dsem,       ddr,       ddr_state,     empty_init,    ROT0,  "Konami", "Dancing Stage Euro Mix (G*936 VER. EAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.7 */
+GAME( 2000, ddrkara2,  sys573,   ddrk,       ddrkara,   ddr_state,     init_ddr,      ROT0,  "Konami", "Dance Dance Revolution Karaoke Mix 2 (GQ947 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 2000, gtrfrk3m,  sys573,   gtrfrk3m,   gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 3rd Mix (GE949 VER. JAC)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.4 */
 GAME( 2000, gtfrk3ma,  gtrfrk3m, gtrfrk3m,   gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 3rd Mix (GE949 VER. JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.4 */
 GAME( 2000, gtfrk3mb,  gtrfrk3m, gtrfrk5m,   gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 3rd Mix - security cassette versionup (949JAZ02)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.4 */

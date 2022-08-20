@@ -69,8 +69,12 @@ VFD colors used in MAME SVGs:
 - #80fff8: cyan (multi color VFD, relatively the brightest)
 - #ff4820: red
 - #50ff30: green
-- #4038ff: blue
+- #4840ff: blue
 - #ffff48: yellow
+
+It's hard to determine if a game is supposed to have yellow instead of green,
+since after decades passed, all the colors fade. It probably has a larger
+effect when a color is a mixture of 2 phosphors.
 
 Color overlays are mostly handled in the SVG, since it's often not possible
 getting the right color when doing it in a .lay file (eg. changing cpacman

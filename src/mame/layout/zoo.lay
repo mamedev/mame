@@ -1,0 +1,175 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+	<element name="SKIP" defstate="1">
+		<rect state="1">
+			<color red="0.0" green="1.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.2" blue="0.0" />
+		</rect>
+		<text string="SKIP">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.0" width="1" height="0.4" />
+		</text>
+		<text string="NEXT">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="DOUBLE" defstate="1">
+		<rect state="1">
+			<color red="0.0" green="1.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.2" blue="0.0" />
+		</rect>
+		<text string="4">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.0" width="1" height="0.4" />
+		</text>
+		<text string="DOUBLE X1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.7" width="1" height="0.3" />
+		</text>
+	</element>
+
+	<element name="ODDS" defstate="1">
+		<rect state="1">
+			<color red="0.0" green="1.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.2" blue="0.0" />
+		</rect>
+		<text string="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.0" width="1" height="0.4" />
+		</text>
+		<text string="ODDS">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
+		</text>
+		<text string="DOUBLE 1/2">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.7" width="1" height="0.3" />
+		</text>
+	</element>
+
+	<element name="TAKE" defstate="1">
+		<rect state="1">
+			<color red="0.0" green="1.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.2" blue="0.0" />
+		</rect>
+		<text string="2">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.0" width="1" height="0.4" />
+		</text>
+		<text string="TAKE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="PLAY" defstate="1">
+		<rect state="1">
+			<color red="0.0" green="1.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.2" blue="0.0" />
+		</rect>
+		<text string="3">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.0" width="1" height="0.4" />
+		</text>
+		<text string="PLAY">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
+		</text>
+		<text string="DOUBLE X2">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.7" width="1" height="0.3" />
+		</text>
+	</element>
+
+	<element name="START" defstate="1">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="5">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.0" width="1" height="0.4" />
+		</text>
+		<text string="START">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="WIN" defstate="1">
+		<disk state="1">
+			<color red="1.0" green="1.0" blue="0.0" />
+		</disk>
+		<disk state="0">
+			<color red="0.1" green="0.1" blue="0.0" />
+		</disk>
+		<text string="WIN">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="ERROR" defstate="1">
+		<disk state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</disk>
+		<disk state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</disk>
+		<text string="ERROR">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
+		</text>
+	</element>
+
+
+	<view name="Button Lamps">
+		<screen index="0">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+
+		<element name="lamp7" ref="WIN">
+			<bounds x="0" y="3.13" width="0.24" height="0.24" />
+		</element>
+
+		<element name="lamp2" ref="SKIP" inputtag="INPUTS" inputmask="0x0200">
+			<bounds x="0.55" y="3.13" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp1" ref="DOUBLE" inputtag="INPUTS" inputmask="0x0008">
+			<bounds x="1.05" y="3.13" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp6" ref="ODDS" inputtag="INPUTS" inputmask="0x0400">
+			<bounds x="1.55" y="3.13" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp3" ref="TAKE" inputtag="INPUTS" inputmask="0x0004">
+			<bounds x="2.05" y="3.13" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp4" ref="PLAY" inputtag="INPUTS" inputmask="0x0800">
+			<bounds x="2.55" y="3.13" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp5" ref="START" inputtag="INPUTS" inputmask="0x0080">
+			<bounds x="3.05" y="3.13" width="0.40" height="0.24" />
+		</element>
+
+		<element name="lamp0" ref="ERROR">
+			<bounds x="3.76" y="3.13" width="0.24" height="0.24" />
+		</element>
+	</view>
+</mamelayout>

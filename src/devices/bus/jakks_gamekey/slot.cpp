@@ -42,7 +42,7 @@ void device_jakks_gamekey_interface::rom_alloc(uint32_t size, const char *tag)
 {
 	if (m_rom == nullptr)
 	{
-		m_rom = device().machine().memory().region_alloc(std::string(tag).append(JAKKSSLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_BIG)->base();
+		m_rom = device().machine().memory().region_alloc(std::string(tag).append(JAKKSSLOT_ROM_REGION_TAG), size, 1, ENDIANNESS_BIG)->base();
 		m_rom_size = size;
 	}
 }

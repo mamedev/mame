@@ -1026,7 +1026,7 @@ ROM_START( bzaxxon )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 521091, "screen", 0)
-	ROM_LOAD( "bzaxxon.svg", 0, 521091, BAD_DUMP CRC(e17a51dd) SHA1(47b042a0e58f602f7c6e12223956a5087ed73bb2) )
+	ROM_LOAD( "bzaxxon.svg", 0, 521091, BAD_DUMP CRC(3df4c10b) SHA1(804cabe09d11bf79592e25615fd6914ef0d337d8) )
 ROM_END
 
 
@@ -1289,7 +1289,7 @@ ROM_START( bpengo )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 565069, "screen", 0)
-	ROM_LOAD( "bpengo.svg", 0, 565069, CRC(07b5ad44) SHA1(2c95024d42a95b2d136e0545d65bc823d53f19c4) )
+	ROM_LOAD( "bpengo.svg", 0, 565069, CRC(29ad1525) SHA1(9ed56ff7bfbf70ead9bd7921f46d86f4b96ee9df) )
 ROM_END
 
 
@@ -1621,7 +1621,7 @@ ROM_START( bdoramon )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 624751, "screen", 0)
-	ROM_LOAD( "bdoramon.svg", 0, 624751, CRC(0a4001dc) SHA1(afd46ef328a0ae839d19bffc0a19162b782c89b9) )
+	ROM_LOAD( "bdoramon.svg", 0, 624751, CRC(fc6ae4e4) SHA1(a9bd544a8753435bdfb8f06285aa799c47c9ff24) )
 ROM_END
 
 
@@ -1835,7 +1835,7 @@ ROM_START( bultrman )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 405725, "screen", 0)
-	ROM_LOAD( "bultrman.svg", 0, 405725, CRC(40a1acdb) SHA1(705a4ef23196ceef2973965fa33369293eacd7ab) )
+	ROM_LOAD( "bultrman.svg", 0, 405725, CRC(dfbe1dd2) SHA1(193ad1138bc0b8596c42517ade3dd128bacd587e) )
 ROM_END
 
 
@@ -3887,7 +3887,7 @@ ROM_START( gckong )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 346544, "screen", 0)
-	ROM_LOAD( "gckong.svg", 0, 346544, CRC(f6722d7b) SHA1(2d9ec994b51020d7d24cb8f36e047ee760801a23) )
+	ROM_LOAD( "gckong.svg", 0, 346544, CRC(a0885a76) SHA1(654b170f276e58f9a13d3a873efc12b574e377cf) )
 ROM_END
 
 
@@ -5050,7 +5050,7 @@ ROM_START( kingman )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
 	ROM_REGION( 396312, "screen", 0)
-	ROM_LOAD( "kingman.svg", 0, 396312, CRC(4861d8f3) SHA1(50eea8128dd261e4e9dd4db7e5bb6512c4460472) )
+	ROM_LOAD( "kingman.svg", 0, 396312, CRC(025f8b94) SHA1(af679a5d487248a17f2d2d2a8953d2165eca346e) )
 ROM_END
 
 

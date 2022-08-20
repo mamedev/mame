@@ -89,13 +89,13 @@ ausnz/excali64.cpp
 ausnz/labtam.cpp
 ausnz/magnum.cpp
 ausnz/mbee.cpp
+ausnz/pegasus.cpp
 ausnz/pipbug.cpp
 ausnz/poly.cpp
 ausnz/proteus.cpp
 ausnz/pulsar.cpp
 ausnz/super80.cpp
 ausnz/tec1.cpp
-aviion/aviion88k.cpp
 banctec/banctec.cpp
 bandai/design_master.cpp
 bandai/rx78.cpp
@@ -213,6 +213,7 @@ dec/vt320.cpp
 dec/vt52.cpp
 dec/vt520.cpp
 dec/vt62.cpp
+dg/aviion88k.cpp
 dms/dms5000.cpp
 dms/dms86.cpp
 dms/zsbc3.cpp
@@ -295,6 +296,7 @@ handheld/hh_rw5000.cpp
 handheld/hh_sm510.cpp
 handheld/hh_tms1k.cpp
 handheld/hh_ucom4.cpp
+handheld/lk3000.cpp
 handheld/monty.cpp
 handheld/rzone.cpp
 handheld/scrablex.cpp
@@ -382,7 +384,8 @@ husky/hawk.cpp
 husky/hunter16.cpp
 husky/hunter2.cpp
 husky/husky.cpp
-ibm6580/ibm6580.cpp
+ibm/ibm6580.cpp
+ibm/rtpc.cpp
 informer/informer_207_100.cpp
 informer/informer_207_376.cpp
 informer/informer_213.cpp
@@ -401,10 +404,9 @@ intel/sdk51.cpp
 intel/sdk80.cpp
 intel/sdk85.cpp
 intel/sdk86.cpp
-interpro/interpro.cpp
+intergraph/interpro.cpp
 interton/vc4000.cpp
 isc/compucolor.cpp
-jazz/jazz.cpp
 kawai/kawai_acr20.cpp
 kawai/kawai_k1.cpp
 kawai/kawai_k4.cpp
@@ -459,6 +461,7 @@ mera/m79152pc.cpp
 mera/vdm7932x.cpp
 mg1/mg1.cpp
 microkey/primo.cpp
+microsoft/jazz.cpp
 microsoft/xbox.cpp
 microterm/ergo201.cpp
 microterm/microterm_f8.cpp
@@ -543,8 +546,8 @@ nintendo/nes_vt369_vtunknown.cpp
 nintendo/pokemini.cpp
 nintendo/snes.cpp
 nintendo/vboy.cpp
-nintendo/vt_unknown.cpp
 nintendo/vt1682.cpp
+nintendo/vt_unknown.cpp
 nokia/dbox.cpp
 nokia/mikromik.cpp
 nokia/nokia_3310.cpp
@@ -596,6 +599,7 @@ pc/ps2.cpp
 pc/sis630.cpp
 pc/tandy1t.cpp
 pc/tosh1000.cpp
+philips/minitel_2_rpic.cpp
 philips/odyssey2.cpp
 philips/p2000t.cpp
 philips/vg5k.cpp
@@ -659,7 +663,6 @@ roland/roland_tr808.cpp
 roland/roland_tr909.cpp
 roland/roland_u20.cpp
 rolm/r9751.cpp
-rtpc/rtpc.cpp
 sage/sage2.cpp
 saitek/ccompan.cpp
 saitek/chesstrv.cpp
@@ -863,7 +866,6 @@ skeleton/lee1220.cpp
 skeleton/lft.cpp
 skeleton/lg-dvd.cpp
 skeleton/lilith.cpp
-skeleton/lk3000.cpp
 skeleton/lms46.cpp
 skeleton/mccpm.cpp
 skeleton/mes.cpp
@@ -878,7 +880,6 @@ skeleton/milwaukee.cpp
 skeleton/mindset.cpp
 skeleton/mini2440.cpp
 skeleton/miniframe.cpp
-skeleton/minitel_2_rpic.cpp
 skeleton/miuchiz.cpp
 skeleton/ml20.cpp
 skeleton/mmd1.cpp
@@ -902,7 +903,6 @@ skeleton/onyx.cpp
 skeleton/p8k.cpp
 skeleton/palestra.cpp
 skeleton/pdt3100.cpp
-skeleton/pegasus.cpp
 skeleton/pencil2.cpp
 skeleton/perq.cpp
 skeleton/pes.cpp
@@ -957,7 +957,6 @@ skeleton/textelcomp.cpp
 skeleton/ti630.cpp
 skeleton/tk635.cpp
 skeleton/tr175.cpp
-skeleton/trs80dt1.cpp
 skeleton/tsispch.cpp
 skeleton/tulip1.cpp
 skeleton/unistar.cpp
@@ -982,15 +981,16 @@ sony/betacam.cpp
 sony/bvm.cpp
 sony/dfs500.cpp
 sony/dpsv55.cpp
+sony/news_38xx.cpp
+sony/news_68k.cpp
+sony/news_r3k.cpp
+sony/news_r4k.cpp
 sony/pockstat.cpp
 sony/ps2sony.cpp
 sony/psx.cpp
 sony/pve500.cpp
 sony/smc777.cpp
 sony/umatic.cpp
-sony_news/news_38xx.cpp
-sony_news/news_68k.cpp
-sony_news/news_r3k.cpp
 sord/m5.cpp
 stm/pp.cpp
 sun/sun1.cpp
@@ -1094,6 +1094,7 @@ trs/meritum.cpp
 trs/radionic.cpp
 trs/tandy2k.cpp
 trs/trs80.cpp
+trs/trs80dt1.cpp
 trs/trs80m2.cpp
 trs/trs80m3.cpp
 trs/vis.cpp
@@ -1216,6 +1217,7 @@ vtech/laser3k.cpp
 vtech/lcmate2.cpp
 vtech/pc2000.cpp
 vtech/pc4.cpp
+vtech/phusion.cpp
 vtech/prestige.cpp
 vtech/socrates.cpp
 vtech/storio.cpp

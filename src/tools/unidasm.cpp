@@ -200,10 +200,12 @@ using util::BIT;
 #include "cpu/z80/z80dasm.h"
 #include "cpu/z8000/8000dasm.h"
 
-#include "corefile.h"
 #include "corestr.h"
 #include "eminline.h"
 #include "endianness.h"
+#include "ioprocs.h"
+#include "osdfile.h"
+#include "strformat.h"
 
 #include <algorithm>
 #include <cctype>
@@ -215,6 +217,7 @@ using util::BIT;
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <utility>
 #include <vector>
 
 #ifdef _WIN32
@@ -1245,51 +1248,11 @@ usage:
 };
 
 
-int main(int argc, char *argv[])
+int disasm_file(util::random_read &file, u64 length, options &opts)
 {
-	// Parse options first
-	options opts;
-	if(parse_options(argc, argv, &opts))
+	if(opts.skip >= length) {
+		std::fprintf(stderr, "File '%s' is too short (only %llu bytes found)\n", opts.filename, (unsigned long long)length);
 		return 1;
-
-	// Load the file
-	void *data = nullptr;
-	u32 length = 0;
-	if(std::strcmp(opts.filename, "-") != 0) {
-		std::error_condition filerr = util::core_file::load(opts.filename, &data, length);
-		if(filerr) {
-			std::fprintf(stderr, "Error opening file '%s' (%s)\n", opts.filename, filerr.message().c_str());
-			return 1;
-		}
-	}
-	else
-	{
-#ifdef _WIN32
-		if (_setmode(_fileno(stdin), _O_BINARY) == -1) {
-#else
-		if (!std::freopen(nullptr, "rb", stdin)) {
-#endif
-			std::fprintf(stderr, "Error reopening stdin in binary mode\n");
-			return 1;
-		}
-		std::size_t allocated = 0x1000;
-		data = std::malloc(allocated);
-		while(!std::ferror(stdin) && !std::feof(stdin)) {
-			if(length == allocated) {
-				allocated <<= 1;
-				data = std::realloc(data, allocated);
-			}
-			if(!data) {
-				std::fprintf(stderr, "Error allocating buffer\n");
-				return 1;
-			}
-
-			length += std::fread((u8 *)data + length, 1, allocated - length, stdin);
-		}
-		if(!length || (std::ferror(stdin) && !std::feof(stdin))) {
-			std::fprintf(stderr, "Error reading from stdin\n");
-			return 1;
-		}
 	}
 
 	// Build the disasm object
@@ -1301,18 +1264,20 @@ int main(int argc, char *argv[])
 
 	// Build the base buffer and fill it (with a margin)
 	unidasm_data_buffer base_buffer(disasm.get(), opts.dasm);
-	u32 rounded_size = (((length - opts.skip) | (granularity - 1)) & ~(granularity - 1));
+	u32 rounded_size = (((length - opts.skip) + (granularity - 1)) & ~(granularity - 1));
 	base_buffer.data.resize(rounded_size + 8, 0x00);
 	base_buffer.size = length;
 	base_buffer.base_pc = opts.basepc;
-	if(opts.xchbytes) {
-		for(uint32_t offset = opts.skip; offset < length - 1; offset += 2) {
-			base_buffer.data[offset - opts.skip] = ((const u8 *)data)[offset + 1];
-			base_buffer.data[offset - opts.skip + 1] = ((const u8 *)data)[offset];
-		}
+	std::size_t actual;
+	std::error_condition filerr = file.read_at(opts.skip, &base_buffer.data[0], length - opts.skip, actual);
+	if(filerr) {
+		std::fprintf(stderr, "Error reading from file '%s' (%s)\n", opts.filename, filerr.message().c_str());
+		return 1;
 	}
-	else
-		memcpy(&base_buffer.data[0], (const u8 *)data + opts.skip, length - opts.skip);
+	if(opts.xchbytes) {
+		for(u64 offset = 0; offset < (length - opts.skip) - 1; offset += 2)
+			std::swap(base_buffer.data[offset], base_buffer.data[offset + 1]);
+	}
 
 	// Build the decryption buffers if needed
 	unidasm_data_buffer opcodes_buffer(disasm.get(), opts.dasm), params_buffer(disasm.get(), opts.dasm);
@@ -1326,18 +1291,12 @@ int main(int argc, char *argv[])
 	unidasm_data_buffer *popcodes = opcodes_buffer.data.empty() ? &base_buffer : &opcodes_buffer;
 	unidasm_data_buffer *pparams  = params_buffer.data.empty() ? popcodes : &params_buffer;
 
-	// Compute the pc warparound
+	// Compute the pc wraparound
 	offs_t pclength = opts.dasm->pcshift < 0 ? rounded_size >> -opts.dasm->pcshift : rounded_size << opts.dasm->pcshift;
 	offs_t limit = opts.basepc + pclength;
-	offs_t pc_mask;
-	if(!limit)
-		pc_mask = 0xffffffff;
-	else {
-		for(pc_mask = 2; pc_mask && pc_mask < limit; pc_mask *= 2);
-		pc_mask--;
-	}
+	offs_t pc_mask = limit ? util::make_bitmask<offs_t>(32 - count_leading_zeros_32(limit - 1)) : 0xffffffff;
 
-	// Compute the page warparound
+	// Compute the page wraparound
 	offs_t page_mask = flags & util::disasm_interface::PAGED ? (1 << disasm->page_address_bits()) - 1 : 0;
 
 	// Next pc computation lambdas
@@ -1648,7 +1607,75 @@ int main(int argc, char *argv[])
 				util::stream_format(std::cout, "%s: %-*s  %s\n", tf(pc_to_string(l.pc)), max_len, tf(dump_raw_bytes(l.pc, l.size >> granularity_shift)), tf(l.dasm));
 	}
 
-	free(data);
-
 	return 0;
+}
+
+
+int main(int argc, char *argv[])
+{
+	// Parse options first
+	options opts;
+	if(parse_options(argc, argv, &opts))
+		return 1;
+
+	// Load the file
+	void *data = nullptr;
+	util::random_read::ptr file;
+	u64 length = 0;
+	if(std::strcmp(opts.filename, "-") != 0) {
+		osd_file::ptr f;
+		std::error_condition filerr = osd_file::open(std::string(opts.filename), OPEN_FLAG_READ, f, length);
+		if(filerr) {
+			std::fprintf(stderr, "Error opening file '%s' (%s)\n", opts.filename, filerr.message().c_str());
+			return 1;
+		}
+		file = util::osd_file_read(std::move(f));
+		if(!file) {
+			std::fprintf(stderr, "Error when opening file '%s'\n", opts.filename);
+			return 1;
+		}
+	}
+	else
+	{
+#ifdef _WIN32
+		if (_setmode(_fileno(stdin), _O_BINARY) == -1) {
+#else
+		if (!std::freopen(nullptr, "rb", stdin)) {
+#endif
+			std::fprintf(stderr, "Error reopening stdin in binary mode\n");
+			return 1;
+		}
+		std::size_t allocated = 0x1000;
+		data = std::malloc(allocated);
+		while(!std::ferror(stdin) && !std::feof(stdin)) {
+			if(length == allocated) {
+				allocated <<= 1;
+				data = std::realloc(data, allocated);
+			}
+			if(!data) {
+				std::fprintf(stderr, "Error allocating buffer\n");
+				return 1;
+			}
+
+			length += std::fread((u8 *)data + length, 1, allocated - length, stdin);
+		}
+		if(!length || (std::ferror(stdin) && !std::feof(stdin))) {
+			std::fprintf(stderr, "Error reading from stdin\n");
+			std::free(data);
+			return 1;
+		}
+		file = util::ram_read(data, length);
+		if(!file) {
+			std::fprintf(stderr, "Error opening stdin as file\n");
+			std::free(data);
+			return 1;
+		}
+	}
+
+	int result = disasm_file(*file, length, opts);
+
+	file.reset();
+	std::free(data);
+
+	return result;
 }
