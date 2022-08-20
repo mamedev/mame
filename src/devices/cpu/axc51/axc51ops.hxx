@@ -720,7 +720,7 @@ void axc51base_cpu_device::movx_a_idptr(uint8_t r)
 //(Move External Ram 8 bit address to A)
 void axc51base_cpu_device::movx_a_ir(uint8_t r)
 {
-	uint32_t addr = external_ram_iaddr(R_REG(r),0xFF); //Grab address by reading location pointed to by R0 or R1
+	uint32_t addr = external_ram_iaddr(R_REG(r),0xff); //Grab address by reading location pointed to by R0 or R1
 	uint8_t byte = (uint8_t)m_io.read_byte(addr);           //Grab 1 byte from External DATA memory pointed to by address
 	SET_ACC(byte);                      //Store to ACC
 }
@@ -737,7 +737,7 @@ void axc51base_cpu_device::movx_idptr_a(uint8_t r)
 //(Move A to External Ram 8 bit address)
 void axc51base_cpu_device::movx_ir_a(uint8_t r)
 {
-	uint32_t addr = external_ram_iaddr(R_REG(r),0xFF);   //Grab address by reading location pointed to by R0 or R1
+	uint32_t addr = external_ram_iaddr(R_REG(r),0xff);   //Grab address by reading location pointed to by R0 or R1
 	m_io.write_byte(addr, ACC);                   //Store ACC to External DATA memory address
 }
 
@@ -746,8 +746,8 @@ void axc51base_cpu_device::mul_ab(uint8_t r)
 {
 	uint16_t result = ACC * B;
 	//A gets lo bits, B gets hi bits of result
-	B = (uint8_t) ((result & 0xFF00) >> 8);
-	SET_ACC((uint8_t)(result & 0x00FF));
+	B = (uint8_t) ((result & 0xff00) >> 8);
+	SET_ACC((uint8_t)(result & 0x00ff));
 	//Set flags
 	SET_OV( ((result & 0x100) >> 8) );      //Set/Clear Overflow Flag if result > 255
 	SET_CY(0);                              //Carry Flag always cleared
