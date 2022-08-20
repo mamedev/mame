@@ -661,7 +661,6 @@ void vs_uni_state::drmario_rom_banking(offs_t offset, u8 data)
 		m_mmc1_shiftcount = 0;
 		m_mmc1_prg16k = 1;
 		m_mmc1_switchlow = 1;
-		m_mmc1_chr4k = 0;
 
 		return;
 	}
