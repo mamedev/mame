@@ -1285,7 +1285,8 @@ void galaxian_state::upper_extend_sprite_info(const uint8_t *base, uint8_t *sx, 
 }
 
 
-void galaxian_state::bmxstunts_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color)
+/*** Jetsoft BMX Stunts ***/
+void bmxstunts_state::bmxstunts_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color)
 {
 	if (BIT(base[2], 4))
 		*code += 0x40;

@@ -745,7 +745,6 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "sound/sn76496.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -1781,22 +1780,22 @@ void galaxian_state::mandingarf_map(address_map &map)
 	map(0xc000, 0xc7ff).rom().region("maincpu", 0xc000); // extend ROM
 }
 
-void galaxian_state::bmxstunts_map(address_map &map) // seems to be the standard galaxian map with just 0x4000 subtracted from the offsets
+void bmxstunts_state::bmxstunts_map(address_map &map) // seems to be the standard galaxian map with just 0x4000 subtracted from the offsets
 {
 	map(0x0000, 0x03ff).mirror(0x0400).ram();
-	map(0x1000, 0x13ff).mirror(0x0400).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
-	map(0x1800, 0x18ff).mirror(0x0700).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x1000, 0x13ff).mirror(0x0400).ram().w(FUNC(bmxstunts_state::galaxian_videoram_w)).share("videoram");
+	map(0x1800, 0x18ff).mirror(0x0700).ram().w(FUNC(bmxstunts_state::galaxian_objram_w)).share("spriteram");
 	map(0x2000, 0x2000).mirror(0x07ff).portr("IN0");
-	map(0x2000, 0x2001).mirror(0x07f8).w(FUNC(galaxian_state::start_lamp_w));
-	map(0x2002, 0x2002).mirror(0x07f8).w(FUNC(galaxian_state::coin_lock_w));
-	map(0x2003, 0x2003).mirror(0x07f8).w(FUNC(galaxian_state::coin_count_0_w));
+	map(0x2000, 0x2001).mirror(0x07f8).w(FUNC(bmxstunts_state::start_lamp_w));
+	map(0x2002, 0x2002).mirror(0x07f8).w(FUNC(bmxstunts_state::coin_lock_w));
+	map(0x2003, 0x2003).mirror(0x07f8).w(FUNC(bmxstunts_state::coin_count_0_w));
 	map(0x2800, 0x2800).mirror(0x07ff).portr("IN1");
 	map(0x3000, 0x3000).mirror(0x07ff).portr("DSW1");
-	map(0x3001, 0x3001).mirror(0x07f8).w(FUNC(galaxian_state::irq_enable_w));
-	map(0x3006, 0x3006).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
-	map(0x3007, 0x3007).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0x3001, 0x3001).mirror(0x07f8).w(FUNC(bmxstunts_state::irq_enable_w));
+	map(0x3006, 0x3006).mirror(0x07f8).w(FUNC(bmxstunts_state::galaxian_flip_screen_x_w));
+	map(0x3007, 0x3007).mirror(0x07f8).w(FUNC(bmxstunts_state::galaxian_flip_screen_y_w));
 	map(0x3800, 0x3800).mirror(0x07ff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
-	map(0x8000, 0x8000).w("snsnd", FUNC(sn76489a_device::write)); // TODO: sounds really bad, check if hookup is a bit more complicated
+	map(0x8000, 0x8000).w(FUNC(bmxstunts_state::snsnd_w));
 	map(0xc000, 0xffff).rom().region("maincpu", 0);
 }
 
@@ -5611,8 +5610,8 @@ static INPUT_PORTS_START( bmxstunts )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 ) // also acts as button
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) // also acts as button
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // also acts as P1 start button
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -7778,14 +7777,17 @@ void galaxian_state::bongo(machine_config &config)
 	m_ay8910[0]->add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
-void galaxian_state::bmxstunts(machine_config &config)
+void bmxstunts_state::bmxstunts(machine_config &config)
 {
 	galaxian_base(config);
 
 	M6502(config.replace(), m_maincpu, 3'072'000); // TODO: verify clock, actually 6502A
-	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::bmxstunts_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bmxstunts_state::bmxstunts_map);
 
-	SN76489A(config, "snsnd", 3'072'000).add_route(ALL_OUTPUTS, "speaker", 0.5); // TODO: verify clock, actually SN76489AN
+	set_irq_line(0);
+
+	SN76489A(config, m_snsnd, 3'072'000); // TODO: verify clock, actually SN76489AN
+	m_snsnd->add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 void galaxian_state::ckongg(machine_config &config)
@@ -8845,11 +8847,10 @@ void galaxian_state::init_victoryc()
 	decode_victoryc();
 }
 
-void galaxian_state::init_bmxstunts()
+void bmxstunts_state::init_bmxstunts()
 {
-	common_init(nullptr, &galaxian_state::galaxian_draw_background, nullptr, &galaxian_state::bmxstunts_extend_sprite_info);
-
-	m_irq_line = 0;
+	common_init(nullptr, &galaxian_state::galaxian_draw_background, nullptr, nullptr);
+	m_extend_sprite_info_ptr = extend_sprite_info_delegate(&bmxstunts_state::bmxstunts_extend_sprite_info, this);
 }
 
 void galaxian_state::init_bigkonggx()
@@ -16004,7 +16005,7 @@ GAME( 1982, guttangts3,  locomotn, guttangts3, guttangt,   guttangt_state, init_
 
 
 // Basic hardware with epoxy block containing a 6502A, SN76489AN, PROM and logic
-GAME( 1985, bmxstunts,   0,        bmxstunts,  bmxstunts,  galaxian_state, init_bmxstunts,  ROT90,  "Jetsoft", "BMX Stunts", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // could be considered working if not for bad GFX and sound
+GAME( 1985, bmxstunts,   0,        bmxstunts,  bmxstunts,  bmxstunts_state,init_bmxstunts,  ROT90,  "Jetsoft", "BMX Stunts", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // could be considered working if not for bad GFX
 
 // Basic hardware + extra RAM
 GAME( 1982, victoryc,    0,        victoryc,   victoryc,   galaxian_state, init_victoryc,   ROT270, "Comsoft", "Victory (Comsoft)",           MACHINE_SUPPORTS_SAVE )
