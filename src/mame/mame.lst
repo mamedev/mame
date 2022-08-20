@@ -31292,6 +31292,7 @@ gfc1080a                        //
 gsfc200                         //
 gsfc80u                         //
 hb10                            //
+hb101                           //
 hb101p                          //
 hb10p                           //
 hb201                           // 1985 MSX Japan
@@ -31302,6 +31303,7 @@ hb55                            //
 hb55d                           // 1983 MSX Germany
 hb55p                           // 1983 MSX
 hb701fd                         //
+hb75                            //
 hb75d                           // 1983 MSX Germany
 hb75p                           // 1983 MSX
 hb8000                          // 1985 MSX Brazil
@@ -31415,6 +31417,7 @@ pv16                            //
 pv7                             //
 spc800                          //
 svi728                          // 1985 MSX
+svi728es                        //
 svi738                          // 1985 MSX
 svi738ar                        //
 svi738dk                        //

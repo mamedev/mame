@@ -355,9 +355,10 @@ Sony HB-20P - MSX1 - hb20p
 Sony HB-55 Version 1 - MSX1 - hb55
 Sony HB-55D - MSX1 - hb55d
 Sony HB-55P - MSX1 - hb55p
+Sony HB-75 - MSX1 - hb75
 Sony HB-75D - MSX1 - hb75d
 Sony HB-75P - MSX1 - hb75p
-*Sony HB-101 - MSX1
+Sony HB-101 - MSX1 - hb101
 Sony HB-101P - MSX1 - hb101p
 Sony HB-201 - MSX1 - hp201
 Sony HB-201P - MSX1 - hb201p
@@ -710,9 +711,11 @@ public:
 	void hb55(machine_config &config);
 	void hb55d(machine_config &config);
 	void hb55p(machine_config &config);
+	void hb75(machine_config &config);
 	void hb75d(machine_config &config);
 	void hb75p(machine_config &config);
 	void hb201p(machine_config &config);
+	void hb101(machine_config &config);
 	void hb101p(machine_config &config);
 	void hb201(machine_config &config);
 	void hb501p(machine_config &config);
@@ -770,12 +773,6 @@ public:
 	void pv16(machine_config &config);
 	void spc800(machine_config &config);
 	void svi728(machine_config &config);
-	void svi738(machine_config &config);
-	void svi738ar(machine_config &config);
-	void svi738dk(machine_config &config);
-	void svi738pl(machine_config &config);
-	void svi738sp(machine_config &config);
-	void svi738sw(machine_config &config);
 	void tadpc20a(machine_config &config);
 	void tadpc200(machine_config &config);
 	void vg8000(machine_config &config);
@@ -970,6 +967,12 @@ public:
 
 	void ax200(machine_config &mconfig);
 	void ax200m(machine_config &mconfig);
+	void svi738(machine_config &config);
+	void svi738ar(machine_config &config);
+	void svi738dk(machine_config &config);
+	void svi738pl(machine_config &config);
+	void svi738sp(machine_config &config);
+	void svi738sw(machine_config &config);
 
 private:
 	template<typename AY8910Type> void msx1_v9938_pal(AY8910Type &ay8910_type, machine_config &config);
@@ -4818,6 +4821,8 @@ void msx_state::mpc10(machine_config &config)
 	msx1(TMS9918, AY8910, config);
 }
 
+/* MSX - Schneider MC 810 */
+
 /* MSX - Sharp Epcom HB-8000 (HotBit) */
 
 ROM_START(hb8000)
@@ -4885,34 +4890,42 @@ void msx_state::hotbi13p(machine_config &config)
 	msx1(TMS9928A, config);
 }
 
+/* MSX - Sincorp SBX (Argentina, homebrew) */
+
 /* MSX - Sony HB-10 */
 
 ROM_START(hb10)
-	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD("hb10bios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
+	ROM_REGION(0x8000, "mainrom", 0)
+	// 5h3 hn613256p c78
+	// 3l1 hn613256p c78 ?
+	ROM_LOAD("hb10bios.ic12", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
 ROM_END
 
 void msx_state::hb10(machine_config &config)
 {
-	// YM2149 (in S-1985 MSX-Engine)
+	// YM2149 (in S-S3527 MSX-Engine)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
-	// S-1985 MSX-Engine
+	// S3527 MSX-Engine
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
+	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1);  /* 16KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 3, 1);  /* 16KB? RAM */
 
-	MSX_S1985(config, "s1985", 0);
-	msx1(TMS9928A, config);
+	msx1(TMS9118, YM2149, config);
 }
+
+/* MSX - Sony HB-10B */
+
+/* MSX - Sony HB-10D */
+// ic12 - tmm23256p 
 
 /* MSX - Sony HB-10P */
 
 ROM_START(hb10p)
-	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD("10pbios.rom", 0x0000, 0x8000, CRC(0f488dd8) SHA1(5e7c8eab238712d1e18b0219c0f4d4dae180420d))
+	ROM_REGION(0x8000, "mainrom", 0)
+	ROM_LOAD("10pbios.ic12", 0x0000, 0x8000, CRC(0f488dd8) SHA1(5e7c8eab238712d1e18b0219c0f4d4dae180420d))
 ROM_END
 
 void msx_state::hb10p(machine_config &config)
@@ -4923,66 +4936,72 @@ void msx_state::hb10p(machine_config &config)
 	// 2 Cartridge slots
 	// T6950
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
+	// A mirror of RAM appears in slot #0, page #3
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
 
-	msx1(TMS9929A, config);
+	msx1(TMS9929A, YM2149, config);
 }
 
 /* MSX - Sony HB-20P */
 
 ROM_START(hb20p)
-	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD("20pbios.rom", 0x0000, 0x8000, CRC(21af423f) SHA1(365c93d7652c9f727221689bcc348652832a7b7a))
+	ROM_REGION(0x8000, "mainrom", 0)
+	// lh2359z3
+	ROM_LOAD("20pbios.ic12", 0x0000, 0x8000, CRC(15ddeb5c) SHA1(63050d2d21214a721cc55f152c22b7be8061ac33))
 ROM_END
 
 void msx_state::hb20p(machine_config &config)
 {
-	// AY8910/YM2149?
+	// YM2149
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
-	// T6950
+	// T6950A
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
+	// A mirror of RAM appears in slot #0, page #3
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
 
-	msx1(TMS9929A, config);
+	msx1(TMS9929A, YM2149, config);
 }
 
 /* MSX - Sony HB-201 */
 
 ROM_START(hb201)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("201bios.rom.ic9", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
-	ROM_LOAD("201note.rom.ic8", 0x8000, 0x4000, CRC(74567244) SHA1(0f4f09f1a6ef7535b243afabfb44a3a0eb0498d9))
-	ROM_FILL(0xc000, 0x4000, 0xff)
+	ROM_REGION(0x8000, "mainrom", 0)
+	ROM_LOAD("201bios.ic9", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
+
+	ROM_REGION(0x4000, "firmware", 0)
+	ROM_LOAD("201note.ic8", 0x0000, 0x4000, CRC(74567244) SHA1(0f4f09f1a6ef7535b243afabfb44a3a0eb0498d9))
 ROM_END
 
 void msx_state::hb201(machine_config &config)
 {
-	// AY8910/YM2149?
+	// YM2149
 	// FDC: None, 0 drives
-	// 2 Cartridge slots?
+	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
-	add_internal_slot(config, MSX_SLOT_ROM, "note", 0, 0, 2, 2, "maincpu", 0x8000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 0, 0, 2, 1, "firmware", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
 
-	msx1(TMS9928A, config);
+	msx1(TMS9118, YM2149, config);
 }
 
 /* MSX - Sony HB-201P */
 
 ROM_START(hb201p)
-	ROM_REGION(0xc000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("201pbios.rom.ic9", 0x0000, 0x8000, CRC(0f488dd8) SHA1(5e7c8eab238712d1e18b0219c0f4d4dae180420d))
-	ROM_LOAD("201pnote.rom.ic8", 0x8000, 0x4000, CRC(1ff9b6ec) SHA1(e84d3ec7a595ee36b50e979683c84105c1871857))
+
+	ROM_REGION(0x4000, "firmware", 0)
+	ROM_LOAD("201pnote.rom.ic8", 0x0000, 0x4000, CRC(1ff9b6ec) SHA1(e84d3ec7a595ee36b50e979683c84105c1871857))
 ROM_END
 
 void msx_state::hb201p(machine_config &config)
@@ -4991,65 +5010,75 @@ void msx_state::hb201p(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
-	add_internal_slot(config, MSX_SLOT_ROM, "note", 0, 0, 2, 1, "maincpu", 0x8000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 0, 0, 2, 1, "firmware", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
 
-	msx1(TMS9929A, config);
+	msx1(TMS9129, YM2149, config);
 }
+
+/* MSX - Sony HB-501F */
+// ic1 - tmm23256p
+// YM2149
+// TMS9129
+// S3527
 
 /* MSX - Sony HB-501P */
 
 ROM_START(hb501p)
-	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("501pbios.rom", 0x0000, 0x8000, CRC(0f488dd8) SHA1(5e7c8eab238712d1e18b0219c0f4d4dae180420d))
 ROM_END
 
 void msx_state::hb501p(machine_config &config)
 {
-	// AY8910/YM2149?
+	// YM2149
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
+	// T6950
+	// S3527
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
 
-	msx1(TMS9929A, config);
+	msx1(TMS9929A, YM2149, config);
 }
 
 /* MSX - Sony HB-55 (Version 1) */
 
 ROM_START(hb55)
-	ROM_REGION(0xc000, "maincpu", 0)
-	ROM_LOAD("hb55bios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
-	ROM_LOAD("hb55note.rom", 0x8000, 0x2000, CRC(5743ab55) SHA1(b9179db93608c4da649532e704f072e0a3ea1b22))
+	ROM_REGION(0x8000, "mainrom", 0)
+	ROM_LOAD("hb55bios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821)) // need verification
+
+	ROM_REGION(0x4000, "firmware", 0)
+	ROM_LOAD("hb55note.rom", 0x0000, 0x2000, CRC(5743ab55) SHA1(b9179db93608c4da649532e704f072e0a3ea1b22)) // need verification
 ROM_END
 
 void msx_state::hb55(machine_config &config)
 {
-	// AY8910/YM2149?
+	// AY8910
 	// FDC: None, 0 drives
-	// 2 Cartridge slots?
+	// 1 Cartridge slot
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
-	add_internal_slot(config, MSX_SLOT_ROM, "note", 0, 0, 2, 1, "maincpu", 0x8000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 0, 0, 2, 1, "firmware", 0x000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1);   /* 16KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
+	// Expansion slot in slot #3
 
-	msx1(TMS9928A, config);
+	msx1(TMS9918A, AY8910, config);
 }
 
-/* MSX - Sony HB-55D */
+/* MSX - Sony HB-55D, is this HB-55 2nd version? */
 
 ROM_START(hb55d)
 	ROM_REGION(0xc000, "maincpu", 0)
-	ROM_LOAD("55dbios.rom", 0x0000, 0x8000, CRC(7e2b32dd) SHA1(38a645febd0e0fe86d594f27c2d14be995acc730))
-	ROM_LOAD("55dnote.rom", 0x8000, 0x4000, CRC(8aae0494) SHA1(97ce59892573cac3c440efff6d74c8a1c29a5ad3))
+	ROM_LOAD("55dbios.rom", 0x0000, 0x8000, CRC(7e2b32dd) SHA1(38a645febd0e0fe86d594f27c2d14be995acc730)) // need verification
+	ROM_LOAD("55dnote.rom", 0x8000, 0x4000, CRC(8aae0494) SHA1(97ce59892573cac3c440efff6d74c8a1c29a5ad3)) // need verification
 ROM_END
 
 void msx_state::hb55d(machine_config &config)
@@ -5070,10 +5099,15 @@ void msx_state::hb55d(machine_config &config)
 /* MSX - Sony HB-55P */
 
 ROM_START(hb55p)
-	ROM_REGION(0xc000, "maincpu", 0)
-	ROM_LOAD("55pbios.ic42", 0x0000, 0x4000, CRC(24c198be) SHA1(7f8c94cb8913db32a696dec80ffc78e46693f1b7))
-	ROM_LOAD("55pbios.ic43", 0x4000, 0x4000, CRC(e516e7e5) SHA1(05fedd4b9bfcf4949020c79d32c4c3f03a54fb62))
-	ROM_LOAD("55pnote.ic44", 0x8000, 0x4000, CRC(492b12f8) SHA1(b262aedc71b445303f84efe5e865cbb71fd7d952))
+	ROM_REGION(0x8000, "mainrom", 0)
+	// Are there machines with ic42 and ic43 populated like this?
+	// Image on msx.org shows only ic42 and ic44 populated (for hb-55)
+//	ROM_LOAD("55pbios.ic42", 0x0000, 0x4000, CRC(24c198be) SHA1(7f8c94cb8913db32a696dec80ffc78e46693f1b7))
+//	ROM_LOAD("55pbios.ic43", 0x4000, 0x4000, CRC(e516e7e5) SHA1(05fedd4b9bfcf4949020c79d32c4c3f03a54fb62))
+	ROM_LOAD("55pbios.ic42", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
+
+	ROM_REGION(0x4000, "firmware", 0)
+	ROM_LOAD("55pnote.ic44", 0x0000, 0x4000, CRC(492b12f8) SHA1(b262aedc71b445303f84efe5e865cbb71fd7d952))
 ROM_END
 
 void msx_state::hb55p(machine_config &config)
@@ -5082,105 +5116,177 @@ void msx_state::hb55p(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
-	add_internal_slot(config, MSX_SLOT_ROM, "note", 0, 0, 2, 1, "maincpu", 0x8000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 0, 0, 2, 1, "firmware", 0x0000);
+	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1);   /* 16KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 3, 1);   /* 16KB RAM */
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
 
-	msx1(TMS9929A, config);
+	msx1(TMS9929A, AY8910, config);
 }
+
+/* MSX - Sony HB-75 */
+
+ROM_START(hb75)
+	ROM_REGION(0x8000, "mainrom", 0)
+	ROM_LOAD("75bios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
+
+	ROM_REGION(0x4000, "firmware", 0)
+	ROM_LOAD("75note.rom", 0x0000, 0x4000, CRC(2433dd0b) SHA1(5f26319aec3354a94e2a98e07b2c70046bc45417))
+ROM_END
+
+void msx_state::hb75(machine_config &config)
+{
+	// AY8910/YM2149?
+	// FDC: None, 0 drives
+	// 1 Cartridge slot
+
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 0, 0, 2, 1, "firmware", 0x0000);
+	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
+	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);  /* 64KB RAM */
+	// Expansion slot in slot #3
+
+	msx1(TMS9918A, AY8910, config);
+}
+
+/* MSX - Sony HB-75AS */
+
+/* MSX - Sony HB-75B */
 
 /* MSX - Sony HB-75D */
 
 ROM_START(hb75d)
-	ROM_REGION(0xc000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("75dbios.rom", 0x0000, 0x8000, CRC(7e2b32dd) SHA1(38a645febd0e0fe86d594f27c2d14be995acc730))
-	ROM_LOAD("75dnote.rom", 0x8000, 0x4000, CRC(8aae0494) SHA1(97ce59892573cac3c440efff6d74c8a1c29a5ad3))
+
+	ROM_REGION(0x4000, "firmware", 0)
+	ROM_LOAD("75dnote.rom", 0x0000, 0x4000, CRC(8aae0494) SHA1(97ce59892573cac3c440efff6d74c8a1c29a5ad3))
 ROM_END
 
 void msx_state::hb75d(machine_config &config)
 {
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
-	// 2 Cartridge slots?
+	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
-	add_internal_slot(config, MSX_SLOT_ROM, "note", 0, 0, 2, 1, "maincpu", 0x8000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 0, 0, 2, 1, "firmware", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
 
-	msx1(TMS9929A, config);
+	msx1(TMS9929A, AY8910, config);
 }
+
+/* MSX - Sony HB-75F */
 
 /* MSX - Sony HB-75P */
 
 ROM_START(hb75p)
-	ROM_REGION(0xc000, "maincpu", 0)
-	ROM_LOAD("75pbios.ic42", 0x0000, 0x4000, CRC(24c198be) SHA1(7f8c94cb8913db32a696dec80ffc78e46693f1b7))
-	ROM_LOAD("75pbios.ic43", 0x4000, 0x4000, CRC(e516e7e5) SHA1(05fedd4b9bfcf4949020c79d32c4c3f03a54fb62))
-	ROM_LOAD("75pnote.ic44", 0x8000, 0x4000, CRC(492b12f8) SHA1(b262aedc71b445303f84efe5e865cbb71fd7d952))
+	ROM_REGION(0x8000, "mainrom", 0)
+	// Are there machines with ic42 and ic43 populated like this?
+	// HB-75P internal image on msx.org only has 2 roms populated (ic42 and ic44)
+//	ROM_LOAD("75pbios.ic42", 0x0000, 0x4000, CRC(24c198be) SHA1(7f8c94cb8913db32a696dec80ffc78e46693f1b7))
+//	ROM_LOAD("75pbios.ic43", 0x4000, 0x4000, CRC(e516e7e5) SHA1(05fedd4b9bfcf4949020c79d32c4c3f03a54fb62))
+	ROM_LOAD("75pbios.ic42", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
+
+	ROM_REGION(0x4000, "firmware", 0)
+	ROM_LOAD("75pnote.ic44", 0x0000, 0x4000, CRC(492b12f8) SHA1(b262aedc71b445303f84efe5e865cbb71fd7d952))
 ROM_END
 
 void msx_state::hb75p(machine_config &config)
 {
 	// AY8910
 	// FDC: None, 0 drives
-	// 2 Cartridge slots?
+	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
-	add_internal_slot(config, MSX_SLOT_ROM, "note", 0, 0, 2, 1, "maincpu", 0x8000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 0, 0, 2, 1, "firmware", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
 
-	msx1(TMS9929A, config);
+	msx1(TMS9929A, AY8910, config);
+}
+
+/* MSX - Sony HB-101 */
+
+ROM_START(hb101)
+	ROM_REGION(0x8000, "mainrom", 0)
+	// 4l1 hn613256p d78
+	ROM_LOAD("101pbios.ic108", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
+
+	ROM_REGION(0x4000, "firmware", 0)
+	// m38128a-91 4202
+	ROM_LOAD("101pnote.ic111", 0x0000, 0x4000, CRC(f62e75f6) SHA1(64adb7fcf9b86f59d8658badb02f58e61bb15712))
+ROM_END
+
+void msx_state::hb101(machine_config &config)
+{
+	// YM2149
+	// FDC: None, 0 drives
+	// 2 Cartridge slots
+
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
+	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1);   /* 16KB RAM */
+	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
+	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
+	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 3, 0, 1, 1, "firmware", 0x0000);
+
+	msx1(TMS9118, YM2149, config);
 }
 
 /* MSX - Sony HB-101P */
 
 ROM_START(hb101p)
-	ROM_REGION(0xc000, "maincpu", 0)
-	ROM_LOAD("101pbios.rom", 0x0000, 0x8000, CRC(0f488dd8) SHA1(5e7c8eab238712d1e18b0219c0f4d4dae180420d))
-	ROM_LOAD("101pnote.rom", 0x8000, 0x4000, CRC(525017c2) SHA1(8ffc24677fd9d2606a79718764261cdf02434f0a))
+	ROM_REGION(0x8000, "mainrom", 0)
+	// m38256-7b 5411
+	ROM_LOAD("101pbios.ic9", 0x0000, 0x8000, CRC(0f488dd8) SHA1(5e7c8eab238712d1e18b0219c0f4d4dae180420d))
+
+	ROM_REGION(0x4000, "firmware", 0)
+	// m38128a-f6 5501
+	ROM_LOAD("101pnote.ic8", 0x0000, 0x4000, CRC(525017c2) SHA1(8ffc24677fd9d2606a79718764261cdf02434f0a))
 ROM_END
 
 void msx_state::hb101p(machine_config &config)
 {
-	// AY8910/YM2149?
+	// YM2149
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 2, 2);   /* 32KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_ROM, "note", 3, 0, 1, 1, "maincpu", 0x8000);
+	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 3, 0, 1, 1, "firmware", 0x0000);
 
-	msx1(TMS9929A, config);
+	msx1(TMS9929A, YM2149, config);
 }
+
+/* MSX - Sony HB-701 */
 
 /* MSX - Sony HB-701FD */
 
 ROM_START(hb701fd)
-	ROM_REGION(0xc000, "maincpu", 0)
-	ROM_LOAD("hb701fdbios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
-	ROM_LOAD("hb701fddisk.rom", 0x8000, 0x4000, CRC(71961d9d) SHA1(2144036d6573d666143e890e5413956bfe8f66c5))
+	ROM_REGION(0x8000, "mainrom", 0)
+	ROM_LOAD("hb701fdbios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821)) // need verification
+
+	ROM_REGION(0x4000, "diskrom", 0)
+	ROM_LOAD("hb701fddisk.rom", 0x0000, 0x4000, CRC(71961d9d) SHA1(2144036d6573d666143e890e5413956bfe8f66c5)) // need verification
 ROM_END
 
 void msx_state::hb701fd(machine_config &config)
 {
-	// YM2149 (in S-1985)
-	// FDC: WD2793?, 1 3.5" SSDD drive
+	// YM2149
+	// FDC: WD2793, 1 3.5" SSDD drive
 	// 2 Cartridge slots
-	// S-1985 MSX Engine
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  /* 64KB RAM */
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 1, 1, 2, "maincpu", 0x8000).set_tags("fdc", "fdc:0", "fdc:1"); // Is this correct??
+	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 1, 1, 2, "diskrom", 0x0000).set_tags("fdc", "fdc:0", "fdc:1"); // Is this correct??
 
 	msx_wd2793_force_ready(config);
 	msx_1_35_ssdd_drive(config);
@@ -5190,9 +5296,8 @@ void msx_state::hb701fd(machine_config &config)
 /* MSX - Spectravideo SVI-728 */
 
 ROM_START(svi728)
-	ROM_REGION(0xc000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("728bios.rom", 0x0000, 0x8000, CRC(1ce9246c) SHA1(ea6a82cf8c6e65eb30b98755c8577cde8d9186c0))
-//  ROM_LOAD("707disk.rom", 0x8000, 0x4000, CRC(f9978853) SHA1(6aa856cc56eb98863c9da7a566571605682b5c6b))
 ROM_END
 
 void msx_state::svi728(machine_config &config)
@@ -5201,195 +5306,231 @@ void msx_state::svi728(machine_config &config)
 	// FDC: None, 0 drives
 	// 1 Cartridge slots, 1 Expansion slot (eg for SVI-707)
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainmirror", 0, 0, 2, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot", 2, 0, msx_cart, nullptr);
-//  MSX_LAYOUT_SLOT (3, 0, 1, 1, DISK_ROM2, 0x4000, 0x8000)
-//  MSX_LAYOUT_SLOT (3, 1, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+	// Expansion slot (for eg SVI-707) in slot #3
 
-	msx1(TMS9129, config);
+	msx1(TMS9129, AY8910, config);
 }
+
+/* MSX - Spectravideo SVI-728 (Arabic) */
+
+/* MSX - Spectravideo SVI-728 (Danish/Norwegian) */
+
+/* MSX - Spectravideo SVI-728 (Spanish) */
+
+ROM_START(svi728es)
+	ROM_REGION(0x8000, "mainrom", 0)
+	ROM_LOAD("728esbios.rom", 0x0000, 0x8000, CRC(76c5e381) SHA1(82415ee031721d1954bfa42e1c6dd79d71c692d6))
+ROM_END
+
+/* MSX - Spectravideo SVI-728 (Swedish/Finnish) */
 
 /* MSX - Spectravideo SVI-738 */
 
 ROM_START(svi738)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("738bios.rom", 0x0000, 0x8000, CRC(ad007d62) SHA1(c53b3f2c00f31683914f7452f3f4d94ae2929c0d))
-	ROM_LOAD("738disk.rom", 0x8000, 0x4000, CRC(acd27a36) SHA1(99a40266bc296cef1d432cb0caa8df1a7e570be4))
-	ROM_LOAD("738232c.rom", 0xc000, 0x2000, CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7))
-	ROM_FILL(0xe000, 0x2000, 0xff)
+
+	ROM_REGION(0x4000, "diskrom", 0)
+	ROM_LOAD("738disk.rom", 0x0000, 0x4000, CRC(acd27a36) SHA1(99a40266bc296cef1d432cb0caa8df1a7e570be4))
+
+	ROM_REGION(0x4000, "rs232rom", ROMREGION_ERASEFF)
+	ROM_LOAD("738232c.rom", 0x0000, 0x2000, CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7))
 ROM_END
 
-void msx_state::svi738(machine_config &config)
+void msx1_v9938_state::svi738(machine_config &config)
 {
 	// AY8910
-	// FDC: wd1793, 1 3.5" SSDD drive
-	// 2 Cartridge slots
+	// FDC: fd1793, 1 3.5" SSDD drive
+	// 1 Cartridge slot
 	// builtin 80 columns card (V9938)
 	// RS-232C interface
+	// 8253 clocked by 1.8432MHz xtal
+	// 8251
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_ROM, "rs232", 3, 0, 1, 1, "maincpu", 0xc000);
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 1, 1, 2, "maincpu", 0x8000).set_tags("fdc", "fdc:0", "fdc:1");
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 2, msx_cart, nullptr);
+	add_internal_slot(config, MSX_SLOT_ROM, "rs232", 3, 0, 1, 1, "rs232rom", 0x0000);
+	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 1, 1, 2, "diskrom", 0x0000).set_tags("fdc", "fdc:0", "fdc:1");
 
 	msx_fd1793(config);
 	msx_1_35_ssdd_drive(config);
-	msx1(TMS9929A, config);
+	msx1_v9938_pal(AY8910, config);
 }
 
 /* MSX - Spectravideo SVI-738 Arabic */
 
 ROM_START(svi738ar)
-	ROM_REGION(0x18000, "maincpu", 0)
-	ROM_LOAD("738arbios.rom", 0x0000, 0x8000, CRC(ad007d62) SHA1(c53b3f2c00f31683914f7452f3f4d94ae2929c0d))
-	ROM_LOAD("738ardisk.rom", 0x8000, 0x4000, CRC(acd27a36) SHA1(99a40266bc296cef1d432cb0caa8df1a7e570be4))
-	ROM_LOAD("738ar232c.rom", 0xc000, 0x2000, CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7))
-	ROM_FILL(0xe000, 0x2000, 0xff)
-	ROM_LOAD("738arab.rom",  0x10000, 0x8000, CRC(339cd1aa) SHA1(0287b2ec897b9196788cd9f10c99e1487d7adbbb))
+	ROM_REGION(0x8000, "mainrom", 0)
+	ROM_LOAD("738arbios.rom", 0x0000, 0x8000, CRC(ad007d62) SHA1(c53b3f2c00f31683914f7452f3f4d94ae2929c0d)) // need verification
+
+	ROM_REGION(0x8000, "arab", 0)
+	ROM_LOAD("738arab.rom",  0x0000, 0x8000, CRC(339cd1aa) SHA1(0287b2ec897b9196788cd9f10c99e1487d7adbbb)) // need verification
+
+	ROM_REGION(0x4000, "diskrom", 0)
+	ROM_LOAD("738ardisk.rom", 0x0000, 0x4000, CRC(acd27a36) SHA1(99a40266bc296cef1d432cb0caa8df1a7e570be4)) // meed verification
+
+	ROM_REGION(0x4000, "rs232rom", ROMREGION_ERASEFF)
+	ROM_LOAD("738ar232c.rom", 0x0000, 0x2000, CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7)) // need verification
 ROM_END
 
-void msx_state::svi738ar(machine_config &config)
+void msx1_v9938_state::svi738ar(machine_config &config)
 {
 	// AY8910
 	// FDC: wd2793, 1 3.5" SSDD drive
-	// 2 Cartridge slots
+	// 1 Cartridge slot
 	// builtin 80 columns card (V9938)
 	// RS-232C interface
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_ROM, "rs232", 3, 0, 1, 1, "maincpu", 0xc000);
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 1, 1, 2, "maincpu", 0x8000).set_tags("fdc", "fdc:0", "fdc:1");
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 2, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_ROM, "arab", 3, 3, 1, 2, "maincpu", 0x10000);
+	add_internal_slot(config, MSX_SLOT_ROM, "rs232", 3, 0, 1, 1, "rs232rom", 0x0000);
+	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 1, 1, 2, "diskrom", 0x0000).set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_slot(config, MSX_SLOT_ROM, "arab", 3, 3, 1, 2, "arab", 0x0000);
 
-	msx_wd2793_force_ready(config);
+//	msx_wd2793_force_ready(config);
+	msx_fd1793(config);
 	msx_1_35_ssdd_drive(config);
-	msx1(TMS9929A, config);
+	msx1_v9938_pal(AY8910, config);
 }
 
-/* MSX - Spectravideo SVI-738 Danish */
+/* MSX - Spectravideo SVI-738 Danish/Norwegian */
 
 ROM_START(svi738dk)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("738dkbios.rom", 0x0000, 0x8000, CRC(88720320) SHA1(1bda5af20cb86565bdc1ebd1e59a691fed7f9256))
-	ROM_LOAD("738dkdisk.rom", 0x8000, 0x4000, CRC(fb884df4) SHA1(6d3a530ae822ec91f6444c681c9b08b9efadc7e7))
-	ROM_LOAD("738dk232c.rom", 0xc000, 0x2000, CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7))
-	ROM_FILL(0xe000, 0x2000, 0xff)
+	ROM_REGION(0x8000, "mainrom", 0)
+	ROM_LOAD("738dkbios.rom", 0x0000, 0x8000, CRC(88720320) SHA1(1bda5af20cb86565bdc1ebd1e59a691fed7f9256)) // need verification
+
+	ROM_REGION(0x4000, "diskrom", 0)
+	ROM_LOAD("738dkdisk.rom", 0x0000, 0x4000, CRC(fb884df4) SHA1(6d3a530ae822ec91f6444c681c9b08b9efadc7e7)) // need verification
+
+	ROM_REGION(0x4000, "rs232rom", ROMREGION_ERASEFF)
+	ROM_LOAD("738dk232c.rom", 0x0000, 0x2000, CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7)) // need verification
 ROM_END
 
-void msx_state::svi738dk(machine_config &config)
+void msx1_v9938_state::svi738dk(machine_config &config)
 {
 	// AY8910
 	// FDC: wd2793, 1 3.5" SSDD drive
-	// 2 Cartridge slots
+	// 1 Cartridge slot
 	// builtin 80 columns card (V9938)
 	// RS-232C interface
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_ROM, "rs232", 3, 0, 1, 1, "maincpu", 0xc000);
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 1, 1, 2, "maincpu", 0x8000).set_tags("fdc", "fdc:0", "fdc:1");
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 2, msx_cart, nullptr);
+	add_internal_slot(config, MSX_SLOT_ROM, "rs232", 3, 0, 1, 1, "rs232rom", 0x0000);
+	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 1, 1, 2, "diskrom", 0x0000).set_tags("fdc", "fdc:0", "fdc:1");
 
-	msx_wd2793_force_ready(config);
+//	msx_wd2793_force_ready(config);
+	msx_fd1793(config);
 	msx_1_35_ssdd_drive(config);
-	msx1(TMS9929A, config);
+	msx1_v9938_pal(AY8910, config);
+}
+
+/* MSX - Spectravideo SVI-738 German */
+
+/* MSX - Spectravideo SVI-738 Polish */
+
+ROM_START(svi738pl)
+	ROM_REGION(0x8000, "mainrom", 0)
+	ROM_LOAD("738plbios.rom", 0x0000, 0x8000, CRC(431b8bf5) SHA1(c90077ed84133a947841e07856e71133ba779da6)) // IC51 on board, need verification
+
+	ROM_REGION(0x4000, "diskrom", 0)
+	ROM_LOAD("738disk.rom",   0x0000, 0x4000, CRC(acd27a36) SHA1(99a40266bc296cef1d432cb0caa8df1a7e570be4)) // need verification
+
+	ROM_REGION(0x4000, "rs232rom", ROMREGION_ERASEFF)
+	ROM_LOAD("738232c.rom",   0x0000, 0x2000, CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7)) // need verification
+ROM_END
+
+void msx1_v9938_state::svi738pl(machine_config &config)
+{
+	// AY8910
+	// FDC: wd2793, 1 3.5" SSDD drive
+	// 1 Cartridge slot
+	// builtin 80 columns card (V9938)
+	// RS-232C interface
+
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
+	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  /* 64KB RAM */
+	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
+	add_internal_slot(config, MSX_SLOT_ROM, "rs232", 3, 0, 1, 1, "rs232rom", 0x0000);
+	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 1, 1, 2, "diskrom", 0x0000).set_tags("fdc", "fdc:0", "fdc:1");
+
+//	msx_wd2793_force_ready(config);
+	msx_fd1793(config);
+	msx_1_35_ssdd_drive(config);
+	msx1_v9938_pal(AY8910, config);
 }
 
 /* MSX - Spectravideo SVI-738 Spanish */
 
 ROM_START(svi738sp)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("738spbios.rom", 0x0000, 0x8000, CRC(f0c0cbb9) SHA1(5f04d5799ed72ea4993e7c4302a1dd55ac1ea8cd))
-	ROM_LOAD("738spdisk.rom", 0x8000, 0x4000, CRC(fb884df4) SHA1(6d3a530ae822ec91f6444c681c9b08b9efadc7e7))
-	ROM_LOAD("738sp232c.rom", 0xc000, 0x2000, CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7))
-	ROM_FILL(0xe000, 0x2000, 0xff)
+	ROM_REGION(0x8000, "mainrom", 0)
+	ROM_LOAD("738spbios.rom", 0x0000, 0x8000, CRC(f0c0cbb9) SHA1(5f04d5799ed72ea4993e7c4302a1dd55ac1ea8cd)) // need verification
+
+	ROM_REGION(0x4000, "diskrom", 0)
+	ROM_LOAD("738spdisk.rom", 0x0000, 0x4000, CRC(fb884df4) SHA1(6d3a530ae822ec91f6444c681c9b08b9efadc7e7)) // need verification
+
+	ROM_REGION(0x4000, "rs232rom", ROMREGION_ERASEFF)
+	ROM_LOAD("738sp232c.rom", 0x0000, 0x2000, CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7)) // need verification
 ROM_END
 
-void msx_state::svi738sp(machine_config &config)
+void msx1_v9938_state::svi738sp(machine_config &config)
 {
 	// AY8910
 	// FDC: wd2793, 1 3.5" SSDD drive
-	// 2 Cartridge slots
+	// 1 Cartridge slot
 	// builtin 80 columns card (V9938)
 	// RS-232C interface
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_ROM, "rs232", 3, 0, 1, 1, "maincpu", 0xc000);
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 1, 1, 2, "maincpu", 0x8000).set_tags("fdc", "fdc:0", "fdc:1");
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 2, msx_cart, nullptr);
+	add_internal_slot(config, MSX_SLOT_ROM, "rs232", 3, 0, 1, 1, "rs232rom", 0x0000);
+	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 1, 1, 2, "diskrom", 0x0000).set_tags("fdc", "fdc:0", "fdc:1");
 
-	msx_wd2793_force_ready(config);
+//	msx_wd2793_force_ready(config);
+	msx_fd1793(config);
 	msx_1_35_ssdd_drive(config);
-	msx1(TMS9929A, config);
+	msx1_v9938_pal(AY8910, config);
 }
 
-/* MSX - Spectravideo SVI-738 Swedish */
+/* MSX - Spectravideo SVI-738 Swedish/Finnish */
 
 ROM_START(svi738sw)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("738sebios.rom", 0x0000, 0x8000, CRC(c8ccdaa0) SHA1(87f4d0fa58cfe9cef818a3185df2735e6da6168c))
-	ROM_LOAD("738sedisk.rom", 0x8000, 0x4000, CRC(fb884df4) SHA1(6d3a530ae822ec91f6444c681c9b08b9efadc7e7))
-	ROM_LOAD("738se232c.rom", 0xc000, 0x2000, CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7))
-	ROM_FILL(0xe000, 0x2000, 0xff)
+
+	ROM_REGION(0x4000, "diskrom", 0)
+	ROM_LOAD("738sedisk.rom", 0x0000, 0x4000, CRC(fb884df4) SHA1(6d3a530ae822ec91f6444c681c9b08b9efadc7e7))
+
+	ROM_REGION(0x4000, "rs232rom", ROMREGION_ERASEFF)
+	ROM_LOAD("738se232c.rom", 0x0000, 0x2000, CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7))
 ROM_END
 
-void msx_state::svi738sw(machine_config &config)
+void msx1_v9938_state::svi738sw(machine_config &config)
 {
 	// AY8910
 	// FDC: wd2793, 1 3.5" SSDD drive
-	// 2 Cartridge slots
+	// 1 Cartridge slot
 	// builtin 80 columns card (V9938)
 	// RS-232C interface
 
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom", 0x0000);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  /* 64KB RAM */
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_ROM, "rs232", 3, 0, 1, 1, "maincpu", 0xc000);
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 1, 1, 2, "maincpu", 0x8000).set_tags("fdc", "fdc:0", "fdc:1");
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 2, msx_cart, nullptr);
+	add_internal_slot(config, MSX_SLOT_ROM, "rs232", 3, 0, 1, 1, "rs232rom", 0x0000);
+	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 1, 1, 2, "diskrom", 0x0000).set_tags("fdc", "fdc:0", "fdc:1");
 
-	msx_wd2793_force_ready(config);
+//	msx_wd2793_force_ready(config);
+	msx_fd1793(config);
 	msx_1_35_ssdd_drive(config);
-	msx1(TMS9929A, config);
-}
-
-/* MSX - Spectravideo SVI-738 Poland*/
-
-ROM_START(svi738pl)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("738plbios.rom", 0x0000, 0x8000, CRC(431b8bf5) SHA1(c90077ed84133a947841e07856e71133ba779da6)) // IC51 on board
-	ROM_LOAD("738disk.rom",   0x8000, 0x4000, CRC(acd27a36) SHA1(99a40266bc296cef1d432cb0caa8df1a7e570be4))
-	ROM_LOAD("738232c.rom",   0xc000, 0x2000, CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7))
-	ROM_FILL(0xe000, 0x2000, 0xff)
-ROM_END
-
-void msx_state::svi738pl(machine_config &config)
-{
-	// AY8910
-	// FDC: wd2793, 1 3.5" SSDD drive
-	// 2 Cartridge slots
-	// builtin 80 columns card (V9938)
-	// RS-232C interface
-
-	add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu", 0x0000);
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  /* 64KB RAM */
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_ROM, "rs232", 3, 0, 1, 1, "maincpu", 0xc000);
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 1, 1, 2, "maincpu", 0x8000).set_tags("fdc", "fdc:0", "fdc:1");
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 2, msx_cart, nullptr);
-
-	msx_wd2793_force_ready(config);
-	msx_1_35_ssdd_drive(config);
-	msx1(TMS9929A, config);
+	msx1_v9938_pal(AY8910, config);
 }
 
 /* MSX - Talent DPC-200 */
@@ -9906,6 +10047,7 @@ COMP(1985, hotbi13b,   hotbi13p, 0,     hotbi13b,   hotbit,   msx_state, empty_i
 COMP(1985, hotbi13p,   0,        0,     hotbi13p,   hotbit,   msx_state, empty_init, "Sharp / Epcom", "HB-8000 Hotbit 1.3p (MSX1)", 0)
 COMP(198?, hb10,       hb10p,    0,     hb10,       msxjp,    msx_state, empty_init, "Sony", "HB-10 (MSX1)", 0)
 COMP(1985, hb10p,      0,        0,     hb10p,      msx,      msx_state, empty_init, "Sony", "HB-10P (MSX1)", 0)
+COMP(1984, hb101,      hb101p,   0,     hb101,      msx,      msx_state, empty_init, "Sony", "HB-101 (MSX1)", 0)
 COMP(1984, hb101p,     0,        0,     hb101p,     msx,      msx_state, empty_init, "Sony", "HB-101P (MSX1)", 0)
 COMP(1985, hb20p,      0,        0,     hb20p,      msx,      msx_state, empty_init, "Sony", "HB-20P (Spanish) (MSX1)", 0)
 COMP(1985, hb201,      hb201p,   0,     hb201,      msxjp,    msx_state, empty_init, "Sony", "HB-201 (Japan) (MSX1)", 0)
@@ -9915,15 +10057,17 @@ COMP(1983, hb55,       hb55p,    0,     hb55,       msxjp,    msx_state, empty_i
 COMP(1983, hb55d,      hb55p,    0,     hb55d,      msx,      msx_state, empty_init, "Sony", "HB-55D (Germany) (MSX1)", 0)
 COMP(1983, hb55p,      0,        0,     hb55p,      msx,      msx_state, empty_init, "Sony", "HB-55P (MSX1)", 0)
 COMP(1984, hb701fd,    0,        0,     hb701fd,    msxjp,    msx_state, empty_init, "Sony", "HB-701FD (MSX1)", 0)
+COMP(1983, hb75,       hb75p,    0,     hb75,       msx,      msx_state, empty_init, "Sony", "HB-75 (Japan) (MSX1)", 0)
 COMP(1983, hb75d,      hb75p,    0,     hb75d,      msx,      msx_state, empty_init, "Sony", "HB-75D (Germany) (MSX1)", 0)
-COMP(1983, hb75p,      0,        0,     hb75p,      msx,      msx_state, empty_init, "Sony", "HB-75P (MSX1)", 0)
+COMP(1983, hb75p,      0,        0,     hb75p,      msx,      msx_state, empty_init, "Sony", "HB-75P (Europe) (MSX1)", 0)
 COMP(1985, svi728,     0,        0,     svi728,     msx,      msx_state, empty_init, "Spectravideo", "SVI-728 (MSX1)", 0)
-COMP(1985, svi738,     0,        0,     svi738,     msx,      msx_state, empty_init, "Spectravideo", "SVI-738 (MSX1)", 0)
-COMP(1983, svi738ar,   svi738,   0,     svi738ar,   msx,      msx_state, empty_init, "Spectravideo", "SVI-738 (Arabic) (MSX1)", 0)
-COMP(1983, svi738dk,   svi738,   0,     svi738dk,   msx,      msx_state, empty_init, "Spectravideo", "SVI-738 (Denmark) (MSX1)", 0)
-COMP(1983, svi738sp,   svi738,   0,     svi738sp,   msx,      msx_state, empty_init, "Spectravideo", "SVI-738 (Spain) (MSX1)", 0)
-COMP(1983, svi738sw,   svi738,   0,     svi738sw,   msx,      msx_state, empty_init, "Spectravideo", "SVI-738 (Swedish) (MSX1)", 0)
-COMP(1983, svi738pl,   svi738,   0,     svi738pl,   msx,      msx_state, empty_init, "Spectravideo", "SVI-738 (Poland) (MSX1)", 0)
+COMP(1985, svi728es,   svi728,   0,     svi728,     msx,      msx_state, empty_init, "Spectravideo", "SVI-728 (Spanish) (MSX1)", 0)
+COMP(1985, svi738,     0,        0,     svi738,     msx,      msx1_v9938_state, empty_init, "Spectravideo", "SVI-738 (MSX1)", 0)
+COMP(1983, svi738ar,   svi738,   0,     svi738ar,   msx,      msx1_v9938_state, empty_init, "Spectravideo", "SVI-738 (Arabic) (MSX1)", 0)
+COMP(1983, svi738dk,   svi738,   0,     svi738dk,   msx,      msx1_v9938_state, empty_init, "Spectravideo", "SVI-738 (Denmark) (MSX1)", 0)
+COMP(1983, svi738sp,   svi738,   0,     svi738sp,   msx,      msx1_v9938_state, empty_init, "Spectravideo", "SVI-738 (Spain) (MSX1)", 0)
+COMP(1983, svi738sw,   svi738,   0,     svi738sw,   msx,      msx1_v9938_state, empty_init, "Spectravideo", "SVI-738 (Swedish) (MSX1)", 0)
+COMP(1983, svi738pl,   svi738,   0,     svi738pl,   msx,      msx1_v9938_state, empty_init, "Spectravideo", "SVI-738 (Poland) (MSX1)", 0)
 COMP(1983, tadpc200,   dpc200,   0,     tadpc200,   msx,      msx_state, empty_init, "Talent", "DPC-200 (MSX1)", 0)
 COMP(1983, tadpc20a,   dpc200,   0,     tadpc20a,   msx,      msx_state, empty_init, "Talent", "DPC-200A (MSX1)", 0)
 COMP(1984, hx10,       0,        0,     hx10,       msx,      msx_state, empty_init, "Toshiba", "HX-10 (MSX1)", 0)
