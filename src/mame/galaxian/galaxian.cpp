@@ -12359,9 +12359,8 @@ ROM_START( bmxstunts )
 	ROM_LOAD16_WORD_SWAP( "b-mx.8", 0x3800, 0x0800, CRC(8bc26d4d) SHA1(c01be14d7cd402a524b61bd845c1ae6b09967bfa) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "bmxh.1h",   0x0000, 0x1000, CRC(b6d28b39) SHA1(3f9a9a182764a57af80d91640d7d2cece1f25af2) )
-	ROM_LOAD( "bmxl.1l-2", 0x1000, 0x1000, BAD_DUMP CRC(164199c2) SHA1(09e19762b76d6ae9d9af3d4a39a75c4a861d4b57) ) // didn't read consistently. Of 5 reads, 1 was like this
-	ROM_LOAD( "bmxl.1l-1", 0x1000, 0x1000, BAD_DUMP CRC(10cbc9d8) SHA1(b6e241e082115a3d67100e5564f2813454d6384e) ) // and 4 like this. Keeping both for now.
+	ROM_LOAD( "bmxh.1h", 0x0000, 0x1000, CRC(b6d28b39) SHA1(3f9a9a182764a57af80d91640d7d2cece1f25af2) )
+	ROM_LOAD( "bmxl.1l", 0x1000, 0x1000, BAD_DUMP CRC(2435510f) SHA1(3215ebe77c90b9548af28f31f3ef37c2f971255d) ) // didn't read consistently, combination of 2 dump attempts
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "bmx6331.6l", 0x0000, 0x0020, CRC(ce3e9306) SHA1(62dc5208eea2d3126e61cc7af30e71a9e60d438c) )
