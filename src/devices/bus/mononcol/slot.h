@@ -26,13 +26,13 @@ public:
 	u8 *get_rom_base()  { return m_rom; }
 	u32 get_rom_size() { return m_rom_size; }
 
-	virtual uint8_t read() { return 0x00; }
-	virtual DECLARE_WRITE_LINE_MEMBER(dir_w) { }
-	virtual void write(uint8_t data) { }
-	virtual void set_ready() { }
+	virtual uint8_t read() = 0;
+	virtual DECLARE_WRITE_LINE_MEMBER(dir_w) = 0;
+	virtual void write(uint8_t data) = 0;
+	virtual void set_ready() = 0;
 
-	virtual void set_spi_region(uint8_t* region) { }
-	virtual void set_spi_size(size_t size) { }
+	virtual void set_spi_region(uint8_t* region) = 0;
+	virtual void set_spi_size(size_t size) = 0;
 
 protected:
 	device_mononcol_cart_interface(machine_config const &mconfig, device_t &device);
@@ -60,12 +60,8 @@ public:
 
 	virtual ~mononcol_cartslot_device();
 
-	template <typename... T> void set_device_load(T &&... args) { m_device_image_load.set(std::forward<T>(args)...); }
-	template <typename... T> void set_device_unload(T &&... args) { m_device_image_unload.set(std::forward<T>(args)...); }
-
 	// device_image_interface implementation
 	virtual image_init_result call_load() override;
-	virtual void call_unload() override;
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual char const *image_interface() const noexcept override { return "monon_color_cart"; }
 	virtual char const *file_extensions() const noexcept override { return "bin"; }
@@ -124,8 +120,6 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 
 	device_mononcol_cart_interface *m_cart;
-	load_delegate m_device_image_load;
-	unload_delegate m_device_image_unload;
 
 	virtual const char *image_type_name() const noexcept override { return "cartridge"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "cart"; }

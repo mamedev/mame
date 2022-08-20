@@ -63,9 +63,7 @@ mononcol_cartslot_device::mononcol_cartslot_device(machine_config const &mconfig
 	device_t(mconfig, type, tag, owner, clock),
 	device_rom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_mononcol_cart_interface>(mconfig, *this),
-	m_cart(nullptr),
-	m_device_image_load(*this),
-	m_device_image_unload(*this)
+	m_cart(nullptr)
 {
 }
 
@@ -82,8 +80,6 @@ mononcol_cartslot_device::~mononcol_cartslot_device()
 void mononcol_cartslot_device::device_start()
 {
 	m_cart = get_card_device();
-	m_device_image_load.resolve();
-	m_device_image_unload.resolve();
 }
 
 
@@ -95,35 +91,20 @@ image_init_result mononcol_cartslot_device::call_load()
 {
 	if (m_cart)
 	{
-		if (!m_device_image_load.isnull())
-			return m_device_image_load(*this);
-		else
-		{
-			u32 len = common_get_size("rom");
+		u32 len = common_get_size("rom");
 
-			rom_alloc(len, 1, ENDIANNESS_LITTLE);
-			common_load_rom(get_rom_base(), len, "rom");
+		rom_alloc(len, 1, ENDIANNESS_LITTLE);
+		common_load_rom(get_rom_base(), len, "rom");
 
-			m_cart->set_spi_region(get_rom_base());
-			m_cart->set_spi_size(get_rom_size());
+		m_cart->set_spi_region(get_rom_base());
+		m_cart->set_spi_size(get_rom_size());
 
-			return image_init_result::PASS;
-		}
+		return image_init_result::PASS;
 	}
 
 	return image_init_result::PASS;
 }
 
-
-/*-------------------------------------------------
- call_unload
- -------------------------------------------------*/
-
-void mononcol_cartslot_device::call_unload()
-{
-	if (!m_device_image_unload.isnull())
-		return m_device_image_unload(*this);
-}
 
 
 /*-------------------------------------------------
