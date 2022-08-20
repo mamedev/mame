@@ -12306,6 +12306,23 @@ ROM_END
 
 
 /*
+
+Dumped by Andrew Welburn
+on the day of 18/07/10
+
+PCB is a bootleg Galaxian, with pin headers, probably
+of European origin. The signs and marking point to
+it being a Moon Cresta, but I'm note sure. Also it
+has a potted block in the CPU socket...
+
+I haven't dumped the gfx roms, lets see what the game
+actually is first, it might run with regular
+moon cresta gfx roms....
+
+(editor's note: yeah, it was actually BMX Stunts)
+
+=========================
+
 BMX Stunts by Jetsoft on Galaxian bootleg PCB.
 
 6502A CPU in epoxy block with one 6331 PROM (not dumped)
@@ -12336,15 +12353,6 @@ Non working board. Powers up to screen full of graphics.
 
 chaneman 7/31/2022
 
-
-Dumped by Andrew Welburn
-on the day of 18/07/10
-
-
-PCB is a bootleg Galaxian, with pin headers, probably
-of European origin. The signs and marking point to
-it being a Moon Cresta, but I'm note sure. Also it
-has a potted block in the CPU socket...
 */
 
 ROM_START( bmxstunts )
@@ -16002,9 +16010,8 @@ GAME( 1982, highroll,    0,        highroll,   highroll,   galaxian_state, init_
 GAME( 1982, guttangt,    locomotn, guttangt,   guttangt,   guttangt_state, init_guttangt,   ROT90,  "bootleg (Recreativos Franco?)",   "Guttang Gottong (bootleg on Galaxian hardware)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // or by 'Tren' ?
 GAME( 1982, guttangts3,  locomotn, guttangts3, guttangt,   guttangt_state, init_guttangts3, ROT90,  "bootleg (Sede 3)",                "Guttang Gottong (Sede 3 bootleg on Galaxian hardware)", MACHINE_SUPPORTS_SAVE ) // still has Konami copyright on screen
 
-
 // Basic hardware with epoxy block containing a 6502A, SN76489AN, PROM and logic
-GAME( 1985, bmxstunts,   0,        bmxstunts,  bmxstunts,  bmxstunts_state,init_bmxstunts,  ROT90,  "Jetsoft", "BMX Stunts", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // could be considered working if not for bad GFX
+GAME( 1985, bmxstunts,   0,        bmxstunts,  bmxstunts,  bmxstunts_state,init_bmxstunts,  ROT90,  "Jetsoft", "BMX Stunts", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 // Basic hardware + extra RAM
 GAME( 1982, victoryc,    0,        victoryc,   victoryc,   galaxian_state, init_victoryc,   ROT270, "Comsoft", "Victory (Comsoft)",           MACHINE_SUPPORTS_SAVE )
