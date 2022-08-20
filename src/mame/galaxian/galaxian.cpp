@@ -8847,7 +8847,7 @@ void galaxian_state::init_victoryc()
 
 void galaxian_state::init_bmxstunts()
 {
-	init_galaxian();
+	common_init(nullptr, &galaxian_state::galaxian_draw_background, nullptr, &galaxian_state::bmxstunts_extend_sprite_info);
 
 	m_irq_line = 0;
 }
@@ -12334,32 +12334,8 @@ been cut between pins 9 and 10?
 Non working board. Powers up to screen full of graphics.
 
 chaneman 7/31/2022
-*/
-
-ROM_START( bmxstunts )
-	ROM_REGION( 0x4000, "maincpu", 0 ) // 5 and 7 might be corrupted
-	ROM_LOAD16_WORD_SWAP( "bmx1.pr1", 0x0000, 0x0800, CRC(cf3061f1) SHA1(e229a2a09b56332359c3f87953acb07c4c7d3abb) )
-	ROM_LOAD16_WORD_SWAP( "bmx2.pr2", 0x0800, 0x0800, CRC(f145e09d) SHA1(8d3f379dbb5ec9304aa61d99cac003dfb8050485) )
-	ROM_LOAD16_WORD_SWAP( "bmx3.pr3", 0x1000, 0x0800, CRC(ea415c49) SHA1(eb55b4b24ef4e04f5c2873ad7fef2dce891cefef) )
-	ROM_LOAD16_WORD_SWAP( "bmx4.pr4", 0x1800, 0x0800, CRC(62bdd971) SHA1(864e787d66f6deb7fa545c475d4feb551e095bf2) )
-	ROM_LOAD16_WORD_SWAP( "bmx5.pr5", 0x2000, 0x0800, BAD_DUMP CRC(b7ae2316) SHA1(17aa542fe8d4f729758f8b21bc667bf756b481b5) )
-	ROM_LOAD16_WORD_SWAP( "bmx6.pr6", 0x2800, 0x0800, CRC(ba9b1a69) SHA1(b17964b31435809ce174f2680f7b463658794220) )
-	ROM_LOAD16_WORD_SWAP( "bmx7.pr7", 0x3000, 0x0800, BAD_DUMP CRC(32636839) SHA1(6371c929b7b3a819dad70b672bc3ca5c3c5c9ced) )
-	ROM_LOAD16_WORD_SWAP( "bmx8.pr8", 0x3800, 0x0800, CRC(fe1052ee) SHA1(f8bcaaecc3dfd10c70cbd9a49b778232ba9e697b) )
-
-	ROM_REGION( 0x2000, "gfx1", 0 ) // possibly slightly corrupted (see tile viewer), plus 1h is probably a bad dump (bikes aren't found anywhere)
-	ROM_LOAD( "bmxh.1h", 0x0000, 0x1000, CRC(b049f648) SHA1(06c5a8b15f876cb6e4798cb5f8b1351cc6c12877) ) // 1ST AND 2ND HALF IDENTICAL
-	ROM_LOAD( "bmxl.1l", 0x1000, 0x1000, CRC(a0f44f47) SHA1(b9d40ff82bb90125f0d9ad2d9590ddd7cc600805) )
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "bmx6331.6l", 0x0000, 0x0020, CRC(ce3e9306) SHA1(62dc5208eea2d3126e61cc7af30e71a9e60d438c) )
-
-	ROM_REGION( 0x0020, "epoxy_block_prom", 0 ) // maybe related to address lines scramble?
-	ROM_LOAD( "6331", 0x0000, 0x0020, NO_DUMP )
-ROM_END
 
 
-/*
 Dumped by Andrew Welburn
 on the day of 18/07/10
 
@@ -12370,25 +12346,26 @@ it being a Moon Cresta, but I'm note sure. Also it
 has a potted block in the CPU socket...
 */
 
-ROM_START( bmxstuntsa )
+ROM_START( bmxstunts )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "b-mx.1", 0x0000, 0x0800, CRC(cf3061f1) SHA1(e229a2a09b56332359c3f87953acb07c4c7d3abb) )
 	ROM_LOAD16_WORD_SWAP( "b-mx.2", 0x0800, 0x0800, CRC(f145e09d) SHA1(8d3f379dbb5ec9304aa61d99cac003dfb8050485) )
 	ROM_LOAD16_WORD_SWAP( "b-mx.3", 0x1000, 0x0800, CRC(ea415c49) SHA1(eb55b4b24ef4e04f5c2873ad7fef2dce891cefef) )
 	ROM_LOAD16_WORD_SWAP( "b-mx.4", 0x1800, 0x0800, CRC(62bdd971) SHA1(864e787d66f6deb7fa545c475d4feb551e095bf2) )
-	ROM_LOAD16_WORD_SWAP( "b-mx.5", 0x2000, 0x0800, CRC(9fa3d4e3) SHA1(61973d99d68790e36112bdaa893fb9406f8d46ca) ) // bmx5.pr5  51.074219%
+	ROM_LOAD16_WORD_SWAP( "b-mx.5", 0x2000, 0x0800, CRC(9fa3d4e3) SHA1(61973d99d68790e36112bdaa893fb9406f8d46ca) )
 	ROM_LOAD16_WORD_SWAP( "b-mx.6", 0x2800, 0x0800, CRC(ba9b1a69) SHA1(b17964b31435809ce174f2680f7b463658794220) )
-	ROM_LOAD16_WORD_SWAP( "b-mx.7", 0x3000, 0x0800, CRC(fa34441a) SHA1(f1591ef81c4fc9c3cd1b9eb96d945d53051a3ea7) ) // bmx7.pr7  58.740234%
-	ROM_LOAD16_WORD_SWAP( "b-mx.8", 0x3800, 0x0800, CRC(8bc26d4d) SHA1(c01be14d7cd402a524b61bd845c1ae6b09967bfa) ) // bmx8.pr8  99.267578%
+	ROM_LOAD16_WORD_SWAP( "b-mx.7", 0x3000, 0x0800, CRC(fa34441a) SHA1(f1591ef81c4fc9c3cd1b9eb96d945d53051a3ea7) )
+	ROM_LOAD16_WORD_SWAP( "b-mx.8", 0x3800, 0x0800, CRC(8bc26d4d) SHA1(c01be14d7cd402a524b61bd845c1ae6b09967bfa) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 ) // not dumped for this set, taken from above
-	ROM_LOAD( "bmxh.1h", 0x0000, 0x1000, BAD_DUMP CRC(b049f648) SHA1(06c5a8b15f876cb6e4798cb5f8b1351cc6c12877) ) // 1ST AND 2ND HALF IDENTICAL
-	ROM_LOAD( "bmxl.1l", 0x1000, 0x1000, BAD_DUMP CRC(a0f44f47) SHA1(b9d40ff82bb90125f0d9ad2d9590ddd7cc600805) )
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "bmxh.1h",   0x0000, 0x1000, CRC(b6d28b39) SHA1(3f9a9a182764a57af80d91640d7d2cece1f25af2) )
+	ROM_LOAD( "bmxl.1l-2", 0x1000, 0x1000, BAD_DUMP CRC(164199c2) SHA1(09e19762b76d6ae9d9af3d4a39a75c4a861d4b57) ) // didn't read consistently. Of 5 reads, 1 was like this
+	ROM_LOAD( "bmxl.1l-1", 0x1000, 0x1000, BAD_DUMP CRC(10cbc9d8) SHA1(b6e241e082115a3d67100e5564f2813454d6384e) ) // and 4 like this. Keeping both for now.
 
-	ROM_REGION( 0x0020, "proms", 0 ) // not dumped for this set, taken from above
-	ROM_LOAD( "bmx6331.6l", 0x0000, 0x0020, BAD_DUMP CRC(ce3e9306) SHA1(62dc5208eea2d3126e61cc7af30e71a9e60d438c) )
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "bmx6331.6l", 0x0000, 0x0020, CRC(ce3e9306) SHA1(62dc5208eea2d3126e61cc7af30e71a9e60d438c) )
 
-	ROM_REGION( 0x0020, "epoxy_block_prom", 0 ) // maybe related to address lines scramble?
+	ROM_REGION( 0x0020, "epoxy_block_prom", 0 )
 	ROM_LOAD( "6331", 0x0000, 0x0020, NO_DUMP )
 ROM_END
 
@@ -16027,8 +16004,7 @@ GAME( 1982, guttangts3,  locomotn, guttangts3, guttangt,   guttangt_state, init_
 
 
 // Basic hardware with epoxy block containing a 6502A, SN76489AN, PROM and logic
-GAME( 1985, bmxstunts,  0,         bmxstunts, bmxstunts,   galaxian_state, init_bmxstunts,  ROT90,  "Jetsoft",                         "BMX Stunts (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // not working due to bad program ROMs
-GAME( 1985, bmxstuntsa, bmxstunts, bmxstunts, bmxstunts,   galaxian_state, init_bmxstunts,  ROT90,  "Jetsoft",                         "BMX Stunts (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // could be considered working if not for bad GFX and sound
+GAME( 1985, bmxstunts,   0,        bmxstunts,  bmxstunts,  galaxian_state, init_bmxstunts,  ROT90,  "Jetsoft", "BMX Stunts", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // could be considered working if not for bad GFX and sound
 
 // Basic hardware + extra RAM
 GAME( 1982, victoryc,    0,        victoryc,   victoryc,   galaxian_state, init_victoryc,   ROT270, "Comsoft", "Victory (Comsoft)",           MACHINE_SUPPORTS_SAVE )
