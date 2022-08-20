@@ -64,8 +64,6 @@ mononcol_cartslot_device::mononcol_cartslot_device(machine_config const &mconfig
 	device_t(mconfig, type, tag, owner, clock),
 	device_rom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_mononcol_cart_interface>(mconfig, *this),
-	m_default_card("rom"),
-	m_extensions("bin"),
 	m_cart(nullptr),
 	m_device_image_load(*this),
 	m_device_image_unload(*this)
@@ -135,7 +133,7 @@ void mononcol_cartslot_device::call_unload()
 
 std::string mononcol_cartslot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	return software_get_default_slot(m_default_card);
+	return software_get_default_slot("rom");
 }
 
 

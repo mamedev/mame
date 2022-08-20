@@ -502,11 +502,18 @@ void monon_color_state::get_sound_command_bit(uint8_t bit)
 
 		if (!m_sound_direction_iswrite)
 		{
-			// status reads want to return the last thing read by the CPU from the SPI
-			// how does this even work? the MCU is assumed to not have SPI access
-			// furthermore, it would have to read the same byte the CPU just read?
+			// There is a protection check involving the axxx commands
+			// The game expects to read a byte from the sound MCU and
+			// compares it with a byte in the SPI ROM from e000 - efff
 			//
-			// if it doesn't get this, it will loop until by chance it gets the same
+			// This data in the SPI ROM is 65ec02 code that maps at
+			// 0x2000, so the check is presumably checking a random byte
+			// from part of the internal sound MCU ROM against the table
+			// stored in ROM.  Sadly the internal program is larger than
+			// the 0x1000 bytes of it that have been duplicated in the
+			// SPI ROM for this check.
+			//
+			// If it doesn't get this, it will loop until by chance it gets the same
 			// value, which results in random delays (eg. when moving the volume
 			// slider from 0 to any other value)
 			//
@@ -558,8 +565,7 @@ void monon_color_state::get_sound_command_bit(uint8_t bit)
 
 				case 0xa000:
 					// spams a variable amount of this between scenes
-					// waits for value from SPI ROM?! (always a value from the block e000 - efff)
-					// is this actually a 'read from SPI block e000-efff' command?
+					// This appears to be for copy protection purposes, see note above
 					LOGMASKED(LOG_SOUNDMCUCOMMS, "a-xxx status return wanted %04x\n", m_sound_latch & 0x0fff);
 					m_sound_direction_iswrite = false;
 					m_sound_bits_in_needed = 9;

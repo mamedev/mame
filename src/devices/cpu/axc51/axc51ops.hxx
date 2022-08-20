@@ -391,17 +391,17 @@ void axc51base_cpu_device::inc_r(uint8_t r)
 //INC DPTR                                  /* 1: 1010 0011 */
 void axc51base_cpu_device::inc_dptr(uint8_t r)
 {
-	//if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x08) // auto-increment enabled (not used here)
+	//if (m_sfr_regs[SFR_DPCON] & 0x08) // auto-increment enabled (not used here)
 	//{
 	//	fatalerror("inc_dptr with auto-inc");
 	//}
 
-	if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x04) // auto-toggle enabled
+	if (m_sfr_regs[SFR_DPCON] & 0x04) // auto-toggle enabled
 	{
 		fatalerror("inc_dptr with auto-toggle");
 	}
 
-	if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x01) // DPTR1 enabled
+	if (m_sfr_regs[SFR_DPCON] & 0x01) // DPTR1 enabled
 	{
 		uint16_t dptr = (DPTR1)+1;
 		SET_DPTR1(dptr);
@@ -450,17 +450,17 @@ void axc51base_cpu_device::jc(uint8_t r)
 void axc51base_cpu_device::jmp_iadptr(uint8_t r)
 {
 	// not listed as being affected by auto-inc or auto-toggle?
-	if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x08) // auto-increment enabled
+	if (m_sfr_regs[SFR_DPCON] & 0x08) // auto-increment enabled
 	{
 		fatalerror("jmp_iadptr with auto-inc");
 	}
 
-	if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x04) // auto-toggle enabled
+	if (m_sfr_regs[SFR_DPCON] & 0x04) // auto-toggle enabled
 	{
 		fatalerror("jmp_iadptr with auto-toggle");
 	}
 
-	if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x01) // DPTR0 enabled
+	if (m_sfr_regs[SFR_DPCON] & 0x01) // DPTR0 enabled
 	{
 		fatalerror("jmp_iadptr with DPTR1");
 	}
@@ -603,12 +603,12 @@ void axc51base_cpu_device::mov_mem_r(uint8_t r)
 //MOV DPTR, #data16                         /* 1: 1001 0000 */
 void axc51base_cpu_device::mov_dptr_byte(uint8_t r)
 {
-	//if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x08) // auto-increment enabled (not used here)
+	//if (m_sfr_regs[SFR_DPCON] & 0x08) // auto-increment enabled (not used here)
 	//{
 	//	fatalerror("mov_dptr_byte with auto-inc");
 	//}
 
-	if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x04) // auto-toggle enabled
+	if (m_sfr_regs[SFR_DPCON] & 0x04) // auto-toggle enabled
 	{
 		fatalerror("mov_dptr_byte with auto-toggle");
 	}
@@ -617,7 +617,7 @@ void axc51base_cpu_device::mov_dptr_byte(uint8_t r)
 	data_hi = m_program.read_byte(m_pc++);                //Grab hi byte
 	data_lo = m_program.read_byte(m_pc++);                //Grab lo byte
 
-	if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x01) // DPTR1 enabled
+	if (m_sfr_regs[SFR_DPCON] & 0x01) // DPTR1 enabled
 	{
 		SET_DPTR1((uint16_t)((data_hi << 8) | data_lo));   //Store to DPTR1
 	}
@@ -685,17 +685,17 @@ void axc51base_cpu_device::mov_c_bitaddr(uint8_t r)
 //MOVC A, @A + DPTR                         /* 1: 1001 0011 */
 void axc51base_cpu_device::movc_a_iadptr(uint8_t r)
 {
-	if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x08) // auto-increment enabled
+	if (m_sfr_regs[SFR_DPCON] & 0x08) // auto-increment enabled
 	{
 		fatalerror("movc_a_iadptr with auto-inc");
 	}
 
-	if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x04) // auto-toggle enabled
+	if (m_sfr_regs[SFR_DPCON] & 0x04) // auto-toggle enabled
 	{
 		fatalerror("movc_a_iadptr with auto-toggle");
 	}
 
-	if (m_sfr_regs[AXC51_DPCON - 0x80] & 0x01) // DPTR1 enabled
+	if (m_sfr_regs[SFR_DPCON] & 0x01) // DPTR1 enabled
 	{
 		fatalerror("movc_a_iadptr with DPTR1");
 	}
