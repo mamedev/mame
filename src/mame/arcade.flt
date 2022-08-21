@@ -492,6 +492,7 @@ konami/konmedal68k.cpp
 konami/kontest.cpp
 konami/kpontoon.cpp
 konami/kpython.cpp
+konami/kpython2.cpp
 konami/ksys573.cpp
 konami/labyrunr.cpp
 konami/lethal.cpp
