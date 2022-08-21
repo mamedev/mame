@@ -495,6 +495,7 @@ public:
 	cmd_reply handle_P(const char *buf);
 	cmd_reply handle_q(const char *buf);
 	cmd_reply handle_s(const char *buf);
+	cmd_reply handle_T(const char *buf);
 	cmd_reply handle_z(const char *buf);
 	cmd_reply handle_Z(const char *buf);
 
@@ -1101,6 +1102,17 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_s(const char *buf)
 }
 
 //-------------------------------------------------------------------------
+// Find out if the thread XX is alive.
+debug_gdbstub::cmd_reply debug_gdbstub::handle_T(const char *buf)
+{
+	if ( is_thread_id_ok(buf) )
+		return REPLY_OK;
+
+	// thread is dead
+	return REPLY_ENN;
+}
+
+//-------------------------------------------------------------------------
 static bool remove_breakpoint(device_debug *debug, uint64_t address, int /*kind*/)
 {
 	const debug_breakpoint *bp = debug->breakpoint_find(address);
@@ -1270,6 +1282,7 @@ void debug_gdbstub::handle_packet()
 		case 'P': reply = handle_P(buf); break;
 		case 'q': reply = handle_q(buf); break;
 		case 's': reply = handle_s(buf); break;
+		case 'T': reply = handle_T(buf); break;
 		case 'z': reply = handle_z(buf); break;
 		case 'Z': reply = handle_Z(buf); break;
 	}
