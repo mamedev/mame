@@ -3274,7 +3274,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/generic/slot.h,BUSES["MONONCOL"] = true
+--@src/devices/bus/mononcol/slot.h,BUSES["MONONCOL"] = true
 ---------------------------------------------------
 
 if (BUSES["MONONCOL"]~=null) then
