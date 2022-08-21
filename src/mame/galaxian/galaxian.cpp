@@ -5622,10 +5622,12 @@ static INPUT_PORTS_START( bmxstunts )
 	PORT_START("DSW1") // only one 6-dip bank
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x00, "SW1:1")
 	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x00, "SW1:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x00, "SW1:3")
-	PORT_DIPNAME(          0x08, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(             0x08, "A 2/1  B 1/3" )
-	PORT_DIPSETTING(             0x00, "A 1/1  B 1/6" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, "A 2/1  B 1/3" )
+	PORT_DIPSETTING(    0x00, "A 1/1  B 1/6" )
 	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x00, "SW1:5")
 	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x00, "SW1:6")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -16083,8 +16085,8 @@ GAME( 1982, zigzagb2,    zigzagb,  zigzag,     zigzag,     zigzagb_state,  init_
 GAME( 1981, gmgalax,     0,        gmgalax,    gmgalax,    gmgalax_state,  init_gmgalax,    ROT90,  "bootleg", "Ghostmuncher Galaxian (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 // Multigames
-GAME( 2002, fourplay,    0,        fourplay,   galaxian,   fourplay_state, init_fourplay,   ROT90, "Macro", "Four Play",   MACHINE_SUPPORTS_SAVE )
-GAME( 2001, videight,    0,        videight,   warofbug,   videight_state, init_videight,   ROT90, "Macro", "Video Eight", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, fourplay,    0,        fourplay,   galaxian,   fourplay_state, init_fourplay,   ROT90,  "Macro", "Four Play",   MACHINE_SUPPORTS_SAVE )
+GAME( 2001, videight,    0,        videight,   warofbug,   videight_state, init_videight,   ROT90,  "Macro", "Video Eight", MACHINE_SUPPORTS_SAVE )
 
 
 /*************************************
