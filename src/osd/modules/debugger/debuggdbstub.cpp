@@ -644,7 +644,7 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 	if ( firststop && !m_initialized )
 	{
 		// find the "main" CPU, which is the first CPU (gdbstub doesn't have any notion of switching CPUs)
-		m_maincpu = device_type_enumerator<cpu_device>(m_machine->root_device()).first();
+		m_maincpu = device_interface_enumerator<cpu_device>(m_machine->root_device()).first();
 		if (!m_maincpu)
 			fatalerror("gdbstub: cannot find any CPUs\n");
 
