@@ -31241,9 +31241,9 @@ cpc88                           //
 cpg120                          //
 cx5f                            //
 cx5f1                           //
-cx5m                            //
+cx5me                           //
 cx5m128                         //
-cx5m2                           //
+cx5miib                         //
 cx7m                            // 1986 MSX2
 cx7m128                         // 1986 MSX2
 dgnmsx                          // 1985 MSX
@@ -31343,17 +31343,20 @@ hx10f                           //
 hx10s                           // 1984 MSX
 hx10sa                          //
 hx20                            // 1984 MSX
+hx20e                           // 1985 MSX
 hx20i                           //
 hx21                            //
-hx21i                           //
+hx21f                           //
 hx22                            //
 hx22i                           //
 hx23                            // 1986 MSX2
 hx23f                           // 1986 MSX2
 hx23i                           //
+hx32                            // 1985 MSX
 hx33                            //
 hx34                            //
 hx34i                           //
+hx51i                           // 1985 MSX
 jvchc7gb                        //
 kmc5000                         //
 mbh1                            // 1983 MSX1
@@ -31424,6 +31427,7 @@ svi738dk                        //
 svi738pl                        // 1985 MSX
 svi738sp                        //
 svi738sw                        // 1985 MSX
+sx100                           // 1985 MSX
 tadpc200                        //
 tadpc20a                        //
 tpc310                          // 1986 MSX2
@@ -31456,7 +31460,6 @@ yis303                          //
 yis503                          //
 yis503f                         //
 yis503ii                        //
-yis503m                         //
 yis604                          //
 yis60464                        //
 
