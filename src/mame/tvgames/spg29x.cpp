@@ -9,7 +9,6 @@
         HyperScan TODO:
         - Various graphics glitches
         - Sound
-        - X-Men hangs after the first match
         - USB
 
         Hyperscan has a hidden test menu that can be accessed with a specific inputs sequence:
@@ -133,6 +132,9 @@ private:
 
 	uint16_t m_tve_control = 0;
 	uint8_t  m_tve_fade_offset = 0;
+	uint16_t m_timers_clk_sel = 0;
+	uint8_t  m_tve_buffer_ctrl = 3 ;
+	uint32_t m_tv_start_addr[3] = { 0 };
 	uint16_t m_gpio_out = 0;
 };
 
@@ -176,6 +178,8 @@ private:
 
 void spg29x_game_state::timers_clk_sel_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
+	COMBINE_DATA(&m_timers_clk_sel);
+
 	auto clock = 27_MHz_XTAL / ((data & 0xff) + 1);
 
 	uint32_t mask = 0x100;
@@ -239,6 +243,23 @@ uint32_t spg29x_game_state::spg290_screen_update(screen_device &screen, bitmap_r
 {
 	m_ppu->screen_update(screen, bitmap, cliprect);
 
+	// TVE frame buffer
+	if (m_tve_buffer_ctrl < 3)
+	{
+		auto &space = m_maincpu->space(AS_PROGRAM);
+		const bool interlaced = m_tve_control & 1;
+		for (int y = cliprect.min_y; y <= cliprect.max_y; y += (interlaced ? 1 : 2))
+			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+			{
+				const uint16_t rgb = space.read_word(m_tv_start_addr[m_tve_buffer_ctrl] + (y * cliprect.width() + x) * 2);
+				const rgb_t pix = rgb_t(pal5bit(rgb >> 11), pal6bit(rgb >> 5), pal5bit(rgb >> 0));
+
+				bitmap.pix(y, x) = pix;
+				if (!interlaced && cliprect.contains(x, y + 1))
+					bitmap.pix(y + 1, x) = pix;
+			}
+	}
+
 	if (m_tve_fade_offset)
 	{
 		int fade_offset = 255 - m_tve_fade_offset;
@@ -260,9 +281,12 @@ void spg29x_game_state::spg290_mem(address_map &map)
 
 	map(0x08030000, 0x08030003).w(FUNC(spg29x_game_state::tve_control_w)).lr32(NAME([this](uint32_t data) { return m_tve_control; }));
 	map(0x0803000c, 0x0803000f).lw32(NAME([this](uint32_t data) { m_tve_fade_offset = data & 0xff; }));
+	map(0x08070000, 0x0807000b).lr32(NAME([this](offs_t offset) { return m_tv_start_addr[offset]; }));
+	map(0x08070000, 0x0807000b).lw32(NAME([this](offs_t offset, uint32_t data, uint32_t mem_mask) { COMBINE_DATA(&m_tv_start_addr[offset]); }));
+	map(0x08090020, 0x08090023).lw32(NAME([this](uint32_t data) { m_tve_buffer_ctrl = data & 3; }));
 	map(0x0807006c, 0x0807006f).lr32(NAME([]() { return 0x01;}));               // MUI Status: SDRAM is in the self-refresh mode
 	//map(0x08150000, 0x08150000).lw8(NAME([this](uint8_t data) { printf("%c", data); })); // UART
-	map(0x082100e4, 0x082100e7).w(FUNC(spg29x_game_state::timers_clk_sel_w));       // Timer Source Clock Selection
+	map(0x082100e4, 0x082100e7).w(FUNC(spg29x_game_state::timers_clk_sel_w)).lr32(NAME([this]() { return m_timers_clk_sel; }));       // Timer Source Clock Selection
 	map(0x08240000, 0x0824000f).noprw();
 
 	//map(0x08000000, 0x0800ffff);  // CSI
@@ -338,6 +362,9 @@ void spg29x_game_state::machine_start()
 
 	save_item(NAME(m_tve_control));
 	save_item(NAME(m_tve_fade_offset));
+	save_item(NAME(m_timers_clk_sel));
+	save_item(NAME(m_tve_buffer_ctrl));
+	save_item(NAME(m_tv_start_addr));
 	save_item(NAME(m_gpio_out));
 }
 
@@ -345,6 +372,9 @@ void spg29x_game_state::machine_reset()
 {
 	m_tve_control = 0;
 	m_tve_fade_offset = 0;
+	m_timers_clk_sel = 0;
+	m_tve_buffer_ctrl = 3;
+	m_tv_start_addr[0] = m_tv_start_addr[1] = m_tv_start_addr[2] = 0;
 	m_gpio_out = 0;
 
 	// disable JTAG
