@@ -24,13 +24,13 @@
 
     TODO:
     - There are currently no differences seen between System 23 (Time Crisis 2) and
-      Super System 23 (GP500, Final Furlong 2).  These will presumably appear when
+      Super System 23 (500GP, Final Furlong 2). These will presumably appear when
       the 3D hardware is emulated.
 
     - Serial number data is at offset 0x201 in the BIOS.  Until the games are running
       and displaying it I'm not going to meddle with it though.
 
-    - Add the sh2 in Gunmen Wars (no ROM, controls the camera)
+    - Improve GMEN hookups/comms.
 
     - Super System 23 tests irqs in the post.  timecrs2v4a's code can
     potentially test 7 sources, but only actually test 5.  With each
@@ -107,6 +107,28 @@ c8000000:
 ':maincpu' (801143E0): unmapped program memory write to 0C800010 = 00000000 & 0000FFFF
 ':maincpu' (801143E0): unmapped program memory write to 0C800010 = 00000000 & 0000FFFF
 ':maincpu' (801143E0): unmapped program memory write to 0C800010 = 00000000 & 0000FFFF
+
+    Game status:
+        rapidrvr,v2c        Missing 3d graphics. Coins up. Freezes right when a game starts.
+        rapidrvrp           Same as above but it's possible to enable (glitchy) 3d by entering certain portions of the development menu.
+        finfurl             Missing 3d graphics. Freezes in attract mode but can 'play' the game with missing 3d. 
+        motoxgo(all)        Inputs don't respond at all. It's not an I/O board issue as changing the I/O program to a different
+                            version doesn't work and using the I/O program on a different game has it work fine (tested on rapidrvr).
+                            May be related to sub_comm_r.
+                            On a side note on actual h/w, unplugging the I/O board (after completing POST) stops inputs from working
+                            even if the I/O board is plugged back in. This is not the case in timecrs2 where plugging an I/O board back
+                            in restores inputs if unplugged in that case.
+        downhill            Freeze with black screen after POST.
+        downhillu           Heavy gfx glitches. Missing rotary inputs. Random freezes.
+        timecrs2(all)       Playable with some gfx glitches up until stage 1-2 (see sub_comm_r).
+        panicprk,j,j2       Freezes during 'SUB-READY WAIT' after POST (see sub_comm_r).
+        gunwars,a           Hardlocks after POST (gmen related?).
+        raceon              Hardlocks after POST (gmen related?).
+        aking               Freezes at the first ingame frame showing the notice screen or test menu.
+        500gp               Heavy gfx glitches. Possible to coin up but freezes when starting a game as well as in attract.
+        finfurl2,j          Freezes upon the gmen transfering the program to the SH2.
+        crszone(all)        Has its IRQs hardwired different from S23/SS23. Won't advance past interrupt check and skipping POST with
+                            DIP #2 on has it freeze shortly after.
 
 ****************************************************************************
 
@@ -1435,7 +1457,6 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_generic_paletteram_32(*this, "paletteram"),
-		m_adc_ports(*this, "ADC.%u", 0),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
@@ -1584,7 +1605,6 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint32_t> m_generic_paletteram_32;
-	optional_ioport_array<4> m_adc_ports;
 
 	c404_t m_c404;
 	c361_t m_c361;
@@ -3196,14 +3216,6 @@ void namcos23_state::iob_p6_w(uint16_t data)
 }
 
 
-// Analog Ports
-
-uint16_t namcos23_state::iob_analog_r(offs_t offset)
-{
-	return m_adc_ports[offset].read_safe(0);
-}
-
-
 void namcos23_state::s23iobrdmap(address_map &map)
 {
 	map(0x0000, 0x1fff).rom().region("iocpu", 0);
@@ -3221,7 +3233,14 @@ void namcos23_state::s23iobrdiomap(address_map &map)
 	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(namcos23_state::iob_p6_r), FUNC(namcos23_state::iob_p6_w));
 	map(h8_device::PORT_8, h8_device::PORT_8).noprw();   // unknown - used on ASCA-5 only
 	map(h8_device::PORT_9, h8_device::PORT_9).noprw();   // unknown - used on ASCA-5 only
-	map(h8_device::ADC_0, h8_device::ADC_3).r(FUNC(namcos23_state::iob_analog_r));
+	map(h8_device::ADC_0, h8_device::ADC_0).portr("ADC0");
+	map(h8_device::ADC_1, h8_device::ADC_1).portr("ADC1");
+	map(h8_device::ADC_2, h8_device::ADC_2).portr("ADC2");
+	map(h8_device::ADC_3, h8_device::ADC_3).portr("ADC3");
+	map(h8_device::ADC_4, h8_device::ADC_4).portr("ADC4");
+	map(h8_device::ADC_5, h8_device::ADC_5).portr("ADC5");
+	map(h8_device::ADC_6, h8_device::ADC_6).portr("ADC6");
+	map(h8_device::ADC_7, h8_device::ADC_7).portr("ADC7");
 }
 
 
@@ -3263,14 +3282,37 @@ void namcos23_state::timecrs2iobrdmap(address_map &map)
 }
 
 
-
-
-
 /***************************************************************************
 
   Inputs
 
 ***************************************************************************/
+
+static INPUT_PORTS_START( h8analog )
+	PORT_START("ADC0")
+	PORT_BIT( 0x3ff, 0x0200, IPT_CUSTOM )
+
+	PORT_START("ADC1")
+	PORT_BIT( 0x3ff, 0x0200, IPT_CUSTOM )
+
+	PORT_START("ADC2")
+	PORT_BIT( 0x3ff, 0x0200, IPT_CUSTOM )
+
+	PORT_START("ADC3")
+	PORT_BIT( 0x3ff, 0x0200, IPT_CUSTOM )
+
+	PORT_START("ADC4")
+	PORT_BIT( 0x3ff, 0x0200, IPT_CUSTOM )
+
+	PORT_START("ADC5")
+	PORT_BIT( 0x3ff, 0x0200, IPT_CUSTOM )
+
+	PORT_START("ADC6")
+	PORT_BIT( 0x3ff, 0x0200, IPT_CUSTOM )
+
+	PORT_START("ADC7")
+	PORT_BIT( 0x3ff, 0x0200, IPT_CUSTOM )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( rapidrvr )
 	PORT_START("P1")
@@ -3280,7 +3322,7 @@ static INPUT_PORTS_START( rapidrvr )
 	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN01")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Test Button") PORT_CODE(KEYCODE_F1)
+	PORT_SERVICE( 0x0100, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Service Up")
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Service Down")
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Service Enter")
@@ -3316,7 +3358,30 @@ static INPUT_PORTS_START( rapidrvr )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DIP:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE_DIPLOC(0x80, IP_ACTIVE_LOW, "DIP:1" )
+	PORT_DIPNAME(0x80,  0x80, "Service Mode DIP" ) PORT_DIPLOCATION("DIP:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	
+	PORT_INCLUDE( h8analog )
+	
+	PORT_MODIFY("ADC0")
+	PORT_BIT( 0x3ff, 0x0200, IPT_AD_STICK_Y )  PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Yaw")
+
+	PORT_MODIFY("ADC1")
+	PORT_BIT( 0x3ff, 0x0200, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Pitch")
+#if 0	
+	PORT_MODIFY("ADC3")
+	PORT_BIT( 0x3ff, 0x0200, IPT_PEDAL )  PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Rear Right Sensor")
+
+	PORT_MODIFY("ADC4")
+	PORT_BIT( 0x3ff, 0x0200, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Rear Left Sensor")
+
+	PORT_MODIFY("ADC5")
+	PORT_BIT( 0x3ff, 0x0200, IPT_PEDAL )  PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Front Right Sensor")
+
+	PORT_MODIFY("ADC6")
+	PORT_BIT( 0x3ff, 0x0200, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Front Left Sensor")
+#endif
 INPUT_PORTS_END
 
 
@@ -3341,7 +3406,6 @@ static INPUT_PORTS_START( rapidrvrp )
 	PORT_BIT( 0x800, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("Dev Service B") // + I/O Air Dumper RL
 
 	PORT_MODIFY("IN01")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Test Button") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("User Service Up")
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("User Service Down")
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("User Service Enter")
@@ -3355,18 +3419,9 @@ static INPUT_PORTS_START( rapidrvrp )
 	PORT_DIPNAME( 0x40, 0x40, "Dev Service Mode" )  PORT_DIPLOCATION("DIP:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE_DIPLOC(0x80, IP_ACTIVE_LOW, "DIP:1" ) PORT_NAME("User Service Mode")
-
-#if 0 // need to hook these up properly
-	PORT_START("ADC.0")
-	PORT_BIT( 0xffff, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_NAME("ADC0") // rear r
-	PORT_START("ADC.1")
-	PORT_BIT( 0xffff, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_NAME("ADC1") // rear l
-	PORT_START("ADC.2")
-	PORT_BIT( 0xffff, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_NAME("ADC2") // front r
-	PORT_START("ADC.3")
-	PORT_BIT( 0xffff, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_NAME("ADC3") // front l
-#endif
+	PORT_DIPNAME(0x80,  0x80, "User Service Mode" ) PORT_DIPLOCATION("DIP:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -3374,24 +3429,19 @@ static INPUT_PORTS_START( finfurl )
 	PORT_INCLUDE( rapidrvr )
 
 	PORT_MODIFY("IN01")
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("Whip Button L")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("Whip Button R")
+	
+	PORT_MODIFY("ADC0")
+	PORT_BIT( 0x3ff, 0x0200, IPT_AD_STICK_Y )  PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Swing")
 
-#if 0 // need to hook these up properly
-	PORT_START("ADC.0")
-	PORT_BIT( 0xffff, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_NAME("ADC0")
-	PORT_START("ADC.1")
-	PORT_BIT( 0xffff, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_NAME("ADC1")
-	PORT_START("ADC.2")
-	PORT_BIT( 0xffff, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_NAME("ADC2")
-	PORT_START("ADC.3")
-	PORT_BIT( 0xffff, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_NAME("ADC3")
-#endif
+	PORT_MODIFY("ADC1")
+	PORT_BIT( 0x3ff, 0x0200, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Handle") PORT_REVERSE
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( s23 )
-	// No idea if start is actually there, but we need buttons to pass error screens
+	// Basically a testing grounds for inputs.
 	// You can go to the pcb test mode by pressing P1-A, and it doesn't crash anymore somehow
 	// Use P1-A to select, P1-Sel+P1-A to exit, up/down to navigate
 	PORT_START("P1")
@@ -3406,26 +3456,48 @@ static INPUT_PORTS_START( s23 )
 	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNKNOWN )   // 0x100 = freeze?
 
 	PORT_START("IN01")
-	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) // gun trigger
-	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) // foot pedal
-	PORT_BIT(0x00fc, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_UNKNOWN )    // this is the "coin acceptor connected" signal
-	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)
+	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_START1)
+	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)
+	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_START2)
+	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(2)
+	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2)
+	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_BUTTON2)
+	PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_BUTTON3)
+	PORT_SERVICE( 0x0100, IP_ACTIVE_LOW )
+	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_NAME("User Service Up")
+	PORT_BIT(0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_NAME("User Service Down")
+	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("User Service Enter")
+	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)
+	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_BUTTON4)
+	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(2)
+	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_PLAYER(2)
 
 	PORT_START("IN23")
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(3)
+	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(3)
+	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(3)
+	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(3)
+	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_START3)
+	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(3)
+	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(3)
+	PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(4)
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(4)
+	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(4)
+	PORT_BIT(0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(4)
+	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_COIN1) // designated coin input for any ASCA pcb
+	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_COIN2)
+	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_START4)
+	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(4)
+	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(4)
 
 	PORT_START("SERVICE")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
 	PORT_START("DSW")
-	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x01, 0x01, "Service Mode DIP" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, "Skip POST" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3447,11 +3519,28 @@ static INPUT_PORTS_START( s23 )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
 
+	PORT_INCLUDE( h8analog )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( timecrs2 )
 	PORT_INCLUDE( s23 )
+
+	PORT_MODIFY("IN01")
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gun Trigger")
+	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Foot Pedal")
+	PORT_BIT(0x00fc, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // this is the "coin acceptor connected" signal
+	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE( 0x1000, IP_ACTIVE_LOW )
+	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("User Service Down")
+	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("User Service Up")
+	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("User Enter")
+
+	PORT_MODIFY("IN23")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("LIGHTX") // tuned for CRT
 	PORT_BIT( 0xfff, 91+733/2, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(91, 91+733) PORT_SENSITIVITY(48) PORT_KEYDELTA(12)
@@ -3461,51 +3550,43 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( downhill )
-	PORT_START("P1")
-	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_INCLUDE( s23 )
 
-	PORT_START("P2")
-	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_MODIFY("IN01")
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Left Brake")
+	PORT_BIT(0xf0fc, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
-	PORT_START("IN01")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3)      // brake left
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_START1)       // start
-	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_SERVICE) PORT_TOGGLE // test switch
-	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)     // select up
-	PORT_BIT(0x400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)   // select down
-	PORT_BIT(0x800, IP_ACTIVE_LOW, IPT_BUTTON1) // enter
-	PORT_BIT(0xf00c, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_MODIFY("IN23")
+	PORT_BIT(0x0400, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Right Brake")
+	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_COIN1)
+	PORT_BIT(0xf3ff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	
+	PORT_MODIFY("ADC6")
+	PORT_BIT( 0x3ff, 0x0200, IPT_PADDLE )  PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Steering")
+INPUT_PORTS_END
 
-	PORT_START("IN23")
-	PORT_BIT(0x400, IP_ACTIVE_LOW, IPT_BUTTON4)     // brake right
-	PORT_BIT(0xfbff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+static INPUT_PORTS_START( 500gp )
+	PORT_INCLUDE( s23 )
 
-	PORT_START("SERVICE")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )   // service coin
+	PORT_MODIFY("IN01")
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("View Button")
+	PORT_CONFNAME( 0x0002, 0x0000, DEF_STR( Cabinet ) )
+	PORT_CONFSETTING(      0x0000, DEF_STR( Standard ) )
+	PORT_CONFSETTING(      0x0002, "Deluxe")
+	PORT_BIT(0xf0fc, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
-	PORT_START("DSW")
-	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x02, 0x02, "Skip POST" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Freeze?" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_MODIFY("IN23")
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Speed Sensor")
+	PORT_BIT(0xf6ff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_MODIFY("ADC0")
+	PORT_BIT( 0x3ff, 0x0200, IPT_PEDAL )  PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Throttle")
+
+	PORT_MODIFY("ADC1")
+	PORT_BIT( 0x2ff, 0x0180, IPT_PEDAL2 )  PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Brake")
+
+	PORT_MODIFY("ADC2")
+	PORT_BIT( 0x3ff, 0x0200, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Bank")
 INPUT_PORTS_END
 
 
@@ -3565,7 +3646,9 @@ void namcos23_state::init_s23()
 	m_render.cur = 0;
 
 	if((!strcmp(machine().system().name, "motoxgo")) ||
-		(!strcmp(machine().system().name, "panicprk")) ||
+		(!strcmp(machine().system().name, "500gp")) ||
+		(!strcmp(machine().system().name, "aking")) ||
+	    (!strcmp(machine().system().name, "panicprk")) ||
 		(!strcmp(machine().system().name, "panicprkj")) ||
 		(!strcmp(machine().system().name, "panicprkj2")) ||
 		(!strcmp(machine().system().name, "rapidrvr")) ||
@@ -3677,11 +3760,10 @@ void namcos23_state::gorgon(machine_config &config)
 	c352.add_route(3, "rspeaker", 1.00);
 }
 
-
 void namcos23_state::s23(machine_config &config)
 {
 	/* basic machine hardware */
-	R4650BE(config, m_maincpu, BUSCLOCK*4);
+	R4650BE(config, m_maincpu, BUSCLOCK*5);
 	m_maincpu->set_icache_size(8192);   // VERIFIED
 	m_maincpu->set_dcache_size(8192);   // VERIFIED
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos23_state::s23_map);
@@ -3756,12 +3838,16 @@ void namcos23_state::timecrs2(machine_config &config)
 	m_iocpu->set_addrmap(AS_PROGRAM, &namcos23_state::timecrs2iobrdmap);
 }
 
-void namcos23_state::gmen(machine_config &config)
+void namcos23_state::ss23(machine_config &config)
 {
 	s23(config);
+}
+
+void namcos23_state::gmen(machine_config &config)
+{
+	ss23(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_clock(BUSCLOCK*5);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos23_state::gmen_mips_map);
 
 	SH2(config, m_gmen_sh2, XTAL(28'700'000));
@@ -3770,71 +3856,12 @@ void namcos23_state::gmen(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(namcos23_state,gmen)
 }
 
-void namcos23_state::ss23(machine_config &config)
-{
-	/* basic machine hardware */
-	R4650BE(config, m_maincpu, BUSCLOCK*5);
-	m_maincpu->set_icache_size(8192);   // VERIFIED
-	m_maincpu->set_dcache_size(8192);   // VERIFIED
-	m_maincpu->set_addrmap(AS_PROGRAM, &namcos23_state::s23_map);
-	m_maincpu->set_vblank_int("screen", FUNC(namcos23_state::interrupt));
-
-	H83002(config, m_subcpu, H8CLOCK);
-	m_subcpu->set_addrmap(AS_PROGRAM, &namcos23_state::s23h8rwmap);
-	m_subcpu->set_addrmap(AS_IO, &namcos23_state::s23h8iomap);
-
-	// Timer at 115200*16 for the jvs serial clock
-	m_subcpu->subdevice<h8_sci_device>("sci0")->set_external_clock_period(attotime::from_hz(JVSCLOCK/8));
-
-	config.set_maximum_quantum(attotime::from_hz(2*115200));
-
-	NAMCO_SETTINGS(config, m_settings, 0);
-
-	RTC4543(config, m_rtc, XTAL(32'768));
-	m_rtc->data_cb().set("subcpu:sci1", FUNC(h8_sci_device::rx_w));
-
-	// FIXME: need better syntax for configuring H8 onboard devices
-	h8_sci_device &subcpu_sci1(*m_subcpu->subdevice<h8_sci_device>("sci1"));
-	subcpu_sci1.tx_handler().set(m_settings, FUNC(namco_settings_device::data_w));
-	subcpu_sci1.clk_handler().set(m_rtc, FUNC(rtc4543_device::clk_w)).invert();
-	subcpu_sci1.clk_handler().append(m_settings, FUNC(namco_settings_device::clk_w));
-
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-
-	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(VSYNC1);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // Not in any way accurate
-	m_screen->set_size(640, 480);
-	m_screen->set_visarea(0, 639, 0, 479);
-	m_screen->set_screen_update(FUNC(namcos23_state::screen_update));
-	m_screen->screen_vblank().set(FUNC(namcos23_state::sub_irq));
-
-	PALETTE(config, m_palette).set_entries(0x8000);
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_namcos23);
-
-	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	c352_device &c352(C352(config, "c352", C352CLOCK, C352DIV));
-	c352.add_route(0, "rspeaker", 1.00);
-	c352.add_route(1, "lspeaker", 1.00);
-	c352.add_route(2, "rspeaker", 1.00);
-	c352.add_route(3, "lspeaker", 1.00);
-}
-
 void namcos23_state::timecrs2v4a(machine_config &config)
 {
 	ss23(config);
-	/* basic machine hardware */
-	H83334(config, m_iocpu, JVSCLOCK);
-	m_iocpu->set_addrmap(AS_PROGRAM, &namcos23_state::timecrs2iobrdmap);
-	m_iocpu->set_addrmap(AS_IO, &namcos23_state::s23iobrdiomap);
 
-	m_iocpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("subcpu:sci0", FUNC(h8_sci_device::rx_w));
-	m_subcpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("iocpu:sci0", FUNC(h8_sci_device::rx_w));
+	/* basic machine hardware */
+	m_iocpu->set_addrmap(AS_PROGRAM, &namcos23_state::timecrs2iobrdmap);
 }
 
 void namcos23_state::ss23e2(machine_config &config)
@@ -3843,13 +3870,6 @@ void namcos23_state::ss23e2(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_clock(BUSCLOCK*6);
-
-	H83334(config, m_iocpu, JVSCLOCK);
-	m_iocpu->set_addrmap(AS_PROGRAM, &namcos23_state::s23iobrdmap);
-	m_iocpu->set_addrmap(AS_IO, &namcos23_state::s23iobrdiomap);
-
-	m_iocpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("subcpu:sci0", FUNC(h8_sci_device::rx_w));
-	m_subcpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("iocpu:sci0", FUNC(h8_sci_device::rx_w));
 }
 
 // a note about "user1" ROMs:
@@ -4555,8 +4575,16 @@ ROM_START( aking )
 	ROM_REGION( 0x80000, "subcpu", 0 )  /* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "ag1vera.ic3",   0x000000, 0x080000, CRC(266ac71c) SHA1(648a64adc0e4a2cefd71c31a6a71359b6c196430) )
 
-	ROM_REGION( 0x40000, "iocpu", 0 )   /* I/O board MB90F574 MCU code */
+	ROM_REGION( 0x40000, "iocpu", 0 )   /* I/O board HD643334 H8/3334 MCU code. Hacked firmware to change the JVS ID to 'FCA-1' */
+	ROM_LOAD( "asc3_io-c1.ic14", 0x000000, 0x020000, BAD_DUMP CRC(b6627a0e) SHA1(92343d527f4a62773c4495b9a04e7e16b9d6fb96) )
+
+#if 0
+	ROM_REGION( 0x40000, "iocpu2", 0 ) // I/O board MB90F574 MCU code 
 	ROM_LOAD( "fcaf10.bin", 0x000000, 0x040000, NO_DUMP ) // 256KB internal flash ROM
+
+	ROM_REGION( 0x10000, "iocpu3", 0 ) // I/O board PIC16F84 code
+	ROM_LOAD( "fcap10.ic2", 0x000000, 0x004010, NO_DUMP )
+#endif
 
 	ROM_REGION32_BE( 0x2000000, "data", 0 ) /* data ROMs */
 	ROM_LOAD16_BYTE( "ag1mtah.2j",  0x0000000, 0x800000, CRC(f2d8ca9d) SHA1(8158d13d74f2aae7c0d1238619ce1ad3a17d8047) )
@@ -4601,8 +4629,16 @@ ROM_START( 500gp )
 	ROM_REGION( 0x80000, "subcpu", 0 )  /* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "5gp3verc.3",   0x000000, 0x080000, CRC(b323abdf) SHA1(8962e39b48a7074a2d492afb5db3f5f3e5ae2389) )
 
-	ROM_REGION( 0x40000, "iocpu", 0 )   /* I/O board MB90F574 MCU code */
+	ROM_REGION( 0x40000, "iocpu", 0 )   /* I/O board HD643334 H8/3334 MCU code. Hacked firmware to change the JVS ID to 'FCA-1' */
+	ROM_LOAD( "asc3_io-c1.ic14", 0x000000, 0x020000, BAD_DUMP CRC(b6627a0e) SHA1(92343d527f4a62773c4495b9a04e7e16b9d6fb96) )
+
+#if 0
+	ROM_REGION( 0x40000, "iocpu2", 0 ) // I/O board MB90F574 MCU code 
 	ROM_LOAD( "fcaf10.bin", 0x000000, 0x040000, NO_DUMP ) // 256KB internal flash ROM
+
+	ROM_REGION( 0x10000, "iocpu3", 0 ) // I/O board PIC16F84 code
+	ROM_LOAD( "fcap10.ic2", 0x000000, 0x004010, NO_DUMP )
+#endif
 
 	ROM_REGION32_BE( 0x2000000, "data", 0 ) /* data ROMs */
 	ROM_LOAD16_BYTE( "5gp1mtah.2j",  0x0000000, 0x800000, CRC(246e4b7a) SHA1(75743294b8f48bffb84f062febfbc02230d49ce9) )
@@ -5455,7 +5491,7 @@ GAME( 1997, panicprkj2,  panicprk, s23,         s23,       namcos23_state, init_
 GAME( 1998, gunwars,     0,        gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Gunmen Wars (Japan, GM1 Ver. B)",     GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1998, gunwarsa,    gunwars,  gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Gunmen Wars (Japan, GM1 Ver. A)",     GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1998, raceon,      0,        gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Race On! (World, RO2 Ver. A)",        GAME_FLAGS | MACHINE_NODEVICE_LAN )
-GAME( 1998, 500gp,       0,        ss23,        s23,       namcos23_state, init_s23, ROT0, "Namco", "500 GP (US, 5GP3 Ver. C)",         GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1998, 500gp,       0,        ss23,        500gp,     namcos23_state, init_s23, ROT0, "Namco", "500 GP (US, 5GP3 Ver. C)",         GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1998, aking,       0,        ss23,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Angler King (Japan, AG1 Ver. A)",     GAME_FLAGS )
 GAME( 1998, finfurl2,    0,        gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Final Furlong 2 (World)",             GAME_FLAGS | MACHINE_NODEVICE_LAN ) // 99/02/26  15:08:47 Overseas
 GAME( 1998, finfurl2j,   finfurl2, gmen,        s23,       namcos23_state, init_s23, ROT0, "Namco", "Final Furlong 2 (Japan, FFS1 Ver.A)", GAME_FLAGS | MACHINE_NODEVICE_LAN ) // 99/02/26  15:03:14 Japanese
