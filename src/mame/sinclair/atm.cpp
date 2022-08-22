@@ -23,6 +23,9 @@ TODO:
 
 #include "beta_m.h"
 #include "glukrs.h"
+#include "bus/ata/ataintf.h"
+#include "bus/ata/atapicdr.h"
+#include "bus/ata/idehd.h"
 #include "bus/centronics/ctronics.h"
 #include "sound/ay8910.h"
 
@@ -40,8 +43,8 @@ namespace {
 #define LOGWARN(...)  LOGMASKED(LOG_WARN,  __VA_ARGS__)
 
 static constexpr u8 ROM_MASK = 0x7;
-static constexpr u8 PEN_RAM_MASK = 0x40;
-static constexpr u8 PEN_DOS7FFD_MASK = 0x80;
+static constexpr u16 PEN_RAM_MASK = 0x40 << 8;
+static constexpr u16 PEN_DOS7FFD_MASK = 0x80 << 8;
 
 class atm_state : public spectrum_128_state
 {
@@ -55,6 +58,7 @@ public:
 		, m_bank_rom(*this, "bank_rom%u", 0U)
 		, m_char_rom(*this, "charrom")
 		, m_beta(*this, BETA_DISK_TAG)
+		, m_ata(*this, "ata")
 		, m_centronics(*this, "centronics")
 		, m_glukrs(*this, "glukrs")
 		, m_palette(*this, "palette")
@@ -76,6 +80,8 @@ private:
 	u8 beta_neutral_r(offs_t offset);
 	u8 beta_enable_r(offs_t offset);
 	u8 beta_disable_r(offs_t offset);
+	u8 ata_r(offs_t offset);
+	void ata_w(offs_t offset, u8 data);
 
 	void atm_ula_w(offs_t offset, u8 data);
 	void atm_port_ffff_w(offs_t offset, u8 data);
@@ -103,47 +109,51 @@ private:
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 
 	required_device<beta_disk_device> m_beta;
+	required_device<ata_interface_device> m_ata;
 	required_device<centronics_device> m_centronics;
 	required_device<glukrs_device> m_glukrs;
 	required_device<device_palette_interface> m_palette;
 
 	bool is_shadow_active() { return m_beta->is_active(); }
-	u8 &pen_page(u8 bank) { return m_pages_map[BIT(m_port_7ffd_data, 4)][bank]; }
+	u16 &pen_page(u8 bank) { return m_pages_map[BIT(m_port_7ffd_data, 4)][bank]; }
 
 	bool m_pen;           // PEN - extended memory manager
 	bool m_cpm;
-	u8 m_pages_map[2][4]; // map: 0,1
+	u16 m_pages_map[2][4]; // map: 0,1
 
 	bool m_pen2;          // palette selector
 	u8 m_rg = 0b011;      // 0:320x200lo, 2:640:200hi, 3:256x192zx, 6:80x25txt
 	u8 m_br3;
+	u8 m_ata_data_hi;
 };
 
 void atm_state::atm_update_memory()
 {
 	using views_link = std::reference_wrapper<memory_view>;
 	views_link views[] = { m_bank_view0, m_bank_view1, m_bank_view2, m_bank_view3 };
-	LOGMEM("7FFD.%d = %X:", BIT(m_port_7ffd_data, 4), (m_port_7ffd_data & 0x07));
+	LOGMEM("PEN%d.%X ", BIT(m_port_7ffd_data, 4), (m_port_7ffd_data & 0x07));
 	for (auto bank = 0; bank < 4 ; bank++)
 	{
-		u8 page = m_pen ? pen_page(bank) : ROM_MASK;
+		u16 page = m_pen ? pen_page(bank) : ROM_MASK;
 		if (page & PEN_RAM_MASK)
 		{
 			if (page & PEN_DOS7FFD_MASK)
-				page = (page & 0xf8) | (m_port_7ffd_data & 0x07);
+			{
+				page = (page & ~0x07) | (m_port_7ffd_data & 0x07);
+			}
+			LOGMEM("RA%s(%X>%X) ", page & PEN_DOS7FFD_MASK ? "+" : " ", m_bank_ram[bank]->entry(), page & 0x3f);
 			page &= 0x3f; // TODO size dependent
 			m_bank_ram[bank]->set_entry(page);
 			views[bank].get().disable();
-			LOGMEM(" RA(%X>%X)", m_bank_ram[bank]->entry(), page);
 		}
 		else
 		{
 			if ((page & PEN_DOS7FFD_MASK) && !BIT(page, 1))
 				page = (page & ~1) | is_shadow_active();
 			page &= ROM_MASK;
+			LOGMEM("RO(%X>%X) ", m_bank_rom[bank]->entry(), page);
 			m_bank_rom[bank]->set_entry(page);
 			views[bank].get().select(0);
-			LOGMEM(" RO(%X>%X)", m_bank_rom[bank]->entry(), page);
 		}
 	}
 	LOGMEM("\n");
@@ -225,9 +235,9 @@ void atm_state::atm_port_fff7_w(offs_t offset, u8 data)
 		return;
 
 	u8 bank = offset >> 14;
-	u8 page = (data & 0xc0) | (~data & 0x3f);
+	u16 page = ((data & 0xc0) << 8) | (~data & 0x3f);
 
-	LOGMEM("PEN%s.%s = %X %s%d: %02X\n", (page | PEN_DOS7FFD_MASK) ? "+" : "!", BIT(m_port_7ffd_data, 4), data, (page & PEN_RAM_MASK) ? "RAM" : "ROM", bank, page & 0x3f);
+	LOGMEM("ATM%s=%X %s%d%s%02X\n", BIT(m_port_7ffd_data, 4), data, (page & PEN_RAM_MASK) ? "RAM" : "ROM", bank, (page & PEN_DOS7FFD_MASK) ? "+" : " ", page & 0x3f);
 	pen_page(bank) = page;
 	atm_update_memory();
 }
@@ -389,6 +399,26 @@ u8 atm_state::beta_disable_r(offs_t offset)
 	return m_program.read_byte(offset + 0x4000);
 }
 
+u8 atm_state::ata_r(offs_t offset)
+{
+	u8 ata_offset = BIT(offset, 5, 3);
+	u16 data = m_ata->cs0_r(ata_offset);
+	if (!ata_offset)
+		m_ata_data_hi = data >> 8;
+
+	return data & 0xff;
+}
+
+void atm_state::ata_w(offs_t offset, u8 data)
+{
+	u8 ata_offset = BIT(offset, 5, 3);
+	u16 ata_data = data;
+	if (!ata_offset)
+		ata_data |= m_ata_data_hi << 8;
+
+	m_ata->cs0_w(ata_offset, ata_data);
+}
+
 void atm_state::atm_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).bankrw(m_bank_ram[0]);
@@ -429,6 +459,13 @@ void atm_state::atm_io(address_map &map)
 	map(0xfadf, 0xfadf).mirror(0x0500).nopr(); // TODO 0xfadf, 0xfbdf, 0xffdf Kempston Mouse
 	map(0x8000, 0x8000).mirror(0x3ffd).w("ay8912", FUNC(ay8910_device::data_w));
 	map(0xc000, 0xc000).mirror(0x3ffd).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
+	map(0xc000, 0xc000).mirror(0x3ffd).w("ay8912", FUNC(ay8910_device::address_w));
+
+	// A: .... .... nnn0 1111
+	map(0x000f, 0x000f).select(0xffe0).rw(FUNC(atm_state::ata_r), FUNC(atm_state::ata_w));
+	// A: .... ...1 0000 1111
+	map(0x010f, 0x010f).mirror(0xfe00).lr8(NAME([this](offs_t offset) { return m_ata_data_hi; }))
+	                   .lw8(NAME([this](offs_t offset, u8 data) { m_ata_data_hi = data; }));
 }
 
 void atm_state::atm_switch(address_map &map)
@@ -510,6 +547,12 @@ static GFXDECODE_START( gfx_atmtb2 )
 	GFXDECODE_ENTRY( "maincpu", 0x13d00, spectrum_charlayout, 7, 1 )
 GFXDECODE_END
 
+static void atm_ata_devices(device_slot_interface &device)
+{
+	device.option_add("hdd", IDE_HARDDISK);
+	device.option_add("cdrom", ATAPI_CDROM);
+}
+
 void atm_state::atm(machine_config &config)
 {
 	spectrum_128(config);
@@ -524,6 +567,8 @@ void atm_state::atm(machine_config &config)
 
 	BETA_DISK(config, m_beta, 0);
 	GLUKRS(config, m_glukrs);
+
+	ATA_INTERFACE(config, m_ata).options(atm_ata_devices, "hdd", nullptr, false);;
 
 	CENTRONICS(config, m_centronics, centronics_devices, "covox");
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
