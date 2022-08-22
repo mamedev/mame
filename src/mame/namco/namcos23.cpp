@@ -194,7 +194,7 @@ The System 23 hardware is the first NAMCO system to require an external 3.3V pow
 was derived from a 5V to 3.3V regulator on systems such as System10/11/12 etc.
 The KEYCUS chip is the familiar MACH211 PLCC44 IC as used on System12. The sound system is also taken from System12.
 
-On bootup, the following happens (on GP500)...
+On bootup, the following happens (on 500GP)...
 
 1st screen - Grey screen with white text
                                "SYSTEM 23 BOOTING     "
@@ -701,7 +701,7 @@ Notes:
       Game             Code and revision
       ----------------------------------
       Angler King      AG1  Ver.A (for Super System 23)
-      GP500            5GP3 Ver.C (for Super System 23)
+      500GP            5GP3 Ver.C (for Super System 23)
       Time Crisis 2    TSS4 Ver.A (for Super System 23)
       Final Furlong 2  FFS1 Ver.A (for Super System 23)
       Final Furlong 2  FFS2 Ver.? (for Super System 23)
