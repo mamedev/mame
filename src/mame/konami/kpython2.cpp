@@ -74,8 +74,9 @@ PWB110526140000 or PWB0000359443
 |                                                             CN6 |
 |                                                                 |
 |      USB                                                    CN8 |
-|                                                                 |
-|   ANALOG                                                     SW |
+|               |-----|                                           |
+|               | U18 |                                           |
+|   ANALOG      |-----|                                        SW |
 |                                                                 |
 |                                                                 |
 |        JAMMA        |--|  CN17 CN16   CN11  CN12 CN13 CN14 CN15 |
@@ -104,6 +105,8 @@ CN15 - Line Out 2 R/Red
 CN16 - COM2
 CN17 - COM1
 SW - 4 position DIP switch
+
+U18 - Renesas F2218UTF24V H8S/2218
 
 
 Python 2 I/O subboard's USB device descriptor + configuration descriptor
