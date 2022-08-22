@@ -305,6 +305,9 @@ machine.hard_reset_pending (read-only)
 machine.devices (read-only)
     A :ref:`device enumerator <luareference-dev-enum>` that yields all
     :ref:`devices <luareference-dev-device>` in the emulated system.
+machine.palettes (read-only)
+    A :ref:`device enumerator <luareference-dev-enum>` that yields all
+    :ref:`palette devices <luareference-dev-dipalette>` in the emulated system.
 machine.screens (read-only)
     A :ref:`device enumerator <luareference-dev-enum>` that yields all
     :ref:`screen devices <luareference-dev-screen>` in the emulated system.
@@ -725,6 +728,9 @@ Instantiation
 manager.machine.devices
     Returns a device enumerator that will iterate over
     :ref:`devices <luareference-dev-device>` in the system.
+manager.machine.palettes
+    Returns a device enumerator that will iterate over
+    :ref:`palette devices <luareference-dev-dipalette>` in the system.
 manager.machine.screens
     Returns a device enumerator that will iterate over
     :ref:`screen devices <luareference-dev-screen>` in the system.
@@ -744,6 +750,13 @@ emu.device_enumerator(device, [depth])
     provided, it must be an integer specifying the maximum number of levels to
     iterate below the specified device (i.e. 1 will limit iteration to the
     device and its immediate children).
+emu.palette_enumerator(device, [depth])
+    Returns a device enumerator that will iterate over
+    :ref:`palette devices <luareference-dev-dipalette>` in the sub-tree starting
+    at the specified device.  The specified device will be included if it is a
+    palette device.  If the depth is provided, it must be an integer specifying
+    the maximum number of levels to iterate below the specified device (i.e. 1
+    will limit iteration to the device and its immediate children).
 emu.screen_enumerator(device, [depth])
     Returns a device enumerator that will iterate over
     :ref:`screen devices <luareference-dev-screen>` in the sub-tree starting at
@@ -849,6 +862,90 @@ device.spaces[] (read-only)
     interface.  Note that the names are specific to the device type and have no
     special significance.
 
+.. _luareference-dev-dipalette:
+
+Palette device
+~~~~~~~~~~~~~~
+
+Wraps MAME’s ``device_palette_interface`` class, which represents a device that
+translates pen values to colours.
+
+Colours are in alpha/red/green/blue (ARGB) format.  Channel values are in the
+range 0 (transparent or off) to 255 (opaque or full intensity), inclusive.
+Colour channel values are not pre-multiplied by the alpha value.  Channel values
+are packed into the bytes of 32-bit unsigned integers, in the order alpha, red,
+green, blue from most-significant to least-significant byte.
+
+Instantiation
+^^^^^^^^^^^^^
+
+manager.machine.palettes[tag]
+    Gets a palette device by tag relative to the root machine device, or ``nil``
+    if no such device exists or it is not a palette device.
+
+Methods
+^^^^^^^
+
+palette:pen(index)
+    Gets the remapped pen number for the specified palette index.
+palette:pen_color(pen)
+    Gets the colour for the specified pen number.
+palette:pen_contrast(pen)
+    Gets the contrast value for the specified pen number.  The contrast is a
+    floating-point number.
+palette:pen_indirect(index)
+    Gets the indirect pen index for the specified palette index.
+palette:indirect_color(index)
+    Gets the indirect pen colour for the specified palette index.
+palette:set_pen_color(pen, color)
+    Sets the colour for the specified pen number.  The colour may be specified
+    as a single packed 32-bit value; or as individual red, green and blue
+    channel values, in that order.
+palette:set_pen_red_level(pen, level)
+    Sets the red channel value of the colour for the specified pen number.
+    Other channel values are not affected.
+palette:set_pen_green_level(pen, level)
+    Sets the green channel value of the colour for the specified pen number.
+    Other channel values are not affected.
+palette:set_pen_blue_level(pen, level)
+    Sets the blue channel value of the colour for the specified pen number.
+    Other channel values are not affected.
+palette:set_pen_contrast(pen, factor)
+    Sets the contrast value for the specified pen number.  The value must be a
+    floating-point number.
+palette:set_pen_indirect(pen, index)
+    Sets the indirect pen index for the specified pen number.
+palette:set_indirect_color(index, color)
+    Sets the indirect pen colour for the specified palette index.  The colour
+    may be specified as a single packed 32-bit value; or as individual red,
+    green and blue channel values, in that order.
+palette:set_shadow_factor(factor)
+    Sets the contrast value for the current shadow group.  The value must be a
+    floating-point number.
+palette:set_highlight_factor(factor)
+    Sets the contrast value for the current highlight group.  The value must be
+    a floating-point number.
+palette:set_shadow_mode(mode)
+    Sets the shadow mode.  The value is the index of the desired shadow table.
+
+Properties
+^^^^^^^^^^
+
+palette.entries (read-only)
+    The number of colour entries in the palette.
+palette.indirect_entries (read-only)
+    The number of indirect pen entries in the palette.
+palette.black_pen (read-only)
+    The index of the fixed black pen entry.
+palette.white_pen (read-only)
+    The index of the fixed white pen.
+palette.shadows_enabled (read-only)
+    A Boolean indicating whether shadow colours are enabled.
+palette.highlights_enabled (read-only)
+    A Boolean indicating whether highlight colours are enabled.
+palette.device (read-only)
+    The underlying :ref:`device <luareference-dev-device>`.
+
 .. _luareference-dev-screen:
 
 Screen device
@@ -926,8 +1023,8 @@ screen:draw_box(left, top, right, bottom, [line], [fill])
     most-significant to least-significant byte.  If the line colour is not
     provided, the UI text colour is used; if the fill colour is not provided,
     the UI background colour is used.
-screen:draw_line(x1, y1, x2, y2, [color])
-    Draws a line from (x1, y1) to (x2, y2).
+screen:draw_line(x0, y0, x1, y1, [color])
+    Draws a line from (x0, y0) to (x1, y1).
 
     Coordinates are floating-point numbers in units of emulated screen pixels,
     with the origin at (0, 0).  Note that emulated screen pixels often aren’t
@@ -1016,6 +1113,10 @@ screen.frame_number (read-only)
 screen.container (read-only)
     The :ref:`render container <luareference-render-container>` used to draw the
     screen.
+screen.palette (read-only)
+    The :ref:`palette device <luareference-dev-dipalette>` used to translate
+    pixel values to colours, or ``nil`` if the screen uses a direct colour pixel
+    format.
 
 .. _luareference-dev-cass:
 
@@ -2596,6 +2697,276 @@ color.b (read/write)
     Blue channel value, in the range of zero (0, off) to one (1, full
     intensity).
 
+.. _luareference-render-bitmap:
+
+Bitmap
+~~~~~~
+
+Wraps implementation of MAME’s ``bitmap_t`` and ``bitmap_specific`` classes,
+which represent two-dimensional bitmaps stored in row-major order.  Pixel
+coordinates are zero-based, increasing to the right and down.  Several pixel
+formats are supported.
+
+Instantiation
+^^^^^^^^^^^^^
+
+emu.bitmap_yuy16([width, height], [xslop], yslop])
+    Creates a Y'CbCr format bitmap with 4:2:2 chroma subsampling (horizontal
+    pairs of pixels have individual luma values but share chroma values).  Each
+    pixel is a 16-bit integer value.  The most significant byte of the pixel
+    value is the unsigned 8-bit Y' (luma) component of the pixel colour.  For
+    each horizontal pair of pixels, the least significant byte of the first
+    pixel (even zero-based X coordinate) value is the signed 8-bit Cb value for
+    the pair of pixels, and the least significant byte of the second pixel (odd
+    zero-based X coordinate) value is the signed 8-bit Cr value for the pair of
+    pixels.
+
+    If no width and height are specified, they are assumed to be zero.  If the
+    width is specified, the height must also be specified.  The X and Y slop
+    values set the amount of extra storage in pixels to reserve at the
+    left/right of each row and top/bottom of each column, respectively.  If an X
+    slop value is specified, a Y slop value must be specified as well.  If no X
+    and Y slop values are specified, they are assumed to be zero (the storage
+    will be sized to fit the bitmap content).  If the width and/or height is
+    less than or equal to zero, no storage will be allocated, irrespective of
+    the X and Y slop values, and the width and height of the bitmap will both be
+    set to zero.
+
+    The initial clipping rectangle is set to the entirety of the bitmap.
+emu.bitmap_rgb32([width, height], [xslop, yslop])
+    Creates an RGB format bitmap with no alpha (transparency) channel.  Each
+    pixel is represented by a 32-bit integer value.  The most significant byte
+    of the pixel value is ignored.  The remaining three bytes, from most
+    significant to least significant, are the unsigned 8-bit unsigned red, green
+    and blue channel values (larger values correspond to higher intensities).
+
+    If no width and height are specified, they are assumed to be zero.  If the
+    width is specified, the height must also be specified.  The X and Y slop
+    values set the amount of extra storage in pixels to reserve at the
+    left/right of each row and top/bottom of each column, respectively.  If an X
+    slop value is specified, a Y slop value must be specified as well.  If no X
+    and Y slop values are specified, they are assumed to be zero (the storage
+    will be sized to fit the bitmap content).  If the width and/or height is
+    less than or equal to zero, no storage will be allocated, irrespective of
+    the X and Y slop values, and the width and height of the bitmap will both be
+    set to zero.
+
+    The initial clipping rectangle is set to the entirety of the bitmap.
+emu.bitmap_argb32([width, height], [xslop, yslop])
+    Creates an ARGB format bitmap.  Each pixel is represented by a 32-bit
+    integer value.  The most significant byte of the pixel is the 8-bit unsigned
+    alpha (transparency) channel value (smaller values are more transparent).
+    The remaining three bytes, from most significant to least significant, are
+    the unsigned 8-bit unsigned red, green and blue channel values (larger
+    values correspond to higher intensities).  Colour channel values are not
+    pre-multiplied by the alpha channel value.
+
+    If no width and height are specified, they are assumed to be zero.  If the
+    width is specified, the height must also be specified.  The X and Y slop
+    values set the amount of extra storage in pixels to reserve at the
+    left/right of each row and top/bottom of each column, respectively.  If an X
+    slop value is specified, a Y slop value must be specified as well.  If no X
+    and Y slop values are specified, they are assumed to be zero (the storage
+    will be sized to fit the bitmap content).  If the width and/or height is
+    less than or equal to zero, no storage will be allocated, irrespective of
+    the X and Y slop values, and the width and height of the bitmap will both be
+    set to zero.
+
+    The initial clipping rectangle is set to the entirety of the bitmap.
+emu.bitmap_yuy16(source, [x0, y0, x1, y1])
+    Creates a Y'CbCr format bitmap with 4:2:2 chroma subsampling representing a
+    view of a portion of an existing bitmap.  The initial clipping rectangle is
+    set to the bounds of the view.  The source bitmap will be locked, preventing
+    resizing and reallocation.
+
+    If no coordinates are specified, the new bitmap will represent a view of the
+    source bitmap’s current clipping rectangle.  If coordinates are specified,
+    the new bitmap will represent a view of the rectangle with top left corner
+    at (x0, y0) and bottom right corner at (x1, y1) in the source bitmap.
+    Coordinates are in units of pixels.  The bottom right coordinates are
+    inclusive.
+
+    The source bitmap must be owned by the Lua script and must use the Y'CbCr
+    format.  Raises an error if coordinates are specified representing a
+    rectangle not fully contained within the source bitmap’s clipping rectangle.
+emu.bitmap_rgb32(source, [x0, y0, x1, y1])
+    Creates an RGB format bitmap with 4:2:2 chroma subsampling representing a
+    view of a portion of an existing bitmap.  The initial clipping rectangle is
+    set to the bounds of the view.  The source bitmap will be locked, preventing
+    resizing and reallocation.
+
+    If no coordinates are specified, the new bitmap will represent a view of the
+    source bitmap’s current clipping rectangle.  If coordinates are specified,
+    the new bitmap will represent a view of the rectangle with top left corner
+    at (x0, y0) and bottom right corner at (x1, y1) in the source bitmap.
+    Coordinates are in units of pixels.  The bottom right coordinates are
+    inclusive.
+
+    The source bitmap must be owned by the Lua script and must use the RGB
+    format.  Raises an error if coordinates are specified representing a
+    rectangle not fully contained within the source bitmap’s clipping rectangle.
+emu.bitmap_argb32(source, [x0, y0, x1, y1])
+    Creates an ARGB format bitmap with 4:2:2 chroma subsampling representing a
+    view of a portion of an existing bitmap.  The initial clipping rectangle is
+    set to the bounds of the view.  The source bitmap will be locked, preventing
+    resizing and reallocation.
+
+    If no coordinates are specified, the new bitmap will represent a view of the
+    source bitmap’s current clipping rectangle.  If coordinates are specified,
+    the new bitmap will represent a view of the rectangle with top left corner
+    at (x0, y0) and bottom right corner at (x1, y1) in the source bitmap.
+    Coordinates are in units of pixels.  The bottom right coordinates are
+    inclusive.
+
+    The source bitmap must be owned by the Lua script and must use the ARGB
+    format.  Raises an error if coordinates are specified representing a
+    rectangle not fully contained within the source bitmap’s clipping rectangle.
+
+Methods
+^^^^^^^
+
+bitmap:reset()
+    Sets the width and height to zero, and frees the pixel storage if the bitmap
+    owns its own storage, or releases the source bitmap if the it represents a
+    view of another bitmap.
+
+    The bitmap must be owned by the Lua script.  Raises an error if the bitmap’s
+    storage is referenced by another bitmap or a :ref:`texture
+    <luareference-render-texture>`.
+bitmap:allocate(width, height, [xslop, yslop])
+    Reallocates storage for the bitmap, sets its width and height, and sets the
+    clipping rectangle to the entirety of the bitmap.  If the bitmap already
+    owns allocated storage, it will always be freed and reallocated; if the
+    bitmap represents a view of another bitmap, the source bitmap will be
+    released.  The storage will be filled with pixel value zero.
+
+    The X and Y slop values set the amount of extra storage in pixels to reserve
+    at the left/right of each row and top/bottom of each column, respectively.
+    If an X slop value is specified, a Y slop value must be specified as well.
+    If no X and Y slop values are specified, they are assumed to be zero (the
+    storage will be sized to fit the bitmap content).  If the width and/or
+    height is less than or equal to zero, no storage will be allocated,
+    irrespective of the X and Y slop values, and the width and height of the
+    bitmap will both be set to zero.
+
+    The bitmap must be owned by the Lua script.  Raises an error if the bitmap’s
+    storage is referenced by another bitmap or a :ref:`texture
+    <luareference-render-texture>`.
+bitmap:resize(width, height, [xslop, yslop])
+    Changes the width and height, and sets the clipping rectangle to the
+    entirety of the bitmap.
+
+    The X and Y slop values set the amount of extra storage in pixels to reserve
+    at the left/right of each row and top/bottom of each column, respectively.
+    If an X slop value is specified, a Y slop value must be specified as well.
+    If no X and Y slop values are specified, they are assumed to be zero (rows
+    will be stored contiguously, and the top row will be placed at the beginning
+    of the bitmap’s storage).
+
+    If the bitmap already owns allocated storage and it is large enough for the
+    updated size, it will be used without being freed; if it is too small for
+    the updated size, it will always be freed and reallocated.  If the bitmap
+    represents a view of another bitmap, the source bitmap will be released.  If
+    storage is allocated, it will be filled with pixel value zero (if existing
+    storage is used, its contents will not be changed).
+
+    Raises an error if the bitmap’s storage is referenced by another bitmap or a
+    :ref:`texture <luareference-render-texture>`.
+bitmap:wrap(source, [x0, y0, x1, y1])
+    Makes the bitmap represent a view of a portion of another bitmap and sets
+    the clipping rectangle to the bounds of the view.
+
+    If no coordinates are specified, the target bitmap will represent a view of
+    the source bitmap’s current clipping rectangle.  If coordinates are
+    specified, the target bitmap will represent a view of the rectangle with top
+    left corner at (x0, y0) and bottom right corner at (x1, y1) in the source
+    bitmap.  Coordinates are in units of pixels.  The bottom right coordinates
+    are inclusive.
+
+    The source bitmap will be locked, preventing resizing and reallocation.  If
+    the target bitmap owns allocated storage, it will be freed; if it represents
+    a view of another bitmap, the current source bitmap will be released.
+
+    The source and target bitmaps must both be owned by the Lua script and must
+    use the same pixel format.  Raises an error if coordinates are specified
+    representing a rectangle not fully contained within the source bitmap’s
+    clipping rectangle; if the bitmap’s storage is referenced by another bitmap
+    or a :ref:`texture <luareference-render-texture>`; or if the source and
+    target are the same bitmap.
+bitmap:pix(x, y)
+    Returns the colour value of the pixel at the specified location.
+    Coordinates are zero-based in units of pixels.
+bitmap:fill(color, [x0, y0, x1, y1])
+    Fills a portion of the bitmap with the specified colour value.  If
+    coordinates are not specified, the clipping rectangle is filled; if
+    coordinates are specified, the intersection of the clipping rectangle and
+    the rectangle with top left corner at (x0, y0) and bottom right corner at
+    (x1, y1) is filled.  Coordinates are in units of pixels.  The bottom right
+    coordinates are inclusive.
+bitmap:plot(x, y, color)
+    Sets the colour value of the pixel at the specified location if it is within
+    the clipping rectangle.  Coordinates are zero-based in units of pixels.
+bitmap:plot_box(x, y, width, height, color)
+    Fills the intersection of the clipping rectangle and the rectangle with top
+    left (x, y) and the specified height and width with the specified colour
+    value.  Coordinates and dimensions are in units of pixels.
+
+Properties
+^^^^^^^^^^
+
+bitmap.width (read-only)
+    Width of the bitmap in pixels.
+bitmap.height (read-only)
+    Height of the bitmap in pixels.
+bitmap.rowpixels (read-only)
+    Row stride of the bitmap’s storage in pixels.  That is, the difference in
+    pixel offsets of the pixels at the same horizontal location in consecutive
+    rows.  May be greater than the width.
+bitmap.rowbytes (read-only)
+    Row stride of the bitmap’s storage in bytes.  That is, the difference in
+    byte addresses of the pixels at the same horizontal location in consecutive
+    rows.
+bitmap.bpp (read-only)
+    Size of the type used to represent pixels in the bitmap in bits (may be
+    larger than the number of significant bits).
+bitmap.valid (read-only)
+    A Boolean indicating whether the bitmap has storage available (may be false
+    for empty bitmaps).
+bitmap.locked (read-only)
+    A Boolean indicating whether the bitmap’s storage is referenced by another
+    bitmap or a :ref:`texture <luareference-render-texture>`.
+
+.. _luareference-render-texture:
+
+Render texture
+~~~~~~~~~~~~~~
+
+Wraps MAME’s ``render_texture`` class, representing a texture that cam be drawn
+in a :ref:`render container <luareference-render-container>`.  Render textures
+must be freed before the emulation session ends.
+
+Instantiation
+^^^^^^^^^^^^^
+
+manager.machine.render:texture_alloc(bitmap)
+    Creates a render texture based on a :ref:`bitmap
+    <luareference-render-bitmap>`.  The bitmap must be owned by the Lua script,
+    and must use the Y'CbCr, RGB or ARGB format.  The bitmap’s storage will be
+    locked, preventing resizing and reallocation.
+
+Methods
+^^^^^^^
+
+texture:free()
+    Frees the texture.  The storage of the underlying bitmap will be released.
+
+Properties
+^^^^^^^^^^
+
+texture.valid (read-only)
+    A Boolean indicating whether the texture is valid (false if the texture has
+    been freed).
+
 .. _luareference-render-manager:
 
 Render manager
@@ -2609,6 +2980,16 @@ Instantiation
 
 manager.machine.render
     Gets the global render manager instance for the emulation session.
+
+Methods
+^^^^^^^
+
+render:texture_alloc(bitmap)
+    Creates a :ref:`render texture <luareference-render-texture>` based on a
+    :ref:`bitmap <luareference-render-bitmap>`.  The bitmap must be owned by the
+    Lua script, and must use the Y'CbCr, RGB or ARGB format.  The bitmap’s
+    storage will be locked, preventing resizing and reallocation.  Render
+    textures must be freed before the emulation session ends.
 
 Properties
 ^^^^^^^^^^
@@ -2718,7 +3099,7 @@ container:draw_box(left, top, right, bottom, [line], [fill])
 
     Coordinates are floating-point numbers in the range of 0 (zero) to 1 (one),
     with (0, 0) at the top left and (1, 1) at the bottom right of the window or
-    screen that showss the user interface.  Note that the aspect ratio is
+    the screen that shows the user interface.  Note that the aspect ratio is
     usually not square.  Coordinates are limited to the window or screen area.
 
     The fill and line colours are in alpha/red/green/blue (ARGB) format.
@@ -2729,20 +3110,13 @@ container:draw_box(left, top, right, bottom, [line], [fill])
     most-significant to least-significant byte.  If the line colour is not
     provided, the UI text colour is used; if the fill colour is not provided,
     the UI background colour is used.
-container:draw_line(x1, y1, x2, y2, [color])
-    Draws a line from (x1, y1) to (x2, y2).
+container:draw_line(x0, y0, x1, y1, [color])
+    Draws a line from (x0, y0) to (x1, y1).
 
     Coordinates are floating-point numbers in the range of 0 (zero) to 1 (one),
     with (0, 0) at the top left and (1, 1) at the bottom right of the window or
-    screen that showss the user interface.  Note that the aspect ratio is
+    the screen that shows the user interface.  Note that the aspect ratio is
     usually not square.  Coordinates are limited to the window or screen area.
-
-    Coordinates are floating-point numbers in units of screen pixels, with the
-    origin at (0, 0).  Note that screen pixels often aren’t square.  The
-    coordinate system is rotated if the screen is rotated, which is usually the
-    case for vertical-format screens.  Before rotation, the origin is at the top
-    left, and coordinates increase to the right and downwards.  Coordinates are
-    limited to the screen area.
 
     The line colour is in alpha/red/green/blue (ARGB) format.  Channel values
     are in the range 0 (transparent or off) to 255 (opaque or full intensity),
@@ -2751,6 +3125,24 @@ container:draw_line(x1, y1, x2, y2, [color])
     integer, in the order alpha, red, green, blue from most-significant to
     least-significant byte.  If the line colour is not provided, the UI text
     colour is used.
+container:draw_quad(texture, x0, y0, x1, y1, [color])
+    Draws a textured rectangle with top left corner at (x0, y0) and bottom right
+    corner at (x1, y1).  If a colour is specified, the ARGB channel values of
+    the texture’s pixels are multiplied by the corresponding values of the
+    specified colour.
+
+    Coordinates are floating-point numbers in the range of 0 (zero) to 1 (one),
+    with (0, 0) at the top left and (1, 1) at the bottom right of the window or
+    the screen that shows the user interface.  Note that the aspect ratio is
+    usually not square.  If the rectangle extends beyond the container’s bounds,
+    it will be cropped.
+
+    The colour is in alpha/red/green/blue (ARGB) format.  Channel values are in
+    the range 0 (transparent or off) to 255 (opaque or full intensity),
+    inclusive.  Colour channel values are not pre-multiplied by the alpha value.
+    The channel values must be packed into the bytes of a 32-bit unsigned
+    integer, in the order alpha, red, green, blue from most-significant to
+    least-significant byte.
 container:draw_text(x|justify, y, text, [foreground], [background])
     Draws text at the specified position.  If the screen is rotated the text
     will be rotated.
@@ -2765,7 +3157,7 @@ container:draw_text(x|justify, y, text, [foreground], [background])
 
     Coordinates are floating-point numbers in the range of 0 (zero) to 1 (one),
     with (0, 0) at the top left and (1, 1) at the bottom right of the window or
-    screen that showss the user interface.  Note that the aspect ratio is
+    the screen that shows the user interface.  Note that the aspect ratio is
     usually not square.  Coordinates are limited to the window or screen area.
 
     The foreground and background colours are in alpha/red/green/blue (ARGB)
