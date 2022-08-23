@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Zsolt Vasvari, Curt Coder
+
 /***************************************************************************
 Lovely Cards/Poker/Pontoon driver, updated by El Condor from work by Uki and
 Zsolt Vasvari respectively.
@@ -74,14 +75,164 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "lvcards.h"
+
 
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
+
+namespace {
+
+class lvcards_state : public driver_device
+{
+public:
+	lvcards_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_decrypted_opcodes(*this, "decrypted_opcodes")
+	{ }
+
+	void lvcards(machine_config &config);
+	void lvcardsa(machine_config &config);
+
+	void init_lvcardsa();
+
+protected:
+	virtual void video_start() override;
+
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+
+	required_device<cpu_device> m_maincpu;
+
+private:
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_device<gfxdecode_device> m_gfxdecode;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
+	tilemap_t *m_bg_tilemap = nullptr;
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void io_map(address_map &map);
+	void lvcards_map(address_map &map);
+	void lvcardsa_decrypted_opcodes_map(address_map &map);
+};
+
+
+class lvpoker_state : public lvcards_state
+{
+public:
+	lvpoker_state(const machine_config &mconfig, device_type type, const char *tag) :
+		lvcards_state(mconfig, type, tag),
+		m_in2(*this, "IN2")
+	{ }
+
+	void lvpoker(machine_config &config);
+	void ponttehk(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	void control_port_2_w(uint8_t data);
+	void control_port_2a_w(uint8_t data);
+	uint8_t payout_r();
+
+	void lvpoker_map(address_map &map);
+	void ponttehk_map(address_map &map);
+
+	required_ioport m_in2;
+
+	uint8_t m_payout = 0U;
+	uint8_t m_pulse = 0U;
+	uint8_t m_result = 0U;
+};
+
+
+// video
+
+void lvcards_state::palette(palette_device &palette) const //Ever so slightly different, but different enough.
+{
+	const uint8_t *color_prom = memregion("proms")->base();
+
+	for (int i = 0; i < palette.entries(); i++)
+	{
+		int bit0, bit1, bit2, bit3;
+
+		// red component
+		bit0 = (color_prom[0] >> 0) & 0x11;
+		bit1 = (color_prom[0] >> 1) & 0x11;
+		bit2 = (color_prom[0] >> 2) & 0x11;
+		bit3 = (color_prom[0] >> 3) & 0x11;
+		int const r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
+		// green component
+		bit0 = (color_prom[palette.entries()] >> 0) & 0x11;
+		bit1 = (color_prom[palette.entries()] >> 1) & 0x11;
+		bit2 = (color_prom[palette.entries()] >> 2) & 0x11;
+		bit3 = (color_prom[palette.entries()] >> 3) & 0x11;
+		int const g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
+		// blue component
+		bit0 = (color_prom[2 * palette.entries()] >> 0) & 0x11;
+		bit1 = (color_prom[2 * palette.entries()] >> 1) & 0x11;
+		bit2 = (color_prom[2 * palette.entries()] >> 2) & 0x11;
+		bit3 = (color_prom[2 * palette.entries()] >> 3) & 0x11;
+		int const b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+
+		color_prom++;
+	}
+}
+
+void lvcards_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+void lvcards_state::colorram_w(offs_t offset, uint8_t data)
+{
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+TILE_GET_INFO_MEMBER(lvcards_state::get_bg_tile_info)
+{
+	int const attr = m_colorram[tile_index];
+	int const code = m_videoram[tile_index] + ((attr & 0x30) << 4) + ((attr & 0x80) << 3);
+	int const color = attr & 0x0f;
+	int const flags = (attr & 0x40) ? TILE_FLIPX : 0;
+
+	tileinfo.set(0, code, color, flags);
+}
+
+void lvcards_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lvcards_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS,
+			8, 8, 32, 32);
+}
+
+uint32_t lvcards_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	return 0;
+}
+
+
+// machine
 
 void lvpoker_state::machine_start()
 {
@@ -135,7 +286,7 @@ void lvpoker_state::control_port_2a_w(uint8_t data)
 
 uint8_t lvpoker_state::payout_r()
 {
-	m_result = ioport("IN2")->read();
+	m_result = m_in2->read();
 
 	if (m_payout)
 	{
@@ -160,22 +311,22 @@ void lvpoker_state::ponttehk_map(address_map &map)
 	map(0x8400, 0x87ff).ram().w(FUNC(lvpoker_state::colorram_w)).share("colorram");
 	map(0xa000, 0xa000).portr("IN0");
 	map(0xa001, 0xa001).portr("IN1").nopw(); // lamps
-	map(0xa002, 0xa002).r(FUNC(lvpoker_state::payout_r)).w(FUNC(lvpoker_state::control_port_2a_w));//.nopw(); // ???
+	map(0xa002, 0xa002).r(FUNC(lvpoker_state::payout_r)).w(FUNC(lvpoker_state::control_port_2a_w)); //.nopw(); // ???
 }
 
 void lvcards_state::lvcards_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x67ff).ram().share("nvram");
-	map(0x9000, 0x93ff).ram().w(FUNC(lvcards_state::videoram_w)).share("videoram");
-	map(0x9400, 0x97ff).ram().w(FUNC(lvcards_state::colorram_w)).share("colorram");
+	map(0x9000, 0x93ff).ram().w(FUNC(lvcards_state::videoram_w)).share(m_videoram);
+	map(0x9400, 0x97ff).ram().w(FUNC(lvcards_state::colorram_w)).share(m_colorram);
 	map(0xa000, 0xa000).portr("IN0");
 	map(0xa001, 0xa001).portr("IN1").nopw();
 	map(0xa002, 0xa002).portr("IN2").nopw();
 	map(0xc000, 0xdfff).rom();
 }
 
-void lvcards_state::lvcards_io_map(address_map &map)
+void lvcards_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).r("aysnd", FUNC(ay8910_device::data_r));
@@ -184,7 +335,7 @@ void lvcards_state::lvcards_io_map(address_map &map)
 
 void lvcards_state::lvcardsa_decrypted_opcodes_map(address_map &map)
 {
-	map(0x0000, 0x5fff).rom().share("decrypted_opcodes");
+	map(0x0000, 0x5fff).rom().share(m_decrypted_opcodes);
 	map(0xc000, 0xdfff).rom().region("maincpu", 0xc000);
 }
 
@@ -446,49 +597,37 @@ static INPUT_PORTS_START( ponttehk )
 INPUT_PORTS_END
 
 
-static const gfx_layout charlayout =
-{
-	8,8,    /* 8*8 characters */
-	RGN_FRAC(1,1),   /* 2048 characters */
-	4,      /* 4 bits per pixel */
-	{0,1,2,3},
-	{4,0,12,8,20,16,28,24},
-	{32*0, 32*1, 32*2, 32*3, 32*4, 32*5, 32*6, 32*7},
-	32*8
-};
-
-/* Graphics Decode Information */
+// Graphics Decode Information
 
 static GFXDECODE_START( gfx_lvcards )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
+	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x4_packed_lsb, 0, 16 )
 GFXDECODE_END
 
-/* Sound Interfaces */
 
 void lvcards_state::lvcards(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 18432000/4); // unknown frequency, assume same as tehkanwc.cpp
+	Z80(config, m_maincpu, 18'432'000 / 4); // unknown frequency, assume same as tehkanwc.cpp
 	m_maincpu->set_addrmap(AS_PROGRAM, &lvcards_state::lvcards_map);
-	m_maincpu->set_addrmap(AS_IO, &lvcards_state::lvcards_io_map);
+	m_maincpu->set_addrmap(AS_IO, &lvcards_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(lvcards_state::irq0_line_hold));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(8*0, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(lvcards_state::screen_update_lvcards));
+	screen.set_screen_update(FUNC(lvcards_state::screen_update));
 	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_lvcards);
-	PALETTE(config, "palette", FUNC(lvcards_state::lvcards_palette), 256);
+	PALETTE(config, "palette", FUNC(lvcards_state::palette), 256);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 18432000/12)); // unknown frequency, assume same as tehkanwc.cpp
+	ay8910_device &aysnd(AY8910(config, "aysnd", 18'432'000 / 12)); // unknown frequency, assume same as tehkanwc.cpp
 	aysnd.port_a_read_callback().set_ioport("DSW0");
 	aysnd.port_b_read_callback().set_ioport("DSW1");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -529,7 +668,7 @@ ROM_START( lvpoker )
 	ROM_LOAD( "lp2.bin",      0x4000, 0x2000, CRC(06d5484f) SHA1(326756a03eaeefc944428c7e011fcdc128aa415a) )
 	ROM_LOAD( "lp3.bin",      0xc000, 0x2000, CRC(05e17de8) SHA1(76b38e414f225789de8af9ca0556008e17285ffe) )
 
-	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_REGION( 0x10000, "tiles", 0 )
 	ROM_LOAD( "lp4.bin",      0x0000, 0x2000, CRC(04fd2a6b) SHA1(33fb42f54646dc91f5aca1c55cfc932fa04f5d77) )
 	ROM_CONTINUE(             0x8000, 0x2000 )
 	ROM_LOAD( "lp5.bin",      0x2000, 0x2000, CRC(9b5b531c) SHA1(1ce700361ea39a15c9c62fc0fa61df0cda62a340) )
@@ -551,7 +690,7 @@ ROM_START( lvcards )
 	ROM_LOAD( "lc2.bin", 0x4000, 0x2000, CRC(deb54548) SHA1(a245898635c5cd3c26989c2bba89bb71edacd906) )
 	ROM_LOAD( "lc3.bin", 0xc000, 0x2000, CRC(45c2bea9) SHA1(3a33501824769656aa87649c3fd0a8b8a4d83f3c) )
 
-	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_REGION( 0x10000, "tiles", 0 )
 	ROM_LOAD( "lc4.bin", 0x0000, 0x2000, CRC(dd705389) SHA1(271c11c2bd9affd976d65e318fd9fb01dbdde040) )
 	ROM_CONTINUE(        0x8000, 0x2000 )
 	ROM_LOAD( "lc5.bin", 0x2000, 0x2000, CRC(ddd1e3e5) SHA1(b7e8ccaab318b61b91eae4eee9e04606f9717037) )
@@ -604,7 +743,7 @@ ROM_START( lvcardsa ) // Tehkan 5910A-1 PCB
 	ROM_LOAD( "2.k4", 0x4000, 0x2000, CRC(d1c72fc2) SHA1(496606e129046d253d716254ef4e58a93ca10aa0) )
 	ROM_LOAD( "3.h4", 0xc000, 0x2000, CRC(45cb4b4f) SHA1(6eb5725c048efe729246c730d6576b19ee24eab7) )
 
-	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_REGION( 0x10000, "tiles", 0 )
 	ROM_LOAD( "4.f4", 0x0000, 0x2000, CRC(dd705389) SHA1(271c11c2bd9affd976d65e318fd9fb01dbdde040) )  // identical
 	ROM_CONTINUE(        0x8000, 0x2000 )
 	ROM_LOAD( "5.d4", 0x2000, 0x2000, CRC(60841508) SHA1(1da57c57ae01b8c93c32e6ffe7efd0852296eaf0) )  // 1st half: identical. 2nd half: 99.963379%
@@ -625,7 +764,7 @@ ROM_START( ponttehk )
 	ROM_LOAD( "ponttehk.001", 0x0000, 0x4000, CRC(1f8c1b38) SHA1(3776ddd695741223bd9ad41f74187bff31f2cd3b) )
 	ROM_LOAD( "ponttehk.002", 0x4000, 0x2000, CRC(befb4f48) SHA1(8ca146c8b52afab5deb6f0ff52bdbb2b1ff3ded7) )
 
-	ROM_REGION( 0x8000, "gfx1", 0 )
+	ROM_REGION( 0x8000, "tiles", 0 )
 	ROM_LOAD( "ponttehk.003", 0x0000, 0x2000, CRC(a6a91b3d) SHA1(d180eabe67efd3fd1205570b661a74acf7ed93b3) )
 	ROM_LOAD( "ponttehk.004", 0x2000, 0x2000, CRC(976ed924) SHA1(4d305694b3e157411068baf3052e3aac7d0b32d5) )
 	ROM_LOAD( "ponttehk.005", 0x4000, 0x2000, CRC(2b8e8ca7) SHA1(dd86d3b4fd1627bdaa0603ffd2f1bc2953bc51f8) )
@@ -639,11 +778,11 @@ ROM_END
 
 void lvcards_state::init_lvcardsa()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	for (int i = 0; i < 0x6000; i++)
 	{
-		uint8_t x = ROM[i];
+		uint8_t x = rom[i];
 
 		switch (i & 0x1111)
 		{
@@ -668,11 +807,11 @@ void lvcards_state::init_lvcardsa()
 		m_decrypted_opcodes[i] = x;
 	}
 
-	for (int A = 0; A < 0x6000; A++)
+	for (int a = 0; a < 0x6000; a++)
 	{
-		uint8_t x = ROM[A];
+		uint8_t x = rom[a];
 
-		switch(A & 0x1111)
+		switch(a & 0x1111)
 		{
 			case 0x0000: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break;
 			case 0x0001: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break;
@@ -692,9 +831,12 @@ void lvcards_state::init_lvcardsa()
 			case 0x1111: x = bitswap<8>(x ^ 0xa8, 7, 6, 3, 4, 5, 2, 1, 0); break;
 		}
 
-		ROM[A] = x;
+		rom[a] = x;
 	}
 }
+
+} // anonymous namespace
+
 
 GAME( 1985, lvcards,  0,       lvcards,  lvcards,  lvcards_state, empty_init,    ROT0, "Tehkan", "Lovely Cards",             MACHINE_SUPPORTS_SAVE )
 GAME( 1985, lvcardsa, lvcards, lvcardsa, lvcards,  lvcards_state, init_lvcardsa, ROT0, "Tehkan", "Lovely Cards (encrypted)", MACHINE_SUPPORTS_SAVE )

@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+
 /***************************************************************************
 
 Pinball Action memory map (preliminary)
@@ -31,7 +32,7 @@ e800      command for the sound CPU
 
 
 Notes:
-- pbactiont (Tecfri) has a ROM on a small subboard with two Z80, not hooked up:
+- pbactiont (Tecfri) has a ROM on a small subboard with two Z80:
 
  2-pin conn   12-pin conn
 ____||________||||||||||||____________________
@@ -57,7 +58,7 @@ ____||________||||||||||||____________________
 
 This subboard controls a vertical board panel with three 7-seg displays (like on a real pinball),
 one for player 1 (7 digits), another for player 2 (7 digits) and the third for game scores (with
-three goups: two digits - one digit - two digits).
+three groups: two digits - one digit - two digits).
 
 One of the Z80s on this board is the main game Z80, the other is for the Pinball cabinet
 
@@ -95,17 +96,260 @@ Stephh's notes (based on the game Z80 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
-#include "pbaction.h"
 
-#include "machine/segacrpt_device.h"
+#include "cpu/z80/z80.h"
 #include "machine/74259.h"
+#include "machine/gen_latch.h"
+#include "machine/segacrpt_device.h"
+#include "machine/z80ctc.h"
 #include "sound/ay8910.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
+
 #include "pbactiont.lh"
 
 
-void pbaction_state::pbaction_sh_command_w(uint8_t data)
+namespace {
+
+class pbaction_state : public driver_device
+{
+public:
+	pbaction_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
+		m_ctc(*this, "ctc"),
+		m_videoram(*this, "videoram%u", 1U),
+		m_colorram(*this, "colorram%u", 1U),
+		m_work_ram(*this, "work_ram"),
+		m_spriteram(*this, "spriteram"),
+		m_decrypted_opcodes(*this, "decrypted_opcodes")
+	{ }
+
+	void pbaction(machine_config &config);
+	void pbactionx(machine_config &config);
+
+	void init_pbaction2();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+	DECLARE_WRITE_LINE_MEMBER(sound_irq_clear);
+
+	void alt_sound_map(address_map &map);
+	void sound_io_map(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_audiocpu;
+
+private:
+	// devices
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<z80ctc_device> m_ctc;
+
+	// memory pointers
+	required_shared_ptr_array<uint8_t, 2> m_videoram;
+	required_shared_ptr_array<uint8_t, 2> m_colorram;
+	required_shared_ptr<uint8_t> m_work_ram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
+
+	// video-related
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	int16_t m_scroll = 0;
+
+	emu_timer *m_soundcommand_timer = nullptr;
+	uint8_t m_nmi_mask = 0;
+
+	void sh_command_w(uint8_t data);
+	TIMER_CALLBACK_MEMBER(sound_trigger);
+	void nmi_mask_w(uint8_t data);
+	uint8_t sound_data_r();
+	void sound_irq_ack_w(uint8_t data);
+	uint8_t pbaction2_prot_kludge_r();
+	template <uint8_t Which> void videoram_w(offs_t offset, uint8_t data);
+	template <uint8_t Which> void colorram_w(offs_t offset, uint8_t data);
+	void scroll_w(uint8_t data);
+	void flipscreen_w(uint8_t data);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void decrypted_opcodes_map(address_map &map);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
+};
+
+class pbaction_tecfri_state : public pbaction_state
+{
+public:
+	pbaction_tecfri_state(const machine_config &mconfig, device_type type, const char *tag) :
+		pbaction_state(mconfig, type, tag),
+		m_subcpu(*this, "subcpu"),
+		m_ctc2(*this, "ctc2"),
+		m_maintosublatch(*this, "maintosublatch"),
+		//m_subtomainlatch(*this, "subtomainlatch"),
+		m_digits(*this, "digit%u", 0U)
+	{ }
+
+	void pbactiont(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	void sub_map(address_map &map);
+	void sub_io_map(address_map &map);
+	void main_io_map(address_map &map);
+
+	TIMER_CALLBACK_MEMBER(sub_trigger);
+	emu_timer *m_subcommand_timer = nullptr;
+
+	uint8_t subcpu_r();
+	void subcpu_w(uint8_t data);
+
+	DECLARE_WRITE_LINE_MEMBER(sub8000_w);
+	DECLARE_WRITE_LINE_MEMBER(sub8001_w);
+	void sub8008_w(uint8_t data);
+
+	void subtomain_w(uint8_t data);
+
+	required_device<z80_device> m_subcpu;
+	required_device<z80ctc_device> m_ctc2;
+	required_device<generic_latch_8_device> m_maintosublatch;
+	//required_device<generic_latch_8_device> m_subtomainlatch;
+	output_finder<24> m_digits;
+	uint8_t m_outlatch = 0;
+	uint32_t m_outdata = 0;
+};
+
+
+// video
+
+template <uint8_t Which>
+void pbaction_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[Which][offset] = data;
+	Which ? m_fg_tilemap->mark_tile_dirty(offset) : m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+template <uint8_t Which>
+void pbaction_state::colorram_w(offs_t offset, uint8_t data)
+{
+	m_colorram[Which][offset] = data;
+	Which ? m_fg_tilemap->mark_tile_dirty(offset) : m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+void pbaction_state::scroll_w(uint8_t data)
+{
+	m_scroll = data - 3;
+	if (flip_screen())
+		m_scroll = -m_scroll;
+
+	m_bg_tilemap->set_scrollx(0, m_scroll);
+	m_fg_tilemap->set_scrollx(0, m_scroll);
+}
+
+void pbaction_state::flipscreen_w(uint8_t data)
+{
+	flip_screen_set(data & 0x01);
+}
+
+TILE_GET_INFO_MEMBER(pbaction_state::get_bg_tile_info)
+{
+	int const attr = m_colorram[0][tile_index];
+	int const code = m_videoram[0][tile_index] + 0x10 * (attr & 0x70);
+	int const color = attr & 0x07;
+	int const flags = (attr & 0x80) ? TILE_FLIPY : 0;
+
+	tileinfo.set(1, code, color, flags);
+}
+
+TILE_GET_INFO_MEMBER(pbaction_state::get_fg_tile_info)
+{
+	int const attr = m_colorram[1][tile_index];
+	int const code = m_videoram[1][tile_index] + 0x10 * (attr & 0x30);
+	int const color = attr & 0x0f;
+	int const flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
+
+	tileinfo.set(0, code, color, flags);
+}
+
+void pbaction_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pbaction_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pbaction_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	m_fg_tilemap->set_transparent_pen(0);
+}
+
+void pbaction_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	{
+		// if next sprite is double size, skip this one
+		if (offs > 0 && m_spriteram[offs - 4] & 0x80)
+			continue;
+
+		int sx = m_spriteram[offs + 3];
+		int sy;
+
+		if (m_spriteram[offs] & 0x80)
+			sy = 225 - m_spriteram[offs + 2];
+		else
+			sy = 241 - m_spriteram[offs + 2];
+
+		int flipx = m_spriteram[offs + 1] & 0x40;
+		int flipy = m_spriteram[offs + 1] & 0x80;
+
+		if (flip_screen())
+		{
+			if (m_spriteram[offs] & 0x80)
+			{
+				sx = 224 - sx;
+				sy = 225 - sy;
+			}
+			else
+			{
+				sx = 240 - sx;
+				sy = 241 - sy;
+			}
+			flipx = !flipx;
+			flipy = !flipy;
+		}
+
+		m_gfxdecode->gfx((m_spriteram[offs] & 0x80) ? 3 : 2)->transpen(bitmap, cliprect, // normal or double size
+				m_spriteram[offs],
+				m_spriteram[offs + 1] & 0x0f,
+				flipx, flipy,
+				sx + (flip_screen() ? m_scroll : -m_scroll), sy, 0);
+	}
+}
+
+uint32_t pbaction_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	return 0;
+}
+
+
+// machine
+
+void pbaction_state::sh_command_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_soundcommand_timer->adjust(attotime::zero, 0);
@@ -124,28 +368,28 @@ void pbaction_state::nmi_mask_w(uint8_t data)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-void pbaction_state::pbaction_map(address_map &map)
+void pbaction_state::main_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xcfff).ram().share("work_ram");
-	map(0xd000, 0xd3ff).ram().w(FUNC(pbaction_state::pbaction_videoram2_w)).share("videoram2");
-	map(0xd400, 0xd7ff).ram().w(FUNC(pbaction_state::pbaction_colorram2_w)).share("colorram2");
-	map(0xd800, 0xdbff).ram().w(FUNC(pbaction_state::pbaction_videoram_w)).share("videoram");
-	map(0xdc00, 0xdfff).ram().w(FUNC(pbaction_state::pbaction_colorram_w)).share("colorram");
-	map(0xe000, 0xe07f).ram().share("spriteram");
+	map(0xc000, 0xcfff).ram().share(m_work_ram);
+	map(0xd000, 0xd3ff).ram().w(FUNC(pbaction_state::videoram_w<1>)).share(m_videoram[1]);
+	map(0xd400, 0xd7ff).ram().w(FUNC(pbaction_state::colorram_w<1>)).share(m_colorram[1]);
+	map(0xd800, 0xdbff).ram().w(FUNC(pbaction_state::videoram_w<0>)).share(m_videoram[0]);
+	map(0xdc00, 0xdfff).ram().w(FUNC(pbaction_state::colorram_w<0>)).share(m_colorram[0]);
+	map(0xe000, 0xe07f).ram().share(m_spriteram);
 	map(0xe400, 0xe5ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xe600, 0xe600).portr("P1").w(FUNC(pbaction_state::nmi_mask_w));
 	map(0xe601, 0xe601).portr("P2");
 	map(0xe602, 0xe602).portr("SYSTEM");
-	map(0xe604, 0xe604).portr("DSW1").w(FUNC(pbaction_state::pbaction_flipscreen_w));
+	map(0xe604, 0xe604).portr("DSW1").w(FUNC(pbaction_state::flipscreen_w));
 	map(0xe605, 0xe605).portr("DSW2");
-	map(0xe606, 0xe606).nopr() /* ??? */ .w(FUNC(pbaction_state::pbaction_scroll_w));
-	map(0xe800, 0xe800).w(FUNC(pbaction_state::pbaction_sh_command_w));
+	map(0xe606, 0xe606).nopr() /* ??? */ .w(FUNC(pbaction_state::scroll_w));
+	map(0xe800, 0xe800).w(FUNC(pbaction_state::sh_command_w));
 }
 
 void pbaction_state::decrypted_opcodes_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
+	map(0x0000, 0x7fff).rom().share(m_decrypted_opcodes);
 	map(0x8000, 0xbfff).rom().region("maincpu", 0x8000);
 }
 
@@ -163,7 +407,7 @@ void pbaction_state::sound_irq_ack_w(uint8_t data)
 	machine().scheduler().synchronize();
 }
 
-void pbaction_state::pbaction_sound_map(address_map &map)
+void pbaction_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x47ff).ram();
@@ -171,14 +415,14 @@ void pbaction_state::pbaction_sound_map(address_map &map)
 	map(0xffff, 0xffff).w(FUNC(pbaction_state::sound_irq_ack_w));
 }
 
-void pbaction_state::pbaction_alt_sound_map(address_map &map)
+void pbaction_state::alt_sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x47ff).ram();
 	map(0x8000, 0x8000).r("soundlatch", FUNC(generic_latch_8_device::read));
 }
 
-void pbaction_state::pbaction_sound_io_map(address_map &map)
+void pbaction_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
@@ -238,11 +482,6 @@ void pbaction_tecfri_state::subtomain_w(uint8_t data)
 	//m_subtomainlatch->write(data); // where does this go if it can't go to maincpu?
 }
 
-uint8_t pbaction_tecfri_state::maintosub_r()
-{
-	return m_maintosublatch->read();
-}
-
 uint8_t pbaction_tecfri_state::subcpu_r()
 {
 	return 0x00; // other values stop the flippers from working? are there different inputs from the custom cabinet in here somehow?
@@ -263,7 +502,7 @@ void pbaction_tecfri_state::sub_map(address_map &map)
 	map(0x8000, 0x8007).w("suboutlatch", FUNC(hct259_device::write_d0));
 	map(0x8008, 0x8008).w(FUNC(pbaction_tecfri_state::sub8008_w));
 
-	map(0x8010, 0x8010).r(FUNC(pbaction_tecfri_state::maintosub_r));
+	map(0x8010, 0x8010).r(m_maintosublatch, FUNC(generic_latch_8_device::read));
 	map(0x8018, 0x8018).w(FUNC(pbaction_tecfri_state::subtomain_w));
 }
 
@@ -346,7 +585,7 @@ static INPUT_PORTS_START( pbaction )
 	PORT_DIPSETTING(    0x04, "100k 300k 1000k" )
 	PORT_DIPSETTING(    0x00, "70k 200k" )
 	PORT_DIPSETTING(    0x03, "100k 300k" )
-	PORT_DIPSETTING(    0x06, "200k 1000k" )                /* see notes */
+	PORT_DIPSETTING(    0x06, "200k 1000k" )                // see notes
 	PORT_DIPSETTING(    0x02, "100k" )
 	PORT_DIPSETTING(    0x05, "200k" )
 	PORT_DIPSETTING(    0x07, DEF_STR( None ) )
@@ -409,10 +648,10 @@ static const gfx_layout spritelayout2 =
 
 
 static GFXDECODE_START( gfx_pbaction )
-	GFXDECODE_ENTRY( "fgchars", 0x00000, charlayout1,    0, 16 )    /*   0-127 characters */
-	GFXDECODE_ENTRY( "bgchars", 0x00000, charlayout2,  128,  8 )    /* 128-255 background */
-	GFXDECODE_ENTRY( "sprites", 0x00000, spritelayout1,  0, 16 )    /*   0-127 normal sprites */
-	GFXDECODE_ENTRY( "sprites", 0x01000, spritelayout2,  0, 16 )    /*   0-127 large sprites */
+	GFXDECODE_ENTRY( "fgchars", 0x00000, charlayout1,    0, 16 )    //   0-127 characters
+	GFXDECODE_ENTRY( "bgchars", 0x00000, charlayout2,  128,  8 )    // 128-255 background
+	GFXDECODE_ENTRY( "sprites", 0x00000, spritelayout1,  0, 16 )    //   0-127 normal sprites
+	GFXDECODE_ENTRY( "sprites", 0x01000, spritelayout2,  0, 16 )    //   0-127 large sprites
 GFXDECODE_END
 
 
@@ -450,39 +689,39 @@ static const z80_daisy_config daisy_chain[] =
 
 void pbaction_state::pbaction(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, 4_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pbaction_state::pbaction_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pbaction_state::main_map);
 
-	Z80(config, m_audiocpu, 12_MHz_XTAL/4);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &pbaction_state::pbaction_sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &pbaction_state::pbaction_sound_io_map);
+	Z80(config, m_audiocpu, 12_MHz_XTAL / 4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &pbaction_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &pbaction_state::sound_io_map);
 	m_audiocpu->set_daisy_config(daisy_chain);
 
-	Z80CTC(config, m_ctc, 12_MHz_XTAL/4);
+	Z80CTC(config, m_ctc, 12_MHz_XTAL / 4);
 	m_ctc->intr_callback().set_inputline(m_audiocpu, 0);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(pbaction_state::screen_update_pbaction));
+	screen.set_screen_update(FUNC(pbaction_state::screen_update));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(pbaction_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pbaction);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 256);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	AY8910(config, "ay1", 12_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.25);
-	AY8910(config, "ay2", 12_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.25);
-	AY8910(config, "ay3", 12_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.25);
+	AY8910(config, "ay1", 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.25);
+	AY8910(config, "ay2", 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.25);
+	AY8910(config, "ay3", 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 void pbaction_state::pbactionx(machine_config &config)
@@ -490,11 +729,11 @@ void pbaction_state::pbactionx(machine_config &config)
 	pbaction(config);
 
 	SEGA_315_5128(config.replace(), m_maincpu, 4_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pbaction_state::pbaction_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pbaction_state::main_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &pbaction_state::decrypted_opcodes_map);
 	downcast<sega_315_5128_device &>(*m_maincpu).set_decrypted_tag(":decrypted_opcodes");
 
-	m_audiocpu->set_addrmap(AS_PROGRAM, &pbaction_state::pbaction_alt_sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &pbaction_state::alt_sound_map);
 	m_audiocpu->irqack_cb().set(FUNC(pbaction_state::sound_irq_clear));
 }
 
@@ -534,8 +773,8 @@ void pbaction_tecfri_state::pbactiont(machine_config &config)
 	Z80CTC(config, m_ctc2, 12_MHz_XTAL/4);
 	m_ctc2->intr_callback().set_inputline(m_subcpu, 0);
 
-	m_audiocpu->set_addrmap(AS_PROGRAM, &pbaction_state::pbaction_alt_sound_map);
-	m_audiocpu->irqack_cb().set(FUNC(pbaction_state::sound_irq_clear));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &pbaction_tecfri_state::alt_sound_map);
+	m_audiocpu->irqack_cb().set(FUNC(pbaction_tecfri_state::sound_irq_clear));
 }
 
 /***************************************************************************
@@ -550,7 +789,7 @@ ROM_START( pbaction )
 	ROM_LOAD( "b-n7.bin",     0x4000, 0x4000, CRC(d54d5402) SHA1(a4c3205bfe5fba8bb1ff3ad15941a77c35b44a27) )
 	ROM_LOAD( "b-l7.bin",     0x8000, 0x2000, CRC(e7412d68) SHA1(e75731d9bea80e0dc09798dd46e3b947fdb54aaa) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound board */
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a-e3.bin",     0x0000,  0x2000, CRC(0e53a91f) SHA1(df2827197cd55c3685e5ac8b26c20800623cb932) )
 
 	ROM_REGION( 0x06000, "fgchars", 0 )
@@ -576,7 +815,7 @@ ROM_START( pbaction2 )
 	ROM_LOAD( "12.bin",     0x4000, 0x4000, CRC(ec3c64c6) SHA1(6130b80606d717f95e219316c2d3fa0a1980ea1d) )
 	ROM_LOAD( "13.bin",     0x8000, 0x4000, CRC(c93c851e) SHA1(b41077708fce4ccbcecdeae32af8821ca5322e87) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound board */
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "pba1.bin",     0x0000,  0x2000, CRC(8b69b933) SHA1(eb0762579d52ed9f5b1a002ffe7e517c59650e22) )
 
 	ROM_REGION( 0x06000, "fgchars", 0 )
@@ -602,7 +841,7 @@ ROM_START( pbaction3 )
 	ROM_IGNORE(0x4000)
 	ROM_LOAD( "pinball_10.bin",     0x4000, 0x8000, CRC(04b56c7c) SHA1(d09c22fd0235e1c6a9b1978ba69338bb1ae5667d) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound board */
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "pinball_01.bin",     0x0000,  0x2000, CRC(8b69b933) SHA1(eb0762579d52ed9f5b1a002ffe7e517c59650e22) )
 
 	ROM_REGION( 0x06000, "fgchars", 0 )
@@ -632,7 +871,7 @@ ROM_START( pbaction4 )
 	ROM_LOAD( "c15.bin",     0x4000, 0x4000, CRC(057acfe3) SHA1(49c184d7caea0c0e9f0d0e163f2ef42bb9aebf16) )
 	ROM_LOAD( "p14.bin",     0x8000, 0x2000, CRC(e7412d68) SHA1(e75731d9bea80e0dc09798dd46e3b947fdb54aaa) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound board */
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "p1.bin",     0x0000,  0x2000, CRC(8b69b933) SHA1(eb0762579d52ed9f5b1a002ffe7e517c59650e22) )
 
 	ROM_REGION( 0x06000, "fgchars", 0 )
@@ -659,10 +898,10 @@ ROM_START( pbactiont )
 	ROM_LOAD( "pba15.bin",     0x4000, 0x4000, CRC(3afef03a) SHA1(dec714415d2fd00c9021171a48f6c94b40888ae8) )
 	ROM_LOAD( "pba14.bin",     0x8000, 0x2000, CRC(c0a98c8a) SHA1(442f37af31db13fd98602dd7f9eeae5529da0f44) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound board */
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "pba1.bin",     0x0000,  0x2000, CRC(8b69b933) SHA1(eb0762579d52ed9f5b1a002ffe7e517c59650e22) )
 
-	ROM_REGION( 0x10000, "subcpu", 0 )    /* 64k for the subboard  */
+	ROM_REGION( 0x10000, "subcpu", 0 )
 	ROM_LOAD( "pba17.bin",    0x0000,  0x4000, CRC(2734ae60) SHA1(4edcdfac1611c49c4f890609efbe8352b8161f8e) )
 
 	ROM_REGION( 0x06000, "fgchars", 0 )
@@ -684,7 +923,7 @@ ROM_END
 
 uint8_t pbaction_state::pbaction2_prot_kludge_r()
 {
-	/* on startup, the game expect this location to NOT act as RAM */
+	// on startup, the game expect this location to NOT act as RAM
 	if (m_maincpu->pc() == 0xab80)
 		return 0;
 
@@ -697,11 +936,13 @@ void pbaction_state::init_pbaction2()
 
 	// first of all, do a simple bitswap
 	for (int i = 0; i < 0xc000; i++)
-		rom[i] = bitswap<8>(rom[i], 7,6,5,4,1,2,3,0);
+		rom[i] = bitswap<8>(rom[i], 7, 6, 5, 4, 1, 2, 3, 0);
 
 	// install a protection (?) workaround
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xc000, read8smo_delegate(*this, FUNC(pbaction_state::pbaction2_prot_kludge_r)) );
 }
+
+} // anonymous namespace
 
 
 // some of these are probably bootlegs

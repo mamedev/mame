@@ -45,7 +45,7 @@
    menu)  There's no Timer 1 IRQ Handler in the code, but presumably the LCD
    is driven directly off the timer pins.
 
-   Some games can be linked via the Infared support provided by the AX208,
+   Some games can be linked via the Infrared support provided by the AX208,
    this is not currently supported.
 
 ***************************************************************************/
@@ -496,7 +496,7 @@ void monon_color_state::get_sound_command_bit(uint8_t bit)
 
 	if (m_sound_bitpos == 0)
 	{
-		// first bit isn't part of the data? but isn't 0/1 depending on if it's a read/write eiter?
+		// first bit isn't part of the data? but isn't 0/1 depending on if it's a read/write either?
 		//LOGMASKED(LOG_SOUNDMCUCOMMS, "%s: started read/write command\n", machine().describe_context());
 		m_sound_bitpos++;
 
@@ -630,7 +630,7 @@ void monon_color_state::out2_w(uint8_t data)
 		else
 		{
 			// sends m_out2data & 0x02 to external device / latches a read bit into m_out2data & 0x80
-			//logerror("%s: send / recieve sound MCU, bit written %d\n", machine().describe_context(), (data & 0x02) >> 1);
+			//logerror("%s: send / receive sound MCU, bit written %d\n", machine().describe_context(), (data & 0x02) >> 1);
 			get_sound_command_bit((data & 0x02) >> 1); 
 		}
 	}
