@@ -36,6 +36,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class myvision_state : public driver_device
 {
 public:
@@ -250,6 +252,8 @@ void myvision_state::myvision(machine_config &config)
 ROM_START( myvision )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 ROM_END
+
+} // anonymous namespace
 
 /* Driver */
 

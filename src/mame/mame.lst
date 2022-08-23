@@ -1371,7 +1371,7 @@ ampex230p                       //
 @source:ampro/ampro.cpp
 ampro                           //
 
-@source:skeleton/ampscarp.cpp
+@source:motorola/ampscarp.cpp
 ampscarp                        // Motorola Amps Car Phone
 
 @source:misc/amspdwy.cpp
@@ -10438,7 +10438,7 @@ chessmsta
 @source:ddr/chessmstdm.cpp
 chessmstdm
 
-@source:misc/chexx.cpp
+@source:ice/chexx.cpp
 chexx83                         // 1983 ICE
 faceoffh                        // 1983 SoftLogic / Entertainment Enterprises
 olihockey                       // 1985 Inor
@@ -14292,7 +14292,7 @@ pbillrdsa                       // (c) 1987 Nihon System (Sega license?)
 freeway
 freewaya
 
-@source:misc/frenzyxprss.cpp
+@source:ice/frenzyxprss.cpp
 frenzyxprss                     // (c) 2001 ICE / Uniana
 
 @source:misc/fresh.cpp
@@ -17105,7 +17105,7 @@ hp2622a                         //
 hp2641                          //
 hp2645                          //
 
-@source:skeleton/hp3478a.cpp
+@source:hp/hp3478a.cpp
 hp3478a                         //
 
 @source:hp/hp48.cpp
@@ -17166,7 +17166,7 @@ hprot1                          //
 hprot2r6                        //
 hprotr8a                        //
 
-@source:skeleton/hpz80unk.cpp
+@source:hp/hpz80unk.cpp
 hpz80unk                        //
 
 @source:hp/hp80.cpp
@@ -17233,7 +17233,7 @@ magerror                        // (c) 1994 Technosoft (Japan) (Arcade TV Game L
 @source:skeleton/i7000.cpp
 i7000                           //
 
-@source:skeleton/ibm3153.cpp
+@source:ibm/ibm3153.cpp
 ibm3153                         //
 
 @source:ibm/ibm6580.cpp
@@ -17255,13 +17255,13 @@ icebox                          // Nutting Icebox
 @source:skeleton/icatel.cpp
 icatel                          //
 
-@source:misc/ice_bozopail.cpp
+@source:ice/ice_bozopail.cpp
 ice_bozo                        // ICE - Bozo Pail Toss
 
-@source:misc/ice_hhhippos.cpp
+@source:ice/ice_hhhippos.cpp
 hhhippos                        //
 
-@source:misc/ice_tbd.cpp
+@source:ice/ice_tbd.cpp
 ice_tbd                         // ICE - Turbo Drive
 
 @source:pinball/icecold.cpp
@@ -20299,7 +20299,7 @@ lethalenua                      // GX191 (c) 1992
 lethalenub                      // GX191 (c) 1992
 lethalenux                      // GX191 (c) 1992
 
-@source:misc/lethalj.cpp
+@source:ice/lethalj.cpp
 cclownz                         // (c) 1999 LAI Games
 cfarm                           // (c) 1999 LAI Games
 eggventr                        // (c) 1997 The Game Room
@@ -31984,7 +31984,7 @@ viostormj                       // GX168 (c) 1993 (Japan)
 viostormu                       // GX168 (c) 1993 (US)
 viostormub                      // GX168 (c) 1993 (US)
 
-@source:skeleton/myvision.cpp
+@source:nichibutsu/myvision.cpp
 myvision                        //
 
 @source:sharp/mz2000.cpp
@@ -33546,7 +33546,7 @@ nws3260                         // Sony NEWS NWS-3260
 @source:sony/news_r4k.cpp
 nws5000x                        // Sony NEWS NWS-5000X
 
-@source:skeleton/newton.cpp
+@source:apple/newton.cpp
 newtnotp
 newtonmp
 spi7000
@@ -33811,7 +33811,7 @@ tpoker2                         // (c) 1993 Micro Manufacturing, Inc.
 @source:misc/notechan.cpp
 notechan                        // (c) 1995 Banpresto
 
-@source:skeleton/notetaker.cpp
+@source:xerox/notetaker.cpp
 notetakr                        //
 
 @source:upl/nova2001.cpp
@@ -36061,7 +36061,7 @@ powerinsj                       // (c) 1993 Atlus (Japan)
 powerinspj                      // prototype (Japan)
 powerinspu                      // prototype (USA)
 
-@source:skeleton/powerstack.cpp
+@source:motorola/powerstack.cpp
 powerstk                        // Motorola Powerstack II
 
 @source:stm/pp.cpp
@@ -37699,7 +37699,7 @@ sc2a                            //
 @source:pacman/schick.cpp
 schick                          // Microhard
 
-@source:misc/schexx4gen.cpp
+@source:ice/schexx4gen.cpp
 schexx                          // (c) 1996 ICE
 
 @source:misc/scm_500.cpp
@@ -43021,7 +43021,7 @@ voyager                         // (c) 2002 Team Play, Inc.
 voyagers                        // (c) 2002 Team Play, Inc.
 policet2                        // (c) 2003 Team Play, Inc.
 
-@source:misc/vp101.cpp
+@source:ice/vp101.cpp
 jnero                           // (c) 2004 ICE/Play Mechanix
 specfrce                        // (c) 2002 ICE/Play Mechanix
 specfrceo                       // (c) 2002 ICE/Play Mechanix

@@ -58,6 +58,7 @@ apple/macpdm.cpp
 apple/macprtb.cpp
 apple/macpwrbk030.cpp
 apple/macquadra700.cpp
+apple/newton.cpp
 apple/tk2000.cpp
 appliedconcepts/boris.cpp
 appliedconcepts/borisdpl.cpp
@@ -369,6 +370,7 @@ hp/hp16500.cpp
 hp/hp2100.cpp
 hp/hp2620.cpp
 hp/hp2640.cpp
+hp/hp3478a.cpp
 hp/hp48.cpp
 hp/hp49gp.cpp
 hp/hp64k.cpp
@@ -379,11 +381,13 @@ hp/hp9825.cpp
 hp/hp9845.cpp
 hp/hp9k.cpp
 hp/hp9k_3xx.cpp
+hp/hpz80unk.cpp
 hp/jornada.cpp
 husky/hawk.cpp
 husky/hunter16.cpp
 husky/hunter2.cpp
 husky/husky.cpp
+ibm/ibm3153.cpp
 ibm/ibm6580.cpp
 ibm/rtpc.cpp
 informer/informer_207_100.cpp
@@ -485,6 +489,7 @@ morrow/microdec.cpp
 morrow/mpz80.cpp
 morrow/tricep.cpp
 mos/kim1.cpp
+motorola/ampscarp.cpp
 motorola/exorciser.cpp
 motorola/exorterm.cpp
 motorola/m6805evs.cpp
@@ -496,6 +501,7 @@ motorola/mekd4.cpp
 motorola/mekd5.cpp
 motorola/mvme147.cpp
 motorola/mvme162.cpp
+motorola/powerstack.cpp
 motorola/sys1121.cpp
 motorola/uchroma68.cpp
 msx/msx.cpp
@@ -531,6 +537,7 @@ neogeo/neogeocd.cpp
 netronics/elf.cpp
 netronics/exp85.cpp
 next/next.cpp
+nichibutsu/myvision.cpp
 nintendo/compmahj.cpp
 nintendo/gamecube.cpp
 nintendo/gb.cpp
@@ -765,7 +772,6 @@ skeleton/alphasma3k.cpp
 skeleton/am1000.cpp
 skeleton/ampex.cpp
 skeleton/ampex210.cpp
-skeleton/ampscarp.cpp
 skeleton/anzterm.cpp
 skeleton/argox.cpp
 skeleton/attache.cpp
@@ -838,12 +844,9 @@ skeleton/grfd2301.cpp
 skeleton/hazeltin.cpp
 skeleton/hazl1420.cpp
 skeleton/hohnadam.cpp
-skeleton/hp3478a.cpp
 skeleton/hprot1.cpp
-skeleton/hpz80unk.cpp
 skeleton/ht68k.cpp
 skeleton/i7000.cpp
-skeleton/ibm3153.cpp
 skeleton/icatel.cpp
 skeleton/icebox.cpp
 skeleton/iez80.cpp
@@ -895,10 +898,7 @@ skeleton/mtd1256.cpp
 skeleton/mw4pole.cpp
 skeleton/mx2178.cpp
 skeleton/mycom.cpp
-skeleton/myvision.cpp
-skeleton/newton.cpp
 skeleton/ngen.cpp
-skeleton/notetaker.cpp
 skeleton/onyx.cpp
 skeleton/p8k.cpp
 skeleton/palestra.cpp
@@ -911,7 +911,6 @@ skeleton/picno.cpp
 skeleton/plan80.cpp
 skeleton/pm68k.cpp
 skeleton/pockchal.cpp
-skeleton/powerstack.cpp
 skeleton/proteus3.cpp
 skeleton/pt68k4.cpp
 skeleton/ptcsol.cpp
@@ -1241,6 +1240,7 @@ wyse/wy85.cpp
 xerox/alto1.cpp
 xerox/alto2.cpp
 xerox/bigbord2.cpp
+xerox/notetaker.cpp
 xerox/xerox820.cpp
 yamaha/fb01.cpp
 yamaha/tg100.cpp

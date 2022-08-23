@@ -36,9 +36,8 @@ Status: not supported yet.
 
 #include "emu.h"
 
+#include "bus/gameboy/carts.h"
 #include "bus/gameboy/gb_slot.h"
-#include "bus/gameboy/mbc.h"
-#include "bus/gameboy/rom.h"
 #include "cpu/lr35902/lr35902.h"
 #include "machine/ram.h"
 #include "sound/gb.h"
@@ -60,52 +59,40 @@ namespace {
 #define SGB_FRAMES_PER_SECOND   61.17
 
 
-class gb_state : public driver_device
+class base_state : public driver_device
 {
 public:
-	gb_state(const machine_config &mconfig, device_type type, const char *tag) :
+	base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_cartslot(*this, "cartslot"),
 		m_maincpu(*this, "maincpu"),
 		m_apu(*this, "apu"),
-		m_region_maincpu(*this, "maincpu"),
 		m_inputs(*this, "INPUTS"),
-		m_bios_hack(*this, "SKIP_CHECK"),
 		m_ppu(*this, "ppu"),
-		m_palette(*this, "palette"),
-		m_cart_low(*this, "cartlow"),
-		m_cart_high(*this, "carthigh")
+		m_palette(*this, "palette")
 	{ }
 
-	void gbpocket(machine_config &config);
-	void gameboy(machine_config &config);
-
 protected:
-	enum {
+	enum
+	{
 		SIO_ENABLED = 0x80,
 		SIO_FAST_CLOCK = 0x02,
 		SIO_INTERNAL_CLOCK = 0x01
 	};
-	static constexpr u8 NO_CART = 0x00;
-	static constexpr u8 BIOS_ENABLED = 0x00;
-	static constexpr u8 CART_PRESENT = 0x01;
-	static constexpr u8 BIOS_DISABLED = 0x02;
+
+	static constexpr XTAL MASTER_CLOCK = 4.194304_MHz_XTAL;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	void gb_io_w(offs_t offset, uint8_t data);
-	void gb_io2_w(offs_t offset, uint8_t data);
 	uint8_t gb_ie_r();
 	void gb_ie_w(uint8_t data);
 	uint8_t gb_io_r(offs_t offset);
 
-	uint8_t gb_bios_r(offs_t offset);
-
 	void gb_timer_callback(uint8_t data);
 
 	void gb_init_regs();
-	void gb_init();
 
 	uint8_t       m_gb_io[0x10]{};
 
@@ -125,25 +112,57 @@ protected:
 
 	required_device<lr35902_cpu_device> m_maincpu;
 	required_device<gameboy_sound_device> m_apu;
-	required_region_ptr<uint8_t> m_region_maincpu;
 	required_ioport m_inputs;
-	required_ioport m_bios_hack;
 	required_device<dmg_ppu_device> m_ppu;
 	required_device<palette_device> m_palette;
-	memory_view m_cart_low;
-	memory_view m_cart_high;
+
+private:
+	void gb_timer_increment();
+	void gb_timer_check_irq();
+	void gb_serial_timer_tick();
+};
+
+
+class gb_state : public base_state
+{
+public:
+	gb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		base_state(mconfig, type, tag),
+		m_region_boot(*this, "maincpu"),
+		m_bios_hack(*this, "SKIP_CHECK")
+	{ }
+
+	void gameboy(machine_config &config);
+	void gbpocket(machine_config &config);
+
+protected:
+	virtual void device_post_load() override;
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	virtual void install_boot();
+	virtual void uninstall_boot();
+
+	void disable_boot();
+
+	void gb_io2_w(offs_t offset, uint8_t data);
+
+	required_region_ptr<uint8_t> m_region_boot;
 
 private:
 	void gb_palette(palette_device &palette) const;
 	void gbp_palette(palette_device &palette) const;
 
-	void gb_timer_increment();
-	void gb_timer_check_irq();
-	void gb_serial_timer_tick();
-
-	void save_gb_base();
-
 	void gameboy_map(address_map &map);
+
+	required_ioport m_bios_hack;
+
+	util::notifier_subscription m_prog_notifier;
+	memory_passthrough_handler m_boot_tap;
+
+	bool m_boot_enabled = false;
+	bool m_installing_boot = false;
 };
 
 
@@ -194,7 +213,12 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	virtual void install_boot() override;
+	virtual void uninstall_boot() override;
+
 private:
+	static constexpr XTAL GBC_CLOCK = 8.388_MHz_XTAL;
+
 	void gbc_io_w(offs_t offset, uint8_t data);
 	void gbc_io2_w(offs_t offset, uint8_t data);
 	uint8_t gbc_io2_r(offs_t offset);
@@ -203,21 +227,19 @@ private:
 
 	required_memory_bank m_rambank;
 	memory_share_creator<uint8_t> m_bankedram;
+
+	memory_passthrough_handler m_boot_high_tap;
 };
 
 
-class megaduck_state : public gb_state
+class megaduck_state : public base_state
 {
 public:
 	megaduck_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gb_state(mconfig, type, tag)
+		base_state(mconfig, type, tag)
 	{ }
 
 	void megaduck(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 private:
 	uint8_t megaduck_video_r(offs_t offset);
@@ -242,11 +264,31 @@ private:
 #define TIMEFRQ     m_gb_io[0x07]   // Timer frequency and start/stop switch
 
 
-//-------------------------
-// handle save state
-//-------------------------
+void base_state::gb_init_regs()
+{
+	/* Initialize the registers */
+	SIODATA = 0x00;
+	SIOCONT = 0x7E;
 
-void gb_state::save_gb_base()
+	gb_io_w(0x05, 0x00);       /* TIMECNT */
+	gb_io_w(0x06, 0x00);       /* TIMEMOD */
+}
+
+
+void gb_state::device_post_load()
+{
+	base_state::device_post_load();
+
+	m_installing_boot = true;
+	if (m_boot_enabled)
+		install_boot();
+	else
+		uninstall_boot();
+	m_installing_boot = false;
+}
+
+
+void base_state::machine_start()
 {
 	save_item(NAME(m_gb_io));
 	save_item(NAME(m_divcount));
@@ -259,41 +301,27 @@ void gb_state::save_gb_base()
 	m_cartslot->save_ram();
 }
 
-
-void gb_state::gb_init_regs()
-{
-	/* Initialize the registers */
-	SIODATA = 0x00;
-	SIOCONT = 0x7E;
-
-	gb_io_w(0x05, 0x00);       /* TIMECNT */
-	gb_io_w(0x06, 0x00);       /* TIMEMOD */
-}
-
-
-void gb_state::gb_init()
-{
-	m_apu->sound_w(0x16, 0x00);       /* Initialize sound hardware */
-
-	m_divcount = 8;
-	m_internal_serial_clock = 0;
-	m_internal_serial_frequency = 512 / 2;
-	m_triggering_irq = 0;
-	m_shift = 10; // slowest timer?
-	m_shift_cycles = 1 << m_shift;
-
-	/* Set registers to default/startup values */
-	m_gb_io[0x00] = 0xCF;
-	m_gb_io[0x01] = 0x00;
-	m_gb_io[0x02] = 0x7E;
-	m_gb_io[0x03] = 0xFF;
-	m_gb_io[0x07] = 0xF8;        /* Upper bits of TIMEFRQ register are set to 1 */
-}
-
-
 void gb_state::machine_start()
 {
-	save_gb_base();
+	base_state::machine_start();
+
+	m_boot_enabled = false;
+	m_installing_boot = false;
+	m_prog_notifier = m_maincpu->space(AS_PROGRAM).add_change_notifier(
+			[this] (read_or_write mode)
+			{
+				if (!m_installing_boot && (uint32_t(mode) & uint32_t(read_or_write::READ)))
+				{
+					m_installing_boot = true;
+					if (m_boot_enabled)
+						install_boot();
+					else
+						uninstall_boot();
+					m_installing_boot = false;
+				}
+			});
+
+	save_item(NAME(m_boot_enabled));
 }
 
 void gbc_state::machine_start()
@@ -303,7 +331,6 @@ void gbc_state::machine_start()
 	m_rambank->configure_entry(0, &m_bankedram[0]);
 	m_rambank->configure_entries(1, 7, &m_bankedram[0], 0x1000);
 }
-
 
 void sgb_state::machine_start()
 {
@@ -321,12 +348,34 @@ void sgb_state::machine_start()
 	save_item(NAME(m_sgb_data));
 }
 
+
+void base_state::machine_reset()
+{
+	m_apu->sound_w(0x16, 0x00); // Initialize sound hardware
+
+	m_divcount = 8;
+	m_internal_serial_clock = 0;
+	m_internal_serial_frequency = 512 / 2;
+	m_triggering_irq = 0;
+	m_shift = 10; // slowest timer?
+	m_shift_cycles = 1 << m_shift;
+
+	// Set registers to default/startup values
+	m_gb_io[0x00] = 0xcf;
+	m_gb_io[0x01] = 0x00;
+	m_gb_io[0x02] = 0x7e;
+	m_gb_io[0x03] = 0xff;
+	m_gb_io[0x07] = 0xf8;       // Upper bits of TIMEFRQ register are set to 1
+}
+
 void gb_state::machine_reset()
 {
-	gb_init();
+	base_state::machine_reset();
 
-	m_cart_low.select(BIOS_ENABLED | (m_cartslot ? CART_PRESENT : NO_CART));
-	m_cart_high.select(m_cartslot ? CART_PRESENT : NO_CART);
+	m_installing_boot = true;
+	m_boot_enabled = true;
+	install_boot();
+	m_installing_boot = false;
 }
 
 void gbc_state::machine_reset()
@@ -346,7 +395,67 @@ void sgb_state::machine_reset()
 }
 
 
-void gb_state::gb_io_w(offs_t offset, uint8_t data)
+void gb_state::install_boot()
+{
+	m_boot_tap.remove();
+	m_boot_tap = m_maincpu->space(AS_PROGRAM).install_read_tap(
+			0x0000, 0x00ff,
+			"boot_r",
+			[this] (offs_t offset, u8 &data, u8 mem_mask)
+			{
+				data = m_region_boot[offset];
+				if (m_bios_hack->read())
+				{
+					// patch out logo and checksum checks
+					// useful to run some pirate carts until properly emulated, or to test homebrew
+					if (offset == 0xe9 || offset == 0xea)
+						data = 0x00;
+					if (offset == 0xfa || offset == 0xfb)
+						data = 0x00;
+				}
+			},
+			&m_boot_tap);
+}
+
+void gbc_state::install_boot()
+{
+	gb_state::install_boot();
+
+	m_boot_high_tap.remove();
+	m_boot_high_tap = m_maincpu->space(AS_PROGRAM).install_read_tap(
+			0x0200, 0x08ff,
+			"boot_high_r",
+			[this] (offs_t offset, u8 &data, u8 mem_mask)
+			{
+				data = m_region_boot[0x0100 + offset - 0x0200];
+			},
+			&m_boot_high_tap);
+}
+
+
+void gb_state::uninstall_boot()
+{
+	m_boot_tap.remove();
+}
+
+void gbc_state::uninstall_boot()
+{
+	gb_state::uninstall_boot();
+
+	m_boot_high_tap.remove();
+}
+
+
+void gb_state::disable_boot()
+{
+	m_installing_boot = true;
+	m_boot_enabled = false;
+	uninstall_boot();
+	m_installing_boot = false;
+}
+
+
+void base_state::gb_io_w(offs_t offset, uint8_t data)
 {
 	static const uint8_t timer_shifts[4] = {10, 4, 6, 8};
 
@@ -431,10 +540,7 @@ logerror("SIOCONT write, serial clock is %04x\n", m_internal_serial_clock);
 void gb_state::gb_io2_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0x10)
-	{
-		/* disable BIOS ROM */
-		m_cart_low.select(BIOS_DISABLED | (m_cartslot ? CART_PRESENT : NO_CART));
-	}
+		disable_boot(); // disable boot ROM
 	else
 		m_ppu->video_w(offset, data);
 }
@@ -592,18 +698,18 @@ void sgb_state::sgb_io_w(offs_t offset, uint8_t data)
 }
 
 /* Interrupt Enable register */
-uint8_t gb_state::gb_ie_r()
+uint8_t base_state::gb_ie_r()
 {
 	return m_maincpu->get_ie();
 }
 
-void gb_state::gb_ie_w(uint8_t data)
+void base_state::gb_ie_w(uint8_t data)
 {
 	m_maincpu->set_ie(data);
 }
 
 /* IO read */
-uint8_t gb_state::gb_io_r(offs_t offset)
+uint8_t base_state::gb_io_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -632,7 +738,7 @@ logerror("IF read, serial clock is %04x\n", m_internal_serial_clock);
 
 
 /* Called when 512 internal cycles are passed */
-void gb_state::gb_serial_timer_tick()
+void base_state::gb_serial_timer_tick()
 {
 	if (SIOCONT & SIO_ENABLED)
 	{
@@ -657,7 +763,7 @@ void gb_state::gb_serial_timer_tick()
 }
 
 
-void gb_state::gb_timer_check_irq()
+void base_state::gb_timer_check_irq()
 {
 	m_reloading = 0;
 	if (m_triggering_irq)
@@ -674,7 +780,7 @@ void gb_state::gb_timer_check_irq()
 	}
 }
 
-void gb_state::gb_timer_increment()
+void base_state::gb_timer_increment()
 {
 	gb_timer_check_irq();
 
@@ -687,7 +793,7 @@ void gb_state::gb_timer_increment()
 }
 
 // This gets called while the cpu is executing instructions to keep the timer state in sync
-void gb_state::gb_timer_callback(uint8_t data)
+void base_state::gb_timer_callback(uint8_t data)
 {
 	uint16_t old_gb_divcount = m_divcount;
 	uint16_t old_internal_serial_clock = m_internal_serial_clock;
@@ -746,8 +852,8 @@ void gbc_state::gbc_io2_w(offs_t offset, uint8_t data)
 		case 0x0D:  // KEY1 - Prepare speed switch
 			m_maincpu->set_speed(data);
 			return;
-		case 0x10:  // BFF - BIOS disable
-			m_cart_low.select(BIOS_DISABLED | (m_cartslot ? CART_PRESENT : NO_CART));
+		case 0x10:  // BFF - boot ROM disable
+			disable_boot();
 			return;
 		case 0x16:  // RP - Infrared port
 			break;
@@ -781,19 +887,6 @@ uint8_t gbc_state::gbc_io2_r(offs_t offset)
   Megaduck routines
 
  ****************************************************************************/
-
-void megaduck_state::machine_start()
-{
-	gb_state::machine_start();
-}
-
-void megaduck_state::machine_reset()
-{
-	gb_init();
-
-	m_cart_low.select((m_cartslot ? CART_PRESENT : NO_CART));
-	m_cart_high.select(m_cartslot ? CART_PRESENT : NO_CART);
-}
 
 /*
  Map megaduck video related area on to regular Game Boy video area
@@ -897,35 +990,13 @@ uint8_t megaduck_state::megaduck_sound_r2(offs_t offset)
 		return data;
 }
 
-uint8_t gb_state::gb_bios_r(offs_t offset)
-{
-	if (m_bios_hack->read())
-	{
-		// patch out logo and checksum checks
-		// useful to run some pirate carts until we implement their complete functionalities + to test homebrew
-		if (offset == 0xe9 || offset == 0xea)
-			return 0x00;
-		if (offset == 0xfa || offset == 0xfb)
-			return 0x00;
-	}
-	return m_region_maincpu[offset];
-}
-
 
 void gb_state::gameboy_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x7fff).view(m_cart_low);
-	m_cart_low[BIOS_ENABLED | NO_CART](0x0000, 0x7fff).noprw();
-	m_cart_low[BIOS_ENABLED | NO_CART](0x0000, 0x00ff).r(FUNC(gb_state::gb_bios_r));
-	m_cart_low[BIOS_ENABLED | CART_PRESENT](0x0000, 0x7fff).rw(m_cartslot, FUNC(gb_cart_slot_device::read_rom), FUNC(gb_cart_slot_device::write_bank));
-	m_cart_low[BIOS_ENABLED | CART_PRESENT](0x0000, 0x00ff).r(FUNC(gb_state::gb_bios_r));
-	m_cart_low[BIOS_DISABLED | NO_CART](0x0000, 0x7fff).noprw();
-	m_cart_low[BIOS_DISABLED | CART_PRESENT](0x0000, 0x7fff).rw(m_cartslot, FUNC(gb_cart_slot_device::read_rom), FUNC(gb_cart_slot_device::write_bank));
+	map(0x0000, 0x7fff).rw(m_cartslot, FUNC(gb_cart_slot_device::read_rom), FUNC(gb_cart_slot_device::write_bank));
 	map(0x8000, 0x9fff).rw(m_ppu, FUNC(dmg_ppu_device::vram_r), FUNC(dmg_ppu_device::vram_w));
-	map(0xa000, 0xbfff).view(m_cart_high);
-	m_cart_high[NO_CART](0xa000, 0xbfff).noprw();
-	m_cart_high[CART_PRESENT](0xa000, 0xbfff).rw(m_cartslot, FUNC(gb_cart_slot_device::read_ram), FUNC(gb_cart_slot_device::write_ram));
+	map(0xa000, 0xbfff).rw(m_cartslot, FUNC(gb_cart_slot_device::read_ram), FUNC(gb_cart_slot_device::write_ram));
 	map(0xc000, 0xdfff).mirror(0x2000).ram();
 	map(0xfe00, 0xfeff).rw(m_ppu, FUNC(dmg_ppu_device::oam_r), FUNC(dmg_ppu_device::oam_w));
 	map(0xff00, 0xff0f).rw(FUNC(gb_state::gb_io_r), FUNC(gb_state::gb_io_w));
@@ -940,17 +1011,9 @@ void gb_state::gameboy_map(address_map &map)
 void sgb_state::sgb_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x7fff).view(m_cart_low);
-	m_cart_low[BIOS_ENABLED | NO_CART](0x0000, 0x7fff).noprw();
-	m_cart_low[BIOS_ENABLED | NO_CART](0x0000, 0x00ff).r(FUNC(sgb_state::gb_bios_r));
-	m_cart_low[BIOS_ENABLED | CART_PRESENT](0x0000, 0x7fff).rw(m_cartslot, FUNC(gb_cart_slot_device::read_rom), FUNC(gb_cart_slot_device::write_bank));
-	m_cart_low[BIOS_ENABLED | CART_PRESENT](0x0000, 0x00ff).r(FUNC(sgb_state::gb_bios_r));
-	m_cart_low[BIOS_DISABLED | NO_CART](0x0000, 0x7fff).noprw();
-	m_cart_low[BIOS_DISABLED | CART_PRESENT](0x0000, 0x7fff).rw(m_cartslot, FUNC(gb_cart_slot_device::read_rom), FUNC(gb_cart_slot_device::write_bank));
+	map(0x0000, 0x7fff).rw(m_cartslot, FUNC(gb_cart_slot_device::read_rom), FUNC(gb_cart_slot_device::write_bank));
 	map(0x8000, 0x9fff).rw(m_ppu, FUNC(sgb_ppu_device::vram_r), FUNC(sgb_ppu_device::vram_w));
-	map(0xa000, 0xbfff).view(m_cart_high);
-	m_cart_high[NO_CART](0xa000, 0xbfff).noprw();
-	m_cart_high[CART_PRESENT](0xa000, 0xbfff).rw(m_cartslot, FUNC(gb_cart_slot_device::read_ram), FUNC(gb_cart_slot_device::write_ram));
+	map(0xa000, 0xbfff).rw(m_cartslot, FUNC(gb_cart_slot_device::read_ram), FUNC(gb_cart_slot_device::write_ram));
 	map(0xc000, 0xdfff).mirror(0x2000).ram();
 	map(0xfe00, 0xfeff).rw(m_ppu, FUNC(sgb_ppu_device::oam_r), FUNC(sgb_ppu_device::oam_w));
 	map(0xff00, 0xff0f).rw(FUNC(sgb_state::gb_io_r), FUNC(sgb_state::sgb_io_w));
@@ -965,19 +1028,9 @@ void sgb_state::sgb_map(address_map &map)
 void gbc_state::gbc_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x7fff).view(m_cart_low);
-	m_cart_low[BIOS_ENABLED | NO_CART](0x0000, 0x7fff).noprw();
-	m_cart_low[BIOS_ENABLED | NO_CART](0x0000, 0x00ff).r(FUNC(gbc_state::gb_bios_r));
-	m_cart_low[BIOS_ENABLED | NO_CART](0x0200, 0x08ff).rom().region("maincpu", 0x0100);
-	m_cart_low[BIOS_ENABLED | CART_PRESENT](0x0000, 0x7fff).rw(m_cartslot, FUNC(gb_cart_slot_device::read_rom), FUNC(gb_cart_slot_device::write_bank));
-	m_cart_low[BIOS_ENABLED | CART_PRESENT](0x0000, 0x00ff).r(FUNC(gbc_state::gb_bios_r));
-	m_cart_low[BIOS_ENABLED | CART_PRESENT](0x0200, 0x08ff).rom().region("maincpu", 0x0100);
-	m_cart_low[BIOS_DISABLED | NO_CART](0x0000, 0x7fff).noprw();
-	m_cart_low[BIOS_DISABLED | CART_PRESENT](0x0000, 0x7fff).rw(m_cartslot, FUNC(gb_cart_slot_device::read_rom), FUNC(gb_cart_slot_device::write_bank));
+	map(0x0000, 0x7fff).rw(m_cartslot, FUNC(gb_cart_slot_device::read_rom), FUNC(gb_cart_slot_device::write_bank));
 	map(0x8000, 0x9fff).rw(m_ppu, FUNC(cgb_ppu_device::vram_r), FUNC(cgb_ppu_device::vram_w));
-	map(0xa000, 0xbfff).view(m_cart_high);
-	m_cart_high[NO_CART](0xa000, 0xbfff).noprw();
-	m_cart_high[CART_PRESENT](0xa000, 0xbfff).rw(m_cartslot, FUNC(gb_cart_slot_device::read_ram), FUNC(gb_cart_slot_device::write_ram));
+	map(0xa000, 0xbfff).rw(m_cartslot, FUNC(gb_cart_slot_device::read_ram), FUNC(gb_cart_slot_device::write_ram));
 	map(0xc000, 0xcfff).mirror(0x2000).ram();
 	map(0xd000, 0xdfff).mirror(0x2000).bankrw(m_rambank);
 	map(0xfe00, 0xfeff).rw(m_ppu, FUNC(cgb_ppu_device::oam_r), FUNC(cgb_ppu_device::oam_w));
@@ -993,18 +1046,12 @@ void gbc_state::gbc_map(address_map &map)
 void megaduck_state::megaduck_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x7fff).view(m_cart_low);
-	m_cart_low[BIOS_ENABLED | NO_CART](0x0000, 0x7fff).noprw();
-	m_cart_low[BIOS_ENABLED | CART_PRESENT](0x0000, 0x7fff).rw(m_cartslot, FUNC(gb_cart_slot_device::read_rom), FUNC(gb_cart_slot_device::write_bank));
-	m_cart_low[BIOS_DISABLED | NO_CART](0x0000, 0x7fff).noprw();
-	m_cart_low[BIOS_DISABLED | CART_PRESENT](0x0000, 0x7fff).rw(m_cartslot, FUNC(gb_cart_slot_device::read_rom), FUNC(gb_cart_slot_device::write_bank));
+	map(0x0000, 0x7fff).rw(m_cartslot, FUNC(gb_cart_slot_device::read_rom), FUNC(gb_cart_slot_device::write_bank));
 	map(0x8000, 0x9fff).rw(m_ppu, FUNC(dmg_ppu_device::vram_r), FUNC(dmg_ppu_device::vram_w));
 	map(0xa000, 0xafff).noprw();  // unused?
-	map(0xb000, 0xb000).view(m_cart_high);
-	m_cart_high[NO_CART](0xb000, 0xb000).noprw();
-	m_cart_high[CART_PRESENT](0xb000, 0xb000).w(m_cartslot, FUNC(gb_cart_slot_device::write_ram)); // used for bankswitch
+	map(0xb000, 0xb000).w(m_cartslot, FUNC(gb_cart_slot_device::write_ram)); // used for bank switch
 	map(0xb001, 0xbfff).noprw();  // unused?
-	map(0xc000, 0xfdff).ram();    // 8k or 16k? ram
+	map(0xc000, 0xfdff).ram();    // 8k or 16k? RAM
 	map(0xfe00, 0xfeff).rw(m_ppu, FUNC(dmg_ppu_device::oam_r), FUNC(dmg_ppu_device::oam_w));
 	map(0xff00, 0xff0f).rw(FUNC(megaduck_state::gb_io_r), FUNC(megaduck_state::gb_io_w));
 	map(0xff10, 0xff1f).rw(FUNC(megaduck_state::megaduck_video_r), FUNC(megaduck_state::megaduck_video_w));
@@ -1032,46 +1079,7 @@ static INPUT_PORTS_START( gameboy )
 	PORT_CONFNAME( 0x01, 0x00, "[HACK] Skip BIOS Logo check" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
-
 INPUT_PORTS_END
-
-static void gb_cart(device_slot_interface &device)
-{
-	device.option_add_internal("rom",         GB_STD_ROM);
-	device.option_add_internal("rom_mbc1",    GB_ROM_MBC1);
-	device.option_add_internal("rom_mbc1col", GB_ROM_MBC1);
-	device.option_add_internal("rom_mbc2",    GB_ROM_MBC2);
-	device.option_add_internal("rom_mbc3",    GB_ROM_MBC3);
-	device.option_add_internal("rom_huc1",    GB_ROM_MBC3);
-	device.option_add_internal("rom_huc3",    GB_ROM_MBC3);
-	device.option_add_internal("rom_mbc5",    GB_ROM_MBC5);
-	device.option_add_internal("rom_mbc6",    GB_ROM_MBC6);
-	device.option_add_internal("rom_mbc7",    GB_ROM_MBC7);
-	device.option_add_internal("rom_tama5",   GB_ROM_TAMA5);
-	device.option_add_internal("rom_mmm01",   GB_ROM_MMM01);
-	device.option_add_internal("rom_m161",    GB_ROM_M161);
-	device.option_add_internal("rom_sachen1", GB_ROM_SACHEN1);
-	device.option_add_internal("rom_sachen2", GB_ROM_SACHEN2);
-	device.option_add_internal("rom_wisdom",  GB_ROM_WISDOM);
-	device.option_add_internal("rom_yong",    GB_ROM_YONG);
-	device.option_add_internal("rom_lasama",  GB_ROM_LASAMA);
-	device.option_add_internal("rom_atvrac",  GB_ROM_ATVRAC);
-	device.option_add_internal("rom_camera",  GB_ROM_CAMERA);
-	device.option_add_internal("rom_188in1",  GB_ROM_188IN1);
-	device.option_add_internal("rom_sintax",  GB_ROM_SINTAX);
-	device.option_add_internal("rom_chong",   GB_ROM_CHONGWU);
-	device.option_add_internal("rom_licheng", GB_ROM_LICHENG);
-	device.option_add_internal("rom_digimon", GB_ROM_DIGIMON);
-	device.option_add_internal("rom_rock8",   GB_ROM_ROCKMAN8);
-	device.option_add_internal("rom_sm3sp",   GB_ROM_SM3SP);
-//  device.option_add_internal("rom_dkong5",  GB_ROM_DKONG5);
-//  device.option_add_internal("rom_unk01",   GB_ROM_UNK01);
-}
-
-static void megaduck_cart(device_slot_interface &device)
-{
-	device.option_add_internal("rom",  MEGADUCK_ROM);
-}
 
 
 
@@ -1134,36 +1142,33 @@ void megaduck_state::megaduck_palette(palette_device &palette) const
 
 void gb_state::gameboy(machine_config &config)
 {
-	/* basic machine hardware */
-	LR35902(config, m_maincpu, XTAL(4'194'304));
+	// basic machine hardware
+	LR35902(config, m_maincpu, MASTER_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gb_state::gameboy_map);
 	m_maincpu->timer_cb().set(FUNC(gb_state::gb_timer_callback));
 	m_maincpu->set_halt_bug(true);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(DMG_FRAMES_PER_SECOND);
-	screen.set_vblank_time(0);
-	screen.set_screen_update("ppu", FUNC(dmg_ppu_device::screen_update));
+	screen.set_raw(MASTER_CLOCK, 456, 0, 20 * 8, 154, 0, 18 * 8);
+	screen.set_screen_update(m_ppu, FUNC(dmg_ppu_device::screen_update));
 	screen.set_palette(m_palette);
-//  screen.set_size(20*8, 18*8);
-	screen.set_size(458, 154);
-	screen.set_visarea(0*8, 20*8-1, 0*8, 18*8-1);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfxdecode_device::empty);
 	PALETTE(config, m_palette, FUNC(gb_state::gb_palette), 4);
 
 	DMG_PPU(config, m_ppu, m_maincpu);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	DMG_APU(config, m_apu, XTAL(4'194'304));
+
+	DMG_APU(config, m_apu, MASTER_CLOCK);
 	m_apu->add_route(0, "lspeaker", 0.50);
 	m_apu->add_route(1, "rspeaker", 0.50);
 
-	/* cartslot */
-	GB_CART_SLOT(config, m_cartslot, gb_cart, nullptr);
+	// cartslot
+	GB_CART_SLOT(config, m_cartslot, gameboy_cartridges, nullptr);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("gameboy");
 	SOFTWARE_LIST(config, "gbc_list").set_compatible("gbcolor");
@@ -1171,18 +1176,18 @@ void gb_state::gameboy(machine_config &config)
 
 void sgb_state::supergb(machine_config &config)
 {
-	/* basic machine hardware */
-	LR35902(config, m_maincpu, 4295454); /* 4.295454 MHz, derived from SNES xtal */
+	// basic machine hardware
+	LR35902(config, m_maincpu, 4'295'454); // derived from SNES xtal
 	m_maincpu->set_addrmap(AS_PROGRAM, &sgb_state::sgb_map);
 	m_maincpu->timer_cb().set(FUNC(sgb_state::gb_timer_callback));
 	m_maincpu->set_halt_bug(true);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_physical_aspect(4, 3); // runs on a TV, not an LCD
 	screen.set_refresh_hz(SGB_FRAMES_PER_SECOND);
 	screen.set_vblank_time(0);
-	screen.set_screen_update("ppu", FUNC(dmg_ppu_device::screen_update));
+	screen.set_screen_update(m_ppu, FUNC(dmg_ppu_device::screen_update));
 	screen.set_palette(m_palette);
 	screen.set_size(32*8, 28*8);
 	screen.set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
@@ -1192,15 +1197,16 @@ void sgb_state::supergb(machine_config &config)
 
 	SGB_PPU(config, m_ppu, m_maincpu);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	DMG_APU(config, m_apu, 4295454);
+
+	DMG_APU(config, m_apu, 4'295'454);
 	m_apu->add_route(0, "lspeaker", 0.50);
 	m_apu->add_route(1, "rspeaker", 0.50);
 
-	/* cartslot */
-	GB_CART_SLOT(config, m_cartslot, gb_cart, nullptr);
+	// cartslot
+	GB_CART_SLOT(config, m_cartslot, gameboy_cartridges, nullptr);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("gameboy");
 	SOFTWARE_LIST(config, "gbc_list").set_compatible("gbcolor");
@@ -1210,16 +1216,16 @@ void sgb_state::supergb2(machine_config &config)
 {
 	gameboy(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &sgb_state::sgb_map);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(*subdevice<screen_device>("screen"));
 	screen.set_physical_aspect(4, 3); // runs on a TV, not an LCD
 	screen.set_size(32*8, 28*8);
 	screen.set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
 
-	m_palette->set_entries(32768);
+	m_palette->set_entries(32'768);
 	m_palette->set_init(FUNC(sgb_state::sgb_palette));
 
 	SGB_PPU(config.replace(), m_ppu, m_maincpu);
@@ -1229,7 +1235,7 @@ void gb_state::gbpocket(machine_config &config)
 {
 	gameboy(config);
 
-	/* video hardware */
+	// video hardware
 	m_palette->set_init(FUNC(gb_state::gbp_palette));
 
 	MGB_PPU(config.replace(), m_ppu, m_maincpu);
@@ -1237,35 +1243,32 @@ void gb_state::gbpocket(machine_config &config)
 
 void gbc_state::gbcolor(machine_config &config)
 {
-	/* basic machine hardware */
-	LR35902(config, m_maincpu, XTAL(4'194'304)); // todo XTAL(8'388'000)
+	// basic machine hardware
+	LR35902(config, m_maincpu, GBC_CLOCK / 2); // FIXME: make the CPU device divide rather than multiply the clock frequency
 	m_maincpu->set_addrmap(AS_PROGRAM, &gbc_state::gbc_map);
 	m_maincpu->timer_cb().set(FUNC(gbc_state::gb_timer_callback));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(DMG_FRAMES_PER_SECOND);
-	screen.set_vblank_time(0);
-	screen.set_screen_update("ppu", FUNC(dmg_ppu_device::screen_update));
+	screen.set_raw(GBC_CLOCK / 2, 456, 0, 20 * 8, 154, 0, 18 * 8);
+	screen.set_screen_update(m_ppu, FUNC(dmg_ppu_device::screen_update));
 	screen.set_palette(m_palette);
-//  screen.set_size(20*8, 18*8);
-	screen.set_size(458, 154);
-	screen.set_visarea(0*8, 20*8-1, 0*8, 18*8-1);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfxdecode_device::empty);
 	PALETTE(config, m_palette, palette_device::BGR_555);
 
 	CGB_PPU(config, m_ppu, m_maincpu);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	CGB04_APU(config, m_apu, XTAL(4'194'304));
+
+	CGB04_APU(config, m_apu, GBC_CLOCK / 2);
 	m_apu->add_route(0, "lspeaker", 0.50);
 	m_apu->add_route(1, "rspeaker", 0.50);
 
-	/* cartslot */
-	GB_CART_SLOT(config, m_cartslot, gb_cart, nullptr);
+	// cartslot
+	GB_CART_SLOT(config, m_cartslot, gameboy_cartridges, nullptr);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("gbcolor");
 	SOFTWARE_LIST(config, "gb_list").set_compatible("gameboy");
@@ -1273,17 +1276,17 @@ void gbc_state::gbcolor(machine_config &config)
 
 void megaduck_state::megaduck(machine_config &config)
 {
-	/* basic machine hardware */
-	LR35902(config, m_maincpu, XTAL(4'194'304)); /* 4.194304 MHz */
+	// basic machine hardware
+	LR35902(config, m_maincpu, XTAL(4'194'304));
 	m_maincpu->set_addrmap(AS_PROGRAM, &megaduck_state::megaduck_map);
 	m_maincpu->timer_cb().set(FUNC(megaduck_state::gb_timer_callback));
 	m_maincpu->set_halt_bug(true);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(DMG_FRAMES_PER_SECOND);
 	screen.set_vblank_time(0);
-	screen.set_screen_update("ppu", FUNC(dmg_ppu_device::screen_update));
+	screen.set_screen_update(m_ppu, FUNC(dmg_ppu_device::screen_update));
 	screen.set_palette(m_palette);
 	screen.set_size(20*8, 18*8);
 	screen.set_visarea(0*8, 20*8-1, 0*8, 18*8-1);
@@ -1293,15 +1296,15 @@ void megaduck_state::megaduck(machine_config &config)
 
 	DMG_PPU(config, m_ppu, m_maincpu);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	DMG_APU(config, m_apu, XTAL(4'194'304));
 	m_apu->add_route(0, "lspeaker", 0.50);
 	m_apu->add_route(1, "rspeaker", 0.50);
 
-	/* cartslot */
-	MEGADUCK_CART_SLOT(config, m_cartslot, megaduck_cart, nullptr);
+	// cartslot
+	MEGADUCK_CART_SLOT(config, m_cartslot, megaduck_cartridges, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("megaduck");
 }
 
@@ -1341,7 +1344,6 @@ ROM_START(gbcolor)
 ROM_END
 
 ROM_START(megaduck)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START(gamefgtr)

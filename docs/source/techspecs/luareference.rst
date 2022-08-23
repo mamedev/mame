@@ -1502,9 +1502,10 @@ space:install_read_tap(start, end, name, callback)
     a string, and the callback must be a function.
 
     The callback is passed three arguments for the access offset, the data read,
-    and the memory access mask.  To modify the data being read, return the
-    modified value from the callback function as an integer.  If the callback
-    does not return an integer, the data will not be modified.
+    and the memory access mask.  The offset is the absolute offset into the
+    address space.  To modify the data being read, return the modified value
+    from the callback function as an integer.  If the callback does not return
+    an integer, the data will not be modified.
 space:install_write_tap(start, end, name, callback)
     Installs a :ref:`pass-through handler <luareference-mem-tap>` that will
     receive notifications on write to the specified range of addresses in the
@@ -1512,9 +1513,10 @@ space:install_write_tap(start, end, name, callback)
     a string, and the callback must be a function.
 
     The callback is passed three arguments for the access offset, the data
-    written, and the memory access mask.  To modify the data being written,
-    return the modified value from the callback function as an integer.  If the
-    callback does not return an integer, the data will not be modified.
+    written, and the memory access mask.  The offset is the absolute offset into
+    the address space.  To modify the data being written, return the modified
+    value from the callback function as an integer.  If the callback does not
+    return an integer, the data will not be modified.
 
 Properties
 ^^^^^^^^^^
