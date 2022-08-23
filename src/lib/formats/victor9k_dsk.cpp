@@ -221,7 +221,7 @@ floppy_image_format_t::desc_e* victor9k_format::get_sector_desc(const format &f,
 	static floppy_image_format_t::desc_e desc[] = {
 		/* 00 */ { SECTOR_INTERLEAVE_SKEW, 0, 0},
 		/* 01 */ { SECTOR_LOOP_START, 0, -1 },
-		/* 02 */ {   SYNC_GCR5, 9 },
+		/* 02 */ {   SYNC_GCR5, 15 },
 		/* 03 */ {   GCR5, 0x07, 1 },
 		/* 04 */ {   CRC_VICTOR_HDR_START, 1 },
 		/* 05 */ {     TRACK_ID_VICTOR_GCR5 },
@@ -229,7 +229,7 @@ floppy_image_format_t::desc_e* victor9k_format::get_sector_desc(const format &f,
 		/* 07 */ {   CRC_END, 1 },
 		/* 08 */ {   CRC, 1 },
 		/* 09 */ {   RAWBYTE, 0x55, 8 },
-		/* 10 */ {   SYNC_GCR5, 5 },
+		/* 10 */ {   SYNC_GCR5, 6 },
 		/* 11 */ {   GCR5, 0x08, 1 },
 		/* 12 */ {   CRC_VICTOR_DATA_START, 2 },
 		/* 13 */ {     SECTOR_DATA_GCR5, -1 },
@@ -242,7 +242,7 @@ floppy_image_format_t::desc_e* victor9k_format::get_sector_desc(const format &f,
 		/* 20 */ { END }
 	};
 
-	current_size = 90 + (1+1+1+1)*10 + 8*8 + 50 + (1+f.sector_base_size+2)*10 + 8*8;
+	current_size = 150 + (1+1+1+1)*10 + 8*8 + 60 + (1+f.sector_base_size+2)*10 + 8*8;
 
 	current_size *= sector_count;
 	return desc;
