@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+
 /*******************************************************************************
  Super Pinball Action (c) 1991 Tecmo
 ********************************************************************************
@@ -10,7 +11,7 @@
 
  A Pinball Game from Tecmo, the Hardware seems to be somewhere between that used
  for Tecmo's classic game Ninja Gaiden (see gaiden.cpp) and that used in Comad's
- Gals Pinball (see galspnbl.cpp) I imagine Comad took the hardware that this uses
+ Gals Pinball (see galspnbl.cpp). I imagine Comad took the hardware that this uses
  as a basis for writing their game on, adding a couple of features such as the
  pixel layer.
 
@@ -85,8 +86,8 @@ The manual defines the controls as 4 push buttons:
 TODO : (also check the notes from the galspnbl.cpp driver)
 
   - coin insertion is not recognized consistently.
-   - convert to tilemaps
   - all the unknown regs
+  - Oki fills the log with 'Requested to play sample 0X on non-stopped voice'
 
 
 Unmapped writes (P.O.S.T.)
@@ -132,27 +133,278 @@ cpu #0 (PC=00001A1A): unmapped memory word write to 00090030 = 00F7 & 00FF
 *******************************************************************************/
 
 #include "emu.h"
-#include "spbactn.h"
+
+#include "tecmo_spr.h"
+#include "tecmo_mix.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
-#include "speaker.h"
 
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
+#include "tilemap.h"
+
+
+// configurable logging
+#define LOG_PROTO     (1U <<  1)
+
+//#define VERBOSE (LOG_GENERAL | LOG_PROTO)
+
+#include "logmacro.h"
+
+#define LOGPROTO(...)     LOGMASKED(LOG_PROTO,     __VA_ARGS__)
+
+
+namespace {
+
+class spbactn_state : public driver_device
+{
+public:
+	spbactn_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_sprgen(*this, "spritegen"),
+		m_mixer(*this, "mixer"),
+		m_soundlatch(*this, "soundlatch"),
+		m_bgvideoram(*this, "bgvideoram"),
+		m_fgvideoram(*this, "fgvideoram"),
+		m_spvideoram(*this, "spvideoram")
+	{ }
+
+	void spbactn(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<tecmo_spr_device> m_sprgen;
+	required_device<tecmo_mix_device> m_mixer;
+	required_device<generic_latch_8_device> m_soundlatch;
+
+	required_shared_ptr<uint16_t> m_bgvideoram;
+	required_shared_ptr<uint16_t> m_fgvideoram;
+	required_shared_ptr<uint16_t> m_spvideoram;
+
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+
+	void main_irq_ack_w(uint16_t data);
+
+	void bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void fg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	int draw_video(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bool alt_sprites);
+
+	void sound_map(address_map &map);
+
+private:
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+
+	bitmap_ind16 m_tile_bitmap_bg;
+	bitmap_ind16 m_tile_bitmap_fg;
+	bitmap_ind16 m_sprite_bitmap;
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void main_map(address_map &map);
+};
+
+class spbactnp_state : public spbactn_state
+{
+public:
+	spbactnp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spbactn_state(mconfig, type, tag),
+		m_extraram(*this, "extraram%u", 1U)
+	{ }
+
+	void spbactnp(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
+	required_shared_ptr_array<uint8_t, 2> m_extraram;
+
+	tilemap_t *m_extra_tilemap = nullptr;
+
+	void extraram_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	TILE_GET_INFO_MEMBER(get_extra_tile_info);
+
+	void _9000a_w(uint16_t data);
+	void _9000c_w(uint16_t data);
+	void _9000e_w(uint16_t data);
+
+	void _90124_w(uint16_t data);
+	void _9012c_w(uint16_t data);
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void extra_map(address_map &map);
+	void main_map(address_map &map);
+};
+
+
+// video
+
+void spbactn_state::bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_bgvideoram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset & 0x1fff);
+}
+
+TILE_GET_INFO_MEMBER(spbactn_state::get_bg_tile_info)
+{
+	int const attr = m_bgvideoram[tile_index];
+	int const tileno = m_bgvideoram[tile_index + 0x2000];
+	tileinfo.set(1, tileno, ((attr & 0x00f0) >> 4), 0);
+}
+
+
+void spbactn_state::fg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_fgvideoram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset & 0x1fff);
+}
+
+TILE_GET_INFO_MEMBER(spbactn_state::get_fg_tile_info)
+{
+	int const attr = m_fgvideoram[tile_index];
+	int const tileno = m_fgvideoram[tile_index + 0x2000];
+
+	int color = ((attr & 0x00f0) >> 4);
+
+	// blending
+	if (attr & 0x0008)
+		color += 0x0010;
+
+	tileinfo.set(0, tileno, color, 0);
+}
+
+
+
+void spbactn_state::video_start()
+{
+	// allocate bitmaps
+	m_screen->register_screen_bitmap(m_tile_bitmap_bg);
+	m_screen->register_screen_bitmap(m_tile_bitmap_fg);
+	m_screen->register_screen_bitmap(m_sprite_bitmap);
+
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spbactn_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 8, 64, 128);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spbactn_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16, 8, 64, 128);
+	m_bg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
+}
+
+void spbactnp_state::video_start()
+{
+	spbactn_state::video_start();
+	// no idea..
+	m_extra_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spbactnp_state::get_extra_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 16, 16);
+}
+
+void spbactnp_state::_9000c_w(uint16_t data)
+{
+	LOGPROTO("_9000c_w %04x\n", data);
+}
+
+void spbactnp_state::_9000e_w(uint16_t data)
+{
+	LOGPROTO("_9000e_w %04x\n", data);
+}
+
+void spbactnp_state::_9000a_w(uint16_t data)
+{
+	LOGPROTO("_9000a_w %04x\n", data);
+}
+
+void spbactnp_state::_90124_w(uint16_t data)
+{
+	LOGPROTO("_90124_w %04x\n", data);
+	m_bg_tilemap->set_scrolly(0, data);
+
+}
+
+void spbactnp_state::_9012c_w(uint16_t data)
+{
+	LOGPROTO("_9012c_w %04x\n", data);
+	m_bg_tilemap->set_scrollx(0, data);
+}
+
+
+void spbactnp_state::extraram_w(offs_t offset, uint8_t data, uint8_t mem_mask)
+{
+	COMBINE_DATA(&m_extraram[0][offset]);
+	m_extra_tilemap->mark_tile_dirty(offset / 2);
+}
+
+TILE_GET_INFO_MEMBER(spbactnp_state::get_extra_tile_info)
+{
+	int tileno = m_extraram[0][(tile_index * 2) + 1];
+	tileno |= m_extraram[0][(tile_index * 2)] << 8;
+	tileinfo.set(3, tileno, 0, 0);
+}
+
+
+
+
+int spbactn_state::draw_video(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bool alt_sprites)
+{
+	m_tile_bitmap_bg.fill(0, cliprect);
+	m_tile_bitmap_fg.fill(0, cliprect);
+	m_sprite_bitmap.fill(0, cliprect);
+	bitmap.fill(0, cliprect);
+
+	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode->gfx(2), cliprect, &m_spvideoram[0], 0, 0, flip_screen(), m_sprite_bitmap);
+	m_bg_tilemap->draw(screen, m_tile_bitmap_bg, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, m_tile_bitmap_fg, cliprect, 0, 0);
+
+	m_mixer->mix_bitmaps(screen, bitmap, cliprect, *m_palette, &m_tile_bitmap_bg, &m_tile_bitmap_fg, (bitmap_ind16*)nullptr, &m_sprite_bitmap);
+
+	return 0;
+}
+
+uint32_t spbactn_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	return draw_video(screen, bitmap, cliprect, false);
+}
+
+uint32_t spbactnp_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	// hack to make the extra CPU do something..
+	m_extraram[1][0x104] = machine().rand();
+	m_extraram[1][0x105] = machine().rand();
+
+	return draw_video(screen, bitmap, cliprect, true);
+}
+
+
+// machine
 
 void spbactn_state::main_irq_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
 }
 
-void spbactn_state::spbactn_map(address_map &map)
+void spbactn_state::main_map(address_map &map)
 {
 	map(0x00000, 0x3ffff).rom();
-	map(0x40000, 0x43fff).ram();   // main ram
-	map(0x50000, 0x50fff).ram().share("spvideoram");
-	map(0x60000, 0x67fff).ram().w(FUNC(spbactn_state::fg_videoram_w)).share("fgvideoram");
-	map(0x70000, 0x77fff).ram().w(FUNC(spbactn_state::bg_videoram_w)).share("bgvideoram");
+	map(0x40000, 0x43fff).ram();   // main RAM
+	map(0x50000, 0x50fff).ram().share(m_spvideoram);
+	map(0x60000, 0x67fff).ram().w(FUNC(spbactn_state::fg_videoram_w)).share(m_fgvideoram);
+	map(0x70000, 0x77fff).ram().w(FUNC(spbactn_state::bg_videoram_w)).share(m_bgvideoram);
 	map(0x80000, 0x827ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x90000, 0x90001).portr("IN0");
 	map(0x90010, 0x90011).portr("IN1");
@@ -160,7 +412,7 @@ void spbactn_state::spbactn_map(address_map &map)
 	map(0x90030, 0x90031).portr("DSW1");
 	map(0x90040, 0x90041).portr("DSW2");
 
-	/* this are an awful lot of unknowns */
+	// these are an awful lot of unknowns
 	map(0x90000, 0x90001).nopw();
 	map(0x90011, 0x90011).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x90020, 0x90021).w(FUNC(spbactn_state::main_irq_ack_w));
@@ -196,46 +448,47 @@ void spbactn_state::spbactn_map(address_map &map)
 
 
 
-void spbactn_state::spbactnp_map(address_map &map)
+void spbactnp_state::main_map(address_map &map)
 {
 	map(0x00000, 0x3ffff).rom();
-	map(0x40000, 0x43fff).ram();   // main ram
-	map(0x50000, 0x50fff).ram().share("spvideoram");
-	map(0x60000, 0x67fff).ram().w(FUNC(spbactn_state::fg_videoram_w)).share("fgvideoram");
-	map(0x70000, 0x77fff).ram().w(FUNC(spbactn_state::bg_videoram_w)).share("bgvideoram");
+	map(0x40000, 0x43fff).ram();   // main RAM
+	map(0x50000, 0x50fff).ram().share(m_spvideoram);
+	map(0x60000, 0x67fff).ram().w(FUNC(spbactnp_state::fg_videoram_w)).share(m_fgvideoram);
+	map(0x70000, 0x77fff).ram().w(FUNC(spbactnp_state::bg_videoram_w)).share(m_bgvideoram);
 	map(0x80000, 0x827ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");   // yes R and G are swapped vs. the released version
 
-	map(0x90002, 0x90003).w(FUNC(spbactn_state::main_irq_ack_w));
-	map(0x90006, 0x90007).w(FUNC(spbactn_state::spbatnp_90006_w));
-	map(0x9000a, 0x9000b).w(FUNC(spbactn_state::spbatnp_9000a_w));
-	map(0x9000c, 0x9000d).w(FUNC(spbactn_state::spbatnp_9000c_w));
-	map(0x9000e, 0x9000f).w(FUNC(spbactn_state::spbatnp_9000e_w));
+	map(0x90000, 0x90001).portr("IN0");
+	map(0x90002, 0x90003).portr("IN1").w(FUNC(spbactnp_state::main_irq_ack_w));
+	map(0x90006, 0x90007).portr("DSW");
+	map(0x90007, 0x90007).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x9000a, 0x9000b).w(FUNC(spbactnp_state::_9000a_w));
+	map(0x9000c, 0x9000d).w(FUNC(spbactnp_state::_9000c_w));
+	map(0x9000e, 0x9000f).w(FUNC(spbactnp_state::_9000e_w));
 
-	map(0x90124, 0x90125).w(FUNC(spbactn_state::spbatnp_90124_w)); // bg scroll
-	map(0x9012c, 0x9012d).w(FUNC(spbactn_state::spbatnp_9012c_w)); // bg scroll
-
-	map(0x90000, 0x900ff).r(FUNC(spbactn_state::temp_read_handler_r)); // temp
+	map(0x90124, 0x90125).w(FUNC(spbactnp_state::_90124_w)); // bg scroll
+	map(0x9012c, 0x9012d).w(FUNC(spbactnp_state::_9012c_w)); // bg scroll
 }
 
-void spbactn_state::spbactn_sound_map(address_map &map)
+void spbactn_state::sound_map(address_map &map)
 {
 	map(0x0000, 0xefff).rom();
 	map(0xf000, 0xf7ff).ram();
 	map(0xf800, 0xf800).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xf810, 0xf811).w("ymsnd", FUNC(ym3812_device::write));
 
-	map(0xfc00, 0xfc00).nopr().nopw(); /* irq ack ?? */
+	map(0xfc00, 0xfc00).nopr().nopw(); // IRQ ack ??
 	map(0xfc20, 0xfc20).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
 
 
-void spbactn_state::spbactnp_extra_map(address_map &map)
+void spbactnp_state::extra_map(address_map &map)
 {
+	map(0x0000, 0xffff).noprw();
 	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xc7ff).ram().share("extraram2");
+	map(0xc000, 0xc7ff).ram().share(m_extraram[1]);
 	map(0xe000, 0xefff).ram();
-	map(0xd000, 0xd1ff).ram().w(FUNC(spbactn_state::extraram_w)).share("extraram");
+	map(0xd000, 0xd1ff).ram().w(FUNC(spbactnp_state::extraram_w)).share(m_extraram[0]);
 	map(0xd200, 0xd200).ram();
 }
 
@@ -265,7 +518,7 @@ static INPUT_PORTS_START( spbactn )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME( "Start" )  /* needed to avoid confusion with # of players. Press mulitple times for multiple players */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME( "Start" )  // needed to avoid confusion with # of players. Press multiple times for multiple players
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -311,16 +564,102 @@ static INPUT_PORTS_START( spbactn )
 	PORT_DIPNAME( 0x10, 0x10, "Hit Difficulty" )        PORT_DIPLOCATION("SW2:5")   // From .xls file - WHAT does that mean ?
 	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Difficult ) )
-	PORT_DIPNAME( 0x20, 0x20, "Display Instructions" )  PORT_DIPLOCATION("SW2:6") /* Listed in manual as "Change Software", but seems to have no effect? */
+	PORT_DIPNAME( 0x20, 0x20, "Display Instructions" )  PORT_DIPLOCATION("SW2:6") // Listed in manual as "Change Software", but seems to have no effect?
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:7") /* As listed in manual, but seems to have no effect? */
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:7") // As listed in manual, but seems to have no effect? Works on the prototype, though
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "Match" )         PORT_DIPLOCATION("SW2:8")   // Check code at 0x00bf8c
 	PORT_DIPSETTING(    0x80, "1/20" )
 	PORT_DIPSETTING(    0x00, "1/40" )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( spbactnp )
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Right Flippers" )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Left Flippers" )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )  PORT_NAME( "Start" )  // needed to avoid confusion with # of players. Press multiple times for multiple players
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME( "Launch Ball / Shake" )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW") // TODO: double check these
+	PORT_DIPNAME( 0x0003, 0x0003, "Balls" )         PORT_DIPLOCATION("SW1:8,7")
+	PORT_DIPSETTING(      0x0000, "2" )
+	PORT_DIPSETTING(      0x0003, "3" )
+	PORT_DIPSETTING(      0x0001, "4" )
+	PORT_DIPSETTING(      0x0002, "5" )
+	PORT_DIPNAME( 0x001c, 0x001c, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:6,5,4")
+	PORT_DIPSETTING(      0x0008, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x000c, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0004, "2 Coins/1 Credit 3/2" )
+	PORT_DIPSETTING(      0x001c, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0014, "1 Coin/1 Credit 2/3" )
+	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0000, "1 Coin/1 Credit 5/6" )
+	PORT_DIPNAME( 0x00e0, 0x00e0, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:3,2,1")
+	PORT_DIPSETTING(      0x0040, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0060, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0020, "2 Coins/1 Credit 3/2" )
+	PORT_DIPSETTING(      0x00e0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x00a0, "1 Coin/1 Credit 2/3" )
+	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0000, "1 Coin/1 Credit 5/6" )
+	PORT_DIPNAME( 0x0100, 0x0100, "Match" )         PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(      0x0100, "1/20" )
+	PORT_DIPSETTING(      0x0000, "1/40" )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, "Display Instructions" )  PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x0800, 0x0800, "Hit Difficulty" )        PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(      0x0800, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Difficult ) )
+	PORT_DIPNAME( 0x3000, 0x3000, "Extra Ball" )        PORT_DIPLOCATION("SW2:4,3")
+	PORT_DIPSETTING(      0x1000, "100k and 500k" )
+	PORT_DIPSETTING(      0x3000, "200k and 800k" )
+	PORT_DIPSETTING(      0x2000, "200k" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( None ) )
+	PORT_DIPNAME( 0xc000, 0xc000, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:2,1")
+	PORT_DIPSETTING(      0x8000, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0xc000, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Hard ) )
+INPUT_PORTS_END
+
 
 static const gfx_layout fgtilelayout =
 {
@@ -362,9 +701,9 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_spbactn )
-	GFXDECODE_ENTRY( "gfx1", 0, fgtilelayout, 0x0200, 16 + 240 )
-	GFXDECODE_ENTRY( "gfx2", 0, bgtilelayout, 0x0300, 16 + 128 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x0000,    0x100 )
+	GFXDECODE_ENTRY( "fgtiles", 0, fgtilelayout, 0x0200, 16 + 240 )
+	GFXDECODE_ENTRY( "bgtiles", 0, bgtilelayout, 0x0300, 16 + 128 )
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 0x0000,    0x100 )
 GFXDECODE_END
 
 
@@ -382,35 +721,33 @@ static const gfx_layout proto_fgtilelayout =
 
 
 static GFXDECODE_START( gfx_spbactnp )
-	GFXDECODE_ENTRY( "gfx1", 0, proto_fgtilelayout,   0x0200, 16 + 240 )
-	GFXDECODE_ENTRY( "gfx2", 0, proto_fgtilelayout,   0x0300, 16 + 128 ) // wrong
-	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_packed_msb, 0x0000, 16 + 384 )
+	GFXDECODE_ENTRY( "fgtiles", 0, proto_fgtilelayout,   0x0200, 16 + 240 )
+	GFXDECODE_ENTRY( "bgtiles", 0, proto_fgtilelayout,   0x0300, 16 + 128 ) // wrong
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_packed_msb, 0x0000, 16 + 384 )
 
-	GFXDECODE_ENTRY( "gfx4", 0, gfx_8x8x4_packed_msb, 0x0000, 16 + 384 ) // more sprites maybe?
+	GFXDECODE_ENTRY( "unkgfx",  0, gfx_8x8x4_packed_msb, 0x0000, 16 + 384 ) // more sprites maybe?
 
 GFXDECODE_END
 
 
 void spbactn_state::spbactn(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M68000(config, m_maincpu, XTAL(12'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &spbactn_state::spbactn_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spbactn_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(spbactn_state::irq3_line_assert));
 
 	Z80(config, m_audiocpu, XTAL(4'000'000));
-	m_audiocpu->set_addrmap(AS_PROGRAM, &spbactn_state::spbactn_sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &spbactn_state::sound_map);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// TODO: verify actual blanking frequencies (should be close to NTSC)
 	m_screen->set_raw(XTAL(22'656'000) / 2, 720, 0, 512, 262, 16, 240);
-	m_screen->set_screen_update(FUNC(spbactn_state::screen_update_spbactn));
-
-	MCFG_VIDEO_START_OVERRIDE(spbactn_state,spbactn)
+	m_screen->set_screen_update(FUNC(spbactn_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spbactn);
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x2800/2);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x2800 / 2);
 
 	TECMO_SPRITE(config, m_sprgen, 0);
 
@@ -421,49 +758,47 @@ void spbactn_state::spbactn(machine_config &config)
 	m_mixer->set_blendsource( 0x1000 + 0x000, 0x1000 + 0x100);
 	m_mixer->set_bgpen(0x800 + 0x300, 0x000 + 0x300);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(4'000'000))); /* Was 3.579545MHz, a common clock, but no way to generate via on PCB OSCs */
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(4'000'000))); // Was 3.579545MHz, a common clock, but no way to generate via on PCB OSCs
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	/* Was 1.056MHz, a common clock, but no way to generate via on PCB OSCs. clock frequency & pin 7 not verified */
+	// Was 1.056MHz, a common clock, but no way to generate via on PCB OSCs. Clock frequency & pin 7 not verified
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(4'000'000) / 4, okim6295_device::PIN7_HIGH));
 	oki.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
-void spbactn_state::spbactnp(machine_config &config)
+void spbactnp_state::spbactnp(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M68000(config, m_maincpu, XTAL(12'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &spbactn_state::spbactnp_map);
-	m_maincpu->set_vblank_int("screen", FUNC(spbactn_state::irq3_line_assert));
+	m_maincpu->set_addrmap(AS_PROGRAM, &spbactnp_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(spbactnp_state::irq3_line_assert));
 
 	Z80(config, m_audiocpu, XTAL(4'000'000));
-	m_audiocpu->set_addrmap(AS_PROGRAM, &spbactn_state::spbactn_sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &spbactnp_state::sound_map);
 
-	// yes another cpu..
+	// yes another CPU..
 	z80_device &extracpu(Z80(config, "extracpu", XTAL(4'000'000)));
-	extracpu.set_addrmap(AS_PROGRAM, &spbactn_state::spbactnp_extra_map);
-	extracpu.set_vblank_int("screen", FUNC(spbactn_state::irq0_line_hold));
-//  extracpu.set_vblank_int("screen", FUNC(spbactn_state::nmi_line_pulse));
+	extracpu.set_addrmap(AS_PROGRAM, &spbactnp_state::extra_map);
+	extracpu.set_vblank_int("screen", FUNC(spbactnp_state::irq0_line_hold));
+//  extracpu.set_vblank_int("screen", FUNC(spbactnp_state::nmi_line_pulse));
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(spbactn_state::screen_update_spbactnp));
-
-	MCFG_VIDEO_START_OVERRIDE(spbactn_state,spbactnp)
+	m_screen->set_screen_update(FUNC(spbactnp_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spbactnp);
-	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 0x2800/2);
+	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 0x2800 / 2);
 
 	TECMO_SPRITE(config, m_sprgen, 0);
 
@@ -474,7 +809,7 @@ void spbactn_state::spbactnp(machine_config &config)
 	m_mixer->set_blendsource( 0x1000 + 0x000, 0x1000 + 0x100);
 	m_mixer->set_bgpen(0x800 + 0x300, 0x000 + 0x300);
 
-	/* sound hardware  - different? */
+	// sound hardware  - different?
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
@@ -484,13 +819,13 @@ void spbactn_state::spbactnp(machine_config &config)
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	okim6295_device &oki(OKIM6295(config, "oki", XTAL(4'000'000)/4, okim6295_device::PIN7_HIGH));
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(4'000'000) / 4, okim6295_device::PIN7_HIGH));
 	oki.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 
 ROM_START( spbactn )
-	/* Board 9002-A (CPU Board) */
+	// Board 9002-A (CPU Board)
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rom1.bin", 0x00000, 0x20000, CRC(6741bd3f) SHA1(844eb6465a15d339043fd6d2b6ba20ba216de493) )
 	ROM_LOAD16_BYTE( "rom2.bin", 0x00001, 0x20000, CRC(488cc511) SHA1(41b4a01f35e0e93634b4843dbb894ab9840807bf) )
@@ -501,22 +836,22 @@ ROM_START( spbactn )
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "a-u19",   0x00000, 0x20000,  CRC(87427d7d) SHA1(f76b0dc3f0d87deb0f0c81084aff9756b236e867) )
 
-	/* Board 9002-B (GFX Board) */
-	ROM_REGION( 0x080000, "gfx1", 0 ) /* 16x8 FG Tiles */
+	// Board 9002-B (GFX Board)
+	ROM_REGION( 0x080000, "fgtiles", 0 ) // 16x8
 	ROM_LOAD( "b-u98",   0x00000, 0x40000, CRC(315eab4d) SHA1(6f812c85981dc649caca8b4635e3b8fd3a3c054d) )
 	ROM_LOAD( "b-u99",   0x40000, 0x40000, CRC(7b76efd9) SHA1(9f23460aebe12cb5c4193776bf876d6044892979) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 ) /* 16x8 BG Tiles */
+	ROM_REGION( 0x080000, "bgtiles", 0 ) // 16x8
 	ROM_LOAD( "b-u104",  0x00000, 0x40000, CRC(b648a40a) SHA1(1fb756dcd027a5702596e33bbe8a0beeb3ceb22b) )
 	ROM_LOAD( "b-u105",  0x40000, 0x40000, CRC(0172d79a) SHA1(7ee1faa65c85860bd81988329df516bc34940ef5) )
 
-	ROM_REGION( 0x080000, "gfx3", 0 ) /* 8x8 Sprite Tiles */
+	ROM_REGION( 0x080000, "sprites", 0 ) // 8x8
 	ROM_LOAD( "b-u110",  0x00000, 0x40000, CRC(862ebacd) SHA1(05732e8524c50256c1db29317625d0edc19b87d2) )
 	ROM_LOAD( "b-u111",  0x40000, 0x40000, CRC(1cc1379a) SHA1(44fdab8cb5ab1488688f1ac52f005454e835efee) )
 ROM_END
 
 ROM_START( spbactnj )
-	/* Board 9002-A (CPU Board) */
+	// Board 9002-A (CPU Board)
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "a-u68.1", 0x00000, 0x20000, CRC(b5b2d824) SHA1(be04ca370a381d7396f39e31fb2680973193daee) )
 	ROM_LOAD16_BYTE( "a-u67.2", 0x00001, 0x20000, CRC(9577b48b) SHA1(291d890a9d0e434455f183eb12ae6edf3156688d) )
@@ -527,16 +862,16 @@ ROM_START( spbactnj )
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "a-u19",   0x00000, 0x20000,  CRC(87427d7d) SHA1(f76b0dc3f0d87deb0f0c81084aff9756b236e867) )
 
-	/* Board 9002-B (GFX Board) */
-	ROM_REGION( 0x080000, "gfx1", 0 ) /* 16x8 FG Tiles */
+	// Board 9002-B (GFX Board)
+	ROM_REGION( 0x080000, "fgtiles", 0 ) // 16x8
 	ROM_LOAD( "b-u98",   0x00000, 0x40000, CRC(315eab4d) SHA1(6f812c85981dc649caca8b4635e3b8fd3a3c054d) )
 	ROM_LOAD( "b-u99",   0x40000, 0x40000, CRC(7b76efd9) SHA1(9f23460aebe12cb5c4193776bf876d6044892979) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 ) /* 16x8 BG Tiles */
+	ROM_REGION( 0x080000, "bgtiles", 0 ) // 16x8
 	ROM_LOAD( "b-u104",  0x00000, 0x40000, CRC(b648a40a) SHA1(1fb756dcd027a5702596e33bbe8a0beeb3ceb22b) )
 	ROM_LOAD( "b-u105",  0x40000, 0x40000, CRC(0172d79a) SHA1(7ee1faa65c85860bd81988329df516bc34940ef5) )
 
-	ROM_REGION( 0x080000, "gfx3", 0 ) /* 8x8 Sprite Tiles */
+	ROM_REGION( 0x080000, "sprites", 0 ) // 8x8
 	ROM_LOAD( "b-u110",  0x00000, 0x40000, CRC(862ebacd) SHA1(05732e8524c50256c1db29317625d0edc19b87d2) )
 	ROM_LOAD( "b-u111",  0x40000, 0x40000, CRC(1cc1379a) SHA1(44fdab8cb5ab1488688f1ac52f005454e835efee) )
 ROM_END
@@ -556,32 +891,35 @@ ROM_START( spbactnp )
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "spa_data_2-21-a10.8e",   0x00000, 0x20000,  CRC(87427d7d) SHA1(f76b0dc3f0d87deb0f0c81084aff9756b236e867) ) // same as regular
 
-	ROM_REGION( 0x080000, "gfx1", 0 ) /* 16x8 FG Tiles */
+	ROM_REGION( 0x080000, "fgtiles", 0 ) // 16x8
 	ROM_LOAD16_BYTE( "spa_back0_split0_5-17-p-1.27b",  0x00000, 0x20000, CRC(37922110) SHA1(8edb6745ab6b6937f1365d35bfcdbe86198de668) )
 	ROM_LOAD16_BYTE( "spa_back0_split1_5-17-p-1.27c",  0x00001, 0x20000, CRC(9d6ef9ab) SHA1(338ff1bd9d30a61d782616cccb4108daac6a8612) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 ) /* 16x8 BG Tiles */ // it only ever draws the background from the rocket level, for all levels??
+	ROM_REGION( 0x080000, "bgtiles", 0 ) // 16x8. It only ever draws the background from the rocket level, for all levels??
 	ROM_LOAD16_BYTE( "spa_back1_split0_3-14-a-11.26b",  0x00000, 0x20000, CRC(6953fd62) SHA1(fb6061f5ad48e0d91d3dad96afbac2d64908f0a7) )
 	ROM_LOAD16_BYTE( "spa_back1_split1_3-14-a-11.26c",  0x00001, 0x20000, CRC(b4123511) SHA1(c65b912238bab74bf46b5d5486c1d998813ef511) )
 
-	ROM_REGION( 0x040000, "gfx3", 0 ) /* 8x8 Sprite Tiles */
+	ROM_REGION( 0x040000, "sprites", 0 ) // 8x8
 	ROM_LOAD( "spa_sp0_4-18-p-8.5m",  0x00000, 0x20000, CRC(cd6ba360) SHA1(a01f65a678b6987ae877c381f74515efee4b492e) )
 	ROM_LOAD( "spa_sp1_3-14-a-10.4m", 0x20000, 0x20000, CRC(86406336) SHA1(bf091dc13404535e6baee990f5e957d3538841ac) )
 
 
-	/* does this have an extra (horizontal) screen maybe, with the girls being displayed on that instead of the main one.. */
-	ROM_REGION( 0x10000, "extracpu", 0 ) // what? it's another z80 rom... unused for now
+	// does this have an extra (horizontal) screen maybe, with the girls being displayed on that instead of the main one..
+	ROM_REGION( 0x10000, "extracpu", 0 ) // what? it's another z80 ROM...
 	ROM_LOAD( "6204_6-6.29c",   0x00000, 0x10000, CRC(e8250c26) SHA1(9b669878790c8e3c5d80f165b5ffa1d6830f4696) )
 
-	ROM_REGION( 0x080000, "gfx4", 0 ) /* 8x8 BG Tiles */ // more 8x8 tiles, with the girl graphics? unused for now .. for horizontal orientation??
+	ROM_REGION( 0x080000, "unkgfx", 0 ) // more 8x8 tiles, with the girl graphics? unused for now .. for horizontal orientation??
 	ROM_LOAD( "spa.25c", 0x00000, 0x20000, CRC(02b69ab9) SHA1(368e774693a6fab756faaeec4ffd42406816e6e2) )
 
-	ROM_REGION( 0x10000, "misc", 0 ) //misc
-	ROM_LOAD( "p109.18d", 0x00000, 0x100, CRC(2297a725) SHA1(211ebae11ca55cc67df29291c3e0916836550bfb) ) // mostly empty.. is this correct?
-	ROM_LOAD( "pin.b.sub.23g", 0x00000, 0x100, CRC(3a0c70ed) SHA1(9be38c421e9a14f6811752a4464dd5dbf037e385) ) // mostly empty.. is this correct?
-	ROM_LOAD( "tcm1.19g.bin", 0x00000, 0x53, CRC(2c54354a) SHA1(11d8b6cdaf052b5a9fbcf6b6fbf99c5f89575cfa) )
+	ROM_REGION( 0x253, "misc", 0 ) //misc
+	ROM_LOAD( "p109.18d",      0x000, 0x100, CRC(2297a725) SHA1(211ebae11ca55cc67df29291c3e0916836550bfb) ) // mostly empty.. is this correct?
+	ROM_LOAD( "pin.b.sub.23g", 0x000, 0x100, CRC(3a0c70ed) SHA1(9be38c421e9a14f6811752a4464dd5dbf037e385) ) // mostly empty.. is this correct?
+	ROM_LOAD( "tcm1.19g.bin",  0x000, 0x053, CRC(2c54354a) SHA1(11d8b6cdaf052b5a9fbcf6b6fbf99c5f89575cfa) )
 ROM_END
 
-GAME( 1991, spbactn,  0,       spbactn,  spbactn, spbactn_state, empty_init, ROT90, "Tecmo", "Super Pinball Action (US)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, spbactnj, spbactn, spbactn,  spbactn, spbactn_state, empty_init, ROT90, "Tecmo", "Super Pinball Action (Japan)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, spbactnp, spbactn, spbactnp, spbactn, spbactn_state, empty_init, ROT90, "Tecmo", "Super Pinball Action (prototype)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // early proto, (c) date is 2 years earlier!
+} // anonymous namespace
+
+
+GAME( 1991, spbactn,  0,       spbactn,  spbactn,  spbactn_state,  empty_init, ROT90, "Tecmo", "Super Pinball Action (US)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, spbactnj, spbactn, spbactn,  spbactn,  spbactn_state,  empty_init, ROT90, "Tecmo", "Super Pinball Action (Japan)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, spbactnp, spbactn, spbactnp, spbactnp, spbactnp_state, empty_init, ROT90, "Tecmo", "Super Pinball Action (prototype)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // early proto, (c) date is 2 years earlier!
