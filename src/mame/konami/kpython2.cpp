@@ -1,10 +1,11 @@
 // license:BSD-3-Clause
-// copyright-holders:windyfairy, Shiz
+// copyright-holders:Ryan Holtz, windyfairy, Shiz
 /***************************************************************************
 
 Konami Python 2 Hardware Overview
 Konami
 
+Code based on sony/ps2sony.cpp.
 
 The Python 2 consists of a consumer SCPH-50000 MB/NH Playstation 2 with an
 additional I/O board housed in a metal case. The PS2 itself is labeled
@@ -368,10 +369,32 @@ TODO:
 
 
 #include "emu.h"
+
 #include "cpu/mips/mips3.h"
 #include "cpu/mips/mips1.h"
+#include "cpu/mips/ps2vu.h"
+#include "cpu/mips/ps2vif1.h"
+
+#include "machine/iopcdvd.h"
+#include "machine/iopdma.h"
+#include "machine/iopintc.h"
+#include "machine/iopsio2.h"
+#include "machine/ioptimer.h"
+
+#include "machine/ps2dma.h"
+#include "machine/ps2intc.h"
+#include "machine/ps2mc.h"
+#include "machine/ps2pad.h"
+#include "machine/ps2sif.h"
+#include "machine/ps2timer.h"
+
+#include "sound/iopspu.h"
+
+#include "video/ps2gs.h"
+#include "video/ps2gif.h"
+
 //#include "machine/ds2430.h"
-#include "machine/timekpr.h"
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -382,63 +405,559 @@ public:
 	kpython2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_iop(*this, "iop")
+		, m_timer(*this, "timer%u", 0U)
+		, m_dmac(*this, "dmac")
+		, m_intc(*this, "intc")
+		, m_sif(*this, "sif")
+		, m_iop_timer(*this, "iop_timer")
+		, m_iop_dma(*this, "iop_dma")
+		, m_iop_intc(*this, "iop_intc")
+		, m_iop_spu(*this, "iop_spu")
+		, m_iop_cdvd(*this, "iop_cdvd")
+		, m_iop_sio2(*this, "iop_sio2")
+		, m_gs(*this, "gs")
+		, m_vu0(*this, "vu0")
+		, m_vu1(*this, "vu1")
+		, m_pad(*this, "pad%u", 0U)
+		, m_mc(*this, "mc")
+		, m_screen(*this, "screen")
+		, m_ram(*this, "ram")
+		, m_iop_ram(*this, "iop_ram")
+		, m_sp_ram(*this, "sp_ram")
+		, m_vu0_imem(*this, "vu0imem")
+		, m_vu0_dmem(*this, "vu0dmem")
+		, m_vu1_imem(*this, "vu1imem")
+		, m_vu1_dmem(*this, "vu1dmem")
+		, m_bios(*this, "bios")
+		, m_vblank_timer(nullptr)
 		, m_ps2_nvram(*this, "ps2_nvram")
 		, m_ps2_hdd_id(*this, "ps2_hdd_id")
 		, m_ds2430_black_rom(*this, "ds2430_black")
 		, m_ds2430_white_rom(*this, "ds2430_white")
 	{ }
 
+
 	void kpython2(machine_config &config);
 
-private:
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void ps2_map(address_map &map);
+	TIMER_CALLBACK_MEMBER(vblank);
 
-	// devices
-	required_device<mips3_device> m_maincpu;
+	uint32_t ipu_r(offs_t offset, uint32_t mem_mask = ~0);
+	void ipu_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint64_t vif0_fifo_r(offs_t offset, uint64_t mem_mask = ~0);
+	void vif0_fifo_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t gif_fifo_r(offs_t offset, uint64_t mem_mask = ~0);
+	void gif_fifo_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t ipu_fifo_r(offs_t offset, uint64_t mem_mask = ~0);
+	void ipu_fifo_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	void debug_w(uint8_t data);
+	uint32_t unk_f430_r();
+	void unk_f430_w(uint32_t data);
+	uint32_t unk_f440_r();
+	void unk_f440_w(uint32_t data);
+	uint32_t unk_f520_r();
+	uint64_t board_id_r();
+
+	void ee_iop_ram_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t ee_iop_ram_r(offs_t offset);
+	void iop_debug_w(uint32_t data);
+
+	DECLARE_WRITE_LINE_MEMBER(iop_timer_irq);
+
+	void mem_map(address_map &map);
+	void iop_map(address_map &map);
+
+	required_device<r5900le_device> m_maincpu;
+	required_device<iop_device>     m_iop;
+	required_device_array<ps2_timer_device, 4> m_timer;
+	required_device<ps2_dmac_device> m_dmac;
+	required_device<ps2_intc_device> m_intc;
+	required_device<ps2_sif_device> m_sif;
+	required_device<iop_timer_device> m_iop_timer;
+	required_device<iop_dma_device> m_iop_dma;
+	required_device<iop_intc_device> m_iop_intc;
+	required_device<iop_spu_device> m_iop_spu;
+	required_device<iop_cdvd_device> m_iop_cdvd;
+	required_device<iop_sio2_device> m_iop_sio2;
+	required_device<ps2_gs_device> m_gs;
+	required_device<sonyvu0_device> m_vu0;
+	required_device<sonyvu1_device> m_vu1;
+	required_device_array<ps2_pad_device, 2> m_pad;
+	required_device<ps2_mc_device>  m_mc;
+	required_device<screen_device>  m_screen;
+	required_shared_ptr<uint64_t>   m_ram;
+	required_shared_ptr<uint32_t>   m_iop_ram;
+	required_shared_ptr<uint64_t>   m_sp_ram;
+	required_shared_ptr<uint64_t>   m_vu0_imem;
+	required_shared_ptr<uint64_t>   m_vu0_dmem;
+	required_shared_ptr<uint64_t>   m_vu1_imem;
+	required_shared_ptr<uint64_t>   m_vu1_dmem;
+	required_region_ptr<uint32_t>   m_bios;
+
+	uint32_t m_unk_f430_reg = 0;
+	uint32_t m_unk_f440_counter = 0;
+	uint32_t m_unk_f440_reg = 0;
+	uint32_t m_unk_f440_ret = 0;
+
+	uint32_t m_ipu_ctrl = 0;
+	uint64_t m_ipu_in_fifo[0x1000]{};
+	uint64_t m_ipu_in_fifo_index = 0;
+	uint64_t m_ipu_out_fifo[0x1000]{};
+	uint64_t m_ipu_out_fifo_index = 0;
+
+	emu_timer *m_vblank_timer = nullptr;
 
 	required_region_ptr<uint8_t> m_ps2_nvram; // Contains an ILINK ID that must match the one encrypted on the HDD
 	required_region_ptr<uint8_t> m_ps2_hdd_id; // Must match the HDD that the data was encrypted against
 
 	required_region_ptr<uint8_t> m_ds2430_black_rom;
 	required_region_ptr<uint8_t> m_ds2430_white_rom;
-
-	// driver_device overrides
-	virtual void video_start() override;
 };
 
 
-void kpython2_state::video_start()
+/**************************************
+ *
+ * Machine Hardware
+ *
+ */
+
+uint64_t kpython2_state::vif0_fifo_r(offs_t offset, uint64_t mem_mask)
 {
+	uint64_t ret = 0ULL;
+	if (offset)
+	{
+		logerror("%s: vif0_fifo_r [127..64]: (%08x%08x & %08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
+	}
+	else
+	{
+		logerror("%s: vif0_fifo_r [63..0]: (%08x%08x & %08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
+	}
+	return ret;
 }
+
+void kpython2_state::vif0_fifo_w(offs_t offset, uint64_t data, uint64_t mem_mask)
+{
+	if (offset)
+	{
+		logerror("%s: vif0_fifo_w [127..64]: %08x%08x & %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
+	}
+	else
+	{
+		logerror("%s: vif0_fifo_w [63..0]: %08x%08x & %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
+	}
+}
+
+uint64_t kpython2_state::gif_fifo_r(offs_t offset, uint64_t mem_mask)
+{
+	uint64_t ret = 0ULL;
+	if (offset)
+	{
+		logerror("%s: gif_fifo_r [127..64]: (%08x%08x & %08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
+	}
+	else
+	{
+		logerror("%s: gif_fifo_r [63..0]: (%08x%08x & %08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
+	}
+	return ret;
+}
+
+void kpython2_state::gif_fifo_w(offs_t offset, uint64_t data, uint64_t mem_mask)
+{
+	if (offset)
+	{
+		logerror("%s: gif_fifo_w [127..64]: %08x%08x & %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
+	}
+	else
+	{
+		logerror("%s: gif_fifo_w [63..0]: %08x%08x & %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
+	}
+}
+
+uint32_t kpython2_state::ipu_r(offs_t offset, uint32_t mem_mask)
+{
+	uint32_t ret = 0;
+	switch (offset)
+	{
+		case 0: /* IPU_CMD */
+			logerror("%s: ipu_r: IPU_CMD (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
+			break;
+		case 2: /* IPU_CTRL */
+			ret = m_ipu_in_fifo_index | (m_ipu_out_fifo_index << 4);
+			logerror("%s: ipu_r: IPU_CTRL (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
+			break;
+		case 4: /* IPU_BP */
+			ret = m_ipu_in_fifo_index << 8;
+			logerror("%s: ipu_r: IPU_BP (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
+			break;
+		case 6: /* IPU_TOP */
+			logerror("%s: ipu_r: IPU_TOP (%08x & %08x)\n", machine().describe_context(), ret, mem_mask);
+			break;
+		default:
+			logerror("%s: ipu_r: Unknown offset %08x & %08x\n", machine().describe_context(), 0x10002000 + (offset << 3), mem_mask);
+			break;
+	}
+	return ret;
+}
+
+void kpython2_state::ipu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	switch (offset)
+	{
+		case 0: /* IPU_CMD */
+			logerror("%s: ipu_w: IPU_CMD = %08x\n", machine().describe_context(), data, mem_mask);
+			switch ((data >> 28) & 0xf)
+			{
+				case 0x00: /* BCLR */
+					m_ipu_in_fifo_index = 0;
+					logerror("%s: IPU command: BCLR (%08x)\n", machine().describe_context(), data, mem_mask);
+					break;
+				case 0x01: /* IDEC */
+					logerror("%s: IPU command: IDEC (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
+					logerror("%s:              FB:%d QSC:%d DT_DECODE:%d SGN:%d DITHER:%d OFM:%s\n", machine().describe_context(),
+						data & 0x3f, (data >> 16) & 0x1f, BIT(data, 24), BIT(data, 25), BIT(data, 26), BIT(data, 27) ? "RGB16" : "RGB32");
+					break;
+				case 0x02: /* BDEC */
+					logerror("%s: IPU command: BDEC (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
+					logerror("%s:              FB:%d QSC:%d DT:%d DCR:%d MBI:%d\n", machine().describe_context(),
+						data & 0x3f, (data >> 16) & 0x1f, BIT(data, 25), BIT(data, 26), BIT(data, 27));
+					break;
+				case 0x03: /* VDEC */
+				{
+					static char const *const vlc[4] =
+					{
+						"Macroblock Address Increment",
+						"Macroblock Type",
+						"Motion Code",
+						"DMVector"
+					};
+					logerror("%s: IPU command: VDEC (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
+					logerror("%s:              FB:%d TBL:%s\n", machine().describe_context(), data & 0x3f, vlc[(data >> 26) & 3]);
+					break;
+				}
+				case 0x04: /* FDEC */
+					logerror("%s: IPU command: FDEC (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
+					logerror("%s:              FB:%d\n", machine().describe_context(), data & 0x3f);
+					break;
+				case 0x05: /* SETIQ */
+					logerror("%s: IPU command: SETIQ (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
+					logerror("%s:              FB:%d IQM:%s quantization matrix\n", machine().describe_context(), data & 0x3f, BIT(data, 27) ? "Non-intra" : "Intra");
+					break;
+				case 0x06: /* SETVQ */
+					logerror("%s: IPU command: SETVQ (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
+					break;
+				case 0x07: /* CSC */
+					logerror("%s: IPU command: CSC (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
+					logerror("%s:              MBC:%d DTE:%d OFM:%s\n", machine().describe_context(), data & 0x3ff, BIT(data, 26), BIT(data, 27) ? "RGB16" : "RGB32");
+					break;
+				case 0x08: /* PACK */
+					logerror("%s: IPU command: PACK (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
+					logerror("%s:              DITHER:%d OFM:%s\n", machine().describe_context(), BIT(data, 26), BIT(data, 27) ? "RGB16" : "INDX4");
+					break;
+				case 0x09: /* SETTH */
+					logerror("%s: IPU command: SETTH (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
+					logerror("%s:              TH0:%d TH1:%s\n", machine().describe_context(), data & 0x1ff, (data >> 16) & 0x1ff);
+					break;
+				default:
+					logerror("%s: Unknown IPU command: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+					break;
+			}
+			break;
+		case 2: /* IPU_CTRL */
+			logerror("%s: ipu_w: IPU_CTRL = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+			if (BIT(data, 30))
+			{
+				m_ipu_in_fifo_index = 0;
+				m_ipu_out_fifo_index = 0;
+				m_ipu_ctrl &= ~(0x8000c000);
+			}
+			break;
+		case 4: /* IPU_BP */
+			logerror("%s: ipu_w: IPU_BP = %08x & %08x (Not Valid!)\n", machine().describe_context(), data, mem_mask);
+			break;
+		case 6: /* IPU_TOP */
+			logerror("%s: ipu_w: IPU_TOP & %08x = %08x\n", machine().describe_context(), data, mem_mask);
+			break;
+		default:
+			logerror("%s: ipu_w: Unknown offset %08x = %08x\n", machine().describe_context(), 0x10002000 + (offset << 3), data);
+			break;
+	}
+}
+
+uint64_t kpython2_state::ipu_fifo_r(offs_t offset, uint64_t mem_mask)
+{
+	uint64_t ret = 0ULL;
+	switch (offset)
+	{
+		case 0:
+			logerror("%s: ipu_fifo_r: IPU_OUT_FIFO[127..64] (%08x%08x & %08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
+			break;
+		case 1:
+			logerror("%s: ipu_fifo_r: IPU_OUT_FIFO[63..0] (%08x%08x & %08x%08x)\n", machine().describe_context(), (uint32_t)(ret >> 32), (uint32_t)ret, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
+			break;
+		case 2:
+			logerror("%s: ipu_fifo_r: IPU_IN_FIFO[127..64] & %08x%08x (Not Valid!)\n", machine().describe_context(), (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
+			break;
+		case 3:
+			logerror("%s: ipu_fifo_r: IPU_IN_FIFO[63..0] & %08x%08x (Not Valid!)\n", machine().describe_context(), (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
+			break;
+		default:
+			logerror("%s: ipu_fifo_r: Unknown offset %08x\n", machine().describe_context(), 0x10007000 + (offset << 1), (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
+			break;
+	}
+	return ret;
+}
+
+void kpython2_state::ipu_fifo_w(offs_t offset, uint64_t data, uint64_t mem_mask)
+{
+	switch (offset)
+	{
+		case 0:
+			logerror("%s: ipu_fifo_w: IPU_OUT_FIFO[127..64] = %08x%08x & %08x%08x (Not Valid!)\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
+			break;
+		case 1:
+			logerror("%s: ipu_fifo_w: IPU_OUT_FIFO[63..0] = %08x%08x & %08x%08x (Not Valid!)\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
+			break;
+		case 2:
+			logerror("%s: ipu_fifo_w: IPU_IN_FIFO[127..64] = %08x%08x & %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
+			m_ipu_in_fifo[m_ipu_in_fifo_index] = data;
+			m_ipu_in_fifo_index++;
+			m_ipu_in_fifo_index &= 0xf;
+			break;
+		case 3:
+			logerror("%s: ipu_fifo_w: IPU_IN_FIFO[63..0] = %08x%08x & %08x%08x\n", machine().describe_context(), (uint32_t)(data >> 32), (uint32_t)data, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
+			break;
+		default:
+			logerror("%s: ipu_fifo_w: Unknown offset %08x = %08x%08x & %08x%08x\n", machine().describe_context(), 0x10007000 + (offset << 1), (uint32_t)(data >> 32), (uint32_t)data, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
+			break;
+	}
+}
+
+WRITE_LINE_MEMBER(kpython2_state::iop_timer_irq)
+{
+	logerror("%s: iop_timer_irq: %d\n", machine().describe_context(), state);
+	if (state)
+		m_iop_intc->raise_interrupt(iop_intc_device::INT_TIMER);
+}
+
+void kpython2_state::iop_debug_w(uint32_t data)
+{
+	//printf("%08x ", data);
+}
+
+void kpython2_state::machine_start()
+{
+	save_item(NAME(m_unk_f430_reg));
+	save_item(NAME(m_unk_f440_counter));
+	save_item(NAME(m_unk_f440_reg));
+	save_item(NAME(m_unk_f440_ret));
+
+	save_item(NAME(m_ipu_ctrl));
+	save_item(NAME(m_ipu_in_fifo));
+	save_item(NAME(m_ipu_in_fifo_index));
+	save_item(NAME(m_ipu_out_fifo));
+	save_item(NAME(m_ipu_out_fifo_index));
+
+	if (!m_vblank_timer)
+		m_vblank_timer = timer_alloc(FUNC(kpython2_state::vblank), this);
+}
+
+void kpython2_state::machine_reset()
+{
+	m_unk_f430_reg = 0;
+	m_unk_f440_reg = 0;
+	m_unk_f440_ret = 0;
+	m_unk_f440_counter = 0;
+
+	m_ipu_ctrl = 0;
+	memset(m_ipu_in_fifo, 0, sizeof(uint64_t)*0x1000);
+	m_ipu_in_fifo_index = 0;
+	memset(m_ipu_out_fifo, 0, sizeof(uint64_t)*0x1000);
+	m_ipu_out_fifo_index = 0;
+
+	m_vblank_timer->adjust(m_screen->time_until_pos(0), 1);
+}
+
+TIMER_CALLBACK_MEMBER(kpython2_state::vblank)
+{
+	if (param)
+	{
+		// VBlank enter
+		m_iop_intc->raise_interrupt(iop_intc_device::INT_VB_ON);
+		m_intc->raise_interrupt(ps2_intc_device::INT_VB_ON);
+		m_vblank_timer->adjust(m_screen->time_until_pos(32), 0);
+		m_gs->vblank_start();
+	}
+	else
+	{
+		// VBlank exit
+		m_iop_intc->raise_interrupt(iop_intc_device::INT_VB_OFF);
+		m_intc->raise_interrupt(ps2_intc_device::INT_VB_OFF);
+		m_vblank_timer->adjust(m_screen->time_until_pos(0), 1);
+		m_gs->vblank_end();
+	}
+}
+
+void kpython2_state::debug_w(uint8_t data)
+{
+	printf("%c", (char)data);
+}
+
+void kpython2_state::ee_iop_ram_w(offs_t offset, uint64_t data, uint64_t mem_mask)
+{
+	const uint32_t offset_hi = (offset << 1);
+	const uint32_t offset_lo = (offset << 1) + 1;
+	const uint32_t mask_hi = (uint32_t)(mem_mask >> 32);
+	const uint32_t mask_lo = (uint32_t)mem_mask;
+	m_iop_ram[offset_hi] &= ~mask_hi;
+	m_iop_ram[offset_hi] |= (uint32_t)(data >> 32) & mask_hi;
+	m_iop_ram[offset_lo] &= ~mask_lo;
+	m_iop_ram[offset_lo] |= (uint32_t)data & mask_lo;
+}
+
+uint64_t kpython2_state::ee_iop_ram_r(offs_t offset)
+{
+	return ((uint64_t)m_iop_ram[offset << 1] << 32) | m_iop_ram[(offset << 1) + 1];
+}
+
+uint64_t kpython2_state::board_id_r()
+{
+	return 0x1234;
+}
+
+uint32_t kpython2_state::unk_f430_r()
+{
+	logerror("%s: Unknown 1000f430 read: %08x\n", machine().describe_context(), 0);
+	//return m_unk_f430_reg;
+	//return ~0;
+	return 0; // BIOS seems unhappy if we return anything else
+}
+
+void kpython2_state::unk_f430_w(uint32_t data)
+{
+	m_unk_f430_reg = data & ~0x80000000;
+	const uint16_t cmd = (data >> 16) & 0xfff;
+	const uint8_t subcmd = (data >> 6) & 0xf;
+	switch (cmd)
+	{
+		case 0x0021:
+			if (subcmd == 1 && !BIT(m_unk_f440_reg, 7))
+			{
+				m_unk_f440_counter = 0;
+			}
+			break;
+	}
+	logerror("%s: Unknown 1000f430 write: %08x (cmd:%02x lsb:%02x)\n", machine().describe_context(), data, (data >> 16) & 0xff, data & 0xff);
+}
+
+uint32_t kpython2_state::unk_f440_r()
+{
+	uint32_t ret = 0;
+
+	const uint8_t lsb5 = m_unk_f430_reg & 0x1f;
+	const uint16_t cmd = (uint16_t)(m_unk_f430_reg >> 16) & 0xfff;
+	const uint8_t subcmd = (m_unk_f430_reg >> 6) & 0xf;
+	if (subcmd == 0)
+	{
+		switch (cmd)
+		{
+			case 0x21:
+				if (m_unk_f440_counter < 2)
+				{
+					ret = 0x1f;
+					m_unk_f440_counter++;
+				}
+				break;
+
+			case 0x40:
+				ret = lsb5;
+				break;
+
+			default:
+				fatalerror("!");
+				break;
+		}
+	}
+
+	logerror("%s: Unknown 1000f440 read: %08x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+void kpython2_state::unk_f440_w(uint32_t data)
+{
+	logerror("%s: Unknown 1000f440 write: %08x\n", machine().describe_context(), data);
+	m_unk_f440_reg = data;
+}
+
+/**************************************
+ *
+ * Video Hardware
+ *
+ */
 
 uint32_t kpython2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
-void kpython2_state::ps2_map(address_map &map)
+void kpython2_state::mem_map(address_map &map)
 {
-	map(0x00000000, 0x01ffffff).ram();
-	map(0x1fc00000, 0x1fdfffff).rom().region("bios", 0);
+	map(0x00000000, 0x01ffffff).mirror(0xe000000).ram().share(m_ram); // 32 MB RAM
+	map(0x10000000, 0x100007ff).rw(m_timer[0], FUNC(ps2_timer_device::read), FUNC(ps2_timer_device::write)).umask64(0x00000000ffffffff);
+	map(0x10000800, 0x10000fff).rw(m_timer[1], FUNC(ps2_timer_device::read), FUNC(ps2_timer_device::write)).umask64(0x00000000ffffffff);
+	map(0x10001000, 0x100017ff).rw(m_timer[2], FUNC(ps2_timer_device::read), FUNC(ps2_timer_device::write)).umask64(0x00000000ffffffff);
+	map(0x10001800, 0x10001fff).rw(m_timer[3], FUNC(ps2_timer_device::read), FUNC(ps2_timer_device::write)).umask64(0x00000000ffffffff);
+	map(0x10002000, 0x10002fff).rw(FUNC(kpython2_state::ipu_r), FUNC(kpython2_state::ipu_w)).umask64(0x00000000ffffffff);
+	map(0x10003000, 0x100030af).rw(m_gs, FUNC(ps2_gs_device::gif_r), FUNC(ps2_gs_device::gif_w));
+	map(0x10004000, 0x1000400f).mirror(0xff0).rw(FUNC(kpython2_state::vif0_fifo_r), FUNC(kpython2_state::vif0_fifo_w));
+	map(0x10005000, 0x1000500f).mirror(0xff0).rw(m_vu1, FUNC(sonyvu1_device::vif_r), FUNC(sonyvu1_device::vif_w));
+	map(0x10006000, 0x1000600f).mirror(0xff0).rw(FUNC(kpython2_state::gif_fifo_r), FUNC(kpython2_state::gif_fifo_w));
+	map(0x10007000, 0x1000701f).mirror(0xfe0).rw(FUNC(kpython2_state::ipu_fifo_r), FUNC(kpython2_state::ipu_fifo_w));
+	map(0x10008000, 0x1000dfff).rw(m_dmac, FUNC(ps2_dmac_device::channel_r), FUNC(ps2_dmac_device::channel_w)).umask64(0x00000000ffffffff);
+	map(0x1000e000, 0x1000efff).rw(m_dmac, FUNC(ps2_dmac_device::read), FUNC(ps2_dmac_device::write)).umask64(0x00000000ffffffff);
+	map(0x1000f000, 0x1000f017).rw(m_intc, FUNC(ps2_intc_device::read), FUNC(ps2_intc_device::write)).umask64(0x00000000ffffffff);
+	map(0x1000f130, 0x1000f137).nopr();
+	map(0x1000f180, 0x1000f187).w(FUNC(kpython2_state::debug_w)).umask64(0x00000000000000ff);
+	map(0x1000f200, 0x1000f24f).rw(m_sif, FUNC(ps2_sif_device::ee_r), FUNC(ps2_sif_device::ee_w)).umask64(0x00000000ffffffff);
+	map(0x1000f430, 0x1000f437).rw(FUNC(kpython2_state::unk_f430_r), FUNC(kpython2_state::unk_f430_w)).umask64(0x00000000ffffffff); // Unknown
+	map(0x1000f440, 0x1000f447).rw(FUNC(kpython2_state::unk_f440_r), FUNC(kpython2_state::unk_f440_w)).umask64(0x00000000ffffffff); // Unknown
+	map(0x1000f520, 0x1000f523).r(m_dmac, FUNC(ps2_dmac_device::disable_mask_r)).umask64(0x00000000ffffffff);
+	map(0x1000f590, 0x1000f593).w(m_dmac, FUNC(ps2_dmac_device::disable_mask_w)).umask64(0x00000000ffffffff);
+	map(0x11000000, 0x11000fff).mirror(0x3000).ram().share(m_vu0_imem);
+	map(0x11004000, 0x11004fff).mirror(0x3000).ram().share(m_vu0_dmem);
+	map(0x11008000, 0x1100bfff).ram().share(m_vu1_imem);
+	map(0x1100c000, 0x1100ffff).ram().share(m_vu1_dmem);
+	map(0x12000000, 0x120003ff).mirror(0xc00).rw(m_gs, FUNC(ps2_gs_device::priv_regs0_r), FUNC(ps2_gs_device::priv_regs0_w));
+	map(0x12001000, 0x120013ff).mirror(0xc00).rw(m_gs, FUNC(ps2_gs_device::priv_regs1_r), FUNC(ps2_gs_device::priv_regs1_w));
+	map(0x1c000000, 0x1c1fffff).rw(FUNC(kpython2_state::ee_iop_ram_r), FUNC(kpython2_state::ee_iop_ram_w)); // IOP has 2MB EDO RAM per Wikipedia, and writes go up to this point
+	map(0x1f803800, 0x1f803807).r(FUNC(kpython2_state::board_id_r));
+	map(0x1fc00000, 0x1fffffff).lr32([this] (offs_t offset) { return m_bios[offset]; }, "bios_r");
+
+	map(0x70000000, 0x70003fff).ram().share(m_sp_ram); // 16KB Scratchpad RAM
 }
 
-void kpython2_state::kpython2(machine_config &config)
+void kpython2_state::iop_map(address_map &map)
 {
-	R5000LE(config, m_maincpu, 294000000); // imported from namcops2.c driver
-	m_maincpu->set_icache_size(16384);
-	m_maincpu->set_dcache_size(16384);
-	m_maincpu->set_addrmap(AS_PROGRAM, &kpython2_state::ps2_map);
-
-	// Video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_screen_update(FUNC(kpython2_state::screen_update));
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 639, 0, 479);
-
-	PALETTE(config, "palette").set_entries(65536);
+	map(0x00000000, 0x001fffff).ram().share(m_iop_ram);
+	map(0x1d000000, 0x1d00004f).rw(m_sif, FUNC(ps2_sif_device::iop_r), FUNC(ps2_sif_device::iop_w));
+	map(0x1e000000, 0x1e003fff).nopr();
+	map(0x1f402000, 0x1f40201f).rw(m_iop_cdvd, FUNC(iop_cdvd_device::read), FUNC(iop_cdvd_device::write));
+	map(0x1f801070, 0x1f80107b).rw(m_iop_intc, FUNC(iop_intc_device::read), FUNC(iop_intc_device::write));
+	map(0x1f801080, 0x1f8010f7).rw(m_iop_dma, FUNC(iop_dma_device::bank0_r), FUNC(iop_dma_device::bank0_w));
+	map(0x1f801450, 0x1f801453).noprw();
+	map(0x1f8014a0, 0x1f8014af).rw(m_iop_timer, FUNC(iop_timer_device::read), FUNC(iop_timer_device::write));
+	map(0x1f801500, 0x1f801577).rw(m_iop_dma, FUNC(iop_dma_device::bank1_r), FUNC(iop_dma_device::bank1_w));
+	map(0x1f801578, 0x1f80157b).noprw();
+	map(0x1f802070, 0x1f802073).w(FUNC(kpython2_state::iop_debug_w)).nopr();
+	map(0x1f808200, 0x1f8082ff).rw(m_iop_sio2, FUNC(iop_sio2_device::read), FUNC(iop_sio2_device::write));
+	map(0x1f900000, 0x1f9007ff).rw(m_iop_spu, FUNC(iop_spu_device::read), FUNC(iop_spu_device::write));
+	map(0x1fc00000, 0x1fffffff).rom().region("bios", 0);
+	map(0x1ffe0130, 0x1ffe0133).nopw();
 }
 
 // TODO: ICCA inputs for Guitar Freaks, Drummania, Dance Dance Revolution/Dancing Stage
@@ -571,6 +1090,55 @@ static INPUT_PORTS_START(toysmarch)
 	// The drum pad values are returned by the drum pad attachment device
 
 INPUT_PORTS_END
+
+void kpython2_state::kpython2(machine_config &config)
+{
+	R5900LE(config, m_maincpu, 294'912'000, m_vu0);
+	m_maincpu->set_force_no_drc(true);
+	m_maincpu->set_icache_size(16384);
+	m_maincpu->set_dcache_size(16384);
+	m_maincpu->set_addrmap(AS_PROGRAM, &kpython2_state::mem_map);
+
+	SONYPS2_VU0(config, m_vu0, 294'912'000, m_vu1);
+	SONYPS2_VU1(config, m_vu1, 294'912'000, m_gs);
+
+	SONYPS2_TIMER(config, m_timer[0], 294912000/2, true);
+	SONYPS2_TIMER(config, m_timer[1], 294912000/2, true);
+	SONYPS2_TIMER(config, m_timer[2], 294912000/2, false);
+	SONYPS2_TIMER(config, m_timer[3], 294912000/2, false);
+
+	SONYPS2_INTC(config, m_intc, m_maincpu);
+	SONYPS2_GS(config, m_gs, 294912000/2, m_intc, m_vu1);
+	SONYPS2_DMAC(config, m_dmac, 294912000/2, m_maincpu, m_ram, m_sif, m_gs, m_vu1);
+	SONYPS2_SIF(config, m_sif, m_intc);
+
+	SONYPS2_IOP(config, m_iop, XTAL(67'737'600)/2);
+	m_iop->set_addrmap(AS_PROGRAM, &kpython2_state::iop_map);
+
+	config.set_perfect_quantum(m_iop);
+
+	SONYPS2_PAD(config, m_pad[0]);
+	SONYPS2_PAD(config, m_pad[1]);
+	SONYPS2_MC(config, m_mc);
+
+	SONYIOP_INTC(config, m_iop_intc, m_iop);
+	SONYIOP_SIO2(config, m_iop_sio2, m_iop_intc, m_pad[0], m_pad[1], m_mc);
+	SONYIOP_CDVD(config, m_iop_cdvd, m_iop_intc);
+	SONYIOP_TIMER(config, m_iop_timer, XTAL(67'737'600)/2);
+	m_iop_timer->irq().set(FUNC(kpython2_state::iop_timer_irq));
+	SONYIOP_SPU(config, m_iop_spu, XTAL(67'737'600)/2, m_iop, m_iop_intc);
+
+	SONYIOP_DMA(config, m_iop_dma, XTAL(67'737'600)/2, m_iop_intc, m_iop_ram, m_sif, m_iop_spu, m_iop_sio2);
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_screen_update(FUNC(kpython2_state::screen_update));
+	screen.set_size(640, 256);
+	screen.set_visarea(0, 639, 0, 223);
+
+	PALETTE(config, "palette").set_entries(65536);
+}
 
 #define KPYTHON2_BIOS  \
 		ROM_REGION32_LE(0x400000, "bios", 0) \
