@@ -443,7 +443,7 @@ void kpython2_state::kpython2(machine_config &config)
 
 // TODO: ICCA inputs for Guitar Freaks, Drummania, Dance Dance Revolution/Dancing Stage
 static INPUT_PORTS_START(kpython2)
-    // DIPSW is returned via endpoint 1 command 0x27 on the USB device
+	// DIPSW is returned via endpoint 1 command 0x27 on the USB device
 	PORT_START("DIPSW")
 	PORT_DIPUNKNOWN_DIPLOC(0x08, IP_ACTIVE_LOW, "DIP SW:4")
 	PORT_DIPUNKNOWN_DIPLOC(0x04, IP_ACTIVE_LOW, "DIP SW:3")
@@ -469,9 +469,9 @@ static INPUT_PORTS_START(kpython2)
 	PORT_START("ANALOG4")
 	PORT_BIT(0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
-    // TODO: Add a toggle for 15 kHz/31 kHz video mode
-    // Based on schematics, the 15K/31K flag is read from the JAMMA header pin S on the real I/O board.
-    // The flag itself is used by endpoint 1 command 0x23, which returns 0 if 31 kHz mode or 0x80 if 15 kHz mode.
+	// TODO: Add a toggle for 15 kHz/31 kHz video mode
+	// Based on schematics, the 15K/31K flag is read from the JAMMA header pin S on the real I/O board.
+	// The flag itself is used by endpoint 1 command 0x23, which returns 0 if 31 kHz mode or 0x80 if 15 kHz mode.
 
 INPUT_PORTS_END
 
@@ -543,15 +543,15 @@ static INPUT_PORTS_START(thrild3)
 
 	// TODO: Rework sensitivity values in future when driver is working
 	PORT_MODIFY("ANALOG1")
-    PORT_BIT(0x0000ffff, 0, IPT_DIAL) PORT_SENSITIVITY(100) PORT_KEYDELTA(2) PORT_NAME("Steering Wheel")
+	PORT_BIT(0x0000ffff, 0, IPT_DIAL) PORT_SENSITIVITY(100) PORT_KEYDELTA(2) PORT_NAME("Steering Wheel")
 
 	PORT_MODIFY("ANALOG2")
-    PORT_BIT(0x0000ffff, 0, IPT_PEDAL) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Accelerator Pedal")
+	PORT_BIT(0x0000ffff, 0, IPT_PEDAL) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Accelerator Pedal")
 
 	PORT_MODIFY("ANALOG3")
-    PORT_BIT(0x0000ffff, 0, IPT_PEDAL) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
+	PORT_BIT(0x0000ffff, 0, IPT_PEDAL) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
 
-    // TODO: Seatbelt toggle, returned by the BELT attachment device
+	// TODO: Seatbelt toggle, returned by the BELT attachment device
 
 INPUT_PORTS_END
 
@@ -566,14 +566,14 @@ static INPUT_PORTS_START(toysmarch)
 	PORT_BIT(0x00080000, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2) PORT_NAME("P1 Select Left")
 	PORT_BIT(0x00100000, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(2) PORT_NAME("P1 Select Left")
 
-    // TODO: Drum pad inputs
-    // The drum pad inputs (P1 and P2 cymbal, drum L, and drum R) are pressure sensitive
-    // The drum pad values are returned by the drum pad attachment device
+	// TODO: Drum pad inputs
+	// The drum pad inputs (P1 and P2 cymbal, drum L, and drum R) are pressure sensitive
+	// The drum pad values are returned by the drum pad attachment device
 
 INPUT_PORTS_END
 
 #define KPYTHON2_BIOS  \
-	    ROM_REGION32_LE(0x400000, "bios", 0) \
+		ROM_REGION32_LE(0x400000, "bios", 0) \
 		ROM_LOAD("ps2-0190j-20030822.bin", 0x000000, 0x400000, CRC(79d60546) SHA1(0ea98a25a32145dda514de2f0d4bfbbd806bd00c))
 
 ROM_START(kpython2)
