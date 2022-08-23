@@ -459,7 +459,6 @@ void atm_state::atm_io(address_map &map)
 	map(0xfadf, 0xfadf).mirror(0x0500).nopr(); // TODO 0xfadf, 0xfbdf, 0xffdf Kempston Mouse
 	map(0x8000, 0x8000).mirror(0x3ffd).w("ay8912", FUNC(ay8910_device::data_w));
 	map(0xc000, 0xc000).mirror(0x3ffd).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
-	map(0xc000, 0xc000).mirror(0x3ffd).w("ay8912", FUNC(ay8910_device::address_w));
 
 	// A: .... .... nnn0 1111
 	map(0x000f, 0x000f).select(0xffe0).rw(FUNC(atm_state::ata_r), FUNC(atm_state::ata_w));
