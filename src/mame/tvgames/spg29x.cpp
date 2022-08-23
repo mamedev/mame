@@ -71,6 +71,7 @@
 
 #include "emu.h"
 #include "cpu/score/score.h"
+#include "imagedev/snapquik.h"
 #include "machine/spg290_cdservo.h"
 #include "machine/spg290_i2c.h"
 #include "machine/spg290_ppu.h"
@@ -109,6 +110,8 @@ private:
 	virtual void machine_start() override;
 
 	uint32_t spg290_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_hyper_exe);
 
 	void spg290_mem(address_map &map);
 	void spg290_bios_mem(address_map &map);
@@ -426,6 +429,23 @@ void spg29x_zone3d_game_state::machine_reset()
 }
 
 
+QUICKLOAD_LOAD_MEMBER(spg29x_game_state::quickload_hyper_exe)
+{
+	const uint32_t length = image.length();
+
+	std::unique_ptr<u8 []> ptr;
+	if (image.fread(ptr, length) != length)
+		return image_init_result::FAIL;
+
+	auto &space = m_maincpu->space(AS_PROGRAM);
+	for (uint32_t i = 0; i < length; i++)
+		space.write_byte(0xa00901fc + i, ptr[i]);
+
+	m_maincpu->set_state_int(SCORE_PC, 0xa0091000); // Game entry point
+
+	return image_init_result::PASS;
+}
+
 void spg29x_game_state::spg29x(machine_config &config)
 {
 	/* basic machine hardware */
@@ -472,6 +492,8 @@ void spg29x_game_state::hyperscan(machine_config &config)
 
 	SOFTWARE_LIST(config, "cd_list").set_original("hyperscan");
 	SOFTWARE_LIST(config, "card_list").set_original("hyperscan_card");
+
+	QUICKLOAD(config, "quickload", "exe").set_load_callback(FUNC(spg29x_game_state::quickload_hyper_exe));
 }
 
 void spg29x_nand_game_state::nand_init(int blocksize, int blocksize_stripped)
