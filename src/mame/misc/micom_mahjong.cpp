@@ -4,8 +4,12 @@
 
 マイコン麻雀 - Micom Mahjong, mail-order Mahjong console.
 
+Two models are known, a grey one and a white one, hardware is presumed to be
+the same. It's not known who developed/manufactured it. Probably not the
+mail company, but they can be considered the publisher.
+
 Hardware notes:
-- Zilog Z8400A Z80A CPU, 11.0592MHz XTAL
+- Zilog Z8400A or Sharp LH0080A, 11.0592MHz XTAL
 - 16KB ROM (4*2732), 1KB RAM (2*MSM2114L)
 - 2KB ROM (2716) for tiles, 1KB VRAM (2*MSM2114L), 1bpp video
 - 1-bit sound
