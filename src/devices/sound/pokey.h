@@ -216,7 +216,7 @@ private:
 		uint8_t m_filter_sample;  /* high-pass filter sample */
 
 		inline void sample(void)            { m_filter_sample = m_output; }
-		inline void reset_channel(void)     { m_counter = m_AUDF ^ 0xff; m_borrow_cnt = 0;  }
+		inline void reset_channel(void)     { m_counter = m_AUDF ^ 0xff; m_borrow_cnt = 0; }
 
 		inline void inc_chan(int cycles)
 		{

@@ -248,7 +248,7 @@ void pokey_device::device_start()
 	poly_init_9_17(m_poly17, 17);
 	vol_init();
 
-	for(int i=0;i<4;i++)
+	for (int i=0; i<4; i++)
 		m_channel[i].m_AUDC = 0xB0;
 
 	/* The pokey does not have a reset line. These should be initialized
@@ -601,7 +601,7 @@ void pokey_device::step_one_clock(void)
 			clock_triggered[CLK_114] = 1;
 		}
 
-		if((m_AUDCTL & CH1_HICLK)&&(clock_triggered[CLK_1]))
+		if ((m_AUDCTL & CH1_HICLK) && (clock_triggered[CLK_1]))
 		{
 			if(m_AUDCTL & CH12_JOINED)
 				m_channel[CHAN1].inc_chan(7);
@@ -611,10 +611,10 @@ void pokey_device::step_one_clock(void)
 
 		int base_clock = (m_AUDCTL & CLK_15KHZ) ? CLK_114 : CLK_28;
 
-		if((!(m_AUDCTL & CH1_HICLK))&&(clock_triggered[base_clock]))
+		if ((!(m_AUDCTL & CH1_HICLK)) && (clock_triggered[base_clock]))
 			m_channel[CHAN1].inc_chan(1);
 
-		if((m_AUDCTL & CH3_HICLK)&&(clock_triggered[CLK_1]))
+		if ((m_AUDCTL & CH3_HICLK) && (clock_triggered[CLK_1]))
 		{
 			if(m_AUDCTL & CH34_JOINED)
 				m_channel[CHAN3].inc_chan(7);
@@ -622,7 +622,7 @@ void pokey_device::step_one_clock(void)
 				m_channel[CHAN3].inc_chan(4);
 		}
 
-		if((!(m_AUDCTL & CH3_HICLK))&&(clock_triggered[base_clock]))
+		if ((!(m_AUDCTL & CH3_HICLK)) && (clock_triggered[base_clock]))
 			m_channel[CHAN3].inc_chan(1);
 
 		if (clock_triggered[base_clock])
