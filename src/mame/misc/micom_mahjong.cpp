@@ -11,7 +11,6 @@ Hardware notes:
 - 1-bit sound
 
 TODO:
-- map the keypad
 - video timing, maybe 11059200 / 2 / (262*352)?
 
 ******************************************************************************/
@@ -65,12 +64,12 @@ private:
 	void input_w(u8 data);
 	void sound_w(u8 data);
 
-	u8 m_inp_mux = 0;
+	u8 m_inp_matrix = 0;
 };
 
 void mmahjong_state::machine_start()
 {
-	save_item(NAME(m_inp_mux));
+	save_item(NAME(m_inp_matrix));
 }
 
 
@@ -93,26 +92,26 @@ void mmahjong_state::vram_w(offs_t offset, u8 data)
 
 void mmahjong_state::input_w(u8 data)
 {
-	// d0-d2: input mux
-	m_inp_mux = ~data;
-}
-
-void mmahjong_state::sound_w(u8 data)
-{
-	// d0: speaker out
-	m_dac->write(data & 1);
+	// d0-d2: input matrix
+	m_inp_matrix = ~data;
 }
 
 u8 mmahjong_state::input_r()
 {
 	u8 data = 0;
 
-	// d0-d7: multiplexed inputs
+	// read keypad
 	for (int i = 0; i < 3; i++)
-		if (BIT(m_inp_mux, i))
+		if (BIT(m_inp_matrix, i))
 			data |= m_inputs[i]->read();
 
 	return ~data;
+}
+
+void mmahjong_state::sound_w(u8 data)
+{
+	// d0: speaker out
+	m_dac->write(data & 1);
 }
 
 
@@ -123,11 +122,9 @@ u8 mmahjong_state::input_r()
 
 void mmahjong_state::main_map(address_map &map)
 {
-	map.unmap_value_high();
 	map(0x0000, 0x3fff).rom();
 	map(0x5000, 0x53ff).ram();
 	map(0x6000, 0x63ff).w(FUNC(mmahjong_state::vram_w)).share("vram");
-
 	map(0x7001, 0x7001).r(FUNC(mmahjong_state::input_r));
 	map(0x7002, 0x7002).w(FUNC(mmahjong_state::input_w));
 	map(0x7004, 0x7004).w(FUNC(mmahjong_state::sound_w));
@@ -141,41 +138,40 @@ void mmahjong_state::main_map(address_map &map)
 
 static INPUT_PORTS_START( mmahjong )
 	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) // 1
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) // 2
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) // 3
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) // 4
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) // 5
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) // 6
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_A) // 1
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_B) // 2
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_C) // 3
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_D) // 4
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_MAHJONG_E) // 5
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_MAHJONG_F) // 6
 
 	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) // 7
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) // 8
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) // 9
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) // 10
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) // 11
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) // 12
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_G) // 7
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_H) // 8
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_I) // 9
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_J) // 10
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_MAHJONG_K) // 11
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_MAHJONG_L) // 12
 
 	PORT_START("IN.2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) // 13
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) // 0 (Tsumo)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) // Pon
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) // Chi
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) // Kan
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) // Reach
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J) // Ron
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_M) // 13
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_N) // 0 (Tsumo)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_PON)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_CHI)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_MAHJONG_KAN)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_MAHJONG_REACH)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_MAHJONG_RON)
 INPUT_PORTS_END
-
-
-static GFXDECODE_START( gfx_mmahjong )
-	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x1, 0, 1 )
-GFXDECODE_END
 
 
 
 /******************************************************************************
     Machine Configs
 ******************************************************************************/
+
+static GFXDECODE_START( gfx_mmahjong )
+	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x1, 0, 1 )
+GFXDECODE_END
 
 void mmahjong_state::mmahjong(machine_config &config)
 {
