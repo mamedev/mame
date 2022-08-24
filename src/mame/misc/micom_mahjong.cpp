@@ -8,6 +8,10 @@ Two models are known, a grey one and a white one, hardware is presumed to be
 the same. It's not known who developed/manufactured it. Probably not the
 mail company, but they can be considered the publisher.
 
+The options at the start of the game:
+Option 1: 1: 3 minutes play time, 2: 5 minutes
+Option 2: 1: advanced difficulty, 2: beginner
+
 Hardware notes:
 - PCB label: IFVC-3224A
 - Zilog Z8400A or Sharp LH0080A, 11.0592MHz XTAL
