@@ -93,6 +93,7 @@ void mmahjong_state::vram_w(offs_t offset, u8 data)
 void mmahjong_state::input_w(u8 data)
 {
 	// d0-d2: input matrix
+	// d3 is also written, but unused
 	m_inp_matrix = ~data;
 }
 
@@ -224,4 +225,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME       PARENT CMP MACHINE   INPUT     STATE           INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1982, mmahjong,  0,      0, mmahjong, mmahjong, mmahjong_state, empty_init, "Nippon Mail Service", "Micom Mahjong", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+CONS( 1982, mmahjong,  0,      0, mmahjong, mmahjong, mmahjong_state, empty_init, "Nippon Mail Service", "Micom Mahjong", MACHINE_SUPPORTS_SAVE )
