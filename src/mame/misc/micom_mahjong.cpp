@@ -6,7 +6,7 @@
 
 Two models are known, a grey one and a white one, hardware is presumed to be
 the same. It's not known who developed/manufactured it. Probably not the
-mail company, but they can be considered the publisher.
+mail order house, but they can be considered the publisher.
 
 The options at the start of the game:
 Option 1: 1: 3 minutes play time, 2: 5 minutes
