@@ -91,20 +91,145 @@
 #include "emu.h"
 #include "rom.h"
 
+namespace {
+
+class gb_rom_device : public device_t, public device_gb_cart_interface
+{
+public:
+	// construction/destruction
+	gb_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// reading and writing
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
+
+protected:
+	gb_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override { shared_start(); }
+	virtual void device_reset() override { shared_reset(); }
+
+	void shared_start();
+	void shared_reset();
+};
+
+
+class gb_rom_tama5_device : public gb_rom_device
+{
+public:
+	// construction/destruction
+	gb_rom_tama5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// reading and writing
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	uint16_t m_tama5_data, m_tama5_addr, m_tama5_cmd;
+	uint8_t m_regs[32];
+	uint8_t m_rtc_reg;
+};
+
+
+class gb_rom_wisdom_device : public gb_rom_device
+{
+public:
+	// construction/destruction
+	gb_rom_wisdom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// reading and writing
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override { shared_start(); }
+	virtual void device_reset() override { shared_reset(); }
+};
+
+
+class gb_rom_yong_device : public gb_rom_device
+{
+public:
+	// construction/destruction
+	gb_rom_yong_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// reading and writing
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override { shared_start(); }
+	virtual void device_reset() override { shared_reset(); }
+};
+
+
+class gb_rom_atvrac_device : public gb_rom_device
+{
+public:
+	// construction/destruction
+	gb_rom_atvrac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// reading and writing
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override { shared_start(); }
+	virtual void device_reset() override { shared_reset(); }
+};
+
+
+class gb_rom_lasama_device : public gb_rom_device
+{
+public:
+	// construction/destruction
+	gb_rom_lasama_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// reading and writing
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override { shared_start(); }
+	virtual void device_reset() override { shared_reset(); }
+};
+
+
+
+class megaduck_rom_device : public device_t, public device_gb_cart_interface
+{
+public:
+	// construction/destruction
+	megaduck_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// reading and writing
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
+
+protected:
+	megaduck_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+};
+
 
 //-------------------------------------------------
 //  gb_rom_device - constructor
 //-------------------------------------------------
-
-DEFINE_DEVICE_TYPE(GB_STD_ROM,    gb_rom_device,        "gb_rom",        "GB Carts")
-DEFINE_DEVICE_TYPE(GB_ROM_TAMA5,  gb_rom_tama5_device,  "gb_rom_tama5",  "GB Tamagotchi")
-DEFINE_DEVICE_TYPE(GB_ROM_WISDOM, gb_rom_wisdom_device, "gb_rom_wisdom", "GB Wisdom Tree Carts")
-DEFINE_DEVICE_TYPE(GB_ROM_YONG,   gb_rom_yong_device,   "gb_rom_yong",   "GB Young Yong Carts")
-DEFINE_DEVICE_TYPE(GB_ROM_ATVRAC, gb_rom_atvrac_device, "gb_rom_atvrac", "GB ATV Racin'")
-DEFINE_DEVICE_TYPE(GB_ROM_LASAMA, gb_rom_lasama_device, "gb_rom_lasama", "GB LaSaMa")
-
-DEFINE_DEVICE_TYPE(MEGADUCK_ROM,  megaduck_rom_device,  "megaduck_rom",  "MegaDuck Carts")
-
 
 gb_rom_device::gb_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
@@ -438,3 +563,16 @@ void megaduck_rom_device::write_ram(offs_t offset, uint8_t data)
 	m_latch_bank = data * 2;
 	m_latch_bank2 = data * 2 + 1;
 }
+
+} // anonymous namespace
+
+
+// device type definition
+DEFINE_DEVICE_TYPE_PRIVATE(GB_STD_ROM,    device_gb_cart_interface, gb_rom_device,        "gb_rom",        "Game Boy Cartridge")
+DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_TAMA5,  device_gb_cart_interface, gb_rom_tama5_device,  "gb_rom_tama5",  "Game Boy Tamagotchi Cartridge")
+DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_WISDOM, device_gb_cart_interface, gb_rom_wisdom_device, "gb_rom_wisdom", "Game Boy Wisdom Tree Cartridge")
+DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_YONG,   device_gb_cart_interface, gb_rom_yong_device,   "gb_rom_yong",   "Game Boy Young Yong Cartridge")
+DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_ATVRAC, device_gb_cart_interface, gb_rom_atvrac_device, "gb_rom_atvrac", "Game Boy ATV Racin' Cartridge")
+DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_LASAMA, device_gb_cart_interface, gb_rom_lasama_device, "gb_rom_lasama", "Game Boy LaSaMa Cartridge")
+
+DEFINE_DEVICE_TYPE_PRIVATE(MEGADUCK_ROM,  device_gb_cart_interface, megaduck_rom_device,  "megaduck_rom",  "MegaDuck Cartridge")

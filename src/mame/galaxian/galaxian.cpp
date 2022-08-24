@@ -5622,10 +5622,12 @@ static INPUT_PORTS_START( bmxstunts )
 	PORT_START("DSW1") // only one 6-dip bank
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x00, "SW1:1")
 	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x00, "SW1:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x00, "SW1:3")
-	PORT_DIPNAME(          0x08, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(             0x08, "A 2/1  B 1/3" )
-	PORT_DIPSETTING(             0x00, "A 1/1  B 1/6" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, "A 2/1  B 1/3" )
+	PORT_DIPSETTING(    0x00, "A 1/1  B 1/6" )
 	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x00, "SW1:5")
 	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x00, "SW1:6")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -7781,12 +7783,12 @@ void bmxstunts_state::bmxstunts(machine_config &config)
 {
 	galaxian_base(config);
 
-	M6502(config.replace(), m_maincpu, 3'072'000); // TODO: verify clock, actually 6502A
+	M6502(config.replace(), m_maincpu, 3'072'000); // Synertek 6502A, TODO: verify clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &bmxstunts_state::bmxstunts_map);
 
 	set_irq_line(0);
 
-	SN76489A(config, m_snsnd, 3'072'000); // TODO: verify clock, actually SN76489AN
+	SN76489A(config, m_snsnd, 3'072'000); // SN76489AN, TODO: verify clock
 	m_snsnd->add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
@@ -12368,7 +12370,7 @@ ROM_START( bmxstunts )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "bmxh.1h", 0x0000, 0x1000, CRC(b6d28b39) SHA1(3f9a9a182764a57af80d91640d7d2cece1f25af2) )
-	ROM_LOAD( "bmxl.1l", 0x1000, 0x1000, BAD_DUMP CRC(2435510f) SHA1(3215ebe77c90b9548af28f31f3ef37c2f971255d) ) // didn't read consistently, combination of 2 dump attempts
+	ROM_LOAD( "bmxl.1l", 0x1000, 0x1000, BAD_DUMP CRC(d221f0aa) SHA1(38fc2892214c8611924ca7726c50055c520b87c5) ) // dying EPROM, combination of several dump attempts, still has bad pixels
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "bmx6331.6l", 0x0000, 0x0020, CRC(ce3e9306) SHA1(62dc5208eea2d3126e61cc7af30e71a9e60d438c) )
@@ -16083,8 +16085,8 @@ GAME( 1982, zigzagb2,    zigzagb,  zigzag,     zigzag,     zigzagb_state,  init_
 GAME( 1981, gmgalax,     0,        gmgalax,    gmgalax,    gmgalax_state,  init_gmgalax,    ROT90,  "bootleg", "Ghostmuncher Galaxian (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 // Multigames
-GAME( 2002, fourplay,    0,        fourplay,   galaxian,   fourplay_state, init_fourplay,   ROT90, "Macro", "Four Play",   MACHINE_SUPPORTS_SAVE )
-GAME( 2001, videight,    0,        videight,   warofbug,   videight_state, init_videight,   ROT90, "Macro", "Video Eight", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, fourplay,    0,        fourplay,   galaxian,   fourplay_state, init_fourplay,   ROT90,  "Macro", "Four Play",   MACHINE_SUPPORTS_SAVE )
+GAME( 2001, videight,    0,        videight,   warofbug,   videight_state, init_videight,   ROT90,  "Macro", "Video Eight", MACHINE_SUPPORTS_SAVE )
 
 
 /*************************************

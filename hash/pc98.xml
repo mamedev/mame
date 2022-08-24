@@ -67941,6 +67941,19 @@ doujin?!?
 		</part>
 	</software>
 
+	<software name="mindbust">
+		<description>Mind Buster!!</description>
+		<year>1995</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="author" value="T.B.S." />
+		<info name="alt_title" value="まいんどばすたぁ!!" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="rom" size="1331888">
+				<rom name="mind buster.d88" size="1331888" crc="8dbe09bf" sha1="d414ebd01ba8762b740ff72dd3a8f0fd251fbc06" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mitsumi">
 		<description>Mitsumi Misato Seifuku Collection</description>
 		<year>19??</year>

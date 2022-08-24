@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Mirko Buffoni
+
 /***************************************************************************
 
 Bomb Jack
@@ -98,13 +99,201 @@ Dip Locations and factory settings verified with manual
 ***************************************************************************/
 
 #include "emu.h"
-#include "bombjack.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/ay8910.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
+
+namespace {
+
+class bombjack_state : public driver_device
+{
+public:
+	bombjack_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_spriteram(*this, "spriteram"),
+		m_bg_tilemaps_rom(*this, "bg_tilemaps"),
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch")
+	{ }
+
+	void bombjack(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	uint8_t soundlatch_read_and_clear();
+	void irq_mask_w(uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	void background_w(uint8_t data);
+	void flipscreen_w(uint8_t data);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	TIMER_CALLBACK_MEMBER(soundlatch_callback);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void audio_io_map(address_map &map);
+	void audio_map(address_map &map);
+	void main_map(address_map &map);
+
+	// memory pointers
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_region_ptr<uint8_t> m_bg_tilemaps_rom;
+
+	// video-related
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_background_image = 0U;
+
+	bool m_nmi_mask = false;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+};
+
+
+// video
+
+void bombjack_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
+}
+
+void bombjack_state::colorram_w(offs_t offset, uint8_t data)
+{
+	m_colorram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
+}
+
+void bombjack_state::background_w(uint8_t data)
+{
+	if (m_background_image != data)
+	{
+		m_background_image = data;
+		m_bg_tilemap->mark_all_dirty();
+	}
+}
+
+void bombjack_state::flipscreen_w(uint8_t data)
+{
+	if (flip_screen() != (data & 0x01))
+	{
+		flip_screen_set(data & 0x01);
+		machine().tilemap().mark_all_dirty();
+	}
+}
+
+TILE_GET_INFO_MEMBER(bombjack_state::get_bg_tile_info)
+{
+	int const offs = (m_background_image & 0x07) * 0x200 + tile_index;
+	int const code = (m_background_image & 0x10) ? m_bg_tilemaps_rom[offs] : 0;
+	int const attr = m_bg_tilemaps_rom[offs + 0x100];
+	int const color = attr & 0x0f;
+	int const flags = (attr & 0x80) ? TILE_FLIPY : 0;
+
+	tileinfo.set(1, code, color, flags);
+}
+
+TILE_GET_INFO_MEMBER(bombjack_state::get_fg_tile_info)
+{
+	int const code = m_videoram[tile_index] + 16 * (m_colorram[tile_index] & 0x10);
+	int const color = m_colorram[tile_index] & 0x0f;
+
+	tileinfo.set(0, code, color, 0);
+}
+
+void bombjack_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bombjack_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bombjack_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	m_fg_tilemap->set_transparent_pen(0);
+}
+
+void bombjack_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	{
+/*
+ abbbbbbb cdefgggg hhhhhhhh iiiiiiii
+
+ a        use big sprites (32x32 instead of 16x16)
+ bbbbbbb  sprite code
+ c        x flip
+ d        y flip (used only in death sequence?)
+ e        ? (set when big sprites are selected)
+ f        ? (set only when the bonus (B) materializes?)
+ gggg     color
+ hhhhhhhh x position
+ iiiiiiii y position
+*/
+
+		int sx = m_spriteram[offs + 3];
+		int sy;
+
+		if (m_spriteram[offs] & 0x80)
+			sy = 225 - m_spriteram[offs + 2];
+		else
+			sy = 241 - m_spriteram[offs + 2];
+
+		int flipx = m_spriteram[offs + 1] & 0x40;
+		int flipy = m_spriteram[offs + 1] & 0x80;
+
+		if (flip_screen())
+		{
+			if (m_spriteram[offs + 1] & 0x20)
+			{
+				sx = 224 - sx;
+				sy = 224 - sy;
+			}
+			else
+			{
+				sx = 240 - sx;
+				sy = 240 - sy;
+			}
+			flipx = !flipx;
+			flipy = !flipy;
+		}
+
+		m_gfxdecode->gfx((m_spriteram[offs] & 0x80) ? 3 : 2)->transpen(bitmap, cliprect,
+				m_spriteram[offs] & 0x7f,
+				m_spriteram[offs + 1] & 0x0f,
+				flipx, flipy,
+				sx, sy, 0);
+	}
+}
+
+uint32_t bombjack_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect);
+	return 0;
+}
+
+
+// machine
 
 uint8_t bombjack_state::soundlatch_read_and_clear()
 {
@@ -134,19 +323,19 @@ void bombjack_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8fff).ram();
-	map(0x9000, 0x93ff).ram().w(FUNC(bombjack_state::bombjack_videoram_w)).share("videoram");
-	map(0x9400, 0x97ff).ram().w(FUNC(bombjack_state::bombjack_colorram_w)).share("colorram");
-	map(0x9820, 0x987f).writeonly().share("spriteram");
+	map(0x9000, 0x93ff).ram().w(FUNC(bombjack_state::videoram_w)).share(m_videoram);
+	map(0x9400, 0x97ff).ram().w(FUNC(bombjack_state::colorram_w)).share(m_colorram);
+	map(0x9820, 0x987f).writeonly().share(m_spriteram);
 	map(0x9a00, 0x9a00).nopw();
 	map(0x9c00, 0x9cff).w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0x9e00, 0x9e00).w(FUNC(bombjack_state::bombjack_background_w));
+	map(0x9e00, 0x9e00).w(FUNC(bombjack_state::background_w));
 	map(0xb000, 0xb000).portr("P1");
 	map(0xb000, 0xb000).w(FUNC(bombjack_state::irq_mask_w));
 	map(0xb001, 0xb001).portr("P2");
 	map(0xb002, 0xb002).portr("SYSTEM");
-	map(0xb003, 0xb003).nopr(); /* watchdog reset? */
+	map(0xb003, 0xb003).nopr(); // watchdog reset?
 	map(0xb004, 0xb004).portr("DSW1");
-	map(0xb004, 0xb004).w(FUNC(bombjack_state::bombjack_flipscreen_w));
+	map(0xb004, 0xb004).w(FUNC(bombjack_state::flipscreen_w));
 	map(0xb005, 0xb005).portr("DSW2");
 	map(0xb800, 0xb800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xc000, 0xdfff).rom();
@@ -181,9 +370,9 @@ static INPUT_PORTS_START( bombjack )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* probably unused */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* probably unused */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* probably unused */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )   // probably unused
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )   // probably unused
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )   // probably unused
 
 	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
@@ -191,16 +380,16 @@ static INPUT_PORTS_START( bombjack )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* probably unused */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* probably unused */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* probably unused */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )   // probably unused
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )   // probably unused
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )   // probably unused
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )    // probably unused
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:!1,!2")
@@ -226,8 +415,8 @@ static INPUT_PORTS_START( bombjack )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	/* Manual states DSW2 bits 0-2 are unused and have to be left on OFF (0x00) */
-	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:!1,!2,!3")  /* see notes */
+	// Manual states DSW2 bits 0-2 are unused and have to be left on OFF (0x00)
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:!1,!2,!3")  // see notes
 	PORT_DIPSETTING(    0x02, "Every 30k" )
 	PORT_DIPSETTING(    0x01, "Every 100k" )
 	PORT_DIPSETTING(    0x07, "50k, 100k and 300k" )
@@ -261,47 +450,47 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout1 =
 {
-	8,8,    /* 8*8 characters */
-	RGN_FRAC(1,3),    /* 512 characters */
-	3,  /* 3 bits per pixel */
-	{ RGN_FRAC(0,3),RGN_FRAC(1,3),RGN_FRAC(2,3) },  /* the bitplanes are separated */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 }, /* pretty straightforward layout */
+	8,8,    // 8*8 characters
+	RGN_FRAC(1,3),    // 512 characters
+	3,  // 3 bits per pixel
+	{ RGN_FRAC(0,3),RGN_FRAC(1,3),RGN_FRAC(2,3) },  // the bitplanes are separated
+	{ 0, 1, 2, 3, 4, 5, 6, 7 }, // pretty straightforward layout
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8 /* every char takes 8 consecutive bytes */
+	8*8 // every char takes 8 consecutive bytes
 };
 
 static const gfx_layout charlayout2 =
 {
-	16,16,  /* 16*16 characters */
-	RGN_FRAC(1,3),    /* 256 characters */
-	3,  /* 3 bits per pixel */
-	{ RGN_FRAC(0,3),RGN_FRAC(1,3),RGN_FRAC(2,3) },    /* the bitplanes are separated */
-	{ 0, 1, 2, 3, 4, 5, 6, 7,   /* pretty straightforward layout */
+	16,16,  // 16*16 characters
+	RGN_FRAC(1,3),    // 256 characters
+	3,  // 3 bits per pixel
+	{ RGN_FRAC(0,3),RGN_FRAC(1,3),RGN_FRAC(2,3) },    // the bitplanes are separated
+	{ 0, 1, 2, 3, 4, 5, 6, 7,   // pretty straightforward layout
 			8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 			16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
-	32*8    /* every character takes 32 consecutive bytes */
+	32*8    // every character takes 32 consecutive bytes
 };
 
 static const gfx_layout spritelayout1 =
 {
-	16,16,  /* 16*16 sprites */
-	128,    /* 128 sprites */
-	3,  /* 3 bits per pixel */
-	{ 0, 1024*8*8, 2*1024*8*8 },    /* the bitplanes are separated */
+	16,16,  // 16*16 sprites
+	128,    // 128 sprites
+	3,  // 3 bits per pixel
+	{ 0, 1024*8*8, 2*1024*8*8 },    // the bitplanes are separated
 	{ 0, 1, 2, 3, 4, 5, 6, 7,
 			8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 			16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
-	32*8    /* every sprite takes 32 consecutive bytes */
+	32*8    // every sprite takes 32 consecutive bytes
 };
 
 static const gfx_layout spritelayout2 =
 {
-	32,32,  /* 32*32 sprites */
-	32, /* 32 sprites */
-	3,  /* 3 bits per pixel */
-	{ 0, 1024*8*8, 2*1024*8*8 },    /* the bitplanes are separated */
+	32,32,  // 32*32 sprites
+	32, // 32 sprites
+	3,  // 3 bits per pixel
+	{ 0, 1024*8*8, 2*1024*8*8 },    // the bitplanes are separated
 	{ 0, 1, 2, 3, 4, 5, 6, 7,
 			8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7,
 			32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
@@ -310,14 +499,14 @@ static const gfx_layout spritelayout2 =
 			16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8,
 			64*8, 65*8, 66*8, 67*8, 68*8, 69*8, 70*8, 71*8,
 			80*8, 81*8, 82*8, 83*8, 84*8, 85*8, 86*8, 87*8 },
-	128*8   /* every sprite takes 128 consecutive bytes */
+	128*8   // every sprite takes 128 consecutive bytes
 };
 
 static GFXDECODE_START( gfx_bombjack )
-	GFXDECODE_ENTRY( "chars",   0x0000, charlayout1,      0, 16 )   /* characters */
-	GFXDECODE_ENTRY( "tiles",   0x0000, charlayout2,      0, 16 )   /* background tiles */
-	GFXDECODE_ENTRY( "sprites", 0x0000, spritelayout1,    0, 16 )   /* normal sprites */
-	GFXDECODE_ENTRY( "sprites", 0x1000, spritelayout2,    0, 16 )   /* large sprites */
+	GFXDECODE_ENTRY( "chars",    0x0000, charlayout1,      0, 16 )
+	GFXDECODE_ENTRY( "bgtiles1", 0x0000, charlayout2,      0, 16 )
+	GFXDECODE_ENTRY( "sprites",  0x0000, spritelayout1,    0, 16 ) // normal sprites
+	GFXDECODE_ENTRY( "sprites",  0x1000, spritelayout2,    0, 16 ) // large sprites
 GFXDECODE_END
 
 
@@ -351,23 +540,23 @@ WRITE_LINE_MEMBER(bombjack_state::vblank_irq)
 
 void bombjack_state::bombjack(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(4'000'000));     /* Confirmed from PCB */
+	// basic machine hardware
+	Z80(config, m_maincpu, XTAL(4'000'000));     // Confirmed from PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &bombjack_state::main_map);
 
-	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(12'000'000)/4)); /* Confirmed from PCB */
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(12'000'000) / 4)); // Confirmed from PCB
 	audiocpu.set_addrmap(AS_PROGRAM, &bombjack_state::audio_map);
 	audiocpu.set_addrmap(AS_IO, &bombjack_state::audio_io_map);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(bombjack_state::screen_update_bombjack));
+	screen.set_screen_update(FUNC(bombjack_state::screen_update));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(bombjack_state::vblank_irq));
 	screen.screen_vblank().append_inputline("audiocpu", INPUT_LINE_NMI);
@@ -376,14 +565,14 @@ void bombjack_state::bombjack(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 128);
 
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, "ay1", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.13); /* Confirmed from PCB */
+	AY8910(config, "ay1", XTAL(12'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 0.13); // Confirmed from PCB
 
-	AY8910(config, "ay2", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.13);
+	AY8910(config, "ay2", XTAL(12'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 0.13);
 
-	AY8910(config, "ay3", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.13);
+	AY8910(config, "ay3", XTAL(12'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 0.13);
 }
 
 
@@ -402,25 +591,25 @@ ROM_START( bombjack )
 	ROM_LOAD( "12_n01b.bin",  0x6000, 0x2000, CRC(1d3ecee5) SHA1(8b3c49e21ea4952cae7042890d1be2115f7d6fda) )
 	ROM_LOAD( "13.1r",        0xc000, 0x2000, CRC(70e0244d) SHA1(67654155e42821ea78a655f869fb81c8d6387f63) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound board */
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "01_h03t.bin",  0x0000, 0x2000, CRC(8407917d) SHA1(318face9f7a7ab6c7eeac773995040425e780aaf) )
 
 	ROM_REGION( 0x3000, "chars", 0 )
-	ROM_LOAD( "03_e08t.bin",  0x0000, 0x1000, CRC(9f0470d5) SHA1(94ef52ef47b4399a03528fe3efeac9c1d6983446) )    /* chars */
+	ROM_LOAD( "03_e08t.bin",  0x0000, 0x1000, CRC(9f0470d5) SHA1(94ef52ef47b4399a03528fe3efeac9c1d6983446) )
 	ROM_LOAD( "04_h08t.bin",  0x1000, 0x1000, CRC(81ec12e6) SHA1(e29ba193f21aa898499187603b25d2e226a07c7b) )
 	ROM_LOAD( "05_k08t.bin",  0x2000, 0x1000, CRC(e87ec8b1) SHA1(a66808ef2d62fca2854396898b86bac9be5f17a3) )
 
-	ROM_REGION( 0x6000, "tiles", 0 )
-	ROM_LOAD( "06_l08t.bin",  0x0000, 0x2000, CRC(51eebd89) SHA1(515128a3971fcb97b60c5b6bdd2b03026aec1921) )    /* background tiles */
+	ROM_REGION( 0x6000, "bgtiles1", 0 )
+	ROM_LOAD( "06_l08t.bin",  0x0000, 0x2000, CRC(51eebd89) SHA1(515128a3971fcb97b60c5b6bdd2b03026aec1921) )
 	ROM_LOAD( "07_n08t.bin",  0x2000, 0x2000, CRC(9dd98e9d) SHA1(6db6006a6e20ff7c243d88293ca53681c4703ea5) )
 	ROM_LOAD( "08_r08t.bin",  0x4000, 0x2000, CRC(3155ee7d) SHA1(e7897dca4c145f10b7d975b8ef0e4d8aa9354c25) )
 
 	ROM_REGION( 0x6000, "sprites", 0 )
-	ROM_LOAD( "16_m07b.bin",  0x0000, 0x2000, CRC(94694097) SHA1(de71bcd67f97d05527f2504fc8430be333fb9ec2) )    /* sprites */
+	ROM_LOAD( "16_m07b.bin",  0x0000, 0x2000, CRC(94694097) SHA1(de71bcd67f97d05527f2504fc8430be333fb9ec2) )
 	ROM_LOAD( "15_l07b.bin",  0x2000, 0x2000, CRC(013f58f2) SHA1(20c64593ab9fcb04cefbce0cd5d17ce3ff26441b) )
 	ROM_LOAD( "14_j07b.bin",  0x4000, 0x2000, CRC(101c858d) SHA1(ed1746c15cdb04fae888601d940183d5c7702282) )
 
-	ROM_REGION( 0x1000, "gfx4", 0 ) /* background tilemaps */
+	ROM_REGION( 0x1000, "bg_tilemaps", 0 )
 	ROM_LOAD( "02_p04t.bin",  0x0000, 0x1000, CRC(398d4a02) SHA1(ac18a8219f99ba9178b96c9564de3978e39c59fd) )
 ROM_END
 
@@ -432,25 +621,25 @@ ROM_START( bombjack2 )
 	ROM_LOAD( "12_n01b.bin",  0x6000, 0x2000, CRC(1d3ecee5) SHA1(8b3c49e21ea4952cae7042890d1be2115f7d6fda) )
 	ROM_LOAD( "13_r01b.bin",  0xc000, 0x2000, CRC(bcafdd29) SHA1(d243eb1249e885aa75fc910fce6e7744770d6e82) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound board */
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "01_h03t.bin",  0x0000, 0x2000, CRC(8407917d) SHA1(318face9f7a7ab6c7eeac773995040425e780aaf) )
 
 	ROM_REGION( 0x3000, "chars", 0 )
-	ROM_LOAD( "03_e08t.bin",  0x0000, 0x1000, CRC(9f0470d5) SHA1(94ef52ef47b4399a03528fe3efeac9c1d6983446) )    /* chars */
+	ROM_LOAD( "03_e08t.bin",  0x0000, 0x1000, CRC(9f0470d5) SHA1(94ef52ef47b4399a03528fe3efeac9c1d6983446) )
 	ROM_LOAD( "04_h08t.bin",  0x1000, 0x1000, CRC(81ec12e6) SHA1(e29ba193f21aa898499187603b25d2e226a07c7b) )
 	ROM_LOAD( "05_k08t.bin",  0x2000, 0x1000, CRC(e87ec8b1) SHA1(a66808ef2d62fca2854396898b86bac9be5f17a3) )
 
-	ROM_REGION( 0x6000, "tiles", 0 )
-	ROM_LOAD( "06_l08t.bin",  0x0000, 0x2000, CRC(51eebd89) SHA1(515128a3971fcb97b60c5b6bdd2b03026aec1921) )    /* background tiles */
+	ROM_REGION( 0x6000, "bgtiles1", 0 )
+	ROM_LOAD( "06_l08t.bin",  0x0000, 0x2000, CRC(51eebd89) SHA1(515128a3971fcb97b60c5b6bdd2b03026aec1921) )
 	ROM_LOAD( "07_n08t.bin",  0x2000, 0x2000, CRC(9dd98e9d) SHA1(6db6006a6e20ff7c243d88293ca53681c4703ea5) )
 	ROM_LOAD( "08_r08t.bin",  0x4000, 0x2000, CRC(3155ee7d) SHA1(e7897dca4c145f10b7d975b8ef0e4d8aa9354c25) )
 
 	ROM_REGION( 0x6000, "sprites", 0 )
-	ROM_LOAD( "16_m07b.bin",  0x0000, 0x2000, CRC(94694097) SHA1(de71bcd67f97d05527f2504fc8430be333fb9ec2) )    /* sprites */
+	ROM_LOAD( "16_m07b.bin",  0x0000, 0x2000, CRC(94694097) SHA1(de71bcd67f97d05527f2504fc8430be333fb9ec2) )
 	ROM_LOAD( "15_l07b.bin",  0x2000, 0x2000, CRC(013f58f2) SHA1(20c64593ab9fcb04cefbce0cd5d17ce3ff26441b) )
 	ROM_LOAD( "14_j07b.bin",  0x4000, 0x2000, CRC(101c858d) SHA1(ed1746c15cdb04fae888601d940183d5c7702282) )
 
-	ROM_REGION( 0x1000, "gfx4", 0 ) /* background tilemaps */
+	ROM_REGION( 0x1000, "bg_tilemaps", 0 )
 	ROM_LOAD( "02_p04t.bin",  0x0000, 0x1000, CRC(398d4a02) SHA1(ac18a8219f99ba9178b96c9564de3978e39c59fd) )
 ROM_END
 
@@ -462,7 +651,7 @@ ROM_START( bombjackt )
 	ROM_LOAD( "12.1n",   0x4000, 0x4000, CRC(0a32506a) SHA1(2fb3ce695caebbae3ca7dd9f3d34ac5b734d77ed) ) // == 11_m01b.bin + (97.229004%) 12_n01b.bin
 	ROM_LOAD( "13.1r",   0xc000, 0x2000, CRC(964ac5c5) SHA1(8d235ae91aea1ae86411671c5aa050c146a52026) ) // sldh - (99.877930%) 13_r01b.bin
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound board */
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "1.6h",  0x0000, 0x2000, CRC(8407917d) SHA1(318face9f7a7ab6c7eeac773995040425e780aaf) )
 
 	/*
@@ -472,26 +661,29 @@ ROM_START( bombjackt )
 	ROM_LOAD( "05_k08t.bin",  0x2000, 0x1000, CRC(e87ec8b1) SHA1(a66808ef2d62fca2854396898b86bac9be5f17a3) )
 	*/
 
-	ROM_REGION( 0x6000, "chars", 0 ) // the Tecfri produced boards apparently use double size roms here (content duplicated in each half)
+	ROM_REGION( 0x6000, "chars", 0 ) // the Tecfri produced boards apparently use double size ROMs here (content duplicated in each half)
 	ROM_LOAD( "3.1e",  0x0000, 0x2000, CRC(54e1dac1) SHA1(3c5d8b932b2a87acf42e0b4632195776689c1154) )
 	ROM_LOAD( "4.1h",  0x2000, 0x2000, CRC(05e428ab) SHA1(0b2cae76aba8372482a4e315a9f49fd15cb94625) )
 	ROM_LOAD( "5.1k",  0x4000, 0x2000, CRC(f282f29a) SHA1(521a110213d6ecdf54be0f50f41c3c266d65d84c) )
 
 
 
-	ROM_REGION( 0x6000, "tiles", 0 ) // ok
-	ROM_LOAD( "6.1l",  0x0000, 0x2000, CRC(51eebd89) SHA1(515128a3971fcb97b60c5b6bdd2b03026aec1921) )    /* background tiles */
+	ROM_REGION( 0x6000, "bgtiles1", 0 ) // ok
+	ROM_LOAD( "6.1l",  0x0000, 0x2000, CRC(51eebd89) SHA1(515128a3971fcb97b60c5b6bdd2b03026aec1921) )
 	ROM_LOAD( "7.1n",  0x2000, 0x2000, CRC(9dd98e9d) SHA1(6db6006a6e20ff7c243d88293ca53681c4703ea5) )
 	ROM_LOAD( "8.1r",  0x4000, 0x2000, CRC(3155ee7d) SHA1(e7897dca4c145f10b7d975b8ef0e4d8aa9354c25) )
 
 	ROM_REGION( 0x6000, "sprites", 0 ) // ok
-	ROM_LOAD( "16.7m",  0x0000, 0x2000, CRC(94694097) SHA1(de71bcd67f97d05527f2504fc8430be333fb9ec2) )    /* sprites */
+	ROM_LOAD( "16.7m",  0x0000, 0x2000, CRC(94694097) SHA1(de71bcd67f97d05527f2504fc8430be333fb9ec2) )
 	ROM_LOAD( "15.7k",  0x2000, 0x2000, CRC(013f58f2) SHA1(20c64593ab9fcb04cefbce0cd5d17ce3ff26441b) )
 	ROM_LOAD( "14.7j",  0x4000, 0x2000, CRC(101c858d) SHA1(ed1746c15cdb04fae888601d940183d5c7702282) )
 
-	ROM_REGION( 0x2000, "gfx4", 0 ) /* background tilemaps */
+	ROM_REGION( 0x2000, "bg_tilemaps", 0 )
 	ROM_LOAD( "2.5n",  0x0000, 0x2000, CRC(de796158) SHA1(e004f10ada5c282f3b4208031e274190a54bf94f) ) // 1xxxxxxxxxxxx = 0xFF (double size, second half empty, otherwise the same)
 ROM_END
+
+} // anonymous namespace
+
 
 /*************************************
  *
@@ -499,6 +691,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1984, bombjack,  0,        bombjack, bombjack, bombjack_state, empty_init, ROT90, "Tehkan", "Bomb Jack (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, bombjack2, bombjack, bombjack, bombjack, bombjack_state, empty_init, ROT90, "Tehkan", "Bomb Jack (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bombjack,  0,        bombjack, bombjack, bombjack_state, empty_init, ROT90, "Tehkan",                  "Bomb Jack (set 1)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bombjack2, bombjack, bombjack, bombjack, bombjack_state, empty_init, ROT90, "Tehkan",                  "Bomb Jack (set 2)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1984, bombjackt, bombjack, bombjack, bombjack, bombjack_state, empty_init, ROT90, "Tehkan (Tecfri licence)", "Bomb Jack (Tecfri, Spain)", MACHINE_SUPPORTS_SAVE ) // official licence

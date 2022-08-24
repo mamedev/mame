@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Hau, Nicola Salmoria
+
 /******************************************************************************
 
   Ganbare Ginkun  (Japan)  (c)1995 TECMO
@@ -27,32 +28,334 @@ TODO:
 Notes:
 - To enter into service mode in Final Star Force press and hold start
   buttons 1 and 2 during P.O.S.T.
-- The games seem to be romswaps. At least you can swap Riot roms on the pcb
+- The games seem to be romswaps. At least you can swap Riot ROMs on the PCB
   with Final Star Force and it'll work without problems.
 
 ******************************************************************************/
 
 #include "emu.h"
-#include "tecmo16.h"
+
+#include "tecmo_spr.h"
+#include "tecmo_mix.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
-#include "speaker.h"
+#include "video/bufsprite.h"
 
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
+#include "tilemap.h"
+
+
+namespace {
+
+class tecmo16_state : public driver_device
+{
+public:
+	tecmo16_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_sprgen(*this, "spritegen"),
+		m_mixer(*this, "mixer"),
+		m_videoram(*this, "videoram%u", 1U),
+		m_colorram(*this, "colorram%u", 1U),
+		m_charram(*this, "charram"),
+		m_spriteram(*this, "spriteram")
+	{ }
+
+	void base(machine_config &config);
+	void ginkun(machine_config &config);
+	void riot(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<tecmo_spr_device> m_sprgen;
+	required_device<tecmo_mix_device> m_mixer;
+
+	required_shared_ptr_array<uint16_t, 2> m_videoram;
+	required_shared_ptr_array<uint16_t, 2> m_colorram;
+	required_shared_ptr<uint16_t> m_charram;
+	required_device<buffered_spriteram16_device> m_spriteram;
+
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_tx_tilemap = nullptr;
+	bitmap_ind16 m_sprite_bitmap;
+	bitmap_ind16 m_tile_bitmap_bg;
+	bitmap_ind16 m_tile_bitmap_fg;
+	bitmap_ind16 m_tile_bitmap_tx;
+	uint8_t m_game_is_riot = 0;
+	uint16_t m_scroll_x[2]{};
+	uint16_t m_scroll_y[2]{};
+	uint16_t m_scroll_char_x = 0;
+	uint16_t m_scroll_char_y = 0;
+
+	template <uint8_t Which> void videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	template <uint8_t Which> void colorram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void charram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void flipscreen_w(uint16_t data);
+	template <uint8_t Which> void scroll_x_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	template <uint8_t Which> void scroll_y_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void scroll_char_x_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void scroll_char_y_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	void irq_150021_w(uint16_t data);
+	void irq_150031_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+
+	TILE_GET_INFO_MEMBER(fg_get_tile_info);
+	TILE_GET_INFO_MEMBER(bg_get_tile_info);
+	TILE_GET_INFO_MEMBER(tx_get_tile_info);
+
+	DECLARE_VIDEO_START(ginkun);
+	DECLARE_VIDEO_START(riot);
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+
+	void save_state();
+	void common_map(address_map& map);
+	void fstarfrc_map(address_map &map);
+	void ginkun_map(address_map &map);
+	void sound_map(address_map &map);
+};
+
+
+// video
+
+// Based on sprite drivers from tehkan/wc90.cpp by Ernesto Corvi (ernesto@imagina.com)
+
+
+void tecmo16_state::save_state()
+{
+	save_item(NAME(m_scroll_x));
+	save_item(NAME(m_scroll_y));
+	save_item(NAME(m_scroll_char_x));
+	save_item(NAME(m_scroll_char_y));
+}
+
+TILE_GET_INFO_MEMBER(tecmo16_state::fg_get_tile_info)
+{
+	int const tile = m_videoram[0][tile_index] & 0x1fff;
+	int const color = m_colorram[0][tile_index] & 0x1f;
+
+	// bit 4 controls blending
+	//tileinfo.category = (m_colorram[0][tile_index] & 0x10) >> 4;
+
+	tileinfo.set(1,
+			tile,
+			color,
+			0);
+}
+
+TILE_GET_INFO_MEMBER(tecmo16_state::bg_get_tile_info)
+{
+	int const tile = m_videoram[1][tile_index] & 0x1fff;
+	int const color = (m_colorram[1][tile_index] & 0x0f);
+
+	tileinfo.set(1,
+			tile,
+			color,
+			0);
+}
+
+TILE_GET_INFO_MEMBER(tecmo16_state::tx_get_tile_info)
+{
+	int const tile = m_charram[tile_index];
+	tileinfo.set(0,
+			tile & 0x0fff,
+			tile >> 12,
+			0);
+}
+
+/******************************************************************************/
+
+void tecmo16_state::video_start()
+{
+	// set up tile layers
+	m_screen->register_screen_bitmap(m_tile_bitmap_bg);
+	m_screen->register_screen_bitmap(m_tile_bitmap_fg);
+	m_screen->register_screen_bitmap(m_tile_bitmap_tx);
+
+	// set up sprites
+	m_screen->register_screen_bitmap(m_sprite_bitmap);
+
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tecmo16_state::fg_get_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 32,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tecmo16_state::bg_get_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 32,32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tecmo16_state::tx_get_tile_info)), TILEMAP_SCAN_ROWS,  8, 8, 64,32);
+
+	m_fg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_transparent_pen(0);
+	m_tx_tilemap->set_transparent_pen(0);
+
+	m_tx_tilemap->set_scrolly(0,-16);
+	m_game_is_riot = 0;
+
+	save_state();
+}
+
+VIDEO_START_MEMBER(tecmo16_state, ginkun)
+{
+	// set up tile layers
+	m_screen->register_screen_bitmap(m_tile_bitmap_bg);
+	m_screen->register_screen_bitmap(m_tile_bitmap_fg);
+	m_screen->register_screen_bitmap(m_tile_bitmap_tx);
+
+	// set up sprites
+	m_screen->register_screen_bitmap(m_sprite_bitmap);
+
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tecmo16_state::fg_get_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 64,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tecmo16_state::bg_get_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 64,32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tecmo16_state::tx_get_tile_info)), TILEMAP_SCAN_ROWS,  8, 8, 64,32);
+
+	m_fg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_transparent_pen(0);
+	m_tx_tilemap->set_transparent_pen(0);
+	m_game_is_riot = 0;
+
+	save_state();
+}
+
+VIDEO_START_MEMBER(tecmo16_state, riot)
+{
+	// set up tile layers
+	m_screen->register_screen_bitmap(m_tile_bitmap_bg);
+	m_screen->register_screen_bitmap(m_tile_bitmap_fg);
+	m_screen->register_screen_bitmap(m_tile_bitmap_tx);
+
+	// set up sprites
+	m_screen->register_screen_bitmap(m_sprite_bitmap);
+
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tecmo16_state::fg_get_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 64,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tecmo16_state::bg_get_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 64,32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tecmo16_state::tx_get_tile_info)), TILEMAP_SCAN_ROWS,  8, 8, 64,32);
+
+	m_fg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_transparent_pen(0);
+	m_tx_tilemap->set_transparent_pen(0);
+	m_tx_tilemap->set_scrolldy(-16,-16);
+	m_game_is_riot = 1;
+
+	save_state();
+}
+
+/******************************************************************************/
+
+template <uint8_t Which>
+void tecmo16_state::videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_videoram[Which][offset]);
+	Which ? m_bg_tilemap->mark_tile_dirty(offset) : m_fg_tilemap->mark_tile_dirty(offset);
+}
+
+template <uint8_t Which>
+void tecmo16_state::colorram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_colorram[Which][offset]);
+	Which ? m_bg_tilemap->mark_tile_dirty(offset) : m_fg_tilemap->mark_tile_dirty(offset);
+}
+
+void tecmo16_state::charram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_charram[offset]);
+	m_tx_tilemap->mark_tile_dirty(offset);
+}
+
+void tecmo16_state::flipscreen_w(uint16_t data)
+{
+	flip_screen_set(data & 0x01);
+}
+
+/******************************************************************************/
+
+template <uint8_t Which>
+void tecmo16_state::scroll_x_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_scroll_x[Which]);
+	Which ? m_bg_tilemap->set_scrollx(0, m_scroll_x[1]) : m_fg_tilemap->set_scrollx(0, m_scroll_x[0]);
+}
+
+template <uint8_t Which>
+void tecmo16_state::scroll_y_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_scroll_y[Which]);
+	Which ? m_bg_tilemap->set_scrolly(0, m_scroll_y[1]) : m_fg_tilemap->set_scrolly(0, m_scroll_y[0]);
+}
+
+void tecmo16_state::scroll_char_x_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_scroll_char_x);
+	m_tx_tilemap->set_scrollx(0, m_scroll_char_x);
+}
+
+void tecmo16_state::scroll_char_y_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_scroll_char_y);
+	m_tx_tilemap->set_scrolly(0, m_scroll_char_y - 16);
+}
+
+/******************************************************************************/
+
+
+/******************************************************************************/
+
+uint32_t tecmo16_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	m_tile_bitmap_bg.fill(0, cliprect);
+	m_tile_bitmap_fg.fill(0, cliprect);
+	m_tile_bitmap_tx.fill(0, cliprect);
+	bitmap.fill(0, cliprect);
+
+	m_bg_tilemap->draw(screen, m_tile_bitmap_bg, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, m_tile_bitmap_fg, cliprect, 0, 0);
+	m_tx_tilemap->draw(screen, m_tile_bitmap_tx, cliprect, 0, 0);
+
+	m_mixer->mix_bitmaps(screen, bitmap, cliprect, *m_palette, &m_tile_bitmap_bg, &m_tile_bitmap_fg, &m_tile_bitmap_tx, &m_sprite_bitmap);
+
+	return 0;
+}
+
+WRITE_LINE_MEMBER(tecmo16_state::screen_vblank)
+{
+	if (state)
+	{
+		const rectangle visarea = m_screen->visible_area();
+		// 2 frame sprite lags
+		m_sprite_bitmap.fill(0, visarea);
+		if (m_game_is_riot)  m_sprgen->gaiden_draw_sprites(*m_screen, m_gfxdecode->gfx(2), visarea, m_spriteram->buffer(), 0, 0, flip_screen(), m_sprite_bitmap);
+		else m_sprgen->gaiden_draw_sprites(*m_screen, m_gfxdecode->gfx(2), visarea, m_spriteram->buffer(), 2, 0, flip_screen(), m_sprite_bitmap);
+
+		m_spriteram->copy();
+	}
+}
+
+
+// machine
 
 /******************************************************************************/
 
 
 /*
 (without setting D0)
-move.b D0, $150031.l  (start of interupt)
+move.b D0, $150031.l  (start of interrupt)
 move.b D0, $150021.l  (end of interrupt in riot, straight after above in ginkun, not used in fstarfrc?)
 */
 
-void tecmo16_state::irq_150021_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void tecmo16_state::irq_150021_w(uint16_t data)
 {
 	// does this disable the vblank IRQ until next frame? fstarfrc expects multiple interrupts per
 	// frame and never writes it, while the others do. riot will start to glitch towards the end
@@ -69,7 +372,7 @@ void tecmo16_state::irq_150031_w(offs_t offset, uint16_t data, uint16_t mem_mask
 void tecmo16_state::common_map(address_map& map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x100000, 0x103fff).ram(); /* Main RAM */
+	map(0x100000, 0x103fff).ram(); // Main RAM
 
 	// tilemap sizes differ between games, probably configurable
 	// but for now we add them in different maps
@@ -82,37 +385,37 @@ void tecmo16_state::common_map(address_map& map)
 	map(0x150030, 0x150031).portr("DSW2").w(FUNC(tecmo16_state::irq_150031_w));
 	map(0x150040, 0x150041).portr("DSW1");
 	map(0x150050, 0x150051).portr("P1_P2");
-//  map(0x160000, 0x160001).nopr();   /* ??? Read at every scene changes */
+//  map(0x160000, 0x160001).nopr();   // ??? Read at every scene changes
 	map(0x160000, 0x160001).w(FUNC(tecmo16_state::scroll_char_x_w));
 	map(0x160006, 0x160007).w(FUNC(tecmo16_state::scroll_char_y_w));
-	map(0x16000c, 0x16000d).w(FUNC(tecmo16_state::scroll_x_w));
-	map(0x160012, 0x160013).w(FUNC(tecmo16_state::scroll_y_w));
-	map(0x160018, 0x160019).w(FUNC(tecmo16_state::scroll2_x_w));
-	map(0x16001e, 0x16001f).w(FUNC(tecmo16_state::scroll2_y_w));
+	map(0x16000c, 0x16000d).w(FUNC(tecmo16_state::scroll_x_w<0>));
+	map(0x160012, 0x160013).w(FUNC(tecmo16_state::scroll_y_w<0>));
+	map(0x160018, 0x160019).w(FUNC(tecmo16_state::scroll_x_w<1>));
+	map(0x16001e, 0x16001f).w(FUNC(tecmo16_state::scroll_y_w<1>));
 }
 
 
 
 void tecmo16_state::fstarfrc_map(address_map &map)
 {
-	map(0x110000, 0x110fff).ram().w(FUNC(tecmo16_state::charram_w)).share("charram");
-	map(0x120000, 0x1207ff).ram().w(FUNC(tecmo16_state::videoram_w)).share("videoram");
-	map(0x120800, 0x120fff).ram().w(FUNC(tecmo16_state::colorram_w)).share("colorram");
-	map(0x121000, 0x1217ff).ram().w(FUNC(tecmo16_state::videoram2_w)).share("videoram2");
-	map(0x121800, 0x121fff).ram().w(FUNC(tecmo16_state::colorram2_w)).share("colorram2");
-	map(0x122000, 0x127fff).ram(); /* work area */
+	map(0x110000, 0x110fff).ram().w(FUNC(tecmo16_state::charram_w)).share(m_charram);
+	map(0x120000, 0x1207ff).ram().w(FUNC(tecmo16_state::videoram_w<0>)).share(m_videoram[0]);
+	map(0x120800, 0x120fff).ram().w(FUNC(tecmo16_state::colorram_w<0>)).share(m_colorram[0]);
+	map(0x121000, 0x1217ff).ram().w(FUNC(tecmo16_state::videoram_w<1>)).share(m_videoram[1]);
+	map(0x121800, 0x121fff).ram().w(FUNC(tecmo16_state::colorram_w<1>)).share(m_colorram[1]);
+	map(0x122000, 0x127fff).ram(); // work area
 
 	common_map(map);
 }
 
 void tecmo16_state::ginkun_map(address_map &map)
 {
-	map(0x110000, 0x110fff).ram().w(FUNC(tecmo16_state::charram_w)).share("charram");
-	map(0x120000, 0x120fff).ram().w(FUNC(tecmo16_state::videoram_w)).share("videoram");
-	map(0x121000, 0x121fff).ram().w(FUNC(tecmo16_state::colorram_w)).share("colorram");
-	map(0x122000, 0x122fff).ram().w(FUNC(tecmo16_state::videoram2_w)).share("videoram2");
-	map(0x123000, 0x123fff).ram().w(FUNC(tecmo16_state::colorram2_w)).share("colorram2");
-	map(0x124000, 0x124fff).ram(); /* extra RAM for Riot */
+	map(0x110000, 0x110fff).ram().w(FUNC(tecmo16_state::charram_w)).share(m_charram);
+	map(0x120000, 0x120fff).ram().w(FUNC(tecmo16_state::videoram_w<0>)).share(m_videoram[0]);
+	map(0x121000, 0x121fff).ram().w(FUNC(tecmo16_state::colorram_w<0>)).share(m_colorram[0]);
+	map(0x122000, 0x122fff).ram().w(FUNC(tecmo16_state::videoram_w<1>)).share(m_videoram[1]);
+	map(0x123000, 0x123fff).ram().w(FUNC(tecmo16_state::colorram_w<1>)).share(m_colorram[1]);
+	map(0x124000, 0x124fff).ram(); // extra RAM for Riot
 
 	common_map(map);
 }
@@ -120,7 +423,7 @@ void tecmo16_state::ginkun_map(address_map &map)
 void tecmo16_state::sound_map(address_map &map)
 {
 	map(0x0000, 0xefff).rom();
-	map(0xf000, 0xfbff).ram(); /* Sound RAM */
+	map(0xf000, 0xfbff).ram(); // Sound RAM
 	map(0xfc00, 0xfc00).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xfc04, 0xfc05).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xfc08, 0xfc08).r("soundlatch", FUNC(generic_latch_8_device::read));
@@ -196,7 +499,7 @@ static INPUT_PORTS_START( fstarfrc )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_COIN2 )
 
 	PORT_START("EXTRA")
-	/* Not used */
+	// Not used
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ginkun )
@@ -239,7 +542,7 @@ static INPUT_PORTS_START( ginkun )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )      /* Doesn't work? */
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )      // Doesn't work?
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )      PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
@@ -267,7 +570,7 @@ static INPUT_PORTS_START( ginkun )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_COIN2 )
 
 	PORT_START("EXTRA")
-	/* Not used */
+	// Not used
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( riot )
@@ -349,28 +652,28 @@ INPUT_PORTS_END
 /******************************************************************************/
 
 static GFXDECODE_START( gfx_tecmo16 )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,         1*16*16,    16 )
-	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0, 0x100 )
-	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_packed_msb,               0, 0x100 )
+	GFXDECODE_ENTRY( "fgtiles", 0, gfx_8x8x4_packed_msb,         1*16*16,    16 )
+	GFXDECODE_ENTRY( "bgtiles", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0, 0x100 )
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_packed_msb,               0, 0x100 )
 GFXDECODE_END
 
 /******************************************************************************/
 
-#define MASTER_CLOCK XTAL(24'000'000)
-#define OKI_CLOCK XTAL(8'000'000)
-
 void tecmo16_state::base(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, MASTER_CLOCK/2);          /* 12MHz */
+	static constexpr XTAL MASTER_CLOCK = XTAL(24'000'000);
+	static constexpr XTAL OKI_CLOCK = XTAL(8'000'000);
+
+	// basic machine hardware
+	M68000(config, m_maincpu, MASTER_CLOCK / 2);          // 12 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &tecmo16_state::fstarfrc_map);
 
-	Z80(config, m_audiocpu, MASTER_CLOCK/6);         /* 4MHz */
+	Z80(config, m_audiocpu, MASTER_CLOCK / 6);         // 4 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tecmo16_state::sound_map);
-								/* NMIs are triggered by the main CPU */
+								// NMIs are triggered by the main CPU
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	/* video hardware */
+	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -388,14 +691,14 @@ void tecmo16_state::base(machine_config &config)
 	TECMO_SPRITE(config, m_sprgen, 0);
 
 	TECMO_MIXER(config, m_mixer, 0);
-	m_mixer->set_mixer_shifts(10,9,4);
+	m_mixer->set_mixer_shifts(10, 9, 4);
 	m_mixer->set_blendcols(   0x0400 + 0x300, 0x0400 + 0x200, 0x0400 + 0x100, 0x0400 + 0x000 );
 	m_mixer->set_regularcols( 0x0000 + 0x300, 0x0000 + 0x200, 0x0000 + 0x100, 0x0000 + 0x000 );
 	m_mixer->set_blendsource( 0x0800 + 0x000, 0x0800 + 0x100); // riot seems to set palettes in 0x800 + 0x200, could be more to this..
 	m_mixer->set_revspritetile();
 	m_mixer->set_bgpen(0x000 + 0x300, 0x400 + 0x300);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
@@ -406,7 +709,7 @@ void tecmo16_state::base(machine_config &config)
 	ymsnd.add_route(0, "lspeaker", 0.60);
 	ymsnd.add_route(1, "rspeaker", 0.60);
 
-	okim6295_device &oki(OKIM6295(config, "oki", OKI_CLOCK/8, okim6295_device::PIN7_HIGH)); // sample rate 1 MHz / 132
+	okim6295_device &oki(OKIM6295(config, "oki", OKI_CLOCK / 8, okim6295_device::PIN7_HIGH)); // sample rate 1 MHz / 132
 	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.40);
 	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.40);
 }
@@ -417,15 +720,14 @@ void tecmo16_state::ginkun(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &tecmo16_state::ginkun_map);
 
-	MCFG_VIDEO_START_OVERRIDE(tecmo16_state,ginkun)
+	MCFG_VIDEO_START_OVERRIDE(tecmo16_state, ginkun)
 }
 
 void tecmo16_state::riot(machine_config &config)
 {
 	ginkun(config);
 
-	/* basic machine hardware */
-	MCFG_VIDEO_START_OVERRIDE(tecmo16_state,riot)
+	MCFG_VIDEO_START_OVERRIDE(tecmo16_state, riot)
 }
 
 /******************************************************************************/
@@ -438,14 +740,14 @@ ROM_START( fstarfrc )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "fstarf07.rom", 0x00000, 0x10000, CRC(e0ad5de1) SHA1(677237341e837061b6cc02200c0752964caed907) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_REGION( 0x20000, "fgtiles", 0 )
 	ROM_LOAD( "fstarf03.rom", 0x00000, 0x20000, CRC(54375335) SHA1(d1af56a7c7fff877066dad3144d0b5147da28c6a) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_REGION( 0x100000, "bgtiles", 0 )
 	ROM_LOAD16_BYTE( "fstarf05.rom", 0x00000, 0x80000, CRC(77a281e7) SHA1(a87a90c2c856d45785cb56185b1a7dff3404b5cb) )
 	ROM_LOAD16_BYTE( "fstarf04.rom", 0x00001, 0x80000, CRC(398a920d) SHA1(eecc167803f48517348d68ce70f15e87eac204bb) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )
+	ROM_REGION( 0x100000, "sprites", 0 )
 	ROM_LOAD16_BYTE( "fstarf09.rom", 0x00000, 0x80000, CRC(d51341d2) SHA1(e46c319158046d407d4387cb2d8f0b6cfd7be576) )
 	ROM_LOAD16_BYTE( "fstarf06.rom", 0x00001, 0x80000, CRC(07e40e87) SHA1(22867e52a8267ae8ae0ff0dba6bb846cb3e1b63d) )
 
@@ -461,14 +763,14 @@ ROM_START( fstarfrcj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "fstarf07.rom", 0x00000, 0x10000, CRC(e0ad5de1) SHA1(677237341e837061b6cc02200c0752964caed907) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_REGION( 0x20000, "fgtiles", 0 )
 	ROM_LOAD( "fstarf03.rom", 0x00000, 0x20000, CRC(54375335) SHA1(d1af56a7c7fff877066dad3144d0b5147da28c6a) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_REGION( 0x100000, "bgtiles", 0 )
 	ROM_LOAD16_BYTE( "fstarf05.rom", 0x00000, 0x80000, CRC(77a281e7) SHA1(a87a90c2c856d45785cb56185b1a7dff3404b5cb) )
 	ROM_LOAD16_BYTE( "fstarf04.rom", 0x00001, 0x80000, CRC(398a920d) SHA1(eecc167803f48517348d68ce70f15e87eac204bb) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )
+	ROM_REGION( 0x100000, "sprites", 0 )
 	ROM_LOAD16_BYTE( "fstarf09.rom", 0x00000, 0x80000, CRC(d51341d2) SHA1(e46c319158046d407d4387cb2d8f0b6cfd7be576) )
 	ROM_LOAD16_BYTE( "fstarf06.rom", 0x00001, 0x80000, CRC(07e40e87) SHA1(22867e52a8267ae8ae0ff0dba6bb846cb3e1b63d) )
 
@@ -484,14 +786,14 @@ ROM_START( fstarfrcja ) // very minor differences with fstarfrcj
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "fstarf07.rom", 0x00000, 0x10000, CRC(e0ad5de1) SHA1(677237341e837061b6cc02200c0752964caed907) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_REGION( 0x20000, "fgtiles", 0 )
 	ROM_LOAD( "fstarf03.rom", 0x00000, 0x20000, CRC(54375335) SHA1(d1af56a7c7fff877066dad3144d0b5147da28c6a) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_REGION( 0x100000, "bgtiles", 0 )
 	ROM_LOAD16_BYTE( "fstarf05.rom", 0x00000, 0x80000, CRC(77a281e7) SHA1(a87a90c2c856d45785cb56185b1a7dff3404b5cb) )
 	ROM_LOAD16_BYTE( "fstarf04.rom", 0x00001, 0x80000, CRC(398a920d) SHA1(eecc167803f48517348d68ce70f15e87eac204bb) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )
+	ROM_REGION( 0x100000, "sprites", 0 )
 	ROM_LOAD16_BYTE( "fstarf09.rom", 0x00000, 0x80000, CRC(d51341d2) SHA1(e46c319158046d407d4387cb2d8f0b6cfd7be576) )
 	ROM_LOAD16_BYTE( "fstarf06.rom", 0x00001, 0x80000, CRC(07e40e87) SHA1(22867e52a8267ae8ae0ff0dba6bb846cb3e1b63d) )
 
@@ -507,14 +809,14 @@ ROM_START( fstarfrcw )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "fstarf07.rom", 0x00000, 0x10000, CRC(e0ad5de1) SHA1(677237341e837061b6cc02200c0752964caed907) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_REGION( 0x20000, "fgtiles", 0 )
 	ROM_LOAD( "fstarf03.rom", 0x00000, 0x20000, CRC(54375335) SHA1(d1af56a7c7fff877066dad3144d0b5147da28c6a) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_REGION( 0x100000, "bgtiles", 0 )
 	ROM_LOAD16_BYTE( "fstarf05.rom", 0x00000, 0x80000, CRC(77a281e7) SHA1(a87a90c2c856d45785cb56185b1a7dff3404b5cb) )
 	ROM_LOAD16_BYTE( "fstarf04.rom", 0x00001, 0x80000, CRC(398a920d) SHA1(eecc167803f48517348d68ce70f15e87eac204bb) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )
+	ROM_REGION( 0x100000, "sprites", 0 )
 	ROM_LOAD16_BYTE( "fstarf09.rom", 0x00000, 0x80000, CRC(d51341d2) SHA1(e46c319158046d407d4387cb2d8f0b6cfd7be576) )
 	ROM_LOAD16_BYTE( "fstarf06.rom", 0x00001, 0x80000, CRC(07e40e87) SHA1(22867e52a8267ae8ae0ff0dba6bb846cb3e1b63d) )
 
@@ -530,14 +832,14 @@ ROM_START( ginkun )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "ginkun07.i17", 0x00000, 0x10000, CRC(8836b1aa) SHA1(22bd5258e5971aa69eaa516d7358d87fbb65bee4) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_REGION( 0x20000, "fgtiles", 0 )
 	ROM_LOAD( "ginkun03.i03", 0x00000, 0x20000, CRC(4456e0df) SHA1(1509474cfbb208502262b7039e28d37be1131a46) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_REGION( 0x100000, "bgtiles", 0 )
 	ROM_LOAD16_BYTE( "ginkun05.i09", 0x00000, 0x80000, CRC(1263bd42) SHA1(bff93633d42bae5b8273465e16bdb4db81bbd6e0) )
 	ROM_LOAD16_BYTE( "ginkun04.i05", 0x00001, 0x80000, CRC(9e4cf611) SHA1(57242f0aac49e0569a57372e59ccc643924e9b44) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )
+	ROM_REGION( 0x100000, "sprites", 0 )
 	ROM_LOAD16_BYTE( "ginkun09.i22", 0x00000, 0x80000, CRC(233384b9) SHA1(031735b0fb2c89b0af26ba76061776767647c59c) )
 	ROM_LOAD16_BYTE( "ginkun06.i16", 0x00001, 0x80000, CRC(f8589184) SHA1(b933265960742cb3505eb73631ec419b7e1d1d63) )
 
@@ -660,14 +962,14 @@ ROM_START( riot )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "7.ic17", 0x00000, 0x10000, CRC(0a95b8f3) SHA1(cc6bdeeeb184eb4f3867eb9c961b0b82743fac9f) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_REGION( 0x20000, "fgtiles", 0 )
 	ROM_LOAD( "3.ic3", 0x00000, 0x20000, CRC(f60f5c96) SHA1(56ea21f22d3cf47071bfb3555b331a676463b63e) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_REGION( 0x100000, "bgtiles", 0 )
 	ROM_LOAD16_BYTE( "5.ic9", 0x00000, 0x80000, CRC(056fce78) SHA1(25234fa0282fdbefefb06e6aa5a467f9d08ed534) )
 	ROM_LOAD16_BYTE( "4.ic5", 0x00001, 0x80000, CRC(0894e7b4) SHA1(37a04476770942f292d836997c649a343f71e317) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )
+	ROM_REGION( 0x100000, "sprites", 0 )
 	ROM_LOAD16_BYTE( "9.ic22", 0x00000, 0x80000, CRC(0ead54f3) SHA1(4848eb158d9e2279332225e0b25f1c96a8a5a0c4) )
 	ROM_LOAD16_BYTE( "6.ic16", 0x00001, 0x80000, CRC(96ef61da) SHA1(c306e4d1eee19af0229a47c2f115f98c74f33d33) )
 
@@ -683,20 +985,23 @@ ROM_START( riotw )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "7.ic17", 0x00000, 0x10000, CRC(0a95b8f3) SHA1(cc6bdeeeb184eb4f3867eb9c961b0b82743fac9f) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_REGION( 0x20000, "fgtiles", 0 )
 	ROM_LOAD( "3.ic3", 0x00000, 0x20000, CRC(f60f5c96) SHA1(56ea21f22d3cf47071bfb3555b331a676463b63e) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_REGION( 0x100000, "bgtiles", 0 )
 	ROM_LOAD16_BYTE( "5.ic9", 0x00000, 0x80000, CRC(056fce78) SHA1(25234fa0282fdbefefb06e6aa5a467f9d08ed534) )
 	ROM_LOAD16_BYTE( "4.ic5", 0x00001, 0x80000, CRC(0894e7b4) SHA1(37a04476770942f292d836997c649a343f71e317) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )
+	ROM_REGION( 0x100000, "sprites", 0 )
 	ROM_LOAD16_BYTE( "9.ic22", 0x00000, 0x80000, CRC(0ead54f3) SHA1(4848eb158d9e2279332225e0b25f1c96a8a5a0c4) )
 	ROM_LOAD16_BYTE( "6.ic16", 0x00001, 0x80000, CRC(96ef61da) SHA1(c306e4d1eee19af0229a47c2f115f98c74f33d33) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "8.ic18", 0x00000, 0x20000, CRC(4b70e266) SHA1(4ed23de9223cc7359fbaff9dd500ef6daee00fb0) )
 ROM_END
+
+} // anonymous namespace
+
 
 /******************************************************************************/
 

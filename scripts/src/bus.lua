@@ -3274,7 +3274,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/generic/slot.h,BUSES["MONONCOL"] = true
+--@src/devices/bus/mononcol/slot.h,BUSES["MONONCOL"] = true
 ---------------------------------------------------
 
 if (BUSES["MONONCOL"]~=null) then
@@ -3685,12 +3685,14 @@ end
 
 if (BUSES["GAMEBOY"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/gameboy/carts.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/carts.h",
+		MAME_DIR .. "src/devices/bus/gameboy/mbc.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/mbc.h",
 		MAME_DIR .. "src/devices/bus/gameboy/gb_slot.cpp",
 		MAME_DIR .. "src/devices/bus/gameboy/gb_slot.h",
 		MAME_DIR .. "src/devices/bus/gameboy/rom.cpp",
 		MAME_DIR .. "src/devices/bus/gameboy/rom.h",
-		MAME_DIR .. "src/devices/bus/gameboy/mbc.cpp",
-		MAME_DIR .. "src/devices/bus/gameboy/mbc.h",
 	}
 end
 

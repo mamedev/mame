@@ -1,0 +1,118 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="kpython2" description="Python 2 upgrade DVD-ROM images">
+
+	<software name="gtrfrkv2">
+		<description>GuitarFreaks V2 (JAA/AAA)</description>
+		<year>2005</year>
+		<publisher>Konami</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="f03jaa03" sha1="4efd2b6cc771ce2ccb3f266803f1c71e804f793f" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="drmnv2">
+		<description>DrumMania V2 (JAA/AAA)</description>
+		<year>2005</year>
+		<publisher>Konami</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="f02jaa03" sha1="f2d05ca3e1b6bedf528fe1b79cd180de319d90a1" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="gtrfrkv2b">
+		<description>GuitarFreaks V2 Version 1.01 (JAA/AAA)</description>
+		<year>2005</year>
+		<publisher>Konami</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="f03jab03" sha1="bf751781d64f561ce5e7b8a5be5974b299301c14" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="drmnv2b">
+		<description>DrumMania V2 Version 1.01 (JAA/AAA)</description>
+		<year>2005</year>
+		<publisher>Konami</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="f02jab03" sha1="e925fc7439386f317749adf8100b56c4e2f8125d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="gtrfrkv3">
+		<description>GuitarFreaks V3 (JAA/AAA)</description>
+		<year>2006</year>
+		<publisher>Konami</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="f33jaa03" sha1="58cd27f49dbdf9fd449adf1d8bc8ec99ea8f03e7" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="drmnv3">
+		<description>DrumMania V3 (JAA/AAA)</description>
+		<year>2006</year>
+		<publisher>Konami</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="f32jaa03" sha1="c659710e70a74f15b2761d85a44c2f51f3a44e0f" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ddrsnu">
+		<description>Dance Dance Revolution SuperNOVA Install Disk (UAA)</description>
+		<year>2006</year>
+		<publisher>Konami</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="fdhuaa03" sha1="476bd58f4d68d2d14568d24d2d3ee1a67a04576d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dstagesn">
+		<description>Dancing Stage SuperNOVA Install Disk (EAA)</description>
+		<year>2006</year>
+		<publisher>Konami</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="fdheaa03" sha1="b2cb31716bf98b09cdef4dae99658b43e7e53dd5" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ddrsn2j">
+		<description>Dance Dance Revolution SuperNOVA 2 Install Disk (JAA/AAA)</description>
+		<year>2007</year>
+		<publisher>Konami</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="gdjjaa03" sha1="3ccf04f254df88b9aed8c1ef4214cd62a1927f97" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ddrsn2u">
+		<description>Dance Dance Revolution SuperNOVA 2 Install Disk (UAA)</description>
+		<year>2007</year>
+		<publisher>Konami</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="gdjuaa03" sha1="67d93c426d60b042432440cb5ac076987f73dbf5" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

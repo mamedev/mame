@@ -1477,7 +1477,7 @@ end
 
 --------------------------------------------------
 --
---@src/devices/machine/acorn_ioc.h,MACHINES["GENERIC_SPI_FLASH"] = true
+--@src/devices/machine/generic_spi_flash.h,MACHINES["GENERIC_SPI_FLASH"] = true
 --------------------------------------------------
 
 if (MACHINES["GENERIC_SPI_FLASH"]~=null) then

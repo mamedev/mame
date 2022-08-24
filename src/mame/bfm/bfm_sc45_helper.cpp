@@ -294,8 +294,6 @@ int find_input_strings(running_machine &machine)
 		{ -1, -1, -1, -1, -1, -1, -1, -1,    -1, -1, -1, -1, -1, -1, -1, -1, }
 	};
 
-	int buttons_used = 1;
-
 	printf("INPUT_PORTS_START( %s ) // this structure is generated\n", machine.system().name);
 	printf("    PORT_INCLUDE( sc4_base )\n");
 
@@ -316,7 +314,6 @@ int find_input_strings(running_machine &machine)
 				if (ignoreports[i][j] > 0)
 				{
 					printf("    PORT_BIT( 0x%04x, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_%d_%d ) PORT_NAME(\"%s\")\n", 1 << j, i,j/*ignoreports[i][j]*/, sc4inputs[i][j].name.c_str());
-					buttons_used++;
 				}
 				else if (ignoreports[i][j] == -3)
 				{
@@ -358,7 +355,6 @@ int find_input_strings(running_machine &machine)
 				{
 					printf("    // 0x%04x - \"%s\" // known extended(?) input, sometimes 'hop top'\n", 1 << j, sc4inputs[i][j].name.c_str());
 				}
-				buttons_used++;
 			}
 		}
 	}
@@ -450,11 +446,6 @@ int find_lamp_strings(running_machine &machine)
 
 		}
 	}
-
-
-
-
-
 
 
 
