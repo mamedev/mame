@@ -397,7 +397,10 @@ TODO:
 
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 
+
+namespace {
 
 class kpython2_state : public driver_device
 {
@@ -1138,6 +1141,9 @@ void kpython2_state::kpython2(machine_config &config)
 	screen.set_visarea(0, 639, 0, 223);
 
 	PALETTE(config, "palette").set_entries(65536);
+
+	/* software list */
+	SOFTWARE_LIST(config, "upgrade_dvds").set_original("kpython2");
 }
 
 #define KPYTHON2_BIOS  \
@@ -1866,6 +1872,8 @@ ROM_START(toysmarch2)
 	DISK_REGION("ide:0:hdd:image")
 	DISK_IMAGE("f00_jaa_2005110400", 0, BAD_DUMP SHA1(dbfcb12be4af67bb285e718b1efd6e829dacb35a))
 ROM_END
+
+} // anonymous namespace
 
 
 GAME(2005, kpython2, 0, kpython2, kpython2, kpython2_state, empty_init, ROT0, "Konami", "Konami Python 2 BIOS", MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT)
