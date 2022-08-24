@@ -1184,43 +1184,30 @@ void pokey_device::vol_init()
 
 void pokey_device::poly_init_4_5(uint32_t *poly, int size)
 {
-	int mask = (1 << size) - 1;
-	int i;
-	uint32_t lfsr = 0;
-
 	LOG_POLY(("poly %d\n", size));
 
-	if(size == 4)
+	int mask = (1 << size) - 1;
+	uint32_t lfsr = 0;
+
+	int const xorbit = size - 1;
+	for (int i = 0; i < mask; i++)
 	{
-		for( i = 0; i < mask; i++ )
-		{
-			lfsr = (lfsr+lfsr) + (~((lfsr >> 2) ^ (lfsr >> 3)) & 1);
-			*poly = lfsr & mask;
-			poly++;
-		}
-	}
-	else // size == 5
-	{
-		for( i = 0; i < mask; i++ )
-		{
-			lfsr = (lfsr+lfsr) + (~((lfsr >> 2) ^ (lfsr >> 4)) & 1);
-			*poly = lfsr & mask;
-			poly++;
-		}
+		lfsr = (lfsr << 1) | (~((lfsr >> 2) ^ (lfsr >> xorbit)) & 1);
+		*poly = lfsr & mask;
+		poly++;
 	}
 }
 
 void pokey_device::poly_init_9_17(uint32_t *poly, int size)
 {
-	int mask = (1 << size) - 1;
-	int i;
-	uint32_t lfsr = mask;
-
 	LOG_RAND(("rand %d\n", size));
+
+	int mask = (1 << size) - 1;
+	uint32_t lfsr = mask;
 
 	if (size == 17)
 	{
-		for( i = 0; i < mask; i++ )
+		for (int i = 0; i < mask; i++)
 		{
 			/* calculate next bit @ 7 */
 			int in8 = ((lfsr >> 8) & 1) ^ ((lfsr >> 13) & 1);
@@ -1235,7 +1222,7 @@ void pokey_device::poly_init_9_17(uint32_t *poly, int size)
 	}
 	else // size == 9
 	{
-		for( i = 0; i < mask; i++ )
+		for (int i = 0; i < mask; i++)
 		{
 			/* calculate next bit */
 			int in = ((lfsr >> 0) & 1) ^ ((lfsr >> 5) & 1);
