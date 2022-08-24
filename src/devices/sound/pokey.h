@@ -2,12 +2,13 @@
 // copyright-holders:Brad Oliver, Eric Smith, Juergen Buchmueller
 /*****************************************************************************
  *
- *  POKEY chip emulator 4.6
+ *  POKEY chip emulator 4.9
  *
  *  Based on original info found in Ron Fries' Pokey emulator,
  *  with additions by Brad Oliver, Eric Smith and Juergen Buchmueller.
  *  paddle (a/d conversion) details from the Atari 400/800 Hardware Manual.
  *  Polynomial algorithms according to info supplied by Perry McFarlane.
+ *  Additional improvements from Mike Saarna's A7800 MAME fork.
  *
  *****************************************************************************/
 

@@ -2,22 +2,23 @@
 // copyright-holders:Brad Oliver, Eric Smith, Juergen Buchmueller
 /*****************************************************************************
  *
- *  POKEY chip emulator 4.9 (a7800)
+ *  POKEY chip emulator 4.9
  *
  *  Based on original info found in Ron Fries' Pokey emulator,
  *  with additions by Brad Oliver, Eric Smith and Juergen Buchmueller,
  *  paddle (a/d conversion) details from the Atari 400/800 Hardware Manual.
  *  Polynomial algorithms according to info supplied by Perry McFarlane.
+ *  Additional improvements from Mike Saarna's A7800 MAME fork.
  *
- *  4.9 (a7800):
+ *  4.9:
  *  - Two-tone mode updated for better accuracy.
  *
- *  4.8 (a7800):
+ *  4.8:
  *  - Poly5 related modes had a pitch shift issue. The poly4/5 init routine
  *    was replaced with one based on Altira's implementation, which resolved
  *    the issue.
  *
- *  4.7 (a7800):
+ *  4.7:
  *    [1] https://www.virtualdub.org/downloads/Altirra%20Hardware%20Reference%20Manual.pdf
  *  - updated to reflect that borrowing cycle delays only impacts voices
  *    running at 1.79MHz. (+4 cycles unlinked, or +7 cycles linked)
