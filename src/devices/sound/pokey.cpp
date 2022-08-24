@@ -644,8 +644,7 @@ void pokey_device::step_one_clock(void)
 
 	if (m_channel[CHAN3].check_borrow())
 	{
-		int isJoined = (m_AUDCTL & CH34_JOINED);
-		if (isJoined)
+		if (m_AUDCTL & CH34_JOINED)
 			m_channel[CHAN4].inc_chan(1);
 		else
 			m_channel[CHAN3].reset_channel();
@@ -662,9 +661,7 @@ void pokey_device::step_one_clock(void)
 
 	if (m_channel[CHAN4].check_borrow())
 	{
-		int isJoined = (m_AUDCTL & CH34_JOINED);
-
-		if (isJoined)
+		if (m_AUDCTL & CH34_JOINED)
 			m_channel[CHAN3].reset_channel();
 		m_channel[CHAN4].reset_channel();
 		process_channel(CHAN4);
@@ -688,9 +685,7 @@ void pokey_device::step_one_clock(void)
 
 	if (m_channel[CHAN1].check_borrow())
 	{
-		int isJoined = (m_AUDCTL & CH12_JOINED);
-
-		if (isJoined)
+		if (m_AUDCTL & CH12_JOINED)
 			m_channel[CHAN2].inc_chan(1);
 		else
 			m_channel[CHAN1].reset_channel();
@@ -706,8 +701,7 @@ void pokey_device::step_one_clock(void)
 
 	if (m_channel[CHAN2].check_borrow())
 	{
-		int isJoined = (m_AUDCTL & CH12_JOINED);
-		if (isJoined)
+		if (m_AUDCTL & CH12_JOINED)
 			m_channel[CHAN1].reset_channel();
 
 		m_channel[CHAN2].reset_channel();
