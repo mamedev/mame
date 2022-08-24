@@ -242,7 +242,9 @@ license:CC0
 		<info name="alt_title" value="奥数实验室"/>
 		<part name="cart" interface="monon_color_cart">
 			<dataarea name="rom" size="0x0400000">
-				<rom name="207.bin" size="0x0400000" crc="6db7936d" sha1="09d52653bc41976de9ad0e424cf9cbfb58e711dc"/>
+				<!--<rom name="207.bin" size="0x0400000" crc="6db7936d" sha1="09d52653bc41976de9ad0e424cf9cbfb58e711dc"/>-->
+        <!-- the above ROM is cleaned of save data, but the ROM below, with the save area populated, was from a cartridge that had never been removed from packaging -->
+				<rom name="207.bin" size="0x0400000" crc="51728461" sha1="aad4bb82c20ab4706c64826c2f09bf59286255f0"/>
 			</dataarea>
 		</part>
 	</software>
