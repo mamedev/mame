@@ -9,6 +9,7 @@ the same. It's not known who developed/manufactured it. Probably not the
 mail company, but they can be considered the publisher.
 
 Hardware notes:
+- PCB label: IFVC-3224A
 - Zilog Z8400A or Sharp LH0080A, 11.0592MHz XTAL
 - 16KB ROM (4*2732), 1KB RAM (2*MSM2114L)
 - 2KB ROM (2716) for tiles, 1KB VRAM (2*MSM2114L), 1bpp video
@@ -211,13 +212,13 @@ void mmahjong_state::mmahjong(machine_config &config)
 
 ROM_START( mmahjong )
 	ROM_REGION( 0x4000, "maincpu", 0 )
-	ROM_LOAD( "ms_1", 0x0000, 0x1000, CRC(a1607ac8) SHA1(4e0d7a0482c7619ef25b12a7e02f5d03bea8ce6f) )
-	ROM_LOAD( "ms_2", 0x1000, 0x1000, CRC(cb1cab68) SHA1(88dc4808126528a269edf742062fa12e902be324) )
-	ROM_LOAD( "ms_3", 0x2000, 0x1000, CRC(2fdd4f55) SHA1(a9246239144c41fd38bd42015552b5afab40e55a) )
-	ROM_LOAD( "ms_4", 0x3000, 0x1000, CRC(cc550e36) SHA1(d66750ce6ddf6e4db4e5bd46a639494d8335a590) )
+	ROM_LOAD( "ms_1.10", 0x0000, 0x1000, CRC(a1607ac8) SHA1(4e0d7a0482c7619ef25b12a7e02f5d03bea8ce6f) )
+	ROM_LOAD( "ms_2.9",  0x1000, 0x1000, CRC(cb1cab68) SHA1(88dc4808126528a269edf742062fa12e902be324) )
+	ROM_LOAD( "ms_3.8",  0x2000, 0x1000, CRC(2fdd4f55) SHA1(a9246239144c41fd38bd42015552b5afab40e55a) )
+	ROM_LOAD( "ms_4.7",  0x3000, 0x1000, CRC(cc550e36) SHA1(d66750ce6ddf6e4db4e5bd46a639494d8335a590) )
 
 	ROM_REGION( 0x800, "tiles", 0 )
-	ROM_LOAD( "ms_a", 0x000, 0x800, CRC(d1dfe5c1) SHA1(5042b89555867db418f4aeef6b520619d8f533f2) )
+	ROM_LOAD( "ms_a.2", 0x000, 0x800, CRC(d1dfe5c1) SHA1(5042b89555867db418f4aeef6b520619d8f533f2) )
 ROM_END
 
 } // anonymous namespace
