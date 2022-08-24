@@ -6,7 +6,7 @@ license:CC0
 <softwarelist name="monon_color" description="M&amp;D Monon Color cartridges">
   <!-- Cartridges contain a serial flash ROM, and an epoxy blob.
        The blob contains game specific music, assuming it to be an MCU
-	   
+
        Note, games save data to 0x50000-0x6ffff, in an unused cart this area is always 0xff filled -->
 
   <!-- Known games list
@@ -30,7 +30,7 @@ license:CC0
     Laboratory Mathematica Olympiad                Àoshù shíyàn shì                            N       Y            NO. 207     PUZ/EDU         奥数实验室
     Logic Fight                                    Luójí pīn yī pīn                            Y       Y            NO. 301     PUZ/EDU         逻辑拼一拼
     Pleasant Goat and Big Big Wolf's comet battle  Xǐyángyáng yǔ huītàiláng-juézhàn miē xīng   Y       Y            NO. 302     PUZ/EDU         喜羊羊与灰太狼-决战咩星
-    Dragon Ball: The Martial Arts Conference       Lóngzhū-wǔdào dàhuì                         Y       Y            NO. 303     ACT             龙珠-武道大会
+    Dragon Ball: Budokai                           Lóngzhū-wǔdào dàhuì                         Y       Y            NO. 303     ACT             龙珠-武道大会
     League of Legends: The Ultimate Fight          Yīngxióng liánméng-zhōngjí gédòu            Y       Y            NO. 304     FTG             英雄联盟-终极格斗
     Ben 10: Alien Force                            ..                                          N       N?                       ACT             BEN 10: ALIEN FORCE
     DIGIMON                                        ..                                          N       N?                       RPG             DIGIMON
@@ -234,7 +234,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="drgnbma"> <!-- 303 - Dragon Ball: The Martial Arts Conference -->
+	<software name="drgnbma"> <!-- 303 - Dragon Ball: Budokai -->
 		<description>Lóngzhū-wǔdào dàhuì</description>
 		<year>2015</year>
 		<publisher>M&amp;D</publisher>
