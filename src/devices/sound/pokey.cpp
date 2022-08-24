@@ -255,13 +255,13 @@ void pokey_device::device_start()
 	 * with random values.
 	 */
 
-	m_KBCODE = 0x09;         /* Atari 800 'no key' */
+	m_KBCODE = 0x09; // Atari 800 'no key'
 	m_SKCTL = 0;
 
 	// TODO, remove this line:
-    m_SKCTL = SK_RESET;
-    // It's left in place to accomodate demos that don't explicitly reset pokey.
-    // See https://atariage.com/forums/topic/337317-a7800-52-release/ and
+	m_SKCTL = SK_RESET;
+	// It's left in place to accomodate demos that don't explicitly reset pokey.
+	// See https://atariage.com/forums/topic/337317-a7800-52-release/ and
 	// https://atariage.com/forums/topic/268458-a7800-the-atari-7800-emulator/?do=findComment&comment=5079170)
 
 	m_SKSTAT = 0;
@@ -1282,7 +1282,7 @@ char *pokey_device::audctl2str(int val)
 }
 
 pokey_device::pokey_channel::pokey_channel()
-	:   m_AUDF(0),
+	:	m_AUDF(0),
 		m_AUDC(0),
 		m_borrow_cnt(0),
 		m_counter(0),
