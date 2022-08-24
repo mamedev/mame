@@ -266,6 +266,6 @@ ROM_END
 
 } // anonymous namespace
 
-CONS( 198?, mimahjng,  0,    0,       mimahjng, mimahjng,  microcomputer_mahjong_state, empty_init, "<unknown>", "Microcomputer Mahjong", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 198?, mimahjng,  0,    0,       mimahjng, mimahjng,  microcomputer_mahjong_state, empty_init, "<unknown>", "Microcomputer Mahjong", MACHINE_NOT_WORKING )
 
 
