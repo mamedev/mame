@@ -40543,7 +40543,7 @@ superchsp                       // prototype
 superchsp2                      // prototype
 superchsu                       // D46 (c) 1992 Taito America Corporation (US)
 
-@source:misc/supercrd.cpp
+@source:funworld/supercrd.cpp
 fruitstr                        // (c) 1992 Fun World
 supercrd                        // (c) 1992 Fun World
 

@@ -311,6 +311,7 @@ funworld/photoply.cpp
 funworld/photoplys.cpp
 funworld/photoplysx.cpp
 funworld/snookr10.cpp
+funworld/supercrd.cpp
 fuuki/fuukifg2.cpp
 fuuki/fuukifg3.cpp
 gaelco/atvtrack.cpp
@@ -884,7 +885,6 @@ misc/stuntair.cpp
 misc/su2000.cpp
 misc/summit.cpp
 misc/sumt8035.cpp
-misc/supercrd.cpp
 misc/supertnk.cpp
 misc/tapatune.cpp
 misc/tattack.cpp
