@@ -42,7 +42,6 @@ b004      flip screen
 b800      command to soundboard & trigger NMI on sound board
 
 
-
 SOUND BOARD:
 0x0000 0x1fff ROM
 0x2000 0x43ff RAM

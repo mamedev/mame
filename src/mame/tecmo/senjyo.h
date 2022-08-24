@@ -95,7 +95,7 @@ private:
 	int m_is_senjyo = 0;
 	int m_scrollhack = 0;
 
-	int m_dac_clock = 0;
+	uint8_t m_dac_clock = 0;
 	tilemap_t *m_fg_tilemap = nullptr;
 	tilemap_t *m_bg1_tilemap = nullptr;
 	tilemap_t *m_bg2_tilemap = nullptr;
