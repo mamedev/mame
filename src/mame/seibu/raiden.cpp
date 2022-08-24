@@ -104,7 +104,7 @@
 #include "speaker.h"
 
 
-// ****************************************************************************
+/******************************************************************************/
 
 void raiden_state::main_map(address_map &map)
 {
@@ -135,7 +135,7 @@ void raiden_state::sub_map(address_map &map)
 }
 
 
-// ****************************************************************************
+/******************************************************************************/
 
 void raiden_state::raidenu_main_map(address_map &map)
 {
@@ -165,7 +165,7 @@ void raiden_state::raidenu_sub_map(address_map &map)
 }
 
 
-// ****************************************************************************
+/******************************************************************************/
 
 void raidenb_state::raidenb_main_map(address_map &map)
 {
@@ -183,7 +183,7 @@ void raidenb_state::raidenb_main_map(address_map &map)
 }
 
 
-// ***************************************************************************
+/*****************************************************************************/
 
 void raiden_state::raiden_sound_map(address_map &map)
 {
@@ -215,7 +215,7 @@ void raiden_state::sei80bu_encrypted_full_map(address_map &map)
 }
 
 
-// ***************************************************************************
+/*****************************************************************************/
 
 static INPUT_PORTS_START( raiden )
 	SEIBU_COIN_INPUTS // coin inputs read through sound cpu
@@ -303,7 +303,7 @@ static INPUT_PORTS_START( raiden )
 INPUT_PORTS_END
 
 
-// ****************************************************************************
+/******************************************************************************/
 
 static const gfx_layout charlayout =
 {
@@ -335,7 +335,7 @@ static GFXDECODE_START( gfx_raiden )
 GFXDECODE_END
 
 
-// ****************************************************************************
+/******************************************************************************/
 
 WRITE_LINE_MEMBER(raiden_state::vblank_irq)
 {
@@ -440,7 +440,7 @@ void raidenb_state::raidenb(machine_config &config)
 }
 
 
-// *************************************************************************
+/***************************************************************************/
 
 /*
     Note: Seibu labeled the roms simply as 1 through 10 and didn't generally
@@ -809,7 +809,7 @@ ROM_START( raidenua )// Different hardware, Main, Sub & sound CPU code not encry
 ROM_END
 
 
-// *************************************************************************
+/***************************************************************************/
 
 /*
   This is based on code by Niclas Karlsson Mate, who figured out the
@@ -850,7 +850,7 @@ void raiden_state::init_raiden()
 }
 
 
-// *************************************************************************
+/***************************************************************************/
 
 // Same PCB, differ by region byte(s)
 GAME( 1990, raiden,   0,      raidene,  raiden, raiden_state,  init_raiden,  ROT270, "Seibu Kaihatsu", "Raiden (set 1)", MACHINE_SUPPORTS_SAVE )
