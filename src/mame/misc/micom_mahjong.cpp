@@ -196,7 +196,7 @@ void mmahjong_state::mmahjong(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(8*32, 8*32);
-	m_screen->set_visarea(0, 8*32-1, 0, 8*32-1);
+	m_screen->set_visarea(0, 8*32-1, 0, 8*24-1);
 	m_screen->set_screen_update(FUNC(mmahjong_state::screen_update));
 	m_screen->set_palette("palette");
 
@@ -229,4 +229,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME      PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1982, mmahjong,      0,      0, mmahjong,     mmahjong,   mmahjong_state, empty_init, "Nippon Mail Service", "Micom Mahjong", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, mmahjong,      0,      0, mmahjong,     mmahjong,   mmahjong_state, empty_init, "Nippon Mail Service", "Micom Mahjong", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
