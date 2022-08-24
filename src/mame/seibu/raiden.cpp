@@ -40,7 +40,8 @@
     The byte at 0xfffff (0x1ffff in program rom 4) controls whether invincibility is enabled:
         0x00  = Disabled
         0xFF  = Enabled
-    On sets with the newer hardware, setting SW1:7 to On is additionally required to be enabled.
+    On sets with the newer hardware, any non-zero value can be used, but setting SW1:7 to On
+    is additionally required.
 
     Common set is main PCB and an OBJ1 daughterboard.
     XTALs: 20MHz, 14.31818MHz, 12MHz
