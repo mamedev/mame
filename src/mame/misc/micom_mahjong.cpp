@@ -12,6 +12,7 @@ Hardware notes:
 
 TODO:
 - map the keypad
+- video timing, maybe 11059200 / 2 / (262*352)?
 
 ******************************************************************************/
 
@@ -235,9 +236,11 @@ ROM_END
 
 } // anonymous namespace
 
+
+
 /******************************************************************************
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1982, mmahjong,      0,      0, mmahjong,     mmahjong,   mmahjong_state, empty_init, "Nippon Mail Service", "Micom Mahjong", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT CMP MACHINE   INPUT     STATE           INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1982, mmahjong,  0,      0, mmahjong, mmahjong, mmahjong_state, empty_init, "Nippon Mail Service", "Micom Mahjong", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
