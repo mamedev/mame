@@ -140,7 +140,9 @@ int victor9k_format::find_size(util::random_read &io, uint32_t form_factor)
 
 	for(int i=0; formats[i].sector_count; i++) {
 		const format &f = formats[i];
-		if(size == (uint32_t) f.sector_count*f.sector_base_size*f.head_count)
+		osd_printf_verbose("find_size io.length: %04x\n", size);
+		osd_printf_verbose("find_size calculation: %04x\n", (f.sector_count*f.sector_base_size*f.head_count));
+		if(size == (uint32_t) f.sector_count*f.sector_base_size)
 			return i;
 	}
 
@@ -351,7 +353,7 @@ const victor9k_format::format victor9k_format::formats[] = {
 		floppy_image::FF_525, floppy_image::SSDD, 1224, 80, 1, 512
 	},
 	{ //
-		floppy_image::FF_525, floppy_image::DSDD, 2448, 80, 2, 512
+		floppy_image::FF_525, floppy_image::DSDD, 2391, 80, 2, 512
 	},
 	{}
 };
@@ -445,6 +447,7 @@ void victor9k_format::extract_sectors(floppy_image *image, const format &f, desc
 	for(int i=0; i<sector_count; i++) {
 		desc_s &ds = sdesc[i];
 		const auto &data = sectors[ds.sector_id];
+		osd_printf_verbose("Sector count: %04x\n", i);
 		if(data.empty())
 			memset((void *)ds.data, 0, ds.size);
 		else if(data.size() < ds.size) {
