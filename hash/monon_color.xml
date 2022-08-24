@@ -155,7 +155,7 @@ license:CC0
 		<info name="alt_title" value="脑力连连看"/>
 		<part name="cart" interface="monon_color_cart">
 			<dataarea name="rom" size="0x0400000">
-				<rom name="20220824_134236_FLASH_25032.bin" size="0x0400000" crc="7e78ed72" sha1="cd2ce46b60fd2d76671e43d69e7fc1938422bd2a"/>
+				<rom name="109.bin" size="0x0400000" crc="7e78ed72" sha1="cd2ce46b60fd2d76671e43d69e7fc1938422bd2a"/>
 			</dataarea>
 		</part>
 	</software>
