@@ -241,7 +241,7 @@ void microcomputer_mahjong_state::mimahjng(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(256, 256);
-	screen.set_visarea(0,224-1, 0, 224-1);
+	screen.set_visarea(0,256-1, 0, 224-1);
 	screen.set_screen_update(FUNC(microcomputer_mahjong_state::screen_update));
 	screen.set_palette("palette");
 
