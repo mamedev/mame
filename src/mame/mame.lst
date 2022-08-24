@@ -9599,7 +9599,7 @@ bob85                           //
 @source:technos/bogeyman.cpp
 bogeyman                        // -0204-0 (Data East part number) (c) 1985 (Arcade TV Game List - P.96, Right, 8 from top)
 
-@source:tehkan/bombjack.cpp
+@source:tecmo/bombjack.cpp
 bombjack                        // (c) 1984 Tehkan
 bombjack2                       // (c) 1984 Tehkan
 bombjackt                       // (c) 1984 Tehkan + Tecfri license
@@ -14558,7 +14558,7 @@ tokyocopi                       //
 tokyocopk                       //
 tuningrc                        //
 
-@source:tehkan/gaiden.cpp
+@source:tecmo/gaiden.cpp
 drgnbowl                        // (c) 1992 Nics
 drgnbowla                       // (c) 1992 Nics
 gaiden                          // 6215 - (c) 1988 Tecmo (US)
@@ -20540,7 +20540,7 @@ luckybale                       // (c) 1996 Sielcon Games
 @source:omron/luna_68k.cpp
 luna                            // Omron Luna
 
-@source:tehkan/lvcards.cpp
+@source:tecmo/lvcards.cpp
 lvcards                         // (c) 1985 Tehkan
 lvcardsa                        // (c) 1985 Tehkan
 lvpoker                         // ???? - (c) 1985 Tehkan
@@ -34387,7 +34387,7 @@ ai1000                          // Casio AI-1000
 pb1000                          // Casio PB-1000
 pb2000c                         // Casio PB-2000C
 
-@source:tehkan/pbaction.cpp
+@source:tecmo/pbaction.cpp
 pbaction                        // (c) 1985 Tehkan
 pbaction2                       // (c) 1985 Tehkan
 pbaction3                       // (c) 1985 Tehkan
@@ -38602,7 +38602,7 @@ selz80                          //
 @source:seibu/sengokmj.cpp
 sengokmj                        // (c) 1991 Sigma
 
-@source:tehkan/senjyo.cpp
+@source:tecmo/senjyo.cpp
 baluba                          // (c) 1986 Able Corp.
 megaforc                        // (c) 1984 Tehkan
 megaforcu                       // (c) 1985 Tehkan + Video Ware license
@@ -39523,7 +39523,7 @@ vpainter                        // 1991 Video Painter
 @source:skeleton/softbox.cpp
 softbox                         //
 
-@source:tehkan/solomon.cpp
+@source:tecmo/solomon.cpp
 solomon                         // (c) 1986 Tecmo
 solomonj                        // (c) 1986 Tecmo
 
@@ -39589,7 +39589,7 @@ spaceg                          // (c) 19??
 @source:irem/spartanxtec.cpp
 spartanxtec
 
-@source:tehkan/spbactn.cpp
+@source:tecmo/spbactn.cpp
 spbactn                         // 9002 - (c) 1991 Tecmo
 spbactnj                        // 9002 - (c) 1991 Tecmo
 spbactnp                        // prototype
@@ -41415,7 +41415,7 @@ ivg09                           //
 @source:misc/taxidriv.cpp
 taxidriv                        // [1984 Graphic Techno]
 
-@source:tehkan/tbowl.cpp
+@source:tecmo/tbowl.cpp
 tbowl                           // 6206 - (c) 1987 Tecmo
 tbowla                          //
 tbowlj                          // 6206 - (c) 1987 Tecmo
@@ -41439,7 +41439,7 @@ tecjmon                         // Talking Electronics Computer
 xforce                          //
 spcteam                         //
 
-@source:tehkan/tecmo.cpp
+@source:tecmo/tecmo.cpp
 backfirt                        // bootleg [(c) 1988 Tecmo]
 gemini                          // (c) 1987 Tecmo
 geminib                         // bootleg
@@ -41454,7 +41454,7 @@ silkwormp                       // 6217 - (c) 1988 Tecmo
 silkwormb                       // bootleg
 silkwormb2                      // bootleg
 
-@source:tehkan/tecmo16.cpp
+@source:tecmo/tecmo16.cpp
 fstarfrc                        // (c) 1992 Tecmo
 fstarfrcj                       // (c) 1992 Tecmo
 fstarfrcja                      // (c) 1992 Tecmo
@@ -41463,7 +41463,7 @@ ginkun                          // (c) 1995 Tecmo
 riot                            // (c) 1992 NMK
 riotw                           // (c) 1992 Woong Bi
 
-@source:tehkan/tecmosys.cpp
+@source:tecmo/tecmosys.cpp
 deroon                          // (c) 1996 Tecmo
 deroon2                         // (c) 1996 Tecmo
 tkdensho                        // (c) 1996 Tecmo
@@ -41476,7 +41476,7 @@ tecnbras                        //
 tecnodar                        // (c) 1991 Automatics Pasqual
 tecnodargr                      // (c) 1991 Automatics Pasqual / Recreativos G.R.
 
-@source:tehkan/tehkanwc.cpp
+@source:tecmo/tehkanwc.cpp
 gridiron                        // (c) 1985 Tehkan
 teedoff                         // 6102 - (c) 1986 Tecmo
 tehkanwc                        // (c) 1985 Tehkan
@@ -43273,7 +43273,7 @@ darius2do                       // C07 (c) 1989 Taito Corporation (Japan)
 sagaia                          // C07 (c) 1989 Taito Corporation Japan (World)
 warriorb                        // D24 (c) 1991 Taito Corporation (Japan)
 
-@source:tehkan/wc90.cpp
+@source:tecmo/wc90.cpp
 pac90                           // bootleg
 twcup90                            // (c) 1989 Tecmo
 twcup90a                           // (c) 1989 Tecmo
@@ -43281,7 +43281,7 @@ twcup90b                           // (c) 1989 Tecmo
 twcup90c                           // (c) 1989 Tecmo
 twcup90t                           // (c) 1989 Tecmo
 
-@source:tehkan/wc90b.cpp
+@source:tecmo/wc90b.cpp
 twcup90b1                          // bootleg
 twcup90b2                          // bootleg
 twcup90ba                          // bootleg
