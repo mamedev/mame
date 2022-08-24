@@ -19864,6 +19864,46 @@ popn9                           // (c) 2003 Konami. Pop'n Music 9
 wswe                            // (c) 2002 Konami. World Soccer Winning Eleven
 wswe2k3                         // (c) 2002 Konami. World Soccer Winning Eleven 2003
 
+@source:konami/kpython2.cpp
+ddrsn2a                         // (c) 2007 Konami. Dance Dance Revolution SuperNOVA 2 (GDJ:A:A:A:2007100800)
+ddrsn2aa                        // (c) 2007 Konami. Dance Dance Revolution SuperNOVA 2 (GDJ:A:A:A:2007071100)
+ddrsn2j                         // (c) 2007 Konami. Dance Dance Revolution SuperNOVA 2 (GDJ:J:A:A:2007100800)
+ddrsn2ja                        // (c) 2007 Konami. Dance Dance Revolution SuperNOVA 2 (GDJ:J:A:A:2007071100)
+ddrsn2u                         // (c) 2007 Konami. Dance Dance Revolution SuperNOVA 2 (GDJ:U:A:A:2007100800)
+ddrsna                          // (c) 2006 Konami. Dance Dance Revolution SuperNOVA (FDH:A:A:A:2006071300)
+ddrsnj                          // (c) 2006 Konami. Dance Dance Revolution SuperNOVA (FDH:J:A:A:2006090600)
+ddrsnu                          // (c) 2006 Konami. Dance Dance Revolution SuperNOVA (FDH:U:A:A:2006072400)
+drmnv2a                         // (c) 2006 Konami. DrumMania V2 (F02:A:A:A:2006011201)
+drmnv2aa                        // (c) 2005 Konami. DrumMania V2 (F02:A:A:A:2005112800)
+drmnv2ab                        // (c) 2005 Konami. DrumMania V2 (F02:A:A:A:2005101600)
+drmnv2j                         // (c) 2006 Konami. DrumMania V2 (F02:J:A:A:2006011201)
+drmnv2ja                        // (c) 2005 Konami. DrumMania V2 (F02:J:A:A:2005112800)
+drmnv2jb                        // (c) 2005 Konami. DrumMania V2 (F02:J:A:A:2005101600)
+drmnv3a                         // (c) 2006 Konami. DrumMania V3 (F32:A:A:A:2006101800)
+drmnv3aa                        // (c) 2006 Konami. DrumMania V3 (F32:A:A:A:2006072600)
+drmnv3j                         // (c) 2006 Konami. DrumMania V3 (F32:J:A:A:2006101800)
+drmnv3ja                        // (c) 2006 Konami. DrumMania V3 (F32:J:A:A:2006072600)
+drmnva                          // (c) 2005 Konami. DrumMania V (E02:A:A:A:2005050200)
+drmnvj                          // (c) 2005 Konami. DrumMania V (E02:J:A:A:2005050200)
+dstagesn                        // (c) 2006 Konami. Dancing Stage SuperNOVA (FDH:E:A:A:2006072500)
+dstagesna                       // (c) 2006 Konami. Dancing Stage SuperNOVA (FDH:E:A:A:2006032200)
+gtrfrkv2a                       // (c) 2006 Konami. Guitar Freaks V2 (F03:A:A:A:2006011201)
+gtrfrkv2aa                      // (c) 2005 Konami. Guitar Freaks V2 (F03:A:A:A:2005112800)
+gtrfrkv2ab                      // (c) 2005 Konami. Guitar Freaks V2 (F03:A:A:A:2005101600)
+gtrfrkv2j                       // (c) 2006 Konami. Guitar Freaks V2 (F03:J:A:A:2006011201)
+gtrfrkv2ja                      // (c) 2005 Konami. Guitar Freaks V2 (F03:J:A:A:2005112800)
+gtrfrkv2jb                      // (c) 2005 Konami. Guitar Freaks V2 (F03:J:A:A:2005101600)
+gtrfrkv3a                       // (c) 2006 Konami. Guitar Freaks V3 (F33:A:A:A:2006101800)
+gtrfrkv3aa                      // (c) 2006 Konami. Guitar Freaks V3 (F33:A:A:A:2006072600)
+gtrfrkv3j                       // (c) 2006 Konami. Guitar Freaks V3 (F33:J:A:A:2006101800)
+gtrfrkv3ja                      // (c) 2006 Konami. Guitar Freaks V3 (F33:J:A:A:2006072600)
+gtrfrkva                        // (c) 2005 Konami. Guitar Freaks V (E03:A:A:A:2005050200)
+gtrfrkvj                        // (c) 2005 Konami. Guitar Freaks V (E03:J:A:A:2005050200)
+kpython2                        // (c) 2005 Konami. Python 2 BIOS
+thrild3j                        // (c) 2005 Konami. Thrill Drive 3 (D44:J:A:A:20050316)
+toysmarch                       // (c) 2005 Konami. Toy's March (E00:J:A:A:2005011602)
+toysmarch2                      // (c) 2005 Konami. Toy's March 2 (F00:J:A:A:2005110400)
+
 @source:ddr/kramermc.cpp
 kramermc                        // 1987 Kramer MC
 
