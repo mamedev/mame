@@ -603,7 +603,7 @@ void pokey_device::step_one_clock(void)
 
 		if ((m_AUDCTL & CH1_HICLK) && (clock_triggered[CLK_1]))
 		{
-			if(m_AUDCTL & CH12_JOINED)
+			if (m_AUDCTL & CH12_JOINED)
 				m_channel[CHAN1].inc_chan(7);
 			else
 				m_channel[CHAN1].inc_chan(4);
@@ -616,7 +616,7 @@ void pokey_device::step_one_clock(void)
 
 		if ((m_AUDCTL & CH3_HICLK) && (clock_triggered[CLK_1]))
 		{
-			if(m_AUDCTL & CH34_JOINED)
+			if (m_AUDCTL & CH34_JOINED)
 				m_channel[CHAN3].inc_chan(7);
 			else
 				m_channel[CHAN3].inc_chan(4);
@@ -956,7 +956,7 @@ void pokey_device::write_internal(offs_t offset, uint8_t data)
 		break;
 
 	case AUDCTL_C:
-		if( data == m_AUDCTL )
+		if (data == m_AUDCTL)
 			return;
 		LOG_SOUND(("POKEY '%s' AUDCTL $%02x (%s)\n", tag(), data, audctl2str(data)));
 		m_AUDCTL = data;
@@ -1009,7 +1009,7 @@ void pokey_device::write_internal(offs_t offset, uint8_t data)
 		LOG(("POKEY '%s' IRQEN  $%02x\n", tag(), data));
 
 		/* acknowledge one or more IRQST bits ? */
-		if( m_IRQST & ~data )
+		if (m_IRQST & ~data)
 		{
 			/* reset IRQST bits that are masked now, except the SEROC bit (acid5200 pokey_seroc test) */
 			m_IRQST &= (IRQ_SEROC | data);
@@ -1025,11 +1025,11 @@ void pokey_device::write_internal(offs_t offset, uint8_t data)
 		break;
 
 	case SKCTL_C:
-		if( data == m_SKCTL )
+		if (data == m_SKCTL)
 			return;
 		LOG(("POKEY '%s' SKCTL  $%02x\n", tag(), data));
 		m_SKCTL = data;
-		if( !(data & SK_RESET) )
+		if (!(data & SK_RESET))
 		{
 			write_internal(IRQEN_C,  0);
 			write_internal(SKREST_C, 0);
@@ -1103,9 +1103,7 @@ inline void pokey_device::process_channel(int ch)
 
 void pokey_device::pokey_potgo(void)
 {
-	int pot;
-
-	if( (m_SKCTL & SK_RESET) == 0)
+	if (!(m_SKCTL & SK_RESET))
 		return;
 
 	LOG(("POKEY #%p pokey_potgo\n", (void *) this));
@@ -1113,18 +1111,17 @@ void pokey_device::pokey_potgo(void)
 	m_ALLPOT = 0x00;
 	m_pot_counter = 0;
 
-	for( pot = 0; pot < 8; pot++ )
+	for (int pot = 0; pot < 8; pot++)
 	{
 		m_POTx[pot] = 228;
-		if( !m_pot_r_cb[pot].isnull() )
+		if (!m_pot_r_cb[pot].isnull())
 		{
 			int r = m_pot_r_cb[pot](pot);
 
 			LOG(("POKEY %s pot_r(%d) returned $%02x\n", tag(), pot, r));
 			if (r >= 228)
-			{
 				r = 228;
-			}
+
 			if (r == 0)
 			{
 				/* immediately set the ready - bit of m_ALLPOT
@@ -1239,22 +1236,20 @@ void pokey_device::poly_init_9_17(uint32_t *poly, int size)
 char *pokey_device::audc2str(int val)
 {
 	static char buff[80];
-	if( val & NOTPOLY5 )
+	if (val & NOTPOLY5)
 	{
-		if( val & PURE )
+		if (val & PURE)
 			strcpy(buff,"pure");
-		else
-		if( val & POLY4 )
+		else if (val & POLY4)
 			strcpy(buff,"poly4");
 		else
 			strcpy(buff,"poly9/17");
 	}
 	else
 	{
-		if( val & PURE )
+		if (val & PURE)
 			strcpy(buff,"poly5");
-		else
-		if( val & POLY4 )
+		else if (val & POLY4)
 			strcpy(buff,"poly4+poly5");
 		else
 			strcpy(buff,"poly9/17+poly5");
@@ -1265,23 +1260,23 @@ char *pokey_device::audc2str(int val)
 char *pokey_device::audctl2str(int val)
 {
 	static char buff[80];
-	if( val & POLY9 )
+	if (val & POLY9)
 		strcpy(buff,"poly9");
 	else
 		strcpy(buff,"poly17");
-	if( val & CH1_HICLK )
+	if (val & CH1_HICLK)
 		strcat(buff,"+ch1hi");
-	if( val & CH3_HICLK )
+	if (val & CH3_HICLK)
 		strcat(buff,"+ch3hi");
-	if( val & CH12_JOINED )
+	if (val & CH12_JOINED)
 		strcat(buff,"+ch1/2");
-	if( val & CH34_JOINED )
+	if (val & CH34_JOINED)
 		strcat(buff,"+ch3/4");
-	if( val & CH1_FILTER )
+	if (val & CH1_FILTER)
 		strcat(buff,"+ch1filter");
-	if( val & CH2_FILTER )
+	if (val & CH2_FILTER)
 		strcat(buff,"+ch2filter");
-	if( val & CLK_15KHZ )
+	if (val & CLK_15KHZ)
 		strcat(buff,"+clk15");
 	return buff;
 }
