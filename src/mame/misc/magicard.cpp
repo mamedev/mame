@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese, Roberto Fresca, David Haywood
+// copyright-holders:Angelo Salese, Roberto Fresca, David Haywood, Paul Arnold
 /******************************************************************************
 
   MAGIC CARD - IMPERA
   -------------------
 
-  Preliminary driver by Roberto Fresca, David Haywood & Angelo Salese
+  Driver by Roberto Fresca, David Haywood, Angelo Salese and Paul Arnold
 
 
   TODO:
@@ -23,23 +23,23 @@
 
   Games running on this hardware:
 
-  * Magic Card (set 1),                         Impera, 199?.
-  * Magic Card (set 2),                         Impera, 199?.
-  * Magic Card (set 3),                         Impera, 199?.
-  * Magic Card Export 94 (set 1),               Impera, 1994.
-  * Magic Card Export 94 (set 2),               Impera, 1994.
-  * Magic Export (V.211A),                      Impera, 1994.
+  * Magic Card (v2.01),                         Impera, 199?.
+  * Magic Card (v1.5 17.12.93, set 1),          Impera, 199?.
+  * Magic Card (v1.5 17.12.93, set 2),          Impera, 199?.
+  * Magic Card Export 94 (v2.11a, set 1),       Impera, 1994.
+  * Magic Card Export 94 (v2.11a, set 2),       Impera, 1994.
+  * Magic Card Export 94 (v2.11a, set 3),       Impera, 1994.
   * Magic Card Jackpot (4.01),                  Impera, 1998.
-  * Magic Card - Wien (Sicherheitsversion 1.2), Impera, 1993.
+  * Magic Card - Wien (v1.2 200/93, set 1),     Impera, 1993.
   * Magic Lotto Export (5.03),                  Impera, 2001.
   * Hot Slots (6.00),                           Impera, 2002.
   * Quingo Export (5.00),                       Impera, 1999.
   * Bel Slots Export (5.01),                    Impera, 1999.
   * Big Deal Belgien (5.04),                    Impera, 2001.
   * Puzzle Me!,                                 Impera, 199?.
-  * unknown 'TE06',                             Impera, 1994.
+  * Magic Card (v1.10 14.09.94)                 Impera, 1994.
   * Lucky 7 (Impera),                           Impera, 199?.
-  * unknown Poker 'W',                          unknown, 1993.
+  * Magic Card - Wien (v1.2 200/93, set 2),     Impera, 1993.
   * Dallas Poker,                               unknown, 1993.
   * Kajot Card (Version 1.01, Wien Euro),       Amatic, 1993.
 
@@ -1279,8 +1279,8 @@ ROM_START( magicardec )
 ROM_END
 
 /*
-  Magic Export.
-  Ver 211A.
+  Magic Card Export 94
+  International Ver. 2.11a (set 3)
 
   1x Philips SCC66470CAB.
   1x Philips SCC68070 CCA84.
@@ -1314,7 +1314,7 @@ ROM_START( magicardf )
 ROM_END
 
 /*
-  Magic Card - Wien
+  Magic Card - Wien v1.2 200/93 set 1
   Sicherheitsversion 1.2
 
 */
@@ -1888,9 +1888,8 @@ ROM_END
 
 
 /*
-  Unknown 'W'
-  Poker Game.
-  Version: 1.2 200/93
+  
+  Magic Card - Wien v1.2 200/93 set 2
 
   PCB layout:
 
@@ -2165,24 +2164,24 @@ ROM_END
 
 //    YEAR  NAME       PARENT    MACHINE          INPUT     STATE           INIT           ROT    COMPANY   FULLNAME                                     FLAGS
 
-GAME( 199?, magicard,   0,        magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (set 1)",                         MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 199?, magicarda,  magicard, magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (set 2)",                         MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 199?, magicardb,  0,        magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (set 3)",                         MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1994, magicard,   0,        magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v2.01)",                         MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1993, magicarda,  magicard, magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.5 17.12.93, set 1)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1993, magicardb,  0,        magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.5 17.12.93, set 2)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1994, magicarde,  0,        hotslots_pic54, magicarde, hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.11a, set 1)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1994, magicardea, magicarde,hotslots_pic54, magicarde, hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.11a, set 2)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1994, magicardeb, magicarde,hotslots,       magicarde, hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.09a)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1998, magicardec, 0,        hotslots,       magicarde, hotslots_state, empty_init, ROT0, "Impera",    "Magic Card III Jackpot (V4.01 6/98)",        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1994, magicardf,  magicarde,hotslots,       magicarde, hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (V2.11a, set 3)",       MACHINE_SUPPORTS_SAVE )
 GAME( 1998, magicardj,  0,        hotslots,       magicarde, hotslots_state, empty_init, ROT0, "Impera",    "Magic Card III Jackpot (V4.01 7/98)",        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1993, magicardw,  magicardb,magicard_pic54, magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card - Wien (Sicherheitsversion 1.2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, magicardw,  magicardb,magicard_pic54, magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.2 200/93, set 1)",            MACHINE_SUPPORTS_SAVE )
 GAME( 2001, magicle,    0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Lotto Export (5.03)",                  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 2002, hotslots,   0,        hotslots,       hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Hot Slots (6.00)",                           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1999, quingo,     0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Quingo Export (5.00)",                       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1999, belslots,   0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Bel Slots Export (5.01)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 2001, bigdeal0,   0,        magicle,        magicard,  hotslots_state, empty_init, ROT0, "Impera",    "Big Deal Belgien (5.04)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 199?, puzzleme,   0,        puzzleme,       puzzleme,  hotslots_state, empty_init, ROT0, "Impera",    "Puzzle Me!",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1994, unkte06,    magicardb,unkte06,        magicard,  magicard_state, empty_init, ROT0, "Impera",    "unknown Poker 'TE06'",                       MACHINE_SUPPORTS_SAVE ) // strings in ROM
-GAME( 199?, lucky7i,    0,        magicard,       lucky7i,   magicard_state, empty_init, ROT0, "Impera",    "Lucky 7 (Impera) V04/91a",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1993, unkpkr_w,   magicardb,magicard,       magicard,  magicard_state, empty_init, ROT0, "<unknown>", "unknown Poker 'W'",                          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1994, unkte06,    magicardb,unkte06,        magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.10 14.09.94)",                MACHINE_SUPPORTS_SAVE ) // strings in ROM
+GAME( 1991, lucky7i,    0,        magicard,       lucky7i,   magicard_state, empty_init, ROT0, "Impera",    "Lucky 7 (Impera) V04/91a",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1993, unkpkr_w,   magicardb,magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.2 200/93, set 2)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1993, dallaspk,   0,        magicard,       dallaspk,  magicard_state, empty_init, ROT0, "<unknown>", "Dallas Poker",                               MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1993, kajotcrd,   0,        hotslots,       magicard,  hotslots_state, empty_init, ROT0, "Amatic",    "Kajot Card (Version 1.01, Wien Euro)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
