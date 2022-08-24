@@ -40,7 +40,7 @@ license:CC0
   (1) (Note: One known to exist in the wild, was supposedly bought at a thrift store. Based around Jackie Chan fighting)
 -->
 
-	<software name="purcfs"> <!-- 101 - Seer: Ares Fighting Spirit -->
+	<software name="seerfs"> <!-- 101 - Seer: Ares Fighting Spirit -->
 		<description>Sài ěr hào: Zhànshén dòu hún</description>
 		<year>2014</year>
 		<publisher>M&amp;D</publisher>
@@ -52,7 +52,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="lockmagi"> <!-- 102 - Roco Kingdom: Magic Array -->
+	<software name="rocomagi"> <!-- 102 - Roco Kingdom: Magic Array -->
 		<description>Luòkè wángguó-mófǎ zhèn</description>
 		<year>2014</year>
 		<publisher>M&amp;D</publisher>
@@ -100,7 +100,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="purceb"> <!-- 105 - Seer: Energy Battle -->
+	<software name="seereb"> <!-- 105 - Seer: Energy Battle -->
 		<description>Sài ěr hào-néngyuán dà zuòzhàn</description>
 		<year>2014</year>
 		<publisher>M&amp;D</publisher>
@@ -136,7 +136,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="lockba"> <!-- 201 - Roco Kingdom: Big Adventure -->
+	<software name="rocoba"> <!-- 201 - Roco Kingdom: Big Adventure -->
 		<description>Luòkè wángguó-dà màoxiǎn</description>
 		<year>2014</year>
 		<publisher>M&amp;D</publisher>
@@ -148,7 +148,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="lockice"> <!-- 202 - Roco Kingdom RPG: Ice Blue -->
+	<software name="rocoice"> <!-- 202 - Roco Kingdom RPG: Ice Blue -->
 		<description>Luòkè wángguó-bīng zhī lán</description>
 		<year>2014</year>
 		<publisher>M&amp;D</publisher>
@@ -160,7 +160,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="lockfire"> <!-- 203 - Roco Kingdom RPG: Black Flame -->
+	<software name="rocofire"> <!-- 203 - Roco Kingdom RPG: Black Flame -->
 		<description>Luòkè wángguó-hēi zhī yán</description>
 		<year>2014</year>
 		<publisher>M&amp;D</publisher>
@@ -173,7 +173,7 @@ license:CC0
 	</software>
 
 	<!-- there is a second glob in the cartridge, presumably for the card reader -->
-	<software name="lockcard" supported="no"> <!-- 204 - Roco Kingdom: Card Wars -->
+	<software name="rococard" supported="no"> <!-- 204 - Roco Kingdom: Card Wars -->
 		<description>Luòkè wángguó-kǎ pái zhàn jì</description>
 		<year>2015</year>
 		<publisher>M&amp;D</publisher>
@@ -198,7 +198,7 @@ license:CC0
 	</software>
 
 	<!-- there is a second glob in the cartridge, presumably for the badge reader -->
-	<software name="lockbadg" supported="no"> <!-- Roco Kingdom: The King's Badge -->
+	<software name="rocobadg" supported="no"> <!-- Roco Kingdom: The King's Badge -->
 		<description>Luòkè wángguó-wángzhě huīzhāng</description>
 		<year>2015</year>
 		<publisher>M&amp;D</publisher>
