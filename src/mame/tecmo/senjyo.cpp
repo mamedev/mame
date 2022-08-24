@@ -11,6 +11,9 @@ TODO:
   fixed at some point)
 - Star Force: the Larios is supposed to blink at the third loop of the BGM.
   Right now it does at second and half, presumably due of the unknown PCB clocks.
+- remove memory pointers for video attribute RAM area (r/w handlers instead?),
+  then the workaround at the end of starforb_map isn't needed, and m_scrollhack
+  can probably be removed too
 
 Note:
 - Star Force shows default MAME palette at POST. Flipped to all_black for now.
@@ -549,6 +552,14 @@ static GFXDECODE_START( gfx_senjyo )
 	GFXDECODE_ENTRY( "gfx5", 0, spritelayout2,  320, 8 )    /* 320-383 large sprites */
 													/* 384-399 is background */
 GFXDECODE_END
+
+
+static const z80_daisy_config senjyo_daisy_chain[] =
+{
+	{ "z80ctc" },
+	{ "z80pio" },
+	{ nullptr }
+};
 
 
 void senjyo_state::senjyo(machine_config &config)

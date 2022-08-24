@@ -310,52 +310,5 @@ uint32_t senjyo_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_radar(bitmap, cliprect);
 
-#if 0
-{
-	char baf[80];
-	uint8_t *senjyo_scrolly3 = m_scrolly3;
-
-	sprintf(baf,"%02x %02x %02x %02x %02x %02x %02x %02x",
-		senjyo_scrolly3[0x00],
-		senjyo_scrolly3[0x01],
-		senjyo_scrolly3[0x02],
-		senjyo_scrolly3[0x03],
-		senjyo_scrolly3[0x04],
-		senjyo_scrolly3[0x05],
-		senjyo_scrolly3[0x06],
-		senjyo_scrolly3[0x07]);
-	ui_draw_text(baf,0,0);
-	sprintf(baf,"%02x %02x %02x %02x %02x %02x %02x %02x",
-		senjyo_scrolly3[0x08],
-		senjyo_scrolly3[0x09],
-		senjyo_scrolly3[0x0a],
-		senjyo_scrolly3[0x0b],
-		senjyo_scrolly3[0x0c],
-		senjyo_scrolly3[0x0d],
-		senjyo_scrolly3[0x0e],
-		senjyo_scrolly3[0x0f]);
-	ui_draw_text(baf,0,10);
-	sprintf(baf,"%02x %02x %02x %02x %02x %02x %02x %02x",
-		senjyo_scrolly3[0x10],
-		senjyo_scrolly3[0x11],
-		senjyo_scrolly3[0x12],
-		senjyo_scrolly3[0x13],
-		senjyo_scrolly3[0x14],
-		senjyo_scrolly3[0x15],
-		senjyo_scrolly3[0x16],
-		senjyo_scrolly3[0x17]);
-	ui_draw_text(baf,0,20);
-	sprintf(baf,"%02x %02x %02x %02x %02x %02x %02x %02x",
-		senjyo_scrolly3[0x18],
-		senjyo_scrolly3[0x19],
-		senjyo_scrolly3[0x1a],
-		senjyo_scrolly3[0x1b],
-		senjyo_scrolly3[0x1c],
-		senjyo_scrolly3[0x1d],
-		senjyo_scrolly3[0x1e],
-		senjyo_scrolly3[0x1f]);
-	ui_draw_text(baf,0,30);
-}
-#endif
 	return 0;
 }

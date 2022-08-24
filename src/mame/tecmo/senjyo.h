@@ -131,7 +131,5 @@ private:
 	void starforb_sound_map(address_map &map);
 };
 
-/*----------- defined in audio/senjyo.c -----------*/
-extern const z80_daisy_config senjyo_daisy_chain[];
 
 #endif // MAME_INCLUDES_SENJYO_H

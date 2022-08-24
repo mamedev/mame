@@ -4,14 +4,6 @@
 #include "senjyo.h"
 
 
-const z80_daisy_config senjyo_daisy_chain[] =
-{
-	{ "z80ctc" },
-	{ "z80pio" },
-	{ nullptr }
-};
-
-
 /* z80 pio */
 
 uint8_t senjyo_state::pio_pa_r()
