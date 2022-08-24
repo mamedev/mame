@@ -1615,7 +1615,6 @@ private:
 
 	tilemap_t *m_bgtilemap;
 	uint8_t m_jvssense;
-	int32_t m_has_jvsio;
 	uint32_t m_main_irqcause;
 	bool m_ctl_vbl_active;
 	uint8_t m_ctl_led;
@@ -3058,13 +3057,6 @@ void namcos23_state::sharedram_sub_w(offs_t offset, uint16_t data, uint16_t mem_
 {
 	uint16_t *shared16 = reinterpret_cast<uint16_t *>(m_shared_ram.target());
 
-	// fake that an I/O board is connected for games w/o a dump or that aren't properly communicating with it yet
-	if(!m_has_jvsio) {
-		if((offset == 0x4052/2) && (data == 0x78)) {
-			data = 0;
-		}
-	}
-
 	COMBINE_DATA(&shared16[BYTE_XOR_BE(offset)]);
 }
 
@@ -3644,37 +3636,6 @@ void namcos23_state::init_s23()
 	m_subcpu_running = false;
 	m_render.count[0] = m_render.count[1] = 0;
 	m_render.cur = 0;
-
-	if((!strcmp(machine().system().name, "motoxgo")) ||
-		(!strcmp(machine().system().name, "500gp")) ||
-		(!strcmp(machine().system().name, "aking")) ||
-	    (!strcmp(machine().system().name, "panicprk")) ||
-		(!strcmp(machine().system().name, "panicprkj")) ||
-		(!strcmp(machine().system().name, "panicprkj2")) ||
-		(!strcmp(machine().system().name, "rapidrvr")) ||
-		(!strcmp(machine().system().name, "rapidrvrv2c")) ||
-		(!strcmp(machine().system().name, "rapidrvrp")) ||
-		(!strcmp(machine().system().name, "finfurl")) ||
-		(!strcmp(machine().system().name, "gunwars")) ||
-		(!strcmp(machine().system().name, "gunwarsa")) ||
-		(!strcmp(machine().system().name, "downhill")) ||
-		(!strcmp(machine().system().name, "downhillu")) ||
-		(!strcmp(machine().system().name, "finfurl2")) ||
-		(!strcmp(machine().system().name, "finfurl2j")) ||
-		(!strcmp(machine().system().name, "raceon")) ||
-		(!strcmp(machine().system().name, "crszone")) ||
-		(!strcmp(machine().system().name, "crszonev4a")) ||
-		(!strcmp(machine().system().name, "crszonev3b")) ||
-		(!strcmp(machine().system().name, "crszonev3b2")) ||
-		(!strcmp(machine().system().name, "crszonev3a")) ||
-		(!strcmp(machine().system().name, "crszonev2a")) ||
-		(!strcmp(machine().system().name, "timecrs2v2b")) ||
-		(!strcmp(machine().system().name, "timecrs2v1b")) ||
-		(!strcmp(machine().system().name, "timecrs2"))) {
-		m_has_jvsio = 1;
-	} else {
-		m_has_jvsio = 0;
-	}
 }
 
 
