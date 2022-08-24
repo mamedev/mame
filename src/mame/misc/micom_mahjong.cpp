@@ -50,7 +50,7 @@ private:
 	required_shared_ptr<u8> m_vram;
 	required_device<tilemap_device> m_tilemap;
 	required_device<screen_device> m_screen;
-	optional_device<dac_bit_interface> m_dac;
+	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<4> m_inputs;
 
 	TILE_GET_INFO_MEMBER(get_tile_info) { tileinfo.set(0, m_vram[tile_index], 0, 0); }
