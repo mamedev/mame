@@ -2,6 +2,17 @@
 // copyright-holders:hap
 /******************************************************************************
 
+マイコン麻雀 - Micom Mahjong, mail-order Mahjong console.
+
+Hardware notes:
+- Z80, 11.0592MHz XTAL
+- 16KB ROM (4*2732), 1KB RAM
+- 2KB ROM (2716) for tiles, 1KB VRAM, 1bpp video
+- 1-bit sound
+
+TODO:
+- map the keypad
+
 ******************************************************************************/
 
 #include "emu.h"
