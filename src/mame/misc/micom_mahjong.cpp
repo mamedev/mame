@@ -67,10 +67,9 @@ private:
 
 	void main_map(address_map &map);
 
-	u8 input_r();
 	void vram_w(offs_t offset, u8 data);
-
 	void input_w(u8 data);
+	u8 input_r();
 	void sound_w(u8 data);
 
 	u8 m_inp_matrix = 0;

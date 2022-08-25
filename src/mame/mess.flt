@@ -479,6 +479,7 @@ miltonbradley/vectrex.cpp
 mips/mips.cpp
 misc/3do.cpp
 misc/eva.cpp
+misc/micom_mahjong.cpp
 misc/monon_color.cpp
 mit/tx0.cpp
 mits/altair.cpp
