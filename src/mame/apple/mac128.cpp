@@ -85,6 +85,7 @@ Scanline 0 is the start of vblank.
 #include "emu.h"
 
 #include "macrtc.h"
+#include "mactoolbox.h"
 
 #include "bus/mackbd/mackbd.h"
 #include "bus/macpds/hyperdrive.h"
@@ -177,7 +178,7 @@ private:
 	required_device<applefdintf_device> m_iwm;
 	required_device_array<floppy_connector, 2> m_floppy;
 	optional_device<mac_keyboard_port_device> m_mackbd;
-	optional_device<rtc3430042_device> m_rtc;
+	required_device<rtc3430042_device> m_rtc;
 	required_device<screen_device> m_screen;
 	required_device<dac_12bit_r2r_device> m_dac; // actually 1-bit pwm w/8-bit counters
 	required_device<filter_biquad_device> m_filter;
@@ -251,7 +252,6 @@ private:
 
 	uint32_t m_overlay = 0;
 
-	int m_irq_count = 0, m_ca2_data = 0;
 	uint8_t m_mouse_bit[2]{}, m_mouse_last[2]{};
 	int16_t m_mouse_last_m[2]{}, m_mouse_count[2]{};
 	int m_screen_buffer = 0;
@@ -286,8 +286,6 @@ void mac128_state::machine_start()
 	m_hblank_timer = timer_alloc(FUNC(mac128_state::mac_hblank), this);
 
 	save_item(NAME(m_overlay));
-	save_item(NAME(m_irq_count));
-	save_item(NAME(m_ca2_data));
 	save_item(NAME(m_mouse_bit));
 	save_item(NAME(m_mouse_last));
 	save_item(NAME(m_mouse_last_m));
@@ -321,8 +319,6 @@ void mac128_state::machine_reset()
 	m_snd_enable = false;
 	m_main_buffer = true;
 	m_snd_vol = 3;
-	m_irq_count = 0;
-	m_ca2_data = 0;
 	m_adb_irq_pending = 0;
 	m_drive_select = 0;
 	m_scsiirq_enable = 0;
@@ -418,15 +414,6 @@ void mac128_state::vblank_irq()
 	if (m_macadb)
 	{
 		m_macadb->adb_vblank();
-	}
-
-	if (++m_irq_count == 60)
-	{
-		m_irq_count = 0;
-
-		m_ca2_data ^= 1;
-		/* signal 1 Hz irq on CA2 input on the VIA */
-		m_via->write_ca2(m_ca2_data);
 	}
 }
 
@@ -1127,6 +1114,7 @@ void mac128_state::mac512ke(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, C7M);        /* 7.8336 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac128_state::mac512ke_map);
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
@@ -1149,6 +1137,7 @@ void mac128_state::mac512ke(machine_config &config)
 
 	/* devices */
 	RTC3430042(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->cko_cb().set(m_via, FUNC(via6522_device::write_ca2));
 
 	IWM(config, m_iwm, C7M);
 	m_iwm->phases_cb().set(FUNC(mac128_state::phases_w));

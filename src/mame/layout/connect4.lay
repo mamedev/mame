@@ -3,47 +3,127 @@
 license:CC0
 -->
 <mamelayout version="2">
-	<element name="digit" defstate="0">
-	<led7seg>
-			<color red="1.0" green="0.0" blue="0.0" />
-	</led7seg>
+
+	<element name="ledseg0">
+		<image statemask="0x01">
+		<data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="40" height="60" viewBox="0 0 109.2832 165.8748">
+				<path fill="#ffffff" d="M 22.20542,9.1048101 28.73216,15.40339 90.121429,15.68542 98.067028,7.8827048 97.972444,6.3785695 91.634871,-0.01402362 H 30.245613 L 22.489191,7.8827048 Z" />
+				</svg>
+			]]>
+		</data>
+		</image>
 	</element>
+
+	<element name="ledseg1">
+		<image statemask="0x01">
+		<data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="40" height="60" viewBox="0 0 109.2832 165.8748">
+				<path fill="#ffffff" d="M 100.27788,70.003783 V 70.003783 L 105.06448,16.31986 98.670479,10.214696 94.729561,13.241168 89.485916,18.262069 85.770371,70.989977 91.77302,76.645088 Z" />
+				</svg>
+			]]>
+		</data>
+		</image>
+	</element>
+
+	<element name="ledseg2">
+		<image statemask="0x01">
+		<data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="40" height="60" viewBox="0 0 109.2832 165.8748">
+				<path fill="#ffffff" d="M 95.196435,139.14134 V 139.14134 L 99.575477,85.260092 93.725882,79.132488 90.12051,82.170085 85.323325,87.209441 81.258449,139.0652 88.377384,147.32974 Z" />
+				</svg>
+			]]>
+		</data>
+		</image>
+	</element>
+
+	<element name="ledseg3">
+		<image statemask="0x01">
+		<data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="40" height="60" viewBox="0 0 109.2832 165.8748">
+				<path fill="#ffffff" d="M 8.3614993,151.77509 15.041155,158.70056 77.868647,159.01066 86.000403,150.43135 85.903597,148.77751 79.417554,141.74867 H 16.590061 L 8.651919,150.43135 Z" id="path1176" />
+				</svg>
+			]]>
+		</data>
+		</image>
+	</element>
+
+	<element name="ledseg4">
+		<image statemask="0x01">
+		<data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="40" height="60" viewBox="0 0 109.2832 165.8748">
+				<path fill="#ffffff" d="M 14.558811,138.94167 V 138.94167 L 19.193501,87.456057 13.002408,81.600896 9.1865559,84.503437 4.1093121,89.318734 0.18881344,137.65642 7.6209698,145.53443 Z" />
+				</svg>
+			]]>
+		</data>
+		</image>
+	</element>
+
+	<element name="ledseg5">
+		<image statemask="0x01">
+		<data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="40" height="60" viewBox="0 0 109.2832 165.8748">
+				<path fill="#ffffff" d="M 20.773462,69.660587 V 69.660587 L 25.697055,15.534132 19.120048,9.3786417 15.066333,12.430062 9.6726043,17.492352 5.8507136,70.654911 12.02517,76.356638 Z" />
+				</svg>
+			]]>
+		</data>
+		</image>
+	</element>
+
+	<element name="ledseg6">
+		<image statemask="0x01">
+		<data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="40" height="60" viewBox="0 0 109.2832 165.8748">
+				<path fill="#ffffff" d="M 15.232441,80.263244 21.75253,86.594345 83.079166,86.877827 91.016666,79.034823 90.922173,77.522917 84.591072,71.097323 H 23.264435 L 15.515923,79.034823 Z" />
+				</svg>
+			]]>
+		</data>
+		</image>
+	</element>
+
+
 	<element name="play" defstate="0">
-		<text string="PLAY" state="1">
+		<text string="PLAYER 1ST" state="1">
 			<color red="1.0" green="1.0" blue="1.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="CONTINUE" state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
 		</text>
 	</element>
 	<element name="pass" defstate="0">
-		<text string="PASS" state="1">
+		<text string="MACHINE 1ST" state="1">
 			<color red="1.0" green="1.0" blue="1.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="COLLECT" state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
 		</text>
 	</element>
 	<element name="select" defstate="0">
-		<rect>
-			<color red="1.0" green="1.0" blue="1.0" />
-		</rect>
 		<text string="SELECT" state="1">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="0.8" height="0.6" />
 		</text>
 	</element>
 	<element name="drop" defstate="0">
-		<rect>
-			<color red="1.0" green="1.0" blue="1.0" />
-		</rect>
 		<text string="DROP" state="1">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.8" />
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="0.8" height="0.6" />
 		</text>
 	</element>
 	<element name="timeout" defstate="0">
-		<rect>
-			<color red="1.0" green="1.0" blue="1.0" />
-		</rect>
 		<text string="TIMEOUT" state="1">
-			<color red="0.0" green="0.0" blue="0.0" />
+			<color red="1.0" green="1.0" blue="1.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
@@ -640,12 +720,65 @@ license:CC0
 			<bounds x="30" y="56" width="28" height="14"/>
 		</element>
 
-		<element name="digit8" ref="digit" state="0">
+
+		<element name="lamp106" ref="ledseg0" state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="56" width="8" height="10"/>
 		</element>
-		<element name="digit9" ref="digit" state="0">
+		<element name="lamp107" ref="ledseg1" state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="56" width="8" height="10"/>
+		</element>
+		<element name="lamp108" ref="ledseg2" state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="56" width="8" height="10"/>
+		</element>
+		<element name="lamp109" ref="ledseg3" state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="56" width="8" height="10"/>
+		</element>
+		<element name="lamp104" ref="ledseg4" state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="56" width="8" height="10"/>
+		</element>
+		<element name="lamp105" ref="ledseg5" state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="56" width="8" height="10"/>
+		</element>
+		<element name="lamp110" ref="ledseg6" state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="56" width="8" height="10"/>
+		</element>
+
+		<element name="lamp114" ref="ledseg0" state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
 			<bounds x="9" y="56" width="8" height="10"/>
 		</element>
+		<element name="lamp115" ref="ledseg1" state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="9" y="56" width="8" height="10"/>
+		</element>
+		<element name="lamp116" ref="ledseg2" state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="9" y="56" width="8" height="10"/>
+		</element>
+		<element name="lamp117" ref="ledseg3" state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="9" y="56" width="8" height="10"/>
+		</element>
+		<element name="lamp112" ref="ledseg4" state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="9" y="56" width="8" height="10"/>
+		</element>
+		<element name="lamp113" ref="ledseg5" state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="9" y="56" width="8" height="10"/>
+		</element>
+		<element name="lamp118" ref="ledseg6" state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="9" y="56" width="8" height="10"/>
+		</element>
+
 		<element name="lamp119" ref="timeout" state="0">
 			<bounds x="30" y="56" width="28" height="14"/>
 		</element>
@@ -656,61 +789,21 @@ license:CC0
 		<element name="lamp121" ref="pass" state="0">
 			<bounds x="40" y="140" width="28" height="14"/>
 		</element>
-		<element name="lamp24" ref="select" state="0">
+		<element name="lamp123" ref="select" state="0">
 			<bounds x="0" y="90" width="28" height="14"/>
 		</element>
-		<element name="lamp123" ref="drop" state="0">
-			<bounds x="20" y="90" width="28" height="14"/>
+		<element name="lamp120" ref="drop" state="0">
+			<bounds x="30" y="90" width="28" height="14"/>
 		</element>
-		<element name="vfd15" ref="vfd0" state="0">
-			<bounds x="0" y="120" width="9" height="14"/>
-		</element>
-		<element name="vfd14" ref="vfd0" state="0">
-			<bounds x="9" y="120" width="9" height="14"/>
-		</element>
-		<element name="vfd13" ref="vfd0" state="0">
-			<bounds x="18" y="120" width="9" height="14"/>
-		</element>
-		<element name="vfd12" ref="vfd0" state="0">
-			<bounds x="27" y="120" width="9" height="14"/>
-		</element>
-		<element name="vfd11" ref="vfd0" state="0">
-			<bounds x="36" y="120" width="9" height="14"/>
-		</element>
-		<element name="vfd10" ref="vfd0" state="0">
-			<bounds x="45" y="120" width="9" height="14"/>
-		</element>
-		<element name="vfd9" ref="vfd0" state="0">
-			<bounds x="54" y="120" width="9" height="14"/>
-		</element>
-		<element name="vfd8" ref="vfd0" state="0">
-			<bounds x="63" y="120" width="9" height="14"/>
-		</element>
-		<element name="vfd7" ref="vfd0" state="0">
-			<bounds x="72" y="120" width="9" height="14"/>
-		</element>
-		<element name="vfd6" ref="vfd0" state="0">
-			<bounds x="81" y="120" width="9" height="14"/>
-		</element>
-		<element name="vfd5" ref="vfd0" state="0">
-			<bounds x="90" y="120" width="9" height="14"/>
-		</element>
-		<element name="vfd4" ref="vfd0" state="0">
-			<bounds x="99" y="120" width="9" height="14"/>
-		</element>
-		<element name="vfd3" ref="vfd0" state="0">
-			<bounds x="108" y="120" width="9" height="14"/>
-		</element>
-		<element name="vfd2" ref="vfd0" state="0">
-			<bounds x="117" y="120" width="9" height="14"/>
-		</element>
-		<element name="vfd1" ref="vfd0" state="0">
-			<bounds x="126" y="120" width="9" height="14"/>
-		</element>
-		<element name="vfd0" ref="vfd0" state="0">
-			<bounds x="135" y="120" width="9" height="14"/>
-		</element>
+
+
+		<repeat count="16">
+			<param name="i" start="15" increment="-1"/>
+			<param name="x" start="0" increment="9"/>
+			<element name="vfd~i~" ref="vfd0">
+				<bounds x="~x~" y="120" width="9" height="14"/>
+			</element>
+		</repeat>
+
 	</view>
 </mamelayout>
-
-

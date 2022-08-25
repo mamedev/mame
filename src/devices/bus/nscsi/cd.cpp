@@ -8,6 +8,7 @@
 
 DEFINE_DEVICE_TYPE(NSCSI_CDROM, nscsi_cdrom_device, "scsi_cdrom", "SCSI CD-ROM")
 DEFINE_DEVICE_TYPE(NSCSI_CDROM_SGI, nscsi_cdrom_sgi_device, "scsi_cdrom_sgi", "SCSI CD-ROM SGI")
+DEFINE_DEVICE_TYPE(NSCSI_CDROM_NEWS, nscsi_cdrom_news_device, "scsi_cdrom_news", "SCSI CD-ROM NEWS")
 DEFINE_DEVICE_TYPE(NSCSI_RRD45, nscsi_dec_rrd45_device, "nrrd45", "RRD45 CD-ROM (New)")
 DEFINE_DEVICE_TYPE(NSCSI_XM3301, nscsi_toshiba_xm3301_device, "nxm3301", "XM-3301TA CD-ROM (New)")
 DEFINE_DEVICE_TYPE(NSCSI_XM5301SUN, nscsi_toshiba_xm5301_sun_device, "nxm5301sun", "XM-5301B Sun 4x CD-ROM (New)")
@@ -23,6 +24,11 @@ nscsi_cdrom_device::nscsi_cdrom_device(const machine_config &mconfig, const char
 
 nscsi_cdrom_sgi_device::nscsi_cdrom_sgi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	nscsi_cdrom_device(mconfig, NSCSI_CDROM_SGI, tag, owner, "Sony", "CDU-76S", "1.0", 0x00, 0x05)
+{
+}
+
+nscsi_cdrom_news_device::nscsi_cdrom_news_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	nscsi_cdrom_device(mconfig, NSCSI_CDROM_NEWS, tag, owner, "Sony", "CD-ROM CDU-541", "1.0A", 0x00, 0x05)
 {
 }
 

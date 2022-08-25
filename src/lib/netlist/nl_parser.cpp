@@ -33,6 +33,8 @@ namespace netlist
 			.comment("/*", "*/", "//");
 		m_tok_paren_left = m_tokenizer.register_token("(");
 		m_tok_paren_right = m_tokenizer.register_token(")");
+		m_tok_brace_left = m_tokenizer.register_token("{");
+		m_tok_brace_right = m_tokenizer.register_token("}");
 		m_tok_comma = m_tokenizer.register_token(",");
 
 		m_tok_static = m_tokenizer.register_token("static");
@@ -52,11 +54,9 @@ namespace netlist
 			"EXTERNAL_LIB_ENTRY");
 		m_tok_SUBMODEL = m_tokenizer.register_token("SUBMODEL");
 		m_tok_NETLIST_START = m_tokenizer.register_token("NETLIST_START");
-		m_tok_NETLIST_END = m_tokenizer.register_token("NETLIST_END");
 		m_tok_NETLIST_EXTERNAL = m_tokenizer.register_token("NETLIST_EXTERNAL");
 		m_tok_EXTERNAL_SOURCE = m_tokenizer.register_token("EXTERNAL_SOURCE");
-		m_tok_TRUTHTABLE_START = m_tokenizer.register_token("TRUTHTABLE_START");
-		m_tok_TRUTHTABLE_END = m_tokenizer.register_token("TRUTHTABLE_END");
+		m_tok_TRUTH_TABLE = m_tokenizer.register_token("TRUTH_TABLE");
 		m_tok_TRUTHTABLE_ENTRY = m_tokenizer.register_token("TRUTHTABLE_ENTRY");
 		m_tok_TT_HEAD = m_tokenizer.register_token("TT_HEAD");
 		m_tok_TT_LINE = m_tokenizer.register_token("TT_LINE");
@@ -77,8 +77,8 @@ namespace netlist
 		return parse(tokstor, nlname);
 	}
 
-	void parser_t::parse_tokens(plib::istream_uptr &&strm,
-		token_store_t &                              tokstor)
+	void
+	parser_t::parse_tokens(plib::istream_uptr &&strm, token_store_t &tokstor)
 	{
 		plib::putf8_reader u8reader(strm.release_stream());
 		m_tokenizer.append_to_store(&u8reader, tokstor);
@@ -100,23 +100,16 @@ namespace netlist
 				return false;
 			}
 
-			if (token.is(m_tok_NETLIST_END) || token.is(m_tok_TRUTHTABLE_END))
+			if (token.is(m_tok_brace_right))  // Netlist ended?
 			{
 				if (!in_nl)
 					error(MF_PARSER_UNEXPECTED_1(token.str()));
 				else
-				{
 					in_nl = false;
-				}
-				require_token(m_tok_paren_left);
-				require_token(m_tok_paren_right);
-
 				m_cur_local->push_back(token);
-				m_cur_local->push_back(token_t(m_tok_paren_left));
-				m_cur_local->push_back(token_t(m_tok_paren_right));
 			}
 			else if (token.is(m_tok_NETLIST_START)
-					 || token.is(m_tok_TRUTHTABLE_START))
+					 || token.is(m_tok_TRUTH_TABLE))
 			{
 				if (in_nl)
 					error(MF_PARSER_UNEXPECTED_1(token.str()));
@@ -125,22 +118,24 @@ namespace netlist
 				if (token.is(m_tok_NETLIST_START)
 					&& (name.str() == nlname || nlname.empty()))
 				{
-					require_token(m_tok_paren_right);
 					parse_netlist();
 					return true;
 				}
-				if (token.is(m_tok_TRUTHTABLE_START) && name.str() == nlname)
+				if (token.is(m_tok_TRUTH_TABLE))
 				{
-					net_truth_table_start(nlname);
-					return true;
+					if (name.str() == nlname)
+					{
+						net_truth_table_start(nlname);
+						return true;
+					}
 				}
 
 				// create a new cached local store
 				m_local.emplace(name.str(), token_store_t());
 				m_cur_local = &m_local[name.str()];
 				auto sl = location();
-				auto li = plib::pfmt(
-					"# {1} \"{2}\"")(sl.line(), sl.file_name());
+				auto li = plib::pfmt("# {1} \"{2}\"")(sl.line(),
+													  sl.file_name());
 
 				m_cur_local->push_back(token_t(token_type::LINEMARKER, li));
 				m_cur_local->push_back(token);
@@ -148,6 +143,14 @@ namespace netlist
 				m_cur_local->push_back(name);
 				// m_cur_local->push_back(token_t(m_tok_paren_right));
 				in_nl = true;
+			}
+			else if (token.is(m_tok_brace_left))
+			{
+				// FIXME - do nothing for now
+				if (!in_nl)
+					printf("FIXME\n");
+				else
+					m_cur_local->push_back(token);
 			}
 			// FIXME: do we really need this going forward ? there should be no
 			// need
@@ -176,6 +179,9 @@ namespace netlist
 
 	void parser_t::parse_netlist()
 	{
+		require_token(m_tok_paren_right);
+		require_token(m_tok_brace_left);
+
 		while (true)
 		{
 			token_t token = get_token();
@@ -222,14 +228,9 @@ namespace netlist
 				require_token(m_tok_paren_right);
 			}
 			else if (token.is(m_tok_NET_REGISTER_DEV))
-			{
 				net_register_dev();
-			}
-			else if (token.is(m_tok_NETLIST_END))
-			{
-				netdev_netlist_end();
+			else if (token.is(m_tok_brace_right))
 				return;
-			}
 			else if (!token.is_type(token_type::IDENTIFIER))
 				error(MF_EXPECTED_IDENTIFIER_GOT_1(token.str()));
 			else
@@ -265,6 +266,7 @@ namespace netlist
 		require_token(m_tok_comma);
 		pstring def_param = get_string();
 		require_token(m_tok_paren_right);
+		require_token(m_tok_brace_left);
 
 		netlist::tt_desc desc;
 		desc.name = nlname;
@@ -299,21 +301,12 @@ namespace netlist
 			}
 			else
 			{
-				require_token(token, m_tok_TRUTHTABLE_END);
-				require_token(m_tok_paren_left);
-				require_token(m_tok_paren_right);
+				require_token(token, m_tok_brace_right);
 				// FIXME: proper location
 				m_setup.truth_table_create(desc, def_param, location());
 				return;
 			}
 		}
-	}
-
-	void parser_t::netdev_netlist_end()
-	{
-		// don't do much
-		require_token(m_tok_paren_left);
-		require_token(m_tok_paren_right);
 	}
 
 	void parser_t::net_model()
@@ -413,7 +406,7 @@ namespace netlist
 		while (true)
 		{
 			pstring t1 = get_identifier();
-			m_setup.register_link(first, t1);
+			m_setup.register_connection(first, t1);
 			m_setup.log().debug("Parser: Connect: {1} {2}\n", first, t1);
 			token_t n = get_token();
 			if (n.is(m_tok_paren_right))
@@ -446,8 +439,10 @@ namespace netlist
 		std::size_t n = pins.size();
 		for (std::size_t i = 0; i < n / 2; i++)
 		{
-			m_setup.register_alias(plib::pfmt("{1}")(i + 1), pins[i * 2]);
-			m_setup.register_alias(plib::pfmt("{1}")(n - i), pins[i * 2 + 1]);
+			m_setup.register_alias(detail::alias_type::PACKAGE_PIN,
+								   plib::pfmt("{1}")(i + 1), pins[i * 2]);
+			m_setup.register_alias(detail::alias_type::PACKAGE_PIN,
+								   plib::pfmt("{1}")(n - i), pins[i * 2 + 1]);
 		}
 	}
 
@@ -481,7 +476,7 @@ namespace netlist
 		if (tok.is_type(token_type::STRING))
 		{
 			m_setup.log().debug("Parser: DefParam: {1} {2}\n", param,
-				tok.str());
+								tok.str());
 			m_setup.register_default_param(param, tok.str());
 			require_token(m_tok_paren_right);
 		}
@@ -584,8 +579,8 @@ namespace netlist
 		return false;
 	}
 
-	plib::istream_uptr source_token_t::stream(
-		[[maybe_unused]] const pstring &name)
+	plib::istream_uptr
+	source_token_t::stream([[maybe_unused]] const pstring &name)
 	{
 		return plib::istream_uptr();
 	}

@@ -9,7 +9,6 @@
 //
 //============================================================
 
-#include "emu.h"
 #include "slideruniform.h"
 
 #include "slider.h"

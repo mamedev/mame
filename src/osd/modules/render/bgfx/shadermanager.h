@@ -16,11 +16,11 @@
 
 #include <bgfx/bgfx.h>
 
-#include "modules/lib/osdobj_common.h"
-
 #include <map>
 #include <string>
 
+
+class osd_options;
 
 class shader_manager {
 public:

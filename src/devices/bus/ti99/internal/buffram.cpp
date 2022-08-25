@@ -26,7 +26,6 @@ namespace bus::ti99::internal {
 buffered_ram_device::buffered_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	:  device_t(mconfig, BUFF_RAM, tag, owner, clock),
 	   device_nvram_interface(mconfig, *this),
-	   m_buffered(true),
 	   m_size(0),
 	   m_mem(nullptr)
 {

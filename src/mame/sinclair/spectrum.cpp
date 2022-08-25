@@ -346,16 +346,19 @@ void spectrum_state::spectrum_ula_w(offs_t offset, uint8_t data)
 	if (is_contended(offset)) content_early();
 	content_early(1);
 
-	unsigned char Changed = m_port_fe_data^data;
+	u8 changed = m_port_fe_data ^ data;
 
-	/* border colour changed? */
-	if ((Changed & 0x07)!=0) m_screen->update_now();
+	/* D0-D2: border colour changed? */
+	if (changed & 0x07) m_screen->update_now();
 
-	/* DAC output state */
-	if ((Changed & (1<<4))!=0) m_speaker->level_w(BIT(data, 4));
+	/* D3-D4: MIC+DAC output state */
+	if (changed & 0x18)
+	{
+		/* D3: write cassette data */
+		if (BIT(changed, 3)) m_cassette->output(BIT(data, 3) ? -1.0 : +1.0);
 
-	/* write cassette data */
-	if ((Changed & (1<<3))!=0) m_cassette->output((data & (1<<3)) ? -1.0 : +1.0);
+		m_speaker->level_w(BIT(data, 3, 2));
+	}
 
 	// Some exp devices use ula port unused bits 5-7:
 	// Beta v2/3/plus use bit 7, Beta clones use bits 6 and 7
@@ -506,16 +509,30 @@ uint8_t spectrum_state::floating_bus_r()
 	*  Note, some were later re-released as "fixed" +2A compatible versions with the floating bus code removed (Arkanoid, Cobra, others?).
 	*/
 
-	uint8_t data = 0xff;
-	int hpos = m_screen->hpos();
-	int vpos = m_screen->vpos();
+	u8 data = 0xff;
+	u64 vpos = m_screen->vpos();
 
 	// peek into attribute ram when beam is in display area
 	// ula always returns ff when in border area (or h/vblank)
-
 	rectangle screen = get_screen_area();
-	if (screen.contains(hpos, vpos))
-		data = m_screen_location[0x1800 + (((vpos - screen.top()) / 8) * 32) + ((hpos - screen.left()) / 8)];
+	if (!m_contention_pattern.empty() && vpos >= screen.top() && vpos <= screen.bottom())
+	{
+		u64 now = m_maincpu->total_cycles() - m_int_at;
+		u64 cf = vpos * m_screen->width() * m_maincpu->clock() / m_screen->clock() + m_contention_offset;
+		u64 ct = cf + screen.width() * m_maincpu->clock() / m_screen->clock();
+		if (cf <= now && now < ct)
+		{
+			u64 clocks = now - cf;
+			if (!BIT(clocks, 2))
+			{
+				u16 y = vpos - screen.top();
+				u16 x = (clocks >> 2) + BIT(clocks, 1);
+				data = clocks & 1
+					? m_screen_location[0x1800 + (((y & 0xf8) << 2) | x)]
+					: m_screen_location[((y & 7) << 8) | ((y & 0x38) << 2) | ((y & 0xc0) << 5) | x];
+			}
+		}
+	}
 
 	return data;
 }
@@ -807,7 +824,9 @@ void spectrum_state::spectrum_common(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
+	static const double speaker_levels[4] = { 0.0, 0.33, 0.66, 1.0 };
+	m_speaker->set_levels(4, speaker_levels);
 
 	/* expansion port */
 	SPECTRUM_EXPANSION_SLOT(config, m_exp, spectrum_expansion_devices, "kempjoy");

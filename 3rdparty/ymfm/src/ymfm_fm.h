@@ -162,8 +162,8 @@ template<class RegisterType> class fm_engine_base;
 template<class RegisterType>
 class fm_operator
 {
-	// "quiet" value, used to optimize when we can skip doing working
-	static constexpr uint32_t EG_QUIET = 0x200;
+	// "quiet" value, used to optimize when we can skip doing work
+	static constexpr uint32_t EG_QUIET = 0x380;
 
 public:
 	// constructor
@@ -206,6 +206,7 @@ public:
 	// simple getters for debugging
 	envelope_state debug_eg_state() const { return m_env_state; }
 	uint16_t debug_eg_attenuation() const { return m_env_attenuation; }
+	uint8_t debug_ssg_inverted() const { return m_ssg_inverted; }
 	opdata_cache &debug_cache() { return m_cache; }
 
 private:

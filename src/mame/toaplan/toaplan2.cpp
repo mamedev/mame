@@ -3050,6 +3050,16 @@ static INPUT_PORTS_START( bgareggatw )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( bgareggak )
+	PORT_INCLUDE( bgaregga )
+
+	PORT_MODIFY("JMPR")
+	PORT_CONFNAME( 0x0003,  0x0003, DEF_STR( Region ) ) //PORT_CONFLOCATION("JP:!2,!1")
+	PORT_CONFSETTING(       0x0001, "Greece" )
+	PORT_CONFSETTING(       0x0003, "Korea" )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( bgareggacn )
 	PORT_INCLUDE( bgaregga )
 
@@ -5446,6 +5456,31 @@ ROM_START( bgareggatw )
 ROM_END
 
 
+// only the program ROMs' dumps were provided for this set.
+// According to the dumper: 'In the Korea Region Setting, DIP SWITCH's 'STAGE EDIT' does not work and
+// the C button (formation change) function in the in-game is also deleted.'
+ROM_START( bgareggak )
+	ROM_REGION( 0x100000, "maincpu", 0 )            // Main 68K code
+	ROM_LOAD16_BYTE( "prg0.bin", 0x000000, 0x080000, CRC(40a108a7) SHA1(cc3227dc87ffefb961dbcdff146e787dbfbdfc2c) )
+	ROM_LOAD16_BYTE( "prg1.bin", 0x000001, 0x080000, CRC(45a6e48a) SHA1(f4d4158b8556b4261291ba9905b9731623b47e54) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )            // Sound Z80 code + bank
+	ROM_LOAD( "snd.bin", 0x00000, 0x20000, BAD_DUMP CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
+
+	ROM_REGION( 0x800000, "gp9001_0", 0 )
+	ROM_LOAD( "rom4.bin",  0x000000, 0x200000, BAD_DUMP CRC(b333d81f) SHA1(5481465f1304334fd55798be2f44324c57c2dbcb) )
+	ROM_LOAD( "rom3.bin",  0x200000, 0x200000, BAD_DUMP CRC(51b9ebfb) SHA1(30e0c326f5175aa436df8dba08f6f4e08130b92f) )
+	ROM_LOAD( "rom2.bin",  0x400000, 0x200000, BAD_DUMP CRC(b330e5e2) SHA1(5d48e9d56f99d093b6390e0af1609fd796df2d35) )
+	ROM_LOAD( "rom1.bin",  0x600000, 0x200000, BAD_DUMP CRC(7eafdd70) SHA1(7c8da8e86c3f9491719b1d7d5d285568d7614f38) )
+
+	ROM_REGION( 0x008000, "text", 0 )
+	ROM_LOAD( "text.u81", 0x00000, 0x08000, BAD_DUMP CRC(e67fd534) SHA1(987d0edffc2c243a13d4567319ea3d185eaadbf8) )
+
+	ROM_REGION( 0x100000, "oki1", 0 )        // ADPCM Samples
+	ROM_LOAD( "rom5.bin", 0x000000, 0x100000, BAD_DUMP CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
+ROM_END
+
+
 ROM_START( bgaregganv )
 	ROM_REGION( 0x100000, "maincpu", 0 )            /* Main 68K code */
 	ROM_LOAD16_BYTE( "prg_0.bin", 0x000000, 0x080000, CRC(951ecc07) SHA1(a82e4b59e4a974566e59f3ab2fbae1aec7d88a2b) )
@@ -5553,6 +5588,28 @@ ROM_START( bgareggabla )
 	ROM_LOAD( "base.bin", 0x00000, 0x08000, CRC(456dd16e) SHA1(84779ee64d3ea33ba1ba4dee39b504a81c6811a1) )
 
 	ROM_REGION( 0x100000, "oki1", 0 )        /* ADPCM Samples */
+	ROM_LOAD( "rom5.bin", 0x000000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
+ROM_END
+
+ROM_START( bgareggablj ) // fixed on Japanese region
+	ROM_REGION( 0x100000, "maincpu", 0 )            // Main 68K code
+	ROM_LOAD16_WORD_SWAP( "sys.bin", 0x000000, 0x100000, CRC(b2a1225f) SHA1(dda00aa5e7ce3f39bb0eebbcd9500ef22a5d74d3) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(                                0x100000 )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )            // Sound Z80 code + bank
+	ROM_LOAD( "snd.bin", 0x00000, 0x20000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
+
+	ROM_REGION( 0x800000, "gp9001_0", 0 )
+	ROM_LOAD( "322_2.bin",  0x000000, 0x400000, CRC(37fe48ed) SHA1(ded5d13c33b4582310cdfb3dd52c052f741c00c5) ) // == rom4.bin+rom3.bin
+	ROM_LOAD( "322_1.bin",  0x400000, 0x400000, CRC(5a06c031) SHA1(ee241ff90117cec1f33ab163601a9d5c75609739) ) // == rom2.bin+rom1.bin
+
+	ROM_REGION( 0x008000, "text", 0 )
+	ROM_LOAD( "text.bin", 0x00000, 0x08000, CRC(e67fd534) SHA1(987d0edffc2c243a13d4567319ea3d185eaadbf8) )
+
+	ROM_REGION( 0x010000, "user1", 0 ) // not graphics
+	ROM_LOAD( "base.bin", 0x00000, 0x08000, CRC(456dd16e) SHA1(84779ee64d3ea33ba1ba4dee39b504a81c6811a1) )
+
+	ROM_REGION( 0x100000, "oki1", 0 )        // ADPCM Samples
 	ROM_LOAD( "rom5.bin", 0x000000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
 ROM_END
 
@@ -6025,20 +6082,20 @@ GAME( 1991, pipibibsbl3, pipibibs, pipibibsbl,   pipibibsbl, toaplan2_state, emp
 GAME( 1993, enmadaio,    0,        enmadaio,     enmadaio,   toaplan2_state, init_enmadaio, ROT0,   "Toaplan / Taito",  "Enma Daio (Japan)", 0 ) // TP-031
 
 // region is in eeprom (and also requires correct return value from a v25 mapped address??)
-GAME( 1992, fixeight,    0,        fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (Europe)",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeightk,   fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (Korea)",                          MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeighth,   fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (Hong Kong)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeighttw,  fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (Taiwan)",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeighta,   fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (Southeast Asia)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeightu,   fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (USA)",                            MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeightj,   fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (Japan)",                          MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeightt,   fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (Europe, Taito license)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeightkt,  fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (Korea, Taito license)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeightht,  fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (Hong Kong, Taito license)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeighttwt, fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (Taiwan, Taito license)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeightat,  fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (Southeast Asia, Taito license)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeightut,  fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (USA, Taito license)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeightjt,  fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (Japan, Taito license)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeight,    0,        fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (Europe)",                                           MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightk,   fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (Korea)",                                            MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeighth,   fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (Hong Kong)",                                        MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeighttw,  fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (Taiwan)",                                           MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeighta,   fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (Southeast Asia)",                                   MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightu,   fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (USA)",                                              MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightj,   fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight - Jigoku no Eiyuu Densetsu (Japan)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightt,   fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (Europe, Taito license)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightkt,  fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (Korea, Taito license)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightht,  fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (Hong Kong, Taito license)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeighttwt, fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (Taiwan, Taito license)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightat,  fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (Southeast Asia, Taito license)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightut,  fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (USA, Taito license)",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightjt,  fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight - Jigoku no Eiyuu Densetsu (Japan, Taito license)",  MACHINE_SUPPORTS_SAVE )
 
 GAME( 1992, fixeightbl,  fixeight, fixeightbl, fixeightbl, toaplan2_state, init_fixeightbl, ROT270,"bootleg", "FixEight (Korea, bootleg)", MACHINE_SUPPORTS_SAVE )
 
@@ -6072,11 +6129,13 @@ GAME( 1996, bgaregga,    0,        bgaregga,   bgaregga,   toaplan2_state, init_
 GAME( 1996, bgareggat,   bgaregga, bgaregga,   bgaregga,   toaplan2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (location test) (Wed Jan 17 1996)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, bgareggahk,  bgaregga, bgaregga,   bgareggahk, toaplan2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (Austria / Hong Kong) (Sat Feb 3 1996)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, bgareggatw,  bgaregga, bgaregga,   bgareggatw, toaplan2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (Taiwan / Germany) (Thu Feb 1 1996)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bgareggak,   bgaregga, bgaregga,   bgareggak,  toaplan2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (Korea / Greece) (Wed Feb 7 1996)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, bgaregganv,  bgaregga, bgaregga,   bgareggahk, toaplan2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga - New Version (Austria / Hong Kong) (Sat Mar 2 1996)" , MACHINE_SUPPORTS_SAVE ) // displays New Version only when set to HK
 GAME( 1996, bgareggat2,  bgaregga, bgaregga,   bgaregga,   toaplan2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Europe / USA / Japan / Asia) (Sat Mar 2 1996)" , MACHINE_SUPPORTS_SAVE ) // displays Type 2 only when set to Europe
 GAME( 1996, bgareggacn,  bgaregga, bgaregga,   bgareggacn, toaplan2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Denmark / China) (Tue Apr 2 1996)", MACHINE_SUPPORTS_SAVE ) // displays Type 2 only when set to Denmark
 GAME( 1996, bgareggabl,  bgaregga, bgareggabl, bgareggacn, toaplan2_state, init_bgaregga,   ROT270, "bootleg",            "1945 Part-2 (Chinese hack of Battle Garegga)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, bgareggabla, bgaregga, bgareggabl, bgareggacn, toaplan2_state, init_bgaregga,   ROT270, "bootleg",            "Lei Shen Zhuan Thunder Deity Biography (Chinese hack of Battle Garegga)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bgareggablj, bgaregga, bgareggabl, bgaregga,   toaplan2_state, init_bgaregga,   ROT270, "bootleg",            "Battle Garegga (Japan, bootleg) (Sat Feb 3 1996)", MACHINE_SUPPORTS_SAVE )
 
 // these are all based on Version B, even if only the Japan version states 'version B'
 GAME( 1998, batrider,    0,        batrider,   batrider,   toaplan2_state, init_batrider,   ROT270, "Raizing / Eighting", "Armed Police Batrider (Europe) (Fri Feb 13 1998)",           MACHINE_SUPPORTS_SAVE )

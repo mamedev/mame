@@ -66,13 +66,14 @@ private:
 
 
 static NETLIST_START(crazybal)
+{
 	SOLVER(Solver, 48000)
 //  PARAM(Solver.FREQ, 48000)
 	PARAM(Solver.ACCURACY, 1e-4)
 
 	// schematics
 	//...
-NETLIST_END()
+}
 
 
 

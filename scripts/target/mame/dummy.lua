@@ -9,8 +9,29 @@
 --
 ---------------------------------------------------------------------------
 
-dofile("arcade.lua")
-dofile("mess.lua")
+-- Set all the device flag setting commands from the block headers
+
+local function selectors_get(path)
+	local selector = ""
+	for l in io.lines(path) do
+		if l:sub(1, 3) == "--@" then
+			local pos = l:find(",")
+			selector = selector .. l:sub(pos+1) .. "\n"
+		end
+	end
+	return selector
+end
+
+local selectors =
+		selectors_get(MAME_DIR .. "scripts/src/cpu.lua") ..
+		selectors_get(MAME_DIR .. "scripts/src/sound.lua") ..
+		selectors_get(MAME_DIR .. "scripts/src/video.lua") ..
+		selectors_get(MAME_DIR .. "scripts/src/machine.lua") ..
+		selectors_get(MAME_DIR .. "scripts/src/bus.lua") ..
+		selectors_get(MAME_DIR .. "scripts/src/formats.lua")
+
+load(selectors)()
+
 
 function createProjects_mame_dummy(_target, _subtarget)
 	project ("mame_dummy")

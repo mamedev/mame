@@ -1398,9 +1398,6 @@ void output_track_metadata(int mode, util::core_file &file, int tracknum, const 
 	// non-CUE mode
 	else if (mode == MODE_NORMAL)
 	{
-		// header on the first track
-		if (tracknum == 0)
-			file.printf("CD_ROM\n\n\n");
 		file.printf("// Track %d\n", tracknum + 1);
 
 		// write out the track type
@@ -2484,6 +2481,42 @@ static void do_extract_cd(parameters_map &params)
 		if (mode == MODE_GDI)
 		{
 			output_toc_file->printf("%d\n", toc.numtrks);
+		}
+		else if (mode == MODE_NORMAL)
+		{
+			bool mode1 = false;
+			bool mode2 = false;
+			bool cdda = false;
+
+			for (int tracknum = 0; tracknum < toc.numtrks; tracknum++)
+			{
+				switch (toc.tracks[tracknum].trktype)
+				{
+					case cdrom_file::CD_TRACK_MODE1:
+					case cdrom_file::CD_TRACK_MODE1_RAW:
+						mode1 = true;
+						break;
+
+					case cdrom_file::CD_TRACK_MODE2:
+					case cdrom_file::CD_TRACK_MODE2_FORM1:
+					case cdrom_file::CD_TRACK_MODE2_FORM2:
+					case cdrom_file::CD_TRACK_MODE2_FORM_MIX:
+					case cdrom_file::CD_TRACK_MODE2_RAW:
+						mode2 = true;
+						break;
+
+					case cdrom_file::CD_TRACK_AUDIO:
+						cdda = true;
+						break;
+				}
+			}
+
+			if (mode2)
+				output_toc_file->printf("CD_ROM_XA\n\n\n");
+			else if (cdda && !mode1)
+				output_toc_file->printf("CD_DA\n\n\n");
+			else
+				output_toc_file->printf("CD_ROM\n\n\n");
 		}
 
 		// iterate over tracks and copy all data

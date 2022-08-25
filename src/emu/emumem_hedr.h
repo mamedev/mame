@@ -23,6 +23,7 @@ public:
 
 	uX read(offs_t offset, uX mem_mask) const override;
 	std::pair<uX, u16> read_flags(offs_t offset, uX mem_mask) const override;
+	u16 lookup_flags(offs_t offset, uX mem_mask) const override;
 	void *get_ptr(offs_t offset) const override;
 	void lookup(offs_t address, offs_t &start, offs_t &end, handler_entry_read<Width, AddrShift> *&handler) const override;
 

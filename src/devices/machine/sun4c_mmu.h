@@ -137,7 +137,7 @@ protected:
 	void type0_timeout_r(const uint32_t offset);
 	void type0_timeout_w(const uint32_t offset);
 	bool translate(uint32_t &addr);
-	void l2p_command(const std::vector<std::string> &params);
+	void l2p_command(const std::vector<std::string_view> &params);
 	uint32_t vaddr_to_cache_line(uint32_t vaddr);
 
 	enum

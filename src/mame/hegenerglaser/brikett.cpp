@@ -203,7 +203,7 @@ INTERRUPT_GEN_MEMBER(brikett_state::interrupt)
 
 READ_LINE_MEMBER(brikett_state::clear_r)
 {
-	// CLEAR low + RESET high resets cpu
+	// CLEAR low + WAIT high resets cpu
 	int ret = (m_reset) ? 0 : 1;
 	m_reset = false;
 	return ret;
@@ -542,6 +542,7 @@ ROM_START( mephisto2a ) // cartridge s/n 0037011
 	ROM_LOAD("4005_02_353_01.3", 0x2000, 0x1000, CRC(1f933d33) SHA1(5d5bfd40158354830c434f4c8b4ff1cac8ab4f5c) ) // "
 ROM_END
 
+
 ROM_START( mephisto2e )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("251-11.1", 0x0000, 0x1000, CRC(3c8e2631) SHA1(5960e47f0659b1e5f164107069738e730e3ff255) ) // M2532A
@@ -590,7 +591,8 @@ CONS( 1982, mephistoj,  0,         0, mephistoj,  mephistoj,  brikett_state, emp
 
 CONS( 1981, mephisto2,  0,         0, mephisto2,  mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto II (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1981, mephisto2a, mephisto2, 0, mephisto2,  mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto II (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1981, mephisto2e, mephisto2, 0, mephisto2e, mephisto2e, brikett_state, empty_init, "Hegener + Glaser", "Mephisto ESB II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
+CONS( 1981, mephisto2e, 0,         0, mephisto2e, mephisto2e, brikett_state, empty_init, "Hegener + Glaser", "Mephisto ESB II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1983, mephisto3,  0,         0, mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1983, mephisto3a, mephisto3, 0, mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -159,7 +159,7 @@
  *                            - ignore FREEZE
  *                            - The crystal clock is the clear-to-send input capture clock for both channels
  *  SIM40 + 0x0701: 0x8A     Serial Module - MCR Low Byte
- *                            - The serial control regosters are only accessable from supervisor mode
+ *                            - The serial control registers are only accessible from supervisor mode
  *                            - IARB = 0x0A - serial module has priority level 10d
  *  SIM40 + 0x0704: 0x01     Serial Module - ILR Interrupt Level
  *  SIM40 + 0x0705: 0x44     Serial Module - IVR Interrupt Vector

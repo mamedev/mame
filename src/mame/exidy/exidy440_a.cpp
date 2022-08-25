@@ -554,7 +554,7 @@ int16_t *exidy440_sound_device::find_or_add_to_sound_cache(int address, int leng
 		if (current.address == address && current.length == length && current.bits == bits && current.frequency == frequency)
 			return &current.data[0];
 
-	return add_to_sound_cache(&m_samples[address], address, length, bits, frequency);
+	return length ? add_to_sound_cache(&m_samples[address], address, length, bits, frequency) : nullptr;
 }
 
 
@@ -584,8 +584,6 @@ void exidy440_sound_device::play_cvsd(int ch)
 
 	/* compute the base address in the converted samples array */
 	base = find_or_add_to_sound_cache(address, length, channel_bits[ch], m_channel_frequency[ch]);
-	if (!base)
-		return;
 
 	/* if the length is 0 or 1, just do an immediate end */
 	if (length <= 3)

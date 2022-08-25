@@ -203,6 +203,16 @@ void midiin_device::call_unload()
 	{
 		m_midi->close();
 	}
+	else
+	{
+		// send "all notes off" CC if unloading a MIDI file
+		for (u8 channel = 0; channel < 0x10; channel++)
+		{
+			xmit_char(0xb0 | channel);
+			xmit_char(123);
+			xmit_char(0);
+		}
+	}
 	m_midi.reset();
 	m_sequence.clear();
 	m_timer->enable(false);

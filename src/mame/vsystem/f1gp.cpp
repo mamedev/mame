@@ -652,7 +652,7 @@ ROM_START( f1gpb )
 	/* RAM, not ROM - handled at run time */
 
 	ROM_REGION( 0x90000, "oki", 0 ) /* sound samples */
-	ROM_LOAD( "6.ic13",   0x000000, 0x030000, CRC(6e83ffd8) SHA1(618fd6cd6c0844a4be96f77ff22cd41364718d16) )
+	ROM_LOAD( "6.ic13",   0x000000, 0x030000, CRC(6e83ffd8) SHA1(618fd6cd6c0844a4be96f77ff22cd41364718d16) ) // a second dump has 0x40 instead of 0x44 at 0x54cbc. Which one is bad?
 	ROM_CONTINUE(         0x040000, 0x050000 )
 ROM_END
 

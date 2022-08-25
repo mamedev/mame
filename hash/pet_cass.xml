@@ -2413,7 +2413,7 @@ license:CC0
 		<!-- pet2001b16 Side B: lit comp4-owww -->
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="11977626">
-				<rom name="2-2 take me out to the ball game for some salad  (1980)(our weird and wacky world).wav" size="11977626" crc="f3bd4a97" sha1="02436bc9dd373e9fd7fa278467215e3b37ac99b0"/>
+				<rom name="2-2 take me out to the ball game for some salad (1980)(our weird and wacky world).wav" size="11977626" crc="f3bd4a97" sha1="02436bc9dd373e9fd7fa278467215e3b37ac99b0"/>
 			</dataarea>
 		</part>
 	</software>

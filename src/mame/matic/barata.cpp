@@ -339,4 +339,4 @@ ROM_END
 /*************************
 *      Game Drivers      *
 *************************/
-GAME( 2002, barata, 0, barata, barata, barata_state, empty_init, ROT0, "Eletro Matic Equipamentos Eletromec??nicos", "Dona Barata (early prototype)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2002, barata, 0, barata, barata, barata_state, empty_init, ROT0, u8"Eletro Matic Equipamentos Eletromecânicos", "Dona Barata (early prototype)", MACHINE_IMPERFECT_GRAPHICS )

@@ -8,7 +8,8 @@
  *   - http://www.cpu-ns32k.net/Whitechapel.html
  *
  * TODO:
- *   - skeleton only
+ *   - hard disk controller
+ *   - keyboard/mouse
  */
 
 #include "emu.h"
@@ -24,11 +25,11 @@
 #include "machine/ns32082.h"
 #include "machine/ns32202.h"
 #include "machine/am79c90.h"
-//#include "machine/am9516.h"
+#include "machine/am9516.h"
 #include "machine/i8251.h"
 #include "machine/pit8253.h"
 #include "machine/wd_fdc.h"
-//#include "machine/d7261.h"
+//#include "machine/upd7261.h"
 #include "machine/mm58174.h"
 
 // buses and connectors
@@ -61,12 +62,14 @@ public:
 		, m_iop_ram(*this, "iop_ram")
 		, m_iop_sram(*this, "iop_sram")
 		, m_iop_ctc(*this, "iop_ctc")
+		, m_dma(*this, "dma%u", 0U)
 		, m_usart(*this, "usart")
 		, m_serial(*this, "serial")
 		, m_rtc(*this, "rtc")
 		, m_fdc(*this, "fdc")
 		, m_fdd(*this, "fdc:0:35dd")
 		, m_net(*this, "net")
+		//, m_hdc(*this, "hdc")
 		, m_crtc(*this, "crtc")
 		, m_screen(*this, "screen")
 		, m_vmram(*this, "vmram")
@@ -78,8 +81,6 @@ public:
 	// machine config
 	void mg1(machine_config &config);
 
-	void init_common();
-
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -88,6 +89,7 @@ protected:
 	// address maps
 	template <unsigned ST> void cpu_map(address_map &map);
 	void iop_map(address_map &map);
+	void dma_map(address_map &map);
 
 private:
 	MC6845_UPDATE_ROW(update_row);
@@ -108,12 +110,15 @@ private:
 
 	required_device<pit8253_device> m_iop_ctc;
 
+	required_device_array<am9516_device, 2> m_dma;
 	required_device<i8251_device> m_usart;
 	required_device<rs232_port_device> m_serial;
 	required_device<mm58174_device> m_rtc;
 	required_device<wd1770_device> m_fdc;
 	required_device<floppy_image_device> m_fdd;
 	required_device<am7990_device> m_net;
+
+	//required_device<upd7261_device> m_hdc;
 
 	required_device<mc6845_device> m_crtc;
 	required_device<screen_device> m_screen;
@@ -125,24 +130,16 @@ private:
 	u8 m_sem[6] = { 0xc0, 0x80, 0xc0, 0xc0, 0xc0, 0xc0 };
 };
 
-
 void mg1_state::machine_start()
-{
-}
-
-
-void mg1_state::machine_reset()
-{
-	m_fdc->set_floppy(m_fdd);
-}
-
-
-void mg1_state::init_common()
 {
 	m_led_err.resolve();
 	m_led_fdd.resolve();
 }
 
+void mg1_state::machine_reset()
+{
+	m_fdc->set_floppy(m_fdd);
+}
 
 template <unsigned ST> void mg1_state::cpu_map(address_map &map)
 {
@@ -192,17 +189,17 @@ template <unsigned ST> void mg1_state::cpu_map(address_map &map)
 	//map(0x308800, 0x3089ff).mirror(0xcf6000); // ctc
 	//map(0x308a00, 0x308bff).mirror(0xcf6000); // raster-op function ctl
 	//map(0x308c00, 0x308dff).mirror(0xcf6000); // raster-op
-	//map(0x308e00, 0x308fff).mirror(0xcf6000); // general/raster-op dma
+
+	map(0x308e00, 0x308e01).mirror(0xcf6000).rw(m_dma[0], FUNC(am9516_device::data_r), FUNC(am9516_device::data_w));
+	map(0x308e02, 0x308e03).mirror(0xcf6000).rw(m_dma[0], FUNC(am9516_device::addr_r), FUNC(am9516_device::addr_w));
+	map(0x308e04, 0x308e05).mirror(0xcf6000).rw(m_dma[1], FUNC(am9516_device::data_r), FUNC(am9516_device::data_w));
+	map(0x308e06, 0x308e07).mirror(0xcf6000).rw(m_dma[1], FUNC(am9516_device::addr_r), FUNC(am9516_device::addr_w));
 
 	map(0x309000, 0x309003).mirror(0xcf6000).umask16(0x00ff).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x309200, 0x3093ff).mirror(0xcf6000).rw(m_net, FUNC(am7990_device::regs_r), FUNC(am7990_device::regs_w));
 	map(0x309400, 0x3095ff).mirror(0xcf6000).umask16(0x00ff).rw(m_rtc, FUNC(mm58174_device::read), FUNC(mm58174_device::write));
 
-	map(0x309600, 0x3097ff).mirror(0xcf6000).lr8(  // hdc
-		[](offs_t offset)
-		{
-			return 0xff;
-		}, "hdc_r");
+	//map(0x309600, 0x309603).mirror(0xcf6000).m(m_hdc, FUNC(upd7261_device::map)).umask16(0x00ff);
 
 	map(0x309800, 0x309807).mirror(0xcf6000).umask16(0x00ff).rw(m_fdc, FUNC(wd1770_device::read), FUNC(wd1770_device::write));
 
@@ -219,7 +216,6 @@ template <unsigned ST> void mg1_state::cpu_map(address_map &map)
 	//map(0x309c00, 0x309dff).mirror(0xcf6000); // dma interrupt acknowledge
 	map(0x309e00, 0x309e3f).mirror(0xcf6000).umask16(0x00ff).m(m_icu, FUNC(ns32202_device::map<BIT(ST, 1)>));
 }
-
 
 void mg1_state::iop_map(address_map &map)
 {
@@ -255,10 +251,16 @@ void mg1_state::iop_map(address_map &map)
 	map(0x8000, 0xbfff).mirror(0x4000).rom().region("iop_prom", 0);
 }
 
+void mg1_state::dma_map(address_map &map)
+{
+	// system memory buffers swap DMA byte lanes
+	map(0x000000, 0xffffff).lrw16(
+		[this](offs_t offset, u16 mem_mask) { return swapendian_int16(m_cpu->space(0).read_word(offset << 1, swapendian_int16(mem_mask))); }, "dma_r",
+		[this](offs_t offset, u16 data, u16 mem_mask) { m_cpu->space(0).write_word(offset << 1, swapendian_int16(data), swapendian_int16(mem_mask)); }, "dma_w");
+}
 
 static INPUT_PORTS_START(mg1)
 INPUT_PORTS_END
-
 
 MC6845_UPDATE_ROW(mg1_state::update_row)
 {
@@ -287,7 +289,6 @@ MC6845_UPDATE_ROW(mg1_state::update_row)
 		}
 	}
 }
-
 
 void mg1_state::mg1(machine_config &config)
 {
@@ -331,6 +332,12 @@ void mg1_state::mg1(machine_config &config)
 
 	PIT8253(config, m_iop_ctc);
 
+	AM9516(config, m_dma[0], 10_MHz_XTAL / 2); // graphics (not used)
+
+	AM9516(config, m_dma[1], 10_MHz_XTAL / 2); // general, ch1 hard disk, ch2 -> J3 or floppy
+	m_dma[1]->out_int().set(m_icu, FUNC(ns32202_device::ir_w<4>));
+	m_dma[1]->set_addrmap(am9516_device::SYSTEM_MEM, &mg1_state::dma_map);
+
 	I8251(config, m_usart, m_iop->clock());
 	m_icu->out_cout().set(m_usart, FUNC(i8251_device::rx_clock_w));
 	m_icu->out_cout().append(m_usart, FUNC(i8251_device::tx_clock_w));
@@ -364,6 +371,15 @@ void mg1_state::mg1(machine_config &config)
 	m_net->dma_in().set([this](offs_t offset) { return m_cpu->space(0).read_word(offset); });
 	m_net->dma_out().set([this](offs_t offset, u16 data, u16 mem_mask) { m_cpu->space(0).write_word(offset, data, mem_mask); });
 
+	// hard disk controller not emulated
+#if 0
+	UPD7261(config, m_hdc, 10_MHz_XTAL);
+	m_hdc->out_dreq().set(m_dma[1], FUNC(am9516_device::dreq_w<0>)).invert();
+	m_hdc->out_int().set(m_icu, FUNC(ns32202_device::ir_w<3>)).invert();
+
+	HARDDISK(config, "hdc:0", 0);
+#endif
+
 	WD1770(config, m_fdc, 8_MHz_XTAL);
 	m_fdc->intrq_wr_callback().set(m_icu, FUNC(ns32202_device::ir_w<8>));
 	//m_fdc->drq_wr_callback().set(m_dma, FUNC(dmac_0448_device::drq<1>));
@@ -376,27 +392,25 @@ void mg1_state::mg1(machine_config &config)
 	config.set_default_layout(layout_mg1);
 }
 
-
 void mg1_state::floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
 	fr.add(FLOPPY_APPLIX_FORMAT);
 }
 
-
 ROM_START(mg1)
 	ROM_REGION16_LE(0x4000, "prom", 0)
 	ROM_SYSTEM_BIOS(0, "260", "v2.60")
-	ROMX_LOAD("sys_260_even.u291", 0x0000, 0x2000, CRC(24b45b73) SHA1(04d86587b104aa122ac395aa39eb92a1f4d68def), ROM_BIOS(0) | ROM_SKIP(1) )
-	ROMX_LOAD("sys_260_odd.u292",  0x0001, 0x2000, CRC(a46ebbf8) SHA1(a2ab9fa3a9576d63d8d49730bfcd58a0f508b30f), ROM_BIOS(0) | ROM_SKIP(1) )
+	ROMX_LOAD("sys_260_even.u291", 0x0000, 0x2000, CRC(24b45b73) SHA1(04d86587b104aa122ac395aa39eb92a1f4d68def), ROM_BIOS(0) | ROM_SKIP(1))
+	ROMX_LOAD("sys_260_odd.u292",  0x0001, 0x2000, CRC(a46ebbf8) SHA1(a2ab9fa3a9576d63d8d49730bfcd58a0f508b30f), ROM_BIOS(0) | ROM_SKIP(1))
 	ROM_SYSTEM_BIOS(1, "251", "v2.51")
-	ROMX_LOAD("sys_251.bin", 0x0000, 0x4000, CRC(aa6c7ccd) SHA1(ef52f0a014c209414f669b7a4d200e9bb9a09fea), ROM_BIOS(1))
+	ROMX_LOAD("even_2.51__sys__13.1_u291.u291", 0x0000, 0x2000, CRC(677cab3c) SHA1(d0197b45ddb1ddd8cd125727312b06dcae0f984a), ROM_BIOS(1) | ROM_SKIP(1))
+	ROMX_LOAD("odd_2.51__sys__13.1_u292.u292",  0x0001, 0x2000, CRC(b0134a98) SHA1(a81bd4987030b09799bad0c3bc758ea8aed8cd2f), ROM_BIOS(1) | ROM_SKIP(1))
 
 	ROM_REGION(0x4000, "iop_prom", 0)
-	ROM_LOAD("iop_30.u285", 0x0000, 0x2000, CRC(733cd089) SHA1(31ffdd85b4ae2ac35dcde292a0d42860baaba88d))
-	ROM_RELOAD(             0x2000, 0x2000)
+	ROM_LOAD("3.0__iop__24.7.87.u285", 0x0000, 0x2000, CRC(733cd089) SHA1(31ffdd85b4ae2ac35dcde292a0d42860baaba88d))
+	ROM_RELOAD(                        0x2000, 0x2000)
 ROM_END
 
-
-/*   YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT         COMPANY  FULLNAME    FLAGS */
-COMP(1984, mg1,  0,      0,      mg1,     mg1,   mg1_state, init_common, "Whitechapel Computer Works",  "MG-1", MACHINE_IS_SKELETON)
+/*   YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY                       FULLNAME    FLAGS */
+COMP(1984, mg1,  0,      0,      mg1,     mg1,   mg1_state, empty_init, "Whitechapel Computer Works", "MG-1",     MACHINE_IS_SKELETON)

@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Joseba Epalza,Andreas Naive
+// copyright-holders:Joseba Epalza, Andreas Naive
+
 /***************************************************************************
 
  Speed Ball / Music Ball
@@ -30,15 +31,211 @@ Interrupt frequency on audio CPU is not a periodical signal, but there are a lot
 ***************************************************************************/
 
 #include "emu.h"
-#include "speedbal.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/ymopl.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "speedbal.lh"
 
+
+// configurable logging
+#define LOG_UNKWRITE     (1U <<  1)
+
+//#define VERBOSE (LOG_GENERAL | LOG_UNKWRITE)
+
+#include "logmacro.h"
+
+#define LOGUNKWRITE(...)     LOGMASKED(LOG_UNKWRITE,     __VA_ARGS__)
+
+
+namespace {
+
+class speedbal_state : public driver_device
+{
+public:
+	speedbal_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_spriteram(*this, "spriteram")
+		, m_background_videoram(*this, "bg_videoram")
+		, m_foreground_videoram(*this, "fg_videoram")
+		, m_digits(*this, "digit%u", 0U)
+	{ }
+
+	void speedbal(machine_config &config);
+
+	void init_speedbal();
+	void init_musicbal();
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_background_videoram;
+	required_shared_ptr<uint8_t> m_foreground_videoram;
+	output_finder<73> m_digits;
+
+	bool m_leds_start = 0;
+	uint32_t m_leds_shiftreg = 0U;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+
+	void coincounter_w(uint8_t data);
+	void foreground_videoram_w(offs_t offset, uint8_t data);
+	void background_videoram_w(offs_t offset, uint8_t data);
+	void maincpu_50_w(uint8_t data);
+	void leds_output_block(uint8_t data);
+	void leds_start_block(uint8_t data);
+	void leds_shift_bit(uint8_t data);
+
+	TILE_GET_INFO_MEMBER(get_tile_info_bg);
+	TILE_GET_INFO_MEMBER(get_tile_info_fg);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void main_cpu_io_map(address_map &map);
+	void main_cpu_map(address_map &map);
+	void sound_cpu_io_map(address_map &map);
+	void sound_cpu_map(address_map &map);
+};
+
+
+// video
+
+TILE_GET_INFO_MEMBER(speedbal_state::get_tile_info_bg)
+{
+	int const code = m_background_videoram[tile_index * 2] + ((m_background_videoram[tile_index * 2 + 1] & 0x30) << 4);
+	int const color = m_background_videoram[tile_index * 2 + 1] & 0x0f;
+
+	tileinfo.set(1, code, color, 0);
+	tileinfo.group = (color == 8);
+}
+
+TILE_GET_INFO_MEMBER(speedbal_state::get_tile_info_fg)
+{
+	int const code = m_foreground_videoram[tile_index * 2] + ((m_foreground_videoram[tile_index * 2 + 1] & 0x30) << 4);
+	int const color = m_foreground_videoram[tile_index * 2 + 1] & 0x0f;
+
+	tileinfo.set(0, code, color, 0);
+	tileinfo.group = (color == 9);
+}
+
+/*************************************
+ *                                   *
+ *      Start-Stop                   *
+ *                                   *
+ *************************************/
+
+void speedbal_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(speedbal_state::get_tile_info_bg)), TILEMAP_SCAN_COLS_FLIP_X, 16, 16, 16, 16);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(speedbal_state::get_tile_info_fg)), TILEMAP_SCAN_COLS_FLIP_X,  8,  8, 32, 32);
+
+	m_bg_tilemap->set_transmask(0, 0xffff, 0x0000); // split type 0 is totally transparent in front half
+	m_bg_tilemap->set_transmask(1, 0x00f7, 0x0000); // split type 1 has pen 0-2, 4-7 transparent in front half
+
+	m_fg_tilemap->set_transmask(0, 0xffff, 0x0001); // split type 0 is totally transparent in front half and has pen 0 transparent in back half
+	m_fg_tilemap->set_transmask(1, 0x0001, 0x0001); // split type 1 has pen 0 transparent in front and back half
+}
+
+
+
+/*************************************
+ *                                   *
+ *  Foreground characters RAM        *
+ *                                   *
+ *************************************/
+
+void speedbal_state::foreground_videoram_w(offs_t offset, uint8_t data)
+{
+	m_foreground_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset >> 1);
+}
+
+/*************************************
+ *                                   *
+ *  Background tiles RAM             *
+ *                                   *
+ *************************************/
+
+void speedbal_state::background_videoram_w(offs_t offset, uint8_t data)
+{
+	m_background_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset >> 1);
+}
+
+
+/*************************************
+ *                                   *
+ *   Sprite drawing                  *
+ *                                   *
+ *************************************/
+
+void speedbal_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// Drawing sprites: 64 in total
+
+	for (int offset = 0; offset < m_spriteram.bytes(); offset += 4)
+	{
+		if (!(m_spriteram[offset + 2] & 0x80))
+			continue;
+
+		int x = 243 - m_spriteram[offset + 3];
+		int y = 239 - m_spriteram[offset + 0];
+
+		int const code = (m_spriteram[offset + 1]) | ((m_spriteram[offset + 2] & 0x40) << 2);
+
+		int const color = m_spriteram[offset + 2] & 0x0f;
+
+		int flipx = 0, flipy = 0;
+
+		if (flip_screen())
+		{
+			x = 246 - x;
+			y = 238 - y;
+			flipx = flipy = 1;
+		}
+
+		m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
+				code,
+				color,
+				flipx, flipy,
+				x, y, 0);
+	}
+}
+
+/*************************************
+ *                                   *
+ *   Refresh screen                  *
+ *                                   *
+ *************************************/
+
+uint32_t speedbal_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	draw_sprites(bitmap, cliprect);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+	return 0;
+}
+
+
+// machine
 
 void speedbal_state::machine_start()
 {
@@ -52,23 +249,23 @@ void speedbal_state::coincounter_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(0, data & 0x80);
 	machine().bookkeeping().coin_counter_w(1, data & 0x40);
 	flip_screen_set(data & 8); // also changes data & 0x10 at the same time too (flipx and flipy?)
-	/* unknown: (data & 0x10) and (data & 4) */
+	// unknown: (data & 0x10) and (data & 4)
 }
 
 void speedbal_state::main_cpu_map(address_map &map)
 {
 	map(0x0000, 0xdbff).rom();
 	map(0xdc00, 0xdfff).ram().share("share1"); // shared with SOUND
-	map(0xe000, 0xe1ff).ram().w(FUNC(speedbal_state::background_videoram_w)).share("bg_videoram");
-	map(0xe800, 0xefff).ram().w(FUNC(speedbal_state::foreground_videoram_w)).share("fg_videoram");
+	map(0xe000, 0xe1ff).ram().w(FUNC(speedbal_state::background_videoram_w)).share(m_background_videoram);
+	map(0xe800, 0xefff).ram().w(FUNC(speedbal_state::foreground_videoram_w)).share(m_foreground_videoram);
 	map(0xf000, 0xf5ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xf600, 0xfeff).ram();
-	map(0xff00, 0xffff).ram().share("spriteram");
+	map(0xff00, 0xffff).ram().share(m_spriteram);
 }
 
 void speedbal_state::maincpu_50_w(uint8_t data)
 {
-	//logerror("%s: maincpu_50_w %02x\n", machine().describe_context(), data);
+	LOGUNKWRITE("%s: maincpu_50_w %02x\n", machine().describe_context(), data);
 }
 
 void speedbal_state::main_cpu_io_map(address_map &map)
@@ -101,7 +298,7 @@ void speedbal_state::leds_output_block(uint8_t data)
 	// Each hypothetical led block has 3 7seg leds.
 	// The shift register is 28 bits, led block number is in the upper bits
 	// and the other 3 bytes in it go to each 7seg led of the current block.
-	int block = m_leds_shiftreg >> 24 & 7;
+	int const block = m_leds_shiftreg >> 24 & 7;
 	m_digits[10 * block] = ~m_leds_shiftreg & 0xff;
 	m_digits[10 * block + 1] = ~m_leds_shiftreg >> 8 & 0xff;
 	m_digits[10 * block + 2] = ~m_leds_shiftreg >> 16 & 0xff;
@@ -220,44 +417,44 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,    /* 8*8 characters */
-	RGN_FRAC(1,2),   /* 1024 characters */
-	4,      /* actually 2 bits per pixel - two of the planes are empty */
+	8,8,    // 8*8 characters
+	RGN_FRAC(1,2),   // 1024 characters
+	4,      // actually 2 bits per pixel - two of the planes are empty
 	{ RGN_FRAC(1,2)+4, RGN_FRAC(1,2)+0, 4, 0 },
 	{ 8+3, 8+2, 8+1, 8+0, 3, 2, 1, 0 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },   /* characters are rotated 90 degrees */
-	16*8       /* every char takes 16 bytes */
+	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },   // characters are rotated 90 degrees
+	16*8       // every char takes 16 bytes
 };
 
 static const gfx_layout tilelayout =
 {
-	16,16,  /* 16*16 tiles */
-	RGN_FRAC(1,1),   /* 1024 tiles */
-	4,      /* 4 bits per pixel */
-	{ 0, 2, 4, 6 }, /* the bitplanes are packed in one nibble */
+	16,16,  // 16*16 tiles
+	RGN_FRAC(1,1),   // 1024 tiles
+	4,      // 4 bits per pixel
+	{ 0, 2, 4, 6 }, // the bitplanes are packed in one nibble
 	{ 0*8+0, 0*8+1, 7*8+0, 7*8+1, 6*8+0, 6*8+1, 5*8+0, 5*8+1,
 			4*8+0, 4*8+1, 3*8+0, 3*8+1, 2*8+0, 2*8+1, 1*8+0, 1*8+1 },
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
 			8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8  /* every sprite takes 128 consecutive bytes */
+	128*8  // every sprite takes 128 consecutive bytes
 };
 
 static const gfx_layout spritelayout =
 {
-	16,16,  /* 16*16 sprites */
-	RGN_FRAC(1,1),    /* 512 sprites */
-	4,      /* 4 bits per pixel */
-	{ 0, 2, 4, 6 }, /* the bitplanes are packed in one nibble */
+	16,16,  // 16*16 sprites
+	RGN_FRAC(1,1),    // 512 sprites
+	4,      // 4 bits per pixel
+	{ 0, 2, 4, 6 }, // the bitplanes are packed in one nibble
 	{ 7*8+1, 7*8+0, 6*8+1, 6*8+0, 5*8+1, 5*8+0, 4*8+1, 4*8+0,
 			3*8+1, 3*8+0, 2*8+1, 2*8+0, 1*8+1, 1*8+0, 0*8+1, 0*8+0 },
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
 			8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8  /* every sprite takes 128 consecutive bytes */
+	128*8  // every sprite takes 128 consecutive bytes
 };
 
 static GFXDECODE_START( gfx_speedbal )
-	GFXDECODE_ENTRY( "chars", 0, charlayout,  256, 16 )
-	GFXDECODE_ENTRY( "bgtiles", 0, tilelayout,  512, 16 )
+	GFXDECODE_ENTRY( "chars",   0, charlayout,   256, 16 )
+	GFXDECODE_ENTRY( "bgtiles", 0, tilelayout,   512, 16 )
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout,   0, 16 )
 GFXDECODE_END
 
@@ -265,21 +462,21 @@ GFXDECODE_END
 
 void speedbal_state::speedbal(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(4'000'000)); // 4 MHz
+	// basic machine hardware
+	Z80(config, m_maincpu, XTAL(4'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &speedbal_state::main_cpu_map);
 	m_maincpu->set_addrmap(AS_IO, &speedbal_state::main_cpu_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(speedbal_state::irq0_line_hold));
 
-	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(4'000'000))); // 4 MHz
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(4'000'000)));
 	audiocpu.set_addrmap(AS_PROGRAM, &speedbal_state::sound_cpu_map);
 	audiocpu.set_addrmap(AS_IO, &speedbal_state::sound_cpu_io_map);
-	audiocpu.set_periodic_int(FUNC(speedbal_state::irq0_line_hold), attotime::from_hz(1000/2)); // approximate?
+	audiocpu.set_periodic_int(FUNC(speedbal_state::irq0_line_hold), attotime::from_hz(1000 / 2)); // approximate?
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(56.4); // measured
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(speedbal_state::screen_update));
@@ -288,7 +485,7 @@ void speedbal_state::speedbal(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_speedbal);
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 768).set_endianness(ENDIANNESS_BIG);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	YM3812(config, "ymsnd", XTAL(4'000'000)).add_route(ALL_OUTPUTS, "mono", 1.0); // 4 MHz(?)
@@ -298,16 +495,16 @@ void speedbal_state::speedbal(machine_config &config)
 void speedbal_state::init_speedbal()
 {
 	// sprite tiles are in an odd order, rearrange to simplify video drawing function
-	uint8_t* rom = memregion("sprites")->base();
-	uint8_t temp[0x200*128];
+	uint8_t *rom = memregion("sprites")->base();
+	uint8_t temp[0x200 * 128];
 
 	for (int i = 0; i < 0x200; i++)
 	{
-		int j = bitswap<16>(i, 15,14,13,12,11,10,9,8,0,1,2,3,4,5,6,7);
-		memcpy(temp + i*128, rom + j*128, 128);
+		int j = bitswap<16>(i, 15, 14, 13, 12, 11, 10, 9, 8, 0, 1, 2, 3, 4, 5, 6, 7);
+		memcpy(temp + i * 128, rom + j * 128, 128);
 	}
 
-	memcpy(rom,temp,0x200*128);
+	memcpy(rom, temp, 0x200 * 128);
 }
 
 
@@ -318,7 +515,7 @@ void speedbal_state::init_speedbal()
 
 ***************************************************************************/
 
-ROM_START( speedbal ) // seems to have a more complete hidden test mode, with a 'hard test' that's not enabled in the alternate Speed Ball rom set
+ROM_START( speedbal ) // seems to have a more complete hidden test mode, with a 'hard test' that's not enabled in the alternate Speed Ball ROM set
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.u14",  0x0000,  0x8000, CRC(94c6f107) SHA1(cd7ada17f0f59623cf615df68c5f8f4077377820) )
 	ROM_LOAD( "3.u15",  0x8000,  0x8000, CRC(a036687f) SHA1(fc2cd683cd6a9a75ab6b188f7b4592b355a569e0) )
@@ -387,7 +584,7 @@ ROM_END
 
 void speedbal_state::init_musicbal()
 {
-	uint8_t* rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	const uint8_t xorTable[8] = {0x05, 0x06, 0x84, 0x84, 0x00, 0x87, 0x84, 0x84};     // XORs affecting bits #0, #1, #2 & #7
 	const int swapTable[4][4] = {                                                   // 4 possible swaps affecting bits #0, #1, #2 & #7
@@ -397,21 +594,22 @@ void speedbal_state::init_musicbal()
 		{0,2,1,7}
 	};
 
-	for (int i=0;i<0x8000;i++)
+	for (int i = 0; i < 0x8000; i++)
 	{
-		int addIdx = BIT(i,3)^(BIT(i,5)<<1)^(BIT(i,9)<<2);  // 3 bits of address...
-		int xorMask = xorTable[addIdx];                     // ... control the xor...
-		int bswIdx = xorMask & 3;                           // ... and the bitswap
+		int addIdx = BIT(i, 3) ^ (BIT(i, 5) << 1) ^ (BIT(i, 9) << 2);  // 3 bits of address...
+		int xorMask = xorTable[addIdx];                                // ... control the XOR...
+		int bswIdx = xorMask & 3;                                      // ... and the bitswap
 
 		// only bits #0, #1, #2 & #7 are affected
-		rom[i] = bitswap<8>(rom[i], swapTable[bswIdx][3], 6,5,4,3, swapTable[bswIdx][2], swapTable[bswIdx][1], swapTable[bswIdx][0]) ^ xorTable[addIdx];
+		rom[i] = bitswap<8>(rom[i], swapTable[bswIdx][3], 6, 5, 4, 3, swapTable[bswIdx][2], swapTable[bswIdx][1], swapTable[bswIdx][0]) ^ xorTable[addIdx];
 	}
 
 	init_speedbal();
 }
 
+} // anonymous namespace
 
 
 GAMEL( 1987, speedbal,         0, speedbal, speedbal, speedbal_state, init_speedbal, ROT270, "Tecfri / Desystem S.A.", "Speed Ball (set 1)", MACHINE_SUPPORTS_SAVE, layout_speedbal )
 GAMEL( 1987, speedbala, speedbal, speedbal, speedbal, speedbal_state, init_speedbal, ROT270, "Tecfri / Desystem S.A.", "Speed Ball (set 2)", MACHINE_SUPPORTS_SAVE, layout_speedbal )
-GAMEL( 1988, musicbal,         0, speedbal, musicbal, speedbal_state, init_musicbal, ROT270, "Tecfri / Desystem S.A.", "Music Ball", MACHINE_SUPPORTS_SAVE, layout_speedbal )
+GAMEL( 1988, musicbal,         0, speedbal, musicbal, speedbal_state, init_musicbal, ROT270, "Tecfri / Desystem S.A.", "Music Ball",         MACHINE_SUPPORTS_SAVE, layout_speedbal )

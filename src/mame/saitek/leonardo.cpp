@@ -46,10 +46,9 @@ The H8 Brute Force module doesn't work with the 1st program version of Leonardo,
 this is mentioned in the repair manual and it says it requires an EPROM upgrade.
 The Sparc module doesn't appear to work with it either. Moreover, the Sparc module
 manual mentions that for it to work properly on Leonardo, the chesscomputer needs
-to be upgraded with an EMI PCB (power supply related).
+to be upgraded with an EMI PCB (power supply related, meaningless for emulation).
 
 TODO:
-- OSA module comms is not completely understood
 - OSA PC link, uses MCU serial interface
 - add nvram (MCU port $14?)
 - add power-off, not useful with missing nvram support
@@ -122,12 +121,16 @@ private:
 	u8 p5_r();
 	void p6_w(u8 data);
 
+	int m_ack_state = 0;
+	int m_rts_state = 0;
 	u8 m_inp_mux = 0;
 	u8 m_led_data[2] = { };
 };
 
 void leo_state::machine_start()
 {
+	save_item(NAME(m_ack_state));
+	save_item(NAME(m_rts_state));
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_data));
 }
@@ -183,7 +186,10 @@ void leo_state::unk_w(u8 data)
 
 void leo_state::exp_rts_w(int state)
 {
-	// NAND with ACK-P (not used by chesscomputer?)
+	// recursive NAND with ACK-P
+	if (state && m_ack_state)
+		m_expansion->ack_w(m_ack_state);
+	m_rts_state = state;
 }
 
 
@@ -225,8 +231,11 @@ void leo_state::p5_w(u8 data)
 	// d3: NAND with STB-P
 	m_stb->in_w<1>(BIT(data, 3));
 
-	// d5: expansion ACK-P
-	m_expansion->ack_w(BIT(data, 5));
+	// d5: expansion ACK-P (recursive NAND with RTS-P)
+	int ack_state = BIT(data, 5);
+	if (m_rts_state || !ack_state)
+		m_expansion->ack_w(ack_state);
+	m_ack_state = ack_state;
 
 	// d6,d7: chessboard led row data
 	m_led_data[0] = (m_led_data[0] & 3) | (~data >> 4 & 0xc);

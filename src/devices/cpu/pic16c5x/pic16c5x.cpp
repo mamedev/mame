@@ -51,6 +51,8 @@
 	*  hap (12-Feb-2017) Ver 1.16                                              *
 	*   - Added basic support for the old GI PIC1650 and PIC1655.              *
 	*   - Made RTCC(aka T0CKI) pin an inputline handler.                       *
+	*  pa (12-Jun-2022) Ver 1.17                                               *
+	*   - Port callback functions pass tristate value in mem_mask.             *
 	*                                                                          *
 	*                                                                          *
 	*  **** Notes: ****                                                        *
@@ -271,7 +273,7 @@ void pic16c5x_device::update_internalram_ptr()
  *  Shortcuts
  ************************************************************************/
 
-#define CLR(flagreg, flag) ( flagreg &= (uint8_t)(~flag) )
+#define CLR(flagreg, flag) ( flagreg &= uint8_t(~flag) )
 #define SET(flagreg, flag) ( flagreg |=  flag )
 
 
@@ -290,7 +292,7 @@ void pic16c5x_device::CALCULATE_Z_FLAG()
 
 void pic16c5x_device::CALCULATE_ADD_CARRY()
 {
-	if ((uint8_t)(m_old_data) > (uint8_t)(m_ALU)) {
+	if (uint8_t(m_old_data) > uint8_t(m_ALU)) {
 		SET(STATUS, C_FLAG);
 	}
 	else {
@@ -300,7 +302,7 @@ void pic16c5x_device::CALCULATE_ADD_CARRY()
 
 void pic16c5x_device::CALCULATE_ADD_DIGITCARRY()
 {
-	if (((uint8_t)(m_old_data) & 0x0f) > ((uint8_t)(m_ALU) & 0x0f)) {
+	if ((uint8_t(m_old_data) & 0x0f) > (uint8_t(m_ALU) & 0x0f)) {
 		SET(STATUS, DC_FLAG);
 	}
 	else {
@@ -310,7 +312,7 @@ void pic16c5x_device::CALCULATE_ADD_DIGITCARRY()
 
 void pic16c5x_device::CALCULATE_SUB_CARRY()
 {
-	if ((uint8_t)(m_old_data) < (uint8_t)(m_ALU)) {
+	if (uint8_t(m_old_data) < uint8_t(m_ALU)) {
 		CLR(STATUS, C_FLAG);
 	}
 	else {
@@ -320,7 +322,7 @@ void pic16c5x_device::CALCULATE_SUB_CARRY()
 
 void pic16c5x_device::CALCULATE_SUB_DIGITCARRY()
 {
-	if (((uint8_t)(m_old_data) & 0x0f) < ((uint8_t)(m_ALU) & 0x0f)) {
+	if ((uint8_t(m_old_data) & 0x0f) < (uint8_t(m_ALU) & 0x0f)) {
 		CLR(STATUS, DC_FLAG);
 	}
 	else {
@@ -363,7 +365,7 @@ uint8_t pic16c5x_device::GET_REGFILE(offs_t addr) /* Read from internal memory *
 		case 0:     /* Not an actual register, so return 0 */
 					data = 0;
 					break;
-		case 4:     data = (FSR | (uint8_t)(~m_picRAMmask));
+		case 4:     data = (FSR | uint8_t(~m_picRAMmask));
 					break;
 		case 5:     /* read port A */
 					if (m_picmodel == 0x1650) {
@@ -375,7 +377,7 @@ uint8_t pic16c5x_device::GET_REGFILE(offs_t addr) /* Read from internal memory *
 					else {
 						data = m_read_a(PIC16C5x_PORTA, 0xff);
 						data &= m_TRISA;
-						data |= ((uint8_t)(~m_TRISA) & PORTA);
+						data |= (uint8_t(~m_TRISA) & PORTA);
 						data &= 0x0f; /* 4-bit port (only lower 4 bits used) */
 					}
 					break;
@@ -386,7 +388,7 @@ uint8_t pic16c5x_device::GET_REGFILE(offs_t addr) /* Read from internal memory *
 					else if (m_picmodel != 0x1655) { /* B is output-only on 1655 */
 						data = m_read_b(PIC16C5x_PORTB, 0xff);
 						data &= m_TRISB;
-						data |= ((uint8_t)(~m_TRISB) & PORTB);
+						data |= (uint8_t(~m_TRISB) & PORTB);
 					}
 					break;
 		case 7:     /* read port C */
@@ -396,7 +398,7 @@ uint8_t pic16c5x_device::GET_REGFILE(offs_t addr) /* Read from internal memory *
 					else if ((m_picmodel == 0x16C55) || (m_picmodel == 0x16C57)) {
 						data = m_read_c(PIC16C5x_PORTC, 0xff);
 						data &= m_TRISC;
-						data |= ((uint8_t)(~m_TRISC) & PORTC);
+						data |= (uint8_t(~m_TRISC) & PORTC);
 					}
 					else { /* PIC16C54, PIC16C56, PIC16C58 */
 						data = M_RDRAM(addr);
@@ -439,9 +441,9 @@ void pic16c5x_device::STORE_REGFILE(offs_t addr, uint8_t data)    /* Write to in
 		case 2:     PCL = data;
 					m_PC = ((STATUS & PA_REG) << 4) | data;
 					break;
-		case 3:     STATUS = (STATUS & (TO_FLAG | PD_FLAG)) | (data & (uint8_t)(~(TO_FLAG | PD_FLAG)));
+		case 3:     STATUS = (STATUS & (TO_FLAG | PD_FLAG)) | (data & uint8_t(~(TO_FLAG | PD_FLAG)));
 					break;
-		case 4:     FSR = (data | (uint8_t)(~m_picRAMmask));
+		case 4:     FSR = (data | uint8_t(~m_picRAMmask));
 					break;
 		case 5:     /* write port A */
 					if (m_picmodel == 0x1650) {
@@ -449,7 +451,7 @@ void pic16c5x_device::STORE_REGFILE(offs_t addr, uint8_t data)    /* Write to in
 					}
 					else if (m_picmodel != 0x1655) { /* A is input-only on 1655 */
 						data &= 0x0f; /* 4-bit port (only lower 4 bits used) */
-						m_write_a(PIC16C5x_PORTA, data & (uint8_t)(~m_TRISA), 0xff);
+						m_write_a(PIC16C5x_PORTA, data & uint8_t(~m_TRISA) & 0x0f, uint8_t(~m_TRISA) & 0x0f);
 					}
 					PORTA = data;
 					break;
@@ -458,7 +460,7 @@ void pic16c5x_device::STORE_REGFILE(offs_t addr, uint8_t data)    /* Write to in
 						m_write_b(PIC16C5x_PORTB, data, 0xff);
 					}
 					else {
-						m_write_b(PIC16C5x_PORTB, data & (uint8_t)(~m_TRISB), 0xff);
+						m_write_b(PIC16C5x_PORTB, data & uint8_t(~m_TRISB), uint8_t(~m_TRISB));
 					}
 					PORTB = data;
 					break;
@@ -467,7 +469,7 @@ void pic16c5x_device::STORE_REGFILE(offs_t addr, uint8_t data)    /* Write to in
 						m_write_c(PIC16C5x_PORTC, data, 0xff);
 					}
 					else if ((m_picmodel == 0x16C55) || (m_picmodel == 0x16C57)) {
-						m_write_c(PIC16C5x_PORTC, data & (uint8_t)(~m_TRISC), 0xff);
+						m_write_c(PIC16C5x_PORTC, data & uint8_t(~m_TRISC), uint8_t(~m_TRISC));
 					}
 					PORTC = data; /* also writes to RAM */
 					break;
@@ -606,7 +608,7 @@ void pic16c5x_device::clrwdt()
 
 void pic16c5x_device::comf()
 {
-	m_ALU = (uint8_t)(~(GET_REGFILE(ADDR)));
+	m_ALU = uint8_t(~(GET_REGFILE(ADDR)));
 	STORE_RESULT(ADDR, m_ALU);
 	CALCULATE_Z_FLAG();
 }
@@ -756,12 +758,12 @@ void pic16c5x_device::tris()
 	switch(m_opcode.b.l & 0x7)
 	{
 		case 5:     if   (m_TRISA == m_W) break;
-					else { m_TRISA = m_W | 0xf0; m_write_a(PIC16C5x_PORTA, PORTA & (uint8_t)(~m_TRISA) & 0x0f, 0xff); break; }
+					else { m_TRISA = m_W | 0xf0; m_write_a(PIC16C5x_PORTA, PORTA & uint8_t(~m_TRISA) & 0x0f, uint8_t(~m_TRISA) & 0x0f); break; }
 		case 6:     if   (m_TRISB == m_W) break;
-					else { m_TRISB = m_W; m_write_b(PIC16C5x_PORTB, PORTB & (uint8_t)(~m_TRISB), 0xff); break; }
+					else { m_TRISB = m_W; m_write_b(PIC16C5x_PORTB, PORTB & uint8_t(~m_TRISB), uint8_t(~m_TRISB)); break; }
 		case 7:     if ((m_picmodel == 0x16C55) || (m_picmodel == 0x16C57)) {
 						if   (m_TRISC == m_W) break;
-						else { m_TRISC = m_W; m_write_c(PIC16C5x_PORTC, PORTC & (uint8_t)(~m_TRISC), 0xff); break; }
+						else { m_TRISC = m_W; m_write_c(PIC16C5x_PORTC, PORTC & uint8_t(~m_TRISC), uint8_t(~m_TRISC)); break; }
 					}
 					else {
 						illegal(); break;
@@ -974,7 +976,7 @@ void pic16c5x_device::state_import(const device_state_entry &entry)
 			PORTD = m_debugger_temp;
 			break;
 		case PIC16C5x_FSR:
-			FSR = ((m_debugger_temp & m_picRAMmask) | (uint8_t)(~m_picRAMmask));
+			FSR = ((m_debugger_temp & m_picRAMmask) | uint8_t(~m_picRAMmask));
 			break;
 		case PIC16C5x_PSCL:
 			m_prescaler = m_debugger_temp;
@@ -1005,7 +1007,7 @@ void pic16c5x_device::state_export(const device_state_entry &entry)
 			m_debugger_temp = PORTD;
 			break;
 		case PIC16C5x_FSR:
-			m_debugger_temp = ((FSR) & m_picRAMmask) | (uint8_t)(~m_picRAMmask);
+			m_debugger_temp = ((FSR) & m_picRAMmask) | uint8_t(~m_picRAMmask);
 			break;
 	}
 }
@@ -1048,7 +1050,7 @@ void pic16c5x_device::pic16c5x_reset_regs()
 	m_TRISC  = 0xff;
 	m_OPTION = (T0CS_FLAG | T0SE_FLAG | PSA_FLAG | PS_REG);
 	PCL    = 0xff;
-	FSR   |= (uint8_t)(~m_picRAMmask);
+	FSR   |= uint8_t(~m_picRAMmask);
 	m_prescaler = 0;
 	m_delay_timer = 0;
 	m_inst_cycles = 0;

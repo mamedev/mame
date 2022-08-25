@@ -10,11 +10,11 @@ license:CC0
 
 	<element name="segc" defstate="0">
 		<rect state="0"><color red="0.1" green="0.1" blue="0.1" /></rect>
-		<rect state="1"><color red="0.2" green="1.0" blue="0.8" /></rect>
+		<rect state="1"><color red="0.5" green="1.0" blue="0.97" /></rect>
 	</element>
 	<element name="segr2" defstate="0">
 		<rect state="0"><color red="0.1" green="0.1" blue="0.01" /></rect>
-		<rect state="1"><color red="1.0" green="0.33" blue="0.2" /></rect>
+		<rect state="1"><color red="1.0" green="0.3" blue="0.13" /></rect>
 	</element>
 
 	<element name="segr" defstate="0">
@@ -28,25 +28,25 @@ license:CC0
 		</rect>
 		<rect state="1">
 			<bounds x="0.1" y="0.1" width="0.8" height="0.8" />
-			<color red="1.0" green="0.33" blue="0.2" />
+			<color red="1.0" green="0.3" blue="0.13" />
 		</rect>
 	</element>
 
 	<element name="c1" defstate="0">
 		<text state="0" string="1"><color red="0.1" green="0.1" blue="0.1" /></text>
-		<text state="1" string="1"><color red="0.2" green="1.0" blue="0.8" /></text>
+		<text state="1" string="1"><color red="0.5" green="1.0" blue="0.97" /></text>
 	</element>
 	<element name="c2" defstate="0">
 		<text state="0" string="2"><color red="0.1" green="0.1" blue="0.1" /></text>
-		<text state="1" string="2"><color red="0.2" green="1.0" blue="0.8" /></text>
+		<text state="1" string="2"><color red="0.5" green="1.0" blue="0.97" /></text>
 	</element>
 	<element name="c3" defstate="0">
 		<text state="0" string="3"><color red="0.1" green="0.1" blue="0.1" /></text>
-		<text state="1" string="3"><color red="0.2" green="1.0" blue="0.8" /></text>
+		<text state="1" string="3"><color red="0.5" green="1.0" blue="0.97" /></text>
 	</element>
 	<element name="c4" defstate="0">
 		<text state="0" string="4"><color red="0.1" green="0.1" blue="0.1" /></text>
-		<text state="1" string="4"><color red="0.2" green="1.0" blue="0.8" /></text>
+		<text state="1" string="4"><color red="0.5" green="1.0" blue="0.97" /></text>
 	</element>
 
 
@@ -58,8 +58,7 @@ license:CC0
 			<bounds left="-15" right="600" top="-11" bottom="805" />
 		</element>
 
-	<!-- 5 -->
-
+		<!-- 5 -->
 		<element name="5.10" ref="segc"><bounds x="0" y="0" width="75" height="32" /></element>
 		<element name="5.10" ref="segc"><bounds x="102" y="0" width="75" height="32" /></element>
 		<element name="5.10" ref="segc"><bounds x="204" y="0" width="75" height="32" /></element>
@@ -86,9 +85,7 @@ license:CC0
 
 		<element name="5.1" ref="c2"><bounds x="510" y="42" width="75" height="95" /></element>
 
-
-	<!-- 4 -->
-
+		<!-- 4 -->
 		<element name="4.10" ref="segc"><bounds x="0" y="165" width="75" height="95" /></element>
 		<element name="4.11" ref="segr"><bounds x="7.9" y="175" width="59.2" height="75" /></element>
 
@@ -107,9 +104,7 @@ license:CC0
 		<element name="4.0" ref="segc"><bounds x="510" y="165" width="75" height="95" /></element>
 		<element name="4.1" ref="segr"><bounds x="517.9" y="175" width="59.2" height="75" /></element>
 
-
-	<!-- 3 -->
-
+		<!-- 3 -->
 		<element name="3.10" ref="segc"><bounds x="0" y="288" width="75" height="95" /></element>
 		<element name="3.11" ref="segr"><bounds x="7.9" y="298" width="59.2" height="75" /></element>
 
@@ -128,9 +123,7 @@ license:CC0
 		<element name="3.0" ref="segc"><bounds x="510" y="288" width="75" height="95" /></element>
 		<element name="3.1" ref="segr"><bounds x="517.9" y="298" width="59.2" height="75" /></element>
 
-
-	<!-- 2 -->
-
+		<!-- 2 -->
 		<element name="2.10" ref="segc"><bounds x="0" y="411" width="75" height="95" /></element>
 		<element name="2.11" ref="segr"><bounds x="7.9" y="421" width="59.2" height="75" /></element>
 
@@ -149,9 +142,7 @@ license:CC0
 		<element name="2.0" ref="segc"><bounds x="510" y="411" width="75" height="95" /></element>
 		<element name="2.1" ref="segr"><bounds x="517.9" y="421" width="59.2" height="75" /></element>
 
-
-	<!-- 1 -->
-
+		<!-- 1 -->
 		<element name="1.10" ref="segc"><bounds x="0" y="534" width="75" height="95" /></element>
 		<element name="1.11" ref="segr"><bounds x="7.9" y="544" width="59.2" height="75" /></element>
 
@@ -170,9 +161,7 @@ license:CC0
 		<element name="1.0" ref="segc"><bounds x="510" y="534" width="75" height="95" /></element>
 		<element name="1.1" ref="segr"><bounds x="517.9" y="544" width="59.2" height="75" /></element>
 
-
-	<!-- 0 -->
-
+		<!-- 0 -->
 		<element name="0.11" ref="c3"><bounds x="0" y="657" width="75" height="95" /></element>
 
 		<element name="0.8" ref="segc"><bounds x="102" y="657" width="75" height="95" /></element>
@@ -198,7 +187,6 @@ license:CC0
 
 		<element ref="static_black"><bounds x="-1" y="770.666" width="587" height="3" /></element>
 		<element ref="static_black"><bounds x="-1" y="782.333" width="587" height="3" /></element>
-
 
 	</view>
 </mamelayout>

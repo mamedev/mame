@@ -346,12 +346,12 @@ DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::cts_wr )
 	if (m_id)
 	{
 		// For channel 1, CTS can be disabled
-		if ((m_asci_stat && Z180_STAT1_CTS1E) == 0) return;
+		if ((m_asci_stat & Z180_STAT1_CTS1E) == 0) return;
 	}
 	else
 	{
 		// For channel 0, high resets TDRE
-		if (m_ext && state && (m_asci_ext && Z180_ASEXT_CTS0) == 0)
+		if (m_ext && state && (m_asci_ext & Z180_ASEXT_CTS0) == 0)
 			m_asci_stat |= Z180_STAT_TDRE;
 	}
 	m_cts = state;
@@ -363,7 +363,7 @@ DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::dcd_wr )
 		return;
 
 	// In extended mode, DCD autoenables RX if configured
-	if (m_ext && (m_asci_ext && Z180_ASEXT_DCD0) == 0)
+	if (m_ext && (m_asci_ext & Z180_ASEXT_DCD0) == 0)
 	{
 		m_rx_enabled = state ? false : true;
 		if (state)
@@ -383,7 +383,7 @@ DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::rxa_wr )
 DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::cka_wr )
 {
 	// For channel 1, CKA can be disabled
-	if (m_id && (m_asci_cntla && Z180_CNTLA1_CKA1D)) return;
+	if (m_id && (m_asci_cntla & Z180_CNTLA1_CKA1D)) return;
 
 	if(state != m_clock_state)
 	{

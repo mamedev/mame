@@ -922,9 +922,12 @@ emu_options::software_options emu_options::evaluate_initial_softlist_options(con
 								// we need to find a mountable image slot, but we need to ensure it is a slot
 								// for which we have not already distributed a part to
 								device_image_interface *image = software_list_device::find_mountable_image(
-									config,
-									swpart,
-									[&results](const device_image_interface &candidate) { return results.image.count(candidate.instance_name()) == 0; });
+										config,
+										swpart,
+										[&results] (const device_image_interface &candidate)
+										{
+											return results.image.count(candidate.instance_name()) == 0;
+										});
 
 								// did we find a slot to put this part into?
 								if (image != nullptr)

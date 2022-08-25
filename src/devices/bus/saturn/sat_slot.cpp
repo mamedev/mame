@@ -57,11 +57,11 @@ device_sat_cart_interface::~device_sat_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_sat_cart_interface::rom_alloc(uint32_t size, const char *tag)
+void device_sat_cart_interface::rom_alloc(uint32_t size)
 {
 	if (m_rom == nullptr)
 	{
-		m_rom = (uint32_t *)device().machine().memory().region_alloc(std::string(tag).append(SATSLOT_ROM_REGION_TAG).c_str(), size, 4, ENDIANNESS_LITTLE)->base();
+		m_rom = (uint32_t *)device().machine().memory().region_alloc(device().subtag("^cart:rom"), size, 4, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 	}
 }
@@ -147,7 +147,7 @@ image_init_result sat_cart_slot_device::call_load()
 			uint32_t len = loaded_through_softlist() ? get_software_region_length("rom") : length();
 			uint32_t *ROM;
 
-			m_cart->rom_alloc(len, tag());
+			m_cart->rom_alloc(len);
 			ROM = m_cart->get_rom_base();
 
 			if (loaded_through_softlist())

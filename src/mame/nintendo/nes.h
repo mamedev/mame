@@ -79,11 +79,13 @@ public:
 	DECLARE_MACHINE_START(famitwin);
 	DECLARE_MACHINE_RESET(fds);
 	DECLARE_MACHINE_RESET(famitwin);
+	DECLARE_MACHINE_RESET(famitvc1);
 	void setup_disk(nes_disksys_device *slot);
 
 	void suborkbd(machine_config &config);
 	void famipalc(machine_config &config);
 	void famicom(machine_config &config);
+	void famitvc1(machine_config &config);
 	void famitwin(machine_config &config);
 	void nespal(machine_config &config);
 	void nespalc(machine_config &config);

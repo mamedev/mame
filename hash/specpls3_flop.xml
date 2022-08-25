@@ -4206,7 +4206,7 @@ license:CC0
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3">
-			<feature name="part_id" value="Side B: Dr. Jekyll and Mr. Hyde  "/>
+			<feature name="part_id" value="Side B: Dr. Jekyll and Mr. Hyde"/>
 			<dataarea name="flop" size="194816">
 				<rom name="double classic (1988)(zenobi)(side b).dsk" size="194816" crc="a92e7e19" sha1="4e7aeebbe48f81534ac6e8e6d3d64b8e08500c7a"/>
 			</dataarea>
@@ -15747,7 +15747,8 @@ license:CC0
 		<description>Terminator 2 - Judgment Day (alt)</description>
 		<year>1991</year>
 		<publisher>Ocean Software</publisher>
-		<part name="flop1" interface="floppy_3">
+		<sharedfeat name="upd765:0_default" value="35ssdd"/> <!-- still need to manually specify this, because by the time shared features are applied, parts have already been distributed to media devices -->
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="216320">
 				<rom name="terminator 2 - judgment day (1991)(ocean).dsk" size="216320" crc="d97a5f2a" sha1="512127b1523d9ba51889b3891592007dcbb89ed0"/>
 			</dataarea>

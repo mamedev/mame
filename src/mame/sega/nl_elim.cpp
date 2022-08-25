@@ -67,6 +67,7 @@
 //
 #define CA3080_DIP(name) SUBMODEL(_CA3080_FAST_DIP, name)
 static NETLIST_START(_CA3080_FAST_DIP)
+{
 	ALIAS(2, F.A0) // -
 	ALIAS(3, F.A1) // +
 	ALIAS(4, F.A2) // V-
@@ -86,7 +87,7 @@ static NETLIST_START(_CA3080_FAST_DIP)
 	ANALOG_INPUT(XGND, 0)
 	NET_C(XGND, VO.IN, VO.ON) // FIXME: assume symmetric supply
 	NET_C(F.Q, VO.IP)
-NETLIST_END()
+}
 
 
 
@@ -115,8 +116,10 @@ NETLIST_END()
 
 #if (SOUND_VARIANT == VARIANT_ELIMINATOR)
 NETLIST_START(elim)
+{
 #else // (SOUND_VARIANT == VARIANT_ZEKTOR)
 NETLIST_START(zektor)
+{
 #endif
 
 	SOLVER(Solver, 1000)
@@ -1219,6 +1222,6 @@ NETLIST_START(zektor)
 	OPTIMIZE_FRONTIER(R8.1, RES_K(10), RXX)
 #endif
 
-NETLIST_END()
+}
 
 #endif
