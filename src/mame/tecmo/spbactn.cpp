@@ -325,7 +325,7 @@ void spbactn_state::video_start()
 void spbactnp_state::video_start()
 {
 	spbactn_state::video_start();
-	// no idea..
+
 	m_extra_tilemap = &machine().tilemap().create(*m_extragfxdecode, tilemap_get_info_delegate(*this, FUNC(spbactnp_state::get_extra_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
@@ -349,7 +349,6 @@ void spbactnp_state::bg_scrolly_w(uint16_t data)
 {
 	LOGPROTO("bg_scrolly_w %04x\n", data);
 	m_bg_tilemap->set_scrolly(0, data);
-
 }
 
 void spbactnp_state::bg_scrollx_w(uint16_t data)
@@ -368,8 +367,8 @@ void spbactnp_state::extraram_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 TILE_GET_INFO_MEMBER(spbactnp_state::get_extra_tile_info)
 {
 	int tileno = m_extraram[0][(tile_index)];
-	tileno |= m_extraram[0][(tile_index+0x800)]<<8;
-	tileinfo.set(0, tileno & 0xfff, tileno>>12, 0);
+	tileno |= m_extraram[0][(tile_index + 0x800)] << 8;
+	tileinfo.set(0, tileno & 0xfff, tileno >> 12, 0);
 }
 
 
