@@ -1342,7 +1342,7 @@ All images in this list were created from original discs, most contain copy prot
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="105082">
 				<rom name="134 mega apocalypse.fsd" size="105082" crc="cf3a7d6e" sha1="296c43f5b55a9ddf9894ec47647e5ce978ad4249" />
-				</dataarea>
+			</dataarea>
 		</part>
 	</software>
 
@@ -3267,25 +3267,25 @@ All images in this list were created from original discs, most contain copy prot
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side 00"/>
 			<dataarea name="flop" size="104947">
-				<rom name="156 beverly hills  cop (side 00).fsd" size="104947" crc="11ecb37b" sha1="85cef485bd4936ac62fe350fcc3242bd62119f51" />
+				<rom name="156 beverly hills cop (side 00).fsd" size="104947" crc="11ecb37b" sha1="85cef485bd4936ac62fe350fcc3242bd62119f51" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side 02"/>
 			<dataarea name="flop" size="104947">
-				<rom name="156 beverly hills  cop (side 02).fsd" size="104947" crc="05d06984" sha1="308cf3ff46e6b88478ab471bd412fc2d86d53e75" />
+				<rom name="156 beverly hills cop (side 02).fsd" size="104947" crc="05d06984" sha1="308cf3ff46e6b88478ab471bd412fc2d86d53e75" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Side 01"/>
 			<dataarea name="flop" size="104948">
-				<rom name="156 beverly hills  cop (side 01).fsd" size="104948" crc="4ce85ea9" sha1="1e2951fb058fe10c212a5b59842733ba3dc09504" />
+				<rom name="156 beverly hills cop (side 01).fsd" size="104948" crc="4ce85ea9" sha1="1e2951fb058fe10c212a5b59842733ba3dc09504" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Side 03"/>
 			<dataarea name="flop" size="104947">
-				<rom name="156 beverly hills  cop (side 03).fsd" size="104947" crc="bc1da561" sha1="8ac0badcea6caaedfe7a1404c4670928c8631fd7" />
+				<rom name="156 beverly hills cop (side 03).fsd" size="104947" crc="bc1da561" sha1="8ac0badcea6caaedfe7a1404c4670928c8631fd7" />
 			</dataarea>
 		</part>
 	</software>

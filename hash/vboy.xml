@@ -14,11 +14,11 @@ According to Planet Virtual Boy, the following undumped protos exist
 
 -->
 <softwarelist name="vboy" description="Nintendo Virtual Boy cartridges">
-	<!-- Developers: T&E Soft -->
 	<software name="3dtetris" supported="no">
 		<description>3-D Tetris (USA)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
+		<info name="developer" value="T&amp;E Soft"/>
 		<info name="serial" value="VUE-VPBE-USA"/>
 		<info name="release" value="19960322"/>
 		<part name="cart" interface="vboy_cart">
@@ -27,443 +27,478 @@ According to Planet Virtual Boy, the following undumped protos exist
 			<feature name="u2" value="U2" />
 			<feature name="u3" value="U3" />
 			<feature name="battery" value="BT1" />
-			<dataarea name="rom" size="1048576" width="32">
-				<rom name="vue-vpbe-0.u1" size="1048576" crc="bb71b522" sha1="5177015a91442e56bd76af39447bca365e06c272" offset="000000" />
+			<dataarea name="rom" size="0x100000" width="32">
+				<rom name="vue-vpbe-0.u1" size="0x100000" crc="bb71b522" sha1="5177015a91442e56bd76af39447bca365e06c272" />
 			</dataarea>
+			<dataarea name="sram" size="0x2000" width="8" />
 		</part>
 	</software>
 
 	<!-- This was built from the final source code using the official compiler VUCC and converted from ISX to ROM. -->
-	<!-- Developers: Japan System Supply - (Planned) Releases: 1996-02-23 (JPN), 1996-08-26 (USA), but the game never got actually released -->
+	<!-- (Planned) Releases: 1996-02-23 (JPN), 1996-08-26 (USA), but the game never got actually released -->
 	<software name="boundh" supported="no">
-		<description>Bound High! (Jpn, USA, prototype)</description>
+		<description>Bound High! (Japan, USA, prototype)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
+		<info name="developer" value="Japan System Supply"/>
 		<info name="serial" value="VUE-VBHE-JPN, VUE-VBHE-USA"/>
 		<part name="cart" interface="vboy_cart">
-			<dataarea name="rom" size="2097152" width="32">
-				<rom name="bound high (ju).bin" size="2097152" crc="e81a3703" sha1="1196ef8b9a96a0ff2f3634f8eb1c4865c0fb6b01" offset="000000" />
+			<dataarea name="rom" size="0x200000" width="32">
+				<rom name="bound high (ju).bin" size="0x200000" crc="e81a3703" sha1="1196ef8b9a96a0ff2f3634f8eb1c4865c0fb6b01" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Developers: Intelligent Systems -->
 	<software name="galactic" supported="no">
-		<description>Galactic Pinball (Jpn, USA)</description>
+		<description>Galactic Pinball (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
+		<info name="developer" value="Intelligent Systems"/>
 		<info name="serial" value="VUE-VGPJ-JPN, VUE-VGPJ-USA"/>
 		<info name="release" value="19950701 (JPN), 19950814 (USA)"/>
+		<info name="alt_title" value="ギャラクティック・ピンボール"/>
 		<part name="cart" interface="vboy_cart">
-			<dataarea name="rom" size="1048576" width="32">
-				<rom name="galactic pinball (japan, usa).bin" size="1048576" crc="c9710a36" sha1="93a25abf4f86e71a49c1c3a470140bb40cb693d6" offset="000000" />
+			<dataarea name="rom" size="0x100000" width="32">
+				<rom name="vue-vgpj-0.u1" size="0x100000" crc="c9710a36" sha1="93a25abf4f86e71a49c1c3a470140bb40cb693d6" />
 			</dataarea>
+			<dataarea name="sram" size="0x2000" width="8" />
 		</part>
 	</software>
 
-	<!-- Developers: T&E Soft -->
 	<software name="golf" supported="no">
 		<description>Golf (USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
+		<info name="developer" value="T&amp;E Soft"/>
 		<info name="serial" value="VUE-VVGE-USA"/>
 		<info name="release" value="199511xx"/>
 		<part name="cart" interface="vboy_cart">
-			<dataarea name="rom" size="2097152" width="32">
-				<rom name="golf (usa).bin" size="2097152" crc="2199af41" sha1="23ce3c174789cdd306497d86cb2c4e76ba8b06e5" offset="000000" />
+			<dataarea name="rom" size="0x200000" width="32">
+				<rom name="vue-vvge-0.u1" size="0x200000" crc="2199af41" sha1="23ce3c174789cdd306497d86cb2c4e76ba8b06e5" />
 			</dataarea>
-			<dataarea name="sram" size="8192" width="8" />
 		</part>
 	</software>
 
-	<!-- Developers: Betop (I'Max) -->
+	<software name="hyperfgt" supported="no">
+		<description>Hyper Fighting (pirate)</description>
+		<year>2013?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Mr. Anon"/>
+		<info name="serial" value="VUE ANON"/>
+		<part name="cart" interface="vboy_cart">
+			<dataarea name="rom" size="0x400000" width="32">
+				<rom name="hyper fighting.bin" size="0x400000" crc="3f2a6ba2" sha1="578355de83822ce67522033dd7545631124a71ab" />
+			</dataarea>
+			<dataarea name="sram" size="0x2000" width="8" />
+		</part>
+	</software>
+
 	<software name="innsmout" supported="no">
-		<description>Innsmouth no Yakata (Jpn)</description>
+		<description>Insmouth no Yakata (Japan)</description>
 		<year>1995</year>
 		<publisher>I'Max</publisher>
+		<info name="developer" value="Betop (I'Max)"/>
 		<info name="serial" value="VUE-VIMJ-JPN"/>
 		<info name="release" value="19951013"/>
+		<info name="alt_title" value="インスマウスの館"/>
 		<part name="cart" interface="vboy_cart">
-			<dataarea name="rom" size="1048576" width="32">
-				<rom name="innsmouth no yakata (japan).bin" size="1048576" crc="83cb6a00" sha1="37e06e53ce2810e870835c48decdd6c72079bfda" offset="000000" />
+			<dataarea name="rom" size="0x100000" width="32">
+				<rom name="insmouth no yakata (japan).bin" size="0x100000" crc="83cb6a00" sha1="37e06e53ce2810e870835c48decdd6c72079bfda" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Developers: Atlus -->
 	<software name="jackbros" supported="no">
 		<description>Jack Bros. (USA)</description>
 		<year>1995</year>
 		<publisher>Atlus</publisher>
+		<info name="developer" value="Atlus"/>
 		<info name="serial" value="VUE-VJBE-USA"/>
 		<info name="release" value="19951020"/>
 		<part name="cart" interface="vboy_cart">
 			<feature name="pcb" value="VUE-AA-01(K)" />
 			<feature name="u1" value="U1 PRG" />
-			<dataarea name="rom" size="1048576" width="32">
-				<rom name="vue-vjbe-0.u1" size="1048576" crc="a44de03c" sha1="0e086d7ef2bd8b97315196943fd0b71da07aa8f1" offset="000000" />
+			<dataarea name="rom" size="0x100000" width="32">
+				<rom name="vue-vjbe-0.u1" size="0x100000" crc="a44de03c" sha1="0e086d7ef2bd8b97315196943fd0b71da07aa8f1" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Developers: Atlus -->
 	<software name="jackbrosj" cloneof="jackbros" supported="no">
-		<description>Jack Bros. no Meiro de Hiihoo! (Jpn)</description>
+		<description>Jack Bros. no Meiro de Hiihoo! (Japan)</description>
 		<year>1995</year>
 		<publisher>Atlus</publisher>
+		<info name="developer" value="Atlus"/>
 		<info name="serial" value="VUE-VJBJ-JPN"/>
 		<info name="release" value="19950929"/>
+		<info name="alt_title" value="ジャック・ブラザースの迷路でヒーホー!"/>
 		<part name="cart" interface="vboy_cart">
-			<dataarea name="rom" size="1048576" width="32">
-				<rom name="jack bros. no meiro de hiihoo (japan).bin" size="1048576" crc="cab61e8b" sha1="a973406590382ee503037271330d68d2834b79db" offset="000000" />
+			<dataarea name="rom" size="0x100000" width="32">
+				<rom name="jack bros. no meiro de hiihoo (japan).bin" size="0x100000" crc="cab61e8b" sha1="a973406590382ee503037271330d68d2834b79db" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Developers: Nintendo R&D1 -->
 	<software name="mariocla" supported="no">
-		<description>Mario Clash (Jpn, USA)</description>
+		<description>Mario Clash (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
+		<info name="developer" value="Nintendo R&amp;D1"/>
 		<info name="serial" value="VUE-VMCJ-JPN, VUE-VMCJ-USA"/>
 		<info name="release" value="19950928 (JPN), 199510xx (USA)"/>
+		<info name="alt_title" value="マリオクラッシュ"/>
 		<part name="cart" interface="vboy_cart">
 			<feature name="pcb" value="VUE-AA-01" />
 			<feature name="u1" value="U1 PRG" />
-			<dataarea name="rom" size="1048576" width="32">
-				<rom name="vue-vmcj-0.u1" size="1048576" crc="a47de78c" sha1="7556a778b60490bdb81774bcbaa7413fc84cb985" offset="000000" />
+			<dataarea name="rom" size="0x100000" width="32">
+				<rom name="vue-vmcj-0.u1" size="0x100000" crc="a47de78c" sha1="7556a778b60490bdb81774bcbaa7413fc84cb985" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Developers: Nintendo R&D1 / Tose Software -->
 	<software name="marioten" supported="no">
-		<description>Mario's Tennis (Jpn, USA)</description>
+		<description>Mario's Tennis (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
+		<info name="developer" value="Nintendo R&amp;D1, Tose Software"/>
 		<info name="serial" value="VUE-VMTJ-JPN, VUE-VMTJ-USA"/>
 		<info name="release" value="19950721 (JPN), 19950814 (USA)"/>
+		<info name="alt_title" value="マリオズテニス"/>
 		<part name="cart" interface="vboy_cart">
-			<dataarea name="rom" size="524288" width="32">
-				<rom name="mario's tennis (japan, usa).bin" size="524288" crc="7ce7460d" sha1="5162f7fa9e3eae4338c53ccba641ba080c768754" offset="000000" />
+			<dataarea name="rom" size="0x80000" width="32">
+				<rom name="vue-vmtj-0.u1" size="0x80000" crc="7ce7460d" sha1="5162f7fa9e3eae4338c53ccba641ba080c768754" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Developers: Nintendo IRD -->
 	<software name="nesterfb" supported="no">
 		<description>Nester's Funky Bowling (USA)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
+		<info name="developer" value="Nintendo IRD"/>
 		<info name="serial" value="VUE-VNFE-USA"/>
 		<info name="release" value="19960226"/>
 		<part name="cart" interface="vboy_cart">
 			<feature name="pcb" value="VUE-AA-01" />
 			<feature name="u1" value="U1 PRG" />
-			<dataarea name="rom" size="2097152" width="32">
-				<rom name="vue-vnfe-0.u1" size="2097152" crc="df4d56b4" sha1="f4a4c7928f15102cf14c90c5f044e5f7cc7c32f9" offset="000000" />
+			<dataarea name="rom" size="0x200000" width="32">
+				<rom name="vue-vnfe-0.u1" size="0x200000" crc="df4d56b4" sha1="f4a4c7928f15102cf14c90c5f044e5f7cc7c32f9" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="nikochan">
-		<description>Niko-chan Battle (Jpn, prototype)</description>
+		<description>Niko-chan Battle (Japan, prototype)</description>
 		<year>1996</year>
 		<publisher>Bullet-Proof Software</publisher>
 		<info name="alt_title" value="ニコちゃんバトル"/>
 		<part name="cart" interface="vboy_cart">
-			<dataarea name="rom" size="1048576" width="32">
-				<rom name="nikochan battle (j)(prototype).bin" size="1048576" crc="f3cd40dd" sha1="217ca062f65d4e8b2848085918af5ac4b33b12d4" offset="000000" />
+			<dataarea name="rom" size="0x100000" width="32">
+				<rom name="nikochan battle (j)(prototype).bin" size="0x100000" crc="f3cd40dd" sha1="217ca062f65d4e8b2848085918af5ac4b33b12d4" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Developers: Raizing -->
 	<software name="panicbom" supported="no">
 		<description>Panic Bomber (USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
+		<info name="developer" value="Raizing"/>
 		<info name="serial" value="VUE-VH2E-USA"/>
 		<info name="release" value="199512xx"/>
 		<part name="cart" interface="vboy_cart">
 			<feature name="pcb" value="VUE-AA-01" />
 			<feature name="u1" value="U1 PRG" />
-			<dataarea name="rom" size="524288" width="32">
-				<rom name="vue-vh2e-0.u1" size="524288" crc="19bb2dfb" sha1="80216b2874cf162f301d571bb8aebc98d80b4f3e" offset="000000" />
+			<dataarea name="rom" size="0x80000" width="32">
+				<rom name="vue-vh2e-0.u1" size="0x80000" crc="19bb2dfb" sha1="80216b2874cf162f301d571bb8aebc98d80b4f3e" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Developers: T&E Soft -->
 	<software name="redalarm" supported="no">
 		<description>Red Alarm (USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
+		<info name="developer" value="T&amp;E Soft"/>
 		<info name="serial" value="VUE-VREE-USA"/>
 		<info name="release" value="19950814"/>
 		<part name="cart" interface="vboy_cart">
-			<dataarea name="rom" size="1048576" width="32">
-				<rom name="red alarm (usa).bin" size="1048576" crc="aa10a7b4" sha1="494fa60cb8997880b4e8cd3270b21d6c2768a48a" offset="000000" />
+			<dataarea name="rom" size="0x100000" width="32">
+				<rom name="vue-vree-0.u1" size="0x100000" crc="aa10a7b4" sha1="494fa60cb8997880b4e8cd3270b21d6c2768a48a" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Developers: T&E Soft -->
 	<software name="redalarmj" cloneof="redalarm" supported="no">
-		<description>Red Alarm (Jpn)</description>
+		<description>Red Alarm (Japan)</description>
 		<year>1995</year>
 		<publisher>T&amp;E Soft</publisher>
+		<info name="developer" value="T&amp;E Soft"/>
 		<info name="serial" value="VUE-VREJ-JPN"/>
 		<info name="release" value="19950721"/>
+		<info name="alt_title" value="レッドアラーム"/>
 		<part name="cart" interface="vboy_cart">
-			<dataarea name="rom" size="1048576" width="32">
-				<rom name="red alarm (japan).bin" size="1048576" crc="7e85c45d" sha1="f5057fa9bfd9d60b9dcfc004cfdd12aa8eb1cb4a" offset="000000" />
+			<dataarea name="rom" size="0x100000" width="32">
+				<rom name="red alarm (japan).bin" size="0x100000" crc="7e85c45d" sha1="f5057fa9bfd9d60b9dcfc004cfdd12aa8eb1cb4a" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Developers: Bandai? -->
 	<software name="sdgundam" supported="no">
-		<description>SD Gundam - Dimension War (Jpn)</description>
+		<description>SD Gundam - Dimension War (Japan)</description>
 		<year>1995</year>
 		<publisher>Bandai</publisher>
+		<info name="developer" value="Locomotive"/>
 		<info name="serial" value="VUE-VSDJ-JPN"/>
 		<info name="release" value="19951222"/>
+		<info name="alt_title" value="SDガンダム ディメンション ウォー"/>
 		<part name="cart" interface="vboy_cart">
-			<dataarea name="rom" size="1048576" width="32">
-				<rom name="sd gundam - dimension war (japan).bin" size="1048576" crc="44788197" sha1="1a67f6bdb45db46e22b8aadea754a68ad379ae29" offset="000000" />
+			<dataarea name="rom" size="0x100000" width="32">
+				<rom name="sd gundam - dimension war (japan).bin" size="0x100000" crc="44788197" sha1="1a67f6bdb45db46e22b8aadea754a68ad379ae29" />
 			</dataarea>
+			<dataarea name="sram" size="0x2000" width="8" />
 		</part>
 	</software>
 
-	<!-- Developers: Taito -->
 	<software name="spaceinv" supported="no">
-		<description>Space Invaders - Virtual Collection (Jpn)</description>
+		<description>Space Invaders - Virtual Collection (Japan)</description>
 		<year>1995</year>
 		<publisher>Taito</publisher>
+		<info name="developer" value="Taito"/>
 		<info name="serial" value="VUE-VSPJ-JPN"/>
 		<info name="release" value="19951201"/>
+		<info name="alt_title" value="スペースインベーダー バーチャルコレクション"/>
 		<part name="cart" interface="vboy_cart">
-			<dataarea name="rom" size="524288" width="32">
-				<rom name="space invaders - virtual collection (japan).bin" size="524288" crc="fa44402d" sha1="16ad904faafd24642dfd056d10a768e81f0d9bfa" offset="000000" />
+			<dataarea name="rom" size="0x80000" width="32">
+				<rom name="space invaders - virtual collection (japan).bin" size="0x80000" crc="fa44402d" sha1="16ad904faafd24642dfd056d10a768e81f0d9bfa" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="spacepin" cloneof="galactic" supported="no">
-		<description>Space Pinball (Jpn, prototype)</description>
+		<description>Space Pinball (Japan, prototype)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="vboy_cart">
-			<dataarea name="rom" size="2097152" width="32">
-				<rom name="space pinball prototype (j).bin" size="2097152" crc="44c2b723" sha1="dc182360c7c8d26323db8921f09db76638e81ced" offset="000000" />
+			<dataarea name="rom" size="0x200000" width="32">
+				<rom name="space pinball prototype (j).bin" size="0x200000" crc="44c2b723" sha1="dc182360c7c8d26323db8921f09db76638e81ced" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Developers: Tomcat System -->
 	<software name="ssquash" supported="no">
-		<description>Space Squash (Jpn)</description>
+		<description>Space Squash (Japan)</description>
 		<year>1995</year>
 		<publisher>Coconuts Japan Entertainment</publisher>
+		<info name="developer" value="Tomcat System"/>
 		<info name="serial" value="VUE-VSSJ-JPN"/>
 		<info name="release" value="19950929"/>
+		<info name="alt_title" value="スペーススカッシュ"/>
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="524288" width="32">
-				<rom name="space squash (japan).bin" size="524288" crc="60895693" sha1="3f08cae2b6f9e386529949ff954220860db1af64" offset="000000" />
+				<rom name="space squash (japan).bin" size="524288" crc="60895693" sha1="3f08cae2b6f9e386529949ff954220860db1af64" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Developers: Nintendo R&D1 -->
 	<software name="telerobo" supported="no">
-		<description>Teleroboxer (Jpn, USA)</description>
+		<description>Teleroboxer (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
+		<info name="developer" value="Nintendo R&amp;D1"/>
 		<info name="serial" value="VUE-VTBJ-JPN, VUE-VTBJ-USA"/>
 		<info name="release" value="19950721 (JPN), 19950814 (USA)"/>
+		<info name="alt_title" value="テレロボクサー"/>
 		<part name="cart" interface="vboy_cart">
-			<dataarea name="rom" size="1048576" width="32">
-				<rom name="teleroboxer (japan, usa).bin" size="1048576" crc="36103000" sha1="c59e020f9674774c5cbc022317ebba0eb1d744f7" offset="000000" />
+			<dataarea name="rom" size="0x100000" width="32">
+				<rom name="vue-vtbj-0.u1" size="0x100000" crc="36103000" sha1="c59e020f9674774c5cbc022317ebba0eb1d744f7" />
 			</dataarea>
-			<dataarea name="sram" size="8192" width="8" />
+			<dataarea name="sram" size="0x2000" width="8" />
 		</part>
 	</software>
 
-	<!-- Developers: Raizing -->
 	<software name="tobidase" supported="no">
-		<description>Tobidase! Panibon (Jpn)</description>
+		<description>Tobidase! Panibon (Japan)</description>
 		<year>1995</year>
 		<publisher>Hudson</publisher>
+		<info name="developer" value="Raizing"/>
 		<info name="serial" value="VUE-VH2J-JPN"/>
 		<info name="release" value="19950721"/>
+		<info name="alt_title" value="とびだせ! ぱにボン"/>
 		<part name="cart" interface="vboy_cart">
-			<dataarea name="rom" size="524288" width="32">
-				<rom name="tobidase panibon (japan).bin" size="524288" crc="40498f5e" sha1="b8a12a9677afa5cbce6ed43eb0effb5a02875534" offset="000000" />
+			<dataarea name="rom" size="0x80000" width="32">
+				<rom name="tobidase panibon (japan).bin" size="0x80000" crc="40498f5e" sha1="b8a12a9677afa5cbce6ed43eb0effb5a02875534" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Developers: Athena -->
 	<software name="vbowling" supported="no">
-		<description>Virtual Bowling (Jpn)</description>
+		<description>Virtual Bowling (Japan)</description>
 		<year>1995</year>
 		<publisher>Athena</publisher>
+		<info name="developer" value="Athena"/>
 		<info name="serial" value="VUE-VVBJ-JPN"/>
 		<info name="release" value="19951222"/>
+		<info name="alt_title" value="バーチャルボウリング"/>
 		<part name="cart" interface="vboy_cart">
-			<dataarea name="rom" size="1048576" width="32">
-				<rom name="virtual bowling (japan).bin" size="1048576" crc="20688279" sha1="a5be7654037050f0a781e70efea0191f43d26f06" offset="000000" />
+			<dataarea name="rom" size="0x100000" width="32">
+				<rom name="virtual bowling (japan).bin" size="0x100000" crc="20688279" sha1="a5be7654037050f0a781e70efea0191f43d26f06" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Developers: Pack-In-Video -->
 	<software name="vfishing" supported="no">
-		<description>Virtual Fishing (Jpn)</description>
+		<description>Virtual Fishing (Japan)</description>
 		<year>1995</year>
 		<publisher>Pack-In-Video</publisher>
+		<info name="developer" value="Pack-In-Video"/>
 		<info name="serial" value="VUE-VVFJ-JPN"/>
 		<info name="release" value="19951016"/>
+		<info name="alt_title" value="バーチャルフィッシング"/>
 		<part name="cart" interface="vboy_cart">
 			<feature name="pcb" value="VUE-AA3A-01" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 [HY6264ALLJ-10]" />
 			<feature name="u3" value="U3 [??]" />
 			<feature name="battery" value="BT1" />
-			<dataarea name="rom" size="1048576" width="32">
-				<rom name="vue-vvfj-0.u1" size="1048576" crc="526cc969" sha1="583b409b7215159219d08e789db46140062095f2" offset="000000" />
+			<dataarea name="rom" size="0x100000" width="32">
+				<rom name="vue-vvfj-0.u1" size="0x100000" crc="526cc969" sha1="583b409b7215159219d08e789db46140062095f2" />
 			</dataarea>
-			<dataarea name="sram" size="8192" width="8" />
+			<dataarea name="sram" size="0x2000" width="8" />
 		</part>
 	</software>
 
-	<!-- Developers: Hudson -->
 	<software name="vforce" supported="no">
 		<description>Vertical Force (USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
+		<info name="developer" value="Hudson"/>
 		<info name="serial" value="VUE-VH3E-USA"/>
 		<info name="release" value="19951201"/>
 		<part name="cart" interface="vboy_cart">
-			<dataarea name="rom" size="1048576" width="32">
-				<rom name="vertical force (usa).bin" size="1048576" crc="4c32ba5e" sha1="38f9008f60b09deef1151d46b905b090a0338200" offset="000000" />
+			<dataarea name="rom" size="0x100000" width="32">
+				<rom name="vue-vh3e-0.u1" size="0x100000" crc="4c32ba5e" sha1="38f9008f60b09deef1151d46b905b090a0338200" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Developers: Hudson -->
 	<software name="vforcej" cloneof="vforce" supported="no">
-		<description>Vertical Force (Jpn)</description>
+		<description>Vertical Force (Japan)</description>
 		<year>1995</year>
 		<publisher>Hudson</publisher>
+		<info name="developer" value="Hudson"/>
 		<info name="serial" value="VUE-VH3J-JPN"/>
 		<info name="release" value="19950812"/>
+		<info name="alt_title" value="バーティカルフォース"/>
 		<part name="cart" interface="vboy_cart">
-			<dataarea name="rom" size="1048576" width="32">
-				<rom name="vertical force (japan).bin" size="1048576" crc="9e9b8b92" sha1="c7204ba5cfe7d26394b5e22badc580c8ed8c0b37" offset="000000" />
+			<dataarea name="rom" size="0x100000" width="32">
+				<rom name="vertical force (japan).bin" size="0x100000" crc="9e9b8b92" sha1="c7204ba5cfe7d26394b5e22badc580c8ed8c0b37" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Developers: T&E Soft -->
 	<software name="vgolf" cloneof="golf" supported="no">
-		<description>T&amp;E Virtual Golf (Jpn)</description>
+		<description>T&amp;E Virtual Golf (Japan)</description>
 		<year>1995</year>
 		<publisher>T&amp;E Soft</publisher>
+		<info name="developer" value="T&amp;E Soft"/>
 		<info name="serial" value="VUE-VVGJ-JPN"/>
 		<info name="release" value="19950811"/>
+		<info name="alt_title" value="T&amp;Eヴァーチャルゴルフ"/>
 		<part name="cart" interface="vboy_cart">
-			<dataarea name="rom" size="2097152" width="32">
-				<rom name="t&amp;e virtual golf (japan).bin" size="2097152" crc="6ba07915" sha1="c595285d42c69f14b2b418c1edfbe4a7f9a624b6" offset="000000" />
+			<dataarea name="rom" size="0x200000" width="32">
+				<rom name="t&amp;e virtual golf (japan).bin" size="0x200000" crc="6ba07915" sha1="c595285d42c69f14b2b418c1edfbe4a7f9a624b6" />
 			</dataarea>
-			<dataarea name="sram" size="8192" width="8" />
 		</part>
 	</software>
 
-	<!-- Developers: J-Wing -->
 	<software name="vlab" supported="no">
-		<description>Virtual Lab (Jpn)</description>
+		<description>Virtual Lab (Japan)</description>
 		<year>1995</year>
 		<publisher>J-Wing</publisher>
+		<info name="developer" value="J-Wing"/>
 		<info name="serial" value="VUE-VJVJ-JPN"/>
 		<info name="release" value="19951208"/>
+		<info name="alt_title" value="バーチャルラボ"/>
 		<part name="cart" interface="vboy_cart">
 			<feature name="pcb" value="VUE-AA-01" />
 			<feature name="u1" value="U1 PRG" />
-			<dataarea name="rom" size="1048576" width="32">
-				<rom name="vue-vjvj-0.u1" size="1048576" crc="8989fe0a" sha1="d96c9f8aac5b4ea012a8fe659bb68fb1159a9c6d" offset="000000" />
+			<dataarea name="rom" size="0x100000" width="32">
+				<rom name="vue-vjvj-0.u1" size="0x100000" crc="8989fe0a" sha1="d96c9f8aac5b4ea012a8fe659bb68fb1159a9c6d" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Developers: Kemco -->
 	<software name="vleague" supported="no">
 		<description>Virtual League Baseball (USA)</description>
 		<year>1995</year>
 		<publisher>Kemco</publisher>
+		<info name="developer" value="Kemco"/>
 		<info name="serial" value="VUE-VVPE-USA"/>
 		<info name="release" value="19950911"/>
 		<part name="cart" interface="vboy_cart">
-			<dataarea name="rom" size="1048576" width="32">
-				<rom name="virtual league baseball (usa).bin" size="1048576" crc="736b40d6" sha1="266fe615ee3df1160a20b456824699f16810fa28" offset="000000" />
+			<dataarea name="rom" size="0x100000" width="32">
+				<rom name="vue-vvpe-0.u1" size="0x100000" crc="736b40d6" sha1="266fe615ee3df1160a20b456824699f16810fa28" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Developers: Kemco -->
 	<software name="vproyak" cloneof="vleague" supported="no">
-		<description>Virtual Pro Yakyuu '95 (Jpn)</description>
+		<description>Virtual Pro Yakyuu '95 (Japan)</description>
 		<year>1995</year>
 		<publisher>Kemco</publisher>
+		<info name="developer" value="Kemco"/>
 		<info name="serial" value="VUE-VVPJ-JPN"/>
 		<info name="release" value="19950811"/>
+		<info name="alt_title" value="バーチャルプロ野球'95"/>
 		<part name="cart" interface="vboy_cart">
-			<dataarea name="rom" size="1048576" width="32">
-				<rom name="virtual pro yakyuu '95 (japan).bin" size="1048576" crc="9ba8bb5e" sha1="ab8fa82b79512eefefccdccea6768078a374c4aa" offset="000000" />
+			<dataarea name="rom" size="0x100000" width="32">
+				<rom name="virtual pro yakyuu '95 (japan).bin" size="0x100000" crc="9ba8bb5e" sha1="ab8fa82b79512eefefccdccea6768078a374c4aa" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Developers: Locomotive -->
 	<software name="vtetris" supported="no">
-		<description>V-Tetris (Jpn)</description>
+		<description>V-Tetris (Japan)</description>
 		<year>1995</year>
 		<publisher>Bullet-Proof Software</publisher>
+		<info name="developer" value="Locomotive"/>
 		<info name="serial" value="VUE-VTRJ-JPN"/>
 		<info name="release" value="19950825"/>
+		<info name="alt_title" value="V・テトリス"/>
 		<part name="cart" interface="vboy_cart">
-			<dataarea name="rom" size="524288" width="32">
-				<rom name="v-tetris (japan).bin" size="524288" crc="3ccb67ae" sha1="ff7d4dfc467e6e0d3fe8517102132a65a9d17589" offset="000000" />
+			<dataarea name="rom" size="0x80000" width="32">
+				<rom name="vue-vtrj-0.u1" size="0x80000" crc="3ccb67ae" sha1="ff7d4dfc467e6e0d3fe8517102132a65a9d17589" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Developers: Nintendo R&D1 -->
 	<software name="wariolnd">
-		<description>Virtual Boy Wario Land (USA) ~ Virtual Boy Wario Land - Awazon no Hihou (Jpn)</description>
+		<description>Virtual Boy Wario Land (USA) ~ Virtual Boy Wario Land - Awazon no Hihou (Japan)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
+		<info name="developer" value="Nintendo R&amp;D1"/>
 		<info name="serial" value="VUE-VWCJ-JPN, VUE-VWCJ-USA"/>
 		<info name="release" value="19951201 (JPN), 199511xx (USA)"/>
+		<info name="alt_title" value="バーチャルボーイ ワリオランド アワゾンの秘宝"/>
 		<part name="cart" interface="vboy_cart">
-			<dataarea name="rom" size="2097152" width="32">
-				<rom name="virtual boy wario land (japan, usa).bin" size="2097152" crc="133e9372" sha1="274c328fbd904f20e69172ab826bf8f94ced1bdb" offset="000000" />
+			<dataarea name="rom" size="0x200000" width="32">
+				<rom name="vue-vwcj-0.u1" size="0x200000" crc="133e9372" sha1="274c328fbd904f20e69172ab826bf8f94ced1bdb" />
 			</dataarea>
-			<dataarea name="sram" size="8192" width="8" />
+			<dataarea name="sram" size="0x2000" width="8" />
 		</part>
 	</software>
 
-	<!-- Developers: Ocean -->
 	<software name="waterwld" supported="no">
 		<description>Waterworld (USA)</description>
 		<year>1995</year>
 		<publisher>Ocean</publisher>
+		<info name="developer" value="Ocean"/>
 		<info name="serial" value="VUE-VWEE-USA"/>
 		<info name="release" value="19951221"/>
 		<part name="cart" interface="vboy_cart">
-			<dataarea name="rom" size="2097152" width="32">
-				<rom name="waterworld (usa).bin" size="2097152" crc="82a95e51" sha1="dcc46484bd0acab0ac1ea178f425a0f5ccfb8dc2" offset="000000" />
+			<dataarea name="rom" size="0x200000" width="32">
+				<rom name="vue-vwee-0.u1" size="0x200000" crc="82a95e51" sha1="dcc46484bd0acab0ac1ea178f425a0f5ccfb8dc2" />
 			</dataarea>
 		</part>
 	</software>

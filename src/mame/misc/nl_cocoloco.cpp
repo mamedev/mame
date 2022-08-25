@@ -10,6 +10,7 @@
 // 7W LM383T Amplifier not included below
 
 NETLIST_START(cocoloco)
+{
 
 	/* Standard stuff */
 
@@ -49,5 +50,5 @@ NETLIST_START(cocoloco)
 	NET_C(C2.2, GND)
 	NET_C(C2.1, RAMP.1)
 #endif
-NETLIST_END()
+}
 

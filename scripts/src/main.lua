@@ -369,7 +369,7 @@ if (STANDALONE~=true) then
 				{ MAME_DIR .. "scripts/build/verinfo.py" },
 				{
 					"@echo Emitting " .. _target .. "_" .. _subtarget .. "_vers.rc" .. "...",
-					PYTHON .. " $(1) -f rc -t " .. _target .. " -s " .. _subtarget .. " -e " .. exename .. " -r " .. rcincfile .. " -o $(@) $(<)"
+					PYTHON .. " $(1) -f rc -t " .. _target .. " -s " .. _subtarget .. " -e " .. exename .. " -r " .. path.getname(rcincfile) .. " -o $(@) $(<)"
 				}
 			},
 		}
@@ -382,7 +382,7 @@ if (STANDALONE~=true) then
 			"mkdir \"" .. path.translate(GEN_DIR .. "resource/", "\\") .. "\" 2>NUL",
 			"mkdir \"" .. path.translate(GEN_DIR .. _target .. "/" .. _subtarget .. "/", "\\") .. "\" 2>NUL",
 			"@echo Emitting " .. _target .. "_" .. _subtarget .. "_vers.rc" .. "...",
-			PYTHON .. " \"" .. path.translate(MAME_DIR .. "scripts/build/verinfo.py", "\\") .. "\" -f rc -t " .. _target .. " -s " .. _subtarget .. " -e " .. exename .. " -o \"" .. path.translate(rcversfile) .. "\" -r \"" .. path.translate(rcincfile, "\\") .. "\" \"" .. path.translate(GEN_DIR .. "version.cpp", "\\") .. "\"",
+			PYTHON .. " \"" .. path.translate(MAME_DIR .. "scripts/build/verinfo.py", "\\") .. "\" -f rc -t " .. _target .. " -s " .. _subtarget .. " -e " .. exename .. " -o \"" .. path.translate(rcversfile) .. "\" -r \"" .. path.getname(rcincfile) .. "\" \"" .. path.translate(GEN_DIR .. "version.cpp", "\\") .. "\"",
 		}
 end
 

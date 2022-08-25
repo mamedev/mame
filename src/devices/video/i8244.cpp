@@ -162,12 +162,24 @@ void i8244_device::device_start()
 	// allocate a stream
 	m_stream = stream_alloc(0, 1, clock());
 
-	// register our state
+	// zerofill
 	memset(m_vdc.reg, 0, 0x100);
-	save_pointer(NAME(m_vdc.reg), 0x100);
-
 	memset(m_collision_map, 0, sizeof(m_collision_map));
 	memset(m_priority_map, 0, sizeof(m_priority_map));
+
+	m_x_beam_pos = 0;
+	m_y_beam_pos = 0;
+	m_control_status = 0;
+	m_collision_status = 0;
+	m_sh_written = false;
+	m_sh_pending = false;
+	m_sh_prescaler = 0;
+	m_sh_count = 0;
+	m_sh_output = 0;
+	m_sh_duty = 0;
+
+	// register our state
+	save_pointer(NAME(m_vdc.reg), 0x100);
 	save_item(NAME(m_collision_map));
 	save_item(NAME(m_priority_map));
 

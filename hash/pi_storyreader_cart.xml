@@ -384,7 +384,7 @@ license:CC0
 		<publisher>Publications International Ltd. / Disney</publisher>
 		<part name="cart" interface="pi_storyreader_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="Arielle  - Die Meerjungfrau (GER).bin" size="0x100000" crc="a113accf" sha1="a7e3a915ce71ddea58e03fdd762c97ad0e72c33e" />
+				<rom name="Arielle - Die Meerjungfrau (GER).bin" size="0x100000" crc="a113accf" sha1="a7e3a915ce71ddea58e03fdd762c97ad0e72c33e" />
 			</dataarea>
 		</part>
 	</software>

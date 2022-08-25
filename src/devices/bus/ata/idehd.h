@@ -44,7 +44,7 @@ protected:
 	virtual int write_sector(uint32_t lba, const void *buffer) = 0;
 	virtual attotime seek_time();
 
-	void ide_build_identify_device();
+	virtual void ide_build_identify_device();
 
 	static const int IDE_DISK_SECTOR_SIZE = 512;
 	virtual int sector_length() override { return IDE_DISK_SECTOR_SIZE; }
@@ -119,7 +119,23 @@ private:
 	emu_timer *     m_last_status_timer;
 };
 
+// ======================> ide_cf_device
+
+class ide_cf_device : public ide_hdd_device
+{
+public:
+	// construction/destruction
+	ide_cf_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	void ide_build_identify_device() override;
+};
+
 // device type definition
 DECLARE_DEVICE_TYPE(IDE_HARDDISK, ide_hdd_device)
+DECLARE_DEVICE_TYPE(ATA_CF, ide_cf_device)
 
 #endif // MAME_BUS_ATA_IDEHD_H

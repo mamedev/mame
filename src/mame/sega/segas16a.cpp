@@ -153,7 +153,7 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 #include "fd1089.h"
 #include "fd1094.h"
 #include "machine/nvram.h"
-#include "segacrp2_device.h"
+#include "machine/segacrp2_device.h"
 #include "sound/dac.h"
 #include "speaker.h"
 

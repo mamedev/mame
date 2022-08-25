@@ -9,7 +9,7 @@
 #ifndef __OSDWINDOW__
 #define __OSDWINDOW__
 
-#include "render.h"
+#include "emucore.h"
 #include "osdhelper.h"
 #include "../frontend/mame/ui/menuitem.h"
 
@@ -87,22 +87,9 @@ public:
 
 	float pixel_aspect() const;
 
-	bool swap_xy() const
-	{
-		bool orientation_swap_xy =
-			(machine().system().flags & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
-		bool rotation_swap_xy =
-			(target()->orientation() & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
-		return orientation_swap_xy ^ rotation_swap_xy;
-	};
+	bool swap_xy() const;
 
-	bool keepaspect() const
-	{
-		if (m_target != nullptr)
-			return m_target->keepaspect();
-		else
-			return false;
-	}
+	bool keepaspect() const;
 
 	virtual osd_dim get_size() = 0;
 

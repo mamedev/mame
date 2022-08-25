@@ -15,7 +15,7 @@
 #include <cstdio>
 
 // MAME headers
-#include "emu.h"
+#include "emucore.h"
 #include "ui/uimain.h"
 #include "rendersw.hxx"
 

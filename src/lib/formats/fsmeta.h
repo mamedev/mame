@@ -37,8 +37,8 @@ enum class meta_name {
 	ascii_flag,
 	owner_id,
 	attributes,
-
-	max = attributes
+	oem_name,
+	max = oem_name
 };
 
 enum class meta_type {

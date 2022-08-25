@@ -2326,19 +2326,19 @@ ROM_START( pompingw )
 	ROM_LOAD( "pwj_07.13h", 0x10000, 0x20000, CRC(a9402420) SHA1(2ca3aa59d561826477e3509fcaeeec753d64d419) )
 
 	ROM_REGION( 0x100000, "chars", ROMREGION_ERASEFF )
-	ROM_LOAD( "pw_02.1e", 0x000000, 0x20000, CRC(4b5992e4) SHA1(2071a1fcfc739d7ca837c03133909101b462d5a6) )
-	ROM_LOAD( "pw_03.2e", 0x020000, 0x20000, CRC(79a8ed08) SHA1(c1e43889e29b80c7fe2c09b11eecde24450a1ff5) )
+	ROM_LOAD( "pwj_02.1e", 0x000000, 0x20000, CRC(4b5992e4) SHA1(2071a1fcfc739d7ca837c03133909101b462d5a6) )
+	ROM_LOAD( "pwj_03.2e", 0x020000, 0x20000, CRC(79a8ed08) SHA1(c1e43889e29b80c7fe2c09b11eecde24450a1ff5) )
 	// 40000-7ffff empty
 	ROM_LOAD( "pwj_04.1g", 0x080000, 0x20000, CRC(01e49081) SHA1(a29ffec199f196a2b3731e4863e863bdd04e2c58) )
-	ROM_LOAD( "pw_05.2g",  0x0a0000, 0x20000, CRC(2fb3db6c) SHA1(328814d28569fec763975a8ae4c2767517a680af) )
+	ROM_LOAD( "pwj_05.2g", 0x0a0000, 0x20000, CRC(2fb3db6c) SHA1(328814d28569fec763975a8ae4c2767517a680af) )
 	// c0000-fffff empty
 
 	ROM_REGION( 0x040000, "sprites", 0 )
-	ROM_LOAD( "pw_10.2k", 0x000000, 0x20000, CRC(fdba4f6e) SHA1(9a2412a97682bbd25b8942520a0c02616bd59353) )
-	ROM_LOAD( "pw_9.1k",  0x020000, 0x20000, CRC(39f47a63) SHA1(05675ad45909a7d723acaf4d53b4e588d4e048b9) )
+	ROM_LOAD( "pwj_10.2k", 0x000000, 0x20000, CRC(83a81c02) SHA1(fced1b5798442b7633cef0c5f87546b1845df096) )
+	ROM_LOAD( "pwj_9.1k",  0x020000, 0x20000, CRC(6b628232) SHA1(7b3848f289ad96f314076ddeb8b0a196d5102b36) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "pw_01.1d", 0x00000, 0x20000, CRC(c52e5b8e) SHA1(933b954bfdd2d67e28b032ffabde192531249c1f) )
+	ROM_LOAD( "pwj_01.1d", 0x00000, 0x20000, CRC(c52e5b8e) SHA1(933b954bfdd2d67e28b032ffabde192531249c1f) )
 ROM_END
 
 ROM_START( pangb )
@@ -2887,6 +2887,29 @@ ROM_END
 
 ROM_START( marukin )
 	ROM_REGION( 0x50000, "maincpu", 0 )
+	ROM_LOAD( "mg3-01b.9d",    0x00000, 0x08000, CRC(529d4389) SHA1(ec2cc0c5da34706e9b93b430ccc63a297c337c4f) )
+	ROM_LOAD( "mg3-02b.10d",   0x10000, 0x20000, CRC(e8a8f14e) SHA1(acfc60d1cc136e0d6e74a0983a16a8164c35333d) )
+
+	ROM_REGION( 0x200000, "chars", 0 )
+	ROM_LOAD( "mg3-a.3k",     0x000000, 0x80000, CRC(420f1de7) SHA1(bc2142175f93f96c45c5ee9d23da14f3eb91e58b) )
+	ROM_LOAD( "mg3-b.4k",     0x080000, 0x80000, CRC(d8de13fa) SHA1(4420fb6fb42d40c0c84a6f4660bd0ffff429261a) )
+	ROM_LOAD( "mg3-c.6k",     0x100000, 0x80000, CRC(fbeb66e8) SHA1(a9f13b3818187af05158dfea62ed46e28acf057b) )
+	ROM_LOAD( "mg3-d.7k",     0x180000, 0x80000, CRC(8f6bd831) SHA1(8fe7aeab0ebe52fde269b320e9c797cb6c036eff) )
+
+	ROM_REGION( 0x040000, "sprites", 0 )
+	ROM_LOAD( "mg3-05.2g",    0x000000, 0x20000, CRC(7a738d2d) SHA1(4b2daf1824b40b961c1e18050197c817fccc2337) )
+	ROM_LOAD( "mg3-04.1g",    0x020000, 0x20000, CRC(56f30515) SHA1(6af85c1bbebba37d3b0d4161bc2495237ddfc494) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "mg3-e.1d",     0x00000, 0x80000, CRC(106c2fa9) SHA1(21d4579f41282dc69ea11fe2977c427543f1c69d) )  // banked
+
+	ROM_REGION( 0x400, "plds", 0 )
+	ROM_LOAD( "mj3c.10f", 0x000, 0x117, CRC(f59ba8d2) SHA1(c59c833674b6591885fd333a7d4715005957a3ab) ) // pal16l8bcn
+	ROM_LOAD( "mj3p.14k", 0x000, 0x117, CRC(2c87be87) SHA1(0778f7939edf9e786839a8af2724e32d8cd4630b) ) // pal16l8bcn
+ROM_END
+
+ROM_START( marukina )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "mg3-01.9d",    0x00000, 0x08000, CRC(04357973) SHA1(61b0b347479126213c90ef6833c09537fab03093) )
 	ROM_LOAD( "mg3-02.10d",   0x10000, 0x20000, CRC(50d08da0) SHA1(5d115eb646f34827d02219be3d5346f05c0c27b6) )
 
@@ -3282,7 +3305,8 @@ GAME( 1990, spangbl2,    spang,    spangbl,    spangbl,    spangbl_state,    ini
 GAME( 1994, mstworld,    0,        mstworld,   mstworld,   mstworld_state,   init_mstworld,   ROT0,   "bootleg (TCH)",             "Monsters World (bootleg of Super Pang)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mstworld2,   mstworld, mstworld2,  mstworld2,  spangbl_state,    init_spangbl,    ROT0,   "bootleg",                   "Monsters World 2 (bootleg of Super Pang)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // GFX garbage at title screen with clean NVRAM
 
-GAME( 1990, marukin,     0,        marukin,    marukin,    mitchell_state,   init_marukin,    ROT0,   "Yuga",                      "Super Marukin-Ban (Japan 901017)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, marukin,     0,        marukin,    marukin,    mitchell_state,   init_marukin,    ROT0,   "Yuga",                      "Super Marukin-Ban (Japan 911128)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, marukina,    marukin,  marukin,    marukin,    mitchell_state,   init_marukin,    ROT0,   "Yuga",                      "Super Marukin-Ban (Japan 901017)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, qtono1,      0,        pang,       qtono1,     mitchell_state,   init_qtono1,     ROT0,   "Capcom",                    "Quiz Tonosama no Yabou (Japan)", MACHINE_SUPPORTS_SAVE )
 

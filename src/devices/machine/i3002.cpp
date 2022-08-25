@@ -125,7 +125,7 @@ bool i3002_device::update_ro()
 	decode_fc(m_fc , fg , rg , reg);
 
 	if (fg == 0 && rg == 2) {
-		uint8_t ik = m_ibus_handler() & m_kbus;
+		uint8_t ik = !m_ibus_handler.isnull() ? m_ibus_handler() & m_kbus : 0;
 		uint8_t at = m_reg[ reg ];
 		set_ro(BIT(at , 0) && !BIT(ik , 0));
 		return true;
@@ -136,10 +136,10 @@ bool i3002_device::update_ro()
 
 void i3002_device::device_start()
 {
-	m_co_handler.resolve_safe();
-	m_ro_handler.resolve_safe();
-	m_ibus_handler.resolve_safe(0);
-	m_mbus_handler.resolve_safe(0);
+	m_co_handler.resolve();
+	m_ro_handler.resolve();
+	m_ibus_handler.resolve();
+	m_mbus_handler.resolve();
 
 	save_item(NAME(m_reg));
 	save_item(NAME(m_fc));
@@ -173,7 +173,7 @@ void i3002_device::update()
 		case 1:
 			// FC 0 RG II
 			{
-				uint8_t m = m_mbus_handler() & WORD_MASK;
+				uint8_t m = !m_mbus_handler.isnull() ? m_mbus_handler() & WORD_MASK : 0;
 				uint8_t tmp = (m_reg[ REG_AC ] & m_kbus) + m + m_ci;
 				m_reg[ reg ] = tmp & WORD_MASK;
 				set_co(BIT(tmp , SLICE_SIZE));
@@ -184,7 +184,7 @@ void i3002_device::update()
 			// FC 0 RG III
 			{
 				// Who designed this mess???
-				uint8_t ik = m_ibus_handler() & WORD_MASK & m_kbus;
+				uint8_t ik = !m_ibus_handler.isnull() ? m_ibus_handler() & WORD_MASK & m_kbus : 0;
 				uint8_t at = m_reg[ reg ];
 				m_reg[ reg ] = 0;
 				set_ro(BIT(at , 0) && !BIT(ik , 0));
@@ -214,7 +214,7 @@ void i3002_device::update()
 		case 1:
 			// FC 1 RG II
 			{
-				uint8_t m = m_mbus_handler() & WORD_MASK;
+				uint8_t m = !m_mbus_handler.isnull() ? m_mbus_handler() & WORD_MASK : 0;
 				m_reg[ REG_MAR ] = m_kbus | m;
 				uint8_t tmp = m + m_kbus + m_ci;
 				m_reg[ reg ] = tmp & WORD_MASK;
@@ -249,7 +249,7 @@ void i3002_device::update()
 		case 2:
 			// FC 2 RG III
 			{
-				uint8_t i = m_ibus_handler() & WORD_MASK;
+				uint8_t i = !m_ibus_handler.isnull() ? m_ibus_handler() & WORD_MASK : 0;
 				uint8_t tmp = (i & m_kbus) + WORD_MASK + m_ci;
 				m_reg[ reg ] = tmp & WORD_MASK;
 				set_co(BIT(tmp , SLICE_SIZE));
@@ -272,7 +272,7 @@ void i3002_device::update()
 		case 1:
 			// FC 3 RG II (== FC 0 RG II)
 			{
-				uint8_t m = m_mbus_handler() & WORD_MASK;
+				uint8_t m = !m_mbus_handler.isnull() ? m_mbus_handler() & WORD_MASK : 0;
 				uint8_t tmp = (m_reg[ REG_AC ] & m_kbus) + m + m_ci;
 				m_reg[ reg ] = tmp & WORD_MASK;
 				set_co(BIT(tmp , SLICE_SIZE));
@@ -282,7 +282,7 @@ void i3002_device::update()
 		case 2:
 			// FC 3 RG III
 			{
-				uint8_t i = m_ibus_handler() & WORD_MASK;
+				uint8_t i = !m_ibus_handler.isnull() ? m_ibus_handler() & WORD_MASK : 0;
 				uint8_t tmp = (i & m_kbus) + m_reg[ reg ] + m_ci;
 				m_reg[ reg ] = tmp & WORD_MASK;
 				set_co(BIT(tmp , SLICE_SIZE));
@@ -305,7 +305,7 @@ void i3002_device::update()
 		case 1:
 			// FC 4 RG II
 			{
-				uint8_t m = m_mbus_handler() & WORD_MASK;
+				uint8_t m = !m_mbus_handler.isnull() ? m_mbus_handler() & WORD_MASK : 0;
 				uint8_t tmp = m & m_reg[ REG_AC ] & m_kbus;
 				m_reg[ reg ] = tmp;
 				set_co(m_ci || tmp != 0);
@@ -315,7 +315,7 @@ void i3002_device::update()
 		case 2:
 			// FC 4 RG III
 			{
-				uint8_t i = m_ibus_handler() & WORD_MASK;
+				uint8_t i = !m_ibus_handler.isnull() ? m_ibus_handler() & WORD_MASK : 0;
 				uint8_t tmp = i & m_reg[ reg ] & m_kbus;
 				m_reg[ reg ] = tmp;
 				set_co(m_ci || tmp != 0);
@@ -340,7 +340,7 @@ void i3002_device::update()
 		case 1:
 			// FC 5 RG II
 			{
-				uint8_t m = m_mbus_handler() & WORD_MASK;
+				uint8_t m = !m_mbus_handler.isnull() ? m_mbus_handler() & WORD_MASK : 0;
 				uint8_t tmp = m & m_kbus;
 				m_reg[ reg ] = tmp;
 				set_co(m_ci || tmp != 0);
@@ -363,7 +363,7 @@ void i3002_device::update()
 		case 1:
 			// FC 6 RG II
 			{
-				uint8_t m = m_mbus_handler() & WORD_MASK;
+				uint8_t m = !m_mbus_handler.isnull() ? m_mbus_handler() & WORD_MASK : 0;
 				uint8_t tmp = m_reg[ REG_AC ] & m_kbus;
 				m_reg[ reg ] = m | tmp;
 				set_co(m_ci || tmp != 0);
@@ -373,7 +373,7 @@ void i3002_device::update()
 		case 2:
 			// FC 6 RG III
 			{
-				uint8_t ik = m_ibus_handler() & WORD_MASK & m_kbus;
+				uint8_t ik = !m_ibus_handler.isnull() ? m_ibus_handler() & WORD_MASK & m_kbus : 0;
 				m_reg[ reg ] |= ik;
 				set_co(m_ci || ik != 0);
 			}
@@ -395,7 +395,7 @@ void i3002_device::update()
 		case 1:
 			// FC 7 RG II
 			{
-				uint8_t m = m_mbus_handler() & WORD_MASK;
+				uint8_t m = !m_mbus_handler.isnull() ? m_mbus_handler() & WORD_MASK : 0;
 				uint8_t tmp = m_reg[ REG_AC ] & m_kbus;
 				set_co(m_ci || (m & tmp) != 0);
 				m_reg[ reg ] = m ^ tmp ^ WORD_MASK;
@@ -405,7 +405,7 @@ void i3002_device::update()
 		case 2:
 			// FC 7 RG III
 			{
-				uint8_t ik = m_ibus_handler() & WORD_MASK & m_kbus;
+				uint8_t ik = !m_ibus_handler.isnull() ? m_ibus_handler() & WORD_MASK & m_kbus : 0;
 				set_co(m_ci || (m_reg[ reg ] & ik) != 0);
 				m_reg[ reg ] = m_reg[ reg ] ^ ik ^ WORD_MASK;
 			}
@@ -418,11 +418,15 @@ void i3002_device::update()
 void i3002_device::set_co(bool co)
 {
 	m_co = co;
-	m_co_handler(m_co);
+	if (!m_co_handler.isnull()) {
+		m_co_handler(m_co);
+	}
 }
 
 void i3002_device::set_ro(bool ro)
 {
 	m_ro = ro;
-	m_ro_handler(m_ro);
+	if (!m_ro_handler.isnull()) {
+		m_ro_handler(m_ro);
+	}
 }

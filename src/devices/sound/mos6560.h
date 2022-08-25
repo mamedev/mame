@@ -111,11 +111,6 @@ protected:
 		TYPE_ATTACK_UFO     // NTSC-M, less features
 	};
 
-	enum
-	{
-		TIMER_LINE
-	};
-
 	mos6560_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
 
 	// device-level overrides

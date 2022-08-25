@@ -237,9 +237,9 @@ static INPUT_PORTS_START( bagman )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, "30000" )
 	PORT_DIPSETTING(    0x00, "40000" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) ) // Cabinet type set through edge connector, not dip switch (verified on real PCB)
-	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_CONFNAME(0x80, 0x80, DEF_STR( Cabinet ) ) // Cabinet type set through edge connector, not dip switch (verified on real PCB)
+	PORT_CONFSETTING(   0x80, DEF_STR( Upright ) )
+	PORT_CONFSETTING(   0x00, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bagmans )
@@ -873,7 +873,7 @@ ROM_START( bagmans4 )
 	ROM_LOAD( "bagman_a1_9t.9t", 0x1000, 0x1000, CRC(b2120edd) SHA1(52b89dbcc749b084331fa82b13d0876e911fce52) )
 ROM_END
 
-ROM_START( bagmans3 ) // not compatible with the PAL16R6 emulator in ../mame/machine/bagman.cpp??
+ROM_START( bagmans3 ) // not compatible with the PAL16R6 emulator in bagman_m.cpp??
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bagman_a2_9e.9e", 0x0000, 0x1000, CRC(5f04d805) SHA1(84bcdfd25634879438429d2b41c491e092388add) )
 	ROM_LOAD( "bagman_a3_9f.9f", 0x1000, 0x1000, CRC(136a78aa) SHA1(14e6a556e00b6ebe718f2fe119b372dc7bfa78d9) )

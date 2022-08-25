@@ -1298,21 +1298,17 @@ void taitoz_state::cpua_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 
 	m_cpua_ctrl = data;
 	parse_cpu_control();
-}
 
-void chasehq_state::chasehq_cpua_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	cpua_ctrl_w(offset, data, mem_mask);
+	/* this is also used for misc. outputs in some games, send to genoutX where X = 0-7
 
-	m_lamps[0] = BIT(m_cpua_ctrl, 5);
-	m_lamps[1] = BIT(m_cpua_ctrl, 6);
-}
-
-void dblaxle_state::dblaxle_cpua_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	cpua_ctrl_w(offset, data, mem_mask);
-
-	m_wheel_vibration = BIT(data, 2);
+	known outputs here:
+	- bshark: 2: vibration/lamp
+	- chasehq: 5, 6: lamps
+	- dblaxle: 2: wheel vibration
+	- sci: 6: lamp, 7: vibration?
+	*/
+	for (int i = 0; i < 8; i++)
+		m_cpua_out[i] = BIT(m_cpua_ctrl, i);
 }
 
 
@@ -1347,26 +1343,6 @@ INTERRUPT_GEN_MEMBER(sci_state::sci_interrupt)
                               EEPROM
 ******************************************************************/
 
-static const u16 spacegun_default_eeprom[64]=
-{
-	0x0000,0x00ff,0x0001,0x4141,0x0000,0x00ff,0x0000,0xf0f0,
-	0x0000,0x00ff,0x0001,0x4141,0x0000,0x00ff,0x0000,0xf0f0,
-	0x0080,0x0080,0x0080,0x0080,0x0001,0x4000,0x0000,0xf000,
-	0x0001,0x4285,0x0000,0xf1e3,0x0001,0x4000,0x0000,0xf000,
-	0x0001,0x4285,0x0000,0xf1e3,0xcccb,0xffff,0xffff,0xffff,
-	0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,
-	0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,
-	0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff
-};
-
-
-#if 0
-u16 taitoz_state::eep_latch_r()
-{
-	return m_eep_latch;
-}
-#endif
-
 void spacegun_state::spacegun_eeprom_w(u8 data)
 {
 /*          0000xxxx    (unused)
@@ -1375,7 +1351,6 @@ void spacegun_state::spacegun_eeprom_w(u8 data)
             0x000000    eeprom data
             x0000000    (unused)                  */
 
-	m_eep_latch = data;
 	m_io_eepromout->write(data, 0xff);
 }
 
@@ -1575,6 +1550,12 @@ void nightstr_state::nightstr_motor_w(offs_t offset, u16 data)
 
 }
 
+void nightstr_state::nightstr_lamps_w(u8 data)
+{
+	for (int i = 0; i < 8; i++)
+		m_lamps[i] = BIT(data, i);
+}
+
 
 void taitoz_state::coin_control_w(u8 data)
 {
@@ -1646,7 +1627,7 @@ void chasehq_state::chasehq_map(address_map &map)
 	map(0x10c000, 0x10ffff).ram();
 	map(0x400001, 0x400001).r(FUNC(chasehq_state::chasehq_input_bypass_r)).w(m_tc0040ioc, FUNC(tc0040ioc_device::portreg_w)).umask16(0x00ff);
 	map(0x400003, 0x400003).rw(m_tc0040ioc, FUNC(tc0040ioc_device::watchdog_r), FUNC(tc0040ioc_device::port_w));
-	map(0x800000, 0x800001).w(FUNC(chasehq_state::chasehq_cpua_ctrl_w));
+	map(0x800000, 0x800001).w(FUNC(chasehq_state::cpua_ctrl_w));
 	map(0x820001, 0x820001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
 	map(0x820003, 0x820003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0xa00000, 0xa00007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));  /* palette */
@@ -1739,7 +1720,7 @@ void sci_state::sci_map(address_map &map)
 	map(0x10c000, 0x10ffff).ram();
 	map(0x200000, 0x20000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
 	map(0x200010, 0x20001f).r(FUNC(sci_state::sci_steer_input_r));
-//  map(0x400000, 0x400001).w(FUNC(sci_state::cpua_ctrl_w));  // ?? doesn't seem to fit what's written
+	map(0x400000, 0x400001).w(FUNC(sci_state::cpua_ctrl_w));
 	map(0x420001, 0x420001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
 	map(0x420003, 0x420003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0x800000, 0x801fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
@@ -1837,14 +1818,14 @@ void spacegun_state::spacegun_cpub_map(address_map &map)
 }
 
 
-void dblaxle_state::dblaxle_map(address_map &map)
+void taitoz_z80_sound_state::dblaxle_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x200000, 0x203fff).ram();
 	map(0x210000, 0x21ffff).ram().share("share1");
 	map(0x400000, 0x40000f).rw(m_tc0510nio, FUNC(tc0510nio_device::halfword_wordswap_r), FUNC(tc0510nio_device::halfword_wordswap_w));
-	map(0x400010, 0x40001f).r(FUNC(dblaxle_state::dblaxle_steer_input_r));
-	map(0x600000, 0x600001).w(FUNC(dblaxle_state::dblaxle_cpua_ctrl_w));  /* could this be causing int6 ? */
+	map(0x400010, 0x40001f).r(FUNC(taitoz_z80_sound_state::dblaxle_steer_input_r));
+	map(0x600000, 0x600001).w(FUNC(taitoz_z80_sound_state::cpua_ctrl_w));  /* could this be causing int6 ? */
 	map(0x620001, 0x620001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
 	map(0x620003, 0x620003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0x800000, 0x801fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
@@ -1852,10 +1833,10 @@ void dblaxle_state::dblaxle_map(address_map &map)
 	map(0xa00000, 0xa0ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::ram_r), FUNC(tc0480scp_device::ram_w));      /* tilemaps */
 	map(0xa30000, 0xa3002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_r), FUNC(tc0480scp_device::ctrl_w));
 	map(0xc00000, 0xc03fff).ram().share("spriteram"); /* mostly unused ? */
-	//map(0xc08000, 0xc08001).rw(FUNC(dblaxle_state::sci_spriteframe_r), FUNC(dblaxle_state::sci_spriteframe_w)); /* set in int6, seems to stay zero */
+	//map(0xc08000, 0xc08001).rw(FUNC(taitoz_z80_sound_state::sci_spriteframe_r), FUNC(taitoz_z80_sound_state::sci_spriteframe_w)); /* set in int6, seems to stay zero */
 }
 
-void dblaxle_state::dblaxle_cpub_map(address_map &map)
+void taitoz_z80_sound_state::dblaxle_cpub_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x103fff).ram();
@@ -3127,6 +3108,7 @@ void taitoz_state::device_post_load()
 void taitoz_state::machine_start()
 {
 	save_item(NAME(m_cpua_ctrl));
+	m_cpua_out.resolve();
 }
 
 void taitoz_z80_sound_state::machine_start()
@@ -3150,13 +3132,6 @@ void contcirc_state::machine_start()
 	save_item(NAME(m_shutter_control));
 }
 
-void chasehq_state::machine_start()
-{
-	taitoz_z80_sound_state::machine_start();
-
-	m_lamps.resolve();
-}
-
 void sci_state::machine_start()
 {
 	taitoz_z80_sound_state::machine_start();
@@ -3173,6 +3148,7 @@ void nightstr_state::machine_start()
 	m_motor_dir.resolve();
 	m_motor_speed.resolve();
 	m_motor_debug.resolve();
+	m_lamps.resolve();
 }
 
 void spacegun_state::machine_start()
@@ -3180,17 +3156,6 @@ void spacegun_state::machine_start()
 	taitoz_state::machine_start();
 
 	m_recoil.resolve();
-
-	m_eep_latch = 0;
-
-	save_item(NAME(m_eep_latch));
-}
-
-void dblaxle_state::machine_start()
-{
-	taitoz_z80_sound_state::machine_start();
-
-	m_wheel_vibration.resolve();
 }
 
 void taitoz_state::machine_reset()
@@ -3553,6 +3518,7 @@ void nightstr_state::nightstr(machine_config &config) //OSC: 26.686, 24.000, 16.
 	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0220ioc->read_2_callback().set_ioport("IN0");
 	m_tc0220ioc->read_3_callback().set_ioport("IN1");
+	m_tc0220ioc->write_3_callback().set(FUNC(nightstr_state::nightstr_lamps_w));
 	m_tc0220ioc->write_4_callback().set(FUNC(nightstr_state::coin_control_w));
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
@@ -3665,7 +3631,7 @@ void spacegun_state::spacegun(machine_config &config) //OSC: 26.686, 24.000, 16.
 	m_subcpu->set_addrmap(AS_PROGRAM, &spacegun_state::spacegun_cpub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(spacegun_state::irq4_line_hold));
 
-	EEPROM_93C46_16BIT(config, m_eeprom).default_data(spacegun_default_eeprom, 128);
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	adc0809_device &adc(ADC0809(config, "adc", 500000)); // clock unknown
 	adc.eoc_ff_callback().set_inputline("sub", 5);
@@ -3715,19 +3681,19 @@ void spacegun_state::spacegun(machine_config &config) //OSC: 26.686, 24.000, 16.
 	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 }
 
-void dblaxle_state::dblaxle(machine_config &config)
+void taitoz_z80_sound_state::dblaxle(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(32'000'000)/2);   // 16 MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &dblaxle_state::dblaxle_map);
-	m_maincpu->set_vblank_int("screen", FUNC(dblaxle_state::irq4_line_hold));
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitoz_z80_sound_state::dblaxle_map);
+	m_maincpu->set_vblank_int("screen", FUNC(taitoz_z80_sound_state::irq4_line_hold));
 
 	Z80(config, m_audiocpu, XTAL(32'000'000)/8);   // 4 MHz
-	m_audiocpu->set_addrmap(AS_PROGRAM, &dblaxle_state::z80_sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &taitoz_z80_sound_state::z80_sound_map);
 
 	M68000(config, m_subcpu, XTAL(32'000'000)/2);   // 16 MHz
-	m_subcpu->set_addrmap(AS_PROGRAM, &dblaxle_state::dblaxle_cpub_map);
-	m_subcpu->set_vblank_int("screen", FUNC(dblaxle_state::irq4_line_hold));
+	m_subcpu->set_addrmap(AS_PROGRAM, &taitoz_z80_sound_state::dblaxle_cpub_map);
+	m_subcpu->set_vblank_int("screen", FUNC(taitoz_z80_sound_state::irq4_line_hold));
 
 	// make quantum time to be a multiple of the xtal (fixes road layer stuck on continue)
 	config.set_maximum_quantum(attotime::from_hz(XTAL(32'000'000)/1024));
@@ -3737,12 +3703,12 @@ void dblaxle_state::dblaxle(machine_config &config)
 	m_tc0510nio->read_1_callback().set_ioport("DSWB");
 	m_tc0510nio->read_2_callback().set_ioport("IN0");
 	m_tc0510nio->read_3_callback().set_ioport("IN1");
-	m_tc0510nio->write_4_callback().set(FUNC(dblaxle_state::coin_control_w));
+	m_tc0510nio->write_4_callback().set(FUNC(taitoz_z80_sound_state::coin_control_w));
 	m_tc0510nio->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
 	screen_config(config, 16, 256);
-	m_screen->set_screen_update(FUNC(dblaxle_state::screen_update_dblaxle));
+	m_screen->set_screen_update(FUNC(taitoz_z80_sound_state::screen_update_dblaxle));
 	m_screen->set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
@@ -5202,6 +5168,9 @@ ROM_START( spacegun )
 	ROM_LOAD( "pal20l8-c57-12.61", 0x0600, 0x0144, CRC(debddb13) SHA1(47be25b3bb157d37b9813737544a56a2090f85ba) )
 	ROM_LOAD( "pal16l8-c57-13.72", 0x0800, 0x0104, CRC(1369f23e) SHA1(bbc960cfc3edd07e89134e1b876aa7a6c0cba5ac) )
 	ROM_LOAD( "pal16r4-c57-14.96", 0x0a00, 0x0104, CRC(75e1bf61) SHA1(e8358329a78ec0ab87641b2ecaec0b2b67c6ca30) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD("93c46.ic93", 0x0000, 0x0080, CRC(4900416b) SHA1(30b1cc90a3c3d719cc053f2cb2631fe4dec25020) )
 ROM_END
 
 ROM_START( spacegunu )
@@ -5240,6 +5209,9 @@ ROM_START( spacegunu )
 	ROM_LOAD( "pal20l8-c57-12.61", 0x0600, 0x0144, CRC(debddb13) SHA1(47be25b3bb157d37b9813737544a56a2090f85ba) )
 	ROM_LOAD( "pal16l8-c57-13.72", 0x0800, 0x0104, CRC(1369f23e) SHA1(bbc960cfc3edd07e89134e1b876aa7a6c0cba5ac) )
 	ROM_LOAD( "pal16r4-c57-14.96", 0x0a00, 0x0104, CRC(75e1bf61) SHA1(e8358329a78ec0ab87641b2ecaec0b2b67c6ca30) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD("93c46.ic93", 0x0000, 0x0080, CRC(4900416b) SHA1(30b1cc90a3c3d719cc053f2cb2631fe4dec25020) )
 ROM_END
 
 ROM_START( spacegunj )
@@ -5278,6 +5250,9 @@ ROM_START( spacegunj )
 	ROM_LOAD( "pal20l8-c57-12.61", 0x0600, 0x0144, CRC(debddb13) SHA1(47be25b3bb157d37b9813737544a56a2090f85ba) )
 	ROM_LOAD( "pal16l8-c57-13.72", 0x0800, 0x0104, CRC(1369f23e) SHA1(bbc960cfc3edd07e89134e1b876aa7a6c0cba5ac) )
 	ROM_LOAD( "pal16r4-c57-14.96", 0x0a00, 0x0104, CRC(75e1bf61) SHA1(e8358329a78ec0ab87641b2ecaec0b2b67c6ca30) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD("93c46.ic93", 0x0000, 0x0080, CRC(4900416b) SHA1(30b1cc90a3c3d719cc053f2cb2631fe4dec25020) )
 ROM_END
 
 ROM_START( dblaxle ) /* Manual refers to this version as the "Version Without Communication" */
@@ -5594,10 +5569,10 @@ GAME( 1990, spacegun,   0,        spacegun,  spacegun,  spacegun_state,         
 GAME( 1990, spacegunj,  spacegun, spacegun,  spacegnj,  spacegun_state,         empty_init,  ORIENTATION_FLIP_X, "Taito Corporation",         "Space Gun (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, spacegunu,  spacegun, spacegun,  spacegnu,  spacegun_state,         empty_init,  ORIENTATION_FLIP_X, "Taito America Corporation", "Space Gun (US)", MACHINE_SUPPORTS_SAVE )
 
-GAMEL(1991, dblaxle,    0,        dblaxle,   dblaxles,  dblaxle_state,          empty_init,  ROT0,               "Taito America Corporation", "Double Axle (US, Rev 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
-GAMEL(1991, dblaxleu,   dblaxle,  dblaxle,   dblaxles,  dblaxle_state,          empty_init,  ROT0,               "Taito America Corporation", "Double Axle (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
-GAMEL(1991, dblaxleul,  dblaxle,  dblaxle,   dblaxle,   dblaxle_state,          empty_init,  ROT0,               "Taito America Corporation", "Double Axle (US, Rev 1, Linkable)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_dblaxle )
-GAMEL(1991, pwheelsj,   dblaxle,  dblaxle,   pwheelsj,  dblaxle_state,          empty_init,  ROT0,               "Taito Corporation",         "Power Wheels (Japan, Rev 2, Linkable)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_dblaxle )
+GAMEL(1991, dblaxle,    0,        dblaxle,   dblaxles,  taitoz_z80_sound_state, empty_init,  ROT0,               "Taito America Corporation", "Double Axle (US, Rev 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
+GAMEL(1991, dblaxleu,   dblaxle,  dblaxle,   dblaxles,  taitoz_z80_sound_state, empty_init,  ROT0,               "Taito America Corporation", "Double Axle (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_dblaxle )
+GAMEL(1991, dblaxleul,  dblaxle,  dblaxle,   dblaxle,   taitoz_z80_sound_state, empty_init,  ROT0,               "Taito America Corporation", "Double Axle (US, Rev 1, Linkable)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_dblaxle )
+GAMEL(1991, pwheelsj,   dblaxle,  dblaxle,   pwheelsj,  taitoz_z80_sound_state, empty_init,  ROT0,               "Taito Corporation",         "Power Wheels (Japan, Rev 2, Linkable)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_dblaxle )
 
 GAMEL(1991, racingb,    0,        racingb,   racingb,   sci_state,              empty_init,  ROT0,               "Taito Corporation Japan",   "Racing Beat (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_dblaxle )
 GAMEL(1991, racingbj,   racingb,  racingb,   racingb,   sci_state,              empty_init,  ROT0,               "Taito Corporation",         "Racing Beat (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_dblaxle )

@@ -22,6 +22,7 @@
 /* mario sound                                                            */
 /* ---------------------------------------------------------------------- */
 static NETLIST_START(nl_mario_snd0)
+{
 
 	RES(R17, RES_K(27))               /* 20 according to parts list           */
 										/* 27 verified, 30K in schematics       */
@@ -66,12 +67,13 @@ static NETLIST_START(nl_mario_snd0)
 
 	TTL_7486_XOR(1K_A, 1J_A.Y, 2J_A.Y)
 	TTL_7408_AND(2K_A, 2H_A.Q, 1K_A)
-NETLIST_END()
+}
 
 /* ---------------------------------------------------------------------- */
 /* luigi sound                                                            */
 /* ---------------------------------------------------------------------- */
 static NETLIST_START(nl_mario_snd1)
+{
 
 	RES(R18, RES_K(30))               /* 20 according to parts list           */
 										/* 27 verified, 30K in schematics       */
@@ -112,7 +114,7 @@ static NETLIST_START(nl_mario_snd1)
 
 	TTL_7486_XOR(1K_B, 1J_B.Y, 2J_B.Y)
 	TTL_7408_AND(2K_B, 2H_B.Q, 1K_B)
-NETLIST_END()
+}
 
 /* ---------------------------------------------------------------------- */
 /* skid sound                                                            */
@@ -120,6 +122,7 @@ NETLIST_END()
 
 // FIXME: Diodes are 1S953
 static NETLIST_START(nl_mario_snd7)
+{
 
 	RES(R61, RES_K(47))
 	CAP(C41, CAP_U(4.7))              /* verified                             */
@@ -167,12 +170,13 @@ static NETLIST_START(nl_mario_snd7)
 	TTL_7486_XOR(1K_C, 3H.Q4, 4K_A.Y)
 	TTL_7408_AND(2K_C, 4L_A.Q, 1K_C)
 
-NETLIST_END()
+}
 
 /* ---------------------------------------------------------------------- */
 /* DAC sound                                                            */
 /* ---------------------------------------------------------------------- */
 static NETLIST_START(nl_mario_dac)
+{
 	RES(R34, RES_M(2))
 	RES(R35, RES_M(1))
 	RES(R36, RES_M(1.8))
@@ -214,9 +218,10 @@ static NETLIST_START(nl_mario_dac)
 	NET_C(R21.2, C19.1, R25.2, R23.1)
 	NET_C(C19.2, R23.2, GND)
 	NET_C(R25.1, V5)
-NETLIST_END()
+}
 
 NETLIST_START(mario)
+{
 
 	LOCAL_SOURCE(nl_mario_snd0)
 	LOCAL_SOURCE(nl_mario_snd1)
@@ -314,4 +319,4 @@ NETLIST_START(mario)
 	NET_C(GND, ROUT.2)
 
 	OPTIMIZE_FRONTIER(R40.1, RES_K(22), 50)
-NETLIST_END()
+}

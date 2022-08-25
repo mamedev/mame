@@ -55,6 +55,12 @@ void hlcd0538_device::device_start()
 	attotime period = (clock() != 0) ? attotime::from_hz(2 * clock()) : attotime::never;
 	m_lcd_timer->adjust(period, 0, period);
 
+	// zerofill
+	m_lcd = 0;
+	m_clk = 0;
+	m_data = 0;
+	m_shift = 0;
+
 	// register for savestates
 	save_item(NAME(m_lcd));
 	save_item(NAME(m_clk));

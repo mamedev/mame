@@ -224,7 +224,8 @@ private:
 };
 
 static NETLIST_START(dummy)
-NETLIST_END()
+{
+}
 
 // **************************************************************************
 //    CORE IMPLEMENTATION
@@ -284,6 +285,8 @@ public:
 
 		for (const auto & r : roms)
 			parser().register_source<netlist_data_folder_t>(r);
+
+		parser().add_include<netlist_data_folder_t>(plib::util::path(filename));
 
 		for (const auto & i : includes)
 			parser().add_include<netlist_data_folder_t>(i);

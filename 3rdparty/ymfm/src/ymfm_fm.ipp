@@ -448,6 +448,8 @@ void fm_operator<RegisterType>::clock(uint32_t env_counter, int32_t lfo_raw_pm)
 	// clock the SSG-EG state (OPN/OPNA)
 	if (m_regs.op_ssg_eg_enable(m_opoffs))
 		clock_ssg_eg_state();
+	else
+		m_ssg_inverted = false;
 
 	// clock the envelope if on an envelope cycle; env_counter is a x.2 value
 	if (bitfield(env_counter, 0, 2) == 0)
@@ -881,6 +883,23 @@ void fm_channel<RegisterType>::clock(uint32_t env_counter, int32_t lfo_raw_pm)
 	for (uint32_t opnum = 0; opnum < array_size(m_op); opnum++)
 		if (m_op[opnum] != nullptr)
 			m_op[opnum]->clock(env_counter, lfo_raw_pm);
+
+/*
+useful temporary code for envelope debugging
+if (m_choffs == 0x101)
+{
+	for (uint32_t opnum = 0; opnum < array_size(m_op); opnum++)
+	{
+		auto &op = *m_op[((opnum & 1) << 1) | ((opnum >> 1) & 1)];
+		printf(" %c%03X%c%c ",
+			"PADSRV"[op.debug_eg_state()],
+			op.debug_eg_attenuation(),
+			op.debug_ssg_inverted() ? '-' : '+',
+			m_regs.op_ssg_eg_enable(op.opoffs()) ? '0' + m_regs.op_ssg_eg_mode(op.opoffs()) : ' ');
+	}
+printf(" -- ");
+}
+*/
 }
 
 
@@ -928,7 +947,8 @@ void fm_channel<RegisterType>::output_2op(output_data &output, uint32_t rshift, 
 	}
 	else
 	{
-		result = op1value + (m_op[1]->compute_volume(m_op[1]->phase(), am_offset) >> rshift);
+		result = (RegisterType::MODULATOR_DELAY ? m_feedback[1] : op1value) >> rshift;
+		result += m_op[1]->compute_volume(m_op[1]->phase(), am_offset) >> rshift;
 		int32_t clipmin = -clipmax - 1;
 		result = clamp(result, clipmin, clipmax);
 	}
@@ -1475,7 +1495,10 @@ void fm_engine_base<RegisterType>::engine_timer_expired(uint32_t tnum)
 	if (tnum == 0 && m_regs.csm())
 		for (uint32_t chnum = 0; chnum < CHANNELS; chnum++)
 			if (bitfield(RegisterType::CSM_TRIGGER_MASK, chnum))
+			{
 				m_channel[chnum]->keyonoff(1, KEYON_CSM, chnum);
+				m_modified_channels |= 1 << chnum;
+			}
 
 	// reset
 	m_timer_running[tnum] = false;

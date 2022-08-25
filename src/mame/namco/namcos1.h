@@ -70,7 +70,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void driver_init() override;
+	void driver_init();
 
 private:
 	required_device<mc6809e_device> m_maincpu;

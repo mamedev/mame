@@ -26,7 +26,8 @@ namespace {
 
 // ======================> coco_os9_impl
 
-class coco_os9_impl : public filesystem_t {
+class coco_os9_impl : public filesystem_t
+{
 public:
 	// ======================> volume_header
 
@@ -95,7 +96,7 @@ public:
 
 	private:
 		fsblk_t::block_t    m_block;
-		std::string			m_filename;
+		std::string         m_filename;
 	};
 
 	// ctor/dtor
@@ -123,7 +124,8 @@ public:
 private:
 	volume_header   m_volume_header;
 };
-}
+
+} // anonymous namespace
 
 //**************************************************************************
 //  IMPLEMENTATION

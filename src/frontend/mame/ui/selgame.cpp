@@ -442,7 +442,7 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 		item_append(_("System Settings"), 0, (void *)(uintptr_t)CONF_MACHINE);
 		skip_main_items = 3;
 
-		if (m_prev_selected && !have_prev_selected)
+		if (m_prev_selected && !have_prev_selected && item_count() > 0)
 			m_prev_selected = item(0).ref();
 	}
 	else

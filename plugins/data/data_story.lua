@@ -16,7 +16,8 @@ function dat.check(set, softlist)
 	data = data:gsub('MAMESCORE records : ([^\n]+)', 'MAMESCORE records :\t\n%1', 1)
 	for line in data:gmatch('[^\n]*') do
 		if (line ~= '') or ((#lines ~= 0) and (lines[#lines] ~= '')) then
-			table.insert(lines, line:gsub('^(.-)_+([0-9.]+)$', '%1\t%2'))
+			line = line:gsub('^(.-)_+([0-9.]+)$', '%1\t%2')
+			table.insert(lines, line)
 		end
 	end
 	info = '#j2\n' .. table.concat(lines, '\n')

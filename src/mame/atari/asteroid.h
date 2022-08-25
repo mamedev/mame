@@ -10,10 +10,9 @@
 
 #pragma once
 
-#include "avgdvg.h"
-
 #include "machine/74153.h"
 #include "machine/er2055.h"
+#include "video/avgdvg.h"
 #include "sound/discrete.h"
 
 class asteroid_state : public driver_device

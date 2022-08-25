@@ -22,7 +22,9 @@ DEFINE_DEVICE_TYPE(HLCD0438, hlcd0438_device, "hlcd0438", "Hughes HLCD 0438 LCD 
 hlcd0438_device::hlcd0438_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, HLCD0438, tag, owner, clock),
 	m_write_segs(*this), m_write_data(*this)
-{ }
+{
+	m_load = 0;
+}
 
 
 //-------------------------------------------------
@@ -39,6 +41,15 @@ void hlcd0438_device::device_start()
 	m_lcd_timer = timer_alloc(FUNC(hlcd0438_device::toggle_lcd), this);
 	attotime period = (clock() != 0) ? attotime::from_hz(2 * clock()) : attotime::never;
 	m_lcd_timer->adjust(period, 0, period);
+
+	// zerofill
+	m_data_in = 0;
+	m_data_out = 0;
+	m_clk = 0;
+	// m_load // not here
+	m_lcd = 0;
+	m_shift = 0;
+	m_latch = 0;
 
 	// register for savestates
 	save_item(NAME(m_data_in));

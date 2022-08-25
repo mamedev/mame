@@ -9,6 +9,7 @@
 #include "netlist/devices/net_lib.h"
 
 NETLIST_START(main)
+{
 
 	/* Standard stuff */
 
@@ -52,9 +53,10 @@ NETLIST_START(main)
 
 	LOG(log_X, op1.OUT)
 	LOG(log_Y, clk)
-NETLIST_END()
+}
 
 NETLIST_START(opamp)
+{
 
 	/* Opamp model from
 	 *
@@ -96,9 +98,10 @@ NETLIST_START(opamp)
 	NET_C(CP1.1, RP1.1)
 	NET_C(EBUF.IP, RP1.1)
 
-NETLIST_END()
+}
 
 NETLIST_START(opamp_mod)
+{
 
 	/* Opamp model from
 	 *
@@ -184,4 +187,4 @@ NETLIST_START(opamp_mod)
 #endif
 	NET_C(EBUF.IP, RP1.1)
 
-NETLIST_END()
+}

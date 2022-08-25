@@ -111,7 +111,7 @@ public:
 	// this probably should do more, like make Genesis V2 'die' if the SEGA string is not written promptly
 	virtual void write_tmss_bank(offs_t offset, uint16_t data) { device().logerror("Write to TMSS bank: offset %x data %x\n", 0xa14000 + (offset << 1), data); }
 
-	virtual void rom_alloc(size_t size, const char *tag);
+	virtual void rom_alloc(size_t size);
 	virtual void nvram_alloc(size_t size);
 	virtual uint16_t* get_rom_base() { return m_rom; }
 	virtual uint16_t* get_nvram_base() { return &m_nvram[0]; }
@@ -267,12 +267,5 @@ public:
 DECLARE_DEVICE_TYPE(MD_CART_SLOT,     md_cart_slot_device)
 DECLARE_DEVICE_TYPE(PICO_CART_SLOT,   pico_cart_slot_device)
 DECLARE_DEVICE_TYPE(COPERA_CART_SLOT, copera_cart_slot_device)
-
-
-/***************************************************************************
- DEVICE CONFIGURATION MACROS
- ***************************************************************************/
-
-#define MDSLOT_ROM_REGION_TAG ":cart:rom"
 
 #endif // MAME_BUS_MEGADRIVE_MD_SLOT_H

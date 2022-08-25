@@ -117,7 +117,7 @@
  *  - add PIT and DUSCC interrupts
  *  - add port mapping to self test jumper
  *  - add VME bus driver
- *  - write and map a 68153 device (accessable from VME side)
+ *  - write and map a 68153 device (accessible from VME side)
  *
  *  Status: passes Self test and get stuck on no ticks for the scheduler.
  *          Schematics of the IRQ routing needed or a good trace of how the

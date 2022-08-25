@@ -55,7 +55,7 @@ DEFINE_DEVICE_TYPE(MC68HC11M0, mc68hc11m0_device, "mc68hc11m0", "Motorola MC68HC
 
 mc68hc11_cpu_device::mc68hc11_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint16_t ram_size, uint16_t reg_block_size, uint16_t rom_size, uint16_t eeprom_size, uint8_t init_value, uint8_t config_mask, uint8_t option_mask)
 	: cpu_device(mconfig, type, tag, owner, clock)
-	, device_nvram_interface(mconfig, *this)
+	, device_nvram_interface(mconfig, *this, (config_mask & 0xf9) != 0)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, address_map_constructor(FUNC(mc68hc11_cpu_device::internal_map), this))
 	, m_port_input_cb(*this)
 	, m_port_output_cb(*this)
@@ -164,11 +164,6 @@ std::unique_ptr<util::disasm_interface> mc68hc11_cpu_device::create_disassembler
 	return std::make_unique<hc11_disassembler>();
 }
 
-
-bool mc68hc11_cpu_device::nvram_can_write()
-{
-	return (m_config_mask & 0xf9) != 0;
-}
 
 bool mc68hc11_cpu_device::nvram_read(util::read_stream &file)
 {

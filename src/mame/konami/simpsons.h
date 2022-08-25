@@ -51,7 +51,7 @@ private:
 
 	/* misc */
 	int        m_firq_enabled = 0;
-	u64        m_nmi_enabled = 0;
+	emu_timer *m_nmi_blocked;
 
 	/* views */
 	memory_view m_palette_view;

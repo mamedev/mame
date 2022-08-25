@@ -14,8 +14,9 @@
 #ifndef DRAWBGFX_TEXTURE_MANAGER
 #define DRAWBGFX_TEXTURE_MANAGER
 
-#include "emu.h"
+#include "bitmap.h"
 
+#include <cstdint>
 #include <map>
 #include <string>
 

@@ -106,7 +106,7 @@ arc_hdisc_we_device::arc_hdisc_we_device(const machine_config &mconfig, const ch
 
 void arc_hdisc_we_device::device_start()
 {
-	u8 *rom = m_podule_rom->base();
+	u8 *const rom = m_podule_rom->base();
 
 	for (int i = 0x0000; i < 0x8000; i++)
 	{

@@ -41,6 +41,13 @@ class i3001_device : public device_t
 public:
 	i3001_device(const machine_config &mconfig , const char *tag , device_t *owner , uint32_t clock = 0);
 
+	// Output callbacks
+	template <typename... T> void set_fo_w_cb(T &&... args) { m_fo_handler.set(std::forward<T>(args)...); }
+
+	// Input callbacks
+	template <typename... T> void set_px_r_cb(T &&... args) { m_px_handler.set(std::forward<T>(args)...); }
+	template <typename... T> void set_sx_r_cb(T &&... args) { m_sx_handler.set(std::forward<T>(args)...); }
+
 	// Mask of valid bits in address
 	static constexpr uint16_t ADDR_MASK = ((1U << 9) - 1);
 
@@ -63,13 +70,6 @@ public:
 	DECLARE_READ_LINE_MEMBER(carry_r) { return m_carry; }
 	DECLARE_READ_LINE_MEMBER(zero_r) { return m_zero; }
 
-	// Output callbacks
-	auto fo_w() { return m_fo_handler.bind(); }
-
-	// Input callbacks
-	auto px_r() { return m_px_handler.bind(); }
-	auto sx_r() { return m_sx_handler.bind(); }
-
 	// Load address (in real hw address is loaded through PX/SX buses)
 	void addr_w(uint16_t addr) { m_addr = addr & ADDR_MASK; }
 
@@ -80,9 +80,9 @@ protected:
 	virtual void device_start() override;
 
 private:
-	devcb_write_line m_fo_handler;
-	devcb_read8 m_px_handler;
-	devcb_read8 m_sx_handler;
+	device_delegate<void (int)> m_fo_handler;
+	device_delegate<uint8_t ()> m_px_handler;
+	device_delegate<uint8_t ()> m_sx_handler;
 
 	uint16_t m_addr;
 	uint8_t m_pr;

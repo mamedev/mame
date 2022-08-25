@@ -6,6 +6,9 @@
 // Note: the X1 input (typically an XTAL) is divided by 2 internally.
 // The device clock should therefore be twice the desired operating
 // frequency (and twice the speed rating suffixed to the part number).
+// Some high-performance AMD versions, however, generate the system
+// clock with a PLL and only support XTAL dividers other than 1 for
+// compatibility and power-saving modes.
 
 #include "emu.h"
 #include "i186.h"
@@ -127,19 +130,27 @@ const uint8_t i80186_cpu_device::m_i80186_timing[] =
 
 DEFINE_DEVICE_TYPE(I80186, i80186_cpu_device, "i80186", "Intel 80186")
 DEFINE_DEVICE_TYPE(I80188, i80188_cpu_device, "i80188", "Intel 80188")
-
-i80188_cpu_device::i80188_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i80186_cpu_device(mconfig, I80188, tag, owner, clock, 8)
-{
-	memcpy(m_timing, m_i80186_timing, sizeof(m_i80186_timing));
-	set_irq_acknowledge_callback(*this, FUNC(i80186_cpu_device::inta_callback));
-}
+DEFINE_DEVICE_TYPE(AM186EM, am186em_device, "am186em", "AMD Am186EM")
+DEFINE_DEVICE_TYPE(AM188EM, am188em_device, "am188em", "AMD Am188EM")
 
 i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i80186_cpu_device(mconfig, I80186, tag, owner, clock, 16)
 {
-	memcpy(m_timing, m_i80186_timing, sizeof(m_i80186_timing));
-	set_irq_acknowledge_callback(*this, FUNC(i80186_cpu_device::inta_callback));
+}
+
+i80188_cpu_device::i80188_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i80186_cpu_device(mconfig, I80188, tag, owner, clock, 8)
+{
+}
+
+am186em_device::am186em_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i80186_cpu_device(mconfig, AM186EM, tag, owner, clock, 16)
+{
+}
+
+am188em_device::am188em_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i80186_cpu_device(mconfig, AM188EM, tag, owner, clock, 8)
+{
 }
 
 i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_bus_size)
@@ -155,6 +166,8 @@ i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, device_type 
 	, m_irqa_cb(*this)
 	, m_irmx_irq_ack(*this)
 {
+	memcpy(m_timing, m_i80186_timing, sizeof(m_i80186_timing));
+	set_irq_acknowledge_callback(*this, FUNC(i80186_cpu_device::inta_callback));
 }
 
 device_memory_interface::space_config_vector i80186_cpu_device::memory_space_config() const

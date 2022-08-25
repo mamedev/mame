@@ -315,9 +315,8 @@ tms32025_disassembler::tms32025_disassembler()
 	const char *const *ops;
 	u16 mask, bits;
 	int bit;
-	int i;
 
-	ops = TMS32025Formats; i = 0;
+	ops = TMS32025Formats;
 	while (*ops)
 	{
 		p = *ops;
@@ -356,7 +355,6 @@ tms32025_disassembler::tms32025_disassembler()
 		Op.emplace_back(mask, bits, *p, ops[0], ops[1]);
 
 		ops += 2;
-		i++;
 	}
 }
 

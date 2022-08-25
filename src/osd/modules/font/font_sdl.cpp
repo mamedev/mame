@@ -11,8 +11,10 @@
 #if defined(SDLMAME_UNIX) && !defined(SDLMAME_MACOSX) && !defined(SDLMAME_HAIKU) && !defined(SDLMAME_ANDROID)
 
 #include "corestr.h"
+#include "emucore.h"
 #include "fileio.h"
 #include "unicode.h"
+#include "osdcore.h"
 
 #ifdef SDLMAME_EMSCRIPTEN
 #include <SDL_ttf.h>

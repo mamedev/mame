@@ -60,11 +60,11 @@ device_a800_cart_interface::~device_a800_cart_interface ()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_a800_cart_interface::rom_alloc(uint32_t size, const char *tag)
+void device_a800_cart_interface::rom_alloc(uint32_t size)
 {
 	if (m_rom == nullptr)
 	{
-		m_rom = device().machine().memory().region_alloc(std::string(tag).append(A800SLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom = device().machine().memory().region_alloc(device().subtag("^cart:rom"), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 
 		// setup other helpers
@@ -235,7 +235,7 @@ image_init_result a800_cart_slot_device::call_load()
 			const char *pcb_name;
 			len = get_software_region_length("rom");
 
-			m_cart->rom_alloc(len, tag());
+			m_cart->rom_alloc(len);
 			memcpy(m_cart->get_rom_base(), get_software_region("rom"), len);
 
 			if ((pcb_name = get_feature("slot")) != nullptr)
@@ -271,7 +271,7 @@ image_init_result a800_cart_slot_device::call_load()
 					m_type = A5200_16K_2CHIPS;
 			}
 
-			m_cart->rom_alloc(len, tag());
+			m_cart->rom_alloc(len);
 			fread(m_cart->get_rom_base(), len);
 		}
 		if (m_type == A800_TELELINK2)

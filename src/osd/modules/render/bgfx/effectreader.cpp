@@ -6,11 +6,7 @@
 //
 //============================================================
 
-#include <string>
-
-#include <bgfx/bgfx.h>
-
-#include "emu.h"
+#include "effectreader.h"
 
 #include "effect.h"
 #include "blendreader.h"
@@ -20,8 +16,6 @@
 #include "shadermanager.h"
 #include "uniformreader.h"
 #include "uniform.h"
-
-#include "effectreader.h"
 
 bgfx_effect *effect_reader::read_from_value(const Value& value, std::string prefix, osd_options &options, shader_manager& shaders)
 {

@@ -84,14 +84,290 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "suprridr.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
+#include "machine/gen_latch.h"
 #include "sound/ay8910.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
+
+namespace {
+
+class suprridr_state : public driver_device
+{
+public:
+	suprridr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_soundlatch(*this, "soundlatch"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_fgram(*this, "fgram"),
+		m_bgram(*this, "bgram"),
+		m_spriteram(*this, "spriteram"),
+		m_contp(*this, "CONTP%u", 1U)
+	{ }
+
+	void suprridr(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(control_r);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	required_shared_ptr<uint8_t> m_fgram;
+	required_shared_ptr<uint8_t> m_bgram;
+	required_shared_ptr<uint8_t> m_spriteram;
+
+	required_ioport_array<2> m_contp;
+
+	uint8_t m_nmi_enable = 0;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap_noscroll = nullptr;
+	uint8_t m_flipx = 0;
+	uint8_t m_flipy = 0;
+
+	void nmi_enable_w(uint8_t data);
+	void coin_lock_w(uint8_t data);
+	void flipx_w(uint8_t data);
+	void flipy_w(uint8_t data);
+	void fgdisable_w(uint8_t data);
+	void fgscrolly_w(uint8_t data);
+	void bgscrolly_w(uint8_t data);
+	void bgram_w(offs_t offset, uint8_t data);
+	void fgram_w(offs_t offset, uint8_t data);
+
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+
+	INTERRUPT_GEN_MEMBER(main_nmi_gen);
+
+	void palette(palette_device &palette) const;
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void main_map(address_map &map);
+	void main_portmap(address_map &map);
+	void sound_map(address_map &map);
+	void sound_portmap(address_map &map);
+};
+
+
+// video
+
+/*************************************
+ *
+ *  Tilemap callbacks
+ *
+ *************************************/
+
+TILE_GET_INFO_MEMBER(suprridr_state::get_bg_tile_info)
+{
+	uint8_t code = m_bgram[tile_index];
+	tileinfo.set(0, code, 0, 0);
+}
+
+
+TILE_GET_INFO_MEMBER(suprridr_state::get_fg_tile_info)
+{
+	uint8_t code = m_fgram[tile_index];
+	tileinfo.set(1, code, 0, 0);
+}
+
+
+
+/*************************************
+ *
+ *  Video startup
+ *
+ *************************************/
+
+void suprridr_state::video_start()
+{
+	m_fg_tilemap          = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(suprridr_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
+	m_bg_tilemap          = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(suprridr_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
+	m_bg_tilemap_noscroll = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(suprridr_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
+
+	m_fg_tilemap->set_transparent_pen(0);
+
+	save_item(NAME(m_flipx));
+	save_item(NAME(m_flipy));
+}
+
+
+
+/*************************************
+ *
+ *  Color PROM decoding
+ *
+ *************************************/
+
+void suprridr_state::palette(palette_device &palette) const
+{
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int i = 0; i < 96; i++)
+	{
+		int bit0, bit1, bit2;
+
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		// blue component
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
+		int const b = 0x4f * bit0 + 0xa8 * bit1;
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
+}
+
+
+
+/*************************************
+ *
+ *  Screen flip/scroll registers
+ *
+ *************************************/
+
+void suprridr_state::flipx_w(uint8_t data)
+{
+	m_flipx = data & 1;
+	machine().tilemap().set_flip_all((m_flipx ? TILEMAP_FLIPX : 0) | (m_flipy ? TILEMAP_FLIPY : 0));
+}
+
+
+void suprridr_state::flipy_w(uint8_t data)
+{
+	m_flipy = data & 1;
+	machine().tilemap().set_flip_all((m_flipx ? TILEMAP_FLIPX : 0) | (m_flipy ? TILEMAP_FLIPY : 0));
+}
+
+
+void suprridr_state::fgdisable_w(uint8_t data)
+{
+	m_fg_tilemap->enable(~data & 1);
+}
+
+
+void suprridr_state::fgscrolly_w(uint8_t data)
+{
+	m_fg_tilemap->set_scrolly(0, data);
+}
+
+
+void suprridr_state::bgscrolly_w(uint8_t data)
+{
+	m_bg_tilemap->set_scrolly(0, data);
+}
+
+
+
+/*************************************
+ *
+ *  Video RAM writes
+ *
+ *************************************/
+
+void suprridr_state::bgram_w(offs_t offset, uint8_t data)
+{
+	m_bgram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_tilemap_noscroll->mark_tile_dirty(offset);
+}
+
+
+void suprridr_state::fgram_w(offs_t offset, uint8_t data)
+{
+	m_fgram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
+}
+
+
+
+/*************************************
+ *
+ *  Video refresh
+ *
+ *************************************/
+
+uint32_t suprridr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	const rectangle &visarea = screen.visible_area();
+
+	// render left 4 columns with no scroll
+	rectangle subclip = visarea;
+	subclip.max_x = subclip.min_x + (m_flipx ? 1 * 8 : 4 * 8) - 1;
+	subclip &= cliprect;
+	m_bg_tilemap_noscroll->draw(screen, bitmap, subclip, 0, 0);
+
+	// render right 1 column with no scroll
+	subclip = visarea;
+	subclip.min_x = subclip.max_x - (m_flipx ? 4 * 8 : 1 * 8) + 1;
+	subclip &= cliprect;
+	m_bg_tilemap_noscroll->draw(screen, bitmap, subclip, 0, 0);
+
+	// render the middle columns normally
+	subclip = visarea;
+	subclip.min_x += m_flipx ? 1 * 8 : 4 * 8;
+	subclip.max_x -= m_flipx ? 4 * 8 : 1 * 8;
+	subclip &= cliprect;
+	m_bg_tilemap->draw(screen, bitmap, subclip, 0, 0);
+
+	// render the top layer
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	// draw the sprites
+	for (int i = 0; i < 48; i++)
+	{
+		int const code = (m_spriteram[i * 4 + 1] & 0x3f) | ((m_spriteram[i * 4 + 2] >> 1) & 0x40);
+		int const color = m_spriteram[i * 4 + 2] & 0x7f;
+		int fx = m_spriteram[i * 4 + 1] & 0x40;
+		int fy = m_spriteram[i * 4 + 1] & 0x80;
+		int x = m_spriteram[i * 4 + 3];
+		int y = 240 - m_spriteram[i * 4 + 0];
+
+		if (m_flipx)
+		{
+			fx = !fx;
+			x = 240 - x;
+		}
+		if (m_flipy)
+		{
+			fy = !fy;
+			y = 240 - y;
+		}
+		m_gfxdecode->gfx(2)->transpen(bitmap, cliprect, code, color, fx, fy, x, y, 0);
+	}
+	return 0;
+}
+
+
+// machine
 
 void suprridr_state::machine_start()
 {
@@ -131,8 +407,8 @@ INTERRUPT_GEN_MEMBER(suprridr_state::main_nmi_gen)
 
 void suprridr_state::coin_lock_w(uint8_t data)
 {
-	/* cleared when 9 credits are hit, but never reset! */
-/*  machine().bookkeeping().coin_lockout_global_w(~data & 1); */
+	// cleared when 9 credits are hit, but never reset!
+//  machine().bookkeeping().coin_lockout_global_w(~data & 1);
 }
 
 
@@ -147,10 +423,10 @@ void suprridr_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x8800, 0x8bff).ram().w(FUNC(suprridr_state::bgram_w)).share("bgram");
-	map(0x9000, 0x97ff).ram().w(FUNC(suprridr_state::fgram_w)).share("fgram");
+	map(0x8800, 0x8bff).ram().w(FUNC(suprridr_state::bgram_w)).share(m_bgram);
+	map(0x9000, 0x97ff).ram().w(FUNC(suprridr_state::fgram_w)).share(m_fgram);
 	map(0x9800, 0x983f).ram();
-	map(0x9840, 0x98ff).ram().share("spriteram");
+	map(0x9840, 0x98ff).ram().share(m_spriteram);
 	map(0x9900, 0x9bff).ram();
 	map(0xa000, 0xa000).portr("INPUTS");
 	map(0xa800, 0xa800).portr("SYSTEM");
@@ -206,20 +482,11 @@ void suprridr_state::sound_portmap(address_map &map)
  *
  *************************************/
 
-#define SUPRRIDR_P1_CONTROL_PORT_TAG    ("CONTP1")
-#define SUPRRIDR_P2_CONTROL_PORT_TAG    ("CONTP2")
-
 CUSTOM_INPUT_MEMBER(suprridr_state::control_r)
 {
-	uint32_t ret;
+	// screen flip multiplexes controls
 
-	/* screen flip multiplexes controls */
-	if (is_screen_flipped())
-		ret = ioport(SUPRRIDR_P2_CONTROL_PORT_TAG)->read();
-	else
-		ret = ioport(SUPRRIDR_P1_CONTROL_PORT_TAG)->read();
-
-	return ret;
+	return m_contp[m_flipx]->read(); // or is it flipy?
 }
 
 
@@ -259,7 +526,7 @@ static INPUT_PORTS_START( suprridr )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START(SUPRRIDR_P1_CONTROL_PORT_TAG)
+	PORT_START("CONTP1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -267,7 +534,7 @@ static INPUT_PORTS_START( suprridr )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START(SUPRRIDR_P2_CONTROL_PORT_TAG)
+	PORT_START("CONTP2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -309,9 +576,9 @@ static const gfx_layout spritelayout =
 
 
 static GFXDECODE_START( gfx_suprridr )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0, 2 )
-	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   32, 2 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 64, 2 )
+	GFXDECODE_ENTRY( "bgtiles", 0, charlayout,    0, 2 )
+	GFXDECODE_ENTRY( "fgtiles", 0, charlayout,   32, 2 )
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 64, 2 )
 GFXDECODE_END
 
 
@@ -323,13 +590,13 @@ GFXDECODE_END
 
 void suprridr_state::suprridr(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(49'152'000)/16);     /* 3 MHz */
+	// basic machine hardware
+	Z80(config, m_maincpu, XTAL(49'152'000) / 16);     // 3 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &suprridr_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &suprridr_state::main_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(suprridr_state::main_nmi_gen));
 
-	Z80(config, m_audiocpu, 10000000/4);       /* 2.5 MHz */
+	Z80(config, m_audiocpu, 10000000 / 4);       // 2.5 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &suprridr_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &suprridr_state::sound_portmap);
 
@@ -345,14 +612,14 @@ void suprridr_state::suprridr(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_suprridr);
-	PALETTE(config, m_palette, FUNC(suprridr_state::suprridr_palette), 96);
+	PALETTE(config, m_palette, FUNC(suprridr_state::palette), 96);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, "ay1", XTAL(49'152'000)/32).add_route(ALL_OUTPUTS, "mono", 0.25);
+	AY8910(config, "ay1", XTAL(49'152'000) / 32).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	ay8910_device &ay2(AY8910(config, "ay2", XTAL(49'152'000)/32));
+	ay8910_device &ay2(AY8910(config, "ay2", XTAL(49'152'000) / 32));
 	ay2.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
 
@@ -386,15 +653,15 @@ ROM_START( suprridr )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sr9",    0x0000, 0x1000, CRC(1c5dba78) SHA1(c2232221ae9960295055fcf1bd75d798136e694c) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_REGION( 0x2000, "bgtiles", 0 )
 	ROM_LOAD( "sr10",   0x0000, 0x1000, CRC(a57ac8d0) SHA1(1d4424dcbecb75b0e3e4ef5d296e252e7e9056ff) )
 	ROM_LOAD( "sr11",   0x1000, 0x1000, CRC(aa7ec7b2) SHA1(bbc6a1022c15ffbf0f6f9828674c8c9947e7ea5a) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_REGION( 0x2000, "fgtiles", 0 )
 	ROM_LOAD( "sr15",   0x0000, 0x1000, CRC(744f3405) SHA1(4df5932e15e68ba10f8b13ed5a59cc7d54af7b80) )
 	ROM_LOAD( "sr16",   0x1000, 0x1000, CRC(3e1a876b) SHA1(15b1c40c4a6e8e3e4702699396ce0885027ab6d1) )
 
-	ROM_REGION( 0x3000, "gfx3", 0 )
+	ROM_REGION( 0x3000, "sprites", 0 )
 	ROM_LOAD( "sr12",   0x0000, 0x1000, CRC(81494fe8) SHA1(056de41952e6fd564ecc0ecb718caf467c03bfed) )
 	ROM_LOAD( "sr13",   0x1000, 0x1000, CRC(63e94648) SHA1(05fdd285f6040aa349082845fcadd6bfbd2da2f5) )
 	ROM_LOAD( "sr14",   0x2000, 0x1000, CRC(277a70af) SHA1(2235b369f1a30443f058bfe895b0d2dd294b587c) )
@@ -405,6 +672,7 @@ ROM_START( suprridr )
 	ROM_LOAD( "clr.8a", 0x0040, 0x0020, CRC(917eabcd) SHA1(df417ca42a4e9e7d32b443e73efaaf395f31e44a) )
 ROM_END
 
+} // anonymous namespace
 
 
 /*************************************

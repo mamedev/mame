@@ -5282,7 +5282,7 @@ Compiled by K1W1
 		<description>Super Cartridge</description>
 		<year>199?</year>
 		<publisher>Unerring Master</publisher>
-		<info name="usage" value="Requires the Atari Super Turbo hardware modification (or compatible ATT, UM) installed in a tape recorder. " />
+		<info name="usage" value="Requires the Atari Super Turbo hardware modification (or compatible ATT, UM) installed in a tape recorder." />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_blizzard" />
 			<dataarea name="rom" size="16384">

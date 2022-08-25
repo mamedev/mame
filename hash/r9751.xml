@@ -53,7 +53,7 @@ license:CC0
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1474560">
 				<rom name="Siemens.9751.CBX.Release.9005.6.84.Disk3.img" size="1474560" crc="2c0226e2" sha1="08fca05de78e6325881deb3f062235a7bcc4ea10"/>
-				</dataarea>
+			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 4" />

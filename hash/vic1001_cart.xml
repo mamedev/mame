@@ -2576,7 +2576,7 @@ B-2007 : Innovative Computing
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
-				<rom name="road race (aka midnight  drive) (commodore)(1981)(vic-1909).a0" size="0x2000" crc="49ed41da" sha1="5cb8f3cc2529a0144b1e66e1cd7af41ad1ba78b4" offset="0x0000" />
+				<rom name="road race (aka midnight drive) (commodore)(1981)(vic-1909).a0" size="0x2000" crc="49ed41da" sha1="5cb8f3cc2529a0144b1e66e1cd7af41ad1ba78b4" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3626,7 +3626,7 @@ B-2007 : Innovative Computing
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
-				<rom name="menagerie  (commodore)(1982)(vic-1926)(jue).a0" size="0x2000" crc="a3c74629" sha1="aec46a3e6f9797b116cbe6a8792e00530234ae80" offset="0x0000" />
+				<rom name="menagerie (commodore)(1982)(vic-1926)(jue).a0" size="0x2000" crc="a3c74629" sha1="aec46a3e6f9797b116cbe6a8792e00530234ae80" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
