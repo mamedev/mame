@@ -720,6 +720,9 @@ void lua_engine::initialize()
 	emu["device_enumerator"] = sol::overload(
 			[] (device_t &dev) { return devenum<device_enumerator>(dev); },
 			[] (device_t &dev, int maxdepth) { return devenum<device_enumerator>(dev, maxdepth); });
+	emu["palette_enumerator"] = sol::overload(
+			[] (device_t &dev) { return devenum<palette_interface_enumerator>(dev); },
+			[] (device_t &dev, int maxdepth) { return devenum<palette_interface_enumerator>(dev, maxdepth); });
 	emu["screen_enumerator"] = sol::overload(
 			[] (device_t &dev) { return devenum<screen_device_enumerator>(dev); },
 			[] (device_t &dev, int maxdepth) { return devenum<screen_device_enumerator>(dev, maxdepth); });
@@ -1271,6 +1274,7 @@ void lua_engine::initialize()
 	machine_type["exit_pending"] = sol::property(&running_machine::exit_pending);
 	machine_type["hard_reset_pending"] = sol::property(&running_machine::hard_reset_pending);
 	machine_type["devices"] = sol::property([] (running_machine &m) { return devenum<device_enumerator>(m.root_device()); });
+	machine_type["palettes"] = sol::property([] (running_machine &m) { return devenum<palette_interface_enumerator>(m.root_device()); });
 	machine_type["screens"] = sol::property([] (running_machine &m) { return devenum<screen_device_enumerator>(m.root_device()); });
 	machine_type["cassettes"] = sol::property([] (running_machine &m) { return devenum<cassette_device_enumerator>(m.root_device()); });
 	machine_type["images"] = sol::property([] (running_machine &m) { return devenum<image_interface_enumerator>(m.root_device()); });
@@ -1432,6 +1436,54 @@ void lua_engine::initialize()
 			});
 
 
+	auto dipalette_type = sol().registry().new_usertype<device_palette_interface>("dipalette", sol::no_constructor);
+	dipalette_type.set_function("pen", &device_palette_interface::pen);
+	dipalette_type.set_function(
+			"pen_color",
+			[] (device_palette_interface const &pal, pen_t pen)
+			{
+				return uint32_t(pal.pen_color(pen));
+			});
+	dipalette_type.set_function("pen_contrast", &device_palette_interface::pen_contrast);
+	dipalette_type.set_function("pen_indirect", &device_palette_interface::pen_indirect);
+	dipalette_type.set_function(
+			"indirect_color",
+			[] (device_palette_interface const &pal, int index)
+			{
+				return uint32_t(pal.indirect_color(index));
+			});
+	dipalette_type["set_pen_color"] = sol::overload(
+			[] (device_palette_interface &pal, pen_t pen, uint32_t color)
+			{
+				pal.set_pen_color(pen, rgb_t(color));
+			},
+			static_cast<void (device_palette_interface::*)(pen_t, uint8_t, uint8_t, uint8_t)>(&device_palette_interface::set_pen_color));
+	dipalette_type.set_function("set_pen_red_level", &device_palette_interface::set_pen_red_level);
+	dipalette_type.set_function("set_pen_green_level", &device_palette_interface::set_pen_green_level);
+	dipalette_type.set_function("set_pen_blue_level", &device_palette_interface::set_pen_blue_level);
+	dipalette_type.set_function("set_pen_contrast", &device_palette_interface::set_pen_contrast);
+	dipalette_type.set_function("set_pen_indirect", &device_palette_interface::set_pen_indirect);
+	dipalette_type["set_indirect_color"] = sol::overload(
+			[] (device_palette_interface &pal, int index, uint32_t color)
+			{
+				pal.set_indirect_color(index, rgb_t(color));
+			},
+			[] (device_palette_interface &pal, int index, uint8_t r, uint8_t g, uint8_t b)
+			{
+				pal.set_indirect_color(index, rgb_t(r, g, b));
+			});
+	dipalette_type.set_function("set_shadow_factor", &device_palette_interface::set_shadow_factor);
+	dipalette_type.set_function("set_highlight_factor", &device_palette_interface::set_highlight_factor);
+	dipalette_type.set_function("set_shadow_mode", &device_palette_interface::set_shadow_mode);
+	dipalette_type["entries"] = sol::property(&device_palette_interface::entries);
+	dipalette_type["indirect_entries"] = sol::property(&device_palette_interface::indirect_entries);
+	dipalette_type["black_pen"] = sol::property(&device_palette_interface::black_pen);
+	dipalette_type["white_pen"] = sol::property(&device_palette_interface::white_pen);
+	dipalette_type["shadows_enabled"] = sol::property(&device_palette_interface::shadows_enabled);
+	dipalette_type["highlights_enabled"] = sol::property(&device_palette_interface::hilights_enabled);
+	dipalette_type["device"] = sol::property(static_cast<device_t & (device_palette_interface::*)()>(&device_palette_interface::device));
+
+
 	auto screen_dev_type = sol().registry().new_usertype<screen_device>(
 			"screen_dev",
 			sol::no_constructor,
@@ -1589,6 +1641,7 @@ void lua_engine::initialize()
 	screen_dev_type["frame_period"] = sol::property([] (screen_device &sdev) { return sdev.frame_period().as_double(); });
 	screen_dev_type["frame_number"] = &screen_device::frame_number;
 	screen_dev_type["container"] = sol::property(&screen_device::container);
+	screen_dev_type["palette"] = sol::property([] (screen_device const &sdev) { return sdev.has_palette() ? &sdev.palette() : nullptr; });
 
 
 	auto cass_type = sol().registry().new_usertype<cassette_image_device>(

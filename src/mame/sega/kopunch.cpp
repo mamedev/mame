@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria
+// copyright-holders: Nicola Salmoria
+
 /********************************************************
 
   KO Punch (c) 1981 Sega
@@ -32,12 +33,195 @@
 ********************************************************/
 
 #include "emu.h"
-#include "kopunch.h"
 
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
-#include "screen.h"
 
+#include "emupal.h"
+#include "screen.h"
+#include "tilemap.h"
+
+
+// configurable logging
+#define LOG_PORT34     (1U <<  1)
+
+//#define VERBOSE (LOG_GENERAL | LOG_PORT34)
+
+#include "logmacro.h"
+
+#define LOGPORT34(...)     LOGMASKED(LOG_PORT34,     __VA_ARGS__)
+
+
+namespace {
+
+class kopunch_state : public driver_device
+{
+public:
+	kopunch_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_vram_fg(*this, "vram_fg")
+		, m_vram_bg(*this, "vram_bg")
+		, m_system(*this, "SYSTEM")
+		, m_lamp(*this, "lamp0")
+	{ }
+
+	void kopunch(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
+	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+private:
+	uint8_t sensors1_r();
+	uint8_t sensors2_r();
+	void lamp_w(uint8_t data);
+	void coin_w(uint8_t data);
+	void vram_fg_w(offs_t offset, uint8_t data);
+	void vram_bg_w(offs_t offset, uint8_t data);
+	void scroll_x_w(uint8_t data);
+	void scroll_y_w(uint8_t data);
+	void gfxbank_w(uint8_t data);
+
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void io_map(address_map &map);
+	void prg_map(address_map &map);
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+
+	// memory pointers
+	required_shared_ptr<uint8_t> m_vram_fg;
+	required_shared_ptr<uint8_t> m_vram_bg;
+
+	required_ioport m_system;
+	output_finder<> m_lamp;
+
+	// video-related
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	uint8_t m_gfxbank = 0U;
+	uint8_t m_scrollx = 0U;
+};
+
+
+// video
+
+void kopunch_state::palette(palette_device &palette) const
+{
+	const uint8_t *color_prom = memregion("proms")->base();
+
+	color_prom += 24; // first 24 colors are black
+
+	for (int i = 0; i < palette.entries(); i++)
+	{
+		int bit0, bit1, bit2;
+
+		// red component
+		bit0 = BIT(*color_prom, 0);
+		bit1 = BIT(*color_prom, 1);
+		bit2 = BIT(*color_prom, 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// green component
+		bit0 = BIT(*color_prom, 3);
+		bit1 = BIT(*color_prom, 4);
+		bit2 = BIT(*color_prom, 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// blue component
+		bit0 = 0;
+		bit1 = BIT(*color_prom, 6);
+		bit2 = BIT(*color_prom, 7);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+		color_prom++;
+	}
+}
+
+void kopunch_state::vram_fg_w(offs_t offset, uint8_t data)
+{
+	m_vram_fg[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
+}
+
+void kopunch_state::vram_bg_w(offs_t offset, uint8_t data)
+{
+	m_vram_bg[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+void kopunch_state::scroll_x_w(uint8_t data)
+{
+	m_scrollx = data;
+	m_bg_tilemap->set_scrollx(0, data);
+}
+
+void kopunch_state::scroll_y_w(uint8_t data)
+{
+	m_bg_tilemap->set_scrolly(0, data);
+}
+
+void kopunch_state::gfxbank_w(uint8_t data)
+{
+	// d0-d2: bg gfx bank
+	if (m_gfxbank != (data & 0x07))
+	{
+		m_gfxbank = data & 0x07;
+		m_bg_tilemap->mark_all_dirty();
+	}
+
+	// d3: flip y, other bits: N/C
+	m_bg_tilemap->set_flip((data & 0x08) ? TILEMAP_FLIPY : 0);
+}
+
+TILE_GET_INFO_MEMBER(kopunch_state::get_fg_tile_info)
+{
+	int const code = m_vram_fg[tile_index];
+
+	tileinfo.set(0, code, 0, 0);
+}
+
+TILE_GET_INFO_MEMBER(kopunch_state::get_bg_tile_info)
+{
+	// note: highest bit is unused
+	int const code = (m_vram_bg[tile_index] & 0x7f) | m_gfxbank << 7;
+
+	tileinfo.set(1, code, 0, 0);
+}
+
+void kopunch_state::video_start()
+{
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(kopunch_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS,  8,  8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(kopunch_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+
+	m_fg_tilemap->set_transparent_pen(0);
+}
+
+uint32_t kopunch_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(0, cliprect);
+
+	// background does not wrap around horizontally
+	rectangle bg_clip = cliprect;
+	bg_clip.max_x = m_scrollx ^ 0xff;
+
+	m_bg_tilemap->draw(screen, bitmap, bg_clip, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
+
+
+// machine
 
 /********************************************************
 
@@ -66,17 +250,17 @@ INPUT_CHANGED_MEMBER(kopunch_state::right_coin_inserted)
 
 ********************************************************/
 
-void kopunch_state::kopunch_map(address_map &map)
+void kopunch_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).ram();
-	map(0x6000, 0x63ff).ram().w(FUNC(kopunch_state::vram_fg_w)).share("vram_fg");
-	map(0x7000, 0x70ff).ram().w(FUNC(kopunch_state::vram_bg_w)).share("vram_bg");
+	map(0x6000, 0x63ff).ram().w(FUNC(kopunch_state::vram_fg_w)).share(m_vram_fg);
+	map(0x7000, 0x70ff).ram().w(FUNC(kopunch_state::vram_bg_w)).share(m_vram_bg);
 	map(0x7100, 0x73ff).ram(); // unused vram
 	map(0x7400, 0x7bff).ram(); // more unused vram? or accidental writes?
 }
 
-void kopunch_state::kopunch_io_map(address_map &map)
+void kopunch_state::io_map(address_map &map)
 {
 	map(0x30, 0x33).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x34, 0x37).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -106,7 +290,7 @@ uint8_t kopunch_state::sensors2_r()
 	// d5: unknown sensor
 	// d6: unknown sensor
 	// d7: coin 1
-	return (machine().rand() & 0x07) | ioport("SYSTEM")->read();
+	return (machine().rand() & 0x07) | m_system->read();
 }
 
 void kopunch_state::lamp_w(uint8_t data)
@@ -122,8 +306,8 @@ void kopunch_state::coin_w(uint8_t data)
 	if (!BIT(data, 6))
 		m_maincpu->set_input_line(I8085_RST55_LINE, CLEAR_LINE);
 
-//  if ((data & 0x3f) != 0x3e)
-//      printf("port 34 = %02x   ",data);
+	if ((data & 0x3f) != 0x3e)
+		LOGPORT34("port 34 = %02x   ", data);
 }
 
 /********************************************************
@@ -141,7 +325,7 @@ static INPUT_PORTS_START( kopunch )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // related to above startbuttons
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // related to above start buttons
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_CUSTOM ) // punch strength (high 3 bits)
@@ -212,8 +396,8 @@ static const gfx_layout bg_layout =
 };
 
 static GFXDECODE_START( gfx_kopunch )
-	GFXDECODE_ENTRY( "gfx1", 0, fg_layout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx2", 0, bg_layout, 0, 1 )
+	GFXDECODE_ENTRY( "fgtiles", 0, fg_layout, 0, 1 )
+	GFXDECODE_ENTRY( "bgtiles", 0, bg_layout, 0, 1 )
 GFXDECODE_END
 
 
@@ -232,10 +416,10 @@ void kopunch_state::machine_start()
 
 void kopunch_state::kopunch(machine_config &config)
 {
-	/* basic machine hardware */
-	I8085A(config, m_maincpu, 4000000); // 4 MHz?
-	m_maincpu->set_addrmap(AS_PROGRAM, &kopunch_state::kopunch_map);
-	m_maincpu->set_addrmap(AS_IO, &kopunch_state::kopunch_io_map);
+	// basic machine hardware
+	I8085A(config, m_maincpu, 4'000'000); // 4 MHz?
+	m_maincpu->set_addrmap(AS_PROGRAM, &kopunch_state::prg_map);
+	m_maincpu->set_addrmap(AS_IO, &kopunch_state::io_map);
 
 	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
 	// $30 - always $9b (PPI mode 0, ports A & B & C as input)
@@ -262,20 +446,20 @@ void kopunch_state::kopunch(machine_config &config)
 	ppi3.in_pc_callback().set_ioport("P2");
 	ppi3.out_pc_callback().set(FUNC(kopunch_state::gfxbank_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 28*8-1);
-	screen.set_screen_update(FUNC(kopunch_state::screen_update_kopunch));
+	screen.set_screen_update(FUNC(kopunch_state::screen_update));
 	screen.set_palette("palette");
 	screen.screen_vblank().set_inputline(m_maincpu, I8085_RST75_LINE);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_kopunch);
-	PALETTE(config, "palette", FUNC(kopunch_state::kopunch_palette), 8);
+	PALETTE(config, "palette", FUNC(kopunch_state::palette), 8);
 
-	/* sound hardware */
+	// sound hardware
 	// ...
 }
 
@@ -292,12 +476,12 @@ ROM_START( kopunch )
 	ROM_LOAD( "epr1105.x",    0x0000, 0x1000, CRC(34ef5e79) SHA1(2827c68f4c902f447a304d3ab0258c7819a0e4ca) )
 	ROM_LOAD( "epr1106.x",    0x1000, 0x1000, CRC(25a5c68b) SHA1(9761418c6f3903f8aaceece658739fe5bf5c0803) )
 
-	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_REGION( 0x1800, "fgtiles", 0 )
 	ROM_LOAD( "epr1103",      0x0000, 0x0800, CRC(bae5e054) SHA1(95373123ab64543cdffb7ee9e02d0613c5c494bf) )
 	ROM_LOAD( "epr1104",      0x0800, 0x0800, CRC(7b119a0e) SHA1(454f01355fa9512a7442990cc92da7bc7a8d6b68) )
 	ROM_LOAD( "epr1102",      0x1000, 0x0800, CRC(8a52de96) SHA1(5abdaa83c6bfea81395cb190f5364b72811927ba) )
 
-	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_REGION( 0x6000, "bgtiles", 0 )
 	ROM_LOAD( "epr1107",      0x0000, 0x1000, CRC(ca00244d) SHA1(690931ea1bef9d80dcd7bd2ea2462b083c884a89) )
 	ROM_LOAD( "epr1108",      0x1000, 0x1000, CRC(cc17c5ed) SHA1(693df076e16cc3a3dd54f6680691e658da3942fe) )
 	ROM_LOAD( "epr1110",      0x2000, 0x1000, CRC(ae0aff15) SHA1(7f71c94bacdb444e5ed4f917c5a7de17012027a9) )
@@ -306,10 +490,12 @@ ROM_START( kopunch )
 	ROM_LOAD( "epr1111",      0x5000, 0x1000, CRC(28530ec9) SHA1(1a8782d37128cdb43133fc891cde93d2bdd5476b) )
 
 	ROM_REGION( 0x0060, "proms", 0 )
-	ROM_LOAD( "epr1101",      0x0000, 0x0020, CRC(15600f5d) SHA1(130179f79761cb16316c544e3c689bc10431db30) ) /* palette */
-	ROM_LOAD( "epr1099",      0x0020, 0x0020, CRC(fc58c456) SHA1(f27c3ad669dfdc33bcd7e0481fa01bf34973e816) ) /* unknown */
-	ROM_LOAD( "epr1100",      0x0040, 0x0020, CRC(bedb66b1) SHA1(8e78bb205d900075b761e1baa5f5813174ff28ba) ) /* unknown */
+	ROM_LOAD( "epr1101",      0x0000, 0x0020, CRC(15600f5d) SHA1(130179f79761cb16316c544e3c689bc10431db30) ) // palette
+	ROM_LOAD( "epr1099",      0x0020, 0x0020, CRC(fc58c456) SHA1(f27c3ad669dfdc33bcd7e0481fa01bf34973e816) ) // unknown
+	ROM_LOAD( "epr1100",      0x0040, 0x0020, CRC(bedb66b1) SHA1(8e78bb205d900075b761e1baa5f5813174ff28ba) ) // unknown
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1981, kopunch, 0, kopunch, kopunch, kopunch_state, empty_init, ROT270, "Sega", "KO Punch", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

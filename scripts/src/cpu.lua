@@ -1109,6 +1109,7 @@ if CPUS["AXC51"] then
 		MAME_DIR .. "src/devices/cpu/axc51/axc51.cpp",
 		MAME_DIR .. "src/devices/cpu/axc51/axc51.h",
 		MAME_DIR .. "src/devices/cpu/axc51/axc51ops.hxx",
+		MAME_DIR .. "src/devices/cpu/axc51/axc51extops.hxx",
 	}
 end
 
@@ -3627,4 +3628,14 @@ end
 if opt_tool(CPUS, "V620") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/v620/v620dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/v620/v620dasm.h")
+end
+
+--------------------------------------------------
+-- Panafacom MN1610, disassembler only
+--@src/devices/cpu/mn1610/mn1610d.h,CPUS["MN1610"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "MN1610") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mn1610/mn1610d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mn1610/mn1610d.h")
 end

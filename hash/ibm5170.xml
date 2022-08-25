@@ -11566,12 +11566,12 @@ license:CC0
 		<info name="developer" value="Virgin Interactive Entertainment" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Disney's Aladdin [Virgin] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="ceaca4d7" sha1="068e75e0e5432eb337b468e647135f085ff3166e"/>
+				<rom name="Disney's Aladdin [Virgin] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="823798f5" sha1="fcf4786b4d867577ea0911a40ceac5531a9995ec"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Disney's Aladdin [Virgin] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="5115f916" sha1="2745fbbe403911e5beceb983cbf86ee501cd69e7"/>
+				<rom name="Disney's Aladdin [Virgin] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="367f6fdc" sha1="176c46d57df5e8fe9221998b0f3d3ba7a096a836"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16281,6 +16281,58 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="lostholm">
+		<description>The Lost Files of Sherlock Holmes</description>
+		<year>1992</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Mythos Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Lost Files of Sherlock Holmes [EA] [1992] [3.5HD] [Disk 1 of 9].img" size="1474560" crc="ec839b11" sha1="5fece3bd550c2f20f3bf8f42722621342589234e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Lost Files of Sherlock Holmes [EA] [1992] [3.5HD] [Disk 2 of 9].img" size="1474560" crc="421e6afb" sha1="1fd013bbbfc547d6f68e18dddc69cb1f48043ce2"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Lost Files of Sherlock Holmes [EA] [1992] [3.5HD] [Disk 3 of 9].img" size="1474560" crc="ee64646a" sha1="58bf6985e0f5595e18038382b9d62f3871753cc3"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Lost Files of Sherlock Holmes [EA] [1992] [3.5HD] [Disk 4 of 9].img" size="1474560" crc="9b89bd4b" sha1="4adf863b9485f72a30594331bdf33c3d5ec0ae85"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Lost Files of Sherlock Holmes [EA] [1992] [3.5HD] [Disk 5 of 9].img" size="1474560" crc="be56ebb1" sha1="9ed776904b4207f01492f3599287d004eab73afb"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Lost Files of Sherlock Holmes [EA] [1992] [3.5HD] [Disk 6 of 9].img" size="1474560" crc="18afe5f8" sha1="d4412b754c6cdcadf4100e31b935fe47f953ee7b"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Lost Files of Sherlock Holmes [EA] [1992] [3.5HD] [Disk 7 of 9].img" size="1474560" crc="9f00c665" sha1="7b9a7b5d734abab7a78a70428bbf10ee97f7e7e7"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Lost Files of Sherlock Holmes [EA] [1992] [3.5HD] [Disk 8 of 9].img" size="1474560" crc="81e18404" sha1="1d8f08bdd8428d498d350270a2bff132933afcec"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Lost Files of Sherlock Holmes [EA] [1992] [3.5HD] [Disk 9 of 9].img" size="1474560" crc="290f085f" sha1="8c81e078271bff8ed1dcb32fbcb774fd5cfb4454"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lostvik">
 		<description>The Lost Vikings</description>
 		<year>1993</year>
@@ -19589,6 +19641,51 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="sq4de" cloneof="sq4">
+		<description>Space Quest IV: Roger Wilco and the Time Rippers (Germany)</description>
+		<year>1991</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="alt_title" value="Space Quest IV: Roger Wilco und die Zeitspringer" />
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="1.000" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Startup Disk" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest 4 (Germany) [Sierra] [1991] [3.5HD] [Disk 1 of 6] [Startup Disk].img" size="1474560" crc="3b86e510" sha1="8fde723b3ed0a8cdc043d844b914dbea75cd3d03"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest 4 (Germany) [Sierra] [1991] [3.5HD] [Disk 2 of 6] [Disk 1].img" size="1474560" crc="bf7430c2" sha1="a31936facd0af8f83ec8c503d4629c967a7d26a3"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest 4 (Germany) [Sierra] [1991] [3.5HD] [Disk 3 of 6] [Disk 2].img" size="1474560" crc="9f1b5af2" sha1="f047d1ed44e39decca7e1abad3d9ea87b58f906c"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest 4 (Germany) [Sierra] [1991] [3.5HD] [Disk 4 of 6] [Disk 3].img" size="1474560" crc="77cb2d3a" sha1="589b1a493c5e9ae8518649fedc3bcc80a9d3cada"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest 4 (Germany) [Sierra] [1991] [3.5HD] [Disk 5 of 6] [Disk 4].img" size="1474560" crc="93083afe" sha1="e47d5eb0a09a2c4fcfb940fc9a3216d8ba9ddd34"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest 4 (Germany) [Sierra] [1991] [3.5HD] [Disk 6 of 6] [Disk 5].img" size="1474560" crc="397c5261" sha1="d80fd6429ac82b32f2cc44a2ccea45351228fab1"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sq5">
 		<description>Space Quest V: The Next Mutation (v1.04)</description>
 		<year>1993</year>
@@ -20536,6 +20633,18 @@ license:CC0
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="Tetris Classic (windows 3.x release) [Spectrum Holobyte] [1992] [3.5DD] [Disk 2 of 2].img" size="737280" crc="655bda8e" sha1="2a2053439e2bec82cb0be8cd4bae8035e9cf33a7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetristr">
+		<description>Tetris Trio</description>
+		<year>1992</year>
+		<publisher>Spectrum Holobyte</publisher>
+		<notes>Compilation includes: "Tetris", "Welltris", "Faces ...tris III"</notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Tetris Trio [Spectrum Holobyte] [1992] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="6712ff24" sha1="af81fe820d987146519c4b5f4ade306e5e04f4b9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -22164,6 +22273,50 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		</part>
 	</software>
 
+	<!-- PC Magazine (UK) -->
+
+	<software name="pcmag9212">
+		<description>PC Magazine (All Star - December 1992)</description>
+		<year>1992</year>
+		<publisher>Ziff-Davis Publishing</publisher>
+		<notes>Disk 1 and 2 include a pack of utilities for Windows 3.x</notes>
+		<info name="usage" value="Requires Windows 3.x"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="PC Magazine (All Star - December 1992) [Ziff-Davis] [1992] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="ca98b850" sha1="fca1f50b13707b3812417ca4836d60ded26d88cf"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="PC Magazine (All Star - December 1992) [Ziff-Davis] [1992] [3.5DD] [Disk 2 of 2].img" size="737280" crc="130cfd37" sha1="99d91e63e7e8a89b3e616d336e9d7eec40a10e2a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- PC Plus (UK) -->
+
+	<software name="pcplus9206">
+		<description>PC Plus (Issue 69 - June 1992)</description>
+		<year>1992</year>
+		<publisher>Future Publishing</publisher>
+		<notes><![CDATA[
+Disk 1 includes: "Symphony 2.2", "Textart", "Shorties", "Chess Puzzle", "Highway Code", "Lotus Smart Suite"
+Disk 2 includes: ""
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="SuperDisk 1" />
+			<dataarea name="flop" size="737280">
+				<rom name="PC Plus (Issue 69 - June 1992) [Future] [1992] [3.5DD] [Disk 1 of 2].img" size="737280" crc="4d3708a9" sha1="50e21bd2e7414f0aa64f16db3af70aac82d60dc2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="SuperDisk 2" />
+			<dataarea name="flop" size="737280">
+				<rom name="PC Plus (Issue 69 - June 1992) [Future] [1992] [3.5DD] [Disk 2 of 2].img" size="737280" status="nodump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- PC Review (UK) -->
 
 	<software name="pcr199205">
@@ -22193,6 +22346,47 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="737280">
 				<rom name="PC Review (Issue 25 - November 1993) [EMAP] [1993] [3.5DD] [Disk 2 of 2].img" size="737280" crc="4a9a0844" sha1="c60ea6ad006b0fc23abc24fd45e6f19634a6f7c5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- PC Today (UK) -->
+
+	<software name="pctod9212">
+		<description>PC Today (Vol. 06 № 08 - December 1992)</description>
+		<year>1992</year>
+		<publisher>EuroPress Publications</publisher>
+		<notes><![CDATA[
+Disk 1 includes: "GST TimeWorks Publisher Lite v1.01"
+Disk 2 includes: "Cliparts for TimeWorks Publisher Lite", "Wessex Systems Mail-Pro 2.01", "PC Today Buyer's Guide", "SysEdit"
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="PC Today (Vol.06 N.08 - December 1992) [EuroPress] [1994] [3.5DD] [Disk 1 of 2].img" size="737280" crc="8649d92b" sha1="17151dbf03fe0765033f05e758c5dddfabf705f4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="PC Today (Vol.06 N.08 - December 1992) [EuroPress] [1994] [3.5DD] [Disk 2 of 2].img" size="737280" crc="916e26c3" sha1="62492689cc89097bf2d437d70c72065d9dde10c4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Personal Computer World -->
+
+	<software name="pcw9404">
+		<description>Personal Computer World (1994-04 - April 1994)</description>
+		<year>1994</year>
+		<publisher>VNU Business Publications</publisher>
+		<notes><![CDATA[Cover Disk includes: 
+Amour-Geddon (part 2) [Psygnosis]: Part 2 of this blockbuster game adds brilliant animation to the program's startup sequence.
+Marketeer [Sterling Data]: All the features anyone involved in marketing could ask for. A superb, easy-to-use system.
+Walking Fingers [David Geffen]: Let your fingers do the walking in this handy mini-database. Fun, logical and good graphics.
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<!-- Bad dump: Modified root file -->
+			<dataarea name="flop" size="737280">
+				<rom name="Personal Computer World 1994-04 [VNU] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="72867707" sha1="b51dedbc660fe88012fd5d4a0749e72296eef279"  status="baddump"/>
 			</dataarea>
 		</part>
 	</software>

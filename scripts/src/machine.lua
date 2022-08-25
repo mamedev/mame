@@ -1475,6 +1475,18 @@ if (MACHINES["GT913"]~=null) then
 	}
 end
 
+--------------------------------------------------
+--
+--@src/devices/machine/generic_spi_flash.h,MACHINES["GENERIC_SPI_FLASH"] = true
+--------------------------------------------------
+
+if (MACHINES["GENERIC_SPI_FLASH"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/generic_spi_flash.cpp",
+		MAME_DIR .. "src/devices/machine/generic_spi_flash.h",
+	}
+end
+
 ---------------------------------------------------
 --
 --@src/devices/machine/hd63450.h,MACHINES["HD63450"] = true

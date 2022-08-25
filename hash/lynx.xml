@@ -161,7 +161,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="bluelghtd" cloneof="bluelght">
-		<description>Blue Lightning (USA, Demo)</description>
+		<description>Blue Lightning (USA, demo)</description>
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="PA2054" />
@@ -1311,7 +1311,7 @@ Known undumped prototypes:
 	</software>
 
 	<software name="zakud" cloneof="zaku">
-		<description>Zaku (Demo)</description>
+		<description>Zaku (demo)</description>
 		<year>2009</year>
 		<publisher>Penguinet</publisher>
 		<part name="cart" interface="lynx_cart">
