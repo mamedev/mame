@@ -11,6 +11,9 @@ TODO:
   fixed at some point)
 - Star Force: the Larios is supposed to blink at the third loop of the BGM.
   Right now it does at second and half, presumably due of the unknown PCB clocks.
+- remove memory pointers for video attribute RAM area (r/w handlers instead?),
+  then the workaround at the end of starforb_map isn't needed, and m_scrollhack
+  can probably be removed too
 
 Note:
 - Star Force shows default MAME palette at POST. Flipped to all_black for now.
@@ -60,7 +63,7 @@ write
 9000 sound chip channel 2 1st 9f,bf,df,ff
 a000 sound chip channel 3 1st 9f,bf,df,ff
 d000 bit 0-3 single sound volume ( freq = ctc2 )
-e000 ? ( initialize only )
+e000 assume DAC enable (senjyo attract mode)
 f000 ? ( initialize only )
 
 I/O read/write
@@ -75,8 +78,6 @@ I/O read/write
 
 ***************************************************************************/
 
-/* 26.February 2012 Tsuyoshi Hasegawa fixed palette intensity */
-
 #include "emu.h"
 #include "senjyo.h"
 
@@ -90,16 +91,7 @@ I/O read/write
 
 void senjyo_state::machine_start()
 {
-	save_item(NAME(m_sound_cmd));
-	save_item(NAME(m_single_volume));
-	save_item(NAME(m_sound_state));
-}
-
-void senjyo_state::machine_reset()
-{
-	m_sound_cmd = 0;
-	m_single_volume = 0;
-	m_sound_state = 0;
+	save_item(NAME(m_dac_clock));
 }
 
 void senjyo_state::irq_ctrl_w(uint8_t data)
@@ -113,12 +105,21 @@ void senjyo_state::flip_screen_w(uint8_t data)
 	flip_screen_set(data);
 }
 
-void senjyo_state::sound_cmd_w(uint8_t data)
+WRITE_LINE_MEMBER(senjyo_state::dac_clock_w)
 {
-	m_sound_cmd = data;
+	if (state)
+		m_dac->write(m_dac_prom->base()[m_dac_clock++ & 0xf]);
+}
 
-	m_pio->strobe_a(0);
-	m_pio->strobe_a(1);
+void senjyo_state::dac_volume_w(uint8_t data)
+{
+	m_volume->flt_volume_set_volume((data & 0xf) / 15.0);
+}
+
+void senjyo_state::dac_enable_w(uint8_t data)
+{
+	// it writes 0xff or 0x00
+	m_dac->set_output_gain(0, (data & 1) ? 1.0 : 0.0);
 }
 
 void senjyo_state::senjyo_map(address_map &map)
@@ -156,7 +157,7 @@ void senjyo_state::senjyo_map(address_map &map)
 	map(0xd001, 0xd001).portr("P2");
 	map(0xd002, 0xd002).portr("SYSTEM").w(FUNC(senjyo_state::irq_ctrl_w));
 	map(0xd003, 0xd003).nopr(); // debug cheat port? (i.e. bit 0 in starforc: invincibility, bit 3-0 in senyjo: disables enemy fire)
-	map(0xd004, 0xd004).portr("DSW1").w(FUNC(senjyo_state::sound_cmd_w));
+	map(0xd004, 0xd004).portr("DSW1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xd005, 0xd005).portr("DSW2");
 }
 
@@ -172,7 +173,8 @@ void senjyo_state::senjyo_sound_map(address_map &map)
 	map(0x8000, 0x8000).w("sn1", FUNC(sn76496_device::write));
 	map(0x9000, 0x9000).w("sn2", FUNC(sn76496_device::write));
 	map(0xa000, 0xa000).w("sn3", FUNC(sn76496_device::write));
-	map(0xd000, 0xd000).w(FUNC(senjyo_state::volume_w));
+	map(0xd000, 0xd000).w(FUNC(senjyo_state::dac_volume_w));
+	map(0xe000, 0xe000).w(FUNC(senjyo_state::dac_enable_w));
 }
 
 void senjyo_state::senjyo_sound_io_map(address_map &map)
@@ -219,7 +221,8 @@ void senjyo_state::starforb_map(address_map &map)
 	map(0xd000, 0xd000).portr("P1").w(FUNC(senjyo_state::flip_screen_w));
 	map(0xd001, 0xd001).portr("P2");
 	map(0xd002, 0xd002).portr("SYSTEM").w(FUNC(senjyo_state::irq_ctrl_w));
-	map(0xd004, 0xd004).portr("DSW1").w(FUNC(senjyo_state::sound_cmd_w));
+	map(0xd003, 0xd003).nopr();
+	map(0xd004, 0xd004).portr("DSW1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xd005, 0xd005).portr("DSW2");
 
 	/* these aren't used / written, left here to make sure memory is allocated */
@@ -237,7 +240,8 @@ void senjyo_state::starforb_sound_map(address_map &map)
 	map(0x8000, 0x8000).w("sn1", FUNC(sn76496_device::write));
 	map(0x9000, 0x9000).w("sn2", FUNC(sn76496_device::write));
 	map(0xa000, 0xa000).w("sn3", FUNC(sn76496_device::write));
-	map(0xd000, 0xd000).w(FUNC(senjyo_state::volume_w));
+	map(0xd000, 0xd000).w(FUNC(senjyo_state::dac_volume_w));
+	map(0xe000, 0xe000).w(FUNC(senjyo_state::dac_enable_w));
 	map(0xf000, 0xffff).ram();
 }
 
@@ -395,7 +399,7 @@ static INPUT_PORTS_START( starforc )
 	PORT_DIPSETTING(    0x18, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x28, DEF_STR( Hardest ) )
-	/* 0x30 and x038 are unused */
+	/* 0x30 and 0x38 are unused */
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
@@ -551,6 +555,14 @@ static GFXDECODE_START( gfx_senjyo )
 GFXDECODE_END
 
 
+static const z80_daisy_config senjyo_daisy_chain[] =
+{
+	{ "z80ctc" },
+	{ "z80pio" },
+	{ nullptr }
+};
+
+
 void senjyo_state::senjyo(machine_config &config)
 {
 	/* basic machine hardware */
@@ -565,12 +577,12 @@ void senjyo_state::senjyo(machine_config &config)
 
 	Z80PIO(config, m_pio, 2000000);
 	m_pio->out_int_callback().set_inputline("sub", INPUT_LINE_IRQ0);
-	m_pio->in_pa_callback().set(FUNC(senjyo_state::pio_pa_r));
+	m_pio->in_pa_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 
 	z80ctc_device& ctc(Z80CTC(config, "z80ctc", 2000000 /* same as "sub" */));
 	ctc.intr_callback().set_inputline("sub", INPUT_LINE_IRQ0);
 	ctc.zc_callback<0>().set("z80ctc", FUNC(z80ctc_device::trg1));
-	ctc.zc_callback<2>().set(FUNC(senjyo_state::sound_line_clock));
+	ctc.zc_callback<2>().set(FUNC(senjyo_state::dac_clock_w));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -589,12 +601,14 @@ void senjyo_state::senjyo(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	SN76496(config, "sn1", 2000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
-
 	SN76496(config, "sn2", 2000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
-
 	SN76496(config, "sn3", 2000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	DAC_4BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.05); // unknown DAC
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set(m_pio, FUNC(z80pio_device::strobe_a)).invert();
+
+	DAC_8BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "volume", 0.05);
+	FILTER_VOLUME(config, m_volume).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 
@@ -674,7 +688,7 @@ ROM_START( senjyo )
 	ROM_LOAD( "08j_09b.bin", 0x08000, 0x2000, CRC(1ee63b5c) SHA1(14dea762446cc3c0d4e407dc1e68c2010999fd58) )
 	ROM_LOAD( "08k_10b.bin", 0x0a000, 0x2000, CRC(a9f41ec9) SHA1(c24f9d54593e764a0b4530b1a2550b999916992c) )
 
-	ROM_REGION( 0x0020, "proms", 0 )    /* PROMs */
+	ROM_REGION( 0x0020, "dac", 0 )
 	ROM_LOAD( "07b.bin",    0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) )  /* waveform */
 ROM_END
 
@@ -711,7 +725,7 @@ ROM_START( starforc )
 	ROM_LOAD( "5.9lm",   0x04000, 0x4000, CRC(f71717f8) SHA1(bf673571f772d8e0eddae89c00f31390c49a25d2) )
 	ROM_LOAD( "4.8lm",   0x08000, 0x4000, CRC(dd9d68a4) SHA1(34c60d2b34c7980bf65a5ebadb9c73f89128141f) )
 
-	ROM_REGION( 0x0020, "proms", 0 )    /* PROMs */
+	ROM_REGION( 0x0020, "dac", 0 )
 	ROM_LOAD( "07b.bin", 0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) ) /* waveform */
 ROM_END
 
@@ -753,7 +767,7 @@ ROM_START( starforcb )
 	ROM_LOAD( "b9.8j",  0x08000, 0x2000, CRC(e7d51959) SHA1(34d9afb0f31dc1d02e7b85aa69345fc66cf0f554) )
 	ROM_LOAD( "b10.8l", 0x0a000, 0x2000, CRC(6ea27bec) SHA1(30da81a99d5920107751afda359576e426c497c4) )
 
-	ROM_REGION( 0x0020, "proms", 0 )    /* PROMs */
+	ROM_REGION( 0x0020, "dac", 0 )
 	ROM_LOAD( "a18s030.7b",    0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) )   /* waveform */
 ROM_END
 
@@ -795,7 +809,7 @@ ROM_START( starforca )
 	ROM_LOAD( "9.bin",   0x08000, 0x2000, CRC(e7d51959) SHA1(34d9afb0f31dc1d02e7b85aa69345fc66cf0f554) )
 	ROM_LOAD( "10.bin",  0x0a000, 0x2000, CRC(6ea27bec) SHA1(30da81a99d5920107751afda359576e426c497c4) )
 
-	ROM_REGION( 0x0020, "proms", 0 )    /* PROMs */
+	ROM_REGION( 0x0020, "dac", 0 )
 	ROM_LOAD( "prom.bin", 0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) ) /* waveform */
 ROM_END
 
@@ -834,7 +848,7 @@ ROM_START( starforce )
 	ROM_LOAD( "5.9lm",   0x04000, 0x4000, CRC(f71717f8) SHA1(bf673571f772d8e0eddae89c00f31390c49a25d2) )
 	ROM_LOAD( "4.8lm",   0x08000, 0x4000, CRC(dd9d68a4) SHA1(34c60d2b34c7980bf65a5ebadb9c73f89128141f) )
 
-	ROM_REGION( 0x0020, "proms", 0 )    /* PROMs */
+	ROM_REGION( 0x0020, "dac", 0 )
 	ROM_LOAD( "07b.bin", 0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) ) /* waveform */
 ROM_END
 
@@ -871,7 +885,7 @@ ROM_START( megaforc )
 	ROM_LOAD( "5.9lm",   0x04000, 0x4000, CRC(f71717f8) SHA1(bf673571f772d8e0eddae89c00f31390c49a25d2) )
 	ROM_LOAD( "4.8lm",   0x08000, 0x4000, CRC(dd9d68a4) SHA1(34c60d2b34c7980bf65a5ebadb9c73f89128141f) )
 
-	ROM_REGION( 0x0020, "proms", 0 )    /* PROMs */
+	ROM_REGION( 0x0020, "dac", 0 )
 	ROM_LOAD( "07b.bin", 0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) ) /* waveform */
 ROM_END
 
@@ -908,7 +922,7 @@ ROM_START( megaforcu ) /* While no "For use in the United States" notice, it's l
 	ROM_LOAD( "5.9lm",   0x04000, 0x4000, CRC(f71717f8) SHA1(bf673571f772d8e0eddae89c00f31390c49a25d2) )
 	ROM_LOAD( "4.8lm",   0x08000, 0x4000, CRC(dd9d68a4) SHA1(34c60d2b34c7980bf65a5ebadb9c73f89128141f) )
 
-	ROM_REGION( 0x0020, "proms", 0 )    /* PROMs */
+	ROM_REGION( 0x0020, "dac", 0 )
 	ROM_LOAD( "07b.bin",  0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) )    /* waveform */
 ROM_END
 
@@ -945,7 +959,7 @@ ROM_START( baluba )
 	ROM_LOAD( "4",   0x04000, 0x4000, CRC(dd954124) SHA1(f37687197d1564331dc27dace23dec462d02202c) )
 	ROM_LOAD( "3",   0x08000, 0x4000, CRC(7ac24983) SHA1(4ac32d95af3147af5b9b1af1f292bb629c5d4fb9) )
 
-	ROM_REGION( 0x0020, "proms", 0 )    /* PROMs */
+	ROM_REGION( 0x0020, "dac", 0 )
 	ROM_LOAD( "07b.bin", 0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) )  /* waveform */
 ROM_END
 

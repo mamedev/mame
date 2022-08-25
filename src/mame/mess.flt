@@ -299,6 +299,7 @@ handheld/hh_tms1k.cpp
 handheld/hh_ucom4.cpp
 handheld/lk3000.cpp
 handheld/monty.cpp
+handheld/pensebem.cpp
 handheld/rzone.cpp
 handheld/scrablex.cpp
 handheld/talkingbb.cpp
@@ -478,6 +479,7 @@ miltonbradley/vectrex.cpp
 mips/mips.cpp
 misc/3do.cpp
 misc/eva.cpp
+misc/micom_mahjong.cpp
 misc/monon_color.cpp
 mit/tx0.cpp
 mits/altair.cpp
@@ -1016,7 +1018,6 @@ tangerine/microtan.cpp
 tangerine/oric.cpp
 tatung/einstein.cpp
 teamconcepts/comquest.cpp
-tectoy/pensebem.cpp
 tektronix/tek405x.cpp
 tektronix/tek410x.cpp
 tektronix/tek43xx.cpp

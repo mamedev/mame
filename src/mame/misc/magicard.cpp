@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese, Roberto Fresca, David Haywood
+// copyright-holders:Angelo Salese, Roberto Fresca, David Haywood, Paul Arnold
 /******************************************************************************
 
   MAGIC CARD - IMPERA
   -------------------
 
-  Preliminary driver by Roberto Fresca, David Haywood & Angelo Salese
+  Driver by Roberto Fresca, David Haywood, Angelo Salese and Paul Arnold
 
 
   TODO:
@@ -23,24 +23,24 @@
 
   Games running on this hardware:
 
-  * Magic Card (set 1),                         Impera, 199?.
-  * Magic Card (set 2),                         Impera, 199?.
-  * Magic Card (set 3),                         Impera, 199?.
-  * Magic Card Export 94 (set 1),               Impera, 1994.
-  * Magic Card Export 94 (set 2),               Impera, 1994.
-  * Magic Export (V.211A),                      Impera, 1994.
+  * Magic Card (v2.01),                         Impera, 1994.
+  * Magic Card (v1.5 17.12.93, set 1),          Impera, 1993.
+  * Magic Card (v1.5 17.12.93, set 2),          Impera, 1993.
+  * Magic Card Export 94 (v2.11a, set 1),       Impera, 1994.
+  * Magic Card Export 94 (v2.11a, set 2),       Impera, 1994.
+  * Magic Card Export 94 (v2.11a, set 3),       Impera, 1994.
   * Magic Card Jackpot (4.01),                  Impera, 1998.
-  * Magic Card - Wien (Sicherheitsversion 1.2), Impera, 1993.
+  * Magic Card - Wien (v1.2 200/93, set 1),     Impera, 1993.
   * Magic Lotto Export (5.03),                  Impera, 2001.
   * Hot Slots (6.00),                           Impera, 2002.
   * Quingo Export (5.00),                       Impera, 1999.
   * Bel Slots Export (5.01),                    Impera, 1999.
   * Big Deal Belgien (5.04),                    Impera, 2001.
   * Puzzle Me!,                                 Impera, 199?.
-  * unknown 'TE06',                             Impera, 1994.
-  * Lucky 7 (Impera),                           Impera, 199?.
-  * unknown Poker 'W',                          unknown, 1993.
-  * Dallas Poker,                               unknown, 1993.
+  * Magic Card (v1.10 14.09.94)                 Impera, 1994.
+  * Lucky 7 (Impera),                           Impera, 1991.
+  * Magic Card - Wien (v1.2 200/93, set 2),     Impera, 1993.
+  * Dallas Poker,                               unknown,1993.
   * Kajot Card (Version 1.01, Wien Euro),       Amatic, 1993.
 
 
@@ -84,19 +84,19 @@
   with "!PRESS HOLD4 for 5sec   TO INIT MACHINE!".  Press HOLD 4 for 5 secs and
   after this game should start without error.
 
-  magicarda/b/w/unkte06/unkpkr_w show !!ERROR!! CALL SERVICEMAN 4
+  magicrd1a/magicrd1b/magicrd1c/magicrd1/magicrd1d show !!ERROR!! CALL SERVICEMAN 4
   Press OWNER BOOK KEEPING. Game enters test Press HOLD3 for next test.
   Select PREFERENCES I and then RAM RESET.
-  magicarda/b/unkpkr_w lock with TURN OFF!
+  magicrd1a/magicrd1b/magicrd1d lock with TURN OFF!
   Quit and restart game.
 
-  magicarde/ea/f
+  magicrde/magicrdea/magicrdeb
   Show STATIC MEMORY ERROR.
   Press OWNER BOOK KEEPING to get past this and again when error appears later.
   Use HOLD3 to enter menu and CLEAR to get hidden test. Press HOLD5 for 5 secs
   will initialise machine.
 
-  magicarde/ea alarm when credit is added and credit is then cleared so can't be played.
+  magicrde/magicrdea alarm when credit is added and credit is then cleared so can't be played.
   Needs further investigation.
 
   Lucky7i shows !! FEHLER !! BITTE TECHNIKER RUFEN 4
@@ -104,8 +104,8 @@
   and then HOLD 5 (RAM RESET).
   Machine shows "GERAET JETZT AUS. UND WIEDER EINSTECKEN!!!
 
-  magicardeb fails on OUT OF RANGE ERROR..
-  magicardec/j fail on ERROR IN SETTINGS
+  magicrdec fails on OUT OF RANGE ERROR..
+  magicrdj/magicrdja fail on ERROR IN SETTINGS
 
   kajotcrd gets stuck during initialisation. Possible eeprom contents issue ?
   dallaspk requires protection device (serial port ?)
@@ -116,8 +116,6 @@
              in the eeprom but there doesn't appear to be any tests to set these.
              Is something missing on this game ?
 
-  magicardf, magicardw, unkte06 and lucky7i appear to work (but are they right?)
-
 *******************************************************************************
 
   Impera boards...
@@ -126,13 +124,13 @@
   ======================================================================================================
   V 1.04     | lucky7i                       | lowest known revision, does not have a socket for the PIC
   ------------------------------------------------------------------------------------------------------
-  V 1.05     | unkte06, magicardw            | PIC16C54 + XTAL got added
+  V 1.05     | magicrd1, magicrd1c          | PIC16C54 + XTAL got added
   ------------------------------------------------------------------------------------------------------
   V 2.1      | puzzleme                      | ESI1, 24C02, YM2149F, RTC added
   ------------------------------------------------------------------------------------------------------
-  V 2.2      | magicarde                     |
+  V 2.2      | magicrde                      |
   ------------------------------------------------------------------------------------------------------
-  V 4.0      | magicardj, magicardf, magicle | ESI1 replaced by ALTERA MAX EPM7128SQC100
+  V 4.0      | magicrdja, magicrdeb, magicle | ESI1 replaced by ALTERA MAX EPM7128SQC100
              |                               | YM2149F replaced by YMZ284-D, MX29F1610 added
   ------------------------------------------------------------------------------------------------------
 
@@ -145,31 +143,31 @@
 
   The information below is purely to aid development and should be removed
   when complete.
-  There are some mysteries - eg. magicardf appears to address an I2C address where
+  There are some mysteries - eg. magicrdeb appears to address an I2C address where
   there is no device but the game seems to work without ?
 
 *******************************************************************************
 
                 DS2401     DS1207   EP      PROTECT  PROT AVAIL     ELO TOUCH
   magicard      NO          YES[3]  24c02   YES         NO
-  magicarda     NO          YES[3]  24c02   YES         NO
-  magicardb     NO          YES[2]  24c02?  YES         NO
-  magicarde     YES         YES[1]  24c02   16C54       YES
-  magicardea    YES         YES[1]  24c02   16C54       YES
-  magicardeb    YES         YES[1]  24c02?  YES         NO
-  magicardec    YES         NO      24c02?  YES         NO
-  magicardf     YES         NO      24c02   ?? *1
-  magicardj     YES         NO ?    24c02   16F84       YES*
-  magicardw     NO ?        YES[2]  24c02?  16C54       YES
+  magicrd1      NO          YES[2]  24c02   16C56       YES
+  magicrd1a     NO          YES[3]  24c02   YES         NO
+  magicrd1b     NO          YES[2]  24c02?  YES         NO
+  magicrd1c     NO ?        YES[2]  24c02?  16C54       YES
+  magicrd1d     NO          YES[2]  24c02   YES         NO
+  magicrde      YES         YES[1]  24c02   16C54       YES
+  magicrdea     YES         YES[1]  24c02   16C54       YES
+  magicrdeb     YES         NO      24c02   ?? *1
+  magicrdec     YES         YES[1]  24c02?  YES         NO
+  magicrdj      YES         NO      24c02?  YES         NO
+  magicrdja     YES         NO ?    24c02   16F84       YES*
   magicle       ?           ?       24c04   16F84       YES*        YES
   hotslots      ?           ?       24c02   YES         NO
   quingo        ?           ?       24c04   YES         NO          YES
   belslots      ?           ?       24c04   YES         NO          YES
   bigdeal0      ?           ?       24c04   ?
   puzzleme      NO          NO      24c02   16C54       YES
-  unkte06       NO          YES[2]  24c02   16C56       YES
   lucky7i                   YES[3]  24c02   NO
-  unkpkr_w      NO          YES[2]  24c02   YES         NO
   dallaspk      NO          YES[4]  24c02   YES         NO          protection via serial port ?
   kajotcrd      YES         ??      24c02   YES         NO
 
@@ -281,7 +279,7 @@ public:
 
 	void magicard_pic54(machine_config &config);
 	void magicard(machine_config &config);
-	void unkte06(machine_config &config);
+	void magicard_pic56(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -608,7 +606,7 @@ static INPUT_PORTS_START( magicard )
 
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( magicarde )
+static INPUT_PORTS_START( magicrde )
 	PORT_INCLUDE( magicard )
 
 	PORT_MODIFY("SW1")
@@ -889,7 +887,7 @@ void magicard_state::magicard_pic54(machine_config &config)
 	pic.write_b().set(FUNC(magicard_state::pic_portb_w));
 }
 
-void magicard_state::unkte06(machine_config &config)
+void magicard_state::magicard_pic56(machine_config &config)
 {
 	magicard(config);
 
@@ -988,7 +986,7 @@ ROM_END
 /*
   Magicard 1.5 17.12.93
 */
-ROM_START( magicarda )
+ROM_START( magicrd1a )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "mcorigg2.bin", 0x00000, 0x20000, CRC(48546aa9) SHA1(23099a5e4c9f2c3386496f6d7f5bb7d435a6fb16) )
 	ROM_RELOAD(                           0x40000, 0x20000 )
@@ -1002,13 +1000,13 @@ ROM_START( magicarda )
 	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(4902b7c2) SHA1(6e6fe825cfcf39bae60ecc45ab0742772f87cf80) ) // created to match game
 
 	ROM_REGION(0x4000, "nvram", 0) /* Default NVRAM */
-	ROM_LOAD( "magicarda.nv", 0x0000, 0x4000, CRC(4d78bbcc) SHA1(943344f03a69ee25526e2b1f2e74722ae2601c11) )
+	ROM_LOAD( "magicrd1a.nv", 0x0000, 0x4000, CRC(4d78bbcc) SHA1(943344f03a69ee25526e2b1f2e74722ae2601c11) )
 ROM_END
 
 /*
   Magicard 1.5 17.12.93
 */
-ROM_START( magicardb )
+ROM_START( magicrd1b )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "mg_8.bin", 0x00000, 0x80000, CRC(f5499765) SHA1(63bcf40b91b43b218c1f9ec1d126a856f35d0844) )
 
@@ -1023,7 +1021,7 @@ ROM_START( magicardb )
 	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(cbcc1a42) SHA1(4b577c85f5856192ce04051a2d305a9080192177) ) // created to match game
 
 	ROM_REGION(0x4000, "nvram", 0) /* Default NVRAM */
-	ROM_LOAD( "magicardb.nv", 0x0000, 0x4000, CRC(4d78bbcc) SHA1(943344f03a69ee25526e2b1f2e74722ae2601c11) )
+	ROM_LOAD( "magicrd1b.nv", 0x0000, 0x4000, CRC(4d78bbcc) SHA1(943344f03a69ee25526e2b1f2e74722ae2601c11) )
 ROM_END
 
 /*
@@ -1110,7 +1108,7 @@ ROM_END
   FAX: 0043/7242/27053    -------
 
 */
-ROM_START( magicardj )
+ROM_START( magicrdja )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "27c4002.ic21", 0x00000, 0x80000, CRC(ab2ed583) SHA1(a2d7148b785a8dfce8cff3b15ada293d65561c98) ) // sldh
 
@@ -1165,7 +1163,7 @@ ROM_END
   Q3: 3686.400  1Q08/95  (PIC?)
 
 */
-ROM_START( magicarde )
+ROM_START( magicrde )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "27c4002_v2.11a_a63d.ic21", 0x00000, 0x80000, CRC(b5f24412) SHA1(73ff05c19132932a419fef0d5dc985440ce70e83) )
 
@@ -1182,7 +1180,7 @@ ROM_START( magicarde )
 	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(b00bf924) SHA1(ab98b2955697765518d877d4e19dbe45de0d9503) ) // created to match game
 
 	ROM_REGION(0x10000, "nvram", 0) /* Default NVRAM */
-	ROM_LOAD( "magicarde.nv", 0x0000, 0x10000, CRC(6b9f6abd) SHA1(fd171f465a16d3f2da9c19924ee31f6e56ee746c) )
+	ROM_LOAD( "magicrde.nv", 0x0000, 0x10000, CRC(6b9f6abd) SHA1(fd171f465a16d3f2da9c19924ee31f6e56ee746c) )
 ROM_END
 
 /*
@@ -1203,7 +1201,7 @@ ROM_END
   Q3: 3686.400  1Q08/95   (PIC?)
 
 */
-ROM_START( magicardea )
+ROM_START( magicrdea )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "27c4002_v2.11a_9505.ic21", 0x00000, 0x80000, CRC(24c69c01) SHA1(0928800b9cfc2ae358f90b3f79c08acd2b2aa7d8) )
 
@@ -1220,7 +1218,7 @@ ROM_START( magicardea )
 	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(b00bf924) SHA1(ab98b2955697765518d877d4e19dbe45de0d9503) ) // created to match game
 
 	ROM_REGION(0x10000, "nvram", 0) /* Default NVRAM */
-	ROM_LOAD( "magicardea.nv", 0x0000, 0x10000, CRC(a1043c84) SHA1(30c3bb43e91fc358a2592f9a6efbd146eec4e43c) )
+	ROM_LOAD( "magicrdea.nv", 0x0000, 0x10000, CRC(a1043c84) SHA1(30c3bb43e91fc358a2592f9a6efbd146eec4e43c) )
 ROM_END
 
 /*
@@ -1235,7 +1233,7 @@ ROM_END
   in the PCB picture.
 
 */
-ROM_START( magicardeb )
+ROM_START( magicrdec )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "27c4002_v2.9a_5b64.ic21", 0x00000, 0x80000, CRC(81ad0437) SHA1(117e2681541f786874cd0bce7f8bfb2bffb0b548) )
 
@@ -1252,7 +1250,7 @@ ROM_START( magicardeb )
 	// PIC undumped
 
 	ROM_REGION(0x10000, "nvram", 0) /* Default NVRAM */
-	ROM_LOAD( "magicardeb.nv", 0x0000, 0x10000, CRC(f40bf542) SHA1(b73838f610dbf35099971d80e240abd672dd36e3) )
+	ROM_LOAD( "magicrdec.nv", 0x0000, 0x10000, CRC(f40bf542) SHA1(b73838f610dbf35099971d80e240abd672dd36e3) )
 ROM_END
 
 /*
@@ -1267,7 +1265,7 @@ ROM_END
   in the PCB picture.
 
 */
-ROM_START( magicardec )
+ROM_START( magicrdj )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "27c4002_v4.01_af18.ic21", 0x00000, 0x80000, CRC(7700fd22) SHA1(0555c08c82f56e6399a89f6408e52d9d0beba2ac) )
 
@@ -1279,8 +1277,8 @@ ROM_START( magicardec )
 ROM_END
 
 /*
-  Magic Export.
-  Ver 211A.
+  Magic Card Export 94
+  International Ver. 2.11a (set 3)
 
   1x Philips SCC66470CAB.
   1x Philips SCC68070 CCA84.
@@ -1296,7 +1294,7 @@ ROM_END
   XTAL: 3x unknown frequency.
 
 */
-ROM_START( magicardf )
+ROM_START( magicrdeb )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "27c4002.ic21", 0x00000, 0x80000, CRC(098258c0) SHA1(5f5dfe376c980ec88e68b324ba912022091e2426) )
 
@@ -1310,15 +1308,15 @@ ROM_START( magicardf )
 	ROM_LOAD( "ds2401", 0x000000, 0x000008, BAD_DUMP CRC(3f87b999) SHA1(29649749d521ced9dc7ef1d0d6ddb9a8beea360f) ) // created to match game
 
 	ROM_REGION(0x10000, "nvram", 0) /* Default NVRAM */
-	ROM_LOAD( "magicardf.nv", 0x0000, 0x10000, CRC(8beb061b) SHA1(c29a2086dea30c98565e811d9686af35da42c9d9) )
+	ROM_LOAD( "magicrdeb.nv", 0x0000, 0x10000, CRC(8beb061b) SHA1(c29a2086dea30c98565e811d9686af35da42c9d9) )
 ROM_END
 
 /*
-  Magic Card - Wien
+  Magic Card - Wien v1.2 200/93 set 1
   Sicherheitsversion 1.2
 
 */
-ROM_START( magicardw )
+ROM_START( magicrd1c )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "am27c4096.bin", 0x00000, 0x80000, CRC(d9e2a4ec) SHA1(b3000ded242fa25709c90b9b2541c9d1d5cabebb) )
 
@@ -1329,7 +1327,7 @@ ROM_START( magicardw )
 	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(ab0b75a2) SHA1(3a3c594d77936e671d25f526459355cc446a0991) ) // created to match game
 
 	ROM_REGION(0x4000, "nvram", 0) /* Default NVRAM */
-	ROM_LOAD( "magicardw.nv", 0x0000, 0x4000, CRC(d6244455) SHA1(b6389574f1d4a4a64590d544c9bafe4892feb0a1) )
+	ROM_LOAD( "magicrd1c.nv", 0x0000, 0x4000, CRC(d6244455) SHA1(b6389574f1d4a4a64590d544c9bafe4892feb0a1) )
 
 	ROM_REGION( 0x0100, "sereeprom", 0 ) // Serial EEPROM
 	ROM_LOAD("24lc02b.ic26",    0x0000, 0x0100, CRC(fea8a821) SHA1(c744cac6af7621524fc3a2b0a9a135a32b33c81b) )
@@ -1727,7 +1725,7 @@ ROM_END
 
 
 /*
-  Unknown 'TE06'
+  magicrd1
   Version 1.1 14.09.94
 
   PCB layout:
@@ -1793,7 +1791,7 @@ ROM_END
   XTAL3 = 3.686JB (PIC?)
 
 */
-ROM_START( unkte06 )
+ROM_START( magicrd1 )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "m27c4002.bin", 0x00000, 0x80000, CRC(229a504f) SHA1(8033e9b4cb55f2364bf4606375ef9ac05fc715fe) )
 
@@ -1804,7 +1802,7 @@ ROM_START( unkte06 )
 	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(cbcc1a42) SHA1(4b577c85f5856192ce04051a2d305a9080192177) ) // created to match game
 
 	ROM_REGION(0x4000, "nvram", 0) /* Default NVRAM */
-	ROM_LOAD( "unkte06.nv", 0x0000, 0x4000, CRC(5b62f04a) SHA1(0cc6404e1bb66801a562ff7a1479859c17e9f209) )
+	ROM_LOAD( "magicrd1.nv", 0x0000, 0x4000, CRC(5b62f04a) SHA1(0cc6404e1bb66801a562ff7a1479859c17e9f209) )
 ROM_END
 
 /*
@@ -1888,9 +1886,8 @@ ROM_END
 
 
 /*
-  Unknown 'W'
-  Poker Game.
-  Version: 1.2 200/93
+  
+  Magic Card - Wien v1.2 200/93 set 2
 
   PCB layout:
 
@@ -1974,7 +1971,7 @@ ROM_END
   +-------------------------------+
 
 */
-ROM_START( unkpkr_w )
+ROM_START( magicrd1d )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "w.bin", 0x00000, 0x80000, CRC(28300427) SHA1(83ea014a818246f476d769ad06cb2eba1ce699e8) )
 
@@ -1982,7 +1979,7 @@ ROM_START( unkpkr_w )
 	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(cbcc1a42) SHA1(4b577c85f5856192ce04051a2d305a9080192177) ) // created to match game
 
 	ROM_REGION(0x4000, "nvram", 0) /* Default NVRAM */
-	ROM_LOAD( "unkpkr_w.nv", 0x0000, 0x4000, CRC(2d2e1082) SHA1(f288fa800da59dc89cdca02e528c94161b149f1c) )
+	ROM_LOAD( "magicrd1d.nv", 0x0000, 0x4000, CRC(2d2e1082) SHA1(f288fa800da59dc89cdca02e528c94161b149f1c) )
 ROM_END
 
 /*
@@ -2165,24 +2162,24 @@ ROM_END
 
 //    YEAR  NAME       PARENT    MACHINE          INPUT     STATE           INIT           ROT    COMPANY   FULLNAME                                     FLAGS
 
-GAME( 199?, magicard,   0,        magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (set 1)",                         MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 199?, magicarda,  magicard, magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (set 2)",                         MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 199?, magicardb,  0,        magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (set 3)",                         MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1994, magicarde,  0,        hotslots_pic54, magicarde, hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.11a, set 1)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1994, magicardea, magicarde,hotslots_pic54, magicarde, hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.11a, set 2)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1994, magicardeb, magicarde,hotslots,       magicarde, hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.09a)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1998, magicardec, 0,        hotslots,       magicarde, hotslots_state, empty_init, ROT0, "Impera",    "Magic Card III Jackpot (V4.01 6/98)",        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1994, magicardf,  magicarde,hotslots,       magicarde, hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (V2.11a, set 3)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1998, magicardj,  0,        hotslots,       magicarde, hotslots_state, empty_init, ROT0, "Impera",    "Magic Card III Jackpot (V4.01 7/98)",        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1993, magicardw,  magicardb,magicard_pic54, magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card - Wien (Sicherheitsversion 1.2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, magicard,   0,        magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v2.01)",                         MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1994, magicrd1,   0,        magicard_pic56, magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.10 14.09.94)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1993, magicrd1a,  magicrd1, magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.5 17.12.93, set 1)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1993, magicrd1b,  magicrd1, magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.5 17.12.93, set 2)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1993, magicrd1c,  magicrd1, magicard_pic54, magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.2 200/93, set 1)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1993, magicrd1d,  magicrd1, magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.2 200/93, set 2)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1994, magicrde,   0,        hotslots_pic54, magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.11a, set 1)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1994, magicrdea,  magicrde, hotslots_pic54, magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.11a, set 2)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1994, magicrdeb,  magicrde, hotslots,       magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (V2.11a, set 3)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1994, magicrdec,  magicrde, hotslots,       magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.09a)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1998, magicrdj,   0,        hotslots,       magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card III Jackpot (V4.01 6/98)",        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1998, magicrdja,  magicrdj, hotslots,       magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card III Jackpot (V4.01 7/98)",        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 2001, magicle,    0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Lotto Export (5.03)",                  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 2002, hotslots,   0,        hotslots,       hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Hot Slots (6.00)",                           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1999, quingo,     0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Quingo Export (5.00)",                       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1999, belslots,   0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Bel Slots Export (5.01)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 2001, bigdeal0,   0,        magicle,        magicard,  hotslots_state, empty_init, ROT0, "Impera",    "Big Deal Belgien (5.04)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 199?, puzzleme,   0,        puzzleme,       puzzleme,  hotslots_state, empty_init, ROT0, "Impera",    "Puzzle Me!",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1994, unkte06,    magicardb,unkte06,        magicard,  magicard_state, empty_init, ROT0, "Impera",    "unknown Poker 'TE06'",                       MACHINE_SUPPORTS_SAVE ) // strings in ROM
-GAME( 199?, lucky7i,    0,        magicard,       lucky7i,   magicard_state, empty_init, ROT0, "Impera",    "Lucky 7 (Impera) V04/91a",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1993, unkpkr_w,   magicardb,magicard,       magicard,  magicard_state, empty_init, ROT0, "<unknown>", "unknown Poker 'W'",                          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1991, lucky7i,    0,        magicard,       lucky7i,   magicard_state, empty_init, ROT0, "Impera",    "Lucky 7 (Impera) V04/91a",                   MACHINE_SUPPORTS_SAVE )
 GAME( 1993, dallaspk,   0,        magicard,       dallaspk,  magicard_state, empty_init, ROT0, "<unknown>", "Dallas Poker",                               MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1993, kajotcrd,   0,        hotslots,       magicard,  hotslots_state, empty_init, ROT0, "Amatic",    "Kajot Card (Version 1.01, Wien Euro)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

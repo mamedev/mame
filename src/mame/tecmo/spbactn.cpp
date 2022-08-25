@@ -148,6 +148,7 @@ cpu #0 (PC=00001A1A): unmapped memory word write to 00090030 = 00F7 & 00FF
 #include "speaker.h"
 #include "tilemap.h"
 
+#include "spbactnp.lh"
 
 // configurable logging
 #define LOG_PROTO     (1U <<  1)
@@ -227,7 +228,12 @@ class spbactnp_state : public spbactn_state
 public:
 	spbactnp_state(const machine_config &mconfig, device_type type, const char *tag) :
 		spbactn_state(mconfig, type, tag),
-		m_extraram(*this, "extraram%u", 1U)
+		m_extracpu(*this, "extracpu"),
+		m_extralatch(*this, "extralatch"),
+		m_extraram(*this, "extraram%u", 1U),
+		m_extrapalette(*this, "extrapalette"),
+		m_extragfxdecode(*this, "extragfxdecode"),
+		m_extrascreen(*this, "extrascreen")
 	{ }
 
 	void spbactnp(machine_config &config);
@@ -236,7 +242,12 @@ protected:
 	virtual void video_start() override;
 
 private:
+	required_device<cpu_device> m_extracpu;
+	required_device<generic_latch_16_device> m_extralatch;
 	required_shared_ptr_array<uint8_t, 2> m_extraram;
+	required_device<palette_device> m_extrapalette;
+	required_device<gfxdecode_device> m_extragfxdecode;
+	required_device<screen_device> m_extrascreen;
 
 	tilemap_t *m_extra_tilemap = nullptr;
 
@@ -245,12 +256,15 @@ private:
 
 	void _9000a_w(uint16_t data);
 	void _9000c_w(uint16_t data);
-	void _9000e_w(uint16_t data);
+	void extrascreen_latch_w(uint16_t data);
 
-	void _90124_w(uint16_t data);
-	void _9012c_w(uint16_t data);
+	void bg_scrolly_w(uint16_t data);
+	void bg_scrollx_w(uint16_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t extrascreen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	uint8_t extra_latch_r(offs_t offset);
 
 	void extra_map(address_map &map);
 	void main_map(address_map &map);
@@ -311,35 +325,35 @@ void spbactn_state::video_start()
 void spbactnp_state::video_start()
 {
 	spbactn_state::video_start();
-	// no idea..
-	m_extra_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spbactnp_state::get_extra_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 16, 16);
+
+	m_extra_tilemap = &machine().tilemap().create(*m_extragfxdecode, tilemap_get_info_delegate(*this, FUNC(spbactnp_state::get_extra_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
 void spbactnp_state::_9000c_w(uint16_t data)
 {
-	LOGPROTO("_9000c_w %04x\n", data);
+	LOGPROTO("%s: _9000c_w %04x\n", machine().describe_context(), data);
 }
 
-void spbactnp_state::_9000e_w(uint16_t data)
+void spbactnp_state::extrascreen_latch_w(uint16_t data)
 {
-	LOGPROTO("_9000e_w %04x\n", data);
+	LOGPROTO("%s: extrascreen_latch_w %04x\n", machine().describe_context(), data);
+	m_extralatch->write(data);
 }
 
 void spbactnp_state::_9000a_w(uint16_t data)
 {
-	LOGPROTO("_9000a_w %04x\n", data);
+	LOGPROTO("%s: _9000a_w %04x\n", machine().describe_context(), data);
 }
 
-void spbactnp_state::_90124_w(uint16_t data)
+void spbactnp_state::bg_scrolly_w(uint16_t data)
 {
-	LOGPROTO("_90124_w %04x\n", data);
+	LOGPROTO("bg_scrolly_w %04x\n", data);
 	m_bg_tilemap->set_scrolly(0, data);
-
 }
 
-void spbactnp_state::_9012c_w(uint16_t data)
+void spbactnp_state::bg_scrollx_w(uint16_t data)
 {
-	LOGPROTO("_9012c_w %04x\n", data);
+	LOGPROTO("bg_scrollx_w %04x\n", data);
 	m_bg_tilemap->set_scrollx(0, data);
 }
 
@@ -347,14 +361,14 @@ void spbactnp_state::_9012c_w(uint16_t data)
 void spbactnp_state::extraram_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&m_extraram[0][offset]);
-	m_extra_tilemap->mark_tile_dirty(offset / 2);
+	m_extra_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
 TILE_GET_INFO_MEMBER(spbactnp_state::get_extra_tile_info)
 {
-	int tileno = m_extraram[0][(tile_index * 2) + 1];
-	tileno |= m_extraram[0][(tile_index * 2)] << 8;
-	tileinfo.set(3, tileno, 0, 0);
+	int tileno = m_extraram[0][(tile_index)];
+	tileno |= m_extraram[0][(tile_index + 0x800)] << 8;
+	tileinfo.set(0, tileno & 0xfff, tileno >> 12, 0);
 }
 
 
@@ -383,13 +397,14 @@ uint32_t spbactn_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 uint32_t spbactnp_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	// hack to make the extra CPU do something..
-	m_extraram[1][0x104] = machine().rand();
-	m_extraram[1][0x105] = machine().rand();
-
 	return draw_video(screen, bitmap, cliprect, true);
 }
 
+uint32_t spbactnp_state::extrascreen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	m_extra_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	return 0;
+}
 
 // machine
 
@@ -461,12 +476,12 @@ void spbactnp_state::main_map(address_map &map)
 	map(0x90002, 0x90003).portr("IN1").w(FUNC(spbactnp_state::main_irq_ack_w));
 	map(0x90006, 0x90007).portr("DSW");
 	map(0x90007, 0x90007).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x9000a, 0x9000b).w(FUNC(spbactnp_state::_9000a_w));
-	map(0x9000c, 0x9000d).w(FUNC(spbactnp_state::_9000c_w));
-	map(0x9000e, 0x9000f).w(FUNC(spbactnp_state::_9000e_w));
+	map(0x9000a, 0x9000b).w(FUNC(spbactnp_state::_9000a_w)); // maybe lamps?
+	map(0x9000c, 0x9000d).w(FUNC(spbactnp_state::_9000c_w)); // maybe lamps?
+	map(0x9000e, 0x9000f).w(FUNC(spbactnp_state::extrascreen_latch_w));
 
-	map(0x90124, 0x90125).w(FUNC(spbactnp_state::_90124_w)); // bg scroll
-	map(0x9012c, 0x9012d).w(FUNC(spbactnp_state::_9012c_w)); // bg scroll
+	map(0x90124, 0x90125).w(FUNC(spbactnp_state::bg_scrolly_w)); // bg scroll
+	map(0x9012c, 0x9012d).w(FUNC(spbactnp_state::bg_scrollx_w)); // bg scroll
 }
 
 void spbactn_state::sound_map(address_map &map)
@@ -481,15 +496,22 @@ void spbactn_state::sound_map(address_map &map)
 }
 
 
+uint8_t spbactnp_state::extra_latch_r(offs_t offset)
+{
+	uint16_t latch = m_extralatch->read();
+	return (offset & 1) ? (latch >> 8) : (latch & 0xff);
+}
+
 
 void spbactnp_state::extra_map(address_map &map)
 {
-	map(0x0000, 0xffff).noprw();
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram().share(m_extraram[1]);
-	map(0xe000, 0xefff).ram();
-	map(0xd000, 0xd1ff).ram().w(FUNC(spbactnp_state::extraram_w)).share(m_extraram[0]);
+	map(0xe000, 0xefff).ram().w(FUNC(spbactnp_state::extraram_w)).share(m_extraram[0]);
+	map(0xd000, 0xd1ff).ram().w(m_extrapalette, FUNC(palette_device::write8)).share("extrapalette");
 	map(0xd200, 0xd200).ram();
+
+	map(0xd800, 0xd801).r(FUNC(spbactnp_state::extra_latch_r));
 }
 
 
@@ -724,9 +746,10 @@ static GFXDECODE_START( gfx_spbactnp )
 	GFXDECODE_ENTRY( "fgtiles", 0, proto_fgtilelayout,   0x0200, 16 + 240 )
 	GFXDECODE_ENTRY( "bgtiles", 0, proto_fgtilelayout,   0x0300, 16 + 128 ) // wrong
 	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_packed_msb, 0x0000, 16 + 384 )
+GFXDECODE_END
 
-	GFXDECODE_ENTRY( "unkgfx",  0, gfx_8x8x4_packed_msb, 0x0000, 16 + 384 ) // more sprites maybe?
-
+static GFXDECODE_START( gfx_extraspbactnp )
+	GFXDECODE_ENTRY( "extragfx",  0, gfx_8x8x4_packed_msb, 0x0000, 16 )
 GFXDECODE_END
 
 
@@ -783,11 +806,12 @@ void spbactnp_state::spbactnp(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(4'000'000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &spbactnp_state::sound_map);
 
-	// yes another CPU..
-	z80_device &extracpu(Z80(config, "extracpu", XTAL(4'000'000)));
-	extracpu.set_addrmap(AS_PROGRAM, &spbactnp_state::extra_map);
-	extracpu.set_vblank_int("screen", FUNC(spbactnp_state::irq0_line_hold));
-//  extracpu.set_vblank_int("screen", FUNC(spbactnp_state::nmi_line_pulse));
+	Z80(config, m_extracpu, XTAL(4'000'000));
+	m_extracpu->set_addrmap(AS_PROGRAM, &spbactnp_state::extra_map);
+	m_extracpu->set_vblank_int("extrascreen", FUNC(spbactnp_state::irq0_line_hold));
+
+	GENERIC_LATCH_16(config, m_extralatch);
+	m_extralatch->data_pending_callback().set_inputline(m_extracpu, INPUT_LINE_NMI);
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -796,9 +820,23 @@ void spbactnp_state::spbactnp(machine_config &config)
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(spbactnp_state::screen_update));
+	m_screen->set_orientation(ROT90);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spbactnp);
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 0x2800 / 2);
+
+	SCREEN(config, m_extrascreen, SCREEN_TYPE_RASTER);
+	m_extrascreen->set_refresh_hz(60);
+	m_extrascreen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_extrascreen->set_size(32*8, 32*8);
+	m_extrascreen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_extrascreen->set_screen_update(FUNC(spbactnp_state::extrascreen_update));
+
+	GFXDECODE(config, m_extragfxdecode, m_extrapalette, gfx_extraspbactnp);
+	PALETTE(config, m_extrapalette).set_format(palette_device::xBRG_444, 0x1000 / 2);
+	m_extrapalette->set_endianness(ENDIANNESS_BIG);
+
+	config.set_default_layout(layout_spbactnp);
 
 	TECMO_SPRITE(config, m_sprgen, 0);
 
@@ -808,8 +846,9 @@ void spbactnp_state::spbactnp(machine_config &config)
 	m_mixer->set_regularcols( 0x0800 + 0x300, 0x0800 + 0x200, 0x0800 + 0x100, 0x0800 + 0x000 );
 	m_mixer->set_blendsource( 0x1000 + 0x000, 0x1000 + 0x100);
 	m_mixer->set_bgpen(0x800 + 0x300, 0x000 + 0x300);
+	m_mixer->set_screen(m_screen);
 
-	// sound hardware  - different?
+	// sound hardware - different?
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
@@ -887,7 +926,6 @@ ROM_START( spbactnp )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "spa.17g", 0x00000, 0x10000, CRC(445fc2c5) SHA1(c0e40496cfcaa0a8c90fb05111fadee74582f91a) )
 
-
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "spa_data_2-21-a10.8e",   0x00000, 0x20000,  CRC(87427d7d) SHA1(f76b0dc3f0d87deb0f0c81084aff9756b236e867) ) // same as regular
 
@@ -903,12 +941,10 @@ ROM_START( spbactnp )
 	ROM_LOAD( "spa_sp0_4-18-p-8.5m",  0x00000, 0x20000, CRC(cd6ba360) SHA1(a01f65a678b6987ae877c381f74515efee4b492e) )
 	ROM_LOAD( "spa_sp1_3-14-a-10.4m", 0x20000, 0x20000, CRC(86406336) SHA1(bf091dc13404535e6baee990f5e957d3538841ac) )
 
-
-	// does this have an extra (horizontal) screen maybe, with the girls being displayed on that instead of the main one..
-	ROM_REGION( 0x10000, "extracpu", 0 ) // what? it's another z80 ROM...
+	ROM_REGION( 0x10000, "extracpu", 0 )
 	ROM_LOAD( "6204_6-6.29c",   0x00000, 0x10000, CRC(e8250c26) SHA1(9b669878790c8e3c5d80f165b5ffa1d6830f4696) )
 
-	ROM_REGION( 0x080000, "unkgfx", 0 ) // more 8x8 tiles, with the girl graphics? unused for now .. for horizontal orientation??
+	ROM_REGION( 0x080000, "extragfx", 0 )
 	ROM_LOAD( "spa.25c", 0x00000, 0x20000, CRC(02b69ab9) SHA1(368e774693a6fab756faaeec4ffd42406816e6e2) )
 
 	ROM_REGION( 0x253, "misc", 0 ) //misc
@@ -922,4 +958,5 @@ ROM_END
 
 GAME( 1991, spbactn,  0,       spbactn,  spbactn,  spbactn_state,  empty_init, ROT90, "Tecmo", "Super Pinball Action (US)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1991, spbactnj, spbactn, spbactn,  spbactn,  spbactn_state,  empty_init, ROT90, "Tecmo", "Super Pinball Action (Japan)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, spbactnp, spbactn, spbactnp, spbactnp, spbactnp_state, empty_init, ROT90, "Tecmo", "Super Pinball Action (prototype)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // early proto, (c) date is 2 years earlier!
+ // early proto, (c) date is 2 years earlier and seems to have been designed for a 'pinball' style cabinet with 2nd display?
+GAME( 1989, spbactnp, spbactn, spbactnp, spbactnp, spbactnp_state, empty_init, ROT0, "Tecmo", "Super Pinball Action (US, prototype, dual screen)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

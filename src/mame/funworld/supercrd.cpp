@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Roberto Fresca
+// copyright-holders: Roberto Fresca
+
 /**********************************************************************************
 
   Super Card - Fun World.
@@ -21,7 +22,7 @@
 
 ***********************************************************************************
 
-  Herdware Notes....
+  Hardware Notes....
 
   CPU:     Fun World custom CPU based on Z80 family.
   Denom:   SUPCA.
@@ -161,19 +162,20 @@
 ***********************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "video/mc6845.h"
 #include "video/resnet.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
 
 
-#define MASTER_CLOCK    XTAL(16'000'000)
-
+namespace {
 
 class supercrd_state : public driver_device
 {
@@ -182,11 +184,15 @@ public:
 		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
+		m_decrypted_opcodes(*this, "decrypted_opcodes"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	void supercrd(machine_config &config);
+
+	void init_fruitstr();
+	void init_supercrd();
 
 protected:
 	virtual void video_start() override;
@@ -194,16 +200,18 @@ protected:
 private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_decrypted_opcodes;
 	tilemap_t *m_bg_tilemap = nullptr;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	void supercrd_videoram_w(offs_t offset, uint8_t data);
-	void supercrd_colorram_w(offs_t offset, uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	void supercrd_palette(palette_device &palette) const;
-	uint32_t screen_update_supercrd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void supercrd_map(address_map &map);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void prg_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map);
 };
 
 
@@ -211,7 +219,7 @@ private:
 *     Video Hardware     *
 *************************/
 
-void supercrd_state::supercrd_palette(palette_device &palette) const
+void supercrd_state::palette(palette_device &palette) const
 {
 	uint8_t const *const color_prom = memregion("proms")->base();
 	static constexpr int resistances_rb[3] = { 1000, 470, 220 };
@@ -249,13 +257,13 @@ void supercrd_state::supercrd_palette(palette_device &palette) const
 }
 
 
-void supercrd_state::supercrd_videoram_w(offs_t offset, uint8_t data)
+void supercrd_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-void supercrd_state::supercrd_colorram_w(offs_t offset, uint8_t data)
+void supercrd_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -269,10 +277,10 @@ TILE_GET_INFO_MEMBER(supercrd_state::get_bg_tile_info)
     xxxx ----   tiles color.
     ---- xxxx   unused.
 */
-	int offs = tile_index;
-	int attr = m_videoram[offs] + (m_colorram[offs] << 8);
-	int code = attr & 0xfff;
-	int color = m_colorram[offs] >> 4;  // 4 bits for color.
+	int const offs = tile_index;
+	int const attr = m_videoram[offs] + (m_colorram[offs] << 8);
+	int const code = attr & 0xfff;
+	int const color = m_colorram[offs] >> 4;  // 4 bits for color.
 
 	tileinfo.set(0, code, color, 0);
 }
@@ -284,7 +292,7 @@ void supercrd_state::video_start()
 }
 
 
-uint32_t supercrd_state::screen_update_supercrd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t supercrd_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -295,14 +303,19 @@ uint32_t supercrd_state::screen_update_supercrd(screen_device &screen, bitmap_rg
 *   Memory map information   *
 *****************************/
 
-void supercrd_state::supercrd_map(address_map &map)
+void supercrd_state::prg_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xcfff).ram().w(FUNC(supercrd_state::supercrd_videoram_w)).share("videoram"); // wrong
-	map(0xd000, 0xdfff).ram().w(FUNC(supercrd_state::supercrd_colorram_w)).share("colorram"); // wrong
+	map(0xc000, 0xcfff).ram().w(FUNC(supercrd_state::videoram_w)).share(m_videoram); // wrong
+	map(0xd000, 0xdfff).ram().w(FUNC(supercrd_state::colorram_w)).share(m_colorram); // wrong
 //  map(0x0000, 0x0000).ram().share("nvram");
 //  map(0xe000, 0xe000).w("crtc", FUNC(mc6845_device::address_w));
 //  map(0xe001, 0xe001).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+}
+
+void supercrd_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom().share(m_decrypted_opcodes);
 }
 
 
@@ -409,13 +422,13 @@ static const gfx_layout charlayout =
 * Graphics Decode Information *
 ******************************/
 
-/* The palette system is adressable through a PLD.
+/* The palette system is addressable through a PLD.
    The game could have 2 different palettes, located
    in the first and second half of the bipolar PROM.
 */
 
-static GFXDECODE_START( gfx_supercrd )  /* Adressing the first half of the palette */
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
+static GFXDECODE_START( gfx_supercrd )  // Addressing the first half of the palette
+	GFXDECODE_ENTRY( "tiles", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
 
@@ -425,33 +438,36 @@ GFXDECODE_END
 
 void supercrd_state::supercrd(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, MASTER_CLOCK/8);    /* 2MHz, guess */
-	m_maincpu->set_addrmap(AS_PROGRAM, &supercrd_state::supercrd_map);
+	static constexpr XTAL MASTER_CLOCK = XTAL(16'000'000);
+
+	// basic machine hardware
+	Z80(config, m_maincpu, MASTER_CLOCK / 8);    // 2MHz, guess
+	m_maincpu->set_addrmap(AS_PROGRAM, &supercrd_state::prg_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &supercrd_state::decrypted_opcodes_map);
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 //  I8255(config, "ppi8255_0", 0);
 //  I8255(config, "ppi8255_1", 0);
 
-	/* video hardware */
+	// video hardware
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size((124+1)*4, (30+1)*8);               /* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1) */
-	screen.set_visarea(0*4, 96*4-1, 0*8, 29*8-1);  /* Taken from MC6845 init, registers 01 & 06 */
-	screen.set_screen_update(FUNC(supercrd_state::screen_update_supercrd));
+	screen.set_size((124+1)*4, (30+1)*8);               // Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1)
+	screen.set_visarea(0*4, 96*4-1, 0*8, 29*8-1);  // Taken from MC6845 init, registers 01 & 06
+	screen.set_screen_update(FUNC(supercrd_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_supercrd);
-	PALETTE(config, "palette", FUNC(supercrd_state::supercrd_palette), 0x200);
+	PALETTE(config, "palette", FUNC(supercrd_state::palette), 0x200);
 
-//  mc6845_device &crtc(MC6845(config, "crtc",  MASTER_CLOCK/8));
+//  mc6845_device &crtc(MC6845(config, "crtc",  MASTER_CLOCK / 8));
 //  crtc.set_screen("screen");
 //  crtc.set_show_border_area(false);
 //  crtc.set_char_width(4);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 //  .add_route(ALL_OUTPUTS, "mono", 0.75);
@@ -464,15 +480,16 @@ void supercrd_state::supercrd(machine_config &config)
 
 ROM_START( supercrd )
 	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "supca_417_ce1.ic37", 0x00000, 0x10000, CRC(b67f7d38) SHA1(eaf8f24d476185d4744858afcbf0005362f49cab) )    // wrong... 1st and 3rd quarter: program
-	ROM_LOAD( "supca_417_ce2.ic51", 0x10000, 0x08000, CRC(36415f73) SHA1(9881b88991f034d79260502289432a7318aa1647) )    // wrong
+	ROM_LOAD( "supca_417_ce1.ic37", 0x00000, 0x08000, CRC(b67f7d38) SHA1(eaf8f24d476185d4744858afcbf0005362f49cab) )
+	ROM_CONTINUE(                   0x00000, 0x08000 )
+	ROM_LOAD( "supca_417_ce2.ic51", 0x08000, 0x08000, CRC(36415f73) SHA1(9881b88991f034d79260502289432a7318aa1647) )    // wrong
 	ROM_IGNORE(                     0x8000)
 
 	ROM_REGION( 0x20000, "gfxtemp", 0 )
 	ROM_LOAD( "supca_410_zg2.ic11", 0x00000, 0x10000, CRC(a4646dc6) SHA1(638ad334bb4f1430381474ddfaa1029cb4d13916) )
 	ROM_LOAD( "supca_410_zg1.ic10", 0x10000, 0x10000, CRC(d3d9ae13) SHA1(4825677bbab2b77ce5aa6500c55a61874932b319) )
 
-	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_REGION( 0x10000, "tiles", 0 )
 	ROM_COPY( "gfxtemp",            0x08000, 0x0000, 0x8000 )   // ok
 	ROM_COPY( "gfxtemp",            0x18000, 0x8000, 0x8000 )   // ok
 
@@ -509,7 +526,7 @@ ROM_START( fruitstr )
 	ROM_LOAD( "fruitstar_zg2.ic11", 0x00000, 0x10000, CRC(4feddc60) SHA1(27a724e4d3273800bbf2f23628737a9be29fe5db) )
 	ROM_LOAD( "fruitstar_zg1.ic10", 0x10000, 0x10000, CRC(c69deb11) SHA1(00988c81a11ad96e4d789c53cfdced9ba8ee9ce0) )
 
-	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_REGION( 0x10000, "tiles", 0 )
 	ROM_COPY( "gfxtemp",            0x08000, 0x0000, 0x8000 )   // ok
 	ROM_COPY( "gfxtemp",            0x18000, 0x8000, 0x8000 )   // ok
 
@@ -519,6 +536,170 @@ ROM_START( fruitstr )
 ROM_END
 
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT        ROT   COMPANY      FULLNAME                  FLAGS
-GAME( 1992, supercrd, 0,      supercrd, supercrd, supercrd_state, empty_init, ROT0, "Fun World", "Super Card (encrypted)", MACHINE_NOT_WORKING )
-GAME( 1992, fruitstr, 0,      supercrd, supercrd, supercrd_state, empty_init, ROT0, "Fun World", "Fruit Star (encrypted)", MACHINE_NOT_WORKING )
+/*
+Preliminary encryption observations:
+- only opcodes seem to be encrypted;
+- there seem to be 4 XOR tables selected by bits 0 and 1 of the address;
+- within a table the XOR seems to be chosen depending on bits 0, 1, 2, 3, 4, 6, 7 of the data. Only bit 5 isn't considered;
+- XOR values seem to only affect bits 0, 1, 4 and 6;
+- the games use different XOR tables;
+- code is mostly the same for both games up to 0x96e, then they start differing significantly;
+- it seems the encryption concept is the same or really similar to ladylinrb,c,d,e in igs/goldstar.cpp.
+*/
+
+void supercrd_state::init_supercrd() // TODO: decrypt
+{
+	uint8_t unkn = 0x00;
+
+	static const uint8_t xor_table_00[0x08][0x08] =
+	{
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x0x and 0x2x
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x1x and 0x3x
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x4x and 0x6x
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x5x and 0x7x
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x8x and 0xax
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x9x and 0xbx
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0xcx and 0xex
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0xdx and 0xfx
+	};
+
+	static const uint8_t xor_table_01[0x08][0x08] =
+	{
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x0x and 0x2x
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x1x and 0x3x
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x4x and 0x6x
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x5x and 0x7x
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x8x and 0xax
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x9x and 0xbx
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0xcx and 0xex
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0xdx and 0xfx
+	};
+
+	static const uint8_t xor_table_02[0x08][0x08] =
+	{
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x0x and 0x2x
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x1x and 0x3x
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x4x and 0x6x
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x5x and 0x7x
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x8x and 0xax
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x9x and 0xbx
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0xcx and 0xex
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0xdx and 0xfx
+	};
+
+	static const uint8_t xor_table_03[0x08][0x08] =
+	{
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x0x and 0x2x
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x1x and 0x3x
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x4x and 0x6x
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x5x and 0x7x
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x8x and 0xax
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x9x and 0xbx
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0xcx and 0xex
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0xdx and 0xfx
+	};
+
+	const uint8_t *rom = memregion("maincpu")->base();
+	uint32_t const len = memregion("maincpu")->bytes();
+
+	for (int i = 0; i < len; i++)
+	{
+		uint8_t x = rom[i];
+
+		uint8_t const row = (BIT(x, 4) +  (BIT(x, 6) << 1) + (BIT(x, 7) << 2));
+
+		uint8_t const xor_v = x & 0x07;
+
+		switch (i & 0x03)
+		{
+			case 0x00: x ^= xor_table_00[row][xor_v]; break;
+			case 0x01: x ^= xor_table_01[row][xor_v]; break;
+			case 0x02: x ^= xor_table_02[row][xor_v]; break;
+			case 0x03: x ^= xor_table_03[row][xor_v]; break;
+		}
+
+		m_decrypted_opcodes[i] = x;
+	}
+}
+
+void supercrd_state::init_fruitstr() // TODO: decrypt
+{
+	uint8_t unkn = 0x00;
+
+	static const uint8_t xor_table_00[0x08][0x08] =
+	{
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x0x and 0x2x
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x1x and 0x3x
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x4x and 0x6x
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x5x and 0x7x
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x8x and 0xax
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x9x and 0xbx
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0xcx and 0xex
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0xdx and 0xfx
+	};
+
+	static const uint8_t xor_table_01[0x08][0x08] =
+	{
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x0x and 0x2x
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x1x and 0x3x
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x4x and 0x6x
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x5x and 0x7x
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x8x and 0xax
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x9x and 0xbx
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0xcx and 0xex
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0xdx and 0xfx
+	};
+
+	static const uint8_t xor_table_02[0x08][0x08] =
+	{
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x0x and 0x2x
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x1x and 0x3x
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x4x and 0x6x
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x5x and 0x7x
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x8x and 0xax
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x9x and 0xbx
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0xcx and 0xex
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0xdx and 0xfx
+	};
+
+	static const uint8_t xor_table_03[0x08][0x08] =
+	{
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x0x and 0x2x
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x1x and 0x3x
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x4x and 0x6x
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x5x and 0x7x
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x8x and 0xax
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0x9x and 0xbx
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0xcx and 0xex
+		{ unkn, unkn, unkn, unkn, unkn, unkn, unkn, unkn }, // 0xdx and 0xfx
+	};
+
+	const uint8_t *rom = memregion("maincpu")->base();
+	uint32_t const len = memregion("maincpu")->bytes();
+
+	for (int i = 0; i < len; i++)
+	{
+		uint8_t x = rom[i];
+
+		uint8_t const row = (BIT(x, 4) +  (BIT(x, 6) << 1) + (BIT(x, 7) << 2));
+
+		uint8_t const xor_v = x & 0x07;
+
+		switch (i & 0x03)
+		{
+			case 0x00: x ^= xor_table_00[row][xor_v]; break;
+			case 0x01: x ^= xor_table_01[row][xor_v]; break;
+			case 0x02: x ^= xor_table_02[row][xor_v]; break;
+			case 0x03: x ^= xor_table_03[row][xor_v]; break;
+		}
+
+		m_decrypted_opcodes[i] = x;
+	}
+}
+
+} // anonymous namespace
+
+
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT           ROT   COMPANY      FULLNAME                  FLAGS
+GAME( 1992, supercrd, 0,      supercrd, supercrd, supercrd_state, init_supercrd, ROT0, "Fun World", "Super Card (encrypted)", MACHINE_IS_SKELETON )
+GAME( 1992, fruitstr, 0,      supercrd, supercrd, supercrd_state, init_fruitstr, ROT0, "Fun World", "Fruit Star (encrypted)", MACHINE_IS_SKELETON )

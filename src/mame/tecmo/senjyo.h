@@ -5,10 +5,13 @@
 
 #pragma once
 
-#include "sound/dac.h"
+#include "machine/gen_latch.h"
 #include "machine/z80daisy.h"
-#include "machine/z80pio.h"
 #include "machine/z80ctc.h"
+#include "machine/z80pio.h"
+#include "sound/dac.h"
+#include "sound/flt_vol.h"
+
 #include "emupal.h"
 #include "tilemap.h"
 
@@ -20,6 +23,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_pio(*this, "z80pio"),
 		m_dac(*this, "dac"),
+		m_dac_prom(*this, "dac"),
+		m_volume(*this, "volume"),
+		m_soundlatch(*this, "soundlatch"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_radar_palette(*this, "radar_palette"),
@@ -53,14 +59,16 @@ public:
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	virtual void video_start() override;
 
 private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
-	required_device<dac_byte_interface> m_dac;
+	required_device<dac_8bit_r2r_device> m_dac;
+	required_memory_region m_dac_prom;
+	required_device<filter_volume_device> m_volume;
+	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<palette_device> m_radar_palette;
@@ -87,9 +95,7 @@ private:
 	int m_is_senjyo = 0;
 	int m_scrollhack = 0;
 
-	uint8_t m_sound_cmd = 0;
-	int m_single_volume = 0;
-	int m_sound_state = 0;
+	uint8_t m_dac_clock = 0;
 	tilemap_t *m_fg_tilemap = nullptr;
 	tilemap_t *m_bg1_tilemap = nullptr;
 	tilemap_t *m_bg2_tilemap = nullptr;
@@ -103,11 +109,10 @@ private:
 	void bg1videoram_w(offs_t offset, uint8_t data);
 	void bg2videoram_w(offs_t offset, uint8_t data);
 	void bg3videoram_w(offs_t offset, uint8_t data);
-	void volume_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(sound_line_clock);
-	void sound_cmd_w(uint8_t data);
+	void dac_volume_w(uint8_t data);
+	void dac_enable_w(uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(dac_clock_w);
 	void irq_ctrl_w(uint8_t data);
-	uint8_t pio_pa_r();
 
 	static rgb_t IIBBGGRR(uint32_t raw);
 	void radar_palette(palette_device &palette) const;
@@ -131,7 +136,5 @@ private:
 	void starforb_sound_map(address_map &map);
 };
 
-/*----------- defined in audio/senjyo.c -----------*/
-extern const z80_daisy_config senjyo_daisy_chain[];
 
 #endif // MAME_INCLUDES_SENJYO_H

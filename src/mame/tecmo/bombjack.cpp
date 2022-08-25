@@ -1,6 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Mirko Buffoni
-
 /***************************************************************************
 
 Bomb Jack
@@ -41,7 +40,6 @@ write:
 b000      interrupt enable
 b004      flip screen
 b800      command to soundboard & trigger NMI on sound board
-
 
 
 SOUND BOARD:
@@ -172,7 +170,11 @@ private:
 };
 
 
-// video
+/*************************************
+ *
+ *  Video
+ *
+ *************************************/
 
 void bombjack_state::videoram_w(offs_t offset, uint8_t data)
 {
@@ -235,19 +237,19 @@ void bombjack_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 {
 	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
-/*
- abbbbbbb cdefgggg hhhhhhhh iiiiiiii
+		/*
+		abbbbbbb cdefgggg hhhhhhhh iiiiiiii
 
- a        use big sprites (32x32 instead of 16x16)
- bbbbbbb  sprite code
- c        x flip
- d        y flip (used only in death sequence?)
- e        ? (set when big sprites are selected)
- f        ? (set only when the bonus (B) materializes?)
- gggg     color
- hhhhhhhh x position
- iiiiiiii y position
-*/
+		a        use big sprites (32x32 instead of 16x16)
+		bbbbbbb  sprite code
+		c        x flip
+		d        y flip (used only in death sequence?)
+		e        ? (set when big sprites are selected)
+		f        ? (set only when the bonus (B) materializes?)
+		gggg     color
+		hhhhhhhh x position
+		iiiiiiii y position
+		*/
 
 		int sx = m_spriteram[offs + 3];
 		int sy;
@@ -293,7 +295,11 @@ uint32_t bombjack_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-// machine
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
 
 uint8_t bombjack_state::soundlatch_read_and_clear()
 {
@@ -304,13 +310,6 @@ uint8_t bombjack_state::soundlatch_read_and_clear()
 		m_soundlatch->clear_w();
 	return res;
 }
-
-
-/*************************************
- *
- *  Address maps
- *
- *************************************/
 
 void bombjack_state::irq_mask_w(uint8_t data)
 {
@@ -564,14 +563,11 @@ void bombjack_state::bombjack(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bombjack);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 128);
 
-
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	AY8910(config, "ay1", XTAL(12'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 0.13); // Confirmed from PCB
-
 	AY8910(config, "ay2", XTAL(12'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 0.13);
-
 	AY8910(config, "ay3", XTAL(12'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 0.13);
 }
 
@@ -643,8 +639,6 @@ ROM_START( bombjack2 )
 	ROM_LOAD( "02_p04t.bin",  0x0000, 0x1000, CRC(398d4a02) SHA1(ac18a8219f99ba9178b96c9564de3978e39c59fd) )
 ROM_END
 
-
-
 ROM_START( bombjackt )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "9.1j",    0x0000, 0x4000, CRC(4b59a3bb) SHA1(dae45985d2575821c86757ead14b8313e922570d) ) // == 09_j01b.bin + 10_l01b.bin
@@ -665,8 +659,6 @@ ROM_START( bombjackt )
 	ROM_LOAD( "3.1e",  0x0000, 0x2000, CRC(54e1dac1) SHA1(3c5d8b932b2a87acf42e0b4632195776689c1154) )
 	ROM_LOAD( "4.1h",  0x2000, 0x2000, CRC(05e428ab) SHA1(0b2cae76aba8372482a4e315a9f49fd15cb94625) )
 	ROM_LOAD( "5.1k",  0x4000, 0x2000, CRC(f282f29a) SHA1(521a110213d6ecdf54be0f50f41c3c266d65d84c) )
-
-
 
 	ROM_REGION( 0x6000, "bgtiles1", 0 ) // ok
 	ROM_LOAD( "6.1l",  0x0000, 0x2000, CRC(51eebd89) SHA1(515128a3971fcb97b60c5b6bdd2b03026aec1921) )
