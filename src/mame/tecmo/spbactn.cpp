@@ -754,7 +754,7 @@ static GFXDECODE_START( gfx_spbactnp )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_extraspbactnp )
-	GFXDECODE_ENTRY( "extragfx",  0, gfx_8x8x4_packed_msb, 0x0000, 16 + 384 ) // more sprites maybe?
+	GFXDECODE_ENTRY( "extragfx",  0, gfx_8x8x4_packed_msb, 0x0000, 16 )
 GFXDECODE_END
 
 
@@ -948,10 +948,10 @@ ROM_START( spbactnp )
 	ROM_LOAD( "spa_sp0_4-18-p-8.5m",  0x00000, 0x20000, CRC(cd6ba360) SHA1(a01f65a678b6987ae877c381f74515efee4b492e) )
 	ROM_LOAD( "spa_sp1_3-14-a-10.4m", 0x20000, 0x20000, CRC(86406336) SHA1(bf091dc13404535e6baee990f5e957d3538841ac) )
 
-	ROM_REGION( 0x10000, "extracpu", 0 ) // what? it's another z80 ROM...
+	ROM_REGION( 0x10000, "extracpu", 0 )
 	ROM_LOAD( "6204_6-6.29c",   0x00000, 0x10000, CRC(e8250c26) SHA1(9b669878790c8e3c5d80f165b5ffa1d6830f4696) )
 
-	ROM_REGION( 0x080000, "extragfx", 0 ) // more 8x8 tiles, with the girl graphics? unused for now .. for horizontal orientation??
+	ROM_REGION( 0x080000, "extragfx", 0 )
 	ROM_LOAD( "spa.25c", 0x00000, 0x20000, CRC(02b69ab9) SHA1(368e774693a6fab756faaeec4ffd42406816e6e2) )
 
 	ROM_REGION( 0x253, "misc", 0 ) //misc
