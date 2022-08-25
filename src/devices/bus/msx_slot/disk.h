@@ -24,6 +24,8 @@ DECLARE_DEVICE_TYPE(MSX_SLOT_DISK4, msx_slot_disk4_device)
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK5, msx_slot_disk5_device)
 /* WD FDC accessed through 7ff0-7ff? (used in Toshiba HX34) */
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK6, msx_slot_disk6_device)
+/* MB FDC accessed through 7ff8-7ffc */
+DECLARE_DEVICE_TYPE(MSX_SLOT_DISK7, msx_slot_disk7_device)
 
 
 class msx_slot_disk_device : public msx_slot_rom_device
@@ -197,5 +199,27 @@ private:
 	void select_drive();
 };
 
+
+class msx_slot_disk7_device : public msx_slot_wd_disk_device
+{
+public:
+	msx_slot_disk7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override;
+
+private:
+	uint8_t m_drive_side_motor;
+	uint8_t m_drive_select0;
+	uint8_t m_drive_select1;
+
+	void set_drive_side_motor();
+	void select_drive();
+};
 
 #endif // MAME_BUS_MSX_SLOT_DISK_H

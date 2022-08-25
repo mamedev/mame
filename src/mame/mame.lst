@@ -31218,7 +31218,6 @@ canonv20f                       //
 canonv20g                       //
 canonv20s                       //
 canonv25                        //
-canonv30                        //
 canonv30f                       //
 canonv8                         //
 cf1200                          // 1984 MSX Japan
@@ -31363,6 +31362,7 @@ mbh1                            // 1983 MSX1
 mbh1e                           // 1984 MSX1
 mbh2                            //
 mbh25                           //
+mbh3                            //
 mbh50                           //
 mbh70                           //
 ml8000                          // 1983 MSX1
@@ -31375,6 +31375,7 @@ mlg1                            //
 mlg10                           //
 mlg3                            //
 mlg30                           //
+mlg30_2                         //
 mpc10                           //
 mpc100                          //
 mpc200                          //

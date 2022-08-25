@@ -41,6 +41,7 @@ DEFINE_DEVICE_TYPE(MSX_SLOT_DISK3, msx_slot_disk3_device, "msx_slot_disk3", "MSX
 DEFINE_DEVICE_TYPE(MSX_SLOT_DISK4, msx_slot_disk4_device, "msx_slot_disk4", "MSX Internal floppy type 4")
 DEFINE_DEVICE_TYPE(MSX_SLOT_DISK5, msx_slot_disk5_device, "msx_slot_disk5", "MSX Internal floppy type 5")
 DEFINE_DEVICE_TYPE(MSX_SLOT_DISK6, msx_slot_disk6_device, "msx_slot_disk6", "MSX Internal floppy type 6")
+DEFINE_DEVICE_TYPE(MSX_SLOT_DISK7, msx_slot_disk7_device, "msx_slot_disk7", "MSX Internal floppy type 7")
 
 
 msx_slot_disk_device::msx_slot_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -776,7 +777,7 @@ void msx_slot_disk6_device::write(offs_t offset, uint8_t data)
 			m_fdc->data_w(data);
 			break;
 
-		// Side and motort control
+		// Side and motor control
 		// bit 0 = side select
 		// bit 1 = motor on/off
 		case 0x7ff4:
@@ -801,6 +802,142 @@ void msx_slot_disk6_device::write(offs_t offset, uint8_t data)
 
 		default:
 			logerror("msx_slot_disk6_device::write: Unmapped write writing %02x to %04x\n", data, offset);
+			break;
+	}
+}
+
+
+msx_slot_disk7_device::msx_slot_disk7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK7, tag, owner, clock)
+	, m_drive_side_motor(0)
+	, m_drive_select0(0)
+	, m_drive_select1(0)
+{
+}
+
+
+void msx_slot_disk7_device::device_start()
+{
+	msx_slot_wd_disk_device::device_start();
+
+	save_item(NAME(m_drive_side_motor));
+	save_item(NAME(m_drive_select0));
+	save_item(NAME(m_drive_select1));
+}
+
+
+void msx_slot_disk7_device::device_reset()
+{
+	m_fdc->dden_w(false);
+}
+
+
+void msx_slot_disk7_device::device_post_load()
+{
+	select_drive();
+}
+
+
+void msx_slot_disk7_device::select_drive()
+{
+	m_drive_select0 = 0;
+	m_drive_select1 = 0;
+	m_floppy = nullptr;
+
+	if ((m_drive_side_motor & 0x03) == 0x01)
+	{
+		m_floppy = m_floppy0 ? m_floppy0->get_device() : nullptr;
+		if (m_floppy)
+			m_drive_select0 = 1;
+	}
+
+	if ((m_drive_side_motor & 0x03) == 0x02)
+	{
+		m_floppy = m_floppy1 ? m_floppy1->get_device() : nullptr;
+		if (m_floppy)
+			m_drive_select1 = 1;
+	}
+
+	m_fdc->set_floppy(m_floppy);
+}
+
+
+void msx_slot_disk7_device::set_drive_side_motor()
+{
+	select_drive();
+
+	if (m_floppy)
+	{
+		m_floppy->mon_w((m_drive_side_motor & 0x08) ? 0 : 1);
+		m_floppy->ss_w(m_drive_side_motor & 0x04);
+	}
+}
+
+
+uint8_t msx_slot_disk7_device::read(offs_t offset)
+{
+	switch (offset)
+	{
+		case 0x7ff8:   // status
+			return m_fdc->status_r();
+
+		case 0x7ff9:   // track
+			return m_fdc->track_r();
+
+		case 0x7ffa:   // sector
+			return m_fdc->sector_r();
+
+		case 0x7ffb:   // data
+			return m_fdc->data_r();
+
+		case 0x7ffc:   // drive status
+			printf("drive status, m_floppy is %s\n", m_floppy ? "not null" : "null");
+			return (m_drive_side_motor & 0x0c)
+				| (m_drive_select0 ? 0x01 : 0x00)  // or bit0 from m_drive_side_motor?
+				| (m_drive_select1 ? 0x02 : 0x00)  // or bit1 from m_drive_side_motor?
+				| (m_floppy && m_floppy->dskchg_r() ? 0x10 : 0x00) // disk changed
+				| (m_floppy ? (m_floppy->ready_r() ? 0x00 : 0x20) : 0x20) // ready something
+				| (m_fdc->drq_r() ? 0x00 : 0x40)
+				| (m_fdc->intrq_r() ? 0x00 : 0x80)
+			;
+	}
+
+	return msx_slot_rom_device::read(offset);
+}
+
+
+void msx_slot_disk7_device::write(offs_t offset, uint8_t data)
+{
+	switch (offset)
+	{
+		case 0x7ff8:   // command
+			m_fdc->cmd_w(data);
+			break;
+
+		case 0x7ff9:   // track
+			m_fdc->track_w(data);
+			break;
+
+		case 0x7ffa:   // sector
+			m_fdc->sector_w(data);
+			break;
+
+		case 0x7ffb:   // data
+			m_fdc->data_w(data);
+			break;
+
+		// Drive, side and motor control
+		// bit 0,1 = drive select
+		// bit 2 = side select
+		// bit 3 = motor on/off
+		case 0x7ffc:
+			printf("Drive/side/motor: %02x\n", data);
+			m_drive_side_motor = data;
+			set_drive_side_motor();
+			break;
+
+		default:
+			logerror("msx_slot_disk7_device::write: Unmapped write writing %02x to %04x\n", data, offset);
 			break;
 	}
 }
