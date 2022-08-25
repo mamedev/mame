@@ -44,7 +44,7 @@ Yellow serial dongle (with passthrough) with the following components:
  -3.6864 Xtal
  -3 x 74HC14D
 
-On latter models (Pentium and better), other kinds of dongles can also be found:
+On newer models (Pentium and better), other kinds of dongles can also be found:
 
 Parallel (without passthrough) dongle with the following components:
  -SX28AC/DP MCU (different manufacturers: Parallax, Ubicom, etc.)
