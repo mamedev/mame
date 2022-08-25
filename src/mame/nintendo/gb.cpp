@@ -892,7 +892,7 @@ uint8_t gbc_state::gbc_io2_r(offs_t offset)
  Map megaduck video related area on to regular Game Boy video area
 
  Different locations of the video registers:
- Register      Game Boy   MegaDuck
+ Register      Game Boy   Mega Duck
  LCDC          FF40       FF10  (See different bit order below)
  STAT          FF41       FF11
  SCY           FF42       FF12
@@ -912,7 +912,7 @@ uint8_t gbc_state::gbc_io2_r(offs_t offset)
 
  Different LCDC register
 
- Game Boy       MegaDuck
+ Game Boy       Mega Duck
  0                      6       - BG & Window Display : 0 - Off, 1 - On
  1                      0       - OBJ Display: 0 - Off, 1 - On
  2                      1       - OBJ Size: 0 - 8x8, 1 - 8x16
