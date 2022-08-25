@@ -2138,6 +2138,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/fs_fat.h,FORMATS["FS_FAT"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "FS_FAT") then
+	files {
+		MAME_DIR.. "src/lib/formats/fs_fat.cpp",
+		MAME_DIR.. "src/lib/formats/fs_fat.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/fs_oric_jasmin.h,FORMATS["FS_ORIC_JASMIN"] = true
 --------------------------------------------------
 
