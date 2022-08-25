@@ -241,10 +241,9 @@ public:
 protected:
 	virtual void video_start() override;
 
+private:
 	required_device<cpu_device> m_extracpu;
 	required_device<generic_latch_16_device> m_extralatch;
-
-private:
 	required_shared_ptr_array<uint8_t, 2> m_extraram;
 	required_device<palette_device> m_extrapalette;
 	required_device<gfxdecode_device> m_extragfxdecode;
@@ -259,14 +258,13 @@ private:
 	void _9000c_w(uint16_t data);
 	void extrascreen_latch_w(uint16_t data);
 
-	void _90124_w(uint16_t data);
-	void _9012c_w(uint16_t data);
+	void bg_scrolly_w(uint16_t data);
+	void bg_scrollx_w(uint16_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t extrascreen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	uint8_t extra_latch_r(offs_t offset);
-
 
 	void extra_map(address_map &map);
 	void main_map(address_map &map);
@@ -347,16 +345,16 @@ void spbactnp_state::_9000a_w(uint16_t data)
 	LOGPROTO("%s: _9000a_w %04x\n", machine().describe_context(), data);
 }
 
-void spbactnp_state::_90124_w(uint16_t data)
+void spbactnp_state::bg_scrolly_w(uint16_t data)
 {
-	LOGPROTO("_90124_w %04x\n", data);
+	LOGPROTO("bg_scrolly_w %04x\n", data);
 	m_bg_tilemap->set_scrolly(0, data);
 
 }
 
-void spbactnp_state::_9012c_w(uint16_t data)
+void spbactnp_state::bg_scrollx_w(uint16_t data)
 {
-	LOGPROTO("_9012c_w %04x\n", data);
+	LOGPROTO("bg_scrollx_w %04x\n", data);
 	m_bg_tilemap->set_scrollx(0, data);
 }
 
@@ -479,12 +477,12 @@ void spbactnp_state::main_map(address_map &map)
 	map(0x90002, 0x90003).portr("IN1").w(FUNC(spbactnp_state::main_irq_ack_w));
 	map(0x90006, 0x90007).portr("DSW");
 	map(0x90007, 0x90007).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x9000a, 0x9000b).w(FUNC(spbactnp_state::_9000a_w));
-	map(0x9000c, 0x9000d).w(FUNC(spbactnp_state::_9000c_w));
+	map(0x9000a, 0x9000b).w(FUNC(spbactnp_state::_9000a_w)); // maybe lamps?
+	map(0x9000c, 0x9000d).w(FUNC(spbactnp_state::_9000c_w)); // maybe lamps?
 	map(0x9000e, 0x9000f).w(FUNC(spbactnp_state::extrascreen_latch_w));
 
-	map(0x90124, 0x90125).w(FUNC(spbactnp_state::_90124_w)); // bg scroll
-	map(0x9012c, 0x9012d).w(FUNC(spbactnp_state::_9012c_w)); // bg scroll
+	map(0x90124, 0x90125).w(FUNC(spbactnp_state::bg_scrolly_w)); // bg scroll
+	map(0x9012c, 0x9012d).w(FUNC(spbactnp_state::bg_scrollx_w)); // bg scroll
 }
 
 void spbactn_state::sound_map(address_map &map)
@@ -825,9 +823,9 @@ void spbactnp_state::spbactnp(machine_config &config)
 
 	config.set_default_layout(layout_spbactnp);
 
-	z80_device &extracpu(Z80(config, m_extracpu, XTAL(4'000'000)));
-	extracpu.set_addrmap(AS_PROGRAM, &spbactnp_state::extra_map);
-	extracpu.set_vblank_int("extrascreen", FUNC(spbactnp_state::irq0_line_hold));
+	Z80(config, m_extracpu, XTAL(4'000'000));
+	m_extracpu->set_addrmap(AS_PROGRAM, &spbactnp_state::extra_map);
+	m_extracpu->set_vblank_int("extrascreen", FUNC(spbactnp_state::irq0_line_hold));
 
 	PALETTE(config, m_extrapalette).set_format(palette_device::xBRG_444, 0x1000 / 2);
 	m_extrapalette->set_endianness(ENDIANNESS_BIG);
@@ -966,4 +964,4 @@ ROM_END
 GAME( 1991, spbactn,  0,       spbactn,  spbactn,  spbactn_state,  empty_init, ROT90, "Tecmo", "Super Pinball Action (US)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1991, spbactnj, spbactn, spbactn,  spbactn,  spbactn_state,  empty_init, ROT90, "Tecmo", "Super Pinball Action (Japan)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
  // early proto, (c) date is 2 years earlier and seems to have been designed for a 'pinball' style cabinet with 2nd display?
-GAME( 1989, spbactnp, spbactn, spbactnp, spbactnp, spbactnp_state, empty_init, ROT0, "Tecmo", "Super Pinball Action (prototype, dual screen)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, spbactnp, spbactn, spbactnp, spbactnp, spbactnp_state, empty_init, ROT0, "Tecmo", "Super Pinball Action (US, prototype, dual screen)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
