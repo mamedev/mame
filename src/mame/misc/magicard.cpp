@@ -84,10 +84,10 @@
   with "!PRESS HOLD4 for 5sec   TO INIT MACHINE!".  Press HOLD 4 for 5 secs and
   after this game should start without error.
 
-  magicrd1/magicrd1a/magicrd1c/magicrd1b/magicrd1d show !!ERROR!! CALL SERVICEMAN 4
+  magicrd1a/magicrd1b/magicrd1c/magicrd1/magicrd1d show !!ERROR!! CALL SERVICEMAN 4
   Press OWNER BOOK KEEPING. Game enters test Press HOLD3 for next test.
   Select PREFERENCES I and then RAM RESET.
-  magicrd1/magicrd1a/magicrd1d lock with TURN OFF!
+  magicrd1a/magicrd1b/magicrd1d lock with TURN OFF!
   Quit and restart game.
 
   magicrde/magicrdea/magicrdeb
@@ -124,7 +124,7 @@
   ======================================================================================================
   V 1.04     | lucky7i                       | lowest known revision, does not have a socket for the PIC
   ------------------------------------------------------------------------------------------------------
-  V 1.05     | magicrd1b, magicrd1c          | PIC16C54 + XTAL got added
+  V 1.05     | magicrd1, magicrd1c          | PIC16C54 + XTAL got added
   ------------------------------------------------------------------------------------------------------
   V 2.1      | puzzleme                      | ESI1, 24C02, YM2149F, RTC added
   ------------------------------------------------------------------------------------------------------
@@ -150,9 +150,9 @@
 
                 DS2401     DS1207   EP      PROTECT  PROT AVAIL     ELO TOUCH
   magicard      NO          YES[3]  24c02   YES         NO
-  magicrd1      NO          YES[3]  24c02   YES         NO
-  magicrd1a     NO          YES[2]  24c02?  YES         NO
-  magicrd1b     NO          YES[2]  24c02   16C56       YES
+  magicrd1      NO          YES[2]  24c02   16C56       YES
+  magicrd1a     NO          YES[3]  24c02   YES         NO
+  magicrd1b     NO          YES[2]  24c02?  YES         NO
   magicrd1c     NO ?        YES[2]  24c02?  16C54       YES
   magicrd1d     NO          YES[2]  24c02   YES         NO
   magicrde      YES         YES[1]  24c02   16C54       YES
@@ -606,7 +606,7 @@ static INPUT_PORTS_START( magicard )
 
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( magicarde )
+static INPUT_PORTS_START( magicrde )
 	PORT_INCLUDE( magicard )
 
 	PORT_MODIFY("SW1")
@@ -986,7 +986,7 @@ ROM_END
 /*
   Magicard 1.5 17.12.93
 */
-ROM_START( magicrd1 )
+ROM_START( magicrd1a )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "mcorigg2.bin", 0x00000, 0x20000, CRC(48546aa9) SHA1(23099a5e4c9f2c3386496f6d7f5bb7d435a6fb16) )
 	ROM_RELOAD(                           0x40000, 0x20000 )
@@ -1000,13 +1000,13 @@ ROM_START( magicrd1 )
 	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(4902b7c2) SHA1(6e6fe825cfcf39bae60ecc45ab0742772f87cf80) ) // created to match game
 
 	ROM_REGION(0x4000, "nvram", 0) /* Default NVRAM */
-	ROM_LOAD( "magicrd1.nv", 0x0000, 0x4000, CRC(4d78bbcc) SHA1(943344f03a69ee25526e2b1f2e74722ae2601c11) )
+	ROM_LOAD( "magicrd1a.nv", 0x0000, 0x4000, CRC(4d78bbcc) SHA1(943344f03a69ee25526e2b1f2e74722ae2601c11) )
 ROM_END
 
 /*
   Magicard 1.5 17.12.93
 */
-ROM_START( magicrd1a )
+ROM_START( magicrd1b )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "mg_8.bin", 0x00000, 0x80000, CRC(f5499765) SHA1(63bcf40b91b43b218c1f9ec1d126a856f35d0844) )
 
@@ -1021,7 +1021,7 @@ ROM_START( magicrd1a )
 	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(cbcc1a42) SHA1(4b577c85f5856192ce04051a2d305a9080192177) ) // created to match game
 
 	ROM_REGION(0x4000, "nvram", 0) /* Default NVRAM */
-	ROM_LOAD( "magicrd1a.nv", 0x0000, 0x4000, CRC(4d78bbcc) SHA1(943344f03a69ee25526e2b1f2e74722ae2601c11) )
+	ROM_LOAD( "magicrd1b.nv", 0x0000, 0x4000, CRC(4d78bbcc) SHA1(943344f03a69ee25526e2b1f2e74722ae2601c11) )
 ROM_END
 
 /*
@@ -1725,7 +1725,7 @@ ROM_END
 
 
 /*
-  Magicrd1b
+  magicrd1
   Version 1.1 14.09.94
 
   PCB layout:
@@ -1791,7 +1791,7 @@ ROM_END
   XTAL3 = 3.686JB (PIC?)
 
 */
-ROM_START( magicrd1b )
+ROM_START( magicrd1 )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "m27c4002.bin", 0x00000, 0x80000, CRC(229a504f) SHA1(8033e9b4cb55f2364bf4606375ef9ac05fc715fe) )
 
@@ -1802,7 +1802,7 @@ ROM_START( magicrd1b )
 	ROM_LOAD( "ds1207", 0x000000, 0x00004d, BAD_DUMP CRC(cbcc1a42) SHA1(4b577c85f5856192ce04051a2d305a9080192177) ) // created to match game
 
 	ROM_REGION(0x4000, "nvram", 0) /* Default NVRAM */
-	ROM_LOAD( "magicrd1b.nv", 0x0000, 0x4000, CRC(5b62f04a) SHA1(0cc6404e1bb66801a562ff7a1479859c17e9f209) )
+	ROM_LOAD( "magicrd1.nv", 0x0000, 0x4000, CRC(5b62f04a) SHA1(0cc6404e1bb66801a562ff7a1479859c17e9f209) )
 ROM_END
 
 /*
@@ -2163,17 +2163,17 @@ ROM_END
 //    YEAR  NAME       PARENT    MACHINE          INPUT     STATE           INIT           ROT    COMPANY   FULLNAME                                     FLAGS
 
 GAME( 1994, magicard,   0,        magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v2.01)",                         MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1993, magicrd1,   0,        magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.5 17.12.93, set 1)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1993, magicrd1a,  magicrd1, magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.5 17.12.93, set 2)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1994, magicrd1b,  magicrd1, magicard_pic56, magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.10 14.09.94)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1994, magicrd1,   0,        magicard_pic56, magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.10 14.09.94)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1993, magicrd1a,  magicrd1, magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.5 17.12.93, set 1)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1993, magicrd1b,  magicrd1, magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.5 17.12.93, set 2)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1993, magicrd1c,  magicrd1, magicard_pic54, magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.2 200/93, set 1)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1993, magicrd1d,  magicrd1, magicard,       magicard,  magicard_state, empty_init, ROT0, "Impera",    "Magic Card (v1.2 200/93, set 2)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1994, magicrde,   0,        hotslots_pic54, magicarde, hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.11a, set 1)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1994, magicrdea,  magicrde, hotslots_pic54, magicarde, hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.11a, set 2)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1994, magicrdeb,  magicrde, hotslots,       magicarde, hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (V2.11a, set 3)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1994, magicrdec,  magicrde, hotslots,       magicarde, hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.09a)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1998, magicrdj,   0,        hotslots,       magicarde, hotslots_state, empty_init, ROT0, "Impera",    "Magic Card III Jackpot (V4.01 6/98)",        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1998, magicrdja,  0,        hotslots,       magicarde, hotslots_state, empty_init, ROT0, "Impera",    "Magic Card III Jackpot (V4.01 7/98)",        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1994, magicrde,   0,        hotslots_pic54, magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.11a, set 1)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1994, magicrdea,  magicrde, hotslots_pic54, magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.11a, set 2)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1994, magicrdeb,  magicrde, hotslots,       magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (V2.11a, set 3)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1994, magicrdec,  magicrde, hotslots,       magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card Export 94 (v2.09a)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1998, magicrdj,   0,        hotslots,       magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card III Jackpot (V4.01 6/98)",        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1998, magicrdja,  magicrdj, hotslots,       magicrde,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Card III Jackpot (V4.01 7/98)",        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 2001, magicle,    0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Magic Lotto Export (5.03)",                  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 2002, hotslots,   0,        hotslots,       hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Hot Slots (6.00)",                           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1999, quingo,     0,        magicle,        hotslots,  hotslots_state, empty_init, ROT0, "Impera",    "Quingo Export (5.00)",                       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
