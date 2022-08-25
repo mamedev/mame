@@ -1039,6 +1039,13 @@ public:
 			char guid_str[256];
 			guid_str[0] = '\0';
 			SDL_JoystickGetGUIDString(guid, guid_str, sizeof(guid_str) - 1);
+			char const *serial = nullptr;
+#if SDL_VERSION_ATLEAST(2, 0, 14)
+			serial = SDL_JoystickGetSerial(joy);
+#endif
+			std::string id(guid_str);
+			if (serial)
+				id.append(1, '-').append(serial);
 
 			sdl_joystick_device *const devinfo = m_sixaxis_mode
 					? &devicelist().create_device<sdl_sixaxis_joystick_device>(machine, name ? name : guid_str, guid_str, *this)
@@ -1053,20 +1060,16 @@ public:
 			devinfo->sdl_state.device = joy;
 			devinfo->sdl_state.joystick_id = SDL_JoystickInstanceID(joy);
 			devinfo->sdl_state.hapdevice = SDL_HapticOpenFromJoystick(joy);
-#if SDL_VERSION_ATLEAST(2, 0, 14)
-			char const *const serial = SDL_JoystickGetSerial(joy);
 			if (serial)
 				devinfo->sdl_state.serial = serial;
-			else
-#endif // SDL_VERSION_ATLEAST(2, 0, 14)
-				devinfo->sdl_state.serial = std::nullopt;
 
-			osd_printf_verbose("Joystick: %s [GUID %s] Vendor ID %04X, Product ID %04X, Revision %04X\n",
+			osd_printf_verbose("Joystick: %s [GUID %s] Vendor ID %04X, Product ID %04X, Revision %04X, Serial %s\n",
 					name ? name : "<nullptr>",
 					guid_str,
 					SDL_JoystickGetVendor(joy),
 					SDL_JoystickGetProduct(joy),
-					SDL_JoystickGetProductVersion(joy));
+					SDL_JoystickGetProductVersion(joy),
+					serial ? serial : "<nullptr>");
 			osd_printf_verbose("Joystick:   ...  %d axes, %d buttons %d hats %d balls\n",
 					SDL_JoystickNumAxes(joy),
 					SDL_JoystickNumButtons(joy),

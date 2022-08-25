@@ -33,11 +33,11 @@ public:
 	auto o3_callback() { return m_out_cb[2].bind(); }
 	auto irq_callback() { return m_irq_cb.bind(); }
 
-	int status(int clock) const { return m_enabled[clock]; } // get whether timer is enabled
-	int irq_state() const { return m_irq; }                 // get IRQ state
-	uint16_t count(int counter) const { return compute_counter(counter); }    // get counter value
-	void set_ext_clock(int counter, double clock);  // set clock frequency
-	int ext_clock(int counter) const { return m_external_clock[counter]; }  // get clock frequency
+	int status(int idx) const { return m_enabled[idx]; }            // get whether timer is enabled
+	int irq_state() const { return m_irq; }                         // get IRQ state
+	int count(int idx) const { return compute_counter(idx); }       // get counter value
+	void set_ext_clock(int counter, double clock);                  // set clock frequency
+	int ext_clock(int idx) const { return m_external_clock[idx]; }  // get clock frequency
 
 	void write(offs_t offset, uint8_t data);
 	uint8_t read(offs_t offset);
@@ -61,12 +61,13 @@ protected:
 	virtual void device_resolve_objects() override;
 
 private:
-	void subtract_from_counter(int counter, int count);
-	void tick(int counter, int count);
-	TIMER_CALLBACK_MEMBER(timeout);
+	void deduct_from_counter(int idx);
+	void tick(int counter);
+	TIMER_CALLBACK_MEMBER(state_changed);
 
-	uint16_t compute_counter(int counter) const;
-	void reload_count(int idx);
+	int compute_counter(int idx) const;
+	void reload_counter(int idx);
+	void update_expiration_for_clock_source(int idx, bool changed_to_external = false, double new_external_clock = 0.0);
 
 	enum
 	{
@@ -112,7 +113,7 @@ private:
 	bool m_clk[3];    // Clock states
 	bool m_enabled[3];
 	uint8_t m_mode[3];
-	bool m_fired[3];
+	bool m_single_fired[3];
 	uint8_t m_t3_divisor;
 	uint8_t m_t3_scaler;
 	uint8_t m_irq;
@@ -129,9 +130,6 @@ private:
 	attotime m_disable_time[3];
 
 	static const char *const opmode[];
-
-	// set in dual 8 bit mode to indicate Output high time cycle
-	bool m_hightime[3];
 };
 
 

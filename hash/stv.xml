@@ -968,7 +968,7 @@ license:CC0
 	</software>
 
 	<!-- Game: Puzzle &amp; Action: Treasure Hunt -->
-	<software name="thunt" supported="no"  cloneof="sandor">
+	<software name="thunt" supported="no" cloneof="sandor">
 		<description>Puzzle &amp; Action: Treasure Hunt (JUET 970901 V2.00E)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
@@ -985,7 +985,7 @@ license:CC0
 	</software>
 
 	<!-- Game: Puzzle &amp; Action: BoMulEul Chajara -->
-	<software name="thuntk" supported="no"  cloneof="sandor">
+	<software name="thuntk" supported="no" cloneof="sandor">
 		<description>Puzzle &amp; Action: BoMulEul Chajara (JUET 970125 V2.00K)</description>
 		<year>1997</year>
 		<publisher>Sega / Deniam</publisher>

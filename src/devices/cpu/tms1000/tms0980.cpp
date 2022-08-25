@@ -4,58 +4,52 @@
 
   TMS1000 family - TMS0980, TMS1980
 
+TMS0980
+- 144x4bit RAM array at the bottom-left (128+16, set up as 8x18x4)
+- 2048x9bit ROM array at the bottom-left
+- main instructions PLAs at the top half, to the right of the midline
+  * top section is assumed to be the CKI bus select
+  * middle section is for microinstruction redirection, this part may differ per die
+  * rest is fixed instructions select, from top-to-bottom: SEAC, LDX, COMX, COMX8,
+    TDO, SBIT, RETN, SETR, REAC, XDA, SAL, RBIT, ..., OFF, SBL, LDP, redir(------00- + R0^BL)
+- 64-term microinstructions PLA between the RAM and ROM, supporting 20 microinstructions
+- 16-term inverted output PLA and segment PLA above the RAM (rotate opla 90 degrees)
+
+TMS1980 is a TMS0980 with a TMS1x00 style opla
+- RAM, ROM, and main instructions PLAs is the same as TMS0980
+- one of the microinstructions redirects to a RSTR instruction, like on TMS0270
+- 32-term output PLA above the RAM, 7 bits! (rotate opla 270 degrees)
+
 */
 
 #include "emu.h"
 #include "tms0980.h"
 #include "tms1k_dasm.h"
 
-// TMS0980
-// - 144x4bit RAM array at the bottom-left (128+16, set up as 8x18x4)
-// - 2048x9bit ROM array at the bottom-left
-// - main instructions PLAs at the top half, to the right of the midline
-//   * top section is assumed to be the CKI bus select
-//   * middle section is for microinstruction redirection, this part may differ per die
-//   * rest is fixed instructions select, from top-to-bottom: SEAC, LDX, COMX, COMX8,
-//     TDO, SBIT, RETN, SETR, REAC, XDA, SAL, RBIT, ..., OFF, SBL, LDP, redir(------00- + R0^BL)
-// - 64-term microinstructions PLA between the RAM and ROM, supporting 20 microinstructions
-// - 16-term inverted output PLA and segment PLA above the RAM (rotate opla 90 degrees)
-DEFINE_DEVICE_TYPE(TMS0980, tms0980_cpu_device, "tms0980", "Texas Instruments TMS0980") // 28-pin DIP, 9 R pins
 
-// TMS1980 is a TMS0980 with a TMS1x00 style opla
-// - RAM, ROM, and main instructions PLAs is the same as TMS0980
-// - one of the microinstructions redirects to a RSTR instruction, like on TMS0270
-// - 32-term inverted output PLA above the RAM, 7 bits! (rotate opla 270 degrees)
+// device definitions
+DEFINE_DEVICE_TYPE(TMS0980, tms0980_cpu_device, "tms0980", "Texas Instruments TMS0980") // 28-pin DIP, 9 R pins
 DEFINE_DEVICE_TYPE(TMS1980, tms1980_cpu_device, "tms1980", "Texas Instruments TMS1980") // 28-pin DIP, 7 O pins, 10 R pins, high voltage
 
 
-// internal memory maps
-void tms0980_cpu_device::program_11bit_9(address_map &map)
-{
-	map(0x000, 0x7ff).rom();
-}
+tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	tms0980_cpu_device(mconfig, TMS0980, tag, owner, clock, 8 /* o pins */, 9 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 1 /* stack levels */, 11 /* rom width */, address_map_constructor(FUNC(tms0980_cpu_device::rom_11bit), this), 8 /* ram width */, address_map_constructor(FUNC(tms0980_cpu_device::ram_144x4), this))
+{ }
 
-void tms0980_cpu_device::data_144x4(address_map &map)
+tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map) :
+	tms0970_cpu_device(mconfig, type, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, stack_levels, rom_width, rom_map, ram_width, ram_map)
+{ }
+
+tms1980_cpu_device::tms1980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	tms0980_cpu_device(mconfig, TMS1980, tag, owner, clock, 7, 10, 7, 9, 4, 1, 11, address_map_constructor(FUNC(tms1980_cpu_device::rom_11bit), this), 8, address_map_constructor(FUNC(tms1980_cpu_device::ram_144x4), this))
+{ }
+
+
+// internal memory maps
+void tms0980_cpu_device::ram_144x4(address_map &map)
 {
 	map(0x00, 0x7f).ram();
 	map(0x80, 0x8f).ram().mirror(0x70); // DAM
-}
-
-
-// device definitions
-tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms0980_cpu_device(mconfig, TMS0980, tag, owner, clock, 8 /* o pins */, 9 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 11 /* prg width */, address_map_constructor(FUNC(tms0980_cpu_device::program_11bit_9), this), 8 /* data width */, address_map_constructor(FUNC(tms0980_cpu_device::data_144x4), this))
-{
-}
-
-tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
-	: tms0970_cpu_device(mconfig, type, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, prgwidth, program, datawidth, data)
-{
-}
-
-tms1980_cpu_device::tms1980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms0980_cpu_device(mconfig, TMS1980, tag, owner, clock, 7, 10, 7, 9, 4, 11, address_map_constructor(FUNC(tms1980_cpu_device::program_11bit_9), this), 8, address_map_constructor(FUNC(tms1980_cpu_device::data_144x4), this))
-{
 }
 
 
@@ -169,7 +163,7 @@ void tms0980_cpu_device::read_opcode()
 {
 	debugger_instruction_hook(m_rom_address);
 	m_opcode = m_program->read_word(m_rom_address) & 0x1ff;
-	m_c4 = bitswap<8>(m_opcode,7,6,5,4,0,1,2,3) & 0xf; // opcode operand is bitswapped for most opcodes
+	m_c4 = bitswap<4>(m_opcode,0,1,2,3); // opcode operand is bitswapped for most opcodes
 
 	m_fixed = m_fixed_decode[m_opcode];
 	m_micro = read_micro();
@@ -185,7 +179,7 @@ void tms0980_cpu_device::read_opcode()
 // i/o handling
 u8 tms0980_cpu_device::read_k_input()
 {
-	u8 k = m_read_k(0, 0xff) & 0x1f;
+	u8 k = m_read_k() & 0x1f;
 	u8 k3 = (k & 0x10) ? 3: 0; // the K3 line is simply K1|K2
 	return (k & 0xf) | k3;
 }
@@ -224,8 +218,45 @@ void tms0980_cpu_device::op_comx()
 	m_x ^= (m_x_mask >> 1);
 }
 
+void tms0980_cpu_device::op_xda()
+{
+	// XDA: exchange DAM and A
+	// note: setting A to DAM is done with DMTP and AUTA during this instruction
+	m_ram_address |= (0x10 << (m_x_bits - 1));
+}
+
+void tms0980_cpu_device::op_off()
+{
+	// OFF: request auto power-off
+	m_power_off(1);
+}
+
+void tms0980_cpu_device::op_seac()
+{
+	// SEAC: set end around carry
+	m_eac = 1;
+}
+
+void tms0980_cpu_device::op_reac()
+{
+	// REAC: reset end around carry
+	m_eac = 0;
+}
+
+void tms0980_cpu_device::op_sal()
+{
+	// SAL: set add latch (reset is done with RETN)
+	m_add = 1;
+}
+
+void tms0980_cpu_device::op_sbl()
+{
+	// SBL: set branch latch (reset is done with RETN)
+	m_bl = 1;
+}
+
 void tms1980_cpu_device::op_tdo()
 {
 	// TDO: transfer accumulator and status(not status_latch!) to O-output
-	write_o_output(m_status << 4 | m_a);
+	write_o_reg(m_status << 4 | m_a);
 }

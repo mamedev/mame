@@ -30,7 +30,7 @@ public:
 
 	void macpdm(machine_config &config);
 
-	virtual void driver_init() override;
+	void driver_init();
 	virtual void driver_reset() override;
 
 private:

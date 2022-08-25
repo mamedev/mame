@@ -23,7 +23,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="asm6809a" cloneof="asm6809">
-		<description>Assembleur 6809 (v1.0, Alt)</description>
+		<description>Assembleur 6809 (v1.0, alt)</description>
 		<year>1984</year>
 		<publisher>TO TEK International</publisher>
 		<info name="alt_title" value="6809 Language Module"/>
@@ -36,7 +36,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="asm6809b" cloneof="asm6809">
-		<description>Assembleur 6809 (v1.0, Alt 2)</description>
+		<description>Assembleur 6809 (v1.0, alt 2)</description>
 		<year>1984</year>
 		<publisher>TO TEK International</publisher>
 		<info name="alt_title" value="6809 Language Module"/>
@@ -73,7 +73,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="agendaa" cloneof="agenda">
-		<description>Agenda (Alt)</description>
+		<description>Agenda (alt)</description>
 		<year>1984</year>
 		<publisher>Answare</publisher>
 
@@ -85,7 +85,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="agendab" cloneof="agenda">
-		<description>Agenda (Alt 2)</description>
+		<description>Agenda (alt 2)</description>
 		<year>1984</year>
 		<publisher>Answare</publisher>
 
@@ -109,7 +109,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="carneta" cloneof="carnet">
-		<description>Carnet d'Adresses (Alt)</description>
+		<description>Carnet d'Adresses (alt)</description>
 		<year>1984</year>
 		<publisher>Answare</publisher>
 
@@ -133,7 +133,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="colorclca" cloneof="colorclc">
-		<description>Colorcalc (Alt)</description>
+		<description>Colorcalc (alt)</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -195,7 +195,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="logoa" cloneof="logo">
-		<description>LOGO (v1.0, Alt)</description>
+		<description>LOGO (v1.0, alt)</description>
 		<year>1984</year>
 		<publisher>TO TEK International</publisher>
 
@@ -207,7 +207,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="logob" cloneof="logo">
-		<description>LOGO (v1.0, Alt 2)</description>
+		<description>LOGO (v1.0, alt 2)</description>
 		<year>1984</year>
 		<publisher>TO TEK International</publisher>
 
@@ -233,7 +233,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- cart label says v3.2, while boot screen says v3.21 -->
 	<software name="lsegedla" cloneof="lsegedl">
-		<description>LSEG-EDL (v3.2, Alt)</description>
+		<description>LSEG-EDL (v3.2, alt)</description>
 		<year>1985</year>
 		<publisher>ASELEC</publisher>
 
@@ -257,7 +257,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="melodiaa" cloneof="melodia">
-		<description>Melodia (Alt)</description>
+		<description>Melodia (alt)</description>
 		<year>1982</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -281,7 +281,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="pictora" cloneof="pictor">
-		<description>Pictor (Alt)</description>
+		<description>Pictor (alt)</description>
 		<year>1983</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -345,7 +345,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="airbusa" cloneof="airbus">
-		<description>Airbus (Alt)</description>
+		<description>Airbus (alt)</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -369,7 +369,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="blitza" cloneof="blitz">
-		<description>Blitz! - Jeu d'Echecs (Alt)</description>
+		<description>Blitz! - Jeu d'Echecs (alt)</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -381,7 +381,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="blitzb" cloneof="blitz">
-		<description>Blitz! - Jeu d'Echecs (Alt 2)</description>
+		<description>Blitz! - Jeu d'Echecs (alt 2)</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -431,7 +431,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="geminia" cloneof="gemini">
-		<description>Gemini (Alt)</description>
+		<description>Gemini (alt)</description>
 		<year>1982</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -455,7 +455,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="gloutona" cloneof="glouton">
-		<description>Glouton (Alt)</description>
+		<description>Glouton (alt)</description>
 		<year>1986</year>
 		<publisher>Hebdogiciel</publisher>
 
@@ -467,7 +467,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="gloutonb" cloneof="glouton">
-		<description>Glouton (Alt 2)</description>
+		<description>Glouton (alt 2)</description>
 		<year>1986</year>
 		<publisher>Hebdogiciel</publisher>
 
@@ -491,7 +491,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="melimemoa" cloneof="melimemo">
-		<description>Melimemot (Alt)</description>
+		<description>Melimemot (alt)</description>
 		<year>1983</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -515,7 +515,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="mine2049a" cloneof="mine2049">
-		<description>Miner 2049er (Alt)</description>
+		<description>Miner 2049er (alt)</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -539,7 +539,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="motusa" cloneof="motus">
-		<description>Motus (Alt)</description>
+		<description>Motus (alt)</description>
 		<year>1982</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -563,7 +563,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="trapa" cloneof="trap">
-		<description>Trap (Alt)</description>
+		<description>Trap (alt)</description>
 		<year>1982</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -587,7 +587,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="tridi444a" cloneof="tridi444">
-		<description>Tridi444 (Alt)</description>
+		<description>Tridi444 (alt)</description>
 		<year>1982</year>
 		<publisher>VIFI-Nathan</publisher>
 

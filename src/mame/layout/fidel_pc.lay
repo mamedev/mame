@@ -97,15 +97,24 @@ license:CC0
 		<text string="H"><color red="0.87" green="0.87" blue="0.84" /></text>
 	</element>
 
-	<element name="text_r11"><text string="[K]"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_r21"><text string="[Q]"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_r31"><text string="[R]"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_r41"><text string="[B]"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_r51"><text string="[N]"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_r61"><text string="[P]"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_p1"><image file="chess/wk.svg"><color alpha="0.79" /></image></element>
+	<element name="text_p2"><image file="chess/wq.svg"><color alpha="0.79" /></image></element>
+	<element name="text_p3"><image file="chess/wr.svg"><color alpha="0.79" /></image></element>
+	<element name="text_p4"><image file="chess/wb.svg"><color alpha="0.79" /></image></element>
+	<element name="text_p5"><image file="chess/wn.svg"><color alpha="0.79" /></image></element>
+	<element name="text_p6"><image file="chess/wp.svg"><color alpha="0.79" /></image></element>
+
+	<!-- generic speaker icon, (C) Mobius, public domain -->
+	<element name="speaker">
+		<image><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.0" width="500" height="500" viewBox="0 0 75 75">
+				<path d="M39.389,13.769 L22.235,28.606 L6,28.606 L6,47.699 L21.989,47.699 L39.389,62.75 L39.389,13.769z" style="stroke:#ceccca;stroke-width:5;stroke-linejoin:round;fill:#ceccca;"/>
+				<path d="M48,27.6a19.5,19.5 0 0 1 0,21.4M55.1,20.5a30,30 0 0 1 0,35.6M61.6,14a38.8,38.8 0 0 1 0,48.6" style="fill:none;stroke:#ceccca;stroke-width:5;stroke-linecap:round"/>
+			</svg>
+		]]></data></image>
+	</element>
 
 	<element name="text_r12"><text string="RESET" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_r22"><text string="spk" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_r32"><text string="PB" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_r42"><text string="PV" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_r52"><text string="TM" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
@@ -422,8 +431,7 @@ license:CC0
 
 		<group ref="sb_ui"><bounds x="-12" y="3" width="10" height="80" /></group>
 
-	<!-- chessboard coords -->
-
+		<!-- chessboard coords -->
 		<element ref="text_8"><bounds x="0.2" y="7"  width="2" height="2" /></element>
 		<element ref="text_7"><bounds x="0.2" y="17" width="2" height="2" /></element>
 		<element ref="text_6"><bounds x="0.2" y="27" width="2" height="2" /></element>
@@ -442,8 +450,7 @@ license:CC0
 		<element ref="text_g"><bounds x="67.5" y="84.5" width="2" height="2" /></element>
 		<element ref="text_h"><bounds x="77.5" y="84.5" width="2" height="2" /></element>
 
-	<!-- panel 7seg leds -->
-
+		<!-- panel 7seg leds -->
 		<element name="digit1" ref="digit"><bounds x="90" y="55" width="8.5" height="5.66" /><orientation rotate="90" /></element>
 		<element name="digit0" ref="digit"><bounds x="90" y="60.66" width="8.5" height="5.66" /><orientation rotate="90" /></element>
 		<element name="digit2" ref="digit"><bounds x="90" y="69.16" width="8.5" height="5.66" /><orientation rotate="90" /></element>
@@ -452,26 +459,25 @@ license:CC0
 		<element name="0.7" ref="led"><bounds x="96.15" y="67.58" width="0.85" height="0.85" /></element>
 		<element name="1.7" ref="led"><bounds x="91.5" y="67.13" width="0.85" height="0.85" /></element>
 
-	<!-- right side -->
+		<!-- right side -->
+		<element ref="text_p1"><bounds x="91.7" y="15.9" width="2.1" height="2.1" /></element>
+		<element ref="text_p2"><bounds x="91.7" y="18.9" width="2.1" height="2.1" /></element>
+		<element ref="text_p3"><bounds x="91.7" y="21.9" width="2.1" height="2.1" /></element>
+		<element ref="text_p4"><bounds x="91.7" y="24.9" width="2.1" height="2.1" /></element>
+		<element ref="text_p5"><bounds x="91.7" y="27.9" width="2.1" height="2.1" /></element>
+		<element ref="text_p6"><bounds x="91.7" y="30.9" width="2.1" height="2.1" /></element>
 
-		<element ref="text_r11"><bounds x="91.5" y="16.15" width="3" height="1.5" /></element>
-		<element ref="text_r21"><bounds x="91.5" y="19.15" width="3" height="1.5" /></element>
-		<element ref="text_r31"><bounds x="91.5" y="22.15" width="3" height="1.5" /></element>
-		<element ref="text_r41"><bounds x="91.5" y="25.15" width="3" height="1.5" /></element>
-		<element ref="text_r51"><bounds x="91.5" y="28.15" width="3" height="1.5" /></element>
-		<element ref="text_r61"><bounds x="91.5" y="31.15" width="3" height="1.5" /></element>
-
-		<element ref="text_r12"><bounds x="96.8" y="8.15" width="10" height="1.5" /></element>
-		<element ref="text_r22"><bounds x="96.8" y="11.15" width="10" height="1.5" /></element>
-		<element ref="text_r32"><bounds x="96.8" y="16.15" width="10" height="1.5" /></element>
-		<element ref="text_r42"><bounds x="96.8" y="19.15" width="10" height="1.5" /></element>
-		<element ref="text_r52"><bounds x="96.8" y="22.15" width="10" height="1.5" /></element>
-		<element ref="text_r62"><bounds x="96.8" y="25.15" width="10" height="1.5" /></element>
-		<element ref="text_r72"><bounds x="96.8" y="28.15" width="10" height="1.5" /></element>
-		<element ref="text_r82"><bounds x="96.8" y="31.15" width="10" height="1.5" /></element>
-		<element ref="text_r92"><bounds x="96.8" y="36.15" width="10" height="1.5" /></element>
-		<element ref="text_ra2"><bounds x="96.8" y="39.15" width="10" height="1.5" /></element>
-		<element ref="text_rb2"><bounds x="96.8" y="42.15" width="10" height="1.5" /></element>
+		<element ref="text_r12"><bounds x="96.8" y="8.25" width="10" height="1.5" /></element>
+		<element ref="speaker"><bounds x="96.8" y="11.25" width="1.5" height="1.5" /></element>
+		<element ref="text_r32"><bounds x="96.8" y="16.25" width="10" height="1.5" /></element>
+		<element ref="text_r42"><bounds x="96.8" y="19.25" width="10" height="1.5" /></element>
+		<element ref="text_r52"><bounds x="96.8" y="22.25" width="10" height="1.5" /></element>
+		<element ref="text_r62"><bounds x="96.8" y="25.25" width="10" height="1.5" /></element>
+		<element ref="text_r72"><bounds x="96.8" y="28.25" width="10" height="1.5" /></element>
+		<element ref="text_r82"><bounds x="96.8" y="31.25" width="10" height="1.5" /></element>
+		<element ref="text_r92"><bounds x="96.8" y="36.25" width="10" height="1.5" /></element>
+		<element ref="text_ra2"><bounds x="96.8" y="39.25" width="10" height="1.5" /></element>
+		<element ref="text_rb2"><bounds x="96.8" y="42.25" width="10" height="1.5" /></element>
 
 		<element ref="text_r13"><bounds x="92.5" y="47.15" width="10" height="1.5" /></element>
 		<element ref="text_r23"><bounds x="92.5" y="50.15" width="10" height="1.5" /></element>

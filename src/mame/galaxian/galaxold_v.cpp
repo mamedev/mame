@@ -441,6 +441,8 @@ VIDEO_START_MEMBER(galaxold_state,rescue)
 {
 	VIDEO_START_CALL_MEMBER(scrambold);
 
+	m_draw_bullets = &galaxold_state::rescue_draw_bullets;
+
 	m_draw_stars = &galaxold_state::rescue_draw_stars;
 
 	m_draw_background = &galaxold_state::rescue_draw_background;
@@ -449,6 +451,8 @@ VIDEO_START_MEMBER(galaxold_state,rescue)
 VIDEO_START_MEMBER(galaxold_state,minefld)
 {
 	VIDEO_START_CALL_MEMBER(scrambold);
+
+	m_draw_bullets = &galaxold_state::rescue_draw_bullets;
 
 	m_draw_stars = &galaxold_state::rescue_draw_stars;
 
@@ -1040,6 +1044,22 @@ void galaxold_state::dambustr_draw_bullets(bitmap_ind16 &bitmap, const rectangle
 	}
 }
 
+void galaxold_state::rescue_draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y)
+{
+	if (flip_screen_x())  x++;
+
+	x = x - 6;
+
+	int color = BULLETS_COLOR_BASE;
+
+	/* bullets are 2 pixels square */
+	for (int i = 0; i < 2; i++)
+		for (int j = 0; j < 2; j++)
+		{
+			if (cliprect.contains(x+i, y+j))
+				bitmap.pix(y+j, x+i) = color;
+		}
+}
 
 
 /* background drawing functions */

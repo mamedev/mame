@@ -28,105 +28,18 @@ TODO:
 
 #include "cpu/m68000/m68000.h"
 
-
-#define ISR_MST     0x80    // Master
-#define ISR_TRX     0x40    // Transmitter
-#define ISR_BB      0x20    // Busy
-#define ISR_PIN     0x10    // No Pending Interrupt
-#define ISR_AL      0x08    // Arbitration Lost
-#define ISR_AAS     0x04    // Addressed As Slave
-#define ISR_AD0     0x02    // Address Zero
-#define ISR_LRB     0x01    // Last Received Bit
-
-#define UMR_OM          0xc0
-#define UMR_OM_NORMAL   0x00
-#define UMR_OM_ECHO     0x40
-#define UMR_OM_LOOPBACK 0x80
-#define UMR_OM_RLOOP    0xc0
-#define UMR_TXC         0x10
-#define UMR_PC          0x08
-#define UMR_P           0x04
-#define UMR_SB          0x02
-#define UMR_CL          0x01
-
-#define USR_RB          0x80
-#define USR_FE          0x40
-#define USR_PE          0x20
-#define USR_OE          0x10
-#define USR_TXEMT       0x08
-#define USR_TXRDY       0x04
-#define USR_RXRDY       0x01
-
-#define TSR_OV0         0x80
-#define TSR_MA1         0x40
-#define TSR_CAP1        0x20
-#define TSR_OV1         0x10
-#define TSR_MA2         0x08
-#define TSR_CAP2        0x04
-#define TSR_OV2         0x02
-
-#define TCR_E1          0xc0
-#define TCR_E1_NONE     0x00
-#define TCR_E1_RISING   0x40
-#define TCR_E1_FALLING  0x80
-#define TCR_E1_BOTH     0xc0
-#define TCR_M1          0x30
-#define TCR_M1_NONE     0x00
-#define TCR_M1_MATCH    0x10
-#define TCR_M1_CAPTURE  0x20
-#define TCR_M1_COUNT    0x30
-#define TCR_E2          0x0c
-#define TCR_E2_NONE     0x00
-#define TCR_E2_RISING   0x04
-#define TCR_E2_FALLING  0x08
-#define TCR_E2_BOTH     0x0c
-#define TCR_M2          0x03
-#define TCR_M2_NONE     0x00
-#define TCR_M2_MATCH    0x01
-#define TCR_M2_CAPTURE  0x02
-#define TCR_M2_COUNT    0x03
-
-#define CSR_COC         0x80
-#define CSR_NDT         0x20
-#define CSR_ERR         0x10
-#define CSR_CA          0x08
-
-#define CER_EC          0x1f
-#define CER_NONE        0x00
-#define CER_TIMING      0x02
-#define CER_BUSERR_MEM  0x09
-#define CER_BUSERR_DEV  0x0a
-#define CER_SOFT_ABORT  0x11
-
-#define DCR1_ERM        0x80
-#define DCR1_DT         0x30
-
-#define DCR2_ERM        0x80
-#define DCR2_DT         0x30
-#define DCR2_DS         0x08
-
-#define OCR_D           0x80
-#define OCR_D_M2D       0x00
-#define OCR_D_D2M       0x80
-#define OCR_OS          0x30
-#define OCR_OS_BYTE     0x00
-#define OCR_OS_WORD     0x10
-
-#define SCR2_MAC        0x0c
-#define SCR2_MAC_NONE   0x00
-#define SCR2_MAC_INC    0x04
-#define SCR2_DAC        0x03
-#define SCR2_DAC_NONE   0x00
-#define SCR2_DAC_INC    0x01
-
-#define CCR_SO          0x80
-#define CCR_SA          0x10
-#define CCR_INE         0x08
-#define CCR_IPL         0x07
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
+enum scc68070_ocr_bits
+{
+	SCC68070_OCR_D           = 0x80,
+	SCC68070_OCR_D_M2D       = 0x00,
+	SCC68070_OCR_D_D2M       = 0x80,
+	SCC68070_OCR_OS          = 0x30,
+	SCC68070_OCR_OS_BYTE     = 0x00,
+	SCC68070_OCR_OS_WORD     = 0x10
+};
 
 // ======================> scc68070_device
 
@@ -141,6 +54,9 @@ public:
 	auto iack7_callback() { return m_iack7_callback.bind(); }
 	auto uart_tx_callback() { return m_uart_tx_callback.bind(); }
 	auto uart_rtsn_callback() { return m_uart_rtsn_callback.bind(); }
+	auto i2c_scl_w() { return m_i2c_scl_callback.bind(); }
+	auto i2c_sda_w() { return m_i2c_sdaw_callback.bind(); }
+	auto i2c_sda_r() { return m_i2c_sdar_callback.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(in2_w);
 	DECLARE_WRITE_LINE_MEMBER(in4_w);
@@ -149,9 +65,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(int1_w);
 	DECLARE_WRITE_LINE_MEMBER(int2_w);
 
+	DECLARE_WRITE_LINE_MEMBER(write_scl);
+
 	TIMER_CALLBACK_MEMBER(timer0_callback);
 	TIMER_CALLBACK_MEMBER(rx_callback);
 	TIMER_CALLBACK_MEMBER(tx_callback);
+	TIMER_CALLBACK_MEMBER(i2c_callback);
 
 	// external callbacks
 	void uart_rx(uint8_t data);
@@ -170,6 +89,17 @@ public:
 		uint8_t control_register;
 		uint8_t reserved;
 		uint8_t clock_control_register;
+		emu_timer* timer;
+		bool scl_out_state;
+		bool scl_in_state;
+		bool sda_out_state;
+		bool sda_in_state;
+		uint8_t clock_change_state;
+		uint8_t clocks;
+		uint8_t state;
+		uint8_t counter;
+		bool first_byte;
+		bool ack_or_nak_sent;
 	};
 
 	struct uart_regs_t
@@ -298,6 +228,10 @@ private:
 	void icr_w(uint8_t data);
 	uint8_t iccr_r();
 	void iccr_w(uint8_t data);
+	void set_i2c_timer();
+	void i2c_process_falling_scl();
+	void i2c_process_rising_scl();
+	void i2c_next_state();
 
 	// UART interface
 	uint8_t umr_r();
@@ -336,6 +270,9 @@ private:
 	devcb_read8 m_iack7_callback;
 	devcb_write8 m_uart_tx_callback;
 	devcb_write_line m_uart_rtsn_callback;
+	devcb_write_line m_i2c_scl_callback;
+	devcb_write_line m_i2c_sdaw_callback;
+	devcb_read8 m_i2c_sdar_callback;
 
 	// internal state
 	uint8_t m_ipl;

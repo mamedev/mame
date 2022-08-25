@@ -1,9 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!--
-NOTE: This list is here only to document available dumps and it's not hooked up with MAME yet.
--->
 
 <softwarelist name="nuon" description="NUON DVD-ROMs">
 

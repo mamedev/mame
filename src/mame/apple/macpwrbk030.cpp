@@ -115,6 +115,7 @@
 #include "machine/z80scc.h"
 #include "macadb.h"
 #include "macscsi.h"
+#include "mactoolbox.h"
 #include "machine/ncr5380.h"
 #include "machine/nscsi_bus.h"
 #include "bus/nscsi/devices.h"
@@ -892,6 +893,7 @@ void macpb030_state::macpb140(machine_config &config)
 {
 	M68030(config, m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &macpb030_state::macpb140_map);
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	M50753(config, m_pmu, 3.93216_MHz_XTAL);
 	m_pmu->read_p<2>().set(FUNC(macpb030_state::pmu_data_r));
@@ -1009,6 +1011,7 @@ void macpb030_state::macpb160(machine_config &config)
 {
 	M68030(config, m_maincpu, 25000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &macpb030_state::macpb160_map);
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	M50753(config, m_pmu, 3.93216_MHz_XTAL);
 	m_pmu->read_p<2>().set(FUNC(macpb030_state::pmu_data_r));

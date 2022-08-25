@@ -4,6 +4,25 @@ license:CC0
 -->
 <mamelayout version="2">
 
+<!-- luascript (-plugin layout), for pressing 2 buttons simultaneously -->
+
+	<script><![CDATA[
+		local layout = {}
+		local prev_state = 0
+
+		function layout.frame()
+			local cur_state = machine.ioport.ports[":CLICKABLE"]:read() & 1
+			if cur_state ~= prev_state then
+				machine.ioport.ports[":IN.1"]:field(0x01):set_value(cur_state)
+				machine.ioport.ports[":IN.1"]:field(0x02):set_value(cur_state)
+			end
+			prev_state = cur_state
+		end
+
+		return layout
+	]]></script>
+
+
 <!-- define elements -->
 
 	<element name="black_rect">
@@ -24,6 +43,7 @@ license:CC0
 			<color red="1.0" green="0.0" blue="0.0" />
 		</disk>
 	</element>
+
 	<element name="hlb" defstate="0">
 		<disk state="0">
 			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
@@ -33,6 +53,10 @@ license:CC0
 			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
 			<color red="0.37" green="0.33" blue="0.3" />
 		</disk>
+	</element>
+
+	<element name="nothing" defstate="0">
+		<rect><color alpha="0" /></rect>
 	</element>
 
 	<element name="text_1"> <rect><color red="0.84" green="0.75" blue="0.50" /></rect>    <text string="1"><color red="0.01" green="0.01" blue="0.01" /></text> </element>
@@ -73,6 +97,19 @@ license:CC0
 	<element name="text_move_back">   <rect><color red="0.84" green="0.75" blue="0.50" /></rect>    <text string="MOVE BACK"             ><color red="0.17" green="0.15" blue="0.15" /></text> </element>
 
 
+<!-- sb board -->
+
+	<element name="cblack"><rect><color red="0.53" green="0.16" blue="0.07" /></rect></element>
+	<element name="cwhite"><rect><color red="0.84" green="0.75" blue="0.50" /></rect></element>
+
+	<element name="hlbb" defstate="0">
+		<text string=" "><bounds x="0" y="0" width="1" height="1" /></text>
+		<disk state="1">
+			<bounds x="0.12" y="0.12" width="0.76" height="0.76" />
+			<color red="0" green="0" blue="0" />
+		</disk>
+	</element>
+
 	<element name="piece" defstate="0">
 		<image file="chess/wp.svg" state="1"/>
 		<image file="chess/wn.svg" state="2"/>
@@ -102,20 +139,6 @@ license:CC0
 		<image file="chess/br.svg" state="22"><color alpha="0.5" /></image>
 		<image file="chess/bq.svg" state="23"><color alpha="0.5" /></image>
 		<image file="chess/bk.svg" state="24"><color alpha="0.5" /></image>
-	</element>
-
-
-<!-- sb board -->
-
-	<element name="cblack"><rect><color red="0.53" green="0.16" blue="0.07" /></rect></element>
-	<element name="cwhite"><rect><color red="0.84" green="0.75" blue="0.50" /></rect></element>
-
-	<element name="hlbb" defstate="0">
-		<text string=" "><bounds x="0" y="0" width="1" height="1" /></text>
-		<disk state="1">
-			<bounds x="0.12" y="0.12" width="0.76" height="0.76" />
-			<color red="0" green="0" blue="0" />
-		</disk>
 	</element>
 
 	<group name="sb_board">
@@ -411,10 +434,10 @@ license:CC0
 		<element ref="text_move_fore">  <bounds x="115"  y="84"   width="12" height="2" /></element>
 		<element ref="text_playmode">   <bounds x="103"  y="74"   width="10" height="2" /></element>
 
-		<element name="8.a" ref="led"> <bounds x="110.5" y="20.63" width="1.5" height="1.5" /> </element>
-		<element name="9.a" ref="led"> <bounds x="112"   y="74.13" width="1.5" height="1.5" /> </element>
-		<element ref="black_rect"> <bounds x="119.4" y="24.2" width="0.2" height="1.6" /> </element>
-		<element ref="black_rect"> <bounds x="116.7" y="25.0" width="2.9" height="0.2" /> </element>
+		<element name="8.a" ref="led"><bounds x="110.5" y="20.63" width="1.5" height="1.5" /></element>
+		<element name="9.a" ref="led"><bounds x="112"   y="74.13" width="1.5" height="1.5" /></element>
+		<element ref="black_rect"><bounds x="119.4" y="24.2" width="0.2" height="1.6" /></element>
+		<element ref="black_rect"><bounds x="116.7" y="25.0" width="2.9" height="0.2" /></element>
 
 		<element ref="hlb" inputtag="IN.1" inputmask="0x01"><bounds x="117" y="19" width="5" height="5" /></element>
 		<element ref="hlb" inputtag="IN.1" inputmask="0x02"><bounds x="117" y="26" width="5" height="5" /></element>
@@ -427,8 +450,11 @@ license:CC0
 		<element ref="hlb" inputtag="IN.0" inputmask="0x02"><bounds x="105" y="78" width="5" height="5" /></element>
 		<element ref="hlb" inputtag="IN.0" inputmask="0x01"><bounds x="119" y="78" width="5" height="5" /></element>
 
+		<!-- hidden input at the left of MONITOR/VIEW buttons to press both -->
+		<element ref="nothing" inputtag="CLICKABLE" inputmask="0x01"><bounds x="110.8" y="24" width="5" height="2" /></element>
+
 		<!-- panel 16seg leds -->
-		<element name="display_background" ref="black_rect"> <bounds x="101" y="4" width="26" height="9.2" /> </element>
+		<element name="display_background" ref="black_rect"> <bounds x="101" y="4" width="26" height="9.2" /></element>
 		<element name="digit3" ref="digit"> <bounds x="102" y="4.5" width="5.66" height="8.5" /></element>
 		<element name="digit2" ref="digit"> <bounds x="108" y="4.5" width="5.66" height="8.5" /></element>
 		<element name="digit1" ref="digit"> <bounds x="114" y="4.5" width="5.66" height="8.5" /></element>

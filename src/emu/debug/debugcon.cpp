@@ -133,7 +133,7 @@ inline bool debugger_console::debug_command::compare::operator()(const debug_com
 }
 
 
-debugger_console::debug_command::debug_command(std::string_view _command, u32 _flags, int _minparams, int _maxparams, std::function<void (const std::vector<std::string> &)> &&_handler)
+debugger_console::debug_command::debug_command(std::string_view _command, u32 _flags, int _minparams, int _maxparams, std::function<void (const std::vector<std::string_view> &)> &&_handler)
 	: command(_command), params(nullptr), help(nullptr), handler(std::move(_handler)), flags(_flags), minparams(_minparams), maxparams(_maxparams)
 {
 }
@@ -143,7 +143,7 @@ debugger_console::debug_command::debug_command(std::string_view _command, u32 _f
 //  execute_help_custom - execute the helpcustom command
 //------------------------------------------------------------
 
-void debugger_console::execute_help_custom(const std::vector<std::string> &params)
+void debugger_console::execute_help_custom(const std::vector<std::string_view> &params)
 {
 	for (const debug_command &cmd : m_commandlist)
 	{
@@ -160,9 +160,9 @@ void debugger_console::execute_help_custom(const std::vector<std::string> &param
     execute_condump - execute the condump command
 ------------------------------------------------------------*/
 
-void debugger_console::execute_condump(const std::vector<std::string>& params)
+void debugger_console::execute_condump(const std::vector<std::string_view>& params)
 {
-	std::string filename = params[0];
+	std::string filename(params[0]);
 	const char* mode;
 
 	/* replace macros */
@@ -308,10 +308,7 @@ CMDERR debugger_console::internal_execute_command(bool execute, std::vector<std:
 
 	// execute the handler
 	if (execute)
-	{
-		std::vector<std::string> params_vec(params.begin(), params.end());
-		found->handler(params_vec);
-	}
+		found->handler(params);
 	return CMDERR::none();
 }
 
@@ -454,7 +451,7 @@ CMDERR debugger_console::validate_command(std::string_view command)
     register_command - register a command handler
 -------------------------------------------------*/
 
-void debugger_console::register_command(std::string_view command, u32 flags, int minparams, int maxparams, std::function<void (const std::vector<std::string> &)> &&handler)
+void debugger_console::register_command(std::string_view command, u32 flags, int minparams, int maxparams, std::function<void (const std::vector<std::string_view> &)> &&handler)
 {
 	if (m_machine.phase() != machine_phase::INIT)
 		throw emu_fatalerror("Can only call debugger_console::register_command() at init time!");

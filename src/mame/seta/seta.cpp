@@ -8769,7 +8769,7 @@ void zombraid_state::machine_start()
 void zombraid_state::zombraid(machine_config &config)
 {
 	gundhara(config);
-	driver_device::static_set_callback(config.root_device(), driver_device::CB_MACHINE_START, driver_callback_delegate());
+	MCFG_MACHINE_START_REMOVE()
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &zombraid_state::zombraid_map);
@@ -12176,7 +12176,7 @@ u16 downtown_state::metafox_protection_r(offs_t offset)
 	// the first address in each range is special and returns data written elsewhere in that range
 	// 21fde0-21fdff appears to be control bytes?
 
-	// Protection device is a surface-scratched SDIP64 on the P1-049-A sub PCB
+	// Protection device (likely X1-017) is a surface-scratched SDIP64 on the P1-049-A sub PCB
 
 	switch (offset)
 	{

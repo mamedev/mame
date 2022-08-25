@@ -9,12 +9,12 @@
    width="1214px">
   <defs>
     <linearGradient id="left-dark" x1="0" x2="1" y1="0" y2="0">
-      <stop id="stop5213" offset="0" stop-color="#00274f" />
-      <stop id="stop5215" offset="1" stop-color="#68cafb" />
+      <stop id="left-dark-0" offset="0" stop-color="#00274f" />
+      <stop id="left-dark-1" offset="1" stop-color="#68cafb" />
     </linearGradient>
     <linearGradient id="right-dark" x1="0" x2="1" y1="0" y2="0">
-      <stop id="stop4" offset="0" stop-color="#68cafb" />
-      <stop id="stop6" offset="1" stop-color="#00274f" />
+      <stop id="right-dark-0" offset="0" stop-color="#68cafb" />
+      <stop id="right-dark-1" offset="1" stop-color="#00274f" />
     </linearGradient>
   </defs>
   <g>

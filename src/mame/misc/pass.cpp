@@ -91,50 +91,149 @@
 
  --- Game Notes ---
 
- Graphical Glitches caused when 2 sprites are close together are NOT bugs, the Sprites are
- infact constructed from a tilemap made of 4x4 tiles.
+ Graphical glitches caused when 2 sprites are close together are NOT bugs, the sprites are
+ in fact constructed from a tilemap made of 4x4 tiles.
 
  I imagine flicker on the main character at times is also correct.
 
- Its rather interesting to see a game this old using 8bpp tiles
+ It's rather interesting to see a game this old using 8bpp tiles
 
 
  */
 
 #include "emu.h"
-#include "pass.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "sound/ymopn.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
-/* todo: check all memory regions actually readable / read from */
-void pass_state::pass_map(address_map &map)
+namespace {
+
+class pass_state : public driver_device
+{
+public:
+	pass_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_bg_tilemap(nullptr),
+		m_fg_tilemap(nullptr),
+		m_bg_videoram(*this, "bg_videoram"),
+		m_fg_videoram(*this, "fg_videoram"),
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode")
+	{
+	}
+
+	void pass(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
+	void bg_videoram_w(offs_t offset, uint16_t data);
+	void fg_videoram_w(offs_t offset, uint16_t data);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void main_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_map(address_map &map);
+
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+
+	required_shared_ptr<uint16_t> m_bg_videoram;
+	required_shared_ptr<uint16_t> m_fg_videoram;
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+};
+
+
+// video
+
+// background tilemap stuff
+
+TILE_GET_INFO_MEMBER(pass_state::get_bg_tile_info)
+{
+	int tileno = m_bg_videoram[tile_index] & 0x1fff;
+	int fx = (m_bg_videoram[tile_index] & 0xc000) >> 14;
+	tileinfo.set(1, tileno, 0, TILE_FLIPYX(fx));
+
+}
+
+void pass_state::bg_videoram_w(offs_t offset, uint16_t data)
+{
+	m_bg_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+// foreground 'sprites' tilemap stuff
+
+TILE_GET_INFO_MEMBER(pass_state::get_fg_tile_info)
+{
+	int tileno = m_fg_videoram[tile_index] & 0x3fff;
+	int flip = (m_fg_videoram[tile_index] & 0xc000) >>14;
+
+	tileinfo.set(0, tileno, 0, TILE_FLIPYX(flip));
+
+}
+
+void pass_state::fg_videoram_w(offs_t offset, uint16_t data)
+{
+	m_fg_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
+}
+
+// video update / start
+
+void pass_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pass_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8,  64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pass_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 4, 4, 128, 64);
+
+	m_fg_tilemap->set_transparent_pen(255);
+}
+
+uint32_t pass_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
+
+
+// machine
+
+// TODO: check all memory regions actually readable / read from
+void pass_state::main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x080000, 0x083fff).ram();
-	map(0x200000, 0x200fff).ram().w(FUNC(pass_state::pass_bg_videoram_w)).share("bg_videoram"); // Background
-	map(0x210000, 0x213fff).ram().w(FUNC(pass_state::pass_fg_videoram_w)).share("fg_videoram"); // Foreground
+	map(0x200000, 0x200fff).ram().w(FUNC(pass_state::bg_videoram_w)).share(m_bg_videoram);
+	map(0x210000, 0x213fff).ram().w(FUNC(pass_state::fg_videoram_w)).share(m_fg_videoram);
 	map(0x220000, 0x2203ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x230001, 0x230001).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x230100, 0x230101).portr("DSW");
 	map(0x230200, 0x230201).portr("INPUTS");
 }
 
-/* sound cpu */
-void pass_state::pass_sound_map(address_map &map)
+void pass_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0xf800, 0xffff).ram();
 }
 
-void pass_state::pass_sound_io_map(address_map &map)
+void pass_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).r("soundlatch", FUNC(generic_latch_8_device::read));
@@ -143,7 +242,7 @@ void pass_state::pass_sound_io_map(address_map &map)
 	map(0xc0, 0xc0).w("soundlatch", FUNC(generic_latch_8_device::clear_w));
 }
 
-/* todo : work out function of unknown but used dsw */
+// TODO : work out function of unknown but used dsw
 static INPUT_PORTS_START( pass )
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0001, 0x0001, "Unknown SW 0-0" )    // USED ! Check code at 0x0046ea
@@ -180,11 +279,11 @@ static INPUT_PORTS_START( pass )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x1800, 0x0000, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Easy ) )         // Time = 99
-	PORT_DIPSETTING(      0x1800, DEF_STR( Normal ) )           // Time = 88
+	PORT_DIPSETTING(      0x1800, DEF_STR( Normal ) )       // Time = 88
 	PORT_DIPSETTING(      0x0800, DEF_STR( Hard ) )         // Time = 77
-	PORT_DIPSETTING(      0x1000, DEF_STR( Hardest ) )          // Time = 66
+	PORT_DIPSETTING(      0x1000, DEF_STR( Hardest ) )      // Time = 66
 	PORT_DIPNAME( 0xe000, 0xe000, DEF_STR( Coinage ) )
-//  PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x4000, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0xc000, DEF_STR( 2C_1C ) )
@@ -212,18 +311,7 @@ static INPUT_PORTS_START( pass )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 INPUT_PORTS_END
 
-static const gfx_layout tiles8x8_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	8,
-	{ 0,1, 2,3, 4,5,6,7 },
-	{ 0, 8, 16, 24, 32, 40, 48, 56 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
-	64*8
-};
-
-/* for something so simple this took a while to see */
+// for something so simple this took a while to see
 static const gfx_layout tiles4x4_fg_layout =
 {
 	4,4,
@@ -236,68 +324,70 @@ static const gfx_layout tiles4x4_fg_layout =
 };
 
 static GFXDECODE_START( gfx_pass )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles4x4_fg_layout, 256, 2 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 2 )
+	GFXDECODE_ENTRY( "fgtiles", 0, tiles4x4_fg_layout, 256, 2 )
+	GFXDECODE_ENTRY( "bgtiles", 0, gfx_8x8x8_raw, 0, 2 )
 GFXDECODE_END
 
-/* todo : is this correct? */
+// TODO : is this correct?
 void pass_state::pass(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 14318180/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pass_state::pass_map);
-	m_maincpu->set_vblank_int("screen", FUNC(pass_state::irq1_line_hold)); /* all the same */
+	// basic machine hardware
+	M68000(config, m_maincpu, 14'318'180 / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pass_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(pass_state::irq1_line_hold)); // all the same
 
-	z80_device &audiocpu(Z80(config, "audiocpu", 14318180/4));
-	audiocpu.set_addrmap(AS_PROGRAM, &pass_state::pass_sound_map);
-	audiocpu.set_addrmap(AS_IO, &pass_state::pass_sound_io_map);
-	audiocpu.set_periodic_int(FUNC(pass_state::irq0_line_hold), attotime::from_hz(60)); /* probably not accurate, unknown timing and generation (ym2203 sound chip?). */
+	z80_device &audiocpu(Z80(config, "audiocpu", 14'318'180 / 4));
+	audiocpu.set_addrmap(AS_PROGRAM, &pass_state::sound_map);
+	audiocpu.set_addrmap(AS_IO, &pass_state::sound_io_map);
+	audiocpu.set_periodic_int(FUNC(pass_state::irq0_line_hold), attotime::from_hz(60)); // probably not accurate, unknown timing and generation (ym2203 sound chip?).
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(8*8, 48*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(pass_state::screen_update_pass));
+	screen.set_screen_update(FUNC(pass_state::screen_update));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x200);
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_pass);
 
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM2203(config, "ymsnd", 14318180/4).add_route(ALL_OUTPUTS, "mono", 0.60);
+	YM2203(config, "ymsnd", 14'318'180 / 4).add_route(ALL_OUTPUTS, "mono", 0.60);
 
-	OKIM6295(config, "oki", 792000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.60); // clock frequency & pin 7 not verified
+	OKIM6295(config, "oki", 792'000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.60); // clock frequency & pin 7 not verified
 }
 
 
 ROM_START( pass )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68k */
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68k
 	ROM_LOAD16_BYTE( "33", 0x00001, 0x20000, CRC(0c5f18f6) SHA1(49b60d46e4149ad1d49b044522a6888737c17e7d) )
 	ROM_LOAD16_BYTE( "34", 0x00000, 0x20000, CRC(7b54573d) SHA1(251e99fa1f045ae4c90676e1953e49e8191440e4) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* z80 clone? */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // z80 clone?
 	ROM_LOAD( "23", 0x00000, 0x10000, CRC(b9a0ccde) SHA1(33e7dda247aa44b1933ae9c033c161c152276ce6) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* samples? */
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "31", 0x00000, 0x20000, CRC(c7315bbd) SHA1(c0bb392793cafc7b3f76da8fb26c6c16948f87e5) )
 
-	ROM_REGION( 0x40000, "gfx1", 0 ) /* fg layer 'sprites' */
+	ROM_REGION( 0x40000, "fgtiles", 0 )
 	ROM_LOAD16_BYTE( "35", 0x00000, 0x20000, CRC(2ab33f07) SHA1(23f2481450b3f43bbe3856c4cf595af74b1da2e0) )
 	ROM_LOAD16_BYTE( "36", 0x00001, 0x20000, CRC(6677709d) SHA1(0d3df11097855294d606e46c0db0cf801c1dc28a) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 ) /* bg tiles */
-	ROM_LOAD16_BYTE( "37", 0x40000, 0x20000, CRC(296499e7) SHA1(b7727f7942e20a2428df84e99075a572189a0096) )
-	ROM_LOAD16_BYTE( "39", 0x40001, 0x20000, CRC(35c0ad5c) SHA1(78e3ca8b2e382a3c7bc53ede2ef5611c520ab095) )
+	ROM_REGION( 0x80000, "bgtiles", 0 )
 	ROM_LOAD16_BYTE( "38", 0x00000, 0x20000, CRC(7f11b81a) SHA1(50253da7c13f9390fe7afd2faf17b8057f0bee1b) )
 	ROM_LOAD16_BYTE( "40", 0x00001, 0x20000, CRC(80e0a71d) SHA1(e62c855f357e7492a59f8719c62a16d418dfa60b) )
+	ROM_LOAD16_BYTE( "37", 0x40000, 0x20000, CRC(296499e7) SHA1(b7727f7942e20a2428df84e99075a572189a0096) )
+	ROM_LOAD16_BYTE( "39", 0x40001, 0x20000, CRC(35c0ad5c) SHA1(78e3ca8b2e382a3c7bc53ede2ef5611c520ab095) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1992, pass, 0, pass, pass, pass_state, empty_init, ROT0, "Oksan", "Pass", MACHINE_SUPPORTS_SAVE )

@@ -450,8 +450,8 @@ ROM_START( ar_airh2 )
 	ROM_LOAD16_BYTE( "arcadia4.u10", 0x00000, 0x10000, CRC(baf8d886) SHA1(77efbc27c1cf717dfee2686009a957029eb1b113) )
 	ROM_LOAD16_BYTE( "arcadia4.u6",  0x00001, 0x10000, CRC(ccff38ee) SHA1(ae89dbc9533358c80423b2dc21f101816730be7c) )
 
-	ROM_REGION( 0x104, "misc", ROMREGION_ERASEFF )
-	ROM_LOAD( "arcadia.u14.bin",  0x000, 0x104, CRC(1af35582) SHA1(a78aa61a56dea9b5c9df8b734f99adb0383d135b) ) // bad/protected?
+	ROM_REGION( 0x104, "plds", ROMREGION_ERASEFF )
+	ROM_LOAD( "arcadia.u14",  0x000, 0x104, NO_DUMP ) // protected
 ROM_END
 
 
@@ -505,8 +505,8 @@ ROM_START( ar_dart2 )
 	ROM_LOAD16_BYTE( "arcadia3.u20", 0xa0000, 0x10000, CRC(efb0f2e2) SHA1(7ba1d85ac573db9bbd1ef04d0770c7c1277bc10e) )
 	ROM_LOAD16_BYTE( "arcadia3.u16", 0xa0001, 0x10000, CRC(a9c5e939) SHA1(75de7c0fb4654b6738ecd0c170589f3a46012f33) )
 
-	ROM_REGION( 0x104, "misc", ROMREGION_ERASEFF )
-	ROM_LOAD( "arcadia.u14.bin",  0x000, 0x104, CRC(1af35582) SHA1(a78aa61a56dea9b5c9df8b734f99adb0383d135b) ) // bad/protected?
+	ROM_REGION( 0x104, "plds", ROMREGION_ERASEFF )
+	ROM_LOAD( "arcadia.u14",  0x000, 0x104, NO_DUMP ) // protected
 ROM_END
 
 
@@ -700,8 +700,8 @@ ROM_START( ar_ninj2 )
 	ROM_LOAD16_BYTE( "arcadia5.u20", 0xa0000, 0x10000, CRC(7359920b) SHA1(72c7438f9f5ef5d6a23f11fc58d32f8e1ff0ae44) )
 	ROM_LOAD16_BYTE( "arcadia5.u16", 0xa0001, 0x10000, CRC(85a639bb) SHA1(22bfadfe6c8fd366e45ec172c070d9811e1ea8a9) )
 
-	ROM_REGION( 0x104, "misc", ROMREGION_ERASEFF )
-	ROM_LOAD( "arcadia.u14.bin",  0x000, 0x104, CRC(1af35582) SHA1(a78aa61a56dea9b5c9df8b734f99adb0383d135b) ) // bad/protected?
+	ROM_REGION( 0x104, "plds", ROMREGION_ERASEFF )
+	ROM_LOAD( "arcadia.u14",  0x000, 0x104, NO_DUMP ) // protected
 ROM_END
 
 
@@ -758,8 +758,8 @@ ROM_START( ar_sdwr2 )
 	ROM_LOAD16_BYTE( "arcadia1.u20", 0xa0000, 0x10000, CRC(5791440b) SHA1(fc9297343ddc2e6e1e22b7ed9a986777519061db) )
 	ROM_LOAD16_BYTE( "arcadia1.u16", 0xa0001, 0x10000, CRC(e63e1679) SHA1(0762bff0018e006905a2e58141fdf05910f06e29) )
 
-	ROM_REGION( 0x104, "misc", ROMREGION_ERASEFF )
-	ROM_LOAD( "arcadia.u14.bin",  0x000, 0x104, CRC(1af35582) SHA1(a78aa61a56dea9b5c9df8b734f99adb0383d135b) ) // bad/protected?
+	ROM_REGION( 0x104, "plds", ROMREGION_ERASEFF )
+	ROM_LOAD( "arcadia.u14",  0x000, 0x104, NO_DUMP ) // protected
 ROM_END
 
 

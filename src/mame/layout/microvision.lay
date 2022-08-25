@@ -10,7 +10,7 @@ license:CC0
 	<element name="lcdm"><rect><color red="0.59" green="0.60" blue="0.44" /></rect></element>
 	<element name="lcda"><rect><color red="0.17" green="0.15" blue="0.27" /></rect></element> <!-- blue tint -->
 
-	<element name="nothing" defstate="0"><text string=" "/></element>
+	<element name="nothing" defstate="0"><rect><color alpha="0" /></rect></element>
 	<element name="text_p1"><text string="PADDLE:" align="2"><color red="0.1" green="0.1" blue="0.1" /></text></element>
 	<element name="text_p2" defstate="0">
 		<simplecounter maxstate="999" digits="3" align="1">

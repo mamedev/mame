@@ -2769,7 +2769,7 @@ license:CC0
 	<software name="stg" supported="partial">
 		<description>S.T.G.</description>
 		<year>1999</year>
-		<publisher>GameLand  / DaiCom Software</publisher>
+		<publisher>GameLand / DaiCom Software</publisher>
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">

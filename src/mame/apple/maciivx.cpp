@@ -31,10 +31,10 @@
 #include "machine/swim1.h"
 #include "machine/timer.h"
 #include "machine/z80scc.h"
-#include "cuda.h"
 #include "egret.h"
 #include "macadb.h"
 #include "macscsi.h"
+#include "mactoolbox.h"
 #include "vasp.h"
 
 #include "emupal.h"
@@ -110,7 +110,7 @@ private:
 		m_maincpu->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
 	}
 
-	WRITE_LINE_MEMBER(cuda_reset_w)
+	WRITE_LINE_MEMBER(egret_reset_w)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 		m_maincpu->set_input_line(INPUT_LINE_RESET, state);
@@ -360,11 +360,12 @@ void maciivx_state::maciivx(machine_config &config)
 {
 	M68030(config, m_maincpu, C32M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &maciivx_state::maciivx_map);
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	maciiv_base(config);
 
 	EGRET(config, m_egret, EGRET_341S0851);
-	m_egret->reset_callback().set(FUNC(maciivx_state::cuda_reset_w));
+	m_egret->reset_callback().set(FUNC(maciivx_state::egret_reset_w));
 	m_egret->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
 	m_egret->via_clock_callback().set(m_vasp, FUNC(vasp_device::cb1_w));
 	m_egret->via_data_callback().set(m_vasp, FUNC(vasp_device::cb2_w));
@@ -383,6 +384,7 @@ void maciivx_state::maciivi(machine_config &config)
 
 	M68030(config.replace(), m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &maciivx_state::maciivi_map);
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 }
 
 ROM_START(maciivx)

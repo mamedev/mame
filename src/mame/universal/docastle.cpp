@@ -511,24 +511,11 @@ static INPUT_PORTS_START( idsoccer )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_8WAY PORT_PLAYER(2)
 INPUT_PORTS_END
 
-/* Graphics Layouts */
-
-static const gfx_layout spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ STEP16(0,4) },
-	{ STEP16(0,64) },
-	128*8
-};
-
 /* Graphics Decode Information */
 
 static GFXDECODE_START( gfx_docastle )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb, 0, 64 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,     0, 32*2 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,   0, 64 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_16x16x4_packed_msb, 0, 32*2 )
 GFXDECODE_END
 
 

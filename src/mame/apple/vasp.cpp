@@ -90,6 +90,7 @@ void vasp_device::device_add_mconfig(machine_config &config)
 	ASC(config, m_asc, C15M, asc_device::asc_type::VASP);
 	m_asc->add_route(0, "lspeaker", 1.0);
 	m_asc->add_route(1, "rspeaker", 1.0);
+	m_asc->irqf_callback().set(FUNC(vasp_device::asc_irq));
 }
 
 //-------------------------------------------------
@@ -344,6 +345,20 @@ WRITE_LINE_MEMBER(vasp_device::slot2_irq_w)
 	}
 
 	pseudovia_recalc_irqs();
+}
+
+WRITE_LINE_MEMBER(vasp_device::asc_irq)
+{
+	if (state == ASSERT_LINE)
+	{
+		m_pseudovia_regs[3] |= 0x10; // any VIA 2 interrupt | sound interrupt
+		pseudovia_recalc_irqs();
+	}
+	else
+	{
+		m_pseudovia_regs[3] &= ~0x10;
+		pseudovia_recalc_irqs();
+	}
 }
 
 void vasp_device::pseudovia_recalc_irqs()
