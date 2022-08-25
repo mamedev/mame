@@ -499,9 +499,7 @@ void spbactn_state::sound_map(address_map &map)
 uint8_t spbactnp_state::extra_latch_r(offs_t offset)
 {
 	uint16_t latch = m_extralatch->read();
-	if (offset & 1) latch >>= 8;
-
-	return latch;
+	return (offset & 1) ? (latch >> 8) : (latch & 0xff);
 }
 
 
@@ -808,26 +806,12 @@ void spbactnp_state::spbactnp(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(4'000'000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &spbactnp_state::sound_map);
 
-	GENERIC_LATCH_16(config, m_extralatch);
-	m_extralatch->data_pending_callback().set_inputline(m_extracpu, INPUT_LINE_NMI);
-
-	GFXDECODE(config, m_extragfxdecode, m_extrapalette, gfx_extraspbactnp);
-
-	SCREEN(config, m_extrascreen, SCREEN_TYPE_RASTER);
-	m_extrascreen->set_refresh_hz(60);
-	m_extrascreen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_extrascreen->set_size(32*8, 32*8);
-	m_extrascreen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	m_extrascreen->set_screen_update(FUNC(spbactnp_state::extrascreen_update));
-
-	config.set_default_layout(layout_spbactnp);
-
 	Z80(config, m_extracpu, XTAL(4'000'000));
 	m_extracpu->set_addrmap(AS_PROGRAM, &spbactnp_state::extra_map);
 	m_extracpu->set_vblank_int("extrascreen", FUNC(spbactnp_state::irq0_line_hold));
 
-	PALETTE(config, m_extrapalette).set_format(palette_device::xBRG_444, 0x1000 / 2);
-	m_extrapalette->set_endianness(ENDIANNESS_BIG);
+	GENERIC_LATCH_16(config, m_extralatch);
+	m_extralatch->data_pending_callback().set_inputline(m_extracpu, INPUT_LINE_NMI);
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -841,6 +825,19 @@ void spbactnp_state::spbactnp(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spbactnp);
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 0x2800 / 2);
 
+	SCREEN(config, m_extrascreen, SCREEN_TYPE_RASTER);
+	m_extrascreen->set_refresh_hz(60);
+	m_extrascreen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_extrascreen->set_size(32*8, 32*8);
+	m_extrascreen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_extrascreen->set_screen_update(FUNC(spbactnp_state::extrascreen_update));
+
+	GFXDECODE(config, m_extragfxdecode, m_extrapalette, gfx_extraspbactnp);
+	PALETTE(config, m_extrapalette).set_format(palette_device::xBRG_444, 0x1000 / 2);
+	m_extrapalette->set_endianness(ENDIANNESS_BIG);
+
+	config.set_default_layout(layout_spbactnp);
+
 	TECMO_SPRITE(config, m_sprgen, 0);
 
 	TECMO_MIXER(config, m_mixer, 0);
@@ -851,7 +848,7 @@ void spbactnp_state::spbactnp(machine_config &config)
 	m_mixer->set_bgpen(0x800 + 0x300, 0x000 + 0x300);
 	m_mixer->set_screen(m_screen);
 
-	// sound hardware  - different?
+	// sound hardware - different?
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
@@ -928,7 +925,6 @@ ROM_START( spbactnp )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "spa.17g", 0x00000, 0x10000, CRC(445fc2c5) SHA1(c0e40496cfcaa0a8c90fb05111fadee74582f91a) )
-
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "spa_data_2-21-a10.8e",   0x00000, 0x20000,  CRC(87427d7d) SHA1(f76b0dc3f0d87deb0f0c81084aff9756b236e867) ) // same as regular
