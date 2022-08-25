@@ -572,7 +572,7 @@ ROM_START( catt )
 	ROM_REGION( 0x0400, "plds", 0 )
 	ROM_LOAD( "peel18cv8.u1", 0x0000, 0x0155, NO_DUMP )
 	ROM_LOAD( "gal16v8a.u10", 0x0200, 0x0117, NO_DUMP )
-	ROM_END
+ROM_END
 
 ROM_START( nost )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* M68000 */

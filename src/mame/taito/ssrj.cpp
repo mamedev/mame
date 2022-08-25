@@ -189,7 +189,6 @@ ROM_START( ssrj )
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "proms",  0x0000, 0x0100, NO_DUMP )
-
 ROM_END
 
 GAME( 1985, ssrj,  0,       ssrj,  ssrj, ssrj_state, empty_init, ROT90, "Taito Corporation", "Super Speed Race Junior (Japan)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

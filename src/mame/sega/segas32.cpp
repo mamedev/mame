@@ -3659,7 +3659,6 @@ ROM_START( f1en )
 	ROM_LOAD64_BYTE( "mpr-14365.ic33", 0x000005, 0x080000, CRC(36913790) SHA1(4a447cffb44b023fe1441277db1e411d4cd119eb) )
 	ROM_LOAD64_BYTE( "mpr-14364.ic28", 0x000006, 0x080000, CRC(0fa12ecd) SHA1(6a34c7718edffbeddded8786e11cac181b485ebd) )
 	ROM_LOAD64_BYTE( "mpr-14363.ic24", 0x000007, 0x080000, CRC(f3427a56) SHA1(6a99d7432dfff35470ddcca5cfde36689a77e706) )
-
 ROM_END
 
 /**************************************************************************************************************************

@@ -532,7 +532,7 @@ ROM_START( prose2k )
 	ROM_LOAD( "am27s19.u77", 0x0000, 0x0020, CRC(a88757fc) SHA1(9066d6dbc009d7a126d75b8461ca464ddf134412))
 	ROM_LOAD( "am27s19.u79", 0x0020, 0x0020, CRC(a165b090) SHA1(bfc413c79915c68906033741318c070ad5dd0f6b))
 	ROM_LOAD( "am27s19.u81", 0x0040, 0x0020, CRC(62e1019b) SHA1(acade372edb08fd0dcb1fa3af806c22c47081880))
-	ROM_END
+ROM_END
 
 ROM_START( prose2ko )
 	// 'Older' prose2k set
@@ -563,7 +563,7 @@ ROM_START( prose2ko )
 	ROM_LOAD( "dm74s288n.u77", 0x0000, 0x0020, CRC(a88757fc) SHA1(9066d6dbc009d7a126d75b8461ca464ddf134412)) // == am27s19.u77
 	ROM_LOAD( "dm74s288n.whitespot.u79", 0x0020, 0x0020, CRC(7faee6cb) SHA1(b6dd2a6909dac9e89e7317c006a013ff0866382d))
 	// no third PROM in this set, a 74S138 is used instead for e0000-fffff ROM mapping
-	ROM_END
+ROM_END
 
 } // anonymous namespace
 
