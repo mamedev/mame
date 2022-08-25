@@ -11,12 +11,10 @@
               * Custom polygon hardware
               * 1 text tilemap
 
-    Gorgon and System 23 use an I/O board based on the Namco C78, which is a Renesas H8/3334 MCU
-    (8-bit version of the H8/3002).
-
-    Super System 23 uses a PIC16Cxx-based I/O board.  In both cases the I/O boards' MCUs apparently are connected
-    to the H8/3002's serial port, similar to System 22 where one 37702 reads the I/O and communicates serially
-    with the second 37702 which is the traditional "subcpu".
+    All games use a JVS I/O board connected to the H8/3002's serial port #0 and requires an I/O board to
+    get past the subcpu check. It's similar to System 22 where one 37702 reads the I/O and communicates
+	serially with the second 37702 which is the traditional "subcpu". Several I/O boards are accepted
+    including TSS-I/O, FCA, ASCA3, ASCA5 and the common JVS I/O boards manufactured by Sega.
 
     NOTES:
     - First 128k of main program ROM is the BIOS, and after that is a 64-bit MIPS ELF image.
@@ -31,6 +29,10 @@
       and displaying it I'm not going to meddle with it though.
 
     - Improve GMEN hookups/comms.
+
+    - Motocross Go! uses two I/O boards chained and handles JVS differently from other games.
+      Currently its second I/O board isn't connected in the chain and has the main board
+      disable inputs because of this.
 
     - Super System 23 tests irqs in the post.  timecrs2v4a's code can
     potentially test 7 sources, but only actually test 5.  With each
@@ -112,19 +114,14 @@ c8000000:
         rapidrvr,v2c        Missing 3d graphics. Coins up. Freezes right when a game starts.
         rapidrvrp           Same as above but it's possible to enable (glitchy) 3d by entering certain portions of the development menu.
         finfurl             Missing 3d graphics. Freezes in attract mode but can 'play' the game with missing 3d. 
-        motoxgo(all)        Inputs don't respond at all. It's not an I/O board issue as changing the I/O program to a different
-                            version doesn't work and using the I/O program on a different game has it work fine (tested on rapidrvr).
-                            May be related to sub_comm_r.
-                            On a side note on actual h/w, unplugging the I/O board (after completing POST) stops inputs from working
-                            even if the I/O board is plugged back in. This is not the case in timecrs2 where plugging an I/O board back
-                            in restores inputs if unplugged in that case.
+        motoxgo(all)        Inputs don't respond at all. Hardlocks shortly in atract mode.
         downhill            Freeze with black screen after POST.
         downhillu           Heavy gfx glitches. Missing rotary inputs. Random freezes.
         timecrs2(all)       Playable with some gfx glitches up until stage 1-2 (see sub_comm_r).
         panicprk,j,j2       Freezes during 'SUB-READY WAIT' after POST (see sub_comm_r).
         gunwars,a           Hardlocks after POST (gmen related?).
         raceon              Hardlocks after POST (gmen related?).
-        aking               Freezes at the first ingame frame showing the notice screen or test menu.
+        aking               Freezes at the first ingame frame showing the notice screen or test menu. Missing rotary inputs.
         500gp               Heavy gfx glitches. Possible to coin up but freezes when starting a game as well as in attract.
         finfurl2,j          Freezes upon the gmen transfering the program to the SH2.
         crszone(all)        Has its IRQs hardwired different from S23/SS23. Won't advance past interrupt check and skipping POST with
@@ -156,6 +153,8 @@ Crisis Zone       Namco, 1999    System 23 Evolution 2
     According to Bandai Namco's website it is indeed SS23, and includes an extra sound board with Zoom Corp. DSP.
 
 A System 23 unit is comprised of some of the following pieces....
+- SYSTEM23 POWER(A) PCB            Small PCB bolted to the metal box only consisting of power in and network in/out. Only Motocross Go! used this as its
+                                   video and sound connectors are mounted on the main board.
 - V185B EMI PCB                    Small PCB bolted to the metal box with several connectors including power in, video out, network in/out, sound out
                                    (to AMP PCB) used with most of the S23/SS23 games that use a single main PCB and no other control PCBs.
 - V198 EMI PCB                     Small PCB bolted to the metal box with several connectors (power/video/sound etc) plus a couple of extra
@@ -172,6 +171,8 @@ A System 23 unit is comprised of some of the following pieces....
                                    If the FCA PCB is not connected, the game will not advance past the 3rd screen shown below.
 - ASCA-3A PCB / ASCA-4A PCB        This is the standard I/O board used with most of the S23/SS23 games with support for digital and
                                    analog controls (buttons/joysticks/pots etc).
+- V183 AMC PCB                     I/O board only in Motocross Go that controls handlebar and seat force feedback. It's connected as a slave
+                                   I/O board. Half of the board recycles a v145 motor board used in Rave Racer, Ace Driver and Dirt Dash.
 - V185 I/O PCB                     Gun I/O board used with Time Crisis II
 - V221 MIU PCB                     Gun I/O board used with Crisis Zone (System 23 Evolution 2) and Time Crisis 3 (on System 246)
 - SYSTEM23 MEM(M) PCB              Holds mask ROMs for GFX/Sound and associated logic
@@ -970,6 +971,49 @@ Note both games use a CCD camera for the gun sensor.
 
 Drive/Feedback PCB
 ------------------
+
+V183 AMC PCB  2473966102 (2473970102)
+|---------------------------------------------------|
+|                                                   |
+|                                                   |
+|                          4.9152MHz              J2|
+|                                     |-----|       |
+|                                     | MCU |       |
+|                                     |     |       |
+|     SS22 FFB                        |-----|       |
+|                      |------|                     |
+|                      |ALTERA|              DSW(4) |
+|                      |EPM7096                     |
+|                      |------|                     |
+|                                                 J4|
+|                                       ADM485      |
+|                 27C1024   62256x2               J5|
+|                                                   |
+|---------------------------------------------------|
+Notes:
+      This board is used only with Motocross Go! to control the steering feedback motor. It communicates as a slave JVS
+      I/O board to both the game board and the ASCA I/O board. Another signal labelled as 'FREEZE/RELAY' connects between
+      this board to its ASCA I/O board.
+
+      MCU      - Fujitsu MB90611A F2MC-16F Family Microcontroller. Clock input 4.9152MHz (QFP100)
+      62256    - 32k x2 SRAM (SOP28)
+      EPM7096  - Altera EPM7064 CPLD labelled 'MG1,P LD0A' (PLCC44)
+      27C1001  - 128k x8 EPROM labelled 'MG1-PRG0' (DIP40)
+      ADM485   - Analog Devices ADM485 +5V Low Power EIA RS-485 Transceiver (SOIC8) 
+      J4/J5    - Standard USB A and B connectors.
+      J2       - Ribbon cable connector.
+      SS22 FFB - The recycled System 22 v147 motor drive board portion.
+
+      From testing on an actual Motocross Go! cabinet, the game doesn't like it if this board is disconnected in any way.
+      It needs both an ASCA and AMC I/O board chained in order to fully boot with properly working I/O. The following happens
+      if any portion of an AMC pcb is disconnected (only applies to Motocross Go!).
+
+      AMC board powered off: Board doesn't properly initialize its subcpu giving a 'subcpu timeout'.
+      AMC board powered on, JVS comms disconnected, freeze/relay connected: Board initializes the subcpu properly but
+      intentionally disables inputs.
+      AMC board powered on, JVS comms connected, freeze/relay disconnected: Board initializes the subcpu properly.
+      Main inputs work. Motor doesn't respond (if freeze/relay is reconnected, the motor will respond again).
+
 
 V194 STR PCB
 2487960102 (2487970102)
