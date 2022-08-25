@@ -18,10 +18,8 @@
 
     The byte at 0xffffd (0x1fffe in program rom 4) in the main cpu region controls the
     country/game mode:
-    High nibble: Player respawn behavior in single player
-        0x0*  = Restart at checkpoint
-        0x8*  = Respawn instantly
-        0xA*  = Unknown, identical to 0x0*? (seen in raidenk)
+        bit 7 = if set, respawn instantly; else restart at checkpoint
+        bit 5 = unknown (seen in raidenk)
 
     Low nibble: country/region code
         0x*0  = World/Japan version? (Seibu Kaihatsu) (distributed by Tecmo?)
