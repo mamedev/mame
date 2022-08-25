@@ -365,7 +365,7 @@ void raiden_state::raiden(machine_config &config)
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(59.60); // verified on pcb */
+	screen.set_refresh_hz(59.60); // verified on pcb
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
