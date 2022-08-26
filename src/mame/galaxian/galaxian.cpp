@@ -12317,7 +12317,7 @@ on the day of 18/07/10
 
 PCB is a bootleg Galaxian, with pin headers, probably
 of European origin. The signs and marking point to
-it being a Moon Cresta, but I'm note sure. Also it
+it being a Moon Cresta, but I'm not sure. Also it
 has a potted block in the CPU socket...
 
 I haven't dumped the gfx roms, lets see what the game
@@ -12330,7 +12330,7 @@ moon cresta gfx roms....
 
 BMX Stunts by Jetsoft on Galaxian bootleg PCB.
 
-6502A CPU in epoxy block with one 6331 PROM (not dumped)
+6502A CPU in epoxy block with one 6331 PROM.
 One 74LS74 and one 74LS273 logic.
 One SN76489AN Digital Complex Sound Generator.
 There was a wire lead coming out of the epoxy and soldered
@@ -12361,7 +12361,7 @@ chaneman 7/31/2022
 */
 
 ROM_START( bmxstunts )
-	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_REGION( 0x4000, "maincpu", 0 ) // A0/A1 swapped, hence the weird ROM load macro
 	ROM_LOAD16_WORD_SWAP( "b-mx.1", 0x0000, 0x0800, CRC(cf3061f1) SHA1(e229a2a09b56332359c3f87953acb07c4c7d3abb) )
 	ROM_LOAD16_WORD_SWAP( "b-mx.2", 0x0800, 0x0800, CRC(f145e09d) SHA1(8d3f379dbb5ec9304aa61d99cac003dfb8050485) )
 	ROM_LOAD16_WORD_SWAP( "b-mx.3", 0x1000, 0x0800, CRC(ea415c49) SHA1(eb55b4b24ef4e04f5c2873ad7fef2dce891cefef) )
