@@ -7786,7 +7786,7 @@ void bmxstunts_state::bmxstunts(machine_config &config)
 {
 	galaxian_base(config);
 
-	M6502(config.replace(), m_maincpu, 3'072'000); // Synertek 6502A, TODO: verify clock
+	M6502(config.replace(), m_maincpu, 3'072'000 / 2); // Synertek 6502A, TODO: verify clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &bmxstunts_state::bmxstunts_map);
 
 	set_irq_line(0);
