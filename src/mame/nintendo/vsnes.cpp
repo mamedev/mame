@@ -419,6 +419,8 @@ u8 vs_base_state::vsnes_in0_r()
 	int ret = m_input_latch[p1] & 1;
 	m_input_latch[p1] >>= 1;
 
+// FIXME: UniSystem's wiring harness connects S Coin 2 to S Coin 1 edge hardness
+// This should mean games that don't check Coin 2 inputs respond on UniSys, but on DualSys they'd miss the Coin 2 inserts as all 4 inputs are separate?
 	ret |= m_coins[Side]->read();             // merge coins, etc
 	ret |= (m_dsw[Side]->read() & 3) << 3;    // merge 2 dipswitches
 	ret |= Side << 7;                         // CPU indicator bit
@@ -1754,7 +1756,7 @@ static INPUT_PORTS_START( rbibb )
 //  PORT_DIPSETTING(    0xe0, "RP2C03" )
 INPUT_PORTS_END
 
-// Note: does not respond to Coin 2 inputs
+// Note: does not check Coin 2 inputs
 static INPUT_PORTS_START( btlecity )
 	PORT_INCLUDE( vsnes_rev )
 
@@ -1895,7 +1897,7 @@ static INPUT_PORTS_START( excitebk )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:!8" )
 INPUT_PORTS_END
 
-// Note: does not respond to Coin 2 inputs
+// Note: does not check Coin 2 inputs
 static INPUT_PORTS_START( jajamaru )
 	PORT_INCLUDE( vsnes_rev )
 
@@ -1950,7 +1952,7 @@ static INPUT_PORTS_START( machridr )
 INPUT_PORTS_END
 
 // TODO: are the missing DIP settings the same as the above set and we can get rid of machridj here?
-// Note: does not respond to Coin 2 inputs
+// Note: does not check Coin 2 inputs
 static INPUT_PORTS_START( machridj )
 	PORT_INCLUDE( vsnes )
 
@@ -2136,7 +2138,7 @@ static INPUT_PORTS_START( vstetris )
 //  PORT_DIPSETTING(    0xe0, "RP2C03" )
 INPUT_PORTS_END
 
-// Note: does not respond to Coin 2 inputs
+// Note: does not check Coin 2 inputs
 static INPUT_PORTS_START( vsskykid )
 	PORT_INCLUDE( vsnes_rev )
 
@@ -2229,7 +2231,7 @@ static INPUT_PORTS_START( goonies )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-// Note: set "SC4-2 A" does not respond to Coin 2 inputs
+// Note: set "SC4-2 A" does not check Coin 2 inputs
 static INPUT_PORTS_START( vssoccer )
 	PORT_INCLUDE( vsnes_rev )
 
@@ -2314,7 +2316,7 @@ static INPUT_PORTS_START( vsslalom )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-// Note: does not respond to Coin 2 inputs
+// Note: does not check Coin 2 inputs
 static INPUT_PORTS_START( starlstr )
 	PORT_INCLUDE( vsnes )
 
@@ -2419,7 +2421,7 @@ static INPUT_PORTS_START( mightybj )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:!8" )
 INPUT_PORTS_END
 
-// Note: does not respond to Coin 2 inputs
+// Note: does not check Coin 2 inputs
 static INPUT_PORTS_START( supxevs )
 	PORT_INCLUDE( vsnes )
 
