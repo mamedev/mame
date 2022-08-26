@@ -9,15 +9,18 @@ runs on hardware similar to Lady Bug
 driver by inkling
 
 Notes:
-- In the Tehkan set (redclsha) the ship doesn't move during attract mode. Earlier version?
-  Gameplay is different too.
+- In the Tehkan set (redclashta) the ship doesn't move during attract mode.
+  Earlier version? Gameplay is different too.
 
 TODO:
-- Colors might be right, need screen shots to verify
-
-- Some graphical problems in both games, but without screenshots its hard to
-  know what we're aiming for
-
+- Colors are not right. In zerohour P1 score should be white, the top score green,
+  and "TOP" should be magenta. How is this determined? It's as if only the top part
+  of the screen has this exception. Sprite colors look ok.
+- Some graphical problems in both games
+- redclash supports more background layer effects: white+mixed with other colors,
+  used in canyon parts and during the big ufo explosion
+- Player bullets: should be 8*2px magenta in zerohour. It's weirder in redclash:
+  1st half of the screen 4*2px red, 2nd half 8*2px yellow.
 - Sound (analog, schematics available for Zero Hour)
 
 ***************************************************************************/
@@ -579,9 +582,9 @@ void redclash_state::init_redclash()
 }
 
 
-GAME( 1980, zerohour,  0,        zerohour, zerohour, redclash_state, init_redclash, ROT270, "Universal",                   "Zero Hour (set 1)",      MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, zerohoura, zerohour, zerohour, zerohour, redclash_state, init_redclash, ROT270, "Universal",                   "Zero Hour (set 2)",      MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, zerohouri, zerohour, zerohour, zerohour, redclash_state, init_redclash, ROT270, "bootleg (Inder SA)",          "Zero Hour (Inder)",      MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zerohour,   0,        zerohour, zerohour, redclash_state, init_redclash, ROT270, "Universal",                   "Zero Hour (set 1)",      MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zerohoura,  zerohour, zerohour, zerohour, redclash_state, init_redclash, ROT270, "Universal",                   "Zero Hour (set 2)",      MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zerohouri,  zerohour, zerohour, zerohour, redclash_state, init_redclash, ROT270, "bootleg (Inder SA)",          "Zero Hour (Inder)",      MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1981, redclash,   0,        redclash, redclash, redclash_state, init_redclash, ROT270, "Kaneko",                      "Red Clash",                 MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, redclasht,  redclash, redclash, redclash, redclash_state, init_redclash, ROT270, "Kaneko (Tehkan license)",     "Red Clash (Tehkan, set 1)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
