@@ -33,13 +33,19 @@ license:CC0
 	<element name="text_from"><text string="FROM"><color red="0.6" green="0.6" blue="0.6" /></text></element>
 	<element name="text_to"><text string="TO"><color red="0.6" green="0.6" blue="0.6" /></text></element>
 
+	<!-- generic speaker icon, (C) Mobius, public domain -->
+	<element name="speaker">
+		<image><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.0" width="500" height="500" viewBox="0 0 75 75">
+				<path d="M39.389,13.769 L22.235,28.606 L6,28.606 L6,47.699 L21.989,47.699 L39.389,62.75 L39.389,13.769z" style="stroke:#cccccc;stroke-width:5;stroke-linejoin:round;fill:#cccccc;"/>
+				<path d="M48,27.6a19.5,19.5 0 0 1 0,21.4M55.1,20.5a30,30 0 0 1 0,35.6M61.6,14a38.8,38.8 0 0 1 0,48.6" style="fill:none;stroke:#cccccc;stroke-width:5;stroke-linecap:round"/>
+			</svg>
+		]]></data></image>
+	</element>
+
 	<element name="text_b1">
 		<rect><color red="0.2" green="0.2" blue="0.2" /></rect>
 		<text string="RE"><color red="0.8" green="0.8" blue="0.8" /></text>
-	</element>
-	<element name="text_b2">
-		<rect><color red="0.2" green="0.2" blue="0.2" /></rect>
-		<text string="spk"><color red="0.8" green="0.8" blue="0.8" /></text>
 	</element>
 	<element name="text_b3">
 		<rect><color red="0.2" green="0.2" blue="0.2" /></rect>
@@ -104,8 +110,7 @@ license:CC0
 	<view name="Internal Layout">
 		<bounds left="-0.5" right="18" top="10" bottom="36" />
 
-	<!-- 7segs/leds -->
-
+		<!-- 7segs/leds -->
 		<element ref="text_from"><bounds x="0" y="17.2" width="8" height="2" /></element>
 		<element ref="text_to"><bounds x="9.5" y="17.2" width="8" height="2" /></element>
 
@@ -117,8 +122,7 @@ license:CC0
 		<element name="1.7" ref="led"><bounds x="8.65" y="11.8" width="0.6" height="0.6" /></element>
 		<element name="0.7" ref="led"><bounds x="8.35" y="15.7" width="0.6" height="0.6" /></element>
 
-	<!-- button panel -->
-
+		<!-- button panel -->
 		<element ref="static_gray"><bounds x="0" y="20" width="4" height="3" /></element>
 		<element ref="static_gray"><bounds x="4.5" y="20" width="4" height="3" /></element>
 		<element ref="static_gray"><bounds x="9" y="20" width="4" height="3" /></element>
@@ -137,7 +141,7 @@ license:CC0
 		<element ref="static_gray"><bounds x="13.5" y="32" width="4" height="3" /></element>
 
 		<element ref="text_b1"><bounds x="0.1" y="20.5" width="3.8" height="2" /></element>
-		<element ref="text_b2"><bounds x="4.6" y="20.5" width="3.8" height="2" /></element>
+		<element ref="speaker"><bounds x="5.5" y="20.5" width="2" height="2" /><orientation flipx="yes" /></element>
 		<element ref="text_b3"><bounds x="9.1" y="20.5" width="3.8" height="2" /></element>
 		<element ref="text_b4"><bounds x="13.6" y="20.5" width="3.8" height="2" /></element>
 		<element ref="text_b5"><bounds x="0.1" y="24.5" width="3.8" height="2" /></element>

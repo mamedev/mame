@@ -9,6 +9,7 @@
  * ---------------------------------------------------------------------------*/
 
 NETLIST_START(gamemachine)
+{
 
 	/* Standard stuff */
 
@@ -87,5 +88,5 @@ NETLIST_START(gamemachine)
 
 	NET_C(C8.1, R1.1, R3.2, IC1.5)
 
-NETLIST_END()
+}
 

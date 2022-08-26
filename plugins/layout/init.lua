@@ -28,6 +28,7 @@ function layout.startplugin()
 			pairs = pairs,
 			ipairs = ipairs,
 			string = { format = string.format },
+			tostring = tostring,
 			table = { insert = table.insert, remove = table.remove } }
 		local script, err = load(script, script, "t", env)
 		if not script then

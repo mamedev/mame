@@ -1705,14 +1705,6 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 		else
 			m_external_artwork = true;
 
-		// if a default view has been specified, use that as a fallback
-		bool have_default = false;
-		if (system.default_layout)
-			have_default |= load_layout_file(nullptr, *system.default_layout);
-		m_manager.machine().config().apply_default_layouts(
-				[this, &have_default] (device_t &dev, internal_layout const &layout)
-				{ have_default |= load_layout_file(nullptr, layout, &dev); });
-
 		// try to load another file based on the parent driver name
 		int cloneof = driver_list::clone(system);
 		while (0 <= cloneof)
@@ -1729,6 +1721,14 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 			const game_driver &parent(driver_list::driver(cloneof));
 			cloneof = driver_list::clone(parent);
 		}
+
+		// if a default view has been specified, use that as a fallback
+		bool have_default = false;
+		if (system.default_layout)
+			have_default |= load_layout_file(nullptr, *system.default_layout);
+		m_manager.machine().config().apply_default_layouts(
+				[this, &have_default] (device_t &dev, internal_layout const &layout)
+				{ have_default |= load_layout_file(nullptr, layout, &dev); });
 
 		have_artwork |= m_external_artwork;
 

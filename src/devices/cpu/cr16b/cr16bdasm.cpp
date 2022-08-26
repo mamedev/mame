@@ -234,22 +234,22 @@ void cr16b_disassembler::format_abs18(std::ostream &stream, u32 addr)
 void cr16b_disassembler::format_pc_disp5(std::ostream &stream, offs_t pc, u8 disp)
 {
 	if (m_arch == cr16_arch::CR16A)
-		util::stream_format(stream, "0x%05X", (disp >= 0x10 ? pc + 0x20 - disp : pc + disp) & 0x1ffff); // SMM
+		util::stream_format(stream, "0x%05X", (pc + disp - (disp >= 0x10 ? 0x20 : 0)) & 0x1ffff); // SMM
 	else
-		util::stream_format(stream, "0x%06X", (disp >= 0x10 ? pc + 0x20 - disp : pc + disp) & 0x1fffff); // LMM
+		util::stream_format(stream, "0x%06X", (pc + disp - (disp >= 0x10 ? 0x20 : 0)) & 0x1fffff); // LMM
 }
 
 void cr16b_disassembler::format_pc_disp9(std::ostream &stream, offs_t pc, u16 disp)
 {
 	if (m_arch == cr16_arch::CR16A)
-		util::stream_format(stream, "0x%05X", (disp >= 0x100 ? pc + 0x200 - disp : pc + disp) & 0x1ffff); // SMM
+		util::stream_format(stream, "0x%05X", (pc + disp - (disp >= 0x100 ? 0x200 : 0)) & 0x1ffff); // SMM
 	else
-		util::stream_format(stream, "0x%06X", (disp >= 0x100 ? pc + 0x200 - disp : pc + disp) & 0x1fffff); // LMM
+		util::stream_format(stream, "0x%06X", (pc + disp - (disp >= 0x100 ? 0x200 : 0)) & 0x1fffff); // LMM
 }
 
 void cr16b_disassembler::format_pc_disp17(std::ostream &stream, offs_t pc, u32 disp)
 {
-	util::stream_format(stream, "0x%05X", (disp >= 0x10000 ? pc + 0x20000 - disp : pc + disp) & 0x1ffff);
+	util::stream_format(stream, "0x%05X", (pc + disp - (disp >= 0x10000 ? 0x20000 : 0)) & 0x1ffff);
 }
 
 void cr16b_disassembler::format_pc_disp21(std::ostream &stream, offs_t pc, u32 disp)

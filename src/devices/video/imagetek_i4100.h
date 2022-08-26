@@ -141,11 +141,6 @@ protected:
 
 	void blt_write(const int tmap, const offs_t offs, const u16 data, const u16 mask);
 
-	enum
-	{
-		TIMER_BLIT_END = 1
-	};
-
 	emu_timer *m_blit_done_timer;
 
 	// I/O operations

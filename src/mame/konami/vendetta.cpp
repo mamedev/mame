@@ -144,7 +144,7 @@ private:
 
 	// misc
 	uint8_t m_irq_enabled = 0;
-	emu_timer *m_z80_nmi_timer;
+	emu_timer *m_nmi_blocked;
 
 	// devices
 	required_device<konami_cpu_device> m_maincpu;
@@ -169,13 +169,13 @@ private:
 	void K052109_w(offs_t offset, uint8_t data);
 	void _5fe0_w(uint8_t data);
 	void z80_arm_nmi_w(uint8_t data);
-	void z80_irq_w(uint8_t data);
+	void z80_nmi_w(int state);
+	void z80_irq_w(uint8_t data = 0);
 	uint8_t z80_irq_r();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(irq);
-	TIMER_CALLBACK_MEMBER(z80_nmi);
 
 	K052109_CB_MEMBER(vendetta_tile_callback);
 	K052109_CB_MEMBER(esckids_tile_callback);
@@ -335,16 +335,17 @@ void vendetta_state::_5fe0_w(uint8_t data)
 	m_k053246->k053246_set_objcha_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-TIMER_CALLBACK_MEMBER(vendetta_state::z80_nmi)
-{
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-}
-
 void vendetta_state::z80_arm_nmi_w(uint8_t data)
 {
+	// see notes in simpsons driver
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	m_nmi_blocked->adjust(m_audiocpu->cycles_to_attotime(4));
+}
 
-	m_z80_nmi_timer->adjust(attotime::from_usec(25));
+void vendetta_state::z80_nmi_w(int state)
+{
+	if (state && !m_nmi_blocked->enabled())
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 void vendetta_state::z80_irq_w(uint8_t data)
@@ -354,7 +355,9 @@ void vendetta_state::z80_irq_w(uint8_t data)
 
 uint8_t vendetta_state::z80_irq_r()
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	if (!machine().side_effects_disabled())
+		z80_irq_w();
+
 	return 0x00;
 }
 
@@ -557,7 +560,7 @@ void vendetta_state::machine_start()
 	m_mainbank->configure_entries(0, 28, memregion("maincpu")->base(), 0x2000);
 	m_mainbank->set_entry(0);
 
-	m_z80_nmi_timer = timer_alloc(FUNC(vendetta_state::z80_nmi), this);
+	m_nmi_blocked = timer_alloc(timer_expired_delegate());
 
 	save_item(NAME(m_irq_enabled));
 	save_item(NAME(m_sprite_colorbase));
@@ -575,6 +578,10 @@ void vendetta_state::machine_reset()
 
 	m_sprite_colorbase = 0;
 	m_irq_enabled = 0;
+
+	// Z80 _NMI goes low at same time as reset
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 void vendetta_state::banking_callback(uint8_t data)
@@ -633,6 +640,7 @@ void vendetta_state::vendetta(machine_config &config)
 	k053260_device &k053260(K053260(config, "k053260", XTAL(3'579'545))); // verified with PCB
 	k053260.add_route(0, "lspeaker", 0.75);
 	k053260.add_route(1, "rspeaker", 0.75);
+	k053260.sh1_cb().set(FUNC(vendetta_state::z80_nmi_w));
 }
 
 void vendetta_state::esckids(machine_config &config)
@@ -1052,16 +1060,16 @@ ROM_END
 ***************************************************************************/
 
 
-GAME( 1991, vendetta,    0,        vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 4 Players, ver. T)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendettar,   vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (US, 4 Players, ver. R)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendettaz,   vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (Asia, 4 Players, ver. Z)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendettaun,  vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 4 Players, ver. ?)",         MACHINE_SUPPORTS_SAVE ) // program ROM labeled as 1
-GAME( 1991, vendetta2pw, vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 2 Players, ver. W)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendetta2peba,vendetta,vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 2 Players, ver. EB-A?)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendetta2pun,vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 2 Players, ver. ?)",         MACHINE_SUPPORTS_SAVE ) // program ROM labeled as 1
-GAME( 1991, vendetta2pu, vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (Asia, 2 Players, ver. U)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendetta2pd, vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (Asia, 2 Players, ver. D)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendettan,   vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Crime Fighters 2 (Japan, 4 Players, ver. N)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendetta2pp, vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Crime Fighters 2 (Japan, 2 Players, ver. P)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, esckids,     0,        esckids,  esckids,  vendetta_state, empty_init, ROT0, "Konami", "Escape Kids (Asia, 4 Players)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1991, esckidsj,    esckids,  esckids,  esckidsj, vendetta_state, empty_init, ROT0, "Konami", "Escape Kids (Japan, 2 Players)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendetta,     0,        vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 4 Players, ver. T)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendettar,    vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (US, 4 Players, ver. R)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendettaz,    vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (Asia, 4 Players, ver. Z)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendettaun,   vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 4 Players, ver. ?)",         MACHINE_SUPPORTS_SAVE ) // program ROM labeled as 1
+GAME( 1991, vendetta2pw,  vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 2 Players, ver. W)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendetta2peba,vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 2 Players, ver. EB-A?)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendetta2pun, vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 2 Players, ver. ?)",         MACHINE_SUPPORTS_SAVE ) // program ROM labeled as 1
+GAME( 1991, vendetta2pu,  vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (Asia, 2 Players, ver. U)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendetta2pd,  vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (Asia, 2 Players, ver. D)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendettan,    vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Crime Fighters 2 (Japan, 4 Players, ver. N)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendetta2pp,  vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Crime Fighters 2 (Japan, 2 Players, ver. P)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, esckids,      0,        esckids,  esckids,  vendetta_state, empty_init, ROT0, "Konami", "Escape Kids (Asia, 4 Players)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1991, esckidsj,     esckids,  esckids,  esckidsj, vendetta_state, empty_init, ROT0, "Konami", "Escape Kids (Japan, 2 Players)",              MACHINE_SUPPORTS_SAVE )

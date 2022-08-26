@@ -2,26 +2,48 @@
 // copyright-holders:R. Belmont, Vas Crabb
 /***************************************************************************
 
-  Apple Macitosh Display Card 4•8 (model 630-0400)
-  Apple Macitosh Display Card 8•24
+  Apple Macintosh Display Card 4•8 (MDC 1.0.1, model 630-0400)
+  Apple Macintosh Display Card 8•24 (MDC 1.2)
 
   Cards have the same framebuffer, CRTC, clock synthesizer, and RAMDAC,
   but use different ROMs and support different monitor profiles.
 
-  The 4•8 shipped with less RAM by default, and as supplied it could not
-  support higher bit depths.  We always emulate it as though it has been
-  upgraded to maximum supported RAM.
+  When 1 MB VRAM is installed, 24-bit direct color is available at up
+  to 640×480 resolution, 8-bit indexed color is available at all
+  supported resolutions, and 1:2:1 convolution is used for interlaced
+  modes with indexed color.  When 512 kB VRAM is installed, 8-bit
+  indexed color is available at up to 640×480 resolution, 4-bit indexed
+  color is available at all supported resolutions, and 1:2:1
+  convolution will not be used.
 
-  Monitor type changes take effect on had reset.  The 8•24 defaults to the
-  “Page-White Gamma” profile for the 21" and 16" color monitors, which
-  affects white balance.  Use the Monitors control panel to switch to the
-  “Uncorrected Gamma” profile if you don’t like it.
+  Monitor type changes take effect on had reset.  MDC 1.2 defaults to
+  the “Page-White Gamma” profile for the 21" and 16" color monitors,
+  which affects white balance.  Use the Monitors control panel to switch
+  to the “Uncorrected Gamma” profile if you don’t like it.
+
+  System 6 will hang on start if 1 MB VRAM is installed, a PAL monitor
+  or encoder is connected, and the card has not been set up.  To avoid
+  this, start the system with a different monitor connected, use the
+  Monitors control panel to select a color mode and resolution, and shut
+  down the system cleanly.  After this, a PAL monitor or encoder can be
+  connected.  System 7 does not suffer from this issue.
+
+  The CRTC counts half-lines vertically, which doesn’t integrate very
+  well with MAME’s screen device.  The screen device also lacks any
+  support for interlaced modes.  To make interlaced modes usable, a few
+  simplifying assumptions are made:
+  * Assume the framebuffer controller’s interlaced mode will be set when
+    when CRTC is configured for interlaced modes (and vice versa).
+  * Assume NTSC-like structure where frame starts with even field where
+    vertical sync coincides with horizontal sync.
+  * Assume the framebuffer controller and RAMDAC are configured for the
+    same pixel format.
 
   TODO:
-  * Proper interrupt timing.
-  * CRTC status registers.
+  * Precise interrupt timing.
+  * Precise timing for odd field flag.
+  * Remaining CRTC registers.
   * Interlaced modes.
-  * 1:2:1 convolution.
 
 ***************************************************************************/
 
@@ -82,9 +104,14 @@ protected:
 private:
 	static constexpr offs_t VRAM_MAX = 0x10'0000 / 4; // chip supports 2M but card can only use 1M
 
-	TIMER_CALLBACK_MEMBER(vbl_tick);
+	TIMER_CALLBACK_MEMBER(vbl_start);
+	void set_vbl_timer();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	template <uint8_t Mode>
+	void update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	template <uint8_t Mode, bool Convolution, bool Mono>
+	void update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void update_crtc();
 
 	uint32_t jmfb_r(offs_t offset);
@@ -97,6 +124,14 @@ private:
 
 	uint32_t rgb_unpack(offs_t offset, uint32_t mem_mask = ~0);
 	void rgb_pack(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+
+	bool ctrl_sense2() const { return BIT(m_control, 11); }
+	bool ctrl_sense1() const { return BIT(m_control, 10); }
+	bool ctrl_sense0() const { return BIT(m_control, 9); }
+	bool ctrl_transfer() const { return BIT(m_control, 6); }
+	bool ctrl_convolution() const { return BIT(m_control, 5); }
+	bool ctrl_interlace() const { return BIT(m_control, 4); }
+	bool ctrl_rgb() const { return BIT(m_control, 2); }
 
 	required_ioport m_config;
 	memory_view m_vram_view;
@@ -114,9 +149,10 @@ private:
 	uint8_t m_colors[3], m_clutcnt, m_clutoffs;
 	uint8_t m_ramdac_mode, m_ramdac_conv;
 
-	uint16_t m_hactive, m_hbporch, m_hsync, m_hfporch;
+	uint16_t m_hhalf, m_hactive, m_hbporch, m_hsync, m_hfporch;
 	uint16_t m_vactive, m_vbporch, m_vsync, m_vfporch;
-	uint32_t m_vbl_disable, m_toggle;
+	uint32_t m_vbl_disable;
+	uint16_t m_halfline_pixels;
 
 	uint16_t m_multiplier;
 	uint16_t m_modulus;
@@ -156,10 +192,10 @@ INPUT_PORTS_START( 48gc )
 	PORT_CONFSETTING(   0x01, u8"Macintosh Portrait Display (B&W 15\" 640\u00d7870)")
 	PORT_CONFSETTING(   0x02, u8"Macintosh RGB Display (12\" 512\u00d7384)")
 	PORT_CONFSETTING(   0x03, u8"Macintosh Two-Page Monitor (B&W 21\" 1152\u00d7870)")
-	//PORT_CONFSETTING(   0x04, u8"NTSC Monitor (512\u00d7384, 640\u00d7480)") requires interlace modes
+	PORT_CONFSETTING(   0x04, u8"NTSC Monitor (512\u00d7384, 640\u00d7480)") // requires interlace modes
 	PORT_CONFSETTING(   0x05, u8"Macintosh Portrait Display (640\u00d7870)")
 	PORT_CONFSETTING(   0x06, u8"Macintosh Hi-Res Display (12-14\" 640\u00d7480)")
-	//PORT_CONFSETTING(   0x0b, u8"NTSC Encoder (512\u00d7384, 640\u00d7480)") requires interlace modes
+	PORT_CONFSETTING(   0x0b, u8"NTSC Encoder (512\u00d7384, 640\u00d7480)") // requires interlace modes
 	PORT_CONFNAME(0x10, 0x00, u8"VRAM size")
 	PORT_CONFSETTING(   0x00, u8"512 kB (4\u20228)")
 	PORT_CONFSETTING(   0x10, u8"1 MB (8\u202224)")
@@ -176,10 +212,12 @@ INPUT_PORTS_START( 824gc )
 	PORT_CONFSETTING(   0x01, u8"Mac Portrait Display (B&W 15\" 640\u00d7870)")
 	PORT_CONFSETTING(   0x02, u8"Mac RGB Display (12\" 512\u00d7384)")
 	PORT_CONFSETTING(   0x03, u8"Mac Two-Page Display (B&W 21\" 1152\u00d7870)")
-	//PORT_CONFSETTING(   0x04, u8"NTSC Monitor (512\u00d7384, 640\u00d7480)") requires interlace modes
+	PORT_CONFSETTING(   0x04, u8"NTSC Monitor (512\u00d7384, 640\u00d7480)") // requires interlace modes
 	PORT_CONFSETTING(   0x06, u8"Mac Hi-Res Display (12-14\" 640\u00d7480)")
-	//PORT_CONFSETTING(   0x0b, u8"NTSC Encoder (512\u00d7384, 640\u00d7480)") requires interlace modes
+	PORT_CONFSETTING(   0x0a, u8"PAL Encoder (640\u00d7480, 768\u00d7576)") // requires interlace modes
+	PORT_CONFSETTING(   0x0b, u8"NTSC Encoder (512\u00d7384, 640\u00d7480)") // requires interlace modes
 	PORT_CONFSETTING(   0x0d, u8"Mac 16\" Color Display (832\u00d7624)")
+	PORT_CONFSETTING(   0x1e, u8"PAL Monitor (640\u00d7480, 768\u00d7576)") // requires interlace modes
 	PORT_CONFNAME(0x10, 0x10, u8"VRAM size")
 	PORT_CONFSETTING(   0x00, u8"512 kB (4\u20228)")
 	PORT_CONFSETTING(   0x10, u8"1 MB (8\u202224)")
@@ -335,7 +373,7 @@ void jmfb_device::device_start()
 			slotspace + 0x200300, slotspace + 0x20033f,
 			write32sm_delegate(*this, FUNC(jmfb_device::clkgen_w)));
 
-	m_timer = timer_alloc(FUNC(jmfb_device::vbl_tick), this);
+	m_timer = timer_alloc(FUNC(jmfb_device::vbl_start), this);
 
 	m_configured = false;
 	m_clut_addr_read = false;
@@ -364,7 +402,7 @@ void jmfb_device::device_start()
 	save_item(NAME(m_vsync));
 	save_item(NAME(m_vfporch));
 	save_item(NAME(m_vbl_disable));
-	save_item(NAME(m_toggle));
+	save_item(NAME(m_halfline_pixels));
 	save_item(NAME(m_multiplier));
 	save_item(NAME(m_modulus));
 	save_item(NAME(m_pdiv));
@@ -393,7 +431,51 @@ void jmfb_device::device_reset()
 		m_vram_view[1].install_readwrite_handler(
 				slotspace, slotspace + (vramsize / 3 * 4) - 1,
 				read32s_delegate(*this, FUNC(jmfb_device::rgb_unpack)), write32s_delegate(*this, FUNC(jmfb_device::rgb_pack)));
-		// TODO: in packed RGB mode, there are one or two bytes that aren't a multiple of 3 - handle them
+		switch (vramsize % 3)
+		{
+		case 0:
+			break;
+		case 1:
+			m_vram_view[1].install_readwrite_handler(
+					slotspace + (vramsize / 3 * 4), slotspace + (vramsize / 3 * 4) + 3,
+					read32s_delegate(
+						*this,
+						NAME(([this, vramsize] (offs_t offset, uint32_t mem_mask) -> uint32_t
+						{
+							auto const color = util::big_endian_cast<uint8_t const>(&m_vram[0]) + (vramsize - 1);
+							return uint32_t(color[0]) << 16;
+						}))),
+					write32s_delegate(
+						*this,
+						NAME(([this, vramsize] (offs_t offset, uint32_t data, uint32_t mem_mask)
+						{
+							auto const color = util::big_endian_cast<uint8_t>(&m_vram[0]) + (vramsize - 1);
+							if (ACCESSING_BITS_16_23)
+								color[0] = uint8_t(data >> 16);
+						}))));
+			break;
+		case 2:
+			m_vram_view[1].install_readwrite_handler(
+					slotspace + (vramsize / 3 * 4), slotspace + (vramsize / 3 * 4) + 3,
+					read32s_delegate(
+						*this,
+						NAME(([this, vramsize] (offs_t offset, uint32_t mem_mask) -> uint32_t
+						{
+							auto const color = util::big_endian_cast<uint8_t const>(&m_vram[0]) + (vramsize - 2);
+							return (uint32_t(color[0]) << 16) | (uint32_t(color[1]) << 8);
+						}))),
+					write32s_delegate(
+						*this,
+						NAME(([this, vramsize] (offs_t offset, uint32_t data, uint32_t mem_mask)
+						{
+							auto const color = util::big_endian_cast<uint8_t>(&m_vram[0]) + (vramsize - 2);
+							if (ACCESSING_BITS_16_23)
+								color[0] = uint8_t(data >> 16);
+							if (ACCESSING_BITS_8_15)
+								color[1] = uint8_t(data >> 8);
+						}))));
+			break;
+		}
 
 		m_clut_addr_read = BIT(config, 5);
 	}
@@ -402,7 +484,6 @@ void jmfb_device::device_reset()
 
 	std::fill_n(&m_vram[0], VRAM_MAX, 0);
 	m_vbl_disable = 1;
-	m_toggle = 0;
 	m_control = 0x0002;
 	m_preload = 256 - 8;
 	m_base = 0;
@@ -417,11 +498,12 @@ void jmfb_device::device_reset()
 	m_hbporch = 22;
 	m_hsync = 30;
 	m_hfporch = 18;
-
 	m_vactive = 1740;
 	m_vbporch = 78;
 	m_vsync = 6;
 	m_vfporch = 6;
+	m_halfline_pixels = 576;
+
 	m_multiplier = 190;
 	m_modulus = 19;
 	m_pdiv = 1;
@@ -433,108 +515,59 @@ void jmfb_device::device_reset()
 
 ***************************************************************************/
 
-TIMER_CALLBACK_MEMBER(jmfb_device::vbl_tick)
+TIMER_CALLBACK_MEMBER(jmfb_device::vbl_start)
 {
 	if (!m_vbl_disable)
 	{
 		raise_slot_irq();
 	}
 
-	// TODO: determine correct timing for vertical blanking interrupt
-	m_timer->adjust(screen().time_until_pos(screen().visible_area().bottom()));
+	set_vbl_timer();
+}
+
+void jmfb_device::set_vbl_timer()
+{
+	// TODO: precise VBL timing in interlaced modes if half-line split is offset (likely doesn't matter in practice)
+	rectangle const &visarea = screen().visible_area();
+	int const height = screen().height();
+	if ((visarea.bottom() + 1) < height)
+	{
+		m_timer->adjust(screen().time_until_pos(visarea.bottom() + 1));
+	}
+	else
+	{
+		m_timer->adjust(screen().time_until_pos(visarea.bottom() + 1 - height));
+	}
 }
 
 uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	auto const trans =
-		[mono = f_monitors[m_monitor_type].mono] (rgb_t color)
-		{
-			return !mono ? color : rgb_t(color.b(), color.b(), color.b());
-		};
-	auto const screenbase = util::big_endian_cast<uint8_t const>(&m_vram[0]) + (m_base << 5);
-	int const xres = screen.visible_area().right();
+	if (!ctrl_transfer())
+	{
+		bitmap.fill(0, cliprect);
+		return 0;
+	}
 
 	switch (m_ramdac_mode)
 	{
 	case 0x0: // 1bpp
-		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
-		{
-			auto const rowbase = screenbase + (y * m_stride * 4);
-			uint32_t *scanline = &bitmap.pix(y);
-			for (int x = 0; x <= xres/8; x++)
-			{
-				uint8_t const pixels = rowbase[x];
-
-				*scanline++ = trans(pen_color(BIT(pixels, 7)));
-				*scanline++ = trans(pen_color(BIT(pixels, 6)));
-				*scanline++ = trans(pen_color(BIT(pixels, 5)));
-				*scanline++ = trans(pen_color(BIT(pixels, 4)));
-				*scanline++ = trans(pen_color(BIT(pixels, 3)));
-				*scanline++ = trans(pen_color(BIT(pixels, 2)));
-				*scanline++ = trans(pen_color(BIT(pixels, 1)));
-				*scanline++ = trans(pen_color(BIT(pixels, 0)));
-			}
-		}
+		update_screen<0x0>(screen, bitmap, cliprect);
 		break;
 
 	case 0x4: // 2bpp
-		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
-		{
-			auto const rowbase = screenbase + (y * m_stride * 4);
-			uint32_t *scanline = &bitmap.pix(y);
-			for (int x = 0; x <= xres/4; x++)
-			{
-				uint8_t const pixels = rowbase[x];
-
-				*scanline++ = trans(pen_color(BIT(pixels, 6, 2)));
-				*scanline++ = trans(pen_color(BIT(pixels, 4, 2)));
-				*scanline++ = trans(pen_color(BIT(pixels, 2, 2)));
-				*scanline++ = trans(pen_color(BIT(pixels, 0, 2)));
-			}
-		}
+		update_screen<0x4>(screen, bitmap, cliprect);
 		break;
 
 	case 0x8: // 4 bpp
-		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
-		{
-			auto const rowbase = screenbase + (y * m_stride * 4);
-			uint32_t *scanline = &bitmap.pix(y);
-			for (int x = 0; x <= xres/2; x++)
-			{
-				uint8_t const pixels = rowbase[x];
-
-				*scanline++ = trans(pen_color(BIT(pixels, 4, 4)));
-				*scanline++ = trans(pen_color(BIT(pixels, 0, 4)));
-			}
-		}
+		update_screen<0x8>(screen, bitmap, cliprect);
 		break;
 
 	case 0xc: // 8 bpp
-		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
-		{
-			auto const rowbase = screenbase + (y * m_stride * 4);
-			uint32_t *scanline = &bitmap.pix(y);
-			for (int x = 0; x <= xres; x++)
-			{
-				*scanline++ = trans(pen_color(rowbase[x]));
-			}
-		}
+		update_screen<0xc>(screen, bitmap, cliprect);
 		break;
 
 	case 0xd: // 24 bpp
-		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
-		{
-			auto source = util::big_endian_cast<uint8_t const>(&m_vram[0]) + (m_base << 6) + (y * m_stride * 8);
-			uint32_t *scanline = &bitmap.pix(y);
-			for (int x = 0; x <= xres; x++)
-			{
-				if (!f_monitors[m_monitor_type].mono)
-					*scanline++ = rgb_t(source[0], source[1], source[2]);
-				else
-					*scanline++ = rgb_t(source[2], source[2], source[2]);
-				source += 3;
-			}
-		}
+		update_screen<0xd>(screen, bitmap, cliprect);
 		break;
 
 	default:
@@ -544,14 +577,192 @@ uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	return 0;
 }
 
+template <uint8_t Mode>
+void jmfb_device::update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	if (!ctrl_convolution())
+	{
+		if (!f_monitors[m_monitor_type].mono)
+			update_screen<Mode, false, false>(screen, bitmap, cliprect);
+		else
+			update_screen<Mode, false, true>(screen, bitmap, cliprect);
+	}
+	else
+	{
+		if (!f_monitors[m_monitor_type].mono)
+			update_screen<Mode, true, false>(screen, bitmap, cliprect);
+		else
+			update_screen<Mode, true, true>(screen, bitmap, cliprect);
+	}
+}
+
+template <uint8_t Mode, bool Convolution, bool Mono>
+void jmfb_device::update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	// TODO: interlaced mode
+	auto const baseoffset = m_base << (((0xd == Mode) ? 6 : 5) + (Convolution ? 1 : 0));
+	auto const screenbase = util::big_endian_cast<uint8_t const>(&m_vram[0]) + baseoffset;
+	auto const stride = m_stride << ((0xd == Mode) ? 3 : 2);
+
+	auto const trans =
+		[] (rgb_t color)
+		{
+			return !Mono ? color : rgb_t(color.b(), color.b(), color.b());
+		};
+
+	rectangle const &visarea = screen.visible_area();
+	int const xstart = visarea.left();
+	int xres = visarea.width();
+	if (0x0 == Mode)
+	{
+		xres /= 8;
+	}
+	else if (0x4 == Mode)
+	{
+		xres /= 4;
+	}
+	else if (0x8 == Mode)
+	{
+		xres /= 2;
+	}
+
+	int y = cliprect.top();
+	while (y < visarea.top())
+	{
+		std::fill_n(&bitmap.pix(y++, xstart), visarea.width(), 0);
+	}
+	while ((y <= cliprect.bottom()) && (y <= visarea.bottom()))
+	{
+		auto source = screenbase + ((y - visarea.top()) * stride);
+		uint32_t *scanline = &bitmap.pix(y, xstart);
+		y++;
+		for (int x = 0; x <= xres; x++)
+		{
+			if (0xd == Mode) // 24bpp
+			{
+				if (!f_monitors[m_monitor_type].mono)
+					*scanline++ = rgb_t(source[0], source[1], source[2]);
+				else
+					*scanline++ = rgb_t(source[2], source[2], source[2]);
+				source += 3;
+			}
+			else if (!Convolution)
+			{
+				uint8_t const pixels = *source++;
+
+				if (0x0 == Mode) // 1bpp
+				{
+					*scanline++ = trans(pen_color(BIT(pixels, 7)));
+					*scanline++ = trans(pen_color(BIT(pixels, 6)));
+					*scanline++ = trans(pen_color(BIT(pixels, 5)));
+					*scanline++ = trans(pen_color(BIT(pixels, 4)));
+					*scanline++ = trans(pen_color(BIT(pixels, 3)));
+					*scanline++ = trans(pen_color(BIT(pixels, 2)));
+					*scanline++ = trans(pen_color(BIT(pixels, 1)));
+					*scanline++ = trans(pen_color(BIT(pixels, 0)));
+				}
+				else if (0x4 == Mode) // 2bpp
+				{
+					*scanline++ = trans(pen_color(BIT(pixels, 6, 2)));
+					*scanline++ = trans(pen_color(BIT(pixels, 4, 2)));
+					*scanline++ = trans(pen_color(BIT(pixels, 2, 2)));
+					*scanline++ = trans(pen_color(BIT(pixels, 0, 2)));
+				}
+				else if (0x8 == Mode) // 4bpp
+				{
+					*scanline++ = trans(pen_color(BIT(pixels, 4, 4)));
+					*scanline++ = trans(pen_color(BIT(pixels, 0, 4)));
+				}
+				else if (0xc == Mode) // 8bpp
+				{
+					*scanline++ = trans(pen_color(pixels));
+				}
+			}
+			else
+			{
+				uint8_t const pixabove = source[0 * stride];
+				uint8_t const pixels = source[1 * stride];
+				uint8_t const pixbelow = source[2 * stride];
+				source++;
+
+				if (0x0 == Mode) // 1bpp
+				{
+					for (int p = 7; p >= 0; p--)
+					{
+						rgb_t const a = pen_color(BIT(pixabove, p));
+						rgb_t const b = pen_color(BIT(pixels, p));
+						rgb_t const c = pen_color(BIT(pixbelow, p));
+						*scanline++ = trans(
+								rgb_t(
+									(a.r() + (uint16_t(b.r()) << 1) + c.r() + 2) >> 2,
+									(a.g() + (uint16_t(b.g()) << 1) + c.g() + 2) >> 2,
+									(a.b() + (uint16_t(b.b()) << 1) + c.b() + 2) >> 2));
+					}
+				}
+				else if (0x4 == Mode) // 2bpp
+				{
+					for (int p = 6; p >= 0; p -= 2)
+					{
+						rgb_t const a = pen_color(BIT(pixabove, p, 2));
+						rgb_t const b = pen_color(BIT(pixels, p, 2));
+						rgb_t const c = pen_color(BIT(pixbelow, p, 2));
+						*scanline++ = trans(
+								rgb_t(
+									(a.r() + (uint16_t(b.r()) << 1) + c.r() + 2) >> 2,
+									(a.g() + (uint16_t(b.g()) << 1) + c.g() + 2) >> 2,
+									(a.b() + (uint16_t(b.b()) << 1) + c.b() + 2) >> 2));
+					}
+				}
+				else if (0x8 == Mode) // 4bpp
+				{
+					for (int p = 4; p >= 0; p -= 4)
+					{
+						rgb_t const a = pen_color(BIT(pixabove, p, 4));
+						rgb_t const b = pen_color(BIT(pixels, p, 4));
+						rgb_t const c = pen_color(BIT(pixbelow, p, 4));
+						*scanline++ = trans(
+								rgb_t(
+									(a.r() + (uint16_t(b.r()) << 1) + c.r() + 2) >> 2,
+									(a.g() + (uint16_t(b.g()) << 1) + c.g() + 2) >> 2,
+									(a.b() + (uint16_t(b.b()) << 1) + c.b() + 2) >> 2));
+					}
+				}
+				else if (0xc == Mode) // 8bpp
+				{
+					rgb_t const a = pen_color(pixabove);
+					rgb_t const b = pen_color(pixels);
+					rgb_t const c = pen_color(pixbelow);
+					*scanline++ = trans(
+							rgb_t(
+								(a.r() + (uint16_t(b.r()) << 1) + c.r() + 2) >> 2,
+								(a.g() + (uint16_t(b.g()) << 1) + c.g() + 2) >> 2,
+								(a.b() + (uint16_t(b.b()) << 1) + c.b() + 2) >> 2));
+				}
+			}
+		}
+	}
+	while (y <= cliprect.bottom())
+	{
+		std::fill_n(&bitmap.pix(y++, xstart), visarea.width(), 0);
+	}
+}
+
 void jmfb_device::update_crtc()
 {
+	// Vertical values are always in half-lines.
+	// In progressive modes, we give the screen device numbers of full lines.
+	// In interlaced modes we let the screen device base horizontal timing on half-lines.
 	int const vtotal = m_vactive + m_vbporch + m_vsync + m_vfporch;
-	int const height = m_vactive;
-	if (vtotal && height && m_multiplier && m_modulus)
+	if (vtotal && m_vactive && m_multiplier && m_modulus)
 	{
-		bool const interlace = BIT(m_control, 4);
-		bool const convolution = BIT(m_control, 5);
+		bool const interlace = vtotal % 2;
+		bool const convolution = ctrl_convolution();
+
+		int const vstart = m_vsync + m_vbporch;
+		int const vlines = vtotal >> (interlace ? 0 : 1);
+		int const top = vstart >> (interlace ? 0 : 1);
+		int const height = m_vactive >> (interlace ? 0 : 1);
+
 		int const divider = 256 - m_preload;
 		XTAL const refclk = 20_MHz_XTAL / m_modulus;
 		XTAL const vcoout = refclk * m_multiplier;
@@ -561,6 +772,7 @@ void jmfb_device::update_crtc()
 				refclk.value(), vcoout.value(), pixclk.value(), dacclk.value());
 
 		int const htotal = m_hactive + m_hbporch + m_hsync + m_hfporch + 8;
+		int const hstart = m_hbporch + m_hsync + 4;
 		int const hactive = m_hactive + 2;
 
 		int scale = 0;
@@ -583,19 +795,20 @@ void jmfb_device::update_crtc()
 			break;
 		}
 		int const hpixels = (htotal << scale >> (convolution ? 2 : 0)) / divider;
+		int const left = (hstart << scale >> (convolution ? 2 : 0)) / divider;
 		int const width = (hactive << scale >> (convolution ? 2 : 0)) / divider;
-		LOGCRTC("horizontal total %d active %d (mode %x %d/%d)\n",
-				htotal, hactive, m_ramdac_mode, width, hpixels);
+		m_halfline_pixels = (m_hhalf << scale >> (convolution ? 2 : 0)) / divider;
+		LOGCRTC("vertical total %d start %d active %d horizontal total %d start %d active %d (mode %x %d/%d)\n",
+				vtotal, vstart, m_vactive, htotal, hstart, hactive, m_ramdac_mode, width, hpixels);
 
-		int const frametotal = hpixels * vtotal >> (interlace ? 0 : 1);
+		int const frametotal = hpixels * vlines;
 
 		screen().configure(
-				hpixels, vtotal >> (interlace ? 0 : 1),
-				rectangle(0, width - 1, 0, (height >> (interlace ? 0 : 1)) - 1),
-				attotime::from_ticks(frametotal, pixclk).attoseconds());
+				hpixels, vlines,
+				rectangle(left, left + width - 1, top, top + height - 1),
+				attotime::from_ticks(frametotal << (convolution ? 2 : 0) >> (interlace ? 1 : 0), pixclk).attoseconds());
 
-		// TODO: determine correct timing for vertical blanking interrupt
-		m_timer->adjust(screen().time_until_pos(height - 1, 0));
+		set_vbl_timer();
 	}
 }
 
@@ -606,11 +819,11 @@ uint32_t jmfb_device::jmfb_r(offs_t offset)
 	case 0x00/4:
 		{
 			uint16_t sense = f_monitors[m_monitor_type].sense[0];
-			if (BIT(m_control, 11))
+			if (ctrl_sense2())
 				sense &= f_monitors[m_monitor_type].sense[1];
-			if (BIT(m_control, 10))
+			if (ctrl_sense1())
 				sense &= f_monitors[m_monitor_type].sense[2];
-			if (BIT(m_control, 9))
+			if (ctrl_sense0())
 				sense &= f_monitors[m_monitor_type].sense[3];
 			return (m_control & 0xf1ff) | (sense << 9);
 		}
@@ -631,6 +844,7 @@ uint32_t jmfb_device::crtc_r(offs_t offset)
 
 	switch (offset)
 	{
+	case 0x08/4: return m_hhalf;     // half line length from start of active area
 	case 0x0c/4: return m_hactive;   // active pixel cells - 2
 	case 0x10/4: return m_hbporch;   // horizontal back porch - 2
 	case 0x14/4: return m_hsync;     // horizontal sync pulse width - 2
@@ -641,12 +855,95 @@ uint32_t jmfb_device::crtc_r(offs_t offset)
 	case 0x2c/4: return m_vsync;     // vertical sync pulse width * 2
 	case 0x30/4: return m_vfporch;   // vertical front porch * 2
 
-	case 0xc0/4: // seems to be frame position flags or something?
-		m_toggle ^= 0xffffffff;
-		return m_toggle;
-	}
+	case 0xc0/4:                     // beam position/status
+		{
+			// TODO: remaining two flags - interrupt status?
+			rectangle const &visarea = screen().visible_area();
+			int const vpos = screen().vpos();
+			int const hpos = screen().hpos();
+			int const hsplit = visarea.left() + m_halfline_pixels;
+			int const vtotal = m_vactive + m_vbporch + m_vsync + m_vfporch;
+			uint8_t result = 0x0f;
 
-	return 0;
+			int halfline;
+			int truehpos;
+			if (vtotal % 2)
+			{
+				// screen device configured to count half-lines vertically
+				int const oddfield = screen().frame_number() % 2;
+				int const oddhalfline = vpos % 2;
+				truehpos = (hpos + ((oddfield != oddhalfline) ? screen().width() : 0)) >> 1;
+
+				// adjust half line count in case half line position is offset
+				if ((oddfield == oddhalfline) && (truehpos >= hsplit))
+				{
+					halfline = vpos + 1;
+					if (halfline >= vtotal)
+					{
+						halfline -= vtotal;
+					}
+				}
+				else if ((oddfield != oddhalfline) && (truehpos < hsplit))
+				{
+					halfline = vpos - 1;
+					if (halfline < 0)
+					{
+						halfline += vtotal;
+					}
+				}
+				else
+				{
+					halfline = vpos;
+				}
+
+				// set odd field flag
+				if (oddfield)
+				{
+					// TODO: confirm where this flips - on sync or on front porch?
+					result |= 0x10; // odd field
+				}
+			}
+			else
+			{
+				// vertical counts are in half-lines but screen device uses full lines
+				halfline = (vpos << 1) | ((hpos >= hsplit) ? 1 : 0);
+				truehpos = hpos;
+			}
+
+			// set horizontal beam position flag
+			if ((truehpos < visarea.left()) || (truehpos > visarea.right()))
+			{
+				result |= 0x20; // horizontal blanking
+			}
+
+			// set appropriate vertical beam position flag (active low)
+			if (halfline < m_vsync)
+			{
+				result &= ~0x04; // sync pulse
+			}
+			else if (halfline < (m_vsync + m_vbporch))
+			{
+				result &= ~0x02; // back porch
+			}
+			else if (halfline < (m_vsync + m_vbporch + m_vactive))
+			{
+				result &= ~0x01; // active
+			}
+			else
+			{
+				result &= ~0x08; // front porch
+			}
+
+			return result;
+		}
+
+	case 0xcc/4: // TODO: What is this?  Waits for bit 3 to clear before clearing interrupts.
+		return 0;
+
+	default:
+		LOGCRTC("%s: read unimplemented CRTC register %02x/4\n", machine().describe_context(), offset * 4);
+		return 0;
+	}
 }
 
 uint32_t jmfb_device::ramdac_r(offs_t offset)
@@ -670,11 +967,19 @@ void jmfb_device::jmfb_w(offs_t offset, uint32_t data)
 	switch (offset)
 	{
 	case 0x00/4: // control
-		LOG("%s: %04x to control (sense %x convolution %x interlace %x RGB %x RAM %dk)\n",
+		LOG("%s: %04x to control (%spixel clock %x sense %x transfer %x convolution %x interlace %x refresh %x RGB %x RAM %dk)\n",
 				machine().describe_context(), data,
-				BIT(data, 9, 3), BIT(data, 5), BIT(data, 4), BIT(data, 2), BIT(data, 0) ? 256 : 128);
-		m_control = data;
-		m_vram_view.select(BIT(data, 2)); // packed RGB mode
+				BIT(data, 15) ? "reset " : "",
+				BIT(data, 12, 3),
+				BIT(data, 9, 3),
+				BIT(data, 6),
+				BIT(data, 5),
+				BIT(data, 4),
+				BIT(data, 3),
+				BIT(data, 2),
+				BIT(data, 0) ? 256 : 128);
+		m_control = data & 0x7fff; // video reset bit needs to read as zero
+		m_vram_view.select(ctrl_rgb() ? 1 : 0); // packed RGB mode
 		break;
 
 	case 0x04/4: // RAMDAC longword load clock divider preload
@@ -700,6 +1005,12 @@ void jmfb_device::crtc_w(offs_t offset, uint32_t data)
 	data &= 0xffff; // 16 bits wide, but lane select is ignored and firmware relies on smearing
 	switch (offset)
 	{
+	case 0x08/4: // half line length from start of active area
+		LOGCRTC("%s: %d to half line cells\n", machine().describe_context(), data);
+		m_hhalf = data & 0x0fff;
+		update_crtc();
+		break;
+
 	case 0x0c/4: // active pixel cells - 2
 		LOGCRTC("%s: %d+2 to active cells\n", machine().describe_context(), data);
 		m_hactive = data & 0x0fff;

@@ -82,6 +82,11 @@ public:
 	mpu4bwb_machines_state(const machine_config &mconfig, device_type type, const char *tag) :
 		mpu4_state(mconfig, type, tag)
 	{
+		// Many BWB games do use the duart payout, but returning random values
+		// there until it's implemented results in an 'unexpected PO' error
+		// (Unexpected Pay Out) while many Barcrest games only boot if the value
+		// changes.  This will go away once the hopper is properly emulated
+		m_hack_duart_fixed_low = true;
 	}
 
 	void bwboki(machine_config &config);
@@ -116,7 +121,7 @@ MACHINE_START_MEMBER(mpu4bwb_machines_state,mpu4bwb)
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	mpu4_config_common();
 
-	m_link7a_connected=0;
+	m_link7a_connected=false;
 	m_mod_number=4;
 	mpu4_install_mod4bwb_space(space);
 }

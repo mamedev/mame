@@ -158,11 +158,11 @@ device_nes_cart_interface::~device_nes_cart_interface()
 //  pointer allocators
 //-------------------------------------------------
 
-void device_nes_cart_interface::prg_alloc(size_t size, const char *tag)
+void device_nes_cart_interface::prg_alloc(size_t size)
 {
 	if (m_prg == nullptr)
 	{
-		m_prg = device().machine().memory().region_alloc(std::string(tag).append(NESSLOT_PRGROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
+		m_prg = device().machine().memory().region_alloc(device().subtag("^cart:prg_rom"), size, 1, ENDIANNESS_LITTLE)->base();
 		m_prg_size = size;
 		m_prg_chunks = size / 0x4000;
 		if (size % 0x2000)
@@ -223,25 +223,21 @@ void device_nes_cart_interface::prg_alloc(size_t size, const char *tag)
 	}
 }
 
-void device_nes_cart_interface::vrom_alloc(size_t size, const char *tag)
+void device_nes_cart_interface::vrom_alloc(size_t size)
 {
 	if (m_vrom == nullptr)
 	{
-		std::string tempstring(tag);
-		tempstring.append(NESSLOT_CHRROM_REGION_TAG);
-		m_vrom = device().machine().memory().region_alloc(tempstring.c_str(), size, 1, ENDIANNESS_LITTLE)->base();
+		m_vrom = device().machine().memory().region_alloc(device().subtag("^cart:chr_rom"), size, 1, ENDIANNESS_LITTLE)->base();
 		m_vrom_size = size;
 		m_vrom_chunks = size / 0x2000;
 	}
 }
 
-void device_nes_cart_interface::misc_rom_alloc(size_t size, const char *tag)
+void device_nes_cart_interface::misc_rom_alloc(size_t size)
 {
 	if (m_misc_rom == nullptr)
 	{
-		std::string tempstring(tag);
-		tempstring.append(NESSLOT_MISC_ROM_REGION_TAG);
-		m_misc_rom = device().machine().memory().region_alloc(tempstring.c_str(), size, 1, ENDIANNESS_LITTLE)->base();
+		m_misc_rom = device().machine().memory().region_alloc(device().subtag("^cart:misc_rom"), size, 1, ENDIANNESS_LITTLE)->base();
 		m_misc_rom_size = size;
 	}
 }

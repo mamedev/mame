@@ -8,7 +8,6 @@
 
 #include "sliderreader.h"
 
-#include "emu.h"
 #include "slider.h"
 #include "chainmanager.h"
 

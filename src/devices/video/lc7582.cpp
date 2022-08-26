@@ -37,6 +37,16 @@ void lc7582_device::device_start()
 	// resolve callbacks
 	m_write_segs.resolve_safe();
 
+	// zerofill
+	m_data = 0;
+	m_ce = 0;
+	m_clk = 0;
+	m_blank = false;
+	m_duty = 0;
+	m_addsp = 0;
+	m_shift = 0;
+	std::fill_n(m_latch, std::size(m_latch), 0);
+
 	// register for savestates
 	save_item(NAME(m_data));
 	save_item(NAME(m_ce));

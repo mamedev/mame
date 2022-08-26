@@ -7,6 +7,10 @@
 
 #include <bgfx/bgfx.h>
 
+#include "palette.h"
+
+#include <cstdint>
+
 /* sdl_info is the information about SDL for the current screen */
 class bgfx_util
 {

@@ -1,20 +1,21 @@
 // license:BSD-3-Clause
 // copyright-holders:Devin Acker
 /***************************************************************************
-    Casio GT913
+    Casio GT913 (uPD913)
 
     This chip powers several late-90s/early-2000s Casio keyboards.
     It's based on the H8/300 instruction set, but with different encoding
     for many opcodes, as well as:
 
-    - Dedicated bank switching instructions (20-bit external address bus)
+    - Dedicated bank switching instructions
+	  (20-bit external address bus + 3 chip select outputs, can address a total of 4MB)
     - Two timers, three 8-bit ports, two 8-bit ADCs
     - Keyboard controller w/ key velocity detection
     - MIDI UART
     - 24-voice DPCM sound
 
-    Earlier and later Casio keyboard models contain "uPD912" and "uPD914" chips,
-    which are presumably similar.
+	Variants include the uPD912 and GT915/uPD915.
+	These were later succeeded by the uPD914.
 
 ***************************************************************************/
 
@@ -28,12 +29,12 @@ gt913_device::gt913_device(const machine_config &mconfig, const char *tag, devic
 	h8_device(mconfig, GT913, tag, owner, clock, address_map_constructor(FUNC(gt913_device::map), this)),
 	device_mixer_interface(mconfig, *this, 2),
 	m_rom(*this, DEVICE_SELF),
-	m_bank(*this, "bank"),
+	data_config("data", ENDIANNESS_BIG, 16, 22, 0),
 	m_intc(*this, "intc"),
 	m_sound(*this, "gt_sound"),
 	m_kbd(*this, "kbd"),
 	m_io_hle(*this, "io_hle"),
-	m_sci(*this, "sci"),
+	m_sci(*this, "sci%u", 0),
 	m_port(*this, "port%u", 1)
 {
 	has_hc = false;
@@ -46,11 +47,10 @@ std::unique_ptr<util::disasm_interface> gt913_device::create_disassembler()
 
 void gt913_device::map(address_map &map)
 {
-//  map.unmap_value_high();
-
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank");
-	map(0xfac0, 0xffbf).ram(); // CTK-551 zeroes out this range at $0418
+	map(0x8000, 0xbfff).rw(FUNC(gt913_device::data_r), FUNC(gt913_device::data_w));
+	map(0xc000, 0xf7ff).rom();
+	map(0xfac0, 0xffbf).ram();
 
 	/* ffc0-ffcb: sound */
 	map(0xffc0, 0xffc5).rw(m_sound, FUNC(gt913_sound_device::data_r), FUNC(gt913_sound_device::data_w));
@@ -66,11 +66,13 @@ void gt913_device::map(address_map &map)
 	map(0xffdc, 0xffdd).w(m_io_hle, FUNC(gt913_io_hle_device::timer_rate0_w));
 	map(0xffdf, 0xffdf).w(m_io_hle, FUNC(gt913_io_hle_device::timer_rate1_w));
 
-	/* ffe0-ffe3: serial */
+	/* ffe0-ffe7: serial */
 	map(0xffe0, 0xffe0).w(FUNC(gt913_device::uart_rate_w));
-	map(0xffe1, 0xffe1).w(m_sci, FUNC(h8_sci_device::tdr_w));
-	map(0xffe2, 0xffe2).rw(FUNC(gt913_device::uart_control_r), FUNC(gt913_device::uart_control_w));
-	map(0xffe3, 0xffe3).r(m_sci, FUNC(h8_sci_device::rdr_r));
+	map(0xffe1, 0xffe1).w(m_sci[0], FUNC(h8_sci_device::tdr_w));
+	map(0xffe2, 0xffe2).select(0x04).rw(FUNC(gt913_device::uart_control_r), FUNC(gt913_device::uart_control_w));
+	map(0xffe3, 0xffe3).r(m_sci[0], FUNC(h8_sci_device::rdr_r));
+	map(0xffe5, 0xffe5).w(m_sci[1], FUNC(h8_sci_device::tdr_w));
+	map(0xffe7, 0xffe7).r(m_sci[1], FUNC(h8_sci_device::rdr_r));
 
 	/* ffe9-ffea: ADC */
 	map(0xffe9, 0xffe9).rw(m_io_hle, FUNC(gt913_io_hle_device::adc_control_r), FUNC(gt913_io_hle_device::adc_control_w));
@@ -78,14 +80,13 @@ void gt913_device::map(address_map &map)
 
 	/* fff0-fff5: I/O ports */
 	map(0xfff0, 0xfff0).rw(m_port[0], FUNC(h8_port_device::ddr_r), FUNC(h8_port_device::ddr_w));
-	map(0xfff1, 0xfff1).rw(m_port[1], FUNC(h8_port_device::ddr_r), FUNC(h8_port_device::ddr_w));
+	// port 2 DDR - ctk601 and gz70sp both seem to use only bit 0 to indicate either all inputs or all outputs
+//	map(0xfff1, 0xfff1).rw(m_port[1], FUNC(h8_port_device::ddr_r), FUNC(h8_port_device::ddr_w));
+	map(0xfff1, 0xfff1).lw8(NAME([this](uint8_t data) { m_port[1]->ddr_w(BIT(data, 0) ? 0xff : 0x00); }));
 	map(0xfff2, 0xfff2).rw(m_port[0], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 	map(0xfff3, 0xfff3).rw(m_port[1], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
-	// likely port 3 - pins are shared with input matrix, ctk551 clears this register on boot and nothing else
-	// (specifically, the pins are also used for key velocity detection, so port 3 is probably used by very few models, if any at all)
 	map(0xfff4, 0xfff4).rw(m_port[2], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
-	// unknown - ctk551 sets/clears a few bits on boot and before going to sleep
-//  map(0xfff5, 0xfff5).noprw();
+	map(0xfff5, 0xfff5).rw(FUNC(gt913_device::syscr_r), FUNC(gt913_device::syscr_w));
 }
 
 void gt913_device::device_add_mconfig(machine_config &config)
@@ -98,34 +99,126 @@ void gt913_device::device_add_mconfig(machine_config &config)
 	m_sound->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
 
 	GT913_KBD_HLE(config, m_kbd, 0);
-	m_kbd->irq_cb().set([this] (int val) { if (val) m_intc->internal_interrupt(5); });
+	m_kbd->irq_cb().set([this] (int val)
+	{
+		if (val)
+			m_intc->internal_interrupt(5);
+		else
+			m_intc->clear_interrupt(5);
+	});
 	GT913_IO_HLE(config, m_io_hle, "intc", 6, 7);
-	H8_SCI(config, m_sci, "intc", 8, 9, 10, 0);
+	H8_SCI(config, m_sci[0], "intc", 8, 9, 10, 0);
+	H8_SCI(config, m_sci[1], "intc", 11, 12, 13, 0);
 
-	H8_PORT(config, m_port[0], h8_device::PORT_1, 0xff, 0x00);
-	H8_PORT(config, m_port[1], h8_device::PORT_2, 0xff, 0x00);
-	H8_PORT(config, m_port[2], h8_device::PORT_3, 0xff, 0x00);
+	H8_PORT(config, m_port[0], h8_device::PORT_1, 0x00, 0x00);
+	H8_PORT(config, m_port[1], h8_device::PORT_2, 0x00, 0x00);
+	H8_PORT(config, m_port[2], h8_device::PORT_3, 0x00, 0x00);
 }
 
 
 void gt913_device::uart_rate_w(uint8_t data)
 {
-	m_sci->brr_w(data >> 2);
+	// TODO: how is SCI1 baud rate actually selected?
+	// gz70sp writes 0x7e to ffe4 to select 31250 baud for MIDI, which doesn't seem right
+	m_sci[0]->brr_w(data >> 2);
+	m_sci[1]->brr_w(data >> 2);
 }
 
-void gt913_device::uart_control_w(uint8_t data)
+void gt913_device::uart_control_w(offs_t offset, uint8_t data)
 {
+	const unsigned num = BIT(offset, 2);
 	/*
 	upper 4 bits seem to correspond to the upper bits of SSR (Tx/Rx/error status)
 	lower 4 bits seem to correspond to the upper bits of SCR (Tx/Rx IRQ enable, Tx/Rx enable(?))
 	*/
-	m_sci->ssr_w(data & 0xf0);
-	m_sci->scr_w((data & 0x0f) << 4);
+	m_sci[num]->ssr_w(data & 0xf0);
+	m_sci[num]->scr_w((data & 0x0f) << 4);
 }
 
-uint8_t gt913_device::uart_control_r()
+uint8_t gt913_device::uart_control_r(offs_t offset)
 {
-	return (m_sci->ssr_r() & 0xf0) | (m_sci->scr_r() >> 4);
+	const unsigned num = BIT(offset, 2);
+	return (m_sci[num]->ssr_r() & 0xf0) | (m_sci[num]->scr_r() >> 4);
+}
+
+void gt913_device::syscr_w(uint8_t data)
+{
+	if (BIT(m_syscr ^ data, 2))
+		// NMI active edge has changed
+		m_intc->set_input(INPUT_LINE_NMI, CLEAR_LINE);
+
+	m_syscr = data;
+}
+
+uint8_t gt913_device::syscr_r()
+{
+	return m_syscr;
+}
+
+void gt913_device::data_w(offs_t offset, uint8_t data)
+{
+	m_data.write_byte(offset | (m_banknum & 0xff) << 14, data);
+}
+
+uint8_t gt913_device::data_r(offs_t offset)
+{
+	return m_data.read_byte(offset | (m_banknum & 0xff) << 14);	
+}
+
+uint8_t gt913_device::read8ib(uint32_t adr)
+{
+	if (BIT(m_syscr, 0))
+		// indirect bank disabled
+		return program.read_byte(adr);
+	else if ((IR[0] & 0x0070) == 0)
+		// indirect bank enabled, using bankh for r0
+		return m_data.read_byte(adr | ((m_banknum >> 6) << 16));
+	else
+		// indirect bank enabled, using bankl for other regs
+		return m_data.read_byte(adr | ((m_banknum & 0x3f) << 16));
+}
+
+void gt913_device::write8ib(uint32_t adr, uint8_t data)
+{
+	if (BIT(m_syscr, 0))
+		// indirect bank disabled
+		program.write_byte(adr, data);
+	else if ((IR[0] & 0x0070) == 0)
+		// indirect bank enabled, using bankh for r0
+		m_data.write_byte(adr | ((m_banknum >> 6) << 16), data);
+	else
+		// indirect bank enabled, using bankl for other regs
+		m_data.write_byte(adr | ((m_banknum & 0x3f) << 16), data);
+}
+
+uint16_t gt913_device::read16ib(uint32_t adr)
+{
+	adr &= ~1;
+
+	if (BIT(m_syscr, 0))
+		// indirect bank disabled
+		return program.read_word(adr);
+	else if ((IR[0] & 0x0070) == 0)
+		// indirect bank enabled, using bankh for r0
+		return m_data.read_word(adr | ((m_banknum >> 6) << 16));
+	else
+		// indirect bank enabled, using bankl for other regs
+		return m_data.read_word(adr | ((m_banknum & 0x3f) << 16));
+}
+
+void gt913_device::write16ib(uint32_t adr, uint16_t data)
+{
+	adr &= ~1;
+
+	if (BIT(m_syscr, 0))
+		// indirect bank disabled
+		program.write_word(adr, data);
+	else if ((IR[0] & 0x0070) == 0)
+		// indirect bank enabled, using bankh for r0
+		m_data.write_word(adr | ((m_banknum >> 6) << 16), data);
+	else
+		// indirect bank enabled, using bankl for other regs
+		m_data.write_word(adr | ((m_banknum & 0x3f) << 16), data);
 }
 
 void gt913_device::irq_setup()
@@ -150,23 +243,40 @@ void gt913_device::internal_update(uint64_t current_time)
 {
 	uint64_t event_time = 0;
 
-	add_event(event_time, m_sci->internal_update(current_time));
+	add_event(event_time, m_sci[0]->internal_update(current_time));
+	add_event(event_time, m_sci[1]->internal_update(current_time));
 
 	recompute_bcount(event_time);
 }
 
 void gt913_device::execute_set_input(int inputnum, int state)
 {
+	if (inputnum == INPUT_LINE_NMI)
+	{
+		if (BIT(m_syscr, 2))
+			state ^= ASSERT_LINE;
+	}
+
 	m_intc->set_input(inputnum, state);
+}
+
+device_memory_interface::space_config_vector gt913_device::memory_space_config() const
+{
+	return space_config_vector{
+		std::make_pair(AS_PROGRAM, &program_config),
+		std::make_pair(AS_IO,      &io_config),
+		std::make_pair(AS_DATA,    &data_config)
+	};
 }
 
 void gt913_device::device_start()
 {
 	h8_device::device_start();
 
-	m_bank->configure_entries(0, m_rom->bytes() >> 12, m_rom->base(), 1 << 12);
+	space(AS_DATA).specific(m_data);
 
 	save_item(NAME(m_banknum));
+	save_item(NAME(m_syscr));
 }
 
 void gt913_device::device_reset()
@@ -174,6 +284,7 @@ void gt913_device::device_reset()
 	h8_device::device_reset();
 
 	m_banknum = 0;
+	m_syscr = 0;
 }
 
 #include "cpu/h8/gt913.hxx"

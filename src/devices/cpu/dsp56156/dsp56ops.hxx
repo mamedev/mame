@@ -5662,11 +5662,11 @@ static bool dsp56156_value_is_unnormalized(dsp56156_core* cpustate, const uint64
 static bool dsp56156_value_is_extended(dsp56156_core* cpustate, const uint64_t value)
 {
 	uint16_t S = (cpustate->PCU.sr >> 10) & 3;
-	uint64_t extMask = 0x000000ffc0000000;
+	uint64_t extMask = 0x000000ffc0000000ULL;
 	if (S == 0 || S == 3)
-		extMask = 0x000000ff80000000;
+		extMask = 0x000000ff80000000ULL;
 	else if (S == 1)
-		extMask = 0x000000ff00000000;
+		extMask = 0x000000ff00000000ULL;
 	uint64_t extVal = value & extMask;
 	return extVal == extMask || extVal == 0;
 }

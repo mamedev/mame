@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-06-11 09:24+1000\n"
-"PO-Revision-Date: 2021-12-09 14:25+0800\n"
+"PO-Revision-Date: 2022-07-02 08:42+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh_CN\n"
@@ -31,6 +31,7 @@ msgstr ""
 msgid ""
 "This system requires media images to be mounted for the following device(s): "
 msgstr ""
+"此系统需要挂载下列装置的媒体映像档： "
 
 #: src/frontend/mame/ui/ui.cpp:1249
 #, c-format
@@ -292,7 +293,7 @@ msgstr "软件列表/项目： %1$s:%2$s"
 
 #: src/frontend/mame/ui/optsmenu.cpp:45 src/frontend/mame/ui/selgame.cpp:441
 msgid "General Settings"
-msgstr ""
+msgstr "一般设定"
 
 #: src/frontend/mame/ui/optsmenu.cpp:77 src/frontend/mame/ui/sndmenu.cpp:30
 msgid "Sound Options"
@@ -300,7 +301,7 @@ msgstr "声音选项"
 
 #: src/frontend/mame/ui/optsmenu.cpp:80
 msgid "Input Assignments"
-msgstr ""
+msgstr "输入配置"
 
 #: src/frontend/mame/ui/optsmenu.cpp:83 src/frontend/mame/ui/miscmenu.cpp:879
 msgid "Plugins"
@@ -308,7 +309,7 @@ msgstr "插件"
 
 #: src/frontend/mame/ui/optsmenu.cpp:85
 msgid "Input Devices"
-msgstr ""
+msgstr "输入装置"
 
 #: src/frontend/mame/ui/optsmenu.cpp:87
 msgid "Save Settings"
@@ -316,7 +317,7 @@ msgstr "保存设定"
 
 #: src/frontend/mame/ui/optsmenu.cpp:185 src/frontend/mame/ui/optsmenu.cpp:227
 msgid "System Filter"
-msgstr ""
+msgstr "系統过滤"
 
 #: src/frontend/mame/ui/optsmenu.cpp:197 src/frontend/mame/ui/custui.cpp:82
 msgid "Customize UI"
@@ -324,7 +325,7 @@ msgstr "自订 UI"
 
 #: src/frontend/mame/ui/optsmenu.cpp:198 src/frontend/mame/ui/dirmenu.cpp:525
 msgid "Configure Folders"
-msgstr ""
+msgstr "文件夹"
 
 #: src/frontend/mame/ui/pluginopt.cpp:35
 msgid "Plugin Options"
@@ -374,7 +375,7 @@ msgstr "其他选项"
 
 #: src/frontend/mame/ui/submenu.cpp:34
 msgid "Skip imperfect emulation warnings"
-msgstr "略过未完整模拟的警示讯息"
+msgstr "略过未完整模拟的警示信息"
 
 #: src/frontend/mame/ui/submenu.cpp:35
 msgid "Re-select last system launched"
@@ -414,7 +415,7 @@ msgstr "略过 BIOS 选择菜单"
 
 #: src/frontend/mame/ui/submenu.cpp:44
 msgid "Skip software part selection menu"
-msgstr ""
+msgstr "略过软件部分选择菜单"
 
 #: src/frontend/mame/ui/submenu.cpp:45
 msgid "Info auto audit"
@@ -739,7 +740,7 @@ msgstr "重新启动系统"
 
 #: src/frontend/mame/ui/filemngr.cpp:154
 msgid "Start System"
-msgstr ""
+msgstr "启动系统"
 
 #: src/frontend/mame/ui/videoopt.cpp:58
 #, c-format
@@ -749,7 +750,7 @@ msgstr "画面 #%d"
 #: src/frontend/mame/ui/videoopt.cpp:101
 #, c-format
 msgid "Video Options: %1$s"
-msgstr ""
+msgstr "视频选项: %1$s"
 
 #: src/frontend/mame/ui/videoopt.cpp:159
 msgid "Zoom to Screen Area"
@@ -889,18 +890,21 @@ msgid ""
 "One or more ROMs/disk images for this system are incorrect. The system may "
 "not run correctly.\n"
 msgstr ""
+"本系统有一个或更多的 ROM/磁盘映像档 是不正确的。此系统可能无法正确执行。\n"
 
 #: src/frontend/mame/ui/info.cpp:80
 msgid ""
 "There are known problems with this system\n"
 "\n"
 msgstr ""
+"本系统已知具有下列的问题\n"
+"\n"
 
 #: src/frontend/mame/ui/info.cpp:85
 msgid ""
 "One or more ROMs/disk images for this system have not been correctly "
 "dumped.\n"
-msgstr ""
+msgstr "本系统有一个或更多的 ROM/磁盘映像档 尚未正确地被 DUMP。\n"
 
 #: src/frontend/mame/ui/info.cpp:93
 msgid "Completely unemulated features: "
@@ -927,19 +931,19 @@ msgstr "尚未支援台面型筐体模式的画面翻转。"
 
 #: src/frontend/mame/ui/info.cpp:132
 msgid "This system requires external artwork files.\n"
-msgstr ""
+msgstr "此系统需要额外的装饰图档"
 
 #: src/frontend/mame/ui/info.cpp:134
 msgid ""
 "This system was never completed. It may exhibit strange behavior or missing "
 "elements that are not bugs in the emulation.\n"
-msgstr ""
+msgstr "本系统无法完成, 并非模拟时的错误而可能呈现怪异的行为或缺少元件。\n"
 
 #: src/frontend/mame/ui/info.cpp:136
 msgid ""
 "This system has no sound hardware, MAME will produce no sounds, this is "
 "expected behaviour.\n"
-msgstr ""
+msgstr "本系统无声音硬体, 故 MAME 将不会产生声音, 这是可预期的行为。\n"
 
 #: src/frontend/mame/ui/info.cpp:140
 msgid ""
@@ -948,6 +952,9 @@ msgid ""
 "There is nothing you can do to fix this problem except wait for the "
 "developers to improve the emulation.\n"
 msgstr ""
+"\n"
+"此系统无法执行, 系统的模拟还不完全。\n"
+"除了等待开发人员改良模拟之外, 没有方法可以解决这个问题。\n"
 
 #: src/frontend/mame/ui/info.cpp:142
 msgid ""
@@ -956,6 +963,9 @@ msgid ""
 "interaction or consist of mechanical devices. It is not possible to fully "
 "experience this system.\n"
 msgstr ""
+"\n"
+"此系统的部分元件无法模拟, 因其需要实际活动的互动或机械装置的组合。 故无法达成"
+"此系统的完整体验。\n"
 
 #: src/frontend/mame/ui/info.cpp:164
 #, c-format
@@ -964,6 +974,9 @@ msgid ""
 "\n"
 "There are working clones of this system: %s"
 msgstr ""
+"\n"
+"\n"
+"本系统尚有可运行的克隆版： %s"
 
 #: src/frontend/mame/ui/info.cpp:365
 #, c-format
@@ -1014,7 +1027,7 @@ msgid ""
 "Video:\n"
 msgstr ""
 "\n"
-"视讯：\n"
+"视频：\n"
 
 #: src/frontend/mame/ui/info.cpp:458
 msgid "None\n"
@@ -1049,7 +1062,7 @@ msgstr "%1$s:\n"
 
 #: src/frontend/mame/ui/info.cpp:618
 msgid "Media Image Information"
-msgstr ""
+msgstr "媒体映像档信息"
 
 #: src/frontend/mame/ui/info.cpp:666
 msgid "Not supported"
@@ -1085,7 +1098,7 @@ msgstr "[ 完整清单 ]"
 
 #: src/frontend/mame/ui/filecreate.cpp:78
 msgid "File Already Exists - Override?"
-msgstr "档案已存在 — 是否覆写？"
+msgstr "文件已存在 — 是否覆写？"
 
 #: src/frontend/mame/ui/filecreate.cpp:80 src/frontend/mame/ui/utils.cpp:1070
 msgid "No"
@@ -1122,7 +1135,7 @@ msgstr "选择初始化内容"
 #: src/frontend/mame/ui/keyboard.cpp:29
 msgctxt "menu-keyboard"
 msgid "Keyboard Selection"
-msgstr ""
+msgstr "键盘选项"
 
 #: src/frontend/mame/ui/keyboard.cpp:46
 msgctxt "menu-keyboard"
@@ -1297,7 +1310,7 @@ msgstr "非 BIOS"
 #: src/frontend/mame/ui/utils.cpp:95
 msgctxt "machine-filter"
 msgid "Parents"
-msgstr "母档"
+msgstr "主档"
 
 #: src/frontend/mame/ui/utils.cpp:96
 msgctxt "machine-filter"
@@ -1347,7 +1360,7 @@ msgstr "水平萤幕"
 #: src/frontend/mame/ui/utils.cpp:105
 msgctxt "machine-filter"
 msgid "Custom Filter"
-msgstr "自订过滤"
+msgstr "自订筛选"
 
 #: src/frontend/mame/ui/utils.cpp:109
 msgctxt "software-filter"
@@ -1372,7 +1385,7 @@ msgstr "最爱"
 #: src/frontend/mame/ui/utils.cpp:113
 msgctxt "software-filter"
 msgid "Parents"
-msgstr "母档"
+msgstr "主档"
 
 #: src/frontend/mame/ui/utils.cpp:114
 msgctxt "software-filter"
@@ -1454,7 +1467,7 @@ msgstr "<设定过滤>"
 
 #: src/frontend/mame/ui/utils.cpp:390
 msgid "Select Filters"
-msgstr ""
+msgstr "选择过滤"
 
 #: src/frontend/mame/ui/utils.cpp:538
 #, c-format
@@ -1471,15 +1484,15 @@ msgstr "新增过滤器"
 
 #: src/frontend/mame/ui/utils.cpp:1013
 msgid "[no category INI files]"
-msgstr "[没有类别 INI 档案]"
+msgstr "[没有类别 INI 文件]"
 
 #: src/frontend/mame/ui/utils.cpp:1021
 msgid "[no groups in INI file]"
-msgstr "[INI 档案中没有群组]"
+msgstr "[INI 文件中没有群组]"
 
 #: src/frontend/mame/ui/utils.cpp:1055
 msgid "No category INI files found"
-msgstr "没有发现群组 INI 档案"
+msgstr "没有发现群组 INI 文件"
 
 #: src/frontend/mame/ui/utils.cpp:1060
 msgid "File"
@@ -1487,7 +1500,7 @@ msgstr "文件"
 
 #: src/frontend/mame/ui/utils.cpp:1064
 msgid "No groups found in category file"
-msgstr "在类别档案中没有找到群组"
+msgstr "在类别文件中没有找到群组"
 
 #: src/frontend/mame/ui/utils.cpp:1069 src/frontend/mame/ui/utils.cpp:1151
 msgid "Group"
@@ -1499,7 +1512,7 @@ msgstr "包含克隆版"
 
 #: src/frontend/mame/ui/utils.cpp:1130
 msgid "Category File"
-msgstr ""
+msgstr "分类文件"
 
 #: src/frontend/mame/ui/utils.cpp:2029 src/frontend/mame/ui/inifile.cpp:277
 msgctxt "swlist-info"
@@ -1574,7 +1587,7 @@ msgstr " （已锁定）"
 #: src/frontend/mame/ui/miscmenu.cpp:354 src/frontend/mame/ui/miscmenu.cpp:541
 msgctxt "menu-crosshair"
 msgid "[built-in]"
-msgstr ""
+msgstr "[内建]"
 
 #: src/frontend/mame/ui/miscmenu.cpp:395
 msgctxt "menu-crosshair"
@@ -1584,17 +1597,17 @@ msgstr "十字准星选项"
 #: src/frontend/mame/ui/miscmenu.cpp:456
 msgctxt "menu-crosshair"
 msgid "Always"
-msgstr ""
+msgstr "总是"
 
 #: src/frontend/mame/ui/miscmenu.cpp:457
 msgctxt "menu-crosshair"
 msgid "Never"
-msgstr ""
+msgstr "绝不"
 
 #: src/frontend/mame/ui/miscmenu.cpp:458
 msgctxt "menu-crosshair"
 msgid "When moved"
-msgstr ""
+msgstr "当移动时"
 
 #: src/frontend/mame/ui/miscmenu.cpp:482
 #, c-format
@@ -1611,17 +1624,17 @@ msgstr "P%1$d 十字准星"
 #: src/frontend/mame/ui/miscmenu.cpp:562
 msgctxt "menu-crosshair"
 msgid "Auto-Hide Delay"
-msgstr ""
+msgstr "自动隐藏延迟"
 
 #: src/frontend/mame/ui/miscmenu.cpp:563
 #, c-format
 msgctxt "menu-crosshair"
 msgid "%1$d s"
-msgstr ""
+msgstr "%1$d 秒"
 
 #: src/frontend/mame/ui/miscmenu.cpp:584
 msgid "Export Displayed List to File"
-msgstr ""
+msgstr "汇出显示清单至档案"
 
 #: src/frontend/mame/ui/miscmenu.cpp:644
 #, c-format
@@ -1643,7 +1656,7 @@ msgstr "汇出 XML 格式列表 （同 -listxml）"
 
 #: src/frontend/mame/ui/miscmenu.cpp:699
 msgid "Export list in XML format (like -listxml, but exclude devices)"
-msgstr "汇出 TXT 格式列表 （同 -listxml，但不包含装置）"
+msgstr "汇出 XML 格式列表 （同 -listxml，但不包含装置）"
 
 #: src/frontend/mame/ui/miscmenu.cpp:700
 msgid "Export list in TXT format (like -listfull)"
@@ -1664,7 +1677,7 @@ msgstr "BIOS"
 
 #: src/frontend/mame/ui/miscmenu.cpp:815
 msgid "[this system has no BIOS settings]"
-msgstr ""
+msgstr "[此系统有无 BIOS 设定]"
 
 #: src/frontend/mame/ui/miscmenu.cpp:824
 msgid "Add To Favorites"
@@ -1775,7 +1788,7 @@ msgstr "%s [内部]"
 
 #: src/frontend/mame/ui/inputmap.cpp:29
 msgid "Input Assignments (general)"
-msgstr ""
+msgstr "输入配置 (一般)"
 
 #: src/frontend/mame/ui/inputmap.cpp:39
 msgid "User Interface"
@@ -1793,15 +1806,15 @@ msgstr "其他控制"
 #: src/frontend/mame/ui/inputmap.cpp:58
 #, c-format
 msgid "Input Assignments (%1$s)"
-msgstr ""
+msgstr "输入配置 (%1$s)"
 
 #: src/frontend/mame/ui/inputmap.cpp:152
 msgid "Input Assignments (this system)"
-msgstr ""
+msgstr "输入配置 (此系统)"
 
 #: src/frontend/mame/ui/inputmap.cpp:254
 msgid "[no assignable inputs are enabled]"
-msgstr ""
+msgstr "[已启用无配置输入]"
 
 #: src/frontend/mame/ui/inputmap.cpp:348
 msgid "Pressed"
@@ -1809,7 +1822,7 @@ msgstr "按住"
 
 #: src/frontend/mame/ui/inputmap.cpp:418
 msgid "Invalid combination entered"
-msgstr ""
+msgstr "输入无效组合"
 
 #: src/frontend/mame/ui/inputmap.cpp:563
 #, c-format
@@ -1853,27 +1866,27 @@ msgstr "按下 %1$s 还原缺省值\n"
 #, c-format
 msgctxt "menu-inputdev"
 msgid "%1$s (%2$s %3$d)"
-msgstr ""
+msgstr "%1$s (%2$s %3$d)"
 
 #: src/frontend/mame/ui/inputdevices.cpp:147
 msgctxt "menu-inputdev"
 msgid "Input Devices"
-msgstr ""
+msgstr "输入装置"
 
 #: src/frontend/mame/ui/inputdevices.cpp:188
 msgctxt "menu-inputdev"
 msgid "[no input devices are enabled]"
-msgstr ""
+msgstr "[已启用无输入装置]"
 
 #: src/frontend/mame/ui/inputtoggle.cpp:22
 msgctxt "menu-inputtoggle"
 msgid "Toggle Inputs"
-msgstr ""
+msgstr "切换输入"
 
 #: src/frontend/mame/ui/inputtoggle.cpp:107
 msgctxt "menu-inputtoggle"
 msgid "[no toggle inputs are enabled]"
-msgstr ""
+msgstr "[已启用无切换输入]"
 
 #: src/frontend/mame/ui/tapectrl.cpp:42
 msgid "Tape Control"
@@ -1922,37 +1935,37 @@ msgstr "快进"
 #: src/frontend/mame/ui/inputopts.cpp:75
 msgctxt "menu-inputopts"
 msgid "Input Settings"
-msgstr ""
+msgstr "输入设定"
 
 #: src/frontend/mame/ui/inputopts.cpp:95
 msgctxt "menu-inputopts"
 msgid "Input Assignments (general)"
-msgstr ""
+msgstr "输入配置 (一般)"
 
 #: src/frontend/mame/ui/inputopts.cpp:97
 msgctxt "menu-inputopts"
 msgid "Input Assignments (this system)"
-msgstr ""
+msgstr "输入配置 (此系统)"
 
 #: src/frontend/mame/ui/inputopts.cpp:99
 msgctxt "menu-inputopts"
 msgid "Analog Input Adjustments"
-msgstr ""
+msgstr "类比输入调整"
 
 #: src/frontend/mame/ui/inputopts.cpp:101
 msgctxt "menu-inputopts"
 msgid "Keyboard Selection"
-msgstr ""
+msgstr "键盘选项"
 
 #: src/frontend/mame/ui/inputopts.cpp:103
 msgctxt "menu-inputopts"
 msgid "Toggle Inputs"
-msgstr ""
+msgstr "开关输入"
 
 #: src/frontend/mame/ui/inputopts.cpp:107
 msgctxt "menu-inputopts"
 msgid "Input Devices"
-msgstr ""
+msgstr "输入装置"
 
 #: src/frontend/mame/ui/imgcntrl.cpp:132
 msgid "Cannot save over directory"
@@ -1964,7 +1977,7 @@ msgid ""
 "Please acquire the correct files or select a different one."
 msgstr ""
 "选定的软件缺少一个或多个必要的 ROM 或 CHD 映像档\n"
-"请取得正确的档案或选择不同的档案。"
+"请取得正确的文件或选择不同的文件。"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:147
 msgid ""
@@ -1994,6 +2007,10 @@ msgid ""
 "If this is your first time using %2$s, please see the %2$s.pdf file in the "
 "docs folder for information on setting up and using %2$s."
 msgstr ""
+"找不到系统 ROM, 请检查 %1$s.ini 档案中指定的 ROM 路径设定。\n"
+"\n"
+"如果是首次使用 %2$s, 请参阅 docs 目录中的 %2$s.pdf 以取得设定 %2$s 的相关信息"
+"\n"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:316
 #, c-format
@@ -2098,7 +2115,7 @@ msgstr "ROM"
 #: src/frontend/mame/ui/dirmenu.cpp:45
 msgctxt "path-option"
 msgid "Software Media"
-msgstr "软件媒介"
+msgstr "软件媒体"
 
 #: src/frontend/mame/ui/dirmenu.cpp:46
 msgctxt "path-option"
@@ -2267,12 +2284,12 @@ msgstr "按下 TAB 键设定"
 #: src/frontend/mame/ui/dirmenu.cpp:421
 #, c-format
 msgid "%1$s Folders"
-msgstr ""
+msgstr "%1$s 文件夹"
 
 #: src/frontend/mame/ui/dirmenu.cpp:421
 #, c-format
 msgid "%1$s Folder"
-msgstr ""
+msgstr "%1$s 文件夹"
 
 #: src/frontend/mame/ui/dirmenu.cpp:484
 msgid "Change Folder"
@@ -2306,91 +2323,91 @@ msgstr "展开以符合"
 #: src/frontend/mame/ui/viewgfx.cpp:822
 msgctxt "gfxview"
 msgid "All categories"
-msgstr ""
+msgstr "所有分类"
 
 #: src/frontend/mame/ui/viewgfx.cpp:824 src/frontend/mame/ui/viewgfx.cpp:829
 #, c-format
 msgctxt "gfxview"
 msgid "Category %1$d"
-msgstr ""
+msgstr "%1$d 分类"
 
 #: src/frontend/mame/ui/viewgfx.cpp:926
 #, c-format
 msgctxt "gfxview"
 msgid "[root%1$s]"
-msgstr ""
+msgstr "[root%1$s]"
 
 #: src/frontend/mame/ui/viewgfx.cpp:926
 #, c-format
 msgctxt "gfxview"
 msgid "[root%1$s] colors"
-msgstr ""
+msgstr "[root%1$s] 色"
 
 #: src/frontend/mame/ui/viewgfx.cpp:926
 #, c-format
 msgctxt "gfxview"
 msgid "[root%1$s] pens"
-msgstr ""
+msgstr "[root%1$s] pens"
 
 #: src/frontend/mame/ui/viewgfx.cpp:940
 #, c-format
 msgctxt "gfxview"
 msgid " #%1$X → %2$X (A:%3$02X R:%4$02X G:%5$02X B:%6$02X)"
-msgstr ""
+msgstr " #%1$X → %2$X (A:%3$02X R:%4$02X G:%5$02X B:%6$02X)"
 
 #: src/frontend/mame/ui/viewgfx.cpp:947
 #, c-format
 msgctxt "gfxview"
 msgid " #%1$X = %2$X (A:%3$02X R:%4$02X G:%5$02X B:%6$02X)"
-msgstr ""
+msgstr " #%1$X = %2$X (A:%3$02X R:%4$02X G:%5$02X B:%6$02X)"
 
 #: src/frontend/mame/ui/viewgfx.cpp:954
 #, c-format
 msgctxt "gfxview"
 msgid " #%1$X (A:%2$02X R:%3$02X G:%4$02X B:%5$02X)"
-msgstr ""
+msgstr " #%1$X (A:%2$02X R:%3$02X G:%4$02X B:%5$02X)"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1134
 #, c-format
 msgctxt "gfxview"
 msgid "[root%1$s] %2$d/%3$d"
-msgstr ""
+msgstr "[root%1$s] %2$d/%3$d"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1157
 #, c-format
 msgctxt "gfxview"
 msgid " #%1$X:%2$X (%3$d %4$d) = %5$X"
-msgstr ""
+msgstr " #%1$X:%2$X (%3$d %4$d) = %5$X"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1165
 #, c-format
 msgctxt "gfxview"
 msgid " %1$d×%2$d color %3$X/%4$X"
-msgstr ""
+msgstr " %1$d×%2$d 色 %3$X/%4$X"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1305
 #, c-format
 msgctxt "gfxview"
 msgid "Tilemap %1$d/%2$d category %3$u"
-msgstr ""
+msgstr "砖图 %1$d/%2$d 分类 %3$u"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1305
 #, c-format
 msgctxt "gfxview"
 msgid "Tilemap %1$d/%2$d "
-msgstr ""
+msgstr "砖图 %1$d/%2$d"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1327
 #, c-format
 msgctxt "gfxview"
 msgid " (%1$u %2$u) = GFX%3$u #%4$X:%5$X"
-msgstr ""
+msgstr " (%1$u %2$u) = GFX%3$u #%4$X:%5$X"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1334
 #, c-format
 msgctxt "gfxview"
 msgid " %1$d×%2$d origin (%3$d %4$d)"
-msgstr ""
+msgstr " %1$d×%2$d 原点 (%3$d %4$d)"
 
 #: src/frontend/mame/ui/selgame.cpp:442
 msgid "System Settings"
@@ -2415,12 +2432,12 @@ msgstr "%1$s - 搜寻： %2$s_"
 #: src/frontend/mame/ui/selector.cpp:105
 msgctxt "menu-selector"
 msgid "[no matches]"
-msgstr ""
+msgstr "[无符合]"
 
 #: src/frontend/mame/ui/selector.cpp:118
 msgctxt "menu-selector"
 msgid "[no choices]"
-msgstr ""
+msgstr "[无选项]"
 
 #: src/frontend/mame/ui/selector.cpp:133
 #, c-format
@@ -2430,7 +2447,7 @@ msgstr "双击或按下 %1$s 以选择"
 
 #: src/frontend/mame/ui/auditmenu.cpp:59
 msgid "Audit Media"
-msgstr ""
+msgstr "验证媒体"
 
 #: src/frontend/mame/ui/auditmenu.cpp:63
 #, c-format
@@ -2443,6 +2460,8 @@ msgid ""
 "Auditing media for system %2$u of %3$u...\n"
 "%1$s"
 msgstr ""
+"正在验证供系统 %2$u 的 %3$u 媒体...\n"
+"%1$s"
 
 #: src/frontend/mame/ui/auditmenu.cpp:119
 #, c-format
@@ -2460,12 +2479,12 @@ msgstr ""
 #: src/frontend/mame/ui/auditmenu.cpp:139
 #, c-format
 msgid "Audit media for %1$u systems marked unavailable"
-msgstr ""
+msgstr "校验标记为不可用的 %1$u 系统媒体"
 
 #: src/frontend/mame/ui/auditmenu.cpp:140
 #, c-format
 msgid "Audit media for all %1$u systems"
-msgstr ""
+msgstr "校验所有 %1$u 系统的媒体"
 
 #: src/frontend/mame/ui/auditmenu.cpp:157
 #, c-format
@@ -2490,7 +2509,7 @@ msgstr "隐藏两者"
 
 #: src/frontend/mame/ui/custui.cpp:142
 msgid "UI Language"
-msgstr ""
+msgstr "UI 语言"
 
 #: src/frontend/mame/ui/custui.cpp:167 src/frontend/mame/ui/custui.cpp:220
 msgid "System Names"
@@ -2550,7 +2569,7 @@ msgstr "采样文字 - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 
 #: src/frontend/mame/ui/custui.cpp:545
 msgid "UI Colors"
-msgstr ""
+msgstr "UI 色"
 
 #: src/frontend/mame/ui/custui.cpp:608
 msgctxt "color-option"
@@ -2560,7 +2579,7 @@ msgstr "一般文本"
 #: src/frontend/mame/ui/custui.cpp:609
 msgctxt "color-option"
 msgid "Selected color"
-msgstr "选择色彩"
+msgstr "选择色"
 
 #: src/frontend/mame/ui/custui.cpp:610
 msgctxt "color-option"
@@ -2772,7 +2791,7 @@ msgstr "修订： %1$s"
 
 #: src/frontend/mame/ui/analogipt.cpp:60
 msgid "Analog Input Adjustments"
-msgstr ""
+msgstr "类比输入调整"
 
 #: src/frontend/mame/ui/analogipt.cpp:92
 #, c-format
@@ -2801,7 +2820,7 @@ msgstr "%1$s 敏感度"
 
 #: src/frontend/mame/ui/analogipt.cpp:402
 msgid "[no analog inputs are enabled]"
-msgstr ""
+msgstr "[已启用无类比输入]"
 
 #: src/frontend/mame/ui/barcode.cpp:40
 msgid "Barcode Reader"
@@ -2822,7 +2841,7 @@ msgstr "条码长度无效！"
 #: src/frontend/mame/ui/mainmenu.cpp:114
 msgctxt "menu-main"
 msgid "Input Settings"
-msgstr ""
+msgstr "输入设定"
 
 #: src/frontend/mame/ui/mainmenu.cpp:117
 msgctxt "menu-main"
@@ -2837,7 +2856,7 @@ msgstr "机器设定"
 #: src/frontend/mame/ui/mainmenu.cpp:121
 msgctxt "menu-main"
 msgid "Bookkeeping Info"
-msgstr "收入信息"
+msgstr "收入资讯"
 
 #: src/frontend/mame/ui/mainmenu.cpp:123
 msgctxt "menu-main"
@@ -2852,7 +2871,7 @@ msgstr "警示信息"
 #: src/frontend/mame/ui/mainmenu.cpp:132
 msgctxt "menu-main"
 msgid "Media Image Information"
-msgstr ""
+msgstr "媒体映像档信息"
 
 #: src/frontend/mame/ui/mainmenu.cpp:134
 msgctxt "menu-main"
@@ -2938,17 +2957,17 @@ msgstr "关于 %1$s"
 #: src/frontend/mame/ui/mainmenu.cpp:194
 msgctxt "menu-main"
 msgid "Start System"
-msgstr ""
+msgstr "启动系统"
 
 #: src/frontend/mame/ui/mainmenu.cpp:198
 msgctxt "menu-main"
 msgid "Select New System"
-msgstr ""
+msgstr "选择新系统"
 
 #: src/frontend/mame/ui/mainmenu.cpp:199
 msgctxt "menu-main"
 msgid "Close Menu"
-msgstr ""
+msgstr "关闭菜单"
 
 #: src/frontend/mame/ui/selmenu.cpp:77
 msgctxt "selmenu-artwork"
@@ -3041,7 +3060,7 @@ msgstr "新增或移除最爱项目"
 
 #: src/frontend/mame/ui/selmenu.cpp:98
 msgid "Export displayed list to file"
-msgstr "汇出显示的清单至档案"
+msgstr "汇出显示的清单至文件"
 
 #: src/frontend/mame/ui/selmenu.cpp:99
 msgid "Audit media"
@@ -3053,11 +3072,11 @@ msgstr "显示文件检视"
 
 #: src/frontend/mame/ui/selmenu.cpp:260
 msgid "Select Software Package Part"
-msgstr ""
+msgstr "选择软件包部分"
 
 #: src/frontend/mame/ui/selmenu.cpp:330
 msgid "Select System BIOS"
-msgstr ""
+msgstr "选择系统 BIOS"
 
 #: src/frontend/mame/ui/selmenu.cpp:644 src/frontend/mame/ui/selmenu.cpp:675
 #, c-format
@@ -3067,7 +3086,7 @@ msgstr "%1$s, %2$s"
 #: src/frontend/mame/ui/selmenu.cpp:648
 #, c-format
 msgid "Software is clone of: %1$s"
-msgstr "软件相容于： %1$s"
+msgstr "软件克隆于： %1$s"
 
 #: src/frontend/mame/ui/selmenu.cpp:650
 msgid "Software is parent"
@@ -3087,12 +3106,12 @@ msgstr "已支援： 是"
 
 #: src/frontend/mame/ui/selmenu.cpp:681
 msgid "System is parent"
-msgstr ""
+msgstr "系统为主档"
 
 #: src/frontend/mame/ui/selmenu.cpp:683 src/frontend/mame/ui/selmenu.cpp:685
 #, c-format
 msgid "System is clone of: %1$s"
-msgstr ""
+msgstr "系统克隆于: %1$s"
 
 #: src/frontend/mame/ui/selmenu.cpp:721
 #, c-format
@@ -3113,8 +3132,8 @@ msgid ""
 "Please acquire the correct files or select a different system.\n"
 "\n"
 msgstr ""
-"选定系统所需要的 ROM / 磁碟映像档为缺少或不正确。\n"
-"请取得正确的档案或选择不同的系统。\n"
+"选定系统所需要的 ROM / 磁盘映像档为缺少或不正确。\n"
+"请取得正确的文件或选择不同的系统。\n"
 "\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2544
@@ -3123,8 +3142,8 @@ msgid ""
 "Please acquire the correct files or select a different software item.\n"
 "\n"
 msgstr ""
-"选定软件所需要的 ROM / 磁碟映像档为缺少或不正确。\n"
-"请取得正确的档案或选择不同的软件项目。\n"
+"选定软件所需要的 ROM / 磁盘映像档为缺少或不正确。\n"
+"请取得正确的文件或选择不同的软件项目。\n"
 "\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2560
@@ -3175,11 +3194,11 @@ msgstr "制造商\t%1$s\n"
 #: src/frontend/mame/ui/selmenu.cpp:2873
 #, c-format
 msgid "System is Clone of\t%1$s\n"
-msgstr ""
+msgstr "系统克隆于\t%1$s\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2878
 msgid "System is Parent\t\n"
-msgstr ""
+msgstr "系统为主档\t\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2882
 msgid "Analog Controls\tYes\n"
@@ -3403,11 +3422,11 @@ msgstr "支援檯面型筐体\t否\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3003
 msgid "System is BIOS\tYes\n"
-msgstr ""
+msgstr "系统为 BIOS\t是\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3003
 msgid "System is BIOS\tNo\n"
-msgstr ""
+msgstr "系统为 BIOS\t否\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3004
 msgid "Support Save\tYes\n"
@@ -5629,7 +5648,7 @@ msgstr "高分档支援选项"
 #: plugins/hiscore/init.lua:88
 msgctxt "plugin-hiscore"
 msgid "Save scores"
-msgstr "储存得分"
+msgstr "保存得分"
 
 #: plugins/hiscore/init.lua:372
 msgctxt "plugin-hiscore"
@@ -5699,7 +5718,7 @@ msgid ""
 "Unable to write file\n"
 "Ensure that cheatpath folder exists"
 msgstr ""
-"无法写入档案\n"
+"无法写入文件\n"
 "确认 cheatpath 资料夹是否存在"
 
 #: plugins/cheatfind/init.lua:497
@@ -5914,17 +5933,17 @@ msgstr "作弊码搜寻器"
 
 #: plugins/portname/init.lua:103
 msgid "Save input names to file"
-msgstr "保存输入名称至档案"
+msgstr "保存输入名称至文件"
 
 #: plugins/portname/init.lua:134 plugins/portname/init.lua:139
 #: plugins/portname/init.lua:155
 msgid "Failed to save input name file"
-msgstr "保存输入名称档案时失败"
+msgstr "保存输入名称文件时失败"
 
 #: plugins/portname/init.lua:167
 #, lua-format
 msgid "Input port name file saved to %s"
-msgstr "输入埠名称档案保存至 %s"
+msgstr "输入埠名称文件保存至 %s"
 
 #: plugins/portname/init.lua:172
 msgid "Input ports"
@@ -6154,7 +6173,7 @@ msgstr "[未设定]"
 #: plugins/inputmacro/inputmacro_menu.lua:359
 msgctxt "plugin-inputmacro"
 msgid "Activation combination"
-msgstr ""
+msgstr "启动组合"
 
 #: plugins/inputmacro/inputmacro_menu.lua:362
 msgctxt "plugin-inputmacro"
@@ -6449,7 +6468,7 @@ msgstr "取消"
 #: plugins/commonui/init.lua:197
 msgctxt "plugin-commonui"
 msgid "Invalid combination entered"
-msgstr ""
+msgstr "输入无效组合"
 
 #: plugins/commonui/init.lua:203
 #, lua-format
@@ -6458,211 +6477,5 @@ msgid ""
 "Enter combination or press %s to cancel\n"
 "%s"
 msgstr ""
-
-#~ msgid "Start Machine"
-#~ msgstr "启动机械"
-
-#~ msgid "Visible Delay"
-#~ msgstr "可见度延迟"
-
-#~ msgid " COLORS"
-#~ msgstr " 色彩"
-
-#~ msgid " PENS"
-#~ msgstr " PENS"
-
-#~ msgctxt "menu-main"
-#~ msgid "Start Machine"
-#~ msgstr "启动机械"
-
-#~ msgctxt "menu-main"
-#~ msgid "Select New Machine"
-#~ msgstr "选择新机器"
-
-#~ msgctxt "menu-main"
-#~ msgid "Return to Machine"
-#~ msgstr "回到机械"
-
-#~ msgid "Software part selection:"
-#~ msgstr "软件部分选项："
-
-#~ msgid "BIOS selection:"
-#~ msgstr "选择 BIOS："
-
-#~ msgid "Driver is parent"
-#~ msgstr "驱动为主档"
-
-#, c-format
-#~ msgid "Driver is clone of: %1$s"
-#~ msgstr "驱动相容于： %1$s"
-
-#, c-format
-#~ msgid "Driver is Clone of\t%1$s\n"
-#~ msgstr "驱动相容于\t%1$s\n"
-
-#~ msgid "Driver is Parent\t\n"
-#~ msgstr "驱动为主档\t\n"
-
-#~ msgid "Driver is BIOS\tYes\n"
-#~ msgstr "驱动程序为 BIOS\t是\n"
-
-#~ msgid "Driver is BIOS\tNo\n"
-#~ msgstr "驱动程序为 BIOS\t否\n"
-
-#~ msgid ""
-#~ "This driver requires images to be loaded in the following device(s): "
-#~ msgstr "此驱动需要额外载入下列装置的映像档： "
-
-#~ msgid ""
-#~ "One or more ROMs/CHDs for this machine are incorrect. The machine may not "
-#~ "run correctly.\n"
-#~ msgstr "本机械有一个或更多的 ROM/CHD 是不正确的。此机械可能无法正确执行。\n"
-
-#~ msgid ""
-#~ "There are known problems with this machine\n"
-#~ "\n"
-#~ msgstr ""
-#~ "本机械已知具有下列的问题\n"
-#~ "\n"
-
-#~ msgid ""
-#~ "One or more ROMs/CHDs for this machine have not been correctly dumped.\n"
-#~ msgstr "本机械有一个或更多的 ROM/CHD 尚未正确地被 DUMP。\n"
-
-#~ msgid "This machine requires external artwork files.\n"
-#~ msgstr "此机械需要额外的装饰图档"
-
-#~ msgid ""
-#~ "This machine was never completed. It may exhibit strange behavior or "
-#~ "missing elements that are not bugs in the emulation.\n"
-#~ msgstr "本机械无法完成，并非模拟中的错误而可能呈现怪异的行为或缺少元件。\n"
-
-#~ msgid ""
-#~ "This machine has no sound hardware, MAME will produce no sounds, this is "
-#~ "expected behaviour.\n"
-#~ msgstr "本机械无声音硬体，故 MAME 将不会产生声音，这是可预期的行为。\n"
-
-#~ msgid ""
-#~ "\n"
-#~ "THIS MACHINE DOESN'T WORK. The emulation for this machine is not yet "
-#~ "complete. There is nothing you can do to fix this problem except wait for "
-#~ "the developers to improve the emulation.\n"
-#~ msgstr ""
-#~ "\n"
-#~ "此机械无法执行，机械的模拟还不完全。\n"
-#~ "除了等待开发人员改良模拟之外，没有方法可以解决这个问题。\n"
-
-#~ msgid ""
-#~ "\n"
-#~ "Elements of this machine cannot be emulated as they require physical "
-#~ "interaction or consist of mechanical devices. It is not possible to fully "
-#~ "experience this machine.\n"
-#~ msgstr ""
-#~ "\n"
-#~ "此机械的部分元件无法模拟，因其需要实际活动的互动或机械装置的组合。故无法达"
-#~ "成此机械的完成体验。\n"
-
-#, c-format
-#~ msgid ""
-#~ "\n"
-#~ "\n"
-#~ "There are working clones of this machine: %s"
-#~ msgstr ""
-#~ "\n"
-#~ "\n"
-#~ "本机械尚有可执行的彷製版： %s"
-
-#, c-format
-#~ msgid ""
-#~ "No machines found. Please check the rompath specified in the %1$s.ini "
-#~ "file.\n"
-#~ "\n"
-#~ "If this is your first time using %2$s, please see the config.txt file in "
-#~ "the docs directory for information on configuring %2$s."
-#~ msgstr ""
-#~ "找不到机械，请检查 %1$s.ini 的 ROM 目录设定\n"
-#~ "\n"
-#~ "如果此为首次使用 %2$s，请参阅 docs 目录中的 config.txt 以取得设定 %2$s 的"
-#~ "相关信息。"
-
-#, c-format
-#~ msgid ""
-#~ "Auditing media for machine %2$u of %3$u...\n"
-#~ "%1$s"
-#~ msgstr ""
-#~ "正在校验供机械 %2$u 的 %3$u 媒体...\n"
-#~ "%1$s"
-
-#, c-format
-#~ msgid "Audit media for %1$u machines marked unavailable"
-#~ msgstr "校验标记为不可用的 %1$u 机械媒体"
-
-#, c-format
-#~ msgid "Audit media for all %1$u machines"
-#~ msgstr "校验所有 %1$u 机械的媒体"
-
-#~ msgid "General Inputs"
-#~ msgstr "一般输入"
-
-#~ msgid "Configure Directories"
-#~ msgstr "设定目录"
-
-#~ msgid "Select custom filters:"
-#~ msgstr "选择自订过滤器:"
-
-#~ msgid "Select category:"
-#~ msgstr "选择类别:"
-
-#~ msgid "This machine has no BIOS."
-#~ msgstr "此机台没有 BIOS。"
-
-#~ msgid "This machine has no configurable inputs."
-#~ msgstr "此机台没有可设定的输入"
-
-#~ msgid "Invalid sequence entered"
-#~ msgstr "输入了无效序列"
-
-#~ msgid "Folders Setup"
-#~ msgstr "文件夹设定"
-
-#, c-format
-#~ msgid "Current %1$s Folders"
-#~ msgstr "当前 %1$s 文件夹"
-
-#~ msgid "UI Customization Settings"
-#~ msgstr "UI 自订设置"
-
-#~ msgid "UI Color Settings"
-#~ msgstr "UI 色彩设定"
-
-#~ msgid "Input (general)"
-#~ msgstr "输入设定 （一般）"
-
-#~ msgid "Input (this machine)"
-#~ msgstr "输入设定 （本机器）"
-
-#~ msgid "Analog Controls"
-#~ msgstr "类比控制"
-
-#~ msgid "Image Information"
-#~ msgstr "映像档信息"
-
-#~ msgctxt "plugin-inputmacro"
-#~ msgid "Activation sequence"
-#~ msgstr "激活序列"
-
-#~ msgctxt "plugin-commonui"
-#~ msgid "Invalid sequence entered"
-#~ msgstr "输入了无效序列"
-
-#, lua-format
-#~ msgctxt "plugin-commonui"
-#~ msgid ""
-#~ "Enter sequence or press %s to cancel\n"
-#~ "%s"
-#~ msgstr ""
-#~ "输入序列或按下 %s 取消\n"
-#~ "%s"
-
-#~ msgid "Skip software parts selection menu"
-#~ msgstr "略过软件部分选择菜单"
+"输入组合或按下 %s 取消\n"
+"%s"

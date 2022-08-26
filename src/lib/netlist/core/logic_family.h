@@ -10,6 +10,8 @@
 
 #include "../nltypes.h"
 
+#include "../plib/palloc.h"
+#include "../plib/pmempool.h"
 #include "../plib/pstring.h"
 
 namespace netlist

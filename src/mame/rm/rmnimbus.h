@@ -261,8 +261,8 @@ private:
 	void decode_dssi_f_plonk_char(uint16_t ds, uint16_t si);
 	void decode_dssi_f_rw_sectors(uint16_t ds, uint16_t si);
 
-	void debug_command(const std::vector<std::string> &params);
-	void video_debug(const std::vector<std::string> &params);
+	void debug_command(const std::vector<std::string_view> &params);
+	void video_debug(const std::vector<std::string_view> &params);
 	offs_t dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 
 	TIMER_CALLBACK_MEMBER(do_mouse);

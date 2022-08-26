@@ -27,6 +27,7 @@
 DEFINE_DEVICE_TYPE(VBOY_CART_SLOT, vboy_cart_slot_device, "vboy_cart_slot", "Nintendo Virtual Boy Cartridge Slot")
 
 
+
 //**************************************************************************
 //  vboy_cart_slot_device
 //**************************************************************************
@@ -69,7 +70,7 @@ image_init_result vboy_cart_slot_device::call_load()
 	if (!loaded_through_softlist())
 	{
 		LOG("Allocating %u byte cartridge ROM region\n", len);
-		romregion = machine().memory().region_alloc(subtag("rom").c_str(), len, 4, ENDIANNESS_LITTLE);
+		romregion = machine().memory().region_alloc(subtag("rom"), len, 4, ENDIANNESS_LITTLE);
 		u32 const cnt(fread(romregion->base(), len));
 		if (cnt != len)
 		{
@@ -129,22 +130,22 @@ std::string vboy_cart_slot_device::get_default_card_software(get_default_card_so
 	software_part const *const part(!image_name.empty() ? find_software_item(image_name, true) : nullptr);
 	if (part)
 	{
-		//printf("[%s] Found software part for image name '%s'\n", tag(), image_name.c_str());
+		osd_printf_verbose("[%s] Found software part for image name '%s'\n", tag(), image_name);
 		for (rom_entry const &entry : part->romdata())
 		{
 			if (ROMENTRY_ISREGION(entry) && (entry.name() == "sram"))
 			{
-				//printf("[%s] Found 'sram' data area, enabling cartridge backup RAM\n", tag());
+				osd_printf_verbose("[%s] Found 'sram' data area, enabling cartridge backup RAM\n", tag());
 				return "flatrom_sram";
 			}
 		}
 	}
 	else
 	{
-		//printf("[%s] No software part found for image name '%s'\n", tag(), image_name.c_str());
+		osd_printf_verbose("[%s] No software part found for image name '%s'\n", tag(), image_name);
 	}
 
-	//printf("[%s] Assuming plain ROM cartridge\n", tag());
+	osd_printf_verbose("[%s] Assuming plain ROM cartridge\n", tag());
 	return "flatrom";
 }
 

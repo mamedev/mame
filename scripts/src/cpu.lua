@@ -1091,16 +1091,31 @@ if CPUS["MCS51"] then
 		MAME_DIR .. "src/devices/cpu/mcs51/mcs51.cpp",
 		MAME_DIR .. "src/devices/cpu/mcs51/mcs51.h",
 		MAME_DIR .. "src/devices/cpu/mcs51/mcs51ops.hxx",
-		MAME_DIR .. "src/devices/cpu/mcs51/axc51-core.cpp",
-		MAME_DIR .. "src/devices/cpu/mcs51/axc51-core.h",
 	}
 end
 
 if opt_tool(CPUS, "MCS51") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mcs51/mcs51dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mcs51/mcs51dasm.h")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mcs51/axc51-core_dasm.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mcs51/axc51-core_dasm.h")
+end
+
+--------------------------------------------------
+-- Appotech AXC-51 (extended Intel 8051)
+--@src/devices/cpu/axc51/axc51.h,CPUS["AXC51"] = true
+--------------------------------------------------
+
+if CPUS["AXC51"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/axc51/axc51.cpp",
+		MAME_DIR .. "src/devices/cpu/axc51/axc51.h",
+		MAME_DIR .. "src/devices/cpu/axc51/axc51ops.hxx",
+		MAME_DIR .. "src/devices/cpu/axc51/axc51extops.hxx",
+	}
+end
+
+if opt_tool(CPUS, "AXC51") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/axc51/axc51dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/acx51/axc51dasm.h")
 end
 
 --------------------------------------------------
@@ -2395,6 +2410,8 @@ end
 --@src/devices/cpu/tms1000/tms1000c.h,CPUS["TMS1000"] = true
 --@src/devices/cpu/tms1000/tms1100.h,CPUS["TMS1000"] = true
 --@src/devices/cpu/tms1000/tms1400.h,CPUS["TMS1000"] = true
+--@src/devices/cpu/tms1000/tms2100.h,CPUS["TMS1000"] = true
+--@src/devices/cpu/tms1000/tms2400.h,CPUS["TMS1000"] = true
 --@src/devices/cpu/tms1000/tms0970.h,CPUS["TMS1000"] = true
 --@src/devices/cpu/tms1000/tms0980.h,CPUS["TMS1000"] = true
 --@src/devices/cpu/tms1000/tms0270.h,CPUS["TMS1000"] = true
@@ -2413,6 +2430,10 @@ if CPUS["TMS1000"] then
 		MAME_DIR .. "src/devices/cpu/tms1000/tms1100.h",
 		MAME_DIR .. "src/devices/cpu/tms1000/tms1400.cpp",
 		MAME_DIR .. "src/devices/cpu/tms1000/tms1400.h",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms2100.cpp",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms2100.h",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms2400.cpp",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms2400.h",
 		MAME_DIR .. "src/devices/cpu/tms1000/tms0970.cpp",
 		MAME_DIR .. "src/devices/cpu/tms1000/tms0970.h",
 		MAME_DIR .. "src/devices/cpu/tms1000/tms0980.cpp",
@@ -3607,4 +3628,14 @@ end
 if opt_tool(CPUS, "V620") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/v620/v620dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/v620/v620dasm.h")
+end
+
+--------------------------------------------------
+-- Panafacom MN1610, disassembler only
+--@src/devices/cpu/mn1610/mn1610d.h,CPUS["MN1610"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "MN1610") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mn1610/mn1610d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mn1610/mn1610d.h")
 end

@@ -51,6 +51,7 @@ private:
 
 	static const u8 exp_2_to_3[4];
 	static const s8 sample_7_to_8[128];
+	static const u16 volume_ramp[17];
 
 	struct voice_t
 	{
@@ -66,15 +67,16 @@ private:
 		s16 m_sample, m_sample_next;
 		u8 m_exp;
 
+		u16 m_volume_data;
 		u32 m_volume_current, m_volume_target;
 		u32 m_volume_rate;
-		bool m_volume_end;
 
 		u8 m_balance[2];
 		u8 m_gain;
 	};
 
 	void mix_sample(voice_t& voice, s64& left, s64& right);
+	void update_envelope(voice_t& voice);
 	void update_sample(voice_t& voice);
 
 	voice_t m_voices[24];

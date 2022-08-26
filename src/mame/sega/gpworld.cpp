@@ -67,7 +67,7 @@ public:
 
 private:
 	virtual void machine_start() override;
-	virtual void driver_init() override;
+	virtual void driver_start() override;
 
 	void mainmem(address_map &map);
 	void mainport(address_map &map);
@@ -544,7 +544,7 @@ ROM_START( gpworld )
 ROM_END
 
 
-void gpworld_state::driver_init()
+void gpworld_state::driver_start()
 {
 	m_nmi_enable = 0;
 	m_start_lamp = 0;

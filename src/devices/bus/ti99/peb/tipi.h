@@ -51,6 +51,8 @@ private:
 	void websocket_incoming(std::shared_ptr<webpp::ws_client::Message> message);
 	void websocket_error(const std::error_code& code);
 	void websocket_closed(int i, const std::string& msg);
+	void websocket_debug(const char* msg, int i);
+
 	TIMER_CALLBACK_MEMBER(open_websocket);
 
 	void send(const char* message);

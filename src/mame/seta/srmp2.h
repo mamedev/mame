@@ -6,7 +6,7 @@
 #pragma once
 
 #include "sound/msm5205.h"
-#include "seta001.h"
+#include "video/x1_001.h"
 #include "emupal.h"
 
 class srmp2_state : public driver_device
@@ -23,7 +23,7 @@ public:
 	srmp2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_seta001(*this, "spritegen"),
+		m_spritegen(*this, "spritegen"),
 		m_msm(*this, "msm"),
 		m_adpcm_rom(*this, "adpcm"),
 		m_mainbank(*this, "mainbank")
@@ -36,7 +36,7 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<seta001_device> m_seta001;
+	required_device<x1_001_device> m_spritegen;
 	required_device<msm5205_device> m_msm;
 	required_region_ptr<uint8_t> m_adpcm_rom;
 	optional_memory_bank m_mainbank;
@@ -87,7 +87,7 @@ private:
 
 	uint32_t screen_update_srmp2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_srmp3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	SETA001_SPRITE_GFXBANK_CB_MEMBER(srmp3_gfxbank_callback);
+	X1_001_SPRITE_GFXBANK_CB_MEMBER(srmp3_gfxbank_callback);
 
 	uint8_t iox_key_matrix_calc(uint8_t p_side);
 

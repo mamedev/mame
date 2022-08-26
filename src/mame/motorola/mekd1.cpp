@@ -111,12 +111,6 @@ public:
 
 	void mekd1(machine_config &config);
 
-	enum
-	{
-		TIMER_BIT_RATE,
-		TIMER_BIT_RATE_HALF
-	};
-
 private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;

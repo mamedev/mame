@@ -30,7 +30,6 @@ license:CC0
 	<element name="text_l8"><text string="RD"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 
 	<element name="text_b1"><text string="RE"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_b2"><text string="spk"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 	<element name="text_b3"><text string="CL"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 	<element name="text_b4"><text string="EN"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 	<element name="text_b5"><text string="BR"><color red="0.7" green="0.7" blue="0.7" /></text></element>
@@ -61,6 +60,16 @@ license:CC0
 	<element name="text_b30"><text string="P"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 	<element name="text_b31"><text string="1"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 	<element name="text_b32"><text string="2"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+
+	<!-- generic speaker icon, (C) Mobius, public domain -->
+	<element name="speaker">
+		<image><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.0" width="500" height="500" viewBox="0 0 75 75">
+				<path d="M39.389,13.769 L22.235,28.606 L6,28.606 L6,47.699 L21.989,47.699 L39.389,62.75 L39.389,13.769z" style="stroke:#b2b2b2;stroke-width:5;stroke-linejoin:round;fill:#b2b2b2;"/>
+				<path d="M48,27.6a19.5,19.5 0 0 1 0,21.4M55.1,20.5a30,30 0 0 1 0,35.6M61.6,14a38.8,38.8 0 0 1 0,48.6" style="fill:none;stroke:#b2b2b2;stroke-width:5;stroke-linecap:round"/>
+			</svg>
+		]]></data></image>
+	</element>
 
 	<element name="white"><rect><color red="0.9" green="0.9" blue="0.9" /></rect></element>
 	<element name="edge1"><rect><color red="0.15" green="0.15" blue="0.15" /></rect></element>
@@ -215,8 +224,7 @@ license:CC0
 	<view name="Internal Layout">
 		<bounds left="-1" right="53" top="6" bottom="54" />
 
-	<!-- leds -->
-
+		<!-- leds -->
 		<element name="7.15" ref="led"><bounds x="1.25" y="8.5" width="1.5" height="1.5" /></element>
 		<element name="6.15" ref="led"><bounds x="8.11" y="8.5" width="1.5" height="1.5" /></element>
 		<element name="5.15" ref="led"><bounds x="14.96" y="8.5" width="1.5" height="1.5" /></element>
@@ -235,8 +243,7 @@ license:CC0
 		<element ref="text_l7"><bounds x="40.39" y="7" width="5.5" height="1.4" /></element>
 		<element ref="text_l8"><bounds x="47.25" y="7" width="5.5" height="1.4" /></element>
 
-	<!-- vfd -->
-
+		<!-- vfd -->
 		<element name="digit0" ref="digit"><bounds x="0" y="12" width="2.75" height="4.125" /></element>
 		<element name="digit1" ref="digit"><bounds x="2.75" y="12" width="2.75" height="4.125" /></element>
 		<element name="digit2" ref="digit"><bounds x="5.50" y="12" width="2.75" height="4.125" /></element>
@@ -246,8 +253,7 @@ license:CC0
 		<element name="digit6" ref="digit"><bounds x="16.50" y="12" width="2.75" height="4.125" /></element>
 		<element name="digit7" ref="digit"><bounds x="19.25" y="12" width="2.75" height="4.125" /></element>
 
-	<!-- button panel -->
-
+		<!-- button panel -->
 		<element ref="button" inputtag="RESET" inputmask="0x01"><bounds x="0" y="20" width="4" height="3" /></element>
 		<element ref="button" inputtag="IN.6" inputmask="0x01"><bounds x="6" y="20" width="4" height="3" /></element>
 		<element ref="button" inputtag="IN.5" inputmask="0x01"><bounds x="12" y="20" width="4" height="3" /></element>
@@ -269,7 +275,7 @@ license:CC0
 		<element ref="button" inputtag="IN.4" inputmask="0x08"><bounds x="18" y="35" width="4" height="3" /></element>
 
 		<element ref="text_b1"><bounds x="-2" y="18.45" width="8" height="1.4" /></element>
-		<element ref="text_b2"><bounds x="4" y="18.45" width="8" height="1.4" /></element>
+		<element ref="speaker"><bounds x="7.3" y="18.45" width="1.4" height="1.4" /></element>
 		<element ref="text_b3"><bounds x="10" y="18.45" width="8" height="1.4" /></element>
 		<element ref="text_b4"><bounds x="16" y="18.45" width="8" height="1.4" /></element>
 
@@ -328,8 +334,7 @@ license:CC0
 		<element ref="text_b31"><bounds x="40" y="33.45" width="8" height="1.4" /></element>
 		<element ref="text_b32"><bounds x="46" y="33.45" width="8" height="1.4" /></element>
 
-	<!-- cards (common ordering, even though in in bridge the ace is the highest) -->
-
+		<!-- cards (common ordering, even though in in bridge the ace is the highest) -->
 		<element ref="gray"><bounds x="-0.5" y="39.7" width="18" height="0.2" /></element>
 		<element ref="text_scan"><bounds x="4" y="39" width="8" height="1.4" /></element>
 

@@ -101,18 +101,17 @@ former value is correct according to the parts list in the service manual.
 
 
 #include "emu.h"
+
 #include "cpu/tms9900/tms9980a.h"
 #include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
+
 #include "screen.h"
 #include "speaker.h"
 
 
-
-/* the color PROM is 32 bytes, but it is a repeating
-   every 8 bytes */
-#define NUM_PENS    (8)
+namespace {
 
 class supertnk_state : public driver_device
 {
@@ -121,6 +120,8 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_watchdog(*this, "watchdog")
+		, m_videoram(*this, "videoram%u", 0U, 0x2000U, ENDIANNESS_BIG)
+		, m_prgbank(*this, "prgbank")
 	{ }
 
 	void supertnk(machine_config &config);
@@ -143,10 +144,12 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_interrupt);
 
-	void supertnk_io_map(address_map &map);
-	void supertnk_map(address_map &map);
+	void io_map(address_map &map);
+	void prg_map(address_map &map);
 
-	std::unique_ptr<uint8_t[]> m_videoram[3];
+	// the color PROM is 32 bytes, but it is repeating every 8 bytes
+	static constexpr uint8_t NUM_PENS = 8;
+
 	uint8_t m_rom_bank = 0;
 	uint8_t m_bitplane_select = 0;
 	pen_t m_pens[NUM_PENS];
@@ -154,12 +157,14 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
+	memory_share_array_creator<uint8_t, 3> m_videoram;
+	required_memory_bank m_prgbank;
 };
 
 
 void supertnk_state::machine_start()
 {
-	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x1000);
+	m_prgbank->configure_entries(0, 4, memregion("maincpu")->base() + 0x800, 0x1000);
 
 	save_item(NAME(m_rom_bank));
 	save_item(NAME(m_bitplane_select));
@@ -176,14 +181,14 @@ void supertnk_state::machine_start()
 WRITE_LINE_MEMBER(supertnk_state::bankswitch_0_w)
 {
 	m_rom_bank = (m_rom_bank & 0x02) | (state ? 0x01 : 0x00);
-	membank("bank1")->set_entry(m_rom_bank);
+	m_prgbank->set_entry(m_rom_bank);
 }
 
 
 WRITE_LINE_MEMBER(supertnk_state::bankswitch_1_w)
 {
 	m_rom_bank = (m_rom_bank & 0x01) | (state ? 0x02 : 0x00);
-	membank("bank1")->set_entry(m_rom_bank);
+	m_prgbank->set_entry(m_rom_bank);
 }
 
 
@@ -223,20 +228,13 @@ WRITE_LINE_MEMBER(supertnk_state::watchdog_reset_w)
 
 void supertnk_state::video_start()
 {
-	offs_t i;
 	const uint8_t *prom = memregion("proms")->base();
 
-	for (i = 0; i < NUM_PENS; i++)
+	for (offs_t i = 0; i < NUM_PENS; i++)
 	{
 		uint8_t data = prom[i];
 
 		m_pens[i] = rgb_t(pal1bit(data >> 2), pal1bit(data >> 5), pal1bit(data >> 6));
-	}
-
-	for (int i = 0; i < 3; i++)
-	{
-		m_videoram[i] = std::make_unique<uint8_t[]>(0x2000);
-		save_pointer(NAME(m_videoram[i]), 0x2000, i);
 	}
 }
 
@@ -314,10 +312,10 @@ uint32_t supertnk_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
  *
  *************************************/
 
-void supertnk_state::supertnk_map(address_map &map)
+void supertnk_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x07ff).rom();
-	map(0x0800, 0x17ff).bankr("bank1");
+	map(0x0800, 0x17ff).bankr(m_prgbank);
 	map(0x1800, 0x1bff).ram();
 	map(0x1efc, 0x1efc).portr("JOYS");
 	map(0x1efd, 0x1efd).portr("INPUTS");
@@ -335,7 +333,7 @@ void supertnk_state::supertnk_map(address_map &map)
  *
  *************************************/
 
-void supertnk_state::supertnk_io_map(address_map &map)
+void supertnk_state::io_map(address_map &map)
 {
 	map(0x0000, 0x0001).nopw();
 	map(0x0800, 0x080f).w("outlatch", FUNC(ls259_device::write_d0));
@@ -434,8 +432,8 @@ void supertnk_state::supertnk(machine_config &config)
 {
 	// CPU TMS9980A; no line connections
 	TMS9980A(config, m_maincpu, 20.79_MHz_XTAL / 2); // divider not verified (possibly should be /3)
-	m_maincpu->set_addrmap(AS_PROGRAM, &supertnk_state::supertnk_map);
-	m_maincpu->set_addrmap(AS_IO, &supertnk_state::supertnk_io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &supertnk_state::prg_map);
+	m_maincpu->set_addrmap(AS_IO, &supertnk_state::io_map);
 
 	ls259_device &outlatch(LS259(config, "outlatch")); // on CPU board near 2114 SRAM
 	outlatch.q_out_cb<0>().set(FUNC(supertnk_state::bitplane_select_0_w));
@@ -447,13 +445,13 @@ void supertnk_state::supertnk(machine_config &config)
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(20.79_MHz_XTAL / 4, 330, 0, 32*8, 315, 0, 32*8); // parameters guessed
 	screen.set_screen_update(FUNC(supertnk_state::screen_update));
 	screen.screen_vblank().set(FUNC(supertnk_state::vblank_interrupt));
 
-	/* audio hardware */
+	// audio hardware
 	SPEAKER(config, "mono").front_center();
 
 	AY8910(config, "aysnd", 2000000).add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -468,21 +466,21 @@ void supertnk_state::supertnk(machine_config &config)
  *************************************/
 
 ROM_START( supertnk )
-	ROM_REGION( 0x14000, "maincpu", 0 ) /* 64k for TMS9980 code + 16k of ROM */
-	ROM_LOAD( "supertan.2d",  0x00000, 0x0800, CRC(1656a2c1) SHA1(1d49945aed105003a051cfbf646af7a4be1b7e86) )
-	ROM_LOAD( "supertnk.3d",  0x10800, 0x0800, CRC(8b023a9a) SHA1(1afdc8d75f2ca04153bac20c0e3e123e2a7acdb7) )
-	ROM_CONTINUE(             0x10000, 0x0800)
-	ROM_LOAD( "supertnk.4d",  0x11800, 0x0800, CRC(b8249e5c) SHA1(ef4bb714b0c1b97890a067f05fc50ab3426ce37f) )
-	ROM_CONTINUE(             0x11000, 0x0800)
-	ROM_LOAD( "supertnk.8d",  0x12800, 0x0800, CRC(d8175a4f) SHA1(cba7b426773ac86c81a9eac81087a2db268cd0f9) )
-	ROM_CONTINUE(             0x12000, 0x0800)
-	ROM_LOAD( "supertnk.9d",  0x13800, 0x0800, CRC(a34a494a) SHA1(9b7f0560e9d569ee25eae56f31886d50a3153dcc) )
-	ROM_CONTINUE(             0x13000, 0x0800)
+	ROM_REGION( 0x4800, "maincpu", 0 ) // 64k for TMS9980 code + 16k of ROM
+	ROM_LOAD( "supertan.2d",  0x0000, 0x0800, CRC(1656a2c1) SHA1(1d49945aed105003a051cfbf646af7a4be1b7e86) )
+	ROM_LOAD( "supertnk.3d",  0x1000, 0x0800, CRC(8b023a9a) SHA1(1afdc8d75f2ca04153bac20c0e3e123e2a7acdb7) )
+	ROM_CONTINUE(             0x0800, 0x0800)
+	ROM_LOAD( "supertnk.4d",  0x2000, 0x0800, CRC(b8249e5c) SHA1(ef4bb714b0c1b97890a067f05fc50ab3426ce37f) )
+	ROM_CONTINUE(             0x1800, 0x0800)
+	ROM_LOAD( "supertnk.8d",  0x3000, 0x0800, CRC(d8175a4f) SHA1(cba7b426773ac86c81a9eac81087a2db268cd0f9) )
+	ROM_CONTINUE(             0x2800, 0x0800)
+	ROM_LOAD( "supertnk.9d",  0x4000, 0x0800, CRC(a34a494a) SHA1(9b7f0560e9d569ee25eae56f31886d50a3153dcc) )
+	ROM_CONTINUE(             0x3800, 0x0800)
 
 	ROM_REGION( 0x0060, "proms", 0 )
-	ROM_LOAD( "supertnk.clr",  0x0000, 0x0020, CRC(9ae1faee) SHA1(19de4bb8bc389d98c8f8e35c755fad96e1a6a0cd) )   /* color PROM */
-	ROM_LOAD( "supertnk.s",    0x0020, 0x0020, CRC(91722fcf) SHA1(f77386014b459cc151d2990ac823b91c04e8d319) )   /* unknown - sync? */
-	ROM_LOAD( "supertnk.t",    0x0040, 0x0020, CRC(154390bd) SHA1(4dc0fd7bd8999d2670c8d93aaada835d2a84d4db) )   /* unknown - sync? */
+	ROM_LOAD( "supertnk.clr",  0x0000, 0x0020, CRC(9ae1faee) SHA1(19de4bb8bc389d98c8f8e35c755fad96e1a6a0cd) )   // color PROM
+	ROM_LOAD( "supertnk.s",    0x0020, 0x0020, CRC(91722fcf) SHA1(f77386014b459cc151d2990ac823b91c04e8d319) )   // unknown - sync?
+	ROM_LOAD( "supertnk.t",    0x0040, 0x0020, CRC(154390bd) SHA1(4dc0fd7bd8999d2670c8d93aaada835d2a84d4db) )   // unknown - sync?
 ROM_END
 
 
@@ -495,15 +493,17 @@ ROM_END
 
 void supertnk_state::init_supertnk()
 {
-	/* decode the TMS9980 ROMs */
+	// decode the TMS9980 ROMs
 	uint8_t *rom = memregion("maincpu")->base();
 	size_t len = memregion("maincpu")->bytes();
 
 	for (offs_t offs = 0; offs < len; offs++)
 	{
-		rom[offs] = bitswap<8>(rom[offs],0,1,2,3,4,5,6,7);
+		rom[offs] = bitswap<8>(rom[offs], 0, 1, 2, 3, 4, 5, 6, 7);
 	}
 }
+
+} // anonymous namespace
 
 
 GAME( 1981, supertnk, 0, supertnk, supertnk, supertnk_state, init_supertnk, ROT90, "Video Games GmbH", "Super Tank", MACHINE_SUPPORTS_SAVE )

@@ -51,12 +51,6 @@ protected:
 	TIMER_CALLBACK_MEMBER(toggle_hsync);
 
 private:
-	enum
-	{
-		TIMER_VSYNC,
-		TIMER_HSYNC
-	};
-
 	void recompute_parameters(bool postload);
 	void generic_access(offs_t offset);
 

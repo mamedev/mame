@@ -67,7 +67,6 @@ void driver_device::static_set_callback(device_t &device, callback_type type, dr
 
 void driver_device::empty_init()
 {
-	driver_init();
 }
 
 
@@ -78,16 +77,6 @@ void driver_device::empty_init()
 std::vector<std::string> driver_device::searchpath() const
 {
 	return m_searchpath;
-}
-
-
-//-------------------------------------------------
-//  driver_init - default implementation which
-//  does nothing
-//-------------------------------------------------
-
-void driver_device::driver_init()
-{
 }
 
 
@@ -260,10 +249,7 @@ void driver_device::device_reset_after_children()
 
 	sound_reset();
 
-	if (!m_callbacks[CB_VIDEO_RESET].isnull())
-		m_callbacks[CB_VIDEO_RESET]();
-	else
-		video_reset();
+	video_reset();
 }
 
 

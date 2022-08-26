@@ -10,7 +10,9 @@
 
 #ifdef SDLMAME_MACOSX
 
+#include "emucore.h"
 #include "fileio.h"
+#include "osdcore.h"
 
 #include <ApplicationServices/ApplicationServices.h>
 #include <CoreFoundation/CoreFoundation.h>

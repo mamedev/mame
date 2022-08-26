@@ -182,8 +182,8 @@ static INPUT_PORTS_START( micro2 )
 
 	PORT_START("FAKE")
 	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, micro2_state, cpu_freq, 0) // factory set
-	PORT_CONFSETTING(    0x00, "6MHz" )
-	PORT_CONFSETTING(    0x01, "12MHz" )
+	PORT_CONFSETTING(    0x00, "6MHz (original)" )
+	PORT_CONFSETTING(    0x01, "12MHz (Octo)" )
 INPUT_PORTS_END
 
 

@@ -11177,7 +11177,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It requires a 64K Apple II+ or later. -->
 
-			<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="234791">
 				<rom name="murder on the mississippi side a.woz" size="234791" crc="5b615fa1" sha1="c6d9bbff02f896b4bdac6dec1adf9bf52ae92cda" />
@@ -23423,6 +23423,22 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234847">
 				<rom name="iggy's gnees.woz" size="234847" crc="85027476" sha1="f67ef9e3430ca8287d95a9f0512dd3e4bb730d90"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lauren25">
+		<description>Lauren of the 25th Century</description>
+		<year>1985</year>
+		<publisher>Addison-Wesley</publisher>
+		<info name="release" value="2022-07-22"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Lauren of the 25th Century" is a 1985 educational game developed by Lucy Werth Ewell and Elizabeth R. Stott, Ph.D. of Rhiannon Software, and distributed by Addison-Wesley. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234835">
+				<rom name="lauren of the 25th century.woz" size="234835" crc="8cfeba56" sha1="9383641151206c241381196a37a59df0a53daa74"/>
 			</dataarea>
 		</part>
 	</software>

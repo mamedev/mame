@@ -26,6 +26,9 @@
 #define MCFG_MACHINE_START_OVERRIDE(_class, _func) \
 	driver_device::static_set_callback(config.root_device(), driver_device::CB_MACHINE_START, driver_callback_delegate(&_class::MACHINE_START_NAME(_func), this));
 
+#define MCFG_MACHINE_START_REMOVE() \
+	driver_device::static_set_callback(config.root_device(), driver_device::CB_MACHINE_START, driver_callback_delegate());
+
 #define MCFG_MACHINE_RESET_OVERRIDE(_class, _func) \
 	driver_device::static_set_callback(config.root_device(), driver_device::CB_MACHINE_RESET, driver_callback_delegate(&_class::MACHINE_RESET_NAME(_func), this));
 
@@ -37,8 +40,8 @@
 #define MCFG_VIDEO_START_OVERRIDE(_class, _func) \
 	driver_device::static_set_callback(config.root_device(), driver_device::CB_VIDEO_START, driver_callback_delegate(&_class::VIDEO_START_NAME(_func), this));
 
-#define MCFG_VIDEO_RESET_OVERRIDE(_class, _func) \
-	driver_device::static_set_callback(config.root_device(), driver_device::CB_VIDEO_RESET, driver_callback_delegate(&_class::VIDEO_RESET_NAME(_func), this));
+#define MCFG_VIDEO_START_REMOVE() \
+	driver_device::static_set_callback(config.root_device(), driver_device::CB_VIDEO_START, driver_callback_delegate());
 
 
 
@@ -60,11 +63,6 @@
 #define VIDEO_START_CALL_MEMBER(name)       VIDEO_START_NAME(name)()
 #define DECLARE_VIDEO_START(name)   void VIDEO_START_NAME(name)() ATTR_COLD
 #define VIDEO_START_MEMBER(cls,name) void cls::VIDEO_START_NAME(name)()
-
-#define VIDEO_RESET_NAME(name)      video_reset_##name
-#define VIDEO_RESET_CALL_MEMBER(name)       VIDEO_RESET_NAME(name)()
-#define DECLARE_VIDEO_RESET(name)   void VIDEO_RESET_NAME(name)()
-#define VIDEO_RESET_MEMBER(cls,name) void cls::VIDEO_RESET_NAME(name)()
 
 
 
@@ -100,7 +98,6 @@ public:
 		CB_MACHINE_START,
 		CB_MACHINE_RESET,
 		CB_VIDEO_START,
-		CB_VIDEO_RESET,
 		CB_COUNT
 	};
 
@@ -144,8 +141,6 @@ public:
 	void irq7_line_assert(device_t &device);
 
 	virtual std::vector<std::string> searchpath() const override;
-
-	virtual void driver_init();
 
 protected:
 	// helpers called at startup

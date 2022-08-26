@@ -104,36 +104,14 @@ void k054539_device::keyoff(int channel)
 		regs[0x22c] &= ~(1 << channel);
 }
 
-void k054539_device::advance_filter(int channel, int val)
-{
-	auto &hist = filter_hist[channel];
-	hist[0] = hist[1];
-	hist[1] = hist[2];
-	hist[2] = hist[3];
-	hist[3] = ((float) val) / 32768.0f;
-}
-
-float k054539_device::calculate_filter(int channel, float t)
-{
-	// Cubic hermite interpolation
-	// t is domain [0,1]
-
-	auto &hist = filter_hist[channel];
-	const float a = (-hist[0] / 2.0f) + (3.0f * hist[1] / 2.0f) - (3.0f * hist[2] / 2.0f) + (hist[3] / 2.0f);
-	const float b = hist[0] - (5.0f * hist[1] / 2.0f) + (2.0f * hist[2]) - (hist[3] / 2.0f);
-	const float c = (-hist[0] / 2.0f) + (hist[2] / 2.0f);
-	return (t * t * t * a) + (t * t * b) + (t * c) + hist[1];
-}
-
 void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-#define VOL_CAP 1.80
+	static constexpr double VOL_CAP = 1.80;
 
 	static const int16_t dpcm[16] = {
 		0 * 0x100,   1 * 0x100,   2 * 0x100,   4 * 0x100,  8 * 0x100, 16 * 0x100, 32 * 0x100, 64 * 0x100,
 		0 * 0x100, -64 * 0x100, -32 * 0x100, -16 * 0x100, -8 * 0x100, -4 * 0x100, -2 * 0x100, -1 * 0x100
 	};
-
 
 	int16_t *rbase = (int16_t *)&ram[0];
 
@@ -216,8 +194,6 @@ void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_
 					cur_pval = chan->pval;
 				}
 
-				float filter_frac = 0;
-
 				switch(base2[0] & 0xc) {
 				case 0x0: { // 8bit pcm
 					cur_pfrac += delta;
@@ -231,17 +207,12 @@ void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_
 							cur_pos = (base1[0x08] | (base1[0x09] << 8) | (base1[0x0a] << 16));
 							cur_val = (int16_t)(read_byte(cur_pos) << 8);
 						}
-
 						if(cur_val == (int16_t)0x8000) {
 							keyoff(ch);
 							cur_val = 0;
 							break;
 						}
-
-						advance_filter(ch, cur_val);
 					}
-
-					filter_frac = (float)(cur_pfrac & 0xffff) / 65536.0f;
 					break;
 				}
 
@@ -259,17 +230,12 @@ void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_
 							cur_pos = (base1[0x08] | (base1[0x09] << 8) | (base1[0x0a] << 16));
 							cur_val = (int16_t)(read_byte(cur_pos) | read_byte(cur_pos+1)<<8);
 						}
-
 						if(cur_val == (int16_t)0x8000) {
 							keyoff(ch);
 							cur_val = 0;
 							break;
 						}
-
-						advance_filter(ch, cur_val);
 					}
-
-					filter_frac = (float)(cur_pfrac & 0xffff) / 65536.0f;
 					break;
 				}
 
@@ -306,11 +272,7 @@ void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_
 							cur_val = -32768;
 						else if(cur_val > 32767)
 							cur_val = 32767;
-
-						advance_filter(ch, cur_val);
 					}
-
-					filter_frac = (float)(cur_pfrac & 0xffff) / 65536.0f;
 
 					cur_pfrac >>= 1;
 					if(cur_pos & 1)
@@ -322,12 +284,9 @@ void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_
 					LOG("Unknown sample type %x for channel %d\n", base2[0] & 0xc, ch);
 					break;
 				}
-
-				const float filter_val = calculate_filter(ch, filter_frac);
-
-				lval += filter_val * lvol;
-				rval += filter_val * rvol;
-				rbase[(rdelta + reverb_pos) & 0x1fff] += int16_t(filter_val*rbvol);
+				lval += cur_val * lvol;
+				rval += cur_val * rvol;
+				rbase[(rdelta + reverb_pos) & 0x1fff] += int16_t(cur_val*rbvol);
 
 				chan->pos = cur_pos;
 				chan->pfrac = cur_pfrac;
@@ -339,13 +298,10 @@ void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_
 					base1[0x0d] = cur_pos>> 8 & 0xff;
 					base1[0x0e] = cur_pos>>16 & 0xff;
 				}
-			} else {
-				// Fill the interpolation vectors with silence when channel is disabled
-				advance_filter(ch, 0);
 			}
 		reverb_pos = (reverb_pos + 1) & 0x1fff;
-		outputs[0].put(sample, lval);
-		outputs[1].put(sample, rval);
+		outputs[0].put_int(sample, lval, 32768);
+		outputs[1].put_int(sample, rval, 32768);
 	}
 }
 
@@ -360,7 +316,6 @@ void k054539_device::init_chip()
 {
 	memset(regs, 0, sizeof(regs));
 	memset(posreg_latch, 0, sizeof(posreg_latch)); //*
-	memset(filter_hist, 0, sizeof(filter_hist));
 	flags |= UPDATE_AT_KEYON; //* make it default until proven otherwise
 
 	ram = std::make_unique<uint8_t []>(0x4000);
@@ -383,7 +338,6 @@ void k054539_device::init_chip()
 	save_item(NAME(cur_ptr));
 	save_item(NAME(cur_limit));
 	save_item(NAME(rom_addr));
-	save_item(NAME(filter_hist));
 
 	save_item(NAME(m_timer_state));
 }
@@ -610,4 +564,3 @@ void k054539_device::rom_bank_updated()
 {
 	stream->update();
 }
-

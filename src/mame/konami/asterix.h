@@ -28,7 +28,6 @@ public:
 	{ }
 
 	void asterix(machine_config &config);
-	void init_asterix();
 
 private:
 	virtual void machine_start() override;
@@ -39,6 +38,7 @@ private:
 
 	void control2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void sound_arm_nmi_w(uint8_t data);
+	void z80_nmi_w(int state);
 	void sound_irq_w(uint16_t data);
 	void protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void asterix_spritebank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -47,7 +47,6 @@ private:
 	K05324X_CB_MEMBER(sprite_callback);
 	K056832_CB_MEMBER(tile_callback);
 	void reset_spritebank();
-	TIMER_CALLBACK_MEMBER(audio_nmi);
 
 	/* video-related */
 	int         m_sprite_colorbase = 0;
@@ -58,9 +57,8 @@ private:
 	int         m_spritebanks[4]{};
 
 	/* misc */
-	uint8_t     m_cur_control2 = 0U;
 	uint16_t    m_prot[2]{};
-	emu_timer  *m_audio_nmi_timer = nullptr;
+	emu_timer  *m_nmi_blocked = nullptr;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

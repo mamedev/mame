@@ -6,16 +6,14 @@
 //
 //============================================================
 
-#include <string>
+#include "chainentryreader.h"
 
-#include "emu.h"
+#include "emucore.h"
 #include "fileio.h"
 #include "rendutil.h"
 #include <modules/render/copyutil.h>
 
 #include <modules/lib/osdobj_common.h>
-
-#include "chainentryreader.h"
 
 #include "texturemanager.h"
 #include "targetmanager.h"

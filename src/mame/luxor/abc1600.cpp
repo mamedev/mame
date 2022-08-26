@@ -34,14 +34,13 @@
 
     TODO:
 
-    - z80dma.cpp register read must return byte UP counter value (0x200 at end of block, not 0 as it does now)
+	- loadsys1 core dump
     - short/long reset (RSTBUT)
     - CIO
         - optimize timers!
         - port C, open drain output bit PC1 (RTC/NVRAM data)
     - connect RS-232 printer port
     - Z80 SCC/DART interrupt chain
-    - Z80 SCC DMA request
     - [:2a:chb] - TX FIFO is full, discarding data
 
 */

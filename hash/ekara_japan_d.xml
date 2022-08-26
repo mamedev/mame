@@ -3,11 +3,12 @@
 <!--
 license:CC0
 -->
-<softwarelist name="ekara_japan_d" description="Takara e-kara (Japan) D-xx / DCxxxx- series cartridges">
+<softwarelist name="ekara_japan_d" description="Takara e-kara (Japan) Dream Cartridge series (D-xx / DCxxxx-)">
 	<!-- cartridges contain ROM + SEEPROM only, the XaviX CPU and BIOS are in the base unit
 
 	***********************************************************************************
 
+	Dream Cartridge (ドリームカートリッジ) series
 	Japanese cart listing (by D code)  (D-xx on cartridge / box, DC in cart identifier code)
 	 * = dumped
 
@@ -19,23 +20,27 @@ license:CC0
 
 	note BAT and BHT aren't the same series
 
-	*D-1   DC0001-BHT  BHT (Best Artists?) Volume 8 (most other BHT carts are in G series, or P series)
-	*D-2   DC0002-BAT  BAT Volume 6
-	*D-3   DC0003-BHT  BHT (Best Artists?) Volume 9
-	 D-4   DC0004-TPJ  TV Pop Volume 8
-	*D-5   DC0005-TPJ  TV Pop Volume 9
-	 D-6   DC0006-BHT  BHT (Best Artists?) Volume 10
+	*D-1   DC0001-BHT  Best Hit Volume 8 (most other BHT carts are in G series, or P series)
+	*D-2   DC0002-BAT  Best Artist Volume 6
+	*D-3   DC0003-BHT  Best Hit Volume 9
+	 D-4   DC0004-TPJ  TV Pop Junior Volume 8
+	*D-5   DC0005-TPJ  TV Pop Junior Volume 9
+	 D-6   DC0006-BHT  Best Hit Volume 10
 	 D-7   DC0007-     (untranslated) Volume 4
-	 D-8   DC0008-BAT  BAT Volume 7?
+	 D-8   DC0008-BAT  Best Artist (no volume number on cover)
+	 D-9   DC0009-TPJ  TV Pop Junior (no volume number on cover)
 
 	(more? what's the D highest number?)
 
 	-->
 
+	<!-- The first two releases will show Dream Cartridge Volume 1 or 2 (series details) when used with Popira, rather than the cartridge title -->
 	<software name="dc0001">
-		<description>BHT Volume 8 (Japan) (DC0001-BHT)</description>
+		<description>Dream Cartridge: Best Hit Vol.8 (Japan) (DC0001-BHT)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="ドリームカートリッジ ベストヒット Vol.8"/> <!-- from cover art -->
+		<info name="alt_title" value="ドリームカートリッジvol.1"/> <!-- shown on-screen when run on Popira -->
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24lc02"/>
 			<dataarea name="rom" size="0x100000">
@@ -45,9 +50,11 @@ license:CC0
 	</software>
 
 	<software name="dc0002">
-		<description>BAT Volume 6 (Japan) (DC0002-BAT)</description>
+		<description>Dream Cartridge: Best Artist Vol.6 (Morning Musume, 7AIR, SALT5, 11WATER, mini-moni, Gotō Maki, Matsuura Aya) (Japan) (DC0002-BAT)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="ドリームカートリッジ ベストアーティスト Vol.6"/> <!-- from cover art -->
+		<info name="alt_title" value="ドリームカートリッジvol.2"/> <!-- shown on-screen when run on Popira -->
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24lc02"/>
 			<dataarea name="rom" size="0x100000">
@@ -56,10 +63,13 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- The remaining releases show the cartridge name -->
 	<software name="dc0003">
-		<description>BHT Volume 9 (Japan) (DC0003-BHT)</description>
+		<description>Dream Cartridge: Best Hit Vol.9 (Japan) (DC0003-BHT)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="ドリームカートリッジ ベストヒット Vol.9"/> <!-- from cover art -->
+		<info name="alt_title" value="ベストヒットvol.9"/> <!-- shown on-screen when run on Popira -->
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24lc02"/>
 			<dataarea name="rom" size="0x100000">
@@ -69,9 +79,11 @@ license:CC0
 	</software>
 
 	<software name="dc0005">
-		<description>TV Pop Volume 9 (Japan) (DC0005-TPJ)</description>
+		<description>Dream Cartridge: TV Pop Junior Vol.9 (Japan) (DC0005-TPJ)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="ドリームカートリッジ TVPOPジュニア Vol.9"/> <!-- from cover art -->
+		<info name="alt_title" value="TV POPジュニアvol.9"/> <!-- shown on-screen when run on Popira -->
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24lc02"/>
 			<dataarea name="rom" size="0x100000">

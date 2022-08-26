@@ -6,7 +6,6 @@ license:CC0
 
 <softwarelist name="snspell" description="Speak &amp; Spell modules">
 
-
 <!-- Speak N Spell (US) -->
 
 	<software name="basbuild">
@@ -170,6 +169,5 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-
 
 </softwarelist>

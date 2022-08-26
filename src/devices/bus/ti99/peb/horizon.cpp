@@ -497,7 +497,7 @@ bool horizon_ramdisk_device::nvram_write(util::write_stream &file)
 	return !file.write(buffer.get(), ramsize + dsrsize, filesize) && filesize == ramsize + dsrsize;
 }
 
-bool horizon_ramdisk_device::nvram_can_write()
+bool horizon_ramdisk_device::nvram_can_write() const
 {
 	// Do not save if nothing was written. This is helpful to avoid loss of the
 	// contents when the settings were found to be different, and the emulation

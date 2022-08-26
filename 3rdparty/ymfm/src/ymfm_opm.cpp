@@ -74,6 +74,7 @@ opm_registers::opm_registers() :
 		m_lfo_waveform[2][index] = am | (pm << 8);
 
 		// waveform 3 is noise; it is filled in dynamically
+		m_lfo_waveform[3][index] = 0;
 	}
 }
 

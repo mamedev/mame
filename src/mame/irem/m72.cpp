@@ -3495,8 +3495,8 @@ ROM_START( airduelm72 )
 	ROM_REGION( 0x20000, "samples", 0 )
 	ROM_LOAD( "ad-v0.ic44", 0x00000, 0x20000, CRC(339f474d) SHA1(a81bb52598a0e31b2ed6a538755237c5d14d1844) )
 
-	ROM_REGION( 0x104, "pals", 0 )
-	ROM_LOAD( "ad-c-3f.ic13", 0x000, 0x104, NO_DUMP ) // unknown type of PAL
+	ROM_REGION( 0x117, "pals", 0 )
+	ROM_LOAD( "ad-c-3f.ic13", 0x000, 0x117, CRC(9748fa38) SHA1(cc883dd801be03f2559c0dcd77580fe7d9546ed3) )
 ROM_END
 
 
@@ -3533,8 +3533,8 @@ ROM_START( airdueljm72 )
 	ROM_REGION( 0x20000, "samples", 0 )
 	ROM_LOAD( "ad-v0.ic44", 0x00000, 0x20000, CRC(339f474d) SHA1(a81bb52598a0e31b2ed6a538755237c5d14d1844) )
 
-	ROM_REGION( 0x104, "pals", 0 )
-	ROM_LOAD( "ad-c-3f.ic13", 0x000, 0x104, NO_DUMP ) // unknown type of PAL
+	ROM_REGION( 0x117, "pals", 0 )
+	ROM_LOAD( "ad-c-3f.ic13", 0x000, 0x117, CRC(9748fa38) SHA1(cc883dd801be03f2559c0dcd77580fe7d9546ed3) )
 ROM_END
 
 

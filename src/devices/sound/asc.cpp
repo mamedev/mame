@@ -4,10 +4,14 @@
 
     asc.c
 
-    Apple Sound Chip (ASC) 344S0063
-    Enhanced Apple Sound Chip (EASC) 343S1063
+    Apple Sound Chip (ASC) 344S0053 (original), 344S0063 (cost-reduced)
+    Enhanced Apple Sound Chip (EASC) 343S1036
 
     Emulation by R. Belmont
+
+    The four-voice wavetable mode is unique to the first-generation ASC.
+    EASC (which was codenamed "Batman") and other ASC clones remove it
+    entirely.
 
     Registers:
     0x800: VERSION

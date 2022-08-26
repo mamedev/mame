@@ -64,6 +64,7 @@ chdman createhd -o ST125N.chd -chs 41921,1,1 -ss 512
 
 #include "rmnimbus.h"
 #include "debugger.h"
+#include "debug/debugcmd.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 #include "imagedev/floppy.h"
@@ -234,12 +235,13 @@ void rmnimbus_state::machine_start()
 	//m_fdc->overide_delays(64,m_fdc->get_cmd_delay());
 }
 
-void rmnimbus_state::debug_command(const std::vector<std::string> &params)
+void rmnimbus_state::debug_command(const std::vector<std::string_view> &params)
 {
 	if (params.size() > 0)
 	{
-		int temp;
-		sscanf(params[0].c_str(), "%d", &temp);
+		uint64_t temp;
+		if (!machine().debugger().commands().validate_number_parameter(params[0], temp))
+			return;
 		m_debug_machine = temp;
 	}
 	else
