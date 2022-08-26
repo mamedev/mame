@@ -137,7 +137,6 @@ private:
 	uint8_t m_mcu_coin_bit5 = 0;
 
 	// misc
-	uint8_t m_bank = 0U;
 	uint8_t m_13_ls74[2]{};
 	uint8_t m_port_select = 0U;     // for muxed controls
 
