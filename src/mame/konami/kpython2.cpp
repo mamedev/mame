@@ -207,7 +207,7 @@ Does not include internal or loctest datecodes.
 Game Title                             Region       Code     Notes
 ------------------------------------------------------------------------------
 DANCE 86.4 FUNKY RADIO STATION         JA           E01
-    [ ] E01:J:A:A:2005040400 (initial release)
+    [x] E01:J:A:A:2005040400 (initial release)
 
 Dance Dance Revolution SuperNOVA       JA           FDH
     [ ] FDH:J:A:A:2006062000 (initial release)
@@ -1094,6 +1094,25 @@ static INPUT_PORTS_START(toysmarch)
 
 INPUT_PORTS_END
 
+static INPUT_PORTS_START(dance864)
+	PORT_INCLUDE(kpython2)
+
+	PORT_MODIFY("IN")
+	PORT_BIT(0x00000100, IP_ACTIVE_LOW, IPT_START1) PORT_PLAYER(1) PORT_NAME("P1 Start")
+	PORT_BIT(0x00000400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_16WAY PORT_PLAYER(1) PORT_NAME("P1 Center")
+	PORT_BIT(0x00000800, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_16WAY PORT_PLAYER(1) PORT_NAME("P1 Left")
+	PORT_BIT(0x00001000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_16WAY PORT_PLAYER(1) PORT_NAME("P1 Right")
+	PORT_BIT(0x00002000, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1) PORT_NAME("P1 Select Left")
+	PORT_BIT(0x00004000, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(1) PORT_NAME("P1 Select Right")
+	PORT_BIT(0x00010000, IP_ACTIVE_LOW, IPT_START2) PORT_PLAYER(2) PORT_NAME("P2 Start")
+	PORT_BIT(0x00040000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_16WAY PORT_PLAYER(2) PORT_NAME("P2 Center")
+	PORT_BIT(0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_16WAY PORT_PLAYER(2) PORT_NAME("P2 Left")
+	PORT_BIT(0x00100000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_16WAY PORT_PLAYER(2) PORT_NAME("P2 Right")
+	PORT_BIT(0x00200000, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2) PORT_NAME("P2 Select Left")
+	PORT_BIT(0x00400000, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(2) PORT_NAME("P2 Select Right")
+
+INPUT_PORTS_END
+
 void kpython2_state::kpython2(machine_config &config)
 {
 	R5900LE(config, m_maincpu, 294'912'000, m_vu0);
@@ -1160,6 +1179,26 @@ ROM_START(kpython2)
 	ROM_REGION(0x28, "ds2430_white", ROMREGION_ERASE00)
 
 	DISK_REGION("ide:0:hdd:image")
+ROM_END
+
+// DANCE 86.4 FUNKY RADIO STATION
+ROM_START(dance864)
+	KPYTHON2_BIOS
+
+	ROM_REGION(0x400, "ps2_nvram", ROMREGION_ERASE00)
+	ROM_LOAD("ps2_nvram", 0x00, 0x400, CRC(aa83752f) SHA1(b69a7ec40e00373e77ba9cd20a4b8d8e3b9dc38d))
+
+	ROM_REGION(0x80, "ps2_hdd_id", ROMREGION_ERASE00)
+	ROM_LOAD("ps2_hdd_id", 0x00, 0x80, CRC(35b17061) SHA1(48998d8ac69388d8e6f09be44c10553030411eb4))
+
+	ROM_REGION(0x28, "ds2430_black", ROMREGION_ERASE00)
+	ROM_LOAD("ds2430_black_gqe01jaa.bin", 0x00, 0x28, BAD_DUMP CRC(888d11da) SHA1(b19be2c62436f1ef7bcc96d1248178224d63e440))
+
+	ROM_REGION(0x28, "ds2430_white", ROMREGION_ERASE00)
+	ROM_LOAD("ds2430_white_gqe01jaa.bin", 0x00, 0x28, BAD_DUMP CRC(09d0087f) SHA1(70d8c7a0c822e5bfcf3e82c5c38ff4e0e13da4ad))
+
+	DISK_REGION("ide:0:hdd:image")
+	DISK_IMAGE("e01_jaa_2005040400", 0, BAD_DUMP SHA1(4ce234b29dccfa6bf948f888298e38689b319ef2))
 ROM_END
 
 // Dance Dance Revolution
@@ -1877,6 +1916,8 @@ ROM_END
 
 
 GAME(2005, kpython2, 0, kpython2, kpython2, kpython2_state, empty_init, ROT0, "Konami", "Konami Python 2 BIOS", MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT)
+
+GAME(2005, dance864, kpython2, kpython2, dance864, kpython2_state, empty_init, ROT0, "Konami", "DANCE 86.4 FUNKY RADIO STATION (E01:J:A:A:2005040400)", MACHINE_IS_SKELETON)
 
 GAME(2006, ddrsnj,   kpython2, kpython2, ddr, kpython2_state, empty_init, ROT0, "Konami", "Dance Dance Revolution SuperNOVA (FDH:J:A:A:2006090600)", MACHINE_IS_SKELETON)
 GAME(2006, ddrsna,   kpython2, kpython2, ddr, kpython2_state, empty_init, ROT0, "Konami", "Dance Dance Revolution SuperNOVA (FDH:A:A:A:2006071300)", MACHINE_IS_SKELETON)
