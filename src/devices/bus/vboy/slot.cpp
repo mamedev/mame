@@ -126,27 +126,38 @@ void vboy_cart_slot_device::device_start()
 
 std::string vboy_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	std::string const image_name(mconfig().options().image_option(instance_name()).value());
-	software_part const *const part(!image_name.empty() ? find_software_item(image_name, true) : nullptr);
-	if (part)
+	if (hook.image_file())
 	{
-		osd_printf_verbose("[%s] Found software part for image name '%s'\n", tag(), image_name);
-		for (rom_entry const &entry : part->romdata())
-		{
-			if (ROMENTRY_ISREGION(entry) && (entry.name() == "sram"))
-			{
-				osd_printf_verbose("[%s] Found 'sram' data area, enabling cartridge backup RAM\n", tag());
-				return "flatrom_sram";
-			}
-		}
+		// TODO: is there a header field or something indicating presence of save RAM?
+		osd_printf_verbose("[%s] Assuming plain ROM cartridge\n", tag());
+		return "flatrom";
 	}
 	else
 	{
-		osd_printf_verbose("[%s] No software part found for image name '%s'\n", tag(), image_name);
+		std::string const image_name(mconfig().options().image_option(instance_name()).value());
+		software_part const *const part(!image_name.empty() ? find_software_item(image_name, true) : nullptr);
+		if (part)
+		{
+			osd_printf_verbose("[%s] Found software part for image name '%s'\n", tag(), image_name);
+			for (rom_entry const &entry : part->romdata())
+			{
+				if (ROMENTRY_ISREGION(entry) && (entry.name() == "sram"))
+				{
+					osd_printf_verbose("[%s] Found 'sram' data area, enabling cartridge backup RAM\n", tag());
+					return "flatrom_sram";
+				}
+			}
+			osd_printf_verbose("[%s] No 'sram' data area found, assuming plain ROM cartridge\n", tag());
+			return "flatrom";
+		}
+		else
+		{
+			osd_printf_verbose("[%s] No software part found for image name '%s'\n", tag(), image_name);
+		}
 	}
 
-	osd_printf_verbose("[%s] Assuming plain ROM cartridge\n", tag());
-	return "flatrom";
+	// leave the slot empty
+	return std::string();
 }
 
 
