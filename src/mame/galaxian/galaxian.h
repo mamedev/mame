@@ -871,6 +871,7 @@ private:
 	uint8_t m_port_select = 0U;
 	uint8_t m_direction[2]{};
 	uint8_t m_counter_74ls161[2]{};
+	uint8_t m_last_dialread[2]{};
 };
 
 

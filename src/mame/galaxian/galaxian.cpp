@@ -6627,15 +6627,18 @@ CUSTOM_INPUT_MEMBER(moonwar_state::dial_r)
 	// see http://www.cityofberwyn.com/schematics/stern/MoonWar_opto.tiff for schematic
 	// i.e. a 74ls161 counts from 0 to 15 which is the absolute number of bars passed on the quadrature
 
-	const int8_t dialread = int8_t(uint8_t(m_dials[m_port_select]->read()));
+	const uint8_t dialread = m_dials[m_port_select]->read();
+	const uint8_t lastread = m_last_dialread[m_port_select];
 
-	if (dialread < 0)
+	if (int8_t(dialread - lastread) < 0)
 		m_direction[m_port_select] = 0x00;
-	else if (dialread > 0)
+	else if (dialread != lastread)
 		m_direction[m_port_select] = 0x10;
 
-	m_counter_74ls161[m_port_select] += std::abs(dialread);
+	m_counter_74ls161[m_port_select] += std::abs(int8_t(dialread - lastread));
 	m_counter_74ls161[m_port_select] &= 0xf;
+
+	m_last_dialread[m_port_select] = dialread;
 
 	const uint8_t ret = m_counter_74ls161[m_port_select] | m_direction[m_port_select];
 	//logerror("dialread1: %02x, counter_74ls161: %02x, spinner ret is %02x\n", dialread, m_counter_74ls161[m_port_select], ret);
@@ -6681,11 +6684,11 @@ static INPUT_PORTS_START( moonwar )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P1_DIAL")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_REVERSE PORT_RESET PORT_CONDITION("IN2", 0x08, EQUALS, 0x08) // cocktail: dial is reversed
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_RESET PORT_CONDITION("IN2", 0x08, EQUALS, 0x00) // upright: dial works normally
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_REVERSE PORT_CONDITION("IN2", 0x08, EQUALS, 0x08) // cocktail: dial is reversed
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_CONDITION("IN2", 0x08, EQUALS, 0x00) // upright: dial works normally
 
 	PORT_START("P2_DIAL")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_RESET PORT_COCKTAIL PORT_REVERSE // cocktail: dial is reversed
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_COCKTAIL PORT_REVERSE // cocktail: dial is reversed
 INPUT_PORTS_END
 
 /* verified from Z80 code */
@@ -6700,10 +6703,10 @@ static INPUT_PORTS_START( moonwara )
 	PORT_DIPSETTING(    0x06, "A 1/4  B 2/1" )
 
 	PORT_MODIFY("P1_DIAL")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_RESET // both: p1 dial works normally, p2 dial is reversed, both share same port
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) // both: p1 dial works normally, p2 dial is reversed, both share same port
 
 	PORT_MODIFY("P2_DIAL")       /* doesn't actually work due to bug in game code */
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_RESET PORT_COCKTAIL
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_COCKTAIL
 INPUT_PORTS_END
 
 
