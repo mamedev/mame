@@ -76,7 +76,7 @@ D Dancing Stage featuring Disney's Rave               2000.11    GCA37 JA       
 D Dancing Stage featuring DREAMS COME TRUE            1999.12    GC910 JA          910 JA/JC A02
 A Dancing Stage featuring TRUE KiSS DESTiNATiON       1999.07    G*884 JA          884 JA A02
 P Dark Horse Legend                                   1998.03    GX706 JA          706 JA A02
-A drummania                                           1999.07    GQ881 JA          881 JA D01 / 881 JA A02(missing, audio CD)
+A drummania                                           1999.07    GQ881 JA          881 JA D01 / 881 JA A02
 D drummania 2ndMIX                                    2000.03    GE912 JA          912 JA B02
 D drummania 3rdMIX                                    2000.09    GCA23 JA          A23 JA A02
 D drummania 4thMIX                                    2001.03    GEA25 JA          A25 JA A02
@@ -4309,7 +4309,7 @@ ROM_START( drmn )
 	ROM_LOAD( "gq881ja.22h",  0x000000, 0x002000, CRC(e834d5ec) SHA1(1c845811e43d7dfec657da288b5a38b8bc9c8366) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "881xxb02", 0, BAD_DUMP SHA1(9252ff1841584c06506f58c9a9cefbc82b32187d) )
+	DISK_IMAGE_READONLY( "881xxb02", 0, BAD_DUMP SHA1(9252ff1841584c06506f58c9a9cefbc82b32187d) ) // drummania/percussion freaks hybrid cd
 ROM_END
 
 ROM_START( drmna )
@@ -4327,11 +4327,10 @@ ROM_START( drmna )
 	ROM_LOAD( "gq881ja.22h",  0x000000, 0x002000, CRC(e834d5ec) SHA1(1c845811e43d7dfec657da288b5a38b8bc9c8366) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "881jad01", 0, BAD_DUMP SHA1(7d9d47bef636dbaa8d578f34ea9489e349d3d6df) ) // upgrade or bootleg?
+	DISK_IMAGE_READONLY( "881jad01", 0, BAD_DUMP SHA1(7d9d47bef636dbaa8d578f34ea9489e349d3d6df) ) // upgrade cd
 
 	DISK_REGION( "cdrom1" )
-	DISK_IMAGE_READONLY( "881jaa02", 0, NO_DUMP ) // game asks for this after installation
-	DISK_IMAGE_READONLY( "881xxb02", 0, BAD_DUMP SHA1(9252ff1841584c06506f58c9a9cefbc82b32187d) )
+	DISK_IMAGE_READONLY( "881jaa02", 0, SHA1(dad3eab14bb4535dd52885fef022720caf280e2b) )
 ROM_END
 
 ROM_START( drmn2m )

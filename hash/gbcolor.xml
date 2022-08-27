@@ -24540,6 +24540,7 @@ license:CC0
     These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 -->
 
+	<!-- missing graphics in Karate Joe -->
 	<software name="atvrackj" supported="partial">
 		<description>ATV Racing &amp; Karate Joe (Europe)</description>
 		<year>200?</year>
@@ -24556,6 +24557,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- missing graphics in Karate Joe -->
 	<software name="atvrackja" cloneof="atvrackj" supported="partial">
 		<description>ATV Racing &amp; Karate Joe (Europe, alt)</description>
 		<year>200?</year>
@@ -24587,6 +24589,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- displays white screen rather than game selection menu - can still use Up/Down and Start to select game -->
 	<software name="fullhang" supported="partial">
 		<description>Full Time Soccer &amp; Hang Time Basketball (Europe)</description>
 		<year>200?</year>
@@ -24634,6 +24637,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- missing graphics in Smash Out -->
 	<software name="pocksmrt" supported="partial">
 		<description>Pocket Smash Out &amp; Race Time (Europe)</description>
 		<year>200?</year>
@@ -24664,7 +24668,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="karatej" supported="partial">
+	<!-- missing graphics make the game almost unplayable -->
+	<software name="karatej" supported="no">
 		<description>Karate Joe (Europe)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
@@ -24705,7 +24710,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="sinkj" supported="partial">
+	<!-- Space Invasion hangs when starting a game, Karate Joe has missing graphics -->
+	<software name="sinkj" supported="no">
 		<description>Space Invasion &amp; Karate Joe (Europe)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
@@ -24721,6 +24727,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Space Invasion hangs when starting a game -->
 	<software name="sinpntr" supported="partial">
 		<description>Space Invasion &amp; Painter (Europe)</description>
 		<year>200?</year>
@@ -24737,7 +24744,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="sinvasn" supported="partial">
+	<!-- hangs when starting a game -->
+	<software name="sinvasn" supported="no">
 		<description>Space Invasion (Europe)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
@@ -27151,7 +27159,7 @@ license:CC0
 	</software>
 
 	<software name="sqsd">
-		<description>Shi Qi Shi Dai - Jing Ling Wang Dan Sheng (China)</description>
+		<description>Shíqì Shídài - Jīnglíng Wang Dànshēng (China)</description>
 		<year>20??</year>
 		<publisher>GOWIN</publisher>
 		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>

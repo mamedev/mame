@@ -775,8 +775,6 @@ ROM_START( bagnardi ) // 1983
 
 	ROM_REGION (0x104, "plds", 0)
 	ROM_LOAD( "lebag_itisa_pal16r6cn.p6", 0x000, 0x104, CRC(13f14bbf) SHA1(b8c4ddf61609465f3a3699dd42796f15a7b17979) )
-
-
 ROM_END
 
 ROM_START( bagnardio ) // 1982, based on bagnard set with mods for license text

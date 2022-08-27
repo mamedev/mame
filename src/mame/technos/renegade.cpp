@@ -490,7 +490,7 @@ void renegade_state::renegade_nomcu_map(address_map &map)
 {
 	map(0x0000, 0x17ff).ram();
 	map(0x1800, 0x1fff).ram().w(FUNC(renegade_state::fg_videoram_w)).share(m_fg_videoram);
-	map(0x2000, 0x20ff).mirror(0x0700).ram().share(m_spriteram);
+	map(0x2000, 0x21ff).mirror(0x0600).ram().share(m_spriteram);
 	map(0x2800, 0x2fff).ram().w(FUNC(renegade_state::bg_videoram_w)).share(m_bg_videoram);
 	map(0x3000, 0x30ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0x3100, 0x31ff).ram().w("palette", FUNC(palette_device::write8_ext)).share("palette_ext");

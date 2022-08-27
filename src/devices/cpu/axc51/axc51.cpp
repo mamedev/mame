@@ -1,13 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Steve Ellenoff, Manuel Abadia, Couriersud
-
-/*
-	This is currently mostly copied from the mcs51 core
-	but as the axc51 has many differences, it will eventually
-	diverge more greatly.  For now assume a lot of what is here
-	is still incorrect.
-
-*/
+// copyright-holders:Steve Ellenoff, Manuel Abadia, Couriersud, David Haywood
 
 /*****************************************************************************
 
@@ -28,9 +20,19 @@
 #include "axc51.h"
 #include "axc51dasm.h"
 
-#define VERBOSE 0
+#define LOG_UNSORTED  (1U <<  1)
+#define LOG_PORTS     (1U <<  2)
+#define LOG_UNHANDLED (1U <<  3)
+#define LOG_UNHANDLED_XSFR (1U <<  4)
 
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
+
+
+#define VERBOSE     (0)
+
+#include "logmacro.h"
+
+
+
 
 /***************************************************************************
     CONSTANTS
@@ -46,45 +48,64 @@ DEFINE_DEVICE_TYPE(AX208P, ax208p_cpu_device, "ax208p", "AppoTech AX208 (AXC51-C
 
 void axc51base_cpu_device::program_internal(address_map &map)
 {
+	map(0x4000, 0x6fff).ram().share("mainram");
 }
 
 void axc51base_cpu_device::data_internal(address_map &map)
 {
-	map(0x0000, 0x00ff).ram().share("scratchpad");
-	map(0x0100, 0x01ff).ram().share("sfr_ram"); /* SFR */
+	map(0x0000, 0x03ff).ram().share("scratchpad"); // DRAM?
 }
 
 void ax208_cpu_device::ax208_internal_program_mem(address_map &map)
 {
+	map(0x4000, 0x6fff).ram().share("mainram");
 	map(0x8000, 0x9fff).rom().region("rom", 0); // this can only be read from code running within the same region
 }
 
+void axc51base_cpu_device::io_internal(address_map& map)
+{
+	map(0x0000, 0x03ff).ram().share("scratchpad");
+	map(0x3000, 0x3fff).rw(FUNC(axc51base_cpu_device::xsfr_read), FUNC(axc51base_cpu_device::xsfr_write)); 
+	map(0x4000, 0x6fff).ram().share("mainram");
 
-axc51base_cpu_device::axc51base_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map, address_map_constructor data_map, int program_width, int data_width, uint8_t features)
+	map(0x7000, 0x77ff).ram(); // JPEG RAM
+}
+
+
+axc51base_cpu_device::axc51base_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map, address_map_constructor data_map, address_map_constructor io_map, int program_width, int data_width, uint8_t features)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, program_map)
-	, m_data_config("data", ENDIANNESS_LITTLE, 8, 9, 0, data_map)
-	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
+	, m_data_config("data", ENDIANNESS_LITTLE, 8, 11, 0, data_map)
+	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0, io_map)
 	, m_pc(0)
 	, m_features(features)
 	, m_rom_size(program_width > 0 ? 1 << program_width : 0)
 	, m_num_interrupts(5)
-	, m_sfr_ram(*this, "sfr_ram")
 	, m_scratchpad(*this, "scratchpad")
+	, m_mainram(*this, "mainram")
 	, m_port_in_cb(*this)
 	, m_port_out_cb(*this)
-	, m_serial_tx_cb(*this)
-	, m_serial_rx_cb(*this)
+	, m_dac_out_cb(*this)
+	, m_spi_in_cb(*this)
+	, m_spi_out_cb(*this)
+	, m_spi_out_dir_cb(*this)
 	, m_rtemp(0)
 {
-	/* default to standard cmos interfacing */
-	for (auto & elem : m_forced_inputs)
-		elem = 0;
+	for (int i = 0; i < 0x80; i++)
+	{
+		m_sfr_regs[i] = 0x00;
+		m_xsfr_regs[i] = 0x00;
+	}
+
+	m_uid[0] = 0x00; // not used?
+	m_uid[1] = 0x00; // used in RTC / USB code?
+	m_uid[2] = 0x91; // used in crypt code?
+	m_uid[3] = 0xb5;
 }
 
 
 axc51base_cpu_device::axc51base_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features)
-	: axc51base_cpu_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(axc51base_cpu_device::program_internal), this), address_map_constructor(FUNC(axc51base_cpu_device::data_internal), this), program_width, data_width, features)
+	: axc51base_cpu_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(axc51base_cpu_device::program_internal), this), address_map_constructor(FUNC(axc51base_cpu_device::data_internal), this), address_map_constructor(FUNC(axc51base_cpu_device::io_internal), this),  program_width, data_width, features)
 {
 }
 
@@ -98,148 +119,143 @@ device_memory_interface::space_config_vector axc51base_cpu_device::memory_space_
 	};
 }
 
-
-/***************************************************************************
-    MACROS
-***************************************************************************/
-
-/* Read Opcode/Opcode Arguments from Program Code */
-#define ROP(pc)         m_program.read_byte(pc)
-#define ROP_ARG(pc)     m_program.read_byte(pc)
-
-/* Read a byte from External Code Memory (Usually Program Rom(s) Space) */
-#define CODEMEM_R(a)    (uint8_t)m_program.read_byte(a)
-
-/* Read/Write a byte from/to External Data Memory (Usually RAM or other I/O) */
-#define DATAMEM_R(a)    (uint8_t)m_io.read_byte(a)
-#define DATAMEM_W(a,v)  m_io.write_byte(a, v)
-
-/* Read/Write a byte from/to the Internal RAM */
-
-#define IRAM_R(a)       iram_read(a)
-#define IRAM_W(a, d)    iram_write(a, d)
-
 /* Read/Write a byte from/to the Internal RAM indirectly */
 /* (called from indirect addressing)                     */
-uint8_t axc51base_cpu_device::iram_iread(offs_t a) { return m_data.read_byte(a); }
-void axc51base_cpu_device::iram_iwrite(offs_t a, uint8_t d) { m_data.write_byte(a, d); }
-
-#define IRAM_IR(a)      iram_iread(a)
-#define IRAM_IW(a, d)   iram_iwrite(a, d)
-
-/* Form an Address to Read/Write to External RAM indirectly */
-/* (called from indirect addressing)                        */
-#define ERAM_ADDR(a,m)  external_ram_iaddr(a,m)
-
-/* Read/Write a bit from Bit Addressable Memory */
-#define BIT_R(a)        bit_address_r(a)
-#define BIT_W(a,v)      bit_address_w(a, v)
-
+/* these go through DBASE register on axc51 (at least stack accesses) */
+uint8_t axc51base_cpu_device::iram_indirect_read(offs_t a) { return m_data.read_byte((m_sfr_regs[SFR_DBASE] * 4) + a); }
+void axc51base_cpu_device::iram_indirect_write(offs_t a, uint8_t d) { m_data.write_byte((m_sfr_regs[SFR_DBASE] * 4) + a, d); }
 
 /***************************************************************************
     SHORTCUTS
 ***************************************************************************/
 
-#define PPC     m_ppc
-#define PC      m_pc
-
 /* SFR Registers - These are accessed directly for speed on read */
 /* Read accessors                                                */
 
-#define SFR_A(a)        m_sfr_ram[(a)]
-#define SET_SFR_A(a,v)  do { SFR_A(a) = (v); } while (0)
+#define SET_SFR_A(a,v)  do { m_sfr_regs[a] = (v); } while (0)
 
-#define ACC         SFR_A(ADDR_ACC)
-#define PSW         SFR_A(ADDR_PSW)
+#define ACC         m_sfr_regs[SFR_ACC]
+#define PSW         m_sfr_regs[SFR_PSW]
 
-#define P0          ((const uint8_t) SFR_A(ADDR_P0))
-#define P1          ((const uint8_t) SFR_A(ADDR_P1))
-#define P2          ((const uint8_t) SFR_A(ADDR_P2))
-#define P3          ((const uint8_t) SFR_A(ADDR_P3))
+#define P0          ((const uint8_t) m_sfr_regs[SFR_P0])
+#define P1          ((const uint8_t) m_sfr_regs[SFR_P1])
+#define P2          ((const uint8_t) m_sfr_regs[SFR_P2])
+#define P3          ((const uint8_t) m_sfr_regs[SFR_P3])
+#define P4          ((const uint8_t) m_sfr_regs[SFR_P4])
 
-#define SP          SFR_A(ADDR_SP)
-#define DPL         SFR_A(ADDR_DPL)
-#define DPH         SFR_A(ADDR_DPH)
-#define PCON        SFR_A(ADDR_PCON)
-#define IE          SFR_A(ADDR_IE)
-#define IP          SFR_A(ADDR_IP)
-#define B           SFR_A(ADDR_B)
+#define SP          m_sfr_regs[SFR_SP]
+#define DPL0        m_sfr_regs[SFR_DPL0]
+#define DPH0        m_sfr_regs[SFR_DPH0]
+#define PCON        m_sfr_regs[SFR_PCON]
+#define IE          m_sfr_regs[SFR_IE]
+#define IE1         m_sfr_regs[SFR_IE1]
+#define IP          m_sfr_regs[SFR_IP]
+#define B           m_sfr_regs[SFR_B]
+#define ER8         m_sfr_regs[SFR_ER8]
+
+#define DPL1        m_sfr_regs[SFR_DPL1]
+#define DPH1        m_sfr_regs[SFR_DPH1]
+
+
+#define ER00        m_sfr_regs[SFR_ER00]
+#define ER01        m_sfr_regs[SFR_ER01]
+
+#define ER10        m_sfr_regs[SFR_ER10]
+#define ER11        m_sfr_regs[SFR_ER11]
+
+#define ER20        m_sfr_regs[SFR_ER20]
+#define ER21        m_sfr_regs[SFR_ER21]
+
+#define ER30        m_sfr_regs[SFR_ER30]
+#define ER31        m_sfr_regs[SFR_ER31]
+
+#define GP0         m_sfr_regs[SFR_GP0]
+#define GP1         m_sfr_regs[SFR_GP1]
+#define GP2         m_sfr_regs[SFR_GP2]
+#define GP3         m_sfr_regs[SFR_GP3]
+#define GP4         m_sfr_regs[SFR_GP4]
+#define GP5         m_sfr_regs[SFR_GP5]
+#define GP6         m_sfr_regs[SFR_GP6]
+#define GP7         m_sfr_regs[SFR_GP7]
 
 #define R_REG(r)    m_scratchpad[(r) | (PSW & 0x18)]
-#define DPTR        ((DPH<<8) | DPL)
 
-/* WRITE accessors */
+#define DPTR0       ((DPH0<<8) | DPL0)
+#define DPTR1       ((DPH1<<8) | DPL1)
 
-/* Shortcuts */
+#define ER0         ((ER01<<8) | ER00)
+#define ER1         ((ER11<<8) | ER10)
+#define ER2         ((ER21<<8) | ER20)
+#define ER3         ((ER31<<8) | ER30)
 
-#define SET_PSW(v)  do { SFR_A(ADDR_PSW) = (v); SET_PARITY(); } while (0)
-#define SET_ACC(v)  do { SFR_A(ADDR_ACC) = (v); SET_PARITY(); } while (0)
+#define SET_PSW(v)  do { m_sfr_regs[SFR_PSW] = (v); SET_PARITY(); } while (0)
+#define SET_ACC(v)  do { m_sfr_regs[SFR_ACC] = (v); SET_PARITY(); } while (0)
 
 /* These trigger actions on modification and have to be written through SFR_W */
-#define SET_P0(v)   IRAM_W(ADDR_P0, v)
-#define SET_P1(v)   IRAM_W(ADDR_P1, v)
-#define SET_P2(v)   IRAM_W(ADDR_P2, v)
-#define SET_P3(v)   IRAM_W(ADDR_P3, v)
-
-
+#define SET_P0(v)   iram_write(SFR_P0, v)
+#define SET_P1(v)   iram_write(SFR_P1, v)
+#define SET_P2(v)   iram_write(SFR_P2, v)
+#define SET_P3(v)   iram_write(SFR_P3, v)
 
 /* No actions triggered on write */
 #define SET_REG(r, v)   do { m_scratchpad[(r) | (PSW & 0x18)] = (v); } while (0)
 
-#define SET_DPTR(n)     do { DPH = ((n) >> 8) & 0xff; DPL = (n) & 0xff; } while (0)
+#define SET_DPTR0(n)    do { DPH0 = ((n) >> 8) & 0xff; DPL0 = (n) & 0xff; } while (0)
+
+#define SET_DPTR1(n)    do { DPH1 = ((n) >> 8) & 0xff; DPL1 = (n) & 0xff; } while (0)
+
+#define SET_ER0(n)      do { ER01 = ((n) >> 8) & 0xff; ER00 = (n) & 0xff; } while (0)
+#define SET_ER1(n)      do { ER11 = ((n) >> 8) & 0xff; ER10 = (n) & 0xff; } while (0)
+#define SET_ER2(n)      do { ER21 = ((n) >> 8) & 0xff; ER20 = (n) & 0xff; } while (0)
+#define SET_ER3(n)      do { ER31 = ((n) >> 8) & 0xff; ER30 = (n) & 0xff; } while (0)
+
+#define SET_ER8(n)      do { ER8 = (n);} while (0)
+
+#define SET_GP0(n)      do { GP0 = (n);} while (0)
+#define SET_GP1(n)      do { GP1 = (n);} while (0)
+#define SET_GP2(n)      do { GP2 = (n);} while (0)
+#define SET_GP3(n)      do { GP3 = (n);} while (0)
+#define SET_GP4(n)      do { GP4 = (n);} while (0)
+#define SET_GP5(n)      do { GP5 = (n);} while (0)
+#define SET_GP6(n)      do { GP6 = (n);} while (0)
+#define SET_GP7(n)      do { GP7 = (n);} while (0)
 
 /* Macros for Setting Flags */
 #define SET_X(R, v) do { R = (v);} while (0)
 
 #define SET_CY(n)       SET_PSW((PSW & 0x7f) | (n<<7))  //Carry Flag
 #define SET_AC(n)       SET_PSW((PSW & 0xbf) | (n<<6))  //Aux.Carry Flag
-#define SET_FO(n)       SET_PSW((PSW & 0xdf) | (n<<5))  //User Flag
+#define SET_EC(n)       SET_PSW((PSW & 0xdf) | (n<<5))  //Extended Instruction Carry Flag EC (not FO)
 #define SET_RS(n)       SET_PSW((PSW & 0xe7) | (n<<3))  //R Bank Select
 #define SET_OV(n)       SET_PSW((PSW & 0xfb) | (n<<2))  //Overflow Flag
+#define SET_EZ(n)       SET_PSW((PSW & 0xfd) | (n<<1))  //Extended Instruction Zero Flag EZ
 #define SET_P(n)        SET_PSW((PSW & 0xfe) | (n<<0))  //Parity Flag
 
 #define SET_BIT(R, n, v) do { R = (R & ~(1<<(n))) | ((v) << (n));} while (0)
 #define GET_BIT(R, n) (((R)>>(n)) & 0x01)
 
-#define SET_EA(n)       SET_BIT(IE, 7, n)       //Global Interrupt Enable/Disable
-#define SET_ES(n)       SET_BIT(IE, 4, v)       //Serial Interrupt Enable/Disable
-#define SET_ET1(n)      SET_BIT(IE, 3, n)       //Timer 1 Interrupt Enable/Disable
-#define SET_EX1(n)      SET_BIT(IE, 2, n)       //External Int 1 Interrupt Enable/Disable
-#define SET_ET0(n)      SET_BIT(IE, 1, n)       //Timer 0 Interrupt Enable/Disable
-#define SET_EX0(n)      SET_BIT(IE, 0, n)       //External Int 0 Interrupt Enable/Disable
-
 /* Macros for accessing flags */
 
 #define GET_CY          GET_BIT(PSW, 7)
 #define GET_AC          GET_BIT(PSW, 6)
-#define GET_FO          GET_BIT(PSW, 5)
+#define GET_EC          GET_BIT(PSW, 5) //Extended Instruction Carry Flag EC (not FO)
 #define GET_RS          GET_BIT(PSW, 3)
 #define GET_OV          GET_BIT(PSW, 2)
+#define GET_EZ          GET_BIT(PSW, 1) //Extended Instruction Zero Flag EZ
 #define GET_P           GET_BIT(PSW, 0)
 
+#define GET_DMAIRQEN    GET_BIT(IE1, 6)
+
 #define GET_EA          GET_BIT(IE, 7)
-#define GET_ET2         GET_BIT(IE, 5)
-#define GET_ES          GET_BIT(IE, 4)
-#define GET_ET1         GET_BIT(IE, 3)
-#define GET_EX1         GET_BIT(IE, 2)
-#define GET_ET0         GET_BIT(IE, 1)
-#define GET_EX0         GET_BIT(IE, 0)
-
-
-
-/*Add and Subtract Flag settings*/
-#define DO_ADD_FLAGS(a,d,c) do_add_flags(a, d, c)
-#define DO_SUB_FLAGS(a,d,c) do_sub_flags(a, d, c)
+#define GET_SDCIRQEN    GET_BIT(IE, 6)
+#define GET_SPIIRQEN    GET_BIT(IE, 5)
+#define GET_USBIRQEN    GET_BIT(IE, 4)
+#define GET_T3IRQEN     GET_BIT(IE, 3)
+#define GET_T2IRQEN     GET_BIT(IE, 2)
+#define GET_T1IRQEN     GET_BIT(IE, 1)
+#define GET_T0IRQEN     GET_BIT(IE, 0)
 
 #define SET_PARITY()    do {m_recalc_parity |= 1;} while (0)
-#define PUSH_PC()       push_pc()
-#define POP_PC()        pop_pc()
-
-/* Clear Current IRQ  */
-#define CLEAR_CURRENT_IRQ() clear_current_irq()
-
-
-/* Hold callback functions so they can be set by caller (before the cpu reset) */
 
 /***************************************************************************
     INLINE FUNCTIONS
@@ -247,28 +263,18 @@ void axc51base_cpu_device::iram_iwrite(offs_t a, uint8_t d) { m_data.write_byte(
 
 void axc51base_cpu_device::clear_current_irq()
 {
-	if (m_cur_irq_prio >= 0)
-		m_irq_active &= ~(1 << m_cur_irq_prio);
-	if (m_irq_active & 4)
-		m_cur_irq_prio = 2;
-	else if (m_irq_active & 2)
-		m_cur_irq_prio = 1;
-	else if (m_irq_active & 1)
-		m_cur_irq_prio = 0;
-	else
-		m_cur_irq_prio = -1;
-	LOG(("New: %d %02x\n", m_cur_irq_prio, m_irq_active));
+	LOGMASKED(LOG_UNHANDLED,"clear irq\n");
 }
 
-uint8_t axc51base_cpu_device::r_acc() { return SFR_A(ADDR_ACC); }
+uint8_t axc51base_cpu_device::r_acc() { return m_sfr_regs[SFR_ACC]; }
 
-uint8_t axc51base_cpu_device::r_psw() { return SFR_A(ADDR_PSW); }
+uint8_t axc51base_cpu_device::r_psw() { return m_sfr_regs[SFR_PSW]; }
 
 
 offs_t axc51base_cpu_device::external_ram_iaddr(offs_t offset, offs_t mem_mask)
 {
 	if (mem_mask == 0x00ff)
-		return (offset & mem_mask) | (P2 << 8);
+		return (offset & mem_mask) | 0x000;
 
 	return offset;
 }
@@ -277,7 +283,7 @@ offs_t axc51base_cpu_device::external_ram_iaddr(offs_t offset, offs_t mem_mask)
 
 uint8_t axc51base_cpu_device::iram_read(size_t offset)
 {
-	return (((offset) < 0x80) ? m_data.read_byte(offset) : sfr_read(offset));
+	return (((offset) < 0x80) ? m_data.read_byte(offset) : sfr_read(offset & 0x7f));
 }
 
 void axc51base_cpu_device::iram_write(size_t offset, uint8_t data)
@@ -285,25 +291,25 @@ void axc51base_cpu_device::iram_write(size_t offset, uint8_t data)
 	if ((offset) < 0x80)
 		m_data.write_byte(offset, data);
 	else
-		sfr_write(offset, data);
+		sfr_write(offset & 0x7f, data);
 }
 
 /*Push the current PC to the stack*/
 void axc51base_cpu_device::push_pc()
 {
 	uint8_t tmpSP = SP+1;                     //Grab and Increment Stack Pointer
-	IRAM_IW(tmpSP, (PC & 0xff));                //Store low byte of PC to Internal Ram (Use IRAM_IW to store stack above 128 bytes)
+	iram_indirect_write(tmpSP, (m_pc & 0xff));                //Store low byte of PC to Internal Ram (Use iram_indirect_write to store stack above 128 bytes)
 	tmpSP++;                                    // ""
 	SP = tmpSP;                             // ""
-	IRAM_IW(tmpSP, ( (PC & 0xff00) >> 8));      //Store hi byte of PC to next address in Internal Ram (Use IRAM_IW to store stack above 128 bytes)
+	iram_indirect_write(tmpSP, ( (m_pc & 0xff00) >> 8));      //Store hi byte of PC to next address in Internal Ram (Use iram_indirect_write to store stack above 128 bytes)
 }
 
 /*Pop the current PC off the stack and into the pc*/
 void axc51base_cpu_device::pop_pc()
 {
 	uint8_t tmpSP = SP;                           //Grab Stack Pointer
-	PC = (IRAM_IR(tmpSP--) & 0xff) << 8;        //Store hi byte to PC (must use IRAM_IR to access stack pointing above 128 bytes)
-	PC = PC | IRAM_IR(tmpSP--);                 //Store lo byte to PC (must use IRAM_IR to access stack pointing above 128 bytes)
+	m_pc = (iram_indirect_read(tmpSP--) & 0xff) << 8;        //Store hi byte to PC (must use iram_indirect_read to access stack pointing above 128 bytes)
+	m_pc = m_pc | iram_indirect_read(tmpSP--);                 //Store lo byte to PC (must use iram_indirect_read to access stack pointing above 128 bytes)
 	SP = tmpSP;                             //Decrement Stack Pointer
 }
 
@@ -339,7 +345,7 @@ uint8_t axc51base_cpu_device::bit_address_r(uint8_t offset)
 		word = ( (offset & 0x78) >> 3) * distance + 0x20;
 		bit_pos = offset & 0x7;
 		mask = (0x1 << bit_pos);
-		return((IRAM_R(word) & mask) >> bit_pos);
+		return((iram_read(word) & mask) >> bit_pos);
 	}
 	//SFR bit addressable registers
 	else {
@@ -347,7 +353,7 @@ uint8_t axc51base_cpu_device::bit_address_r(uint8_t offset)
 		word = ( (offset & 0x78) >> 3) * distance + 0x80;
 		bit_pos = offset & 0x7;
 		mask = (0x1 << bit_pos);
-		return ((IRAM_R(word) & mask) >> bit_pos);
+		return ((iram_read(word) & mask) >> bit_pos);
 	}
 }
 
@@ -367,9 +373,9 @@ void axc51base_cpu_device::bit_address_w(uint8_t offset, uint8_t bit)
 		bit_pos = offset & 0x7;
 		bit = (bit & 0x1) << bit_pos;
 		mask = ~(1 << bit_pos) & 0xff;
-		result = IRAM_R(word) & mask;
+		result = iram_read(word) & mask;
 		result = result | bit;
-		IRAM_W(word, result);
+		iram_write(word, result);
 	}
 	/* SFR bit addressable registers */
 	else {
@@ -378,9 +384,9 @@ void axc51base_cpu_device::bit_address_w(uint8_t offset, uint8_t bit)
 		bit_pos = offset & 0x7;
 		bit = (bit & 0x1) << bit_pos;
 		mask = ~(1 << bit_pos) & 0xff;
-		result = IRAM_R(word) & mask;
+		result = iram_read(word) & mask;
 		result = result | bit;
-		IRAM_W(word, result);
+		iram_write(word, result);
 	}
 }
 
@@ -406,53 +412,56 @@ void axc51base_cpu_device::do_sub_flags(uint8_t a, uint8_t data, uint8_t c)
 	SET_OV((result1 < -128 || result1 > 127));
 }
 
-void axc51base_cpu_device::transmit_receive(int source)
+uint32_t axc51base_cpu_device::get_dptr0_with_autoinc(uint8_t auto_inc)
 {
-}
-
-void axc51base_cpu_device::update_timer_t0(int cycles)
-{
-}
-
-
-
-void axc51base_cpu_device::update_timer_t1(int cycles)
-{
-}
-
-void axc51base_cpu_device::update_timer_t2(int cycles)
-{
-}
-
-void axc51base_cpu_device::update_timers(int cycles)
-{
-	while (cycles--)
+	uint32_t addr = external_ram_iaddr(DPTR0, 0xffff);
+	if (auto_inc) // auto-increment enabled
 	{
-		update_timer_t0(1);
-		update_timer_t1(1);
+		if (m_sfr_regs[SFR_DPCON] & 0x20) // DPID0  DPTR0 increase direction control
+		{
+			uint16_t dptr = (DPTR0)-1;
+			SET_DPTR0(dptr);
+		}
+		else
+		{
+			uint16_t dptr = (DPTR0)+1;
+			SET_DPTR0(dptr);
+		}
 	}
+	return addr;
 }
 
-void axc51base_cpu_device::serial_transmit(uint8_t data)
+uint32_t axc51base_cpu_device::get_dptr1_with_autoinc(uint8_t auto_inc)
 {
+	uint32_t addr = external_ram_iaddr(DPTR1, 0xffff);
+	if (auto_inc) // auto-increment enabled
+	{
+		if (m_sfr_regs[SFR_DPCON] & 0x10) // DPID1  DPTR1 increase direction control
+		{
+			uint16_t dptr = (DPTR1)-1;
+			SET_DPTR1(dptr);
+		}
+		else
+		{
+			uint16_t dptr = (DPTR1)+1;
+			SET_DPTR1(dptr);
+		}
+	}
+	return addr;
 }
 
-void axc51base_cpu_device::serial_receive()
+uint32_t axc51base_cpu_device::process_dptr_access()
 {
-}
+	uint8_t auto_inc = m_sfr_regs[SFR_DPCON] & 0x08;
+	uint32_t addr = (m_sfr_regs[SFR_DPCON] & 0x01) ? get_dptr1_with_autoinc(auto_inc) : get_dptr0_with_autoinc(auto_inc);
 
-/* Check and update status of serial port */
-void axc51base_cpu_device::update_serial(int cycles)
-{
-	while (--cycles>=0)
-		transmit_receive(0);
-}
+	if (m_sfr_regs[SFR_DPCON] & 0x04)
+	{
+		// auto toggle DPR
+		m_sfr_regs[SFR_DPCON] ^= 0x01;
+	}
 
-/* Check and update status of serial port */
-void axc51base_cpu_device::update_irq_prio(uint8_t ipl, uint8_t iph)
-{
-	for (int i=0; i<8; i++)
-		m_irq_prio[i] = ((ipl >> i) & 1) | (((iph >>i ) & 1) << 1);
+	return addr;
 }
 
 
@@ -463,6 +472,8 @@ void axc51base_cpu_device::update_irq_prio(uint8_t ipl, uint8_t iph)
 #define OPHANDLER( _name ) void axc51base_cpu_device::_name (uint8_t r)
 
 #include "axc51ops.hxx"
+#include "axc51extops.hxx"
+
 
 
 void axc51base_cpu_device::execute_op(uint8_t op)
@@ -672,7 +683,7 @@ void axc51base_cpu_device::execute_op(uint8_t op)
 		case 0xa2:  mov_c_bitaddr(op);             break;  //MOV C, bit addr
 		case 0xa3:  inc_dptr(op);                  break;  //INC DPTR
 		case 0xa4:  mul_ab(op);                        break;  //MUL AB
-		case 0xa5:  illegal(op);                       break;  //reserved
+		case 0xa5:  axc51_extended_a5(op);                       break;  
 
 		case 0xa6:
 		case 0xa7:  mov_ir_mem(op&1);              break;  //MOV @R0/@R1, data addr
@@ -812,22 +823,72 @@ const uint8_t axc51base_cpu_device::axc51_cycles[256] = {
 	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 };
 
+uint16_t axc51base_cpu_device::get_irq_base()
+{
+	int base = 0;
+
+	switch (m_sfr_regs[SFR_DPCON] & 0xc0)
+	{
+	case 0x00:
+	case 0xc0:
+		base = 0; // invalid
+		break;
+
+	case 0x80:
+		base = 0x8000;
+		break;
+
+	case 0x40:
+		base = 0x4000;
+		break;
+	}
+
+	return base;
+}
+
+TIMER_CALLBACK_MEMBER(axc51base_cpu_device::timer0_cb)
+{
+	// TODO: this logic is not correct
+
+	m_timer0irq = true;
+}
+
+TIMER_CALLBACK_MEMBER(axc51base_cpu_device::dactimer_cb)
+{
+	// TODO: this logic is not correct
+
+	m_dactimerirq = true;
+}
+
 
 void axc51base_cpu_device::check_irqs()
 {
+	// TODO: this logic is not correct
+
+	if (!GET_EA)
+		return;
+
+	uint16_t base = get_irq_base();
+
+	if (!base)
+		return;
+
+	if (m_timer0irq && GET_T0IRQEN)
+	{
+		push_pc();
+		m_pc = base + V_TIMER0;
+		m_timer0irq = false;
+	}
+	else if (m_dactimerirq && GET_DMAIRQEN)
+	{
+		push_pc();
+		m_pc = base + V_DAC;
+		m_dactimerirq = false;
+	}
 }
 
-void axc51base_cpu_device::burn_cycles(int cycles)
-{
-	/* Update Timer (if any timers are running) */
-	update_timers(cycles);
 
-	/* Update Serial (only for mode 0) */
-	update_serial(cycles);
 
-	/* check_irqs */
-	check_irqs();
-}
 
 void axc51base_cpu_device::execute_set_input(int irqline, int state)
 {
@@ -850,14 +911,13 @@ void axc51base_cpu_device::execute_run()
 	check_irqs();
 
 	m_icount -= m_inst_cycles;
-	burn_cycles(m_inst_cycles);
 
 	do
 	{
 		/* Read next opcode */
-		PPC = PC;
-		debugger_instruction_hook(PC);
-		op = m_program.read_byte(PC++);
+		m_ppc = m_pc;
+		debugger_instruction_hook(m_pc);
+		op = m_program.read_byte(m_pc++);
 
 		/* process opcode and count cycles */
 		m_inst_cycles = axc51_cycles[op];
@@ -866,73 +926,291 @@ void axc51base_cpu_device::execute_run()
 		/* burn the cycles */
 		m_icount -= m_inst_cycles;
 
-		burn_cycles(m_inst_cycles);
+		check_irqs();
 
 	} while( m_icount > 0 );
 }
 
+uint8_t axc51base_cpu_device::xsfr_read(offs_t offset)
+{
+	offset &= 0x7f;
 
+	LOGMASKED(LOG_UNHANDLED_XSFR,"%s: reading unhandled XSFR reg %04x\n", machine().describe_context(), offset + 0x3000);
+
+	return m_xsfr_regs[offset];
+}
+
+void axc51base_cpu_device::xsfr_write(offs_t offset, uint8_t data)
+{
+	offset &= 0x7f;
+
+	switch (offset)
+	{
+	case XSFR_PUP0: // 0x3010
+	case XSFR_PUP1: // 0x3011
+	case XSFR_PUP2: // 0x3012
+	case XSFR_PUP3: // 0x3013
+	case XSFR_PUP4: // 0x3014
+
+	case XSFR_PDN0: // 0x3015
+	case XSFR_PDN1: // 0x3016
+	case XSFR_PDN2: // 0x3017
+	case XSFR_PDN3: // 0x3018
+	case XSFR_PDN4: // 0x3019
+		break;
+
+	case XSFR_PHD0: // 0x301a
+	case XSFR_PHD1: // 0x301b
+	case XSFR_PHD2: // 0x301c
+	case XSFR_PHD3: // 0x301d
+	case XSFR_PHD4: // 0x301e
+		break;
+
+	default:
+		LOGMASKED(LOG_UNHANDLED_XSFR,"%s: writing to unhandled XSFR reg %04x data %02x\n", machine().describe_context(), offset + 0x3000, data);
+		break;
+
+	}
+	m_xsfr_regs[offset] = data;
+}
 
 
 void axc51base_cpu_device::sfr_write(size_t offset, uint8_t data)
 {
 	/* update register */
-	assert(offset >= 0x80 && offset <= 0xff);
-
 	switch (offset)
 	{
-		case ADDR_P0:   m_port_out_cb[0](data);             break;
-		case ADDR_P1:   m_port_out_cb[1](data);             break;
-		case ADDR_P2:   m_port_out_cb[2](data);             break;
-		case ADDR_P3:   m_port_out_cb[3](data);             break;
-		case ADDR_PSW:  SET_PARITY();                       break;
-		case ADDR_ACC:  SET_PARITY();                       break;
-		case ADDR_IP:   update_irq_prio(data, 0);  break;
+	case SFR_P0:   write_port(0, data);       break;
+	case SFR_P1:   write_port(1, data);       break;
+	case SFR_P2:   write_port(2, data);       break;
+	case SFR_P3:   write_port(3, data);       break;
+	case SFR_PSW:  SET_PARITY();              break;
+	case SFR_ACC:  SET_PARITY();              break;
+	case SFR_IP:   break;
 
-		case ADDR_B:
-		case ADDR_SP:
-		case ADDR_DPL:
-		case ADDR_DPH:
-		case ADDR_PCON:
-		case ADDR_IE:
-			break;
-		default:
-			LOG(("axc51 '%s': attemping to write to an invalid/non-implemented SFR address: %x at 0x%04x, data=%x\n", tag(), (uint32_t)offset,PC,data));
-			/* no write in this case according to manual */
-			return;
+	case SFR_B:
+	case SFR_SP:
+	case SFR_DPL0:
+	case SFR_DPH0:
+	case SFR_PCON:
+		break;
+
+	case SFR_DPL1: // 0x84
+	case SFR_DPH1: // 0x85
+		break;
+
+	case SFR_IE:
+		break;
+
+	case SFR_IE1:
+		break;
+
+	case SFR_GP0: // 0xa1
+	case SFR_GP1: // 0xa2
+	case SFR_GP2: // 0xa3
+	case SFR_GP3: // 0xa4
+	case SFR_GP4: // 0xb1
+	case SFR_GP5: // 0xb2
+	case SFR_GP6: // 0xb3
+	case SFR_GP7: // 0xb5
+		break;
+
+	case SFR_DACLCH: // 0xa6
+		m_dac_out_cb[0](data);
+		break;
+
+	case SFR_DACRCH: // 0xa7
+		m_dac_out_cb[1](data);
+		break;
+
+	case SFR_P0DIR: // 0xba
+	case SFR_P1DIR: // 0xbb
+	case SFR_P2DIR: // 0xbc
+	case SFR_P3DIR: // 0xbd
+	case SFR_P4DIR: // 0xbe
+		break;
+
+	case SFR_ER00: // 0xe6
+	case SFR_ER01: // 0xe7
+	case SFR_ER10: // 0xe8
+	case SFR_ER11: // 0xe9
+	case SFR_ER20: // 0xea
+	case SFR_ER21: // 0xeb
+	case SFR_ER30: // 0xec
+	case SFR_ER31: // 0xed
+	case SFR_ER8:  // 0xee
+		break;
+
+	case SFR_P4: write_port(4, data); break; // 0xb4
+
+	case SFR_TMR0CON: // 0xf8
+	case SFR_TMR0CNT: // 0xf9
+	case SFR_TMR0PR:  // 0xfa
+	case SFR_TMR0PSR: // 0xfb
+		break;
+
+	case SFR_IE2CRPT: // 0x95 controls automatic encryption
+		ie2crypt_w(data);
+		return;
+
+	case SFR_DPCON: dpcon_w(data); return; // 0x86
+
+	case SFR_DBASE: // 0x9b
+		m_sfr_regs[SFR_DBASE] = data;
+		return;
+
+
+	case SFR_SPIDMAADR: spidmaadr_w(data); return; // 0xd6
+	case SFR_SPIDMACNT: spidmacnt_w(data); return; // 0xd7
+	case SFR_SPICON: spicon_w(data); return; // 0xd8
+	case SFR_SPIBUF: spibuf_w(data); return; // 0xd9
+	case SFR_SPIBAUD: spibaud_w(data); return; // 0xda
+
+
+	default:
+		LOGMASKED(LOG_UNHANDLED,"%s: attemping to write to an invalid/non-implemented SFR address: %02x  data=%02x\n", machine().describe_context(), (uint32_t)offset, data);
+		/* no write in this case according to manual */
+		return;
 	}
-	m_data.write_byte((size_t)offset | 0x100, data);
+	m_sfr_regs[offset] = data;
+}
+
+uint8_t axc51base_cpu_device::read_port(int i)
+{
+	uint8_t latched_out_data = 0x00;
+	uint8_t port_direction = 0x00;
+	uint8_t pup = 0x00;
+	uint8_t pdn = 0x00;
+
+	// direction 0xff = all bits set to input?
+
+	// pdn and pup registers are mentioned as 'pull down' and 'pull up' but other than
+	// there being 5 of them it isn't clear if they're used for these ports or not
+
+	switch (i)
+	{
+	case 0: latched_out_data = P0; port_direction = m_sfr_regs[SFR_P0DIR]; pup = m_xsfr_regs[XSFR_PUP0]; pdn = m_xsfr_regs[XSFR_PDN0]; break;
+	case 1: latched_out_data = P1; port_direction = m_sfr_regs[SFR_P1DIR]; pup = m_xsfr_regs[XSFR_PUP1]; pdn = m_xsfr_regs[XSFR_PDN1]; break;
+	case 2: latched_out_data = P2; port_direction = m_sfr_regs[SFR_P2DIR]; pup = m_xsfr_regs[XSFR_PUP2]; pdn = m_xsfr_regs[XSFR_PDN2]; break;
+	case 3: latched_out_data = P3; port_direction = m_sfr_regs[SFR_P3DIR]; pup = m_xsfr_regs[XSFR_PUP3]; pdn = m_xsfr_regs[XSFR_PDN3]; break;
+	case 4: latched_out_data = P4; port_direction = m_sfr_regs[SFR_P4DIR]; pup = m_xsfr_regs[XSFR_PUP4]; pdn = m_xsfr_regs[XSFR_PDN4]; break;
+	}
+
+	uint8_t incoming = m_port_in_cb[i]();
+
+	LOGMASKED(LOG_PORTS,"%s: reading port %d with direction %02x pup %02x pdn %02x latched output %02x incoming data %02x\n", machine().describe_context(), i, port_direction, pup, pdn, latched_out_data, incoming);
+	return incoming;
+}
+
+void axc51base_cpu_device::write_port(int i, uint8_t data)
+{
+	uint8_t port_direction = 0x00;
+	uint8_t pup = 0x00;
+	uint8_t pdn = 0x00;
+
+	switch (i)
+	{
+	case 0: port_direction = m_sfr_regs[SFR_P0DIR]; pup = m_xsfr_regs[XSFR_PUP0]; pdn = m_xsfr_regs[XSFR_PDN0]; break;
+	case 1: port_direction = m_sfr_regs[SFR_P1DIR]; pup = m_xsfr_regs[XSFR_PUP1]; pdn = m_xsfr_regs[XSFR_PDN1]; break;
+	case 2: port_direction = m_sfr_regs[SFR_P2DIR]; pup = m_xsfr_regs[XSFR_PUP2]; pdn = m_xsfr_regs[XSFR_PDN2]; break;
+	case 3: port_direction = m_sfr_regs[SFR_P3DIR]; pup = m_xsfr_regs[XSFR_PUP3]; pdn = m_xsfr_regs[XSFR_PDN3]; break;
+	case 4: port_direction = m_sfr_regs[SFR_P4DIR]; pup = m_xsfr_regs[XSFR_PUP4]; pdn = m_xsfr_regs[XSFR_PDN4]; break;
+	}
+
+	LOGMASKED(LOG_PORTS,"%s: writing port %d with direction %02x pup %02x pdn %02x data %02x\n", machine().describe_context(), i, port_direction, pup, pdn, data);
+	m_port_out_cb[i](data); // also send port direction??
 }
 
 uint8_t axc51base_cpu_device::sfr_read(size_t offset)
 {
-	assert(offset >= 0x80 && offset <= 0xff);
-
 	switch (offset)
 	{
-		/* Move to memory map */
-		case ADDR_P0:   return (P0 | m_forced_inputs[0]) & m_port_in_cb[0]();
-		case ADDR_P1:   return (P1 | m_forced_inputs[1]) & m_port_in_cb[1]();
-		case ADDR_P2:   return (P2 | m_forced_inputs[2]) & m_port_in_cb[2]();
-		case ADDR_P3:   return (P3 | m_forced_inputs[3]) & m_port_in_cb[3]()
-							& ~(GET_BIT(m_last_line_state, AXC51_INT0_LINE) ? 4 : 0)
-							& ~(GET_BIT(m_last_line_state, AXC51_INT1_LINE) ? 8 : 0);
+	case SFR_P0:   return read_port(0);
+	case SFR_P1:   return read_port(1);
+	case SFR_P2:   return read_port(2);
+	case SFR_P3:   return read_port(3);
 
-		case ADDR_PSW:
-		case ADDR_ACC:
-		case ADDR_B:
-		case ADDR_SP:
-		case ADDR_DPL:
-		case ADDR_DPH:
-		case ADDR_PCON:
-		case ADDR_IE:
-		case ADDR_IP:
-			return m_data.read_byte((size_t) offset | 0x100);
+	case SFR_PSW:
+	case SFR_ACC:
+	case SFR_B:
+	case SFR_SP:
+	case SFR_DPL0:
+	case SFR_DPH0:
+	case SFR_PCON:
+	case SFR_IE:
+	case SFR_IE1:
+
+	case SFR_DPL1: // 0x84
+	case SFR_DPH1: // 0x85
+
+	case SFR_IP:
+
+	case SFR_GP0: // 0xa1
+	case SFR_GP1: // 0xa2
+	case SFR_GP2: // 0xa3
+	case SFR_GP3: // 0xa4
+	case SFR_GP4: // 0xb1
+	case SFR_GP5: // 0xb2
+	case SFR_GP6: // 0xb3
+	case SFR_GP7: // 0xb5
+		return m_sfr_regs[offset];
+
+	case SFR_P4: // 0xb4
+		return read_port(4);
+
+	case SFR_P0DIR: // 0xba
+	case SFR_P1DIR: // 0xbb
+	case SFR_P2DIR: // 0xbc
+	case SFR_P3DIR: // 0xbd
+	case SFR_P4DIR: // 0xbe
+
+	case SFR_ER00: // 0xe6
+	case SFR_ER01: // 0xe7
+	case SFR_ER10: // 0xe8
+	case SFR_ER11: // 0xe9
+	case SFR_ER20: // 0xea
+	case SFR_ER21: // 0xeb
+	case SFR_ER30: // 0xec
+	case SFR_ER31: // 0xed
+	case SFR_ER8:  // 0xee
+
+	case SFR_TMR0CON: // 0xf8
+	case SFR_TMR0CNT: // 0xf9
+	case SFR_TMR0PR:  // 0xfa
+	case SFR_TMR0PSR: // 0xfb
+
+	case SFR_IE2CRPT: // 0x95 controls automatic encryption
+		return m_sfr_regs[offset];
+
+
+	case SFR_DPCON: // 0x86
+		return dpcon_r();
+
+	case SFR_IRTCON: // 0x9f
+		return 0x00;// machine().rand();
+
+	case SFR_SPICON: // 0xd8
+		return spicon_r();
+
+	case SFR_SPIBUF: // 0xd9
+		return spibuf_r();
+
+	case SFR_UID0: return m_uid[0]; // 0xe2 Chip-ID, can only be read from code in internal area?
+	case SFR_UID1: return m_uid[1]; // 0xe3
+	case SFR_UID2: return m_uid[2]; // 0xe4
+	case SFR_UID3: return m_uid[3]; // 0xe5
+
+	case SFR_LFSRFIFO: // 0xf6
+		return 0x00;// machine().rand();
+
+	case SFR_UARTSTA: // 0xfc
+		return uartsta_r();
+
 		/* Illegal or non-implemented sfr */
-		default:
-			LOG(("axc51 '%s': attemping to read an invalid/non-implemented SFR address: %x at 0x%04x\n", tag(), (uint32_t)offset,PC));
-			/* according to the manual, the read may return random bits */
-			return 0xff;
+	default:
+		LOGMASKED(LOG_UNHANDLED,"%s: attemping to read an invalid/non-implemented SFR address: %02x\n", machine().describe_context(), (uint32_t)offset);
+		/* according to the manual, the read may return random bits */
+		return 0xff;
 	}
 }
 
@@ -945,50 +1223,64 @@ void axc51base_cpu_device::device_start()
 
 	m_port_in_cb.resolve_all_safe(0xff);
 	m_port_out_cb.resolve_all_safe();
-	m_serial_rx_cb.resolve_safe(0);
-	m_serial_tx_cb.resolve_safe();
+	m_dac_out_cb.resolve_all_safe();
+
+	m_spi_in_cb.resolve_safe(0xff);
+	m_spi_out_cb.resolve_safe();
+	m_spi_out_dir_cb.resolve_safe();
 
 	/* Save states */
 	save_item(NAME(m_ppc));
 	save_item(NAME(m_pc));
 	save_item(NAME(m_last_op));
 	save_item(NAME(m_last_bit));
-	save_item(NAME(m_cur_irq_prio) );
 	save_item(NAME(m_last_line_state) );
 	save_item(NAME(m_recalc_parity) );
-	save_item(NAME(m_irq_prio) );
-	save_item(NAME(m_irq_active) );
-	save_item(NAME(m_uart.data_out));
-	save_item(NAME(m_uart.bits_to_send));
-	save_item(NAME(m_uart.smod_div));
-	save_item(NAME(m_uart.rx_clk));
-	save_item(NAME(m_uart.tx_clk));
-	save_item(NAME(m_uart.delay_cycles));
+	save_item(NAME(m_sfr_regs));
+	save_item(NAME(m_xsfr_regs));
 
-	state_add( AXC51_PC,  "PC", m_pc).formatstr("%04X");
-	state_add( AXC51_SP,  "SP", SP).formatstr("%02X");
-	state_add( AXC51_PSW, "PSW", PSW).formatstr("%02X");
-	state_add( AXC51_ACC, "A", ACC).formatstr("%02X");
-	state_add( AXC51_B,   "B", B).formatstr("%02X");
-	state_add<uint16_t>( AXC51_DPTR, "DPTR", [this](){ return DPTR; }, [this](uint16_t dp){ SET_DPTR(dp); }).formatstr("%04X");
-	state_add( AXC51_DPH, "DPH", DPH).noshow();
-	state_add( AXC51_DPL, "DPL", DPL).noshow();
-	state_add( AXC51_IE,  "IE", IE).formatstr("%02X");
-	state_add( AXC51_IP,  "IP", IP).formatstr("%02X");
+	state_add( SFR_STATEREG_PC,  "PC", m_pc).formatstr("%04X");
+	state_add( SFR_STATEREG_SP,  "SP", SP).formatstr("%02X");
+	state_add( SFR_STATEREG_PSW, "PSW", PSW).formatstr("%02X");
+	state_add( SFR_STATEREG_ACC, "A", ACC).formatstr("%02X");
+	state_add( SFR_STATEREG_B,   "B", B).formatstr("%02X");
+	state_add<uint16_t>( SFR_STATEREG_DPTR0, "DPTR0", [this](){ return DPTR0; }, [this](uint16_t dp){ SET_DPTR0(dp); }).formatstr("%04X");
+	state_add<uint16_t>( SFR_STATEREG_DPTR1, "DPTR1", [this](){ return DPTR1; }, [this](uint16_t dp){ SET_DPTR1(dp); }).formatstr("%04X");
+	state_add( SFR_STATEREG_DPH0, "DPH0", DPH0).noshow();
+	state_add( SFR_STATEREG_DPL0, "DPL0", DPL0).noshow();
+	state_add( SFR_STATEREG_IE,  "IE", IE).formatstr("%02X");
+	state_add( SFR_STATEREG_IP,  "IP", IP).formatstr("%02X");
 	if (m_rom_size > 0)
-		state_add<uint8_t>( AXC51_P0,  "P0", [this](){ return P0; }, [this](uint8_t p){ SET_P0(p); }).formatstr("%02X");
-	state_add<uint8_t>( AXC51_P1,  "P1", [this](){ return P1; }, [this](uint8_t p){ SET_P1(p); }).formatstr("%02X");
-	state_add<uint8_t>( AXC51_P2,  "P2", [this](){ return P2; }, [this](uint8_t p){ SET_P2(p); }).formatstr("%02X");
-	state_add<uint8_t>( AXC51_P3,  "P3", [this](){ return P3; }, [this](uint8_t p){ SET_P3(p); }).formatstr("%02X");
-	state_add<uint8_t>( AXC51_R0,  "R0", [this](){ return R_REG(0); }, [this](uint8_t r){ SET_REG(0, r); }).formatstr("%02X");
-	state_add<uint8_t>( AXC51_R1,  "R1", [this](){ return R_REG(1); }, [this](uint8_t r){ SET_REG(1, r); }).formatstr("%02X");
-	state_add<uint8_t>( AXC51_R2,  "R2", [this](){ return R_REG(2); }, [this](uint8_t r){ SET_REG(2, r); }).formatstr("%02X");
-	state_add<uint8_t>( AXC51_R3,  "R3", [this](){ return R_REG(3); }, [this](uint8_t r){ SET_REG(3, r); }).formatstr("%02X");
-	state_add<uint8_t>( AXC51_R4,  "R4", [this](){ return R_REG(4); }, [this](uint8_t r){ SET_REG(4, r); }).formatstr("%02X");
-	state_add<uint8_t>( AXC51_R5,  "R5", [this](){ return R_REG(5); }, [this](uint8_t r){ SET_REG(5, r); }).formatstr("%02X");
-	state_add<uint8_t>( AXC51_R6,  "R6", [this](){ return R_REG(6); }, [this](uint8_t r){ SET_REG(6, r); }).formatstr("%02X");
-	state_add<uint8_t>( AXC51_R7,  "R7", [this](){ return R_REG(7); }, [this](uint8_t r){ SET_REG(7, r); }).formatstr("%02X");
-	state_add<uint8_t>( AXC51_RB,  "RB", [this](){ return (PSW & 0x18)>>3; }, [this](uint8_t rb){ SET_RS(rb); }).mask(0x03).formatstr("%02X");
+		state_add<uint8_t>( SFR_STATEREG_P0,  "P0", [this](){ return P0; }, [this](uint8_t p){ SET_P0(p); }).formatstr("%02X");
+	state_add<uint8_t>( SFR_STATEREG_P1,  "P1", [this](){ return P1; }, [this](uint8_t p){ SET_P1(p); }).formatstr("%02X");
+	state_add<uint8_t>( SFR_STATEREG_P2,  "P2", [this](){ return P2; }, [this](uint8_t p){ SET_P2(p); }).formatstr("%02X");
+	state_add<uint8_t>( SFR_STATEREG_P3,  "P3", [this](){ return P3; }, [this](uint8_t p){ SET_P3(p); }).formatstr("%02X");
+	state_add<uint8_t>( SFR_STATEREG_R0,  "R0", [this](){ return R_REG(0); }, [this](uint8_t r){ SET_REG(0, r); }).formatstr("%02X");
+	state_add<uint8_t>( SFR_STATEREG_R1,  "R1", [this](){ return R_REG(1); }, [this](uint8_t r){ SET_REG(1, r); }).formatstr("%02X");
+	state_add<uint8_t>( SFR_STATEREG_R2,  "R2", [this](){ return R_REG(2); }, [this](uint8_t r){ SET_REG(2, r); }).formatstr("%02X");
+	state_add<uint8_t>( SFR_STATEREG_R3,  "R3", [this](){ return R_REG(3); }, [this](uint8_t r){ SET_REG(3, r); }).formatstr("%02X");
+	state_add<uint8_t>( SFR_STATEREG_R4,  "R4", [this](){ return R_REG(4); }, [this](uint8_t r){ SET_REG(4, r); }).formatstr("%02X");
+	state_add<uint8_t>( SFR_STATEREG_R5,  "R5", [this](){ return R_REG(5); }, [this](uint8_t r){ SET_REG(5, r); }).formatstr("%02X");
+	state_add<uint8_t>( SFR_STATEREG_R6,  "R6", [this](){ return R_REG(6); }, [this](uint8_t r){ SET_REG(6, r); }).formatstr("%02X");
+	state_add<uint8_t>( SFR_STATEREG_R7,  "R7", [this](){ return R_REG(7); }, [this](uint8_t r){ SET_REG(7, r); }).formatstr("%02X");
+	state_add<uint8_t>( SFR_STATEREG_RB,  "RB", [this](){ return (PSW & 0x18)>>3; }, [this](uint8_t rb){ SET_RS(rb); }).mask(0x03).formatstr("%02X");
+
+	state_add<uint16_t>( SFR_STATEREG_ER0, "ER0", [this](){ return ER0; }, [this](uint16_t dp){ SET_ER0(dp); }).formatstr("%04X");
+	state_add<uint16_t>( SFR_STATEREG_ER1, "ER1", [this](){ return ER1; }, [this](uint16_t dp){ SET_ER1(dp); }).formatstr("%04X");
+	state_add<uint16_t>( SFR_STATEREG_ER2, "ER2", [this](){ return ER2; }, [this](uint16_t dp){ SET_ER2(dp); }).formatstr("%04X");
+	state_add<uint16_t>( SFR_STATEREG_ER3, "ER3", [this](){ return ER3; }, [this](uint16_t dp){ SET_ER3(dp); }).formatstr("%04X");
+
+	state_add<uint8_t>( SFR_ER8, "ER8", [this](){ return ER8; }, [this](uint8_t r){ SET_ER8(r); }).formatstr("%02X");
+
+	state_add<uint8_t>( SFR_STATEREG_GP0, "GP0", [this](){ return GP0; }, [this](uint8_t r){ SET_GP0(r); }).formatstr("%02X");
+	state_add<uint8_t>( SFR_STATEREG_GP1, "GP1", [this](){ return GP1; }, [this](uint8_t r){ SET_GP1(r); }).formatstr("%02X");
+	state_add<uint8_t>( SFR_STATEREG_GP2, "GP2", [this](){ return GP2; }, [this](uint8_t r){ SET_GP2(r); }).formatstr("%02X");
+	state_add<uint8_t>( SFR_STATEREG_GP3, "GP3", [this](){ return GP3; }, [this](uint8_t r){ SET_GP3(r); }).formatstr("%02X");
+	state_add<uint8_t>( SFR_STATEREG_GP4, "GP4", [this](){ return GP4; }, [this](uint8_t r){ SET_GP4(r); }).formatstr("%02X");
+	state_add<uint8_t>( SFR_STATEREG_GP5, "GP5", [this](){ return GP5; }, [this](uint8_t r){ SET_GP5(r); }).formatstr("%02X");
+	state_add<uint8_t>( SFR_STATEREG_GP6, "GP6", [this](){ return GP6; }, [this](uint8_t r){ SET_GP6(r); }).formatstr("%02X");
+	state_add<uint8_t>( SFR_STATEREG_GP7, "GP7", [this](){ return GP7; }, [this](uint8_t r){ SET_GP7(r); }).formatstr("%02X");
+
 
 
 	state_add( STATE_GENPC, "GENPC", m_pc ).noshow();
@@ -996,6 +1288,10 @@ void axc51base_cpu_device::device_start()
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_rtemp).formatstr("%8s").noshow();
 
 	set_icountptr(m_icount);
+
+	m_timer0 = timer_alloc(FUNC(axc51base_cpu_device::timer0_cb), this);
+	m_dactimer = timer_alloc(FUNC(axc51base_cpu_device::dactimer_cb), this);
+
 }
 
 void axc51base_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
@@ -1006,11 +1302,11 @@ void axc51base_cpu_device::state_string_export(const device_state_entry &entry, 
 			str = string_format("%c%c%c%c%c%c%c%c",
 				PSW & 0x80 ? 'C':'.',
 				PSW & 0x40 ? 'A':'.',
-				PSW & 0x20 ? 'F':'.',
+				PSW & 0x20 ? 'c':'.', // EC
 				PSW & 0x10 ? '0':'.',
 				PSW & 0x08 ? '1':'.',
 				PSW & 0x04 ? 'V':'.',
-				PSW & 0x02 ? '?':'.',
+				PSW & 0x02 ? 'z':'.', // EZ
 				PSW & 0x01 ? 'P':'.');
 			break;
 	}
@@ -1022,25 +1318,21 @@ void axc51base_cpu_device::device_reset()
 	m_last_line_state = 0;
 
 	/* Flag as NO IRQ in Progress */
-	m_irq_active = 0;
-	m_cur_irq_prio = -1;
 	m_last_op = 0;
 	m_last_bit = 0;
 
 	/* these are all defined reset states */
-	PPC = PC;
-	PC = 0;
+	m_ppc = m_pc;
+	m_pc = 0;
 	SP = 0x7;
 	SET_PSW(0);
 	SET_ACC(0);
-	DPH = 0;
-	DPL = 0;
+	DPH0 = 0;
+	DPL0 = 0;
 	B = 0;
 	IP = 0;
-	update_irq_prio(IP, 0);
 	IE = 0;
 	PCON = 0;
-
 
 	/* set the port configurations to all 1's */
 	SET_P3(0xff);
@@ -1048,14 +1340,16 @@ void axc51base_cpu_device::device_reset()
 	SET_P1(0xff);
 	SET_P0(0xff);
 
-	m_uart.data_out = 0;
-	m_uart.rx_clk = 0;
-	m_uart.tx_clk = 0;
-	m_uart.bits_to_send = 0;
-	m_uart.delay_cycles = 0;
-	m_uart.smod_div = 0;
-
 	m_recalc_parity = 0;
+
+	m_spi_dma_addr = 0;
+
+//	m_timer0->adjust(attotime::never);
+//	m_dactimer->adjust(attotime::never);
+
+
+	m_timer0->adjust(attotime::from_hz(120), 0, attotime::from_hz(120));
+	m_dactimer->adjust(attotime::from_hz(8000), 0, attotime::from_hz(8000));
 }
 
 
@@ -1066,151 +1360,171 @@ std::unique_ptr<util::disasm_interface> axc51base_cpu_device::create_disassemble
 
 
 
-// AX208 (specific CPU)
 
-ax208_cpu_device::ax208_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: axc51base_cpu_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(ax208_cpu_device::ax208_internal_program_mem), this), address_map_constructor(FUNC(ax208_cpu_device::data_internal), this), 0, 8)
+/*
+
+SFR_SPICON (at 0xd8)
+
+7  SPIPND  (0 = Send not finished, 1 = finished)
+6  SPISM   (0 = Master, 1 = Slave)
+5  SPIRT   (RX/TX select for 2-wire mode / DMA, 0 = TX, 1 = RX)
+4  SPIWS   (0 = 3-wire mode, 1 = 2-wire mode)
+3  SPIGSEL (0 = group 0, 1 = group 1)
+2  SPIEDGE (if SPIIDST == 0 then 0 = falling edge, 1 = rising edge, if SPIIDST == 1 inverted)
+1  SPIDST  (0 = clock signal is 0 when idle, 1 = clock signal is 1 when idle)
+0  SPIEN   (0 = SPI disable, 1 = enable)
+*/
+
+uint8_t axc51base_cpu_device::spicon_r()
 {
+	uint8_t result = m_sfr_regs[SFR_SPICON] | 0x80;
+//	LOGMASKED(LOG_UNSORTED,"%s: sfr_read SFR_SPICON %02x\n", machine().describe_context(), result);
+	return result;
 }
 
-ax208_cpu_device::ax208_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ax208_cpu_device(mconfig, AX208, tag, owner, clock)
+/*
+
+SFR_UARTSTA (at 0xfc)
+
+7 UTRXNB      (9th bit of data of RX buffer)   
+6 FEF         (0 = stop bit was 1 in last frame,  1 = stop bit was 0)
+5 RXIF        (0 = receive not done, 1 = done)
+4 TXIF        (0 = transmit not done, 1 = done)
+3 ---
+2 ---
+1 ---
+0 PSEL        (UART port / pin select)
+
+*/
+
+uint8_t axc51base_cpu_device::uartsta_r()
 {
+	//uint8_t result = m_sfr_regs[SFR_UARTSTA];
+	uint8_t result = 0x30;
+	LOGMASKED(LOG_UNSORTED, "%s: sfr_read SFR_UARTSTA %02x\n", machine().describe_context(), result);
+	return result;
 }
 
 
-std::unique_ptr<util::disasm_interface> ax208_cpu_device::create_disassembler()
+void axc51base_cpu_device::spicon_w(uint8_t data)
 {
-	return std::make_unique<ax208_disassembler>();
+//	LOGMASKED(LOG_UNSORTED,"%s: sfr_write SFR_SPICON %02x\n", machine().describe_context(), data);
+	m_sfr_regs[SFR_SPICON] = data;
+	m_spi_out_dir_cb((data & 0x20) ? true : false);
 }
 
 
 
-
-offs_t ax208_cpu_device::external_ram_iaddr(offs_t offset, offs_t mem_mask)
+uint8_t axc51base_cpu_device::dpcon_r()
 {
-	if (mem_mask == 0x00ff)
-		return (offset & mem_mask);
-
-	return offset;
+	LOGMASKED(LOG_UNSORTED,"%s: sfr_read SFR_DPCON\n", machine().describe_context());
+	return m_sfr_regs[SFR_DPCON];
 }
 
-uint8_t ax208_cpu_device::spicon_r()
+uint8_t axc51base_cpu_device::spibuf_r()
 {
-	logerror("%s: sfr_read AXC51_SPICON\n", machine().describe_context());
-	return axc51base_cpu_device::sfr_read(AXC51_SPICON);
+	// TODO: encryption here (if enabled)
+	uint8_t ret = m_spi_in_cb();
+	if (m_sfr_regs[SFR_IE2CRPT] & 0x03)
+		ret = machine().rand();
+
+	return ret;
 }
 
-uint8_t ax208_cpu_device::dpcon_r()
+void axc51base_cpu_device::spibuf_w(uint8_t data)
 {
-	logerror("%s: sfr_read AXC51_DPCON\n", machine().describe_context());
-	return axc51base_cpu_device::sfr_read(AXC51_DPCON);
+	// TODO: encryption here (if enabled)
+	m_spi_out_cb(data);
 }
 
-uint8_t ax208_cpu_device::spibuf_r()
+void axc51base_cpu_device::spibaud_w(uint8_t data)
 {
-	// HACK while we figure things out
+	LOGMASKED(LOG_UNSORTED,"%s: sfr_write SFR_SPIBAUD %02x\n", machine().describe_context(), data);
+	m_sfr_regs[SFR_SPIBAUD] = data;
+}
 
-	if (state_int(AXC51_PC) == 0x8910)
+/*
+SFR_DPCON (at 0x86)
+
+7  IA   01 = vector base 0x4003, 10 = vector base 0x8003, 00/11 invalid
+6  IA
+5  DPID0  DPTR0 increase direction control, 0 = increase, 1 = decrease
+4  DPID1  DPTR1 increase direction control, 0 = increase, 1 = descrese
+3  DPAID  DPTR auto increase enable
+2  DPTSL  DPSEL auto-toggle enable (0 = no auto toggle, 1 = auto toggle)
+1  ---
+0  DPSEL  DPTR Select (0 = use DPTR0, 1 = use DPTR1)
+*/
+
+void axc51base_cpu_device::dpcon_w(uint8_t data)
+{
+	m_sfr_regs[SFR_DPCON] = data;
+}
+
+/*
+SFR_IE2CRPT (at 0x95)
+
+7  ----
+6  ----
+5  wdt_int_enable
+4  soft_int
+3  sd_do_crypt
+2  sd_di_crypt
+1  spi_do_crypt
+0  spi_di_crypt
+
+*/
+
+void axc51base_cpu_device::ie2crypt_w(uint8_t data)
+{
+	LOGMASKED(LOG_UNSORTED,"%s: sfr_write SFR_IE2CRPT %02x\n", machine().describe_context(), data);
+	m_sfr_regs[SFR_IE2CRPT] = data;
+
+	if (data & 0x03)
 	{
-		logerror("%s: sfr_read AXC51_SPIBUF (reading from %08x)\n", machine().describe_context(), m_spiaddr);
-
-		return m_spiptr[m_spiaddr++];
+		LOGMASKED(LOG_UNSORTED,"SPI encryption turned on!\n");
 	}
 
-	logerror("%s: sfr_read AXC51_SPIBUF\n", machine().describe_context());
-
-	return machine().rand();
-	//return axc51base_cpu_device::sfr_read(AXC51_SPIBUF);
+	if (data & 0x0c)
+	{
+		LOGMASKED(LOG_UNSORTED,"SD Card encryption turned on!\n");
+	}
 }
 
-uint8_t ax208_cpu_device::sfr_read(size_t offset)
+
+
+
+void axc51base_cpu_device::spidmaadr_w(uint8_t data)
 {
-	switch (offset)
+	m_sfr_regs[SFR_SPIDMAADR] = data;
+
+	m_spi_dma_addr <<= 8;
+	m_spi_dma_addr = (m_spi_dma_addr & 0xff00) | data;
+
+}
+
+void axc51base_cpu_device::spidmacnt_w(uint8_t data)
+{
+	m_sfr_regs[SFR_SPIDMACNT] = data;
+
+	if (((m_sfr_regs[SFR_SPICON]) & 0x20) == 0x20) // Read from SPI
 	{
-	case 0x82:
-	case 0x83:
-	case 0xe0: // ACC
-		return axc51base_cpu_device::sfr_read(offset);
-
-	case AXC51_DPCON: // 0x86
-		return dpcon_r();
-
-	case AXC51_IRTCON: // 0x9f
-		return machine().rand();
-
-	case AXC51_SPICON: // 0xd8
-		return spicon_r();
-
-	case AXC51_SPIBUF: // 0xd9
-		return spibuf_r();
+		for (int i = 0; i < (data + 1) * 2; i++)
+		{
+			spibuf_w(0x00); // clock
+			uint8_t romdat = spibuf_r();
+			m_io.write_byte(m_spi_dma_addr++, romdat); // is this the correct destination space?
+		}
+	}
+	else
+	{
+		for (int i = 0; i < (data + 1) * 2; i++)
+		{
+			uint8_t ramdat = m_io.read_byte(m_spi_dma_addr++);
+			spibuf_w(ramdat);
+		}
 
 	}
-	logerror("%s: sfr_read (%02x)\n", machine().describe_context(), offset);
-	return axc51base_cpu_device::sfr_read(offset);
-}
-
-void ax208_cpu_device::spicon_w(uint8_t data)
-{
-	logerror("%s: sfr_write AXC51_SPICON %02x\n", machine().describe_context(), data);
-	axc51base_cpu_device::sfr_write(AXC51_SPICON, data);
-}
-
-
-void ax208_cpu_device::spibuf_w(uint8_t data)
-{
-	logerror("%s: sfr_write AXC51_SPIBUF %02x\n", machine().describe_context(), data);
-	axc51base_cpu_device::sfr_write(AXC51_SPIBUF, data);
-}
-
-void ax208_cpu_device::spibaud_w(uint8_t data)
-{
-	logerror("%s: sfr_write AXC51_SPIBAUD %02x\n", machine().describe_context(), data);
-	axc51base_cpu_device::sfr_write(AXC51_SPIBAUD, data);
-}
-
-void ax208_cpu_device::dpcon_w(uint8_t data)
-{
-	logerror("%s: sfr_write AXC51_DPCON %02x\n", machine().describe_context(), data);
-	axc51base_cpu_device::sfr_write(AXC51_DPCON, data);
-}
-
-
-void ax208_cpu_device::spidmaadr_w(uint8_t data)
-{
-	logerror("%s: sfr_write AXC51_SPIDMAADR %02x\n", machine().describe_context(), data);
-	axc51base_cpu_device::sfr_write(AXC51_SPIDMAADR, data);
-}
-
-void ax208_cpu_device::spidmacnt_w(uint8_t data)
-{
-	logerror("%s: sfr_write AXC51_SPIDMACNT %02x\n", machine().describe_context(), data);
-	axc51base_cpu_device::sfr_write(AXC51_SPIDMACNT, data);
-}
-
-void ax208_cpu_device::sfr_write(size_t offset, uint8_t data)
-{
-	switch (offset)
-	{
-	case 0x82:
-	case 0x83:
-	case 0xe0:
-		axc51base_cpu_device::sfr_write(offset, data);
-		return;
-		
-
-	case AXC51_DPCON: dpcon_w(data); return; // 0x86
-
-	case AXC51_SPIDMAADR: spidmaadr_w(data); return; // 0xd6
-	case AXC51_SPIDMACNT: spidmacnt_w(data); return; // 0xd7
-	case AXC51_SPICON: spicon_w(data); return; // 0xd8
-	case AXC51_SPIBUF: spibuf_w(data); return; // 0xd9
-	case AXC51_SPIBAUD: spibaud_w(data); return; // 0xda
-
-	}
-
-	logerror("%s: sfr_write (%02x) %02x\n", machine().describe_context(), offset, data);
-	axc51base_cpu_device::sfr_write(offset, data);
 }
 
 ROM_START( ax208 ) // assume all production ax208 chips use this internal ROM
@@ -1226,10 +1540,29 @@ const tiny_rom_entry *ax208_cpu_device::device_rom_region() const
 void ax208_cpu_device::device_reset()
 {
 	axc51base_cpu_device::device_reset();
-	set_state_int(AXC51_PC, 0x8000);
-
-	m_spiaddr = 0;
+	set_state_int(SFR_STATEREG_PC, 0x8000);
 }
+
+
+// AX208 (specific CPU)
+
+ax208_cpu_device::ax208_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: axc51base_cpu_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(ax208_cpu_device::ax208_internal_program_mem), this), address_map_constructor(FUNC(ax208_cpu_device::data_internal), this), address_map_constructor(FUNC(axc51base_cpu_device::io_internal), this), 0, 8)
+{
+}
+
+ax208_cpu_device::ax208_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ax208_cpu_device(mconfig, AX208, tag, owner, clock)
+{
+}
+
+
+std::unique_ptr<util::disasm_interface> ax208_cpu_device::create_disassembler()
+{
+	return std::make_unique<ax208_disassembler>();
+}
+
+
 
 
 ax208p_cpu_device::ax208p_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

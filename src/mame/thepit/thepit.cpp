@@ -1030,7 +1030,6 @@ ROM_START( ttfitter )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "ttfitter.clr", 0x0000, 0x0020, CRC(a758b567) SHA1(d188c90dba10fe3abaae92488786b555b35218c5) ) // dlsh
-
 ROM_END
 
 ROM_START( intrepid )
@@ -1132,7 +1131,6 @@ ROM_START( intrepidb3)
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "82s123.ic4",      0x0000, 0x0020, CRC(aa1f7f5e) SHA1(311dd17aa11490a1173c76223e4ccccf8ea29850) )
 ROM_END
-
 
 ROM_START( zaryavos )
 	ROM_REGION( 0x10000, "maincpu", 0 )

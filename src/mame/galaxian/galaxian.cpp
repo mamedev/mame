@@ -745,7 +745,6 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "sound/sn76496.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -1781,22 +1780,22 @@ void galaxian_state::mandingarf_map(address_map &map)
 	map(0xc000, 0xc7ff).rom().region("maincpu", 0xc000); // extend ROM
 }
 
-void galaxian_state::bmxstunts_map(address_map &map) // seems to be the standard galaxian map with just 0x4000 subtracted from the offsets
+void bmxstunts_state::bmxstunts_map(address_map &map) // seems to be the standard galaxian map with just 0x4000 subtracted from the offsets
 {
 	map(0x0000, 0x03ff).mirror(0x0400).ram();
-	map(0x1000, 0x13ff).mirror(0x0400).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
-	map(0x1800, 0x18ff).mirror(0x0700).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x1000, 0x13ff).mirror(0x0400).ram().w(FUNC(bmxstunts_state::galaxian_videoram_w)).share("videoram");
+	map(0x1800, 0x18ff).mirror(0x0700).ram().w(FUNC(bmxstunts_state::galaxian_objram_w)).share("spriteram");
 	map(0x2000, 0x2000).mirror(0x07ff).portr("IN0");
-	map(0x2000, 0x2001).mirror(0x07f8).w(FUNC(galaxian_state::start_lamp_w));
-	map(0x2002, 0x2002).mirror(0x07f8).w(FUNC(galaxian_state::coin_lock_w));
-	map(0x2003, 0x2003).mirror(0x07f8).w(FUNC(galaxian_state::coin_count_0_w));
+	map(0x2000, 0x2001).mirror(0x07f8).w(FUNC(bmxstunts_state::start_lamp_w));
+	map(0x2002, 0x2002).mirror(0x07f8).w(FUNC(bmxstunts_state::coin_lock_w));
+	map(0x2003, 0x2003).mirror(0x07f8).w(FUNC(bmxstunts_state::coin_count_0_w));
 	map(0x2800, 0x2800).mirror(0x07ff).portr("IN1");
 	map(0x3000, 0x3000).mirror(0x07ff).portr("DSW1");
-	map(0x3001, 0x3001).mirror(0x07f8).w(FUNC(galaxian_state::irq_enable_w));
-	map(0x3006, 0x3006).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
-	map(0x3007, 0x3007).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0x3001, 0x3001).mirror(0x07f8).w(FUNC(bmxstunts_state::irq_enable_w));
+	map(0x3006, 0x3006).mirror(0x07f8).w(FUNC(bmxstunts_state::galaxian_flip_screen_x_w));
+	map(0x3007, 0x3007).mirror(0x07f8).w(FUNC(bmxstunts_state::galaxian_flip_screen_y_w));
 	map(0x3800, 0x3800).mirror(0x07ff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
-	map(0x8000, 0x8000).w("snsnd", FUNC(sn76489a_device::write)); // TODO: sounds really bad, check if hookup is a bit more complicated
+	map(0x8000, 0x8000).w(FUNC(bmxstunts_state::snsnd_w));
 	map(0xc000, 0xffff).rom().region("maincpu", 0);
 }
 
@@ -5606,27 +5605,31 @@ static INPUT_PORTS_START( bmxstunts )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 ) // also acts as button
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) // also acts as button
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // also acts as 1P start button
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // also acts as 2P start button
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_CONFSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START("DSW1") // only one 6-dip bank
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x00, "SW1:1")
 	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x00, "SW1:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x00, "SW1:3")
-	PORT_DIPNAME(          0x08, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(             0x08, "A 2/1  B 1/3" )
-	PORT_DIPSETTING(             0x00, "A 1/1  B 1/6" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, "A 2/1  B 1/3" )
+	PORT_DIPSETTING(    0x00, "A 1/1  B 1/6" )
 	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x00, "SW1:5")
 	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x00, "SW1:6")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -6626,15 +6629,18 @@ CUSTOM_INPUT_MEMBER(moonwar_state::dial_r)
 	// see http://www.cityofberwyn.com/schematics/stern/MoonWar_opto.tiff for schematic
 	// i.e. a 74ls161 counts from 0 to 15 which is the absolute number of bars passed on the quadrature
 
-	const int8_t dialread = int8_t(uint8_t(m_dials[m_port_select]->read()));
+	const uint8_t dialread = m_dials[m_port_select]->read();
+	const uint8_t lastread = m_last_dialread[m_port_select];
 
-	if (dialread < 0)
+	if (int8_t(dialread - lastread) < 0)
 		m_direction[m_port_select] = 0x00;
-	else if (dialread > 0)
+	else if (dialread != lastread)
 		m_direction[m_port_select] = 0x10;
 
-	m_counter_74ls161[m_port_select] += std::abs(dialread);
+	m_counter_74ls161[m_port_select] += std::abs(int8_t(dialread - lastread));
 	m_counter_74ls161[m_port_select] &= 0xf;
+
+	m_last_dialread[m_port_select] = dialread;
 
 	const uint8_t ret = m_counter_74ls161[m_port_select] | m_direction[m_port_select];
 	//logerror("dialread1: %02x, counter_74ls161: %02x, spinner ret is %02x\n", dialread, m_counter_74ls161[m_port_select], ret);
@@ -6680,11 +6686,11 @@ static INPUT_PORTS_START( moonwar )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P1_DIAL")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_REVERSE PORT_RESET PORT_CONDITION("IN2", 0x08, EQUALS, 0x08) // cocktail: dial is reversed
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_RESET PORT_CONDITION("IN2", 0x08, EQUALS, 0x00) // upright: dial works normally
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_REVERSE PORT_CONDITION("IN2", 0x08, EQUALS, 0x08) // cocktail: dial is reversed
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_CONDITION("IN2", 0x08, EQUALS, 0x00) // upright: dial works normally
 
 	PORT_START("P2_DIAL")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_RESET PORT_COCKTAIL PORT_REVERSE // cocktail: dial is reversed
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_COCKTAIL PORT_REVERSE // cocktail: dial is reversed
 INPUT_PORTS_END
 
 /* verified from Z80 code */
@@ -6699,10 +6705,10 @@ static INPUT_PORTS_START( moonwara )
 	PORT_DIPSETTING(    0x06, "A 1/4  B 2/1" )
 
 	PORT_MODIFY("P1_DIAL")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_RESET // both: p1 dial works normally, p2 dial is reversed, both share same port
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) // both: p1 dial works normally, p2 dial is reversed, both share same port
 
 	PORT_MODIFY("P2_DIAL")       /* doesn't actually work due to bug in game code */
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_RESET PORT_COCKTAIL
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_COCKTAIL
 INPUT_PORTS_END
 
 
@@ -7778,14 +7784,17 @@ void galaxian_state::bongo(machine_config &config)
 	m_ay8910[0]->add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
-void galaxian_state::bmxstunts(machine_config &config)
+void bmxstunts_state::bmxstunts(machine_config &config)
 {
 	galaxian_base(config);
 
-	M6502(config.replace(), m_maincpu, 3'072'000); // TODO: verify clock, actually 6502A
-	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::bmxstunts_map);
+	M6502(config.replace(), m_maincpu, 3'072'000 / 2); // Synertek 6502A, TODO: verify clock
+	m_maincpu->set_addrmap(AS_PROGRAM, &bmxstunts_state::bmxstunts_map);
 
-	SN76489A(config, "snsnd", 3'072'000).add_route(ALL_OUTPUTS, "speaker", 0.5); // TODO: verify clock, actually SN76489AN
+	set_irq_line(0);
+
+	SN76489A(config, m_snsnd, 3'072'000); // SN76489AN, TODO: verify clock
+	m_snsnd->add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 void galaxian_state::ckongg(machine_config &config)
@@ -8845,11 +8854,10 @@ void galaxian_state::init_victoryc()
 	decode_victoryc();
 }
 
-void galaxian_state::init_bmxstunts()
+void bmxstunts_state::init_bmxstunts()
 {
-	init_galaxian();
-
-	m_irq_line = 0;
+	common_init(nullptr, &galaxian_state::galaxian_draw_background, nullptr, nullptr);
+	m_extend_sprite_info_ptr = extend_sprite_info_delegate(&bmxstunts_state::bmxstunts_extend_sprite_info, this);
 }
 
 void galaxian_state::init_bigkonggx()
@@ -12305,9 +12313,26 @@ ROM_END
 
 
 /*
+
+Dumped by Andrew Welburn
+on the day of 18/07/10
+
+PCB is a bootleg Galaxian, with pin headers, probably
+of European origin. The signs and marking point to
+it being a Moon Cresta, but I'm not sure. Also it
+has a potted block in the CPU socket...
+
+I haven't dumped the gfx roms, lets see what the game
+actually is first, it might run with regular
+moon cresta gfx roms....
+
+(editor's note: yeah, it was actually BMX Stunts)
+
+=========================
+
 BMX Stunts by Jetsoft on Galaxian bootleg PCB.
 
-6502A CPU in epoxy block with one 6331 PROM (not dumped)
+6502A CPU in epoxy block with one 6331 PROM.
 One 74LS74 and one 74LS273 logic.
 One SN76489AN Digital Complex Sound Generator.
 There was a wire lead coming out of the epoxy and soldered
@@ -12334,62 +12359,29 @@ been cut between pins 9 and 10?
 Non working board. Powers up to screen full of graphics.
 
 chaneman 7/31/2022
+
 */
 
 ROM_START( bmxstunts )
-	ROM_REGION( 0x4000, "maincpu", 0 ) // 5 and 7 might be corrupted
-	ROM_LOAD16_WORD_SWAP( "bmx1.pr1", 0x0000, 0x0800, CRC(cf3061f1) SHA1(e229a2a09b56332359c3f87953acb07c4c7d3abb) )
-	ROM_LOAD16_WORD_SWAP( "bmx2.pr2", 0x0800, 0x0800, CRC(f145e09d) SHA1(8d3f379dbb5ec9304aa61d99cac003dfb8050485) )
-	ROM_LOAD16_WORD_SWAP( "bmx3.pr3", 0x1000, 0x0800, CRC(ea415c49) SHA1(eb55b4b24ef4e04f5c2873ad7fef2dce891cefef) )
-	ROM_LOAD16_WORD_SWAP( "bmx4.pr4", 0x1800, 0x0800, CRC(62bdd971) SHA1(864e787d66f6deb7fa545c475d4feb551e095bf2) )
-	ROM_LOAD16_WORD_SWAP( "bmx5.pr5", 0x2000, 0x0800, BAD_DUMP CRC(b7ae2316) SHA1(17aa542fe8d4f729758f8b21bc667bf756b481b5) )
-	ROM_LOAD16_WORD_SWAP( "bmx6.pr6", 0x2800, 0x0800, CRC(ba9b1a69) SHA1(b17964b31435809ce174f2680f7b463658794220) )
-	ROM_LOAD16_WORD_SWAP( "bmx7.pr7", 0x3000, 0x0800, BAD_DUMP CRC(32636839) SHA1(6371c929b7b3a819dad70b672bc3ca5c3c5c9ced) )
-	ROM_LOAD16_WORD_SWAP( "bmx8.pr8", 0x3800, 0x0800, CRC(fe1052ee) SHA1(f8bcaaecc3dfd10c70cbd9a49b778232ba9e697b) )
-
-	ROM_REGION( 0x2000, "gfx1", 0 ) // possibly slightly corrupted (see tile viewer), plus 1h is probably a bad dump (bikes aren't found anywhere)
-	ROM_LOAD( "bmxh.1h", 0x0000, 0x1000, CRC(b049f648) SHA1(06c5a8b15f876cb6e4798cb5f8b1351cc6c12877) ) // 1ST AND 2ND HALF IDENTICAL
-	ROM_LOAD( "bmxl.1l", 0x1000, 0x1000, CRC(a0f44f47) SHA1(b9d40ff82bb90125f0d9ad2d9590ddd7cc600805) )
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "bmx6331.6l", 0x0000, 0x0020, CRC(ce3e9306) SHA1(62dc5208eea2d3126e61cc7af30e71a9e60d438c) )
-
-	ROM_REGION( 0x0020, "epoxy_block_prom", 0 ) // maybe related to address lines scramble?
-	ROM_LOAD( "6331", 0x0000, 0x0020, NO_DUMP )
-ROM_END
-
-
-/*
-Dumped by Andrew Welburn
-on the day of 18/07/10
-
-
-PCB is a bootleg Galaxian, with pin headers, probably
-of European origin. The signs and marking point to
-it being a Moon Cresta, but I'm note sure. Also it
-has a potted block in the CPU socket...
-*/
-
-ROM_START( bmxstuntsa )
-	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_REGION( 0x4000, "maincpu", 0 ) // A0 inverted, hence the weird ROM load macro
 	ROM_LOAD16_WORD_SWAP( "b-mx.1", 0x0000, 0x0800, CRC(cf3061f1) SHA1(e229a2a09b56332359c3f87953acb07c4c7d3abb) )
 	ROM_LOAD16_WORD_SWAP( "b-mx.2", 0x0800, 0x0800, CRC(f145e09d) SHA1(8d3f379dbb5ec9304aa61d99cac003dfb8050485) )
 	ROM_LOAD16_WORD_SWAP( "b-mx.3", 0x1000, 0x0800, CRC(ea415c49) SHA1(eb55b4b24ef4e04f5c2873ad7fef2dce891cefef) )
 	ROM_LOAD16_WORD_SWAP( "b-mx.4", 0x1800, 0x0800, CRC(62bdd971) SHA1(864e787d66f6deb7fa545c475d4feb551e095bf2) )
-	ROM_LOAD16_WORD_SWAP( "b-mx.5", 0x2000, 0x0800, CRC(9fa3d4e3) SHA1(61973d99d68790e36112bdaa893fb9406f8d46ca) ) // bmx5.pr5  51.074219%
+	ROM_LOAD16_WORD_SWAP( "b-mx.5", 0x2000, 0x0800, CRC(9fa3d4e3) SHA1(61973d99d68790e36112bdaa893fb9406f8d46ca) )
 	ROM_LOAD16_WORD_SWAP( "b-mx.6", 0x2800, 0x0800, CRC(ba9b1a69) SHA1(b17964b31435809ce174f2680f7b463658794220) )
-	ROM_LOAD16_WORD_SWAP( "b-mx.7", 0x3000, 0x0800, CRC(fa34441a) SHA1(f1591ef81c4fc9c3cd1b9eb96d945d53051a3ea7) ) // bmx7.pr7  58.740234%
-	ROM_LOAD16_WORD_SWAP( "b-mx.8", 0x3800, 0x0800, CRC(8bc26d4d) SHA1(c01be14d7cd402a524b61bd845c1ae6b09967bfa) ) // bmx8.pr8  99.267578%
+	ROM_LOAD16_WORD_SWAP( "b-mx.7", 0x3000, 0x0800, CRC(fa34441a) SHA1(f1591ef81c4fc9c3cd1b9eb96d945d53051a3ea7) )
+	ROM_LOAD16_WORD_SWAP( "b-mx.8", 0x3800, 0x0800, CRC(8bc26d4d) SHA1(c01be14d7cd402a524b61bd845c1ae6b09967bfa) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 ) // not dumped for this set, taken from above
-	ROM_LOAD( "bmxh.1h", 0x0000, 0x1000, BAD_DUMP CRC(b049f648) SHA1(06c5a8b15f876cb6e4798cb5f8b1351cc6c12877) ) // 1ST AND 2ND HALF IDENTICAL
-	ROM_LOAD( "bmxl.1l", 0x1000, 0x1000, BAD_DUMP CRC(a0f44f47) SHA1(b9d40ff82bb90125f0d9ad2d9590ddd7cc600805) )
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "bmxh.1h", 0x0000, 0x1000, CRC(b6d28b39) SHA1(3f9a9a182764a57af80d91640d7d2cece1f25af2) )
+	ROM_LOAD( "bmxl.1l", 0x1000, 0x1000, BAD_DUMP CRC(d221f0aa) SHA1(38fc2892214c8611924ca7726c50055c520b87c5) ) // dying EPROM, combination of several dump attempts, still has bad pixels
 
-	ROM_REGION( 0x0020, "proms", 0 ) // not dumped for this set, taken from above
-	ROM_LOAD( "bmx6331.6l", 0x0000, 0x0020, BAD_DUMP CRC(ce3e9306) SHA1(62dc5208eea2d3126e61cc7af30e71a9e60d438c) )
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "bmx6331.6l", 0x0000, 0x0020, CRC(ce3e9306) SHA1(62dc5208eea2d3126e61cc7af30e71a9e60d438c) )
 
-	ROM_REGION( 0x0020, "epoxy_block_prom", 0 ) // maybe related to address lines scramble?
-	ROM_LOAD( "6331", 0x0000, 0x0020, NO_DUMP )
+	ROM_REGION( 0x0020, "epoxy_block_prom", 0 )
+	ROM_LOAD( "6331", 0x0000, 0x0020, CRC(13a9bc62) SHA1(1c4e4fab051e313e38eb77f1872845efe2e4e04f) )
 ROM_END
 
 
@@ -16025,10 +16017,8 @@ GAME( 1982, highroll,    0,        highroll,   highroll,   galaxian_state, init_
 GAME( 1982, guttangt,    locomotn, guttangt,   guttangt,   guttangt_state, init_guttangt,   ROT90,  "bootleg (Recreativos Franco?)",   "Guttang Gottong (bootleg on Galaxian hardware)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // or by 'Tren' ?
 GAME( 1982, guttangts3,  locomotn, guttangts3, guttangt,   guttangt_state, init_guttangts3, ROT90,  "bootleg (Sede 3)",                "Guttang Gottong (Sede 3 bootleg on Galaxian hardware)", MACHINE_SUPPORTS_SAVE ) // still has Konami copyright on screen
 
-
 // Basic hardware with epoxy block containing a 6502A, SN76489AN, PROM and logic
-GAME( 1985, bmxstunts,  0,         bmxstunts, bmxstunts,   galaxian_state, init_bmxstunts,  ROT90,  "Jetsoft",                         "BMX Stunts (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // not working due to bad program ROMs
-GAME( 1985, bmxstuntsa, bmxstunts, bmxstunts, bmxstunts,   galaxian_state, init_bmxstunts,  ROT90,  "Jetsoft",                         "BMX Stunts (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // could be considered working if not for bad GFX and sound
+GAME( 1985, bmxstunts,   0,        bmxstunts,  bmxstunts,  bmxstunts_state,init_bmxstunts,  ROT90,  "Jetsoft", "BMX Stunts", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 // Basic hardware + extra RAM
 GAME( 1982, victoryc,    0,        victoryc,   victoryc,   galaxian_state, init_victoryc,   ROT270, "Comsoft", "Victory (Comsoft)",           MACHINE_SUPPORTS_SAVE )
@@ -16100,8 +16090,8 @@ GAME( 1982, zigzagb2,    zigzagb,  zigzag,     zigzag,     zigzagb_state,  init_
 GAME( 1981, gmgalax,     0,        gmgalax,    gmgalax,    gmgalax_state,  init_gmgalax,    ROT90,  "bootleg", "Ghostmuncher Galaxian (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 // Multigames
-GAME( 2002, fourplay,    0,        fourplay,   galaxian,   fourplay_state, init_fourplay,   ROT90, "Macro", "Four Play",   MACHINE_SUPPORTS_SAVE )
-GAME( 2001, videight,    0,        videight,   warofbug,   videight_state, init_videight,   ROT90, "Macro", "Video Eight", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, fourplay,    0,        fourplay,   galaxian,   fourplay_state, init_fourplay,   ROT90,  "Macro", "Four Play",   MACHINE_SUPPORTS_SAVE )
+GAME( 2001, videight,    0,        videight,   warofbug,   videight_state, init_videight,   ROT90,  "Macro", "Video Eight", MACHINE_SUPPORTS_SAVE )
 
 
 /*************************************

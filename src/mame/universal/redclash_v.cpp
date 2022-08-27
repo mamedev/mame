@@ -85,10 +85,10 @@ void redclash_state::palette(palette_device &palette) const
 	{
 		uint8_t ctabentry;
 
-		ctabentry = bitswap<4>((color_prom[i] >> 0) & 0x0f, 0,1,2,3);
+		ctabentry = bitswap<4>(color_prom[i], 0,1,2,3);
 		palette.set_pen_indirect(i + 0x20, ctabentry);
 
-		ctabentry = bitswap<4>((color_prom[i] >> 4) & 0x0f, 0,1,2,3);
+		ctabentry = bitswap<4>(color_prom[i], 4,5,6,7);
 		palette.set_pen_indirect(i + 0x40, ctabentry);
 	}
 
@@ -152,10 +152,9 @@ void redclash_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 			if (m_spriteram[offs + i] & 0x80)
 			{
-				int color = m_spriteram[offs + i + 2] & 0x0f;
+				int color = bitswap<4>(m_spriteram[offs + i + 2], 5,2,1,0);
 				int sx = m_spriteram[offs + i + 3];
 				int sy = offs / 4 + (m_spriteram[offs + i] & 0x07);
-
 
 				switch ((m_spriteram[offs + i] & 0x18) >> 3)
 				{
@@ -222,7 +221,6 @@ void redclash_state::draw_bullets( bitmap_ind16 &bitmap, const rectangle &clipre
 {
 	for (int offs = 0; offs < 0x20; offs++)
 	{
-//      sx = m_videoramoffs];
 		int sx = 8 * offs + (m_videoram[offs] & 0x07);   /* ?? */
 		int sy = 0xff - m_videoram[offs + 0x20];
 

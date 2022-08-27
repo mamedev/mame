@@ -64,6 +64,10 @@
 
 #include "imagedev/cartrom.h"
 
+#include <cassert>
+#include <string>
+#include <utility>
+
 
 //**************************************************************************
 //  FORWARD DECLARATIONS
@@ -140,13 +144,13 @@ public:
 protected:
 	device_vboy_cart_interface(machine_config const &mconfig, device_t &device);
 
-	bool has_slot() const { return nullptr != m_slot; }
-	address_space *exp_space() { return m_slot ? m_slot->m_exp_space.target() : nullptr; }
-	address_space *chip_space() { return m_slot ? m_slot->m_chip_space.target() : nullptr; }
-	address_space *rom_space() { return m_slot ? m_slot->m_rom_space.target() : nullptr; }
-	offs_t exp_base() { return m_slot ? m_slot->m_exp_base : 0U; }
-	offs_t chip_base() { return m_slot ? m_slot->m_chip_base : 0U; }
-	offs_t rom_base() { return m_slot ? m_slot->m_rom_base : 0U; }
+	bool has_slot() const noexcept { return nullptr != m_slot; }
+	address_space *exp_space() noexcept { return m_slot ? m_slot->m_exp_space.target() : nullptr; }
+	address_space *chip_space() noexcept { return m_slot ? m_slot->m_chip_space.target() : nullptr; }
+	address_space *rom_space() noexcept { return m_slot ? m_slot->m_rom_space.target() : nullptr; }
+	offs_t exp_base() noexcept { return m_slot ? m_slot->m_exp_base : 0U; }
+	offs_t chip_base() noexcept { return m_slot ? m_slot->m_chip_base : 0U; }
+	offs_t rom_base() noexcept { return m_slot ? m_slot->m_rom_base : 0U; }
 
 	void battery_load(void *buffer, int length, int fill) { assert(m_slot); m_slot->battery_load(buffer, length, fill); }
 	void battery_load(void *buffer, int length, void *def_buffer) { assert(m_slot); m_slot->battery_load(buffer, length, def_buffer); }

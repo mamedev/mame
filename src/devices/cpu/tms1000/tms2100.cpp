@@ -256,6 +256,7 @@ void tms2100_cpu_device::interrupt()
 
 	// insert CALL to 0
 	m_opcode = 0xc0;
+	m_c4 = 0;
 	m_fixed = m_fixed_decode[m_opcode];
 	m_micro = m_micro_decode[m_opcode];
 

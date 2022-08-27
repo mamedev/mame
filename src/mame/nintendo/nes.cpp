@@ -398,7 +398,7 @@ CONS( 198?, m82p,     nes,     0,      nespal,   nes,     nes_state, empty_init,
 
 // Famicom hardware
 CONS( 1983, famicom,  0,       nes,    famicom,  famicom, nes_state, init_famicom, "Nintendo",      "Famicom",                         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-CONS( 1983, famitvc1, famicom, 0,      famitvc1, famicom, nes_state, init_famicom, "Sharp",         "My Computer Terebi C1",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+CONS( 1983, famitvc1, famicom, 0,      famitvc1, famicom, nes_state, init_famicom, "Sharp",         "My Computer Terebi C1",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // working but for unimplemented save/load in builtin cartridge, which causes system to hang
 CONS( 1986, fds,      famicom, 0,      fds,      famicom, nes_state, init_famicom, "Nintendo",      "Famicom (w/ Disk System add-on)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 CONS( 1986, famitwin, famicom, 0,      famitwin, famicom, nes_state, init_famicom, "Sharp",         "Famicom Twin",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 

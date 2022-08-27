@@ -26310,6 +26310,24 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="narcp" cloneof="narc">
+		<description>NARC (USA, CES sample, prototype)</description>
+		<year>1990</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="axrom" />
+			<!-- It is on an AOROM board but has an attached stripboard with a 74LS02 that makes this akin to ANROM (no bus conflicts) -->
+			<feature name="pcb_model" value="NES-AOROM-01" />
+			<feature name="bus_conflict" value="no" />
+			<dataarea name="prg" size="131072">
+				<rom name="narc.prg" size="131072" crc="4e392514" sha1="d5abf4766b1f3b407993f0e7b91c3be4c95267ba" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nesgolfu" cloneof="nesgolf">
 		<description>NES Open Tournament Golf (USA)</description>
 		<year>1991</year>
@@ -33966,7 +33984,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="shinsend">
+<!-- Game crashes due to incorrect emulation of MMC1 reset writes. This happens when you select みる in the in-game command menu. -->
+	<software name="shinsend" supported="no">
 		<description>Shinsenden (Japan)</description>
 		<year>1989</year>
 		<publisher>Irem</publisher>
@@ -44252,6 +44271,24 @@ license:CC0
 	</software>
 
 <!-- Non game cartridges -->
+
+	<software name="ctrltest">
+		<description>Controller Test Program (Japan)</description>
+		<year>198?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb_model" value="HVC-NROM-03" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="32768">
+				<rom name="0.prg" size="16384" crc="18380c6f" sha1="817e92b73312c2d9cc791414a70100025e0640c1" status="baddump" /> <!-- From a 16K EPROM. Data is 8K mirrored twice. Is this correct? -->
+				<rom size="16384" offset="0x4000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="0.chr" size="8192" crc="8fc61c7d" sha1="885c1d58baa5dea208e6b98525637a0071570e20" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="ggenie">
 		<description>Game Genie (USA, v1.5 &amp; v1.5A)</description>

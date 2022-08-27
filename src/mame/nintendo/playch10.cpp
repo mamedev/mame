@@ -428,7 +428,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	void pc10_set_videorom_bank(int first, int count, int bank, int size);
-	void set_videoram_bank(int first, int count, int bank, int size);
+	void pc10_set_videoram_bank(int first, int count, int bank, int size);
 	void gboard_scanline_cb(int scanline, bool vblank, bool blanked);
 	DECLARE_WRITE_LINE_MEMBER(int_detect_w);
 	void mapper9_latch(offs_t offset);
@@ -486,8 +486,11 @@ private:
 	u8* m_vrom = nullptr;
 	std::unique_ptr<u8[]> m_vram;
 	chr_bank m_chr_page[8];
-	int m_mmc1_shiftreg = 0;
-	int m_mmc1_shiftcount = 0;
+	u8 m_mmc1_shiftreg = 0;
+	u8 m_mmc1_shiftcount = 0;
+	u8 m_mmc1_prg16k = 0;
+	u8 m_mmc1_chr4k = 0;
+	u8 m_mmc1_switchlow = 0;
 	int m_gboard_banks[2]{};
 	int m_gboard_command = 0;
 	int m_IRQ_count = 0;
@@ -712,7 +715,7 @@ void playch10_state::machine_start()
 			m_nt_page[i]->configure_entries(0, 2, m_nt_ram.get(), 0x400);
 
 	if (m_vram)
-		set_videoram_bank(0, 8, 0, 8);
+		pc10_set_videoram_bank(0, 8, 0, 8);
 	else
 		pc10_set_videorom_bank(0, 8, 0, 8);
 }
@@ -945,7 +948,7 @@ void playch10_state::pc10_set_videorom_bank(int first, int count, int bank, int 
 	}
 }
 
-void playch10_state::set_videoram_bank(int first, int count, int bank, int size)
+void playch10_state::pc10_set_videoram_bank(int first, int count, int bank, int size)
 {
 	// first = first bank to map
 	// count = number of 1K banks to map
@@ -1056,16 +1059,12 @@ void playch10_state::prg8(int slot, int bank)
 
 void playch10_state::mmc1_rom_switch_w(offs_t offset, u8 data)
 {
-	static int size16k, switchlow, vrom4k;
-
 	// reset mapper
 	if (data & 0x80)
 	{
-		m_mmc1_shiftreg = m_mmc1_shiftcount = 0;
-
-		size16k = 1;
-		switchlow = 1;
-		vrom4k = 0;
+		m_mmc1_shiftcount = 0;
+		m_mmc1_prg16k = 1;
+		m_mmc1_switchlow = 1;
 
 		return;
 	}
@@ -1088,32 +1087,40 @@ void playch10_state::mmc1_rom_switch_w(offs_t offset, u8 data)
 
 				pc10_set_mirroring(mirr[m_mmc1_shiftreg & 0x03]);
 
-				vrom4k = m_mmc1_shiftreg & 0x10;
-				size16k = m_mmc1_shiftreg & 0x08;
-				switchlow = m_mmc1_shiftreg & 0x04;
+				m_mmc1_chr4k = m_mmc1_shiftreg & 0x10;
+				m_mmc1_prg16k = m_mmc1_shiftreg & 0x08;
+				m_mmc1_switchlow = m_mmc1_shiftreg & 0x04;
 				break;
 			}
 
-			case 1: // video rom banking - bank 0 - 4k or 8k
+			case 1: // video banking - bank 0 - 4k or 8k
 				if (m_vram)
-					set_videoram_bank(0, (vrom4k) ? 4 : 8, m_mmc1_shiftreg & 0x1f, 4);
+				{
+					if (m_mmc1_chr4k)
+						pc10_set_videoram_bank(0, 4, m_mmc1_shiftreg, 4);
+					else
+						pc10_set_videoram_bank(0, 8, m_mmc1_shiftreg & ~1, 4);
+				}
 				else
-					pc10_set_videorom_bank(0, (vrom4k) ? 4 : 8, m_mmc1_shiftreg & 0x1f, 4);
+					if (m_mmc1_chr4k)
+						pc10_set_videorom_bank(0, 4, m_mmc1_shiftreg, 4);
+					else
+						pc10_set_videorom_bank(0, 8, m_mmc1_shiftreg & ~1, 4);
 				break;
 
-			case 2: // video rom banking - bank 1 - 4k only
-				if (vrom4k)
+			case 2: // video banking - bank 1 - 4k only
+				if (m_mmc1_chr4k)
 				{
 					if (m_vram)
-						set_videoram_bank(0, (vrom4k) ? 4 : 8, m_mmc1_shiftreg & 0x1f, 4);
+						pc10_set_videoram_bank(4, 4, m_mmc1_shiftreg, 4);
 					else
-						pc10_set_videorom_bank(4, 4, m_mmc1_shiftreg & 0x1f, 4);
+						pc10_set_videorom_bank(4, 4, m_mmc1_shiftreg, 4);
 				}
 				break;
 
 			case 3: // program banking
-				if (size16k)
-					prg16(!switchlow, m_mmc1_shiftreg);
+				if (m_mmc1_prg16k)
+					prg16(!m_mmc1_switchlow, m_mmc1_shiftreg);
 				else
 					prg32(m_mmc1_shiftreg >> 1);
 				break;
@@ -1411,7 +1418,7 @@ void playch10_state::hboard_rom_switch_w(offs_t offset, u8 data)
 					data &= 0xfe;
 					page ^= (cmd << 1);
 					if (data & 0x40)
-						set_videoram_bank(page, 2, data, 1);
+						pc10_set_videoram_bank(page, 2, data, 1);
 					else
 						pc10_set_videorom_bank(page, 2, data, 1);
 					return;
@@ -1422,7 +1429,7 @@ void playch10_state::hboard_rom_switch_w(offs_t offset, u8 data)
 				case 5: // char banking
 					page ^= cmd + 2;
 					if (data & 0x40)
-						set_videoram_bank(page, 1, data, 1);
+						pc10_set_videoram_bank(page, 1, data, 1);
 					else
 						pc10_set_videorom_bank(page, 1, data, 1);
 					return;

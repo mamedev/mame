@@ -105,7 +105,7 @@ void ds1207_device::nvram_default()
 	m_device_state = 0;
 
 	int expected_bytes = sizeof(m_unique_pattern) + sizeof(m_identification) + sizeof(m_security_match) + sizeof(m_secure_memory)
-	                     + sizeof(m_days_left) + sizeof(m_start_time) + sizeof(m_device_state);;
+	                     + sizeof(m_days_left) + sizeof(m_start_time) + sizeof(m_device_state);
 
 	if(!m_region.found())
 	{

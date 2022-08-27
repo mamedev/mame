@@ -2432,7 +2432,7 @@ ROM_START( alexkidd1 )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
 	ROM_LOAD( "317-0021.key", 0x0000, 0x2000, BAD_DUMP CRC(504388a3) SHA1(20625e9e99c08a28b253676cc843ae5228ec9d5b) )
-	ROM_END
+ROM_END
 
 
 //*************************************************************************************************************************
