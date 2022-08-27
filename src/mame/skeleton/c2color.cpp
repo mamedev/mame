@@ -21,8 +21,8 @@
 
     TODO:
     identify CPU type - It's an i8051 derived CPU, and seems to be "Mars Semiconductor Corp" related, there is a MARS-PCCAM string
-	                    amongst other things, this is a known USB identifier for the "Discovery Kids Digital Camera"
-						Possibly a MR97327B, which is listed as RISC-51 in places, but little information can be found in English
+                        amongst other things, this is a known USB identifier for the "Discovery Kids Digital Camera"
+                        Possibly a MR97327B, which is listed as RISC-51 in places, but little information can be found in English
 
 
 *******************************************************************************/
@@ -174,7 +174,7 @@ ROM_START( c2color )
 	//
 	// A large number of graphics, which are assumed to be JPEG compressed are indexed
 	// by the MRDB tables, no sound effects or non-graphical resources have been
-	// identified	
+	// identified
 
 	ROM_REGION( 0x400000, "spi2", ROMREGION_ERASEFF )
 	ROM_LOAD( "spi.u16", 0x000000, 0x400000, CRC(9101b02a) SHA1(8c31e7641f4667bd8d5d7cc991cd5976828a0628) )

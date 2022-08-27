@@ -80,7 +80,7 @@ public:
 		m_cart(*this, "cartslot"),
 		m_maincpu(*this, "maincpu"),
 		m_musicmcu(*this, "musicmcu"),
-		m_musicrom(*this, "musicmcu"),	
+		m_musicrom(*this, "musicmcu"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_dac(*this, "dac"),
@@ -224,7 +224,7 @@ void monon_color_state::machine_reset()
 	m_bufpos_y = 239;
 
 	std::fill(std::begin(m_storeregs), std::end(m_storeregs), 0);
-	std::fill(std::begin(m_linebuf), std::end(m_linebuf), 0);	
+	std::fill(std::begin(m_linebuf), std::end(m_linebuf), 0);
 	std::fill(std::begin(m_vidbuffer), std::end(m_vidbuffer), 0);
 
 	m_music_direction_iswrite = true;
@@ -372,12 +372,12 @@ static INPUT_PORTS_START( monon_color )
 INPUT_PORTS_END
 
 /*
-	muxselect = p1 & 0x18;
+    muxselect = p1 & 0x18;
 
-	0x30 input bits in p0
-	0x04 input bits in p2
+    0x30 input bits in p0
+    0x04 input bits in p2
 
-	0x04 in port 4 combine inputs?
+    0x04 in port 4 combine inputs?
 */
 
 uint8_t monon_color_state::read_current_inputs()
@@ -632,7 +632,7 @@ void monon_color_state::out2_w(uint8_t data)
 		{
 			// sends m_out2data & 0x02 to external device / latches a read bit into m_out2data & 0x80
 			//logerror("%s: send / receive music MCU, bit written %d\n", machine().describe_context(), (data & 0x02) >> 1);
-			get_music_command_bit((data & 0x02) >> 1); 
+			get_music_command_bit((data & 0x02) >> 1);
 		}
 	}
 
@@ -700,7 +700,7 @@ void monon_color_state::do_draw_inner(int pal_to_use, int start, int step, int p
 					else
 					{
 						m_linebuf[real_ypos] = rgb;
-						
+
 					}
 				}
 			}
@@ -716,15 +716,15 @@ void monon_color_state::do_draw(int amount, int pal_to_use)
 	}
 	else if (m_storeregs[0x12] == 0x12) // 4bpp mode
 	{
-		do_draw_inner(pal_to_use, 4, 4, 0xf, amount);	
+		do_draw_inner(pal_to_use, 4, 4, 0xf, amount);
 	}
 	else if (m_storeregs[0x12] == 0x11) // 2bpp mode
 	{
-		do_draw_inner(pal_to_use, 6, 2, 0x3, amount);	
+		do_draw_inner(pal_to_use, 6, 2, 0x3, amount);
 	}
 	else if (m_storeregs[0x12] == 0x10)  // 1bpp mode
 	{
-		do_draw_inner(pal_to_use, 7, 1, 1, amount);	
+		do_draw_inner(pal_to_use, 7, 1, 1, amount);
 	}
 
 	m_bufpos_y = 239;
@@ -741,7 +741,7 @@ void monon_color_state::do_palette(int amount, int pal_to_use)
 		m_curpal[address] = romdat;
 		int entry = address / 3;
 
-		m_palette->set_pen_color(entry, rgb_t(m_curpal[(entry * 3) + 2], m_curpal[(entry * 3) + 1],	m_curpal[(entry * 3) + 0]));
+		m_palette->set_pen_color(entry, rgb_t(m_curpal[(entry * 3) + 2], m_curpal[(entry * 3) + 1], m_curpal[(entry * 3) + 0]));
 	}
 }
 
@@ -795,8 +795,8 @@ void monon_color_state::write_to_video_device(uint8_t data)
 				m_storeregs[m_out0data] = data;
 		}
 
-		//	popmessage("%02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x | %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n", m_storeregs[0x00], m_storeregs[0x01], m_storeregs[0x02], m_storeregs[0x03], m_storeregs[0x04], m_storeregs[0x05], m_storeregs[0x06], m_storeregs[0x07], m_storeregs[0x08], m_storeregs[0x09], m_storeregs[0x0a], m_storeregs[0x0b], m_storeregs[0x0c], m_storeregs[0x0d], m_storeregs[0x0e], m_storeregs[0x0f],
-		//		m_storeregs[0x10], m_storeregs[0x11], m_storeregs[0x12], m_storeregs[0x13], m_storeregs[0x14], m_storeregs[0x15], m_storeregs[0x16], m_storeregs[0x17], m_storeregs[0x18], m_storeregs[0x19], m_storeregs[0x1a], m_storeregs[0x1b], m_storeregs[0x1c], m_storeregs[0x1d], m_storeregs[0x1e], m_storeregs[0x1f]);
+		//  popmessage("%02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x | %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n", m_storeregs[0x00], m_storeregs[0x01], m_storeregs[0x02], m_storeregs[0x03], m_storeregs[0x04], m_storeregs[0x05], m_storeregs[0x06], m_storeregs[0x07], m_storeregs[0x08], m_storeregs[0x09], m_storeregs[0x0a], m_storeregs[0x0b], m_storeregs[0x0c], m_storeregs[0x0d], m_storeregs[0x0e], m_storeregs[0x0f],
+		//      m_storeregs[0x10], m_storeregs[0x11], m_storeregs[0x12], m_storeregs[0x13], m_storeregs[0x14], m_storeregs[0x15], m_storeregs[0x16], m_storeregs[0x17], m_storeregs[0x18], m_storeregs[0x19], m_storeregs[0x1a], m_storeregs[0x1b], m_storeregs[0x1c], m_storeregs[0x1d], m_storeregs[0x1e], m_storeregs[0x1f]);
 
 	}
 	else if (m_out4data == 0x09)
@@ -960,7 +960,7 @@ void monon_color_state::monon_color(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.500); // should this be in the AX208 device?
-	
+
 	mononcol_cartslot_device &cartslot(MONONCOL_CARTSLOT(config, "cartslot", mononcol_plain_slot));
 	cartslot.set_must_be_loaded(true);
 
