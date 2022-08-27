@@ -68,23 +68,89 @@
  F100 - ????  CDS disk 0 controller
  F300 - ????  CDS disk 1 controller
 
-The supplied flex and uniflex floppies all worked when this driver was
-created (2014-03-25), but have been broken since sometime in 2015.
+** Notes on use of MAME with common disk images **
 
-The message is the same for all 3 disks: Unable to identify the image format.
+MAME emulates the floppy disk controller more thoroughly than some other common
+emulators for these systems. Other common emulators can ignore the disk density
+and disk side driven by the software. FLEX numbers sectors contiguously from one
+side to the other, so a simple emulator need only map the track and sector
+numbers. Real disk images often mix single and double density formats, e.g.
+single density for the first track, and the software may not have been updated
+to correctly drive the side and density outputs, so disks for these other
+emulators might not work in MAME. These disk images and their softare need to be
+updated - this is not working around limitations of MAME, these would not be
+expected to work on real hardware either.
 
-Official notes:
-mess swtpc09 -flop1 DMAF2_BOOT.dsk
-press D to boot flex operating system. dir 0 will perform a directory of drive 0.
+However the disk controllers used by MAME have some options that can help with
+this transition, help get these disk images running as-is. The disk density
+selection can be overridden. The disk side selection can be overridden for a
+given number of FLEX sectors per side and this can be done separately for
+track 0 and side 0.
 
-mess swtpc09u -flop1 uflxbtsd.dsk
-type D to boot uniflex. This is a multiuser operating system, I need to add an extra terminal to this
-and then it would be cool to get it running multiuser.
+The FDC clock speed needs to be appropriate for the disk drives and format. The
+historical controllers typically hard wired a clock rate, and the historical
+software was not written to drive clock selection as available in some later
+controllers. The CPU clock may also need to be adjusted for some combinations,
+to meet the timing requirements.
 
-mess swtpc09d3 -window -flop1 UOS_3S_BOOT.dsk
-type D to boot uniflex. This one has potential to get harddisk support for uniflex in the future.
+The boot ROM many also need patching to boot a double density rather than
+single density format disk, and this emulator has an opion to patch the ROM
+for this.
 
-mess swtpc09i  not working
+Examples:
+
+mame swtpc09 -fdc:0 35hd -flop1 DMAF2_BOOT.dsk
+Options:
+ DMAF2/3 FDC clock: 2.0MHz
+ DMAF2/3 expected density: double density
+ DMAF2/3 FLEX expected sectors per side: 36
+Type D to boot FLEX operating system.
+
+mame swtpc09u -flop1 uflxbtsd.dsk
+Options (untested, but the DMAF2 is tested with FLEX):
+ DMAF2/3 FDC clock: 2.0MHz
+ DMAF2/3 expected density: double density
+Type D to boot UniFLEX.
+
+mame swtpc09d3 -hard1 wd0.chd -hard2 wd1.chd -fdc:0 8dsdd -flop1 UOS_3S_BOOT.mfi
+Where the disks are prepared:
+ chdman createhd -o wd0.chd -i wd0.dsk -chs 306,6,17 -s 512
+ chdman createhd -o wd1.chd -i wd1.dsk -chs 306,6,17 -s 512
+ floptool flopconvert uniflex mfi UOS_3S_BOOT.DSK UOS_3S_BOOT.mfi
+Options:
+ DMAF2/3 FDC clock: 2.0MHz
+ DMAF2/3 expected density: double density
+Type D to boot UniFLEX from the floppy disk, or W to boot from the hard disk.
+
+mame swtpc09i -io1:dc5:fdc:0 35hd -flop1 FLEX292F.dsk
+Options:
+ DC5 Control register bit 7: Erroneous side select
+ DC5 FDC clock: 2.0MHz
+ DC5 Expected density: double density
+ DC5 FLEX expected sectors per side: 36
+ CPU clock: 4MHz
+Type U to boot into FLEX
+
+mame swtpc09i -hard 2048X18X32.chd
+Where 2048X18X32.chd is derived from the 2048X18X32.dsk image.  MAME expects the
+ROM at 0xf000 rather than 0xe800 as implement here (todo updated ROM?), so patch
+at offset 0x68 0xf1 to 0xe9, and at offset 0x2c51c 0xf1 to 0xe9. The PIA IDE is
+installed in IO6 here, yet this software expects it at IO1, so patch these to
+0xe06* at offsets 0xd6, 0xd6, 0xdb, 0xe0, 0xe5, 0xe8, 0xed, 0xf2, 0xfa, 0xff,
+0x104, 0x109, 0x10e, 0x113, 0x116. Then remove the trailing info, past
+2048X18X32X256. Then fill every second byte with zero as only the lower 8 bits
+of every 16 bit word are used. Then convert to a CHD disk file, adding the
+geometry:
+ chdman createhd -o 2048X18X32.chd -i 2048X18X32.dsk -chs 2048,18,32 -s 512
+MAME appears to cold start FLEX at 0xcd00 as opposed to 0xc800, and the PIA IDE
+ROM needs patching for that, and there is a machine option to do so. At the SBUG
+prompt enter Ctrl-P and 'E800', then 'G' and it should boot into FLEX. MAME
+might not match the ROM and hardware here.
+
+mame swtpc09o -io1:dc5:fdc:0 qd -flop1 OS9BTBK3.DSK
+ DC5 FDC clock: 1.0MHz
+ CPU clock: 4MHz
+Boots into OS9, asking for the date and time.
 
 ***************************************************************************/
 
@@ -627,8 +693,8 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT    CLASS          INIT            COMPANY  FULLNAME                    FLAGS
-COMP( 1980, swtpc09,   0,       0,      swtpc09,   swtpc09, swtpc09_state, init_swtpc09,   "SWTPC", "swtpc S/09 Sbug",          MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 1980, swtpc09i,  swtpc09, 0,      swtpc09i,  swtpc09, swtpc09_state, init_swtpc09i,  "SWTPC", "swtpc S/09 Sbug + piaide", MACHINE_NO_SOUND_HW  | MACHINE_NOT_WORKING )
-COMP( 1980, swtpc09u,  swtpc09, 0,      swtpc09u,  swtpc09, swtpc09_state, init_swtpc09u,  "SWTPC", "swtpc S/09 UNIBug + DMAF2", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 1980, swtpc09d3, swtpc09, 0,      swtpc09d3, swtpc09, swtpc09_state, init_swtpc09d3, "SWTPC", "swtpc S/09 UNIBug + DMAF3", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 1980, swtpc09o,  swtpc09, 0,      swtpc09o,  swtpc09, swtpc09_state, init_swtpc09o,  "SWTPC", "swtpc S/09 OS9",           MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 1980, swtpc09,   0,       0,      swtpc09,   swtpc09, swtpc09_state, init_swtpc09,   "SWTPC", "swtpc S/09 Sbug",          MACHINE_NO_SOUND_HW )
+COMP( 1980, swtpc09i,  swtpc09, 0,      swtpc09i,  swtpc09, swtpc09_state, init_swtpc09i,  "SWTPC", "swtpc S/09 Sbug + piaide", MACHINE_NO_SOUND_HW )
+COMP( 1980, swtpc09u,  swtpc09, 0,      swtpc09u,  swtpc09, swtpc09_state, init_swtpc09u,  "SWTPC", "swtpc S/09 UNIBug + DMAF2", MACHINE_NO_SOUND_HW )
+COMP( 1980, swtpc09d3, swtpc09, 0,      swtpc09d3, swtpc09, swtpc09_state, init_swtpc09d3, "SWTPC", "swtpc S/09 UNIBug + DMAF3", MACHINE_NO_SOUND_HW )
+COMP( 1980, swtpc09o,  swtpc09, 0,      swtpc09o,  swtpc09, swtpc09_state, init_swtpc09o,  "SWTPC", "swtpc S/09 OS9",           MACHINE_NO_SOUND_HW )
