@@ -5387,7 +5387,6 @@ ROM_START( bgareggat )
 	/* Stored on an NEC ES23C8001EJ Mask ROM with no Raizing/8ing custom markings.*/
 	ROM_REGION( 0x100000, "oki1", 0 )        /* ADPCM Samples */
 	ROM_LOAD( "rom5.bin", 0x000000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
-
 ROM_END
 
 ROM_START( bgaregga )
