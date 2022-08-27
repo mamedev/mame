@@ -213,7 +213,7 @@ meta_data isis_impl::volume_metadata()
 		}
 		res.set(meta_name::name, vol_name);
 		try {
-			res.set(meta_name::os_version, std::stoul(std::string(file_data.cbegin() + 9, file_data.cbegin() + 11)));
+			res.set(meta_name::os_version, u64(std::stoul(std::string(file_data.cbegin() + 9, file_data.cbegin() + 11))));
 		} catch (...) {
 			res.set(meta_name::os_version, 0);
 		}
