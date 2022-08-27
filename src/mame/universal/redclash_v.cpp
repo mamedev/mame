@@ -142,6 +142,7 @@ void redclash_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 {
 	for (int offs = m_spriteram.bytes() - 0x20; offs >= 0; offs -= 0x20)
 	{
+		// find last valid sprite of current block
 		int i = 0;
 		while (i < 0x20 && m_spriteram[offs + i] != 0)
 			i += 4;
@@ -154,7 +155,7 @@ void redclash_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			{
 				int color = bitswap<4>(m_spriteram[offs + i + 2], 5,2,1,0);
 				int sx = m_spriteram[offs + i + 3];
-				int sy = offs / 4 + (m_spriteram[offs + i] & 0x07);
+				int sy = offs / 4 + (m_spriteram[offs + i] & 0x07) - 16;
 
 				switch ((m_spriteram[offs + i] & 0x18) >> 3)
 				{
@@ -166,13 +167,13 @@ void redclash_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 								code,
 								color,
 								0,0,
-								sx,sy - 16,0);
+								sx,sy,0);
 						/* wraparound */
 						m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
 								code,
 								color,
 								0,0,
-								sx - 256,sy - 16,0);
+								sx - 256,sy,0);
 						break;
 					}
 
@@ -186,7 +187,7 @@ void redclash_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 									code,
 									color,
 									0,0,
-									sx,sy - 16,0);
+									sx,sy,0);
 						}
 						else
 						{
@@ -196,7 +197,7 @@ void redclash_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 									code,
 									color,
 									0,0,
-									sx,sy - 16,0);
+									sx,sy,0);
 						}
 						break;
 
@@ -205,7 +206,7 @@ void redclash_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 								m_spriteram[offs + i + 1],// + 4 * (m_spriteram[offs + i + 2] & 0x10),
 								color,
 								0,0,
-								sx,sy - 16,0);
+								sx,sy,0);
 						break;
 
 					case 0:
@@ -221,16 +222,22 @@ void redclash_state::draw_bullets( bitmap_ind16 &bitmap, const rectangle &clipre
 {
 	for (int offs = 0; offs < 0x20; offs++)
 	{
-		int sx = 8 * offs + (m_videoram[offs] & 0x07);   /* ?? */
+		int sx = 8 * offs + 8;
 		int sy = 0xff - m_videoram[offs + 0x20];
 
 		if (flip_screen())
-		{
-			sx = 240 - sx;
-		}
+			sx = 264 - sx;
 
-		if (cliprect.contains(sx, sy))
-			bitmap.pix(sy, sx) = 0x19;
+		int fine_x = m_videoram[offs] >> 3 & 7;
+		sx = sx - fine_x;
+
+		for (int y = 0; y < 2; y++)
+			for (int x = 0; x < 8; x++)
+			{
+				if (cliprect.contains(sx + x, sy - y))
+					bitmap.pix(sy - y, sx + x) = 0x3f;
+			}
+
 	}
 }
 
@@ -245,8 +252,8 @@ uint32_t redclash_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	m_stars->draw(bitmap, cliprect, 0x60, true, 0x00, 0xff);
-	draw_sprites(bitmap, cliprect);
 	draw_bullets(bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

@@ -19,8 +19,9 @@ TODO:
 - Some graphical problems in both games
 - redclash supports more background layer effects: white+mixed with other colors,
   used in canyon parts and during the big ufo explosion
-- Player bullets: should be 8*2px magenta in zerohour. It's weirder in redclash:
-  1st half of the screen 4*2px red, 2nd half 8*2px yellow.
+- According to video reference(could only find 1), redclash player bullets should be
+  4*2px red on the 1st half of the screen and 8*2px yellow on the 2nd half, zerohour
+  bullets are correct though(always 8*2px magenta)
 - Sound (analog, schematics available for Zero Hour)
 
 ***************************************************************************/
