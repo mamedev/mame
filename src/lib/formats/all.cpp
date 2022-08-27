@@ -272,6 +272,10 @@
 #include "cp68_dsk.h"
 #endif
 
+#ifdef HAS_FORMATS_FDOS_DSK
+#include "fdos_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_FLEX_DSK
 #include "flex_dsk.h"
 #endif
