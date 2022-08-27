@@ -68,30 +68,30 @@
  F100 - ????  CDS disk 0 controller
  F300 - ????  CDS disk 1 controller
 
-** Notes on the use with common disk images **
+** Notes on use of MAME with common disk images **
 
-This emulator emulates the floppy disk controller more thoroughly than some
-other common emulators for these systems. Other common emulators can ignore
-the disk density and disk side driven by the software. FLEX numbers sectors
-contiguously from one side to the other so a simple emulator need only map the
-track and sector numbers. Real disk images often mix single and double density
-formats, e.g. single density for the first track, and the software may not
-have been updated to correctly drive the side and density outputs, so disks
-for these other emulators might not work in this emulator. These disk images
-and their softare need to be updated - this is not working around limitations
-of this emulator, these would not be expected to work on real hardware either.
+MAME emulates the floppy disk controller more thoroughly than some other common
+emulators for these systems. Other common emulators can ignore the disk density
+and disk side driven by the software. FLEX numbers sectors contiguously from one
+side to the other, so a simple emulator need only map the track and sector
+numbers. Real disk images often mix single and double density formats, e.g.
+single density for the first track, and the software may not have been updated
+to correctly drive the side and density outputs, so disks for these other
+emulators might not work in MAME. These disk images and their softare need to be
+updated - this is not working around limitations of MAME, these would not be
+expected to work on real hardware either.
 
-However the disk controllers used by this emulator have some options that can
-help with this transition, help get these disk images running as-is. The disk
-density selection can be overridden. The disk side selection can be overridden
-for a given number of FLEX sectors per side and this can be done separately
-for track 0 and side 0.
+However the disk controllers used by MAME have some options that can help with
+this transition, help get these disk images running as-is. The disk density
+selection can be overridden. The disk side selection can be overridden for a
+given number of FLEX sectors per side and this can be done separately for
+track 0 and side 0.
 
-The FDC clock speed needs to be appropriate for the disk drives and
-format. The historical controllers typically hard wired a clock rate, and the
-historical software was not written to drive clock selection as available in
-some later controllers. The CPU clock may also need to be adjusted for some
-combinations, to meet the timing requirements.
+The FDC clock speed needs to be appropriate for the disk drives and format. The
+historical controllers typically hard wired a clock rate, and the historical
+software was not written to drive clock selection as available in some later
+controllers. The CPU clock may also need to be adjusted for some combinations,
+to meet the timing requirements.
 
 The boot ROM many also need patching to boot a double density rather than
 single density format disk, and this emulator has an opion to patch the ROM
@@ -132,20 +132,20 @@ Options:
 Type U to boot into FLEX
 
 mame swtpc09i -hard 2048X18X32.chd
-Where 2048X18X32.chd is derived from the 2048X18X32.dsk image.  This software
-expects the ROM at 0xf000 rather than 0xe800 as implement here (todo updated
-ROM?), so patch at offset 0x68 0xf1 to 0xe9, and at offset 0x2c51c 0xf1 to
-0xe9. The PIA IDE is installed in IO6 here, yet this software expects it at
-IO1, so patch these to 0xe06* at offsets 0xd6, 0xd6, 0xdb, 0xe0, 0xe5, 0xe8,
-0xed, 0xf2, 0xfa, 0xff, 0x104, 0x109, 0x10e, 0x113, 0x116. Then remove the
-trailing info, past 2048X18X32X256. Then fill every second byte with zero as
-only the lower 8 bits of every 16 bit word are used. Then convert to a CHD
-disk file, adding the geometry:
+Where 2048X18X32.chd is derived from the 2048X18X32.dsk image.  MAME expects the
+ROM at 0xf000 rather than 0xe800 as implement here (todo updated ROM?), so patch
+at offset 0x68 0xf1 to 0xe9, and at offset 0x2c51c 0xf1 to 0xe9. The PIA IDE is
+installed in IO6 here, yet this software expects it at IO1, so patch these to
+0xe06* at offsets 0xd6, 0xd6, 0xdb, 0xe0, 0xe5, 0xe8, 0xed, 0xf2, 0xfa, 0xff,
+0x104, 0x109, 0x10e, 0x113, 0x116. Then remove the trailing info, past
+2048X18X32X256. Then fill every second byte with zero as only the lower 8 bits
+of every 16 bit word are used. Then convert to a CHD disk file, adding the
+geometry:
  chdman createhd -o 2048X18X32.chd -i 2048X18X32.dsk -chs 2048,18,32 -s 512
-This software appears to cold start FLEX at 0xcd00 as opposed to 0xc800, and the
-PIA IDE ROM needs patching for that, and there is a machine option to do so.
-At the SBUG prompt enter Ctrl-P and 'E800', then 'G' and it should boot into FLEX.
-This software might not match the ROM and hardware here.
+MAME appears to cold start FLEX at 0xcd00 as opposed to 0xc800, and the PIA IDE
+ROM needs patching for that, and there is a machine option to do so. At the SBUG
+prompt enter Ctrl-P and 'E800', then 'G' and it should boot into FLEX. MAME
+might not match the ROM and hardware here.
 
 mame swtpc09o -io1:dc5:fdc:0 qd -flop1 OS9BTBK3.DSK
  DC5 FDC clock: 1.0MHz
