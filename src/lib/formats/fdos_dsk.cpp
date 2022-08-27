@@ -49,8 +49,8 @@ namespace
 	public:
 		struct dirent_entry_fdos
 		{
-			char filename[8]{};
-			char password[8]{};
+			char filename[8] = {};
+			char password[8] = {};
 			uint8_t start_track = 0;
 			uint8_t start_sector = 0;
 			uint8_t num_sectors[2] = {};
@@ -121,10 +121,10 @@ int fdos_format::find_size(util::random_read &io, uint32_t form_factor, const st
 		if (boot0[0] != 0xbd && boot0[3] != 0xde)
 			continue;
 		
-		LOG_FORMATS("FDOS floppy dsk: size %d bytes, %d total sectors, %d remaining bytes, expected form factor %x\n",
-				(uint32_t)size,
-				(uint32_t)size / f.sector_base_size,
-				(uint32_t)size % f.sector_base_size,
+		LOG_FORMATS("FDOS floppy dsk: size %u bytes, %u total sectors, %u remaining bytes, expected form factor %x\n",
+				size,
+				size / f.sector_base_size,
+				size % f.sector_base_size,
 				form_factor);
 		
 		// Directory entries start at Track 2 Sector 0
