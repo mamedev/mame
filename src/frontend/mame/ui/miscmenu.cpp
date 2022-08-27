@@ -28,12 +28,11 @@
 #include "romload.h"
 #include "uiinput.h"
 
-#include "corestr.h"
-
 #include <algorithm>
 #include <cstring>
 #include <fstream>
 #include <iterator>
+#include <locale>
 
 
 namespace ui {
@@ -445,10 +444,17 @@ void menu_crosshair::populate(float &customtop, float &custombottom)
 			if ((length > 4) && core_filename_ends_with(dir->name, ".png"))
 				m_pics.emplace_back(dir->name, length - 4);
 		}
+		std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t>>(std::locale());
 		std::stable_sort(
 				m_pics.begin(),
 				m_pics.end(),
-				[] (std::string const &a, std::string const &b) { return 0 > core_stricmp(a.c_str(), b.c_str()); });
+				[&coll] (auto const &x, auto const &y)
+				{
+					std::wstring const wx = wstring_from_utf8(x);
+					std::wstring const wy = wstring_from_utf8(y);
+					return 0 > coll.compare(wx.data(), wx.data() + wx.size(), wy.data(), wy.data() + wy.size());
+				}
+		);
 	}
 
 	// Make sure to keep these matched to the CROSSHAIR_VISIBILITY_xxx types
