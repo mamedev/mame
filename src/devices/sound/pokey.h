@@ -206,33 +206,33 @@ private:
 	{
 	public:
 		pokey_channel();
-		pokey_device *m_parent;
+
 		uint8_t m_INTMask;
-		uint8_t m_AUDF;           /* AUDFx (D200, D202, D204, D206) */
-		uint8_t m_AUDC;           /* AUDCx (D201, D203, D205, D207) */
-		int32_t m_borrow_cnt;     /* borrow counter */
-		int32_t m_counter;        /* channel counter */
-		uint8_t m_output;         /* channel output signal (1 active, 0 inactive) */
-		uint8_t m_filter_sample;  /* high-pass filter sample */
+		uint8_t m_AUDF;           // AUDFx (D200, D202, D204, D206)
+		uint8_t m_AUDC;           // AUDCx (D201, D203, D205, D207)
+		int32_t m_borrow_cnt;     // borrow counter
+		int32_t m_counter;        // channel counter
+		uint8_t m_output;         // channel output signal (1 active, 0 inactive)
+		uint8_t m_filter_sample;  // high-pass filter sample
 
-		inline void sample(void)            { m_filter_sample = m_output; }
-		inline void reset_channel(void)     { m_counter = m_AUDF ^ 0xff; m_borrow_cnt = 0; }
+		void sample()            { m_filter_sample = m_output; }
+		void reset_channel()     { m_counter = m_AUDF ^ 0xff; m_borrow_cnt = 0; }
 
-		inline void inc_chan(int cycles)
+		void inc_chan(pokey_device &host, int cycles)
 		{
 			m_counter = (m_counter + 1) & 0xff;
 			if (m_counter == 0 && m_borrow_cnt == 0)
 			{
 				m_borrow_cnt = cycles;
-				if (m_parent->m_IRQEN & m_INTMask)
+				if (host.m_IRQEN & m_INTMask)
 				{
 					/* Exposed state has changed: This should only be updated after a resync ... */
-					m_parent->machine().scheduler().synchronize(timer_expired_delegate(FUNC(pokey_device::sync_set_irqst), m_parent), m_INTMask);
+					host.machine().scheduler().synchronize(timer_expired_delegate(FUNC(pokey_device::sync_set_irqst), &host), m_INTMask);
 				}
 			}
 		}
 
-		inline int check_borrow()
+		int check_borrow()
 		{
 			if (m_borrow_cnt > 0)
 			{
@@ -254,7 +254,7 @@ private:
 	void vol_init();
 
 	inline void process_channel(int ch);
-	void pokey_potgo(void);
+	void pokey_potgo();
 	char *audc2str(int val);
 	char *audctl2str(int val);
 

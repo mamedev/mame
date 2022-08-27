@@ -9,15 +9,18 @@ runs on hardware similar to Lady Bug
 driver by inkling
 
 Notes:
-- In the Tehkan set (redclsha) the ship doesn't move during attract mode. Earlier version?
-  Gameplay is different too.
+- In the Tehkan set (redclashta) the ship doesn't move during attract mode.
+  Earlier version? Gameplay is different too.
 
 TODO:
-- Colors might be right, need screen shots to verify
-
-- Some graphical problems in both games, but without screenshots its hard to
-  know what we're aiming for
-
+- Colors are not right. In zerohour P1 score should be white, the top score green,
+  and "TOP" should be magenta. How is this determined? It's as if only the top part
+  of the screen has this exception. Sprite colors look ok.
+- Some graphical problems in both games
+- redclash supports more background layer effects: white+mixed with other colors,
+  used in canyon parts and during the big ufo explosion
+- Player bullets: should be 8*2px magenta in zerohour. It's weirder in redclash:
+  1st half of the screen 4*2px red, 2nd half 8*2px yellow.
 - Sound (analog, schematics available for Zero Hour)
 
 ***************************************************************************/
@@ -27,10 +30,37 @@ TODO:
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
-#include "sound/sn76496.h"
+//#include "sound/sn76496.h"
 #include "screen.h"
 #include "speaker.h"
 
+static const char *const sample_names[] =
+{
+	"*zerohour",
+	"zh0",
+	"zh1",
+	"zh2",
+	"zh3",
+	"zh4",
+	"zh5",
+	"zh6",
+	"zh7",
+	"zh8",
+	"zh9",
+	"zh10",
+	nullptr
+};
+
+WRITE_LINE_MEMBER(redclash_state::sound_w)
+{
+	m_allow = state;
+}
+
+template <unsigned S> WRITE_LINE_MEMBER(redclash_state::sample_w)
+{
+	if (m_allow && state)
+		m_samples->start(S, S);
+}
 
 void redclash_state::irqack_w(uint8_t data)
 {
@@ -188,30 +218,9 @@ static INPUT_PORTS_START( redclash )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( zerohour )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_INCLUDE( redclash )
 
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	/* Note that there are TWO VBlank inputs, one is active low, the other active */
-	/* high. There are probably other differences in the hardware, but emulating */
-	/* them this way is enough to get the game running. */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-
-	PORT_START("DSW1")
+	PORT_MODIFY("DSW1")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW1:8" )    /* Switches 6-8 are not used */
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW1:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW1:6" )
@@ -229,7 +238,7 @@ static INPUT_PORTS_START( zerohour )
 	PORT_DIPSETTING(    0x80, "4" )
 	PORT_DIPSETTING(    0x40, "5" )
 
-	PORT_START("DSW2")
+	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:4,3,2,1")
 	PORT_DIPSETTING(    0x06, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
@@ -252,15 +261,6 @@ static INPUT_PORTS_START( zerohour )
 	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
-
-	PORT_START("FAKE")
-	/* The coin slots are not memory mapped. Coin Left causes a NMI, */
-	/* Coin Right an IRQ. This fake input port is used by the interrupt */
-	/* handler to be notified of coin insertions. We use IMPULSE to */
-	/* trigger exactly one interrupt, without having to check when the */
-	/* user releases the key. */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, redclash_state, left_coin_inserted, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, redclash_state, right_coin_inserted, 0)
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -331,6 +331,7 @@ GFXDECODE_END
 void redclash_state::machine_start()
 {
 	save_item(NAME(m_gfxbank));
+	save_item(NAME(m_allow));
 
 	m_gfxbank = 0;
 }
@@ -341,10 +342,22 @@ void redclash_state::zerohour(machine_config &config)
 	Z80(config, m_maincpu, 4_MHz_XTAL);  /* 4 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &redclash_state::zerohour_map);
 
-	LS259(config, "outlatch1"); // C1 (CS10 decode)
+	ls259_device &outlatch1(LS259(config, "outlatch1")); // C1 (CS10 decode)
+	outlatch1.q_out_cb<0>().set(FUNC(redclash_state::sample_w<0>));
+	outlatch1.q_out_cb<1>().set(FUNC(redclash_state::sample_w<1>));
+	outlatch1.q_out_cb<2>().set(FUNC(redclash_state::sample_w<2>));
+	outlatch1.q_out_cb<3>().set(FUNC(redclash_state::sample_w<3>));
+	outlatch1.q_out_cb<4>().set(FUNC(redclash_state::sample_w<4>));
+	outlatch1.q_out_cb<5>().set(FUNC(redclash_state::sample_w<5>));
+	outlatch1.q_out_cb<6>().set(FUNC(redclash_state::sample_w<6>));
+	outlatch1.q_out_cb<7>().set(FUNC(redclash_state::sample_w<7>));
 
 	ls259_device &outlatch2(LS259(config, "outlatch2")); // C2 (CS11 decode)
 	outlatch2.q_out_cb<0>().set(FUNC(redclash_state::star_w<0>));
+	outlatch2.q_out_cb<1>().set(FUNC(redclash_state::sample_w<8>));
+	outlatch2.q_out_cb<2>().set(FUNC(redclash_state::sound_w));
+	outlatch2.q_out_cb<3>().set(FUNC(redclash_state::sample_w<9>));
+	outlatch2.q_out_cb<4>().set(FUNC(redclash_state::sample_w<10>));
 	outlatch2.q_out_cb<5>().set(FUNC(redclash_state::star_w<1>));
 	outlatch2.q_out_cb<6>().set(FUNC(redclash_state::star_w<2>));
 	outlatch2.q_out_cb<7>().set(FUNC(redclash_state::flipscreen_w));
@@ -362,6 +375,12 @@ void redclash_state::zerohour(machine_config &config)
 	ZEROHOUR_STARS(config, m_stars, 0);
 
 	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(11);
+	m_samples->set_samples_names(sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 
@@ -579,9 +598,9 @@ void redclash_state::init_redclash()
 }
 
 
-GAME( 1980, zerohour,  0,        zerohour, zerohour, redclash_state, init_redclash, ROT270, "Universal",                   "Zero Hour (set 1)",      MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, zerohoura, zerohour, zerohour, zerohour, redclash_state, init_redclash, ROT270, "Universal",                   "Zero Hour (set 2)",      MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, zerohouri, zerohour, zerohour, zerohour, redclash_state, init_redclash, ROT270, "bootleg (Inder SA)",          "Zero Hour (Inder)",      MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zerohour,   0,        zerohour, zerohour, redclash_state, init_redclash, ROT270, "Universal",                   "Zero Hour (set 1)",      MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zerohoura,  zerohour, zerohour, zerohour, redclash_state, init_redclash, ROT270, "Universal",                   "Zero Hour (set 2)",      MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zerohouri,  zerohour, zerohour, zerohour, redclash_state, init_redclash, ROT270, "bootleg (Inder SA)",          "Zero Hour (Inder)",      MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1981, redclash,   0,        redclash, redclash, redclash_state, init_redclash, ROT270, "Kaneko",                      "Red Clash",                 MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, redclasht,  redclash, redclash, redclash, redclash_state, init_redclash, ROT270, "Kaneko (Tehkan license)",     "Red Clash (Tehkan, set 1)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

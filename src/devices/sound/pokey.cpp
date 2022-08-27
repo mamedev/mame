@@ -189,23 +189,23 @@ DEFINE_DEVICE_TYPE(POKEY, pokey_device, "pokey", "Atari C012294 POKEY")
 //  pokey_device - constructor
 //-------------------------------------------------
 
-pokey_device::pokey_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, POKEY, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		device_execute_interface(mconfig, *this),
-		device_state_interface(mconfig, *this),
-		m_icount(0),
-		m_stream(nullptr),
-		m_pot_r_cb(*this),
-		m_allpot_r_cb(*this),
-		m_serin_r_cb(*this),
-		m_serout_w_cb(*this),
-		m_keyboard_r(*this),
-		m_irq_f(*this),
-		m_output_type(LEGACY_LINEAR),
-		m_serout_ready_timer(nullptr),
-		m_serout_complete_timer(nullptr),
-		m_serin_ready_timer(nullptr)
+pokey_device::pokey_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, POKEY, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	device_execute_interface(mconfig, *this),
+	device_state_interface(mconfig, *this),
+	m_icount(0),
+	m_stream(nullptr),
+	m_pot_r_cb(*this),
+	m_allpot_r_cb(*this),
+	m_serin_r_cb(*this),
+	m_serout_w_cb(*this),
+	m_keyboard_r(*this),
+	m_irq_f(*this),
+	m_output_type(LEGACY_LINEAR),
+	m_serout_ready_timer(nullptr),
+	m_serout_complete_timer(nullptr),
+	m_serin_ready_timer(nullptr)
 {
 }
 
@@ -217,12 +217,9 @@ void pokey_device::device_start()
 {
 	//int sample_rate = clock();
 
-	/* Setup channels */
-	for (int i=0; i<POKEY_CHANNELS; i++)
-	{
-		m_channel[i].m_parent = this;
-		m_channel[i].m_INTMask = 0;
-	}
+	// Set up channels
+	for (pokey_channel &chan : m_channel)
+		chan.m_INTMask = 0;
 	m_channel[CHAN1].m_INTMask = IRQ_TIMR1;
 	m_channel[CHAN2].m_INTMask = IRQ_TIMR2;
 	m_channel[CHAN4].m_INTMask = IRQ_TIMR4;
@@ -249,7 +246,7 @@ void pokey_device::device_start()
 	vol_init();
 
 	for (int i=0; i<4; i++)
-		m_channel[i].m_AUDC = 0xB0;
+		m_channel[i].m_AUDC = 0xb0;
 
 	/* The pokey does not have a reset line. These should be initialized
 	 * with random values.
@@ -570,7 +567,7 @@ void pokey_device::step_pot()
  *
  */
 
-void pokey_device::step_one_clock(void)
+void pokey_device::step_one_clock()
 {
 	if (m_SKCTL & SK_RESET)
 	{
@@ -604,33 +601,33 @@ void pokey_device::step_one_clock(void)
 		if ((m_AUDCTL & CH1_HICLK) && (clock_triggered[CLK_1]))
 		{
 			if (m_AUDCTL & CH12_JOINED)
-				m_channel[CHAN1].inc_chan(7);
+				m_channel[CHAN1].inc_chan(*this, 7);
 			else
-				m_channel[CHAN1].inc_chan(4);
+				m_channel[CHAN1].inc_chan(*this, 4);
 		}
 
 		int base_clock = (m_AUDCTL & CLK_15KHZ) ? CLK_114 : CLK_28;
 
 		if ((!(m_AUDCTL & CH1_HICLK)) && (clock_triggered[base_clock]))
-			m_channel[CHAN1].inc_chan(1);
+			m_channel[CHAN1].inc_chan(*this, 1);
 
 		if ((m_AUDCTL & CH3_HICLK) && (clock_triggered[CLK_1]))
 		{
 			if (m_AUDCTL & CH34_JOINED)
-				m_channel[CHAN3].inc_chan(7);
+				m_channel[CHAN3].inc_chan(*this, 7);
 			else
-				m_channel[CHAN3].inc_chan(4);
+				m_channel[CHAN3].inc_chan(*this, 4);
 		}
 
 		if ((!(m_AUDCTL & CH3_HICLK)) && (clock_triggered[base_clock]))
-			m_channel[CHAN3].inc_chan(1);
+			m_channel[CHAN3].inc_chan(*this, 1);
 
 		if (clock_triggered[base_clock])
 		{
 			if (!(m_AUDCTL & CH12_JOINED))
-				m_channel[CHAN2].inc_chan(1);
+				m_channel[CHAN2].inc_chan(*this, 1);
 			if (!(m_AUDCTL & CH34_JOINED))
-				m_channel[CHAN4].inc_chan(1);
+				m_channel[CHAN4].inc_chan(*this, 1);
 		}
 
 		/* Potentiometer handling */
@@ -645,7 +642,7 @@ void pokey_device::step_one_clock(void)
 	if (m_channel[CHAN3].check_borrow())
 	{
 		if (m_AUDCTL & CH34_JOINED)
-			m_channel[CHAN4].inc_chan(1);
+			m_channel[CHAN4].inc_chan(*this, 1);
 		else
 			m_channel[CHAN3].reset_channel();
 
@@ -677,7 +674,7 @@ void pokey_device::step_one_clock(void)
 		m_old_raw_inval = true;
 	}
 
-	if ( (m_SKCTL & SK_TWOTONE) && (m_channel[CHAN2].m_borrow_cnt == 1) )
+	if ((m_SKCTL & SK_TWOTONE) && (m_channel[CHAN2].m_borrow_cnt == 1))
 	{
 		m_channel[CHAN1].reset_channel();
 		m_old_raw_inval = true;
@@ -686,7 +683,7 @@ void pokey_device::step_one_clock(void)
 	if (m_channel[CHAN1].check_borrow())
 	{
 		if (m_AUDCTL & CH12_JOINED)
-			m_channel[CHAN2].inc_chan(1);
+			m_channel[CHAN2].inc_chan(*this, 1);
 		else
 			m_channel[CHAN1].reset_channel();
 
@@ -710,7 +707,7 @@ void pokey_device::step_one_clock(void)
 
 		// check if some of the requested timer interrupts are enabled
 		if ((m_IRQST & IRQ_TIMR2) && !m_irq_f.isnull())
-				m_irq_f(IRQ_TIMR2);
+			m_irq_f(IRQ_TIMR2);
 	}
 
 	if (m_old_raw_inval)
@@ -1101,7 +1098,7 @@ inline void pokey_device::process_channel(int ch)
 }
 
 
-void pokey_device::pokey_potgo(void)
+void pokey_device::pokey_potgo()
 {
 	if (!(m_SKCTL & SK_RESET))
 		return;
@@ -1281,12 +1278,12 @@ char *pokey_device::audctl2str(int val)
 	return buff;
 }
 
-pokey_device::pokey_channel::pokey_channel()
-	:	m_AUDF(0),
-		m_AUDC(0),
-		m_borrow_cnt(0),
-		m_counter(0),
-		m_output(0),
-		m_filter_sample(0)
+pokey_device::pokey_channel::pokey_channel() :
+	m_AUDF(0),
+	m_AUDC(0),
+	m_borrow_cnt(0),
+	m_counter(0),
+	m_output(0),
+	m_filter_sample(0)
 {
 }

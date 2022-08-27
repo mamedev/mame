@@ -892,7 +892,7 @@ uint8_t gbc_state::gbc_io2_r(offs_t offset)
  Map megaduck video related area on to regular Game Boy video area
 
  Different locations of the video registers:
- Register      Game Boy   MegaDuck
+ Register      Game Boy   Mega Duck
  LCDC          FF40       FF10  (See different bit order below)
  STAT          FF41       FF11
  SCY           FF42       FF12
@@ -912,7 +912,7 @@ uint8_t gbc_state::gbc_io2_r(offs_t offset)
 
  Different LCDC register
 
- Game Boy       MegaDuck
+ Game Boy       Mega Duck
  0                      6       - BG & Window Display : 0 - Off, 1 - On
  1                      0       - OBJ Display: 0 - Off, 1 - On
  2                      1       - OBJ Size: 0 - 8x8, 1 - 8x16
@@ -1064,16 +1064,20 @@ void megaduck_state::megaduck_map(address_map &map)
 }
 
 
-static INPUT_PORTS_START( gameboy )
+static INPUT_PORTS_START( megaduck )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_NAME("Left")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_NAME("Left")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_NAME("Right")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_NAME("Up")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_NAME("Down")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Button A")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Button B")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START) PORT_NAME("Start")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SELECT) PORT_NAME("Select")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_NAME("Up")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_NAME("Down")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2)        PORT_NAME("Button A")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_NAME("Button B")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START)          PORT_NAME("Start")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SELECT)         PORT_NAME("Select")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( gameboy )
+	PORT_INCLUDE(megaduck)
 
 	PORT_START("SKIP_CHECK")
 	PORT_CONFNAME( 0x01, 0x00, "[HACK] Skip BIOS Logo check" )
@@ -1389,18 +1393,18 @@ ROM_END
 } // anonymous namespace
 
 
-//   YEAR  NAME      PARENT   COMPAT   MACHINE   INPUT    STATE           INIT        COMPANY     FULLNAME
-CONS(1990, gameboy,  0,       0,       gameboy,  gameboy, gb_state,       empty_init, "Nintendo", "Game Boy",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-CONS(1994, supergb,  gameboy, 0,       supergb,  gameboy, sgb_state,      empty_init, "Nintendo", "Super Game Boy",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-CONS(1998, supergb2, gameboy, 0,       supergb2, gameboy, sgb_state,      empty_init, "Nintendo", "Super Game Boy 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-CONS(1996, gbpocket, gameboy, 0,       gbpocket, gameboy, gb_state,       empty_init, "Nintendo", "Game Boy Pocket",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-CONS(1998, gbcolor,  0,       0,       gbcolor,  gameboy, gbc_state,      empty_init, "Nintendo", "Game Boy Color",   MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+//   YEAR  NAME      PARENT   COMPAT   MACHINE   INPUT     STATE           INIT        COMPANY     FULLNAME
+CONS(1990, gameboy,  0,       0,       gameboy,  gameboy,  gb_state,       empty_init, "Nintendo", "Game Boy",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+CONS(1994, supergb,  gameboy, 0,       supergb,  gameboy,  sgb_state,      empty_init, "Nintendo", "Super Game Boy",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+CONS(1998, supergb2, gameboy, 0,       supergb2, gameboy,  sgb_state,      empty_init, "Nintendo", "Super Game Boy 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+CONS(1996, gbpocket, gameboy, 0,       gbpocket, gameboy,  gb_state,       empty_init, "Nintendo", "Game Boy Pocket",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+CONS(1998, gbcolor,  0,       0,       gbcolor,  gameboy,  gbc_state,      empty_init, "Nintendo", "Game Boy Color",   MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 
 // Sound is not 100% yet, it generates some sounds which could be OK. Since we're lacking a real system there's no way to verify.
-CONS(1993, megaduck, 0,       0,       megaduck, gameboy, megaduck_state, empty_init, "Welback Holdings (Timlex International) / Creatronic / Videojet / Cougar USA", "Mega Duck / Cougar Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS(1993, megaduck, 0,       0,       megaduck, megaduck, megaduck_state, empty_init, "Welback Holdings (Timlex International) / Creatronic / Videojet / Cougar USA", "Mega Duck / Cougar Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-CONS(199?, mduckspa, 0,       0,       megaduck, gameboy, megaduck_state, empty_init, "Cefa Toys", "Super Quique / Mega Duck (Spain)", MACHINE_NOT_WORKING ) // versions for other regions exist too
+CONS(199?, mduckspa, 0,       0,       megaduck, megaduck, megaduck_state, empty_init, "Cefa Toys", "Super Quique / Mega Duck (Spain)", MACHINE_NOT_WORKING ) // versions for other regions exist too
 
 
 // http://blog.gg8.se/wordpress/2012/11/11/gameboy-clone-game-fighter-teardown/
-CONS(1993, gamefgtr, gameboy, 0,       gameboy,  gameboy, gb_state,       empty_init, "bootleg", "Game Fighter (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+CONS(1993, gamefgtr, gameboy, 0,       gameboy,  gameboy,  gb_state,       empty_init, "bootleg", "Game Fighter (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)

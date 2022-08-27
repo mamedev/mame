@@ -4,9 +4,9 @@
 license:CC0
 -->
 
-<softwarelist name="intellect02" description="Intellect-02 Cartridges">
+<softwarelist name="intellect02" description="Intellect-02 cartridges">
 
-<!-- Intellect-02 Cartridges -->
+<!-- Intellect-02 cartridges -->
 
 	<software name="chess">
 		<description>Chess (3 levels)</description>

@@ -5605,19 +5605,21 @@ static INPUT_PORTS_START( bmxstunts )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // also acts as P1 start button
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // also acts as 1P start button
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // also acts as 2P start button
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_CONFSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START("DSW1") // only one 6-dip bank
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x00, "SW1:1")
@@ -6627,15 +6629,18 @@ CUSTOM_INPUT_MEMBER(moonwar_state::dial_r)
 	// see http://www.cityofberwyn.com/schematics/stern/MoonWar_opto.tiff for schematic
 	// i.e. a 74ls161 counts from 0 to 15 which is the absolute number of bars passed on the quadrature
 
-	const int8_t dialread = int8_t(uint8_t(m_dials[m_port_select]->read()));
+	const uint8_t dialread = m_dials[m_port_select]->read();
+	const uint8_t lastread = m_last_dialread[m_port_select];
 
-	if (dialread < 0)
+	if (int8_t(dialread - lastread) < 0)
 		m_direction[m_port_select] = 0x00;
-	else if (dialread > 0)
+	else if (dialread != lastread)
 		m_direction[m_port_select] = 0x10;
 
-	m_counter_74ls161[m_port_select] += std::abs(dialread);
+	m_counter_74ls161[m_port_select] += std::abs(int8_t(dialread - lastread));
 	m_counter_74ls161[m_port_select] &= 0xf;
+
+	m_last_dialread[m_port_select] = dialread;
 
 	const uint8_t ret = m_counter_74ls161[m_port_select] | m_direction[m_port_select];
 	//logerror("dialread1: %02x, counter_74ls161: %02x, spinner ret is %02x\n", dialread, m_counter_74ls161[m_port_select], ret);
@@ -6681,11 +6686,11 @@ static INPUT_PORTS_START( moonwar )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P1_DIAL")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_REVERSE PORT_RESET PORT_CONDITION("IN2", 0x08, EQUALS, 0x08) // cocktail: dial is reversed
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_RESET PORT_CONDITION("IN2", 0x08, EQUALS, 0x00) // upright: dial works normally
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_REVERSE PORT_CONDITION("IN2", 0x08, EQUALS, 0x08) // cocktail: dial is reversed
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_CONDITION("IN2", 0x08, EQUALS, 0x00) // upright: dial works normally
 
 	PORT_START("P2_DIAL")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_RESET PORT_COCKTAIL PORT_REVERSE // cocktail: dial is reversed
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_COCKTAIL PORT_REVERSE // cocktail: dial is reversed
 INPUT_PORTS_END
 
 /* verified from Z80 code */
@@ -6700,10 +6705,10 @@ static INPUT_PORTS_START( moonwara )
 	PORT_DIPSETTING(    0x06, "A 1/4  B 2/1" )
 
 	PORT_MODIFY("P1_DIAL")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_RESET // both: p1 dial works normally, p2 dial is reversed, both share same port
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) // both: p1 dial works normally, p2 dial is reversed, both share same port
 
 	PORT_MODIFY("P2_DIAL")       /* doesn't actually work due to bug in game code */
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_RESET PORT_COCKTAIL
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_COCKTAIL
 INPUT_PORTS_END
 
 
@@ -7783,7 +7788,7 @@ void bmxstunts_state::bmxstunts(machine_config &config)
 {
 	galaxian_base(config);
 
-	M6502(config.replace(), m_maincpu, 3'072'000); // Synertek 6502A, TODO: verify clock
+	M6502(config.replace(), m_maincpu, 3'072'000 / 2); // Synertek 6502A, TODO: verify clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &bmxstunts_state::bmxstunts_map);
 
 	set_irq_line(0);
@@ -12314,7 +12319,7 @@ on the day of 18/07/10
 
 PCB is a bootleg Galaxian, with pin headers, probably
 of European origin. The signs and marking point to
-it being a Moon Cresta, but I'm note sure. Also it
+it being a Moon Cresta, but I'm not sure. Also it
 has a potted block in the CPU socket...
 
 I haven't dumped the gfx roms, lets see what the game
@@ -12327,7 +12332,7 @@ moon cresta gfx roms....
 
 BMX Stunts by Jetsoft on Galaxian bootleg PCB.
 
-6502A CPU in epoxy block with one 6331 PROM (not dumped)
+6502A CPU in epoxy block with one 6331 PROM.
 One 74LS74 and one 74LS273 logic.
 One SN76489AN Digital Complex Sound Generator.
 There was a wire lead coming out of the epoxy and soldered
@@ -12358,7 +12363,7 @@ chaneman 7/31/2022
 */
 
 ROM_START( bmxstunts )
-	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_REGION( 0x4000, "maincpu", 0 ) // A0 inverted, hence the weird ROM load macro
 	ROM_LOAD16_WORD_SWAP( "b-mx.1", 0x0000, 0x0800, CRC(cf3061f1) SHA1(e229a2a09b56332359c3f87953acb07c4c7d3abb) )
 	ROM_LOAD16_WORD_SWAP( "b-mx.2", 0x0800, 0x0800, CRC(f145e09d) SHA1(8d3f379dbb5ec9304aa61d99cac003dfb8050485) )
 	ROM_LOAD16_WORD_SWAP( "b-mx.3", 0x1000, 0x0800, CRC(ea415c49) SHA1(eb55b4b24ef4e04f5c2873ad7fef2dce891cefef) )
@@ -12376,7 +12381,7 @@ ROM_START( bmxstunts )
 	ROM_LOAD( "bmx6331.6l", 0x0000, 0x0020, CRC(ce3e9306) SHA1(62dc5208eea2d3126e61cc7af30e71a9e60d438c) )
 
 	ROM_REGION( 0x0020, "epoxy_block_prom", 0 )
-	ROM_LOAD( "6331", 0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "6331", 0x0000, 0x0020, CRC(13a9bc62) SHA1(1c4e4fab051e313e38eb77f1872845efe2e4e04f) )
 ROM_END
 
 
