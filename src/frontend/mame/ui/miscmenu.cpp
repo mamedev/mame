@@ -448,7 +448,7 @@ void menu_crosshair::populate(float &customtop, float &custombottom)
 		std::stable_sort(
 				m_pics.begin(),
 				m_pics.end(),
-				[] (std::string const &a, std::string const &b) { return 0 > core_stricmp(a.c_str(), b.c_str()); });
+				[] (std::string const &a, std::string const &b) { return 0 > core_stricmp(a, b); });
 	}
 
 	// Make sure to keep these matched to the CROSSHAIR_VISIBILITY_xxx types

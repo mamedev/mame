@@ -1030,7 +1030,7 @@ private:
 
 	static bool include_clones_default(std::string const &name)
 	{
-		return !core_stricmp(name.c_str(), "category.ini") || !core_stricmp(name.c_str(), "alltime.ini");
+		return !core_stricmp(name, "category.ini") || !core_stricmp(name, "alltime.ini");
 	}
 
 	unsigned m_ini, m_group;

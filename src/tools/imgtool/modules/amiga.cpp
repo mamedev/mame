@@ -255,14 +255,17 @@ static int intl_toupper(int c)
 
 
 /* Amiga filename case insensitive string compare */
-static int intl_stricmp(const char *s1, const char *s2)
+static int intl_stricmp(std::string_view s1, std::string_view s2)
 {
+	const int END_VALUE = -256;
+	auto s1_iter = s1.begin();
+	auto s2_iter = s2.begin();
+
 	for (;;)
 	{
-		int c1 = intl_toupper(*s1++);
-		int c2 = intl_toupper(*s2++);
-
-		if (c1 == 0 || c1 != c2)
+		int c1 = s1_iter != s1.end() ? intl_toupper((uint8_t)*s1_iter++) : END_VALUE;
+		int c2 = s2_iter != s2.end() ? intl_toupper((uint8_t)*s2_iter++) : END_VALUE;
+		if (c1 == END_VALUE || c1 != c2)
 			return c1 - c2;
 	}
 }
@@ -971,7 +974,7 @@ static imgtoolerr_t walk_hash_chain(imgtool::image &img, const char *path, int s
 	char name[31];
 
 	/* choose compare function depending on intl mode */
-	int (*cmp)(const char *, const char *) = is_intl(img) ? &intl_stricmp : &core_stricmp;
+	int (*cmp)(std::string_view, std::string_view) = is_intl(img) ? &intl_stricmp : &core_stricmp;
 
 	/* initialize filenames */
 	memset(name, 0, sizeof(name));
