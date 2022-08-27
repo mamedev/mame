@@ -61,10 +61,11 @@
 #include "bus/mononcol/carts.h"
 
 #include "cpu/axc51/axc51.h"
+#include "cpu/m6502/m65ce02.h"
 #include "sound/dac.h"
 
 #define LOG_VDP (1U <<  1)
-#define LOG_SOUNDMCUCOMMS (1U << 2)
+#define LOG_MUSICMCUCOMMS (1U << 2)
 
 //#define VERBOSE     (LOG_VDP)
 #define VERBOSE     (0)
@@ -78,6 +79,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_cart(*this, "cartslot"),
 		m_maincpu(*this, "maincpu"),
+		m_musicmcu(*this, "musicmcu"),
+		m_musicrom(*this, "musicmcu"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_dac(*this, "dac"),
@@ -98,11 +101,16 @@ private:
 
 	required_device<mononcol_cartslot_device> m_cart;
 	required_device<ax208_cpu_device> m_maincpu;
+	required_device<m65ce02_device> m_musicmcu;
+	required_region_ptr<uint8_t> m_musicrom;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<dac_8bit_r2r_twos_complement_device> m_dac;
 	required_ioport_array<4> m_debugin;
 	required_ioport_array<4> m_controls;
+
+	void music_mem(address_map &map);
+	uint8_t music_rts_r();
 
 	uint8_t in0_r();
 	uint8_t in1_r();
@@ -128,12 +136,6 @@ private:
 		return m_cart->read();
 	}
 
-	uint8_t spibuf_direct_r()
-	{
-		m_lastspi = m_cart->read();
-		return m_lastspi;
-	}
-
 	DECLARE_WRITE_LINE_MEMBER(spidir_w)
 	{
 		m_cart->dir_w(state);
@@ -144,12 +146,12 @@ private:
 		m_cart->write(data);
 	}
 
-	void get_sound_command_bit(uint8_t bit);
-	bool m_sound_direction_iswrite;
-	uint16_t m_sound_latch;
-	uint8_t m_sound_bitpos;
-	uint8_t m_sound_response_bit;
-	uint8_t m_sound_bits_in_needed;
+	void get_music_command_bit(uint8_t bit);
+	bool m_music_direction_iswrite;
+	uint16_t m_music_latch;
+	uint8_t m_music_bitpos;
+	uint8_t m_music_response_bit;
+	uint8_t m_music_bits_in_needed;
 
 	void do_draw_inner(int pal_to_use, int start, int step, int pixmask, int amount);
 	void do_draw(int amount, int pal_to_use);
@@ -167,8 +169,6 @@ private:
 	uint8_t m_out2data;
 	uint8_t m_out1data;
 	uint8_t m_out0data;
-
-	uint8_t m_lastspi;
 
 	uint8_t m_curpal[0x800 * 3];
 };
@@ -190,11 +190,11 @@ void monon_color_state::machine_start()
 	save_item(NAME(m_curpal));
 	save_item(NAME(m_storeregs));
 
-	save_item(NAME(m_sound_direction_iswrite));
-	save_item(NAME(m_sound_latch));
-	save_item(NAME(m_sound_bitpos));
-	save_item(NAME(m_sound_response_bit));
-	save_item(NAME(m_sound_bits_in_needed));
+	save_item(NAME(m_music_direction_iswrite));
+	save_item(NAME(m_music_latch));
+	save_item(NAME(m_music_bitpos));
+	save_item(NAME(m_music_response_bit));
+	save_item(NAME(m_music_bits_in_needed));
 }
 
 
@@ -226,13 +226,16 @@ void monon_color_state::machine_reset()
 	m_bufpos_y = 239;
 
 	std::fill(std::begin(m_storeregs), std::end(m_storeregs), 0);
-	std::fill(std::begin(m_linebuf), std::end(m_linebuf), 0);	
+	std::fill(std::begin(m_linebuf), std::end(m_linebuf), 0);
 
-	m_sound_direction_iswrite = true;
-	m_sound_latch = 0;
-	m_sound_bitpos = 0;
-	m_sound_response_bit = 0;
-	m_sound_bits_in_needed = 0;
+	m_music_direction_iswrite = true;
+	m_music_latch = 0;
+	m_music_bitpos = 0;
+	m_music_response_bit = 0;
+	m_music_bits_in_needed = 0;
+
+	// don't need it running for now as the program is incomplete
+	m_musicmcu->suspend(SUSPEND_REASON_DISABLE, 1);
 }
 
 
@@ -370,12 +373,12 @@ static INPUT_PORTS_START( monon_color )
 INPUT_PORTS_END
 
 /*
-	muxselect = p1 & 0x18;
+    muxselect = p1 & 0x18;
 
-	0x30 input bits in p0
-	0x04 input bits in p2
+    0x30 input bits in p0
+    0x04 input bits in p2
 
-	0x04 in port 4 combine inputs?
+    0x04 in port 4 combine inputs?
 */
 
 uint8_t monon_color_state::read_current_inputs()
@@ -432,7 +435,7 @@ uint8_t monon_color_state::in2_r()
 {
 	uint8_t in = read_current_inputs();
 	uint8_t ret = m_out2data & 0x7b;
-	ret |= m_sound_response_bit << 7;
+	ret |= m_music_response_bit << 7;
 	if (in & 0x04) ret |= 0x04;
 
 	return ret;
@@ -491,90 +494,88 @@ void monon_color_state::out1_w(uint8_t data)
 
 }
 
-void monon_color_state::get_sound_command_bit(uint8_t bit)
+void monon_color_state::get_music_command_bit(uint8_t bit)
 {
 	bit &= 1;
 
-	if (m_sound_bitpos == 0)
+	if (m_music_bitpos == 0)
 	{
 		// first bit isn't part of the data? but isn't 0/1 depending on if it's a read/write either?
-		//LOGMASKED(LOG_SOUNDMCUCOMMS, "%s: started read/write command\n", machine().describe_context());
-		m_sound_bitpos++;
-
-		if (!m_sound_direction_iswrite)
-		{
-			// There is a protection check involving the axxx commands
-			// The game expects to read a byte from the sound MCU and
-			// compares it with a byte in the SPI ROM from e000 - efff
-			//
-			// This data in the SPI ROM is 65ec02 code that maps at
-			// 0x2000, so the check is presumably checking a random byte
-			// from part of the internal sound MCU ROM against the table
-			// stored in ROM.  Sadly the internal program is larger than
-			// the 0x1000 bytes of it that have been duplicated in the
-			// SPI ROM for this check.
-			//
-			// If it doesn't get this, it will loop until by chance it gets the same
-			// value, which results in random delays (eg. when moving the volume
-			// slider from 0 to any other value)
-			//
-			// mechcycla (the game with the earliest firmware) will jump to an infinite
-			// loop if this is wrong, this doesn't happen with mechcycl, which uses a
-			// later firmware.
-
-			m_sound_latch = m_lastspi;
-			//logerror("m_sound_latch set to %02x\n", m_sound_latch);
-
-		}
+		//LOGMASKED(LOG_MUSICMCUCOMMS, "%s: started read/write command\n", machine().describe_context());
+		m_music_bitpos++;
 	}
 	else
 	{
-		if (m_sound_direction_iswrite)
+		if (m_music_direction_iswrite)
 		{
-			m_sound_latch = m_sound_latch << 1;
-			m_sound_latch |= bit;
+			m_music_latch = m_music_latch << 1;
+			m_music_latch |= bit;
 
-			m_sound_bitpos++;
+			m_music_bitpos++;
 
-			if (m_sound_bitpos == 17)
+			if (m_music_bitpos == 17)
 			{
-				//LOGMASKED(LOG_SOUNDMCUCOMMS, "%s: sent sound word %04x to MCU\n", machine().describe_context(), m_sound_latch);
-				m_sound_bitpos = 0;
+				//LOGMASKED(LOG_MUSICMCUCOMMS, "%s: sent sound word %04x to MCU\n", machine().describe_context(), m_music_latch);
+				m_music_bitpos = 0;
 
-				switch (m_sound_latch & 0xf000)
+				switch (m_music_latch & 0xf000)
 				{
 
 				case 0x0000:
-					LOGMASKED(LOG_SOUNDMCUCOMMS, "0-00x set volume to %04x\n", m_sound_latch & 0x0fff);
-					m_sound_latch = 0;
+					LOGMASKED(LOG_MUSICMCUCOMMS, "0-00x set volume to %04x\n", m_music_latch & 0x0fff);
+					m_music_latch = 0;
 					break;
 
 				case 0x2000:
-					LOGMASKED(LOG_SOUNDMCUCOMMS, "2-00x play music %04x\n", m_sound_latch & 0x0fff);
-					m_sound_latch = 0;
+					LOGMASKED(LOG_MUSICMCUCOMMS, "2-00x play music %04x\n", m_music_latch & 0x0fff);
+					m_music_latch = 0;
 					break;
 
 				case 0x3000:
-					LOGMASKED(LOG_SOUNDMCUCOMMS, "3-000 stop all %04x\n", m_sound_latch & 0x0fff);
-					m_sound_latch = 0;
+					LOGMASKED(LOG_MUSICMCUCOMMS, "3-000 stop all %04x\n", m_music_latch & 0x0fff);
+					m_music_latch = 0;
 					break;
 
 				case 0x4000:
-					LOGMASKED(LOG_SOUNDMCUCOMMS, "4-000 reset? %04x\n", m_sound_latch & 0x0fff);
-					m_sound_latch = 0;
+					LOGMASKED(LOG_MUSICMCUCOMMS, "4-000 reset? %04x\n", m_music_latch & 0x0fff);
+					m_music_latch = 0;
 					break;
 
 				case 0xa000:
-					// spams a variable amount of this between scenes
-					// This appears to be for copy protection purposes, see note above
-					LOGMASKED(LOG_SOUNDMCUCOMMS, "a-xxx status return wanted %04x\n", m_sound_latch & 0x0fff);
-					m_sound_direction_iswrite = false;
-					m_sound_bits_in_needed = 9;
+					// Spams this command a variable amount of this between scenes
+
+					// There is a protection check involving the axxx commands
+					// The game expects to read a byte from the music MCU and
+					// compares it with a byte in the SPI ROM from e000 - efff
+					//
+					// This data in the SPI ROM is 65ce02 code that maps at
+					// 0x2000, so the check is presumably checking a random byte
+					// from part of the internal music MCU ROM against the table
+					// stored in ROM.  Sadly the internal program is larger than
+					// the 0x1000 bytes of it that have been duplicated in the
+					// SPI ROM for this check.
+					//
+					// If it doesn't get this, it will loop until by chance it gets the same
+					// value, which results in random delays (eg. when moving the volume
+					// slider from 0 to any other value)
+					//
+					// mechcycla (the game with the earliest firmware) will jump to an infinite
+					// loop if this is wrong, this doesn't happen with mechcycl, which uses a
+					// later firmware.
+					//
+					// unfortunately no way of getting the MCU to read out anytihng
+					// other than the single 0x1000 range it checks using the axxx commands
+					// has been found.
+
+					LOGMASKED(LOG_MUSICMCUCOMMS, "a-xxx status return wanted %04x\n", m_music_latch & 0x0fff);
+					m_music_direction_iswrite = false;
+					m_music_bits_in_needed = 9;
+					m_music_latch = m_musicrom[m_music_latch & 0xfff];
 					break;
 
 				default:
-					LOGMASKED(LOG_SOUNDMCUCOMMS, "x-xxx unknown MCU write %04x\n", m_sound_latch);
-					m_sound_latch = 0;
+					LOGMASKED(LOG_MUSICMCUCOMMS, "x-xxx unknown MCU write %04x\n", m_music_latch);
+					m_music_latch = 0;
 					break;
 
 				}
@@ -583,16 +584,16 @@ void monon_color_state::get_sound_command_bit(uint8_t bit)
 		}
 		else
 		{
-			m_sound_response_bit = (m_sound_latch & 0x80)>>7;
-			m_sound_latch <<= 1;
+			m_music_response_bit = (m_music_latch & 0x80)>>7;
+			m_music_latch <<= 1;
 
-			m_sound_bitpos++;
+			m_music_bitpos++;
 
-			if (m_sound_bitpos == m_sound_bits_in_needed)
+			if (m_music_bitpos == m_music_bits_in_needed)
 			{
-				//LOGMASKED(LOG_SOUNDMCUCOMMS, "%s: finished clocking in MCU response to read?\n", machine().describe_context());
-				m_sound_bitpos = 0;
-				m_sound_direction_iswrite = true;
+				//LOGMASKED(LOG_MUSICMCUCOMMS, "%s: finished clocking in MCU response to read?\n", machine().describe_context());
+				m_music_bitpos = 0;
+				m_music_direction_iswrite = true;
 			}
 		}
 	}
@@ -600,7 +601,7 @@ void monon_color_state::get_sound_command_bit(uint8_t bit)
 
 void monon_color_state::out2_w(uint8_t data)
 {
-	// on the cartridge PCB the connections to the sound MCU glob are marked P21, P25 and P27
+	// on the cartridge PCB the connections to the music MCU glob are marked P21, P25 and P27
 	// This is where the signals go on the AX208 (Port 2 bit 1, Port 2 bit 5, Port 2 bit 7)
 
 	// m-C- --Ms
@@ -631,8 +632,8 @@ void monon_color_state::out2_w(uint8_t data)
 		else
 		{
 			// sends m_out2data & 0x02 to external device / latches a read bit into m_out2data & 0x80
-			//logerror("%s: send / receive sound MCU, bit written %d\n", machine().describe_context(), (data & 0x02) >> 1);
-			get_sound_command_bit((data & 0x02) >> 1); 
+			//logerror("%s: send / receive music MCU, bit written %d\n", machine().describe_context(), (data & 0x02) >> 1);
+			get_music_command_bit((data & 0x02) >> 1);
 		}
 	}
 
@@ -700,7 +701,7 @@ void monon_color_state::do_draw_inner(int pal_to_use, int start, int step, int p
 					else
 					{
 						m_linebuf[real_ypos] = rgb;
-						
+
 					}
 				}
 			}
@@ -716,15 +717,15 @@ void monon_color_state::do_draw(int amount, int pal_to_use)
 	}
 	else if (m_storeregs[0x12] == 0x12) // 4bpp mode
 	{
-		do_draw_inner(pal_to_use, 4, 4, 0xf, amount);	
+		do_draw_inner(pal_to_use, 4, 4, 0xf, amount);
 	}
 	else if (m_storeregs[0x12] == 0x11) // 2bpp mode
 	{
-		do_draw_inner(pal_to_use, 6, 2, 0x3, amount);	
+		do_draw_inner(pal_to_use, 6, 2, 0x3, amount);
 	}
 	else if (m_storeregs[0x12] == 0x10)  // 1bpp mode
 	{
-		do_draw_inner(pal_to_use, 7, 1, 1, amount);	
+		do_draw_inner(pal_to_use, 7, 1, 1, amount);
 	}
 
 	m_bufpos_y = 239;
@@ -741,7 +742,7 @@ void monon_color_state::do_palette(int amount, int pal_to_use)
 		m_curpal[address] = romdat;
 		int entry = address / 3;
 
-		m_palette->set_pen_color(entry, rgb_t(m_curpal[(entry * 3) + 2], m_curpal[(entry * 3) + 1],	m_curpal[(entry * 3) + 0]));
+		m_palette->set_pen_color(entry, rgb_t(m_curpal[(entry * 3) + 2], m_curpal[(entry * 3) + 1], m_curpal[(entry * 3) + 0]));
 	}
 }
 
@@ -795,8 +796,8 @@ void monon_color_state::write_to_video_device(uint8_t data)
 				m_storeregs[m_out0data] = data;
 		}
 
-		//	popmessage("%02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x | %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n", m_storeregs[0x00], m_storeregs[0x01], m_storeregs[0x02], m_storeregs[0x03], m_storeregs[0x04], m_storeregs[0x05], m_storeregs[0x06], m_storeregs[0x07], m_storeregs[0x08], m_storeregs[0x09], m_storeregs[0x0a], m_storeregs[0x0b], m_storeregs[0x0c], m_storeregs[0x0d], m_storeregs[0x0e], m_storeregs[0x0f],
-		//		m_storeregs[0x10], m_storeregs[0x11], m_storeregs[0x12], m_storeregs[0x13], m_storeregs[0x14], m_storeregs[0x15], m_storeregs[0x16], m_storeregs[0x17], m_storeregs[0x18], m_storeregs[0x19], m_storeregs[0x1a], m_storeregs[0x1b], m_storeregs[0x1c], m_storeregs[0x1d], m_storeregs[0x1e], m_storeregs[0x1f]);
+		//  popmessage("%02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x | %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n", m_storeregs[0x00], m_storeregs[0x01], m_storeregs[0x02], m_storeregs[0x03], m_storeregs[0x04], m_storeregs[0x05], m_storeregs[0x06], m_storeregs[0x07], m_storeregs[0x08], m_storeregs[0x09], m_storeregs[0x0a], m_storeregs[0x0b], m_storeregs[0x0c], m_storeregs[0x0d], m_storeregs[0x0e], m_storeregs[0x0f],
+		//      m_storeregs[0x10], m_storeregs[0x11], m_storeregs[0x12], m_storeregs[0x13], m_storeregs[0x14], m_storeregs[0x15], m_storeregs[0x16], m_storeregs[0x17], m_storeregs[0x18], m_storeregs[0x19], m_storeregs[0x1a], m_storeregs[0x1b], m_storeregs[0x1c], m_storeregs[0x1d], m_storeregs[0x1e], m_storeregs[0x1f]);
 
 	}
 	else if (m_out4data == 0x09)
@@ -901,6 +902,25 @@ void monon_color_state::out4_w(uint8_t data)
 	m_out4data = data;
 }
 
+
+uint8_t monon_color_state::music_rts_r()
+{
+	return 0x60;
+}
+
+void monon_color_state::music_mem(address_map &map)
+{
+	map(0x0000, 0x01ff).ram();
+
+	map(0x2000, 0x2fff).rom().region("musicmcu", 0x0000);
+	map(0x3000, 0x3fff).r(FUNC(monon_color_state::music_rts_r)); // likely ROM here, lots of JSR calls
+
+	map(0xa000, 0xafff).r(FUNC(monon_color_state::music_rts_r)); // likely ROM here, lots of JSR calls
+
+	map(0xfff0, 0xffff).rom().region("musicmcu", 0x1ff0);
+}
+
+
 void monon_color_state::monon_color(machine_config &config)
 {
 	/* basic machine hardware */
@@ -915,11 +935,14 @@ void monon_color_state::monon_color(machine_config &config)
 	m_maincpu->port_out_cb<2>().set(FUNC(monon_color_state::out2_w));
 	m_maincpu->port_out_cb<3>().set(FUNC(monon_color_state::out3_w));
 	m_maincpu->port_out_cb<4>().set(FUNC(monon_color_state::out4_w));
-	m_maincpu->spi_in_cb().set(FUNC(monon_color_state::spibuf_direct_r));
+	m_maincpu->spi_in_cb().set(FUNC(monon_color_state::spibuf_r));
 	m_maincpu->spi_out_cb().set(FUNC(monon_color_state::spibuf_w));
 	m_maincpu->spi_out_dir_cb().set(FUNC(monon_color_state::spidir_w));
 	m_maincpu->dac_out_cb<0>().set(FUNC(monon_color_state::dacout0_w));
 	m_maincpu->dac_out_cb<1>().set(FUNC(monon_color_state::dacout1_w));
+
+	M65CE02(config, m_musicmcu, 4000000);
+	m_musicmcu->set_addrmap(AS_PROGRAM, &monon_color_state::music_mem);
 
 	/* video hardware */
 
@@ -938,7 +961,7 @@ void monon_color_state::monon_color(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.500); // should this be in the AX208 device?
-	
+
 	mononcol_cartslot_device &cartslot(MONONCOL_CARTSLOT(config, "cartslot", mononcol_plain_slot));
 	cartslot.set_must_be_loaded(true);
 
@@ -947,6 +970,16 @@ void monon_color_state::monon_color(machine_config &config)
 }
 
 ROM_START( mononcol )
+	// TODO: each cartridge has a music MCU inside of it.  This data appears to be 0x1000 bytes of the
+	//       program that is checked as 'security' and can be found in the SPI ROMs.  A way to dump
+	//       the full ROM is needed, at which point the game specific music MCU ROMs should be
+	//       moved into the software list.  This just allows us to study what exists of this sound
+	//       program until then.
+	ROM_REGION( 0x2000, "musicmcu", ROMREGION_ERASEFF )
+	ROM_LOAD( "music_mcu.bin", 0x0000, 0x1000, BAD_DUMP CRC(54224c67) SHA1(4a4e1d6995e6c8a36e3979bc22b8e9a1ea8f954f) )
+	// fake boot vector, as we don't have one, but the code above expects to boot at 0x2000
+	ROM_FILL( 0x1ffc, 0x1, 0x00 )
+	ROM_FILL( 0x1ffd, 0x1, 0x20 )
 ROM_END
 
 CONS( 2014, mononcol,    0,          0,  monon_color,  monon_color,    monon_color_state, empty_init,    "M&D",   "Monon Color", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

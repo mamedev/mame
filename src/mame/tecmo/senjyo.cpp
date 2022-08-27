@@ -14,6 +14,7 @@ TODO:
 - remove memory pointers for video attribute RAM area (r/w handlers instead?),
   then the workaround at the end of starforb_map isn't needed, and m_scrollhack
   can probably be removed too
+- lowpass filter on DAC?
 
 Note:
 - Star Force shows default MAME palette at POST. Flipped to all_black for now.

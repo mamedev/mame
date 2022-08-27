@@ -15,7 +15,7 @@ Notes:
 TODO:
 - Colors are not right. In zerohour P1 score should be white, the top score green,
   and "TOP" should be magenta. How is this determined? It's as if only the top part
-  of the screen has this exception. Sprite colors look ok.
+  of the screen has this exception. Maybe via the unknown PROM? Sprite colors look ok.
 - Some graphical problems in both games
 - redclash supports more background layer effects: white+mixed with other colors,
   used in canyon parts and during the big ufo explosion
@@ -30,37 +30,10 @@ TODO:
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
-//#include "sound/sn76496.h"
+#include "sound/sn76496.h"
 #include "screen.h"
 #include "speaker.h"
 
-static const char *const sample_names[] =
-{
-	"*zerohour",
-	"zh0",
-	"zh1",
-	"zh2",
-	"zh3",
-	"zh4",
-	"zh5",
-	"zh6",
-	"zh7",
-	"zh8",
-	"zh9",
-	"zh10",
-	nullptr
-};
-
-WRITE_LINE_MEMBER(redclash_state::sound_w)
-{
-	m_allow = state;
-}
-
-template <unsigned S> WRITE_LINE_MEMBER(redclash_state::sample_w)
-{
-	if (m_allow && state)
-		m_samples->start(S, S);
-}
 
 void redclash_state::irqack_w(uint8_t data)
 {
@@ -331,7 +304,6 @@ GFXDECODE_END
 void redclash_state::machine_start()
 {
 	save_item(NAME(m_gfxbank));
-	save_item(NAME(m_allow));
 
 	m_gfxbank = 0;
 }
@@ -342,22 +314,10 @@ void redclash_state::zerohour(machine_config &config)
 	Z80(config, m_maincpu, 4_MHz_XTAL);  /* 4 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &redclash_state::zerohour_map);
 
-	ls259_device &outlatch1(LS259(config, "outlatch1")); // C1 (CS10 decode)
-	outlatch1.q_out_cb<0>().set(FUNC(redclash_state::sample_w<0>));
-	outlatch1.q_out_cb<1>().set(FUNC(redclash_state::sample_w<1>));
-	outlatch1.q_out_cb<2>().set(FUNC(redclash_state::sample_w<2>));
-	outlatch1.q_out_cb<3>().set(FUNC(redclash_state::sample_w<3>));
-	outlatch1.q_out_cb<4>().set(FUNC(redclash_state::sample_w<4>));
-	outlatch1.q_out_cb<5>().set(FUNC(redclash_state::sample_w<5>));
-	outlatch1.q_out_cb<6>().set(FUNC(redclash_state::sample_w<6>));
-	outlatch1.q_out_cb<7>().set(FUNC(redclash_state::sample_w<7>));
+	LS259(config, "outlatch1"); // C1 (CS10 decode)
 
 	ls259_device &outlatch2(LS259(config, "outlatch2")); // C2 (CS11 decode)
 	outlatch2.q_out_cb<0>().set(FUNC(redclash_state::star_w<0>));
-	outlatch2.q_out_cb<1>().set(FUNC(redclash_state::sample_w<8>));
-	outlatch2.q_out_cb<2>().set(FUNC(redclash_state::sound_w));
-	outlatch2.q_out_cb<3>().set(FUNC(redclash_state::sample_w<9>));
-	outlatch2.q_out_cb<4>().set(FUNC(redclash_state::sample_w<10>));
 	outlatch2.q_out_cb<5>().set(FUNC(redclash_state::star_w<1>));
 	outlatch2.q_out_cb<6>().set(FUNC(redclash_state::star_w<2>));
 	outlatch2.q_out_cb<7>().set(FUNC(redclash_state::flipscreen_w));
@@ -375,12 +335,6 @@ void redclash_state::zerohour(machine_config &config)
 	ZEROHOUR_STARS(config, m_stars, 0);
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(11);
-	m_samples->set_samples_names(sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 
