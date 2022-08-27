@@ -23764,7 +23764,7 @@ tankbatl                        // (c) 1992 Microprose Games Inc.
 @source:beehive/microb.cpp
 dm3270                          //
 
-@source:misc/micom_mahjong.cpp
+@source:tvgames/micom_mahjong.cpp
 mmahjong
 
 @source:misc/microdar.cpp
