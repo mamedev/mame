@@ -156,7 +156,7 @@ private:
 	void do_palette(int amount, int pal_to_use);
 
 	rgb_t m_linebuf[240];
-	rgb_t m_vidbuffer[320 * 240];
+	std::unique_ptr<rgb_t[]> m_vidbuffer;
 	int16_t m_bufpos_y;
 	uint32_t m_bufpos_x;
 	uint8_t m_storeregs[0x20];
@@ -175,6 +175,8 @@ private:
 
 void monon_color_state::machine_start()
 {
+	m_vidbuffer = std::make_unique<rgb_t[]>(320 * 240);
+
 	save_item(NAME(m_dacbyte));
 	save_item(NAME(m_out4data));
 	save_item(NAME(m_out3data));
@@ -182,7 +184,7 @@ void monon_color_state::machine_start()
 	save_item(NAME(m_out1data));
 	save_item(NAME(m_out0data));
 	save_item(NAME(m_linebuf));
-	save_item(NAME(m_vidbuffer));
+	save_pointer(NAME(m_vidbuffer), 320 * 240);
 	save_item(NAME(m_bufpos_x));
 	save_item(NAME(m_bufpos_y));
 	save_item(NAME(m_curpal));
@@ -225,7 +227,6 @@ void monon_color_state::machine_reset()
 
 	std::fill(std::begin(m_storeregs), std::end(m_storeregs), 0);
 	std::fill(std::begin(m_linebuf), std::end(m_linebuf), 0);	
-	std::fill(std::begin(m_vidbuffer), std::end(m_vidbuffer), 0);
 
 	m_sound_direction_iswrite = true;
 	m_sound_latch = 0;
@@ -238,7 +239,7 @@ void monon_color_state::machine_reset()
 
 uint32_t monon_color_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	rgb_t* videoram = m_vidbuffer;
+	rgb_t* videoram = m_vidbuffer.get();
 
 	for (int y = 0; y < 240; y++)
 	{
