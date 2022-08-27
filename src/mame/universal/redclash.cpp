@@ -15,7 +15,7 @@ Notes:
 TODO:
 - Colors are not right. In zerohour P1 score should be white, the top score green,
   and "TOP" should be magenta. How is this determined? It's as if only the top part
-  of the screen has this exception. Sprite colors look ok.
+  of the screen has this exception. Maybe via the unknown PROM? Sprite colors look ok.
 - Some graphical problems in both games
 - redclash supports more background layer effects: white+mixed with other colors,
   used in canyon parts and during the big ufo explosion
