@@ -108,7 +108,7 @@ int fdos_format::find_size(util::random_read &io, uint32_t form_factor, const st
 
 	for (int i=0; fdos_formats::formats[i].form_factor; i++) {
 		const format &f = fdos_formats::formats[i];
-		
+
 		// Format Check
 		// Check byte 0 and byte 3 of Track 0 Sector 0
 		// 00320 2400 BD 240C START  JSR   BOOT
@@ -120,13 +120,13 @@ int fdos_format::find_size(util::random_read &io, uint32_t form_factor, const st
 			return -1;
 		if (boot0[0] != 0xbd && boot0[3] != 0xde)
 			continue;
-		
+
 		LOG_FORMATS("FDOS floppy dsk: size %u bytes, %u total sectors, %u remaining bytes, expected form factor %x\n",
 				size,
 				size / f.sector_base_size,
 				size % f.sector_base_size,
 				form_factor);
-		
+
 		// Directory entries start at Track 2 Sector 0
 		ec = io.read_at(2 * f.sector_count * f.sector_base_size, &info, sizeof(struct fdos_formats::dirent_entry_fdos), actual);
 		if (ec || actual != sizeof(struct fdos_formats::dirent_entry_fdos))

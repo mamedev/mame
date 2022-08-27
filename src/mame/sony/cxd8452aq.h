@@ -25,7 +25,7 @@ public:
 
 	template <typename... T>
 	void set_apbus_address_translator(T &&...args) { m_apbus_virt_to_phys_callback.set(std::forward<T>(args)...); }
-	
+
 	template <typename T>
 	void set_bus(T &&tag, int spacenum) { m_bus.set_tag(std::forward<T>(tag), spacenum); }
 

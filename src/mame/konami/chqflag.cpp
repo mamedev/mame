@@ -85,7 +85,7 @@ void chqflag_state::chqflag_vreg_w(uint8_t data)
 	const double shadow_factors[4] = {0.8, 1.0, 1.33, 1.66};
 	uint8_t shadow_value = (data & 0x08) >> 3;
 	uint8_t shadow_setting = (data & 0x80) >> 7;
-	
+
 	m_k051960->set_shadow_inv(shadow_setting);
 
 	m_palette->set_shadow_factor(shadow_factors[(shadow_setting << 1) + shadow_value]);
@@ -95,7 +95,7 @@ void chqflag_state::chqflag_vreg_w(uint8_t data)
 		m_last_vreg = shadow_setting;
 		update_background_shadows(shadow_setting);
 	}
-	
+
 	#if 0
 	if ((data & 0x80) != m_last_vreg)
 	{

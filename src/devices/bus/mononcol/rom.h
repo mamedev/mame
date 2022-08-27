@@ -34,8 +34,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(dir_w) override { m_spi->dir_w(state); }
 	void write(uint8_t data) override { m_spi->write(data); }
 	void set_ready() override { m_spi->set_ready(); }
-	void set_spi_region(uint8_t* region) override { m_spi->set_rom_ptr(region); } 
-	void set_spi_size(size_t size) override { m_spi->set_rom_size(size); } 
+	void set_spi_region(uint8_t* region) override { m_spi->set_rom_ptr(region); }
+	void set_spi_size(size_t size) override { m_spi->set_rom_size(size); }
 
 
 protected:

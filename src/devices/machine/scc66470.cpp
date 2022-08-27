@@ -3,19 +3,19 @@
 /***************************************************************************
     Philips SCC66470 Video and System controller.
 
-	This does not render the image to the display. It is up to the user
-	to provide their own screen_update function. Pixel (palette offset) data
-	can be obtained by calling line( line number ) for each line.
-	Some boards have multiple video sources, the source being displayed being
-	selected based on pixel value...is there a nice way of doing this other
-	than leaving it to the board driver ?
+    This does not render the image to the display. It is up to the user
+    to provide their own screen_update function. Pixel (palette offset) data
+    can be obtained by calling line( line number ) for each line.
+    Some boards have multiple video sources, the source being displayed being
+    selected based on pixel value...is there a nice way of doing this other
+    than leaving it to the board driver ?
 
-	Todo:
-		Add support for mosaic and RLE screens.
-		Add remaining pixac operations. Only BCOLOUR1/BCOLOUR2 are supported.
-		Add interlaced support.
-		Add bep ?
-		Verify number of cycles for each access.
+    Todo:
+        Add support for mosaic and RLE screens.
+        Add remaining pixac operations. Only BCOLOUR1/BCOLOUR2 are supported.
+        Add interlaced support.
+        Add bep ?
+        Verify number of cycles for each access.
 ***************************************************************************/
 
 #include "emu.h"
@@ -98,7 +98,7 @@ struct horizontal_settings
 
 static const horizontal_settings h_table[] =
 {
-	               //cf1 cf2 ss st
+				   //cf1 cf2 ss st
 	{ 512,  64 },  // 0   0   0  0
 	{ 512,  64 },  // 0   0   0  1
 	{ 512,   0 },  // 0   0   1  0

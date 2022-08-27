@@ -84,12 +84,12 @@ private:
 	devcb_write_line m_firq_handler;
 	devcb_write_line m_nmi_handler;
 
-	uint8_t	m_spriterombank[3];
-	uint8_t	m_romoffset;
-	bool	m_spriteflip, m_readroms;
+	uint8_t m_spriterombank[3];
+	uint8_t m_romoffset;
+	bool    m_spriteflip, m_readroms;
 	uint8_t m_shadow_config;
-	bool	m_inv_shadow;
-	bool	m_nmi_enabled;
+	bool    m_inv_shadow;
+	bool    m_nmi_enabled;
 
 	int k051960_fetchromdata( int byte );
 };

@@ -1353,7 +1353,7 @@ void playch10_state::gboard_rom_switch_w(offs_t offset, u8 data)
 
 		case 0x2001: // enable ram at $6000
 			// ignored - we always enable it
-		     break;
+			 break;
 
 		case 0x4000: // scanline counter
 			m_IRQ_count_latch = data;

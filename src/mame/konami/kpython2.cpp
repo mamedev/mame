@@ -155,7 +155,7 @@ The PS2 is unaffected by the garbage byte.
 Endpoint 1 (IN, Bulk): Command handler, receives commands from the PS2
 Endpoint 2 (OUT, Bulk): Command responses, sends responses back to the PS2
 Endpoint 3 (IN, Interrupt): JAMMA I/O + analog I/O state response
-	Response:
+    Response:
         0x00 - 0x04 JAMMA I/O (IN)
         0x04 - 0x06 Analog I/O (ANALOG1)
         0x06 - 0x08 Analog I/O (ANALOG2)

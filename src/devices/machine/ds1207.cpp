@@ -105,7 +105,7 @@ void ds1207_device::nvram_default()
 	m_device_state = 0;
 
 	int expected_bytes = sizeof(m_unique_pattern) + sizeof(m_identification) + sizeof(m_security_match) + sizeof(m_secure_memory)
-	                     + sizeof(m_days_left) + sizeof(m_start_time) + sizeof(m_device_state);
+						 + sizeof(m_days_left) + sizeof(m_start_time) + sizeof(m_device_state);
 
 	if(!m_region.found())
 	{
@@ -266,8 +266,8 @@ WRITE_LINE_MEMBER(ds1207_device::write_clk)
 				if(m_bit == 24)
 				{
 					LOGDATA("%s: DS1270 -> command %02x %02x %02x (%02x %02x)\n", machine().describe_context(),
-					           m_command[ 0 ], m_command[ 1 ], m_command[ 2 ], m_unique_pattern[ 0 ], m_unique_pattern[ 1 ]);
-							   
+							   m_command[ 0 ], m_command[ 1 ], m_command[ 2 ], m_unique_pattern[ 0 ], m_unique_pattern[ 1 ]);
+
 					if(m_command[ 2 ] == m_unique_pattern[ 1 ] && (m_command[ 1 ] & ~3) == m_unique_pattern[ 0 ])
 					{
 						set_start_time();
@@ -355,8 +355,8 @@ WRITE_LINE_MEMBER(ds1207_device::write_clk)
 				if(m_bit == 64)
 				{
 					LOGDATA("%s: DS1270 <- identification %02x %02x %02x %02x %02x %02x %02x %02x\n", machine().describe_context(),
-					           m_identification[ 0 ], m_identification[ 1 ], m_identification[ 2 ], m_identification[ 3 ],
-					           m_identification[ 4 ], m_identification[ 5 ], m_identification[ 6 ], m_identification[ 7 ]);
+							   m_identification[ 0 ], m_identification[ 1 ], m_identification[ 2 ], m_identification[ 3 ],
+							   m_identification[ 4 ], m_identification[ 5 ], m_identification[ 6 ], m_identification[ 7 ]);
 
 					new_state(STATE_WRITE_COMPARE_REGISTER);
 				}
@@ -368,10 +368,10 @@ WRITE_LINE_MEMBER(ds1207_device::write_clk)
 				if(m_bit == 64)
 				{
 					LOGDATA("%s: DS1207 -> compare register %02x %02x %02x %02x %02x %02x %02x %02x (%02x %02x %02x %02x %02x %02x %02x %02x)\n", machine().describe_context(),
-					           m_compare_register[ 0 ], m_compare_register[ 1 ], m_compare_register[ 2 ], m_compare_register[ 3 ],
-					           m_compare_register[ 4 ], m_compare_register[ 5 ], m_compare_register[ 6 ], m_compare_register[ 7 ],
-					           m_security_match[ 0 ], m_security_match[ 1 ], m_security_match[ 2 ], m_security_match[ 3 ],
-					           m_security_match[ 4 ], m_security_match[ 5 ], m_security_match[ 6 ], m_security_match[ 7 ]);
+							   m_compare_register[ 0 ], m_compare_register[ 1 ], m_compare_register[ 2 ], m_compare_register[ 3 ],
+							   m_compare_register[ 4 ], m_compare_register[ 5 ], m_compare_register[ 6 ], m_compare_register[ 7 ],
+							   m_security_match[ 0 ], m_security_match[ 1 ], m_security_match[ 2 ], m_security_match[ 3 ],
+							   m_security_match[ 4 ], m_security_match[ 5 ], m_security_match[ 6 ], m_security_match[ 7 ]);
 
 					if(memcmp(m_compare_register, m_security_match, sizeof(m_compare_register)) == 0)
 					{
@@ -415,8 +415,8 @@ WRITE_LINE_MEMBER(ds1207_device::write_clk)
 				if(m_bit == 64)
 				{
 					LOGDATA("%s: DS1207 -> identification %02x %02x %02x %02x %02x %02x %02x %02x\n", machine().describe_context(),
-					           m_identification[ 0 ], m_identification[ 1 ], m_identification[ 2 ], m_identification[ 3 ],
-					           m_identification[ 4 ], m_identification[ 5 ], m_identification[ 6 ], m_identification[ 7 ]);
+							   m_identification[ 0 ], m_identification[ 1 ], m_identification[ 2 ], m_identification[ 3 ],
+							   m_identification[ 4 ], m_identification[ 5 ], m_identification[ 6 ], m_identification[ 7 ]);
 
 					new_state(STATE_WRITE_SECURITY_MATCH);
 				}
@@ -428,8 +428,8 @@ WRITE_LINE_MEMBER(ds1207_device::write_clk)
 				if(m_bit == 64)
 				{
 					LOGDATA("%s: DS1207 >- security match %02x %02x %02x %02x %02x %02x %02x %02x\n", machine().describe_context(),
-					           m_security_match[ 0 ], m_security_match[ 1 ], m_security_match[ 2 ], m_security_match[ 3 ],
-					           m_security_match[ 4 ], m_security_match[ 5 ], m_security_match[ 6 ], m_security_match[ 7 ]);
+							   m_security_match[ 0 ], m_security_match[ 1 ], m_security_match[ 2 ], m_security_match[ 3 ],
+							   m_security_match[ 4 ], m_security_match[ 5 ], m_security_match[ 6 ], m_security_match[ 7 ]);
 
 					new_state(STATE_STOP);
 				}
@@ -519,7 +519,7 @@ void ds1207_device::adjust_time_into_day()
 	if(!(m_device_state & DAYS_EXPIRED) && (m_device_state & OSC_ENABLED) && (m_device_state & OSC_RUNNING))
 	{
 		uint64_t day_clock = ((uint64_t)m_day_clock[ 0 ]) | (((uint64_t)m_day_clock[ 1 ]) << 8) | (((uint64_t)m_day_clock[ 2 ]) << 16);
-		
+
 		const uint64_t cur_time = machine().time().as_ticks(32768) / 2700;
 		const uint64_t diff_time = cur_time - m_last_update_time;
 		m_last_update_time = cur_time;

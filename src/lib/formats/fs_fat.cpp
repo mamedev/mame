@@ -2,15 +2,15 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-	fs_fat.cpp
+    fs_fat.cpp
 
-	PC FAT disk images
+    PC FAT disk images
 
-	Current Limitations:
-	- Read only
-	- Only supports floppy disks
-	- No FAT32 support
-	- No Long Filenames Support
+    Current Limitations:
+    - Read only
+    - Only supports floppy disks
+    - No FAT32 support
+    - No Long Filenames Support
 
 *****************************************************************************
 
@@ -18,125 +18,125 @@
 
   Offset  Length  Description
   ------  ------  -----------
-	   0     446  Boot machine code
-	 446      16  Partion #1 info
-	 462      16  Partion #2 info
-	 478      16  Partion #3 info
-	 494      16  Partion #4 info
-	 510       2  Magic bytes (0x55 0xAA)
+       0     446  Boot machine code
+     446      16  Partion #1 info
+     462      16  Partion #2 info
+     478      16  Partion #3 info
+     494      16  Partion #4 info
+     510       2  Magic bytes (0x55 0xAA)
 
 
   Partition info format:
 
   Offset  Length  Description
   ------  ------  -----------
-	   0       1  Active byte (0x80=active 0x00=inactive)
-	   1       1  Starting head
-	   2       1  Starting sector (bits 5-0) and high bits of starting track (bits 6-5)
-	   3       1  Low bits of starting track
-	   4       1  Partition type:
-					   0x00     Unused
-					   0x?1     FAT12   (0-15 MB)
-					   0x?2     XENIX
-					   0x?4     FAT16   (16-32 MB)
-					   0x?6     FAT16`  (32 MB-2 GB)
-					   0x?7     HPFS or NTFS
-					   0x?A     Boot Manager
-					   0x?B     FAT32   (512 MB-2 TB)
-					   0x?C     FAT32   (512 MB-2 TB LBA)
-					   0x1?     OS/2 Boot manager/Win95 hidden
-					   0xC?     DR-DOS secured partition
-					   0xD?     Multiuser DOS secured partition
-					   0xE?     SpeedStor extended partition
-	   5       1  Ending head
-	   6       1  Ending sector (bits 5-0) and high bits of ending track (bits 6-5)
-	   7       1  Low bits of ending track
-	   8       4  Sector index of beginning of partition
-	  12       4  Total sectors in partition
+       0       1  Active byte (0x80=active 0x00=inactive)
+       1       1  Starting head
+       2       1  Starting sector (bits 5-0) and high bits of starting track (bits 6-5)
+       3       1  Low bits of starting track
+       4       1  Partition type:
+                       0x00     Unused
+                       0x?1     FAT12   (0-15 MB)
+                       0x?2     XENIX
+                       0x?4     FAT16   (16-32 MB)
+                       0x?6     FAT16`  (32 MB-2 GB)
+                       0x?7     HPFS or NTFS
+                       0x?A     Boot Manager
+                       0x?B     FAT32   (512 MB-2 TB)
+                       0x?C     FAT32   (512 MB-2 TB LBA)
+                       0x1?     OS/2 Boot manager/Win95 hidden
+                       0xC?     DR-DOS secured partition
+                       0xD?     Multiuser DOS secured partition
+                       0xE?     SpeedStor extended partition
+       5       1  Ending head
+       6       1  Ending sector (bits 5-0) and high bits of ending track (bits 6-5)
+       7       1  Low bits of ending track
+       8       4  Sector index of beginning of partition
+      12       4  Total sectors in partition
 
 
   Boot sector format:
 
   Offset  Length  Description
   ------  ------  -----------
-	   0       3  Jump instruction (to skip over header on boot)
-	   3       8  OEM Name
-	  11       2  Bytes per sector
-	  13       1  Sectors per cluster
-	  14       2  Reserved sector count (including boot sector)
-	  16       1  Number of FATs (file allocation tables)
-	  17       2  Number of root directory entries
-	  19       2  Total sectors (bits 0-15)
-	  21       1  Media descriptor
-	  22       2  Sectors per FAT
-	  24       2  Sectors per track
-	  26       2  Number of heads
-	  28       4  Hidden sectors
-	  32       4  Total sectors (bits 16-47)
-	  36       1  Physical drive number
-	  37       1  Current head
-	  38       1  Signature
-	  39       4  ID
-	  43      11  Volume Label
-	  54       8  FAT file system type
-	  62     448  Boot machine code
-	 510       2  Magic bytes (0x55 0xAA)
+       0       3  Jump instruction (to skip over header on boot)
+       3       8  OEM Name
+      11       2  Bytes per sector
+      13       1  Sectors per cluster
+      14       2  Reserved sector count (including boot sector)
+      16       1  Number of FATs (file allocation tables)
+      17       2  Number of root directory entries
+      19       2  Total sectors (bits 0-15)
+      21       1  Media descriptor
+      22       2  Sectors per FAT
+      24       2  Sectors per track
+      26       2  Number of heads
+      28       4  Hidden sectors
+      32       4  Total sectors (bits 16-47)
+      36       1  Physical drive number
+      37       1  Current head
+      38       1  Signature
+      39       4  ID
+      43      11  Volume Label
+      54       8  FAT file system type
+      62     448  Boot machine code
+     510       2  Magic bytes (0x55 0xAA)
 
   For more information:
-	http://support.microsoft.com/kb/q140418/
+    http://support.microsoft.com/kb/q140418/
 
 
   Directory Entry Format:
 
   Offset  Length  Description
   ------  ------  -----------
-	   0       8  DOS File Name (padded with spaces)
-	   8       3  DOS File Extension (padded with spaces)
-	  11       1  File Attributes
-	  12       2  Unknown
-	  14       4  Time of Creation
-	  18       2  Last Access Time
-	  20       2  EA-Index (OS/2 stuff)
-	  22       4  Last Modified Time
-	  26       2  First Cluster
-	  28       4  File Size
+       0       8  DOS File Name (padded with spaces)
+       8       3  DOS File Extension (padded with spaces)
+      11       1  File Attributes
+      12       2  Unknown
+      14       4  Time of Creation
+      18       2  Last Access Time
+      20       2  EA-Index (OS/2 stuff)
+      22       4  Last Modified Time
+      26       2  First Cluster
+      28       4  File Size
 
 
   Dates and times are stored in separate words; when together, the time is
   first and the date is second.
 
-	Time:
-		bits 15-11      Hour
-		bits 10- 5      Minute
-		bits  4- 0      Second / 2
+    Time:
+        bits 15-11      Hour
+        bits 10- 5      Minute
+        bits  4- 0      Second / 2
 
-	Date:
-		bits 15- 9      Year - 1980
-		bits  8- 5      Month
-		bits  4- 0      Day
+    Date:
+        bits 15- 9      Year - 1980
+        bits  8- 5      Month
+        bits  4- 0      Day
 
   LFN Entry Format:
 
   Offset  Length  Description
   ------  ------  -----------
-	   0       1  Sequence Number (bit 6 is set on highest sequence)
-	   1      10  Name characters (five UTF-16LE chars)
-	  11       1  Attributes (always 0x0F)
-	  12       1  Reserved (always 0x00)
-	  13       1  Checksum of short filename entry
-	  14      12  Name characters (six UTF-16LE chars)
-	  26       2  Entry Cluster (always 0x00)
-	  28       4  Name characters (two UTF-16LE chars)
+       0       1  Sequence Number (bit 6 is set on highest sequence)
+       1      10  Name characters (five UTF-16LE chars)
+      11       1  Attributes (always 0x0F)
+      12       1  Reserved (always 0x00)
+      13       1  Checksum of short filename entry
+      14      12  Name characters (six UTF-16LE chars)
+      26       2  Entry Cluster (always 0x00)
+      28       4  Name characters (two UTF-16LE chars)
 
   Valid characters in DOS file names:
-	- Upper case letters A-Z
-	- Numbers 0-9
-	- Space (though there is no way to identify a trailing space)
-	- ! # $ % & ( ) - @ ^ _ ` { } ~
-	- Characters 128-255 (though the code page is indeterminate)
+    - Upper case letters A-Z
+    - Numbers 0-9
+    - Space (though there is no way to identify a trailing space)
+    - ! # $ % & ( ) - @ ^ _ ` { } ~
+    - Characters 128-255 (though the code page is indeterminate)
 
   For more information:
-	http://en.wikipedia.org/wiki/File_Allocation_Table
+    http://en.wikipedia.org/wiki/File_Allocation_Table
 
 ****************************************************************************/
 
@@ -169,27 +169,27 @@ public:
 	{
 	}
 
-	std::string_view raw_stem() const	{ return std::string_view((const char *) &m_block.rodata()[m_offset + 0], 8); }
-	std::string_view raw_ext() const	{ return std::string_view((const char *) &m_block.rodata()[m_offset + 8], 3); }
-	u8 attributes() const				{ return m_block.r8(m_offset + 11); }
-	u32 raw_create_datetime() const		{ return m_block.r32l(m_offset + 14); }
-	u32 raw_modified_datetime() const	{ return m_block.r32l(m_offset + 22); }
-	u32 start_cluster() const			{ return ((u32)m_block.r16l(m_offset + 20)) << 16 | m_block.r16l(m_offset + 26); }
-	u32 file_size() const				{ return m_block.r32l(m_offset + 28); }
+	std::string_view raw_stem() const   { return std::string_view((const char *) &m_block.rodata()[m_offset + 0], 8); }
+	std::string_view raw_ext() const    { return std::string_view((const char *) &m_block.rodata()[m_offset + 8], 3); }
+	u8 attributes() const               { return m_block.r8(m_offset + 11); }
+	u32 raw_create_datetime() const     { return m_block.r32l(m_offset + 14); }
+	u32 raw_modified_datetime() const   { return m_block.r32l(m_offset + 22); }
+	u32 start_cluster() const           { return ((u32)m_block.r16l(m_offset + 20)) << 16 | m_block.r16l(m_offset + 26); }
+	u32 file_size() const               { return m_block.r32l(m_offset + 28); }
 
-	bool is_read_only() const			{ return (attributes() & 0x01) != 0x00; }
-	bool is_hidden() const				{ return (attributes() & 0x02) != 0x00; }
-	bool is_system() const				{ return (attributes() & 0x04) != 0x00; }
-	bool is_volume_label() const		{ return (attributes() & 0x08) != 0x00; }
-	bool is_subdirectory() const		{ return (attributes() & 0x10) != 0x00; }
-	bool is_archive() const				{ return (attributes() & 0x20) != 0x00; }
+	bool is_read_only() const           { return (attributes() & 0x01) != 0x00; }
+	bool is_hidden() const              { return (attributes() & 0x02) != 0x00; }
+	bool is_system() const              { return (attributes() & 0x04) != 0x00; }
+	bool is_volume_label() const        { return (attributes() & 0x08) != 0x00; }
+	bool is_subdirectory() const        { return (attributes() & 0x10) != 0x00; }
+	bool is_archive() const             { return (attributes() & 0x20) != 0x00; }
 
 	std::string name() const;
 	meta_data metadata() const;
 
 private:
-	fsblk_t::block_t	m_block;
-	u32					m_offset;
+	fsblk_t::block_t    m_block;
+	u32                 m_offset;
 };
 
 
@@ -231,13 +231,13 @@ public:
 	std::vector<u32> get_sectors_from_fat(const directory_entry &dirent) const;
 
 private:
-	fsblk_t::block_t				m_boot_sector_block;
-	std::vector<u8>					m_file_allocation_table;
-	u32								m_starting_sector;
-	u32								m_sector_count;
-	u16								m_reserved_sector_count;
-	u16								m_bytes_per_sector;
-	u8								m_bits_per_fat_entry;
+	fsblk_t::block_t                m_boot_sector_block;
+	std::vector<u8>                 m_file_allocation_table;
+	u32                             m_starting_sector;
+	u32                             m_sector_count;
+	u16                             m_reserved_sector_count;
+	u16                             m_bytes_per_sector;
+	u8                              m_bits_per_fat_entry;
 
 	// methods
 	std::optional<directory_entry> find_entity(const std::vector<std::string> &path) const;
@@ -257,9 +257,9 @@ public:
 	virtual std::vector<u32> get_directory_sectors() const override;
 
 private:
-	const impl &	m_fs;
-	u32				m_first_sector;
-	u16				m_directory_entry_count;
+	const impl &    m_fs;
+	u32             m_first_sector;
+	u16             m_directory_entry_count;
 };
 
 
@@ -273,8 +273,8 @@ public:
 	virtual std::vector<u32> get_directory_sectors() const override;
 
 private:
-	const impl &	m_fs;
-	directory_entry	m_dirent;
+	const impl &    m_fs;
+	directory_entry m_dirent;
 };
 
 
@@ -286,7 +286,7 @@ private:
 //**************************************************************************
 
 //-------------------------------------------------
-//	validate_filename
+//  validate_filename
 //-------------------------------------------------
 
 namespace {
@@ -303,7 +303,7 @@ bool validate_filename(std::string_view name)
 
 
 //-------------------------------------------------
-//	decode_fat_datetime
+//  decode_fat_datetime
 //-------------------------------------------------
 
 util::arbitrary_datetime decode_fat_datetime(u32 dt)
@@ -311,12 +311,12 @@ util::arbitrary_datetime decode_fat_datetime(u32 dt)
 	util::arbitrary_datetime result;
 	memset(&result, 0, sizeof(result));
 
-	result.year			= ((dt >> 25)		& 0x7F) + 1980;
-	result.month		= (dt >> 21)		& 0x0F;
-	result.day_of_month = (dt >> 16)		& 0x1F;
-	result.hour			= (dt >> 11)		& 0x1F;
-	result.minute		= (dt >>  5)		& 0x3F;
-	result.second		= ((dt >>  0)		& 0x1F) * 2;
+	result.year         = ((dt >> 25)       & 0x7F) + 1980;
+	result.month        = (dt >> 21)        & 0x0F;
+	result.day_of_month = (dt >> 16)        & 0x1F;
+	result.hour         = (dt >> 11)        & 0x1F;
+	result.minute       = (dt >>  5)        & 0x3F;
+	result.second       = ((dt >>  0)       & 0x1F) * 2;
 	return result;
 }
 
@@ -324,7 +324,7 @@ util::arbitrary_datetime decode_fat_datetime(u32 dt)
 }
 
 //-------------------------------------------------
-//	fat_image::can_format
+//  fat_image::can_format
 //-------------------------------------------------
 
 bool fs::fat_image::can_format() const
@@ -334,7 +334,7 @@ bool fs::fat_image::can_format() const
 
 
 //-------------------------------------------------
-//	fat_image::can_read
+//  fat_image::can_read
 //-------------------------------------------------
 
 bool fs::fat_image::can_read() const
@@ -344,7 +344,7 @@ bool fs::fat_image::can_read() const
 
 
 //-------------------------------------------------
-//	fat_image::can_write
+//  fat_image::can_write
 //-------------------------------------------------
 
 bool fs::fat_image::can_write() const
@@ -354,7 +354,7 @@ bool fs::fat_image::can_write() const
 
 
 //-------------------------------------------------
-//	fat_image::has_rsrc
+//  fat_image::has_rsrc
 //-------------------------------------------------
 
 bool fs::fat_image::has_rsrc() const
@@ -364,7 +364,7 @@ bool fs::fat_image::has_rsrc() const
 
 
 //-------------------------------------------------
-//	fat_image::directory_separator
+//  fat_image::directory_separator
 //-------------------------------------------------
 
 char fs::fat_image::directory_separator() const
@@ -374,20 +374,20 @@ char fs::fat_image::directory_separator() const
 
 
 //-------------------------------------------------
-//	fat_image::volume_meta_description
+//  fat_image::volume_meta_description
 //-------------------------------------------------
 
 std::vector<meta_description> fs::fat_image::volume_meta_description() const
 {
 	std::vector<meta_description> results;
-	results.emplace_back(meta_name::name, "UNTITLED",	false, [](const meta_value &m) { return m.as_string().size() <= 11; }, "Volume name, up to 11 characters");
-	results.emplace_back(meta_name::oem_name, "",		false, [](const meta_value &m) { return m.as_string().size() <= 8; }, "OEM name, up to 8 characters");
+	results.emplace_back(meta_name::name, "UNTITLED",   false, [](const meta_value &m) { return m.as_string().size() <= 11; }, "Volume name, up to 11 characters");
+	results.emplace_back(meta_name::oem_name, "",       false, [](const meta_value &m) { return m.as_string().size() <= 8; }, "OEM name, up to 8 characters");
 	return results;
 }
 
 
 //-------------------------------------------------
-//	fat_image::file_meta_description
+//  fat_image::file_meta_description
 //-------------------------------------------------
 
 std::vector<meta_description> fs::fat_image::file_meta_description() const
@@ -402,7 +402,7 @@ std::vector<meta_description> fs::fat_image::file_meta_description() const
 
 
 //-------------------------------------------------
-//	fat_image::directory_meta_description
+//  fat_image::directory_meta_description
 //-------------------------------------------------
 
 std::vector<meta_description> fs::fat_image::directory_meta_description() const
@@ -416,7 +416,7 @@ std::vector<meta_description> fs::fat_image::directory_meta_description() const
 
 
 //-------------------------------------------------
-//	fat_image::mount_partition
+//  fat_image::mount_partition
 //-------------------------------------------------
 
 std::unique_ptr<filesystem_t> fs::fat_image::mount_partition(fsblk_t &blockdev, u32 starting_sector, u32 sector_count, u8 bits_per_fat_entry)
@@ -444,7 +444,7 @@ std::unique_ptr<filesystem_t> fs::fat_image::mount_partition(fsblk_t &blockdev, 
 
 
 //-------------------------------------------------
-//	directory_entry::name
+//  directory_entry::name
 //-------------------------------------------------
 
 std::string directory_entry::name() const
@@ -458,22 +458,22 @@ std::string directory_entry::name() const
 
 
 //-------------------------------------------------
-//	directory_entry::metadata
+//  directory_entry::metadata
 //-------------------------------------------------
 
 meta_data directory_entry::metadata() const
 {
 	meta_data result;
-	result.set(meta_name::name,					name());
-	result.set(meta_name::creation_date,		decode_fat_datetime(raw_create_datetime()));
-	result.set(meta_name::modification_date,	decode_fat_datetime(raw_modified_datetime()));
-	result.set(meta_name::length,				file_size());
+	result.set(meta_name::name,                 name());
+	result.set(meta_name::creation_date,        decode_fat_datetime(raw_create_datetime()));
+	result.set(meta_name::modification_date,    decode_fat_datetime(raw_modified_datetime()));
+	result.set(meta_name::length,               file_size());
 	return result;
 }
 
 
 //-------------------------------------------------
-//	impl ctor
+//  impl ctor
 //-------------------------------------------------
 
 impl::impl(fsblk_t &blockdev, fsblk_t::block_t &&boot_sector_block, std::vector<u8> &&file_allocation_table, u32 starting_sector, u32 sector_count, u16 reserved_sector_count, u8 bits_per_fat_entry)
@@ -490,20 +490,20 @@ impl::impl(fsblk_t &blockdev, fsblk_t::block_t &&boot_sector_block, std::vector<
 
 
 //-------------------------------------------------
-//	impl::volume_metadata
+//  impl::volume_metadata
 //-------------------------------------------------
 
 meta_data impl::volume_metadata()
 {
 	meta_data results;
-	results.set(meta_name::name,		m_boot_sector_block.rstr(43, 11));
-	results.set(meta_name::oem_name,	m_boot_sector_block.rstr(3, 8));
+	results.set(meta_name::name,        m_boot_sector_block.rstr(43, 11));
+	results.set(meta_name::oem_name,    m_boot_sector_block.rstr(3, 8));
 	return results;
 }
 
 
 //-------------------------------------------------
-//	impl::metadata
+//  impl::metadata
 //-------------------------------------------------
 
 std::pair<err_t, meta_data> impl::metadata(const std::vector<std::string> &path)
@@ -517,7 +517,7 @@ std::pair<err_t, meta_data> impl::metadata(const std::vector<std::string> &path)
 
 
 //-------------------------------------------------
-//	impl::directory_contents
+//  impl::directory_contents
 //-------------------------------------------------
 
 std::pair<err_t, std::vector<dir_entry>> impl::directory_contents(const std::vector<std::string> &path)
@@ -539,7 +539,7 @@ std::pair<err_t, std::vector<dir_entry>> impl::directory_contents(const std::vec
 
 
 //-------------------------------------------------
-//	impl::file_read
+//  impl::file_read
 //-------------------------------------------------
 
 std::pair<err_t, std::vector<u8>> impl::file_read(const std::vector<std::string> &path)
@@ -569,7 +569,7 @@ std::pair<err_t, std::vector<u8>> impl::file_read(const std::vector<std::string>
 
 
 //-------------------------------------------------
-//	impl::get_sectors_from_fat
+//  impl::get_sectors_from_fat
 //-------------------------------------------------
 
 std::vector<u32> impl::get_sectors_from_fat(const directory_entry &dirent) const
@@ -629,7 +629,7 @@ std::vector<u32> impl::get_sectors_from_fat(const directory_entry &dirent) const
 
 
 //-------------------------------------------------
-//	impl::find_entity
+//  impl::find_entity
 //-------------------------------------------------
 
 std::optional<directory_entry> impl::find_entity(const std::vector<std::string> &path) const
@@ -649,7 +649,7 @@ std::optional<directory_entry> impl::find_entity(const std::vector<std::string> 
 
 
 //-------------------------------------------------
-//	impl::find_directory
+//  impl::find_directory
 //-------------------------------------------------
 
 directory_span::ptr impl::find_directory(std::vector<std::string>::const_iterator path_begin, std::vector<std::string>::const_iterator path_end) const
@@ -676,7 +676,7 @@ directory_span::ptr impl::find_directory(std::vector<std::string>::const_iterato
 
 
 //-------------------------------------------------
-//	impl::find_child
+//  impl::find_child
 //-------------------------------------------------
 
 std::optional<directory_entry> impl::find_child(const directory_span &current_dir, std::string_view target) const
@@ -695,7 +695,7 @@ std::optional<directory_entry> impl::find_child(const directory_span &current_di
 
 
 //-------------------------------------------------
-//	impl::iterate_directory_entries
+//  impl::iterate_directory_entries
 //-------------------------------------------------
 
 void impl::iterate_directory_entries(const directory_span &dir, const std::function<bool(const directory_entry &dirent)> &callback) const
@@ -728,7 +728,7 @@ void impl::iterate_directory_entries(const directory_span &dir, const std::funct
 
 
 //-------------------------------------------------
-//	root_directory_span ctor
+//  root_directory_span ctor
 //-------------------------------------------------
 
 root_directory_span::root_directory_span(const impl &fs, u32 first_sector, u16 directory_entry_count)
@@ -740,7 +740,7 @@ root_directory_span::root_directory_span(const impl &fs, u32 first_sector, u16 d
 
 
 //-------------------------------------------------
-//	root_directory_span::get_directory_sectors
+//  root_directory_span::get_directory_sectors
 //-------------------------------------------------
 
 std::vector<u32> root_directory_span::get_directory_sectors() const
@@ -756,7 +756,7 @@ std::vector<u32> root_directory_span::get_directory_sectors() const
 
 
 //-------------------------------------------------
-//	subdirectory_span ctor
+//  subdirectory_span ctor
 //-------------------------------------------------
 
 subdirectory_span::subdirectory_span(const impl &fs, directory_entry &&dirent)
@@ -767,7 +767,7 @@ subdirectory_span::subdirectory_span(const impl &fs, directory_entry &&dirent)
 
 
 //-------------------------------------------------
-//	subdirectory_span::get_directory_sectors
+//  subdirectory_span::get_directory_sectors
 //-------------------------------------------------
 
 std::vector<u32> subdirectory_span::get_directory_sectors() const
@@ -781,7 +781,7 @@ std::vector<u32> subdirectory_span::get_directory_sectors() const
 //**************************************************************************
 
 //-------------------------------------------------
-//	pc_fat_image::name
+//  pc_fat_image::name
 //-------------------------------------------------
 
 const char *fs::pc_fat_image::name() const
@@ -791,7 +791,7 @@ const char *fs::pc_fat_image::name() const
 
 
 //-------------------------------------------------
-//	pc_fat_image::description
+//  pc_fat_image::description
 //-------------------------------------------------
 
 const char *fs::pc_fat_image::description() const
@@ -801,7 +801,7 @@ const char *fs::pc_fat_image::description() const
 
 
 //-------------------------------------------------
-//	pc_fat_image::enumerate_f
+//  pc_fat_image::enumerate_f
 //-------------------------------------------------
 
 void pc_fat_image::enumerate_f(floppy_enumerator &fe, u32 form_factor, const std::vector<u32> &variants) const
@@ -818,7 +818,7 @@ void pc_fat_image::enumerate_f(floppy_enumerator &fe, u32 form_factor, const std
 
 
 //-------------------------------------------------
-//	pc_fat_image::mount
+//  pc_fat_image::mount
 //-------------------------------------------------
 
 std::unique_ptr<filesystem_t> pc_fat_image::mount(fsblk_t &blockdev) const

@@ -1137,7 +1137,7 @@ void vs_smbbl_state::smbbl_ppu_map(address_map &map)
 #define VS_UNI_JOYSTICK(port_tag, player, type1, name1)  \
 	PORT_START(port_tag)                                 \
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(player) PORT_NAME("%p A")  \
-	PORT_BIT( 0X02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(player) PORT_NAME("%p B")  \
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(player) PORT_NAME("%p B")  \
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, type1 ) PORT_NAME(name1)                 \
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )                             \
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(player)    \
@@ -1148,7 +1148,7 @@ void vs_smbbl_state::smbbl_ppu_map(address_map &map)
 #define VS_DUAL_JOYSTICK(port_tag, player, type1, type2, name1, name2)  \
 	PORT_START(port_tag)                                                \
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(player) PORT_NAME("%p A")  \
-	PORT_BIT( 0X02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(player) PORT_NAME("%p B")  \
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(player) PORT_NAME("%p B")  \
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, type1 ) PORT_NAME(name1)                 \
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, type2 ) PORT_NAME(name2)                 \
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(player)    \

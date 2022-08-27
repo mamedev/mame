@@ -5,15 +5,15 @@
 MicroART ATM (clone of Spectrum)
 
 NOTES:
-	Current implementation based on ATM Turbo 2+. If anybody wants to validate ATM1, existing
-	code must be moved to atmtb2_state not modified.
+    Current implementation based on ATM Turbo 2+. If anybody wants to validate ATM1, existing
+    code must be moved to atmtb2_state not modified.
 
 TODO:
-	* ports read
-	* ATM2+ (compare to ATM2) has only 1M RAM vs 512K
-	* Mem masks are hardcoded to 1M RAM
-	* better handling of SHADOW ports
-	* validate screen timings
+    * ports read
+    * ATM2+ (compare to ATM2) has only 1M RAM vs 512K
+    * Mem masks are hardcoded to 1M RAM
+    * better handling of SHADOW ports
+    * validate screen timings
 
 *******************************************************************************************/
 

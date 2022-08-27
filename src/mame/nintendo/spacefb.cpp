@@ -425,7 +425,7 @@ void spacefb_state::draw_starfield(screen_device &screen, bitmap_rgb32 &bitmap, 
 			shift_star_generator();
 	}
 
-	// visible region of the screen 
+	// visible region of the screen
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		for (int x = SPACEFB_HBEND; x < SPACEFB_HBSTART; x++)
