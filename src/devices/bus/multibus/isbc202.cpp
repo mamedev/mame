@@ -61,6 +61,7 @@
 #include "emu.h"
 #include "isbc202.h"
 #include "formats/img_dsk.h"
+#include "formats/fs_isis.h"
 
 // Debugging
 #include "logmacro.h"
@@ -480,6 +481,7 @@ static void isbc202_floppies(device_slot_interface &device)
 static void isbc202_floppy_formats(format_registration &fr)
 {
 	fr.add(FLOPPY_IMG_FORMAT);
+	fr.add(fs::ISIS);
 };
 
 void isbc202_device::device_add_mconfig(machine_config &config)
