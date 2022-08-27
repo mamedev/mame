@@ -13,7 +13,6 @@
 #include "ladybug_v.h"
 #include "emupal.h"
 #include "tilemap.h"
-#include "sound/samples.h"
 
 
 // redclash/zerohour
@@ -28,7 +27,6 @@ public:
 		, m_palette(*this, "palette")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_stars(*this, "stars")
-		, m_samples(*this, "samples")
 	{ }
 
 	void redclash(machine_config &config);
@@ -51,8 +49,6 @@ private:
 	void irqack_w(uint8_t data);
 	void star_reset_w(uint8_t data);
 	template <unsigned B> DECLARE_WRITE_LINE_MEMBER(star_w);
-	template <unsigned S> DECLARE_WRITE_LINE_MEMBER(sample_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_w);
 	void palette(palette_device &palette) const;
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
@@ -69,10 +65,8 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<zerohour_stars_device> m_stars;
-	required_device<samples_device> m_samples;
 
 	tilemap_t   *m_fg_tilemap = nullptr;
-	bool m_allow = false;
 	int         m_gfxbank = 0;   // redclash only
 };
 
