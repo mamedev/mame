@@ -1162,7 +1162,8 @@ void vs_smbbl_state::smbbl_ppu_map(address_map &map)
 // bit 3-4: DSW SW:1,2
 // bit 5-6: coins
 // bit 7: CPU indicator bit (Main: 0, Sub: 1)
-// Note: Port impulse is 3 frames since 1 frame is too short for some games (T.K.O. Boxing). Testing on VS. hardware shows the actual coin drop time varies between 2.5 to 4 frames.
+// Note: Port impulse is 3 frames since 1 frame is too short for some games (T.K.O. Boxing).
+// Testing on VS. hardware shows the actual coin drop time varies between 2.5 to 4 frames.
 #define VS_COINS_AND_SERVICE(coin_tag, service, coin1, coin2)  \
 	PORT_START(coin_tag)                                       \
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )               \
@@ -1174,8 +1175,8 @@ void vs_smbbl_state::smbbl_ppu_map(address_map &map)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, coin2 ) PORT_IMPULSE(3)    \
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-// So-called "reversed" controls. This represents the actual VS. wiring. The left controller and buttons
-// are read from $4017, while the right controller and buttons are read from $4016.
+// So-called "reversed" controls. This represents the actual VS. wiring. The left controller
+// and buttons are read from $4017, while the right controller and buttons are read from $4016.
 // Most games follow the standard convention and consider the left controller P1, when it matters.
 // Note, this is reversed from NES where P1 is read from $4016 and P2 is read from $4017.
 static INPUT_PORTS_START( vsnes_rev )
@@ -1186,8 +1187,8 @@ static INPUT_PORTS_START( vsnes_rev )
 	// There is also a DSW which is defined per game, below
 INPUT_PORTS_END
 
-// Only used by SMB, TKO Boxing, and Mighty Bomb Jack. In 2 player games these games consider
-// the right controls to be P1, so we relabel them for convenience.
+// Only used by SMB, TKO Boxing, and Mighty Bomb Jack. In 2 player games these
+// games consider the right controls to be P1, so we relabel them for convenience.
 static INPUT_PORTS_START( vsnes )
 	VS_UNI_JOYSTICK("IN0", 1, IPT_START1, "Select 1 (Blue)")
 	VS_UNI_JOYSTICK("IN1", 2, IPT_START2, "Select 2 (Green)")
