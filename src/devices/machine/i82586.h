@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "dinetwork.h"
+
 class i82586_base_device :
 	public device_t,
 	public device_memory_interface,

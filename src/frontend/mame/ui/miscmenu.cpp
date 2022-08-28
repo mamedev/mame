@@ -23,6 +23,7 @@
 #include "osdnet.h"
 #include "mameopts.h"
 #include "pluginopts.h"
+#include "dinetwork.h"
 #include "drivenum.h"
 #include "fileio.h"
 #include "romload.h"
