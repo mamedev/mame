@@ -13,7 +13,7 @@
   These will scroll at a rate controlled by the speed register
 
   I'm basically doing the same thing by drawing each
-  starfield on alternate frames, and then offseting them
+  starfield on alternate frames, and then offsetting them
 
 ***************************************************************************/
 
@@ -112,12 +112,12 @@ void zerohour_stars_device::draw(bitmap_ind16 &bitmap, rectangle const &cliprect
 			bool const feedback((state & 0x00020) ? !tempbit : tempbit);
 
 			bool const hcond(BIT(xloc + 8, 4));
-			bool const vcond(!m_has_va_bit || BIT(yloc, 0));
+			bool const vcond(m_has_va_bit || BIT(yloc, 0));
 
 			if (cliprect.contains(xloc, yloc) && (hcond == vcond))
 			{
 				if (((state & 0x000ff) == 0x000ff) && !feedback)
-					bitmap.pix(yloc, xloc) = m_pal_offset + ((state >> 9) & 0x1f);
+					bitmap.pix(yloc, xloc) = m_pal_offset + (state >> 9 & 0x1f);
 			}
 
 			// update LFSR state

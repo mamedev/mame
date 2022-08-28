@@ -52,18 +52,18 @@ void zerohour_state::palette(palette_device &palette) const
 		int bit0, bit1;
 
 		// red component
-		bit0 = BIT(i, 3);
-		bit1 = BIT(i, 4);
-		int const b = 0x47 * bit0 + 0x97 * bit1;
+		bit0 = BIT(i, 0);
+		int const r = 0x97 * bit0;
 
 		// green component
-		bit0 = BIT(i, 1);
-		bit1 = BIT(i, 2);
+		bit0 = BIT(i, 2);
+		bit1 = BIT(i, 1);
 		int const g = 0x47 * bit0 + 0x97 * bit1;
 
 		// blue component
-		bit0 = BIT(i, 0);
-		int const r = 0x47 * bit0;
+		bit0 = BIT(i, 4);
+		bit1 = BIT(i, 3);
+		int const b = 0x47 * bit0 + 0x97 * bit1;
 
 		palette.set_indirect_color(i + 0x20, rgb_t(r, g, b));
 	}
@@ -239,9 +239,8 @@ void zerohour_state::draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-WRITE_LINE_MEMBER(zerohour_state::screen_vblank)
+WRITE_LINE_MEMBER(zerohour_state::update_stars)
 {
-	// falling edge
 	if (!state)
 		m_stars->update_state();
 }

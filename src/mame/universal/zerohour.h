@@ -41,7 +41,7 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	DECLARE_WRITE_LINE_MEMBER(update_stars);
 	void videoram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(gfxbank_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);

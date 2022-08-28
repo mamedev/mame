@@ -20132,9 +20132,7 @@ dorodon2                        // Falcon
 ladybug                         // 8110 (c) 1981
 ladybugb                        // bootleg
 ladybugb2                       // bootleg
-mrsdyna                         // 8203 (c) 1982 Universal
 snapjack                        // ???? (c)
-sraider                         // 8203 (c) 1982 Universal
 
 @source:misc/ladyfrog.cpp
 ladyfrog                        // (c) 1990 Mondial Games
@@ -40012,6 +40010,10 @@ spyhuntpr                       // (c) 1985 Recreativos Franco S.A.
 
 @source:skeleton/squale.cpp
 squale                          //
+
+@source:universal/sraider.cpp
+mrsdyna                         // 8203 (c) 1982 Universal
+sraider                         // 8203 (c) 1982 Universal
 
 @source:seta/srmp2.cpp
 mjyuugi                         // (c) 1990 Visco
