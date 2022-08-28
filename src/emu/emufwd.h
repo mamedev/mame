@@ -99,6 +99,7 @@ class symbol_table;
 class debug_breakpoint;
 class debug_watchpoint;
 class debug_registerpoint;
+class debug_exceptionpoint;
 
 // declared in debugger.h
 class debugger_manager;

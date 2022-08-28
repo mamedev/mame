@@ -71,7 +71,7 @@ static bool cConditionDescending(const debug_breakpoint *a, const debug_breakpoi
 
 static bool cActionAscending(const debug_breakpoint *a, const debug_breakpoint *b)
 {
-	return strcmp(a->action(), b->action()) < 0;
+	return a->action() < b->action();
 }
 
 static bool cActionDescending(const debug_breakpoint *a, const debug_breakpoint *b)
