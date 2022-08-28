@@ -59,6 +59,7 @@ public:
 		, m_char_rom(*this, "charrom")
 		, m_beta(*this, BETA_DISK_TAG)
 		, m_ata(*this, "ata")
+		, m_image(*this, "ata:0:hdd:image")
 		, m_centronics(*this, "centronics")
 		, m_glukrs(*this, "glukrs")
 		, m_palette(*this, "palette")
@@ -110,6 +111,7 @@ private:
 
 	required_device<beta_disk_device> m_beta;
 	required_device<ata_interface_device> m_ata;
+	required_device<harddisk_image_device> m_image;
 	required_device<centronics_device> m_centronics;
 	required_device<glukrs_device> m_glukrs;
 	required_device<device_palette_interface> m_palette;
@@ -401,8 +403,16 @@ u8 atm_state::beta_disable_r(offs_t offset)
 
 u8 atm_state::ata_r(offs_t offset)
 {
+	/* Due to specific ATA it returns IDE_STATUS_DRDY if image is not provided.
+	As a result software is waiting for data which never can be delivered.
+	We'll treat no-image-provided as no-ATA.
+	Testing: osatm2 */
+	if (m_image->get_hard_disk_file() == nullptr)
+		return 0xff;
+
 	u8 ata_offset = BIT(offset, 5, 3);
 	u16 data = m_ata->cs0_r(ata_offset);
+
 	if (!ata_offset)
 		m_ata_data_hi = data >> 8;
 
@@ -411,6 +421,9 @@ u8 atm_state::ata_r(offs_t offset)
 
 void atm_state::ata_w(offs_t offset, u8 data)
 {
+	if (m_image->get_hard_disk_file() == nullptr) // same as ata_r
+		return;
+
 	u8 ata_offset = BIT(offset, 5, 3);
 	u16 ata_data = data;
 	if (!ata_offset)
@@ -463,8 +476,8 @@ void atm_state::atm_io(address_map &map)
 	// A: .... .... nnn0 1111
 	map(0x000f, 0x000f).select(0xffe0).rw(FUNC(atm_state::ata_r), FUNC(atm_state::ata_w));
 	// A: .... ...1 0000 1111
-	map(0x010f, 0x010f).mirror(0xfe00).lr8(NAME([this](offs_t offset) { return m_ata_data_hi; }))
-	                   .lw8(NAME([this](offs_t offset, u8 data) { m_ata_data_hi = data; }));
+	map(0x010f, 0x010f).mirror(0xfe00).lrw8(NAME([this](offs_t offset) { return m_ata_data_hi; })
+		, NAME([this](offs_t offset, u8 data) { m_ata_data_hi = data; }));
 }
 
 void atm_state::atm_switch(address_map &map)
