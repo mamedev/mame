@@ -2330,11 +2330,16 @@ static INPUT_PORTS_START( bnglngby )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( Free_Play ) )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!4")
-	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPSETTING(    0x08, "3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW1:!5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "SW1:!6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW1:!7" )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x08, "4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW1:!5" )      // stored in $f5, is it ever used?
+// TODO: check if there's a more specific meaning than difficulty for this.
+// The game seems to peg several things to level# ($d2) + DIP determined value ($0233).
+	PORT_DIPNAME( 0x60, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:!6,!7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( Hard ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:!8" )
 INPUT_PORTS_END
 
