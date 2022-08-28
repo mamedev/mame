@@ -78,7 +78,7 @@ private:
 void myvision_state::myvision_mem(address_map &map)
 {
 	map.unmap_value_high();
-	//map(0x0000, 0x5fff)      // mapped by the cartslot
+	map(0x0000, 0x5fff).r(m_cart, FUNC(generic_slot_device::read_rom));
 	map(0xa000, 0xa7ff).ram();
 	map(0xe000, 0xe000).rw("tms9918", FUNC(tms9918a_device::vram_read), FUNC(tms9918a_device::vram_write));
 	map(0xe002, 0xe002).rw("tms9918", FUNC(tms9918a_device::register_read), FUNC(tms9918a_device::register_write));
@@ -135,15 +135,11 @@ static INPUT_PORTS_START( myvision )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_MAHJONG_K) PORT_NAME("11")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_MAHJONG_G) PORT_NAME("7")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_MAHJONG_C) PORT_NAME("3")
-
 INPUT_PORTS_END
 
 
 void myvision_state::machine_start()
 {
-	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x5fff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
-
 	save_item(NAME(m_column));
 }
 
@@ -242,7 +238,7 @@ void myvision_state::myvision(machine_config &config)
 	/* cartridge */
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "myvision_cart"));
 	cartslot.set_device_load(FUNC(myvision_state::cart_load));
-	//cartslot.set_must_be_loaded(true);
+	cartslot.set_must_be_loaded(true);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("myvision");
@@ -257,5 +253,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT        COMPANY       FULLN AME              FLAGS
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT        COMPANY       FULLNAME               FLAGS
 CONS( 1983, myvision, 0,      0,      myvision, myvision, myvision_state, empty_init, "Nichibutsu", "My Vision (KH-1000)", 0 )
