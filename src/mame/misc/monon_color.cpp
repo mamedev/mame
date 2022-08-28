@@ -227,6 +227,10 @@ void monon_color_state::machine_reset()
 
 	std::fill(std::begin(m_storeregs), std::end(m_storeregs), 0);
 	std::fill(std::begin(m_linebuf), std::end(m_linebuf), 0);
+	std::fill(std::begin(m_curpal), std::end(m_curpal), 0);
+
+	for (int i = 0; i < 320 * 240; i++)
+		m_vidbuffer.get()[i] = 0x00;
 
 	m_music_direction_iswrite = true;
 	m_music_latch = 0;
