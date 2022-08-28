@@ -1585,7 +1585,6 @@ static INPUT_PORTS_START( vsbball )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( iceclmrj )
@@ -1884,7 +1883,6 @@ static INPUT_PORTS_START( machridr )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:!8" )
 INPUT_PORTS_END
 
-// TODO: are the missing DIP settings the same as the above set and we can get rid of machridj here?
 // Note: does not check Coin 2 inputs
 static INPUT_PORTS_START( machridj )
 	PORT_INCLUDE( vsnes_rev )
@@ -1899,10 +1897,19 @@ static INPUT_PORTS_START( machridj )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( Free_Play ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:!4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW1:!5" )
+	PORT_DIPNAME( 0x18, 0x00, "Max Lives After Level 1" )  PORT_DIPLOCATION("SW1:!4,!5")
+	PORT_DIPSETTING(    0x18, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPSETTING(    0x10, "5" )
+	PORT_DIPSETTING(    0x08, "6" )
+// # of lives is determined by remaining energy bars at the end of level 1
+// formula: lives = min(floor(energy / divisor) + 1, maxval)
+// maxval:     3   4   5   6
+// divisor:    4   3   2   1
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "SW1:!6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW1:!7" )
+	PORT_DIPNAME( 0x40, 0x00, "Enemies" )               PORT_DIPLOCATION("SW1:!7")
+	PORT_DIPSETTING(    0x40, "More" )
+	PORT_DIPSETTING(    0x00, "Less" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:!8" )
 INPUT_PORTS_END
 
