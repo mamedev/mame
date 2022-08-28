@@ -15,7 +15,7 @@ Notes:
 TODO:
 - Colors are not right. In zerohour P1 score should be white, the top score green,
   and "TOP" should be magenta. How is this determined? It's as if only the top part
-  of the screen has this exception. Maybe via the unknown PROM? Sprite colors look ok.
+  of the screen has this exception. Sprite colors look ok.
 - Some graphical problems in both games
 - redclash supports more background layer effects: white+mixed with other colors,
   used in canyon parts and during the big ufo explosion
@@ -323,7 +323,7 @@ void zerohour_state::zerohour(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(9.828_MHz_XTAL / 2, 312, 8, 248, 262, 32, 224);
 	screen.set_screen_update(FUNC(zerohour_state::screen_update));
-	screen.screen_vblank().set(FUNC(zerohour_state::screen_vblank));
+	screen.screen_vblank().set(FUNC(zerohour_state::update_stars));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_zerohour);

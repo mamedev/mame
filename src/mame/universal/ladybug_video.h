@@ -30,6 +30,8 @@ protected:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
 private:
+	void draw_sprites(bitmap_ind16 &bitmap, rectangle const &cliprect);
+
 	required_device<gfxdecode_device>   m_gfxdecode;
 	std::unique_ptr<u8 []>              m_spr_ram;
 	std::unique_ptr<u8 []>              m_bg_ram;

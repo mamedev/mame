@@ -1494,6 +1494,7 @@ universal/docastle.cpp
 universal/getaway.cpp
 universal/ladybug.cpp
 universal/mrdo.cpp
+universal/sraider.cpp
 universal/superdq.cpp
 universal/zerohour.cpp
 upl/mouser.cpp
