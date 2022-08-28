@@ -31208,7 +31208,10 @@ ax200                           //
 ax200m                          //
 ax230                           //
 ax350                           //
+ax350ii                         //
+ax350iif                        //
 ax370                           //
+ax500                           //
 bruc100                         //
 bruc100a                        //
 canonv10                        //
@@ -31243,7 +31246,7 @@ cx5f1                           //
 cx5me                           //
 cx5m128                         //
 cx5miib                         //
-cx7m                            // 1986 MSX2
+cx7128                          // 1986 MSX2
 cx7m128                         // 1986 MSX2
 dgnmsx                          // 1985 MSX
 dpc100                          // 1984 MSX Korea
@@ -31268,9 +31271,9 @@ fs1300                          // 1985 MSX Japan
 fs4000                          // 1985 MSX Japan
 fs4000a                         //
 fs4500                          // 1986 MSX2 Japan
-fs4600                          // 1986 MSX2 Japan
-fs4700                          // 1986 MSX2 Japan
-fs5000                          // 1986 MSX2 Japan
+fs4600f                         // 1986 MSX2 Japan
+fs4700f                         // 1986 MSX2 Japan
+fs5000f2                        // 1986 MSX2 Japan
 fs5500f1                        // 1985 MSX2 Japan
 fs5500f2                        // 1985 MSX2 Japan
 fsa1                            // 1986 MSX2 Japan
@@ -31307,13 +31310,13 @@ hb75d                           // 1983 MSX Germany
 hb75p                           // 1983 MSX
 hb8000                          // 1985 MSX Brazil
 hbf1                            // 1986 MSX2 Japan
-hbf12                           // 1987 MSX2 Japan
+hbf1ii                          // 1987 MSX2 Japan
 hbf1xd                          // 1987 MSX2 Japan
 hbf1xdj                         // 1988 MSX2+ Japan
-hbf1xdm2                        // 1988 MSX2 Japan
 hbf1xv                          // 1989 MSX2+ Japan
 hbf5                            //
 hbf500                          // 1986 MSX2 Japan
+hbf500_2                        //
 hbf500f                         //
 hbf500p                         // 1985 MSX2
 hbf700d                         // 1985 MSX2 Germany
@@ -31350,11 +31353,9 @@ hx22                            //
 hx22i                           //
 hx23                            // 1986 MSX2
 hx23f                           // 1986 MSX2
-hx23i                           //
 hx32                            // 1985 MSX
 hx33                            //
 hx34                            //
-hx34i                           //
 hx51i                           // 1985 MSX
 jvchc7gb                        //
 kmc5000                         //
@@ -31383,6 +31384,7 @@ mpc200sp                        //
 mpc2300                         //
 mpc2500f                        //
 mpc25fd                         //
+mpc25fs                         //
 mpc27                           //
 mpc64                           //
 mx10                            //
@@ -31391,12 +31393,11 @@ mx15                            //
 mx64                            //
 nms801                          //
 nms8220                         // 1986 MSX2
-nms8220a                        // 1986 MSX2
 nms8245                         // 1986 MSX2
 nms8245f                        // 1986 MSX2
 nms8250                         // 1986 MSX2
-nms8250f                        //
-nms8250j                        //
+nms8250_16                      //
+nms8250_19                      //
 nms8255                         // 1986 MSX2
 nms8255f                        //
 nms8260                         //
@@ -31406,6 +31407,7 @@ nms8280g                        // 1986 MSX2
 perfect1                        //
 phc2                            //
 phc23                           // 1986 MSX2 Japan
+phc23jb                         // 1987 MSX2 Japan
 phc28                           //
 phc28l                          //
 phc28s                          //
@@ -31434,6 +31436,7 @@ tadpc20a                        //
 tpc310                          // 1986 MSX2
 tpp311                          //
 tps312                          //
+ucv102                          //
 vg8000                          //
 vg8010                          //
 vg8010f                         //
@@ -31441,10 +31444,10 @@ vg802000                        //
 vg802020                        // 1985 MSX
 vg8020f                         //
 vg8230                          // 1986 MSX2
-vg8230j                         //
 vg8235                          // 1986 MSX2
 vg8235f                         // 1986 MSX2
 vg8240                          // 1986 MSX2
+victhc80                        //
 victhc90                        //
 victhc95                        //
 victhc95a                       //
@@ -31462,7 +31465,6 @@ yis503                          //
 yis503f                         //
 yis503ii                        //
 yis604                          //
-yis60464                        //
 
 @source:microterm/mt420.cpp
 mt420                           //
