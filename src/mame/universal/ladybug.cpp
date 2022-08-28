@@ -929,7 +929,7 @@ void sraider_state::sraider(machine_config &config)
 	PALETTE(config, m_palette, FUNC(sraider_state::sraider_palette), 4*8 + 4*16 + 32 + 2, 32 + 32 + 1);
 
 	LADYBUG_VIDEO(config, m_video, 4000000).set_gfxdecode_tag(m_gfxdecode);
-	ZEROHOUR_STARS(config, m_stars, 0);
+	ZEROHOUR_STARS(config, m_stars).has_va_bit(false);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria
+// copyright-holders:David Haywood
 /*************************************************************************
 
     Zero Hour / Red Clash
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_REDCLASH_H
-#define MAME_INCLUDES_REDCLASH_H
+#ifndef MAME_INCLUDES_ZEROHOUR_H
+#define MAME_INCLUDES_ZEROHOUR_H
 
 #pragma once
 
@@ -15,11 +15,10 @@
 #include "tilemap.h"
 
 
-// redclash/zerohour
-class redclash_state : public driver_device
+class zerohour_state : public driver_device
 {
 public:
-	redclash_state(const machine_config &mconfig, device_type type, const char *tag)
+	zerohour_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_videoram(*this, "videoram")
 		, m_spriteram(*this, "spriteram")
@@ -32,7 +31,7 @@ public:
 	void redclash(machine_config &config);
 	void zerohour(machine_config &config);
 
-	void init_redclash();
+	void init_zerohour();
 
 	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
@@ -70,4 +69,4 @@ private:
 	int         m_gfxbank = 0;   // redclash only
 };
 
-#endif // MAME_INCLUDES_REDCLASH_H
+#endif // MAME_INCLUDES_ZEROHOUR_H

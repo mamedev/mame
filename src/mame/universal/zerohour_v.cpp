@@ -2,14 +2,12 @@
 // copyright-holders:David Haywood
 /***************************************************************************
 
-  redclash.cpp
-
   Functions to emulate the video hardware of the machine.
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "redclash.h"
+#include "zerohour.h"
 #include "video/resnet.h"
 
 /***************************************************************************
@@ -21,7 +19,7 @@
 
 ***************************************************************************/
 
-void redclash_state::palette(palette_device &palette) const
+void zerohour_state::palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 
@@ -98,13 +96,13 @@ void redclash_state::palette(palette_device &palette) const
 }
 
 
-void redclash_state::videoram_w(offs_t offset, uint8_t data)
+void zerohour_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE_LINE_MEMBER(redclash_state::gfxbank_w)
+WRITE_LINE_MEMBER(zerohour_state::gfxbank_w)
 {
 	if (m_gfxbank != state)
 	{
@@ -113,17 +111,17 @@ WRITE_LINE_MEMBER(redclash_state::gfxbank_w)
 	}
 }
 
-WRITE_LINE_MEMBER(redclash_state::flipscreen_w)
+WRITE_LINE_MEMBER(zerohour_state::flipscreen_w)
 {
 	flip_screen_set(state);
 }
 
-void redclash_state::star_reset_w(uint8_t data)
+void zerohour_state::star_reset_w(uint8_t data)
 {
 	m_stars->set_enable(true);
 }
 
-TILE_GET_INFO_MEMBER(redclash_state::get_fg_tile_info)
+TILE_GET_INFO_MEMBER(zerohour_state::get_fg_tile_info)
 {
 	int code = m_videoram[tile_index];
 	int color = (m_videoram[tile_index] & 0x70) >> 4; // ??
@@ -132,13 +130,13 @@ TILE_GET_INFO_MEMBER(redclash_state::get_fg_tile_info)
 }
 
 
-void redclash_state::video_start()
+void zerohour_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(redclash_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(zerohour_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-void redclash_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void zerohour_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int offs = m_spriteram.bytes() - 0x20; offs >= 0; offs -= 0x20)
 	{
@@ -218,7 +216,7 @@ void redclash_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-void redclash_state::draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void zerohour_state::draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int offs = 0; offs < 0x20; offs++)
 	{
@@ -229,7 +227,7 @@ void redclash_state::draw_bullets( bitmap_ind16 &bitmap, const rectangle &clipre
 			sx = 264 - sx;
 
 		int fine_x = m_videoram[offs] >> 3 & 7;
-		sx = sx - fine_x;
+		sx -= fine_x;
 
 		for (int y = 0; y < 2; y++)
 			for (int x = 0; x < 8; x++)
@@ -241,19 +239,19 @@ void redclash_state::draw_bullets( bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-WRITE_LINE_MEMBER(redclash_state::screen_vblank)
+WRITE_LINE_MEMBER(zerohour_state::screen_vblank)
 {
 	// falling edge
 	if (!state)
 		m_stars->update_state();
 }
 
-uint32_t redclash_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t zerohour_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
-	m_stars->draw(bitmap, cliprect, 0x60, true, 0x00, 0xff);
+	m_stars->draw(bitmap, cliprect);
 	draw_bullets(bitmap, cliprect);
 	draw_sprites(bitmap, cliprect);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect);
 	return 0;
 }

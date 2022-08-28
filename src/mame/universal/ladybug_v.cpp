@@ -344,10 +344,19 @@ uint32_t sraider_state::screen_update_sraider(screen_device &screen, bitmap_ind1
 	bitmap.fill(0, cliprect);
 
 	// draw the stars
+	rectangle stars_clip = cliprect;
 	if (flip_screen())
-		m_stars->draw(bitmap, cliprect, 0x60, false, 0x27, 0xff);
+	{
+		stars_clip.min_x = 0x27;
+		stars_clip.max_x = 0xff;
+	}
 	else
-		m_stars->draw(bitmap, cliprect, 0x60, false, 0x00, 0xd8);
+	{
+		stars_clip.min_x = 0x00;
+		stars_clip.max_x = 0xd8;
+	}
+	stars_clip &= cliprect;
+	m_stars->draw(bitmap, stars_clip);
 
 	// draw the gridlines
 	m_palette->set_indirect_color(0x40, rgb_t(

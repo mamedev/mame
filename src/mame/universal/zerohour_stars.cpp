@@ -32,6 +32,9 @@ zerohour_stars_device::zerohour_stars_device(machine_config const &mconfig, char
 	, m_offset(0)
 	, m_count(0)
 {
+	// set default configuration
+	m_pal_offset = 0x60;
+	m_has_va_bit = true;
 }
 
 void zerohour_stars_device::device_start()
@@ -95,8 +98,7 @@ void zerohour_stars_device::set_speed(u8 speed, u8 mask)
 }
 
 // Draw the stars
-// Space Raider doesn't use the Va bit, and it is also set up to window the stars to a certain x range
-void zerohour_stars_device::draw(bitmap_ind16 &bitmap, rectangle const &cliprect, u8 pal_offs, bool has_va, u8 firstx, u8 lastx)
+void zerohour_stars_device::draw(bitmap_ind16 &bitmap, rectangle const &cliprect)
 {
 	if (m_enable)
 	{
@@ -110,12 +112,12 @@ void zerohour_stars_device::draw(bitmap_ind16 &bitmap, rectangle const &cliprect
 			bool const feedback((state & 0x00020) ? !tempbit : tempbit);
 
 			bool const hcond(BIT(xloc + 8, 4));
-			bool const vcond(!has_va || BIT(yloc, 0));
+			bool const vcond(!m_has_va_bit || BIT(yloc, 0));
 
 			if (cliprect.contains(xloc, yloc) && (hcond == vcond))
 			{
-				if (((state & 0x000ff) == 0x000ff) && !feedback && (xloc >= firstx) && (xloc <= lastx))
-					bitmap.pix(yloc, xloc) = pal_offs + ((state >> 9) & 0x1f);
+				if (((state & 0x000ff) == 0x000ff) && !feedback)
+					bitmap.pix(yloc, xloc) = m_pal_offset + ((state >> 9) & 0x1f);
 			}
 
 			// update LFSR state

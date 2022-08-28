@@ -27,7 +27,7 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "redclash.h"
+#include "zerohour.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
@@ -36,38 +36,38 @@ TODO:
 #include "speaker.h"
 
 
-void redclash_state::irqack_w(uint8_t data)
+void zerohour_state::irqack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-template <unsigned B> WRITE_LINE_MEMBER(redclash_state::star_w)
+template <unsigned B> WRITE_LINE_MEMBER(zerohour_state::star_w)
 {
 	m_stars->set_speed(state ? 1 << B : 0, 1U << B);
 }
 
-void redclash_state::zerohour_map(address_map &map)
+void zerohour_state::zerohour_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom();
 	map(0x3000, 0x37ff).ram();
 	map(0x3800, 0x3bff).ram().share(m_spriteram);
-	map(0x4000, 0x43ff).ram().w(FUNC(redclash_state::videoram_w)).share(m_videoram);
+	map(0x4000, 0x43ff).ram().w(FUNC(zerohour_state::videoram_w)).share(m_videoram);
 	map(0x4800, 0x4800).portr("IN0");    /* IN0 */
 	map(0x4801, 0x4801).portr("IN1");    /* IN1 */
 	map(0x4802, 0x4802).portr("DSW1");   /* DSW0 */
 	map(0x4803, 0x4803).portr("DSW2");   /* DSW1 */
 	map(0x5000, 0x5007).w("outlatch1", FUNC(ls259_device::write_d0));    /* to sound board */
 	map(0x5800, 0x5807).w("outlatch2", FUNC(ls259_device::write_d0));    /* to sound board */
-	map(0x7000, 0x7000).w(FUNC(redclash_state::star_reset_w));
-	map(0x7800, 0x7800).w(FUNC(redclash_state::irqack_w));
+	map(0x7000, 0x7000).w(FUNC(zerohour_state::star_reset_w));
+	map(0x7800, 0x7800).w(FUNC(zerohour_state::irqack_w));
 }
 
-void redclash_state::redclash_map(address_map &map)
+void zerohour_state::redclash_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom();
 //  map(0x3000, 0x3000).set_nopw();
 //  map(0x3800, 0x3800).set_nopw();
-	map(0x4000, 0x43ff).ram().w(FUNC(redclash_state::videoram_w)).share(m_videoram);
+	map(0x4000, 0x43ff).ram().w(FUNC(zerohour_state::videoram_w)).share(m_videoram);
 	map(0x4800, 0x4800).portr("IN0");    /* IN0 */
 	map(0x4801, 0x4801).portr("IN1");    /* IN1 */
 	map(0x4802, 0x4802).portr("DSW1");   /* DSW0 */
@@ -76,8 +76,8 @@ void redclash_state::redclash_map(address_map &map)
 	map(0x5800, 0x5807).w("outlatch2", FUNC(ls259_device::write_d0));    /* to sound board */
 	map(0x6000, 0x67ff).ram();
 	map(0x6800, 0x6bff).ram().share(m_spriteram);
-	map(0x7000, 0x7000).w(FUNC(redclash_state::star_reset_w));
-	map(0x7800, 0x7800).w(FUNC(redclash_state::irqack_w));
+	map(0x7000, 0x7000).w(FUNC(zerohour_state::star_reset_w));
+	map(0x7800, 0x7800).w(FUNC(zerohour_state::irqack_w));
 }
 
 /*
@@ -85,19 +85,19 @@ void redclash_state::redclash_map(address_map &map)
   Interrupts are still used, but they are related to coin
   slots. Left slot generates an IRQ, Right slot a NMI.
 */
-INPUT_CHANGED_MEMBER( redclash_state::left_coin_inserted )
+INPUT_CHANGED_MEMBER( zerohour_state::left_coin_inserted )
 {
 	if(newval)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-INPUT_CHANGED_MEMBER( redclash_state::right_coin_inserted )
+INPUT_CHANGED_MEMBER( zerohour_state::right_coin_inserted )
 {
 	if(newval)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-static INPUT_PORTS_START( redclash )
+static INPUT_PORTS_START( zerohour )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
@@ -122,6 +122,59 @@ static INPUT_PORTS_START( redclash )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW1")
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW1:8" )    /* Switches 6-8 are not used */
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW1:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW1:6" )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:4,3")   /* Also determines the default topscore, 0 for "No Bonus" */
+	PORT_DIPSETTING(    0x00, "No Bonus" )
+	PORT_DIPSETTING(    0x30, "5000" )
+	PORT_DIPSETTING(    0x20, "8000" )
+	PORT_DIPSETTING(    0x10, "10000" )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:2,1")
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0xc0, "3" )
+	PORT_DIPSETTING(    0x80, "4" )
+	PORT_DIPSETTING(    0x40, "5" )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:4,3,2,1")
+	PORT_DIPSETTING(    0x06, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )    /* all other combinations give 1C_1C */
+	PORT_DIPSETTING(    0x09, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW2:8,7,6,5")
+	PORT_DIPSETTING(    0x60, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0xa0, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x70, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )    /* all other combinations give 1C_1C */
+	PORT_DIPSETTING(    0x90, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
+
+	PORT_START("FAKE")
+	/* The coin slots are not memory mapped. Coin Left causes a NMI, */
+	/* Coin Right an IRQ. This fake input port is used by the interrupt */
+	/* handler to be notified of coin insertions. */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, zerohour_state, left_coin_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, zerohour_state, right_coin_inserted, 0)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( redclash )
+	PORT_INCLUDE( zerohour )
+
+	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, "Difficulty?" )
 	PORT_DIPSETTING(    0x03, "Easy?" )
 	PORT_DIPSETTING(    0x02, "Medium?" )
@@ -145,7 +198,7 @@ static INPUT_PORTS_START( redclash )
 	PORT_DIPSETTING(    0x80, "5" )
 	PORT_DIPSETTING(    0x40, "7" )
 
-	PORT_START("DSW2")
+	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 5C_1C ) )
@@ -180,61 +233,6 @@ static INPUT_PORTS_START( redclash )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_8C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_9C ) )
-
-	PORT_START("FAKE")
-	/* The coin slots are not memory mapped. Coin Left causes a NMI, */
-	/* Coin Right an IRQ. This fake input port is used by the interrupt */
-	/* handler to be notified of coin insertions. We use IMPULSE to */
-	/* trigger exactly one interrupt, without having to check when the */
-	/* user releases the key. */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, redclash_state, left_coin_inserted, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, redclash_state, right_coin_inserted, 0)
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( zerohour )
-	PORT_INCLUDE( redclash )
-
-	PORT_MODIFY("DSW1")
-	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW1:8" )    /* Switches 6-8 are not used */
-	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW1:7" )
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW1:6" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:5")
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:4,3")   /* Also determines the default topscore, 0 for "No Bonus" */
-	PORT_DIPSETTING(    0x00, "No Bonus" )
-	PORT_DIPSETTING(    0x30, "5000" )
-	PORT_DIPSETTING(    0x20, "8000" )
-	PORT_DIPSETTING(    0x10, "10000" )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:2,1")
-	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPSETTING(    0xc0, "3" )
-	PORT_DIPSETTING(    0x80, "4" )
-	PORT_DIPSETTING(    0x40, "5" )
-
-	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:4,3,2,1")
-	PORT_DIPSETTING(    0x06, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x0a, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )    /* all other combinations give 1C_1C */
-	PORT_DIPSETTING(    0x09, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW2:8,7,6,5")
-	PORT_DIPSETTING(    0x60, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0xa0, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x70, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )    /* all other combinations give 1C_1C */
-	PORT_DIPSETTING(    0x90, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -292,7 +290,7 @@ static const gfx_layout spritelayout16x16bis =
 	32*32
 };
 
-static GFXDECODE_START( gfx_redclash )
+static GFXDECODE_START( gfx_zerohour )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,          0,  8 )
 	GFXDECODE_ENTRY( "gfx3", 0x0000, spritelayout8x8,   4*8, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, spritelayout16x16, 4*8, 16 )
@@ -302,50 +300,48 @@ static GFXDECODE_START( gfx_redclash )
 GFXDECODE_END
 
 
-void redclash_state::machine_start()
+void zerohour_state::machine_start()
 {
 	save_item(NAME(m_gfxbank));
-
-	m_gfxbank = 0;
 }
 
-void redclash_state::zerohour(machine_config &config)
+void zerohour_state::zerohour(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 4_MHz_XTAL);  /* 4 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &redclash_state::zerohour_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zerohour_state::zerohour_map);
 
 	LS259(config, "outlatch1"); // C1 (CS10 decode)
 
 	ls259_device &outlatch2(LS259(config, "outlatch2")); // C2 (CS11 decode)
-	outlatch2.q_out_cb<0>().set(FUNC(redclash_state::star_w<0>));
-	outlatch2.q_out_cb<5>().set(FUNC(redclash_state::star_w<1>));
-	outlatch2.q_out_cb<6>().set(FUNC(redclash_state::star_w<2>));
-	outlatch2.q_out_cb<7>().set(FUNC(redclash_state::flipscreen_w));
+	outlatch2.q_out_cb<0>().set(FUNC(zerohour_state::star_w<0>));
+	outlatch2.q_out_cb<5>().set(FUNC(zerohour_state::star_w<1>));
+	outlatch2.q_out_cb<6>().set(FUNC(zerohour_state::star_w<2>));
+	outlatch2.q_out_cb<7>().set(FUNC(zerohour_state::flipscreen_w));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(9.828_MHz_XTAL / 2, 312, 8, 248, 262, 32, 224);
-	screen.set_screen_update(FUNC(redclash_state::screen_update));
-	screen.screen_vblank().set(FUNC(redclash_state::screen_vblank));
+	screen.set_screen_update(FUNC(zerohour_state::screen_update));
+	screen.screen_vblank().set(FUNC(zerohour_state::screen_vblank));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_redclash);
-	PALETTE(config, m_palette, FUNC(redclash_state::palette), 4*8 + 4*16 + 32, 32 + 32);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_zerohour);
+	PALETTE(config, m_palette, FUNC(zerohour_state::palette), 4*8 + 4*16 + 32, 32 + 32);
 
-	ZEROHOUR_STARS(config, m_stars, 0);
+	ZEROHOUR_STARS(config, m_stars);
 
 	/* sound hardware */
 }
 
 
-void redclash_state::redclash(machine_config &config)
+void zerohour_state::redclash(machine_config &config)
 {
 	zerohour(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &redclash_state::redclash_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zerohour_state::redclash_map);
 
-	subdevice<addressable_latch_device>("outlatch2")->q_out_cb<1>().set(FUNC(redclash_state::gfxbank_w));
+	subdevice<addressable_latch_device>("outlatch2")->q_out_cb<1>().set(FUNC(zerohour_state::gfxbank_w));
 }
 
 
@@ -538,7 +534,7 @@ ROM_START( redclashs )
 	ROM_LOAD( "3.11e",        0x0040, 0x0020, CRC(27fa3a50) SHA1(7cf59b7a37c156640d6ea91554d1c4276c1780e0) ) /* ?? */
 ROM_END
 
-void redclash_state::init_redclash()
+void zerohour_state::init_zerohour()
 {
 	uint8_t const *const src = memregion("gfx2")->base();
 	uint8_t *const dst = memregion("gfx3")->base();
@@ -553,11 +549,11 @@ void redclash_state::init_redclash()
 }
 
 
-GAME( 1980, zerohour,   0,        zerohour, zerohour, redclash_state, init_redclash, ROT270, "Universal",                   "Zero Hour (set 1)",      MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, zerohoura,  zerohour, zerohour, zerohour, redclash_state, init_redclash, ROT270, "Universal",                   "Zero Hour (set 2)",      MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, zerohouri,  zerohour, zerohour, zerohour, redclash_state, init_redclash, ROT270, "bootleg (Inder SA)",          "Zero Hour (Inder)",      MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zerohour,   0,        zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "Universal",                   "Zero Hour (set 1)",      MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zerohoura,  zerohour, zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "Universal",                   "Zero Hour (set 2)",      MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zerohouri,  zerohour, zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "bootleg (Inder SA)",          "Zero Hour (Inder)",      MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1981, redclash,   0,        redclash, redclash, redclash_state, init_redclash, ROT270, "Kaneko",                      "Red Clash",                 MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, redclasht,  redclash, redclash, redclash, redclash_state, init_redclash, ROT270, "Kaneko (Tehkan license)",     "Red Clash (Tehkan, set 1)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, redclashta, redclash, redclash, redclash, redclash_state, init_redclash, ROT270, "Kaneko (Tehkan license)",     "Red Clash (Tehkan, set 2)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, redclashs,  redclash, redclash, redclash, redclash_state, init_redclash, ROT270, "Kaneko (Suntronics license)", "Red Clash (Suntronics)",    MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, redclash,   0,        redclash, redclash, zerohour_state, init_zerohour, ROT270, "Kaneko",                      "Red Clash",                 MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, redclasht,  redclash, redclash, redclash, zerohour_state, init_zerohour, ROT270, "Kaneko (Tehkan license)",     "Red Clash (Tehkan, set 1)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, redclashta, redclash, redclash, redclash, zerohour_state, init_zerohour, ROT270, "Kaneko (Tehkan license)",     "Red Clash (Tehkan, set 2)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, redclashs,  redclash, redclash, redclash, zerohour_state, init_zerohour, ROT270, "Kaneko (Suntronics license)", "Red Clash (Suntronics)",    MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
