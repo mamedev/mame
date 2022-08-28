@@ -31,7 +31,7 @@ TODO:
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
-#include "sound/sn76496.h"
+#include "sound/samples.h"
 #include "video/resnet.h"
 
 #include "emupal.h"
@@ -53,6 +53,7 @@ public:
 		, m_palette(*this, "palette")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_stars(*this, "stars")
+		, m_samples(*this, "samples")
 	{ }
 
 	void base(machine_config &config);
@@ -75,7 +76,10 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	void irqack_w(u8 data) { m_maincpu->set_input_line(0, CLEAR_LINE); }
 	void star_reset_w(u8 data);
-	template <unsigned B> DECLARE_WRITE_LINE_MEMBER(star_w);
+	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(star_w);
+	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(sample_w);
+	DECLARE_WRITE_LINE_MEMBER(sound_enable_w);
+
 	void palette(palette_device &palette) const;
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
@@ -93,8 +97,10 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<zerohour_stars_device> m_stars;
+	optional_device<samples_device> m_samples;
 
 	tilemap_t *m_fg_tilemap = nullptr;
+	int m_sound_on = 0;
 	int m_gfxbank = 0; // redclash only
 };
 
@@ -114,6 +120,7 @@ void zerohour_state::init_zerohour()
 
 void zerohour_state::machine_start()
 {
+	save_item(NAME(m_sound_on));
 	save_item(NAME(m_gfxbank));
 }
 
@@ -229,9 +236,9 @@ WRITE_LINE_MEMBER(zerohour_state::flipscreen_w)
 	flip_screen_set(state);
 }
 
-template <unsigned B> WRITE_LINE_MEMBER(zerohour_state::star_w)
+template <unsigned N> WRITE_LINE_MEMBER(zerohour_state::star_w)
 {
-	m_stars->set_speed(state ? 1 << B : 0, 1U << B);
+	m_stars->set_speed(state ? 1 << N : 0, 1U << N);
 }
 
 void zerohour_state::star_reset_w(u8 data)
@@ -372,6 +379,44 @@ u32 zerohour_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	m_fg_tilemap->draw(screen, bitmap, cliprect);
 
 	return 0;
+}
+
+
+
+/***************************************************************************
+    Sound
+***************************************************************************/
+
+static const char *const zerohour_sample_names[] =
+{
+	"*zerohour",
+	"zh0",
+	"zh1",
+	"zh2",
+	"zh3",
+	"zh4",
+	"zh5",
+	"zh6",
+	"zh7",
+	"zh8",
+	"zh9",
+	"zh10",
+	nullptr
+};
+
+WRITE_LINE_MEMBER(zerohour_state::sound_enable_w)
+{
+	if (!state)
+		m_samples->stop_all();
+	m_sound_on = state;
+}
+
+template <unsigned N> WRITE_LINE_MEMBER(zerohour_state::sample_w)
+{
+	if (m_sound_on && state)
+		m_samples->start(N, N);
+	else if (0x100 & 1 << N)
+		m_samples->stop(N);
 }
 
 
@@ -679,6 +724,26 @@ void zerohour_state::zerohour(machine_config &config)
 	base(config);
 
 	// sound hardware
+	m_outlatch[0]->q_out_cb<0>().set(FUNC(zerohour_state::sample_w<0>));
+	m_outlatch[0]->q_out_cb<1>().set(FUNC(zerohour_state::sample_w<1>));
+	m_outlatch[0]->q_out_cb<2>().set(FUNC(zerohour_state::sample_w<2>));
+	m_outlatch[0]->q_out_cb<3>().set(FUNC(zerohour_state::sample_w<3>));
+	m_outlatch[0]->q_out_cb<4>().set(FUNC(zerohour_state::sample_w<4>));
+	m_outlatch[0]->q_out_cb<5>().set(FUNC(zerohour_state::sample_w<5>));
+	m_outlatch[0]->q_out_cb<6>().set(FUNC(zerohour_state::sample_w<6>));
+	m_outlatch[0]->q_out_cb<7>().set(FUNC(zerohour_state::sample_w<7>));
+
+	m_outlatch[1]->q_out_cb<1>().set(FUNC(zerohour_state::sample_w<8>));
+	m_outlatch[1]->q_out_cb<2>().set(FUNC(zerohour_state::sound_enable_w));
+	m_outlatch[1]->q_out_cb<3>().set(FUNC(zerohour_state::sample_w<9>));
+	m_outlatch[1]->q_out_cb<4>().set(FUNC(zerohour_state::sample_w<10>));
+
+	SPEAKER(config, "mono").front_center();
+
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(11);
+	m_samples->set_samples_names(zerohour_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void zerohour_state::redclash(machine_config &config)
@@ -886,9 +951,9 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME        PARENT    MACHINE   INPUT     STATE           INIT           SCREEN  COMPANY                        FULLNAME                     FLAGS
-GAME( 1980, zerohour,   0,        zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "Universal",                   "Zero Hour (set 1)",         MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, zerohoura,  zerohour, zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "Universal",                   "Zero Hour (set 2)",         MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, zerohouri,  zerohour, zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "bootleg (Inder SA)",          "Zero Hour (Inder)",         MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zerohour,   0,        zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "Universal",                   "Zero Hour (set 1)",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zerohoura,  zerohour, zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "Universal",                   "Zero Hour (set 2)",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zerohouri,  zerohour, zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "bootleg (Inder SA)",          "Zero Hour (Inder)",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1981, redclash,   0,        redclash, redclash, zerohour_state, init_zerohour, ROT270, "Kaneko",                      "Red Clash",                 MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, redclasht,  redclash, redclash, redclash, zerohour_state, init_zerohour, ROT270, "Kaneko (Tehkan license)",     "Red Clash (Tehkan, set 1)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
