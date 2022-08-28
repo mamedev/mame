@@ -11,6 +11,7 @@
 #pragma once
 
 #include "ladybug_v.h"
+#include "zerohour_stars.h"
 #include "emupal.h"
 #include "tilemap.h"
 
