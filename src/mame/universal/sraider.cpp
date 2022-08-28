@@ -52,17 +52,17 @@ public:
 	void mrsdyna(machine_config &config);
 
 protected:
-	uint8_t protection_r();
-	void unk_0x28_w(uint8_t data);
-	void unk_0x30_w(uint8_t data);
-	void unk_0x38_w(uint8_t data);
-	uint8_t rnd_r();
-	virtual void io_w(uint8_t data);
+	u8 protection_r();
+	void unk_0x28_w(u8 data);
+	void unk_0x30_w(u8 data);
+	void unk_0x38_w(u8 data);
+	u8 rnd_r();
+	virtual void io_w(u8 data);
 	void mrsdyna_palette(palette_device &palette) const;
 	DECLARE_WRITE_LINE_MEMBER(update_stars);
 
 	virtual void machine_start() override;
-	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void cpu1_map(address_map &map);
 	void cpu2_map(address_map &map);
@@ -74,10 +74,10 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<ladybug_video_device> m_video;
 
-	uint8_t m_grid_color = 0;
-	uint8_t m_0x28 = 0;
-	uint8_t m_0x30 = 0;
-	uint8_t m_0x38 = 0;
+	u8 m_grid_color = 0;
+	u8 m_0x28 = 0;
+	u8 m_0x30 = 0;
+	u8 m_0x38 = 0;
 };
 
 // add stars from zerohour, uses grid layer
@@ -93,7 +93,7 @@ public:
 	void sraider(machine_config &config);
 
 protected:
-	virtual void io_w(uint8_t data) override;
+	virtual void io_w(u8 data) override;
 	void sraider_palette(palette_device &palette) const;
 	DECLARE_WRITE_LINE_MEMBER(update_stars);
 	TILE_GET_INFO_MEMBER(get_grid_tile_info);
@@ -101,10 +101,10 @@ protected:
 	tilemap_t *m_grid_tilemap = nullptr;
 
 	virtual void video_start() override;
-	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+	virtual u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 private:
-	required_shared_ptr<uint8_t> m_grid_data;
+	required_shared_ptr<u8> m_grid_data;
 	required_device<zerohour_stars_device> m_stars;
 };
 
@@ -134,7 +134,7 @@ void mrsdyna_state::mrsdyna_palette(palette_device &palette) const
 			2, resistances, gweights, 470, 0,
 			2, resistances, bweights, 470, 0);
 
-	const uint8_t *color_prom = memregion("proms")->base();
+	const u8 *color_prom = memregion("proms")->base();
 
 	// create a lookup table for the palette
 	for (int i = 0; i < 0x20; i++)
@@ -165,14 +165,14 @@ void mrsdyna_state::mrsdyna_palette(palette_device &palette) const
 	// characters
 	for (int i = 0; i < 0x20; i++)
 	{
-		uint8_t const ctabentry = ((i << 3) & 0x18) | ((i >> 2) & 0x07);
+		u8 const ctabentry = ((i << 3) & 0x18) | ((i >> 2) & 0x07);
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	// sprites
 	for (int i = 0; i < 0x20; i++)
 	{
-		uint8_t ctabentry;
+		u8 ctabentry;
 
 		ctabentry = bitswap<4>((color_prom[i] >> 0) & 0x0f, 0,1,2,3);
 		palette.set_pen_indirect(i + 0x20, ctabentry);
@@ -214,6 +214,7 @@ void sraider_state::sraider_palette(palette_device &palette) const
 	palette.set_pen_indirect(0x81, 0x40);
 }
 
+
 TILE_GET_INFO_MEMBER(sraider_state::get_grid_tile_info)
 {
 	if (tile_index < 512)
@@ -243,7 +244,7 @@ WRITE_LINE_MEMBER(sraider_state::update_stars)
 		m_stars->update_state();
 }
 
-uint32_t mrsdyna_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 mrsdyna_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// clear the bg bitmap
 	bitmap.fill(0, cliprect);
@@ -254,7 +255,7 @@ uint32_t mrsdyna_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-uint32_t sraider_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 sraider_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// clear the bg bitmap
 	bitmap.fill(0, cliprect);
@@ -285,7 +286,7 @@ uint32_t sraider_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	{
 		if (m_grid_data[i] != 0)
 		{
-			uint8_t x = i;
+			u8 x = i;
 			int height = cliprect.max_y - cliprect.min_y + 1;
 
 			if (flip_screen())
@@ -307,7 +308,7 @@ uint32_t sraider_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
     I/O
 ***************************************************************************/
 
-void mrsdyna_state::io_w(uint8_t data)
+void mrsdyna_state::io_w(u8 data)
 {
 	// bit7 = flip
 	// bit6 = grid red
@@ -325,7 +326,7 @@ void mrsdyna_state::io_w(uint8_t data)
 	m_grid_color = data & 0x70;
 }
 
-void sraider_state::io_w(uint8_t data)
+void sraider_state::io_w(u8 data)
 {
 	mrsdyna_state::io_w(data);
 
@@ -338,13 +339,13 @@ void sraider_state::io_w(uint8_t data)
 }
 
 // documentation TBD - 556 dual timer
-uint8_t mrsdyna_state::rnd_r()
+u8 mrsdyna_state::rnd_r()
 {
 	return machine().rand() & 3;
 }
 
 // Protection - documentation TBD
-uint8_t mrsdyna_state::protection_r()
+u8 mrsdyna_state::protection_r()
 {
 	// This must return X011111X or cpu #1 will hang
 	// see code at rst $10
@@ -352,7 +353,7 @@ uint8_t mrsdyna_state::protection_r()
 }
 
 // Unknown IO - documentation TBD
-void mrsdyna_state::unk_0x28_w(uint8_t data)
+void mrsdyna_state::unk_0x28_w(u8 data)
 {
 	// These 8 bits are stored in the LS259 latch at A7,
 	// and connected to all the select lines on 2 4066s at B7/C7
@@ -360,7 +361,7 @@ void mrsdyna_state::unk_0x28_w(uint8_t data)
 }
 
 // documentation TBD
-void mrsdyna_state::unk_0x30_w(uint8_t data)
+void mrsdyna_state::unk_0x30_w(u8 data)
 {
 	// bits 0-2 select 4051s at M7 and M8
 	// bits 3-5 select 4051s at K7 and K8
@@ -368,7 +369,7 @@ void mrsdyna_state::unk_0x30_w(uint8_t data)
 }
 
 // documentation TBD
-void mrsdyna_state::unk_0x38_w(uint8_t data)
+void mrsdyna_state::unk_0x38_w(u8 data)
 {
 	// These 6 bits are stored in the LS174 latch at N8
 	// bits 0-2 select 4051s at H7 and H8

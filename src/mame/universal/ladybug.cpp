@@ -87,7 +87,7 @@ public:
 protected:
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	void ladybug_palette(palette_device &palette) const;
-	uint32_t screen_update_ladybug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_ladybug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void ladybug_map(address_map &map);
 
@@ -117,14 +117,14 @@ protected:
 	void decrypted_opcodes_map(address_map &map);
 
 private:
-	required_shared_ptr<uint8_t> m_decrypted_opcodes;
+	required_shared_ptr<u8> m_decrypted_opcodes;
 };
 
 void dorodon_state::init_dorodon()
 {
 	/* decode the opcodes */
-	uint8_t *rom = memregion("maincpu")->base();
-	uint8_t *table = memregion("user1")->base();
+	u8 *rom = memregion("maincpu")->base();
+	u8 *table = memregion("user1")->base();
 
 	for (offs_t i = 0; i < 0x6000; i++)
 		m_decrypted_opcodes[i] = table[rom[i]];
@@ -166,7 +166,7 @@ void ladybug_state::ladybug_palette(palette_device &palette) const
 			2, resistances, gweights, 470, 0,
 			2, resistances, bweights, 470, 0);
 
-	const uint8_t *color_prom = memregion("proms")->base();
+	const u8 *color_prom = memregion("proms")->base();
 
 	// create a lookup table for the palette
 	for (int i = 0; i < 0x20; i++)
@@ -197,14 +197,14 @@ void ladybug_state::ladybug_palette(palette_device &palette) const
 	// characters
 	for (int i = 0; i < 0x20; i++)
 	{
-		uint8_t const ctabentry = ((i << 3) & 0x18) | ((i >> 2) & 0x07);
+		u8 const ctabentry = ((i << 3) & 0x18) | ((i >> 2) & 0x07);
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	// sprites
 	for (int i = 0; i < 0x20; i++)
 	{
-		uint8_t ctabentry;
+		u8 ctabentry;
 
 		ctabentry = bitswap<4>((color_prom[i] >> 0) & 0x0f, 0,1,2,3);
 		palette.set_pen_indirect(i + 0x20, ctabentry);
@@ -213,19 +213,6 @@ void ladybug_state::ladybug_palette(palette_device &palette) const
 		palette.set_pen_indirect(i + 0x40, ctabentry);
 	}
 }
-
-uint32_t ladybug_state::screen_update_ladybug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(0, cliprect);
-	m_video->draw(screen, bitmap, cliprect, flip_screen());
-	return 0;
-}
-
-
-
-/***************************************************************************
-    I/O
-***************************************************************************/
 
 WRITE_LINE_MEMBER(ladybug_state::flipscreen_w)
 {
@@ -236,28 +223,11 @@ WRITE_LINE_MEMBER(ladybug_state::flipscreen_w)
 	}
 }
 
-INPUT_CHANGED_MEMBER(ladybug_state::coin1_inserted)
+u32 ladybug_state::screen_update_ladybug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	/* left coin insertion causes an NMI */
-	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
-}
-
-INPUT_CHANGED_MEMBER(ladybug_state::coin2_inserted)
-{
-	/* right coin insertion causes an IRQ */
-	if (newval)
-		m_maincpu->set_input_line(0, HOLD_LINE);
-}
-
-CUSTOM_INPUT_MEMBER(ladybug_state::ladybug_p1_control_r)
-{
-	return m_p1_control->read();
-}
-
-CUSTOM_INPUT_MEMBER(ladybug_state::ladybug_p2_control_r)
-{
-	// upright cabinet only uses a single set of controls */
-	return ((m_port_dsw0->read() & 0x20) ? m_p2_control : m_p1_control)->read();
+	bitmap.fill(0, cliprect);
+	m_video->draw(screen, bitmap, cliprect, flip_screen());
+	return 0;
 }
 
 
@@ -293,6 +263,31 @@ void dorodon_state::decrypted_opcodes_map(address_map &map)
 /***************************************************************************
     Input Ports
 ***************************************************************************/
+
+INPUT_CHANGED_MEMBER(ladybug_state::coin1_inserted)
+{
+	/* left coin insertion causes an NMI */
+	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+}
+
+INPUT_CHANGED_MEMBER(ladybug_state::coin2_inserted)
+{
+	/* right coin insertion causes an IRQ */
+	if (newval)
+		m_maincpu->set_input_line(0, HOLD_LINE);
+}
+
+CUSTOM_INPUT_MEMBER(ladybug_state::ladybug_p1_control_r)
+{
+	return m_p1_control->read();
+}
+
+CUSTOM_INPUT_MEMBER(ladybug_state::ladybug_p2_control_r)
+{
+	// upright cabinet only uses a single set of controls */
+	return ((m_port_dsw0->read() & 0x20) ? m_p2_control : m_p1_control)->read();
+}
+
 
 static INPUT_PORTS_START( ladybug )
 	PORT_START("IN0")

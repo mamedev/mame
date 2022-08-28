@@ -37,7 +37,7 @@ void ladybug_video_device::device_start()
 }
 
 
-void ladybug_video_device::bg_w(offs_t offset, uint8_t data)
+void ladybug_video_device::bg_w(offs_t offset, u8 data)
 {
 	m_bg_ram[offset & 0x07ff] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x03ff);

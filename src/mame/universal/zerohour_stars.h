@@ -26,11 +26,11 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	u8  m_enable;
-	u8  m_speed;
+	u8 m_enable;
+	u8 m_speed;
 	u32 m_state;
 	u16 m_offset;
-	u8  m_count;
+	u8 m_count;
 
 	u16 m_pal_offset;
 	bool m_has_va_bit;

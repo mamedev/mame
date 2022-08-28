@@ -17,10 +17,10 @@ public:
 
 	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 
-	uint8_t spr_r(offs_t offset) { return m_spr_ram[offset & 0x03ff]; }
-	void spr_w(offs_t offset, uint8_t data) { m_spr_ram[offset & 0x03ff] = data; }
-	uint8_t bg_r(offs_t offset) { return m_bg_ram[offset & 0x07ff]; }
-	void bg_w(offs_t offset, uint8_t data);
+	u8 spr_r(offs_t offset) { return m_spr_ram[offset & 0x03ff]; }
+	void spr_w(offs_t offset, u8 data) { m_spr_ram[offset & 0x03ff] = data; }
+	u8 bg_r(offs_t offset) { return m_bg_ram[offset & 0x07ff]; }
+	void bg_w(offs_t offset, u8 data);
 
 	void draw(screen_device &screen, bitmap_ind16 &bitmap, rectangle const &cliprect, bool flip);
 

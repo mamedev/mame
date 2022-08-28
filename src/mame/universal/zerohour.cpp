@@ -27,18 +27,206 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "zerohour.h"
+#include "zerohour_stars.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "sound/sn76496.h"
+#include "video/resnet.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
+namespace {
 
-void zerohour_state::irqack_w(uint8_t data)
+class zerohour_state : public driver_device
 {
-	m_maincpu->set_input_line(0, CLEAR_LINE);
+public:
+	zerohour_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_videoram(*this, "videoram")
+		, m_spriteram(*this, "spriteram")
+		, m_maincpu(*this, "maincpu")
+		, m_outlatch(*this, "outlatch%u", 0)
+		, m_palette(*this, "palette")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_stars(*this, "stars")
+	{ }
+
+	void base(machine_config &config);
+	void zerohour(machine_config &config);
+	void redclash(machine_config &config);
+
+	void init_zerohour();
+
+	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
+	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+private:
+	DECLARE_WRITE_LINE_MEMBER(update_stars);
+	void videoram_w(offs_t offset, u8 data);
+	DECLARE_WRITE_LINE_MEMBER(gfxbank_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	void irqack_w(u8 data) { m_maincpu->set_input_line(0, CLEAR_LINE); }
+	void star_reset_w(u8 data);
+	template <unsigned B> DECLARE_WRITE_LINE_MEMBER(star_w);
+	void palette(palette_device &palette) const;
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void redclash_map(address_map &map);
+	void zerohour_map(address_map &map);
+
+	required_shared_ptr<u8> m_videoram;
+	required_shared_ptr<u8> m_spriteram;
+	required_device<cpu_device> m_maincpu;
+	required_device_array<ls259_device, 2> m_outlatch;
+	required_device<palette_device> m_palette;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<zerohour_stars_device> m_stars;
+
+	tilemap_t *m_fg_tilemap = nullptr;
+	int m_gfxbank = 0; // redclash only
+};
+
+void zerohour_state::init_zerohour()
+{
+	u8 const *const src = memregion("gfx2")->base();
+	u8 *const dst = memregion("gfx3")->base();
+	int const len = memregion("gfx3")->bytes();
+
+	/* rearrange the sprite graphics */
+	for (int i = 0; i < len; i++)
+	{
+		int const j = (i & ~0x003e) | ((i & 0x0e) << 2) | ((i & 0x30) >> 3);
+		dst[i] = src[j];
+	}
+}
+
+void zerohour_state::machine_start()
+{
+	save_item(NAME(m_gfxbank));
+}
+
+
+
+/***************************************************************************
+    Video
+***************************************************************************/
+
+/***************************************************************************
+
+  Convert the color PROMs into a more useable format.
+
+  I'm using the same palette conversion as Lady Bug, but the Zero Hour
+  schematics show a different resistor network.
+
+***************************************************************************/
+
+void zerohour_state::palette(palette_device &palette) const
+{
+	const u8 *color_prom = memregion("proms")->base();
+
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x20; i++)
+	{
+		int bit0, bit1;
+
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 5);
+		int const r = 0x47 * bit0 + 0x97 * bit1;
+
+		// green component
+		bit0 = BIT(color_prom[i], 2);
+		bit1 = BIT(color_prom[i], 6);
+		int const g = 0x47 * bit0 + 0x97 * bit1;
+
+		// blue component
+		bit0 = BIT(color_prom[i], 4);
+		bit1 = BIT(color_prom[i], 7);
+		int const b = 0x47 * bit0 + 0x97 * bit1;
+
+		palette.set_indirect_color(i, rgb_t(r, g, b));
+	}
+
+	// star colors
+	for (int i = 0; i < 0x20; i++)
+	{
+		int bit0, bit1;
+
+		// red component
+		bit0 = BIT(i, 0);
+		int const r = 0x97 * bit0;
+
+		// green component
+		bit0 = BIT(i, 2);
+		bit1 = BIT(i, 1);
+		int const g = 0x47 * bit0 + 0x97 * bit1;
+
+		// blue component
+		bit0 = BIT(i, 4);
+		bit1 = BIT(i, 3);
+		int const b = 0x47 * bit0 + 0x97 * bit1;
+
+		palette.set_indirect_color(i + 0x20, rgb_t(r, g, b));
+	}
+
+	// color_prom now points to the beginning of the lookup table
+	color_prom += 0x20;
+
+	// characters
+	for (int i = 0; i < 0x20; i++)
+	{
+		u8 const ctabentry = ((i << 3) & 0x18) | ((i >> 2) & 0x07);
+		palette.set_pen_indirect(i, ctabentry);
+	}
+
+	// sprites
+	for (int i = 0; i < 0x20; i++)
+	{
+		u8 ctabentry;
+
+		ctabentry = bitswap<4>(color_prom[i], 0,1,2,3);
+		palette.set_pen_indirect(i + 0x20, ctabentry);
+
+		ctabentry = bitswap<4>(color_prom[i], 4,5,6,7);
+		palette.set_pen_indirect(i + 0x40, ctabentry);
+	}
+
+	// stars
+	for (int i = 0; i < 0x20; i++)
+		palette.set_pen_indirect(i + 0x60, i + 0x20);
+}
+
+
+void zerohour_state::videoram_w(offs_t offset, u8 data)
+{
+	m_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
+}
+
+WRITE_LINE_MEMBER(zerohour_state::gfxbank_w)
+{
+	if (m_gfxbank != state)
+	{
+		m_gfxbank = state;
+		m_fg_tilemap->mark_all_dirty();
+	}
+}
+
+WRITE_LINE_MEMBER(zerohour_state::flipscreen_w)
+{
+	flip_screen_set(state);
 }
 
 template <unsigned B> WRITE_LINE_MEMBER(zerohour_state::star_w)
@@ -46,18 +234,164 @@ template <unsigned B> WRITE_LINE_MEMBER(zerohour_state::star_w)
 	m_stars->set_speed(state ? 1 << B : 0, 1U << B);
 }
 
+void zerohour_state::star_reset_w(u8 data)
+{
+	m_stars->set_enable(true);
+}
+
+WRITE_LINE_MEMBER(zerohour_state::update_stars)
+{
+	if (!state)
+		m_stars->update_state();
+}
+
+
+TILE_GET_INFO_MEMBER(zerohour_state::get_fg_tile_info)
+{
+	int code = m_videoram[tile_index];
+	int color = (m_videoram[tile_index] & 0x70) >> 4; // ??
+
+	tileinfo.set(0, code, color, 0);
+}
+
+void zerohour_state::video_start()
+{
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(zerohour_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap->set_transparent_pen(0);
+}
+
+void zerohour_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int offs = m_spriteram.bytes() - 0x20; offs >= 0; offs -= 0x20)
+	{
+		// find last valid sprite of current block
+		int i = 0;
+		while (i < 0x20 && m_spriteram[offs + i] != 0)
+			i += 4;
+
+		while (i > 0)
+		{
+			i -= 4;
+
+			if (m_spriteram[offs + i] & 0x80)
+			{
+				int color = bitswap<4>(m_spriteram[offs + i + 2], 5,2,1,0);
+				int sx = m_spriteram[offs + i + 3];
+				int sy = offs / 4 + (m_spriteram[offs + i] & 0x07) - 16;
+
+				switch ((m_spriteram[offs + i] & 0x18) >> 3)
+				{
+					case 3: /* 24x24 */
+					{
+						int code = ((m_spriteram[offs + i + 1] & 0xf0) >> 4) + ((m_gfxbank & 1) << 4);
+
+						m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
+								code,
+								color,
+								0,0,
+								sx,sy,0);
+						/* wraparound */
+						m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
+								code,
+								color,
+								0,0,
+								sx - 256,sy,0);
+						break;
+					}
+
+					case 2: /* 16x16 */
+						if (m_spriteram[offs + i] & 0x20) /* zero hour spaceships */
+						{
+							int code = ((m_spriteram[offs + i + 1] & 0xf8) >> 3) + ((m_gfxbank & 1) << 5);
+							int bank = (m_spriteram[offs + i + 1] & 0x02) >> 1;
+
+							m_gfxdecode->gfx(4+bank)->transpen(bitmap,cliprect,
+									code,
+									color,
+									0,0,
+									sx,sy,0);
+						}
+						else
+						{
+							int code = ((m_spriteram[offs + i + 1] & 0xf0) >> 4) + ((m_gfxbank & 1) << 4);
+
+							m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+									code,
+									color,
+									0,0,
+									sx,sy,0);
+						}
+						break;
+
+					case 1: /* 8x8 */
+						m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+								m_spriteram[offs + i + 1],// + 4 * (m_spriteram[offs + i + 2] & 0x10),
+								color,
+								0,0,
+								sx,sy,0);
+						break;
+
+					case 0:
+						popmessage("unknown sprite size 0");
+						break;
+				}
+			}
+		}
+	}
+}
+
+void zerohour_state::draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int offs = 0; offs < 0x20; offs++)
+	{
+		int sx = 8 * offs + 8;
+		int sy = 0xff - m_videoram[offs + 0x20];
+
+		if (flip_screen())
+			sx = 264 - sx;
+
+		int fine_x = m_videoram[offs] >> 3 & 7;
+		sx -= fine_x;
+
+		for (int y = 0; y < 2; y++)
+			for (int x = 0; x < 8; x++)
+			{
+				if (cliprect.contains(sx + x, sy - y))
+					bitmap.pix(sy - y, sx + x) = 0x3f;
+			}
+
+	}
+}
+
+u32 zerohour_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(m_palette->black_pen(), cliprect);
+	m_stars->draw(bitmap, cliprect);
+	draw_bullets(bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
+	m_fg_tilemap->draw(screen, bitmap, cliprect);
+
+	return 0;
+}
+
+
+
+/***************************************************************************
+    Address Maps
+***************************************************************************/
+
 void zerohour_state::zerohour_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom();
 	map(0x3000, 0x37ff).ram();
 	map(0x3800, 0x3bff).ram().share(m_spriteram);
 	map(0x4000, 0x43ff).ram().w(FUNC(zerohour_state::videoram_w)).share(m_videoram);
-	map(0x4800, 0x4800).portr("IN0");    /* IN0 */
-	map(0x4801, 0x4801).portr("IN1");    /* IN1 */
-	map(0x4802, 0x4802).portr("DSW1");   /* DSW0 */
-	map(0x4803, 0x4803).portr("DSW2");   /* DSW1 */
-	map(0x5000, 0x5007).w("outlatch1", FUNC(ls259_device::write_d0));    /* to sound board */
-	map(0x5800, 0x5807).w("outlatch2", FUNC(ls259_device::write_d0));    /* to sound board */
+	map(0x4800, 0x4800).portr("IN0");
+	map(0x4801, 0x4801).portr("IN1");
+	map(0x4802, 0x4802).portr("DSW1");
+	map(0x4803, 0x4803).portr("DSW2");
+	map(0x5000, 0x5007).w(m_outlatch[0], FUNC(ls259_device::write_d0)); // to sound board
+	map(0x5800, 0x5807).w(m_outlatch[1], FUNC(ls259_device::write_d0)); // to sound board
 	map(0x7000, 0x7000).w(FUNC(zerohour_state::star_reset_w));
 	map(0x7800, 0x7800).w(FUNC(zerohour_state::irqack_w));
 }
@@ -68,34 +402,36 @@ void zerohour_state::redclash_map(address_map &map)
 //  map(0x3000, 0x3000).set_nopw();
 //  map(0x3800, 0x3800).set_nopw();
 	map(0x4000, 0x43ff).ram().w(FUNC(zerohour_state::videoram_w)).share(m_videoram);
-	map(0x4800, 0x4800).portr("IN0");    /* IN0 */
-	map(0x4801, 0x4801).portr("IN1");    /* IN1 */
-	map(0x4802, 0x4802).portr("DSW1");   /* DSW0 */
-	map(0x4803, 0x4803).portr("DSW2");   /* DSW1 */
-	map(0x5000, 0x5007).w("outlatch1", FUNC(ls259_device::write_d0));    /* to sound board */
-	map(0x5800, 0x5807).w("outlatch2", FUNC(ls259_device::write_d0));    /* to sound board */
+	map(0x4800, 0x4800).portr("IN0");
+	map(0x4801, 0x4801).portr("IN1");
+	map(0x4802, 0x4802).portr("DSW1");
+	map(0x4803, 0x4803).portr("DSW2");
+	map(0x5000, 0x5007).w(m_outlatch[0], FUNC(ls259_device::write_d0)); // to sound board
+	map(0x5800, 0x5807).w(m_outlatch[1], FUNC(ls259_device::write_d0)); // to sound board
 	map(0x6000, 0x67ff).ram();
 	map(0x6800, 0x6bff).ram().share(m_spriteram);
 	map(0x7000, 0x7000).w(FUNC(zerohour_state::star_reset_w));
 	map(0x7800, 0x7800).w(FUNC(zerohour_state::irqack_w));
 }
 
-/*
-  This game doesn't have VBlank interrupts.
-  Interrupts are still used, but they are related to coin
-  slots. Left slot generates an IRQ, Right slot a NMI.
-*/
+
+
+/***************************************************************************
+    Input Ports
+***************************************************************************/
+
 INPUT_CHANGED_MEMBER( zerohour_state::left_coin_inserted )
 {
-	if(newval)
+	if (newval)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 INPUT_CHANGED_MEMBER( zerohour_state::right_coin_inserted )
 {
-	if(newval)
+	if (newval)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
+
 
 static INPUT_PORTS_START( zerohour )
 	PORT_START("IN0")
@@ -115,20 +451,20 @@ static INPUT_PORTS_START( zerohour )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	/* Note that there are TWO VBlank inputs, one is active low, the other active */
-	/* high. There are probably other differences in the hardware, but emulating */
-	/* them this way is enough to get the game running. */
+	// Note that there are TWO VBlank inputs, one is active low, the other active
+	// high. There are probably other differences in the hardware, but emulating
+	// them this way is enough to get the game running.
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW1")
-	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW1:8" )    /* Switches 6-8 are not used */
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW1:8" ) // Switches 6-8 are not used
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW1:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW1:6" )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:4,3")   /* Also determines the default topscore, 0 for "No Bonus" */
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:4,3") // Also determines the default topscore, 0 for "No Bonus"
 	PORT_DIPSETTING(    0x00, "No Bonus" )
 	PORT_DIPSETTING(    0x30, "5000" )
 	PORT_DIPSETTING(    0x20, "8000" )
@@ -145,7 +481,7 @@ static INPUT_PORTS_START( zerohour )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )    /* all other combinations give 1C_1C */
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) ) // all other combinations give 1C_1C
 	PORT_DIPSETTING(    0x09, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
@@ -156,7 +492,7 @@ static INPUT_PORTS_START( zerohour )
 	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x70, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )    /* all other combinations give 1C_1C */
+	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) ) // all other combinations give 1C_1C
 	PORT_DIPSETTING(    0x90, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
@@ -164,9 +500,9 @@ static INPUT_PORTS_START( zerohour )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
 
 	PORT_START("FAKE")
-	/* The coin slots are not memory mapped. Coin Left causes a NMI, */
-	/* Coin Right an IRQ. This fake input port is used by the interrupt */
-	/* handler to be notified of coin insertions. */
+	// The coin slots are not memory mapped. Coin Left causes a NMI,
+	// Coin Right an IRQ. This fake input port is used by the interrupt
+	// handler to be notified of coin insertions.
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, zerohour_state, left_coin_inserted, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, zerohour_state, right_coin_inserted, 0)
 INPUT_PORTS_END
@@ -235,6 +571,12 @@ static INPUT_PORTS_START( redclash )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_9C ) )
 INPUT_PORTS_END
 
+
+
+/***************************************************************************
+    GFX Layouts
+***************************************************************************/
+
 static const gfx_layout charlayout =
 {
 	8,8,
@@ -300,26 +642,26 @@ static GFXDECODE_START( gfx_zerohour )
 GFXDECODE_END
 
 
-void zerohour_state::machine_start()
-{
-	save_item(NAME(m_gfxbank));
-}
 
-void zerohour_state::zerohour(machine_config &config)
+/***************************************************************************
+    Machine Configs
+***************************************************************************/
+
+void zerohour_state::base(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 4_MHz_XTAL);  /* 4 MHz */
+	// basic machine hardware
+	Z80(config, m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &zerohour_state::zerohour_map);
 
-	LS259(config, "outlatch1"); // C1 (CS10 decode)
+	LS259(config, m_outlatch[0]); // C1 (CS10 decode)
 
-	ls259_device &outlatch2(LS259(config, "outlatch2")); // C2 (CS11 decode)
-	outlatch2.q_out_cb<0>().set(FUNC(zerohour_state::star_w<0>));
-	outlatch2.q_out_cb<5>().set(FUNC(zerohour_state::star_w<1>));
-	outlatch2.q_out_cb<6>().set(FUNC(zerohour_state::star_w<2>));
-	outlatch2.q_out_cb<7>().set(FUNC(zerohour_state::flipscreen_w));
+	LS259(config, m_outlatch[1]); // C2 (CS11 decode)
+	m_outlatch[1]->q_out_cb<0>().set(FUNC(zerohour_state::star_w<0>));
+	m_outlatch[1]->q_out_cb<5>().set(FUNC(zerohour_state::star_w<1>));
+	m_outlatch[1]->q_out_cb<6>().set(FUNC(zerohour_state::star_w<2>));
+	m_outlatch[1]->q_out_cb<7>().set(FUNC(zerohour_state::flipscreen_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(9.828_MHz_XTAL / 2, 312, 8, 248, 262, 32, 224);
 	screen.set_screen_update(FUNC(zerohour_state::screen_update));
@@ -330,26 +672,27 @@ void zerohour_state::zerohour(machine_config &config)
 	PALETTE(config, m_palette, FUNC(zerohour_state::palette), 4*8 + 4*16 + 32, 32 + 32);
 
 	ZEROHOUR_STARS(config, m_stars);
-
-	/* sound hardware */
 }
 
+void zerohour_state::zerohour(machine_config &config)
+{
+	base(config);
+
+	// sound hardware
+}
 
 void zerohour_state::redclash(machine_config &config)
 {
-	zerohour(config);
+	base(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &zerohour_state::redclash_map);
-
-	subdevice<addressable_latch_device>("outlatch2")->q_out_cb<1>().set(FUNC(zerohour_state::gfxbank_w));
+	m_outlatch[1]->q_out_cb<1>().set(FUNC(zerohour_state::gfxbank_w));
 }
 
 
 
 /***************************************************************************
-
-  Game driver(s)
-
+    ROM Definitions
 ***************************************************************************/
 
 ROM_START( zerohour )
@@ -534,26 +877,20 @@ ROM_START( redclashs )
 	ROM_LOAD( "3.11e",        0x0040, 0x0020, CRC(27fa3a50) SHA1(7cf59b7a37c156640d6ea91554d1c4276c1780e0) ) /* ?? */
 ROM_END
 
-void zerohour_state::init_zerohour()
-{
-	uint8_t const *const src = memregion("gfx2")->base();
-	uint8_t *const dst = memregion("gfx3")->base();
-	int const len = memregion("gfx3")->bytes();
-
-	/* rearrange the sprite graphics */
-	for (int i = 0; i < len; i++)
-	{
-		int const j = (i & ~0x003e) | ((i & 0x0e) << 2) | ((i & 0x30) >> 3);
-		dst[i] = src[j];
-	}
-}
+} // anonymous namespace
 
 
-GAME( 1980, zerohour,   0,        zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "Universal",                   "Zero Hour (set 1)",      MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, zerohoura,  zerohour, zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "Universal",                   "Zero Hour (set 2)",      MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, zerohouri,  zerohour, zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "bootleg (Inder SA)",          "Zero Hour (Inder)",      MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1981, redclash,   0,        redclash, redclash, zerohour_state, init_zerohour, ROT270, "Kaneko",                      "Red Clash",                 MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, redclasht,  redclash, redclash, redclash, zerohour_state, init_zerohour, ROT270, "Kaneko (Tehkan license)",     "Red Clash (Tehkan, set 1)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, redclashta, redclash, redclash, redclash, zerohour_state, init_zerohour, ROT270, "Kaneko (Tehkan license)",     "Red Clash (Tehkan, set 2)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, redclashs,  redclash, redclash, redclash, zerohour_state, init_zerohour, ROT270, "Kaneko (Suntronics license)", "Red Clash (Suntronics)",    MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+/***************************************************************************
+    Drivers
+***************************************************************************/
+
+//    YEAR  NAME        PARENT    MACHINE   INPUT     STATE           INIT           SCREEN  COMPANY                        FULLNAME                     FLAGS
+GAME( 1980, zerohour,   0,        zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "Universal",                   "Zero Hour (set 1)",         MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zerohoura,  zerohour, zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "Universal",                   "Zero Hour (set 2)",         MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zerohouri,  zerohour, zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "bootleg (Inder SA)",          "Zero Hour (Inder)",         MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+
+GAME( 1981, redclash,   0,        redclash, redclash, zerohour_state, init_zerohour, ROT270, "Kaneko",                      "Red Clash",                 MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, redclasht,  redclash, redclash, redclash, zerohour_state, init_zerohour, ROT270, "Kaneko (Tehkan license)",     "Red Clash (Tehkan, set 1)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, redclashta, redclash, redclash, redclash, zerohour_state, init_zerohour, ROT270, "Kaneko (Tehkan license)",     "Red Clash (Tehkan, set 2)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, redclashs,  redclash, redclash, redclash, zerohour_state, init_zerohour, ROT270, "Kaneko (Suntronics license)", "Red Clash (Suntronics)",    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
