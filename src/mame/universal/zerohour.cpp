@@ -17,8 +17,9 @@ TODO:
   and "TOP" should be magenta. How is this determined? It's as if only the top part
   of the screen has this exception. Sprite colors look ok.
 - Some graphical problems in both games
-- redclash supports more background layer effects: white+mixed with other colors,
-  used in canyon parts and during the big ufo explosion
+- redclash supports more background layer effects: white+mixed with other colors
+  scrolling at the same speed as the stars, it's used in canyon parts and during the
+  big ufo explosion
 - According to video reference(could only find 1), redclash player bullets should be
   4*2px red on the 1st half of the screen and 8*2px yellow on the 2nd half, zerohour
   bullets are correct though(always 8*2px magenta)
@@ -41,6 +42,7 @@ TODO:
 
 namespace {
 
+// zerohour/common
 class zerohour_state : public driver_device
 {
 public:
@@ -58,7 +60,6 @@ public:
 
 	void base(machine_config &config);
 	void zerohour(machine_config &config);
-	void redclash(machine_config &config);
 
 	void init_zerohour();
 
@@ -69,10 +70,8 @@ protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-private:
 	DECLARE_WRITE_LINE_MEMBER(update_stars);
 	void videoram_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(gfxbank_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	void irqack_w(u8 data) { m_maincpu->set_input_line(0, CLEAR_LINE); }
 	void star_reset_w(u8 data);
@@ -83,11 +82,10 @@ private:
 	void palette(palette_device &palette) const;
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void redclash_map(address_map &map);
 	void zerohour_map(address_map &map);
 
 	required_shared_ptr<u8> m_videoram;
@@ -102,6 +100,29 @@ private:
 	tilemap_t *m_fg_tilemap = nullptr;
 	int m_sound_on = 0;
 	int m_gfxbank = 0; // redclash only
+};
+
+// redclash, adds background layer
+class redclash_state : public zerohour_state
+{
+public:
+	redclash_state(const machine_config &mconfig, device_type type, const char *tag)
+		: zerohour_state(mconfig, type, tag)
+	{ }
+
+	void redclash(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+
+private:
+	DECLARE_WRITE_LINE_MEMBER(gfxbank_w);
+	void background_w(u8 data);
+
+	void redclash_map(address_map &map);
+
+	u8 m_background = 0;
 };
 
 void zerohour_state::init_zerohour()
@@ -121,7 +142,13 @@ void zerohour_state::init_zerohour()
 void zerohour_state::machine_start()
 {
 	save_item(NAME(m_sound_on));
+}
+
+void redclash_state::machine_start()
+{
+	zerohour_state::machine_start();
 	save_item(NAME(m_gfxbank));
+	save_item(NAME(m_background));
 }
 
 
@@ -222,13 +249,16 @@ void zerohour_state::videoram_w(offs_t offset, u8 data)
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE_LINE_MEMBER(zerohour_state::gfxbank_w)
+WRITE_LINE_MEMBER(redclash_state::gfxbank_w)
 {
-	if (m_gfxbank != state)
-	{
-		m_gfxbank = state;
-		m_fg_tilemap->mark_all_dirty();
-	}
+	m_gfxbank = state;
+}
+
+void redclash_state::background_w(u8 data)
+{
+	// redclash background layer
+	// 0x70: normal, 0xc3: white, 0x92: white+green, 0xf4: white+red/black
+	m_background = data;
 }
 
 WRITE_LINE_MEMBER(zerohour_state::flipscreen_w)
@@ -285,62 +315,43 @@ void zerohour_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 				int color = bitswap<4>(m_spriteram[offs + i + 2], 5,2,1,0);
 				int sx = m_spriteram[offs + i + 3];
 				int sy = offs / 4 + (m_spriteram[offs + i] & 0x07) - 16;
+				int bank = 0, code = 0;
 
 				switch ((m_spriteram[offs + i] & 0x18) >> 3)
 				{
-					case 3: /* 24x24 */
-					{
-						int code = ((m_spriteram[offs + i + 1] & 0xf0) >> 4) + ((m_gfxbank & 1) << 4);
-
-						m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
-								code,
-								color,
-								0,0,
-								sx,sy,0);
-						/* wraparound */
-						m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
-								code,
-								color,
-								0,0,
-								sx - 256,sy,0);
+					case 1: // 8x8
+						bank = 1;
+						code = m_spriteram[offs + i + 1] + ((m_gfxbank & 1) << 8);
 						break;
-					}
 
-					case 2: /* 16x16 */
-						if (m_spriteram[offs + i] & 0x20) /* zero hour spaceships */
+					case 2: // 16x16
+						if (m_spriteram[offs + i] & 0x20) // zero hour spaceships
 						{
-							int code = ((m_spriteram[offs + i + 1] & 0xf8) >> 3) + ((m_gfxbank & 1) << 5);
-							int bank = (m_spriteram[offs + i + 1] & 0x02) >> 1;
-
-							m_gfxdecode->gfx(4+bank)->transpen(bitmap,cliprect,
-									code,
-									color,
-									0,0,
-									sx,sy,0);
+							code = ((m_spriteram[offs + i + 1] & 0xf8) >> 3) + ((m_gfxbank & 1) << 5);
+							bank = 4 + ((m_spriteram[offs + i + 1] & 0x02) >> 1);
 						}
 						else
 						{
-							int code = ((m_spriteram[offs + i + 1] & 0xf0) >> 4) + ((m_gfxbank & 1) << 4);
-
-							m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
-									code,
-									color,
-									0,0,
-									sx,sy,0);
+							bank = 2;
+							code = ((m_spriteram[offs + i + 1] & 0xf0) >> 4) + ((m_gfxbank & 1) << 4);
 						}
 						break;
 
-					case 1: /* 8x8 */
-						m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
-								m_spriteram[offs + i + 1],// + 4 * (m_spriteram[offs + i + 2] & 0x10),
-								color,
-								0,0,
-								sx,sy,0);
+					case 3: // 24x24
+					{
+						bank = 3;
+						code = ((m_spriteram[offs + i + 1] & 0xf0) >> 4) + ((m_gfxbank & 1) << 4);
 						break;
+					}
 
-					case 0:
-						popmessage("unknown sprite size 0");
+					default: // invalid
 						break;
+				}
+
+				if (bank > 0)
+				{
+					m_gfxdecode->gfx(bank)->transpen(bitmap, cliprect, code, color, 0, 0, sx, sy, 0);
+					m_gfxdecode->gfx(bank)->transpen(bitmap, cliprect, code, color, 0, 0, sx - 256, sy, 0); // wraparound
 				}
 			}
 		}
@@ -374,6 +385,22 @@ u32 zerohour_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	m_stars->draw(bitmap, cliprect);
+	draw_bullets(bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
+	m_fg_tilemap->draw(screen, bitmap, cliprect);
+
+	return 0;
+}
+
+u32 redclash_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(m_palette->black_pen(), cliprect);
+	m_stars->draw(bitmap, cliprect);
+
+	// background effect, preliminary
+	if (m_background & 0xf)
+		bitmap.fill(m_palette->white_pen(), cliprect);
+
 	draw_bullets(bitmap, cliprect);
 	draw_sprites(bitmap, cliprect);
 	m_fg_tilemap->draw(screen, bitmap, cliprect);
@@ -441,12 +468,12 @@ void zerohour_state::zerohour_map(address_map &map)
 	map(0x7800, 0x7800).w(FUNC(zerohour_state::irqack_w));
 }
 
-void zerohour_state::redclash_map(address_map &map)
+void redclash_state::redclash_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom();
-//  map(0x3000, 0x3000).set_nopw();
-//  map(0x3800, 0x3800).set_nopw();
-	map(0x4000, 0x43ff).ram().w(FUNC(zerohour_state::videoram_w)).share(m_videoram);
+	map(0x3000, 0x3000).w(FUNC(redclash_state::background_w));
+	map(0x3800, 0x3800).nopw(); // sound related?
+	map(0x4000, 0x43ff).ram().w(FUNC(redclash_state::videoram_w)).share(m_videoram);
 	map(0x4800, 0x4800).portr("IN0");
 	map(0x4801, 0x4801).portr("IN1");
 	map(0x4802, 0x4802).portr("DSW1");
@@ -455,8 +482,8 @@ void zerohour_state::redclash_map(address_map &map)
 	map(0x5800, 0x5807).w(m_outlatch[1], FUNC(ls259_device::write_d0)); // to sound board
 	map(0x6000, 0x67ff).ram();
 	map(0x6800, 0x6bff).ram().share(m_spriteram);
-	map(0x7000, 0x7000).w(FUNC(zerohour_state::star_reset_w));
-	map(0x7800, 0x7800).w(FUNC(zerohour_state::irqack_w));
+	map(0x7000, 0x7000).w(FUNC(redclash_state::star_reset_w));
+	map(0x7800, 0x7800).w(FUNC(redclash_state::irqack_w));
 }
 
 
@@ -746,12 +773,14 @@ void zerohour_state::zerohour(machine_config &config)
 	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
-void zerohour_state::redclash(machine_config &config)
+void redclash_state::redclash(machine_config &config)
 {
 	base(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &zerohour_state::redclash_map);
-	m_outlatch[1]->q_out_cb<1>().set(FUNC(zerohour_state::gfxbank_w));
+	m_maincpu->set_addrmap(AS_PROGRAM, &redclash_state::redclash_map);
+	m_outlatch[1]->q_out_cb<1>().set(FUNC(redclash_state::gfxbank_w));
+
+	m_stars->has_va_bit(false);
 }
 
 
@@ -955,7 +984,7 @@ GAME( 1980, zerohour,   0,        zerohour, zerohour, zerohour_state, init_zeroh
 GAME( 1980, zerohoura,  zerohour, zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "Universal",                   "Zero Hour (set 2)",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, zerohouri,  zerohour, zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "bootleg (Inder SA)",          "Zero Hour (Inder)",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1981, redclash,   0,        redclash, redclash, zerohour_state, init_zerohour, ROT270, "Kaneko",                      "Red Clash",                 MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, redclasht,  redclash, redclash, redclash, zerohour_state, init_zerohour, ROT270, "Kaneko (Tehkan license)",     "Red Clash (Tehkan, set 1)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, redclashta, redclash, redclash, redclash, zerohour_state, init_zerohour, ROT270, "Kaneko (Tehkan license)",     "Red Clash (Tehkan, set 2)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, redclashs,  redclash, redclash, redclash, zerohour_state, init_zerohour, ROT270, "Kaneko (Suntronics license)", "Red Clash (Suntronics)",    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, redclash,   0,        redclash, redclash, redclash_state, init_zerohour, ROT270, "Kaneko",                      "Red Clash",                 MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, redclasht,  redclash, redclash, redclash, redclash_state, init_zerohour, ROT270, "Kaneko (Tehkan license)",     "Red Clash (Tehkan, set 1)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, redclashta, redclash, redclash, redclash, redclash_state, init_zerohour, ROT270, "Kaneko (Tehkan license)",     "Red Clash (Tehkan, set 2)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, redclashs,  redclash, redclash, redclash, redclash_state, init_zerohour, ROT270, "Kaneko (Suntronics license)", "Red Clash (Suntronics)",    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
