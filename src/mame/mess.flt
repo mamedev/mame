@@ -247,6 +247,8 @@ epson/qx10.cpp
 ericsson/e9161.cpp
 ericsson/eispc.cpp
 exidy/sorcerer.cpp
+facit/f4431.cpp
+facit/facit4440.cpp
 fairchild/channelf.cpp
 fairchild/f387x.cpp
 fairlight/cmi.cpp
@@ -827,7 +829,6 @@ skeleton/epic14e.cpp
 skeleton/esprit.cpp
 skeleton/eurit.cpp
 skeleton/eurocom2.cpp
-skeleton/facit4440.cpp
 skeleton/fanucs15.cpp
 skeleton/fanucspmg.cpp
 skeleton/fc100.cpp

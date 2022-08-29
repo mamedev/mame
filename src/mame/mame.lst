@@ -13872,11 +13872,14 @@ f1gpb                           // bootleg
 mosaicf2                        // (c) 1999 F2 System
 royalpk2                        //
 
+@source:facit/f4431.cpp
+f4431                           // 1981 Facit
+
+@source:facit/facit4440.cpp
+facit4440                       // 1984
+
 @source:fairchild/f387x.cpp
 f387x                           // (c) 1979 Fairchild
-
-@source:skeleton/facit4440.cpp
-facit4440                       // 1984
 
 @source:falco/falco500.cpp
 falco5220e                      // 1987
