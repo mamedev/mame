@@ -1955,6 +1955,31 @@ Beyond that last category are the roms waiting to be classified.
 		</part>
 	</software>
 
+	<software name="kidklownp" cloneof="kidklown">
+		<!-- 64history.net -->
+		<description>Kid Klown in Crazy Chase (Euro, prototype)</description>
+		<year>1994</year>
+		<publisher>Kemco</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2Q5B-03" />
+			<feature name="u1" value="U1 4/2/1M EPROM(J)" />
+			<feature name="u2" value="U2 4/2/1M EPROM(J)" />
+			<feature name="u3" value="U3 256/64K SRAM" /> <!-- empty socket -->
+			<feature name="u4" value="U4 D77C25/P25" /> <!-- empty socket -->
+			<feature name="u5" value="U5 74F138" />
+			<feature name="u6" value="U6 74HCU04" />
+			<feature name="u7" value="U7 CIC" />
+			<feature name="lockout" value="D413A" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="no shell" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="pal.u1" size="0x80000" crc="cdd879d0" sha1="a6677822284ea8be4f816575390a017996bf36d9" offset="0x00000" />
+				<rom name="crazy chase.u2" size="0x80000" crc="0aff2f07" sha1="708e721cbfd340ed85e356cadccab0296f67619f" offset="0x80000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kylepettp" cloneof="kylepett">
 		<!-- 64history.net -->
 		<!-- Notes: identical to the final release -->
@@ -3530,7 +3555,7 @@ Beyond that last category are the roms waiting to be classified.
 			<feature name="pcb" value="SHVC-2QW5B-X1" />
 			<feature name="u1" value="U1 4/8M EPROM(J)" />
 			<feature name="u2" value="U2 4/8M EPROM(J)" /> <!-- empty socket -->
-			<feature name="u3" value="U3 16/64/254K SRAM" />
+			<feature name="u3" value="U3 16/64/254K SRAM" /> <!-- silkscreen says 254K. surely it's a typo. -->
 			<feature name="u4" value="U4 µPD77C25/P25" /> <!-- DSP1 -->
 			<feature name="u5" value="" /> <!-- to do : identify u5 -->
 			<feature name="u6" value="U6 PLD" />
@@ -4047,8 +4072,41 @@ Beyond that last category are the roms waiting to be classified.
 		</part>
 	</software>
 
+<!-- Game hangs during attract mode story sequence. Voice samples do not play. -->
+	<software name="weaponldup" cloneof="weaponld" supported="no">
+		<!-- drbizz -->
+		<description>WeaponLord (USA, prototype)</description>
+		<year>1995</year>
+		<publisher>Namco</publisher>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-4QW5B-01" />
+			<feature name="u1" value="U1 1/2/4/8M EPROM(J)" />
+			<feature name="u2" value="U2 1/2/4/8M EPROM(J)" />
+			<feature name="u3" value="U3 1/2/4/8M EPROM(J)" />
+			<feature name="u4" value="U4 1/2/4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u5" value="U5 16/64/256K SRAM" /> <!-- empty socket -->
+			<feature name="u6" value="U6 µPD77C25/P25" /> <!-- empty socket -->
+			<feature name="u7" value="U7 EP330" />
+			<feature name="u8" value="U8 EP330" />
+			<feature name="u9" value="U9 74LS157" />
+			<feature name="u10" value="U10 CIC" />
+			<feature name="u11" value="U11 HCU04" />
+			<feature name="lockout" value="" />
+			<feature name="dipswitch" value="DSW1" /> <!-- (........) -->
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="no shell" />
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="0x300000">
+				<rom name="u1" size="0x100000" crc="aeb10377" sha1="29a2c39ab52567b98665a7e3db9023c8f80b59c3" offset="0x000000" />
+				<rom name="u2" size="0x100000" crc="23df3a8a" sha1="96efc2028fd22e2404b4f276f73b3300dc1f8beb" offset="0x100000" />
+				<rom name="wl 5-31-95.u3" size="0x100000" crc="2a777b27" sha1="57ef4f9da9e05e26fc70ca2985245d452683a7a6" offset="0x200000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wildgunsup" cloneof="wildguns">
-		<!-- lostleves.org -->
+		<!-- lostlevels.org -->
 		<description>Wild Guns (USA, final prototype)</description>
 		<year>1995</year>
 		<publisher>Natsume</publisher>
@@ -64654,7 +64712,8 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
-	<software name="weaponld">
+<!-- Game hangs during attract mode story sequence. Voice samples do not play. -->
+	<software name="weaponld" supported="no">
 		<description>WeaponLord (Euro)</description>
 		<year>1995</year>
 		<publisher>Ocean</publisher>
@@ -64667,7 +64726,8 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
-	<software name="weaponldu" cloneof="weaponld">
+<!-- Game hangs during attract mode story sequence. Voice samples do not play. -->
+	<software name="weaponldu" cloneof="weaponld" supported="no">
 		<description>WeaponLord (USA)</description>
 		<year>1995</year>
 		<publisher>Namco</publisher>

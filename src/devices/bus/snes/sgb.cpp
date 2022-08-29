@@ -15,6 +15,9 @@
 #include "emu.h"
 #include "sgb.h"
 
+#include "bus/gameboy/carts.h"
+
+
 //-------------------------------------------------
 //  sns_rom_sgb_device - constructor
 //-------------------------------------------------
@@ -23,8 +26,8 @@ DEFINE_DEVICE_TYPE(SNS_LOROM_SUPERGB,  sns_rom_sgb1_device, "sns_rom_sgb",  "SNE
 DEFINE_DEVICE_TYPE(SNS_LOROM_SUPERGB2, sns_rom_sgb2_device, "sns_rom_sgb2", "SNES Super Game Boy 2 Cart")
 
 
-sns_rom_sgb_device::sns_rom_sgb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: sns_rom_device(mconfig, type, tag, owner, clock),
+sns_rom_sgb_device::sns_rom_sgb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	sns_rom_device(mconfig, type, tag, owner, clock),
 	m_sgb_cpu(*this, "sgb_cpu"),
 	m_sgb_apu(*this, "sgb_apu"),
 	m_sgb_ppu(*this, "sgb_ppu"),
@@ -154,13 +157,6 @@ void sns_rom_sgb_device::gb_timer_callback(uint8_t data)
 }
 
 
-static void supergb_cart(device_slot_interface &device)
-{
-	device.option_add_internal("rom",  GB_STD_ROM);
-	device.option_add_internal("rom_mbc1",  GB_ROM_MBC1);
-}
-
-
 void sns_rom_sgb1_device::device_add_mconfig(machine_config &config)
 {
 	LR35902(config, m_sgb_cpu, 4295454);   /* 4.295454 MHz */
@@ -172,7 +168,7 @@ void sns_rom_sgb1_device::device_add_mconfig(machine_config &config)
 
 	DMG_APU(config, m_sgb_apu, 4295454);
 
-	GB_CART_SLOT(config, m_cartslot, supergb_cart, nullptr);
+	GB_CART_SLOT(config, m_cartslot, gameboy_cartridges, nullptr);
 }
 
 
@@ -199,7 +195,7 @@ void sns_rom_sgb2_device::device_add_mconfig(machine_config &config)
 
 	DMG_APU(config, m_sgb_apu, XTAL(4'194'304));
 
-	GB_CART_SLOT(config, m_cartslot, supergb_cart, nullptr);
+	GB_CART_SLOT(config, m_cartslot, gameboy_cartridges, nullptr);
 }
 
 

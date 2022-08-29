@@ -20,7 +20,10 @@
     https://www.youtube.com/watch?v=D3XO4aTZEko
 
     TODO:
-    identify CPU type, and if the system ROM is needed to run carts or not
+    identify CPU type - It's an i8051 derived CPU, and seems to be "Mars Semiconductor Corp" related, there is a MARS-PCCAM string
+                        amongst other things, this is a known USB identifier for the "Discovery Kids Digital Camera"
+                        Possibly a MR97327B, which is listed as RISC-51 in places, but little information can be found in English
+
 
 *******************************************************************************/
 
@@ -145,8 +148,36 @@ void c2_color_state::c2_color(machine_config &config)
 }
 
 ROM_START( c2color )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "system.rom", 0x000000, 0x400000, NO_DUMP ) // must have an internal rom for the built in game, unknown size etc.
+	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "bootloader", 0x0000, 0x4000, NO_DUMP )
+
+	// As with the cartridges, each of these has a 0x20 byte header before the i8051
+	// code starts.  This suggests it is unlikely the game runs directly from the SPI
+	// ROM and more likely a bootloader copies the code into RAM.
+	// The Mainboard has a 2MByte DRAM on it
+
+	// This, the larger of the 2 ROMs contains unique code, it appears to be the base
+	// game, and system functions.  It also has some 16-bit signed PCM samples.
+	ROM_REGION( 0x800000, "spi1", ROMREGION_ERASEFF )
+	ROM_LOAD( "spi.u7", 0x000000, 0x800000, CRC(6a4d2cd2) SHA1(46e109bbd5db206911716919ad13efc080cbdf34) )
+
+	// The smaller ROM is much more similar to the cartridges (actually identical up
+	// until the first MRDB resource block at 0x26000 aside from a few bytes in the
+	// 0x20 header, and the game number at the 0x20000 mark being 0)
+	//
+	// This ROM also has a 2nd MRDB resource block, whereas the cartridges only have
+	// a single block
+	//
+	// The code still contains a lot of generic 'firmware' like functions, but it is
+	// unclear if any of the code is used, or if these ROMs are used more like skins
+	// for the base game, accessing the resource table only
+	//
+	// A large number of graphics, which are assumed to be JPEG compressed are indexed
+	// by the MRDB tables, no sound effects or non-graphical resources have been
+	// identified
+
+	ROM_REGION( 0x400000, "spi2", ROMREGION_ERASEFF )
+	ROM_LOAD( "spi.u16", 0x000000, 0x400000, CRC(9101b02a) SHA1(8c31e7641f4667bd8d5d7cc991cd5976828a0628) )
 ROM_END
 
 //    year, name,         parent,  compat, machine,      input,        class,              init,       company,  fullname,                             flags

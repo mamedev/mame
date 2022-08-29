@@ -6,10 +6,10 @@
 
 #pragma once
 
-
 #include "parallel.h"
-#include "bus/gameboy/rom.h"
-#include "bus/gameboy/mbc.h"
+
+#include "bus/gameboy/gb_slot.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS

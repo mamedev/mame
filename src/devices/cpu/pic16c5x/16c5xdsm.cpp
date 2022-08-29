@@ -82,9 +82,8 @@ pic16c5x_disassembler::pic16c5x_disassembler()
 	const char *const *ops;
 	u16 mask, bits;
 	int bit;
-	int i;
 
-	ops = PIC16C5xFormats; i = 0;
+	ops = PIC16C5xFormats;
 	while (*ops)
 	{
 		p = *ops;
@@ -115,7 +114,6 @@ pic16c5x_disassembler::pic16c5x_disassembler()
 		Op.emplace_back(mask, bits, *p, ops[0], ops[1]);
 
 		ops += 2;
-		i++;
 	}
 }
 

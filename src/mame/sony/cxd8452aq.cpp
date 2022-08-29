@@ -93,7 +93,7 @@ void cxd8452aq_device::device_start()
 	save_item(NAME(m_irq));
 }
 
-void cxd8452aq_device::device_reset() 
+void cxd8452aq_device::device_reset()
 {
 	m_sonic3_reg = {};
 }

@@ -1211,15 +1211,15 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_Z(const char *buf)
 			return REPLY_OK;
 		case 2:
 			// write watchpoint
-			debug->watchpoint_set(*m_address_space, read_or_write::WRITE, offset, kind, nullptr, nullptr);
+			debug->watchpoint_set(*m_address_space, read_or_write::WRITE, offset, kind);
 			return REPLY_OK;
 		case 3:
 			// read watchpoint
-			debug->watchpoint_set(*m_address_space, read_or_write::READ, offset, kind, nullptr, nullptr);
+			debug->watchpoint_set(*m_address_space, read_or_write::READ, offset, kind);
 			return REPLY_OK;
 		case 4:
 			// access watchpoint
-			debug->watchpoint_set(*m_address_space, read_or_write::READWRITE, offset, kind, nullptr, nullptr);
+			debug->watchpoint_set(*m_address_space, read_or_write::READWRITE, offset, kind);
 			return REPLY_OK;
 	}
 

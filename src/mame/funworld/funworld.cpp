@@ -5064,7 +5064,7 @@ ROM_END
   u20.bin   1ST AND 2ND HALF IDENTICAL
   u21.bin   1ST AND 2ND HALF IDENTICAL
 */
-	ROM_START( pool10b )    // 1st set nominated for parent
+ROM_START( pool10b )    // 1st set nominated for parent
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u2.bin", 0x8000, 0x8000, CRC(64fee38e) SHA1(8a624a0b6eb4a3ba09e5b396dc5a01994dfdf294) )
 	ROM_IGNORE(                 0x8000 )    // Identical halves. Discarding 2nd half
@@ -5115,7 +5115,7 @@ ROM_END
 
     3.50.u2   1ST AND 2ND HALF IDENTICAL
 */
-	ROM_START( pool10d )
+ROM_START( pool10d )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "3.50.u2", 0x8000, 0x8000, CRC(4c68e1f4) SHA1(bbab63a18e0c041ce519daa32e12dd1b6a672dce) )
 	ROM_IGNORE(                  0x8000 )   // Identical halves. Discarding 2nd half

@@ -435,6 +435,7 @@ static int hddir(int argc, char *argv[])
 static int generic_read(image_handler &ih, const char *srcpath, const char *dstpath)
 {
 	auto [fsm, fs] = ih.get_fs();
+	std::ignore = fsm;
 
 	std::vector<std::string> path = ih.path_split(srcpath);
 	auto [err, dfork] = fs->file_read(path);
@@ -533,6 +534,7 @@ static int generic_write(image_handler &ih, const char *srcpath, const char *dst
 
 	std::vector<std::string> path = ih.path_split(dstpath);
 	auto [err, meta] = fs->metadata(path);
+	std::ignore = meta;
 
 	if(err) {
 		fs::meta_data meta;
@@ -540,7 +542,7 @@ static int generic_write(image_handler &ih, const char *srcpath, const char *dst
 		auto dpath = path;
 		dpath.pop_back();
 		err = fs->file_create(dpath, meta);
-		if(!err) {
+		if(err) {
 			fprintf(stderr, "File creation failure.\n");
 			return 1;
 		}
@@ -548,7 +550,7 @@ static int generic_write(image_handler &ih, const char *srcpath, const char *dst
 
 	auto dfork = image_handler::fload(srcpath);
 	err = fs->file_write(path, dfork);
-	if(!err) {
+	if(err) {
 		fprintf(stderr, "File writing failure.\n");
 		return 1;
 	}

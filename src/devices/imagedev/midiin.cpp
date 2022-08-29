@@ -62,6 +62,10 @@ midiin_device::midiin_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
+midiin_device::~midiin_device()
+{
+}
+
 ioport_constructor midiin_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(midiin);

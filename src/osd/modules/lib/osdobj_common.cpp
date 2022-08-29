@@ -17,6 +17,7 @@
 #include "modules/netdev/netdev_module.h"
 #include "modules/midi/midi_module.h"
 #include "modules/monitor/monitor_module.h"
+#include "osdnet.h"
 #include "watchdog.h"
 
 #include "emu.h"
