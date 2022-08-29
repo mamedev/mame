@@ -13,10 +13,10 @@ Notes:
   Earlier version? Gameplay is different too.
 
 TODO:
-- Some graphical problems in both games
 - redclash supports more background layer effects: white+mixed with other colors
   scrolling at the same speed as the stars, it's used in canyon parts and during the
   big ufo explosion
+- redclash canyon level, a gap sometimes appears on the right side, maybe BTANB
 - According to video reference(could only find 1), redclash player bullets should be
   4*2px red on the 1st half of the screen and 8*2px yellow on the 2nd half, zerohour
   bullets are correct though(always 8*2px magenta)
@@ -478,6 +478,7 @@ void redclash_state::beeper_w(u8 data)
 }
 
 
+
 /***************************************************************************
     Address Maps
 ***************************************************************************/
@@ -816,7 +817,7 @@ void redclash_state::redclash(machine_config &config)
 	m_outlatch[1]->q_out_cb<2>().set(FUNC(redclash_state::sound_enable_w));
 
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_beep).add_route(ALL_OUTPUTS, "mono", 0.5);
+	SPEAKER_SOUND(config, m_beep).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	CLOCK(config, m_beep_clock, 0);
 	m_beep_clock->signal_handler().set(m_beep, FUNC(speaker_sound_device::level_w));
@@ -1020,9 +1021,9 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME        PARENT    MACHINE   INPUT     STATE           INIT           SCREEN  COMPANY                        FULLNAME                     FLAGS
-GAME( 1980, zerohour,   0,        zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "Universal",                   "Zero Hour (set 1)",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, zerohoura,  zerohour, zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "Universal",                   "Zero Hour (set 2)",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, zerohouri,  zerohour, zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "bootleg (Inder SA)",          "Zero Hour (Inder)",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zerohour,   0,        zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "Universal",                   "Zero Hour (set 1)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zerohoura,  zerohour, zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "Universal",                   "Zero Hour (set 2)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zerohouri,  zerohour, zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "bootleg (Inder SA)",          "Zero Hour (bootleg)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1981, redclash,   0,        redclash, redclash, redclash_state, init_zerohour, ROT270, "Kaneko",                      "Red Clash",                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, redclasht,  redclash, redclash, redclash, redclash_state, init_zerohour, ROT270, "Kaneko (Tehkan license)",     "Red Clash (Tehkan, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
