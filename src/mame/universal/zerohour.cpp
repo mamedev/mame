@@ -23,7 +23,11 @@ TODO:
 - According to video reference(could only find 1), redclash player bullets should be
   4*2px red on the 1st half of the screen and 8*2px yellow on the 2nd half, zerohour
   bullets are correct though(always 8*2px magenta)
-- Sound (analog, schematics available for Zero Hour)
+- Sound (analog, schematics available for Zero Hour), redclash sound is not the same
+
+BTANB:
+- redclash gameplay tempo is erratic (many slowdowns)
+- redclash beeper sound stops abruptly at the canyon parts
 
 ***************************************************************************/
 
@@ -32,6 +36,8 @@ TODO:
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
+#include "machine/clock.h"
+#include "sound/spkrdev.h"
 #include "sound/samples.h"
 #include "video/resnet.h"
 
@@ -77,7 +83,7 @@ protected:
 	void star_reset_w(u8 data);
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(star_w);
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(sample_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_enable_w);
+	virtual DECLARE_WRITE_LINE_MEMBER(sound_enable_w);
 
 	void palette(palette_device &palette) const;
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -108,6 +114,8 @@ class redclash_state : public zerohour_state
 public:
 	redclash_state(const machine_config &mconfig, device_type type, const char *tag)
 		: zerohour_state(mconfig, type, tag)
+		, m_beep_clock(*this, "beep_clock")
+		, m_beep(*this, "beep")
 	{ }
 
 	void redclash(machine_config &config);
@@ -115,12 +123,17 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(sound_enable_w) override;
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(gfxbank_w);
 	void background_w(u8 data);
+	void beeper_w(u8 data);
 
 	void redclash_map(address_map &map);
+
+	required_device<clock_device> m_beep_clock;
+	required_device<speaker_sound_device> m_beep;
 
 	u8 m_background = 0;
 };
@@ -433,19 +446,32 @@ static const char *const zerohour_sample_names[] =
 
 WRITE_LINE_MEMBER(zerohour_state::sound_enable_w)
 {
-	if (!state)
+	if (!state && m_samples)
 		m_samples->stop_all();
 	m_sound_on = state;
+}
+
+WRITE_LINE_MEMBER(redclash_state::sound_enable_w)
+{
+	zerohour_state::sound_enable_w(state);
+	if (!state)
+		beeper_w(0);
 }
 
 template <unsigned N> WRITE_LINE_MEMBER(zerohour_state::sample_w)
 {
 	if (m_sound_on && state)
 		m_samples->start(N, N);
-	else if (0x100 & 1 << N)
+	else if (N == 8)
 		m_samples->stop(N);
 }
 
+void redclash_state::beeper_w(u8 data)
+{
+	// beeper frequency (0xff is off), preliminary
+	bool on = m_sound_on && (data != 0xff);
+	m_beep_clock->set_period(attotime::from_hz(on ? data * 8 : 0));
+}
 
 
 /***************************************************************************
@@ -472,7 +498,7 @@ void redclash_state::redclash_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom();
 	map(0x3000, 0x3000).w(FUNC(redclash_state::background_w));
-	map(0x3800, 0x3800).nopw(); // sound related?
+	map(0x3800, 0x3800).w(FUNC(redclash_state::beeper_w));
 	map(0x4000, 0x43ff).ram().w(FUNC(redclash_state::videoram_w)).share(m_videoram);
 	map(0x4800, 0x4800).portr("IN0");
 	map(0x4801, 0x4801).portr("IN1");
@@ -770,7 +796,7 @@ void zerohour_state::zerohour(machine_config &config)
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(11);
 	m_samples->set_samples_names(zerohour_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 void redclash_state::redclash(machine_config &config)
@@ -781,6 +807,16 @@ void redclash_state::redclash(machine_config &config)
 	m_outlatch[1]->q_out_cb<1>().set(FUNC(redclash_state::gfxbank_w));
 
 	m_stars->has_va_bit(false);
+
+	// sound hardware
+	m_outlatch[1]->q_out_cb<2>().set(FUNC(redclash_state::sound_enable_w));
+
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_beep).add_route(ALL_OUTPUTS, "mono", 0.5);
+
+	CLOCK(config, m_beep_clock, 0);
+	m_beep_clock->signal_handler().set(m_beep, FUNC(speaker_sound_device::level_w));
+	m_beep_clock->set_duty_cycle(0.1);
 }
 
 
@@ -984,7 +1020,7 @@ GAME( 1980, zerohour,   0,        zerohour, zerohour, zerohour_state, init_zeroh
 GAME( 1980, zerohoura,  zerohour, zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "Universal",                   "Zero Hour (set 2)",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, zerohouri,  zerohour, zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "bootleg (Inder SA)",          "Zero Hour (Inder)",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1981, redclash,   0,        redclash, redclash, redclash_state, init_zerohour, ROT270, "Kaneko",                      "Red Clash",                 MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, redclasht,  redclash, redclash, redclash, redclash_state, init_zerohour, ROT270, "Kaneko (Tehkan license)",     "Red Clash (Tehkan, set 1)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, redclashta, redclash, redclash, redclash, redclash_state, init_zerohour, ROT270, "Kaneko (Tehkan license)",     "Red Clash (Tehkan, set 2)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, redclashs,  redclash, redclash, redclash, redclash_state, init_zerohour, ROT270, "Kaneko (Suntronics license)", "Red Clash (Suntronics)",    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, redclash,   0,        redclash, redclash, redclash_state, init_zerohour, ROT270, "Kaneko",                      "Red Clash",                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, redclasht,  redclash, redclash, redclash, redclash_state, init_zerohour, ROT270, "Kaneko (Tehkan license)",     "Red Clash (Tehkan, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, redclashta, redclash, redclash, redclash, redclash_state, init_zerohour, ROT270, "Kaneko (Tehkan license)",     "Red Clash (Tehkan, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, redclashs,  redclash, redclash, redclash, redclash_state, init_zerohour, ROT270, "Kaneko (Suntronics license)", "Red Clash (Suntronics)",    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
