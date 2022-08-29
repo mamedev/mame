@@ -13,9 +13,6 @@ Notes:
   Earlier version? Gameplay is different too.
 
 TODO:
-- Colors are not right. In zerohour P1 score should be white, the top score green,
-  and "TOP" should be magenta. How is this determined? It's as if only the top part
-  of the screen has this exception. Sprite colors look ok.
 - Some graphical problems in both games
 - redclash supports more background layer effects: white+mixed with other colors
   scrolling at the same speed as the stars, it's used in canyon parts and during the
@@ -24,6 +21,9 @@ TODO:
   4*2px red on the 1st half of the screen and 8*2px yellow on the 2nd half, zerohour
   bullets are correct though(always 8*2px magenta)
 - Sound (analog, schematics available for Zero Hour), redclash sound is not the same
+- redclash beeper frequency range should be higher, but it doesn't really matter
+  since it can't be solved with a simple multiply calculation. Besides, anything more
+  than right now and ears will be destroyed, so maybe the sound is softer(filtered)
 
 BTANB:
 - redclash gameplay tempo is erratic (many slowdowns)
@@ -299,7 +299,11 @@ WRITE_LINE_MEMBER(zerohour_state::update_stars)
 TILE_GET_INFO_MEMBER(zerohour_state::get_fg_tile_info)
 {
 	int code = m_videoram[tile_index];
-	int color = (m_videoram[tile_index] & 0x70) >> 4; // ??
+	int color = (m_videoram[tile_index] & 0x70) >> 4;
+
+	// score panel colors are determined differently: P1=5, TOP=4, P2=7
+	if ((tile_index & 0x1f) > 0x1b)
+		color = (((tile_index >> 5) + 12) & 0x1f) >> 3 ^ 7;
 
 	tileinfo.set(0, code, color, 0);
 }
@@ -816,7 +820,7 @@ void redclash_state::redclash(machine_config &config)
 
 	CLOCK(config, m_beep_clock, 0);
 	m_beep_clock->signal_handler().set(m_beep, FUNC(speaker_sound_device::level_w));
-	m_beep_clock->set_duty_cycle(0.1);
+	m_beep_clock->set_duty_cycle(0.25);
 }
 
 
@@ -1016,11 +1020,11 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME        PARENT    MACHINE   INPUT     STATE           INIT           SCREEN  COMPANY                        FULLNAME                     FLAGS
-GAME( 1980, zerohour,   0,        zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "Universal",                   "Zero Hour (set 1)",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, zerohoura,  zerohour, zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "Universal",                   "Zero Hour (set 2)",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, zerohouri,  zerohour, zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "bootleg (Inder SA)",          "Zero Hour (Inder)",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zerohour,   0,        zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "Universal",                   "Zero Hour (set 1)",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zerohoura,  zerohour, zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "Universal",                   "Zero Hour (set 2)",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zerohouri,  zerohour, zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "bootleg (Inder SA)",          "Zero Hour (Inder)",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1981, redclash,   0,        redclash, redclash, redclash_state, init_zerohour, ROT270, "Kaneko",                      "Red Clash",                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, redclasht,  redclash, redclash, redclash, redclash_state, init_zerohour, ROT270, "Kaneko (Tehkan license)",     "Red Clash (Tehkan, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, redclashta, redclash, redclash, redclash, redclash_state, init_zerohour, ROT270, "Kaneko (Tehkan license)",     "Red Clash (Tehkan, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, redclashs,  redclash, redclash, redclash, redclash_state, init_zerohour, ROT270, "Kaneko (Suntronics license)", "Red Clash (Suntronics)",    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, redclash,   0,        redclash, redclash, redclash_state, init_zerohour, ROT270, "Kaneko",                      "Red Clash",                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, redclasht,  redclash, redclash, redclash, redclash_state, init_zerohour, ROT270, "Kaneko (Tehkan license)",     "Red Clash (Tehkan, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, redclashta, redclash, redclash, redclash, redclash_state, init_zerohour, ROT270, "Kaneko (Tehkan license)",     "Red Clash (Tehkan, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, redclashs,  redclash, redclash, redclash, redclash_state, init_zerohour, ROT270, "Kaneko (Suntronics license)", "Red Clash (Suntronics)",    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
