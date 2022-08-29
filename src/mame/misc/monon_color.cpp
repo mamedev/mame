@@ -96,8 +96,10 @@ protected:
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-private:
 
+private:
+	static constexpr unsigned VIDEO_WIDTH = 320;
+	static constexpr unsigned VIDEO_HEIGHT = 240;
 
 	required_device<mononcol_cartslot_device> m_cart;
 	required_device<ax208_cpu_device> m_maincpu;
@@ -108,6 +110,21 @@ private:
 	required_device<dac_8bit_r2r_twos_complement_device> m_dac;
 	required_ioport_array<4> m_debugin;
 	required_ioport_array<4> m_controls;
+
+	rgb_t m_linebuf[VIDEO_HEIGHT];
+	std::unique_ptr<rgb_t[]> m_vidbuffer;
+	int16_t m_bufpos_y;
+	uint32_t m_bufpos_x;
+	uint8_t m_storeregs[0x20];
+	uint8_t m_dacbyte;
+
+	uint8_t m_out4data;
+	uint8_t m_out3data;
+	uint8_t m_out2data;
+	uint8_t m_out1data;
+	uint8_t m_out0data;
+
+	uint8_t m_curpal[0x800 * 3];
 
 	void music_mem(address_map &map);
 	uint8_t music_rts_r();
@@ -156,26 +173,11 @@ private:
 	void do_draw_inner(int pal_to_use, int start, int step, int pixmask, int amount);
 	void do_draw(int amount, int pal_to_use);
 	void do_palette(int amount, int pal_to_use);
-
-	rgb_t m_linebuf[240];
-	std::unique_ptr<rgb_t[]> m_vidbuffer;
-	int16_t m_bufpos_y;
-	uint32_t m_bufpos_x;
-	uint8_t m_storeregs[0x20];
-	uint8_t m_dacbyte;
-
-	uint8_t m_out4data;
-	uint8_t m_out3data;
-	uint8_t m_out2data;
-	uint8_t m_out1data;
-	uint8_t m_out0data;
-
-	uint8_t m_curpal[0x800 * 3];
 };
 
 void monon_color_state::machine_start()
 {
-	m_vidbuffer = std::make_unique<rgb_t[]>(320 * 240);
+	m_vidbuffer = std::make_unique<rgb_t[]>(VIDEO_WIDTH * VIDEO_HEIGHT);
 
 	save_item(NAME(m_dacbyte));
 	save_item(NAME(m_out4data));
@@ -184,7 +186,7 @@ void monon_color_state::machine_start()
 	save_item(NAME(m_out1data));
 	save_item(NAME(m_out0data));
 	save_item(NAME(m_linebuf));
-	save_pointer(NAME(m_vidbuffer), 320 * 240);
+	save_pointer(NAME(m_vidbuffer), VIDEO_WIDTH * VIDEO_HEIGHT);
 	save_item(NAME(m_bufpos_x));
 	save_item(NAME(m_bufpos_y));
 	save_item(NAME(m_curpal));
@@ -225,8 +227,10 @@ void monon_color_state::machine_reset()
 	m_bufpos_x = 0;
 	m_bufpos_y = 239;
 
-	std::fill(std::begin(m_storeregs), std::end(m_storeregs), 0);
 	std::fill(std::begin(m_linebuf), std::end(m_linebuf), 0);
+	std::fill_n(m_vidbuffer.get(), VIDEO_WIDTH * VIDEO_HEIGHT, 0);
+	std::fill(std::begin(m_storeregs), std::end(m_storeregs), 0);
+	std::fill(std::begin(m_curpal), std::end(m_curpal), 0);
 
 	m_music_direction_iswrite = true;
 	m_music_latch = 0;
@@ -242,12 +246,12 @@ void monon_color_state::machine_reset()
 
 uint32_t monon_color_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	rgb_t* videoram = m_vidbuffer.get();
+	rgb_t const *videoram = m_vidbuffer.get();
 
-	for (int y = 0; y < 240; y++)
+	for (int y = 0; y < VIDEO_HEIGHT; y++)
 	{
-		int count = (y * 320);
-		for(int x = 0; x < 320; x++)
+		int count = y * VIDEO_WIDTH;
+		for(int x = 0; x < VIDEO_WIDTH; x++)
 		{
 			rgb_t pixel = videoram[count++];
 			bitmap.pix(y, x) = pixel;
@@ -678,7 +682,7 @@ void monon_color_state::do_draw_inner(int pal_to_use, int start, int step, int p
 		{
 			int real_ypos = m_bufpos_y;
 			real_ypos -= yadjust;
-			if ((real_ypos >= 0) && (real_ypos < 240))
+			if ((real_ypos >= 0) && (real_ypos < VIDEO_HEIGHT))
 			{
 				uint8_t pixx = (pix >> i) & pixmask;
 				uint8_t newr = m_curpal[((pixx + pal_to_use) * 3) + 2];
@@ -833,7 +837,7 @@ void monon_color_state::write_to_video_device(uint8_t data)
 			LOGMASKED(LOG_VDP, "Finished Column %d\n", m_bufpos_x);
 			m_bufpos_x++;
 
-			if (m_bufpos_x == 320)
+			if (m_bufpos_x == VIDEO_WIDTH)
 			{
 				LOGMASKED(LOG_VDP, "------------------------------------------------------------------------------------------------\n");
 				m_bufpos_x = 0;
@@ -880,8 +884,8 @@ void monon_color_state::write_to_video_device(uint8_t data)
 				else if ((data == 0xd0) || (data == 0xd4))
 				{
 					// assume there's some kind of line column buffer, the exact swap trigger is unknown
-					for (int i = 0; i < 240; i++)
-						m_vidbuffer[(i * 320) + m_bufpos_x] = m_linebuf[i];
+					for (int i = 0; i < VIDEO_HEIGHT; i++)
+						m_vidbuffer[(i * VIDEO_WIDTH) + m_bufpos_x] = m_linebuf[i];
 				}
 			}
 		}
@@ -952,8 +956,8 @@ void monon_color_state::monon_color(machine_config &config)
 	m_screen->set_refresh_hz(120);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_screen_update(FUNC(monon_color_state::screen_update));
-	m_screen->set_size(320, 240);
-	m_screen->set_visarea(0*8, 320-1, 0*8, 240-1);
+	m_screen->set_size(VIDEO_WIDTH, VIDEO_HEIGHT);
+	m_screen->set_visarea(0*8, VIDEO_WIDTH-1, 0*8, VIDEO_HEIGHT-1);
 
 	PALETTE(config, m_palette).set_entries(0x800);
 
