@@ -23,7 +23,6 @@
 #include "zippath.h"
 
 #include <algorithm>
-#include <cctype>
 #include <cstring>
 #include <regex>
 #include <sstream>
@@ -140,8 +139,7 @@ void device_image_interface::set_image_filename(std::string_view filename)
 
 bool device_image_interface::is_filetype(std::string_view candidate_filetype) const
 {
-	return std::equal(m_filetype.begin(), m_filetype.end(), candidate_filetype.begin(), candidate_filetype.end(),
-						[] (unsigned char c1, unsigned char c2) { return std::tolower(c1) == c2; });
+	return util::streqlower(m_filetype, candidate_filetype);
 }
 
 

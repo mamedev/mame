@@ -107,11 +107,9 @@ Kanji-ru Teacher Junior Kokitaoshi                                  Nichikonren 
 Kanji-ru Teacher Kokitaoshi                                         Nichikonren Kikaku                1993/?     FD×02
 Keyword Eiwa Jiten (Kenkyuusha-hen)                                 Camp                              1989/12    FD×02
 Keyword Waei Jiten (Kenkyuusha-hen)                                 Camp                              1989/12    FD×02
-Kimi Toshitai You-jan Part 1                                        System Pro                        1989/9     FD
 Kiwame Jouseki Shuu                                                 Log                               1992/11    FD
 LiveMotion Support Library                                          Fujitsu                           1993/1     FD
 Loop Eraser                                                         Nichikonren Kikaku                1994/9     FD×02
-Loop: Izanahi no Kaikiten                                           Grocer                            1995/10    FD×05
 LPACK                                                               Kansai Denki                      1991/10    FD
 Lucid ASM & Debugger Ver. 1.1                                       Kansai Denki                      1990/4     FD
 Magic Ayako Suzume                                                  Cosmos Computer                   1992/5     FDx03
@@ -1184,6 +1182,45 @@ Zurukamashi Ver 2.0                                                 Nichikonren 
 		</part>
 	</software>
 
+	<software name="irium">
+		<description>Irium</description>
+		<year>1993</year>
+		<publisher>オレンジハウス (Orange House)</publisher>
+		<info name="alt_title" value="イリウム" />
+		<info name="release" value="199306xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Kidou Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="irium_kidou_disk.hdm" size="1261568" crc="bff7d2f7" sha1="f9fe6edbed84f21cf30b7b0200f3fb52f69516d9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="irium_disk_a.hdm" size="1261568" crc="b735fec7" sha1="bf43f5ac8187f8c44637f1125f60eb031f9bc733"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="irium_disk_b.hdm" size="1261568" crc="2651b236" sha1="b798f6e75a34ad9321db0a7e9cddc3aaff88adcb"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="1261568">
+				<rom name="irium_disk_c.hdm" size="1261568" crc="b5b4cf37" sha1="cf65e486138fba52b42ea5b2b6f40c9734e65df1"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk D" />
+			<dataarea name="flop" size="1261568">
+				<rom name="irium_disk_d.hdm" size="1261568" crc="718554ba" sha1="368658fff7ca04e4daf65d5ed15ab0cb6675c04c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kakefuku">
 		<description>Kakeibo + Fukubukuro - Wagaya no Benrichou Vol. 1</description>
 		<year>1989</year>
@@ -1379,6 +1416,45 @@ Zurukamashi Ver 2.0                                                 Nichikonren 
 		</part>
 	</software>
 
+	<software name="loop">
+		<description>:LOOP - Izanai no Kaikiten</description>
+		<year>1995</year>
+		<publisher>グローサー (Grocer)</publisher>
+		<info name="alt_title" value="：ＬＯＯＰ ～いざなひの回帰点～" />
+		<info name="release" value="19951015" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="loop_disk_a.hdm" size="1261568" crc="34eed721" sha1="b3e6756c37011b62b5aeec414af62338de833ebc"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="loop_disk_b.hdm" size="1261568" crc="602bb87f" sha1="23063beece65431fa684d8e85c9b85a850f83f4a"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="1261568">
+				<rom name="loop_disk_c.hdm" size="1261568" crc="f8862840" sha1="98e03a7e7b391df652eb4911b7e5a5427fed7a45"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk D" />
+			<dataarea name="flop" size="1261568">
+				<rom name="loop_disk_d.hdm" size="1261568" crc="432156f3" sha1="baacc12f2e42ef6a855916258329b355f1d519f8"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk E" />
+			<dataarea name="flop" size="1261568">
+				<rom name="loop_disk_e.hdm" size="1261568" crc="b95aa8b1" sha1="3c30627595c545550b0d4c81e4027d93fa7a2925"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!--
 	Track 15 side 0 of the program disk and track 10 side 0 of the ending disk are protected (overlapped sectors).
 	The game includes a pre-formatted user disk but it can also save to any generic blank disk.
@@ -1444,6 +1520,26 @@ Zurukamashi Ver 2.0                                                 Nichikonren 
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261568">
 				<rom name="maririndx_diskc.hdm" size="1261568" crc="d4f2fc7d" sha1="2efc64d48f990691420eb51fb284ab585b5cf419"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- PC-9801 / X68000 / FM Towns hybrid -->
+	<software name="megastor">
+		<description>Disk Megastore Volume 1</description>
+		<year>1994</year>
+		<publisher>白夜書房 (Byakuya Shobou)</publisher>
+		<info name="usage" value="Requires 2 MB RAM. Boot TownsOS V2.1, then run the icon on floppy drive A:" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="A-disk - AliceSoft Megastore Tokubetsu Disk - PC98/Towns/X68000" />
+			<dataarea name="flop" size="1261568">
+				<rom name="disk_megastore_vol_1_disk_a.hdm" size="1261568" crc="dc86aecf" sha1="6c08b7efa239975557ed7684948827caee896c47"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="B-disk - Active/Hoka - PC98/ETC (CG-File)" />
+			<dataarea name="flop" size="1261568">
+				<rom name="disk_megastore_vol_1_disk_b.hdm" size="1261568" crc="2f3447cc" sha1="013f5ecadc5a6bc2480d4c6c69a52c6ec880aa15"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1744,6 +1840,19 @@ Zurukamashi Ver 2.0                                                 Nichikonren 
 			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1261568">
 				<rom name="ponyon_disk_d.hdm" size="1261568" crc="83968e40" sha1="96d3b72f0c64c3b3abc0c75eb9ff6ed0d3d98f0e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="powdollsp">
+		<description>Power DoLLS S-Premium Disk</description>
+		<year>1994</year>
+		<publisher>工画堂 (Kogado)</publisher>
+		<info name="alt_title" value="パワードール　Ｓ-ＰＲＥＭＩＵＭ　ＤＩＳＫ" />
+		<info name="usage" value="Boot TownsOS V2.1 and run the icon on drive A. The music player requires the Power DoLLS CD."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="power_dolls_s-premium_disk.hdm" size="1261568" crc="dd2bc176" sha1="7dc621f68934fb9b049a760e3dc0cbdb25582933"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2590,7 +2699,7 @@ Zurukamashi Ver 2.0                                                 Nichikonren 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="youjuu_club_custom_disk_a.hdm" size="1261568" crc="e3f2a6a2" sha1="f8ba8158190305c963fbbe07dffc6985d6bb2875"/>
+				<rom name="youjuu_club_custom_disk_a.hdm" size="1261568" crc="03952bf5" sha1="f2ec12e4dde1e61015a0d949fab642d4098043cf"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
@@ -2603,6 +2712,20 @@ Zurukamashi Ver 2.0                                                 Nichikonren 
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261568">
 				<rom name="youjuu_club_custom_disk_c.hdm" size="1261568" crc="dee16755" sha1="300f3069d4fa1e4e7dfa6f25a0f511e4eb68e080"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="youjong">
+		<description>You-Jong Part I</description>
+		<year>1989</year>
+		<publisher>SystemPro</publisher>
+		<info name="alt_title" value="Ｙｏｕ雀　Ｐａｒｔ　Ｉ" />
+		<info name="release" value="198909xx" />
+		<info name="usage" value="Boot TownsOS V1.1 and run the icon on drive A:"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="3402715">
+				<rom name="youjong_part1.mfm" size="3402715" crc="2a106643" sha1="a98fb6db9e0079f9c57dd17036982c39bfee8377"/>
 			</dataarea>
 		</part>
 	</software>

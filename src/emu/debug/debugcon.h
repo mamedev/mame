@@ -83,7 +83,7 @@ public:
 	// command handling
 	CMDERR          execute_command(std::string_view command, bool echo);
 	CMDERR          validate_command(std::string_view command);
-	void            register_command(std::string_view command, u32 flags, int minparams, int maxparams, std::function<void (const std::vector<std::string> &)> &&handler);
+	void            register_command(std::string_view command, u32 flags, int minparams, int maxparams, std::function<void (const std::vector<std::string_view> &)> &&handler);
 	void            source_script(const char *file);
 	void            process_source_file();
 
@@ -119,8 +119,8 @@ public:
 private:
 	void exit();
 
-	void execute_help_custom(const std::vector<std::string> &params);
-	void execute_condump(const std::vector<std::string>& params);
+	void execute_help_custom(const std::vector<std::string_view> &params);
+	void execute_condump(const std::vector<std::string_view>& params);
 
 	[[nodiscard]] static std::string_view trim_parameter(std::string_view param, bool keep_quotes);
 	CMDERR internal_execute_command(bool execute, std::vector<std::string_view> &params);
@@ -131,7 +131,7 @@ private:
 
 	struct debug_command
 	{
-		debug_command(std::string_view _command, u32 _flags, int _minparams, int _maxparams, std::function<void (const std::vector<std::string> &)> &&_handler);
+		debug_command(std::string_view _command, u32 _flags, int _minparams, int _maxparams, std::function<void (const std::vector<std::string_view> &)> &&_handler);
 
 		struct compare
 		{
@@ -144,7 +144,7 @@ private:
 		std::string     command;
 		const char *    params;
 		const char *    help;
-		std::function<void (const std::vector<std::string> &)> handler;
+		std::function<void (const std::vector<std::string_view> &)> handler;
 		u32             flags;
 		int             minparams;
 		int             maxparams;

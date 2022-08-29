@@ -55,6 +55,8 @@ saturn_bram32mb_device::saturn_bram32mb_device(const machine_config &mconfig, co
 
 void saturn_bram_device::device_start()
 {
+	if (m_ext_bram.empty())
+		nvram_enable_backup(false);
 }
 
 void saturn_bram_device::device_reset()
@@ -64,10 +66,7 @@ void saturn_bram_device::device_reset()
 bool saturn_bram_device::nvram_read(util::read_stream &file)
 {
 	size_t actual;
-	if (m_ext_bram.empty())
-		return true;
-	else
-		return !file.read(&m_ext_bram[0], m_ext_bram.size(), actual) && actual == m_ext_bram.size();
+	return !file.read(&m_ext_bram[0], m_ext_bram.size(), actual) && actual == m_ext_bram.size();
 }
 
 bool saturn_bram_device::nvram_write(util::write_stream &file)
@@ -76,13 +75,11 @@ bool saturn_bram_device::nvram_write(util::write_stream &file)
 	return !file.write(&m_ext_bram[0], m_ext_bram.size(), actual) && actual == m_ext_bram.size();
 }
 
-bool saturn_bram_device::nvram_can_write()
-{
-	return !m_ext_bram.empty();
-}
-
 void saturn_bram_device::nvram_default()
 {
+	if (m_ext_bram.empty())
+		return;
+
 	static const uint8_t init[16] =
 	{ 'B', 'a', 'c', 'k', 'U', 'p', 'R', 'a', 'm', ' ', 'F', 'o', 'r', 'm', 'a', 't' };
 	memset(&m_ext_bram[0], 0, m_ext_bram.size());

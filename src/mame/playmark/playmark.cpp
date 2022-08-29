@@ -82,7 +82,6 @@ A |__     |_MCT1413P_|       |
 
 
 TODO:
-- Hard Times sound is controlled by a PIC16C57 whose internal ROM is currently missing.
 - Lucky Boom has some minor colour issue with the background - see the title screen. The
   game selects the wrong colour for some tiles. The tiles should be colour 0x01 not 0x02.
   Affects the backgrounds in game however it's barely noticeable.
@@ -395,7 +394,7 @@ void playmark_state::hrdtimes_main_map(address_map &map)
 	map(0x300017, 0x300017).w(FUNC(playmark_state::coinctrl_w));
 	map(0x30001a, 0x30001b).portr("DSW2");
 	map(0x30001c, 0x30001d).portr("DSW1");
-//  map(0x30001f, 0x30001f).w(FUNC(playmark_state::playmark_snd_command_w));
+	map(0x30001f, 0x30001f).w(FUNC(playmark_state::playmark_snd_command_w));
 	map(0x304000, 0x304001).nopw();        // watchdog? irq ack?
 }
 
@@ -1258,12 +1257,11 @@ void playmark_state::hrdtimes(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(playmark_state::irq6_line_hold));
 
 	PIC16C57(config, m_audio_pic, XTAL(24'000'000)/2);    // verified on pcb
-//  m_audio_pic->write_a().set(FUNC(playmark_state::playmark_oki_banking_w)); // Banking data output but not wired. Port C is wired to the OKI banking instead
+	m_audio_pic->write_a().set(FUNC(playmark_state::playmark_oki_banking_w)); // Banking data output but not wired. Port C is wired to the OKI banking instead
 	m_audio_pic->read_b().set(FUNC(playmark_state::playmark_snd_command_r));
 	m_audio_pic->write_b().set(FUNC(playmark_state::playmark_oki_w));
 	m_audio_pic->read_c().set(FUNC(playmark_state::playmark_snd_flag_r));
 	m_audio_pic->write_c().set(FUNC(playmark_state::hrdtimes_snd_control_w));
-	m_audio_pic->set_disable();       // Internal code is not dumped yet
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1624,10 +1622,12 @@ ROM_START( hrdtimes ) // PCB marked Hard Times 28-06-94
 	ROM_LOAD16_BYTE( "32.u66",       0x00001, 0x80000, CRC(f2c6b382) SHA1(d73affed091a261c4bfe17f409657e0a46b6c163) )
 
 	ROM_REGION( 0x1000, "audiopic", ROMREGION_ERASE00 ) // sound (PIC16C57)
-	// ROM will be copied here by the init code from "user1"
-
-	ROM_REGION( 0x3000, "user1", 0 )
-	ROM_LOAD( "pic16c57.hex",     0x0000, 0x1000, NO_DUMP )
+	/* PIC configuration:
+	     -User ID: 0794
+	     -Watchdog Timer: probably enbaled (unconfirmed, but program resets watchdog timer and unprotected PICs had it enabled)
+	     -Oscilator Mode: possibly HS based on unprotected PICs (uses buffered logic level clock - LP, XT and HS would work)
+	*/
+	ROM_LOAD( "pic16c57.bin", 0x0000, 0x1000, CRC(db307198) SHA1(21e98a69e673f6d48eb48239b4c51f6e7aa19a66) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "33.u36",       0x000000, 0x80000, CRC(d1239ce5) SHA1(8e966a39a47f66c5e904ec4357c751e896ed47cb) )
@@ -1654,10 +1654,12 @@ ROM_START( hrdtimesa )
 	ROM_LOAD16_BYTE( "u66.bin",       0x00001, 0x80000, CRC(041ec30a) SHA1(00476ebd0a64cbd027be159cae7666d2df6d11ba) )
 
 	ROM_REGION( 0x1000, "audiopic", ROMREGION_ERASE00 ) // sound (PIC16C57)
-	// ROM will be copied here by the init code from "user1"
-
-	ROM_REGION( 0x3000, "user1", 0 )
-	ROM_LOAD( "pic16c57.hex",     0x0000, 0x1000, NO_DUMP )
+	/* PIC configuration:
+	     -User ID: 0794
+	     -Watchdog Timer: probably enbaled (unconfirmed, but program resets watchdog timer and unprotected PICs had it enabled)
+	     -Oscilator Mode: possibly HS based on unprotected PICs (uses buffered logic level clock - LP, XT and HS would work)
+	*/
+	ROM_LOAD( "pic16c57.bin", 0x0000, 0x1000, CRC(db307198) SHA1(21e98a69e673f6d48eb48239b4c51f6e7aa19a66) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "fh1_playmark_ht", 0x000000, 0x100000, CRC(3cca02b0) SHA1(22c57f4192bf81dd26caa6adfb1c80665bdc305c) )
@@ -1871,15 +1873,15 @@ void playmark_state::init_pic_decode()
 
 
 
-GAME( 1995, bigtwin,   0,        bigtwin,      bigtwin,   playmark_state, init_pic_decode, ROT0, "Playmark", "Big Twin", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, bigtwinb,  bigtwin,  bigtwinb,     bigtwinb,  playmark_state, init_pic_decode, ROT0, "Playmark", "Big Twin (No Girls Conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, bigtwin,   0,        bigtwin,      bigtwin,   playmark_state, init_pic_decode, ROT0, "Playmark", "Big Twin",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1995, bigtwinb,  bigtwin,  bigtwinb,     bigtwinb,  playmark_state, init_pic_decode, ROT0, "Playmark", "Big Twin (No Girls Conversion)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1995, wbeachvl,  0,        wbeachvl_pic, wbeachvl,  playmark_state, empty_init,      ROT0, "Playmark", "World Beach Volley (set 1, PIC16C57 audio CPU)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // no music due to incorrect OKI banking / PIC hookup
-GAME( 1995, wbeachvla, wbeachvl, wbeachvl_mcs, wbeachvl,  playmark_state, empty_init,      ROT0, "Playmark", "World Beach Volley (set 1, S87C751 audio CPU)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // wrong banking, so some sounds are played at the wrong time
-GAME( 1995, wbeachvl2, wbeachvl, wbeachvl_pic, wbeachvl,  playmark_state, empty_init,      ROT0, "Playmark", "World Beach Volley (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wbeachvl3, wbeachvl, wbeachvl_pic, wbeachvl,  playmark_state, empty_init,      ROT0, "Playmark", "World Beach Volley (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, excelsr,   0,        excelsr,      excelsr,   playmark_state, init_pic_decode, ROT0, "Playmark", "Excelsior (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, excelsra,  excelsr,  excelsr,      excelsr,   playmark_state, init_pic_decode, ROT0, "Playmark", "Excelsior (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, hrdtimes,  0,        hrdtimes,     hrdtimes,  playmark_state, empty_init,      ROT0, "Playmark", "Hard Times (set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, hrdtimesa, hrdtimes, hrdtimes,     hrdtimes,  playmark_state, empty_init,      ROT0, "Playmark", "Hard Times (set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, hotmind,   0,        hotmind,      hotmind,   playmark_state, init_pic_decode, ROT0, "Playmark", "Hot Mind (Hard Times hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, luckboomh, luckboom, luckboomh,    luckboomh, playmark_state, init_pic_decode, ROT0, "Playmark", "Lucky Boom (Hard Times hardware)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wbeachvla, wbeachvl, wbeachvl_mcs, wbeachvl,  playmark_state, empty_init,      ROT0, "Playmark", "World Beach Volley (set 1, S87C751 audio CPU)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // wrong banking, so some sounds are played at the wrong time
+GAME( 1995, wbeachvl2, wbeachvl, wbeachvl_pic, wbeachvl,  playmark_state, empty_init,      ROT0, "Playmark", "World Beach Volley (set 2)",                     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wbeachvl3, wbeachvl, wbeachvl_pic, wbeachvl,  playmark_state, empty_init,      ROT0, "Playmark", "World Beach Volley (set 3)",                     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, excelsr,   0,        excelsr,      excelsr,   playmark_state, init_pic_decode, ROT0, "Playmark", "Excelsior (set 1)",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1996, excelsra,  excelsr,  excelsr,      excelsr,   playmark_state, init_pic_decode, ROT0, "Playmark", "Excelsior (set 2)",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1994, hrdtimes,  0,        hrdtimes,     hrdtimes,  playmark_state, empty_init,      ROT0, "Playmark", "Hard Times (set 1)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1994, hrdtimesa, hrdtimes, hrdtimes,     hrdtimes,  playmark_state, empty_init,      ROT0, "Playmark", "Hard Times (set 2)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1995, hotmind,   0,        hotmind,      hotmind,   playmark_state, init_pic_decode, ROT0, "Playmark", "Hot Mind (Hard Times hardware)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1996, luckboomh, luckboom, luckboomh,    luckboomh, playmark_state, init_pic_decode, ROT0, "Playmark", "Lucky Boom (Hard Times hardware)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

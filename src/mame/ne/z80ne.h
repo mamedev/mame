@@ -223,7 +223,7 @@ public:
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void driver_init() override;
+	virtual void driver_start() override;
 
 	struct wd17xx_state_t
 	{

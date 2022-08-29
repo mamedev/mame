@@ -95,6 +95,7 @@ menu_load_save_state_base::menu_load_save_state_base(
 	, m_confirm_delete(nullptr)
 	, m_must_exist(must_exist)
 	, m_keys_released(false)
+	, m_slot_selected(INPUT_CODE_INVALID)
 {
 	set_one_shot(one_shot);
 	set_needs_prev_menu_item(!one_shot);
@@ -237,7 +238,12 @@ void menu_load_save_state_base::populate(float &customtop, float &custombottom)
 void menu_load_save_state_base::handle(event const *ev)
 {
 	// process the event
-	if (ev && (ev->iptkey == IPT_UI_SELECT))
+	if (INPUT_CODE_INVALID != m_slot_selected)
+	{
+		if (!machine().input().code_pressed(m_slot_selected))
+			stack_pop();
+	}
+	else if (ev && (ev->iptkey == IPT_UI_SELECT))
 	{
 		if (ev->itemref)
 		{
@@ -245,10 +251,7 @@ void menu_load_save_state_base::handle(event const *ev)
 			file_entry const &entry = file_entry_from_itemref(ev->itemref);
 			slot_selected(std::string(entry.file_name()));
 		}
-		else
-		{
-			stack_pop();
-		}
+		stack_pop();
 	}
 	else if (ev && (ev->iptkey == IPT_UI_CLEAR))
 	{
@@ -266,9 +269,13 @@ void menu_load_save_state_base::handle(event const *ev)
 	else if (!m_confirm_delete)
 	{
 		// poll inputs
-		std::string name = poll_inputs();
-		if (!name.empty())
-			try_select_slot(std::move(name));
+		input_code code;
+		std::string name = poll_inputs(code);
+		if (!name.empty() && try_select_slot(std::move(name)))
+		{
+			m_switch_poller.reset();
+			m_slot_selected = code;
+		}
 	}
 }
 
@@ -292,25 +299,32 @@ std::string menu_load_save_state_base::get_visible_name(const std::string &file_
 //  poll_inputs
 //-------------------------------------------------
 
-std::string menu_load_save_state_base::poll_inputs()
+std::string menu_load_save_state_base::poll_inputs(input_code &code)
 {
-	input_code const code = m_switch_poller.poll();
-	if (INPUT_CODE_INVALID == code)
+	input_code const result = m_switch_poller.poll();
+	if (INPUT_CODE_INVALID == result)
 	{
 		m_keys_released = true;
 	}
 	else if (m_keys_released)
 	{
-		input_item_id const id = code.item_id();
+		input_item_id const id = result.item_id();
 
 		// keyboard A-Z and 0-9
 		if (((ITEM_ID_A <= id) && (ITEM_ID_Z >= id)) || ((ITEM_ID_0 <= id) && (ITEM_ID_9 >= id)))
+		{
+			code = result;
 			return keyboard_input_item_name(id);
+		}
 
 		// joystick buttons
-		if ((DEVICE_CLASS_JOYSTICK == code.device_class()) && (ITEM_CLASS_SWITCH == code.item_class()) && (ITEM_MODIFIER_NONE == code.item_modifier()) && (ITEM_ID_BUTTON1 <= id) && (ITEM_ID_BUTTON32 >= id))
-			return util::string_format("joy%i-%i", code.device_index(), id - ITEM_ID_BUTTON1 + 1);
+		if ((DEVICE_CLASS_JOYSTICK == result.device_class()) && (ITEM_CLASS_SWITCH == result.item_class()) && (ITEM_MODIFIER_NONE == result.item_modifier()) && (ITEM_ID_BUTTON1 <= id) && (ITEM_ID_BUTTON32 >= id))
+		{
+			code = result;
+			return util::string_format("joy%i-%i", result.device_index(), id - ITEM_ID_BUTTON1 + 1);
+		}
 	}
+	code = INPUT_CODE_INVALID;
 	return "";
 }
 
@@ -319,10 +333,17 @@ std::string menu_load_save_state_base::poll_inputs()
 //  try_select_slot
 //-------------------------------------------------
 
-void menu_load_save_state_base::try_select_slot(std::string &&name)
+bool menu_load_save_state_base::try_select_slot(std::string &&name)
 {
 	if (!m_must_exist || is_present(name))
+	{
 		slot_selected(std::move(name));
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 
@@ -337,9 +358,6 @@ void menu_load_save_state_base::slot_selected(std::string &&name)
 
 	// record the last slot touched
 	s_last_file_selected = std::move(name);
-
-	// no matter what, pop out
-	menu::stack_pop();
 }
 
 
@@ -391,6 +409,10 @@ void menu_load_save_state_base::handle_keys(uint32_t flags, int &iptkey)
 		}
 		iptkey = IPT_INVALID;
 	}
+	else if (INPUT_CODE_INVALID != m_slot_selected)
+	{
+		iptkey = IPT_INVALID;
+	}
 	else
 	{
 		menu::handle_keys(flags, iptkey);
@@ -415,7 +437,7 @@ void menu_load_save_state_base::custom_render(void *selectedref, float top, floa
 	if (selected_item().ref())
 	{
 		if (m_delete_prompt.empty())
-			m_delete_prompt = util::string_format(_("Press %1$s to delete"), machine().input().seq_name(machine().ioport().type_seq(IPT_UI_CLEAR)));
+			m_delete_prompt = util::string_format(_("Press %1$s to delete"), ui().get_general_input_setting(IPT_UI_CLEAR));
 		text[count++] = m_delete_prompt;
 	}
 

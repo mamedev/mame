@@ -11,6 +11,18 @@ import sys
 import xml.sax
 
 
+def path_components(path):
+    result = [ ]
+    while True:
+        path, basename = os.path.split(path)
+        if basename:
+            result.append(basename)
+        else:
+            if path:
+                result.append(path)
+            return tuple(reversed(result))
+
+
 class ParserBase:
     def process_lines(self, inputfile):
         self.input_line = 1
@@ -425,7 +437,7 @@ class DriverFilter:
                     sys.stderr.write('%s:%s: Pattern "%s" did not match any source files\n' % (path, parser.input_line, text))
                     sys.exit(1)
                 for source in paths:
-                    sourcefile('/'.join(os.path.split(os.path.relpath(source, basepath))))
+                    sourcefile('/'.join(path_components(os.path.relpath(source, basepath))))
 
         try:
             filterfile = io.open(path, 'r', encoding='utf-8')
@@ -727,6 +739,7 @@ def parse_command_line():
 
     subparser = subparsers.add_parser('sourcesproject', help='generate project directives for source files')
     subparser.add_argument('-t', '--target', metavar='<target>', required=True, help='generated emulator target name')
+    subparser.add_argument('-l', '--list', metavar='<lstfile>', required=True, help='master driver list file')
     subparser.add_argument('sources', metavar='<srcfile>', nargs='+', help='source files to include')
 
     subparser = subparsers.add_parser('filterproject', help='generate project directives using filter file')
@@ -1001,7 +1014,34 @@ def collect_sources(root, sources):
     return result
 
 
-def write_filter(options, filterfile):
+def write_sources_project(options, projectfile):
+    def sourcefile(filename):
+        if tuple(filename.split('/')) in splitsources:
+            state['havedrivers'] = True
+
+    def driver(shortname):
+        pass
+
+    header_to_optional = collect_lua_directives(options)
+    sources = collect_sources(options.root, options.sources)
+    splitsources = frozenset(s[2:] for s in (path_components(s) for s in sources) if s[:2] == ('src', 'mame'))
+    state = { 'havedrivers': False }
+    DriverFilter().parse_list(options.list, sourcefile, driver)
+    if not state['havedrivers']:
+        sys.stderr.write('None of the specified source files contain system drivers\n')
+        sys.exit(1)
+    source_dependencies = scan_source_dependencies(options.root, sources)
+    write_project(options, projectfile, header_to_optional, source_dependencies, True)
+
+
+def write_filter_project(options, projectfile):
+    header_to_optional = collect_lua_directives(options)
+    sources = DriverCollector(options).sources
+    source_dependencies = scan_source_dependencies(options.root, (os.path.join('src', 'mame', *n.split('/')) for n in sources))
+    write_project(options, projectfile, header_to_optional, source_dependencies, False)
+
+
+def write_sources_filter(options, filterfile):
     sources = set()
     DriverFilter().parse_list(options.list, lambda n: sources.add(n), lambda n: None)
 
@@ -1020,16 +1060,11 @@ def write_filter(options, filterfile):
 if __name__ == '__main__':
     options = parse_command_line()
     if options.command == 'sourcesproject':
-        header_to_optional = collect_lua_directives(options)
-        source_dependencies = scan_source_dependencies(options.root, collect_sources(options.root, options.sources))
-        write_project(options, sys.stdout, header_to_optional, source_dependencies, True)
+        write_sources_project(options, sys.stdout)
     elif options.command == 'filterproject':
-        header_to_optional = collect_lua_directives(options)
-        sources = DriverCollector(options).sources
-        source_dependencies = scan_source_dependencies(options.root, (os.path.join('src', 'mame', *n.split('/')) for n in sources))
-        write_project(options, sys.stdout, header_to_optional, source_dependencies, False)
+        write_filter_project(options, sys.stdout)
     elif options.command == 'sourcesfilter':
-        write_filter(options, sys.stdout)
+        write_sources_filter(options, sys.stdout)
     elif options.command == 'driverlist':
         DriverLister(options).write_source(sys.stdout)
     elif options.command == 'reconcilelist':

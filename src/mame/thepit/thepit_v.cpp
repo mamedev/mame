@@ -250,18 +250,15 @@ void thepit_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 			/* sprites 0-3 are drawn one pixel down */
 			if (offs < 16) y++;
 
+			m_gfxdecode->gfx(2 * m_graphics_bank + 1)->transpen(bitmap,cliprect,
+			m_spriteram[offs + 1] & 0x3f,
+			m_spriteram[offs + 2],
+			flipx, flipy, x, y, 0);
 
-					m_gfxdecode->gfx(2 * m_graphics_bank + 1)->transpen(bitmap,cliprect,
-					m_spriteram[offs + 1] & 0x3f,
-					m_spriteram[offs + 2],
-					flipx, flipy, x, y, 0);
-
-
-					m_gfxdecode->gfx(2 * m_graphics_bank + 1)->transpen(bitmap,cliprect,
-					m_spriteram[offs + 1] & 0x3f,
-					m_spriteram[offs + 2],
-					flipx, flipy, x-256, y, 0);
-
+			m_gfxdecode->gfx(2 * m_graphics_bank + 1)->transpen(bitmap,cliprect,
+			m_spriteram[offs + 1] & 0x3f,
+			m_spriteram[offs + 2],
+			flipx, flipy, x-256, y, 0);
 		}
 	}
 }

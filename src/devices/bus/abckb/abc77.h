@@ -50,12 +50,6 @@ protected:
 	virtual void txd_w(int state) override;
 
 private:
-	enum
-	{
-		TIMER_SERIAL,
-		TIMER_RESET
-	};
-
 	void serial_output(int state);
 	void key_down(int state);
 

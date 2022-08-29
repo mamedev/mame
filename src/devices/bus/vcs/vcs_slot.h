@@ -8,80 +8,8 @@
 #include "imagedev/cartrom.h"
 
 
-/***************************************************************************
- TYPE DEFINITIONS
- ***************************************************************************/
+class device_vcs_cart_interface;
 
-#define A26SLOT_ROM_REGION_TAG ":cart:rom"
-
-/* PCB */
-enum
-{
-	A26_2K = 0,
-	A26_4K,
-	A26_F4,
-	A26_F6,
-	A26_F8,
-	A26_F8SW,
-	A26_FA,
-	A26_FE,
-	A26_3E,     // to test
-	A26_3F,
-	A26_E0,
-	A26_E7,
-	A26_UA,
-	A26_DC,
-	A26_CV,
-	A26_FV,
-	A26_JVP,    // to test
-	A26_32IN1,
-	A26_8IN1,
-	A26_4IN1,
-	A26_DPC,
-	A26_SS,
-	A26_CM,
-	A26_X07,
-	A26_HARMONY,
-};
-
-
-// ======================> device_vcs_cart_interface
-
-class device_vcs_cart_interface : public device_interface
-{
-public:
-	// construction/destruction
-	virtual ~device_vcs_cart_interface();
-
-	// reading from ROM
-	virtual uint8_t read_rom(offs_t offset) { return 0xff; }
-	// writing to RAM chips (sometimes it is in a different range than write_bank!)
-	virtual void write_ram(offs_t offset, uint8_t data) { }
-
-	// read/write to bankswitch address
-	virtual uint8_t read_bank(address_space &space, offs_t offset) { return 0xff; }
-	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) { }
-
-	virtual void setup_addon_ptr(uint8_t *ptr) { }
-
-	void rom_alloc(uint32_t size, const char *tag);
-	void ram_alloc(uint32_t size);
-	uint8_t* get_rom_base() { return m_rom; }
-	uint8_t*  get_ram_base() { return &m_ram[0]; }
-	uint32_t  get_rom_size() { return m_rom_size; }
-	uint32_t  get_ram_size() { return m_ram.size(); }
-
-protected:
-	device_vcs_cart_interface(const machine_config &mconfig, device_t &device);
-
-	// internal state
-	uint8_t *m_rom;
-	uint32_t m_rom_size;
-	std::vector<uint8_t> m_ram;
-};
-
-
-// ======================> vcs_cart_slot_device
 
 class vcs_cart_slot_device : public device_t,
 								public device_cartrom_image_interface,
@@ -101,6 +29,8 @@ public:
 	vcs_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~vcs_cart_slot_device();
 
+	template <typename T> void set_address_space(T &&tag, int no) { m_address_space.set_tag(std::forward<T>(tag), no); }
+
 	// image-level overrides
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
@@ -115,12 +45,6 @@ public:
 	int get_cart_type() { return m_type; }
 	static int identify_cart_type(const uint8_t *ROM, uint32_t len);
 
-	// reading and writing
-	virtual uint8_t read_rom(offs_t offset);
-	virtual uint8_t read_bank(address_space &space, offs_t offset);
-	virtual void write_bank(address_space &space, offs_t offset, uint8_t data);
-	virtual void write_ram(offs_t offset, uint8_t data);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -128,6 +52,7 @@ protected:
 private:
 	device_vcs_cart_interface*       m_cart;
 	int m_type;
+	optional_address_space m_address_space;
 
 	static bool detect_snowhite(const uint8_t *cart, uint32_t len);
 	static bool detect_modeDC(const uint8_t *cart, uint32_t len);
@@ -144,6 +69,35 @@ private:
 	static bool detect_8K_mode3F(const uint8_t *cart, uint32_t len);
 	static bool detect_32K_mode3F(const uint8_t *cart, uint32_t len);
 	static bool detect_super_chip(const uint8_t *cart, uint32_t len);
+
+	friend class device_vcs_cart_interface;
+};
+
+
+class device_vcs_cart_interface : public device_interface
+{
+public:
+	// construction/destruction
+	virtual ~device_vcs_cart_interface();
+
+	virtual void install_memory_handlers(address_space *space) { }
+
+	virtual void setup_addon_ptr(uint8_t *ptr) { }
+
+	void rom_alloc(uint32_t size, const char *tag);
+	void ram_alloc(uint32_t size);
+	uint8_t *get_rom_base() { return m_rom; }
+	uint8_t *get_ram_base() { return &m_ram[0]; }
+	uint32_t get_rom_size() { return m_rom_size; }
+	uint32_t get_ram_size() { return m_ram.size(); }
+
+protected:
+	device_vcs_cart_interface(const machine_config &mconfig, device_t &device);
+
+	// internal state
+	uint8_t *m_rom;
+	uint32_t m_rom_size;
+	std::vector<uint8_t> m_ram;
 };
 
 

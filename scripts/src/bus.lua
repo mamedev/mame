@@ -53,6 +53,8 @@ if (BUSES["A800"]~=null) then
 		MAME_DIR .. "src/devices/bus/a800/rom.h",
 		MAME_DIR .. "src/devices/bus/a800/oss.cpp",
 		MAME_DIR .. "src/devices/bus/a800/oss.h",
+		MAME_DIR .. "src/devices/bus/a800/rtime8.cpp",
+		MAME_DIR .. "src/devices/bus/a800/rtime8.h",
 		MAME_DIR .. "src/devices/bus/a800/sparta.cpp",
 		MAME_DIR .. "src/devices/bus/a800/sparta.h",
 	}
@@ -1753,6 +1755,8 @@ if (BUSES["ISA"]~=null) then
 		MAME_DIR .. "src/devices/bus/isa/3xtwin.h",
 		MAME_DIR .. "src/devices/bus/isa/lrk330.cpp",
 		MAME_DIR .. "src/devices/bus/isa/lrk330.h",
+		MAME_DIR .. "src/devices/bus/isa/opus100pm.cpp",
+		MAME_DIR .. "src/devices/bus/isa/opus100pm.h",
 	}
 end
 
@@ -3270,6 +3274,23 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/mononcol/slot.h,BUSES["MONONCOL"] = true
+---------------------------------------------------
+
+if (BUSES["MONONCOL"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/mononcol/slot.cpp",
+		MAME_DIR .. "src/devices/bus/mononcol/slot.h",
+		MAME_DIR .. "src/devices/bus/mononcol/carts.cpp",
+		MAME_DIR .. "src/devices/bus/mononcol/carts.h",
+		MAME_DIR .. "src/devices/bus/mononcol/rom.cpp",
+		MAME_DIR .. "src/devices/bus/mononcol/rom.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/neogeo/slot.h,BUSES["NEOGEO"] = true
 ---------------------------------------------------
 
@@ -3664,12 +3685,14 @@ end
 
 if (BUSES["GAMEBOY"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/gameboy/carts.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/carts.h",
+		MAME_DIR .. "src/devices/bus/gameboy/mbc.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/mbc.h",
 		MAME_DIR .. "src/devices/bus/gameboy/gb_slot.cpp",
 		MAME_DIR .. "src/devices/bus/gameboy/gb_slot.h",
 		MAME_DIR .. "src/devices/bus/gameboy/rom.cpp",
 		MAME_DIR .. "src/devices/bus/gameboy/rom.h",
-		MAME_DIR .. "src/devices/bus/gameboy/mbc.cpp",
-		MAME_DIR .. "src/devices/bus/gameboy/mbc.h",
 	}
 end
 
@@ -4899,6 +4922,8 @@ if (BUSES["PCE_CTRL"]~=null) then
 		MAME_DIR .. "src/devices/bus/pce_ctrl/joypad6.h",
 		MAME_DIR .. "src/devices/bus/pce_ctrl/multitap.cpp",
 		MAME_DIR .. "src/devices/bus/pce_ctrl/multitap.h",
+		MAME_DIR .. "src/devices/bus/pce_ctrl/pachinko.cpp",
+		MAME_DIR .. "src/devices/bus/pce_ctrl/pachinko.h",
 	}
 end
 

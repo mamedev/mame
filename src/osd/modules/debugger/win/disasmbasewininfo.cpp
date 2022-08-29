@@ -174,7 +174,7 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 				{
 					if (bp == nullptr)
 					{
-						int32_t bpindex = debug->breakpoint_set(address, nullptr, nullptr);
+						int32_t bpindex = debug->breakpoint_set(address);
 						machine().debugger().console().printf("Breakpoint %X set\n", bpindex);
 					}
 					else

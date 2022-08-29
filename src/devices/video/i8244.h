@@ -159,17 +159,17 @@ protected:
 	u8 m_collision_map[0x200];
 	u8 m_priority_map[0x200];
 
-	u8 m_x_beam_pos = 0;
-	u8 m_y_beam_pos = 0;
-	u8 m_control_status = 0;
-	u8 m_collision_status = 0;
+	u8 m_x_beam_pos;
+	u8 m_y_beam_pos;
+	u8 m_control_status;
+	u8 m_collision_status;
 
-	bool m_sh_written = false;
-	bool m_sh_pending = false;
-	u8 m_sh_prescaler = 0;
-	u8 m_sh_count = 0;
-	int m_sh_output = 0;
-	u8 m_sh_duty = 0;
+	bool m_sh_written;
+	bool m_sh_pending;
+	u8 m_sh_prescaler;
+	u8 m_sh_count;
+	int m_sh_output;
+	u8 m_sh_duty;
 };
 
 

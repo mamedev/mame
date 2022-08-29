@@ -83,6 +83,9 @@
 #define HOPPER_NONDUART_B   5
 
 INPUT_PORTS_EXTERN( mpu4 );
+INPUT_PORTS_EXTERN( mpu4_dutch );
+INPUT_PORTS_EXTERN( mpu4_dutch_invcoin );
+INPUT_PORTS_EXTERN( mpu4_dutch_alt_invcoin );
 INPUT_PORTS_EXTERN( mpu4_invcoin );
 INPUT_PORTS_EXTERN( mpu4_impcoin );
 INPUT_PORTS_EXTERN( mpu4_invimpcoin );
@@ -483,6 +486,7 @@ protected:
 	void mpu4_install_mod4yam_space(address_space &space);
 	void mpu4_install_mod4oki_space(address_space &space);
 	void mpu4_config_common();
+	void add_ym2413(machine_config& config);
 
 	DECLARE_MACHINE_START(mod2);
 	DECLARE_MACHINE_RESET(mpu4);
@@ -669,6 +673,8 @@ protected:
 	bool m_undercurrent_detect = false;
 
 	bool m_low_volt_detect = true;
+
+	bool m_use_coinlocks = false;
 
 	bool m_hack_duart_fixed_low = false;
 

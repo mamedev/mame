@@ -4318,7 +4318,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" />
 			<dataarea name="rom" size="8388608">
-				<rom name="92344 - Thomas and seine Freunde  - Freunde Halten Zusammen (Germany).bin" size="8388608" crc="5aeb37aa" sha1="0e7f870a2269e7ef0fa1b1fc15eb9b6b89952a06" />
+				<rom name="92344 - Thomas and seine Freunde - Freunde Halten Zusammen (Germany).bin" size="8388608" crc="5aeb37aa" sha1="0e7f870a2269e7ef0fa1b1fc15eb9b6b89952a06" />
 			</dataarea>
 		</part>
 	</software>

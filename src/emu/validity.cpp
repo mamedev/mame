@@ -11,10 +11,12 @@
 #include "emu.h"
 #include "validity.h"
 
-#include "corestr.h"
 #include "emuopts.h"
 #include "romload.h"
+#include "speaker.h"
 #include "video/rgbutil.h"
+
+#include "corestr.h"
 #include "unicode.h"
 
 #include <cctype>
@@ -2044,7 +2046,7 @@ void validity_checker::validate_driver(device_t &root)
 	device_t::feature_type const imperfect(m_current_driver->type.imperfect_features());
 	if (!(m_current_driver->flags & (machine_flags::IS_BIOS_ROOT | machine_flags::NO_SOUND_HW)) && !(unemulated & device_t::feature::SOUND))
 	{
-		sound_interface_enumerator iter(root);
+		speaker_device_enumerator iter(root);
 		if (!iter.first())
 			osd_printf_error("Driver is missing MACHINE_NO_SOUND or MACHINE_NO_SOUND_HW flag\n");
 	}

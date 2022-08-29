@@ -50,7 +50,7 @@ notes:
 
 TODO:
 - bootrom disable timer shouldn't be needed, real ARM has already fetched the next opcode
-- more accurate dynamic cpu clock divider (same problem as in saitek_risc2500.cpp),
+- more accurate dynamic cpu clock divider (same problem as in saitek/risc2500.cpp),
   sound pitch is correct now though
 - does the R40 version have the same clock divider value?
 

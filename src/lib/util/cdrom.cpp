@@ -360,7 +360,7 @@ cdrom_file::~cdrom_file()
 ***************************************************************************/
 
 /**
- * @fn  std::error_condition read_partial_sector(void *dest, uint32_t lbasector, uint32_t chdsector, uint32_t tracknum, uint32_t startoffs, uint32_t length)
+ * @fn  std::error_condition read_partial_sector(void *dest, uint32_t lbasector, uint32_t chdsector, uint32_t tracknum, uint32_t startoffs, uint32_t length, bool phys)
  *
  * @brief   Reads partial sector.
  *
@@ -370,6 +370,7 @@ cdrom_file::~cdrom_file()
  * @param   tracknum        The tracknum.
  * @param   startoffs       The startoffs.
  * @param   length          The length.
+ * @param   phys            true to physical.
  *
  * @return  The partial sector.
  */
@@ -570,7 +571,7 @@ bool cdrom_file::read_subcode(uint32_t lbasector, void *buffer, bool phys)
 		return false;
 
 	// read the data
-	std::error_condition err = read_partial_sector(buffer, lbasector, chdsector, tracknum, cdtoc.tracks[tracknum].datasize, cdtoc.tracks[tracknum].subsize);
+	std::error_condition err = read_partial_sector(buffer, lbasector, chdsector, tracknum, cdtoc.tracks[tracknum].datasize, cdtoc.tracks[tracknum].subsize, phys);
 	return !err;
 }
 

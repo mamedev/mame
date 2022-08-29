@@ -4785,7 +4785,7 @@ license:CC0
 	</software>
 
 	<software name="stakwindev" cloneof="stakwin" supported="no">
-		<description>Stakes Winner / Stakes Winner - GI Kinzen  Seiha e no Michi (early development board)</description>
+		<description>Stakes Winner / Stakes Winner - GI Kinzen Seiha e no Michi (early development board)</description>
 		<year>1995</year>
 		<publisher>Saurus</publisher>
 		<info name="alt_title" value="ステークスウィナー"/>
@@ -4806,7 +4806,7 @@ license:CC0
 				<rom name="v1.v1" offset="0x000000" size="0x080000" crc="ac590b85" sha1="47ff2ba9648b7145c29b534cd1f6839abb43bee2" />
 				<rom name="v2.v2" offset="0x080000" size="0x080000" crc="23ad8a91" sha1="da620c182fe9fc36421da73f2937e627d9a641bf" />
 				<rom name="v3.v3" offset="0x100000" size="0x080000" crc="e2d216b6" sha1="28b70e57a352ef6a08a5564f7756113a66e7dbb7" />
-				</dataarea>
+			</dataarea>
 			<dataarea name="sprites" size="0x800000">
 				<rom loadflag="load32_byte" name="c1.c1"   offset="0x000000" size="0x080000" crc="fb2f29d3" sha1="1f4cf27d7da1262bae28a8dd88c56d8a9324e982" />
 				<rom loadflag="load32_byte" name="c2.c2"   offset="0x000002" size="0x080000" crc="6108e6db" sha1="f4cdb5df29698f1ba362a227b82d43c3baaa8948" />

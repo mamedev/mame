@@ -13,7 +13,7 @@ Auto Response Board (ARB) overview:
 - PCB label AV001C01 REV A
 
 The electronic magnetic chessboard is the first of its kind. AVE later licensed
-it to Fidelity (see fidel_elite.cpp).
+it to Fidelity (see fidelity/elite.cpp).
 ARB is a romless system, the program ROM is on a cartridge.
 
 Known chess modules (*denotes not dumped yet):
@@ -44,9 +44,9 @@ TODO:
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/w65c02s.h"
 #include "video/pwm.h"
-#include "machine/sensorboard.h"
 #include "machine/6522via.h"
 #include "machine/nvram.h"
+#include "machine/sensorboard.h"
 #include "sound/dac.h"
 
 #include "speaker.h"
@@ -276,8 +276,11 @@ static INPUT_PORTS_START( arb )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CODE(KEYCODE_0) PORT_NAME("New Game / Options / Pawn / 0")
 
 	PORT_START("IN.1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_F1) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, arb_state, reset_button, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_CODE(KEYCODE_F1) PORT_NAME("Halt") PORT_CHANGED_MEMBER(DEVICE_SELF, arb_state, halt_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_F1) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, arb_state, reset_button, 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_CODE(KEYCODE_F1) PORT_NAME("Halt") PORT_CHANGED_MEMBER(DEVICE_SELF, arb_state, halt_button, 0)
+
+	PORT_START("CLICKABLE") // helper for clickable artwork
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER)
 INPUT_PORTS_END
 
 

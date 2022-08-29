@@ -3,38 +3,39 @@
 <!--
 license:CC0
 -->
-<softwarelist name="ekara_japan_s" description="Takara e-kara (Japan) S-xx / SCxxxx- series cartridges">
+<softwarelist name="ekara_japan_s" description="Takara e-kara (Japan) Saiten Cartridge series (S-xx / SCxxxx-)">
 	<!-- cartridges contain ROM only, the XaviX CPU and BIOS are in the base unit
 
 	***********************************************************************************
 
+	Saiten Cartridge (採点カートリッジ) series
 	Japanese cart listing (by S code) (S-x on cartridge / box, SC in cart identifier code)
-	TODO: what are the full titles for SAI and HWK
 
-	SAI seems to be used for multiple different series here, need to look at the subtitles too
+	This is the 'Saiten Cartridge' (Scoring Cartridge) series with all titles ranking you on
+	your performance
 
-	S-1  *SC0001-KTY  Hello Kitty Special
-	S-2   SC0002-SAI  SAI (series 3) Volume 1
-	S-3  *SC0003-     Kids' Challenge Volume 1
-	S-4  *SC0004-SAI  SAI (series 1) Volume 1
-	S-5  *SC0005-SAI  SAI (series 2) Volume 1  (same series as 6,9,19,21,22)
-	S-6  *SC0006-SAI  SAI (series 2) Volume 2  (same series as 5,9,19,21,22)
-	S-7   SC0007-     unknown(2) Volume 1
-	S-8   SC0008-SAI  SAI (series 3) Volume 2
-	S-9  *SC0009-SAI  SAI (series 2) Volume 3  (same series as 5,6,19,21,22)
-	S-10 *SC0010-HWK  HWK (untranslated)
+	S-1  *SC0001-KTY  Karaoke Ehon Vol.1 Hello Kitty
+	S-2   SC0002-SAI  Saiten Cartridge Challenge Idol vol.1
+	S-3  *SC0003-SAI  Kids' Challenge Vol.1
+	S-4  *SC0004-SAI  Saiten Cartridge Enka no Tatsujin
+	S-5  *SC0005-SAI  Saiten Cartridge Nesshō vol. 1
+	S-6  *SC0006-SAI  Saiten Cartridge Nesshō vol. 2
+	S-7  *SC0007-DCS  Saiten Cartridge Detective Conan Vol.1
+	S-8   SC0008-SAI  Saiten Cartridge Challenge Idol vol.2
+	S-9  *SC0009-SAI  Saiten Cartridge Nesshō vol. 3
+	S-10 *SC0010-HKW  Hikawa Kiyoshi no Karaoke Dōjō
 	S-11  SC0011-     PostPet
-	S-12 *SC0012-SAI  SAI (series 3) Volume 3
-	S-13  SC0013-     SAI (series 2) Volume 4
-	S-14  SC0014-     SAI (series 3) Volume 4
-	S-15  SC0015-     unknown(2) Volume 2
-	S-16  SC0016-SAI  SAI (series 2) Volume 5
-	S-17  SC0017-     unknown(1) Volume 2
-	S-18 *SC0018-SAI  Challenge Artist Volume 1
-	S-19 *SC0019-SAI  SAI (series 2) Volume 6  (same series as 5,6,9,21,22)
-	S-20  SC0020-     SAI (series 3) Volume 5
-	S-21 *SC0021-SAI  SAI (series 2) Volume 7  (same series as 5,6,9,19,22)
-	S-22 *SC0022-SAI  SAI (series 2) Volume 8  (same series as 5,6,9,19,21)
+	S-12 *SC0012-SAI  Saiten Cartridge Challenge Idol vol.3
+	S-13  SC0013-     Saiten Cartridge Nesshō vol. 4
+	S-14  SC0014-     Saiten Cartridge Challenge Idol vol.4
+	S-15 *SC0015-DCS  Saiten Cartridge Detective Conan Vol.2
+	S-16  SC0016-SAI  Saiten Cartridge Nesshō vol. 5
+	S-17  SC0017-     Kids' Challenge Vol.2
+	S-18 *SC0018-SAI  Saiten Cartridge Challenge Artist Vol.1 (Morning Musume, Tanpopo, Petit Moni, Gotō Maki)
+	S-19 *SC0019-SAI  Saiten Cartridge Nesshō vol. 6
+	S-20  SC0020-     Saiten Cartridge Challenge Idol vol.5
+	S-21 *SC0021-SAI  Saiten Cartridge Nesshō vol. 7
+	S-22 *SC0022-SAI  Saiten Cartridge Nesshō vol. 8
 
 	(more? what's the S highest number?, had S-23 noted, but can't find evidence of it now)
 
@@ -44,9 +45,10 @@ license:CC0
 	<!-- these have unique presentation -->
 
 	<software name="sc0001">
-		<description>Hello Kitty Special (Japan) (SC0001-KTY)</description>
+		<description>Karaoke Ehon Vol.1 Hello Kitty (Japan) (SC0001-KTY)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="カラオケえほん Vol.1 ハローキティ"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="01.bin" size="0x100000" crc="0635e39f" sha1="bfe33b0de01e8618abfdd190abf752cee53a6403"/>
@@ -56,9 +58,10 @@ license:CC0
 
 
 	<software name="sc0003">
-		<description>Kids' Challenge Volume 1 (Japan) (SC0003-xxx)</description>
+		<description>Kids' Challenge Vol.1 (Japan) (SC0003-SAI)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ キッズチャレンジ Vol.1"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="sc0003-.u1" size="0x100000" crc="935e3445" sha1="e86949467e65d515523629ca1e8f8b47cdaaacf0"/>
@@ -67,9 +70,10 @@ license:CC0
 	</software>
 
 	<software name="sc0004">
-		<description>SAI (series 1) Volume 1 (Japan) (SC0004-SAI)</description>
+		<description>Saiten Cartridge: Enka no Tatsujin (Japan) (SC0004-SAI)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ 演歌の達人"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="sc0004-sai.u1" size="0x100000" crc="c2a080da" sha1="6eb803bc8587308002f7f8a15b1928c8f726c192"/>
@@ -78,9 +82,10 @@ license:CC0
 	</software>
 
 	<software name="sc0005">
-		<description>SAI (series 2) Volume 1 (Japan) (SC0005-SAI)</description>
+		<description>Saiten Cartridge: Nesshō vol. 1 (Japan) (SC0005-SAI)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ 熱唱 vol. 1"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="sc0005-sai.u1" size="0x100000" crc="f919b155" sha1="60fc9985d277422d4d64fb4f0cebf2732e2958aa"/>
@@ -89,9 +94,10 @@ license:CC0
 	</software>
 
 	<software name="sc0006">
-		<description>SAI (series 2) Volume 2 (Japan) (SC0006-SAI)</description>
+		<description>Saiten Cartridge: Nesshō vol. 2 (Japan) (SC0006-SAI)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ 熱唱 vol. 2"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="sc0006-sai.u1" size="0x100000" crc="4bd8669e" sha1="e77d16ecead2a6c660fedcbca3a1e0e719648be4"/>
@@ -99,10 +105,24 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="sc0009">
-		<description>SAI (series 2) Volume 3 (Japan) (SC0009-SAI)</description>
+	<software name="sc0007">
+		<description>Saiten Cartridge: Detective Conan Vol.1 (Japan) (SC0007-DCS)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ 名探偵コナン Vol.1"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="sc0007-dcs.u1" size="0x200000" crc="5b8cf5ee" sha1="b31e610110fda7c7b49e7318d3191967fcf49ed8"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="sc0009">
+		<description>Saiten Cartridge: Nesshō vol. 3 (Japan) (SC0009-SAI)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ 熱唱 vol. 3"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="sc0009-sai.u1" size="0x100000" crc="61413fd5" sha1="47dad178faa99301009ae74554a39b15c01e0db2"/>
@@ -111,9 +131,10 @@ license:CC0
 	</software>
 
 	<software name="sc0010">
-		<description>HWK (Japan) (SC0010-HKW)</description>
+		<description>Hikawa Kiyoshi no Karaoke Dōjō (Japan) (SC0010-HKW)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="氷川きよしのカラオケ道場"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="sc0010-hkw.u1" size="0x200000" crc="fd6dc588" sha1="fece06706399eb36f3e69f7693116c944fe890e7"/>
@@ -122,9 +143,10 @@ license:CC0
 	</software>
 
 	<software name="sc0012">
-		<description>SAI (series 3) Volume 3 (Japan) (SC0012-SAI)</description>
+		<description>Saiten Cartridge: Challenge Idol vol.3 (Japan) (SC0012-SAI)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ チャレンジアイドル vol.3"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="sc0012-sai.u1" size="0x100000" crc="8b971664" sha1="5f748d3406dbe74ce06c68aa07bafa9e288d5b51"/>
@@ -132,10 +154,25 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="sc0018">
-		<description>Challenge Artist Volume 1 (Japan) (SC0018-SAI)</description>
+
+	<software name="sc0015">
+		<description>Saiten Cartridge: Detective Conan Vol.2 (Japan) (SC0015-DCS)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ 名探偵コナン Vol.2"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="sc0015-dcs.u1" size="0x200000" crc="a1b31faa" sha1="e5508940c5e674a1e12ef2cc9a5d10365ac4fa64"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="sc0018">
+		<description>Saiten Cartridge: Challenge Artist Vol.1 (Morning Musume, Tanpopo, Petit Moni, Gotō Maki) (Japan) (SC0018-SAI)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ チャレンジアーティスト (モーニング娘。他)"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="sc0018-sai.u1" size="0x100000" crc="23545417" sha1="64b84de483c6c5d1129826324b30580a189077ea"/>
@@ -144,9 +181,10 @@ license:CC0
 	</software>
 
 	<software name="sc0019">
-		<description>SAI (series 2) Volume 6 (Japan) (SC0019-SAI)</description>
+		<description>Saiten Cartridge: Nesshō vol. 6 (Japan) (SC0019-SAI)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ 熱唱 vol. 6"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="sc0019-sai.u1" size="0x100000" crc="136c12e3" sha1="fabd2e83732fdbbd737fc55902a3b1612c73f929"/>
@@ -155,9 +193,10 @@ license:CC0
 	</software>
 
 	<software name="sc0021">
-		<description>SAI (series 2) Volume 7 (Japan) (SC0021-SAI)</description>
+		<description>Saiten Cartridge: Nesshō vol. 7 - Mrs Selection (Japan) (SC0021-SAI)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ 熱唱 vol. 7 ～ミセスセレクション～"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="sc0021-sai.u1" size="0x100000" crc="fbc77e6c" sha1="eee3c8a68807dbac62c8021f9c755d08076925e2"/>
@@ -166,9 +205,10 @@ license:CC0
 	</software>
 
 	<software name="sc0022">
-		<description>SAI (series 2) Volume 8 (Japan) (SC0022-SAI)</description>
+		<description>Saiten Cartridge: Nesshō vol. 8 (Japan) (SC0022-SAI)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ 熱唱 vol. 8"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="sc0022-sai.u1" size="0x100000" crc="d631d890" sha1="a0953aa347c9ec152e64bc455fc360056c5c0807"/>

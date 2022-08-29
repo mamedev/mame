@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Pierpaolo Prazzoli
+// copyright-holders:Pierpaolo Prazzoli, Brad Oliver, Fabio Priuli
 /***************************************************************************
 
 Nintendo VS UniSystem and DualSystem - (c) 1984 Nintendo of America
@@ -83,8 +83,8 @@ Needed roms:
 - Family Stadium '88         (by Namco, 1988; sequel to RBI Baseball)
 - Family Tennis              (by Namco, 1987)
 - Head to Head Baseball      (ever finished/released?, by Nintendo, 1986)
-- Lionex                     (prototype by Sunsoft, 1987)
-- Madura no Tsubasa          (prototype by Sunsoft, 1987)
+- Lionex                     (prototype by Sun Electronics, 1986, DRGN-D board, unreleased dump exists)
+- The Wings of Madoola       (prototype by Sun Electronics, 1987, DRGN-D board, unreleased dump exists)
 - Pro Yakyuu Family Stadium  (by Namco, 1986; Japan version of RBI Baseball)
 - Quest of Ki                (by Namco/Game Studio, 1988)
 - Super Chinese              (by Namco/Culture Brain, 1988)
@@ -95,8 +95,11 @@ Needed roms:
 - Walkure no Bouken          (by Namco, 1986)
 - Wild Gunman                (1984, light gun game)
 
+BTANB:
+    - Coin sound clipped when first coin is inserted in VS. Castlevania.
+
 TO DO:
-    - Merge mapper implementations in machine/vsnes.c with playch10 and MESS NES
+    - Merge mapper implementations with playch10, NES, etc
     - Check others bits in coin counter
     - Check other values in bnglngby irq
     - Top Gun: cpu #0 (PC=00008016): unmapped memory byte read from 00007FFF ???
@@ -139,21 +142,221 @@ Changes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "vsnes.h"
 
+#include "bus/nes_ctrl/zapper_sensor.h"
 #include "cpu/m6502/n2a03.h"
 #include "cpu/z80/z80.h"
+#include "machine/nvram.h"
+#include "machine/watchdog.h"
+#include "sound/sn76496.h"
+#include "video/ppu2c0x.h"
+
 #include "screen.h"
 #include "speaker.h"
 
 #include "layout/generic.h"
 
 
-/******************************************************************************/
+namespace {
+
+class vs_base_state : public driver_device
+{
+protected:
+	vs_base_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_subcpu(*this, "sub")
+		, m_ppu1(*this, "ppu1")
+		, m_ppu2(*this, "ppu2")
+		, m_sensor(*this, "sensor")
+		, m_nvram(*this, "nvram")
+		, m_watchdog(*this, "watchdog")
+		, m_gfx1_rom(*this, "gfx1")
+		, m_prg_banks(*this, "prg%u", 0U)
+		, m_prg_view(*this, "prg_view")
+		, m_chr_banks(*this, "chr%u", 0U)
+		, m_chr_view(*this, "chr_view")
+		, m_in(*this, "IN%u", 0U)
+		, m_coins(*this, "COINS%u", 1U)
+		, m_dsw(*this, "DSW%u", 0U)
+		, m_gunx(*this, "GUNX")
+		, m_guny(*this, "GUNY")
+	{
+	}
+
+	virtual void machine_reset() override;
+
+	template <u8 Side> void sprite_dma_w(address_space &space, u8 data);
+	template <u8 Side> void vsnes_coin_counter_w(offs_t offset, u8 data);
+	template <u8 Side> u8 vsnes_coin_counter_r(offs_t offset);
+	template <u8 Side> void vsnes_in0_w(u8 data);
+	template <u8 Side> u8 vsnes_in0_r();
+	template <u8 Side> u8 vsnes_in1_r();
+
+	void vsnes_cpu1_map(address_map &map);
+	void vsnes_cpu2_map(address_map &map);
+	void vsnes_ppu1_map(address_map &map);
+	void vsnes_ppu2_map(address_map &map);
+
+	void init_prg_banking();
+	void prg32(int bank);
+	void prg16(int slot, int bank);
+	void prg8(int slot, int bank);
+
+	enum { MAIN = 0, SUB = 1 };
+
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_subcpu;
+	required_device<ppu2c0x_device> m_ppu1;
+	optional_device<ppu2c0x_device> m_ppu2;
+
+	optional_device<nes_zapper_sensor_device> m_sensor;
+	optional_device<nvram_device> m_nvram;
+	optional_device<watchdog_timer_device> m_watchdog;
+
+	optional_memory_region m_gfx1_rom;
+
+	memory_bank_array_creator<4> m_prg_banks;
+	memory_view m_prg_view;
+	int m_prg_chunks = 0;
+
+	memory_bank_array_creator<8> m_chr_banks;
+	memory_view m_chr_view;
+	int m_chr_chunks = 0;
+
+	bool m_has_gun = false;
+
+private:
+	optional_ioport_array<4> m_in;
+	optional_ioport_array<2> m_coins;
+	optional_ioport_array<2> m_dsw;
+	optional_ioport m_gunx;
+	optional_ioport m_guny;
+
+	int m_coin = 0;
+	int m_input_latch[4]{};
+	int m_input_strobe[2]{};
+};
+
+class vs_uni_state : public vs_base_state
+{
+public:
+	vs_uni_state(const machine_config &mconfig, device_type type, const char *tag)
+		: vs_base_state(mconfig, type, tag)
+	{
+	}
+
+	void vsnes(machine_config &config);
+	void jajamaru(machine_config &config);
+	void mightybj(machine_config &config);
+	void topgun(machine_config &config);
+	void vsgshoe(machine_config &config);
+
+	void init_vskonami();
+	void init_vsvram();
+	void init_bnglngby();
+	void init_drmario();
+	void init_vs108();
+	void init_vsfdf();
+	void init_tkoboxng();
+	void init_vsgun();
+	void init_supxevs();
+	void init_vsgshoe();
+	void init_vsnormal();
+	void init_platoon();
+	void init_rbibb();
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	void vsnormal_vrom_banking(u8 data);
+	void vskonami_rom_banking(offs_t offset, u8 data);
+	void vsgshoe_gun_in0_w(u8 data);
+	void drmario_rom_banking(offs_t offset, u8 data);
+	void vsvram_rom_banking(u8 data);
+	void vs108_rom_banking(offs_t offset, u8 data);
+	u8 rbibb_prot_r(offs_t offset);
+	u8 supxevs_prot_1_r();
+	u8 supxevs_prot_2_r();
+	u8 supxevs_prot_3_r();
+	u8 supxevs_prot_4_r();
+	u8 tkoboxng_prot_r(offs_t offset);
+	void sunsoft3_rom_banking(offs_t offset, u8 data);
+	void set_bnglngby_irq_w(u8 data);
+	u8 set_bnglngby_irq_r();
+
+	void v_set_videorom_bank(int start, int count, int vrom_start_bank);
+
+	int m_mmc1_shiftreg = 0;
+	int m_mmc1_shiftcount = 0;
+	int m_mmc1_prg16k = 0;
+	int m_mmc1_switchlow = 0;
+	int m_mmc1_chr4k = 0;
+	int m_108_reg = 0;
+	int m_prot_index = 0;
+	int m_ret = 0;
+};
+
+class vs_dual_state : public vs_base_state
+{
+public:
+	vs_dual_state(const machine_config &mconfig, device_type type, const char *tag)
+		: vs_base_state(mconfig, type, tag)
+	{
+	}
+
+	void vsdual(machine_config &config);
+	void init_vsdual();
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	template <u8 Side> void vsdual_vrom_banking(u8 data);
+};
+
+class vs_smbbl_state : public vs_base_state
+{
+public:
+	vs_smbbl_state(const machine_config &mconfig, device_type type, const char *tag)
+		: vs_base_state(mconfig, type, tag)
+		, m_sn1(*this, "sn1")
+		, m_sn2(*this, "sn2")
+	{
+	}
+
+	void vs_smbbl(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	void smbbl_6502_sn_w(offs_t offset, u8 data);
+	void smbbl_z80_sn_w(offs_t offset, u8 data);
+	u8 smbbl_z80_data_r();
+	u8 smbbl_z80_address_r(offs_t offset);
+	void smbbl_scanline_cb(int scanline, bool vblank, bool blanked);
+	u8 smbbl_ppu_data_r();
+
+	void smbbl_6502_map(address_map &map);
+	void smbbl_z80_map(address_map &map);
+	void smbbl_ppu_map(address_map &map);
+
+	required_device<sn76489_device> m_sn1;
+	required_device<sn76489_device> m_sn2;
+
+	u8 m_bootleg_sound_offset = 0;
+	u8 m_bootleg_sound_data = 0;
+	int m_bootleg_latched_scanline = 0;
+};
+
+
+//******************************************************************************
 
 
 template <u8 Side>
-void vsnes_state::sprite_dma_w(address_space &space, u8 data)
+void vs_base_state::sprite_dma_w(address_space &space, u8 data)
 {
 	if (Side == MAIN)
 		m_ppu1->spriteram_dma(space, data & 0x07);
@@ -162,7 +365,7 @@ void vsnes_state::sprite_dma_w(address_space &space, u8 data)
 }
 
 template <u8 Side>
-void vsnes_state::vsnes_coin_counter_w(offs_t offset, u8 data)
+void vs_base_state::vsnes_coin_counter_w(offs_t offset, u8 data)
 {
 	machine().bookkeeping().coin_counter_w(Side, data & 0x01);
 	m_coin = data;
@@ -173,7 +376,7 @@ void vsnes_state::vsnes_coin_counter_w(offs_t offset, u8 data)
 }
 
 template <u8 Side>
-u8 vsnes_state::vsnes_coin_counter_r(offs_t offset)
+u8 vs_base_state::vsnes_coin_counter_r(offs_t offset)
 {
 	// reads effectively write MSB of address (via open bus) to coin counter
 	machine().bookkeeping().coin_counter_w(Side, BIT(offset, 8));
@@ -183,7 +386,7 @@ u8 vsnes_state::vsnes_coin_counter_r(offs_t offset)
 }
 
 template <u8 Side>
-void vsnes_state::vsnes_in0_w(u8 data)
+void vs_base_state::vsnes_in0_w(u8 data)
 {
 	// Toggling bit 0 high then low resets both controllers
 	if (m_input_strobe[Side] & ~data & 1)
@@ -202,7 +405,7 @@ void vsnes_state::vsnes_in0_w(u8 data)
 }
 
 template <u8 Side>
-u8 vsnes_state::vsnes_in0_r()
+u8 vs_base_state::vsnes_in0_r()
 {
 	int p1 = 2 * Side;
 
@@ -216,15 +419,23 @@ u8 vsnes_state::vsnes_in0_r()
 	int ret = m_input_latch[p1] & 1;
 	m_input_latch[p1] >>= 1;
 
+// FIXME: UniSystem's wiring harness connects S Coin 2 to S Coin 1 edge hardness
+// This should mean games that don't check Coin 2 inputs respond on UniSys, but on DualSys they'd miss the Coin 2 inserts as all 4 inputs are separate?
 	ret |= m_coins[Side]->read();             // merge coins, etc
 	ret |= (m_dsw[Side]->read() & 3) << 3;    // merge 2 dipswitches
+	ret |= Side << 7;                         // CPU indicator bit
 
 	return ret;
 }
 
 template <u8 Side>
-u8 vsnes_state::vsnes_in1_r()
+u8 vs_base_state::vsnes_in1_r()
 {
+	// Only the Sub side CPU can kick the watchdog, which it must do by periodically reading $4017.
+	// This is one reason UniSystem games too must be installed on the Sub side.
+	if (m_watchdog && Side == SUB)
+		m_watchdog->watchdog_reset();
+
 	int p2 = 2 * Side + 1;
 
 	if (m_input_strobe[Side] & 1)
@@ -238,17 +449,557 @@ u8 vsnes_state::vsnes_in1_r()
 	return ret;
 }
 
-/******************************************************************************/
+/*************************************
+ *
+ *  Init machine
+ *
+ *************************************/
+
+void vs_base_state::machine_reset()
+{
+	m_input_latch[0] = m_input_latch[1] = 0;
+	m_input_latch[2] = m_input_latch[3] = 0;
+	m_input_strobe[0] = m_input_strobe[1] = 0;
+}
+
+/*************************************
+ *
+ *  Machine start functions
+ *
+ *************************************/
+
+void vs_base_state::init_prg_banking()
+{
+	u8 *base = memregion("prg")->base();
+	m_prg_chunks = memregion("prg")->bytes() / 0x2000;
+
+	for (int i = 0; i < 4; i++)
+	{
+		m_prg_banks[i]->configure_entries(0, m_prg_chunks, base, 0x2000);
+		m_prg_banks[i]->set_entry(m_prg_chunks - 4 + i);
+	}
+
+	m_prg_view.select(0);
+}
+
+// safe banking helpers (only work when PRG size is a power of 2, i.e. not Gumshoe)
+
+void vs_base_state::prg32(int bank)
+{
+	bank = (bank << 2) & (m_prg_chunks - 1);
+
+	for (int i = 0; i < 4; i++)
+		m_prg_banks[i]->set_entry(bank + i);
+}
+
+void vs_base_state::prg16(int slot, int bank)
+{
+	bank = (bank << 1) & (m_prg_chunks - 1);
+	slot = (slot & 1) << 1;
+
+	for (int i = 0; i < 2; i++)
+		m_prg_banks[slot + i]->set_entry(bank + i);
+}
+
+void vs_base_state::prg8(int slot, int bank)
+{
+	m_prg_banks[slot & 0x03]->set_entry(bank & (m_prg_chunks - 1));
+}
+
+void vs_uni_state::v_set_videorom_bank(int start, int count, int vrom_start_bank)
+{
+	assert(start + count <= 8);
+
+	vrom_start_bank &= m_chr_chunks - 1;
+	assert(vrom_start_bank + count <= m_chr_chunks);
+
+	// count determines the size of the area mapped
+	for (int i = 0; i < count; i++)
+		m_chr_banks[i + start]->set_entry(vrom_start_bank + i);
+}
+
+void vs_uni_state::machine_start()
+{
+	// establish chr banks
+	// DRIVER_INIT is called first - means we can handle this different for VRAM games!
+	if (m_gfx1_rom != nullptr)
+	{
+		u8 *base = m_gfx1_rom->base();
+		m_chr_chunks = m_gfx1_rom->bytes() / 0x400;
+
+		for (int i = 0; i < 8; i++)
+		{
+			m_ppu1->space(AS_PROGRAM).install_read_bank(0x0400 * i, 0x0400 * i + 0x03ff, m_chr_banks[i]);
+			m_chr_banks[i]->configure_entries(0, m_chr_chunks, base, 0x400);
+		}
+		v_set_videorom_bank(0, 8, 0);
+	}
+	else
+		m_chr_view.select(0);
+}
+
+void vs_dual_state::machine_start()
+{
+	for (int i = 0; i < 2; i++)
+	{
+		const char *region = i ? "gfx2" : "gfx1";
+		u8 *base = memregion(region)->base();
+		int entries = memregion(region)->bytes() / 0x2000;
+		m_chr_banks[i]->configure_entries(0, entries, base, 0x2000);
+		m_chr_banks[i]->set_entry(0);
+	}
+}
+
+void vs_smbbl_state::machine_start()
+{
+	m_ppu1->set_scanline_callback(*this, FUNC(vs_smbbl_state::smbbl_scanline_cb));
+
+	u8 *base = m_gfx1_rom->base();
+	int entries = m_gfx1_rom->bytes() / 0x2000;
+	m_chr_banks[0]->configure_entries(0, entries, base, 0x2000);
+	m_chr_banks[0]->set_entry(0);
+}
+
+/**********************************************************************************
+ *
+ *  Game and Board-specific initialization
+ *
+ **********************************************************************************/
+
+//**********************************************************************************
+// Most games: VROM Banking in controller 0 write
+
+void vs_uni_state::vsnormal_vrom_banking(u8 data)
+{
+	// switch vrom
+	v_set_videorom_bank(0, 8, (data & 4) ? 8 : 0);
+
+	// bit 1 ( data & 2 ) enables writes to extra ram, we ignore it
+
+	// move along
+	vsnes_in0_w<MAIN>(data);
+}
+
+void vs_uni_state::init_vsnormal()
+{
+	// vrom switching is enabled with bit 2 of $4016
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4016, 0x4016, write8smo_delegate(*this, FUNC(vs_uni_state::vsnormal_vrom_banking)));
+}
+
+//**********************************************************************************
+// Gun games: VROM Banking in controller 0 write
+
+void vs_uni_state::init_vsgun()
+{
+	init_vsnormal();
+	m_has_gun = true;
+}
+
+//**********************************************************************************
+// Konami VRC1 games: ROM banking at $8000-$ffff
+
+void vs_uni_state::vskonami_rom_banking(offs_t offset, u8 data)
+{
+	int reg = BIT(offset, 12, 3);
+
+	switch (reg)
+	{
+		case 0: // prg bank 0
+		case 2: // prg bank 1
+		case 4: // prg bank 2
+			prg8(reg >> 1, data);
+			break;
+
+		case 6: // vrom bank 0
+			v_set_videorom_bank(0, 4, data * 4);
+			break;
+
+		case 7: // vrom bank 1
+			v_set_videorom_bank(4, 4, data * 4);
+			break;
+	}
+}
+
+void vs_uni_state::init_vskonami()
+{
+	// point program banks to last 32K
+	init_prg_banking();
+
+	// banking is done with writes to the $8000-$ffff area
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8sm_delegate(*this, FUNC(vs_uni_state::vskonami_rom_banking)));
+}
+
+//**********************************************************************************
+// Vs. Gumshoe
+
+void vs_uni_state::vsgshoe_gun_in0_w(u8 data)
+{
+	// Gumshoe uniquely has a bankable 16K EPROM in addition to the normal unbanked 8K slots
+	m_prg_banks[0]->set_entry(BIT(data, 2));
+
+	// otherwise do normal CHR banking and IO write
+	vsnormal_vrom_banking(data);
+}
+
+void vs_uni_state::init_vsgshoe()
+{
+	// point program banks to last 32K
+	init_prg_banking();
+
+	// vrom switching is enabled with bit 2 of $4016
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4016, 0x4016, write8smo_delegate(*this, FUNC(vs_uni_state::vsgshoe_gun_in0_w)));
+
+	m_has_gun = true;
+}
+
+//**********************************************************************************
+// MMC1 (Dr Mario): ROM banking at $8000-$ffff
+
+void vs_uni_state::drmario_rom_banking(offs_t offset, u8 data)
+{
+	// reset mapper
+	if (data & 0x80)
+	{
+		m_mmc1_shiftcount = 0;
+		m_mmc1_prg16k = 1;
+		m_mmc1_switchlow = 1;
+
+		return;
+	}
+
+	// update shift register
+	m_mmc1_shiftreg = (m_mmc1_shiftreg >> 1) | (data & 1) << 4;
+	m_mmc1_shiftcount = (m_mmc1_shiftcount + 1) % 5;
+
+	// are we done shifting?
+	if (!m_mmc1_shiftcount)
+	{
+		// apply data to registers
+		switch (BIT(offset, 13, 2))
+		{
+			case 0: // mirroring and options
+				m_mmc1_chr4k = m_mmc1_shiftreg & 0x10;
+				m_mmc1_prg16k = m_mmc1_shiftreg & 0x08;
+				m_mmc1_switchlow = m_mmc1_shiftreg & 0x04;
+				// 0x03: mirroring bits unused on VS
+				break;
+
+			case 1: // video rom banking - bank 0 - 4k or 8k
+				if (m_mmc1_chr4k)
+					v_set_videorom_bank(0, 4, m_mmc1_shiftreg * 4);
+				else
+					v_set_videorom_bank(0, 8, (m_mmc1_shiftreg & ~1) * 4);
+				break;
+
+			case 2: // video rom banking - bank 1 - 4k only
+				if (m_mmc1_chr4k)
+					v_set_videorom_bank(4, 4, m_mmc1_shiftreg * 4);
+				break;
+
+			case 3: // program banking
+				if (m_mmc1_prg16k)
+					prg16(!m_mmc1_switchlow, m_mmc1_shiftreg);
+				else
+					prg32(m_mmc1_shiftreg >> 1);
+				break;
+		}
+	}
+}
+
+void vs_uni_state::init_drmario()
+{
+	// point program banks to last 32K
+	init_prg_banking();
+
+	// MMC1 mapper at $8000-$ffff
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8sm_delegate(*this, FUNC(vs_uni_state::drmario_rom_banking)));
+
+	m_mmc1_shiftreg = 0;
+	m_mmc1_shiftcount = 0;
+}
+
+//**********************************************************************************
+// (UNROM) Games with VRAM instead of graphics ROMs: ROM banking at $8000-$ffff
+
+void vs_uni_state::vsvram_rom_banking(u8 data)
+{
+	prg16(0, data);
+}
+
+void vs_uni_state::init_vsvram()
+{
+	// point program banks to last 32K
+	init_prg_banking();
+
+	// banking is done with writes to the $8000-$ffff area
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8smo_delegate(*this, FUNC(vs_uni_state::vsvram_rom_banking)));
+}
+
+//**********************************************************************************
+// (Namco) 108 (MMC3 predecessor) games
+
+void vs_uni_state::vs108_rom_banking(offs_t offset, u8 data)
+{
+	switch (offset & 0x6001)
+	{
+		case 0x0000: // $8000
+			m_108_reg = data & 0x07;
+			break;
+
+		case 0x0001: // $8001
+			switch (m_108_reg)
+			{
+				case 0: case 1:
+					v_set_videorom_bank(m_108_reg * 2, 2, data);
+					break;
+				case 2: case 3: case 4: case 5:
+					v_set_videorom_bank(m_108_reg + 2, 1, data);
+					break;
+				case 6: case 7:
+					prg8(m_108_reg - 6, data);
+					break;
+			}
+			break;
+
+		default:
+			logerror("vs108_rom_banking uncaught: %04x value: %02x\n", offset + 0x8000, data);
+			break;
+	}
+}
+
+// Common init for (Namco) 108 games
+
+void vs_uni_state::init_vs108()
+{
+	// point program banks to last 32K
+	init_prg_banking();
+
+	m_108_reg = 0;
+
+	// 108 chip at $8000-$9fff
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8sm_delegate(*this, FUNC(vs_uni_state::vs108_rom_banking)));
+}
+
+// Vs. RBI Baseball
+// rbibb uses a protection chip labeled '127'
+// Tests indicate that '127' uses a LFSR with taps: 23, 18, 0
+// It is still unknown how bits are then shuffled for readback at 0x5601/0x5e01
+u8 vs_uni_state::rbibb_prot_r(offs_t offset)
+{
+	static constexpr u8 prot_data[32] = {
+		0xff, 0xfd, 0xf5, 0xf4, 0xb4, 0xb4, 0xa6, 0x2e,
+		0x2f, 0x6f, 0x6f, 0x7d, 0xd5, 0xd4, 0x94, 0x94,
+		0x86, 0x2e, 0x2f, 0x6f, 0x6b, 0x79, 0xd1, 0xd0,
+		0x92, 0x92, 0x8d, 0x65, 0x64, 0x34, 0xb0, 0xa2
+	};
+
+	if (offset == 0)
+	{
+		m_prot_index = 0;
+		return 0;
+	}
+
+	return prot_data[m_prot_index++ & 0x1f];
+}
+
+void vs_uni_state::init_rbibb()
+{
+	init_vs108();
+
+	// RBI Baseball protection, address fully decoded except A11
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5600, 0x5601, read8sm_delegate(*this, FUNC(vs_uni_state::rbibb_prot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5e00, 0x5e01, read8sm_delegate(*this, FUNC(vs_uni_state::rbibb_prot_r)));
+}
+
+// Vs. Super Xevious
+
+u8 vs_uni_state::supxevs_prot_1_r()
+{
+	m_prot_index ^= 1;
+	return 0x05;
+}
+
+u8 vs_uni_state::supxevs_prot_2_r()
+{
+	return m_prot_index ? 0x01 : 0x00;
+}
+
+u8 vs_uni_state::supxevs_prot_3_r()
+{
+	return m_prot_index ? 0x89 : 0xd1;
+}
+
+u8 vs_uni_state::supxevs_prot_4_r()
+{
+	return m_prot_index ? 0x37 : 0x3e;
+}
+
+void vs_uni_state::init_supxevs()
+{
+	init_vs108();
+
+	// Vs. Super Xevious Protection
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x54ff, 0x54ff, read8smo_delegate(*this, FUNC(vs_uni_state::supxevs_prot_1_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5678, 0x5678, read8smo_delegate(*this, FUNC(vs_uni_state::supxevs_prot_2_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x578f, 0x578f, read8smo_delegate(*this, FUNC(vs_uni_state::supxevs_prot_3_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5567, 0x5567, read8smo_delegate(*this, FUNC(vs_uni_state::supxevs_prot_4_r)));
+
+	m_prot_index = 0;
+}
+
+// Vs. TKO Boxing
+// tkoboxng uses a protection chip labeled '128'
+u8 vs_uni_state::tkoboxng_prot_r(offs_t offset)
+{
+	static constexpr u8 prot_data[32] = {
+		0xff, 0xbf, 0xb7, 0x97, 0x97, 0x17, 0x57, 0x4f,
+		0x6f, 0x6b, 0xeb, 0xa9, 0xb1, 0x90, 0x94, 0x14,
+		0x56, 0x4e, 0x6f, 0x6b, 0xeb, 0xa9, 0xb1, 0x90,
+		0xd4, 0x5c, 0x3e, 0x26, 0x87, 0x83, 0x13, 0x00
+	};
+
+	if (offset == 0)
+	{
+		m_prot_index = 0;
+		return 0;
+	}
+
+	return prot_data[m_prot_index++ & 0x1f];
+}
+
+void vs_uni_state::init_tkoboxng()
+{
+	init_vs108();
+
+	// security device at $5e00-$5e01
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5e00, 0x5e01, read8sm_delegate(*this, FUNC(vs_uni_state::tkoboxng_prot_r)));
+}
+
+// Vs. Freedom Force
+
+void vs_uni_state::init_vsfdf()
+{
+	init_vs108();
+	m_has_gun = true;
+}
+
+//**********************************************************************************
+// Sunsoft-3 (Platoon) rom banking
+
+void vs_uni_state::sunsoft3_rom_banking(offs_t offset, u8 data)
+{
+	switch (offset & 0x7800)
+	{
+		case 0x0800:
+		case 0x1800:
+		case 0x2800:
+		case 0x3800:
+			v_set_videorom_bank((offset >> 11) & 0x06, 2, data * 2);
+			break;
+
+		case 0x7800:
+			prg16(0, data);
+			break;
+	}
+
+}
+
+void vs_uni_state::init_platoon()
+{
+	// point program banks to last 32K
+	init_prg_banking();
+
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8sm_delegate(*this, FUNC(vs_uni_state::sunsoft3_rom_banking)));
+}
+
+//**********************************************************************************
+// Vs. Raid on Bungeling Bay (Japan)
+
+// FIXME: this is a bad hack! The unused 8K ROM in the driver supposedly runs on the main CPU (protection?)
+// and does some sort of handshake (with IRQs) with the game running on the sub CPU.
+void vs_uni_state::set_bnglngby_irq_w(u8 data)
+{
+	m_ret = data;
+	m_maincpu->set_input_line(0, (data & 2) ? ASSERT_LINE : CLEAR_LINE);
+	// other values ???
+	// 0, 4, 84
+}
+
+u8 vs_uni_state::set_bnglngby_irq_r()
+{
+	return m_ret;
+}
+
+void vs_uni_state::init_bnglngby()
+{
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0231, 0x0231, read8smo_delegate(*this, FUNC(vs_uni_state::set_bnglngby_irq_r)), write8smo_delegate(*this, FUNC(vs_uni_state::set_bnglngby_irq_w)));
+
+	m_ret = 0;
+
+	// normal banking
+	init_vsnormal();
+}
+
+//**********************************************************************************
+// VS DualSystem
+
+template <u8 Side>
+void vs_dual_state::vsdual_vrom_banking(u8 data)
+{
+	// switch vrom
+	m_chr_banks[Side]->set_entry(BIT(data, 2));
+
+	// bit 1 ( data & 2 ) triggers irq on the other cpu
+	auto cpu = (Side == SUB) ? m_maincpu : m_subcpu;
+	cpu->set_input_line(0, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
+
+	// move along
+	vsnes_in0_w<Side>(data);
+}
+
+void vs_dual_state::init_vsdual()
+{
+	// vrom switching is enabled with bit 2 of $4016
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4016, 0x4016, write8smo_delegate(*this, FUNC(vs_dual_state::vsdual_vrom_banking<MAIN>)));
+	m_subcpu->space(AS_PROGRAM).install_write_handler(0x4016, 0x4016, write8smo_delegate(*this, FUNC(vs_dual_state::vsdual_vrom_banking<SUB>)));
+}
+
+//**********************************************************************************
+// Vs. Super Mario Bros (Bootleg)
+
+void vs_smbbl_state::smbbl_scanline_cb(int scanline, bool vblank, bool blanked)
+{
+	// Z80 IRQ is controlled by two factors:
+	// - bit 6 of current (next) scanline number
+	// - bit 6 of latched scanline number from Z80 reading $4000
+	if (!BIT(m_bootleg_latched_scanline, 6))
+	{
+		m_subcpu->set_input_line(INPUT_LINE_IRQ0, BIT(scanline + 1, 6) ? ASSERT_LINE : CLEAR_LINE);
+	}
+}
+
+u8 vs_smbbl_state::smbbl_ppu_data_r()
+{
+	// CPU always reads higher CHR ROM banks from $2007, PPU always reads lower ones
+	m_chr_banks[0]->set_entry(1);
+	u8 data = m_ppu1->read(0x2007);
+	m_chr_banks[0]->set_entry(0);
+
+	return data;
+}
 
 
-void vsnes_state::vsnes_cpu1_map(address_map &map)
+//******************************************************************************
+
+
+void vs_base_state::vsnes_cpu1_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x1800).ram();
 	map(0x2000, 0x3fff).rw(m_ppu1, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4014, 0x4014).w(FUNC(vsnes_state::sprite_dma_w<MAIN>));
-	map(0x4016, 0x4016).rw(FUNC(vsnes_state::vsnes_in0_r<MAIN>), FUNC(vsnes_state::vsnes_in0_w<MAIN>));
-	map(0x4017, 0x4017).r(FUNC(vsnes_state::vsnes_in1_r<MAIN>)); // IN1 - input port 2 / PSG second control register
-	map(0x4020, 0x5fff).rw(FUNC(vsnes_state::vsnes_coin_counter_r<MAIN>), FUNC(vsnes_state::vsnes_coin_counter_w<MAIN>));
+	map(0x4014, 0x4014).w(FUNC(vs_base_state::sprite_dma_w<MAIN>));
+	map(0x4016, 0x4016).rw(FUNC(vs_base_state::vsnes_in0_r<MAIN>), FUNC(vs_base_state::vsnes_in0_w<MAIN>));
+	map(0x4017, 0x4017).r(FUNC(vs_base_state::vsnes_in1_r<MAIN>)); // IN1 - input port 2 / PSG second control register
+	map(0x4020, 0x5fff).rw(FUNC(vs_base_state::vsnes_coin_counter_r<MAIN>), FUNC(vs_base_state::vsnes_coin_counter_w<MAIN>));
 	map(0x6000, 0x67ff).mirror(0x1800).ram().share("nvram");
 	// Games that don't bank PRG
 	map(0x8000, 0xffff).rom().region("prg", 0);
@@ -260,19 +1011,19 @@ void vsnes_state::vsnes_cpu1_map(address_map &map)
 	m_prg_view[0](0xe000, 0xffff).bankr(m_prg_banks[3]);
 }
 
-void vsnes_state::vsnes_cpu2_map(address_map &map)
+void vs_base_state::vsnes_cpu2_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x1800).ram();
 	map(0x2000, 0x3fff).rw(m_ppu2, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4014, 0x4014).w(FUNC(vsnes_state::sprite_dma_w<SUB>));
-	map(0x4016, 0x4016).rw(FUNC(vsnes_state::vsnes_in0_r<SUB>), FUNC(vsnes_state::vsnes_in0_w<SUB>));
-	map(0x4017, 0x4017).r(FUNC(vsnes_state::vsnes_in1_r<SUB>));  // IN1 - input port 2 / PSG second control register
-	map(0x4020, 0x5fff).rw(FUNC(vsnes_state::vsnes_coin_counter_r<SUB>), FUNC(vsnes_state::vsnes_coin_counter_w<SUB>));
+	map(0x4014, 0x4014).w(FUNC(vs_base_state::sprite_dma_w<SUB>));
+	map(0x4016, 0x4016).rw(FUNC(vs_base_state::vsnes_in0_r<SUB>), FUNC(vs_base_state::vsnes_in0_w<SUB>));
+	map(0x4017, 0x4017).r(FUNC(vs_base_state::vsnes_in1_r<SUB>));  // IN1 - input port 2 / PSG second control register
+	map(0x4020, 0x5fff).rw(FUNC(vs_base_state::vsnes_coin_counter_r<SUB>), FUNC(vs_base_state::vsnes_coin_counter_w<SUB>));
 	map(0x6000, 0x67ff).mirror(0x1800).ram().share("nvram");
 	map(0x8000, 0xffff).rom();
 }
 
-void vsnes_state::vsnes_ppu1_map(address_map &map)
+void vs_base_state::vsnes_ppu1_map(address_map &map)
 {
 	map(0x0000, 0x1fff).bankr(m_chr_banks[0]);
 	map(0x0000, 0x1fff).view(m_chr_view);
@@ -281,7 +1032,7 @@ void vsnes_state::vsnes_ppu1_map(address_map &map)
 	map(0x3f00, 0x3fff).rw(m_ppu1, FUNC(ppu2c0x_device::palette_read), FUNC(ppu2c0x_device::palette_write));
 }
 
-void vsnes_state::vsnes_ppu2_map(address_map &map)
+void vs_base_state::vsnes_ppu2_map(address_map &map)
 {
 	map(0x0000, 0x1fff).bankr(m_chr_banks[1]);
 	map(0x2000, 0x2fff).mirror(0x1000).ram();
@@ -290,7 +1041,7 @@ void vsnes_state::vsnes_ppu2_map(address_map &map)
 
 
 
-uint8_t vsnes_state::vsnes_bootleg_z80_address_r(offs_t offset)
+u8 vs_smbbl_state::smbbl_z80_address_r(offs_t offset)
 {
 	// NMI routine uses the value read here as the low part of an offset from 0x2000 to store a value read at 0x4000
 	// before reading 0x6000 and returning
@@ -303,7 +1054,7 @@ uint8_t vsnes_state::vsnes_bootleg_z80_address_r(offs_t offset)
 	return 0xf0 | m_bootleg_sound_offset;
 }
 
-void vsnes_state::bootleg_sound_write(offs_t offset, uint8_t data)
+void vs_smbbl_state::smbbl_6502_sn_w(offs_t offset, u8 data)
 {
 	m_bootleg_sound_offset = offset & 0xf;
 	m_bootleg_sound_data = data;
@@ -311,7 +1062,7 @@ void vsnes_state::bootleg_sound_write(offs_t offset, uint8_t data)
 	m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
-uint8_t vsnes_state::vsnes_bootleg_z80_data_r()
+u8 vs_smbbl_state::smbbl_z80_data_r()
 {
 	//printf("Z80 read data %02x\n", m_bootleg_sound_data);
 	m_bootleg_latched_scanline = m_ppu1->get_current_scanline();
@@ -321,7 +1072,7 @@ uint8_t vsnes_state::vsnes_bootleg_z80_data_r()
 }
 
 // A0 = SN #1 enable, A1 = SN #2 enable, A2 = SN write enables (both) on edge
-void vsnes_state::vssmbbl_sn_w(offs_t offset, uint8_t data)
+void vs_smbbl_state::smbbl_z80_sn_w(offs_t offset, u8 data)
 {
 //  printf("sn_w: ofs %x\n", offset & 7);
 	if (!(offset & 4))
@@ -340,14 +1091,15 @@ void vsnes_state::vssmbbl_sn_w(offs_t offset, uint8_t data)
 
 
 // the bootleg still makes writes to the PSG addresses, it seems the Z80 should interpret them to play the sounds
-void vsnes_state::vsnes_cpu1_bootleg_map(address_map &map)
+void vs_smbbl_state::smbbl_6502_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x0800).ram();
 	map(0x2000, 0x3fff).rw(m_ppu1, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4000, 0x400f).w(FUNC(vsnes_state::bootleg_sound_write));
-	map(0x4016, 0x4016).rw(FUNC(vsnes_state::vsnes_in0_r<MAIN>), FUNC(vsnes_state::vsnes_in0_w<MAIN>));
-	map(0x4017, 0x4017).r(FUNC(vsnes_state::vsnes_in1_r<MAIN>)); // IN1 - input port 2 / PSG second control register
-	map(0x4020, 0x4020).w(FUNC(vsnes_state::vsnes_coin_counter_w<MAIN>));
+	map(0x2007, 0x2007).r(FUNC(vs_smbbl_state::smbbl_ppu_data_r));
+	map(0x4000, 0x400f).w(FUNC(vs_smbbl_state::smbbl_6502_sn_w));
+	map(0x4016, 0x4016).rw(FUNC(vs_smbbl_state::vsnes_in0_r<MAIN>), FUNC(vs_smbbl_state::vsnes_in0_w<MAIN>));
+	map(0x4017, 0x4017).r(FUNC(vs_smbbl_state::vsnes_in1_r<MAIN>)); // IN1 - input port 2 / PSG second control register
+	map(0x4020, 0x4020).w(FUNC(vs_smbbl_state::vsnes_coin_counter_w<MAIN>));
 	map(0x6000, 0x67ff).mirror(0x0800).ram();
 	map(0x8000, 0xffff).rom();
 }
@@ -365,211 +1117,129 @@ void vsnes_state::vsnes_cpu1_bootleg_map(address_map &map)
 // x11x xxxx xxxx xxxx = 6502 address (6000) (read)
 // x11x xxxx xxxx xW21 = SN76489s (6000) (write)
 
-void vsnes_state::vsnes_bootleg_z80_map(address_map &map)
+void vs_smbbl_state::smbbl_z80_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom().region("sub", 0);
-	map(0x2000, 0x27ff).ram();
-
-	map(0x4000, 0x5fff).r(FUNC(vsnes_state::vsnes_bootleg_z80_data_r)); // read in IRQ & NMI
-	map(0x6000, 0x7fff).rw(FUNC(vsnes_state::vsnes_bootleg_z80_address_r), FUNC(vsnes_state::vssmbbl_sn_w));
+	map(0x2000, 0x27ff).mirror(0x1800).ram();
+	map(0x4000, 0x5fff).r(FUNC(vs_smbbl_state::smbbl_z80_data_r)); // read in IRQ & NMI
+	map(0x6000, 0x7fff).rw(FUNC(vs_smbbl_state::smbbl_z80_address_r), FUNC(vs_smbbl_state::smbbl_z80_sn_w));
 }
 
-void vsnes_state::vsnes_ppu_bootleg_map(address_map &map)
+void vs_smbbl_state::smbbl_ppu_map(address_map &map)
 {
 	map(0x0000, 0x1fff).bankr(m_chr_banks[0]);
 	map(0x2000, 0x27ff).mirror(0x1800).ram();
 	map(0x3f00, 0x3fff).rw(m_ppu1, FUNC(ppu2c0x_device::palette_read), FUNC(ppu2c0x_device::palette_write));
 }
 
-/******************************************************************************/
+//******************************************************************************
 
+#define VS_UNI_JOYSTICK(port_tag, player, type1, name1)  \
+	PORT_START(port_tag)                                 \
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(player) PORT_NAME("%p A")  \
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(player) PORT_NAME("%p B")  \
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, type1 ) PORT_NAME(name1)                 \
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )                             \
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(player)    \
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(player)  \
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(player)  \
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(player)
 
-static INPUT_PORTS_START( vsnes )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)    /* BUTTON A on a nes */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)    /* BUTTON B on a nes */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )            /* SELECT on a nes */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )           /* START on a nes */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+#define VS_DUAL_JOYSTICK(port_tag, player, type1, type2, name1, name2)  \
+	PORT_START(port_tag)                                                \
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(player) PORT_NAME("%p A")  \
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(player) PORT_NAME("%p B")  \
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, type1 ) PORT_NAME(name1)                 \
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, type2 ) PORT_NAME(name2)                 \
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(player)    \
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(player)  \
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(player)  \
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(player)
 
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)    /* BUTTON A on a nes */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)    /* BUTTON B on a nes */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 )            /* SELECT on a nes */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )           /* START on a nes */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+// bit 0: serial controller pin
+// bit 1: always 0 (from floating input on 74LS240)
+// bit 2: service switch
+// bit 3-4: DSW SW:1,2
+// bit 5-6: coins
+// bit 7: CPU indicator bit (Main: 0, Sub: 1)
+// Note: Port impulse is 3 frames since 1 frame is too short for some games (T.K.O. Boxing).
+// Testing on VS. hardware shows the actual coin drop time varies between 2.5 to 4 frames.
+#define VS_COINS_AND_SERVICE(coin_tag, service, coin1, coin2)  \
+	PORT_START(coin_tag)                                       \
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )               \
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )               \
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, service) PORT_IMPULSE(3)   \
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )               \
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )               \
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, coin1 ) PORT_IMPULSE(3)    \
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, coin2 ) PORT_IMPULSE(3)    \
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("COINS1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )            /* serial pin from controller */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_IMPULSE(1)  /* service credit? */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )            /* bit 0 of dsw goes here */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )            /* bit 1 of dsw goes here */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	/* There is also a DSW which is defined per game, below */
-INPUT_PORTS_END
-
+// So-called "reversed" controls. This represents the actual VS. wiring. The left controller
+// and buttons are read from $4017, while the right controller and buttons are read from $4016.
+// Most games follow the standard convention and consider the left controller P1, when it matters.
+// Note, this is reversed from NES where P1 is read from $4016 and P2 is read from $4017.
 static INPUT_PORTS_START( vsnes_rev )
-	PORT_INCLUDE( vsnes )
+	VS_UNI_JOYSTICK("IN0", 2, IPT_START1, "Select 1 (Blue)")
+	VS_UNI_JOYSTICK("IN1", 1, IPT_START2, "Select 2 (Green)")
+	VS_COINS_AND_SERVICE("COINS1", IPT_SERVICE1, IPT_COIN1, IPT_COIN2)
 
-	PORT_MODIFY("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)    /* BUTTON A on a nes */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)    /* BUTTON B on a nes */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-
-	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)    /* BUTTON A on a nes */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)    /* BUTTON B on a nes */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	// There is also a DSW which is defined per game, below
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( vsnes_dual )
-	/* Left Side Controls */
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)    /* BUTTON A on a nes */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)    /* BUTTON B on a nes */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )            /* SELECT on a nes */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START3 )            /* START on a nes */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+// Only used by SMB, TKO Boxing, and Mighty Bomb Jack. In 2 player games these
+// games consider the right controls to be P1, so we relabel them for convenience.
+static INPUT_PORTS_START( vsnes )
+	VS_UNI_JOYSTICK("IN0", 1, IPT_START1, "Select 1 (Blue)")
+	VS_UNI_JOYSTICK("IN1", 2, IPT_START2, "Select 2 (Green)")
+	VS_COINS_AND_SERVICE("COINS1", IPT_SERVICE1, IPT_COIN1, IPT_COIN2)
 
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)    /* BUTTON A on a nes */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)    /* BUTTON B on a nes */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 )            /* SELECT on a nes */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START4 )            /* START on a nes */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-
-	PORT_START("COINS1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )            /* serial pin from controller */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_IMPULSE(1)  /* service credit? */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )            /* bit 0 of dsw goes here */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )            /* bit 1 of dsw goes here */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )            /* this bit masks irqs - don't change */
-
-	/* Right Side Controls */
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3)    /* BUTTON A on a nes */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3)    /* BUTTON B on a nes */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("2nd Side 1 Player Start") PORT_CODE(KEYCODE_MINUS)   /* SELECT on a nes */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("2nd Side 3 Player Start") PORT_CODE(KEYCODE_BACKSLASH)   /* START on a nes */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(3)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(3)
-
-	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(4)    /* BUTTON A on a nes */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(4)    /* BUTTON B on a nes */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("2nd Side 2 Player Start") PORT_CODE(KEYCODE_EQUALS)  /* SELECT on a nes */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("2nd Side 4 Player Start") PORT_CODE(KEYCODE_BACKSPACE)   /* START on a nes */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(4)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(4)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(4)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(4)
-
-	PORT_START("COINS2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )            /* serial pin from controller */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_IMPULSE(1)  /* service credit? */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )            /* bit 0 of dsw goes here */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )            /* bit 1 of dsw goes here */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )            /* this bit masks irqs - don't change */
-
-	/* Both sides also have a DSW (#0 & #1) which are defined per game, below */
+	// There is also a DSW which is defined per game, below
 INPUT_PORTS_END
 
+// Standard "reversed" controls for DualSystem.
 static INPUT_PORTS_START( vsnes_dual_rev )
-	PORT_INCLUDE( vsnes_dual )
+	// Left Side Controls
+	VS_DUAL_JOYSTICK("IN0", 2, IPT_START1, IPT_START3, "Select 1 (Blue)", "Select 3 (Purple)")
+	VS_DUAL_JOYSTICK("IN1", 1, IPT_START2, IPT_START4, "Select 2 (Green)", "Select 4 (Yellow)")
+	VS_COINS_AND_SERVICE("COINS1", IPT_SERVICE1, IPT_COIN1, IPT_COIN2)
 
-	PORT_MODIFY("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)    /* BUTTON A on a nes */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)    /* BUTTON B on a nes */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	// Right Side Controls
+	VS_DUAL_JOYSTICK("IN2", 4, IPT_START5, IPT_START7, "2nd Side Select 1 (Blue)", "2nd Side Select 3 (Purple)")
+	VS_DUAL_JOYSTICK("IN3", 3, IPT_START6, IPT_START8, "2nd Side Select 2 (Green)", "2nd Side Select 4 (Yellow)")
+	VS_COINS_AND_SERVICE("COINS2", IPT_SERVICE2, IPT_COIN3, IPT_COIN4)
 
-	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)    /* BUTTON A on a nes */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)    /* BUTTON B on a nes */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	// Both sides also have a DSW (#0 & #1) which are defined per game, below
+INPUT_PORTS_END
 
-	PORT_MODIFY("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(4)    /* BUTTON A on a nes */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(4)    /* BUTTON B on a nes */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(4)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(4)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(4)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(4)
+// Only used by vstennis and defined for convenience. In a doubles match P1 and P3 will serve
+// first for their respective side. On hardware this is the right controls on either panel.
+static INPUT_PORTS_START( vsnes_dual )
+	// Left Side Controls
+	VS_DUAL_JOYSTICK("IN0", 1, IPT_START1, IPT_START3, "Select 1 (Blue)", "Select 3 (Purple)")
+	VS_DUAL_JOYSTICK("IN1", 2, IPT_START2, IPT_START4, "Select 2 (Green)", "Select 4 (Yellow)")
+	VS_COINS_AND_SERVICE("COINS1", IPT_SERVICE1, IPT_COIN1, IPT_COIN2)
 
-	PORT_MODIFY("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3)    /* BUTTON A on a nes */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3)    /* BUTTON B on a nes */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(3)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(3)
+	// Right Side Controls
+	VS_DUAL_JOYSTICK("IN2", 3, IPT_START5, IPT_START7, "2nd Side Select 1 (Blue)", "2nd Side Select 3 (Purple)")
+	VS_DUAL_JOYSTICK("IN3", 4, IPT_START6, IPT_START8, "2nd Side Select 2 (Green)", "2nd Side Select 4 (Yellow)")
+	VS_COINS_AND_SERVICE("COINS2", IPT_SERVICE2, IPT_COIN3, IPT_COIN4)
+
+	// Both sides also have a DSW (#0 & #1) which are defined per game, below
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vsnes_zapper )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )             // low 6 bits always read 0b010000
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNUSED )            // low 6 bits always read 0b010000
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )            /* sprite hit */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 )           /* gun trigger */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )            // sprite hit
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 )           // gun trigger
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("COINS1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )            /* serial pin from controller */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_IMPULSE(1)  /* service credit? */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )            /* bit 0 of dsw goes here */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )            /* bit 1 of dsw goes here */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	VS_COINS_AND_SERVICE("COINS1", IPT_SERVICE1, IPT_COIN1, IPT_COIN2)
 
 	PORT_START("GUNX")  // FAKE - Gun X pos
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_MINMAX(0, 255)
@@ -580,9 +1250,9 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( topgun )
-	PORT_INCLUDE( vsnes )
+	PORT_INCLUDE( vsnes_rev )
 
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW0")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!1,!2,!3")
 	PORT_DIPSETTING(    0x03, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 4C_1C ) )
@@ -595,7 +1265,7 @@ static INPUT_PORTS_START( topgun )
 	PORT_DIPNAME( 0x08, 0x00, "Lives per Coin" )        PORT_DIPLOCATION("SW1:!4")
 	PORT_DIPSETTING(    0x00, "3 - 12 Max" )
 	PORT_DIPSETTING(    0x08, "2 - 9 Max" )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SW1:!5,!6")
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:!5,!6")
 	PORT_DIPSETTING(    0x00, "30k and Every 50k" )
 	PORT_DIPSETTING(    0x20, "50k and Every 100k" )
 	PORT_DIPSETTING(    0x10, "100k and Every 150k" )
@@ -609,9 +1279,9 @@ static INPUT_PORTS_START( topgun )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( platoon )
-	PORT_INCLUDE( vsnes )
+	PORT_INCLUDE( vsnes_rev )
 
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW0")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:!1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -640,7 +1310,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( golf )
 	PORT_INCLUDE( vsnes_rev )
 
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW0")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
 	PORT_DIPNAME( 0x07, 0x01, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!1,!2,!3")
 	PORT_DIPSETTING(    0x07, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 3C_1C ) )
@@ -650,12 +1320,12 @@ static INPUT_PORTS_START( golf )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x08, 0x00, "Hole Size" )         PORT_DIPLOCATION("SW1:!4")
+	PORT_DIPNAME( 0x08, 0x00, "Hole Size" )             PORT_DIPLOCATION("SW1:!4")
 	PORT_DIPSETTING(    0x00, "Large" )
 	PORT_DIPSETTING(    0x08, "Small" )
 	PORT_DIPNAME( 0x10, 0x00, "Points per Stroke" )     PORT_DIPLOCATION("SW1:!5")
-	PORT_DIPSETTING(    0x00, DEF_STR( Easier ) ) /* See table below for "OFF" setting */
-	PORT_DIPSETTING(    0x10, DEF_STR( Harder ) ) /* See table below for "ON" setting */
+	PORT_DIPSETTING(    0x00, DEF_STR( Easier ) )       // See table below for "OFF" setting
+	PORT_DIPSETTING(    0x10, DEF_STR( Harder ) )       // See table below for "ON" setting
 /*
 Stroke Play   OFF/ON
 Hole in 1     +5  +4
@@ -681,21 +1351,22 @@ Lose Hole   -1  -2
 	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )
 INPUT_PORTS_END
 
-/* Same as 'golf', but 4 start buttons */
+// Same as 'golf', but 4 start buttons
+// FIXME: since UniSystems only have P1/P2 start buttons this implies the golf4s versions are for DualSystem only
 static INPUT_PORTS_START( golf4s )
 	PORT_INCLUDE( golf )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START3 )        /* START on a nes */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START3 ) PORT_NAME("Select 3 (Purple)")  // START on a NES
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START4 )        /* START on a nes */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START4 ) PORT_NAME("Select 4 (Yellow)")  // START on a NES
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vstennis )
 	PORT_INCLUDE( vsnes_dual )
 
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW0")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
 	PORT_DIPNAME( 0x03, 0x00, "Difficulty Vs. Computer" )   PORT_DIPLOCATION("SW1:!1,!2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
@@ -706,31 +1377,31 @@ static INPUT_PORTS_START( vstennis )
 	PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x10, 0x00, "Raquet Size" )       PORT_DIPLOCATION("SW1:!5")
+	PORT_DIPNAME( 0x10, 0x00, "Raquet Size" )           PORT_DIPLOCATION("SW1:!5")
 	PORT_DIPSETTING(    0x00, "Large" )
 	PORT_DIPSETTING(    0x10, "Small" )
-	PORT_DIPNAME( 0x20, 0x00, "Extra Score" )       PORT_DIPLOCATION("SW1:!6")
+	PORT_DIPNAME( 0x20, 0x00, "Extra Score" )           PORT_DIPLOCATION("SW1:!6")
 	PORT_DIPSETTING(    0x00, "1 Set" )
 	PORT_DIPSETTING(    0x20, "1 Game" )
-	PORT_DIPNAME( 0x40, 0x00, "Court Color" )       PORT_DIPLOCATION("SW1:!7")
+	PORT_DIPNAME( 0x40, 0x00, "Court Color" )           PORT_DIPLOCATION("SW1:!7")
 	PORT_DIPSETTING(    0x00, "Green" )
 	PORT_DIPSETTING(    0x40, "Blue" )
-	PORT_DIPNAME( 0x80, 0x00, "Copyright" )         PORT_DIPLOCATION("SW1:!8")
+	PORT_DIPNAME( 0x80, 0x00, "Copyright" )             PORT_DIPLOCATION("SW1:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( USA ) )
 
-	PORT_START("DSW1")  /* DSW1 - bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
-	PORT_SERVICE( 0x01, IP_ACTIVE_HIGH )            PORT_DIPLOCATION("SW2:!1")
+	PORT_START("DSW1")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
+	PORT_SERVICE( 0x01, IP_ACTIVE_HIGH )                PORT_DIPLOCATION("SW2:!1")
 	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW2:!2,!3")
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( Free_Play ) )
 	PORT_DIPNAME( 0x18, 0x08, "Game Mode - Credits: 1VsC/2VsC/1Vs1/2Vs2" )  PORT_DIPLOCATION("SW2:!4,!5")
-	PORT_DIPSETTING(    0x00, "A - 1/1/1/1" )
-	PORT_DIPSETTING(    0x10, "B - 1/2/1/2" )
-	PORT_DIPSETTING(    0x08, "C - 2/2/2/2" )
-	PORT_DIPSETTING(    0x18, "D - 2/2/4/4" )
+	PORT_DIPSETTING(    0x00, "A - 1/1/2/2" )
+	PORT_DIPSETTING(    0x10, "B - 1/2/2/2" )
+	PORT_DIPSETTING(    0x08, "C - 1/1/2/4" )
+	PORT_DIPSETTING(    0x18, "D - 1/2/2/4" )
 	PORT_DIPNAME( 0x60, 0x00, "Rackets Per Game" )      PORT_DIPLOCATION("SW2:!6,!7")
 	PORT_DIPSETTING(    0x60, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
@@ -742,9 +1413,9 @@ static INPUT_PORTS_START( vstennis )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( wrecking )
-	PORT_INCLUDE( vsnes_dual )
+	PORT_INCLUDE( vsnes_dual_rev )
 
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW0")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!1,!2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
@@ -759,7 +1430,7 @@ static INPUT_PORTS_START( wrecking )
 	PORT_DIPSETTING(    0x14, "80,000 Pts" )
 	PORT_DIPSETTING(    0x0c, "100,000 Pts" )
 	PORT_DIPSETTING(    0x1c, DEF_STR( None ) )
-	PORT_DIPNAME( 0xe0, 0xe0, "Additional Bonus Lives" )    PORT_DIPLOCATION("SW1:!6,!7,!8") /* Manual shows NONE as Factory Shipment Setting */
+	PORT_DIPNAME( 0xe0, 0xe0, "Additional Bonus Lives" )    PORT_DIPLOCATION("SW1:!6,!7,!8") // Manual shows NONE as Factory Shipment Setting
 	PORT_DIPSETTING(    0x00, "20,000 Pts" )
 	PORT_DIPSETTING(    0x80, "30,000 Pts" )
 	PORT_DIPSETTING(    0x40, "40,000 Pts" )
@@ -769,7 +1440,7 @@ static INPUT_PORTS_START( wrecking )
 	PORT_DIPSETTING(    0xa0, "100,000 Pts" )
 	PORT_DIPSETTING(    0xe0, DEF_STR( None ) )
 
-	PORT_START("DSW1")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW1")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
 	PORT_DIPNAME( 0x07, 0x01, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW2:!1,!2,!3")
 	PORT_DIPSETTING(    0x07, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 3C_1C ) )
@@ -784,17 +1455,17 @@ static INPUT_PORTS_START( wrecking )
 	PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x20, 0x00, "Copyright" )         PORT_DIPLOCATION("SW2:!6")
-	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )    /* (c) Nintendo Co., Ltd. */
-	PORT_DIPSETTING(    0x20, DEF_STR( USA ) )      /* (c) Nintendo of America Inc. */
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "SW2:!7" )       /* Manual states this is Unused */
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW2:!8" )       /* Manual states this is Unused */
+	PORT_DIPNAME( 0x20, 0x00, "Copyright" )             PORT_DIPLOCATION("SW2:!6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )        // (c) Nintendo Co., Ltd.
+	PORT_DIPSETTING(    0x20, DEF_STR( USA ) )          // (c) Nintendo of America Inc.
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "SW2:!7" )       // Manual states this is Unused
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW2:!8" )       // Manual states this is Unused
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( balonfgt )
-	PORT_INCLUDE( vsnes_dual )
+	PORT_INCLUDE( vsnes_dual_rev )
 
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW0")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!1,!2,!3")
 	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
@@ -804,13 +1475,13 @@ static INPUT_PORTS_START( balonfgt )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( Free_Play ) )
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x00, "SW1:!4" )       /* Manual states this is Unused */
-	PORT_DIPUNUSED_DIPLOC( 0x10, 0x00, "SW1:!5" )       /* Manual states this is Unused */
-	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "SW1:!6" )       /* Manual states this is Unused */
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "SW1:!7" )       /* Manual states this is Unused */
-	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )            PORT_DIPLOCATION("SW1:!8")
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x00, "SW1:!4" )       // Manual states this is Unused
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x00, "SW1:!5" )       // Manual states this is Unused
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "SW1:!6" )       // Manual states this is Unused
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "SW1:!7" )       // Manual states this is Unused
+	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )                PORT_DIPLOCATION("SW1:!8")
 
-	PORT_START("DSW1")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW1")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:!1,!2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
@@ -829,18 +1500,18 @@ static INPUT_PORTS_START( balonfgt )
 	PORT_DIPSETTING(    0x40, "20,000 Pts" )
 	PORT_DIPSETTING(    0x20, "40,000 Pts" )
 	PORT_DIPSETTING(    0x60, DEF_STR( None ) )
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW2:!8" )       /* Manual states this is Unused */
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW2:!8" )       // Manual states this is Unused
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vsmahjng )
-	PORT_INCLUDE( vsnes_dual )
+	PORT_INCLUDE( vsnes_dual_rev )
 
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW0")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x00, "SW1:!1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x00, "SW1:!2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW1:!3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:!4" )
-	PORT_DIPNAME( 0x30, 0x00, "Time" )          PORT_DIPLOCATION("SW1:!5,!6")
+	PORT_DIPNAME( 0x30, 0x00, "Time" )                  PORT_DIPLOCATION("SW1:!5,!6")
 	PORT_DIPSETTING(    0x30, "30" )
 	PORT_DIPSETTING(    0x10, "45" )
 	PORT_DIPSETTING(    0x20, "60" )
@@ -848,8 +1519,8 @@ static INPUT_PORTS_START( vsmahjng )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW1:!7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:!8" )
 
-	PORT_START("DSW1")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
-	PORT_SERVICE( 0x01, IP_ACTIVE_HIGH )            PORT_DIPLOCATION("SW2:!1")
+	PORT_START("DSW1")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
+	PORT_SERVICE( 0x01, IP_ACTIVE_HIGH )                PORT_DIPLOCATION("SW2:!1")
 	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW2:!2,!3")
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -868,9 +1539,9 @@ static INPUT_PORTS_START( vsmahjng )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vsbball )
-	PORT_INCLUDE( vsnes_dual )
+	PORT_INCLUDE( vsnes_dual_rev )
 
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW0")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
 	PORT_DIPNAME( 0x03, 0x02, "Player Defense Strength" )   PORT_DIPLOCATION("SW1:!1,!2")
 	PORT_DIPSETTING(    0x00, "Weak" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
@@ -892,8 +1563,8 @@ static INPUT_PORTS_START( vsbball )
 	PORT_DIPSETTING(    0x40, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0xc0, "Strong" )
 
-	PORT_START("DSW1")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
-	PORT_SERVICE( 0x01, IP_ACTIVE_HIGH )            PORT_DIPLOCATION("SW2:!1")
+	PORT_START("DSW1")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
+	PORT_SERVICE( 0x01, IP_ACTIVE_HIGH )                PORT_DIPLOCATION("SW2:!1")
 	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW2:!2,!3")
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -908,57 +1579,7 @@ static INPUT_PORTS_START( vsbball )
 	PORT_DIPSETTING(    0x28, "300 Pts" )
 	PORT_DIPSETTING(    0x18, "350 Pts" )
 	PORT_DIPSETTING(    0x38, "400 Pts" )
-	PORT_DIPNAME( 0x40, 0x00, "Bonus Play" )        PORT_DIPLOCATION("SW2:!7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:!8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( vsbballj )
-	PORT_INCLUDE( vsnes_dual )
-
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
-	PORT_DIPNAME( 0x03, 0x02, "Player Defense Strength" )   PORT_DIPLOCATION("SW1:!1,!2")
-	PORT_DIPSETTING(    0x00, "Weak" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x03, "Strong" )
-	PORT_DIPNAME( 0x0c, 0x08, "Player Offense Strength" )   PORT_DIPLOCATION("SW1:!3,!4")
-	PORT_DIPSETTING(    0x00, "Weak" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x0c, "Strong" )
-	PORT_DIPNAME( 0x30, 0x20, "Computer Defense Strength" ) PORT_DIPLOCATION("SW1:!5,!6")
-	PORT_DIPSETTING(    0x00, "Weak" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x30, "Strong" )
-	PORT_DIPNAME( 0xc0, 0x80, "Computer Offense Strength" ) PORT_DIPLOCATION("SW1:!7,!8")
-	PORT_DIPSETTING(    0x00, "Weak" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0xc0, "Strong" )
-
-	PORT_START("DSW1")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
-	PORT_SERVICE( 0x01, IP_ACTIVE_HIGH )            PORT_DIPLOCATION("SW2:!1")
-	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW2:!2,!3")
-	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x38, 0x00, "Starting Points" )       PORT_DIPLOCATION("SW2:!4,!5,!6")
-	PORT_DIPSETTING(    0x00, "80 Pts" )
-	PORT_DIPSETTING(    0x20, "100 Pts" )
-	PORT_DIPSETTING(    0x10, "150 Pts" )
-	PORT_DIPSETTING(    0x30, "200 Pts" )
-	PORT_DIPSETTING(    0x08, "250 Pts" )
-	PORT_DIPSETTING(    0x28, "300 Pts" )
-	PORT_DIPSETTING(    0x18, "350 Pts" )
-	PORT_DIPSETTING(    0x38, "400 Pts" )
-	PORT_DIPNAME( 0x40, 0x00, "Bonus Play" )        PORT_DIPLOCATION("SW2:!7")
+	PORT_DIPNAME( 0x40, 0x00, "Bonus Play" )            PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:!8")
@@ -966,11 +1587,10 @@ static INPUT_PORTS_START( vsbballj )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-/* iceclmrj has dual inputs reversed! */
 static INPUT_PORTS_START( iceclmrj )
 	PORT_INCLUDE( vsnes_dual_rev )
 
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW0")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
 	PORT_DIPNAME( 0x07, 0x00, "Coinage (Left Side)" )   PORT_DIPLOCATION("SW1:!1,!2,!3")
 	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
@@ -991,7 +1611,7 @@ static INPUT_PORTS_START( iceclmrj )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("DSW1")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW1")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
 	PORT_DIPNAME( 0x07, 0x00, "Coinage (Right Side)" )  PORT_DIPLOCATION("SW2:!1,!2,!3")
 	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
@@ -1016,18 +1636,18 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( drmario )
 	PORT_INCLUDE( vsnes_rev )
 
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW0")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
 	PORT_DIPNAME( 0x03, 0x03, "Drop Rate Increases After" ) PORT_DIPLOCATION("SW1:!1,!2")
 	PORT_DIPSETTING(    0x00, "7 Pills" )
 	PORT_DIPSETTING(    0x01, "8 Pills" )
 	PORT_DIPSETTING(    0x02, "9 Pills" )
 	PORT_DIPSETTING(    0x03, "10 Pills" )
-	PORT_DIPNAME( 0x0c, 0x04, "Virus Level" )       PORT_DIPLOCATION("SW1:!3,!4")
+	PORT_DIPNAME( 0x0c, 0x04, "Virus Level" )           PORT_DIPLOCATION("SW1:!3,!4")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x08, "5" )
 	PORT_DIPSETTING(    0x0c, "7" )
-	PORT_DIPNAME( 0x30, 0x00, "Drop Speed Up" )     PORT_DIPLOCATION("SW1:!5,!6")
+	PORT_DIPNAME( 0x30, 0x00, "Drop Speed Up" )         PORT_DIPLOCATION("SW1:!5,!6")
 	PORT_DIPSETTING(    0x00, "Slow" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x20, "Fast" )
@@ -1043,7 +1663,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( rbibb )
 	PORT_INCLUDE( vsnes_rev )
 
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW0")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!1,!2")
 	PORT_DIPSETTING(    0x03, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
@@ -1057,7 +1677,7 @@ static INPUT_PORTS_START( rbibb )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:!5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xe0, 0x00, "PPU Type" )          PORT_DIPLOCATION("SW1:!6,!7,!8")
+	PORT_DIPNAME( 0xe0, 0x00, "PPU Type" )              PORT_DIPLOCATION("SW1:!6,!7,!8")
 	PORT_DIPSETTING(    0x00, "RP2C04-0001" )
 	PORT_DIPSETTING(    0x20, "RP2C03" )
 	PORT_DIPSETTING(    0x40, "RP2C04-0002" )
@@ -1068,10 +1688,11 @@ static INPUT_PORTS_START( rbibb )
 //  PORT_DIPSETTING(    0xe0, "RP2C03" )
 INPUT_PORTS_END
 
+// Note: does not check Coin 2 inputs
 static INPUT_PORTS_START( btlecity )
 	PORT_INCLUDE( vsnes_rev )
 
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW0")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
 	PORT_DIPNAME( 0x01, 0x01, "Credits for 2 Players" ) PORT_DIPLOCATION("SW1:!1")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x01, "2" )
@@ -1084,7 +1705,7 @@ static INPUT_PORTS_START( btlecity )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:!4" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW1:!5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "SW1:!6" )
-	PORT_DIPNAME( 0xc0, 0x00, "PPU Type" )          PORT_DIPLOCATION("SW1:!7,!8")
+	PORT_DIPNAME( 0xc0, 0x00, "PPU Type" )              PORT_DIPLOCATION("SW1:!7,!8")
 	PORT_DIPSETTING(    0x00, "RP2C04-0001" )
 	PORT_DIPSETTING(    0x40, "RP2C04-0002" )
 	PORT_DIPSETTING(    0x80, "RP2C04-0003" )
@@ -1094,7 +1715,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( cluclu )
 	PORT_INCLUDE( vsnes_rev )
 
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW0")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!1,!2,!3")
 	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
@@ -1105,7 +1726,9 @@ static INPUT_PORTS_START( cluclu )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( Free_Play ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:!4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW1:!5" )
+	PORT_DIPNAME( 0x10, 0x10, "Credits for 2 Players" ) PORT_DIPLOCATION("SW1:!5")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x10, "2" )
 	PORT_DIPNAME( 0x60, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!6,!7")
 	PORT_DIPSETTING(    0x60, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
@@ -1115,9 +1738,9 @@ static INPUT_PORTS_START( cluclu )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cstlevna )
-	PORT_INCLUDE( vsnes )
+	PORT_INCLUDE( vsnes_rev )
 
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW0")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!1,!2,!3")
 	PORT_DIPSETTING(    0x03, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 4C_1C ) )
@@ -1130,7 +1753,7 @@ static INPUT_PORTS_START( cstlevna )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!4")
 	PORT_DIPSETTING(    0x08, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPNAME( 0x30, 0x00, "Bonus points" )       PORT_DIPLOCATION("SW1:!5,!6")
+	PORT_DIPNAME( 0x30, 0x00, "Bonus points" )          PORT_DIPLOCATION("SW1:!5,!6")
 	PORT_DIPSETTING(    0x00, "Timer x 4, Hearts x 40" )
 	PORT_DIPSETTING(    0x20, "Timer x 6, Hearts x 60" )
 	PORT_DIPSETTING(    0x10, "Timer x 8, Hearts x 80" )
@@ -1144,7 +1767,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( iceclimb )
 	PORT_INCLUDE( vsnes_rev )
 
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW0")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!1,!2,!3")
 	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
@@ -1168,26 +1791,21 @@ static INPUT_PORTS_START( iceclimb )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW1:!8" )
 INPUT_PORTS_END
 
-/* Same as 'iceclimb', but different buttons mapping and input protection */
+// Same as 'iceclimb', but different buttons mapping and input protection
 static INPUT_PORTS_START( iceclmbj )
 	PORT_INCLUDE( iceclimb )
 
-	PORT_MODIFY("IN0")  /* IN0 */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_CUSTOM )       // protection /* START on a nes */
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_CUSTOM )        // protection?  START on a NES
 
-	PORT_MODIFY("IN1")  /* IN1 */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_CUSTOM )       // protection /* START on a nes */
-
-	PORT_MODIFY("COINS1")    /* IN2 */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )      /* service credit? */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_CUSTOM )        // protection?  START on a NES
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( excitebk )
-	PORT_INCLUDE( vsnes )
+	PORT_INCLUDE( vsnes_rev )
 
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW0")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!1,!2,!3")
 	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
@@ -1197,35 +1815,29 @@ static INPUT_PORTS_START( excitebk )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x18, 0x00, "Bonus Bike" )        PORT_DIPLOCATION("SW1:!4,!5")
+	PORT_DIPNAME( 0x18, 0x00, "Bonus Bike" )            PORT_DIPLOCATION("SW1:!4,!5")
 	PORT_DIPSETTING(    0x00, "100k and Every 50k" )
 	PORT_DIPSETTING(    0x10, "Every 100k" )
 	PORT_DIPSETTING(    0x08, "100k Only" )
 	PORT_DIPSETTING(    0x18, DEF_STR( None ) )
-	PORT_DIPNAME( 0x20, 0x00, "1st Half Qualifying Time" )  PORT_DIPLOCATION("SW1:!6") /* Manual calls this "Time/Challenge" */
+	PORT_DIPNAME( 0x20, 0x00, "1st Half Qualifying Time" )  PORT_DIPLOCATION("SW1:!6") // Manual calls this "Time/Challenge"
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x40, 0x00, "2nd Half Qualifying Time" )  PORT_DIPLOCATION("SW1:!7") /* Manual calls this "Time/Excitebike" */
+	PORT_DIPNAME( 0x40, 0x00, "2nd Half Qualifying Time" )  PORT_DIPLOCATION("SW1:!7") // Manual calls this "Time/Excitebike"
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:!8" )
 INPUT_PORTS_END
 
+// Note: does not check Coin 2 inputs
 static INPUT_PORTS_START( jajamaru )
 	PORT_INCLUDE( vsnes_rev )
 
-	PORT_MODIFY("IN0")  /* IN0 */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START2 )        /* START on a nes */
+	// FIXME: jajamaru needs button 3 to select a 2 player game. This is installed here for now, but really 2 player mode should only work on a DualSystem.
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START3 ) PORT_NAME("Select 3 (Purple)")  // START on a NES
 
-	PORT_MODIFY("IN1")  /* IN1 */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )       /* SELECT on a nes */
-
-	PORT_MODIFY("COINS1")    /* IN2 */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )      /* service credit? */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW0")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!1,!2,!3")
 	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
@@ -1247,9 +1859,9 @@ static INPUT_PORTS_START( jajamaru )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( machridr )
-	PORT_INCLUDE( vsnes )
+	PORT_INCLUDE( vsnes_rev )
 
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW0")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!1,!2,!3")
 	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
@@ -1259,35 +1871,23 @@ static INPUT_PORTS_START( machridr )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x18, 0x00, "Time" )          PORT_DIPLOCATION("SW1:!4,!5")
+	PORT_DIPNAME( 0x18, 0x00, "Time" )                  PORT_DIPLOCATION("SW1:!4,!5")
 	PORT_DIPSETTING(    0x00, "280 (Easy)" )
 	PORT_DIPSETTING(    0x10, "250" )
 	PORT_DIPSETTING(    0x08, "220" )
 	PORT_DIPSETTING(    0x18, "200 (Hard)" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "SW1:!6" )
-	PORT_DIPNAME( 0x40, 0x00, "Enemies" )           PORT_DIPLOCATION("SW1:!7")
+	PORT_DIPNAME( 0x40, 0x00, "Enemies" )               PORT_DIPLOCATION("SW1:!7")
 	PORT_DIPSETTING(    0x40, "More" )
 	PORT_DIPSETTING(    0x00, "Less" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:!8" )
 INPUT_PORTS_END
 
+// Note: does not check Coin 2 inputs
 static INPUT_PORTS_START( machridj )
-	PORT_INCLUDE( vsnes )
+	PORT_INCLUDE( vsnes_rev )
 
-	PORT_MODIFY("IN0")  /* IN0 */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )        /* SELECT on a nes */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )        /* START on a nes */
-
-	PORT_MODIFY("IN1")  /* IN1 */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )        /* SELECT on a nes */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )        /* START on a nes */
-
-	PORT_MODIFY("COINS1")    /* IN2 */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )      /* service credit? */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 )
-
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW0")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!1,!2,!3")
 	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
@@ -1297,17 +1897,26 @@ static INPUT_PORTS_START( machridj )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( Free_Play ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:!4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW1:!5" )
+	PORT_DIPNAME( 0x18, 0x00, "Max Lives After Level 1" )  PORT_DIPLOCATION("SW1:!4,!5")
+	PORT_DIPSETTING(    0x18, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPSETTING(    0x10, "5" )
+	PORT_DIPSETTING(    0x08, "6" )
+// # of lives is determined by remaining energy bars at the end of level 1
+// formula: lives = min(floor(energy / divisor) + 1, maxval)
+// maxval:     3   4   5   6
+// divisor:    4   3   2   1
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "SW1:!6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW1:!7" )
+	PORT_DIPNAME( 0x40, 0x00, "Enemies" )               PORT_DIPLOCATION("SW1:!7")
+	PORT_DIPSETTING(    0x40, "More" )
+	PORT_DIPSETTING(    0x00, "Less" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:!8" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( suprmrio )
 	PORT_INCLUDE( vsnes )
 
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW0")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!1,!2,!3")
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
@@ -1325,7 +1934,7 @@ static INPUT_PORTS_START( suprmrio )
 	PORT_DIPSETTING(    0x20, "150 Coins" )
 	PORT_DIPSETTING(    0x10, "200 Coins" )
 	PORT_DIPSETTING(    0x30, "250 Coins" )
-	PORT_DIPNAME( 0x40, 0x00, "Timer" )         PORT_DIPLOCATION("SW1:!7")
+	PORT_DIPNAME( 0x40, 0x00, "Timer" )                 PORT_DIPLOCATION("SW1:!7")
 	PORT_DIPSETTING(    0x00, "Slow" )
 	PORT_DIPSETTING(    0x40, "Fast" )
 	PORT_DIPNAME( 0x80, 0x80, "Continue Lives" )        PORT_DIPLOCATION("SW1:!8")
@@ -1336,7 +1945,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( duckhunt )
 	PORT_INCLUDE( vsnes_zapper )
 
-	PORT_START("DSW0")  /* IN3 */
+	PORT_START("DSW0")
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!1,!2,!3")
 	PORT_DIPSETTING(    0x03, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 4C_1C ) )
@@ -1364,7 +1973,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( hogalley )
 	PORT_INCLUDE( vsnes_zapper )
 
-	PORT_START("DSW0")  /* IN3 */
+	PORT_START("DSW0")
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!1,!2,!3")
 	PORT_DIPSETTING(    0x03, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 4C_1C ) )
@@ -1392,7 +2001,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( vsgshoe )
 	PORT_INCLUDE( vsnes_zapper )
 
-	PORT_START("DSW0")  /* IN3 */
+	PORT_START("DSW0")
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!1,!2,!3")
 	PORT_DIPSETTING(    0x03, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 4C_1C ) )
@@ -1421,7 +2030,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( vsfdf )
 	PORT_INCLUDE( vsnes_zapper )
 
-	PORT_START("DSW0")  /* IN3 */
+	PORT_START("DSW0")
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!1,!2,!3")
 	PORT_DIPSETTING(    0x03, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 4C_1C ) )
@@ -1449,7 +2058,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( vstetris )
 	PORT_INCLUDE( vsnes_rev )
 
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW0")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x00, "SW1:!1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x00, "SW1:!2" )
 	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:!3,!4")
@@ -1458,7 +2067,7 @@ static INPUT_PORTS_START( vstetris )
 	PORT_DIPSETTING(    0x08, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Hard ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW1:!5" )
-	PORT_DIPNAME( 0xe0, 0x00, "PPU Type" )          PORT_DIPLOCATION("SW1:!6,!7,!8")
+	PORT_DIPNAME( 0xe0, 0x00, "PPU Type" )              PORT_DIPLOCATION("SW1:!6,!7,!8")
 	PORT_DIPSETTING(    0x00, "RP2C04-0001" )
 	PORT_DIPSETTING(    0x20, "RP2C03" )
 	PORT_DIPSETTING(    0x40, "RP2C04-0002" )
@@ -1469,17 +2078,15 @@ static INPUT_PORTS_START( vstetris )
 //  PORT_DIPSETTING(    0xe0, "RP2C03" )
 INPUT_PORTS_END
 
-/* P2 Start is a different bit */
+// Note: does not check Coin 2 inputs
 static INPUT_PORTS_START( vsskykid )
 	PORT_INCLUDE( vsnes_rev )
 
+	// FIXME: vsskykid needs button 3 to select a 2 player game. This is installed here for now, but really 2 player mode should only work on a DualSystem.
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )        /* START on a nes */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START3 ) PORT_NAME("Select 3 (Purple)")  // START on a NES
 
-	PORT_MODIFY("IN1")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )       /* SELECT on a nes */
-
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW0")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:!1,!2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Normal ) )
@@ -1493,7 +2100,7 @@ static INPUT_PORTS_START( vsskykid )
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0xe0, 0x00, "PPU Type" )          PORT_DIPLOCATION("SW1:!6,!7,!8")
+	PORT_DIPNAME( 0xe0, 0x00, "PPU Type" )              PORT_DIPLOCATION("SW1:!6,!7,!8")
 	PORT_DIPSETTING(    0x00, "RP2C04-0001" )
 	PORT_DIPSETTING(    0x20, "RP2C03" )
 	PORT_DIPSETTING(    0x40, "RP2C04-0002" )
@@ -1504,12 +2111,14 @@ static INPUT_PORTS_START( vsskykid )
 //  PORT_DIPSETTING(    0xe0, "RP2C03" )
 INPUT_PORTS_END
 
+// In US Pinball both P1/P2 B buttons move left flipper, both A buttons move right flipper. All four operate the plunger.
+// In JP Pinball both P1 B/A buttons move left flipper, both P2 B/A move right flipper. Both A buttons operate the plunger.
 static INPUT_PORTS_START( vspinbal )
-	PORT_INCLUDE( vsnes )
+	PORT_INCLUDE( vsnes_rev )
 
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW0")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
 	PORT_DIPNAME( 0x07, 0x01, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( 4C_1C ) )    PORT_DIPLOCATION("SW1:!1,!2,!3")
+	PORT_DIPSETTING(    0x07, DEF_STR( 4C_1C ) )        PORT_DIPLOCATION("SW1:!1,!2,!3")
 	PORT_DIPSETTING(    0x03, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
@@ -1523,32 +2132,20 @@ static INPUT_PORTS_START( vspinbal )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:!5")
 	PORT_DIPSETTING(    0x00, "50000" )
 	PORT_DIPSETTING(    0x10, "70000" )
-	PORT_DIPNAME( 0x60, 0x00, "Balls" )         PORT_DIPLOCATION("SW1:!6,!7")
+	PORT_DIPNAME( 0x60, 0x00, "Balls" )                 PORT_DIPLOCATION("SW1:!6,!7")
 	PORT_DIPSETTING(    0x60, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x40, "4" )
 	PORT_DIPSETTING(    0x20, "5" )
-	PORT_DIPNAME( 0x80, 0x00, "Ball speed" )        PORT_DIPLOCATION("SW1:!8")
+	PORT_DIPNAME( 0x80, 0x00, "Ball speed" )            PORT_DIPLOCATION("SW1:!8")
 	PORT_DIPSETTING(    0x00, "Slow" )
 	PORT_DIPSETTING(    0x80, "Fast" )
 INPUT_PORTS_END
 
-/* Same as 'vspinbal', but different buttons mapping */
-static INPUT_PORTS_START( vspinblj )
-	PORT_INCLUDE( vspinbal )
-
-	PORT_MODIFY("IN0")  /* IN0 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)        /* Right flipper */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
-
-	PORT_MODIFY("IN1")  /* IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)        /* Left flipper */
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( goonies )
-	PORT_INCLUDE( vsnes )
+	PORT_INCLUDE( vsnes_rev )
 
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW0")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!1,!2,!3")
 	PORT_DIPSETTING(    0x03, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 4C_1C ) )
@@ -1566,7 +2163,7 @@ static INPUT_PORTS_START( goonies )
 	PORT_DIPSETTING(    0x20, "50000" )
 	PORT_DIPSETTING(    0x10, "60000" )
 	PORT_DIPSETTING(    0x30, "70000" )
-	PORT_DIPNAME(0x40,  0x00, "Timer" )         PORT_DIPLOCATION("SW1:!7")
+	PORT_DIPNAME(0x40,  0x00, "Timer" )                 PORT_DIPLOCATION("SW1:!7")
 	PORT_DIPSETTING(    0x00, "Slow" )
 	PORT_DIPSETTING(    0x40, "Fast" )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:!8")
@@ -1574,10 +2171,11 @@ static INPUT_PORTS_START( goonies )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
+// Note: set "SC4-2 A" does not check Coin 2 inputs
 static INPUT_PORTS_START( vssoccer )
 	PORT_INCLUDE( vsnes_rev )
 
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW0")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!1,!2,!3")
 	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
@@ -1587,7 +2185,7 @@ static INPUT_PORTS_START( vssoccer )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x18, 0x08, "Points Timer" )      PORT_DIPLOCATION("SW1:!4,!5")
+	PORT_DIPNAME( 0x18, 0x08, "Points Timer" )          PORT_DIPLOCATION("SW1:!4,!5")
 	PORT_DIPSETTING(    0x00, "600 Pts" )
 	PORT_DIPSETTING(    0x10, "800 Pts" )
 	PORT_DIPSETTING(    0x08, "1000 Pts" )
@@ -1603,7 +2201,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( vsgradus )
 	PORT_INCLUDE( vsnes_rev )
 
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW0")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!1,!2,!3")
 	PORT_DIPSETTING(    0x03, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 4C_1C ) )
@@ -1616,7 +2214,7 @@ static INPUT_PORTS_START( vsgradus )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!4")
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPNAME( 0x30, 0x00, "Bonus" )         PORT_DIPLOCATION("SW1:!5,!6")
+	PORT_DIPNAME( 0x30, 0x00, "Bonus" )                 PORT_DIPLOCATION("SW1:!5,!6")
 	PORT_DIPSETTING(    0x00, "100k" )
 	PORT_DIPSETTING(    0x20, "200k" )
 	PORT_DIPSETTING(    0x10, "300k" )
@@ -1630,9 +2228,9 @@ static INPUT_PORTS_START( vsgradus )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vsslalom )
-	PORT_INCLUDE( vsnes )
+	PORT_INCLUDE( vsnes_rev )
 
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW0")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!1,!2,!3")
 	PORT_DIPSETTING(    0x03, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 4C_1C ) )
@@ -1658,8 +2256,9 @@ static INPUT_PORTS_START( vsslalom )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
+// Note: does not check Coin 2 inputs
 static INPUT_PORTS_START( starlstr )
-	PORT_INCLUDE( vsnes_dual )
+	PORT_INCLUDE( vsnes_rev )
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!1,!2")
@@ -1670,7 +2269,7 @@ static INPUT_PORTS_START( starlstr )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW1:!3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:!4" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW1:!5" )
-	PORT_DIPNAME( 0xe0, 0x00, "PPU Type" )          PORT_DIPLOCATION("SW1:!6,!7,!8")
+	PORT_DIPNAME( 0xe0, 0x00, "PPU Type" )              PORT_DIPLOCATION("SW1:!6,!7,!8")
 	PORT_DIPSETTING(    0x00, "RP2C03" )
 	PORT_DIPSETTING(    0x20, "RP2C04-0001" )
 //  PORT_DIPSETTING(    0x40, "RP2C03" )
@@ -1679,20 +2278,12 @@ static INPUT_PORTS_START( starlstr )
 	PORT_DIPSETTING(    0xa0, "RP2C04-0003" )
 //  PORT_DIPSETTING(    0xc0, "RP2C03" )
 	PORT_DIPSETTING(    0xe0, "RP2C04-0004" )
-
-	PORT_START("DSW1")  /* no DSW1? */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tkoboxng )
 	PORT_INCLUDE( vsnes )
 
-	PORT_MODIFY("COINS1")    /* IN2 */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )      /* service credit? */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 )
-
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW0")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!1,!2")
 	PORT_DIPSETTING(    0x03, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
@@ -1704,7 +2295,7 @@ static INPUT_PORTS_START( tkoboxng )
 	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x0C, DEF_STR( Very_Hard ) )
 	PORT_DIPUNUSED_DIPLOC( 0x10, 0x00, "SW1:!5" )
-	PORT_DIPNAME( 0xe0, 0x00, "PPU Type" )          PORT_DIPLOCATION("SW1:!6,!7,!8")
+	PORT_DIPNAME( 0xe0, 0x00, "PPU Type" )              PORT_DIPLOCATION("SW1:!6,!7,!8")
 	PORT_DIPSETTING(    0x00, "RP2C04-0003" )
 //  PORT_DIPSETTING(    0x20, "RP2C03" )
 //  PORT_DIPSETTING(    0x40, "RP2C03" )
@@ -1718,19 +2309,17 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( bnglngby )
 	PORT_INCLUDE( vsnes_rev )
 
-	PORT_MODIFY("IN0")  /* IN0 */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_CUSTOM )       // protection /* START on a nes */
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_CUSTOM )        // protection?  START on a NES
 
-	PORT_MODIFY("IN1")  /* IN1 */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_CUSTOM )       // protection /* START on a nes */
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_CUSTOM )        // protection?  START on a NES
 
-	PORT_MODIFY("COINS1")    /* IN2 */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )      /* service credit? */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 )
+	// FIXME: This is faking that the game is running on the Sub CPU and can be removed once it really IS running there
+	PORT_MODIFY("COINS1")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM )
 
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW0")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!1,!2,!3")
 	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
@@ -1752,7 +2341,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( mightybj )
 	PORT_INCLUDE( vsnes )
 
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
+	PORT_START("DSW0")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!1,!2,!3")
 	PORT_DIPSETTING(    0x07, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
@@ -1772,20 +2361,17 @@ static INPUT_PORTS_START( mightybj )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:!8" )
 INPUT_PORTS_END
 
+// Note: does not check Coin 2 inputs
 static INPUT_PORTS_START( supxevs )
-	PORT_INCLUDE( vsnes )
+	PORT_INCLUDE( vsnes_rev )
 
-	PORT_MODIFY("IN1")  /* IN1 */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )       /* SELECT on a nes */
-
-	PORT_MODIFY("COINS1")    /* IN2 */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )      /* service credit? */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x00, "SW1:!1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x00, "SW1:!2" )
+	PORT_START("DSW0")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:!1")
+	PORT_DIPSETTING(    0x00, "50000" ) // and every ?
+	PORT_DIPSETTING(    0x01, "70000" ) // and every ?
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!2")
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW1:!3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:!4" )
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!5,!6")
@@ -1800,35 +2386,37 @@ static INPUT_PORTS_START( supxevs )
 	PORT_DIPSETTING(    0xc0, "RP2C04-0004" )
 INPUT_PORTS_END
 
-void vsnes_state::vsnes(machine_config &config)
-{
-	/* basic machine hardware */
-	n2a03_device &maincpu(N2A03(config, m_maincpu, NTSC_APU_CLOCK));
-	maincpu.set_addrmap(AS_PROGRAM, &vsnes_state::vsnes_cpu1_map);
 
-	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsnes)
+void vs_uni_state::vsnes(machine_config &config)
+{
+	// basic machine hardware
+	n2a03_device &maincpu(N2A03(config, m_maincpu, NTSC_APU_CLOCK));
+	maincpu.set_addrmap(AS_PROGRAM, &vs_uni_state::vsnes_cpu1_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen1(SCREEN(config, "screen1", SCREEN_TYPE_RASTER));
 	screen1.set_raw(N2A03_NTSC_XTAL / 4, 341, 0, VISIBLE_SCREEN_WIDTH, ppu2c0x_device::NTSC_SCANLINES_PER_FRAME, 0, VISIBLE_SCREEN_HEIGHT);
 	screen1.set_screen_update("ppu1", FUNC(ppu2c0x_device::screen_update));
 
 	PPU_2C04(config, m_ppu1);
-	m_ppu1->set_addrmap(0, &vsnes_state::vsnes_ppu1_map);
+	m_ppu1->set_addrmap(0, &vs_uni_state::vsnes_ppu1_map);
 	m_ppu1->set_screen("screen1");
 	m_ppu1->set_cpu_tag(m_maincpu);
 	m_ppu1->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	NES_ZAPPER_SENSOR(config, m_sensor, 0).set_screen_tag("screen1");
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	maincpu.add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	// watchdog resets system between 1.23s and 1.33s in hardware tests, exact timing unknown
+	WATCHDOG_TIMER(config, m_watchdog); // .set_time(attotime::from_msec(1300)); // FIXME: this won't work yet since the UniSystem emulation uses the wrong side of the PCB
 }
 
-void vsnes_state::jajamaru(machine_config &config)
+void vs_uni_state::jajamaru(machine_config &config)
 {
 	vsnes(config);
 
@@ -1838,7 +2426,7 @@ void vsnes_state::jajamaru(machine_config &config)
 	m_ppu1->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 }
 
-void vsnes_state::mightybj(machine_config &config)
+void vs_uni_state::mightybj(machine_config &config)
 {
 	vsnes(config);
 
@@ -1848,7 +2436,7 @@ void vsnes_state::mightybj(machine_config &config)
 	m_ppu1->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 }
 
-void vsnes_state::vsgshoe(machine_config &config)
+void vs_uni_state::vsgshoe(machine_config &config)
 {
 	vsnes(config);
 
@@ -1858,27 +2446,28 @@ void vsnes_state::vsgshoe(machine_config &config)
 	m_ppu1->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 }
 
-void vsnes_state::topgun(machine_config &config)
+void vs_uni_state::topgun(machine_config &config)
 {
 	vsnes(config);
 
 	PPU_2C05_04(config.replace(), m_ppu1);
-	m_ppu1->set_addrmap(0, &vsnes_state::vsnes_ppu1_map);
+	m_ppu1->set_addrmap(0, &vs_uni_state::vsnes_ppu1_map);
 	m_ppu1->set_screen("screen1");
 	m_ppu1->set_cpu_tag(m_maincpu);
 	m_ppu1->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 }
 
-void vsnes_state::vsdual(machine_config &config)
+void vs_dual_state::vsdual(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	n2a03_device &maincpu(N2A03(config, m_maincpu, NTSC_APU_CLOCK));
-	maincpu.set_addrmap(AS_PROGRAM, &vsnes_state::vsnes_cpu1_map);
+	maincpu.set_addrmap(AS_PROGRAM, &vs_dual_state::vsnes_cpu1_map);
 
 	n2a03_device &subcpu(N2A03(config, m_subcpu, NTSC_APU_CLOCK));
-	subcpu.set_addrmap(AS_PROGRAM, &vsnes_state::vsnes_cpu2_map);
+	subcpu.set_addrmap(AS_PROGRAM, &vs_dual_state::vsnes_cpu2_map);
 
-	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsdual)
+	// need high level of interleave to keep screens in sync in Balloon Fight.
+	config.set_perfect_quantum(m_maincpu);
 
 	config.set_default_layout(layout_dualhsxs);
 
@@ -1893,44 +2482,37 @@ void vsnes_state::vsdual(machine_config &config)
 	screen2.set_screen_update("ppu2", FUNC(ppu2c0x_device::screen_update));
 
 	PPU_2C04(config, m_ppu1);
-	m_ppu1->set_addrmap(0, &vsnes_state::vsnes_ppu1_map);
+	m_ppu1->set_addrmap(0, &vs_dual_state::vsnes_ppu1_map);
 	m_ppu1->set_screen("screen1");
 	m_ppu1->set_cpu_tag(m_maincpu);
 	m_ppu1->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	PPU_2C04(config, m_ppu2);
-	m_ppu2->set_addrmap(0, &vsnes_state::vsnes_ppu2_map);
+	m_ppu2->set_addrmap(0, &vs_dual_state::vsnes_ppu2_map);
 	m_ppu2->set_screen("screen2");
 	m_ppu2->set_cpu_tag(m_subcpu);
 	m_ppu2->int_callback().set_inputline(m_subcpu, INPUT_LINE_NMI);
 
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	maincpu.add_route(ALL_OUTPUTS, "mono", 0.50);
-	subcpu.add_route(ALL_OUTPUTS, "mono", 0.50);
+	// sound hardware
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	maincpu.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	subcpu.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+
+	// watchdog resets system between 1.23s and 1.33s in hardware tests, exact timing unknown
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(1300));
 }
 
-void vsnes_state::vsdual_pi(machine_config &config)
+void vs_smbbl_state::vs_smbbl(machine_config &config)
 {
-	vsdual(config);
-	config.set_perfect_quantum(m_maincpu);
-	// need high level of interleave to keep screens in sync in Balloon Fight.
-	// however vsmahjng doesn't like perfect interleave? you end up needing to reset it to boot? maybe something in a bad default state? watchdog?
-	// as the board would always be running in 'perfect interleave' the fact the Mahjong game doesn't work like this needs investigating.
-}
-
-void vsnes_state::vsnes_bootleg(machine_config &config)
-{
-	/* basic machine hardware */
+	// basic machine hardware
 	M6502(config, m_maincpu, XTAL(16'000'000)/8);
-	m_maincpu->set_addrmap(AS_PROGRAM, &vsnes_state::vsnes_cpu1_bootleg_map);
-
-	MCFG_MACHINE_START_OVERRIDE(vsnes_state,bootleg)
+	m_maincpu->set_addrmap(AS_PROGRAM, &vs_smbbl_state::smbbl_6502_map);
 
 	Z80(config, m_subcpu, XTAL(16'000'000)/8); // Z8400APS-Z80CPU
-	m_subcpu->set_addrmap(AS_PROGRAM, &vsnes_state::vsnes_bootleg_z80_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &vs_smbbl_state::smbbl_z80_map);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen1(SCREEN(config, "screen1", SCREEN_TYPE_RASTER));
 	screen1.set_refresh_hz(56.69);
 	screen1.set_size(32*8, 280);
@@ -1938,19 +2520,19 @@ void vsnes_state::vsnes_bootleg(machine_config &config)
 	screen1.set_screen_update("ppu1", FUNC(ppu2c0x_device::screen_update));
 
 	PPU_2C04C(config, m_ppu1);
-	m_ppu1->set_addrmap(0, &vsnes_state::vsnes_ppu_bootleg_map);
+	m_ppu1->set_addrmap(0, &vs_smbbl_state::smbbl_ppu_map);
 	m_ppu1->set_cpu_tag(m_maincpu);
 	m_ppu1->set_screen("screen1");
 	m_ppu1->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	SN76489(config, "sn1", XTAL(16'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.50); // one runs at 2 MHz, other runs at 4 MHz
 	SN76489(config, "sn2", XTAL(16'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
-/******************************************************************************/
+//******************************************************************************
 
 /*  Palettes were obtained for each RGB PPU type by running a test program
     that fills the screen with a single color and analyzing the RGB output.
@@ -2907,70 +3489,72 @@ ROM_START( iceclmrd )
 	ROM_COPY( "ppu1:palette", 0x00, 0x00, 0xc0 )
 ROM_END
 
-/******************************************************************************/
+} // anonymous namespace
+
+//******************************************************************************
 /* Sets by region:
    World (C) Nintendo
    US    (C) Nintendo of America
    Japan (C) Nintendo Co., Ltd.
 */
 
-//    YEAR  NAME      PARENT     MACHINE        INPUT     STATE        INIT      MONITOR
-GAME( 1985, btlecity, 0,         vsnes,         btlecity, vsnes_state, init_vsnormal, ROT0, "Namco",                  "Vs. Battle City",                 0 )
-GAME( 1985, starlstr, 0,         vsnes,         starlstr, vsnes_state, init_vsnormal, ROT0, "Namco",                  "Vs. Star Luster",                 0 )
-GAME( 1987, cstlevna, 0,         vsnes,         cstlevna, vsnes_state, init_vsvram,   ROT0, "Konami",                 "Vs. Castlevania",                 0 )
-GAME( 1984, cluclu,   0,         vsnes,         cluclu,   vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Clu Clu Land",                0 )
-GAME( 1990, drmario,  0,         vsnes,         drmario,  vsnes_state, init_drmario,  ROT0, "Nintendo",               "Vs. Dr. Mario",                   0 )
-GAME( 1984, excitebk, 0,         vsnes,         excitebk, vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Excitebike (set EB4-3 E)",    0 )
-GAME( 1984, excitebko,excitebk,  vsnes,         excitebk, vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Excitebike (set EB4-3 ?)",    0 ) // older
-GAME( 1984, excitebkj,excitebk,  vsnes,         excitebk, vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Excitebike (set EB4-4 A)",    0 ) // likely Japan
-GAME( 1986, goonies,  0,         vsnes,         goonies,  vsnes_state, init_vskonami, ROT0, "Konami",                 "Vs. The Goonies (set E)",         0 )
-GAME( 1984, iceclimb, 0,         vsnes,         iceclmbj, vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Ice Climber (set IC4-4 B-1)", 0 )
-GAME( 1984, iceclimba,iceclimb,  vsnes,         iceclimb, vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Ice Climber (set IC4-4 ?)",   0 )
-GAME( 1985, nvs_machrider, 0,    vsnes,         machridr, vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Mach Rider (Endurance Course Version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1985, nvs_machridera,nvs_machrider,vsnes, machridj, vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Mach Rider (Fighting Course Version, set MR4-1 A)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1986, rbibb,    0,         vsnes,         rbibb,    vsnes_state, init_rbibb,    ROT0, "Namco",                  "Vs. Atari R.B.I. Baseball (set 1)", 0 )
-GAME( 1986, rbibba,   rbibb,     vsnes,         rbibb,    vsnes_state, init_rbibb,    ROT0, "Namco",                  "Vs. Atari R.B.I. Baseball (set 2)", 0 )
-GAME( 1986, suprmrio, 0,         vsnes,         suprmrio, vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Super Mario Bros. (set SM4-4 E)", 0 )
-GAME( 1986, suprmrioa,suprmrio,  vsnes,         suprmrio, vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Super Mario Bros. (set ?, harder)", 0 )
-GAME( 1986, suprmriobl,suprmrio, vsnes_bootleg, suprmrio, vsnes_state, init_bootleg,  ROT0, "bootleg",                "Vs. Super Mario Bros. (bootleg with Z80, set 1)", 0 ) // timer starts at 200(!)
-GAME( 1986, suprmriobl2,suprmrio,vsnes_bootleg, suprmrio, vsnes_state, init_bootleg,  ROT0, "bootleg",                "Vs. Super Mario Bros. (bootleg with Z80, set 2)", 0 ) // timer starts at 300
-GAME( 1988, skatekds, suprmrio,  vsnes,         suprmrio, vsnes_state, init_vsnormal, ROT0, "hack (Two-Bit Score)",   "Vs. Skate Kids. (Graphic hack of Super Mario Bros.)", 0 )
-GAME( 1985, vsskykid, 0,         vsnes,         vsskykid, vsnes_state, init_vs108,    ROT0, "Namco",                  "Vs. Super SkyKid", 0 )
-GAME( 1987, tkoboxng, 0,         vsnes,         tkoboxng, vsnes_state, init_tkoboxng, ROT0, "Namco / Data East USA",  "Vs. T.K.O. Boxing", 0 )
-GAME( 1984, smgolf,   0,         vsnes,         golf4s,   vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Men Version, set GF4-2 F)",       0 )
-GAME( 1984, smgolfb,  smgolf,    vsnes,         golf,     vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Men Version, set GF4-2 ?)",       0 )
-GAME( 1984, smgolfj,  smgolf,    vsnes,         golf,     vsnes_state, init_vsnormal, ROT0, "Nintendo Co., Ltd.",     "Vs. Stroke & Match Golf (Men Version) (Japan, set GF3 B)", 0 )
-GAME( 1984, ladygolfe,smgolf,    vsnes,         golf,     vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Ladies Version, set LG4 E)",      0 )
-GAME( 1984, ladygolf, smgolf,    vsnes,         golf,     vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Ladies Version, set LG4 ?)",      0 )
-GAME( 1984, vspinbal, 0,         vsnes,         vspinbal, vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Pinball (US, set PN4 E-1)",  0 )
-GAME( 1984, vspinbalj,vspinbal,  vsnes,         vspinblj, vsnes_state, init_vsnormal, ROT0, "Nintendo Co., Ltd.",     "Vs. Pinball (Japan, set PN3 B)", 0 )
-GAME( 1986, vsslalom, 0,         vsnes,         vsslalom, vsnes_state, init_vsnormal, ROT0, "Rare Coin-It Inc.",      "Vs. Slalom", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1985, vssoccer, 0,         vsnes,         vssoccer, vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Soccer (set SC4-2 A)", 0 )
-GAME( 1985, vssoccera,vssoccer,  vsnes,         vssoccer, vsnes_state, init_bnglngby, ROT0, "Nintendo",               "Vs. Soccer (set SC4-3 ?)", 0 )
-GAME( 1986, vsgradus, 0,         vsnes,         vsgradus, vsnes_state, init_vskonami, ROT0, "Konami",                 "Vs. Gradius (US, set GR E)", 0 )
-GAME( 1987, nvs_platoon,  0,     vsnes,         platoon,  vsnes_state, init_platoon,  ROT0, "Ocean Software Limited", "Vs. Platoon", 0 )
-GAME( 1987, vstetris, 0,         vsnes,         vstetris, vsnes_state, init_vsnormal, ROT0, "Academysoft-Elorg",      "Vs. Tetris" , 0 )
-GAME( 1986, nvs_mightybj, 0,     mightybj,      mightybj, vsnes_state, init_vsnormal, ROT0, "Tecmo",                  "Vs. Mighty Bomb Jack (Japan)", 0 )
-GAME( 1985, jajamaru, 0,         jajamaru,      jajamaru, vsnes_state, init_vsnormal, ROT0, "Jaleco",                 "Vs. Ninja Jajamaru Kun (Japan)", 0 )
-GAME( 1987, topgun,   0,         topgun,        topgun,   vsnes_state, init_vsvram,   ROT0, "Konami",                 "Vs. Top Gun", 0)
-GAME( 1985, bnglngby, 0,         vsnes,         bnglngby, vsnes_state, init_bnglngby, ROT0, "Nintendo / Broderbund Software Inc.",  "Vs. Raid on Bungeling Bay (RD4-2 B)", 0 )
-GAME( 1986, supxevs,  0,         vsnes,         supxevs,  vsnes_state, init_supxevs,  ROT0, "Namco",                  "Vs. Super Xevious", 0 )
+//    YEAR  NAME            PARENT         MACHINE        INPUT     STATE           INIT           MONITOR
+GAME( 1985, btlecity,       0,             vsnes,         btlecity, vs_uni_state,   init_vsnormal, ROT0, "Namco",                  "Vs. Battle City",                                          0 )
+GAME( 1985, starlstr,       0,             vsnes,         starlstr, vs_uni_state,   init_vsnormal, ROT0, "Namco",                  "Vs. Star Luster",                                          0 )
+GAME( 1987, cstlevna,       0,             vsnes,         cstlevna, vs_uni_state,   init_vsvram,   ROT0, "Konami",                 "Vs. Castlevania",                                          0 )
+GAME( 1984, cluclu,         0,             vsnes,         cluclu,   vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Clu Clu Land",                                         0 )
+GAME( 1990, drmario,        0,             vsnes,         drmario,  vs_uni_state,   init_drmario,  ROT0, "Nintendo",               "Vs. Dr. Mario",                                            0 )
+GAME( 1984, excitebk,       0,             vsnes,         excitebk, vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Excitebike (set EB4-3 E)",                             0 )
+GAME( 1984, excitebko,      excitebk,      vsnes,         excitebk, vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Excitebike (set EB4-3 ?)",                             0 ) // older
+GAME( 1984, excitebkj,      excitebk,      vsnes,         excitebk, vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Excitebike (set EB4-4 A)",                             0 ) // likely Japan
+GAME( 1986, goonies,        0,             vsnes,         goonies,  vs_uni_state,   init_vskonami, ROT0, "Konami",                 "Vs. The Goonies (set E)",                                  0 )
+GAME( 1984, iceclimb,       0,             vsnes,         iceclmbj, vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Ice Climber (set IC4-4 B-1)",                          0 )
+GAME( 1984, iceclimba,      iceclimb,      vsnes,         iceclimb, vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Ice Climber (set IC4-4 ?)",                            0 )
+GAME( 1985, nvs_machrider,  0,             vsnes,         machridr, vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Mach Rider (Endurance Course Version)",                MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1985, nvs_machridera, nvs_machrider, vsnes,         machridj, vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Mach Rider (Fighting Course Version, set MR4-1 A)",    MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1986, rbibb,          0,             vsnes,         rbibb,    vs_uni_state,   init_rbibb,    ROT0, "Namco",                  "Vs. Atari R.B.I. Baseball (set 1)",                        0 )
+GAME( 1986, rbibba,         rbibb,         vsnes,         rbibb,    vs_uni_state,   init_rbibb,    ROT0, "Namco",                  "Vs. Atari R.B.I. Baseball (set 2)",                        0 )
+GAME( 1986, suprmrio,       0,             vsnes,         suprmrio, vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Super Mario Bros. (set SM4-4 E)",                      0 )
+GAME( 1986, suprmrioa,      suprmrio,      vsnes,         suprmrio, vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Super Mario Bros. (set ?, harder)",                    0 )
+GAME( 1986, suprmriobl,     suprmrio,      vs_smbbl,      suprmrio, vs_smbbl_state, empty_init,    ROT0, "bootleg",                "Vs. Super Mario Bros. (bootleg with Z80, set 1)",          0 ) // timer starts at 200(!)
+GAME( 1986, suprmriobl2,    suprmrio,      vs_smbbl,      suprmrio, vs_smbbl_state, empty_init,    ROT0, "bootleg",                "Vs. Super Mario Bros. (bootleg with Z80, set 2)",          0 ) // timer starts at 300
+GAME( 1988, skatekds,       suprmrio,      vsnes,         suprmrio, vs_uni_state,   init_vsnormal, ROT0, "hack (Two-Bit Score)",   "Vs. Skate Kids. (Graphic hack of Super Mario Bros.)",      0 )
+GAME( 1985, vsskykid,       0,             vsnes,         vsskykid, vs_uni_state,   init_vs108,    ROT0, "Namco",                  "Vs. Super SkyKid",                                         0 )
+GAME( 1987, tkoboxng,       0,             vsnes,         tkoboxng, vs_uni_state,   init_tkoboxng, ROT0, "Namco / Data East USA",  "Vs. T.K.O. Boxing",                                        0 )
+GAME( 1984, smgolf,         0,             vsnes,         golf,     vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Men Version, set GF4-2 F)",       0 )
+GAME( 1984, smgolfb,        smgolf,        vsnes,         golf4s,   vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Men Version, set GF4-2 ?)",       0 )
+GAME( 1984, smgolfj,        smgolf,        vsnes,         golf,     vs_uni_state,   init_vsnormal, ROT0, "Nintendo Co., Ltd.",     "Vs. Stroke & Match Golf (Men Version) (Japan, set GF3 B)", 0 )
+GAME( 1984, ladygolfe,      smgolf,        vsnes,         golf4s,   vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Ladies Version, set LG4 E)",      0 )
+GAME( 1984, ladygolf,       smgolf,        vsnes,         golf,     vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Ladies Version, set LG4 ?)",      0 )
+GAME( 1984, vspinbal,       0,             vsnes,         vspinbal, vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Pinball (US, set PN4 E-1)",                            0 )
+GAME( 1984, vspinbalj,      vspinbal,      vsnes,         vspinbal, vs_uni_state,   init_vsnormal, ROT0, "Nintendo Co., Ltd.",     "Vs. Pinball (Japan, set PN3 B)",                           0 )
+GAME( 1986, vsslalom,       0,             vsnes,         vsslalom, vs_uni_state,   init_vsnormal, ROT0, "Rare Coin-It Inc.",      "Vs. Slalom",                                               MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1985, vssoccer,       0,             vsnes,         vssoccer, vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Soccer (set SC4-2 A)",                                 0 )
+GAME( 1985, vssoccera,      vssoccer,      vsnes,         vssoccer, vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Soccer (set SC4-3 ?)",                                 0 )
+GAME( 1986, vsgradus,       0,             vsnes,         vsgradus, vs_uni_state,   init_vskonami, ROT0, "Konami",                 "Vs. Gradius (US, set GR E)",                               0 )
+GAME( 1987, nvs_platoon,    0,             vsnes,         platoon,  vs_uni_state,   init_platoon,  ROT0, "Ocean Software Limited", "Vs. Platoon",                                              0 )
+GAME( 1987, vstetris,       0,             vsnes,         vstetris, vs_uni_state,   init_vsnormal, ROT0, "Academysoft-Elorg",      "Vs. Tetris" ,                                              0 )
+GAME( 1986, nvs_mightybj,   0,             mightybj,      mightybj, vs_uni_state,   init_vsnormal, ROT0, "Tecmo",                  "Vs. Mighty Bomb Jack (Japan)",                             0 )
+GAME( 1985, jajamaru,       0,             jajamaru,      jajamaru, vs_uni_state,   init_vsnormal, ROT0, "Jaleco",                 "Vs. Ninja Jajamaru Kun (Japan)",                           0 )
+GAME( 1987, topgun,         0,             topgun,        topgun,   vs_uni_state,   init_vsvram,   ROT0, "Konami",                 "Vs. Top Gun",                                              0 )
+GAME( 1985, bnglngby,       0,             vsnes,         bnglngby, vs_uni_state,   init_bnglngby, ROT0, "Nintendo / Broderbund Software Inc.", "Vs. Raid on Bungeling Bay (RD4-2 B)",         0 )
+GAME( 1986, supxevs,        0,             vsnes,         supxevs,  vs_uni_state,   init_supxevs,  ROT0, "Namco",                  "Vs. Super Xevious",                                        0 )
 
 // Light Gun games
-GAME( 1985, duckhunt, 0,         vsnes,         duckhunt, vsnes_state, init_vsgun,    ROT0, "Nintendo",               "Vs. Duck Hunt (set DH3 E)",         0 )
-GAME( 1985, hogalley, 0,         vsnes,         hogalley, vsnes_state, init_vsgun,    ROT0, "Nintendo",               "Vs. Hogan's Alley (set HA4-1 E-1)", 0 )
-GAME( 1986, vsgshoe,  0,         vsgshoe,       vsgshoe,  vsnes_state, init_vsgshoe,  ROT0, "Nintendo",               "Vs. Gumshoe (set GM5)",             0 )
-GAME( 1988, vsfdf,    0,         vsnes,         vsfdf,    vsnes_state, init_vsfdf,    ROT0, "Sunsoft",                "Vs. Freedom Force",                 0 )
+GAME( 1985, duckhunt,       0,             vsnes,         duckhunt, vs_uni_state,   init_vsgun,    ROT0, "Nintendo",               "Vs. Duck Hunt (set DH3 E)",         0 )
+GAME( 1985, hogalley,       0,             vsnes,         hogalley, vs_uni_state,   init_vsgun,    ROT0, "Nintendo",               "Vs. Hogan's Alley (set HA4-1 E-1)", 0 )
+GAME( 1986, vsgshoe,        0,             vsgshoe,       vsgshoe,  vs_uni_state,   init_vsgshoe,  ROT0, "Nintendo",               "Vs. Gumshoe (set GM5)",             0 )
+GAME( 1988, vsfdf,          0,             vsnes,         vsfdf,    vs_uni_state,   init_vsfdf,    ROT0, "Sunsoft",                "Vs. Freedom Force",                 0 )
 
 // Dual games
-GAME( 1984, vstennis, 0,         vsdual_pi,     vstennis, vsnes_state, init_vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Tennis (Japan/USA, set TE A-3)" ,  0 )
-GAME( 1984, vstennisa,vstennis,  vsdual_pi,     vstennis, vsnes_state, init_vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Tennis (Japan/USA, set 2)",        0 )
-GAME( 1984, vstennisb,vstennis,  vsdual_pi,     vstennis, vsnes_state, init_vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Tennis (Japan/USA, set 3)",        MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1984, wrecking, 0,         vsdual_pi,     wrecking, vsnes_state, init_vsdual,   ROT0, "Nintendo",               "Vs. Wrecking Crew",                    0 )
-GAME( 1984, balonfgt, 0,         vsdual_pi,     balonfgt, vsnes_state, init_vsdual,   ROT0, "Nintendo",               "Vs. Balloon Fight (set BF4 A-3)",      0 )
-GAME( 1984, vsmahjng, 0,         vsdual,        vsmahjng, vsnes_state, init_vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Mahjong (Japan)",                  0 )
-GAME( 1984, vsbball,  0,         vsdual_pi,     vsbball,  vsnes_state, init_vsdual,   ROT0, "Nintendo of America",    "Vs. Baseball (US, set BA E-1)",        0 )
-GAME( 1984, vsbballj, vsbball,   vsdual_pi,     vsbballj, vsnes_state, init_vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Baseball (Japan, set BA A-3)",     0 )
-GAME( 1984, vsbballja,vsbball,   vsdual_pi,     vsbballj, vsnes_state, init_vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Baseball (Japan, set BA A-2)",     0 )
-GAME( 1984, vsbballjb,vsbball,   vsdual_pi,     vsbballj, vsnes_state, init_vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Baseball (Japan, set BA A-1)",     0 )
-GAME( 1984, iceclmrd, 0,         vsdual_pi,     iceclmrj, vsnes_state, init_vsdual,   ROT0, "Nintendo",               "Vs. Ice Climber Dual (set IC4-4 A-1)", 0 )
+GAME( 1984, vstennis,       0,             vsdual,        vstennis, vs_dual_state,  init_vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Tennis (Japan/USA, set TE A-3)" ,  0 )
+GAME( 1984, vstennisa,      vstennis,      vsdual,        vstennis, vs_dual_state,  init_vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Tennis (Japan/USA, set 2)",        0 )
+GAME( 1984, vstennisb,      vstennis,      vsdual,        vstennis, vs_dual_state,  init_vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Tennis (Japan/USA, set 3)",        MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, wrecking,       0,             vsdual,        wrecking, vs_dual_state,  init_vsdual,   ROT0, "Nintendo",               "Vs. Wrecking Crew",                    0 )
+GAME( 1984, balonfgt,       0,             vsdual,        balonfgt, vs_dual_state,  init_vsdual,   ROT0, "Nintendo",               "Vs. Balloon Fight (set BF4 A-3)",      0 )
+GAME( 1984, vsmahjng,       0,             vsdual,        vsmahjng, vs_dual_state,  init_vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Mahjong (Japan)",                  0 )
+GAME( 1984, vsbball,        0,             vsdual,        vsbball,  vs_dual_state,  init_vsdual,   ROT0, "Nintendo of America",    "Vs. Baseball (US, set BA E-1)",        0 )
+GAME( 1984, vsbballj,       vsbball,       vsdual,        vsbball,  vs_dual_state,  init_vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Baseball (Japan, set BA A-3)",     0 )
+GAME( 1984, vsbballja,      vsbball,       vsdual,        vsbball,  vs_dual_state,  init_vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Baseball (Japan, set BA A-2)",     0 )
+GAME( 1984, vsbballjb,      vsbball,       vsdual,        vsbball,  vs_dual_state,  init_vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Baseball (Japan, set BA A-1)",     0 )
+GAME( 1984, iceclmrd,       0,             vsdual,        iceclmrj, vs_dual_state,  init_vsdual,   ROT0, "Nintendo",               "Vs. Ice Climber Dual (set IC4-4 A-1)", 0 )

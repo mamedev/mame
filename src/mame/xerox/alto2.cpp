@@ -29,7 +29,7 @@ public:
 	void alto2(machine_config &config);
 
 protected:
-	virtual void driver_init() override;
+	virtual void driver_start() override;
 
 	TIMER_CALLBACK_MEMBER(handle_vblank);
 
@@ -296,7 +296,7 @@ void alto2_state::alto2(machine_config &config)
 	DIABLO_HD(config, DIABLO_HD_1, 3333333);
 }
 
-void alto2_state::driver_init()
+void alto2_state::driver_start()
 {
 	// Create a timer which fires twice per frame, once for each field
 	m_vblank_timer = timer_alloc(FUNC(alto2_state::handle_vblank), this);

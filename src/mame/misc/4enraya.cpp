@@ -251,7 +251,7 @@ public:
 	}
 
 private:
-	void driver_init() override;
+	virtual void driver_start() override;
 };
 
 
@@ -1021,7 +1021,7 @@ ROM_END
 *          Driver Init             *
 ***********************************/
 
-void unk_gambl_enc_state::driver_init()
+void unk_gambl_enc_state::driver_start()
 {
 	// descramble ROM
 	uint8_t *rom = memregion("maincpu")->base();

@@ -31,7 +31,7 @@ TIMER_CALLBACK_MEMBER(spectrum_state::finish_screen_update)
 	    https://github.com/mamedev/mame/pull/9670#issuecomment-1118576555
 	    https://github.com/mamedev/mame/pull/9750
 	*/
-	m_screen->update_now();
+	if (started()) m_screen->update_now();
 	m_finish_screen_update_timer->adjust(m_screen->time_until_pos(m_screen->visible_area().bottom(), m_screen->visible_area().right() + 1));
 }
 
@@ -173,7 +173,6 @@ TODO Curren implementation only tracks char switch position. In order to track b
 */
 void spectrum_state::spectrum_update_screen(screen_device &screen_d, bitmap_ind16 &bitmap, const rectangle &screen)
 {
-	u8 *attrs_location = m_screen_location + 0x1800;
 	bool invert_attrs = u64(screen_d.frame_number() / m_frame_invert_count) & 1;
 	for (u16 vpos = screen.top(); vpos <= screen.bottom(); vpos++)
 	{
@@ -195,7 +194,7 @@ void spectrum_state::spectrum_update_screen(screen_device &screen_d, bitmap_ind1
 		}
 		u16 y = vpos - get_screen_area().top();
 		u8 *scr = &m_screen_location[((y & 7) << 8) | ((y & 0x38) << 2) | ((y & 0xc0) << 5) | (x >> 3)];
-		u8 *attr = &attrs_location[((y & 0xf8) << 2) | (x >> 3)];
+		u8 *attr = &m_screen_location[0x1800 + (((y & 0xf8) << 2) | (x >> 3))];
 		u16 *pix = &(bitmap.pix(vpos, hpos));
 
 		while ((hpos + (chunk_right ? 0 : 4)) <= screen.right())

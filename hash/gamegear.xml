@@ -88,7 +88,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524278">
-				<rom name="adventures of batman &amp; robin, the (prototype - apr 27,  1995).bin" size="524278" crc="acce0d15" sha1="ac60f308640eea536bb3007d2a0b78d95b81d160"/>
+				<rom name="adventures of batman &amp; robin, the (prototype - apr 27, 1995).bin" size="524278" crc="acce0d15" sha1="ac60f308640eea536bb3007d2a0b78d95b81d160"/>
 			</dataarea>
 		</part>
 	</software>
@@ -99,7 +99,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="523228">
-				<rom name="adventures of batman &amp; robin, the (prototype - apr 29,  1995 - a).bin" size="523228" crc="14867057" sha1="7877c4f8c271c37fc7d72208460231e60e63b95e"/>
+				<rom name="adventures of batman &amp; robin, the (prototype - apr 29, 1995 - a).bin" size="523228" crc="14867057" sha1="7877c4f8c271c37fc7d72208460231e60e63b95e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -110,7 +110,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="523228">
-				<rom name="adventures of batman &amp; robin, the (prototype - apr 30,  1995).bin" size="523228" crc="50376471" sha1="cda657eb423a8891304cb64cf4a43fd434c60588"/>
+				<rom name="adventures of batman &amp; robin, the (prototype - apr 30, 1995).bin" size="523228" crc="50376471" sha1="cda657eb423a8891304cb64cf4a43fd434c60588"/>
 			</dataarea>
 		</part>
 	</software>
@@ -121,7 +121,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="523228">
-				<rom name="adventures of batman &amp; robin, the (prototype - may 02,  1995).bin" size="523228" crc="e57566f3" sha1="81cb20d64acc5cee4bc7b56f0dcec9125b55f66f"/>
+				<rom name="adventures of batman &amp; robin, the (prototype - may 02, 1995).bin" size="523228" crc="e57566f3" sha1="81cb20d64acc5cee4bc7b56f0dcec9125b55f66f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -132,7 +132,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="523228">
-				<rom name="adventures of batman &amp; robin, the (prototype - may 04,  1995).bin" size="523228" crc="a9cf66ed" sha1="19f890a237d4aa0868121d80944055a314275f81"/>
+				<rom name="adventures of batman &amp; robin, the (prototype - may 04, 1995).bin" size="523228" crc="a9cf66ed" sha1="19f890a237d4aa0868121d80944055a314275f81"/>
 			</dataarea>
 		</part>
 	</software>
@@ -143,7 +143,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524282">
-				<rom name="adventures of batman &amp; robin, the (prototype - may 06,  1995 - b).bin" size="524282" crc="50c2f1ad" sha1="8cebb48b14c4c1ee4d168f764b074a87cc4e5324"/>
+				<rom name="adventures of batman &amp; robin, the (prototype - may 06, 1995 - b).bin" size="524282" crc="50c2f1ad" sha1="8cebb48b14c4c1ee4d168f764b074a87cc4e5324"/>
 			</dataarea>
 		</part>
 	</software>
@@ -154,7 +154,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524282">
-				<rom name="adventures of batman &amp; robin, the (prototype - may 06,  1995).bin" size="524282" crc="c403264a" sha1="0afd0624bd054430b7894c24e2fb186d5f44af99"/>
+				<rom name="adventures of batman &amp; robin, the (prototype - may 06, 1995).bin" size="524282" crc="c403264a" sha1="0afd0624bd054430b7894c24e2fb186d5f44af99"/>
 			</dataarea>
 		</part>
 	</software>
@@ -165,7 +165,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524282">
-				<rom name="adventures of batman &amp; robin, the (prototype - may 07,  1995).bin" size="524282" crc="fc916fd7" sha1="ea5b5b79f92f5546a733efc10f42997956037463"/>
+				<rom name="adventures of batman &amp; robin, the (prototype - may 07, 1995).bin" size="524282" crc="fc916fd7" sha1="ea5b5b79f92f5546a733efc10f42997956037463"/>
 			</dataarea>
 		</part>
 	</software>
@@ -254,7 +254,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="aladdin (prototype - dec 29,  1993).bin" size="524288" crc="5b1f717f" sha1="ed303cb2debbc74f65a02f863e8c5bbb446155c4"/>
+				<rom name="aladdin (prototype - dec 29, 1993).bin" size="524288" crc="5b1f717f" sha1="ed303cb2debbc74f65a02f863e8c5bbb446155c4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -265,7 +265,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="aladdin (prototype - jan 11,  1994).bin" size="524288" crc="8a1693ab" sha1="7ec48d31a35006ccba4abcf108e187e0b222852b"/>
+				<rom name="aladdin (prototype - jan 11, 1994).bin" size="524288" crc="8a1693ab" sha1="7ec48d31a35006ccba4abcf108e187e0b222852b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -276,7 +276,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="aladdin (prototype - jan 13,  1994).bin" size="524288" crc="75a7f142" sha1="a968ee77938233a4ff94c73266c7fb36fa25657d"/>
+				<rom name="aladdin (prototype - jan 13, 1994).bin" size="524288" crc="75a7f142" sha1="a968ee77938233a4ff94c73266c7fb36fa25657d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -493,7 +493,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="asterix (prototype - feb 16,  1994).bin" size="524288" crc="1e8d735c" sha1="7d411f499e313bece6cd0a6f32c614adc0405190"/>
+				<rom name="asterix (prototype - feb 16, 1994).bin" size="524288" crc="1e8d735c" sha1="7d411f499e313bece6cd0a6f32c614adc0405190"/>
 			</dataarea>
 		</part>
 	</software>
@@ -504,7 +504,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="asterix (prototype - feb 22,  1994).bin" size="524288" crc="31bd3d8a" sha1="ca04b12f93d3657e323db8ae3f3f31a6220ec732"/>
+				<rom name="asterix (prototype - feb 22, 1994).bin" size="524288" crc="31bd3d8a" sha1="ca04b12f93d3657e323db8ae3f3f31a6220ec732"/>
 			</dataarea>
 		</part>
 	</software>
@@ -515,7 +515,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="asterix (prototype - jan 25,  1994).bin" size="524288" crc="ba45f00f" sha1="4d52303ce4aa680fcf5813317804b5805b9222a4"/>
+				<rom name="asterix (prototype - jan 25, 1994).bin" size="524288" crc="ba45f00f" sha1="4d52303ce4aa680fcf5813317804b5805b9222a4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -526,7 +526,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="asterix (prototype - mar 13,  1994).bin" size="524288" crc="faf09846" sha1="cde9940d29dc834806b55cc1783c1b7944eb7600"/>
+				<rom name="asterix (prototype - mar 13, 1994).bin" size="524288" crc="faf09846" sha1="cde9940d29dc834806b55cc1783c1b7944eb7600"/>
 			</dataarea>
 		</part>
 	</software>
@@ -537,7 +537,7 @@ Hung Tao Hsin games are possibly pirate bootlegs though they may be officially l
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="asterix (prototype - mar 15,  1994).bin" size="524288" crc="66d8eb63" sha1="be292971696ecfa753d312c97c5b4788f5adfbee"/>
+				<rom name="asterix (prototype - mar 15, 1994).bin" size="524288" crc="66d8eb63" sha1="be292971696ecfa753d312c97c5b4788f5adfbee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -832,7 +832,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="berenstain bears (prototype - aug 01,  1994).bin" size="262144" crc="882b8f53" sha1="c7e0ccefdcc4f12d7ecdbab383e441b829a2c789"/>
+				<rom name="berenstain bears (prototype - aug 01, 1994).bin" size="262144" crc="882b8f53" sha1="c7e0ccefdcc4f12d7ecdbab383e441b829a2c789"/>
 			</dataarea>
 		</part>
 	</software>
@@ -843,7 +843,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="berenstain bears (prototype - aug 11,  1994 - a).bin" size="262144" crc="81a5e68f" sha1="af14fcb9329c0ded9775473ef78e241fb6b2d365"/>
+				<rom name="berenstain bears (prototype - aug 11, 1994 - a).bin" size="262144" crc="81a5e68f" sha1="af14fcb9329c0ded9775473ef78e241fb6b2d365"/>
 			</dataarea>
 		</part>
 	</software>
@@ -854,7 +854,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="berenstain bears (prototype - aug 11,  1994).bin" size="262144" crc="50d400b8" sha1="2d6ecb588299bbe9cb0eb54954663043355d759e"/>
+				<rom name="berenstain bears (prototype - aug 11, 1994).bin" size="262144" crc="50d400b8" sha1="2d6ecb588299bbe9cb0eb54954663043355d759e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -865,7 +865,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="berenstain bears (prototype - aug 12,  1994).bin" size="262144" crc="0e676927" sha1="9b2aa818cdadc435ca1aee8ae54809377dce26f3"/>
+				<rom name="berenstain bears (prototype - aug 12, 1994).bin" size="262144" crc="0e676927" sha1="9b2aa818cdadc435ca1aee8ae54809377dce26f3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -876,7 +876,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="berenstain bears (prototype - aug 13,  1994).bin" size="262144" crc="f8f11b2a" sha1="b43373e626d96649f11d5f0ac1101a20b7404978"/>
+				<rom name="berenstain bears (prototype - aug 13, 1994).bin" size="262144" crc="f8f11b2a" sha1="b43373e626d96649f11d5f0ac1101a20b7404978"/>
 			</dataarea>
 		</part>
 	</software>
@@ -887,7 +887,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="berenstain bears (prototype - aug 14,  1994).bin" size="262144" crc="d0971f78" sha1="a8adae0ac9301b3342d79715b18e8cdebc6d84f6"/>
+				<rom name="berenstain bears (prototype - aug 14, 1994).bin" size="262144" crc="d0971f78" sha1="a8adae0ac9301b3342d79715b18e8cdebc6d84f6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -898,7 +898,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="berenstain bears (prototype - aug 19,  1994).bin" size="262144" crc="177d65ac" sha1="0e44212a90383b82cd0d4e03b6cd12a6b38e2d48"/>
+				<rom name="berenstain bears (prototype - aug 19, 1994).bin" size="262144" crc="177d65ac" sha1="0e44212a90383b82cd0d4e03b6cd12a6b38e2d48"/>
 			</dataarea>
 		</part>
 	</software>
@@ -909,7 +909,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="berenstain bears (prototype - aug 20,  1994).bin" size="262144" crc="f61ac1e8" sha1="6aad469e328614d9ed3f8f84bd90ef2dac2e71db"/>
+				<rom name="berenstain bears (prototype - aug 20, 1994).bin" size="262144" crc="f61ac1e8" sha1="6aad469e328614d9ed3f8f84bd90ef2dac2e71db"/>
 			</dataarea>
 		</part>
 	</software>
@@ -920,7 +920,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="berenstain bears (prototype - aug 24,  1994).bin" size="262144" crc="b73486d6" sha1="480537a721631fc9cebe67422010dfe5739002ef"/>
+				<rom name="berenstain bears (prototype - aug 24, 1994).bin" size="262144" crc="b73486d6" sha1="480537a721631fc9cebe67422010dfe5739002ef"/>
 			</dataarea>
 		</part>
 	</software>
@@ -931,7 +931,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="berenstain bears (prototype - aug 25,  1994 - b).bin" size="262144" crc="e07b865e" sha1="ac152aa09dc09419c26761c18276fe4d679d8992"/>
+				<rom name="berenstain bears (prototype - aug 25, 1994 - b).bin" size="262144" crc="e07b865e" sha1="ac152aa09dc09419c26761c18276fe4d679d8992"/>
 			</dataarea>
 		</part>
 	</software>
@@ -942,7 +942,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="berenstain bears (prototype - aug 26,  1994 - b).bin" size="262144" crc="217b1ef0" sha1="bd1ff3c4669379b2a02bd8e1d76b9c02fefc783e"/>
+				<rom name="berenstain bears (prototype - aug 26, 1994 - b).bin" size="262144" crc="217b1ef0" sha1="bd1ff3c4669379b2a02bd8e1d76b9c02fefc783e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -953,7 +953,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="berenstain bears (prototype - aug 26,  1994).bin" size="262144" crc="167a4af6" sha1="09bb4a3e936dcce34b46090f5f2f1353dee1d6f6"/>
+				<rom name="berenstain bears (prototype - aug 26, 1994).bin" size="262144" crc="167a4af6" sha1="09bb4a3e936dcce34b46090f5f2f1353dee1d6f6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -964,7 +964,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="berenstain bears (prototype - jul 15,  1994 - b).bin" size="262144" crc="fcf47bc9" sha1="5fc1a46c47bb847fd3dbca54c9ba729011546b76"/>
+				<rom name="berenstain bears (prototype - jul 15, 1994 - b).bin" size="262144" crc="fcf47bc9" sha1="5fc1a46c47bb847fd3dbca54c9ba729011546b76"/>
 			</dataarea>
 		</part>
 	</software>
@@ -975,7 +975,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="berenstain bears (prototype - jul 21,  1994).bin" size="262144" crc="a279c6bc" sha1="92ed587953db4c0001d19395c9c8c611d15d0cef"/>
+				<rom name="berenstain bears (prototype - jul 21, 1994).bin" size="262144" crc="a279c6bc" sha1="92ed587953db4c0001d19395c9c8c611d15d0cef"/>
 			</dataarea>
 		</part>
 	</software>
@@ -986,7 +986,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="berenstain bears (prototype - jul 22,  1994).bin" size="262144" crc="ffbf5abe" sha1="83e3d4ed1437b6ed042b88129f3c1fb3d1846c94"/>
+				<rom name="berenstain bears (prototype - jul 22, 1994).bin" size="262144" crc="ffbf5abe" sha1="83e3d4ed1437b6ed042b88129f3c1fb3d1846c94"/>
 			</dataarea>
 		</part>
 	</software>
@@ -997,7 +997,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="berenstain bears (prototype - jul 27,  1994).bin" size="262144" crc="112b123f" sha1="801ed129a09373ad9606f7dedc9ce0bd7ce7dd21"/>
+				<rom name="berenstain bears (prototype - jul 27, 1994).bin" size="262144" crc="112b123f" sha1="801ed129a09373ad9606f7dedc9ce0bd7ce7dd21"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1008,7 +1008,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="berenstain bears (prototype - jun 28,  1994).bin" size="262144" crc="75a7a8ca" sha1="9e16aa6a11186089510fac9413bdd8e62001a761"/>
+				<rom name="berenstain bears (prototype - jun 28, 1994).bin" size="262144" crc="75a7a8ca" sha1="9e16aa6a11186089510fac9413bdd8e62001a761"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1077,7 +1077,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="bonkers wax up (prototype - dec 03,  1994).bin" size="524288" crc="63429025" sha1="7e426a1db56125836dd93ea57d5ac82cff1be23f"/>
+				<rom name="bonkers wax up (prototype - dec 03, 1994).bin" size="524288" crc="63429025" sha1="7e426a1db56125836dd93ea57d5ac82cff1be23f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1088,7 +1088,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="bonkers wax up (prototype - dec 05,  1994).bin" size="524288" crc="c2229b6e" sha1="dcbb000cda6f303d902a308a50e08ebc4803d511"/>
+				<rom name="bonkers wax up (prototype - dec 05, 1994).bin" size="524288" crc="c2229b6e" sha1="dcbb000cda6f303d902a308a50e08ebc4803d511"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1099,7 +1099,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="bonkers wax up (prototype - dec 07,  1994 - c).bin" size="524288" crc="edaf25e7" sha1="415fc9e0021f544cbf8fd0895d013465654fd1d5"/>
+				<rom name="bonkers wax up (prototype - dec 07, 1994 - c).bin" size="524288" crc="edaf25e7" sha1="415fc9e0021f544cbf8fd0895d013465654fd1d5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1110,7 +1110,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="bonkers wax up (prototype - dec 08,  1994 - b).bin" size="524288" crc="9907a738" sha1="c8844bfda83a94ce648588ef945a0d76503b84ce"/>
+				<rom name="bonkers wax up (prototype - dec 08, 1994 - b).bin" size="524288" crc="9907a738" sha1="c8844bfda83a94ce648588ef945a0d76503b84ce"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1121,7 +1121,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="bonkers wax up (prototype - dec 08,  1994 - c).bin" size="524288" crc="91258adc" sha1="50897d1cbda11e7b20678924d7461f8acd6f0686"/>
+				<rom name="bonkers wax up (prototype - dec 08, 1994 - c).bin" size="524288" crc="91258adc" sha1="50897d1cbda11e7b20678924d7461f8acd6f0686"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1132,7 +1132,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="bonkers wax up (prototype - dec 11,  1994).bin" size="524288" crc="9a405d0d" sha1="e797640e2363f517fb83ee42903f5d13a1ffad73"/>
+				<rom name="bonkers wax up (prototype - dec 11, 1994).bin" size="524288" crc="9a405d0d" sha1="e797640e2363f517fb83ee42903f5d13a1ffad73"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1143,7 +1143,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="bonkers wax up (prototype - dec 12,  1994 - d).bin" size="524288" crc="6d295894" sha1="368286ded1662eddfff056ad77583d62ce83f58b"/>
+				<rom name="bonkers wax up (prototype - dec 12, 1994 - d).bin" size="524288" crc="6d295894" sha1="368286ded1662eddfff056ad77583d62ce83f58b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1154,7 +1154,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="bonkers wax up (prototype - nov 15,  1994).bin" size="524288" crc="85510a57" sha1="6cd8fee2110bc5010a2840c6e5b3fb32270efc02"/>
+				<rom name="bonkers wax up (prototype - nov 15, 1994).bin" size="524288" crc="85510a57" sha1="6cd8fee2110bc5010a2840c6e5b3fb32270efc02"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1165,7 +1165,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="bonkers wax up (prototype - nov 21,  1994).bin" size="524288" crc="dab43f8f" sha1="c60fbd9e191e4154e26e73f0fd1be1dc6e999e11"/>
+				<rom name="bonkers wax up (prototype - nov 21, 1994).bin" size="524288" crc="dab43f8f" sha1="c60fbd9e191e4154e26e73f0fd1be1dc6e999e11"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1176,7 +1176,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="bonkers wax up (prototype - nov 23,  1994).bin" size="524288" crc="1b081950" sha1="ac22b149fcd6b500875c93f71e12b2a6cedea507"/>
+				<rom name="bonkers wax up (prototype - nov 23, 1994).bin" size="524288" crc="1b081950" sha1="ac22b149fcd6b500875c93f71e12b2a6cedea507"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1187,7 +1187,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="bonkers wax up (prototype - nov 26,  1994).bin" size="524288" crc="eb3f22c2" sha1="fbdccd5ee5f38b8ce5654a0093f32e3811c8b56b"/>
+				<rom name="bonkers wax up (prototype - nov 26, 1994).bin" size="524288" crc="eb3f22c2" sha1="fbdccd5ee5f38b8ce5654a0093f32e3811c8b56b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1198,7 +1198,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="bonkers wax up (prototype - nov 29,  1994).bin" size="524288" crc="ad6a62fa" sha1="4ad7947a4ffee9a76d146fecc9c3c2f6c5e680b7"/>
+				<rom name="bonkers wax up (prototype - nov 29, 1994).bin" size="524288" crc="ad6a62fa" sha1="4ad7947a4ffee9a76d146fecc9c3c2f6c5e680b7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1209,7 +1209,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="bonkers wax up (prototype - oct 31,  1994).bin" size="524288" crc="777dfd80" sha1="160d28c7fd900ab25117247eccecf2ecdb164ce4"/>
+				<rom name="bonkers wax up (prototype - oct 31, 1994).bin" size="524288" crc="777dfd80" sha1="160d28c7fd900ab25117247eccecf2ecdb164ce4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1460,7 +1460,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="chicago syndicate (prototype - jul 03,  1995).bin" size="524288" crc="e3c0ea98" sha1="e526b1ff96c245d4ec69064a2cc8e57169081802"/>
+				<rom name="chicago syndicate (prototype - jul 03, 1995).bin" size="524288" crc="e3c0ea98" sha1="e526b1ff96c245d4ec69064a2cc8e57169081802"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1471,7 +1471,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="chicago syndicate (prototype - jul 05,  1995).bin" size="524288" crc="4158e203" sha1="18b2a946800d4a6347cd96c8790add2f34fe4dfa"/>
+				<rom name="chicago syndicate (prototype - jul 05, 1995).bin" size="524288" crc="4158e203" sha1="18b2a946800d4a6347cd96c8790add2f34fe4dfa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1482,7 +1482,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="chicago syndicate (prototype - jul 07,  1995).bin" size="524288" crc="e44d1b01" sha1="b76a7e673e5581a2084098f737ff551ce8880296"/>
+				<rom name="chicago syndicate (prototype - jul 07, 1995).bin" size="524288" crc="e44d1b01" sha1="b76a7e673e5581a2084098f737ff551ce8880296"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1493,7 +1493,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="chicago syndicate (prototype - jul 10,  1995).bin" size="524288" crc="42becef6" sha1="b32ec7e95dc39f0b78dd3d0b17c2d504f5f24f9a"/>
+				<rom name="chicago syndicate (prototype - jul 10, 1995).bin" size="524288" crc="42becef6" sha1="b32ec7e95dc39f0b78dd3d0b17c2d504f5f24f9a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1504,7 +1504,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="chicago syndicate (prototype - jul 11,  1995).bin" size="524288" crc="afe46aa8" sha1="bc01553450523d4860c2fb42d84297fd80cbf5d2"/>
+				<rom name="chicago syndicate (prototype - jul 11, 1995).bin" size="524288" crc="afe46aa8" sha1="bc01553450523d4860c2fb42d84297fd80cbf5d2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1515,7 +1515,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="chicago syndicate (prototype - jul 19,  1995).bin" size="524288" crc="dd5f9327" sha1="b70863b4a6aec101cee895baf3f8ea27e076e369"/>
+				<rom name="chicago syndicate (prototype - jul 19, 1995).bin" size="524288" crc="dd5f9327" sha1="b70863b4a6aec101cee895baf3f8ea27e076e369"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1526,7 +1526,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="chicago syndicate (prototype - jul 20,  1995).bin" size="524288" crc="b0597a54" sha1="087df96c15aa1258a46690b4859a5447481e058f"/>
+				<rom name="chicago syndicate (prototype - jul 20, 1995).bin" size="524288" crc="b0597a54" sha1="087df96c15aa1258a46690b4859a5447481e058f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1537,7 +1537,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="chicago syndicate (prototype - jul 21,  1995 - b).bin" size="524288" crc="26ced733" sha1="5c6db9314cbc4c7933dacc076e59948147ad79ae"/>
+				<rom name="chicago syndicate (prototype - jul 21, 1995 - b).bin" size="524288" crc="26ced733" sha1="5c6db9314cbc4c7933dacc076e59948147ad79ae"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1548,7 +1548,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="chicago syndicate (prototype - jul 21,  1995).bin" size="524288" crc="8e149bb8" sha1="17887be88692097acc74488b16a255b7b6b95aee"/>
+				<rom name="chicago syndicate (prototype - jul 21, 1995).bin" size="524288" crc="8e149bb8" sha1="17887be88692097acc74488b16a255b7b6b95aee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1559,7 +1559,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="chicago syndicate (prototype - jun 01,  1995).bin" size="524288" crc="448c6890" sha1="5ab2358c0db7c486ce2e9bcc663c054a694bff46"/>
+				<rom name="chicago syndicate (prototype - jun 01, 1995).bin" size="524288" crc="448c6890" sha1="5ab2358c0db7c486ce2e9bcc663c054a694bff46"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1570,7 +1570,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="chicago syndicate (prototype - jun 05,  1995).bin" size="524288" crc="af43b940" sha1="0fc9d9a9bbbc00dc286f350de07b0e53a507c01f"/>
+				<rom name="chicago syndicate (prototype - jun 05, 1995).bin" size="524288" crc="af43b940" sha1="0fc9d9a9bbbc00dc286f350de07b0e53a507c01f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1581,7 +1581,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="chicago syndicate (prototype - jun 07,  1995).bin" size="524288" crc="9b2fd7f3" sha1="6154bbc7c0c06d354283af2292eb041e1d87944a"/>
+				<rom name="chicago syndicate (prototype - jun 07, 1995).bin" size="524288" crc="9b2fd7f3" sha1="6154bbc7c0c06d354283af2292eb041e1d87944a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1592,7 +1592,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="chicago syndicate (prototype - jun 08,  1995).bin" size="524288" crc="2036d4b7" sha1="7138742323b2ba7d18eb9497f78fcb6cd2025df1"/>
+				<rom name="chicago syndicate (prototype - jun 08, 1995).bin" size="524288" crc="2036d4b7" sha1="7138742323b2ba7d18eb9497f78fcb6cd2025df1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1603,7 +1603,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="chicago syndicate (prototype - jun 12,  1995).bin" size="524288" crc="f2c24745" sha1="99aeac9b5b3800ddd8ee6630e373af73496c8b3a"/>
+				<rom name="chicago syndicate (prototype - jun 12, 1995).bin" size="524288" crc="f2c24745" sha1="99aeac9b5b3800ddd8ee6630e373af73496c8b3a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1614,7 +1614,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="chicago syndicate (prototype - jun 14,  1995).bin" size="524288" crc="463a2197" sha1="7f83c523a6b0813a2c1f72e71f5dbc0e1ea556cb"/>
+				<rom name="chicago syndicate (prototype - jun 14, 1995).bin" size="524288" crc="463a2197" sha1="7f83c523a6b0813a2c1f72e71f5dbc0e1ea556cb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1625,7 +1625,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="chicago syndicate (prototype - jun 19,  1995).bin" size="524288" crc="3cdb35b1" sha1="61ca81b15fad4d71a8222a8dc9f9c1fc05561549"/>
+				<rom name="chicago syndicate (prototype - jun 19, 1995).bin" size="524288" crc="3cdb35b1" sha1="61ca81b15fad4d71a8222a8dc9f9c1fc05561549"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1636,7 +1636,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="chicago syndicate (prototype - jun 20,  1995).bin" size="524288" crc="bf82cf83" sha1="924bb32515d4a0435fb318f852483fdc1974e771"/>
+				<rom name="chicago syndicate (prototype - jun 20, 1995).bin" size="524288" crc="bf82cf83" sha1="924bb32515d4a0435fb318f852483fdc1974e771"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1647,7 +1647,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="chicago syndicate (prototype - jun 22,  1995).bin" size="524288" crc="4ac79cec" sha1="821bc6a27dd1cf519033d65ffe41458f3bee21cd"/>
+				<rom name="chicago syndicate (prototype - jun 22, 1995).bin" size="524288" crc="4ac79cec" sha1="821bc6a27dd1cf519033d65ffe41458f3bee21cd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1658,7 +1658,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="chicago syndicate (prototype - jun 26,  1995).bin" size="524288" crc="abe696e5" sha1="148d09a535e50730672557668c3161f3b18b4834"/>
+				<rom name="chicago syndicate (prototype - jun 26, 1995).bin" size="524288" crc="abe696e5" sha1="148d09a535e50730672557668c3161f3b18b4834"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1669,7 +1669,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="chicago syndicate (prototype - jun 28,  1995).bin" size="524288" crc="5cd07aed" sha1="5a46ace9f6b24e8403caead2b6ec39e4059e68e6"/>
+				<rom name="chicago syndicate (prototype - jun 28, 1995).bin" size="524288" crc="5cd07aed" sha1="5a46ace9f6b24e8403caead2b6ec39e4059e68e6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1680,7 +1680,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="chicago syndicate (prototype - jun 29,  1995 - b).bin" size="524288" crc="d3614e4e" sha1="6fd25c55c8cc6b10f928af6d5de83d61685df940"/>
+				<rom name="chicago syndicate (prototype - jun 29, 1995 - b).bin" size="524288" crc="d3614e4e" sha1="6fd25c55c8cc6b10f928af6d5de83d61685df940"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1691,7 +1691,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="chicago syndicate (prototype - jun 29,  1995).bin" size="524288" crc="e1112763" sha1="f72c381fabef9286da6a7ede230156277364c5d1"/>
+				<rom name="chicago syndicate (prototype - jun 29, 1995).bin" size="524288" crc="e1112763" sha1="f72c381fabef9286da6a7ede230156277364c5d1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1702,7 +1702,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="chicago syndicate (prototype - jun 30,  1995 - b).bin" size="524288" crc="f68a3581" sha1="5fc82fc2866b7dd99868dfa1a0b619ad688d1221"/>
+				<rom name="chicago syndicate (prototype - jun 30, 1995 - b).bin" size="524288" crc="f68a3581" sha1="5fc82fc2866b7dd99868dfa1a0b619ad688d1221"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1713,7 +1713,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="chicago syndicate (prototype - may 05,  1995).bin" size="524288" crc="a5fa4eaf" sha1="6534e73ea631de8df56779f3ba4c1948b0070400"/>
+				<rom name="chicago syndicate (prototype - may 05, 1995).bin" size="524288" crc="a5fa4eaf" sha1="6534e73ea631de8df56779f3ba4c1948b0070400"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2485,7 +2485,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="dynamite headdy (prototype - jun 15,  1994).bin" size="524288" crc="7bf339c0" sha1="0e8bccb304898a80efcbae8351303103ec4145ee"/>
+				<rom name="dynamite headdy (prototype - jun 15, 1994).bin" size="524288" crc="7bf339c0" sha1="0e8bccb304898a80efcbae8351303103ec4145ee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2496,7 +2496,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="dynamite headdy (prototype - jul 01,  1994).bin" size="524288" crc="49389319" sha1="0e408b4c9dfbb94bdf556b7aa920d4ac71d88c56"/>
+				<rom name="dynamite headdy (prototype - jul 01, 1994).bin" size="524288" crc="49389319" sha1="0e408b4c9dfbb94bdf556b7aa920d4ac71d88c56"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2507,7 +2507,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="dynamite headdy (prototype - jul 05,  1994).bin" size="524288" crc="c7bea89a" sha1="59807e03d32837db34e2912d0e85db812edf823c"/>
+				<rom name="dynamite headdy (prototype - jul 05, 1994).bin" size="524288" crc="c7bea89a" sha1="59807e03d32837db34e2912d0e85db812edf823c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3291,7 +3291,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="gp rider (prototype - jan 04,  1994).bin" size="524288" crc="12e4f6db" sha1="5e13822bf04facc19d44a718635647ad4db6cd2a"/>
+				<rom name="gp rider (prototype - jan 04, 1994).bin" size="524288" crc="12e4f6db" sha1="5e13822bf04facc19d44a718635647ad4db6cd2a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4135,7 +4135,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="legend of illusion starring mickey mouse (prototype - oct 11,  1994).bin" size="524288" crc="f9d4cee9" sha1="13c6f75a1360a76673bcebdf18b9735ddaa113c7"/>
+				<rom name="legend of illusion starring mickey mouse (prototype - oct 11, 1994).bin" size="524288" crc="f9d4cee9" sha1="13c6f75a1360a76673bcebdf18b9735ddaa113c7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4146,7 +4146,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="legend of illusion starring mickey mouse (prototype - oct 14,  1994).bin" size="524288" crc="670ede92" sha1="98c4adaf6e74d960760f686f256f63bc887c1a2b"/>
+				<rom name="legend of illusion starring mickey mouse (prototype - oct 14, 1994).bin" size="524288" crc="670ede92" sha1="98c4adaf6e74d960760f686f256f63bc887c1a2b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4157,7 +4157,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="legend of illusion starring mickey mouse (prototype - oct 17,  1994).bin" size="524288" crc="de8545af" sha1="ccbcda1e7d74e0bfe94ecb1214d4ca1a5d1504ab"/>
+				<rom name="legend of illusion starring mickey mouse (prototype - oct 17, 1994).bin" size="524288" crc="de8545af" sha1="ccbcda1e7d74e0bfe94ecb1214d4ca1a5d1504ab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4168,7 +4168,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="legend of illusion starring mickey mouse (prototype - sep 22,  1994).bin" size="524288" crc="1cc16ad9" sha1="2d78a5b6449c9d20cd03156a56cbc6bc10c2ef68"/>
+				<rom name="legend of illusion starring mickey mouse (prototype - sep 22, 1994).bin" size="524288" crc="1cc16ad9" sha1="2d78a5b6449c9d20cd03156a56cbc6bc10c2ef68"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4179,7 +4179,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="legend of illusion starring mickey mouse (prototype - sep 30,  1994 - sel).bin" size="524288" crc="a0565a5c" sha1="14f266482bfd25238c6e44087c26aca329d4fa64"/>
+				<rom name="legend of illusion starring mickey mouse (prototype - sep 30, 1994 - sel).bin" size="524288" crc="a0565a5c" sha1="14f266482bfd25238c6e44087c26aca329d4fa64"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4190,7 +4190,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="legend of illusion starring mickey mouse (prototype - sep 30,  1994).bin" size="524288" crc="63020617" sha1="94ec7c72e2fb6e4bd51ef55eac9646fb2fa8d791"/>
+				<rom name="legend of illusion starring mickey mouse (prototype - sep 30, 1994).bin" size="524288" crc="63020617" sha1="94ec7c72e2fb6e4bd51ef55eac9646fb2fa8d791"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4282,7 +4282,7 @@ a certain item) -->
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="514313">
-				<rom name="lion king, the (prototype - aug 03,  1994).bin" size="514313" crc="aacb7387" sha1="6d71ff5dfd04ec1641b0db367b52ae3f23805e60"/>
+				<rom name="lion king, the (prototype - aug 03, 1994).bin" size="514313" crc="aacb7387" sha1="6d71ff5dfd04ec1641b0db367b52ae3f23805e60"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4293,7 +4293,7 @@ a certain item) -->
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="514450">
-				<rom name="lion king, the (prototype - aug 11,  1994).bin" size="514450" crc="214c13dc" sha1="9d8fdc7b48f2c09bcbbb30061941e46ddf986e4e"/>
+				<rom name="lion king, the (prototype - aug 11, 1994).bin" size="514450" crc="214c13dc" sha1="9d8fdc7b48f2c09bcbbb30061941e46ddf986e4e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4304,7 +4304,7 @@ a certain item) -->
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="514478">
-				<rom name="lion king, the (prototype - aug 12,  1994).bin" size="514478" crc="0e80efe0" sha1="0e5f5156be26d18f8c2678f7d2400a54b9c51f37"/>
+				<rom name="lion king, the (prototype - aug 12, 1994).bin" size="514478" crc="0e80efe0" sha1="0e5f5156be26d18f8c2678f7d2400a54b9c51f37"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4315,7 +4315,7 @@ a certain item) -->
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="514482">
-				<rom name="lion king, the (prototype - aug 13,  1994).bin" size="514482" crc="8250c11e" sha1="05d6e8f6b8adde3a03ea89f53dd02f02f3366477"/>
+				<rom name="lion king, the (prototype - aug 13, 1994).bin" size="514482" crc="8250c11e" sha1="05d6e8f6b8adde3a03ea89f53dd02f02f3366477"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4326,7 +4326,7 @@ a certain item) -->
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="514486">
-				<rom name="lion king, the (prototype - aug 14,  1994).bin" size="514486" crc="eb10a2d4" sha1="cdce953f16e4db6e9137ea8d523588b3469a544d"/>
+				<rom name="lion king, the (prototype - aug 14, 1994).bin" size="514486" crc="eb10a2d4" sha1="cdce953f16e4db6e9137ea8d523588b3469a544d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4337,7 +4337,7 @@ a certain item) -->
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="514486">
-				<rom name="lion king, the (prototype - aug 16,  1994).bin" size="514486" crc="c6af9643" sha1="14c4d13eb118dc5082441f4eddaac229019b2598"/>
+				<rom name="lion king, the (prototype - aug 16, 1994).bin" size="514486" crc="c6af9643" sha1="14c4d13eb118dc5082441f4eddaac229019b2598"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4348,7 +4348,7 @@ a certain item) -->
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="514618">
-				<rom name="lion king, the (prototype - aug 17,  1994 - 2).bin" size="514618" crc="b65030d0" sha1="d3d44f8cbe32970f2e138c183078b8190808e625"/>
+				<rom name="lion king, the (prototype - aug 17, 1994 - 2).bin" size="514618" crc="b65030d0" sha1="d3d44f8cbe32970f2e138c183078b8190808e625"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4359,7 +4359,7 @@ a certain item) -->
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="514538">
-				<rom name="lion king, the (prototype - aug 17,  1994).bin" size="514538" crc="4214c474" sha1="6301d8ede680007e645c84d24064df5e76ea996b"/>
+				<rom name="lion king, the (prototype - aug 17, 1994).bin" size="514538" crc="4214c474" sha1="6301d8ede680007e645c84d24064df5e76ea996b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4370,7 +4370,7 @@ a certain item) -->
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="523862">
-				<rom name="lion king, the (prototype - aug 20,  1994).bin" size="523862" crc="3d0b31a2" sha1="79f221ca2654d5df64392e4e06c498557eaebf19"/>
+				<rom name="lion king, the (prototype - aug 20, 1994).bin" size="523862" crc="3d0b31a2" sha1="79f221ca2654d5df64392e4e06c498557eaebf19"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4846,7 +4846,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="mighty morphin power rangers (prototype - jul 16,  1994).bin" size="524288" crc="2887f04a" sha1="88a90ac68fe67872cdee9c4ab2b77595347297eb"/>
+				<rom name="mighty morphin power rangers (prototype - jul 16, 1994).bin" size="524288" crc="2887f04a" sha1="88a90ac68fe67872cdee9c4ab2b77595347297eb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4869,7 +4869,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="mighty morphin power rangers - the movie (prototype - may 30,  1995).bin" size="524288" crc="8c665203" sha1="ad8fa368c86687d99587aec697ed9f7b47c918b4"/>
+				<rom name="mighty morphin power rangers - the movie (prototype - may 30, 1995).bin" size="524288" crc="8c665203" sha1="ad8fa368c86687d99587aec697ed9f7b47c918b4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5102,89 +5102,89 @@ a certain item) -->
 	</software>
 
 	<software name="nbaactp08" cloneof="nbaact">
-		<description>NBA Action Starring David Robinson (Final A,  19940228)</description>
+		<description>NBA Action Starring David Robinson (Final A, 19940228)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="nba action starring david robinson (final a - feb 28,  1994).bin" size="262144" crc="d15aa940" sha1="54060a0430a898f9ac32eb685758f5144a347531"/>
+				<rom name="nba action starring david robinson (final a - feb 28, 1994).bin" size="262144" crc="d15aa940" sha1="54060a0430a898f9ac32eb685758f5144a347531"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="nbaactp07" cloneof="nbaact">
-		<description>NBA Action Starring David Robinson (Final B,  19940301)</description>
+		<description>NBA Action Starring David Robinson (Final B, 19940301)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="nba action starring david robinson (final b - mar 01,  1994).bin" size="262144" crc="4415c0bb" sha1="d7062bdecbb42c1869ba70f5d6eed441607e8bd8"/>
+				<rom name="nba action starring david robinson (final b - mar 01, 1994).bin" size="262144" crc="4415c0bb" sha1="d7062bdecbb42c1869ba70f5d6eed441607e8bd8"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="nbaactp06" cloneof="nbaact">
-		<description>NBA Action Starring David Robinson (Final C,  19940302)</description>
+		<description>NBA Action Starring David Robinson (Final C, 19940302)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="nba action starring david robinson (final c - mar 02,  1994).bin" size="262144" crc="5254577a" sha1="41124a549e9b5362b496709f61ce6710df6caec2"/>
+				<rom name="nba action starring david robinson (final c - mar 02, 1994).bin" size="262144" crc="5254577a" sha1="41124a549e9b5362b496709f61ce6710df6caec2"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="nbaactp05" cloneof="nbaact">
-		<description>NBA Action Starring David Robinson (Final D,  19940303)</description>
+		<description>NBA Action Starring David Robinson (Final D, 19940303)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="nba action starring david robinson (final d - mar 03,  1994).bin" size="262144" crc="75a5bc5d" sha1="226de9e66562f7dd05b0b3265aefa94f86f2a724"/>
+				<rom name="nba action starring david robinson (final d - mar 03, 1994).bin" size="262144" crc="75a5bc5d" sha1="226de9e66562f7dd05b0b3265aefa94f86f2a724"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="nbaactp04" cloneof="nbaact">
-		<description>NBA Action Starring David Robinson (Final E,  19940304)</description>
+		<description>NBA Action Starring David Robinson (Final E, 19940304)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="nba action starring david robinson (final e - mar 04,  1994).bin" size="262144" crc="80c0586c" sha1="cd2114ce46eec5b0e4bc4f1c4c65926b4c37541a"/>
+				<rom name="nba action starring david robinson (final e - mar 04, 1994).bin" size="262144" crc="80c0586c" sha1="cd2114ce46eec5b0e4bc4f1c4c65926b4c37541a"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="nbaactp03" cloneof="nbaact">
-		<description>NBA Action Starring David Robinson (Final F,  19940304)</description>
+		<description>NBA Action Starring David Robinson (Final F, 19940304)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="nba action starring david robinson (final f - mar 04,  1994).bin" size="262144" crc="a82049df" sha1="60e804882a04f376e6914ebd9683268d016d0d69"/>
+				<rom name="nba action starring david robinson (final f - mar 04, 1994).bin" size="262144" crc="a82049df" sha1="60e804882a04f376e6914ebd9683268d016d0d69"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="nbaactp02" cloneof="nbaact">
-		<description>NBA Action Starring David Robinson (Final G,  19940305)</description>
+		<description>NBA Action Starring David Robinson (Final G, 19940305)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="nba action starring david robinson (final g - mar 05,  1994).bin" size="262144" crc="e197a0bb" sha1="7b6620a9f60d75595df59f3723c8c5b76e6b2d8f"/>
+				<rom name="nba action starring david robinson (final g - mar 05, 1994).bin" size="262144" crc="e197a0bb" sha1="7b6620a9f60d75595df59f3723c8c5b76e6b2d8f"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="nbaactp01" cloneof="nbaact">
-		<description>NBA Action Starring David Robinson (Final H,  19940308)</description>
+		<description>NBA Action Starring David Robinson (Final H, 19940308)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="nba action starring david robinson (final h - mar 08,  1994).bin" size="262144" crc="c9e98a49" sha1="0ea3a2656145092d8df00b6a7668599b0ab1b8d3"/>
+				<rom name="nba action starring david robinson (final h - mar 08, 1994).bin" size="262144" crc="c9e98a49" sha1="0ea3a2656145092d8df00b6a7668599b0ab1b8d3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5195,7 +5195,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="nba action starring david robinson (prototype - feb 02,  1994).bin" size="262144" crc="f9d5500b" sha1="6c427db53067dfaf1979422b970b79d6fa55fec8"/>
+				<rom name="nba action starring david robinson (prototype - feb 02, 1994).bin" size="262144" crc="f9d5500b" sha1="6c427db53067dfaf1979422b970b79d6fa55fec8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5206,7 +5206,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="nba action starring david robinson (prototype - feb 03,  1994).bin" size="262144" crc="e2341dce" sha1="5a4ab43ddd63d3a9198a940479626b427ec39c6a"/>
+				<rom name="nba action starring david robinson (prototype - feb 03, 1994).bin" size="262144" crc="e2341dce" sha1="5a4ab43ddd63d3a9198a940479626b427ec39c6a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5217,7 +5217,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="nba action starring david robinson (prototype - feb 06,  1994).bin" size="262144" crc="07649147" sha1="c0389169ce2b8b619afa6b7e2c5cede667299e64"/>
+				<rom name="nba action starring david robinson (prototype - feb 06, 1994).bin" size="262144" crc="07649147" sha1="c0389169ce2b8b619afa6b7e2c5cede667299e64"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5228,7 +5228,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="nba action starring david robinson (prototype - feb 08,  1994).bin" size="262144" crc="5e089fbc" sha1="026cfde6ad4a499fa08ebec57a69cd80239f642b"/>
+				<rom name="nba action starring david robinson (prototype - feb 08, 1994).bin" size="262144" crc="5e089fbc" sha1="026cfde6ad4a499fa08ebec57a69cd80239f642b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5239,7 +5239,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="nba action starring david robinson (prototype - feb 12,  1994).bin" size="262144" crc="0c0f6b4c" sha1="006ce9972fd532abb1b426de2bf02e75dd616bba"/>
+				<rom name="nba action starring david robinson (prototype - feb 12, 1994).bin" size="262144" crc="0c0f6b4c" sha1="006ce9972fd532abb1b426de2bf02e75dd616bba"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5250,7 +5250,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="nba action starring david robinson (prototype - feb 15,  1994).bin" size="262144" crc="e73b02a4" sha1="6bff3fa4cab82f688a02318b19af57cb21f75ca5"/>
+				<rom name="nba action starring david robinson (prototype - feb 15, 1994).bin" size="262144" crc="e73b02a4" sha1="6bff3fa4cab82f688a02318b19af57cb21f75ca5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5261,7 +5261,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="nba action starring david robinson (prototype - feb 17,  1994).bin" size="262144" crc="c4b3328c" sha1="60ebead82b6e30f00ea5ac37f30d854eddc37945"/>
+				<rom name="nba action starring david robinson (prototype - feb 17, 1994).bin" size="262144" crc="c4b3328c" sha1="60ebead82b6e30f00ea5ac37f30d854eddc37945"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5272,7 +5272,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="nba action starring david robinson (prototype - feb 20,  1994).bin" size="262144" crc="91e3026c" sha1="eedd9e46158547c80d4c58745a68fe3d083288c2"/>
+				<rom name="nba action starring david robinson (prototype - feb 20, 1994).bin" size="262144" crc="91e3026c" sha1="eedd9e46158547c80d4c58745a68fe3d083288c2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5283,7 +5283,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="nba action starring david robinson (prototype - feb 21,  1994).bin" size="262144" crc="9265f8c3" sha1="74716d2e00728bee25985ca2acf0547080699f87"/>
+				<rom name="nba action starring david robinson (prototype - feb 21, 1994).bin" size="262144" crc="9265f8c3" sha1="74716d2e00728bee25985ca2acf0547080699f87"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5294,7 +5294,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="nba action starring david robinson (prototype - feb 24,  1994).bin" size="262144" crc="21a79f63" sha1="bfbcb9dc6c2c66108ba8910df7b360f287feb997"/>
+				<rom name="nba action starring david robinson (prototype - feb 24, 1994).bin" size="262144" crc="21a79f63" sha1="bfbcb9dc6c2c66108ba8910df7b360f287feb997"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5305,7 +5305,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="nba action starring david robinson (prototype - feb 25,  1994 - b).bin" size="262144" crc="188a319e" sha1="23cdda16537505afa407704f493c0ed4e51d6373"/>
+				<rom name="nba action starring david robinson (prototype - feb 25, 1994 - b).bin" size="262144" crc="188a319e" sha1="23cdda16537505afa407704f493c0ed4e51d6373"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5316,7 +5316,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="nba action starring david robinson (prototype - feb 25,  1994).bin" size="262144" crc="afc8a69e" sha1="305c1ca1b947694b61cfd896abca5c6f9ec287f3"/>
+				<rom name="nba action starring david robinson (prototype - feb 25, 1994).bin" size="262144" crc="afc8a69e" sha1="305c1ca1b947694b61cfd896abca5c6f9ec287f3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5327,7 +5327,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="nba action starring david robinson (prototype - feb 26,  1994).bin" size="262144" crc="6896b65d" sha1="1d75c23394eaf7506f54a4f55a9e2234c35a5b6d"/>
+				<rom name="nba action starring david robinson (prototype - feb 26, 1994).bin" size="262144" crc="6896b65d" sha1="1d75c23394eaf7506f54a4f55a9e2234c35a5b6d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5338,7 +5338,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="nba action starring david robinson (prototype - feb 27,  1994).bin" size="262144" crc="ab721f11" sha1="a11674848036a8d587c939ac568bc505d811c0ab"/>
+				<rom name="nba action starring david robinson (prototype - feb 27, 1994).bin" size="262144" crc="ab721f11" sha1="a11674848036a8d587c939ac568bc505d811c0ab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5349,7 +5349,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="nba action starring david robinson (prototype - feb 28,  1994).bin" size="262144" crc="82e882d6" sha1="e9b3acc9c18ff76d3a48400da39eae98f42d3e5d"/>
+				<rom name="nba action starring david robinson (prototype - feb 28, 1994).bin" size="262144" crc="82e882d6" sha1="e9b3acc9c18ff76d3a48400da39eae98f42d3e5d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5360,7 +5360,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="nba action starring david robinson (prototype - jan 04,  1994).bin" size="262144" crc="c658b5b3" sha1="9f7e49a7881333a0bc8e6c0ad2a6920102bdb23c"/>
+				<rom name="nba action starring david robinson (prototype - jan 04, 1994).bin" size="262144" crc="c658b5b3" sha1="9f7e49a7881333a0bc8e6c0ad2a6920102bdb23c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5371,7 +5371,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="nba action starring david robinson (prototype - jan 06,  1994).bin" size="262144" crc="41dabd84" sha1="01bb6913099fedbc2cf0193351f8a307facad3df"/>
+				<rom name="nba action starring david robinson (prototype - jan 06, 1994).bin" size="262144" crc="41dabd84" sha1="01bb6913099fedbc2cf0193351f8a307facad3df"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5382,7 +5382,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="nba action starring david robinson (prototype - jan 10,  1994).bin" size="262144" crc="a34b2b4c" sha1="377ccf6af5fd66672e212005529665c3934e4ead"/>
+				<rom name="nba action starring david robinson (prototype - jan 10, 1994).bin" size="262144" crc="a34b2b4c" sha1="377ccf6af5fd66672e212005529665c3934e4ead"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5393,7 +5393,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="nba action starring david robinson (prototype - jan 24,  1994).bin" size="262144" crc="9824f77d" sha1="d38c5f823bbb8db43bf25a71d57329d7ca7e9087"/>
+				<rom name="nba action starring david robinson (prototype - jan 24, 1994).bin" size="262144" crc="9824f77d" sha1="d38c5f823bbb8db43bf25a71d57329d7ca7e9087"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5404,7 +5404,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="nba action starring david robinson (prototype - jan 29,  1994).bin" size="262144" crc="0d6bf79d" sha1="866f61bfd3e54dc6963fae24fda1333cdceef32d"/>
+				<rom name="nba action starring david robinson (prototype - jan 29, 1994).bin" size="262144" crc="0d6bf79d" sha1="866f61bfd3e54dc6963fae24fda1333cdceef32d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5415,7 +5415,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="nba action starring david robinson (prototype - dec 01,  1993).bin" size="262144" crc="8c089da5" sha1="ac01abe3858ac97f31b23104231bb26bb2ee4a6c"/>
+				<rom name="nba action starring david robinson (prototype - dec 01, 1993).bin" size="262144" crc="8c089da5" sha1="ac01abe3858ac97f31b23104231bb26bb2ee4a6c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5426,7 +5426,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="nba action starring david robinson (prototype - nov 28,  1993).bin" size="262144" crc="31084021" sha1="6e12de62fe88f12ec28e594871df90a4e42f4f33"/>
+				<rom name="nba action starring david robinson (prototype - nov 28, 1993).bin" size="262144" crc="31084021" sha1="6e12de62fe88f12ec28e594871df90a4e42f4f33"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5523,7 +5523,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="nfl '95 (prototype - aug 08,  1994).bin" size="524288" crc="8cd96d95" sha1="2bcaa3b7d0ba5bb5dfb716071f365f6e0248bc0b"/>
+				<rom name="nfl '95 (prototype - aug 08, 1994).bin" size="524288" crc="8cd96d95" sha1="2bcaa3b7d0ba5bb5dfb716071f365f6e0248bc0b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5534,7 +5534,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="nfl '95 (prototype - aug 25,  1994 - a).bin" size="524288" crc="7f769052" sha1="0d79198d43250ad4a745da7853050a3db8f2803c"/>
+				<rom name="nfl '95 (prototype - aug 25, 1994 - a).bin" size="524288" crc="7f769052" sha1="0d79198d43250ad4a745da7853050a3db8f2803c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5545,7 +5545,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="nfl '95 (prototype - aug 25,  1994).bin" size="524288" crc="fe140eaa" sha1="b79af203bc01ea1c59563e34105cb36cad158cca"/>
+				<rom name="nfl '95 (prototype - aug 25, 1994).bin" size="524288" crc="fe140eaa" sha1="b79af203bc01ea1c59563e34105cb36cad158cca"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5556,7 +5556,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="nfl '95 (prototype - aug 26,  1994).bin" size="524288" crc="f77138dd" sha1="b86fa58449e1544014ffce590efe16678e93f811"/>
+				<rom name="nfl '95 (prototype - aug 26, 1994).bin" size="524288" crc="f77138dd" sha1="b86fa58449e1544014ffce590efe16678e93f811"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5567,7 +5567,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="nfl '95 (prototype - aug 31,  1994).bin" size="524288" crc="a3b046e7" sha1="d426cd29a03b2341c417c3d5b40f16c4e066f27e"/>
+				<rom name="nfl '95 (prototype - aug 31, 1994).bin" size="524288" crc="a3b046e7" sha1="d426cd29a03b2341c417c3d5b40f16c4e066f27e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5578,7 +5578,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="nfl '95 (prototype - sep 02,  1994).bin" size="524288" crc="3978387b" sha1="f2e837a299bc357f8f75e8daaa38159d926d8202"/>
+				<rom name="nfl '95 (prototype - sep 02, 1994).bin" size="524288" crc="3978387b" sha1="f2e837a299bc357f8f75e8daaa38159d926d8202"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5589,7 +5589,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="nfl '95 (prototype - sep 08,  1994).bin" size="524288" crc="ff70a26f" sha1="95ef164e629eb5ac88201e2cb1606d305f1881b0"/>
+				<rom name="nfl '95 (prototype - sep 08, 1994).bin" size="524288" crc="ff70a26f" sha1="95ef164e629eb5ac88201e2cb1606d305f1881b0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5600,7 +5600,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="nfl '95 (prototype - sep 10,  1994).bin" size="524288" crc="132db489" sha1="5eebf128b61ce03ea2eb44e5b42ccdf4de80d0ec"/>
+				<rom name="nfl '95 (prototype - sep 10, 1994).bin" size="524288" crc="132db489" sha1="5eebf128b61ce03ea2eb44e5b42ccdf4de80d0ec"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5611,7 +5611,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="nfl '95 (prototype - sep 11,  1994 - b).bin" size="524288" crc="c57c6afd" sha1="087c59dace9afbd2cd6b53bfe896f33820b03f5e"/>
+				<rom name="nfl '95 (prototype - sep 11, 1994 - b).bin" size="524288" crc="c57c6afd" sha1="087c59dace9afbd2cd6b53bfe896f33820b03f5e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5622,7 +5622,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="nfl '95 (prototype - sep 11,  1994 - c).bin" size="524288" crc="088e4b6d" sha1="7a5c9883fa5775ee357de76e60b5435acfa4f47f"/>
+				<rom name="nfl '95 (prototype - sep 11, 1994 - c).bin" size="524288" crc="088e4b6d" sha1="7a5c9883fa5775ee357de76e60b5435acfa4f47f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5633,7 +5633,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="nfl '95 (prototype - sep 12,  1994).bin" size="524288" crc="b38f48b6" sha1="dc3c1d7b0137d26d79cb7d0be5ed51d551a256d7"/>
+				<rom name="nfl '95 (prototype - sep 12, 1994).bin" size="524288" crc="b38f48b6" sha1="dc3c1d7b0137d26d79cb7d0be5ed51d551a256d7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5644,7 +5644,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="nfl '95 (prototype - sep 14,  1994 - f).bin" size="524288" crc="2828cb66" sha1="e76270bfbe8a64173fba9ca14d15679fb340d0c9"/>
+				<rom name="nfl '95 (prototype - sep 14, 1994 - f).bin" size="524288" crc="2828cb66" sha1="e76270bfbe8a64173fba9ca14d15679fb340d0c9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5655,7 +5655,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="nfl '95 (prototype - sep 14,  1994).bin" size="524288" crc="474a162b" sha1="441468692ee04852424dac693697389c93f44482"/>
+				<rom name="nfl '95 (prototype - sep 14, 1994).bin" size="524288" crc="474a162b" sha1="441468692ee04852424dac693697389c93f44482"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5703,7 +5703,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="nhl all-star hockey (prototype - dec 15,  1994).bin" size="524288" crc="e583d999" sha1="dec66ddac97c91aebcefc479da79ea086b0ebea8"/>
+				<rom name="nhl all-star hockey (prototype - dec 15, 1994).bin" size="524288" crc="e583d999" sha1="dec66ddac97c91aebcefc479da79ea086b0ebea8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5714,7 +5714,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="nhl all-star hockey (prototype - dec 22,  1994).bin" size="524288" crc="dfba792a" sha1="be689bef9395d698ed5f9629c80762d7f6847393"/>
+				<rom name="nhl all-star hockey (prototype - dec 22, 1994).bin" size="524288" crc="dfba792a" sha1="be689bef9395d698ed5f9629c80762d7f6847393"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5725,7 +5725,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="nhl all-star hockey (prototype - dec 29,  1994).bin" size="524288" crc="e14d071b" sha1="be2afd53ba0ceb64e9069c4fefd73db5b31ad9e2"/>
+				<rom name="nhl all-star hockey (prototype - dec 29, 1994).bin" size="524288" crc="e14d071b" sha1="be2afd53ba0ceb64e9069c4fefd73db5b31ad9e2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5736,7 +5736,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="nhl all-star hockey (prototype - dec 31,  1994).bin" size="524288" crc="8a2b6323" sha1="f7d636b7e75853a744c61da7ac3c91766fc34dc7"/>
+				<rom name="nhl all-star hockey (prototype - dec 31, 1994).bin" size="524288" crc="8a2b6323" sha1="f7d636b7e75853a744c61da7ac3c91766fc34dc7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5747,7 +5747,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="nhl all-star hockey (prototype - jan 02,  1995).bin" size="524288" crc="2551f22c" sha1="393d17319e28c5774e7a3f2c336a36f1279d6932"/>
+				<rom name="nhl all-star hockey (prototype - jan 02, 1995).bin" size="524288" crc="2551f22c" sha1="393d17319e28c5774e7a3f2c336a36f1279d6932"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5758,7 +5758,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="nhl all-star hockey (prototype - jan 03,  1995).bin" size="524288" crc="ece5633b" sha1="5560ce4cff2f2b4ca7a89c34d295ac11983aa698"/>
+				<rom name="nhl all-star hockey (prototype - jan 03, 1995).bin" size="524288" crc="ece5633b" sha1="5560ce4cff2f2b4ca7a89c34d295ac11983aa698"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5769,7 +5769,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="nhl all-star hockey (prototype - jan 07,  1995).bin" size="524288" crc="82504476" sha1="7ff1ee75043b1fe81c7db4b1aeac0f3c3c84c90a"/>
+				<rom name="nhl all-star hockey (prototype - jan 07, 1995).bin" size="524288" crc="82504476" sha1="7ff1ee75043b1fe81c7db4b1aeac0f3c3c84c90a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5780,7 +5780,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="nhl all-star hockey (prototype - jan 11,  1995).bin" size="524288" crc="49f8b9e4" sha1="c5bc673a9e1c046a13d19151e52022dba3e862ba"/>
+				<rom name="nhl all-star hockey (prototype - jan 11, 1995).bin" size="524288" crc="49f8b9e4" sha1="c5bc673a9e1c046a13d19151e52022dba3e862ba"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5791,7 +5791,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="nhl all-star hockey (prototype - jan 13,  1995).bin" size="524288" crc="87d8fe13" sha1="338d8d9a6adaa9f4cc1733a62de76ad240ff1f79"/>
+				<rom name="nhl all-star hockey (prototype - jan 13, 1995).bin" size="524288" crc="87d8fe13" sha1="338d8d9a6adaa9f4cc1733a62de76ad240ff1f79"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5802,7 +5802,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="nhl all-star hockey (prototype - jan 16,  1995).bin" size="524288" crc="50dcf5b6" sha1="5e251060685b00d4b492e1eddfcabfa0d78d42cf"/>
+				<rom name="nhl all-star hockey (prototype - jan 16, 1995).bin" size="524288" crc="50dcf5b6" sha1="5e251060685b00d4b492e1eddfcabfa0d78d42cf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5824,7 +5824,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="nhl all-star hockey (prototype - jan 21,  1995).bin" size="524288" crc="16af7995" sha1="7d0dd9e5d441e6e55d0c31f313c7761cf5860c16"/>
+				<rom name="nhl all-star hockey (prototype - jan 21, 1995).bin" size="524288" crc="16af7995" sha1="7d0dd9e5d441e6e55d0c31f313c7761cf5860c16"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5835,7 +5835,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="nhl all-star hockey (prototype - jan 24,  1995 - a).bin" size="524288" crc="0b1c38f4" sha1="91e8a0184d77dcd7c484b125b560b113aeaeaeb4"/>
+				<rom name="nhl all-star hockey (prototype - jan 24, 1995 - a).bin" size="524288" crc="0b1c38f4" sha1="91e8a0184d77dcd7c484b125b560b113aeaeaeb4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5846,7 +5846,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="nhl all-star hockey (prototype - jan 24,  1995 - b).bin" size="524288" crc="0a4a6830" sha1="c7c54814c416bd3a1eed38e13a1644fe3f57160e"/>
+				<rom name="nhl all-star hockey (prototype - jan 24, 1995 - b).bin" size="524288" crc="0a4a6830" sha1="c7c54814c416bd3a1eed38e13a1644fe3f57160e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5857,7 +5857,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="nhl all-star hockey (prototype - jan 24,  1995 - c).bin" size="524288" crc="54f5efb2" sha1="318b3f3615f7b94e9f375f8b1c7a0a98c2bfe3ab"/>
+				<rom name="nhl all-star hockey (prototype - jan 24, 1995 - c).bin" size="524288" crc="54f5efb2" sha1="318b3f3615f7b94e9f375f8b1c7a0a98c2bfe3ab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5868,7 +5868,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="nhl all-star hockey (prototype - jan 24,  1995).bin" size="524288" crc="74be3c4c" sha1="235a09f13eecd83d6c278a5e476a93004ff78c9b"/>
+				<rom name="nhl all-star hockey (prototype - jan 24, 1995).bin" size="524288" crc="74be3c4c" sha1="235a09f13eecd83d6c278a5e476a93004ff78c9b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5879,7 +5879,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="nhl all-star hockey (prototype - jan 25,  1995).bin" size="524288" crc="a587b13e" sha1="4f6077aa192be69261cbce3ec3ddc35c6d04a0d2"/>
+				<rom name="nhl all-star hockey (prototype - jan 25, 1995).bin" size="524288" crc="a587b13e" sha1="4f6077aa192be69261cbce3ec3ddc35c6d04a0d2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6899,7 +6899,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="ristar (prototype - nov 01,  1994).bin" size="524288" crc="44fa6ae6" sha1="e2a06327647d9ad2358e34aae069d7789bc70e65"/>
+				<rom name="ristar (prototype - nov 01, 1994).bin" size="524288" crc="44fa6ae6" sha1="e2a06327647d9ad2358e34aae069d7789bc70e65"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6910,7 +6910,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="ristar (prototype - nov 02,  1994).bin" size="524288" crc="302d2b4b" sha1="cf2a646d5c4b3f717a5c2a29d193210abbf770ca"/>
+				<rom name="ristar (prototype - nov 02, 1994).bin" size="524288" crc="302d2b4b" sha1="cf2a646d5c4b3f717a5c2a29d193210abbf770ca"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6921,7 +6921,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="ristar (prototype - oct 19,  1994).bin" size="524288" crc="672d38d5" sha1="ac6d5e7f5c3fbd828876a12e10d89274025f3924"/>
+				<rom name="ristar (prototype - oct 19, 1994).bin" size="524288" crc="672d38d5" sha1="ac6d5e7f5c3fbd828876a12e10d89274025f3924"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6932,7 +6932,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="ristar (prototype - oct 26,  1994).bin" size="524288" crc="a302413c" sha1="b13c32f50e7eb7d8147b7ad1d310e89e690ba6b2"/>
+				<rom name="ristar (prototype - oct 26, 1994).bin" size="524288" crc="a302413c" sha1="b13c32f50e7eb7d8147b7ad1d310e89e690ba6b2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6943,7 +6943,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="ristar (prototype - sep 09,  1994).bin" size="524288" crc="a1c214bd" sha1="f746e8e99f4fca811a32716d96a4e6528ec930eb"/>
+				<rom name="ristar (prototype - sep 09, 1994).bin" size="524288" crc="a1c214bd" sha1="f746e8e99f4fca811a32716d96a4e6528ec930eb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7401,7 +7401,7 @@ a certain item) -->
 		<part name="cart" interface="gamegear_cart">
 			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="524288">
-				<rom name="shining force ii (prototype - apr 27,  1994).bin" size="524288" crc="65e5345c" sha1="71ed14c75915d606e00481cc2fbbaa28b6d2ba4f"/>
+				<rom name="shining force ii (prototype - apr 27, 1994).bin" size="524288" crc="65e5345c" sha1="71ed14c75915d606e00481cc2fbbaa28b6d2ba4f"/>
 			</dataarea>
 			<!-- KM62256BLG-10L - 32Kx8 bit Low Power CMOS Static RAM -->
 			<dataarea name="ram" size="32768">
@@ -7416,7 +7416,7 @@ a certain item) -->
 		<part name="cart" interface="gamegear_cart">
 			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="524288">
-				<rom name="shining force ii (prototype - jul 08,  1994).bin" size="524288" crc="80dca91d" sha1="a9dd1254577bff20ee33f7bce56e2c4361f911c4"/>
+				<rom name="shining force ii (prototype - jul 08, 1994).bin" size="524288" crc="80dca91d" sha1="a9dd1254577bff20ee33f7bce56e2c4361f911c4"/>
 			</dataarea>
 			<!-- KM62256BLG-10L - 32Kx8 bit Low Power CMOS Static RAM -->
 			<dataarea name="ram" size="32768">
@@ -7431,7 +7431,7 @@ a certain item) -->
 		<part name="cart" interface="gamegear_cart">
 			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="524288">
-				<rom name="shining force ii (prototype - jun 27,  1994).bin" size="524288" crc="8bfc56c3" sha1="900f8640af14dd6c413f20058a98da11a0fd07b1"/>
+				<rom name="shining force ii (prototype - jun 27, 1994).bin" size="524288" crc="8bfc56c3" sha1="900f8640af14dd6c413f20058a98da11a0fd07b1"/>
 			</dataarea>
 			<!-- KM62256BLG-10L - 32Kx8 bit Low Power CMOS Static RAM -->
 			<dataarea name="ram" size="32768">
@@ -7446,7 +7446,7 @@ a certain item) -->
 		<part name="cart" interface="gamegear_cart">
 			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="524288">
-				<rom name="shining force ii (prototype - may 30,  1994).bin" size="524288" crc="e97ec011" sha1="bb7be9acb986a923c6c8ae41053c1b2f508885d1"/>
+				<rom name="shining force ii (prototype - may 30, 1994).bin" size="524288" crc="e97ec011" sha1="bb7be9acb986a923c6c8ae41053c1b2f508885d1"/>
 			</dataarea>
 			<!-- KM62256BLG-10L - 32Kx8 bit Low Power CMOS Static RAM -->
 			<dataarea name="ram" size="32768">
@@ -7655,7 +7655,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sonic blast (prototype 611 - may 31,  1996, 13.49).bin" size="524288" crc="c09ef45b" sha1="5d9fa949aeddfc4251d7b8a58cb1122f190ecd36"/>
+				<rom name="sonic blast (prototype 611 - may 31, 1996, 13.49).bin" size="524288" crc="c09ef45b" sha1="5d9fa949aeddfc4251d7b8a58cb1122f190ecd36"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7666,7 +7666,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="sonic blast (prototype 74 - jul 17,  1996, 09.11).bin" size="1048576" crc="362b186d" sha1="e7bb20410c7ab341a3f7df7fcfee3a6996823655"/>
+				<rom name="sonic blast (prototype 74 - jul 17, 1996, 09.11).bin" size="1048576" crc="362b186d" sha1="e7bb20410c7ab341a3f7df7fcfee3a6996823655"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7677,7 +7677,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="sonic blast (prototype 806 - aug 06,  1996, 18.37).bin" size="1048576" crc="19dad067" sha1="12a8a59da110b914acde68112db691df9595d4e8"/>
+				<rom name="sonic blast (prototype 806 - aug 06, 1996, 18.37).bin" size="1048576" crc="19dad067" sha1="12a8a59da110b914acde68112db691df9595d4e8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7688,7 +7688,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="sonic blast (prototype 821 - aug 22,  1996, 09.38).bin" size="1048576" crc="5eecb549" sha1="da497ae41be3fccc97eb18bd6349917e645c5179"/>
+				<rom name="sonic blast (prototype 821 - aug 22, 1996, 09.38).bin" size="1048576" crc="5eecb549" sha1="da497ae41be3fccc97eb18bd6349917e645c5179"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7699,7 +7699,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="sonic blast (prototype 827 - aug 28,  1996, 11.13).bin" size="1048576" crc="e6847ac0" sha1="f1a1edee0eb15faf74dd6896753f0f6abcf12a45"/>
+				<rom name="sonic blast (prototype 827 - aug 28, 1996, 11.13).bin" size="1048576" crc="e6847ac0" sha1="f1a1edee0eb15faf74dd6896753f0f6abcf12a45"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7710,7 +7710,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="sonic blast (prototype 94 - sep 02,  1996, 17.47).bin" size="1048576" crc="2f22a352" sha1="8aa965b342466cc3ac4093bba61abf7d68b5ec86"/>
+				<rom name="sonic blast (prototype 94 - sep 02, 1996, 17.47).bin" size="1048576" crc="2f22a352" sha1="8aa965b342466cc3ac4093bba61abf7d68b5ec86"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7827,7 +7827,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sonic spinball (prototype 0307 - mar 07,  1994, 05.24).bin" size="524288" crc="3283580d" sha1="1b6f1469d0e707aab3eba3c6748f350a30eb530f"/>
+				<rom name="sonic spinball (prototype 0307 - mar 07, 1994, 05.24).bin" size="524288" crc="3283580d" sha1="1b6f1469d0e707aab3eba3c6748f350a30eb530f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7838,7 +7838,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sonic spinball (prototype 031094 - mar 10,  1994, 17.41).bin" size="524288" crc="1a736612" sha1="81dc53c9103fab356014e7e45082fc562cdd59ec"/>
+				<rom name="sonic spinball (prototype 031094 - mar 10, 1994, 17.41).bin" size="524288" crc="1a736612" sha1="81dc53c9103fab356014e7e45082fc562cdd59ec"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7849,7 +7849,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sonic spinball (prototype 031194 - mar 11,  1994, 12.09).bin" size="524288" crc="1aed8f62" sha1="cec96b3372a4ecb39ac7bd51829d4f641ff8d198"/>
+				<rom name="sonic spinball (prototype 031194 - mar 11, 1994, 12.09).bin" size="524288" crc="1aed8f62" sha1="cec96b3372a4ecb39ac7bd51829d4f641ff8d198"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7860,7 +7860,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sonic spinball (prototype 032194 - mar 21,  1994, 07.12).bin" size="524288" crc="46657b4e" sha1="6b08dd5e60e957739cd7c8dea5f9fcb2bf82009c"/>
+				<rom name="sonic spinball (prototype 032194 - mar 21, 1994, 07.12).bin" size="524288" crc="46657b4e" sha1="6b08dd5e60e957739cd7c8dea5f9fcb2bf82009c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7871,7 +7871,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sonic spinball (prototype 0328 - mar 28,  1994, 06.54).bin" size="524288" crc="1233c3e3" sha1="41260c00f83592c6c21800750bd25359f8cce911"/>
+				<rom name="sonic spinball (prototype 0328 - mar 28, 1994, 06.54).bin" size="524288" crc="1233c3e3" sha1="41260c00f83592c6c21800750bd25359f8cce911"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7882,7 +7882,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sonic spinball (prototype 0329 - mar 29,  1994, 07.35).bin" size="524288" crc="aa7aedb0" sha1="f3a3b701f7700459b0a4175e6b8c24ab68518f40"/>
+				<rom name="sonic spinball (prototype 0329 - mar 29, 1994, 07.35).bin" size="524288" crc="aa7aedb0" sha1="f3a3b701f7700459b0a4175e6b8c24ab68518f40"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7893,7 +7893,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sonic spinball (prototype 0330 - mar 30,  1994, 06.54).bin" size="524288" crc="2ca34ab2" sha1="a066324f8d781ea218ea61689eea6d6254bf9aab"/>
+				<rom name="sonic spinball (prototype 0330 - mar 30, 1994, 06.54).bin" size="524288" crc="2ca34ab2" sha1="a066324f8d781ea218ea61689eea6d6254bf9aab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7904,7 +7904,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sonic spinball (prototype 0405 - apr 05,  1994, 18.07).bin" size="524288" crc="09b913d5" sha1="35ed35fda5fc8d5f1ac1068157c176bb216769e4"/>
+				<rom name="sonic spinball (prototype 0405 - apr 05, 1994, 18.07).bin" size="524288" crc="09b913d5" sha1="35ed35fda5fc8d5f1ac1068157c176bb216769e4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7915,7 +7915,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sonic spinball (prototype 0412 - apr 12,  1994, 07.26).bin" size="524288" crc="f8a432f6" sha1="3fd285036f794574b7310ca093a6d5d5bc244bc7"/>
+				<rom name="sonic spinball (prototype 0412 - apr 12, 1994, 07.26).bin" size="524288" crc="f8a432f6" sha1="3fd285036f794574b7310ca093a6d5d5bc244bc7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7926,7 +7926,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sonic spinball (prototype 0413 - apr 13,  1994, 02.54).bin" size="524288" crc="1f1abf2c" sha1="a4c3d6b3601d321003aad3b759487bddb4cd64b3"/>
+				<rom name="sonic spinball (prototype 0413 - apr 13, 1994, 02.54).bin" size="524288" crc="1f1abf2c" sha1="a4c3d6b3601d321003aad3b759487bddb4cd64b3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7937,7 +7937,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sonic spinball (prototype 0415 - apr 15,  1994, 17.33).bin" size="524288" crc="e3b5cd1e" sha1="e59e3d9b0a8d9adb13a32cfdbe027ade81c8ded1"/>
+				<rom name="sonic spinball (prototype 0415 - apr 15, 1994, 17.33).bin" size="524288" crc="e3b5cd1e" sha1="e59e3d9b0a8d9adb13a32cfdbe027ade81c8ded1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7948,7 +7948,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sonic spinball (prototype 0421 - apr 21,  1994, 05.30).bin" size="524288" crc="bbaecf7c" sha1="f0abf46487acc6a2a93b3e7e93dbe9f651ccbd41"/>
+				<rom name="sonic spinball (prototype 0421 - apr 21, 1994, 05.30).bin" size="524288" crc="bbaecf7c" sha1="f0abf46487acc6a2a93b3e7e93dbe9f651ccbd41"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7959,7 +7959,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="376832">
-				<rom name="sonic spinball (prototype 0427 - apr 27,  1994, 04.51).bin" size="376832" crc="07d32244" sha1="2be84549aeecf580ef25290b7255270ede38b830"/>
+				<rom name="sonic spinball (prototype 0427 - apr 27, 1994, 04.51).bin" size="376832" crc="07d32244" sha1="2be84549aeecf580ef25290b7255270ede38b830"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7970,7 +7970,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sonic spinball (prototype 0429 - apr 29,  1994, 06.01).bin" size="524288" crc="30a7d062" sha1="35954b7e65e663fba3066046e971316d5e573158"/>
+				<rom name="sonic spinball (prototype 0429 - apr 29, 1994, 06.01).bin" size="524288" crc="30a7d062" sha1="35954b7e65e663fba3066046e971316d5e573158"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7981,7 +7981,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sonic spinball (prototype 0430 - apr 29,  1994, 21.48).bin" size="524288" crc="221c4ba4" sha1="ab9ac3b4ebecd02c8f3b0d29b921a3d8bcf96458"/>
+				<rom name="sonic spinball (prototype 0430 - apr 29, 1994, 21.48).bin" size="524288" crc="221c4ba4" sha1="ab9ac3b4ebecd02c8f3b0d29b921a3d8bcf96458"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7992,7 +7992,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sonic spinball (prototype 503b - may 03,  1994, 19.27).bin" size="524288" crc="e2fe976a" sha1="7577eef2ac9823a539d6af1c2673d1702d29695f"/>
+				<rom name="sonic spinball (prototype 503b - may 03, 1994, 19.27).bin" size="524288" crc="e2fe976a" sha1="7577eef2ac9823a539d6af1c2673d1702d29695f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8003,7 +8003,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sonic spinball (prototype 0505 - may 05,  1994, 04.47).bin" size="524288" crc="be76bf30" sha1="975232a729179c1db5307c072593cdbf83e233d6"/>
+				<rom name="sonic spinball (prototype 0505 - may 05, 1994, 04.47).bin" size="524288" crc="be76bf30" sha1="975232a729179c1db5307c072593cdbf83e233d6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8014,7 +8014,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sonic spinball (prototype 0506 - may 06,  1994, 13.04).bin" size="524288" crc="a4833d27" sha1="36cd00138f78bf31ee6098d1f5b0b2e870ab5637"/>
+				<rom name="sonic spinball (prototype 0506 - may 06, 1994, 13.04).bin" size="524288" crc="a4833d27" sha1="36cd00138f78bf31ee6098d1f5b0b2e870ab5637"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8025,7 +8025,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sonic spinball (prototype 0525 - may 25,  1994, 13.24).bin" size="524288" crc="a035fd5c" sha1="cf9afbc274afcd28931bb1298c53bfdf6e04a9b6"/>
+				<rom name="sonic spinball (prototype 0525 - may 25, 1994, 13.24).bin" size="524288" crc="a035fd5c" sha1="cf9afbc274afcd28931bb1298c53bfdf6e04a9b6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8036,7 +8036,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sonic spinball (prototype 0530 - may 30,  1994, 23.25).bin" size="524288" crc="6107819d" sha1="8c16865212ad284a0929869a95980bcdf3d9ba81"/>
+				<rom name="sonic spinball (prototype 0530 - may 30, 1994, 23.25).bin" size="524288" crc="6107819d" sha1="8c16865212ad284a0929869a95980bcdf3d9ba81"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8155,7 +8155,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sonic the hedgehog - triple trouble (prototype 0808 - aug 08,  1994, 18.05).bin" size="524288" crc="80eb7cfb" sha1="02257fece665d04d3c88b5f5589773d5a8433953"/>
+				<rom name="sonic the hedgehog - triple trouble (prototype 0808 - aug 08, 1994, 18.05).bin" size="524288" crc="80eb7cfb" sha1="02257fece665d04d3c88b5f5589773d5a8433953"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8282,7 +8282,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="sports trivia (prototype - mar 08,  1995).bin" size="131072" crc="c38d41c3" sha1="d3503a568182f1f286203c2e2a5516f74684f4f3"/>
+				<rom name="sports trivia (prototype - mar 08, 1995).bin" size="131072" crc="c38d41c3" sha1="d3503a568182f1f286203c2e2a5516f74684f4f3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8293,7 +8293,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="sports trivia (prototype - mar 09,  1995).bin" size="131072" crc="34407fe9" sha1="c977c038df47192996e05c9db130bf2c82a129ff"/>
+				<rom name="sports trivia (prototype - mar 09, 1995).bin" size="131072" crc="34407fe9" sha1="c977c038df47192996e05c9db130bf2c82a129ff"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8304,7 +8304,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - mar 13,  1995).bin" size="262144" crc="a8d1ac51" sha1="58c08b83df499755a47dc8407807bd2f93a58583"/>
+				<rom name="sports trivia (prototype - mar 13, 1995).bin" size="262144" crc="a8d1ac51" sha1="58c08b83df499755a47dc8407807bd2f93a58583"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8315,7 +8315,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="sports trivia (prototype - mar 16,  1995 - 1meg).bin" size="131072" crc="464f1b51" sha1="151a9d25a29a41d00d20d9d6a93620682464e037"/>
+				<rom name="sports trivia (prototype - mar 16, 1995 - 1meg).bin" size="131072" crc="464f1b51" sha1="151a9d25a29a41d00d20d9d6a93620682464e037"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8326,7 +8326,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - mar 16,  1995 - 2meg).bin" size="262144" crc="caf87d8b" sha1="61e215dd6ac4a9ab334210a9d87876222a717e12"/>
+				<rom name="sports trivia (prototype - mar 16, 1995 - 2meg).bin" size="262144" crc="caf87d8b" sha1="61e215dd6ac4a9ab334210a9d87876222a717e12"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8337,7 +8337,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - mar 17,  1995 - 2meg).bin" size="262144" crc="43bb6b10" sha1="5b5034d5689bb116ca602ea30a696af60444ced8"/>
+				<rom name="sports trivia (prototype - mar 17, 1995 - 2meg).bin" size="262144" crc="43bb6b10" sha1="5b5034d5689bb116ca602ea30a696af60444ced8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8348,7 +8348,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - mar 20,  1995 - 2meg).bin" size="262144" crc="e7aff566" sha1="693cc753fc94eb5d79fb0bf0e4cb484dd1fb57f3"/>
+				<rom name="sports trivia (prototype - mar 20, 1995 - 2meg).bin" size="262144" crc="e7aff566" sha1="693cc753fc94eb5d79fb0bf0e4cb484dd1fb57f3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8359,7 +8359,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - mar 20,  1995 - qtest).bin" size="262144" crc="a3e57816" sha1="70e71c0581019c89bd2c38ee45b05bff84fc3eb0"/>
+				<rom name="sports trivia (prototype - mar 20, 1995 - qtest).bin" size="262144" crc="a3e57816" sha1="70e71c0581019c89bd2c38ee45b05bff84fc3eb0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8370,7 +8370,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="sports trivia (prototype - apr 25,  1995 - 1meg).bin" size="131072" crc="895af58a" sha1="8e42323155c0e0f0cd050e66f89f821cb884f7a1"/>
+				<rom name="sports trivia (prototype - apr 25, 1995 - 1meg).bin" size="131072" crc="895af58a" sha1="8e42323155c0e0f0cd050e66f89f821cb884f7a1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8381,7 +8381,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="sports trivia (prototype - apr 25,  1995 - qtest).bin" size="131072" crc="7524957c" sha1="90834a82aa40f69abf57d34d1910d829d8632af0"/>
+				<rom name="sports trivia (prototype - apr 25, 1995 - qtest).bin" size="131072" crc="7524957c" sha1="90834a82aa40f69abf57d34d1910d829d8632af0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8392,7 +8392,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="sports trivia (prototype - apr 27,  1995 - 1meg).bin" size="131072" crc="7898919f" sha1="36d665e221ecf7c0d5f3af1edc83c9e56f3256af"/>
+				<rom name="sports trivia (prototype - apr 27, 1995 - 1meg).bin" size="131072" crc="7898919f" sha1="36d665e221ecf7c0d5f3af1edc83c9e56f3256af"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8403,7 +8403,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="sports trivia (prototype - may 04,  1995 - 1meg).bin" size="131072" crc="bba4cf7b" sha1="7c17382789e6648019e99fb8feca84535f50ae4f"/>
+				<rom name="sports trivia (prototype - may 04, 1995 - 1meg).bin" size="131072" crc="bba4cf7b" sha1="7c17382789e6648019e99fb8feca84535f50ae4f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8425,7 +8425,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - may 02,  1995 - 2meg).bin" size="262144" crc="15e7e261" sha1="03b4e8d8afc14d8df113043c3d53130df6eb769e"/>
+				<rom name="sports trivia (prototype - may 02, 1995 - 2meg).bin" size="262144" crc="15e7e261" sha1="03b4e8d8afc14d8df113043c3d53130df6eb769e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8436,7 +8436,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - apr 03,  1995 - 2meg).bin" size="262144" crc="3e3d6728" sha1="8fc968be19d8da9335bf3a6dac97657058ef5a78"/>
+				<rom name="sports trivia (prototype - apr 03, 1995 - 2meg).bin" size="262144" crc="3e3d6728" sha1="8fc968be19d8da9335bf3a6dac97657058ef5a78"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8447,7 +8447,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - apr 03,  1995 - qtest).bin" size="262144" crc="c68762e6" sha1="dbab3669da5a204ce78af3fc5a1749a08c39262e"/>
+				<rom name="sports trivia (prototype - apr 03, 1995 - qtest).bin" size="262144" crc="c68762e6" sha1="dbab3669da5a204ce78af3fc5a1749a08c39262e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8458,7 +8458,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - apr 04,  1995 - 2meg).bin" size="262144" crc="d61a366f" sha1="463dbaafd144c430f3b62dbb53578f26441bfdb8"/>
+				<rom name="sports trivia (prototype - apr 04, 1995 - 2meg).bin" size="262144" crc="d61a366f" sha1="463dbaafd144c430f3b62dbb53578f26441bfdb8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8469,7 +8469,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - apr 05,  1995 - 2meg - b).bin" size="262144" crc="818ec54c" sha1="48ff2e462d0b17022c8085133447dd7eedac898b"/>
+				<rom name="sports trivia (prototype - apr 05, 1995 - 2meg - b).bin" size="262144" crc="818ec54c" sha1="48ff2e462d0b17022c8085133447dd7eedac898b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8480,7 +8480,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - apr 05,  1995 - 2meg - c).bin" size="262144" crc="f88a55f4" sha1="c857bef7eed535d1f827ad439df112b3b0c05cf8"/>
+				<rom name="sports trivia (prototype - apr 05, 1995 - 2meg - c).bin" size="262144" crc="f88a55f4" sha1="c857bef7eed535d1f827ad439df112b3b0c05cf8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8491,7 +8491,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - apr 05,  1995 - qtest).bin" size="262144" crc="93b98f19" sha1="a57c18adfa86e86b3e43f605617205a219aafdfb"/>
+				<rom name="sports trivia (prototype - apr 05, 1995 - qtest).bin" size="262144" crc="93b98f19" sha1="a57c18adfa86e86b3e43f605617205a219aafdfb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8502,7 +8502,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - apr 06,  1995 - 2meg).bin" size="262144" crc="cab74070" sha1="aa61ae6b979d30757b1192118796878e3e1c082f"/>
+				<rom name="sports trivia (prototype - apr 06, 1995 - 2meg).bin" size="262144" crc="cab74070" sha1="aa61ae6b979d30757b1192118796878e3e1c082f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8513,7 +8513,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - apr 07,  1995 - 2meg).bin" size="262144" crc="352e8b8c" sha1="e4938d6b435fce12b4b73591447422342b919e9f"/>
+				<rom name="sports trivia (prototype - apr 07, 1995 - 2meg).bin" size="262144" crc="352e8b8c" sha1="e4938d6b435fce12b4b73591447422342b919e9f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8524,7 +8524,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - apr 07,  1995 - qtest).bin" size="262144" crc="961ae378" sha1="34986c53709ef347a8ec620dbe7b35fef8ff3ef0"/>
+				<rom name="sports trivia (prototype - apr 07, 1995 - qtest).bin" size="262144" crc="961ae378" sha1="34986c53709ef347a8ec620dbe7b35fef8ff3ef0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8535,7 +8535,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - apr 11,  1995 - 2meg).bin" size="262144" crc="8bdb184d" sha1="203f4ebd0ca75bbeeb3723372500336415f59da4"/>
+				<rom name="sports trivia (prototype - apr 11, 1995 - 2meg).bin" size="262144" crc="8bdb184d" sha1="203f4ebd0ca75bbeeb3723372500336415f59da4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8546,7 +8546,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - apr 12,  1995 - 2meg).bin" size="262144" crc="1e360a20" sha1="5ced41cadede9959775f1d6cf229a19c0d739c88"/>
+				<rom name="sports trivia (prototype - apr 12, 1995 - 2meg).bin" size="262144" crc="1e360a20" sha1="5ced41cadede9959775f1d6cf229a19c0d739c88"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8557,7 +8557,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - apr 28,  1995 - 2meg).bin" size="262144" crc="26470d2b" sha1="23a9d5dee62d64eed1de6e35ac75cbe5786a0c06"/>
+				<rom name="sports trivia (prototype - apr 28, 1995 - 2meg).bin" size="262144" crc="26470d2b" sha1="23a9d5dee62d64eed1de6e35ac75cbe5786a0c06"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8568,7 +8568,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - mar 21,  1995 - 2meg).bin" size="262144" crc="18cf6145" sha1="400a91d37ad6eaf54d2b4057d562876507ea715e"/>
+				<rom name="sports trivia (prototype - mar 21, 1995 - 2meg).bin" size="262144" crc="18cf6145" sha1="400a91d37ad6eaf54d2b4057d562876507ea715e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8579,7 +8579,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - mar 23,  1995 - 2meg).bin" size="262144" crc="27816c09" sha1="5ad1ed30fcc414b237c6a9057e3f43913c3ebf23"/>
+				<rom name="sports trivia (prototype - mar 23, 1995 - 2meg).bin" size="262144" crc="27816c09" sha1="5ad1ed30fcc414b237c6a9057e3f43913c3ebf23"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8590,7 +8590,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - mar 23,  1995 - algotest).bin" size="262144" crc="9a8ad5ca" sha1="7a9dfd2ca7ecba07ef141ad9f2428052b441e200"/>
+				<rom name="sports trivia (prototype - mar 23, 1995 - algotest).bin" size="262144" crc="9a8ad5ca" sha1="7a9dfd2ca7ecba07ef141ad9f2428052b441e200"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8601,7 +8601,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - mar 23,  1995 - qtest).bin" size="262144" crc="acb7e580" sha1="227f12188ceaa0577cd6604804d1228e342c67a2"/>
+				<rom name="sports trivia (prototype - mar 23, 1995 - qtest).bin" size="262144" crc="acb7e580" sha1="227f12188ceaa0577cd6604804d1228e342c67a2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8612,7 +8612,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - mar 27,  1995 - 2meg).bin" size="262144" crc="517bd817" sha1="3ae00363f54b73c47d6e6125e3a7d3741f33fccf"/>
+				<rom name="sports trivia (prototype - mar 27, 1995 - 2meg).bin" size="262144" crc="517bd817" sha1="3ae00363f54b73c47d6e6125e3a7d3741f33fccf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8623,7 +8623,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - mar 27,  1995 - algotest).bin" size="262144" crc="511b1d24" sha1="b7ba8f1c6ec2958da3a040ab56f9915f13723a70"/>
+				<rom name="sports trivia (prototype - mar 27, 1995 - algotest).bin" size="262144" crc="511b1d24" sha1="b7ba8f1c6ec2958da3a040ab56f9915f13723a70"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8634,7 +8634,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - mar 29,  1995 - 2meg).bin" size="262144" crc="e906fbd8" sha1="3410bafb1757988f1cb270745dfa9ac22212539b"/>
+				<rom name="sports trivia (prototype - mar 29, 1995 - 2meg).bin" size="262144" crc="e906fbd8" sha1="3410bafb1757988f1cb270745dfa9ac22212539b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8645,7 +8645,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - mar 29,  1995 - algotest).bin" size="262144" crc="e80459b3" sha1="cfcb94207728f781602ff8375cda3c2de25b7eed"/>
+				<rom name="sports trivia (prototype - mar 29, 1995 - algotest).bin" size="262144" crc="e80459b3" sha1="cfcb94207728f781602ff8375cda3c2de25b7eed"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8656,7 +8656,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - mar 29,  1995 - qtest).bin" size="262144" crc="05047357" sha1="50cce09ee3c077feaf7ad9df1e2a9f4fde0e7691"/>
+				<rom name="sports trivia (prototype - mar 29, 1995 - qtest).bin" size="262144" crc="05047357" sha1="50cce09ee3c077feaf7ad9df1e2a9f4fde0e7691"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8667,7 +8667,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - mar 30,  1995 - 2meg - d).bin" size="262144" crc="302b9b36" sha1="d462337a78f85882e7ebcb95e129ab18e75e44a4"/>
+				<rom name="sports trivia (prototype - mar 30, 1995 - 2meg - d).bin" size="262144" crc="302b9b36" sha1="d462337a78f85882e7ebcb95e129ab18e75e44a4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8678,7 +8678,7 @@ a certain item) -->
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - mar 30,  1995 - qtest).bin" size="262144" crc="f3f9a87b" sha1="0ac64a9077ddcb53d2d35748f13b9d462f27ab51"/>
+				<rom name="sports trivia (prototype - mar 30, 1995 - qtest).bin" size="262144" crc="f3f9a87b" sha1="0ac64a9077ddcb53d2d35748f13b9d462f27ab51"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8902,7 +8902,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="super columns (prototype - dec 01,  1994).bin" size="131072" crc="56cf1d4f" sha1="29dac0da809c8a74c6610e4dde300efaddaca29a"/>
+				<rom name="super columns (prototype - dec 01, 1994).bin" size="131072" crc="56cf1d4f" sha1="29dac0da809c8a74c6610e4dde300efaddaca29a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8913,7 +8913,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="super columns (prototype - dec 15,  1994).bin" size="131072" crc="abe92434" sha1="3edad6d335d5f6ec3dc403fd642cd6a71e3c053d"/>
+				<rom name="super columns (prototype - dec 15, 1994).bin" size="131072" crc="abe92434" sha1="3edad6d335d5f6ec3dc403fd642cd6a71e3c053d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8924,7 +8924,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="super columns (prototype - dec 21,  1994).bin" size="131072" crc="81451fc0" sha1="b7cabe08f0e0850b055fd0e694e175e8f1c47e4d"/>
+				<rom name="super columns (prototype - dec 21, 1994).bin" size="131072" crc="81451fc0" sha1="b7cabe08f0e0850b055fd0e694e175e8f1c47e4d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8935,7 +8935,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="super columns (prototype - dec 26,  1994).bin" size="131072" crc="5c4c633d" sha1="d3050de383e772bb068d4c722bbe91ff05172d45"/>
+				<rom name="super columns (prototype - dec 26, 1994).bin" size="131072" crc="5c4c633d" sha1="d3050de383e772bb068d4c722bbe91ff05172d45"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8946,7 +8946,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="super columns (prototype - dec 28,  1994).bin" size="131072" crc="3d931952" sha1="b2bc04e1f7a00ec5431774db0b47da53db57d3a3"/>
+				<rom name="super columns (prototype - dec 28, 1994).bin" size="131072" crc="3d931952" sha1="b2bc04e1f7a00ec5431774db0b47da53db57d3a3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8957,7 +8957,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="super columns (prototype - jan 06,  1995).bin" size="131072" crc="096f4ff5" sha1="fed437cf7d22c685fef7b2e55579cd77bb48e232"/>
+				<rom name="super columns (prototype - jan 06, 1995).bin" size="131072" crc="096f4ff5" sha1="fed437cf7d22c685fef7b2e55579cd77bb48e232"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8968,7 +8968,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="super columns (prototype - nov 11,  1994).bin" size="131072" crc="f28f89d1" sha1="e5b23a687c9dd285970f4783369e36c7a96d19fa"/>
+				<rom name="super columns (prototype - nov 11, 1994).bin" size="131072" crc="f28f89d1" sha1="e5b23a687c9dd285970f4783369e36c7a96d19fa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9407,7 +9407,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="taz in escape from mars (prototype - aug 10,  1994).bin" size="524288" crc="92388016" sha1="ed5a66c278fc429fd4ddb993c4a7bdf2d2400a3a"/>
+				<rom name="taz in escape from mars (prototype - aug 10, 1994).bin" size="524288" crc="92388016" sha1="ed5a66c278fc429fd4ddb993c4a7bdf2d2400a3a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9418,7 +9418,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="taz in escape from mars (prototype - aug 12,  1994).bin" size="524288" crc="a43fdfad" sha1="6482e281447b586c533a45527db52bd5c333ebdd"/>
+				<rom name="taz in escape from mars (prototype - aug 12, 1994).bin" size="524288" crc="a43fdfad" sha1="6482e281447b586c533a45527db52bd5c333ebdd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9429,7 +9429,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="taz in escape from mars (prototype - aug 14,  1994).bin" size="524288" crc="9267d968" sha1="8800da06ea2aa3982cf2e294b165f5e1a9cab63c"/>
+				<rom name="taz in escape from mars (prototype - aug 14, 1994).bin" size="524288" crc="9267d968" sha1="8800da06ea2aa3982cf2e294b165f5e1a9cab63c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9440,7 +9440,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="taz in escape from mars (prototype - aug 19,  1994).bin" size="524288" crc="57747640" sha1="d32127a67f988062407d92bb1dfdf3ce38210e31"/>
+				<rom name="taz in escape from mars (prototype - aug 19, 1994).bin" size="524288" crc="57747640" sha1="d32127a67f988062407d92bb1dfdf3ce38210e31"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9451,7 +9451,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="taz in escape from mars (prototype - aug 23,  1994).bin" size="524288" crc="6cd0fd78" sha1="9cc498d9975fa2633a4ec98581768856884163a8"/>
+				<rom name="taz in escape from mars (prototype - aug 23, 1994).bin" size="524288" crc="6cd0fd78" sha1="9cc498d9975fa2633a4ec98581768856884163a8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9462,7 +9462,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="taz in escape from mars (prototype - aug 29,  1994 - b).bin" size="524288" crc="3c03919d" sha1="b1b5f7b06001f38e0533bc489b5c7f8b9caf6a5b"/>
+				<rom name="taz in escape from mars (prototype - aug 29, 1994 - b).bin" size="524288" crc="3c03919d" sha1="b1b5f7b06001f38e0533bc489b5c7f8b9caf6a5b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9473,7 +9473,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="taz in escape from mars (prototype - aug 30,  1994).bin" size="524288" crc="09679b89" sha1="20c0398e036f733734d2d38e8d2e3e57a1086106"/>
+				<rom name="taz in escape from mars (prototype - aug 30, 1994).bin" size="524288" crc="09679b89" sha1="20c0398e036f733734d2d38e8d2e3e57a1086106"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9484,7 +9484,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="taz in escape from mars (prototype - may 11,  1994).bin" size="262144" crc="030f396a" sha1="47b98ee8dfe407bac65fd02257e99221feb088fc"/>
+				<rom name="taz in escape from mars (prototype - may 11, 1994).bin" size="262144" crc="030f396a" sha1="47b98ee8dfe407bac65fd02257e99221feb088fc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9495,7 +9495,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="taz in escape from mars (prototype - sep 02,  1994).bin" size="524288" crc="18913d93" sha1="afca21f4f5337540343b6c74f36d6b2d0c9ca6c9"/>
+				<rom name="taz in escape from mars (prototype - sep 02, 1994).bin" size="524288" crc="18913d93" sha1="afca21f4f5337540343b6c74f36d6b2d0c9ca6c9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9506,7 +9506,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="taz in escape from mars (prototype - sep 05,  1994 - b).bin" size="524288" crc="d84a631c" sha1="02b726d8c0da2f51076ad95ddc750d423636a807"/>
+				<rom name="taz in escape from mars (prototype - sep 05, 1994 - b).bin" size="524288" crc="d84a631c" sha1="02b726d8c0da2f51076ad95ddc750d423636a807"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9517,7 +9517,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="taz in escape from mars (prototype - sep 05,  1994 - c).bin" size="524288" crc="61330a58" sha1="b383c0e67e47bb1b6f2402948408da1d5418c354"/>
+				<rom name="taz in escape from mars (prototype - sep 05, 1994 - c).bin" size="524288" crc="61330a58" sha1="b383c0e67e47bb1b6f2402948408da1d5418c354"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9528,7 +9528,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="taz in escape from mars (prototype - sep 06,  1994 - d).bin" size="524288" crc="1f040bca" sha1="5fb66139767319777153faddbdfdb1168f898546"/>
+				<rom name="taz in escape from mars (prototype - sep 06, 1994 - d).bin" size="524288" crc="1f040bca" sha1="5fb66139767319777153faddbdfdb1168f898546"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9539,7 +9539,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="taz in escape from mars (prototype - sep 09,  1994 - b).bin" size="524288" crc="c867da05" sha1="c3cbe41444dadd60a0f79af213a50eab552f083f"/>
+				<rom name="taz in escape from mars (prototype - sep 09, 1994 - b).bin" size="524288" crc="c867da05" sha1="c3cbe41444dadd60a0f79af213a50eab552f083f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9550,7 +9550,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="taz in escape from mars (prototype - sep 10,  1994).bin" size="524288" crc="faf4bec0" sha1="3d0da9536c47ecad367a83a6645172cee46b2ca8"/>
+				<rom name="taz in escape from mars (prototype - sep 10, 1994).bin" size="524288" crc="faf4bec0" sha1="3d0da9536c47ecad367a83a6645172cee46b2ca8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9593,7 +9593,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="tempo jr. (prototype - dec 05,  1994).bin" size="524288" crc="3475d48e" sha1="c86b63d669464cba8bf167c33cfa8dc5bf1625b4"/>
+				<rom name="tempo jr. (prototype - dec 05, 1994).bin" size="524288" crc="3475d48e" sha1="c86b63d669464cba8bf167c33cfa8dc5bf1625b4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9604,7 +9604,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="tempo jr. (prototype - dec 12,  1994).bin" size="524288" crc="fb9a5885" sha1="6112068a8b6ad0e34afc2d576c2ef7e95af32c6d"/>
+				<rom name="tempo jr. (prototype - dec 12, 1994).bin" size="524288" crc="fb9a5885" sha1="6112068a8b6ad0e34afc2d576c2ef7e95af32c6d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9615,7 +9615,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="tempo jr. (prototype - dec 26,  1994).bin" size="524288" crc="e484e41c" sha1="9fb56c4cb39f48bdfb6a16a7af40b85888d81b3b"/>
+				<rom name="tempo jr. (prototype - dec 26, 1994).bin" size="524288" crc="e484e41c" sha1="9fb56c4cb39f48bdfb6a16a7af40b85888d81b3b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9626,7 +9626,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="tempo jr. (prototype - feb 06,  1995).bin" size="524288" crc="3ef6551c" sha1="f3a25425c939a3190c15a1c35a86cde116dcc5ea"/>
+				<rom name="tempo jr. (prototype - feb 06, 1995).bin" size="524288" crc="3ef6551c" sha1="f3a25425c939a3190c15a1c35a86cde116dcc5ea"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9637,7 +9637,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="tempo jr. (prototype - feb 15,  1995).bin" size="524288" crc="79e83d67" sha1="bb2cfeb11e0319021a83a63556bd5e4f98e3d217"/>
+				<rom name="tempo jr. (prototype - feb 15, 1995).bin" size="524288" crc="79e83d67" sha1="bb2cfeb11e0319021a83a63556bd5e4f98e3d217"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9648,7 +9648,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="tempo jr. (prototype - jan 17,  1995).bin" size="524288" crc="ab6dc88c" sha1="987bbf9f394a3aa7e79a95b847b093e45d532296"/>
+				<rom name="tempo jr. (prototype - jan 17, 1995).bin" size="524288" crc="ab6dc88c" sha1="987bbf9f394a3aa7e79a95b847b093e45d532296"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9659,7 +9659,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="tempo jr. (prototype - jan 20,  1995).bin" size="524288" crc="96d64b16" sha1="01a81e62f04759993d1fb865aa5f7feb086e15ec"/>
+				<rom name="tempo jr. (prototype - jan 20, 1995).bin" size="524288" crc="96d64b16" sha1="01a81e62f04759993d1fb865aa5f7feb086e15ec"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9670,7 +9670,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="tempo jr. (prototype - jan 31,  1995).bin" size="524288" crc="7afedf36" sha1="75a0914f97622c3f148b7874a8b8ce564a150eae"/>
+				<rom name="tempo jr. (prototype - jan 31, 1995).bin" size="524288" crc="7afedf36" sha1="75a0914f97622c3f148b7874a8b8ce564a150eae"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9681,7 +9681,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="tempo jr. (prototype - nov 28,  1994).bin" size="524288" crc="a33b5b92" sha1="d909b2b153e500c506a5cee3439d3c514c58600b"/>
+				<rom name="tempo jr. (prototype - nov 28, 1994).bin" size="524288" crc="a33b5b92" sha1="d909b2b153e500c506a5cee3439d3c514c58600b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10183,7 +10183,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="world series baseball '95 (prototype - jul 09,  1994).bin" size="524288" crc="410f1ca0" sha1="a1f06ac03e229b6be08e995365bf6ffda0b32184"/>
+				<rom name="world series baseball '95 (prototype - jul 09, 1994).bin" size="524288" crc="410f1ca0" sha1="a1f06ac03e229b6be08e995365bf6ffda0b32184"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10194,7 +10194,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="world series baseball '95 (prototype - jul 19,  1994).bin" size="524288" crc="5f7cca5f" sha1="7b9750f398f1bab2a6d10df58e610a4ce59287bb"/>
+				<rom name="world series baseball '95 (prototype - jul 19, 1994).bin" size="524288" crc="5f7cca5f" sha1="7b9750f398f1bab2a6d10df58e610a4ce59287bb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10205,7 +10205,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="world series baseball '95 (prototype - jul 22,  1994).bin" size="524288" crc="6073cd59" sha1="149f8d34be9f2cfc080f5e192712a134656d12f3"/>
+				<rom name="world series baseball '95 (prototype - jul 22, 1994).bin" size="524288" crc="6073cd59" sha1="149f8d34be9f2cfc080f5e192712a134656d12f3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10216,7 +10216,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="world series baseball '95 (prototype - jul 28,  1994).bin" size="524288" crc="4190ad97" sha1="fddf978dc5c29ca234080fff32680fbf66d7be2c"/>
+				<rom name="world series baseball '95 (prototype - jul 28, 1994).bin" size="524288" crc="4190ad97" sha1="fddf978dc5c29ca234080fff32680fbf66d7be2c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10227,7 +10227,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="world series baseball '95 (prototype - jul 29,  1994).bin" size="524288" crc="f1987de6" sha1="5ba283dff711ad4a32d52aa077829dda43d52eaa"/>
+				<rom name="world series baseball '95 (prototype - jul 29, 1994).bin" size="524288" crc="f1987de6" sha1="5ba283dff711ad4a32d52aa077829dda43d52eaa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10238,7 +10238,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="world series baseball '95 (prototype - jun 29,  1994).bin" size="524288" crc="496515a6" sha1="3e05e8b9628853d05aef16a6b7d09e307c989548"/>
+				<rom name="world series baseball '95 (prototype - jun 29, 1994).bin" size="524288" crc="496515a6" sha1="3e05e8b9628853d05aef16a6b7d09e307c989548"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10321,7 +10321,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="x-men - gamemaster's legacy (prototype - aug 10,  1994).bin" size="524288" crc="66cc4034" sha1="46237cf1c2810a8f2e5c31907a1ae04b647256c8"/>
+				<rom name="x-men - gamemaster's legacy (prototype - aug 10, 1994).bin" size="524288" crc="66cc4034" sha1="46237cf1c2810a8f2e5c31907a1ae04b647256c8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10332,7 +10332,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="x-men - gamemaster's legacy (prototype 36 - aug 31,  1994).bin" size="524288" crc="271a0a1d" sha1="9df11129d4f7e55a1380b139d1bb0cdb4137a702"/>
+				<rom name="x-men - gamemaster's legacy (prototype 36 - aug 31, 1994).bin" size="524288" crc="271a0a1d" sha1="9df11129d4f7e55a1380b139d1bb0cdb4137a702"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10343,7 +10343,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="x-men - gamemaster's legacy (prototype 51 - sep 06,  1994).bin" size="524288" crc="a3cf94ba" sha1="1078ef9c16cb997f61eddbd07c1bfbc5f74b177b"/>
+				<rom name="x-men - gamemaster's legacy (prototype 51 - sep 06, 1994).bin" size="524288" crc="a3cf94ba" sha1="1078ef9c16cb997f61eddbd07c1bfbc5f74b177b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10365,7 +10365,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="x-men - mojo world (prototype - jun 05,  1996).bin" size="524288" crc="626f9987" sha1="b9a4d3bd1f33a988b48fdffedabd26ddaf7d7ab5"/>
+				<rom name="x-men - mojo world (prototype - jun 05, 1996).bin" size="524288" crc="626f9987" sha1="b9a4d3bd1f33a988b48fdffedabd26ddaf7d7ab5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10376,7 +10376,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="x-men - mojo world (prototype - jun 13,  1996).bin" size="524288" crc="c4f3ced4" sha1="eb9646133ca49838c7d559492f1a059398abe34f"/>
+				<rom name="x-men - mojo world (prototype - jun 13, 1996).bin" size="524288" crc="c4f3ced4" sha1="eb9646133ca49838c7d559492f1a059398abe34f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10387,7 +10387,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="x-men - mojo world (prototype - jun 24,  1996).bin" size="524288" crc="78001a5d" sha1="e7d3af2bb027af159d02eb85b8810438af59c8dd"/>
+				<rom name="x-men - mojo world (prototype - jun 24, 1996).bin" size="524288" crc="78001a5d" sha1="e7d3af2bb027af159d02eb85b8810438af59c8dd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10398,7 +10398,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="x-men - mojo world (prototype - jun 25,  1996).bin" size="524288" crc="d4d2f077" sha1="3ade7aeea0d0d5e65d4da24021b565de891e45a8"/>
+				<rom name="x-men - mojo world (prototype - jun 25, 1996).bin" size="524288" crc="d4d2f077" sha1="3ade7aeea0d0d5e65d4da24021b565de891e45a8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10409,7 +10409,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="x-men - mojo world (prototype - jun 27,  1996).bin" size="524288" crc="425ac73f" sha1="5690f9609c641ea7718ddb8e7c36342eeb4a25dd"/>
+				<rom name="x-men - mojo world (prototype - jun 27, 1996).bin" size="524288" crc="425ac73f" sha1="5690f9609c641ea7718ddb8e7c36342eeb4a25dd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10420,7 +10420,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="x-men - mojo world (prototype - jun 28,  1996).bin" size="524288" crc="d44925ea" sha1="97fce993a317cbc09825849a45bc2c2ab3e97179"/>
+				<rom name="x-men - mojo world (prototype - jun 28, 1996).bin" size="524288" crc="d44925ea" sha1="97fce993a317cbc09825849a45bc2c2ab3e97179"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10431,7 +10431,7 @@ a certain item) -->
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="x-men - mojo world (prototype - jun 29,  1996).bin" size="524288" crc="ba71da19" sha1="cc3fc3b57bcd4daea90a572c935013d286ebbb99"/>
+				<rom name="x-men - mojo world (prototype - jun 29, 1996).bin" size="524288" crc="ba71da19" sha1="cc3fc3b57bcd4daea90a572c935013d286ebbb99"/>
 			</dataarea>
 		</part>
 	</software>

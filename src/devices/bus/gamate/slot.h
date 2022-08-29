@@ -31,7 +31,7 @@ public:
 	virtual uint8_t read_cart(offs_t offset) { return 0xff; }
 	virtual void write_cart(offs_t offset, uint8_t data) { }
 
-	void rom_alloc(uint32_t size, const char *tag);
+	void rom_alloc(uint32_t size);
 	uint8_t* get_rom_base() { return m_rom; }
 	uint32_t get_rom_size() { return m_rom_size; }
 
@@ -96,8 +96,6 @@ DECLARE_DEVICE_TYPE(GAMATE_CART_SLOT, gamate_cart_slot_device)
 /***************************************************************************
  DEVICE CONFIGURATION MACROS
  ***************************************************************************/
-
-#define GAMATESLOT_ROM_REGION_TAG ":cart:rom"
 
 void gamate_cart(device_slot_interface &device);
 

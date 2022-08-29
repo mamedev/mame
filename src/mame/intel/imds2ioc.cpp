@@ -2,13 +2,7 @@
 // copyright-holders:F. Ulivi
 // I/O controller for Intel Intellec MDS series-II
 //
-// NOTE:
-// Firmware running on PIO is NOT original because a dump is not available at the moment.
-// Emulator runs a version of PIO firmware that was specifically developed by me to implement
-// line printer output.
-//
 // TODO:
-// - Find a dump of the original PIO firmware
 // - Adjust speed of processors. Wait states are not accounted for yet.
 
 #include "emu.h"
@@ -328,20 +322,10 @@ WRITE_LINE_MEMBER(imds2ioc_device::pio_lpt_ack_w)
 
 WRITE_LINE_MEMBER(imds2ioc_device::pio_lpt_busy_w)
 {
-	// Busy is active high in centronics_device whereas it's active low in MDS
-	if (!state) {
+	if (state) {
 		m_device_status_byte |= 0x10;
 	} else {
 		m_device_status_byte &= ~0x10;
-	}
-}
-
-WRITE_LINE_MEMBER(imds2ioc_device::pio_lpt_select_w)
-{
-	if (state) {
-		m_device_status_byte |= 0x40;
-	} else {
-		m_device_status_byte &= ~0x40;
 	}
 }
 
@@ -641,7 +625,6 @@ void imds2ioc_device::device_add_mconfig(machine_config &config)
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->ack_handler().set(FUNC(imds2ioc_device::pio_lpt_ack_w));
 	m_centronics->busy_handler().set(FUNC(imds2ioc_device::pio_lpt_busy_w));
-	m_centronics->perror_handler().set(FUNC(imds2ioc_device::pio_lpt_select_w));
 }
 
 ROM_START(imds2ioc)
@@ -665,10 +648,8 @@ ROM_START(imds2ioc)
 	ROMX_LOAD("104593-004.a53", 0x1800, 0x0800, CRC(04407e2a) SHA1(ecd65e4337d2bb7f5f6fdaae95696c9207ba57ee), ROM_BIOS(2))
 
 	// ROM definition of PIO controller (8041A)
-	// For the time being a specially developed PIO firmware is used until a dump of the original PIO is
-	// available.
 	ROM_REGION(0x400, "iocpio", 0)
-	ROM_LOAD("pio_a72.bin", 0, 0x400, BAD_DUMP CRC(8c8e740b) SHA1(9b9333a9dc9585aa8f630721d13e551a5c87defc))
+	ROM_LOAD("104566-0012.bin", 0, 0x400, CRC(f999e5da) SHA1(77ac1fab5443a16f906b25926ab3ba3ae42db6bb))
 
 	// ROM definition of keyboard controller (8741)
 	ROM_REGION(0x400, "kbcpu", 0)

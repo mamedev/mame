@@ -982,7 +982,7 @@ bool sun4_mmu_base_device::translate(uint32_t &addr)
 	return entry.valid;
 }
 
-void sun4_mmu_base_device::l2p_command(const std::vector<std::string> &params)
+void sun4_mmu_base_device::l2p_command(const std::vector<std::string_view> &params)
 {
 	uint64_t addr, offset;
 

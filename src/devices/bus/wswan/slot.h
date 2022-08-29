@@ -101,7 +101,7 @@ public:
 	virtual u16 read_io(offs_t offset, u16 mem_mask) { return 0xffff; }
 	virtual void write_io(offs_t offset, u16 data, u16 mem_mask) { }
 
-	void rom_alloc(u32 size, const char *tag);
+	void rom_alloc(u32 size);
 	void nvram_alloc(u32 size);
 	u16* get_rom_base() { return m_rom; }
 	uint8_t* get_nvram_base() { return &m_nvram[0]; }
@@ -183,12 +183,5 @@ protected:
 
 // device type definition
 DECLARE_DEVICE_TYPE(WS_CART_SLOT, ws_cart_slot_device)
-
-
-/***************************************************************************
- DEVICE CONFIGURATION MACROS
- ***************************************************************************/
-
-#define WSSLOT_ROM_REGION_TAG ":cart:rom"
 
 #endif // MAME_BUS_WSWAN_SLOT_H

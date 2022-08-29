@@ -1000,7 +1000,7 @@ void systeme_state::init_fantzn2()
 //
 ROM_START( fantzn2 )
 	ROM_REGION( 0x50000, "maincpu", 0 )
-	ROM_LOAD( "epr-11416.ic7",  0x00000, 0x08000, CRC(76db7b7b) SHA1(d60e2961fc893dcb4445aed5f67515cbd25b610f) )    /* encrypted */
+	ROM_LOAD( "epr-11416.ic7",  0x00000, 0x08000, CRC(76db7b7b) SHA1(d60e2961fc893dcb4445aed5f67515cbd25b610f) ) // encrypted
 
 	ROM_LOAD( "epr-11415.ic5",  0x10000, 0x10000, CRC(57b45681) SHA1(1ae6d0d58352e246a4ec4e1ce02b0417257d5d20) )
 	ROM_LOAD( "epr-11413.ic3",  0x20000, 0x10000, CRC(a231dc85) SHA1(45b94fdbde28c02e88546178ef3e8f9f3a96ab86) )
@@ -1021,7 +1021,7 @@ ROM_END
 //
 ROM_START( hangonjr )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "epr-7257b.ic7",   0x00000, 0x08000, CRC(d63925a7) SHA1(699f222d9712fa42651c753fe75d7b60e016d3ad) ) /* Fixed Code */
+	ROM_LOAD( "epr-7257b.ic7",   0x00000, 0x08000, CRC(d63925a7) SHA1(699f222d9712fa42651c753fe75d7b60e016d3ad) ) // fixed code
 
 	/* The following are 8 0x4000 banks that get mapped to reads from 0x8000 - 0xbfff */
 	ROM_LOAD( "epr-7258.ic5",   0x10000, 0x08000, CRC(ee3caab3) SHA1(f583cf92c579d1ca235e8b300e256ba58a04dc90) )
@@ -1036,15 +1036,15 @@ ROM_END
 //
 ROM_START( opaopa )
 	ROM_REGION( 0x50000, "maincpu", 0 )
-	ROM_LOAD( "epr-11054.ic7",  0x00000, 0x08000, CRC(024b1244) SHA1(59a522ac3d98982cc4ddb1c81f9584d3da453649) ) /* encrypted */
+	ROM_LOAD( "epr-11054.ic7",  0x00000, 0x08000, CRC(024b1244) SHA1(59a522ac3d98982cc4ddb1c81f9584d3da453649) ) // encrypted
 
-	/* The following are 8 0x4000 banks that get mapped to reads from 0x8000 - 0xbfff */
-	ROM_LOAD( "epr-11053.ic5",  0x10000, 0x08000, CRC(6bc41d6e) SHA1(8997a4ac2a9704f1400d0ec16b259ee496a7efef) ) /* encrypted */
-	ROM_LOAD( "epr-11052.ic4",  0x18000, 0x08000, CRC(395c1d0a) SHA1(1594bad13e78c5fad4db644cd85a6bac1eaddbad) ) /* encrypted */
-	ROM_LOAD( "epr-11051.ic3",  0x20000, 0x08000, CRC(4ca132a2) SHA1(cb4e4c01b6ab070eef37c0603190caafe6236ccd) ) /* encrypted */
-	ROM_LOAD( "epr-11050.ic2",  0x28000, 0x08000, CRC(a165e2ef) SHA1(498ff4c5d3a2658567393378c56be6ed86ac0384) ) /* encrypted */
+	// The following are 8 0x4000 banks that get mapped to reads from 0x8000 - 0xbfff
+	ROM_LOAD( "epr-11053.ic5",  0x10000, 0x08000, CRC(6bc41d6e) SHA1(8997a4ac2a9704f1400d0ec16b259ee496a7efef) ) // encrypted
+	ROM_LOAD( "epr-11052.ic4",  0x18000, 0x08000, CRC(395c1d0a) SHA1(1594bad13e78c5fad4db644cd85a6bac1eaddbad) ) // encrypted
+	ROM_LOAD( "epr-11051.ic3",  0x20000, 0x08000, CRC(4ca132a2) SHA1(cb4e4c01b6ab070eef37c0603190caafe6236ccd) ) // encrypted
+	ROM_LOAD( "epr-11050.ic2",  0x28000, 0x08000, CRC(a165e2ef) SHA1(498ff4c5d3a2658567393378c56be6ed86ac0384) ) // encrypted
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 ) /* MC8123 key */
+	ROM_REGION( 0x2000, "maincpu:key", 0 ) // MC8123 key
 	ROM_LOAD( "317-0042.key",  0x0000, 0x2000, CRC(d6312538) SHA1(494ac7f080775c21dc7d369e6ea78f3299e6975a) )
 ROM_END
 
@@ -1054,9 +1054,9 @@ ROM_END
 //
 ROM_START( opaopan )
 	ROM_REGION( 0x50000, "maincpu", 0 )
-	ROM_LOAD( "epr-11023a.ic7",  0x00000, 0x08000, CRC(101c5c6a) SHA1(5862c6b8d9e1fc8dc9cd26d87f36fde5ce9484ac) ) /* Fixed Code */
+	ROM_LOAD( "epr-11023a.ic7",  0x00000, 0x08000, CRC(101c5c6a) SHA1(5862c6b8d9e1fc8dc9cd26d87f36fde5ce9484ac) ) // fixed code
 
-	/* The following are 8 0x4000 banks that get mapped to reads from 0x8000 - 0xbfff */
+	// The following are 8 0x4000 banks that get mapped to reads from 0x8000 - 0xbfff
 	ROM_LOAD( "epr-11022.ic5",  0x10000, 0x08000, CRC(15203a42) SHA1(41cfb9a884ed313d4dc3a36696a63a87e49b3b34) )
 	ROM_LOAD( "epr-11021.ic4",  0x18000, 0x08000, CRC(b4e83340) SHA1(57955b2b1e5c55b50ed6b53f1b52787442fe716b) )
 	ROM_LOAD( "epr-11020.ic3",  0x20000, 0x08000, CRC(c51aad27) SHA1(b6828d7f7283d00964bde7c93f67f4b7f3b9dd87) )
@@ -1070,9 +1070,9 @@ ROM_END
 //
 ROM_START( ridleofp )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "epr-10426.bin",   0x00000, 0x08000, CRC(4404c7e7) SHA1(555f44786976a009d96a6395c9173929ad6138a7) ) /* Fixed Code */
+	ROM_LOAD( "epr-10426.bin",   0x00000, 0x08000, CRC(4404c7e7) SHA1(555f44786976a009d96a6395c9173929ad6138a7) ) // fixed code
 
-	/* The following are 8 0x4000 banks that get mapped to reads from 0x8000 - 0xbfff */
+	// The following are 8 0x4000 banks that get mapped to reads from 0x8000 - 0xbfff
 	ROM_LOAD( "epr-10425.bin",   0x10000, 0x08000, CRC(35964109) SHA1(a7bc64a87b23139b0edb9c3512f47dcf73feb854) )
 	ROM_LOAD( "epr-10424.bin",   0x18000, 0x08000, CRC(fcda1dfa) SHA1(b8497b04de28fc0d6b7cb0206ad50948cff07840) )
 	ROM_LOAD( "epr-10423.bin",   0x20000, 0x08000, CRC(0b87244f) SHA1(c88041614735a9b6cba1edde0a11ed413e115361) )
@@ -1085,7 +1085,7 @@ ROM_END
 //
 ROM_START( slapshtr )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "epr-7351.ic7",   0x00000, 0x08000, CRC(894adb04) SHA1(e38d296aa56c531985cde75423ae03f0d9cc8f5d) ) /* Fixed Code */
+	ROM_LOAD( "epr-7351.ic7",   0x00000, 0x08000, CRC(894adb04) SHA1(e38d296aa56c531985cde75423ae03f0d9cc8f5d) ) // fixed code
 
 	ROM_LOAD( "epr-7352.ic5",   0x10000, 0x08000, CRC(61c938b6) SHA1(bdce617050371c7b2880967c7c7356f34b91911d) )
 	ROM_LOAD( "epr-7353.ic4",   0x18000, 0x08000, CRC(8ee2951a) SHA1(562fef28e6358cbbb4889cc7cd592ca659c238fb) )
@@ -1098,13 +1098,13 @@ ROM_END
 //
 ROM_START( tetrisse )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "epr-12213.7", 0x00000, 0x08000, CRC(ef3c7a38) SHA1(cbb91aef330ab1a37d3e21ecf1d008143d0dd7ec) ) /* Fixed Code */
+	ROM_LOAD( "epr-12213.7", 0x00000, 0x08000, CRC(ef3c7a38) SHA1(cbb91aef330ab1a37d3e21ecf1d008143d0dd7ec) ) // Fixed Code
 
-	/* The following are 8 0x4000 banks that get mapped to reads from 0x8000 - 0xbfff */
+	// The following are 8 0x4000 banks that get mapped to reads from 0x8000 - 0xbfff
 	ROM_LOAD( "epr-12212.5", 0x10000, 0x08000, CRC(28b550bf) SHA1(445922a62e8a7360335c754ad70dabbe0208207b) )
 	ROM_LOAD( "epr-12211.4", 0x18000, 0x08000, CRC(5aa114e9) SHA1(f9fc7fe4d0444a264185e74d2abc8475f0976534) )
-	/* ic3 unpopulated */
-	/* ic2 unpopulated */
+	// ic3 unpopulated
+	// ic2 unpopulated
 ROM_END
 
 //*************************************************************************************************************************
@@ -1114,7 +1114,7 @@ ROM_END
 //
 ROM_START( transfrm )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "epr-7605.ic7",   0x00000, 0x08000, CRC(ccf1d123) SHA1(5ade9b00e2a36d034fafdf1902d47a9a00e96fc4) ) /* Fixed Code */
+	ROM_LOAD( "epr-7605.ic7",   0x00000, 0x08000, CRC(ccf1d123) SHA1(5ade9b00e2a36d034fafdf1902d47a9a00e96fc4) ) // fixed code
 
 	/* The following are 8 0x4000 banks that get mapped to reads from 0x8000 - 0xbfff */
 	ROM_LOAD( "epr-7347.ic5",   0x10000, 0x08000, CRC(df0f639f) SHA1(a09a9841b66de246a585be63d911b9a42a323503) )
@@ -1128,9 +1128,9 @@ ROM_END
 //
 ROM_START( astrofl )
 	ROM_REGION( 0x50000, "maincpu", 0 )
-	ROM_LOAD( "epr-7723.ic7",   0x00000, 0x08000, CRC(66061137) SHA1(cb6a2c7864f9f87bbedfd4b1448ad6c2de65d6ca) ) /* encrypted */
+	ROM_LOAD( "epr-7723.ic7",   0x00000, 0x08000, CRC(66061137) SHA1(cb6a2c7864f9f87bbedfd4b1448ad6c2de65d6ca) ) // encrypted
 
-	/* The following are 8 0x4000 banks that get mapped to reads from 0x8000 - 0xbfff */
+	// The following are 8 0x4000 banks that get mapped to reads from 0x8000 - 0xbfff
 	ROM_LOAD( "epr-7347.ic5",   0x10000, 0x08000, CRC(df0f639f) SHA1(a09a9841b66de246a585be63d911b9a42a323503) )
 	ROM_LOAD( "epr-7348.ic4",   0x18000, 0x08000, CRC(0f38ea96) SHA1(d4d421c5d93832e2bc1f22f39dffb6b80f2750bd) )
 	ROM_LOAD( "epr-7349.ic3",   0x20000, 0x08000, CRC(f8c352d5) SHA1(e59565ab6928c67706c6f82f6ea9a64cdfc65a21) )
@@ -1144,32 +1144,32 @@ ROM_END
 //   ROMs have no SEGA EPR codes but are all marked
 //
 //        Megumi Rescue
-//           V10.30
+//        Version 10.30
 //        Final Version
 //            IC-x
 //       (c)1987SEGA/EXA
 //
 //   (where -x is the IC position on the PCB)
-
+//
 ROM_START( megrescu )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "v10_30ic.7",   0x00000, 0x08000, CRC(490d0059) SHA1(de4e23eb862ef3c29b2fbdceba14360eb6e2a8ef) ) /* Fixed Code */
+	ROM_LOAD( "megumi_rescue_version_10.30_final_version_ic-7.ic7",   0x00000, 0x08000, CRC(490d0059) SHA1(de4e23eb862ef3c29b2fbdceba14360eb6e2a8ef) ) // fixed code
 
-	ROM_LOAD( "v10_30ic.5",   0x10000, 0x08000, CRC(278caba8) SHA1(809e504f6c680f742f0a5968d6bb16c2f67f851c) )
-	ROM_LOAD( "v10_30ic.4",   0x18000, 0x08000, CRC(bda242d1) SHA1(3704da98fe91d9e7f4380ea5e1f897b6b7049466) )
-	ROM_LOAD( "v10_30ic.3",   0x20000, 0x08000, CRC(56e36f85) SHA1(84aa78bc628bce64b1b990a8c9fcca25e5940bd3) )
-	ROM_LOAD( "v10_30ic.2",   0x28000, 0x08000, CRC(5b74c767) SHA1(dbc82a4e046f01130c72bbd7a81190d7f0ca209c) )
+	ROM_LOAD( "megumi_rescue_version_10.30_final_version_ic-5.ic5",   0x10000, 0x08000, CRC(278caba8) SHA1(809e504f6c680f742f0a5968d6bb16c2f67f851c) )
+	ROM_LOAD( "megumi_rescue_version_10.30_final_version_ic-4.ic4",   0x18000, 0x08000, CRC(bda242d1) SHA1(3704da98fe91d9e7f4380ea5e1f897b6b7049466) )
+	ROM_LOAD( "megumi_rescue_version_10.30_final_version_ic-3.ic3",   0x20000, 0x08000, CRC(56e36f85) SHA1(84aa78bc628bce64b1b990a8c9fcca25e5940bd3) )
+	ROM_LOAD( "megumi_rescue_version_10.30_final_version_ic-2.ic2",   0x28000, 0x08000, CRC(5b74c767) SHA1(dbc82a4e046f01130c72bbd7a81190d7f0ca209c) )
 ROM_END
 
 
-//    YEAR, NAME,     PARENT,   MACHINE,           INPUT,    STATE          INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1985, hangonjr, 0,        hangonjr,          hangonjr, systeme_state, empty_init,    ROT0,   "Sega", "Hang-On Jr. (Rev. B)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, slapshtr, 0,        systeme,           slapshtr, systeme_state, empty_init,    ROT0,   "Sega", "Slap Shooter", MACHINE_SUPPORTS_SAVE) // 1986 date from flyer
-GAME( 1986, transfrm, 0,        systeme,           transfrm, systeme_state, empty_init,    ROT0,   "Sega", "Transformer", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, astrofl,  transfrm, systemex_315_5177, transfrm, systeme_state, empty_init,    ROT0,   "Sega", "Astro Flash (Japan)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT    MACHINE            INPUT     STATE          INIT           MONITOR COMPANY         FULLNAME,FLAGS
+GAME( 1985, hangonjr, 0,        hangonjr,          hangonjr, systeme_state, empty_init,    ROT0,   "Sega",         "Hang-On Jr. (Rev. B)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, slapshtr, 0,        systeme,           slapshtr, systeme_state, empty_init,    ROT0,   "Sega",         "Slap Shooter", MACHINE_SUPPORTS_SAVE) // 1986 date from flyer
+GAME( 1986, transfrm, 0,        systeme,           transfrm, systeme_state, empty_init,    ROT0,   "Sega",         "Transformer", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, astrofl,  transfrm, systemex_315_5177, transfrm, systeme_state, empty_init,    ROT0,   "Sega",         "Astro Flash (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, ridleofp, 0,        ridleofp,          ridleofp, systeme_state, empty_init,    ROT90,  "Sega / Nasco", "Riddle of Pythagoras (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opaopa,   0,        systemeb,          opaopa,   systeme_state, init_opaopa,   ROT0,   "Sega", "Opa Opa (MC-8123, 317-0042)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opaopan,  opaopa,   systeme,           opaopa,   systeme_state, empty_init,    ROT0,   "Sega", "Opa Opa (Rev A, unprotected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, fantzn2,  0,        systemex,          fantzn2,  systeme_state, init_fantzn2,  ROT0,   "Sega", "Fantasy Zone II - The Tears of Opa-Opa (MC-8123, 317-0057)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tetrisse, 0,        systeme,           tetrisse, systeme_state, empty_init,    ROT0,   "Sega", "Tetris (Japan, System E)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, megrescu, 0,        ridleofp,          megrescu, systeme_state, empty_init,    ROT90,  "Sega / Exa", "Megumi Rescue", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opaopa,   0,        systemeb,          opaopa,   systeme_state, init_opaopa,   ROT0,   "Sega",         "Opa Opa (MC-8123, 317-0042)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opaopan,  opaopa,   systeme,           opaopa,   systeme_state, empty_init,    ROT0,   "Sega",         "Opa Opa (Rev A, unprotected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, fantzn2,  0,        systemex,          fantzn2,  systeme_state, init_fantzn2,  ROT0,   "Sega",         "Fantasy Zone II - The Tears of Opa-Opa (MC-8123, 317-0057)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tetrisse, 0,        systeme,           tetrisse, systeme_state, empty_init,    ROT0,   "Sega",         "Tetris (Japan, System E)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, megrescu, 0,        ridleofp,          megrescu, systeme_state, empty_init,    ROT90,  "Sega / Exa",   "Megumi Rescue", MACHINE_SUPPORTS_SAVE )

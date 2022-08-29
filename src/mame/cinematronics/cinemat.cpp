@@ -68,11 +68,11 @@ void cinemat_state::machine_start()
 
 void cinemat_state::machine_reset()
 {
-	/* reset the coin states */
+	// reset the coin states
 	m_coin_detected = 0;
 	m_coin_last_reset = 0;
 
-	/* reset mux select */
+	// reset mux select
 	m_mux_select = 0;
 }
 
@@ -106,7 +106,7 @@ u8 cinemat_state::switches_r(offs_t offset)
 
 INPUT_CHANGED_MEMBER(cinemat_state::coin_inserted)
 {
-	/* on the falling edge of a new coin, set the coin_detected flag */
+	// on the falling edge of a new coin, set the coin_detected flag
 	if (newval == 0)
 		m_coin_detected = 1;
 }
@@ -127,7 +127,7 @@ u8 cinemat_state::coin_input_r()
 
 WRITE_LINE_MEMBER(cinemat_state::coin_reset_w)
 {
-	/* on the rising edge of a coin reset, clear the coin_detected flag */
+	// on the rising edge of a coin reset, clear the coin_detected flag
 	if (state)
 		m_coin_detected = 0;
 }
@@ -170,7 +170,7 @@ u8 cinemat_state::speedfrk_wheel_r(offs_t offset)
 	static const u8 speedfrk_steer[] = {0xe, 0x6, 0x2, 0x0, 0x3, 0x7, 0xf};
 	int delta_wheel;
 
-	/* the shift register is cleared once per 'frame' */
+	// the shift register is cleared once per 'frame'
 	delta_wheel = s8(m_wheel->read()) / 8;
 	if (delta_wheel > 3)
 		delta_wheel = 3;
@@ -201,7 +201,7 @@ static const struct
 	u16 bitmask;
 } sundance_port_map[16] =
 {
-	{ "PAD1", 0x155 },  /* bit  0 is set if P1 1,3,5,7,9 is pressed */
+	{ "PAD1", 0x155 },  // bit  0 is set if P1 1,3,5,7,9 is pressed
 	{ nullptr, 0 },
 	{ nullptr, 0 },
 	{ nullptr, 0 },
@@ -211,21 +211,21 @@ static const struct
 	{ nullptr, 0 },
 	{ nullptr, 0 },
 
-	{ "PAD2", 0x1a1 },  /* bit  8 is set if P2 1,6,8,9 is pressed */
-	{ "PAD1", 0x1a1 },  /* bit  9 is set if P1 1,6,8,9 is pressed */
-	{ "PAD2", 0x155 },  /* bit 10 is set if P2 1,3,5,7,9 is pressed */
+	{ "PAD2", 0x1a1 },  // bit  8 is set if P2 1,6,8,9 is pressed
+	{ "PAD1", 0x1a1 },  // bit  9 is set if P1 1,6,8,9 is pressed
+	{ "PAD2", 0x155 },  // bit 10 is set if P2 1,3,5,7,9 is pressed
 	{ nullptr, 0 },
 
-	{ "PAD1", 0x093 },  /* bit 12 is set if P1 1,2,5,8 is pressed */
-	{ "PAD2", 0x093 },  /* bit 13 is set if P2 1,2,5,8 is pressed */
-	{ "PAD1", 0x048 },  /* bit 14 is set if P1 4,8 is pressed */
-	{ "PAD2", 0x048 },  /* bit 15 is set if P2 4,8 is pressed */
+	{ "PAD1", 0x093 },  // bit 12 is set if P1 1,2,5,8 is pressed
+	{ "PAD2", 0x093 },  // bit 13 is set if P2 1,2,5,8 is pressed
+	{ "PAD1", 0x048 },  // bit 14 is set if P1 4,8 is pressed
+	{ "PAD2", 0x048 },  // bit 15 is set if P2 4,8 is pressed
 };
 
 
 u8 cinemat_16level_state::sundance_inputs_r(offs_t offset)
 {
-	/* handle special keys first */
+	// handle special keys first
 	if (sundance_port_map[offset].portname)
 		return (ioport(sundance_port_map[offset].portname)->read() & sundance_port_map[offset].bitmask) ? 0 : 1;
 	else
@@ -261,7 +261,7 @@ u8 qb3_state::qb3_frame_r()
 	attotime frame_period = m_screen->frame_period();
 	int percent = next_update.attoseconds() / (frame_period.attoseconds() / 100);
 
-	/* note this is just an approximation... */
+	// note this is just an approximation...
 	return (percent >= 10);
 }
 
@@ -376,8 +376,26 @@ static INPUT_PORTS_START( spacewar )
 INPUT_PORTS_END
 
 
+// TODO: There's 5 numbered buttons for changing the game mode during play:
+// 1: "Space ship and missiles rebound from edge of space"
+// 2: "Rebound position extended as space is expanded"
+// 3: "Sun changes to black hole"
+// 4: "Space ship repelled when approaching the sun"
+// 5: "Sun loses gravitational pull"
+// "Game 2 cannot be played until the game 1 button has been pushed"
+// "Game 5 cannot be changed to game 4"
+// "Changes to 4 and 5 not possible in novice class"
+// Also released in France with simplified controls, removing the hyperspace and option keys
 static INPUT_PORTS_START( spaceshp )
 	PORT_INCLUDE( spacewar )
+
+	PORT_MODIFY("INPUTS")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 
 	PORT_MODIFY("SWITCHES")
 	PORT_DIPNAME( 0x03, 0x00, "Time" ) PORT_DIPLOCATION("SW1:!4,!3")
@@ -385,6 +403,10 @@ static INPUT_PORTS_START( spaceshp )
 	PORT_DIPSETTING(    0x01, "1:30/coin" )
 	PORT_DIPSETTING(    0x02, "2:00/coin" )
 	PORT_DIPSETTING(    0x03, "2:30/coin" )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 
@@ -435,10 +457,10 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( speedfrk )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_CUSTOM ) /* steering wheel, fake below */
-	PORT_BIT( 0x0070, IP_ACTIVE_LOW, IPT_CUSTOM ) /* gear shift, fake below */
+	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_CUSTOM ) // steering wheel, fake below
+	PORT_BIT( 0x0070, IP_ACTIVE_LOW, IPT_CUSTOM ) // gear shift, fake below
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) /* gas */
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) // gas
 	PORT_BIT( 0xfe00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SWITCHES")
@@ -478,7 +500,7 @@ static INPUT_PORTS_START( speedfrk )
 INPUT_PORTS_END
 
 
-/* TODO: 4way or 8way stick? */
+// TODO: 4way or 8way stick?
 static INPUT_PORTS_START( starhawk )
 	PORT_START("INPUTS")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -516,7 +538,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( sundance )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) /* P1 Pad */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) // P1 Pad
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START2 )
@@ -524,14 +546,14 @@ static INPUT_PORTS_START( sundance )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Toggle Grid") PORT_CODE(KEYCODE_G)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("4 Suns") PORT_CODE(KEYCODE_SLASH)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_CUSTOM ) /* P2 Pad */
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM ) /* P1 Pad */
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_CUSTOM ) /* P2 Pad */
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_CUSTOM ) // P2 Pad
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM ) // P1 Pad
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_CUSTOM ) // P2 Pad
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2 Suns") PORT_CODE(KEYCODE_COMMA)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_CUSTOM ) /* P1 Pad */
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) /* P2 Pad */
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_CUSTOM ) /* P1 Pad */
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM ) /* P2 Pad */
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_CUSTOM ) // P1 Pad
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) // P2 Pad
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_CUSTOM ) // P1 Pad
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM ) // P2 Pad
 
 	PORT_START("SWITCHES")
 	PORT_DIPNAME( 0x03, 0x02, "Time" )
@@ -542,7 +564,7 @@ static INPUT_PORTS_START( sundance )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Language ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Japanese ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) /* supposedly coinage, doesn't work */
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) // supposedly coinage, doesn't work
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
@@ -798,10 +820,10 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( solarq )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) /* nova */
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) /* fire */
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) /* thrust */
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) /* hyperspace */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) // nova
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) // fire
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) // thrust
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) // hyperspace
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
 	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -837,7 +859,7 @@ static INPUT_PORTS_START( boxingb )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0fc0, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_CUSTOM ) /* dial */
+	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_CUSTOM ) // dial
 
 	PORT_START("SWITCHES")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
@@ -921,7 +943,7 @@ static INPUT_PORTS_START( demon )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* also mapped to Button 3, player 2 */
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // also mapped to Button 3, player 2
 
 	PORT_START("SWITCHES")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
@@ -938,7 +960,7 @@ static INPUT_PORTS_START( demon )
 	PORT_DIPSETTING(    0x30, "1" )
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPSETTING(    0x00, "10" )
-/*  PORT_DIPSETTING(    0x20, "1" )*/
+//  PORT_DIPSETTING(    0x20, "1" )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -956,11 +978,11 @@ static INPUT_PORTS_START( qb3 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_JOYSTICKRIGHT_DOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_BUTTON4 )                 // read at $1a5; if 0 add 8 to $25
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_BUTTON4 )  // read at $1a5; if 0 add 8 to $25
 	PORT_DIPNAME( 0x0200, 0x0200, "Debug" )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_BUTTON2 )                 // read at $c7; jmp to $3AF1 if 0
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_BUTTON2 )  // read at $c7; jmp to $3AF1 if 0
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_JOYSTICKLEFT_RIGHT )
 	PORT_DIPNAME( 0x1000, 0x1000, "Infinite Lives" )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
@@ -978,13 +1000,13 @@ static INPUT_PORTS_START( qb3 )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Free_Play ) )    // read at $244, $2c1
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Free_Play ) )  // read at $244, $2c1
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )  // read at $27d
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )   // read at $282
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  // read at $282
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
@@ -1001,7 +1023,7 @@ INPUT_PORTS_END
 
 void cinemat_state::cinemat_nojmi_4k(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	CCPU(config, m_maincpu, MASTER_CLOCK/4);
 	m_maincpu->set_vector_func(FUNC(cinemat_state::cinemat_vector_callback));
 	m_maincpu->external_func().set(FUNC(cinemat_state::joystick_read));
@@ -1013,7 +1035,7 @@ void cinemat_state::cinemat_nojmi_4k(machine_config &config)
 	m_outlatch->q_out_cb<5>().set(FUNC(cinemat_state::coin_reset_w));
 	m_outlatch->q_out_cb<6>().set(FUNC(cinemat_state::vector_control_w));
 
-	/* video hardware */
+	// video hardware
 	VECTOR(config, "vector", 0);
 	SCREEN(config, m_screen, SCREEN_TYPE_VECTOR);
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
@@ -1086,7 +1108,7 @@ void cinemat_state::barrier(machine_config &config)
 
 WRITE_LINE_MEMBER(cinemat_state::speedfrk_start_led_w)
 {
-	/* start LED is controlled by bit 0x02 */
+	// start LED is controlled by bit 0x02
 	m_led = !state;
 }
 
@@ -1590,7 +1612,7 @@ void qb3_state::init_qb3()
 GAME(  1977, spacewar, 0,        spacewar, spacewar, cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Space Wars", MACHINE_SUPPORTS_SAVE )
 GAME(  1978, spaceshp, spacewar, spacewar, spaceshp, cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics (Sega license)", "Space Ship", MACHINE_SUPPORTS_SAVE )
 GAMEL( 1979, barrier,  0,        barrier,  barrier,  cinemat_state,         empty_init,    ORIENTATION_FLIP_X ^ ROT270, "Cinematronics (Vectorbeam license)", "Barrier", MACHINE_SUPPORTS_SAVE, layout_barrier ) // developed by Cinematronics, then (when they noticed it wasn't going to be a successful game) sold to Vectorbeam, and ultimately back in the hands of Cinematronics again after they bought the dying company Vectorbeam
-GAMEL(  1979, speedfrk, 0,        speedfrk, speedfrk, cinemat_state,         init_speedfrk, ORIENTATION_FLIP_Y,   "Vectorbeam", "Speed Freak", MACHINE_SUPPORTS_SAVE, layout_speedfrk )
+GAMEL( 1979, speedfrk, 0,        speedfrk, speedfrk, cinemat_state,         init_speedfrk, ORIENTATION_FLIP_Y,   "Vectorbeam", "Speed Freak", MACHINE_SUPPORTS_SAVE, layout_speedfrk )
 GAME(  1979, starhawk, 0,        starhawk, starhawk, cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Starhawk", MACHINE_SUPPORTS_SAVE )
 GAMEL( 1979, sundance, 0,        sundance, sundance, cinemat_16level_state, init_sundance, ORIENTATION_FLIP_X ^ ROT270, "Cinematronics", "Sundance", MACHINE_SUPPORTS_SAVE, layout_sundance )
 GAMEL( 1979, tailg,    0,        tailg,    tailg,    cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Tailgunner", MACHINE_SUPPORTS_SAVE, layout_tailg )
@@ -1606,7 +1628,7 @@ GAMEL( 1980, starcasp, starcas,  starcas,  starcas,  cinemat_state,         empt
 GAMEL( 1980, starcase, starcas,  starcas,  starcas,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics (Mottoeis license)", "Star Castle (Mottoeis)", MACHINE_SUPPORTS_SAVE, layout_starcas )
 GAMEL( 1980, stellcas, starcas,  starcas,  starcas,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "bootleg (Elettronolo)", "Stellar Castle (Elettronolo)", MACHINE_SUPPORTS_SAVE, layout_starcas )
 GAMEL( 1981, spaceftr, starcas,  starcas,  starcas,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics (Zaccaria license)", "Space Fortress (Zaccaria)", MACHINE_SUPPORTS_SAVE, layout_starcas )
-GAMEL( 1981, solarq,   0,        solarq,   solarq,   cinemat_64level_state, empty_init,   ORIENTATION_FLIP_Y ^ ORIENTATION_FLIP_X, "Cinematronics", "Solar Quest (rev 10 8 81)", MACHINE_SUPPORTS_SAVE, layout_solarq )
+GAMEL( 1981, solarq,   0,        solarq,   solarq,   cinemat_64level_state, empty_init,    ORIENTATION_FLIP_Y ^ ORIENTATION_FLIP_X, "Cinematronics", "Solar Quest (rev 10 8 81)", MACHINE_SUPPORTS_SAVE, layout_solarq )
 GAME(  1981, boxingb,  0,        boxingb,  boxingb,  cinemat_color_state,   init_boxingb,  ORIENTATION_FLIP_Y,   "Cinematronics", "Boxing Bugs", MACHINE_SUPPORTS_SAVE )
 GAMEL( 1981, wotw,     0,        wotw,     wotw,     cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "War of the Worlds", MACHINE_SUPPORTS_SAVE, layout_wotw )
 GAME(  1981, wotwc,    wotw,     wotwc,    wotw,     cinemat_color_state,   empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "War of the Worlds (color)", MACHINE_SUPPORTS_SAVE )
