@@ -59,7 +59,6 @@ public:
 		, m_char_rom(*this, "charrom")
 		, m_beta(*this, BETA_DISK_TAG)
 		, m_ata(*this, "ata")
-		, m_image(*this, "ata:0:hdd:image")
 		, m_centronics(*this, "centronics")
 		, m_glukrs(*this, "glukrs")
 		, m_palette(*this, "palette")
@@ -111,7 +110,6 @@ private:
 
 	required_device<beta_disk_device> m_beta;
 	required_device<ata_interface_device> m_ata;
-	required_device<harddisk_image_device> m_image;
 	required_device<centronics_device> m_centronics;
 	required_device<glukrs_device> m_glukrs;
 	required_device<device_palette_interface> m_palette;
@@ -403,13 +401,6 @@ u8 atm_state::beta_disable_r(offs_t offset)
 
 u8 atm_state::ata_r(offs_t offset)
 {
-	/* Due to specific ATA it returns IDE_STATUS_DRDY if image is not provided.
-	As a result software is waiting for data which never can be delivered.
-	We'll treat no-image-provided as no-ATA.
-	Testing: osatm2 */
-	if (m_image->get_hard_disk_file() == nullptr)
-		return 0xff;
-
 	u8 ata_offset = BIT(offset, 5, 3);
 	u16 data = m_ata->cs0_r(ata_offset);
 
@@ -421,9 +412,6 @@ u8 atm_state::ata_r(offs_t offset)
 
 void atm_state::ata_w(offs_t offset, u8 data)
 {
-	if (m_image->get_hard_disk_file() == nullptr) // same as ata_r
-		return;
-
 	u8 ata_offset = BIT(offset, 5, 3);
 	u16 ata_data = data;
 	if (!ata_offset)
@@ -580,7 +568,7 @@ void atm_state::atm(machine_config &config)
 	BETA_DISK(config, m_beta, 0);
 	GLUKRS(config, m_glukrs);
 
-	ATA_INTERFACE(config, m_ata).options(atm_ata_devices, "hdd", nullptr, false);;
+	ATA_INTERFACE(config, m_ata).options(atm_ata_devices, nullptr, nullptr, false);;
 
 	CENTRONICS(config, m_centronics, centronics_devices, "covox");
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
