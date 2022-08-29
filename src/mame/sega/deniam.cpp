@@ -113,7 +113,7 @@ private:
 	required_shared_ptr<u16> m_textram;
 	required_shared_ptr<u16> m_spriteram;
 
-	required_memory_region m_spritegfx;
+	required_region_ptr<u8> m_spritegfx;
 
 	// video-related
 	tilemap_t *m_fg_tilemap = nullptr;
@@ -353,8 +353,6 @@ void deniamc_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 {
 	for (int offs = m_spriteram.bytes() / 2 - 8; offs >= 0; offs -= 8)
 	{
-		u8 *rom = m_spritegfx->base();
-
 		int sx = (m_spriteram[offs + 1] & 0x01ff) + 16 * 8 - 1;
 		if (sx >= 512) sx -= 512;
 		const int starty = m_spriteram[offs + 0] & 0xff;
@@ -376,7 +374,7 @@ void deniamc_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 		}
 
 		const int start = m_spriteram[offs + 3] + ((m_spriteram[offs + 4] & 0x1f00) << 8);
-		rom += 2 * start;
+		const u8 *rom = &m_spritegfx[2 * start];
 
 		for (int y = starty + 1; y <= endy; y++)
 		{

@@ -390,7 +390,7 @@ void chaknpop_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		}
 
 
-				m_gfxdecode->gfx(0)->transpen(bitmap, cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap, cliprect,
 				tile,
 				color,
 				flipx, flipy,
