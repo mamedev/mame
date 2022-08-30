@@ -1197,6 +1197,7 @@ sega/coolridr.cpp
 sega/dc_atomiswave.cpp
 sega/deniam.cpp
 sega/dotrikun.cpp
+sega/eshockey.cpp
 sega/flashbeats.cpp
 sega/fwheel.cpp
 sega/gpworld.cpp
