@@ -17,9 +17,6 @@ TODO:
   scrolling at the same speed as the stars, it's used in canyon parts and during the
   big ufo explosion
 - redclash canyon level, a gap sometimes appears on the right side, maybe BTANB
-- According to video reference(could only find 1), redclash player bullets should be
-  4*2px red on the 1st half of the screen and 8*2px yellow on the 2nd half, zerohour
-  bullets are correct though(always 8*2px magenta)
 - Sound (analog, schematics available for Zero Hour), redclash sound is not the same
 - redclash beeper frequency range should be higher, but it doesn't really matter
   since it can't be solved with a simple multiply calculation. Besides, anything more
@@ -327,11 +324,22 @@ void zerohour_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		{
 			i -= 4;
 
+			/*
+			 e-sssyyy iiiiiiii --c--ccc xxxxxxxx
+
+			 e: enable?
+			 i: code (some bits unused for large sprites)
+			 s: size (0x20 only applies to size 16x16)
+			 c: color
+			 x: x position
+			 y: fine-y (coarse-y is from offset)
+			*/
+
 			if (m_spriteram[offs + i] & 0x80)
 			{
-				int color = bitswap<4>(m_spriteram[offs + i + 2], 5,2,1,0);
 				int sx = m_spriteram[offs + i + 3];
 				int sy = offs / 4 + (m_spriteram[offs + i] & 0x07) - 16;
+				int color = bitswap<4>(m_spriteram[offs + i + 2], 5,2,1,0);
 				int bank = 0, code = 0;
 
 				switch ((m_spriteram[offs + i] & 0x18) >> 3)
@@ -344,8 +352,8 @@ void zerohour_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 					case 2: // 16x16
 						if (m_spriteram[offs + i] & 0x20) // zero hour spaceships
 						{
-							code = ((m_spriteram[offs + i + 1] & 0xf8) >> 3) + ((m_gfxbank & 1) << 5);
 							bank = 4 + ((m_spriteram[offs + i + 1] & 0x02) >> 1);
+							code = ((m_spriteram[offs + i + 1] & 0xf8) >> 3) + ((m_gfxbank & 1) << 5);
 						}
 						else
 						{
@@ -382,6 +390,10 @@ void zerohour_state::draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprec
 		int sx = 8 * offs + 8;
 		int sy = 0xff - m_videoram[offs + 0x20];
 
+		// width and color are from the same bitfield
+		int width = 8 - (m_videoram[offs] >> 5 & 6);
+		int color = (m_videoram[offs] >> 3 & 0x10) | 5;
+
 		if (flip_screen())
 			sx = 264 - sx;
 
@@ -389,10 +401,10 @@ void zerohour_state::draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprec
 		sx -= fine_x;
 
 		for (int y = 0; y < 2; y++)
-			for (int x = 0; x < 8; x++)
+			for (int x = 0; x < width; x++)
 			{
 				if (cliprect.contains(sx + x, sy - y))
-					bitmap.pix(sy - y, sx + x) = 0x3f;
+					bitmap.pix(sy - y, sx + x) = color;
 			}
 
 	}

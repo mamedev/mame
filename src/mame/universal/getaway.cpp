@@ -21,7 +21,7 @@ located covered with a panel.  The dumped set seems to be designed for this
 cabinet.
 
 English-language flyers show a sit-down cabinet with a gear shift lever,
-accelerator pedal, and digital displays for high scores.  The set dumped set
+accelerator pedal, and digital displays for high scores.  The dumped set
 doesn't have support for the additional I/O.
 
 TODO:
@@ -207,7 +207,7 @@ void getaway_state::io_w(offs_t offset, u8 data)
 
 	[0x07]
 	???w wwww transfer width, in 8 pixel units
-	        Notice that 0xff is set on POST, either full clear or NOP
+	          Notice that 0xff is set on POST, either full clear or NOP
 
 	[0x08]
 	hhhh hhhh transfer height, in scanline units
