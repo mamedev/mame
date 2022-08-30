@@ -17,14 +17,17 @@ TODO:
   scrolling at the same speed as the stars, it's used in canyon parts and during the
   big ufo explosion
 - redclash canyon level, a gap sometimes appears on the right side, maybe BTANB
-- Sound (analog, schematics available for Zero Hour), redclash sound is not the same
-- redclash beeper frequency range should be higher, but it doesn't really matter
-  since it can't be solved with a simple multiply calculation. Besides, anything more
-  than right now and ears will be destroyed, so maybe the sound is softer(filtered)
+- replace zerohour samples with netlist audio (schematics available but bad quality)
+- add redclash samples or netlist audio (eg. player shot sound, explosions)
+- redclash beeper frequency range should be higher, but it can't be solved with a
+  simple multiply calculation. Besides, anything more than right now and ears will
+  be destroyed, so maybe the sound is softer(filtered)
 
 BTANB:
 - redclash gameplay tempo is erratic (many slowdowns)
 - redclash beeper sound stops abruptly at the canyon parts
+- other than the pitch being inaccurate (see TODO), redclash beeper really does
+  sound like garbage, the only time it sounds pleasing is during the boss fight
 
 ***************************************************************************/
 
@@ -105,7 +108,7 @@ protected:
 	int m_gfxbank = 0; // redclash only
 };
 
-// redclash, adds background layer
+// redclash, adds background layer, one extra sound channel
 class redclash_state : public zerohour_state
 {
 public:
