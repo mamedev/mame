@@ -33,6 +33,7 @@ public:
 	// configuration
 	auto data_pending_callback() { return m_data_pending_cb.bind(); }
 	void set_separate_acknowledge(bool ack) { m_separate_acknowledge = ack; }
+	void boost_after_write(attotime duration) { m_boost_after_write = duration; }
 
 	DECLARE_READ_LINE_MEMBER(pending_r);
 
@@ -55,6 +56,7 @@ private:
 
 	bool                    m_separate_acknowledge;
 	bool                    m_latch_written;
+	attotime                m_boost_after_write;
 	devcb_write_line        m_data_pending_cb;
 };
 

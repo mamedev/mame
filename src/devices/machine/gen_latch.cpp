@@ -35,6 +35,7 @@ generic_latch_base_device::generic_latch_base_device(const machine_config &mconf
 	device_t(mconfig, type, tag, owner, clock),
 	m_separate_acknowledge(false),
 	m_latch_written(false),
+	m_boost_after_write(attotime::zero),
 	m_data_pending_cb(*this)
 {
 }
@@ -91,6 +92,11 @@ void generic_latch_base_device::set_latch_written(bool latch_written)
 	{
 		m_latch_written = latch_written;
 		m_data_pending_cb(latch_written ? 1 : 0);
+
+		// MAME can't time travel in case of tight back and forth comms.
+		// Instead of adding perfect quantum, boosting interleave may work around it.
+		if (latch_written && !m_boost_after_write.is_zero())
+			machine().scheduler().boost_interleave(attotime::zero, m_boost_after_write);
 	}
 }
 
