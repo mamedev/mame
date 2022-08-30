@@ -118,10 +118,10 @@ void digiblast_state::digiblast(machine_config &config)
 
 }
 
-ROM_START( digibst )
+ROM_START( digiblst )
 	//ROM_REGION( 0x4200000, "flash", ROMREGION_ERASEFF )
 ROM_END
 
 } // Anonymous namespace
 
-GAME( 2005, digibst,  0, digiblast,  digiblast,  digiblast_state, empty_init,  ROT0, "Nikko Entertainment B.V. / Grey Innovation", "digiBLAST", MACHINE_IS_SKELETON )
+CONS( 2005, digiblst,  0, 0, digiblast,  digiblast,  digiblast_state, empty_init, "Nikko Entertainment B.V. / Grey Innovation", "digiBLAST", MACHINE_IS_SKELETON )
