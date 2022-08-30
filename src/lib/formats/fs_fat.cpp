@@ -483,7 +483,7 @@ impl::impl(fsblk_t &blockdev, fsblk_t::block_t &&boot_sector_block, std::vector<
 	, m_starting_sector(starting_sector)
 	, m_sector_count(sector_count)
 	, m_reserved_sector_count(reserved_sector_count)
-	, m_bytes_per_sector(boot_sector_block.r16l(11))
+	, m_bytes_per_sector(m_boot_sector_block.r16l(11))
 	, m_bits_per_fat_entry(bits_per_fat_entry)
 {
 }
