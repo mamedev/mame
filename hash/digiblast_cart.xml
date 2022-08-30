@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+
+<!--
+	These dumps seem to have blank ECC data, it might need to be reconstructed as done in eolith/ghosteo.cpp
+-->
+<softwarelist name="digiblast_cart" description="Nikko Entertainment B.V. / Grey Innovation digiBLAST Cartridges">
+
+	<software name="sonicx1" supported="no">
+		<description>Sonic X 1 (Italy / Spain)</description>
+		<year>2005</year>
+		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
+		<part name="cart" interface="digiblast_cart">
+			<dataarea name="rom" size="0x4200000">
+				<rom name="sonic x 1 (ita esp).bin" size="0x4200000" crc="63c9ccc0" sha1="762a7b488a3c8b8ee37eaabf85245bfc3e71bbc3" />
+			</dataarea>
+		</part>
+	</software>
+	
+</softwarelist>
