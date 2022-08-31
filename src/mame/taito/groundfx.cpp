@@ -219,17 +219,17 @@ void groundfx_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	for (int offs = (m_spriteram.bytes() / 4 - 4); offs >= 0; offs -= 4)
 	{
-		u32 data = m_spriteram[offs+0];
+		u32 data = m_spriteram[offs + 0];
 		int flipx =          (data & 0x00800000) >> 23;
 		int zoomx =          (data & 0x007f0000) >> 16;
 		const u32 tilenum =  (data & 0x00007fff);
 
-		data = m_spriteram[offs+2];
+		data = m_spriteram[offs + 2];
 		const int priority = (data & 0x000c0000) >> 18;
 		u32 color =          (data & 0x0003fc00) >> 10;
 		int x =              (data & 0x000003ff);
 
-		data = m_spriteram[offs+3];
+		data = m_spriteram[offs + 3];
 		const int dblsize =  (data & 0x00040000) >> 18;
 		int flipy =          (data & 0x00020000) >> 17;
 		int zoomy =          (data & 0x0001fc00) >> 10;
