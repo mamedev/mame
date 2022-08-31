@@ -22,11 +22,21 @@ modules:
       no-debuginfo: true
       strip: true
     build-commands:
-      - make SOURCES=src/mame/pacman -j ${FLATPAK_BUILDER_N_JOBS}
+      - make
+          -j ${FLATPAK_BUILDER_N_JOBS}
+          USE_SYSTEM_LIB_FLAC=1
+          SDL_INI_PATH='$$HOME/.APP_NAME;/app/share/APP_NAME/ini'
+          LDOPTS=-Wl,-s
       - install -Dm 0755 mame ${FLATPAK_DEST}/bin/mame
       - install -Dm 0644 ${FLATPAK_ID}.desktop ${FLATPAK_DEST}/share/applications/${FLATPAK_ID}.desktop
       - install -Dm 0644 ${FLATPAK_ID}.metainfo.xml ${FLATPAK_DEST}/share/metainfo/${FLATPAK_ID}.metainfo.xml
+      - install -Dm 0644 mame16x16.png ${FLATPAK_DEST}/share/icons/hicolor/16x16/apps/${FLATPAK_ID}.png
+      - install -Dm 0644 mame24x24.png ${FLATPAK_DEST}/share/icons/hicolor/24x24/apps/${FLATPAK_ID}.png
+      - install -Dm 0644 mame32x32.png ${FLATPAK_DEST}/share/icons/hicolor/32x32/apps/${FLATPAK_ID}.png
+      - install -Dm 0644 mame48x48.png ${FLATPAK_DEST}/share/icons/hicolor/48x48/apps/${FLATPAK_ID}.png
+      - install -Dm 0644 mame64x64.png ${FLATPAK_DEST}/share/icons/hicolor/64x64/apps/${FLATPAK_ID}.png
       - install -Dm 0644 mame128x128.png ${FLATPAK_DEST}/share/icons/hicolor/128x128/apps/${FLATPAK_ID}.png
+      - install -Dm 0644 mame256x256.png ${FLATPAK_DEST}/share/icons/hicolor/256x256/apps/${FLATPAK_ID}.png
       - cp COPYING ${FLATPAK_DEST}/bin/
       - cp uismall.bdf ${FLATPAK_DEST}/bin/
       - mkdir -p ${FLATPAK_DEST}/share/mame/
@@ -46,19 +56,25 @@ modules:
       - cp -r samples/ ${FLATPAK_DEST}/share/mame/
     sources:
       - type: archive
-        url: https://github.com/mamedev/mame/archive/refs/tags/mame0246.tar.gz
-        sha256: 293c8f4b550694e0f6aa21165d7f7be9aa3a5284d957265c4e7469159a71b5d5
+        url: https://github.com/mamedev/mame/archive/refs/tags/mame0247.tar.gz
+        sha256: a2486d34b15f13c3d7028436f7da373d37c7fd47f34a2ea19ff48cf57daf29e1
+      - type: file
+        path: mame16x16.png
+      - type: file
+        path: mame24x24.png
+      - type: file
+        path: mame32x32.png
+      - type: file
+        path: mame48x48.png
+      - type: file
+        path: mame64x64.png
       - type: file
         path: mame128x128.png
+      - type: file
+        path: mame256x256.png
       - type: file
         path: org.mamedev.MAME.desktop
       - type: file
         path: org.mamedev.MAME.metainfo.xml
       - type: file
         path: mame.ini
-      - type: patch
-        path: inipath.patch
-      - type: patch
-        path: use-system-lib-flac.patch
-      - type: patch
-        path: ldopts.patch

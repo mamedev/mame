@@ -8,7 +8,16 @@
     MAME is a multi-purpose emulation framework.
   </summary>
   <description>
-    <p>MAME&apos;s purpose is to preserve decades of software history. As electronic technology continues to rush forward, MAME prevents this important &quot;vintage&quot; software from being lost and forgotten. This is achieved by documenting the hardware and how it functions. The source code to MAME serves as this documentation. The fact that the software is usable serves primarily to validate the accuracy of the documentation (how else can you prove that you have recreated the hardware faithfully?). Over time, MAME (originally stood for Multiple Arcade Machine Emulator) absorbed the sister-project MESS (Multi Emulator Super System), so MAME now documents a wide variety of (mostly vintage) computers, video game consoles and calculators, in addition to the arcade video games that were its initial focus.</p>
+    <p>
+        MAME&apos;s purpose is to preserve decades of software history. As electronic technology continues to rush
+        forward, MAME prevents this important &quot;vintage&quot; software from being lost and forgotten. This is
+        achieved by documenting the hardware and how it functions. The source code to MAME serves as this documentation.
+        The fact that the software is usable serves primarily to validate the accuracy of the documentation (how else
+        can you prove that you have recreated the hardware faithfully?). Over time, MAME (originally stood for Multiple
+        Arcade Machine Emulator) absorbed the sister-project MESS (Multi Emulator Super System), so MAME now documents a
+        wide variety of (mostly vintage) computers, video game consoles and calculators, in addition to the arcade video
+        games that were its initial focus.
+    </p>
   </description>
   <categories>
     <category>Game</category>
@@ -18,28 +27,14 @@
   <url type="homepage">https://www.mamedev.org</url>
   <launchable type="desktop-id">org.mamedev.MAME.desktop</launchable>
   <releases>
+    <release version="0.247" date="2022-08-31"/>
+    <release version="0.246" date="2022-07-31"/>
     <release version="0.245" date="2022-06-30"/>
   </releases>
   <provides>
     <binary>mame</binary>
   </provides>
-  <content_rating type="oars-1.0">
-    <content_attribute id="violence-cartoon">intense</content_attribute>
-    <content_attribute id="violence-fantasy">intense</content_attribute>
-    <content_attribute id="violence-realistic">intense</content_attribute>
-    <content_attribute id="violence-bloodshed">intense</content_attribute>
-    <content_attribute id="violence-sexual">intense</content_attribute>
-    <content_attribute id="drugs-alcohol">moderate</content_attribute>
-    <content_attribute id="drugs-narcotics">moderate</content_attribute>
-    <content_attribute id="drugs-tobacco">moderate</content_attribute>
-    <content_attribute id="sex-nudity">intense</content_attribute>
-    <content_attribute id="sex-themes">intense</content_attribute>
-    <content_attribute id="language-profanity">intense</content_attribute>
-    <content_attribute id="language-humor">intense</content_attribute>
-    <content_attribute id="language-discrimination">intense</content_attribute>
-    <content_attribute id="money-advertising">moderate</content_attribute>
-    <content_attribute id="money-gambling">moderate</content_attribute>
-  </content_rating>
+  <content_rating type="oars-1.0" />
   <screenshots>
     <screenshot type="default">
         <image type="source" width="1280" height="960">https://upload.wikimedia.org/wikipedia/commons/6/6f/NewMAME.png</image>
