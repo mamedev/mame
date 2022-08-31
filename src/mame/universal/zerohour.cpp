@@ -76,7 +76,6 @@ protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	DECLARE_WRITE_LINE_MEMBER(update_stars);
 	void videoram_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	void irqack_w(u8 data) { m_maincpu->set_input_line(0, CLEAR_LINE); }
@@ -287,12 +286,6 @@ template <unsigned N> WRITE_LINE_MEMBER(zerohour_state::star_w)
 void zerohour_state::star_reset_w(u8 data)
 {
 	m_stars->set_enable(true);
-}
-
-WRITE_LINE_MEMBER(zerohour_state::update_stars)
-{
-	if (!state)
-		m_stars->update_state();
 }
 
 
@@ -783,7 +776,7 @@ void zerohour_state::base(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(9.828_MHz_XTAL / 2, 312, 8, 248, 262, 32, 224);
 	screen.set_screen_update(FUNC(zerohour_state::screen_update));
-	screen.screen_vblank().set(FUNC(zerohour_state::update_stars));
+	screen.screen_vblank().set(m_stars, FUNC(zerohour_stars_device::update_state));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_zerohour);

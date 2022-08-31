@@ -17,7 +17,7 @@ public:
 
 	// public interface
 	void set_enable(bool on);
-	void update_state();
+	void update_state(int state);
 	void set_speed(u8 speed, u8 mask);
 	void draw(bitmap_ind16 &bitmap, rectangle const &cliprect);
 

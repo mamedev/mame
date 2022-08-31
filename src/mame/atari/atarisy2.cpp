@@ -1259,6 +1259,7 @@ void atarisy2_state::atarisy2(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, m6502_device::NMI_LINE);
+	// apb3 fails the self-test with a 100 µs delay or less
 	m_soundlatch->data_pending_callback().append([this](int state) { if (state) machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(200)); });
 
 	GENERIC_LATCH_8(config, m_mainlatch);
