@@ -2032,10 +2032,13 @@ bool moof_format::load(util::random_read &io, uint32_t form_factor, const std::v
 	switch(r8(img, off_info + 1)) {
 	case 1:
 		image->set_form_variant(floppy_image::FF_35, floppy_image::SSDD);
+		break;
 	case 2:
 		image->set_form_variant(floppy_image::FF_35, floppy_image::DSDD);
+		break;
 	case 3:
 		image->set_form_variant(floppy_image::FF_35, floppy_image::DSHD);
+		break;
 	default:
 		return false;
 	}
