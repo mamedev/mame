@@ -1870,6 +1870,7 @@ void validity_checker::validate_begin()
 	m_defstr_map.clear();
 	m_region_map.clear();
 	m_ioport_set.clear();
+	m_slotcard_set.clear();
 
 	// reset internal state
 	m_errors = 0;
@@ -2547,6 +2548,10 @@ void validity_checker::validate_devices(machine_config &config)
 			{
 				// the default option is already instantiated here, so don't try adding it again
 				if (slot->default_option() != nullptr && option.first == slot->default_option())
+					continue;
+
+				// if we need to save time, instantiate and validate each slot card type at most once
+				if (m_quick && !m_slotcard_set.insert(option.second->devtype().shortname()).second)
 					continue;
 
 				m_checking_card = true;
