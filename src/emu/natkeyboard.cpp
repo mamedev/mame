@@ -15,6 +15,9 @@
 #include "emuopts.h"
 #include "unicode.h"
 
+// FIXME: allow OSD module headers to be included in a less ugly way
+#include "../osd/modules/lib/osdlib.h"
+
 #include <algorithm>
 #include <cstring>
 

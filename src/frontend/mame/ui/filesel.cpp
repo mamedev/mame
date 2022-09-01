@@ -304,44 +304,40 @@ void menu_file_selector::select_item(const file_selector_entry &entry)
 //  type_search_char
 //-------------------------------------------------
 
-void menu_file_selector::type_search_char(char32_t ch)
+void menu_file_selector::update_search()
 {
-	std::string const current(m_filename);
-	if (input_character(m_filename, ch, uchar_is_printable))
+	ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename);
+
+	file_selector_entry const *const cur_selected(reinterpret_cast<file_selector_entry const *>(get_selection_ref()));
+
+	// if it's a perfect match for the current selection, don't move it
+	if (!cur_selected || core_strnicmp(cur_selected->basename.c_str(), m_filename.c_str(), m_filename.size()))
 	{
-		ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename);
-
-		file_selector_entry const *const cur_selected(reinterpret_cast<file_selector_entry const *>(get_selection_ref()));
-
-		// if it's a perfect match for the current selection, don't move it
-		if (!cur_selected || core_strnicmp(cur_selected->basename.c_str(), m_filename.c_str(), m_filename.size()))
+		std::string::size_type bestmatch(0);
+		file_selector_entry const *selected_entry(cur_selected);
+		for (auto &entry : m_entrylist)
 		{
-			std::string::size_type bestmatch(0);
-			file_selector_entry const *selected_entry(cur_selected);
-			for (auto &entry : m_entrylist)
+			// TODO: more efficient "common prefix" code
+			std::string::size_type match(0);
+			for (std::string::size_type i = 1; m_filename.size() >= i; ++i)
 			{
-				// TODO: more efficient "common prefix" code
-				std::string::size_type match(0);
-				for (std::string::size_type i = 1; m_filename.size() >= i; ++i)
-				{
-					if (!core_strnicmp(entry.basename.c_str(), m_filename.c_str(), i))
-						match = i;
-					else
-						break;
-				}
-
-				if (match > bestmatch)
-				{
-					bestmatch = match;
-					selected_entry = &entry;
-				}
+				if (!core_strnicmp(entry.basename.c_str(), m_filename.c_str(), i))
+					match = i;
+				else
+					break;
 			}
 
-			if (selected_entry && (selected_entry != cur_selected))
+			if (match > bestmatch)
 			{
-				set_selection((void *)selected_entry);
-				centre_selection();
+				bestmatch = match;
+				selected_entry = &entry;
 			}
+		}
+
+		if (selected_entry && (selected_entry != cur_selected))
+		{
+			set_selection((void *)selected_entry);
+			centre_selection();
 		}
 	}
 }
@@ -448,7 +444,13 @@ void menu_file_selector::handle(event const *ev)
 		if (ev->iptkey == IPT_SPECIAL)
 		{
 			// if it's any other key and we're not maxed out, update
-			type_search_char(ev->unichar);
+			if (input_character(m_filename, ev->unichar, uchar_is_printable))
+				update_search();
+		}
+		else if (ev->iptkey == IPT_UI_PASTE)
+		{
+			if (paste_text(m_filename, uchar_is_printable))
+				update_search();
 		}
 		else if (ev->iptkey == IPT_UI_CANCEL)
 		{

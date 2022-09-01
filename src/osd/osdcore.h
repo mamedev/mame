@@ -11,7 +11,6 @@
 
 #pragma once
 
-
 #include "osdcomm.h"
 
 #include "strformat.h"
@@ -19,6 +18,7 @@
 #include <cstdint>
 #include <iosfwd>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -349,13 +349,6 @@ void osd_work_item_release(osd_work_item *item);
 ///   NUL-terminated string.
 void osd_break_into_debugger(const char *message);
 
-
-/// \brief Get clipboard text
-///
-/// Gets current clipboard content as UTF-8 text.  Returns an empty
-/// string if the clipboard contents cannot be converted to plain text.
-/// \return Clipboard contents or an empty string.
-std::string osd_get_clipboard_text();
 
 
 /***************************************************************************

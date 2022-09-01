@@ -144,6 +144,8 @@ private:
 
 	class buffer_helper;
 	struct addr_space;
+	class palette_wrapper;
+	template <typename T> class bitmap_helper;
 	class tap_helper;
 	class addr_space_change_notif;
 	class symbol_table_wrapper;
