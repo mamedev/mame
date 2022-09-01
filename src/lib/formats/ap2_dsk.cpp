@@ -1646,7 +1646,7 @@ const char *a2_woz_format::extensions() const
 
 bool a2_woz_format::supports_save() const
 {
-	return false;
+	return true;
 }
 
 const uint8_t a2_woz_format::signature[8] = { 0x57, 0x4f, 0x5a, 0x31, 0xff, 0x0a, 0x0d, 0x0a };
@@ -1793,6 +1793,113 @@ bool a2_woz_format::load(util::random_read &io, uint32_t form_factor, const std:
 	return true;
 }
 
+bool a2_woz_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
+{
+	std::vector<std::vector<bool>> tracks(160);
+	bool twosided = false;
+
+	if(image->get_form_factor() == floppy_image::FF_525) {
+		for(unsigned int i=0; i != 141; i++)
+			if(image->track_is_formatted(i >> 2, 0, i & 3))
+				tracks[i] = generate_bitstream_from_track(i >> 2, 0, 3915, image, i & 3);
+
+	} else if(image->get_variant() == floppy_image::DSHD) {
+		for(unsigned int i=0; i != 160; i++)
+			if(image->track_is_formatted(i >> 1, i & 1)) {
+				tracks[i] = generate_bitstream_from_track(i >> 1, i & 1, 1000, image);
+				if(i & 1)
+					twosided = true;
+			}
+
+	} else {
+		// 200000000 / 60.0 * 1.979e-6 ~= 6.5967
+		static const int cell_size_per_speed_zone[5] = {
+			394 * 65967 / 10000,
+			429 * 65967 / 10000,
+			472 * 65967 / 10000,
+			525 * 65967 / 10000,
+			590 * 65967 / 10000
+		};
+
+		for(unsigned int i=0; i != 160; i++)
+			if(image->track_is_formatted(i >> 1, i & 1)) {
+				tracks[i] = generate_bitstream_from_track(i >> 1, i & 1, cell_size_per_speed_zone[i / (2*16)], image);
+				if(i & 1)
+					twosided = true;
+			}
+	}
+
+	int max_blocks = 0;
+	int total_blocks = 0;
+	for(const auto &t : tracks) {
+		int blocks = (t.size() + 4095) / 4096;
+		total_blocks += blocks;
+		if(max_blocks < blocks)
+			max_blocks = blocks;
+	}
+
+	std::vector<uint8_t> data(1536 + total_blocks*512, 0);
+
+	memcpy(&data[0], signature2, 8);
+
+	w32(data, 12, 0x4F464E49);  // INFO
+	w32(data, 16, 60);          // size
+	data[20] = 2;               // chunk version
+	data[21] = image->get_form_factor() == floppy_image::FF_525 ? 1 : 2;
+	data[22] = 0;               // not write protected
+	data[23] = 1;               // synchronized, since our internal format is
+	data[24] = 1;               // weak bits are generated, not stored
+	data[25] = 'M';
+	data[26] = 'A';
+	data[27] = 'M';
+	data[28] = 'E';
+	memset(&data[29], ' ', 32-4);
+	data[57] = twosided ? 2 : 1;
+	data[58] = 0;               // boot sector unknown
+	data[59] = image->get_form_factor() == floppy_image::FF_525 ? 32 : image->get_variant() == floppy_image::DSHD ? 8 : 16;
+	w16(data, 60, 0);           // compatibility unknown
+	w16(data, 62, 0);           // needed ram unknown
+	w16(data, 64, max_blocks);
+	w32(data, 80, 0x50414D54);  // TMAP
+	w32(data, 84, 160);         // size
+
+	uint8_t tcount = 0;
+	for(int i=0; i != 160 ; i++)
+		data[88 + i] = tracks[i].empty() ? 0xff : tcount++;
+
+	w32(data, 248, 0x534B5254); // TRKS
+	w32(data, 252, 1280 + total_blocks*512);   // size
+
+	uint8_t tid = 0;
+	uint16_t tb = 3;
+	for(int i=0; i != 160 ; i++)
+		if(!tracks[i].empty()) {
+			int blocks = (tracks[i].size() + 4095) / 4096;
+			w16(data, 256 + tid*8, tb);
+			w16(data, 256 + tid*8 + 2, blocks);
+			w32(data, 256 + tid*8 + 4, tracks[i].size());
+			tb += blocks;
+			tid ++;
+		}
+
+	tb = 3;
+	for(int i=0; i != 160 ; i++)
+		if(!tracks[i].empty()) {
+			int off = tb * 512;
+			int size = tracks[i].size();
+			for(int j=0; j != size; j++)
+				if(tracks[i][j])
+					data[off + (j >> 3)] |= 0x80 >> (j & 7);
+			tb += (size + 4095) / 4096;
+		}
+
+	w32(data, 8, crc32r(&data[12], data.size() - 12));
+
+	size_t actual;
+	io.write_at(0, data.data(), data.size(), actual);
+	return true;
+}
+
 uint32_t a2_woz_format::find_tag(const std::vector<uint8_t> &data, uint32_t tag)
 {
 	uint32_t offset = 12;
@@ -1812,6 +1919,20 @@ uint32_t a2_woz_format::r32(const std::vector<uint8_t> &data, uint32_t offset)
 uint16_t a2_woz_format::r16(const std::vector<uint8_t> &data, uint32_t offset)
 {
 	return data[offset] | (data[offset+1] << 8);
+}
+
+void a2_woz_format::w32(std::vector<uint8_t> &data, int offset, uint32_t value)
+{
+	data[offset] = value;
+	data[offset+1] = value >> 8;
+	data[offset+2] = value >> 16;
+	data[offset+3] = value >> 24;
+}
+
+void a2_woz_format::w16(std::vector<uint8_t> &data, int offset, uint16_t value)
+{
+	data[offset] = value;
+	data[offset+1] = value >> 8;
 }
 
 uint8_t a2_woz_format::r8(const std::vector<uint8_t> &data, uint32_t offset)
@@ -1908,12 +2029,16 @@ bool moof_format::load(util::random_read &io, uint32_t form_factor, const std::v
 	if(!flux_size)
 		off_flux = 0;
 
-	bool is_ds = r8(img, off_info + 1) == 3;
-
-	if(is_ds)
-		image->set_form_variant(floppy_image::FF_35, floppy_image::DSDD);
-	else
+	switch(r8(img, off_info + 1)) {
+	case 1:
 		image->set_form_variant(floppy_image::FF_35, floppy_image::SSDD);
+	case 2:
+		image->set_form_variant(floppy_image::FF_35, floppy_image::DSDD);
+	case 3:
+		image->set_form_variant(floppy_image::FF_35, floppy_image::DSHD);
+	default:
+		return false;
+	}
 
 	for (unsigned int trkid = 0; trkid != 160; trkid++) {
 		int head = trkid & 1;
@@ -1954,9 +2079,6 @@ bool moof_format::load(util::random_read &io, uint32_t form_factor, const std::v
 				return false;
 
 			generate_track_from_bitstream(track, head, &img[boff], track_size, image, 0, 0xffff);
-
-			if(!track && head && track_size >= 90000)
-				image->set_variant(floppy_image::DSHD);
 		}
 	}
 
