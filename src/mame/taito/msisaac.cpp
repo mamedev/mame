@@ -84,7 +84,6 @@ private:
 	required_shared_ptr_array<uint8_t, 3> m_videoram;
 
 	// video-related
-	bitmap_ind16 *m_tmp_bitmap[2]{};
 	tilemap_t *m_bg_tilemap[2]{};
 	tilemap_t *m_fg_tilemap = nullptr;
 	uint8_t m_bg2_textbank = 0;
