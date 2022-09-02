@@ -10,8 +10,6 @@
 
 #include "cpu/lr35902/lr35902.h"
 #include "bus/gameboy/gb_slot.h"
-#include "bus/gameboy/rom.h"
-#include "bus/gameboy/mbc.h"
 #include "video/gb_lcd.h"
 #include "sound/gb.h"
 

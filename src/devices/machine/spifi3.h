@@ -180,7 +180,7 @@ private:
 
 		T pop()
 		{
-			if (size == 0) 
+			if (size == 0)
 			{
 				fatalerror("spifi3: FIFO underflow!");
 			}

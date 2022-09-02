@@ -281,7 +281,7 @@ void s_smp_device::io_w(offs_t offset, u8 data)
 			// osd_printf_debug("%s SPC: %02x to APU @ %d\n", machine().describe_context(), data, offset & 3);
 			m_port_out[offset - 4] = data;
 			// Unneeded, we already run at perfect_interleave
-			// machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
+			// machine().scheduler().perfect_quantum(attotime::from_usec(20));
 			break;
 		case 0xa:       /* Timer 0 */
 		case 0xb:       /* Timer 1 */

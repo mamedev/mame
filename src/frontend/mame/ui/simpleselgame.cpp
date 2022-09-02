@@ -132,6 +132,10 @@ void simple_menu_select_game::handle(event const *ev)
 			case IPT_UI_CANCEL:
 				inkey_cancel();
 				break;
+			case IPT_UI_PASTE:
+				if (paste_text(m_search, uchar_is_printable))
+					reset(reset_options::SELECT_FIRST);
+				break;
 			case IPT_SPECIAL:
 				inkey_special(*ev);
 				break;
@@ -218,7 +222,7 @@ void simple_menu_select_game::inkey_cancel()
 void simple_menu_select_game::inkey_special(const event &menu_event)
 {
 	// typed characters append to the buffer
-	size_t old_size = m_search.size();
+	size_t const old_size = m_search.size();
 	if (input_character(m_search, menu_event.unichar, uchar_is_printable))
 	{
 		if (m_search.size() < old_size)

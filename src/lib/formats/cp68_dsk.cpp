@@ -133,7 +133,7 @@ int cp68_format::find_size(util::random_read &io, uint32_t form_factor, const st
 
 	for (int i=0; cp68_formats::formats[i].form_factor; i++) {
 		const format &f = cp68_formats::formats[i];
-		
+
 		// Look at the system information sector.
 		ec = io.read_at(f.sector_base_size * 2, &info, sizeof(struct cp68_formats::sysinfo_sector_cp68), actual);
 		if (ec || actual == 0)

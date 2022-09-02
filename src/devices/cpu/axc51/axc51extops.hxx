@@ -320,7 +320,7 @@ void axc51base_cpu_device::axc51_extended_a5(uint8_t r)
 		uint16_t dpt = get_dpt(i);
 		uint16_t val = get_erx(n);
 
-		m_io.write_word(dpt, val);  
+		m_io.write_word(dpt, val);
 
 		do_ez_flags(val);
 
@@ -556,7 +556,7 @@ void axc51base_cpu_device::extended_a5_0f()
 		uint16_t dpt = get_dpt(i);
 		uint32_t res = val - val2 - (GET_EC);
 
-		m_io.write_word(dpt, res);  
+		m_io.write_word(dpt, res);
 
 		do_ec_ez_flags(res);
 

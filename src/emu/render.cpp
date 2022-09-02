@@ -691,7 +691,7 @@ const rgb_t *render_container::bcg_lookup_table(int texformat, u32 &out_length, 
 				m_bcglookup.resize(palette->max_index());
 				recompute_lookups();
 			}
-			assert (palette == &m_palclient->palette());
+			assert(palette == &m_palclient->palette());
 			out_length = palette->max_index();
 			return &m_bcglookup[0];
 

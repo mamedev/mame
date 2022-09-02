@@ -282,6 +282,13 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("rpenable",  CMDFLAG_NONE, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_rpdisenable, this, true, _1));
 	m_console.register_command("rplist",    CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_rplist, this, _1));
 
+	m_console.register_command("epset",     CMDFLAG_NONE, 1, 3, std::bind(&debugger_commands::execute_epset, this, _1));
+	m_console.register_command("ep",        CMDFLAG_NONE, 1, 3, std::bind(&debugger_commands::execute_epset, this, _1));
+	m_console.register_command("epclear",   CMDFLAG_NONE, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_epclear, this, _1));
+	m_console.register_command("epdisable", CMDFLAG_NONE, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_epdisenable, this, false, _1));
+	m_console.register_command("epenable",  CMDFLAG_NONE, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_epdisenable, this, true, _1));
+	m_console.register_command("eplist",    CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_eplist, this, _1));
+
 	m_console.register_command("statesave", CMDFLAG_NONE, 1, 1, std::bind(&debugger_commands::execute_statesave, this, _1));
 	m_console.register_command("ss",        CMDFLAG_NONE, 1, 1, std::bind(&debugger_commands::execute_statesave, this, _1));
 	m_console.register_command("stateload", CMDFLAG_NONE, 1, 1, std::bind(&debugger_commands::execute_stateload, this, _1));
@@ -471,8 +478,9 @@ bool debugger_commands::validate_boolean_parameter(std::string_view param, bool 
 		return true;
 
 	// evaluate the expression; success if no error
-	bool const is_true = util::streqlower(param, "true");
-	bool const is_false = util::streqlower(param, "false");
+	using namespace std::literals;
+	bool const is_true = util::streqlower(param, "true"sv);
+	bool const is_false = util::streqlower(param, "false"sv);
 
 	if (is_true || is_false)
 	{
@@ -1153,7 +1161,7 @@ void debugger_commands::execute_tracelog(const std::vector<std::string_view> &pa
 	/* then do a printf */
 	std::ostringstream buffer;
 	if (mini_printf(buffer, params[0], params.size() - 1, &values[1]))
-		m_console.get_visible_cpu()->debug()->trace_printf("%s", std::move(buffer).str().c_str());
+		m_console.get_visible_cpu()->debug()->trace_printf("%s", std::move(buffer).str());
 }
 
 
@@ -1189,7 +1197,7 @@ void debugger_commands::execute_tracesym(const std::vector<std::string_view> &pa
 	// then do a printf
 	std::ostringstream buffer;
 	if (mini_printf(buffer, format.str(), params.size(), values))
-		m_console.get_visible_cpu()->debug()->trace_printf("%s", std::move(buffer).str().c_str());
+		m_console.get_visible_cpu()->debug()->trace_printf("%s", std::move(buffer).str());
 }
 
 
@@ -1819,12 +1827,12 @@ void debugger_commands::execute_bpset(const std::vector<std::string_view> &param
 		return;
 
 	// param 3 is the action
-	std::string action;
+	std::string_view action;
 	if (params.size() > 2 && !debug_command_parameter_command(action = params[2]))
 		return;
 
 	// set the breakpoint
-	int const bpnum = debug->breakpoint_set(address, condition.is_empty() ? nullptr : condition.original_string(), action.c_str());
+	int const bpnum = debug->breakpoint_set(address, condition.is_empty() ? nullptr : condition.original_string(), action);
 	m_console.printf("Breakpoint %X set\n", bpnum);
 }
 
@@ -1966,16 +1974,20 @@ void debugger_commands::execute_wpset(int spacenum, const std::vector<std::strin
 
 	// param 3 is the type
 	read_or_write type;
-	if (util::streqlower(params[2], "r"))
-		type = read_or_write::READ;
-	else if (util::streqlower(params[2], "w"))
-		type = read_or_write::WRITE;
-	else if (util::streqlower(params[2], "rw") || util::streqlower(params[2], "wr"))
-		type = read_or_write::READWRITE;
-	else
 	{
-		m_console.printf("Invalid watchpoint type: expected r, w, or rw\n");
-		return;
+		using util::streqlower;
+		using namespace std::literals;
+		if (streqlower(params[2], "r"sv))
+			type = read_or_write::READ;
+		else if (streqlower(params[2], "w"sv))
+			type = read_or_write::WRITE;
+		else if (streqlower(params[2], "rw"sv) || streqlower(params[2], "wr"sv))
+			type = read_or_write::READWRITE;
+		else
+		{
+			m_console.printf("Invalid watchpoint type: expected r, w, or rw\n");
+			return;
+		}
 	}
 
 	// param 4 is the condition
@@ -1984,12 +1996,12 @@ void debugger_commands::execute_wpset(int spacenum, const std::vector<std::strin
 		return;
 
 	// param 5 is the action
-	std::string action;
+	std::string_view action;
 	if (params.size() > 4 && !debug_command_parameter_command(action = params[4]))
 		return;
 
 	// set the watchpoint
-	int const wpnum = debug->watchpoint_set(*space, type, address, length, (condition.is_empty()) ? nullptr : condition.original_string(), action.c_str());
+	int const wpnum = debug->watchpoint_set(*space, type, address, length, (condition.is_empty()) ? nullptr : condition.original_string(), action);
 	m_console.printf("Watchpoint %X set\n", wpnum);
 }
 
@@ -2133,12 +2145,12 @@ void debugger_commands::execute_rpset(const std::vector<std::string_view> &param
 		return;
 
 	// param 2 is the action
-	std::string action;
+	std::string_view action;
 	if (params.size() > 1 && !debug_command_parameter_command(action = params[1]))
 		return;
 
 	// set the registerpoint
-	int const rpnum = cpu->debug()->registerpoint_set(condition.original_string(), action.c_str());
+	int const rpnum = cpu->debug()->registerpoint_set(condition.original_string(), action);
 	m_console.printf("Registerpoint %X set\n", rpnum);
 }
 
@@ -2201,6 +2213,148 @@ void debugger_commands::execute_rpdisenable(bool enable, const std::vector<std::
 }
 
 
+//-------------------------------------------------
+//  execute_epset - execute the exception point
+//  set command
+//-------------------------------------------------
+
+void debugger_commands::execute_epset(const std::vector<std::string_view> &params)
+{
+	// CPU is implicit
+	device_t *cpu;
+	if (!validate_cpu_parameter(std::string_view(), cpu))
+		return;
+
+	// param 1 is the exception type
+	u64 type;
+	if (!validate_number_parameter(params[0], type))
+		return;
+
+	// param 2 is the condition
+	parsed_expression condition(cpu->debug()->symtable());
+	if (params.size() > 1 && !debug_command_parameter_expression(params[1], condition))
+		return;
+
+	// param 3 is the action
+	std::string_view action;
+	if (params.size() > 2 && !debug_command_parameter_command(action = params[2]))
+		return;
+
+	// set the exception point
+	int epnum = cpu->debug()->exceptionpoint_set(type, (condition.is_empty()) ? nullptr : condition.original_string(), action);
+	m_console.printf("Exception point %X set\n", epnum);
+}
+
+
+//-------------------------------------------------
+//  execute_epclear - execute the exception point
+//  clear command
+//-------------------------------------------------
+
+void debugger_commands::execute_epclear(const std::vector<std::string_view> &params)
+{
+	if (params.empty()) // if no parameters, clear all
+	{
+		for (device_t &device : device_enumerator(m_machine.root_device()))
+			device.debug()->exceptionpoint_clear_all();
+		m_console.printf("Cleared all exception points\n");
+	}
+	else // otherwise, clear the specific ones
+	{
+		execute_index_command(
+				params,
+				[this] (device_t &device, u64 param) -> bool
+				{
+					if (!device.debug()->exceptionpoint_clear(param))
+						return false;
+					m_console.printf("Exception point %X cleared\n", param);
+					return true;
+				},
+				"Invalid exception point number %X\n");
+	}
+}
+
+
+//-------------------------------------------------
+//  execute_epdisenable - execute the exception
+//  point disable/enable commands
+//-------------------------------------------------
+
+void debugger_commands::execute_epdisenable(bool enable, const std::vector<std::string_view> &params)
+{
+	if (params.empty()) // if no parameters, disable/enable all
+	{
+		for (device_t &device : device_enumerator(m_machine.root_device()))
+			device.debug()->exceptionpoint_enable_all(enable);
+		m_console.printf(enable ? "Enabled all exception points\n" : "Disabled all exception points\n");
+	}
+	else // otherwise, disable/enable the specific ones
+	{
+		execute_index_command(
+				params,
+				[this, enable] (device_t &device, u64 param) -> bool
+				{
+					if (!device.debug()->exceptionpoint_enable(param, enable))
+						return false;
+					m_console.printf(enable ? "Exception point %X enabled\n" : "Exception point %X disabled\n", param);
+					return true;
+				},
+				"Invalid exception point number %X\n");
+	}
+}
+
+
+//-------------------------------------------------
+//  execute_eplist - execute the exception point
+//  list command
+//-------------------------------------------------
+
+void debugger_commands::execute_eplist(const std::vector<std::string_view> &params)
+{
+	int printed = 0;
+	std::string buffer;
+	auto const apply =
+			[this, &printed, &buffer] (device_t &device)
+			{
+				if (!device.debug()->exceptionpoint_list().empty())
+				{
+					m_console.printf("Device '%s' exception points:\n", device.tag());
+
+					// loop over the exception points
+					for (const auto &epp : device.debug()->exceptionpoint_list())
+					{
+						debug_exceptionpoint &ep = *epp.second;
+						buffer = string_format("%c%4X : %X", ep.enabled() ? ' ' : 'D', ep.index(), ep.type());
+						if (std::string(ep.condition()).compare("1") != 0)
+							buffer.append(string_format(" if %s", ep.condition()));
+						if (!ep.action().empty())
+							buffer.append(string_format(" do %s", ep.action()));
+						m_console.printf("%s\n", buffer);
+						printed++;
+					}
+				}
+			};
+
+	if (!params.empty())
+	{
+		device_t *cpu;
+		if (!validate_cpu_parameter(params[0], cpu))
+			return;
+		apply(*cpu);
+		if (!printed)
+			m_console.printf("No exception points currently installed for CPU %s\n", cpu->tag());
+	}
+	else
+	{
+		// loop over all CPUs
+		for (device_t &device : device_enumerator(m_machine.root_device()))
+			apply(device);
+		if (!printed)
+			m_console.printf("No exception points currently installed\n");
+	}
+}
+
+
 /*-------------------------------------------------
     execute_rplist - execute the registerpoint list
     command
@@ -2221,7 +2375,7 @@ void debugger_commands::execute_rplist(const std::vector<std::string_view> &para
 					for (const auto &rp : device.debug()->registerpoint_list())
 					{
 						buffer = string_format("%c%4X if %s", rp.enabled() ? ' ' : 'D', rp.index(), rp.condition());
-						if (rp.action() && *rp.action())
+						if (!rp.action().empty())
 							buffer.append(string_format(" do %s", rp.action()));
 						m_console.printf("%s\n", buffer);
 						printed++;
@@ -3129,30 +3283,34 @@ void debugger_commands::execute_cheatnext(bool initial, const std::vector<std::s
 
 	// decode condition
 	u8 condition;
-	if (util::streqlower(params[0], "all"))
-		condition = CHEAT_ALL;
-	else if (util::streqlower(params[0], "equal") || util::streqlower(params[0], "eq"))
-		condition = (params.size() > 1) ? CHEAT_EQUALTO : CHEAT_EQUAL;
-	else if (util::streqlower(params[0], "notequal") || util::streqlower(params[0], "ne"))
-		condition = (params.size() > 1) ? CHEAT_NOTEQUALTO : CHEAT_NOTEQUAL;
-	else if (util::streqlower(params[0], "decrease") || util::streqlower(params[0], "de") || params[0] == "-")
-		condition = (params.size() > 1) ? CHEAT_DECREASEOF : CHEAT_DECREASE;
-	else if (util::streqlower(params[0], "increase") || util::streqlower(params[0], "in") || params[0] == "+")
-		condition = (params.size() > 1) ? CHEAT_INCREASEOF : CHEAT_INCREASE;
-	else if (util::streqlower(params[0], "decreaseorequal") || util::streqlower(params[0], "deeq"))
-		condition = CHEAT_DECREASE_OR_EQUAL;
-	else if (util::streqlower(params[0], "increaseorequal") || util::streqlower(params[0], "ineq"))
-		condition = CHEAT_INCREASE_OR_EQUAL;
-	else if (util::streqlower(params[0], "smallerof") || util::streqlower(params[0], "lt") || params[0] == "<")
-		condition = CHEAT_SMALLEROF;
-	else if (util::streqlower(params[0], "greaterof") || util::streqlower(params[0], "gt") || params[0] == ">")
-		condition = CHEAT_GREATEROF;
-	else if (util::streqlower(params[0], "changedby") || util::streqlower(params[0], "ch") || params[0] == "~")
-		condition = CHEAT_CHANGEDBY;
-	else
 	{
-		m_console.printf("Invalid condition type\n");
-		return;
+		using util::streqlower;
+		using namespace std::literals;
+		if (streqlower(params[0], "all"sv))
+			condition = CHEAT_ALL;
+		else if (streqlower(params[0], "equal"sv) || streqlower(params[0], "eq"sv))
+			condition = (params.size() > 1) ? CHEAT_EQUALTO : CHEAT_EQUAL;
+		else if (streqlower(params[0], "notequal"sv) || streqlower(params[0], "ne"sv))
+			condition = (params.size() > 1) ? CHEAT_NOTEQUALTO : CHEAT_NOTEQUAL;
+		else if (streqlower(params[0], "decrease"sv) || streqlower(params[0], "de"sv) || params[0] == "-"sv)
+			condition = (params.size() > 1) ? CHEAT_DECREASEOF : CHEAT_DECREASE;
+		else if (streqlower(params[0], "increase"sv) || streqlower(params[0], "in"sv) || params[0] == "+"sv)
+			condition = (params.size() > 1) ? CHEAT_INCREASEOF : CHEAT_INCREASE;
+		else if (streqlower(params[0], "decreaseorequal"sv) || streqlower(params[0], "deeq"sv))
+			condition = CHEAT_DECREASE_OR_EQUAL;
+		else if (streqlower(params[0], "increaseorequal"sv) || streqlower(params[0], "ineq"sv))
+			condition = CHEAT_INCREASE_OR_EQUAL;
+		else if (streqlower(params[0], "smallerof"sv) || streqlower(params[0], "lt"sv) || params[0] == "<"sv)
+			condition = CHEAT_SMALLEROF;
+		else if (streqlower(params[0], "greaterof"sv) || streqlower(params[0], "gt"sv) || params[0] == ">"sv)
+			condition = CHEAT_GREATEROF;
+		else if (streqlower(params[0], "changedby"sv) || streqlower(params[0], "ch"sv) || params[0] == "~"sv)
+			condition = CHEAT_CHANGEDBY;
+		else
+		{
+			m_console.printf("Invalid condition type\n");
+			return;
+		}
 	}
 
 	m_cheat.undo++;
@@ -3754,17 +3912,16 @@ void debugger_commands::execute_dasm(const std::vector<std::string_view> &params
 
 void debugger_commands::execute_trace(const std::vector<std::string_view> &params, bool trace_over)
 {
-	std::string action;
+	std::string_view action;
 	bool detect_loops = true;
 	bool logerror = false;
-	device_t *cpu;
-	const char *mode;
 	std::string filename(params[0]);
 
 	// replace macros
 	strreplace(filename, "{game}", m_machine.basename());
 
 	// validate parameters
+	device_t *cpu;
 	if (!validate_cpu_parameter(params.size() > 1 ? params[1] : std::string_view(), cpu))
 		return;
 	if (params.size() > 2)
@@ -3775,9 +3932,10 @@ void debugger_commands::execute_trace(const std::vector<std::string_view> &param
 		std::string flag;
 		while (std::getline(stream, flag, '|'))
 		{
-			if (util::streqlower(flag, "noloop"))
+			using namespace std::literals;
+			if (util::streqlower(flag, "noloop"sv))
 				detect_loops = false;
-			else if (util::streqlower(flag, "logerror"))
+			else if (util::streqlower(flag, "logerror"sv))
 				logerror = true;
 			else
 			{
@@ -3790,19 +3948,22 @@ void debugger_commands::execute_trace(const std::vector<std::string_view> &param
 		return;
 
 	// open the file
-	FILE *f = nullptr;
-	if (!util::streqlower(filename, "off"))
+	std::unique_ptr<std::ofstream> f;
+	using namespace std::literals;
+	if (!util::streqlower(filename, "off"sv))
 	{
-		mode = "w";
+		std::ios_base::openmode mode = std::ios_base::out;
 
 		// opening for append?
 		if ((filename[0] == '>') && (filename[1] == '>'))
 		{
-			mode = "a";
+			mode |= std::ios_base::ate;
 			filename = filename.substr(2);
 		}
+		else
+			mode |= std::ios_base::trunc;
 
-		f = fopen(filename.c_str(), mode);
+		f = std::make_unique<std::ofstream>(filename.c_str(), mode);
 		if (!f)
 		{
 			m_console.printf("Error opening file '%s'\n", params[0]);
@@ -3811,7 +3972,7 @@ void debugger_commands::execute_trace(const std::vector<std::string_view> &param
 	}
 
 	// do it
-	cpu->debug()->trace(f, trace_over, detect_loops, logerror, action.c_str());
+	cpu->debug()->trace(std::move(f), trace_over, detect_loops, logerror, action);
 	if (f)
 		m_console.printf("Tracing CPU '%s' to file %s\n", cpu->tag(), filename);
 	else

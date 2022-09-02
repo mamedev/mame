@@ -32,22 +32,22 @@ memory map:
            bit 2 = nmi enable/acknowledge
            bit 3 = flip screen (applies to sprites only, not tilemaps)
            bit 4 = disable internal sprite processing
-		   		   used by Devastators, TMNT, Aliens, Chequered Flag, maybe others
+                   used by Devastators, TMNT, Aliens, Chequered Flag, maybe others
                    aliens sets it just after checking bit 0, and before copying
                    the sprite data
            bit 5 = enable gfx ROM reading
            bit 6 = let cpu address bits 2~5 pass through CA0~3 when bit 5 is set
 001     W  bit 0 = invert shadow for all pens
-		   bit 1 = force shadows for pen 0x0f
-		   bit 2 = disable shadows for pen 0x0f (priority over bit 1)	
-		   Devastators sets bit 1.
+           bit 1 = force shadows for pen 0x0f
+           bit 2 = disable shadows for pen 0x0f (priority over bit 1)
+           Devastators sets bit 1.
            Ultraman sets the register to 0x0f.
            None of the other games I tested seem to set this register to other than 0.
            Update: Chequered Flag sets bit 0 when background should be dimmed.
 002-003 W  selects the portion of the gfx ROMs to be read.
 004     W  bit 0 = OC6 when gfx ROM reading is enabled
-		   bit 1 = OC7 when gfx ROM reading is enabled
-		   Aliens uses this to select the ROM bank to be read, but Punk Shot
+           bit 1 = OC7 when gfx ROM reading is enabled
+           Aliens uses this to select the ROM bank to be read, but Punk Shot
            and TMNT don't, they use another bit of the registers above. Many
            other games write to this register before testing.
            Bits 2-7 of 003 go to OC0-OC5.
@@ -345,7 +345,7 @@ void k051960_device::k051937_w(offs_t offset, u8 data)
 	{
 		if (0)
 			logerror("%s: %02x to 051937 address %x\n", machine().describe_context(), data, offset);
-		
+
 		m_shadow_config = data & 0x07;
 	}
 	else if (offset >= 2 && offset < 5)
@@ -478,7 +478,7 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 		}
 
 		drawmode_table[gfx(0)->granularity() - 1] = (shadow ^ m_inv_shadow) ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
-		
+
 		if (zoomx == 0x10000 && zoomy == 0x10000)
 		{
 			int sx, sy;

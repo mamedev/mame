@@ -30,6 +30,7 @@ void applefdintf_device::formats_35(format_registration &fr)
 	fr.add_pc_formats();
 	fr.add(FLOPPY_DC42_FORMAT);
 	fr.add(FLOPPY_WOZ_FORMAT);
+	fr.add(FLOPPY_MOOF_FORMAT);
 	fr.add(FLOPPY_APPLE_GCR_FORMAT);
 	fr.add(FLOPPY_APPLE_2MG_FORMAT);
 

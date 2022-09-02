@@ -10,7 +10,7 @@
     on the parameters.
 
     Thunder Cross II POST checks of this chip.
-	It literally tests the chip in an unit test fashion:
+    It literally tests the chip in an unit test fashion:
       1. zeroing all ports;
       2. test that status returns 0;
       3. ping ACX reg 0 with 0xff;
@@ -126,13 +126,13 @@ void k054000_device::map(address_map &map)
 inline int k054000_device::convert_raw_to_result_delta(u8 *buf)
 {
 	int res = (buf[0] << 16) | (buf[1] << 8) | buf[2];
-	
+
 	// Last value in the buffer is used as OTG correction in Vendetta
 	if (buf[3] & 0x80)
 		res -= (0x100 - buf[3]);
 	else
 		res += buf[3];
-	
+
 	return res;
 }
 
@@ -169,22 +169,22 @@ u8 k054000_device::axis_check(u32 m_Ac, u32 m_Bc, u32 m_Aa, u32 m_Ba)
 {
 	u8 res = 0;
 	s32 sub = m_Ac - m_Bc;
-	
+
 	// MSB check
 	if ((sub > 511) || (sub <= -1024))
 		res |= 1;
-	
+
 	// LSB check
 	if ((abs(sub) & 0x1ff) > ((m_Aa + m_Ba) & 0x1ff))
 		res |= 1;
-	
+
 	return res;
 }
 
 u8 k054000_device::status_r()
 {
 	u8 res;
-	
+
 	res = axis_check(m_Acx, m_Bcx, m_Aax, m_Bax);
 	res |= axis_check(m_Acy, m_Bcy, m_Aay, m_Bay);
 

@@ -12,15 +12,19 @@
 //    - osd_ticks
 //    - osd_sleep
 //============================================================
+#ifndef MAME_OSD_LIB_OSDLIB_H
+#define MAME_OSD_LIB_OSDLIB_H
 
-#ifndef __OSDLIB__
-#define __OSDLIB__
+#pragma once
 
 #include <initializer_list>
 #include <string>
+#include <string_view>
+#include <system_error>
 #include <type_traits>
 #include <vector>
 #include <memory>
+
 
 /*-----------------------------------------------------------------------------
     osd_process_kill: kill the current process
@@ -54,10 +58,22 @@ void osd_process_kill();
 int osd_setenv(const char *name, const char *value, int overwrite);
 
 
-/*-----------------------------------------------------------------------------
-    osd_get_clipboard_text: retrieves text from the clipboard
------------------------------------------------------------------------------*/
-std::string osd_get_clipboard_text();
+/// \brief Get clipboard text
+///
+/// Gets current clipboard content as UTF-8 text.  Returns an empty
+/// string if the clipboard contents cannot be converted to plain text.
+/// \return Clipboard contents or an empty string.
+std::string osd_get_clipboard_text() noexcept;
+
+
+/// \brief Set clipboard text
+///
+/// Sets the desktop environment's clipboard contents to the supplied
+/// UTF-8 text.  The contents of the clipboard may be changed on error.
+/// \param [in] text The text to copy to the clipboard.
+/// \return An error condition if the operation failed or is
+///   unsupported.
+std::error_condition osd_set_clipboard_text(std::string_view text) noexcept;
 
 
 namespace osd {
@@ -193,4 +209,4 @@ protected:
 #define OSD_DYNAMIC_CALL(fname, ...) (*m_##fname##_pfn) ( __VA_ARGS__ )
 #define OSD_DYNAMIC_API_TEST(fname) (m_##fname##_pfn != nullptr)
 
-#endif  /* __OSDLIB__ */
+#endif // MAME_OSD_LIB_OSDLIB_H

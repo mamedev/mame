@@ -20,37 +20,12 @@ DEFINE_DEVICE_TYPE(MONONCOL_CARTSLOT, mononcol_cartslot_device, "mononcol_cartsl
 //**************************************************************************
 
 device_mononcol_cart_interface::device_mononcol_cart_interface(machine_config const &mconfig, device_t &device) :
-	device_interface(device, "genslot"),
-	m_rom(nullptr),
-	m_rom_size(0)
+	device_interface(device, "mononcart")
 {
 }
 
 device_mononcol_cart_interface::~device_mononcol_cart_interface()
 {
-}
-
-void device_mononcol_cart_interface::rom_alloc(u32 size, int width, endianness_t endian)
-{
-	if (m_rom)
-	{
-		throw emu_fatalerror(
-				"%s: Request to allocate ROM when already allocated (allocated size %u, requested size %u)\n",
-				device().tag(),
-				m_rom_size,
-				size);
-	}
-
-	std::string fulltag = device().subtag("^cart:rom");
-
-	device().logerror("Allocating %u byte ROM region with tag '%s' (width %d)\n", size, fulltag, width);
-	m_rom = device().machine().memory().region_alloc(fulltag, size, width, endian)->base();
-	m_rom_size = size;
-
-	if (!(m_rom_size && !(m_rom_size & (m_rom_size - 1))))
-	{
-		fatalerror("m_rom_size is NOT a power of 2");
-	}
 }
 
 
@@ -61,7 +36,7 @@ void device_mononcol_cart_interface::rom_alloc(u32 size, int width, endianness_t
 
 mononcol_cartslot_device::mononcol_cartslot_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	device_rom_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_mononcol_cart_interface>(mconfig, *this),
 	m_cart(nullptr)
 {
@@ -91,17 +66,34 @@ image_init_result mononcol_cartslot_device::call_load()
 {
 	if (m_cart)
 	{
-		u32 len = common_get_size("rom");
+		memory_region *romregion(loaded_through_softlist() ? memregion("rom") : nullptr);
+		if (loaded_through_softlist() && !romregion)
+		{
+			seterror(image_error::INVALIDIMAGE, "Software list item has no 'rom' data area");
+			return image_init_result::FAIL;
+		}
 
-		rom_alloc(len, 1, ENDIANNESS_LITTLE);
-		common_load_rom(get_rom_base(), len, "rom");
+		const u32 len = loaded_through_softlist() ? get_software_region_length("rom") : length();
+		if (!len || ((len - 1) & len))
+		{
+			seterror(image_error::INVALIDIMAGE, "Cartridge ROM size is not a power of 2");
+			return image_init_result::FAIL;
+		}
 
-		m_cart->set_spi_region(get_rom_base());
-		m_cart->set_spi_size(get_rom_size());
+		if (!loaded_through_softlist())
+		{
+			LOG("Allocating %u byte cartridge ROM region\n", len);
+			romregion = machine().memory().region_alloc(subtag("rom"), len, 4, ENDIANNESS_LITTLE);
+			const u32 cnt = fread(romregion->base(), len);
+			if (cnt != len)
+			{
+				seterror(image_error::UNSPECIFIED, "Error reading cartridge file");
+				return image_init_result::FAIL;
+			}
+		}
 
-		return image_init_result::PASS;
+		m_cart->set_spi_region(romregion->base(), romregion->bytes());
 	}
-
 	return image_init_result::PASS;
 }
 
@@ -114,44 +106,4 @@ image_init_result mononcol_cartslot_device::call_load()
 std::string mononcol_cartslot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
 	return software_get_default_slot("rom");
-}
-
-
-/**************************************************
-
- Implementation
-
- **************************************************/
-
-
-/*-------------------------------------------------
- common_get_size - it gets image file size both
- for fullpath and for softlist
- -------------------------------------------------*/
-
-u32 mononcol_cartslot_device::common_get_size(char const *region)
-{
-	// if we are loading from softlist, you have to specify a region
-	assert(!loaded_through_softlist() || (region != nullptr));
-
-	return !loaded_through_softlist() ? length() : get_software_region_length(region);
-}
-
-/*-------------------------------------------------
- common_load_rom - it loads from image file both
- for fullpath and for softlist
- -------------------------------------------------*/
-
-void mononcol_cartslot_device::common_load_rom(u8 *ROM, u32 len, char const *region)
-{
-	// basic sanity check
-	assert((ROM != nullptr) && (len > 0));
-
-	// if we are loading from softlist, you have to specify a region
-	assert(!loaded_through_softlist() || (region != nullptr));
-
-	if (!loaded_through_softlist())
-		fread(ROM, len);
-	else
-		memcpy(ROM, get_software_region(region), len);
 }

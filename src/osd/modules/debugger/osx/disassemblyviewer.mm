@@ -182,7 +182,7 @@
 		// if it doesn't exist, add a new one
 		if (bp == nullptr)
 		{
-			uint32_t const bpnum = device.debug()->breakpoint_set(address, nullptr, nullptr);
+			uint32_t const bpnum = device.debug()->breakpoint_set(address);
 			machine->debugger().console().printf("Breakpoint %X set\n", bpnum);
 		}
 		else

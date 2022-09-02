@@ -87,13 +87,6 @@ public:
 
 	void nimbus(machine_config &config);
 
-	uint32_t m_debug_machine = 0;
-	uint32_t m_debug_trap = 0;
-
-	void decode_subbios(device_t *device, offs_t pc);
-	void decode_subbios_return(device_t *device, offs_t pc);
-	void decode_dos21(device_t *device, offs_t pc);
-
 private:
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<i8031_device> m_iocpu;

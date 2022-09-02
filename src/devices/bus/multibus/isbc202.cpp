@@ -743,7 +743,7 @@ void isbc202_device::set_output()
 			LOG_BUS("CPU out of wait state\n");
 			xack_w(0);
 			// Ensure the MCU executes a few instruction before the CPU
-			machine().scheduler().boost_interleave(attotime::from_usec(1) , attotime::from_usec(5));
+			machine().scheduler().add_quantum(attotime::from_usec(1) , attotime::from_usec(5));
 			m_inputs[ IN_SEL_START ] = false;
 		}
 		if (BIT(m_mask , 4)) {

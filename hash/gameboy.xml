@@ -7509,7 +7509,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tamaosu">
+	<!-- unemulated speaker and real-time clock -->
+	<software name="tamaosu" supported="partial">
 		<!-- The game cart has an integrated speaker and a replaceable battery (CR2016). -->
 		<description>Game de Hakken!! Tamagotchi - Osutchi to Mesutchi (Japan)</description>
 		<year>1998</year>
@@ -27784,9 +27785,10 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 	</software>
 
 	<software name="lasama">
-		<description>La Sa Ma Chuan Qi - Story of Lasama (Taiwan)</description>
+		<description>Lāsàmǎ Chuánqí - Story of Lasama (Taiwan)</description>
 		<year>19??</year>
 		<publisher>GOWIN</publisher>
+		<info name="alt_title" value="拉薩瑪傳奇" />
 		<info name="serial" value="GS-04" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_lasama" />

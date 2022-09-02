@@ -327,16 +327,30 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tintinpr">
+	<software name="tintinpr" supported="no">
 		<description>The Adventures of Tintin - Prisoners of the Sun (Europe)</description>
 		<year>2000</year>
 		<publisher>Infogrames</publisher>
 		<info name="alt_title" value="Tintin - Prisoners of the Sun (Box?), Tintin - Le Temple du Soleil (French Box)"/>
 		<info name="serial" value="CGB-BTTP-FAH"/>
+		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="adventures of tintin, the - prisoners of the sun (europe) (en,fr,de).bin" size="1048576" crc="b2205d49" sha1="34ab01951490a9510a3e0d3493d25a2547761aea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tintinprp" cloneof="tintinpr" supported="no">
+		<description>The Adventures of Tintin - Prisoners of the Sun (Europe, prototype)</description>
+		<year>2000</year>
+		<publisher>Infogrames</publisher>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="tintin - temple du soleil (prototype).bin" size="0x100000" crc="94aed620" sha1="8c29d9135fcf3c74397da8b0898af07d0b3b7955"/>
 			</dataarea>
 		</part>
 	</software>
@@ -660,6 +674,18 @@ license:CC0
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="antz (europe) (en,fr,de,es,it,nl).bin" size="1048576" crc="4839e0c1" sha1="2cba2b024edb4b702d2acabefbcb310f4d6e2075"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="antzp" cloneof="antz">
+		<description>Antz (Europe, prototype)</description>
+		<year>1999</year>
+		<publisher>Infogrames</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="antz (prototype).bin" size="0x80000" crc="f287fc49" sha1="99818cd3dc4bfe61bf0095856a0f443afae89acf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1752,6 +1778,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="beachbalp" cloneof="beachbal">
+		<description>Beach'n Ball (Europe, prototype, 20001121)</description>
+		<year>2000</year>
+		<publisher>Infogrames</publisher>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="beach'n ball (nov 21, 2000 prototype).bin" size="0x100000" crc="a56180a8" sha1="faaf82512ad3f5429acf401d9e74d7016252e263"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bearblue">
 		<description>Jim Henson's Bear in the Big Blue House (Europe)</description>
 		<year>2002</year>
@@ -2108,6 +2147,31 @@ license:CC0
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="524288">
 				<rom name="cgb-bbqp-0.u1" size="524288" crc="a4c6523d" sha1="2b4b8c3a4a74fdf7acc4138125fea5d8f5a9a093"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bobbobetp" cloneof="bobbobet">
+		<description>Bob et Bobette - Les Dompteurs du Temps ~ Suske en Wiske - De Tijdtemmers (Europe, late prototype)</description>
+		<year>2001</year>
+		<publisher>Infogrames</publisher>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="suske en wiske - de tijdtemmers ~ bob et bobette - les dompteurs du temps (prototype b).bin" size="0x80000" crc="6bfcfd87" sha1="83c64dd44d3d03e3fd0711b23bf63e2264256dea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bobbobetp1" cloneof="bobbobet" supported="no">
+		<description>Bob et Bobette - Les Dompteurs du Temps ~ Suske en Wiske - De Tijdtemmers (Europe, early prototype)</description>
+		<year>2001?</year>
+		<publisher>Infogrames</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="suske en wiske - de tijdtemmers ~ bob et bobette - les dompteurs du temps (prototype a).bin" size="0x80000" crc="617d7667" sha1="b215146fe8e2a5836d0ac6fa4785f95db464fc1a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5339,6 +5403,19 @@ license:CC0
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="cgb-bdrp-0.u1" size="1048576" crc="e9e67403" sha1="5001f0f4904ca4fb6ab287b52136d00ac94b49d7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="driverp" cloneof="driver">
+		<description>Driver (Europe, prototype)</description>
+		<year>2000</year>
+		<publisher>Infogrames</publisher>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="driver - you are the wheelman (prototype).bin" size="0x100000" crc="33e9d438" sha1="07e25b8c7569e064d060258981814a151202edbb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10019,36 +10096,6 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="klustar">
-		<description>Klustar (Europe)</description>
-		<year>1999</year>
-		<publisher>Infogrames</publisher>
-		<info name="serial" value="DMG-AKUP-EUR"/>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc5" />
-			<dataarea name="rom" size="262144">
-				<rom name="klustar (europe) (en,fr,de,es,it).bin" size="262144" crc="577e1521" sha1="b78d832e5d39180d84bf13dde81b923717cb35aa"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="kokings">
-		<description>Knockout Kings (Europe, USA)</description>
-		<year>1999</year>
-		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="CGB-AXKE-USA, CGB-AXKP-EUR"/>
-		<sharedfeat name="compatibility" value="GBC"/>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-A07-01" />
-			<feature name="u1" value="U1 2M/4M/8M MROM" />
-			<feature name="u2" value="U2 MBC5" />
-			<feature name="slot" value="rom_mbc5" />
-			<dataarea name="rom" size="1048576">
-				<rom name="cgb-axkp-0.u1" size="1048576" crc="a0d64934" sha1="a04d86a384c5c417bf9f1219eb14829d0459f469"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="klax">
 		<description>Klax (Europe, USA)</description>
 		<year>1999</year>
@@ -10066,6 +10113,43 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="klustar">
+		<description>Klustar (Europe)</description>
+		<year>1999</year>
+		<publisher>Infogrames</publisher>
+		<info name="serial" value="DMG-AKUP-EUR"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="262144">
+				<rom name="klustar (europe) (en,fr,de,es,it).bin" size="262144" crc="577e1521" sha1="b78d832e5d39180d84bf13dde81b923717cb35aa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="klustarp" cloneof="klustar">
+		<description>Klustar (Europe, prototype, 19981001)</description>
+		<year>1998</year>
+		<publisher>Ocean</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="klustar (oct 1, 1998 europe prototype).bin" size="0x20000" crc="fc56bb35" sha1="7512484c9c84592e65f19f135cbe629f5a1ee84e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="klustarjp" cloneof="klustar">
+		<description>Klustar (Japan, prototype, 19981001)</description>
+		<year>1998</year>
+		<publisher>Ocean</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="klustar (oct 1, 1998 japanese prototype).bin" size="0x20000" crc="f9c6e0a5" sha1="4990b427f1b85ceca9646b3edfa921ed160a55a9"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="klustaru" cloneof="klustar">
 		<description>Klustar (USA)</description>
 		<year>1999</year>
@@ -10075,6 +10159,23 @@ license:CC0
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="262144">
 				<rom name="klustar (usa).bin" size="262144" crc="3f8d6041" sha1="096748f23f61e83837568c4070a34572d11ff48e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kokings">
+		<description>Knockout Kings (Europe, USA)</description>
+		<year>1999</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="serial" value="CGB-AXKE-USA, CGB-AXKP-EUR"/>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A07-01" />
+			<feature name="u1" value="U1 2M/4M/8M MROM" />
+			<feature name="u2" value="U2 MBC5" />
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="cgb-axkp-0.u1" size="1048576" crc="a0d64934" sha1="a04d86a384c5c417bf9f1219eb14829d0459f469"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11150,6 +11251,21 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="looneymap" cloneof="looneyma">
+		<description>Looney Tunes Collector - Martian Alert! (Europe, prototype)</description>
+		<year>2000</year>
+		<publisher>Infogrames</publisher>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="looney tunes collector - martian alert (prototype).bin" size="0x200000" crc="9058eae3" sha1="601236c323f4adbe5bd6091fac8871e11d71f105"/>
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="looneymaj" cloneof="looneyma">
 		<description>Looney Tunes Collector - Martian Quest! (Japan)</description>
 		<year>2001</year>
@@ -11574,6 +11690,19 @@ license:CC0
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="lucky luke - desperado train (europe) (en,fr,de,es,it,nl).bin" size="1048576" crc="ce7f108a" sha1="857dda99bdb15c49918c633dbcb73bd96ef7bae9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="luckyldtp" cloneof="luckyldt">
+		<description>Lucky Luke - Desperado Train (Europe, prototype)</description>
+		<year>2000</year>
+		<publisher>Infogrames</publisher>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="lucky luke - desperado train (prototype).bin" size="0x100000" crc="b558c401" sha1="ab9b610f2858fec8bd4542731f6fbfd4b7faf9e1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12243,6 +12372,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="mausp" cloneof="maus">
+		<description>Die Maus (Europe, prototype)</description>
+		<year>1999</year>
+		<publisher>Infogrames</publisher>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="die maus (prototype).bin" size="0x100000" crc="d6e8f27e" sha1="5c60b47701329e0d3ed9a1a4c929255f0fe360d9"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mausvo">
 		<description>Die Maus - Verrückte Olympiade (Germany)</description>
 		<year>2001</year>
@@ -12256,6 +12398,19 @@ license:CC0
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="cgb-bvod-0.u1" size="1048576" crc="fd11138e" sha1="861f53ec6d5981b5f5237777fd776299d90f4cc0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mausvop" cloneof="mausvo">
+		<description>Die Maus - Verrückte Olympiade (Germany, prototype)</description>
+		<year>2001?</year>
+		<publisher>Infogrames</publisher>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="die maus - verrueckte olympiade (prototype).bin" size="0x200000" crc="39671abc" sha1="ee110f4db4e2776198894baba00941e75696bc29"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13590,6 +13745,22 @@ license:CC0
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="cgb-am9p-0.u1" size="1048576" crc="45543ba2" sha1="06e57b38b7f9ec71809f309aa7d220af48ca96b6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moominjp" cloneof="moomin">
+		<description>Moomin no Daibouken (Japan, prototype)</description>
+		<year>2000</year>
+		<publisher>Sunsoft</publisher>
+		<info name="alt_title" value="ムーミンの大冒険"/>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x200000">
+				<rom name="moomin's tale (prototype).bin" size="0x200000" crc="3c193973" sha1="b60e7896fa4ceca42530f1de01e4691ee9590a7f"/>
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
 			</dataarea>
 		</part>
 	</software>
@@ -19808,6 +19979,18 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="snoopytnp" cloneof="snoopytn">
+		<description>Snoopy Tennis (Europe, prototype)</description>
+		<year>2001</year>
+		<publisher>Infogrames</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="snoopy tennis (prototype).bin" size="0x100000" crc="49db04a6" sha1="03adc2731945bc86588fffedfee2050a00679ce6"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="snoopytnj" cloneof="snoopytn">
 		<description>Snoopy Tennis (Japan)</description>
 		<year>2001</year>
@@ -19917,7 +20100,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="anpan5to">
+	<software name="anpan5to" supported="no">
 		<description>Soreike! Anpanman - 5-tsu no Tou no Ousama (Japan)</description>
 		<year>2000</year>
 		<publisher>Tamsoft</publisher>
@@ -22063,6 +22246,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="tootuffp" cloneof="tootuff">
+		<description>Tootuff (prototype)</description>
+		<year>2001</year>
+		<publisher>Infogrames</publisher>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="tootuff (prototype).bin" size="0x100000" crc="709f4ad6" sha1="f71f380f9c68c42fc1461532ca92bffaa301da4d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="topgearj" cloneof="tgrally">
 		<description>Top Gear Pocket (Japan)</description>
 		<year>1999</year>
@@ -22768,6 +22964,21 @@ license:CC0
 				<rom name="uefa 2000 (europe) (en,fr,de,es,it,nl).bin" size="1048576" crc="4b314d4b" sha1="56e5f0e62b65a265c85e1a88882b18139f26b94d"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uefa2kp" cloneof="uefa2k">
+		<description>UEFA 2000 (prototype)</description>
+		<year>2000</year>
+		<publisher>Infogrames</publisher>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="uefa 2000 (prototype).bin" size="0x100000" crc="03380957" sha1="9f44aa3230aba33c9c38c5e17f9cef2e9a10747e"/>
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
 			</dataarea>
 		</part>
 	</software>
@@ -23658,6 +23869,21 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="wdlp" cloneof="wdl">
+		<description>WDL - Thundertanx (prototype)</description>
+		<year>2000?</year>
+		<publisher>3DO</publisher>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="wdl - world destruction league - thunder tanks (prototype).bin" size="0x100000" crc="41df1c79" sha1="126b3626fb4752312834ac42bb5b873c22a3aea3"/>
+			</dataarea>
+			<dataarea name="ram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wsoccr2k" cloneof="iss2k">
 		<description>World Soccer GB 2000 (Japan)</description>
 		<year>2000</year>
@@ -23707,6 +23933,19 @@ license:CC0
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="cgb-awup-0.u1" size="1048576" crc="cb04f34d" sha1="0bff9f46f2c455e98a5f0d9c0d560eda88d939de"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wormsarmp" cloneof="wormsarm" supported="no"> <!-- terrain is not rendered -->
+		<description>Worms Armageddon (prototype)</description>
+		<year>1999?</year>
+		<publisher>Infogrames</publisher>
+		<sharedfeat name="compatibility" value="GBC"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="worms armageddon (prototype).bin" size="0x100000" crc="66fda365" sha1="b0b14b13ec7cffb04efbf0dcdd93a2eea679ea0c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -24540,6 +24779,7 @@ license:CC0
     These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 -->
 
+	<!-- missing graphics in Karate Joe -->
 	<software name="atvrackj" supported="partial">
 		<description>ATV Racing &amp; Karate Joe (Europe)</description>
 		<year>200?</year>
@@ -24556,6 +24796,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- missing graphics in Karate Joe -->
 	<software name="atvrackja" cloneof="atvrackj" supported="partial">
 		<description>ATV Racing &amp; Karate Joe (Europe, alt)</description>
 		<year>200?</year>
@@ -24587,6 +24828,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- displays white screen rather than game selection menu - can still use Up/Down and Start to select game -->
 	<software name="fullhang" supported="partial">
 		<description>Full Time Soccer &amp; Hang Time Basketball (Europe)</description>
 		<year>200?</year>
@@ -24634,6 +24876,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- missing graphics in Smash Out -->
 	<software name="pocksmrt" supported="partial">
 		<description>Pocket Smash Out &amp; Race Time (Europe)</description>
 		<year>200?</year>
@@ -24664,7 +24907,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="karatej" supported="partial">
+	<!-- missing graphics make the game almost unplayable -->
+	<software name="karatej" supported="no">
 		<description>Karate Joe (Europe)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
@@ -24705,7 +24949,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="sinkj" supported="partial">
+	<!-- Space Invasion hangs when starting a game, Karate Joe has missing graphics -->
+	<software name="sinkj" supported="no">
 		<description>Space Invasion &amp; Karate Joe (Europe)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
@@ -24721,6 +24966,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Space Invasion hangs when starting a game -->
 	<software name="sinpntr" supported="partial">
 		<description>Space Invasion &amp; Painter (Europe)</description>
 		<year>200?</year>
@@ -24737,7 +24983,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="sinvasn" supported="partial">
+	<!-- hangs when starting a game -->
+	<software name="sinvasn" supported="no">
 		<description>Space Invasion (Europe)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
@@ -27151,7 +27398,7 @@ license:CC0
 	</software>
 
 	<software name="sqsd">
-		<description>Shi Qi Shi Dai - Jing Ling Wang Dan Sheng (China)</description>
+		<description>Shíqì Shídài - Jīnglíng Wang Dànshēng (China)</description>
 		<year>20??</year>
 		<publisher>GOWIN</publisher>
 		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
@@ -27251,7 +27498,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dkong5">
+	<software name="dkong5" supported="no">
 		<description>Donkey Kong 5 (China, bad?)</description>
 		<year>2000</year>
 		<publisher>Yong Yong</publisher>

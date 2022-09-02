@@ -148,6 +148,10 @@ private:
 	void execute_rpclear(const std::vector<std::string_view> &params);
 	void execute_rpdisenable(bool enable, const std::vector<std::string_view> &params);
 	void execute_rplist(const std::vector<std::string_view> &params);
+	void execute_epset(const std::vector<std::string_view> &params);
+	void execute_epclear(const std::vector<std::string_view> &params);
+	void execute_epdisenable(bool enable, const std::vector<std::string_view> &params);
+	void execute_eplist(const std::vector<std::string_view> &params);
 	void execute_statesave(const std::vector<std::string_view> &params);
 	void execute_stateload(const std::vector<std::string_view> &params);
 	void execute_rewind(const std::vector<std::string_view> &params);
