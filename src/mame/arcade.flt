@@ -1014,6 +1014,7 @@ nintendo/mario.cpp
 nintendo/mmagic.cpp
 nintendo/multigam.cpp
 nintendo/n8080.cpp
+nintendo/nes_arcade_bl.cpp
 nintendo/nss.cpp
 nintendo/playch10.cpp
 nintendo/popeye.cpp

@@ -33391,6 +33391,9 @@ m82p                            // Nintendo M82 Display Unit PAL
 nes                             // Nintendo Entertainment System
 nespal                          // Nintendo Entertainment System PAL
 
+@source:nintendo/nes_arcade_bl.cpp
+smb3bl
+
 @source:nintendo/nes_clone.cpp
 afbm7800
 dancexpt
