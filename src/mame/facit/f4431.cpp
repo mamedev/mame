@@ -29,13 +29,16 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/ay31015.h"
-#include "machine/clock.h"
 #include "machine/er1400.h"
+#include "machine/ripple_counter.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 #include "video/tms9927.h"
+#include "f4431_kbd.h"
 #include "emupal.h"
 #include "screen.h"
+
+#include "f4431.lh"
 
 
 namespace {
@@ -158,27 +161,23 @@ uint32_t f4431_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 {
 	if (m_display_enabled)
 	{
-		for (int y = 0; y < 25; y++)
+		for (int i = cliprect.min_y; i <= cliprect.max_y; i++)
 		{
 			for (int x = 0; x < 80; x++)
 			{
-				uint8_t code = m_ascii[y * 80 + x];
+				uint8_t code = m_ascii[(i / 10) * 80 + x];
+				uint8_t data = m_chargen[((i % 10) << 7) | code];
 
-				for (int i = 0; i < 10; i++)
-				{
-					uint8_t data = m_chargen[(i << 7) | code];
-
-					bitmap.pix(y * 10 + i, x * 10 + 0) = BIT(data, 7) ? rgb_t::white() : rgb_t::black();
-					bitmap.pix(y * 10 + i, x * 10 + 1) = (BIT(data, 7) || BIT(data, 6)) ? rgb_t::white() : rgb_t::black();
-					bitmap.pix(y * 10 + i, x * 10 + 2) = (BIT(data, 6) || BIT(data, 5)) ? rgb_t::white() : rgb_t::black();
-					bitmap.pix(y * 10 + i, x * 10 + 3) = (BIT(data, 5) || BIT(data, 4)) ? rgb_t::white() : rgb_t::black();
-					bitmap.pix(y * 10 + i, x * 10 + 4) = (BIT(data, 4) || BIT(data, 3)) ? rgb_t::white() : rgb_t::black();
-					bitmap.pix(y * 10 + i, x * 10 + 5) = (BIT(data, 3) || BIT(data, 2)) ? rgb_t::white() : rgb_t::black();
-					bitmap.pix(y * 10 + i, x * 10 + 6) = (BIT(data, 2) || BIT(data, 1)) ? rgb_t::white() : rgb_t::black();
-					bitmap.pix(y * 10 + i, x * 10 + 7) = (BIT(data, 1) || BIT(data, 0)) ? rgb_t::white() : rgb_t::black();
-					bitmap.pix(y * 10 + i, x * 10 + 8) = BIT(data, 0) ? rgb_t::white() : rgb_t::black();
-					bitmap.pix(y * 10 + i, x * 10 + 9) = rgb_t::black();
-				}
+				bitmap.pix(i, x * 10 + 0) = BIT(data, 7) ? rgb_t::white() : rgb_t::black();
+				bitmap.pix(i, x * 10 + 1) = (BIT(data, 7) || BIT(data, 6)) ? rgb_t::white() : rgb_t::black();
+				bitmap.pix(i, x * 10 + 2) = (BIT(data, 6) || BIT(data, 5)) ? rgb_t::white() : rgb_t::black();
+				bitmap.pix(i, x * 10 + 3) = (BIT(data, 5) || BIT(data, 4)) ? rgb_t::white() : rgb_t::black();
+				bitmap.pix(i, x * 10 + 4) = (BIT(data, 4) || BIT(data, 3)) ? rgb_t::white() : rgb_t::black();
+				bitmap.pix(i, x * 10 + 5) = (BIT(data, 3) || BIT(data, 2)) ? rgb_t::white() : rgb_t::black();
+				bitmap.pix(i, x * 10 + 6) = (BIT(data, 2) || BIT(data, 1)) ? rgb_t::white() : rgb_t::black();
+				bitmap.pix(i, x * 10 + 7) = (BIT(data, 1) || BIT(data, 0)) ? rgb_t::white() : rgb_t::black();
+				bitmap.pix(i, x * 10 + 8) = BIT(data, 0) ? rgb_t::white() : rgb_t::black();
+				bitmap.pix(i, x * 10 + 9) = rgb_t::black();
 			}
 		}
 	}
@@ -192,7 +191,8 @@ uint32_t f4431_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 void f4431_state::brightness_w(uint8_t data)
 {
-	logerror("brightness_w: %02x\n", data);
+	if (0)
+		logerror("brightness_w: %02x\n", data);
 }
 
 
@@ -250,6 +250,15 @@ void f4431_state::latch_w(uint8_t data)
 
 void f4431_state::machine_start()
 {
+	// set uart control lines
+	m_uart->write_cs(1);
+	m_uart->write_np(1);
+	m_uart->write_tsb(1);
+	m_uart->write_nb2(1);
+	m_uart->write_nb1(1);
+	m_uart->write_eps(1);
+	m_uart->write_swe(0);
+
 	// register for save states
 	save_item(NAME(m_display_enabled));
 	save_item(NAME(m_nmi_disabled));
@@ -310,6 +319,18 @@ void f4431_state::f4431(machine_config &config)
 	m_vtc->hsyn_callback().set(m_ctc, FUNC(z80ctc_device::trg3));
 
 	AY31015(config, m_uart);
+	m_uart->set_auto_rdav(true);
+	m_uart->write_so_callback().set("kbd", FUNC(f4431_kbd_device::rx_w));
+
+	ripple_counter_device &uart_clk(RIPPLE_COUNTER(config, "uart_clk", 4_MHz_XTAL / 13));
+	uart_clk.set_stages(12);
+	uart_clk.count_out_cb().set(m_uart, FUNC(ay31015_device::write_rcp)).bit(4); // Q4
+	uart_clk.count_out_cb().append(m_uart, FUNC(ay31015_device::write_tcp)).bit(4); // Q4
+
+	f4431_kbd_device &kbd(F4431_KBD(config, "kbd"));
+	kbd.tx_handler().set(m_uart, FUNC(ay31015_device::write_si));
+
+	config.set_default_layout(layout_f4431);
 }
 
 
@@ -342,9 +363,6 @@ ROM_START( f4431 )
 
 	ROM_REGION(0x20, "prom", 0)
 	ROM_LOAD("11419960-00_4431.d19", 0x00, 0x20, CRC(daae0c28) SHA1(58c55b8b9d4161a9d38259a4375cf19799ea0b7a))
-
-	ROM_REGION(0x800, "keyb", 0)
-	ROM_LOAD("11419660-00_kb31.u3", 0x000, 0x800, CRC(45b90749) SHA1(91d0ef181fe05e9474871e26dc75c313cb67c337))
 ROM_END
 
 
