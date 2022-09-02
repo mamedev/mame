@@ -302,20 +302,14 @@ u32 sraider_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 void mrsdyna_state::io_w(u8 data)
 {
-	// bit7 = flip
-	// bit6 = grid red
-	// bit5 = grid green
-	// bit4 = grid blue
+	// bit012 = stars speed/dir (not used for mrsdyna)
 	// bit3 = enable stars (not used for mrsdyna)
-	// bit210 = stars speed/dir (not used for mrsdyna)
-
-	if (flip_screen() != (data & 0x80))
-	{
-		flip_screen_set(data & 0x80);
-		machine().tilemap().mark_all_dirty();
-	}
-
+	// bit4 = grid blue
+	// bit5 = grid green
+	// bit6 = grid red
+	// bit7 = flip
 	m_grid_color = data & 0x70;
+	flip_screen_set(data & 0x80);
 }
 
 void sraider_state::io_w(u8 data)

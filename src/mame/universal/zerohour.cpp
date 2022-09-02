@@ -79,7 +79,6 @@ protected:
 	virtual void video_start() override;
 
 	void videoram_w(offs_t offset, u8 data);
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	void irqack_w(u8 data) { m_maincpu->set_input_line(0, CLEAR_LINE); }
 	void star_reset_w(u8 data);
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(star_w);
@@ -273,11 +272,6 @@ void redclash_state::background_w(u8 data)
 	// redclash background layer
 	// 0x70: normal, 0xc3: white, 0x92: white+green, 0xf4: white+red/black
 	m_background = data;
-}
-
-WRITE_LINE_MEMBER(zerohour_state::flipscreen_w)
-{
-	flip_screen_set(state);
 }
 
 template <unsigned N> WRITE_LINE_MEMBER(zerohour_state::star_w)
@@ -773,7 +767,7 @@ void zerohour_state::base(machine_config &config)
 	m_outlatch[1]->q_out_cb<0>().set(FUNC(zerohour_state::star_w<0>));
 	m_outlatch[1]->q_out_cb<5>().set(FUNC(zerohour_state::star_w<1>));
 	m_outlatch[1]->q_out_cb<6>().set(FUNC(zerohour_state::star_w<2>));
-	m_outlatch[1]->q_out_cb<7>().set(FUNC(zerohour_state::flipscreen_w));
+	m_outlatch[1]->q_out_cb<7>().set(FUNC(zerohour_state::flip_screen_set));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
