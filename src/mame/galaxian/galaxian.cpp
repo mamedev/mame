@@ -8259,7 +8259,7 @@ void monsterz_state::monsterz(machine_config &config)
 		{
 			if ((m_monsterz_audio_portb & 0x01) && !(data & 0x01))
 			{
-				machine().scheduler().boost_interleave(m_screen->scan_period(), attotime(0, m_screen->refresh_attoseconds()));
+				machine().scheduler().add_quantum(m_screen->scan_period(), attotime(0, m_screen->refresh_attoseconds()));
 				m_maincpu->set_input_line(0, HOLD_LINE);
 			}
 			m_monsterz_audio_portb = data;
@@ -8269,7 +8269,7 @@ void monsterz_state::monsterz(machine_config &config)
 		{
 			if ((m_monsterz_sample_portc & 0x01) && !(data & 0x01))
 			{
-				machine().scheduler().boost_interleave(m_screen->scan_period(), attotime(0, m_screen->refresh_attoseconds()));
+				machine().scheduler().add_quantum(m_screen->scan_period(), attotime(0, m_screen->refresh_attoseconds()));
 				m_audiocpu->set_input_line(0, HOLD_LINE);
 			}
 			m_monsterz_sample_portc = data;

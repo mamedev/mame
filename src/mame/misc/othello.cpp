@@ -183,7 +183,7 @@ void othello_state::unk_8a_w(uint8_t data)
 	m_n7751_command = (data & 0x07);
 	m_n7751->set_input_line(0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
 	//m_n7751->set_input_line(0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+	machine().scheduler().perfect_quantum(attotime::from_usec(100));
 	*/
 
 	logerror("8a -> %x\n", data);

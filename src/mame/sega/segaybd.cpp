@@ -707,7 +707,7 @@ void segaybd_state::update_irqs()
 	m_suby->set_input_line(6, m_timer_irq_state && m_vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
 
 	if (m_timer_irq_state || m_vblank_irq_state)
-		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
+		machine().scheduler().perfect_quantum(attotime::from_usec(50));
 }
 
 

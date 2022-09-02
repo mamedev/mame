@@ -171,7 +171,7 @@ TIMER_CALLBACK_MEMBER(atari_sound_comm_device::delayed_sound_reset)
 
 	// allocate a high frequency timer until a response is generated
 	// the main CPU is *very* sensistive to the timing of the response
-	machine().scheduler().boost_interleave(SOUND_TIMER_RATE, SOUND_TIMER_BOOST);
+	machine().scheduler().add_quantum(SOUND_TIMER_RATE, SOUND_TIMER_BOOST);
 }
 
 
@@ -193,7 +193,7 @@ TIMER_CALLBACK_MEMBER(atari_sound_comm_device::delayed_sound_write)
 
 	// allocate a high frequency timer until a response is generated
 	// the main CPU is *very* sensistive to the timing of the response
-	machine().scheduler().boost_interleave(SOUND_TIMER_RATE, SOUND_TIMER_BOOST);
+	machine().scheduler().add_quantum(SOUND_TIMER_RATE, SOUND_TIMER_BOOST);
 }
 
 

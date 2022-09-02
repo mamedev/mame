@@ -500,7 +500,7 @@ TIMER_CALLBACK_MEMBER(itech8_state::delayed_z80_control_w)
 	}
 
 	/* boost the interleave whenever this is written to */
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+	machine().scheduler().perfect_quantum(attotime::from_usec(100));
 
 	/* stash the new value */
 	m_z80_ctrl = data;

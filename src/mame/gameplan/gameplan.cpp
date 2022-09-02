@@ -131,7 +131,7 @@ WRITE_LINE_MEMBER(gameplan_state::audio_reset_w)
 	if (state == 0)
 	{
 		m_riot->reset();
-		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
+		machine().scheduler().perfect_quantum(attotime::from_usec(10));
 	}
 }
 
@@ -159,7 +159,7 @@ WRITE_LINE_MEMBER(gameplan_state::r6532_irq)
 {
 	m_audiocpu->set_input_line(0, state);
 	if (state == ASSERT_LINE)
-		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
+		machine().scheduler().perfect_quantum(attotime::from_usec(10));
 }
 
 
