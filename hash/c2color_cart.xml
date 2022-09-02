@@ -29,7 +29,7 @@ license:CC0
 	<!-- Green package -->
 	<software name="agree" supported="no">
 		<description>Dì 1 dàn: Dài Lóngwáng Fēngyìn</description>
-		<year>2015</year>
+		<year>2014</year>
 		<publisher>Baiyi Animation</publisher>
 		<info name="alt_title" value="第1弹：带龙王封印"/>
 		<part name="cart" interface="c2color_cart">
@@ -42,7 +42,7 @@ license:CC0
 	<!-- Red package -->
 	<software name="kingwing" supported="no">
 		<description>Dì 2 dàn: Zhī Yìwáng De Shì Liàn</description>
-		<year>2015</year>
+		<year>2014</year>
 		<publisher>Baiyi Animation</publisher>
 		<info name="alt_title" value="第2弹：之翼王的试炼"/>
 		<part name="cart" interface="c2color_cart">
@@ -55,7 +55,7 @@ license:CC0
 	<!-- Blue package -->
 	<software name="firedevl" supported="no">
 		<description>Dì 3 dàn: Zhī Yīngxióng Dǎo Zhī Lièyàn Mó</description>
-		<year>2015</year>
+		<year>2014</year>
 		<publisher>Baiyi Animation</publisher>
 		<info name="alt_title" value="第3弹：之英雄岛之烈焰魔"/>
 		<part name="cart" interface="c2color_cart">
@@ -68,7 +68,7 @@ license:CC0
 	<!-- Yellow package -->
 	<software name="darkones" supported="no">
 		<description>Dì 4 dàn: Ànhēi Shìlì Zài Lín</description>
-		<year>2015</year>
+		<year>2014</year>
 		<publisher>Baiyi Animation</publisher>
 		<info name="alt_title" value="第４弹：暗黑势力再临"/>
 		<part name="cart" interface="c2color_cart">
@@ -81,7 +81,7 @@ license:CC0
 	<!-- Black package -->
 	<software name="kingdlnd" supported="no">
 		<description>Dì 5 dàn: Shénmì De Lóngzú Zhī Wáng</description>
-		<year>2015</year>
+		<year>2014</year>
 		<publisher>Baiyi Animation</publisher>
 		<info name="alt_title" value="第５弹：神秘的龙族之王"/>
 		<part name="cart" interface="c2color_cart">
