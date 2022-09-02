@@ -116,7 +116,7 @@ INPUT_PORTS_END
 
 void nes_arcade_bl_state::smb3bl(machine_config &config)
 {
-	N2A03(config, m_maincpu, 3.579545_MHz_XTAL / 2); // TODO: verify divider
+	N2A03G(config, m_maincpu, 3.579545_MHz_XTAL / 2); // TODO: verify divider
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_arcade_bl_state::nes_cpu_map);
 
 	z80_device &timercpu(Z80(config, "timercpu", 3.579545_MHz_XTAL));

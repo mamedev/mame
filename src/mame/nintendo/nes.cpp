@@ -51,7 +51,7 @@ INPUT_PORTS_END
 void nes_state::nes(machine_config &config)
 {
 	// basic machine hardware
-	n2a03_device &maincpu(N2A03(config, m_maincpu, NTSC_APU_CLOCK));
+	n2a03_device &maincpu(N2A03G(config, m_maincpu, NTSC_APU_CLOCK));
 	maincpu.set_addrmap(AS_PROGRAM, &nes_state::nes_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
