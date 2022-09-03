@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-01 02:13+1000\n"
-"PO-Revision-Date: 2022-06-19 17:51+0300\n"
+"PO-Revision-Date: 2022-09-03 11:52+0300\n"
 "Last-Translator: Stanley Kid <stanley.udr.kid@gmail.com>\n"
 "Language-Team: MAME Language Team\n"
 "Language: uk\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Poedit 3.0.1\n"
+"X-Generator: Poedit 3.1.1\n"
 
 #: src/frontend/mame/ui/ui.cpp:472 src/frontend/mame/ui/ui.cpp:545
 msgid ""
@@ -276,7 +276,7 @@ msgstr "%1$s %2$s (%3$d / %4$d програмні пакети)"
 #: src/frontend/mame/ui/selsoft.cpp:707
 #, c-format
 msgid "%1$s - select software"
-msgstr ""
+msgstr "%1$s - вибір програми"
 
 #: src/frontend/mame/ui/selsoft.cpp:712 src/frontend/mame/ui/selgame.cpp:1074
 #, c-format
@@ -1879,17 +1879,17 @@ msgstr ""
 #: src/frontend/mame/ui/inputdevices.cpp:88
 msgctxt "menu-inputdev"
 msgid "Copy Device ID"
-msgstr ""
+msgstr "Копіювати ID пристрою"
 
 #: src/frontend/mame/ui/inputdevices.cpp:122
 msgctxt "menu-inputdev"
 msgid "Copied device ID to clipboard"
-msgstr ""
+msgstr "Копіювати ID пристрою до буфера обміну."
 
 #: src/frontend/mame/ui/inputdevices.cpp:124
 msgctxt "menu-inputdev"
 msgid "Error copying device ID to clipboard"
-msgstr ""
+msgstr "Помилка копіювання ID пристрою до буфера обміну."
 
 #: src/frontend/mame/ui/inputdevices.cpp:162
 msgctxt "menu-inputdev"
@@ -2177,7 +2177,7 @@ msgstr "UI-переклади"
 #: src/frontend/mame/ui/dirmenu.cpp:52
 msgctxt "path-option"
 msgid "Software Lists"
-msgstr ""
+msgstr "Переліки програм"
 
 #: src/frontend/mame/ui/dirmenu.cpp:53
 msgctxt "path-option"
@@ -6513,7 +6513,3 @@ msgid ""
 msgstr ""
 "Укажи комбінацію чи натисни %s для скасування.\n"
 "%s"
-
-#, c-format
-#~ msgid "System: \"%1$s\" software list "
-#~ msgstr "Система: \"%1$s\" переліків програм "

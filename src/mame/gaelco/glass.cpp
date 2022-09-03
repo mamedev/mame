@@ -161,23 +161,19 @@ void glass_state::blitter_w(uint16_t data)
 		m_current_bit = 0;
 
 		// fill the screen bitmap with the current picture
-		{
-			uint8_t const *gfx = m_bmap + (m_blitter_command & 0x07) * 0x10000 + (m_blitter_command & 0x08) * 0x10000 + 0x140;
+		uint8_t const *gfx = m_bmap + (m_blitter_command & 0x07) * 0x10000 + (m_blitter_command & 0x08) * 0x10000 + 0x140;
 
-			if ((m_blitter_command & 0x18) != 0)
+		if (m_blitter_command & 0x18)
+		{
+			for (int j = 0; j < 200; j++)
 			{
-				for (int j = 0; j < 200; j++)
-				{
-					for (int i = 0; i < 320; i++)
-					{
-						int const color = *gfx;
-						gfx++;
-						m_screen_bitmap->pix(j, i) = color & 0xff;
-					}
-				}
+				for (int i = 0; i < 320; i++)
+					m_screen_bitmap->pix(j, i) = *gfx++;
 			}
-			else
-				m_screen_bitmap->fill(0);
+		}
+		else
+		{
+			m_screen_bitmap->fill(0);
 		}
 	}
 }

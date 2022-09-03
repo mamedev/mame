@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-01 02:13+1000\n"
-"PO-Revision-Date: 2022-07-02 08:42+0800\n"
+"PO-Revision-Date: 2022-09-02 10:02+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh_CN\n"
@@ -30,7 +30,7 @@ msgstr ""
 #: src/frontend/mame/ui/ui.cpp:557
 msgid ""
 "This system requires media images to be mounted for the following device(s): "
-msgstr "此系统需要挂载下列装置的媒体映像档： "
+msgstr "此系统需要挂载下列设备的媒体映像档： "
 
 #: src/frontend/mame/ui/ui.cpp:1252
 #, c-format
@@ -273,7 +273,7 @@ msgstr "%1$s %2$s ( %3$d / %4$d 软件包 )"
 #: src/frontend/mame/ui/selsoft.cpp:707
 #, c-format
 msgid "%1$s - select software"
-msgstr ""
+msgstr "%1$s - 选择软件"
 
 #: src/frontend/mame/ui/selsoft.cpp:712 src/frontend/mame/ui/selgame.cpp:1074
 #, c-format
@@ -308,7 +308,7 @@ msgstr "插件"
 
 #: src/frontend/mame/ui/optsmenu.cpp:85
 msgid "Input Devices"
-msgstr "输入装置"
+msgstr "输入设备"
 
 #: src/frontend/mame/ui/optsmenu.cpp:87
 msgid "Save Settings"
@@ -590,39 +590,39 @@ msgstr "投币脉冲"
 
 #: src/frontend/mame/ui/submenu.cpp:102
 msgid "Input Device Options"
-msgstr "输入装置选项"
+msgstr "输入设备选项"
 
 #: src/frontend/mame/ui/submenu.cpp:103
 msgid "Lightgun Device Assignment"
-msgstr "分配光线枪装置"
+msgstr "分配光线枪设备"
 
 #: src/frontend/mame/ui/submenu.cpp:104
 msgid "Trackball Device Assignment"
-msgstr "分配轨迹球装置"
+msgstr "分配轨迹球设备"
 
 #: src/frontend/mame/ui/submenu.cpp:105
 msgid "Pedal Device Assignment"
-msgstr "分配踏板装置"
+msgstr "分配踏板设备"
 
 #: src/frontend/mame/ui/submenu.cpp:106
 msgid "AD Stick Device Assignment"
-msgstr "分配 AD 游戏杆装置"
+msgstr "分配 AD 游戏杆设备"
 
 #: src/frontend/mame/ui/submenu.cpp:107
 msgid "Paddle Device Assignment"
-msgstr "分配划桨装置"
+msgstr "分配划桨设备"
 
 #: src/frontend/mame/ui/submenu.cpp:108
 msgid "Dial Device Assignment"
-msgstr "分配转盘装置"
+msgstr "分配转盘设备"
 
 #: src/frontend/mame/ui/submenu.cpp:109
 msgid "Positional Device Assignment"
-msgstr "分配指向装置"
+msgstr "分配指向设备"
 
 #: src/frontend/mame/ui/submenu.cpp:110
 msgid "Mouse Device Assignment"
-msgstr "分配鼠标装置"
+msgstr "分配鼠标设备"
 
 #: src/frontend/mame/ui/submenu.cpp:112
 msgid "Keyboard Input Provider"
@@ -963,7 +963,7 @@ msgid ""
 "experience this system.\n"
 msgstr ""
 "\n"
-"此系统的部分元件无法模拟, 因其需要实际活动的互动或机械装置的组合。 故无法达成"
+"此系统的部分元件无法模拟, 因其需要实际活动的互动或机械设备的组合。 故无法达成"
 "此系统的完整体验。\n"
 
 #: src/frontend/mame/ui/info.cpp:165
@@ -1444,7 +1444,7 @@ msgstr "释出区域"
 #: src/frontend/mame/ui/utils.cpp:125
 msgctxt "software-filter"
 msgid "Device Type"
-msgstr "装置类别"
+msgstr "设备类别"
 
 #: src/frontend/mame/ui/utils.cpp:126
 msgctxt "software-filter"
@@ -1541,7 +1541,7 @@ msgstr "重设"
 
 #: src/frontend/mame/ui/miscmenu.cpp:148
 msgid "Network Devices"
-msgstr "网路装置"
+msgstr "网路设备"
 
 #: src/frontend/mame/ui/miscmenu.cpp:237
 #, c-format
@@ -1655,7 +1655,7 @@ msgstr "汇出 XML 格式列表 （同 -listxml）"
 
 #: src/frontend/mame/ui/miscmenu.cpp:706
 msgid "Export list in XML format (like -listxml, but exclude devices)"
-msgstr "汇出 XML 格式列表 （同 -listxml，但不包含装置）"
+msgstr "汇出 XML 格式列表 （同 -listxml，但不包含设备）"
 
 #: src/frontend/mame/ui/miscmenu.cpp:707
 msgid "Export list in TXT format (like -listfull)"
@@ -1870,27 +1870,27 @@ msgstr "%1$s (%2$s %3$d)"
 #: src/frontend/mame/ui/inputdevices.cpp:88
 msgctxt "menu-inputdev"
 msgid "Copy Device ID"
-msgstr ""
+msgstr "拷贝设备 ID"
 
 #: src/frontend/mame/ui/inputdevices.cpp:122
 msgctxt "menu-inputdev"
 msgid "Copied device ID to clipboard"
-msgstr ""
+msgstr "已拷贝设备 ID 至剪贴板"
 
 #: src/frontend/mame/ui/inputdevices.cpp:124
 msgctxt "menu-inputdev"
 msgid "Error copying device ID to clipboard"
-msgstr ""
+msgstr "拷贝设备 ID 至剪贴板时发生错误"
 
 #: src/frontend/mame/ui/inputdevices.cpp:162
 msgctxt "menu-inputdev"
 msgid "Input Devices"
-msgstr "输入装置"
+msgstr "输入设备"
 
 #: src/frontend/mame/ui/inputdevices.cpp:203
 msgctxt "menu-inputdev"
 msgid "[no input devices are enabled]"
-msgstr "[已启用无输入装置]"
+msgstr "[已启用无输入设备]"
 
 #: src/frontend/mame/ui/inputtoggle.cpp:22
 msgctxt "menu-inputtoggle"
@@ -1979,7 +1979,7 @@ msgstr "输入配置 (一般)"
 #: src/frontend/mame/ui/inputopts.cpp:109
 msgctxt "menu-inputopts"
 msgid "Input Devices"
-msgstr "输入装置"
+msgstr "输入设备"
 
 #: src/frontend/mame/ui/imgcntrl.cpp:132
 msgid "Cannot save over directory"
@@ -2925,7 +2925,7 @@ msgstr "条码读取器"
 #: src/frontend/mame/ui/mainmenu.cpp:157
 msgctxt "menu-main"
 msgid "Network Devices"
-msgstr "网路装置"
+msgstr "网路设备"
 
 #: src/frontend/mame/ui/mainmenu.cpp:159
 msgctxt "menu-main"
@@ -3528,7 +3528,7 @@ msgstr ""
 "[ 此选项当前已挂载於运行中的系统 ]\n"
 "\n"
 "选项： %1$s\n"
-"装置： %2$s\n"
+"设备： %2$s\n"
 "\n"
 "已选用的选项启用下列项目：\n"
 
@@ -3545,7 +3545,7 @@ msgstr ""
 "[ 此选项当前「尚未」挂载於运行中的系统 ]\n"
 "\n"
 "选项： %1$s\n"
-"装置： %2$s\n"
+"设备： %2$s\n"
 "\n"
 "如选用此选项，下列项目將启用：\n"
 
@@ -3606,7 +3606,7 @@ msgstr "* 配置设定：\n"
 
 #: src/frontend/mame/ui/devopt.cpp:298
 msgid "* Input device(s):\n"
-msgstr "* 输入装置：\n"
+msgstr "* 输入设备：\n"
 
 #: src/frontend/mame/ui/devopt.cpp:300
 #, c-format
@@ -6498,7 +6498,3 @@ msgid ""
 msgstr ""
 "输入组合或按下 %s 取消\n"
 "%s"
-
-#, c-format
-#~ msgid "System: \"%1$s\" software list "
-#~ msgstr "系统： \"%1$s\" 软件清单 "

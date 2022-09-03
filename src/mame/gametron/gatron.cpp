@@ -344,12 +344,13 @@ namespace {
 class gatron_state : public driver_device
 {
 public:
-	gatron_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	gatron_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_lamps(*this, "lamp%u", 0U) { }
+		m_lamps(*this, "lamp%u", 0U)
+	{ }
 
 	void gat(machine_config &config);
 

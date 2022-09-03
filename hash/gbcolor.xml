@@ -25003,7 +25003,8 @@ license:CC0
 
 <!-- Sachen games -->
 
-	<software name="beastfgt">
+	<!-- missing HUD graphics on GBC -->
+	<software name="beastfgt" supported="partial">
 		<description>Beast Fighter (Taiwan)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -25069,6 +25070,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- hangs at logo screen, doesn't reach game -->
 	<software name="rocmanx" supported="no">
 		<description>Rocman-X (Taiwan)</description>
 		<year>19??</year>
@@ -25376,7 +25378,8 @@ license:CC0
 
 -->
 
-	<software name="emochndx" supported="partial">
+	<!-- badly broken gameplay -->
+	<software name="emochndx" supported="no">
 		<description>Emo Cheng DX (China)</description>
 		<year>200?</year>
 		<publisher>Sintax</publisher>
@@ -26845,16 +26848,20 @@ license:CC0
 	</software>
 
 	<software name="chongwu">
+	<!-- This appears to be a re-release of a Li Cheng / Niutoude game, givern that
+	     it contains the Niutoude logo, with most of the protection checks patched
+	     out. -->
 	<!-- 1byte difference between this and the hacked version... check what is about! -->
 	<!-- at 0x1e0 starts a routine which (at 0x1ec) reads from $41c3, then compares
 	     the value with 0x5d. if comparison fails, the code enters a routine at 0x780
 	     where it gets stuck. if comparison works, then the code goes to 0x150 as the
 	     patched version does (because the single modified byte replaces the jump to
 	     0x1e0 with the jump to 0x150). Not sure yet if current workaround is correct... -->
-		<description>Chong Wu Xiao Jing Ling - Jie Jin Ta Zhi Wang (China)</description>
+		<description>Chǒngwù Xiǎo Jīnglíng - Jié Jīn Tǎ Zhī Wáng (China)</description>
 		<year>20??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="宠物小精灵 结金塔之王"/>
+		<info name="alt_title" value="宠物小精灵 结金塔之王"/> <!-- cartridge label -->
+		<info name="alt_title" value="寵物小精靈 Pokemon Pikecho"/> <!-- title screen -->
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_chong" />
 			<dataarea name="rom" size="1048576">
