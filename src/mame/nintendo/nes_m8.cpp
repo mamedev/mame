@@ -10,7 +10,7 @@
   Internally it contains a near-stock NES main PCB and a NES M8 board.
   The NES M8 board connects to the NES via the standard cartridge slot
   (by way of a 72-pin cart adapter as the M8 board's edge connector is
-  60-pin Famicom-style), and multiplexes 16 pairs of PRG and CHR ROMs.
+  60-pin Famicom-style), and multiplexes 16 pairs of PRG and CHR EPROMs.
   The near-stock NES is missing its CIC chip, and an additional wire
   runs from the M8 board to the host reset line of the CIC (that is the
   M8 board can directly reset the 2A03).
