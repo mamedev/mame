@@ -361,8 +361,9 @@ int victor9k_format::get_image_offset(const format &f, int _head, int _track)
 {
 	int offset = 0;
 	if (_head) {
+		int first_side = 0;  //build up offset for first side
 		for (int track = 0; track < f.track_count; track++) {
-			offset += compute_track_size(f, _head, track);
+			offset += compute_track_size(f, first_side, track);
 		}
 	}
 	for (int track = 0; track < _track; track++) {
@@ -465,6 +466,8 @@ bool victor9k_format::save(util::random_read_write &io, const std::vector<uint32
 			uint8_t sectdata[40*512];
 			desc_s sectors[40];
 			int offset = get_image_offset(f, head, track);
+			osd_printf_verbose(">>type: %s, head: %d, track: %d, sector_count: %d, offset: %d, track_size: %d\n", 
+				f.sector_base_size, head, track, sector_count, offset, track_size);
 
 			build_sector_description(f, sectdata, 0, sectors, sector_count);
 			extract_sectors(image, f, sectors, track, head, sector_count);
@@ -495,7 +498,7 @@ void victor9k_format::extract_sectors(floppy_image *image, const format &f, desc
 		const auto &data = sectors[ds.sector_id];
 		osd_printf_verbose("Head: %01d TracK: %02d Total Sectors: %02d Current Sector: %02d ", 
 			head, track, sector_count, i);
-		if((&data == nullptr) || data.empty()) {
+		if(data.empty()) {
 			memset((uint8_t *)ds.data, 0, ds.size);
 		} else if(data.size() < ds.size) {
 			memcpy((uint8_t *)ds.data, data.data(), data.size() - 1);
