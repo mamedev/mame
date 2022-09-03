@@ -64,7 +64,7 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
-	virtual void update_lfsr(apu_t::noise_t *chan);
+	virtual void update_lfsr(apu_t::noise_t &chan);
 
 private:
 	/* GLOBAL CONSTANTS */
@@ -100,7 +100,7 @@ public:
 	apu2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual void update_lfsr(apu_t::noise_t *chan) override;
+	virtual void update_lfsr(apu_t::noise_t &chan) override;
 };
 
 

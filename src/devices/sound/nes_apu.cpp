@@ -392,7 +392,7 @@ void nesapu_device::apu_noise(apu_t::noise_t *chan)
 	while (chan->phaseacc < 0)
 	{
 		chan->phaseacc += freq;
-		update_lfsr(chan);
+		update_lfsr(*chan);
 	}
 
 	if (BIT(chan->lfsr, 0)) /* silence channel */
@@ -407,16 +407,16 @@ void nesapu_device::apu_noise(apu_t::noise_t *chan)
 		chan->output = 0x0f - chan->env_vol;
 }
 
-void nesapu_device::update_lfsr(apu_t::noise_t *chan)
+void nesapu_device::update_lfsr(apu_t::noise_t &chan)
 {
-	chan->lfsr |= (BIT(chan->lfsr, 0) ^ BIT(chan->lfsr, (chan->regs[2] & 0x80) ? 6 : 1)) << 15;
-	chan->lfsr >>= 1;
+	chan.lfsr |= (BIT(chan.lfsr, 0) ^ BIT(chan.lfsr, (chan.regs[2] & 0x80) ? 6 : 1)) << 15;
+	chan.lfsr >>= 1;
 }
 
-void apu2a03_device::update_lfsr(apu_t::noise_t *chan)
+void apu2a03_device::update_lfsr(apu_t::noise_t &chan)
 {
-	chan->lfsr |= (BIT(chan->lfsr, 0) ^ BIT(chan->lfsr, 1)) << 15;
-	chan->lfsr >>= 1;
+	chan.lfsr |= (BIT(chan.lfsr, 0) ^ BIT(chan.lfsr, 1)) << 15;
+	chan.lfsr >>= 1;
 }
 
 /* RESET DPCM PARAMETERS */
@@ -628,7 +628,7 @@ void nesapu_device::write(offs_t offset, u8 value)
 		break;
 
 	case apu_t::IRQCTRL:
-		if(value & 0x80)
+		if (value & 0x80)
 			m_APU.step_mode = 5;
 		else
 			m_APU.step_mode = 4;
