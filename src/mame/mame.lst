@@ -33407,13 +33407,14 @@ famitwin                        // Sharp Famicom Twin System
 fctitler                        // Sharp Famicom Titler AN-510
 fds                             // Nintendo Family Computer (a.k.a. Famicom) + Disk System add-on
 gchinatv                        // Golden China TV Game Centre (Chinese famiclone)
-m82                             // Nintendo M82 Display Unit
-m82p                            // Nintendo M82 Display Unit PAL
 nes                             // Nintendo Entertainment System
 nespal                          // Nintendo Entertainment System PAL
 
 @source:nintendo/nes_m8.cpp
 nesm8                           // Nintendo M8 Game Selectable Working Product Display
+
+@source:nintendo/nes_m82.cpp
+m82                             // Nintendo M82 Game Selectable Working Product Display
 
 @source:nintendo/nes_arcade_bl.cpp
 smb3bl

@@ -368,19 +368,6 @@ ROM_START( fctitler )
 	ROM_LOAD( "rp2c0x.pal", 0x00, 0xc0, CRC(48de65dc) SHA1(d10acafc8da9ff479c270ec01180cca61efe62f5) )
 ROM_END
 
-ROM_START( m82 )
-	ROM_REGION( 0x14000, "maincpu", 0 )  // Main RAM + program banks
-	// Banks to be mapped at 0xe000? More investigations needed...
-	ROM_LOAD( "m82_v1_0.bin", 0x10000, 0x4000, CRC(7d56840a) SHA1(cbd2d14fa073273ba58367758f40d67fd8a9106d) )
-ROM_END
-
-ROM_START( m82p )
-	// same as m82
-	ROM_REGION( 0x14000, "maincpu", 0 )  // Main RAM + program banks
-	// Banks to be mapped at 0xe000? More investigations needed...
-	ROM_LOAD( "m82_v1_0.bin", 0x10000, 0x4000, CRC(7d56840a) SHA1(cbd2d14fa073273ba58367758f40d67fd8a9106d) )
-ROM_END
-
 // see http://www.disgruntleddesigner.com/chrisc/drpcjr/index.html
 // and http://www.disgruntleddesigner.com/chrisc/drpcjr/DrPCJrMemMap.txt
 ROM_START( drpcjr )
@@ -427,10 +414,6 @@ ROM_END
 // Nintendo Entertainment System hardware
 CONS( 1985, nes,      0,       0,      nes,      nes,     nes_state, empty_init,   "Nintendo",      "Nintendo Entertainment System / Famicom (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 CONS( 1987, nespal,   nes,     0,      nespal,   nes,     nes_state, empty_init,   "Nintendo",      "Nintendo Entertainment System (PAL)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-// M82 Display Unit
-// supports up to twelve cartridge slots
-CONS( 198?, m82,      nes,     0,      nes,      nes,     nes_state, empty_init,   "Nintendo",      "M82 Display Unit (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-CONS( 198?, m82p,     nes,     0,      nespal,   nes,     nes_state, empty_init,   "Nintendo",      "M82 Display Unit (PAL)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 // Famicom hardware
 CONS( 1983, famicom,  0,       nes,    famicom,  famicom, nes_state, init_famicom, "Nintendo",      "Famicom",                         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
