@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Roberto Fresca
+// copyright-holders: Roberto Fresca
+
 /****************************************************************************************
 
   GAME-A-TRON gambling hardware.
@@ -66,7 +67,7 @@
 
   Identified the unknown writes as a init sequence for 1x PSG sound device.
   Is a SN76489/496 family device, and can't be identified accurately due to
-  almost all devices are plastic covered.
+  almost all devices being plastic covered.
 
 
   * PCB 3: BINGO.
@@ -129,8 +130,8 @@
 
   All games:
 
-  The first time the machine is turned on, will show the legend "DATA ERROR".
-  You must to RESET (F3) the machine to initialize the NVRAM properly.
+  The first time the machine is turned on, it will show the legend "DATA ERROR".
+  You must RESET (F3) the machine to initialize the NVRAM properly.
 
   NOTE: These games are intended to be for amusement only.
   There is not such a payout system, so... Don't ask about it!
@@ -322,24 +323,95 @@
 
 
 #include "emu.h"
-#include "gatron.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "sound/sn76496.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "bingo.lh"
 #include "poker41.lh"
 #include "pulltabs.lh"
 
 
-#define MASTER_CLOCK    XTAL(16'000'000)
-#define CPU_CLOCK       MASTER_CLOCK / 24    // 666.66 kHz, guess...
+namespace {
 
+class gatron_state : public driver_device
+{
+public:
+	gatron_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_lamps(*this, "lamp%u", 0U) { }
+
+	void gat(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
+	required_shared_ptr<uint8_t> m_videoram;
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	output_finder<9> m_lamps;
+	tilemap_t *m_bg_tilemap = nullptr;
+
+	void output_port_0_w(uint8_t data);
+	void output_port_1_w(uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void prg_map(address_map &map);
+	void port_map(address_map &map);
+};
+
+
+// video
+
+void gatron_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+TILE_GET_INFO_MEMBER(gatron_state::get_bg_tile_info)
+{
+/*  - bits -
+    7654 3210
+    xxxx xxxx   tiles code.
+
+    only one color code
+*/
+
+	int const code = m_videoram[tile_index];
+
+	tileinfo.set(0, code, 0, 0);
+}
+
+void gatron_state::video_start()
+{
+	m_lamps.resolve();
+
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gatron_state::get_bg_tile_info)), TILEMAP_SCAN_COLS, 8, 16, 48, 16);
+}
+
+uint32_t gatron_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	return 0;
+}
+
+
+// machine
 
 /****************************
 *    Read/Write Handlers    *
@@ -445,16 +517,16 @@ void gatron_state::output_port_1_w(uint8_t data)
 * Memory Map Information *
 *************************/
 
-void gatron_state::gat_map(address_map &map)
+void gatron_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
-	map(0x6000, 0x63ff).ram().w(FUNC(gatron_state::videoram_w)).share("videoram");
-	map(0x8000, 0x87ff).ram().share("nvram");                          /* battery backed RAM */
-	map(0xa000, 0xa000).w("snsnd", FUNC(sn76489_device::write));       /* PSG */
-	map(0xe000, 0xe000).w(FUNC(gatron_state::output_port_0_w));  /* lamps */
+	map(0x6000, 0x63ff).ram().w(FUNC(gatron_state::videoram_w)).share(m_videoram);
+	map(0x8000, 0x87ff).ram().share("nvram");                          // battery backed RAM
+	map(0xa000, 0xa000).w("snsnd", FUNC(sn76489_device::write));       // PSG
+	map(0xe000, 0xe000).w(FUNC(gatron_state::output_port_0_w));  // lamps
 }
 
-void gatron_state::gat_portmap(address_map &map)
+void gatron_state::port_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -539,14 +611,13 @@ INPUT_PORTS_END
 static const gfx_layout charlayout =
 {
 	8, 16,
-	RGN_FRAC(1,3),  /* 256 tiles */
+	RGN_FRAC(1,3),  // 256 tiles
 	3,
-	{ 0, RGN_FRAC(1,3), RGN_FRAC(2,3) },    /* bitplanes are separated */
+	{ 0, RGN_FRAC(1,3), RGN_FRAC(2,3) },    // bitplanes are separated
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 		8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	16*8    /* every char takes 16 consecutive bytes */
-
+	16*8    // every char takes 16 consecutive bytes
 };
 
 
@@ -555,7 +626,7 @@ static const gfx_layout charlayout =
 ******************************/
 
 static GFXDECODE_START( gfx_gat )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
+	GFXDECODE_ENTRY( "chars", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
 
@@ -565,10 +636,13 @@ GFXDECODE_END
 
 void gatron_state::gat(machine_config &config)
 {
-	/* basic machine hardware */
+	static constexpr XTAL MASTER_CLOCK = XTAL(16'000'000);
+	static constexpr XTAL CPU_CLOCK = MASTER_CLOCK / 24;    // 666.66 kHz, guess...
+
+	// basic machine hardware
 	Z80(config, m_maincpu, CPU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &gatron_state::gat_map);
-	m_maincpu->set_addrmap(AS_IO, &gatron_state::gat_portmap);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gatron_state::prg_map);
+	m_maincpu->set_addrmap(AS_IO, &gatron_state::port_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -577,7 +651,7 @@ void gatron_state::gat(machine_config &config)
 	ppi.in_pb_callback().set_ioport("IN1");
 	ppi.out_pc_callback().set(FUNC(gatron_state::output_port_1_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -590,9 +664,9 @@ void gatron_state::gat(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_gat);
 	PALETTE(config, "palette").set_entries(8);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	SN76489(config, "snsnd", MASTER_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 2.00);   // Present in Bingo PCB. Clock need to be verified.
+	SN76489(config, "snsnd", MASTER_CLOCK / 8).add_route(ALL_OUTPUTS, "mono", 2.00);   // Present in Bingo PCB. Clock needs to be verified.
 }
 
 
@@ -605,7 +679,7 @@ ROM_START( poker41 )
 	ROM_LOAD( "poker.u00",      0x0000, 0x2000, CRC(8361fccd) SHA1(4faae6bb3104c1f4a0939d613966085d7e34c1df))
 	ROM_LOAD( "poker-4-1.u08",  0x2000, 0x1000, CRC(61e71f31) SHA1(b8d162a47752cff7412b3920ec9dd7a469e81e62) )
 
-	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_REGION( 0x3000, "chars", 0 )
 	ROM_LOAD( "black.u33",      0x0000, 0x1000, CRC(3f8a2d59) SHA1(d61dce33aa8637105905830e2f37c1052c441194) )
 	ROM_LOAD( "poker-g.u32",    0x1000, 0x1000, CRC(3e7772b2) SHA1(c7499ff148e5a9cbf0958820c41ea09a843ab355) )
 	ROM_LOAD( "poker-r.u31",    0x2000, 0x1000, CRC(18d090ec) SHA1(3504f18b3984d16545dbe61a03fbf6b8e2027150) )
@@ -615,7 +689,7 @@ ROM_START( pulltabs )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pull-tabs-1-90.u00", 0x0000, 0x2000, CRC(7cfd490d) SHA1(8eb360f8f4806a4281dae12236d30aa86d00993d) )
 
-	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_REGION( 0x3000, "chars", 0 )
 	ROM_LOAD( "pt-3b-v.u33",    0x0000, 0x1000, CRC(3505cec1) SHA1(98ab0383c4be382aea81ab93433f2f29a075f65d) )
 	ROM_LOAD( "pt-2g-v.u32",    0x1000, 0x1000, CRC(4a3f4f36) SHA1(3dc29f78b7df1a433d0b39bfeaa227615e70ceed) )
 	ROM_LOAD( "pt-1r-v.u31",    0x2000, 0x1000, CRC(6d1b80f4) SHA1(f2da4b4ae1eb05f9ea02e7495ee8110698cc5d1b) )
@@ -625,18 +699,20 @@ ROM_START( bingo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "revb.u2", 0x0000, 0x2000, CRC(0322e2b5) SHA1(e191ad00de56e448a41350e32fb6a4828050a2d4) )
 
-	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_REGION( 0x3000, "chars", 0 )
 	ROM_LOAD( "revb.u23",    0x0000, 0x1000, CRC(8d15fc35) SHA1(e66abaead70e6c024efbf177f1a4616449f2d231) )
 	ROM_LOAD( "revb.u22",    0x1000, 0x1000, CRC(60254c3b) SHA1(4b9e57a8ac9e6e2c6349d6847bbf3f46232721ad) )
 	ROM_LOAD( "revb.u21",    0x2000, 0x1000, CRC(b8cc348b) SHA1(34a4690f6464db17ee363bba8709d0ad63aa7cf1) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME      PARENT  MACHINE  INPUT     CLASS         INIT        ROT   COMPANY         FULLNAME              FLAGS  LAYOUT   */
-GAMEL( 1983, poker41,  0,      gat,     poker41,  gatron_state, empty_init, ROT0, "Game-A-Tron",  "Four In One Poker",  MACHINE_SUPPORTS_SAVE,     layout_poker41  )
-GAMEL( 1983, pulltabs, 0,      gat,     pulltabs, gatron_state, empty_init, ROT0, "Game-A-Tron",  "Pull Tabs",          MACHINE_SUPPORTS_SAVE,     layout_pulltabs )
-GAMEL( 1983, bingo,    0,      gat,     bingo,    gatron_state, empty_init, ROT0, "Game-A-Tron",  "Bingo",              MACHINE_SUPPORTS_SAVE,     layout_bingo  )
+//     YEAR  NAME      PARENT  MACHINE  INPUT     CLASS         INIT        ROT   COMPANY         FULLNAME              FLAGS                  LAYOUT
+GAMEL( 1983, poker41,  0,      gat,     poker41,  gatron_state, empty_init, ROT0, "Game-A-Tron",  "Four In One Poker",  MACHINE_SUPPORTS_SAVE, layout_poker41  )
+GAMEL( 1983, pulltabs, 0,      gat,     pulltabs, gatron_state, empty_init, ROT0, "Game-A-Tron",  "Pull Tabs",          MACHINE_SUPPORTS_SAVE, layout_pulltabs )
+GAMEL( 1983, bingo,    0,      gat,     bingo,    gatron_state, empty_init, ROT0, "Game-A-Tron",  "Bingo",              MACHINE_SUPPORTS_SAVE, layout_bingo  )

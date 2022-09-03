@@ -157,4 +157,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1987, smb3bl, 0, smb3bl, smb3bl, nes_arcade_bl_state, empty_init, ROT0, "Sang Ho Soft", "Super Mario Bros. 3 (NES bootleg)", 0 ) // 1987.10.01 in Z80 ROM
+GAME( 1987, smb3bl, 0, smb3bl, smb3bl, nes_arcade_bl_state, empty_init, ROT0, "Sang Ho Soft", "Super Mario Bros. 3 (NES bootleg)", MACHINE_IS_SKELETON ) // 1987.10.01 in Z80 ROM
