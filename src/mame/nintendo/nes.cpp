@@ -129,9 +129,6 @@ void nes_state::famicomo(machine_config &config)
 	n2a03_device &maincpu(N2A03(config.replace(), m_maincpu, NTSC_APU_CLOCK));
 	maincpu.set_addrmap(AS_PROGRAM, &nes_state::nes_map);
 
-	m_ppu->set_cpu_tag(m_maincpu);
-	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-
 	maincpu.add_route(ALL_OUTPUTS, "mono", 0.90);
 }
 
