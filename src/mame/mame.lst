@@ -13615,6 +13615,9 @@ esh                             // (c) 1984 Funai / Gakken
 esha                            // (c) 1984 Funai / Gakken
 eshb                            // (c) 1984 Funai / Gakken
 
+@source:sega/eshockey.cpp
+eshockey                        //
+
 @source:orca/espial.cpp
 espial                          // (c) 1983 Thunderbolt, Orca logo is hidden in title screen
 espialu                         // (c) 1983 Thunderbolt, Orca logo is hidden in title screen
@@ -13872,11 +13875,14 @@ f1gpb                           // bootleg
 mosaicf2                        // (c) 1999 F2 System
 royalpk2                        //
 
+@source:facit/f4431.cpp
+f4431                           // 1981 Facit
+
+@source:facit/facit4440.cpp
+facit4440                       // 1984
+
 @source:fairchild/f387x.cpp
 f387x                           // (c) 1979 Fairchild
-
-@source:skeleton/facit4440.cpp
-facit4440                       // 1984
 
 @source:falco/falco500.cpp
 falco5220e                      // 1987
@@ -20132,9 +20138,7 @@ dorodon2                        // Falcon
 ladybug                         // 8110 (c) 1981
 ladybugb                        // bootleg
 ladybugb2                       // bootleg
-mrsdyna                         // 8203 (c) 1982 Universal
 snapjack                        // ???? (c)
-sraider                         // 8203 (c) 1982 Universal
 
 @source:misc/ladyfrog.cpp
 ladyfrog                        // (c) 1990 Mondial Games
@@ -23764,7 +23768,7 @@ tankbatl                        // (c) 1992 Microprose Games Inc.
 @source:beehive/microb.cpp
 dm3270                          //
 
-@source:misc/micom_mahjong.cpp
+@source:tvgames/micom_mahjong.cpp
 mmahjong
 
 @source:misc/microdar.cpp
@@ -33387,6 +33391,9 @@ m82p                            // Nintendo M82 Display Unit PAL
 nes                             // Nintendo Entertainment System
 nespal                          // Nintendo Entertainment System PAL
 
+@source:nintendo/nes_arcade_bl.cpp
+smb3bl
+
 @source:nintendo/nes_clone.cpp
 afbm7800
 dancexpt
@@ -36794,7 +36801,7 @@ panther                         // M27 no copyright notice
 redalert                        // M27 (c) 1981 + "GDI presents"
 ww3                             // M27 (c) 1981
 
-@source:universal/redclash.cpp
+@source:universal/zerohour.cpp
 redclash                        // (c) Kaneko
 redclasht                       // (c) 1981 Tehkan
 redclashta                      // (c) 1981 Tehkan
@@ -40012,6 +40019,10 @@ spyhuntpr                       // (c) 1985 Recreativos Franco S.A.
 
 @source:skeleton/squale.cpp
 squale                          //
+
+@source:universal/sraider.cpp
+mrsdyna                         // 8203 (c) 1982 Universal
+sraider                         // 8203 (c) 1982 Universal
 
 @source:seta/srmp2.cpp
 mjyuugi                         // (c) 1990 Visco
@@ -44065,7 +44076,7 @@ jm_05r                          //
 jm_12b                          //
 jm_12r                          //
 nf_08x                          //
-nf_10                           //
+nf_10f                          //
 nf_20                           //
 nf_22                           //
 nf_23                           //
@@ -44078,6 +44089,7 @@ rs_lx2                          //
 rs_lx3                          //
 rs_lx4                          //
 rs_lx5                          //
+rs_pa2                          //
 tfs_12                          //
 tom_06                          //
 tom_10f                         //

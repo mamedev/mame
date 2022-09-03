@@ -20,6 +20,7 @@
 #include "corestr.h"
 #include "opresolv.h"
 
+#include <cstdarg>
 #include <cstdio>
 #include <cstring>
 #include <cctype>

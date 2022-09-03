@@ -335,7 +335,7 @@ protected:
 
 	void led_state_w(offs_t offset, uint32_t data);
 	uint64_t front_panel_r(offs_t offset);
-	
+
 	TIMER_CALLBACK_MEMBER(freerun_clock);
 	uint32_t freerun_r(offs_t offset);
 	void freerun_w(offs_t offset, uint32_t data);

@@ -192,6 +192,54 @@ void menu_software_list::append_software_entry(const software_info &swinfo)
 
 
 //-------------------------------------------------
+//  update_search - update meunu for new search text
+//-------------------------------------------------
+
+void menu_software_list::update_search(void *selectedref)
+{
+	// display the popup
+	ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_search);
+
+	// identify the selected entry
+	entry_info const *const cur_selected = (uintptr_t(selectedref) != 1)
+			? reinterpret_cast<entry_info const *>(get_selection_ref())
+			: nullptr;
+
+	// if it's a perfect match for the current selection, don't move it
+	if (!cur_selected || core_strnicmp((m_ordered_by_shortname ? cur_selected->short_name : cur_selected->long_name).c_str(), m_search.c_str(), m_search.size()))
+	{
+		std::string::size_type bestmatch(0);
+		entry_info const *selected_entry(cur_selected);
+		for (auto &entry : m_entrylist)
+		{
+			// TODO: more efficient "common prefix" code
+			auto const &compare_name = m_ordered_by_shortname ? entry.short_name : entry.long_name;
+			std::string::size_type match(0);
+			for (std::string::size_type i = 1; m_search.size() >= i; ++i)
+			{
+				if (!core_strnicmp(compare_name.c_str(), m_search.c_str(), i))
+					match = i;
+				else
+					break;
+			}
+
+			if (match > bestmatch)
+			{
+				bestmatch = match;
+				selected_entry = &entry;
+			}
+		}
+
+		if (selected_entry && (selected_entry != cur_selected))
+		{
+			set_selection((void *)selected_entry);
+			centre_selection();
+		}
+	}
+}
+
+
+//-------------------------------------------------
 //  populate
 //-------------------------------------------------
 
@@ -267,50 +315,15 @@ void menu_software_list::handle(event const *ev)
 				stack_pop();
 			}
 		}
+		else if (ev->iptkey == IPT_UI_PASTE)
+		{
+			if (paste_text(m_search, m_ordered_by_shortname ? is_valid_softlist_part_char : uchar_is_printable))
+				update_search(ev->itemref);
+		}
 		else if (ev->iptkey == IPT_SPECIAL)
 		{
-			if (input_character(m_search, ev->unichar, m_ordered_by_shortname ? is_valid_softlist_part_char : [] (char32_t ch) { return true; }))
-			{
-				// display the popup
-				ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_search);
-
-				// identify the selected entry
-				entry_info const *const cur_selected = (uintptr_t(ev->itemref) != 1)
-						? reinterpret_cast<entry_info const *>(get_selection_ref())
-						: nullptr;
-
-				// if it's a perfect match for the current selection, don't move it
-				if (!cur_selected || core_strnicmp((m_ordered_by_shortname ? cur_selected->short_name : cur_selected->long_name).c_str(), m_search.c_str(), m_search.size()))
-				{
-					std::string::size_type bestmatch(0);
-					entry_info const *selected_entry(cur_selected);
-					for (auto &entry : m_entrylist)
-					{
-						// TODO: more efficient "common prefix" code
-						auto const &compare_name = m_ordered_by_shortname ? entry.short_name : entry.long_name;
-						std::string::size_type match(0);
-						for (std::string::size_type i = 1; m_search.size() >= i; ++i)
-						{
-							if (!core_strnicmp(compare_name.c_str(), m_search.c_str(), i))
-								match = i;
-							else
-								break;
-						}
-
-						if (match > bestmatch)
-						{
-							bestmatch = match;
-							selected_entry = &entry;
-						}
-					}
-
-					if (selected_entry && (selected_entry != cur_selected))
-					{
-						set_selection((void *)selected_entry);
-						centre_selection();
-					}
-				}
-			}
+			if (input_character(m_search, ev->unichar, m_ordered_by_shortname ? is_valid_softlist_part_char : uchar_is_printable))
+				update_search(ev->itemref);
 		}
 		else if (ev->iptkey == IPT_UI_CANCEL)
 		{

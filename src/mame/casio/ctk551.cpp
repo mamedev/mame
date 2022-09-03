@@ -1,117 +1,117 @@
 // license:BSD-3-Clause
 // copyright-holders:Devin Acker
 /*
-	Casio GT913-based keyboards and MIDI modules
+    Casio GT913-based keyboards and MIDI modules
 
 -------------------------------------------------------------------------------
 
-	Celviano AP-10 digital piano (1995)
+    Celviano AP-10 digital piano (1995)
 
-	Main board (JCM358-MA1M):
-		LSI301: CPU (Casio/NEC uPD912GF)
-		LSI302: DSP (Hitachi HG51B277FB)
-		LSI303: 8Mbit ROM (Macronix MX23C8100MC-12)
-		LSI304: 64kbit SRAM for CPU (Sanyo LC3564SM-85), battery backed
-		LSI305: 256kbit SRAM for DSP (Sanyo LC333832M-70)
-		LSI306: stereo DAC (NEC uPD6379GR)
-		X301:   24MHz crystal for CPU
-		X302:   16MHz ceramic for DSP
+    Main board (JCM358-MA1M):
+        LSI301: CPU (Casio/NEC uPD912GF)
+        LSI302: DSP (Hitachi HG51B277FB)
+        LSI303: 8Mbit ROM (Macronix MX23C8100MC-12)
+        LSI304: 64kbit SRAM for CPU (Sanyo LC3564SM-85), battery backed
+        LSI305: 256kbit SRAM for DSP (Sanyo LC333832M-70)
+        LSI306: stereo DAC (NEC uPD6379GR)
+        X301:   24MHz crystal for CPU
+        X302:   16MHz ceramic for DSP
 
-	Service manual with schematics, pinouts, etc.:
-	https://revenant1.net/casio/manuals/upd91x/ap10.pdf
+    Service manual with schematics, pinouts, etc.:
+    https://revenant1.net/casio/manuals/upd91x/ap10.pdf
 
-	To access the test mode (not mentioned in the service manual):
-	Hold both pedals and "Transpose/Tune/MIDI" while turning on the keyboard, then release the button.
-	Afterwards, press one of these buttons:
-	- Transpose: LED test
-	- Effect: switch test (press all front panel buttons left to right)
-	- Piano: key test (press all keys left to right)
-	- E.Piano: ROM test
-	- Organ/Strings/Song: sound volume test
-	- Record/Start/Stop: stereo test
-	- Demo: MIDI loopback test
-	- Harpsichord: exit test mode
+    To access the test mode (not mentioned in the service manual):
+    Hold both pedals and "Transpose/Tune/MIDI" while turning on the keyboard, then release the button.
+    Afterwards, press one of these buttons:
+    - Transpose: LED test
+    - Effect: switch test (press all front panel buttons left to right)
+    - Piano: key test (press all keys left to right)
+    - E.Piano: ROM test
+    - Organ/Strings/Song: sound volume test
+    - Record/Start/Stop: stereo test
+    - Demo: MIDI loopback test
+    - Harpsichord: exit test mode
 
-	TODO: fix backup RAM getting re-initialized on every boot.
-	Depends on the power switch being implemented correctly - turning the power off
-	is supposed to trigger a NMI which updates the RAM checksum, but the NMI handler
-	always proceeds to fully start up the system as if the power is being turned on
+    TODO: fix backup RAM getting re-initialized on every boot.
+    Depends on the power switch being implemented correctly - turning the power off
+    is supposed to trigger a NMI which updates the RAM checksum, but the NMI handler
+    always proceeds to fully start up the system as if the power is being turned on
 
 -------------------------------------------------------------------------------
 
-	General MIDI modules (1996)
+    General MIDI modules (1996)
 
-	- GZ-30M
-	  Basic model, small desktop module
+    - GZ-30M
+      Basic model, small desktop module
       No 5-pin MIDI jack, only mini-DIN for RS-232 or RS-422
-	- GZ-70SP
-	  MIDI module built into a pair of speakers w/ karaoke mic input
-	  Provides both standard MIDI and mini-DIN connectors
-	- WG-130
-	  WaveBlaster-style PC daughterboard
+    - GZ-70SP
+      MIDI module built into a pair of speakers w/ karaoke mic input
+      Provides both standard MIDI and mini-DIN connectors
+    - WG-130
+      WaveBlaster-style PC daughterboard
 
-	WG-130 board:
-		LSI101: stereo DAC (NEC uPD6379GR)
-		LSI102: CPU (Casio GT913F)
-		LSI103: 16Mbit ROM (Casio GM16000N-C40)
-		LSI104: 64kbit SRAM (Sanyo LC3564SM-85)
-		LSI105: unpopulated, for DSP SRAM
-		LSI106: unpopulated, for DSP
-		X101: 30MHz crystal
-		X102: unpopulated, for DSP
+    WG-130 board:
+        LSI101: stereo DAC (NEC uPD6379GR)
+        LSI102: CPU (Casio GT913F)
+        LSI103: 16Mbit ROM (Casio GM16000N-C40)
+        LSI104: 64kbit SRAM (Sanyo LC3564SM-85)
+        LSI105: unpopulated, for DSP SRAM
+        LSI106: unpopulated, for DSP
+        X101: 30MHz crystal
+        X102: unpopulated, for DSP
 
-	All three of these apparently use the same mask ROM.
-	This ROM was also distributed as part of Casio's SW-10 softsynth for Windows,
-	which it released in early 1997 as part of the "LANA Lite" karaoke system.
-	http://web.archive.org/web/20011122112757/www.casio.co.jp/lanalite/LanaSw10.exe
+    All three of these apparently use the same mask ROM.
+    This ROM was also distributed as part of Casio's SW-10 softsynth for Windows,
+    which it released in early 1997 as part of the "LANA Lite" karaoke system.
+    http://web.archive.org/web/20011122112757/www.casio.co.jp/lanalite/LanaSw10.exe
 
-	The WG-130 (and possibly others) have unpopulated footprints for the same DSP
-	used in some keyboards (e.g. the CTK-601). The ROM does actually support
-	using the DSP if it's present, and responds to the same sysex message used to
-	enable reverb on the CTK-601 and similar models (F0 44 0E 09 0x F7).
+    The WG-130 (and possibly others) have unpopulated footprints for the same DSP
+    used in some keyboards (e.g. the CTK-601). The ROM does actually support
+    using the DSP if it's present, and responds to the same sysex message used to
+    enable reverb on the CTK-601 and similar models (F0 44 0E 09 0x F7).
 
-	Pulling CPU pin 53 (KI0/P24) low starts a ROM checksum test.
-	The result is indicated both by sound as well as output on pin 55 (KI2/P11).
+    Pulling CPU pin 53 (KI0/P24) low starts a ROM checksum test.
+    The result is indicated both by sound as well as output on pin 55 (KI2/P11).
 
-	More info and photos:
-	https://piano.tyonmage.com/casio/gz-30m.html
-	https://piano.tyonmage.com/casio/gz-70sp.html
-	http://www.yjfy.com/museum/sound/WG-130.htm
+    More info and photos:
+    https://piano.tyonmage.com/casio/gz-30m.html
+    https://piano.tyonmage.com/casio/gz-70sp.html
+    http://www.yjfy.com/museum/sound/WG-130.htm
 
 -------------------------------------------------------------------------------
 
-	CTK-601/611 / Concertmate 990 (1997)
+    CTK-601/611 / Concertmate 990 (1997)
 
-	Main board (JCM462-MA1M):
-		LSI1: CPU (Casio GT913F)
-		LSI2: DSP (Casio GD277F / Hitachi HG51B277FB)
-		LSI3: 16Mbit ROM (Macronix MX23C1610MC-12)
-		LSI4: 256kbit SRAM for CPU (Toshiba TC55257DFL-70L)
-		LSI5: 256kbit SRAM for DSP (same as LSI4)
-		LSI6: stereo DAC (NEC uPD6379GR)
-		X1:   30MHz crystal for CPU
-		X2:   20MHz ceramic for DSP
+    Main board (JCM462-MA1M):
+        LSI1: CPU (Casio GT913F)
+        LSI2: DSP (Casio GD277F / Hitachi HG51B277FB)
+        LSI3: 16Mbit ROM (Macronix MX23C1610MC-12)
+        LSI4: 256kbit SRAM for CPU (Toshiba TC55257DFL-70L)
+        LSI5: 256kbit SRAM for DSP (same as LSI4)
+        LSI6: stereo DAC (NEC uPD6379GR)
+        X1:   30MHz crystal for CPU
+        X2:   20MHz ceramic for DSP
 
-	Display board (JCM462-LCD1M):
-		LSI401: LCD controller (Epson SED1278F2A)
+    Display board (JCM462-LCD1M):
+        LSI401: LCD controller (Epson SED1278F2A)
 
-	Service manuals with schematics, pinouts, etc.:
-	https://revenant1.net/casio/manuals/upd91x/ctk601.pdf
-	https://revenant1.net/casio/manuals/upd91x/ctk611.pdf
+    Service manuals with schematics, pinouts, etc.:
+    https://revenant1.net/casio/manuals/upd91x/ctk601.pdf
+    https://revenant1.net/casio/manuals/upd91x/ctk611.pdf
 
-	To access the test mode (not mentioned in the service manual):
-	Hold the keypad 0 button while turning on the keyboard, then release the button.
-	"TST" will appear on the LCD. Afterwards, press one of these buttons:
-	- Keypad 0: switch test (press all front panel buttons in a specific order, generally left to right)
-	- Keypad 1: pedal and key test
-	- Keypad 2: ROM test
-	- Keypad 4/5/6: sound volume test
-	- Keypad 7/8: stereo test
-	- Keypad 9: MIDI loopback test
-	- Keypad +: power source test
-	- Cursor Left: LCD test (all segments at once)
-	- Cursor Right: LCD test (all segments individually)
-	- Cursor Down: power off
+    To access the test mode (not mentioned in the service manual):
+    Hold the keypad 0 button while turning on the keyboard, then release the button.
+    "TST" will appear on the LCD. Afterwards, press one of these buttons:
+    - Keypad 0: switch test (press all front panel buttons in a specific order, generally left to right)
+    - Keypad 1: pedal and key test
+    - Keypad 2: ROM test
+    - Keypad 4/5/6: sound volume test
+    - Keypad 7/8: stereo test
+    - Keypad 9: MIDI loopback test
+    - Keypad +: power source test
+    - Cursor Left: LCD test (all segments at once)
+    - Cursor Right: LCD test (all segments individually)
+    - Cursor Down: power off
 
 -------------------------------------------------------------------------------
 
@@ -125,16 +125,16 @@
       Adds pitch wheel and different selection of demo songs
 
     Main board (JCM453-MA1M / JCM456-MA1M):
-		LSI1: CPU (Casio GT913F)
-		LSI2: 8Mbit ROM (OKI MSM538002E)
-		LSI3: LCD controller (HD44780 compatible)
-			  May be either a Samsung KS0066U-10B or Epson SED1278F2A.
-		IC1:  stereo DAC (NEC uPD6379GR)
-		X1:   30MHz ceramic
+        LSI1: CPU (Casio GT913F)
+        LSI2: 8Mbit ROM (OKI MSM538002E)
+        LSI3: LCD controller (HD44780 compatible)
+              May be either a Samsung KS0066U-10B or Epson SED1278F2A.
+        IC1:  stereo DAC (NEC uPD6379GR)
+        X1:   30MHz ceramic
 
     Service manuals with schematics, pinouts, etc.:
     https://revenant1.net/casio/manuals/upd91x/ctk531.pdf
-	https://revenant1.net/casio/manuals/upd91x/ctk541.pdf
+    https://revenant1.net/casio/manuals/upd91x/ctk541.pdf
 
     To access the test mode (not mentioned in the service manual):
     Hold the "Start/Stop" and keypad 0 buttons together when turning on the keyboard.
@@ -659,7 +659,7 @@ INPUT_PORTS_START(ap10)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Start / Stop") PORT_CODE(KEYCODE_0)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Demo")         PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
-		
+
 	PORT_START("maincpu:kbd:VELOCITY")
 	PORT_BIT( 0x7f, 0x7f, IPT_POSITIONAL ) PORT_NAME("Key Velocity") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0)
 
@@ -686,7 +686,7 @@ INPUT_PORTS_START(gz70sp)
 	PORT_START("maincpu:kbd:KI0")
 	PORT_START("maincpu:kbd:KI1")
 	PORT_START("maincpu:kbd:KI2")
-	
+
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) // test mode output (1 = in progress / OK, 0 = error)
@@ -835,7 +835,7 @@ INPUT_PORTS_START(ctk601)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Keypad 5") PORT_CODE(KEYCODE_5_PAD)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Keypad 1") PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Transpose / Tune / MIDI")
-		
+
 	PORT_START("maincpu:kbd:VELOCITY")
 	PORT_BIT( 0x7f, 0x7f, IPT_POSITIONAL ) PORT_NAME("Key Velocity") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0)
 
@@ -881,7 +881,7 @@ INPUT_PORTS_START(ctk601)
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(ctk551_state, inputs_r)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER )  PORT_NAME("Pedal")
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
-		
+
 	PORT_START("SWITCH")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER )    PORT_NAME("Mode (Full Range Chord)") PORT_CHANGED_MEMBER(DEVICE_SELF, ctk551_state, switch_w, 0x1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER )    PORT_NAME("Mode (Fingered)")         PORT_CHANGED_MEMBER(DEVICE_SELF, ctk551_state, switch_w, 0x2)
@@ -1014,7 +1014,7 @@ ROM_START(ctk601)
 	ROM_LOAD16_WORD_SWAP("ctk601.lsi3", 0x000000, 0x200000, CRC(23ae6ab1) SHA1(c1a8a1b9af19888360b56587c58602c26ad5029e)) // MX23C1610MC-12CA62
 
 	ROM_REGION(366949, "screen", 0)
-	ROM_LOAD("ctk601.svg", 0, 366949, CRC(7596bb55) SHA1(73f999675158e41b96ab9d2ee31edd19b8ab3e0e))
+	ROM_LOAD("ctk601.svg", 0, 366949, CRC(f150ca5a) SHA1(203fc05171ae6f5ef69c13dc4c0f538fb1ea152b))
 ROM_END
 
 ROM_START(ctk551)

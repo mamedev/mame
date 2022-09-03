@@ -19,15 +19,15 @@ license:CC0
     Seer: Energy Battle                            Sài ěr hào-néngyuán dà zuòzhàn              Y       Y            NO. 105     PUZ             赛尔号-能源大作战
     Iron Man: Hero Strike                          Gāngtiě xiá-yīngxióng fǎnjí zhàn            Y       Y            NO. 106     ACT             钢铁侠-英雄反击战
     Zombie Hunter                                  Jiāngshī lièrén                             Y       Y            NO. 107     ACT             僵尸猎人
-    IELTS Adventure                                Yǎsī tǎ dà màoxiǎn                          N       Y            NO. 108     PUZ/EDU         雅思塔大冒险
-    Ultimate Brain Power                           Nǎolì liánlián kàn                          N       Y            NO. 109     PUZ/EDU         脑力连连看
+    IELTS Adventure                                Yǎsī tǎ dà màoxiǎn                          Y       Y            NO. 108     PUZ/EDU         雅思塔大冒险
+    Ultimate Brain Power                           Nǎolì liánlián kàn                          Y       Y            NO. 109     PUZ/EDU         脑力连连看
     Roco Kingdom: Big Adventure                    Luòkè wángguó-dà màoxiǎn                    Y       Y            NO. 201     ACT             洛克王国-大冒险
     Roco Kingdom RPG: Ice Blue                     Luòkè wángguó-bīng zhī lán                  Y       Y            NO. 202     RPG             洛克王国-冰之蓝
     Roco Kingdom RPG: Black Flame                  Luòkè wángguó-hēi zhī yán                   Y       Y            NO. 203     RPG             洛克王国-黑之炎
     Roco Kingdom: Card Wars                        Luòkè wángguó-kǎ pái zhàn jì                Y       Y            NO. 204     RPG             洛克王国-卡牌战纪
     Armor Warrior                                  Kǎijiǎ yǒngshì dàluàn dòu                   Y       Y            NO. 205     ACT             铠甲勇士大乱斗
     Roco Kingdom: The King's Badge                 Luòkè wángguó-wángzhě huīzhāng              Y       Y            NO. 206     RPG             洛克王国-王者徽章
-    Laboratory Mathematica Olympiad                Àoshù shíyàn shì                            N       Y            NO. 207     PUZ/EDU         奥数实验室
+    Laboratory Mathematica Olympiad                Àoshù shíyàn shì                            Y       Y            NO. 207     PUZ/EDU         奥数实验室
     Logic Fight                                    Luójí pīn yī pīn                            Y       Y            NO. 301     PUZ/EDU         逻辑拼一拼
     Pleasant Goat and Big Big Wolf's comet battle  Xǐyángyáng yǔ huītàiláng-juézhàn miē xīng   Y       Y            NO. 302     PUZ/EDU         喜羊羊与灰太狼-决战咩星
     Dragon Ball: Budokai                           Lóngzhū-wǔdào dàhuì                         Y       Y            NO. 303     ACT             龙珠-武道大会
@@ -136,6 +136,30 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="ielts"> <!-- 108 - IELTS Adventure -->
+		<description>Yǎsī tǎ dà màoxiǎn</description>
+		<year>2014</year>
+		<publisher>M&amp;D</publisher>
+		<info name="alt_title" value="雅思塔大冒险"/>
+		<part name="cart" interface="monon_color_cart">
+			<dataarea name="rom" size="0x0800000">
+				<rom name="108.bin" size="0x0800000" crc="73c5d04b" sha1="e4fd91d8b86860c2ed973bc6114099a5cea41555"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultbrain"> <!-- 109 - Ultimate Brain Power -->
+		<description>Nǎolì liánlián kàn</description>
+		<year>2014</year>
+		<publisher>M&amp;D</publisher>
+		<info name="alt_title" value="脑力连连看"/>
+		<part name="cart" interface="monon_color_cart">
+			<dataarea name="rom" size="0x0400000">
+				<rom name="109.bin" size="0x0400000" crc="7e78ed72" sha1="cd2ce46b60fd2d76671e43d69e7fc1938422bd2a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rocoba"> <!-- 201 - Roco Kingdom: Big Adventure -->
 		<description>Luòkè wángguó-dà màoxiǎn</description>
 		<year>2014</year>
@@ -152,7 +176,7 @@ license:CC0
 		<description>Luòkè wángguó-bīng zhī lán</description>
 		<year>2014</year>
 		<publisher>M&amp;D</publisher>
-		<info name="alt_title" value="冰之蓝"/>
+		<info name="alt_title" value="洛克王国-冰之蓝"/>
 		<part name="cart" interface="monon_color_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="202.bin" size="0x1000000" crc="e5f1e94f" sha1="ca95171b8b01367f05156656397789c66f0e0ffb"/>
@@ -198,7 +222,7 @@ license:CC0
 	</software>
 
 	<!-- there is a second glob in the cartridge, presumably for the badge reader -->
-	<software name="rocobadg" supported="no"> <!-- Roco Kingdom: The King's Badge -->
+	<software name="rocobadg" supported="no"> <!-- 206 - Roco Kingdom: The King's Badge -->
 		<description>Luòkè wángguó-wángzhě huīzhāng</description>
 		<year>2015</year>
 		<publisher>M&amp;D</publisher>
@@ -206,6 +230,21 @@ license:CC0
 		<part name="cart" interface="monon_color_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="206.bin" size="0x1000000" crc="8cf5a3b6" sha1="608604f3701dfc7870ac24426c9bb6e5591d5f0a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- 207 wasn't printed anywhere on the box or the cartridge, number taken from list in header -->
+	<software name="labmath"> <!-- 207 - Laboratory Mathematica Olympiad -->
+		<description>Àoshù shíyàn shì</description>
+		<year>2014</year>
+		<publisher>M&amp;D</publisher>
+		<info name="alt_title" value="奥数实验室"/>
+		<part name="cart" interface="monon_color_cart">
+			<dataarea name="rom" size="0x0400000">
+				<!--<rom name="207.bin" size="0x0400000" crc="6db7936d" sha1="09d52653bc41976de9ad0e424cf9cbfb58e711dc"/>-->
+				<!-- the above ROM is cleaned of save data, but the ROM below, with the save area populated, was from a cartridge that had never been removed from packaging -->
+				<rom name="207.bin" size="0x0400000" crc="51728461" sha1="aad4bb82c20ab4706c64826c2f09bf59286255f0"/>
 			</dataarea>
 		</part>
 	</software>

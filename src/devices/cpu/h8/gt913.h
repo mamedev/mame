@@ -43,7 +43,7 @@ protected:
 	void write8ib(uint32_t adr, uint8_t data);
 	uint16_t read16ib(uint32_t adr);
 	void write16ib(uint32_t adr, uint16_t data);
-	
+
 	virtual void update_irq_filter() override;
 	virtual void interrupt_taken() override;
 	virtual void internal_update(uint64_t current_time) override;

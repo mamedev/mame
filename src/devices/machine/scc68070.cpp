@@ -57,7 +57,7 @@ enum isr_bits
 	ISR_LRB      =  0x01,                        // Last Received Bit
 	ISR_SSR_MASK =  (ISR_MST | ISR_TRX | ISR_BB),// Mask for detecting start/stop/restart
 	ISR_START    =  (ISR_MST | ISR_TRX | ISR_BB),// Start bit request
-	ISR_STOP     =  (ISR_MST | ISR_TRX)			// Stop bit request
+	ISR_STOP     =  (ISR_MST | ISR_TRX)         // Stop bit request
 };
 
 enum umr_bits
@@ -756,7 +756,7 @@ uint8_t scc68070_device::lir_r()
 void scc68070_device::lir_w(uint8_t data)
 {
 	LOGMASKED(LOG_IRQS, "%s: LIR Write: %02x\n", machine().describe_context(), data);
-	
+
 	switch (data & 0x88)
 	{
 	case 0x08:
@@ -874,7 +874,7 @@ uint8_t scc68070_device::idr_r()
 	// I2C data register: 80002001
 	if (!machine().side_effects_disabled())
 		LOGMASKED(LOG_I2C, "%s: I2C Data Register Read: %02x\n", machine().describe_context(), m_i2c.data_register);
-	
+
 	m_i2c.counter = 0;
 	m_i2c.status_register |= ISR_PIN;
 	m_i2c_int = false;
@@ -887,7 +887,7 @@ uint8_t scc68070_device::idr_r()
 	{
 		m_i2c.sda_out_state = (m_i2c.control_register & ICR_ACK) ? false : true;
 		m_i2c_sdaw_callback(m_i2c.sda_out_state);
-		
+
 		if (m_i2c.control_register & ICR_ACK)
 		{
 			m_i2c.state = I2C_SEND_ACK_AND_RX;
@@ -1004,7 +1004,7 @@ void scc68070_device::isr_w(uint8_t data)
 		{
 			// we should send STOP here, however, unkte06 in magicard appears to expect
 			// NAK followed by STOP when in read mode.
-			
+
 			if (data & ISR_PIN)
 			{
 				m_i2c_int = false;
@@ -1105,7 +1105,7 @@ void scc68070_device::icr_w(uint8_t data)
 {
 	LOGMASKED(LOG_I2C, "%s: I2C Control Register Write: %02x\n", machine().describe_context(), data);
 	m_i2c.control_register = data;
-	
+
 	if (!(data & ICR_ESO))
 	{
 		m_i2c.timer->adjust(attotime::never);
@@ -1151,7 +1151,7 @@ void scc68070_device::i2c_process_falling_scl()
 				m_i2c.state = I2C_GET_ACK;
 			}
 			break;
-			
+
 		case I2C_GET_ACK:
 			m_i2c.status_register &= ~ISR_PIN;
 			m_i2c_int = true;
@@ -1217,7 +1217,7 @@ void scc68070_device::i2c_process_rising_scl()
 				m_i2c.status_register &= ~ISR_LRB;
 			}
 			break;
-			
+
 		case I2C_SEND_STOP:
 		case I2C_SEND_RESTART:
 			m_i2c.timer->adjust(attotime::from_nsec(5000));
@@ -1302,13 +1302,13 @@ void scc68070_device::i2c_next_state()
 				i2c_process_falling_scl();
 			}
 			break;
-			
+
 		case I2C_SCL_SET_1:
 			m_i2c.clock_change_state = I2C_SCL_WAIT_1;
 			m_i2c.scl_out_state = true;
 			m_i2c_scl_callback(true);
 			break;
-			
+
 		case I2C_SCL_WAIT_1:
 			set_i2c_timer();
 			m_i2c.clock_change_state = I2C_SCL_SET_0;

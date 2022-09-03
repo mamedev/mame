@@ -11,6 +11,7 @@
 
 #include "osdcore.h"
 
+#include <cstdarg>
 #include <cmath>
 
 bool state_reader::READER_CHECK(bool condition, const char* format, ...)

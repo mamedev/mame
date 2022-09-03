@@ -870,8 +870,8 @@ Palette device
 Wraps MAME’s ``device_palette_interface`` class, which represents a device that
 translates pen values to colours.
 
-Colours are in alpha/red/green/blue (ARGB) format.  Channel values are in the
-range 0 (transparent or off) to 255 (opaque or full intensity), inclusive.
+Colours are represented in alpha/red/green/blue (ARGB) format.  Channel values
+range from 0 (transparent or off) to 255 (opaque or full intensity), inclusive.
 Colour channel values are not pre-multiplied by the alpha value.  Channel values
 are packed into the bytes of 32-bit unsigned integers, in the order alpha, red,
 green, blue from most-significant to least-significant byte.
@@ -931,6 +931,9 @@ palette:set_shadow_mode(mode)
 Properties
 ^^^^^^^^^^
 
+palette.palette (read-only)
+    The underlying :ref:`palette <luareference-render-palette>` managed by the
+    device.
 palette.entries (read-only)
     The number of colour entries in the palette.
 palette.indirect_entries (read-only)
@@ -1001,10 +1004,12 @@ screen:pixel(x, y)
     packed into a 32-bit integer.  Returns zero (0) if the specified point is
     outside the visible area.
 screen:pixels()
-    Returns all visible pixels as 32-bit integers packed into a binary string in
-    host Endian order.  Pixels are organised in row-major order, from left to
-    right then top to bottom.  Pixels values are either palette indices or
-    colours in RGB format packed into 32-bit integers.
+    Returns all visible pixels, the visible area width and visible area height.
+
+    Pixels are returned as 32-bit integers packed into a binary string in host
+    Endian order.  Pixels are organised in row-major order, from left to right
+    then top to bottom.  Pixels values are either palette indices or colours in
+    RGB format packed into 32-bit integers.
 screen:draw_box(left, top, right, bottom, [line], [fill])
     Draws an outlined rectangle with edges at the specified positions.
 
@@ -2699,12 +2704,140 @@ color.b (read/write)
     Blue channel value, in the range of zero (0, off) to one (1, full
     intensity).
 
+.. _luareference-render-palette:
+
+Palette
+~~~~~~~
+
+Wraps MAME’s ``palette_t`` class, which represents a table of colours that can
+be looked up by zero-based index.  Palettes always contain additional special
+entries for black and white.
+
+Each colour has an associated contrast adjustment value.  Each adjustment group
+has associated brightness and contrast adjustment values.  The palette also has
+overall brightness, contrast and gamma adjustment values.
+
+Colours are represented in alpha/red/green/blue (ARGB) format.  Channel values
+range from 0 (transparent or off) to 255 (opaque or full intensity), inclusive.
+Colour channel values are not pre-multiplied by the alpha value.  Channel values
+are packed into the bytes of 32-bit unsigned integers, in the order alpha, red,
+green, blue from most-significant to least-significant byte.
+
+Instantiation
+^^^^^^^^^^^^^
+
+emu.palette(colors, [groups])
+    Creates a palette with the specified number of colours and
+    brightness/contrast adjustment groups.  The number of colour groups defaults
+    to one if not specified.  Colours are initialised to black, brightness
+    adjustment is initialised to 0.0, contrast adjustment initialised to 1.0,
+    and gamma adjustment is initialised to 1.0.
+
+Methods
+^^^^^^^
+
+palette:entry_color(index)
+    Gets the colour at the specified zero-based index.
+
+    Index values range from zero to the number of colours in the palette minus
+    one.  Returns black if the index is greater than or equal to the number of
+    colours in the palette.
+palette:entry_contrast(index)
+    Gets the contrast adjustment for the colour at the specified zero-based
+    index.  This is a floating-point number.
+
+    Index values range from zero to the number of colours in the palette minus
+    one.  Returns 1.0 if the index is greater than or equal to the number of
+    colours in the palette.
+palette:entry_adjusted_color(index, [group])
+    Gets a colour with brightness, contrast and gamma adjustments applied.
+
+    If the group is specified, colour index values range from zero to the number
+    of colours in the palette minus one, and group values range from zero to the
+    number of adjustment groups in the palette minus one.
+
+    If the group is not specified, index values range from zero to the number of
+    colours multiplied by the number of adjustment groups plus one.  Index
+    values may be calculated by multiplying the zero-based group index by the
+    number of colours in the palette, and adding the zero-based colour index.
+    The last two index values correspond to the special entries for black and
+    white, respectively.
+
+    Returns black if the specified combination of index and adjustment group is
+    invalid.
+palette:entry_set_color(index, color)
+    Sets the colour at the specified zero-based index.  The colour may be
+    specified as a single packed 32-bit value; or as individual red, green and
+    blue channel values, in that order.
+
+    Index values range from zero to the number of colours in the palette minus
+    one.  Raises an error if the index value is invalid.
+palette:entry_set_red_level(index, level)
+    Sets the red channel value of the colour at the specified zero-based index.
+    Other channel values are not affected.
+
+    Index values range from zero to the number of colours in the palette minus
+    one.  Raises an error if the index value is invalid.
+palette:entry_set_green_level(index, level)
+    Sets the green channel value of the colour at the specified zero-based
+    index.  Other channel values are not affected.
+
+    Index values range from zero to the number of colours in the palette minus
+    one.  Raises an error if the index value is invalid.
+palette:entry_set_blue_level(index, level)
+    Sets the blue channel value of the colour at the specified zero-based index.
+    Other channel values are not affected.
+
+    Index values range from zero to the number of colours in the palette minus
+    one.  Raises an error if the index value is invalid.
+palette:entry_set_contrast(index, level)
+    Sets the contrast adjustment value for the colour at the specified
+    zero-based index.  This must be a floating-point number.
+
+    Index values range from zero to the number of colours in the palette minus
+    one.  Raises an error if the index value is invalid.
+palette:group_set_brightness(group, brightness)
+    Sets the brightness adjustment value for the adjustment group at the
+    specified zero-based index.  This must be a floating-point number.
+
+    Group values range from zero to the number of adjustment groups in the
+    palette minus one.  Raises an error if the index value is invalid.
+palette:group_set_contrast(group, contrast)
+    Sets the contrast adjustment value for the adjustment group at the specified
+    zero-based index.  This must be a floating-point number.
+
+    Group values range from zero to the number of adjustment groups in the
+    palette minus one.  Raises an error if the index value is invalid.
+
+Properties
+^^^^^^^^^^
+
+palette.colors (read-only)
+    The number of colour entries in each group of colours in the palette.
+palette.groups (read-only)
+    The number of groups of colours in the palette.
+palette.max_index (read-only)
+    The number of valid colour indices in the palette.
+palette.black_entry (read-only)
+    The index of the special entry for the colour black.
+palette.white_entry (read-only)
+    The index of the special entry for the colour white.
+palette.brightness (write-only)
+    The overall brightness adjustment for the palette.  This is a floating-point
+    number.
+palette.contrast (write-only)
+    The overall contrast adjustment for the palette.  This is a floating-point
+    number.
+palette.gamma (write-only)
+    The overall gamma adjustment for the palette.  This is a floating-point
+    number.
+
 .. _luareference-render-bitmap:
 
 Bitmap
 ~~~~~~
 
-Wraps implementation of MAME’s ``bitmap_t`` and ``bitmap_specific`` classes,
+Wraps implementations of MAME’s ``bitmap_t`` and ``bitmap_specific`` classes,
 which represent two-dimensional bitmaps stored in row-major order.  Pixel
 coordinates are zero-based, increasing to the right and down.  Several pixel
 formats are supported.
@@ -2712,6 +2845,70 @@ formats are supported.
 Instantiation
 ^^^^^^^^^^^^^
 
+emu.bitmap_ind8(palette, [width, height], [xslop, yslop])
+    Creates an 8-bit indexed bitmap.  Each pixel is a zero-based, unsigned 8-bit
+    index into a :ref:`palette <luareference-render-palette>`.
+
+    If no width and height are specified, they are assumed to be zero.  If the
+    width is specified, the height must also be specified.  The X and Y slop
+    values set the amount of extra storage in pixels to reserve at the
+    left/right of each row and top/bottom of each column, respectively.  If an X
+    slop value is specified, a Y slop value must be specified as well.  If no X
+    and Y slop values are specified, they are assumed to be zero (the storage
+    will be sized to fit the bitmap content).  If the width and/or height is
+    less than or equal to zero, no storage will be allocated, irrespective of
+    the X and Y slop values, and the width and height of the bitmap will both be
+    set to zero.
+
+    The initial clipping rectangle is set to the entirety of the bitmap.
+emu.bitmap_ind16(palette, [width, height], [xslop, yslop])
+    Creates a 16-bit indexed bitmap.  Each pixel is a zero-based, unsigned
+    16-bit index into a :ref:`palette <luareference-render-palette>`.
+
+    If no width and height are specified, they are assumed to be zero.  If the
+    width is specified, the height must also be specified.  The X and Y slop
+    values set the amount of extra storage in pixels to reserve at the
+    left/right of each row and top/bottom of each column, respectively.  If an X
+    slop value is specified, a Y slop value must be specified as well.  If no X
+    and Y slop values are specified, they are assumed to be zero (the storage
+    will be sized to fit the bitmap content).  If the width and/or height is
+    less than or equal to zero, no storage will be allocated, irrespective of
+    the X and Y slop values, and the width and height of the bitmap will both be
+    set to zero.
+
+    The initial clipping rectangle is set to the entirety of the bitmap.
+emu.bitmap_ind32(palette, [width, height], [xslop, yslop])
+    Creates a 32-bit indexed bitmap.  Each pixel is a zero-based, unsigned
+    32-bit index into a :ref:`palette <luareference-render-palette>`.
+
+    If no width and height are specified, they are assumed to be zero.  If the
+    width is specified, the height must also be specified.  The X and Y slop
+    values set the amount of extra storage in pixels to reserve at the
+    left/right of each row and top/bottom of each column, respectively.  If an X
+    slop value is specified, a Y slop value must be specified as well.  If no X
+    and Y slop values are specified, they are assumed to be zero (the storage
+    will be sized to fit the bitmap content).  If the width and/or height is
+    less than or equal to zero, no storage will be allocated, irrespective of
+    the X and Y slop values, and the width and height of the bitmap will both be
+    set to zero.
+
+    The initial clipping rectangle is set to the entirety of the bitmap.
+emu.bitmap_ind64(palette, [width, height], [xslop, yslop])
+    Creates a 64-bit indexed bitmap.  Each pixel is a zero-based, unsigned
+    64-bit index into a :ref:`palette <luareference-render-palette>`.
+
+    If no width and height are specified, they are assumed to be zero.  If the
+    width is specified, the height must also be specified.  The X and Y slop
+    values set the amount of extra storage in pixels to reserve at the
+    left/right of each row and top/bottom of each column, respectively.  If an X
+    slop value is specified, a Y slop value must be specified as well.  If no X
+    and Y slop values are specified, they are assumed to be zero (the storage
+    will be sized to fit the bitmap content).  If the width and/or height is
+    less than or equal to zero, no storage will be allocated, irrespective of
+    the X and Y slop values, and the width and height of the bitmap will both be
+    set to zero.
+
+    The initial clipping rectangle is set to the entirety of the bitmap.
 emu.bitmap_yuy16([width, height], [xslop], yslop])
     Creates a Y'CbCr format bitmap with 4:2:2 chroma subsampling (horizontal
     pairs of pixels have individual luma values but share chroma values).  Each
@@ -2775,6 +2972,70 @@ emu.bitmap_argb32([width, height], [xslop, yslop])
     set to zero.
 
     The initial clipping rectangle is set to the entirety of the bitmap.
+emu.bitmap_ind8(source, [x0, y0, x1, y1])
+    Creates an 8-bit indexed bitmap representing a view of a portion of an
+    existing bitmap.  The initial clipping rectangle is set to the bounds of the
+    view.  The source bitmap will be locked, preventing resizing and
+    reallocation.
+
+    If no coordinates are specified, the new bitmap will represent a view of the
+    source bitmap’s current clipping rectangle.  If coordinates are specified,
+    the new bitmap will represent a view of the rectangle with top left corner
+    at (x0, y0) and bottom right corner at (x1, y1) in the source bitmap.
+    Coordinates are in units of pixels.  The bottom right coordinates are
+    inclusive.
+
+    The source bitmap must be owned by the Lua script and must use the 8-bit
+    indexed format.  Raises an error if coordinates are specified representing a
+    rectangle not fully contained within the source bitmap’s clipping rectangle.
+emu.bitmap_ind16(source, [x0, y0, x1, y1])
+    Creates a 16-bit indexed bitmap representing a view of a portion of an
+    existing bitmap.  The initial clipping rectangle is set to the bounds of the
+    view.  The source bitmap will be locked, preventing resizing and
+    reallocation.
+
+    If no coordinates are specified, the new bitmap will represent a view of the
+    source bitmap’s current clipping rectangle.  If coordinates are specified,
+    the new bitmap will represent a view of the rectangle with top left corner
+    at (x0, y0) and bottom right corner at (x1, y1) in the source bitmap.
+    Coordinates are in units of pixels.  The bottom right coordinates are
+    inclusive.
+
+    The source bitmap must be owned by the Lua script and must use the 16-bit
+    indexed format.  Raises an error if coordinates are specified representing a
+    rectangle not fully contained within the source bitmap’s clipping rectangle.
+emu.bitmap_ind32(source, [x0, y0, x1, y1])
+    Creates a 32-bit indexed bitmap representing a view of a portion of an
+    existing bitmap.  The initial clipping rectangle is set to the bounds of the
+    view.  The source bitmap will be locked, preventing resizing and
+    reallocation.
+
+    If no coordinates are specified, the new bitmap will represent a view of the
+    source bitmap’s current clipping rectangle.  If coordinates are specified,
+    the new bitmap will represent a view of the rectangle with top left corner
+    at (x0, y0) and bottom right corner at (x1, y1) in the source bitmap.
+    Coordinates are in units of pixels.  The bottom right coordinates are
+    inclusive.
+
+    The source bitmap must be owned by the Lua script and must use the 32-bit
+    indexed format.  Raises an error if coordinates are specified representing a
+    rectangle not fully contained within the source bitmap’s clipping rectangle.
+emu.bitmap_ind64(source, [x0, y0, x1, y1])
+    Creates a 64-bit indexed bitmap representing a view of a portion of an
+    existing bitmap.  The initial clipping rectangle is set to the bounds of the
+    view.  The source bitmap will be locked, preventing resizing and
+    reallocation.
+
+    If no coordinates are specified, the new bitmap will represent a view of the
+    source bitmap’s current clipping rectangle.  If coordinates are specified,
+    the new bitmap will represent a view of the rectangle with top left corner
+    at (x0, y0) and bottom right corner at (x1, y1) in the source bitmap.
+    Coordinates are in units of pixels.  The bottom right coordinates are
+    inclusive.
+
+    The source bitmap must be owned by the Lua script and must use the 64-bit
+    indexed format.  Raises an error if coordinates are specified representing a
+    rectangle not fully contained within the source bitmap’s clipping rectangle.
 emu.bitmap_yuy16(source, [x0, y0, x1, y1])
     Creates a Y'CbCr format bitmap with 4:2:2 chroma subsampling representing a
     view of a portion of an existing bitmap.  The initial clipping rectangle is
@@ -2827,6 +3088,10 @@ emu.bitmap_argb32(source, [x0, y0, x1, y1])
 Methods
 ^^^^^^^
 
+bitmap:cliprect()
+    Returns the left, top, right and bottom coordinates of the bitmap’s clipping
+    rectangle.  Coordinates are in units of pixels; the bottom and right
+    coordinates are inclusive.
 bitmap:reset()
     Sets the width and height to zero, and frees the pixel storage if the bitmap
     owns its own storage, or releases the source bitmap if the it represents a
@@ -2898,6 +3163,17 @@ bitmap:wrap(source, [x0, y0, x1, y1])
 bitmap:pix(x, y)
     Returns the colour value of the pixel at the specified location.
     Coordinates are zero-based in units of pixels.
+bitmap:pixels([x0, y0, x1, y1])
+    Returns the pixels, width and height of the portion of the bitmap with top
+    left corner at (x0, y0) and bottom right corner at (x1, y1).  Coordinates
+    are in units of pixels.  The bottom right coordinates are inclusive.  If
+    coordinates are not specified, the bitmap’s clipping rectangle is used.
+
+    Pixels are returned packed into a binary string in host Endian order.
+    Pixels are organised in row-major order, from left to right then top to
+    bottom.  The size and format of the pixel values depends on the format of
+    the bitmap.  Raises an error if coordinates are specified representing a
+    rectangle not fully contained within the bitmap’s clipping rectangle.
 bitmap:fill(color, [x0, y0, x1, y1])
     Fills a portion of the bitmap with the specified colour value.  If
     coordinates are not specified, the clipping rectangle is filled; if
@@ -2916,6 +3192,10 @@ bitmap:plot_box(x, y, width, height, color)
 Properties
 ^^^^^^^^^^
 
+bitmap.palette (read/write)
+    The :ref:`palette <luareference-render-palette>` used to translate pixel
+    values to colours.  Only applicable for bitmaps that use indexed pixel
+    formats.
 bitmap.width (read-only)
     Width of the bitmap in pixels.
 bitmap.height (read-only)
@@ -2989,7 +3269,7 @@ Methods
 render:texture_alloc(bitmap)
     Creates a :ref:`render texture <luareference-render-texture>` based on a
     :ref:`bitmap <luareference-render-bitmap>`.  The bitmap must be owned by the
-    Lua script, and must use the Y'CbCr, RGB or ARGB format.  The bitmap’s
+    Lua script, and must use the Y'CbCr, RGB or ARGB pixel format.  The bitmap’s
     storage will be locked, preventing resizing and reallocation.  Render
     textures must be freed before the emulation session ends.
 

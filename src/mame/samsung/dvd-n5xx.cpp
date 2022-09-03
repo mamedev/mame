@@ -54,7 +54,7 @@ The Next Tetris (dumped)              -----------------------
 Crayon Shin-chan 3 (not dumped?)      Interactive Sampler (three different versions)
                                       Nuon Games + Demos (collection from Nuon-Dome)
                                       Nuon-Dome PhillyClassic 5 Demo Disc (give-away collection)
-									  Motorola BlackBird Demonstration Pack
+                                      Motorola BlackBird Demonstration Pack
 
 There were also a number of homebrew titles made available.
 It was noted that only the Samsung and RCA units can run homebrew software and the Samsung DVD-N501 is the most compatible unit

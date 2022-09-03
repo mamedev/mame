@@ -10,7 +10,7 @@ license:CC0
 			<color red="0.2" green="0.2" blue="0.2" />
 		</rect>
 	</element>
-	
+
 	<!-- text elements -->
 	<element name="transpose"><text string="TRANSPOSE/" /></element>
 	<element name="tune_midi"><text string="TUNE/MIDI" /></element>
@@ -35,7 +35,7 @@ license:CC0
 	<element name="stop"><text string="STOP" /></element>
 	<element name="demo"><text string="DEMO" /></element>
 	<element name="ap10"><text string="AP-10" /></element>
-	
+
 	<!-- button primitives -->
 	<element name="button" defstate="0">
 		<disk><bounds x="0" y="0" width="21" height="21" /><color red="0.0" green="0.0" blue="0.0" /></disk>
@@ -48,13 +48,13 @@ license:CC0
 		<disk state="1"><bounds x="46" y="2" width="17" height="17" /><color red="0.5" green="0.5" blue="0.5" /></disk>
 		<rect state="1"><bounds x="11" y="2" width="43" height="17" /><color red="0.5" green="0.5" blue="0.5" /></rect>
 	</element>
-	
+
 	<!-- LED primitive -->
 	<element name="led" defstate="0">
 		<disk state="0"><color red="0.4" green="0.3" blue="0.3" /></disk>
 		<disk state="1"><color red="1.0" green="0.1" blue="0.1" /></disk>
 	</element>
-	
+
 	<!-- keyboard primitives -->
 	<element name="keyfill"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
 	<element name="whitekey" defstate="0">
@@ -103,72 +103,72 @@ license:CC0
 		<rect state="1"><bounds x="0" y="0" width="44" height="324" /><color red="0.1" green="0.1" blue="0.1" /></rect>
 		<rect state="1"><bounds x="4" y="0" width="36" height="320" /><color red="0.1" green="0.1" blue="0.1" /></rect>
 	</element>
-	
+
 	<!-- button group -->
 	<group name="buttons">
 		<bounds x="0" y="0" width="4428" height="300" />
-	
+
 		<element ref="transpose"><bounds xc="80" y="40" width="200" height="40"/></element>
 		<element ref="tune_midi"><bounds xc="80" y="80" width="200" height="40"/></element>
 		<element ref="button" inputtag="maincpu:kbd:KI0" inputmask="0x1"><bounds xc="80" y="128" width="160" height="48"/></element>
-		
+
 		<element ref="digital"><bounds xc="280" y="40" width="180" height="40"/></element>
 		<element ref="effect"><bounds xc="280" y="80" width="180" height="40"/></element>
 		<element ref="button" inputtag="maincpu:kbd:KI0" inputmask="0x2"><bounds xc="280" y="128" width="160" height="48"/></element>
-		
+
 		<element ref="led" name="led_console_0"><bounds xc="400" y="00" width="40" height="40" /></element>
 		<element ref="chorus"><bounds x="440" y="0" width="300" height="40"/></element>
-		
+
 		<element ref="led" name="led_console_1"><bounds xc="400" y="64" width="40" height="40" /></element>
 		<element ref="reverb2"><bounds x="440" y="64" width="300" height="40"/></element>
-		
+
 		<element ref="led" name="led_console_2"><bounds xc="400" y="128" width="40" height="40" /></element>
 		<element ref="reverb1"><bounds x="440" y="128" width="300" height="40"/></element>
-		
+
 		<element ref="piano"><bounds xc="880" y="80" width="200" height="40"/></element>
 		<element ref="button" inputtag="maincpu:kbd:KI0" inputmask="0x4"><bounds xc="880" y="128" width="160" height="48"/></element>
-		
+
 		<element ref="epiano"><bounds xc="1080" y="80" width="200" height="40"/></element>
 		<element ref="button" inputtag="maincpu:kbd:KI0" inputmask="0x8"><bounds xc="1080" y="128" width="160" height="48"/></element>
-		
+
 		<element ref="harpsi"><bounds xc="1280" y="40" width="200" height="40"/></element>
 		<element ref="chord"><bounds xc="1280" y="80" width="200" height="40"/></element>
 		<element ref="button" inputtag="maincpu:kbd:KI1" inputmask="0x1"><bounds xc="1280" y="128" width="160" height="48"/></element>
-		
+
 		<element ref="pipe"><bounds xc="1480" y="40" width="200" height="40"/></element>
 		<element ref="organ"><bounds xc="1480" y="80" width="200" height="40"/></element>
 		<element ref="button" inputtag="maincpu:kbd:KI1" inputmask="0x2"><bounds xc="1480" y="128" width="160" height="48"/></element>
-		
+
 		<element ref="strings"><bounds xc="1680" y="80" width="200" height="40"/></element>
 		<element ref="button" inputtag="maincpu:kbd:KI1" inputmask="0x4"><bounds xc="1680" y="128" width="160" height="48"/></element>
-		
+
 		<element ref="led" name="led_console_3"><bounds xc="1980" y="28" width="40" height="40" /></element>
 		<element ref="songa"><bounds xc="2080" y="28" width="200" height="40"/></element>
 		<element ref="led" name="led_console_4"><bounds xc="1980" y="80" width="40" height="40" /></element>
 		<element ref="songb"><bounds xc="2080" y="80" width="200" height="40"/></element>
 		<element ref="button" inputtag="maincpu:kbd:KI2" inputmask="0x1"><bounds xc="2080" y="128" width="160" height="48"/></element>
-		
+
 		<element ref="led" name="led_console_5"><bounds xc="2280" y="28" width="40" height="40" /></element>
 		<element ref="record"><bounds xc="2280" y="80" width="200" height="40"/></element>
 		<element ref="button" inputtag="maincpu:kbd:KI2" inputmask="0x2"><bounds xc="2280" y="128" width="160" height="48"/></element>
-		
+
 		<element ref="start"><bounds xc="2480" y="40" width="200" height="40"/></element>
 		<element ref="stop"><bounds xc="2480" y="80" width="200" height="40"/></element>
 		<element ref="button" inputtag="maincpu:kbd:KI2" inputmask="0x4"><bounds xc="2480" y="128" width="160" height="48"/></element>
-		
+
 		<element ref="demo"><bounds xc="2880" y="80" width="200" height="40"/></element>
 		<element ref="button" inputtag="maincpu:kbd:KI2" inputmask="0x8"><bounds xc="2880" y="128" width="160" height="48"/></element>
 	</group>
-	
+
 	<!-- keyboard group -->
 	<group name="keyboard">
 		<element ref="keyfill"><bounds x="72" y="98" width="4284" height="524" /></element>
-		
+
 		<!-- octave 0 -->
 		<element ref="blackkey"    inputtag="maincpu:kbd:FI0" inputmask="0x02"><bounds x="151" y="108" width="44" height="324" /></element>
 		<element ref="whitekey-a0" inputtag="maincpu:kbd:FI0" inputmask="0x01"><bounds x="82" y="108" width="79" height="504" /></element>
 		<element ref="whitekey-r"  inputtag="maincpu:kbd:FI0" inputmask="0x04"><bounds x="164" y="108" width="79" height="504" /></element>
-		
+
 		<!-- octave 1 -->
 		<element ref="blackkey"    inputtag="maincpu:kbd:FI0" inputmask="0x10"><bounds x="294" y="108" width="44" height="324" /></element>
 		<element ref="blackkey"    inputtag="maincpu:kbd:FI0" inputmask="0x40"><bounds x="397" y="108" width="44" height="324" /></element>
@@ -270,7 +270,7 @@ license:CC0
 		<!-- final key -->
 		<element ref="whitekey"    inputtag="maincpu:kbd:FI10" inputmask="0x80"><bounds x="4264" y="108" width="79" height="504" /></element>
 	</group>
-	
+
 	<view name="Keyboard">
 		<!-- overall background -->
 		<element ref="greyback"><bounds x="0" y="0" width="4428" height="824" /></element>
