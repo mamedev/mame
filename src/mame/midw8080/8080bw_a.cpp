@@ -56,7 +56,7 @@ DEFINE_DEVICE_TYPE(CANE_AUDIO,  cane_audio_device,  "cane_audio",  "Model Racing
 static const char *const invaders_sample_names[] =
 {
 	"*invaders",
-	"1",        /* shot/missle */
+	"1",        /* shot/missile */
 	"2",        /* base hit/explosion */
 	"3",        /* invader hit */
 	"4",        /* fleet move 1 */
@@ -110,7 +110,7 @@ void _8080bw_state::invadpt2_sh_port_1_w(uint8_t data)
 
 	m_sn->enable_w(!BIT(data, 0));                      // SAUCER SOUND
 
-	if (BIT(rising_bits, 1)) m_samples->start(0, 0);    // MISSLE SOUND
+	if (BIT(rising_bits, 1)) m_samples->start(0, 0);    // MISSILE SOUND
 	if (BIT(rising_bits, 2)) m_samples->start(1, 1);    // EXPLOSION
 	if (BIT(rising_bits, 3)) m_samples->start(2, 2);    // INVADER HIT
 	if (BIT(rising_bits, 4)) m_samples->start(5, 8);    // BONUS MISSILE BASE
@@ -143,6 +143,103 @@ void _8080bw_state::invadpt2_sh_port_2_w(uint8_t data)
 	m_color_map = BIT(data, 5);
 
 	m_port_2_last_extra = data;
+}
+
+
+
+/*******************************************************/
+/*                                                     */
+/* SNK "Ozma Wars"                                     */
+/* No schematic or manual could be found.              */
+/* Suspected of having a SN76577 for the enemy         */
+/* movement sounds, another for the enemy death        */
+/* sounds, and analog circuits for the shooting and    */
+/* explosion sounds.                                   */
+/*                                                     */
+/*******************************************************/
+
+static const char *const ozmawars_sample_names[] =
+{
+	"*ozmawars",
+	"ow0",        // shoot
+	"ow1",        // die
+	"ow2",        // docking 1
+	"ow3",        // docking 2
+	"ow4",        // docking 3
+	"ow5",        // docking 4
+	"ow6",        // refuel
+	"ow7",        // comet
+	"ow8",        // hit invader
+	"ow9",        // hit meteor
+	"ow10",       // stage with invaders
+	"ow11",       // globe-thing after the comet
+	"ow12",       // not sure
+	"ow13",       // stage with wheels
+	"ow14",       // meteor stage
+	nullptr
+};
+
+
+void ozmawars_state::ozmawars_port03_w(uint8_t data)
+{
+	uint8_t rising_bits = data & ~m_port03;
+
+	m_port03 = data;
+	m_screen_red = BIT(data, 2);
+	m_sound_enable = BIT(data, 5);
+
+	if (m_sound_enable)
+	{
+		if (BIT(rising_bits, 0)) m_samples->start(4, 11, 1); // the globe-thing after the comet
+		if (BIT(rising_bits, 1)) m_samples->start(0, 0);     // fire
+		if (BIT(rising_bits, 2)) m_samples->start(1, 1);     // die
+		if (BIT(rising_bits, 3)) m_samples->start(2, 8);     // hit inv
+		if (BIT(rising_bits, 4)) m_samples->start(4, 6);     // refuel
+	}
+	else
+		m_samples->stop(4);
+}
+
+void ozmawars_state::ozmawars_port04_w(uint8_t data)
+{
+	if (m_sound_enable)
+	{
+		if (data == 0x01) m_samples->start(4, 13, 1);    // stage with wheels
+		if (data == 0x15) m_samples->start(4, 10, 1);    // stage with invaders
+		if (data == 0x17) m_samples->start(4, 9);        // meteor hit
+		if (data == 0x1f) m_samples->start(4, 14, 1);    // meteor stage
+		//if (data == 0x35) m_samples->start(4, 12, 1);    // 
+		//if (data == 0x3f) m_samples->start(4, 11, 1);    // 
+	}
+	if (data == 0) m_samples->stop(4);    // 
+}
+
+void ozmawars_state::ozmawars_port05_w(uint8_t data)
+{
+	uint8_t rising_bits = data & ~m_port05;
+
+	m_port05 = data;
+	m_flip_screen = BIT(data, 5) & ioport(CABINET_PORT_TAG)->read();
+	m_color_map = BIT(data, 5);
+
+	if (m_sound_enable)
+	{
+		if (BIT(rising_bits, 0)) m_samples->start(4, 2);    // docking 1
+		if (BIT(rising_bits, 1)) m_samples->start(4, 3);    // docking 2
+		if (BIT(rising_bits, 2)) m_samples->start(4, 4);    // docking 3
+		if (BIT(rising_bits, 3)) m_samples->start(4, 5);    // docking 4
+		if (BIT(rising_bits, 4)) m_samples->start(4, 7);    // comet
+	}
+}
+
+void ozmawars_state::ozmawars_samples_audio(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(5);
+	m_samples->set_samples_names(ozmawars_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
