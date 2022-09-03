@@ -51,7 +51,7 @@ INPUT_PORTS_END
 void nes_state::nes(machine_config &config)
 {
 	// basic machine hardware
-	n2a03_device &maincpu(N2A03(config, m_maincpu, NTSC_APU_CLOCK));
+	n2a03_device &maincpu(N2A03G(config, m_maincpu, NTSC_APU_CLOCK));
 	maincpu.set_addrmap(AS_PROGRAM, &nes_state::nes_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -119,6 +119,17 @@ void nes_state::famicom(machine_config &config)
 
 	SOFTWARE_LIST(config, "flop_list").set_original("famicom_flop");
 	SOFTWARE_LIST(config, "cass_list").set_original("famicom_cass");
+}
+
+void nes_state::famicomo(machine_config &config)
+{
+	famicom(config);
+
+	// basic machine hardware
+	n2a03_device &maincpu(N2A03(config.replace(), m_maincpu, NTSC_APU_CLOCK));
+	maincpu.set_addrmap(AS_PROGRAM, &nes_state::nes_map);
+
+	maincpu.add_route(ALL_OUTPUTS, "mono", 0.90);
 }
 
 void nes_state::nespalc(machine_config &config)
@@ -314,6 +325,10 @@ ROM_START( famicom )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  // Main RAM
 ROM_END
 
+ROM_START( famicomo )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  // Main RAM
+ROM_END
+
 ROM_START( famitvc1 )
 	ROM_REGION( 0x2000, "canvas_prg", 0 )
 	ROM_LOAD( "ix0402ce.ic109", 0x0000, 0x2000, CRC(96456b13) SHA1(a4dcb3c4f2be5077f0d197e870a26414287ce189) ) // dump needs verified
@@ -398,6 +413,7 @@ CONS( 198?, m82p,     nes,     0,      nespal,   nes,     nes_state, empty_init,
 
 // Famicom hardware
 CONS( 1983, famicom,  0,       nes,    famicom,  famicom, nes_state, init_famicom, "Nintendo",      "Famicom",                         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+CONS( 1983, famicomo, famicom, 0,      famicomo, famicom, nes_state, init_famicom, "Nintendo",      "Famicom (earlier, with RP2A03)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 CONS( 1983, famitvc1, famicom, 0,      famitvc1, famicom, nes_state, init_famicom, "Sharp",         "My Computer Terebi C1",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // working but for unimplemented save/load in builtin cartridge, which causes system to hang
 CONS( 1986, fds,      famicom, 0,      fds,      famicom, nes_state, init_famicom, "Nintendo",      "Famicom (w/ Disk System add-on)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 CONS( 1986, famitwin, famicom, 0,      famitwin, famicom, nes_state, init_famicom, "Sharp",         "Famicom Twin",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

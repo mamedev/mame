@@ -1184,7 +1184,7 @@ MACHINE_START_MEMBER(multigam_state,supergm3)
 void multigam_state::multigam(machine_config &config)
 {
 	/* basic machine hardware */
-	N2A03(config, m_maincpu, NTSC_APU_CLOCK);
+	N2A03G(config, m_maincpu, NTSC_APU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &multigam_state::multigam_map);
 
 	/* video hardware */

@@ -404,7 +404,7 @@ void nes_clone_state::machine_start()
 void nes_clone_state::nes_clone(machine_config &config)
 {
 	/* basic machine hardware */
-	N2A03(config, m_maincpu, NTSC_APU_CLOCK);
+	N2A03G(config, m_maincpu, NTSC_APU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_clone_state::nes_clone_map);
 
 	/* video hardware */
@@ -427,7 +427,7 @@ void nes_clone_state::nes_clone(machine_config &config)
 void nes_clone_state::nes_clone_pal(machine_config &config)
 {
 	/* basic machine hardware */
-	N2A03(config, m_maincpu, PALC_APU_CLOCK);
+	N2A03G(config, m_maincpu, PALC_APU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_clone_state::nes_clone_map);
 
 	/* video hardware */
