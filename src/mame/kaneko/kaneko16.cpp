@@ -30,7 +30,7 @@ Year + Game                    PCB         Notes
 91  The Berlin Wall            BW-002      3 x VU-003 (encrypted high colour background)
     Magical Crystals           Z00FC-02
 92  Bakuretsu Breaker          ZOOFC-02
-    Blaze On                   Z02AT-002   2 x VU-002 Sprites Chips (Atlus PCB ID: ATL-67140)
+    BlaZeon                    Z02AT-002   2 x VU-002 Sprites Chips (Atlus PCB ID: ATL-67140)
     Shogun Warriors            ZO1DK-002   CALC3 MCU protection (EEPROM handling, 68k code snippet, data - palettes, tilemaps, fighters)
     B.Rap Boys                 ZO1DK-002   CALC3 MCU protection (EEPROM handling, 68k code snippet, data - palettes, tilemaps, fighters)
 93  Wing Force (prototype)     Z08AT-001   2 x VU-002 Sprites Chips, OKI sound
@@ -328,7 +328,7 @@ void kaneko16_state::bakubrkr_map(address_map &map)
 
 
 /***************************************************************************
-                                    Blaze On
+                                    BlaZeon
 ***************************************************************************/
 
 void kaneko16_state::blazeon_map(address_map &map)
@@ -632,7 +632,7 @@ void kaneko16_shogwarr_state::shogwarr_map(address_map &map)
 ***************************************************************************/
 
 /***************************************************************************
-                                    Blaze On
+                                    BlaZeon
 ***************************************************************************/
 
 void kaneko16_state::blazeon_soundmem(address_map &map)
@@ -865,7 +865,7 @@ INPUT_PORTS_END
 
 
 /***************************************************************************
-                                    Blaze On
+                                    BlaZeon
 ***************************************************************************/
 
 static INPUT_PORTS_START( blazeon )
@@ -962,7 +962,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( wingforc )
 	PORT_START("DSW2_P1")       /* c00000.w */
-	// The game reads and stores these the same as Blaze On.
+	// The game reads and stores these the same as BlaZeon.
 	// However, none of them actually get used. Lives does work if you patch out the
 	// code that actively zeroes out the value it reads from here.
 	PORT_DIPUNUSED_DIPLOC( 0x0001, 0x0001, "SW1:1" )
@@ -985,7 +985,7 @@ static INPUT_PORTS_START( wingforc )
 
 	PORT_START("DSW1_P2")       /* c00002.w */
 	// In a similar story to DSW2, these are read and then forced to zero.
-	// These are credit selections with the same values as Blaze On.
+	// These are credit selections with the same values as BlaZeon.
 	// These work if you remove the code to force to zero, but they don't
 	// give any feedback unless the coin increases the credit counter.
 	PORT_DIPUNUSED_DIPLOC( 0x0001, 0x0001, "SW2:1" )
@@ -1806,11 +1806,11 @@ void kaneko16_state::bakubrkr(machine_config &config)
 
 
 /***************************************************************************
-                                    Blaze On
+                                    BlaZeon
 ***************************************************************************/
 
 /*
-    Blaze On:
+    BlaZeon:
         1]      busy loop
         2]      does nothing
         3]      rte
@@ -2690,7 +2690,7 @@ ROM_END
 
 /***************************************************************************
 
-                            Blaze On (Japan version)
+                            BlaZeon (Japan version)
 
 CPU:          TMP68HC000-12/D780C-2(Z80)
 SOUND:        YM2151
@@ -2757,7 +2757,7 @@ ROM_END
 Proto board without the later Z09AF-00x's Toybox protection MCU.
 The missing chip "KD" at U97 is a 74 pqfp just like the Toybox and connected to U92
 where the MCU code would be as well as connected to the EEPROM.
-Half way between the Blaze On board and the later Toybox protected Z09AF boards.
+Half way between the BlaZeon board and the later Toybox protected Z09AF boards.
 
 Z08AT-001 PCB:
 
@@ -4369,8 +4369,8 @@ GAME( 1994, packbang,   0,        berlwall, packbang,  kaneko16_berlwall_state, 
 GAME( 1991, mgcrystl,   0,        mgcrystl, mgcrystl,  kaneko16_state,          empty_init,    ROT0,  "Kaneko", "Magical Crystals (World, 92/01/10)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, mgcrystlo,  mgcrystl, mgcrystl, mgcrystl,  kaneko16_state,          empty_init,    ROT0,  "Kaneko", "Magical Crystals (World, 91/12/10)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, mgcrystlj,  mgcrystl, mgcrystl, mgcrystl,  kaneko16_state,          empty_init,    ROT0,  "Kaneko (Atlus license)", "Magical Crystals (Japan, 92/01/13)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, blazeon,    0,        blazeon,  blazeon,   kaneko16_state,          empty_init,    ROT0,  "A.I (Atlus license)",  "Blaze On (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, blazeonj,   blazeon,  blazeon,  blazeon,   kaneko16_state,          empty_init,    ROT0,  "A.I (Atlus license)",  "Blaze On (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, blazeon,    0,        blazeon,  blazeon,   kaneko16_state,          empty_init,    ROT0,  "A.I (Atlus license)",  "BlaZeon (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, blazeonj,   blazeon,  blazeon,  blazeon,   kaneko16_state,          empty_init,    ROT0,  "A.I (Atlus license)",  "BlaZeon (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, explbrkr,   0,        bakubrkr, bakubrkr,  kaneko16_state,          init_bakubrkr, ROT90, "Kaneko", "Explosive Breaker (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, explbrkrk,  explbrkr, bakubrkr, bakubrkr,  kaneko16_state,          init_bakubrkr, ROT90, "Kaneko", "Explosive Breaker (Korea)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, bakubrkr,   explbrkr, bakubrkr, bakubrkr,  kaneko16_state,          init_bakubrkr, ROT90, "Kaneko", "Bakuretsu Breaker (Japan)", MACHINE_SUPPORTS_SAVE )
