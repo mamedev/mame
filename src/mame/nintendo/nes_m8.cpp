@@ -445,7 +445,7 @@ ROM_START( nesm8 )
 
 	// Mach Rider
 	ROM_REGION( 0x8000, "prg13", 0 )
-	ROM_LOAD("mr-prg h.u20",  0x0000, 0x8000, CRC(3acd4bf1) SHA1(dc68972ac4d087fa5aa7c7180465f438be02ffe3) )
+	ROM_LOAD("mr-prg h.u20",  0x0000, 0x8000, CRC(af2bbcbc) SHA1(79b0886c35137b1f31f86e935574c1816a823851) )
 
 	ROM_REGION( 0x2000, "chr13", 0 )
 	ROM_LOAD("mr-chr h.u45",  0x0000, 0x2000, CRC(33a2b41a) SHA1(671f37bce742e63250296e62c143f8a82f860b04) )
