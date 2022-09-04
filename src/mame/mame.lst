@@ -44468,7 +44468,7 @@ z80clock                        // 2020 Tom Storey
 @source:homebrew/z80dev.cpp
 z80dev                          //
 
-@source:ne/z80ne.cpp
+@source:misc/z80ne.cpp
 z80ne                           // 1980 - Z80NE
 z80net                          // 1980 - Z80NE + LX388 Video Interface
 z80netb                         // 1980 - Z80NE + LX388 Video Interface + 16Kb BASIC

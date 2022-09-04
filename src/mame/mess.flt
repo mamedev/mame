@@ -482,6 +482,7 @@ mips/mips.cpp
 misc/3do.cpp
 misc/eva.cpp
 misc/monon_color.cpp
+misc/z80ne.cpp
 mit/tx0.cpp
 mits/altair.cpp
 mits/mits680b.cpp
@@ -520,7 +521,6 @@ ncd/ncd68k.cpp
 ncd/ncd88k.cpp
 ncd/ncdmips.cpp
 ncd/ncdppc.cpp
-ne/z80ne.cpp
 nec/apc.cpp
 nec/ews4800.cpp
 nec/pc100.cpp
