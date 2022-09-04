@@ -210,7 +210,7 @@ ROM_END
 
 ROM_START( nshort ) // 2.00
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("nshort.bin", 0x00000, 0x10000, CRC(4bd51e23) SHA1(3f55cc1c55dae8818b7e9384b6b8d43dc4f0a1af) )
+	ROM_LOAD("nshort.bin", 0x0000, 0x10000, CRC(4bd51e23) SHA1(3f55cc1c55dae8818b7e9384b6b8d43dc4f0a1af) )
 ROM_END
 
 } // anonymous namespace
