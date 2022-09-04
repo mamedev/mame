@@ -92,7 +92,7 @@ private:
 	u16 m_time_limit = 0;
 	emu_timer* m_play_timer = nullptr;
 
-	TIMER_CALLBACK_MEMBER(m8_play_timer_callback);
+	TIMER_CALLBACK_MEMBER(m8_play_timer_cb);
 	u8 m8_in0_r();
 	u8 m8_in1_r();
 	void m8_in0_w(u8 data);
@@ -172,7 +172,7 @@ void m8_state::m8_reset()
 	m_maincpu->reset();
 }
 
-TIMER_CALLBACK_MEMBER(m8_state::m8_play_timer_callback)
+TIMER_CALLBACK_MEMBER(m8_state::m8_play_timer_cb)
 {
 	m8_reset();
 }
@@ -289,7 +289,7 @@ void m8_state::machine_start()
 		m_chr_view[i].install_rom(0x0000, 0x1fff, m_chr[i]->base());
 	}
 
-	m_play_timer = timer_alloc(FUNC(m8_state::m8_play_timer_callback), this);
+	m_play_timer = timer_alloc(FUNC(m8_state::m8_play_timer_cb), this);
 
 	save_item(NAME(m_curr_game));
 	save_item(NAME(m_time_limit));
@@ -343,127 +343,127 @@ void m8_state::nes_m8(machine_config &config)
 ROM_START( nesm8 )
 	// M8 splash screen and instructions
 	ROM_REGION( 0x8000, "prg0", 0 )
-	ROM_LOAD("m8-prg-2 h.u1", 0x0000, 0x4000, CRC(15a0d398) SHA1(3601ee85d568271a1ebaae058191b092a8dcbcdc) )
-	ROM_RELOAD(               0x4000, 0x4000 )
+	ROM_LOAD( "m8-prg-2 h.u1", 0x0000, 0x4000, CRC(15a0d398) SHA1(3601ee85d568271a1ebaae058191b092a8dcbcdc) )
+	ROM_RELOAD(                0x4000, 0x4000 )
 
 	ROM_REGION( 0x2000, "chr0", 0 )
-	ROM_LOAD("m8-chr h.u29",  0x0000, 0x2000, CRC(7a7ad128) SHA1(a22be640cf04a6fdd9ec3b291b33d10ecbee0ef8) )
+	ROM_LOAD( "m8-chr h.u29",  0x0000, 0x2000, CRC(7a7ad128) SHA1(a22be640cf04a6fdd9ec3b291b33d10ecbee0ef8) )
 
 	// Duck Hunt
 	ROM_REGION( 0x8000, "prg1", 0 )
-	ROM_LOAD("dh-prg h.u2",   0x0000, 0x4000, CRC(90ca616d) SHA1(b742576317cd6a04caac25252d5593844c9a0bb6) )
-	ROM_RELOAD(               0x4000, 0x4000 )
+	ROM_LOAD( "dh-prg h.u2",   0x0000, 0x4000, CRC(90ca616d) SHA1(b742576317cd6a04caac25252d5593844c9a0bb6) )
+	ROM_RELOAD(                0x4000, 0x4000 )
 
 	ROM_REGION( 0x2000, "chr1", 0 )
-	ROM_LOAD("dh-chr h.u30",  0x0000, 0x2000, CRC(4e049e03) SHA1(ffad32a3bab2fb3826bc554b1b9838e837513576) )
+	ROM_LOAD( "dh-chr h.u30",  0x0000, 0x2000, CRC(4e049e03) SHA1(ffad32a3bab2fb3826bc554b1b9838e837513576) )
 
 	// Hogan's Alley
 	ROM_REGION( 0x8000, "prg2", 0 )
-	ROM_LOAD("ha-prg h.u3",   0x0000, 0x4000, CRC(8963ae6e) SHA1(bca489ed0fb58e1e99f36c427bc0d7d805b6c61a) )
-	ROM_RELOAD(               0x4000, 0x4000 )
+	ROM_LOAD( "ha-prg h.u3",   0x0000, 0x4000, CRC(8963ae6e) SHA1(bca489ed0fb58e1e99f36c427bc0d7d805b6c61a) )
+	ROM_RELOAD(                0x4000, 0x4000 )
 
 	ROM_REGION( 0x2000, "chr2", 0 )
-	ROM_LOAD("ha-chr h.u31",  0x0000, 0x2000, CRC(5df42fc4) SHA1(4fcf23151d9f11c1ef1b1007dd8058f5d5fe9ab8) )
+	ROM_LOAD( "ha-chr h.u31",  0x0000, 0x2000, CRC(5df42fc4) SHA1(4fcf23151d9f11c1ef1b1007dd8058f5d5fe9ab8) )
 
 	// Wild Gunman
 	ROM_REGION( 0x8000, "prg3", 0 )
-	ROM_LOAD("wg-prg h.u4",   0x0000, 0x4000, CRC(389960db) SHA1(6b38f2c86ef27f653a2bdb9c682ac0bc981c7db6) )
-	ROM_RELOAD(               0x4000, 0x4000 )
+	ROM_LOAD( "wg-prg h.u4",   0x0000, 0x4000, CRC(389960db) SHA1(6b38f2c86ef27f653a2bdb9c682ac0bc981c7db6) )
+	ROM_RELOAD(                0x4000, 0x4000 )
 
 	ROM_REGION( 0x2000, "chr3", 0 )
-	ROM_LOAD("wg-chr h.u32",  0x0000, 0x2000, CRC(a5e04856) SHA1(9194d89a34f687742216889cbb3e717a9ae81c92) )
+	ROM_LOAD( "wg-chr h.u32",  0x0000, 0x2000, CRC(a5e04856) SHA1(9194d89a34f687742216889cbb3e717a9ae81c92) )
 
 	// Balloon Fight
 	ROM_REGION( 0x8000, "prg4", 0 )
-	ROM_LOAD("bf-prg v.u5",   0x0000, 0x4000, CRC(bd2e9025) SHA1(6742fa2ea498e5b73dc2024ad3888a64e6b894e4) )
-	ROM_RELOAD(               0x4000, 0x4000 )
+	ROM_LOAD( "bf-prg v.u5",   0x0000, 0x4000, CRC(bd2e9025) SHA1(6742fa2ea498e5b73dc2024ad3888a64e6b894e4) )
+	ROM_RELOAD(                0x4000, 0x4000 )
 
 	ROM_REGION( 0x2000, "chr4", 0 )
-	ROM_LOAD("bf-chr v.u33",  0x0000, 0x2000, CRC(c642a1df) SHA1(e73cd3d4c0bad8e6f7a1aa6a580f3817a83756a9) )
+	ROM_LOAD( "bf-chr v.u33",  0x0000, 0x2000, CRC(c642a1df) SHA1(e73cd3d4c0bad8e6f7a1aa6a580f3817a83756a9) )
 
 	// Ice Climber
 	ROM_REGION( 0x8000, "prg5", 0 )
-	ROM_LOAD("ic-prg v.u6",   0x0000, 0x4000, CRC(d548307f) SHA1(e323ebaa2c0be5b9a31a21743ddfe7f3d1580672) )
-	ROM_RELOAD(               0x4000, 0x4000 )
+	ROM_LOAD( "ic-prg v.u6",   0x0000, 0x4000, CRC(d548307f) SHA1(e323ebaa2c0be5b9a31a21743ddfe7f3d1580672) )
+	ROM_RELOAD(                0x4000, 0x4000 )
 
 	ROM_REGION( 0x2000, "chr5", 0 )
-	ROM_LOAD("ic-chr v.u34",  0x0000, 0x2000, CRC(0d58a8b1) SHA1(7ae5f457bb5996a5373c9cf46db3d296e27ec56a) )
+	ROM_LOAD( "ic-chr v.u34",  0x0000, 0x2000, CRC(0d58a8b1) SHA1(7ae5f457bb5996a5373c9cf46db3d296e27ec56a) )
 
 	// Kung Fu
 	ROM_REGION( 0x8000, "prg6", 0 )
-	ROM_LOAD("sx-prg h.u7",   0x0000, 0x8000, CRC(0516375e) SHA1(55dc3550c6133f8624eb6cf3d2f145e4313c2ff6) )
+	ROM_LOAD( "sx-prg h.u7",   0x0000, 0x8000, CRC(0516375e) SHA1(55dc3550c6133f8624eb6cf3d2f145e4313c2ff6) )
 
 	ROM_REGION( 0x2000, "chr6", 0 )
-	ROM_LOAD("sx-chr h.u35",  0x0000, 0x2000, CRC(430b49a4) SHA1(7e618dbff521c3d5ee0f3d8bb01d2e770395a6bc) )
+	ROM_LOAD( "sx-chr h.u35",  0x0000, 0x2000, CRC(430b49a4) SHA1(7e618dbff521c3d5ee0f3d8bb01d2e770395a6bc) )
 
 	// Pinball
 	ROM_REGION( 0x8000, "prg7", 0 )
-	ROM_LOAD("pn-prg v.u8",   0x0000, 0x4000, CRC(91d33e3c) SHA1(607c5954e5c577ac78db3234987f8fe62f86f068) )
-	ROM_RELOAD(               0x4000, 0x4000 )
+	ROM_LOAD( "pn-prg v.u8",   0x0000, 0x4000, CRC(91d33e3c) SHA1(607c5954e5c577ac78db3234987f8fe62f86f068) )
+	ROM_RELOAD(                0x4000, 0x4000 )
 
 	ROM_REGION( 0x2000, "chr7", 0 )
-	ROM_LOAD("pn-chr v.u36",  0x0000, 0x2000, CRC(f2a53b3d) SHA1(0d2a521fd984c76cbf9b3cbd47e68c6ce4c6eeae) )
+	ROM_LOAD( "pn-chr v.u36",  0x0000, 0x2000, CRC(f2a53b3d) SHA1(0d2a521fd984c76cbf9b3cbd47e68c6ce4c6eeae) )
 
 	// Super Mario Bros.
 	ROM_REGION( 0x8000, "prg8", 0 )
-	ROM_LOAD("sm-prg h.u15",  0x0000, 0x8000, CRC(5cf548d3) SHA1(fefa1097449a3a11ebf8c6199e905996c5dc8fbd) )
+	ROM_LOAD( "sm-prg h.u15",  0x0000, 0x8000, CRC(5cf548d3) SHA1(fefa1097449a3a11ebf8c6199e905996c5dc8fbd) )
 
 	ROM_REGION( 0x2000, "chr8", 0 )
-	ROM_LOAD("sm-chr h.u40",  0x0000, 0x2000, CRC(867b51ad) SHA1(394badaf0b0bdd0ea279a1bca89a9d9ddc00b1b5) )
+	ROM_LOAD( "sm-chr h.u40",  0x0000, 0x2000, CRC(867b51ad) SHA1(394badaf0b0bdd0ea279a1bca89a9d9ddc00b1b5) )
 
 	// Baseball
 	ROM_REGION( 0x8000, "prg9", 0 )
-	ROM_LOAD("ba-prg v.u16",  0x0000, 0x4000, CRC(39d1fa03) SHA1(28d84cfefa81bbfd3d26e0f70f1b9f53383e54ad) )
-	ROM_RELOAD(               0x4000, 0x4000 )
+	ROM_LOAD( "ba-prg v.u16",  0x0000, 0x4000, CRC(39d1fa03) SHA1(28d84cfefa81bbfd3d26e0f70f1b9f53383e54ad) )
+	ROM_RELOAD(                0x4000, 0x4000 )
 
 	ROM_REGION( 0x2000, "chr9", 0 )
-	ROM_LOAD("ba-chr v.u41",  0x0000, 0x2000, CRC(cde71b82) SHA1(296ccef8a1fd9209f414ce0c788ab0dc95058242) )
+	ROM_LOAD( "ba-chr v.u41",  0x0000, 0x2000, CRC(cde71b82) SHA1(296ccef8a1fd9209f414ce0c788ab0dc95058242) )
 
 	// Golf
 	ROM_REGION( 0x8000, "prg10", 0 )
-	ROM_LOAD("gf-prg v.u17",  0x0000, 0x4000, CRC(f9622bfa) SHA1(b4e341a91f614bb19c67cc0205b2443591567aea) )
-	ROM_RELOAD(               0x4000, 0x4000 )
+	ROM_LOAD( "gf-prg v.u17",  0x0000, 0x4000, CRC(f9622bfa) SHA1(b4e341a91f614bb19c67cc0205b2443591567aea) )
+	ROM_RELOAD(                0x4000, 0x4000 )
 
 	ROM_REGION( 0x2000, "chr10", 0 )
-	ROM_LOAD("gf-chr v.u42",  0x0000, 0x2000, CRC(ff6fc790) SHA1(40177839b61f375f2ad03b203328683264845b5b) )
+	ROM_LOAD( "gf-chr v.u42",  0x0000, 0x2000, CRC(ff6fc790) SHA1(40177839b61f375f2ad03b203328683264845b5b) )
 
 	// Tennis
 	ROM_REGION( 0x8000, "prg11", 0 )
-	ROM_LOAD("te-prg h.u18",  0x0000, 0x4000, CRC(8b2e3e81) SHA1(e54274c0b0d651458c5459d41872b1f99904d0fb) )
-	ROM_RELOAD(               0x4000, 0x4000 )
+	ROM_LOAD( "te-prg h.u18",  0x0000, 0x4000, CRC(8b2e3e81) SHA1(e54274c0b0d651458c5459d41872b1f99904d0fb) )
+	ROM_RELOAD(                0x4000, 0x4000 )
 
 	ROM_REGION( 0x2000, "chr11", 0 )
-	ROM_LOAD("te-chr h.u43",  0x0000, 0x2000, CRC(3a34c45b) SHA1(2cc26a01c38ead50503dccb3ee929ba7a2b6772c) )
+	ROM_LOAD( "te-chr h.u43",  0x0000, 0x2000, CRC(3a34c45b) SHA1(2cc26a01c38ead50503dccb3ee929ba7a2b6772c) )
 
 	// Excitebike
 	ROM_REGION( 0x8000, "prg12", 0 )
-	ROM_LOAD("eb-prg h.u19",  0x0000, 0x4000, CRC(3a94fa0b) SHA1(6239e91ccefdc017d233cbae388c6568a17ed04b) )
-	ROM_RELOAD(               0x4000, 0x4000 )
+	ROM_LOAD( "eb-prg h.u19",  0x0000, 0x4000, CRC(3a94fa0b) SHA1(6239e91ccefdc017d233cbae388c6568a17ed04b) )
+	ROM_RELOAD(                0x4000, 0x4000 )
 
 	ROM_REGION( 0x2000, "chr12", 0 )
-	ROM_LOAD("eb-chr h.u44",  0x0000, 0x2000, CRC(e5f72401) SHA1(a8bf028e1a62677e48e88cf421bb2a8051eb800c) )
+	ROM_LOAD( "eb-chr h.u44",  0x0000, 0x2000, CRC(e5f72401) SHA1(a8bf028e1a62677e48e88cf421bb2a8051eb800c) )
 
 	// Mach Rider
 	ROM_REGION( 0x8000, "prg13", 0 )
-	ROM_LOAD("mr-prg h.u20",  0x0000, 0x8000, CRC(af2bbcbc) SHA1(79b0886c35137b1f31f86e935574c1816a823851) )
+	ROM_LOAD( "mr-prg h.u20",  0x0000, 0x8000, CRC(af2bbcbc) SHA1(79b0886c35137b1f31f86e935574c1816a823851) )
 
 	ROM_REGION( 0x2000, "chr13", 0 )
-	ROM_LOAD("mr-chr h.u45",  0x0000, 0x2000, CRC(33a2b41a) SHA1(671f37bce742e63250296e62c143f8a82f860b04) )
+	ROM_LOAD( "mr-chr h.u45",  0x0000, 0x2000, CRC(33a2b41a) SHA1(671f37bce742e63250296e62c143f8a82f860b04) )
 
 	// Wrecking Crew
 	ROM_REGION( 0x8000, "prg14", 0 )
-	ROM_LOAD("wr-prg v.u21",  0x0000, 0x8000, CRC(4328b273) SHA1(764d68f05f4a6e43fb26d7e654e237d2b0258fe4) )
+	ROM_LOAD( "wr-prg v.u21",  0x0000, 0x8000, CRC(4328b273) SHA1(764d68f05f4a6e43fb26d7e654e237d2b0258fe4) )
 
 	ROM_REGION( 0x2000, "chr14", 0 )
-	ROM_LOAD("wr-chr v.u46",  0x0000, 0x2000, CRC(23f0b9fd) SHA1(c7f2d4f5f555490847654b8458687f94fba3bd12) )
+	ROM_LOAD( "wr-chr v.u46",  0x0000, 0x2000, CRC(23f0b9fd) SHA1(c7f2d4f5f555490847654b8458687f94fba3bd12) )
 
 	// Popeye
 	ROM_REGION( 0x8000, "prg15", 0 )
-	ROM_LOAD("pp-prg v.u22",  0x0000, 0x4000, CRC(0fa63a45) SHA1(50c594a6d8dcbeee2d83bca8c54c42cf57093aba) )
-	ROM_RELOAD(               0x4000, 0x4000 )
+	ROM_LOAD( "pp-prg v.u22",  0x0000, 0x4000, CRC(0fa63a45) SHA1(50c594a6d8dcbeee2d83bca8c54c42cf57093aba) )
+	ROM_RELOAD(                0x4000, 0x4000 )
 
 	ROM_REGION( 0x2000, "chr15", 0 )
-	ROM_LOAD("pp-chr v.u47",  0x0000, 0x2000, CRC(a5fd8d98) SHA1(09d229404babb6c89b417ac541bab80fb06d2ba9) )
+	ROM_LOAD( "pp-chr v.u47",  0x0000, 0x2000, CRC(a5fd8d98) SHA1(09d229404babb6c89b417ac541bab80fb06d2ba9) )
 ROM_END
 
 } // anonymous namespace
