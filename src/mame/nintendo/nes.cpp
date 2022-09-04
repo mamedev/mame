@@ -129,6 +129,7 @@ void nes_state::famicomo(machine_config &config)
 	n2a03_device &maincpu(N2A03(config.replace(), m_maincpu, NTSC_APU_CLOCK));
 	maincpu.set_addrmap(AS_PROGRAM, &nes_state::nes_map);
 
+	// sound hardware
 	maincpu.add_route(ALL_OUTPUTS, "mono", 0.90);
 }
 
@@ -261,7 +262,7 @@ MACHINE_RESET_MEMBER( nes_state, famitvc1 )
 
 void nes_state::famitvc1(machine_config &config)
 {
-	famicom(config);
+	famicomo(config); // has an RP2A03 like the original Famicom
 
 	MCFG_MACHINE_RESET_OVERRIDE( nes_state, famitvc1 )
 
@@ -282,7 +283,7 @@ MACHINE_START_MEMBER( nes_state, famitwin )
 	{
 		setup_disk(m_disk);
 
-		// replace the famicom disk ROM with the famicom twin one (until we modernize the floppy drive)
+		// replace the famicom disk ROM with the twin famicom one (until we modernize the floppy drive)
 		m_maincpu->space(AS_PROGRAM).install_rom(0xe000, 0xffff, memregion("maincpu")->base() + 0xe000);
 	}
 }
@@ -420,7 +421,7 @@ CONS( 1983, famicom,  0,       nes,    famicom,  famicom, nes_state, init_famico
 CONS( 1983, famicomo, famicom, 0,      famicomo, famicom, nes_state, init_famicom, "Nintendo",      "Famicom (earlier, with RP2A03)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 CONS( 1983, famitvc1, famicom, 0,      famitvc1, famicom, nes_state, init_famicom, "Sharp",         "My Computer Terebi C1",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 CONS( 1986, fds,      famicom, 0,      fds,      famicom, nes_state, init_famicom, "Nintendo",      "Famicom (w/ Disk System add-on)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-CONS( 1986, famitwin, famicom, 0,      famitwin, famicom, nes_state, init_famicom, "Sharp",         "Famicom Twin",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+CONS( 1986, famitwin, famicom, 0,      famitwin, famicom, nes_state, init_famicom, "Sharp",         "Twin Famicom",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 CONS( 1989, fctitler, famicom, 0,      fctitler, famicom, nes_state, init_famicom, "Sharp",         "Famicom Titler",                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 // Clone hardware
