@@ -65,7 +65,7 @@ private:
 	u16 m_time_limit = 0;
 	emu_timer* m_play_timer = nullptr;
 
-	TIMER_CALLBACK_MEMBER(m82_play_timer_callback);
+	TIMER_CALLBACK_MEMBER(m82_play_timer_cb);
 	u8 m82_in0_r();
 	u8 m82_in1_r();
 	void m82_in0_w(u8 data);
@@ -117,7 +117,7 @@ void m82_state::m82_in0_w(u8 data)
 
 /**************************************************************************/
 
-TIMER_CALLBACK_MEMBER(m82_state::m82_play_timer_callback)
+TIMER_CALLBACK_MEMBER(m82_state::m82_play_timer_cb)
 {
 }
 
@@ -171,7 +171,11 @@ void m82_state::machine_start()
 	for (int i = 0; i < 4; i++)
 		m_nt_page[i]->configure_entries(0, 2, m_nt_ram.get(), 0x400);
 
-	m_play_timer = timer_alloc(FUNC(m82_state::m82_play_timer_callback), this);
+	// vertical mirroring. TODO: replace this with proper code
+	m_nt_page[1]->set_entry(1);
+	m_nt_page[3]->set_entry(1);
+
+	m_play_timer = timer_alloc(FUNC(m82_state::m82_play_timer_cb), this);
 }
 
 void m82_state::machine_reset()
