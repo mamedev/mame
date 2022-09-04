@@ -5,7 +5,7 @@
 
   Nintendo NES M82 Game Selectable Working Product Display
 
-  Machine is skeleton. It loads the builtin splash screen ROM but lacks
+  Emulation is incomplete. It loads the builtin splash screen ROM but lacks
   12 cartridge slots, timer, game select button, etc. Listen to the nice
   little tune in the meantime. It's not the same as M8 and FamicomBox.
 
@@ -232,4 +232,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1986, m82,  0,       nes_m82, nes_m82, m82_state, empty_init,  ROT0, "Nintendo", "M82 Game Selectable Working Product Display",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IS_SKELETON )
+GAME( 1986, m82,  0,       nes_m82, nes_m82, m82_state, empty_init,  ROT0, "Nintendo", "M82 Game Selectable Working Product Display",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
