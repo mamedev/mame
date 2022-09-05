@@ -300,6 +300,7 @@ The King of Route 66 (Rev A)                  840-0087C  23819A  20 (64Mb)   pre
 The Maze of the Kings (prototype)               no cart  *       21 (64Mb)   present  315-6206  FRI           * flash-PCB, not dumped but known to exist
 Tokyo Bus Guide (Rev A)                       840-0045C  23468A  18 (64Mb)   present  315-6206  317-0290-COM  requires 837-13844 JVS IO
 Virtua Athletics / Virtua Athlete (prototype)   no cart  none    21*(64Mb)   present  315-6206  present       * only first 14 flash roms contain game data, have Japan text label "Overseas sales (NA & EU)"
+Virtua Golf / Dynamic Golf (prototype)      not present  *       21*(64Mb)   present  315-6206  present       * instead of EPROM have tiny PCB with 2 flashroms on it, only first 11 flash roms contain game data
 Virtua NBA (prototype)                          no cart  *       21 (64Mb)   present  315-6206  317-0271-COM  * instead of EPROM have tiny PCB with 2 flashroms on it
 Virtua NBA (prototype, 15.11)                   no cart  *       21 (64Mb)   present  315-6206  317-0271-COM  * instead of EPROM have tiny PCB with 2 flashroms on it
 Virtua Tennis / Power Smash (prototype)         no cart  *       21 (64Mb)   present  315-6206  317-0263-COM  * flash-PCB, title screen have label "SOFT R&D Dept.#3", not dumped but known to exist
@@ -8023,6 +8024,31 @@ ROM_END
 
 /* prototype cartridges for games released on GD-ROM */
 
+ROM_START( dygolfp )
+	NAOMIGD_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD("rom0.ic22",   0x00000000, 0x00400000, CRC(2f391fdf) SHA1(cdcc42cbe450897162d0a0e3186caf4ce2b7711d) )
+	ROM_LOAD("rom1.ic1s",   0x00800000, 0x00800000, CRC(2c683edd) SHA1(9a281bfb917b11ff0035a7ad341a4e410502adb9) )
+	ROM_LOAD("rom2.ic2s",   0x01000000, 0x00800000, CRC(1795e6f4) SHA1(8ddbb8d062b3e7b20b64c32977be402706a7689e) )
+	ROM_LOAD("rom3.ic3s",   0x01800000, 0x00800000, CRC(9b45cc32) SHA1(bf0cefed34ef3a04b1a80fe9c39b2674342f7271) )
+	ROM_LOAD("rom4.ic4s",   0x02000000, 0x00800000, CRC(2c5a570a) SHA1(c2732d411c42950add995537b4497e56b478c7e9) )
+	ROM_LOAD("rom5.ic5s",   0x02800000, 0x00800000, CRC(48cc544e) SHA1(6a0beafa0f77ab093108b0d230e44505665fdd97) )
+	ROM_LOAD("rom6.ic6s",   0x03000000, 0x00800000, CRC(e12db83b) SHA1(98c963949f4869f58cee1c7c6a21d4c29bd37ddc) )
+	ROM_LOAD("rom7.ic7s",   0x03800000, 0x00800000, CRC(36c313a6) SHA1(b2ffa974c9651bfddafcca96e51b0323926eb6bc) )
+	ROM_LOAD("rom8.ic8s",   0x04000000, 0x00800000, CRC(9868d078) SHA1(e462885405b114cfacf481a5dd887aeef44d91c6) )
+	ROM_LOAD("rom9.ic9s",   0x04800000, 0x00800000, CRC(032cca1a) SHA1(5e9887915e75fe3548bc73f60c9bdc1981f7b5c9) )
+	ROM_LOAD("rom10.ic10s", 0x05000000, 0x00800000, CRC(6d094477) SHA1(29f1144646053060fa0dcedf6206037915b6fbfe) )
+	ROM_LOAD("rom11.ic11s", 0x05800000, 0x00800000, CRC(6c803ca0) SHA1(2965d8e0b0a96b0a79525012a030c34678cc285e) )
+	// ic 12-21 populated, empty
+
+	ROM_REGION(0x84, "some_eeprom", 0)
+	ROM_LOAD( "sflash.ic37",   0x000000, 0x000084, CRC(40711000) SHA1(ac44d55b5e0a43f90b542285339ce07c69c8929d) )
+
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 populated, not used
+ROM_END
+
 ROM_START( puyofevp )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -10779,6 +10805,7 @@ void naomi_state::init_hotd2()
 // 0xxx Star Horse 2002 (whole set)
 
 /* Cartridge prototypes of games released on GD-ROM */
+/* none */ GAME( 2001, dygolfp,   dygolf,   naomim2, naomi, naomi_state, init_naomi, ROT0, "Sega", "Virtua Golf / Dynamic Golf (prototype)", GAME_FLAGS )
 /* none */ GAME( 2003, puyofevp,  puyofev,  naomim1, naomi, naomi_state, init_naomi, ROT0, "Sega", "Puyo Puyo Fever (prototype ver 0.01)", GAME_FLAGS )
 /* none */ GAME( 2001, vathletep, vathlete, naomim2, naomi, naomi_state, init_naomi, ROT0, "Sega", "Virtua Athletics / Virtua Athlete (prototype)", GAME_FLAGS )
 
