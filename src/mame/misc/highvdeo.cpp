@@ -1741,12 +1741,12 @@ GAMEL( 2000, cfever50,  0,        tv_vcf,   tv_vcf,  highvdeo_state, empty_init,
 GAMEL( 2000, newmcard,  0,        newmcard, tv_tcf,  highvdeo_state, empty_init, ROT0, "High Video",             "New Magic Card",                                  0,                   layout_fashion )
 GAMEL( 2000, record,    0,        record,   tv_tcf,  highvdeo_state, empty_init, ROT0, "High Video",             "Record (Version 1)",                              0,                   layout_fashion )
 
-// 320x240, palette (RAMDAC at 0x30/32/34)
+// 320x240, palette (RAMDAC at 0x30/32/34) no ROM banking
 GAMEL( 2000, tour4010,  0,        tv_ncf,   tv_ncf,  highvdeo_state, empty_init, ROT0, "High Video",             "Tour 4010",                                       0,                   layout_fashion )
 GAMEL( 2000, cfever51,  0,        tv_ncf,   tv_ncf,  highvdeo_state, empty_init, ROT0, "High Video",             "Casino Fever 5.1",                                0,                   layout_fashion )
 GAMEL( 2000, cfever61,  0,        tv_ncf,   tv_ncf,  highvdeo_state, empty_init, ROT0, "High Video",             "Casino Fever 6.1",                                0,                   layout_fashion )
 
-// 320x240, palette (RAMDAC at 0x30/32/34) no ROM banking
+// 320x240, palette (RAMDAC at 0x30/32/34) no ROM banking, alt VRAM base
 GAMEL( 2000, nyjoker,   0,        nyjoker,  nyjoker, highvdeo_state, empty_init, ROT0, "High Video",             "New York Joker",                                  0,                   layout_fashion )
 GAMEL( 2000, galeone,   0,        nyjoker,  nyjoker, highvdeo_state, empty_init, ROT0, "San Remo Games",         "Il Galeone",                                      0,                   layout_fashion )
 GAMEL( 200?, unksmk,    0,        nyjoker,  nyjoker, highvdeo_state, empty_init, ROT0, "High Video",             "unknown SMK game",                                MACHINE_NOT_WORKING, layout_fashion ) // needs correct inputs (is this a good dump?)
