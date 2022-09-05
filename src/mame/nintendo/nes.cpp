@@ -15,7 +15,7 @@
 #include "emu.h"
 #include "nes.h"
 
-#include "cpu/m6502/n2a03.h"
+#include "cpu/m6502/rp2a03.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 
@@ -51,7 +51,7 @@ INPUT_PORTS_END
 void nes_state::nes(machine_config &config)
 {
 	// basic machine hardware
-	n2a03_device &maincpu(N2A03G(config, m_maincpu, NTSC_APU_CLOCK));
+	rp2a03_device &maincpu(RP2A03G(config, m_maincpu, NTSC_APU_CLOCK));
 	maincpu.set_addrmap(AS_PROGRAM, &nes_state::nes_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -126,7 +126,7 @@ void nes_state::famicomo(machine_config &config)
 	famicom(config);
 
 	// basic machine hardware
-	n2a03_device &maincpu(N2A03(config.replace(), m_maincpu, NTSC_APU_CLOCK));
+	rp2a03_device &maincpu(RP2A03(config.replace(), m_maincpu, NTSC_APU_CLOCK));
 	maincpu.set_addrmap(AS_PROGRAM, &nes_state::nes_map);
 
 	// sound hardware
