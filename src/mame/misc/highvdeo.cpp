@@ -1721,6 +1721,15 @@ ROM_START( saladue )
 	ROM_LOAD( "4828 som sala", 0x00000, 0x80000, CRC(64ec8642) SHA1(7200b05b3bc107e2f360fa48c9c98ebd0cf593c5) )
 ROM_END
 
+ROM_START( saladuea )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "bingov1.2u7.bin", 0x000000, 0x100000, CRC(feca3217) SHA1(144f7b7ded565398c11b3f61756b0bbc34423073) )
+	ROM_LOAD16_BYTE( "bingov1.2u8.bin", 0x000001, 0x100000, CRC(bb708ef1) SHA1(e5b6265bbe365ce93ec5e1459e7242a4b43bcc04) )
+
+	ROM_REGION( 0x080000, "oki", 0 )
+	ROM_LOAD( "bingosomv1.2bin", 0x00000, 0x80000, CRC(2f5a954c) SHA1(7a88423349cd66fbdd66b6387c8c223944680797) ) // same as zoomaniaa, is this correct?
+ROM_END
+
 ROM_START( bingopd )
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "e730 bingo p", 0x000000, 0x100000, CRC(c801fae5) SHA1(2793e65bcfef3dd3c83b02ee51b5acdb98a382c4) )
@@ -1765,5 +1774,6 @@ GAMEL( 2000, cuncino,   0,        grancapi, brasil,  highvdeo_state, empty_init,
 GAMEL( 200?, newtiger,  0,        newtiger, brasil,  highvdeo_state, empty_init, ROT0, "High Video",             "New Tiger",                                       MACHINE_NOT_WORKING, layout_fashion ) // slightly differently protected
 GAMEL( 200?, zoomania,  0,        zoomania, brasil,  highvdeo_state, empty_init, ROT0, "Industrias Brasilerias", "Zoomania (Version 10.04, set 1)",                 MACHINE_NOT_WORKING, layout_fashion )
 GAMEL( 200?, zoomaniaa, zoomania, zoomania, brasil,  highvdeo_state, empty_init, ROT0, "Industrias Brasilerias", "Zoomania (Version 10.04, set 2)",                 MACHINE_NOT_WORKING, layout_fashion )
-GAMEL( 200?, saladue,   zoomania, zoomania, brasil,  highvdeo_state, empty_init, ROT0, "Industrias Brasilerias", "Sala Due (Version 3.04)",                         MACHINE_NOT_WORKING, layout_fashion )
+GAMEL( 200?, saladue,   0,        zoomania, brasil,  highvdeo_state, empty_init, ROT0, "Industrias Brasilerias", "Sala Due (Version 3.04)",                         MACHINE_NOT_WORKING, layout_fashion )
+GAMEL( 200?, saladuea,  saladue,  zoomania, brasil,  highvdeo_state, empty_init, ROT0, "Industrias Brasilerias", "Sala Due (Version 1.04)",                         MACHINE_NOT_WORKING, layout_fashion )
 GAMEL( 200?, bingopd,   0,        zoomania, brasil,  highvdeo_state, empty_init, ROT0, "Industrias Brasilerias", "Paradise (Industrias Brasilerias, Version 1.04)", MACHINE_NOT_WORKING, layout_fashion )
