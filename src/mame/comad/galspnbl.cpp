@@ -42,6 +42,12 @@ Sound: Oki 6295, K-665 (rebadged YM3812)
 Other: Actel A1020B 84pin PLCC, Cypress CY7384A 84pin PLCC
        2 8-switch dipswitches
 
+Known undumped games/sets:
+
+  Star Pinball
+  Star Pinball II (non nude Hot Pinball with alternate title)
+  Hot Pinball (non nude version)
+
 ***************************************************************************/
 
 #include "emu.h"
