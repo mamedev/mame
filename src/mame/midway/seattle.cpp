@@ -1668,7 +1668,7 @@ static INPUT_PORTS_START( blitz )
 //  PORT_DIPSETTING(      0x0004, "Not Used 1" ) Marked as Unused in the manual
 //  PORT_DIPSETTING(      0x0008, "Not Used 2" ) Marked as Unused in the manual
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ))
-	PORT_DIPNAME( 0x0030, 0x0030, "Curency Type" )
+	PORT_DIPNAME( 0x0030, 0x0030, "Currency Type" )
 	PORT_DIPSETTING(      0x0030, DEF_STR( USA ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( French ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( German ) )
@@ -2619,11 +2619,13 @@ ROM_END
 
 #define BLITZ_BIOS \
 		ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) \
-		ROM_DEFAULT_BIOS("l12") \
+		ROM_DEFAULT_BIOS("l1_") \
 		ROM_SYSTEM_BIOS( 0, "l11", "Boot Code L1.1" ) \
 		ROMX_LOAD( "blitz1_1.u32", 0x000000, 0x80000, CRC(8163ce02) SHA1(89b432d8879052f6c5534ee49599f667f50a010f), ROM_BIOS(0) ) \
 		ROM_SYSTEM_BIOS( 1, "l12", "Boot Code L1.2" ) \
-		ROMX_LOAD( "blitz1_2.u32", 0x000000, 0x80000, CRC(38dbecf5) SHA1(7dd5a5b3baf83a7f8f877ff4cd3f5e8b5201b36f), ROM_BIOS(1) )
+		ROMX_LOAD( "blitz1_2.u32", 0x000000, 0x80000, CRC(38dbecf5) SHA1(7dd5a5b3baf83a7f8f877ff4cd3f5e8b5201b36f), ROM_BIOS(1) ) \
+		ROM_SYSTEM_BIOS( 2, "l1_", "Boot Code L1.?" ) \
+		ROMX_LOAD( "blitz1__.u32", 0x000000, 0x80000, CRC(4fd0559f) SHA1(f1b7ab162b327b7acd81b605d0245ad9ffa3d886), ROM_BIOS(2) ) // sticker fallen off, probably newest (see 0x129f0 vs. 0x122ed in 112 and 0x121bd in 111
 
 ROM_START( blitz )
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version 1.02
