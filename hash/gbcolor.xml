@@ -3749,7 +3749,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="miraclz2">
+	<software name="miraclz2" supported="partial">
 		<description>Daikaijuu Monogatari - The Miracle of the Zone II (Japan)</description>
 		<year>1999</year>
 		<publisher>Hudson Soft</publisher>
@@ -3768,7 +3768,7 @@ license:CC0
 			<dataarea name="rom" size="1048576">
 				<rom name="dmg-am6j-0.u1" size="1048576" crc="692d6794" sha1="7bf6e2d7fc58e8abe61785e413bcf4150fa8bee5"/>
 			</dataarea>
-			<dataarea name="ram" size="32768">
+			<dataarea name="nvram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -16439,8 +16439,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="pokecardj" cloneof="pokecard">
-		<!-- This game uses an integrated (on-cart) IR port por connected multiplayer gameplay. -->
+	<software name="pokecardj" cloneof="pokecard" supported="partial">
+		<!-- This game uses an integrated (on-cart) IR port for connected multiplayer gameplay. -->
 		<description>Pokémon Card GB (Japan)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
@@ -16459,7 +16459,7 @@ license:CC0
 			<dataarea name="rom" size="1048576">
 				<rom name="dmg-acxj-0.u1" size="1048576" crc="1926f570" sha1="2287627c5b4d56bd9a01aab83408c301b9cf1a6c"/>
 			</dataarea>
-			<dataarea name="ram" size="32768">
+			<dataarea name="nvram" size="32768">
 			</dataarea>
 		</part>
 	</software>

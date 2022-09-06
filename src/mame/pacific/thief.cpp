@@ -118,11 +118,12 @@ private:
 
 	struct coprocessor
 	{
-		coprocessor(device_t &host) : context_ram(host, "context_ram", 0x400, ENDIANNESS_LITTLE),
-									  bank(0),
-									  image_ram(host, "image_ram", 0x2000, ENDIANNESS_LITTLE),
-									  param{}
-									  { }
+		coprocessor(device_t &host) :
+			context_ram(host, "context_ram", 0x400, ENDIANNESS_LITTLE),
+			bank(0),
+			image_ram(host, "image_ram", 0x2000, ENDIANNESS_LITTLE),
+			param{}
+		{ }
 
 		memory_share_creator<uint8_t> context_ram;
 		uint8_t bank;

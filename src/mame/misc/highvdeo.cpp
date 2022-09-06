@@ -239,24 +239,19 @@ void highvdeo_state::machine_reset()
 
 uint32_t highvdeo_state::screen_update_tourvisn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	for(int y=cliprect.min_y;y<=cliprect.max_y;y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		int count = ((y * (screen.visible_area().max_x+1)) + cliprect.min_x) >> 1;
-		for(int x=(cliprect.min_x>>1);x<=(cliprect.max_x>>1);x++)
+		int count = ((y * (screen.visible_area().max_x + 1)) + cliprect.min_x) >> 1;
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			uint32_t color;
+			uint16_t color = m_blit_ram[count];
+			if (!BIT(x, 0))
+			{
+				color >>= 8;
+				count++;
+			}
 
-			color = ((m_blit_ram[count]) & 0x00ff)>>0;
-
-			if(cliprect.contains((x*2)+0, y))
-				bitmap.pix(y, (x*2)+0) = m_palette->pen(color);
-
-			color = ((m_blit_ram[count]) & 0xff00)>>8;
-
-			if(cliprect.contains((x*2)+1, y))
-				bitmap.pix(y, (x*2)+1) = m_palette->pen(color);
-
-			count++;
+			bitmap.pix(y, x) = m_palette->pen(color & 0xff);
 		}
 	}
 
@@ -268,13 +263,11 @@ uint32_t highvdeo_state::screen_update_brasil(screen_device &screen, bitmap_rgb3
 {
 	pen_t const *const rgb = m_palette->pens(); // 16 bit RGB
 
-	for(int y=cliprect.min_y;y<=cliprect.max_y;y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		int count = (y * 400) + cliprect.min_x;
-		for(int x=cliprect.min_x;x<=cliprect.max_x;x++)
-		{
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			bitmap.pix(y, x) = rgb[m_blit_ram[count++]];
-		}
 	}
 
 	return 0;
@@ -498,7 +491,7 @@ void highvdeo_state::tv_tcf_io(address_map &map)
 
 uint16_t highvdeo_state::ciclone_status_r()
 {
-	m_resetpulse^=0x10;
+	m_resetpulse ^= 0x10;
 	return 0 | m_resetpulse;
 }
 
@@ -538,7 +531,7 @@ uint16_t highvdeo_state::record_status_r()
 	if (!machine().side_effects_disabled())
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
-	m_resetpulse^=0x15;       // and 0x07, cmp with 0x05
+	m_resetpulse ^= 0x15;       // and 0x07, cmp with 0x05
 	return 0 | m_resetpulse;
 }
 
@@ -625,7 +618,7 @@ void highvdeo_state::record_io(address_map &map)
 
 uint16_t highvdeo_state::brasil_status_r()
 {
-	m_resetpulse^=0x10;
+	m_resetpulse ^= 0x10;
 	return 3 | m_resetpulse;
 }
 
@@ -668,13 +661,13 @@ uint16_t highvdeo_state::newtiger_prot_r()
 
 uint16_t highvdeo_state::magicbom_status_r()
 {
-	m_resetpulse^=0x20;
+	m_resetpulse ^= 0x20;
 	return  m_resetpulse;
 }
 
 uint16_t highvdeo_state::magicbom_prot_r()
 {
-	return (m_grancapi_prot_latch & 3)|0x0b;
+	return (m_grancapi_prot_latch & 3) | 0x0b;
 }
 
 
@@ -703,11 +696,9 @@ void highvdeo_state::brasil_io(address_map &map)
 
 void highvdeo_state::fashion_output_w(uint16_t data)
 {
-	int i;
-
 //  popmessage("%04x",data);
 
-	for(i=0;i<4;i++)
+	for (int i = 0; i < 4; i++)
 	{
 		machine().bookkeeping().coin_counter_w(i,data & 0x20);
 		machine().bookkeeping().coin_lockout_w(i,~data & 0x01);
