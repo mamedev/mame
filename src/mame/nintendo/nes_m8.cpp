@@ -212,7 +212,7 @@ static INPUT_PORTS_START( nes_m8 )
 
 	PORT_START("S1")
 	PORT_CONFNAME( 0x0f, 0x08, "Play Time Limit" )
-	PORT_CONFSETTING(    0x01, ":20 sec." )
+	PORT_CONFSETTING(    0x01, "20 sec." )
 	PORT_CONFSETTING(    0x02, "3:00 min." )
 	PORT_CONFSETTING(    0x04, "6:00 min." )
 	PORT_CONFSETTING(    0x08, "25:00 min." )

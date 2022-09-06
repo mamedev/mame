@@ -156,7 +156,7 @@ static INPUT_PORTS_START( nes_m82 )
 
 	PORT_START("CN12")
 	PORT_CONFNAME( 0x0f, 0x08, "Play Time Limit" )
-	PORT_CONFSETTING(    0x01, ":30 sec." )
+	PORT_CONFSETTING(    0x01, "30 sec." )
 	PORT_CONFSETTING(    0x02, "3:00 min." )
 	PORT_CONFSETTING(    0x04, "6:00 min." )
 	PORT_CONFSETTING(    0x08, "128:00 min." )
@@ -182,10 +182,10 @@ void m82_state::machine_reset()
 {
 	switch (m_cn12->read())
 	{
-		case 1: m_time_limit =      20; break;
-		case 2: m_time_limit =  3 * 60; break;
-		case 4: m_time_limit =  6 * 60; break;
-		case 8: m_time_limit = 25 * 60; break;
+		case 1: m_time_limit =       30; break;
+		case 2: m_time_limit =   3 * 60; break;
+		case 4: m_time_limit =   6 * 60; break;
+		case 8: m_time_limit = 128 * 60; break;
 	}
 
 	m_curr_slot = 0;
