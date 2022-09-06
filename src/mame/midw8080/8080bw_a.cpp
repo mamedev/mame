@@ -206,7 +206,7 @@ void ozmawars_state::ozmawars_port04_w(uint8_t data)
 	{
 		if (data == 0x01) m_samples->start(4, 13, 1);    // stage with wheels
 		if (data == 0x15) m_samples->start(4, 10, 1);    // stage with invaders
-		if (data == 0x17) m_samples->start(4, 9);        // meteor hit
+		if (data == 0x17) m_samples->start(3, 9);        // meteor hit
 		if (data == 0x1f) m_samples->start(4, 14, 1);    // meteor stage
 		//if (data == 0x35) m_samples->start(4, 12, 1);    // 
 		//if (data == 0x3f) m_samples->start(4, 11, 1);    // 
