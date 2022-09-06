@@ -16934,6 +16934,7 @@ hideseek                        //
 higemaru                        // 9/1984 (c) 1984
 
 @source:misc/highvdeo.cpp
+bingopd
 brasil                          // (c) 2000 unknown
 cfever1k                        // (c) 2000 High Video
 cfever40                        // (c) 2000 High Video
@@ -16951,9 +16952,13 @@ newmcard                        // (c) 19?? unknown
 newtiger                        // (c) 200? unknown
 nyjoker                         //
 record                          // (c) 2000 High Video
+saladue
+saladuea
 tour4000                        // (c) 2000 High Video
 tour4010                        // (c) 2000 High Video
 unksmk                          //
+zoomania
+zoomaniaa
 
 @source:sega/hikaru.cpp
 airtrix                         // 2001.02? Air Trix (Rev A)
