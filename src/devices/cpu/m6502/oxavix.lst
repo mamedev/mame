@@ -335,8 +335,8 @@ sta_xav_idx
 
 adc_xav_zpg
 	TMP = read_pc();
-	TMP = read_zeropage(TMP);
-	do_adc(TMP);
+	TMP2 = read_zeropage(TMP);
+	do_adc(TMP2);
 	prefetch();
 
 and_xav_zpg
@@ -360,20 +360,20 @@ bit_xav_zpg
 
 cmp_xav_zpg
 	TMP = read_pc();
-	TMP = read_zeropage(TMP);
-	do_cmp(A, TMP);
+	TMP2 = read_zeropage(TMP);
+	do_cmp(A, TMP2);
 	prefetch();
 
 cpx_xav_zpg
 	TMP = read_pc();
-	TMP = read_zeropage(TMP);
-	do_cmp(X, TMP);
+	TMP2 = read_zeropage(TMP);
+	do_cmp(X, TMP2);
 	prefetch();
 
 cpy_xav_zpg
 	TMP = read_pc();
-	TMP = read_zeropage(TMP);
-	do_cmp(Y, TMP);
+	TMP2 = read_zeropage(TMP);
+	do_cmp(Y, TMP2);
 	prefetch();
 
 dec_xav_zpg
@@ -450,8 +450,8 @@ ror_xav_zpg
 
 sbc_xav_zpg
 	TMP = read_pc();
-	TMP = read_zeropage(TMP);
-	do_sbc(TMP);
+	TMP2 = read_zeropage(TMP);
+	do_sbc(TMP2);
 	prefetch();
 
 sta_xav_zpg
@@ -579,8 +579,8 @@ sax_xav_zpy
 adc_xav_zpx
 	TMP = read_pc();
 	read_zeropage(TMP); // dummy read
-	TMP = read_zeropage(uint8_t(TMP+X));
-	do_adc(TMP);
+	TMP2 = read_zeropage(uint8_t(TMP+X));
+	do_adc(TMP2);
 	prefetch();
 
 and_xav_zpx
@@ -603,8 +603,8 @@ asl_xav_zpx
 cmp_xav_zpx
 	TMP = read_pc();
 	read_zeropage(TMP); // dummy read
-	TMP = read_zeropage(uint8_t(TMP+X));
-	do_cmp(A, TMP);
+	TMP2 = read_zeropage(uint8_t(TMP+X));
+	do_cmp(A, TMP2);
 	prefetch();
 
 dec_xav_zpx
@@ -690,8 +690,8 @@ ror_xav_zpx
 sbc_xav_zpx
 	TMP = read_pc();
 	read_zeropage(TMP); // dummy read
-	TMP = read_zeropage(uint8_t(TMP+X));
-	do_sbc(TMP);
+	TMP2 = read_zeropage(uint8_t(TMP+X));
+	do_sbc(TMP2);
 	prefetch();
 
 sta_xav_zpx
