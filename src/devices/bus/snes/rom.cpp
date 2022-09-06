@@ -20,7 +20,7 @@ DEFINE_DEVICE_TYPE(SNS_LOROM_OBC1,     sns_rom_obc1_device,      "sns_rom_obc1",
 // LoROM pirate carts with protection
 DEFINE_DEVICE_TYPE(SNS_LOROM_POKEMON,  sns_rom_pokemon_device,   "sns_rom_pokemon",   "SNES Pirate Carts with Protection")
 DEFINE_DEVICE_TYPE(SNS_LOROM_TEKKEN2,  sns_rom_tekken2_device,   "sns_rom_tekken2",   "SNES Tekken 2")
-DEFINE_DEVICE_TYPE(SNS_LOROM_SOULBLAD, sns_rom_soulblad_device,  "sns_rom_soulblad",  "SNES Sound Blade")
+DEFINE_DEVICE_TYPE(SNS_LOROM_SOULBLAD, sns_rom_soulblad_device,  "sns_rom_soulblad",  "SNES Soul Blade")
 DEFINE_DEVICE_TYPE(SNS_LOROM_BANANA,   sns_rom_banana_device,    "sns_rom_banana",    "SNES Banana de Pijamas")
 DEFINE_DEVICE_TYPE(SNS_LOROM_BUGSLIFE, sns_rom_bugs_device,      "sns_rom_bugslife",  "SNES A Bug's Life")
 // LoROM pirate multicarts
@@ -371,29 +371,13 @@ void sns_rom_tekken2_device::chip_write(offs_t offset, uint8_t data)
 }
 
 
-// Soul Blade: Adresses $xxx0-$xxx3 in banks $80-$bf always read $55, $0f, $aa, $f0.
+// Soul Blade: Addresses $xxx0-$xxx3 in banks $80-$bf always read $55, $0f, $aa, $f0.
 // Banks $c0-$ff return open bus.
 uint8_t sns_rom_soulblad_device::chip_read(offs_t offset)
 {
-	uint8_t value;
-	offset &= 3;
-	switch (offset)
-	{
-		case 0:
-		default:
-			value = 0x55;
-			break;
-		case 1:
-			value = 0x0f;
-			break;
-		case 2:
-			value = 0xaa;
-			break;
-		case 3:
-			value = 0xf0;
-			break;
-	}
-	return value;
+	static constexpr uint8_t lut[4] = { 0x55, 0x0f, 0xaa, 0xf0 };
+
+	return lut[offset & 3];
 }
 
 // Multicart pirate banking emulation

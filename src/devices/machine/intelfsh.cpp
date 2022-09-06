@@ -95,6 +95,7 @@ DEFINE_DEVICE_TYPE(FUJITSU_29DL164BD,     fujitsu_29dl164bd_device,     "mbm29dl
 DEFINE_DEVICE_TYPE(FUJITSU_29LV002TC,     fujitsu_29lv002tc_device,     "mbm29lv002tc",          "Fujitsu MBM29LV002TC Flash")
 DEFINE_DEVICE_TYPE(FUJITSU_29LV800B,      fujitsu_29lv800b_device,      "mbm29lv800b",           "Fujitsu MBM29LV800B Flash")
 DEFINE_DEVICE_TYPE(INTEL_E28F400B,        intel_e28f400b_device,        "intel_e28f400b",        "Intel E28F400B Flash")
+DEFINE_DEVICE_TYPE(MACRONIX_29F008TC,     macronix_29f008tc_device,     "macronix_29f008tc",     "Macronix 29F008TC Flash")
 DEFINE_DEVICE_TYPE(MACRONIX_29L001MC,     macronix_29l001mc_device,     "macronix_29l001mc",     "Macronix 29L001MC Flash")
 DEFINE_DEVICE_TYPE(MACRONIX_29LV160TMC,   macronix_29lv160tmc_device,   "macronix_29lv160tmc",   "Macronix 29LV160TMC Flash")
 DEFINE_DEVICE_TYPE(TMS_29F040,            tms_29f040_device,            "tms_29f040",            "Texas Instruments 29F040 Flash")
@@ -353,6 +354,13 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_maker_id = MFG_SHARP;
 		m_device_id = 0xb5;
 		break;
+	case FLASH_MACRONIX_29F008TC:
+		m_bits = 8;
+		m_size = 0x100000;
+		m_maker_id = MFG_MACRONIX;
+		m_device_id = 0x81;
+		m_sector_is_4k = true;
+		break;
 	case FLASH_MACRONIX_29L001MC:
 		m_bits = 8;
 		m_size = 0x20000;
@@ -464,6 +472,9 @@ cat28f020_device::cat28f020_device(const machine_config &mconfig, const char *ta
 
 intel_e28f008sa_device::intel_e28f008sa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, INTEL_E28F008SA, tag, owner, clock, FLASH_INTEL_E28F008SA) { }
+
+macronix_29f008tc_device::macronix_29f008tc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intelfsh8_device(mconfig, MACRONIX_29F008TC, tag, owner, clock, FLASH_MACRONIX_29F008TC) { }
 
 macronix_29l001mc_device::macronix_29l001mc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, MACRONIX_29L001MC, tag, owner, clock, FLASH_MACRONIX_29L001MC) { }

@@ -125,7 +125,7 @@ void score7_disassembler::disasm32(std::ostream &stream, offs_t pc, uint32_t opc
 			util::stream_format(stream, "j%s 0x%08x", GET_J_LK(opcode) ? "l": "", (pc & 0xfc000000) | (GET_J_DISP24(opcode) << 1));
 			break;
 		case 0x03:      // RIX-form-1
-			util::stream_format(stream, "%s  r%d, [R%d, %d]+", m_rix1_op[GET_RIX_FUNC3(opcode)], GET_RIX_RD(opcode), GET_RIX_RA(opcode), sign_extend(GET_RIX_IMM12(opcode), 12));
+			util::stream_format(stream, "%s r%d, [r%d, %d]+", m_rix1_op[GET_RIX_FUNC3(opcode)], GET_RIX_RD(opcode), GET_RIX_RA(opcode), sign_extend(GET_RIX_IMM12(opcode), 12));
 			break;
 		case 0x04:
 			util::stream_format(stream, "b%s%s 0x%08x", m_cond[GET_BC_BC(opcode) & 0x0f], GET_BC_LK(opcode) ? "l": "", pc + (sign_extend(GET_BC_DISP19(opcode), 19) << 1));
@@ -158,7 +158,7 @@ void score7_disassembler::disasm32(std::ostream &stream, offs_t pc, uint32_t opc
 			}
 			break;
 		case 0x07:      // RIX-form-2
-			util::stream_format(stream, "%s r%d, [R%d]+, %d", m_rix2_op[GET_RIX_FUNC3(opcode)], GET_RIX_RD(opcode), GET_RIX_RA(opcode), sign_extend(GET_RIX_IMM12(opcode), 12));
+			util::stream_format(stream, "%s r%d, [r%d]+, %d", m_rix2_op[GET_RIX_FUNC3(opcode)], GET_RIX_RD(opcode), GET_RIX_RA(opcode), sign_extend(GET_RIX_IMM12(opcode), 12));
 			break;
 		case 0x08:
 			util::stream_format(stream, "addri%s r%d, r%d, %d", GET_RI_CU(opcode) ? ".c": "", GET_RI_RD(opcode), GET_RI_RA(opcode), sign_extend(GET_RI_IMM14(opcode), 14));
@@ -234,7 +234,10 @@ void score7_disassembler::disasm16(std::ostream &stream, offs_t pc, uint16_t opc
 			util::stream_format(stream, "ldiu! r%d, 0x%02x", GET_I2_RD(opcode), GET_I2_IMM8(opcode));
 			break;
 		case 0x06:      // I-form-1a
-			util::stream_format(stream, "%s! r%d, %d", m_i1a_op[GET_I16_FUNC3(opcode)], GET_I16_RD(opcode), GET_I16_IMM5(opcode));
+			if (GET_I16_FUNC3(opcode) == 0)
+				util::stream_format(stream, "%s! r%d, %d", (GET_I16_IMM5(opcode) & 0x10) ? "subei" : "addei", GET_I16_RD(opcode), GET_I16_IMM5(opcode) & 0x0f);
+			else
+				util::stream_format(stream, "%s! r%d, %d", m_i1a_op[GET_I16_FUNC3(opcode)], GET_I16_RD(opcode), GET_I16_IMM5(opcode));
 			break;
 		case 0x07:      // I-form-1b
 			switch(GET_I16_FUNC3(opcode))

@@ -3512,18 +3512,18 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Detana Twinbee Yahoo! Deluxe Pack (Japan) (3M)... -->
+	<!-- Identifying Detana Twinbee Yahho! Deluxe Pack (Japan) (3M)... -->
 	<software name="tbyahhod" supported="no">
-		<description>Detana Twinbee Yahoo! Deluxe Pack (Jpn, 3M)</description>
+		<description>Detana Twinbee Yahho! Deluxe Pack (Jpn, 3M)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-9505G (VS012-J1)"/>
 		<info name="release" value="19950929"/>
-		<info name="alt_title" value="出たなツインビーヤッホー! DELUXE PACK"/>
+		<info name="alt_title" value="出たなツインビーヤッホー！ DELUXE PACK"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="detana twinbee yahoo deluxe pack (japan) (3m)" sha1="eba96093ca1030f0d6cafb34c64567ec91851684" />
+				<disk name="detana twinbee yahho  deluxe pack (japan) (3m)" sha1="eba96093ca1030f0d6cafb34c64567ec91851684" />
 			</diskarea>
 		</part>
 	</software>
@@ -11755,12 +11755,12 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="literary fragment (disc 1 of 2)  (jpn) (dw0311)" sha1="262198f1a11ee0ec6326ed297d48a9f9cb74220c" />
+				<disk name="literary fragment (disc 1 of 2) (jpn) (dw0311)" sha1="262198f1a11ee0ec6326ed297d48a9f9cb74220c" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="literary fragment (disc 2 of 2)  (jpn) (dw0311)" sha1="1eed92b57b2e4b88132e6a9bd664f8fb1344a3b7" />
+				<disk name="literary fragment (disc 2 of 2) (jpn) (dw0311)" sha1="1eed92b57b2e4b88132e6a9bd664f8fb1344a3b7" />
 			</diskarea>
 		</part>
 	</software>
@@ -11939,7 +11939,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="maria  hibaihin (jpn) (dw0905)" sha1="66e65d682cb319bfa9017e38bf135e81aec02e96" />
+				<disk name="maria hibaihin (jpn) (dw0905)" sha1="66e65d682cb319bfa9017e38bf135e81aec02e96" />
 			</diskarea>
 		</part>
 	</software>
@@ -16438,12 +16438,12 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Detana Twinbee Yahho ! Deluxe Pack (T-9505G)... -->
 	<software name="tbyahhoda" cloneof="tbyahhod" supported="no">
-		<description>Detana Twinbee Yahoo! Deluxe Pack (Jpn, alt)</description>
+		<description>Detana Twinbee Yahho! Deluxe Pack (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-9505G (VS012-J1)"/>
 		<info name="release" value="19950929"/>
-		<info name="alt_title" value="出たなツインビーヤッホー! DELUXE PACK"/>
+		<info name="alt_title" value="出たなツインビーヤッホー！ DELUXE PACK"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -18614,7 +18614,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Koden Koureijjyutsu  Hyaku Monogatari - Hontoni Atta Kowai Hanashi (Satakore) Disc 1 (T-14324G)... -->
 	<!-- Identifying Koden Koureijjyutsu  Hyaku Monogatari - Hontoni Atta Kowai Hanashi (Satakore) Disc 2 (T-14324G)... -->
 	<software name="koden" supported="no">
-		<description>Koden Koureijjyutsu  Hyaku Monogatari - Hontoni Atta Kowai Hanashi (Jpn, Satakore)</description>
+		<description>Koden Koureijjyutsu: Hyaku Monogatari - Hontoni Atta Kowai Hanashi (Jpn, Satakore)</description>
 		<year>1998</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="T-14324G"/>
@@ -23805,7 +23805,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="kindaichi shounen no  jikenbo (j) (t-14315g)" sha1="a5f0c91bcb24a84d9517c11dd956e4243db1e8af" />
+				<disk name="kindaichi shounen no jikenbo (j) (t-14315g)" sha1="a5f0c91bcb24a84d9517c11dd956e4243db1e8af" />
 			</diskarea>
 		</part>
 	</software>
@@ -27000,7 +27000,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="blue seed  kushinada hirokuden (gs-9014)" sha1="d472ad046ced23bafe40090c1fc353f6ae2fe4fc" />
+				<disk name="blue seed kushinada hirokuden (gs-9014)" sha1="d472ad046ced23bafe40090c1fc353f6ae2fe4fc" />
 			</diskarea>
 		</part>
 	</software>

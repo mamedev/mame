@@ -245,7 +245,7 @@ void cp2000_state::cp2000(machine_config &config)
 ******************************************************************************/
 
 ROM_START( cp2000 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD("c55126_y01-rom.u3", 0x0000, 0x1000, CRC(aa7b8536) SHA1(62fb2c5631541e9058e51eb6bdc6e69569baeef3) )
 ROM_END
 

@@ -15,6 +15,8 @@
 #include "cpu/tms1000/tms1000c.h"
 #include "cpu/tms1000/tms1100.h"
 #include "cpu/tms1000/tms1400.h"
+#include "cpu/tms1000/tms2100.h"
+#include "cpu/tms1000/tms2400.h"
 #include "cpu/tms1000/tms0970.h"
 #include "cpu/tms1000/tms0980.h"
 #include "cpu/tms1000/tms0270.h"

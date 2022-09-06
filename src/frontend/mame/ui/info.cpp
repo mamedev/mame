@@ -19,6 +19,7 @@
 #include "romload.h"
 #include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 #include <set>
 #include <sstream>
@@ -208,7 +209,7 @@ machine_static_info::machine_static_info(const ui_options &options, machine_conf
 	for (device_t &device : device_enumerator(config.root_device()))
 	{
 		// the "no sound hardware" warning doesn't make sense when you plug in a sound card
-		if (dynamic_cast<device_sound_interface *>(&device))
+		if (dynamic_cast<speaker_device *>(&device))
 			m_flags &= ~::machine_flags::NO_SOUND_HW;
 
 		// build overall emulation status

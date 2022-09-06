@@ -219,7 +219,7 @@ void amsterdam_state::dallas32(machine_config &config)
 ******************************************************************************/
 
 ROM_START( amsterd )
-	ROM_REGION16_BE( 0x1000000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("amsterda-u.bin", 0x00000, 0x08000, CRC(0a75514e) SHA1(27daf78b0aba4d7a293b96b3c1fa92f6ee9bcb59) )
 	ROM_LOAD16_BYTE("amsterda-l.bin", 0x00001, 0x08000, CRC(6e17d8fa) SHA1(e0f9e57aaa445f6ff7cbe868658ed7bcfa7e31fb) )
 ROM_END
@@ -227,11 +227,11 @@ ROM_END
 
 ROM_START( dallas32 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("dallas32.bin", 0x000000, 0x10000, CRC(83b9ff3f) SHA1(97bf4cb3c61f8ec328735b3c98281bba44b30a28) )
+	ROM_LOAD("dallas32.bin", 0x00000, 0x10000, CRC(83b9ff3f) SHA1(97bf4cb3c61f8ec328735b3c98281bba44b30a28) )
 ROM_END
 
 ROM_START( dallas16 )
-	ROM_REGION16_BE( 0x1000000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("dallas-u.bin", 0x00000, 0x08000, CRC(70b741f7) SHA1(23d55ed0fea127b727d725c367ee1932ff5af39f) )
 	ROM_LOAD16_BYTE("dallas-l.bin", 0x00001, 0x08000, CRC(69300ad3) SHA1(57ec1b955b1ddfe722011ff5da68a0cd71af9251) )
 ROM_END
@@ -239,11 +239,11 @@ ROM_END
 
 ROM_START( roma32 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("roma32.bin", 0x000000, 0x10000, CRC(587d03bf) SHA1(504e9ff958084700076d633f9c306fc7baf64ffd) )
+	ROM_LOAD("roma32.bin", 0x00000, 0x10000, CRC(587d03bf) SHA1(504e9ff958084700076d633f9c306fc7baf64ffd) )
 ROM_END
 
 ROM_START( roma16 )
-	ROM_REGION16_BE( 0x1000000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("roma16-u.bin", 0x00000, 0x08000, CRC(111d030f) SHA1(e027f7e7018d28ab794e7730392506056809db6b) )
 	ROM_LOAD16_BYTE("roma16-l.bin", 0x00001, 0x08000, CRC(8245ddd2) SHA1(ab048b60fdc4358913a5d07b6fee863b66dd6734) )
 ROM_END

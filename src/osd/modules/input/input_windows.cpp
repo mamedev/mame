@@ -78,8 +78,6 @@ void windows_osd_interface::poll_input(running_machine &machine) const
 
 void windows_osd_interface::customize_input_type_list(std::vector<input_type_entry> &typelist)
 {
-	const char* uimode;
-
 	// loop over the defaults
 	for (input_type_entry &entry : typelist)
 		switch (entry.type())
@@ -91,16 +89,18 @@ void windows_osd_interface::customize_input_type_list(std::vector<input_type_ent
 				break;
 			// configurable UI mode switch
 			case IPT_UI_TOGGLE_UI:
-				uimode = options().ui_mode_key();
-				if (strcmp(uimode, "auto"))
 				{
-					std::string fullmode = "ITEM_ID_";
-					fullmode += uimode;
-					input_item_id const mameid_code = keyboard_trans_table::instance().lookup_mame_code(fullmode.c_str());
-					if (ITEM_ID_INVALID != mameid_code)
+					char const *const uimode = options().ui_mode_key();
+					if (uimode && *uimode && strcmp(uimode, "auto"))
 					{
-						input_code const ui_code = input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, input_item_id(mameid_code));
-						entry.defseq(SEQ_TYPE_STANDARD).set(ui_code);
+						std::string fullmode("ITEM_ID_");
+						fullmode.append(uimode);
+						input_item_id const mameid_code = keyboard_trans_table::instance().lookup_mame_code(fullmode.c_str());
+						if (ITEM_ID_INVALID != mameid_code)
+						{
+							input_code const ui_code = input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, input_item_id(mameid_code));
+							entry.defseq(SEQ_TYPE_STANDARD).set(ui_code);
+						}
 					}
 				}
 				break;

@@ -2299,7 +2299,6 @@ ROM_START( warlords )
 	/* mirror and painted background. */
 	ROM_LOAD( "037235-01.n7", 0x0000, 0x0100, CRC(a2c5c277) SHA1(f04de9fb6ee9619b4a4aae10c92b16b3123046cf) )
 	ROM_LOAD( "037161-01.m6", 0x0100, 0x0100, CRC(4cd24c85) SHA1(00f4876279255f3a2d136a9d916b388812cbd1fc) ) // Sync PROM
-
 ROM_END
 
 

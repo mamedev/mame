@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+
+<softwarelist name="lanteach" description="Language Teacher modules">
+
+	<software name="germant">
+		<description>German For Travel</description>
+		<year>1980</year>
+		<publisher>Texas Instruments</publisher>
+		<part name="cart" interface="lanteach">
+			<dataarea name="rom" size="0x4000">
+				<rom name="cd3509.vsm" offset="0x0000" size="0x4000" crc="a2877cbb" sha1="500dd1319bea28b41b6cfdaaeaecdef66c066854" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

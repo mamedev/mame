@@ -93,8 +93,8 @@ According to Planet Virtual Boy, the following undumped protos exist
 		</part>
 	</software>
 
-	<software name="innsmout" supported="no">
-		<description>Insmouth no Yakata (Japan)</description>
+	<software name="insmouse" supported="no">
+		<description>Insmouse no Yakata (Japan)</description>
 		<year>1995</year>
 		<publisher>I'Max</publisher>
 		<info name="developer" value="Betop (I'Max)"/>
@@ -103,7 +103,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="alt_title" value="インスマウスの館"/>
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="0x100000" width="32">
-				<rom name="insmouth no yakata (japan).bin" size="0x100000" crc="83cb6a00" sha1="37e06e53ce2810e870835c48decdd6c72079bfda" />
+				<rom name="insmouse no yakata (japan).bin" size="0x100000" crc="83cb6a00" sha1="37e06e53ce2810e870835c48decdd6c72079bfda" />
 			</dataarea>
 		</part>
 	</software>

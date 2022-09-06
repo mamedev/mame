@@ -2,8 +2,6 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0
-
-NOTE: This list is here only to document available dumps and it's not hoocked up with MAME yet.
 -->
 
 <softwarelist name="hyperscan" description="HyperScan CD-ROMs">

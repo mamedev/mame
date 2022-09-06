@@ -5,6 +5,178 @@
  Game Boy carts with MBC (Memory Bank Controller)
 
 
+ MBC1 Mapper
+ ===========
+
+ The MBC1 mapper has two modes: 2MB ROM/8KB RAM or 512KB ROM/32KB RAM.
+ Initially, the mapper operates in 2MB ROM/8KB RAM mode.
+
+ 0000-1FFF - Writing to this area enables (value 0x0A) or disables (not 0x0A) the
+             SRAM.
+ 2000-3FFF - Writing a value 0bXXXBBBBB into the 2000-3FFF memory area selects the
+             lower 5 bits of the ROM bank to select for the 4000-7FFF memory area.
+             If a value of 0bXXX00000 is written then this will autmatically be
+             changed to 0bXXX00001 by the mbc chip. Initial value 00.
+ 4000-5FFF - Writing a value 0bXXXXXXBB into the 4000-5FFF memory area either selects
+             the RAM bank to use or bits 6 and 7 for the ROM bank to use for the 4000-7FFF
+             memory area. This behaviour depends on the memory moddel chosen.
+             These address lines are fixed in mode 1 and switch depending on A14 in mode 0.
+             In mode 0 these will drive 0 when RB 00 is accessed (A14 low) or the value set
+             in 4000-5FFF when RB <> 00 is accessed (A14 high).
+             Switching between modes does not clear this register. Initial value 00.
+ 6000-7FFF - Writing a value 0bXXXXXXXB into the 6000-7FFF memory area switches the mode.
+             B=0 - 2MB ROM/8KB RAM mode
+             B=1 - 512KB ROM/32KB RAM mode
+
+ Regular ROM aliasing rules apply.
+
+
+ MBC2 Mapper
+ ===========
+
+ The MBC2 mapper includes 512x4bits of builtin RAM.
+
+ 0000-3FFF - Writing to this area enables (value 0bXXXX1010) or disables (any
+             other value than 0bXXXX1010) the RAM. In order to perform this
+             function bit 8 of the address must be reset, so usable areas are
+             0000-00FF, 0200-02FF, 0400-04FF, 0600-06FF, ..., 3E00-3EFF,
+ 0000-3FFF - Writing to this area selects the rom bank to appear at 4000-7FFF.
+             Only bits 3-0 are used to select the bank number. If a value of
+             0bXXXX0000 is written then this is automatically changed into
+             0bXXXX0001 by the mapper.
+             In order to perform the rom banking bit 8 of the address must be
+             set, so usable areas are 0100-01FF, 0300-03FF, 0500-05FF, 0700-
+             07FF,..., 3F00-3FFF,
+
+ Regular ROM aliasing rules apply.
+
+
+ MBC3 Mapper
+ ===========
+
+ The MBC3 mapper cartridges can include a RTC chip.
+
+ 0000-1FFF - Writing to this area enables (value 0x0A) or disables (not 0x0A) the
+             SRAM and RTC registers.
+ 2000-3FFF - Writing to this area selects the rom bank to appear at 4000-7FFF.
+             Bits 6-0 are used  to select the bank number. If a value of
+             0bX0000000 is written then this is autmatically changed into
+             0bX0000001 by the mapper.
+ 4000-5FFF - Writing to this area selects the RAM bank or the RTC register to
+             read.
+             XXXX00bb - Select RAM bank bb.
+             XXXX1rrr - Select RTC register rrr. Accepted values for rrr are:
+                        000 - Seconds (0x00-0x3B)
+                        001 - Minutes (0x00-0x3B)
+                        010 - Hours (0x00-0x17)
+                        011 - Bits 7-0 of the day counter
+                        100 - bit 0 - Bit 8 of the day counter
+                              bit 6 - Halt RTC timer ( 0 = timer active, 1 = halted)
+                              bit 7 - Day counter overflow flag
+ 6000-7FFF - Writing 0x00 followed by 0x01 latches the RTC data. This latching
+             method is used for reading the RTC registers.
+
+ Regular ROM aliasing rules apply.
+
+
+ MBC5 Mapper
+ ===========
+
+ 0000-1FFF - Writing to this area enables (0x0A) or disables (not 0x0A) the SRAM area.
+ 2000-2FFF - Writing to this area updates bits 7-0 of the ROM bank number to
+             appear at 4000-7FFF.
+ 3000-3FFF - Writing to this area updates bit 8 of the ROM bank number to appear
+             at 4000-7FFF.
+ 4000-5FFF - Writing to this area select the RAM bank number to use. If the
+             cartridge includes a Rumble Pack then bit 3 is used to control
+             rumble motor (0 - disable motor, 1 - enable motor).
+
+
+ MBC7 Mapper (Used by Kirby's Tilt n' Tumble, Command Master)
+ ===========
+
+ Status: Partial support (only ROM banking supported at the moment)
+
+ The MBC7 mapper has 0x0200(?) bytes of RAM built in.
+
+ 0000-1FFF - Probably enable/disable RAM
+             In order to use this area bit 12 of the address be set.
+             Values written: 00, 0A
+ 2000-2FFF - Writing to this area selects the ROM bank to appear at
+             4000-7FFF.
+             In order to use this area bit 12 of the address be set.
+             Values written: 01, 07, 01, 1C
+ 3000-3FFF - Unknown
+             In order to use this area bit 12 of the address be set.
+             Values written: 00
+ 4000-4FFF - Unknown
+             In order to use this area bit 12 of the address be set.
+             Values written: 00, 40, 3F
+
+
+ MMM01 mapper
+ ============
+
+ Used by: Momotarou Collection 2, Taito Pack
+
+ Status: not supported yet.
+
+ Momotarou Collection 2:
+
+ MOMOTARODENGEKI2, 0x00000, blocks 0x00 - 0x1F
+ 0x147: 01 04 00 00 33 00
+ MOMOTAROU GAIDEN, 0x80000, blocks 0x20 - 0x3F
+ 0x147: 06 03 00 00 18 00
+
+ When picking top option:
+ 3FFF <- 20
+ 5FFF <- 40
+ 7FFF <- 21
+ 1FFF <- 3A
+ 1FFF <- 7A
+
+ When picking bottom option:
+ 3FFF <- 00
+ 5FFF <- 01
+ 7FFF <- 01
+ 1FFF <- 3A
+ 1FFF <- 7A
+
+ Taito Pack (MMM01+RAM, 512KB, 64KB RAM):
+ 1st option (BUBBLE BOBBLE, blocks 0x10 - 0x17, MBC1+RAM, 128KB, 8KB RAM):
+   2000 <- 70  01110000  => starting block, 10000
+   6000 <- 30  00110000  => 8 blocks
+   4000 <- 70  01110000  => ???
+   0000 <- 40  01000000  => upper 3 bits determine lower 3 bits of starting block?
+
+ 2nd option (ELEVATOR ACTION, blocks 0x18 - 0x1B, MBC1, 64KB, 2KB RAM):
+   2000 <- 78  01111000  => starting block, 11000
+   6000 <- 38  00111000  => 4 blocks
+   4000 <- 70  01110000  => ???
+   0000 <- 40  01000000  => upper 3 bits determine lower 3 bits of starting block?
+
+ 3rd option (CHASE HQ, blocks 0x08 - 0x0F, MBC1+RAM, 128KB, 8KB RAM):
+   2000 <- 68  01101000  => starting block, 01000
+   6000 <- 30  00110000  => 8 blocks
+   4000 <- 70  01110000  => ???
+   0000 <- 40  01000000  => upper 3 bits determine lower 3 bits of starting block?
+
+ 4th option (SAGAIA, blocks 0x00 - 0x07, MBC1+RAM, 128KB, 8KB RAM):
+   2000 <- 60  01100000  => starting block, 00000
+   6000 <- 30  00110000  => 8 blocks
+   4000 <- 70  01110000  => ???
+   0000 <- 40  01000000  => upper 3 bits determine lower 3 bits of starting block?
+
+ Known:
+ The last 2 banks in a MMM01 dump are actually the starting banks for a MMM01 image.
+
+ 0000-1FFF => bit6 set => perform mapping
+
+ Possible mapping registers:
+ 1FFF - Enable RAM ???
+ 3FFF - xxxbbbbb - Bit0-5 of the rom bank to select at 0x4000-0x7FFF ?
+
+
  TODO: RTC runs too fast while in-game, in MBC-3 games... find the problem!
 
  ***********************************************************************************************************/
@@ -14,29 +186,418 @@
 #include "mbc.h"
 
 
+namespace {
+
+class gb_rom_mbc_device : public device_t, public device_gb_cart_interface
+{
+public:
+	// reading and writing
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
+
+protected:
+	// construction/destruction
+	gb_rom_mbc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override { shared_start(); }
+	virtual void device_reset() override { shared_reset(); }
+
+	void shared_start();
+	void shared_reset();
+
+	uint8_t m_ram_enable;
+};
+
+
+class gb_rom_mbc1_device : public gb_rom_mbc_device
+{
+public:
+
+	// construction/destruction
+	gb_rom_mbc1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
+
+protected:
+	enum {
+		MODE_16M_64k = 0, /// 16Mbit ROM, 64kBit RAM
+		MODE_4M_256k = 1  /// 4Mbit ROM, 256kBit RAM
+	};
+
+	gb_rom_mbc1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override { shared_start(); save_item(NAME(m_mode)); }
+	virtual void device_reset() override { shared_reset(); m_mode = MODE_16M_64k; }
+	virtual void set_additional_wirings(uint8_t mask, int shift) override { m_mask = mask; m_shift = shift; }  // these get set at cart loading
+
+	uint8_t m_mode, m_mask;
+	int m_shift;
+};
+
+
+class gb_rom_mbc2_device : public gb_rom_mbc_device
+{
+public:
+	// construction/destruction
+	gb_rom_mbc2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override { shared_start(); }
+	virtual void device_reset() override { shared_reset(); }
+};
+
+
+class gb_rom_mbc3_device : public gb_rom_mbc_device
+{
+public:
+	// construction/destruction
+	gb_rom_mbc3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	void update_rtc();
+	uint8_t m_rtc_regs[5];
+	int m_rtc_ready;
+};
+
+
+class gb_rom_mbc5_device : public gb_rom_mbc_device
+{
+public:
+	// construction/destruction
+	gb_rom_mbc5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
+
+protected:
+	gb_rom_mbc5_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override { shared_start(); m_rumble.resolve(); }
+	virtual void device_reset() override { shared_reset(); }
+
+	output_finder<> m_rumble;
+};
+
+
+class gb_rom_mbc6_device : public gb_rom_mbc_device
+{
+public:
+	// construction/destruction
+	gb_rom_mbc6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	uint16_t m_latch1, m_latch2;
+	uint8_t m_bank_4000, m_bank_6000;
+};
+
+
+class gb_rom_mbc7_device : public gb_rom_mbc_device
+{
+public:
+	// construction/destruction
+	gb_rom_mbc7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override { shared_start(); }
+	virtual void device_reset() override { shared_reset(); }
+};
+
+
+class gb_rom_m161_device : public gb_rom_mbc_device
+{
+public:
+	// construction/destruction
+	gb_rom_m161_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+	virtual uint8_t read_ram(offs_t offset) override { return 0xff; }
+	virtual void write_ram(offs_t offset, uint8_t data) override { }
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	uint8_t m_base_bank;
+	uint8_t m_load_disable;
+};
+
+
+class gb_rom_mmm01_device : public gb_rom_mbc_device
+{
+public:
+	// construction/destruction
+	gb_rom_mmm01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// reading and writing
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	uint16_t m_romb;
+	uint8_t  m_romb_nwe;
+	uint8_t  m_ramb;
+	uint8_t  m_ramb_nwe;
+	uint8_t  m_mode;
+	uint8_t  m_mode_nwe;
+	uint8_t  m_map;
+	uint8_t  m_mux;
+};
+
+
+class gb_rom_sachen_mmc1_device : public gb_rom_mbc_device
+{
+public:
+	// construction/destruction
+	gb_rom_sachen_mmc1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+	virtual uint8_t read_ram(offs_t offset) override { return 0xff; }
+	virtual void write_ram(offs_t offset, uint8_t data) override { }
+
+protected:
+	enum {
+		MODE_LOCKED,
+		MODE_UNLOCKED
+	};
+
+	gb_rom_sachen_mmc1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	uint8_t m_base_bank, m_mask, m_mode, m_unlock_cnt;
+};
+
+
+class gb_rom_sachen_mmc2_device : public gb_rom_sachen_mmc1_device
+{
+public:
+	// construction/destruction
+	gb_rom_sachen_mmc2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
+
+protected:
+	enum {
+		MODE_LOCKED_DMG,
+		MODE_LOCKED_CGB,
+		MODE_UNLOCKED
+	};
+
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+};
+
+
+class gb_rom_188in1_device : public gb_rom_mbc1_device
+{
+public:
+	// construction/destruction
+	gb_rom_188in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// reading and writing
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override { shared_start(); save_item(NAME(m_game_base)); }
+	virtual void device_reset() override { shared_reset(); m_game_base = 0; }
+
+private:
+	uint32_t m_game_base;
+};
+
+
+class gb_rom_sintax_device : public gb_rom_mbc_device
+{
+public:
+	// construction/destruction
+	gb_rom_sintax_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// reading and writing
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	void set_xor_for_bank(uint8_t bank);
+
+	uint8_t m_bank_mask, m_bank, m_reg;
+
+	uint8_t m_currentxor, m_xor2, m_xor3, m_xor4, m_xor5, m_sintax_mode;
+};
+
+
+class gb_rom_chongwu_device : public gb_rom_mbc5_device
+{
+public:
+	// construction/destruction
+	gb_rom_chongwu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual uint8_t read_rom(offs_t offset) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	uint8_t m_protection_checked;
+};
+
+
+class gb_rom_licheng_device : public gb_rom_mbc5_device
+{
+public:
+	// construction/destruction
+	gb_rom_licheng_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+};
+
+
+class gb_rom_digimon_device : public gb_rom_mbc5_device
+{
+public:
+	// construction/destruction
+	gb_rom_digimon_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override { shared_start(); }
+	virtual void device_reset() override { shared_reset(); }
+	virtual void write_ram(offs_t offset, uint8_t data) override;
+};
+
+
+class gb_rom_rockman8_device : public gb_rom_mbc_device
+{
+public:
+	// construction/destruction
+	gb_rom_rockman8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// reading and writing
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override { shared_start(); }
+	virtual void device_reset() override { shared_reset(); }
+
+	uint8_t m_bank_mask, m_bank, m_reg;
+};
+
+
+class gb_rom_sm3sp_device : public gb_rom_mbc_device
+{
+public:
+	// construction/destruction
+	gb_rom_sm3sp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// reading and writing
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override { shared_start(); }
+	virtual void device_reset() override { shared_reset(); }
+
+	uint8_t m_bank_mask, m_bank, m_reg, m_mode;
+};
+
+
+class gb_rom_camera_device : public gb_rom_mbc_device
+{
+public:
+	// construction/destruction
+	gb_rom_camera_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	void update_camera();
+	uint8_t m_camera_regs[54];
+};
+
+
 //-------------------------------------------------
 //  gb_rom_mbc*_device - constructor
 //-------------------------------------------------
-
-DEFINE_DEVICE_TYPE(GB_ROM_MBC1,     gb_rom_mbc1_device,        "gb_rom_mbc1",     "GB MBC1 Carts")
-DEFINE_DEVICE_TYPE(GB_ROM_MBC2,     gb_rom_mbc2_device,        "gb_rom_mbc2",     "GB MBC2 Carts")
-DEFINE_DEVICE_TYPE(GB_ROM_MBC3,     gb_rom_mbc3_device,        "gb_rom_mbc3",     "GB MBC3 Carts")
-DEFINE_DEVICE_TYPE(GB_ROM_MBC5,     gb_rom_mbc5_device,        "gb_rom_mbc5",     "GB MBC5 Carts")
-DEFINE_DEVICE_TYPE(GB_ROM_MBC6,     gb_rom_mbc6_device,        "gb_rom_mbc6",     "GB MBC6 Carts")
-DEFINE_DEVICE_TYPE(GB_ROM_MBC7,     gb_rom_mbc7_device,        "gb_rom_mbc7",     "GB MBC7 Carts")
-DEFINE_DEVICE_TYPE(GB_ROM_M161,     gb_rom_m161_device,        "gb_rom_m161",     "GB M161 Carts")
-DEFINE_DEVICE_TYPE(GB_ROM_MMM01,    gb_rom_mmm01_device,       "gb_rom_mmm01",    "GB MMM01 Carts")
-DEFINE_DEVICE_TYPE(GB_ROM_SACHEN1,  gb_rom_sachen_mmc1_device, "gb_rom_sachen1",  "GB Sachen MMC1 Carts")
-DEFINE_DEVICE_TYPE(GB_ROM_SACHEN2,  gb_rom_sachen_mmc2_device, "gb_rom_sachen2",  "GB Sachen MMC2 Carts")
-DEFINE_DEVICE_TYPE(GB_ROM_188IN1,   gb_rom_188in1_device,      "gb_rom_188in1",   "GB 188in1")
-DEFINE_DEVICE_TYPE(GB_ROM_SINTAX,   gb_rom_sintax_device,      "gb_rom_sintax",   "GB MBC5 Sintax Carts")
-DEFINE_DEVICE_TYPE(GB_ROM_CHONGWU,  gb_rom_chongwu_device,     "gb_rom_chongwu",  "GB Chong Wu Xiao Jing Ling")
-DEFINE_DEVICE_TYPE(GB_ROM_LICHENG,  gb_rom_licheng_device,     "gb_rom_licheng",  "GB MBC5 Li Cheng Carts")
-DEFINE_DEVICE_TYPE(GB_ROM_DIGIMON,  gb_rom_digimon_device,     "gb_rom_digimon",  "GB Digimon")
-DEFINE_DEVICE_TYPE(GB_ROM_ROCKMAN8, gb_rom_rockman8_device,    "gb_rom_rockman8", "GB MBC1 Rockman 8")
-DEFINE_DEVICE_TYPE(GB_ROM_SM3SP,    gb_rom_sm3sp_device,       "gb_sm3sp",        "GB MBC1 Super Mario 3 Special")
-DEFINE_DEVICE_TYPE(GB_ROM_CAMERA,   gb_rom_camera_device,      "gb_rom_camera",   "GB Camera")
-
 
 gb_rom_mbc_device::gb_rom_mbc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
@@ -1439,3 +2000,26 @@ void gb_rom_camera_device::write_ram(offs_t offset, uint8_t data)
 			m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x1fff)] = data;
 	}
 }
+
+} // anonymous namespace
+
+
+// device type definition
+DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_MBC1,     device_gb_cart_interface, gb_rom_mbc1_device,        "gb_rom_mbc1",     "GB MBC1 Carts")
+DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_MBC2,     device_gb_cart_interface, gb_rom_mbc2_device,        "gb_rom_mbc2",     "GB MBC2 Carts")
+DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_MBC3,     device_gb_cart_interface, gb_rom_mbc3_device,        "gb_rom_mbc3",     "GB MBC3 Carts")
+DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_MBC5,     device_gb_cart_interface, gb_rom_mbc5_device,        "gb_rom_mbc5",     "GB MBC5 Carts")
+DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_MBC6,     device_gb_cart_interface, gb_rom_mbc6_device,        "gb_rom_mbc6",     "GB MBC6 Carts")
+DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_MBC7,     device_gb_cart_interface, gb_rom_mbc7_device,        "gb_rom_mbc7",     "GB MBC7 Carts")
+DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_M161,     device_gb_cart_interface, gb_rom_m161_device,        "gb_rom_m161",     "GB M161 Carts")
+DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_MMM01,    device_gb_cart_interface, gb_rom_mmm01_device,       "gb_rom_mmm01",    "GB MMM01 Carts")
+DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_SACHEN1,  device_gb_cart_interface, gb_rom_sachen_mmc1_device, "gb_rom_sachen1",  "GB Sachen MMC1 Carts")
+DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_SACHEN2,  device_gb_cart_interface, gb_rom_sachen_mmc2_device, "gb_rom_sachen2",  "GB Sachen MMC2 Carts")
+DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_188IN1,   device_gb_cart_interface, gb_rom_188in1_device,      "gb_rom_188in1",   "GB 188in1")
+DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_SINTAX,   device_gb_cart_interface, gb_rom_sintax_device,      "gb_rom_sintax",   "GB MBC5 Sintax Carts")
+DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_CHONGWU,  device_gb_cart_interface, gb_rom_chongwu_device,     "gb_rom_chongwu",  "GB Chong Wu Xiao Jing Ling")
+DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_LICHENG,  device_gb_cart_interface, gb_rom_licheng_device,     "gb_rom_licheng",  "GB MBC5 Li Cheng Carts")
+DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_DIGIMON,  device_gb_cart_interface, gb_rom_digimon_device,     "gb_rom_digimon",  "GB Digimon")
+DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_ROCKMAN8, device_gb_cart_interface, gb_rom_rockman8_device,    "gb_rom_rockman8", "GB MBC1 Rockman 8")
+DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_SM3SP,    device_gb_cart_interface, gb_rom_sm3sp_device,       "gb_sm3sp",        "GB MBC1 Super Mario 3 Special")
+DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_CAMERA,   device_gb_cart_interface, gb_rom_camera_device,      "gb_rom_camera",   "GB Camera")

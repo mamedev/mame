@@ -132,7 +132,7 @@ Virtua Fighter 3
 Virtua Fighter 3 Team Battle
 Le Mans 24
 Scud Race / Sega Super GT
-Scud Race Plus
+Scud Race Plus / Sega Super GT Plus
 The Lost World: Jurassic Park
 The Lost World: Jurassic Park Special
 Virtua Striker 2
@@ -5667,7 +5667,7 @@ ROM_START( spikeofe )   /* Step 2.1, Sega game ID# is 833-13746, ROM board ID# 8
 	ROM_PARAMETER( ":315_5881:key", "29236fc8" )
 ROM_END
 
-ROM_START( eca )   /* Step 2.1 Export version */
+ROM_START( eca )   /* Step 2.1, Sega game ID# is 833-13945-03 ECA EXP, ROM board ID# 834-13946-03 ECA EXP, Security board ID# 837-13947-COM */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-22903.17", 0x000006, 0x200000, CRC(53882217) SHA1(163cbc92ff88671882cc1af377ceec80ba9f36db) )
@@ -5732,7 +5732,7 @@ ROM_START( eca )   /* Step 2.1 Export version */
 	ROM_PARAMETER( ":315_5881:key", "2923aa91" )
 ROM_END
 
-ROM_START( ecaj )    /* Step 2.1, ROM board ID# 834-13946 ECA */
+ROM_START( ecaj )    /* Step 2.1, Sega game ID# is 833-13945 ECA, ROM board ID# 834-13946 ECA, Security board ID# 837-13947-COM */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-22891.17", 0x000006, 0x200000, CRC(823a251c) SHA1(d2cc4be9dffa860d9af519e1387e7b51322c5454) )
@@ -5797,7 +5797,7 @@ ROM_START( ecaj )    /* Step 2.1, ROM board ID# 834-13946 ECA */
 	ROM_PARAMETER( ":315_5881:key", "2923aa91" )
 ROM_END
 
-ROM_START( ecau )    /* Step 2.1, ROM board ID# 834-13946-01 ECA */
+ROM_START( ecau )    /* Step 2.1, Sega game ID# is 833-13945-01 ECA, ROM board ID# 834-13946-01 ECA, Security board ID# 837-13947-COM */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-22895.17", 0x000006, 0x200000, CRC(07df16a0) SHA1(a9ad2b229854a5f4f761565141db738adde28720) )
@@ -6784,11 +6784,11 @@ GAME( 1997, getbassur,    bassdx, model3_10,      bass,     model3_state,     in
 GAME( 1997, getbass,      bassdx,   getbass,      bass,     model3_state,     init_bass, ROT0, "Sega", "Get Bass: Sega Bass Fishing (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 /* Model 3 Step 1.5 */
-GAME( 1996, scud,              0,      scud,      scud,     model3_state,     init_scud, ROT0, "Sega", "Scud Race Twin/DX (Export)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // No region specified or selectable
-GAME( 1996, scuddx,         scud,      scud,      scud,     model3_state,     init_scud, ROT0, "Sega", "Scud Race Deluxe (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Japan, USA, Export
-GAME( 1996, scudau,         scud,      scud,      scud,     model3_state,     init_scud, ROT0, "Sega", "Scud Race Twin/DX (Australia)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, scudplus,       scud,      scud,      scud,     model3_state, init_scudplus, ROT0, "Sega", "Scud Race Plus Twin/DX (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Japan, USA, Export
-GAME( 1997, scudplusa,      scud,      scud,      scud,     model3_state,init_scudplusa, ROT0, "Sega", "Scud Race Plus Twin/DX", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Japan, USA, Export
+GAME( 1996, scud,              0,      scud,      scud,     model3_state,     init_scud, ROT0, "Sega", "Scud Race / Sega Super GT - Twin/DX (Export)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // No region specified or selectable
+GAME( 1996, scuddx,         scud,      scud,      scud,     model3_state,     init_scud, ROT0, "Sega", "Scud Race / Sega Super GT - Deluxe (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Japan, USA, Export
+GAME( 1996, scudau,         scud,      scud,      scud,     model3_state,     init_scud, ROT0, "Sega", "Scud Race - Twin/DX (Australia)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, scudplus,       scud,      scud,      scud,     model3_state, init_scudplus, ROT0, "Sega", "Scud Race Plus / Sega Super GT Plus - Twin/DX (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Japan, USA, Export
+GAME( 1997, scudplusa,      scud,      scud,      scud,     model3_state,init_scudplusa, ROT0, "Sega", "Scud Race Plus / Sega Super GT Plus - Twin/DX", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Japan, USA, Export
 GAME( 1997, lostwsga,          0,  lostwsga,      lostwsga, model3_state, init_lostwsga, ROT0, "Sega", "The Lost World: Jurassic Park (Japan, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, lostwsgp,   lostwsga,  lostwsga,      lostwsga, model3_state, init_lostwsga, ROT0, "Sega", "The Lost World: Jurassic Park (location test)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Japan, USA, Export, Koala
 GAME( 1997, vs215,           vs2, model3_15,      model3,   model3_state,    init_vs215, ROT0, "Sega", "Virtua Striker 2 (Step 1.5, Export, USA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

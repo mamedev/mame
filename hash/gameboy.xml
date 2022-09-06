@@ -6258,7 +6258,7 @@ license:CC0
 		<year>1991</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="DMG-EAA" />
-		<info name="release" value="19910809 " />
+		<info name="release" value="19910809" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="0x10000">
@@ -7509,7 +7509,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tamaosu">
+	<!-- unemulated speaker and real-time clock -->
+	<software name="tamaosu" supported="partial">
 		<!-- The game cart has an integrated speaker and a replaceable battery (CR2016). -->
 		<description>Game de Hakken!! Tamagotchi - Osutchi to Mesutchi (Japan)</description>
 		<year>1998</year>
@@ -7714,7 +7715,7 @@ license:CC0
 			<!-- Generic developer board, RAM and battery not used for this game -->
 			<feature name="pcb" value="DMG-MBC1 MULTICHECKER-01" />
 			<feature name="u1" value="U1HC00" />
-			<feature name="u2" value="U2 28PSOCKET [CXK5864PN-15LL]"  />
+			<feature name="u2" value="U2 28PSOCKET [CXK5864PN-15LL]" />
 			<feature name="u3" value="U2 32PSOCKET [HN27C301AG-17]" />
 			<feature name="u4" value="U2 32PSOCKET [HN27C301AG-17]" />
 			<feature name="u5" value="U5 MBC1 [DMG MBC1A]" />
@@ -27784,9 +27785,10 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 	</software>
 
 	<software name="lasama">
-		<description>La Sa Ma Chuan Qi - Story of Lasama (Taiwan)</description>
+		<description>Lāsàmǎ Chuánqí - Story of Lasama (Taiwan)</description>
 		<year>19??</year>
 		<publisher>GOWIN</publisher>
+		<info name="alt_title" value="拉薩瑪傳奇" />
 		<info name="serial" value="GS-04" />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_lasama" />

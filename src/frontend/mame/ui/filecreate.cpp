@@ -208,13 +208,22 @@ void menu_file_create::handle(event const *ev)
 			}
 			break;
 
+		case IPT_UI_PASTE:
+			if (get_selection_ref() == ITEMREF_NEW_IMAGE_NAME)
+			{
+				if (paste_text(m_filename, &osd_is_valid_filename_char))
+					reset(reset_options::REMEMBER_POSITION);
+			}
+			break;
+
 		case IPT_SPECIAL:
 			if (get_selection_ref() == ITEMREF_NEW_IMAGE_NAME)
 			{
-				input_character(m_filename, ev->unichar, &osd_is_valid_filename_char);
-				reset(reset_options::REMEMBER_POSITION);
+				if (input_character(m_filename, ev->unichar, &osd_is_valid_filename_char))
+					reset(reset_options::REMEMBER_POSITION);
 			}
 			break;
+
 		case IPT_UI_CANCEL:
 			m_ok = false;
 			break;

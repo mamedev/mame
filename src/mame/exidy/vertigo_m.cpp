@@ -114,7 +114,7 @@ TIMER_CALLBACK_MEMBER(vertigo_state::sound_command_w)
 	   quickly. Otherwise the main CPU gives up with sound. Boosting
 	   the interleave for a while helps. */
 
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+	machine().scheduler().perfect_quantum(attotime::from_usec(100));
 }
 
 

@@ -45,11 +45,11 @@ device_vc4000_cart_interface::~device_vc4000_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_vc4000_cart_interface::rom_alloc(uint32_t size, const char *tag)
+void device_vc4000_cart_interface::rom_alloc(uint32_t size)
 {
 	if (m_rom == nullptr)
 	{
-		m_rom = device().machine().memory().region_alloc(std::string(tag).append(VC4000SLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom = device().machine().memory().region_alloc(device().subtag("^cart:rom"), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 	}
 }
@@ -180,7 +180,7 @@ image_init_result vc4000_cart_slot_device::call_load()
 			return image_init_result::FAIL;
 		}
 
-		m_cart->rom_alloc(size, tag());
+		m_cart->rom_alloc(size);
 
 		if (!loaded_through_softlist())
 			fread(m_cart->get_rom_base(), size);

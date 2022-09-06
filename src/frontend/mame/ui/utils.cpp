@@ -1028,9 +1028,10 @@ private:
 		}
 	}
 
-	static bool include_clones_default(std::string const &name)
+	static bool include_clones_default(std::string_view name)
 	{
-		return !core_stricmp(name.c_str(), "category.ini") || !core_stricmp(name.c_str(), "alltime.ini");
+		using namespace std::literals;
+		return util::streqlower(name, "category.ini"sv) || util::streqlower(name, "alltime.ini"sv);
 	}
 
 	unsigned m_ini, m_group;

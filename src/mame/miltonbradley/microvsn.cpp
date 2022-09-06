@@ -448,9 +448,9 @@ void microvision_state::microvision(machine_config &config)
 	TMS1100(config, m_tms1100, 0);
 	m_tms1100->set_output_pla(microvision_output_pla[0]);
 	m_tms1100->set_decode_micro().set(FUNC(microvision_state::tms1100_decode_micro));
-	m_tms1100->k().set(FUNC(microvision_state::tms1100_k_r));
-	m_tms1100->o().set(FUNC(microvision_state::tms1100_o_w));
-	m_tms1100->r().set(FUNC(microvision_state::tms1100_r_w));
+	m_tms1100->read_k().set(FUNC(microvision_state::tms1100_k_r));
+	m_tms1100->write_o().set(FUNC(microvision_state::tms1100_o_w));
+	m_tms1100->write_r().set(FUNC(microvision_state::tms1100_r_w));
 
 	I8021(config, m_i8021, 0);
 	m_i8021->bus_in_cb().set(FUNC(microvision_state::i8021_p0_r));

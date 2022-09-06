@@ -1,5 +1,43 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli, Wilbert Pol
+/***************************************************************************
+
+Cardridge port pinouts:
+ Pin  Name     Description
+  1   VCC      +5 VDC
+  2   PHI      CPU clock ?
+  3   /WR      Write
+  4   /RD      Read
+  5   /CS      SRAM select
+  6   A0       Address 0
+  7   A1       Address 1
+  8   A2       Address 2
+  9   A3       Address 3
+ 10   A4       Address 4
+ 11   A5       Address 5
+ 12   A6       Address 6
+ 13   A7       Address 7
+ 14   A8       Address 8
+ 15   A9       Address 9
+ 16   A10      Address 10
+ 17   A11      Address 11
+ 18   A12      Address 12
+ 19   A13      Address 13
+ 20   A14      Address 14
+ 21   A15      Address 15
+ 22   D0       Data 0
+ 23   D1       Data 1
+ 24   D2       Data 2
+ 25   D3       Data 3
+ 26   D4       Data 4
+ 27   D5       Data 5
+ 28   D6       Data 6
+ 29   D7       Data 7
+ 30   /RST     Reset
+ 31   AUDIOIN  Never used ?
+ 32   GND      Ground
+
+***************************************************************************/
 #ifndef MAME_BUS_GAMEBOY_GB_SLOT_H
 #define MAME_BUS_GAMEBOY_GB_SLOT_H
 
@@ -63,7 +101,7 @@ public:
 	virtual uint8_t read_ram(offs_t offset) { return 0xff; }
 	virtual void write_ram(offs_t offset, uint8_t data) {}
 
-	void rom_alloc(uint32_t size, const char *tag);
+	void rom_alloc(uint32_t size);
 	void ram_alloc(uint32_t size);
 	uint8_t* get_rom_base() { return m_rom; }
 	uint8_t* get_ram_base() { return &m_ram[0]; }
@@ -203,7 +241,5 @@ public:
 // device type definition
 DECLARE_DEVICE_TYPE(GB_CART_SLOT,       gb_cart_slot_device)
 DECLARE_DEVICE_TYPE(MEGADUCK_CART_SLOT, megaduck_cart_slot_device)
-
-#define GBSLOT_ROM_REGION_TAG ":cart:rom"
 
 #endif // MAME_BUS_GAMEBOY_GB_SLOT_H

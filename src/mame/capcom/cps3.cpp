@@ -131,6 +131,7 @@ JoJo's Bizarre Adventure                                   JJM999A0F  CP3000B0G 
 JoJo's Bizarre Adventure                                   JJM999A0F  CP3000B0G  EUROPE  X          CAP-JJM0A0  CAP-JJM-1   CAP-JJM-120  990927
 JoJo no Kimyou na Bouken: Mirai e no Isan                  JJM99900F  CP300000G  JAPAN       X                                           990913
 JoJo no Kimyou na Bouken: Mirai e no Isan                  JJM99900F  CP300000G  JAPAN       X                                           990927
+JoJo no Kimyou na Bouken: Mirai e no Isan                  JJM99900F  CP300000G  JAPAN*      X                                           991015
 JoJo's Bizarre Adventure                                   JJM999A0F  CP3000B0G  EUROPE      X                                           990913
 JoJo's Bizarre Adventure                                   JJM999A0F  CP3000B0G  EUROPE      X                                           990927
 

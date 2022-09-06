@@ -149,7 +149,7 @@ void DasmWindow::toggleBreakpointAtCursor(bool changedTo)
 		// If none exists, add a new one
 		if (!bp)
 		{
-			int32_t bpindex = cpuinfo->breakpoint_set(address, nullptr, nullptr);
+			int32_t bpindex = cpuinfo->breakpoint_set(address);
 			m_machine.debugger().console().printf("Breakpoint %X set\n", bpindex);
 		}
 		else

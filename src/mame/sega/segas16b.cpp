@@ -1316,7 +1316,7 @@ TIMER_CALLBACK_MEMBER(segas16b_state::i8751_sync)
 	if (!m_i8751_vblank_hook.isnull())
 		m_mcu->suspend(SUSPEND_REASON_DISABLE, 1);
 	else if (m_mcu != nullptr)
-		machine().scheduler().boost_interleave(attotime::zero, attotime::from_msec(10));
+		machine().scheduler().perfect_quantum(attotime::from_msec(10));
 }
 
 TIMER_CALLBACK_MEMBER(segas16b_state::atomicp_sound_irq)

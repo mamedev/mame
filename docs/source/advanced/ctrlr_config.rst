@@ -228,3 +228,34 @@ Here’s an example that overrides defaults for 280-ZZZAP:
 
 This sets the controls to steer left and right to the K and J keys,
 respectively, and disables the toggle setting for the gear shift input.
+
+
+.. _ctrlrcfg-mapdevice:
+
+Assigning input device numbers
+------------------------------
+
+Use ``mapdevice`` elements with ``device`` and ``controller`` attributes to
+assign stable numbers to input devices.  Note that all devices explicitly
+configured in this way must be connected when MAME starts for this to work as
+expected.
+
+Set the ``device`` attribute to the device ID of the input device, and set the
+``controller`` attribute to the desired input device token (device type and
+number).
+
+Here’s an example numbering two light guns and two XInput game controllers:
+
+.. code-block:: XML
+
+    <system name="default">
+        <input>
+            <mapdevice device="VID_D209&amp;PID_1601" controller="GUNCODE_1" />
+            <mapdevice device="VID_D209&amp;PID_1602" controller="GUNCODE_2" />
+            <mapdevice device="XInput Player 1" controller="JOYCODE_1" />
+            <mapdevice device="XInput Player 2" controller="JOYCODE_2" />
+        </input>
+    </system>
+
+MAME applies ``mapdevice`` elements found inside any applicable ``system``
+element.

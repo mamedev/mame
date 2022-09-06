@@ -69,6 +69,11 @@ void menu_selector::handle(event const *ev)
 			}
 			break;
 
+		case IPT_UI_PASTE:
+			if (paste_text(m_search, uchar_is_printable))
+				reset(reset_options::SELECT_FIRST);
+			break;
+
 		case IPT_SPECIAL:
 			if (input_character(m_search, ev->unichar, uchar_is_printable))
 				reset(reset_options::SELECT_FIRST);

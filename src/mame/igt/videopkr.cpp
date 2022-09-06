@@ -1408,7 +1408,7 @@ ROM_START( videopkr )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "vpbjorg.col",    0x0000, 0x0100, CRC(09abf5f1) SHA1(f2d6b4f2f08b47b93728dafb50576d5ca859255f) )
-	ROM_END
+ROM_END
 
 ROM_START( blckjack )
 	ROM_REGION( 0x1000, "maincpu", 0 )

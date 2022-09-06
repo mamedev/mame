@@ -115,7 +115,8 @@ public:
 	void timeslice();
 	void abort_timeslice() noexcept;
 	void trigger(int trigid, const attotime &after = attotime::zero);
-	void boost_interleave(const attotime &timeslice_time, const attotime &boost_duration);
+	void add_quantum(const attotime &quantum, const attotime &duration);
+	void perfect_quantum(const attotime &duration);
 	void suspend_resume_changed() { m_suspend_changes_pending = true; }
 
 	// timers, specified by callback/name
@@ -140,7 +141,6 @@ private:
 	void compute_perfect_interleave();
 	void rebuild_execute_list();
 	void apply_suspend_changes();
-	void add_scheduling_quantum(const attotime &quantum, const attotime &duration);
 
 	// timer helpers
 	emu_timer &timer_list_insert(emu_timer &timer);
