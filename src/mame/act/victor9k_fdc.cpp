@@ -34,8 +34,6 @@
     - communication error with SCP after loading boot sector
         - bp ff1a8
         - patch ff1ab=c3
-    - single/double sided jumper
-    - header sync length unknown (6 is too short)
     - 8048 spindle speed control
 
 */
