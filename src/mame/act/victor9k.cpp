@@ -644,11 +644,13 @@ void victor9k_state::machine_start()
 	int m_ram_size = m_ram->size();
     u8 *m_ram_ptr = m_ram->pointer();
 
-    if (LOG) logerror("ramsize %i\n", m_ram_size);
-    int ramsize = m_ram_size - 0x1ffff; // subtract 128K for main board, which is handled seperately
+    int ramsize = m_ram_size;
 	if (ramsize > 0) {
 		address_space& space = m_maincpu->space(AS_PROGRAM);
-		space.install_ram(0x020000, ramsize - 1 + 0x20000, m_ram_ptr + 0x020000);
+		if (ramsize > 0xdffff)   //the 896KB option overlaps 1 bit with 
+			ramsize = 0xdffff;   //the I/O memory space, truncating
+		if (LOG) logerror("install_ram ramsize %x\n", ramsize);
+		space.install_ram(0x0, ramsize, m_ram_ptr);
 	}
 }
 
