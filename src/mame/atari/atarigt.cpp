@@ -8,7 +8,15 @@
 
     Games supported:
         * T-Mek (1994) [5 sets]
-        * Primal Rage (1994) [2 sets]
+        * Primal Rage v2.0 (1994)
+		 	Build:	AUG 9 1994 17:05:40
+			   OS:	AUG 9 1994 17:05:02
+        * Primal Rage v2.3 (1994)
+		 	Build:	DEC 6 1994 16:04:09
+			   OS:	DEC 7 1994 17:24:05
+        * Primal Rage v2.3 Japanese (1994)
+		 	Build:	JAN 4 1995 18:25:45
+			   OS:	JAN 4 1995 18:28:24
 
     Known bugs:
         * Protection not fully understood
