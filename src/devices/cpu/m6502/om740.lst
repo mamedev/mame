@@ -1164,7 +1164,7 @@ adct_aba
 	TMP = set_h(TMP, read_pc());
 	TMP2 = read_data(TMP);
 	TMP = read(X);
-	read_dummy(TMP);
+	read_dummy(X);
 	do_adct(TMP2);
 	write(X, TMP);
 	prefetch();
@@ -1220,11 +1220,11 @@ adct_idy
 	prefetch();
 
 adct_imm
-	TMP = read_pc();
-	TMP2 = read(X);
+	TMP2 = read_pc();
+	TMP = read(X);
 	read_dummy(X);
-	do_adct(TMP);
-	write(X, TMP2);
+	do_adct(TMP2);
+	write(X, TMP);
 	prefetch();
 
 adct_zpg
@@ -1390,7 +1390,7 @@ cmpt_idy
 	read_dummy(set_l(TMP, TMP+Y));
 	TMP2 = read_data(TMP+Y);
 	TMP = read(X);
-	do_cmp(TMP, read(TMP2+Y));
+	do_cmp(TMP, TMP2);
 	prefetch();
 
 cmpt_imm
@@ -1748,11 +1748,11 @@ sbct_idy
 	prefetch();
 
 sbct_imm
-	TMP = read_pc();
-	TMP2 = read(X);
+	TMP2 = read_pc();
+	TMP = read(X);
 	read_dummy(X);
-	do_sbct(TMP);
-	write(X, TMP2);
+	do_sbct(TMP2);
+	write(X, TMP);
 	prefetch();
 
 sbct_zpg
