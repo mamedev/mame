@@ -107,8 +107,7 @@
 
 #include "coretmpl.h" // util::BIT
 #include "ioprocs.h"
-
-#include "osdcore.h" // osd_printf_*
+#include "imageutl.h"
 
 #include <cstring>
 #include <iterator>
@@ -178,71 +177,71 @@ int victor9k_format::identify(util::random_read &io, uint32_t form_factor, const
 void victor9k_format::log_boot_sector(uint8_t *data)
 {
 	// System disc ID
-	osd_printf_verbose("System disc: %s\n", ((data[0] == 0xff) && (data[1] == 0x00)) ? "yes" : "no");
+	LOG_FORMATS("System disc: %s\n", ((data[0] == 0xff) && (data[1] == 0x00)) ? "yes" : "no");
 
 	// Load address
-	osd_printf_verbose("Load address: %04x\n", (data[2] && data[3]));
+	LOG_FORMATS("Load address: %04x\n", (data[2] && data[3]));
 
 	// Length
-	osd_printf_verbose("Length: %04x\n", (data[4] <<8 | data[5]));
+	LOG_FORMATS("Length: %04x\n", (data[4] <<8 | data[5]));
 
 	// Entry offset
-	osd_printf_verbose("Entry offset: %04x\n", (data[6] << 8 | data[7]));
+	LOG_FORMATS("Entry offset: %04x\n", (data[6] << 8 | data[7]));
 
 	// Entry segment
-	osd_printf_verbose("Entry segment: %04x\n", (data[8] << 8 | data[9]));
+	LOG_FORMATS("Entry segment: %04x\n", (data[8] << 8 | data[9]));
 
 	// I.D.
-	osd_printf_verbose("Disk I.D.: %s\n", (data[10] << 8 | data[17]));
+	LOG_FORMATS("Disk I.D.: %s\n", (data[10] << 8 | data[17]));
 
 	// Part number
-	osd_printf_verbose("Part number: %s\n", (data[18] << 8 | data[25]));
+	LOG_FORMATS("Part number: %s\n", (data[18] << 8 | data[25]));
 
 	// Sector size
-	osd_printf_verbose("Sector size: %04d\n", (data[26] << 8 | data[27]));
+	LOG_FORMATS("Sector size: %04d\n", (data[26] << 8 | data[27]));
 
 	// Data start
-	osd_printf_verbose("Data start: %04x\n", (data[28] << 8 | data[29]));
+	LOG_FORMATS("Data start: %04x\n", (data[28] << 8 | data[29]));
 
 	// Boot start
-	osd_printf_verbose("Boot start: %04x\n", (data[30] << 8 | data[31]));
+	LOG_FORMATS("Boot start: %04x\n", (data[30] << 8 | data[31]));
 
 	//Disk type - flags
-	osd_printf_verbose("%s sided\n", (data[32]) ? "Double" : "Single");
+	LOG_FORMATS("%s sided\n", (data[32]) ? "Double" : "Single");
 
     //Sector Interleave
-	osd_printf_verbose("Sector Interleave: %02x\n", data[33]);
+	LOG_FORMATS("Sector Interleave: %02x\n", data[33]);
 
 	// Disc type
 	switch (data[34]) {
-		case 0x01: osd_printf_verbose("Disc type: CP/M\n"); break;
-		case 0x10: osd_printf_verbose("Disc type: MS-DOS\n"); break;
-		default: osd_printf_verbose("Disc type: unknown\n"); break;
+		case 0x01: LOG_FORMATS("Disc type: CP/M\n"); break;
+		case 0x10: LOG_FORMATS("Disc type: MS-DOS\n"); break;
+		default: LOG_FORMATS("Disc type: unknown\n"); break;
 	}
 
 	//reserved
-	osd_printf_verbose("Part number: %s\n", data[35] << 8 | data[37]);
+	LOG_FORMATS("Part number: %s\n", data[35] << 8 | data[37]);
 
 	// Speed table
-	osd_printf_verbose("Speed table:  ");
+	LOG_FORMATS("Speed table:  ");
 	for (int i = 38; i < 56; i++) {
-		osd_printf_verbose("%02x ", data[i]);
+		LOG_FORMATS("%02x ", data[i]);
 	}
-	osd_printf_verbose("\n");
+	LOG_FORMATS("\n");
 
 	// Zone table
-	osd_printf_verbose("Zone table:            ");
+	LOG_FORMATS("Zone table:            ");
 	for (int i = 56; i < 71; i++) {
-		osd_printf_verbose("%02x ", data[i]);
+		LOG_FORMATS("%02x ", data[i]);
 	}
-	osd_printf_verbose("\n");
+	LOG_FORMATS("\n");
 
 	// Sector/track
-	osd_printf_verbose("Sector/track:          ");
+	LOG_FORMATS("Sector/track:          ");
 	for (int i = 71; i < 86; i++) {
-		osd_printf_verbose("%02x ", data[i]);
+		LOG_FORMATS("%02x ", data[i]);
 	}
-	osd_printf_verbose("\n");
+	LOG_FORMATS("\n");
 }
 
 floppy_image_format_t::desc_e* victor9k_format::get_sector_desc(const format &f, int &current_size, int sector_count)
@@ -296,7 +295,7 @@ bool victor9k_format::load(util::random_read &io, uint32_t form_factor, const st
 
 	const format &f = formats[type];
 
-	osd_printf_verbose("Type: %d Head Count: %d Sector Count: %d\n", type, 
+	LOG_FORMATS("Type: %d Head Count: %d Sector Count: %d\n", type, 
 		f.head_count, f.sector_count);
 
 	uint64_t size;
@@ -314,7 +313,7 @@ bool victor9k_format::load(util::random_read &io, uint32_t form_factor, const st
 
 	int track_offset = 0;
 
-	osd_printf_verbose("load Heads: %01d Tracks: %02d Sectors/track head[1]track[1]: %02d\n ", 
+	LOG_FORMATS("load Heads: %01d Tracks: %02d Sectors/track head[1]track[1]: %02d\n ", 
 		f.head_count, f.track_count, sectors_per_track[1][1]);
 
 	for (int head = 0; head < f.head_count; head++) {
@@ -328,7 +327,7 @@ bool victor9k_format::load(util::random_read &io, uint32_t form_factor, const st
 
 			int remaining_size = total_size - current_size;
 			if(remaining_size < 0) {
-				osd_printf_error("victor9k_format: Incorrect track layout, max_size=%d, current_size=%d\n", total_size, current_size);
+				LOG_FORMATS("victor9k_format: Incorrect track layout, max_size=%d, current_size=%d\n", total_size, current_size);
 				return false;
 			}
 
@@ -353,7 +352,7 @@ bool victor9k_format::load(util::random_read &io, uint32_t form_factor, const st
 
 int victor9k_format::get_rpm(int head, int track)
 {
-	osd_printf_verbose("Head: %1d TracK: %02d \n ", head, track);
+	LOG_FORMATS("Head: %1d TracK: %02d \n ", head, track);
 	return rpm[speed_zone[head][track]];
 }
 
@@ -450,14 +449,14 @@ bool victor9k_format::save(util::random_read_write &io, const std::vector<uint32
 	int type = victor9k_format::identify(image);
 	uint64_t size;
 	io.length(size);
-	osd_printf_verbose("save type: %01d, size: %d\n", type, size);
+	LOG_FORMATS("save type: %01d, size: %d\n", type, size);
 
 	if(type == -1)
 		return false;
 
 	const format &f = formats[type];
 
-	osd_printf_verbose("save Heads: %01d Tracks: %02d Sectors/track head[1]track[1]: %02d\n ", 
+	LOG_FORMATS("save Heads: %01d Tracks: %02d Sectors/track head[1]track[1]: %02d\n ", 
 		f.head_count, f.track_count, sectors_per_track[1][1]);
 	for(int head=0; head < f.head_count; head++) {
 		for(int track=0; track < f.track_count; track++) {
@@ -466,7 +465,7 @@ bool victor9k_format::save(util::random_read_write &io, const std::vector<uint32
 			uint8_t sectdata[40*512];
 			desc_s sectors[40];
 			int offset = get_image_offset(f, head, track);
-			osd_printf_verbose(">>type: %s, head: %d, track: %d, sector_count: %d, offset: %d, track_size: %d\n", 
+			LOG_FORMATS(">>type: %s, head: %d, track: %d, sector_count: %d, offset: %d, track_size: %d\n", 
 				f.sector_base_size, head, track, sector_count, offset, track_size);
 
 			build_sector_description(f, sectdata, 0, sectors, sector_count);
@@ -496,17 +495,17 @@ void victor9k_format::extract_sectors(floppy_image *image, const format &f, desc
 	for(int i=0; i<sector_count; i++) {
 		desc_s &ds = sdesc[i];
 		const auto &data = sectors[ds.sector_id];
-		osd_printf_verbose("Head: %01d TracK: %02d Total Sectors: %02d Current Sector: %02d ", 
+		LOG_FORMATS("Head: %01d TracK: %02d Total Sectors: %02d Current Sector: %02d ", 
 			head, track, sector_count, i);
 		if(data.empty()) {
 			memset((uint8_t *)ds.data, 0, ds.size);
 		} else if(data.size() < ds.size) {
 			memcpy((uint8_t *)ds.data, data.data(), data.size() - 1);
 			memset((uint8_t *)ds.data + data.size() - 1, 0, data.size() - ds.size);
-			osd_printf_verbose("data.size(): %01d\n", data.size());
+			LOG_FORMATS("data.size(): %01d\n", data.size());
 		} else
 			memcpy((uint8_t *)ds.data, data.data(), ds.size);
-		osd_printf_verbose("data.size(): %01d\n", data.size());
+		LOG_FORMATS("data.size(): %01d\n", data.size());
 	}
 }
 
