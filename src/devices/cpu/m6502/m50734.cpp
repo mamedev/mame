@@ -62,6 +62,8 @@ void m50734_device::device_start()
 
 void m50734_device::device_reset()
 {
+	m740_device::device_reset();
+
 	std::fill(std::begin(m_port_direction), std::end(m_port_direction), 0x00);
 	for (int n = 0; n < 4; n++)
 		m_port_out_cb[n](m_port_3state[n]);
