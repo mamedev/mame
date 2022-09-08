@@ -1024,6 +1024,8 @@ if (BUSES["CBMIEC"]~=null) then
 		MAME_DIR .. "src/devices/bus/cbmiec/fd2000.h",
 		MAME_DIR .. "src/devices/bus/cbmiec/interpod.cpp",
 		MAME_DIR .. "src/devices/bus/cbmiec/interpod.h",
+		MAME_DIR .. "src/devices/bus/cbmiec/mps1200.cpp",
+		MAME_DIR .. "src/devices/bus/cbmiec/mps1200.h",
 		MAME_DIR .. "src/devices/bus/cbmiec/serialbox.cpp",
 		MAME_DIR .. "src/devices/bus/cbmiec/serialbox.h",
 		MAME_DIR .. "src/devices/bus/cbmiec/vic1515.cpp",
