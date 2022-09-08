@@ -101,8 +101,6 @@ protected:
 	O(bvc_m_rel);
 	O(bvs_m_rel);
 	O(cmp_m_abx); O(cmp_m_aby); O(cmp_m_idx); O(cmp_m_idy); O(cmp_m_zpx);
-	O(cpx_m_aba);
-	O(cpy_m_aba);
 	O(dec_m_aba); O(dec_m_abx); O(dec_m_zpg); O(dec_m_zpx);
 	O(eor_m_abx); O(eor_m_aby); O(eor_m_idx); O(eor_m_idy); O(eor_m_zpx);
 	O(inc_m_aba); O(inc_m_abx); O(inc_m_zpg); O(inc_m_zpx);
