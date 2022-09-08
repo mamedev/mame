@@ -63,6 +63,7 @@ void m50734_device::device_start()
 void m50734_device::device_reset()
 {
 	m740_device::device_reset();
+	SP = 0x01ff;
 
 	std::fill(std::begin(m_port_direction), std::end(m_port_direction), 0x00);
 	for (int n = 0; n < 4; n++)
@@ -110,7 +111,7 @@ void m50734_device::port_w(offs_t offset, u8 data)
 	{
 		if (m_port_direction[N] != data)
 		{
-			logerror("Port P%d direction = $%02X\n", N, data);
+			logerror("%s: Port P%d direction = $%02X\n", machine().describe_context(), N, data);
 			m_port_direction[N] = data;
 			m_port_out_cb[N]((data & m_port_latch[N]) | (m_port_3state[N] & ~m_port_direction[N]));
 		}
@@ -132,7 +133,7 @@ u8 m50734_device::p0_function_r()
 
 void m50734_device::p0_function_w(u8 data)
 {
-	logerror("Port P0 function = $%02X\n", data);
+	logerror("%s: Port P0 function = $%02X\n", machine().describe_context(), data);
 	m_p0_function = data;
 }
 
@@ -143,7 +144,7 @@ u8 m50734_device::p2_p3_function_r()
 
 void m50734_device::p2_p3_function_w(u8 data)
 {
-	logerror("Port P2/P3 function = $%02X\n", data);
+	logerror("%s: Port P2/P3 function = $%02X\n", machine().describe_context(), data);
 	m_p2_p3_function = data & 0xc7;
 }
 
