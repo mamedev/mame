@@ -19,7 +19,13 @@
 	- AY-5-1013A UART
 
     TODO:
-	- Almost everything
+	- Character attributes (RAM at 0xc000)
+	- Cursor
+	- 132 column mode
+	- Smooth scrolling
+	- Timings
+	- Printer
+	- Verify/fix EAROM emulation
 	- Move ergo201 driver here? The hardware is very similar
 
     Notes:
@@ -27,6 +33,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "machine/ay31015.h"
 #include "machine/er1400.h"
@@ -92,8 +99,13 @@ private:
 	void latch_w(uint8_t data);
 
 	void scanline_cb(uint32_t data);
+	void vsync_cb(int state);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void row_w(offs_t offset, uint8_t data);
 	void brightness_w(uint8_t data);
+
+	uint8_t m_row_address;
+	uint8_t m_row_attr;
 
 	bool m_display_enabled;
 	bool m_nmi_disabled;
@@ -112,6 +124,7 @@ void f4431_state::mem_map(address_map &map)
 	map(0x4000, 0x4000).w(FUNC(f4431_state::latch_w));
 	map(0x5000, 0x5000).w(m_uart, FUNC(ay31015_device::transmit));
 	map(0x6000, 0x6000).r(m_uart, FUNC(ay31015_device::receive));
+	map(0x6000, 0x6fff).w(FUNC(f4431_state::row_w));
 	map(0x6001, 0x6001).r(FUNC(f4431_state::latch_r));
 	map(0x7000, 0x77ff).ram(); // scratchpad ram
 	map(0x8000, 0x8fff).ram().share(m_ascii);
@@ -150,7 +163,16 @@ void f4431_state::scanline_cb(uint32_t data)
 	// in the actual system this would be generated
 	// by the r0 and r3 output of the vtc
 
-	if (!m_nmi_disabled && ((data % 10) == 0))
+	if (!m_nmi_disabled && ((data % 10) == 9))
+	{
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	}
+}
+
+void f4431_state::vsync_cb(int state)
+{
+	if (!m_nmi_disabled && state)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -159,25 +181,68 @@ void f4431_state::scanline_cb(uint32_t data)
 
 uint32_t f4431_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (m_display_enabled)
+	if (m_display_enabled && BIT(m_row_attr, 6))
 	{
 		for (int i = cliprect.min_y; i <= cliprect.max_y; i++)
 		{
-			for (int x = 0; x < 80; x++)
-			{
-				uint8_t code = m_ascii[(i / 10) * 80 + x];
-				uint8_t data = m_chargen[((i % 10) << 7) | code];
+			int line = i % 10;
 
-				bitmap.pix(i, x * 10 + 0) = BIT(data, 7) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix(i, x * 10 + 1) = (BIT(data, 7) || BIT(data, 6)) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix(i, x * 10 + 2) = (BIT(data, 6) || BIT(data, 5)) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix(i, x * 10 + 3) = (BIT(data, 5) || BIT(data, 4)) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix(i, x * 10 + 4) = (BIT(data, 4) || BIT(data, 3)) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix(i, x * 10 + 5) = (BIT(data, 3) || BIT(data, 2)) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix(i, x * 10 + 6) = (BIT(data, 2) || BIT(data, 1)) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix(i, x * 10 + 7) = (BIT(data, 1) || BIT(data, 0)) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix(i, x * 10 + 8) = BIT(data, 0) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix(i, x * 10 + 9) = rgb_t::black();
+			// double height, bottom
+			if ((m_row_attr & 0x30) == 0x10)
+				line = line / 2 + 5;
+			
+			// double height, top
+			if ((m_row_attr & 0x30) == 0x20)
+				line = line / 2;
+			
+			if (BIT(m_row_attr, 4) || BIT(m_row_attr, 5) )
+			{
+				// double width
+				for (int x = 0; x < 40; x++)
+				{
+					uint8_t code = m_ascii[(m_row_address << 4) + x * 2];
+					uint8_t data = m_chargen[(line << 7) | code];
+
+					bitmap.pix(i, x * 20 + 0) = BIT(data, 7) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(i, x * 20 + 1) = BIT(data, 7) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(i, x * 20 + 2) = (BIT(data, 7) || BIT(data, 6)) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(i, x * 20 + 3) = (BIT(data, 7) || BIT(data, 6)) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(i, x * 20 + 4) = (BIT(data, 6) || BIT(data, 5)) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(i, x * 20 + 5) = (BIT(data, 6) || BIT(data, 5)) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(i, x * 20 + 6) = (BIT(data, 5) || BIT(data, 4)) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(i, x * 20 + 7) = (BIT(data, 5) || BIT(data, 4)) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(i, x * 20 + 8) = (BIT(data, 4) || BIT(data, 3)) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(i, x * 20 + 9) = (BIT(data, 4) || BIT(data, 3)) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(i, x * 20 + 10) = (BIT(data, 3) || BIT(data, 2)) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(i, x * 20 + 11) = (BIT(data, 3) || BIT(data, 2)) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(i, x * 20 + 12) = (BIT(data, 2) || BIT(data, 1)) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(i, x * 20 + 13) = (BIT(data, 2) || BIT(data, 1)) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(i, x * 20 + 14) = (BIT(data, 1) || BIT(data, 0)) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(i, x * 20 + 15) = (BIT(data, 1) || BIT(data, 0)) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(i, x * 20 + 16) = BIT(data, 0) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(i, x * 20 + 17) = BIT(data, 0) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(i, x * 20 + 18) = rgb_t::black();
+					bitmap.pix(i, x * 20 + 19) = rgb_t::black();
+				}
+			}
+			else
+			{
+				for (int x = 0; x < 80; x++)
+				{
+					uint8_t code = m_ascii[(m_row_address << 4) + x];
+					uint8_t data = m_chargen[(line << 7) | code];
+
+					bitmap.pix(i, x * 10 + 0) = BIT(data, 7) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(i, x * 10 + 1) = (BIT(data, 7) || BIT(data, 6)) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(i, x * 10 + 2) = (BIT(data, 6) || BIT(data, 5)) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(i, x * 10 + 3) = (BIT(data, 5) || BIT(data, 4)) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(i, x * 10 + 4) = (BIT(data, 4) || BIT(data, 3)) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(i, x * 10 + 5) = (BIT(data, 3) || BIT(data, 2)) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(i, x * 10 + 6) = (BIT(data, 2) || BIT(data, 1)) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(i, x * 10 + 7) = (BIT(data, 1) || BIT(data, 0)) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(i, x * 10 + 8) = BIT(data, 0) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(i, x * 10 + 9) = rgb_t::black();
+				}
 			}
 		}
 	}
@@ -187,6 +252,14 @@ uint32_t f4431_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	}
 
 	return 0;
+}
+
+void f4431_state::row_w(offs_t offset, uint8_t data)
+{
+	logerror("row_w: %02x %02x line %d %d\n", offset, data, m_screen->vpos(), m_screen->hpos());
+
+	m_row_address = offset >> 4;
+	m_row_attr = data;
 }
 
 void f4431_state::brightness_w(uint8_t data)
@@ -217,7 +290,7 @@ uint8_t f4431_state::latch_r()
 	data |= m_uart->dav_r() << 1;
 	data |= m_switches->read() << 2;
 	data |= m_earom->data_r() << 5;
-	data |= m_screen->vblank() << 7;
+	data |= (m_screen->vblank() ? 0 : 1) << 7;
 
 	return data;
 }
@@ -260,6 +333,8 @@ void f4431_state::machine_start()
 	m_uart->write_swe(0);
 
 	// register for save states
+	save_item(NAME(m_row_address));
+	save_item(NAME(m_row_attr));
 	save_item(NAME(m_display_enabled));
 	save_item(NAME(m_nmi_disabled));
 }
@@ -300,11 +375,6 @@ void f4431_state::f4431(machine_config &config)
 	m_ctc->set_clk<2>(4_MHz_XTAL / 13);
 	m_ctc->zc_callback<2>().set(m_dart, FUNC(z80dart_device::rxtxcb_w));
 
-	Z80DART(config, m_dart, 4_MHz_XTAL);
-	m_dart->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	// port a: serial i/o
-	// port b: printer
-
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_color(rgb_t::green());
 	m_screen->set_raw(9.828_MHz_XTAL * 2, 1020, 0, 800, 268, 0, 250); // probably wrong
@@ -317,6 +387,17 @@ void f4431_state::f4431(machine_config &config)
 	m_vtc->set_char_width(10); // renders in half-dots?
 	m_vtc->set_screen("screen");
 	m_vtc->hsyn_callback().set(m_ctc, FUNC(z80ctc_device::trg3));
+	m_vtc->vsyn_callback().set(FUNC(f4431_state::vsync_cb));
+
+	Z80DART(config, m_dart, 4_MHz_XTAL);
+	m_dart->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_dart->out_txda_callback().set("comm", FUNC(rs232_port_device::write_txd));
+	m_dart->out_rtsa_callback().set("comm", FUNC(rs232_port_device::write_rts));
+	// port b: printer
+
+	rs232_port_device &porta(RS232_PORT(config, "comm", default_rs232_devices, nullptr));
+	porta.rxd_handler().set(m_dart, FUNC(z80dart_device::rxa_w));
+	porta.cts_handler().set(m_dart, FUNC(z80dart_device::ctsa_w));
 
 	AY31015(config, m_uart);
 	m_uart->set_auto_rdav(true);
@@ -374,4 +455,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME  FLAGS
-COMP( 1981, f4431, 0,       0,     f4431,   f4431, f4431_state, empty_init, "Facit", "4431",   MACHINE_IS_SKELETON )
+COMP( 1981, f4431, 0,       0,     f4431,   f4431, f4431_state, empty_init, "Facit", "4431",   MACHINE_NOT_WORKING )
