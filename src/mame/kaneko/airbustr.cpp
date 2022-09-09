@@ -1,6 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders: Luca Elia
-
 /***************************************************************************
 
                                 Air Buster
@@ -86,10 +85,6 @@ f150<-  index of table of routines at 2907
 
 ----------------
 
-
-
-
-
                     Interesting routines (sub CPU)
                     -------------------------------
 
@@ -154,13 +149,6 @@ f14c    scroll regs high bits
 
 ----------------
 
-
-
-
-
-
-
-
                     Interesting routines (sound CPU)
                     -------------------------------
 
@@ -179,12 +167,11 @@ c760    ROM bank
                                 To Do
                                 -----
 
-- Is the sub CPU / sound CPU communication status port (0e) correct ?
-- Main CPU: port  01 ? boot sub/sound CPU?
+- Is the sub CPU / sound CPU communication status port (0x0e) correct ?
+- Main CPU: port 0x01 ? boot sub/sound CPU?
 - Sub  CPU: port 0x38 ? irq ack?
 - incomplete DSWs
 - Spriteram low 0x300 bytes (priority?)
-- Hook up KANEKO CALC1 chip for the original sets
 */
 
 /*
@@ -228,7 +215,6 @@ Code at 505: waits for bit 1 to go low, writes command, waits for bit
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
-#include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "sound/ymopn.h"
 
@@ -265,18 +251,16 @@ public:
 		, m_slave(*this, "slave")
 		, m_audiocpu(*this, "audiocpu")
 		, m_pandora(*this, "pandora")
+		, m_calc1(*this, "calc1")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
-		, m_watchdog(*this, "watchdog")
 		, m_soundlatch(*this, "soundlatch%u", 1)
 	{
 	}
 
 	void airbustr(machine_config &config);
 	void airbustrb(machine_config &config);
-
-	void init_airbustr();
 
 protected:
 	virtual void machine_start() override;
@@ -304,13 +288,14 @@ private:
 	required_device<cpu_device> m_slave;
 	required_device<cpu_device> m_audiocpu;
 	required_device<kaneko_pandora_device> m_pandora;
+	optional_device<kaneko_hit_device> m_calc1;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_device<watchdog_timer_device> m_watchdog;
 	required_device_array<generic_latch_8_device, 2> m_soundlatch;
 
-	uint8_t devram_r(address_space &space, offs_t offset);
+	void calc1_w(offs_t offset, uint8_t data);
+	uint8_t calc1_r(offs_t offset);
 	void master_nmi_trigger_w(uint8_t data);
 	void master_bankswitch_w(uint8_t data);
 	void slave_bankswitch_w(uint8_t data);
@@ -325,16 +310,18 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	INTERRUPT_GEN_MEMBER(slave_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
-	void master_io_map(address_map &map);
+
 	void master_map(address_map &map);
-	void slave_io_map(address_map &map);
+	void master_prot_map(address_map &map);
+	void master_io_map(address_map &map);
 	void slave_map(address_map &map);
-	void sound_io_map(address_map &map);
+	void slave_io_map(address_map &map);
 	void sound_map(address_map &map);
+	void sound_io_map(address_map &map);
 };
 
 
-// video
+// Video
 
 /**************************************************************************
 
@@ -363,7 +350,6 @@ private:
 
 
 **************************************************************************/
-
 
 /*  Scroll Registers
 
@@ -444,40 +430,25 @@ WRITE_LINE_MEMBER(airbustr_state::screen_vblank)
 }
 
 
-// machine
+// Machine
 
 // Read / Write Handlers
-uint8_t airbustr_state::devram_r(address_space &space, offs_t offset)
+
+void airbustr_state::calc1_w(offs_t offset, uint8_t data)
 {
-	// this is a custom implementation of the Kaneko CALC1 chip. TODO: hook up the generic implementation in kaneko_hit.cpp
-	switch (offset)
-	{
-		/* Reading efe0 probably resets a watchdog mechanism
-		   that would reset the main CPU. We avoid this and patch
-		   the ROM instead (main CPU has to be reset once at startup) */
-		case 0xfe0:
-			return m_watchdog->reset_r(space);
+	offset += 0x1fe0;
+	m_devram[offset] = data;
 
-		/* Reading a word at eff2 probably yields the product
-		   of the words written to eff0 and eff2 */
-		case 0xff2:
-		case 0xff3:
-		{
-			int x = (m_devram[0xff0] + m_devram[0xff1] * 256) * (m_devram[0xff2] + m_devram[0xff3] * 256);
-			if (offset == 0xff2)
-				return (x & 0x00ff) >> 0;
-			else
-				return (x & 0xff00) >> 8;
-		}
+	// CALC1 chip is 16-bit
+	uint16_t data16 = m_devram[offset | 1] << 8 | m_devram[offset & ~1];
+	m_calc1->kaneko_hit_w((offset & 0x1f) / 2, data16);
+}
 
-		/* Reading eff4, F0 times must yield at most 80-1 consecutive
-		   equal values */
-		case 0xff4:
-			return machine().rand();
-
-		default:
-			return m_devram[offset];
-	}
+uint8_t airbustr_state::calc1_r(offs_t offset)
+{
+	// CALC1 chip is 16-bit
+	uint16_t ret = m_calc1->kaneko_hit_r(offset / 2);
+	return (offset & 1) ? (ret >> 8) : (ret & 0xff);
 }
 
 void airbustr_state::master_nmi_trigger_w(uint8_t data)
@@ -537,15 +508,23 @@ void airbustr_state::coin_counter_w(uint8_t data)
 	machine().bookkeeping().coin_lockout_w(1, ~data & 8);
 }
 
+
 // Memory Maps
+
 void airbustr_state::master_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr(m_masterbank);
 	map(0xc000, 0xcfff).rw(m_pandora, FUNC(kaneko_pandora_device::spriteram_r), FUNC(kaneko_pandora_device::spriteram_w));
 	map(0xd000, 0xdfff).ram();
-	map(0xe000, 0xefff).ram().share(m_devram); // shared with protection device
+	map(0xe000, 0xefff).ram().share(m_devram); // shared with protection device (see below)
 	map(0xf000, 0xffff).ram().share("master_slave");
+}
+
+void airbustr_state::master_prot_map(address_map &map)
+{
+	master_map(map);
+	map(0xefe0, 0xeff5).rw(FUNC(airbustr_state::calc1_r), FUNC(airbustr_state::calc1_w));
 }
 
 void airbustr_state::master_io_map(address_map &map)
@@ -600,7 +579,8 @@ void airbustr_state::sound_io_map(address_map &map)
 	map(0x06, 0x06).r(m_soundlatch[0], FUNC(generic_latch_8_device::read)).w(m_soundlatch[1], FUNC(generic_latch_8_device::write));
 }
 
-/* Input Ports */
+
+// Input Ports
 
 static INPUT_PORTS_START( airbustr )
 	PORT_START("P1")
@@ -631,7 +611,7 @@ static INPUT_PORTS_START( airbustr )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )        // used
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // used
 
 	PORT_START("DSW1")
 	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW1:1" )
@@ -640,9 +620,9 @@ static INPUT_PORTS_START( airbustr )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW1:3" )
 	PORT_DIPNAME( 0x08, 0x08, "Coin Mode" )             PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x08, "Mode 1" )            //     routine at 0x056d: 11 21 12 16 (bit 3 active)
-	PORT_DIPSETTING(    0x00, "Mode 2" )            //     11 21 13 14 (bit 3 not active)
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(    0x08, "Mode 1" )            // routine at 0x056d: 11 21 12 16 (bit 3 active)
+	PORT_DIPSETTING(    0x00, "Mode 2" )            // 11 21 13 14 (bit 3 not active)
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )    PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )    PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )    PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
@@ -651,7 +631,7 @@ static INPUT_PORTS_START( airbustr )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )    PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )    PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_4C ) )    PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )    PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )    PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )    PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
@@ -699,6 +679,7 @@ static INPUT_PORTS_START( airbustrj )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 INPUT_PORTS_END
 
+
 // Graphics Decode Information
 
 static GFXDECODE_START( gfx_airbustr )
@@ -728,6 +709,7 @@ INTERRUPT_GEN_MEMBER(airbustr_state::slave_interrupt)
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xfd); // Z80
 }
 
+
 // Machine Initialization
 
 void airbustr_state::machine_start()
@@ -750,17 +732,18 @@ void airbustr_state::machine_reset()
 	m_highbits = 0;
 }
 
+
 // Machine Driver
 
-void airbustr_state::airbustr(machine_config &config)
+void airbustr_state::airbustrb(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_master, XTAL(12'000'000) / 2);   // verified on PCB
+	Z80(config, m_master, XTAL(12'000'000) / 2); // verified on PCB
 	m_master->set_addrmap(AS_PROGRAM, &airbustr_state::master_map);
 	m_master->set_addrmap(AS_IO, &airbustr_state::master_io_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(airbustr_state::scanline), "screen", 0, 1);
 
-	Z80(config, m_slave, XTAL(12'000'000) / 2);    // verified on PCB
+	Z80(config, m_slave, XTAL(12'000'000) / 2); // verified on PCB
 	m_slave->set_addrmap(AS_PROGRAM, &airbustr_state::slave_map);
 	m_slave->set_addrmap(AS_IO, &airbustr_state::slave_io_map);
 	m_slave->set_vblank_int("screen", FUNC(airbustr_state::slave_interrupt)); // nmi signal from master CPU
@@ -769,10 +752,8 @@ void airbustr_state::airbustr(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &airbustr_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &airbustr_state::sound_io_map);
 
-	config.set_maximum_quantum(attotime::from_hz(6000));  // Palette RAM is filled by sub CPU with data supplied by main CPU
-							// Maybe a high value is safer in order to avoid glitches
-
-	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_seconds(3));  // a guess, and certainly wrong
+	// palette RAM is filled by sub CPU with data supplied by main CPU, maybe a high value is safer in order to avoid glitches
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -799,7 +780,7 @@ void airbustr_state::airbustr(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000) / 4));   // verified on PCB
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000) / 4)); // verified on PCB
 	ymsnd.port_a_read_callback().set_ioport("DSW1");
 	ymsnd.port_b_read_callback().set_ioport("DSW2");
 	ymsnd.irq_handler().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
@@ -808,13 +789,17 @@ void airbustr_state::airbustr(machine_config &config)
 	ymsnd.add_route(2, "mono", 0.25);
 	ymsnd.add_route(3, "mono", 0.50);
 
-	OKIM6295(config, "oki", XTAL(12'000'000)/4, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.80);   // verified on PCB
+	OKIM6295(config, "oki", XTAL(12'000'000)/4, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.80); // verified on PCB
 }
 
-void airbustr_state::airbustrb(machine_config &config)
+void airbustr_state::airbustr(machine_config &config)
 {
-	airbustr(config);
-	m_watchdog->set_time(attotime::from_seconds(0)); // no protection device or watchdog
+	airbustrb(config);
+
+	m_master->set_addrmap(AS_PROGRAM, &airbustr_state::master_prot_map);
+
+	KANEKO_HIT(config, m_calc1).set_type(0);
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3)); // a guess, and certainly wrong
 }
 
 
@@ -907,18 +892,11 @@ ROM_START( airbustrb )
 	ROM_LOAD( "3.bin", 0x20000, 0x20000, CRC(58cd19e2) SHA1(479f22241bf29f7af67d9679fc6c20f10004fdd8) )
 ROM_END
 
-// Driver Initialization
-
-void airbustr_state::init_airbustr()
-{
-	m_master->space(AS_PROGRAM).install_read_handler(0xe000, 0xefff, read8m_delegate(*this, FUNC(airbustr_state::devram_r))); // protection device lives here
-}
-
 } // anonymous namespace
 
 
 // Game Drivers
 
-GAME( 1990, airbustr,  0,        airbustr,  airbustr,  airbustr_state, init_airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (World)",   MACHINE_SUPPORTS_SAVE ) // 891220
-GAME( 1990, airbustrj, airbustr, airbustr,  airbustrj, airbustr_state, init_airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (Japan)",   MACHINE_SUPPORTS_SAVE ) // 891229
-GAME( 1990, airbustrb, airbustr, airbustrb, airbustrj, airbustr_state, empty_init,    ROT0, "bootleg",                "Air Buster: Trouble Specialty Raid Unit (bootleg)", MACHINE_SUPPORTS_SAVE ) // based on Japan set (891229)
+GAME( 1990, airbustr,  0,        airbustr,  airbustr,  airbustr_state, empty_init, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (World)",   MACHINE_SUPPORTS_SAVE ) // 891220
+GAME( 1990, airbustrj, airbustr, airbustr,  airbustrj, airbustr_state, empty_init, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (Japan)",   MACHINE_SUPPORTS_SAVE ) // 891229
+GAME( 1990, airbustrb, airbustr, airbustrb, airbustrj, airbustr_state, empty_init, ROT0, "bootleg",                "Air Buster: Trouble Specialty Raid Unit (bootleg)", MACHINE_SUPPORTS_SAVE ) // based on Japan set (891229)
