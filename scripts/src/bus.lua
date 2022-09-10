@@ -3134,6 +3134,8 @@ if (BUSES["NES_CTRL"]~=null) then
 		MAME_DIR .. "src/devices/bus/nes_ctrl/powerpad.h",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/rob.cpp",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/rob.h",
+		MAME_DIR .. "src/devices/bus/nes_ctrl/sharpcass.cpp",
+		MAME_DIR .. "src/devices/bus/nes_ctrl/sharpcass.h",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/snesadapter.cpp",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/snesadapter.h",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/suborkey.cpp",
