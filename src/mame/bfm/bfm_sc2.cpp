@@ -802,8 +802,7 @@ void bfm_sc2_state::volume_override_w(uint8_t data)
 
 void bfm_sc2_state::nec_reset_w(uint8_t data)
 {
-	m_upd7759->start_w(0);
-	m_upd7759->reset_w(data != 0);
+	m_upd7759->reset_w(BIT(data, 0));
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -817,9 +816,9 @@ void bfm_sc2_state::nec_latch_w(uint8_t data)
 
 	m_upd7759->set_rom_bank(bank);
 
-	m_upd7759->port_w(data & 0x3f);    // setup sample
-	m_upd7759->start_w(1);
+	m_upd7759->port_w(data & 0x7f);    // setup sample
 	m_upd7759->start_w(0);
+	m_upd7759->start_w(1);
 }
 
 ///////////////////////////////////////////////////////////////////////////
