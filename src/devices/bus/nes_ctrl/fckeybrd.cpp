@@ -203,7 +203,7 @@ void nes_fckeybrd_device::write(u8 data)
 {
 	// tape output (not fully tested)
 	if ((m_cassette->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_RECORD)
-		m_cassette->output(BIT(data, 0) ? +1.0 : -1.0);
+		m_cassette->output(BIT(data, 0) ? -1.0 : +1.0); // Arkanoid 2 requires this polarity for saving
 
 	m_fck_enable = BIT(data, 2);
 
