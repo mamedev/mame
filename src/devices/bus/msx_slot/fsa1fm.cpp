@@ -81,10 +81,12 @@ uint8_t msx_slot_fsa1fm_device::read(offs_t offset)
 	if (offset < 0x4000)
 		return m_bank_base_0000[offset & 0x3fff];
 	if (offset < 0x8000)
+	{
 		// TODO: How much of the sram is visible?
 		if (offset >= 0x6000 && offset < 0x6400)
 			return m_sram[offset & 0x3ff];
 		return m_bank_base_4000[offset & 0x3fff];
+	}
 	if (offset < 0xc000)
 		return m_bank_base_8000[offset & 0x3fff];
 	return 0xff;
