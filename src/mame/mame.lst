@@ -37125,6 +37125,9 @@ rt1715                          //
 rt1715lc                        // (latin/cyrillic)
 rt1715w                         //
 
+@source:ibm/rs6000_type7xxx.cpp
+rs6k7009						// IBM RS/6000 Type 7009 Server
+
 @source:ibm/rtpc.cpp
 rtpc010                         // IBM RT PC Model 010
 rtpc015                         // IBM RT PC Model 015
