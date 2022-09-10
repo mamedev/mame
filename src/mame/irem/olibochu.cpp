@@ -3,60 +3,20 @@
 /***************************************************************************
 
 Oli-Boo-Chu (aka Punching Kid)
+Accordingly, the Irem board type is M47.
 
 driver by Nicola Salmoria
 
 TODO:
-- verify CPU speed/XTAL, currently guessed
 - verify AY8910 irq freq and XTAL, both are approximated from video recording
-- Figure out (ad)pcm format or chip? see samples roms, 16.1m is definitely death sound.
-  Sample triggers are already hooked up preliminary.
+- verify CPU speed/XTAL, currently guessed, but it's logical to share the same
+  master XTAL with AY8910
+- verify adpcm freq/prescaler
 - How is the first half of the palette used? (the colors, not the clut).
   The title logo looks better with it, but not much else does. Or maybe it's a
   region change? The Japanese Irem flyer (Punching Kid) shows the purple/yellow
   maze colors. The USA licensed version has a black background like in MAME,
   and it matches a video of the cabinet.
-
-============================================================================
-PSG table (from sound test):
-data0 |data1   |sample            | possible data trigger
-----------------------------------------------------------
-0x80  |0x00    | coin             | 0x.1
-0x08  |0x00    | opening melody   | 0x.5
-0x40  |0x00    | bgm              | 0x.2
-0x04  |0x00    | hi-score melody  | 0x.6
-0x02  |0x00    | ending melody    | 0x.7
-0x01  |0x00    | spot melody      | 0x.8
-0x10  |0x00    | clear melody     | 0x.4
-0x20  |0x00    | race trap melody | 0x.3
-0x00  |0x80    | extend sound     | 0x.9
-0x00  |0x40    | oli paralyze     | 0x.a
-0x00  |0x04    | chu out          |
-0x00  |0x08    | mystery sound    |
-0x00  |0x01    | oli out          | 0x5.?
-0x00  |0x10    | chu has food     |
-0x00  |0x00    | <stop playing>   | 0x.0
------------------------------------------------------------
-       0x02?     unused?
-       0x20?     unused?
-
-$7004 writes, related to $7000 reads
-0x00-0x0f <don't care (retains previous value>
-0x10-0x1f 0x28 -> sample ROM 0x0500
-0x20-0x2f 0x00 -> sample ROM 0x0000
-0x30-0x3f 0x48 -> sample ROM 0x0900
-0x40-0x4f 0x00 -> sample ROM 0x0000
-0x50-0x5f 0x80 -> sample ROM 0x1000
-0x60-0x6f 0x3a -> 0x60 and above is invalid (opcodes instead of offsets)
-0x70-0x7f 0x70
-0x80-0x8f 0x0f
-0x90-0x9f 0x0a
-0xa0-0xaf 0x3a
-0xb0-0xbf 0x61
-0xc0-0xcf 0xca
-0xd0-0xdf 0x01
-0xe0-0xef 0x14
-0xf0-0xff 0x32
 
 ***************************************************************************/
 
@@ -66,6 +26,7 @@ $7004 writes, related to $7000 reads
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/ay8910.h"
+#include "sound/msm5205.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -79,16 +40,17 @@ class olibochu_state : public driver_device
 public:
 	olibochu_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram"),
-		m_spriteram(*this, "spriteram"),
-		m_spriteram2(*this, "spriteram2"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_spriteram(*this, "spriteram%u", 0),
+		m_soundlatch(*this, "soundlatch%u", 0),
 		m_ay(*this, "aysnd"),
-		m_soundlatch(*this, "soundlatch%u", 0)
+		m_adpcm(*this, "adpcm"),
+		m_adpcmrom(*this, "adpcm")
 	{ }
 
 	void olibochu(machine_config &config);
@@ -99,21 +61,20 @@ protected:
 	virtual void video_start() override;
 
 private:
-	/* memory pointers */
-	required_shared_ptr<u8> m_videoram;
-	required_shared_ptr<u8> m_colorram;
-	required_shared_ptr<u8> m_spriteram;
-	required_shared_ptr<u8> m_spriteram2;
-
-	/* devices */
+	// devices, memory pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_device<ay8910_device> m_ay;
+	required_shared_ptr<u8> m_videoram;
+	required_shared_ptr<u8> m_colorram;
+	required_shared_ptr_array<u8, 2> m_spriteram;
 	required_device_array<generic_latch_8_device, 2> m_soundlatch;
+	required_device<ay8910_device> m_ay;
+	required_device<msm5205_device> m_adpcm;
+	required_region_ptr<u8> m_adpcmrom;
 
-	/* video-related */
+	// video-related
 	tilemap_t *m_bg_tilemap = nullptr;
 
 	void videoram_w(offs_t offset, u8 data);
@@ -125,14 +86,16 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 
-	/* misc */
+	// misc
 	u16 m_soundcmd = 0;
-	u8 m_sample_address = 0;
+	u8 m_sample_latch = 0;
+	u16 m_sample_address = 0;
 
 	void sound_command_w(offs_t offset, u8 data);
-	void sample_address_w(u8 data);
+	void sample_latch_w(u8 data);
 	void sample_start_w(u8 data);
 	u8 soundlatch_r();
+	DECLARE_WRITE_LINE_MEMBER(adpcm_vck);
 
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
@@ -218,15 +181,16 @@ void olibochu_state::video_start()
 void olibochu_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	// 8x8 sprites
-	for (int offs = m_spriteram2.bytes() - 4; offs >= 0; offs -= 4)
+	for (int offs = m_spriteram[0].bytes() - 4; offs >= 0; offs -= 4)
 	{
-		int attr = m_spriteram2[offs + 1];
-		int code = m_spriteram2[offs];
+		const u8 *src = &m_spriteram[0][offs];
+		int code = src[0];
+		int attr = src[1];
 		int color = attr & 0x3f;
 		int flipx = attr & 0x40;
 		int flipy = attr & 0x80;
-		int sx = m_spriteram2[offs + 3];
-		int sy = m_spriteram2[offs + 2];
+		int sy = src[2];
+		int sx = src[3];
 
 		if (flip_screen())
 		{
@@ -236,23 +200,20 @@ void olibochu_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(0)->transpen(
-				bitmap, cliprect,
-				code, color,
-				flipx, flipy,
-				sx, sy, 0);
+		m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, code, color, flipx, flipy, sx, sy, 0);
 	}
 
 	// 16x16 sprites
-	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	for (int offs = m_spriteram[1].bytes() - 4; offs >= 0; offs -= 4)
 	{
-		int attr = m_spriteram[offs + 1];
-		int code = m_spriteram[offs];
+		const u8 *src = &m_spriteram[1][offs];
+		int code = src[0];
+		int attr = src[1];
 		int color = attr & 0x3f;
 		int flipx = attr & 0x40;
 		int flipy = attr & 0x80;
-		int sx = m_spriteram[offs + 3];
-		int sy = ((m_spriteram[offs + 2] + 8) & 0xff) - 8;
+		int sy = ((src[2] + 8) & 0xff) - 8;
+		int sx = src[3];
 
 		if (flip_screen())
 		{
@@ -262,11 +223,7 @@ void olibochu_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(1)->transpen(
-				bitmap, cliprect,
-				code, color,
-				flipx, flipy,
-				sx, sy, 0);
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, code, color, flipx, flipy, sx, sy, 0);
 	}
 }
 
@@ -275,7 +232,10 @@ u32 olibochu_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE);
 	draw_sprites(bitmap, cliprect);
+
+	// high priority tiles are used during intermission (after round 2)
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1));
+
 	return 0;
 }
 
@@ -304,22 +264,21 @@ void olibochu_state::sound_command_w(offs_t offset, u8 data)
 	m_soundlatch[0]->write((16 - c) & 0xf);
 }
 
-void olibochu_state::sample_address_w(u8 data)
+void olibochu_state::sample_latch_w(u8 data)
 {
-	m_sample_address = data;
+	m_sample_latch = data;
 }
 
 void olibochu_state::sample_start_w(u8 data)
 {
 	if (data & 0x80)
 	{
-		// start sample at m_sample_address * 0x20
+		// start sample
 		m_soundlatch[1]->clear_w();
+		m_sample_address = m_sample_latch * 0x20 * 2;
 	}
-	else
-	{
-		// stop playing sample
-	}
+
+	m_adpcm->reset_w(BIT(~data, 7));
 }
 
 u8 olibochu_state::soundlatch_r()
@@ -327,15 +286,25 @@ u8 olibochu_state::soundlatch_r()
 	return (m_soundlatch[0]->read() & 0xf) | (m_soundlatch[1]->read() << 4 & 0xf0);
 }
 
+WRITE_LINE_MEMBER(olibochu_state::adpcm_vck)
+{
+	if (state)
+	{
+		const u8 data = m_adpcmrom[m_sample_address / 2];
+		m_adpcm->data_w((m_sample_address & 1) ? (data & 0xf) : (data >> 4));
+		m_sample_address = (m_sample_address + 1) & 0x3fff;
+	}
+}
+
 
 void olibochu_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x83ff).ram().w(FUNC(olibochu_state::videoram_w)).share("videoram");
-	map(0x8400, 0x87ff).ram().w(FUNC(olibochu_state::colorram_w)).share("colorram");
-	map(0x9000, 0x901f).writeonly().share("spriteram");
+	map(0x8000, 0x83ff).ram().w(FUNC(olibochu_state::videoram_w)).share(m_videoram);
+	map(0x8400, 0x87ff).ram().w(FUNC(olibochu_state::colorram_w)).share(m_colorram);
+	map(0x9000, 0x901f).writeonly().share(m_spriteram[1]);
 	map(0x9020, 0x903f).nopw(); // discard?
-	map(0x9800, 0x983f).writeonly().share("spriteram2");
+	map(0x9800, 0x983f).writeonly().share(m_spriteram[0]);
 	map(0xa000, 0xa000).portr("IN0");
 	map(0xa001, 0xa001).portr("IN1");
 	map(0xa002, 0xa002).portr("IN2");
@@ -353,7 +322,7 @@ void olibochu_state::sound_map(address_map &map)
 	map(0x6000, 0x63ff).ram();
 	map(0x7000, 0x7000).r(FUNC(olibochu_state::soundlatch_r));
 	map(0x7000, 0x7001).w(m_ay, FUNC(ay8910_device::address_data_w));
-	map(0x7004, 0x7004).w(FUNC(olibochu_state::sample_address_w));
+	map(0x7004, 0x7004).w(FUNC(olibochu_state::sample_latch_w));
 	map(0x7006, 0x7006).w(FUNC(olibochu_state::sample_start_w));
 }
 
@@ -500,6 +469,7 @@ GFXDECODE_END
 void olibochu_state::machine_start()
 {
 	save_item(NAME(m_soundcmd));
+	save_item(NAME(m_sample_latch));
 	save_item(NAME(m_sample_address));
 }
 
@@ -522,11 +492,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(olibochu_state::scanline)
 void olibochu_state::olibochu(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 4000000);
+	Z80(config, m_maincpu, 18'432'000 / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &olibochu_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(olibochu_state::scanline), "screen", 0, 1);
 
-	Z80(config, m_audiocpu, 4000000);
+	Z80(config, m_audiocpu, 18'432'000 / 6);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &olibochu_state::sound_map);
 	m_audiocpu->set_periodic_int(FUNC(olibochu_state::irq0_line_hold), attotime::from_hz(120));
 
@@ -548,7 +518,12 @@ void olibochu_state::olibochu(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch[0]);
 	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
-	AY8910(config, m_ay, 3072000/2).add_route(ALL_OUTPUTS, "mono", 0.50);
+	AY8910(config, m_ay, 18'432'000 / 12).add_route(ALL_OUTPUTS, "mono", 0.5);
+
+	MSM5205(config, m_adpcm, 384'000);
+	m_adpcm->vck_callback().set(FUNC(olibochu_state::adpcm_vck));
+	m_adpcm->set_prescaler_selector(msm5205_device::S96_4B);
+	m_adpcm->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 
@@ -574,7 +549,7 @@ ROM_START( olibochu )
 	ROM_LOAD( "17.4j",        0x0000, 0x1000, CRC(57f07402) SHA1(a763a835ac512c69b4351c1ec72b0a64e46203aa) )
 	ROM_LOAD( "18.4l",        0x1000, 0x1000, CRC(0a903e9c) SHA1(d893c2f5373f748d8bebf3673b15014f4a8d4b5c) )
 
-	ROM_REGION( 0x2000, "samples", 0 )
+	ROM_REGION( 0x2000, "adpcm", 0 )
 	ROM_LOAD( "15.1k",        0x0000, 0x1000, CRC(fb5dd281) SHA1(fba947ae7b619c2559b5af69ef02acfb15733f0d) )
 	ROM_LOAD( "16.1m",        0x1000, 0x1000, CRC(c07614a5) SHA1(d13d271a324f99d008429c16193c4504e5894493) )
 
