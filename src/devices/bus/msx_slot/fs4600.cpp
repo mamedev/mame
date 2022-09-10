@@ -69,11 +69,11 @@ void msx_slot_fs4600_device::restore_banks()
 
 uint8_t msx_slot_fs4600_device::read(offs_t offset)
 {
-	if ((m_control & 0x02) && ((offset & 0x3fff) == 0x3ffd))
+	if ((BIT(m_control, 1)) && ((offset & 0x3fff) == 0x3ffd))
 	{
 		return m_sram[m_sram_address++ & 0xfff];
 	}
-	if ((m_control & 0x04) && (offset& 0x7ff8) == 0x7ff0)
+	if ((BIT(m_control, 2)) && (offset& 0x7ff8) == 0x7ff0)
 	{
 		return m_selected_bank[(offset >> 1) & 0x03];
 	}
@@ -120,17 +120,17 @@ void msx_slot_fs4600_device::write(offs_t offset, uint8_t data)
 			{
 				case 0x6000:
 					m_selected_bank[1] = data;
-					m_bank_base[1] = m_rom + ( ( m_selected_bank[1] * 0x4000 ) & 0x0fffff );
+					m_bank_base[1] = m_rom + ((m_selected_bank[1] * 0x4000) & 0x0fffff);
 					break;
 
 				case 0x6400:
 					m_selected_bank[0] = data;
-					m_bank_base[0] = m_rom + ( ( m_selected_bank[0] * 0x4000 ) & 0x0fffff );
+					m_bank_base[0] = m_rom + ((m_selected_bank[0] * 0x4000) & 0x0fffff);
 					break;
 
 				case 0x7000:
 					m_selected_bank[2] = data;
-					m_bank_base[2] = m_rom + ( ( m_selected_bank[2] * 0x4000 ) & 0x0fffff );
+					m_bank_base[2] = m_rom + ((m_selected_bank[2] * 0x4000) & 0x0fffff);
 					break;
 
 				default:

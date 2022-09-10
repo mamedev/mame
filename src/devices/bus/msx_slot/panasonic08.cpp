@@ -75,7 +75,7 @@ void msx_slot_panasonic08_device::map_bank(int bank)
 	}
 	else
 	{
-		m_bank_base[bank] = m_rom + ( ( m_selected_bank[bank] * 0x2000 ) & 0x1fffff );
+		m_bank_base[bank] = m_rom + ((m_selected_bank[bank] * 0x2000) & 0x1fffff);
 	}
 }
 
@@ -123,32 +123,32 @@ void msx_slot_panasonic08_device::write(offs_t offset, uint8_t data)
 
 	switch (offset)
 	{
-		case 0x6000:    /* Switched 0x0000-0x1fff */
+		case 0x6000:    // Switches 0x0000-0x1fff
 			m_selected_bank[0] = data;
 			map_bank(0);
 			break;
 
-		case 0x6400:    /* Switches 0x2000-0x3fff */
+		case 0x6400:    // Switches 0x2000-0x3fff
 			m_selected_bank[1] = data;
 			map_bank(1);
 			break;
 
-		case 0x6800:    /* Switches 0x4000-0x5fff */
+		case 0x6800:    // Switches 0x4000-0x5fff
 			m_selected_bank[2] = data;
 			map_bank(2);
 			break;
 
-		case 0x6c00:    /* Switches 0x6000-0x7fff */
+		case 0x6c00:    // Switches 0x6000-0x7fff
 			m_selected_bank[3] = data;
 			map_bank(3);
 			break;
 
-		case 0x7000:    /* Switches 0x8000-0x9fff */
+		case 0x7000:    // Switches 0x8000-0x9fff
 			m_selected_bank[4] = data;
 			map_bank(4);
 			break;
 
-		case 0x7800:    /* Switches 0xa000-0xbfff */
+		case 0x7800:    // Switches 0xa000-0xbfff
 			m_selected_bank[5] = data;
 			map_bank(5);
 			break;

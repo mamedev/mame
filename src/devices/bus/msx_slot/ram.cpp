@@ -20,16 +20,16 @@ void msx_slot_ram_device::device_start()
 
 uint8_t msx_slot_ram_device::read(offs_t offset)
 {
-	if ( offset >= m_start_address && offset < m_end_address )
+	if (offset >= m_start_address && offset < m_end_address)
 	{
-		return m_ram[ offset - m_start_address ];
+		return m_ram[offset - m_start_address];
 	}
-	return 0xFF;
+	return 0xff;
 }
 
 void msx_slot_ram_device::write(offs_t offset, uint8_t data)
 {
-	if ( offset >= m_start_address && offset < m_end_address )
+	if (offset >= m_start_address && offset < m_end_address)
 	{
 		m_ram[offset - m_start_address] = data;
 	}

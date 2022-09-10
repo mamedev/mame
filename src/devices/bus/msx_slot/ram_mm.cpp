@@ -21,19 +21,19 @@ void msx_slot_ram_mm_device::device_start()
 	{
 		case   64*1024: m_bank_mask = 0x03; break;
 		case  128*1024: m_bank_mask = 0x07; break;
-		case  256*1024: m_bank_mask = 0x0F; break;
-		case  512*1024: m_bank_mask = 0x1F; break;
-		case 1024*1024: m_bank_mask = 0x3F; break;
-		case 2048*1024: m_bank_mask = 0x7F; break;
-		case 4096*1024: m_bank_mask = 0xFF; break;
+		case  256*1024: m_bank_mask = 0x0f; break;
+		case  512*1024: m_bank_mask = 0x1f; break;
+		case 1024*1024: m_bank_mask = 0x3f; break;
+		case 2048*1024: m_bank_mask = 0x7f; break;
+		case 4096*1024: m_bank_mask = 0xff; break;
 		default: fatalerror("Invalid memory mapper size specified\n");
 	}
 
 	m_ram.resize(m_total_size);
 
-	for ( int i = 0; i < 4; i++ )
+	for (int i = 0; i < 4; i++)
 	{
-		m_bank_selected[i] = 3 -i;
+		m_bank_selected[i] = 3 - i;
 		m_bank_base[i] = &m_ram[0x4000 * m_bank_selected[i]];
 	}
 
@@ -41,8 +41,8 @@ void msx_slot_ram_mm_device::device_start()
 	save_item(NAME(m_bank_selected));
 
 	// Install IO read/write handlers
-	io_space().install_read_handler(0xFC, 0xFF, read8sm_delegate(*this, FUNC(msx_slot_ram_mm_device::read_mapper_bank)));
-	io_space().install_write_handler(0xFC, 0xFF, write8sm_delegate(*this, FUNC(msx_slot_ram_mm_device::write_mapper_bank)));
+	io_space().install_read_handler(0xfc, 0xff, read8sm_delegate(*this, FUNC(msx_slot_ram_mm_device::read_mapper_bank)));
+	io_space().install_write_handler(0xfc, 0xff, write8sm_delegate(*this, FUNC(msx_slot_ram_mm_device::write_mapper_bank)));
 }
 
 void msx_slot_ram_mm_device::device_post_load()
@@ -52,7 +52,7 @@ void msx_slot_ram_mm_device::device_post_load()
 
 void msx_slot_ram_mm_device::restore_banks()
 {
-	for ( int i = 0; i < 3; i++ )
+	for (int i = 0; i < 3; i++)
 	{
 		m_bank_base[i] = &m_ram[0x4000 * ( m_bank_selected[i] & m_bank_mask )];
 	}
@@ -78,5 +78,5 @@ void msx_slot_ram_mm_device::write_mapper_bank(offs_t offset, uint8_t data)
 	offset &= 3;
 
 	m_bank_selected[offset] = data;
-	m_bank_base[offset] = &m_ram[0x4000 * ( m_bank_selected[offset] & m_bank_mask )];
+	m_bank_base[offset] = &m_ram[0x4000 * (m_bank_selected[offset] & m_bank_mask)];
 }

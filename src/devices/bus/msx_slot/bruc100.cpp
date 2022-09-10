@@ -28,7 +28,7 @@ msx_slot_bruc100_device::msx_slot_bruc100_device(const machine_config &mconfig, 
 void msx_slot_bruc100_device::device_start()
 {
 	// Sanity checks
-	if (m_rom_region->bytes() < m_region_offset + 0x8000)
+	if (m_rom_region->bytes() < m_region_offset + 0x10000)
 	{
 		fatalerror("Memory region '%s' is too small for the BRUC100 firmware\n", m_rom_region.finder_tag());
 	}
