@@ -66,6 +66,10 @@ public:
 	auto p3_in_cb() { return m_port_in_cb[3].bind(); }
 	auto p3_out_cb() { return m_port_out_cb[3].bind(); }
 	auto p4_in_cb() { return m_port_in_cb[4].bind(); }
+	auto an0_in_cb() { return m_analog_in_cb[0].bind(); }
+	auto an1_in_cb() { return m_analog_in_cb[1].bind(); }
+	auto an2_in_cb() { return m_analog_in_cb[2].bind(); }
+	auto an3_in_cb() { return m_analog_in_cb[3].bind(); }
 
 	// port three-state output configuration
 	void set_p0_3state(u8 value) { assert(!configured()); m_port_3state[0] = value; }
@@ -92,7 +96,6 @@ protected:
 	virtual void write_data(u16 adr, u8 val) override;
 
 private:
-	void internal_map(address_map &map);
 	template <int N> u8 port_r(offs_t offset);
 	template <int N> void port_w(offs_t offset, u8 data);
 	u8 p4_r();
@@ -100,18 +103,30 @@ private:
 	void p0_function_w(u8 data);
 	u8 p2_p3_function_r();
 	void p2_p3_function_w(u8 data);
+	u8 ad_control_r();
+	void ad_control_w(u8 data);
+	u8 ad_r();
+
+	TIMER_CALLBACK_MEMBER(ad_complete);
+
+	void internal_map(address_map &map);
 
 	const address_space_config m_data_config;
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
 
 	devcb_read8::array<5> m_port_in_cb;
 	devcb_write8::array<4> m_port_out_cb;
+	devcb_read8::array<4> m_analog_in_cb;
+
+	emu_timer *m_ad_timer;
 
 	u8 m_port_latch[4];
 	u8 m_port_direction[4];
 	u8 m_port_3state[4];
 	u8 m_p0_function;
 	u8 m_p2_p3_function;
+	u8 m_ad_control;
+	u8 m_ad_register;
 };
 
 DECLARE_DEVICE_TYPE(M50734, m50734_device)
