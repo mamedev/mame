@@ -393,6 +393,7 @@ husky/husky.cpp
 ibm/ibm3153.cpp
 ibm/ibm6580.cpp
 ibm/rtpc.cpp
+ibm/rs6000_type7xxx.cpp
 informer/informer_207_100.cpp
 informer/informer_207_376.cpp
 informer/informer_213.cpp
@@ -482,6 +483,7 @@ mips/mips.cpp
 misc/3do.cpp
 misc/eva.cpp
 misc/monon_color.cpp
+misc/mtu130.cpp
 misc/z80ne.cpp
 mit/tx0.cpp
 mits/altair.cpp
