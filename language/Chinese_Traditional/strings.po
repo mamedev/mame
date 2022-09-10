@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-01 02:13+1000\n"
-"PO-Revision-Date: 2022-07-02 08:43+0800\n"
+"PO-Revision-Date: 2022-09-02 09:48+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh_TW\n"
@@ -273,7 +273,7 @@ msgstr "%1$s %2$s ( %3$d / %4$d 軟體套件 )"
 #: src/frontend/mame/ui/selsoft.cpp:707
 #, c-format
 msgid "%1$s - select software"
-msgstr ""
+msgstr "%1$s - 選擇軟體"
 
 #: src/frontend/mame/ui/selsoft.cpp:712 src/frontend/mame/ui/selgame.cpp:1074
 #, c-format
@@ -1870,17 +1870,17 @@ msgstr "%1$s (%2$s %3$d)"
 #: src/frontend/mame/ui/inputdevices.cpp:88
 msgctxt "menu-inputdev"
 msgid "Copy Device ID"
-msgstr ""
+msgstr "複製裝置 ID"
 
 #: src/frontend/mame/ui/inputdevices.cpp:122
 msgctxt "menu-inputdev"
 msgid "Copied device ID to clipboard"
-msgstr ""
+msgstr "已複製裝置 ID 至剪貼簿"
 
 #: src/frontend/mame/ui/inputdevices.cpp:124
 msgctxt "menu-inputdev"
 msgid "Error copying device ID to clipboard"
-msgstr ""
+msgstr "複製裝置 ID 至剪貼簿時發生錯誤"
 
 #: src/frontend/mame/ui/inputdevices.cpp:162
 msgctxt "menu-inputdev"
@@ -6498,7 +6498,3 @@ msgid ""
 msgstr ""
 "輸入組合或按下 %s 取消\n"
 "%s"
-
-#, c-format
-#~ msgid "System: \"%1$s\" software list "
-#~ msgstr "系統： \"%1$s\" 軟體清單 "

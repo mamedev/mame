@@ -42735,7 +42735,7 @@ license:CC0
 	</software>
 
 	<software name="wilyrock">
-		<description>Wily &amp; Light no Rockboard - That's Paradise (Japan)</description>
+		<description>Wily &amp; Light no RockBoard - That's Paradise (Japan)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="CAP-BE"/>
@@ -52447,6 +52447,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="western kids (japan).prg" size="262144" crc="567dccbd" sha1="0bff6c23288cc6428704d6eefc0906e4750d73d8" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wilyrocks" cloneof="wilyrock">
+		<description>Wily &amp; Light no RockBoard - That's Paradise (Japan, sample)</description>
+		<year>1992</year>
+		<publisher>Capcom</publisher>
+		<info name="alt_title" value="ワイリー&amp;ライトのロックボード ザッツパラダイス"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="HVC-TGROM" />
+			<dataarea name="prg" size="0x40000">
+				<rom name="rockboard_proto.prg" size="0x40000" crc="cd372f96" sha1="31a8e73d1d96a105ad0df90edda4c52cde2ce00d" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="0x2000">
 			</dataarea>
 		</part>
 	</software>

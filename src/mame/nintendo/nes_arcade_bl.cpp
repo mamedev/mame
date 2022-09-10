@@ -116,7 +116,7 @@ INPUT_PORTS_END
 
 void nes_arcade_bl_state::smb3bl(machine_config &config)
 {
-	N2A03(config, m_maincpu, 3.579545_MHz_XTAL / 2); // TODO: verify divider
+	N2A03G(config, m_maincpu, 3.579545_MHz_XTAL / 2); // TODO: verify divider
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_arcade_bl_state::nes_cpu_map);
 
 	z80_device &timercpu(Z80(config, "timercpu", 3.579545_MHz_XTAL));
@@ -157,4 +157,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1987, smb3bl, 0, smb3bl, smb3bl, nes_arcade_bl_state, empty_init, ROT0, "Sang Ho Soft", "Super Mario Bros. 3 (NES bootleg)", 0 ) // 1987.10.01 in Z80 ROM
+GAME( 1987, smb3bl, 0, smb3bl, smb3bl, nes_arcade_bl_state, empty_init, ROT0, "Sang Ho Soft", "Super Mario Bros. 3 (NES bootleg)", MACHINE_IS_SKELETON ) // 1987.10.01 in Z80 ROM

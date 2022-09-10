@@ -2,8 +2,6 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    samples.h
-
     Sound device for sample playback.
 
 ***************************************************************************/
@@ -169,7 +167,7 @@ public:
 private:
 	// internal state
 	samples_device &m_samples;
-	int                     m_current;
+	int m_current;
 };
 
 #endif // MAME_SOUND_SAMPLES_H

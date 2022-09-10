@@ -85,6 +85,7 @@ public:
 	void suborkbd(machine_config &config);
 	void famipalc(machine_config &config);
 	void famicom(machine_config &config);
+	void famicomo(machine_config &config);
 	void famitvc1(machine_config &config);
 	void famitwin(machine_config &config);
 	void nespal(machine_config &config);

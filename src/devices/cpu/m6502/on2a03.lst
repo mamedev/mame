@@ -4,8 +4,8 @@
 adc_nd_aba
 	TMP = read_pc();
 	TMP = set_h(TMP, read_pc());
-	TMP = read(TMP);
-	do_adc_nd(TMP);
+	TMP2 = read(TMP);
+	do_adc_nd(TMP2);
 	prefetch();
 
 adc_nd_abx
@@ -15,8 +15,8 @@ adc_nd_abx
 		read(set_l(TMP, TMP+X));
 	}
 	TMP += X;
-	TMP = read(TMP);
-	do_adc_nd(TMP);
+	TMP2 = read(TMP);
+	do_adc_nd(TMP2);
 	prefetch();
 
 adc_nd_aby
@@ -26,8 +26,8 @@ adc_nd_aby
 		read(set_l(TMP, TMP+Y));
 	}
 	TMP += Y;
-	TMP = read(TMP);
-	do_adc_nd(TMP);
+	TMP2 = read(TMP);
+	do_adc_nd(TMP2);
 	prefetch();
 
 adc_nd_idx
@@ -56,15 +56,15 @@ adc_nd_imm
 
 adc_nd_zpg
 	TMP = read_pc();
-	TMP = read(TMP);
-	do_adc_nd(TMP);
+	TMP2 = read(TMP);
+	do_adc_nd(TMP2);
 	prefetch();
 
 adc_nd_zpx
 	TMP = read_pc();
 	read(TMP);
-	TMP = read(uint8_t(TMP+X));
-	do_adc_nd(TMP);
+	TMP2 = read(uint8_t(TMP+X));
+	do_adc_nd(TMP2);
 	prefetch();
 
 arr_nd_imm
@@ -155,8 +155,8 @@ rra_nd_zpx
 sbc_nd_aba
 	TMP = read_pc();
 	TMP = set_h(TMP, read_pc());
-	TMP = read(TMP);
-	do_sbc_nd(TMP);
+	TMP2 = read(TMP);
+	do_sbc_nd(TMP2);
 	prefetch();
 
 sbc_nd_abx
@@ -166,8 +166,8 @@ sbc_nd_abx
 		read(set_l(TMP, TMP+X));
 	}
 	TMP += X;
-	TMP = read(TMP);
-	do_sbc_nd(TMP);
+	TMP2 = read(TMP);
+	do_sbc_nd(TMP2);
 	prefetch();
 
 sbc_nd_aby
@@ -177,8 +177,8 @@ sbc_nd_aby
 		read(set_l(TMP, TMP+Y));
 	}
 	TMP += Y;
-	TMP = read(TMP);
-	do_sbc_nd(TMP);
+	TMP2 = read(TMP);
+	do_sbc_nd(TMP2);
 	prefetch();
 
 sbc_nd_idx
@@ -207,15 +207,15 @@ sbc_nd_imm
 
 sbc_nd_zpg
 	TMP = read_pc();
-	TMP = read(TMP);
-	do_sbc_nd(TMP);
+	TMP2 = read(TMP);
+	do_sbc_nd(TMP2);
 	prefetch();
 
 sbc_nd_zpx
 	TMP = read_pc();
 	read(TMP);
-	TMP = read(uint8_t(TMP+X));
-	do_sbc_nd(TMP);
+	TMP2 = read(uint8_t(TMP+X));
+	do_sbc_nd(TMP2);
 	prefetch();
 
 isb_nd_aba

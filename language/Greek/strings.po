@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-01 02:13+1000\n"
-"PO-Revision-Date: 2021-06-24 16:00+0300\n"
+"PO-Revision-Date: 2022-09-05 19:00+0300\n"
 "Last-Translator: Mame.gr - BraiNKilleR\n"
 "Language-Team: MAME Language Team\n"
 "Language: el\n"
@@ -31,6 +31,7 @@ msgstr ""
 msgid ""
 "This system requires media images to be mounted for the following device(s): "
 msgstr ""
+"Αυτό το σύστημα απαιτεί εικόνες μέσων να φορτωθούν για την ακόλουθη συσκευή(ες): "
 
 #: src/frontend/mame/ui/ui.cpp:1252
 #, c-format
@@ -273,7 +274,7 @@ msgstr "%1$s %2$s ( %3$d / %4$d πακέτα λογισμικού)"
 #: src/frontend/mame/ui/selsoft.cpp:707
 #, c-format
 msgid "%1$s - select software"
-msgstr ""
+msgstr "%1$s - επιλογή λογισμικού"
 
 #: src/frontend/mame/ui/selsoft.cpp:712 src/frontend/mame/ui/selgame.cpp:1074
 #, c-format
@@ -1596,7 +1597,7 @@ msgstr " (κλειδωμένο)"
 #: src/frontend/mame/ui/miscmenu.cpp:354 src/frontend/mame/ui/miscmenu.cpp:548
 msgctxt "menu-crosshair"
 msgid "[built-in]"
-msgstr "[ενσωματομένο]"
+msgstr "[ενσωματωμένο]"
 
 #: src/frontend/mame/ui/miscmenu.cpp:395
 msgctxt "menu-crosshair"
@@ -1881,17 +1882,17 @@ msgstr "%1$s (%2$s %3$d)"
 #: src/frontend/mame/ui/inputdevices.cpp:88
 msgctxt "menu-inputdev"
 msgid "Copy Device ID"
-msgstr ""
+msgstr "Αντιγραφή Ταυτότητας Συσκευής"
 
 #: src/frontend/mame/ui/inputdevices.cpp:122
 msgctxt "menu-inputdev"
 msgid "Copied device ID to clipboard"
-msgstr ""
+msgstr "Η Ταυτότητα Συσκευής αντιγράφηκε στο πρόχειρο"
 
 #: src/frontend/mame/ui/inputdevices.cpp:124
 msgctxt "menu-inputdev"
 msgid "Error copying device ID to clipboard"
-msgstr ""
+msgstr "Πρόβλημα κατά την αντιγραφή της ταυτότητας συσκευής"
 
 #: src/frontend/mame/ui/inputdevices.cpp:162
 msgctxt "menu-inputdev"
@@ -2034,6 +2035,12 @@ msgid ""
 "If this is your first time using %2$s, please see the %2$s.pdf file in the "
 "docs folder for information on setting up and using %2$s."
 msgstr ""
+"Δε βρεθηκαν ROMs συστήματος. Παρακαλώ ελέγξτε τις ρυθμίσεις διαδρομής roms "
+"που βρισκονται στο αρχείο %1$s.ini.\n"
+"\n"
+"Αν αυτή είναι η πρώτη φορά που χρησιμοποιείτε το %2$s, παρακαλώ δείτε το "
+"αρχείο %2$s.pdf στο φάκελο docs για πληροφορίες σχετικά με τη ρύθμιση και "
+"χρήση του %2$s."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:316
 #, c-format
@@ -2173,7 +2180,7 @@ msgstr "Μεταφράσεις UI"
 #: src/frontend/mame/ui/dirmenu.cpp:52
 msgctxt "path-option"
 msgid "Software Lists"
-msgstr ""
+msgstr "Λίστες Λογισμικού"
 
 #: src/frontend/mame/ui/dirmenu.cpp:53
 msgctxt "path-option"
@@ -2541,7 +2548,7 @@ msgstr "Γλώσσα UI"
 
 #: src/frontend/mame/ui/custui.cpp:167 src/frontend/mame/ui/custui.cpp:220
 msgid "System Names"
-msgstr "Ονόματα συστήματος"
+msgstr "Ονόματα Συστημάτων"
 
 #: src/frontend/mame/ui/custui.cpp:193 src/frontend/mame/ui/custui.cpp:223
 msgid "Show Side Panels"
@@ -2561,7 +2568,7 @@ msgstr "Γλώσσα"
 
 #: src/frontend/mame/ui/custui.cpp:234 src/frontend/mame/ui/custui.cpp:278
 msgid "[built-in]"
-msgstr "[ενσωματομένο]"
+msgstr "[ενσωματωμένα]"
 
 #: src/frontend/mame/ui/custui.cpp:334
 msgid "UI Fonts"
@@ -6518,7 +6525,3 @@ msgid ""
 msgstr ""
 "Εισάγετε συνδυασμό ή πατήστε %s για ακύρωση\n"
 "%s"
-
-#, c-format
-#~ msgid "System: \"%1$s\" software list "
-#~ msgstr "Σύστημα: \"%1$s\" λίστα λογισμικού "

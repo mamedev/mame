@@ -4193,7 +4193,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="spinner">
+	<software name="spinner" supported="partial">
 		<!-- Game cart has an integrated infrared port for multiplayer play. -->
 		<description>Chousoku Spinner (Japan)</description>
 		<year>1998</year>
@@ -4213,7 +4213,7 @@ license:CC0
 			<dataarea name="rom" size="0x80000">
 				<rom name="chousoku spinner (japan).bin" size="0x80000" crc="b4fa9cf2" sha1="057a3251bbb7eb4e04b01f786bd2986af5eabc58" />
 			</dataarea>
-			<dataarea name="ram" size="0x8000">
+			<dataarea name="nvram" size="0x8000">
 			</dataarea>
 		</part>
 	</software>
@@ -4704,7 +4704,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="miraclzn">
+	<software name="miraclzn" supported="partial">
 		<!--
 		Supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
 		multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
@@ -4728,7 +4728,7 @@ license:CC0
 			<dataarea name="rom" size="0x80000">
 				<rom name="dmg-amzj-0.u1" size="0x80000" crc="26d2d5c2" sha1="44cafcb56f470881b67e57c0649afbc638cda136" />
 			</dataarea>
-			<dataarea name="ram" size="0x8000">
+			<dataarea name="nvram" size="0x8000">
 			</dataarea>
 		</part>
 	</software>
@@ -7821,7 +7821,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="gbkiss">
+	<software name="gbkiss" supported="partial">
 		<!--
 		"GBKiss" is an integrated infrared port for cart-to-cart multiplayer play, but also for PC connection
 		with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel port (DB25) modem/adaptor for PC-DOS
@@ -7836,7 +7836,7 @@ license:CC0
 			<dataarea name="rom" size="0x40000">
 				<rom name="gbkiss mini games (japan).bin" size="0x40000" crc="92a03fc3" sha1="3c6c78f0a936dbc3f366a82c1eca8be0597d4d5b" />
 			</dataarea>
-			<dataarea name="ram" size="0x8000">
+			<dataarea name="nvram" size="0x8000">
 			</dataarea>
 		</part>
 	</software>
@@ -15732,7 +15732,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="nectaris">
+	<software name="nectaris" supported="partial">
 		<!--
 		Supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
 		multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
@@ -15756,7 +15756,7 @@ license:CC0
 			<dataarea name="rom" size="0x80000">
 				<rom name="nectaris gb (japan).bin" size="0x80000" crc="20bfd7ef" sha1="ba251bfef8162ef032da8d5c28fe693ede28f030" />
 			</dataarea>
-			<dataarea name="ram" size="0x8000">
+			<dataarea name="nvram" size="0x8000">
 			</dataarea>
 		</part>
 	</software>
@@ -18103,7 +18103,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="pockbmanj" cloneof="pockbman">
+	<software name="pockbmanj" cloneof="pockbman" supported="partial">
 		<!--
 		Supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
 		multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
@@ -18127,7 +18127,7 @@ license:CC0
 			<dataarea name="rom" size="0x80000">
 				<rom name="dmg-apoj-0.u1" size="0x80000" crc="212b47a5" sha1="83d1c2420ae69d2a7ca9880c9b84f0ba948e39eb" />
 			</dataarea>
-			<dataarea name="ram" size="0x8000">
+			<dataarea name="nvram" size="0x8000">
 			</dataarea>
 		</part>
 	</software>
@@ -23116,7 +23116,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="sbdaman">
+	<software name="sbdaman" supported="partial">
 		<!--
 		Supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
 		multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
@@ -23140,7 +23140,7 @@ license:CC0
 			<dataarea name="rom" size="0x80000">
 				<rom name="dmg-abdj-0.u1" size="0x80000" crc="239711ec" sha1="36eac648d0406c84d6708695f30bc8739d1bc648" />
 			</dataarea>
-			<dataarea name="ram" size="0x8000">
+			<dataarea name="nvram" size="0x8000">
 			</dataarea>
 		</part>
 	</software>
