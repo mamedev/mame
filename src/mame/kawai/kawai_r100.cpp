@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m3745x.h"
+#include "cpu/m6502/m50734.h"
 #include "machine/nvram.h"
 
 class kawai_r100_state : public driver_device
@@ -22,12 +22,33 @@ public:
 	void r100(machine_config &config);
 
 private:
-	void main_map(address_map &map);
-	//void data_map(address_map &map);
+	void p0_w(u8 data);
+	void p1_w(u8 data);
+	void p2_w(u8 data);
+	void p3_w(u8 data);
 
-	required_device<m740_device> m_maincpu;
+	void main_map(address_map &map);
+	void data_map(address_map &map);
+
+	required_device<m50734_device> m_maincpu;
 };
 
+
+void kawai_r100_state::p0_w(u8 data)
+{
+}
+
+void kawai_r100_state::p1_w(u8 data)
+{
+}
+
+void kawai_r100_state::p2_w(u8 data)
+{
+}
+
+void kawai_r100_state::p3_w(u8 data)
+{
+}
 
 void kawai_r100_state::main_map(address_map &map)
 {
@@ -36,15 +57,27 @@ void kawai_r100_state::main_map(address_map &map)
 	map(0x4400, 0xffff).rom().region("program", 0x4400);
 }
 
+void kawai_r100_state::data_map(address_map &map)
+{
+	// TODO: 0x0000-0x1fff and 0x2000-0x3fff mapped to cartridge slot
+}
+
 
 static INPUT_PORTS_START(r100)
 INPUT_PORTS_END
 
 void kawai_r100_state::r100(machine_config &config)
 {
-	M37450(config, m_maincpu, 16_MHz_XTAL / 2); // FIXME: M50734SP
+	M50734(config, m_maincpu, 16_MHz_XTAL / 2); // M50734SP
 	m_maincpu->set_addrmap(AS_PROGRAM, &kawai_r100_state::main_map);
-	//m_maincpu->set_addrmap(AS_DATA, &kawai_r100_state::data_map);
+	m_maincpu->set_addrmap(AS_DATA, &kawai_r100_state::data_map);
+	m_maincpu->set_p0_3state(0x20);
+	m_maincpu->set_p3_3state(0x02);
+	m_maincpu->p0_out_cb().set(FUNC(kawai_r100_state::p0_w));
+	m_maincpu->p1_out_cb().set(FUNC(kawai_r100_state::p1_w));
+	m_maincpu->p2_out_cb().set(FUNC(kawai_r100_state::p2_w));
+	m_maincpu->p3_out_cb().set(FUNC(kawai_r100_state::p3_w));
+	m_maincpu->p4_in_cb().set_constant(0x0f);
 
 	NVRAM(config, "nvram1", nvram_device::DEFAULT_ALL_0); // MB8464-15LL-SK + battery
 	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0); // MB8464-15LL-SK + battery

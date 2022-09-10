@@ -3749,7 +3749,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="miraclz2">
+	<software name="miraclz2" supported="partial">
 		<description>Daikaijuu Monogatari - The Miracle of the Zone II (Japan)</description>
 		<year>1999</year>
 		<publisher>Hudson Soft</publisher>
@@ -3768,7 +3768,7 @@ license:CC0
 			<dataarea name="rom" size="1048576">
 				<rom name="dmg-am6j-0.u1" size="1048576" crc="692d6794" sha1="7bf6e2d7fc58e8abe61785e413bcf4150fa8bee5"/>
 			</dataarea>
-			<dataarea name="ram" size="32768">
+			<dataarea name="nvram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -14634,7 +14634,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="netdeget">
+	<!-- requires Flash storage and Mobile Adapter emulation -->
+	<software name="netdeget" supported="partial">
 		<description>Net de Get - Minigame @ 100 (Japan)</description>
 		<year>2001</year>
 		<publisher>Konami</publisher>
@@ -14653,7 +14654,7 @@ license:CC0
 			<dataarea name="rom" size="1048576">
 				<rom name="cgb-bmvj-0.u1" size="1048576" crc="6e33d509" sha1="819efde3ebd0f52b080a8307979803914d029035"/>
 			</dataarea>
-			<dataarea name="ram" size="32768">
+			<dataarea name="nvram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -16438,8 +16439,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="pokecardj" cloneof="pokecard">
-		<!-- This game uses an integrated (on-cart) IR port por connected multiplayer gameplay. -->
+	<software name="pokecardj" cloneof="pokecard" supported="partial">
+		<!-- This game uses an integrated (on-cart) IR port for connected multiplayer gameplay. -->
 		<description>Pokémon Card GB (Japan)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
@@ -16458,7 +16459,7 @@ license:CC0
 			<dataarea name="rom" size="1048576">
 				<rom name="dmg-acxj-0.u1" size="1048576" crc="1926f570" sha1="2287627c5b4d56bd9a01aab83408c301b9cf1a6c"/>
 			</dataarea>
-			<dataarea name="ram" size="32768">
+			<dataarea name="nvram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -26325,6 +26326,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="cjgedou" supported="no">
+		<description>Chāojí Gédòu 2001 Alpha (Taiwan)</description>
+		<year>200?</year>
+		<publisher>Vast Fame</publisher>
+		<info name="alt_title" value="超級格鬥2001α"/> <!-- translates to "Super Fight 2001 Alpha" -->
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" /> <!-- TODO: set properly when protection is emulated -->
+			<dataarea name="rom" size="2097152">
+				<rom name="Chao Ji Ge Dou 2001 Alpha (Unl) [C] [Raw].gbc" size="2097152" crc="afd7a0cc" sha1="f44f629687ec91aade40ff52014587003f728ec9"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="emodao">
 		<description>E Mo Dao (China, ripped from 8 in 1 multicart)</description>
 		<year>200?</year>
@@ -26887,11 +26901,27 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="soulfalc">
-		<description>Soul Falchion - Ge Dou Jian Shen (China)</description>
+	<software name="soulfalc" supported="no">
+		<description>Gédòu Jiàn Shén - Soul Falchion (Taiwan)</description>
+		<year>2002</year>
+		<publisher>V.Fame</publisher>
+		<info name="alt_title" value="格鬥劍神 Soul Falchion"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" /> <!-- TODO: set properly when protection is emulated -->
+			<dataarea name="rom" size="1048576">
+				<rom name="Ge Dou Jian Shen - Soul Falchion (Unl) [C] [Raw].gbc" size="1048576" crc="1b1c6f68" sha1="fd06c62b42878e8094e610b180c1848c785f67e9"/>
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- is this a deprotected hack? -->
+	<software name="soulfalcc">
+		<description>Gédòu Jiàn Shén - Soul Falchion (China)</description>
 		<year>2002</year>
 		<publisher>V.Fame ~ Guangzhou Li Cheng</publisher>
-		<info name="alt_title" value="格鬥劍神"/>
+		<info name="alt_title" value="格斗劍神 Soul Falchion"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">

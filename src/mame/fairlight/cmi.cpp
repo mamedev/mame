@@ -137,8 +137,8 @@
 #define VBLANK_END              0
 #define VBLANK_START            256
 
-#define HBLANK_FREQ     (PIXEL_CLOCK / HTOTAL)
-#define VBLANK_FREQ     (HBLANK_FREQ / VTOTAL)
+#define HBLANK_FREQ             (PIXEL_CLOCK / HTOTAL)
+#define VBLANK_FREQ             (HBLANK_FREQ / VTOTAL)
 
 #define MAPSEL_P2_B             0x00
 #define MAPSEL_P2_A             0x03
@@ -160,11 +160,6 @@
 #define IRQ_IPI1_LEVEL          (3 ^ 7)
 #define IRQ_SMIDINT_LEVEL       (3 ^ 7)
 #define IRQ_AIC_LEVEL           (4 ^ 7)
-
-static const int ch_int_levels[8] =
-{
-	12 ^ 7, 8 ^ 7, 13 ^ 7, 9 ^ 7, 14 ^ 7, 10 ^ 7, 15 ^ 7, 11  ^ 7
-};
 
 #define IRQ_PERRINT_LEVEL       (0 ^ 7)
 #define IRQ_RTCINT_LEVEL        (0 ^ 7)
@@ -1639,7 +1634,8 @@ WRITE_LINE_MEMBER(cmi_state::channel_irq)
 	{
 		LOGMASKED(LOG_CHANNELS, "Channel IRQ: %d\n", state);
 	}
-	set_interrupt(CPU_1, ch_int_levels[Channel], state);
+	static const int ch_int_levels[8] = { 12, 8, 13, 9, 14, 10, 15, 11 };
+	set_interrupt(CPU_1, ch_int_levels[Channel] ^ 7, state);
 }
 
 void cmi_state::i8214_cpu1_w(u8 data)

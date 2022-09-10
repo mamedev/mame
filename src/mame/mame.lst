@@ -16934,6 +16934,7 @@ hideseek                        //
 higemaru                        // 9/1984 (c) 1984
 
 @source:misc/highvdeo.cpp
+bingopd
 brasil                          // (c) 2000 unknown
 cfever1k                        // (c) 2000 High Video
 cfever40                        // (c) 2000 High Video
@@ -16951,9 +16952,13 @@ newmcard                        // (c) 19?? unknown
 newtiger                        // (c) 200? unknown
 nyjoker                         //
 record                          // (c) 2000 High Video
+saladue
+saladuea
 tour4000                        // (c) 2000 High Video
 tour4010                        // (c) 2000 High Video
 unksmk                          //
+zoomania
+zoomaniaa
 
 @source:sega/hikaru.cpp
 airtrix                         // 2001.02? Air Trix (Rev A)
@@ -17721,8 +17726,9 @@ gtg2                            // (c) 1992 Strata/Incredible Technologies
 gtg2j                           // (c) 1991 Strata/Incredible Technologies
 gtg2t                           // (c) 1989 Strata/Incredible Technologies
 gtgj31                          // (c) 1990 Strata/Incredible Technologies
-gtgt                            // (c) 1990 Strata/Incredible Technologies
-gtgt1                           // (c) 1990 Strata/Incredible Technologies
+gtgt10                          // (c) 1990 Strata/Incredible Technologies
+gtgt20                          // (c) 1990 Strata/Incredible Technologies
+gtgt21                          // (c) 1990 Strata/Incredible Technologies
 hstennis                        // (c) 1990 Strata/Incredible Technologies
 hstennis10                      // (c) 1990 Strata/Incredible Technologies
 neckneck                        // (c) 1992 Bundra Games/Incredible Technologies
@@ -19938,8 +19944,9 @@ ddrkara2                        // 2000 - Dance Dance Revolution Karaoke Mix 2 (
 ddr2m                           // 1999 - Dance Dance Revolution 2nd Mix (GN895 VER. JAA)
 ddr2mc                          // 1999 - Dance Dance Revolution 2nd Mix with beatmaniaIIDX CLUB VERSiON (GE896 VER. JAA)
 ddr2mc2                         // 1999 - Dance Dance Revolution 2nd Mix with beatmaniaIIDX substream CLUB VERSiON 2 (GE984 VER. JAA)
-ddr2ml                          // 1999 - Dance Dance Revolution 2nd Mix - Link Ver (GE885 VER. JAB)
-ddr2mla                         // 1999 - Dance Dance Revolution 2nd Mix - Link Ver (GE885 VER. JAA)
+ddr2ml                          // 1999 - Dance Dance Revolution 2nd Mix - Link Ver (GE885 VER. JAC)
+ddr2mla                         // 1999 - Dance Dance Revolution 2nd Mix - Link Ver (GE885 VER. JAB)
+ddr2mlb                         // 1999 - Dance Dance Revolution 2nd Mix - Link Ver (GE885 VER. JAA)
 ddr3ma                          // 1999 - Dance Dance Revolution 3rd Mix (GN887 VER. AAA)
 ddr3mj                          // 1999 - Dance Dance Revolution 3rd Mix (GN887 VER. JAA)
 ddr3mk                          // 2000 - Dance Dance Revolution 3rd Mix - Ver.Korea2 (GN887 VER. KBA)
@@ -19966,6 +19973,7 @@ ddrsbm                          // 1999 - Dance Dance Revolution Solo Bass Mix (
 ddru                            // 1999 - Dance Dance Revolution (GN845 VER. UAA)
 ddrusa                          // 2000 - Dance Dance Revolution USA (G*A44 VER. UAA)
 dmx                             // 2000 - Dance Maniax (G*874 VER. JAA)
+dmxa                            // 2000 - Dance Maniax (G*874 VER. AAA)
 dmx2m                           // 2000 - Dance Maniax 2nd Mix (G*A39 VER. JAA)
 dmx2majp                        // 2001 - Dance Maniax 2nd Mix Append J-Paradise (G*A38 VER. JAA
 dncfrks                         // 2000 - Dance Freaks (G*874 VER. KAA)
@@ -20020,6 +20028,7 @@ gtrfrk2ml2                      // 1999 - Guitar Freaks Link Kit 2 (GC929 VER. J
 gtrfrk3m                        // 2000 - Guitar Freaks 3rd Mix (GE949 VER. JAC)
 gtrfrk4m                        // 2000 - Guitar Freaks 4th Mix (G*A24 VER. JAA)
 gtrfrk5m                        // 2001 - Guitar Freaks 5th Mix (G*A26 VER. JAA)
+gtrfrk5ma                       // 2001 - Guitar Freaks 5th Mix (G*A26 VER. AAA)
 gtrfrk6m                        // 2001 - Guitar Freaks 6th Mix (G*B06 VER. JAA)
 gtrfrk7m                        // 2001 - Guitar Freaks 7th Mix (G*B17 VER. JAA)
 gtrfrk8m                        // 2002 - Guitar Freaks 8th Mix power-up ver. (G*C08 VER. JBA)
@@ -20070,8 +20079,10 @@ pcnfrk5mk                       // 2001 - Percussion Freaks 5th Mix (G*B05 VER. 
 pcnfrk6m                        // 2001 - Percussion Freaks 6th Mix (G*B16 VER. AAA)
 pcnfrk7m                        // 2002 - Percussion Freaks 7th Mix (G*C07 VER. AAA)
 pcnfrk8m                        // 2003 - Percussion Freaks 8th Mix (G*C38 VER. AAA)
-pcnfrk9m                        // 2003 - Percussion Freaks 9th Mix eAmusement (G*D09 VER. ABA)
-pcnfrk10m                       // 2004 - Percussion Freaks 10th Mix eAmusement (G*D40 VER. ACA)
+pcnfrk9m                        // 2003 - Percussion Freaks 9th Mix (G*D09 VER. AAA)
+pcnfrk9ma                       // 2003 - Percussion Freaks 9th Mix eAmusement (G*D09 VER. ABA)
+pcnfrk10m                       // 2004 - Percussion Freaks 10th Mix (G*D40 VER. AAA)
+pcnfrk10ma                      // 2004 - Percussion Freaks 10th Mix eAmusement (G*D40 VER. ACA)
 pnchmn                          // 2000 - Punch Mania: Hokuto no Ken (GQ918 VER. JAB)
 pnchmn2                         // 2000 - Punch Mania 2: Hokuto no Ken (GQA09 JAA)
 pnchmna                         // 2000 - Punch Mania: Hokuto no Ken (GQ918 VER. JAB, ALT CD)
@@ -32610,6 +32621,7 @@ drbyocwt                        // 2001.?? Derby Owners Club World Edition (Rev 
 dybb99                          // 1999.11 Dynamite Baseball '99 (Rev B)
 dybbnao                         // 1998.12 Dynamite Baseball NAOMI
 dygolf                          // 2001.04.27 Dynamic Golf / Virtua Golf (Rev A)
+dygolfp                         // 2001.?? Dynamic Golf / Virtua Golf (prototype)
 f355                            // 1999.07 Ferrari F355 Challenge (deluxe, no link)
 f355p                           // 1999.05 Ferrari F355 Challenge (private show version)
 f355bios                        // 1999.08 F355 Challenge Twin/Deluxe (BIOS)
@@ -37113,6 +37125,9 @@ rt1715                          //
 rt1715lc                        // (latin/cyrillic)
 rt1715w                         //
 
+@source:ibm/rs6000_type7xxx.cpp
+rs6k7009						// IBM RS/6000 Type 7009 Server
+
 @source:ibm/rtpc.cpp
 rtpc010                         // IBM RT PC Model 010
 rtpc015                         // IBM RT PC Model 015
@@ -37888,7 +37903,6 @@ hyprdriv                        // (c) 1998 Midway Games
 mace                            // (c) 1996 Atari Games
 macea                           // (c) 1996 Atari Games
 sfrush                          // (c) 1996 Atari Games
-sfrusha                         // (c) 1996 Atari Games
 sfrushrk                        // (c) 1996 Atari Games
 sfrushrkw                       // (c) 1996 Atari Games
 sfrushrkwo                      // (c) 1996 Atari Games
@@ -44468,7 +44482,7 @@ z80clock                        // 2020 Tom Storey
 @source:homebrew/z80dev.cpp
 z80dev                          //
 
-@source:ne/z80ne.cpp
+@source:misc/z80ne.cpp
 z80ne                           // 1980 - Z80NE
 z80net                          // 1980 - Z80NE + LX388 Video Interface
 z80netb                         // 1980 - Z80NE + LX388 Video Interface + 16Kb BASIC
@@ -44836,3 +44850,6 @@ sc203                           // SC203 - Modular Z180 Computer
 
 @source:vtech/phusion.cpp
 phusion                         //
+
+@source:misc/mtu130.cpp
+mtu130

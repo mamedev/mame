@@ -653,7 +653,6 @@ void upd7759_device::internal_start_w(int state)
 
 void upd7756_device::internal_start_w(int state)
 {
-
 	uint8_t oldstart = m_start;
 	m_start = (state != 0);
 

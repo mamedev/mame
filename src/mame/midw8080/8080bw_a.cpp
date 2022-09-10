@@ -151,7 +151,7 @@ void _8080bw_state::invadpt2_sh_port_2_w(uint8_t data)
 /*                                                     */
 /* SNK "Ozma Wars"                                     */
 /* No schematic or manual could be found.              */
-/* Suspected of having a SN76577 for the enemy         */
+/* It has a SN76477 for the enemy                      */
 /* movement sounds, another for the enemy death        */
 /* sounds, and analog circuits for the shooting and    */
 /* explosion sounds.                                   */
@@ -206,12 +206,12 @@ void ozmawars_state::ozmawars_port04_w(uint8_t data)
 	{
 		if (data == 0x01) m_samples->start(4, 13, 1);    // stage with wheels
 		if (data == 0x15) m_samples->start(4, 10, 1);    // stage with invaders
-		if (data == 0x17) m_samples->start(4, 9);        // meteor hit
+		if (data == 0x17) m_samples->start(3, 9);        // meteor hit
 		if (data == 0x1f) m_samples->start(4, 14, 1);    // meteor stage
-		//if (data == 0x35) m_samples->start(4, 12, 1);    // 
-		//if (data == 0x3f) m_samples->start(4, 11, 1);    // 
+		//if (data == 0x35) m_samples->start(4, 12, 1);    //
+		//if (data == 0x3f) m_samples->start(4, 11, 1);    //
 	}
-	if (data == 0) m_samples->stop(4);    // 
+	if (data == 0) m_samples->stop(4);    //
 }
 
 void ozmawars_state::ozmawars_port05_w(uint8_t data)

@@ -514,7 +514,7 @@ void redclash_state::beeper_w(u8 data)
 {
 	// beeper frequency (0xff is off), preliminary
 	bool on = m_sound_on && (data != 0xff);
-	m_beep_clock->set_period(attotime::from_hz(on ? data * 8 : 0));
+	m_beep_clock->set_period(attotime::from_hz(on ? (data * 8 + 32) : 0));
 }
 
 
@@ -1042,7 +1042,7 @@ ROM_START( redclashs )
 	ROM_LOAD( "2.9c",        0x2000, 0x1000, CRC(b60e5ada) SHA1(37440f382c5e8852d804fa9837c36cc1e9d94d1d) )
 
 	ROM_REGION(0x0800, "gfx1", 0 )
-	ROM_LOAD( "6.a12",        0x0000, 0x0800, CRC(da9bbcc2) SHA1(4cbe03c7f5e99cc2f124e0089ea3c392156b5d92) )
+	ROM_LOAD( "6.a12",       0x0000, 0x0800, CRC(da9bbcc2) SHA1(4cbe03c7f5e99cc2f124e0089ea3c392156b5d92) )
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "4.3e",        0x0000, 0x0800, CRC(483a1293) SHA1(e7812475c7509389bcf8fee35598e9894428eb37) )

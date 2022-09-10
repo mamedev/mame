@@ -548,6 +548,8 @@ uint8_t upd765_family_device::fifo_r()
 	uint8_t r = 0xff;
 	switch(main_phase) {
 	case PHASE_CMD:
+		if(machine().side_effects_disabled())
+			return 0x00;
 		if(command_pos)
 			fifo_w(0xff);
 		LOGFIFO("fifo_r in command phase\n");

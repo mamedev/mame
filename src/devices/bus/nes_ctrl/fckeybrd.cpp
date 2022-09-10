@@ -2,7 +2,7 @@
 // copyright-holders:Fabio Priuli
 /**********************************************************************
 
-    Nintendo Family Computer Keyboard Component
+    Nintendo Family Computer Keyboard HVC-007 and Data Recorder HVC-008
 
 **********************************************************************/
 
@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(NES_FCKEYBOARD, nes_fckeybrd_device, "nes_fckeybrd", "Nintendo Family Computer Keyboard Component")
+DEFINE_DEVICE_TYPE(NES_FCKEYBOARD, nes_fckeybrd_device, "nes_fckeybrd", "Nintendo Family Computer Keyboard and Data Recorder")
 
 
 static INPUT_PORTS_START( fc_keyboard )
@@ -106,6 +106,9 @@ static INPUT_PORTS_START( fc_keyboard )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE)     PORT_CHAR(' ')
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Del") PORT_CODE(KEYCODE_DEL)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Ins") PORT_CODE(KEYCODE_INSERT)
+
+	PORT_START("FCKEY.9")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_KEYBOARD ) // final dummy row
 INPUT_PORTS_END
 
 
@@ -139,13 +142,14 @@ void nes_fckeybrd_device::device_add_mconfig(machine_config &config)
 //  nes_fckeybrd_device - constructor
 //-------------------------------------------------
 
-nes_fckeybrd_device::nes_fckeybrd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_fckeybrd_device::nes_fckeybrd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, NES_FCKEYBOARD, tag, owner, clock)
 	, device_nes_control_port_interface(mconfig, *this)
 	, m_cassette(*this, "tape")
 	, m_kbd(*this, "FCKEY.%u", 0)
 	, m_fck_scan(0)
-	, m_fck_mode(0)
+	, m_fck_nibble(0)
+	, m_fck_enable(0)
 {
 }
 
@@ -157,18 +161,8 @@ nes_fckeybrd_device::nes_fckeybrd_device(const machine_config &mconfig, const ch
 void nes_fckeybrd_device::device_start()
 {
 	save_item(NAME(m_fck_scan));
-	save_item(NAME(m_fck_mode));
-}
-
-
-//-------------------------------------------------
-//  device_reset
-//-------------------------------------------------
-
-void nes_fckeybrd_device::device_reset()
-{
-	m_fck_scan = 0;
-	m_fck_mode = 0;
+	save_item(NAME(m_fck_nibble));
+	save_item(NAME(m_fck_enable));
 }
 
 
@@ -176,28 +170,26 @@ void nes_fckeybrd_device::device_reset()
 //  read
 //-------------------------------------------------
 
-uint8_t nes_fckeybrd_device::read_exp(offs_t offset)
+u8 nes_fckeybrd_device::read_exp(offs_t offset)
 {
-	uint8_t ret = 0;
-	if (offset == 0)    //$4016
+	u8 ret = 0;
+
+	if (m_fck_enable)
 	{
-		// FC Keyboard: tape input
-		if ((m_cassette->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY)
+		if (offset == 0)  // $4016
 		{
-			double level = m_cassette->input();
-			if (level < 0)
-				ret |= 0x00;
-			else
-				ret |= 0x02;
+			// FC Keyboard: tape input
+			if ((m_cassette->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY)
+			{
+				if (m_cassette->input() >= 0)
+					ret |= 0x02;
+			}
 		}
-	}
-	else    //$4017
-	{
-		// FC Keyboard: rows of the keyboard matrix are read 4-bits at time and returned as bit1->bit4
-		if (m_fck_scan < 9)
-			ret |= ~(((m_kbd[m_fck_scan]->read() >> (m_fck_mode * 4)) & 0x0f) << 1) & 0x1e;
-		else
-			ret |= 0x1e;
+		else              // $4017
+		{
+			// FC Keyboard: rows of the keyboard matrix are read 4-bits at time and returned as bit1->bit4
+			ret |= BIT(~m_kbd[m_fck_scan]->read(), m_fck_nibble * 4, 4) << 1;
+		}
 	}
 
 	return ret;
@@ -207,22 +199,19 @@ uint8_t nes_fckeybrd_device::read_exp(offs_t offset)
 //  write
 //-------------------------------------------------
 
-void nes_fckeybrd_device::write(uint8_t data)
+void nes_fckeybrd_device::write(u8 data)
 {
 	// tape output (not fully tested)
 	if ((m_cassette->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_RECORD)
-		m_cassette->output(((data & 0x07) == 0x07) ? +1.0 : -1.0);
+		m_cassette->output(BIT(data, 0) ? -1.0 : +1.0); // Arkanoid 2 requires this polarity for saving
 
-	if (BIT(data, 2))   // keyboard active
-	{
-		uint8_t out = BIT(data, 1);   // scan
+	m_fck_enable = BIT(data, 2);
 
-		if (m_fck_mode && !out && ++m_fck_scan > 9)
-			m_fck_scan = 0;
+	u8 prev = m_fck_nibble;
+	m_fck_nibble = BIT(data, 1);
+	if (prev && !m_fck_nibble)
+		m_fck_scan = (m_fck_scan + 1) % 10;
 
-		m_fck_mode = out;   // access lower or upper 4 bits
-
-		if (BIT(data, 0))   // reset
-			m_fck_scan = 0;
-	}
+	if (BIT(data, 0))   // reset
+		m_fck_scan = 0;
 }
