@@ -538,6 +538,7 @@ PCB Layouts missing
 #include "bus/msx_slot/slot.h"
 #include "bus/msx_slot/rom.h"
 #include "bus/msx_slot/ram.h"
+#include "bus/msx_slot/ax230.h"
 #include "bus/msx_slot/bunsetsu.h"
 #include "bus/msx_slot/bruc100.h"
 #include "bus/msx_slot/cartridge.h"
@@ -2667,15 +2668,6 @@ void msx2_state::turbor(AY8910Type &ay8910_type, machine_config &config)
 /* MSX - Al Fateh 123 - rebranded Sakhr / Al Alamiah AX-230, dump needed to verify */
 
 /* MSX - AVT DPC-200 */
-// GSS Z8400A PS cpu
-// AY-3-8910
-// FDC: None, 0 drives
-// 1 Cartridge slot
-// 1 Expansion slot
-// add_internal_slot(config, MSX_SLOT_ROM, "bios", 0, 0, 0, 2, "maincpu");
-// add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  // 64KB RAM
-// add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
-// expansion in slot #3
 
 /* MSX - AVT FC-200 - probably same as Goldstar FC-80, dump needed to verify */
 
@@ -2698,7 +2690,7 @@ void msx_state::perfect1(machine_config &config)
 	// AY-3-8910
 	// TMS9129
 	// DW64MX1
-	// FDC: None, 0 dribes
+	// FDC: None, 0 drives
 	// 1 Cartridge slot
 
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
@@ -4618,7 +4610,7 @@ void msx_state::ax230(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 2, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4); // 64KB RAM
 	// TODO: uses ascii8 mapper type?
-	add_internal_slot(config, MSX_SLOT_ROM, "games", 3, 3, 1, 2, "games");
+	add_internal_slot(config, MSX_SLOT_AX230, "games", 3, 3, 1, 2, "games");
 
 	msx1(TMS9918, AY8910, config);
 }
@@ -6197,7 +6189,7 @@ void msx1_v9938_state::cx5m128(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 	// 1 Mini cart slot (with YRM-502)
-	// 1 Module slot
+	// 1 Yamaha Module slot
 	// S3527
 
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
@@ -11086,7 +11078,7 @@ COMP(1986, ax150,      0,        0,     ax150,      msx,      msx_state, empty_i
 COMP(1986, ax170,      0,        0,     ax170,      msx,      msx_state, empty_init, "Sakhr", "AX-170 (Arabic) (MSX1)", 0)
 COMP(1986, ax200,      0,        0,     ax200,      msx,      msx1_v9938_state, empty_init, "Sakhr", "AX-200 (Arabic/English) (MSX1)", 0)
 COMP(1986, ax200m,     ax200,    0,     ax200m,     msx,      msx1_v9938_state, empty_init, "Sakhr", "AX-200M (Arabic/English) (MSX1)", 0)
-COMP(1986, ax230,      0,        0,     ax230,      msx,      msx_state, empty_init, "Sakhr", "AX-230 (Arabic) (MSX1)", MACHINE_NOT_WORKING)
+COMP(1986, ax230,      0,        0,     ax230,      msx,      msx_state, empty_init, "Sakhr", "AX-230 (Arabic) (MSX1)", 0)
 COMP(19??, spc800,     0,        0,     spc800,     msx,      msx_state, empty_init, "Samsung", "SPC-800 (MSX1)", 0)
 COMP(1985, mpc64,      0,        0,     mpc64,      msxjp,    msx_state, empty_init, "Sanyo", "MPC-64 (MSX1)", 0)
 COMP(1985, mpc100,     0,        0,     mpc100,     msx,      msx_state, empty_init, "Sanyo", "MPC-100 (MSX1)", 0)
