@@ -32,13 +32,15 @@ protected:
 	void restore_banks();
 
 private:
+	static constexpr size_t SRAM_SIZE = 0x4000;
+
 	required_device<nvram_device> m_nvram;
 	required_memory_region m_rom_region;
 	uint32_t m_region_offset;
 	const uint8_t *m_rom;
 	uint8_t m_selected_bank[8];
 	const uint8_t *m_bank_base[8];
-	uint8_t m_sram[0x4000];
+	std::vector<uint8_t> m_sram;
 
 	void map_bank(int bank);
 };

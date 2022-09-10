@@ -30,6 +30,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
+	static constexpr size_t SRAM_SIZE = 0x4000;
+
 	void restore_banks();
 	void map_bank(int bank);
 

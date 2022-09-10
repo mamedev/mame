@@ -28,7 +28,7 @@ public:
 	void set_start_address(uint32_t start_address) { m_start_address = start_address; m_end_address = m_start_address + m_size; }
 	void set_size(uint32_t size) { m_size = size; m_end_address = m_start_address + m_size; }
 
-	virtual uint8_t read(offs_t offset) { return 0xFF; }
+	virtual uint8_t read(offs_t offset) { return 0xff; }
 	virtual void write(offs_t offset, uint8_t data) { }
 
 	address_space &memory_space() const { return *m_mem_space; }

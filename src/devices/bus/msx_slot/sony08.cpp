@@ -26,13 +26,12 @@ msx_slot_sony08_device::msx_slot_sony08_device(const machine_config &mconfig, co
 		m_selected_bank[i] = 0;
 		m_bank_base[i] = nullptr;
 	}
-	memset(m_sram, 0, sizeof(m_sram));
 }
 
 
 void msx_slot_sony08_device::device_add_mconfig(machine_config &config)
 {
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 }
 
 
@@ -46,7 +45,8 @@ void msx_slot_sony08_device::device_start()
 
 	m_rom = m_rom_region->base() + m_region_offset;
 
-	m_nvram->set_base(m_sram, 0x4000);
+	m_sram.resize(SRAM_SIZE);
+	m_nvram->set_base(m_sram.data(), SRAM_SIZE);
 
 	save_item(NAME(m_selected_bank));
 
@@ -74,13 +74,13 @@ void msx_slot_sony08_device::map_bank(int bank)
 		return;
 	}
 
-	m_bank_base[bank] = m_rom + ((m_selected_bank[bank] * 0x2000) & 0xFFFFF);
+	m_bank_base[bank] = m_rom + ((m_selected_bank[bank] * 0x2000) & 0xfffff);
 	if (bank == 2)
 	{
 		if (m_selected_bank[bank] & 0x80)
 		{
-			m_bank_base[0] = m_sram;
-			m_bank_base[1] = m_sram + 0x2000;
+			m_bank_base[0] = &m_sram[0x0000];
+			m_bank_base[1] = &m_sram[0x2000];
 		}
 		else
 		{
@@ -104,7 +104,7 @@ uint8_t msx_slot_sony08_device::read(offs_t offset)
 {
 	if (offset >= 0xc000)
 	{
-		return 0xFF;
+		return 0xff;
 	}
 
 	if ((offset & 0xf000) == 0x7000 && (m_selected_bank[3] & 0x80))
@@ -118,7 +118,7 @@ uint8_t msx_slot_sony08_device::read(offs_t offset)
 	{
 		return mem[offset & 0x1fff];
 	}
-	return 0xFF;
+	return 0xff;
 }
 
 
@@ -128,39 +128,39 @@ void msx_slot_sony08_device::write(offs_t offset, uint8_t data)
 	{
 		if (m_bank_base[0] != nullptr)
 		{
-			m_sram[offset & 0x3fff] = data;
+			m_sram[offset] = data;
 			return;
 		}
 	}
 
 	switch (offset)
 	{
-		case 0x4FFF:
+		case 0x4fff:  // 4000-5fff
 			m_selected_bank[2] = data;
 			map_bank(2);
 			break;
 
-		case 0x6FFF:     // 6000-7FFF
+		case 0x6fff:  // 6000-7fff
 			m_selected_bank[3] = data;
 			map_bank(3);
 			break;
 
-		case 0x77FF:
+		case 0x77ff:
 			m_selected_bank[6] = data;
 			map_bank(6);
 			break;
 
-		case 0x7FFF:
+		case 0x7fff:
 			m_selected_bank[7] = data;
 			map_bank(7);
 			break;
 
-		case 0x8FFF:
+		case 0x8fff:  // 8000-9fff
 			m_selected_bank[4] = data;
 			map_bank(4);
 			break;
 
-		case 0xAFFF:
+		case 0xafff:  // a000-bfff
 			m_selected_bank[5] = data;
 			map_bank(5);
 			break;

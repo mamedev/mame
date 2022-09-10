@@ -43,7 +43,8 @@ void msx_slot_fsa1fm_device::device_start()
 	}
 
 	m_rom = m_rom_region->base() + m_region_offset;
-	m_nvram->set_base(m_sram, 0x2000);
+	m_sram.resize(SRAM_SIZE);
+	m_nvram->set_base(m_sram.data(), SRAM_SIZE);
 
 	save_item(NAME(m_selected_bank));
 

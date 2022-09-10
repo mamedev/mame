@@ -23,13 +23,12 @@ msx_slot_fs4600_device::msx_slot_fs4600_device(const machine_config &mconfig, co
 	, m_sram_address(0)
 	, m_control(0)
 {
-	memset(m_sram, 0, sizeof(m_sram));
 }
 
 
 void msx_slot_fs4600_device::device_add_mconfig(machine_config &config)
 {
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 }
 
 
@@ -42,7 +41,8 @@ void msx_slot_fs4600_device::device_start()
 	}
 
 	m_rom = m_rom_region->base() + m_region_offset;
-	m_nvram->set_base(m_sram, 0x1000);
+	m_sram.resize(SRAM_SIZE);
+	m_nvram->set_base(m_sram.data(), SRAM_SIZE);
 
 	save_item(NAME(m_selected_bank));
 	save_item(NAME(m_sram_address));
