@@ -12,10 +12,10 @@ TODO:
 - is the "Chu has food" sample ever played? Nothing is written to soundcmd when
   a Chu eats a Boo dropping
 - How is the first half of the palette used? (the colors, not the clut).
-  The title logo looks better with it, but not much else does. Or maybe it's a
-  region change? The Japanese Irem flyer (Punching Kid) shows the purple/yellow
-  maze colors. The USA licensed version has a black background like in MAME,
-  and it matches a video of the cabinet.
+  The title logo looks better with it, but not much else does. Looks like it's
+  a regional configuration? The Japanese Irem flyer (Punching Kid) shows the
+  purple/yellow maze colors. The USA licensed version has a black background
+  like in MAME, and it matches a video of the GDI cabinet.
 
 --------------
 
@@ -94,6 +94,8 @@ public:
 
 	void olibochu(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(palette_changed) { adjust_palette(); }
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -120,6 +122,7 @@ private:
 	void flipscreen_w(u8 data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void palette(palette_device &palette) const;
+	void adjust_palette();
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
@@ -149,6 +152,7 @@ void olibochu_state::machine_start()
 void olibochu_state::machine_reset()
 {
 	m_soundcmd = 0;
+	adjust_palette();
 }
 
 
@@ -185,14 +189,17 @@ void olibochu_state::palette(palette_device &palette) const
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
+}
 
-	// color_prom now points to the beginning of the lookup table
-	color_prom += 0x20;
+void olibochu_state::adjust_palette()
+{
+	int bank = (ioport("CONF")->read() & 1) ? 0x10 : 0;
+	const u8 *color_prom = memregion("proms")->base() + 0x20;
 
 	for (int i = 0; i < 0x100; i++)
 	{
-		palette.set_pen_indirect(i, (color_prom[i] & 0xf) | 0x10);
-		palette.set_pen_indirect(i + 0x100, (color_prom[i + 0x100] & 0xf) | 0x10);
+		m_palette->set_pen_indirect(i, (color_prom[i] & 0xf) | bank);
+		m_palette->set_pen_indirect(i + 0x100, (color_prom[i + 0x100] & 0xf) | bank);
 	}
 }
 
@@ -283,8 +290,7 @@ void olibochu_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 u32 olibochu_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->black_pen(), cliprect);
-	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES);
 	draw_sprites(bitmap, cliprect);
 
 	// high priority tiles are used during intermission (after round 2)
@@ -300,7 +306,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(olibochu_state::scanline)
 	if (scanline == 248) // vblank irq
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); // Z80 - RST 10h
 
-	if (scanline == 0) // periodic irq
+	if (scanline == 128) // periodic irq
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); // Z80 - RST 08h
 }
 
@@ -478,11 +484,16 @@ static INPUT_PORTS_START( olibochu )
 	PORT_DIPNAME( 0x20, 0x20, "Invincibility (Cheat)" ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	// Start Pattern: enable to select round at game start (turn off to start game)
-	PORT_DIPNAME( 0x40, 0x40, "Start Pattern (Cheat)") PORT_DIPLOCATION("SW2:7")
+	// Level Select: enable to select round at game start (turn off to start game)
+	PORT_DIPNAME( 0x40, 0x40, "Level Select (Cheat)") PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )
+
+	PORT_START("CONF")
+	PORT_CONFNAME( 0x01, 0x01, "Palette" ) PORT_CHANGED_MEMBER(DEVICE_SELF, olibochu_state, palette_changed, 0)
+	PORT_CONFSETTING(    0x01, "USA" )
+	PORT_CONFSETTING(    0x00, "Japan" )
 INPUT_PORTS_END
 
 
@@ -571,37 +582,37 @@ void olibochu_state::olibochu(machine_config &config)
 
 ROM_START( olibochu )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1b.3n",        0x0000, 0x1000, CRC(bf17f4f4) SHA1(1075456f4b70a68548e0e1b6271fd4b845a77ce4) )
-	ROM_LOAD( "2b.3lm",       0x1000, 0x1000, CRC(63833b0d) SHA1(0135c449c92470241d03a87709c739209139d660) )
-	ROM_LOAD( "3b.3k",        0x2000, 0x1000, CRC(a4038e8b) SHA1(d7dce830239c8975ac135b213a99eec0c20ec3e2) )
-	ROM_LOAD( "4b.3j",        0x3000, 0x1000, CRC(aad4bec4) SHA1(9203564ac841a8de2f9b8183d4086acce95e3d47) )
-	ROM_LOAD( "5b.3h",        0x4000, 0x1000, CRC(66efa79f) SHA1(535369d958461834435d3202cd7310ecd0aa528c) )
-	ROM_LOAD( "6b.3f",        0x5000, 0x1000, CRC(1123d1ef) SHA1(6094e732e61915c45b14acd90c1343f05385daf4) )
-	ROM_LOAD( "7c.3e",        0x6000, 0x1000, CRC(89c26fb4) SHA1(ebc51e40612af894b20bd7fc3a5179cd35aaac9b) )
-	ROM_LOAD( "8b.3d",        0x7000, 0x1000, CRC(af19e5a5) SHA1(5a55bbee5b2f20e2988171a310c8293dabbd9a72) )
+	ROM_LOAD( "1b.3n",  0x0000, 0x1000, CRC(bf17f4f4) SHA1(1075456f4b70a68548e0e1b6271fd4b845a77ce4) )
+	ROM_LOAD( "2b.3lm", 0x1000, 0x1000, CRC(63833b0d) SHA1(0135c449c92470241d03a87709c739209139d660) )
+	ROM_LOAD( "3b.3k",  0x2000, 0x1000, CRC(a4038e8b) SHA1(d7dce830239c8975ac135b213a99eec0c20ec3e2) )
+	ROM_LOAD( "4b.3j",  0x3000, 0x1000, CRC(aad4bec4) SHA1(9203564ac841a8de2f9b8183d4086acce95e3d47) )
+	ROM_LOAD( "5b.3h",  0x4000, 0x1000, CRC(66efa79f) SHA1(535369d958461834435d3202cd7310ecd0aa528c) )
+	ROM_LOAD( "6b.3f",  0x5000, 0x1000, CRC(1123d1ef) SHA1(6094e732e61915c45b14acd90c1343f05385daf4) )
+	ROM_LOAD( "7c.3e",  0x6000, 0x1000, CRC(89c26fb4) SHA1(ebc51e40612af894b20bd7fc3a5179cd35aaac9b) )
+	ROM_LOAD( "8b.3d",  0x7000, 0x1000, CRC(af19e5a5) SHA1(5a55bbee5b2f20e2988171a310c8293dabbd9a72) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "17.4j",        0x0000, 0x1000, CRC(57f07402) SHA1(a763a835ac512c69b4351c1ec72b0a64e46203aa) )
-	ROM_LOAD( "18.4l",        0x1000, 0x1000, CRC(0a903e9c) SHA1(d893c2f5373f748d8bebf3673b15014f4a8d4b5c) )
+	ROM_LOAD( "17.4j",  0x0000, 0x1000, CRC(57f07402) SHA1(a763a835ac512c69b4351c1ec72b0a64e46203aa) )
+	ROM_LOAD( "18.4l",  0x1000, 0x1000, CRC(0a903e9c) SHA1(d893c2f5373f748d8bebf3673b15014f4a8d4b5c) )
 
 	ROM_REGION( 0x2000, "samples", 0 )
-	ROM_LOAD( "15.1k",        0x0000, 0x1000, CRC(fb5dd281) SHA1(fba947ae7b619c2559b5af69ef02acfb15733f0d) )
-	ROM_LOAD( "16.1m",        0x1000, 0x1000, CRC(c07614a5) SHA1(d13d271a324f99d008429c16193c4504e5894493) )
+	ROM_LOAD( "15.1k",  0x0000, 0x1000, CRC(fb5dd281) SHA1(fba947ae7b619c2559b5af69ef02acfb15733f0d) )
+	ROM_LOAD( "16.1m",  0x1000, 0x1000, CRC(c07614a5) SHA1(d13d271a324f99d008429c16193c4504e5894493) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "13.6n",        0x0000, 0x1000, CRC(b4fcf9af) SHA1(b360daa0670160dca61512823c98bc37ad99b9cf) )
-	ROM_LOAD( "14.4n",        0x1000, 0x1000, CRC(af54407e) SHA1(1883928b721e03e452fd0c626c403dc374b02ed7) )
+	ROM_LOAD( "13.6n",  0x0000, 0x1000, CRC(b4fcf9af) SHA1(b360daa0670160dca61512823c98bc37ad99b9cf) )
+	ROM_LOAD( "14.4n",  0x1000, 0x1000, CRC(af54407e) SHA1(1883928b721e03e452fd0c626c403dc374b02ed7) )
 
 	ROM_REGION( 0x4000, "gfx2", 0 )
-	ROM_LOAD( "9.6a",         0x0000, 0x1000, CRC(fa69e16e) SHA1(5a493a0a108b3e496884d1f499f3445d4e241ecd) )
-	ROM_LOAD( "10.2a",        0x1000, 0x1000, CRC(10359f84) SHA1(df55f06fd98233d0efbc30e3e24bf9b8cab1a5cc) )
-	ROM_LOAD( "11.4a",        0x2000, 0x1000, CRC(1d968f5f) SHA1(4acf78d865ca36355bb15dc1d476f5e97a5d91b7) )
-	ROM_LOAD( "12.2a",        0x3000, 0x1000, CRC(d8f0c157) SHA1(a7b0c873e016c3b3252c2c9b6400b0fd3d650b2f) )
+	ROM_LOAD( "9.6a",   0x0000, 0x1000, CRC(fa69e16e) SHA1(5a493a0a108b3e496884d1f499f3445d4e241ecd) )
+	ROM_LOAD( "10.2a",  0x1000, 0x1000, CRC(10359f84) SHA1(df55f06fd98233d0efbc30e3e24bf9b8cab1a5cc) )
+	ROM_LOAD( "11.4a",  0x2000, 0x1000, CRC(1d968f5f) SHA1(4acf78d865ca36355bb15dc1d476f5e97a5d91b7) )
+	ROM_LOAD( "12.2a",  0x3000, 0x1000, CRC(d8f0c157) SHA1(a7b0c873e016c3b3252c2c9b6400b0fd3d650b2f) )
 
 	ROM_REGION( 0x0220, "proms", 0 )
-	ROM_LOAD( "c-1",          0x0000, 0x0020, CRC(e488e831) SHA1(6264741f7091c614093ae1ea4f6ead3d0cef83d3) ) // palette
-	ROM_LOAD( "c-2",          0x0020, 0x0100, CRC(698a3ba0) SHA1(3c1a6cb881ef74647c651462a27d812234408e45) ) // char lookup table
-	ROM_LOAD( "c-3",          0x0120, 0x0100, CRC(efc4e408) SHA1(f0796426cf324791853aa2ae6d0c3d1f8108d5c2) ) // sprite lookup table
+	ROM_LOAD( "c-1",    0x0000, 0x0020, CRC(e488e831) SHA1(6264741f7091c614093ae1ea4f6ead3d0cef83d3) ) // palette
+	ROM_LOAD( "c-2",    0x0020, 0x0100, CRC(698a3ba0) SHA1(3c1a6cb881ef74647c651462a27d812234408e45) ) // char lookup table
+	ROM_LOAD( "c-3",    0x0120, 0x0100, CRC(efc4e408) SHA1(f0796426cf324791853aa2ae6d0c3d1f8108d5c2) ) // sprite lookup table
 ROM_END
 
 } // anonymous namespace
@@ -612,5 +623,5 @@ ROM_END
     Drivers
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT MACHINE   INPUT     STATE           INIT        SCREEN  COMPANY               FULLNAME       FLAGS
-GAME( 1981, olibochu, 0,     olibochu, olibochu, olibochu_state, empty_init, ROT270, "Irem (GDI license)", "Oli-Boo-Chu", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT        SCREEN  COMPANY               FULLNAME       FLAGS
+GAME( 1981, olibochu, 0,      olibochu, olibochu, olibochu_state, empty_init, ROT270, "Irem (GDI license)", "Oli-Boo-Chu", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
