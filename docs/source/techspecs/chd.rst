@@ -15,6 +15,7 @@ This document describes the CHD format. It is explicitly *descriptive*, and does
 how to encode a stream into a CHD file. It also describes the format parameters for each compression
 codec used to compress individual hunks.
 
+
 Definitions
 -----------
 Some terms used elsewhere in this document are defined here for clarity.
@@ -64,7 +65,7 @@ Header Format
 -------------
 There have been 5 versions of the CHD file format. All versions but version
 5 are considered deprecated and are no longer in common use. Each CHD version
-has a different layout, but the first 16 bytes are always the same and are
+has a different layout, but the layout of the first 16 bytes are always the same and are
 sufficient to determine the CHD version. All numbers are in **big endian** order.
 
 Version 1
@@ -75,7 +76,7 @@ is as follows. CHD version 1 only supports hard disks.
 +------------------+----------+
 | Magic_Number     | 8 bytes  |
 +------------------+----------+
-| Header_Length    | 4 bytes  |
+| Header_Size      | 4 bytes  |
 +------------------+----------+
 | Header_Version   | 4 bytes  |
 +------------------+----------+
@@ -85,7 +86,7 @@ is as follows. CHD version 1 only supports hard disks.
 +------------------+----------+
 | Hunk_Size        | 4 bytes  |
 +------------------+----------+
-| Total_Hunks      | 4 bytes  |
+| Hunk_Count       | 4 bytes  |
 +------------------+----------+
 | Cylinders        | 4 bytes  |
 +------------------+----------+
@@ -102,7 +103,7 @@ Magic_Number
 ''''''''''''
 'MComprHD', 8 bytes
 
-Header_Length
+Header_Size
 '''''''''''''
 4 byte unsigned integer, big-endian. The length of the header. Value: 76. 
 
@@ -135,7 +136,7 @@ Hunk_Size
 **Not** the *hunk size* as used conventionally in this document. To calculate
 the *hunk size*, multiply ``Hunk_Size`` by 512.
 
-Total_Hunks
+Hunk_Count
 '''''''''''
 4 byte unsigned integer, big-endian. The total number of hunks in the CHD file. 
 
@@ -168,7 +169,7 @@ is as follows. CHD version 2 only supports hard disks.
 +------------------+----------+
 | Magic_Number     | 8 bytes  |
 +------------------+----------+
-| Header_Length    | 4 bytes  |
+| Header_Size      | 4 bytes  |
 +------------------+----------+
 | Header_Version   | 4 bytes  |
 +------------------+----------+
@@ -178,7 +179,7 @@ is as follows. CHD version 2 only supports hard disks.
 +------------------+----------+
 | Hunk_Size        | 4 bytes  |
 +------------------+----------+
-| Total_Hunks      | 4 bytes  |
+| Hunk_Count       | 4 bytes  |
 +------------------+----------+
 | Cylinders        | 4 bytes  |
 +------------------+----------+
@@ -190,14 +191,14 @@ is as follows. CHD version 2 only supports hard disks.
 +------------------+----------+
 | Parent_MD5_Hash  | 16 bytes |
 +------------------+----------+
-| Sector_Length    | 4 bytes  |
+| Sector_Size      | 4 bytes  |
 +------------------+----------+
 
 Magic_Number
 ''''''''''''
 'MComprHD', 8 bytes
 
-Header_Length
+Header_Size
 '''''''''''''
 4 byte unsigned integer, big-endian. The length of the header. Value: 76. 
 
@@ -226,11 +227,11 @@ Possible values:
 
 Hunk_Size
 '''''''''
-4 byte unsigned integer, big-endian. Number of ``Sector_Length``-length sectors per hunk. 
+4 byte unsigned integer, big-endian. Number of ``Sector_Size``-length sectors per hunk. 
 **Not** the *hunk size* as used conventionally in this document. To calculate
-the *hunk size*, multiply ``Hunk_Size`` by ``Sector_Length``.
+the *hunk size*, multiply ``Hunk_Size`` by ``Sector_Size``.
 
-Total_Hunks
+Hunk_Count
 '''''''''''
 4 byte unsigned integer, big-endian. The total number of hunks in the CHD file. 
 
@@ -254,7 +255,7 @@ Parent_MD5_Hash
 '''''''''''''''
 16 byte MD5 hash of the compressed parent CHD file.
 
-Sector_Length
+Sector_Size
 '''''''''''''
 4 byte unsigned integer, big-endian. The number of bytes per sector.
 
@@ -265,7 +266,7 @@ The CHD version 3 header is 120 bytes long. The structure of the version 3 heade
 +------------------+----------+
 | Magic_Number     | 8 bytes  |
 +------------------+----------+
-| Header_Length    | 4 bytes  |
+| Header_Size      | 4 bytes  |
 +------------------+----------+
 | Header_Version   | 4 bytes  |
 +------------------+----------+
@@ -273,7 +274,7 @@ The CHD version 3 header is 120 bytes long. The structure of the version 3 heade
 +------------------+----------+
 | Compression_Type | 4 bytes  |
 +------------------+----------+
-| Total_Hunks      | 4 bytes  |
+| Hunk_Count       | 4 bytes  |
 +------------------+----------+
 | Logical_Size     | 8 bytes  |
 +------------------+----------+
@@ -294,7 +295,7 @@ Magic_Number
 ''''''''''''
 'MComprHD', 8 bytes
 
-Header_Length
+Header_Size
 '''''''''''''
 4 byte unsigned integer, big-endian. The length of the header. Value: 76. 
 
@@ -322,7 +323,7 @@ Possible values:
 * ``0x00000001`` Deflate/Zlib (``CHDCOMPRESSION_ZLIB``)
 * ``0x00000002`` Deflate/Zlib+ (``CHDCOMPRESSION_ZLIB_PLUS``)
 
-Total_Hunks
+Hunk_Count
 '''''''''''
 4 byte unsigned integer, big-endian. The total number of hunks in the CHD file. 
 
@@ -336,7 +337,7 @@ Metadata_Offset
 
 MD5_Hash
 ''''''''
-16 byte MD5 hash of the decompressed data in this CHD file. 
+16 byte MD5 hash of the decompressed data in the CHD file. 
 
 Parent_MD5_Hash
 '''''''''''''''
@@ -361,7 +362,7 @@ The CHD version 4 header is 108 bytes long. The structure of the version 4 heade
 +------------------+----------+
 | Magic_Number     | 8 bytes  |
 +------------------+----------+
-| Header_Length    | 4 bytes  |
+| Header_Size      | 4 bytes  |
 +------------------+----------+
 | Header_Version   | 4 bytes  |
 +------------------+----------+
@@ -369,7 +370,7 @@ The CHD version 4 header is 108 bytes long. The structure of the version 4 heade
 +------------------+----------+
 | Compression_Type | 4 bytes  |
 +------------------+----------+
-| Total_Hunks      | 4 bytes  |
+| Hunk_Count       | 4 bytes  |
 +------------------+----------+
 | Logical_Size     | 8 bytes  |
 +------------------+----------+
@@ -388,7 +389,7 @@ Magic_Number
 ''''''''''''
 'MComprHD', 8 bytes
 
-Header_Length
+Header_Size
 '''''''''''''
 4 byte unsigned integer, big-endian. The length of the header. Value: 76. 
 
@@ -417,7 +418,7 @@ Possible values:
 * ``0x00000002`` Deflate/Zlib+ (``CHDCOMPRESSION_ZLIB_PLUS``)
 * ``0x00000003`` AV Huffman (``CHDCOMPRESSION_AV``)
 
-Total_Hunks
+Hunk_Count
 '''''''''''
 4 byte unsigned integer, big-endian. The total number of hunks in the CHD file. 
 
@@ -452,7 +453,7 @@ The CHD version 5 header is 124 bytes long. The structure of the version 5 heade
 +---------------------+----------+
 | Magic_Number        | 8 bytes  |
 +---------------------+----------+
-| Header_Length       | 4 bytes  |
+| Header_Size         | 4 bytes  |
 +---------------------+----------+
 | Header_Version      | 4 bytes  |
 +---------------------+----------+
@@ -479,7 +480,7 @@ Magic_Number
 ''''''''''''
 'MComprHD', 8 bytes
 
-Header_Length
+Header_Size
 '''''''''''''
 4 byte unsigned integer, big-endian. The length of the header. Value: 76. 
 
@@ -544,20 +545,174 @@ Hunk Map Format
 CHD version 1 and 2 share a map format, CHD version 3 and 4 extends the V1-2 map format differently,
 and CHD version 5 uses a completely different map format. For CHD version 1-4, the map begins directly after
 the header, and in CHD v5, the map occurs at ``Map_Offset``. The map has a total length of the size of
-a map entry multiplied by the *hunk count*, and each map entry is laid out sequentially.
+a map entry multiplied by the *hunk count*, and each map entry is laid out sequentially for all versions.
 
 Version 1-2 Map
 ~~~~~~~~~~~~~~~
-The size of each map entry in the V1-2 map format is 8 bytes. The total size of the map in CHD version 1-2 can
-be calculated by multiplying the *hunk count* by 8. Each map entry has the following structure.
+Each map entry in the V1-2 map format is stored as an 8-byte big-endian integer. The total size of the map in CHD version 1-2 can be calculated by
+multiplying the *hunk count* by 8. The structure of a V1-2 map entry is as follows, assuming little-endian conversion.
 
++------------+---------+
+| Block_Size | 20 bits |
++------------+---------+
+| Offset     | 44 bits |
++------------+---------+
 
+Block_Size
+''''''''''
+High 20 bits, interpreted as a 4 byte, unsigned little-endian integer. The *block size* of the hunk this map entry refers to.
+
+Offset
+''''''
+Low 44 bits, interpreted as a 8 byte unsigned little-endian integer. The offset in the CHD file to the beginning of the hunk this map entry refers to.
 
 Version 3-4 Map
 ~~~~~~~~~~~~~~~
+Each map entry in the V3-4 map format is 16 bytes long. The total size of the map in CHD version 1-2 can be calculated by
+multiplying the *hunk count* by 16. The structure of a V3-4 map entry is as follows.
+
++------------------+---------+
+| Offset           | 8 bytes |
++------------------+---------+
+| CRC              | 4 bytes |
++------------------+---------+
+| Block_Size       | 3 bytes |
++------------------+---------+
+| Compression_Type | 1 byte  |
++------------------+---------+
+
+Offset
+''''''
+8 byte unsigned integer, big-endian. The offset in the CHD file to the beginning of the hunk this map entry refers to.
+
+CRC
+'''
+4 byte unsigned integer, big-endian. The `CRC32 ISO/HDLC <https://reveng.sourceforge.io/crc-catalogue/17plus.htm#crc.cat.crc-32-iso-hdlc>`_ checksum for the 
+decompressed hunk data.
+
+Block_Size
+''''''''''
+3 byte unsigned integer, big-endian. The *block size* of the hunk this map entry refers to.
+
+Compression_Type
+''''''''''''''''
+1 byte unsigned integer, the upper four bits are undefined. The type of compression used in the hunk this map entry refers to.
+
+Possible compression types are
+
+* ``0x0`` Invalid
+* ``0x1`` Compressed with the CHD file Codec
+* ``0x2`` Uncompressed
+* ``0x3`` Mini (Raw Data stored in Offset)
+* ``0x4`` Decompress from Self
+* ``0x5`` Decompress from Parent
+* ``0x6`` Secondary Compression
 
 Version 5 Map 
 ~~~~~~~~~~~~~
+CHD V5 maps can be either compressed or uncompressed. If the first codec in the header `Compression_Type` is `0x0`, then the entire CHD file, including the map, is uncompressed. 
+If the first codec in the header `Compression_Type` is anything other than `0x0`, then a form of compression is used, and the map will be compressed.
+
+Uncompressed Map
+''''''''''''''''
+Since the uncompressed map only occurs when the entire CHD file is uncompressed, each uncompressed map entry contains only the 4-byte offset to the beginning of the hunk data. 
+The total size of an uncompressed map in CHD version 5 can be calculated by multiplying the *hunk count* by 4. The structure of a V5 uncompressed map entry is as follows.
+
++------------------+---------+
+| Offset           | 4 bytes |
++------------------+---------+
+
+Offset
+>>>>>>
+4 byte unsigned integer, big-endian. The offset in the CHD file to the beginning of the hunk this map entry refers to.
+
+Compressed Map
+''''''''''''''
+The structure of the compressed map header is as follows.
+
++-----------------+---------+
+| Map_Size        | 4 bytes |
++-----------------+---------+
+| Map_Offset      | 6 bytes |
++-----------------+---------+
+| Map_CRC         | 2 bytes |
++-----------------+---------+
+| Size_Bits       | 1 byte  |
++-----------------+---------+
+| Self_Bits       | 1 byte  |
++-----------------+---------+
+| Parent_Bits     | 1 byte  |
++-----------------+---------+
+| Reserved        | 1 byte  |
++-----------------+---------+
+
+Map_Size
+>>>>>>>>
+4 byte unsigned integer, big-endian. The compressed length of the map.
+
+Map_Offset
+>>>>>>>>>>
+6 byte unsigned integer, big-endian. The offset in the CHD file to the first compressed map entry. 
+
+Map_CRC
+>>>>>>>
+2 byte unsigned integer, big-endian. The `CRC16 IBM/3740 <https://reveng.sourceforge.io/crc-catalogue/16.htm#crc.cat.crc-16-ibm-3740>`_ checksum for the 
+decompressed map data.
+
+Size_Bits
+>>>>>>>>>
+1 byte unsigned integer. The number of bits used to store the *block size* of a hunk in a map entry, for hunks compressed with one of four codecs used in the CHD file.
+
+Self_Bits
+>>>>>>>>>
+1 byte unsigned integer. The number of bits used to store the offset to a hunk that is a reference to another hunk in the same CHD file, for hunks that are decompressed from Self.
+
+Parent_Bits
+>>>>>>>>>>>
+1 byte unsigned integer. The number of bits used to store the offset to a hunk that is a reference to another hunk in the parent file, for hunks that are decompressed from Parent.
+
+Reserved
+>>>>>>>>
+Reserved for future use.
+
+The structure of each map entry in the compressed map, once decompressed, is as follows.
+
++------------------+---------+
+| Compression_Type | 1 byte  |
++------------------+---------+
+| Block_Size       | 3 bytes |
++------------------+---------+
+| Offset           | 6 bytes |
++------------------+---------+
+| CRC              | 2 bytes |
++------------------+---------+
+
+Compression_Type
+>>>>>>>>>>>>>>>>
+1 byte unsigned integer, the upper four bits are undefined. The type of compression used in the hunk this map entry refers to.
+
+Possible compression types are
+
+* ``0x0`` Compression Type 0 (`Compression_Type[0]`)
+* ``0x1`` Compression Type 1 (`Compression_Type[1]`)
+* ``0x2`` Compression Type 2 (`Compression_Type[2]`)
+* ``0x3`` Compression Type 3 (`Compression_Type[3]`)
+* ``0x4`` Uncompressed
+* ``0x5`` Decompress from Self
+* ``0x6`` Decompress from Parent
+
+Block_Size
+>>>>>>>>>>
+3 byte unsigned integer, big-endian. The *block size* of the hunk this map entry refers to.
+
+Offset
+>>>>>>
+6 byte unsigned integer, big-endian. The offset in the CHD file to the beginning of the hunk this map entry refers to.
+
+CRC
+>>>
+2 byte unsigned integer, big-endian. The `CRC16 IBM/3740 <https://reveng.sourceforge.io/crc-catalogue/16.htm#crc.cat.crc-16-ibm-3740>`_ checksum for the 
+decompressed hunk data.
 
 Compression Codecs
 ------------------
