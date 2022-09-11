@@ -4950,3 +4950,18 @@ if (BUSES["PC8801"]~=null) then
 		MAME_DIR .. "src/devices/bus/pc8801/jmbx1.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/bus/mtu130/board.h,BUSES["MTU130"] = true
+---------------------------------------------------
+
+if (BUSES["MTU130"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/mtu130/board.cpp",
+		MAME_DIR .. "src/devices/bus/mtu130/board.h",
+		MAME_DIR .. "src/devices/bus/mtu130/datamover.cpp",
+		MAME_DIR .. "src/devices/bus/mtu130/datamover.h",
+	}
+ end
+

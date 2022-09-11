@@ -6,6 +6,9 @@
 // Silently boots to floppy, so nothing will happen if you don't have
 // a bootable disk in the drive.
 
+// The backplane has 5 slots, one if which is used by the main cpu
+// card, the Monomeg, and one by the FDC card.
+
 // Unimplemented:
 // - MTUTAPE, a kind of digital tape?
 // - MTUNET, some proprietary network
@@ -13,14 +16,14 @@
 // - Sound on user via cb2, it's weird
 // - Light pen, need working demo code
 
-// Unimplemented extension boards:
+// Implemented extension boards:
 // - DATAMOVER, a 68k-based board, used by BASIC 1.5 to accelerate floating point operations
+
+// Unimplemented extension boards:
 // - PROGRAMMOVER, a z80-based board
+// - MultI-O, an i/o board
 
 // Need to add the extra PROMs once they're dumped.
-
-// Note that we hardcoded the ram in bank 3 BASIC 1.5 needs, it should
-// be added by DATAMOVER (or PROGRAMMOVER after some reconfiguration).
 
 // Probable bug somewhere making the BASIC (light pen, game) demos
 // fail in the demonstration disk, possibly in the customized 6502
@@ -34,6 +37,8 @@
 #include "machine/mos6551.h"
 #include "machine/upd765.h"
 #include "bus/rs232/rs232.h"
+#include "bus/mtu130/board.h"
+#include "bus/mtu130/datamover.h"
 #include "sound/dac.h"
 #include "emupal.h"
 #include "screen.h"
@@ -53,6 +58,7 @@ public:
 		m_rs232(*this, "rs232"),
 		m_fdc(*this, "fdc"),
 		m_floppy(*this, "fdc:%d", 0U),
+		m_ext(*this, "ext%d", 0U),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_dac(*this, "dac"),
@@ -88,6 +94,7 @@ private:
 	required_device<rs232_port_device> m_rs232;
 	required_device<upd765a_device> m_fdc;
 	required_device_array<floppy_connector, 4> m_floppy;
+	required_device_array<mtu130_extension_device, 3> m_ext;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<dac_byte_interface> m_dac;
@@ -115,6 +122,7 @@ private:
 
 	static void floppies(device_slot_interface &device);
 	void map(address_map &map);
+	void extension_board(machine_config &config, int slot_id, const char *tag, const char *def);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	u8 fdc_ctrl_r();
@@ -162,6 +170,9 @@ void mtu130_state::machine_start()
 	m_se_view.select(0);
 	m_rom_view.disable();
 	m_rof_view.disable();
+
+	for(auto e : m_ext)
+		e->map_io(m_io_view[1]);
 }
 
 void mtu130_state::video_start()
@@ -382,7 +393,8 @@ void mtu130_state::map(address_map &map)
 
 	map(0x1c000, 0x1ffff).ram().share(m_videoram);                  // 16k of video ram
 
-	map(0x30000, 0x3ffff).ram();                                    // Basic 1.5 wants more ram, comes from an extension board
+	map(0x20000, 0x3ffff).lrw8(NAME([this](offs_t offset) -> u8 { return m_ext[0]->read23(offset) & m_ext[1]->read23(offset) & m_ext[2]->read23(offset); }),
+							   NAME([this](offs_t offset, u8 data) { m_ext[0]->write23(offset, data); m_ext[1]->write23(offset, data); m_ext[2]->write23(offset, data); }));
 }
 
 void mtu130_state::floppies(device_slot_interface &device)
@@ -391,8 +403,22 @@ void mtu130_state::floppies(device_slot_interface &device)
 	device.option_add("8dsdd", FLOPPY_8_DSDD);
 }
 
+void mtu130_state::extension_board(machine_config &config, int slot_id, const char *tag, const char *def)
+{
+	MTU130_EXTENSION(config, m_ext[slot_id]);
+	m_ext[slot_id]->set_slot_id(slot_id);
+	m_ext[slot_id]->set_irq_merger(m_irq_merger);
+	if(def)
+		m_ext[slot_id]->set_default_option(def);
+
+	m_ext[slot_id]->option_add("datamover", MTU130_DATAMOVER0);
+	m_ext[slot_id]->option_add("datamover_sec", MTU130_DATAMOVER1); // Datamover using secondary i/o addresses
+}
+
 void mtu130_state::mtu130(machine_config &config)
 {
+	config.set_perfect_quantum(m_maincpu); // Needs tight sync with the 68000 in the datamover
+
 	M6502MTU(config, m_maincpu, 10_MHz_XTAL/10);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mtu130_state::map);
 
@@ -442,6 +468,10 @@ void mtu130_state::mtu130(machine_config &config)
 
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, m_speaker, 1.0);
 	SPEAKER(config, m_speaker).front_center();
+
+	extension_board(config, 0, "ext0", "datamover");
+	extension_board(config, 1, "ext1", nullptr);
+	extension_board(config, 2, "ext2", nullptr);
 }
 
 
