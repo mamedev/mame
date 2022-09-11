@@ -630,29 +630,29 @@ Compressed Map
 ''''''''''''''
 The structure of the compressed map header is as follows.
 
-+-----------------+---------+
-| Map_Size        | 4 bytes |
-+-----------------+---------+
-| Map_Offset      | 6 bytes |
-+-----------------+---------+
-| Map_CRC         | 2 bytes |
-+-----------------+---------+
-| Size_Bits       | 1 byte  |
-+-----------------+---------+
-| Self_Bits       | 1 byte  |
-+-----------------+---------+
-| Parent_Bits     | 1 byte  |
-+-----------------+---------+
-| Reserved        | 1 byte  |
-+-----------------+---------+
++--------------+---------+
+| Map_Size     | 4 bytes |
++--------------+---------+
+| First_Offset | 6 bytes |
++--------------+---------+
+| Map_CRC      | 2 bytes |
++--------------+---------+
+| Size_Bits    | 1 byte  |
++--------------+---------+
+| Self_Bits    | 1 byte  |
++--------------+---------+
+| Parent_Bits  | 1 byte  |
++--------------+---------+
+| Reserved     | 1 byte  |
++--------------+---------+
 
 Map_Size
 >>>>>>>>
 4 byte unsigned integer, big-endian. The compressed length of the map.
 
-Map_Offset
+First_Offset
 >>>>>>>>>>
-6 byte unsigned integer, big-endian. The offset in the CHD file to the first compressed map entry. 
+6 byte unsigned integer, big-endian. The offset in the CHD file to the beginning of the hunk the first map entry refers to.
 
 Map_CRC
 >>>>>>>
@@ -780,7 +780,7 @@ The ``flac`` codec compresses hunks with `FLAC <https://en.wikipedia.org/wiki/FL
 At the start of each compressed hunk, there is a one byte header of either ``L`` (``0x4C``) to indicate little-endian output, or ``B`` (``0x42``) to indicate big-endian output. The FLAC-compressed bytes begin
 after this one byte header. The FLAC decompressor implementation must be correctly configured according to the header byte.
 
-FLAC data is compressed as raw FLAC frames, **without a ```STREAM`` section <https://xiph.org/flac/format.html#stream>`_, and thus no ``STREAMINFO``** or any other metadata. There are 2 channels per block, 
+FLAC data is compressed as raw FLAC frames, without `metadata blocks or a fLaC header <https://xiph.org/flac/format.html#stream>`_. There are 2 channels per block, 
 each channel encoded as 16-bit signed integer PCM. The samples are interleaved with the left channel first, then the right channel. 
 
 
