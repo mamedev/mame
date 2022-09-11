@@ -743,7 +743,6 @@ ROM_START( nesm8b )
 	ROM_LOAD( "sc-chr h.u31",  0x0000, 0x2000, CRC(307b19ab) SHA1(b35ef4c2cf071db77cec1b4529b43a20cfcce172) )
 
 	// 10-Yard Fight
-	// 10-Yard Fight
 	ROM_REGION( 0x8000, "prg3", 0 )
 	ROM_LOAD( "ty-prg v.u4",   0x0000, 0x8000, CRC(df58fc5a) SHA1(7cc69b39ece2168574599d45ab8452edd4f5a3a1) )
 
