@@ -215,7 +215,7 @@ public:
 
 	void zr107(machine_config &config);
 
-	virtual void driver_init() override;
+	void driver_init();
 
 protected:
 	required_device<ppc_device> m_maincpu;

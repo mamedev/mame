@@ -45,7 +45,8 @@
 #include "emu.h"
 #include "nes_apu.h"
 
-DEFINE_DEVICE_TYPE(NES_APU, nesapu_device, "nesapu", "N2A03 APU")
+DEFINE_DEVICE_TYPE(NES_APU,  nesapu_device,  "nesapu",  "N2A0X APU")
+DEFINE_DEVICE_TYPE(APU_2A03, apu2a03_device, "apu2a03", "RP2A03 APU")
 
 nesapu_device::nesapu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
@@ -62,6 +63,12 @@ nesapu_device::nesapu_device(const machine_config& mconfig, const char* tag, dev
 	: nesapu_device(mconfig, NES_APU, tag, owner, clock)
 {
 }
+
+apu2a03_device::apu2a03_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock)
+	: nesapu_device(mconfig, APU_2A03, tag, owner, clock)
+{
+}
+
 
 void nesapu_device::device_reset()
 {
@@ -177,7 +184,7 @@ void nesapu_device::device_start()
 	save_item(NAME(m_APU.tri.output));
 
 	save_item(NAME(m_APU.noi.regs));
-	save_item(NAME(m_APU.noi.seed));
+	save_item(NAME(m_APU.noi.lfsr));
 	save_item(NAME(m_APU.noi.vbl_length));
 	save_item(NAME(m_APU.noi.phaseacc));
 	save_item(NAME(m_APU.noi.env_phase));
@@ -385,10 +392,10 @@ void nesapu_device::apu_noise(apu_t::noise_t *chan)
 	while (chan->phaseacc < 0)
 	{
 		chan->phaseacc += freq;
-		chan->seed = (chan->seed >> 1) | ((BIT(chan->seed, 0) ^ BIT(chan->seed, (chan->regs[2] & 0x80) ? 6 : 1)) << 14);
+		update_lfsr(*chan);
 	}
 
-	if (BIT(chan->seed, 0)) /* make it silence */
+	if (BIT(chan->lfsr, 0)) /* silence channel */
 	{
 		chan->output = 0;
 		return;
@@ -398,6 +405,18 @@ void nesapu_device::apu_noise(apu_t::noise_t *chan)
 		chan->output = chan->regs[0] & 0x0f;
 	else
 		chan->output = 0x0f - chan->env_vol;
+}
+
+void nesapu_device::update_lfsr(apu_t::noise_t &chan)
+{
+	chan.lfsr |= (BIT(chan.lfsr, 0) ^ BIT(chan.lfsr, (chan.regs[2] & 0x80) ? 6 : 1)) << 15;
+	chan.lfsr >>= 1;
+}
+
+void apu2a03_device::update_lfsr(apu_t::noise_t &chan)
+{
+	chan.lfsr |= (BIT(chan.lfsr, 0) ^ BIT(chan.lfsr, 1)) << 15;
+	chan.lfsr >>= 1;
 }
 
 /* RESET DPCM PARAMETERS */
@@ -609,7 +628,7 @@ void nesapu_device::write(offs_t offset, u8 value)
 		break;
 
 	case apu_t::IRQCTRL:
-		if(value & 0x80)
+		if (value & 0x80)
 			m_APU.step_mode = 5;
 		else
 			m_APU.step_mode = 4;

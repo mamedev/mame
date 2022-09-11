@@ -396,5 +396,5 @@ ROM_END
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    INIT,MONITOR,COMPANY,FULLNAME,FLAGS
 GAME( 1986, rockrage,  0,        rockrage, rockrage, rockrage_state, empty_init, ROT0, "Konami", "Rock'n Rage (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rockragea, rockrage, rockrage, rockrage, rockrage_state, empty_init, ROT0, "Konami", "Rock'n Rage (prototype?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rockragea, rockrage, rockrage, rockrage, rockrage_state, empty_init, ROT0, "Konami", "Rock'n Rage (prototype?)", MACHINE_SUPPORTS_SAVE ) // no title screen, abruptly cuts off ending before the "presented by Konami" seen in other sets, location test? 
 GAME( 1986, rockragej, rockrage, rockrage, rockrage, rockrage_state, empty_init, ROT0, "Konami", "Koi no Hotrock (Japan)", MACHINE_SUPPORTS_SAVE )

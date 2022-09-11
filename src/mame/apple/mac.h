@@ -286,7 +286,6 @@ private:
 	void set_scc_waitrequest(int waitrequest);
 	void mac_driver_init(model_t model);
 	void mac_install_memory(offs_t memory_begin, offs_t memory_end, offs_t memory_size, void *memory_data, int is_rom);
-	offs_t mac_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 };
 
 #endif // MAME_INCLUDES_MAC_H

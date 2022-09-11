@@ -31,7 +31,7 @@ protected:
 	virtual void nvram_default() override                       { }
 	virtual bool nvram_read(util::read_stream &file) override   { size_t actual; return !file.read (get_cart_base(), get_cart_size(), actual) && actual == get_cart_size(); }
 	virtual bool nvram_write(util::write_stream &file) override { size_t actual; return !file.write(get_cart_base(), get_cart_size(), actual) && actual == get_cart_size(); }
-	virtual bool nvram_can_write() override                     { return m_modified; }   // Save only if the EPROM has been programmed
+	virtual bool nvram_can_write() const override               { return m_modified; }   // Save only if the EPROM has been programmed
 
 	// z88cart_interface overrides
 	virtual uint8_t read(offs_t offset) override;

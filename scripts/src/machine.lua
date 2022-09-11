@@ -1181,6 +1181,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/ds1207.h,MACHINES["DS1207"] = true
+---------------------------------------------------
+
+if (MACHINES["DS1207"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ds1207.cpp",
+		MAME_DIR .. "src/devices/machine/ds1207.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/ds1302.h,MACHINES["DS1302"] = true
 ---------------------------------------------------
 
@@ -1460,6 +1472,18 @@ if (MACHINES["GT913"]~=null) then
 		MAME_DIR .. "src/devices/machine/gt913_kbd.h",
 		MAME_DIR .. "src/devices/machine/gt913_snd.cpp",
 		MAME_DIR .. "src/devices/machine/gt913_snd.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/machine/generic_spi_flash.h,MACHINES["GENERIC_SPI_FLASH"] = true
+--------------------------------------------------
+
+if (MACHINES["GENERIC_SPI_FLASH"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/generic_spi_flash.cpp",
+		MAME_DIR .. "src/devices/machine/generic_spi_flash.h",
 	}
 end
 
@@ -3102,6 +3126,17 @@ if (MACHINES["SAA1043"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/saa1043.cpp",
 		MAME_DIR .. "src/devices/machine/saa1043.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/scc66470.h,MACHINES["SCC66470"] = true
+---------------------------------------------------
+if (MACHINES["SCC66470"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/scc66470.cpp",
+		MAME_DIR .. "src/devices/machine/scc66470.h",
 	}
 end
 
@@ -4823,6 +4858,19 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/spifi3.h,MACHINES["SPIFI3"] = true
+---------------------------------------------------
+
+if (MACHINES["SPIFI3"]~=null) then
+	MACHINES["NSCSI"] = true
+	files {
+		MAME_DIR .. "src/devices/machine/spifi3.cpp",
+		MAME_DIR .. "src/devices/machine/spifi3.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/applefdintf.h,MACHINES["APPLE_FDINTF"] = true
 ---------------------------------------------------
 if (MACHINES["APPLE_FDINTF"]~=null) then
@@ -4939,28 +4987,6 @@ if (MACHINES["NS32082"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/ns32082.cpp",
 		MAME_DIR .. "src/devices/machine/ns32082.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/tsconfdma.h,MACHINES["TSCONF_DMA"] = true
----------------------------------------------------
-if (MACHINES["TSCONF_DMA"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/tsconfdma.cpp",
-		MAME_DIR .. "src/devices/machine/tsconfdma.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/glukrs.h,MACHINES["GLUKRS"] = true
----------------------------------------------------
-if (MACHINES["GLUKRS"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/glukrs.cpp",
-		MAME_DIR .. "src/devices/machine/glukrs.h",
 	}
 end
 

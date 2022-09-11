@@ -632,7 +632,7 @@ protected:
 	void dma_transfer_write();
 	void dma_transfer_read();
 
-	void fcodes_command(int ref, const std::vector<std::string> &params);
+	void fcodes_command(int ref, const std::vector<std::string_view> &params);
 };
 
 class sun4_state : public sun4_base_state
@@ -690,10 +690,10 @@ void sun4_base_state::debugger_w(offs_t offset, uint32_t data, uint32_t mem_mask
 	m_mmu->insn_data_w<sun4_mmu_base_device::SUPER_INSN>(offset, data, mem_mask);
 }
 
-void sun4_base_state::fcodes_command(int ref, const std::vector<std::string> &params)
+void sun4_base_state::fcodes_command(int ref, const std::vector<std::string_view> &params)
 {
 #if SUN4_LOG_FCODES
-	if (params < 1)
+	if (params.length() < 1)
 		return;
 
 	bool is_on = (params[0] == "on");

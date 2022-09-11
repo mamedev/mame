@@ -92,9 +92,8 @@ pic16c62x_disassembler::pic16c62x_disassembler()
 	const char *const *ops;
 	u16 mask, bits;
 	int bit;
-	int i;
 
-	ops = PIC16C62xFormats; i = 0;
+	ops = PIC16C62xFormats;
 	while (*ops)
 	{
 		p = *ops;
@@ -126,9 +125,7 @@ pic16c62x_disassembler::pic16c62x_disassembler()
 		Op.emplace_back(mask, bits, *p, ops[0], ops[1]);
 
 		ops += 2;
-		i++;
 	}
-
 }
 
 offs_t pic16c62x_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)

@@ -86,7 +86,7 @@ struct apu_t
 		}
 
 		u8 regs[4]; /* regs[1] unused */
-		u32 seed = 1;
+		u16 lfsr = 1;
 		int vbl_length = 0;
 		float phaseacc = 0.0;
 		float env_phase = 0.0;

@@ -297,7 +297,8 @@ public:
 		m_wheel_driver(*this, "wheel"),
 		m_lamps(*this, "lamp%u", 0U),
 		m_leds(*this, "led%u", 0U)
-		{}
+	{
+	}
 
 	void seattle_common(machine_config &config);
 	void phoenix(machine_config &config);
@@ -1668,7 +1669,7 @@ static INPUT_PORTS_START( blitz )
 //  PORT_DIPSETTING(      0x0004, "Not Used 1" ) Marked as Unused in the manual
 //  PORT_DIPSETTING(      0x0008, "Not Used 2" ) Marked as Unused in the manual
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ))
-	PORT_DIPNAME( 0x0030, 0x0030, "Curency Type" )
+	PORT_DIPNAME( 0x0030, 0x0030, "Currency Type" )
 	PORT_DIPSETTING(      0x0030, DEF_STR( USA ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( French ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( German ) )
@@ -2408,31 +2409,13 @@ ROM_END
 
 
 ROM_START( sfrush )
-	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) // Boot Code Version L1.0
-	ROM_LOAD( "hdboot.u32", 0x000000, 0x80000, CRC(39a35f1b) SHA1(c46d83448399205d38e6e41dd56abbc362254254) )
-
-	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
-
-	ROM_REGION32_LE( 0x200000, "cage:boot", 0 ) // TMS320C31 boot ROM  Version L1.0
-	ROM_LOAD32_BYTE( "sndboot.u69", 0x000000, 0x080000, CRC(7e52cdc7) SHA1(f735063e19d2ca672cef6d761a2a47df272e8c59) )
-
-	ROM_REGION32_LE( 0x1000000, "cage", 0 ) // TMS320C31 sound ROMs
-	ROM_LOAD32_WORD( "sfrush.u62",  0x400000, 0x200000, CRC(5d66490e) SHA1(bd39ea3b45d44cae6ca5890f365653326bbecd2d) )
-	ROM_LOAD32_WORD( "sfrush.u61",  0x400002, 0x200000, CRC(f3a00ee8) SHA1(c1ac780efc32b2e30522d7cc3e6d92e7daaadddd) )
-	ROM_LOAD32_WORD( "sfrush.u53",  0x800000, 0x200000, CRC(71f8ddb0) SHA1(c24bef801f43bae68fda043c4356e8cf1298ca97) )
-	ROM_LOAD32_WORD( "sfrush.u49",  0x800002, 0x200000, CRC(dfb0a54c) SHA1(ed34f9485f7a7e5bb73bf5c6428b27548e12db12) )
-
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version L1.06
-	DISK_IMAGE( "sfrush", 0, SHA1(e2db0270a707fb2115207f988d5751081d6b4994) )
-
-	ROM_REGION( 0x2000, "serial_security_pic", ROMREGION_ERASEFF ) // security PIC (provides game ID code and serial number)
-	ROM_LOAD( "315_sf_rush.u96", 0x0000, 0x1000, CRC(e3527a3a) SHA1(5e556e6dfd87df5a895bdf4bd7f77708ac327db7) )
-ROM_END
-
-
-ROM_START( sfrusha )
-	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) // Boot Code Version L1.06A
-	ROM_LOAD( "hdbootv1_06a.bin", 0x000000, 0x80000, CRC(f247ba60) SHA1(850f97002eb1e362c3df870d7b6a1b5524ab983d) )
+	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 )
+	ROM_SYSTEM_BIOS( 0, "l10",   "Boot Code Version L1.0" )
+	ROMX_LOAD( "hdboot.u32",       0x000000, 0x80000, CRC(39a35f1b) SHA1(c46d83448399205d38e6e41dd56abbc362254254), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "l106a", "Boot Code Version L1.06A" )
+	ROMX_LOAD( "hdbootv1_06a.bin", 0x000000, 0x80000, CRC(f247ba60) SHA1(850f97002eb1e362c3df870d7b6a1b5524ab983d), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "l112",  "Boot Code Version L1.12" )
+	ROMX_LOAD( "hdbootv1_12.u32",  0x000000, 0x80000, CRC(efec7dfb) SHA1(3632934dc655867636fd2c5c4e96b3e300d86d68), ROM_BIOS(2) )
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 
@@ -2619,11 +2602,13 @@ ROM_END
 
 #define BLITZ_BIOS \
 		ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) \
-		ROM_DEFAULT_BIOS("l12") \
+		ROM_DEFAULT_BIOS("l1_") \
 		ROM_SYSTEM_BIOS( 0, "l11", "Boot Code L1.1" ) \
 		ROMX_LOAD( "blitz1_1.u32", 0x000000, 0x80000, CRC(8163ce02) SHA1(89b432d8879052f6c5534ee49599f667f50a010f), ROM_BIOS(0) ) \
 		ROM_SYSTEM_BIOS( 1, "l12", "Boot Code L1.2" ) \
-		ROMX_LOAD( "blitz1_2.u32", 0x000000, 0x80000, CRC(38dbecf5) SHA1(7dd5a5b3baf83a7f8f877ff4cd3f5e8b5201b36f), ROM_BIOS(1) )
+		ROMX_LOAD( "blitz1_2.u32", 0x000000, 0x80000, CRC(38dbecf5) SHA1(7dd5a5b3baf83a7f8f877ff4cd3f5e8b5201b36f), ROM_BIOS(1) ) \
+		ROM_SYSTEM_BIOS( 2, "l1_", "Boot Code L1.?" ) \
+		ROMX_LOAD( "blitz1__.u32", 0x000000, 0x80000, CRC(4fd0559f) SHA1(f1b7ab162b327b7acd81b605d0245ad9ffa3d886), ROM_BIOS(2) ) // sticker fallen off, probably newest (see 0x129f0 vs. 0x122ed in 112 and 0x121bd in 111
 
 ROM_START( blitz )
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version 1.02
@@ -2921,8 +2906,7 @@ GAME(  1996, wg3dh,      0,        wg3dh,     wg3dh,    seattle_state, init_wg3d
 GAME(  1996, wg3dhfe,    wg3dh,    wg3dh,     wg3dh,    seattle_state, init_wg3dh,    ROT0, "Atari Games",  "Wayne Gretzky's 3D Hockey Fatality Edition (prototype)", MACHINE_SUPPORTS_SAVE )
 GAME(  1996, mace,       0,        mace,      mace,     seattle_state, init_mace,     ROT0, "Atari Games",  "Mace: The Dark Age (boot ROM 1.0ce, HDD 1.0b)", MACHINE_SUPPORTS_SAVE )
 GAME(  1997, macea,      mace,     mace,      mace,     seattle_state, init_mace,     ROT0, "Atari Games",  "Mace: The Dark Age (HDD 1.0a)", MACHINE_SUPPORTS_SAVE )
-GAMEL( 1996, sfrush,     0,        sfrush,    sfrush,   seattle_state, init_sfrush,   ROT0, "Atari Games",  "San Francisco Rush (boot rom L 1.0)", MACHINE_SUPPORTS_SAVE, layout_sfrush )
-GAMEL( 1996, sfrusha,    sfrush,   sfrush,    sfrush,   seattle_state, init_sfrush,   ROT0, "Atari Games",  "San Francisco Rush (boot rom L 1.06A)", MACHINE_SUPPORTS_SAVE, layout_sfrush )
+GAMEL( 1996, sfrush,     0,        sfrush,    sfrush,   seattle_state, init_sfrush,   ROT0, "Atari Games",  "San Francisco Rush", MACHINE_SUPPORTS_SAVE, layout_sfrush )
 GAMEL( 1997, sfrushrk,   0,        sfrushrk,  sfrushrk, seattle_state, init_sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock (boot rom L 1.0, GUTS Oct 6 1997 / MAIN Oct 16 1997)", MACHINE_SUPPORTS_SAVE, layout_sfrush )
 GAMEL( 1997, sfrushrkw,  sfrushrk, sfrushrkw, sfrushrk, seattle_state, init_sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock (Wavenet, boot rom L 1.38, GUTS Aug 19 1997 / MAIN Aug 19 1997)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sfrush )
 GAMEL( 1997, sfrushrkwo, sfrushrk, sfrushrkw, sfrushrk, seattle_state, init_sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock (Wavenet, boot rom L 1.38, GUTS Aug 6 1997 / MAIN Aug 5 1997)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sfrush )

@@ -85,6 +85,7 @@ Scanline 0 is the start of vblank.
 #include "emu.h"
 
 #include "macrtc.h"
+#include "mactoolbox.h"
 
 #include "bus/mackbd/mackbd.h"
 #include "bus/macpds/hyperdrive.h"
@@ -1113,6 +1114,7 @@ void mac128_state::mac512ke(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, C7M);        /* 7.8336 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac128_state::mac512ke_map);
+	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
@@ -1381,7 +1383,6 @@ ROM_START( mac128k )
 	// @U2E  342-0191-A  PAL16R4  BMU0
 	// @U1E  342-0251-A  PAL16R8  LAG
 	// @U1D  342-0254-A  PAL16R4A TSM
-
 ROM_END
 
 ROM_START( mac512k )

@@ -3845,13 +3845,13 @@ void vgmplay_state::vgmplay(machine_config &config)
 	m_dmg[1]->add_route(0, m_mixer, 1, AUTO_ALLOC_INPUT, 0);
 	m_dmg[1]->add_route(0, m_mixer, 1, AUTO_ALLOC_INPUT, 1);
 
-	N2A03(config, m_nescpu[0], 0);
+	N2A03G(config, m_nescpu[0], 0);
 	m_nescpu[0]->set_addrmap(AS_PROGRAM, &vgmplay_state::nescpu_map<0>);
 	m_nescpu[0]->set_disable();
 	m_nescpu[0]->add_route(ALL_OUTPUTS, m_mixer, 0.50, AUTO_ALLOC_INPUT, 0);
 	m_nescpu[0]->add_route(ALL_OUTPUTS, m_mixer, 0.50, AUTO_ALLOC_INPUT, 1);
 
-	N2A03(config, m_nescpu[1], 0);
+	N2A03G(config, m_nescpu[1], 0);
 	m_nescpu[1]->set_addrmap(AS_PROGRAM, &vgmplay_state::nescpu_map<1>);
 	m_nescpu[1]->set_disable();
 	m_nescpu[1]->add_route(ALL_OUTPUTS, m_mixer, 0.50, AUTO_ALLOC_INPUT, 0);

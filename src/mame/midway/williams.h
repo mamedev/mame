@@ -44,13 +44,9 @@ public:
 		m_pia(*this, "pia_%u", 0U)
 	{ }
 
+	void stargate(machine_config &config);
+	void robotron(machine_config &config);
 	void lottofun(machine_config &config);
-	void williams_base(machine_config &config);
-
-	void init_stargate();
-	void init_playball();
-	void init_lottofun();
-	void init_robotron();
 
 	u8 port_0_49way_r();
 	virtual u8 video_counter_r();
@@ -63,6 +59,8 @@ public:
 	void palette_init(palette_device &palette) const;
 
 protected:
+	void williams_base(machine_config &config);
+
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
@@ -132,8 +130,6 @@ public:
 	void jin(machine_config &config);
 
 protected:
-	virtual void driver_init() override;
-
 	virtual void main_map(address_map &map);
 
 	void video_control_w(u8 data);
@@ -158,7 +154,7 @@ public:
 	{ }
 
 private:
-	virtual void driver_init() override;
+	virtual void driver_start() override;
 };
 
 class mayday_state : public defender_state
@@ -169,7 +165,7 @@ public:
 	{ }
 
 private:
-	virtual void driver_init() override;
+	virtual void driver_start() override;
 
 	virtual void main_map(address_map &map) override;
 
@@ -187,8 +183,6 @@ public:
 	void sinistar(machine_config &config);
 
 private:
-	virtual void driver_init() override;
-
 	virtual void vram_select_w(u8 data) override;
 
 	void main_map(address_map &map);
@@ -204,8 +198,6 @@ public:
 	void bubbles(machine_config &config);
 
 private:
-	virtual void driver_init() override;
-
 	void main_map(address_map &map);
 
 	virtual void cmos_w(offs_t offset, u8 data) override;
@@ -221,8 +213,6 @@ public:
 	void playball(machine_config &config);
 
 private:
-	virtual void driver_init() override;
-
 	void snd_cmd_w(u8 data);
 };
 
@@ -235,14 +225,14 @@ public:
 		m_mux1(*this, "mux_1")
 	{ }
 
-	void williams_muxed(machine_config &config);
+	void joust(machine_config &config);
+	void splat(machine_config &config);
 
-	void init_splat();
-	void init_joust();
 	void init_alienar();
-	void init_alienaru();
 
 private:
+	void williams_muxed(machine_config &config);
+
 	required_device<ls157_device> m_mux0;
 	required_device<ls157_device> m_mux1;
 };
@@ -257,8 +247,6 @@ public:
 	void spdball(machine_config &config);
 
 private:
-	virtual void driver_init() override;
-
 	void main_map(address_map &map);
 };
 
@@ -279,7 +267,6 @@ public:
 private:
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	virtual void driver_init() override;
 
 	optional_device<cpu_device> m_soundcpu_b;
 	optional_memory_bank m_bankb;
@@ -407,8 +394,6 @@ public:
 	void inferno(machine_config &config);
 
 private:
-	virtual void driver_init() override;
-
 	required_device<ls157_device> m_mux;
 };
 
@@ -429,8 +414,6 @@ protected:
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
 private:
-	virtual void driver_init() override;
-
 	virtual TILE_GET_INFO_MEMBER(get_tile_info) override;
 	virtual void bg_select_w(u8 data) override;
 
@@ -459,7 +442,6 @@ public:
 
 private:
 	virtual void machine_start() override;
-	virtual void driver_init() override;
 
 	DECLARE_WRITE_LINE_MEMBER(maxvol_w);
 	void lamp_w(u8 data);
@@ -485,7 +467,6 @@ public:
 
 private:
 	virtual void machine_start() override;
-	virtual void driver_init() override;
 
 	required_device<ls157_device> m_mux;
 	required_device<s11_obg_device> m_bg;

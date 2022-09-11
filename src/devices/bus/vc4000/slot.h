@@ -6,8 +6,6 @@
 #include "imagedev/cartrom.h"
 
 
-#define VC4000SLOT_ROM_REGION_TAG ":cart:rom"
-
 /* PCB */
 enum
 {
@@ -32,7 +30,7 @@ public:
 	virtual uint8_t read_ram(offs_t offset) { return 0xff; }
 	virtual void write_ram(offs_t offset, uint8_t data) { }
 
-	void rom_alloc(uint32_t size, const char *tag);
+	void rom_alloc(uint32_t size);
 	void ram_alloc(uint32_t size);
 	uint8_t* get_rom_base() { return m_rom; }
 	uint8_t* get_ram_base() { return &m_ram[0]; }

@@ -236,7 +236,7 @@ void bsmt2000_device::write_data(uint16_t data)
 	m_deferred_data_write->adjust(attotime::zero, data);
 
 	// boost the interleave on a write so that the caller detects the status more accurately
-	machine().scheduler().boost_interleave(attotime::from_usec(1), attotime::from_usec(10));
+	machine().scheduler().add_quantum(attotime::from_usec(1), attotime::from_usec(10));
 }
 
 

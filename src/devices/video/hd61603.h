@@ -50,10 +50,10 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	u8 m_count = 0;
-	u16 m_data = 0;
-	u64 m_ram = 0;
-	int m_blank = 0;
+	u8 m_count;
+	u16 m_data;
+	u64 m_ram;
+	int m_blank;
 
 	// callbacks
 	devcb_write64 m_write_segs;

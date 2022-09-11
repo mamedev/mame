@@ -76,7 +76,7 @@ uint16_t saturn_state::saturn_soundram_r(offs_t offset)
 void saturn_state::minit_w(uint32_t data)
 {
 	//logerror("%s MINIT write = %08x\n", machine().describe_context(),data);
-	machine().scheduler().boost_interleave(m_minit_boost_timeslice, attotime::from_usec(m_minit_boost));
+	machine().scheduler().add_quantum(m_minit_boost_timeslice, attotime::from_usec(m_minit_boost));
 	machine().scheduler().trigger(1000);
 	machine().scheduler().synchronize(); // force resync
 	m_slave->pulse_frt_input();
@@ -85,7 +85,7 @@ void saturn_state::minit_w(uint32_t data)
 void saturn_state::sinit_w(uint32_t data)
 {
 	//logerror("%s SINIT write = %08x\n", machine().describe_context(),data);
-	machine().scheduler().boost_interleave(m_sinit_boost_timeslice, attotime::from_usec(m_sinit_boost));
+	machine().scheduler().add_quantum(m_sinit_boost_timeslice, attotime::from_usec(m_sinit_boost));
 	machine().scheduler().synchronize(); // force resync
 	m_maincpu->pulse_frt_input();
 }
@@ -116,7 +116,7 @@ void saturn_state::saturn_minit_w(uint32_t data)
 		machine().scheduler().synchronize(); // force resync
 	else
 	{
-		machine().scheduler().boost_interleave(m_minit_boost_timeslice, attotime::from_usec(m_minit_boost));
+		machine().scheduler().add_quantum(m_minit_boost_timeslice, attotime::from_usec(m_minit_boost));
 		machine().scheduler().trigger(1000);
 	}
 
@@ -129,7 +129,7 @@ void saturn_state::saturn_sinit_w(uint32_t data)
 	if(m_fake_comms->read() & 1)
 		machine().scheduler().synchronize(); // force resync
 	else
-		machine().scheduler().boost_interleave(m_sinit_boost_timeslice, attotime::from_usec(m_sinit_boost));
+		machine().scheduler().add_quantum(m_sinit_boost_timeslice, attotime::from_usec(m_sinit_boost));
 
 	m_maincpu->pulse_frt_input();
 }

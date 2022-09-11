@@ -77,6 +77,9 @@ int strreplace(std::string &str, const std::string& search, const std::string& r
 
 namespace util {
 
+bool strequpper(std::string_view str, std::string_view ucstr);
+bool streqlower(std::string_view str, std::string_view lcstr);
+
 // based on Jaro-Winkler distance - returns value from 0.0 (totally dissimilar) to 1.0 (identical)
 double edit_distance(std::u32string_view lhs, std::u32string_view rhs);
 

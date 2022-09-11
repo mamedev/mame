@@ -285,7 +285,7 @@ Arch Linux
 
 You’ll need a few prerequisites from your distro::
 
-    sudo pacman -S base-devel git sdl2 gconf sdl2_ttf gcc qt5
+    sudo pacman -S base-devel git sdl2_ttf python libxinerama libpulse alsa-lib qt5-base
 
 Compilation is exactly as described above in All Platforms.
 
@@ -356,7 +356,7 @@ MAME directory):
 
 .. code-block:: bash
 
-    emmake make SUBTARGET=pacmantest SOURCES=src/mame/drivers/pacman.cpp
+    emmake make SUBTARGET=pacmantest SOURCES=src/mame/pacman/pacman.cpp
 
 The **SOURCES** parameter should have the path to at least one driver **.cpp**
 file.  The make process will attempt to locate and include all dependencies
@@ -366,7 +366,7 @@ commas) if this process misses something. e.g.
 
 .. code-block:: bash
 
-    emmake make SUBTARGET=apple2e SOURCES=src/mame/drivers/apple2e.cpp,src/mame/machine/applefdc.cpp
+    emmake make SUBTARGET=apple2e SOURCES=src/mame/apple/apple2e.cpp,src/devices/machine/applefdc.cpp
 
 The value of the **SUBTARGET** parameter serves only to differentiate multiple
 builds and need not be set to any specific value.

@@ -4452,16 +4452,6 @@ void tmnt_state::init_cuebrick()
 	save_item(NAME(m_cuebrick_nvram));
 }
 
-void tmnt_state::init_thndrx2()
-{
-	u16 *ROM = (u16 *)memregion("maincpu")->base();
-
-	// cfr. notes in k054000 device
-	// this makes 11C / 12C to return bad (for ROM checksum)
-	// but goes on instead of halting for 14D (the protection chip device)
-	ROM[0x16c0 / 2] = 0x4e71;
-}
-
 //    YEAR  NAME         PARENT    MACHINE   INPUT      STATE       INIT      MONITOR COMPANY    FULLNAME,FLAGS
 GAME( 1989, cuebrick,    0,        cuebrick, cuebrick,  tmnt_state, init_cuebrick,ROT0,  "Konami",  "Cue Brick (World, version D)", MACHINE_SUPPORTS_SAVE )
 
@@ -4527,9 +4517,9 @@ GAME( 1991, ssridersjbd, ssriders, ssriders, ssriders,  tmnt_state, empty_init, 
 GAME( 1991, ssridersb,   ssriders, sunsetbl, sunsetbl,  tmnt_state, empty_init,  ROT0,   "bootleg", "Sunset Riders (bootleg 4 Players ver ADD)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1991, ssriders2,   ssriders, sunsetbl, sunsetbl,  tmnt_state, empty_init,  ROT0,   "bootleg", "Sunset Riders 2 (bootleg 4 Players ver ADD)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, thndrx2,     0,        thndrx2,  thndrx2,   tmnt_state, init_thndrx2,  ROT0, "Konami",  "Thunder Cross II (World)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // Fails k054000 unit tests, cfr. driver_init & device
-GAME( 1991, thndrx2a,    thndrx2,  thndrx2,  thndrx2,   tmnt_state, init_thndrx2,  ROT0, "Konami",  "Thunder Cross II (Asia)",  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // ^
-GAME( 1991, thndrx2j,    thndrx2,  thndrx2,  thndrx2,   tmnt_state, init_thndrx2,  ROT0, "Konami",  "Thunder Cross II (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // ^
+GAME( 1991, thndrx2,     0,        thndrx2,  thndrx2,   tmnt_state, empty_init,  ROT0, "Konami",  "Thunder Cross II (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, thndrx2a,    thndrx2,  thndrx2,  thndrx2,   tmnt_state, empty_init,  ROT0, "Konami",  "Thunder Cross II (Asia)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1991, thndrx2j,    thndrx2,  thndrx2,  thndrx2,   tmnt_state, empty_init,  ROT0, "Konami",  "Thunder Cross II (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1993, prmrsocr,    0,        prmrsocr, prmrsocr, prmrsocr_state, empty_init, ROT0, "Konami",  "Premier Soccer (ver EAB)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, prmrsocrj,   prmrsocr, prmrsocr, prmrsocr, prmrsocr_state, empty_init, ROT0, "Konami",  "Premier Soccer (ver JAB)", MACHINE_SUPPORTS_SAVE )

@@ -778,6 +778,7 @@ uint32_t cclimber_state::screen_update_toprollr(screen_device &screen, bitmap_in
 	rectangle scroll_area_clip = cliprect;
 	scroll_area_clip.min_x = (m_flip_x ? 3 : 5) * 8;
 	scroll_area_clip.max_x = (m_flip_x ? 27 : 29) * 8 - 1;
+	scroll_area_clip &= cliprect;
 
 	bitmap.fill(CCLIMBER_BG_PEN, cliprect);
 

@@ -171,7 +171,7 @@ void qixmcu_state::coinctrl_w(uint8_t data)
 		m_mcu->set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
 		/* temporarily boost the interleave to sync things up */
 		/* note: I'm using 50 because 30 is not enough for space dungeon at game over */
-		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
+		machine().scheduler().perfect_quantum(attotime::from_usec(50));
 	}
 	else
 	{

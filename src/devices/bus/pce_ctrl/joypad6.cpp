@@ -39,10 +39,10 @@ DEFINE_DEVICE_TYPE(PCE_ARCADE_PAD_6, pce_arcade_pad_6_device, "pce_arcade_pad_6"
 static INPUT_PORTS_START( pce_joypad6 )
 	// Action button order on original pad is bottom row: III, II, I, and top row: IV, V, VI
 	PORT_START("BUTTONS_0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Button I")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Button II")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SELECT  ) PORT_NAME("Select")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START   ) PORT_NAME("Run")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("%p Button I")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("%p Button II")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SELECT  ) PORT_NAME("%p Select")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START   ) PORT_NAME("%p Run")
 
 	PORT_START("DIRECTION")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
@@ -51,10 +51,10 @@ static INPUT_PORTS_START( pce_joypad6 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
 
 	PORT_START("BUTTONS_1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Button III")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Button IV")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Button V")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Button VI")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("%p Button III")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("%p Button IV")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("%p Button V")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("%p Button VI")
 
 	PORT_START("JOY_MODE")
 	PORT_CONFNAME( 0x01, 0x00, "Joypad Mode" ) PORT_CHANGED_MEMBER(DEVICE_SELF, pce_joypad6_base_device, joypad_mode_changed, 0)
@@ -135,7 +135,9 @@ pce_joypad6_base_device::pce_joypad6_base_device(const machine_config &mconfig, 
 	device_t(mconfig, type, tag, owner, clock),
 	device_pce_control_port_interface(mconfig, *this),
 	m_muxer(*this, "mux_%u", 0U),
-	m_joypad_mode(*this, "JOY_MODE")
+	m_joypad_mode(*this, "JOY_MODE"),
+	m_counter(0),
+	m_prev_clr(false)
 {
 }
 

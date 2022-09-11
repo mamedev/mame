@@ -267,7 +267,7 @@ const software_info *software_list_device::find(const std::string &look_for)
 			{
 				const char *shortname = info.shortname().c_str();
 				return (iswild && core_strwildcmp(look_for.c_str(), shortname) == 0)
-						|| core_stricmp(look_for.c_str(), shortname) == 0;
+						|| util::streqlower(look_for, shortname);
 			});
 
 	return iter != info_list.end() ? &*iter : nullptr;

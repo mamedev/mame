@@ -114,7 +114,7 @@ public:
 
 	void pktgaldx(machine_config &config);
 
-	virtual void driver_init() override;
+	void driver_init();
 
 private:
 	// memory pointers
@@ -674,8 +674,6 @@ ROM_END
 
 void pktgaldx_state::driver_init()
 {
-	base_state::driver_init();
-
 	deco56_decrypt_gfx(machine(), "tiles");
 	deco102_decrypt_cpu((uint16_t *)memregion("maincpu")->base(), m_decrypted_opcodes, 0x80000, 0x42ba, 0x00, 0x00);
 }

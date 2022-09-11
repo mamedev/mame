@@ -17,7 +17,8 @@ DEFINE_DEVICE_TYPE(A26_ROM_COMPUMATE, a26_rom_cm_device, "a2600_cm", "Atari 2600
 
 
 a26_rom_cm_device::a26_rom_cm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: a26_rom_f6_device(mconfig, A26_ROM_COMPUMATE, tag, owner, clock)
+	: a26_rom_base_device(mconfig, A26_ROM_COMPUMATE, tag, owner, clock)
+	, m_bank(*this, "bank")
 {
 }
 
@@ -25,14 +26,9 @@ a26_rom_cm_device::a26_rom_cm_device(const machine_config &mconfig, const char *
 //  mapper specific start/reset
 //-------------------------------------------------
 
-void a26_rom_cm_device::device_start()
-{
-	save_item(NAME(m_base_bank));
-}
-
 void a26_rom_cm_device::device_reset()
 {
-	m_base_bank = 3;
+	m_bank->set_entry(3);
 }
 
 
@@ -48,11 +44,8 @@ ioport_constructor a26_rom_cm_device::device_input_ports() const
 
 void a26_rom_cm_device::install_memory_handlers(address_space *space)
 {
-	space->install_read_handler(0x1000, 0x1fff, read8sm_delegate(*this, FUNC(a26_rom_cm_device::read)));
+	m_bank->configure_entries(0, 4, get_rom_base(), 0x1000);
+
+	space->install_read_bank(0x1000, 0x1fff, m_bank);
 }
 
-
-uint8_t a26_rom_cm_device::read(offs_t offset)
-{
-	return m_rom[offset + (m_base_bank * 0x1000)];
-}

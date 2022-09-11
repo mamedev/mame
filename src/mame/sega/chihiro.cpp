@@ -663,9 +663,9 @@ private:
 	void chihiro_map_io(address_map &map);
 
 	void jamtable_disasm(address_space &space, uint32_t address, uint32_t size);
-	void jamtable_disasm_command(const std::vector<std::string> &params);
-	void chihiro_help_command(const std::vector<std::string> &params);
-	void debug_commands(const std::vector<std::string> &params);
+	void jamtable_disasm_command(const std::vector<std::string_view> &params);
+	void chihiro_help_command(const std::vector<std::string_view> &params);
+	void debug_commands(const std::vector<std::string_view> &params);
 };
 
 /* jamtable instructions for Chihiro (different from Xbox console)
@@ -780,7 +780,7 @@ void chihiro_state::jamtable_disasm(address_space &space, uint32_t address, uint
 	}
 }
 
-void chihiro_state::jamtable_disasm_command(const std::vector<std::string> &params)
+void chihiro_state::jamtable_disasm_command(const std::vector<std::string_view> &params)
 {
 	address_space &space = m_maincpu->space();
 	uint64_t  addr, size;
@@ -794,7 +794,7 @@ void chihiro_state::jamtable_disasm_command(const std::vector<std::string> &para
 	jamtable_disasm(space, (uint32_t)addr, (uint32_t)size);
 }
 
-void chihiro_state::chihiro_help_command(const std::vector<std::string> &params)
+void chihiro_state::chihiro_help_command(const std::vector<std::string_view> &params)
 {
 	debugger_console &con = machine().debugger().console();
 
@@ -803,7 +803,7 @@ void chihiro_state::chihiro_help_command(const std::vector<std::string> &params)
 	con.printf("  chihiro help -- this list\n");
 }
 
-void chihiro_state::debug_commands(const std::vector<std::string> &params)
+void chihiro_state::debug_commands(const std::vector<std::string_view> &params)
 {
 	if (params.size() < 1)
 		return;

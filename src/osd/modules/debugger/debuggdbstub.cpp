@@ -495,6 +495,7 @@ public:
 	cmd_reply handle_P(const char *buf);
 	cmd_reply handle_q(const char *buf);
 	cmd_reply handle_s(const char *buf);
+	cmd_reply handle_T(const char *buf);
 	cmd_reply handle_z(const char *buf);
 	cmd_reply handle_Z(const char *buf);
 
@@ -643,7 +644,11 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 
 	if ( firststop && !m_initialized )
 	{
-		m_maincpu = m_machine->root_device().subdevice(":maincpu");
+		// find the "main" CPU, which is the first CPU (gdbstub doesn't have any notion of switching CPUs)
+		m_maincpu = device_interface_enumerator<cpu_device>(m_machine->root_device()).first();
+		if (!m_maincpu)
+			fatalerror("gdbstub: cannot find any CPUs\n");
+
 		const char *cpuname = m_maincpu->shortname();
 		auto it = gdb_register_maps.find(cpuname);
 		if ( it == gdb_register_maps.end() )
@@ -1097,6 +1102,17 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_s(const char *buf)
 }
 
 //-------------------------------------------------------------------------
+// Find out if the thread XX is alive.
+debug_gdbstub::cmd_reply debug_gdbstub::handle_T(const char *buf)
+{
+	if ( is_thread_id_ok(buf) )
+		return REPLY_OK;
+
+	// thread is dead
+	return REPLY_ENN;
+}
+
+//-------------------------------------------------------------------------
 static bool remove_breakpoint(device_debug *debug, uint64_t address, int /*kind*/)
 {
 	const debug_breakpoint *bp = debug->breakpoint_find(address);
@@ -1195,15 +1211,15 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_Z(const char *buf)
 			return REPLY_OK;
 		case 2:
 			// write watchpoint
-			debug->watchpoint_set(*m_address_space, read_or_write::WRITE, offset, kind, nullptr, nullptr);
+			debug->watchpoint_set(*m_address_space, read_or_write::WRITE, offset, kind);
 			return REPLY_OK;
 		case 3:
 			// read watchpoint
-			debug->watchpoint_set(*m_address_space, read_or_write::READ, offset, kind, nullptr, nullptr);
+			debug->watchpoint_set(*m_address_space, read_or_write::READ, offset, kind);
 			return REPLY_OK;
 		case 4:
 			// access watchpoint
-			debug->watchpoint_set(*m_address_space, read_or_write::READWRITE, offset, kind, nullptr, nullptr);
+			debug->watchpoint_set(*m_address_space, read_or_write::READWRITE, offset, kind);
 			return REPLY_OK;
 	}
 
@@ -1266,6 +1282,7 @@ void debug_gdbstub::handle_packet()
 		case 'P': reply = handle_P(buf); break;
 		case 'q': reply = handle_q(buf); break;
 		case 's': reply = handle_s(buf); break;
+		case 'T': reply = handle_T(buf); break;
 		case 'z': reply = handle_z(buf); break;
 		case 'Z': reply = handle_Z(buf); break;
 	}

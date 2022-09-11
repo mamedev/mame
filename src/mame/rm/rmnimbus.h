@@ -87,13 +87,6 @@ public:
 
 	void nimbus(machine_config &config);
 
-	uint32_t m_debug_machine = 0;
-	uint32_t m_debug_trap = 0;
-
-	void decode_subbios(device_t *device, offs_t pc);
-	void decode_subbios_return(device_t *device, offs_t pc);
-	void decode_dos21(device_t *device, offs_t pc);
-
 private:
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<i8031_device> m_iocpu;
@@ -261,8 +254,8 @@ private:
 	void decode_dssi_f_plonk_char(uint16_t ds, uint16_t si);
 	void decode_dssi_f_rw_sectors(uint16_t ds, uint16_t si);
 
-	void debug_command(const std::vector<std::string> &params);
-	void video_debug(const std::vector<std::string> &params);
+	void debug_command(const std::vector<std::string_view> &params);
+	void video_debug(const std::vector<std::string_view> &params);
 	offs_t dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 
 	TIMER_CALLBACK_MEMBER(do_mouse);

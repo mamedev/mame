@@ -538,7 +538,7 @@ void tnx1_state::config(machine_config &config)
 	m_maincpu->refresh_cb().set(FUNC(tnx1_state::refresh_w));
 
 	/* video hardware */
-	// FIXME: 59.94 screen refresch is the NTSC standard
+	// FIXME: 59.94 screen refresh is the NTSC standard
 	auto &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(59.94)
 		.set_vblank_time(ATTOSECONDS_IN_USEC(0))

@@ -1710,7 +1710,6 @@ ROM_START( sboblboblc )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "a71-25.41",    0x0000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )    /* video timing */
-
 ROM_END
 
 
@@ -1746,7 +1745,6 @@ ROM_START( sboblbobld )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "a71-25.41",    0x0000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )    /* video timing */
-
 ROM_END
 
 ROM_START( sboblboble ) // identical to sboblbobld but for the first program ROM
@@ -1781,7 +1779,6 @@ ROM_START( sboblboble ) // identical to sboblbobld but for the first program ROM
 
 	ROM_REGION( 0x0100, "proms", 0 ) // not provided for this set
 	ROM_LOAD( "a71-25.41",    0x0000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )    /* video timing */
-
 ROM_END
 
 ROM_START( sboblboblf ) // single layer PCB '8001 AX'
