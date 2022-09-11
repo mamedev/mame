@@ -71,16 +71,19 @@ void shangha3_state::video_start()
 
 	m_screen->register_screen_bitmap(m_rawbitmap);
 
-	for (i = 0;i < 14;i++)
+	for (i = 0; i < 14; i++)
 		m_drawmode_table[i] = DRAWMODE_SOURCE;
 	m_drawmode_table[14] = m_do_shadows ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
 	m_drawmode_table[15] = DRAWMODE_NONE;
 
 	if (m_do_shadows)
 	{
+		// MAME default of 0.6 causes visible drop shadow following player cursors
+		m_palette->set_shadow_factor(1.0);
+
 		/* Prepare the shadow table */
-		for (i = 0;i < 128;i++)
-			m_palette->shadow_table()[i] = i+128;
+		for (i = 0; i < 128; i++)
+			m_palette->shadow_table()[i] = i + 128;
 	}
 
 	save_item(NAME(m_gfxlist_addr));
@@ -94,7 +97,8 @@ void shangha3_state::flipscreen_w(uint8_t data)
 	/* bit 7 flips screen, the rest seems to always be set to 0x7e */
 	flip_screen_set(data & 0x80);
 
-	if ((data & 0x7f) != 0x7e) popmessage("flipscreen_w %02x",data);
+	if ((data & 0x7f) != 0x7e)
+		popmessage("flipscreen_w %02x",data);
 }
 
 void shangha3_state::gfxlist_addr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -183,7 +187,7 @@ void shangha3_state::blitter_go_w(uint16_t data)
 					{
 						int dx,dy,tile;
 
-						/* TODO: zooming algo is definitely wrong for Blocken here */
+						// TODO: zooming algo is definitely wrong for Blocken here
 						if (condensed)
 						{
 							int addr = ((y+srcy) & 0x1f) |
