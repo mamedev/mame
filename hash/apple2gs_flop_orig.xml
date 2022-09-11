@@ -3930,6 +3930,7 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
+	
 	<software name="spacea2">
 		<description>Space Ace II: Borf's Revenge</description>
 		<year>2022</year>
@@ -3992,4 +3993,33 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="lemmings">
+		<description>LemminGS</description>
+		<year>1996</year>
+		<publisher>Brutal Deluxe Software</publisher>
+		<info name="release" value="1996"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!--  Apple IIgs version by Antoine Vignau and Olivier Zardini -->
+		<!--  GS/OS Compatible, Hard drive installable. -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="819200">
+				<rom name="LemminGS1.po" size="819200" crc="6a80c9b4" sha1="5753a09d88c51558ebab523aa5358132615b4614"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="819200">
+				<rom name="LemminGS2.po" size="819200" crc="f5461e78" sha1="9a069abf9e9f511fd2abad500a237014cfcea3d9"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="819200">
+				<rom name="LemminGS3.po" size="819200" crc="18303b46" sha1="0327ea6286b18104dcb7dfc59e888a07e06c77d7"/>
+			</dataarea>
+		</part>
+	</software>
+	
 </softwarelist>
