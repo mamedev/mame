@@ -3,30 +3,70 @@
 /***************************************************************************
 
 Oli-Boo-Chu (aka Punching Kid)
-Accordingly, the Irem board type is M47.
 
 driver by Nicola Salmoria
 
 TODO:
-- verify AY8910 irq freq and XTAL, both are approximated from video recording
-- verify CPU speed/XTAL, currently guessed, but it's logical to share the same
-  master XTAL with AY8910
-- verify adpcm freq/prescaler
+- HC55516 should actually be HC55536
+- verify HC55536 clock, I don't think it's from master XTAL, maybe R/C osc
+- is the "Chu has food" sample ever played? Nothing is written to soundcmd when
+  a Chu eats a Boo dropping
 - How is the first half of the palette used? (the colors, not the clut).
   The title logo looks better with it, but not much else does. Or maybe it's a
   region change? The Japanese Irem flyer (Punching Kid) shows the purple/yellow
   maze colors. The USA licensed version has a black background like in MAME,
   and it matches a video of the cabinet.
 
+--------------
+
+Sound M-47C-A:
+
+                Z80
+             2114   OBC17
+             2114   OBC18
+  OBC15
+  OBC16
+
+  HC3-55536    8910
+
+
+CPU M-47A-A:
+
+          2128
+          2128             2114 2114
+          OBC8B            2114 2114
+          OBC7C
+          OBC6B
+          OBC5B
+          OBC4B
+ SW1 Z80  OBC3B
+          OBC2B
+ SW2      OBC1B   18.432MHz
+
+
+VIDEO M-47B-A:
+
+    OBC10      OBC11     OBC9
+    OBC12
+              2125     C-3          2114
+              2125                  2114
+     2125     2125
+     2125     2125
+     2125
+     2125              C-2          2114
+                                    2114
+               OBC14     OBC13
+
 ***************************************************************************/
 
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/clock.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/ay8910.h"
-#include "sound/msm5205.h"
+#include "sound/hc55516.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -48,9 +88,8 @@ public:
 		m_colorram(*this, "colorram"),
 		m_spriteram(*this, "spriteram%u", 0),
 		m_soundlatch(*this, "soundlatch%u", 0),
-		m_ay(*this, "aysnd"),
-		m_adpcm(*this, "adpcm"),
-		m_adpcmrom(*this, "adpcm")
+		m_cvsd(*this, "cvsd"),
+		m_samplerom(*this, "samples")
 	{ }
 
 	void olibochu(machine_config &config);
@@ -70,9 +109,8 @@ private:
 	required_shared_ptr<u8> m_colorram;
 	required_shared_ptr_array<u8, 2> m_spriteram;
 	required_device_array<generic_latch_8_device, 2> m_soundlatch;
-	required_device<ay8910_device> m_ay;
-	required_device<msm5205_device> m_adpcm;
-	required_region_ptr<u8> m_adpcmrom;
+	required_device<hc55516_device> m_cvsd;
+	required_region_ptr<u8> m_samplerom;
 
 	// video-related
 	tilemap_t *m_bg_tilemap = nullptr;
@@ -95,13 +133,29 @@ private:
 	void sample_latch_w(u8 data);
 	void sample_start_w(u8 data);
 	u8 soundlatch_r();
-	DECLARE_WRITE_LINE_MEMBER(adpcm_vck);
+	void cvsd_tick(int state);
 
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };
 
+void olibochu_state::machine_start()
+{
+	save_item(NAME(m_soundcmd));
+	save_item(NAME(m_sample_latch));
+	save_item(NAME(m_sample_address));
+}
 
+void olibochu_state::machine_reset()
+{
+	m_soundcmd = 0;
+}
+
+
+
+/***************************************************************************
+    Video
+***************************************************************************/
 
 void olibochu_state::palette(palette_device &palette) const
 {
@@ -239,6 +293,22 @@ u32 olibochu_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER(olibochu_state::scanline)
+{
+	int scanline = param;
+
+	if (scanline == 248) // vblank irq
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); // Z80 - RST 10h
+
+	if (scanline == 0) // periodic irq
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); // Z80 - RST 08h
+}
+
+
+
+/***************************************************************************
+    Sound
+***************************************************************************/
 
 void olibochu_state::sound_command_w(offs_t offset, u8 data)
 {
@@ -275,10 +345,10 @@ void olibochu_state::sample_start_w(u8 data)
 	{
 		// start sample
 		m_soundlatch[1]->clear_w();
-		m_sample_address = m_sample_latch * 0x20 * 2;
+		m_sample_address = m_sample_latch * 0x20 * 8;
 	}
 
-	m_adpcm->reset_w(BIT(~data, 7));
+	m_cvsd->fzq_w(BIT(data, 7));
 }
 
 u8 olibochu_state::soundlatch_r()
@@ -286,16 +356,20 @@ u8 olibochu_state::soundlatch_r()
 	return (m_soundlatch[0]->read() & 0xf) | (m_soundlatch[1]->read() << 4 & 0xf0);
 }
 
-WRITE_LINE_MEMBER(olibochu_state::adpcm_vck)
+void olibochu_state::cvsd_tick(int state)
 {
 	if (state)
 	{
-		const u8 data = m_adpcmrom[m_sample_address / 2];
-		m_adpcm->data_w((m_sample_address & 1) ? (data & 0xf) : (data >> 4));
-		m_sample_address = (m_sample_address + 1) & 0x3fff;
+		m_cvsd->digin_w(BIT(m_samplerom[m_sample_address / 8], ~m_sample_address & 7));
+		m_sample_address = (m_sample_address + 1) & 0xffff;
 	}
 }
 
+
+
+/***************************************************************************
+    Address Maps
+***************************************************************************/
 
 void olibochu_state::main_map(address_map &map)
 {
@@ -321,11 +395,16 @@ void olibochu_state::sound_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x6000, 0x63ff).ram();
 	map(0x7000, 0x7000).r(FUNC(olibochu_state::soundlatch_r));
-	map(0x7000, 0x7001).w(m_ay, FUNC(ay8910_device::address_data_w));
+	map(0x7000, 0x7001).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0x7004, 0x7004).w(FUNC(olibochu_state::sample_latch_w));
 	map(0x7006, 0x7006).w(FUNC(olibochu_state::sample_start_w));
 }
 
+
+
+/***************************************************************************
+    Input Ports
+***************************************************************************/
 
 static INPUT_PORTS_START( olibochu )
 	PORT_START("IN0")
@@ -335,7 +414,7 @@ static INPUT_PORTS_START( olibochu )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )  /* works in service mode but not in game */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) // works in service mode but not in game
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("IN1")
@@ -358,61 +437,35 @@ static INPUT_PORTS_START( olibochu )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("DSW0") /* Listed as sw1 */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
+	PORT_START("DSW0")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x0c, "5000" )
 	PORT_DIPSETTING(    0x08, "10000" )
 	PORT_DIPSETTING(    0x04, "15000" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) /* Nothing listed for this DIP */
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) /* Nothing listed for this DIP */
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW1:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW1:6" )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x80, "Cross Hatch Pattern" )
+	PORT_DIPNAME( 0x80, 0x80, "Cross Hatch Pattern" ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW1") /* Most likely not a bank of Dip Switches */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("DSW1") // works in service mode, but PCB only has 2 dipsw banks and this port is never read in game
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW2") /* Listed as sw2 */
-	PORT_DIPNAME( 0x01, 0x01, "Stop Mode (Cheat)") /* In stop mode, press 2 to stop and 1 to restart */
+	PORT_START("DSW2")
+	// Freeze: press P1 start to stop, P2 start to continue
+	PORT_DIPNAME( 0x01, 0x01, "Freeze (Cheat)") PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0e, 0x0e, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x0e, 0x0e, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:2,3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
@@ -421,19 +474,22 @@ static INPUT_PORTS_START( olibochu )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_5C ) )
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x20, 0x20, "Invulnerability (Cheat)" ) /* Listed as "No Hit" */
+	PORT_SERVICE_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW2:5" )
+	PORT_DIPNAME( 0x20, 0x20, "Invincibility (Cheat)" ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) /* Listed as "Start Pattern"... Level Select or Preview?? */
+	// Start Pattern: enable to select round at game start (turn off to start game)
+	PORT_DIPNAME( 0x40, 0x40, "Start Pattern (Cheat)") PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) /* Listed as "Screen 180" currently has no effect */
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )
 INPUT_PORTS_END
 
 
+
+/***************************************************************************
+    GFX Layouts
+***************************************************************************/
 
 static const gfx_layout charlayout =
 {
@@ -466,37 +522,18 @@ GFXDECODE_END
 
 
 
-void olibochu_state::machine_start()
-{
-	save_item(NAME(m_soundcmd));
-	save_item(NAME(m_sample_latch));
-	save_item(NAME(m_sample_address));
-}
-
-void olibochu_state::machine_reset()
-{
-	m_soundcmd = 0;
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(olibochu_state::scanline)
-{
-	int scanline = param;
-
-	if(scanline == 248) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); // Z80 - RST 10h
-
-	if(scanline == 0) // sprite buffer irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); // Z80 - RST 08h
-}
+/***************************************************************************
+    Machine Configs
+***************************************************************************/
 
 void olibochu_state::olibochu(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 18'432'000 / 6);
+	Z80(config, m_maincpu, 18.432_MHz_XTAL / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &olibochu_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(olibochu_state::scanline), "screen", 0, 1);
 
-	Z80(config, m_audiocpu, 18'432'000 / 6);
+	Z80(config, m_audiocpu, 18.432_MHz_XTAL / 6);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &olibochu_state::sound_map);
 	m_audiocpu->set_periodic_int(FUNC(olibochu_state::irq0_line_hold), attotime::from_hz(120));
 
@@ -518,20 +555,18 @@ void olibochu_state::olibochu(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch[0]);
 	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
-	AY8910(config, m_ay, 18'432'000 / 12).add_route(ALL_OUTPUTS, "mono", 0.5);
+	AY8910(config, "aysnd", 18.432_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	MSM5205(config, m_adpcm, 384'000);
-	m_adpcm->vck_callback().set(FUNC(olibochu_state::adpcm_vck));
-	m_adpcm->set_prescaler_selector(msm5205_device::S96_4B);
-	m_adpcm->add_route(ALL_OUTPUTS, "mono", 0.25);
+	HC55516(config, m_cvsd, 0).add_route(ALL_OUTPUTS, "mono", 0.5);
+	clock_device &cvsd_clock(CLOCK(config, "cvsd_clock", 16000));
+	cvsd_clock.signal_handler().set(FUNC(olibochu_state::cvsd_tick));
+	cvsd_clock.signal_handler().append(m_cvsd, FUNC(hc55516_device::mclock_w));
 }
 
 
 
 /***************************************************************************
-
-  Game driver(s)
-
+    ROM Definitions
 ***************************************************************************/
 
 ROM_START( olibochu )
@@ -549,7 +584,7 @@ ROM_START( olibochu )
 	ROM_LOAD( "17.4j",        0x0000, 0x1000, CRC(57f07402) SHA1(a763a835ac512c69b4351c1ec72b0a64e46203aa) )
 	ROM_LOAD( "18.4l",        0x1000, 0x1000, CRC(0a903e9c) SHA1(d893c2f5373f748d8bebf3673b15014f4a8d4b5c) )
 
-	ROM_REGION( 0x2000, "adpcm", 0 )
+	ROM_REGION( 0x2000, "samples", 0 )
 	ROM_LOAD( "15.1k",        0x0000, 0x1000, CRC(fb5dd281) SHA1(fba947ae7b619c2559b5af69ef02acfb15733f0d) )
 	ROM_LOAD( "16.1m",        0x1000, 0x1000, CRC(c07614a5) SHA1(d13d271a324f99d008429c16193c4504e5894493) )
 
@@ -572,4 +607,10 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1981, olibochu, 0, olibochu, olibochu, olibochu_state, empty_init, ROT270, "Irem (GDI license)", "Oli-Boo-Chu", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+
+/***************************************************************************
+    Drivers
+***************************************************************************/
+
+//    YEAR  NAME      PARENT MACHINE   INPUT     STATE           INIT        SCREEN  COMPANY               FULLNAME       FLAGS
+GAME( 1981, olibochu, 0,     olibochu, olibochu, olibochu_state, empty_init, ROT270, "Irem (GDI license)", "Oli-Boo-Chu", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
