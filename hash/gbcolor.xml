@@ -15690,7 +15690,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="pockfam2">
+	<!-- unemulated real-time clock and melody generator -->
+	<software name="pockfam2" supported="partial">
 		<!-- The game cart has an integrated speaker and a replaceable battery (CR2025). -->
 		<description>Pocket Family GB2 (Japan)</description>
 		<year>1999</year>
@@ -18486,7 +18487,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="robopsun">
+	<!-- unemulated real-time clock and melody generator -->
+	<software name="robopsun" supported="partial">
 		<!-- Notes: The game cart has its own speaker, IR interface and a replaceable battery. -->
 		<description>Robopon - Sun Version (USA)</description>
 		<year>2000</year>
@@ -18510,7 +18512,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="robopspc">
+	<!-- unemulated real-time clock and melody generator -->
+	<software name="robopspc" supported="partial">
 		<!-- Supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
 		    multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
 		    port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
@@ -18540,7 +18543,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="robopmon">
+	<!-- unemulated real-time clock and melody generator -->
+	<software name="robopmon" supported="partial">
 		<!-- Supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
 		    multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
 		    port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
@@ -18569,7 +18573,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="robopstr">
+	<!-- unemulated real-time clock and melody generator -->
+	<software name="robopstr" supported="partial">
 		<!-- Supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
 		    multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
 		    port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
@@ -18598,7 +18603,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="robopsunj" cloneof="robopsun">
+	<!-- unemulated real-time clock and melody generator -->
+	<software name="robopsunj" cloneof="robopsun" supported="partial">
 		<description>Robot Ponkottsu - Sun Version (Japan)</description>
 		<year>1998</year>
 		<publisher>Hudson Soft</publisher>

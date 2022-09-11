@@ -18148,7 +18148,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="pockfam">
+	<!-- unemulated real-time clock and melody generator -->
+	<software name="pockfam" supported="partial">
 		<!--
 		Supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
 		multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
