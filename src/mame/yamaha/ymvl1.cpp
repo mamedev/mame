@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 
-// Yamaha VL-1 synthesizer
+// Yamaha VL1 synthesizer
 
 // The VL1-m rackable version exists but we don't have the firmware
 
@@ -35,6 +35,8 @@
 #include "emu.h"
 #include "machine/tmp68301.h"
 #include "video/t6963c.h"
+
+namespace {
 
 class vl1_state : public driver_device
 {
@@ -107,5 +109,6 @@ ROM_START(vl1)
 	ROM_LOAD16_BYTE("vl1v2l.ic67", 1, 0x80000, CRC(382d24e9) SHA1(4e6637c8e1876c5931f944f8a188d58cdb1eb47f))
 ROM_END
 
-SYST(1981, vl1, 0, 0, vl1, vl1, vl1_state, empty_init, "Yamaha", "VL1", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+} // anonymous namespace
 
+SYST(1993, vl1, 0, 0, vl1, vl1, vl1_state, empty_init, "Yamaha", "VL1", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
