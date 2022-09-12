@@ -48025,6 +48025,27 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="indorap" cloneof="indora">
+		<description>Indora no Hikari (Japan, prototype, 19870815)</description>
+		<year>1987</year>
+		<publisher>Kemco</publisher>
+		<info name="alt_title" value="インドラの光"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<feature name="pcb" value="HVC-SNROM" />
+			<dataarea name="prg" size="131072">
+				<rom name="ksc-in-0 prg" size="131072" crc="6867f828" sha1="2302c76a188546cf9e7f2cb60a1bc9879b492f0b" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jlfight">
 		<description>J.League Fighting Soccer - The King of Ace Strikers (Japan)</description>
 		<year>1993</year>
