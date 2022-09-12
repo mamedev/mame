@@ -7,6 +7,7 @@ Oli-Boo-Chu (aka Punching Kid)
 driver by Nicola Salmoria
 
 TODO:
+- accurate video timing, irq timing
 - HC55516 should actually be HC55536
 - verify HC55536 clock, I don't think it's from master XTAL, maybe R/C osc
 - is the "Chu has food" sample ever played? Nothing is written to soundcmd when
@@ -492,8 +493,8 @@ static INPUT_PORTS_START( olibochu )
 
 	PORT_START("CONF")
 	PORT_CONFNAME( 0x01, 0x01, "Palette" ) PORT_CHANGED_MEMBER(DEVICE_SELF, olibochu_state, palette_changed, 0)
-	PORT_CONFSETTING(    0x01, "USA" )
-	PORT_CONFSETTING(    0x00, "Japan" )
+	PORT_CONFSETTING(    0x01, "Oli-Boo-Chu" )
+	PORT_CONFSETTING(    0x00, "Punching Kid" )
 INPUT_PORTS_END
 
 
