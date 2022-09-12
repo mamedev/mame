@@ -3684,19 +3684,45 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/gameboy/gb_slot.h,BUSES["GAMEBOY"] = true
+--@src/devices/bus/gameboy/slot.h,BUSES["GAMEBOY"] = true
 ---------------------------------------------------
 
 if (BUSES["GAMEBOY"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/gameboy/camera.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/camera.h",
+		MAME_DIR .. "src/devices/bus/gameboy/cartbase.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/cartbase.h",
+		MAME_DIR .. "src/devices/bus/gameboy/cartbase.ipp",
+		MAME_DIR .. "src/devices/bus/gameboy/cartheader.h",
 		MAME_DIR .. "src/devices/bus/gameboy/carts.cpp",
 		MAME_DIR .. "src/devices/bus/gameboy/carts.h",
+		MAME_DIR .. "src/devices/bus/gameboy/gbslot.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/gbslot.h",
+		MAME_DIR .. "src/devices/bus/gameboy/gbxfile.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/gbxfile.h",
+		MAME_DIR .. "src/devices/bus/gameboy/huc1.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/huc1.h",
+		MAME_DIR .. "src/devices/bus/gameboy/huc3.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/huc3.h",
 		MAME_DIR .. "src/devices/bus/gameboy/mbc.cpp",
 		MAME_DIR .. "src/devices/bus/gameboy/mbc.h",
-		MAME_DIR .. "src/devices/bus/gameboy/gb_slot.cpp",
-		MAME_DIR .. "src/devices/bus/gameboy/gb_slot.h",
+		MAME_DIR .. "src/devices/bus/gameboy/mbc2.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/mbc2.h",
+		MAME_DIR .. "src/devices/bus/gameboy/mbc6.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/mbc6.h",
+		MAME_DIR .. "src/devices/bus/gameboy/mbc7.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/mbc7.h",
+		MAME_DIR .. "src/devices/bus/gameboy/mdslot.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/mdslot.h",
+		MAME_DIR .. "src/devices/bus/gameboy/mmm01.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/mmm01.h",
 		MAME_DIR .. "src/devices/bus/gameboy/rom.cpp",
 		MAME_DIR .. "src/devices/bus/gameboy/rom.h",
+		MAME_DIR .. "src/devices/bus/gameboy/slot.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/slot.h",
+		MAME_DIR .. "src/devices/bus/gameboy/tama5.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/tama5.h",
 	}
 end
 

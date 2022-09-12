@@ -2467,7 +2467,8 @@ license:CC0
 			<feature name="pcb" value="DMG-M-BFAN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1 [DMG MBC1-B]" />
-			<feature name="slot" value="rom_mbc1col" />
+			<feature name="slot" value="rom_mbc1" />
+			<feature name="banklowbits" value="4" />
 			<dataarea name="rom" size="1048576">
 				<rom name="cgb-b2ck-0.u1" size="1048576" crc="af2b426e" sha1="52451464a9f4dd5faefe4594954cbce03bff0d05"/>
 			</dataarea>
@@ -3398,7 +3399,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="commandm" supported="no">
+	<software name="commandm">
 		<!-- The game cart includes a motion-sensor (U4) for controlling the game by moving and shaking the console. -->
 		<description>Command Master (Japan)</description>
 		<year>2000</year>
@@ -3413,7 +3414,7 @@ license:CC0
 			<feature name="u2" value="U2 16/32M MASK ROM" />
 			<feature name="u3" value="U3 2/4K EEPROM" />
 			<feature name="u4" value="U4 ADXL202" />
-			<feature name="slot" value="rom_mbc7" />
+			<feature name="slot" value="rom_mbc7_4k" />
 			<dataarea name="rom" size="2097152">
 				<rom name="cgb-kcej-0.u1" size="2097152" crc="d10b5645" sha1="f1d3a1ff7a76c49ce3e094ca994d488dbdadf9a2"/>
 			</dataarea>
@@ -10006,7 +10007,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="kirbytlt" supported="no">
+	<software name="kirbytlt">
 		<!-- The game cart includes a motion-sensor (U4) for controlling the game by moving and shaking the console. -->
 		<description>Kirby Tilt 'n' Tumble (USA)</description>
 		<year>2001</year>
@@ -10019,7 +10020,7 @@ license:CC0
 			<feature name="u2" value="U2 4/8M MASK ROM" />
 			<feature name="u3" value="U3 2/4K EEPROM" />
 			<feature name="u4" value="U4 ADXL202" />
-			<feature name="slot" value="rom_mbc7" />
+			<feature name="slot" value="rom_mbc7_2k" />
 			<dataarea name="rom" size="1048576">
 				<rom name="cgb-ktne-0.u1" size="1048576" crc="e541acf1" sha1="6ab8d666e2bebbb3fee7796c8968aab2ea21b8f9"/>
 			</dataarea>
@@ -10321,7 +10322,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="korokoro" cloneof="kirbytlt" supported="no">
+	<software name="korokoro" cloneof="kirbytlt">
 		<!-- The game cart includes a motion-sensor (U4) for controlling the game by moving and shaking the console. -->
 		<description>Korokoro Kirby (Japan)</description>
 		<year>2000</year>
@@ -10336,7 +10337,7 @@ license:CC0
 			<feature name="u2" value="U2 4/8M MASK ROM" />
 			<feature name="u3" value="U3 2/4K EEPROM" />
 			<feature name="u4" value="U4 ADXL202" />
-			<feature name="slot" value="rom_mbc7" />
+			<feature name="slot" value="rom_mbc7_2k" />
 			<dataarea name="rom" size="1048576">
 				<rom name="cgb-kkkj-0.u1" size="1048576" crc="c0face3d" sha1="8dd46f6d34c831c910c4574f252fa47ce6f67261"/>
 			</dataarea>
@@ -14634,7 +14635,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- requires Flash storage and Mobile Adapter emulation -->
+	<!-- requires Mobile Adapter emulation -->
 	<software name="netdeget" supported="partial">
 		<description>Net de Get - Minigame @ 100 (Japan)</description>
 		<year>2001</year>
@@ -15712,7 +15713,7 @@ license:CC0
 			<dataarea name="rom" size="2097152">
 				<rom name="cgb-hf2j-0.u1" size="2097152" crc="2a273244" sha1="fc88fcf5aab548936cd6617c4e2ea07b77ee43c8"/>
 			</dataarea>
-			<dataarea name="ram" size="32768">
+			<dataarea name="nvram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -18507,7 +18508,7 @@ license:CC0
 			<dataarea name="rom" size="1048576">
 				<rom name="robopon - sun version (usa).bin" size="1048576" crc="32caef11" sha1="399c928a38a3901b7a1093bd61f5a4d8c05b9771"/>
 			</dataarea>
-			<dataarea name="ram" size="32768">
+			<dataarea name="nvram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -18538,7 +18539,7 @@ license:CC0
 			<dataarea name="rom" size="1048576">
 				<rom name="dmg-h5uj-0.u1" size="1048576" crc="4aa209cd" sha1="79d1eda07e792497506ff1494e5222db2a52702f"/>
 			</dataarea>
-			<dataarea name="ram" size="32768">
+			<dataarea name="nvram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -18568,7 +18569,7 @@ license:CC0
 			<dataarea name="rom" size="1048576">
 				<rom name="dmg-h3uj-0.u1" size="1048576" crc="87a29030" sha1="7d6424bfecfeb17aee9f779dcb9bac47114730cd"/>
 			</dataarea>
-			<dataarea name="ram" size="32768">
+			<dataarea name="nvram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -18598,7 +18599,7 @@ license:CC0
 			<dataarea name="rom" size="1048576">
 				<rom name="dmg-hrcj-0.u1" size="1048576" crc="b28f32ac" sha1="27a96410b38e695d9b80ae861af3b472f0e84c60"/>
 			</dataarea>
-			<dataarea name="ram" size="32768">
+			<dataarea name="nvram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -18619,7 +18620,7 @@ license:CC0
 			<dataarea name="rom" size="1048576">
 				<rom name="dmg-hrej-0.u1" size="1048576" crc="cb0b8003" sha1="2f82dd4a1537111d14f11eb13c7ce6fc748e83fe"/>
 			</dataarea>
-			<dataarea name="ram" size="32768">
+			<dataarea name="nvram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -19867,7 +19868,7 @@ license:CC0
 			<dataarea name="rom" size="131072">
 				<rom name="shutokou racing, the (japan).bin" size="131072" crc="36e781cd" sha1="0f29818190ea9ce8c242b648ba64d50cc5408e5a"/>
 			</dataarea>
-			<dataarea name="nvram" size="8192">
+			<dataarea name="nvram" size="512">
 			</dataarea>
 		</part>
 	</software>
@@ -24791,7 +24792,6 @@ license:CC0
 		<description>ATV Racing &amp; Karate Joe (Europe)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
-		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_atvrac" />
@@ -24808,7 +24808,6 @@ license:CC0
 		<description>ATV Racing &amp; Karate Joe (Europe, alt)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
-		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_atvrac" />
@@ -24824,7 +24823,6 @@ license:CC0
 		<description>ATV Racing (Europe)</description>
 		<year>2001</year>
 		<publisher>Rocket Games</publisher>
-		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_atvrac" />
 			<dataarea name="rom" size="262144">
@@ -24840,7 +24838,6 @@ license:CC0
 		<description>Full Time Soccer &amp; Hang Time Basketball (Europe)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
-		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_atvrac" />
@@ -24856,7 +24853,6 @@ license:CC0
 		<description>Full Time Soccer (Europe)</description>
 		<year>2000</year>
 		<publisher>Rocket Games</publisher>
-		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_atvrac" />
 			<dataarea name="rom" size="262144">
@@ -24871,7 +24867,6 @@ license:CC0
 		<description>Hang Time Basketball (Europe)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
-		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_atvrac" />
@@ -24888,7 +24883,6 @@ license:CC0
 		<description>Pocket Smash Out &amp; Race Time (Europe)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
-		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_atvrac" />
@@ -24902,7 +24896,6 @@ license:CC0
 		<description>Pocket Smash Out (Europe)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
-		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_atvrac" />
@@ -24919,7 +24912,6 @@ license:CC0
 		<description>Karate Joe (Europe)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
-		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_atvrac" />
@@ -24933,7 +24925,6 @@ license:CC0
 		<description>Painter (Europe)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
-		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_atvrac" />
 			<dataarea name="rom" size="262144">
@@ -24946,7 +24937,6 @@ license:CC0
 		<description>Race Time (Europe)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
-		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_atvrac" />
@@ -24961,7 +24951,6 @@ license:CC0
 		<description>Space Invasion &amp; Karate Joe (Europe)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
-		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_atvrac" />
@@ -24978,7 +24967,6 @@ license:CC0
 		<description>Space Invasion &amp; Painter (Europe)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
-		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_atvrac" />
@@ -24995,7 +24983,6 @@ license:CC0
 		<description>Space Invasion (Europe)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
-		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_atvrac" />
@@ -25090,7 +25077,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="shero" supported="no">
+	<software name="shero">
 		<description>Street Hero (Taiwan)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -25103,7 +25090,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="thundbmna" cloneof="thundbmn" supported="no">
+	<software name="thundbmna" cloneof="thundbmn">
 		<description>Thunder Blast Man (Europe)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -25129,7 +25116,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mc_sac01" supported="no">
+	<software name="mc_sac01">
 		<description>4 in 1 + 8 in 1 (World, 4B-001)</description>
 		<year>20??</year>
 		<publisher>Sachen</publisher>
@@ -25141,7 +25128,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mc_sac02" supported="no">
+	<software name="mc_sac02">
 		<description>4 in 1 + 8 in 1 (World, 4B-002)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -25154,7 +25141,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mc_sac05" supported="no">
+	<software name="mc_sac05">
 		<description>4 in 1 + 8 in 1 + 16 in 1 (World, 4B-005)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -25167,7 +25154,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mc_sac07" supported="no">
+	<!-- missing HUD graphics in Ant Soldiers on GBC -->
+	<software name="mc_sac07" supported="partial">
 		<description>4 in 1 + 8 in 1 (World, 4B-007)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -25180,7 +25168,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mc_6in1">
+	<!-- missing HUD graphics in Ant Soldiers on GBC -->
+	<software name="mc_6in1" supported="partial">
 		<description>Super 6 in 1 (Taiwan)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -25205,7 +25194,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mc_31t" cloneof="mc_31" supported="no">
+	<!-- missing HUD graphics in Ant Soldiers on GBC -->
+	<software name="mc_31t" cloneof="mc_31" supported="partial">
 		<description>31 in 1 Mighty Mix (Taiwan)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -25217,7 +25207,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mc_31" supported="no">
+	<!-- missing HUD graphics in Ant Soldiers on GBC -->
+	<software name="mc_31" supported="partial">
 		<description>31-in-1 Mighty Mix (Australia)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -25947,7 +25938,7 @@ license:CC0
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="GBCK003" />
-			<feature name="slot" value="rom_188in1" />
+			<feature name="slot" value="rom_gbck003" />
 			<dataarea name="rom" size="8388608">
 				<rom name="m29w640ft.u2" size="8388608" crc="e4068d7d" sha1="e61ee50ed39fd5b5cc8bdcb96fe1c3cccdcfc76f" />
 			</dataarea>
@@ -26319,26 +26310,26 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="nuwang2k" supported="no"> <!-- requires protection emulation -->
+	<software name="nuwang2k">
 		<description>Nǚwáng Gédòu 2000 (Taiwan)</description>
 		<year>200?</year>
 		<publisher>Vast Fame</publisher>
 		<info name="alt_title" value="女王格鬥2000"/> <!-- translates to "Queen Fight 2000" -->
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc5" /> <!-- TODO: set properly when protection is emulated -->
+			<feature name="slot" value="rom_vf001" />
 			<dataarea name="rom" size="2097152">
 				<rom name="Nv Wang Ge Dou 2000 (Unl) [C] [Raw].gbc" size="2097152" crc="e1668b49" sha1="37516139aa317a16440379c1dc00bdfc4c1e607a"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="cjgedou" supported="no">
+	<software name="cjgedou">
 		<description>Chāojí Gédòu 2001 Alpha (Taiwan)</description>
 		<year>200?</year>
 		<publisher>Vast Fame</publisher>
 		<info name="alt_title" value="超級格鬥2001α"/> <!-- translates to "Super Fight 2001 Alpha" -->
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc5" /> <!-- TODO: set properly when protection is emulated -->
+			<feature name="slot" value="rom_vf001" />
 			<dataarea name="rom" size="2097152">
 				<rom name="Chao Ji Ge Dou 2001 Alpha (Unl) [C] [Raw].gbc" size="2097152" crc="afd7a0cc" sha1="f44f629687ec91aade40ff52014587003f728ec9"/>
 			</dataarea>
@@ -26907,13 +26898,13 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="soulfalc" supported="no">
+	<software name="soulfalc">
 		<description>Gédòu Jiàn Shén - Soul Falchion (Taiwan)</description>
 		<year>2002</year>
 		<publisher>V.Fame</publisher>
 		<info name="alt_title" value="格鬥劍神 Soul Falchion"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc5" /> <!-- TODO: set properly when protection is emulated -->
+			<feature name="slot" value="rom_vf001" />
 			<dataarea name="rom" size="1048576">
 				<rom name="Ge Dou Jian Shen - Soul Falchion (Unl) [C] [Raw].gbc" size="1048576" crc="1b1c6f68" sha1="fd06c62b42878e8094e610b180c1848c785f67e9"/>
 			</dataarea>

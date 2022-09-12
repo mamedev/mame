@@ -17,27 +17,13 @@
   - SGB should be moved to SNES driver
   - Emulate OAM corruption bug on 16bit inc/dec in $fe** region
 
-
-Mappers used in the Game Boy
-===========================
-
-HuC1 mapper
-===========
-
-Status: not supported yet.
-
-
-HuC3 mapper
-===========
-
-Status: not supported yet.
-
 ***************************************************************************/
 
 #include "emu.h"
 
 #include "bus/gameboy/carts.h"
-#include "bus/gameboy/gb_slot.h"
+#include "bus/gameboy/gbslot.h"
+#include "bus/gameboy/mdslot.h"
 #include "cpu/lr35902/lr35902.h"
 #include "machine/ram.h"
 #include "sound/gb.h"
@@ -129,6 +115,7 @@ public:
 	gb_state(const machine_config &mconfig, device_type type, const char *tag) :
 		base_state(mconfig, type, tag),
 		m_region_boot(*this, "maincpu"),
+		m_boot_view(*this, "boot"),
 		m_bios_hack(*this, "SKIP_CHECK")
 	{ }
 
@@ -136,33 +123,25 @@ public:
 	void gbpocket(machine_config &config);
 
 protected:
-	virtual void device_post_load() override;
-
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-
-	virtual void install_boot();
-	virtual void uninstall_boot();
 
 	void disable_boot();
 
 	void gb_io2_w(offs_t offset, uint8_t data);
 
 	required_region_ptr<uint8_t> m_region_boot;
+	memory_view m_boot_view;
 
 private:
+	u8 boot_r(offs_t offset);
+
 	void gb_palette(palette_device &palette) const;
 	void gbp_palette(palette_device &palette) const;
 
 	void gameboy_map(address_map &map);
 
 	required_ioport m_bios_hack;
-
-	util::notifier_subscription m_prog_notifier;
-	memory_passthrough_handler m_boot_tap;
-
-	bool m_boot_enabled = false;
-	bool m_installing_boot = false;
 };
 
 
@@ -212,9 +191,6 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-
-	virtual void install_boot() override;
-	virtual void uninstall_boot() override;
 
 private:
 	static constexpr XTAL GBC_CLOCK = 8.388_MHz_XTAL;
@@ -275,19 +251,6 @@ void base_state::gb_init_regs()
 }
 
 
-void gb_state::device_post_load()
-{
-	base_state::device_post_load();
-
-	m_installing_boot = true;
-	if (m_boot_enabled)
-		install_boot();
-	else
-		uninstall_boot();
-	m_installing_boot = false;
-}
-
-
 void base_state::machine_start()
 {
 	save_item(NAME(m_gb_io));
@@ -297,36 +260,21 @@ void base_state::machine_start()
 	save_item(NAME(m_triggering_irq));
 	save_item(NAME(m_reloading));
 	save_item(NAME(m_sio_count));
-
-	m_cartslot->save_ram();
 }
 
 void gb_state::machine_start()
 {
 	base_state::machine_start();
 
-	m_boot_enabled = false;
-	m_installing_boot = false;
-	m_prog_notifier = m_maincpu->space(AS_PROGRAM).add_change_notifier(
-			[this] (read_or_write mode)
-			{
-				if (!m_installing_boot && (uint32_t(mode) & uint32_t(read_or_write::READ)))
-				{
-					m_installing_boot = true;
-					if (m_boot_enabled)
-						install_boot();
-					else
-						uninstall_boot();
-					m_installing_boot = false;
-				}
-			});
-
-	save_item(NAME(m_boot_enabled));
+	m_maincpu->space(AS_PROGRAM).install_view(0x0000, 0x08ff, m_boot_view);
+	m_boot_view[0].install_read_handler(0x0000, 0x00ff, read8sm_delegate(*this, NAME(&gb_state::boot_r)));
 }
 
 void gbc_state::machine_start()
 {
 	gb_state::machine_start();
+
+	m_boot_view[0].install_rom(0x0200, 0x08ff, &m_region_boot[0x100]);
 
 	m_rambank->configure_entry(0, &m_bankedram[0]);
 	m_rambank->configure_entries(1, 7, &m_bankedram[0], 0x1000);
@@ -372,10 +320,7 @@ void gb_state::machine_reset()
 {
 	base_state::machine_reset();
 
-	m_installing_boot = true;
-	m_boot_enabled = true;
-	install_boot();
-	m_installing_boot = false;
+	m_boot_view.select(0);
 }
 
 void gbc_state::machine_reset()
@@ -395,63 +340,9 @@ void sgb_state::machine_reset()
 }
 
 
-void gb_state::install_boot()
-{
-	m_boot_tap.remove();
-	m_boot_tap = m_maincpu->space(AS_PROGRAM).install_read_tap(
-			0x0000, 0x00ff,
-			"boot_r",
-			[this] (offs_t offset, u8 &data, u8 mem_mask)
-			{
-				data = m_region_boot[offset];
-				if (m_bios_hack->read())
-				{
-					// patch out logo and checksum checks
-					// useful to run some pirate carts until properly emulated, or to test homebrew
-					if (offset == 0xe9 || offset == 0xea)
-						data = 0x00;
-					if (offset == 0xfa || offset == 0xfb)
-						data = 0x00;
-				}
-			},
-			&m_boot_tap);
-}
-
-void gbc_state::install_boot()
-{
-	gb_state::install_boot();
-
-	m_boot_high_tap.remove();
-	m_boot_high_tap = m_maincpu->space(AS_PROGRAM).install_read_tap(
-			0x0200, 0x08ff,
-			"boot_high_r",
-			[this] (offs_t offset, u8 &data, u8 mem_mask)
-			{
-				data = m_region_boot[0x0100 + offset - 0x0200];
-			},
-			&m_boot_high_tap);
-}
-
-
-void gb_state::uninstall_boot()
-{
-	m_boot_tap.remove();
-}
-
-void gbc_state::uninstall_boot()
-{
-	gb_state::uninstall_boot();
-
-	m_boot_high_tap.remove();
-}
-
-
 void gb_state::disable_boot()
 {
-	m_installing_boot = true;
-	m_boot_enabled = false;
-	uninstall_boot();
-	m_installing_boot = false;
+	m_boot_view.disable();
 }
 
 
@@ -543,6 +434,20 @@ void gb_state::gb_io2_w(offs_t offset, uint8_t data)
 		disable_boot(); // disable boot ROM
 	else
 		m_ppu->video_w(offset, data);
+}
+
+u8 gb_state::boot_r(offs_t offset)
+{
+	if (m_bios_hack->read())
+	{
+		// patch out logo and checksum checks
+		// useful to run some pirate carts until properly emulated, or to test homebrew
+		if (offset == 0xe9 || offset == 0xea)
+			return 0x00;
+		if (offset == 0xfa || offset == 0xfb)
+			return 0x00;
+	}
+	return m_region_boot[offset];
 }
 
 #ifdef MAME_DEBUG
@@ -994,9 +899,7 @@ uint8_t megaduck_state::megaduck_sound_r2(offs_t offset)
 void gb_state::gameboy_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x7fff).rw(m_cartslot, FUNC(gb_cart_slot_device::read_rom), FUNC(gb_cart_slot_device::write_bank));
 	map(0x8000, 0x9fff).rw(m_ppu, FUNC(dmg_ppu_device::vram_r), FUNC(dmg_ppu_device::vram_w));
-	map(0xa000, 0xbfff).rw(m_cartslot, FUNC(gb_cart_slot_device::read_ram), FUNC(gb_cart_slot_device::write_ram));
 	map(0xc000, 0xdfff).mirror(0x2000).ram();
 	map(0xfe00, 0xfeff).rw(m_ppu, FUNC(dmg_ppu_device::oam_r), FUNC(dmg_ppu_device::oam_w));
 	map(0xff00, 0xff0f).rw(FUNC(gb_state::gb_io_r), FUNC(gb_state::gb_io_w));
@@ -1011,9 +914,7 @@ void gb_state::gameboy_map(address_map &map)
 void sgb_state::sgb_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x7fff).rw(m_cartslot, FUNC(gb_cart_slot_device::read_rom), FUNC(gb_cart_slot_device::write_bank));
 	map(0x8000, 0x9fff).rw(m_ppu, FUNC(sgb_ppu_device::vram_r), FUNC(sgb_ppu_device::vram_w));
-	map(0xa000, 0xbfff).rw(m_cartslot, FUNC(gb_cart_slot_device::read_ram), FUNC(gb_cart_slot_device::write_ram));
 	map(0xc000, 0xdfff).mirror(0x2000).ram();
 	map(0xfe00, 0xfeff).rw(m_ppu, FUNC(sgb_ppu_device::oam_r), FUNC(sgb_ppu_device::oam_w));
 	map(0xff00, 0xff0f).rw(FUNC(sgb_state::gb_io_r), FUNC(sgb_state::sgb_io_w));
@@ -1028,9 +929,7 @@ void sgb_state::sgb_map(address_map &map)
 void gbc_state::gbc_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x7fff).rw(m_cartslot, FUNC(gb_cart_slot_device::read_rom), FUNC(gb_cart_slot_device::write_bank));
 	map(0x8000, 0x9fff).rw(m_ppu, FUNC(cgb_ppu_device::vram_r), FUNC(cgb_ppu_device::vram_w));
-	map(0xa000, 0xbfff).rw(m_cartslot, FUNC(gb_cart_slot_device::read_ram), FUNC(gb_cart_slot_device::write_ram));
 	map(0xc000, 0xcfff).mirror(0x2000).ram();
 	map(0xd000, 0xdfff).mirror(0x2000).bankrw(m_rambank);
 	map(0xfe00, 0xfeff).rw(m_ppu, FUNC(cgb_ppu_device::oam_r), FUNC(cgb_ppu_device::oam_w));
@@ -1046,11 +945,7 @@ void gbc_state::gbc_map(address_map &map)
 void megaduck_state::megaduck_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x7fff).rw(m_cartslot, FUNC(gb_cart_slot_device::read_rom), FUNC(gb_cart_slot_device::write_bank));
 	map(0x8000, 0x9fff).rw(m_ppu, FUNC(dmg_ppu_device::vram_r), FUNC(dmg_ppu_device::vram_w));
-	map(0xa000, 0xafff).noprw();  // unused?
-	map(0xb000, 0xb000).w(m_cartslot, FUNC(gb_cart_slot_device::write_ram)); // used for bank switch
-	map(0xb001, 0xbfff).noprw();  // unused?
 	map(0xc000, 0xfdff).ram();    // 8k or 16k? RAM
 	map(0xfe00, 0xfeff).rw(m_ppu, FUNC(dmg_ppu_device::oam_r), FUNC(dmg_ppu_device::oam_w));
 	map(0xff00, 0xff0f).rw(FUNC(megaduck_state::gb_io_r), FUNC(megaduck_state::gb_io_w));
@@ -1173,6 +1068,7 @@ void gb_state::gameboy(machine_config &config)
 
 	// cartslot
 	GB_CART_SLOT(config, m_cartslot, gameboy_cartridges, nullptr);
+	m_cartslot->set_space(m_maincpu, AS_PROGRAM);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("gameboy");
 	SOFTWARE_LIST(config, "gbc_list").set_compatible("gbcolor");
@@ -1211,6 +1107,7 @@ void sgb_state::supergb(machine_config &config)
 
 	// cartslot
 	GB_CART_SLOT(config, m_cartslot, gameboy_cartridges, nullptr);
+	m_cartslot->set_space(m_maincpu, AS_PROGRAM);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("gameboy");
 	SOFTWARE_LIST(config, "gbc_list").set_compatible("gbcolor");
@@ -1273,6 +1170,7 @@ void gbc_state::gbcolor(machine_config &config)
 
 	// cartslot
 	GB_CART_SLOT(config, m_cartslot, gameboy_cartridges, nullptr);
+	m_cartslot->set_space(m_maincpu, AS_PROGRAM);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("gbcolor");
 	SOFTWARE_LIST(config, "gb_list").set_compatible("gameboy");
@@ -1309,6 +1207,8 @@ void megaduck_state::megaduck(machine_config &config)
 
 	// cartslot
 	MEGADUCK_CART_SLOT(config, m_cartslot, megaduck_cartridges, nullptr);
+	m_cartslot->set_space(m_maincpu, AS_PROGRAM);
+
 	SOFTWARE_LIST(config, "cart_list").set_original("megaduck");
 }
 
