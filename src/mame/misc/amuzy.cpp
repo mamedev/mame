@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
-/***************************************************************************
+/******************************************************************************
 
     amuzy.cpp - Amuzy cartridge arcade/medal system
     Skeleton by R. Belmont
@@ -15,7 +15,30 @@
     SCI0 and SCI1 (UART) IRQs are valid
     All other vectors are RTE.
 
-************************************************************************/
+===============================================================================
+
+    YGV625 preliminary pinout
+
+    D15-0 CPU data bus
+    A13-1 CPU address bus
+    A0[WRH_N] CPU address bus/write pulse input
+    CS_N chip select
+    RD_N Read pulse input
+    WRL_N Light (?) pulse input
+    WAIT_N CPU pass wait (tristate)
+    READY_N CPU bus ready (tristate)
+    INT_N irq (open drain)
+    C16_N CPU bus width selection
+    LEND_N endian control
+    RESET_N reset input
+
+    MD31-0 CG memory data bus
+    MA24-1 CG memory address bus
+    CE3-0_N CG memory chip enable
+    OE3-0_N CG memory output enable
+    WEH_N, WEL_N CG memory write enable
+
+******************************************************************************/
 
 #include "emu.h"
 
@@ -46,6 +69,10 @@ private:
 
 	void amuzy_map(address_map &map);
 
+	u16 status_r(offs_t offset);
+	void status_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 m_status[2]{};
+
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -56,6 +83,8 @@ amuzy_state::amuzy_state(const machine_config &mconfig, device_type type, const 
 	m_palette(*this, "palette"),
 	m_oki(*this, "oki")
 {
+	std::fill(std::begin(m_status), std::end(m_status), 0);
+
 }
 
 u32 amuzy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -68,12 +97,33 @@ TIMER_DEVICE_CALLBACK_MEMBER(amuzy_state::scanline)
 {
 }
 
+// video or FIFO status bits
+u16 amuzy_state::status_r(offs_t offset)
+{
+	// Note: if bit 0 doesn't act like a heartbeat then a watchdog reset will eventually occur.
+	if (offset == 0)
+		return (m_status[0] & 0xfffe) | m_screen->vblank();
+
+	// PC=0xb2ee, FIFO empty?
+	m_status[1] ^= 0x20;
+	return m_status[1];
+}
+
+void amuzy_state::status_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_status[offset]);
+}
+
 
 void amuzy_state::amuzy_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
 	map(0x200000, 0x20ffff).ram();
-	map(0x600000, 0x603fff).ram();  // possibly YGV625 display list
+	//  0x220000- 0x22000d  YGV625 CG memory readback?
+	//  0x600000- 0x601fff) YGV625 display list
+	map(0x600000, 0x603fff).ram();
+	//  0x603c00- 0x603c7f (at least) YGV625 registers
+	map(0x603c4c, 0x603c4f).rw(FUNC(amuzy_state::status_r), FUNC(amuzy_state::status_w));
 }
 
 void amuzy_state::amuzy(machine_config &config)
@@ -84,7 +134,7 @@ void amuzy_state::amuzy(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// screen parameters are completely made up
 	m_screen->set_refresh_hz(59.62);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(80, 400-1, 16, 240-1);
 	m_screen->set_screen_update(FUNC(amuzy_state::screen_update));
