@@ -2915,6 +2915,11 @@ uint8_t dmg_ppu_device::video_r(offs_t offset)
 		if (offset == 0x29) LOG("BCPD read, palette is %s\n", m_pal_locked == LOCKED ? "LOCKED" : "UNLOCKED");
 	}
 
+	// TODO: Why is m_current_line kept separate?  The way this device keeps state is a mess.
+	// Many 188in1 games hang polling the line counter only seeing 0x00 without this.
+	if (4 == offset)
+		return m_current_line;
+
 	return m_vid_regs[offset];
 }
 
