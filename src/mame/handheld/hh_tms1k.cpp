@@ -5215,7 +5215,7 @@ ROM_END
   Entex Musical Marvin
   * TMS1100 MP1228 (no decap)
   * 1 7seg LED, 8 other leds, 1-bit sound with volume decay
-  * dials for speed, tone (volume decay), volume (also off/on switch)
+  * knobs for speed, tone (volume decay), volume (also off/on switch)
 
   The design patent was assigned to Hanzawa (Japan), so it's probably
   manufactured by them.
@@ -5261,8 +5261,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(mmarvin_state::speaker_decay_sim)
 {
 	m_volume->flt_volume_set_volume(m_speaker_volume);
 
-	// volume decays when speaker is off, decay scale is determined by tone dial
-	double step = (1.01 - 1.003) / 255.0; // approximation
+	// volume decays when speaker is off, decay scale is determined by tone knob
+	double step = (1.01 - 1.003) / 100.0; // approximation
 	m_speaker_volume /= 1.01 - (double)(u8)m_inputs[5]->read() * step;
 }
 
@@ -5277,10 +5277,10 @@ void mmarvin_state::write_r(u32 data)
 	// R2-R5: input mux
 	m_inp_mux = data >> 2 & 0xf;
 
-	// R6: trigger speed dial timer
+	// R6: trigger speed knob timer
 	if (m_r & 0x40 && ~data & 0x40)
 	{
-		double step = (2100 - 130) / 255.0; // duration range is around 0.13s to 2.1s
+		double step = (2100 - 130) / 100.0; // duration range is around 0.13s to 2.1s
 		m_speed_timer->adjust(attotime::from_msec(2100 - (u8)m_inputs[4]->read() * step));
 	}
 
@@ -5335,10 +5335,10 @@ static INPUT_PORTS_START( mmarvin )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Space")
 
 	PORT_START("IN.4")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CENTERDELTA(0) PORT_PLAYER(1) PORT_NAME("Speed Dial")
+	PORT_ADJUSTER(50, "Speed Knob")
 
 	PORT_START("IN.5")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CENTERDELTA(0) PORT_PLAYER(2) PORT_NAME("Tone Dial")
+	PORT_ADJUSTER(50, "Tone Knob")
 INPUT_PORTS_END
 
 void mmarvin_state::mmarvin(machine_config &config)

@@ -116,8 +116,6 @@ private:
 	required_region_ptr<u8> m_samplerom;
 
 	// video-related
-	tilemap_t *m_bg_tilemap = nullptr;
-
 	void videoram_w(offs_t offset, u8 data);
 	void colorram_w(offs_t offset, u8 data);
 	void flipscreen_w(u8 data);
@@ -126,13 +124,9 @@ private:
 	void adjust_palette();
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// misc
-	u16 m_soundcmd = 0;
-	u8 m_sample_latch = 0;
-	u16 m_sample_address = 0;
-
 	void sound_command_w(offs_t offset, u8 data);
 	void sample_latch_w(u8 data);
 	void sample_start_w(u8 data);
@@ -141,6 +135,11 @@ private:
 
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
+
+	tilemap_t *m_bg_tilemap = nullptr;
+	u16 m_soundcmd = 0;
+	u8 m_sample_latch = 0;
+	u16 m_sample_address = 0;
 };
 
 void olibochu_state::machine_start()
@@ -240,7 +239,7 @@ void olibochu_state::video_start()
 	m_bg_tilemap->set_transparent_pen(0);
 }
 
-void olibochu_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void olibochu_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// 8x8 sprites
 	for (int offs = m_spriteram[0].bytes() - 4; offs >= 0; offs -= 4)

@@ -172,14 +172,15 @@ namespace {
 class kangaroo_state : public driver_device
 {
 public:
-	kangaroo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	kangaroo_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_video_control(*this, "video_control"),
 		m_videoram(*this, "videoram", 256 * 64 * 4, ENDIANNESS_LITTLE), // video RAM is accessed 32 bits at a time (two planes, 4bpp each, 4 pixels)
 		m_blitbank(*this, "blitbank"),
 		m_blitrom(*this, "blitter"),
 		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void nomcu(machine_config &config);
 
@@ -216,8 +217,9 @@ private:
 class kangaroo_mcu_state : public kangaroo_state
 {
 public:
-	kangaroo_mcu_state(const machine_config &mconfig, device_type type, const char *tag)
-		: kangaroo_state(mconfig, type, tag) { }
+	kangaroo_mcu_state(const machine_config &mconfig, device_type type, const char *tag) :
+		kangaroo_state(mconfig, type, tag)
+	{ }
 
 	void mcu(machine_config &config);
 
@@ -236,7 +238,6 @@ private:
 };
 
 
-// video
 
 /*************************************
  *
@@ -398,7 +399,7 @@ uint32_t kangaroo_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
-// machine
+
 
 /*************************************
  *
@@ -442,6 +443,7 @@ void kangaroo_mcu_state::machine_reset()
 
 	m_mcu_clock = 0;
 }
+
 
 /*************************************
  *
