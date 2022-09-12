@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli, Wilbert Pol
+// copyright-holders:Vas Crabb, Wilbert Pol
 #ifndef MAME_BUS_GAMEBOY_MBC_H
 #define MAME_BUS_GAMEBOY_MBC_H
 

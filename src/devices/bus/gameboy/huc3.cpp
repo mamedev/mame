@@ -9,7 +9,7 @@
 
  The HuC-3 controller appears to only respond to A15-A13 and D6-D0, i.e.
  addresses are effectively masked with 0xE000 and data is effectively masked
- with 0x3F.
+ with 0x7F.
 
  Major components in the cartridge include:
  * U1 program ROM
