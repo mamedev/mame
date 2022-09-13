@@ -22,7 +22,6 @@
 **
 **
 ** Todo/known issues:
-** - ax230: Builtin games not emulated
 ** - piopx7/piopx7uk/piopxv60: Pioneer System Remote (home entertainment/Laserdisc control) not implemented
 ** - piopx7: Dump is from a PAL (EU/AU) machine, we have no known good dumps from JP or US NTSC machines
 ** - spc800: Haven't been able to test operation of the han rom yet
@@ -4609,7 +4608,6 @@ void msx_state::ax230(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "arabic2", 1, 0, 2, 1, "mainrom", 0x8000);
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 2, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4); // 64KB RAM
-	// TODO: uses ascii8 mapper type?
 	add_internal_slot(config, MSX_SLOT_AX230, "games", 3, 3, 1, 2, "games");
 
 	msx1(TMS9918, AY8910, config);
@@ -8866,7 +8864,7 @@ void msx2_state::phc77(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_MSX_WRITE, "msxwrite", 2, 0, 1, 2, "msxwrite", 0x00000);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "subrom");
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 0, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_slot(config, MSX_SLOT_DISK1, "disk", 3, 0, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 2, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);   // 64KB RAM
 
