@@ -2,9 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    mamedasm.c
-
-    Generic MAME disassembler.
+    Universal disassembler.
 
 ****************************************************************************/
 
