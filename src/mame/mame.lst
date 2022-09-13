@@ -12505,6 +12505,9 @@ dietgou                         // MAY (c) 1993
 digel804                        //
 ep804                           //
 
+@source:skeleton/digiblast.cpp
+digiblst
+
 @source:skeleton/digilog320.cpp
 digilog320                      //
 
