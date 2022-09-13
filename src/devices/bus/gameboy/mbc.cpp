@@ -75,6 +75,9 @@
  TODO:
  * What does MBC3 do with the RAM bank outputs when RTC is selected?
  * How do MBC3 invalid second/minute/hour values roll over?
+ * For convenience, MBC3 and MBC30 are emulated as one device for now.
+  - MBC3 only has 2 RAM bank outputs, but it will allow 3 like MBC30 here.
+  - MBC30 supposedly has 8 ROM bank outputs, but the one game using it only needs 7.
  * MBC5 logo spoofing class implements several strategies.  It's likely not all carts using it use all
    the strategies.  Strategies implemented by each cartridge should be identified.
  * Digimon 2 mapper doesn't work
@@ -177,11 +180,6 @@ protected:
 			m_view_ram.disable();
 	}
 
-	void enable_ram(u8 data)
-	{
-		set_ram_enable(0x0a == (data & 0x0f));
-	}
-
 	void bank_switch_coarse(u8 data)
 	{
 		set_bank_rom_coarse(data & m_bank_lines[1]);
@@ -251,6 +249,11 @@ protected:
 	bool install_memory(std::string &message) ATTR_COLD
 	{
 		return rom_mbc_device_base::install_memory(message, 4, 9);
+	}
+
+	void enable_ram(u8 data)
+	{
+		set_ram_enable(0x0a == data);
 	}
 
 	void bank_switch_fine_low(u8 data)
@@ -474,6 +477,11 @@ protected:
 	}
 
 private:
+	void enable_ram(u8 data)
+	{
+		set_ram_enable(0x0a == (data & 0x0f));
+	}
+
 	void bank_switch_fine(u8 data)
 	{
 		data &= 0x1f;
@@ -676,7 +684,7 @@ public:
 		}
 
 		// set up ROM and RAM
-		if (!install_memory(message, 2, 7))
+		if (!install_memory(message, 3, 7))
 			return image_init_result::FAIL;
 
 		// install bank switching handlers
@@ -701,6 +709,13 @@ public:
 				0xa000, 0xbfff,
 				write8smo_delegate(*this, FUNC(mbc3_device::write_rtc)));
 
+		// if real-time clock crystal is present, start it ticking
+		if (m_has_rtc_xtal)
+		{
+			logerror("Real-time clock crystal present, starting timer\n");
+			m_timer_rtc->adjust(attotime(1, 0), 0, attotime(1, 0));
+		}
+
 		// all good
 		return image_init_result::PASS;
 	};
@@ -716,8 +731,6 @@ protected:
 		save_item(NAME(m_rtc_enable));
 		save_item(NAME(m_rtc_select));
 		save_item(NAME(m_rtc_latch));
-
-		m_timer_rtc->adjust(attotime(1, 0), 0, attotime(1, 0));
 	}
 
 	virtual void device_reset() override ATTR_COLD
@@ -1747,6 +1760,11 @@ protected:
 	}
 
 private:
+	void enable_ram(u8 data)
+	{
+		set_ram_enable(0x0a == (data & 0x0f));
+	}
+
 	void bank_switch_fine(u8 data)
 	{
 		data >>= 1;
@@ -1761,7 +1779,7 @@ private:
 
 // device type definition
 DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_MBC1,     device_gb_cart_interface, bus::gameboy::mbc1_device,        "gb_rom_mbc1",     "Game Boy MBC1 Cartridge")
-DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_MBC3,     device_gb_cart_interface, bus::gameboy::mbc3_device,        "gb_rom_mbc3",     "Game Boy MBC3 Cartridge")
+DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_MBC3,     device_gb_cart_interface, bus::gameboy::mbc3_device,        "gb_rom_mbc3",     "Game Boy MBC3/MBC30 Cartridge")
 DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_MBC5,     device_gb_cart_interface, bus::gameboy::mbc5_device,        "gb_rom_mbc5",     "Game Boy MBC5 Cartridge")
 DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_SINTAX,   device_gb_cart_interface, bus::gameboy::sintax_device,      "gb_rom_sintax",   "Game Boy Sintax MBC5 Cartridge")
 DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_CHONGWU,  device_gb_cart_interface, bus::gameboy::chongwu_device,     "gb_rom_chongwu",  "Game Boy Chongwu Xiao Jingling Pokemon Pikecho Cartridge")

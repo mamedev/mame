@@ -76,8 +76,8 @@
  0x6 - Execute extended command (selector from bits 3-0 of 0xB)
 
  The games use four of the sixteen possible extended commands:
- 0x0 - Atomically read real-time clock to registers 0-7
- 0x1 - Atomically write real-time clock from registers 0-7
+ 0x0 - Atomically read real-time clock to registers 0-6
+ 0x1 - Atomically write real-time clock from registers 0-6
  0x2 - Some kind of handshake/status request - sets result to 0x1
  0xe - Sent twice to trigger melody generator
 
