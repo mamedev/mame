@@ -2533,10 +2533,8 @@ ROM_END
 
 ROM_START( sf2049se )
 	ROM_REGION32_LE( 0x80000, PCI_ID_NILE":rom", 0 )
-	// Bad Dump
-	// POST Message: Boot EPROM checksum...FAILED. Computed: F7017455
-	// End of file including checksum area is filled with FF's.
-	ROM_LOAD( "sf2049se.u27", 0x000000, 0x80000, CRC(da4ecd9c) SHA1(2574ff3d608ebcc59a63cf6dea13ee7650ae8921) BAD_DUMP )
+	// POST output reports bad checksum for boot ROM, this is correct as verified with several original U27 chips
+	ROM_LOAD( "sf2049se.u27", 0x000000, 0x80000, CRC(da4ecd9c) SHA1(2574ff3d608ebcc59a63cf6dea13ee7650ae8921) )
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_NILE":update", ROMREGION_ERASEFF )
 
