@@ -15950,7 +15950,7 @@ license:CC0
 			<feature name="u3" value="U3 RAM [D431000AGW-70LL]" />
 			<feature name="u4" value="U4 MM1134 [6735]" />
 			<feature name="battery" value="CR2025" />
-			<feature name="slot" value="rom_mbc3" />
+			<feature name="slot" value="rom_mbc30" />
 			<feature name="rtc" value="yes" />
 			<dataarea name="rom" size="2097152">
 				<rom name="cgb-bxtj-0.u1" size="2097152" crc="270c4ecc" sha1="95127b901bbce2407daf43cce9f45d4c27ef635d"/>

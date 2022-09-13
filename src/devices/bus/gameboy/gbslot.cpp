@@ -484,6 +484,32 @@ bool is_wisdom_tree(std::string_view tag, util::random_read &file, u64 length, u
 }
 
 
+bool is_mbc30(std::string_view tag, util::random_read &file, u64 length, u64 offset, u8 const *header)
+{
+	// MBC30 supposedly has an additional ROM bank output
+	if ((u32(0x4000) << 7) < length)
+	{
+		osd_printf_verbose(
+				"[%s] Assuming 0x%06X-byte cartridge declaring MBC3 controller uses MBC30\n",
+				tag,
+				length);
+		return true;
+	}
+
+	// MBC30 has three RAM bank outputs, supporting up to 64 KiB static RAM
+	if (cartheader::RAM_SIZE_64K == header[cartheader::OFFSET_RAM_SIZE - 0x100])
+	{
+		osd_printf_verbose(
+				"[%s] Assuming cartridge declaring MBC3 controller with 64 KiB RAM uses MBC30\n",
+				tag);
+		return true;
+	}
+
+	// MBC3 should be fine
+	return false;
+}
+
+
 bool is_m161(std::string_view tag, util::random_read &file, u64 length, u64 offset, u8 const *header)
 {
 	// supports eight 32 KiB banks at most, doesn't make sense without at least two banks
@@ -667,7 +693,10 @@ std::optional<char const *> probe_gbx_footer(std::string_view tag, util::random_
 		result = slotoptions::GB_MBC2;
 		break;
 	case gbxfile::TYPE_MBC3:
-		result = slotoptions::GB_MBC3;
+		if (((u32(0x4000) << 7) < leader.rom_bytes) || ((u32(0x2000) << 2) < leader.ram_bytes))
+			result = slotoptions::GB_MBC30;
+		else
+			result = slotoptions::GB_MBC3;
 		break;
 	case gbxfile::TYPE_MBC5:
 		result = slotoptions::GB_MBC5;
@@ -845,14 +874,20 @@ char const *guess_cart_type(std::string_view tag, util::random_read &file, u64 l
 		return slotoptions::GB_MMM01;
 	// 0x0e
 	case cartheader::TYPE_MBC3_RTC_BATT:
+		if (is_mbc30(tag, file, length, offset, header))
+			return slotoptions::GB_MBC30;
 		return slotoptions::GB_MBC3;
 	case cartheader::TYPE_MBC3_RTC_RAM_BATT:
 		if (is_m161(tag, file, length, offset, header))
 			return slotoptions::GB_M161;
+		else if (is_mbc30(tag, file, length, offset, header))
+			return slotoptions::GB_MBC30;
 		return slotoptions::GB_MBC3;
 	case cartheader::TYPE_MBC3:
 	case cartheader::TYPE_MBC3_RAM:
 	case cartheader::TYPE_MBC3_RAM_BATT:
+		if (is_mbc30(tag, file, length, offset, header))
+			return slotoptions::GB_MBC30;
 		return slotoptions::GB_MBC3;
 	// 0x14
 	case cartheader::TYPE_MBC5:

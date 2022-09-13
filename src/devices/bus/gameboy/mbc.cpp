@@ -105,8 +105,8 @@
 #include <sstream>
 #include <type_traits>
 
-#define VERBOSE 1
-#define LOG_OUTPUT_FUNC osd_printf_info
+//#define VERBOSE 1
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 
@@ -754,7 +754,7 @@ protected:
 			int day_of_week,
 			int hour,
 			int minute,
-			int second) override
+			int second) override ATTR_COLD
 	{
 		if (!m_has_rtc_xtal && !m_has_battery)
 		{
@@ -960,7 +960,7 @@ private:
 		// TODO: what happens with the RAM bank outputs when the RTC is selected?
 		// TODO: what happens for 4-7?
 		// TODO: is the high nybble ignored altogether?
-		bank_switch_coarse(data & 0x03);
+		bank_switch_coarse(data & 0x07);
 		m_rtc_select = data;
 		if (m_rtc_enable)
 		{
