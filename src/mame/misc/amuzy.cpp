@@ -167,4 +167,4 @@ ROM_END
 
 }   // anonymous namespace
 
-COMP( 1994, mmhammer,  0, 0, amuzy, amuzy, amuzy_state, empty_init, "Amuzy", "Mogu Mogu Hammer",  MACHINE_NOT_WORKING )
+GAME( 1994, mmhammer,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy", "Mogu Mogu Hammer",  MACHINE_NOT_WORKING )
