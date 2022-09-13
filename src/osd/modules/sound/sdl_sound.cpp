@@ -17,8 +17,8 @@
 #include <SDL2/SDL.h>
 
 // MAME headers
-#include "emu.h"
 #include "emuopts.h"
+#include "osdcore.h"
 
 #include "../../sdl/osdsdl.h"
 

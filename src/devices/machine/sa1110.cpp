@@ -2314,12 +2314,12 @@ void sa1110_periphs_device::device_start()
 	save_item(NAME(m_icp_regs.uart.rx_fifo_read_idx));
 	save_item(NAME(m_icp_regs.uart.rx_fifo_write_idx));
 	save_item(NAME(m_icp_regs.uart.rx_fifo_count));
-	m_icp_regs.uart_rx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1110_periphs_device::icp_rx_callback), this));
+	m_icp_regs.uart_rx_timer = timer_alloc(FUNC(sa1110_periphs_device::icp_rx_callback), this);
 	save_item(NAME(m_icp_regs.uart.tx_fifo));
 	save_item(NAME(m_icp_regs.uart.tx_fifo_read_idx));
 	save_item(NAME(m_icp_regs.uart.tx_fifo_write_idx));
 	save_item(NAME(m_icp_regs.uart.tx_fifo_count));
-	m_icp_regs.uart_tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1110_periphs_device::icp_tx_callback), this));
+	m_icp_regs.uart_tx_timer = timer_alloc(FUNC(sa1110_periphs_device::icp_tx_callback), this);
 	save_item(NAME(m_icp_regs.uart.rx_break_interlock));
 
 	save_item(NAME(m_icp_regs.utcr4));
@@ -2331,12 +2331,12 @@ void sa1110_periphs_device::device_start()
 	save_item(NAME(m_icp_regs.hssp.rx_fifo_read_idx));
 	save_item(NAME(m_icp_regs.hssp.rx_fifo_write_idx));
 	save_item(NAME(m_icp_regs.hssp.rx_fifo_count));
-	m_icp_regs.hssp.rx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1110_periphs_device::hssp_rx_callback), this));
+	m_icp_regs.hssp.rx_timer = timer_alloc(FUNC(sa1110_periphs_device::hssp_rx_callback), this);
 	save_item(NAME(m_icp_regs.hssp.tx_fifo));
 	save_item(NAME(m_icp_regs.hssp.tx_fifo_read_idx));
 	save_item(NAME(m_icp_regs.hssp.tx_fifo_write_idx));
 	save_item(NAME(m_icp_regs.hssp.tx_fifo_count));
-	m_icp_regs.hssp.tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1110_periphs_device::hssp_tx_callback), this));
+	m_icp_regs.hssp.tx_timer = timer_alloc(FUNC(sa1110_periphs_device::hssp_tx_callback), this);
 
 	save_item(NAME(m_uart_regs.utcr));
 	save_item(NAME(m_uart_regs.utsr0));
@@ -2363,7 +2363,7 @@ void sa1110_periphs_device::device_start()
 	save_item(NAME(m_mcp_regs.audio_tx_fifo_read_idx));
 	save_item(NAME(m_mcp_regs.audio_tx_fifo_write_idx));
 	save_item(NAME(m_mcp_regs.audio_tx_fifo_count));
-	m_mcp_regs.audio_tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1110_periphs_device::mcp_audio_tx_callback), this));
+	m_mcp_regs.audio_tx_timer = timer_alloc(FUNC(sa1110_periphs_device::mcp_audio_tx_callback), this);
 	save_item(NAME(m_mcp_regs.telecom_rx_fifo));
 	save_item(NAME(m_mcp_regs.telecom_rx_fifo_read_idx));
 	save_item(NAME(m_mcp_regs.telecom_rx_fifo_write_idx));
@@ -2372,7 +2372,7 @@ void sa1110_periphs_device::device_start()
 	save_item(NAME(m_mcp_regs.telecom_tx_fifo_read_idx));
 	save_item(NAME(m_mcp_regs.telecom_tx_fifo_write_idx));
 	save_item(NAME(m_mcp_regs.telecom_tx_fifo_count));
-	m_mcp_regs.telecom_tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1110_periphs_device::mcp_telecom_tx_callback), this));
+	m_mcp_regs.telecom_tx_timer = timer_alloc(FUNC(sa1110_periphs_device::mcp_telecom_tx_callback), this);
 
 	save_item(NAME(m_ssp_regs.sscr0));
 	save_item(NAME(m_ssp_regs.sscr1));
@@ -2381,12 +2381,12 @@ void sa1110_periphs_device::device_start()
 	save_item(NAME(m_ssp_regs.rx_fifo_read_idx));
 	save_item(NAME(m_ssp_regs.rx_fifo_write_idx));
 	save_item(NAME(m_ssp_regs.rx_fifo_count));
-	m_ssp_regs.rx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1110_periphs_device::ssp_rx_callback), this));
+	m_ssp_regs.rx_timer = timer_alloc(FUNC(sa1110_periphs_device::ssp_rx_callback), this);
 	save_item(NAME(m_ssp_regs.tx_fifo));
 	save_item(NAME(m_ssp_regs.tx_fifo_read_idx));
 	save_item(NAME(m_ssp_regs.tx_fifo_write_idx));
 	save_item(NAME(m_ssp_regs.tx_fifo_count));
-	m_ssp_regs.tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1110_periphs_device::ssp_tx_callback), this));
+	m_ssp_regs.tx_timer = timer_alloc(FUNC(sa1110_periphs_device::ssp_tx_callback), this);
 
 	save_item(NAME(m_ostmr_regs.osmr));
 	save_item(NAME(m_ostmr_regs.oscr));
@@ -2395,14 +2395,14 @@ void sa1110_periphs_device::device_start()
 	save_item(NAME(m_ostmr_regs.oier));
 	for (int i = 0; i < 4; i++)
 	{
-		m_ostmr_regs.timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1110_periphs_device::ostimer_tick_cb), this));
+		m_ostmr_regs.timer[i] = timer_alloc(FUNC(sa1110_periphs_device::ostimer_tick_cb), this);
 	}
 
 	save_item(NAME(m_rtc_regs.rtar));
 	save_item(NAME(m_rtc_regs.rcnr));
 	save_item(NAME(m_rtc_regs.rttr));
 	save_item(NAME(m_rtc_regs.rtsr));
-	m_rtc_regs.tick_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1110_periphs_device::rtc_tick_cb), this));
+	m_rtc_regs.tick_timer = timer_alloc(FUNC(sa1110_periphs_device::rtc_tick_cb), this);
 
 	save_item(NAME(m_power_regs.pmcr));
 	save_item(NAME(m_power_regs.pssr));

@@ -9,9 +9,6 @@
 // standard windows headers
 #include <windows.h>
 
-// MAME headers
-#include "emu.h"
-
 #include "drawnone.h"
 
 //============================================================

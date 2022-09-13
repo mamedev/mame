@@ -127,6 +127,7 @@ dsp56156_device::dsp56156_device(const machine_config &mconfig, const char *tag,
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1, address_map_constructor(FUNC(dsp56156_device::dsp56156_program_map), this))
 	, m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1, address_map_constructor(FUNC(dsp56156_device::dsp56156_x_data_map), this))
 	, m_program_ram(*this, "dsk56156_program_ram")
+	, portC_cb(*this)
 {
 }
 
@@ -267,6 +268,9 @@ void dsp56156_device::device_start()
 	m_core.modB_state = false;
 	m_core.modC_state = false;
 	m_core.reset_state = false;
+
+	/* Resolve line callbacks */
+	portC_cb.resolve_safe();
 
 	/* save states - dsp56156_core members */
 	save_item(NAME(m_core.modA_state));

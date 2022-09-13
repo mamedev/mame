@@ -224,7 +224,7 @@ namespace plib {
 			const string_list &sep, bool remove_ws, bool concat)
 	{
 		const pstring STR = "\"";
-		string_list tmpret;
+		string_list tmp_ret;
 		string_list tmp(psplit(str, sep));
 		std::size_t pi(0);
 
@@ -240,7 +240,7 @@ namespace plib {
 					pi++;
 				}
 				s += STR;
-				tmpret.push_back(s);
+				tmp_ret.push_back(s);
 			}
 			else
 			{
@@ -257,34 +257,34 @@ namespace plib {
 					}
 				}
 				if (!remove_ws || (tok != " " && tok != "\t"))
-					tmpret.push_back(tok);
+					tmp_ret.push_back(tok);
 			}
 			pi++;
 		}
 
 		if (!concat)
-			return tmpret;
+			return tmp_ret;
 
 		// FIXME: error if concat at beginning or end
 		string_list ret;
 		pi = 0;
-		while (pi<tmpret.size())
+		while (pi<tmp_ret.size())
 		{
-			if (tmpret[pi] == "##")
+			if (tmp_ret[pi] == "##")
 			{
 				while (ret.back() == " " || ret.back() == "\t")
 					ret.pop_back();
 				pstring cc = ret.back();
 				ret.pop_back();
 				pi++;
-				while (pi < tmpret.size() && (tmpret[pi] == " " || tmpret[pi] == "\t"))
+				while (pi < tmp_ret.size() && (tmp_ret[pi] == " " || tmp_ret[pi] == "\t"))
 					pi++;
-				if (pi == tmpret.size())
+				if (pi == tmp_ret.size())
 					error("## found at end of sequence");
-				ret.push_back(cc + tmpret[pi]);
+				ret.push_back(cc + tmp_ret[pi]);
 			}
 			else
-				ret.push_back(tmpret[pi]);
+				ret.push_back(tmp_ret[pi]);
 			pi++;
 		}
 		return ret;
@@ -329,18 +329,18 @@ namespace plib {
 					while (token != ")")
 					{
 						pstring par("");
-						int pcnt(1);
+						int parenthesis_count(1);
 						while (true)
 						{
-							if (pcnt==1 && token == ",")
+							if (parenthesis_count==1 && token == ",")
 							{
 								token = elems.next();
 								break;
 							}
 							if (token == "(")
-								pcnt++;
+								parenthesis_count++;
 							if (token == ")")
-								if (--pcnt == 0)
+								if (--parenthesis_count == 0)
 									break;
 							par += token;
 							token = elems.next();
@@ -386,7 +386,7 @@ namespace plib {
 		return tmpret;
 	}
 
-	static pstring catremainder(const std::vector<pstring> &elems, std::size_t start, const pstring &sep)
+	static pstring cat_remainder(const std::vector<pstring> &elems, std::size_t start, const pstring &sep)
 	{
 		pstring ret("");
 		for (std::size_t i = start; i < elems.size(); i++)
@@ -613,7 +613,7 @@ namespace plib {
 					{
 						arg = arg.substr(1, arg.length() - 2);
 						// first try local context
-						auto l(plib::util::buildpath({m_stack.back().m_local_path, arg}));
+						auto l(plib::util::build_path({m_stack.back().m_local_path, arg}));
 						auto lstrm(m_sources.get_stream(l));
 						if (!lstrm.empty())
 						{
@@ -632,8 +632,8 @@ namespace plib {
 					}
 					else
 						error("include misspelled:" + arg);
-					pstring linemarker = pfmt("# {1} \"{2}\" 1\n")(m_stack.back().m_lineno, m_stack.back().m_name);
-					push_out(linemarker);
+					pstring line_marker = pfmt("# {1} \"{2}\" 1\n")(m_stack.back().m_lineno, m_stack.back().m_name);
+					push_out(line_marker);
 				}
 			}
 			else if (lti[0] == "#pragma")
@@ -641,7 +641,7 @@ namespace plib {
 				if (m_if_flag == 0 && lti.size() > 3 && lti[1] == "NETLIST")
 				{
 					if (lti[2] == "warning")
-						error("NETLIST: " + catremainder(lti, 3, " "));
+						error("NETLIST: " + cat_remainder(lti, 3, " "));
 				}
 			}
 			else if (lti[0] == "#define")
@@ -654,10 +654,10 @@ namespace plib {
 					pstring n = args.next();
 					if (!is_valid_token(n))
 						error("define expected identifier");
-					auto *prevdef = get_define(n);
+					auto *previous_define = get_define(n);
 					if (lti.size() == 2)
 					{
-						if (prevdef != nullptr && !prevdef->m_replace.empty())
+						if (previous_define != nullptr && !previous_define->m_replace.empty())
 							error("redefinition of " + n);
 						m_defines.insert({n, define_t(n, "")});
 					}
@@ -681,7 +681,7 @@ namespace plib {
 						while (!args.eod())
 							r += args.next_ws();
 						def.m_replace = r;
-						if (prevdef != nullptr && prevdef->m_replace != r)
+						if (previous_define != nullptr && previous_define->m_replace != r)
 							error("redefinition of " + n);
 						m_defines.insert({n, def});
 					}
@@ -690,7 +690,7 @@ namespace plib {
 						pstring r;
 						while (!args.eod())
 							r += args.next_ws();
-						if (prevdef != nullptr && prevdef->m_replace != r)
+						if (previous_define != nullptr && previous_define->m_replace != r)
 							error("redefinition of " + n);
 						m_defines.insert({n, define_t(n, r)});
 					}
@@ -735,10 +735,10 @@ namespace plib {
 		while (!m_stack.empty())
 		{
 			putf8string line;
-			pstring linemarker = pfmt("# {1} \"{2}\"\n")(m_stack.back().m_lineno, m_stack.back().m_name);
-			push_out(linemarker);
+			pstring line_marker = pfmt("# {1} \"{2}\"\n")(m_stack.back().m_lineno, m_stack.back().m_name);
+			push_out(line_marker);
 			bool last_skipped=false;
-			while (m_stack.back().m_reader.readline(line))
+			while (m_stack.back().m_reader.read_line(line))
 			{
 				m_stack.back().m_lineno++;
 				auto r(process_line(pstring(line)));
@@ -755,8 +755,8 @@ namespace plib {
 			m_stack.pop_back();
 			if (!m_stack.empty())
 			{
-				linemarker = pfmt("# {1} \"{2}\" 2\n")(m_stack.back().m_lineno, m_stack.back().m_name);
-				push_out(linemarker);
+				line_marker = pfmt("# {1} \"{2}\" 2\n")(m_stack.back().m_lineno, m_stack.back().m_name);
+				push_out(line_marker);
 			}
 		}
 	}

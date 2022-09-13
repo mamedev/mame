@@ -83,10 +83,10 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// other protecteds
 	virtual void iwm_modereg_w(uint8_t data);
+
 
 private:
 	// data that is constant for the lifetime of the emulation
@@ -107,7 +107,7 @@ private:
 	uint8_t statusreg_r();
 	uint8_t read_reg(int lines);
 	void write_reg(uint8_t data);
-	void turn_motor_onoff(bool status);
+	TIMER_CALLBACK_MEMBER(turn_motor_onoff);
 	void iwm_access(int offset);
 };
 

@@ -39,7 +39,7 @@ m58846_device::m58846_device(const machine_config &mconfig, const char *tag, dev
 void m58846_device::device_start()
 {
 	melps4_cpu_device::device_start();
-	m_timer = timer_alloc(0);
+	m_timer = timer_alloc(FUNC(m58846_device::timer_update), this);
 }
 
 
@@ -66,11 +66,8 @@ void m58846_device::reset_timer()
 	m_timer->adjust(base);
 }
 
-void m58846_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(m58846_device::timer_update)
 {
-	if (id != 0)
-		return;
-
 	// timer 1: 7-bit fixed counter (manual specifically says 127)
 	if (++m_tmr_count[0] == 127)
 	{

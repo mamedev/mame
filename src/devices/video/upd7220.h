@@ -85,21 +85,18 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual space_config_vector memory_space_config() const override;
 
+	TIMER_CALLBACK_MEMBER(hsync_update);
+	TIMER_CALLBACK_MEMBER(vsync_update);
+	TIMER_CALLBACK_MEMBER(blank_update);
+
 	void start_dma();
 	void stop_dma();
-private:
-	enum
-	{
-		TIMER_VSYNC,
-		TIMER_HSYNC,
-		TIMER_BLANK
-	};
 
+private:
 	inline uint16_t readword(offs_t address);
 	inline void writeword(offs_t address, uint16_t data);
 	inline void fifo_clear();

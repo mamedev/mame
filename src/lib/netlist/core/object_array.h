@@ -8,8 +8,12 @@
 #ifndef NL_CORE_OBJECT_ARRAY_H_
 #define NL_CORE_OBJECT_ARRAY_H_
 
+#include "base_objects.h"
+#include "logic.h"
+
 #include "../nltypes.h"
 
+#include "../plib/pfmtlog.h"
 #include "../plib/plists.h"
 #include "../plib/pstring.h"
 
@@ -45,19 +49,19 @@ namespace netlist
 		}
 
 		template<class D>
-		object_array_base_t(D &dev, std::size_t offset, const pstring &fmt, nldelegate delegate)
+		object_array_base_t(D &dev, std::size_t offset, const pstring &fmt, nl_delegate delegate)
 		{
 			for (std::size_t i = 0; i<N; i++)
 				this->emplace_back(dev, formatted(fmt, i+offset), delegate);
 		}
 
 		template<class D>
-		object_array_base_t(D &dev, std::size_t offset, std::size_t qmask, const pstring &fmt)
+		object_array_base_t(D &dev, std::size_t offset, std::size_t output_mask, const pstring &fmt)
 		{
 			for (std::size_t i = 0; i<N; i++)
 			{
 				pstring name(formatted(fmt, i+offset));
-				if ((qmask >> i) & 1)
+				if ((output_mask >> i) & 1)
 					name += "Q";
 				this->emplace(i, dev, name);
 			}
@@ -90,8 +94,8 @@ namespace netlist
 		using base_type::base_type;
 
 		template<class D, std::size_t ND>
-		object_array_t(D &dev, std::size_t offset, std::size_t qmask,
-			const pstring &fmt, std::array<nldelegate, ND> &&delegates)
+		object_array_t(D &dev, std::size_t offset, std::size_t output_mask,
+			const pstring &fmt, std::array<nl_delegate, ND> &&delegates)
 		{
 			static_assert(N <= ND, "initializer_list size mismatch");
 			std::size_t i = 0;
@@ -100,7 +104,7 @@ namespace netlist
 				if (i < N)
 				{
 					pstring name(this->formatted(fmt, i+offset));
-					if ((qmask >> i) & 1)
+					if ((output_mask >> i) & 1)
 						name += "Q";
 					this->emplace_back(dev, name, e);
 				}
@@ -133,7 +137,7 @@ namespace netlist
 
 	private:
 		template <std::size_t P>
-		constexpr const value_type &e() const { return (*this)[P](); }
+		constexpr value_type e() const { return (*this)[P](); }
 	};
 
 	template<std::size_t N>
@@ -174,7 +178,7 @@ namespace netlist
 		}
 
 		template<typename T, std::size_t NT>
-		void push(const T &v, const std::array<netlist_time, NT> &t)
+		void push(const T &v, const std::array<const netlist_time, NT> &t)
 		{
 			static_assert(NT >= N, "Not enough timing entries provided");
 
@@ -218,6 +222,28 @@ namespace netlist
 				(*this)[i].set_tristate(v, ts_off_on, ts_on_off);
 		}
 	};
+
+	// -----------------------------------------------------------------------------
+	// Externals
+	// -----------------------------------------------------------------------------
+
+	extern template class object_array_t<logic_input_t, 1>;
+	extern template class object_array_t<logic_input_t, 2>;
+	extern template class object_array_t<logic_input_t, 3>;
+	extern template class object_array_t<logic_input_t, 4>;
+	extern template class object_array_t<logic_input_t, 5>;
+	extern template class object_array_t<logic_input_t, 6>;
+	extern template class object_array_t<logic_input_t, 7>;
+	extern template class object_array_t<logic_input_t, 8>;
+
+	extern template class object_array_t<logic_output_t, 1>;
+	extern template class object_array_t<logic_output_t, 2>;
+	extern template class object_array_t<logic_output_t, 3>;
+	extern template class object_array_t<logic_output_t, 4>;
+	extern template class object_array_t<logic_output_t, 5>;
+	extern template class object_array_t<logic_output_t, 6>;
+	extern template class object_array_t<logic_output_t, 7>;
+	extern template class object_array_t<logic_output_t, 8>;
 
 } // namespace netlist
 

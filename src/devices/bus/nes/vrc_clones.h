@@ -46,13 +46,13 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(irq_timer_tick);
 
 private:
 	u16 m_irq_count;
 	int m_irq_enable;
 
-	static const device_timer_id TIMER_IRQ = 0;
 	emu_timer *irq_timer;
 };
 
@@ -246,14 +246,14 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(irq_timer_tick);
 
 private:
 	u16 m_irq_count;
 	u8 m_irq_latch;
 	int m_irq_enable;
 
-	static const device_timer_id TIMER_IRQ = 0;
 	emu_timer *irq_timer;
 };
 

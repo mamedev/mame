@@ -291,6 +291,8 @@ protected:
 		TAGLO_PTAGLO = 0xffffff00, // physical adddress bits 35:12
 		TAGLO_PSTATE = 0x000000c0, // primary cache state
 		TAGLO_P      = 0x00000001, // primary tag even parity
+		TAGLO_CS     = 0x00001c00, // scache status
+		TAGLO_STAG   = 0xffffe000, // scache tag
 	};
 	enum icache_mask : u32
 	{
@@ -305,6 +307,12 @@ protected:
 		DCACHE_P    = 0x02000000, // even parity for ptag and cs
 		DCACHE_W    = 0x02000000, // write-back
 		DCACHE_WP   = 0x02000000, // even parity for write-back
+	};
+	enum scache_mask : u32
+	{
+		SCACHE_CS   = 0x01c00000, // cache state
+		SCACHE_STAG = 0x0007ffff, // physical tag
+		SCACHE_PIDX = 0x00380000, // primary cache index
 	};
 
 	// device_t overrides
@@ -342,6 +350,7 @@ protected:
 	void cpu_sdr(u32 const op);
 
 	// cp0 implementation
+	void cp0_cache(u32 const op);
 	void cp0_execute(u32 const op);
 	u64 cp0_get(unsigned const reg);
 	void cp0_set(unsigned const reg, u64 const data);
@@ -382,6 +391,9 @@ protected:
 	std::string debug_string(u64 string_pointer, unsigned limit = 0);
 	std::string debug_string_array(u64 array_pointer);
 	std::string debug_unicode_string(u64 unicode_string_pointer);
+
+	// configuration helpers
+	void configure_scache();
 
 	// device configuration state
 	address_space_config m_program_config_le;
@@ -458,6 +470,14 @@ protected:
 	std::unique_ptr<u32[]> m_icache_tag;
 	std::unique_ptr<u32[]> m_icache_data;
 
+	// experimental scache state
+	u32 m_scache_size; // Size in bytes
+	u8 m_scache_line_size;
+	u32 m_scache_line_index; // Secondary cache line shift
+	u32 m_scache_tag_mask; // Mask for extracting the tag from a physical address
+	u32 m_scache_tag_size;
+	std::unique_ptr<u32[]> m_scache_tag;
+
 	// statistics
 	u64 m_tlb_scans;
 	u64 m_tlb_loops;
@@ -485,15 +505,16 @@ public:
 class r4400_device : public r4000_base_device
 {
 public:
-	r4400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, bool timer_interrupt_disabled)
+	r4400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, bool timer_interrupt_disabled, u32 scache_size, u8 scache_line_size)
 		: r4000_base_device(mconfig, R4400, tag, owner, clock, 0x0440, 0x0500, CACHE_16K, CACHE_16K, 10, 20, 69, 133, timer_interrupt_disabled)
 	{
-		// no secondary cache
-		m_cp0[CP0_Config] |= CONFIG_SC;
+		m_scache_size = scache_size;
+		m_scache_line_size = scache_line_size;
+		configure_scache();
 	}
 
 	r4400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: r4400_device(mconfig, tag, owner, clock, false)
+		: r4400_device(mconfig, tag, owner, clock, false, 0, 0)
 	{
 	}
 };

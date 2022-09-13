@@ -38,7 +38,8 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(conversion_complete);
 
 private:
 	// internal state
@@ -77,10 +78,7 @@ private:
 	get_analogue_delegate m_get_analogue_cb;
 	eoc_delegate          m_eoc_cb;
 
-	enum
-	{
-		TIMER_CONVERSION_COMPLETE
-	};
+	emu_timer *m_conversion_timer;
 };
 
 DECLARE_DEVICE_TYPE(UPD7002, upd7002_device)

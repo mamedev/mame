@@ -64,11 +64,8 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
-	enum {
-		TIMER_DRIVE_READY_POLLING = 4
-	};
+	TIMER_CALLBACK_MEMBER(update_floppy);
 
 	enum {
 		PHASE_CMD, PHASE_EXEC, PHASE_RESULT
@@ -290,7 +287,7 @@ protected:
 
 	void end_reset();
 
-	void delay_cycles(emu_timer *tm, int cycles);
+	void delay_cycles(floppy_info &fi, int cycles);
 	void check_irq();
 	void fifo_expect(int size, bool write);
 	void fifo_push(uint8_t data, bool internal);
@@ -303,7 +300,7 @@ protected:
 	void disable_transfer();
 	int calc_sector_size(uint8_t size);
 
-	void run_drive_ready_polling();
+	TIMER_CALLBACK_MEMBER(run_drive_ready_polling);
 
 	virtual int check_command();
 	virtual void start_command(int cmd);
@@ -529,6 +526,18 @@ public:
 	virtual void map(address_map &map) override;
 };
 
+class pc8477b_device : public ps2_fdc_device {
+public:
+	pc8477b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, mode_t mode)
+		: pc8477b_device(mconfig, tag, owner, clock)
+	{
+		set_mode(mode);
+	}
+	pc8477b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void map(address_map &map) override;
+};
+
 class wd37c65c_device : public upd765_family_device {
 public:
 	wd37c65c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -594,6 +603,7 @@ DECLARE_DEVICE_TYPE(N82077AA,       n82077aa_device)
 DECLARE_DEVICE_TYPE(PC_FDC_SUPERIO, pc_fdc_superio_device)
 DECLARE_DEVICE_TYPE(DP8473,         dp8473_device)
 DECLARE_DEVICE_TYPE(PC8477A,        pc8477a_device)
+DECLARE_DEVICE_TYPE(PC8477B,        pc8477b_device)
 DECLARE_DEVICE_TYPE(WD37C65C,       wd37c65c_device)
 DECLARE_DEVICE_TYPE(MCS3201,        mcs3201_device)
 DECLARE_DEVICE_TYPE(TC8566AF,       tc8566af_device)

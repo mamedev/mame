@@ -35,24 +35,23 @@ psxdma_device::psxdma_device(const machine_config &mconfig, const char *tag, dev
 
 void psxdma_device::device_reset()
 {
-	int n;
-
 	m_dpcp = 0;
 	m_dicr = 0;
 
-	for( n = 0; n < 7; n++ )
+	for (int n = 0; n < 7; n++)
 	{
-		dma_stop_timer( n );
+		// FIXME: proper reset values
+		m_channel[n].n_channelcontrol = 0;
+		m_channel[n].b_running = 0;
+		dma_stop_timer(n);
 	}
 }
 
 void psxdma_device::device_post_load()
 {
-	int n;
-
-	for( n = 0; n < 7; n++ )
+	for (int n = 0; n < 7; n++)
 	{
-		dma_timer_adjust( n );
+		dma_timer_adjust(n);
 	}
 }
 
@@ -64,7 +63,7 @@ void psxdma_device::device_start()
 	{
 		psx_dma_channel *dma = &m_channel[ index ];
 
-		dma->timer = timer_alloc(index);
+		dma->timer = timer_alloc( FUNC( psxdma_device::dma_finished ), this );
 
 		save_item( NAME( dma->n_base ), index );
 		save_item( NAME( dma->n_blockcontrol ), index );
@@ -90,7 +89,7 @@ void psxdma_device::dma_stop_timer( int index )
 {
 	psx_dma_channel *dma = &m_channel[ index ];
 
-	dma->timer->adjust( attotime::never);
+	dma->timer->adjust(attotime::never);
 	dma->b_running = 0;
 }
 
@@ -129,8 +128,9 @@ void psxdma_device::dma_interrupt_update()
 	m_dicr &= 0x00ffffff | ( m_dicr << 8 );
 }
 
-void psxdma_device::dma_finished( int index )
+TIMER_CALLBACK_MEMBER( psxdma_device::dma_finished )
 {
+	const int index = param;
 	psx_dma_channel *dma = &m_channel[ index ];
 
 	if( dma->n_channelcontrol == 0x01000401 && index == 2 )
@@ -194,11 +194,6 @@ void psxdma_device::dma_finished( int index )
 	m_dicr |= 1 << ( 24 + index );
 	dma_interrupt_update();
 	dma_stop_timer( index );
-}
-
-void psxdma_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	dma_finished(id);
 }
 
 void psxdma_device::install_read_handler( int index, read_delegate p_fn_dma_read )

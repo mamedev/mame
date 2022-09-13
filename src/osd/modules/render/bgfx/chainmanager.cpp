@@ -9,13 +9,16 @@
 //
 //============================================================
 
+#include "chainmanager.h"
+
 #include <bx/readerwriter.h>
 #include <bx/file.h>
 
-#include "emu.h"
+#include "emucore.h"
+#include "render.h"
 #include "../frontend/mame/ui/slider.h"
 
-#include "osdcore.h"
+#include "modules/lib/osdobj_common.h"
 #include "modules/osdwindow.h"
 
 #include <rapidjson/document.h>
@@ -23,7 +26,6 @@
 
 #include "bgfxutil.h"
 
-#include "chainmanager.h"
 #include "chainreader.h"
 #include "chain.h"
 
@@ -33,9 +35,26 @@
 
 #include "sliderdirtynotifier.h"
 
+#include "osdcore.h"
+#include "osdfile.h"
+
 using namespace rapidjson;
 
 const uint32_t chain_manager::CHAIN_NONE = 0;
+
+chain_manager::screen_prim::screen_prim(render_primitive *prim)
+{
+	m_prim = prim;
+	m_screen_width = (uint16_t)floorf(prim->get_full_quad_width() + 0.5f);
+	m_screen_height = (uint16_t)floorf(prim->get_full_quad_height() + 0.5f);
+	m_quad_width = (uint16_t)floorf(prim->get_quad_width() + 0.5f);
+	m_quad_height = (uint16_t)floorf(prim->get_quad_height() + 0.5f);
+	m_tex_width = (float)prim->texture.width;
+	m_tex_height = (float)prim->texture.height;
+	m_rowpixels = prim->texture.rowpixels;
+	m_palette_length = prim->texture.palette_length;
+	m_flags = prim->flags;
+}
 
 chain_manager::chain_manager(running_machine& machine, osd_options& options, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t window_index, slider_dirty_notifier& slider_notifier)
 	: m_machine(machine)
@@ -73,8 +92,7 @@ void chain_manager::refresh_available_chains()
 	m_available_chains.clear();
 	m_available_chains.push_back(chain_desc("none", ""));
 
-	std::string chains_path;
-	osd_subst_env(chains_path, util::string_format("%s" PATH_SEPARATOR "chains", m_options.bgfx_path()));
+	const std::string chains_path  = osd_subst_env(util::string_format("%s" PATH_SEPARATOR "chains", m_options.bgfx_path()));
 	find_available_chains(chains_path, "");
 
 	destroy_unloaded_chains();
@@ -151,8 +169,7 @@ bgfx_chain* chain_manager::load_chain(std::string name, uint32_t screen_index)
 	{
 		name = name + ".json";
 	}
-	std::string path;
-	osd_subst_env(path, util::string_format("%s" PATH_SEPARATOR "chains" PATH_SEPARATOR, m_options.bgfx_path()));
+	std::string path = osd_subst_env(util::string_format("%s" PATH_SEPARATOR "chains" PATH_SEPARATOR, m_options.bgfx_path()));
 	path += name;
 
 	bx::FileReader reader;
@@ -468,7 +485,10 @@ uint32_t chain_manager::update_screen_textures(uint32_t view, render_primitive *
 
 		if (texture == nullptr)
 		{
-			bgfx_texture *texture = new bgfx_texture(full_name, dst_format, tex_width, tex_height, mem, BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT, pitch, prim.m_rowpixels, width_div_factor, width_mul_factor);
+			uint32_t flags = BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT;
+			if (!PRIMFLAG_GET_TEXWRAP(prim.m_flags))
+				flags |= BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP;
+			bgfx_texture *texture = new bgfx_texture(full_name, dst_format, tex_width, tex_height, mem, flags, pitch, prim.m_rowpixels, width_div_factor, width_mul_factor);
 			m_textures.add_provider(full_name, texture);
 
 			if (prim.m_prim->texture.palette)

@@ -7,25 +7,18 @@
 //============================================================
 
 #include "input_module.h"
-#include "modules/osdmodule.h"
 
 #if defined(OSD_WINDOWS)
 
-// standard windows headers
-#include <windows.h>
-#include <tchar.h>
-#undef interface
-
-// MAME headers
 #include "emu.h"
+
+#include "input_windows.h"
+
 #include "strconv.h"
 
-// MAMEOS headers
-#include "winmain.h"
-#include "window.h"
+// standard windows headers
+#include <tchar.h>
 
-#include "input_common.h"
-#include "input_windows.h"
 
 namespace {
 
@@ -156,8 +149,8 @@ public:
 		if (!(cursor_info.flags & CURSOR_SHOWING))
 		{
 			// We measure the position change from the previously set center position
-			mouse.lX = (cursor_info.ptScreenPos.x - win32_mouse.last_point.x) * INPUT_RELATIVE_PER_PIXEL;
-			mouse.lY = (cursor_info.ptScreenPos.y - win32_mouse.last_point.y) * INPUT_RELATIVE_PER_PIXEL;
+			mouse.lX = (cursor_info.ptScreenPos.x - win32_mouse.last_point.x) * osd::INPUT_RELATIVE_PER_PIXEL;
+			mouse.lY = (cursor_info.ptScreenPos.y - win32_mouse.last_point.y) * osd::INPUT_RELATIVE_PER_PIXEL;
 
 			RECT window_pos = {0};
 			GetWindowRect(std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window(), &window_pos);

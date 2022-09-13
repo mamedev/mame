@@ -55,10 +55,21 @@ DEFINE_DEVICE_TYPE(TI99_MECMOUSE, bus::ti99::joyport::mecmouse_device, "ti99_mec
 
 namespace bus::ti99::joyport {
 
-#define POLL_TIMER 1
-
 mecmouse_device::mecmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TI99_MECMOUSE, tag, owner, clock), device_ti99_joyport_interface(mconfig, *this), m_last_select(0), m_read_y_axis(false), m_x(0), m_y(0), m_x_buf(0), m_y_buf(0), m_last_mx(0), m_last_my(0), m_poll_timer(nullptr)
+	: device_t(mconfig, TI99_MECMOUSE, tag, owner, clock)
+	, device_ti99_joyport_interface(mconfig, *this)
+	, m_mousex(*this, "MOUSEX")
+	, m_mousey(*this, "MOUSEY")
+	, m_mousebutton(*this, "MOUSE0")
+	, m_last_select(0)
+	, m_read_y_axis(false)
+	, m_x(0)
+	, m_y(0)
+	, m_x_buf(0)
+	, m_y_buf(0)
+	, m_last_mx(0)
+	, m_last_my(0)
+	, m_poll_timer(nullptr)
 {
 }
 
@@ -66,7 +77,7 @@ mecmouse_device::mecmouse_device(const machine_config &mconfig, const char *tag,
 uint8_t mecmouse_device::read_dev()
 {
 	int answer;
-	int buttons = ioport("MOUSE0")->read() & 3;
+	int buttons = m_mousebutton->read() & 3;
 
 	answer = (m_read_y_axis? m_y_buf : m_x_buf) << 1;
 
@@ -132,17 +143,14 @@ void mecmouse_device::write_dev(uint8_t data)
 	}
 }
 
-void mecmouse_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(mecmouse_device::poll_mouse)
 {
 	// Poll the movement
-	int new_mx, new_my;
-	int delta_x, delta_y;
-
-	new_mx = ioport("MOUSEX")->read();
-	new_my = ioport("MOUSEY")->read();
+	int new_mx = m_mousex->read();
+	int new_my = m_mousey->read();
 
 	// compute x delta
-	delta_x = new_mx - m_last_mx;
+	int delta_x = new_mx - m_last_mx;
 
 	// Prevent unplausible values at startup.
 	if (delta_x > 10000 || delta_x<-10000) delta_x = 0;
@@ -150,7 +158,7 @@ void mecmouse_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	m_last_mx = new_mx;
 
 	// compute y delta
-	delta_y = new_my - m_last_my;
+	int delta_y = new_my - m_last_my;
 
 	if (delta_y > 10000 || delta_y<-10000) delta_y = 0;
 
@@ -163,7 +171,7 @@ void mecmouse_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 void mecmouse_device::device_start()
 {
-	m_poll_timer = timer_alloc(POLL_TIMER);
+	m_poll_timer = timer_alloc(FUNC(mecmouse_device::poll_mouse), this);
 	// The poll time cannot depend on the console settings, since the TI-99/4A
 	// has no clock line on the joystick port. The rate is not mentioned in
 	// the specs; however, if it is too low, the mouse pointer will do jumps

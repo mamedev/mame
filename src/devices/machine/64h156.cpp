@@ -92,7 +92,7 @@ void c64h156_device::device_start()
 	m_write_byte.resolve_safe();
 
 	// allocate timer
-	t_gen = timer_alloc(0);
+	t_gen = timer_alloc(FUNC(c64h156_device::update_tick), this);
 
 	// register for state saving
 	save_item(NAME(m_mtr));
@@ -130,10 +130,10 @@ void c64h156_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  update_tick - pump the device life cycle
 //-------------------------------------------------
 
-void c64h156_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(c64h156_device::update_tick)
 {
 	live_sync();
 	live_run();

@@ -47,17 +47,25 @@ namespace plib
 	template <typename BASEARENA, std::size_t MINALIGN>
 	class mempool_arena;
 
+	template <std::size_t MINALLOC = 0>
 	struct aligned_arena;
-	class dynlib_base;
+
+	class dynamic_library_base;
 
 	template<bool debug_enabled>
 	class plog_base;
 
 	struct plog_level;
 
+	template <typename A, typename T>
+	class timed_queue_linear;
+
+	template <typename A, typename T>
+	class timed_queue_heap;
+
 	namespace detail
 	{
-		class token_store;
+		class token_store_t;
 	} // namespace detail
 
 } // namespace plib
@@ -81,8 +89,15 @@ namespace plib
 		UNKNOWN,
 		CLANG,
 		GCC,
-		MSC,
-		NVCC
+		MSC
+	};
+
+	enum class ci_cpp_stdlib
+	{
+		UNKNOWN,
+		LIBSTDCXX,
+		LIBCPP,
+		MSVCPRT
 	};
 
 	enum class ci_os
@@ -108,7 +123,20 @@ namespace plib
 	enum class ci_env
 	{
 		DEFAULT,
-		MSVC
+		MSVC,
+		NVCC
+	};
+
+	// <sys/types.h> on ubuntu system may define major and minor as macros
+	// That's why we use vmajor, .. here
+	template <std::size_t MAJOR, std::size_t MINOR, std::size_t PL = 0>
+	struct typed_version
+	{
+		static_assert((MINOR < 100) && (PL < 100), "typed_version: MAJOR, MINOR or PATCHLEVEL exceeds or equal to 100");
+		using vmajor = std::integral_constant<std::size_t, MAJOR>;
+		using vminor = std::integral_constant<std::size_t, MINOR>;
+		using vpatchlevel = std::integral_constant<std::size_t, PL>;
+		using full = std::integral_constant<std::size_t, MAJOR * 10000 + MINOR * 100 + PL>;
 	};
 
 	struct compile_info
@@ -137,21 +165,31 @@ namespace plib
 		static constexpr int128_type int128_max() { return int128_type(); }
 		static constexpr uint128_type uint128_max() { return uint128_type(); }
 	#endif
-	#if (NVCCBUILD > 0)
-		using type = std::integral_constant<ci_compiler, ci_compiler::NVCC>;
-		using version = std::integral_constant<int, NVCCBUILD>;
-	#elif defined(__clang__)
+	#if defined(__clang__)
 		using type = std::integral_constant<ci_compiler, ci_compiler::CLANG>;
-		using version = std::integral_constant<int, (__clang_major__) * 100 + (__clang_minor__)>;
+		using version = typed_version<__clang_major__, __clang_minor__, __clang_patchlevel__>;
 	#elif defined(__GNUC__)
 		using type = std::integral_constant<ci_compiler, ci_compiler::GCC>;
-		using version = std::integral_constant<int, (__GNUC__) * 100 + (__GNUC_MINOR__)>;
+		using version = typed_version<__GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__>;
 	#elif defined(_MSC_VER)
 		using type = std::integral_constant<ci_compiler, ci_compiler::MSC>;
-		using version = std::integral_constant<int, _MSC_VER>;
+		using version = typed_version<_MSC_VER / 100, _MSC_VER % 100>;
 	#else
 		using type = std::integral_constant<ci_compiler, ci_compiler::UNKNOWN>;
-		using version = std::integral_constant<int, 0>;
+		using version = typed_version<0, 0>;
+	#endif
+	#if defined(_LIBCPP_VERSION)
+		using cpp_stdlib = std::integral_constant<ci_cpp_stdlib, ci_cpp_stdlib::LIBCPP>;
+		using cpp_stdlib_version = typed_version<(_LIBCPP_VERSION) / 1000, ((_LIBCPP_VERSION) / 100) % 10, _LIBCPP_VERSION % 100>;
+	#elif defined(__GLIBCXX__)
+		using cpp_stdlib = std::integral_constant<ci_cpp_stdlib, ci_cpp_stdlib::LIBSTDCXX>;
+		using cpp_stdlib_version = typed_version<(_GLIBCXX_RELEASE), 0>;
+	#elif defined(_CPPLIB_VER) && defined(_MSVC_STL_VERSION)
+		using cpp_stdlib = std::integral_constant<ci_cpp_stdlib, ci_cpp_stdlib::MSVCPRT>;
+		using cpp_stdlib_version = typed_version<_CPPLIB_VER, 0>;
+	#else
+		using cpp_stdlib = std::integral_constant<ci_cpp_stdlib, ci_cpp_stdlib::UNKNOWN>;
+		using cpp_stdlib_version = typed_version<0, 0, 0>;
 	#endif
 	#ifdef __unix__
 		using is_unix = std::integral_constant<bool, true>;
@@ -195,9 +233,9 @@ namespace plib
 		using mingw = std::integral_constant<bool, false>;
 	#endif
 	#if defined(__APPLE__)
-		using clang_apple_noexcept_issue = std::integral_constant<bool, version::value < 1100>;
+		using clang_noexcept_issue = std::integral_constant<bool, (type::value == ci_compiler::CLANG) && (version::full::value < 110003)>;
 	#else
-		using clang_apple_noexcept_issue = std::integral_constant<bool, false>;
+		using clang_noexcept_issue = std::integral_constant<bool, (type::value == ci_compiler::CLANG) && (version::vmajor::value < 9)>;
 	#endif
 	#if defined(__ia64__)
 		using abi_vtable_function_descriptors = std::integral_constant<bool, true>;
@@ -206,8 +244,18 @@ namespace plib
 	#endif
 	#if defined(_MSC_VER)
 		using env = std::integral_constant<ci_env, ci_env::MSVC>;
+		using env_version = typed_version<_MSC_VER / 100, _MSC_VER % 100>;
+	#elif defined(__NVCC__) || defined(__CUDACC__)
+		using env = std::integral_constant<ci_env, ci_env::NVCC>;
+		using env_version = typed_version<__CUDA_API_VER_MAJOR__, __CUDA_API_VER_MINOR__, __CUDACC_VER_BUILD__>;
+		#if defined(__CUDA_ARCH__)
+			using cuda_arch = std::integral_constant<std::size_t, __CUDA_ARCH__>;
+		#else
+			using cuda_arch = std::integral_constant<std::size_t, 0>;
+	#endif
 	#else
 		using env = std::integral_constant<ci_env, ci_env::DEFAULT>;
+		using env_version = version;
 	#endif
 	};
 
@@ -252,7 +300,7 @@ namespace plib
 
 	template<typename T> struct is_floating_point : public std::is_floating_point<T> { };
 
-	template< class T >
+	template<class T>
 	struct is_arithmetic : std::integral_constant<bool,
 		plib::is_integral<T>::value || plib::is_floating_point<T>::value> {};
 
@@ -316,10 +364,10 @@ namespace plib
 
 	/// \brief mark arguments as not used for compiler
 	///
-	/// @tparam Ts unsused parameters
+	/// \tparam Ts unused parameters
 	///
 	template<typename... Ts>
-	inline void unused_var(Ts&&...) noexcept {} // NOLINT(readability-named-parameter)
+	inline void unused_var(Ts&&...) noexcept {} // NOLINT(readability-named-parameter) // FIXME: remove unused var completely
 
 	/// \brief copy type S to type D byte by byte
 	///
@@ -343,7 +391,7 @@ namespace plib
 
 	/// \brief Test if type R has a stream operator << defined
 	///
-	/// has_ostram_operator<std::ostream, int>:: value should be true
+	/// has_ostream_operator<std::ostream, int>:: value should be true
 	///
 	/// \tparam LEFT Stream type
 	/// \tparam RIGHT Type to check for operator overload

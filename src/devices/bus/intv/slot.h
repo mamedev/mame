@@ -70,7 +70,7 @@ public:
 	virtual void write_rome0(offs_t offset, uint16_t data) {}
 	virtual void write_romf0(offs_t offset, uint16_t data) {}
 
-	void rom_alloc(uint32_t size, const char *tag);
+	void rom_alloc(uint32_t size);
 	void ram_alloc(uint32_t size);
 	uint8_t* get_rom_base() { return m_rom; }
 	uint8_t* get_ram_base() { return &m_ram[0]; }
@@ -180,8 +180,6 @@ DECLARE_DEVICE_TYPE(INTV_CART_SLOT, intv_cart_slot_device)
 /***************************************************************************
  DEVICE CONFIGURATION MACROS
  ***************************************************************************/
-
-#define INTVSLOT_ROM_REGION_TAG ":cart:rom"
 
 void intv_cart(device_slot_interface &device);
 

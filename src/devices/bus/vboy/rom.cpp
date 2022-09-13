@@ -9,6 +9,7 @@
 #include "bus/generic/slot.h"
 
 //#define VERBOSE 1
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 
@@ -63,7 +64,7 @@ image_init_result vboy_flat_rom_device::load()
 				0,
 				0,
 				rom_base(),
-				[this, rom = reinterpret_cast<u32 *>(romregion->base())] (offs_t begin, offs_t end, offs_t mirror, offs_t src)
+				[this, rom = &romregion->as_u32()] (offs_t begin, offs_t end, offs_t mirror, offs_t src)
 				{
 					LOG(
 							"Install ROM 0x%08X-0x%08X at 0x%08X-0x%08X mirror %08X\n",

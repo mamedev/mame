@@ -9,7 +9,7 @@ be inserted into the Odyssey 2/G7000.
 
 Hardware notes:
 - Z80 @ 3.547MHz
-- 2*8KB ROM, 16KB RAM(2*TMS4416, 2 unpopulated sockets)
+- 2*8KB ROM, 16KB RAM(2*TMS4416, 2 unpopulated locations)
 - optional data recorder
 
 The RAM can be expanded to 32KB by simply adding two more TMS4416. To enable it,

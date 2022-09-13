@@ -10,6 +10,9 @@ on:
     - '.github/**'
     - 'language/**'
 
+permissions:
+  contents: read
+
 jobs:
   build-language:
     runs-on: ubuntu-latest

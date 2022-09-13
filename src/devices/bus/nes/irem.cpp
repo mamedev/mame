@@ -115,7 +115,7 @@ void nes_g101_device::pcb_reset()
 void nes_h3001_device::device_start()
 {
 	nes_g101_device::device_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_h3001_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -260,22 +260,19 @@ void nes_g101_device::write_h(offs_t offset, u8 data)
 
  -------------------------------------------------*/
 
-void nes_h3001_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_h3001_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
+	if (m_irq_enable)
 	{
-		if (m_irq_enable)
-		{
-			// 16bit counter, IRQ fired when the counter reaches 0
-			// after firing, the counter is *not* reloaded and does not wrap
-			if (m_irq_count)
-				m_irq_count--;
+		// 16bit counter, IRQ fired when the counter reaches 0
+		// after firing, the counter is *not* reloaded and does not wrap
+		if (m_irq_count)
+			m_irq_count--;
 
-			if (!m_irq_count)
-			{
-				set_irq_line(ASSERT_LINE);
-				m_irq_enable = 0;
-			}
+		if (!m_irq_count)
+		{
+			set_irq_line(ASSERT_LINE);
+			m_irq_enable = 0;
 		}
 	}
 }

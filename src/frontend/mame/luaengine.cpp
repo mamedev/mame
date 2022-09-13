@@ -716,16 +716,13 @@ void lua_engine::initialize()
 			static_cast<char const *(*)(char const *)>(&lang_translate),
 			static_cast<char const *(*)(char const *, char const *)>(&lang_translate));
 	emu["pid"] = &osd_getpid;
-	emu["subst_env"] =
-		[] (const std::string &str)
-		{
-			std::string result;
-			osd_subst_env(result, str);
-			return result;
-		};
+	emu.set_function("subst_env", &osd_subst_env);
 	emu["device_enumerator"] = sol::overload(
 			[] (device_t &dev) { return devenum<device_enumerator>(dev); },
 			[] (device_t &dev, int maxdepth) { return devenum<device_enumerator>(dev, maxdepth); });
+	emu["palette_enumerator"] = sol::overload(
+			[] (device_t &dev) { return devenum<palette_interface_enumerator>(dev); },
+			[] (device_t &dev, int maxdepth) { return devenum<palette_interface_enumerator>(dev, maxdepth); });
 	emu["screen_enumerator"] = sol::overload(
 			[] (device_t &dev) { return devenum<screen_device_enumerator>(dev); },
 			[] (device_t &dev, int maxdepth) { return devenum<screen_device_enumerator>(dev, maxdepth); });
@@ -1157,25 +1154,25 @@ void lua_engine::initialize()
 	auto core_options_entry_type = sol().registry().new_usertype<core_options::entry>("core_options_entry", "new", sol::no_constructor);
 	core_options_entry_type.set("value", sol::overload(
 		[this](core_options::entry &e, bool val) {
-			if(e.type() != OPTION_BOOLEAN)
+			if(e.type() != core_options::option_type::BOOLEAN)
 				luaL_error(m_lua_state, "Cannot set option to wrong type");
 			else
 				e.set_value(val ? "1" : "0", OPTION_PRIORITY_CMDLINE);
 		},
 		[this](core_options::entry &e, float val) {
-			if(e.type() != OPTION_FLOAT)
+			if(e.type() != core_options::option_type::FLOAT)
 				luaL_error(m_lua_state, "Cannot set option to wrong type");
 			else
 				e.set_value(string_format("%f", val), OPTION_PRIORITY_CMDLINE);
 		},
 		[this](core_options::entry &e, int val) {
-			if(e.type() != OPTION_INTEGER)
+			if(e.type() != core_options::option_type::INTEGER)
 				luaL_error(m_lua_state, "Cannot set option to wrong type");
 			else
 				e.set_value(string_format("%d", val), OPTION_PRIORITY_CMDLINE);
 		},
 		[this](core_options::entry &e, const char *val) {
-			if(e.type() != OPTION_STRING)
+			if(e.type() != core_options::option_type::STRING)
 				luaL_error(m_lua_state, "Cannot set option to wrong type");
 			else
 				e.set_value(val, OPTION_PRIORITY_CMDLINE);
@@ -1277,6 +1274,7 @@ void lua_engine::initialize()
 	machine_type["exit_pending"] = sol::property(&running_machine::exit_pending);
 	machine_type["hard_reset_pending"] = sol::property(&running_machine::hard_reset_pending);
 	machine_type["devices"] = sol::property([] (running_machine &m) { return devenum<device_enumerator>(m.root_device()); });
+	machine_type["palettes"] = sol::property([] (running_machine &m) { return devenum<palette_interface_enumerator>(m.root_device()); });
 	machine_type["screens"] = sol::property([] (running_machine &m) { return devenum<screen_device_enumerator>(m.root_device()); });
 	machine_type["cassettes"] = sol::property([] (running_machine &m) { return devenum<cassette_device_enumerator>(m.root_device()); });
 	machine_type["images"] = sol::property([] (running_machine &m) { return devenum<image_interface_enumerator>(m.root_device()); });
@@ -1290,7 +1288,7 @@ void lua_engine::initialize()
 	game_driver_type["manufacturer"] = sol::readonly(&game_driver::manufacturer);
 	game_driver_type["parent"] = sol::readonly(&game_driver::parent);
 	game_driver_type["compatible_with"] = sol::property([] (game_driver const &driver) { return strcmp(driver.compatible_with, "0") ? driver.compatible_with : nullptr; });
-	game_driver_type["source_file"] = sol::property([] (game_driver const &driver) { return &driver.type.source()[0]; });
+	game_driver_type["source_file"] = sol::property([] (game_driver const &driver) { return driver.type.source(); });
 	game_driver_type["orientation"] = sol::property(
 			[] (game_driver const &driver)
 			{
@@ -1438,11 +1436,67 @@ void lua_engine::initialize()
 			});
 
 
+	auto dipalette_type = sol().registry().new_usertype<device_palette_interface>("dipalette", sol::no_constructor);
+	dipalette_type.set_function("pen", &device_palette_interface::pen);
+	dipalette_type.set_function(
+			"pen_color",
+			[] (device_palette_interface const &pal, pen_t pen)
+			{
+				return uint32_t(pal.pen_color(pen));
+			});
+	dipalette_type.set_function("pen_contrast", &device_palette_interface::pen_contrast);
+	dipalette_type.set_function("pen_indirect", &device_palette_interface::pen_indirect);
+	dipalette_type.set_function(
+			"indirect_color",
+			[] (device_palette_interface const &pal, int index)
+			{
+				return uint32_t(pal.indirect_color(index));
+			});
+	dipalette_type["set_pen_color"] = sol::overload(
+			[] (device_palette_interface &pal, pen_t pen, uint32_t color)
+			{
+				pal.set_pen_color(pen, rgb_t(color));
+			},
+			static_cast<void (device_palette_interface::*)(pen_t, uint8_t, uint8_t, uint8_t)>(&device_palette_interface::set_pen_color));
+	dipalette_type.set_function("set_pen_red_level", &device_palette_interface::set_pen_red_level);
+	dipalette_type.set_function("set_pen_green_level", &device_palette_interface::set_pen_green_level);
+	dipalette_type.set_function("set_pen_blue_level", &device_palette_interface::set_pen_blue_level);
+	dipalette_type.set_function("set_pen_contrast", &device_palette_interface::set_pen_contrast);
+	dipalette_type.set_function("set_pen_indirect", &device_palette_interface::set_pen_indirect);
+	dipalette_type["set_indirect_color"] = sol::overload(
+			[] (device_palette_interface &pal, int index, uint32_t color)
+			{
+				pal.set_indirect_color(index, rgb_t(color));
+			},
+			[] (device_palette_interface &pal, int index, uint8_t r, uint8_t g, uint8_t b)
+			{
+				pal.set_indirect_color(index, rgb_t(r, g, b));
+			});
+	dipalette_type.set_function("set_shadow_factor", &device_palette_interface::set_shadow_factor);
+	dipalette_type.set_function("set_highlight_factor", &device_palette_interface::set_highlight_factor);
+	dipalette_type.set_function("set_shadow_mode", &device_palette_interface::set_shadow_mode);
+	dipalette_type["palette"] = sol::property(
+			[] (device_palette_interface &pal)
+			{
+				return pal.palette()
+					? std::optional<palette_wrapper>(std::in_place, *pal.palette())
+					: std::optional<palette_wrapper>();
+			});
+	dipalette_type["entries"] = sol::property(&device_palette_interface::entries);
+	dipalette_type["indirect_entries"] = sol::property(&device_palette_interface::indirect_entries);
+	dipalette_type["black_pen"] = sol::property(&device_palette_interface::black_pen);
+	dipalette_type["white_pen"] = sol::property(&device_palette_interface::white_pen);
+	dipalette_type["shadows_enabled"] = sol::property(&device_palette_interface::shadows_enabled);
+	dipalette_type["highlights_enabled"] = sol::property(&device_palette_interface::hilights_enabled);
+	dipalette_type["device"] = sol::property(static_cast<device_t & (device_palette_interface::*)()>(&device_palette_interface::device));
+
+
 	auto screen_dev_type = sol().registry().new_usertype<screen_device>(
 			"screen_dev",
 			sol::no_constructor,
 			sol::base_classes, sol::bases<device_t>());
-	screen_dev_type["draw_box"] =
+	screen_dev_type.set_function(
+			"draw_box",
 			[] (screen_device &sdev, float x1, float y1, float x2, float y2, std::optional<uint32_t> fgcolor, std::optional<uint32_t> bgcolor)
 			{
 				float const sc_width(sdev.visible_area().width());
@@ -1457,8 +1511,9 @@ void lua_engine::initialize()
 				if (!bgcolor)
 					bgcolor = ui.colors().background_color();
 				ui.draw_outlined_box(sdev.container(), x1, y1, x2, y2, *fgcolor, *bgcolor);
-			};
-	screen_dev_type["draw_line"] =
+			});
+	screen_dev_type.set_function(
+			"draw_line",
 			[] (screen_device &sdev, float x1, float y1, float x2, float y2, std::optional<uint32_t> color)
 			{
 				float const sc_width(sdev.visible_area().width());
@@ -1470,8 +1525,9 @@ void lua_engine::initialize()
 				if (!color)
 					color = mame_machine_manager::instance()->ui().colors().text_color();
 				sdev.container().add_line(x1, y1, x2, y2, UI_LINE_WIDTH, rgb_t(*color), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-			};
-	screen_dev_type["draw_text"] =
+			});
+	screen_dev_type.set_function(
+			"draw_text",
 			[this] (screen_device &sdev, sol::object xobj, float y, char const *msg, std::optional<uint32_t> fgcolor, std::optional<uint32_t> bgcolor)
 			{
 				float const sc_width(sdev.visible_area().width());
@@ -1509,78 +1565,80 @@ void lua_engine::initialize()
 						x, y, (1.0f - x),
 						justify, ui::text_layout::word_wrapping::WORD,
 						mame_ui_manager::OPAQUE_, *fgcolor, *bgcolor);
-			};
-	screen_dev_type["orientation"] =
-		[] (screen_device &sdev)
-		{
-			uint32_t flags = sdev.orientation();
-			int rotation_angle = 0;
-			switch (flags)
+			});
+	screen_dev_type.set_function(
+			"orientation",
+			[] (screen_device &sdev)
 			{
-			case ORIENTATION_SWAP_XY:
-			case ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X:
-				rotation_angle = 90;
-				flags ^= ORIENTATION_FLIP_X;
-				break;
-			case ORIENTATION_FLIP_Y:
-			case ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y:
-				rotation_angle = 180;
-				flags ^= ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y;
-				break;
-			case ORIENTATION_SWAP_XY | ORIENTATION_FLIP_Y:
-			case ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y:
-				rotation_angle = 270;
-				flags ^= ORIENTATION_FLIP_Y;
-				break;
-			}
-			return std::tuple<int, bool, bool>(rotation_angle, flags & ORIENTATION_FLIP_X, flags & ORIENTATION_FLIP_Y);
-		};
+				uint32_t flags = sdev.orientation();
+				int rotation_angle = 0;
+				switch (flags)
+				{
+				case ORIENTATION_SWAP_XY:
+				case ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X:
+					rotation_angle = 90;
+					flags ^= ORIENTATION_FLIP_X;
+					break;
+				case ORIENTATION_FLIP_Y:
+				case ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y:
+					rotation_angle = 180;
+					flags ^= ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y;
+					break;
+				case ORIENTATION_SWAP_XY | ORIENTATION_FLIP_Y:
+				case ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y:
+					rotation_angle = 270;
+					flags ^= ORIENTATION_FLIP_Y;
+					break;
+				}
+				return std::tuple<int, bool, bool>(rotation_angle, flags & ORIENTATION_FLIP_X, flags & ORIENTATION_FLIP_Y);
+			});
 	screen_dev_type["time_until_pos"] = sol::overload(
 			[] (screen_device &sdev, int vpos) { return sdev.time_until_pos(vpos).as_double(); },
 			[] (screen_device &sdev, int vpos, int hpos) { return sdev.time_until_pos(vpos, hpos).as_double(); });
-	screen_dev_type["time_until_vblank_start"] = &screen_device::time_until_vblank_start;
-	screen_dev_type["time_until_vblank_end"] = &screen_device::time_until_vblank_end;
-	screen_dev_type["snapshot"] =
-		[this] (screen_device &sdev, char const *filename) -> sol::object
-		{
-			// FIXME: this shouldn't be a member of the screen device
-			// the screen is only used as a hint when configured for native snapshots and may be ignored
-			std::string snapstr;
-			bool is_absolute_path = false;
-			if (filename)
+	screen_dev_type.set_function("time_until_vblank_start", &screen_device::time_until_vblank_start);
+	screen_dev_type.set_function("time_until_vblank_end", &screen_device::time_until_vblank_end);
+	screen_dev_type.set_function(
+			"snapshot",
+			[this] (screen_device &sdev, char const *filename) -> sol::object
 			{
-				// a filename was specified; if it isn't absolute post-process it
-				snapstr = process_snapshot_filename(machine(), filename);
-				is_absolute_path = osd_is_absolute_path(snapstr);
-			}
+				// FIXME: this shouldn't be a member of the screen device
+				// the screen is only used as a hint when configured for native snapshots and may be ignored
+				std::string snapstr;
+				bool is_absolute_path = false;
+				if (filename)
+				{
+					// a filename was specified; if it isn't absolute post-process it
+					snapstr = process_snapshot_filename(machine(), filename);
+					is_absolute_path = osd_is_absolute_path(snapstr);
+				}
 
-			// open the file
-			emu_file file(is_absolute_path ? "" : machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			std::error_condition filerr;
-			if (!snapstr.empty())
-				filerr = file.open(snapstr);
-			else
-				filerr = machine().video().open_next(file, "png");
-			if (filerr)
-				return sol::make_object(sol(), filerr);
+				// open the file
+				emu_file file(is_absolute_path ? "" : machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+				std::error_condition filerr;
+				if (!snapstr.empty())
+					filerr = file.open(snapstr);
+				else
+					filerr = machine().video().open_next(file, "png");
+				if (filerr)
+					return sol::make_object(sol(), filerr);
 
-			// and save the snapshot
-			machine().video().save_snapshot(&sdev, file);
-			return sol::lua_nil;
-		};
-	screen_dev_type["pixel"] = [] (screen_device &sdev, s32 x, s32 y) { return sdev.pixel(x, y); };
-	screen_dev_type["pixels"] =
-		[] (screen_device &sdev, sol::this_state s)
-		{
-			// TODO: would be better if this could return a tuple of (buffer, width, height)
-			const rectangle &visarea = sdev.visible_area();
-			luaL_Buffer buff;
-			int size = visarea.height() * visarea.width() * 4;
-			u32 *ptr = (u32 *)luaL_buffinitsize(s, &buff, size);
-			sdev.pixels(ptr);
-			luaL_pushresultsize(&buff, size);
-			return sol::make_reference(s, sol::stack_reference(s, -1));
-		};
+				// and save the snapshot
+				machine().video().save_snapshot(&sdev, file);
+				return sol::lua_nil;
+			});
+	screen_dev_type.set_function("pixel", &screen_device::pixel);
+	screen_dev_type.set_function(
+			"pixels",
+			[] (screen_device &sdev, sol::this_state s)
+			{
+				const rectangle &visarea = sdev.visible_area();
+				luaL_Buffer buff;
+				int size = visarea.height() * visarea.width() * 4;
+				u32 *const ptr = reinterpret_cast<u32 *>(luaL_buffinitsize(s, &buff, size));
+				sdev.pixels(ptr);
+				luaL_pushresultsize(&buff, size);
+				return std::make_tuple(sol::make_reference(s, sol::stack_reference(s, -1)), visarea.width(), visarea.height());
+			});
 	screen_dev_type["screen_type"] = sol::property(&screen_device::screen_type);
 	screen_dev_type["width"] = sol::property([] (screen_device &sdev) { return sdev.visible_area().width(); });
 	screen_dev_type["height"] = sol::property([] (screen_device &sdev) { return sdev.visible_area().height(); });
@@ -1595,6 +1653,7 @@ void lua_engine::initialize()
 	screen_dev_type["frame_period"] = sol::property([] (screen_device &sdev) { return sdev.frame_period().as_double(); });
 	screen_dev_type["frame_number"] = &screen_device::frame_number;
 	screen_dev_type["container"] = sol::property(&screen_device::container);
+	screen_dev_type["palette"] = sol::property([] (screen_device const &sdev) { return sdev.has_palette() ? &sdev.palette() : nullptr; });
 
 
 	auto cass_type = sol().registry().new_usertype<cassette_image_device>(

@@ -26,17 +26,13 @@ public:
 	bit_socket_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
 protected:
-	enum
-	{
-		TIMER_ID_POLL = 1
-	};
-
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual DECLARE_WRITE_LINE_MEMBER(input_tip) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(input_ring) override;
+
+	TIMER_CALLBACK_MEMBER(poll_tick);
 
 private:
 	required_device<bitbanger_device>   m_stream;
@@ -68,7 +64,7 @@ void bit_socket_device::device_add_mconfig(machine_config &config)
 
 void bit_socket_device::device_start()
 {
-	m_poll_timer = timer_alloc(TIMER_ID_POLL);
+	m_poll_timer = timer_alloc(FUNC(bit_socket_device::poll_tick), this);
 
 	save_item(NAME(m_tip_in));
 	save_item(NAME(m_ring_in));
@@ -79,23 +75,13 @@ void bit_socket_device::device_start()
 }
 
 
-void bit_socket_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(bit_socket_device::poll_tick)
 {
-	switch (id)
+	u8 data;
+	while (m_stream->input(&data, 1))
 	{
-	case TIMER_ID_POLL:
-		{
-			u8 data;
-			while (m_stream->input(&data, 1))
-			{
-				if (BIT(data, 1)) output_tip(BIT(data, 0));
-				if (BIT(data, 2)) output_ring(BIT(data, 0));
-			}
-		}
-		break;
-
-	default:
-		break;
+		if (BIT(data, 1)) output_tip(BIT(data, 0));
+		if (BIT(data, 2)) output_ring(BIT(data, 0));
 	}
 }
 

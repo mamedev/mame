@@ -41,9 +41,10 @@ protected:
 	void opna_reset_routes_config(machine_config &config);
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	void pc9801_86_config(machine_config &config);
 	virtual u16 read_io_base() override;
+
+	TIMER_CALLBACK_MEMBER(dac_tick);
 
 	required_device<pc9801_slot_device> m_bus;
 	required_device<ym2608_device>  m_opna;

@@ -153,21 +153,33 @@ void i8244_device::device_start()
 	m_irq_func.resolve_safe();
 
 	// allocate timers
-	m_vblank_timer = timer_alloc(TIMER_VBLANK_START);
+	m_vblank_timer = timer_alloc(FUNC(i8244_device::vblank_start), this);
 	m_vblank_timer->adjust(screen().time_until_pos(m_vblank_start, m_hblank_start - 1), 0, screen().frame_period());
 
-	m_hblank_timer = timer_alloc(TIMER_HBLANK_START);
+	m_hblank_timer = timer_alloc(FUNC(i8244_device::hblank_start), this);
 	m_hblank_timer->adjust(screen().time_until_pos(0, m_hblank_start), 0, screen().scan_period());
 
 	// allocate a stream
 	m_stream = stream_alloc(0, 1, clock());
 
-	// register our state
+	// zerofill
 	memset(m_vdc.reg, 0, 0x100);
-	save_pointer(NAME(m_vdc.reg), 0x100);
-
 	memset(m_collision_map, 0, sizeof(m_collision_map));
 	memset(m_priority_map, 0, sizeof(m_priority_map));
+
+	m_x_beam_pos = 0;
+	m_y_beam_pos = 0;
+	m_control_status = 0;
+	m_collision_status = 0;
+	m_sh_written = false;
+	m_sh_pending = false;
+	m_sh_prescaler = 0;
+	m_sh_count = 0;
+	m_sh_output = 0;
+	m_sh_duty = 0;
+
+	// register our state
+	save_pointer(NAME(m_vdc.reg), 0x100);
 	save_item(NAME(m_collision_map));
 	save_item(NAME(m_priority_map));
 
@@ -185,27 +197,20 @@ void i8244_device::device_start()
 
 
 //-------------------------------------------------
-//  device_timer - handle timer callbacks
+//  timer events
 //-------------------------------------------------
 
-void i8244_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(i8244_device::hblank_start)
 {
-	switch (id)
-	{
-		case TIMER_HBLANK_START:
-			// hblank starts (updates sound shift register)
-			sound_update();
-			break;
+	// hblank starts (updates sound shift register)
+	sound_update();
+}
 
-		case TIMER_VBLANK_START:
-			// vblank starts
-			m_control_status |= 0x08;
-			m_irq_func(ASSERT_LINE);
-			break;
-
-		default:
-			break;
-	}
+TIMER_CALLBACK_MEMBER(i8244_device::vblank_start)
+{
+	// vblank starts
+	m_control_status |= 0x08;
+	m_irq_func(ASSERT_LINE);
 }
 
 

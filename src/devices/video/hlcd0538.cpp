@@ -51,9 +51,15 @@ void hlcd0538_device::device_start()
 	m_write_interrupt.resolve_safe();
 
 	// timer (when LCD pin is oscillator)
-	m_lcd_timer = timer_alloc();
+	m_lcd_timer = timer_alloc(FUNC(hlcd0538_device::toggle_lcd), this);
 	attotime period = (clock() != 0) ? attotime::from_hz(2 * clock()) : attotime::never;
 	m_lcd_timer->adjust(period, 0, period);
+
+	// zerofill
+	m_lcd = 0;
+	m_clk = 0;
+	m_data = 0;
+	m_shift = 0;
 
 	// register for savestates
 	save_item(NAME(m_lcd));
@@ -66,6 +72,11 @@ void hlcd0538_device::device_start()
 //-------------------------------------------------
 //  handlers
 //-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(hlcd0538_device::toggle_lcd)
+{
+	lcd_w(!m_lcd);
+}
 
 WRITE_LINE_MEMBER(hlcd0538_device::clk_w)
 {

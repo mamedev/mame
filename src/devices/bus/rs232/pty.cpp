@@ -63,7 +63,7 @@ ioport_constructor pseudo_terminal_device::device_input_ports() const
 
 void pseudo_terminal_device::device_start()
 {
-	m_timer_poll = timer_alloc(TIMER_POLL);
+	m_timer_poll = timer_alloc(FUNC(pseudo_terminal_device::update_queue), this);
 
 	open();
 }
@@ -76,20 +76,7 @@ void pseudo_terminal_device::device_stop()
 void pseudo_terminal_device::device_reset()
 {
 	update_serial(0);
-	queue();
-}
-
-void pseudo_terminal_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_POLL:
-		queue();
-		break;
-
-	default:
-		break;
-	}
+	update_queue(0);
 }
 
 void pseudo_terminal_device::tra_callback()
@@ -99,7 +86,7 @@ void pseudo_terminal_device::tra_callback()
 
 void pseudo_terminal_device::tra_complete()
 {
-	queue();
+	update_queue(0);
 }
 
 void pseudo_terminal_device::rcv_complete()
@@ -108,7 +95,7 @@ void pseudo_terminal_device::rcv_complete()
 	write(get_received_char());
 }
 
-void pseudo_terminal_device::queue(void)
+TIMER_CALLBACK_MEMBER(pseudo_terminal_device::update_queue)
 {
 	if (is_transmit_register_empty())
 	{

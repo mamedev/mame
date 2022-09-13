@@ -6,17 +6,17 @@
 //
 //============================================================
 
+#include "winutil.h"
+
+// lib/util
+#include "timeconv.h"
+
+// osd
+#include "strconv.h"
+
 // standard windows headers
 #include <windows.h>
 #include <direct.h>
-
-// MAME headers
-#include "emu.h"
-
-// MAMEOS headers
-#include "winutil.h"
-#include "strconv.h"
-#include "timeconv.h"
 
 
 //============================================================
@@ -101,7 +101,7 @@ BOOL win_is_gui_application()
 //============================================================
 //  osd_subst_env
 //============================================================
-void osd_subst_env(std::string &dst, const std::string &src)
+std::string osd_subst_env(std::string_view src)
 {
 	std::wstring const w_src = osd::text::to_wstring(src);
 	std::vector<wchar_t> buffer(w_src.size() + 2);
@@ -112,10 +112,11 @@ void osd_subst_env(std::string &dst, const std::string &src)
 		buffer.resize(length + 1);
 		length = ExpandEnvironmentStringsW(w_src.c_str(), &buffer[0], buffer.size());
 	}
+
+	std::string dst;
 	if (length)
 		osd::text::from_wstring(dst, &buffer[0]);
-	else
-		dst.clear();
+	return dst;
 }
 
 //-------------------------------------------------
@@ -127,4 +128,69 @@ HMODULE WINAPI GetModuleHandleUni()
 	MEMORY_BASIC_INFORMATION mbi;
 	VirtualQuery((LPCVOID)GetModuleHandleUni, &mbi, sizeof(mbi));
 	return (HMODULE)mbi.AllocationBase;
+}
+
+
+//============================================================
+//  win_error_to_error_condition
+//============================================================
+
+std::error_condition win_error_to_error_condition(DWORD error) noexcept
+{
+	// TODO: work out if there's a better way to do this
+	switch (error)
+	{
+	case ERROR_SUCCESS:
+		return std::error_condition();
+
+	case ERROR_INVALID_HANDLE:
+		return std::errc::bad_file_descriptor;
+
+	case ERROR_OUTOFMEMORY:
+		return std::errc::not_enough_memory;
+
+	case ERROR_NOT_SUPPORTED:
+		return std::errc::not_supported;
+
+	case ERROR_FILE_NOT_FOUND:
+	case ERROR_PATH_NOT_FOUND:
+	case ERROR_INVALID_NAME:
+		return std::errc::no_such_file_or_directory;
+
+	case ERROR_FILENAME_EXCED_RANGE:
+		return std::errc::filename_too_long;
+
+	case ERROR_ACCESS_DENIED:
+	case ERROR_SHARING_VIOLATION:
+		return std::errc::permission_denied;
+
+	case ERROR_ALREADY_EXISTS:
+		return std::errc::file_exists;
+
+	case ERROR_TOO_MANY_OPEN_FILES:
+		return std::errc::too_many_files_open;
+
+	case ERROR_WRITE_FAULT:
+	case ERROR_READ_FAULT:
+		return std::errc::io_error;
+
+	case ERROR_HANDLE_DISK_FULL:
+	case ERROR_DISK_FULL:
+		return std::errc::no_space_on_device;
+
+	case ERROR_PATH_BUSY:
+	case ERROR_BUSY:
+		return std::errc::device_or_resource_busy;
+
+	case ERROR_FILE_TOO_LARGE:
+		return std::errc::file_too_large;
+
+	case ERROR_INVALID_ACCESS:
+	case ERROR_NEGATIVE_SEEK:
+	case ERROR_BAD_ARGUMENTS:
+		return std::errc::invalid_argument;
+
+	default:
+		return std::error_condition(error, std::system_category());
+	}
 }

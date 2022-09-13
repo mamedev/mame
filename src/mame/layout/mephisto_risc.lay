@@ -2,10 +2,28 @@
 <!--
 license:CC0
 -->
+<mamelayout version="2">
 
 <!-- mephisto_polgar.lay and mephisto_risc.lay are identical -->
 
-<mamelayout version="2">
+<!-- luascript (-plugin layout), for pressing 2 buttons simultaneously -->
+
+	<script><![CDATA[
+		local layout = {}
+		local prev_state = 0
+
+		function layout.frame()
+			local cur_state = machine.ioport.ports[":CLICKABLE"]:read() & 1
+			if cur_state ~= prev_state then
+				machine.ioport.ports[":KEY"]:field(0x40):set_value(cur_state)
+				machine.ioport.ports[":KEY"]:field(0x80):set_value(cur_state)
+			end
+			prev_state = cur_state
+		end
+
+		return layout
+	]]></script>
+
 
 <!-- define elements -->
 
@@ -26,6 +44,10 @@ license:CC0
 			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
 			<color red="0.7" green="0.7" blue="0.7" />
 		</rect>
+	</element>
+
+	<element name="nothing" defstate="0">
+		<rect><color alpha="0" /></rect>
 	</element>
 
 	<element name="text_1"> <rect><color red="0.56" green="0.33" blue="0.12" /></rect>    <text string="1"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
@@ -64,6 +86,19 @@ license:CC0
 	<element name="text_p6"><image file="chess/wp.svg"/></element>
 
 
+<!-- sb board -->
+
+	<element name="cblack"><rect><color red="0.56" green="0.33" blue="0.12" /></rect></element>
+	<element name="cwhite"><rect><color red="0.84" green="0.75" blue="0.50" /></rect></element>
+
+	<element name="hlbb" defstate="0">
+		<text string=" "><bounds x="0" y="0" width="1" height="1" /></text>
+		<disk state="1">
+			<bounds x="0.12" y="0.12" width="0.76" height="0.76" />
+			<color red="0" green="0" blue="0" />
+		</disk>
+	</element>
+
 	<element name="piece" defstate="0">
 		<image file="chess/wp.svg" state="1"/>
 		<image file="chess/wn.svg" state="2"/>
@@ -93,20 +128,6 @@ license:CC0
 		<image file="chess/br.svg" state="22"><color alpha="0.5" /></image>
 		<image file="chess/bq.svg" state="23"><color alpha="0.5" /></image>
 		<image file="chess/bk.svg" state="24"><color alpha="0.5" /></image>
-	</element>
-
-
-<!-- sb board -->
-
-	<element name="cblack"><rect><color red="0.56" green="0.33" blue="0.12" /></rect></element>
-	<element name="cwhite"><rect><color red="0.84" green="0.75" blue="0.50" /></rect></element>
-
-	<element name="hlbb" defstate="0">
-		<text string=" "><bounds x="0" y="0" width="1" height="1" /></text>
-		<disk state="1">
-			<bounds x="0.12" y="0.12" width="0.76" height="0.76" />
-			<color red="0" green="0" blue="0" />
-		</disk>
 	</element>
 
 	<group name="sb_board">
@@ -421,6 +442,9 @@ license:CC0
 		<element ref="hlb" inputtag="KEY" inputmask="0x20">       <bounds x="54.5" y="3" width="3.5" height="2.5" />  </element>
 		<element ref="hlb" inputtag="KEY" inputmask="0x40">       <bounds x="49.5" y="10" width="3.5" height="2.5" />  </element>
 		<element ref="hlb" inputtag="KEY" inputmask="0x80">       <bounds x="54.5" y="10" width="3.5" height="2.5" />  </element>
+
+		<!-- hidden input above ENT/CL buttons to press both -->
+		<element ref="nothing" inputtag="CLICKABLE" inputmask="0x01"><bounds x="52.2" y="8.0" width="3.1" height="1.1" /></element>
 	</group>
 
 

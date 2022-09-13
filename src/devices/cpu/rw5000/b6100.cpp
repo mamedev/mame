@@ -47,7 +47,7 @@ std::unique_ptr<util::disasm_interface> b6100_cpu_device::create_disassembler()
 // digit segment decoder
 u16 b6100_cpu_device::decode_digit(u8 data)
 {
-	static u16 lut_segs[0x10] =
+	static const u16 lut_segs[0x10] =
 	{
 		// 0-9 same as B6000
 		0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f,
@@ -96,6 +96,12 @@ bool b6100_cpu_device::op_is_lb(u8 op)
 //-------------------------------------------------
 //  changed opcodes (no need for separate file)
 //-------------------------------------------------
+
+void b6100_cpu_device::op_tkbs()
+{
+	// TKBS: load segments (no TKB step)
+	seg_w(m_seg | decode_digit(ram_r()));
+}
 
 void b6100_cpu_device::op_read()
 {

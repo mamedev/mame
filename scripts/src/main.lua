@@ -10,20 +10,18 @@
 ---------------------------------------------------------------------------
 
 function mainProject(_target, _subtarget)
-if (_OPTIONS["SOURCES"] == nil) then
+local projname
+if (_OPTIONS["SOURCES"] == nil) and (_OPTIONS["SOURCEFILTER"] == nil) then
 	if (_target == _subtarget) then
-		project (_target)
+		projname = _target
 	else
-		if (_subtarget=="mess") then
-			project (_subtarget)
-		else
-			project (_target .. _subtarget)
-		end
+		projname = _target .. _subtarget
 	end
 else
-	project (_subtarget)
+	projname = _subtarget
 end
-	uuid (os.uuid(_target .."_" .. _subtarget))
+	project (projname)
+	uuid (os.uuid(_target .. "_" .. _subtarget))
 	kind "ConsoleApp"
 
 	configuration { "android*" }
@@ -109,12 +107,6 @@ end
 if (STANDALONE~=true) then
 	findfunction("linkProjects_" .. _OPTIONS["target"] .. "_" .. _OPTIONS["subtarget"])(_OPTIONS["target"], _OPTIONS["subtarget"])
 end
-	links {
-		"osd_" .. _OPTIONS["osd"],
-	}
-	links {
-		"qtdbg_" .. _OPTIONS["osd"],
-	}
 if (STANDALONE~=true) then
 	links {
 		"frontend",
@@ -123,6 +115,12 @@ end
 	links {
 		"optional",
 		"emu",
+	}
+	links {
+		"osd_" .. _OPTIONS["osd"],
+	}
+	links {
+		"qtdbg_" .. _OPTIONS["osd"],
 	}
 --if (STANDALONE~=true) then
 	links {
@@ -196,7 +194,8 @@ end
 
 	override_resources = false;
 
-	maintargetosdoptions(_target,_subtarget)
+	maintargetosdoptions(_target, _subtarget)
+	local exename = projname -- FIXME: should include the OSD prefix if any
 
 	includedirs {
 		MAME_DIR .. "src/osd",
@@ -207,10 +206,22 @@ end
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
 		GEN_DIR  .. _target .. "/layout",
-		GEN_DIR  .. "resource",
 		ext_includedir("zlib"),
 		ext_includedir("flac"),
 	}
+
+	resincludedirs {
+		MAME_DIR .. "scripts/resources/windows/" .. _target,
+		GEN_DIR  .. "resource",
+	}
+
+	configuration { "vs20*"}
+		-- See https://github.com/bkaradzic/GENie/issues/544
+		includedirs {
+			MAME_DIR .. "scripts/resources/windows/" .. _target,
+			GEN_DIR  .. "resource",
+		}
+	configuration { }
 
 
 if (STANDALONE==true) then
@@ -219,96 +230,159 @@ end
 
 if (STANDALONE~=true) then
 	if _OPTIONS["targetos"]=="macosx" and (not override_resources) then
+		local plistname = _target .. "_" .. _subtarget .. "-Info.plist"
 		linkoptions {
-			"-sectcreate __TEXT __info_plist " .. _MAKE.esc(GEN_DIR) .. "resource/" .. _subtarget .. "-Info.plist"
+			"-sectcreate __TEXT __info_plist " .. _MAKE.esc(GEN_DIR) .. "resource/" .. plistname
 		}
 		custombuildtask {
-			{ GEN_DIR .. "version.cpp" ,  GEN_DIR .. "resource/" .. _subtarget .. "-Info.plist",    {  MAME_DIR .. "scripts/build/verinfo.py" }, {"@echo Emitting " .. _subtarget .. "-Info.plist" .. "...",    PYTHON .. " $(1)  -p -b " .. _subtarget .. " $(<) > $(@)" }},
+			{
+				GEN_DIR .. "version.cpp",
+				GEN_DIR .. "resource/" .. plistname,
+				{ MAME_DIR .. "scripts/build/verinfo.py" },
+				{
+					"@echo Emitting " .. plistname .. "...",
+					PYTHON .. " $(1) -f plist -t " .. _target .. " -s " .. _subtarget .. " -e " .. exename .. " -o $(@) $(<)"
+				}
+			},
 		}
 		dependency {
-			{ "$(TARGET)" ,  GEN_DIR  .. "resource/" .. _subtarget .. "-Info.plist", true  },
+			{ "$(TARGET)" ,  GEN_DIR  .. "resource/" .. plistname, true },
 		}
 
 	end
-	local rctarget = _subtarget
 
+	local rcversfile = GEN_DIR .. "resource/" .. _target .. "_" .. _subtarget .. "_vers.rc"
 	if _OPTIONS["targetos"]=="windows" and (not override_resources) then
-		rcfile = MAME_DIR .. "scripts/resources/windows/" .. _subtarget .. "/" .. rctarget ..".rc"
-		if os.isfile(rcfile) then
-			files {
-				rcfile,
-			}
-			dependency {
-				{ "$(OBJDIR)/".._subtarget ..".res" ,  GEN_DIR  .. "resource/" .. rctarget .. "vers.rc", true  },
-			}
-		else
-			rctarget = "mame"
-			files {
-				MAME_DIR .. "scripts/resources/windows/mame/mame.rc",
-			}
-			dependency {
-				{ "$(OBJDIR)/mame.res" ,  GEN_DIR  .. "resource/" .. rctarget .. "vers.rc", true  },
-			}
-		end
+		files {
+			rcversfile
+		}
 	end
 
-	local mainfile = MAME_DIR .. "src/".._target .."/" .. _subtarget ..".cpp"
+	local rcincfile = MAME_DIR .. "scripts/resources/windows/" .. _target .. "/" .. _subtarget ..".rc"
+	if not os.isfile(rcincfile) then
+		rcincfile = MAME_DIR .. "scripts/resources/windows/mame/mame.rc"
+		resincludedirs {
+			MAME_DIR .. "scripts/resources/windows/mame",
+		}
+		configuration { "vs20*"}
+			-- See https://github.com/bkaradzic/GENie/issues/544
+			includedirs {
+				MAME_DIR .. "scripts/resources/windows/mame",
+			}
+		configuration { }
+	end
+
+	local mainfile = MAME_DIR .. "src/" .. _target .. "/" .. _subtarget .. ".cpp"
 	if not os.isfile(mainfile) then
-		mainfile = MAME_DIR .. "src/".._target .."/" .. _target ..".cpp"
+		mainfile = MAME_DIR .. "src/" .. _target .. "/" .. _target .. ".cpp"
 	end
 	files {
 		mainfile,
 		GEN_DIR .. "version.cpp",
-		GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",
+		GEN_DIR .. _target .. "/" .. _subtarget .. "/drivlist.cpp",
 	}
 
-	if (_OPTIONS["SOURCES"] == nil) then
-
-		if os.isfile(MAME_DIR .. "src/".._target .."/" .. _subtarget ..".flt") then
-			dependency {
+	local driverlist = MAME_DIR .. "src/" .. _target .. "/" .. _target .. ".lst"
+	local driverssrc = GEN_DIR .. _target .. "/" .. _subtarget .. "/drivlist.cpp"
+	if _OPTIONS["SOURCES"] ~= nil then
+		dependency {
+			{ driverssrc, driverlist, true },
+		}
+		custombuildtask {
 			{
-				GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",  MAME_DIR .. "src/".._target .."/" .. _target ..".lst", true },
-			}
-			custombuildtask {
-				{ MAME_DIR .. "src/".._target .."/" .. _subtarget ..".flt" ,  GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",    {  MAME_DIR .. "scripts/build/makedep.py", MAME_DIR .. "src/".._target .."/" .. _target ..".lst"  }, {"@echo Building driver list...",    PYTHON .. " $(1) driverlist $(2) -f $(<) > $(@)" }},
-			}
-		else
-			if os.isfile(MAME_DIR .. "src/".._target .."/" .. _subtarget ..".lst") then
-				custombuildtask {
-					{ MAME_DIR .. "src/".._target .."/" .. _subtarget ..".lst" ,  GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",    {  MAME_DIR .. "scripts/build/makedep.py" }, {"@echo Building driver list...",    PYTHON .. " $(1) driverlist $(<) > $(@)" }},
-				}
-			else
-				dependency {
+				GEN_DIR .. _target .."/" .. _subtarget .. ".flt" ,
+				driverssrc,
+				{ MAME_DIR .. "scripts/build/makedep.py", driverlist },
 				{
-					GEN_DIR  .. _target .. "/" .. _target .."/drivlist.cpp",  MAME_DIR .. "src/".._target .."/" .. _target ..".lst", true },
+					"@echo Building driver list...",
+					PYTHON .. " $(1) -r " .. MAME_DIR .. " driverlist $(2) -f $(<) > $(@)"
 				}
-				custombuildtask {
-					{ MAME_DIR .. "src/".._target .."/" .. _target ..".lst" ,  GEN_DIR  .. _target .. "/" .. _target .."/drivlist.cpp",    {  MAME_DIR .. "scripts/build/makedep.py" }, {"@echo Building driver list...",    PYTHON .. " $(1) driverlist $(<) > $(@)" }},
-				}
-			end
-		end
-	end
-
-	if (_OPTIONS["SOURCES"] ~= nil) then
-			dependency {
+			},
+		}
+	elseif _OPTIONS["SOURCEFILTER"] ~= nil then
+		dependency {
+			{ driverssrc, driverlist, true },
+		}
+		custombuildtask {
 			{
-				GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",  MAME_DIR .. "src/".._target .."/" .. _target ..".lst", true },
-			}
-			custombuildtask {
-				{ GEN_DIR .. _target .."/" .. _subtarget ..".flt" ,  GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",    {  MAME_DIR .. "scripts/build/makedep.py", MAME_DIR .. "src/".._target .."/" .. _target ..".lst"  }, {"@echo Building driver list...",    PYTHON .. " $(1) driverlist $(2) -f $(<) > $(@)" }},
-			}
+				MAME_DIR .. _OPTIONS["SOURCEFILTER"],
+				driverssrc,
+				{ MAME_DIR .. "scripts/build/makedep.py", driverlist },
+				{
+					"@echo Building driver list...",
+					PYTHON .. " $(1) -r " .. MAME_DIR .. " driverlist $(2) -f $(<) > $(@)"
+				}
+			},
+		}
+	elseif os.isfile(MAME_DIR .. "src/" .. _target .."/" .. _subtarget ..".flt") then
+		dependency {
+			{ driverssrc, driverlist, true },
+		}
+		custombuildtask {
+			{
+				MAME_DIR .. "src/" .. _target .. "/" .. _subtarget .. ".flt",
+				driverssrc,
+				{ MAME_DIR .. "scripts/build/makedep.py", driverlist },
+				{
+					"@echo Building driver list...",
+					PYTHON .. " $(1) -r " .. MAME_DIR .. " driverlist $(2) -f $(<) > $(@)"
+				}
+			},
+		}
+	elseif os.isfile(MAME_DIR .. "src/" .._target .. "/" .. _subtarget ..".lst") then
+		custombuildtask {
+			{
+				MAME_DIR .. "src/" .. _target .. "/" .. _subtarget .. ".lst",
+				driverssrc,
+				{ MAME_DIR .. "scripts/build/makedep.py" },
+				{
+					"@echo Building driver list...",
+					PYTHON .. " $(1) -r " .. MAME_DIR .. " driverlist $(<) > $(@)"
+				}
+			},
+		}
+	else
+		dependency {
+			{ driverssrc, driverlist, true },
+		}
+		custombuildtask {
+			{
+				driverlist,
+				driverssrc,
+				{ MAME_DIR .. "scripts/build/makedep.py" },
+				{
+					"@echo Building driver list...",
+					PYTHON .. " $(1) -r " .. MAME_DIR .. " driverlist $(<) > $(@)"
+				}
+			},
+		}
 	end
 
 	configuration { "mingw*" }
+		dependency {
+			{ "$(OBJDIR)/" .. _target .. "_" .. _subtarget .. "_vers.res", rcincfile, true },
+		}
 		custombuildtask {
-			{ GEN_DIR .. "version.cpp" ,  GEN_DIR  .. "resource/" .. rctarget .. "vers.rc",    {  MAME_DIR .. "scripts/build/verinfo.py" }, {"@echo Emitting " .. rctarget .. "vers.rc" .. "...",    PYTHON .. " $(1)  -r -b " .. rctarget .. " $(<) > $(@)" }},
+			{
+				GEN_DIR .. "version.cpp" ,
+				rcversfile,
+				{ MAME_DIR .. "scripts/build/verinfo.py" },
+				{
+					"@echo Emitting " .. _target .. "_" .. _subtarget .. "_vers.rc" .. "...",
+					PYTHON .. " $(1) -f rc -t " .. _target .. " -s " .. _subtarget .. " -e " .. exename .. " -r " .. path.getname(rcincfile) .. " -o $(@) $(<)"
+				}
+			},
 		}
 
 	configuration { "vs20*" }
+		dependency {
+			{ "$(OBJDIR)/" .. _target .. "_" .. _subtarget .. "_vers.res", rcincfile, true },
+		}
 		prebuildcommands {
-			"mkdir \"" .. path.translate(GEN_DIR  .. "resource/","\\") .. "\" 2>NUL",
-			"@echo Emitting ".. rctarget .. "vers.rc...",
-			PYTHON .. " \"" .. path.translate(MAME_DIR .. "scripts/build/verinfo.py","\\") .. "\" -r -b " .. rctarget .. " \"" .. path.translate(GEN_DIR .. "version.cpp","\\") .. "\" > \"" .. path.translate(GEN_DIR  .. "resource/" .. rctarget .. "vers.rc", "\\") .. "\"" ,
+			"mkdir \"" .. path.translate(GEN_DIR .. "resource/", "\\") .. "\" 2>NUL",
+			"mkdir \"" .. path.translate(GEN_DIR .. _target .. "/" .. _subtarget .. "/", "\\") .. "\" 2>NUL",
+			"@echo Emitting " .. _target .. "_" .. _subtarget .. "_vers.rc" .. "...",
+			PYTHON .. " \"" .. path.translate(MAME_DIR .. "scripts/build/verinfo.py", "\\") .. "\" -f rc -t " .. _target .. " -s " .. _subtarget .. " -e " .. exename .. " -o \"" .. path.translate(rcversfile) .. "\" -r \"" .. path.getname(rcincfile) .. "\" \"" .. path.translate(GEN_DIR .. "version.cpp", "\\") .. "\"",
 		}
 end
 

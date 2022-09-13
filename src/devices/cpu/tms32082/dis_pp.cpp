@@ -507,7 +507,7 @@ std::string tms32082_pp_disassembler::format_alu_op(int aluop, int a, const std:
 				return util::string_format("%s = %s", dst_text, b_text);
 
 			case 0xf0:      // A & B & C | ~A & B & C | A & ~B & C | ~A & ~B & C       = C
-				return util::string_format("%s = %s", dst_text, c_text);;
+				return util::string_format("%s = %s", dst_text, c_text);
 
 			case 0x0f:      // A & B & ~C | ~A & B & ~C | A & ~B & ~C | ~A & ~B & ~C   = ~C
 				return util::string_format("%s = ~%s", dst_text, c_text);

@@ -63,7 +63,7 @@ void psxsio_device::device_start()
 	m_dtr_handler.resolve_safe();
 	m_rts_handler.resolve_safe();
 
-	m_timer = timer_alloc( 0 );
+	m_timer = timer_alloc( FUNC( psxsio_device::sio_tick ), this );
 	m_mode = 0;
 	m_control = 0;
 	m_baud = 0;
@@ -138,7 +138,7 @@ void psxsio_device::sio_timer_adjust()
 	m_timer->adjust( n_time );
 }
 
-void psxsio_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
+TIMER_CALLBACK_MEMBER( psxsio_device::sio_tick )
 {
 	verboselog( *this, 2, "sio tick\n" );
 

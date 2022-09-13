@@ -59,9 +59,18 @@ void pcf2100_device::device_start()
 	m_write_segs.resolve_safe();
 
 	// timer
-	m_lcd_timer = timer_alloc();
+	m_lcd_timer = timer_alloc(FUNC(pcf2100_device::update_output_latches), this);
 	attotime period = attotime::from_hz(clock());
 	m_lcd_timer->adjust(period, 0, period);
+
+	// zerofill
+	m_shift = 0;
+	m_count = 0;
+	m_bpout = 0;
+	std::fill_n(m_latch, std::size(m_latch), 0);
+	m_clb = 0;
+	m_data = 0;
+	m_dlen = 0;
 
 	// register for savestates
 	save_item(NAME(m_shift));
@@ -78,7 +87,7 @@ void pcf2100_device::device_start()
 //  handlers
 //-------------------------------------------------
 
-void pcf2100_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(pcf2100_device::update_output_latches)
 {
 	// transfer latches to output
 	m_write_segs(m_bpout, m_latch[m_bpout]);

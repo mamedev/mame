@@ -115,12 +115,10 @@ vsmile_ctrl_device_base::~vsmile_ctrl_device_base()
 void vsmile_ctrl_device_base::device_start()
 {
 	// allocate a timer to limit transmit rate to something realistic
-	m_tx_timer = machine().scheduler().timer_alloc(
-			timer_expired_delegate(FUNC(vsmile_ctrl_device_base::tx_timer_expired), this));
+	m_tx_timer = timer_alloc(FUNC(vsmile_ctrl_device_base::tx_timer_expired), this);
 
 	// allocate a timer for RTS timeouts
-	m_rts_timer = machine().scheduler().timer_alloc(
-			timer_expired_delegate(FUNC(vsmile_ctrl_device_base::rts_timer_expired), this));
+	m_rts_timer = timer_alloc(FUNC(vsmile_ctrl_device_base::rts_timer_expired), this);
 
 	// start with transmit queue empty
 	m_tx_fifo_head = m_tx_fifo_tail = 0U;

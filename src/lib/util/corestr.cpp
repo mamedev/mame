@@ -146,38 +146,15 @@ void strreplacechr(std::string& str, char ch, char newch)
 	}
 }
 
-static std::string_view internal_strtrimspace(std::string_view str, bool right_only)
-{
-	// identify the start
-	std::string_view::iterator start = str.begin();
-	if (!right_only)
-	{
-		start = std::find_if(
-			str.begin(),
-			str.end(),
-			[](char c) { return !isspace(uint8_t(c)); });
-	}
-
-	// identify the end
-	std::string_view::iterator end = std::find_if(
-		str.rbegin(),
-		std::string_view::reverse_iterator(start),
-		[](char c) { return !isspace(uint8_t(c)); }).base();
-
-	// extract the string
-	return end > start
-		? str.substr(start - str.begin(), end - start)
-		: std::string_view();
-}
-
 std::string_view strtrimspace(std::string_view str)
 {
-	return internal_strtrimspace(str, false);
+	std::string_view str2 = strtrimleft(str, [] (char c) { return !isspace(uint8_t(c)); });
+	return strtrimright(str2, [] (char c) { return !isspace(uint8_t(c)); });
 }
 
 std::string_view strtrimrightspace(std::string_view str)
 {
-	return internal_strtrimspace(str, true);
+	return strtrimright(str, [] (char c) { return !isspace(uint8_t(c)); });
 }
 
 std::string strmakeupper(std::string_view str)
@@ -188,11 +165,11 @@ std::string strmakeupper(std::string_view str)
 }
 
 /**
- * @fn  std::string &strmakelower(std::string_view str)
+ * @fn  std::string strmakelower(std::string_view str)
  *
  * @brief   Returns a lower case version of the given string.
  *
- * @param [in,out]  str The string to make lower case
+ * @param [in]  str The string to make lower case
  *
  * @return  A new std::string having been changed to lower case
  */
@@ -231,6 +208,40 @@ int strreplace(std::string &str, const std::string& search, const std::string& r
 }
 
 namespace util {
+
+/**
+ * @fn  bool streqlower(std::string_view str, std::string_view lcstr)
+ *
+ * @brief   Tests whether a mixed-case string matches a lowercase string.
+ *
+ * @param [in]  str   First string to compare (may be mixed-case).
+ * @param [in]  lcstr Second string to compare (must be all lowercase).
+ *
+ * @return  True if the strings match regardless of case.
+ */
+
+bool streqlower(std::string_view str, std::string_view lcstr)
+{
+	return std::equal(str.begin(), str.end(), lcstr.begin(), lcstr.end(),
+						[] (unsigned char c1, unsigned char c2) { return std::tolower(c1) == c2; });
+}
+
+/**
+ * @fn  bool strequpper(std::string_view str, std::string_view ucstr)
+ *
+ * @brief   Tests whether a mixed-case string matches an uppercase string.
+ *
+ * @param [in]  str   First string to compare (may be mixed-case).
+ * @param [in]  ucstr Second string to compare (must be all uppercase).
+ *
+ * @return  True if the strings match regardless of case.
+ */
+
+bool strequpper(std::string_view str, std::string_view ucstr)
+{
+	return std::equal(str.begin(), str.end(), ucstr.begin(), ucstr.end(),
+						[] (unsigned char c1, unsigned char c2) { return std::toupper(c1) == c2; });
+}
 
 /**
  * @fn  double edit_distance(std::u32string_view lhs, std::u32string_view rhs)

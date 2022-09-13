@@ -97,7 +97,7 @@ void tms34061_device::device_start()
 	m_regs[TMS34061_VERCOUNTER]   = 0x0000;
 
 	/* start vertical interrupt timer */
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tms34061_device::interrupt), this));
+	m_timer = timer_alloc(FUNC(tms34061_device::interrupt), this);
 
 	save_item(NAME(m_regs));
 	save_item(NAME(m_xmask));

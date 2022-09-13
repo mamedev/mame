@@ -11,15 +11,14 @@
 
 #pragma once
 
-
 #include "osdcomm.h"
 
 #include "strformat.h"
 
-#include <cstdarg>
 #include <cstdint>
 #include <iosfwd>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -351,35 +350,6 @@ void osd_work_item_release(osd_work_item *item);
 void osd_break_into_debugger(const char *message);
 
 
-/// \brief Get clipboard text
-///
-/// Gets current clipboard content as UTF-8 text.  Returns an empty
-/// string if the clipboard contents cannot be converted to plain text.
-/// \return Clipboard contents or an empty string.
-std::string osd_get_clipboard_text();
-
-
-/***************************************************************************
-    MIDI I/O INTERFACES
-***************************************************************************/
-
-class osd_midi_device
-{
-public:
-	virtual ~osd_midi_device() { }
-	// free result with osd_close_midi_channel()
-	virtual bool open_input(const char *devname) = 0;
-	// free result with osd_close_midi_channel()
-	virtual bool open_output(const char *devname) = 0;
-	virtual void close() = 0;
-	virtual bool poll() = 0;
-	virtual int read(uint8_t *pOut) = 0;
-	virtual void write(uint8_t data) = 0;
-};
-
-//FIXME: really needed here?
-void osd_list_network_adapters();
-
 
 /***************************************************************************
     UNCATEGORIZED INTERFACES
@@ -390,11 +360,10 @@ void osd_list_network_adapters();
 
     Parameters:
 
-        dst - result pointer
         src - source string
 
 -----------------------------------------------------------------------------*/
-void osd_subst_env(std::string &dst, std::string const &src);
+std::string osd_subst_env(std::string_view src);
 
 class osd_gpu
 {

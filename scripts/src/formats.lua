@@ -901,6 +901,30 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/cp68_dsk.h,FORMATS["CP68_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "CP68_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/cp68_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/cp68_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/fdos_dsk.h,FORMATS["FDOS_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "FDOS_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/fdos_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/fdos_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/uniflex_dsk.h,FORMATS["UNIFLEX_DSK"] = true
 --------------------------------------------------
 
@@ -2126,6 +2150,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/fs_fat.h,FORMATS["FS_FAT"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "FS_FAT") then
+	files {
+		MAME_DIR.. "src/lib/formats/fs_fat.cpp",
+		MAME_DIR.. "src/lib/formats/fs_fat.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/fs_oric_jasmin.h,FORMATS["FS_ORIC_JASMIN"] = true
 --------------------------------------------------
 
@@ -2133,6 +2169,18 @@ if opt_tool(FORMATS, "FS_ORIC_JASMIN") then
 	files {
 		MAME_DIR.. "src/lib/formats/fs_oric_jasmin.cpp",
 		MAME_DIR.. "src/lib/formats/fs_oric_jasmin.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/fs_cbmdos.h,FORMATS["FS_CBMDOS"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "FS_CBMDOS") then
+	files {
+		MAME_DIR.. "src/lib/formats/fs_cbmdos.cpp",
+		MAME_DIR.. "src/lib/formats/fs_cbmdos.h",
 	}
 end
 

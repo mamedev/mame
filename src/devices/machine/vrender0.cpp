@@ -164,10 +164,10 @@ void vrender0soc_device::device_start()
 	if (this->clock() == 0)
 		fatalerror("%s: bus clock not setup properly",this->tag());
 
-	m_Timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vrender0soc_device::Timercb<0>),this));
-	m_Timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vrender0soc_device::Timercb<1>),this));
-	m_Timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vrender0soc_device::Timercb<2>),this));
-	m_Timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vrender0soc_device::Timercb<3>),this));
+	m_Timer[0] = timer_alloc(FUNC(vrender0soc_device::Timercb<0>), this);
+	m_Timer[1] = timer_alloc(FUNC(vrender0soc_device::Timercb<1>), this);
+	m_Timer[2] = timer_alloc(FUNC(vrender0soc_device::Timercb<2>), this);
+	m_Timer[3] = timer_alloc(FUNC(vrender0soc_device::Timercb<3>), this);
 
 	write_tx.resolve_all_safe();
 

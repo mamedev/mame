@@ -227,10 +227,10 @@ void timekeeper_device::device_start()
 	save_item(NAME(m_data));
 	save_item(NAME(m_watchdog_delay));
 
-	emu_timer *timer = timer_alloc();
+	emu_timer *timer = timer_alloc(FUNC(timekeeper_device::timer_tick), this);
 	timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 
-	m_watchdog_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(timekeeper_device::watchdog_callback), this));
+	m_watchdog_timer = timer_alloc(FUNC(timekeeper_device::watchdog_callback), this);
 	m_watchdog_timer->adjust(attotime::never);
 	m_reset_cb.resolve_safe();
 	m_irq_cb.resolve_safe();
@@ -240,7 +240,9 @@ void timekeeper_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void timekeeper_device::device_reset() { }
+void timekeeper_device::device_reset()
+{
+}
 
 void timekeeper_device::counters_to_ram()
 {
@@ -268,7 +270,7 @@ void timekeeper_device::counters_from_ram()
 	m_century = counter_from_ram(&m_data[0], m_offset_century);
 }
 
-void timekeeper_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(timekeeper_device::timer_tick)
 {
 	LOGMASKED(LOG_TICKS, "Tick\n");
 	if ((m_seconds & SECONDS_ST) != 0 ||

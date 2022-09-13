@@ -100,7 +100,7 @@ void sun4_mmu_base_device::device_start()
 	m_type1_w.resolve_safe();
 
 	// allocate timer for system reset
-	m_reset_timer = timer_alloc(TIMER_RESET);
+	m_reset_timer = timer_alloc(FUNC(sun4_mmu_base_device::reset_off_tick), this);
 	m_reset_timer->adjust(attotime::never);
 
 	m_segmap = std::make_unique<std::unique_ptr<uint8_t[]>[]>(16);
@@ -221,13 +221,10 @@ void sun4_mmu_base_device::device_reset()
 	memset(&m_cachedata[0], 0, sizeof(uint32_t) * 16384);
 }
 
-void sun4_mmu_base_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(sun4_mmu_base_device::reset_off_tick)
 {
-	if (id == TIMER_RESET)
-	{
-		m_reset_timer->adjust(attotime::never);
-		m_cpu->set_input_line(SPARC_RESET, CLEAR_LINE);
-	}
+	m_reset_timer->adjust(attotime::never);
+	m_cpu->set_input_line(SPARC_RESET, CLEAR_LINE);
 }
 
 uint32_t sun4_mmu_base_device::fetch_insn(const bool supervisor, uint32_t offset)
@@ -985,7 +982,7 @@ bool sun4_mmu_base_device::translate(uint32_t &addr)
 	return entry.valid;
 }
 
-void sun4_mmu_base_device::l2p_command(const std::vector<std::string> &params)
+void sun4_mmu_base_device::l2p_command(const std::vector<std::string_view> &params)
 {
 	uint64_t addr, offset;
 

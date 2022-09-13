@@ -58,20 +58,21 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override { lcd_w(!m_lcd); }
+
+	TIMER_CALLBACK_MEMBER(toggle_lcd);
 
 private:
 	emu_timer *m_lcd_timer;
 
 	// pin state
-	int m_data_in = 0;
-	int m_data_out = 0;
-	int m_clk = 0;
-	int m_load = 0;
-	int m_lcd = 0;
+	int m_data_in;
+	int m_data_out;
+	int m_clk;
+	int m_load;
+	int m_lcd;
 
-	u32 m_shift = 0;
-	u32 m_latch = 0;
+	u32 m_shift;
+	u32 m_latch;
 
 	devcb_write32 m_write_segs;
 	devcb_write_line m_write_data;

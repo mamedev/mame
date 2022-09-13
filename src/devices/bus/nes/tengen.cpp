@@ -60,7 +60,7 @@ nes_tengen037_device::nes_tengen037_device(const machine_config &mconfig, const 
 void nes_tengen032_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_tengen032_device::irq_timer_tick), this);
 	timer_freq = clocks_to_attotime(4);
 	irq_timer->adjust(attotime::zero, 0, timer_freq);
 
@@ -146,23 +146,20 @@ inline void nes_tengen032_device::irq_clock(int blanked)
 // we use the HBLANK IRQ latch from PPU for the scanline based IRQ mode
 // and a timer for the cycle based IRQ mode, which both call irq_clock
 
-void nes_tengen032_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_tengen032_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
+	if (m_irq_pending)
 	{
-		if (m_irq_pending)
-		{
-			set_irq_line(ASSERT_LINE);
-			m_irq_pending = 0;
-		}
-
-		if (m_irq_mode)
-			irq_clock(0);
+		set_irq_line(ASSERT_LINE);
+		m_irq_pending = 0;
 	}
+
+	if (m_irq_mode)
+		irq_clock(0);
 }
 
 
-void nes_tengen032_device::hblank_irq(int scanline, int vblank, int blanked)
+void nes_tengen032_device::hblank_irq(int scanline, bool vblank, bool blanked)
 {
 	if (!m_irq_mode) // we are in scanline mode!
 	{

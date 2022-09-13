@@ -1,0 +1,166 @@
+{
+"words" : [
+	"astable",
+	"behavioural",
+	"datasheet",
+	"datasheets",
+	"demultiplexer",
+	"demultiplexers",
+	"highpass",
+	"lowpass",
+	"misformatted", // not in leo
+	"monostable",
+	"presettable", // not in leo
+	"transconductance",
+	"retriggerable", // not in leo
+	// Names
+	"Chebyshev",
+	"Raphson",
+	"Schmitt",
+	"Schottky",
+	"Zener",
+	"Thevenin",
+	// Company names
+	"Fairchild",
+	"Signetics",
+	"Mostek",
+	// Technical terms
+	"cmos",
+	"kaby", // Kaby Lake
+	"mosfet",
+	"mosfets",
+	"nmos",
+	"opamp",
+	"opamps",
+	"picosecond",
+	"pmos",
+	// Physics
+	"atto",
+	"centi",
+	"deca",
+	"femto",
+	"giga",
+	"hecto",
+	"peta",
+	"tera",
+	"yocto",
+	"yotta",
+	"zepto",
+	"zetta",
+	// Software
+	"kicad",
+	// C library functions / definitions
+	"feenableexcept",
+	"fedisableexcept",
+	// asm
+	"rdtsc",
+	"rdtscp",
+	"cpuid",
+	// Specific project terms
+	"MAME",
+	"Couriersud",
+	"netlist",
+	"netlists",
+	"nltool",
+	"nlwav",
+	"nvcc",
+	"lfsr",
+	"gmres",
+	"nlmod_",
+	// FIXME: Remove everything below here again
+	//        Excluded for now ... Still over 1000 in the log
+	"plib",    // namespace
+	"isnull",
+	"pstring",
+	"passert",
+	"putf",
+	"tokstor",
+	"psplit",
+	"gmin",
+	"lastx",
+	"idrn",
+	"preprocessor",
+	"ppreprocessor",
+	"psource",
+	"psemaphore",
+	"modacc",
+	"Ainv",
+	"anetlist",
+	"netdev",
+	"solv",
+	"sexpr",
+	"pstonum",
+	"pmfp",
+	"pmatrix",
+	"pfmt",
+	"nlname",
+	"nlparse",
+	"nlstate",
+	"nlconst",
+	"nlsetup",
+	"pfmp",
+	"resched",
+	"tokenizer",
+	"ptokenizer",
+	"pexception",
+	"devs",
+	"gonn",
+	"nzbd",
+	"nthcode",
+	"Vcrit",
+	"perrmsg",
+	"pfunction",
+	"tname",
+	"stname",
+	"parray",
+	"nzrd"
+],
+"languageSettings": [
+	// This one works with Python
+	{
+		"languageId": "python",
+		"includeRegExpList": [
+			"/#.*/",
+			"/('''|\"\"\")[^\\1]+?\\1/g",
+			"strings"
+		]
+	},
+	// This one works with JavaScript, Typescript, etc
+	{
+		"languageId": "javascript,typescript",
+		"includeRegExpList": [
+			"CStyleComment",
+			"strings"
+		]
+	},
+	// Use with cpp or c files
+	{
+		"languageId": "cpp,c,h",
+		// Turn off compound words, because it is only checking strings.
+		"allowCompoundWords": false,
+		// Only check comments and strings
+		//"includeRegExpList": [
+		//	"CStyleComment",
+		//	"string"
+		//],
+		"ignoreRegExpList": [
+			"/#include.*/",                    // Exclude includes, because they are also strings
+			"/#pragma.*/",                     // Exclude pragmas, they may include strings
+			"/\/\/ NOLINT\\(.*/",              // Exclude clang-tidy instructions
+			"/\/\/\/ \\\\file.*/",             // Doxygen
+			"/\/\/\/ \\\\addtogroup.*/",       // Doxygen
+			"/`[^`]+`/",                       // Markup code formatt
+			"/} \/\/ namespace.*/",            // Namespace comments
+			// Project specific exclusions start here
+			"/\/\/ copyright-holders.*/",
+			"/\/\/- Pinalias:/",
+			"/\/\/#.*/",                       // commented source code
+			"\/\/ Source:.*/",                 // generated code
+			"/\\$[A-z0-9][^\\s]*/",            // everything starting with a $
+			// The following should be removed again
+			"/[A-z][^\\s]+::[^\\s]+/",         // any namespace qualifier
+			"/[A-Z][A-Z][A-Z][^\\s]*/"         // Identifiers starting with at least 3 capital letters
+		]
+	}
+]
+}

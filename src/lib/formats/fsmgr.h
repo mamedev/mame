@@ -18,6 +18,15 @@ using u16 = uint16_t;
 using u32 = uint32_t;
 using u64 = uint64_t;
 
+enum err_t {
+	ERR_OK = 0,
+	ERR_UNSUPPORTED,
+	ERR_INVALID,
+	ERR_NOT_FOUND,
+	ERR_NOT_EMPTY,
+	ERR_NO_SPACE,
+};
+
 template<typename T> class refcounted_outer {
 public:
 	refcounted_outer(bool weak) :  m_object(nullptr), m_is_weak_ref(weak) {}
@@ -118,15 +127,14 @@ public:
 enum class dir_entry_type {
 	dir,
 	file,
-	system_file,
 };
 
 struct dir_entry {
 	std::string m_name;
 	dir_entry_type m_type;
-	u64 m_key;
+	meta_data m_meta;
 
-	dir_entry(const std::string &name, dir_entry_type type, u64 key) : m_name(name), m_type(type), m_key(key) {}
+	dir_entry(dir_entry_type type, const meta_data &meta) : m_name(meta.get_string(meta_name::name)), m_type(type), m_meta(std::move(meta)) {}
 };
 
 class fsblk_t {
@@ -200,83 +208,50 @@ protected:
 
 class filesystem_t {
 public:
-	class dir_t;
-	class file_t;
-
-protected:
-	class idir_t : public refcounted_inner {
-	public:
-		idir_t() : refcounted_inner() {}
-		virtual ~idir_t() = default;
-
-		virtual meta_data metadata() = 0;
-		virtual void metadata_change(const meta_data &info);
-		virtual std::vector<dir_entry> contents() = 0;
-		virtual file_t file_get(u64 key) = 0;
-		virtual dir_t dir_get(u64 key) = 0;
-		virtual file_t file_create(const meta_data &info);
-		virtual void file_delete(u64 key);
-	};
-
-	class ifile_t : public refcounted_inner {
-	public:
-		ifile_t() : refcounted_inner() {}
-		virtual ~ifile_t() = default;
-
-		virtual meta_data metadata() = 0;
-		virtual void metadata_change(const meta_data &info);
-		virtual std::vector<u8> read_all() = 0;
-		virtual void replace(const std::vector<u8> &data);
-		virtual std::vector<u8> rsrc_read_all();
-		virtual void rsrc_replace(const std::vector<u8> &data);
-	};
-
-public:
-	class dir_t : public refcounted_outer<idir_t> {
-	public:
-		dir_t(bool weak = false) :  refcounted_outer<idir_t>(weak) {}
-		dir_t(idir_t *dir, bool weak = true) : refcounted_outer(dir, weak) {}
-		virtual ~dir_t() = default;
-
-		dir_t strong() { return dir_t(m_object, false); }
-		dir_t weak() { return dir_t(m_object, true); }
-
-		meta_data metadata() { return m_object->metadata(); }
-		void metadata_change(const meta_data &info) { m_object->metadata_change(info); }
-		std::vector<dir_entry> contents() { return m_object->contents(); }
-		file_t file_get(u64 key) { return m_object->file_get(key); }
-		dir_t dir_get(u64 key)  { return m_object->dir_get(key); }
-		file_t file_create(const meta_data &info) { return m_object->file_create(info); }
-		void file_delete(u64 key) { m_object->file_delete(key); }
-	};
-
-	class file_t : public refcounted_outer<ifile_t> {
-	public:
-		file_t(bool weak = false) : refcounted_outer<ifile_t>(weak) {}
-		file_t(ifile_t *file, bool weak = true) : refcounted_outer(file, weak) {}
-		virtual ~file_t() = default;
-
-		file_t strong() { return file_t(m_object, false); }
-		file_t weak() { return file_t(m_object, true); }
-
-		meta_data metadata() { return m_object->metadata(); }
-		void metadata_change(const meta_data &info) { m_object->metadata_change(info); }
-		std::vector<u8> read_all() { return m_object->read_all(); }
-		void replace(const std::vector<u8> &data) { m_object->replace(data); }
-		std::vector<u8> rsrc_read_all() { return m_object->rsrc_read_all(); }
-		void rsrc_replace(const std::vector<u8> &data) { m_object->rsrc_replace(data); }
-	};
-
-	filesystem_t(fsblk_t &blockdev, u32 size) : m_blockdev(blockdev) {
-		m_blockdev.set_block_size(size);
-	}
-
 	virtual ~filesystem_t() = default;
 
-	virtual dir_t root();
-	virtual void format(const meta_data &meta);
-	virtual meta_data metadata();
-	virtual void  metadata_change(const meta_data &info);
+	// Get the metadata for the volume
+	virtual meta_data volume_metadata();
+
+	// Change the metadata for the volume
+	virtual err_t volume_metadata_change(const meta_data &meta);
+
+	// Get the metadata for a file or a directory.  Empty path targets the root directory
+	virtual std::pair<err_t, meta_data> metadata(const std::vector<std::string> &path);
+
+	// Change the metadata for a file or a directory.  Empty path targets the root directory
+	virtual err_t metadata_change(const std::vector<std::string> &path, const meta_data &meta);
+
+	// Get the contents of a directory, empty path targets the root directory
+	virtual std::pair<err_t, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path);
+
+	// Rename a file or a directory.  In contrast to metadata_change, this can move the object
+	// between directories
+	virtual err_t rename(const std::vector<std::string> &opath, const std::vector<std::string> &npath);
+
+	// Remove a file or a directory.  Directories must be empty (e.g. it's not recursive)
+	virtual err_t remove(const std::vector<std::string> &path);
+
+	// Create a directory, path designates where the directory must be, directory name is in meta
+	virtual err_t dir_create(const std::vector<std::string> &path, const meta_data &meta);
+
+	// Create an empty file, path designates where the file must be, file name is in meta
+	virtual err_t file_create(const std::vector<std::string> &path, const meta_data &meta);
+
+	// Read the contents of a file
+	virtual std::pair<err_t, std::vector<u8>> file_read(const std::vector<std::string> &path);
+
+	// Replace the contents of a file, the file must already exist
+	virtual err_t file_write(const std::vector<std::string> &path, const std::vector<u8> &data);
+
+	// Read the resource fork of a file on systems that handle those
+	virtual std::pair<err_t, std::vector<u8>> file_rsrc_read(const std::vector<std::string> &path);
+
+	// Replace the resource fork of a file, the file must already exist
+	virtual err_t file_rsrc_write(const std::vector<std::string> &path, const std::vector<u8> &data);
+
+	// Format an image, provide the volume metadata
+	virtual err_t format(const meta_data &meta);
 
 	static void copy(u8 *p, const u8 *src, u32 size);
 	static void fill(u8 *p, u8 data, u32 size);
@@ -298,9 +273,13 @@ public:
 	static u32 r24l(const u8 *p);
 	static u32 r32l(const u8 *p);
 
+protected:
+	filesystem_t(fsblk_t &blockdev, u32 size) : m_blockdev(blockdev) {
+		m_blockdev.set_block_size(size);
+	}
+
 	static std::string trim_end_spaces(const std::string &str);
 
-protected:
 	fsblk_t &m_blockdev;
 };
 

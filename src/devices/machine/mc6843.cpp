@@ -18,7 +18,7 @@ mc6843_device::mc6843_device(const machine_config &mconfig, const char *tag, dev
 void mc6843_device::device_start()
 {
 	m_irq.resolve_safe();
-	m_timer = timer_alloc(0);
+	m_timer = timer_alloc(FUNC(mc6843_device::update_tick), this);
 	m_floppy = nullptr;
 
 	m_dir  = 0x00;
@@ -300,7 +300,7 @@ void mc6843_device::ready_callback(floppy_image_device *floppy, int state)
 	}
 }
 
-void mc6843_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(mc6843_device::update_tick)
 {
 	live_sync();
 	run(true, false, false);

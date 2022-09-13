@@ -25,6 +25,7 @@ extern void *GetOSWindow(void *wincontroller);
 // MAMEOS headers
 #include "emu.h"
 #include "window.h"
+#include "render.h"
 #include "rendutil.h"
 #include "aviwrite.h"
 
@@ -48,6 +49,8 @@ extern void *GetOSWindow(void *wincontroller);
 #include "bgfx/slider.h"
 #include "bgfx/target.h"
 #include "bgfx/view.h"
+
+#include "modules/lib/osdobj_common.h"
 
 #include "imgui/imgui.h"
 
@@ -542,11 +545,11 @@ void renderer_bgfx::render_post_screen_quad(int view, render_primitive* prim, bg
 	vertex(&vertices[4], x[2], y[2], 0, 0xffffffff, u[2], v[2]);
 	vertex(&vertices[5], x[0], y[0], 0, 0xffffffff, u[0], v[0]);
 
-	uint32_t texture_flags = BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP;
+	uint32_t texture_flags = 0U;
+	if (!PRIMFLAG_GET_TEXWRAP(prim->flags))
+		texture_flags |= BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP;
 	if (video_config.filter == 0)
-	{
 		texture_flags |= BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT;
-	}
 
 	uint32_t blend = PRIMFLAG_GET_BLENDMODE(prim->flags);
 	bgfx::setVertexBuffer(0,buffer);
@@ -602,11 +605,11 @@ void renderer_bgfx::render_textured_quad(render_primitive* prim, bgfx::Transient
 	vertex(&vertices[4], x[2], y[2], 0, rgba, u[2], v[2]);
 	vertex(&vertices[5], x[0], y[0], 0, rgba, u[0], v[0]);
 
-	uint32_t texture_flags = BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP;
-	if (video_config.filter == 0)
-	{
+	uint32_t texture_flags = 0U;
+	if (!PRIMFLAG_GET_TEXWRAP(prim->flags))
+		texture_flags |= BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP;
+	if (!PRIMFLAG_GET_ANTIALIAS(prim->flags))
 		texture_flags |= BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT;
-	}
 
 	const bool is_screen = PRIMFLAG_GET_SCREENTEX(prim->flags);
 	uint16_t tex_width(prim->texture.width);
@@ -1045,6 +1048,30 @@ void renderer_bgfx::setup_ortho_view()
 		s_current_view++;
 	}
 	m_ortho_view->update();
+}
+
+render_primitive_list *renderer_bgfx::get_primitives()
+{
+	auto win = try_getwindow();
+	if (win == nullptr)
+		return nullptr;
+
+	// determines whether the screen container is transformed by the chain's shaders
+	bool chain_transform = false;
+
+	// check the first chain
+	bgfx_chain* chain = this->m_chains->screen_chain(0);
+	if (chain != nullptr)
+	{
+		chain_transform = chain->transform();
+	}
+
+	osd_dim wdim = win->get_size();
+	if (wdim.width() > 0 && wdim.height() > 0)
+		win->target()->set_bounds(wdim.width(), wdim.height(), win->pixel_aspect());
+
+	win->target()->set_transform_container(!chain_transform);
+	return &win->target()->get_primitives();
 }
 
 renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(bool atlas_valid, render_primitive** prim, bgfx::TransientVertexBuffer* buffer, int32_t screen)

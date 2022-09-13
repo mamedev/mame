@@ -9,9 +9,12 @@
 #include "emu.h"
 #include "hdc.h"
 
-#define LOG_HDC_STATUS      0
-#define LOG_HDC_CALL        0
-#define LOG_HDC_DATA        0
+#define LOG_HDC_STATUS      (1U << 1)
+#define LOG_HDC_CALL        (1U << 2)
+#define LOG_HDC_DATA        (1U << 3)
+
+#define VERBOSE (0)
+#include "logmacro.h"
 
 #define CMD_TESTREADY   0x00
 #define CMD_RECALIBRATE 0x01
@@ -52,7 +55,7 @@
 #define CTL_PIO         0x00
 #define CTL_DMA         0x01
 
-static const char *const hdc_command_names[] =
+const char *const s_hdc_command_names[] =
 {
 	"CMD_TESTREADY",        /* 0x00 */
 	"CMD_RECALIBRATE",      /* 0x01 */
@@ -153,9 +156,23 @@ xt_hdc_device::xt_hdc_device(const machine_config &mconfig, const char *tag, dev
 
 xt_hdc_device::xt_hdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	buffer_ptr(nullptr), csb(0), status(0), error(0), m_type(0), m_current_cmd(0),
+	m_buffer_ptr(nullptr),
+	m_csb(0),
+	m_status(0),
+	m_error(0),
+	m_type(0),
+	m_current_cmd(0),
 	m_irq_handler(*this),
-	m_drq_handler(*this), drv(0), timer(nullptr), data_cnt(0), hdc_control(0), hdcdma_src(nullptr), hdcdma_dst(nullptr), hdcdma_read(0), hdcdma_write(0), hdcdma_size(0)
+	m_drq_handler(*this),
+	m_drv(0),
+	m_timer(nullptr),
+	m_data_cnt(0),
+	m_hdc_control(0),
+	m_hdcdma_src(nullptr),
+	m_hdcdma_dst(nullptr),
+	m_hdcdma_read(0),
+	m_hdcdma_write(0),
+	m_hdcdma_size(0)
 {
 }
 
@@ -177,43 +194,43 @@ st11m_device::st11m_device(const machine_config &mconfig, const char *tag, devic
 
 void xt_hdc_device::device_start()
 {
-	buffer.resize(256*512);   // maximum possible transfer
-	timer = timer_alloc();
+	m_buffer = std::make_unique<uint8_t[]>(256*512);   // maximum possible transfer
+	m_timer = timer_alloc(FUNC(xt_hdc_device::process_command), this);
 	m_irq_handler.resolve_safe();
 	m_drq_handler.resolve_safe();
 }
 
 void xt_hdc_device::device_reset()
 {
-	drv = 0;
-	data_cnt = 0;
-	buffer_ptr = nullptr;
-	hdc_control = 0;
+	m_drv = 0;
+	m_data_cnt = 0;
+	m_buffer_ptr = nullptr;
+	m_hdc_control = 0;
 	for (int i = 0; i < 2; i++)
 	{
-		cylinders[i] = 612;
-		rwc[i] = 613;
-		wp[i] = 613;
-		heads[i] = 4;
-		ecc[i] = 11;
+		m_cylinders[i] = 612;
+		m_rwc[i] = 613;
+		m_wp[i] = 613;
+		m_heads[i] = 4;
+		m_ecc[i] = 11;
 
 		/* indexes */
-		cylinder[i] = 0;
-		head[i] = 0;
-		sector[i] = 0;
-		sector_cnt[i] = 0;
-		control[i] = 0;
+		m_cylinder[i] = 0;
+		m_head[i] = 0;
+		m_sector[i] = 0;
+		m_sector_cnt[i] = 0;
+		m_control[i] = 0;
 	}
 
-	csb = 0;
-	status = 0;
-	error = 0;
+	m_csb = 0;
+	m_status = 0;
+	m_error = 0;
 }
 
 hard_disk_file *xt_hdc_device::pc_hdc_file(int id)
 {
 	harddisk_image_device *img = nullptr;
-	switch( id )
+	switch (id)
 	{
 	case 0:
 		img = subdevice<harddisk_image_device>("primary");
@@ -222,7 +239,7 @@ hard_disk_file *xt_hdc_device::pc_hdc_file(int id)
 		img = subdevice<harddisk_image_device>("slave");
 		break;
 	}
-	if ( img == nullptr )
+	if (img == nullptr)
 		return nullptr;
 
 	if (!img->exists())
@@ -231,64 +248,57 @@ hard_disk_file *xt_hdc_device::pc_hdc_file(int id)
 	return img->get_hard_disk_file();
 }
 
-void xt_hdc_device::pc_hdc_result(int set_error_info)
+void xt_hdc_device::pc_hdc_result(bool set_error_info)
 {
-	if ( ( hdc_control & 0x02 ))
+	if (m_hdc_control & 0x02)
 	{
 		// dip switch selected IRQ 5 or 2
 		m_irq_handler(1);
 	}
 
-	if (LOG_HDC_STATUS)
-		logerror("pc_hdc_result(): $%02x to $%04x\n", csb, data_cnt);
+	LOGMASKED(LOG_HDC_STATUS, "pc_hdc_result(): $%02x to $%04x\n", m_csb, m_data_cnt);
 
-	buffer[data_cnt++] = csb;
+	m_buffer[m_data_cnt++] = m_csb;
 
-	if (set_error_info && ( csb & CSB_ERROR ) )
+	if (set_error_info && (m_csb & CSB_ERROR))
 	{
-		buffer[data_cnt++] = error;
-		if (error & 0x80)
+		m_buffer[m_data_cnt++] = m_error;
+		if (m_error & 0x80)
 		{
-			buffer[data_cnt++] = (drv << 5) | head[drv];
-			buffer[data_cnt++] = ((cylinder[drv] >> 2) & 0xc0) | sector[drv];
-			buffer[data_cnt++] = cylinder[drv] & 0xff;
+			m_buffer[m_data_cnt++] = (m_drv << 5) | m_head[m_drv];
+			m_buffer[m_data_cnt++] = ((m_cylinder[m_drv] >> 2) & 0xc0) | m_sector[m_drv];
+			m_buffer[m_data_cnt++] = m_cylinder[m_drv] & 0xff;
 
-			if (LOG_HDC_STATUS)
-			{
-				logerror("pc_hdc_result(): result [%02x %02x %02x %02x]\n",
-					buffer[data_cnt-4], buffer[data_cnt-3], buffer[data_cnt-2], buffer[data_cnt-1]);
-			}
+			LOGMASKED(LOG_HDC_STATUS, "pc_hdc_result(): result [%02x %02x %02x %02x]\n",
+				m_buffer[m_data_cnt - 4], m_buffer[m_data_cnt - 3], m_buffer[m_data_cnt - 2], m_buffer[m_data_cnt - 1]);
 		}
 		else
 		{
-			if (LOG_HDC_STATUS)
-				logerror("pc_hdc_result(): result [%02x]\n", buffer[data_cnt-1]);
+			LOGMASKED(LOG_HDC_STATUS, "pc_hdc_result(): result [%02x]\n", m_buffer[m_data_cnt - 1]);
 		}
 	}
-	status |= STA_INTERRUPT | STA_INPUT | STA_REQUEST | STA_COMMAND | STA_READY;
+	m_status |= STA_INTERRUPT | STA_INPUT | STA_REQUEST | STA_COMMAND | STA_READY;
 }
 
 
 
-int xt_hdc_device::no_dma(void)
+bool xt_hdc_device::no_dma()
 {
-	return (hdc_control & CTL_DMA) == 0;
+	return (m_hdc_control & CTL_DMA) == 0;
 }
 
 
 
 int xt_hdc_device::get_lbasector()
 {
-	int lbasector;
-
-	hard_disk_file *file = pc_hdc_file(drv);
+	hard_disk_file *file = pc_hdc_file(m_drv);
 	const auto &info = file->get_info();
 
-	lbasector = cylinder[drv];
+	int lbasector = m_cylinder[m_drv];
 	lbasector *= info.heads;
-	lbasector += head[drv];
+	lbasector += m_head[m_drv];
 	lbasector *= info.sectors;
-	lbasector += sector[drv];
+	lbasector += m_sector[m_drv];
 	return lbasector;
 }
 
@@ -304,42 +314,43 @@ int xt_hdc_device::get_lbasector()
 
 int xt_hdc_device::dack_r()
 {
-	uint8_t result;
-
-	hard_disk_file *file = pc_hdc_file(drv);
+	hard_disk_file *file = pc_hdc_file(m_drv);
 	if (!file)
 		return 0;
 	const auto &info = file->get_info();
 
-	if (hdcdma_read == 0)
+	if (m_hdcdma_read == 0)
 	{
-		file->read(get_lbasector(), hdcdma_data);
-		hdcdma_read = 512;
-		hdcdma_size -= 512;
-		hdcdma_src = hdcdma_data;
-		sector[drv]++;
+		file->read(get_lbasector(), m_hdcdma_data);
+		m_hdcdma_read = 512;
+		m_hdcdma_size -= 512;
+		m_hdcdma_src = m_hdcdma_data;
+		m_sector[m_drv]++;
 	}
 
-	result = *(hdcdma_src++);
+	uint8_t result = *(m_hdcdma_src++);
 
-	if( --hdcdma_read == 0 )
+	if (--m_hdcdma_read == 0)
 	{
 		/* end of cylinder ? */
-		if (sector[drv] >= info.sectors)
+		if (m_sector[m_drv] >= info.sectors)
 		{
-			sector[drv] = 0;
-			if (++head[drv] >= info.heads)     /* beyond heads? */
+			m_sector[m_drv] = 0;
+			if (++m_head[m_drv] >= info.heads)  /* beyond heads? */
 			{
-				head[drv] = 0;                  /* reset head */
-				cylinder[drv]++;                /* next cylinder */
+				m_head[m_drv] = 0;              /* reset head */
+				m_cylinder[m_drv]++;            /* next cylinder */
 			}
 		}
 	}
 
 	if (!no_dma())
 	{
-		m_drq_handler((hdcdma_read || hdcdma_size ) ? 1 : 0);
-		if(!(hdcdma_read || hdcdma_size)) pc_hdc_result(0);
+		m_drq_handler((m_hdcdma_read || m_hdcdma_size) ? 1 : 0);
+		if (!(m_hdcdma_read || m_hdcdma_size))
+		{
+			pc_hdc_result(false);
+		}
 	}
 
 	return result;
@@ -347,64 +358,68 @@ int xt_hdc_device::dack_r()
 
 int xt_hdc_device::dack_rs()
 {
-	uint8_t result;
+	logerror("%s dack_rs(%d %d)\n", machine().describe_context(), m_hdcdma_read, m_hdcdma_size);
 
-	logerror("%s dack_rs(%d %d)\n", machine().describe_context(), hdcdma_read, hdcdma_size);
-
-	if (hdcdma_read == 0)
+	if (m_hdcdma_read == 0)
 	{
-		hdcdma_read = 512;
-		hdcdma_size -= 512;
-		hdcdma_src = hdcdma_data;
+		m_hdcdma_read = 512;
+		m_hdcdma_size -= 512;
+		m_hdcdma_src = m_hdcdma_data;
 	}
 
-	result = *(hdcdma_src++);
+	uint8_t m_result = *(m_hdcdma_src++);
 
-	hdcdma_read--;
+	m_hdcdma_read--;
 
 	if (!no_dma())
 	{
-		m_drq_handler((hdcdma_read) ? 1 : 0);
-		if(!(hdcdma_read)) pc_hdc_result(0);
+		m_drq_handler(m_hdcdma_read ? 1 : 0);
+		if (!m_hdcdma_read)
+		{
+			pc_hdc_result(false);
+		}
 	}
 
-	return result;
+	return m_result;
 }
 
 
 
 void xt_hdc_device::dack_w(int data)
 {
-	hard_disk_file *file = pc_hdc_file(drv);
+	hard_disk_file *file = pc_hdc_file(m_drv);
 	if (!file)
 		return;
 	const auto &info = file->get_info();
 
-	*(hdcdma_dst++) = data;
+	*(m_hdcdma_dst++) = data;
 
-	if( --hdcdma_write == 0 )
+	if (--m_hdcdma_write == 0)
 	{
-		file->write(get_lbasector(), hdcdma_data);
-		hdcdma_write = 512;
-		hdcdma_size -= 512;
+		file->write(get_lbasector(), m_hdcdma_data);
+		m_hdcdma_write = 512;
+		m_hdcdma_size -= 512;
 
 		/* end of cylinder ? */
-		if( ++sector[drv] >= info.sectors )
+		if (++m_sector[m_drv] >= info.sectors)
 		{
-			sector[drv] = 0;
-			if (++head[drv] >= info.heads)     /* beyond heads? */
+			m_sector[m_drv] = 0;
+			if (++m_head[m_drv] >= info.heads)  /* beyond heads? */
 			{
-				head[drv] = 0;                  /* reset head */
-				cylinder[drv]++;                /* next cylinder */
+				m_head[m_drv] = 0;              /* reset head */
+				m_cylinder[m_drv]++;            /* next cylinder */
 			}
 		}
-		hdcdma_dst = hdcdma_data;
+		m_hdcdma_dst = m_hdcdma_data;
 	}
 
 	if (!no_dma())
 	{
-		m_drq_handler(hdcdma_size ? 1 : 0);
-		if(!hdcdma_size) pc_hdc_result(1);
+		m_drq_handler(m_hdcdma_size ? 1 : 0);
+		if (!m_hdcdma_size)
+		{
+			pc_hdc_result(true);
+		}
 	}
 }
 
@@ -412,19 +427,22 @@ void xt_hdc_device::dack_w(int data)
 
 void xt_hdc_device::dack_ws(int data)
 {
-	*(hdcdma_dst++) = data;
+	*(m_hdcdma_dst++) = data;
 
-	if( --hdcdma_write == 0 )
+	if (--m_hdcdma_write == 0)
 	{
-		hdcdma_write = 512;
-		hdcdma_size -= 512;
-		hdcdma_dst = hdcdma_data;
+		m_hdcdma_write = 512;
+		m_hdcdma_size -= 512;
+		m_hdcdma_dst = m_hdcdma_data;
 	}
 
 	if (!no_dma())
 	{
-		m_drq_handler(hdcdma_size ? 1 : 0);
-		if(!hdcdma_size) pc_hdc_result(1);
+		m_drq_handler(m_hdcdma_size ? 1 : 0);
+		if (!m_hdcdma_size)
+		{
+			pc_hdc_result(true);
+		}
 	}
 }
 
@@ -432,46 +450,48 @@ void xt_hdc_device::dack_ws(int data)
 
 void xt_hdc_device::execute_read()
 {
-	hard_disk_file *disk;
-	int size = sector_cnt[drv] * 512;
-	int read_ = 0;
+	int size = m_sector_cnt[m_drv] * 512;
 
-	if(sector_cnt[drv] == 0)
+	if (m_sector_cnt[m_drv] == 0)
 		size = 256 * 512;
 
-	disk = pc_hdc_file(drv);
+	hard_disk_file *disk = pc_hdc_file(m_drv);
 	if (!disk)
 		return;
 
-	status |= STA_READY;  // ready to receive data
-	status &= ~STA_INPUT;
-	status &= ~STA_COMMAND;
+	m_status |= STA_READY;  // ready to receive data
+	m_status &= ~(STA_INPUT | STA_COMMAND);
 
-	hdcdma_src = hdcdma_data;
-	hdcdma_read = read_;
-	hdcdma_size = size;
+	m_hdcdma_src = m_hdcdma_data;
+	m_hdcdma_read = 0;
+	m_hdcdma_size = size;
 
-	if(!no_dma())
+	if (!no_dma())
 	{
 		m_drq_handler(1);
-		if(!hdcdma_size) pc_hdc_result(0);
+		if (!m_hdcdma_size)
+		{
+			pc_hdc_result(false);
+		}
 	}
 }
 
 void xt_hdc_device::execute_readsbuff()
 {
-	status |= STA_READY;  // ready to receive data
-	status &= ~STA_INPUT;
-	status &= ~STA_COMMAND;
+	m_status |= STA_READY;  // ready to receive data
+	m_status &= ~(STA_INPUT | STA_COMMAND);
 
-	hdcdma_src = hdcdma_data;
-	hdcdma_read = 512;
-	hdcdma_size = 512;
+	m_hdcdma_src = m_hdcdma_data;
+	m_hdcdma_read = 512;
+	m_hdcdma_size = 512;
 
-	if(!no_dma())
+	if (!no_dma())
 	{
 		m_drq_handler(1);
-		if(!hdcdma_size) pc_hdc_result(0);
+		if (!m_hdcdma_size)
+		{
+			pc_hdc_result(false);
+		}
 	}
 }
 
@@ -479,24 +499,22 @@ void xt_hdc_device::execute_readsbuff()
 
 void xt_hdc_device::execute_write()
 {
-	hard_disk_file *disk;
-	int size = sector_cnt[drv] * 512;
-	int write_ = 512;
+	int size = m_sector_cnt[m_drv] * 512;
 
-	if(sector_cnt[drv] == 0)
+	if (m_sector_cnt[m_drv] == 0)
 		size = 256 * 512;
 
-	disk = pc_hdc_file(drv);
+	hard_disk_file *disk = pc_hdc_file(m_drv);
 	if (!disk)
 		return;
 
-	status |= STA_READY;  // ready to receive data
-	status |= STA_INPUT;
-	status &= ~STA_COMMAND;
+	m_status |= STA_READY;  // ready to receive data
+	m_status |= STA_INPUT;
+	m_status &= ~STA_COMMAND;
 
-	hdcdma_dst = hdcdma_data;
-	hdcdma_write = write_;
-	hdcdma_size = size;
+	m_hdcdma_dst = m_hdcdma_data;
+	m_hdcdma_write = 512;
+	m_hdcdma_size = size;
 
 	if (!no_dma())
 	{
@@ -508,13 +526,13 @@ void xt_hdc_device::execute_write()
 
 void xt_hdc_device::execute_writesbuff()
 {
-	hdcdma_dst = hdcdma_data;
-	hdcdma_write = 512;
-	hdcdma_size = 512;
+	m_hdcdma_dst = m_hdcdma_data;
+	m_hdcdma_write = 512;
+	m_hdcdma_size = 512;
 
-	status |= STA_READY;  // ready to receive data
-	status |= STA_INPUT;
-	status &= ~STA_COMMAND;
+	m_status |= STA_READY;  // ready to receive data
+	m_status |= STA_INPUT;
+	m_status &= ~STA_COMMAND;
 
 	if (!no_dma())
 	{
@@ -526,75 +544,76 @@ void xt_hdc_device::execute_writesbuff()
 
 void xt_hdc_device::get_drive()
 {
-	drv = (buffer[1] >> 5) & 1;
-	csb = (drv) ? CSB_LUN : 0x00;
+	m_drv = BIT(m_buffer[1], 5);
+	m_csb = m_drv ? CSB_LUN : 0x00;
 }
 
 
 
 void xt_hdc_device::get_chsn()
 {
-	head[drv] = buffer[1] & 0x1f;
-	sector[drv] = buffer[2] & 0x3f;
-	cylinder[drv] = (buffer[2] & 0xc0) << 2;
-	cylinder[drv] |= buffer[3];
-	sector_cnt[drv] = buffer[4];
-	control[drv] = buffer[5];   /* 7: no retry, 6: no ecc retry, 210: step rate */
+	m_head[m_drv] = m_buffer[1] & 0x1f;
+	m_sector[m_drv] = m_buffer[2] & 0x3f;
+	m_cylinder[m_drv] = (m_buffer[2] & 0xc0) << 2;
+	m_cylinder[m_drv] |= m_buffer[3];
+	m_sector_cnt[m_drv] = m_buffer[4];
+	m_control[m_drv] = m_buffer[5];   /* 7: no retry, 6: no ecc retry, 210: step rate */
 
-	error = 0x80;   /* a potential error has C/H/S/N info */
+	m_error = 0x80;   /* a potential error has C/H/S/N info */
 }
 
-int xt_hdc_device::test_ready()
+bool xt_hdc_device::test_ready()
 {
-	if( !pc_hdc_file(drv) )
+	if (!pc_hdc_file(m_drv))
 	{
-		csb |= CSB_ERROR;
-		error |= 0x04;  /* drive not ready */
-		return 0;
+		m_csb |= CSB_ERROR;
+		m_error |= 0x04;  /* drive not ready */
+		return false;
 	}
-	return 1;
+	return true;
 }
 
-void xt_hdc_device::command()
+TIMER_CALLBACK_MEMBER(xt_hdc_device::process_command)
 {
-	int set_error_info = 1;
-	int old_error = error;          /* Previous error data is needed for CMD_SENSE */
-	const char *command_name;
+	int old_error = m_error;          /* Previous error data is needed for CMD_SENSE */
 
-	csb = 0x00;
-	error = 0;
+	m_csb = 0x00;
+	m_error = 0;
 
-	buffer_ptr = &buffer[0];
+	m_buffer_ptr = &m_buffer[0];
 
 	get_drive();
-	data_cnt = 0;
+	m_data_cnt = 0;
 
-	if (LOG_HDC_STATUS)
-	{
-		command_name = hdc_command_names[m_current_cmd] ? hdc_command_names[m_current_cmd] : "Unknown";
-		logerror("%s pc_hdc_command(): Executing command; cmd=0x%02x (%s) drv=%d\n",
-			machine().describe_context(), m_current_cmd, command_name, drv);
-	}
+	LOGMASKED(LOG_HDC_STATUS, "%s pc_hdc_command(): Executing command; cmd=0x%02x (%s) drv=%d\n",
+		machine().describe_context(), m_current_cmd, s_hdc_command_names[m_current_cmd] ? s_hdc_command_names[m_current_cmd] : "Unknown", m_drv);
 
 	switch (m_current_cmd)
 	{
 		case CMD_TESTREADY:
-			set_error_info = 0;
 			test_ready();
-			if(no_dma()) pc_hdc_result(set_error_info);
+			if (no_dma())
+			{
+				pc_hdc_result(false);
+			}
 			break;
 		case CMD_SENSE:
 			/* Perform error code translation. This may need to be expanded in the future. */
-			buffer[data_cnt++] = ( old_error & 0xC0 ) | ( ( old_error & 0x04 ) ? 0x04 : 0x00 ) ;
-			buffer[data_cnt++] = (drv << 5) | head[drv];
-			buffer[data_cnt++] = ((cylinder[drv] >> 2) & 0xc0) | sector[drv];
-			buffer[data_cnt++] = cylinder[drv] & 0xff;
-			set_error_info = 0;
-			if(no_dma()) pc_hdc_result(set_error_info);
+			m_buffer[m_data_cnt++] = (old_error & 0xc0) | (old_error & 0x04);
+			m_buffer[m_data_cnt++] = (m_drv << 5) | m_head[m_drv];
+			m_buffer[m_data_cnt++] = ((m_cylinder[m_drv] >> 2) & 0xc0) | m_sector[m_drv];
+			m_buffer[m_data_cnt++] = m_cylinder[m_drv] & 0xff;
+			if (no_dma())
+			{
+				pc_hdc_result(false);
+			}
 			break;
 		case CMD_RECALIBRATE:
 			get_chsn();
-			if(no_dma()) pc_hdc_result(set_error_info);
+			if (no_dma())
+			{
+				pc_hdc_result(true);
+			}
 			break;
 
 		case CMD_FORMATDRV:
@@ -605,31 +624,27 @@ void xt_hdc_device::command()
 		case CMD_DRIVEDIAG:
 			get_chsn();
 			test_ready();
-			if(no_dma()) pc_hdc_result(set_error_info);
+			if (no_dma())
+			{
+				pc_hdc_result(true);
+			}
 			break;
 
 		case CMD_READ:
 		case CMD_READLONG:
 			get_chsn();
 
-			if (LOG_HDC_STATUS)
-			{
-				logerror("%s hdc read D:%d C:%d H:%d S:%d N:%d CTL:$%02x\n",
-					machine().describe_context(), drv, cylinder[drv], head[drv], sector[drv], sector_cnt[drv], control[drv]);
-			}
+			LOGMASKED(LOG_HDC_STATUS, "%s hdc read D:%d C:%d H:%d S:%d N:%d CTL:$%02x\n",
+				machine().describe_context(), m_drv, m_cylinder[m_drv], m_head[m_drv], m_sector[m_drv], m_sector_cnt[m_drv], m_control[m_drv]);
 
 			if (test_ready())
 				execute_read();
 			else
-				pc_hdc_result(1);
-			set_error_info = 0;
+				pc_hdc_result(true);
 			break;
 
 		case CMD_READSBUFF:
-			if (LOG_HDC_STATUS)
-			{
-				logerror("%s hdc read sector buffer\n", machine().describe_context());
-			}
+			LOGMASKED(LOG_HDC_STATUS, "%s hdc read sector buffer\n", machine().describe_context());
 
 			execute_readsbuff();
 			break;
@@ -638,52 +653,49 @@ void xt_hdc_device::command()
 		case CMD_WRITELONG:
 			get_chsn();
 
-			if (LOG_HDC_STATUS)
-			{
-				logerror("%s hdc write  D:%d C:%d H:%d S:%d N:%d CTL:$%02x\n",
-					machine().describe_context(), drv, cylinder[drv], head[drv], sector[drv], sector_cnt[drv], control[drv]);
-			}
+			LOGMASKED(LOG_HDC_STATUS, "%s hdc write  D:%d C:%d H:%d S:%d N:%d CTL:$%02x\n",
+				machine().describe_context(), m_drv, m_cylinder[m_drv], m_head[m_drv], m_sector[m_drv], m_sector_cnt[m_drv], m_control[m_drv]);
 
 			if (test_ready())
 				execute_write();
 			break;
 
 		case CMD_WRITESBUFF:
-			if (LOG_HDC_STATUS)
-			{
-				logerror("%s hdc write sector buffer\n", machine().describe_context());
-			}
+			LOGMASKED(LOG_HDC_STATUS, "%s hdc write sector buffer\n", machine().describe_context());
 
 			execute_writesbuff();
 			break;
 
 		case CMD_SETPARAM:
 			get_chsn();
-			cylinders[drv] = ((buffer[6]&3)<<8) | buffer[7];
-			heads[drv] = buffer[8] & 0x1f;
-			rwc[drv] = ((buffer[9]&3)<<8) | buffer[10];
-			wp[drv] = ((buffer[11]&3)<<8) | buffer[12];
-			ecc[drv] = buffer[13];
-			if(no_dma()) pc_hdc_result(set_error_info);
+			m_cylinders[m_drv] = ((m_buffer[6] & 3) << 8) | m_buffer[7];
+			m_heads[m_drv] = m_buffer[8] & 0x1f;
+			m_rwc[m_drv] = ((m_buffer[9] & 3) << 8) | m_buffer[10];
+			m_wp[m_drv] = ((m_buffer[11] & 3) << 8) | m_buffer[12];
+			m_ecc[m_drv] = m_buffer[13];
+			if (no_dma())
+			{
+				pc_hdc_result(true);
+			}
 			break;
 
 		case CMD_GETECC:
-			buffer[data_cnt++] = ecc[drv];
-			if(no_dma()) pc_hdc_result(set_error_info);
+			m_buffer[m_data_cnt++] = m_ecc[m_drv];
+			if (no_dma())
+			{
+				pc_hdc_result(true);
+			}
 			break;
 
 		case CMD_RAMDIAG:
 		case CMD_INTERNDIAG:
-			if(no_dma()) pc_hdc_result(set_error_info);
+			if (no_dma())
+			{
+				pc_hdc_result(true);
+			}
 			break;
 	}
 }
-
-void xt_hdc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	command();
-}
-
 
 /*  Command format
  *  Bits     Description
@@ -705,43 +717,41 @@ void xt_hdc_device::device_timer(emu_timer &timer, device_timer_id id, int param
  *  cccccccc write precomp l
  *  eeeeeeee ecc
  */
-void xt_hdc_device::data_w(int data)
+void xt_hdc_device::data_w(uint8_t data)
 {
-	if(!(status & STA_COMMAND) && m_current_cmd != CMD_SETPARAM)
+	if (!(m_status & STA_COMMAND) && m_current_cmd != CMD_SETPARAM)
 	{
-		if (LOG_HDC_DATA)
-			logerror("hdc_data_w PIO $%02x (%i) (%s): \n", data,data_cnt,hdc_command_names[m_current_cmd] ? hdc_command_names[m_current_cmd] : "Unknown");
+		LOGMASKED(LOG_HDC_DATA, "hdc_data_w PIO $%02x (%i) (%s): \n", data, m_data_cnt, s_hdc_command_names[m_current_cmd] ? s_hdc_command_names[m_current_cmd] : "Unknown");
 		// PIO data transfer
-		buffer[data_cnt++] = data;
-		if(data_cnt >= hdcdma_size)
+		m_buffer[m_data_cnt++] = data;
+		if (m_data_cnt >= m_hdcdma_size)
 		{
-			data_cnt = 0;
+			m_data_cnt = 0;
 			// write to disk
 			do
 			{
-				if(m_current_cmd == CMD_WRITESBUFF)
-					dack_ws(buffer[data_cnt++]);
+				if (m_current_cmd == CMD_WRITESBUFF)
+					dack_ws(m_buffer[m_data_cnt++]);
 				else
-					dack_w(buffer[data_cnt++]);
+					dack_w(m_buffer[m_data_cnt++]);
 			}
-			while (hdcdma_size);
-			data_cnt = 0;
-			pc_hdc_result(1);
+			while (m_hdcdma_size);
+			m_data_cnt = 0;
+			pc_hdc_result(true);
 		}
 		return;
 	}
 
-	if( data_cnt == 0 )
+	if (m_data_cnt == 0)
 	{
-		buffer_ptr = &buffer[0];
+		m_buffer_ptr = &m_buffer[0];
 		m_current_cmd = data;
-		data_cnt = 6;   /* expect 6 bytes including this one */
-		status &= ~STA_READY;
-		status &= ~STA_INPUT;
+		m_data_cnt = 6;   /* expect 6 bytes including this one */
+		m_status &= ~(STA_READY | STA_INPUT);
 		switch (data)
 		{
 			case CMD_SETPARAM:
-				data_cnt += 8;
+				m_data_cnt += 8;
 				break;
 
 			case CMD_TESTREADY:
@@ -765,76 +775,73 @@ void xt_hdc_device::data_w(int data)
 				break;
 
 			default:
-				data_cnt = 0;
-				status |= STA_INPUT;
-				csb |= CSB_ERROR | 0x20; /* unknown command */
-				pc_hdc_result(1);
+				m_data_cnt = 0;
+				m_status |= STA_INPUT;
+				m_csb |= CSB_ERROR | 0x20; /* unknown command */
+				pc_hdc_result(true);
 				break;
 		}
-		if( data_cnt )
-			status |= STA_REQUEST;
+		if (m_data_cnt)
+			m_status |= STA_REQUEST;
 	}
 
-	if (data_cnt)
+	if (m_data_cnt)
 	{
-		if (LOG_HDC_DATA)
-			logerror("hdc_data_w $%02x (%i) (%s): \n", data,data_cnt,hdc_command_names[m_current_cmd] ? hdc_command_names[m_current_cmd] : "Unknown");
+		LOGMASKED(LOG_HDC_DATA, "hdc_data_w $%02x (%i) (%s): \n", data, m_data_cnt, s_hdc_command_names[m_current_cmd] ? s_hdc_command_names[m_current_cmd] : "Unknown");
 
-		*buffer_ptr++ = data;
+		*m_buffer_ptr++ = data;
 		// XXX ec1841 wants this
-		if (m_current_cmd == CMD_SETPARAM && data_cnt == 9 && (m_type == EC1841)) {
-			status &= ~STA_READY;
-		} else {
-			status |= STA_READY;
-			if(m_current_cmd == CMD_SETPARAM && data_cnt == 9)  // some controllers want geometry info as data, not as a command (true for the Seagate ST11M?)
-				status &= ~STA_COMMAND;
-		}
-		if (--data_cnt == 0)
+		if (m_current_cmd == CMD_SETPARAM && m_data_cnt == 9 && m_type == EC1841)
 		{
-			if (LOG_HDC_STATUS)
-				logerror("%s pc_hdc_data_w(): Launching command\n", machine().describe_context());
+			m_status &= ~STA_READY;
+		}
+		else
+		{
+			m_status |= STA_READY;
+			if (m_current_cmd == CMD_SETPARAM && m_data_cnt == 9)  // some controllers want geometry info as data, not as a command (true for the Seagate ST11M?)
+				m_status &= ~STA_COMMAND;
+		}
+		if (--m_data_cnt == 0)
+		{
+			LOGMASKED(LOG_HDC_STATUS, "%s pc_hdc_data_w(): Launching command\n", machine().describe_context());
 
-			status &= ~STA_COMMAND;
-			status &= ~STA_REQUEST;
-			status &= ~STA_READY;
-			status &= ~STA_INPUT;
-			timer->adjust(attotime::from_msec(1),0);
+			m_status &= ~(STA_COMMAND | STA_REQUEST | STA_READY | STA_INPUT);
+			m_timer->adjust(attotime::from_msec(1));
 		}
 	}
 }
 
 
 
-void xt_hdc_device::reset_w(int data)
+void xt_hdc_device::reset_w(uint8_t data)
 {
-	cylinder[0] = cylinder[1] = 0;
-	head[0] = head[1] = 0;
-	sector[0] = sector[1] = 0;
-	csb = 0;
-	status = STA_COMMAND | STA_READY;
-	memset(&buffer[0], 0, buffer.size());
-	buffer_ptr = &buffer[0];
-	data_cnt = 0;
+	m_cylinder[0] = m_cylinder[1] = 0;
+	m_head[0] = m_head[1] = 0;
+	m_sector[0] = m_sector[1] = 0;
+	m_csb = 0;
+	m_status = STA_COMMAND | STA_READY;
+	std::fill_n(&m_buffer[0], 256*512, 0);
+	m_buffer_ptr = &m_buffer[0];
+	m_data_cnt = 0;
 }
 
 
 
-void xt_hdc_device::select_w(int data)
+void xt_hdc_device::select_w(uint8_t data)
 {
-	status &= ~STA_INTERRUPT;
-	status |= STA_SELECT;
+	m_status &= ~STA_INTERRUPT;
+	m_status |= STA_SELECT;
 }
 
 
 
-void xt_hdc_device::control_w(int data)
+void xt_hdc_device::control_w(uint8_t data)
 {
-	if (LOG_HDC_STATUS)
-		logerror("%s: pc_hdc_control_w(): control write %d\n", machine().describe_context(), data);
+	LOGMASKED(LOG_HDC_STATUS, "%s: pc_hdc_control_w(): control write %d\n", machine().describe_context(), data);
 
-	hdc_control = data;
+	m_hdc_control = data;
 
-	if (!(hdc_control & 0x02))
+	if (!(m_hdc_control & 0x02))
 	{
 		m_irq_handler(0);
 	}
@@ -846,44 +853,40 @@ uint8_t xt_hdc_device::data_r()
 {
 	uint8_t data = 0xff;
 
-	if(!(status & STA_COMMAND) && (m_current_cmd == CMD_READ || m_current_cmd == CMD_READLONG || m_current_cmd == CMD_READSBUFF))
+	if (!(m_status & STA_COMMAND) && (m_current_cmd == CMD_READ || m_current_cmd == CMD_READLONG || m_current_cmd == CMD_READSBUFF))
 	{
 		// PIO data transfer
-		if(data_cnt == 0)
+		if (m_data_cnt == 0)
 		{
 			do
 			{
 				if (m_current_cmd == CMD_READSBUFF)
-					buffer[data_cnt++] = dack_rs();
+					m_buffer[m_data_cnt++] = dack_rs();
 				else
-					buffer[data_cnt++] = dack_r();
-			} while (hdcdma_read);
-			data_cnt = 0;
+					m_buffer[m_data_cnt++] = dack_r();
+			} while (m_hdcdma_read);
+			m_data_cnt = 0;
 		}
-		data = buffer[data_cnt++];
-		if(data_cnt >= ((sector_cnt[drv]!=0) ? (sector_cnt[drv] * 512) : (256 * 512)))
+		data = m_buffer[m_data_cnt++];
+		if (m_data_cnt >= ((m_sector_cnt[m_drv] != 0) ? (m_sector_cnt[m_drv] * 512) : (256 * 512)))
 		{
-			data_cnt = 0;
-			pc_hdc_result(1);
+			m_data_cnt = 0;
+			pc_hdc_result(true);
 		}
-		if (LOG_HDC_DATA)
-			logerror("hdc_data_r PIO $%02x (%i): \n", data,data_cnt);
+		LOGMASKED(LOG_HDC_DATA, "hdc_data_r PIO $%02x (%i): \n", data, m_data_cnt);
 		return data;
 	}
 
-	if( data_cnt )
+	if (m_data_cnt)
 	{
-		data = *buffer_ptr++;
-		status &= ~STA_INTERRUPT;
-		if( --data_cnt == 0 )
+		data = *m_buffer_ptr++;
+		m_status &= ~STA_INTERRUPT;
+		if (--m_data_cnt == 0)
 		{
-			status &= ~STA_INPUT;
-			status &= ~STA_REQUEST;
-			status &= ~STA_SELECT;
-			status |= STA_COMMAND;
+			m_status &= ~(STA_INPUT | STA_REQUEST | STA_SELECT);
+			m_status |= STA_COMMAND;
 		}
-		if (LOG_HDC_DATA)
-			logerror("hdc_data_r $%02x (%i): \n", data,data_cnt);
+		LOGMASKED(LOG_HDC_DATA, "hdc_data_r $%02x (%i): \n", data, m_data_cnt);
 	}
 	return data;
 }
@@ -892,12 +895,12 @@ uint8_t xt_hdc_device::data_r()
 
 uint8_t xt_hdc_device::status_r()
 {
-	return status;
+	return m_status;
 }
 
 void xt_hdc_device::set_ready()
 {
-	status |= STA_READY; // XXX
+	m_status |= STA_READY; // XXX
 }
 
 //**************************************************************************
@@ -963,7 +966,8 @@ isa8_hdc_device::isa8_hdc_device(const machine_config &mconfig, const char *tag,
 isa8_hdc_device::isa8_hdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
-	m_hdc(*this,"hdc"), dip(0)
+	m_hdc(*this,"hdc"),
+	m_dip(0)
 {
 }
 
@@ -990,7 +994,7 @@ void isa8_hdc_device::device_start()
 
 void isa8_hdc_device::device_reset()
 {
-	dip = ioport("HDD")->read();
+	m_dip = ioport("HDD")->read();
 
 	if (ioport("ROM")->read() == 1 && m_hdc->install_rom())
 		m_isa->install_rom(this, 0xc8000, 0xc9fff, "hdc");
@@ -1002,11 +1006,12 @@ void isa8_hdc_device::device_reset()
  *      hard disk controller
  *
  *************************************************************************/
+
 uint8_t isa8_hdc_device::pc_hdc_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
-	switch( offset )
+	switch (offset)
 	{
 		case 0: data = m_hdc->data_r();     break;
 		case 1: data = m_hdc->status_r();   break;
@@ -1014,18 +1019,16 @@ uint8_t isa8_hdc_device::pc_hdc_r(offs_t offset)
 		case 3: break;
 	}
 
-	if (LOG_HDC_CALL)
-		logerror("%s pc_hdc_r(): offs=%d result=0x%02x\n", machine().describe_context(), offset, data);
+	LOGMASKED(LOG_HDC_CALL, "%s pc_hdc_r(): offs=%d result=0x%02x\n", machine().describe_context(), offset, data);
 
 	return data;
 }
 
 void isa8_hdc_device::pc_hdc_w(offs_t offset, uint8_t data)
 {
-	if (LOG_HDC_CALL)
-		logerror("%s pc_hdc_w(): offs=%d data=0x%02x\n", machine().describe_context(), offset, data);
+	LOGMASKED(LOG_HDC_CALL, "%s pc_hdc_w(): offs=%d data=0x%02x\n", machine().describe_context(), offset, data);
 
-	switch( offset )
+	switch (offset)
 	{
 		case 0: m_hdc->data_w(data);    break;
 		case 1: m_hdc->reset_w(data);   break;
@@ -1043,7 +1046,7 @@ uint8_t isa8_hdc_device::dack_r(int line)
 		return m_hdc->dack_r();
 }
 
-void isa8_hdc_device::dack_w(int line,uint8_t data)
+void isa8_hdc_device::dack_w(int line, uint8_t data)
 {
 	if (m_hdc->get_command() == CMD_WRITESBUFF)
 		m_hdc->dack_ws(data);
@@ -1069,20 +1072,19 @@ void isa8_hdc_device::dack_w(int line,uint8_t data)
 uint8_t isa8_hdc_device::pc_hdc_dipswitch_r()
 {
 	m_hdc->set_ready();
-	if (LOG_HDC_STATUS)
-		logerror("%s: pc_hdc_dipswitch_r: status $%02X\n", machine().describe_context(), m_hdc->status_r());
-	return dip;
+	LOGMASKED(LOG_HDC_STATUS, "%s: pc_hdc_dipswitch_r: status $%02X\n", machine().describe_context(), m_hdc->status_r());
+	return m_dip;
 }
 
-WRITE_LINE_MEMBER( isa8_hdc_device::irq_w )
+WRITE_LINE_MEMBER(isa8_hdc_device::irq_w)
 {
-	if (BIT(dip, 6))
+	if (BIT(m_dip, 6))
 		m_isa->irq5_w(state);
 	else
 		m_isa->irq2_w(state);
 }
 
-WRITE_LINE_MEMBER( isa8_hdc_device::drq_w )
+WRITE_LINE_MEMBER(isa8_hdc_device::drq_w)
 {
 	m_isa->drq3_w(state);
 }

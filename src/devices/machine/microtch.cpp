@@ -80,10 +80,10 @@ microtouch_device::microtouch_device(const machine_config &mconfig, const char *
 
 int microtouch_device::check_command( const char* commandtocheck, int command_len, uint8_t* command_data )
 {
-	if ( (command_len == (strlen(commandtocheck) + 2)) &&
+	if ((command_len == (strlen(commandtocheck) + 2)) &&
 			(command_data[0] == 0x01) &&
 			(strncmp(commandtocheck, (const char*)command_data + 1, strlen(commandtocheck)) == 0) &&
-			(command_data[command_len-1] == 0x0d) )
+			(command_data[command_len-1] == 0x0d))
 	{
 		return 1;
 	}
@@ -111,10 +111,10 @@ void microtouch_device::send_format_decimal_packet(int x, int y)
 	int decx, decy;
 
 	decx = x / 16;
-	if ( decx > 999 )
+	if (decx > 999)
 		decx = 999;
 	decy = y / 16;
-	if ( decy > 999 )
+	if (decy > 999)
 		decy = 999;
 
 	// header byte
@@ -138,12 +138,11 @@ void microtouch_device::send_touch_packet()
 	int tx = m_touchx->read();
 	int ty = m_touchy->read();
 
-	if ( m_out_touch_cb.isnull() ||
-			m_out_touch_cb( &tx, &ty ) != 0 )
+	if (m_out_touch_cb.isnull() || m_out_touch_cb(&tx, &ty) != 0)
 	{
 		ty = 0x4000 - ty;
 
-		switch( m_format )
+		switch (m_format)
 		{
 			case FORMAT_TABLET:
 				send_format_table_packet(0xc8, tx, ty);
@@ -160,54 +159,49 @@ void microtouch_device::send_touch_packet()
 	}
 }
 
-void microtouch_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(microtouch_device::update_output)
 {
-	if (!id)
+	if (m_tx_buffer_ptr < m_tx_buffer_num)
 	{
-		if ( m_tx_buffer_ptr < m_tx_buffer_num )
+		if (is_transmit_register_empty())
 		{
-			if(is_transmit_register_empty())
-			{
-				m_output = m_tx_buffer[m_tx_buffer_ptr++];
-				m_output_valid = true;
-				tra_complete();
-			}
-
-			if ( m_tx_buffer_ptr == m_tx_buffer_num )
-			{
-				m_tx_buffer_ptr = m_tx_buffer_num = 0;
-			}
-			return;
+			m_output = m_tx_buffer[m_tx_buffer_ptr++];
+			m_output_valid = true;
+			tra_complete();
 		}
 
-		if ( (m_reset_done == 0) ||
-				(m_format == FORMAT_UNKNOWN) ||
-				(m_mode != MODE_STREAM))
+		if (m_tx_buffer_ptr == m_tx_buffer_num)
 		{
-			return;
+			m_tx_buffer_ptr = m_tx_buffer_num = 0;
 		}
+		return;
+	}
 
-		// send format tablet packet
-		if (m_touch->read())
+	if (m_reset_done == 0 || m_format == FORMAT_UNKNOWN || m_mode != MODE_STREAM)
+	{
+		return;
+	}
+
+	// send format tablet packet
+	if (m_touch->read())
+	{
+		send_touch_packet();
+	}
+	else
+	{
+		if (m_last_touch_state == 1)
 		{
-			send_touch_packet();
-		}
-		else
-		{
-			if ( m_last_touch_state == 1 )
+			m_last_touch_state = 0;
+			switch (m_format)
 			{
-				m_last_touch_state = 0;
-				switch( m_format )
-				{
-					case FORMAT_TABLET:
-						send_format_table_packet(0x88, m_last_x, m_last_y);
-						break;
-					case FORMAT_DECIMAL:
-						send_format_decimal_packet(m_last_x, m_last_y);
-						break;
-					case FORMAT_UNKNOWN:
-						break;
-				}
+				case FORMAT_TABLET:
+					send_format_table_packet(0x88, m_last_x, m_last_y);
+					break;
+				case FORMAT_DECIMAL:
+					send_format_decimal_packet(m_last_x, m_last_y);
+					break;
+				case FORMAT_UNKNOWN:
+					break;
 			}
 		}
 	}
@@ -227,7 +221,7 @@ void microtouch_device::device_start()
 	m_last_y = 0;
 	m_last_touch_state = -1;
 
-	m_timer = timer_alloc();
+	m_timer = timer_alloc(FUNC(microtouch_device::update_output), this);
 	m_timer->adjust(attotime::from_hz(167*5), 0, attotime::from_hz(167*5));
 
 	m_format = FORMAT_UNKNOWN;
@@ -261,10 +255,10 @@ void microtouch_device::rcv_complete()
 	receive_register_extract();
 	m_rx_buffer[m_rx_buffer_ptr] = get_received_char();
 	m_rx_buffer_ptr++;
-	if(m_rx_buffer_ptr == 16)
+	if (m_rx_buffer_ptr == 16)
 		return;
 
-	if (m_rx_buffer_ptr > 0 && (m_rx_buffer[m_rx_buffer_ptr-1] == 0x0d))
+	if (m_rx_buffer_ptr > 0 && m_rx_buffer[m_rx_buffer_ptr-1] == 0x0d)
 	{
 		if (VERBOSE)
 		{
@@ -274,32 +268,32 @@ void microtouch_device::rcv_complete()
 			LOG("Microtouch: received command %s\n", command);
 		}
 		// check command
-		if ( check_command( "MS", m_rx_buffer_ptr, m_rx_buffer ) )
+		if (check_command("MS", m_rx_buffer_ptr, m_rx_buffer))
 		{
 			m_mode = MODE_STREAM;
 		}
-		else if ( check_command( "MI", m_rx_buffer_ptr, m_rx_buffer ) )
+		else if (check_command("MI", m_rx_buffer_ptr, m_rx_buffer))
 		{
 			m_mode = MODE_INACTIVE;
 		}
-		else if ( check_command( "MP", m_rx_buffer_ptr, m_rx_buffer ) )
+		else if (check_command("MP", m_rx_buffer_ptr, m_rx_buffer))
 		{
 			m_mode = MODE_POINT;
 		}
-		else if ( check_command( "R", m_rx_buffer_ptr, m_rx_buffer ) )
+		else if (check_command("R", m_rx_buffer_ptr, m_rx_buffer))
 		{
 			m_tx_buffer_num = 0;
 			m_reset_done = 1;
 		}
-		else if ( check_command( "FT", m_rx_buffer_ptr, m_rx_buffer ) )
+		else if (check_command("FT", m_rx_buffer_ptr, m_rx_buffer))
 		{
 			m_format = FORMAT_TABLET;
 		}
-		else if ( check_command( "FD", m_rx_buffer_ptr, m_rx_buffer ) )
+		else if (check_command("FD", m_rx_buffer_ptr, m_rx_buffer))
 		{
 			m_format = FORMAT_DECIMAL;
 		}
-		else if ( check_command("OI", m_rx_buffer_ptr, m_rx_buffer ) )
+		else if (check_command("OI", m_rx_buffer_ptr, m_rx_buffer))
 		{
 			// output identity - SMT3, ver 01.00
 			m_tx_buffer[m_tx_buffer_num++] = 0x01;
@@ -313,7 +307,7 @@ void microtouch_device::rcv_complete()
 			m_rx_buffer_ptr = 0;
 			return;
 		}
-		else if ( check_command("OS", m_rx_buffer_ptr, m_rx_buffer ) )
+		else if (check_command("OS", m_rx_buffer_ptr, m_rx_buffer))
 		{
 			// output status
 			m_tx_buffer[m_tx_buffer_num++] = 0x01;
@@ -347,9 +341,9 @@ void microtouch_device::rcv_complete()
 	}
 }
 
-INPUT_CHANGED_MEMBER( microtouch_device::touch )
+INPUT_CHANGED_MEMBER(microtouch_device::touch)
 {
-	if ( newval && ( m_mode == MODE_POINT ) )
+	if (newval && (m_mode == MODE_POINT))
 	{
 		send_touch_packet();
 	}
@@ -368,11 +362,11 @@ ROM_END
 
 static INPUT_PORTS_START(microtouch)
 	PORT_START("TOUCH")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME( "Touch screen" ) PORT_CHANGED_MEMBER( DEVICE_SELF,microtouch_device, touch, 0 )
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Touch screen") PORT_CHANGED_MEMBER(DEVICE_SELF, microtouch_device, touch, 0)
 	PORT_START("TOUCH_X")
-	PORT_BIT( 0x3fff, 0x2000, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(45) PORT_KEYDELTA(15)
+	PORT_BIT(0x3fff, 0x2000, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(45) PORT_KEYDELTA(15)
 	PORT_START("TOUCH_Y")
-	PORT_BIT( 0x3fff, 0x2000, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(45) PORT_KEYDELTA(15)
+	PORT_BIT(0x3fff, 0x2000, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(45) PORT_KEYDELTA(15)
 INPUT_PORTS_END
 
 ioport_constructor microtouch_device::device_input_ports() const
@@ -387,7 +381,7 @@ void microtouch_device::tra_callback()
 
 void microtouch_device::tra_complete()
 {
-	if(m_output_valid)
+	if (m_output_valid)
 	{
 		transmit_register_setup(m_output);
 		m_output_valid = false;

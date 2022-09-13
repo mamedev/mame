@@ -67,22 +67,22 @@ private:
 	switch_code_poller                              m_switch_poller;
 	std::unordered_map<std::string, file_entry>     m_file_entries;
 	std::unordered_map<std::string, std::string>    m_filename_to_code_map;
-	std::string_view const                          m_header;
 	std::string_view const                          m_footer;
 	std::string                                     m_delete_prompt;
 	std::string                                     m_confirm_prompt;
 	file_entry const *                              m_confirm_delete;
 	bool const                                      m_must_exist;
 	bool                                            m_keys_released;
+	input_code                                      m_slot_selected;
 
 	static void *itemref_from_file_entry(const file_entry &entry);
 	static const file_entry &file_entry_from_itemref(void *itemref);
 
-	void try_select_slot(std::string &&name);
+	bool try_select_slot(std::string &&name);
 	void slot_selected(std::string &&name);
 	std::string state_directory() const;
 	bool is_present(const std::string &name) const;
-	std::string poll_inputs();
+	std::string poll_inputs(input_code &code);
 	std::string get_visible_name(const std::string &file_name);
 };
 

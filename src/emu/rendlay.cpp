@@ -59,6 +59,9 @@
 // screenless layouts
 #include "noscreens.lh"
 
+// single screen layouts
+#include "monitors.lh"
+
 // dual screen layouts
 #include "dualhsxs.lh"
 #include "dualhovu.lh"
@@ -2465,6 +2468,7 @@ public:
 	led7seg_component(environment &env, util::xml::data_node const &compnode)
 		: component(env, compnode)
 	{
+		m_invert = env.get_attribute_int(compnode, "invert", 0);
 	}
 
 protected:
@@ -2473,8 +2477,8 @@ protected:
 
 	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
-		rgb_t const onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
-		rgb_t const offpen = rgb_t(0x20, 0xff, 0xff, 0xff);
+		rgb_t const onpen = rgb_t(m_invert ? 0x20 : 0xff, 0xff, 0xff, 0xff);
+		rgb_t const offpen = rgb_t(m_invert ? 0xff : 0x20, 0xff, 0xff, 0xff);
 
 		// sizes for computation
 		int const bmwidth = 250;
@@ -2516,6 +2520,8 @@ protected:
 		// resample to the target size
 		render_resample_argb_bitmap_hq(dest, tempbitmap, color(state));
 	}
+private:
+	int m_invert = 0;
 };
 
 

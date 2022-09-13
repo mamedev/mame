@@ -8,9 +8,9 @@
 
 #include <stdexcept>
 
-namespace fs {
+using namespace fs;
 
-const vtech_image VTECH;
+namespace fs { const vtech_image VTECH; }
 
 // Floppy only, format is 40 tracks, 1 head, 16 sectors numbered 0-15, 256 bytes/sector.
 // Filesystem has no subdirectories.
@@ -26,6 +26,38 @@ const vtech_image VTECH;
 //
 //  Files are stored with 126 bytes/sector, and bytes 126 and 127 are
 //  track/sector of the next file data sector.
+
+namespace {
+
+class vtech_impl : public filesystem_t {
+public:
+	vtech_impl(fsblk_t &blockdev);
+	virtual ~vtech_impl() = default;
+
+	virtual meta_data volume_metadata() override;
+	virtual err_t volume_metadata_change(const meta_data &info) override;
+	virtual std::pair<err_t, meta_data> metadata(const std::vector<std::string> &path) override;
+	virtual err_t metadata_change(const std::vector<std::string> &path, const meta_data &meta) override;
+
+	virtual std::pair<err_t, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path) override;
+	virtual err_t rename(const std::vector<std::string> &opath, const std::vector<std::string> &npath) override;
+	virtual err_t remove(const std::vector<std::string> &path) override;
+
+	virtual err_t file_create(const std::vector<std::string> &path, const meta_data &meta) override;
+
+	virtual std::pair<err_t, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
+	virtual err_t file_write(const std::vector<std::string> &path, const std::vector<u8> &data) override;
+
+	virtual err_t format(const meta_data &meta) override;
+
+private:
+	meta_data file_metadata(const u8 *entry);
+	std::tuple<fsblk_t::block_t, u32> file_find(std::string name);
+	std::vector<std::pair<u8, u8>> allocate_blocks(u32 count);
+	void free_blocks(const std::vector<std::pair<u8, u8>> &blocks);
+	u32 free_block_count();
+};
+}
 
 const char *vtech_image::name() const
 {
@@ -45,7 +77,7 @@ void vtech_image::enumerate_f(floppy_enumerator &fe, u32 form_factor, const std:
 
 std::unique_ptr<filesystem_t> vtech_image::mount(fsblk_t &blockdev) const
 {
-	return std::make_unique<impl>(blockdev);
+	return std::make_unique<vtech_impl>(blockdev);
 }
 
 bool vtech_image::can_format() const
@@ -74,12 +106,6 @@ std::vector<meta_description> vtech_image::volume_meta_description() const
 	return res;
 }
 
-meta_data vtech_image::impl::metadata()
-{
-	meta_data res;
-	return res;
-}
-
 std::vector<meta_description> vtech_image::file_meta_description() const
 {
 	std::vector<meta_description> res;
@@ -90,45 +116,42 @@ std::vector<meta_description> vtech_image::file_meta_description() const
 	return res;
 }
 
+vtech_impl::vtech_impl(fsblk_t &blockdev) : filesystem_t(blockdev, 128)
+{
+}
 
-void vtech_image::impl::format(const meta_data &meta)
+err_t vtech_impl::format(const meta_data &meta)
 {
 	m_blockdev.fill(0);
+	return ERR_OK;
 }
 
-vtech_image::impl::impl(fsblk_t &blockdev) : filesystem_t(blockdev, 128), m_root(true)
-{
-}
-
-filesystem_t::dir_t vtech_image::impl::root()
-{
-	if(!m_root)
-		m_root = new root_dir(*this);
-	return m_root.strong();
-}
-
-void vtech_image::impl::drop_root_ref()
-{
-	m_root = nullptr;
-}
-
-void vtech_image::impl::root_dir::drop_weak_references()
-{
-	m_fs.drop_root_ref();
-}
-
-meta_data vtech_image::impl::root_dir::metadata()
+meta_data vtech_impl::volume_metadata()
 {
 	return meta_data();
 }
 
-std::vector<dir_entry> vtech_image::impl::root_dir::contents()
+err_t vtech_impl::volume_metadata_change(const meta_data &meta)
 {
-	std::vector<dir_entry> res;
+	return ERR_OK;
+}
 
-	u64 id = 0;
+meta_data vtech_impl::file_metadata(const u8 *entry)
+{
+	meta_data res;
+
+	res.set(meta_name::name, trim_end_spaces(rstr(entry+2, 8)));
+	res.set(meta_name::basic, entry[0] == 'T');
+	res.set(meta_name::loading_address, r16l(entry + 0xc));
+	res.set(meta_name::length, ((r16l(entry + 0xe) - r16l(entry + 0xc) + 1) & 0xffff));
+
+	return res;
+}
+
+std::tuple<fsblk_t::block_t, u32> vtech_impl::file_find(std::string name)
+{
 	for(int sect = 0; sect != 14; sect++) {
-		auto bdir = m_fs.m_blockdev.get(sect);
+		auto bdir = m_blockdev.get(sect);
 		for(u32 i = 0; i != 8; i ++) {
 			u32 off = i*16;
 			u8 type = bdir.r8(off);
@@ -136,69 +159,154 @@ std::vector<dir_entry> vtech_image::impl::root_dir::contents()
 				continue;
 			if(bdir.r8(off+1) != ':')
 				continue;
-			std::string fname = trim_end_spaces(bdir.rstr(off+2, 8));
-			res.emplace_back(dir_entry(fname, dir_entry_type::file, id));
-			id++;
+			if(trim_end_spaces(bdir.rstr(off+2, 8)) == name) {
+				return std::make_tuple(bdir, i);
+			}
+		}
+	}
+	return std::make_tuple(fsblk_t::block_t(), 0xffffffff);
+}
+
+std::pair<err_t, meta_data> vtech_impl::metadata(const std::vector<std::string> &path)
+{
+	if(path.size() != 1)
+		return std::make_pair(ERR_NOT_FOUND, meta_data());
+
+	auto [bdir, off] = file_find(path[0]);
+	if(off == 0xffffffff)
+		return std::make_pair(ERR_NOT_FOUND, meta_data());
+
+	return std::make_pair(ERR_OK, file_metadata(bdir.rodata() + off));
+}
+
+err_t vtech_impl::metadata_change(const std::vector<std::string> &path, const meta_data &meta)
+{
+	if(path.size() != 1)
+		return ERR_NOT_FOUND;
+
+	auto [bdir, off] = file_find(path[0]);
+	if(!off)
+		return ERR_NOT_FOUND;
+
+	u8 *entry = bdir.data() + off;
+	if(meta.has(meta_name::basic))
+		w8  (entry+0x0, meta.get_flag(meta_name::basic) ? 'T' : 'B');
+	if(meta.has(meta_name::name)) {
+		std::string name = meta.get_string(meta_name::name);
+		name.resize(8, ' ');
+		wstr(entry+0x2, name);
+	}
+	if(meta.has(meta_name::loading_address)) {
+		u16 new_loading = meta.get_number(meta_name::loading_address);
+		u16 new_end = r16l(entry + 0xe) - r16l(entry + 0xc) + new_loading;
+		w16l(entry + 0xc, new_loading);
+		w16l(entry + 0xe, new_end);
+	}
+
+	return ERR_OK;
+}
+
+std::pair<err_t, std::vector<dir_entry>> vtech_impl::directory_contents(const std::vector<std::string> &path)
+{
+	std::pair<err_t, std::vector<dir_entry>> res;
+
+	if(path.size() != 0) {
+		res.first = ERR_NOT_FOUND;
+		return res;
+	}
+
+	res.first = ERR_OK;
+
+	for(int sect = 0; sect != 14; sect++) {
+		auto bdir = m_blockdev.get(sect);
+		for(u32 i = 0; i != 8; i ++) {
+			u32 off = i*16;
+			u8 type = bdir.r8(off);
+			if(type != 'T' && type != 'B')
+				continue;
+			if(bdir.r8(off+1) != ':')
+				continue;
+			meta_data meta = file_metadata(bdir.rodata()+off);
+			res.second.emplace_back(dir_entry(dir_entry_type::file, meta));
 		}
 	}
 	return res;
 }
 
-filesystem_t::file_t vtech_image::impl::root_dir::file_get(u64 key)
+err_t vtech_impl::rename(const std::vector<std::string> &opath, const std::vector<std::string> &npath)
 {
-	if(key >= 15*8)
-		throw std::out_of_range("Key out of range");
+	if(opath.size() != 1 || npath.size() != 1)
+		return ERR_NOT_FOUND;
 
-	auto bdir = m_fs.m_blockdev.get(key >> 3);
-	int off = (key & 7) << 4;
-	return file_t(new file(m_fs, this, bdir.rodata() + off, key));
+	auto [bdir, off] = file_find(opath[0]);
+	if(!off)
+		return ERR_NOT_FOUND;
+
+	std::string name = npath[0];
+	name.resize(8, ' ');
+	wstr(bdir.data() + off + 2, name);
+
+	return ERR_OK;
 }
 
-void vtech_image::impl::root_dir::update_file(u16 key, const u8 *entry)
+err_t vtech_impl::remove(const std::vector<std::string> &path)
 {
-	auto bdir = m_fs.m_blockdev.get(key >> 3);
-	int off = (key & 7) << 4;
-	bdir.copy(off, entry, 16);
+	return ERR_NOT_FOUND;
 }
 
-filesystem_t::dir_t vtech_image::impl::root_dir::dir_get(u64 key)
+
+err_t vtech_impl::file_create(const std::vector<std::string> &path, const meta_data &meta)
 {
-	throw std::logic_error("Directories not supported");
+	if(path.size() != 0)
+		return ERR_NOT_FOUND;
+
+	// Find the key for the next unused entry
+	for(int sect = 0; sect != 14; sect++) {
+		auto bdir = m_blockdev.get(sect);
+		for(u32 i = 0; i != 16; i ++) {
+			u32 off = i*16;
+			u8 type = bdir.r8(off);
+			if(type != 'T' && type != 'B') {
+				std::string fname = meta.get_string(meta_name::name, "");
+				fname.resize(8, ' ');
+
+				bdir.w8  (off+0x0, meta.get_flag(meta_name::basic, true) ? 'T' : 'B');
+				bdir.w8  (off+0x1, ':');
+				bdir.wstr(off+0x2, fname);
+				bdir.w8  (off+0xa, 0x00);
+				bdir.w8  (off+0xb, 0x00);
+				bdir.w16l(off+0xc, meta.get_number(meta_name::loading_address, 0x7ae9));
+				bdir.w16l(off+0xe, bdir.r16l(off+0xc) - 1); // Size 0 initially
+				return ERR_OK;
+			}
+		}
+	}
+	return ERR_NO_SPACE;
 }
 
-vtech_image::impl::file::file(impl &fs, root_dir *dir, const u8 *entry, u16 key) : m_fs(fs), m_dir(dir), m_key(key)
+std::pair<err_t, std::vector<u8>> vtech_impl::file_read(const std::vector<std::string> &path)
 {
-	memcpy(m_entry, entry, 16);
-}
+	std::vector<u8> data;
 
-void vtech_image::impl::file::drop_weak_references()
-{
-}
+	if(path.size() != 1)
+		return std::make_pair(ERR_NOT_FOUND, data);
 
-meta_data vtech_image::impl::file::metadata()
-{
-	meta_data res;
+	auto [bdir, off] = file_find(path[0]);
+	if(off == 0xffffffff)
+		return std::make_pair(ERR_NOT_FOUND, data);
 
-	res.set(meta_name::name, trim_end_spaces(rstr(m_entry+2, 8)));
-	res.set(meta_name::basic, m_entry[0] == 'T');
-	res.set(meta_name::loading_address, r16l(m_entry + 0xc));
-	res.set(meta_name::length, ((r16l(m_entry + 0xe) - r16l(m_entry + 0xc) + 1) & 0xffff));
+	const u8 *entry = bdir.rodata() + off;
 
-	return res;
-}
+	u8 track = entry[0xa];
+	u8 sector = entry[0xb];
+	int len = ((r16l(entry + 0xe) - r16l(entry + 0xc)) & 0xffff) + 1;
 
-std::vector<u8> vtech_image::impl::file::read_all()
-{
-	u8 track = m_entry[0xa];
-	u8 sector = m_entry[0xb];
-	int len = ((r16l(m_entry + 0xe) - r16l(m_entry + 0xc)) & 0xffff) + 1;
-
-	std::vector<u8> data(len, 0);
+	data.resize(len, 0);
 	int pos = 0;
 	while(pos < len) {
 		if(track >= 40 || sector >= 16)
 			break;
-		auto dblk = m_fs.m_blockdev.get(track*16 + sector);
+		auto dblk = m_blockdev.get(track*16 + sector);
 		int size = len - pos;
 		if(size > 126)
 			size = 126;
@@ -207,44 +315,21 @@ std::vector<u8> vtech_image::impl::file::read_all()
 		track = dblk.r8(126);
 		sector = dblk.r8(127);
 	}
-	return data;
+	return std::make_pair(ERR_OK, data);
 }
 
-vtech_image::impl::file_t vtech_image::impl::root_dir::file_create(const meta_data &info)
+err_t vtech_impl::file_write(const std::vector<std::string> &path, const std::vector<u8> &data)
 {
-	// Find the key for the next unused entry
-	for(int sect = 0; sect != 14; sect++) {
-		auto bdir = m_fs.m_blockdev.get(sect);
-		u64 id = 0;
-		for(u32 i = 0; i != 16; i ++) {
-			u32 off = i*16;
-			u8 type = bdir.r8(off);
-			if(type != 'T' && type != 'B') {
-				std::string fname = info.get_string(meta_name::name, "");
-				fname.resize(8, ' ');
+	if(path.size() != 1)
+		return ERR_NOT_FOUND;
 
-				bdir.w8  (off+0x0, info.get_flag(meta_name::basic, true) ? 'T' : 'B');
-				bdir.w8  (off+0x1, ':');
-				bdir.wstr(off+0x2, fname);
-				bdir.w8  (off+0xa, 0x00);
-				bdir.w8  (off+0xb, 0x00);
-				bdir.w16l(off+0xc, info.get_number(meta_name::loading_address, 0x7ae9));
-				bdir.w16l(off+0xe, bdir.r16l(off+0xc) - 1); // Size 0 initially
-				return file_t(new file(m_fs, this, bdir.rodata() + off, id));
-			}
-			id++;
-		}
-	}
-	return nullptr;
-}
+	auto [bdir, off] = file_find(path[0]);
+	if(off == 0xffffffff)
+		return ERR_NOT_FOUND;
 
-void vtech_image::impl::root_dir::file_delete(u64 key)
-{
-}
+	u8 *entry = bdir.data() + off;
 
-void vtech_image::impl::file::replace(const std::vector<u8> &data)
-{
-	u32 cur_len = ((r16l(m_entry + 0xe) - r16l(m_entry + 0xc) + 1) & 0xffff);
+	u32 cur_len = ((r16l(entry + 0xe) - r16l(entry + 0xc) + 1) & 0xffff);
 	u32 new_len = data.size();
 	if(new_len > 65535)
 		new_len = 65535;
@@ -252,24 +337,24 @@ void vtech_image::impl::file::replace(const std::vector<u8> &data)
 	u32 need_ns = (new_len + 125) / 126;
 
 	// Enough space?
-	if(cur_ns < need_ns && m_fs.free_block_count() < need_ns - cur_ns)
-		return;
+	if(cur_ns < need_ns && free_block_count() < need_ns - cur_ns)
+		return ERR_NO_SPACE;
 
-	u8 track = m_entry[0xa];
-	u8 sector = m_entry[0xb];
+	u8 track = entry[0xa];
+	u8 sector = entry[0xb];
 	std::vector<std::pair<u8, u8>> tofree;
 	for(u32 i = 0; i != cur_ns; i++) {
 		tofree.emplace_back(std::make_pair(track, sector));
-		auto dblk = m_fs.m_blockdev.get(track*16 + sector);
+		auto dblk = m_blockdev.get(track*16 + sector);
 		track = dblk.r8(126);
 		sector = dblk.r8(127);
 	}
 
-	m_fs.free_blocks(tofree);
+	free_blocks(tofree);
 
-	std::vector<std::pair<u8, u8>> blocks = m_fs.allocate_blocks(need_ns);
+	std::vector<std::pair<u8, u8>> blocks = allocate_blocks(need_ns);
 	for(u32 i=0; i != need_ns; i ++) {
-		auto dblk = m_fs.m_blockdev.get(blocks[i].first * 16 + blocks[i].second);
+		auto dblk = m_blockdev.get(blocks[i].first * 16 + blocks[i].second);
 		u32 len = new_len - i*126;
 		if(len > 126)
 			len = 126;
@@ -283,44 +368,18 @@ void vtech_image::impl::file::replace(const std::vector<u8> &data)
 			dblk.w16l(126, 0);
 	}
 
-	u16 end_address = (r16l(m_entry + 0xc) + data.size() - 1) & 0xffff;
-	w16l(m_entry + 0xe, end_address);
+	u16 end_address = (r16l(entry + 0xc) + data.size() - 1) & 0xffff;
+	w16l(entry + 0xe, end_address);
 	if(need_ns) {
-		w8(m_entry + 0xa, blocks[0].first);
-		w8(m_entry + 0xb, blocks[0].second);
+		w8(entry + 0xa, blocks[0].first);
+		w8(entry + 0xb, blocks[0].second);
 	} else
-		w16l(m_entry + 0xa, 0);
+		w16l(entry + 0xa, 0);
 
-	m_dir->update_file(m_key, m_entry);
+	return ERR_OK;
 }
 
-void vtech_image::impl::root_dir::metadata_change(const meta_data &info)
-{
-}
-
-void vtech_image::impl::metadata_change(const meta_data &info)
-{
-}
-
-void vtech_image::impl::file::metadata_change(const meta_data &info)
-{
-	if(info.has(meta_name::basic))
-		w8  (m_entry+0x0, info.get_flag(meta_name::basic) ? 'T' : 'B');
-	if(info.has(meta_name::name)) {
-		std::string name = info.get_string(meta_name::name);
-		name.resize(8, ' ');
-		wstr(m_entry+0x2, name);
-	}
-	if(info.has(meta_name::loading_address)) {
-		u16 new_loading = info.get_number(meta_name::loading_address);
-		u16 new_end = r16l(m_entry + 0xe) - r16l(m_entry + 0xc) + new_loading;
-		w16l(m_entry + 0xc, new_loading);
-		w16l(m_entry + 0xe, new_end);
-	}
-	m_dir->update_file(m_key, m_entry);
-}
-
-std::vector<std::pair<u8, u8>> vtech_image::impl::allocate_blocks(u32 count)
+std::vector<std::pair<u8, u8>> vtech_impl::allocate_blocks(u32 count)
 {
 	std::vector<std::pair<u8, u8>> blocks;
 	if(free_block_count() < count)
@@ -341,7 +400,7 @@ std::vector<std::pair<u8, u8>> vtech_image::impl::allocate_blocks(u32 count)
 	abort();
 }
 
-void vtech_image::impl::free_blocks(const std::vector<std::pair<u8, u8>> &blocks)
+void vtech_impl::free_blocks(const std::vector<std::pair<u8, u8>> &blocks)
 {
 	auto fmap = m_blockdev.get(15);
 	for(auto ref : blocks) {
@@ -353,7 +412,7 @@ void vtech_image::impl::free_blocks(const std::vector<std::pair<u8, u8>> &blocks
 	}
 }
 
-u32 vtech_image::impl::free_block_count()
+u32 vtech_impl::free_block_count()
 {
 	auto fmap = m_blockdev.get(15);
 	u32 nf = 0;
@@ -367,5 +426,3 @@ u32 vtech_image::impl::free_block_count()
 	}
 	return nf;
 }
-
-} // namespace fs

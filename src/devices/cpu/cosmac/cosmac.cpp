@@ -10,7 +10,7 @@ TODO:
 - is it useful to emulate I and N registers or can they just be defined as (m_op >> x & 0xf)?
 - 1804/5/6: extended opcode timing is wrong, multiple execute states
 - 1804/5/6: add more extended opcodes (05/06 supports more than 04)
-- 1804/5/6: add counter/timer
+- 1804/5/6: other counter modes
 - 1804/5: add internal address map (ram/rom)
 
 **********************************************************************/
@@ -251,10 +251,10 @@ cosmac_device::ophandler cdp1802_device::get_ophandler(uint16_t opcode) const
 
 const cosmac_device::ophandler cdp1804_device::s_opcodetable_ex[256] =
 {
-	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
-	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::ldc,    &cdp1804_device::und,
-	&cdp1804_device::gec,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
-	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::stpc,   &cdp1804_device::und,    &cdp1804_device::spm2,   &cdp1804_device::scm2,
+	&cdp1804_device::spm1,   &cdp1804_device::scm1,   &cdp1804_device::ldc,    &cdp1804_device::stm,
+	&cdp1804_device::gec,    &cdp1804_device::und,    &cdp1804_device::xie,    &cdp1804_device::xid,
+	&cdp1804_device::cie,    &cdp1804_device::cid,    &cdp1804_device::und,    &cdp1804_device::und,
 
 	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
 	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
@@ -371,7 +371,6 @@ cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, co
 		m_write_dma(*this),
 		m_write_sc(*this),
 		m_write_tpb(*this),
-		m_op(0),
 		m_state(cosmac_state::STATE_1_INIT),
 		m_mode(cosmac_mode::RESET),
 		m_pmode(cosmac_mode::RUN),
@@ -451,6 +450,34 @@ cdp1806_device::cdp1806_device(const machine_config &mconfig, const char *tag, d
 
 void cosmac_device::device_start()
 {
+	// init uninitialized
+	m_pc = 0;
+	m_op = 0;
+	m_flagsio = 0;
+
+	m_d = 0;
+	m_b = 0;
+	m_p = 0;
+	m_x = 0;
+	m_n = 0;
+	m_i = 0;
+	m_t = 0;
+
+	m_df = 0;
+	m_ie = 0;
+	m_cie = 0;
+	m_xie = 0;
+	m_cil = 0;
+	m_q = 0;
+
+	for (uint16_t &r : m_r)
+		r = 0;
+
+	m_cnt_mode = 0;
+	m_cnt_load = 0;
+	m_cnt_count = 0;
+	m_cnt_timer = timer_alloc(FUNC(cosmac_device::cnt_timerout), this);
+
 	// resolve callbacks
 	m_read_wait.resolve();
 	m_read_clear.resolve();
@@ -508,7 +535,13 @@ void cosmac_device::device_start()
 	save_item(NAME(m_t));
 	save_item(NAME(m_df));
 	save_item(NAME(m_ie));
+	save_item(NAME(m_cie));
+	save_item(NAME(m_xie));
+	save_item(NAME(m_cil));
 	save_item(NAME(m_q));
+	save_item(NAME(m_cnt_mode));
+	save_item(NAME(m_cnt_load));
+	save_item(NAME(m_cnt_count));
 
 	// set our instruction counter
 	set_icountptr(m_icount);
@@ -521,13 +554,7 @@ void cosmac_device::device_start()
 
 void cosmac_device::device_reset()
 {
-	m_ie = 0;
-	set_q_flag(0);
-	m_df = 0;
-	m_p = 0;
-
-	for (uint16_t &r : m_r)
-		r = machine().rand() & 0xffff;
+	// not here, it's done with WAIT and CLEAR lines
 }
 
 
@@ -1053,7 +1080,7 @@ inline void cosmac_device::fetch_instruction()
 //  reset_state - handle reset state
 //-------------------------------------------------
 
-inline void cosmac_device::reset_state()
+void cosmac_device::reset_state()
 {
 	m_state = cosmac_state::STATE_1_INIT;
 
@@ -1067,6 +1094,16 @@ inline void cosmac_device::reset_state()
 		output_state_code();
 }
 
+void cdp1804_device::reset_state()
+{
+	m_xie = 1;
+	m_cie = 1;
+	m_cil = 0;
+	stop_count();
+
+	cosmac_device::reset_state();
+}
+
 
 //-------------------------------------------------
 //  initialize - handle initialization state
@@ -1074,6 +1111,7 @@ inline void cosmac_device::reset_state()
 
 inline void cosmac_device::initialize()
 {
+	T = (X << 4) | P;
 	X = 0;
 	P = 0;
 	R[0] = 0;
@@ -1123,7 +1161,7 @@ inline void cosmac_device::execute_instruction()
 	{
 		m_state = cosmac_state::STATE_2_DMA_OUT;
 	}
-	else if (IE && m_irq)
+	else if (check_irq())
 	{
 		m_state = cosmac_state::STATE_3_INT;
 	}
@@ -1155,7 +1193,7 @@ inline void cosmac_device::dma_input()
 	{
 		m_state = cosmac_state::STATE_2_DMA_OUT;
 	}
-	else if (IE && m_irq)
+	else if (check_irq())
 	{
 		m_state = cosmac_state::STATE_3_INT;
 	}
@@ -1193,7 +1231,7 @@ inline void cosmac_device::dma_output()
 	{
 		m_state = cosmac_state::STATE_2_DMA_OUT;
 	}
-	else if (IE && m_irq)
+	else if (check_irq())
 	{
 		m_state = cosmac_state::STATE_3_INT;
 	}
@@ -1397,7 +1435,7 @@ void cosmac_device::lsie()  { long_skip(IE); }
 // control instructions opcode handlers
 void cosmac_device::idl()   { /* idle */ }
 void cosmac_device::nop()   { }
-void cosmac_device::und()   { /* undefined opcode in CDP1801 */ }
+void cosmac_device::und()   { /* undefined opcode */ }
 void cosmac_device::sep()   { P = N; }
 void cosmac_device::sex()   { X = N; }
 void cosmac_device::seq()   { set_q_flag(1); }
@@ -1454,11 +1492,68 @@ void cosmac_device::rsxd()  { RAM_W(R[X], R[N] & 0xff); R[X]--; RAM_W(R[X], R[N]
 
 void cosmac_device::rnx()   { R[X] = R[N]; }
 
-void cosmac_device::bci()   { short_branch(1); } // wrong! tests CI flag
-void cosmac_device::bxi()   { short_branch(0); } // wrong! tests XI flag
+void cosmac_device::bci()   { short_branch(m_cil); m_cil = 0; }
+void cosmac_device::bxi()   { short_branch(m_irq); }
 
-void cosmac_device::ldc()   { /* logerror("LDC counter set: %X\n", D); */ }
-void cosmac_device::gec()   { D = machine().rand() & 0xf; } // wrong!
+void cosmac_device::xie()   { m_xie = 1; }
+void cosmac_device::xid()   { m_xie = 0; }
+void cosmac_device::cie()   { m_cie = 1; }
+void cosmac_device::cid()   { m_cie = 0; }
+
+void cosmac_device::scm1()  { stop_count(); m_cnt_mode = 2; }
+void cosmac_device::scm2()  { stop_count(); m_cnt_mode = 3; }
+void cosmac_device::spm1()  { stop_count(); m_cnt_mode = 4; }
+void cosmac_device::spm2()  { stop_count(); m_cnt_mode = 5; }
+
+void cosmac_device::gec()   { D = get_count(); }
+void cosmac_device::stpc()  { stop_count(); }
+
+void cosmac_device::stm()
+{
+	if (m_cnt_mode != 1)
+	{
+		// start clocking counter in timer mode
+		m_cnt_mode = 1;
+		int count = (m_cnt_count == 0) ? 0x100 : m_cnt_count;
+		m_cnt_timer->adjust(attotime::from_ticks(0x100 * count, clock()));
+	}
+}
+
+void cosmac_device::ldc()
+{
+	m_cnt_load = D;
+	if (m_cnt_mode == 0)
+	{
+		m_cnt_count = m_cnt_load;
+		m_cil = 0;
+	}
+}
+
+uint8_t cosmac_device::get_count()
+{
+	if (m_cnt_mode == 1)
+	{
+		// get current count of active timer (rounded up)
+		uint64_t ticks = m_cnt_timer->remaining().as_ticks(clock());
+		return (ticks >> 8) + ((ticks & 0xff) ? 1 : 0);
+	}
+	else
+		return m_cnt_count;
+}
+
+void cosmac_device::stop_count()
+{
+	m_cnt_count = get_count();
+	m_cnt_mode = 0;
+	m_cnt_timer->adjust(attotime::never);
+}
+
+TIMER_CALLBACK_MEMBER(cosmac_device::cnt_timerout)
+{
+	m_cil = 1;
+	int count = (m_cnt_load == 0) ? 0x100 : m_cnt_load;
+	m_cnt_timer->adjust(attotime::from_ticks(0x100 * count, clock()));
+}
 
 // CDP1805/06 additional extended opcodes
 // TODO

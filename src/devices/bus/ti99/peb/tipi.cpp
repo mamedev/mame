@@ -80,12 +80,12 @@
 #define LOG_EPROM      (1U<<2)
 #define LOG_CRU        (1U<<3)
 #define LOG_PORTS      (1U<<4)
-#define LOG_CONFIG     (1U<<5)
-#define LOG_RPI        (1U<<6)
-#define LOG_QUEUE      (1U<<7)
-#define LOG_PROT       (1U<<8)
+#define LOG_RPI        (1U<<5)
+#define LOG_QUEUE      (1U<<6)
+#define LOG_PROT       (1U<<7)
+#define LOG_DETAIL     (1U<<8)
 
-#define VERBOSE ( LOG_GENERAL | LOG_WARN | LOG_CONFIG )
+#define VERBOSE ( LOG_GENERAL | LOG_WARN )
 #define RASPI "rpi"
 
 #include "logmacro.h"
@@ -103,8 +103,10 @@ tipi_card_device::tipi_card_device(const machine_config &mconfig, const char *ta
 	m_dsr(false),
 	m_portaccess(false),
 	m_waitinit(false),
+	m_syncmode(true),
 	m_rpiconn(false),
 	m_tc(0),
+	m_rd(0),
 	m_lasttc(0)
 {
 }
@@ -155,9 +157,8 @@ void tipi_card_device::readz(offs_t offset, uint8_t *value)
 			int val = 0;
 			if (m_address & 2)
 			{
-				val = m_indqueue.front();
-				m_indqueue.pop();
-				LOGMASKED(LOG_PORTS, "RDIN -> %02x\n", val);
+				LOGMASKED(LOG_PORTS, "RDIN -> %02x\n", m_rd);
+				val = m_rd;
 			}
 			else
 			{
@@ -263,7 +264,11 @@ void tipi_card_device::cruwrite(offs_t offset, uint8_t data)
 			break;
 		case 1:
 			LOGMASKED(LOG_CRU, "CRU Bit 1 %s\n", (data!=0)? "on" : "off");
-			if (data != 0) send("RESET");
+			if (data != 0)
+			{
+				LOGMASKED(LOG_RPI, "Sending RESET\n");
+				send("RESET");
+			}
 			break;
 		default:
 			LOGMASKED(LOG_CRU, "Unknown CRU Bit %d\n", bit);
@@ -274,7 +279,7 @@ void tipi_card_device::cruwrite(offs_t offset, uint8_t data)
 
 void tipi_card_device::send(const char* message)
 {
-	if (m_rpiconn)
+	if (m_rpiconn && m_connected)
 	{
 		*m_send_stream << message;
 		m_wsclient->send(m_send_stream);
@@ -283,11 +288,11 @@ void tipi_card_device::send(const char* message)
 
 void tipi_card_device::send(u8* message, int len)
 {
-	if (m_rpiconn)
+	if (m_rpiconn && m_connected)
 	{
 		for (int i=0; i < len; i++)
 		{
-			LOGMASKED(LOG_RPI, "Sending byte %02x\n", message[i]);
+			LOGMASKED(LOG_DETAIL, "Sending byte %02x\n", message[i]);
 			*m_send_stream << message[i];
 		}
 		m_wsclient->send(m_send_stream, nullptr, 130);  // binary (10000010)
@@ -393,6 +398,9 @@ void tipi_card_device::process_message()
 					{
 						m_rc = m_tc;   // Auto-acknowledge
 						m_lasttc = m_tc;
+
+						m_rd = m_indqueue.front();
+						m_indqueue.pop();
 					}
 				}
 			}
@@ -406,7 +414,7 @@ void tipi_card_device::process_message()
 
     Default for port is 9901.
 */
-void tipi_card_device::open_websocket()
+TIMER_CALLBACK_MEMBER(tipi_card_device::open_websocket)
 {
 	if (m_rpiconn)
 	{
@@ -459,24 +467,35 @@ void tipi_card_device::websocket_opened()
 	LOG("Connection established\n");
 	m_connected = true;
 	m_rc = 0;
-
 	if (m_waitinit) m_slot->set_ready(ASSERT_LINE);
 }
 
 void tipi_card_device::websocket_incoming(std::shared_ptr<webpp::ws_client::Message> message)
 {
+	// Caution: Message is an istream, so the string method consumes the Message
+	// Size is not changed, nor is fin_rsv_opcode
+	std::string msg;
+
 	switch (message->fin_rsv_opcode & 0x0f)
 	{
 	case 1:
+		msg = message->string();
 		// Text message is "RD=xxx" or "RC=xxx" with xxx=decimal number
-		LOGMASKED(LOG_RPI, "Got text message: %s\n", message->string());
-		if (message->string().find("RD=")==0)
+
+		LOGMASKED(LOG_RPI, "Got text message: %s\n", msg);
+
+		if (msg.find("RD=")==0)
 		{
 			m_indqueue.push(std::stoi(message->string().substr(3)));
 		}
-		if (message->string().find("RC=")==0)
+		if (msg.find("RC=")==0)
 		{
 			m_rc = std::stoi(message->string().substr(3));
+		}
+		if (msg.find("ASYNC")==0)
+		{
+			LOG("TIPI server offers ASYNC communication\n");
+			m_syncmode = false;
 		}
 		break;
 
@@ -539,15 +558,6 @@ void tipi_card_device::websocket_error(const std::error_code& code)
 	}
 }
 
-/*
-    Restart the websocket connection
-*/
-void tipi_card_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	open_websocket();
-}
-
-
 void tipi_card_device::websocket_closed(int i, const std::string& msg)
 {
 	LOG("Closing connection\n");
@@ -573,7 +583,7 @@ void tipi_card_device::device_start()
 	save_item(NAME(m_rc));
 	save_item(NAME(m_lasttc));
 
-	m_restart_timer = timer_alloc(0);
+	m_restart_timer = timer_alloc(FUNC(tipi_card_device::open_websocket), this);
 	m_rpiconn = (m_rpi->exists());
 }
 
@@ -581,12 +591,14 @@ void tipi_card_device::device_reset()
 {
 	m_cru_base = (ioport("SW1")->read()) << 8;
 	m_waitinit = (ioport("WAIT")->read()!=0);
-	m_syncmode = (ioport("MODE")->read()!=0);
+	m_syncmode = true;
 	m_address = 0;
 	m_dsr = false;
 	m_portaccess = false;
-	if (!m_rpiconn) LOGMASKED(LOG_CONFIG, "No Raspberry Pi connected\n");
-	open_websocket();
+	if (!m_rpiconn) LOGMASKED(LOG_WARN, "No Raspberry Pi connected\n");
+
+	// READY=0 is ignored at this point because the CPU is being reset at this time
+	open_websocket(0);
 	m_connected = false;
 	m_lasttc = 0;
 	m_attempts = 5;
@@ -596,17 +608,18 @@ void tipi_card_device::device_stop()
 {
 	// MZ: Without this I'm getting segfaults/list corruption
 	// when leaving the emulation
-	m_wsclient = NULL;
+	m_wsclient->stop();
 	LOG("Stopping TIPI\n");
 }
 
 /*
     The CRU address base for the card.
+    For the Geneve OS version 7.30, CRU base 1800 is mandatory.
 */
 INPUT_PORTS_START( tipi )
 	PORT_START("SW1")
-	PORT_DIPNAME(0x1f, 0x10, "CRU base")
-		PORT_DIPSETTING(0x10, "1000") // Default setting
+	PORT_DIPNAME(0x1f, 0x18, "CRU base")
+		PORT_DIPSETTING(0x10, "1000")
 		PORT_DIPSETTING(0x11, "1100")
 		PORT_DIPSETTING(0x12, "1200")
 		PORT_DIPSETTING(0x13, "1300")
@@ -614,7 +627,7 @@ INPUT_PORTS_START( tipi )
 		PORT_DIPSETTING(0x15, "1500")
 		PORT_DIPSETTING(0x16, "1600")
 		PORT_DIPSETTING(0x17, "1700")
-		PORT_DIPSETTING(0x18, "1800")
+		PORT_DIPSETTING(0x18, "1800") // Default setting
 		PORT_DIPSETTING(0x19, "1900")
 		PORT_DIPSETTING(0x1a, "1a00")
 		PORT_DIPSETTING(0x1b, "1b00")
@@ -626,11 +639,6 @@ INPUT_PORTS_START( tipi )
 	PORT_CONFNAME(0x01, 0x00, "Wait for initialization")
 		PORT_CONFSETTING( 0x00, DEF_STR( Off ) )
 		PORT_CONFSETTING( 0x01, DEF_STR( On ) )
-	PORT_START("MODE")
-	PORT_CONFNAME(0x01, 0x00, "Transfer mode")
-		PORT_CONFSETTING( 0x00, "async" )
-		PORT_CONFSETTING( 0x01, "sync" )
-
 INPUT_PORTS_END
 
 void tipi_card_device::device_add_mconfig(machine_config &config)

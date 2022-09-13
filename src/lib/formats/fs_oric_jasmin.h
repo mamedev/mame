@@ -29,8 +29,6 @@ public:
 
 	virtual std::vector<meta_description> volume_meta_description() const override;
 	virtual std::vector<meta_description> file_meta_description() const override;
-
-	static bool validate_filename(std::string name);
 };
 
 extern const oric_jasmin_image ORIC_JASMIN;

@@ -49,7 +49,6 @@
 #define VERBOSE         (0)
 #include "logmacro.h"
 
-
 /***************************************************************************
     LOCAL VARIABLES
 ***************************************************************************/
@@ -95,9 +94,9 @@ void ptm6840_device::device_start()
 	m_out_cb.resolve_all_safe();
 	m_irq_cb.resolve_safe();
 
-	m_timer[0] = timer_alloc(0);
-	m_timer[1] = timer_alloc(1);
-	m_timer[2] = timer_alloc(2);
+	m_timer[0] = timer_alloc(FUNC(ptm6840_device::state_changed), this);
+	m_timer[1] = timer_alloc(FUNC(ptm6840_device::state_changed), this);
+	m_timer[2] = timer_alloc(FUNC(ptm6840_device::state_changed), this);
 
 	for (auto & elem : m_timer)
 	{
@@ -118,12 +117,12 @@ void ptm6840_device::device_start()
 	save_item(NAME(m_gate));
 	save_item(NAME(m_clk));
 	save_item(NAME(m_mode));
-	save_item(NAME(m_fired));
+	save_item(NAME(m_single_fired));
 	save_item(NAME(m_enabled));
 	save_item(NAME(m_external_clock));
 	save_item(NAME(m_counter));
+	save_item(NAME(m_disable_time));
 	save_item(NAME(m_latch));
-	save_item(NAME(m_hightime));
 }
 
 
@@ -141,136 +140,79 @@ void ptm6840_device::device_reset()
 	m_status_read_since_int = 0;
 	m_irq                   = 0;
 	m_t3_scaler             = 0;
-	m_hightime[0]           = false;
-	m_hightime[1]           = false;
-	m_hightime[2]           = false;
 
 	for (int i = 0; i < 3; i++)
 	{
-		m_counter[i] = 0xffff;
-		m_latch[i]   = 0xffff;
-		m_output[i]  = 0;
-		m_fired[i]   = 0;
-		m_enabled[i] = 0;
-		m_mode[i] = 0;
+		m_counter[i]      = 0xffff;
+		m_latch[i]        = 0xffff;
+		m_disable_time[i] = attotime::never;
+		m_output[i]       = false;
+		m_clk[i]          = false;
+		m_single_fired[i] = false;
+		m_enabled[i]      = false;
+		m_mode[i]         = 0;
 	}
 }
 
 void ptm6840_device::device_resolve_objects()
 {
 	for (int i = 0; i < 3; i++)
-		m_gate[i]  = 0;
-}
-
-//-------------------------------------------------
-//  device_timer - handle timer callbacks
-//-------------------------------------------------
-
-void ptm6840_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	timeout(id);
+		m_gate[i] = false;
 }
 
 
 //-------------------------------------------------
-//  subtract_from_counter - Subtract from Counter
+//  deduct_from_counter - count back by one step
 //-------------------------------------------------
 
-void ptm6840_device::subtract_from_counter(int counter, int count)
+void ptm6840_device::deduct_from_counter(int idx)
 {
-	// Determine the clock frequency for this timer
-	double clk = m_control_reg[counter] & INTERNAL_CLK_EN ? static_cast<double>(clock()) : m_external_clock[counter];
-
-	// Dual-byte mode
-	if (m_control_reg[counter] & COUNT_MODE_8BIT)
+	if (m_control_reg[idx] & COUNT_MODE_8BIT)
 	{
-		int lsb = m_counter[counter] & 0xff;
-		int msb = m_counter[counter] >> 8;
+		// Dual-byte mode
+		uint16_t msb = m_counter[idx] >> 8;
+		uint16_t lsb = m_counter[idx] & 0xff;
 
-		// Count the clocks
-		lsb -= count;
+		lsb--;
 
-		// Loop while we're less than zero
-		while (lsb < 0)
+		bool timed_out = false;
+		if (lsb == 0xffff)
 		{
 			// Borrow from the MSB
-			lsb += (m_latch[counter] & 0xff) + 1;
+			lsb = (m_latch[idx] & 0xff) + 1;
 			msb--;
 
-			// If MSB goes less than zero, we've expired
-			if ((msb == 0 && !m_hightime[counter]) || (msb < 0 && m_hightime[counter]))
+			if (msb < 0)
 			{
-				timeout(counter);
-				msb = (m_latch[counter] >> 8) + 1;
+				// If MSB is less than zero, we've timed out, no need to manually reload
+				timed_out = true;
+				state_changed(idx);
+			}
+			else if (msb == 0)
+			{
+				// If MSB is at zero, our output state potentially needs to change, also no need to manually reload
+				msb = (m_latch[idx] >> 8) + 1;
+				state_changed(idx);
 			}
 		}
 
-		// Store the result
-		m_counter[counter] = (msb << 8) | lsb;
-	}
-
-	// Word mode
-	else
-	{
-		int word = m_counter[counter];
-
-		// Count the clocks
-		word -= count;
-
-		// loop while we're less than zero
-		while (word < 0)
+		// Store the result if we haven't timed out (which already reloads the counter from the latches)
+		if (!timed_out)
 		{
-			// Borrow from the MSB
-			word += m_latch[counter] + 1;
-
-			// We've expired
-			timeout(counter);
-		}
-
-		// Store the result
-		m_counter[counter] = word;
-	}
-
-	if (m_enabled[counter])
-	{
-		int clks = m_counter[counter];
-		if (m_control_reg[counter] & COUNT_MODE_8BIT)
-		{
-			/* In dual 8 bit mode, let the counter fire when MSB == 0 */
-			m_hightime[counter] = !(clks & 0xff00);
-			clks &= 0xff00;
-		}
-
-		attotime duration = attotime::from_hz(clk) * clks;
-		if (counter == 2)
-		{
-			duration *= m_t3_divisor;
-		}
-		m_timer[counter]->adjust(duration);
-	}
-}
-
-
-
-//-------------------------------------------------
-//  tick
-//-------------------------------------------------
-
-void ptm6840_device::tick(int counter, int count)
-{
-	if (counter == 2)
-	{
-		m_t3_scaler += count;
-
-		if ( m_t3_scaler > m_t3_divisor - 1)
-		{
-			subtract_from_counter(counter, 1);
-			m_t3_scaler = 0;
+			m_counter[idx] = (msb << 8) + lsb;
 		}
 	}
 	else
 	{
-		subtract_from_counter(counter, count);
+		// Word mode
+		m_counter[idx]--;
+
+		const bool one_shot_mode = m_mode[idx] == 4 || m_mode[idx] == 6;
+		// If we've ticked once in one-shot-mode, or we've expired, our state needs to change
+		if ((one_shot_mode && !m_output[idx]) || m_counter[idx] == 0xffff)
+		{
+			state_changed(idx);
+		}
 	}
 }
 
@@ -314,67 +256,75 @@ void ptm6840_device::update_interrupts()
 //  compute_counter - Compute Counter
 //-------------------------------------------------
 
-uint16_t ptm6840_device::compute_counter( int counter ) const
+int ptm6840_device::compute_counter(int idx) const
 {
-	double clk;
+	uint32_t clk;
 
-	// If there's no timer, return the count
-	if (!m_enabled[counter])
+	// If the timer is disabled, return the raw counter value
+	if (!m_enabled[idx])
 	{
-		LOGMASKED(LOG_COUNTERS, "Timer #%d read counter: %d\n", counter + 1, m_counter[counter]);
-		return m_counter[counter];
+		LOGMASKED(LOG_COUNTERS, "Timer #%d read counter: %04x\n", idx + 1, m_counter[idx]);
+		return m_counter[idx];
+	}
+	else if (m_control_reg[0] & RESET_TIMERS)
+	{
+		// If we're held in reset, return either the latch value for 16-bit mode, or the computed count for dual-8-bit
+		if (m_control_reg[idx] & COUNT_MODE_8BIT)
+		{
+			const uint16_t latch_lsb = m_latch[idx] & 0xff;
+			const uint16_t latch_msb = m_latch[idx] >> 8;
+			return latch_msb * (latch_lsb + 1);
+		}
+		return m_latch[idx];
 	}
 
 	// determine the clock frequency for this timer
-	if (m_control_reg[counter] & INTERNAL_CLK_EN)
+	if (m_control_reg[idx] & INTERNAL_CLK_EN)
 	{
-		clk = static_cast<double>(clock());
+		clk = clock();
 	}
 	else
 	{
-		clk = m_external_clock[counter];
+		clk = m_external_clock[idx];
 	}
 
-	if (counter == 2)
+	if (idx == 2)
 	{
 		clk /= m_t3_divisor;
 	}
-	LOGMASKED(LOG_COUNTERS, "Timer #%d %s clock freq %f \n", counter + 1, (m_control_reg[counter] & INTERNAL_CLK_EN) ? "internal" : "external", clk);
+	LOGMASKED(LOG_COUNTERS, "Timer #%d %s clock freq %d\n", idx + 1, (m_control_reg[idx] & INTERNAL_CLK_EN) ? "internal" : "external", clk);
 
 	// See how many are left
-	int remaining = (m_timer[counter]->remaining() * clk).as_double();
-
-	// Adjust the count for dual byte mode
-	if (m_control_reg[counter] & COUNT_MODE_8BIT)
+	attotime remaining_time = m_timer[idx]->remaining();
+	if (remaining_time.is_never())
 	{
-		int divisor = (m_counter[counter] & 0xff) + 1;
-		int msb = remaining / divisor;
-		int lsb = remaining % divisor;
-		remaining = (msb << 8) | lsb;
+		if (m_disable_time[idx].is_never())
+		{
+			return m_counter[idx];
+		}
+		remaining_time = m_disable_time[idx];
 	}
+	int remaining = remaining_time.as_ticks(clk);
 
-	LOGMASKED(LOG_COUNTERS, "Timer #%d read counter: %d\n", counter + 1, remaining);
+	LOGMASKED(LOG_COUNTERS, "Timer #%d read counter: %04x\n", idx + 1, remaining);
 	return remaining;
 }
 
 
 
 //-------------------------------------------------
-//  reload_count - Reload Counter
+//  reload_counter
 //-------------------------------------------------
 
-void ptm6840_device::reload_count(int idx)
+void ptm6840_device::reload_counter(int idx)
 {
-	double clk;
+	const bool one_shot_mode = m_mode[idx] == 4 || m_mode[idx] == 6;
 
 	// Copy the latched value in
 	m_counter[idx] = m_latch[idx];
 
-	// If reset is held, don't start counting
-	if (m_control_reg[0] & RESET_TIMERS)
-		return;
-
 	// Determine the clock frequency for this timer
+	double clk;
 	if (m_control_reg[idx] & INTERNAL_CLK_EN)
 	{
 		clk = static_cast<double> (clock());
@@ -387,38 +337,43 @@ void ptm6840_device::reload_count(int idx)
 	}
 
 	// Determine the number of clock periods before we expire
-	int count = m_counter[idx];
+	int count = m_counter[idx] + 1;
 	if (m_control_reg[idx] & COUNT_MODE_8BIT)
 	{
-		if (m_hightime[idx])
-			count = 0xff;
+		const uint16_t latch_lsb = m_latch[idx] & 0xff;
+		const uint16_t latch_msb = m_latch[idx] >> 8;
+		if (!m_output[idx])
+		{
+			count = (latch_lsb + 1) * latch_msb;
+		}
 		else
-			count = ((count >> 8) + 1) * ((count & 0xff) + 1);
-
+		{
+			count = latch_lsb + 1;
+		}
 	}
-	else
+	else if (one_shot_mode)
 	{
-		count = count + 1;
-	}
-
-	m_fired[idx] = 0;
-
-	if ((m_mode[idx] == 4) || (m_mode[idx] == 6))
-	{
-		m_output[idx] = 1;
-		m_out_cb[idx](m_output[idx]);
+		if (!m_output[idx])
+		{
+			count = 1;
+		}
+		else
+		{
+			count = m_counter[idx];
+		}
 	}
 
 	// Set the timer
-	LOGMASKED(LOG_COUNTERS, "Timer #%d reload_count: clock = %f  count = %d\n", idx + 1, clk, count);
+	LOGMASKED(LOG_COUNTERS, "Timer #%d init_timer: clock = %f  count = %04x\n", idx + 1, clk, count);
 
 	if (clk == 0.0)
 	{
-		m_enabled[idx] = 0;
-		m_timer[idx]->enable(false);
+		m_enabled[idx] = false;
+		m_timer[idx]->adjust(attotime::never);
 	}
 	else
 	{
+		m_enabled[idx] = true;
 		attotime duration = attotime::from_hz(clk) * count;
 
 		if (idx == 2)
@@ -426,11 +381,19 @@ void ptm6840_device::reload_count(int idx)
 			duration *= m_t3_divisor;
 		}
 
-		LOGMASKED(LOG_COUNTERS, "Timer #%d reload_count: output = %f\n", idx + 1, duration.as_double());
+		LOGMASKED(LOG_COUNTERS, "Timer #%d init_timer: duration = %f\n", idx + 1, duration.as_double());
 
-		m_enabled[idx] = 1;
-		m_timer[idx]->adjust(duration);
-		m_timer[idx]->enable(true);
+		const bool one_shot_mode = m_mode[idx] == 4 || m_mode[idx] == 6;
+		const bool gated = (!one_shot_mode && m_gate[idx]) || (m_control_reg[0] & RESET_TIMERS);
+		if (gated)
+		{
+			m_disable_time[idx] = duration;
+			m_timer[idx]->adjust(attotime::never);
+		}
+		else
+		{
+			m_timer[idx]->adjust(duration, idx);
+		}
 	}
 }
 
@@ -447,25 +410,28 @@ uint8_t ptm6840_device::read(offs_t offset)
 	switch ( offset )
 	{
 		case PTM_6840_CTRL1:
-		{
 			val = 0;
 			break;
-		}
 
 		case PTM_6840_STATUS:
-		{
 			LOGMASKED(LOG_STATUS, "%s: Status read = %04X\n", machine().describe_context(), m_status_reg);
 			m_status_read_since_int |= m_status_reg & 0x07;
 			val = m_status_reg;
 			break;
-		}
+
+		case PTM_6840_LSB1:
+		case PTM_6840_LSB2:
+		case PTM_6840_LSB3:
+			val = m_lsb_buffer;
+			LOGMASKED(LOG_COUNTERS, "%s: Counter LSB read = %02x\n", machine().describe_context(), val);
+			break;
 
 		case PTM_6840_MSBBUF1:
 		case PTM_6840_MSBBUF2:
 		case PTM_6840_MSBBUF3:
 		{
 			int idx = (offset - 2) / 2;
-			int result = compute_counter(idx);
+			uint16_t result = compute_counter(idx);
 
 			// Clear the interrupt if the status has been read
 			if (m_status_read_since_int & (1 << idx))
@@ -474,26 +440,16 @@ uint8_t ptm6840_device::read(offs_t offset)
 				update_interrupts();
 			}
 
-			m_lsb_buffer = result & 0xff;
-
-			LOGMASKED(LOG_COUNTERS, "%s: Counter %d read = %04X\n", machine().describe_context(), idx + 1, result >> 8);
 			val = result >> 8;
-			break;
-		}
+			m_lsb_buffer = (uint8_t)result;
 
-		case PTM_6840_LSB1:
-		case PTM_6840_LSB2:
-		case PTM_6840_LSB3:
-		{
-			val = m_lsb_buffer;
+			LOGMASKED(LOG_COUNTERS, "%s: Counter %d MSB read = %02x\n", machine().describe_context(), idx + 1, val);
 			break;
 		}
 
 		default:
-		{
 			val = 0;
 			break;
-		}
 
 	}
 	return val;
@@ -519,8 +475,11 @@ void ptm6840_device::write(offs_t offset, uint8_t data)
 
 			LOGMASKED(LOG_CONTROL, "Control register #%d selected\n", idx + 1);
 			LOGMASKED(LOG_CONTROL, "operation mode   = %s\n", opmode[m_mode[idx]]);
-			LOGMASKED(LOG_CONTROL, "value            = %04X\n", m_control_reg[idx]);
+			LOGMASKED(LOG_CONTROL, "value            = %02x\n", m_control_reg[idx]);
 			LOGMASKED(LOG_CONTROL, "t3divisor        = %d\n", m_t3_divisor);
+			LOGMASKED(LOG_CONTROL, "irq/output/int   = %d/%d/%d\n", BIT(m_control_reg[idx], 6), BIT(m_control_reg[idx], 7), BIT(m_control_reg[idx], 1));
+			LOGMASKED(LOG_CONTROL, "latch            = %04x\n", m_latch[idx]);
+			LOGMASKED(LOG_CONTROL, "counter          = %04x\n", m_counter[idx]);
 
 			if (diffs & INTERRUPT_EN)
 				update_interrupts();
@@ -537,12 +496,17 @@ void ptm6840_device::write(offs_t offset, uint8_t data)
 				// Holding reset down
 				if (data & RESET_TIMERS)
 				{
+					m_status_reg = 0;
+					m_status_read_since_int = 0;
+					update_interrupts();
 					LOGMASKED(LOG_RESETS, "Timer reset\n");
 					for (int i = 0; i < 3; i++)
 					{
-						m_timer[i]->enable(false);
-						m_enabled[i] = 0;
-						m_hightime[idx] = false;
+						m_timer[i]->adjust(attotime::never);
+						m_enabled[i] = false;
+						reload_counter(i);
+						m_output[i] = false;
+						m_out_cb[i](m_output[i]);
 					}
 				}
 				// Releasing reset
@@ -550,8 +514,13 @@ void ptm6840_device::write(offs_t offset, uint8_t data)
 				{
 					for (int i = 0; i < 3; i++)
 					{
-						m_hightime[idx] = false;
-						reload_count(i);
+						m_single_fired[i] = false;
+						reload_counter(i);
+						if (!m_disable_time[i].is_never() && m_timer[i]->remaining().is_never() && ((m_control_reg[i] & INTERNAL_CLK_EN) || m_external_clock[i] != 0.0))
+						{
+							m_timer[i]->adjust(m_disable_time[i], i);
+							m_disable_time[i] = attotime::never;
+						}
 					}
 				}
 
@@ -562,8 +531,7 @@ void ptm6840_device::write(offs_t offset, uint8_t data)
 			// Changing the clock source? (e.g. Zwackery)
 			if (diffs & INTERNAL_CLK_EN)
 			{
-				m_hightime[idx] = false;
-				reload_count(idx);
+				update_expiration_for_clock_source(idx, !(m_control_reg[idx] & INTERNAL_CLK_EN), m_external_clock[idx]);
 			}
 			break;
 		}
@@ -591,8 +559,7 @@ void ptm6840_device::write(offs_t offset, uint8_t data)
 			// Reload the count if in an appropriate mode
 			if (!(m_control_reg[idx] & 0x10) || (m_control_reg[0] & RESET_TIMERS))
 			{
-				m_hightime[idx] = false;
-				reload_count(idx);
+				reload_counter(idx);
 			}
 
 			LOGMASKED(LOG_COUNTERS, "%s: Counter #%d latch = %04X\n", machine().describe_context(), idx + 1, m_latch[idx]);
@@ -603,60 +570,69 @@ void ptm6840_device::write(offs_t offset, uint8_t data)
 
 
 //-------------------------------------------------
-//  timeout - Called if timer is mature
+//  state_changed - called if timer output state
+//  changes (masked or not)
 //-------------------------------------------------
 
-void ptm6840_device::timeout(int idx)
+TIMER_CALLBACK_MEMBER(ptm6840_device::state_changed)
 {
-	LOGMASKED(LOG_TIMEOUTS, "**ptm6840 t%d timeout**\n", idx + 1);
+	LOGMASKED(LOG_TIMEOUTS, "**ptm6840 t%d state_changed**\n", param + 1);
 
-	// Set the interrupt flag
-	m_status_reg |= (1 << idx);
-	m_status_read_since_int &= ~(1 << idx);
-	update_interrupts();
-
-	if (m_control_reg[idx] & COUNT_OUT_EN)
+	// Set the interrupt flag if at the end of a full cycle
+	const bool one_shot_mode = m_mode[param] == 4 || m_mode[param] == 6;
+	const bool dual_8bit = m_control_reg[param] & COUNT_MODE_8BIT;
+	const bool end_of_cycle = (!dual_8bit && !one_shot_mode) || m_output[param];
+	if (end_of_cycle)
 	{
-		switch (m_mode[idx])
-		{
-			case 0:
-			case 2:
-
-				if (m_control_reg[idx] & COUNT_MODE_8BIT)
-				{
-					m_hightime[idx] = !m_hightime[idx];
-					m_output[idx] = m_hightime[idx];
-					m_out_cb[idx](m_output[idx]);
-				}
-				else
-				{
-					m_output[idx] = m_output[idx] ^ 1;
-					m_out_cb[idx](m_output[idx]);
-				}
-				LOGMASKED(LOG_TIMEOUTS, "%6.6f: **ptm6840 t%d output %d **\n", machine().time().as_double(), idx + 1, m_output[idx]);
-				break;
-
-			case 4:
-			case 6:
-				if (!m_fired[idx])
-				{
-					m_output[idx] = 1;
-					LOGMASKED(LOG_TIMEOUTS, "**ptm6840 t%d output %d **\n", idx + 1, m_output[idx]);
-
-					m_out_cb[idx](m_output[idx]);
-
-					// No changes in output until reinit
-					m_fired[idx] = 1;
-
-					m_status_reg |= (1 << idx);
-					m_status_read_since_int &= ~(1 << idx);
-					update_interrupts();
-				}
-				break;
-		}
+		m_status_reg |= (1 << param);
+		m_status_read_since_int &= ~(1 << param);
+		update_interrupts();
 	}
-	m_enabled[idx]= 0;
-	reload_count(idx);
+
+	const bool enable_output = m_control_reg[param] & COUNT_OUT_EN;
+	switch (m_mode[param])
+	{
+		case 0:
+		case 2:
+			m_output[param] = !m_output[param];
+			if (enable_output)
+			{
+				m_out_cb[param](m_output[param]);
+			}
+			else
+			{
+				m_out_cb[param](0);
+			}
+			LOGMASKED(LOG_TIMEOUTS, "%6.6f: **ptm6840 t%d output %d **\n", machine().time().as_double(), param + 1, m_output[param]);
+			break;
+
+		case 4:
+		case 6:
+			m_output[param] = !m_output[param];
+			LOGMASKED(LOG_TIMEOUTS, "**ptm6840 t%d output %d **\n", param + 1, m_output[param]);
+
+			if (!m_single_fired[param])
+			{
+				if (enable_output)
+				{
+					m_out_cb[param](m_output[param]);
+				}
+
+				if (!m_output[param])
+				{
+					// Don't allow output to change until reinitialization
+					m_single_fired[param] = true;
+				}
+			}
+			else
+			{
+				m_out_cb[param](0);
+			}
+			break;
+	}
+
+	m_enabled[param] = false;
+	reload_counter(param);
 }
 
 
@@ -666,13 +642,25 @@ void ptm6840_device::timeout(int idx)
 
 void ptm6840_device::set_gate(int idx, int state)
 {
-	if ((m_mode[idx] & 1) == 0)
+	const bool one_shot_mode = m_mode[idx] == 4 || m_mode[idx] == 6;
+	if (state == 0 && m_gate[idx])
 	{
-		if (state == 0 && m_gate[idx])
+		if (!(m_control_reg[0] & RESET_TIMERS))
 		{
-			m_hightime[idx] = false;
-			reload_count(idx);
+			m_single_fired[idx] = false;
+			m_output[idx] = false;
+			reload_counter(idx);
 		}
+		if (!m_disable_time[idx].is_never() && ((m_control_reg[idx] & INTERNAL_CLK_EN) || m_external_clock[idx] != 0.0))
+		{
+			m_timer[idx]->adjust(m_disable_time[idx], idx);
+			m_disable_time[idx] = attotime::never;
+		}
+	}
+	else if (state == 1 && !m_gate[idx] && !one_shot_mode) // Gate disable is ignored in one-shot mode
+	{
+		m_disable_time[idx] = m_timer[idx]->remaining();
+		m_timer[idx]->adjust(attotime::never);
 	}
 	m_gate[idx] = state;
 }
@@ -684,60 +672,127 @@ void ptm6840_device::set_gate(int idx, int state)
 
 void ptm6840_device::set_clock(int idx, int state)
 {
-	m_clk[idx] = state;
-
-	if (!(m_control_reg[idx] & INTERNAL_CLK_EN))
+	if (m_clk[idx] == state)
 	{
-		if (state)
+		return;
+	}
+
+	const bool old_clk = m_clk[idx];
+	m_clk[idx] = state;
+	const bool rising_edge = !old_clk && state;
+	if (rising_edge)
+	{
+		return;
+	}
+
+	const bool use_external_clk = !(m_control_reg[idx] & INTERNAL_CLK_EN);
+	const bool timer_running = !(m_control_reg[0] & RESET_TIMERS);
+	const bool one_shot_mode = m_mode[idx] == 4 || m_mode[idx] == 6;
+	const bool gated = !one_shot_mode && m_gate[idx];
+
+	// Don't allow ticking if timers are held in reset, internally-clocked, or gated
+	if (use_external_clk && timer_running && !gated)
+	{
+		if (idx == 2)
 		{
-			tick(idx, 1);
+			m_t3_scaler++;
+			if (m_t3_scaler >= m_t3_divisor)
+			{
+				deduct_from_counter(idx);
+				m_t3_scaler = 0;
+			}
+		}
+		else
+		{
+			deduct_from_counter(idx);
 		}
 	}
 }
 
 
 //-------------------------------------------------
-//  set_ext_clock - set external clock frequency
+//  update_expiration_for_clock_source
 //-------------------------------------------------
 
-void ptm6840_device::set_ext_clock(int counter, double clock)
+void ptm6840_device::update_expiration_for_clock_source(int idx, bool changed_to_external, double new_external_clock)
 {
-	m_external_clock[counter] = clock;
-
-	if (!(m_control_reg[counter] & INTERNAL_CLK_EN))
+	if (!(m_control_reg[0] & RESET_TIMERS))
 	{
-		if (!m_external_clock[counter])
+		double divisor = idx == 2 ? m_t3_divisor : 1.0;
+		double clk = (m_control_reg[idx] & INTERNAL_CLK_EN ? static_cast<double>(clock()) : new_external_clock) / divisor;
+
+		// First, figure out how much time was remaining on the counter
+		if (changed_to_external)
 		{
-			m_enabled[counter] = 0;
-			m_timer[counter]->enable(false);
+			m_control_reg[idx] |= INTERNAL_CLK_EN;
 		}
-	}
-	else
-	{
-		int count;
-		attotime duration;
 
-		// Determine the number of clock periods before we expire
-		count = m_counter[counter];
+		int updated_counter = compute_counter(idx);
 
-		if (m_control_reg[counter] & COUNT_MODE_8BIT)
+		if (changed_to_external)
 		{
-			count = ((count >> 8) + 1) * ((count & 0xff) + 1);
+			m_control_reg[idx] &= ~INTERNAL_CLK_EN;
+		}
+
+		if (clk == 0.0)
+		{
+			// If we're externally clocked with no fixed incoming clock
+
+			// Adjust for dual-byte mode if we're not in the last countdown
+			if ((m_control_reg[idx] & COUNT_MODE_8BIT) && !m_output[idx])
+			{
+				const uint16_t latch_lsb = m_latch[idx] & 0xff;
+				const uint16_t latch_msb = m_latch[idx] >> 8;
+				const uint8_t count_lsb = updated_counter % latch_msb;
+				const uint8_t count_msb = (updated_counter - count_lsb) / (latch_lsb + 1);
+				m_counter[idx] = (count_msb << 8) | count_lsb;
+			}
+			else
+			{
+				m_counter[idx] = updated_counter;
+			}
+
+			m_enabled[idx] = false;
+			m_timer[idx]->adjust(attotime::never);
+			return;
 		}
 		else
 		{
-			count = count + 1;
+			// If we're externally clocked with a valid incoming clock OR we're internally-clocked
+			attotime duration = attotime::from_hz(clk) * updated_counter;
+
+			m_enabled[idx] = true;
+
+			const bool one_shot_mode = m_mode[idx] == 4 || m_mode[idx] == 6;
+			const bool gated = !one_shot_mode && m_gate[idx];
+			if (gated)
+			{
+				m_timer[idx]->adjust(attotime::never);
+				m_disable_time[idx] = duration;
+			}
+			else
+			{
+				m_timer[idx]->adjust(duration, idx);
+			}
 		}
-
-		duration = attotime::from_hz(clock) * count;
-
-		if (counter == 2)
-		{
-			duration *= m_t3_divisor;
-		}
-
-		m_enabled[counter] = 1;
-		m_timer[counter]->adjust(duration);
-		m_timer[counter]->enable(true);
 	}
+}
+
+
+
+//-------------------------------------------------
+//  set_ext_clock - set external clock frequency
+//-------------------------------------------------
+
+void ptm6840_device::set_ext_clock(int idx, double clk)
+{
+	if (m_external_clock[idx] == clk)
+		return;
+
+	if (!(m_control_reg[idx] & INTERNAL_CLK_EN))
+	{
+		update_expiration_for_clock_source(idx, false, clk);
+	}
+
+	m_external_clock[idx] = clk;
 }

@@ -9,6 +9,8 @@
 #define NL_CORE_STATE_VAR_H_
 
 #include "../nltypes.h"
+
+#include "../plib/pfmtlog.h"
 #include "../plib/pstring.h"
 
 namespace netlist
@@ -17,6 +19,7 @@ namespace netlist
 	///  Use the state_var template to define a variable whose value is saved.
 	///  Within a device definition use
 	///
+	/// ```
 	///      NETLIB_OBJECT(abc)
 	///      {
 	///          NETLIB_CONSTRUCTOR(abc)
@@ -24,27 +27,29 @@ namespace netlist
 	///          ...
 	///          state_var<unsigned> m_var;
 	///      }
+	/// ```
+	///
 	template <typename T>
 	struct state_var
 	{
 	public:
-
 		using value_type = T;
 
 		template <typename O>
 		//! Constructor.
-		state_var(O &owner,             //!< owner must have a netlist() method.
-				const pstring &name,    //!< identifier/name for this state variable
-				const T &value          //!< Initial value after construction
-				);
+		state_var(O &      owner, //!< owner must have a netlist() method.
+			const pstring &name,  //!< identifier/name for this state variable
+			const T &      value  //!< Initial value after construction
+		);
 
 		template <typename O>
 		//! Constructor.
-		state_var(O &owner,             //!< owner must have a netlist() method.
-				const pstring &name     //!< identifier/name for this state variable
+		state_var(O &      owner, //!< owner must have a netlist() method.
+			const pstring &name   //!< identifier/name for this state variable
 		);
 
-		PMOVEASSIGN(state_var, delete)
+		state_var(state_var &&) noexcept = delete;
+		state_var &operator=(state_var &&) noexcept = delete;
 
 		//! Destructor.
 		~state_var() noexcept = default;
@@ -59,38 +64,47 @@ namespace netlist
 			return *this;
 		} // OSX doesn't like noexcept
 		//! Assignment operator to assign value of type T.
-		constexpr state_var &operator=(const T &rhs) noexcept { m_value = rhs; return *this; }
+		constexpr state_var &operator=(const T &rhs) noexcept
+		{
+			m_value = rhs;
+			return *this;
+		}
 		//! Assignment move operator to assign value of type T.
-		//constexpr state_var &operator=(T &&rhs) noexcept { std::swap(m_value, rhs); return *this; }
-		constexpr state_var &operator=(T &&rhs) noexcept { m_value = std::move(rhs); return *this; }
+		// constexpr state_var &operator=(T &&rhs) noexcept { std::swap(m_value,
+		// rhs); return *this; }
+		constexpr state_var &operator=(T &&rhs) noexcept
+		{
+			m_value = std::move(rhs);
+			return *this;
+		}
 		//! Return non-const value of state variable.
-		constexpr operator T & () noexcept { return m_value; }
+		constexpr operator T &() noexcept { return m_value; }
 		//! Return const value of state variable.
-		constexpr operator const T & () const noexcept { return m_value; }
+		constexpr operator const T &() const noexcept { return m_value; }
 		//! Return non-const value of state variable.
-		constexpr T & var() noexcept { return m_value; }
+		constexpr T &var() noexcept { return m_value; }
 		//! Return const value of state variable.
-		constexpr const T & var() const noexcept { return m_value; }
+		constexpr const T &var() const noexcept { return m_value; }
 		//! Return non-const value of state variable.
-		constexpr T & operator ()() noexcept { return m_value; }
+		constexpr T &operator()() noexcept { return m_value; }
 		//! Return const value of state variable.
-		constexpr const T & operator ()() const noexcept { return m_value; }
+		constexpr const T &operator()() const noexcept { return m_value; }
 		//! Access state variable by ->.
-		constexpr T * operator->() noexcept { return &m_value; }
+		constexpr T *operator->() noexcept { return &m_value; }
 		//! Access state variable by const ->.
-		constexpr const T * operator->() const noexcept{ return &m_value; }
+		constexpr const T *operator->() const noexcept { return &m_value; }
 		//! Access state variable by *.
-		constexpr T * operator *() noexcept { return &m_value; }
+		constexpr T *operator*() noexcept { return &m_value; }
 		//! Access state variable by const *.
-		constexpr const T * operator *() const noexcept{ return &m_value; }
+		constexpr const T *operator*() const noexcept { return &m_value; }
 
 	private:
 		T m_value;
 	};
 
 	/// \brief A persistent array template.
-	///  Use this state_var template to define an array whose contents are saved.
-	///  Please refer to \ref state_var.
+	///  Use this state_var template to define an array whose contents are
+	///  saved. Please refer to \ref state_var.
 	///
 	///  \tparam C container class to use.
 
@@ -101,24 +115,25 @@ namespace netlist
 		using value_type = typename C::value_type;
 		//! Constructor.
 		template <typename O>
-		state_container(O &owner,           //!< owner must have a netlist() method.
-				const pstring &name,        //!< identifier/name for this state variable
-				const value_type &value     //!< Initial value after construction
-				);
+		state_container(O &   owner, //!< owner must have a netlist() method.
+			const pstring &   name, //!< identifier/name for this state variable
+			const value_type &value //!< Initial value after construction
+		);
 		//! Constructor.
 		template <typename O>
-		state_container(O &owner,           //!< owner must have a netlist() method.
-				const pstring &name,        //!< identifier/name for this state variable
-				std::size_t n,              //!< number of elements to allocate
-				const value_type &value     //!< Initial value after construction
-				);
+		state_container(O &   owner, //!< owner must have a netlist() method.
+			const pstring &   name, //!< identifier/name for this state variable
+			std::size_t       n,    //!< number of elements to allocate
+			const value_type &value //!< Initial value after construction
+		);
 		//! Copy Constructor.
 		state_container(const state_container &rhs) noexcept = default;
 		//! Destructor.
 		~state_container() noexcept = default;
 		//! Move Constructor.
 		state_container(state_container &&rhs) noexcept = default;
-		state_container &operator=(const state_container &rhs) noexcept = default;
+		state_container &operator=(
+			const state_container &rhs) noexcept = default;
 		state_container &operator=(state_container &&rhs) noexcept = default;
 	};
 
@@ -156,28 +171,42 @@ namespace netlist
 	template <typename C>
 	template <typename O>
 	state_container<C>::state_container(O &owner, const pstring &name,
-		const state_container<C>::value_type & value)
+		const state_container<C>::value_type &value)
 	{
 		owner.state().save(owner, static_cast<C &>(*this), owner.name(), name);
-		for (std::size_t i=0; i < this->size(); i++)
+		for (std::size_t i = 0; i < this->size(); i++)
 			(*this)[i] = value;
 	}
 
 	template <typename C>
 	template <typename O>
 	state_container<C>::state_container(O &owner, const pstring &name,
-		std::size_t n, const state_container<C>::value_type & value)
+		std::size_t n, const state_container<C>::value_type &value)
 	: C(n, value)
 	{
 		owner.state().save(owner, static_cast<C &>(*this), owner.name(), name);
 	}
 
+	// -----------------------------------------------------------------------------
+	// Externals
+	// -----------------------------------------------------------------------------
+
+	extern template struct state_var<std::uint8_t>;
+	extern template struct state_var<std::uint16_t>;
+	extern template struct state_var<std::uint32_t>;
+	extern template struct state_var<std::uint64_t>;
+	extern template struct state_var<std::int8_t>;
+	extern template struct state_var<std::int16_t>;
+	extern template struct state_var<std::int32_t>;
+	extern template struct state_var<std::int64_t>;
+	extern template struct state_var<bool>;
+
 } // namespace netlist
 
 namespace plib
 {
-	template<typename X>
-	struct ptype_traits<netlist::state_var<X>> : ptype_traits<X>
+	template <typename X>
+	struct format_traits<netlist::state_var<X>> : format_traits<X>
 	{
 	};
 } // namespace plib

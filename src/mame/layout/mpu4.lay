@@ -8,6 +8,11 @@ license:CC0
 			<color red="1.0" green="0.0" blue="0.0" />
 		</led7seg>
 	</element>
+	<element name="digitinv">
+		<led7seg invert="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
 	<element name="matrixlamp">
 		<rect state ="0">
 			<color red="0.7" green="0.7" blue="0.7" />
@@ -29,6 +34,264 @@ license:CC0
 			<color red="0" green="0.6" blue="1.0" />
 		</led16segsc>
 	</element>
+
+
+	<element name="text0"><text string="0"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text1"><text string="1"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text2"><text string="2"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text3"><text string="3"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text4"><text string="4"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text5"><text string="5"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text6"><text string="6"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text7"><text string="7"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text8"><text string="8"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text9"><text string="9"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text10"><text string="10"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text11"><text string="11"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text12"><text string="12"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text13"><text string="13"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text14"><text string="14"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text15"><text string="15"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text16"><text string="16"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text17"><text string="17"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text18"><text string="18"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text19"><text string="19"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text20"><text string="20"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text21"><text string="21"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text22"><text string="22"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text23"><text string="23"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text24"><text string="24"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text25"><text string="25"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text26"><text string="26"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text27"><text string="27"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text28"><text string="28"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text29"><text string="29"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text30"><text string="30"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text31"><text string="31"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text32"><text string="32"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text33"><text string="33"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text34"><text string="34"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text35"><text string="35"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text36"><text string="36"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text37"><text string="37"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text38"><text string="38"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text39"><text string="39"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text40"><text string="40"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text41"><text string="41"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text42"><text string="42"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text43"><text string="43"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text44"><text string="44"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text45"><text string="45"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text46"><text string="46"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text47"><text string="47"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text48"><text string="48"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text49"><text string="49"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text50"><text string="50"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text51"><text string="51"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text52"><text string="52"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text53"><text string="53"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text54"><text string="54"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text55"><text string="55"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text56"><text string="56"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text57"><text string="57"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text58"><text string="58"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text59"><text string="59"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text60"><text string="60"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text61"><text string="61"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text62"><text string="62"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text63"><text string="63"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text64"><text string="64"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text65"><text string="65"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text66"><text string="66"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text67"><text string="67"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text68"><text string="68"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text69"><text string="69"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text70"><text string="70"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text71"><text string="71"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text72"><text string="72"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text73"><text string="73"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text74"><text string="74"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text75"><text string="75"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text76"><text string="76"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text77"><text string="77"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text78"><text string="78"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text79"><text string="79"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text80"><text string="80"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text81"><text string="81"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text82"><text string="82"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text83"><text string="83"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text84"><text string="84"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text85"><text string="85"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text86"><text string="86"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text87"><text string="87"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text88"><text string="88"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text89"><text string="89"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text90"><text string="90"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text91"><text string="91"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text92"><text string="92"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text93"><text string="93"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text94"><text string="94"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text95"><text string="95"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text96"><text string="96"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text97"><text string="97"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text98"><text string="98"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text99"><text string="99"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text100"><text string="100"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text101"><text string="101"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text102"><text string="102"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text103"><text string="103"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text104"><text string="104"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text105"><text string="105"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text106"><text string="106"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text107"><text string="107"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text108"><text string="108"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text109"><text string="109"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text110"><text string="110"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text111"><text string="111"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text112"><text string="112"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text113"><text string="113"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text114"><text string="114"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text115"><text string="115"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text116"><text string="116"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text117"><text string="117"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text118"><text string="118"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text119"><text string="119"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text120"><text string="120"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text121"><text string="121"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text122"><text string="122"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text123"><text string="123"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text124"><text string="124"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text125"><text string="125"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text126"><text string="126"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text127"><text string="127"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text128"><text string="128"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text129"><text string="129"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text130"><text string="130"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text131"><text string="131"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text132"><text string="132"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text133"><text string="133"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text134"><text string="134"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text135"><text string="135"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text136"><text string="136"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text137"><text string="137"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text138"><text string="138"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text139"><text string="139"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text140"><text string="140"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text141"><text string="141"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text142"><text string="142"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text143"><text string="143"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text144"><text string="144"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text145"><text string="145"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text146"><text string="146"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text147"><text string="147"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text148"><text string="148"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text149"><text string="149"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text150"><text string="150"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text151"><text string="151"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text152"><text string="152"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text153"><text string="153"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text154"><text string="154"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text155"><text string="155"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text156"><text string="156"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text157"><text string="157"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text158"><text string="158"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text159"><text string="159"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text160"><text string="160"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text161"><text string="161"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text162"><text string="162"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text163"><text string="163"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text164"><text string="164"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text165"><text string="165"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text166"><text string="166"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text167"><text string="167"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text168"><text string="168"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text169"><text string="169"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text170"><text string="170"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text171"><text string="171"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text172"><text string="172"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text173"><text string="173"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text174"><text string="174"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text175"><text string="175"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text176"><text string="176"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text177"><text string="177"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text178"><text string="178"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text179"><text string="179"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text180"><text string="180"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text181"><text string="181"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text182"><text string="182"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text183"><text string="183"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text184"><text string="184"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text185"><text string="185"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text186"><text string="186"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text187"><text string="187"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text188"><text string="188"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text189"><text string="189"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text190"><text string="190"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text191"><text string="191"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text192"><text string="192"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text193"><text string="193"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text194"><text string="194"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text195"><text string="195"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text196"><text string="196"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text197"><text string="197"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text198"><text string="198"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text199"><text string="199"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text200"><text string="200"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text201"><text string="201"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text202"><text string="202"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text203"><text string="203"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text204"><text string="204"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text205"><text string="205"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text206"><text string="206"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text207"><text string="207"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text208"><text string="208"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text209"><text string="209"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text210"><text string="210"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text211"><text string="211"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text212"><text string="212"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text213"><text string="213"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text214"><text string="214"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text215"><text string="215"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text216"><text string="216"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text217"><text string="217"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text218"><text string="218"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text219"><text string="219"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text220"><text string="220"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text221"><text string="221"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text222"><text string="222"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text223"><text string="223"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text224"><text string="224"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text225"><text string="225"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text226"><text string="226"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text227"><text string="227"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text228"><text string="228"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text229"><text string="229"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text230"><text string="230"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text231"><text string="231"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text232"><text string="232"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text233"><text string="233"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text234"><text string="234"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text235"><text string="235"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text236"><text string="236"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text237"><text string="237"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text238"><text string="238"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text239"><text string="239"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text240"><text string="240"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text241"><text string="241"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text242"><text string="242"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text243"><text string="243"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text244"><text string="244"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text245"><text string="245"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text246"><text string="246"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text247"><text string="247"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text248"><text string="248"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text249"><text string="249"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text250"><text string="250"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text251"><text string="251"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text252"><text string="252"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text253"><text string="253"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text254"><text string="254"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text255"><text string="255"><color red="0.03" green="0.03" blue="0.03" /></text></element>
 
 	<group name="vfd">
 		<repeat count="16">
@@ -57,24 +320,58 @@ license:CC0
 		<element name="reel6" ref="Steppers" state="0">
 			<bounds x="280" y="300" width="50" height="50"/>
 		</element>
+		<element name="reel7" ref="Steppers" state="0">
+			<bounds x="340" y="300" width="50" height="50"/>
+		</element>
+
+		<!-- standard lamps -->
 		<repeat count="16">
 			<param name="s" start="0" increment="8" />
-			<param name="x" start="0" increment="8" />
+			<param name="x" start="0" increment="24" />
 			<repeat count="8">
 				<param name="n" start="~s~" increment="1" />
-				<param name="y" start="0" increment="8" />
+				<param name="y" start="0" increment="16" />
 				<element name="lamp~n~" ref="matrixlamp" state="0" blend="add">
-					<bounds x="~x~" y="~y~" width="7" height="7" />
+					<bounds x="~x~" y="~y~" width="23" height="15" />
+				</element>
+				<element name="text~n~" ref="text~n~">
+					<bounds x="~x~" y="~y~" width="23" height="15" />
 				</element>
 			</repeat>
 		</repeat>
-		<repeat count="8">
+
+		<!-- extender board lamps (not always used) -->
+		<repeat count="16">
+			<param name="s" start="128" increment="8" />
+			<param name="x" start="0" increment="24" />
+			<repeat count="8">
+				<param name="n" start="~s~" increment="1" />
+				<param name="y" start="140" increment="16" />
+				<element name="lamp~n~" ref="matrixlamp" state="0" blend="add">
+					<bounds x="~x~" y="~y~" width="23" height="15" />
+				</element>
+				<element name="text~n~" ref="text~n~">
+					<bounds x="~x~" y="~y~" width="23" height="15" />
+				</element>
+			</repeat>
+		</repeat>
+
+		<repeat count="16">
 			<param name="n" start="0" increment="1" />
 			<param name="x" start="300" increment="8" />
 			<element name="digit~n~" ref="digit" state="0">
-				<bounds x="~x~" y="200" width="8" height="10" />
+				<bounds x="~x~" y="280" width="8" height="10" />
 			</element>
 		</repeat>
+
+		<repeat count="16">
+			<param name="n" start="0" increment="1" />
+			<param name="x" start="300" increment="8" />
+			<element name="digit~n~" ref="digitinv" state="0">
+				<bounds x="~x~" y="295" width="8" height="10" />
+			</element>
+		</repeat>
+
 		<group ref="vfd">
 			<bounds x="17" y="280" width="112" height="24" />
 		</group>

@@ -30,6 +30,7 @@ multibus_device::multibus_device(machine_config const &mconfig, char const *tag,
 	, m_mem_config("mem", ENDIANNESS_LITTLE, 16, 24)
 	, m_pio_config("pio", ENDIANNESS_LITTLE, 16, 16)
 	, m_int_cb(*this)
+	, m_xack_cb(*this)
 {
 }
 
@@ -41,6 +42,7 @@ device_memory_interface::space_config_vector multibus_device::memory_space_confi
 void multibus_device::device_start()
 {
 	m_int_cb.resolve_all_safe();
+	m_xack_cb.resolve_safe();
 }
 
 multibus_slot_device::multibus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)

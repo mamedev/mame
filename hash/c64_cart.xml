@@ -1714,7 +1714,7 @@ license:CC0
 
 	<software name="alphazoo">
 		<description>Alphabet Zoo</description>
-			<year>1983</year>
+		<year>1983</year>
 		<publisher>Spinnaker Software</publisher>
 		<info name="serial" value="ABZ-C6" />
 		<part name="cart" interface="c64_cart">
@@ -6264,7 +6264,7 @@ license:CC0
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x10000">
-					<rom name="final_cartridge_3_1988-05.bin" size="0x10000" crc="0d54e680" sha1="85870c1608538169fbae0563e8a3ac8d3ead12a1"/>
+				<rom name="final_cartridge_3_1988-05.bin" size="0x10000" crc="0d54e680" sha1="85870c1608538169fbae0563e8a3ac8d3ead12a1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6278,7 +6278,7 @@ license:CC0
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x10000">
-					<rom name="final_cartridge_3_1987-11.bin" size="0x10000" crc="e3257fd5" sha1="be832850972f909a204f633011898a5ddab0b8f0"/>
+				<rom name="final_cartridge_3_1987-11.bin" size="0x10000" crc="e3257fd5" sha1="be832850972f909a204f633011898a5ddab0b8f0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6292,7 +6292,7 @@ license:CC0
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x10000">
-					<rom name="final_cartridge_3_1987-09.bin" size="0x10000" crc="eeab7bc3" sha1="a1f40b46df36161419092b7b8d7a085e821070d5"/>
+				<rom name="final_cartridge_3_1987-09.bin" size="0x10000" crc="eeab7bc3" sha1="a1f40b46df36161419092b7b8d7a085e821070d5"/>
 			</dataarea>
 		</part>
 	</software>

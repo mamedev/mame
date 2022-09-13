@@ -9,6 +9,7 @@ license:CC0
 	<element name="black"><rect><color red="0.21" green="0.2" blue="0.2" /></rect></element>
 	<element name="lcd_bg"><rect><color red="0.54" green="0.57" blue="0.58" /></rect></element>
 	<element name="text_mode"><text string="Mode" align="1"><color red="0.36" green="0.35" blue="0.35" /></text></element>
+	<element name="whitem"><rect><color red="0.60" green="0.60" blue="0.59" /></rect></element>
 
 	<element name="digit" defstate="0">
 		<led7seg><color red="0.2" green="0.16" blue="0.16" /></led7seg>
@@ -50,7 +51,7 @@ license:CC0
 	</element>
 	<element name="text_newgame">
 		<rect><color red="0.21" green="0.2" blue="0.2" /></rect>
-		<text string="New Game"> <color red="0.81" green="0.8" blue="0.79" /></text>
+		<text string="New Game"><color red="0.81" green="0.8" blue="0.79" /></text>
 	</element>
 	<element name="text_sound">
 		<rect><color red="0.21" green="0.2" blue="0.2" /></rect>
@@ -603,12 +604,26 @@ license:CC0
 		<element ref="black"><bounds x="91.75" y="60.5" width="0.25" height="24" /></element>
 		<element ref="black"><bounds x="102" y="60.5" width="0.25" height="24" /></element>
 
-		<element ref="black"><bounds x="92.5" y="10.5" width="9" height="4" /></element>
-		<element ref="black"><bounds x="92.5" y="15.5" width="9" height="4" /></element>
-		<element ref="black"><bounds x="92.5" y="20.5" width="9" height="4" /></element>
-		<element ref="black"><bounds x="92.5" y="25.5" width="9" height="4" /></element>
-		<element ref="black"><bounds x="92.5" y="30.5" width="9" height="4" /></element>
-		<element ref="black"><bounds x="92.5" y="35.5" width="9" height="4" /></element>
+		<element ref="text_p1"><bounds x="95.4" y="10.8" width="3.2" height="3.2" /></element>
+		<element ref="text_p2"><bounds x="95.4" y="15.8" width="3.2" height="3.2" /></element>
+		<element ref="text_p3"><bounds x="95.4" y="20.8" width="3.2" height="3.2" /></element>
+		<element ref="text_p4"><bounds x="95.4" y="25.8" width="3.2" height="3.2" /></element>
+		<element ref="text_p5"><bounds x="95.4" y="30.8" width="3.2" height="3.2" /></element>
+		<element ref="text_p6"><bounds x="95.4" y="35.8" width="3.2" height="3.2" /></element>
+
+		<element ref="whitem" blend="multiply"><bounds x="92.5" y="10.5" width="9" height="4" /></element>
+		<element ref="whitem" blend="multiply"><bounds x="92.5" y="15.5" width="9" height="4" /></element>
+		<element ref="whitem" blend="multiply"><bounds x="92.5" y="20.5" width="9" height="4" /></element>
+		<element ref="whitem" blend="multiply"><bounds x="92.5" y="25.5" width="9" height="4" /></element>
+		<element ref="whitem" blend="multiply"><bounds x="92.5" y="30.5" width="9" height="4" /></element>
+		<element ref="whitem" blend="multiply"><bounds x="92.5" y="35.5" width="9" height="4" /></element>
+
+		<element ref="black" blend="add"><bounds x="92.5" y="10.5" width="9" height="4" /></element>
+		<element ref="black" blend="add"><bounds x="92.5" y="15.5" width="9" height="4" /></element>
+		<element ref="black" blend="add"><bounds x="92.5" y="20.5" width="9" height="4" /></element>
+		<element ref="black" blend="add"><bounds x="92.5" y="25.5" width="9" height="4" /></element>
+		<element ref="black" blend="add"><bounds x="92.5" y="30.5" width="9" height="4" /></element>
+		<element ref="black" blend="add"><bounds x="92.5" y="35.5" width="9" height="4" /></element>
 
 		<element ref="black"><bounds x="92.5" y="60.5" width="9" height="4" /></element>
 		<element ref="black"><bounds x="92.5" y="65.5" width="9" height="4" /></element>
@@ -638,13 +653,6 @@ license:CC0
 		<element ref="text_tabcolor"><bounds x="80.6" y="97.5" width="8.8" height="2" /></element>
 		<element ref="text_scroll">  <bounds x="92.6" y="92.5" width="8.8" height="2" /></element>
 		<element ref="text_play">    <bounds x="92.6" y="97.5" width="8.8" height="2" /></element>
-
-		<element ref="text_p1"><bounds x="95.4" y="10.8"  width="3.2" height="3.2" /><color alpha="0.75" /></element>
-		<element ref="text_p2"><bounds x="95.4" y="15.8" width="3.2" height="3.2" /><color alpha="0.75" /></element>
-		<element ref="text_p3"><bounds x="95.4" y="20.8" width="3.2" height="3.2" /><color alpha="0.75" /></element>
-		<element ref="text_p4"><bounds x="95.4" y="25.8" width="3.2" height="3.2" /><color alpha="0.75" /></element>
-		<element ref="text_p5"><bounds x="95.4" y="30.8" width="3.2" height="3.2" /><color alpha="0.75" /></element>
-		<element ref="text_p6"><bounds x="95.4" y="35.8" width="3.2" height="3.2" /><color alpha="0.75" /></element>
 
 		<element ref="text_white">   <bounds x="92.6" y="41.5" width="8.8" height="2" /></element>
 		<element ref="text_black">   <bounds x="92.6" y="46.5" width="8.8" height="2" /></element>

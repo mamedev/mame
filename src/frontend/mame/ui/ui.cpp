@@ -42,6 +42,8 @@
 #include "screen.h"
 #include "uiinput.h"
 
+// FIXME: allow OSD module headers to be included in a less ugly way
+#include "../osd/modules/lib/osdlib.h"
 #include "../osd/modules/lib/osdobj_common.h"
 
 #include <chrono>
@@ -552,7 +554,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 			if (!mandatory_images.empty() && show_mandatory_fileman)
 			{
 				std::ostringstream warning;
-				warning << _("This driver requires images to be loaded in the following device(s): ");
+				warning << _("This system requires media images to be mounted for the following device(s): ");
 
 				output_joined_collection(mandatory_images,
 						[&warning](const std::reference_wrapper<const std::string> &img)    { warning << "\"" << img.get() << "\""; },
@@ -1116,6 +1118,7 @@ void mame_ui_manager::decrease_frameskip()
 bool mame_ui_manager::can_paste()
 {
 	// check to see if the clipboard is not empty
+	// FIXME: this is expensive - need a cheaper way to check if clipboard contains suitable content
 	return !osd_get_clipboard_text().empty();
 }
 
@@ -2171,7 +2174,7 @@ void mame_ui_manager::save_main_option()
 			return;
 		}
 	}
-	popup_time(3, "%s", _("\n    Configuration saved    \n\n"));
+	popup_time(3, "%s", _("\n    Settings saved    \n\n"));
 }
 
 void mame_ui_manager::menu_reset()

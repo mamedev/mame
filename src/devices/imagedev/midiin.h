@@ -27,6 +27,7 @@ class midiin_device :    public device_t,
 public:
 	// construction/destruction
 	midiin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	~midiin_device();
 
 	auto input_callback() { return m_input_cb.bind(); }
 
@@ -50,11 +51,11 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-
 	// serial overrides
 	virtual void tra_complete() override;    // Tx completed sending byte
 	virtual void tra_callback() override;    // Tx send bit
+
+	TIMER_CALLBACK_MEMBER(midi_update);
 
 private:
 	static const int XMIT_RING_SIZE = (8192*4*4);

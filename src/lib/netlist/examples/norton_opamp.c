@@ -7,6 +7,7 @@
 #include "netlist/devices/net_lib.h"
 
 NETLIST_START(main)
+{
 
 	/* Standard stuff */
 
@@ -44,9 +45,10 @@ NETLIST_START(main)
 
 	LOG(logX, op1.OUT)
 	LOG(logY, clk)
-NETLIST_END()
+}
 
 NETLIST_START(opamp)
+{
 
 	/* Opamp model from
 	 *
@@ -94,9 +96,10 @@ NETLIST_START(opamp)
 	NET_C(CP1.1, RP1.1)
 	NET_C(EBUF.IP, RP1.1)
 
-NETLIST_END()
+}
 
 NETLIST_START(opamp_fast)
+{
 
 	/*
 	 *  Fast norton opamp model without bandwidth
@@ -123,4 +126,4 @@ NETLIST_START(opamp_fast)
 	PARAM(G1.G, 1000000)
 	PARAM(G1.RO, RES_K(8))
 
-NETLIST_END()
+}

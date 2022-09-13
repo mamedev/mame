@@ -1260,8 +1260,8 @@ void z8_device::device_start()
 	space(AS_IO).specific(m_regs);
 
 	/* allocate timers */
-	m_internal_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z8_device::timeout<0>), this));
-	m_internal_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z8_device::timeout<1>), this));
+	m_internal_timer[0] = timer_alloc(FUNC(z8_device::timeout<0>), this);
+	m_internal_timer[1] = timer_alloc(FUNC(z8_device::timeout<1>), this);
 
 	/* Clear state */
 	std::fill(std::begin(m_irq_line), std::end(m_irq_line), CLEAR_LINE);

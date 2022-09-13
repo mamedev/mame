@@ -68,18 +68,15 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	inline u16 ef9340_get_c_addr(u8 x, u8 y);
 	inline void ef9340_inc_c();
 
-	void ef9340_scanline(int vpos);
+	TIMER_CALLBACK_MEMBER(draw_scanline);
+	TIMER_CALLBACK_MEMBER(blink_update);
 
 	// timers
-	static constexpr device_timer_id TIMER_LINE = 0;
-	static constexpr device_timer_id TIMER_BLINK = 1;
-
 	emu_timer *m_line_timer;
 	emu_timer *m_blink_timer;
 
@@ -87,8 +84,8 @@ protected:
 
 	bitmap_ind16 m_tmp_bitmap;
 
-	int m_offset_x = 0;
-	int m_offset_y = 0;
+	int m_offset_x;
+	int m_offset_y;
 
 	struct
 	{

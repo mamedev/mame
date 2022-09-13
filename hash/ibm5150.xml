@@ -119,11 +119,12 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="agentusa">
-		<description>Agent USA</description>
+		<description>Agent USA (cracked)</description>
 		<year>1985</year>
 		<publisher>Scholastic Corporation</publisher>
 		<info name="developer" value="Tom Snyder Productions" />
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184320">
 				<rom name="agent usa.img" size="184320" crc="480ab416" sha1="dc0008d4218787969f5a7856d49b1558a70e0fa9"/>
@@ -132,12 +133,12 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="alleycat">
-		<description>Alley Cat [cr]</description>
+		<description>Alley Cat (cracked)</description>
 		<year>1984</year>
 		<publisher>IBM</publisher>
 		<info name="developer" value="Synapse Software" />
 		<info name="usage" value="PC Booter" />
-		<info name="cracked" value="demonlord" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184320">
 				<rom name="alley cat.img" size="184320" crc="23228e10" sha1="c4e1b163b14fbffe3bef97816d5b7db142c593f1"/>
@@ -158,11 +159,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="aplepanc">
-		<description>Apple Panic [cr]</description>
+		<description>Apple Panic (cracked)</description>
 		<year>1982</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="usage" value="PC Booter" />
-		<info name="cracked" value="demonlord" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
 				<rom name="apple panic.img" size="163840" crc="5594040e" sha1="d865096cfdc42c964bf375725cfd2c5058a97217"/>
@@ -290,11 +291,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="bigtop" supported="no">
-		<description>Big Top [cr]</description>
+		<description>Big Top (cracked)</description>
 		<year>1983</year>
 		<publisher>Funtastic</publisher>
 		<info name="usage" value="PC Booter" />
-		<info name="cracked" value="demonlord" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184320">
 				<rom name="big top.img" size="184320" crc="b5ed200c" sha1="3e9f581acb9022d97049124fa9e416d31d2efa68"/>
@@ -398,7 +399,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="bdash12a" cloneof="bdash12">
-		<description>Boulder Dash I &amp; II (alt) [cr]</description>
+		<description>Boulder Dash I &amp; II (alt) (cracked)</description>
 		<year>1985</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="developer" value="First Star Software" />
@@ -436,7 +437,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="bugrangr">
-		<description>Buggy Ranger [cr]</description>
+		<description>Buggy Ranger (cracked)</description>
 		<year>1989</year>
 		<publisher>Iron Byte</publisher>
 		<info name="usage" value="PC Booter" />
@@ -750,12 +751,12 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="dunzhina" cloneof="dunzhin">
-		<description>Dunzhin: Warrior of Ras Volume I [cr]</description>
+		<description>Dunzhin: Warrior of Ras Volume I (cracked)</description>
 		<year>1982</year>
 		<publisher>Computer Applications Unlimited</publisher>
 		<info name="developer" value="Intelligent Statement" />
 		<info name="usage" value="PC Booter" />
-		<info name="cracked" value="demonlord" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
 				<rom name="dunzhin - warrior of ras volume i.img" size="163840" crc="b9262dc3" sha1="7e76c35d082debca67b06c9326a49b47db46463c"/>
@@ -886,7 +887,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="4thprot">
-		<description>Frederick Forsyth's The Fourth Protocol [cr]</description>
+		<description>Frederick Forsyth's The Fourth Protocol (cracked)</description>
 		<year>1987</year>
 		<publisher>Ariolasoft UK</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1073,10 +1074,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 
 	<software name="hhmack" supported="no">
 	<!-- Might be Bad -->
-		<description>Hard Hat Mack</description>
+		<description>Hard Hat Mack (cracked)</description>
 		<year>1984</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
 				<rom name="hard hat mack.img" size="204800" crc="919b3aff" sha1="037aad77c610282aca5c77dffc4548c7c4ef8394"/>
@@ -1195,11 +1197,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="jbird">
-		<description>J-Bird [cr]</description>
+		<description>J-Bird (cracked)</description>
 		<year>1983</year>
 		<publisher>Greg Kuperberg</publisher>
 		<info name="usage" value="PC Booter" />
-		<info name="cracked" value="demonlord" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
 				<rom name="j-bird.img" size="163840" crc="d5b17630" sha1="485b19cf53898edba077c33dfaa68ef218ee9137"/>
@@ -1262,11 +1264,12 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="kingqst" supported="no">
-		<description>King's Quest</description>
+		<description>King's Quest (PC Booter release, cracked)</description>
 		<year>1984</year>
 		<publisher>IBM</publisher>
 		<info name="developer" value="Sierra On-Line" />
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="king's quest.img" size="368640" crc="a331a88b" sha1="51b7db761c2d9d8bb25fe053e0a5a0f97e2f2914"/>
@@ -1275,11 +1278,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="kingqst2">
-		<description>King's Quest II: Romancing the Throne (v1.1h) [cr]</description>
+		<description>King's Quest II: Romancing the Throne (v1.1h) (cracked)</description>
 		<year>1985</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="usage" value="PC Booter" />
-		<info name="cracked" value="demonlord" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="king's quest ii - romancing the throne v1.1h (disk 1 of 2).img" size="368640" crc="4107b044" sha1="874bc6ccffbd9a0e5faee8972b2eeedfb82aeb62"/>
@@ -1389,11 +1392,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="marble">
-		<description>Marble Madness [cr]</description>
+		<description>Marble Madness (cracked)</description>
 		<year>1986</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="usage" value="PC Booter" />
-		<info name="cracked" value="demonlord" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
 				<rom name="marble madness (disk 1 of 2).img" size="409600" crc="256bcd8c" sha1="e68e7c0e2c7d55a5fdcf96fa41d52a6de7ee73a8"/>
@@ -1438,12 +1441,12 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="msadventcr" cloneof="msadvent">
-		<description>Microsoft Adventure [cr]</description>
+		<description>Microsoft Adventure (cracked)</description>
 		<year>1981</year>
 		<publisher>IBM</publisher>
 		<info name="developer" value="Microsoft" />
 		<info name="usage" value="PC Booter" />
-		<info name="cracked" value="demonlord" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184320">
 				<rom name="microsoft adventure [cr].img" size="184320" crc="7148422b" sha1="4d0704af33186890a7579a60f88e1576b718886d"/>
@@ -1452,11 +1455,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="decathln">
-		<description>Microsoft Decathlon [cr]</description>
+		<description>Microsoft Decathlon (cracked)</description>
 		<year>1982</year>
 		<publisher>Microsoft</publisher>
 		<info name="usage" value="PC Booter" />
-		<info name="cracked" value="demonlord" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184320">
 				<rom name="microsoft decathlon.img" size="184320" crc="34435a3c" sha1="55bb5aa1b085c167e1f07ceb7cca845d6b18173e"/>
@@ -1570,10 +1573,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="montezum">
-		<description>Montezuma's Revenge</description>
+		<description>Montezuma's Revenge (cracked)</description>
 		<year>1984</year>
 		<publisher>BCI Software</publisher>
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184320">
 				<rom name="montezuma's revenge.img" size="184320" crc="a6847754" sha1="411728a69cf1fc92510565be03e38193700f287f"/>
@@ -1582,11 +1586,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="mpatrol">
-		<description>Moon Patrol [cr]</description>
+		<description>Moon Patrol (cracked)</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
 		<info name="usage" value="PC Booter" />
-		<info name="cracked" value="demonlord" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="moon patrol.img" size="368640" crc="abba0f4a" sha1="ec9304efec24d91e4ce584f977dd899bf22353d3"/>
@@ -1667,7 +1671,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="musicset">
-		<description>Will Harvey's Music Construction Set [cr]</description>
+		<description>Will Harvey's Music Construction Set (cracked)</description>
 		<year>1984</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="usage" value="PC Booter" />
@@ -1732,6 +1736,18 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="pacmantm">
+		<description>Pac-Man (Thunder Mountain release)</description>
+		<year>1988</year>
+		<publisher>Thunder Mountain</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="38224">
+				<rom name="Pac-Man [Thunder Mountain] [1988] [5.25DD].td0" size="38224" crc="3ce9b079" sha1="14b6f646807630d0e916ed0209baaf0b2ed3c67f"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="packpc">
 		<description>Pack PC Opera Soft</description>
 		<year>1987</year>
@@ -1769,11 +1785,12 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="poolchal">
-		<description>PC Pool challenges</description>
+		<description>PC Pool Challenges (cracked)</description>
 		<year>1984</year>
 		<publisher>IBM</publisher>
 		<info name="developer" value="Hesware" />
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184320">
 				<rom name="pc pool challenges.img" size="184320" crc="3a3b51d5" sha1="a86b3e1ea24a745bac757508ad33d7f1289c31cf"/>
@@ -1782,11 +1799,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="pinball">
-		<description>Pinball Construction Set [cr]</description>
+		<description>Pinball Construction Set (cracked)</description>
 		<year>1985</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="usage" value="PC Booter" />
-		<info name="cracked" value="demonlord" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
 				<rom name="pinball construction set.img" size="409600" crc="6460e995" sha1="4e20da455dcd482371fa55510ea5f4c440580cce"/>
@@ -1806,11 +1823,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="pirates">
-		<description>Sid Meier's Pirates! [cr]</description>
+		<description>Sid Meier's Pirates! (cracked)</description>
 		<year>1987</year>
 		<publisher>MicroProse</publisher>
 		<info name="usage" value="PC Booter" />
-		<info name="cracked" value="demonlord" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="pirates (disk 1 of 2).img" size="368640" crc="db732151" sha1="5e9c1d4866aa928fc8ac1d61779bd2971761c52b"/>
@@ -1958,11 +1975,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="serptine">
-		<description>Serpentine [cr]</description>
+		<description>Serpentine (cracked)</description>
 		<year>1984</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="usage" value="PC Booter" />
-		<info name="cracked" value="demonlord" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
 				<rom name="serpentine.img" size="163840" crc="bcf96e44" sha1="e9fb3bf2e0d689ed7793e1b1426f20d76796c686"/>
@@ -1971,10 +1988,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="7citygld">
-		<description>Seven Cities of Gold</description>
+		<description>Seven Cities of Gold (cracked)</description>
 		<year>1985</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="152123">
 				<rom name="seven cities of gold (disk 1).td0" size="152123" crc="ab769135" sha1="8e226deb89b32eee926ee02510566e2d75c56916"/>
@@ -2024,7 +2042,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="silentsra" cloneof="silentsr">
-		<description>Silent Service - The Submarine Simulation [cr]</description>
+		<description>Silent Service - The Submarine Simulation (cracked)</description>
 		<year>1985</year>
 		<publisher>MicroProse</publisher>
 		<info name="usage" value="PC Booter" />
@@ -2084,10 +2102,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="spacestr">
-		<description>Space Strike</description>
+		<description>Space Strike (cracked)</description>
 		<year>1982</year>
 		<publisher>Funtastic</publisher>
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
 				<rom name="space strike.img" size="163840" crc="89af96f6" sha1="cd59d75dd76abf2023f72f9515c5366f6132d842"/>
@@ -2157,10 +2176,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="sumgame2">
-		<description>Summer Games II</description>
+		<description>Summer Games II (cracked)</description>
 		<year>1986</year>
 		<publisher>Epyx</publisher>
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="Niclas (The Carebears)" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="summer games 2.img" size="368640" crc="a9ebb8f5" sha1="78f5300488c37f858681b856ff53e6eeadf01d53"/>
@@ -2325,10 +2345,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="troltale">
-		<description>Troll's Tale</description>
+		<description>Troll's Tale (cracked)</description>
 		<year>1984</year>
 		<publisher>Sierra</publisher>
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184320">
 				<rom name="troll's tale.img" size="184320" crc="8879486a" sha1="c11bb9280a5f10d1a15a2bb0a40ae4c24381e84c"/>
@@ -2337,10 +2358,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="tv101">
-		<description>TV and Cinema 101: Trivia from Talkies to Trekkies</description>
+		<description>TV and Cinema 101: Trivia from Talkies to Trekkies (cracked)</description>
 		<year>1984</year>
 		<publisher>IBM</publisher>
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="tv and cinema 101 - trivia from talkies to trekkies.img" size="327680" crc="de4e13e8" sha1="39d54c50efe78e6ab4e3821f7038cea8b830239a"/>
@@ -2349,10 +2371,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="ulysses">
-		<description>Ulysses and the Golden Fleece</description>
+		<description>Ulysses and the Golden Fleece (cracked)</description>
 		<year>1981</year>
 		<publisher>Sierra</publisher>
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
 				<rom name="ulysses and the golden fleece (disk 1 of 2).img" size="163840" crc="9bae2a6a" sha1="a81403b5ee77f974817b2efa9752e8a25d6ac32b"/>
@@ -2470,10 +2493,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="wizardr4">
-		<description>Wizardry IV: The Return of Werdna</description>
+		<description>Wizardry IV: The Return of Werdna (cracked)</description>
 		<year>1987</year>
 		<publisher>Sir-Tech Software</publisher>
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="737280">
 				<rom name="wizardry 4 - the return of werdna.img" size="737280" crc="e33b0ade" sha1="fa524474b8c05047baf8474ea2efdf6cb9052a06"/>
@@ -2482,10 +2506,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="wizardr5">
-		<description>Wizardry V: Heart of the Maelstrom</description>
+		<description>Wizardry V: Heart of the Maelstrom (cracked)</description>
 		<year>1987</year>
 		<publisher>Sir-Tech Software</publisher>
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="737280">
 				<rom name="wizardry 5 - heart of the maelstrom.img" size="737280" crc="a85a5459" sha1="c5a8dd0db15b0bf940b266775d3df19b385f146c"/>
@@ -5385,12 +5410,12 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="version" value="6.0" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="[PC] DR DOS  6.00 Business Update FR [5.25DD] [Disk 1 of 2].img" size="368640" crc="747dfe34" sha1="fc1b19f48ceb4a7c8c5e912582c6eb8889c231fb"/>
+				<rom name="[PC] DR DOS 6.00 Business Update FR [5.25DD] [Disk 1 of 2].img" size="368640" crc="747dfe34" sha1="fc1b19f48ceb4a7c8c5e912582c6eb8889c231fb"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="[PC] DR DOS  6.00 Business Update FR [5.25DD] [Disk 2 of 2].img" size="368640" crc="02a45926" sha1="88a93294606904c2aac270c81d401ee90cd1ad6f"/>
+				<rom name="[PC] DR DOS 6.00 Business Update FR [5.25DD] [Disk 2 of 2].img" size="368640" crc="02a45926" sha1="88a93294606904c2aac270c81d401ee90cd1ad6f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5402,7 +5427,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="version" value="6.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="[PC] DR DOS  6.00 Business Update FR [3.5DD] [Disk 1 of 1].img" size="737280" crc="ce6fe2d7" sha1="684b4a184557b5932ea3c97146b483827e4a6d4d"/>
+				<rom name="[PC] DR DOS 6.00 Business Update FR [3.5DD] [Disk 1 of 1].img" size="737280" crc="ce6fe2d7" sha1="684b4a184557b5932ea3c97146b483827e4a6d4d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5884,17 +5909,17 @@ has been replaced with an all-zero block. -->
 		<publisher>Microsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="disk1.img" size="368640" crc="136579c0" sha1="dc50472d5355b7c29fab0361c262ef83dde6a2ea"/>
+				<rom name="disk1 (alt).img" size="368640" crc="136579c0" sha1="dc50472d5355b7c29fab0361c262ef83dde6a2ea"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="disk2.img" size="368640" crc="c5e7e32f" sha1="c03f03494271bbdfb8865efa79bf8f5b5061b233"/>
+				<rom name="disk2 (alt).img" size="368640" crc="c5e7e32f" sha1="c03f03494271bbdfb8865efa79bf8f5b5061b233"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="disk3.img" size="368640" crc="9a7366fe" sha1="e56a8fb2732a258bd50465c596ff5e16b53afae3"/>
+				<rom name="disk3 (alt).img" size="368640" crc="9a7366fe" sha1="e56a8fb2732a258bd50465c596ff5e16b53afae3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7311,7 +7336,7 @@ has been replaced with an all-zero block. -->
 				<rom name="D6.img" size="368640" crc="e8962a7e" sha1="8dbcf2b2d3c849de88a9db5d817bffbcb3d074e0"/>
 			</dataarea>
 		</part>
-			<part name="flop7" interface="floppy_5_25">
+		<part name="flop7" interface="floppy_5_25">
 			<feature name="part_id" value="Development System volume D7"/>
 			<dataarea name="flop" size="368640">
 				<rom name="D7.img" size="368640" crc="5e734955" sha1="e925c894c0674a83185d1d2f4dcfa3834fc8aa2d"/>
@@ -7329,7 +7354,7 @@ has been replaced with an all-zero block. -->
 				<rom name="D9.img" size="368640" crc="d07dbd2c" sha1="1941e45a0a3d861222a0ada0e945a8ac69f18074"/>
 			</dataarea>
 		</part>
-			<part name="flop10" interface="floppy_5_25">
+		<part name="flop10" interface="floppy_5_25">
 			<feature name="part_id" value="Development System volume D10"/>
 			<dataarea name="flop" size="368640">
 				<rom name="D10.img" size="368640" crc="25d07207" sha1="ef25823026141ccf3d5c12a0f64e5bca7703e65a"/>
@@ -7472,7 +7497,7 @@ has been replaced with an all-zero block. -->
 
 	<!-- DOS-based games -->
 
-	<software name="2400ad" supported="no"> <!-- unemulated protection, game needs cracked exe to play ATM  -->
+	<software name="2400ad" supported="no"> <!-- unemulated protection, game needs cracked exe to play ATM -->
 		<description>2400 A.D. (set 1)</description>
 		<year>1987</year>
 		<publisher>Origin</publisher>
@@ -7902,6 +7927,90 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="drgnstrk">
+		<description>Advanced Dungeons &amp; Dragons - DragonStrike (v1.2)</description>
+		<year>1990</year>
+		<publisher>SSI</publisher>
+		<info name="developer" value="Westwood Associates" />
+		<info name="version" value="1.2" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="DragonStrike (v1.2) [SSI] [1990] [5.25DD] [Disk 1 of 4].img" size="368640" crc="376cc6e4" sha1="878b61c532e3bbce2bb5aea79497bfcbe0efaf2f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="DragonStrike (v1.2) [SSI] [1990] [5.25DD] [Disk 2 of 4].img" size="368640" crc="a985af7d" sha1="28443a14d072f56f3b1b2e2668e5975ff290532b"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="DragonStrike (v1.2) [SSI] [1990] [5.25DD] [Disk 3 of 4].img" size="368640" crc="75b5e9be" sha1="c010110044b3b4e1e5bf5c6c796c1ba8c7cad0d7"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="DragonStrike (v1.2) [SSI] [1990] [5.25DD] [Disk 4 of 4].img" size="368640" crc="2b7d460d" sha1="8e9fc7392c6d7b7de8c623c8ad015399a36d598f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drgnstrka" cloneof="drgnstrk">
+		<description>Advanced Dungeons &amp; Dragons - DragonStrike (v1.0)</description>
+		<year>1990</year>
+		<publisher>SSI</publisher>
+		<info name="developer" value="Westwood Associates" />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="DragonStrike (v1.0) [SSI] [1990] [5.25DD] [Disk 1 of 4].img" size="368640" crc="9b558856" sha1="047db55b0ca2e5e8df78c2c81886208cc1b8dd81"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="DragonStrike (v1.0) [SSI] [1990] [5.25DD] [Disk 2 of 4].img" size="368640" crc="03f54f0e" sha1="79ca48d302c428aacfd311354ecf2f3c1687c16c"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="DragonStrike (v1.0) [SSI] [1990] [5.25DD] [Disk 3 of 4].img" size="368640" crc="e32a01da" sha1="da0930ab4edf03fadeab40311ba9beb25f76729d"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="DragonStrike (v1.0) [SSI] [1990] [5.25DD] [Disk 4 of 4].img" size="368640" crc="b343e058" sha1="c2d8bb7348a79a742488fa12f5f2c1e3a837e22a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drgnstrkb" cloneof="drgnstrk">
+		<description>Advanced Dungeons &amp; Dragons - DragonStrike (v1.1)</description>
+		<year>1990</year>
+		<publisher>SSI</publisher>
+		<info name="developer" value="Westwood Associates" />
+		<info name="version" value="1.1" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="DragonStrike (v1.1) [SSI] [1990] [5.25DD] [Disk 1 of 4].img" size="368640" crc="b68f7377" sha1="f48fbae2e8f145a5ccfe67bb37c3d8d6348018a2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="DragonStrike (v1.1) [SSI] [1990] [5.25DD] [Disk 2 of 4].img" size="368640" crc="a985af7d" sha1="28443a14d072f56f3b1b2e2668e5975ff290532b"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="DragonStrike (v1.1) [SSI] [1990] [5.25DD] [Disk 3 of 4].img" size="368640" crc="75b5e9be" sha1="c010110044b3b4e1e5bf5c6c796c1ba8c7cad0d7"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="DragonStrike (v1.1) [SSI] [1990] [5.25DD] [Disk 4 of 4].img" size="368640" crc="2b7d460d" sha1="8e9fc7392c6d7b7de8c623c8ad015399a36d598f"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="darkmoon">
 		<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
 		<description>Advanced Dungeons &amp; Dragons - Eye of the Beholder II: The Legend of Darkmoon</description>
@@ -8263,7 +8372,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ys" supported="no">
 		<description>Ancient Land of Ys</description>
 		<year>1989</year>
@@ -9487,52 +9596,52 @@ has been replaced with an all-zero block. -->
 		<info name="version" value="1.000.046" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [5.25DD] [Disk 01 of 10].img" size="368640" crc="c2c2801b" sha1="95118dac5ee6232413e282397f047f70c2a5ca95"/>
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989] [5.25DD] [Disk 01 of 10].img" size="368640" crc="c2c2801b" sha1="95118dac5ee6232413e282397f047f70c2a5ca95"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [5.25DD] [Disk 02 of 10].img" size="368640" crc="793af3e9" sha1="37cc73635c32a6a23934676d9c04e40b17be48b9"/>
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989] [5.25DD] [Disk 02 of 10].img" size="368640" crc="793af3e9" sha1="37cc73635c32a6a23934676d9c04e40b17be48b9"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [5.25DD] [Disk 03 of 10].img" size="368640" crc="f0db56de" sha1="6b1e5624a63cb98896da397084242f9b7e11f6fd"/>
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989] [5.25DD] [Disk 03 of 10].img" size="368640" crc="f0db56de" sha1="6b1e5624a63cb98896da397084242f9b7e11f6fd"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [5.25DD] [Disk 04 of 10].img" size="368640" crc="b50d5d25" sha1="14901e38dddf7fda09f5ba70de016584ef988d21"/>
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989] [5.25DD] [Disk 04 of 10].img" size="368640" crc="b50d5d25" sha1="14901e38dddf7fda09f5ba70de016584ef988d21"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [5.25DD] [Disk 05 of 10].img" size="368640" crc="c25e531d" sha1="d2c4a8439d396a1eaea1ad8cd3b533071a8bb69f"/>
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989] [5.25DD] [Disk 05 of 10].img" size="368640" crc="c25e531d" sha1="d2c4a8439d396a1eaea1ad8cd3b533071a8bb69f"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [5.25DD] [Disk 06 of 10].img" size="368640" crc="f19693f3" sha1="9fcee8c6dbcc6e9b10e8582aaddcb774608a3e84"/>
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989] [5.25DD] [Disk 06 of 10].img" size="368640" crc="f19693f3" sha1="9fcee8c6dbcc6e9b10e8582aaddcb774608a3e84"/>
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [5.25DD] [Disk 07 of 10].img" size="368640" crc="eec57cd1" sha1="a8468d3c8505fa80e71f658356e7ce3387877699"/>
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989] [5.25DD] [Disk 07 of 10].img" size="368640" crc="eec57cd1" sha1="a8468d3c8505fa80e71f658356e7ce3387877699"/>
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [5.25DD] [Disk 08 of 10].img" size="368640" crc="ee0c8b6f" sha1="17284ab1dd6e45cc3c968d35a3e5e2785071e153"/>
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989] [5.25DD] [Disk 08 of 10].img" size="368640" crc="ee0c8b6f" sha1="17284ab1dd6e45cc3c968d35a3e5e2785071e153"/>
 			</dataarea>
 		</part>
 		<part name="flop9" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [5.25DD] [Disk 09 of 10].img" size="368640" crc="b8badbd5" sha1="5b5fac0fa5acdbe4d9c987e992afe6526db0edbb"/>
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989] [5.25DD] [Disk 09 of 10].img" size="368640" crc="b8badbd5" sha1="5b5fac0fa5acdbe4d9c987e992afe6526db0edbb"/>
 			</dataarea>
 		</part>
 		<part name="flop10" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [5.25DD] [Disk 10 of 10].img" size="368640" crc="77d189bd" sha1="6a51026779cf8c2495e04195fe2d15708bf40f51"/>
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989] [5.25DD] [Disk 10 of 10].img" size="368640" crc="77d189bd" sha1="6a51026779cf8c2495e04195fe2d15708bf40f51"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9545,22 +9654,22 @@ has been replaced with an all-zero block. -->
 		<info name="version" value="1.000.046" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [3.5DD] [Disk 1 of 4].img" size="737280" crc="d3f80650" sha1="e4119b36a02230acf42498879ab7570a183f35b4"/>
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989] [3.5DD] [Disk 1 of 4].img" size="737280" crc="d3f80650" sha1="e4119b36a02230acf42498879ab7570a183f35b4"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [3.5DD] [Disk 2 of 4].img" size="737280" crc="61663864" sha1="02865bc61fe45a8031c608ec7c76ef9f05ac8ae3"/>
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989] [3.5DD] [Disk 2 of 4].img" size="737280" crc="61663864" sha1="02865bc61fe45a8031c608ec7c76ef9f05ac8ae3"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [3.5DD] [Disk 3 of 4].img" size="737280" crc="1e6c2f9b" sha1="95f5673450c7f81d296887506e7109b45d022b32"/>
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989] [3.5DD] [Disk 3 of 4].img" size="737280" crc="1e6c2f9b" sha1="95f5673450c7f81d296887506e7109b45d022b32"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989]  [3.5DD] [Disk 4 of 4].img" size="737280" crc="a35399e0" sha1="da4d4814782be5a14429c193e66993764a1cd0cc"/>
+				<rom name="Laura Bow - The Colonel's Bequest [Sierra On-Line] [1989] [3.5DD] [Disk 4 of 4].img" size="737280" crc="a35399e0" sha1="da4d4814782be5a14429c193e66993764a1cd0cc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11161,7 +11270,29 @@ has been replaced with an all-zero block. -->
 		<info name="developer" value="Manley &amp; Associates, Inc" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Home Alone [Capstone] [1991] [3.5].img" size="737280" crc="4cb8e8c4" sha1="27929ce82de6cbfaa5e45ce3afcde086efe8244a"/>
+				<rom name="Home Alone [Capstone] [1991] [3.5DD] [Disk 1 of 1].img" size="737280" crc="a2d89384" sha1="07f7546e3d1082ea2e94e485db792c8e04e8658f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="homealn2">
+		<description>Home Alone 2: Lost in New York</description>
+		<year>1992</year>
+		<publisher>Capstone</publisher>
+		<info name="developer" value="Manley &amp; Associates, Inc" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Home Alone 2 [Capstone] [1992] [3.5DD] [Disk 1 of 3].img" size="737280" crc="fdca251d" sha1="12b765a38bbf7757c4db9c087bbd34a477270293"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Home Alone 2 [Capstone] [1992] [3.5DD] [Disk 2 of 3].img" size="737280" crc="20746bb9" sha1="4f1c826182497c0bea2140e615cd0437fd05197d"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Home Alone 2 [Capstone] [1992] [3.5DD] [Disk 3 of 3].img" size="737280" crc="d00095cd" sha1="fb0da176945d880db44f386c8b23928b1309eac3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11717,6 +11848,24 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="kingqstd" supported="no">
+		<description>King's Quest (DOS release)</description>
+		<year>1987</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<part name="flop1" interface="floppy_5_25">
+			<!-- Copy-protected key disk -->
+			<dataarea name="flop" size="2873168">
+				<rom name="King's Quest [Sierra] [1987] [5.25DD] [Disk 1 of 2].mfm" size="2873168" crc="89662da9" sha1="ffa69b494eaa5edd2a5f32ee16a39a3e7a146bce"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="King's Quest [Sierra] [1987] [5.25DD] [Disk 2 of 2].img" size="368640" crc="7524a18f" sha1="726577c03b919aa8ce278d769b3a11eb70f5c444"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kingqst1">
 		<description>King's Quest I: Quest for the Crown</description>
 		<year>1990</year>
@@ -11876,7 +12025,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="kult">
-		<description>Kult [cr]</description>
+		<description>Kult (cracked)</description>
 		<year>1989</year>
 		<publisher>Infogrames Multimedia SA</publisher>
 		<info name="developer" value="Exxos/ERE Informatique" />
@@ -13405,7 +13554,7 @@ has been replaced with an all-zero block. -->
 		<publisher>Sega</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="[PC] Outrun [3.5DD]  [Disk 1 of 1].img" size="737280" crc="5bf4afae" sha1="f189136da8ac284cfb3bf06b402328cd827a42a2"/>
+				<rom name="[PC] Outrun [3.5DD] [Disk 1 of 1].img" size="737280" crc="5bf4afae" sha1="f189136da8ac284cfb3bf06b402328cd827a42a2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13416,18 +13565,26 @@ has been replaced with an all-zero block. -->
 		<publisher>Kixx</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Outrun (Kixx release) [Sega] [1989] [3.5DD]  [Disk 1 of 1].img" size="737280" crc="55bf00de" sha1="b48e9536263481ac283149c3ab679e9369027729"/>
+				<rom name="Outrun (Kixx release) [Sega] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="55bf00de" sha1="b48e9536263481ac283149c3ab679e9369027729"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="overnet">
-		<description>Over the Net</description>
+		<description>Over the Net!</description>
 		<year>1991</year>
-		<publisher>Genias</publisher>
+		<publisher>Merit Software</publisher>
+		<info name="developer" value="Genias" />
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - VGA/MCGA" />
 			<dataarea name="flop" size = "737280">
-				<rom name="Over the Net (1991)(Genias).dsk" size="737280" crc="71e8f2d0" sha1="e2b758f7484e602d6ac5b7375b46591f5f7230ee"/>
+				<rom name="Over The Net [Merit Software] [1991] [3.5DD] [Disk 1 of 2].img" size="737280" crc="65f2cd46" sha1="f84f5411296e07b29c5ca418d86c7aee235e853e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Hercules/CGA/EGA" />
+			<dataarea name="flop" size = "737280">
+				<rom name="Over The Net [Merit Software] [1991] [3.5DD] [Disk 2 of 2].img" size="737280" crc="07c9aa99" sha1="17c6c7b0cea815f176b9d99653c7c9d4f4241904"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14257,6 +14414,19 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="secretagsw" cloneof="secretag">
+		<description>Secret Agent (shareware, The $5 Computer Software Store - Wiz Technology release)</description>
+		<year>1993</year>
+		<publisher>Wiz Technology</publisher>
+		<info name="developer" value="Apogee Software" />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Secret Agent (shareware) [Wiz Technology] [1993] [3.5DD] [Disk 1 of 1].img" size="737280" crc="598832f3" sha1="bd3020c23f5ee27b4eaf2ce3646d8006595c54bc"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="monkey">
 		<description>The Secret of Monkey Island (5.25", EGA version)</description>
 		<year>1990</year>
@@ -14332,7 +14502,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sexvixen">
 		<description>Sex Vixens from Space</description>
 		<year>1989</year>
@@ -15645,6 +15815,17 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="tempdeat">
+		<description>Temple of Death (PC Disk Quarterly #9)</description>
+		<year>1991</year>
+		<publisher>I.B. Mafazette</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Temple of Death [I.B. Mafazette] [1990] [5.25DD] [Disk 1 of 1].img" size="368640" crc="7ae4a39e" sha1="805dc8539ff8edeca61a13405ee58c6fe92e07e2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tenniscup2">
 		<description>Tennis Cup II (Kixx release)</description>
 		<year>1992</year>
@@ -16165,7 +16346,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="wcsoccer">
 		<description>World Championship Soccer (5.25")</description>
 		<year>1991</year>

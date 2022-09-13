@@ -162,7 +162,7 @@ void nes_batmap_000_device::write_h(offs_t offset, u8 data)
  -------------------------------------------------*/
 
 // IRQ based on our MMC3 implementation, details for SRR are unclear
-void nes_batmap_srrx_device::hblank_irq(int scanline, int vblank, int blanked)
+void nes_batmap_srrx_device::hblank_irq(int scanline, bool vblank, bool blanked)
 {
 	if (scanline < ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE)
 	{

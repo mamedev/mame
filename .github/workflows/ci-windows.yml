@@ -18,6 +18,9 @@ on:
     - 'COPYING'
     - 'makefile'
 
+permissions:
+  contents: read
+
 jobs:
 
   build-windows-gcc:

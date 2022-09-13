@@ -123,7 +123,7 @@ license:CC0
 		<description>Alphabet Zoo</description>
 		<year>1984</year>
 		<publisher>Spinnaker Software</publisher>
-		<info name="author" value="Dale Disharoon &amp; Bill Groetzinger " />
+		<info name="author" value="Dale Disharoon &amp; Bill Groetzinger" />
 		<info name="serial" value="ABC-CV" />
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="16384">
@@ -1206,7 +1206,7 @@ license:CC0
 		<description>Pitfall II: Lost Caverns</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="VS-008    " />
+		<info name="serial" value="VS-008" />
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="pitfall2.1" size="8192" crc="08ad596e" sha1="d4961033a60b00fb9f99de49079a588b4a6518f0" offset="0x0000" />
@@ -1813,7 +1813,7 @@ license:CC0
 				<rom name="secalpha.1" size="8192" crc="9299539b" sha1="880beb9a4df332948052b40eef09b6c877de5f9e" offset="0x0000" /> <!-- 2364 -->
 				<rom name="secalpha.2" size="8192" crc="c8d6e83d" sha1="366877e0b68cdf2e4bfde38d9ce72eed97946f89" offset="0x2000" /> <!-- 2364 -->
 				<rom name="secalpha.3" size="4096" crc="354a3b2f" sha1="ff8966cec010248af60d2e2abee8a949c154ea25" offset="0x4000" /> <!-- 2332 -->
-				 <!-- NOTE: on this PCB, 2332 upper half is inaccessible and returns open bus, this misfeature is not yet emulated -->
+				<!-- NOTE: on this PCB, 2332 upper half is inaccessible and returns open bus, this misfeature is not yet emulated -->
 			</dataarea>
 		</part>
 	</software>

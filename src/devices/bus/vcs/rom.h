@@ -10,60 +10,50 @@
 
 // ======================> a26_rom_2k_device
 
-class a26_rom_2k_device : public device_t,
-						public device_vcs_cart_interface
+class a26_rom_base_device : public device_t,
+							public device_vcs_cart_interface
 {
-public:
-	// construction/destruction
-	a26_rom_2k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// reading and writing
-	virtual uint8_t read_rom(offs_t offset) override;
-
 protected:
-	a26_rom_2k_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a26_rom_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, type, tag, owner, clock)
+		, device_vcs_cart_interface(mconfig, *this)
+	{ }
 
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override { }
+
+	bool is_ram_present(size_t minimum_size);
+	uint8_t read_ram(offs_t offset);
+	void write_ram(offs_t offset, uint8_t data);
 };
 
 
-// ======================> a26_rom_4k_device
-
-class a26_rom_4k_device : public a26_rom_2k_device
+class a26_rom_2k_4k_device : public a26_rom_base_device
 {
 public:
-	// construction/destruction
-	a26_rom_4k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a26_rom_2k_4k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// reading and writing
-
-	// accesses just use the 2K ones, since it is just direct access to ROM/RAM
-	// masked with its size!
+	virtual void install_memory_handlers(address_space *space) override;
 };
 
 
 // ======================> a26_rom_f6_device
 
-class a26_rom_f6_device : public a26_rom_2k_device
+class a26_rom_f6_device : public a26_rom_base_device
 {
 public:
-	// construction/destruction
 	a26_rom_f6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// reading and writing
-	virtual uint8_t read_rom(offs_t offset) override;
-	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) override;
+	virtual void install_memory_handlers(address_space *space) override;
 
 protected:
 	a26_rom_f6_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	void install_super_chip_handlers(address_space *space);
 
-	// device-level overrides
-	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual uint8_t get_start_bank() { return 0; }
+	void switch_bank(offs_t offset, uint8_t data);
 
-	int m_base_bank;
+	memory_bank_creator m_bank;
 };
 
 
@@ -72,16 +62,12 @@ protected:
 class a26_rom_f4_device : public a26_rom_f6_device
 {
 public:
-	// construction/destruction
 	a26_rom_f4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// reading and writing
-	virtual uint8_t read_rom(offs_t offset) override;
-	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) override;
+	virtual void install_memory_handlers(address_space *space) override;
 
 protected:
-	// device-level overrides
-	virtual void device_reset() override;
+	virtual uint8_t get_start_bank() override { return 7; }
 };
 
 
@@ -90,12 +76,9 @@ protected:
 class a26_rom_f8_device : public a26_rom_f6_device
 {
 public:
-	// construction/destruction
 	a26_rom_f8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// reading and writing
-	virtual uint8_t read_rom(offs_t offset) override;
-	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) override;
+	virtual void install_memory_handlers(address_space *space) override;
 
 protected:
 	a26_rom_f8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -107,12 +90,11 @@ protected:
 class a26_rom_f8_sw_device : public a26_rom_f8_device
 {
 public:
-	// construction/destruction
 	a26_rom_f8_sw_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// device-level overrides
-	virtual void device_reset() override;
+	// Snow White proto starts from bank 1
+	virtual uint8_t get_start_bank() override { return 1; }
 };
 
 
@@ -121,279 +103,266 @@ protected:
 class a26_rom_fa_device : public a26_rom_f6_device
 {
 public:
-	// construction/destruction
 	a26_rom_fa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// reading and writing
-	virtual uint8_t read_rom(offs_t offset) override;
-	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) override;
+	virtual void install_memory_handlers(address_space *space) override;
 };
 
 
 // ======================> a26_rom_fe_device
 
-class a26_rom_fe_device : public a26_rom_2k_device
+class a26_rom_fe_device : public a26_rom_base_device
 {
 public:
-	// construction/destruction
 	a26_rom_fe_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// reading and writing
-	virtual uint8_t read_rom(offs_t offset) override;
-	virtual uint8_t read_bank(address_space &space, offs_t offset) override;
-	virtual void write_ram(offs_t offset, uint8_t data) override;
-	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) override;
+	virtual void install_memory_handlers(address_space *space) override;
 
 protected:
-	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	void trigger_bank();
+	void switch_bank(uint8_t data);
 
-	int m_base_bank;
-	int m_trigger_on_next_access;
+	memory_bank_creator m_bank;
+	bool m_trigger_on_next_access;
+	bool m_ignore_first_read;
 };
 
 
 // ======================> a26_rom_3e_device
 
-class a26_rom_3e_device : public a26_rom_f6_device
+class a26_rom_3e_device : public a26_rom_base_device
 {
 public:
-	// construction/destruction
 	a26_rom_3e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// reading and writing
-	virtual uint8_t read_rom(offs_t offset) override;
-	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) override;
-	virtual void write_ram(offs_t offset, uint8_t data) override;
+	virtual void install_memory_handlers(address_space *space) override;
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
 	virtual void device_reset() override;
+	void select_ram_bank(offs_t offset, uint8_t data);
+	void select_rom_bank(offs_t offset, uint8_t data);
 
-	int m_num_bank;
-	int m_ram_bank;
-	int m_ram_enable;
+	memory_bank_creator m_rom_bank;
+	memory_bank_creator m_ram_bank;
+	memory_view m_view;
+	uint8_t m_rom_bank_mask;
+	uint8_t m_ram_bank_mask;
 };
 
 
 // ======================> a26_rom_3f_device
 
-class a26_rom_3f_device : public a26_rom_f6_device
+class a26_rom_3f_device : public a26_rom_base_device
 {
 public:
-	// construction/destruction
 	a26_rom_3f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// reading and writing
-	virtual uint8_t read_rom(offs_t offset) override;
-	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) override;
+	virtual void install_memory_handlers(address_space *space) override;
 
 protected:
-	// device-level overrides
 	virtual void device_reset() override;
+	void select_bank(offs_t offset, uint8_t data);
 
-	int m_num_bank;
+	memory_bank_creator m_bank;
+	uint8_t m_bank_mask;
 };
 
 
 // ======================> a26_rom_e0_device
 
-class a26_rom_e0_device : public a26_rom_f6_device
+class a26_rom_e0_device : public a26_rom_base_device
 {
 public:
-	// construction/destruction
 	a26_rom_e0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// reading and writing
-	virtual uint8_t read_rom(offs_t offset) override;
-	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) override;
+	virtual void install_memory_handlers(address_space *space) override;
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
 	virtual void device_reset() override;
+	template <uint8_t Bank> void switch_bank(offs_t offset, uint8_t data);
 
-	int m_base_banks[4];
+	memory_bank_array_creator<3> m_bank;
 };
 
 
 // ======================> a26_rom_e7_device
 
-class a26_rom_e7_device : public a26_rom_f6_device
+class a26_rom_e7_device : public a26_rom_base_device
 {
 public:
-	// construction/destruction
 	a26_rom_e7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// reading and writing
-	virtual uint8_t read_rom(offs_t offset) override;
-	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) override;
+	virtual void install_memory_handlers(address_space *space) override;
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
 	virtual void device_reset() override;
+	void switch_rom_bank(offs_t offset, uint8_t data);
+	void switch_ram_bank(offs_t offset, uint8_t data);
 
-	int m_ram_bank;
+	memory_bank_creator m_rom_bank;
+	memory_bank_creator m_lo_ram_bank;
+	memory_bank_creator m_hi_ram_bank;
+	memory_view m_view;
 };
 
 
 // ======================> a26_rom_ua_device
 
-class a26_rom_ua_device : public a26_rom_f6_device
+class a26_rom_ua_device : public a26_rom_base_device
 {
 public:
-	// construction/destruction
 	a26_rom_ua_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// reading and writing
-	virtual uint8_t read_rom(offs_t offset) override;
-	virtual uint8_t read_bank(address_space &space, offs_t offset) override;
-	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) override;
+	virtual void install_memory_handlers(address_space *space) override;
 
 protected:
-	// device-level overrides
 	virtual void device_reset() override;
+	void change_bank(offs_t offset);
+
+	memory_bank_creator m_bank;
 };
 
 
 // ======================> a26_rom_cv_device
 
-class a26_rom_cv_device : public a26_rom_2k_device
+class a26_rom_cv_device : public a26_rom_base_device
 {
 public:
-	// construction/destruction
 	a26_rom_cv_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// reading and writing
-	virtual uint8_t read_rom(offs_t offset) override;
-	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) override;
+	virtual void install_memory_handlers(address_space *space) override;
 };
 
 
 // ======================> a26_rom_dc_device
 
-class a26_rom_dc_device : public a26_rom_f6_device
+class a26_rom_dc_device : public a26_rom_base_device
 {
 public:
-	// construction/destruction
 	a26_rom_dc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// reading and writing
-	virtual uint8_t read_rom(offs_t offset) override;
-	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) override;
+	virtual void install_memory_handlers(address_space *space) override;
+
+protected:
+	virtual void device_reset() override;
+	uint8_t read_current_bank(offs_t offset);
+	void switch_bank(offs_t offset, uint8_t data);
+
+	memory_bank_creator m_bank;
 };
 
 
 // ======================> a26_rom_fv_device
 
-class a26_rom_fv_device : public a26_rom_f6_device
+class a26_rom_fv_device : public a26_rom_base_device
 {
 public:
-	// construction/destruction
 	a26_rom_fv_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// reading and writing
-	virtual uint8_t read_rom(offs_t offset) override;
-	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) override;
+	virtual void install_memory_handlers(address_space *space) override;
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
 	virtual void device_reset() override;
+	void switch_bank(offs_t offset, uint8_t data);
 
-	int m_locked;
+	memory_bank_creator m_bank;
 };
 
 
 // ======================> a26_rom_jvp_device
 
-class a26_rom_jvp_device : public a26_rom_f6_device
+class a26_rom_jvp_device : public a26_rom_base_device
 {
 public:
-	// construction/destruction
 	a26_rom_jvp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// reading and writing
-	virtual uint8_t read_rom(offs_t offset) override;
-	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) override;
+	virtual void install_memory_handlers(address_space *space) override;
+
+protected:
+	virtual void device_reset() override;
+	void change_bank();
+
+	memory_bank_creator m_bank;
 };
 
 
 // ======================> a26_rom_4in1_device
 
-class a26_rom_4in1_device : public a26_rom_f6_device
+class a26_rom_4in1_device : public a26_rom_base_device
 {
 public:
-	// construction/destruction
 	a26_rom_4in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// reading and writing
-	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void install_memory_handlers(address_space *space) override;
 
 protected:
-	// device-level overrides
+	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	memory_bank_creator m_bank;
+	uint8_t m_current_game;
 };
 
 
 // ======================> a26_rom_8in1_device
 
-class a26_rom_8in1_device : public a26_rom_f8_device
+class a26_rom_8in1_device : public a26_rom_base_device
 {
 public:
-	// construction/destruction
 	a26_rom_8in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// reading and writing
-	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void install_memory_handlers(address_space *space) override;
 
 protected:
-	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	void switch_bank(offs_t offset, uint8_t data);
 
-	int m_reset_bank;
+	memory_bank_creator m_bank;
+	uint8_t m_game_bank;
 };
 
 
 // ======================> a26_rom_32in1_device
 
-class a26_rom_32in1_device : public a26_rom_f6_device
+class a26_rom_32in1_device : public a26_rom_base_device
 {
 public:
-	// construction/destruction
 	a26_rom_32in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// reading and writing
-	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void install_memory_handlers(address_space *space) override;
 
 protected:
-	// device-level overrides
+	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	memory_bank_creator m_bank;
+	uint8_t m_current_game;
 };
 
 
 // ======================> a26_rom_x07_device
 
-class a26_rom_x07_device : public a26_rom_f6_device
+class a26_rom_x07_device : public a26_rom_base_device
 {
 public:
-	// construction/destruction
 	a26_rom_x07_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// reading and writing
-	virtual uint8_t read_rom(offs_t offset) override;
-	virtual void write_bank(address_space &space, offs_t offset, uint8_t data) override;
+	virtual void install_memory_handlers(address_space *space) override;
+
+private:
+	void change_bank1(offs_t offset);
+	void change_bank2(offs_t offset);
+
+	memory_bank_creator m_bank;
 };
 
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(A26_ROM_2K,    a26_rom_2k_device)
-DECLARE_DEVICE_TYPE(A26_ROM_4K,    a26_rom_4k_device)
+DECLARE_DEVICE_TYPE(A26_ROM_2K_4K, a26_rom_2k_4k_device)
 DECLARE_DEVICE_TYPE(A26_ROM_F4,    a26_rom_f4_device)
 DECLARE_DEVICE_TYPE(A26_ROM_F6,    a26_rom_f6_device)
 DECLARE_DEVICE_TYPE(A26_ROM_F8,    a26_rom_f8_device)

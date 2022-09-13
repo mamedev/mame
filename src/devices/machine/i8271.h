@@ -44,7 +44,8 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(floppy_tick);
 
 private:
 	enum {
@@ -234,7 +235,7 @@ private:
 	void cmd_w(uint8_t data);
 	void param_w(uint8_t data);
 
-	void delay_cycles(emu_timer *tm, int cycles);
+	void delay_cycles(floppy_info &fi, int cycles);
 	void set_drq(bool state);
 	void set_irq(bool state);
 	bool get_ready(int fid);

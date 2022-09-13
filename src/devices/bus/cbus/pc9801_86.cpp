@@ -229,7 +229,7 @@ void pc9801_86_device::device_start()
 
 	m_io_base = 0;
 
-	m_dac_timer = timer_alloc();
+	m_dac_timer = timer_alloc(FUNC(pc9801_86_device::dac_tick), this);
 	save_item(NAME(m_count));
 	save_item(NAME(m_queue));
 	save_item(NAME(m_irq_rate));
@@ -382,10 +382,8 @@ u8 pc9801_86_device::queue_pop()
 	return ret;
 }
 
-void pc9801_86_device::device_timer(emu_timer& timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(pc9801_86_device::dac_tick)
 {
-	int16_t lsample, rsample;
-
 	m_pcm_clk = !m_pcm_clk;
 	if((m_pcm_ctrl & 0x40) || !(m_pcm_ctrl & 0x80))
 		return;
@@ -402,24 +400,24 @@ void pc9801_86_device::device_timer(emu_timer& timer, device_timer_id id, int pa
 		case 0x50: // 8bit right only
 			m_rdac->write(queue_pop() << 8);
 			break;
-		case 0x30: // 16bit stereo
-			lsample = queue_pop() << 8;
+		case 0x30: { // 16bit stereo
+			int16_t lsample = queue_pop() << 8;
 			lsample |= queue_pop();
-			rsample = queue_pop() << 8;
+			int16_t rsample = queue_pop() << 8;
 			rsample |= queue_pop();
 			m_ldac->write(lsample);
 			m_rdac->write(rsample);
-			break;
-		case 0x20: // 16bit left only
-			lsample = queue_pop() << 8;
+		} break;
+		case 0x20: { // 16bit left only
+			int16_t lsample = queue_pop() << 8;
 			lsample |= queue_pop();
 			m_ldac->write(lsample);
-			break;
-		case 0x10: // 16bit right only
-			rsample = queue_pop() << 8;
+		}   break;
+		case 0x10: { // 16bit right only
+			int16_t rsample = queue_pop() << 8;
 			rsample |= queue_pop();
 			m_rdac->write(rsample);
-			break;
+		}   break;
 	}
 	if((queue_count() < m_irq_rate) && (m_pcm_ctrl & 0x20))
 	{

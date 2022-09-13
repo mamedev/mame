@@ -109,11 +109,12 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(advance_counters);
 
 	bool is_reset() const { return (m_register[MASTER_INTERRUPT_CONTROL] & MICR_RESET) != 0; }
 
-	enum
+	enum : int
 	{
 		TIMER_1 = 0,
 		TIMER_2,
@@ -121,7 +122,7 @@ protected:
 	};
 
 	// ports
-	enum
+	enum : int
 	{
 		PORT_A = 0,
 		PORT_B,
@@ -369,15 +370,15 @@ protected:
 	void write_register(offs_t offset, u8 data);
 	void write_register(offs_t offset, u8 data, u8 mask);
 
-	bool counter_enabled(device_timer_id id);
-	bool counter_external_output(device_timer_id id);
-	bool counter_external_count(device_timer_id id);
-	bool counter_external_trigger(device_timer_id id);
-	bool counter_external_gate(device_timer_id id);
-	bool counter_gated(device_timer_id id);
-	void count(device_timer_id id);
-	void trigger(device_timer_id id);
-	void gate(device_timer_id id, int state);
+	bool counter_enabled(int id);
+	bool counter_external_output(int id);
+	bool counter_external_count(int id);
+	bool counter_external_trigger(int id);
+	bool counter_external_gate(int id);
+	bool counter_gated(int id);
+	void count(int id);
+	void trigger(int id);
+	void gate(int id, int state);
 	void match_pattern(int port);
 	void external_port_w(int port, int bit, int state);
 

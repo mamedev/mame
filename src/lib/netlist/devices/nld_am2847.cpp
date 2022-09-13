@@ -73,18 +73,18 @@ namespace netlist::devices {
 		, m_last_CP(*this, "m_last_CP", 0)
 		// FIXME: needs family!
 		{
-			register_subalias("OUTA", "A.OUT");
-			register_subalias("OUTB", "B.OUT");
-			register_subalias("OUTC", "C.OUT");
-			register_subalias("OUTD", "D.OUT");
-			register_subalias("INA", "A.IN");
-			register_subalias("INB", "B.IN");
-			register_subalias("INC", "C.IN");
-			register_subalias("IND", "D.IN");
-			register_subalias("RCA", "A.RC");
-			register_subalias("RCB", "B.RC");
-			register_subalias("RCC", "C.RC");
-			register_subalias("RCD", "D.RC");
+			register_sub_alias("OUTA", "A.OUT");
+			register_sub_alias("OUTB", "B.OUT");
+			register_sub_alias("OUTC", "C.OUT");
+			register_sub_alias("OUTD", "D.OUT");
+			register_sub_alias("INA", "A.IN");
+			register_sub_alias("INB", "B.IN");
+			register_sub_alias("INC", "C.IN");
+			register_sub_alias("IND", "D.IN");
+			register_sub_alias("RCA", "A.RC");
+			register_sub_alias("RCB", "B.RC");
+			register_sub_alias("RCC", "C.RC");
+			register_sub_alias("RCD", "D.RC");
 
 			connect("A.VSS", "B.VSS");
 			connect("A.VSS", "C.VSS");
@@ -93,8 +93,8 @@ namespace netlist::devices {
 			connect("A.VDD", "C.VDD");
 			connect("A.VDD", "D.VDD");
 
-			register_subalias("VSS", "A.VSS");
-			register_subalias("VDD", "A.VDD");
+			register_sub_alias("VSS", "A.VSS");
+			register_sub_alias("VDD", "A.VDD");
 		}
 
 		NETLIB_RESETI()
@@ -107,10 +107,10 @@ namespace netlist::devices {
 		{
 			if (m_last_CP && !m_CP())
 			{
-				m_A.shift();
-				m_B.shift();
-				m_C.shift();
-				m_D.shift();
+				m_A().shift();
+				m_B().shift();
+				m_C().shift();
+				m_D().shift();
 			}
 			m_last_CP = m_CP();
 		}

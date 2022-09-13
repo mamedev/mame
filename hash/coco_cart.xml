@@ -451,7 +451,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="developer" value="The Image Producers" />
 		<info name="serial" value="26-3082" />
 		<part name="cart" interface="coco_cart">
-			<dataarea name="rom" size="4097">
+			<dataarea name="rom" size="4096">
 				<rom name="crosswords (1981) (26-3082) (the image producers).rom" size="4096" crc="06075f2a" sha1="949cac570d8ccb6cea0ed565d420f3198e2f1c64"/>
 			</dataarea>
 		</part>
@@ -934,7 +934,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 	</software>
 
 	<software name="mindroll">
-	<!-- This cartridge contains the CoCo 1/2 & the CoCo 3 versions  -->
+	<!-- This cartridge contains the CoCo 1/2 & the CoCo 3 versions -->
 		<description>Mind-Roll</description>
 		<year>1988</year>
 		<publisher>Tandy</publisher>

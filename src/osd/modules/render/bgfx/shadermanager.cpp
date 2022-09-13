@@ -9,15 +9,18 @@
 //
 //============================================================
 
+#include "shadermanager.h"
+
+#include "emucore.h"
+
+#include "osdfile.h"
+#include "modules/lib/osdobj_common.h"
+
 #include <bx/math.h>
 #include <bx/readerwriter.h>
 #include <bx/file.h>
 
-#include "emu.h"
-
 #include <bgfx/bgfx.h>
-
-#include "shadermanager.h"
 
 shader_manager::~shader_manager()
 {
@@ -116,9 +119,7 @@ std::string shader_manager::make_path_string(osd_options &options, std::string n
 			fatalerror("Unknown BGFX renderer type %d", bgfx::getRendererType());
 	}
 	shader_path += PATH_SEPARATOR;
-	osd_subst_env(shader_path, shader_path);
-
-	return shader_path;
+	return osd_subst_env(shader_path);
 }
 
 const bgfx::Memory* shader_manager::load_mem(std::string name)

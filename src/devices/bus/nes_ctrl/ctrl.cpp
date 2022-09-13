@@ -59,6 +59,7 @@
 #include "partytap.h"
 #include "powerpad.h"
 #include "rob.h"
+#include "sharpcass.h"
 #include "snesadapter.h"
 #include "suborkey.h"
 #include "turbofile.h"
@@ -223,6 +224,7 @@ void fc_expansion_devices(device_slot_interface &device)
 	device.option_add("joypad", NES_FCPAD_EXP);
 	device.option_add("arcstick", NES_ARCSTICK);
 	device.option_add("fc_keyboard", NES_FCKEYBOARD);
+	device.option_add("sharp_cassette", NES_SHARPCASS);
 	device.option_add("zapper", NES_ZAPPER);
 	device.option_add("bandaihs", NES_BANDAIHS);
 	device.option_add("vaus", NES_ARKPADDLE_FC);

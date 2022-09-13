@@ -34,6 +34,9 @@ typedef uint64_t HashT;
 
 #include "modules/opengl/gl_shader_mgr.h"
 
+#include "emucore.h"
+#include "render.h"
+
 //============================================================
 //  Textures
 //============================================================

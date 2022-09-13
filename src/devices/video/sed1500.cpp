@@ -63,15 +63,18 @@ sed1503_device::sed1503_device(const machine_config &mconfig, const char *tag, d
 
 void sed1500_device::device_start()
 {
-	memset(m_ram, 0, sizeof(m_ram));
-
 	// resolve callbacks
 	m_write_segs.resolve_safe();
 
 	// timer
-	m_lcd_timer = timer_alloc();
+	m_lcd_timer = timer_alloc(FUNC(sed1500_device::update_segs), this);
 	attotime period = attotime::from_hz(clock() / 64);
 	m_lcd_timer->adjust(period, 0, period);
+
+	// zerofill
+	m_mode = 0;
+	m_cout = 0;
+	std::fill_n(m_ram, std::size(m_ram), 0);
 
 	// register for savestates
 	save_item(NAME(m_mode));
@@ -84,7 +87,7 @@ void sed1500_device::device_start()
 //  handlers
 //-------------------------------------------------
 
-void sed1500_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(sed1500_device::update_segs)
 {
 	u64 data = 0;
 

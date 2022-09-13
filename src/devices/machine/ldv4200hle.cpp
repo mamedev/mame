@@ -683,7 +683,7 @@ void pioneer_ldv4200hle_device::device_start()
 	m_serial_tx.resolve_safe();
 
 	// allocate timers
-	m_vbi_fetch = timer_alloc(TID_VBI_DATA_FETCH);
+	m_vbi_fetch = timer_alloc(FUNC(pioneer_ldv4200hle_device::process_vbi_data), this);
 
 	// register state saving
 	save_item(NAME(m_cmd_buffer));
@@ -771,124 +771,112 @@ void pioneer_ldv4200hle_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handle timers set by this
-//  device
+//  process_vbi_data - process VBI data and
+//  act on search/play seeking
 //-------------------------------------------------
 
-void pioneer_ldv4200hle_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(pioneer_ldv4200hle_device::process_vbi_data)
 {
-	switch (id)
+	uint32_t line = get_field_code(LASERDISC_CODE_LINE1718, false);
+	if ((line & 0xf80000) == 0xf80000 || line == VBI_CODE_LEADIN || line == VBI_CODE_LEADOUT)
 	{
-		case TID_VBI_DATA_FETCH:
+		uint32_t old_frame = m_curr_frame;
+		if (line == VBI_CODE_LEADIN)
+			m_curr_frame = 0;
+		else if (line == VBI_CODE_LEADOUT)
+			m_curr_frame = 54000;
+		else
+			m_curr_frame = bcd_to_literal(line & 0x7ffff);
+
+		LOGMASKED(LOG_FRAMES, "Current frame is %d (VBI 16: %06x, VBI 17: %06x, VBI 18: %06x, VBI 1718: %06x\n", m_curr_frame,
+			get_field_code(LASERDISC_CODE_LINE16, false),
+			get_field_code(LASERDISC_CODE_LINE17, false),
+			get_field_code(LASERDISC_CODE_LINE18, false),
+			line);
+
+		if (m_mode != MODE_STILL && m_mode != MODE_PAUSE)
 		{
-			uint32_t line = get_field_code(LASERDISC_CODE_LINE1718, false);
-			if ((line & 0xf80000) == 0xf80000 || line == VBI_CODE_LEADIN || line == VBI_CODE_LEADOUT)
+			if (m_mark_frame != ~uint32_t(0) && m_search_frame == ~uint32_t(0))
 			{
-				uint32_t old_frame = m_curr_frame;
-				if (line == VBI_CODE_LEADIN)
-					m_curr_frame = 0;
-				else if (line == VBI_CODE_LEADOUT)
-					m_curr_frame = 54000;
-				else
-					m_curr_frame = bcd_to_literal(line & 0x7ffff);
-
-				LOGMASKED(LOG_FRAMES, "Current frame is %d (VBI 16: %06x, VBI 17: %06x, VBI 18: %06x, VBI 1718: %06x\n", m_curr_frame,
-					get_field_code(LASERDISC_CODE_LINE16, false),
-					get_field_code(LASERDISC_CODE_LINE17, false),
-					get_field_code(LASERDISC_CODE_LINE18, false),
-					line);
-
-				if (m_mode != MODE_STILL && m_mode != MODE_PAUSE)
+				int32_t old_delta = (int32_t)m_mark_frame - (int32_t)old_frame;
+				int32_t curr_delta = (int32_t)m_mark_frame - (int32_t)m_curr_frame;
+				LOGMASKED(LOG_STOPS, "%s: Stop Mark is currently %d, old frame is %d, current frame is %d, old delta %d, curr delta %d\n", machine().describe_context(), m_mark_frame, old_frame, m_curr_frame, old_delta, curr_delta);
+				if (curr_delta == 0 || std::signbit(old_delta) != std::signbit(curr_delta))
 				{
-					if (m_mark_frame != ~uint32_t(0) && m_search_frame == ~uint32_t(0))
+					m_mark_frame = ~uint32_t(0);
+					if (is_cav_disc())
 					{
-						int32_t old_delta = (int32_t)m_mark_frame - (int32_t)old_frame;
-						int32_t curr_delta = (int32_t)m_mark_frame - (int32_t)m_curr_frame;
-						LOGMASKED(LOG_STOPS, "%s: Stop Mark is currently %d, old frame is %d, current frame is %d, old delta %d, curr delta %d\n", machine().describe_context(), m_mark_frame, old_frame, m_curr_frame, old_delta, curr_delta);
-						if (curr_delta == 0 || std::signbit(old_delta) != std::signbit(curr_delta))
-						{
-							m_mark_frame = ~uint32_t(0);
-							if (is_cav_disc())
-							{
-								LOGMASKED(LOG_STOPS | LOG_SQUELCHES, "%s: Stop Mark: Zero delta w/ CAV disc, entering still mode and squelching audio\n", machine().describe_context());
-								m_mode = MODE_STILL;
-								update_video_enable();
-							}
-							else
-							{
-								LOGMASKED(LOG_STOPS | LOG_SQUELCHES, "%s: Stop Mark: Zero delta w/ CLV disc, entering still mode and squelching video+audio\n", machine().describe_context());
-								m_mode = MODE_PAUSE;
-								video_enable(false);
-							}
-
-							set_audio_squelch(true, true);
-
-							if (m_cmd_running)
-							{
-								LOGMASKED(LOG_SEARCHES | LOG_COMMANDS, "%s: Stop Mark: Command running, sending reply\n", machine().describe_context());
-								m_cmd_running = false;
-								queue_reply("R\x0d");
-							}
-						}
+						LOGMASKED(LOG_STOPS | LOG_SQUELCHES, "%s: Stop Mark: Zero delta w/ CAV disc, entering still mode and squelching audio\n", machine().describe_context());
+						m_mode = MODE_STILL;
+						update_video_enable();
+					}
+					else
+					{
+						LOGMASKED(LOG_STOPS | LOG_SQUELCHES, "%s: Stop Mark: Zero delta w/ CLV disc, entering still mode and squelching video+audio\n", machine().describe_context());
+						m_mode = MODE_PAUSE;
+						video_enable(false);
 					}
 
-					if (m_search_frame != ~uint32_t(0))
+					set_audio_squelch(true, true);
+
+					if (m_cmd_running)
 					{
-						// TODO: Chapter-search support
-						int32_t delta = (int32_t)m_search_frame - (int32_t)m_curr_frame;
-						LOGMASKED(LOG_SEARCHES, "%s: Searching from current frame %d with delta %d\n", machine().describe_context(), m_curr_frame, delta);
-						if (delta == 0)
-						{
-							// We've found our frame, enter play, pause or still mode.
-							m_search_frame = ~uint32_t(0);
-							if (is_cav_disc())
-							{
-								LOGMASKED(LOG_SEARCHES | LOG_SQUELCHES, "%s: Search Mark: Zero delta w/ CAV disc, entering still mode and squelching audio\n", machine().describe_context());
-								m_mode = MODE_STILL;
-								update_video_enable();
-							}
-							else
-							{
-								LOGMASKED(LOG_SEARCHES | LOG_SQUELCHES, "%s: Search Mark: Zero delta w/ CLV disc, entering still mode and squelching video+audio\n", machine().describe_context());
-								m_mode = MODE_PAUSE;
-								video_enable(false);
-							}
-
-							set_audio_squelch(true, true);
-
-							if (m_cmd_running)
-							{
-								LOGMASKED(LOG_SEARCHES | LOG_COMMANDS, "%s: Search Mark: Command running, sending reply\n", machine().describe_context());
-								m_cmd_running = false;
-								queue_reply("R\x0d");
-							}
-						}
-						else if (delta <= 2 && delta > 0)
-						{
-							LOGMASKED(LOG_SEARCHES, "%s: Positive near delta, letting disc run to current\n", machine().describe_context());
-							// We're approaching our frame, let it run up.
-						}
-						else
-						{
-							if (delta < 0)
-							{
-								advance_slider(std::min(-2, delta / 2));
-							}
-							else
-							{
-								advance_slider(std::max(1, delta / 2));
-							}
-						}
+						LOGMASKED(LOG_SEARCHES | LOG_COMMANDS, "%s: Stop Mark: Command running, sending reply\n", machine().describe_context());
+						m_cmd_running = false;
+						queue_reply("R\x0d");
 					}
 				}
 			}
-			break;
-		}
 
-		// pass everything else onto the parent
-		default:
-			laserdisc_device::device_timer(timer, id, param);
-			break;
+			if (m_search_frame != ~uint32_t(0))
+			{
+				// TODO: Chapter-search support
+				int32_t delta = (int32_t)m_search_frame - (int32_t)m_curr_frame;
+				LOGMASKED(LOG_SEARCHES, "%s: Searching from current frame %d with delta %d\n", machine().describe_context(), m_curr_frame, delta);
+				if (delta == 0)
+				{
+					// We've found our frame, enter play, pause or still mode.
+					m_search_frame = ~uint32_t(0);
+					if (is_cav_disc())
+					{
+						LOGMASKED(LOG_SEARCHES | LOG_SQUELCHES, "%s: Search Mark: Zero delta w/ CAV disc, entering still mode and squelching audio\n", machine().describe_context());
+						m_mode = MODE_STILL;
+						update_video_enable();
+					}
+					else
+					{
+						LOGMASKED(LOG_SEARCHES | LOG_SQUELCHES, "%s: Search Mark: Zero delta w/ CLV disc, entering still mode and squelching video+audio\n", machine().describe_context());
+						m_mode = MODE_PAUSE;
+						video_enable(false);
+					}
+
+					set_audio_squelch(true, true);
+
+					if (m_cmd_running)
+					{
+						LOGMASKED(LOG_SEARCHES | LOG_COMMANDS, "%s: Search Mark: Command running, sending reply\n", machine().describe_context());
+						m_cmd_running = false;
+						queue_reply("R\x0d");
+					}
+				}
+				else if (delta <= 2 && delta > 0)
+				{
+					LOGMASKED(LOG_SEARCHES, "%s: Positive near delta, letting disc run to current\n", machine().describe_context());
+					// We're approaching our frame, let it run up.
+				}
+				else
+				{
+					if (delta < 0)
+					{
+						advance_slider(std::min(-2, delta / 2));
+					}
+					else
+					{
+						advance_slider(std::max(1, delta / 2));
+					}
+				}
+			}
+		}
 	}
 }
 

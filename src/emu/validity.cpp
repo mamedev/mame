@@ -11,10 +11,12 @@
 #include "emu.h"
 #include "validity.h"
 
-#include "corestr.h"
 #include "emuopts.h"
 #include "romload.h"
+#include "speaker.h"
 #include "video/rgbutil.h"
+
+#include "corestr.h"
 #include "unicode.h"
 
 #include <cctype>
@@ -1868,6 +1870,7 @@ void validity_checker::validate_begin()
 	m_defstr_map.clear();
 	m_region_map.clear();
 	m_ioport_set.clear();
+	m_slotcard_set.clear();
 
 	// reset internal state
 	m_errors = 0;
@@ -2044,7 +2047,7 @@ void validity_checker::validate_driver(device_t &root)
 	device_t::feature_type const imperfect(m_current_driver->type.imperfect_features());
 	if (!(m_current_driver->flags & (machine_flags::IS_BIOS_ROOT | machine_flags::NO_SOUND_HW)) && !(unemulated & device_t::feature::SOUND))
 	{
-		sound_interface_enumerator iter(root);
+		speaker_device_enumerator iter(root);
 		if (!iter.first())
 			osd_printf_error("Driver is missing MACHINE_NO_SOUND or MACHINE_NO_SOUND_HW flag\n");
 	}
@@ -2545,6 +2548,10 @@ void validity_checker::validate_devices(machine_config &config)
 			{
 				// the default option is already instantiated here, so don't try adding it again
 				if (slot->default_option() != nullptr && option.first == slot->default_option())
+					continue;
+
+				// if we need to save time, instantiate and validate each slot card type at most once
+				if (m_quick && !m_slotcard_set.insert(option.second->devtype().shortname()).second)
 					continue;
 
 				m_checking_card = true;

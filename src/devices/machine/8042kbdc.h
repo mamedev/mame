@@ -64,12 +64,11 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	void mouse_enqueue(uint8_t value);
+	TIMER_CALLBACK_MEMBER(update_timer);
 
-	static const device_timer_id TIMER_UPDATE = 0;
+	void mouse_enqueue(uint8_t value);
 
 private:
 	uint8_t m_inport;

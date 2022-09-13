@@ -14,10 +14,9 @@
     and debugging. (Adding to the confusion is that the typical CPU16 bus
     interface uses 24-bit physical addresses, with or without a MMU.)
 
-    The execution core is currently somewhat incomplete. 16-bit memory
-    shifting instructions, indexed jump instructions, extended divisions
-    and the MAC unit are not yet supported. Interrupts have also not been
-    implemented yet.
+    The execution core is currently somewhat incomplete. Indexed jump
+    instructions, extended divisions and the MAC unit are not yet
+    supported. Interrupts have also not been implemented yet.
 
 ***************************************************************************/
 
@@ -31,36 +30,39 @@ enum class cpu16_device::seq : u16
 	BOOT_0, BOOT_1, BOOT_2, BOOT_3,
 	INVALID,
 	PREFETCH_1, PREFETCH_2,
+	LOAD8_EA, LOAD8_EXT,
+	LOAD16_EA, LOAD16_EA_LSB, LOAD16_EXT, LOAD16_EXT_LSB,
 	STORE8_EA, STORE8_EXT,
 	STORE16_EA, STORE16_EXT,
 	ABA,
 	ABX,
-	ADDA_IND8, ADDA_IND8_2, ADDA_IND8_3, ADDA_IMM8, ADDA_IND16, ADDA_IND16_2, ADDA_IND16_3, ADDA_EXT, ADDA_INDE, ADDA_INDE_2, ADDA_INDE_3,
-	ADDB_IND8, ADDB_IND8_2, ADDB_IND8_3, ADDB_IMM8, ADDB_IND16, ADDB_IND16_2, ADDB_IND16_3, ADDB_EXT, ADDB_INDE, ADDB_INDE_2, ADDB_INDE_3,
-	ADDD_IND8, ADDD_IND8_2, ADDD_IND8_2B, ADDD_IND8_3, ADDD_IMM8, ADDD_IMM16, ADDD_IND16, ADDD_IND16_2, ADDD_IND16_2B, ADDD_IND16_3, ADDD_EXT, ADDD_INDE, ADDD_INDE_2, ADDD_INDE_2B, ADDD_INDE_3,
-	ADDE_IMM8, ADDE_IMM16, ADDE_IND16, ADDE_IND16_2, ADDE_IND16_2B, ADDE_IND16_3, ADDE_EXT,
+	ADDA_IND8, ADDA_IND8_3, ADDA_IMM8, ADDA_IND16, ADDA_IND16_3, ADDA_EXT, ADDA_INDE, ADDA_INDE_3,
+	ADDB_IND8, ADDB_IND8_3, ADDB_IMM8, ADDB_IND16, ADDB_IND16_3, ADDB_EXT, ADDB_INDE, ADDB_INDE_3,
+	ADDD_IND8, ADDD_IND8_3, ADDD_IMM8, ADDD_IMM16, ADDD_IND16, ADDD_IND16_3, ADDD_EXT, ADDD_INDE, ADDD_INDE_3,
+	ADDE_IMM8, ADDE_IMM16, ADDE_IND16, ADDE_IND16_3, ADDE_EXT,
 	ADE,
 	ADX,
 	AEX,
 	AIX_IMM8, AIX_IMM16,
-	ANDA_IND8, ANDA_IND8_2, ANDA_IND8_3, ANDA_IMM8, ANDA_IND16, ANDA_IND16_2, ANDA_IND16_3, ANDA_EXT, ANDA_INDE,
-	ANDB_IND8, ANDB_IND8_2, ANDB_IND8_3, ANDB_IMM8, ANDB_IND16, ANDB_IND16_2, ANDB_IND16_3, ANDB_EXT, ANDB_INDE,
-	ANDD_IND8, ANDD_IND8_2, ANDD_IND8_2B, ANDD_IND8_3, ANDD_IMM16, ANDD_IND16, ANDD_IND16_2, ANDD_IND16_2B, ANDD_IND16_3, ANDD_EXT, ANDD_INDE,
-	ANDE_IMM16, ANDE_IND16, ANDE_IND16_2, ANDE_IND16_2B, ANDE_IND16_3, ANDE_EXT,
+	ANDA_IND8, ANDA_IND8_3, ANDA_IMM8, ANDA_IND16, ANDA_IND16_3, ANDA_EXT, ANDA_INDE,
+	ANDB_IND8, ANDB_IND8_3, ANDB_IMM8, ANDB_IND16, ANDB_IND16_3, ANDB_EXT, ANDB_INDE,
+	ANDD_IND8, ANDD_IND8_3, ANDD_IMM16, ANDD_IND16, ANDD_IND16_3, ANDD_EXT, ANDD_INDE,
+	ANDE_IMM16, ANDE_IND16, ANDE_IND16_3, ANDE_EXT,
 	ANDP,
-	ASR_IND8, ASR_IND8_2, ASR_IND8_3, ASR_IND16, ASR_IND16_2, ASR_IND16_3, ASR_EXT,
+	ASR_IND8, ASR_IND8_3, ASR_IND16, ASR_IND16_3, ASR_EXT,
 	ASRA,
 	ASRB,
 	ASRD,
 	ASRE,
-	BCLR_IND16, BCLR_IND16_2, BCLR_IND16_3, BCLR_EXT, BCLR_IND8, BCLR_IND8_2, BCLR_IND8_3,
-	BCLRW_IND16, BCLRW_IND16_2, BCLRW_IND16_2B, BCLRW_IND16_3, BCLRW_EXT,
-	BITA_IND8, BITA_IND8_2, BITA_IND8_3, BITA_IMM8, BITA_IND16, BITA_IND16_2, BITA_IND16_3, BITA_EXT, BITA_INDE,
-	BITB_IND8, BITB_IND8_2, BITB_IND8_3, BITB_IMM8, BITB_IND16, BITB_IND16_2, BITB_IND16_3, BITB_EXT, BITB_INDE,
+	ASRW_IND16, ASRW_IND16_3, ASRW_EXT,
+	BCLR_IND16, BCLR_IND16_3, BCLR_EXT, BCLR_IND8, BCLR_IND8_2, BCLR_IND8_3,
+	BCLRW_IND16, BCLRW_IND16_3, BCLRW_EXT,
+	BITA_IND8, BITA_IND8_3, BITA_IMM8, BITA_IND16, BITA_IND16_3, BITA_EXT, BITA_INDE,
+	BITB_IND8, BITB_IND8_3, BITB_IMM8, BITB_IND16, BITB_IND16_3, BITB_EXT, BITB_INDE,
 	BCC,
-	BRSET_IND8, BRSET_IND8_2, BRSET_IND8_3, BRSET_IND8_4, BRSET_IND16, BRSET_IND16_2, BRSET_IND16_3, BRSET_EXT,
-	BSET_IND16, BSET_IND16_2, BSET_IND16_3, BSET_EXT, BSET_IND8, BSET_IND8_2, BSET_IND8_3,
-	BSETW_IND16, BSETW_IND16_2, BSETW_IND16_2B, BSETW_IND16_3, BSETW_EXT,
+	BRSET_IND8, BRSET_IND8_3, BRSET_IND8_4, BRSET_IND16, BRSET_IND16_3, BRSET_EXT,
+	BSET_IND16, BSET_IND16_3, BSET_EXT, BSET_IND8, BSET_IND8_2, BSET_IND8_3,
+	BSETW_IND16, BSETW_IND16_3, BSETW_EXT,
 	BSR, BSR_2, BSR_2B, BSR_3, BSR_3B,
 	CBA,
 	CLR_IND8, CLR_IND16, CLR_EXT,
@@ -70,51 +72,51 @@ enum class cpu16_device::seq : u16
 	CLRE,
 	CLRM,
 	CLRW_IND16, CLRW_EXT,
-	CMPA_IND8, CMPA_IND8_2, CMPA_IND8_3, CMPA_IMM8, CMPA_IND16, CMPA_IND16_2, CMPA_IND16_3, CMPA_EXT, CMPA_INDE,
-	CMPB_IND8, CMPB_IND8_2, CMPB_IND8_3, CMPB_IMM8, CMPB_IND16, CMPB_IND16_2, CMPB_IND16_3, CMPB_EXT, CMPB_INDE,
-	CPD_IND8, CPD_IND8_2, CPD_IND8_2B, CPD_IND8_3, CPD_IMM16, CPD_IND16, CPD_IND16_2, CPD_IND16_2B, CPD_IND16_3, CPD_EXT, CPD_INDE,
-	CPE_IMM16, CPE_IND16, CPE_IND16_2, CPE_IND16_2B, CPE_IND16_3, CPE_EXT,
-	CPX_IND8, CPX_IND8_2, CPX_IND8_2B, CPX_IND8_3, CPX_IMM16, CPX_IND16, CPX_IND16_2, CPX_IND16_2B, CPX_IND16_3, CPX_EXT,
+	CMPA_IND8, CMPA_IND8_3, CMPA_IMM8, CMPA_IND16, CMPA_IND16_3, CMPA_EXT, CMPA_INDE,
+	CMPB_IND8, CMPB_IND8_3, CMPB_IMM8, CMPB_IND16, CMPB_IND16_3, CMPB_EXT, CMPB_INDE,
+	CPD_IND8, CPD_IND8_3, CPD_IMM16, CPD_IND16, CPD_IND16_3, CPD_EXT, CPD_INDE,
+	CPE_IMM16, CPE_IND16, CPE_IND16_3, CPE_EXT,
+	CPX_IND8, CPX_IND8_3, CPX_IMM16, CPX_IND16, CPX_IND16_3, CPX_EXT,
 	DAA,
-	DEC_IND8, DEC_IND8_2, DEC_IND8_3, DEC_IND16, DEC_IND16_2, DEC_IND16_3, DEC_EXT,
+	DEC_IND8, DEC_IND8_3, DEC_IND16, DEC_IND16_3, DEC_EXT,
 	DECA,
 	DECB,
-	DECW_IND16, DECW_IND16_2, DECW_IND16_2B, DECW_IND16_3, DECW_EXT,
+	DECW_IND16, DECW_IND16_3, DECW_EXT,
 	DIV, DIV_2, DIV_3, DIV_4, DIV_5, DIV_6, DIV_7, DIV_8, DIV_9, DIV_10, DIV_11,
 	EMUL, EMUL_2, EMUL_3, EMUL_4, EMUL_5,
 	EMULS, EMULS_2, EMULS_3, EMULS_4,
-	EORA_IND8, EORA_IND8_2, EORA_IND8_3, EORA_IMM8, EORA_IND16, EORA_IND16_2, EORA_IND16_3, EORA_EXT, EORA_INDE,
-	EORB_IND8, EORB_IND8_2, EORB_IND8_3, EORB_IMM8, EORB_IND16, EORB_IND16_2, EORB_IND16_3, EORB_EXT, EORB_INDE,
-	EORD_IND8, EORD_IND8_2, EORD_IND8_2B, EORD_IND8_3, EORD_IMM16, EORD_IND16, EORD_IND16_2, EORD_IND16_2B, EORD_IND16_3, EORD_EXT, EORD_INDE,
-	EORE_IMM16, EORE_IND16, EORE_IND16_2, EORE_IND16_2B, EORE_IND16_3, EORE_EXT,
-	INC_IND8, INC_IND8_2, INC_IND8_3, INC_IND16, INC_IND16_2, INC_IND16_3, INC_EXT,
+	EORA_IND8, EORA_IND8_3, EORA_IMM8, EORA_IND16, EORA_IND16_3, EORA_EXT, EORA_INDE,
+	EORB_IND8, EORB_IND8_3, EORB_IMM8, EORB_IND16, EORB_IND16_3, EORB_EXT, EORB_INDE,
+	EORD_IND8, EORD_IND8_3, EORD_IMM16, EORD_IND16, EORD_IND16_3, EORD_EXT, EORD_INDE,
+	EORE_IMM16, EORE_IND16, EORE_IND16_3, EORE_EXT,
+	INC_IND8, INC_IND8_3, INC_IND16, INC_IND16_3, INC_EXT,
 	INCA,
 	INCB,
-	INCW_IND16, INCW_IND16_2, INCW_IND16_2B, INCW_IND16_3, INCW_EXT,
+	INCW_IND16, INCW_IND16_3, INCW_EXT,
 	JMP_EXT20,
 	JSR_EXT20, JSR_EXT20_2, JSR_EXT20_2B, JSR_EXT20_3, JSR_EXT20_3B,
 	LBCC,
 	LBSR, LBSR_2, LBSR_2B, LBSR_3, LBSR_3B,
-	LDAA_IND8, LDAA_IND8_2, LDAA_IND8_3, LDAA_IMM8, LDAA_IND16, LDAA_IND16_2, LDAA_IND16_3, LDAA_EXT, LDAA_INDE,
-	LDAB_IND8, LDAB_IND8_2, LDAB_IND8_3, LDAB_IMM8, LDAB_IND16, LDAB_IND16_2, LDAB_IND16_3, LDAB_EXT, LDAB_INDE,
-	LDD_IND8, LDD_IND8_2, LDD_IND8_2B, LDD_IND8_3, LDD_IMM16, LDD_IND16, LDD_IND16_2, LDD_IND16_2B, LDD_IND16_3, LDD_EXT, LDD_INDE,
-	LDE_IMM16, LDE_IND16, LDE_IND16_2, LDE_IND16_2B, LDE_IND16_3, LDE_EXT,
+	LDAA_IND8, LDAA_IND8_3, LDAA_IMM8, LDAA_IND16, LDAA_IND16_3, LDAA_EXT, LDAA_INDE,
+	LDAB_IND8, LDAB_IND8_3, LDAB_IMM8, LDAB_IND16, LDAB_IND16_3, LDAB_EXT, LDAB_INDE,
+	LDD_IND8, LDD_IND8_3, LDD_IMM16, LDD_IND16, LDD_IND16_3, LDD_EXT, LDD_INDE,
+	LDE_IMM16, LDE_IND16, LDE_IND16_3, LDE_EXT,
 	LDED, LDED_2, LDED_2B, LDED_3, LDED_3B, LDED_4,
 	LDHI, LDHI_2, LDHI_2B, LDHI_3, LDHI_3B, LDHI_4,
-	LDX_IND8, LDX_IND8_2, LDX_IND8_2B, LDX_IND8_3, LDX_IMM16, LDX_IND16, LDX_IND16_2, LDX_IND16_2B, LDX_IND16_3, LDX_EXT,
-	MOVB_IXP_EXT, MOVB_IXP_EXT_2, MOVB_IXP_EXT_3, MOVB_EXT_IXP, MOVB_EXT_IXP_2, MOVB_EXT_IXP_3, MOVB_EXT_EXT, MOVB_EXT_EXT_2, MOVB_EXT_EXT_3,
-	MOVW_IXP_EXT, MOVW_IXP_EXT_2, MOVW_IXP_EXT_2B, MOVW_IXP_EXT_3, MOVW_EXT_IXP, MOVW_EXT_IXP_2, MOVW_EXT_IXP_2B, MOVW_EXT_IXP_3, MOVW_EXT_EXT, MOVW_EXT_EXT_2, MOVW_EXT_EXT_2B, MOVW_EXT_EXT_3,
+	LDX_IND8, LDX_IND8_3, LDX_IMM16, LDX_IND16, LDX_IND16_3, LDX_EXT,
+	MOVB_IXP_EXT, MOVB_IXP_EXT_3, MOVB_EXT_IXP, MOVB_EXT_IXP_3, MOVB_EXT_EXT, MOVB_EXT_EXT_3,
+	MOVW_IXP_EXT, MOVW_IXP_EXT_3, MOVW_EXT_IXP, MOVW_EXT_IXP_3, MOVW_EXT_EXT, MOVW_EXT_EXT_3,
 	MUL, MUL_2, MUL_3, MUL_4, MUL_5,
-	NEG_IND8, NEG_IND8_2, NEG_IND8_3, NEG_IND16, NEG_IND16_2, NEG_IND16_3, NEG_EXT,
+	NEG_IND8, NEG_IND8_3, NEG_IND16, NEG_IND16_3, NEG_EXT,
 	NEGA,
 	NEGB,
 	NEGD,
 	NEGE,
-	NEGW_IND16, NEGW_IND16_2, NEGW_IND16_2B, NEGW_IND16_3, NEGW_EXT,
-	ORAA_IND8, ORAA_IND8_2, ORAA_IND8_3, ORAA_IMM8, ORAA_IND16, ORAA_IND16_2, ORAA_IND16_3, ORAA_EXT, ORAA_INDE,
-	ORAB_IND8, ORAB_IND8_2, ORAB_IND8_3, ORAB_IMM8, ORAB_IND16, ORAB_IND16_2, ORAB_IND16_3, ORAB_EXT, ORAB_INDE,
-	ORD_IND8, ORD_IND8_2, ORD_IND8_2B, ORD_IND8_3, ORD_IMM16, ORD_IND16, ORD_IND16_2, ORD_IND16_2B, ORD_IND16_3, ORD_EXT, ORD_INDE,
-	ORE_IMM16, ORE_IND16, ORE_IND16_2, ORE_IND16_2B, ORE_IND16_3, ORE_EXT,
+	NEGW_IND16, NEGW_IND16_3, NEGW_EXT,
+	ORAA_IND8, ORAA_IND8_3, ORAA_IMM8, ORAA_IND16, ORAA_IND16_3, ORAA_EXT, ORAA_INDE,
+	ORAB_IND8, ORAB_IND8_3, ORAB_IMM8, ORAB_IND16, ORAB_IND16_3, ORAB_EXT, ORAB_INDE,
+	ORD_IND8, ORD_IND8_3, ORD_IMM16, ORD_IND16, ORD_IND16_3, ORD_EXT, ORD_INDE,
+	ORE_IMM16, ORE_IND16, ORE_IND16_3, ORE_EXT,
 	ORP,
 	PSHA, PSHA_2,
 	PSHB,
@@ -122,16 +124,18 @@ enum class cpu16_device::seq : u16
 	PULA, PULA_2, PULA_3,
 	PULB, PULB_2, PULB_3,
 	PULM, PULM_0, PULM_1, PULM_2, PULM_3, PULM_4, PULM_5, PULM_6, PULM_7, PULM_8, PULM_0B, PULM_1B, PULM_2B, PULM_3B, PULM_4B, PULM_5B, PULM_6B, PULM_7B,
-	ROL_IND8, ROL_IND8_2, ROL_IND8_3, ROL_IND16, ROL_IND16_2, ROL_IND16_3, ROL_EXT,
+	ROL_IND8, ROL_IND8_3, ROL_IND16, ROL_IND16_3, ROL_EXT,
 	ROLA,
 	ROLB,
 	ROLD,
 	ROLE,
-	ROR_IND8, ROR_IND8_2, ROR_IND8_3, ROR_IND16, ROR_IND16_2, ROR_IND16_3, ROR_EXT,
+	ROLW_IND16, ROLW_IND16_3, ROLW_EXT,
+	ROR_IND8, ROR_IND8_3, ROR_IND16, ROR_IND16_3, ROR_EXT,
 	RORA,
 	RORB,
 	RORD,
 	RORE,
+	RORW_IND16, RORW_IND16_3, RORW_EXT,
 	RTS, RTS_2, RTS_2B, RTS_3, RTS_3B, RTS_4,
 	SBA,
 	SDE,
@@ -141,10 +145,10 @@ enum class cpu16_device::seq : u16
 	STE_IND16, STE_EXT,
 	STED, STED_2, STED_2B,
 	STX_IND8, STX_IND16, STX_EXT,
-	SUBA_IND8, SUBA_IND8_2, SUBA_IND8_3, SUBA_IMM8, SUBA_IND16, SUBA_IND16_2, SUBA_IND16_3, SUBA_EXT, SUBA_INDE, SUBA_INDE_2, SUBA_INDE_3,
-	SUBB_IND8, SUBB_IND8_2, SUBB_IND8_3, SUBB_IMM8, SUBB_IND16, SUBB_IND16_2, SUBB_IND16_3, SUBB_EXT, SUBB_INDE, SUBB_INDE_2, SUBB_INDE_3,
-	SUBD_IND8, SUBD_IND8_2, SUBD_IND8_2B, SUBD_IND8_3, SUBD_IMM16, SUBD_IND16, SUBD_IND16_2, SUBD_IND16_2B, SUBD_IND16_3, SUBD_EXT, SUBD_INDE, SUBD_INDE_2, SUBD_INDE_2B, SUBD_INDE_3,
-	SUBE_IMM16, SUBE_IND16, SUBE_IND16_2, SUBE_IND16_2B, SUBE_IND16_3, SUBE_EXT,
+	SUBA_IND8, SUBA_IND8_3, SUBA_IMM8, SUBA_IND16, SUBA_IND16_3, SUBA_EXT, SUBA_INDE, SUBA_INDE_3,
+	SUBB_IND8, SUBB_IND8_3, SUBB_IMM8, SUBB_IND16, SUBB_IND16_3, SUBB_EXT, SUBB_INDE, SUBB_INDE_3,
+	SUBD_IND8, SUBD_IND8_3, SUBD_IMM16, SUBD_IND16, SUBD_IND16_3, SUBD_EXT, SUBD_INDE, SUBD_INDE_3,
+	SUBE_IMM16, SUBE_IND16, SUBE_IND16_3, SUBE_EXT,
 	SXT,
 	TAB,
 	TAP,
@@ -158,12 +162,12 @@ enum class cpu16_device::seq : u16
 	TEKB,
 	TPA,
 	TPD,
-	TST_IND8, TST_IND8_2, TST_IND8_3, TST_IND16, TST_IND16_2, TST_IND16_3, TST_EXT,
+	TST_IND8, TST_IND8_3, TST_IND16, TST_IND16_3, TST_EXT,
 	TSTA,
 	TSTB,
 	TSTD,
 	TSTE,
-	TSTW_IND16, TSTW_IND16_2, TSTW_IND16_2B, TSTW_IND16_3, TSTW_EXT,
+	TSTW_IND16, TSTW_IND16_3, TSTW_EXT,
 	TSX,
 	TXKB,
 	TXS,
@@ -176,9 +180,6 @@ enum class cpu16_device::seq : u16
 
 ALLOW_SAVE_TYPE(cpu16_device::seq)
 
-
-// device type definition
-DEFINE_DEVICE_TYPE(MC68HC16Z1, mc68hc16z1_device, "mc68hc16z1", "Motorola MC68HC16Z1")
 
 cpu16_device::cpu16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map)
 	: cpu_device(mconfig, type, tag, owner, clock)
@@ -198,21 +199,12 @@ cpu16_device::cpu16_device(const machine_config &mconfig, device_type type, cons
 	, m_sl(false)
 	, m_index_mask{0, 0}
 	, m_sequence(seq::BOOT_0)
+	, m_return_sequence(seq::BOOT_0)
 	, m_ea(0)
 	, m_tmp(0)
 	, m_start(false)
 	, m_icount(0)
 {
-}
-
-mc68hc16z1_device::mc68hc16z1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: cpu16_device(mconfig, MC68HC16Z1, tag, owner, clock, address_map_constructor(FUNC(mc68hc16z1_device::internal_map), this))
-{
-}
-
-void mc68hc16z1_device::internal_map(address_map &map)
-{
-	map(0xfe000, 0xfe3ff).ram(); // FIXME: this is relocatable
 }
 
 std::unique_ptr<util::disasm_interface> cpu16_device::create_disassembler()
@@ -363,7 +355,8 @@ void cpu16_device::device_start()
 	save_item(NAME(m_sl));
 	save_item(NAME(m_index_mask));
 	save_item(NAME(m_sequence));
-	save_item(NAME(m_ea));	
+	save_item(NAME(m_return_sequence));
+	save_item(NAME(m_ea));
 	save_item(NAME(m_tmp));
 	save_item(NAME(m_start));
 }
@@ -468,14 +461,14 @@ const cpu16_device::seq cpu16_device::s_inst_decode[4][256] =
 	// Page 2
 	{
 		// 270X-273X
-		seq::NEGW_IND16, seq::DECW_IND16, seq::NEGW_IND16, seq::INCW_IND16, seq::INVALID, seq::CLRW_IND16, seq::TSTW_IND16, seq::INVALID,
-		seq::BCLRW_IND16, seq::BSETW_IND16, seq::INVALID, seq::INVALID, seq::INVALID, seq::INVALID, seq::INVALID, seq::INVALID,
-		seq::NEGW_IND16, seq::DECW_IND16, seq::NEGW_IND16, seq::INCW_IND16, seq::INVALID, seq::CLRW_IND16, seq::TSTW_IND16, seq::INVALID,
-		seq::BCLRW_IND16, seq::BSETW_IND16, seq::INVALID, seq::INVALID, seq::INVALID, seq::INVALID, seq::INVALID, seq::INVALID,
-		seq::NEGW_IND16, seq::DECW_IND16, seq::NEGW_IND16, seq::INCW_IND16, seq::INVALID, seq::CLRW_IND16, seq::TSTW_IND16, seq::INVALID,
-		seq::BCLRW_IND16, seq::BSETW_IND16, seq::INVALID, seq::INVALID, seq::INVALID, seq::INVALID, seq::INVALID, seq::INVALID,
-		seq::NEGW_EXT, seq::DECW_EXT, seq::NEGW_EXT, seq::INCW_EXT, seq::INVALID, seq::CLRW_EXT, seq::TSTW_EXT, seq::INVALID,
-		seq::BCLRW_EXT, seq::BSETW_EXT, seq::INVALID, seq::INVALID, seq::INVALID, seq::INVALID, seq::INVALID, seq::INVALID,
+		seq::NEGW_IND16, seq::DECW_IND16, seq::NEGW_IND16, seq::INCW_IND16, seq::ROLW_IND16, seq::CLRW_IND16, seq::TSTW_IND16, seq::INVALID,
+		seq::BCLRW_IND16, seq::BSETW_IND16, seq::INVALID, seq::INVALID, seq::ROLW_IND16, seq::ASRW_IND16, seq::RORW_IND16, seq::RORW_IND16,
+		seq::NEGW_IND16, seq::DECW_IND16, seq::NEGW_IND16, seq::INCW_IND16, seq::ROLW_IND16, seq::CLRW_IND16, seq::TSTW_IND16, seq::INVALID,
+		seq::BCLRW_IND16, seq::BSETW_IND16, seq::INVALID, seq::INVALID, seq::ROLW_IND16, seq::ASRW_IND16, seq::RORW_IND16, seq::RORW_IND16,
+		seq::NEGW_IND16, seq::DECW_IND16, seq::NEGW_IND16, seq::INCW_IND16, seq::ROLW_IND16, seq::CLRW_IND16, seq::TSTW_IND16, seq::INVALID,
+		seq::BCLRW_IND16, seq::BSETW_IND16, seq::INVALID, seq::INVALID, seq::ROLW_IND16, seq::ASRW_IND16, seq::RORW_IND16, seq::RORW_IND16,
+		seq::NEGW_EXT, seq::DECW_EXT, seq::NEGW_EXT, seq::INCW_EXT, seq::ROLW_EXT, seq::CLRW_EXT, seq::TSTW_EXT, seq::INVALID,
+		seq::BCLRW_EXT, seq::BSETW_EXT, seq::INVALID, seq::INVALID, seq::ROLW_EXT, seq::ASRW_EXT, seq::RORW_EXT, seq::RORW_EXT,
 
 		// 274X-277X
 		seq::SUBA_INDE, seq::ADDA_INDE, seq::SUBA_INDE, seq::ADDA_INDE, seq::EORA_INDE, seq::LDAA_INDE, seq::ANDA_INDE, seq::ORAA_INDE,
@@ -665,7 +658,7 @@ u16 cpu16_device::ror16(u16 data, bool cin) noexcept
 	m_ccr = (m_ccr & 0xf0ff)
 			| (BIT(result, 15) ? 0x0800 : 0)
 			| (result == 0 ? 0x0400 : 0)
-			| (BIT(data, 0) != BIT(result, 7) ? 0x0200 : 0)
+			| (BIT(data, 0) != BIT(result, 15) ? 0x0200 : 0)
 			| (BIT(data, 0) ? 0x0100 : 0);
 	return result;
 }
@@ -687,7 +680,7 @@ u16 cpu16_device::asr16(u16 data) noexcept
 	m_ccr = (m_ccr & 0xf0ff)
 			| (BIT(result, 15) ? 0x0800 : 0)
 			| (result == 0 ? 0x0400 : 0)
-			| (BIT(data, 0) != BIT(result, 7) ? 0x0200 : 0)
+			| (BIT(data, 0) != BIT(result, 15) ? 0x0200 : 0)
 			| (BIT(data, 0) ? 0x0100 : 0);
 	return result;
 }
@@ -1030,6 +1023,65 @@ void cpu16_device::execute_run()
 			m_icount -= 2;
 			break;
 
+		case seq::LOAD8_EA:
+			m_tmp = m_data.read_byte(m_ea);
+			m_sequence = m_return_sequence;
+			m_icount -= 2;
+			break;
+
+		case seq::LOAD8_EXT:
+			m_tmp = m_data.read_byte(m_ea);
+			m_sequence = m_return_sequence;
+			m_icount -= 2;
+			advance();
+			break;
+
+		case seq::LOAD16_EA:
+			if (BIT(m_ea, 0))
+			{
+				m_tmp = m_data.read_byte(m_ea);
+				m_ea = (m_ea + 1) & 0xfffff;
+				m_sequence = seq::LOAD16_EA_LSB;
+			}
+			else
+			{
+				m_tmp = m_data.read_word(m_ea);
+				m_sequence = m_return_sequence;
+			}
+			m_icount -= 2;
+			break;
+
+		case seq::LOAD16_EA_LSB:
+			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
+			m_ea = (m_ea - 1) & 0xfffff;
+			m_sequence = m_return_sequence;
+			m_icount -= 2;
+			break;
+
+		case seq::LOAD16_EXT:
+			if (BIT(m_ea, 0))
+			{
+				m_tmp = m_data.read_byte(m_ea);
+				m_ea = (m_ea + 1) & 0xfffff;
+				m_sequence = seq::LOAD16_EXT_LSB;
+			}
+			else
+			{
+				m_tmp = m_data.read_word(m_ea);
+				m_sequence = m_return_sequence;
+				advance();
+			}
+			m_icount -= 2;
+			break;
+
+		case seq::LOAD16_EXT_LSB:
+			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
+			m_ea = (m_ea - 1) & 0xfffff;
+			m_sequence = m_return_sequence;
+			advance();
+			m_icount -= 2;
+			break;
+
 		case seq::STORE8_EA:
 			m_data.write_word(m_ea, (m_tmp & 0x00ff) | (m_tmp << 8), BIT(m_ea, 0) ? 0x00ff : 0xff00);
 			m_start = true;
@@ -1093,14 +1145,9 @@ void cpu16_device::execute_run()
 		case seq::ADDA_IND8:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
-			m_sequence = seq::ADDA_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::ADDA_IND8_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::ADDA_IND8_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::ADDA_IND8_3;
 			m_icount -= 2;
 			break;
 
@@ -1121,15 +1168,9 @@ void cpu16_device::execute_run()
 		case seq::ADDA_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::ADDA_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::ADDA_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::ADDA_IND16_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::ADDA_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -1144,7 +1185,8 @@ void cpu16_device::execute_run()
 		case seq::ADDA_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u16(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::ADDA_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::ADDA_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -1152,14 +1194,9 @@ void cpu16_device::execute_run()
 		case seq::ADDA_INDE:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_e)) & 0xfffff;
-			m_sequence = seq::ADDA_INDE_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::ADDA_INDE_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::ADDA_INDE_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::ADDA_INDE_3;
 			m_icount -= 2;
 			break;
 
@@ -1173,14 +1210,9 @@ void cpu16_device::execute_run()
 		case seq::ADDB_IND8:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
-			m_sequence = seq::ADDB_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::ADDB_IND8_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::ADDB_IND8_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::ADDB_IND8_3;
 			m_icount -= 2;
 			break;
 
@@ -1201,15 +1233,9 @@ void cpu16_device::execute_run()
 		case seq::ADDB_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::ADDB_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::ADDB_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::ADDB_IND16_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::ADDB_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -1224,7 +1250,8 @@ void cpu16_device::execute_run()
 		case seq::ADDB_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u16(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::ADDB_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::ADDB_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -1232,14 +1259,9 @@ void cpu16_device::execute_run()
 		case seq::ADDB_INDE:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_e)) & 0xfffff;
-			m_sequence = seq::ADDB_INDE_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::ADDB_INDE_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::ADDB_INDE_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::ADDB_INDE_3;
 			m_icount -= 2;
 			break;
 
@@ -1253,29 +1275,9 @@ void cpu16_device::execute_run()
 		case seq::ADDD_IND8:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
-			m_sequence = seq::ADDD_IND8_2;
+			m_sequence = seq::LOAD16_EA;
+			m_return_sequence = seq::ADDD_IND8_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::ADDD_IND8_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::ADDD_IND8_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::ADDD_IND8_3;
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::ADDD_IND8_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_sequence = seq::ADDD_IND8_3;
 			m_icount -= 2;
 			break;
 
@@ -1305,31 +1307,9 @@ void cpu16_device::execute_run()
 		case seq::ADDD_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::ADDD_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::ADDD_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::ADDD_IND16_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::ADDD_IND16_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::ADDD_IND16_3;
-				advance();
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::ADDD_IND16_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_sequence = seq::ADDD_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -1344,7 +1324,8 @@ void cpu16_device::execute_run()
 		case seq::ADDD_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u32(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::ADDD_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::ADDD_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -1352,29 +1333,9 @@ void cpu16_device::execute_run()
 		case seq::ADDD_INDE:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_e)) & 0xfffff;
-			m_sequence = seq::ADDD_INDE_2;
+			m_sequence = seq::LOAD16_EA;
+			m_return_sequence = seq::ADDD_INDE_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::ADDD_INDE_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::ADDD_INDE_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::ADDD_INDE_3;
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::ADDD_INDE_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_sequence = seq::ADDD_INDE_3;
 			m_icount -= 2;
 			break;
 
@@ -1404,31 +1365,9 @@ void cpu16_device::execute_run()
 		case seq::ADDE_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::ADDE_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::ADDE_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::ADDE_IND16_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::ADDE_IND16_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::ADDE_IND16_3;
-				advance();
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::ADDE_IND16_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_sequence = seq::ADDE_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -1443,7 +1382,8 @@ void cpu16_device::execute_run()
 		case seq::ADDE_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u32(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::ADDE_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::ADDE_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -1492,14 +1432,9 @@ void cpu16_device::execute_run()
 		case seq::ANDA_IND8:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
-			m_sequence = seq::ANDA_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::ANDA_IND8_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::ANDA_IND8_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::ANDA_IND8_3;
 			m_icount -= 2;
 			break;
 
@@ -1522,15 +1457,9 @@ void cpu16_device::execute_run()
 		case seq::ANDA_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::ANDA_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::ANDA_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::ANDA_IND16_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::ANDA_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -1546,7 +1475,8 @@ void cpu16_device::execute_run()
 		case seq::ANDA_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u16(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::ANDA_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::ANDA_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -1554,7 +1484,8 @@ void cpu16_device::execute_run()
 		case seq::ANDA_INDE:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_e)) & 0xfffff;
-			m_sequence = seq::ANDA_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::ANDA_IND8_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -1562,14 +1493,9 @@ void cpu16_device::execute_run()
 		case seq::ANDB_IND8:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
-			m_sequence = seq::ANDB_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::ANDB_IND8_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::ANDB_IND8_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::ANDB_IND8_3;
 			m_icount -= 2;
 			break;
 
@@ -1592,15 +1518,9 @@ void cpu16_device::execute_run()
 		case seq::ANDB_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::ANDB_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::ANDB_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::ANDB_IND16_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::ANDB_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -1616,7 +1536,8 @@ void cpu16_device::execute_run()
 		case seq::ANDB_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u16(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::ANDB_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::ANDB_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -1624,7 +1545,8 @@ void cpu16_device::execute_run()
 		case seq::ANDB_INDE:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_e)) & 0xfffff;
-			m_sequence = seq::ANDB_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::ANDB_IND8_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -1632,29 +1554,9 @@ void cpu16_device::execute_run()
 		case seq::ANDD_IND8:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
-			m_sequence = seq::ANDD_IND8_2;
+			m_sequence = seq::LOAD16_EA;
+			m_return_sequence = seq::ANDD_IND8_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::ANDD_IND8_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::ANDD_IND8_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::ANDD_IND8_3;
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::ANDD_IND8_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_sequence = seq::ANDD_IND8_3;
 			m_icount -= 2;
 			break;
 
@@ -1678,31 +1580,9 @@ void cpu16_device::execute_run()
 		case seq::ANDD_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::ANDD_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::ANDD_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::ANDD_IND16_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::ANDD_IND16_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::ANDD_IND16_3;
-				advance();
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::ANDD_IND16_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_sequence = seq::ANDD_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -1718,7 +1598,8 @@ void cpu16_device::execute_run()
 		case seq::ANDD_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u32(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::ANDD_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::ANDD_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -1726,7 +1607,8 @@ void cpu16_device::execute_run()
 		case seq::ANDD_INDE:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_e)) & 0xfffff;
-			m_sequence = seq::ANDD_IND8_2;
+			m_sequence = seq::LOAD16_EA;
+			m_return_sequence = seq::ANDD_IND8_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -1743,31 +1625,9 @@ void cpu16_device::execute_run()
 		case seq::ANDE_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::ANDE_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::ANDE_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::ANDE_IND16_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::ANDE_IND16_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::ANDE_IND16_3;
-				advance();
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::ANDE_IND16_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_sequence = seq::ANDE_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -1783,7 +1643,8 @@ void cpu16_device::execute_run()
 		case seq::ANDE_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u32(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::ANDE_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::ANDE_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -1800,14 +1661,9 @@ void cpu16_device::execute_run()
 		case seq::ASR_IND8:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
-			m_sequence = seq::ASR_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::ASR_IND8_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::ASR_IND8_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::ASR_IND8_3;
 			m_icount -= 2;
 			break;
 
@@ -1820,15 +1676,9 @@ void cpu16_device::execute_run()
 		case seq::ASR_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::ASR_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::ASR_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::ASR_IND16_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::ASR_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -1842,7 +1692,8 @@ void cpu16_device::execute_run()
 		case seq::ASR_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u16(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::ASR_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::ASR_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -1875,18 +1726,37 @@ void cpu16_device::execute_run()
 			m_icount -= 2;
 			break;
 
-		case seq::BCLR_IND16:
+		case seq::ASRW_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
-			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::BCLR_IND16_2;
+			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::ASRW_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
 
-		case seq::BCLR_IND16_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::BCLR_IND16_3;
-			advance();
+		case seq::ASRW_IND16_3:
+			m_fetch_pipe[0] = m_cache.read_word(m_pc);
+			m_tmp = asr16(m_tmp);
+			m_sequence = seq::STORE16_EA;
+			m_icount -= 2;
+			break;
+
+		case seq::ASRW_EXT:
+			m_fetch_pipe[0] = m_cache.read_word(m_pc);
+			m_ea = u16(m_ek) << 16 | m_fetch_pipe[1];
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::ASRW_IND16_3;
+			m_start = false;
+			m_icount -= 2;
+			break;
+
+		case seq::BCLR_IND16:
+			m_fetch_pipe[0] = m_cache.read_word(m_pc);
+			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::BCLR_IND16_3;
+			m_start = false;
 			m_icount -= 2;
 			break;
 
@@ -1901,7 +1771,8 @@ void cpu16_device::execute_run()
 		case seq::BCLR_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u16(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::BCLR_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::BCLR_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -1932,32 +1803,9 @@ void cpu16_device::execute_run()
 		case seq::BCLRW_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::BCLRW_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::BCLRW_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::BCLRW_IND16_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::BCLRW_IND16_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::BCLRW_IND16_3;
-				advance();
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::BCLRW_IND16_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_ea = (m_ea - 1) & 0xfffff;
-			m_sequence = seq::BCLRW_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -1972,7 +1820,8 @@ void cpu16_device::execute_run()
 		case seq::BCLRW_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u16(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::BCLRW_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::BCLRW_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -1980,14 +1829,9 @@ void cpu16_device::execute_run()
 		case seq::BITA_IND8:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
-			m_sequence = seq::BITA_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::BITA_IND8_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::BITA_IND8_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::BITA_IND8_3;
 			m_icount -= 2;
 			break;
 
@@ -2008,15 +1852,9 @@ void cpu16_device::execute_run()
 		case seq::BITA_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::BITA_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::BITA_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::BITA_IND16_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::BITA_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -2031,7 +1869,8 @@ void cpu16_device::execute_run()
 		case seq::BITA_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u16(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::BITA_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::BITA_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -2039,7 +1878,8 @@ void cpu16_device::execute_run()
 		case seq::BITA_INDE:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_e)) & 0xfffff;
-			m_sequence = seq::BITA_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::BITA_IND8_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -2047,14 +1887,9 @@ void cpu16_device::execute_run()
 		case seq::BITB_IND8:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
-			m_sequence = seq::BITB_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::BITB_IND8_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::BITB_IND8_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::BITB_IND8_3;
 			m_icount -= 2;
 			break;
 
@@ -2075,15 +1910,9 @@ void cpu16_device::execute_run()
 		case seq::BITB_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::BITB_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::BITB_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::BITB_IND16_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::BITB_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -2098,7 +1927,8 @@ void cpu16_device::execute_run()
 		case seq::BITB_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u16(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::BITB_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::BITB_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -2106,7 +1936,8 @@ void cpu16_device::execute_run()
 		case seq::BITB_INDE:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_e)) & 0xfffff;
-			m_sequence = seq::BITB_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::BITB_IND8_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -2126,14 +1957,9 @@ void cpu16_device::execute_run()
 		case seq::BRSET_IND8:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[1] >> 8)) & 0xfffff;
-			m_sequence = seq::BRSET_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::BRSET_IND8_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::BRSET_IND8_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::BRSET_IND8_3;
 			m_icount -= 2;
 			break;
 
@@ -2159,16 +1985,10 @@ void cpu16_device::execute_run()
 		case seq::BRSET_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::BRSET_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::BRSET_IND16_3;
 			m_start = false;
 			m_icount -= 2;
-			break;
-
-		case seq::BRSET_IND16_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::BRSET_IND16_3;
-			m_icount -= 2;
-			advance();
 			break;
 
 		case seq::BRSET_IND16_3:
@@ -2183,7 +2003,8 @@ void cpu16_device::execute_run()
 		case seq::BRSET_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u32(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::BRSET_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::BRSET_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -2191,15 +2012,9 @@ void cpu16_device::execute_run()
 		case seq::BSET_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::BSET_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::BSET_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::BSET_IND16_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::BSET_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -2214,7 +2029,8 @@ void cpu16_device::execute_run()
 		case seq::BSET_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u16(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::BSET_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::BSET_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -2245,32 +2061,9 @@ void cpu16_device::execute_run()
 		case seq::BSETW_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::BSETW_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::BSETW_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::BSETW_IND16_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::BSETW_IND16_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::BSETW_IND16_3;
-				advance();
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::BSETW_IND16_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_ea = (m_ea - 1) & 0xfffff;
-			m_sequence = seq::BSETW_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -2285,7 +2078,8 @@ void cpu16_device::execute_run()
 		case seq::BSETW_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u16(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::BSETW_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::BSETW_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -2449,14 +2243,9 @@ void cpu16_device::execute_run()
 		case seq::CMPA_IND8:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
-			m_sequence = seq::CMPA_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::CMPA_IND8_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::CMPA_IND8_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::CMPA_IND8_3;
 			m_icount -= 2;
 			break;
 
@@ -2477,15 +2266,9 @@ void cpu16_device::execute_run()
 		case seq::CMPA_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::CMPA_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::CMPA_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::CMPA_IND16_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::CMPA_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -2500,7 +2283,8 @@ void cpu16_device::execute_run()
 		case seq::CMPA_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u16(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::CMPA_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::CMPA_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -2508,7 +2292,8 @@ void cpu16_device::execute_run()
 		case seq::CMPA_INDE:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_e)) & 0xfffff;
-			m_sequence = seq::CMPA_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::CMPA_IND8_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -2516,14 +2301,9 @@ void cpu16_device::execute_run()
 		case seq::CMPB_IND8:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
-			m_sequence = seq::CMPB_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::CMPB_IND8_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::CMPB_IND8_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::CMPB_IND8_3;
 			m_icount -= 2;
 			break;
 
@@ -2544,15 +2324,9 @@ void cpu16_device::execute_run()
 		case seq::CMPB_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::CMPB_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::CMPB_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::CMPB_IND16_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::CMPB_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -2567,7 +2341,8 @@ void cpu16_device::execute_run()
 		case seq::CMPB_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u16(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::CMPB_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::CMPB_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -2575,7 +2350,8 @@ void cpu16_device::execute_run()
 		case seq::CMPB_INDE:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_e)) & 0xfffff;
-			m_sequence = seq::CMPB_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::CMPB_IND8_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -2583,29 +2359,9 @@ void cpu16_device::execute_run()
 		case seq::CPD_IND8:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
-			m_sequence = seq::CPD_IND8_2;
+			m_sequence = seq::LOAD16_EA;
+			m_return_sequence = seq::CPD_IND8_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::CPD_IND8_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::CPD_IND8_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::CPD_IND8_3;
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::CPD_IND8_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_sequence = seq::CPD_IND8_3;
 			m_icount -= 2;
 			break;
 
@@ -2628,31 +2384,9 @@ void cpu16_device::execute_run()
 		case seq::CPD_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::CPD_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::CPD_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::CPD_IND16_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::CPD_IND16_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::CPD_IND16_3;
-				advance();
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::CPD_IND16_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_sequence = seq::CPD_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -2667,7 +2401,8 @@ void cpu16_device::execute_run()
 		case seq::CPD_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u32(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::CPD_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::CPD_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -2675,7 +2410,8 @@ void cpu16_device::execute_run()
 		case seq::CPD_INDE:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_e)) & 0xfffff;
-			m_sequence = seq::CPD_IND8_2;
+			m_sequence = seq::LOAD16_EA;
+			m_return_sequence = seq::CPD_IND8_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -2692,31 +2428,9 @@ void cpu16_device::execute_run()
 		case seq::CPE_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::CPE_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::CPE_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::CPE_IND16_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::CPE_IND16_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::CPE_IND16_3;
-				advance();
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::CPE_IND16_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_sequence = seq::CPE_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -2731,7 +2445,8 @@ void cpu16_device::execute_run()
 		case seq::CPE_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u32(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::CPE_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::CPE_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -2739,29 +2454,9 @@ void cpu16_device::execute_run()
 		case seq::CPX_IND8:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
-			m_sequence = seq::CPX_IND8_2;
+			m_sequence = seq::LOAD16_EA;
+			m_return_sequence = seq::CPX_IND8_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::CPX_IND8_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::CPX_IND8_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::CPX_IND8_3;
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::CPX_IND8_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_sequence = seq::CPX_IND8_3;
 			m_icount -= 2;
 			break;
 
@@ -2784,31 +2479,9 @@ void cpu16_device::execute_run()
 		case seq::CPX_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::CPX_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::CPX_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::CPX_IND16_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::CPX_IND16_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::CPX_IND16_3;
-				advance();
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::CPX_IND16_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_sequence = seq::CPX_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -2823,7 +2496,8 @@ void cpu16_device::execute_run()
 		case seq::CPX_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u32(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::CPX_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::CPX_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -2852,14 +2526,9 @@ void cpu16_device::execute_run()
 		case seq::DEC_IND8:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
-			m_sequence = seq::DEC_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::DEC_IND8_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::DEC_IND8_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::DEC_IND8_3;
 			m_icount -= 2;
 			break;
 
@@ -2873,15 +2542,9 @@ void cpu16_device::execute_run()
 		case seq::DEC_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::DEC_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::DEC_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::DEC_IND16_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::DEC_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -2896,7 +2559,8 @@ void cpu16_device::execute_run()
 		case seq::DEC_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u16(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::DEC_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::DEC_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -2920,32 +2584,9 @@ void cpu16_device::execute_run()
 		case seq::DECW_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::DECW_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::DECW_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::DECW_IND16_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::DECW_IND16_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::DECW_IND16_3;
-				advance();
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::DECW_IND16_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_ea = (m_ea - 1) & 0xfffff;
-			m_sequence = seq::DECW_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -2960,7 +2601,8 @@ void cpu16_device::execute_run()
 		case seq::DECW_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u16(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::DECW_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::DECW_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -3080,14 +2722,9 @@ void cpu16_device::execute_run()
 		case seq::EORA_IND8:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
-			m_sequence = seq::EORA_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::EORA_IND8_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::EORA_IND8_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::EORA_IND8_3;
 			m_icount -= 2;
 			break;
 
@@ -3110,15 +2747,9 @@ void cpu16_device::execute_run()
 		case seq::EORA_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::EORA_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::EORA_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::EORA_IND16_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::EORA_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -3134,7 +2765,8 @@ void cpu16_device::execute_run()
 		case seq::EORA_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u16(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::EORA_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::EORA_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -3142,7 +2774,8 @@ void cpu16_device::execute_run()
 		case seq::EORA_INDE:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_e)) & 0xfffff;
-			m_sequence = seq::EORA_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::EORA_IND8_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -3150,14 +2783,9 @@ void cpu16_device::execute_run()
 		case seq::EORB_IND8:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
-			m_sequence = seq::EORB_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::EORB_IND8_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::EORB_IND8_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::EORB_IND8_3;
 			m_icount -= 2;
 			break;
 
@@ -3180,15 +2808,9 @@ void cpu16_device::execute_run()
 		case seq::EORB_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::EORB_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::EORB_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::EORB_IND16_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::EORB_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -3204,7 +2826,8 @@ void cpu16_device::execute_run()
 		case seq::EORB_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u16(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::EORB_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::EORB_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -3212,7 +2835,8 @@ void cpu16_device::execute_run()
 		case seq::EORB_INDE:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_e)) & 0xfffff;
-			m_sequence = seq::EORB_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::EORB_IND8_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -3220,29 +2844,9 @@ void cpu16_device::execute_run()
 		case seq::EORD_IND8:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
-			m_sequence = seq::EORD_IND8_2;
+			m_sequence = seq::LOAD16_EA;
+			m_return_sequence = seq::EORD_IND8_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::EORD_IND8_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::EORD_IND8_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::EORD_IND8_3;
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::EORD_IND8_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_sequence = seq::EORD_IND8_3;
 			m_icount -= 2;
 			break;
 
@@ -3266,31 +2870,9 @@ void cpu16_device::execute_run()
 		case seq::EORD_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::EORD_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::EORD_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::EORD_IND16_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::EORD_IND16_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::EORD_IND16_3;
-				advance();
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::EORD_IND16_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_sequence = seq::EORD_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -3306,7 +2888,8 @@ void cpu16_device::execute_run()
 		case seq::EORD_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u32(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::EORD_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::EORD_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -3314,7 +2897,8 @@ void cpu16_device::execute_run()
 		case seq::EORD_INDE:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_e)) & 0xfffff;
-			m_sequence = seq::EORD_IND8_2;
+			m_sequence = seq::LOAD16_EA;
+			m_return_sequence = seq::EORD_IND8_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -3331,31 +2915,9 @@ void cpu16_device::execute_run()
 		case seq::EORE_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::EORE_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::EORE_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::EORE_IND16_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::EORE_IND16_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::EORE_IND16_3;
-				advance();
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::EORE_IND16_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_sequence = seq::EORE_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -3371,7 +2933,8 @@ void cpu16_device::execute_run()
 		case seq::EORE_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u32(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::EORE_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::EORE_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -3379,14 +2942,9 @@ void cpu16_device::execute_run()
 		case seq::INC_IND8:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
-			m_sequence = seq::INC_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::INC_IND8_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::INC_IND8_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::INC_IND8_3;
 			m_icount -= 2;
 			break;
 
@@ -3400,15 +2958,9 @@ void cpu16_device::execute_run()
 		case seq::INC_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::INC_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::INC_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::INC_IND16_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::INC_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -3423,7 +2975,8 @@ void cpu16_device::execute_run()
 		case seq::INC_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u16(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::INC_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::INC_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -3447,32 +3000,9 @@ void cpu16_device::execute_run()
 		case seq::INCW_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::INCW_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::INCW_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::INCW_IND16_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::INCW_IND16_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::INCW_IND16_3;
-				advance();
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::INCW_IND16_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_ea = (m_ea - 1) & 0xfffff;
-			m_sequence = seq::INCW_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -3487,7 +3017,8 @@ void cpu16_device::execute_run()
 		case seq::INCW_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u16(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::INCW_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::INCW_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -3633,14 +3164,9 @@ void cpu16_device::execute_run()
 		case seq::LDAA_IND8:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
-			m_sequence = seq::LDAA_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::LDAA_IND8_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::LDAA_IND8_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::LDAA_IND8_3;
 			m_icount -= 2;
 			break;
 
@@ -3663,15 +3189,9 @@ void cpu16_device::execute_run()
 		case seq::LDAA_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::LDAA_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::LDAA_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::LDAA_IND16_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::LDAA_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -3687,7 +3207,8 @@ void cpu16_device::execute_run()
 		case seq::LDAA_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u32(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::LDAA_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::LDAA_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -3695,7 +3216,8 @@ void cpu16_device::execute_run()
 		case seq::LDAA_INDE:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_e)) & 0xfffff;
-			m_sequence = seq::LDAA_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::LDAA_IND8_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -3703,14 +3225,9 @@ void cpu16_device::execute_run()
 		case seq::LDAB_IND8:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
-			m_sequence = seq::LDAB_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::LDAB_IND8_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::LDAB_IND8_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::LDAB_IND8_3;
 			m_icount -= 2;
 			break;
 
@@ -3733,15 +3250,9 @@ void cpu16_device::execute_run()
 		case seq::LDAB_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::LDAB_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::LDAB_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::LDAB_IND16_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::LDAB_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -3757,7 +3268,8 @@ void cpu16_device::execute_run()
 		case seq::LDAB_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u32(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::LDAB_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::LDAB_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -3765,7 +3277,8 @@ void cpu16_device::execute_run()
 		case seq::LDAB_INDE:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_e)) & 0xfffff;
-			m_sequence = seq::LDAB_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::LDAB_IND8_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -3773,29 +3286,9 @@ void cpu16_device::execute_run()
 		case seq::LDD_IND8:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
-			m_sequence = seq::LDD_IND8_2;
+			m_sequence = seq::LOAD16_EA;
+			m_return_sequence = seq::LDD_IND8_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::LDD_IND8_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::LDD_IND8_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::LDD_IND8_3;
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::LDD_IND8_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_sequence = seq::LDD_IND8_3;
 			m_icount -= 2;
 			break;
 
@@ -3819,31 +3312,9 @@ void cpu16_device::execute_run()
 		case seq::LDD_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::LDD_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::LDD_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::LDD_IND16_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::LDD_IND16_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::LDD_IND16_3;
-				advance();
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::LDD_IND16_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_sequence = seq::LDD_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -3859,7 +3330,8 @@ void cpu16_device::execute_run()
 		case seq::LDD_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u32(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::LDD_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::LDD_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -3867,7 +3339,8 @@ void cpu16_device::execute_run()
 		case seq::LDD_INDE:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_e)) & 0xfffff;
-			m_sequence = seq::LDD_IND8_2;
+			m_sequence = seq::LOAD16_EA;
+			m_return_sequence = seq::LDD_IND8_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -3884,31 +3357,9 @@ void cpu16_device::execute_run()
 		case seq::LDE_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::LDE_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::LDE_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::LDE_IND16_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::LDE_IND16_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::LDE_IND16_3;
-				advance();
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::LDE_IND16_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_sequence = seq::LDE_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -3924,7 +3375,8 @@ void cpu16_device::execute_run()
 		case seq::LDE_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u32(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::LDE_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::LDE_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -4055,29 +3507,9 @@ void cpu16_device::execute_run()
 		case seq::LDX_IND8:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
-			m_sequence = seq::LDX_IND8_2;
+			m_sequence = seq::LOAD16_EA;
+			m_return_sequence = seq::LDX_IND8_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::LDX_IND8_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::LDX_IND8_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::LDX_IND8_3;
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::LDX_IND8_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_sequence = seq::LDX_IND8_3;
 			m_icount -= 2;
 			break;
 
@@ -4101,30 +3533,9 @@ void cpu16_device::execute_run()
 		case seq::LDX_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::LDX_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::LDX_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::LDX_IND16_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::LDX_IND16_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::LDX_IND16_3;
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::LDX_IND16_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_sequence = seq::LDX_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -4140,7 +3551,8 @@ void cpu16_device::execute_run()
 		case seq::LDX_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u32(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::LDX_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::LDX_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -4149,15 +3561,9 @@ void cpu16_device::execute_run()
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = m_index_regs[0];
 			m_index_regs[0] = u32(m_ek) << 16 | m_fetch_pipe[1]; // HACK: save destination in XK:IX to prevent it from being overwritten
-			m_sequence = seq::MOVB_IXP_EXT_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::MOVB_IXP_EXT_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::MOVB_IXP_EXT_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::MOVB_IXP_EXT_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -4173,15 +3579,9 @@ void cpu16_device::execute_run()
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = m_index_regs[0];
 			m_index_regs[0] = u32(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::MOVB_EXT_IXP_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::MOVB_EXT_IXP_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::MOVB_EXT_IXP_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::MOVB_EXT_IXP_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -4197,15 +3597,9 @@ void cpu16_device::execute_run()
 		case seq::MOVB_EXT_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u32(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::MOVB_EXT_EXT_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::MOVB_EXT_EXT_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::MOVB_EXT_EXT_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::MOVB_EXT_EXT_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -4221,32 +3615,9 @@ void cpu16_device::execute_run()
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = m_index_regs[0];
 			m_index_regs[0] = u32(m_ek) << 16 | m_fetch_pipe[1]; // HACK: save destination in XK:IX to prevent it from being overwritten
-			m_sequence = seq::MOVW_IXP_EXT_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::MOVW_IXP_EXT_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::MOVW_IXP_EXT_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::MOVW_IXP_EXT_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::MOVW_IXP_EXT_3;
-				advance();
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::MOVW_IXP_EXT_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_ea = (m_ea - 1) & 0xfffff;
-			m_sequence = seq::MOVW_IXP_EXT_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -4262,31 +3633,9 @@ void cpu16_device::execute_run()
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = m_index_regs[0];
 			m_index_regs[0] = u32(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::MOVW_EXT_IXP_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::MOVW_EXT_IXP_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::MOVW_EXT_IXP_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::MOVW_EXT_IXP_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::MOVW_EXT_IXP_3;
-				advance();
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::MOVW_EXT_IXP_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_sequence = seq::MOVW_EXT_IXP_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -4302,31 +3651,9 @@ void cpu16_device::execute_run()
 		case seq::MOVW_EXT_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u32(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::MOVW_EXT_EXT_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::MOVW_EXT_EXT_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::MOVW_EXT_EXT_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::MOVW_EXT_EXT_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::MOVW_EXT_EXT_3;
-				advance();
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::MOVW_EXT_EXT_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_sequence = seq::MOVW_EXT_EXT_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -4370,14 +3697,9 @@ void cpu16_device::execute_run()
 		case seq::NEG_IND8:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
-			m_sequence = seq::NEG_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::NEG_IND8_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::NEG_IND8_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::NEG_IND8_3;
 			m_icount -= 2;
 			break;
 
@@ -4390,15 +3712,9 @@ void cpu16_device::execute_run()
 		case seq::NEG_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::NEG_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::NEG_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::NEG_IND16_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::NEG_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -4412,7 +3728,8 @@ void cpu16_device::execute_run()
 		case seq::NEG_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u16(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::NEG_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::NEG_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -4448,32 +3765,9 @@ void cpu16_device::execute_run()
 		case seq::NEGW_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::NEGW_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::NEGW_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::NEGW_IND16_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::NEGW_IND16_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::NEGW_IND16_3;
-				advance();
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::NEGW_IND16_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_ea = (m_ea - 1) & 0xfffff;
-			m_sequence = seq::NEGW_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -4488,7 +3782,8 @@ void cpu16_device::execute_run()
 		case seq::NEGW_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u16(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::NEGW_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::NEGW_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -4496,14 +3791,9 @@ void cpu16_device::execute_run()
 		case seq::ORAA_IND8:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
-			m_sequence = seq::ORAA_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::ORAA_IND8_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::ORAA_IND8_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::ORAA_IND8_3;
 			m_icount -= 2;
 			break;
 
@@ -4526,15 +3816,9 @@ void cpu16_device::execute_run()
 		case seq::ORAA_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::ORAA_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::ORAA_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::ORAA_IND16_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::ORAA_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -4550,7 +3834,8 @@ void cpu16_device::execute_run()
 		case seq::ORAA_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u16(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::ORAA_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::ORAA_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -4558,7 +3843,8 @@ void cpu16_device::execute_run()
 		case seq::ORAA_INDE:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_e)) & 0xfffff;
-			m_sequence = seq::ORAA_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::ORAA_IND8_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -4566,14 +3852,9 @@ void cpu16_device::execute_run()
 		case seq::ORAB_IND8:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
-			m_sequence = seq::ORAB_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::ORAB_IND8_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::ORAB_IND8_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::ORAB_IND8_3;
 			m_icount -= 2;
 			break;
 
@@ -4596,15 +3877,9 @@ void cpu16_device::execute_run()
 		case seq::ORAB_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::ORAB_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::ORAB_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::ORAB_IND16_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::ORAB_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -4620,7 +3895,8 @@ void cpu16_device::execute_run()
 		case seq::ORAB_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u16(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::ORAB_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::ORAB_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -4628,7 +3904,8 @@ void cpu16_device::execute_run()
 		case seq::ORAB_INDE:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_e)) & 0xfffff;
-			m_sequence = seq::ORAB_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::ORAB_IND8_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -4636,29 +3913,9 @@ void cpu16_device::execute_run()
 		case seq::ORD_IND8:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
-			m_sequence = seq::ORD_IND8_2;
+			m_sequence = seq::LOAD16_EA;
+			m_return_sequence = seq::ORD_IND8_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::ORD_IND8_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::ORD_IND8_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::ORD_IND8_3;
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::ORD_IND8_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_sequence = seq::ORD_IND8_3;
 			m_icount -= 2;
 			break;
 
@@ -4682,31 +3939,9 @@ void cpu16_device::execute_run()
 		case seq::ORD_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::ORD_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::ORD_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::ORD_IND16_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::ORD_IND16_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::ORD_IND16_3;
-				advance();
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::ORD_IND16_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_sequence = seq::ORD_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -4722,7 +3957,8 @@ void cpu16_device::execute_run()
 		case seq::ORD_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u32(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::ORD_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::ORD_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -4730,7 +3966,8 @@ void cpu16_device::execute_run()
 		case seq::ORD_INDE:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_e)) & 0xfffff;
-			m_sequence = seq::ORD_IND8_2;
+			m_sequence = seq::LOAD16_EA;
+			m_return_sequence = seq::ORD_IND8_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -4747,31 +3984,9 @@ void cpu16_device::execute_run()
 		case seq::ORE_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::ORE_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::ORE_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::ORE_IND16_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::ORE_IND16_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::ORE_IND16_3;
-				advance();
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::ORE_IND16_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_sequence = seq::ORE_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -4787,7 +4002,8 @@ void cpu16_device::execute_run()
 		case seq::ORE_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u32(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::ORE_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::ORE_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -4974,14 +4190,9 @@ void cpu16_device::execute_run()
 		case seq::ROL_IND8:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
-			m_sequence = seq::ROL_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::ROL_IND8_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::ROL_IND8_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::ROL_IND8_3;
 			m_icount -= 2;
 			break;
 
@@ -4994,15 +4205,9 @@ void cpu16_device::execute_run()
 		case seq::ROL_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::ROL_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::ROL_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::ROL_IND16_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::ROL_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -5016,7 +4221,8 @@ void cpu16_device::execute_run()
 		case seq::ROL_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u16(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::ROL_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::ROL_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -5049,17 +4255,37 @@ void cpu16_device::execute_run()
 			m_icount -= 2;
 			break;
 
-		case seq::ROR_IND8:
+		case seq::ROLW_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
-			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
-			m_sequence = seq::ROR_IND8_2;
+			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::ROLW_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
 
-		case seq::ROR_IND8_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::ROR_IND8_3;
+		case seq::ROLW_IND16_3:
+			m_fetch_pipe[0] = m_cache.read_word(m_pc);
+			m_tmp = rol16(m_tmp, BIT(m_fetch_pipe[2], 3) && BIT(m_ccr, 8));
+			m_sequence = seq::STORE16_EA;
+			m_icount -= 2;
+			break;
+
+		case seq::ROLW_EXT:
+			m_fetch_pipe[0] = m_cache.read_word(m_pc);
+			m_ea = u16(m_ek) << 16 | m_fetch_pipe[1];
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::ROLW_IND16_3;
+			m_start = false;
+			m_icount -= 2;
+			break;
+
+		case seq::ROR_IND8:
+			m_fetch_pipe[0] = m_cache.read_word(m_pc);
+			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::ROR_IND8_3;
+			m_start = false;
 			m_icount -= 2;
 			break;
 
@@ -5072,15 +4298,9 @@ void cpu16_device::execute_run()
 		case seq::ROR_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::ROR_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::ROR_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::ROR_IND16_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::ROR_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -5094,7 +4314,8 @@ void cpu16_device::execute_run()
 		case seq::ROR_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u16(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::ROR_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::ROR_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -5124,6 +4345,31 @@ void cpu16_device::execute_run()
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_e = ror16(m_e, !BIT(m_fetch_pipe[2], 0) && BIT(m_ccr, 8));
 			advance();
+			m_icount -= 2;
+			break;
+
+		case seq::RORW_IND16:
+			m_fetch_pipe[0] = m_cache.read_word(m_pc);
+			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::RORW_IND16_3;
+			m_start = false;
+			m_icount -= 2;
+			break;
+
+		case seq::RORW_IND16_3:
+			m_fetch_pipe[0] = m_cache.read_word(m_pc);
+			m_tmp = ror16(m_tmp, !BIT(m_fetch_pipe[2], 0) && BIT(m_ccr, 8));
+			m_sequence = seq::STORE16_EA;
+			m_icount -= 2;
+			break;
+
+		case seq::RORW_EXT:
+			m_fetch_pipe[0] = m_cache.read_word(m_pc);
+			m_ea = u16(m_ek) << 16 | m_fetch_pipe[1];
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::RORW_IND16_3;
+			m_start = false;
 			m_icount -= 2;
 			break;
 
@@ -5408,14 +4654,9 @@ void cpu16_device::execute_run()
 		case seq::SUBA_IND8:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
-			m_sequence = seq::SUBA_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::SUBA_IND8_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::SUBA_IND8_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::SUBA_IND8_3;
 			m_icount -= 2;
 			break;
 
@@ -5436,15 +4677,9 @@ void cpu16_device::execute_run()
 		case seq::SUBA_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::SUBA_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::SUBA_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::SUBA_IND16_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::SUBA_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -5459,7 +4694,8 @@ void cpu16_device::execute_run()
 		case seq::SUBA_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u16(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::SUBA_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::SUBA_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -5467,14 +4703,9 @@ void cpu16_device::execute_run()
 		case seq::SUBA_INDE:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_e)) & 0xfffff;
-			m_sequence = seq::SUBA_INDE_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::SUBA_INDE_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::SUBA_INDE_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::SUBA_INDE_3;
 			m_icount -= 2;
 			break;
 
@@ -5488,14 +4719,9 @@ void cpu16_device::execute_run()
 		case seq::SUBB_IND8:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
-			m_sequence = seq::SUBB_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::SUBB_IND8_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::SUBB_IND8_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::SUBB_IND8_3;
 			m_icount -= 2;
 			break;
 
@@ -5516,15 +4742,9 @@ void cpu16_device::execute_run()
 		case seq::SUBB_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::SUBB_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::SUBB_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::SUBB_IND16_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::SUBB_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -5539,7 +4759,8 @@ void cpu16_device::execute_run()
 		case seq::SUBB_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u16(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::SUBB_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::SUBB_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -5547,14 +4768,9 @@ void cpu16_device::execute_run()
 		case seq::SUBB_INDE:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_e)) & 0xfffff;
-			m_sequence = seq::SUBB_INDE_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::SUBB_INDE_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::SUBB_INDE_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::SUBB_INDE_3;
 			m_icount -= 2;
 			break;
 
@@ -5568,29 +4784,9 @@ void cpu16_device::execute_run()
 		case seq::SUBD_IND8:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
-			m_sequence = seq::SUBD_IND8_2;
+			m_sequence = seq::LOAD16_EA;
+			m_return_sequence = seq::SUBD_IND8_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::SUBD_IND8_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::SUBD_IND8_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::SUBD_IND8_3;
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::SUBD_IND8_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_sequence = seq::SUBD_IND8_3;
 			m_icount -= 2;
 			break;
 
@@ -5613,31 +4809,9 @@ void cpu16_device::execute_run()
 		case seq::SUBD_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::SUBD_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::SUBD_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::SUBD_IND16_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::SUBD_IND16_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::SUBD_IND16_3;
-				advance();
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::SUBD_IND16_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_sequence = seq::SUBD_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -5652,7 +4826,8 @@ void cpu16_device::execute_run()
 		case seq::SUBD_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u32(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::SUBD_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::SUBD_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -5660,29 +4835,9 @@ void cpu16_device::execute_run()
 		case seq::SUBD_INDE:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_e)) & 0xfffff;
-			m_sequence = seq::SUBD_INDE_2;
+			m_sequence = seq::LOAD16_EA;
+			m_return_sequence = seq::SUBD_INDE_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::SUBD_INDE_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::SUBD_IND8_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::SUBD_INDE_3;
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::SUBD_INDE_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_sequence = seq::SUBD_INDE_3;
 			m_icount -= 2;
 			break;
 
@@ -5705,31 +4860,9 @@ void cpu16_device::execute_run()
 		case seq::SUBE_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::SUBE_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::SUBE_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::SUBE_IND16_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::SUBE_IND16_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::SUBE_IND16_3;
-				advance();
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::SUBE_IND16_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_sequence = seq::SUBE_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -5744,7 +4877,8 @@ void cpu16_device::execute_run()
 		case seq::SUBE_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u32(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::SUBE_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::SUBE_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -5853,14 +4987,9 @@ void cpu16_device::execute_run()
 		case seq::TST_IND8:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
-			m_sequence = seq::TST_IND8_2;
+			m_sequence = seq::LOAD8_EA;
+			m_return_sequence = seq::TST_IND8_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::TST_IND8_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::TST_IND8_3;
 			m_icount -= 2;
 			break;
 
@@ -5874,15 +5003,9 @@ void cpu16_device::execute_run()
 		case seq::TST_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::TST_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::TST_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::TST_IND16_2:
-			m_tmp = m_data.read_byte(m_ea);
-			m_sequence = seq::TST_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -5897,7 +5020,8 @@ void cpu16_device::execute_run()
 		case seq::TST_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u16(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::TST_IND16_2;
+			m_sequence = seq::LOAD8_EXT;
+			m_return_sequence = seq::TST_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;
@@ -5933,31 +5057,9 @@ void cpu16_device::execute_run()
 		case seq::TSTW_IND16:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 4, 2)] + s16(m_fetch_pipe[1])) & 0xfffff;
-			m_sequence = seq::TSTW_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::TSTW_IND16_3;
 			m_start = false;
-			m_icount -= 2;
-			break;
-
-		case seq::TSTW_IND16_2:
-			if (BIT(m_ea, 0))
-			{
-				m_tmp = m_data.read_byte(m_ea);
-				m_ea = (m_ea + 1) & 0xfffff;
-				m_sequence = seq::TSTW_IND16_2B;
-			}
-			else
-			{
-				m_tmp = m_data.read_word(m_ea);
-				m_sequence = seq::TSTW_IND16_3;
-				advance();
-			}
-			m_icount -= 2;
-			break;
-
-		case seq::TSTW_IND16_2B:
-			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
-			m_sequence = seq::TSTW_IND16_3;
-			advance();
 			m_icount -= 2;
 			break;
 
@@ -5972,7 +5074,8 @@ void cpu16_device::execute_run()
 		case seq::TSTW_EXT:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = u16(m_ek) << 16 | m_fetch_pipe[1];
-			m_sequence = seq::TSTW_IND16_2;
+			m_sequence = seq::LOAD16_EXT;
+			m_return_sequence = seq::TSTW_IND16_3;
 			m_start = false;
 			m_icount -= 2;
 			break;

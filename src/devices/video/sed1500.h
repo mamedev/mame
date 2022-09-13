@@ -44,14 +44,15 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(update_segs);
 
 	emu_timer *m_lcd_timer;
 
 	const u8 m_cmax; // number of COL pins
 	const u8 m_smax; // number of SEG pins
-	u8 m_mode = 0;
-	u8 m_cout = 0;
+	u8 m_mode;
+	u8 m_cout;
 	u8 m_ram[0x80];
 
 	// callbacks

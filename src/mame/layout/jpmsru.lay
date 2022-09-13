@@ -4,12 +4,10 @@ license:CC0
 -->
 <mamelayout version="2">
 	<element name="matrixlamp">
-		<rect state ="0">
-			<bounds x="0" y="0" width="7" height="7" />
+		<rect state="0">
 			<color red="0.7" green="0.7" blue="0.7" />
 		</rect>
-		<rect state ="1">
-			<bounds x="0" y="0" width="7" height="7" />
+		<rect state="1">
 			<color red="0.95" green="0.95" blue="0.43" />
 		</rect>
 	</element>
@@ -20,26 +18,26 @@ license:CC0
 	</element>
 	<element name="Reel">
 		<rect> <bounds x="0" y="0" width="100" height="400"/> <color alpha="0.0"/> </rect>
-		<text string="1">		<bounds x="0" y="40" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="2">		<bounds x="0" y="60" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="3">		<bounds x="0" y="80" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="4">		<bounds x="0" y="100" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="5">		<bounds x="0" y="120" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="6">		<bounds x="0" y="140" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="7">		<bounds x="0" y="160" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="8">		<bounds x="0" y="180" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="9">		<bounds x="0" y="200" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="10">		<bounds x="0" y="220" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="11">		<bounds x="0" y="240" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="12">		<bounds x="0" y="260" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="13">		<bounds x="0" y="280" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="14">		<bounds x="0" y="300" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="15">		<bounds x="0" y="320" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="16">		<bounds x="0" y="340" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="17">		<bounds x="0" y="360" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="18">		<bounds x="0" y="380" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="19">		<bounds x="0" y="0" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="20">		<bounds x="0" y="20" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="1">       <bounds x="0" y="40" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="2">       <bounds x="0" y="60" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="3">       <bounds x="0" y="80" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="4">       <bounds x="0" y="100" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="5">       <bounds x="0" y="120" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="6">       <bounds x="0" y="140" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="7">       <bounds x="0" y="160" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="8">       <bounds x="0" y="180" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="9">       <bounds x="0" y="200" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="10">      <bounds x="0" y="220" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="11">      <bounds x="0" y="240" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="12">      <bounds x="0" y="260" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="13">      <bounds x="0" y="280" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="14">      <bounds x="0" y="300" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="15">      <bounds x="0" y="320" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="16">      <bounds x="0" y="340" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="17">      <bounds x="0" y="360" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="18">      <bounds x="0" y="380" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="19">      <bounds x="0" y="0" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="20">      <bounds x="0" y="20" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
 	</element>
 	<element name="LCD" defstate="0">
 		<led7seg>
@@ -59,11 +57,26 @@ license:CC0
 				<yscroll name="sreel~i~" size="0.25" wrap="yes" min="65536" max="0"/>
 			</element>
 		</repeat>
-		<element name="digit0" ref="LCD"><bounds x="220" y="350" width="24" height="40" /></element>
-		<element name="digit1" ref="LCD"><bounds x="244" y="350" width="24" height="40" /></element>
-		<repeat count="7">
+		<element name="digit5" ref="LCD"><bounds x="20" y="250" width="24" height="40" /></element>
+		<element name="digit4" ref="LCD"><bounds x="44" y="250" width="24" height="40" /></element>
+		<element name="digit3" ref="LCD"><bounds x="68" y="250" width="24" height="40" /></element>
+		<element name="digit2" ref="LCD"><bounds x="92" y="250" width="24" height="40" /></element>
+		<element name="digit1" ref="LCD"><bounds x="116" y="250" width="24" height="40" /></element>
+		<element name="digit0" ref="LCD"><bounds x="140" y="250" width="24" height="40" /></element>
+		<repeat count="5">
 			<param name="i" start="0" increment="8" />
 			<param name="y" start="0" increment="8" />
+			<repeat count="8">
+				<param name="j" start="~i~" increment="1" />
+				<param name="x" start="0" increment="8" />
+				<element name="lamp~j~" ref="matrixlamp" state="0">
+					<bounds x="~x~" y="~y~" width="7" height="7"/>
+				</element>
+			</repeat>
+		</repeat>
+		<repeat count="7">
+			<param name="i" start="40" increment="8" />
+			<param name="y" start="48" increment="8" />
 			<repeat count="8">
 				<param name="j" start="~i~" increment="1" />
 				<param name="x" start="0" increment="8" />

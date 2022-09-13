@@ -102,7 +102,7 @@ void ns32081_device::device_start()
 	save_item(NAME(m_state));
 	save_item(NAME(m_tcy));
 
-	m_complete = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ns32081_device::complete), this));
+	m_complete = timer_alloc(FUNC(ns32081_device::complete), this);
 }
 
 void ns32081_device::device_reset()
@@ -570,7 +570,10 @@ void ns32081_device::execute()
 		m_status |= SLAVE_Q;
 	}
 	else if (softfloat_exceptionFlags & softfloat_flag_invalid)
+	{
 		m_fsr |= TT_INV;
+		m_status |= SLAVE_Q;
+	}
 	else if (softfloat_exceptionFlags & softfloat_flag_inexact)
 	{
 		m_fsr |= FSR_IF | TT_INX;

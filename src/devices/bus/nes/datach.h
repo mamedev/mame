@@ -155,8 +155,10 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_add_mconfig(machine_config &config) override;
+
+	TIMER_CALLBACK_MEMBER(irq_timer_tick);
+	TIMER_CALLBACK_MEMBER(serial_tick);
 
 	uint8_t m_datach_latch;
 	required_device<i2cmem_device> m_i2cmem;
@@ -165,7 +167,6 @@ protected:
 	uint8_t m_i2c_dir;
 	uint8_t m_i2c_in_use;
 
-	static const device_timer_id TIMER_SERIAL = 1;
 	emu_timer *serial_timer;
 };
 

@@ -16,6 +16,7 @@
 #include <string>
 #include <string_view>
 
+#include <algorithm>
 #include <cstring>
 
 
@@ -51,6 +52,20 @@ int core_strnicmp(const char *s1, const char *s2, size_t n);
 int core_strwildcmp(const char *sp1, const char *sp2);
 bool core_iswildstr(const char *sp);
 
+/* trim functions */
+template <typename TPred>
+std::string_view strtrimleft(std::string_view str, TPred &&pred)
+{
+	auto const start = std::find_if(str.begin(), str.end(), pred);
+	return str.substr(start - str.begin());
+}
+
+template <typename TPred>
+std::string_view strtrimright(std::string_view str, TPred &&pred)
+{
+	auto const end = std::find_if(str.rbegin(), str.rend(), pred);
+	return str.substr(0, str.size() - (end - str.rbegin()));
+}
 
 void strdelchr(std::string& str, char chr);
 void strreplacechr(std::string& str, char ch, char newch);
@@ -61,6 +76,9 @@ void strreplacechr(std::string& str, char ch, char newch);
 int strreplace(std::string &str, const std::string& search, const std::string& replace);
 
 namespace util {
+
+bool strequpper(std::string_view str, std::string_view ucstr);
+bool streqlower(std::string_view str, std::string_view lcstr);
 
 // based on Jaro-Winkler distance - returns value from 0.0 (totally dissimilar) to 1.0 (identical)
 double edit_distance(std::u32string_view lhs, std::u32string_view rhs);

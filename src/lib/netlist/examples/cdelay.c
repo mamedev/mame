@@ -8,6 +8,7 @@
 #include "netlist/devices/net_lib.h"
 
 NETLIST_START(perf)
+{
 
 	SOLVER(Solver, 48000)
 	PARAM(Solver.ACCURACY, 1e-20)
@@ -15,7 +16,7 @@ NETLIST_START(perf)
 
 	TTL_7400_NAND(n1,clk,clk)
 
-NETLIST_END()
+}
 
 #ifndef P_FREQ
 #define P_FREQ 4800
@@ -26,6 +27,7 @@ NETLIST_END()
 #endif
 
 NETLIST_START(cap_delay)
+{
 
 	/*
 	 * delay circuit
@@ -50,4 +52,4 @@ NETLIST_START(cap_delay)
 	LOG(logn1Q, C.2)
 	LOG(logn2Q, n1.Q)
 
-NETLIST_END()
+}

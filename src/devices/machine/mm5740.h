@@ -105,13 +105,15 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	TIMER_CALLBACK_MEMBER(perform_scan);
+
 private:
 	devcb_read16::array<9> m_read_x;
-	devcb_read_line m_read_shift, m_read_control;
+	devcb_read_line m_read_shift;
+	devcb_read_line m_read_control;
 	devcb_write_line m_write_data_ready;
 
 	required_memory_region m_rom;                   // Internal ROM

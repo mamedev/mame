@@ -52,12 +52,12 @@ void device_electron_cart_interface::rom_alloc(uint32_t size, const char *tag)
 	{
 		if (size <= 0x8000)
 		{
-			m_rom = device().machine().memory().region_alloc(std::string(tag).append(ELECTRON_CART_ROM_REGION_TAG).c_str(), 0x8000, 1, ENDIANNESS_LITTLE)->base();
+			m_rom = device().machine().memory().region_alloc(std::string(tag).append(ELECTRON_CART_ROM_REGION_TAG), 0x8000, 1, ENDIANNESS_LITTLE)->base();
 			m_rom_size = 0x8000;
 		}
 		else
 		{
-			m_rom = device().machine().memory().region_alloc(std::string(tag).append(ELECTRON_CART_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
+			m_rom = device().machine().memory().region_alloc(std::string(tag).append(ELECTRON_CART_ROM_REGION_TAG), size, 1, ENDIANNESS_LITTLE)->base();
 			m_rom_size = size;
 		}
 	}
@@ -261,6 +261,7 @@ void electron_cartslot_device::write(offs_t offset, uint8_t data, int infc, int 
 #include "aqr.h"
 #include "click.h"
 #include "cumana.h"
+#include "elksdp1.h"
 #include "mgc.h"
 #include "peg400.h"
 //#include "pmse2p.h"
@@ -283,6 +284,7 @@ void electron_cart(device_slot_interface &device)
 	device.option_add_internal("aqr", ELECTRON_AQR);
 	device.option_add_internal("click", ELECTRON_CLICK);
 	device.option_add_internal("cumana", ELECTRON_CUMANA);
+	device.option_add_internal("elksdp1", ELECTRON_ELKSDP1);
 	device.option_add_internal("mgc", ELECTRON_MGC);
 	device.option_add_internal("peg400", ELECTRON_PEG400);
 	//device.option_add_internal("pmse2p", ELECTRON_PMSE2P);

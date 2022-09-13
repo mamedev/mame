@@ -133,9 +133,6 @@ public:
 			std::function<void (bool, bool)> &&handler = nullptr);
 	virtual ~menu_machine_configure();
 
-protected:
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
-
 private:
 	using s_bios = std::vector<std::pair<std::string, int>>;
 
@@ -144,8 +141,8 @@ private:
 		ADDFAV = 1,
 		DELFAV,
 		SAVE,
-		CONTROLLER,
 		VIDEO,
+		CONTROLLER,
 		BIOS,
 		ADVANCED,
 		LAST = ADVANCED
@@ -179,8 +176,6 @@ public:
 protected:
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle(event const *ev) override;
-
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 };
 
 } // namespace ui
