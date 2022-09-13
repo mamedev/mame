@@ -1207,7 +1207,9 @@ class sintax_device : public mbc5_logo_spoof_device_base
 {
 public:
 	sintax_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
-		mbc5_logo_spoof_device_base(mconfig, GB_ROM_SINTAX, tag, owner, clock)
+		mbc5_logo_spoof_device_base(mconfig, GB_ROM_SINTAX, tag, owner, clock),
+		m_scramble_mode(0U),
+		m_xor_index(0U)
 	{
 	}
 

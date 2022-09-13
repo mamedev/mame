@@ -828,7 +828,7 @@ bool detect_mmm01(std::string_view tag, util::random_read &file, u64 length, u64
 					std::find_if(
 						std::begin(KNOWN_COLLECTIONS),
 						std::end(KNOWN_COLLECTIONS),
-						[backheader] (auto const &name)
+						[&backheader] (auto const &name)
 						{
 							return std::equal(std::begin(name), std::end(name), &backheader[cartheader::OFFSET_TITLE - 0x100]);
 						}));
