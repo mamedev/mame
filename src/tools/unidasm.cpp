@@ -1477,7 +1477,7 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 	if(is_octal) {
 		switch(granularity) {
 		case 1:
-			dump_raw_bytes = [step = disasm->opcode_alignment(), next_pc, base_buffer](offs_t pc, offs_t size) -> std::string {
+			dump_raw_bytes = [step = disasm->opcode_alignment(), &next_pc, &base_buffer](offs_t pc, offs_t size) -> std::string {
 				std::string result = "";
 				for(offs_t i=0; i != size; i++) {
 					if(i)
@@ -1491,7 +1491,7 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 			break;
 
 		case 2:
-			dump_raw_bytes = [step = disasm->opcode_alignment(), next_pc, base_buffer](offs_t pc, offs_t size) -> std::string {
+			dump_raw_bytes = [step = disasm->opcode_alignment(), &next_pc, &base_buffer](offs_t pc, offs_t size) -> std::string {
 				std::string result = "";
 				for(offs_t i=0; i != size; i++) {
 					if(i)
@@ -1505,7 +1505,7 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 			break;
 
 		case 4:
-			dump_raw_bytes = [step = disasm->opcode_alignment(), next_pc, base_buffer](offs_t pc, offs_t size) -> std::string {
+			dump_raw_bytes = [step = disasm->opcode_alignment(), &next_pc, &base_buffer](offs_t pc, offs_t size) -> std::string {
 				std::string result = "";
 				for(offs_t i=0; i != size; i++) {
 					if(i)
@@ -1519,7 +1519,7 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 			break;
 
 		case 8:
-			dump_raw_bytes = [step = disasm->opcode_alignment(), next_pc, base_buffer](offs_t pc, offs_t size) -> std::string {
+			dump_raw_bytes = [step = disasm->opcode_alignment(), &next_pc, &base_buffer](offs_t pc, offs_t size) -> std::string {
 				std::string result = "";
 				for(offs_t i=0; i != size; i++) {
 					if(i)
@@ -1535,7 +1535,7 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 	} else {
 		switch(granularity) {
 		case 1:
-			dump_raw_bytes = [step = disasm->opcode_alignment(), next_pc, base_buffer](offs_t pc, offs_t size) -> std::string {
+			dump_raw_bytes = [step = disasm->opcode_alignment(), &next_pc, &base_buffer](offs_t pc, offs_t size) -> std::string {
 				std::string result = "";
 				for(offs_t i=0; i != size; i++) {
 					if(i)
@@ -1549,7 +1549,7 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 			break;
 
 		case 2:
-			dump_raw_bytes = [step = disasm->opcode_alignment(), next_pc, base_buffer](offs_t pc, offs_t size) -> std::string {
+			dump_raw_bytes = [step = disasm->opcode_alignment(), &next_pc, &base_buffer](offs_t pc, offs_t size) -> std::string {
 				std::string result = "";
 				for(offs_t i=0; i != size; i++) {
 					if(i)
@@ -1563,7 +1563,7 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 			break;
 
 		case 4:
-			dump_raw_bytes = [step = disasm->opcode_alignment(), next_pc, base_buffer](offs_t pc, offs_t size) -> std::string {
+			dump_raw_bytes = [step = disasm->opcode_alignment(), &next_pc, &base_buffer](offs_t pc, offs_t size) -> std::string {
 				std::string result = "";
 				for(offs_t i=0; i != size; i++) {
 					if(i)
@@ -1577,7 +1577,7 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 			break;
 
 		case 8:
-			dump_raw_bytes = [step = disasm->opcode_alignment(), next_pc, base_buffer](offs_t pc, offs_t size) -> std::string {
+			dump_raw_bytes = [step = disasm->opcode_alignment(), &next_pc, &base_buffer](offs_t pc, offs_t size) -> std::string {
 				std::string result = "";
 				for(offs_t i=0; i != size; i++) {
 					if(i)

@@ -319,10 +319,10 @@ void oneshot_state::draw_crosshairs()
 
 	m_gun_x[0] += m_gun_x_shift;
 
-	m_gun_y[0] -= 0x0a;
-	if (m_gun_y[0] < 0)
+	if (m_gun_y[0] >= 0x0a)
+		m_gun_y[0] -= 0x0a;
+	else
 		m_gun_y[0] = 0;
-
 
 	// get gun raw coordinates (player 2)
 	m_gun_x[1] = (m_io_lightgun_x[1]->read() & 0xff) * 320 / 256;
@@ -332,8 +332,10 @@ void oneshot_state::draw_crosshairs()
 	//xpos = m_gun_x[1];
 	//ypos = m_gun_y[1];
 
-	m_gun_x[1] += m_gun_x_shift - 0x0a;
-	if (m_gun_x[1] < 0)
+	m_gun_x[1] += m_gun_x_shift;
+	if (m_gun_x[1] >= 0x0a)
+		m_gun_x[1] -= 0x0a;
+	else
 		m_gun_x[1] = 0;
 }
 
