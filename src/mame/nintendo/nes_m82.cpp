@@ -59,7 +59,7 @@ private:
 	required_ioport m_cn12;
 
 	required_memory_bank_array<4> m_nt_page;
-	std::unique_ptr<u8[]> m_nt_ram;
+	std::unique_ptr<u8 []> m_nt_ram;
 
 	u8 m_curr_slot = 0;
 	u16 m_time_limit = 0;
@@ -110,8 +110,8 @@ u8 m82_state::m82_in1_r()
 
 void m82_state::m82_in0_w(u8 data)
 {
-	for (int i = 0; i < 5; i++)
-		m_ctrl[i]->write(data);
+	for (auto &ctrl : m_ctrl)
+		ctrl->write(data);
 }
 
 
@@ -131,7 +131,7 @@ void m82_state::m82_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x1800).ram();
 	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4014, 0x4014).lw8(NAME([this](address_space &space, u8 data) { m_ppu->spriteram_dma(space, data); }));
+	map(0x4014, 0x4014).lw8(NAME([this] (address_space &space, u8 data) { m_ppu->spriteram_dma(space, data); }));
 	map(0x4016, 0x4016).rw(FUNC(m82_state::m82_in0_r), FUNC(m82_state::m82_in0_w)); // IN0 - input port 1
 	map(0x4017, 0x4017).r(FUNC(m82_state::m82_in1_r));     // IN1 - input port 2 / PSG second control register
 
@@ -157,9 +157,9 @@ static INPUT_PORTS_START( nes_m82 )
 	PORT_START("CN12")
 	PORT_CONFNAME( 0x0f, 0x08, "Play Time Limit" )
 	PORT_CONFSETTING(    0x01, "30 sec." )
-	PORT_CONFSETTING(    0x02, "3:00 min." )
-	PORT_CONFSETTING(    0x04, "6:00 min." )
-	PORT_CONFSETTING(    0x08, "128:00 min." )
+	PORT_CONFSETTING(    0x02, "3 min." )
+	PORT_CONFSETTING(    0x04, "6 min." )
+	PORT_CONFSETTING(    0x08, "128 min." )
 INPUT_PORTS_END
 
 
@@ -168,8 +168,8 @@ void m82_state::machine_start()
 {
 	m_nt_ram = std::make_unique<u8[]>(0x800);
 
-	for (int i = 0; i < 4; i++)
-		m_nt_page[i]->configure_entries(0, 2, m_nt_ram.get(), 0x400);
+	for (auto &page : m_nt_page)
+		page->configure_entries(0, 2, m_nt_ram.get(), 0x400);
 
 	// vertical mirroring. TODO: replace this with proper code
 	m_nt_page[1]->set_entry(1);
