@@ -36,7 +36,7 @@ int core_stricmp(std::string_view s1, std::string_view s2)
 		const int c1 = tolower(uint8_t(*s1_iter++));
 		const int c2 = tolower(uint8_t(*s2_iter++));
 		const int diff = c1 - c2;
-        if (diff)
+		if (diff)
 			return diff;
 	}
 }

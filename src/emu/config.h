@@ -15,6 +15,10 @@
 
 #include "xmlfile.h"
 
+#include <map>
+#include <string>
+#include <string_view>
+
 
 enum class config_type : int
 {
@@ -46,27 +50,28 @@ public:
 	// construction/destruction
 	configuration_manager(running_machine &machine);
 
-	void config_register(const char *nodename, load_delegate load, save_delegate save);
+	void config_register(std::string_view name, load_delegate &&load, save_delegate &&save);
+
 	bool load_settings();
 	void save_settings();
 
-	// getters
-	running_machine &machine() const { return m_machine; }
-
 private:
-	struct config_element
+	struct config_handler
 	{
-		std::string     name;              // node name
-		load_delegate   load;              // load callback
-		save_delegate   save;              // save callback
+		load_delegate load;
+		save_delegate save;
 	};
 
-	bool load_xml(emu_file &file, config_type which_type);
+	running_machine &machine() const { return m_machine; }
+
+	bool attempt_load(game_driver const &system, emu_file &file, std::string_view name, config_type which_type);
+
+	bool load_xml(game_driver const &system, emu_file &file, config_type which_type);
 	bool save_xml(emu_file &file, config_type which_type);
 
 	// internal state
-	running_machine &   m_machine;                  // reference to our machine
-	std::vector<config_element> m_typelist;
+	running_machine &m_machine;
+	std::multimap<std::string, config_handler> m_typelist;
 };
 
 #endif // MAME_EMU_CONFIG_H

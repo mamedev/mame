@@ -789,7 +789,6 @@ bool detect_mmm01(std::string_view tag, util::random_read &file, u64 length, u64
 	if ((length & 0x3fff) || ((u32(0x4000) << 9) < length))
 		return false;
 
-
 	// now check for a valid cartridge header
 	u32 const lastpage(get_mmm01_initial_low_page(length));
 	u8 backheader[0x50];

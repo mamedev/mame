@@ -24794,7 +24794,7 @@ license:CC0
 		<publisher>Rocket Games</publisher>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="524288">
 				<rom name="atv racing &amp; karate joe (europe) (unl).bin" size="524288" crc="a07b6e79" sha1="3701028d66564625933a3868340813e6d7c36b7b"/>
 			</dataarea>
@@ -24810,7 +24810,7 @@ license:CC0
 		<publisher>Rocket Games</publisher>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="524288">
 				<rom name="atv racing &amp; karate joe (europe) (alternate) (unl).bin" size="524288" crc="6908f4af" sha1="95287b440139e88d90700f892d1da60aaa4da778"/>
 			</dataarea>
@@ -24824,7 +24824,7 @@ license:CC0
 		<year>2001</year>
 		<publisher>Rocket Games</publisher>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="262144">
 				<rom name="atv racing (europe) (unl).bin" size="262144" crc="7987d5cd" sha1="b3c6c2970c3bfa95fb2eef10e2160f55f52d8e1a"/>
 			</dataarea>
@@ -24840,7 +24840,7 @@ license:CC0
 		<publisher>Rocket Games</publisher>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="524288">
 				<rom name="full time soccer &amp; hang time basketball (europe) (unl).bin" size="524288" crc="0634c196" sha1="aefb746984b3450b90bbfaa5de21a252685ddabb"/>
 			</dataarea>
@@ -24854,7 +24854,7 @@ license:CC0
 		<year>2000</year>
 		<publisher>Rocket Games</publisher>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="262144">
 				<rom name="full time soccer (europe) (unl).bin" size="262144" crc="b99beda2" sha1="a2b1268df08b583d033999b894638dadf32e37f4"/>
 			</dataarea>
@@ -24869,7 +24869,7 @@ license:CC0
 		<publisher>Rocket Games</publisher>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="262144">
 				<rom name="hang time basketball (europe) (unl).bin" size="262144" crc="3207b7d9" sha1="340201c045c020be6de3504fdecbce1ff07a2139"/>
 			</dataarea>
@@ -24885,7 +24885,7 @@ license:CC0
 		<publisher>Rocket Games</publisher>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="524288">
 				<rom name="pocket smash out &amp; race time (europe) (unl).bin" size="524288" crc="0ad5b775" sha1="01f68a0a45408da9892b8cc0a4a9c688dcdd9618"/>
 			</dataarea>
@@ -24898,7 +24898,7 @@ license:CC0
 		<publisher>Rocket Games</publisher>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="262144">
 				<rom name="pocket smash out (europe) (unl).bin" size="262144" crc="cbd14276" sha1="0a721164053a8b2765ea9826a0958415701ca6f5"/>
 			</dataarea>
@@ -24914,7 +24914,7 @@ license:CC0
 		<publisher>Rocket Games</publisher>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="262144">
 				<rom name="karate joe (europe) (unl).bin" size="262144" crc="b8a54e29" sha1="bc9e760dcc851a01240b49b28cde8fe5ab18df91"/>
 			</dataarea>
@@ -24926,7 +24926,7 @@ license:CC0
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="262144">
 				<rom name="painter (europe) (unl).bin" size="262144" crc="f4801f21" sha1="78db482d1d12b4556b6a5b995ce37a2435236a06"/>
 			</dataarea>
@@ -24939,7 +24939,7 @@ license:CC0
 		<publisher>Rocket Games</publisher>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="262144">
 				<rom name="race time (europe) (unl).bin" size="262144" crc="599c867d" sha1="157f15e601dfb858630a53313b71e4ecd0bb13e1"/>
 			</dataarea>
@@ -24953,7 +24953,7 @@ license:CC0
 		<publisher>Rocket Games</publisher>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="524288">
 				<rom name="space invasion &amp; karate joe (europe) (unl).bin" size="524288" crc="6a184c55" sha1="96918cbd3648b227eb43e5a9711d1a9939541bea"/>
 			</dataarea>
@@ -24969,7 +24969,7 @@ license:CC0
 		<publisher>Rocket Games</publisher>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="524288">
 				<rom name="space invasion &amp; painter (europe) (unl).bin" size="524288" crc="bd4c1065" sha1="a5bf26ed894576dada84f6925cc659980cf150a0"/>
 			</dataarea>
@@ -24985,7 +24985,7 @@ license:CC0
 		<publisher>Rocket Games</publisher>
 		<sharedfeat name="compatibility" value="GBC"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_atvrac" />
+			<feature name="slot" value="rom_rocket" />
 			<dataarea name="rom" size="131072">
 				<rom name="space invasion (europe) (unl).bin" size="131072" crc="2b2d9868" sha1="bcf0940375a23bca6957eec2ab8e49af695aeb32"/>
 			</dataarea>
