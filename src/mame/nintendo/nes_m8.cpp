@@ -81,7 +81,7 @@ private:
 	required_ioport m_s1;
 
 	required_memory_bank_array<4> m_nt_page;
-	std::unique_ptr<u8[]> m_nt_ram;
+	std::unique_ptr<u8 []> m_nt_ram;
 
 	required_memory_region_array<16> m_prg;
 	required_memory_region_array<16> m_chr;
@@ -140,8 +140,8 @@ u8 m8_state::m8_in1_r()
 
 void m8_state::m8_in0_w(u8 data)
 {
-	for (int i = 0; i < 3; i++)
-		m_ctrl[i]->write(data);
+	for (auto &ctrl : m_ctrl)
+		ctrl->write(data);
 }
 
 
@@ -187,7 +187,7 @@ void m8_state::m8_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x1800).ram();
 	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4014, 0x4014).lw8(NAME([this](address_space &space, u8 data) { m_ppu->spriteram_dma(space, data); }));
+	map(0x4014, 0x4014).lw8(NAME([this] (address_space &space, u8 data) { m_ppu->spriteram_dma(space, data); }));
 	map(0x4016, 0x4016).rw(FUNC(m8_state::m8_in0_r), FUNC(m8_state::m8_in0_w)); // IN0 - input port 1
 	map(0x4017, 0x4017).r(FUNC(m8_state::m8_in1_r));     // IN1 - input port 2 / PSG second control register
 
@@ -213,9 +213,9 @@ static INPUT_PORTS_START( m8_base )
 	PORT_START("S1")
 	PORT_CONFNAME( 0x0f, 0x08, "Play Time Limit" )
 	PORT_CONFSETTING(    0x01, "20 sec." )
-	PORT_CONFSETTING(    0x02, "3:00 min." )
-	PORT_CONFSETTING(    0x04, "6:00 min." )
-	PORT_CONFSETTING(    0x08, "25:00 min." )
+	PORT_CONFSETTING(    0x02, "3 min." )
+	PORT_CONFSETTING(    0x04, "6 min." )
+	PORT_CONFSETTING(    0x08, "25 min." )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( nes_m8 )
