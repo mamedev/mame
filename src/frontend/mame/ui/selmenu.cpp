@@ -278,7 +278,7 @@ void menu_select_launch::software_parts::populate(float &customtop, float &custo
 	parts.reserve(m_parts.size());
 	for (s_parts::const_iterator it = m_parts.begin(); m_parts.end() != it; ++it)
 		parts.push_back(it);
-	std::sort(parts.begin(), parts.end(), [] (auto const &left, auto const &right) { return 0 > core_stricmp(left->first.c_str(), right->first.c_str()); });
+	std::sort(parts.begin(), parts.end(), [] (auto const &left, auto const &right) { return 0 > core_stricmp(left->first, right->first); });
 	for (auto const &elem : parts)
 		item_append(elem->first, elem->second, 0, (void *)&*elem);
 
