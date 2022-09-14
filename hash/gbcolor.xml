@@ -26328,7 +26328,6 @@ license:CC0
 		<publisher>Vast Fame</publisher>
 		<info name="alt_title" value="超級格鬥2001α"/> <!-- translates to "Super Fight 2001 Alpha" -->
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="HK0819" />
 			<feature name="slot" value="rom_vf001" />
 			<dataarea name="rom" size="2097152">
 				<rom name="Chao Ji Ge Dou 2001 Alpha (Unl) [C] [Raw].gbc" size="2097152" crc="afd7a0cc" sha1="f44f629687ec91aade40ff52014587003f728ec9"/>
@@ -26344,7 +26343,7 @@ license:CC0
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="口袋怪獸-動作篇" />
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="HK0701" />
+			<feature name="pcb" value="HK0819" />
 			<feature name="slot" value="rom_newgbchk" />
 			<dataarea name="rom" size="1048576">
 				<rom name="koudai guaishou dongzuo pian.gbc" size="1048576" crc="14355371" sha1="f398086d1f8cb435a632e5ea45fb19e980b0568d" />
@@ -26359,6 +26358,7 @@ license:CC0
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="怪獸 Go! Go! Ⅱ" />
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="HK0701" />
 			<feature name="slot" value="rom_newgbchk" />
 			<dataarea name="rom" size="1048576">
 				<rom name="guaishou go go ii.gbc" size="1048576" crc="b0237467" sha1="8ed6f39a9973d634266806455ef845b6bdb5ab95" />
