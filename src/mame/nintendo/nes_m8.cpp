@@ -404,8 +404,8 @@ void m8_state::machine_start()
 {
 	m_nt_ram = std::make_unique<u8[]>(0x800);
 
-	for (int i = 0; i < 4; i++)
-		m_nt_page[i]->configure_entries(0, 2, m_nt_ram.get(), 0x400);
+	for (auto &page : m_nt_page)
+		page->configure_entries(0, 2, m_nt_ram.get(), 0x400);
 
 	for (int i = 0; i < 16; i++)
 	{
