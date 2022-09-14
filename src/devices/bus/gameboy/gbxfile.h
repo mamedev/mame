@@ -62,6 +62,7 @@ enum : u32
 	TYPE_MBC5       = 0x4d424335,   // 'MBC5'
 	TYPE_MBC7       = 0x4d424337,   // 'MBC7'
 	TYPE_MMM01      = 0x4d4d4d31,   // 'MMM1'
+	TYPE_NEWGBCHK   = 0x4e47484b,   // 'NGHK'
 	TYPE_ROCKET     = 0x524f434b,   // 'ROCK'
 	TYPE_PLAIN      = 0x524f4d00,   // 'ROM\0'
 	TYPE_SACHEN1    = 0x53414d31,   // 'SAM1'

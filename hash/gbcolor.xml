@@ -26290,8 +26290,7 @@ license:CC0
 			<dataarea name="rom" size="2097152">
 				<rom name="2003 ha li bo te 2 - xiao shi de mi shi (unlicensed, chinese) [raw dump].bin" size="2097152" crc="1b3e1243" sha1="0829cbcab3ef5d03c94d5efe769f4f4a93ac47fa"/>
 			</dataarea>
-			<dataarea name="nvram" size="8192">
-			</dataarea>
+			<dataarea name="nvram" size="8192" />
 		</part>
 	</software>
 
@@ -26329,10 +26328,42 @@ license:CC0
 		<publisher>Vast Fame</publisher>
 		<info name="alt_title" value="超級格鬥2001α"/> <!-- translates to "Super Fight 2001 Alpha" -->
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="HK0819" />
 			<feature name="slot" value="rom_vf001" />
 			<dataarea name="rom" size="2097152">
 				<rom name="Chao Ji Ge Dou 2001 Alpha (Unl) [C] [Raw].gbc" size="2097152" crc="afd7a0cc" sha1="f44f629687ec91aade40ff52014587003f728ec9"/>
 			</dataarea>
+		</part>
+	</software>
+
+	<!-- graphical hack of The Smurfs' Nightmare -->
+	<!-- has also been dumped with unused byte at 0xA3B86 having value 0x2A rather than 0x0A (probably bitrot) -->
+	<software name="kdgsdzp">
+		<description>Kǒudài Guàishòu - Dòngzuò Piān (China)</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="口袋怪獸-動作篇" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="HK0701" />
+			<feature name="slot" value="rom_newgbchk" />
+			<dataarea name="rom" size="1048576">
+				<rom name="koudai guaishou dongzuo pian.gbc" size="1048576" crc="14355371" sha1="f398086d1f8cb435a632e5ea45fb19e980b0568d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- graphical hack of Kirby's Dream Land 2 -->
+	<software name="gsgogo2">
+		<description>Guàishòu Go! Go! Ⅱ (China)</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="怪獸 Go! Go! Ⅱ" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_newgbchk" />
+			<dataarea name="rom" size="1048576">
+				<rom name="guaishou go go ii.gbc" size="1048576" crc="b0237467" sha1="8ed6f39a9973d634266806455ef845b6bdb5ab95" />
+			</dataarea>
+			<dataarea name="nvram" size="8192" />
 		</part>
 	</software>
 
@@ -26414,10 +26445,11 @@ license:CC0
 	<software name="pokesaphc" cloneof="pokesaph">
 	<!-- This dump is "unconfirmed", in the sense that later redumps have resulted in inconsistent reads (none working except this one) -->
 	<!-- 4MB rom with crc 3a08c8eb is taizou's cracked version running on base MBC5 -->
-		<description>Koudai Guaishou - Lanbaoshi (China)</description>
+		<description>Kǒudài Guàishòu - Lánbǎoshí (China)</description>
 		<year>200?</year>
 		<publisher>Sintax</publisher>
-		<info name="alt_title" value="口袋怪獸 - 藍寶石, 2003 口袋怪獸-藍寶石 (Cart)"/>
+		<info name="alt_title" value="口袋怪獸 - 藍寶石" />
+		<info name="alt_title" value="2003 口袋怪獸-藍寶石" /> <!-- on cartridge -->
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
 			<dataarea name="rom" size="2097152">

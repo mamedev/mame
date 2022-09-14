@@ -80,6 +80,8 @@
   - MBC30 supposedly has 8 ROM bank outputs, but the one game using it only needs 7.
  * MBC5 logo spoofing class implements several strategies.  It's likely not all carts using it use all
    the strategies.  Strategies implemented by each cartridge should be identified.
+ * HK0701 and HK0819 seem to differ in that HK0819 fully decodes ROM addresses while HK0701 mirrors - we
+   should probably emulated the difference at some point.
  * Digimon 2 mapper doesn't work
 
  ***********************************************************************************************************/
@@ -1454,6 +1456,115 @@ public:
 
 
 //**************************************************************************
+//  New Game Boy Color cartridges with HK0701 and HK0819 boards
+//**************************************************************************
+
+class ngbchk_device : public rom_mbc_device_base
+{
+public:
+	ngbchk_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+		rom_mbc_device_base(mconfig, GB_ROM_NEWGBCHK, tag, owner, clock),
+		m_view_prot(*this, "protection")
+	{
+	}
+
+	virtual image_init_result load(std::string &message) override ATTR_COLD
+	{
+		// TODO: ROM addresses seem to be fully decoded with HK0819 (rather than mirroring)
+
+		// set up ROM and RAM
+		// TODO: how many RAM bank outputs are actually present?
+		if (!install_memory(message, 2, 7))
+			return image_init_result::FAIL;
+
+		// install handlers
+		cart_space()->install_write_handler(
+				0x0000, 0x1fff,
+				write8smo_delegate(*this, FUNC(ngbchk_device::enable_ram)));
+		cart_space()->install_write_handler(
+				0x2000, 0x3fff,
+				write8smo_delegate(*this, FUNC(ngbchk_device::bank_switch_fine)));
+		cart_space()->install_write_handler(
+				0x4000, 0x5fff,
+				write8smo_delegate(*this, FUNC(ngbchk_device::bank_switch_coarse)));
+
+		// install protection over the top of high ROM bank
+		cart_space()->install_view(
+				0x4000, 0x7fff,
+				m_view_prot);
+		m_view_prot[0].install_read_handler(
+				0x4000, 0x4fff, 0x0ff0, 0x0000, 0x0000,
+				read8sm_delegate(*this, FUNC(ngbchk_device::protection)));
+		m_view_prot[0].unmap_read(0x5000, 0x7fff);
+
+		// all good
+		return image_init_result::PASS;
+	}
+
+protected:
+	virtual void device_reset() override ATTR_COLD
+	{
+		rom_mbc_device_base::device_reset();
+
+		// TODO: proper reset state
+		set_bank_rom_coarse(0);
+		set_bank_rom_fine(0);
+		set_ram_enable(false);
+
+		m_view_prot.disable();
+	}
+
+private:
+	void enable_ram(u8 data)
+	{
+		// TODO: how many bits are checked?
+		set_ram_enable(0x0a == data);
+	}
+
+	void bank_switch_fine(u8 data)
+	{
+		set_bank_rom_fine(data & 0x7f);
+		LOG("Protection read %s\n", BIT(data, 7) ? "enabled" : "disabled");
+		if (BIT(data, 7))
+			m_view_prot.select(0);
+		else
+			m_view_prot.disable();
+	}
+
+	u8 protection(offs_t offset)
+	{
+		offset >>= 4;
+		switch (offset & 0x007)
+		{
+		default: // just to shut up dumb compilers
+		case 0x000:
+			return offset;
+		case 0x001:
+			return offset ^ 0xaa;
+		case 0x002:
+			return offset ^ 0xaa;
+		case 0x003:
+			return (offset >> 1) | (offset << 7);
+		case 0x004:
+			return (offset << 1) | (offset >> 7);
+		case 0x05:
+			return bitswap<8>(offset, 0, 1, 2, 3, 4, 5, 6, 7);
+		case 0x06:
+			return
+					(bitswap<4>(offset | (offset >> 1), 6, 4, 2, 0) << 4) |
+					bitswap<4>(offset & (offset >> 1), 6, 4, 2, 0);
+		case 0x07:
+			return
+					(bitswap<4>(offset ^ (~offset >> 1), 6, 4, 2, 0) << 4) |
+					bitswap<4>(offset ^ (offset >> 1), 6, 4, 2, 0);
+		}
+	}
+
+	memory_view m_view_prot;
+};
+
+
+//**************************************************************************
 //  Fast Fame VF001 MBC5 variant with protection
 //**************************************************************************
 
@@ -1786,5 +1897,6 @@ DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_MBC5,     device_gb_cart_interface, bus::gameb
 DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_SINTAX,   device_gb_cart_interface, bus::gameboy::sintax_device,      "gb_rom_sintax",   "Game Boy Sintax MBC5 Cartridge")
 DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_CHONGWU,  device_gb_cart_interface, bus::gameboy::chongwu_device,     "gb_rom_chongwu",  "Game Boy Chongwu Xiao Jingling Pokemon Pikecho Cartridge")
 DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_LICHENG,  device_gb_cart_interface, bus::gameboy::licheng_device,     "gb_rom_licheng",  "Game Boy Li Cheng MBC5 Cartridge")
+DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_NEWGBCHK, device_gb_cart_interface, bus::gameboy::ngbchk_device,      "gb_rom_ngbchk",   "Game Boy HK0701/HK0819 Cartridge")
 DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_VF001,    device_gb_cart_interface, bus::gameboy::vf001_device,       "gb_rom_vf001",    "Game Boy Vast Fame VF001 Cartridge")
 DEFINE_DEVICE_TYPE_PRIVATE(GB_ROM_DIGIMON,  device_gb_cart_interface, bus::gameboy::digimon_device,     "gb_rom_digimon",  "Game Boy Digimon 2 Cartridge")

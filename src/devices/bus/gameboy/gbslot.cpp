@@ -722,20 +722,23 @@ std::optional<char const *> probe_gbx_footer(std::string_view tag, util::random_
 	case gbxfile::TYPE_MMM01:
 		result = slotoptions::GB_MMM01;
 		break;
+	case gbxfile::TYPE_CAMERA:
+		result = slotoptions::GB_CAMERA;
+		break;
 	case gbxfile::TYPE_HUC1:
 		result = slotoptions::GB_HUC1;
 		break;
 	case gbxfile::TYPE_HUC3:
 		result = slotoptions::GB_HUC3;
 		break;
-	case gbxfile::TYPE_CAMERA:
-		result = slotoptions::GB_CAMERA;
+	case gbxfile::TYPE_SINTAX:
+		result = slotoptions::GB_SINTAX;
 		break;
 	case gbxfile::TYPE_LICHENG:
 		result = slotoptions::GB_LICHENG;
 		break;
-	case gbxfile::TYPE_SINTAX:
-		result = slotoptions::GB_SINTAX;
+	case gbxfile::TYPE_NEWGBCHK:
+		result = slotoptions::GB_NEWGBCHK;
 		break;
 	case gbxfile::TYPE_VF001:
 		result = slotoptions::GB_VF001;
