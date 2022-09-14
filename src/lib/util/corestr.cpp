@@ -24,15 +24,18 @@
 
 int core_stricmp(std::string_view s1, std::string_view s2)
 {
-	const int END_VALUE = -256;
 	auto s1_iter = s1.begin();
 	auto s2_iter = s2.begin();
-
-	for (;;)
+	while (true)
 	{
-		int c1 = s1_iter != s1.end() ? tolower((uint8_t)*s1_iter++) : END_VALUE;
-		int c2 = s2_iter != s2.end() ? tolower((uint8_t)*s2_iter++) : END_VALUE;
-		if (c1 == END_VALUE || c1 != c2)
+		if (s1.end() == s1_iter)
+			return (s2.end() == s2_iter) ? 0 : -1;
+		else if (s2.end() == s2_iter)
+			return 1;
+
+		const auto c1 = tolower(uint8_t(*s1_iter++));
+		const auto c2 = tolower(uint8_t(*s2_iter++));
+		if (c1 != c2)
 			return c1 - c2;
 	}
 }
