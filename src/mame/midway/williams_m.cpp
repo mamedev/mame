@@ -422,7 +422,7 @@ TIMER_CALLBACK_MEMBER(blaster_state::deferred_snd_cmd_w)
 }
 
 
-void blaster_state::snd_cmd_w(u8 data)
+void blaster_state::blaster_snd_cmd_w(u8 data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(blaster_state::deferred_snd_cmd_w),this), data);
 }

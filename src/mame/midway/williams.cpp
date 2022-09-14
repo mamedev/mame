@@ -1753,6 +1753,7 @@ void blaster_state::blaster(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "soundirq_b").output_handler().set_inputline(m_soundcpu_b, M6808_IRQ_LINE);
 
+	m_pia[1]->writepb_handler().set(FUNC(blaster_state::blaster_snd_cmd_w));
 	m_pia[2]->writepa_handler().set("ldac", FUNC(dac_byte_interface::data_w));
 
 	PIA6821(config, m_pia[3], 0);

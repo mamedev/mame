@@ -295,7 +295,7 @@ private:
 	void remap_select_w(u8 data);
 	void video_control_w(u8 data);
 	TIMER_CALLBACK_MEMBER(deferred_snd_cmd_w);
-	virtual void snd_cmd_w(u8 data) override;
+	void blaster_snd_cmd_w(u8 data);
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
