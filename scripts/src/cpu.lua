@@ -2106,6 +2106,7 @@ end
 --------------------------------------------------
 -- NEC uPD7810 series
 --@src/devices/cpu/upd7810/upd7810.h,CPUS["UPD7810"] = true
+--@src/devices/cpu/upd7810/upd7811.h,CPUS["UPD7810"] = true
 --------------------------------------------------
 
 if CPUS["UPD7810"] then

@@ -289,6 +289,7 @@ gamepark/gp32.cpp
 gridcomp/gridcomp.cpp
 grundy/newbrain.cpp
 h01x/h01x.cpp
+handheld/gmaster.cpp
 handheld/hh_cop400.cpp
 handheld/hh_cops1.cpp
 handheld/hh_hmcs40.cpp
@@ -309,7 +310,6 @@ handheld/talkingfb.cpp
 handheld/tispeak.cpp
 handheld/tispellb.cpp
 handheld/wildfire.cpp
-hartung/gmaster.cpp
 hds/hds200.cpp
 heathkit/et3400.cpp
 heathkit/h19.cpp
