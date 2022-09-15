@@ -1052,7 +1052,7 @@ end
 
 	configuration { }
 
-	if string.find(_OPTIONS["gcc"], "clang") and str_to_version(_OPTIONS["gcc_version"]) >= 150000 then
+	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") and str_to_version(_OPTIONS["gcc_version"]) >= 150000 then
 		buildoptions_c {
 			"-Wno-strict-prototypes",
 		}
