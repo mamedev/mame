@@ -62,7 +62,7 @@ private:
 
 	uint8_t m_ports[5]{};
 	uint8_t m_ram[0x4000]{};
-	required_device<cpu_device> m_maincpu;
+	required_device<upd78c11_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<generic_slot_device> m_cart;
 };
@@ -135,26 +135,26 @@ void gmaster_state::gmaster_io_w(offs_t offset, uint8_t data)
 			break;
 		case 1:
 			m_video.delayed = false;
-			if (m_video.x < std::size(m_video.pixels[0])) // continental galaxy flutlicht
+			if (m_video.x < std::size(m_video.pixels[0])) // continental galaxy floodlight
 			{
 				m_video.pixels[m_video.y][m_video.x] = data;
 			}
 			logerror("%.4x lcd x:%.2x y:%.2x %.4x written %.2x\n", m_maincpu->pc(), m_video.x, m_video.y, 0x4000 + offset, data);
 			m_video.x++;
-/* 02 b8 1a
-   02 bb 1a
-   02 bb 22
-   04 b8 12
-   04 b8 1a
-   04 b8 22
-   04 b9 12
-   04 b9 1a
-   04 b9 22
-   02 bb 12
-    4000 e0
-    rr w rr w rr w rr w rr w rr w rr w rr w
-    4000 ee
-*/
+			/* 02 b8 1a
+			02 bb 1a
+			02 bb 22
+			04 b8 12
+			04 b8 1a
+			04 b8 22
+			04 b9 12
+			04 b9 1a
+			04 b9 22
+			02 bb 12
+				4000 e0
+				rr w rr w rr w rr w rr w rr w rr w rr w
+				4000 ee
+			*/
 			break;
 		default:
 			logerror("%.4x memory %.4x written %.2x\n", m_maincpu->pc(), 0x4000 + offset, data);
@@ -166,7 +166,6 @@ void gmaster_state::gmaster_io_w(offs_t offset, uint8_t data)
 
 uint8_t gmaster_state::gmaster_portb_r()
 {
-//  uint8_t data = m_ports[1];
 	uint8_t data = 0xff;
 
 	logerror("%.4x port B read %.2x\n", m_maincpu->pc(), data);
@@ -176,7 +175,6 @@ uint8_t gmaster_state::gmaster_portb_r()
 
 uint8_t gmaster_state::gmaster_portc_r()
 {
-//  uint8_t data = m_ports[2];
 	uint8_t data = 0xff;
 
 	logerror("%.4x port C read %.2x\n", m_maincpu->pc(), data);
@@ -186,7 +184,6 @@ uint8_t gmaster_state::gmaster_portc_r()
 
 uint8_t gmaster_state::gmaster_portd_r()
 {
-//  uint8_t data = m_ports[3];
 	uint8_t data = 0xff;
 
 	logerror("%.4x port D read %.2x\n", m_maincpu->pc(), data);
@@ -196,7 +193,6 @@ uint8_t gmaster_state::gmaster_portd_r()
 
 uint8_t gmaster_state::gmaster_portf_r()
 {
-//  uint8_t data = m_ports[4];
 	uint8_t data = 0xff;
 
 	logerror("%.4x port F read %.2x\n", m_maincpu->pc(), data);
@@ -223,7 +219,6 @@ void gmaster_state::gmaster_portc_w(uint8_t data)
 	logerror("%.4x port C written %.2x\n", m_maincpu->pc(), data);
 
 	m_video.y = BLITTER_Y;
-	m_speaker->level_w(BIT(data, 4));
 }
 
 void gmaster_state::gmaster_portd_w(uint8_t data)
@@ -241,7 +236,6 @@ void gmaster_state::gmaster_portf_w(uint8_t data)
 
 void gmaster_state::gmaster_mem(address_map &map)
 {
-	//map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x7fff).rw(FUNC(gmaster_state::gmaster_io_r), FUNC(gmaster_state::gmaster_io_w));
 	//map(0x8000, 0xfeff)      // mapped by the cartslot
 }
@@ -253,10 +247,10 @@ static INPUT_PORTS_START( gmaster )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("B")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("A")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SELECT) PORT_NAME("Select")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START) PORT_NAME("Start")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SELECT)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START)
 INPUT_PORTS_END
 
 
@@ -319,18 +313,19 @@ void gmaster_state::machine_start()
 
 void gmaster_state::gmaster(machine_config &config)
 {
-	upd78c11_device &upd(UPD78C11(config, m_maincpu, 12_MHz_XTAL/2/*?*/)); // µPD78C11 in the unit
-	upd.set_addrmap(AS_PROGRAM, &gmaster_state::gmaster_mem);
-	upd.pa_in_cb().set_ioport("JOY");
-	upd.pb_in_cb().set(FUNC(gmaster_state::gmaster_portb_r));
-	upd.pc_in_cb().set(FUNC(gmaster_state::gmaster_portc_r));
-	upd.pd_in_cb().set(FUNC(gmaster_state::gmaster_portd_r));
-	upd.pf_in_cb().set(FUNC(gmaster_state::gmaster_portf_r));
-	upd.pa_out_cb().set(FUNC(gmaster_state::gmaster_porta_w));
-	upd.pb_out_cb().set(FUNC(gmaster_state::gmaster_portb_w));
-	upd.pc_out_cb().set(FUNC(gmaster_state::gmaster_portc_w));
-	upd.pd_out_cb().set(FUNC(gmaster_state::gmaster_portd_w));
-	upd.pf_out_cb().set(FUNC(gmaster_state::gmaster_portf_w));
+	UPD78C11(config, m_maincpu, 12_MHz_XTAL); // µPD78C11 in the unit
+	m_maincpu->set_addrmap(AS_PROGRAM, &gmaster_state::gmaster_mem);
+	m_maincpu->pa_in_cb().set_ioport("JOY");
+	m_maincpu->pb_in_cb().set(FUNC(gmaster_state::gmaster_portb_r));
+	m_maincpu->pc_in_cb().set(FUNC(gmaster_state::gmaster_portc_r));
+	m_maincpu->pd_in_cb().set(FUNC(gmaster_state::gmaster_portd_r));
+	m_maincpu->pf_in_cb().set(FUNC(gmaster_state::gmaster_portf_r));
+	m_maincpu->pa_out_cb().set(FUNC(gmaster_state::gmaster_porta_w));
+	m_maincpu->pb_out_cb().set(FUNC(gmaster_state::gmaster_portb_w));
+	m_maincpu->pc_out_cb().set(FUNC(gmaster_state::gmaster_portc_w));
+	m_maincpu->pd_out_cb().set(FUNC(gmaster_state::gmaster_portd_w));
+	m_maincpu->pf_out_cb().set(FUNC(gmaster_state::gmaster_portf_w));
+	m_maincpu->to_func().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60);
@@ -346,7 +341,6 @@ void gmaster_state::gmaster(machine_config &config)
 
 	GENERIC_CARTSLOT(config, m_cart, generic_linear_slot, "gmaster_cart").set_must_be_loaded(true);
 
-
 	SOFTWARE_LIST(config, "cart_list").set_original("gmaster");
 }
 
@@ -358,4 +352,4 @@ ROM_END
 
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY    FULLNAME */
-CONS( 1990, gmaster, 0,      0,      gmaster, gmaster, gmaster_state, init_gmaster, "Hartung", "Game Master", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 1990, gmaster, 0,      0,      gmaster, gmaster, gmaster_state, init_gmaster, "Hartung", "Game Master", MACHINE_NOT_WORKING )
