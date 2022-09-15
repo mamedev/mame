@@ -1259,6 +1259,7 @@ yamaha/ymmu80.cpp
 yamaha/ympsr16.cpp
 yamaha/ympsr340.cpp
 yamaha/ympsr40.cpp
+yamaha/ympsr400.cpp
 yamaha/ympsr60.cpp
 yamaha/ymqy70.cpp
 yamaha/ymrx15.cpp

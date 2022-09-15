@@ -44436,6 +44436,9 @@ psr70                           // 1985 PSR-70
 @source:yamaha/ympsr340.cpp
 psr340                          // 1999 PSR-340
 
+@source:yamaha/ympsr400.cpp
+psr500                          // 1991 PSR-500
+
 @source:yamaha/ymqy70.cpp
 qy70                            // 1997 QY-70
 
