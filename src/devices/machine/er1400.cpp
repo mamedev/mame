@@ -304,7 +304,7 @@ TIMER_CALLBACK_MEMBER(er1400_device::propagate_data)
 {
 	if (m_code_input == 5)
 	{
-		m_data_output = BIT(m_data_register, 13);
+		m_data_output = BIT(m_data_register, 14);
 		LOG("Data output %d bit\n", m_data_output);
 	}
 	else
@@ -370,7 +370,7 @@ WRITE_LINE_MEMBER(er1400_device::clock_w)
 			break;
 
 		case 5: // shift data out
-			m_data_register = (m_data_register & 0x1fff) << 1;
+			m_data_register = (m_data_register & 0x3fff) << 1;
 			m_data_propagation_timer->adjust(attotime::from_usec(20));
 			break;
 
