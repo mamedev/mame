@@ -25,7 +25,7 @@
 	- Smooth scrolling
 	- Timings
 	- Printer
-	- Verify/fix EAROM emulation
+	- Figure out why the EAROM hack is needed
 	- Move ergo201 driver here? The hardware is very similar
 
     Notes:
@@ -119,6 +119,7 @@ private:
 void f4431_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
+	map(0x1a00, 0x1a00).nopw(); // spurious write
 	map(0x2000, 0x2000).w(FUNC(f4431_state::brightness_w));
 	map(0x3000, 0x300f).w(m_vtc, FUNC(tms9927_device::write));
 	map(0x4000, 0x4000).w(FUNC(f4431_state::latch_w));
@@ -145,10 +146,12 @@ void f4431_state::io_map(address_map &map)
 
 static INPUT_PORTS_START( f4431 )
 	PORT_START("switches")
-	PORT_DIPNAME(0x01, 0x01, "W4 (Production Test)")
+	PORT_DIPNAME(0x01, 0x01, "Production Test")
+	PORT_DIPLOCATION("W:4")
 	PORT_DIPSETTING(   0x01, DEF_STR( Off ))
 	PORT_DIPSETTING(   0x00, DEF_STR( On ))
-	PORT_DIPNAME(0x02, 0x02, "W5 (Disable EAROM Save)")
+	PORT_DIPNAME(0x02, 0x00, "Enable EAROM Save")
+	PORT_DIPLOCATION("W:5")
 	PORT_DIPSETTING(   0x02, DEF_STR( Off ))
 	PORT_DIPSETTING(   0x00, DEF_STR( On ))
 INPUT_PORTS_END
@@ -256,7 +259,8 @@ uint32_t f4431_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 void f4431_state::row_w(offs_t offset, uint8_t data)
 {
-	logerror("row_w: %02x %02x line %d %d\n", offset, data, m_screen->vpos(), m_screen->hpos());
+	if (0)
+		logerror("row_w: %02x %02x line %d %d\n", offset, data, m_screen->vpos(), m_screen->hpos());
 
 	m_row_address = offset >> 4;
 	m_row_attr = data;
@@ -306,16 +310,20 @@ void f4431_state::latch_w(uint8_t data)
 	// ------1-  earom data
 	// -------0  earom c1
 
-	logerror("latch_w: %02x\n", data);
+	if (0)
+		logerror("latch_w: %02x\n", data);
 
 	m_earom->c1_w(BIT(data, 0));
-
-	// correct?
 	m_earom->data_w(BIT(data, 4) ? 0 : BIT(data, 1));
-
 	m_earom->c3_w(BIT(data, 2));
 	m_earom->c2_w(BIT(data, 3));
-	m_earom->clock_w(BIT(data, 4));
+
+	// don't clock a 'standby' state. the system clocks this and afterwards
+	// the real state; this causes the real state to be ignored, losing the
+	// first bit. to avoid this we don't clock the standby state. maybe it
+	// works in the real system because of timing.
+	if (data & 0x1d)
+		m_earom->clock_w(BIT(data, 4));
 
 	m_display_enabled = bool(BIT(data, 5));
 	m_nmi_disabled = bool(BIT(data, 6));
@@ -444,6 +452,10 @@ ROM_START( f4431 )
 
 	ROM_REGION(0x20, "prom", 0)
 	ROM_LOAD("11419960-00_4431.d19", 0x00, 0x20, CRC(daae0c28) SHA1(58c55b8b9d4161a9d38259a4375cf19799ea0b7a))
+
+	// factory default settings
+	ROM_REGION16_LE(200, "earom", 0)
+	ROM_LOAD("earom.d63", 0, 200, CRC(f14db754) SHA1(904e26974fbe7fe9166b731850bf414d8ffbe75d))
 ROM_END
 
 
