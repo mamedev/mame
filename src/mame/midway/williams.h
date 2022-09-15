@@ -198,10 +198,10 @@ private:
 };
 
 // Bubbles: 8-bit nvram
-class williams_cmos8_state : public williams_state
+class bubbles_state : public williams_state
 {
 public:
-	williams_cmos8_state(const machine_config &mconfig, device_type type, const char *tag) :
+	bubbles_state(const machine_config &mconfig, device_type type, const char *tag) :
 		williams_state(mconfig, type, tag)
 	{ }
 
@@ -210,11 +210,11 @@ protected:
 };
 
 // Conquest: flywheel controller
-class conquest_state : public williams_cmos8_state
+class conquest_state : public williams_state
 {
 public:
 	conquest_state(const machine_config &mconfig, device_type type, const char *tag) :
-		williams_cmos8_state(mconfig, type, tag),
+		williams_state(mconfig, type, tag),
 		m_dial(*this, "DIAL")
 	{ }
 
@@ -226,10 +226,10 @@ private:
 };
 
 // Joust, Splat: muxed inputs
-class williams_muxed_state : public williams_state
+class wms_muxed_state : public williams_state
 {
 public:
-	williams_muxed_state(const machine_config &mconfig, device_type type, const char *tag) :
+	wms_muxed_state(const machine_config &mconfig, device_type type, const char *tag) :
 		williams_state(mconfig, type, tag),
 		m_mux0(*this, "mux_0"),
 		m_mux1(*this, "mux_1")

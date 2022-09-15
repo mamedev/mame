@@ -228,7 +228,7 @@ void williams_state::cmos_w(offs_t offset, u8 data)
 }
 
 
-void williams_cmos8_state::cmos_w(offs_t offset, u8 data)
+void bubbles_state::cmos_w(offs_t offset, u8 data)
 {
 	/* bubbles has additional CMOS for a full 8 bits */
 	m_nvram[offset] = data;

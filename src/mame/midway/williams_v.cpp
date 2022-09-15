@@ -190,7 +190,7 @@ void williams2_state::video_start()
 	blitter_init(m_blitter_config, nullptr);
 
 	/* create the tilemap */
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(williams2_state::get_tile_info)), TILEMAP_SCAN_COLS,  24,16, 128,16);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(williams2_state::get_tile_info)), TILEMAP_SCAN_COLS, 24,16, 128,16);
 	m_bg_tilemap->set_scrolldx(2, 0);
 
 	state_save_register();
