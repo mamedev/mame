@@ -1333,14 +1333,6 @@ protected:
 	void STAX_H_xx();
 	void JR();
 	void CALT_7801();
-	void DCR_A_7801();
-	void DCR_B_7801();
-	void DCR_C_7801();
-	void DCRW_wa_7801();
-	void INR_A_7801();
-	void INR_B_7801();
-	void INR_C_7801();
-	void INRW_wa_7801();
 	void IN();
 	void OUT();
 	void MOV_A_S();

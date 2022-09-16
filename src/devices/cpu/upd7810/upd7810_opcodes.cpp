@@ -8126,14 +8126,13 @@ void upd7810_device::MOV_L_A()
 void upd7810_device::INRW_wa()
 {
 	PAIR ea = m_va;
-	uint8_t tmp, m;
-
 	RDOPARG( ea.b.l );
-	m = RM( ea.d );
-	tmp = m + 1;
-	ZHC_ADD( tmp, m, 0 );
-	WM( ea.d, tmp );
-	SKIP_CY;
+	uint8_t m = RM( ea.d ) + 1;
+	WM( ea.d, m );
+
+	if (m == 0)
+		PSW |= SK;
+	SET_Z(m);
 }
 
 /* 21: 0010 0001 */
@@ -8232,14 +8231,13 @@ void upd7810_device::LDAX_Hm()
 void upd7810_device::DCRW_wa()
 {
 	PAIR ea = m_va;
-	uint8_t tmp, m;
-
 	RDOPARG( ea.b.l );
-	m = RM( ea.d );
-	tmp = m - 1;
-	ZHC_SUB( tmp, m, 0 );
-	WM( ea.d, tmp );
-	SKIP_CY;
+	uint8_t m = RM( ea.d ) - 1;
+	WM( ea.d, m );
+
+	if (m == 0xff)
+		PSW |= SK;
+	SET_Z(m);
 }
 
 /* 31: 0011 0001 */
@@ -8368,28 +8366,25 @@ void upd7810_device::CALL_w()
 /* 41: 0100 0001 */
 void upd7810_device::INR_A()
 {
-	uint8_t tmp = A + 1;
-	ZHC_ADD( tmp, A, 0 );
-	A = tmp;
-	SKIP_CY;
+	if (++A == 0)
+		PSW |= SK;
+	SET_Z(A);
 }
 
 /* 42: 0100 0010 */
 void upd7810_device::INR_B()
 {
-	uint8_t tmp = B + 1;
-	ZHC_ADD( tmp, B, 0 );
-	B = tmp;
-	SKIP_CY;
+	if (++B == 0)
+		PSW |= SK;
+	SET_Z(B);
 }
 
 /* 43: 0100 0011 */
 void upd7810_device::INR_C()
 {
-	uint8_t tmp = C + 1;
-	ZHC_ADD( tmp, C, 0 );
-	C = tmp;
-	SKIP_CY;
+	if (++C == 0)
+		PSW |= SK;
+	SET_Z(C);
 }
 
 /* 44: 0100 0100 llll llll hhhh hhhh */
@@ -8490,28 +8485,25 @@ void upd7810_device::EXH()
 /* 51: 0101 0001 */
 void upd7810_device::DCR_A()
 {
-	uint8_t tmp = A - 1;
-	ZHC_SUB( tmp, A, 0 );
-	A = tmp;
-	SKIP_CY;
+	if (--A == 0xff)
+		PSW |= SK;
+	SET_Z(A);
 }
 
 /* 52: 0101 0010 */
 void upd7810_device::DCR_B()
 {
-	uint8_t tmp = B - 1;
-	ZHC_SUB( tmp, B, 0 );
-	B = tmp;
-	SKIP_CY;
+	if (--B == 0xff)
+		PSW |= SK;
+	SET_Z(B);
 }
 
 /* 53: 0101 0011 */
 void upd7810_device::DCR_C()
 {
-	uint8_t tmp = C - 1;
-	ZHC_SUB( tmp, C, 0 );
-	C = tmp;
-	SKIP_CY;
+	if (--C == 0xff)
+		PSW |= SK;
+	SET_Z(C);
 }
 
 /* 54: 0101 0100 llll llll hhhh hhhh */
@@ -9367,63 +9359,6 @@ void upd7810_device::CALT_7801()
 
 	PCL=RM(w.w.l);
 	PCH=RM(w.w.l+1);
-}
-
-/* DCR(W) and INR(W) instructions do not modify the CY register on at least 78c05 and 78c06 */
-void upd7810_device::DCR_A_7801()
-{
-	uint32_t old_CY = PSW & CY;
-	DCR_A();
-	PSW = ( PSW & ~CY ) | old_CY;
-}
-
-void upd7810_device::DCR_B_7801()
-{
-	uint32_t old_CY = PSW & CY;
-	DCR_B();
-	PSW = ( PSW & ~CY ) | old_CY;
-}
-
-void upd7810_device::DCR_C_7801()
-{
-	uint32_t old_CY = PSW & CY;
-	DCR_C();
-	PSW = ( PSW & ~CY ) | old_CY;
-}
-
-void upd7810_device::DCRW_wa_7801()
-{
-	uint32_t old_CY = PSW & CY;
-	DCRW_wa();
-	PSW = ( PSW & ~CY ) | old_CY;
-}
-
-void upd7810_device::INR_A_7801()
-{
-	uint32_t old_CY = PSW & CY;
-	INR_A();
-	PSW = ( PSW & ~CY ) | old_CY;
-}
-
-void upd7810_device::INR_B_7801()
-{
-	uint32_t old_CY = PSW & CY;
-	INR_B();
-	PSW = ( PSW & ~CY ) | old_CY;
-}
-
-void upd7810_device::INR_C_7801()
-{
-	uint32_t old_CY = PSW & CY;
-	INR_C();
-	PSW = ( PSW & ~CY ) | old_CY;
-}
-
-void upd7810_device::INRW_wa_7801()
-{
-	uint32_t old_CY = PSW & CY;
-	INRW_wa();
-	PSW = ( PSW & ~CY ) | old_CY;
 }
 
 void upd7810_device::IN()
