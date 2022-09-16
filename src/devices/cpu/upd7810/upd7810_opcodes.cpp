@@ -9420,7 +9420,7 @@ void upd7810_device::STM()
 
 void upd7810_device::STM_7801()
 {
-	/* Set the timer flip/fliop */
+	/* Set the timer flip/flop */
 	TO = 1;
 	m_to_func(TO);
 

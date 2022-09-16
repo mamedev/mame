@@ -1,9 +1,41 @@
 // license:GPL-2.0+
-// copyright-holders:Peter Trauner
+// copyright-holders:Peter Trauner, hap
 /******************************************************************************
 
 Hartung Game Master
 PeT mess@utanet.at march 2002
+
+Hardware notes:
+- NEC D78C11AGF (4KB internal ROM), 12.00MHz XTAL
+- ?KB external RAM, cartridge slot for external ROM
+- 2*LCDC hiding under epoxy, appears to be SED1520
+- 61*64 LCD screen
+- 1-bit sound
+
+Known releases:
+- Hartung Game Master (original version)
+- Hartung Game Tronic / Mega Tronic / Super Game
+- Systema 2000 (UK)
+- Impel Game Master (Hong Kong)
+- Videojet Game Master (France)
+- Prodis PDJ-10 (Spain)
+- Delplay Game Plus (France, vertical orientation)
+
+I presume it's an anonymous Hong Kong production. Most of the games too,
+they have no copyright/company info in them. Some of the later games have
+a copyright by Bon Treasure (a Hong Kong company that's also involved with
+Watara SuperVision), so perhaps it's them.
+
+TODO:
+- how much external RAM does it have? 16KB seems overkill and the games
+  only use a little
+- sound off doesn't work (usually the Select button to toggle), speaker is
+  connected to PC4, but upd7810.cpp doesn't automatically write to port C
+  on MCC related changes
+
+BTANB:
+- LCD flickers partially, especially bad in finitezn
+- fast button retriggers, for example the gear shift in carracing
 
 ******************************************************************************/
 
@@ -20,6 +52,7 @@ PeT mess@utanet.at march 2002
 #include "softlist_dev.h"
 #include "speaker.h"
 
+namespace {
 
 class gmaster_state : public driver_device
 {
@@ -45,105 +78,41 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<generic_slot_device> m_cart;
 
-	void gmaster_palette(palette_device &palette) const;
-	uint8_t gmaster_io_r(offs_t offset);
-	void gmaster_io_w(offs_t offset, uint8_t data);
-	void gmaster_portb_w(uint8_t data);
-	void gmaster_portc_w(uint8_t data);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u8 io_r(offs_t offset);
+	void io_w(offs_t offset, u8 data);
+	void portb_w(u8 data);
+	void portc_w(u8 data);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	template<int N> SED1520_UPDATE_CB(screen_update_cb);
+	void palette(palette_device &palette) const;
 
 	void gmaster_mem(address_map &map);
 
-	uint8_t m_ram[0x4000] = { };
-
+	u8 m_ram[0x4000] = { };
 	u8 m_chipsel = 0;
 };
 
-
-uint8_t gmaster_state::gmaster_io_r(offs_t offset)
+void gmaster_state::machine_start()
 {
-	u8 data = 0;
-
-	// read from external RAM
-	if (m_chipsel & 1)
-		data |= m_ram[offset];
-
-	// read from LCD
-	for (int i = 0; i < 2; i++)
-		if (BIT(m_chipsel, i + 1))
-			data |= m_lcd[i]->read(offset & 1);
-
-	return data;
+	save_item(NAME(m_ram));
+	save_item(NAME(m_chipsel));
 }
 
-void gmaster_state::gmaster_io_w(offs_t offset, uint8_t data)
+void gmaster_state::palette(palette_device &palette) const
 {
-	// write to external RAM
-	if (m_chipsel & 1)
-		m_ram[offset] = data;
-
-	// write to LCD
-	for (int i = 0; i < 2; i++)
-		if (BIT(m_chipsel, i + 1))
-			m_lcd[i]->write(offset & 1, data);
-}
-
-
-void gmaster_state::gmaster_portb_w(uint8_t data)
-{
-	// d0: ?
-	// d1: ?
-}
-
-void gmaster_state::gmaster_portc_w(uint8_t data)
-{
-	// d0: RAM CS
-	// d1: LCD1 CS
-	// d2: LCD2 CS
-	m_chipsel = data & 7;
-}
-
-
-void gmaster_state::gmaster_mem(address_map &map)
-{
-	map(0x4000, 0x7fff).rw(FUNC(gmaster_state::gmaster_io_r), FUNC(gmaster_state::gmaster_io_w));
-	map(0x8000, 0xfeff).r("cartslot", FUNC(generic_slot_device::read_rom));
-}
-
-
-static INPUT_PORTS_START( gmaster )
-	PORT_START("JOY")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SELECT)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START)
-INPUT_PORTS_END
-
-
-static constexpr rgb_t gmaster_pens[2] =
-{
-#if 1
-	{ 130, 159, 166 },
-	{ 45, 45, 43 }
-#else
-	{ 255,255,255 },
-	{ 0, 0, 0 }
-#endif
+	palette.set_pen_color(0, rgb_t(0x80, 0x8c, 0x8c)); // LCD background
+	palette.set_pen_color(1, rgb_t(0x1c, 0x20, 0x20)); // pixel
 };
 
 
-void gmaster_state::gmaster_palette(palette_device &palette) const
-{
-	palette.set_pen_colors(0, gmaster_pens);
-}
 
+/******************************************************************************
+    I/O
+******************************************************************************/
 
-uint32_t gmaster_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+// LCD outputs
+
+u32 gmaster_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u32 s0 = m_lcd[0]->screen_update(screen, bitmap, cliprect);
 	u32 s1 = m_lcd[1]->screen_update(screen, bitmap, cliprect);
@@ -175,25 +144,95 @@ SED1520_UPDATE_CB(gmaster_state::screen_update_cb)
 	return 0;
 }
 
-void gmaster_state::machine_start()
+
+// memory mapped I/O
+
+u8 gmaster_state::io_r(offs_t offset)
 {
-	save_item(NAME(m_ram));
+	u8 data = 0;
+
+	// read from external RAM
+	if (m_chipsel & 1)
+		data |= m_ram[offset];
+
+	// read from LCD
+	for (int i = 0; i < 2; i++)
+		if (BIT(m_chipsel, i + 1))
+			data |= m_lcd[i]->read(offset & 1);
+
+	return data;
+}
+
+void gmaster_state::io_w(offs_t offset, u8 data)
+{
+	// write to external RAM
+	if (m_chipsel & 1)
+		m_ram[offset] = data;
+
+	// write to LCD
+	for (int i = 0; i < 2; i++)
+		if (BIT(m_chipsel, i + 1))
+			m_lcd[i]->write(offset & 1, data);
+}
+
+void gmaster_state::gmaster_mem(address_map &map)
+{
+	// 0x0000-0x0fff is internal ROM
+	map(0x4000, 0x7fff).rw(FUNC(gmaster_state::io_r), FUNC(gmaster_state::io_w));
+	map(0x8000, 0xfeff).r("cartslot", FUNC(generic_slot_device::read_rom));
+	// 0xff00-0xffff is internal RAM
 }
 
 
+// MCU ports
+
+void gmaster_state::portb_w(u8 data)
+{
+	// ?
+}
+
+void gmaster_state::portc_w(u8 data)
+{
+	// d0: RAM CS
+	// d1,d2: LCD CS
+	m_chipsel = data & 7;
+}
+
+
+
+/******************************************************************************
+    Input Ports
+******************************************************************************/
+
+static INPUT_PORTS_START( gmaster )
+	PORT_START("JOY")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SELECT )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START )
+INPUT_PORTS_END
+
+
+
+/******************************************************************************
+    Machine Configs
+******************************************************************************/
+
 void gmaster_state::gmaster(machine_config &config)
 {
-	UPD78C11(config, m_maincpu, 12_MHz_XTAL); // µPD78C11 in the unit
+	// basic machine hardware
+	UPD78C11(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gmaster_state::gmaster_mem);
 	m_maincpu->pa_in_cb().set_ioport("JOY");
-	m_maincpu->pb_out_cb().set(FUNC(gmaster_state::gmaster_portb_w));
-	m_maincpu->pc_out_cb().set(FUNC(gmaster_state::gmaster_portc_w));
+	m_maincpu->pb_out_cb().set(FUNC(gmaster_state::portb_w));
+	m_maincpu->pc_out_cb().set(FUNC(gmaster_state::portc_w));
 	m_maincpu->to_func().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
 	// video hardware
-	SED1520(config, m_lcd[0]).set_screen_update_cb(FUNC(gmaster_state::screen_update_cb<0>));
-	SED1520(config, m_lcd[1]).set_screen_update_cb(FUNC(gmaster_state::screen_update_cb<1>));
-
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(80, 64);
@@ -201,22 +240,38 @@ void gmaster_state::gmaster(machine_config &config)
 	m_screen->set_screen_update(FUNC(gmaster_state::screen_update));
 	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(gmaster_state::gmaster_palette), std::size(gmaster_pens));
+	PALETTE(config, "palette", FUNC(gmaster_state::palette), 2);
 
+	SED1520(config, m_lcd[0]).set_screen_update_cb(FUNC(gmaster_state::screen_update_cb<0>));
+	SED1520(config, m_lcd[1]).set_screen_update_cb(FUNC(gmaster_state::screen_update_cb<1>));
+
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(0, "mono", 0.50);
 
+	// cartridge
 	GENERIC_CARTSLOT(config, m_cart, generic_linear_slot, "gmaster_cart").set_must_be_loaded(true);
-
 	SOFTWARE_LIST(config, "cart_list").set_original("gmaster");
 }
 
 
+
+/******************************************************************************
+    ROM Definitions
+******************************************************************************/
+
 ROM_START(gmaster)
-	ROM_REGION(0x1000,"maincpu", 0)
-	ROM_LOAD("d78c11agf_e19.u1", 0x0000, 0x1000, CRC(05cc45e5) SHA1(05d73638dea9657ccc2791c0202d9074a4782c1e) )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "d78c11agf_e19.u1", 0x0000, 0x1000, CRC(05cc45e5) SHA1(05d73638dea9657ccc2791c0202d9074a4782c1e) )
 ROM_END
 
+} // anonymous namespace
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY    FULLNAME */
-CONS( 1990, gmaster, 0,      0,      gmaster, gmaster, gmaster_state, empty_init, "Hartung", "Game Master", MACHINE_NOT_WORKING )
+
+
+/******************************************************************************
+    Drivers
+******************************************************************************/
+
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY    FULLNAME
+CONS( 1990, gmaster, 0,      0,      gmaster, gmaster, gmaster_state, empty_init, "Hartung", "Game Master", MACHINE_SUPPORTS_SAVE )
