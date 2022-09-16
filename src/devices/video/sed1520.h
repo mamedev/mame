@@ -2,9 +2,9 @@
 // copyright-holders:Sandro Ronco
 /***************************************************************************
 
-        SED1520 LCD controller
-        SED1560 LCD controller
-        EPL43102 LCD controller
+    SED1520 LCD controller
+    SED1560 LCD controller
+    EPL43102 LCD controller
 
 ***************************************************************************/
 
