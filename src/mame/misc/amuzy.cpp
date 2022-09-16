@@ -159,12 +159,21 @@ ROM_START( mmhammer )
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD16_WORD_SWAP( "s29al004d70tfi01.u1", 0x000000, 0x080000, CRC(f6aa7880) SHA1(c3dfdc5250875c365c7146b6fe6288d1605d17e5) )
 
-	// YGV625 has a 32 bit data bus to the ROMs, so these are likely word-interleaved
 	ROM_REGION(0x400000, "gfx", 0)
-	ROM_LOAD32_WORD( "s29al016d70tfi01.u2", 0x000000, 0x200000, CRC(beb65917) SHA1(835a0ceef2fdfee2730d88e04a4a131575048979) )
-	ROM_LOAD32_WORD( "s29al016d70tfi01.u3", 0x000002, 0x200000, CRC(cedb6c55) SHA1(c2981b2547468723da6f5416a81b937b293576fc) )
+	ROM_LOAD( "s29al016d70tfi01.u2", 0x000000, 0x200000, CRC(beb65917) SHA1(835a0ceef2fdfee2730d88e04a4a131575048979) )
+	ROM_LOAD( "s29al016d70tfi01.u3", 0x200000, 0x200000, CRC(cedb6c55) SHA1(c2981b2547468723da6f5416a81b937b293576fc) )
+ROM_END
+
+ROM_START( docchift )
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD16_WORD_SWAP( "s29al004d70tfi01.u1", 0x000000, 0x080000, CRC(b69d97f6) SHA1(8ecb6300d435200cf694f6f0d6a847d60354dbae) )
+
+	ROM_REGION(0x400000, "gfx", 0)
+	ROM_LOAD( "s29al016d70tfi01.u2", 0x000000, 0x200000, CRC(044f004b) SHA1(c9f8797fcd5f67831311e4fea2621d7337c74fa2) )
+	ROM_LOAD( "s29al016d70tfi01.u3", 0x200000, 0x200000, CRC(fb668dbd) SHA1(49514b0c886578f065e47d9c7a5453e09622ba55) )
 ROM_END
 
 }   // anonymous namespace
 
+GAME( 2007, docchift,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy", "Docchi Fighter",  MACHINE_NOT_WORKING )
 GAME( 2008, mmhammer,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy", "Mogu Mogu Hammer",  MACHINE_NOT_WORKING )
