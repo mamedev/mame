@@ -6,17 +6,20 @@
 Fidelity Elegance Chess Challenger (AS12/6085)
 
 Hardware notes (AS12):
-- PCB label 510-1083A01
+- PCB label 510-1084B01
 - R65C02P3 @ 3/3.57MHz (apparently the first few had a 3MHz CPU)
-- 2*8KB ROM + 1*4KB ROM, 2*2KB RAM(HM6116)
+- 2*8KB ROM + 1*4KB ROM, 2*2KB RAM(HM6116+TMM2016)
 
 Hardware notes (6085):
 - PCB label 510-1084B01
 - R65C02P4 @ 4MHz
-- 3*8KB ROM(TMM2764), 2*2KB RAM(HM6116)
+- 3*8KB ROM(TMM2764), 2*2KB RAM(HM6116+TMM2016)
 
 This is on the SC12B board, with enough modifications to support more leds and
 magnetic chess board sensors. See sc12.cpp for a more technical description.
+
+The first RAM chip is low-power, and battery-backed with a capacitor. This is
+also mentioned in the manual. Maybe it does not apply to older PCBs.
 
 TODO:
 - is the initial AS12 3MHz version the same ROM as felega1? When it's configured
@@ -31,6 +34,7 @@ TODO:
 #include "bus/generic/slot.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/clock.h"
+#include "machine/nvram.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
@@ -172,7 +176,8 @@ u8 as12_state::input_r(offs_t offset)
 void as12_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x0fff).ram();
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0800, 0x0fff).ram();
 	map(0x1800, 0x1807).w(FUNC(as12_state::led_w)).nopr();
 	map(0x2000, 0x5fff).r("cartslot", FUNC(generic_slot_device::read_rom));
 	map(0x6000, 0x6000).mirror(0x1fff).w(FUNC(as12_state::control_w));
@@ -234,9 +239,12 @@ void as12_state::feleg(machine_config &config)
 	irq_clock.set_pulse_width(attotime::from_usec(17)); // active for 17us
 	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
+	m_board->set_nvram_enable(true);
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
