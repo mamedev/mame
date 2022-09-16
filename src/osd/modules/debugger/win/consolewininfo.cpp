@@ -12,6 +12,9 @@
 #include "debugviewinfo.h"
 #include "uimetrics.h"
 
+// devices
+#include "imagedev/cassette.h"
+
 // emu
 #include "debug/debugcon.h"
 #include "debugger.h"
@@ -19,8 +22,8 @@
 #include "softlist_dev.h"
 #include "debug/debugcpu.h"
 
-// devices
-#include "imagedev/cassette.h"
+// util
+#include "util/xmlfile.h"
 
 // osd/windows
 #include "winutf8.h"
@@ -493,6 +496,13 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 		}
 	}
 	return disasmbasewin_info::handle_command(wparam, lparam);
+}
+
+
+void consolewin_info::save_configuration_to_node(util::xml::data_node &node)
+{
+	disasmbasewin_info::save_configuration_to_node(node);
+	node.set_attribute_int(osd::debugger::ATTR_WINDOW_TYPE, osd::debugger::WINDOW_TYPE_CONSOLE);
 }
 
 

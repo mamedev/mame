@@ -15,25 +15,36 @@
 #include "emuopts.h"
 #include "fileio.h"
 
+#include "xmlfile.h"
+
 #include <system_error>
 #include <utility>
 
 #define DEBUG_CONFIG        0
 
+
 //**************************************************************************
 //  CONFIGURATION MANAGER
 //**************************************************************************
 
-//-------------------------------------------------
-//  configuration_manager - constructor
-//-------------------------------------------------
-
+/*************************************
+ *
+ *  Construction/destruction
+ *
+ *************************************/
 
 configuration_manager::configuration_manager(running_machine &machine) :
 	m_machine(machine),
 	m_typelist()
 {
 }
+
+
+configuration_manager::~configuration_manager()
+{
+}
+
+
 
 /*************************************
  *
@@ -256,6 +267,12 @@ bool configuration_manager::load_xml(game_driver const &system, emu_file &file, 
 		for (auto const &type : m_typelist)
 			type.second.load(which_type, level, systemnode->get_child(type.first.c_str()));
 		count++;
+
+		// save unhandled settings for default and system types
+		if (config_type::DEFAULT == which_type)
+			save_unhandled(m_unhandled_default, *systemnode);
+		else if (config_type::SYSTEM == which_type)
+			save_unhandled(m_unhandled_system, *systemnode);
 	}
 
 	// error if this isn't a valid match
@@ -302,9 +319,48 @@ bool configuration_manager::save_xml(emu_file &file, config_type which_type)
 			curnode->delete_node();
 	}
 
-	// flush the file
+	// restore unhandled settings
+	if ((config_type::DEFAULT == which_type) && m_unhandled_default)
+		restore_unhandled(*m_unhandled_default, *systemnode);
+	else if ((config_type::SYSTEM == which_type) && m_unhandled_system)
+		restore_unhandled(*m_unhandled_system, *systemnode);
+
+	// write out the file
 	root->write(file);
 
 	// free and get out of here
 	return true;
+}
+
+
+
+/*************************************
+ *
+ *  Preserving unhandled settings
+ *
+ *************************************/
+
+void configuration_manager::save_unhandled(
+		std::unique_ptr<util::xml::file> &unhandled,
+		util::xml::data_node const &systemnode)
+{
+	for (util::xml::data_node const *curnode = systemnode.get_first_child(); curnode; curnode = curnode->get_next_sibling())
+	{
+		auto const handler = m_typelist.lower_bound(curnode->get_name());
+		if ((m_typelist.end() == handler) || (handler->first != curnode->get_name()))
+		{
+			if (!unhandled)
+				unhandled = util::xml::file::create();
+			curnode->copy_into(*unhandled);
+		}
+	}
+}
+
+
+void configuration_manager::restore_unhandled(
+		util::xml::file const &unhandled,
+		util::xml::data_node &systemnode)
+{
+	for (util::xml::data_node const *curnode = unhandled.get_first_child(); curnode; curnode = curnode->get_next_sibling())
+		curnode->copy_into(systemnode);
 }

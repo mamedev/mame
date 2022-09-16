@@ -6,6 +6,8 @@
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 
+#include "util/xmlfile.h"
+
 #include <QtWidgets/QActionGroup>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QMenu>
@@ -140,12 +142,12 @@ void BreakpointsWindowQtConfig::applyToQWidget(QWidget* widget)
 void BreakpointsWindowQtConfig::addToXmlDataNode(util::xml::data_node &node) const
 {
 	WindowQtConfig::addToXmlDataNode(node);
-	node.set_attribute_int("bwtype", m_bwType);
+	node.set_attribute_int(osd::debugger::ATTR_WINDOW_POINTS_TYPE, m_bwType);
 }
 
 
 void BreakpointsWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
 {
 	WindowQtConfig::recoverFromXmlNode(node);
-	m_bwType = node.get_attribute_int("bwtype", m_bwType);
+	m_bwType = node.get_attribute_int(osd::debugger::ATTR_WINDOW_POINTS_TYPE, m_bwType);
 }

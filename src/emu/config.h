@@ -13,9 +13,8 @@
 
 #pragma once
 
-#include "xmlfile.h"
-
 #include <map>
+#include <memory>
 #include <string>
 #include <string_view>
 
@@ -49,6 +48,7 @@ public:
 
 	// construction/destruction
 	configuration_manager(running_machine &machine);
+	~configuration_manager();
 
 	void config_register(std::string_view name, load_delegate &&load, save_delegate &&save);
 
@@ -69,9 +69,14 @@ private:
 	bool load_xml(game_driver const &system, emu_file &file, config_type which_type);
 	bool save_xml(emu_file &file, config_type which_type);
 
+	void save_unhandled(std::unique_ptr<util::xml::file> &unhandled, util::xml::data_node const &systemnode);
+	void restore_unhandled(util::xml::file const &unhandled, util::xml::data_node &systemnode);
+
 	// internal state
 	running_machine &m_machine;
 	std::multimap<std::string, config_handler> m_typelist;
+	std::unique_ptr<util::xml::file> m_unhandled_default;
+	std::unique_ptr<util::xml::file> m_unhandled_system;
 };
 
 #endif // MAME_EMU_CONFIG_H

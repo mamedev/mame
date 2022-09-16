@@ -8,6 +8,8 @@
 #include "debug/dvdisasm.h"
 #include "debug/points.h"
 
+#include "util/xmlfile.h"
+
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QAction>
@@ -288,11 +290,11 @@ void DasmWindowQtConfig::buildFromQWidget(QWidget *widget)
 
 	QActionGroup *rightBarGroup = window->findChild<QActionGroup *>("rightbargroup");
 	if (rightBarGroup->checkedAction()->text() == "Raw Opcodes")
-		m_rightBar = 0;
+		m_rightBar = DASM_RIGHTCOL_RAW;
 	else if (rightBarGroup->checkedAction()->text() == "Encrypted Opcodes")
-		m_rightBar = 1;
+		m_rightBar = DASM_RIGHTCOL_ENCRYPTED;
 	else if (rightBarGroup->checkedAction()->text() == "Comments")
-		m_rightBar = 2;
+		m_rightBar = DASM_RIGHTCOL_COMMENTS;
 }
 
 void DasmWindowQtConfig::applyToQWidget(QWidget *widget)
@@ -302,20 +304,23 @@ void DasmWindowQtConfig::applyToQWidget(QWidget *widget)
 	QComboBox *cpu = window->findChild<QComboBox *>("cpu");
 	cpu->setCurrentIndex(m_cpu);
 
-	QActionGroup *rightBarGroup = window->findChild<QActionGroup *>("rightbargroup");
-	rightBarGroup->actions()[m_rightBar]->trigger();
+	if ((DASM_RIGHTCOL_RAW <= m_rightBar) && (DASM_RIGHTCOL_COMMENTS >= m_rightBar))
+	{
+		QActionGroup *rightBarGroup = window->findChild<QActionGroup *>("rightbargroup");
+		rightBarGroup->actions()[m_rightBar - 1]->trigger();
+	}
 }
 
 void DasmWindowQtConfig::addToXmlDataNode(util::xml::data_node &node) const
 {
 	WindowQtConfig::addToXmlDataNode(node);
-	node.set_attribute_int("cpu", m_cpu);
-	node.set_attribute_int("rightbar", m_rightBar);
+	node.set_attribute_int(osd::debugger::ATTR_WINDOW_DISASSEMBLY_CPU, m_cpu);
+	node.set_attribute_int(osd::debugger::ATTR_WINDOW_DISASSEMBLY_RIGHT_COLUMN, m_rightBar);
 }
 
 void DasmWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
 {
 	WindowQtConfig::recoverFromXmlNode(node);
-	m_cpu = node.get_attribute_int("cpu", m_cpu);
-	m_rightBar = node.get_attribute_int("rightbar", m_rightBar);
+	m_cpu = node.get_attribute_int(osd::debugger::ATTR_WINDOW_DISASSEMBLY_CPU, m_cpu);
+	m_rightBar = node.get_attribute_int(osd::debugger::ATTR_WINDOW_DISASSEMBLY_RIGHT_COLUMN, m_rightBar);
 }

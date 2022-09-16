@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "../xmlconfig.h"
+
 // standard windows headers
 #include <windows.h>
 #include <windowsx.h>

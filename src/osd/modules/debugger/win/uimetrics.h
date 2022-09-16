@@ -41,4 +41,4 @@ private:
 	uint32_t const m_vscroll_width;
 };
 
-#endif
+#endif // MAME_DEBUGGER_WIN_UIMETRICS_H

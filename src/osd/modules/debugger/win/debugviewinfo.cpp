@@ -12,8 +12,11 @@
 #include "debugwininfo.h"
 #include "uimetrics.h"
 #include "debugger.h"
+
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
+
+#include "util/xmlfile.h"
 
 #include "strconv.h"
 
@@ -180,6 +183,18 @@ void debugview_info::send_pagedown()
 }
 
 
+int debugview_info::source_index() const
+{
+	if (m_view)
+	{
+		debug_view_source const *const source = m_view->source();
+		if (source)
+			return m_view->source_index(*source);
+	}
+	return -1;
+}
+
+
 char const *debugview_info::source_name() const
 {
 	if (m_view)
@@ -281,6 +296,56 @@ HWND debugview_info::create_source_combobox(HWND parent, LONG_PTR userdata)
 		m_view->set_source(*cursource);
 	}
 	return result;
+}
+
+
+void debugview_info::restore_configuration_from_node(util::xml::data_node const &node)
+{
+	if (m_view->cursor_supported())
+	{
+		util::xml::data_node const *const selection = node.get_child(osd::debugger::NODE_WINDOW_SELECTION);
+		if (selection)
+		{
+			debug_view_xy pos = m_view->cursor_position();
+			m_view->set_cursor_visible(0 != selection->get_attribute_int(osd::debugger::ATTR_SELECTION_CURSOR_VISIBLE, m_view->cursor_visible() ? 1 : 0));
+			selection->get_attribute_int(osd::debugger::ATTR_SELECTION_CURSOR_X, pos.x);
+			selection->get_attribute_int(osd::debugger::ATTR_SELECTION_CURSOR_Y, pos.y);
+			m_view->set_cursor_position(pos);
+		}
+	}
+
+	util::xml::data_node const *const scroll = node.get_child(osd::debugger::NODE_WINDOW_SCROLL);
+	if (scroll)
+	{
+		debug_view_xy origin = m_view->visible_position();
+		origin.x = scroll->get_attribute_int(osd::debugger::ATTR_SCROLL_ORIGIN_X, origin.x * metrics().debug_font_width()) / metrics().debug_font_width();
+		origin.y = scroll->get_attribute_int(osd::debugger::ATTR_SCROLL_ORIGIN_Y, origin.y * metrics().debug_font_height()) / metrics().debug_font_height();
+		m_view->set_visible_position(origin);
+	}
+}
+
+
+void debugview_info::save_configuration_to_node(util::xml::data_node &node)
+{
+	if (m_view->cursor_supported())
+	{
+		util::xml::data_node *const selection = node.add_child(osd::debugger::NODE_WINDOW_SELECTION, nullptr);
+		if (selection)
+		{
+			debug_view_xy const pos = m_view->cursor_position();
+			selection->set_attribute_int(osd::debugger::ATTR_SELECTION_CURSOR_VISIBLE, m_view->cursor_visible() ? 1 : 0);
+			selection->set_attribute_int(osd::debugger::ATTR_SELECTION_CURSOR_X, pos.x);
+			selection->set_attribute_int(osd::debugger::ATTR_SELECTION_CURSOR_Y, pos.y);
+		}
+	}
+
+	util::xml::data_node *const scroll = node.add_child(osd::debugger::NODE_WINDOW_SCROLL, nullptr);
+	if (scroll)
+	{
+		debug_view_xy const origin = m_view->visible_position();
+		scroll->set_attribute_int(osd::debugger::ATTR_SCROLL_ORIGIN_X, origin.x * metrics().debug_font_width());
+		scroll->set_attribute_int(osd::debugger::ATTR_SCROLL_ORIGIN_Y, origin.y * metrics().debug_font_height());
+	}
 }
 
 

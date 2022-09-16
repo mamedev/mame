@@ -1524,7 +1524,10 @@ private:
 	void bank_switch_fine(u8 data)
 	{
 		set_bank_rom_fine(data & 0x7f);
-		LOG("Protection read %s\n", BIT(data, 7) ? "enabled" : "disabled");
+		LOG(
+				"%s: Protection read %s\n",
+				machine().describe_context(),
+				BIT(data, 7) ? "enabled" : "disabled");
 		if (BIT(data, 7))
 			m_view_prot.select(0);
 		else
@@ -1562,6 +1565,7 @@ private:
 
 	memory_view m_view_prot;
 };
+
 
 
 //**************************************************************************

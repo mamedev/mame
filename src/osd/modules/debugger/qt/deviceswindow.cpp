@@ -2,7 +2,11 @@
 // copyright-holders:Andrew Gardner
 #include "emu.h"
 #include "deviceswindow.h"
+
 #include "deviceinformationwindow.h"
+
+#include "util/xmlfile.h"
+
 
 DevicesWindowModel::DevicesWindowModel(running_machine &machine, QObject *parent) :
 	m_machine(machine)

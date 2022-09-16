@@ -1,11 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrew Gardner
 #include "emu.h"
+#include "deviceinformationwindow.h"
+
+#include "util/xmlfile.h"
+
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QVBoxLayout>
-
-#include "deviceinformationwindow.h"
 
 
 DeviceInformationWindow::DeviceInformationWindow(running_machine &machine, device_t *device, QWidget *parent) :
@@ -127,12 +129,12 @@ void DeviceInformationWindowQtConfig::applyToQWidget(QWidget *widget)
 void DeviceInformationWindowQtConfig::addToXmlDataNode(util::xml::data_node &node) const
 {
 	WindowQtConfig::addToXmlDataNode(node);
-	node.set_attribute("device-tag", m_device_tag.c_str());
+	node.set_attribute(osd::debugger::ATTR_WINDOW_DEVICE_TAG, m_device_tag.c_str());
 }
 
 
 void DeviceInformationWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
 {
 	WindowQtConfig::recoverFromXmlNode(node);
-	m_device_tag = node.get_attribute_string("device-tag", ":");
+	m_device_tag = node.get_attribute_string(osd::debugger::ATTR_WINDOW_DEVICE_TAG, ":");
 }

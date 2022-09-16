@@ -3,6 +3,8 @@
 #ifndef MAME_DEBUGGER_QT_WINDOWQT_H
 #define MAME_DEBUGGER_QT_WINDOWQT_H
 
+#include "../xmlconfig.h"
+
 #include "config.h"
 #include "debugger.h"
 

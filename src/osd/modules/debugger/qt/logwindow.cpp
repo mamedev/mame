@@ -1,13 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrew Gardner
 #include "emu.h"
-#include <QtWidgets/QVBoxLayout>
-
 #include "logwindow.h"
 
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 #include "debug/dvdisasm.h"
+
+#include "util/xmlfile.h"
+
+#include <QtWidgets/QVBoxLayout>
 
 
 LogWindow::LogWindow(running_machine &machine, QWidget *parent) :

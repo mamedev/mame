@@ -493,22 +493,22 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 - (void)saveConfigurationToNode:(util::xml::data_node *)node {
 	if (view->cursor_supported())
 	{
-		util::xml::data_node *const selection = node->add_child("selection", nullptr);
+		util::xml::data_node *const selection = node->add_child(osd::debugger::NODE_WINDOW_SELECTION, nullptr);
 		if (selection)
 		{
 			debug_view_xy const pos = view->cursor_position();
-			selection->set_attribute_int("visible", view->cursor_visible() ? 1 : 0);
-			selection->set_attribute_int("start_x", pos.x);
-			selection->set_attribute_int("start_y", pos.y);
+			selection->set_attribute_int(osd::debugger::ATTR_SELECTION_CURSOR_VISIBLE, view->cursor_visible() ? 1 : 0);
+			selection->set_attribute_int(osd::debugger::ATTR_SELECTION_CURSOR_X, pos.x);
+			selection->set_attribute_int(osd::debugger::ATTR_SELECTION_CURSOR_Y, pos.y);
 		}
 	}
 
-	util::xml::data_node *const scroll = node->add_child("scroll", nullptr);
+	util::xml::data_node *const scroll = node->add_child(osd::debugger::NODE_WINDOW_SCROLL, nullptr);
 	if (scroll)
 	{
 		NSRect const visible = [self visibleRect];
-		scroll->set_attribute_float("position_x", visible.origin.x);
-		scroll->set_attribute_float("position_y", visible.origin.y);
+		scroll->set_attribute_float(osd::debugger::ATTR_SCROLL_ORIGIN_X, visible.origin.x);
+		scroll->set_attribute_float(osd::debugger::ATTR_SCROLL_ORIGIN_Y, visible.origin.y);
 	}
 }
 
@@ -516,23 +516,23 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 - (void)restoreConfigurationFromNode:(util::xml::data_node const *)node {
 	if (view->cursor_supported())
 	{
-		util::xml::data_node const *const selection = node->get_child("selection");
+		util::xml::data_node const *const selection = node->get_child(osd::debugger::NODE_WINDOW_SELECTION);
 		if (selection)
 		{
 			debug_view_xy pos = view->cursor_position();
-			view->set_cursor_visible(0 != selection->get_attribute_int("visible", view->cursor_visible() ? 1 : 0));
-			pos.x = selection->get_attribute_int("start_x", pos.x);
-			pos.y = selection->get_attribute_int("start_y", pos.y);
+			view->set_cursor_visible(0 != selection->get_attribute_int(osd::debugger::ATTR_SELECTION_CURSOR_VISIBLE, view->cursor_visible() ? 1 : 0));
+			pos.x = selection->get_attribute_int(osd::debugger::ATTR_SELECTION_CURSOR_X, pos.x);
+			pos.y = selection->get_attribute_int(osd::debugger::ATTR_SELECTION_CURSOR_Y, pos.y);
 			view->set_cursor_position(pos);
 		}
 	}
 
-	util::xml::data_node const *const scroll = node->get_child("scroll");
+	util::xml::data_node const *const scroll = node->get_child(osd::debugger::NODE_WINDOW_SCROLL);
 	if (scroll)
 	{
 		NSRect visible = [self visibleRect];
-		visible.origin.x = scroll->get_attribute_float("position_x", visible.origin.x);
-		visible.origin.y = scroll->get_attribute_float("position_y", visible.origin.y);
+		visible.origin.x = scroll->get_attribute_float(osd::debugger::ATTR_SCROLL_ORIGIN_X, visible.origin.x);
+		visible.origin.y = scroll->get_attribute_float(osd::debugger::ATTR_SCROLL_ORIGIN_Y, visible.origin.y);
 		[self scrollRectToVisible:visible];
 	}
 }

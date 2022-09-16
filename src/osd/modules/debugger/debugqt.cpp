@@ -32,6 +32,9 @@
 #include "qt/deviceswindow.h"
 #include "qt/deviceinformationwindow.h"
 
+#include "util/xmlfile.h"
+
+
 class debug_qt : public osd_module, public debug_module
 #if defined(_WIN32) && !defined(SDLMAME_WIN32)
 , public QAbstractNativeEventFilter
@@ -89,9 +92,9 @@ void xml_configuration_load(running_machine &machine, config_type cfg_type, conf
 
 	// Configuration load
 	util::xml::data_node const *wnode = nullptr;
-	for (wnode = parentnode->get_child("window"); wnode; wnode = wnode->get_next_sibling("window"))
+	for (wnode = parentnode->get_child(osd::debugger::NODE_WINDOW); wnode; wnode = wnode->get_next_sibling(osd::debugger::NODE_WINDOW))
 	{
-		WindowQtConfig::WindowType type = (WindowQtConfig::WindowType)wnode->get_attribute_int("type", WindowQtConfig::WIN_TYPE_UNKNOWN);
+		WindowQtConfig::WindowType type = (WindowQtConfig::WindowType)wnode->get_attribute_int(osd::debugger::ATTR_WINDOW_TYPE, WindowQtConfig::WIN_TYPE_UNKNOWN);
 		switch (type)
 		{
 			case WindowQtConfig::WIN_TYPE_MAIN:               xmlConfigurations.push_back(std::make_unique<MainWindowQtConfig>()); break;
@@ -119,7 +122,7 @@ void xml_configuration_save(running_machine &machine, config_type cfg_type, util
 		WindowQtConfig &config = *xmlConfigurations[i];
 
 		// Create an xml node
-		util::xml::data_node *const debugger_node = parentnode->add_child("window", nullptr);
+		util::xml::data_node *const debugger_node = parentnode->add_child(osd::debugger::NODE_WINDOW, nullptr);
 
 		// Insert the appropriate information
 		if (debugger_node)

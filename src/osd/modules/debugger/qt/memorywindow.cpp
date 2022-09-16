@@ -7,6 +7,8 @@
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 
+#include "util/xmlfile.h"
+
 #include <QtGui/QClipboard>
 #include <QtGui/QMouseEvent>
 #include <QtWidgets/QActionGroup>
@@ -76,17 +78,17 @@ MemoryWindow::MemoryWindow(running_machine &machine, QWidget *parent) :
 	// Create a data format group
 	QActionGroup *dataFormat = new QActionGroup(this);
 	dataFormat->setObjectName("dataformat");
-	QAction *formatActOne  = new QAction("1-byte hexadecimal", this);
-	QAction *formatActTwo  = new QAction("2-byte hexadecimal", this);
-	QAction *formatActFour = new QAction("4-byte hexadecimal", this);
-	QAction *formatActEight = new QAction("8-byte hexadecimal", this);
-	QAction *formatActOneOctal = new QAction("1-byte octal", this);
-	QAction *formatActTwoOctal = new QAction("2-byte octal", this);
-	QAction *formatActFourOctal = new QAction("4-byte octal", this);
-	QAction *formatActEightOctal = new QAction("8-byte octal", this);
-	QAction *formatAct32bitFloat = new QAction("32 bit floating point", this);
-	QAction *formatAct64bitFloat = new QAction("64 bit floating point", this);
-	QAction *formatAct80bitFloat = new QAction("80 bit floating point", this);
+	QAction *formatActOne  = new QAction("1-byte Chunks (Hex)", this);
+	QAction *formatActTwo  = new QAction("2-byte Chunks (Hex)", this);
+	QAction *formatActFour = new QAction("4-byte Chunks (Hex)", this);
+	QAction *formatActEight = new QAction("8-byte Chunks (Hex)", this);
+	QAction *formatActOneOctal = new QAction("1-byte Chunks (Octal)", this);
+	QAction *formatActTwoOctal = new QAction("2-byte Chunks (Octal)", this);
+	QAction *formatActFourOctal = new QAction("4-byte Chunks (Octal)", this);
+	QAction *formatActEightOctal = new QAction("8-byte Chunks (Octal)", this);
+	QAction *formatAct32bitFloat = new QAction("32-bit Floating Point", this);
+	QAction *formatAct64bitFloat = new QAction("64-bit Floating Point", this);
+	QAction *formatAct80bitFloat = new QAction("80-bit Floating Point", this);
 	formatActOne->setObjectName("formatActOne");
 	formatActTwo->setObjectName("formatActTwo");
 	formatActFour->setObjectName("formatActFour");
@@ -484,35 +486,35 @@ void MemoryWindowQtConfig::buildFromQWidget(QWidget *widget)
 
 	QActionGroup *radixGroup = window->findChild<QActionGroup*>("radixgroup");
 	if (radixGroup->checkedAction()->text() == "Hexadecimal Addresses")
-		m_addressRadix = 0;
+		m_addressRadix = 16;
 	else if (radixGroup->checkedAction()->text() == "Decimal Addresses")
-		m_addressRadix = 1;
+		m_addressRadix = 10;
 	else if (radixGroup->checkedAction()->text() == "Octal Addresses")
-		m_addressRadix = 2;
+		m_addressRadix = 8;
 
 	QActionGroup *dataFormat = window->findChild<QActionGroup*>("dataformat");
-	if (dataFormat->checkedAction()->text() == "1-byte hexadecimal")
-		m_dataFormat = 0;
-	else if (dataFormat->checkedAction()->text() == "2-byte hexadecimal")
-		m_dataFormat = 1;
-	else if (dataFormat->checkedAction()->text() == "4-byte hexadecimal")
-		m_dataFormat = 2;
-	else if (dataFormat->checkedAction()->text() == "8-byte hexadecimal")
-		m_dataFormat = 3;
-	else if (dataFormat->checkedAction()->text() == "1-byte octal")
-		m_dataFormat = 4;
-	else if (dataFormat->checkedAction()->text() == "2-byte octal")
-		m_dataFormat = 5;
-	else if (dataFormat->checkedAction()->text() == "4-byte octal")
-		m_dataFormat = 6;
-	else if (dataFormat->checkedAction()->text() == "8-byte octal")
-		m_dataFormat = 7;
-	else if (dataFormat->checkedAction()->text() == "32 bit floating point")
-		m_dataFormat = 8;
-	else if (dataFormat->checkedAction()->text() == "64 bit floating point")
-		m_dataFormat = 9;
-	else if (dataFormat->checkedAction()->text() == "80 bit floating point")
-		m_dataFormat = 10;
+	if (dataFormat->checkedAction()->text() == "1-byte Chunks (Hex)")
+		m_dataFormat = int(debug_view_memory::data_format::HEX_8BIT);
+	else if (dataFormat->checkedAction()->text() == "2-byte Chunks (Hex)")
+		m_dataFormat = int(debug_view_memory::data_format::HEX_16BIT);
+	else if (dataFormat->checkedAction()->text() == "4-byte Chunks (Hex)")
+		m_dataFormat = int(debug_view_memory::data_format::HEX_32BIT);
+	else if (dataFormat->checkedAction()->text() == "8-byte Chunks (Hex)")
+		m_dataFormat = int(debug_view_memory::data_format::HEX_64BIT);
+	else if (dataFormat->checkedAction()->text() == "1-byte Chunks (Octal)")
+		m_dataFormat = int(debug_view_memory::data_format::OCTAL_8BIT);
+	else if (dataFormat->checkedAction()->text() == "2-byte Chunks (Octal)")
+		m_dataFormat = int(debug_view_memory::data_format::OCTAL_16BIT);
+	else if (dataFormat->checkedAction()->text() == "4-byte Chunks (Octal)")
+		m_dataFormat = int(debug_view_memory::data_format::OCTAL_32BIT);
+	else if (dataFormat->checkedAction()->text() == "8-byte Chunks (Octal)")
+		m_dataFormat = int(debug_view_memory::data_format::OCTAL_64BIT);
+	else if (dataFormat->checkedAction()->text() == "32-bit floating point")
+		m_dataFormat = int(debug_view_memory::data_format::FLOAT_32BIT);
+	else if (dataFormat->checkedAction()->text() == "64-bit Floating Point")
+		m_dataFormat = int(debug_view_memory::data_format::FLOAT_64BIT);
+	else if (dataFormat->checkedAction()->text() == "80-bit Floating Point")
+		m_dataFormat = int(debug_view_memory::data_format::FLOAT_80BIT);
 }
 
 
@@ -531,30 +533,50 @@ void MemoryWindowQtConfig::applyToQWidget(QWidget *widget)
 	addressGroup->actions()[m_addressMode]->trigger();
 
 	QActionGroup *radixGroup = window->findChild<QActionGroup*>("radixgroup");
-	radixGroup->actions()[m_addressRadix]->trigger();
+	switch (m_addressRadix)
+	{
+	case 16: radixGroup->actions()[0]->trigger(); break;
+	case 10: radixGroup->actions()[1]->trigger(); break;
+	case 8: radixGroup->actions()[2]->trigger(); break;
+	default: break;
+	}
 
 	QActionGroup *dataFormat = window->findChild<QActionGroup*>("dataformat");
-	dataFormat->actions()[m_dataFormat]->trigger();
+	switch (debug_view_memory::data_format(m_dataFormat))
+	{
+	case debug_view_memory::data_format::HEX_8BIT: dataFormat->actions()[0]->trigger(); break;
+	case debug_view_memory::data_format::HEX_16BIT: dataFormat->actions()[1]->trigger(); break;
+	case debug_view_memory::data_format::HEX_32BIT: dataFormat->actions()[2]->trigger(); break;
+	case debug_view_memory::data_format::HEX_64BIT: dataFormat->actions()[3]->trigger(); break;
+	case debug_view_memory::data_format::OCTAL_8BIT: dataFormat->actions()[4]->trigger(); break;
+	case debug_view_memory::data_format::OCTAL_16BIT: dataFormat->actions()[5]->trigger(); break;
+	case debug_view_memory::data_format::OCTAL_32BIT: dataFormat->actions()[6]->trigger(); break;
+	case debug_view_memory::data_format::OCTAL_64BIT: dataFormat->actions()[7]->trigger(); break;
+	case debug_view_memory::data_format::FLOAT_32BIT: dataFormat->actions()[8]->trigger(); break;
+	case debug_view_memory::data_format::FLOAT_64BIT: dataFormat->actions()[9]->trigger(); break;
+	case debug_view_memory::data_format::FLOAT_80BIT: dataFormat->actions()[10]->trigger(); break;
+	default: break;
+	}
 }
 
 
 void MemoryWindowQtConfig::addToXmlDataNode(util::xml::data_node &node) const
 {
 	WindowQtConfig::addToXmlDataNode(node);
-	node.set_attribute_int("memoryregion", m_memoryRegion);
-	node.set_attribute_int("reverse", m_reverse);
-	node.set_attribute_int("addressmode", m_addressMode);
-	node.set_attribute_int("addressradix", m_addressRadix);
-	node.set_attribute_int("dataformat", m_dataFormat);
+	node.set_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_REGION, m_memoryRegion);
+	node.set_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_REVERSE_COLUMNS, m_reverse);
+	node.set_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_ADDRESS_MODE, m_addressMode);
+	node.set_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_ADDRESS_RADIX, m_addressRadix);
+	node.set_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_DATA_FORMAT, m_dataFormat);
 }
 
 
 void MemoryWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
 {
 	WindowQtConfig::recoverFromXmlNode(node);
-	m_memoryRegion = node.get_attribute_int("memoryregion", m_memoryRegion);
-	m_reverse = node.get_attribute_int("reverse", m_reverse);
-	m_addressMode = node.get_attribute_int("addressmode", m_addressMode);
-	m_addressRadix = node.get_attribute_int("addressradix", m_addressRadix);
-	m_dataFormat = node.get_attribute_int("dataformat", m_dataFormat);
+	m_memoryRegion = node.get_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_REGION, m_memoryRegion);
+	m_reverse = node.get_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_REVERSE_COLUMNS, m_reverse);
+	m_addressMode = node.get_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_ADDRESS_MODE, m_addressMode);
+	m_addressRadix = node.get_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_ADDRESS_RADIX, m_addressRadix);
+	m_dataFormat = node.get_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_DATA_FORMAT, m_dataFormat);
 }

@@ -8,6 +8,8 @@
 #include "debug/dvdisasm.h"
 #include "debug/points.h"
 
+#include "util/xmlfile.h"
+
 #include <QtGui/QCloseEvent>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QDockWidget>
@@ -499,7 +501,7 @@ void MainWindowQtConfig::applyToQWidget(QWidget *widget)
 void MainWindowQtConfig::addToXmlDataNode(util::xml::data_node &node) const
 {
 	WindowQtConfig::addToXmlDataNode(node);
-	node.set_attribute_int("rightbar", m_rightBar);
+	node.set_attribute_int(osd::debugger::ATTR_WINDOW_DISASSEMBLY_RIGHT_COLUMN, m_rightBar);
 	node.set_attribute("qtwindowstate", m_windowState.toPercentEncoding().data());
 }
 
@@ -509,7 +511,7 @@ void MainWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
 	WindowQtConfig::recoverFromXmlNode(node);
 	const char* state = node.get_attribute_string("qtwindowstate", "");
 	m_windowState = QByteArray::fromPercentEncoding(state);
-	m_rightBar = node.get_attribute_int("rightbar", m_rightBar);
+	m_rightBar = node.get_attribute_int(osd::debugger::ATTR_WINDOW_DISASSEMBLY_RIGHT_COLUMN, m_rightBar);
 }
 
 DasmDockWidget::~DasmDockWidget()
