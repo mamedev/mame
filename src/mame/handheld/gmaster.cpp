@@ -1,16 +1,19 @@
 // license:GPL-2.0+
 // copyright-holders:Peter Trauner
 /******************************************************************************
- PeT mess@utanet.at march 2002
+
+Hartung Game Master
+PeT mess@utanet.at march 2002
+
 ******************************************************************************/
 
 #include "emu.h"
 
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "cpu/upd7810/upd7811.h"
 #include "sound/spkrdev.h"
-
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
+#include "video/sed1520.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -21,11 +24,13 @@
 class gmaster_state : public driver_device
 {
 public:
-	gmaster_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_speaker(*this, "speaker")
-		, m_cart(*this, "cartslot")
+	gmaster_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_lcd(*this, "lcd%u", 0),
+		m_screen(*this, "screen"),
+		m_speaker(*this, "speaker"),
+		m_cart(*this, "cartslot")
 	{ }
 
 	void gmaster(machine_config &config);
@@ -35,6 +40,8 @@ protected:
 
 private:
 	required_device<upd78c11_device> m_maincpu;
+	required_device_array<sed1520_device, 2> m_lcd;
+	required_device<screen_device> m_screen;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<generic_slot_device> m_cart;
 
@@ -43,133 +50,58 @@ private:
 	void gmaster_io_w(offs_t offset, uint8_t data);
 	void gmaster_portb_w(uint8_t data);
 	void gmaster_portc_w(uint8_t data);
-	uint32_t screen_update_gmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	template<int N> SED1520_UPDATE_CB(screen_update_cb);
 
 	void gmaster_mem(address_map &map);
 
-	struct
-	{
-		uint8_t data[8] = { };
-		int index = 0;
-		int x = 0, y = 0;
-		bool mode = false; // true read does not increase address
-		bool delayed = false;
-		uint8_t pixels[8][64] = { };
-	} m_video;
-
-	uint8_t m_ports[5] = { };
 	uint8_t m_ram[0x4000] = { };
+
+	u8 m_chipsel = 0;
 };
 
 
 uint8_t gmaster_state::gmaster_io_r(offs_t offset)
 {
-	uint8_t data = 0;
+	u8 data = 0;
 
-	if (m_ports[2] & 1)
-	{
-		data = m_ram[offset];
-		logerror("%.4x external memory %.4x read %.2x\n", m_maincpu->pc(), 0x4000 + offset, data);
-	}
-	else
-	{
-		switch (offset)
-		{
-		case 1:
-			data = m_video.pixels[m_video.y][m_video.x];
-			logerror("%.4x lcd x:%.2x y:%.2x %.4x read %.2x\n", m_maincpu->pc(), m_video.x, m_video.y, 0x4000 + offset, data);
-			if (!(m_video.mode) && m_video.delayed)
-			{
-				m_video.x++;
-			}
-			m_video.delayed = true;
-			break;
-		default:
-			logerror("%.4x memory %.4x read %.2x\n", m_maincpu->pc(), 0x4000 + offset, data);
-			break;
-		}
-	}
+	// read from external RAM
+	if (m_chipsel & 1)
+		data |= m_ram[offset];
+
+	// read from LCD
+	for (int i = 0; i < 2; i++)
+		if (BIT(m_chipsel, i + 1))
+			data |= m_lcd[i]->read(offset & 1);
+
 	return data;
 }
 
-#define BLITTER_Y ((m_ports[2]&4)|(m_video.data[0]&3))
-
-
 void gmaster_state::gmaster_io_w(offs_t offset, uint8_t data)
 {
-	if (m_ports[2] & 1)
-	{
+	// write to external RAM
+	if (m_chipsel & 1)
 		m_ram[offset] = data;
-		logerror("%.4x external memory %.4x written %.2x\n", m_maincpu->pc(), 0x4000 + offset, data);
-	}
-	else
-	{
-		switch (offset)
-		{
-		case 0:
-			m_video.delayed = false;
-			logerror("%.4x lcd %.4x written %.2x\n", m_maincpu->pc(), 0x4000 + offset, data);
-			// e2 af a4 a0 a9 falling block init for both halves
-			if ((data & 0xfc) == 0xb8)
-			{
-				m_video.index = 0;
-				m_video.data[m_video.index] = data;
-				m_video.y = BLITTER_Y;
-			}
-			else if ((data & 0xc0) == 0)
-			{
-				m_video.x = data;
-			}
-			else if ((data & 0xf0) == 0xe0)
-			{
-				m_video.mode = (data & 0xe) ? false : true;
-			}
-			m_video.data[m_video.index] = data;
-			m_video.index = (m_video.index + 1) & 7;
-			break;
-		case 1:
-			m_video.delayed = false;
-			if (m_video.x < std::size(m_video.pixels[0])) // continental galaxy floodlight
-			{
-				m_video.pixels[m_video.y][m_video.x] = data;
-			}
-			logerror("%.4x lcd x:%.2x y:%.2x %.4x written %.2x\n", m_maincpu->pc(), m_video.x, m_video.y, 0x4000 + offset, data);
-			m_video.x++;
-			/* 02 b8 1a
-			02 bb 1a
-			02 bb 22
-			04 b8 12
-			04 b8 1a
-			04 b8 22
-			04 b9 12
-			04 b9 1a
-			04 b9 22
-			02 bb 12
-				4000 e0
-				rr w rr w rr w rr w rr w rr w rr w rr w
-				4000 ee
-			*/
-			break;
-		default:
-			logerror("%.4x memory %.4x written %.2x\n", m_maincpu->pc(), 0x4000 + offset, data);
-			break;
-		}
-	}
+
+	// write to LCD
+	for (int i = 0; i < 2; i++)
+		if (BIT(m_chipsel, i + 1))
+			m_lcd[i]->write(offset & 1, data);
 }
 
 
 void gmaster_state::gmaster_portb_w(uint8_t data)
 {
-	m_ports[1] = data;
-	logerror("%.4x port B written %.2x\n", m_maincpu->pc(), data);
+	// d0: ?
+	// d1: ?
 }
 
 void gmaster_state::gmaster_portc_w(uint8_t data)
 {
-	m_ports[2] = data;
-	logerror("%.4x port C written %.2x\n", m_maincpu->pc(), data);
-
-	m_video.y = BLITTER_Y;
+	// d0: RAM CS
+	// d1: LCD1 CS
+	// d2: LCD2 CS
+	m_chipsel = data & 7;
 }
 
 
@@ -211,38 +143,40 @@ void gmaster_state::gmaster_palette(palette_device &palette) const
 }
 
 
-uint32_t gmaster_state::screen_update_gmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gmaster_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int y = 0; y < std::size(m_video.pixels); y++)
-	{
-		for (int x = 0; x < std::size(m_video.pixels[0]); x++)
-		{
-			uint8_t const d = m_video.pixels[y][x];
+	u32 s0 = m_lcd[0]->screen_update(screen, bitmap, cliprect);
+	u32 s1 = m_lcd[1]->screen_update(screen, bitmap, cliprect);
+	return s0 & s1;
+}
 
-			bitmap.pix((y * 8 + 0), x) = BIT(d, 0);
-			bitmap.pix((y * 8 + 1), x) = BIT(d, 1);
-			bitmap.pix((y * 8 + 2), x) = BIT(d, 2);
-			bitmap.pix((y * 8 + 3), x) = BIT(d, 3);
-			bitmap.pix((y * 8 + 4), x) = BIT(d, 4);
-			bitmap.pix((y * 8 + 5), x) = BIT(d, 5);
-			bitmap.pix((y * 8 + 6), x) = BIT(d, 6);
-			bitmap.pix((y * 8 + 7), x) = BIT(d, 7);
+template<int N>
+SED1520_UPDATE_CB(gmaster_state::screen_update_cb)
+{
+	rectangle clip = m_screen->visible_area();
+	if (N == 1)
+		clip.min_y = 32;
+	else
+		clip.max_y = 32-1;
+	clip &= cliprect;
+
+	for (int c = 0; c < 320; c++)
+	{
+		for (int b = 0; b < 8; b++)
+		{
+			int pixel = lcd_on ? BIT(dram[c], b) : 0;
+			int x = c % 80;
+			int y = N << 5 | (c / 80) << 3 | b;
+
+			if (clip.contains(x, y))
+				bitmap.pix(y, x) = pixel;
 		}
 	}
 	return 0;
 }
 
-
 void gmaster_state::machine_start()
 {
-	save_item(NAME(m_video.data));
-	save_item(NAME(m_video.index));
-	save_item(NAME(m_video.x));
-	save_item(NAME(m_video.y));
-	save_item(NAME(m_video.mode));
-	save_item(NAME(m_video.delayed));
-	save_item(NAME(m_video.pixels));
-	save_item(NAME(m_ports));
 	save_item(NAME(m_ram));
 }
 
@@ -256,12 +190,16 @@ void gmaster_state::gmaster(machine_config &config)
 	m_maincpu->pc_out_cb().set(FUNC(gmaster_state::gmaster_portc_w));
 	m_maincpu->to_func().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(60);
-	screen.set_size(64, 64);
-	screen.set_visarea(0, 64-1-3, 0, 64-1);
-	screen.set_screen_update(FUNC(gmaster_state::screen_update_gmaster));
-	screen.set_palette("palette");
+	// video hardware
+	SED1520(config, m_lcd[0]).set_screen_update_cb(FUNC(gmaster_state::screen_update_cb<0>));
+	SED1520(config, m_lcd[1]).set_screen_update_cb(FUNC(gmaster_state::screen_update_cb<1>));
+
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(80, 64);
+	m_screen->set_visarea(0, 64-1-3, 0, 64-1);
+	m_screen->set_screen_update(FUNC(gmaster_state::screen_update));
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(gmaster_state::gmaster_palette), std::size(gmaster_pens));
 
