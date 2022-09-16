@@ -3163,6 +3163,10 @@ mwskinst                        // (c) 2000 Midway
 @source:sinclair/atm.cpp
 atm                             //
 atmtb2                          //
+atmtb2plus                      //
+
+@source:sinclair/pentevo.cpp
+pentevo                         //
 
 @source:acorn/atom.cpp
 atom                            // 1979 Acorn Atom
