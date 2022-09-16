@@ -53,7 +53,7 @@ private:
 	bool get_softlist_info(device_image_interface &img);
 
 	device_t *m_current_cpu;
-	HMENU   m_devices_menu;
+	HMENU m_devices_menu;
 	std::map<std::string,std::string> slmap;
 };
 

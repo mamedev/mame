@@ -214,6 +214,23 @@ MemoryWindow::~MemoryWindow()
 }
 
 
+void MemoryWindow::saveConfigurationToNode(util::xml::data_node &node)
+{
+	WindowQt::saveConfigurationToNode(node);
+
+	node.set_attribute_int(osd::debugger::ATTR_WINDOW_TYPE, osd::debugger::WINDOW_TYPE_MEMORY_VIEWER);
+
+	debug_view_memory &memView = *m_memTable->view<debug_view_memory>();
+	node.set_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_REGION, m_memTable->sourceIndex());
+	node.set_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_REVERSE_COLUMNS, memView.reverse() ? 1 : 0);
+	node.set_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_ADDRESS_MODE, memView.physical() ? 1 : 0);
+	node.set_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_ADDRESS_RADIX, memView.address_radix());
+	node.set_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_DATA_FORMAT, int(memView.get_data_format()));
+	node.set_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_ROW_CHUNKS, memView.chunks_per_row());
+	node.add_child(osd::debugger::NODE_WINDOW_EXPRESSION, memView.expression());
+}
+
+
 void MemoryWindow::memoryRegionChanged(int index)
 {
 	if (index < m_memTable->view()->source_count())
@@ -222,7 +239,7 @@ void MemoryWindow::memoryRegionChanged(int index)
 		m_memTable->viewport()->update();
 
 		// Update the data format radio buttons to the memory region's default
-		debug_view_memory *memView = downcast<debug_view_memory*>(m_memTable->view());
+		debug_view_memory *memView = m_memTable->view<debug_view_memory>();
 		switch (memView->get_data_format())
 		{
 		case debug_view_memory::data_format::HEX_8BIT: dataFormatMenuItem("formatActOne")->setChecked(true); break;
@@ -252,7 +269,7 @@ void MemoryWindow::memoryRegionChanged(int index)
 void MemoryWindow::expressionSubmitted()
 {
 	const QString expression = m_inputEdit->text();
-	downcast<debug_view_memory *>(m_memTable->view())->set_expression(expression.toLocal8Bit().data());
+	m_memTable->view<debug_view_memory>()->set_expression(expression.toLocal8Bit().data());
 
 	// Make the cursor pop
 	m_memTable->view()->set_cursor_visible(true);
@@ -269,7 +286,7 @@ void MemoryWindow::expressionSubmitted()
 
 void MemoryWindow::formatChanged(QAction* changedTo)
 {
-	debug_view_memory *memView = downcast<debug_view_memory*>(m_memTable->view());
+	debug_view_memory *const memView = m_memTable->view<debug_view_memory>();
 
 	if (changedTo->text() == "1-byte hexadecimal")
 		memView->set_data_format(debug_view_memory::data_format::HEX_8BIT);
@@ -300,7 +317,7 @@ void MemoryWindow::formatChanged(QAction* changedTo)
 
 void MemoryWindow::addressChanged(QAction* changedTo)
 {
-	debug_view_memory *memView = downcast<debug_view_memory *>(m_memTable->view());
+	debug_view_memory *const memView = m_memTable->view<debug_view_memory>();
 
 	if (changedTo->text() == "Logical Addresses")
 		memView->set_physical(false);
@@ -313,7 +330,7 @@ void MemoryWindow::addressChanged(QAction* changedTo)
 
 void MemoryWindow::radixChanged(QAction* changedTo)
 {
-	debug_view_memory *memView = downcast<debug_view_memory *>(m_memTable->view());
+	debug_view_memory *const memView = m_memTable->view<debug_view_memory>();
 
 	if (changedTo->text() == "Hexadecimal Addresses")
 		memView->set_address_radix(16);
@@ -328,7 +345,7 @@ void MemoryWindow::radixChanged(QAction* changedTo)
 
 void MemoryWindow::reverseChanged(bool changedTo)
 {
-	debug_view_memory *memView = downcast<debug_view_memory*>(m_memTable->view());
+	debug_view_memory *const memView = m_memTable->view<debug_view_memory>();
 	memView->set_reverse(changedTo);
 	m_memTable->viewport()->update();
 }
@@ -336,7 +353,7 @@ void MemoryWindow::reverseChanged(bool changedTo)
 
 void MemoryWindow::increaseBytesPerLine(bool changedTo)
 {
-	debug_view_memory *memView = downcast<debug_view_memory*>(m_memTable->view());
+	debug_view_memory *const memView = m_memTable->view<debug_view_memory>();
 	memView->set_chunks_per_row(memView->chunks_per_row() + 1);
 	m_memTable->viewport()->update();
 }
@@ -344,7 +361,7 @@ void MemoryWindow::increaseBytesPerLine(bool changedTo)
 
 void MemoryWindow::decreaseBytesPerLine(bool checked)
 {
-	debug_view_memory *memView = downcast<debug_view_memory *>(m_memTable->view());
+	debug_view_memory *const memView = m_memTable->view<debug_view_memory>();
 	memView->set_chunks_per_row(memView->chunks_per_row() - 1);
 	m_memTable->viewport()->update();
 }
@@ -404,7 +421,7 @@ void DebuggerMemView::addItemsToContextMenu(QMenu *menu)
 
 	if (view()->cursor_visible())
 	{
-		debug_view_memory &memView = downcast<debug_view_memory &>(*view());
+		debug_view_memory &memView = *view<debug_view_memory>();
 		debug_view_memory_source const &source = downcast<debug_view_memory_source const &>(*memView.source());
 		address_space *const addressSpace = source.space();
 		if (addressSpace)
@@ -468,55 +485,6 @@ void DebuggerMemView::copyLastPc()
 //=========================================================================
 //  MemoryWindowQtConfig
 //=========================================================================
-void MemoryWindowQtConfig::buildFromQWidget(QWidget *widget)
-{
-	WindowQtConfig::buildFromQWidget(widget);
-	MemoryWindow *window = dynamic_cast<MemoryWindow *>(widget);
-	QComboBox *memoryRegion = window->findChild<QComboBox*>("memoryregion");
-	m_memoryRegion = memoryRegion->currentIndex();
-
-	QAction *reverse = window->findChild<QAction *>("reverse");
-	m_reverse = reverse->isChecked();
-
-	QActionGroup *addressGroup = window->findChild<QActionGroup*>("addressgroup");
-	if (addressGroup->checkedAction()->text() == "Logical Addresses")
-		m_addressMode = 0;
-	else if (addressGroup->checkedAction()->text() == "Physical Addresses")
-		m_addressMode = 1;
-
-	QActionGroup *radixGroup = window->findChild<QActionGroup*>("radixgroup");
-	if (radixGroup->checkedAction()->text() == "Hexadecimal Addresses")
-		m_addressRadix = 16;
-	else if (radixGroup->checkedAction()->text() == "Decimal Addresses")
-		m_addressRadix = 10;
-	else if (radixGroup->checkedAction()->text() == "Octal Addresses")
-		m_addressRadix = 8;
-
-	QActionGroup *dataFormat = window->findChild<QActionGroup*>("dataformat");
-	if (dataFormat->checkedAction()->text() == "1-byte Chunks (Hex)")
-		m_dataFormat = int(debug_view_memory::data_format::HEX_8BIT);
-	else if (dataFormat->checkedAction()->text() == "2-byte Chunks (Hex)")
-		m_dataFormat = int(debug_view_memory::data_format::HEX_16BIT);
-	else if (dataFormat->checkedAction()->text() == "4-byte Chunks (Hex)")
-		m_dataFormat = int(debug_view_memory::data_format::HEX_32BIT);
-	else if (dataFormat->checkedAction()->text() == "8-byte Chunks (Hex)")
-		m_dataFormat = int(debug_view_memory::data_format::HEX_64BIT);
-	else if (dataFormat->checkedAction()->text() == "1-byte Chunks (Octal)")
-		m_dataFormat = int(debug_view_memory::data_format::OCTAL_8BIT);
-	else if (dataFormat->checkedAction()->text() == "2-byte Chunks (Octal)")
-		m_dataFormat = int(debug_view_memory::data_format::OCTAL_16BIT);
-	else if (dataFormat->checkedAction()->text() == "4-byte Chunks (Octal)")
-		m_dataFormat = int(debug_view_memory::data_format::OCTAL_32BIT);
-	else if (dataFormat->checkedAction()->text() == "8-byte Chunks (Octal)")
-		m_dataFormat = int(debug_view_memory::data_format::OCTAL_64BIT);
-	else if (dataFormat->checkedAction()->text() == "32-bit floating point")
-		m_dataFormat = int(debug_view_memory::data_format::FLOAT_32BIT);
-	else if (dataFormat->checkedAction()->text() == "64-bit Floating Point")
-		m_dataFormat = int(debug_view_memory::data_format::FLOAT_64BIT);
-	else if (dataFormat->checkedAction()->text() == "80-bit Floating Point")
-		m_dataFormat = int(debug_view_memory::data_format::FLOAT_80BIT);
-}
-
 
 void MemoryWindowQtConfig::applyToQWidget(QWidget *widget)
 {
@@ -557,17 +525,6 @@ void MemoryWindowQtConfig::applyToQWidget(QWidget *widget)
 	case debug_view_memory::data_format::FLOAT_80BIT: dataFormat->actions()[10]->trigger(); break;
 	default: break;
 	}
-}
-
-
-void MemoryWindowQtConfig::addToXmlDataNode(util::xml::data_node &node) const
-{
-	WindowQtConfig::addToXmlDataNode(node);
-	node.set_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_REGION, m_memoryRegion);
-	node.set_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_REVERSE_COLUMNS, m_reverse);
-	node.set_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_ADDRESS_MODE, m_addressMode);
-	node.set_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_ADDRESS_RADIX, m_addressRadix);
-	node.set_attribute_int(osd::debugger::ATTR_WINDOW_MEMORY_DATA_FORMAT, m_dataFormat);
 }
 
 

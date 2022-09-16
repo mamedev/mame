@@ -46,24 +46,21 @@ LogWindow::~LogWindow()
 }
 
 
+void LogWindow::saveConfigurationToNode(util::xml::data_node &node)
+{
+	WindowQt::saveConfigurationToNode(node);
+
+	node.set_attribute_int(osd::debugger::ATTR_WINDOW_TYPE, osd::debugger::WINDOW_TYPE_ERROR_LOG_VIEWER);
+}
+
+
 //=========================================================================
 //  LogWindowQtConfig
 //=========================================================================
-void LogWindowQtConfig::buildFromQWidget(QWidget *widget)
-{
-	WindowQtConfig::buildFromQWidget(widget);
-}
-
 
 void LogWindowQtConfig::applyToQWidget(QWidget *widget)
 {
 	WindowQtConfig::applyToQWidget(widget);
-}
-
-
-void LogWindowQtConfig::addToXmlDataNode(util::xml::data_node &node) const
-{
-	WindowQtConfig::addToXmlDataNode(node);
 }
 
 

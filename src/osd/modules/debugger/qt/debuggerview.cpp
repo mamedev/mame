@@ -51,6 +51,19 @@ DebuggerView::~DebuggerView()
 		m_machine.debug_view().free_view(*m_view);
 }
 
+
+int DebuggerView::sourceIndex() const
+{
+	if (m_view)
+	{
+		debug_view_source const *const source = m_view->source();
+		if (source)
+			return m_view->source_index(*source);
+	}
+	return -1;
+}
+
+
 void DebuggerView::paintEvent(QPaintEvent *event)
 {
 	// Tell the MAME debug view how much real estate is available

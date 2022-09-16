@@ -43,7 +43,9 @@ public:
 		m_metrics(),
 		m_waiting_for_debugger(false),
 		m_window_list(),
-		m_main_console(nullptr)
+		m_main_console(nullptr),
+		m_config(),
+		m_save_windows(true)
 	{
 	}
 
@@ -60,6 +62,9 @@ protected:
 	virtual running_machine &machine() const override { return *m_machine; }
 
 	virtual ui_metrics &metrics() const override { return *m_metrics; }
+	virtual void set_color_theme(int index) override;
+	virtual bool get_save_window_arrangement() const override { return m_save_windows; }
+	virtual void set_save_window_arrangement(bool save) override { m_save_windows = save; }
 
 	virtual bool const &waiting_for_debugger() const override { return m_waiting_for_debugger; }
 	virtual bool seq_pressed() const override;
@@ -88,6 +93,7 @@ private:
 	consolewin_info             *m_main_console;
 
 	util::xml::file::ptr m_config;
+	bool m_save_windows;
 };
 
 
@@ -191,6 +197,14 @@ void debugger_windows::debugger_update()
 }
 
 
+void debugger_windows::set_color_theme(int index)
+{
+	m_metrics->set_color_theme(index);
+	for (auto const &window : m_window_list)
+		window->redraw();
+}
+
+
 bool debugger_windows::seq_pressed() const
 {
 	input_seq const &seq = m_machine->ioport().type_seq(IPT_UI_DEBUG_BREAK);
@@ -286,7 +300,14 @@ void debugger_windows::config_load(config_type cfgtype, config_level cfglevel, u
 {
 	if (parentnode)
 	{
-		if (config_type::SYSTEM == cfgtype)
+		if (config_type::DEFAULT == cfgtype)
+		{
+			m_save_windows = 0 != parentnode->get_attribute_int(osd::debugger::ATTR_DEBUGGER_SAVE_WINDOWS, m_save_windows ? 1 : 0);
+			util::xml::data_node const *const colors = parentnode->get_child(osd::debugger::NODE_COLORS);
+			if (colors)
+				m_metrics->set_color_theme(colors->get_attribute_int(osd::debugger::ATTR_COLORS_THEME, m_metrics->get_color_theme()));
+		}
+		else if (config_type::SYSTEM == cfgtype)
 		{
 			if (m_main_console)
 			{
@@ -305,7 +326,14 @@ void debugger_windows::config_load(config_type cfgtype, config_level cfglevel, u
 
 void debugger_windows::config_save(config_type cfgtype, util::xml::data_node *parentnode)
 {
-	if (config_type::SYSTEM == cfgtype)
+	if (config_type::DEFAULT == cfgtype)
+	{
+		parentnode->set_attribute_int(osd::debugger::ATTR_DEBUGGER_SAVE_WINDOWS, m_save_windows ? 1 : 0);
+		util::xml::data_node *const colors = parentnode->add_child(osd::debugger::NODE_COLORS, nullptr);
+		if (colors)
+			colors->set_attribute_int(osd::debugger::ATTR_COLORS_THEME, m_metrics->get_color_theme());
+	}
+	else if (m_save_windows && (config_type::SYSTEM == cfgtype))
 	{
 		for (auto &info : m_window_list)
 			info->save_configuration(*parentnode);

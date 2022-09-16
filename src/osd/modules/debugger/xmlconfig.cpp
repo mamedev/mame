@@ -6,11 +6,14 @@
 namespace osd::debugger {
 
 char const *const NODE_WINDOW = "window";
+char const *const NODE_COLORS = "colors";
 
 char const *const NODE_WINDOW_SPLITS = "splits";
 char const *const NODE_WINDOW_SELECTION = "selection";
 char const *const NODE_WINDOW_SCROLL = "scroll";
 char const *const NODE_WINDOW_EXPRESSION = "expression";
+
+char const *const ATTR_DEBUGGER_SAVE_WINDOWS = "savewindows";
 
 char const *const ATTR_WINDOW_TYPE = "type";
 char const *const ATTR_WINDOW_POSITION_X = "position_x";
@@ -31,6 +34,8 @@ char const *const ATTR_WINDOW_DISASSEMBLY_RIGHT_COLUMN = "rightbar";
 char const *const ATTR_WINDOW_POINTS_TYPE = "bwtype";
 
 char const *const ATTR_WINDOW_DEVICE_TAG = "device-tag";
+
+char const *const ATTR_COLORS_THEME = "theme";
 
 char const *const ATTR_SPLITS_CONSOLE_STATE = "state";
 char const *const ATTR_SPLITS_CONSOLE_DISASSEMBLY = "disassembly";

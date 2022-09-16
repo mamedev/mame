@@ -59,6 +59,12 @@ debugwin_info::~debugwin_info()
 }
 
 
+void debugwin_info::redraw()
+{
+	RedrawWindow(m_wnd, nullptr, nullptr, RDW_INVALIDATE | RDW_ALLCHILDREN);
+}
+
+
 void debugwin_info::destroy()
 {
 	for (int curview = 0; curview < MAX_VIEWS; curview++)

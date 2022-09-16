@@ -498,7 +498,7 @@ void debugview_info::draw_contents(HDC windc)
 		for (int iter = 0; iter < 2; iter++)
 		{
 			COLORREF fgcolor;
-			COLORREF bgcolor = RGB(0xff,0xff,0xff);
+			COLORREF bgcolor = metrics().view_colors(DCA_NORMAL).second;
 			HBRUSH bgbrush = nullptr;
 			int last_attrib = -1;
 			TCHAR buffer[256];
@@ -522,20 +522,8 @@ void debugview_info::draw_contents(HDC windc)
 				{
 					COLORREF oldbg = bgcolor;
 
-					// pick new background color
-					bgcolor = RGB(0xff,0xff,0xff);
-					if (viewdata[col].attrib & DCA_VISITED) bgcolor = RGB(0xc6, 0xe2, 0xff);
-					if (viewdata[col].attrib & DCA_ANCILLARY) bgcolor = RGB(0xe0,0xe0,0xe0);
-					if (viewdata[col].attrib & DCA_SELECTED) bgcolor = RGB(0xff,0x80,0x80);
-					if (viewdata[col].attrib & DCA_CURRENT) bgcolor = RGB(0xff,0xff,0x00);
-					if ((viewdata[col].attrib & DCA_SELECTED) && (viewdata[col].attrib & DCA_CURRENT)) bgcolor = RGB(0xff,0xc0,0x80);
-
-					// pick new foreground color
-					fgcolor = RGB(0x00,0x00,0x00);
-					if (viewdata[col].attrib & DCA_CHANGED) fgcolor = RGB(0xff,0x00,0x00);
-					if (viewdata[col].attrib & DCA_INVALID) fgcolor = RGB(0x00,0x00,0xff);
-					if (viewdata[col].attrib & DCA_DISABLED) fgcolor = RGB((GetRValue(fgcolor) + GetRValue(bgcolor)) / 2, (GetGValue(fgcolor) + GetGValue(bgcolor)) / 2, (GetBValue(fgcolor) + GetBValue(bgcolor)) / 2);
-					if (viewdata[col].attrib & DCA_COMMENT) fgcolor = RGB(0x00,0x80,0x00);
+					// pick new colors
+					std::tie(fgcolor, bgcolor) = metrics().view_colors(viewdata[col].attrib);
 
 					// flush any pending drawing
 					if (count > 0)
@@ -546,7 +534,7 @@ void debugview_info::draw_contents(HDC windc)
 							FillRect(dc, &bounds, bgbrush);
 							if (do_filldown)
 							{
-								COLORREF const filldown = (last_attrib & DCA_ANCILLARY) ? RGB(0xe0,0xe0,0xe0) : RGB(0xff,0xff,0xff);
+								COLORREF const filldown = metrics().view_colors(last_attrib & DCA_ANCILLARY).second;
 								if (oldbg != filldown)
 								{
 									DeleteObject(bgbrush);
@@ -593,7 +581,7 @@ void debugview_info::draw_contents(HDC windc)
 				FillRect(dc, &bounds, bgbrush);
 				if (do_filldown)
 				{
-					COLORREF const filldown = (last_attrib & DCA_ANCILLARY) ? RGB(0xe0,0xe0,0xe0) : RGB(0xff,0xff,0xff);
+					COLORREF const filldown = metrics().view_colors(last_attrib & DCA_ANCILLARY).second;
 					if (bgcolor != filldown)
 					{
 						DeleteObject(bgbrush);

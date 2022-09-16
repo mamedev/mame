@@ -29,6 +29,17 @@ DeviceInformationWindow::~DeviceInformationWindow()
 {
 }
 
+
+void DeviceInformationWindow::saveConfigurationToNode(util::xml::data_node &node)
+{
+	WindowQt::saveConfigurationToNode(node);
+
+	node.set_attribute_int(osd::debugger::ATTR_WINDOW_TYPE, osd::debugger::WINDOW_TYPE_DEVICE_INFO_VIEWER);
+
+	node.set_attribute(osd::debugger::ATTR_WINDOW_DEVICE_TAG, m_device->tag());
+}
+
+
 void DeviceInformationWindow::fill_device_information()
 {
 	setWindowTitle(util::string_format("Debug: Device %s", m_device->tag()).c_str());
@@ -101,35 +112,16 @@ void DeviceInformationWindow::set_device(const char *tag)
 	fill_device_information();
 }
 
-const char *DeviceInformationWindow::device_tag() const
-{
-	return m_device->tag();
-}
-
 
 //=========================================================================
 //  DeviceInformationWindowQtConfig
 //=========================================================================
-void DeviceInformationWindowQtConfig::buildFromQWidget(QWidget *widget)
-{
-	WindowQtConfig::buildFromQWidget(widget);
-	DeviceInformationWindow *window = dynamic_cast<DeviceInformationWindow *>(widget);
-	m_device_tag = window->device_tag();
-}
-
 
 void DeviceInformationWindowQtConfig::applyToQWidget(QWidget *widget)
 {
 	WindowQtConfig::applyToQWidget(widget);
 	DeviceInformationWindow *window = dynamic_cast<DeviceInformationWindow *>(widget);
 	window->set_device(m_device_tag.c_str());
-}
-
-
-void DeviceInformationWindowQtConfig::addToXmlDataNode(util::xml::data_node &node) const
-{
-	WindowQtConfig::addToXmlDataNode(node);
-	node.set_attribute(osd::debugger::ATTR_WINDOW_DEVICE_TAG, m_device_tag.c_str());
 }
 
 
