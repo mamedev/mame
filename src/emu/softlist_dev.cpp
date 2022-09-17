@@ -250,7 +250,7 @@ void software_list_device::display_matches(const machine_config &config, const c
 //  from an intermediate point
 //-------------------------------------------------
 
-const software_info *software_list_device::find(const std::string &look_for)
+const software_info *software_list_device::find(std::string_view look_for)
 {
 	// empty search returns nothing
 	if (look_for.empty())
