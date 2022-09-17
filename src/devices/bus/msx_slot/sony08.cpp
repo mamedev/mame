@@ -21,11 +21,6 @@ msx_slot_sony08_device::msx_slot_sony08_device(const machine_config &mconfig, co
 	, m_region_offset(0)
 	, m_rom(nullptr)
 {
-	for (int i = 0; i < 8; i++)
-	{
-		m_selected_bank[i] = 0;
-		m_bank_base[i] = nullptr;
-	}
 }
 
 
@@ -50,6 +45,11 @@ void msx_slot_sony08_device::device_start()
 
 	save_item(NAME(m_selected_bank));
 
+	for (int i = 0; i < 8; i++)
+	{
+		m_selected_bank[i] = 0;
+		m_bank_base[i] = nullptr;
+	}
 	restore_banks();
 }
 
