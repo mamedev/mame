@@ -9,7 +9,7 @@ Hardware notes:
 - NEC D78C11AGF (4KB internal ROM), 12.00MHz XTAL
 - ?KB external RAM, cartridge slot for external ROM
 - 2*LCDC hiding under epoxy, appears to be SED1520
-- 61*64 LCD screen
+- 61*64 1bpp LCD screen (the odd width is correct)
 - 1-bit sound
 
 Known releases:
@@ -100,8 +100,8 @@ void gmaster_state::machine_start()
 
 void gmaster_state::palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(0x80, 0x8c, 0x8c)); // LCD background
-	palette.set_pen_color(1, rgb_t(0x1c, 0x20, 0x20)); // pixel
+	palette.set_pen_color(0, rgb_t(0x88, 0x98, 0x90)); // LCD background
+	palette.set_pen_color(1, rgb_t(0x1c, 0x20, 0x24)); // pixel
 };
 
 
@@ -210,8 +210,8 @@ static INPUT_PORTS_START( gmaster )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) // B
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) // A
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SELECT )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START )
 INPUT_PORTS_END
