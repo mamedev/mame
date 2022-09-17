@@ -11005,50 +11005,50 @@ COMP(1984, canonv10,   canonv20, 0,     canonv10,   msx,      msx_state, empty_i
 COMP(1984, canonv20,   0,        0,     canonv20,   msx,      msx_state, empty_init, "Canon", "V-20 (Japan) (MSX1)", 0)
 COMP(1985, canonv20e,  canonv20, 0,     canonv20e,  msx,      msx_state, empty_init, "Canon", "V-20E (UK) (MSX1)", 0) // Different Euro keyboard layout?
 COMP(1985, canonv20f,  canonv20, 0,     canonv20e,  msx,      msx_state, empty_init, "Canon", "V-20F (France) (MSX1)", 0) // Different French keyboard layout?
-COMP(1985, canonv20g,  canonv20, 0,     canonv20e,  msx,      msx_state, empty_init, "Canon", "V-20G (MSX1)", 0) // Different German keyboard layout?
-COMP(1985, canonv20s,  canonv20, 0,     canonv20e,  msx,      msx_state, empty_init, "Canon", "V-20S (MSX1)", 0) // Different Spanish keyboard layout?
+COMP(198?, canonv20g,  canonv20, 0,     canonv20e,  msx,      msx_state, empty_init, "Canon", "V-20G (MSX1)", 0) // Different German keyboard layout?
+COMP(198?, canonv20s,  canonv20, 0,     canonv20e,  msx,      msx_state, empty_init, "Canon", "V-20S (MSX1)", 0) // Different Spanish keyboard layout?
 COMP(1985, mx10,       mx15,     0,     mx10,       msx,      msx_state, empty_init, "Casio", "MX-10 (Japan) (MSX1)", 0)
 COMP(1987, mx101,      mx15,     0,     mx101,      msx,      msx_state, empty_init, "Casio", "MX-101 (Japan) (MSX1)", 0)
 COMP(1986, mx15,       0,        0,     mx15,       msx,      msx_state, empty_init, "Casio", "MX-15 (International) (MSX1)", 0)
 COMP(1984, pv7,        pv16,     0,     pv7,        msx,      msx_state, empty_init, "Casio", "PV-7 (Japan) (MSX1)", 0)
 COMP(1985, pv16,       0,        0,     pv16,       msx,      msx_state, empty_init, "Casio", "PV-16 (Japan) (MSX1)", 0)
-COMP(198?, cpc88,      0,        0,     cpc88,      msxkr,    msx_state, empty_init, "Daewoo", "CPC-88 (Korea) (MSX1)", 0)
+COMP(1984, cpc88,      0,        0,     cpc88,      msxkr,    msx_state, empty_init, "Daewoo", "CPC-88 (Korea) (MSX1)", 0)
 COMP(1984, dpc100,     dpc200,   0,     dpc100,     msxkr,    msx_state, empty_init, "Daewoo", "IQ-1000 DPC-100 (Korea) (MSX1)", 0)
 COMP(1984, dpc180,     dpc200,   0,     dpc180,     msxkr,    msx_state, empty_init, "Daewoo", "IQ-1000 DPC-180 (Korea) (MSX1)", 0)
 COMP(1984, dpc200,     0,        0,     dpc200,     msxkr,    msx_state, empty_init, "Daewoo", "IQ-1000 DPC-200 (Korea) (MSX1)", 0)
-COMP(1985, dpc200e,    0,        0,     dpc200e,    msx,      msx_state, empty_init, "Daewoo", "DPC-200E (Belgium, French) (MSX1)", 0)
-COMP(1983, cpc50a,     cpc51,    0,     cpc50a,     msxkr,    msx_state, empty_init, "Daewoo", "Zemmix CPC-50A (Korea) (MSX1)", 0)
-COMP(1983, cpc50b,     cpc51,    0,     cpc50b,     msxkr,    msx_state, empty_init, "Daewoo", "Zemmix CPC-50B (Korea) (MSX1)", 0)
-COMP(1986, cpc51,      0,        0,     cpc51,      msxkr,    msx_state, empty_init, "Daewoo", "Zemmix CPC-51 (Korea) (MSX1)", 0)
+COMP(1985, dpc200e,    0,        0,     dpc200e,    msx,      msx_state, empty_init, "Daewoo", "DPC-200E (French) (MSX1)", 0)
+COMP(1986, cpc50a,     cpc51,    0,     cpc50a,     msxkr,    msx_state, empty_init, "Daewoo", "Zemmix CPC-50A (Korea) (MSX1)", 0)
+COMP(1987, cpc50b,     cpc51,    0,     cpc50b,     msxkr,    msx_state, empty_init, "Daewoo", "Zemmix CPC-50B (Korea) (MSX1)", 0)
+COMP(1988, cpc51,      0,        0,     cpc51,      msxkr,    msx_state, empty_init, "Daewoo", "Zemmix CPC-51 (Korea) (MSX1)", 0)
 COMP(1985, dgnmsx,     0,        0,     dgnmsx,     msx,      msx_state, empty_init, "Eurohard S.A.", "Dragon MSX-64 (Spain) (MSX1)", 0)
-COMP(1983, fdpc200,    0,        0,     fdpc200,    msx,      msx_state, empty_init, "Fenner", "DPC-200 (Italy) (MSX1)", 0)
-COMP(1984, fpc500,     0,        0,     fpc500,     msx,      msx_state, empty_init, "Fenner", "FPC-500 (Italy) (MSX1)", 0)
-COMP(1986, fspc800,    0,        0,     fspc800,    msx,      msx_state, empty_init, "Fenner", "SPC-800 (Italy) (MSX1)", 0)
-COMP(1984, bruc100,    0,        0,     bruc100,    msx,      bruc100_state, empty_init, "Frael", "Bruc 100-1 (Italy) (MSX1)", 0)
-COMP(1984, bruc100a,   bruc100,  0,     bruc100a,   msx,      bruc100_state, empty_init, "Frael", "Bruc 100-2 (Italy) (MSX1)", 0)
+COMP(1985, fdpc200,    0,        0,     fdpc200,    msx,      msx_state, empty_init, "Fenner", "DPC-200 (Italy) (MSX1)", 0)
+COMP(1985, fpc500,     0,        0,     fpc500,     msx,      msx_state, empty_init, "Fenner", "FPC-500 (Italy) (MSX1)", 0)
+COMP(1984, fspc800,    0,        0,     fspc800,    msx,      msx_state, empty_init, "Fenner", "SPC-800 (Italy) (MSX1)", 0)
+COMP(1987, bruc100,    0,        0,     bruc100,    msx,      bruc100_state, empty_init, "Frael", "Bruc 100-1 (Italy) (MSX1)", 0)
+COMP(1988, bruc100a,   bruc100,  0,     bruc100a,   msx,      bruc100_state, empty_init, "Frael", "Bruc 100-2 (Italy) (MSX1)", 0)
 COMP(1983, fmx,        0,        0,     fmx,        msxjp,    msx_state, empty_init, "Fujitsu", "FM-X (Japan) (MSX1)", 0)
 COMP(1984, gsfc80u,    0,        0,     gsfc80u,    msxkr,    msx_state, empty_init, "Goldstar", "FC-80U (Korea) (MSX1)", 0)
-COMP(1983, gsfc200,    0,        0,     gsfc200,    msx,      msx_state, empty_init, "Goldstar", "FC-200 (Europe) (MSX1)", 0)
+COMP(1984, gsfc200,    0,        0,     gsfc200,    msx,      msx_state, empty_init, "Goldstar", "FC-200 (Europe) (MSX1)", 0)
 COMP(1985, gfc1080,    0,        0,     gfc1080,    msxkr,    msx_state, empty_init, "Goldstar", "GFC-1080 (Koera) (MSX1)", 0)
 COMP(1985, gfc1080a,   0,        0,     gfc1080a,   msxkr,    msx_state, empty_init, "Goldstar", "GFC-1080A (Korea) (MSX1)", 0)
-COMP(1983, expert10,   expert13, 0,     expert10,   expert10, msx_state, empty_init, "Gradiente", "Expert XP-800 (1.0) (Brazil) (MSX1)", 0)
-COMP(1984, expert11,   expert13, 0,     expert11,   expert11, msx_state, empty_init, "Gradiente", "Expert XP-800 (1.1) / Expert GPC-1 (Brazil) (MSX1)", 0)
-COMP(1984, expert13,   0,        0,     expert13,   expert11, msx_state, empty_init, "Gradiente", "Expert 1.3 (Brazil) (MSX1)", 0)
-COMP(1985, expertdp,   0,        0,     expertdp,   expert11, msx_state, empty_init, "Gradiente", "Expert DDPlus (Brazil) (MSX1)", 0)
-COMP(1984, expertpl,   0,        0,     expertpl,   expert11, msx_state, empty_init, "Gradiente", "Expert Plus (Brazil) (MSX1)", 0)
+COMP(1985, expert10,   expert13, 0,     expert10,   expert10, msx_state, empty_init, "Gradiente", "Expert XP-800 (1.0) (Brazil) (MSX1)", 0)
+COMP(198?, expert11,   expert13, 0,     expert11,   expert11, msx_state, empty_init, "Gradiente", "Expert XP-800 (1.1) / Expert GPC-1 (Brazil) (MSX1)", 0)
+COMP(198?, expert13,   0,        0,     expert13,   expert11, msx_state, empty_init, "Gradiente", "Expert 1.3 (Brazil) (MSX1)", 0)
+COMP(1989, expertdp,   0,        0,     expertdp,   expert11, msx_state, empty_init, "Gradiente", "Expert DDPlus (Brazil) (MSX1)", 0)
+COMP(1989, expertpl,   0,        0,     expertpl,   expert11, msx_state, empty_init, "Gradiente", "Expert Plus (Brazil) (MSX1)", 0)
 COMP(1983, mbh1,       0,        0,     mbh1,       msxjp,    msx_state, empty_init, "Hitachi", "MB-H1 (Japan) (MSX1)", 0)
 COMP(1984, mbh1e,      mbh1,     0,     mbh1e,      msxjp,    msx_state, empty_init, "Hitachi", "MB-H1E (Japan) (MSX1)", 0)
 COMP(1984, mbh2,       0,        0,     mbh2,       msxjp,    msx_state, empty_init, "Hitachi", "MB-H2 (Japan) (MSX1)", 0)
-COMP(1984, mbh25,      0,        0,     mbh25,      msxjp,    msx_state, empty_init, "Hitachi", "MB-H25 (Japan) (MSX1)", 0)
-COMP(1983, mbh50,      0,        0,     mbh50,      msxjp,    msx_state, empty_init, "Hitachi", "MB-H50 (Japan) (MSX1)", 0)
-COMP(1983, jvchc7gb,   0,        0,     jvchc7gb,   msx,      msx_state, empty_init, "JVC", "HC-7E / HC-7GB (Europe) (MSX1)", 0)
+COMP(1988, mbh25,      0,        0,     mbh25,      msxjp,    msx_state, empty_init, "Hitachi", "MB-H25 (Japan) (MSX1)", 0)
+COMP(1986, mbh50,      0,        0,     mbh50,      msxjp,    msx_state, empty_init, "Hitachi", "MB-H50 (Japan) (MSX1)", 0)
+COMP(1985, jvchc7gb,   0,        0,     jvchc7gb,   msx,      msx_state, empty_init, "JVC", "HC-7E / HC-7GB (Europe) (MSX1)", 0)
 COMP(1983, ml8000,     0,        0,     ml8000,     msx,      msx_state, empty_init, "Mitsubishi", "ML-8000 (Japan) (MSX1)", 0)
 COMP(1984, mlf48,      0,        0,     mlf48,      msx,      msx_state, empty_init, "Mitsubishi", "ML-F48 (UK) (MSX1)", 0)
-COMP(1983, mlf80,      0,        0,     mlf80,      msx,      msx_state, empty_init, "Mitsubishi", "ML-F80 (UK) (MSX1)", 0)
+COMP(1984, mlf80,      0,        0,     mlf80,      msx,      msx_state, empty_init, "Mitsubishi", "ML-F80 (UK) (MSX1)", 0)
 COMP(1984, mlf110,     0,        0,     mlf110,     msxjp,    msx_state, empty_init, "Mitsubishi", "ML-F110 (Japan) (MSX1)", 0)
 COMP(1984, mlf120,     0,        0,     mlf120,     msxjp,    msx_state, empty_init, "Mitsubishi", "ML-F120 (Japan) (MSX1)", 0)
-COMP(1983, mlfx1,      0,        0,     mlfx1,      msx,      msx_state, empty_init, "Mitsubishi", "ML-FX1 (Spain) (MSX1)", 0)
-COMP(1984, cf1200,     0,        0,     cf1200,     msxjp,    msx_state, empty_init, "National / Matsushita", "CF-1200 (Japan) (MSX1)", 0)
+COMP(1986, mlfx1,      0,        0,     mlfx1,      msx,      msx_state, empty_init, "Mitsubishi", "ML-FX1 (Spain) (MSX1)", 0)
+COMP(1985, cf1200,     0,        0,     cf1200,     msxjp,    msx_state, empty_init, "National / Matsushita", "CF-1200 (Japan) (MSX1)", 0)
 COMP(1983, cf2000,     0,        0,     cf2000,     msxjp,    msx_state, empty_init, "National / Matsushita", "CF-2000 (Japan) (MSX1)", 0)
 COMP(1984, cf2700,     0,        0,     cf2700,     msxjp,    msx_state, empty_init, "National / Matsushita", "CF-2700 (Japan) (MSX1)", 0)
 COMP(1984, cf3000,     0,        0,     cf3000,     msxjp,    msx_state, empty_init, "National / Matsushita", "CF-3000 (Japan) (MSX1)", 0)
@@ -11056,22 +11056,22 @@ COMP(1985, cf3300,     0,        0,     cf3300,     msxjp,    msx_state, empty_i
 COMP(1985, fs1300,     0,        0,     fs1300,     msxjp,    msx_state, empty_init, "National / Matsushita", "FS-1300 (Japan) (MSX1)", 0)
 COMP(1985, fs4000,     0,        0,     fs4000,     msxjp,    msx_state, empty_init, "National / Matsushita", "FS-4000 (Japan) (MSX1)", 0)
 COMP(1985, fs4000a,    fs4000,   0,     fs4000a,    msxjp,    msx_state, empty_init, "National / Matsushita", "FS-4000 (alt) (Japan) (MSX1)", 0)
-COMP(1983, phc2,       0,        0,     phc2,       msx,      msx_state, empty_init, "Olympia", "PHC-2 (France) (MSX1)" , 0)
+COMP(1985, phc2,       0,        0,     phc2,       msx,      msx_state, empty_init, "Olympia", "PHC-2 (France) (MSX1)" , 0)
 COMP(1984, phc28,      0,        0,     phc28,      msx,      msx_state, empty_init, "Olympia", "PHC-28 (France) (MSX1)", 0)
 // should be german layout
-COMP(1984, cf2700g,    0,        0,     cf2700g,    msx,      msx_state, empty_init, "Panasonic", "CF-2700 (Germany) (MSX1)", 0)
+COMP(1985, cf2700g,    cf2700uk, 0,     cf2700g,    msx,      msx_state, empty_init, "Panasonic", "CF-2700 (Germany) (MSX1)", 0)
 // should be qwerty with pound
-COMP(1984, cf2700uk,   0,        0,     cf2700uk,   msx,      msx_state, empty_init, "Panasonic", "CF-2700 (UK) (MSX1)", 0)
-COMP(1983, nms801,     0,        0,     nms801,     msx,      msx_state, empty_init, "Philips", "NMS-801 (Italy) (MSX1)", 0)
+COMP(1985, cf2700uk,   0,        0,     cf2700uk,   msx,      msx_state, empty_init, "Panasonic", "CF-2700 (UK) (MSX1)", 0)
+COMP(1989, nms801,     0,        0,     nms801,     msx,      msx_state, empty_init, "Philips", "NMS-801 (Italy) (MSX1)", 0)
 COMP(1984, vg8000,     vg8010,   0,     vg8000,     msx,      msx_state, empty_init, "Philips", "VG-8000 (Europe) (MSX1)", 0)
-COMP(1984, vg8010,     0,        0,     vg8010,     msx,      msx_state, empty_init, "Philips", "VG-8010 / VG-8010/00 (Europe) (MSX1)", 0)
-COMP(1984, vg8010f,    vg8010,   0,     vg8010f,    msx,      msx_state, empty_init, "Philips", "VG-8010F / VG-8010/19 (French) (MSX1)" , 0)
+COMP(1985, vg8010,     0,        0,     vg8010,     msx,      msx_state, empty_init, "Philips", "VG-8010 / VG-8010/00 (Europe) (MSX1)", 0)
+COMP(1985, vg8010f,    vg8010,   0,     vg8010f,    msx,      msx_state, empty_init, "Philips", "VG-8010F / VG-8010/19 (French) (MSX1)" , 0)
 COMP(1985, vg802000,   vg802020, 0,     vg802000,   msx,      msx_state, empty_init, "Philips", "VG-8020/00 (Europe) (MSX1)", 0)
 COMP(1985, vg8020f,    vg802020, 0,     vg8020f,    msx,      msx_state, empty_init, "Philips", "VG-8020/19 / VG-8020F (French) (MSX1)", 0)
 COMP(1985, vg802020,   0,        0,     vg802020,   msx,      msx_state, empty_init, "Philips", "VG-8020/20 (Europe) (MSX1)", 0)
-COMP(1985, piopx7,     0,        0,     piopx7,     msx,      msx_state, empty_init, "Pioneer", "PX-07 Palcom (Japan) (MSX1)", 0)
+COMP(1984, piopx7,     0,        0,     piopx7,     msx,      msx_state, empty_init, "Pioneer", "PX-07 Palcom (Japan) (MSX1)", 0)
 COMP(1985, piopx7uk,   piopx7,   0,     piopx7uk,   msx,      msx_state, empty_init, "Pioneer", "PX-07UK Palcom (UK) (MSX1)", 0)
-COMP(1984, piopxv60,   piopx7,   0,     piopxv60,   msxjp,    msx_state, empty_init, "Pioneer", "PX-V60 (Japan) (MSX1)", 0)
+COMP(1986, piopxv60,   piopx7,   0,     piopxv60,   msxjp,    msx_state, empty_init, "Pioneer", "PX-V60 (Japan) (MSX1)", 0)
 COMP(1986, ax150,      0,        0,     ax150,      msx,      msx_state, empty_init, "Sakhr", "AX-150 (Arabic) (MSX1)", 0)
 COMP(1986, ax170,      0,        0,     ax170,      msx,      msx_state, empty_init, "Sakhr", "AX-170 (Arabic) (MSX1)", 0)
 COMP(1986, ax200,      0,        0,     ax200,      msx,      msx1_v9938_state, empty_init, "Sakhr", "AX-200 (Arabic/English) (MSX1)", 0)
@@ -11081,38 +11081,38 @@ COMP(1984, spc800,     0,        0,     spc800,     msx,      msx_state, empty_i
 COMP(1983, mpc10,      0,        0,     mpc10,      msx,      msx_state, empty_init, "Sanyo", "MPC-10 / Wavy 10 (Japan) (MSX1)", 0)
 COMP(1985, mpc64,      0,        0,     mpc64,      msxjp,    msx_state, empty_init, "Sanyo", "MPC-64 (Germany) (MSX1)", 0)
 COMP(1985, mpc100,     0,        0,     mpc100,     msx,      msx_state, empty_init, "Sanyo", "MPC-100 (UK) (MSX1)", 0)
-COMP(1983, mpc200,     0,        0,     mpc200,     msx,      msx_state, empty_init, "Sanyo", "MPC-200 (MSX1)", 0) // Is this the same as MPC-200SP ?
-COMP(1983, mpc200sp,   mpc200,   0,     mpc200sp,   msx,      msx_state, empty_init, "Sanyo", "MPC-200SP (Spain) (MSX1)", 0) // Spanish keyboard?
-COMP(1983, phc28l,     0,        0,     phc28l,     msx,      msx_state, empty_init, "Sanyo", "PHC-28L (France) (MSX1)", 0)
-COMP(1983, phc28s,     0,        0,     phc28s,     msx,      msx_state, empty_init, "Sanyo", "PHC-28S (France) (MSX1)", 0)
+COMP(1985, mpc200,     0,        0,     mpc200,     msx,      msx_state, empty_init, "Sanyo", "MPC-200 (MSX1)", 0) // Is this the same as MPC-200SP ?
+COMP(1985, mpc200sp,   mpc200,   0,     mpc200sp,   msx,      msx_state, empty_init, "Sanyo", "MPC-200SP (Spain) (MSX1)", 0) // Spanish keyboard?
+COMP(1985, phc28l,     0,        0,     phc28l,     msx,      msx_state, empty_init, "Sanyo", "PHC-28L (France) (MSX1)", 0)
+COMP(1984, phc28s,     0,        0,     phc28s,     msx,      msx_state, empty_init, "Sanyo", "PHC-28S (France) (MSX1)", 0)
 COMP(1985, hb8000,     0,        0,     hb8000,     hotbit,   msx_state, empty_init, "Sharp / Epcom", "HB-8000 (Hotbit) (Brazil) (MSX1)", 0)
-COMP(1985, hotbi13b,   hotbi13p, 0,     hotbi13b,   hotbit,   msx_state, empty_init, "Sharp / Epcom", "HB-8000 Hotbit 1.3b (Brazil) (MSX1)", 0)
-COMP(1985, hotbi13p,   0,        0,     hotbi13p,   hotbit,   msx_state, empty_init, "Sharp / Epcom", "HB-8000 Hotbit 1.3p (Brazil) (MSX1)", 0)
+COMP(198?, hotbi13b,   hotbi13p, 0,     hotbi13b,   hotbit,   msx_state, empty_init, "Sharp / Epcom", "HB-8000 Hotbit 1.3b (Brazil) (MSX1)", 0)
+COMP(198?, hotbi13p,   0,        0,     hotbi13p,   hotbit,   msx_state, empty_init, "Sharp / Epcom", "HB-8000 Hotbit 1.3p (Brazil) (MSX1)", 0)
 COMP(1985, hb10,       hb10p,    0,     hb10,       msxjp,    msx_state, empty_init, "Sony", "HB-10 (Japan) (MSX1)", 0)
 COMP(1986, hb10p,      0,        0,     hb10p,      msx,      msx_state, empty_init, "Sony", "HB-10P (Netherlands, Spain) (MSX1)", 0)
 COMP(1984, hb101,      hb101p,   0,     hb101,      msx,      msx_state, empty_init, "Sony", "HB-101 (Japan) (MSX1)", 0)
 COMP(1984, hb101p,     0,        0,     hb101p,     msx,      msx_state, empty_init, "Sony", "HB-101P (Europe) (MSX1)", 0)
-COMP(1985, hb20p,      0,        0,     hb20p,      msx,      msx_state, empty_init, "Sony", "HB-20P (Spain) (MSX1)", 0)
+COMP(1986, hb20p,      0,        0,     hb20p,      msx,      msx_state, empty_init, "Sony", "HB-20P (Spain) (MSX1)", 0)
 COMP(1985, hb201,      hb201p,   0,     hb201,      msxjp,    msx_state, empty_init, "Sony", "HB-201 (Japan) (MSX1)", 0)
 COMP(1985, hb201p,     0,        0,     hb201p,     msx,      msx_state, empty_init, "Sony", "HB-201P (Europe) (MSX1)", 0)
 COMP(1984, hb501p,     0,        0,     hb501p,     msx,      msx_state, empty_init, "Sony", "HB-501P (Europe) (MSX1)", 0)
 COMP(1983, hb55,       hb55p,    0,     hb55,       msxjp,    msx_state, empty_init, "Sony", "HB-55 (Japan) (MSX1)", 0)
-COMP(1983, hb55d,      hb55p,    0,     hb55d,      msx,      msx_state, empty_init, "Sony", "HB-55D (Germany) (MSX1)", 0)
-COMP(1983, hb55p,      0,        0,     hb55p,      msx,      msx_state, empty_init, "Sony", "HB-55P (Europe) (MSX1)", 0)
+COMP(1984, hb55d,      hb55p,    0,     hb55d,      msx,      msx_state, empty_init, "Sony", "HB-55D (Germany) (MSX1)", 0)
+COMP(1984, hb55p,      0,        0,     hb55p,      msx,      msx_state, empty_init, "Sony", "HB-55P (Europe) (MSX1)", 0)
 COMP(1984, hb701fd,    0,        0,     hb701fd,    msxjp,    msx_state, empty_init, "Sony", "HB-701FD (Japan) (MSX1)", 0)
-COMP(1983, hb75,       hb75p,    0,     hb75,       msx,      msx_state, empty_init, "Sony", "HB-75 (Japan) (MSX1)", 0)
-COMP(1983, hb75d,      hb75p,    0,     hb75d,      msx,      msx_state, empty_init, "Sony", "HB-75D (Germany) (MSX1)", 0)
-COMP(1983, hb75p,      0,        0,     hb75p,      msx,      msx_state, empty_init, "Sony", "HB-75P (Europe) (MSX1)", 0)
-COMP(1985, svi728,     0,        0,     svi728,     msx,      msx_state, empty_init, "Spectravideo", "SVI-728 (International) (MSX1)", 0)
-COMP(1985, svi728es,   svi728,   0,     svi728,     msx,      msx_state, empty_init, "Spectravideo", "SVI-728 (Spanish) (MSX1)", 0)
+COMP(1984, hb75,       hb75p,    0,     hb75,       msx,      msx_state, empty_init, "Sony", "HB-75 (Japan) (MSX1)", 0)
+COMP(1984, hb75d,      hb75p,    0,     hb75d,      msx,      msx_state, empty_init, "Sony", "HB-75D (Germany) (MSX1)", 0)
+COMP(1984, hb75p,      0,        0,     hb75p,      msx,      msx_state, empty_init, "Sony", "HB-75P (Europe) (MSX1)", 0)
+COMP(1984, svi728,     0,        0,     svi728,     msx,      msx_state, empty_init, "Spectravideo", "SVI-728 (International) (MSX1)", 0)
+COMP(1984, svi728es,   svi728,   0,     svi728,     msx,      msx_state, empty_init, "Spectravideo", "SVI-728 (Spanish) (MSX1)", 0)
 COMP(1985, svi738,     0,        0,     svi738,     msx,      msx1_v9938_state, empty_init, "Spectravideo", "SVI-738 (International) (MSX1)", 0)
-COMP(1983, svi738ar,   svi738,   0,     svi738ar,   msx,      msx1_v9938_state, empty_init, "Spectravideo", "SVI-738 (Arabic) (MSX1)", 0)
-COMP(1983, svi738dk,   svi738,   0,     svi738dk,   msx,      msx1_v9938_state, empty_init, "Spectravideo", "SVI-738 (Denmark, Norway) (MSX1)", 0)
-COMP(1983, svi738sp,   svi738,   0,     svi738sp,   msx,      msx1_v9938_state, empty_init, "Spectravideo", "SVI-738 (Spain) (MSX1)", 0)
-COMP(1983, svi738sw,   svi738,   0,     svi738sw,   msx,      msx1_v9938_state, empty_init, "Spectravideo", "SVI-738 (Finland, Sweden) (MSX1)", 0)
-COMP(1983, svi738pl,   svi738,   0,     svi738pl,   msx,      msx1_v9938_state, empty_init, "Spectravideo", "SVI-738 (Poland) (MSX1)", 0)
-COMP(1983, tadpc200,   dpc200,   0,     tadpc200,   msx,      msx_state, empty_init, "Talent", "DPC-200 (Argentina) (MSX1)", 0)
-COMP(1983, tadpc20a,   dpc200,   0,     tadpc20a,   msx,      msx1_v9938_state, empty_init, "Talent", "DPC-200A (Argentina) (MSX1)", 0)
+COMP(1987, svi738ar,   svi738,   0,     svi738ar,   msx,      msx1_v9938_state, empty_init, "Spectravideo", "SVI-738 (Arabic) (MSX1)", 0)
+COMP(1985, svi738dk,   svi738,   0,     svi738dk,   msx,      msx1_v9938_state, empty_init, "Spectravideo", "SVI-738 (Denmark, Norway) (MSX1)", 0)
+COMP(1985, svi738sp,   svi738,   0,     svi738sp,   msx,      msx1_v9938_state, empty_init, "Spectravideo", "SVI-738 (Spain) (MSX1)", 0)
+COMP(1985, svi738sw,   svi738,   0,     svi738sw,   msx,      msx1_v9938_state, empty_init, "Spectravideo", "SVI-738 (Finland, Sweden) (MSX1)", 0)
+COMP(1986, svi738pl,   svi738,   0,     svi738pl,   msx,      msx1_v9938_state, empty_init, "Spectravideo", "SVI-738 (Poland) (MSX1)", 0)
+COMP(1986, tadpc200,   dpc200,   0,     tadpc200,   msx,      msx_state, empty_init, "Talent", "DPC-200 (Argentina) (MSX1)", 0)
+COMP(1988, tadpc20a,   dpc200,   0,     tadpc20a,   msx,      msx1_v9938_state, empty_init, "Talent", "DPC-200A (Argentina) (MSX1)", 0)
 COMP(1984, hx10,       0,        0,     hx10,       msx,      msx_state, empty_init, "Toshiba", "HX-10 (Europe) (MSX1)", 0)
 COMP(1983, hx10d,      hx10,     0,     hx10d,      msxjp,    msx_state, empty_init, "Toshiba", "HX-10D (Japan) (MSX1)", 0)
 COMP(1984, hx10dp,     hx10,     0,     hx10dp,     msxjp,    msx_state, empty_init, "Toshiba", "HX-10DP (Japan) (MSX1)", 0)
@@ -11122,11 +11122,11 @@ COMP(1983, hx10s,      hx10,     0,     hx10s,      msx,      msx_state, empty_i
 COMP(1984, hx10sa,     hx10,     0,     hx10sa,     msxjp,    msx_state, empty_init, "Toshiba", "HX-10SA (Japan) (MSX1)", 0)
 COMP(1984, hx20,       0,        0,     hx20,       msx,      msx_state, empty_init, "Toshiba", "HX-20 (Japan) (MSX1)", 0)
 COMP(1985, hx20e,      hx20,     0,     hx20e,      msx,      msx_state, empty_init, "Toshiba", "HX-20E (Spain) (MSX1)", 0)
-COMP(1984, hx20i,      hx20,     0,     hx20i,      msx,      msx_state, empty_init, "Toshiba", "HX-20I (Italy) (MSX1)", 0)
+COMP(1985, hx20i,      hx20,     0,     hx20i,      msx,      msx_state, empty_init, "Toshiba", "HX-20I (Italy) (MSX1)", 0)
 COMP(1984, hx21,       0,        0,     hx21,       msxjp,    msx_state, empty_init, "Toshiba", "HX-21 (Japan) (MSX1)", MACHINE_NOT_WORKING) // Does not go into firmware, check rs232c presence and needs kanji rom
-COMP(1984, hx21f,      hx21,     0,     hx21f,      msx,      msx_state, empty_init, "Toshiba", "HX-21F (France) (MSX1)", 0)
+COMP(1985, hx21f,      hx21,     0,     hx21f,      msx,      msx_state, empty_init, "Toshiba", "HX-21F (France) (MSX1)", 0)
 COMP(1984, hx22,       0,        0,     hx22,       msxjp,    msx_state, empty_init, "Toshiba", "HX-22 (Japan) (MSX1)", MACHINE_NOT_WORKING) // Does not go into firmware, check rs232c presence and needs kanji rom
-COMP(1984, hx22i,      hx22,     0,     hx22i,      msx,      msx_state, empty_init, "Toshiba", "HX-22I (Italy) (MSX1)", 0)
+COMP(1985, hx22i,      hx22,     0,     hx22i,      msx,      msx_state, empty_init, "Toshiba", "HX-22I (Italy) (MSX1)", 0)
 COMP(1985, hx32,       0,        0,     hx32,       msxjp,    msx_state, empty_init, "Toshiba", "HX-32 (Japan) (MSX1)", MACHINE_NOT_WORKING) // Does not go into firmware, check rs232c presence and needs kanji rom
 COMP(1985, hx51i,      0,        0,     hx51i,      msx,      msx_state, empty_init, "Toshiba", "HX-51I (Italy, Spain) (MSX1)", 0)
 COMP(1983, hc5,        hc7,      0,     hc5,        msxjp,    msx_state, empty_init, "Victor", "HC-5 (Japan) (MSX1)", 0)
@@ -11148,25 +11148,25 @@ COMP(1984, yc64,       0,        0,     yc64,       msx,      msx_state, empty_i
 COMP(1985, mx64,       0,        0,     mx64,       msxkr,    msx_state, empty_init, "Yeno", "MX64 (France) (MSX1)", 0)
 
 /* MSX2 */
-COMP(1985, canonv25,   0,        0,     canonv25,   msx2,     msx2_state, empty_init, "Canon", "V-25 (MSX2)", 0)
-COMP(1985, canonv30f,  0,        0,     canonv30f,  msx2,     msx2_state, empty_init, "Canon", "V-30F (MSX2)", MACHINE_NOT_WORKING) // Problems with floppy interface
+COMP(1985, canonv25,   0,        0,     canonv25,   msx2,     msx2_state, empty_init, "Canon", "V-25 (Japan) (MSX2)", 0)
+COMP(1985, canonv30f,  0,        0,     canonv30f,  msx2,     msx2_state, empty_init, "Canon", "V-30F (Japan) (MSX2)", MACHINE_NOT_WORKING) // Problems with floppy interface
 COMP(1986, cpc300,     0,        0,     cpc300,     msx2kr,   msx2_state, empty_init, "Daewoo", "IQ-2000 CPC-300 (Korea) (MSX2)", 0)
-COMP(1986, cpc300e,    0,        0,     cpc300e,    msx2kr,   msx2_state, empty_init, "Daewoo", "IQ-2000 CPC-300E (Korea) (MSX2)", 0)
-COMP(1985, cpc330k,    0,        0,     cpc330k,    msx2kr,   msx2_state, empty_init, "Daewoo", "CPC-330K KOBO (Korea) (MSX2)", 0)
-COMP(1988, cpc400,     0,        0,     cpc400,     msx2kr,   msx2_state, empty_init, "Daewoo", "X-II CPC-400 (Korea) (MSX2)", 0)
+COMP(1987, cpc300e,    0,        0,     cpc300e,    msx2kr,   msx2_state, empty_init, "Daewoo", "IQ-2000 CPC-300E (Korea) (MSX2)", 0)
+COMP(1988, cpc330k,    0,        0,     cpc330k,    msx2kr,   msx2_state, empty_init, "Daewoo", "CPC-330K KOBO (Korea) (MSX2)", 0)
+COMP(1987, cpc400,     0,        0,     cpc400,     msx2kr,   msx2_state, empty_init, "Daewoo", "X-II CPC-400 (Korea) (MSX2)", 0)
 COMP(1988, cpc400s,    0,        0,     cpc400s,    msx2kr,   msx2_state, empty_init, "Daewoo", "X-II CPC-400S (Korea) (MSX2)", 0)
 COMP(1990, cpc61,      0,        0,     cpc61,      msx2kr,   msx2_state, empty_init, "Daewoo", "Zemmix CPC-61 (Korea) (MSX2)", 0)
 COMP(1991, cpg120,     0,        0,     cpg120,     msx2kr,   msx2_state, empty_init, "Daewoo", "Zemmix CPG-120 Normal (Korea) (MSX2)", 0)
-COMP(198?, fpc900,     0,        0,     fpc900,     msx2,     msx2_state, empty_init, "Fenner", "FPC-900 (MSX2)", 0)
+COMP(1986, fpc900,     0,        0,     fpc900,     msx2,     msx2_state, empty_init, "Fenner", "FPC-900 (Italy) (MSX2)", 0)
 COMP(1986, expert20,   0,        0,     expert20,   msx2,     msx2_state, empty_init, "Gradiente", "Expert 2.0 (Brazil) (MSX2)", 0)
-COMP(198?, mbh3,       0,        0,     mbh3,       msx2jp,   msx2_state, empty_init, "Hitachi", "MB-H3 (MSX2)", 0)
-COMP(198?, mbh70,      0,        0,     mbh70,      msx2jp,   msx2_state, empty_init, "Hitachi", "MB-H70 (MSX2)", MACHINE_NOT_WORKING) // How to enter/use the firmware?
-COMP(1987, kmc5000,    0,        0,     kmc5000,    msx2jp,   msx2_state, empty_init, "Kawai", "KMC-5000 (MSX2)", 0)
-COMP(1985, mlg1,       0,        0,     mlg1,       msx2,     msx2_state, empty_init, "Mitsubishi", "ML-G1 (MSX2)", 0)
-COMP(198?, mlg3,       0,        0,     mlg3,       msx2,     msx2_state, empty_init, "Mitsubishi", "ML-G3 (MSX2)", 0)
-COMP(1985, mlg10,      0,        0,     mlg10,      msx2jp,   msx2_state, empty_init, "Mitsubishi", "ML-G10 (MSX2)", 0)
-COMP(1985, mlg30,      0,        0,     mlg30,      msx2,     msx2_state, empty_init, "Mitsubishi", "ML-G30 Model 1 (MSX2)", 0)
-COMP(1985, mlg30_2,    0,        0,     mlg30_2,    msx2,     msx2_state, empty_init, "Mitsubishi", "ML-G30 Model 2 (MSX2)", 0)
+COMP(1985, mbh3,       0,        0,     mbh3,       msx2jp,   msx2_state, empty_init, "Hitachi", "MB-H3 (Japan) (MSX2)", 0)
+COMP(1986, mbh70,      0,        0,     mbh70,      msx2jp,   msx2_state, empty_init, "Hitachi", "MB-H70 (Japan) (MSX2)", MACHINE_NOT_WORKING) // How to enter/use the firmware?
+COMP(1987, kmc5000,    0,        0,     kmc5000,    msx2jp,   msx2_state, empty_init, "Kawai", "KMC-5000 (Japan) (MSX2)", 0)
+COMP(1986, mlg1,       0,        0,     mlg1,       msx2,     msx2_state, empty_init, "Mitsubishi", "ML-G1 (Spain) (MSX2)", 0)
+COMP(1986, mlg3,       0,        0,     mlg3,       msx2,     msx2_state, empty_init, "Mitsubishi", "ML-G3 (Spain) (MSX2)", 0)
+COMP(1985, mlg10,      0,        0,     mlg10,      msx2jp,   msx2_state, empty_init, "Mitsubishi", "ML-G10 (Japan) (MSX2)", 0)
+COMP(1985, mlg30,      0,        0,     mlg30,      msx2,     msx2_state, empty_init, "Mitsubishi", "ML-G30 Model 1 (Japan) (MSX2)", 0)
+COMP(1985, mlg30_2,    0,        0,     mlg30_2,    msx2,     msx2_state, empty_init, "Mitsubishi", "ML-G30 Model 2 (Japan) (MSX2)", 0)
 COMP(1985, fs5500f1,   fs5500f2, 0,     fs5500f1,   msx2jp,   msx2_state, empty_init, "National / Matsushita", "FS-5500F1 (Japan) (MSX2)", 0)
 COMP(1985, fs5500f2,   0,        0,     fs5500f2,   msx2jp,   msx2_state, empty_init, "National / Matsushita", "FS-5500F2 (Japan) (MSX2)", 0)
 COMP(1986, fs4500,     0,        0,     fs4500,     msx2jp,   msx2_state, empty_init, "National / Matsushita", "FS-4500 (Japan) (MSX2)", 0)
@@ -11177,86 +11177,86 @@ COMP(1986, fsa1,       fsa1a,    0,     fsa1,       msx2jp,   msx2_state, empty_
 COMP(1986, fsa1a,      0,        0,     fsa1a,      msx2jp,   msx2_state, empty_init, "Panasonic / Matsushita", "FS-A1 / 2nd released version (Japan) (MSX2)", 0)
 COMP(1987, fsa1mk2,    0,        0,     fsa1mk2,    msx2jp,   msx2_state, empty_init, "Panasonic / Matsushita", "FS-A1MK2 (Japan) (MSX2)", 0)
 COMP(1987, fsa1f,      0,        0,     fsa1f,      msx2jp,   msx2_state, empty_init, "Panasonic / Matsushita", "FS-A1F (Japan) (MSX2)", 0)
-COMP(1987, fsa1fm,     0,        0,     fsa1fm,     msx2jp,   msx2_state, empty_init, "Panasonic / Matsushita", "FS-A1FM (Japan) (MSX2)", MACHINE_NOT_WORKING) // Modem not emulated, firmware partially working
-COMP(1986, nms8220,    0,        0,     nms8220,    msx2,     msx2_state, empty_init, "Philips", "NMS 8220 (MSX2)", 0)
-COMP(1986, vg8230,     0,        0,     vg8230,     msx2,     msx2_state, empty_init, "Philips", "VG-8230 (MSX2)", 0)
-COMP(1986, vg8235,     0,        0,     vg8235,     msx2,     msx2_state, empty_init, "Philips", "VG-8235 (MSX2)", 0)
-COMP(1986, vg8235f,    vg8235,   0,     vg8235f,    msx2,     msx2_state, empty_init, "Philips", "VG-8235F (MSX2)", 0)
-COMP(1986, vg8240,     0,        0,     vg8240,     msx2,     msx2_state, empty_init, "Philips", "VG-8240 (MSX2)", 0)
-COMP(1986, nms8245,    0,        0,     nms8245,    msx2,     msx2_state, empty_init, "Philips", "NMS 8245 (MSX2)", 0)
-COMP(1986, nms8245f,   nms8245,  0,     nms8245f,   msx2,     msx2_state, empty_init, "Philips", "NMS 8245F (MSX2)", 0)
-COMP(1986, nms8250,    nms8255,  0,     nms8250,    msx2,     msx2_state, empty_init, "Philips", "NMS 8250 (MSX2)", 0)
-COMP(1986, nms8250_16, nms8255,  0,     nms8250,    msx2,     msx2_state, empty_init, "Philips", "NMS 8250/16 (Spain) (MSX2)", 0) // Spanish keyboard
-COMP(1986, nms8250_19, nms8255,  0,     nms8250,    msx2,     msx2_state, empty_init, "Philips", "NMS 8250/19 (France) (MSX2)", 0) // French keyboard
-COMP(1986, nms8255,    0,        0,     nms8255,    msx2,     msx2_state, empty_init, "Philips", "NMS 8255 (MSX2)", 0)
-COMP(1986, nms8255f,   nms8255,  0,     nms8255f,   msx2,     msx2_state, empty_init, "Philips", "NMS 8255F (MSX2)", 0) // French keyboard
-COMP(1986, nms8260,    0,        0,     nms8260,    msx2,     msx2_state, empty_init, "Philips", "NMS 8260 (Prototype) (MSX2)", MACHINE_NOT_WORKING)
-COMP(1986, nms8280,    0,        0,     nms8280,    msx2,     msx2_state, empty_init, "Philips", "NMS 8280 (MSX2)", 0)
-COMP(1986, nms8280f,   nms8280,  0,     nms8280f,   msx2,     msx2_state, empty_init, "Philips", "NMS 8280F (MSX2)", 0) // French keyboard
-COMP(1986, nms8280g,   nms8280,  0,     nms8280g,   msx2,     msx2_state, empty_init, "Philips", "NMS 8280G (MSX2)", 0)
-COMP(1987, ucv102,     0,        0,     ucv102,     msx2jp,   msx2_state, empty_init, "Pioneer", "UC-V102 (MSX2)", MACHINE_NOT_WORKING)
-COMP(1986, ax350,      ax350ii,  0,     ax350,      msx2,     msx2_state, empty_init, "Sakhr", "AX-350 (Arabic) (MSX2)", 0)
-COMP(1986, ax350ii,    0,        0,     ax350ii,    msx2,     msx2_state, empty_init, "Sakhr", "AX-350 II (Arabic) (MSX2)", MACHINE_NOT_WORKING) // floppy problems
-COMP(1986, ax350iif,   ax350ii,  0,     ax350iif,   msx2,     msx2_state, empty_init, "Sakhr", "AX-350 II F (Arabic) (MSX2)", MACHINE_NOT_WORKING) // floppy problems, arabic rom not repsonding to input
-COMP(1986, ax370,      0,        0,     ax370,      msx2,     msx2_state, empty_init, "Sakhr", "AX-370 (Arabic) (MSX2)", MACHINE_NOT_WORKING) // floppy problems
+COMP(1988, fsa1fm,     0,        0,     fsa1fm,     msx2jp,   msx2_state, empty_init, "Panasonic / Matsushita", "FS-A1FM (Japan) (MSX2)", MACHINE_NOT_WORKING) // Modem not emulated, firmware partially working
+COMP(1987, nms8220,    0,        0,     nms8220,    msx2,     msx2_state, empty_init, "Philips", "NMS 8220 (Europe) (MSX2)", 0)
+COMP(1986, vg8230,     0,        0,     vg8230,     msx2,     msx2_state, empty_init, "Philips", "VG-8230 (Netherlands) (MSX2)", 0)
+COMP(1986, vg8235,     0,        0,     vg8235,     msx2,     msx2_state, empty_init, "Philips", "VG-8235 (Europe) (MSX2)", 0)
+COMP(1986, vg8235f,    vg8235,   0,     vg8235f,    msx2,     msx2_state, empty_init, "Philips", "VG-8235F (France) (MSX2)", 0)
+COMP(1986, vg8240,     0,        0,     vg8240,     msx2,     msx2_state, empty_init, "Philips", "VG-8240 (Prototype) (MSX2)", 0)
+COMP(1987, nms8245,    0,        0,     nms8245,    msx2,     msx2_state, empty_init, "Philips", "NMS 8245 (Europe) (MSX2)", 0)
+COMP(1987, nms8245f,   nms8245,  0,     nms8245f,   msx2,     msx2_state, empty_init, "Philips", "NMS 8245F (France) (MSX2)", 0)
+COMP(1987, nms8250,    nms8255,  0,     nms8250,    msx2,     msx2_state, empty_init, "Philips", "NMS 8250 (Europe) (MSX2)", 0)
+COMP(1987, nms8250_16, nms8255,  0,     nms8250,    msx2,     msx2_state, empty_init, "Philips", "NMS 8250/16 (Spain) (MSX2)", 0) // Spanish keyboard
+COMP(1987, nms8250_19, nms8255,  0,     nms8250,    msx2,     msx2_state, empty_init, "Philips", "NMS 8250/19 (France) (MSX2)", 0) // French keyboard
+COMP(1987, nms8255,    0,        0,     nms8255,    msx2,     msx2_state, empty_init, "Philips", "NMS 8255 (Europe) (MSX2)", 0)
+COMP(1987, nms8255f,   nms8255,  0,     nms8255f,   msx2,     msx2_state, empty_init, "Philips", "NMS 8255F (France) (MSX2)", 0) // French keyboard
+COMP(1987, nms8260,    0,        0,     nms8260,    msx2,     msx2_state, empty_init, "Philips", "NMS 8260 (Prototype) (MSX2)", MACHINE_NOT_WORKING)
+COMP(1987, nms8280,    0,        0,     nms8280,    msx2,     msx2_state, empty_init, "Philips", "NMS 8280 (Europe) (MSX2)", 0)
+COMP(1986, nms8280f,   nms8280,  0,     nms8280f,   msx2,     msx2_state, empty_init, "Philips", "NMS 8280F (France) (MSX2)", 0) // French keyboard
+COMP(1986, nms8280g,   nms8280,  0,     nms8280g,   msx2,     msx2_state, empty_init, "Philips", "NMS 8280G (Germany) (MSX2)", 0)
+COMP(1987, ucv102,     0,        0,     ucv102,     msx2jp,   msx2_state, empty_init, "Pioneer", "UC-V102 (Japan) (MSX2)", MACHINE_NOT_WORKING)
+COMP(1987, ax350,      ax350ii,  0,     ax350,      msx2,     msx2_state, empty_init, "Sakhr", "AX-350 (Arabic) (MSX2)", 0)
+COMP(1987, ax350ii,    0,        0,     ax350ii,    msx2,     msx2_state, empty_init, "Sakhr", "AX-350 II (Arabic) (MSX2)", MACHINE_NOT_WORKING) // floppy problems
+COMP(1987, ax350iif,   ax350ii,  0,     ax350iif,   msx2,     msx2_state, empty_init, "Sakhr", "AX-350 II F (Arabic) (MSX2)", MACHINE_NOT_WORKING) // floppy problems, arabic rom not repsonding to input
+COMP(1988, ax370,      0,        0,     ax370,      msx2,     msx2_state, empty_init, "Sakhr", "AX-370 (Arabic) (MSX2)", MACHINE_NOT_WORKING) // floppy problems
 COMP(1987, ax500,      0,        0,     ax500,      msx2,     msx2_state, empty_init, "Sakhr", "AX-500 (Arabic) (MSX2)", MACHINE_NOT_WORKING) // floppy problems
-COMP(19??, mpc2300,    0,        0,     mpc2300,    msx2,     msx2_state, empty_init, "Sanyo", "MPC-2300 (MSX2)", MACHINE_NOT_WORKING) // Keyboard responds differently
-COMP(198?, mpc2500f,   0,        0,     mpc2500f,   msx2,     msx2_state, empty_init, "Sanyo", "MPC-2500FD (MSX2)", MACHINE_NOT_WORKING) // Russian keyboard?
-COMP(19??, mpc25fd,    0,        0,     mpc25fd,    msx2,     msx2_state, empty_init, "Sanyo", "Wavy MPC-25FD (MSX2)", 0)
-COMP(19??, mpc25fs,    0,        0,     mpc25fs,    msx2,     msx2_state, empty_init, "Sanyo", "Wavy MPC-25FS (MSX2)", 0)
-COMP(198?, mpc27,      0,        0,     mpc27,      msx2jp,   msx2_state, empty_init, "Sanyo", "Wavy MPC-27 (MSX2)", MACHINE_NOT_WORKING) // Light pen not emulated
+COMP(1987, mpc2300,    0,        0,     mpc2300,    msx2,     msx2_state, empty_init, "Sanyo", "MPC-2300 (USSR) (MSX2)", MACHINE_NOT_WORKING) // Keyboard responds differently
+COMP(1987, mpc2500f,   0,        0,     mpc2500f,   msx2,     msx2_state, empty_init, "Sanyo", "MPC-2500FD (USSR) (MSX2)", MACHINE_NOT_WORKING) // Russian keyboard?
+COMP(1985, mpc25fd,    0,        0,     mpc25fd,    msx2,     msx2_state, empty_init, "Sanyo", "Wavy MPC-25FD (Japan) (MSX2)", 0)
+COMP(1985, mpc25fs,    0,        0,     mpc25fs,    msx2,     msx2_state, empty_init, "Sanyo", "Wavy MPC-25FS (Japan) (MSX2)", 0)
+COMP(1985, mpc27,      0,        0,     mpc27,      msx2jp,   msx2_state, empty_init, "Sanyo", "Wavy MPC-27 (Japan) (MSX2)", MACHINE_NOT_WORKING) // Light pen not emulated
 COMP(1986, phc23,      0,        0,     phc23,      msx2jp,   msx2_state, empty_init, "Sanyo", "Wavy PHC-23 (Japan) (MSX2)", 0)
 //COMP(1987, phc23j,     0,        0,     phc23,      msx2jp,   msx2_state, empty_init, "Sanyo", "Wavy PHC-23J (Japan) (MSX2)", 0) // different keyboard layout
 COMP(1987, phc23jb,    0,        0,     phc23jb,    msx2jp,   msx2_state, empty_init, "Sanyo", "Wavy PHC-23JB (Japan) (MSX2)", 0)
-COMP(198?, phc55fd2,   0,        0,     phc55fd2,   msx2jp,   msx2_state, empty_init, "Sanyo", "Wavy PHC-55FD2 (MSX2)", 0)
-COMP(198?, phc77,      0,        0,     phc77,      msx2jp,   msx2_state, empty_init, "Sanyo", "Wavy PHC-77 (MSX2)", 0)
+COMP(1988, phc55fd2,   0,        0,     phc55fd2,   msx2jp,   msx2_state, empty_init, "Sanyo", "Wavy PHC-55FD2 (Japan) (MSX2)", 0)
+COMP(1987, phc77,      0,        0,     phc77,      msx2jp,   msx2_state, empty_init, "Sanyo", "Wavy PHC-77 (Japan) (MSX2)", 0)
 COMP(1986, hbf1,       hbf1xd,   0,     hbf1,       msx2jp,   msx2_state, empty_init, "Sony", "HB-F1 (Japan) (MSX2)", 0)
 COMP(1987, hbf1ii,     hbf1xd,   0,     hbf1ii,     msx2jp,   msx2_state, empty_init, "Sony", "HB-F1II (Japan) (MSX2)", 0)
 COMP(1987, hbf1xd,     0,        0,     hbf1xd,     msx2jp,   msx2_state, empty_init, "Sony", "HB-F1XD (Japan) (MSX2)", 0)
-COMP(19??, hbf5,       0,        0,     hbf5,       msx2,     msx2_state, empty_init, "Sony", "HB-F5 (MSX2)", 0)
-COMP(1985, hbf9p,      0,        0,     hbf9p,      msx2,     msx2_state, empty_init, "Sony", "HB-F9P (MSX2)", 0)
+COMP(1985, hbf5,       0,        0,     hbf5,       msx2,     msx2_state, empty_init, "Sony", "HB-F5 (Japan) (MSX2)", 0)
+COMP(1986, hbf9p,      0,        0,     hbf9p,      msx2,     msx2_state, empty_init, "Sony", "HB-F9P (Europe) (MSX2)", 0)
 COMP(19??, hbf9pr,     hbf9p,    0,     hbf9pr,     msx2,     msx2_state, empty_init, "Sony", "HB-F9P Russian (MSX2)", MACHINE_NOT_WORKING) // Keyboard responds differently
-COMP(1985, hbf9s,      hbf9p,    0,     hbf9s,      msx2,     msx2_state, empty_init, "Sony", "HB-F9S (MSX2)", 0)
+COMP(1986, hbf9s,      hbf9p,    0,     hbf9s,      msx2,     msx2_state, empty_init, "Sony", "HB-F9S (Spain) (MSX2)", 0)
 COMP(1986, hbf500,     hbf500p,  0,     hbf500,     msx2jp,   msx2_state, empty_init, "Sony", "HB-F500 (Japan) (MSX2)", 0)
 COMP(1986, hbf500_2,   hbf500p,  0,     hbf500_2,   msx2jp,   msx2_state, empty_init, "Sony", "HB-F500 2nd version (Japan) (MSX2)", 0)
-COMP(198?, hbf500f,    hbf500p,  0,     hbf500f,    msx2,     msx2_state, empty_init, "Sony", "HB-F500F (MSX2)", 0) // French keyboard?
-COMP(1985, hbf500p,    0,        0,     hbf500p,    msx2,     msx2_state, empty_init, "Sony", "HB-F500P (MSX2)", 0)
-COMP(1985, hbf700d,    hbf700p,  0,     hbf700d,    msx2,     msx2_state, empty_init, "Sony", "HB-F700D (Germany) (MSX2)", 0)
-COMP(1985, hbf700f,    hbf700p,  0,     hbf700f,    msx2,     msx2_state, empty_init, "Sony", "HB-F700F (MSX2)", 0)
-COMP(1985, hbf700p,    0,        0,     hbf700p,    msx2,     msx2_state, empty_init, "Sony", "HB-F700P (MSX2)", 0)
-COMP(1985, hbf700s,    hbf700p,  0,     hbf700s,    msx2,     msx2_state, empty_init, "Sony", "HB-F700S (Spain) (MSX2)", 0)
+COMP(1986, hbf500f,    hbf500p,  0,     hbf500f,    msx2,     msx2_state, empty_init, "Sony", "HB-F500F (France) (MSX2)", 0) // French keyboard?
+COMP(1986, hbf500p,    0,        0,     hbf500p,    msx2,     msx2_state, empty_init, "Sony", "HB-F500P (Europe) (MSX2)", 0)
+COMP(1986, hbf700d,    hbf700p,  0,     hbf700d,    msx2,     msx2_state, empty_init, "Sony", "HB-F700D (Germany) (MSX2)", 0)
+COMP(1986, hbf700f,    hbf700p,  0,     hbf700f,    msx2,     msx2_state, empty_init, "Sony", "HB-F700F (France) (MSX2)", 0)
+COMP(1986, hbf700p,    0,        0,     hbf700p,    msx2,     msx2_state, empty_init, "Sony", "HB-F700P (Europe) (MSX2)", 0)
+COMP(1986, hbf700s,    hbf700p,  0,     hbf700s,    msx2,     msx2_state, empty_init, "Sony", "HB-F700S (Spain) (MSX2)", 0)
 COMP(1986, hbf900,     hbf900a,  0,     hbf900,     msx2jp,   msx2_state, empty_init, "Sony", "HB-F900 (Japan) (MSX2)", 0)
 COMP(1986, hbf900a,    0,        0,     hbf900,     msx2jp,   msx2_state, empty_init, "Sony", "HB-F900 (alt) (Japan) (MSX2)", 0)
-COMP(1986, hbg900ap,   hbg900p,  0,     hbg900ap,   msx2,     msx2_state, empty_init, "Sony", "HB-G900AP (MSX2)", MACHINE_NOT_WORKING) // goes into the weeds with rs232 rom enabled
-COMP(1986, hbg900p,    0,        0,     hbg900p,    msx2,     msx2_state, empty_init, "Sony", "HB-G900P (MSX2)", MACHINE_NOT_WORKING) // goes into the weeds with rs232 rom enabled
+COMP(1987, hbg900ap,   hbg900p,  0,     hbg900ap,   msx2,     msx2_state, empty_init, "Sony", "HB-G900AP (Europe) (MSX2)", MACHINE_NOT_WORKING) // goes into the weeds with rs232 rom enabled
+COMP(1986, hbg900p,    0,        0,     hbg900p,    msx2,     msx2_state, empty_init, "Sony", "HB-G900P (Europe) (MSX2)", MACHINE_NOT_WORKING) // goes into the weeds with rs232 rom enabled
 COMP(1986, hotbit20,   0,        0,     hotbit20,   msx2,     msx2_state, empty_init, "Sharp / Epcom", "HB-8000 Hotbit 2.0 (MSX2)", 0) // Black screen
-COMP(1986, tpc310,     0,        0,     tpc310,     msx2,     msx2_state, empty_init, "Talent", "TPC-310 (MSX2)", 0)
-COMP(19??, tpp311,     0,        0,     tpp311,     msx2,     msx2_state, empty_init, "Talent", "TPP-311 (MSX2)", 0)
-COMP(19??, tps312,     0,        0,     tps312,     msx2,     msx2_state, empty_init, "Talent", "TPS-312 (MSX2)", 0)
-COMP(1986, hx23,       hx23f,    0,     hx23,       msx2,     msx2_state, empty_init, "Toshiba", "HX-23 (MSX2)", 0)
-COMP(1986, hx23f,      0,        0,     hx23f,      msx2,     msx2_state, empty_init, "Toshiba", "HX-23F (MSX2)", 0)
-COMP(1985, hx33,       hx34,     0,     hx33,       msx2jp,   msx2_state, empty_init, "Toshiba", "HX-33 (MSX2)", MACHINE_NOT_WORKING) // cannot start firmware
-COMP(1985, hx34,       0,        0,     hx34,       msx2jp,   msx2_state, empty_init, "Toshiba", "HX-34 (MSX2)", MACHINE_NOT_WORKING) // cannot start firmware
-COMP(1985, fstm1,      0,        0,     fstm1,      msx,      msx2_state, empty_init, "Toshiba", "FS-TM1 (MSX2)", 0)
-COMP(198?, victhc80,   0,        0,     victhc80,   msxjp,    msx2_state, empty_init, "Victor", "HC-80 (MSX2)", 0)
-COMP(198?, victhc90,   victhc95, 0,     victhc90,   msxjp,    msx2_state, empty_init, "Victor", "HC-90 (MSX2)", MACHINE_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start
-COMP(1986, victhc95,   0,        0,     victhc95,   msxjp,    msx2_state, empty_init, "Victor", "HC-95 (MSX2)", MACHINE_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start
-COMP(1986, victhc95a,  victhc95, 0,     victhc95a,  msxjp,    msx2_state, empty_init, "Victor", "HC-95A (MSX2)", MACHINE_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start
-COMP(1986, cx7128,     cx7m128,  0,     cx7128,     msx2,     msx2_state, empty_init, "Yamaha", "CX7/128 (MSX2)", 0)
-COMP(1986, cx7m128,    0,        0,     cx7m128,    msx2,     msx2_state, empty_init, "Yamaha", "CX7M/128 (MSX2)", 0)
-COMP(198?, y503iiir,   0,        0,     y503iiir,   msx2,     msx2_state, empty_init, "Yamaha", "YIS-503 III R (Russian) (MSX2)", MACHINE_NOT_WORKING) // Russian keyboard, network not implemented
+COMP(1987, tpc310,     0,        0,     tpc310,     msx2,     msx2_state, empty_init, "Talent", "TPC-310 (Argentina) (MSX2)", 0)
+COMP(1987, tpp311,     0,        0,     tpp311,     msx2,     msx2_state, empty_init, "Talent", "TPP-311 (Argentina) (MSX2)", 0)
+COMP(1987, tps312,     0,        0,     tps312,     msx2,     msx2_state, empty_init, "Talent", "TPS-312 (Argentina) (MSX2)", 0)
+COMP(1985, hx23,       hx23f,    0,     hx23,       msx2,     msx2_state, empty_init, "Toshiba", "HX-23 (Japan) (MSX2)", 0)
+COMP(1985, hx23f,      0,        0,     hx23f,      msx2,     msx2_state, empty_init, "Toshiba", "HX-23F (Japan) (MSX2)", 0)
+COMP(1985, hx33,       hx34,     0,     hx33,       msx2jp,   msx2_state, empty_init, "Toshiba", "HX-33 (Japan) (MSX2)", MACHINE_NOT_WORKING) // cannot start firmware
+COMP(1985, hx34,       0,        0,     hx34,       msx2jp,   msx2_state, empty_init, "Toshiba", "HX-34 (Japan) (MSX2)", MACHINE_NOT_WORKING) // cannot start firmware
+COMP(1986, fstm1,      0,        0,     fstm1,      msx,      msx2_state, empty_init, "Toshiba", "FS-TM1 (Italy) (MSX2)", 0)
+COMP(1986, victhc80,   0,        0,     victhc80,   msxjp,    msx2_state, empty_init, "Victor", "HC-80 (Japan) (MSX2)", 0)
+COMP(1986, victhc90,   victhc95, 0,     victhc90,   msxjp,    msx2_state, empty_init, "Victor", "HC-90 (Japan) (MSX2)", MACHINE_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start
+COMP(1986, victhc95,   0,        0,     victhc95,   msxjp,    msx2_state, empty_init, "Victor", "HC-95 (Japan) (MSX2)", MACHINE_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start
+COMP(1986, victhc95a,  victhc95, 0,     victhc95a,  msxjp,    msx2_state, empty_init, "Victor", "HC-95A (Japan) (MSX2)", MACHINE_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start
+COMP(1985, cx7128,     cx7m128,  0,     cx7128,     msx2,     msx2_state, empty_init, "Yamaha", "CX7/128 (Japan) (MSX2)", 0)
+COMP(1985, cx7m128,    0,        0,     cx7m128,    msx2,     msx2_state, empty_init, "Yamaha", "CX7M/128 (Japan) (MSX2)", 0)
+COMP(1985, y503iiir,   0,        0,     y503iiir,   msx2,     msx2_state, empty_init, "Yamaha", "YIS-503 III R (USSR) (MSX2)", MACHINE_NOT_WORKING) // Russian keyboard, network not implemented
 COMP(198?, y503iiire,  y503iiir, 0,     y503iiir,   msx2,     msx2_state, empty_init, "Yamaha", "YIS-503 III R (Estonian) (MSX2)", MACHINE_NOT_WORKING) // Russian/Estonian keyboard, network not implemented
-COMP(1985, yis604,     0,        0,     yis604,     msx2jp,   msx2_state, empty_init, "Yamaha", "YIS604/128 (MSX2)", 0)
-COMP(198?, y805128,    y805256,  0,     y805128,    msx2jp,   msx2_state, empty_init, "Yamaha", "YIS805/128 (Japan) (MSX2)", MACHINE_NOT_WORKING) // Floppy support broken
-COMP(198?, y805128r2,  y805256,  0,     y805128r2,  msx2,     msx2_state, empty_init, "Yamaha", "YIS805/128R2 (Russian) (MSX2)", MACHINE_NOT_WORKING) // Floppy support broken, network not implemented
+COMP(1985, yis604,     0,        0,     yis604,     msx2jp,   msx2_state, empty_init, "Yamaha", "YIS604/128 (Japan) (MSX2)", 0)
+COMP(1986, y805128,    y805256,  0,     y805128,    msx2jp,   msx2_state, empty_init, "Yamaha", "YIS805/128 (Japan) (MSX2)", MACHINE_NOT_WORKING) // Floppy support broken
+COMP(1986, y805128r2,  y805256,  0,     y805128r2,  msx2,     msx2_state, empty_init, "Yamaha", "YIS805/128R2 (USSR) (MSX2)", MACHINE_NOT_WORKING) // Floppy support broken, network not implemented
 COMP(198?, y805128r2e, y805256,  0,     y805128r2,  msx2,     msx2_state, empty_init, "Yamaha", "YIS805/128R2 (Estonian) (MSX2)", MACHINE_NOT_WORKING) // Floppy support broken, network not implemented
 COMP(198?, y805256,    0,        0,     y805256,    msx2jp,   msx2_state, empty_init, "Yamaha", "YIS805/256 (Japan) (MSX2)", MACHINE_NOT_WORKING) // Floppy support broken
 
 /* MSX2+ */
-COMP(19??, expert3i,   0,        0,     expert3i,   msx2,     msx2_state, empty_init, "Ciel", "Expert 3 IDE (MSX2+)", MACHINE_NOT_WORKING) // Some hardware not emulated
-COMP(1996, expert3t,   0,        0,     expert3t,   msx2,     msx2_state, empty_init, "Ciel", "Expert 3 Turbo (MSX2+)", MACHINE_NOT_WORKING) // Some hardware not emulated
-COMP(19??, expertac,   0,        0,     expertac,   msx2,     msx2_state, empty_init, "Gradiente", "Expert AC88+ (MSX2+)", MACHINE_NOT_WORKING) // Some hardware not emulated
-COMP(19??, expertdx,   0,        0,     expertdx,   msx2,     msx2_state, empty_init, "Gradiente", "Expert DDX+ (MSX2+)", MACHINE_NOT_WORKING) // Some hardware not emulated
+COMP(19??, expert3i,   0,        0,     expert3i,   msx2,     msx2_state, empty_init, "Ciel", "Expert 3 IDE (Brazil) (MSX2+)", MACHINE_NOT_WORKING) // Some hardware not emulated
+COMP(1996, expert3t,   0,        0,     expert3t,   msx2,     msx2_state, empty_init, "Ciel", "Expert 3 Turbo (Brazil) (MSX2+)", MACHINE_NOT_WORKING) // Some hardware not emulated
+COMP(19??, expertac,   0,        0,     expertac,   msx2,     msx2_state, empty_init, "Gradiente", "Expert AC88+ (Brazil) (MSX2+)", MACHINE_NOT_WORKING) // Some hardware not emulated
+COMP(19??, expertdx,   0,        0,     expertdx,   msx2,     msx2_state, empty_init, "Gradiente", "Expert DDX+ (Brazil) (MSX2+)", MACHINE_NOT_WORKING) // Some hardware not emulated
 COMP(1988, fsa1fx,     0,        0,     fsa1fx,     msx2jp,   msx2_state, empty_init, "Panasonic / Matsushita", "FS-A1FX (Japan) (MSX2+)", 0)
 COMP(1988, fsa1wx,     fsa1wxa,  0,     fsa1wx,     msx2jp,   msx2_state, empty_init, "Panasonic / Matsushita", "FS-A1WX / 1st released version (Japan) (MSX2+)", 0)
 COMP(1988, fsa1wxa,    0,        0,     fsa1wx,     msx2jp,   msx2_state, empty_init, "Panasonic / Matsushita", "FS-A1WX / 2nd released version (Japan) (MSX2+)", 0)
@@ -11264,10 +11264,10 @@ COMP(1989, fsa1wsx,    0,        0,     fsa1wsx,    msx2jp,   msx2_state, empty_
 COMP(1988, hbf1xdj,    0,        0,     hbf1xdj,    msx2jp,   msx2_state, empty_init, "Sony", "HB-F1XDJ (Japan) (MSX2+)", 0)
 COMP(1989, hbf1xv,     0,        0,     hbf1xv,     msx2jp,   msx2_state, empty_init, "Sony", "HB-F1XV (Japan) (MSX2+)", 0)
 COMP(1988, phc70fd,    phc70fd2, 0,     phc70fd,    msx2jp,   msx2_state, empty_init, "Sanyo", "WAVY PHC-70FD (Japan) (MSX2+)", 0)
-COMP(1988, phc70fd2,   0,        0,     phc70fd2,   msx2jp,   msx2_state, empty_init, "Sanyo", "WAVY PHC-70FD2 (Japan) (MSX2+)", 0)
+COMP(1989, phc70fd2,   0,        0,     phc70fd2,   msx2jp,   msx2_state, empty_init, "Sanyo", "WAVY PHC-70FD2 (Japan) (MSX2+)", 0)
 COMP(1989, phc35j,     0,        0,     phc35j,     msx2jp,   msx2_state, empty_init, "Sanyo", "WAVY PHC-35J (Japan) (MSX2+)", 0)
 
 /* MSX Turbo-R */
 /* Temporary placeholders, Turbo-R hardware is not supported yet */
-COMP(19??, fsa1gt,     0,        0,     fsa1gt,     msx2jp,   msx2_state, empty_init, "Panasonic", "FS-A1GT (MSX Turbo-R)", MACHINE_NOT_WORKING)
-COMP(19??, fsa1st,     0,        0,     fsa1st,     msx2jp,   msx2_state, empty_init, "Panasonic", "FS-A1ST (MSX Turbo-R)", MACHINE_NOT_WORKING)
+COMP(1991, fsa1gt,     0,        0,     fsa1gt,     msx2jp,   msx2_state, empty_init, "Panasonic", "FS-A1GT (Japan) (MSX Turbo-R)", MACHINE_NOT_WORKING)
+COMP(1991, fsa1st,     0,        0,     fsa1st,     msx2jp,   msx2_state, empty_init, "Panasonic", "FS-A1ST (Japan) (MSX Turbo-R)", MACHINE_NOT_WORKING)
