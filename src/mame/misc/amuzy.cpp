@@ -184,6 +184,6 @@ ROM_END
 
 }   // anonymous namespace
 
-GAME( 2006, achimuit,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Achi Muite Hoi Batoru",  MACHINE_NOT_WORKING )
+GAME( 2006, amhbattl,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Acchi Muite Hoi Battle",  MACHINE_NOT_WORKING )
 GAME( 2007, docchift,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Docchi Fighter",  MACHINE_NOT_WORKING )
 GAME( 2008, mmhammer,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Mogu Mogu Hammer",  MACHINE_NOT_WORKING )
