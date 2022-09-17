@@ -26376,7 +26376,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_slmulti" />
 			<dataarea name="rom" size="0x1000000">
-				<rom name="new super color 145 in 1.gbc" size="0x1000000" crc="12345678" sha1="cbeb1745d68163978a422a8d7260a6a0f2693b85" />
+				<rom name="new super color 145 in 1.gbc" size="0x1000000" crc="b087710c" sha1="cbeb1745d68163978a422a8d7260a6a0f2693b85" />
 			</dataarea>
 		</part>
 	</software>
