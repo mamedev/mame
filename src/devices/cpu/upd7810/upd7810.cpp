@@ -897,6 +897,15 @@ void upd7801_device::upd7810_take_irq()
 	}
 }
 
+void upd7810_device::upd7810_to_output_change(int state)
+{
+	TO = state & 1;
+	m_to_func(TO);
+
+	if (m_mcc & 0x10)
+		WP(UPD7810_PORTC, m_pc_out);
+}
+
 void upd7810_device::upd7810_co0_output_change()
 {
 	/* Output LV0 Content to CO0 */
@@ -907,6 +916,8 @@ void upd7810_device::upd7810_co0_output_change()
 		LV0 ^= 1;
 
 	m_co0_func(CO0);
+	if (m_mcc & 0x40)
+		WP(UPD7810_PORTC, m_pc_out);
 }
 void upd7810_device::upd7810_co1_output_change()
 {
@@ -918,6 +929,8 @@ void upd7810_device::upd7810_co1_output_change()
 		LV1 ^= 1;
 
 	m_co1_func(CO1);
+	if (m_mcc & 0x80)
+		WP(UPD7810_PORTC, m_pc_out);
 }
 
 void upd7810_device::upd7810_write_EOM()
@@ -972,6 +985,8 @@ void upd7810_device::upd7810_sio_output()
 	{
 		TXD = m_txs & 1;
 		m_txd_func(TXD);
+		if (m_mcc & 0x01)
+			WP(UPD7810_PORTC, m_pc_out);
 		m_txs >>= 1;
 		m_txcnt--;
 		if (0 == m_txcnt)
@@ -1267,8 +1282,7 @@ void upd7810_device::upd7810_handle_timer0(int cycles, int clkdiv)
 			/* timer F/F source is timer 0 ? */
 			if (0x00 == (TMM & 0x03))
 			{
-				TO ^= 1;
-				m_to_func(TO);
+				upd7810_to_output_change(TO ^ 1);
 			}
 			/* timer 1 chained with timer 0 ? */
 			if ((TMM & 0xe0) == 0x60)
@@ -1281,8 +1295,7 @@ void upd7810_device::upd7810_handle_timer0(int cycles, int clkdiv)
 					/* timer F/F source is timer 1 ? */
 					if (0x01 == (TMM & 0x03))
 					{
-						TO ^= 1;
-						m_to_func(TO);
+						upd7810_to_output_change(TO ^ 1);
 					}
 				}
 			}
@@ -1304,8 +1317,7 @@ void upd7810_device::upd7810_handle_timer1(int cycles, int clkdiv)
 			/* timer F/F source is timer 1 ? */
 			if (0x01 == (TMM & 0x03))
 			{
-				TO ^= 1;
-				m_to_func(TO);
+				upd7810_to_output_change(TO ^ 1);
 			}
 		}
 	}
@@ -1360,8 +1372,7 @@ void upd7810_device::handle_timers(int cycles)
 		OVCF += cycles;
 		while (OVCF >= 1)
 		{
-			TO ^= 1;
-			m_to_func(TO);
+			upd7810_to_output_change(TO ^ 1);
 			OVCF -= 1;
 		}
 	}
@@ -1526,8 +1537,7 @@ void upd7801_device::handle_timers(int cycles)
 			IRR |= INTFT0;
 
 			/* Reset the timer flip/fliop */
-			TO = 0;
-			m_to_func(TO);
+			upd7810_to_output_change(0);
 
 			/* Reload the timer */
 			m_ovc0 = 8 * ( TM0 + ( ( TM1 & 0x0f ) << 8 ) );
@@ -1540,16 +1550,14 @@ void upd78c05_device::handle_timers(int cycles)
 	if ( m_ovc0 ) {
 		m_ovc0 -= cycles;
 
-		if ( m_ovc0 <= 0 ) {
+		if ( m_ovc0 <= 0 )
+		{
 			IRR |= INTFT0;
-			if (0x00 == (TMM & 0x03)) {
-				TO ^= 1;
-				m_to_func(TO);
-			}
+			if (0x00 == (TMM & 0x03))
+				upd7810_to_output_change(TO ^ 1);
 
-			while ( m_ovc0 <= 0 ) {
+			while ( m_ovc0 <= 0 )
 				m_ovc0 += ( ( TMM & 0x04 ) ? 16 * 8 : 8 ) * TM0;
-			}
 		}
 	}
 }

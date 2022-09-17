@@ -161,6 +161,7 @@ protected:
 	void upd7810_handle_timer0(int cycles, int clkdiv);
 	void upd7810_handle_timer1(int cycles, int clkdiv);
 
+	void upd7810_to_output_change(int state);
 	void upd7810_co0_output_change();
 	void upd7810_co1_output_change();
 

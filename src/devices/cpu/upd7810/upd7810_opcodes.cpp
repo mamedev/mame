@@ -1047,7 +1047,10 @@ void upd7810_device::MOV_MM_A()
 /* 4d d1: 0100 1101 1101 0001 */
 void upd7810_device::MOV_MCC_A()
 {
+	if (MCC == A)
+		return;
 	MCC = A;
+	WP(UPD7810_PORTC, m_pc_out);
 }
 
 /* 4d d2: 0100 1101 1101 0010 */
@@ -9448,8 +9451,7 @@ void upd7810_device::STM()
 void upd7810_device::STM_7801()
 {
 	/* Set the timer flip/flop */
-	TO = 1;
-	m_to_func(TO);
+	upd7810_to_output_change(1);
 
 	/* Reload the timer */
 	m_ovc0 = 16 * ( TM0 + ( ( TM1 & 0x0f ) << 8 ) );
