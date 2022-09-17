@@ -3,6 +3,7 @@
 /******************************************************************************
 
 Hartung Game Master
+Hong Kong LCD handheld console (mainly sold in Europe)
 PeT mess@utanet.at march 2002
 
 Hardware notes:
