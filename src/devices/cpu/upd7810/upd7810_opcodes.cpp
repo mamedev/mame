@@ -8126,13 +8126,16 @@ void upd7810_device::MOV_L_A()
 void upd7810_device::INRW_wa()
 {
 	PAIR ea = m_va;
-	RDOPARG( ea.b.l );
-	uint8_t m = RM( ea.d ) + 1;
-	WM( ea.d, m );
+	uint8_t tmp, m;
+	uint8_t old_cy = PSW & CY;
 
-	if (m == 0)
-		PSW |= SK;
-	SET_Z(m);
+	RDOPARG( ea.b.l );
+	m = RM( ea.d );
+	tmp = m + 1;
+	ZHC_ADD( tmp, m, 0 );
+	WM( ea.d, tmp );
+	SKIP_CY;
+	PSW = ( PSW & ~CY ) | old_cy;
 }
 
 /* 21: 0010 0001 */
@@ -8231,13 +8234,16 @@ void upd7810_device::LDAX_Hm()
 void upd7810_device::DCRW_wa()
 {
 	PAIR ea = m_va;
-	RDOPARG( ea.b.l );
-	uint8_t m = RM( ea.d ) - 1;
-	WM( ea.d, m );
+	uint8_t tmp, m;
+	uint8_t old_cy = PSW & CY;
 
-	if (m == 0xff)
-		PSW |= SK;
-	SET_Z(m);
+	RDOPARG( ea.b.l );
+	m = RM( ea.d );
+	tmp = m - 1;
+	ZHC_SUB( tmp, m, 0 );
+	WM( ea.d, tmp );
+	SKIP_CY;
+	PSW = ( PSW & ~CY ) | old_cy;
 }
 
 /* 31: 0011 0001 */
@@ -8366,25 +8372,34 @@ void upd7810_device::CALL_w()
 /* 41: 0100 0001 */
 void upd7810_device::INR_A()
 {
-	if (++A == 0)
-		PSW |= SK;
-	SET_Z(A);
+	uint8_t old_cy = PSW & CY;
+	uint8_t tmp = A + 1;
+	ZHC_ADD( tmp, A, 0 );
+	A = tmp;
+	SKIP_CY;
+	PSW = ( PSW & ~CY ) | old_cy;
 }
 
 /* 42: 0100 0010 */
 void upd7810_device::INR_B()
 {
-	if (++B == 0)
-		PSW |= SK;
-	SET_Z(B);
+	uint8_t old_cy = PSW & CY;
+	uint8_t tmp = B + 1;
+	ZHC_ADD( tmp, B, 0 );
+	B = tmp;
+	SKIP_CY;
+	PSW = ( PSW & ~CY ) | old_cy;
 }
 
 /* 43: 0100 0011 */
 void upd7810_device::INR_C()
 {
-	if (++C == 0)
-		PSW |= SK;
-	SET_Z(C);
+	uint8_t old_cy = PSW & CY;
+	uint8_t tmp = C + 1;
+	ZHC_ADD( tmp, C, 0 );
+	C = tmp;
+	SKIP_CY;
+	PSW = ( PSW & ~CY ) | old_cy;
 }
 
 /* 44: 0100 0100 llll llll hhhh hhhh */
@@ -8485,25 +8500,34 @@ void upd7810_device::EXH()
 /* 51: 0101 0001 */
 void upd7810_device::DCR_A()
 {
-	if (--A == 0xff)
-		PSW |= SK;
-	SET_Z(A);
+	uint8_t old_cy = PSW & CY;
+	uint8_t tmp = A - 1;
+	ZHC_SUB( tmp, A, 0 );
+	A = tmp;
+	SKIP_CY;
+	PSW = ( PSW & ~CY ) | old_cy;
 }
 
 /* 52: 0101 0010 */
 void upd7810_device::DCR_B()
 {
-	if (--B == 0xff)
-		PSW |= SK;
-	SET_Z(B);
+	uint8_t old_cy = PSW & CY;
+	uint8_t tmp = B - 1;
+	ZHC_SUB( tmp, B, 0 );
+	B = tmp;
+	SKIP_CY;
+	PSW = ( PSW & ~CY ) | old_cy;
 }
 
 /* 53: 0101 0011 */
 void upd7810_device::DCR_C()
 {
-	if (--C == 0xff)
-		PSW |= SK;
-	SET_Z(C);
+	uint8_t old_cy = PSW & CY;
+	uint8_t tmp = C - 1;
+	ZHC_SUB( tmp, C, 0 );
+	C = tmp;
+	SKIP_CY;
+	PSW = ( PSW & ~CY ) | old_cy;
 }
 
 /* 54: 0101 0100 llll llll hhhh hhhh */
@@ -8843,7 +8867,10 @@ void upd7810_device::PRE_60()
 /* 61: 0110 0001 */
 void upd7810_device::DAA()
 {
-	uint8_t l = A & 0x0f, h = A >> 4, tmp, adj = 0x00, old_cy = PSW & CY;
+	uint8_t l = A & 0x0f;
+	uint8_t h = A >> 4;
+	uint8_t adj = 0x00;
+	uint8_t old_cy = PSW & CY;
 
 	if (0 == (PSW & HC))
 	{
@@ -8860,15 +8887,15 @@ void upd7810_device::DAA()
 				adj = 0x66;
 		}
 	}
-	else
-	if (l < 3)
+	else if (l < 3)
 	{
 		if (h < 10 && 0 == (PSW & CY))
 			adj = 0x06;
 		else
 			adj = 0x66;
 	}
-	tmp = A + adj;
+
+	uint8_t tmp = A + adj;
 	ZHC_ADD( tmp, A, PSW & CY );
 	PSW |= old_cy;
 	A = tmp;
