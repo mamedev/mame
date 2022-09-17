@@ -138,10 +138,6 @@ void gamepock_state::machine_reset()
 	hd44102ch_init( 0 );
 	hd44102ch_init( 1 );
 	hd44102ch_init( 2 );
-
-	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000,0xbfff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
-
 }
 
 uint32_t gamepock_state::screen_update_gamepock(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -214,10 +210,4 @@ uint32_t gamepock_state::screen_update_gamepock(screen_device &screen, bitmap_in
 	}
 
 	return 0;
-}
-
-/* This is called whenever the T0 pin switches state */
-WRITE_LINE_MEMBER(gamepock_state::gamepock_to_w)
-{
-	m_speaker->level_w(state & 1);
 }

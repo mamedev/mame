@@ -6,7 +6,6 @@
 #include "gamepock.h"
 
 #include "bus/generic/carts.h"
-#include "cpu/upd7810/upd7810.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -17,10 +16,11 @@
 void gamepock_state::gamepock_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x0fff).rom();
+	// 0x0000-0x0fff is internal ROM
 	map(0x1000, 0x3fff).noprw();
-	//map(0x4000,0xbfff).rom();        // mapped by the cartslot
+	map(0x4000, 0xbfff).r("cartslot", FUNC(generic_slot_device::read_rom));
 	map(0xc000, 0xc7ff).mirror(0x0800).ram();
+	// 0xff80-0xffff is internal RAM
 }
 
 
@@ -43,13 +43,13 @@ INPUT_PORTS_END
 
 void gamepock_state::gamepock(machine_config &config)
 {
-	upd78c06_device &upd(UPD78C06(config, m_maincpu, 6_MHz_XTAL)); // uPD78C06AG
-	upd.set_addrmap(AS_PROGRAM, &gamepock_state::gamepock_mem);
-	upd.pa_out_cb().set(FUNC(gamepock_state::port_a_w));
-	upd.pb_in_cb().set(FUNC(gamepock_state::port_b_r));
-	upd.pb_out_cb().set(FUNC(gamepock_state::port_b_w));
-	upd.pc_in_cb().set(FUNC(gamepock_state::port_c_r));
-	upd.to_func().set(FUNC(gamepock_state::gamepock_to_w));
+	UPD78C06(config, m_maincpu, 6_MHz_XTAL); // uPD78C06AG
+	m_maincpu->set_addrmap(AS_PROGRAM, &gamepock_state::gamepock_mem);
+	m_maincpu->pa_out_cb().set(FUNC(gamepock_state::port_a_w));
+	m_maincpu->pb_in_cb().set(FUNC(gamepock_state::port_b_r));
+	m_maincpu->pb_out_cb().set(FUNC(gamepock_state::port_b_w));
+	m_maincpu->pc_in_cb().set(FUNC(gamepock_state::port_c_r));
+	m_maincpu->to_func().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60);
@@ -65,7 +65,7 @@ void gamepock_state::gamepock(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "gamepock_cart");
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "gamepock_cart");
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("gamepock");

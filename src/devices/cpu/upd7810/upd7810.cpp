@@ -392,6 +392,18 @@ void upd7810_device::upd_internal_256_ram_map(address_map &map)
 	map(0xff00, 0xffff).ram();
 }
 
+void upd7810_device::upd_internal_4096_rom_128_ram_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0xff80, 0xffff).ram();
+}
+
+void upd7810_device::upd_internal_4096_rom_256_ram_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0xff00, 0xffff).ram();
+}
+
 upd7810_device::upd7810_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_to_func(*this)
@@ -494,13 +506,13 @@ void upd78c05_device::configure_ops()
 	m_opXX = s_opXX_78c05;
 }
 
-upd78c05_device::upd78c05_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: upd78c05_device(mconfig, UPD78C05, tag, owner, clock)
+upd78c05_device::upd78c05_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map)
+	: upd7810_device(mconfig, type, tag, owner, clock, internal_map)
 {
 }
 
-upd78c05_device::upd78c05_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: upd7810_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(upd78c05_device::upd_internal_128_ram_map), this))
+upd78c05_device::upd78c05_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: upd78c05_device(mconfig, UPD78C05, tag, owner, clock, address_map_constructor(FUNC(upd78c05_device::upd_internal_128_ram_map), this))
 {
 }
 
@@ -517,7 +529,7 @@ void upd78c06_device::configure_ops()
 }
 
 upd78c06_device::upd78c06_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: upd78c05_device(mconfig, UPD78C06, tag, owner, clock)
+	: upd78c05_device(mconfig, UPD78C06, tag, owner, clock, address_map_constructor(FUNC(upd78c06_device::upd_internal_4096_rom_128_ram_map), this))
 {
 }
 

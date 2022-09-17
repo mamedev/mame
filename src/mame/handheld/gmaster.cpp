@@ -28,8 +28,8 @@ Watara SuperVision), so perhaps it's them.
 
 TODO:
 - does port B do anything?
-- hspace should have some kind of volume filter on the bgm? not sure what
-  what controls it, or maybe it's a hardware quirk
+- according to one video on Youtube, hspace should have some kind of volume
+  filter on the bgm? not sure what controls it, or maybe it's a hardware quirk
 
 BTANB:
 - LCD flickers partially, especially bad in finitezn
@@ -60,8 +60,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_lcd(*this, "lcd%u", 0),
 		m_screen(*this, "screen"),
-		m_speaker(*this, "speaker"),
-		m_cart(*this, "cartslot")
+		m_speaker(*this, "speaker")
 	{ }
 
 	void gmaster(machine_config &config);
@@ -74,7 +73,6 @@ private:
 	required_device_array<sed1520_device, 2> m_lcd;
 	required_device<screen_device> m_screen;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<generic_slot_device> m_cart;
 
 	u8 io_r(offs_t offset);
 	void io_w(offs_t offset, u8 data);
@@ -250,7 +248,7 @@ void gmaster_state::gmaster(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(0, "mono", 0.50);
 
 	// cartridge
-	GENERIC_CARTSLOT(config, m_cart, generic_linear_slot, "gmaster_cart").set_must_be_loaded(true);
+	GENERIC_CARTSLOT(config, "cartslot", generic_linear_slot, "gmaster_cart").set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("gmaster");
 }
 
