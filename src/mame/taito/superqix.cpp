@@ -869,7 +869,7 @@ void hotsmash_state::hotsmash_z80_mcu_w(u8 data)
 	//if ((m_from_z80 != 0x04) && (m_from_z80 != 0x08))
 	//  logerror("%s: z80 write to MCU %02x; Z80HasWritten: %d (and will be 1 after this); MCUHasWritten: %d\n",machine().describe_context(), m_from_z80, m_z80_has_written, m_mcu_has_written);
 	m_z80_has_written = 1; // set the semaphore, and assert interrupt on the mcu
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(250)); //boost the interleave temporarily, or the game will crash.
+	machine().scheduler().perfect_quantum(attotime::from_usec(250)); //boost the interleave temporarily, or the game will crash.
 	m_mcu->set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
 }
 

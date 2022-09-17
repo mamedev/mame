@@ -224,6 +224,7 @@ protected:
 	void dimas_w(uint8_t data);
 	void dimcnt_w(uint8_t data);
 	void unknown_w(uint8_t data);
+	void update_volume();
 	void volume_override_w(uint8_t data);
 	void expansion_latch_w(uint8_t data);
 	uint8_t expansion_latch_r();
@@ -769,6 +770,22 @@ void bfm_sc2_state::unknown_w(uint8_t data)
 
 ///////////////////////////////////////////////////////////////////////////
 
+void bfm_sc2_state::update_volume()
+{
+	float percent = m_volume_override ? 1.0f : (64 - m_global_volume) / 64.0f;
+
+	if (m_ym2413)
+	{
+		m_ym2413->set_output_gain(0, percent);
+		m_ym2413->set_output_gain(1, percent);
+	}
+
+	if (m_upd7759)
+	{
+		m_upd7759->set_output_gain(0, percent);
+	}
+}
+
 void bfm_sc2_state::volume_override_w(uint8_t data)
 {
 	int old = m_volume_override;
@@ -777,16 +794,7 @@ void bfm_sc2_state::volume_override_w(uint8_t data)
 
 	if ( old != m_volume_override )
 	{
-		ym2413_device *ym = m_ym2413;
-
-		if (!m_ym2413)
-			return;
-
-		float percent = m_volume_override? 1.0f : (32-m_global_volume)/32.0f;
-
-		ym->set_output_gain(0, percent);
-		ym->set_output_gain(1, percent);
-		m_upd7759->set_output_gain(0, percent);
+		update_volume();
 	}
 }
 
@@ -794,8 +802,7 @@ void bfm_sc2_state::volume_override_w(uint8_t data)
 
 void bfm_sc2_state::nec_reset_w(uint8_t data)
 {
-	m_upd7759->start_w(0);
-	m_upd7759->reset_w(data != 0);
+	m_upd7759->reset_w(BIT(data, 0));
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -809,7 +816,7 @@ void bfm_sc2_state::nec_latch_w(uint8_t data)
 
 	m_upd7759->set_rom_bank(bank);
 
-	m_upd7759->port_w(data & 0x3f);    // setup sample
+	m_upd7759->port_w(data & 0x7f);    // setup sample
 	m_upd7759->start_w(0);
 	m_upd7759->start_w(1);
 }
@@ -875,19 +882,7 @@ void bfm_sc2_state::expansion_latch_w(uint8_t data)
 			{
 				if ( m_global_volume > 0  ) m_global_volume--;
 			}
-
-			{
-				ym2413_device *ym = m_ym2413;
-
-				if (m_ym2413)
-				{
-					float percent = m_volume_override ? 1.0f : (32 - m_global_volume) / 32.0f;
-
-					ym->set_output_gain(0, percent);
-					ym->set_output_gain(1, percent);
-					m_upd7759->set_output_gain(0, percent);
-				}
-			}
+			update_volume();
 		}
 	}
 }

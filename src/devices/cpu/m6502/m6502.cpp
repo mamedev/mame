@@ -43,12 +43,14 @@ void m6502_device::device_start()
 
 void m6502_device::init()
 {
-	space(AS_PROGRAM).cache(mintf->cprogram);
-	space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).cache(mintf->csprogram);
-	if(space(AS_PROGRAM).addr_width() > 14)
-		space(AS_PROGRAM).specific(mintf->program);
-	else
-		space(AS_PROGRAM).specific(mintf->program14);
+	if(mintf) {
+		space(AS_PROGRAM).cache(mintf->cprogram);
+		space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).cache(mintf->csprogram);
+		if(space(AS_PROGRAM).addr_width() > 14)
+			space(AS_PROGRAM).specific(mintf->program);
+		else
+			space(AS_PROGRAM).specific(mintf->program14);
+	}
 
 	sync_w.resolve_safe();
 

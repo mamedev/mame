@@ -285,7 +285,7 @@ Arch Linux
 
 You’ll need a few prerequisites from your distro::
 
-    sudo pacman -S base-devel git sdl2 gconf sdl2_ttf gcc qt5
+    sudo pacman -S base-devel git sdl2_ttf python libxinerama libpulse alsa-lib qt5-base
 
 Compilation is exactly as described above in All Platforms.
 

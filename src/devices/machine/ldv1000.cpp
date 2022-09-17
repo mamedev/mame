@@ -316,7 +316,7 @@ void pioneer_ldv1000_device::player_vsync(const vbi_metadata &vbi, int fieldnum,
 	m_process_vbi_timer->adjust(screen().time_until_pos(19*2));
 
 	// boost interleave for the first 1ms to improve communications
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_msec(1));
+	machine().scheduler().perfect_quantum(attotime::from_msec(1));
 }
 
 

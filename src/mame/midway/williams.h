@@ -27,6 +27,7 @@
 #include "screen.h"
 #include "tilemap.h"
 
+// base Williams hardware
 class williams_state : public driver_device
 {
 public:
@@ -44,8 +45,11 @@ public:
 		m_pia(*this, "pia_%u", 0U)
 	{ }
 
-	void stargate(machine_config &config);
-	void robotron(machine_config &config);
+	void williams_base(machine_config &config);
+	void williams_b0(machine_config &config);
+	void williams_b1(machine_config &config);
+	void williams_b2(machine_config &config);
+
 	void lottofun(machine_config &config);
 
 	u8 port_0_49way_r();
@@ -59,20 +63,26 @@ public:
 	void palette_init(palette_device &palette) const;
 
 protected:
-	void williams_base(machine_config &config);
-
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
+	// blitter type
 	enum
 	{
-		//controlbyte (0xCA00) bit definitions
+		WILLIAMS_BLITTER_NONE = 0, // no blitter
+		WILLIAMS_BLITTER_SC1 = 1,  // Special Chip 1 blitter
+		WILLIAMS_BLITTER_SC2 = 2   // Special Chip 2 "bugfixed" blitter
+	};
+
+	// controlbyte (0xCA00) bit definitions
+	enum
+	{
 		WMS_BLITTER_CONTROLBYTE_NO_EVEN = 0x80,
 		WMS_BLITTER_CONTROLBYTE_NO_ODD = 0x40,
 		WMS_BLITTER_CONTROLBYTE_SHIFT = 0x20,
 		WMS_BLITTER_CONTROLBYTE_SOLID = 0x10,
 		WMS_BLITTER_CONTROLBYTE_FOREGROUND_ONLY = 0x08,
-		WMS_BLITTER_CONTROLBYTE_SLOW = 0x04, //2us blits instead of 1us
+		WMS_BLITTER_CONTROLBYTE_SLOW = 0x04, // 2us blits instead of 1us
 		WMS_BLITTER_CONTROLBYTE_DST_STRIDE_256 = 0x02,
 		WMS_BLITTER_CONTROLBYTE_SRC_STRIDE_256 = 0x01
 	};
@@ -92,14 +102,10 @@ protected:
 	std::unique_ptr<uint8_t[]> m_blitter_remap_lookup;
 	virtual void vram_select_w(u8 data);
 	virtual void cmos_w(offs_t offset, u8 data);
-	void sinistar_vram_select_w(u8 data);
 	void blitter_w(address_space &space, offs_t offset, u8 data);
 
 	TIMER_CALLBACK_MEMBER(deferred_snd_cmd_w);
-
-	void snd_cmd_w(u8 data);
-
-	DECLARE_WRITE_LINE_MEMBER(lottofun_coin_lock_w);
+	virtual void snd_cmd_w(u8 data);
 
 	void state_save_register();
 	void blitter_init(int blitter_config, const uint8_t *remap_prom);
@@ -115,9 +121,10 @@ protected:
 	optional_device_array<pia6821_device, 4> m_pia;
 
 	virtual void sound_map(address_map &map);
-	void base_map(address_map &map);
+	virtual void main_map(address_map &map);
 };
 
+// Defender
 class defender_state : public williams_state
 {
 public:
@@ -129,8 +136,10 @@ public:
 	void defender(machine_config &config);
 	void jin(machine_config &config);
 
+	void init_defndjeu();
+
 protected:
-	virtual void main_map(address_map &map);
+	virtual void main_map(address_map &map) override;
 
 	void video_control_w(u8 data);
 
@@ -146,17 +155,7 @@ private:
 	void bank_select_w(u8 data);
 };
 
-class defndjeu_state : public defender_state
-{
-public:
-	defndjeu_state(const machine_config &mconfig, device_type type, const char *tag) :
-		defender_state(mconfig, type, tag)
-	{ }
-
-private:
-	virtual void driver_start() override;
-};
-
+// Hoei Mayday: custom protection
 class mayday_state : public defender_state
 {
 public:
@@ -165,14 +164,11 @@ public:
 	{ }
 
 private:
-	virtual void driver_start() override;
-
-	virtual void main_map(address_map &map) override;
-
-	uint8_t *m_protection = nullptr;
 	u8 protection_r(offs_t offset);
+	virtual void main_map(address_map &map) override;
 };
 
+// Sinistar: blitter window clip
 class sinistar_state : public williams_state
 {
 public:
@@ -184,25 +180,10 @@ public:
 
 private:
 	virtual void vram_select_w(u8 data) override;
-
-	void main_map(address_map &map);
+	virtual void main_map(address_map &map) override;
 };
 
-class bubbles_state : public williams_state
-{
-public:
-	bubbles_state(const machine_config &mconfig, device_type type, const char *tag) :
-		williams_state(mconfig, type, tag)
-	{ }
-
-	void bubbles(machine_config &config);
-
-private:
-	void main_map(address_map &map);
-
-	virtual void cmos_w(offs_t offset, u8 data) override;
-};
-
+// Playball: more soundlatch bits
 class playball_state : public williams_state
 {
 public:
@@ -213,13 +194,42 @@ public:
 	void playball(machine_config &config);
 
 private:
-	void snd_cmd_w(u8 data);
+	virtual void snd_cmd_w(u8 data) override;
 };
 
-class williams_muxed_state : public williams_state
+// Bubbles: 8-bit nvram
+class bubbles_state : public williams_state
 {
 public:
-	williams_muxed_state(const machine_config &mconfig, device_type type, const char *tag) :
+	bubbles_state(const machine_config &mconfig, device_type type, const char *tag) :
+		williams_state(mconfig, type, tag)
+	{ }
+
+protected:
+	virtual void cmos_w(offs_t offset, u8 data) override;
+};
+
+// Conquest: flywheel controller
+class conquest_state : public williams_state
+{
+public:
+	conquest_state(const machine_config &mconfig, device_type type, const char *tag) :
+		williams_state(mconfig, type, tag),
+		m_dial(*this, "DIAL")
+	{ }
+
+	DECLARE_CUSTOM_INPUT_MEMBER(dial0_r) { return m_dial->read() & 3; }
+	DECLARE_CUSTOM_INPUT_MEMBER(dial1_r) { return m_dial->read() >> 2 & 3; }
+
+private:
+	required_ioport m_dial;
+};
+
+// Joust, Splat: muxed inputs
+class wms_muxed_state : public williams_state
+{
+public:
+	wms_muxed_state(const machine_config &mconfig, device_type type, const char *tag) :
 		williams_state(mconfig, type, tag),
 		m_mux0(*this, "mux_0"),
 		m_mux1(*this, "mux_1")
@@ -237,6 +247,7 @@ private:
 	required_device<ls157_device> m_mux1;
 };
 
+// Speed Ball: more input ports
 class spdball_state : public williams_state
 {
 public:
@@ -247,9 +258,10 @@ public:
 	void spdball(machine_config &config);
 
 private:
-	void main_map(address_map &map);
+	virtual void main_map(address_map &map) override;
 };
 
+// Blaster: extra sound hardware
 class blaster_state : public williams_state
 {
 public:
@@ -283,16 +295,17 @@ private:
 	void remap_select_w(u8 data);
 	void video_control_w(u8 data);
 	TIMER_CALLBACK_MEMBER(deferred_snd_cmd_w);
-	void snd_cmd_w(u8 data);
+	void blaster_snd_cmd_w(u8 data);
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
 	inline void update_blaster_banking();
 
-	void main_map(address_map &map);
+	virtual void main_map(address_map &map) override;
 	void sound2_map(address_map &map);
 };
 
+// base Williams 2nd gen hardware
 class williams2_state : public williams_state
 {
 public:
@@ -350,7 +363,7 @@ protected:
 	virtual TIMER_DEVICE_CALLBACK_MEMBER(va11_callback) override;
 	TIMER_DEVICE_CALLBACK_MEMBER(endscreen_callback);
 	TIMER_CALLBACK_MEMBER(deferred_snd_cmd_w);
-	void snd_cmd_w(u8 data);
+	virtual void snd_cmd_w(u8 data) override;
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
@@ -383,6 +396,7 @@ protected:
 	void d000_map(address_map &map);
 };
 
+// Inferno
 class inferno_state : public williams_d000_ram_state
 {
 public:
@@ -397,6 +411,7 @@ private:
 	required_device<ls157_device> m_mux;
 };
 
+// Mystic Marathon
 class mysticm_state : public williams_d000_ram_state
 {
 public:
@@ -420,9 +435,9 @@ private:
 	int color_decode(uint8_t base_col, int sig_J1, int y);
 
 	uint8_t m_bg_color = 0;
-
 };
 
+// Turkey Shoot
 class tshoot_state : public williams_d000_rom_state
 {
 public:
@@ -454,6 +469,7 @@ private:
 	output_finder<> m_feather_blower;
 };
 
+// Joust 2
 class joust2_state : public williams_d000_rom_state
 {
 public:
@@ -476,18 +492,9 @@ private:
 	virtual void bg_select_w(u8 data) override;
 
 	TIMER_CALLBACK_MEMBER(deferred_snd_cmd_w);
-	void snd_cmd_w(u8 data);
+	virtual void snd_cmd_w(u8 data) override;
 	DECLARE_WRITE_LINE_MEMBER(pia_s11_bg_strobe_w);
 };
 
-/*----------- defined in video/williams.cpp -----------*/
-
-#define WILLIAMS_BLITTER_NONE       0       /* no blitter */
-#define WILLIAMS_BLITTER_SC1        1       /* Special Chip 1 blitter */
-#define WILLIAMS_BLITTER_SC2        2       /* Special Chip 2 "bugfixed" blitter */
-
-#define WILLIAMS_TILEMAP_MYSTICM    0       /* IC79 is a 74LS85 comparator */
-#define WILLIAMS_TILEMAP_TSHOOT     1       /* IC79 is a 74LS157 selector jumpered to be enabled */
-#define WILLIAMS_TILEMAP_JOUST2     2       /* IC79 is a 74LS157 selector jumpered to be disabled */
 
 #endif // MAME_MIDWAY_WILLIAMS_H

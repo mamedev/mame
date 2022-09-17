@@ -364,7 +364,6 @@ void _20pacgal_state::draw_stars(bitmap_rgb32 &bitmap, const rectangle &cliprect
 		uint8_t feedback = (m_stars_ctrl[0] >> 6) & 1;
 		uint16_t star_seta = (m_stars_ctrl[0] >> 3) & 0x01;
 		uint16_t star_setb = (m_stars_ctrl[0] >> 3) & 0x02;
-		int cnt = 0;
 
 		/* This is a guess based on galaga star sets */
 		star_seta = 0x3fc0 | (star_seta << 14);
@@ -399,7 +398,6 @@ void _20pacgal_state::draw_stars(bitmap_rgb32 &bitmap, const rectangle &cliprect
 			{
 				if (y >= cliprect.min_y && y <= cliprect.max_y)
 					bitmap.pix(y, x) = NUM_PENS + (lfsr & 0x3f);
-				cnt++;
 			}
 		}
 	}

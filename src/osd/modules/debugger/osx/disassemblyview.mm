@@ -274,14 +274,14 @@
 - (void)saveConfigurationToNode:(util::xml::data_node *)node {
 	[super saveConfigurationToNode:node];
 	debug_view_disasm *const dasmView = downcast<debug_view_disasm *>(view);
-	node->set_attribute_int("rightbar", dasmView->right_column());
+	node->set_attribute_int(osd::debugger::ATTR_WINDOW_DISASSEMBLY_RIGHT_COLUMN, dasmView->right_column());
 }
 
 
 - (void)restoreConfigurationFromNode:(util::xml::data_node const *)node {
 	[super restoreConfigurationFromNode:node];
 	debug_view_disasm *const dasmView = downcast<debug_view_disasm *>(view);
-	dasmView->set_right_column((disasm_right_column)node->get_attribute_int("rightbar", dasmView->right_column()));
+	dasmView->set_right_column((disasm_right_column)node->get_attribute_int(osd::debugger::ATTR_WINDOW_DISASSEMBLY_RIGHT_COLUMN, dasmView->right_column()));
 }
 
 @end

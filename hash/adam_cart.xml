@@ -7,7 +7,7 @@ license:CC0
 
 	<!--
 	<software name="adamdev" supported="no">
-	    <description>ADAM Dev (Prototype)</description>
+	    <description>ADAM Dev (prototype)</description>
 	    <year>198?</year>
 	    <publisher>Coleco?</publisher>
 	    <part name="cart" interface="coleco_cart">
@@ -22,7 +22,7 @@ license:CC0
 	-->
 
 	<software name="ard" supported="no">
-		<description>ADAM Resident Debugger (Prototype Rev20)</description>
+		<description>ADAM Resident Debugger (prototype revision 2.0)</description>
 		<year>198?</year>
 		<publisher>Coleco?</publisher>
 
@@ -58,7 +58,7 @@ license:CC0
 	</software>
 
 	<software name="adamdiaga" cloneof="adamdiag">
-		<description>ADAM Diagnostics (Alt)</description>
+		<description>ADAM Diagnostics (alt)</description>
 		<year>198?</year>
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="coleco_cart">
@@ -80,7 +80,7 @@ license:CC0
 	</software>
 
 	<software name="adamtesta" cloneof="adamtest">
-		<description>ADAM Final Test (Alt)</description>
+		<description>ADAM Final Test (alt)</description>
 		<year>198?</year>
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="coleco_cart">

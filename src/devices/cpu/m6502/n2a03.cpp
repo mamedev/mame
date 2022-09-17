@@ -13,7 +13,8 @@
 #include "n2a03d.h"
 
 DEFINE_DEVICE_TYPE(N2A03_CORE, n2a03_core_device, "n2a03_core", "Ricoh N2A03 core") // needed for some VT systems with XOP instead of standard APU
-DEFINE_DEVICE_TYPE(N2A03, n2a03_device, "n2a03", "Ricoh N2A03")
+DEFINE_DEVICE_TYPE(N2A03,      n2a03_device,      "n2a03",      "Ricoh N2A03")      // earliest version, found in punchout, spnchout, dkong3, VS. systems, and some early Famicoms
+DEFINE_DEVICE_TYPE(N2A03G,     n2a03g_device,     "n2a03g",     "Ricoh N2A03G")     // later revision, found in front-loader NES
 
 uint8_t n2a03_device::psg1_4014_r()
 {
@@ -64,12 +65,22 @@ n2a03_core_device::n2a03_core_device(const machine_config &mconfig, const char *
 
 
 
-n2a03_device::n2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: n2a03_core_device(mconfig, N2A03, tag, owner, clock)
+n2a03_device::n2a03_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: n2a03_core_device(mconfig, type, tag, owner, clock)
 	, device_mixer_interface(mconfig, *this, 1)
 	, m_apu(*this, "nesapu")
 {
 	program_config.m_internal_map = address_map_constructor(FUNC(n2a03_device::n2a03_map), this);
+}
+
+n2a03_device::n2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: n2a03_device(mconfig, N2A03, tag, owner, clock)
+{
+}
+
+n2a03g_device::n2a03g_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: n2a03_device(mconfig, N2A03G, tag, owner, clock)
+{
 }
 
 
@@ -92,9 +103,17 @@ uint8_t n2a03_device::apu_read_mem(offs_t offset)
 
 void n2a03_device::device_add_mconfig(machine_config &config)
 {
-	NES_APU(config, m_apu, DERIVED_CLOCK(1,1));
+	APU_2A03(config, m_apu, DERIVED_CLOCK(1,1));
 	m_apu->irq().set(FUNC(n2a03_device::apu_irq));
 	m_apu->mem_read().set(FUNC(n2a03_device::apu_read_mem));
+	m_apu->add_route(ALL_OUTPUTS, *this, 1.0, AUTO_ALLOC_INPUT, 0);
+}
+
+void n2a03g_device::device_add_mconfig(machine_config &config)
+{
+	NES_APU(config, m_apu, DERIVED_CLOCK(1,1));
+	m_apu->irq().set(FUNC(n2a03g_device::apu_irq));
+	m_apu->mem_read().set(FUNC(n2a03g_device::apu_read_mem));
 	m_apu->add_route(ALL_OUTPUTS, *this, 1.0, AUTO_ALLOC_INPUT, 0);
 }
 

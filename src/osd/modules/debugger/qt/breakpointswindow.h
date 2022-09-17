@@ -18,6 +18,9 @@ public:
 	BreakpointsWindow(running_machine &machine, QWidget *parent = nullptr);
 	virtual ~BreakpointsWindow();
 
+protected:
+	virtual void saveConfigurationToNode(util::xml::data_node &node) override;
+
 private slots:
 	void typeChanged(QAction *changedTo);
 
@@ -34,7 +37,7 @@ class BreakpointsWindowQtConfig : public WindowQtConfig
 {
 public:
 	BreakpointsWindowQtConfig() :
-		WindowQtConfig(WIN_TYPE_BREAK_POINTS),
+		WindowQtConfig(osd::debugger::WINDOW_TYPE_POINTS_VIEWER),
 		m_bwType(0)
 	{
 	}
@@ -44,9 +47,7 @@ public:
 	// Settings
 	int m_bwType;
 
-	void buildFromQWidget(QWidget *widget);
 	void applyToQWidget(QWidget *widget);
-	void addToXmlDataNode(util::xml::data_node &node) const;
 	void recoverFromXmlNode(util::xml::data_node const &node);
 };
 

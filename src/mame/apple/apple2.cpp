@@ -1398,7 +1398,7 @@ ROM_START(apple2) /* the classic, non-autoboot apple2 with integer basic in rom.
 	ROMX_LOAD ( "341-0004-00.f8", 0x3800, 0x0800, CRC(020a86d0) SHA1(52a18bd578a4694420009cad7a7a5779a8c00226), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "autostart", "Autostart Monitor")
 	ROMX_LOAD ( "341-0020-00.f8", 0x3800, 0x0800, CRC(079589c4) SHA1(a28852ff997b4790e53d8d0352112c4b1a395098), ROM_BIOS(1)) /* 341-0020-00: Autostart Monitor/Applesoft Basic $f800; Was sometimes mounted on Language card; Label(from Apple Language Card - Front.jpg): S 8115 // C68018 // 341-0020-00 */
-	ROM_END
+ROM_END
 
 ROM_START(apple2p) /* the autoboot apple2+ with applesoft (microsoft-written) basic in rom; optional card with monitor and integer basic was possible but isn't yet supported */
 	ROM_REGION(0x0800,"gfx1",0)

@@ -51,18 +51,26 @@ public:
 	void psg1_4017_w(uint8_t data);
 
 	void n2a03_map(address_map &map);
+
 protected:
+	n2a03_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	required_device<nesapu_device> m_apu;
 
 	virtual void device_add_mconfig(machine_config &config) override;
 
-private:
 	DECLARE_WRITE_LINE_MEMBER(apu_irq);
 	uint8_t apu_read_mem(offs_t offset);
-
 };
 
+class n2a03g_device : public n2a03_device
+{
+public:
+	n2a03g_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+};
 
 /* These are the official XTAL values and clock rates used by Nintendo for
    manufacturing throughout the production of the 2A03. PALC_APU_CLOCK is
@@ -82,6 +90,7 @@ enum {
 };
 
 DECLARE_DEVICE_TYPE(N2A03_CORE, n2a03_core_device)
-DECLARE_DEVICE_TYPE(N2A03, n2a03_device)
+DECLARE_DEVICE_TYPE(N2A03,      n2a03_device)
+DECLARE_DEVICE_TYPE(N2A03G,     n2a03g_device)
 
 #endif // MAME_CPU_M6502_N2A03_H

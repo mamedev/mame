@@ -2,7 +2,7 @@
 // copyright-holders:Juergen Buchmueller
 /*****************************************************************************
  *
- *   upd7810.c
+ *   upd7810.cpp
  *   Portable uPD7810/11, 7810H/11H, 78C10/C11/C14 emulator V0.3
  *
  *  This work is based on the
@@ -12,20 +12,38 @@
  *   not to be confused with the later and incompatible 78K family, though
  *   its architectural influence is acknowledged.
  *
- * NS20030115:
+ * 2002-02-19 (PeT):
+ * - type selection/gamemaster support added
+ * - gamemaster init hack? added
+ * - ORAX added
+ * - jre negative fixed
+ * - prefixed opcodes skipping fixed
+ * - interrupts fixed and improved
+ * - sub(and related)/add/daa flags fixed
+ * - mvi ports,... fixed
+ * - rll, rlr, drll, drlr fixed
+ * - rets fixed
+ * - l0, l1 skipping fixed
+ * - calt fixed
+ *
+ * 2003-01-15 (NS):
  * - fixed INRW_wa()
  * - TODO: add 7807, differences are listed below.
- *       I only added support for these opcodes needed by homedata.c (yes, I am
- *       lazy):
- *       4C CE (MOV A,PT)
- *       48 AC (EXA)
- *       48 AD (EXR)
- *       48 AE (EXH)
- *       48 AF (EXX)
- *       50 xx (SKN bit)
- *       58 xx (SETB)
- *       5B xx (CLR)
- *       5D xx (SK bit)
+ *   I only added support for these opcodes needed by homedata.c (yes, I am lazy):
+ *   - 4C CE (MOV A,PT)
+ *   - 48 AC (EXA)
+ *   - 48 AD (EXR)
+ *   - 48 AE (EXH)
+ *   - 48 AF (EXX)
+ *   - 50 xx (SKN bit)
+ *   - 58 xx (SETB)
+ *   - 5B xx (CLR)
+ *   - 5D xx (SK bit)
+ *
+ * 2004-05-23 (Hau):
+ * - gta, gti, dgt fixed
+ * - working reg opcodes fixed
+ * - sio input fixed
  *
  * 2008-02-24 (Wilbert Pol):
  * - Added preliminary support for uPD7801
@@ -38,31 +56,9 @@
  *   implementation has not been tested and is probably incorrect.
  *
  *****************************************************************************/
-/* Hau around 23 May 2004
-  gta, gti, dgt fixed
-  working reg opcodes fixed
-  sio input fixed
---
-  PeT around 19 February 2002
-  type selection/gamemaster support added
-  gamemaster init hack? added
-  ORAX added
-  jre negativ fixed
-  prefixed opcodes skipping fixed
-  interrupts fixed and improved
-  sub(and related)/add/daa flags fixed
-  mvi ports,... fixed
-  rll, rlr, drll, drlr fixed
-  rets fixed
-  l0, l1 skipping fixed
-  calt fixed
-*/
-
 /*
 
 7807 DESCRIPTION
-
-
 
    PA0  1     64 Vcc
    PA1  2     63 Vdd
@@ -182,7 +178,6 @@ In asynchronous mode, you can
 - switch 7bit/8bit data
 - set parity ON/OFF and EVEN/ODD
 - set 1/2 stop bit
-
 
 
 

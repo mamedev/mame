@@ -560,31 +560,34 @@ void score7_cpu_device::op_specialform()
 			}
 			break;
 		case 0x18:  // sll
-			m_gpr[rd] = m_gpr[ra] << (m_gpr[rb] & 0x1f);
+			r = m_gpr[ra] << (m_gpr[rb] & 0x1f);
 			if (cu)
 			{
-				CHECK_Z(m_gpr[rd]);
-				CHECK_N(m_gpr[rd]);
+				CHECK_Z(r);
+				CHECK_N(r);
 				SET_C(BIT(m_gpr[ra], 32 - (m_gpr[rb] & 0x1f)));
 			}
+			m_gpr[rd] = r;
 			break;
 		case 0x1a:  // srl
-			m_gpr[rd] = m_gpr[ra] >> (m_gpr[rb] & 0x1f);
+			r = m_gpr[ra] >> (m_gpr[rb] & 0x1f);
 			if (cu)
 			{
-				CHECK_Z(m_gpr[rd]);
-				CHECK_N(m_gpr[rd]);
+				CHECK_Z(r);
+				CHECK_N(r);
 				SET_C(BIT(m_gpr[ra], (m_gpr[rb] & 0x1f) - 1));
 			}
+			m_gpr[rd] = r;
 			break;
 		case 0x1b:  // sra
-			m_gpr[rd] = sign_extend(m_gpr[ra] >> (m_gpr[rb] & 0x1f), 32 - (m_gpr[rb] & 0x1f));
+			r = sign_extend(m_gpr[ra] >> (m_gpr[rb] & 0x1f), 32 - (m_gpr[rb] & 0x1f));
 			if (cu)
 			{
-				CHECK_Z(m_gpr[rd]);
-				CHECK_N(m_gpr[rd]);
+				CHECK_Z(r);
+				CHECK_N(r);
 				SET_C(BIT(m_gpr[ra], (m_gpr[rb] & 0x1f) - 1));
 			}
+			m_gpr[rd] = r;
 			break;
 		case 0x1c:  // ror
 			unemulated_op("ror");
@@ -661,10 +664,14 @@ void score7_cpu_device::op_specialform()
 		case 0x28:  // mfsr
 			if (rb < 3)
 				m_gpr[rd] = m_sr[rb];
+			else
+				logerror("%s: mfsr accessing sr%d (PC=0x%08x)\n", tag(), rb, m_ppc);
 			break;
 		case 0x29:  // mtsr
 			if (rb < 3)
 				m_sr[rb] = m_gpr[ra];
+			else
+				logerror("%s: mtsr accessing sr%d (PC=0x%08x)\n", tag(), rb, m_ppc);
 			break;
 		case 0x2a:  // t
 			SET_T(check_condition(rb));
@@ -710,31 +717,34 @@ void score7_cpu_device::op_specialform()
 			unemulated_op("sce");
 			break;
 		case 0x38:  // slli
-			m_gpr[rd] = m_gpr[ra] << rb;
+			r = m_gpr[ra] << rb;
 			if (cu)
 			{
-				CHECK_Z(m_gpr[rd]);
-				CHECK_N(m_gpr[rd]);
+				CHECK_Z(r);
+				CHECK_N(r);
 				SET_C(BIT(m_gpr[ra], 32 - rb));
 			}
+			m_gpr[rd] = r;
 			break;
 		case 0x3a:  // srli
-			m_gpr[rd] = m_gpr[ra] >> rb;
+			r = m_gpr[ra] >> rb;
 			if (cu)
 			{
-				CHECK_Z(m_gpr[rd]);
-				CHECK_N(m_gpr[rd]);
+				CHECK_Z(r);
+				CHECK_N(r);
 				SET_C(BIT(m_gpr[ra], rb - 1));
 			}
+			m_gpr[rd] = r;
 			break;
 		case 0x3b:  // srai
-			m_gpr[rd] = sign_extend(m_gpr[ra] >> rb, 32 - rb);
+			r = sign_extend(m_gpr[ra] >> rb, 32 - rb);
 			if (cu)
 			{
-				CHECK_Z(m_gpr[rd]);
-				CHECK_N(m_gpr[rd]);
+				CHECK_Z(r);
+				CHECK_N(r);
 				SET_C(BIT(m_gpr[ra], rb - 1));
 			}
+			m_gpr[rd] = r;
 			break;
 		case 0x3c:  // rori
 			unemulated_op("rori");
@@ -1196,11 +1206,12 @@ void score7_cpu_device::op_rform2()
 			m_gpr[rd] = r;
 			break;
 		case 0x02:  // neg!
-			m_gpr[rd] = 0 - m_gpr[ra];
-			CHECK_Z(m_gpr[rd]);
-			CHECK_N(m_gpr[rd]);
-			CHECK_V_SUB(0, m_gpr[ra], m_gpr[rd]);
+			r = 0 - m_gpr[ra];
+			CHECK_Z(r);
+			CHECK_N(r);
+			CHECK_V_SUB(0, m_gpr[ra], r);
 			CHECK_C_SUB(0, m_gpr[ra]);
+			m_gpr[rd] = r;
 			break;
 		case 0x03:  // cmp!
 			r = m_gpr[rd] - m_gpr[ra];
@@ -1290,9 +1301,12 @@ void score7_cpu_device::op_iform1a()
 			else
 				m_gpr[rd] += 1 << (imm5 & 0xf);
 
-			// condition flags are invalid after this instruction
+			// according to the datasheet, the flags are undefined after this instruction, but xmen expects the Z flag to be valid.
+			CHECK_Z(m_gpr[rd]);
+			CHECK_N(m_gpr[rd]);
 			break;
 		case 0x01:  // slli!
+			SET_C(BIT(m_gpr[rd], 32 - imm5));
 			m_gpr[rd] <<= imm5;
 			CHECK_Z(m_gpr[rd]);
 			CHECK_N(m_gpr[rd]);
@@ -1301,6 +1315,7 @@ void score7_cpu_device::op_iform1a()
 			unemulated_op("sdbbp!");
 			break;
 		case 0x03:  // srli!
+			SET_C(BIT(m_gpr[rd], imm5 - 1));
 			m_gpr[rd] >>= imm5;
 			CHECK_Z(m_gpr[rd]);
 			CHECK_N(m_gpr[rd]);

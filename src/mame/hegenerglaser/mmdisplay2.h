@@ -42,8 +42,8 @@ private:
 	void lcd_palette(palette_device &palette) const;
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 
-	u8 m_latch = 0;
-	u8 m_ctrl = 0;
+	u8 m_latch;
+	u8 m_ctrl;
 };
 
 

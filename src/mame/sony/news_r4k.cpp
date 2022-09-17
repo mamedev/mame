@@ -335,7 +335,7 @@ protected:
 
 	void led_state_w(offs_t offset, uint32_t data);
 	uint64_t front_panel_r(offs_t offset);
-	
+
 	TIMER_CALLBACK_MEMBER(freerun_clock);
 	uint32_t freerun_r(offs_t offset);
 	void freerun_w(offs_t offset, uint32_t data);
@@ -1236,7 +1236,6 @@ static INPUT_PORTS_START(nws5000)
 INPUT_PORTS_END
 
 ROM_START(nws5000x)
-
 	ROM_REGION64_BE(0x40000, "mrom", 0)
 	ROM_SYSTEM_BIOS(0, "nws5000x", "APbus System Monitor Release 3.201")
 	ROMX_LOAD("mpu-33__ver3.201__1994_sony.rom", 0x00000, 0x40000, CRC(8a6ca2b7) SHA1(72d52e24a554c56938d69f7d279b2e65e284fd59), ROM_BIOS(0))

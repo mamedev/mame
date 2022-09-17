@@ -240,7 +240,7 @@ void delta1_state::delta1(machine_config &config)
 ******************************************************************************/
 
 ROM_START( ccdelta1 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD("ma_winke_y1d", 0x0000, 0x1000, CRC(ddc04aca) SHA1(bbf334c82bc89b2f131f5a50f0a617bc3bc4c329) ) // 2332a
 ROM_END
 

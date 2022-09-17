@@ -250,7 +250,7 @@ void cham24_state::machine_reset()
 void cham24_state::cham24(machine_config &config)
 {
 	/* basic machine hardware */
-	N2A03(config, m_maincpu, NTSC_APU_CLOCK);
+	N2A03G(config, m_maincpu, NTSC_APU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cham24_state::cham24_map);
 
 	/* video hardware */

@@ -32,6 +32,9 @@
 #include "qt/deviceswindow.h"
 #include "qt/deviceinformationwindow.h"
 
+#include "util/xmlfile.h"
+
+
 class debug_qt : public osd_module, public debug_module
 #if defined(_WIN32) && !defined(SDLMAME_WIN32)
 , public QAbstractNativeEventFilter
@@ -53,8 +56,13 @@ public:
 #if defined(_WIN32) && !defined(SDLMAME_WIN32)
 	virtual bool nativeEventFilter(const QByteArray &eventType, void *message, long *) Q_DECL_OVERRIDE;
 #endif
+
 private:
+	void configuration_save(config_type which_type, util::xml::data_node *parentnode);
+	void gather_save_configurations();
+
 	running_machine *m_machine;
+	util::xml::file::ptr m_config;
 };
 
 
@@ -89,75 +97,20 @@ void xml_configuration_load(running_machine &machine, config_type cfg_type, conf
 
 	// Configuration load
 	util::xml::data_node const *wnode = nullptr;
-	for (wnode = parentnode->get_child("window"); wnode; wnode = wnode->get_next_sibling("window"))
+	for (wnode = parentnode->get_child(osd::debugger::NODE_WINDOW); wnode; wnode = wnode->get_next_sibling(osd::debugger::NODE_WINDOW))
 	{
-		WindowQtConfig::WindowType type = (WindowQtConfig::WindowType)wnode->get_attribute_int("type", WindowQtConfig::WIN_TYPE_UNKNOWN);
-		switch (type)
+		switch (wnode->get_attribute_int(osd::debugger::ATTR_WINDOW_TYPE, -1))
 		{
-			case WindowQtConfig::WIN_TYPE_MAIN:               xmlConfigurations.push_back(std::make_unique<MainWindowQtConfig>()); break;
-			case WindowQtConfig::WIN_TYPE_MEMORY:             xmlConfigurations.push_back(std::make_unique<MemoryWindowQtConfig>()); break;
-			case WindowQtConfig::WIN_TYPE_DASM:               xmlConfigurations.push_back(std::make_unique<DasmWindowQtConfig>()); break;
-			case WindowQtConfig::WIN_TYPE_LOG:                xmlConfigurations.push_back(std::make_unique<LogWindowQtConfig>()); break;
-			case WindowQtConfig::WIN_TYPE_BREAK_POINTS:       xmlConfigurations.push_back(std::make_unique<BreakpointsWindowQtConfig>()); break;
-			case WindowQtConfig::WIN_TYPE_DEVICES:            xmlConfigurations.push_back(std::make_unique<DevicesWindowQtConfig>()); break;
-			case WindowQtConfig::WIN_TYPE_DEVICE_INFORMATION: xmlConfigurations.push_back(std::make_unique<DeviceInformationWindowQtConfig>()); break;
+			case osd::debugger::WINDOW_TYPE_CONSOLE:            xmlConfigurations.push_back(std::make_unique<MainWindowQtConfig>()); break;
+			case osd::debugger::WINDOW_TYPE_MEMORY_VIEWER:      xmlConfigurations.push_back(std::make_unique<MemoryWindowQtConfig>()); break;
+			case osd::debugger::WINDOW_TYPE_DISASSEMBLY_VIEWER: xmlConfigurations.push_back(std::make_unique<DasmWindowQtConfig>()); break;
+			case osd::debugger::WINDOW_TYPE_ERROR_LOG_VIEWER:   xmlConfigurations.push_back(std::make_unique<LogWindowQtConfig>()); break;
+			case osd::debugger::WINDOW_TYPE_POINTS_VIEWER:      xmlConfigurations.push_back(std::make_unique<BreakpointsWindowQtConfig>()); break;
+			case osd::debugger::WINDOW_TYPE_DEVICES_VIEWER:     xmlConfigurations.push_back(std::make_unique<DevicesWindowQtConfig>()); break;
+			case osd::debugger::WINDOW_TYPE_DEVICE_INFO_VIEWER: xmlConfigurations.push_back(std::make_unique<DeviceInformationWindowQtConfig>()); break;
 			default: continue;
 		}
 		xmlConfigurations.back()->recoverFromXmlNode(*wnode);
-	}
-}
-
-
-void xml_configuration_save(running_machine &machine, config_type cfg_type, util::xml::data_node *parentnode)
-{
-	// We only save system configuration
-	if (cfg_type != config_type::SYSTEM)
-		return;
-
-	for (int i = 0; i < xmlConfigurations.size(); i++)
-	{
-		WindowQtConfig &config = *xmlConfigurations[i];
-
-		// Create an xml node
-		util::xml::data_node *const debugger_node = parentnode->add_child("window", nullptr);
-
-		// Insert the appropriate information
-		if (debugger_node)
-			config.addToXmlDataNode(*debugger_node);
-	}
-}
-
-
-void gather_save_configurations()
-{
-	xmlConfigurations.clear();
-
-	// Loop over all the open windows
-	foreach (QWidget *widget, QApplication::topLevelWidgets())
-	{
-		if (!widget->isVisible())
-			continue;
-
-		if (!widget->isWindow() || widget->windowType() != Qt::Window)
-			continue;
-
-		// Figure out its type
-		if (dynamic_cast<MainWindow *>(widget))
-			xmlConfigurations.push_back(std::make_unique<MainWindowQtConfig>());
-		else if (dynamic_cast<MemoryWindow *>(widget))
-			xmlConfigurations.push_back(std::make_unique<MemoryWindowQtConfig>());
-		else if (dynamic_cast<DasmWindow *>(widget))
-			xmlConfigurations.push_back(std::make_unique<DasmWindowQtConfig>());
-		else if (dynamic_cast<LogWindow *>(widget))
-			xmlConfigurations.push_back(std::make_unique<LogWindowQtConfig>());
-		else if (dynamic_cast<BreakpointsWindow *>(widget))
-			xmlConfigurations.push_back(std::make_unique<BreakpointsWindowQtConfig>());
-		else if (dynamic_cast<DevicesWindow *>(widget))
-			xmlConfigurations.push_back(std::make_unique<DevicesWindowQtConfig>());
-		else if (dynamic_cast<DeviceInformationWindow *>(widget))
-			xmlConfigurations.push_back(std::make_unique<DeviceInformationWindowQtConfig>());
-
-		xmlConfigurations.back()->buildFromQWidget(widget);
 	}
 }
 
@@ -171,7 +124,7 @@ void load_and_clear_main_window_config(std::vector<std::unique_ptr<WindowQtConfi
 	for (int i = 0; i < configList.size(); i++)
 	{
 		WindowQtConfig &config = *configList[i];
-		if (config.m_type == WindowQtConfig::WIN_TYPE_MAIN)
+		if (config.m_type == osd::debugger::WINDOW_TYPE_CONSOLE)
 		{
 			config.applyToQWidget(mainQtWindow);
 			configList.erase(configList.begin() + i);
@@ -190,17 +143,17 @@ void setup_additional_startup_windows(running_machine &machine, std::vector<std:
 		WindowQt *foo = nullptr;
 		switch (config.m_type)
 		{
-		case WindowQtConfig::WIN_TYPE_MEMORY:
+		case osd::debugger::WINDOW_TYPE_MEMORY_VIEWER:
 			foo = new MemoryWindow(machine); break;
-		case WindowQtConfig::WIN_TYPE_DASM:
+		case osd::debugger::WINDOW_TYPE_DISASSEMBLY_VIEWER:
 			foo = new DasmWindow(machine); break;
-		case WindowQtConfig::WIN_TYPE_LOG:
+		case osd::debugger::WINDOW_TYPE_ERROR_LOG_VIEWER:
 			foo = new LogWindow(machine); break;
-		case WindowQtConfig::WIN_TYPE_BREAK_POINTS:
+		case osd::debugger::WINDOW_TYPE_POINTS_VIEWER:
 			foo = new BreakpointsWindow(machine); break;
-		case WindowQtConfig::WIN_TYPE_DEVICES:
+		case osd::debugger::WINDOW_TYPE_DEVICES_VIEWER:
 			foo = new DevicesWindow(machine); break;
-		case WindowQtConfig::WIN_TYPE_DEVICE_INFORMATION:
+		case osd::debugger::WINDOW_TYPE_DEVICE_INFO_VIEWER:
 			foo = new DeviceInformationWindow(machine); break;
 		default:
 			break;
@@ -263,10 +216,11 @@ void debug_qt::init_debugger(running_machine &machine)
 	}
 
 	m_machine = &machine;
+
 	// Setup the configuration XML saving and loading
 	machine.configuration().config_register("debugger",
 			configuration_manager::load_delegate(&xml_configuration_load, &machine),
-			configuration_manager::save_delegate(&xml_configuration_save, &machine));
+			configuration_manager::save_delegate(&debug_qt::configuration_save, this));
 }
 
 
@@ -343,6 +297,7 @@ void debug_qt::wait_for_debugger(device_t &device, bool firststop)
 		// all the QT windows are already gone.
 		gather_save_configurations();
 	}
+
 #if defined(_WIN32) && !defined(SDLMAME_WIN32)
 	winwindow_update_cursor_state(*m_machine); // make sure the cursor isn't hidden while in debugger
 #endif
@@ -356,6 +311,38 @@ void debug_qt::wait_for_debugger(device_t &device, bool firststop)
 void debug_qt::debugger_update()
 {
 	qApp->processEvents(QEventLoop::AllEvents, 1);
+}
+
+
+void debug_qt::configuration_save(config_type which_type, util::xml::data_node *parentnode)
+{
+	// We only save system configuration for now
+	if ((config_type::SYSTEM == which_type) && parentnode && m_config)
+	{
+		for (util::xml::data_node const *node = m_config->get_first_child(); node; node = node->get_next_sibling())
+			node->copy_into(*parentnode);
+		m_config.reset();
+	}
+}
+
+
+void debug_qt::gather_save_configurations()
+{
+	m_config = util::xml::file::create();
+
+	// Loop over all the open windows
+	foreach (QWidget *widget, QApplication::topLevelWidgets())
+	{
+		if (!widget->isVisible())
+			continue;
+
+		if (!widget->isWindow() || widget->windowType() != Qt::Window)
+			continue;
+
+		WindowQt *const win = dynamic_cast<WindowQt *>(widget);
+		if (win)
+			win->saveConfiguration(*m_config);
+	}
 }
 
 #else // USE_QTDEBUG

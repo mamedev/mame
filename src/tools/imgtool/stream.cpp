@@ -17,6 +17,7 @@
 #include "unzip.h"
 
 #include <cassert>
+#include <cstdarg>
 #include <cstdio>
 #include <cstring>
 

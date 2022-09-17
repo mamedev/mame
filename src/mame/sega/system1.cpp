@@ -630,7 +630,7 @@ void system1_state::soundport_w(u8 data)
 {
 	/* boost interleave when communicating with the sound CPU */
 	m_soundlatch->write(data);
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+	machine().scheduler().perfect_quantum(attotime::from_usec(100));
 }
 
 
@@ -662,7 +662,7 @@ void system1_state::mcu_control_w(u8 data)
 
 	/* boost interleave to ensure that the MCU can break the Z80 out of a HALT */
 	if (!BIT(m_mcu_control, 6) && BIT(data, 6))
-		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
+		machine().scheduler().perfect_quantum(attotime::from_usec(10));
 
 	m_mcu_control = data;
 	m_maincpu->set_input_line(INPUT_LINE_HALT, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
@@ -779,7 +779,7 @@ void system1_state::nob_maincpu_latch_w(u8 data)
 {
 	m_nob_maincpu_latch = data;
 	m_mcu->set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+	machine().scheduler().perfect_quantum(attotime::from_usec(100));
 }
 
 

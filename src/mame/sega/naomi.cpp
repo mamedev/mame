@@ -300,6 +300,7 @@ The King of Route 66 (Rev A)                  840-0087C  23819A  20 (64Mb)   pre
 The Maze of the Kings (prototype)               no cart  *       21 (64Mb)   present  315-6206  FRI           * flash-PCB, not dumped but known to exist
 Tokyo Bus Guide (Rev A)                       840-0045C  23468A  18 (64Mb)   present  315-6206  317-0290-COM  requires 837-13844 JVS IO
 Virtua Athletics / Virtua Athlete (prototype)   no cart  none    21*(64Mb)   present  315-6206  present       * only first 14 flash roms contain game data, have Japan text label "Overseas sales (NA & EU)"
+Virtua Golf / Dynamic Golf (prototype)      not present  *       21*(64Mb)   present  315-6206  present       * instead of EPROM have tiny PCB with 2 flashroms on it, only first 11 flash roms contain game data
 Virtua NBA (prototype)                          no cart  *       21 (64Mb)   present  315-6206  317-0271-COM  * instead of EPROM have tiny PCB with 2 flashroms on it
 Virtua NBA (prototype, 15.11)                   no cart  *       21 (64Mb)   present  315-6206  317-0271-COM  * instead of EPROM have tiny PCB with 2 flashroms on it
 Virtua Tennis / Power Smash (prototype)         no cart  *       21 (64Mb)   present  315-6206  317-0263-COM  * flash-PCB, title screen have label "SOFT R&D Dept.#3", not dumped but known to exist
@@ -8023,6 +8024,31 @@ ROM_END
 
 /* prototype cartridges for games released on GD-ROM */
 
+ROM_START( dygolfp )
+	NAOMIGD_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD("rom0.ic22",   0x00000000, 0x00400000, CRC(2f391fdf) SHA1(cdcc42cbe450897162d0a0e3186caf4ce2b7711d) )
+	ROM_LOAD("rom1.ic1s",   0x00800000, 0x00800000, CRC(2c683edd) SHA1(9a281bfb917b11ff0035a7ad341a4e410502adb9) )
+	ROM_LOAD("rom2.ic2s",   0x01000000, 0x00800000, CRC(1795e6f4) SHA1(8ddbb8d062b3e7b20b64c32977be402706a7689e) )
+	ROM_LOAD("rom3.ic3s",   0x01800000, 0x00800000, CRC(9b45cc32) SHA1(bf0cefed34ef3a04b1a80fe9c39b2674342f7271) )
+	ROM_LOAD("rom4.ic4s",   0x02000000, 0x00800000, CRC(2c5a570a) SHA1(c2732d411c42950add995537b4497e56b478c7e9) )
+	ROM_LOAD("rom5.ic5s",   0x02800000, 0x00800000, CRC(48cc544e) SHA1(6a0beafa0f77ab093108b0d230e44505665fdd97) )
+	ROM_LOAD("rom6.ic6s",   0x03000000, 0x00800000, CRC(e12db83b) SHA1(98c963949f4869f58cee1c7c6a21d4c29bd37ddc) )
+	ROM_LOAD("rom7.ic7s",   0x03800000, 0x00800000, CRC(36c313a6) SHA1(b2ffa974c9651bfddafcca96e51b0323926eb6bc) )
+	ROM_LOAD("rom8.ic8s",   0x04000000, 0x00800000, CRC(9868d078) SHA1(e462885405b114cfacf481a5dd887aeef44d91c6) )
+	ROM_LOAD("rom9.ic9s",   0x04800000, 0x00800000, CRC(032cca1a) SHA1(5e9887915e75fe3548bc73f60c9bdc1981f7b5c9) )
+	ROM_LOAD("rom10.ic10s", 0x05000000, 0x00800000, CRC(6d094477) SHA1(29f1144646053060fa0dcedf6206037915b6fbfe) )
+	ROM_LOAD("rom11.ic11s", 0x05800000, 0x00800000, CRC(6c803ca0) SHA1(2965d8e0b0a96b0a79525012a030c34678cc285e) )
+	// ic 12-21 populated, empty
+
+	ROM_REGION(0x84, "some_eeprom", 0)
+	ROM_LOAD( "sflash.ic37",   0x000000, 0x000084, CRC(40711000) SHA1(ac44d55b5e0a43f90b542285339ce07c69c8929d) )
+
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 populated, not used
+ROM_END
+
 ROM_START( puyofevp )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -8229,7 +8255,6 @@ ROM_START( gundmgd )
 	//PIC16C622A (317-5069-COM)
 	//(sticker 253-5509-5069)
 	ROM_LOAD("317-5069-com.pic", 0x00, 0x4000, CRC(44d0b242) SHA1(cac31c2ed317e2b44ee93d762188aacea2398949) )
-
 ROM_END
 
 ROM_START( sfz3ugd )
@@ -8504,7 +8529,6 @@ ROM_START( bdrdown )
 	//PIC16C622A (317-5097-JPN)
 	//(sticker 253-5509-5097J)
 	ROM_LOAD("317-5097-jpn.pic", 0x00, 0x4000, CRC(16d2a748) SHA1(5358f89c26427428840fd9af7d584a55db5a76de) )
-
 ROM_END
 
 ROM_START( psyvar2 )
@@ -9049,7 +9073,6 @@ ROM_START( vtennis2 )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	ROM_LOAD("317-0318-com.pic", 0x00, 0x4000, CRC(83de4047) SHA1(1808ac0d8353b92296de37f98b490a42a0e141cf) )
-
 ROM_END
 
 /*
@@ -9093,7 +9116,6 @@ ROM_START( keyboard )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	ROM_LOAD("317-0323-com.pic", 0x00, 0x4000, CRC(c8854ef2) SHA1(b43b956df142fe4167dcc2ec805921e25bba180f) )
-
 ROM_END
 
 ROM_START( lupinshoo )
@@ -9166,7 +9188,6 @@ ROM_START( luptype )
 	//PIC16C622A (317-0332-JPN)
 	//(sticker 253-5508-0332J)
 	ROM_LOAD("317-0332-jpn.pic", 0x00, 0x4000, CRC(43e78ecf) SHA1(bbe4b036e965fbba6ab79c88cba4ea8f0ea3f9fc) )
-
 ROM_END
 
 /*
@@ -9200,7 +9221,6 @@ ROM_START( mok )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	ROM_LOAD("317-0333-com.pic", 0x00, 0x4000, CRC(15fb7792) SHA1(03932ba9b1738d5ab75b2a465cc3254e75f59f63) )
-
 ROM_END
 
 
@@ -9215,7 +9235,6 @@ ROM_START( ngdup23a )
 	//PIC16C622A (317-0314-COM)
 	//(sticker 253-5508-0314)
 	ROM_LOAD("317-0314-com.pic", 0x00, 0x4000,  CRC(fa0b6c70) SHA1(c29936cb18e1dd592563b1104281f031e3b12fc2) )
-
 ROM_END
 
 ROM_START( ngdup23c )
@@ -9920,7 +9939,6 @@ ROM_START( vf4o )
 	//PIC16C622A (317-0314-COM)
 	//(sticker 253-5508-0314)
 	ROM_LOAD("317-0314-com.pic", 0x00, 0x4000, CRC(fa0b6c70) SHA1(c29936cb18e1dd592563b1104281f031e3b12fc2) )
-
 ROM_END
 
 ROM_START( vf4b )
@@ -9934,7 +9952,6 @@ ROM_START( vf4b )
 	//PIC16C622A (317-0314-COM)
 	//(sticker 253-5508-0314)
 	ROM_LOAD("317-0314-com.pic", 0x00, 0x4000, CRC(fa0b6c70) SHA1(c29936cb18e1dd592563b1104281f031e3b12fc2) )
-
 ROM_END
 
 ROM_START( vf4 )
@@ -9948,7 +9965,6 @@ ROM_START( vf4 )
 	//PIC16C622A (317-0314-COM)
 	//(sticker 253-5508-0314)
 	ROM_LOAD("317-0314-com.pic", 0x00, 0x4000, CRC(fa0b6c70) SHA1(c29936cb18e1dd592563b1104281f031e3b12fc2) )
-
 ROM_END
 
 /*
@@ -9987,7 +10003,6 @@ ROM_START( beachspi )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	ROM_LOAD("317-0317-com.pic", 0x00, 0x4000, CRC(ef65fe73) SHA1(2c02d1570c1fdad56bc684c60bb17255c73c6d45) )
-
 ROM_END
 
 ROM_START( initd )
@@ -10035,7 +10050,6 @@ ROM_START( vf4evo )
 	//PIC16C622A (317-0338-JPN)
 	//(sticker 253-5508-0338J)
 	ROM_LOAD("317-0338-jpn.pic", 0x00, 0x4000, CRC(b177ba7d) SHA1(f751ec43a8e944a01eeda58c01b7bc73e5df749d) )
-
 ROM_END
 
 ROM_START( vf4evob )
@@ -10049,7 +10063,6 @@ ROM_START( vf4evob )
 	//PIC16C622A (317-0338-JPN)
 	//(sticker 253-5508-0338J)
 	ROM_LOAD("317-0338-jpn.pic", 0x00, 0x4000, CRC(b177ba7d) SHA1(f751ec43a8e944a01eeda58c01b7bc73e5df749d) )
-
 ROM_END
 
 ROM_START( vf4evoa )
@@ -10258,7 +10271,6 @@ ROM_START( vf4tunedd )
 	//PIC16C622A (317-0387-COM)
 	//(sticker 253-5508-0387)
 	ROM_LOAD("317-0387-com.pic", 0x00, 0x4000, CRC(8728aeaa) SHA1(07983ab41d143f845c3150dfc9b7301968708e18) )
-
 ROM_END
 
 
@@ -10793,6 +10805,7 @@ void naomi_state::init_hotd2()
 // 0xxx Star Horse 2002 (whole set)
 
 /* Cartridge prototypes of games released on GD-ROM */
+/* none */ GAME( 2001, dygolfp,   dygolf,   naomim2, naomi, naomi_state, init_naomi, ROT0, "Sega", "Virtua Golf / Dynamic Golf (prototype)", GAME_FLAGS )
 /* none */ GAME( 2003, puyofevp,  puyofev,  naomim1, naomi, naomi_state, init_naomi, ROT0, "Sega", "Puyo Puyo Fever (prototype ver 0.01)", GAME_FLAGS )
 /* none */ GAME( 2001, vathletep, vathlete, naomim2, naomi, naomi_state, init_naomi, ROT0, "Sega", "Virtua Athletics / Virtua Athlete (prototype)", GAME_FLAGS )
 

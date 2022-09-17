@@ -3,7 +3,8 @@
 #ifndef MAME_DEBUGGER_QT_WINDOWQT_H
 #define MAME_DEBUGGER_QT_WINDOWQT_H
 
-#include "config.h"
+#include "../xmlconfig.h"
+
 #include "debugger.h"
 
 #include <QtWidgets/QMainWindow>
@@ -29,6 +30,7 @@ public:
 	bool wantsHide() { return s_hideAll; }
 	void clearHideFlag() { s_hideAll = false; }
 
+	void saveConfiguration(util::xml::data_node &parentnode);
 
 protected slots:
 	void debugActOpenMemory();
@@ -51,6 +53,8 @@ protected slots:
 
 
 protected:
+	virtual void saveConfigurationToNode(util::xml::data_node &node);
+
 	running_machine &m_machine;
 
 	static bool s_refreshAll;
@@ -64,20 +68,7 @@ protected:
 class WindowQtConfig
 {
 public:
-	enum WindowType
-	{
-		WIN_TYPE_UNKNOWN,
-		WIN_TYPE_MAIN,
-		WIN_TYPE_MEMORY,
-		WIN_TYPE_DASM,
-		WIN_TYPE_LOG,
-		WIN_TYPE_BREAK_POINTS,
-		WIN_TYPE_DEVICES,
-		WIN_TYPE_DEVICE_INFORMATION
-	};
-
-public:
-	WindowQtConfig(const WindowType& type=WIN_TYPE_UNKNOWN) :
+	WindowQtConfig(int type) :
 		m_type(type),
 		m_size(800, 600),
 		m_position(120, 120)
@@ -85,13 +76,11 @@ public:
 	virtual ~WindowQtConfig() {}
 
 	// Settings
-	WindowType m_type;
+	int m_type;
 	QPoint m_size;
 	QPoint m_position;
 
-	virtual void buildFromQWidget(QWidget *widget);
 	virtual void applyToQWidget(QWidget *widget);
-	virtual void addToXmlDataNode(util::xml::data_node &node) const;
 	virtual void recoverFromXmlNode(util::xml::data_node const &node);
 };
 
