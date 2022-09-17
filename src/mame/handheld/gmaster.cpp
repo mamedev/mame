@@ -32,6 +32,10 @@ TODO:
 - sound off doesn't work (usually the Select button to toggle), speaker is
   connected to PC4, but upd7810.cpp doesn't automatically write to port C
   on MCC related changes
+- related to the note above, writing to PC4 manually when MCC4 is off won't
+  produce sound, the only game that does this is hspace
+- hspace should have some kind of volume filter on the bgm, not sure what
+  controls it, maybe port B?
 
 BTANB:
 - LCD flickers partially, especially bad in finitezn
