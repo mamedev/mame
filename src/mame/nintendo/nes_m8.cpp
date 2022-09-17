@@ -58,8 +58,8 @@ public:
 		, m_nt_page(*this, "nt_page%u", 0U)
 		, m_prg(*this, "prg%u", 0U)
 		, m_chr(*this, "chr%u", 0U)
-		, m_prg_view(*this, "prg_view")
-		, m_chr_view(*this, "chr_view")
+		, m_prg_bank(*this, "prg_bank")
+		, m_chr_bank(*this, "chr_bank")
 	{
 	}
 
@@ -85,8 +85,8 @@ private:
 
 	required_memory_region_array<16> m_prg;
 	required_memory_region_array<16> m_chr;
-	memory_view m_prg_view;
-	memory_view m_chr_view;
+	required_memory_bank m_prg_bank;
+	required_memory_bank m_chr_bank;
 
 	u8 m_curr_game = 0;
 	u16 m_time_limit = 0;
@@ -159,8 +159,8 @@ void m8_state::m8_set_mirroring()
 
 void m8_state::m8_romswitch()
 {
-	m_prg_view.select(m_curr_game);
-	m_chr_view.select(m_curr_game);
+	m_prg_bank->set_entry(m_curr_game);
+	m_chr_bank->set_entry(m_curr_game);
 	m8_set_mirroring();
 }
 
@@ -191,12 +191,12 @@ void m8_state::m8_map(address_map &map)
 	map(0x4016, 0x4016).rw(FUNC(m8_state::m8_in0_r), FUNC(m8_state::m8_in0_w)); // IN0 - input port 1
 	map(0x4017, 0x4017).r(FUNC(m8_state::m8_in1_r));     // IN1 - input port 2 / PSG second control register
 
-	map(0x8000, 0xffff).view(m_prg_view);
+	map(0x8000, 0xffff).bankr(m_prg_bank);
 }
 
 void m8_state::m8_ppu_map(address_map &map)
 {
-	map(0x0000, 0x1fff).view(m_chr_view);
+	map(0x0000, 0x1fff).bankr(m_chr_bank);
 	map(0x2000, 0x23ff).mirror(0x1000).bankrw(m_nt_page[0]);
 	map(0x2400, 0x27ff).mirror(0x1000).bankrw(m_nt_page[1]);
 	map(0x2800, 0x2bff).mirror(0x1000).bankrw(m_nt_page[2]);
@@ -409,8 +409,8 @@ void m8_state::machine_start()
 
 	for (int i = 0; i < 16; i++)
 	{
-		m_prg_view[i].install_rom(0x8000, 0xffff, m_prg[i]->base());
-		m_chr_view[i].install_rom(0x0000, 0x1fff, m_chr[i]->base());
+		m_prg_bank->configure_entry(i, m_prg[i]->base());
+		m_chr_bank->configure_entry(i, m_chr[i]->base());
 	}
 
 	m_play_timer = timer_alloc(FUNC(m8_state::m8_play_timer_cb), this);
@@ -418,8 +418,6 @@ void m8_state::machine_start()
 	save_item(NAME(m_curr_game));
 	save_item(NAME(m_time_limit));
 	save_pointer(NAME(m_nt_ram), 0x800);
-
-	machine().save().register_postload(save_prepost_delegate(FUNC(m8_state::m8_romswitch), this));
 }
 
 void m8_state::machine_reset()
