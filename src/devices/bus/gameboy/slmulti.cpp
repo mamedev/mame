@@ -55,10 +55,26 @@ private:
 		set_bank_rom_high(page);
 	}
 
+	void update_bank_ram()
+	{
+		u16 const page(bank_ram_entry());
+		LOG(
+				"%s: Set RAM page 0x%X (0x%05X)\n",
+				machine().describe_context(),
+				page,
+				u32(page) << 13);
+		set_bank_ram(page);
+	}
+
 	u16 bank_rom_entry_high() const noexcept
 	{
 		u16 const hi(m_high_page_rom & m_page_mask_rom);
 		return (m_base_page_rom & ~m_page_mask_rom) | (hi ? hi : (m_zero_remap_rom & m_page_mask_rom));
+	}
+
+	u8 bank_ram_entry() const noexcept
+	{
+		return (m_base_page_ram & ~m_page_mask_ram) | (m_page_ram & m_page_mask_ram);
 	}
 
 	memory_view m_view_ctrl;
@@ -73,6 +89,8 @@ private:
 
 	u8 m_enable_ram;
 	u8 m_base_page_ram;
+	u8 m_page_ram;
+	u8 m_page_mask_ram;
 };
 
 
@@ -90,7 +108,9 @@ slmulti_device::slmulti_device(
 	m_page_mask_rom(0U),
 	m_zero_remap_rom(0U),
 	m_enable_ram(0U),
-	m_base_page_ram(0U)
+	m_base_page_ram(0U),
+	m_page_ram(0U),
+	m_page_mask_ram(0U)
 {
 }
 
@@ -156,6 +176,8 @@ void slmulti_device::device_start()
 
 	m_enable_ram = 0U;
 	m_base_page_ram = 0U;
+	m_page_ram = 0U;
+	m_page_mask_ram = 0U;
 
 	save_item(NAME(m_config_cmd));
 	save_item(NAME(m_base_page_rom));
@@ -164,6 +186,8 @@ void slmulti_device::device_start()
 	save_item(NAME(m_zero_remap_rom));
 	save_item(NAME(m_enable_ram));
 	save_item(NAME(m_base_page_ram));
+	save_item(NAME(m_page_ram));
+	save_item(NAME(m_page_mask_ram));
 }
 
 
@@ -175,6 +199,7 @@ void slmulti_device::device_reset()
 
 	set_bank_rom_low(m_base_page_rom & ~m_page_mask_rom);
 	update_bank_rom_high();
+	update_bank_ram();
 }
 
 
@@ -217,7 +242,8 @@ void slmulti_device::set_config_cmd(u8 data)
 
 void slmulti_device::bank_switch_ram(u8 data)
 {
-	LOG("%s: Set RAM bank 0x%02X\n", machine().describe_context(), data);
+	m_page_ram = data & 0x0f;
+	update_bank_ram();
 }
 
 
@@ -279,12 +305,14 @@ void slmulti_device::do_config_cmd(u8 data)
 	case 0xbb:
 		m_enable_ram = BIT(data, 5);
 		m_base_page_ram = BIT(data, 0, 4);
-		set_bank_ram(m_base_page_ram);
+		m_page_mask_ram = BIT(data, 4) ? 0x00 : 0x03;
 		LOG(
-				"%s: Set RAM %s, base page = 0x%X\n",
+				"%s: Set RAM %s, base page = 0x%X, page mask = 0x%X\n",
 				machine().describe_context(),
 				m_enable_ram ? "enabled" : "disabled",
-				m_base_page_ram);
+				m_base_page_ram,
+				m_page_mask_ram);
+		update_bank_ram();
 		break;
 
 	default:

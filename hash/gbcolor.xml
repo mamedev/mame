@@ -26372,6 +26372,7 @@ license:CC0
 		<year>200?</year>
 		<publisher>Vast Fame</publisher>
 		<info name="alt_title" value="銀版中文RPG戰略+動作+益智12in1" />
+		<info name="usage" value="Use hard reset to return to game selection menu." />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_slmulti" />
 			<dataarea name="rom" size="0x800000">
@@ -26386,10 +26387,25 @@ license:CC0
 		<year>200?</year>
 		<publisher>Vast Fame</publisher>
 		<info name="alt_title" value="史上超強RPG+格鬥+益智版組合卡18in1" />
+		<info name="usage" value="Use hard reset to return to game selection menu." />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_slmulti" />
 			<dataarea name="rom" size="0x1000000">
 				<rom name="shishang chaoqiang rpg + gedou + yizhi ban zuhe ka 18 in 1.gbc" size="0x1000000" crc="28519ab1" sha1="b4c81c2b1d7f787ee92f38d45c86fe602c0aba22" />
+			</dataarea>
+			<dataarea name="nvram" size="0x20000" />
+		</part>
+	</software>
+
+	<software name="sl36in1">
+		<description>36 in 1 (SL36-0032)</description>
+		<year>200?</year>
+		<publisher>SL?</publisher>
+		<info name="usage" value="Use hard reset to return to game selection menu." />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_slmulti" />
+			<dataarea name="rom" size="0x400000">
+				<rom name="36 in 1 sl36-0032.gbc" size="0x400000" crc="f68d980a" sha1="63181a86fa4a653744e9c393aa9f113e981d9cc7" />
 			</dataarea>
 			<dataarea name="nvram" size="0x20000" />
 		</part>
