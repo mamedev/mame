@@ -110,9 +110,9 @@ void mpu4mod2_machines_state::mpu4_memmap_characteriser_rtc(address_map &map)
 template<const uint8_t* Table> void mpu4mod2_machines_state::mod2_cheatchr_pal_rtc_f(machine_config &config)
 {
 	mod2_cheatchr_pal_f<Table>(config);
-	
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4mod2_machines_state::mpu4_memmap_characteriser_rtc);
-	
+
 	M48T02(config, "rtc");
 }
 

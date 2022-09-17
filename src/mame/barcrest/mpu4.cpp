@@ -335,7 +335,7 @@ void mpu4_state::update_meters()
 	case STANDARD_REEL:
 		if (m_hopper_type != TUBES)
 		{
-			data = (data & 0x0F); //Strip reel data from meter drives, leaving active elements			
+			data = (data & 0x0F); //Strip reel data from meter drives, leaving active elements
 		}
 		break;
 
@@ -777,33 +777,33 @@ uint8_t mpu4_state::pia_ic5_porta_r()
 	if (m_hopper_type == HOPPER_NONDUART_A)
 	{
 		if (m_hopper1->line_r() && m_hopper1_opto)
-        {
-            m_aux1_input |= 0x04;
-        }
-        else
-        {
-            m_aux1_input &= ~0x04;
-        }
+		{
+			m_aux1_input |= 0x04;
+		}
+		else
+		{
+			m_aux1_input &= ~0x04;
+		}
 	}
 	else if (m_hopper_type == HOPPER_TWIN_HOPPER)
 	{
 		if (m_hopper1->line_r())
-	    {
-	        m_aux1_input |= 0x08;
-	    }
-	    else
-	    {
-	        m_aux1_input &= ~0x08;
-	    }
+		{
+			m_aux1_input |= 0x08;
+		}
+		else
+		{
+			m_aux1_input &= ~0x08;
+		}
 
 		if (m_hopper2->line_r())
-	    {
-	        m_aux1_input |= 0x04;
-	    }
-	    else
-	    {
-	        m_aux1_input &= ~0x04;
-	    }
+		{
+			m_aux1_input |= 0x04;
+		}
+		else
+		{
+			m_aux1_input &= ~0x04;
+		}
 	}
 
 	LOG(("%s: IC5 PIA Read of Port A (AUX1)\n",machine().describe_context()));
@@ -918,13 +918,13 @@ uint8_t mpu4_state::pia_ic5_portb_r()
 	if (m_hopper_type == HOPPER_NONDUART_B)
 	{
 		if (m_hopper1->line_r() && m_hopper1_opto)
-	    {
-	        m_aux2_input |= 0x08;
-	    }
-	    else
-	    {
-	        m_aux2_input &= ~0x08;
-	    }
+		{
+			m_aux2_input |= 0x08;
+		}
+		else
+		{
+			m_aux2_input &= ~0x08;
+		}
 	}
 
 	LOG(("%s: IC5 PIA Read of Port B (coin input AUX2)\n",machine().describe_context()));
@@ -1102,7 +1102,7 @@ void mpu4_state::pia_ic7_portb_w(uint8_t data)
 	else if (m_hopper_type == HOPPER_TWIN_HOPPER)
 	{
 		m_hopper1->motor_w(data & 0x20);
-		m_hopper2->motor_w(data & 0x40);		
+		m_hopper2->motor_w(data & 0x40);
 	}
 
 	m_mmtr_data = data;
@@ -1171,7 +1171,7 @@ void mpu4_state::pia_ic8_portb_w(uint8_t data)
 	{
 		m_hopper1->motor_w(data & 0x01);
 		m_hopper1_opto =  (data & 0x04);
-		data &= ~0x05; //remove Triacs from use			
+		data &= ~0x05; //remove Triacs from use
 	}
 	else if (m_hopper_type == HOPPER_DUART_C)
 	{
@@ -1180,7 +1180,7 @@ void mpu4_state::pia_ic8_portb_w(uint8_t data)
 		m_hopper1_opto =  (data & 0x04);
 		m_hopper2->motor_w(data & 0x02);
 		m_hopper2_opto =  (data & 0x04);
-		data &= ~0x07; //remove Triacs from use			
+		data &= ~0x07; //remove Triacs from use
 	}
 	LOG_IC8(("%s: IC8 PIA Port B Set to %2x (OUTPUT PORT, TRIACS)\n", machine().describe_context(),data));
 	for (int i = 0; i < 8; i++)
@@ -2351,7 +2351,7 @@ void mpu4_state::mpu4_common(machine_config &config)
 
 	BACTA_DATALOGGER(config, m_dataport, 0);
 	m_dataport->rxd_handler().set(FUNC(mpu4_state::dataport_rxd));
-	
+
 	HOPPER(config, m_hopper1, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 }
 

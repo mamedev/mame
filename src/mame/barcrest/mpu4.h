@@ -106,7 +106,7 @@ namespace mpu4_traits {
 		RT1,    // 1-3
 		RT2,    // 4-12
 		RT3,    // 96-3
-		
+
 		// Lamp extenders
 		LPS,    // small
 		LPLA,   // large A
@@ -172,7 +172,7 @@ public:
 		, m_mpu4leds(*this, "mpu4led%u", 0U)
 		, m_digits(*this, "digit%u", 0U)
 		, m_triacs(*this, "triac%u", 0U)
-		
+
 	 { }
 
 	void init_m4();
@@ -572,7 +572,7 @@ protected:
 
 	bool m_hopper1_opto = false;
 	bool m_hopper2_opto = false;
-	
+
 	static constexpr uint8_t reel_mux_table[8]= {0,4,2,6,1,5,3,7};//include 7, although I don't think it's used, this is basically a wire swap
 	static constexpr uint8_t reel_mux_table7[8]= {3,1,5,6,4,2,0,7};
 };
