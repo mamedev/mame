@@ -12,7 +12,7 @@
 #include "emu.h"
 #include "slmulti.h"
 
-#include "cartbase.h"
+#include "cartbase.ipp"
 
 #include <string>
 
@@ -25,7 +25,7 @@ namespace bus::gameboy {
 
 namespace {
 
-class slmulti_device : public mbc_dual_uniform_device_base
+class slmulti_device : public mbc_ram_device_base<mbc_dual_uniform_device_base>
 {
 public:
 	slmulti_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
@@ -37,8 +37,10 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
+	void enable_ram(u8 data);
 	void bank_switch_rom_fine(u8 data);
 	void bank_switch_rom_coarse(u8 data);
+	void bank_switch_ram(u8 data);
 	void set_config_cmd(u8 data);
 	void do_config_cmd(u8 data);
 
@@ -55,17 +57,22 @@ private:
 
 	u16 bank_rom_entry_high() const noexcept
 	{
-		u16 const hi(m_high_page & m_page_mask);
-		return (m_base_page & ~m_page_mask) | (hi ? hi : (m_zero_remap & m_page_mask));
+		u16 const hi(m_high_page_rom & m_page_mask_rom);
+		return (m_base_page_rom & ~m_page_mask_rom) | (hi ? hi : (m_zero_remap_rom & m_page_mask_rom));
 	}
 
 	memory_view m_view_ctrl;
+	memory_view m_view_ram;
 
-	u16 m_base_page;
-	u16 m_high_page;
-	u16 m_page_mask;
-	u16 m_zero_remap;
-	u8 m_config_cmd;
+	u16 m_config_cmd;
+
+	u16 m_base_page_rom;
+	u16 m_high_page_rom;
+	u16 m_page_mask_rom;
+	u16 m_zero_remap_rom;
+
+	u8 m_enable_ram;
+	u8 m_base_page_ram;
 };
 
 
@@ -74,32 +81,46 @@ slmulti_device::slmulti_device(
 		char const *tag,
 		device_t *owner,
 		u32 clock) :
-	mbc_dual_uniform_device_base(mconfig, GB_ROM_SLMULTI, tag, owner, clock),
+	mbc_ram_device_base<mbc_dual_uniform_device_base>(mconfig, GB_ROM_SLMULTI, tag, owner, clock),
 	m_view_ctrl(*this, "ctrl"),
-	m_base_page(0U),
-	m_high_page(0U),
-	m_page_mask(0U),
-	m_zero_remap(0U),
-	m_config_cmd(0U)
+	m_view_ram(*this, "ram"),
+	m_config_cmd(0U),
+	m_base_page_rom(0U),
+	m_high_page_rom(0U),
+	m_page_mask_rom(0U),
+	m_zero_remap_rom(0U),
+	m_enable_ram(0U),
+	m_base_page_ram(0U)
 {
 }
 
 
 image_init_result slmulti_device::load(std::string &message)
 {
-	// set up ROM
+	// set up ROM and RAM
 	set_bank_bits_rom(10);
-	if (!check_rom(message))
+	set_bank_bits_ram(4);
+	if (!check_rom(message) || !check_ram(message))
 		return image_init_result::FAIL;
+	cart_space()->install_view(0xa000, 0xbfff, m_view_ram);
 	install_rom();
+	install_ram(m_view_ram[0]);
 
 	// install memory mapping control handlers
-	cart_space()->install_view(
-			0x2000, 0x7fff,
-			m_view_ctrl);
+	cart_space()->install_write_handler(
+			0x0000, 0x1fff,
+			write8smo_delegate(*this, FUNC(slmulti_device::enable_ram)));
 	cart_space()->install_write_handler(
 			0x2000, 0x3fff,
 			write8smo_delegate(*this, FUNC(slmulti_device::bank_switch_rom_fine)));
+	cart_space()->install_write_handler(
+			0x4000, 0x5fff,
+			write8smo_delegate(*this, FUNC(slmulti_device::bank_switch_ram)));
+
+	// configuration mode and MBC5 mode partially overlay the normal handlers
+	cart_space()->install_view(
+			0x2000, 0x7fff,
+			m_view_ctrl);
 
 	// this is for MBC5 games
 	m_view_ctrl[0].install_write_handler(
@@ -124,34 +145,58 @@ image_init_result slmulti_device::load(std::string &message)
 
 void slmulti_device::device_start()
 {
-	mbc_dual_uniform_device_base::device_start();
+	mbc_ram_device_base<mbc_dual_uniform_device_base>::device_start();
 
-	m_base_page = 0U;
-	m_high_page = 0U;
-	m_page_mask = 1U;
-	m_zero_remap = 0U;
-	m_config_cmd = 0U;
+	m_config_cmd = 0x0100U;
 
-	save_item(NAME(m_base_page));
-	save_item(NAME(m_high_page));
-	save_item(NAME(m_page_mask));
-	save_item(NAME(m_zero_remap));
+	m_base_page_rom = 0U;
+	m_high_page_rom = 0U;
+	m_page_mask_rom = 1U;
+	m_zero_remap_rom = 0U;
+
+	m_enable_ram = 0U;
+	m_base_page_ram = 0U;
+
 	save_item(NAME(m_config_cmd));
+	save_item(NAME(m_base_page_rom));
+	save_item(NAME(m_high_page_rom));
+	save_item(NAME(m_page_mask_rom));
+	save_item(NAME(m_zero_remap_rom));
+	save_item(NAME(m_enable_ram));
+	save_item(NAME(m_base_page_ram));
 }
 
 
 void slmulti_device::device_reset()
 {
-	mbc_dual_uniform_device_base::device_reset();
+	mbc_ram_device_base<mbc_dual_uniform_device_base>::device_reset();
 
-	set_bank_rom_low(m_base_page & ~m_page_mask);
+	m_view_ram.disable();
+
+	set_bank_rom_low(m_base_page_rom & ~m_page_mask_rom);
 	update_bank_rom_high();
+}
+
+
+void slmulti_device::enable_ram(u8 data)
+{
+	// TODO: how many bits are checked?
+	if ((0x0a == (data & 0x0f)) && m_enable_ram)
+	{
+		LOG("%s: Cartridge RAM enabled\n", machine().describe_context());
+		m_view_ram.select(0);
+	}
+	else
+	{
+		LOG("%s: Cartridge RAM disabled\n", machine().describe_context());
+		m_view_ram.disable();
+	}
 }
 
 
 void slmulti_device::bank_switch_rom_fine(u8 data)
 {
-	m_high_page = data;
+	m_high_page_rom = data;
 	update_bank_rom_high();
 }
 
@@ -170,22 +215,33 @@ void slmulti_device::set_config_cmd(u8 data)
 }
 
 
+void slmulti_device::bank_switch_ram(u8 data)
+{
+	LOG("%s: Set RAM bank 0x%02X\n", machine().describe_context(), data);
+}
+
+
 void slmulti_device::do_config_cmd(u8 data)
 {
+	LOG(
+			"%s: Execute configuration command 0x%02X with argument 0x%02X\n",
+			machine().describe_context(),
+			m_config_cmd,
+			data);
 	switch (m_config_cmd)
 	{
 	case 0x55:
 		// bit 4 unknown
-		m_base_page = (m_base_page & ~0x0200) | (u16(BIT(data, 3)) << 9);
-		m_page_mask = (2U << BIT(~data, 0, 3)) - 1;
+		m_base_page_rom = (m_base_page_rom & ~0x0200) | (u16(BIT(data, 3)) << 9);
+		m_page_mask_rom = (2U << BIT(~data, 0, 3)) - 1;
 		switch (BIT(data, 5, 2))
 		{
 		case 0x0: // used for MBC5 games
-			m_zero_remap = 0U;
+			m_zero_remap_rom = 0U;
 			m_view_ctrl.select(0);
 			break;
 		case 0x3: // used for MBC1 games
-			m_zero_remap = 1U;
+			m_zero_remap_rom = 1U;
 			m_view_ctrl.disable();
 			break;
 		default:
@@ -196,35 +252,51 @@ void slmulti_device::do_config_cmd(u8 data)
 			m_view_ctrl.disable();
 		}
 		LOG(
-				"%s: Set base page = 0x%03X (0x%06X), page mask = 0x%03X, zero remap = 0x%03X%s\n",
+				"%s: Set base ROM page = 0x%03X (0x%06X), page mask = 0x%03X, zero remap = 0x%03X%s\n",
 				machine().describe_context(),
-				m_base_page,
-				u32(m_base_page) << 14,
-				m_page_mask,
-				m_zero_remap,
+				m_base_page_rom,
+				u32(m_base_page_rom) << 14,
+				m_page_mask_rom,
+				m_zero_remap_rom,
 				BIT(data, 7) ? ", reset" : "");
-		set_bank_rom_low(m_base_page & ~m_page_mask);
+		set_bank_rom_low(m_base_page_rom & ~m_page_mask_rom);
 		update_bank_rom_high();
 		if (BIT(data, 7))
 			machine().root_device().reset(); // TODO: expose reset line on cartridge interface
 		break;
 
 	case 0xaa:
-		m_base_page = (m_base_page & ~0x01fe) | (u16(data) << 1);
+		m_base_page_rom = (m_base_page_rom & ~0x01fe) | (u16(data) << 1);
 		LOG(
-				"%s: Set base page = 0x%03X (0x%06X)\n",
+				"%s: Set base ROM page = 0x%03X (0x%06X)\n",
 				machine().describe_context(),
-				m_base_page,
-				u32(m_base_page) << 14);
+				m_base_page_rom,
+				u32(m_base_page_rom) << 14);
+		set_bank_rom_low(m_base_page_rom & ~m_page_mask_rom);
+		update_bank_rom_high();
+		break;
+
+	case 0xbb:
+		m_enable_ram = BIT(data, 5);
+		m_base_page_ram = BIT(data, 0, 4);
+		set_bank_ram(m_base_page_ram);
+		LOG(
+				"%s: Set RAM %s, base page = 0x%X\n",
+				machine().describe_context(),
+				m_enable_ram ? "enabled" : "disabled",
+				m_base_page_ram);
 		break;
 
 	default:
-		LOG(
+		logerror(
 				"%s: Unknown configuration command 0x%02X with argument 0x%02X\n",
 				machine().describe_context(),
 				m_config_cmd,
 				data);
 	}
+
+	// gbcolor:vf12in1 immediately writes 0x07 without writing to 0x5000 in between
+	m_config_cmd = 0x0100;
 }
 
 } // anonymous namespace
