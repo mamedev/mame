@@ -3719,6 +3719,8 @@ if (BUSES["GAMEBOY"]~=null) then
 		MAME_DIR .. "src/devices/bus/gameboy/mmm01.h",
 		MAME_DIR .. "src/devices/bus/gameboy/rom.cpp",
 		MAME_DIR .. "src/devices/bus/gameboy/rom.h",
+		MAME_DIR .. "src/devices/bus/gameboy/slmulti.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/slmulti.h",
 		MAME_DIR .. "src/devices/bus/gameboy/slot.cpp",
 		MAME_DIR .. "src/devices/bus/gameboy/slot.h",
 		MAME_DIR .. "src/devices/bus/gameboy/tama5.cpp",

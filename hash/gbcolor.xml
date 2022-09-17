@@ -26287,8 +26287,8 @@ license:CC0
 		<info name="alt_title" value="2003哈利波特2-消失的密室 ~ 2003 Harry Potter 2 - Xiao Shi De Mi Shi"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
-			<dataarea name="rom" size="2097152">
-				<rom name="2003 ha li bo te 2 - xiao shi de mi shi (unlicensed, chinese) [raw dump].bin" size="2097152" crc="1b3e1243" sha1="0829cbcab3ef5d03c94d5efe769f4f4a93ac47fa"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="2003 ha li bo te 2 - xiao shi de mi shi (unlicensed, chinese) [raw dump].bin" size="0x200000" crc="1b3e1243" sha1="0829cbcab3ef5d03c94d5efe769f4f4a93ac47fa"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192" />
 		</part>
@@ -26301,8 +26301,8 @@ license:CC0
 		<info name="alt_title" value="哈利小子IV, 2003哈利小子IV ~ 2003 Ha Li Xiao Zi IV (Cart)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
-			<dataarea name="rom" size="2097152">
-				<rom name="2003 ha li xiao zi iv (unlicensed, chinese) [raw dump].bin" size="2097152" crc="db3c8b95" sha1="0d230b20388f4396d6345b8eb59f54fc169ad8ee"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="2003 ha li xiao zi iv (unlicensed, chinese) [raw dump].bin" size="0x200000" crc="db3c8b95" sha1="0d230b20388f4396d6345b8eb59f54fc169ad8ee"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -26316,8 +26316,8 @@ license:CC0
 		<info name="alt_title" value="女王格鬥2000"/> <!-- translates to "Queen Fight 2000" -->
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_vf001" />
-			<dataarea name="rom" size="2097152">
-				<rom name="Nv Wang Ge Dou 2000 (Unl) [C] [Raw].gbc" size="2097152" crc="e1668b49" sha1="37516139aa317a16440379c1dc00bdfc4c1e607a"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="nuwang gedou.gbc" size="0x200000" crc="e1668b49" sha1="37516139aa317a16440379c1dc00bdfc4c1e607a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -26329,8 +26329,8 @@ license:CC0
 		<info name="alt_title" value="超級格鬥2001α"/> <!-- translates to "Super Fight 2001 Alpha" -->
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_vf001" />
-			<dataarea name="rom" size="2097152">
-				<rom name="Chao Ji Ge Dou 2001 Alpha (Unl) [C] [Raw].gbc" size="2097152" crc="afd7a0cc" sha1="f44f629687ec91aade40ff52014587003f728ec9"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="chaoju gedou 2001 alpha.gbc" size="0x200000" crc="afd7a0cc" sha1="f44f629687ec91aade40ff52014587003f728ec9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -26345,8 +26345,8 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="HK0819" />
 			<feature name="slot" value="rom_newgbchk" />
-			<dataarea name="rom" size="1048576">
-				<rom name="koudai guaishou dongzuo pian.gbc" size="1048576" crc="14355371" sha1="f398086d1f8cb435a632e5ea45fb19e980b0568d" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="koudai guaishou dongzuo pian.gbc" size="0x100000" crc="14355371" sha1="f398086d1f8cb435a632e5ea45fb19e980b0568d" />
 			</dataarea>
 		</part>
 	</software>
@@ -26360,10 +26360,24 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="HK0701" />
 			<feature name="slot" value="rom_newgbchk" />
-			<dataarea name="rom" size="1048576">
-				<rom name="guaishou go go ii.gbc" size="1048576" crc="b0237467" sha1="8ed6f39a9973d634266806455ef845b6bdb5ab95" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="guaishou go go ii.gbc" size="0x100000" crc="b0237467" sha1="8ed6f39a9973d634266806455ef845b6bdb5ab95" />
 			</dataarea>
 			<dataarea name="nvram" size="8192" />
+		</part>
+	</software>
+
+	<!-- some games don't work on gbcolor (e.g. 02. KOF98 works on gameboy but not gbcolor) -->
+	<software name="145in1" supported="partial">
+		<description>New Super Color 145 in 1 (China)</description>
+		<year>200?</year>
+		<publisher>J.Y. Company</publisher>
+		<info name="usage" value="Use hard reset to return to game selection menu." />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_slmulti" />
+			<dataarea name="rom" size="0x1000000">
+				<rom name="new super color 145 in 1.gbc" size="0x1000000" crc="12345678" sha1="cbeb1745d68163978a422a8d7260a6a0f2693b85" />
+			</dataarea>
 		</part>
 	</software>
 
@@ -27601,7 +27615,7 @@ license:CC0
 	used here repeated twice. we need to redump the standalone cart to confirm the size
 	but the 256KB version is definitely underdumped and misses sprite data
 	-->
-		<description>Super Mario 3 Special (China)</description>
+	<description>Super Mario 3 Special (China)</description>
 		<year>2000</year>
 		<publisher>Yong Yong</publisher>
 		<part name="cart" interface="gameboy_cart">

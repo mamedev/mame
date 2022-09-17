@@ -47,6 +47,7 @@ extern char const *const GB_LICHENG;
 extern char const *const GB_NEWGBCHK;
 extern char const *const GB_VF001;
 extern char const *const GB_DIGIMON;
+extern char const *const GB_SLMULTI;
 
 extern char const *const MEGADUCK_STD;
 extern char const *const MEGADUCK_BANKED;

@@ -18,6 +18,7 @@
 #include "mbc7.h"
 #include "mmm01.h"
 #include "rom.h"
+#include "slmulti.h"
 #include "tama5.h"
 
 
@@ -53,6 +54,7 @@ char const *const GB_LICHENG        = "rom_licheng";
 char const *const GB_NEWGBCHK       = "rom_newgbchk";
 char const *const GB_VF001          = "rom_vf001";
 char const *const GB_DIGIMON        = "rom_digimon";
+char const *const GB_SLMULTI        = "rom_slmulti";
 
 char const *const MEGADUCK_STD      = "rom";
 char const *const MEGADUCK_BANKED   = "rom_banked";
@@ -95,6 +97,7 @@ void gameboy_cartridges(device_slot_interface &device)
 	device.option_add_internal(slotoptions::GB_NEWGBCHK,        GB_ROM_NEWGBCHK);
 	device.option_add_internal(slotoptions::GB_VF001,           GB_ROM_VF001);
 	device.option_add_internal(slotoptions::GB_DIGIMON,         GB_ROM_DIGIMON);
+	device.option_add_internal(slotoptions::GB_SLMULTI,         GB_ROM_SLMULTI);
 }
 
 
