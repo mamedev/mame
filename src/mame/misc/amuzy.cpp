@@ -173,7 +173,17 @@ ROM_START( docchift )
 	ROM_LOAD( "s29al016d70tfi01.u3", 0x200000, 0x200000, CRC(fb668dbd) SHA1(49514b0c886578f065e47d9c7a5453e09622ba55) )
 ROM_END
 
+ROM_START( achimuit )
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD16_WORD_SWAP( "s29al004d70tfi01.u1", 0x000000, 0x080000, CRC(b24f7bf4) SHA1(254e814c26a1430d6fecc68e07e7ee2cdab77f21) )
+
+	ROM_REGION(0x400000, "gfx", 0)
+	ROM_LOAD( "s29al016d70tfi01.u2", 0x000000, 0x200000, CRC(cb1fd823) SHA1(f425a37ca425315f294366298146c3f6547a28c0) )
+	ROM_LOAD( "s29al016d70tfi01.u3", 0x200000, 0x200000, CRC(f5bfb1e8) SHA1(e36be311782e4bcbd00a8bc93473f23e5c39c67a) )
+ROM_END
+
 }   // anonymous namespace
 
-GAME( 2007, docchift,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy", "Docchi Fighter",  MACHINE_NOT_WORKING )
-GAME( 2008, mmhammer,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy", "Mogu Mogu Hammer",  MACHINE_NOT_WORKING )
+GAME( 2006, achimuit,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Achi Muite Hoi Batoru",  MACHINE_NOT_WORKING )
+GAME( 2007, docchift,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Docchi Fighter",  MACHINE_NOT_WORKING )
+GAME( 2008, mmhammer,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Mogu Mogu Hammer",  MACHINE_NOT_WORKING )
