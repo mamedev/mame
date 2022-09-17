@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria, hap
+// copyright-holders:Nicola Salmoria
 /***************************************************************************
 
 Oli-Boo-Chu (aka Punching Kid)
