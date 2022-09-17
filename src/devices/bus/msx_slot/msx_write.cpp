@@ -16,21 +16,29 @@ DEFINE_DEVICE_TYPE(MSX_SLOT_MSX_WRITE, msx_slot_msx_write_device, "msx_slot_msx_
 msx_slot_msx_write_device::msx_slot_msx_write_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSX_SLOT_MSX_WRITE, tag, owner, clock)
 	, msx_internal_slot_interface(mconfig, *this)
-	, m_nvram(*this, "nvram")
 	, m_rom_region(*this, finder_base::DUMMY_TAG)
+	, m_switch_port(*this, "SWITCH")
 	, m_region_offset(0)
 	, m_rom(nullptr)
 	, m_bank_base_4000(nullptr)
 	, m_bank_base_8000(nullptr)
+	, m_enabled(true)
 {
 }
 
 
-void msx_slot_msx_write_device::device_add_mconfig(machine_config &config)
-{
-	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
-}
+static INPUT_PORTS_START(msx_write)
+	PORT_START("SWITCH")
+	PORT_CONFNAME(0x01, 0x01, "Firmware is")
+	PORT_CONFSETTING(0x00, "disabled")
+	PORT_CONFSETTING(0x01, "enabled")
+INPUT_PORTS_END
 
+
+ioport_constructor msx_slot_msx_write_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(msx_write);
+}
 
 void msx_slot_msx_write_device::device_start()
 {
@@ -41,8 +49,6 @@ void msx_slot_msx_write_device::device_start()
 	}
 
 	m_rom = m_rom_region->base() + m_region_offset;
-	m_sram.resize(SRAM_SIZE);
-	m_nvram->set_base(m_sram.data(), SRAM_SIZE);
 
 	save_item(NAME(m_selected_bank));
 
@@ -54,6 +60,8 @@ void msx_slot_msx_write_device::device_reset()
 {
 	m_selected_bank[0] = 0x00;
 	m_selected_bank[1] = 0x01;
+
+	m_enabled = BIT(m_switch_port->read(), 0);
 
 	map_bank();
 }
@@ -74,10 +82,9 @@ void msx_slot_msx_write_device::map_bank()
 
 uint8_t msx_slot_msx_write_device::read(offs_t offset)
 {
+	if (!m_enabled)
+		return 0xff;
 	if (offset < 0x8000)
-//		// TODO: How much of the sram is visible?
-//		if (offset >= 0x6000 && offset < 0x6400)
-//			return m_sram[offset & 0x3ff];
 		return m_bank_base_4000[offset & 0x3fff];
 	if (offset < 0xc000)
 		return m_bank_base_8000[offset & 0x3fff];
@@ -87,12 +94,8 @@ uint8_t msx_slot_msx_write_device::read(offs_t offset)
 
 void msx_slot_msx_write_device::write(offs_t offset, uint8_t data)
 {
-//	// TODO: How much of the sram is visible?
-//	if (offset >= 0x6000 && offset <= 0x6400)
-//	{
-//		m_sram[offset & 0x3ff] = data;
-//		return;
-//	}
+	if (!m_enabled)
+		return;
 	logerror("write %04x : %02x\n", offset, data);
 	if (offset == 0x6fff)
 	{

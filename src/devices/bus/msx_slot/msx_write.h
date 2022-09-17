@@ -27,19 +27,17 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
-	static constexpr size_t SRAM_SIZE = 0x2000;
-
-	required_device<nvram_device> m_nvram;
 	required_memory_region m_rom_region;
+	required_ioport m_switch_port;
 	uint32_t m_region_offset;
 	const uint8_t *m_rom;
 	uint8_t m_selected_bank[2];
-	std::vector<uint8_t> m_sram;
 	const uint8_t *m_bank_base_4000;
 	const uint8_t *m_bank_base_8000;
+	bool m_enabled;
 
 	void map_bank();
 };
