@@ -542,7 +542,7 @@ static int generic_write(image_handler &ih, const char *srcpath, const char *dst
 		auto dpath = path;
 		dpath.pop_back();
 		err = fs->file_create(dpath, meta);
-		if(!err) {
+		if(err) {
 			fprintf(stderr, "File creation failure.\n");
 			return 1;
 		}
@@ -550,7 +550,7 @@ static int generic_write(image_handler &ih, const char *srcpath, const char *dst
 
 	auto dfork = image_handler::fload(srcpath);
 	err = fs->file_write(path, dfork);
-	if(!err) {
+	if(err) {
 		fprintf(stderr, "File writing failure.\n");
 		return 1;
 	}

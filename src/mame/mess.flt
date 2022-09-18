@@ -247,6 +247,8 @@ epson/qx10.cpp
 ericsson/e9161.cpp
 ericsson/eispc.cpp
 exidy/sorcerer.cpp
+facit/f4431.cpp
+facit/facit4440.cpp
 fairchild/channelf.cpp
 fairchild/f387x.cpp
 fairlight/cmi.cpp
@@ -287,6 +289,7 @@ gamepark/gp32.cpp
 gridcomp/gridcomp.cpp
 grundy/newbrain.cpp
 h01x/h01x.cpp
+handheld/gmaster.cpp
 handheld/hh_cop400.cpp
 handheld/hh_cops1.cpp
 handheld/hh_hmcs40.cpp
@@ -307,7 +310,6 @@ handheld/talkingfb.cpp
 handheld/tispeak.cpp
 handheld/tispellb.cpp
 handheld/wildfire.cpp
-hartung/gmaster.cpp
 hds/hds200.cpp
 heathkit/et3400.cpp
 heathkit/h19.cpp
@@ -391,6 +393,7 @@ husky/husky.cpp
 ibm/ibm3153.cpp
 ibm/ibm6580.cpp
 ibm/rtpc.cpp
+ibm/rs6000_type7xxx.cpp
 informer/informer_207_100.cpp
 informer/informer_207_376.cpp
 informer/informer_213.cpp
@@ -479,8 +482,9 @@ miltonbradley/vectrex.cpp
 mips/mips.cpp
 misc/3do.cpp
 misc/eva.cpp
-misc/micom_mahjong.cpp
 misc/monon_color.cpp
+misc/mtu130.cpp
+misc/z80ne.cpp
 mit/tx0.cpp
 mits/altair.cpp
 mits/mits680b.cpp
@@ -519,7 +523,6 @@ ncd/ncd68k.cpp
 ncd/ncd88k.cpp
 ncd/ncdmips.cpp
 ncd/ncdppc.cpp
-ne/z80ne.cpp
 nec/apc.cpp
 nec/ews4800.cpp
 nec/pc100.cpp
@@ -812,6 +815,7 @@ skeleton/design.cpp
 skeleton/diablo1300.cpp
 skeleton/didact.cpp
 skeleton/digel804.cpp
+skeleton/digiblast.cpp
 skeleton/digijet.cpp
 skeleton/digilog320.cpp
 skeleton/digilog400.cpp
@@ -828,7 +832,6 @@ skeleton/epic14e.cpp
 skeleton/esprit.cpp
 skeleton/eurit.cpp
 skeleton/eurocom2.cpp
-skeleton/facit4440.cpp
 skeleton/fanucs15.cpp
 skeleton/fanucspmg.cpp
 skeleton/fc100.cpp
@@ -1112,6 +1115,7 @@ tvgames/generalplus_gpl16250_spi_direct.cpp
 tvgames/generalplus_gpl162xx_lcdtype.cpp
 tvgames/generalplus_gpl32612.cpp
 tvgames/magiceyes_pollux_vr3520f.cpp
+tvgames/micom_mahjong.cpp
 tvgames/monkey_king_3b.cpp
 tvgames/pubint_storyreader.cpp
 tvgames/spg110.cpp
@@ -1255,11 +1259,13 @@ yamaha/ymmu80.cpp
 yamaha/ympsr16.cpp
 yamaha/ympsr340.cpp
 yamaha/ympsr40.cpp
+yamaha/ympsr400.cpp
 yamaha/ympsr60.cpp
 yamaha/ymqy70.cpp
 yamaha/ymrx15.cpp
 yamaha/ymsy35.cpp
 yamaha/ymtx81z.cpp
+yamaha/ymvl1.cpp
 yamaha/ymvl70.cpp
 zenith/mdt60.cpp
 zenith/z100.cpp

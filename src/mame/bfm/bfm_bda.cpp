@@ -212,7 +212,6 @@ void bfm_bda_device::blank(int data)
 
 int bfm_bda_device::write_char(int data)
 {
-	int change = 0;
 	if ( m_user_def )
 	{
 		m_user_def--;
@@ -226,8 +225,6 @@ int bfm_bda_device::write_char(int data)
 		}
 
 		setdata( m_user_data, data);
-		change ++;
-
 	}
 	else
 	{

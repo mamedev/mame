@@ -45,6 +45,7 @@ mpu4_characteriser_pal::mpu4_characteriser_pal(const machine_config &mconfig, de
 	m_current_chr_table(nullptr),
 	m_prot_col(0),
 	m_cpu(*this, finder_base::DUMMY_TAG),
+	m_allow_6800_cheat(false),
 	m_allow_6809_cheat(false),
 	m_allow_68k_cheat(false),
 	m_current_lamp_table(nullptr),
@@ -177,12 +178,21 @@ void mpu4_characteriser_pal::write(offs_t offset, uint8_t data)
 
 uint8_t mpu4_characteriser_pal::protection_r()
 {
-	if (m_allow_6809_cheat || m_allow_68k_cheat)
+	if (m_allow_6800_cheat || m_allow_6809_cheat || m_allow_68k_cheat)
 	{
 		uint8_t ret = 0x00;
-		if (m_allow_6809_cheat)
+
+		// the basic forms for many of these protection checks can be cheated quite easily
+		if (m_allow_6800_cheat)
 		{
-			/* a cheat ... many early games use a standard check */
+			// MPU3
+			int addr = m_cpu->state_int(M6800_X);
+			ret = m_cpu->space(AS_PROGRAM).read_byte(addr+1);
+			logerror("%s: Characteriser protection_r WITH 6800 CHEAT (col is %02x returning %02x from addr %04x)\n", machine().describe_context(), m_prot_col, ret, addr);
+		}
+		else if (m_allow_6809_cheat)
+		{
+			// MPU4 (lamp scrambling where used not handled)
 			int addr = m_cpu->state_int(M6809_X);
 			if ((addr >= 0x800) && (addr <= 0xfff)) return 0x00; // prevent recursion, only care about ram/rom areas for this cheat.
 
@@ -191,6 +201,7 @@ uint8_t mpu4_characteriser_pal::protection_r()
 		}
 		else if (m_allow_68k_cheat)
 		{
+			// MPU4 Video (question decrambling where used not handled)
 			ret = m_cpu->state_int(M68K_D0) & 0xff;
 			logerror("%s: Characteriser protection_r WITH 68000 CHEAT (col is %02x returning %02x)\n", machine().describe_context(), m_prot_col, ret);
 		}

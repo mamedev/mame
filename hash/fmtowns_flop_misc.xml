@@ -663,45 +663,6 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="irium">
-		<description>Irium</description>
-		<year>1993</year>
-		<publisher>オレンジハウス (Orange House)</publisher>
-		<info name="alt_title" value="イリウム" />
-		<info name="release" value="199306xx" />
-		<info name="usage" value="Requires 2 MB RAM"/>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="System Disk" />
-			<dataarea name="flop" size="1261568">
-				<rom name="irium (disk 1 - system).hdm" size="1261568" crc="7d6b858f" sha1="1670641115935a85164a58f58cdeb2b4514652a2"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk A" />
-			<dataarea name="flop" size="1261568">
-				<rom name="irium (disk 2 - a).hdm" size="1261568" crc="0d11cb39" sha1="0ef37fb4abd4cd473ba6518d3dfce40aaefeba05"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk B" />
-			<dataarea name="flop" size="1261568">
-				<rom name="irium (disk 3 - b).hdm" size="1261568" crc="193a7e6d" sha1="895d7c1ff30b64612ac18aedb3b1d67f79738322"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<feature name="part_id" value="Disk C" />
-			<dataarea name="flop" size="1261568">
-				<rom name="irium (disk 4 - c).hdm" size="1261568" crc="c7032ea8" sha1="35c8158074c8024dd65217727161c6f920f9ef06"/>
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_3_5">
-			<feature name="part_id" value="Disk D" />
-			<dataarea name="flop" size="1261568">
-				<rom name="irium (disk 5 - d).hdm" size="1261568" crc="7485ce43" sha1="c16a5acf65b732676496b9fd89e337609283cb12"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="illcity">
 		<!--
 		Origin: Tokugawa Corporate Forums (yukin)

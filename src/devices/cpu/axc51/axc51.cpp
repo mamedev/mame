@@ -65,7 +65,7 @@ void ax208_cpu_device::ax208_internal_program_mem(address_map &map)
 void axc51base_cpu_device::io_internal(address_map& map)
 {
 	map(0x0000, 0x03ff).ram().share("scratchpad");
-	map(0x3000, 0x3fff).rw(FUNC(axc51base_cpu_device::xsfr_read), FUNC(axc51base_cpu_device::xsfr_write)); 
+	map(0x3000, 0x3fff).rw(FUNC(axc51base_cpu_device::xsfr_read), FUNC(axc51base_cpu_device::xsfr_write));
 	map(0x4000, 0x6fff).ram().share("mainram");
 
 	map(0x7000, 0x77ff).ram(); // JPEG RAM
@@ -683,7 +683,7 @@ void axc51base_cpu_device::execute_op(uint8_t op)
 		case 0xa2:  mov_c_bitaddr(op);             break;  //MOV C, bit addr
 		case 0xa3:  inc_dptr(op);                  break;  //INC DPTR
 		case 0xa4:  mul_ab(op);                        break;  //MUL AB
-		case 0xa5:  axc51_extended_a5(op);                       break;  
+		case 0xa5:  axc51_extended_a5(op);                       break;
 
 		case 0xa6:
 		case 0xa7:  mov_ir_mem(op&1);              break;  //MOV @R0/@R1, data addr
@@ -1344,8 +1344,8 @@ void axc51base_cpu_device::device_reset()
 
 	m_spi_dma_addr = 0;
 
-//	m_timer0->adjust(attotime::never);
-//	m_dactimer->adjust(attotime::never);
+//  m_timer0->adjust(attotime::never);
+//  m_dactimer->adjust(attotime::never);
 
 
 	m_timer0->adjust(attotime::from_hz(120), 0, attotime::from_hz(120));
@@ -1378,7 +1378,7 @@ SFR_SPICON (at 0xd8)
 uint8_t axc51base_cpu_device::spicon_r()
 {
 	uint8_t result = m_sfr_regs[SFR_SPICON] | 0x80;
-//	LOGMASKED(LOG_UNSORTED,"%s: sfr_read SFR_SPICON %02x\n", machine().describe_context(), result);
+//  LOGMASKED(LOG_UNSORTED,"%s: sfr_read SFR_SPICON %02x\n", machine().describe_context(), result);
 	return result;
 }
 
@@ -1386,7 +1386,7 @@ uint8_t axc51base_cpu_device::spicon_r()
 
 SFR_UARTSTA (at 0xfc)
 
-7 UTRXNB      (9th bit of data of RX buffer)   
+7 UTRXNB      (9th bit of data of RX buffer)
 6 FEF         (0 = stop bit was 1 in last frame,  1 = stop bit was 0)
 5 RXIF        (0 = receive not done, 1 = done)
 4 TXIF        (0 = transmit not done, 1 = done)
@@ -1408,7 +1408,7 @@ uint8_t axc51base_cpu_device::uartsta_r()
 
 void axc51base_cpu_device::spicon_w(uint8_t data)
 {
-//	LOGMASKED(LOG_UNSORTED,"%s: sfr_write SFR_SPICON %02x\n", machine().describe_context(), data);
+//  LOGMASKED(LOG_UNSORTED,"%s: sfr_write SFR_SPICON %02x\n", machine().describe_context(), data);
 	m_sfr_regs[SFR_SPICON] = data;
 	m_spi_out_dir_cb((data & 0x20) ? true : false);
 }

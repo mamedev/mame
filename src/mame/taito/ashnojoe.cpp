@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders: David Haywood
+
 /***************************************************************************
 
     Success Joe / Ashita no Joe [Wave]
@@ -75,15 +76,246 @@ Coin B is not used
 *************************************************************************/
 
 #include "emu.h"
-#include "ashnojoe.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/gen_latch.h"
+#include "sound/msm5205.h"
 #include "sound/ymopn.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
+
+namespace {
+
+class ashnojoe_state : public driver_device
+{
+public:
+	ashnojoe_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_tileram(*this, "tileram_%u", 1U),
+		m_tilemap_reg(*this, "tilemap_reg"),
+		m_audiobank(*this, "audiobank"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_msm(*this, "msm"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_soundlatch(*this, "soundlatch")
+	{ }
+
+	void ashnojoe(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	// memory pointers
+	required_shared_ptr_array<u16, 7> m_tileram;
+	required_shared_ptr<u16> m_tilemap_reg;
+	required_memory_bank m_audiobank;
+
+	// video-related
+	tilemap_t *m_tilemap[7]{};
+
+	// sound-related
+	u8 m_adpcm_byte = 0;
+	u8 m_msm5205_vclk_toggle = 0;
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<msm5205_device> m_msm;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<generic_latch_8_device> m_soundlatch;
+
+	u16 fake_4a00a_r();
+	void adpcm_w(u8 data);
+	u8 sound_latch_status_r();
+	template<unsigned Which> void tileram_8x8_w(offs_t offset, u16 data);
+	template<unsigned Which> void tileram_16x16_w(offs_t offset, u16 data);
+	void tilemaps_xscroll_w(offs_t offset, u16 data);
+	void tilemaps_yscroll_w(offs_t offset, u16 data);
+	void tilemap_regs_w(offs_t offset, u16 data, u16 mem_mask);
+	void ym2203_write_a(u8 data);
+	void ym2203_write_b(u8 data);
+	TILE_GET_INFO_MEMBER(get_tile_info_highest);
+	TILE_GET_INFO_MEMBER(get_tile_info_midlow);
+	TILE_GET_INFO_MEMBER(get_tile_info_high);
+	TILE_GET_INFO_MEMBER(get_tile_info_low);
+	TILE_GET_INFO_MEMBER(get_tile_info_midhigh);
+	TILE_GET_INFO_MEMBER(get_tile_info_lowest);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(vclk_cb);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
+	void sound_portmap(address_map &map);
+};
+
+
+// video
+
+TILE_GET_INFO_MEMBER(ashnojoe_state::get_tile_info_highest)
+{
+	const int code = m_tileram[0][tile_index];
+
+	tileinfo.set(2,
+			code & 0xfff,
+			((code >> 12) & 0x0f),
+			0);
+}
+
+TILE_GET_INFO_MEMBER(ashnojoe_state::get_tile_info_midlow)
+{
+	const int code = m_tileram[1][tile_index * 2];
+	const int attr = m_tileram[1][tile_index * 2 + 1];
+
+	tileinfo.set(4,
+			(code & 0x7fff),
+			((attr >> 8) & 0x1f) + 0x40,
+			0);
+}
+
+TILE_GET_INFO_MEMBER(ashnojoe_state::get_tile_info_high)
+{
+	const int code = m_tileram[2][tile_index];
+
+	tileinfo.set(0,
+			code & 0xfff,
+			((code >> 12) & 0x0f) + 0x10,
+			0);
+}
+
+TILE_GET_INFO_MEMBER(ashnojoe_state::get_tile_info_low)
+{
+	const int code = m_tileram[3][tile_index];
+
+	tileinfo.set(1,
+			code & 0xfff,
+			((code >> 12) & 0x0f) + 0x60,
+			0);
+}
+
+TILE_GET_INFO_MEMBER(ashnojoe_state::get_tile_info_midhigh)
+{
+	const int code = m_tileram[4][tile_index * 2];
+	const int attr = m_tileram[4][tile_index * 2 + 1];
+
+	tileinfo.set(4,
+			(code & 0x7fff),
+			((attr >> 8) & 0x1f) + 0x20,
+			0);
+}
+
+TILE_GET_INFO_MEMBER(ashnojoe_state::get_tile_info_lowest)
+{
+	const int buffer = (m_tilemap_reg[0] & 0x02) >> 1;
+	int const code = m_tileram[5 + buffer][tile_index * 2];
+	int const attr = m_tileram[5 + buffer][tile_index * 2 + 1];
+
+	tileinfo.set(3,
+			(code & 0x1fff),
+			((attr >> 8) & 0x1f) + 0x70,
+			0);
+}
+
+
+void ashnojoe_state::tilemaps_xscroll_w(offs_t offset, u16 data)
+{
+	switch (offset)
+	{
+	case 0:
+		m_tilemap[2]->set_scrollx(0, data);
+		break;
+	case 1:
+		m_tilemap[4]->set_scrollx(0, data);
+		break;
+	case 2:
+		m_tilemap[1]->set_scrollx(0, data);
+		break;
+	case 3:
+		m_tilemap[3]->set_scrollx(0, data);
+		break;
+	case 4:
+		m_tilemap[5]->set_scrollx(0, data);
+		break;
+	}
+}
+
+void ashnojoe_state::tilemaps_yscroll_w(offs_t offset, u16 data)
+{
+	switch (offset)
+	{
+	case 0:
+		m_tilemap[2]->set_scrolly(0, data);
+		break;
+	case 1:
+		m_tilemap[4]->set_scrolly(0, data);
+		break;
+	case 2:
+		m_tilemap[1]->set_scrolly(0, data);
+		break;
+	case 3:
+		m_tilemap[3]->set_scrolly(0, data);
+		break;
+	case 4:
+		m_tilemap[5]->set_scrolly(0, data);
+		break;
+	}
+}
+
+void ashnojoe_state::tilemap_regs_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	const u16 old = m_tilemap_reg[offset];
+	data = COMBINE_DATA(&m_tilemap_reg[offset]);
+	if (old != data)
+	{
+		if (offset == 0)
+		{
+			if ((old ^ data) & 0x02)
+				m_tilemap[5]->mark_all_dirty();
+		}
+	}
+}
+
+void ashnojoe_state::video_start()
+{
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ashnojoe_state::get_tile_info_highest)), TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ashnojoe_state::get_tile_info_midlow)),  TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ashnojoe_state::get_tile_info_high)),    TILEMAP_SCAN_ROWS,  8,  8, 64, 64);
+	m_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ashnojoe_state::get_tile_info_low)),     TILEMAP_SCAN_ROWS,  8,  8, 64, 64);
+	m_tilemap[4] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ashnojoe_state::get_tile_info_midhigh)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap[5] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ashnojoe_state::get_tile_info_lowest)),  TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+
+	m_tilemap[0]->set_transparent_pen(15);
+	m_tilemap[1]->set_transparent_pen(15);
+	m_tilemap[2]->set_transparent_pen(15);
+	m_tilemap[3]->set_transparent_pen(15);
+	m_tilemap[4]->set_transparent_pen(15);
+}
+
+u32 ashnojoe_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	//m_tilemap_reg[0] & 0x10 // ?? on coin insertion
+
+	flip_screen_set(m_tilemap_reg[0] & 1);
+
+	m_tilemap[5]->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap[3]->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap[4]->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
+
+
+// machine
 
 u16 ashnojoe_state::fake_4a00a_r()
 {
@@ -108,21 +340,21 @@ void ashnojoe_state::tileram_16x16_w(offs_t offset, u16 data)
 		m_tilemap[(Which < 5) ? Which : 5]->mark_tile_dirty(offset / 2);
 }
 
-void ashnojoe_state::ashnojoe_map(address_map &map)
+void ashnojoe_state::main_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
-	map(0x040000, 0x041fff).ram().w(FUNC(ashnojoe_state::tileram_8x8_w<2>)).share("tileram_3");
-	map(0x042000, 0x043fff).ram().w(FUNC(ashnojoe_state::tileram_8x8_w<3>)).share("tileram_4");
-	map(0x044000, 0x044fff).ram().w(FUNC(ashnojoe_state::tileram_16x16_w<4>)).share("tileram_5");
-	map(0x045000, 0x045fff).ram().w(FUNC(ashnojoe_state::tileram_16x16_w<1>)).share("tileram_2");
-	map(0x046000, 0x046fff).ram().w(FUNC(ashnojoe_state::tileram_16x16_w<5>)).share("tileram_6");
-	map(0x047000, 0x047fff).ram().w(FUNC(ashnojoe_state::tileram_16x16_w<6>)).share("tileram_7");
-	map(0x048000, 0x048fff).ram().w(FUNC(ashnojoe_state::tileram_8x8_w<0>)).share("tileram_1");
+	map(0x040000, 0x041fff).ram().w(FUNC(ashnojoe_state::tileram_8x8_w<2>)).share(m_tileram[2]);
+	map(0x042000, 0x043fff).ram().w(FUNC(ashnojoe_state::tileram_8x8_w<3>)).share(m_tileram[3]);
+	map(0x044000, 0x044fff).ram().w(FUNC(ashnojoe_state::tileram_16x16_w<4>)).share(m_tileram[4]);
+	map(0x045000, 0x045fff).ram().w(FUNC(ashnojoe_state::tileram_16x16_w<1>)).share(m_tileram[1]);
+	map(0x046000, 0x046fff).ram().w(FUNC(ashnojoe_state::tileram_16x16_w<5>)).share(m_tileram[5]);
+	map(0x047000, 0x047fff).ram().w(FUNC(ashnojoe_state::tileram_16x16_w<6>)).share(m_tileram[6]);
+	map(0x048000, 0x048fff).ram().w(FUNC(ashnojoe_state::tileram_8x8_w<0>)).share(m_tileram[0]);
 	map(0x049000, 0x049fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x04a000, 0x04a001).portr("P1");
 	map(0x04a002, 0x04a003).portr("P2");
 	map(0x04a004, 0x04a005).portr("DSW");
-	map(0x04a006, 0x04a007).w(FUNC(ashnojoe_state::tilemap_regs_w)).share("tilemap_reg");
+	map(0x04a006, 0x04a007).w(FUNC(ashnojoe_state::tilemap_regs_w)).share(m_tilemap_reg);
 	map(0x04a009, 0x04a009).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x04a00a, 0x04a00b).r(FUNC(ashnojoe_state::fake_4a00a_r));  // ??
 	map(0x04a010, 0x04a019).w(FUNC(ashnojoe_state::tilemaps_xscroll_w));
@@ -146,7 +378,7 @@ void ashnojoe_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x7fff).ram();
-	map(0x8000, 0xffff).bankr("audiobank");
+	map(0x8000, 0xffff).bankr(m_audiobank);
 }
 
 void ashnojoe_state::sound_portmap(address_map &map)
@@ -257,7 +489,7 @@ GFXDECODE_END
 
 void ashnojoe_state::ym2203_write_a(u8 data)
 {
-	/* This gets called at 8910 startup with 0xff before the 5205 exists, causing a crash */
+	// This gets called at 8910 startup with 0xff before the 5205 exists, causing a crash
 	if (data == 0xff)
 		return;
 
@@ -269,7 +501,7 @@ void ashnojoe_state::ym2203_write_b(u8 data)
 	m_audiobank->set_entry(data & 0x0f);
 }
 
-WRITE_LINE_MEMBER(ashnojoe_state::ashnojoe_vclk_cb)
+WRITE_LINE_MEMBER(ashnojoe_state::vclk_cb)
 {
 	if (m_msm5205_vclk_toggle == 0)
 	{
@@ -286,6 +518,10 @@ WRITE_LINE_MEMBER(ashnojoe_state::ashnojoe_vclk_cb)
 
 void ashnojoe_state::machine_start()
 {
+	u8 *ROM = memregion("audiocpu")->base();
+	m_audiobank->configure_entries(0, 16, &ROM[0x10000], 0x8000);
+	m_audiobank->set_entry(0);
+
 	save_item(NAME(m_adpcm_byte));
 	save_item(NAME(m_msm5205_vclk_toggle));
 }
@@ -299,16 +535,16 @@ void ashnojoe_state::machine_reset()
 
 void ashnojoe_state::ashnojoe(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 8000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ashnojoe_state::ashnojoe_map);
+	// basic machine hardware
+	M68000(config, m_maincpu, 8_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ashnojoe_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(ashnojoe_state::irq1_line_hold));
 
-	Z80(config, m_audiocpu, 4000000);
+	Z80(config, m_audiocpu, 8_MHz_XTAL / 2);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ashnojoe_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &ashnojoe_state::sound_portmap);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -318,32 +554,32 @@ void ashnojoe_state::ashnojoe(machine_config &config)
 	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_ashnojoe);
-	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x1000/2);
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x1000 / 2);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", 4000000));
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 8_MHz_XTAL / 2));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.port_a_write_callback().set(FUNC(ashnojoe_state::ym2203_write_a));
 	ymsnd.port_b_write_callback().set(FUNC(ashnojoe_state::ym2203_write_b));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.1);
 
-	MSM5205(config, m_msm, 384000);
-	m_msm->vck_legacy_callback().set(FUNC(ashnojoe_state::ashnojoe_vclk_cb));
+	MSM5205(config, m_msm, 384'000);
+	m_msm->vck_legacy_callback().set(FUNC(ashnojoe_state::vclk_cb));
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);
 	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 ROM_START( scessjoe )
-	ROM_REGION( 0xc0000, "maincpu", 0 )     /* 68000 code */
+	ROM_REGION( 0xc0000, "maincpu", 0 )     // 68000
 	ROM_LOAD16_BYTE( "5.4q", 0x00000, 0x10000, CRC(c805f9e7) SHA1(e1e85701bde496b1fd64211b94bfb0def597ae51) )
 	ROM_LOAD16_BYTE( "6.4s", 0x00001, 0x10000, CRC(eda7a537) SHA1(3bb19fbdfb6c8af4e2078958fa445ac1f4434d0d) )
 	ROM_LOAD16_WORD_SWAP( "sj201-nw.6m", 0x80000, 0x40000, CRC(5a64ca42) SHA1(660b8bca21ef3c2230adce7cb7e7d1f018714f23) )
 
-	ROM_REGION( 0x90000, "audiocpu", 0 )     /* 32k for Z80 code */
+	ROM_REGION( 0x90000, "audiocpu", 0 )     // Z80
 	ROM_LOAD( "9.8q",         0x00000, 0x08000, CRC(8767e212) SHA1(13bf927febedff9d7d164fbf0da7fb3a588c2a94) )
 	ROM_LOAD( "sj401-nw.10r", 0x10000, 0x80000, CRC(25dfab59) SHA1(7d50159204ba05323a2442778f35192e66117dda) )
 
@@ -373,12 +609,12 @@ ROM_START( scessjoe )
 ROM_END
 
 ROM_START( ashnojoe )
-	ROM_REGION( 0xc0000, "maincpu", 0 )     /* 68000 code */
+	ROM_REGION( 0xc0000, "maincpu", 0 )     // 68000
 	ROM_LOAD16_BYTE( "5.bin", 0x00000, 0x10000, CRC(c61e1569) SHA1(422c18f5810539b5a9e3a9bd4e3b4d70bde8d1d5) )
 	ROM_LOAD16_BYTE( "6.bin", 0x00001, 0x10000, CRC(c0a16338) SHA1(fb127b9d38f2c9807b6e23ff71935fc8a22a2e8f) )
 	ROM_LOAD16_WORD_SWAP( "sj201-nw.6m", 0x80000, 0x40000, CRC(5a64ca42) SHA1(660b8bca21ef3c2230adce7cb7e7d1f018714f23) )
 
-	ROM_REGION( 0x90000, "audiocpu", 0 )     /* 32k for Z80 code */
+	ROM_REGION( 0x90000, "audiocpu", 0 )     // Z80
 	ROM_LOAD( "9.8q",         0x00000, 0x08000, CRC(8767e212) SHA1(13bf927febedff9d7d164fbf0da7fb3a588c2a94) )
 	ROM_LOAD( "sj401-nw.10r", 0x10000, 0x80000, CRC(25dfab59) SHA1(7d50159204ba05323a2442778f35192e66117dda) )
 
@@ -407,12 +643,8 @@ ROM_START( ashnojoe )
 	ROM_LOAD16_WORD_SWAP( "sj409-nw.7j", 0x280000, 0x80000, CRC(d8764213) SHA1(89eadefb956863216c8e3d0380394aba35e8c856) )
 ROM_END
 
-void ashnojoe_state::init_ashnojoe()
-{
-	u8 *ROM = memregion("audiocpu")->base();
-	m_audiobank->configure_entries(0, 16, &ROM[0x10000], 0x8000);
-	m_audiobank->set_entry(0);
-}
+} // anonymous namespace
 
-GAME( 1990, scessjoe, 0,        ashnojoe, ashnojoe, ashnojoe_state, init_ashnojoe, ROT0, "Taito Corporation / Wave", "Success Joe (World)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ashnojoe, scessjoe, ashnojoe, ashnojoe, ashnojoe_state, init_ashnojoe, ROT0, "Taito Corporation / Wave", "Ashita no Joe (Japan)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1990, scessjoe, 0,        ashnojoe, ashnojoe, ashnojoe_state, empty_init, ROT0, "Taito Corporation / Wave", "Success Joe (World)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ashnojoe, scessjoe, ashnojoe, ashnojoe, ashnojoe_state, empty_init, ROT0, "Taito Corporation / Wave", "Ashita no Joe (Japan)", MACHINE_SUPPORTS_SAVE )

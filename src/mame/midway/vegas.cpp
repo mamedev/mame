@@ -1624,7 +1624,7 @@ static INPUT_PORTS_START( nbashowt )
 	PORT_DIPSETTING(      0x0004, "Mode 6")
 	PORT_DIPSETTING(      0x0002, "Mode 7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x0030, 0x0030, "Curency Type" )
+	PORT_DIPNAME( 0x0030, 0x0030, "Currency Type" )
 	PORT_DIPSETTING(      0x0030, DEF_STR( USA ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( French ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( German ) )
@@ -1807,7 +1807,7 @@ static INPUT_PORTS_START( cartfury )
 	PORT_DIPSETTING(      0x0004, "Mode 6")
 	PORT_DIPSETTING(      0x0002, "Mode 7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x0030, 0x0030, "Curency Type" )
+	PORT_DIPNAME( 0x0030, 0x0030, "Currency Type" )
 	PORT_DIPSETTING(      0x0030, DEF_STR( USA ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( French ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( German ) )
@@ -2533,10 +2533,8 @@ ROM_END
 
 ROM_START( sf2049se )
 	ROM_REGION32_LE( 0x80000, PCI_ID_NILE":rom", 0 )
-	// Bad Dump
-	// POST Message: Boot EPROM checksum...FAILED. Computed: F7017455
-	// End of file including checksum area is filled with FF's.
-	ROM_LOAD( "sf2049se.u27", 0x000000, 0x80000, CRC(da4ecd9c) SHA1(2574ff3d608ebcc59a63cf6dea13ee7650ae8921) BAD_DUMP )
+	// POST output reports bad checksum for boot ROM, this is correct as verified with several original U27 chips
+	ROM_LOAD( "sf2049se.u27", 0x000000, 0x80000, CRC(da4ecd9c) SHA1(2574ff3d608ebcc59a63cf6dea13ee7650ae8921) )
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_NILE":update", ROMREGION_ERASEFF )
 

@@ -452,7 +452,7 @@ void snes_state::snes_w_io(address_space &space, offs_t offset, uint8_t data)
 	{
 //      printf("816: %02x to APU @ %d (PC=%06x)\n", data, offset & 3,m_maincpu->pc());
 		m_soundcpu->spc_port_in_w(offset & 0x3, data);
-		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
+		machine().scheduler().perfect_quantum(attotime::from_usec(20));
 		return;
 	}
 

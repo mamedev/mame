@@ -661,7 +661,7 @@ TIMER_CALLBACK_MEMBER(midway_sounds_good_device::synced_write)
 
 	// oftentimes games will write one nibble at a time; the sync on this is very
 	// important, so we boost the interleave briefly while this happens
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(250));
+	machine().scheduler().perfect_quantum(attotime::from_usec(250));
 }
 
 
@@ -828,5 +828,5 @@ TIMER_CALLBACK_MEMBER(midway_turbo_cheap_squeak_device::synced_write)
 
 	// oftentimes games will write one nibble at a time; the sync on this is very
 	// important, so we boost the interleave briefly while this happens
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+	machine().scheduler().perfect_quantum(attotime::from_usec(100));
 }

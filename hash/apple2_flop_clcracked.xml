@@ -49511,4 +49511,32 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="frac1988">
+		<description>Fraction-oids (1988 Version) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Mindplay</publisher>
+		<info name="release" value="2022-07-30"/>
+		<!--"Fraction-oids" is a 1988 educational game developed by Methods and Solutions and distributed by Mindplay. This version, dated 1988 on the title screen, is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="fraction-oids 1988 (4am crack).dsk" size="143360" crc="e51c6e0c" sha1="4495aba81633650d79e639b48c5ea74a14748bad"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sbnumbr3">
+		<description>Stickybear Numbers (Revision 3) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="release" value="2022-07-30"/>
+		<!--"Stickybear Numbers" is a 1982 educational game developed by Richard Hefter and Steve and Janie Worthington, and distributed by Optimum Resource. This version, the third known unique version dated 1982, is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="stickybear numbers rev. 3 (4am and san inc crack).dsk" size="143360" crc="581ed024" sha1="928957799cf58013466eebb1eed2ce7837bafeb0"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

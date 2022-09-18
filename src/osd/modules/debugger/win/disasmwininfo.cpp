@@ -12,6 +12,9 @@
 #include "debugviewinfo.h"
 #include "disasmviewinfo.h"
 #include "uimetrics.h"
+
+#include "util/xmlfile.h"
+
 #include "winutf8.h"
 
 
@@ -142,4 +145,33 @@ void disasmwin_info::process_string(const std::string &string)
 void disasmwin_info::update_caption()
 {
 	win_set_window_text_utf8(window(), std::string("Disassembly: ").append(m_views[0]->source_name()).c_str());
+}
+
+
+void disasmwin_info::restore_configuration_from_node(util::xml::data_node const &node)
+{
+	m_views[0]->set_source_index(node.get_attribute_int(osd::debugger::ATTR_WINDOW_DISASSEMBLY_CPU, m_views[0]->source_index()));
+	int const cursource = m_views[0]->source_index();
+	if (0 <= cursource)
+		SendMessage(m_combownd, CB_SETCURSEL, cursource, 0);
+	update_caption();
+
+	util::xml::data_node const *const expr = node.get_child(osd::debugger::NODE_WINDOW_EXPRESSION);
+	if (expr && expr->get_value())
+	{
+		set_editwnd_text(expr->get_value());
+		process_string(expr->get_value());
+	}
+
+	disasmbasewin_info::restore_configuration_from_node(node);
+}
+
+
+void disasmwin_info::save_configuration_to_node(util::xml::data_node &node)
+{
+	disasmbasewin_info::save_configuration_to_node(node);
+
+	node.set_attribute_int(osd::debugger::ATTR_WINDOW_TYPE, osd::debugger::WINDOW_TYPE_DISASSEMBLY_VIEWER);
+	node.set_attribute_int(osd::debugger::ATTR_WINDOW_DISASSEMBLY_CPU, m_views[0]->source_index());
+	node.add_child(osd::debugger::NODE_WINDOW_EXPRESSION, downcast<disasmview_info *>(m_views[0].get())->expression());
 }

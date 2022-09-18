@@ -139,11 +139,6 @@ void sdl_event_manager::process_window_event(running_machine &machine, SDL_Event
 
 void sdl_osd_interface::customize_input_type_list(std::vector<input_type_entry> &typelist)
 {
-	input_item_id mameid_code;
-	input_code ui_code;
-	const char* uimode;
-	char fullmode[64];
-
 	// loop over the defaults
 	for (input_type_entry &entry : typelist)
 	{
@@ -151,22 +146,27 @@ void sdl_osd_interface::customize_input_type_list(std::vector<input_type_entry> 
 		{
 			// configurable UI mode switch
 		case IPT_UI_TOGGLE_UI:
-			uimode = options().ui_mode_key();
-			if (!strcmp(uimode, "auto"))
 			{
+				char const *const uimode = options().ui_mode_key();
+				input_item_id mameid_code = ITEM_ID_INVALID;
+				if (!uimode || !*uimode || !strcmp(uimode, "auto"))
+				{
 #if defined(__APPLE__) && defined(__MACH__)
-				mameid_code = keyboard_trans_table::instance().lookup_mame_code("ITEM_ID_INSERT");
-#else
-				mameid_code = keyboard_trans_table::instance().lookup_mame_code("ITEM_ID_SCRLOCK");
+					mameid_code = keyboard_trans_table::instance().lookup_mame_code("ITEM_ID_INSERT");
 #endif
+				}
+				else
+				{
+					std::string fullmode("ITEM_ID_");
+					fullmode.append(uimode);
+					mameid_code = keyboard_trans_table::instance().lookup_mame_code(fullmode.c_str());
+				}
+				if (ITEM_ID_INVALID != mameid_code)
+				{
+					input_code const ui_code = input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, input_item_id(mameid_code));
+					entry.defseq(SEQ_TYPE_STANDARD).set(ui_code);
+				}
 			}
-			else
-			{
-				snprintf(fullmode, 63, "ITEM_ID_%s", uimode);
-				mameid_code = keyboard_trans_table::instance().lookup_mame_code(fullmode);
-			}
-			ui_code = input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, input_item_id(mameid_code));
-			entry.defseq(SEQ_TYPE_STANDARD).set(ui_code);
 			break;
 			// alt-enter for fullscreen
 		case IPT_OSD_1:

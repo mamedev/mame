@@ -617,7 +617,7 @@ void dkong_state::p8257_drq_w(uint8_t data)
 	m_dma8257->dreq0_w(data & 0x01);
 	m_dma8257->dreq1_w(data & 0x01);
 	machine().scheduler().abort_timeslice(); // transfer occurs immediately
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100)); // smooth things out a bit
+	machine().scheduler().perfect_quantum(attotime::from_usec(100)); // smooth things out a bit
 }
 
 uint8_t dkong_state::dkong_in2_r(offs_t offset)

@@ -2,19 +2,19 @@
 // copyright-holders:Devin Acker
 
 /*
-	VTech Phusion (2000)
+    VTech Phusion (2000)
 
-	This handheld organizer/PDA runs on an unknown CR16B SoC.
-	It's probably similar (but not identical) to the one described in glcx.cpp.
+    This handheld organizer/PDA runs on an unknown CR16B SoC.
+    It's probably similar (but not identical) to the one described in glcx.cpp.
 
-	Main board:
-		U1:  Analog Integrations AIC1652CS
-		U2:  8Mbit flash (Toshiba TC58FVT800FT-85)
-		U3:  Hyundai GM76FV18ALLFW70
-		U10: unknown CR16B-based SoC (epoxy blob)
-		U11: National Semiconductor DS14C232CM
-		U12: National Semiconductor LM4882
-		U14: 16Mbit mask ROM (Sharp LH53V16500)
+    Main board:
+        U1:  Analog Integrations AIC1652CS
+        U2:  8Mbit flash (Toshiba TC58FVT800FT-85)
+        U3:  Hyundai GM76FV18ALLFW70
+        U10: unknown CR16B-based SoC (epoxy blob)
+        U11: National Semiconductor DS14C232CM
+        U12: National Semiconductor LM4882
+        U14: 16Mbit mask ROM (Sharp LH53V16500)
 
 */
 

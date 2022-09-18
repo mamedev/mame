@@ -2035,7 +2035,6 @@ ROM_START( horshoes )
 
 	ROM_REGION( 0x0200, "plds", 0 ) // PAL20L8BCNS
 	ROM_LOAD( "c47-06.ic12", 0x0000, 0x0144, CRC(4342ca6c) SHA1(9c798a6f1508b03004b76577eb823f004df7298d) )
-
 ROM_END
 
 ROM_START( palamed ) /* Prototype or location test?? - Line 5 of notice screen says "Territory" later sets say "Territories" */

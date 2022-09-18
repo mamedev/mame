@@ -19,16 +19,18 @@ Additionally VM Labs went bankrupt in 2002 so there was zero support for it afte
 
 Externally the units look like any other DVD player but have a NUON logo on the front.
 There were several models of NUON DVD players manufactured with Samsung being the most common with the most models released....
+Motorola Blackbird (only for developers)
 Motorola Streamaster 5000 (set top box)
 Raite Optoelectronics RDP-741
 RCA (Thomson multimedia) DRC300N
-Samsung - DVD-N2000
+RCA (Thomson multimedia) DRC480N
+Samsung - DVD-N2000 (Extiva)
           DVD-N501  Service manual available with technical info, block diagrams and schematics. Search 'dvdn501.pdf service manual'.
           DVD-N504  Asia/Europe only
           DVD-N505  Asia/Europe only
           DVD-N591  Korea only
 Toshiba - SD2300
-There were also several other models announced but not released.
+There were also two models announced but not released: Samsung DVD-N705, Oritron DVD900.
 
 Some of the players came bundled with a game controller and a few 3rd-party controllers were produced....
 Warrior Digital Gamepad HPI-2000 - Bundled with Samsung DVD-N2000. Digital only with 10 buttons and a D-pad.
@@ -52,6 +54,7 @@ The Next Tetris (dumped)              -----------------------
 Crayon Shin-chan 3 (not dumped?)      Interactive Sampler (three different versions)
                                       Nuon Games + Demos (collection from Nuon-Dome)
                                       Nuon-Dome PhillyClassic 5 Demo Disc (give-away collection)
+                                      Motorola BlackBird Demonstration Pack
 
 There were also a number of homebrew titles made available.
 It was noted that only the Samsung and RCA units can run homebrew software and the Samsung DVD-N501 is the most compatible unit

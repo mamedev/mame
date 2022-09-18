@@ -6211,7 +6211,7 @@ ROM_END
 /*  Witch Card (Video Klein)
     Video Klein original with epoxy block module
 */
-	ROM_START( witchcrd )
+ROM_START( witchcrd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epoxy_27128.bin",    0x4000, 0x4000, CRC(48186272) SHA1(d211bfa89404a292e6d0f0169ed11e1e74a361d9) )  // epoxy block program ROM
 
@@ -6512,7 +6512,7 @@ ROM_END
     Video Klein original with epoxy block module.
     Alt set....
 */
-	ROM_START( witchgmea )
+ROM_START( witchgmea )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "wc_epoxy.bin",   0x0000, 0x8000, CRC(33f1acd9) SHA1(2facb3d807b5b2a2978e567d0c1106c0a027621a) )  // epoxy block program ROM
 

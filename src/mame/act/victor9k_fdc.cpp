@@ -34,8 +34,6 @@
     - communication error with SCP after loading boot sector
         - bp ff1a8
         - patch ff1ab=c3
-    - single/double sided jumper
-    - header sync length unknown (6 is too short)
     - 8048 spindle speed control
 
 */
@@ -944,14 +942,14 @@ uint8_t victor_9000_fdc_device::via6_pb_r()
 
 	    bit     description
 
-	    PB0     RDY0 from SCP
-	    PB1     RDY1 from SCP
-	    PB2
-	    PB3     _DS1
-	    PB4     _DS0
+	    PB0     RDY0 to SCP    Motor speed status, drive A
+	    PB1     RDY1 to SCP    Motor speed status, drive B
+	    PB2     _SCRESET       Motor speed controller (8048) reset, output
+	    PB3     DS1            Door B sense, input       ->order is correct, leads with B
+	    PB4     DSO            Door A sense, input
 	    PB5     SINGLE/_DOUBLE SIDED
-	    PB6
-	    PB7
+	    PB6     STP0           Stepper enable A
+	    PB7     STP1           Stepper enable B
 
 	*/
 
@@ -970,7 +968,7 @@ uint8_t victor_9000_fdc_device::via6_pb_r()
 	data |= ((m_floppy0->get_device() && m_floppy0->get_device()->exists()) ? 0 : 1) << 4;
 
 	// single/double sided jumper
-	//data |= 0x20;
+	data |= (2U << 5);
 
 	return data;
 }
@@ -981,14 +979,14 @@ void victor_9000_fdc_device::via6_pb_w(uint8_t data)
 
 	    bit     description
 
-	    PB0     RDY0 to SCP
-	    PB1     RDY1 to SCP
-	    PB2     _SCRESET
-	    PB3
-	    PB4
-	    PB5
-	    PB6     STP0
-	    PB7     STP1
+	    PB0     RDY0 to SCP    Motor speed status, drive A
+	    PB1     RDY1 to SCP    Motor speed status, drive B
+	    PB2     _SCRESET       Motor speed controller (8048) reset, output
+	    PB3     DS1            Door B sense, input       ->order is correct, leads with B
+	    PB4     DSO            Door A sense, input
+	    PB5     SINGLE/_DOUBLE SIDED
+	    PB6     STP0           Stepper enable A
+	    PB7     STP1           Stepper enable B
 
 	*/
 

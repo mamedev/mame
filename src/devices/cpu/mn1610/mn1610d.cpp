@@ -14,6 +14,8 @@
 
 #include "mn1610d.h"
 
+namespace {
+
 char const *const reg[] = { "r0", "r1", "r2", "r3", "r4", "sp", "str", "ic" };
 
 enum operand_type : unsigned
@@ -54,7 +56,7 @@ struct instruction
 	u32 flags;
 };
 
-static const struct instruction mn1610_table[] =
+const struct instruction mn1610_table[] =
 {
 	// memory
 	{ 0xc700, 0xc700, "b",    { EA } },            // 11mm m111 nnnn nnnn
@@ -109,7 +111,7 @@ static const struct instruction mn1610_table[] =
 };
 
 // opcodes are sorted in descending order of number of bits in mask to ensure correct decoding
-static const struct instruction mn1613_table[] =
+const struct instruction mn1613_table[] =
 {
 	{ 0x1707, 0xffff, "popm", { } },               // 0001 0111 0000 0111
 	{ 0x170f, 0xffff, "pshm", { } },               // 0001 0111 0000 1111
@@ -194,6 +196,9 @@ static const struct instruction mn1613_table[] =
 
 	{ 0x1f00, 0xff00, "neg",  { Rs, C, SK } },     // 0001 1111 kkkk cddd
 };
+
+} // anonymous namespace
+
 
 std::optional<std::string> mn1610_disassembler::operand(unsigned t, u16 pc, u16 data)
 {

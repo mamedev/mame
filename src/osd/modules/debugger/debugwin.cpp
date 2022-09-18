@@ -22,8 +22,11 @@
 #include "win/pointswininfo.h"
 #include "win/uimetrics.h"
 
+#include "config.h"
 #include "debugger.h"
 #include "debug/debugcpu.h"
+
+#include "util/xmlfile.h"
 
 #include "window.h"
 #include "../input/input_common.h"
@@ -40,7 +43,9 @@ public:
 		m_metrics(),
 		m_waiting_for_debugger(false),
 		m_window_list(),
-		m_main_console(nullptr)
+		m_main_console(nullptr),
+		m_config(),
+		m_save_windows(true)
 	{
 	}
 
@@ -57,6 +62,9 @@ protected:
 	virtual running_machine &machine() const override { return *m_machine; }
 
 	virtual ui_metrics &metrics() const override { return *m_metrics; }
+	virtual void set_color_theme(int index) override;
+	virtual bool get_save_window_arrangement() const override { return m_save_windows; }
+	virtual void set_save_window_arrangement(bool save) override { m_save_windows = save; }
 
 	virtual bool const &waiting_for_debugger() const override { return m_waiting_for_debugger; }
 	virtual bool seq_pressed() const override;
@@ -73,11 +81,19 @@ protected:
 private:
 	template <typename T> T *create_window();
 
+	void config_load(config_type cfgtype, config_level cfglevel, util::xml::data_node const *parentnode);
+	void config_save(config_type cfgtype, util::xml::data_node *parentnode);
+
+	void load_configuration(util::xml::data_node const &parentnode);
+
 	running_machine             *m_machine;
 	std::unique_ptr<ui_metrics>    m_metrics;
 	bool                        m_waiting_for_debugger;
 	std::vector<std::unique_ptr<debugwin_info>>  m_window_list;
 	consolewin_info             *m_main_console;
+
+	util::xml::file::ptr m_config;
+	bool m_save_windows;
 };
 
 
@@ -97,22 +113,32 @@ void debugger_windows::init_debugger(running_machine &machine)
 {
 	m_machine = &machine;
 	m_metrics = std::make_unique<ui_metrics>(downcast<osd_options &>(m_machine->options()));
+	machine.configuration().config_register(
+			"debugger",
+			configuration_manager::load_delegate(&debugger_windows::config_load, this),
+			configuration_manager::save_delegate(&debugger_windows::config_save, this));
 }
 
 
 void debugger_windows::wait_for_debugger(device_t &device, bool firststop)
 {
 	// create a console window
-	if (m_main_console == nullptr)
+	if (!m_main_console)
 		m_main_console = create_window<consolewin_info>();
 
 	// update the views in the console to reflect the current CPU
-	if (m_main_console != nullptr)
+	if (m_main_console)
 		m_main_console->set_cpu(device);
 
 	// when we are first stopped, adjust focus to us
-	if (firststop && (m_main_console != nullptr))
+	if (firststop && m_main_console)
 	{
+		if (m_config)
+		{
+			for (util::xml::data_node const *node = m_config->get_first_child(); node; node = node->get_next_sibling())
+				load_configuration(*node);
+			m_config.reset();
+		}
 		m_main_console->set_foreground();
 		if (winwindow_has_focus())
 			m_main_console->set_default_focus();
@@ -168,6 +194,14 @@ void debugger_windows::debugger_update()
 				info->restore_field(focuswnd);
 		}
 	}
+}
+
+
+void debugger_windows::set_color_theme(int index)
+{
+	m_metrics->set_color_theme(index);
+	for (auto const &window : m_window_list)
+		window->redraw();
 }
 
 
@@ -247,21 +281,104 @@ void debugger_windows::hide_all()
 }
 
 
-template <typename T> T *debugger_windows::create_window()
+template <typename T>
+T *debugger_windows::create_window()
 {
 	// allocate memory
 	std::unique_ptr<T> info = std::make_unique<T>(static_cast<debugger_windows_interface &>(*this));
 	if (info->is_valid())
 	{
+		T &result(*info);
 		m_window_list.push_back(std::move(info));
-		T *ptr = dynamic_cast<T*>(m_window_list.back().get());
-		return ptr;
+		return &result;
 	}
 	return nullptr;
 }
 
 
-#else /* not windows */
+void debugger_windows::config_load(config_type cfgtype, config_level cfglevel, util::xml::data_node const *parentnode)
+{
+	if (parentnode)
+	{
+		if (config_type::DEFAULT == cfgtype)
+		{
+			m_save_windows = 0 != parentnode->get_attribute_int(osd::debugger::ATTR_DEBUGGER_SAVE_WINDOWS, m_save_windows ? 1 : 0);
+			util::xml::data_node const *const colors = parentnode->get_child(osd::debugger::NODE_COLORS);
+			if (colors)
+				m_metrics->set_color_theme(colors->get_attribute_int(osd::debugger::ATTR_COLORS_THEME, m_metrics->get_color_theme()));
+		}
+		else if (config_type::SYSTEM == cfgtype)
+		{
+			if (m_main_console)
+			{
+				load_configuration(*parentnode);
+			}
+			else
+			{
+				if (!m_config)
+					m_config = util::xml::file::create();
+				parentnode->copy_into(*m_config);
+			}
+		}
+	}
+}
+
+
+void debugger_windows::config_save(config_type cfgtype, util::xml::data_node *parentnode)
+{
+	if (config_type::DEFAULT == cfgtype)
+	{
+		parentnode->set_attribute_int(osd::debugger::ATTR_DEBUGGER_SAVE_WINDOWS, m_save_windows ? 1 : 0);
+		util::xml::data_node *const colors = parentnode->add_child(osd::debugger::NODE_COLORS, nullptr);
+		if (colors)
+			colors->set_attribute_int(osd::debugger::ATTR_COLORS_THEME, m_metrics->get_color_theme());
+	}
+	else if (m_save_windows && (config_type::SYSTEM == cfgtype))
+	{
+		for (auto &info : m_window_list)
+			info->save_configuration(*parentnode);
+	}
+}
+
+
+void debugger_windows::load_configuration(util::xml::data_node const &parentnode)
+{
+	for (util::xml::data_node const *node = parentnode.get_child(osd::debugger::NODE_WINDOW); node; node = node->get_next_sibling(osd::debugger::NODE_WINDOW))
+	{
+		debugwin_info *win = nullptr;
+		switch (node->get_attribute_int(osd::debugger::ATTR_WINDOW_TYPE, -1))
+		{
+		case osd::debugger::WINDOW_TYPE_CONSOLE:
+			m_main_console->restore_configuration_from_node(*node);
+			break;
+		case osd::debugger::WINDOW_TYPE_MEMORY_VIEWER:
+			win = create_window<memorywin_info>();
+			break;
+		case osd::debugger::WINDOW_TYPE_DISASSEMBLY_VIEWER:
+			win = create_window<disasmwin_info>();
+			break;
+		case osd::debugger::WINDOW_TYPE_ERROR_LOG_VIEWER:
+			win = create_window<logwin_info>();
+			break;
+		case osd::debugger::WINDOW_TYPE_POINTS_VIEWER:
+			win = create_window<pointswin_info>();
+			break;
+		case osd::debugger::WINDOW_TYPE_DEVICES_VIEWER:
+			// not supported
+			break;
+		case osd::debugger::WINDOW_TYPE_DEVICE_INFO_VIEWER:
+			// not supported
+			break;
+		default:
+			break;
+		}
+		if (win)
+			win->restore_configuration_from_node(*node);
+	}
+}
+
+
+#else // not Windows
 MODULE_NOT_SUPPORTED(debugger_windows, OSD_DEBUG_PROVIDER, "windows")
 #endif
 

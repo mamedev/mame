@@ -10633,8 +10633,8 @@ ROM_END
 /*
   Channel Three
   Seems a modded version of Cherry Master.
-
-*/ROM_START( chthree )
+*/
+ROM_START( chthree )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.u40",   0x0000, 0x8000, CRC(3d677758) SHA1(d2d13e54d3b55460a05b0ca42e12d8a6d72954ba) ) // 1ST AND 2ND HALF IDENTICAL
 	ROM_IGNORE(0x8000)
@@ -16939,7 +16939,6 @@ ROM_START( bonusch )
 	ROM_LOAD( "tbp24s10.4e", 0x0000, 0x0100, CRC(06fa2649) SHA1(b2f17d37826317ccad19d535cd5afeedb143778b) )
 	ROM_LOAD( "tbp24s10.4f", 0x0100, 0x0100, CRC(38000593) SHA1(e0113590cb2dc338d61ae2e7e92b1046c5c2d19f) )
 	ROM_LOAD( "tbp24s10.4h", 0x0200, 0x0100, CRC(cbf0062d) SHA1(f49dfca34d2eb86b5ff16872fab23d3e3a10be9a) )
-
 ROM_END
 
 /*
@@ -17878,7 +17877,6 @@ ROM_START( fl7_3121 )  // Red, White & Blue 7's + Hollywood Nights. Serial 7D063
 
 	ROM_REGION(0x8, "fl7w4_id", 0)     /* Electronic Serial DS2401 */
 	ROM_LOAD( "ds2401.bin", 0x0000, 0x0008, CRC(b7078792) SHA1(f9eba1587b65ed9bc07ea6c4b2d393fb43f60659) ) // Hand built to match our ROM set
-
 ROM_END
 
 /*
@@ -17909,7 +17907,6 @@ ROM_START( fl7_50 )  // Serial 00000069A1C9.
 
 	ROM_REGION(0x8, "fl7w4_id", 0)     /* Electronic Serial */
 	ROM_LOAD( "eserial.bin", 0x0000, 0x0008, NO_DUMP ) // Hand built to match our ROM set
-
 ROM_END
 
 
@@ -17941,7 +17938,6 @@ ROM_START( fl7_500 )  // Serial 000000125873.
 
 	ROM_REGION(0x8, "fl7w4_id", 0)     /* Electronic Serial */
 	ROM_LOAD( "eserial.bin",  0x0000, 0x0008, NO_DUMP ) // Hand built to match our ROM set
-
 ROM_END
 
 
@@ -17973,7 +17969,6 @@ ROM_START( fl7_2000 )  // Serial 00000063A47F.
 
 	ROM_REGION(0x8, "fl7w4_id", 0)     /* Electronic Serial */
 	ROM_LOAD( "eserial.bin", 0x0000, 0x0008, NO_DUMP ) // Hand built to match our ROM set
-
 ROM_END
 
 
@@ -18005,7 +18000,6 @@ ROM_START( fl7_2k16 )  // Serial 000000743111.
 
 	ROM_REGION(0x8, "fl7w4_id", 0)     /* Electronic Serial */
 	ROM_LOAD( "eserial.bin", 0x0000, 0x0008, NO_DUMP ) // Hand built to match our ROM set
-
 ROM_END
 
 
@@ -18036,7 +18030,6 @@ ROM_START( fl7_tw )  // Serial 00000050E9B7.
 
 	ROM_REGION(0x8, "fl7w4_id", 0)     /* Electronic Serial */
 	ROM_LOAD( "eserial.bin", 0x0000, 0x0008, NO_DUMP ) // Hand built to match our ROM set
-
 ROM_END
 
 

@@ -49,6 +49,7 @@ const folders_entry f_folders[] =
 	{ N_p("path-option", "Cheat Files"),        OPTION_CHEATPATH,          ADDING },
 	{ N_p("path-option", "Plugins"),            OPTION_PLUGINSPATH,        ADDING },
 	{ N_p("path-option", "UI Translations"),    OPTION_LANGUAGEPATH,       CHANGE },
+	{ N_p("path-option", "Software Lists"),     OPTION_HASHPATH,           ADDING },
 	{ N_p("path-option", "INIs"),               OPTION_INIPATH,            ADDING },
 	{ N_p("path-option", "UI Settings"),        OPTION_UI_PATH,            CHANGE },
 	{ N_p("path-option", "Plugin Data"),        OPTION_PLUGINDATAPATH,     CHANGE },
@@ -176,6 +177,8 @@ private:
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle(event const *ev) override;
 
+	void update_search();
+
 	int const    m_ref;
 	std::string  m_current_path;
 	std::string  m_search;
@@ -241,10 +244,13 @@ void menu_add_change_folder::handle(event const *ev)
 			m_search.clear();
 			reset(reset_options::SELECT_FIRST);
 		}
+		else if (ev->iptkey == IPT_UI_PASTE)
+		{
+			if (paste_text(m_search, uchar_is_printable))
+				update_search();
+		}
 		else if (ev->iptkey == IPT_SPECIAL)
 		{
-			bool update_selected = false;
-
 			if (ev->unichar == 0x09)
 			{
 				// Tab key, save current path
@@ -276,56 +282,10 @@ void menu_add_change_folder::handle(event const *ev)
 				reset_parent(reset_options::SELECT_FIRST);
 				stack_pop();
 			}
-			else
+			else if (input_character(m_search, ev->unichar, uchar_is_printable))
 			{
 				// if it's any other key and we're not maxed out, update
-				update_selected = input_character(m_search, ev->unichar, uchar_is_printable);
-			}
-
-			// check for entries which matches our search buffer
-			if (update_selected)
-			{
-				const int cur_selected = selected_index();
-				int entry, bestmatch = 0;
-
-				// from current item to the end
-				for (entry = cur_selected; entry < item_count(); entry++)
-					if (item(entry).ref() && !m_search.empty())
-					{
-						int match = 0;
-						for (int i = 0; i < m_search.size() + 1; i++)
-						{
-							if (core_strnicmp(item(entry).text().c_str(), m_search.data(), i) == 0)
-								match = i;
-						}
-
-						if (match > bestmatch)
-						{
-							bestmatch = match;
-							set_selected_index(entry);
-						}
-					}
-
-				// and from the first item to current one
-				for (entry = 0; entry < cur_selected; entry++)
-				{
-					if (item(entry).ref() && !m_search.empty())
-					{
-						int match = 0;
-						for (int i = 0; i < m_search.size() + 1; i++)
-						{
-							if (core_strnicmp(item(entry).text().c_str(), m_search.data(), i) == 0)
-								match = i;
-						}
-
-						if (match > bestmatch)
-						{
-							bestmatch = match;
-							set_selected_index(entry);
-						}
-					}
-				}
-				centre_selection();
+				update_search();
 			}
 		}
 		else if (ev->iptkey == IPT_UI_CANCEL)
@@ -406,6 +366,56 @@ void menu_add_change_folder::custom_render(void *selectedref, float top, float b
 			origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
 			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
 			ui().colors().text_color(), ui().colors().background_color(), 1.0f);
+}
+
+//-------------------------------------------------
+//  update search
+//-------------------------------------------------
+
+void menu_add_change_folder::update_search()
+{
+	// check for entries which matches our search buffer
+	const int cur_selected = selected_index();
+	int entry, bestmatch = 0;
+
+	// from current item to the end
+	for (entry = cur_selected; entry < item_count(); entry++)
+		if (item(entry).ref() && !m_search.empty())
+		{
+			int match = 0;
+			for (int i = 0; i < m_search.size() + 1; i++)
+			{
+				if (core_strnicmp(item(entry).text().c_str(), m_search.data(), i) == 0)
+					match = i;
+			}
+
+			if (match > bestmatch)
+			{
+				bestmatch = match;
+				set_selected_index(entry);
+			}
+		}
+
+	// and from the first item to current one
+	for (entry = 0; entry < cur_selected; entry++)
+	{
+		if (item(entry).ref() && !m_search.empty())
+		{
+			int match = 0;
+			for (int i = 0; i < m_search.size() + 1; i++)
+			{
+				if (core_strnicmp(item(entry).text().c_str(), m_search.data(), i) == 0)
+					match = i;
+			}
+
+			if (match > bestmatch)
+			{
+				bestmatch = match;
+				set_selected_index(entry);
+			}
+		}
+	}
+	centre_selection();
 }
 
 

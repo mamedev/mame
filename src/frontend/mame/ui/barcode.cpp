@@ -58,24 +58,11 @@ void menu_barcode_reader::populate(float &customtop, float &custombottom)
 {
 	if (current_device())
 	{
-		std::string buffer;
-		const char *new_barcode;
-
 		// selected device
 		item_append(std::string(current_display_name()), std::string(current_device()->tag() + 1), current_display_flags(), ITEMREF_SELECT_READER);
 
 		// append the "New Barcode" item
-		if (get_selection_ref() == ITEMREF_NEW_BARCODE)
-		{
-			buffer.append(m_barcode_buffer);
-			new_barcode = buffer.c_str();
-		}
-		else
-		{
-			new_barcode = m_barcode_buffer.c_str();
-		}
-
-		item_append(_("New Barcode:"), new_barcode, 0, ITEMREF_NEW_BARCODE);
+		item_append(_("New Barcode:"), m_barcode_buffer, 0, ITEMREF_NEW_BARCODE);
 
 		// finish up the menu
 		item_append(_("Enter Code"), 0, ITEMREF_ENTER_BARCODE);
@@ -131,11 +118,19 @@ void menu_barcode_reader::handle(event const *ev)
 			}
 			break;
 
+		case IPT_UI_PASTE:
+			if (get_selection_ref() == ITEMREF_NEW_BARCODE)
+			{
+				if (paste_text(m_barcode_buffer, uchar_is_digit))
+					ev->item->set_subtext(m_barcode_buffer);
+			}
+			break;
+
 		case IPT_SPECIAL:
 			if (get_selection_ref() == ITEMREF_NEW_BARCODE)
 			{
 				if (input_character(m_barcode_buffer, ev->unichar, uchar_is_digit))
-					reset(reset_options::REMEMBER_POSITION);
+					ev->item->set_subtext(m_barcode_buffer);
 			}
 			break;
 		}

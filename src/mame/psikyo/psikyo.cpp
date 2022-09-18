@@ -1245,7 +1245,6 @@ ROM_START( samuraia )
 
 	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* Sprites LUT */
 	ROM_LOAD( "u11.bin",  0x000000, 0x040000, CRC(11a04d91) SHA1(5d146a9a39a70f2ee212ceab9a5469598432449e) ) // x1xxxxxxxxxxxxxxxx = 0xFF
-
 ROM_END
 
 ROM_START( sngkace )
@@ -1658,7 +1657,6 @@ ROM_START( s1945 )
 
 	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* */
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(dee22654) SHA1(5df05b0029ff7b1f7f04b41da7823d2aa8034bd2) )
-
 ROM_END
 
 ROM_START( s1945a )
@@ -1686,7 +1684,6 @@ ROM_START( s1945a )
 
 	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* */
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(dee22654) SHA1(5df05b0029ff7b1f7f04b41da7823d2aa8034bd2) )
-
 ROM_END
 
 ROM_START( s1945j )
@@ -1714,7 +1711,6 @@ ROM_START( s1945j )
 
 	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* */
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(dee22654) SHA1(5df05b0029ff7b1f7f04b41da7823d2aa8034bd2) )
-
 ROM_END
 
 ROM_START( s1945k ) /* Same MCU as the current parent set, region dip has no effect on this set */
@@ -1742,7 +1738,6 @@ ROM_START( s1945k ) /* Same MCU as the current parent set, region dip has no eff
 
 	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* */
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(dee22654) SHA1(5df05b0029ff7b1f7f04b41da7823d2aa8034bd2) )
-
 ROM_END
 
 
@@ -1797,7 +1792,6 @@ ROM_START( tengai )
 
 	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  // Sprites LUT
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(681d7d55) SHA1(b0b28471440d747adbc4d22d1918f89f6ede1615) )
-
 ROM_END
 
 ROM_START( tengaij )
@@ -1830,7 +1824,6 @@ ROM_START( tengaij )
 
 	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  // Sprites LUT
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(681d7d55) SHA1(b0b28471440d747adbc4d22d1918f89f6ede1615) )
-
 ROM_END
 
 /***************************************************************************

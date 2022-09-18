@@ -738,7 +738,6 @@ ROM_START( burglarx )
 
 	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "bx-rom1.snd", 0x000000, 0x080000, CRC(8ae67138) SHA1(3ea44f805a1f978e0a1c1bb7f45507379b147bc0) ) // 2 x 40000
-
 ROM_END
 
 

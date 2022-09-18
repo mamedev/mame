@@ -67,6 +67,7 @@ public:
 	z1013_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_mainpio(*this, "z80pio")
 		, m_rom(*this, "maincpu")
 		, m_ram(*this, "mainram")
 		, m_cass(*this, "cassette")
@@ -74,11 +75,18 @@ public:
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
 		, m_io_keyboard(*this, "X%u", 0U)
+		, m_clock_config(*this, "TAKT")
 	{ }
 
 	void z1013k76(machine_config &config);
 	void z1013a2(machine_config &config);
 	void z1013(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(clock_config_changed);
+
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 
 private:
 	void z1013_keyboard_w(uint8_t data);
@@ -95,10 +103,9 @@ private:
 
 	uint8_t m_keyboard_line = 0U;
 	bool m_keyboard_part = false;
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
 
 	required_device<cpu_device> m_maincpu;
+	required_device<z80pio_device> m_mainpio;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;
 	required_device<cassette_image_device> m_cass;
@@ -106,6 +113,7 @@ private:
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
 	optional_ioport_array<9> m_io_keyboard;
+	required_ioport m_clock_config;
 };
 
 
@@ -120,7 +128,7 @@ void z1013_state::mem_map(address_map &map)
 void z1013_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x03).rw("z80pio", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x00, 0x03).rw(m_mainpio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x08, 0x08).w(FUNC(z1013_state::z1013_keyboard_w));
 }
 
@@ -171,6 +179,11 @@ static INPUT_PORTS_START( z1013_8x4 )
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
+	PORT_START("TAKT")
+		PORT_CONFNAME(3, 3, "System Clock") PORT_CHANGED_MEMBER(DEVICE_SELF, z1013_state, clock_config_changed, 0)
+		PORT_CONFSETTING(3, "1 MHz")
+		PORT_CONFSETTING(2, "2 MHz")
+		PORT_CONFSETTING(1, "4 MHz")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( z1013_8x8 )
@@ -251,6 +264,11 @@ static INPUT_PORTS_START( z1013_8x8 )
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
+	PORT_START("TAKT")
+		PORT_CONFNAME(3, 3, "System Clock") PORT_CHANGED_MEMBER(DEVICE_SELF, z1013_state, clock_config_changed, 0)
+		PORT_CONFSETTING(3, "1 MHz")
+		PORT_CONFSETTING(2, "2 MHz")
+		PORT_CONFSETTING(1, "4 MHz")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( z1013 )
@@ -259,6 +277,11 @@ static INPUT_PORTS_START( z1013 )
 		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
+	PORT_START("TAKT")
+		PORT_CONFNAME(3, 3, "System Clock") PORT_CHANGED_MEMBER(DEVICE_SELF, z1013_state, clock_config_changed, 0)
+		PORT_CONFSETTING(3, "1 MHz")
+		PORT_CONFSETTING(2, "2 MHz")
+		PORT_CONFSETTING(1, "4 MHz")
 INPUT_PORTS_END
 
 
@@ -301,6 +324,17 @@ void z1013_state::machine_reset()
 	m_keyboard_line = 0U;
 
 	m_maincpu->set_state_int(Z80_PC, 0xf000);
+
+	const XTAL clock = 8_MHz_XTAL / (1 << m_clock_config->read());
+	m_maincpu->set_unscaled_clock(clock);
+	m_mainpio->set_unscaled_clock(clock);
+}
+
+INPUT_CHANGED_MEMBER(z1013_state::clock_config_changed)
+{
+	const XTAL clock = 8_MHz_XTAL / (1 << newval);
+	m_maincpu->set_unscaled_clock(clock);
+	m_mainpio->set_unscaled_clock(clock);
 }
 
 void z1013_state::machine_start()
@@ -422,16 +456,13 @@ GFXDECODE_END
 void z1013_state::z1013(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(1'000'000));
+	Z80(config, m_maincpu, 8_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &z1013_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &z1013_state::io_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0, 32*8-1, 0, 32*8-1);
+	screen.set_raw(8_MHz_XTAL, 512, 0, 256, 302, 0, 256);
 	screen.set_screen_update(FUNC(z1013_state::screen_update_z1013));
 	screen.set_palette("palette");
 
@@ -443,10 +474,10 @@ void z1013_state::z1013(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
-	z80pio_device& pio(Z80PIO(config, "z80pio", XTAL(1'000'000)));
-	pio.in_pa_callback().set(FUNC(z1013_state::port_a_r));
-	pio.in_pb_callback().set(FUNC(z1013_state::port_b_r));
-	pio.out_pb_callback().set(FUNC(z1013_state::port_b_w));
+	Z80PIO(config, m_mainpio, 8_MHz_XTAL / 8);
+	m_mainpio->in_pa_callback().set(FUNC(z1013_state::port_a_r));
+	m_mainpio->in_pb_callback().set(FUNC(z1013_state::port_b_r));
+	m_mainpio->out_pb_callback().set(FUNC(z1013_state::port_b_w));
 
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
@@ -466,17 +497,15 @@ void z1013_state::z1013a2(machine_config &config)
 {
 	z1013(config);
 
-	z80pio_device &pio(*subdevice<z80pio_device>("z80pio"));
-	pio.in_pb_callback().set(FUNC(z1013_state::a2_port_b_r));
+	m_mainpio->in_pb_callback().set(FUNC(z1013_state::a2_port_b_r));
 }
 
 void z1013_state::z1013k76(machine_config &config)
 {
 	z1013(config);
 
-	z80pio_device &pio(*subdevice<z80pio_device>("z80pio"));
-	pio.in_pb_callback().set(FUNC(z1013_state::k7659_port_b_r));
-	pio.out_pb_callback().set_nop();
+	m_mainpio->in_pb_callback().set(FUNC(z1013_state::k7659_port_b_r));
+	m_mainpio->out_pb_callback().set_nop();
 }
 
 /* ROM definition */

@@ -97,7 +97,7 @@
 	ROM_LOAD( "gal16v8.digi.a.u5", 0x0000, 0x000117, CRC(137c8d65) SHA1(c86d8ae7e0c99c4f179810dd12e7f412f167093e) ) /* FM + DIGITAL sound/rom card */  \
 	ROM_LOAD( "gal16v8.digi.b.u5", 0x0000, 0x000117, CRC(98dc995a) SHA1(13056e0b2a979a92279b668ce570b80bb75654f9) ) /* DIGITAL sound/rom card */  \
 	ROM_LOAD( "gal16v8.esp.b.u9", 0x0000, 0x000117, CRC(d0ea9b54) SHA1(b7611fb4004431a21f81be10934392bea8dc00a0) ) /* E.S.P. sound/rom card */  \
-	ROM_END
+ROM_END
 
 /*******************************************************************************************************************************************************************************************************
   SPRINT

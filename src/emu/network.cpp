@@ -8,12 +8,15 @@
 
 ***************************************************************************/
 
-#include <cctype>
-
 #include "emu.h"
 #include "network.h"
+
 #include "config.h"
+#include "dinetwork.h"
+
 #include "xmlfile.h"
+
+#include <cctype>
 
 //**************************************************************************
 //  NETWORK MANAGER

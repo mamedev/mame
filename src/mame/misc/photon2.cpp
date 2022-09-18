@@ -99,7 +99,7 @@ private:
 #define SPEC_LEFT_BORDER_CYCLES   24   /* Cycles to display left hand border */
 #define SPEC_DISPLAY_XSIZE_CYCLES 128  /* Horizontal screen resolution */
 #define SPEC_RIGHT_BORDER_CYCLES  24   /* Cycles to display right hand border */
-#define SPEC_RETRACE_CYCLES       48   /* Cycles taken for horizonal retrace */
+#define SPEC_RETRACE_CYCLES       48   /* Cycles taken for horizontal retrace */
 #define SPEC_CYCLES_PER_LINE      224  /* Number of cycles to display a single line */
 
 static constexpr rgb_t spectrum_palette[16] = {

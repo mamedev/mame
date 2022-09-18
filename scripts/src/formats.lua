@@ -913,6 +913,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/fdos_dsk.h,FORMATS["FDOS_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "FDOS_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/fdos_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/fdos_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/uniflex_dsk.h,FORMATS["UNIFLEX_DSK"] = true
 --------------------------------------------------
 

@@ -3,6 +3,8 @@
 #ifndef MAME_DEBUGGER_QT_DEVICEINFORMATIONWINDOW_H
 #define MAME_DEBUGGER_QT_DEVICEINFORMATIONWINDOW_H
 
+#pragma once
+
 #include "windowqt.h"
 
 //============================================================
@@ -17,7 +19,9 @@ public:
 	virtual ~DeviceInformationWindow();
 
 	void set_device(const char *tag);
-	const char *device_tag() const;
+
+protected:
+	virtual void saveConfigurationToNode(util::xml::data_node &node) override;
 
 private:
 	device_t *m_device;
@@ -37,15 +41,13 @@ public:
 	std::string m_device_tag;
 
 	DeviceInformationWindowQtConfig() :
-		WindowQtConfig(WIN_TYPE_DEVICE_INFORMATION)
+		WindowQtConfig(osd::debugger::WINDOW_TYPE_DEVICE_INFO_VIEWER)
 	{
 	}
 
 	~DeviceInformationWindowQtConfig() {}
 
-	void buildFromQWidget(QWidget *widget);
 	void applyToQWidget(QWidget *widget);
-	void addToXmlDataNode(util::xml::data_node &node) const;
 	void recoverFromXmlNode(util::xml::data_node const &node);
 };
 

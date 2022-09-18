@@ -46,6 +46,7 @@ const help_item f_static_help_list[] =
 		"  Breakpoints\n"
 		"  Watchpoints\n"
 		"  Registerpoints\n"
+		"  Exception Points\n"
 		"  Expressions\n"
 		"  Comments\n"
 		"  Cheats\n"
@@ -189,6 +190,18 @@ const help_item f_static_help_list[] =
 		"  rpdisable [<rpnum>[,...]] -- disabled given registerpoints or all if no <rpnum> specified\n"
 		"  rpenable [<rpnum>[,...]]  -- enables given registerpoints or all if no <rpnum> specified\n"
 		"  rplist [<CPU>] -- lists all the registerpoints\n"
+	},
+	{
+		"exceptionpoints",
+		"\n"
+		"Exception Point Commands\n"
+		"Type help <command> for further details on each command\n"
+		"\n"
+		"  ep[set] <type>[,<condition>[,<action>]] -- sets exception point on <type>\n"
+		"  epclear [<epnum>] -- clears a given exception point or all if no <epnum> specified\n"
+		"  epdisable [<epnum>] -- disabled a given exception point or all if no <epnum> specified\n"
+		"  epenable [<epnum>]  -- enables a given exception point or all if no <epnum> specified\n"
+		"  eplist -- lists all the registerpoints\n"
 	},
 	{
 		"expressions",
@@ -1553,6 +1566,92 @@ const help_item f_static_help_list[] =
 		"\n"
 		"The rplist command lists all the current registerpoints, along with their index and any "
 		"actions attached to them.\n"
+	},
+	{
+		"epset",
+		"\n"
+		"  ep[set] <type>[,<condition>[,<action>]]\n"
+		"\n"
+		"Sets a new exception point for exceptions of type <type> on the currently visible CPU. "
+		"The optional <condition> parameter lets you specify an expression that will be evaluated "
+		"each time the exception point is hit. If the result of the expression is true (non-zero), "
+		"the exception point will actually halt execution at the start of the exception handler; "
+		"otherwise, execution will continue with no notification. The optional <action> parameter "
+		"provides a command that is executed whenever the exception point is hit and the "
+		"<condition> is true. Note that you may need to embed the action within braces { } in order "
+		"to prevent commas and semicolons from being interpreted as applying to the epset command "
+		"itself.\n"
+		"\n"
+		"The numbering of exceptions depends upon the CPU type. Causes of exceptions may include "
+		"internally or externally vectored interrupts, errors occurring within instructions and "
+		"system calls.\n"
+		"\n"
+		"Each exception point that is set is assigned an index which can be used in other "
+		"exception point commands to reference this exception point.\n"
+		"\n"
+		"Examples:\n"
+		"\n"
+		"ep 2\n"
+		"  Set an exception that will halt execution whenever the visible CPU raises exception "
+		"number 2.\n"
+	},
+	{
+		"epclear",
+		"\n"
+		"  epclear [<epnum>[,...]]\n"
+		"\n"
+		"The epclear command clears exception points. If <epnum> is specified, only the requested "
+		"exception points are cleared, otherwise all exception points are cleared.\n"
+		"\n"
+		"Examples:\n"
+		"\n"
+		"epclear 3\n"
+		"  Clear exception point index 3.\n"
+		"\n"
+		"epclear\n"
+		"  Clear all exception points.\n"
+	},
+	{
+		"epdisable",
+		"\n"
+		"  epdisable [<epnum>[,...]]\n"
+		"\n"
+		"The epdisable command disables exception points. If <epnum> is specified, only the requested "
+		"exception points are disabled, otherwise all exception points are disabled. Note that "
+		"disabling an exception point does not delete it, it just temporarily marks the exception "
+		"point as inactive.\n"
+		"\n"
+		"Examples:\n"
+		"\n"
+		"epdisable 3\n"
+		"  Disable exception point index 3.\n"
+		"\n"
+		"epdisable\n"
+		"  Disable all exception points.\n"
+	},
+	{
+		"epenable",
+		"\n"
+		"  epenable [<epnum>[,...]]\n"
+		"\n"
+		"The epenable command enables exception points. If <epnum> is specified, only the "
+		"requested exception points are enabled, otherwise all exception points are enabled.\n"
+		"\n"
+		"Examples:\n"
+		"\n"
+		"epenable 3\n"
+		"  Enable exception point index 3.\n"
+		"\n"
+		"epenable\n"
+		"  Enable all exception points.\n"
+	},
+	{
+		"eplist",
+		"\n"
+		"  eplist\n"
+		"\n"
+		"The eplist command lists all the current exception points, along with their index and "
+		"any conditions or actions attached to them.\n"
 	},
 	{
 		"map",

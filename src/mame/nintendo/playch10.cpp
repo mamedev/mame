@@ -1353,7 +1353,7 @@ void playch10_state::gboard_rom_switch_w(offs_t offset, u8 data)
 
 		case 0x2001: // enable ram at $6000
 			// ignored - we always enable it
-		     break;
+			 break;
 
 		case 0x4000: // scanline counter
 			m_IRQ_count_latch = data;
@@ -1906,7 +1906,7 @@ void playch10_state::playch10(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &playch10_state::bios_map);
 	m_maincpu->set_addrmap(AS_IO, &playch10_state::bios_io_map);
 
-	N2A03(config, m_cartcpu, NTSC_APU_CLOCK);
+	N2A03G(config, m_cartcpu, NTSC_APU_CLOCK);
 	m_cartcpu->set_addrmap(AS_PROGRAM, &playch10_state::cart_map);
 
 	ls259_device &outlatch1(LS259(config, "outlatch1")); // 7D

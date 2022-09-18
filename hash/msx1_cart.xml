@@ -13007,7 +13007,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="espeech" supported="no">
+	<software name="espeech">
 		<description>Easi-Speech</description>
 		<year>1987</year>
 		<publisher>R.Amy</publisher>

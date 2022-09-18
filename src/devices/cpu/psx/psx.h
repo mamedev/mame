@@ -310,7 +310,7 @@ protected:
 	devcb_read8 m_cd_read_handler;
 	devcb_write8 m_cd_write_handler;
 	required_device<ram_device> m_ram;
-	memory_region *m_rom;
+	required_memory_region m_rom;
 	bool m_disable_rom_berr;
 
 private:

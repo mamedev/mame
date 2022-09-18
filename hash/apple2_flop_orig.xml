@@ -23443,4 +23443,772 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="microz1">
+		<description>Microzine 1</description>
+		<year>1983</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-08-02"/>
+		<sharedfeat name="compatibility" value="A2P,A2E"/>
+		<!-- It requires a 48K Apple ][+ or unenhanced //e. Due to issues unrelated to the copy protection, it does not run on later machines. -->
+		<!--"Microzine No. 1" is a 1983 set of educational games and programs distributed by Scholastic. Credits: Dan Klassen (producer and editor), David G. Olmon (lead programmer), Tom Hansen (software designer), Karen Klassen (software designer), Don Wagner (software designer), Al Borchers (programmer), Gary Johnson (programmer), Ame C. Flynn (graphic design), Michael Callery (graphic design), Lorene Lavora (illustration), Steve Sullivan (illustration), Deborah Kovacs (creative director), Stephen Gass (project manager), Jeffrey Siegel (editor), Bob Neumann (contributing editor), Megan Stine (contributing editor), H. William Stine (contributing editor). It requires a 48K Apple ][+ or unenhanced //e. Due to issues unrelated to the copy protection, it does not run on later machines.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="235330">
+				<rom name="microzine no. 1 (1983)(scholastic) - side 1- twistaplot, what's next.woz" size="235330" crc="dae1c1d3" sha1="cd2a57adf261788ad6ab07fc45fae9feca084072"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="235351">
+				<rom name="microzine no. 1 (1983)(scholastic) - side 2- ask me, poster, secret files, computer stuff.woz" size="235351" crc="e445cd5f" sha1="0f1b490deb174f1aec38e8ad4fc99956aa638a04"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz2">
+		<description>Microzine 2</description>
+		<year>1983</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-08-02"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Microzine No. 2" is a 1983 set of educational games and programs distributed by Scholastic. Credits: Dan Klassen (producer and editor), David G. Olmon (lead programmer), Tom Hansen (software designer), Karen Klassen (software designer), Don Wagner (software designer), Al Borchers (programmer), Gary Johnson (programmer), Dave Updegraff (programmer), Ame C. Flynn (graphic design), Michael Callery (graphic design), Lorene Lavora (illustration), Steve Sullivan (illustration), Deborah Kovacs (creative director), Stephen Gass (project manager), Jeffrey Siegel (editor), Bob Neumann (contributing editor). It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="235338">
+				<rom name="microzine no. 2 (1983)(scholastic) - side 1- what's inside, northwoods adventure, melody maker, computer stuff.woz" size="235338" crc="ee720a80" sha1="e8317617b40f258d85be445f64ca5b77c706b87a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="235312">
+				<rom name="microzine no. 2 (1983)(scholastic) - side 2- ride the wind, word ladder, what's next.woz" size="235312" crc="05ba43ce" sha1="365b865a9dce82819bd1806095c6fb3c14cc16f4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz3">
+		<description>Microzine 3</description>
+		<year>1983</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-08-02"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Microzine No. 3" is a 1983 set of educational games and programs distributed by Scholastic. Credits: Dan Klassen (producer and editor), David G. Olmon (lead programmer), Tom Hansen (software designer), Karen Klassen (software designer), Don Wagner (software designer), Al Borchers (programmer), Gary Johnson (programmer), Dave Updegraff (programmer), Will Kefauver (art director), Lauretta Jones (illustrator), M. Brooks Jones (illustrator), Lorene Lavora (illustrator), Deborah Kovacs (creative director), Stephen Gass (project manager), Jeffrey Siegel (editor), Amy McKinley (associate editor), Andy Ragan (associate editor). It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="242008">
+				<rom name="microzine no. 3 (1983)(scholastic) - side 1- what's inside, mystery at pinecrest manor, computer stuff.woz" size="242008" crc="3fef2d3b" sha1="a6540cd2dc5830b8ee49a5a930124d173081707d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="222012">
+				<rom name="microzine no. 3 (1983)(scholastic) - side 2- tag, bookstore, amazing robot.woz" size="222012" crc="bdf8ae04" sha1="e891c8b88fc22c6d09634d0bef386e6895390e3f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz4">
+		<description>Microzine 4</description>
+		<year>1984</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-08-03"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Microzine No. 4" is a 1984 set of educational games and programs distributed by Scholastic. Credits: Dan Klassen (producer and editor), David G. Olmon (lead programmer), Tom Hansen (software designer), Karen Klassen (software designer), Don Wagner (software designer), Al Borchers (programmer), Gary Johnson (programmer), Dave Updegraff (programmer), Will Kefauver (art director), Lauretta Jones (illustrator), M. Brooks Jones (illustrator), Lorene Lavora (illustrator), Deborah Kovacs (creative director), Stephen Gass (project manager), Jeffrey Siegel (editor), Amy McKinley (associate editor), Andy Ragan (associate editor). It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="242009">
+				<rom name="microzine no. 4 (1984)(scholastic) - side 1- what's inside, adventures in the microzine, computer stuff.woz" size="242009" crc="35661262" sha1="252d4bf67f3fdd2f2cd0cd7efec4a9dda06930b2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="241978">
+				<rom name="microzine no. 4 (1984)(scholastic) - side 2- log-it , traps, what's next.woz" size="241978" crc="c1dbfd01" sha1="f6b7853ea838d4d278e51f23521dbe60d0c53055"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz5">
+		<description>Microzine 5</description>
+		<year>1984</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-08-03"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Microzine No. 5" is a 1984 set of educational games and programs distributed by Scholastic. Credits: Dan Klassen (producer and editor), David G. Olmon (lead programmer), Tom Hansen (software designer), Karen Klassen (software designer), Don Wagner (software designer), Al Borchers (programmer), Gary Johnson (programmer), Dave Updegraff (programmer), Sandi Young (art director and graphic designer), Will Kefauver (design consultant), Lauretta Jones (illustrator), Lorene Lavora (illustrator), Deborah Kovacs (creative director), Stephen Gass (project manager), Jeffrey Siegel (editor), Amy McKinley (associate editor), Andy Ragan (associate editor). It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="242013">
+				<rom name="microzine no. 5 (1984)(scholastic) - side 1- what's inside, pirates of the soft seas.woz" size="242013" crc="96d5b90c" sha1="874ec0ec9d678fa17b564124b5676bc7bb3366e7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="468345">
+				<rom name="microzine no. 5 (1984)(scholastic) - side 2- story teller, amazing robot ii, fences, computer stuff, what's next.woz" size="468345" crc="72c3234c" sha1="9d6f0e63e23f04711f7d9b4a29d8360cdc7012b4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz6">
+		<description>Microzine 6</description>
+		<year>1984</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-08-03"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Microzine No. 6" is a 1984 set of educational games and programs distributed by Scholastic. Credits: Dan Klassen (producer and editor), David G. Olmon (lead programmer), Tom Hansen (software designer), Karen Klassen (software designer), Don Wagner (software designer), Al Borchers (programmer), Gary Johnson (programmer), Dave Updegraff (programmer), Sandi Young (art director and graphic designer), Will Kefauver (design consultant and illustrator), Lauretta Jones (illustrator), Deborah Kovacs (creative director), Stephen Gass (project manager), Jeffrey Siegel (editor), Amy McKinley (associate editor), Andy Ragan (associate editor). It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="242007">
+				<rom name="microzine no. 6 (1984)(scholastic) - side 1- what's inside, fossils alive, computer stuff.woz" size="242007" crc="72a35e01" sha1="2f58292998be8aa652f2bbfbe9e4d9853628196f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="235355">
+				<rom name="microzine no. 6 (1984)(scholastic) - side 2- olympic news, free store, sound off , what's next.woz" size="235355" crc="868b3b99" sha1="eb0cd6df242d8c9bf15fb8169ac9612d240996ff"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz7">
+		<description>Microzine 7</description>
+		<year>1984</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-08-03"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Microzine No. 7" is a 1984 set of educational games and programs distributed by Scholastic. Credits: Dan Klassen (producer and editor), Tom Hansen (software designer), Karen Klassen (software designer), Don Wagner (software designer), Al Borchers (programmer), Kevin Dybdal (programmer), Gary Johnson (programmer), Dave Olmon (programmer), Dave Updegraff (programmer), Neal Yaughn (programmer), Sandi Young (art director, graphic designer, illustrator), Steve Sullivan (illustrator), Maryl Skinner (illustrator), Deborah Kovacs (creative director), Maryellen Kohn (project manager), Jeffrey Siegel (senior editor), Amy McKinley (editor), Andy Ragan (contributing editor). It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="235380">
+				<rom name="microzine no. 7 (1984)(scholastic) - side 1- what's inside, brain drain, computer stuff.woz" size="235380" crc="de2e773e" sha1="5bffba51323383412a502525790d99b29216cd05"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="235387">
+				<rom name="microzine no. 7 (1984)(scholastic) - side 2- survey taker, city blocks, back page, what's next.woz" size="235387" crc="af5af6f6" sha1="a348bde53b27a180fde07a057a896625a7144891"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz8">
+		<description>Microzine 8</description>
+		<year>1984</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-08-04"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Microzine No. 8" is a 1984 set of educational games and programs distributed by Scholastic. Credits: Dan Klassen (producer and editor), Tom Hansen (software designer), Karen Klassen (software designer), Don Wagner (software designer), Al Borchers (programmer), Gary Johnson (programmer), Kevin Dybdal (programmer), Dave Olmon (programmer), Richard Rathe (programmer), Dave Updegraff (programmer), Neal Yaughn (programmer), Sandi Young (illustrator), Steve Sullivan (illustrator), David A. Bowman (illustrator and contributing editor), Deborah Kovacs (creative director), Maryellen Kohn (project manager), Jeffrey Siegel (senior editor), Amy McKinley (editor), Andy Ragan (contributing editor). It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="235414">
+				<rom name="microzine no. 8 (1984)(scholastic) - side 1- letter from the editor, zazoo come home, computer stuff.woz" size="235414" crc="3f630756" sha1="566ddf1848c4795d38aba9a6bb83b5121da5cd85"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="235412">
+				<rom name="microzine no. 8 (1984)(scholastic) - side 2- secret journal, drawing board, back page, what's next.woz" size="235412" crc="18dfb87e" sha1="cb0280bb4cedd4908efcb5d7010918382dd93a3d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz9">
+		<description>Microzine 9</description>
+		<year>1985</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-08-04"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Microzine No. 9" is a 1985 set of educational games and programs distributed by Scholastic. Credits: Dan Klassen (producer and editor), Tom Hansen (software designer), Karen Klassen (software designer), Don Wagner (software designer), Al Borchers (programmer), Gary Johnson (programmer), Kevin Dybdal (programmer), Dave Olmon (programmer), Richard Rathe (programmer), Dave Updegraff (programmer), Neal Yaughn (programmer), Bayard Colyear (illustrator), Lauretta Jones (illustrator), Malcom Kirton (illustrator), Sandi Young (illustrator), Deborah Kovacs (creative director), Maryellen Kohn (project manager), Jeffrey Siegel (senior editor), Amy McKinley (editor), Andy Ragan (contributing editor), David A. Bowman (contributing editor). It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="235451">
+				<rom name="microzine no. 9 (1985)(scholastic) - side 1- letter from the editor, the big nap, computer stuff.woz" size="235451" crc="1e257b42" sha1="4383290783a341d8bb20c2754c8378476e115098"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="235446">
+				<rom name="microzine no. 9 (1985)(scholastic) - side 2- budget maker, quizzler, back page, what's next.woz" size="235446" crc="365a0c86" sha1="ce7ddce720301566aea86d07c085cc4f34096b97"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz10">
+		<description>Microzine 10</description>
+		<year>1985</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-08-04"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Microzine No. 10" is a 1985 set of educational games and programs distributed by Scholastic. Credits: Dan Klassen (producer and editor), Tom Hansen (software designer), Karen Klassen (software designer), Don Wagner (software designer), Al Borchers (programmer), Gary Johnson (programmer), Kevin Dybdal (programmer), Dave Olmon (programmer), Dave Updegraff (programmer), Neal Yaughn (programmer), Bayard Colyear (illustrator), Malcom Kirton (illustrator), Sandi Young (illustrator), Deborah Kovacs (creative director), Maryellen Kohn (project manager), Jeffrey Siegel (senior editor), Amy McKinley (editor), David A. Bowman (contributing editor). It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="235383">
+				<rom name="microzine no. 10 (1985)(scholastic) - side 1- letter from the editor, the shot heard 'round the world, computer stuff.woz" size="235383" crc="64061df0" sha1="a9ed98926b7a3b66b657a8bcedfa6cbd942b5e53"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="235354">
+				<rom name="microzine no. 10 (1985)(scholastic) - side 2- sailing, billboard, back page, what's next.woz" size="235354" crc="2f51d985" sha1="2fee6c6bffb8d2bf5afe91b6d5968e890dd7e2f8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz11">
+		<description>Microzine 11</description>
+		<year>1985</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-08-04"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Microzine No. 11" is a 1985 set of educational games and programs distributed by Scholastic. Credits: Dan Klassen (producer and editor), Tom Hansen (software designer), Karen Klassen (software designer), Don Wagner (software designer), Al Borchers (programmer), Gary Johnson (programmer), Kevin Dybdal (programmer), Dave Olmon (programmer), Dave Updegraff (programmer), Neal Yaughn (programmer), Bayard Colyear (illustrator), Malcom Kirton (illustrator), Sandi Young (illustrator), Deborah Kovacs (creative director), Jeffrey Siegel (senior editor), Amy McKinley (senior editor), David A. Bowman (contributing editor). It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="235340">
+				<rom name="microzine no. 11 (1985)(scholastic) - side 1- letter from the editor, the dark tower, computer stuff.woz" size="235340" crc="2d5799b4" sha1="3b197714b107138ec681eb9803b4cff044610d6d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="235339">
+				<rom name="microzine no. 11 (1985)(scholastic) - side 2- secret coder, sticker factory, back page, what's next.woz" size="235339" crc="6090c01e" sha1="ba8083ac1ae9e77f2d92c58f8bf0554cc665a2dd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz12">
+		<description>Microzine 12</description>
+		<year>1985</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-08-04"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Microzine No. 12" is a 1985 set of educational games and programs developed by Information Technology Design Associates and distributed by Scholastic. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="234878">
+				<rom name="microzine no. 12 (1985)(scholastic) - side 1- letter from the editor, wagons west, computer stuff.woz" size="234878" crc="abb0f2df" sha1="ffae6d7ea55499283d331488a30f7a85b22703b1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="234884">
+				<rom name="microzine no. 12 (1985)(scholastic) - side 2- newspaper maker, t-shirt puzzles, micro-toon, what's next.woz" size="234884" crc="3fd01f78" sha1="95936de42e1718c45fa661ed233ec8d6101f4048"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz13">
+		<description>Microzine 13</description>
+		<year>1985</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-08-04"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Microzine No. 13" is a 1985 set of educational games and programs developed by Information Technology Design Associates and distributed by Scholastic. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="234890">
+				<rom name="microzine no. 13 (1985)(scholastic) - side 1- letter from the editor, the frog and the fables, computer stuff.woz" size="234890" crc="57749cde" sha1="1751dea829f35f04a6fa5eb37694120af724052e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="234890">
+				<rom name="microzine no. 13 (1985)(scholastic) - side 2- the secret of the sphinx, who's who in outer space, what's next.woz" size="234890" crc="b9d4b929" sha1="76828d26a8674c478968ff953834db87a73bd687"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz14">
+		<description>Microzine 14</description>
+		<year>1986</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-08-04"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Microzine No. 14" is a 1986 set of educational games and programs developed by Methods and Solutions, and distributed by Scholastic. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="234864">
+				<rom name="microzine no. 14 (1986)(scholastic) - side 1- letter from the editor, the funhouse caper, computer stuff.woz" size="234864" crc="94aa4f1a" sha1="bf35a3f0e612528392e89db53973da83942a2be6"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="241521">
+				<rom name="microzine no. 14 (1986)(scholastic) - side 2- cartoon maker, inventors and inventions, puzzler, what's next.woz" size="241521" crc="4c089cc2" sha1="1feefae30b7d4cd7ede9538bc68219ed2b0e8c6d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz15">
+		<description>Microzine 15</description>
+		<year>1986</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-08-04"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Microzine No. 15" is a 1986 set of educational games and programs developed by Information Technology Design Associates and distributed by Scholastic. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="234895">
+				<rom name="microzine no. 15 (1986)(scholastic) - side 1- letter from the editor, 2088- an oval office odyssey, computer stuff.woz" size="234895" crc="20f0044c" sha1="07069bf1c0c90acc7b8ddd551f55c0b1d8c7ad71"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="234871">
+				<rom name="microzine no. 15 (1986)(scholastic) - side 2- keyboarding, roundup, estimator, what's next.woz" size="234871" crc="3c7b0194" sha1="717fd25f03d2366511ebf69026eb202c085ae948"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz16">
+		<description>Microzine 16</description>
+		<year>1986</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-08-04"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Microzine No. 16" is a 1986 set of educational games and programs developed by Methods and Solutions, and distributed by Scholastic. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="234864">
+				<rom name="microzine no. 16 (1986)(scholastic) - side 1- letter from the editor, tickets to america, computer stuff.woz" size="234864" crc="a439c666" sha1="56e8178a44fc836349559846a80f7d00ab2eb0c9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="234885">
+				<rom name="microzine no. 16 (1986)(scholastic) - side 2- shifty shapes, solar pilot, atgtfp, what's next.woz" size="234885" crc="75001eec" sha1="e3048a82f5585e8b572b480dbde8534c5695b36a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz17">
+		<description>Microzine 17</description>
+		<year>1986</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-08-06"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Microzine No. 17" is a 1986 set of educational games and programs developed by Methods and Solutions, and distributed by Scholastic. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="234874">
+				<rom name="microzine no. 17 (1986)(scholastic) - side 1- letter from the editor, microagent of the body guard, computer stuff.woz" size="234874" crc="d3b3bd85" sha1="b3994d8fbf75bd3cd4303a9bcbcf53f00ef86b77"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="234871">
+				<rom name="microzine no. 17 (1986)(scholastic) - side 2- mission- mix-up, marvelous menagerie, basic training, what's next.woz" size="234871" crc="4a3b4d61" sha1="1db34fc55cc603385a19f67dd6699c03aecad1e8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz18">
+		<description>Microzine 18</description>
+		<year>1986</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-08-06"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Microzine No. 18" is a 1986 set of educational games and programs developed by Information Technology Design Associates and distributed by Scholastic. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="234866">
+				<rom name="microzine no. 18 (1986)(scholastic) - side 1- letter from the editor, history mystery.woz" size="234866" crc="01d248ff" sha1="682ff202097b0ce76d7b8b0454a6622c2eeddbe7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="234837">
+				<rom name="microzine no. 18 (1986)(scholastic) - side 2- computer stuff, scholasticalc, letter writer, rose and calumny.woz" size="234837" crc="bc2ce0ff" sha1="03e0c46f0ee91e62a672e4aa412e141d60e884ed"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz19">
+		<description>Microzine 19</description>
+		<year>1987</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-08-06"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Microzine No. 19" is a 1987 set of educational games and programs developed by Information Technology Design Associates and distributed by Scholastic. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="234871">
+				<rom name="microzine no. 19 (1987)(scholastic) - side 1- letter from the editor, malice in wonderland.woz" size="234871" crc="ca880ee9" sha1="5e853779a9c8a11ff8bcf99fd59576c453914881"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="234891">
+				<rom name="microzine no. 19 (1987)(scholastic) - side 2- computer stuff, animation lab, calendar, estimator, what's next.woz" size="234891" crc="a98b369d" sha1="b1a1d5a08972ba7bd6657b41edc0dc508c8344d1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz20">
+		<description>Microzine 20</description>
+		<year>1987</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-08-06"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Microzine No. 20" is a 1987 set of educational games and programs distributed by Scholastic. Credits: Christopher McQuilkin (programming manager), Alissa Nordlicht (programmer), Linda Gottfried (art director), Sandi Young (contributing art director), Malcolm Kirton (assistant art director). It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="235030">
+				<rom name="microzine no. 20 (1987)(scholastic) - side 1- letters, voyage to see what's on the bottom, computer stuff.woz" size="235030" crc="a279550e" sha1="66afc468057df6292afb5a9fe45a8baab02ee766"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="235018">
+				<rom name="microzine no. 20 (1987)(scholastic) - side 2- interactions, heros and villains, monitor mystery.woz" size="235018" crc="7f7002ce" sha1="7d2a5cba7d0142ee919fa04b3a6f407db73c5e8e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz21">
+		<description>Microzine 21</description>
+		<year>1987</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-08-10"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Microzine No. 21" is a 1987 set of educational games and programs distributed by Scholastic. Credits: Christopher McQuilkin (programming manager), Alissa Nordlicht (programmer), Amy E. McKinley (senior product editor), David A. Bowman (contributing editor), Elisabeth Gitelle (contributing editor), Mark I. Malamud (contributing editor), Linda Gottfried (art director), Malcolm Kirton (assistant art director). It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="235115">
+				<rom name="microzine no. 21 (1987)(scholastic) - side 1- robot rescue, computer stuff.woz" size="235115" crc="3d2129c8" sha1="7dc06a2c396f2182364dd9ac46d3b251e863989e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="235137">
+				<rom name="microzine no. 21 (1987)(scholastic) - side 2- fabulous kids, fill in the blanks, monitor mystery.woz" size="235137" crc="25f92a0e" sha1="6867de1fc18a1a16ee42dfe63b4247ca369af3a0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz22">
+		<description>Microzine 22</description>
+		<year>1987</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-08-10"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Microzine No. 22" is a 1987 set of educational games and programs distributed by Scholastic. Credits: Christopher McQuilkin (programming manager), Alissa Nordlicht (programmer), Amy E. McKinley (senior product editor), Lisa Mandel (associate editor), Rose Trivisonno (contributing editor), Linda Gottfried (art director), Malcolm Kirton (assistant art director). It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="235085">
+				<rom name="microzine no. 22 (1987)(scholastic) - side 1- letters, the haunted channels, computer stuff.woz" size="235085" crc="d57e5404" sha1="f9c90043fc1d59810b3bae44709a50c10f9ed9f2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="235066">
+				<rom name="microzine no. 22 (1987)(scholastic) - side 2- math mall, monitor mystery.woz" size="235066" crc="6c3e8bb9" sha1="4c52d74450156a6a61332721ad9d34925e8f06e3"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side 3"/>
+			<dataarea name="flop" size="235041">
+				<rom name="microzine no. 22 (1987)(scholastic) - side 3- newsprint.woz" size="235041" crc="80a2107a" sha1="7a5b192259e6faed08f0fb61c12264e6918806a7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz23">
+		<description>Microzine 23</description>
+		<year>1987</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-08-11"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Microzine No. 23" is a 1987 set of educational games and programs distributed by Scholastic. Credits: Christopher McQuilkin (programming manager), Alissa Nordlicht (programmer), Cary Hammer (contributing programmer), Mark Nichols (contributing programmer), Dan Kinch (contributing programmer), Amy E. McKinley (senior product editor), Lisa Mandel (associate editor), Rose Trivisonno (contributing editor), Linda Gottfried (art director), Malcolm Kirton (assistant art director). It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="235199">
+				<rom name="microzine no. 23 (1987)(scholastic) - side 1- letters, escape from antcatraz, computer stuff.woz" size="235199" crc="067889b0" sha1="73749910a2bee7576b5b477fa949f575caa29383"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="241835">
+				<rom name="microzine no. 23 (1987)(scholastic) - side 2- math mall, monitor mystery.woz" size="241835" crc="ab6d85b0" sha1="9d4c08ce7a2123cd86a15f8d9f43aa56f31ab824"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side 3"/>
+			<dataarea name="flop" size="235163">
+				<rom name="microzine no. 23 (1987)(scholastic) - side 3- greetings .woz" size="235163" crc="213d9cbe" sha1="7e7e2a793826acdce1f8c01a7119f909d1e3ba0a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz24">
+		<description>Microzine 24</description>
+		<year>1987</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-08-12"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Microzine No. 24" is a 1987 set of educational games and programs distributed by Scholastic. Credits: Cary Hammer (director of programming), Andrew Kaplan (programmer), Mark Nichols (programmer), Alissa Nordlicht (programmer), Stuart Blavatnik (programmer), Jim Markowich (programmer), Christopher McQuilkin (programmer), Aaron Weaver (contributing programmer), Amy E. McKinley (senior product editor), Lisa Mandel (associate editor), Rose Trivisonno (contributing editor), Linda Gottfried (art director), Edwin Torres (assistant art director). It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="235259">
+				<rom name="microzine no. 24 (1987)(scholastic) - side 1- captains of the china trade, computer stuff.woz" size="235259" crc="017a1085" sha1="6d3f9671d0f87b4d270106903e373eefc1985045"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="235261">
+				<rom name="microzine no. 24 (1987)(scholastic) - side 2- dr. maxwell's molecule magic, monitor mystery.woz" size="235261" crc="b869df7c" sha1="688ef51095643663134b7717ad7ee5514e2571ce"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side 3"/>
+			<dataarea name="flop" size="235139">
+				<rom name="microzine no. 24 (1987)(scholastic) - side 3- banner maker.woz" size="235139" crc="b4343854" sha1="476c670d04ed8ebc3276bab9113e89eef437c4b8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz25">
+		<description>Microzine 25</description>
+		<year>1988</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-08-13"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Microzine No. 25" is a 1988 set of educational games and programs distributed by Scholastic. Credits: Cary Hammer (director of programming), A. Caleb Gattegno (programmer), Andrew Kaplan (programmer), Mark Nichols (programmer), Alissa Nordlicht (programmer), Stuart Blavatnik (contributing programmer), JoAnn Comito (contributing programmer), Amy E. McKinley (senior product editor), Lisa Mandel (associate editor), Rose Trivisonno (contributing editor), Linda Gottfried (art director), Edwin Torres (assistant art director). It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="235244">
+				<rom name="microzine no. 25 (1988)(scholastic) - side 1- letters, cosmic heroes, computer stuff.woz" size="235244" crc="dfd13096" sha1="ee3684ed93820c953bd8775789502ba85a3f2ca6"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="235240">
+				<rom name="microzine no. 25 (1988)(scholastic) - side 2- the learning machine, picture this.woz" size="235240" crc="f56a22c7" sha1="c4438ba971418f38dcc261ffd8bfdd3e2c619fbd"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side 3"/>
+			<dataarea name="flop" size="235205">
+				<rom name="microzine no. 25 (1988)(scholastic) - side 3- blueprint maker.woz" size="235205" crc="5aae950f" sha1="ce23de1831e3b51413c4c9435b6b293379bc1aa1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz26">
+		<description>Microzine 26</description>
+		<year>1988</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-08-13"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Microzine No. 26" is a 1988 set of educational games and programs distributed by Scholastic. Credits: Cary Hammer (director of programming), A. Caleb Gattegno (programmer), Andrew Kaplan (programmer), Mark Nichols (programmer), Alissa Nordlicht (programmer), Stuart Blavatnik (contributing programmer), Amy E. McKinley (senior product editor), Lisa Mandel (associate editor), Rose Trivisonno (contributing editor), Linda Gottfried (art director), Tara Framer (assistant art director), Edwin Torres (assistant art director). It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 1"/>
+			<dataarea name="flop" size="235256">
+				<rom name="microzine no. 26 (1988)(scholastic) - disk 1, side 1- the wizard of darkling wood, letters, computer stuff.woz" size="235256" crc="da8fe27b" sha1="60cef73d719c2ef80bbbbf599e96e770f82fc136"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 2"/>
+			<dataarea name="flop" size="235256">
+				<rom name="microzine no. 26 (1988)(scholastic) - disk 1, side 2- the wizard of darkling wood, letters, computer stuff.woz" size="235256" crc="19702123" sha1="0ab3523faf50a5c67521925074c4a4a6965a2cb9"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="235212">
+				<rom name="microzine no. 26 (1988)(scholastic) - disk 2- congratulations .woz" size="235212" crc="baec01d6" sha1="b117b4e832df8a1620bb70fcff4b860e794d8eb3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz27">
+		<description>Microzine 27</description>
+		<year>1988</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-08-13"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Microzine No. 27" is a 1988 set of educational games and programs distributed by Scholastic. Credits: Cary Hammer (director of programming), A. Caleb Gattegno (programmer), Andrew Kaplan (programmer), Alissa Nordlicht (programmer), Donald Way (programmer), Stuart Blavatnik (contributing programmer), Amy E. McKinley (editorial director), Lisa Mandel (project editor), Rose Trivisonno (contributing editor), Nancy Waks (contributing editor), Tara Framer (art director), Edwin Torres (art director). It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 1"/>
+			<dataarea name="flop" size="235211">
+				<rom name="microzine no. 27 (1988)(scholastic) - disk 1, side 1- microzine guide, monitor mystery.woz" size="235211" crc="5a19894c" sha1="ebbb65ed2dcc8de7d04aeac3d16a43b22431280a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 2"/>
+			<dataarea name="flop" size="235190">
+				<rom name="microzine no. 27 (1988)(scholastic) - disk 1, side 2- rebus maker.woz" size="235190" crc="7c9fc160" sha1="6f74da37246b8b7068c1d5de26c116c8d562526f"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 1"/>
+			<dataarea name="flop" size="235200">
+				<rom name="microzine no. 27 (1988)(scholastic) - disk 2, side 1- constellation odyssey.woz" size="235200" crc="684aa097" sha1="4297b8c60c06ac99967d73b2cced5a8c7d482f26"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 2"/>
+			<dataarea name="flop" size="235199">
+				<rom name="microzine no. 27 (1988)(scholastic) - disk 2, side 2- the learning machine.woz" size="235199" crc="4161e076" sha1="a2998dde8f9004acf7ea265500a4e481361e3171"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz28">
+		<description>Microzine 28</description>
+		<year>1988</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-08-13"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Microzine No. 28" is a 1988 set of educational games and programs distributed by Scholastic. Credits: Cary Hammer (director of programming), A. Caleb Gattegno (programmer), Andrew Kaplan (programmer), Alissa Nordlicht (programmer), Donald Way (programmer), Stuart Blavatnik (contributing programmer), Amy E. McKinley (editorial director), Lisa Mandel (project editor), Lainee Cohen (contributing editor), Claire Curtin (contributing editor), Rose Trivisonno (contributing editor), Nancy Waks (contributing editor), Tara Framer (art director), Edwin Torres (art director). It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 1"/>
+			<dataarea name="flop" size="235282">
+				<rom name="microzine no. 28 (1988)(scholastic) - disk 1, side 1- microzine guide, african animals.woz" size="235282" crc="5d06c353" sha1="bb922b1fc2df04b6a1e39f4873a7cb0d131a0898"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 2"/>
+			<dataarea name="flop" size="234754">
+				<rom name="microzine no. 28 (1988)(scholastic) - disk 1, side 2- stationery maker.woz" size="234754" crc="a1f201d1" sha1="805ec37f4e821d47a80f5d69e7eadea27e04a05c"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 1"/>
+			<dataarea name="flop" size="235268">
+				<rom name="microzine no. 28 (1988)(scholastic) - disk 2, side 1- quest for the pole.woz" size="235268" crc="7c476e38" sha1="ddb963228a421beff88a07b3afbf76d782a68463"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 2"/>
+			<dataarea name="flop" size="235259">
+				<rom name="microzine no. 28 (1988)(scholastic) - disk 2, side 2- sound lab.woz" size="235259" crc="3b452a94" sha1="8d36afd45a344931a1922692c62ac92846c8a8f1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz29">
+		<description>Microzine 29</description>
+		<year>1988</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-08-13"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Microzine No. 29" is a 1988 set of educational games and programs distributed by Scholastic. Credits: Cary Hammer (director of programming), A. Caleb Gattegno (programmer), Andrew Kaplan (programmer), Alissa Nordlicht (programmer), Julia Watkins (programmer), Donald Way (programmer), Stuart Blavatnik (contributing programmer), Amy E. McKinley (editorial director), Lisa Mandel (project editor), Lainee Cohen (contributing editor), Rose Trivisonno (contributing editor), Nancy Waks (contributing editor), Tara Framer (art director), Jenny Grant (assistant art director). It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 1"/>
+			<dataarea name="flop" size="235281">
+				<rom name="microzine no. 29 (1988)(scholastic) - disk 1, side 1- microzine guide, desert dilemma.woz" size="235281" crc="a7a8ce67" sha1="c5f75d739fa8aeeda55719c9e4c1257a2f9620d7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 2"/>
+			<dataarea name="flop" size="235263">
+				<rom name="microzine no. 29 (1988)(scholastic) - disk 1, side 2- screen artist.woz" size="235263" crc="1aee21dc" sha1="e6e503e83e2c5b2015b79e55841d4e8c25baf670"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 1"/>
+			<dataarea name="flop" size="235270">
+				<rom name="microzine no. 29 (1988)(scholastic) - disk 2, side 1- the myths of olympus.woz" size="235270" crc="7ed1e4de" sha1="de3cdafbb3d15f58586ac948a706493aa2273e06"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 2"/>
+			<dataarea name="flop" size="235265">
+				<rom name="microzine no. 29 (1988)(scholastic) - disk 2, side 2- light on target.woz" size="235265" crc="a76fdf53" sha1="bc76c2adcdb50eaa38fa1532da231765dc55667b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microz30">
+		<description>Microzine 30</description>
+		<year>1989</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2022-08-13"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Microzine No. 30" is a 1989 set of educational games and programs distributed by Scholastic. Credits: Cary Hammer (director of programming), Andrew Kaplan (programmer), Alissa Nordlicht (programmer), Alan R. Schwartz (programmer), Julia Watkins (programmer), Donald Way (programmer), Chris McQuilkin (contributing programmer), Amy E. McKinley (editorial director), Lisa Mandel (project editor), Lainee Cohen (contributing editor), Rose Trivisonno (contributing editor), Tara Framer (art director), Jenny Grant (assistant art director). It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 1"/>
+			<dataarea name="flop" size="235245">
+				<rom name="microzine no. 30 (1989)(scholastic) - disk 1, side 1- microzine guide, double vision.woz" size="235245" crc="bc750c20" sha1="7ab182c6e33f51812af7b98200d7ad32e9a54cf9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 2"/>
+			<dataarea name="flop" size="235227">
+				<rom name="microzine no. 30 (1989)(scholastic) - disk 1, side 2- poster maker.woz" size="235227" crc="c000d5e8" sha1="656e6daf79464fbab043edc026450346cce73da3"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 1"/>
+			<dataarea name="flop" size="235236">
+				<rom name="microzine no. 30 (1989)(scholastic) - disk 2, side 1- toward the north star.woz" size="235236" crc="4c9c6557" sha1="9f0563e64be5e685825fb165803c2bece7ac10b0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 2"/>
+			<dataarea name="flop" size="235227">
+				<rom name="microzine no. 30 (1989)(scholastic) - disk 2, side 2- contraptions.woz" size="235227" crc="1395c9bb" sha1="067ac290dd6f1df39352407c314a4f5726a45fa3"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

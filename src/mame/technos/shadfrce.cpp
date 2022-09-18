@@ -904,6 +904,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1993, shadfrce,   0,        shadfrce, shadfrce, shadfrce_state, empty_init, ROT0, "Technos Japan", "Shadow Force (World, Version 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, shadfrceu,  shadfrce, shadfrce, shadfrce, shadfrce_state, empty_init, ROT0, "Technos Japan", "Shadow Force (US, Version 2)",    MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, shadfrcej,  shadfrce, shadfrce, shadfrce, shadfrce_state, empty_init, ROT0, "Technos Japan", "Shadow Force (Japan, Version 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shadfrce,   0,        shadfrce, shadfrce, shadfrce_state, empty_init, ROT0, "Technos Japan", "Shadow Force (World, Version 3)",                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shadfrceu,  shadfrce, shadfrce, shadfrce, shadfrce_state, empty_init, ROT0, "Technos Japan", "Shadow Force (US, Version 2)",                    MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shadfrcej,  shadfrce, shadfrce, shadfrce, shadfrce_state, empty_init, ROT0, "Technos Japan", "Shadow Force - Henshin Ninja (Japan, Version 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

@@ -177,7 +177,7 @@ void msm6242_device::set_irq(bool active)
 
 	if (!m_out_int_handler.isnull())
 		m_out_int_handler(active ? ASSERT_LINE : CLEAR_LINE);
-	
+
 	if (active)
 	{
 		if (!BIT(m_reg[1], 1)) // irq is pulsed
