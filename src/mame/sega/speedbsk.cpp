@@ -102,6 +102,7 @@ public:
 		m_ppi(*this, "ppi%u", 0U),
 		m_lcd(*this, "lcd"),
 		m_lamp_pwm(*this, "lamp_pwm%u", 0),
+		m_soundbank(*this, "soundbank"),
 		m_lamps(*this, "hole_%u", 1U),
 		m_start_lamp(*this, "start_lamp")
 	{ }
@@ -116,6 +117,8 @@ private:
 	required_device_array<i8255_device, 2> m_ppi;
 	required_device<hd44780_device> m_lcd;
 	required_device_array<pwm_display_device, 6> m_lamp_pwm;
+
+	required_memory_bank m_soundbank;
 
 	output_finder<24> m_lamps;
 	output_finder<> m_start_lamp;
@@ -134,6 +137,7 @@ private:
 	void solenoid2_w(uint8_t data);
 	void ppi1_porta_w(uint8_t data);
 	void ppi1_portc_w(uint8_t data);
+	void soundbank_w(uint8_t data);
 };
 
 
@@ -159,7 +163,7 @@ void speedbsk_state::main_map(address_map &map)
 void speedbsk_state::audio_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("audiocpu", 0);
-	map(0x8000, 0xbfff).rom().region("audiocpu", 0x80000); // banked rom?
+	map(0x8000, 0x9fff).bankr(m_soundbank);
 	map(0xc000, 0xdfff).m("rfsnd", FUNC(rf5c164_device::rf5c164_map));
 	map(0xe000, 0xffff).ram();
 }
@@ -170,9 +174,9 @@ void speedbsk_state::audio_io_map(address_map &map)
 	map(0x01, 0x01).nopw();
 	map(0x02, 0x03).rw("tmp82c51", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x10, 0x13).nopw(); // misc. outputs
-	map(0x20, 0x20).lr8(NAME([]() -> uint8_t { return 0x01; })); // some kind of serial read
+	map(0x20, 0x20).lr8(NAME([]() -> uint8_t { return 0x01; })); // ready for more outputs?
 	map(0x21, 0x23).nopw();
-	map(0x30, 0x30).nopw(); // bankswitch?
+	map(0x30, 0x30).w(FUNC(speedbsk_state::soundbank_w));
 	map(0x40, 0x41).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x50, 0x50).rw("adc", FUNC(msm6253_device::d0_r), FUNC(msm6253_device::select_w));
 }
@@ -353,11 +357,19 @@ void speedbsk_state::ppi1_portc_w(uint8_t data)
 	m_lcd->e_w(BIT(data, 2));
 }
 
+void speedbsk_state::soundbank_w(uint8_t data)
+{
+	m_soundbank->set_entry(data);
+}
+
 void speedbsk_state::machine_start()
 {
 	// resolve outputs
 	m_lamps.resolve();
 	m_start_lamp.resolve();
+
+	m_soundbank->configure_entries(0, 0x100, memregion("audiocpu")->base(), 0x2000);
+	m_soundbank->set_entry(0);
 }
 
 

@@ -22,6 +22,10 @@
     types include MSM2128-15RS and HM6116P-3). A third 4016-like RAM (usually
     SY2158A-2) is used for the row buffer, with A8-A10 tied to GND.
 
+    To initialize EAROM settings on the WY-50, hold down the G key while
+    booting. The equivalent procedure on the WY-75 uses 5 on the numeric
+    keypad instead.
+
 *******************************************************************************/
 
 #include "emu.h"

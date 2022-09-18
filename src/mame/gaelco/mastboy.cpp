@@ -930,7 +930,7 @@ ROM_START( mastboya )
 	ROM_LOAD( "gal16v8-25.ic84",   0x00022e, 0x000117, NO_DUMP )
 ROM_END
 
-/* The internal ROM should be different on the Italian sets, as it indexes the wrong strings on the startup screens, 
+/* The internal ROM should be different on the Italian sets, as it indexes the wrong strings on the startup screens,
    showing MARK instead of PLAY MARK etc. So, marked as BAD_DUMP on these sets */
 
 ROM_START( mastboyi )
@@ -1051,8 +1051,8 @@ ROM_START( mastboyib )
 	ROM_LOAD( "17_domande-rom.ic94", 0x100000, 0x020000, CRC(bdce54df) SHA1(b30a3adcdeba26f91f7de8e174f54a158d173dba) )
 	ROM_RELOAD(                      0x120000, 0x020000) // 128kb ROMs are mirrored
 
-/* TEMPO LIBERO - CULTURA 011092 6913 0424 
-   SCIENZA - NATURA       011092 6969 0400 
+/* TEMPO LIBERO - CULTURA 011092 6913 0424
+   SCIENZA - NATURA       011092 6969 0400
    TEMPO LIBERO - HOBBY   011092 6569 0300
    SPORT - WC_90          011092 6072 0212
    SCIENZA - SESSUOLOGIA  011092 6098 0276 */

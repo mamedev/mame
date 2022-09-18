@@ -164,7 +164,7 @@ ROM_START( learnwin )
 	ROM_LOAD( "sp128_88.bin",  0x0000, 0x4000, CRC(b71719b0) SHA1(22dc76d21a7ea29398b502d049a44d9aeeb97a87) ) // system
 	ROM_LOAD( "sp128_99.bin",  0x4000, 0x4000, CRC(525e0d14) SHA1(444df5d31308f3e8dc8608d1c04277f506d4308b) ) // speech cart
 	ROM_LOAD( "sp0256-al2.bin",0x8000, 0x0800, CRC(b504ac15) SHA1(e60fcb5fa16ff3f3b69d36c7a6e955744d3feafc) ) // speech cart voice chip
-ROM_LOAD( "toshiba_t7984", 0xc000, 0x2000, NO_DUMP ) // unknown - possible MCU
+	ROM_LOAD( "toshiba_t7984", 0xc000, 0x2000, NO_DUMP ) // unknown - possible MCU
 ROM_END
 
 ROM_START( learnwin2 )
@@ -197,7 +197,7 @@ ROM_START( spielmast )
 	ROM_LOAD( "sp128_81.bin",  0x4000, 0x4000, CRC(9f761217) SHA1(d85bc443a7d5856335f3e4cf8742512555345af8) ) // speech cart
 	ROM_LOAD( "sp0256-al2.bin",0x8000, 0x0800, CRC(b504ac15) SHA1(e60fcb5fa16ff3f3b69d36c7a6e955744d3feafc) ) // speech cart voice chip
 	ROM_LOAD( "toshiba_t7984", 0xc000, 0x2000, NO_DUMP ) // unknown - possible MCU
-	ROM_END
+ROM_END
 
 
 //**************************************************************************

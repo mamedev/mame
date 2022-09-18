@@ -162,7 +162,7 @@ void fcrash_state::cawingbl_soundlatch_w(offs_t offset, uint16_t data, uint16_t 
 	{
 		m_soundlatch->write(data >> 8);
 		m_audiocpu->set_input_line(0, HOLD_LINE);
-		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); /* boost the interleave or some voices get dropped */
+		machine().scheduler().perfect_quantum(attotime::from_usec(50)); /* boost the interleave or some voices get dropped */
 	}
 }
 

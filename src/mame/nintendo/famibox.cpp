@@ -523,7 +523,7 @@ void famibox_state::machine_start()
 void famibox_state::famibox(machine_config &config)
 {
 	// basic machine hardware
-	N2A03(config, m_maincpu, NTSC_APU_CLOCK);
+	N2A03G(config, m_maincpu, NTSC_APU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &famibox_state::famibox_map);
 
 	// video hardware

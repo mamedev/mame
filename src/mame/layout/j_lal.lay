@@ -180,8 +180,8 @@ license:CC0
 		<text string="Grapes">      <bounds x="0" y="320" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
 		<text string="Orange">      <bounds x="0" y="340" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
 		<text string="Plum">        <bounds x="0" y="360" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="Pear">		<bounds x="0" y="380" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="Triple Bar">	<bounds x="0" y="0" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Pear">        <bounds x="0" y="380" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Triple Bar">  <bounds x="0" y="0" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
 	</element>
 	<element name="Reel 2">
 		<rect> <bounds x="0" y="0" width="100" height="400"/> <color alpha="0.0"/> </rect>
@@ -250,7 +250,7 @@ license:CC0
 		<text string="Melon*">      <bounds x="0" y="340" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
 		<text string="Pear">        <bounds x="0" y="360" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
 		<text string="7">           <bounds x="0" y="380" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="Triple Bar">	<bounds x="0" y="0" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Triple Bar">  <bounds x="0" y="0" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
 	</element>
 	<element name="LCD" defstate="0">
 		<led7seg>

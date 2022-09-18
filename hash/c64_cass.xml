@@ -3,8 +3,7 @@
 <!--
 license:CC0
 
-The majority of this list was sourced from The Ultimate Tape Archive V1.0 released 11th December 2018.
-This list is progressively being updated to reflect The Ultimate Tape Archive V2.0 released 18th August 2020.
+The majority of this list was sourced from The Ultimate Tape Archive V2.0 released 18th August 2020.
 Some others are based on c64tapes.org dumps
 Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/index.htm
 -->
@@ -16571,6 +16570,31 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="xeviousu" cloneof="xevious">
+		<description>Xevious (U.S. Gold)</description>
+		<year>1986</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="481514">
+				<rom name="Xevious.tap" size="481514" crc="194cff0b" sha1="899fd177c55c47329e533eb12cd845e3c9680e55"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yabbadab">
+		<description>Yabba Dabba Doo!</description>
+		<year>1985</year>
+		<publisher>Quicksilva</publisher>
+		<info name="alt_title" value="Flintstones: Yabba Dabba Dooo!"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1012784">
+				<rom name="Yabba_Dabba_Doo.tap" size="1012784" crc="420fe117" sha1="84369f06641123adfd860271176f48da49cb8c43"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="yeti">
 		<description>Yeti</description>
 		<year>1988</year>
@@ -16587,10 +16611,37 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>Yie Ar Kung-Fu</description>
 		<year>1985</year>
 		<publisher>Erbe</publisher>
+		<info name="usage" value="Ensure c1541 Slot Device is removed prior to loading"/>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="644167">
 				<rom name="Yie_Ar_Kung-Fu.tap" size="644167" crc="0d890987" sha1="5151ed8914b520ab9bf184ee8523845d30b2b599"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yieari" cloneof="yiear">
+		<description>Yie Ar Kung-Fu (Imagine)</description>
+		<year>1985</year>
+		<publisher>Imagine</publisher>
+		<info name="usage" value="Ensure c1541 Slot Device is removed prior to loading"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="644167">
+				<rom name="Yie_Ar_Kung-Fu.tap" size="644167" crc="a09b3061" sha1="bf2d9fb5bc8308230dfb34f57ef66e1dd823f710"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yiear2" supported="no"> <!-- game partially loads and stops with a black screen -->
+		<description>Yie Ar Kung Fu II</description>
+		<year>1986</year>
+		<publisher>Imagine</publisher>
+		<info name="alt_title" value="Yie Ar Kung-Fu 2: The Emperor Yie-Gah"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="721387">
+				<rom name="Yie_Ar_Kung_Fu_II.tap" size="721387" crc="58321272" sha1="4ec4dcef73e9a2ad32486891509144a16f70f008"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16611,14 +16662,70 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>Yogi's Great Escape (set 2)</description>
 		<year>1990</year>
 		<publisher>HiTEC Software</publisher>
+
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="664916">
 				<rom name="yogi's great escape side a.tap" size="664916" crc="e07c6a8c" sha1="777a03d414eaebceca0ff28a3df3dbe61e9f6494"/>
 			</dataarea>
 		</part>
+
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="665130">
 				<rom name="yogi's great escape side b.tap" size="665130" crc="268e5891" sha1="bca798fa1f984ace680442205c63fc7ee06e67ec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zagamiss">
+		<description>Zaga Mission</description>
+		<year>1984</year>
+		<publisher>Anirog</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="416406">
+				<rom name="Zaga_Mission.tap" size="416406" crc="01631cce" sha1="4461d444e1c8affc6442c83eea2954d0f6b6c76e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zamzara">
+		<description>Zamzara</description>
+		<year>1992</year>
+		<publisher>Prism Leisure</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="500964">
+				<rom name="Zamzara.tap" size="500964" crc="ecbf1dd9" sha1="b060364352cf2ebe9d7abe0450fe8bb3da1e78be"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zaxxon">
+		<description>Zaxxon</description>
+		<year>1984</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="300138">
+				<rom name="Zaxxon.tap" size="300138" crc="de87e7e7" sha1="cadcb380bd053aa94871217f6c490a376ca31652"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="300138">
+				<rom name="Zaxxon_a1.tap" size="300138" crc="24daa189" sha1="9016548a9f9e263d5aded361cd863e2e98b5da80"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zodiac">
+		<description>Zodiac</description>
+		<year>1984</year>
+		<publisher>Anirog</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="414063">
+				<rom name="Zodiac.tap" size="414063" crc="2c6e23ab" sha1="72305782d90ce501a000a08e0375e65afaa5109c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16631,6 +16738,19 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="671986">
 				<rom name="Zoids.tap" size="671986" crc="36b5241a" sha1="b2e64109bdcccaa4bc70fe4866e5063796990d26"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zoidstbb">
+		<description>Zoids: The Battle Begins</description>
+		<year>1985</year>
+		<publisher>Martech</publisher>
+		<info name="alt_title" value="Zoids"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="565558">
+				<rom name="Zoids-_The_Battle_Begins.tap" size="565558" crc="2f27e808" sha1="38d8dde264907a1660c0daef699cd8983c5862e9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16673,6 +16793,26 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="553882">
 				<rom name="Zorro.tap" size="553882" crc="03807c2b" sha1="3608835f5a8fb54cc16be98a0fef5b2e8b6071de"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zzapsizz2">
+		<description>Zzap! Sizzlers II</description>
+		<year>1986</year>
+		<publisher>Gremlin Graphics</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A: Monty on the Run / Bounder"/>
+			<dataarea name="cass" size="1347367">
+				<rom name="Zzap_Sizzlers_II_Side_1.tap" size="1347367" crc="7312bae2" sha1="9e26e149cff2975afde54e42c788c0d3dbc3fcfb"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B: Starquake / Z"/>
+			<dataarea name="cass" size="991427">
+				<rom name="Zzap_Sizzlers_II_Side_2.tap" size="991427" crc="ffa0e2c2" sha1="ce605b0ba7f761d274e9561aac7f1fd2868bc5e8"/>
 			</dataarea>
 		</part>
 	</software>

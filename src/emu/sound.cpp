@@ -10,11 +10,14 @@
 
 #include "emu.h"
 
-#include "speaker.h"
-#include "emuopts.h"
-#include "osdepend.h"
 #include "config.h"
+#include "emuopts.h"
+#include "speaker.h"
+
 #include "wavwrite.h"
+#include "xmlfile.h"
+
+#include "osdepend.h"
 
 
 //**************************************************************************

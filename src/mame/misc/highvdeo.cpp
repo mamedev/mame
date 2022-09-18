@@ -128,6 +128,8 @@ public:
 	{ }
 
 	void grancapi(machine_config &config);
+	void newtiger(machine_config &config);
+	void zoomania(machine_config &config);
 	void tv_ncf(machine_config &config);
 	void ciclone(machine_config &config);
 	void nyjoker(machine_config &config);
@@ -141,6 +143,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	required_shared_ptr<uint16_t> m_blit_ram;
@@ -157,18 +160,25 @@ private:
 	template<int Mask> void bankselect_w(uint8_t data);
 	void write1_w(uint16_t data);
 	uint16_t tv_ncf_read1_r();
-	uint16_t newmcard_status_r(offs_t offset);
+	uint16_t newmcard_status_r();
+	uint16_t newmcard_prot_r();
 	uint16_t newmcard_vblank_r();
 	void newmcard_vblank_w(uint16_t data);
 	void write2_w(uint16_t data);
+	void write2_no_lock_w(uint16_t data);
 	void nyj_write2_w(uint16_t data);
-	uint16_t brasil_status_r(offs_t offset);
+	uint16_t brasil_status_r();
+	uint16_t brasil_prot_r();
 	void brasil_status_w(uint16_t data);
-	uint16_t ciclone_status_r(offs_t offset);
-	uint16_t grancapi_status_r(offs_t offset);
-	void grancapi_status_w(uint16_t data);
-	uint16_t magicbom_status_r(offs_t offset);
-	uint16_t record_status_r(offs_t offset);
+	uint16_t ciclone_status_r();
+	uint16_t ciclone_prot_r();
+	uint16_t grancapi_status_r();
+	uint16_t grancapi_prot_r();
+	uint16_t newtiger_prot_r();
+	uint16_t magicbom_status_r();
+	uint16_t magicbom_prot_r();
+	uint16_t record_status_r();
+	uint16_t record_prot_r();
 	void fashion_output_w(uint16_t data);
 	void tv_oki6376_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t tv_oki6376_r();
@@ -188,6 +198,8 @@ private:
 	void ciclone_io(address_map &map);
 	void fashion_io(address_map &map);
 	void grancapi_io(address_map &map);
+	void newtiger_io(address_map &map);
+	void zoomania_io(address_map &map);
 	void magicbom_io(address_map &map);
 	void newmcard_io_base(address_map &map);
 	void newmcard_io(address_map &map);
@@ -202,6 +214,8 @@ private:
 	void tv_tcf_map(address_map &map);
 	void tv_vcf_io(address_map &map);
 	void tv_vcf_map(address_map &map);
+
+	uint8_t m_resetpulse;
 };
 
 void highvdeo_state::machine_start()
@@ -213,29 +227,31 @@ void highvdeo_state::machine_start()
 		uint32_t max = memregion("maincpu")->bytes() / 0x40000;
 		m_mainbank->configure_entries(0, max, memregion("maincpu")->base(), 0x40000);
 	}
+
+	save_item(NAME(m_resetpulse));
+}
+
+void highvdeo_state::machine_reset()
+{
+	m_resetpulse = 0;
 }
 
 
 uint32_t highvdeo_state::screen_update_tourvisn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	for(int y=cliprect.min_y;y<=cliprect.max_y;y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		int count = ((y * (screen.visible_area().max_x+1)) + cliprect.min_x) >> 1;
-		for(int x=(cliprect.min_x>>1);x<=(cliprect.max_x>>1);x++)
+		int count = ((y * (screen.visible_area().max_x + 1)) + cliprect.min_x) >> 1;
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			uint32_t color;
+			uint16_t color = m_blit_ram[count];
+			if (!BIT(x, 0))
+			{
+				color >>= 8;
+				count++;
+			}
 
-			color = ((m_blit_ram[count]) & 0x00ff)>>0;
-
-			if(cliprect.contains((x*2)+0, y))
-				bitmap.pix(y, (x*2)+0) = m_palette->pen(color);
-
-			color = ((m_blit_ram[count]) & 0xff00)>>8;
-
-			if(cliprect.contains((x*2)+1, y))
-				bitmap.pix(y, (x*2)+1) = m_palette->pen(color);
-
-			count++;
+			bitmap.pix(y, x) = m_palette->pen(color & 0xff);
 		}
 	}
 
@@ -247,13 +263,11 @@ uint32_t highvdeo_state::screen_update_brasil(screen_device &screen, bitmap_rgb3
 {
 	pen_t const *const rgb = m_palette->pens(); // 16 bit RGB
 
-	for(int y=cliprect.min_y;y<=cliprect.max_y;y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		int count = (y * 400) + cliprect.min_x;
-		for(int x=cliprect.min_x;x<=cliprect.max_x;x++)
-		{
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			bitmap.pix(y, x) = rgb[m_blit_ram[count++]];
-		}
 	}
 
 	return 0;
@@ -368,13 +382,11 @@ void highvdeo_state::tv_vcf_io(address_map &map)
 
 uint16_t highvdeo_state::tv_ncf_read1_r()
 {
-	static int resetpulse = 0;
-
 	// Bit 6 of port 1 is connected to clock impulse, as heartbeat.  If impulse cease
 	// machine resets itself.
-	resetpulse ^= 0x40;
+	m_resetpulse ^= 0x40;
 
-	return (m_inputs[1]->read() & 0xbf) | resetpulse;
+	return (m_inputs[1]->read() & 0xbf) | m_resetpulse;
 }
 
 void highvdeo_state::tv_ncf_oki6376_st_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -477,24 +489,22 @@ void highvdeo_state::tv_tcf_io(address_map &map)
 *
 ****************************/
 
-uint16_t highvdeo_state::ciclone_status_r(offs_t offset)
+uint16_t highvdeo_state::ciclone_status_r()
 {
-	static uint16_t resetpulse;
-	switch(offset*2)
-	{
-		case 0:
-		resetpulse^=0x10;
-		return 0 | resetpulse;
-		case 2: return 0x15; //and 0x3f
-	}
+	m_resetpulse ^= 0x10;
+	return 0 | m_resetpulse;
+}
 
-	return 0;
+uint16_t highvdeo_state::ciclone_prot_r()
+{
+	return 0x15; // & 0x3f
 }
 
 void highvdeo_state::ciclone_io(address_map &map)
 {
 	tv_tcf_io(map);
-	map(0x0030, 0x0033).r(FUNC(highvdeo_state::ciclone_status_r));
+	map(0x0030, 0x0031).r(FUNC(highvdeo_state::ciclone_status_r));
+	map(0x0032, 0x0033).r(FUNC(highvdeo_state::ciclone_prot_r));
 }
 
 /****************************
@@ -503,37 +513,33 @@ void highvdeo_state::ciclone_io(address_map &map)
 *
 ****************************/
 
-uint16_t highvdeo_state::newmcard_status_r(offs_t offset)
+uint16_t highvdeo_state::newmcard_status_r()
 {
-	switch(offset*2)
-	{
-	case 0:
-		if (!machine().side_effects_disabled())
-			m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-		return 2; //and $7
-	case 2:
-		return 2; //and $7
-	}
-	return 0;
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	return 2; //and $7
 }
 
-uint16_t highvdeo_state::record_status_r(offs_t offset)
+uint16_t highvdeo_state::newmcard_prot_r()
 {
-	static uint16_t resetpulse;
-	switch(offset*2)
-	{
-	case 0:
-		if (!machine().side_effects_disabled())
-			m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-		resetpulse^=0x15;       // and 0x07, cmp with 0x05
-		return 0 | resetpulse;
-	case 2:
-		return 0x15;    // unknown
-	}
-
-	return 0;
+	return 2; //and $7
 }
 
+
+uint16_t highvdeo_state::record_status_r()
+{
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+
+	m_resetpulse ^= 0x15;       // and 0x07, cmp with 0x05
+	return 0 | m_resetpulse;
+}
+
+
+uint16_t highvdeo_state::record_prot_r()
+{
+	return 0x15;    // unknown
+}
 
 uint16_t highvdeo_state::newmcard_vblank_r()
 {
@@ -556,6 +562,12 @@ void highvdeo_state::write2_w(uint16_t data)
 		machine().bookkeeping().coin_counter_w(i,data & 0x20);
 		machine().bookkeeping().coin_lockout_w(i,~data & 0x08);
 	}
+}
+
+void highvdeo_state::write2_no_lock_w(uint16_t data)
+{
+	// does coinlock not map here on these, or is it inverted?
+	//popmessage("%04x", data);
 }
 
 void highvdeo_state::newmcard_map(address_map &map)
@@ -586,13 +598,15 @@ void highvdeo_state::newmcard_io_base(address_map &map)
 void highvdeo_state::newmcard_io(address_map &map)
 {
 	newmcard_io_base(map);
-	map(0x0030, 0x0033).r(FUNC(highvdeo_state::newmcard_status_r));
+	map(0x0030, 0x0031).r(FUNC(highvdeo_state::newmcard_status_r));
+	map(0x0032, 0x0033).r(FUNC(highvdeo_state::newmcard_prot_r));
 }
 
 void highvdeo_state::record_io(address_map &map)
 {
 	newmcard_io_base(map);
-	map(0x0030, 0x0033).r(FUNC(highvdeo_state::record_status_r));
+	map(0x0030, 0x0031).r(FUNC(highvdeo_state::record_status_r));
+	map(0x0032, 0x0033).r(FUNC(highvdeo_state::record_prot_r));
 }
 
 /****************************
@@ -602,20 +616,15 @@ void highvdeo_state::record_io(address_map &map)
 ****************************/
 
 
-uint16_t highvdeo_state::brasil_status_r(offs_t offset)
+uint16_t highvdeo_state::brasil_status_r()
 {
-	static uint16_t resetpulse;
+	m_resetpulse ^= 0x10;
+	return 3 | m_resetpulse;
+}
 
-	switch(offset*2)
-	{
-		case 0:
-		resetpulse^=0x10;
-
-		return 3 | resetpulse;
-		case 2: return (m_brasil_prot_latch & 3); //and 0x3f
-	}
-
-	return 0;
+uint16_t highvdeo_state::brasil_prot_r()
+{
+	return (m_brasil_prot_latch & 3); //and 0x3f
 }
 
 /*bankaddress might be incorrect.*/
@@ -633,51 +642,32 @@ void highvdeo_state::brasil_status_w(uint16_t data)
 //  popmessage("%04x",data);
 }
 
-uint16_t highvdeo_state::grancapi_status_r(offs_t offset)
+uint16_t highvdeo_state::grancapi_status_r()
 {
-	static uint16_t resetpulse;
-
-	switch(offset*2)
-	{
-		case 0:
-		resetpulse^=0x20;
-
-		return 3 | resetpulse;
-		case 2: return (m_grancapi_prot_latch & 3)|0x17; //and 0x3f  // This will always return 0x17: Coverity 316053
-	}
-
-	return 0;
+	m_resetpulse ^= 0x20;
+	return 0xd3 | m_resetpulse;
 }
 
-/*bankaddress might be incorrect.*/
-void highvdeo_state::grancapi_status_w(uint16_t data)
+uint16_t highvdeo_state::grancapi_prot_r()
 {
-	switch(data & 3) //data & 7?
-	{
-		case 0: m_grancapi_prot_latch = 1; break;
-		case 1: m_grancapi_prot_latch = 0; break;
-		case 2: m_grancapi_prot_latch = 2; break;
-	}
-
-	m_mainbank->set_entry(data & 0x07);
-
-//  popmessage("%04x",data);
+	return 0x17;
 }
 
-uint16_t highvdeo_state::magicbom_status_r(offs_t offset)
+uint16_t highvdeo_state::newtiger_prot_r()
 {
-	static uint16_t resetpulse;
+	return 0x08;
+}
 
-	switch(offset*2)
-	{
-		case 0:
-		resetpulse^=0x20;
 
-		return  resetpulse;
-		case 2: return (m_grancapi_prot_latch & 3)|0x0b; //and 0x3f
-	}
+uint16_t highvdeo_state::magicbom_status_r()
+{
+	m_resetpulse ^= 0x20;
+	return  m_resetpulse;
+}
 
-	return 0;
+uint16_t highvdeo_state::magicbom_prot_r()
+{
+	return (m_grancapi_prot_latch & 3) | 0x0b;
 }
 
 
@@ -692,7 +682,8 @@ void highvdeo_state::brasil_map(address_map &map)
 
 void highvdeo_state::brasil_io(address_map &map)
 {
-	map(0x0030, 0x0033).r(FUNC(highvdeo_state::brasil_status_r));
+	map(0x0030, 0x0031).r(FUNC(highvdeo_state::brasil_status_r));
+	map(0x0032, 0x0033).r(FUNC(highvdeo_state::brasil_prot_r));
 	map(0x0030, 0x0031).w(FUNC(highvdeo_state::brasil_status_w));
 	map(0x0000, 0x0001).w(FUNC(highvdeo_state::write1_w)); // lamps
 	map(0x0002, 0x0003).w(FUNC(highvdeo_state::write2_w)); // coin counter & coin lockout
@@ -705,11 +696,9 @@ void highvdeo_state::brasil_io(address_map &map)
 
 void highvdeo_state::fashion_output_w(uint16_t data)
 {
-	int i;
-
 //  popmessage("%04x",data);
 
-	for(i=0;i<4;i++)
+	for (int i = 0; i < 4; i++)
 	{
 		machine().bookkeeping().coin_counter_w(i,data & 0x20);
 		machine().bookkeeping().coin_lockout_w(i,~data & 0x01);
@@ -724,29 +713,43 @@ void highvdeo_state::fashion_io(address_map &map)
 
 void highvdeo_state::grancapi_io(address_map &map)
 {
-	map(0x0030, 0x0033).r(FUNC(highvdeo_state::grancapi_status_r));
-	map(0x000e, 0x000f).w(FUNC(highvdeo_state::grancapi_status_w));
+	map(0x0030, 0x0031).r(FUNC(highvdeo_state::grancapi_status_r));
+	map(0x0032, 0x0033).r(FUNC(highvdeo_state::grancapi_prot_r));
+	map(0x0030, 0x0030).w(FUNC(highvdeo_state::bankselect_w<0x07>));
 	map(0x0000, 0x0001).w(FUNC(highvdeo_state::write1_w)); // lamps
 	map(0x0002, 0x0003).w(FUNC(highvdeo_state::write2_w)); // coin counter & coin lockout
 	map(0x0006, 0x0007).w(FUNC(highvdeo_state::tv_oki6376_w));
 	map(0x0008, 0x0009).r(FUNC(highvdeo_state::read0_r));
 	map(0x000a, 0x000b).r(FUNC(highvdeo_state::read1_r));
 	map(0x000e, 0x000e).rw(FUNC(highvdeo_state::read2_nmi_clear_r), FUNC(highvdeo_state::nmi_clear_w));
-//  map(0xffa2, 0xffa3).w(FUNC(highvdeo_state::));
 }
+
+void highvdeo_state::newtiger_io(address_map &map)
+{
+	grancapi_io(map);
+	map(0x0002, 0x0003).w(FUNC(highvdeo_state::write2_no_lock_w));
+	map(0x0032, 0x0033).r(FUNC(highvdeo_state::newtiger_prot_r));
+}
+
+void highvdeo_state::zoomania_io(address_map &map)
+{
+	brasil_io(map);
+	map(0x0002, 0x0003).w(FUNC(highvdeo_state::write2_no_lock_w));
+	map(0x0030, 0x0031).r(FUNC(highvdeo_state::grancapi_status_r));
+}
+
 
 void highvdeo_state::magicbom_io(address_map &map)
 {
-	map(0x0002, 0x0003).w(FUNC(highvdeo_state::fashion_output_w));
-	map(0x0030, 0x0033).r(FUNC(highvdeo_state::magicbom_status_r));
-	map(0x000e, 0x000f).w(FUNC(highvdeo_state::grancapi_status_w));
+	map(0x0030, 0x0031).r(FUNC(highvdeo_state::magicbom_status_r));
+	map(0x0032, 0x0033).r(FUNC(highvdeo_state::magicbom_prot_r));
+	map(0x0030, 0x0030).w(FUNC(highvdeo_state::bankselect_w<0x07>));
 	map(0x0000, 0x0001).w(FUNC(highvdeo_state::write1_w)); // lamps
 	map(0x0002, 0x0003).w(FUNC(highvdeo_state::write2_w)); // coin counter & coin lockout
 	map(0x0006, 0x0007).w(FUNC(highvdeo_state::tv_oki6376_w));
 	map(0x0008, 0x0009).r(FUNC(highvdeo_state::read0_r));
 	map(0x000a, 0x000b).r(FUNC(highvdeo_state::read1_r));
 	map(0x000e, 0x000e).rw(FUNC(highvdeo_state::read2_nmi_clear_r), FUNC(highvdeo_state::nmi_clear_w));
-//  map(0xffa2, 0xffa3).w(FUNC(highvdeo_state::));
 }
 
 
@@ -1353,10 +1356,25 @@ void highvdeo_state::grancapi(machine_config &config)
 	OKIM6376(config, m_okim6376, XTAL(12'000'000)/2/2/20).add_route(ALL_OUTPUTS, "mono", 1.0); //Guess, gives same sample rate as previous emulation
 }
 
+void highvdeo_state::newtiger(machine_config &config)
+{
+	grancapi(config);
+	m_maincpu->set_addrmap(AS_IO, &highvdeo_state::newtiger_io);
+}
+
+void highvdeo_state::zoomania(machine_config &config)
+{
+	grancapi(config);
+
+	I80186(config.replace(), m_maincpu, 32.0000_MHz_XTAL/2); // 32Mhz XTAL near 20Mhz rated CPU
+	m_maincpu->set_addrmap(AS_PROGRAM, &highvdeo_state::brasil_map);
+	m_maincpu->set_addrmap(AS_IO, &highvdeo_state::zoomania_io);
+}
+
 void highvdeo_state::magicbom(machine_config &config)
 {
 	I80186(config, m_maincpu, 20000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &highvdeo_state::brasil_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &highvdeo_state::tv_tcf_map);
 	m_maincpu->set_addrmap(AS_IO, &highvdeo_state::magicbom_io);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -1366,10 +1384,14 @@ void highvdeo_state::magicbom(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(400, 300);
 	screen.set_visarea(0, 400-1, 0, 300-1);
-	screen.set_screen_update(FUNC(highvdeo_state::screen_update_brasil));
+	screen.set_screen_update(FUNC(highvdeo_state::screen_update_tourvisn));
 	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
 
-	PALETTE(config, m_palette, palette_device::RGB_565);
+	PALETTE(config, m_palette).set_entries(0x100);
+	m_palette->set_format(palette_device::RGB_565, 0x100);
+
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac.set_addrmap(0, &highvdeo_state::ramdac_map);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1645,10 +1667,8 @@ ROM_END
 
 ROM_START( unksmk ) // VIDEO/SMK-1 C PCB. V30 + OKI M6376. Feigns to be a NeoGeo multigame to cover gambling game? Needs investigation.
 	ROM_REGION( 0x100000, "maincpu", 0 ) // no labels
-	ROM_LOAD16_BYTE( "ic7", 0x00000, 0x40000, CRC(ce1f303c) SHA1(8563ba217357857d0bc49cc64426406fa12a2f9b) )
-	ROM_RELOAD(             0x80000, 0x40000 )
-	ROM_LOAD16_BYTE( "ic8", 0x00001, 0x40000, CRC(b85575e5) SHA1(4fcda845c8e1b6c843cfe0a1f9b06df806325a7d) )
-	ROM_RELOAD(             0x80001, 0x40000 )
+	ROM_LOAD16_BYTE( "ic7", 0x80000, 0x40000, CRC(ce1f303c) SHA1(8563ba217357857d0bc49cc64426406fa12a2f9b) )
+	ROM_LOAD16_BYTE( "ic8", 0x80001, 0x40000, CRC(b85575e5) SHA1(4fcda845c8e1b6c843cfe0a1f9b06df806325a7d) )
 
 	ROM_REGION( 0x080000, "oki", 0 )
 	ROM_LOAD( "ng 1.ic25", 0x00000, 0x80000, CRC(89291fe6) SHA1(f729e6b90a98151ff64baa1d852137a86bd0ef93) ) // handwritten label
@@ -1663,26 +1683,88 @@ ROM_START( newtiger ) // New High Video TYPE 001/V0 PCB. N80C186XL25 + OKIM6376 
 	ROM_LOAD( "new tiger sound v.-1 memory 2m.u16", 0x00000, 0x40000, CRC(aa8444ec) SHA1(3663c01a7cf2fe334eb6ea974d6a0c0b6bb88354) )
 ROM_END
 
+
+ROM_START( zoomania )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "zoo10.04-u7.bin", 0x000000, 0x100000, CRC(f5c14df4) SHA1(49ff2fc504f9d612d74ad6bf98f914cedaf5f8f0) )
+	ROM_LOAD16_BYTE( "zoo10.04-u8.bin", 0x000001, 0x100000, CRC(6b99d566) SHA1(462c783eaa4e05174fe6db5ae37fc6327305dfad) )
+
+	ROM_REGION( 0x080000, "oki", 0 )
+	ROM_LOAD( "zoosom10.04.bin", 0x00000, 0x80000, CRC(49caa85b) SHA1(8ee3b72d082c7818f3937445ddbee8d14154b8a4) )
+ROM_END
+
+ROM_START( zoomaniaa )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	// u8 and u7 are swapped here?
+	ROM_LOAD16_BYTE( "u 08 zoo c soq", 0x000000, 0x100000, CRC(7761beac) SHA1(a4e69631159036b1c6f6a310d18302bdf0fff610) )
+	ROM_LOAD16_BYTE( "u 07 zoo c soq", 0x000001, 0x100000, CRC(6b99d566) SHA1(462c783eaa4e05174fe6db5ae37fc6327305dfad) ) // same as zoomania
+
+	ROM_REGION( 0x080000, "oki", 0 ) /* M6376 Samples */
+	ROM_LOAD( "u somzoo c soq", 0x00000, 0x80000, CRC(2f5a954c) SHA1(7a88423349cd66fbdd66b6387c8c223944680797) )
+ROM_END
+
+ROM_START( saladue )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "07 sala 10,8", 0x000000, 0x100000, CRC(dbb4650b) SHA1(e2e6080dd100bdf621420050769af2ea5775ea5b) )
+	ROM_LOAD16_BYTE( "08 sala 10,8", 0x000001, 0x100000, CRC(207e0382) SHA1(6cb5f3bb82976bbbe20a1b97ad28412250fe228c) )
+
+	ROM_REGION( 0x080000, "oki", 0 )
+	ROM_LOAD( "4828 som sala", 0x00000, 0x80000, CRC(64ec8642) SHA1(7200b05b3bc107e2f360fa48c9c98ebd0cf593c5) )
+ROM_END
+
+ROM_START( saladuea )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "bingov1.2u7.bin", 0x000000, 0x100000, CRC(feca3217) SHA1(144f7b7ded565398c11b3f61756b0bbc34423073) )
+	ROM_LOAD16_BYTE( "bingov1.2u8.bin", 0x000001, 0x100000, CRC(bb708ef1) SHA1(e5b6265bbe365ce93ec5e1459e7242a4b43bcc04) )
+
+	ROM_REGION( 0x080000, "oki", 0 )
+	ROM_LOAD( "bingosomv1.2bin", 0x00000, 0x80000, CRC(2f5a954c) SHA1(7a88423349cd66fbdd66b6387c8c223944680797) ) // same as zoomaniaa, is this correct?
+ROM_END
+
+ROM_START( bingopd )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "e730 bingo p", 0x000000, 0x100000, CRC(c801fae5) SHA1(2793e65bcfef3dd3c83b02ee51b5acdb98a382c4) )
+	ROM_LOAD16_BYTE( "3db8 08",      0x000001, 0x100000, CRC(a238e008) SHA1(313ebd62c333f335aa871d8998bef006adb653fa) )
+
+	ROM_REGION( 0x080000, "oki", 0 )
+	ROM_LOAD( "samples", 0x00000, 0x80000, NO_DUMP )
+ROM_END
+
 } // Anonymous namespace
 
+// should some of these be set up as clones? they seem very similar at least
 
-GAMEL( 2000, tour4000,  0,      tv_vcf,   tv_vcf,  highvdeo_state, empty_init, ROT0, "High Video",     "Tour 4000",                              0,                   layout_fashion )
-GAMEL( 2000, cfever40,  0,      tv_vcf,   tv_vcf,  highvdeo_state, empty_init, ROT0, "High Video",     "Casino Fever 4.0",                       0,                   layout_fashion )
-GAMEL( 2000, cfever50,  0,      tv_vcf,   tv_vcf,  highvdeo_state, empty_init, ROT0, "High Video",     "Casino Fever 5.0",                       0,                   layout_fashion )
-GAMEL( 2000, tour4010,  0,      tv_ncf,   tv_ncf,  highvdeo_state, empty_init, ROT0, "High Video",     "Tour 4010",                              0,                   layout_fashion )
-GAMEL( 2000, cfever51,  0,      tv_ncf,   tv_ncf,  highvdeo_state, empty_init, ROT0, "High Video",     "Casino Fever 5.1",                       0,                   layout_fashion )
-GAMEL( 2000, cfever61,  0,      tv_ncf,   tv_ncf,  highvdeo_state, empty_init, ROT0, "High Video",     "Casino Fever 6.1",                       0,                   layout_fashion )
-GAMEL( 2000, nyjoker,   0,      nyjoker,  nyjoker, highvdeo_state, empty_init, ROT0, "High Video",     "New York Joker",                         0,                   layout_fashion )
-GAMEL( 2000, cfever1k,  0,      tv_tcf,   tv_tcf,  highvdeo_state, empty_init, ROT0, "High Video",     "Casino Fever 1k",                        0,                   layout_fashion )
-GAMEL( 2000, girotutt,  0,      tv_tcf,   tv_tcf,  highvdeo_state, empty_init, ROT0, "High Video",     "GiroTutto",                              0,                   layout_fashion )
-GAMEL( 2000, galeone,   0,      nyjoker,  nyjoker, highvdeo_state, empty_init, ROT0, "San Remo Games", "Il Galeone",                             0,                   layout_fashion )
-GAMEL( 2000, ciclone,   0,      ciclone,  tv_tcf,  highvdeo_state, empty_init, ROT0, "High Video",     "Ciclone",                                0,                   layout_fashion )
-GAMEL( 2000, newmcard,  0,      newmcard, tv_tcf,  highvdeo_state, empty_init, ROT0, "High Video",     "New Magic Card",                         0,                   layout_fashion )
-GAMEL( 2000, brasil,    0,      brasil,   brasil,  highvdeo_state, empty_init, ROT0, "High Video",     "Bra$il (Version 3)",                     0,                   layout_fashion )
-GAMEL( 2000, fashion,   brasil, fashion,  fashion, highvdeo_state, empty_init, ROT0, "High Video",     "Fashion (Version 2.14)",                 0,                   layout_fashion )
-GAMEL( 2000, grancapi,  0,      grancapi, brasil,  highvdeo_state, empty_init, ROT0, "High Video",     "Gran Capitan (Version 3)",               MACHINE_NOT_WORKING, layout_fashion )
-GAMEL( 2000, magicbom,  0,      magicbom, fashion, highvdeo_state, empty_init, ROT0, "High Video",     "Magic Bomb (Version 1)",                 MACHINE_NOT_WORKING, layout_fashion )
-GAMEL( 2000, record,    0,      record,   tv_tcf,  highvdeo_state, empty_init, ROT0, "High Video",     "Record (Version 1)",                     0,                   layout_fashion )
-GAMEL( 2000, cuncino,   0,      grancapi, brasil,  highvdeo_state, empty_init, ROT0, "High Video",     "Capitan Uncino (High Video, version 2)", MACHINE_NOT_WORKING, layout_fashion )
-GAMEL( 200?, unksmk,    0,      nyjoker,  nyjoker, highvdeo_state, empty_init, ROT0, "High Video",     "unknown SMK game",                       MACHINE_NOT_WORKING, layout_fashion ) // needs correct inputs
-GAMEL( 200?, newtiger,  0,      magicbom, fashion, highvdeo_state, empty_init, ROT0, "High Video",     "New Tiger",                              MACHINE_NOT_WORKING, layout_fashion ) // slightly differently protected
+// 320x240, palette (RAMDAC at 0x10/12/14)
+GAMEL( 2000, tour4000,  0,        tv_vcf,   tv_vcf,  highvdeo_state, empty_init, ROT0, "High Video",             "Tour 4000",                                       0,                   layout_fashion )
+GAMEL( 2000, cfever40,  0,        tv_vcf,   tv_vcf,  highvdeo_state, empty_init, ROT0, "High Video",             "Casino Fever 4.0",                                0,                   layout_fashion )
+GAMEL( 2000, cfever50,  0,        tv_vcf,   tv_vcf,  highvdeo_state, empty_init, ROT0, "High Video",             "Casino Fever 5.0",                                0,                   layout_fashion )
+GAMEL( 2000, newmcard,  0,        newmcard, tv_tcf,  highvdeo_state, empty_init, ROT0, "High Video",             "New Magic Card",                                  0,                   layout_fashion )
+GAMEL( 2000, record,    0,        record,   tv_tcf,  highvdeo_state, empty_init, ROT0, "High Video",             "Record (Version 1)",                              0,                   layout_fashion )
+
+// 320x240, palette (RAMDAC at 0x30/32/34) no ROM banking
+GAMEL( 2000, tour4010,  0,        tv_ncf,   tv_ncf,  highvdeo_state, empty_init, ROT0, "High Video",             "Tour 4010",                                       0,                   layout_fashion )
+GAMEL( 2000, cfever51,  0,        tv_ncf,   tv_ncf,  highvdeo_state, empty_init, ROT0, "High Video",             "Casino Fever 5.1",                                0,                   layout_fashion )
+GAMEL( 2000, cfever61,  0,        tv_ncf,   tv_ncf,  highvdeo_state, empty_init, ROT0, "High Video",             "Casino Fever 6.1",                                0,                   layout_fashion )
+
+// 320x240, palette (RAMDAC at 0x30/32/34) no ROM banking, alt VRAM base
+GAMEL( 2000, nyjoker,   0,        nyjoker,  nyjoker, highvdeo_state, empty_init, ROT0, "High Video",             "New York Joker",                                  0,                   layout_fashion )
+GAMEL( 2000, galeone,   0,        nyjoker,  nyjoker, highvdeo_state, empty_init, ROT0, "San Remo Games",         "Il Galeone",                                      0,                   layout_fashion )
+GAMEL( 200?, unksmk,    0,        nyjoker,  nyjoker, highvdeo_state, empty_init, ROT0, "High Video",             "unknown SMK game",                                MACHINE_NOT_WORKING, layout_fashion ) // needs correct inputs (is this a good dump?)
+
+// 400x300, palette (in RAM)
+GAMEL( 2000, magicbom,  0,        magicbom, tv_tcf,  highvdeo_state, empty_init, ROT0, "High Video",             "Magic Bomb (Version 1)",                          MACHINE_NOT_WORKING, layout_fashion )
+GAMEL( 2000, cfever1k,  0,        tv_tcf,   tv_tcf,  highvdeo_state, empty_init, ROT0, "High Video",             "Casino Fever 1k",                                 0,                   layout_fashion )
+GAMEL( 2000, girotutt,  0,        tv_tcf,   tv_tcf,  highvdeo_state, empty_init, ROT0, "High Video",             "GiroTutto",                                       0,                   layout_fashion )
+GAMEL( 2000, ciclone,   0,        ciclone,  tv_tcf,  highvdeo_state, empty_init, ROT0, "High Video",             "Ciclone",                                         0,                   layout_fashion )
+
+// 400x300, RGB color
+GAMEL( 2000, brasil,    0,        brasil,   brasil,  highvdeo_state, empty_init, ROT0, "High Video",             "Bra$il (Version 3)",                              0,                   layout_fashion )
+GAMEL( 2000, fashion,   brasil,   fashion,  fashion, highvdeo_state, empty_init, ROT0, "High Video",             "Fashion (Version 2.14)",                          0,                   layout_fashion )
+GAMEL( 2000, grancapi,  0,        grancapi, brasil,  highvdeo_state, empty_init, ROT0, "High Video",             "Gran Capitan (Version 3)",                        MACHINE_NOT_WORKING, layout_fashion )
+GAMEL( 2000, cuncino,   0,        grancapi, brasil,  highvdeo_state, empty_init, ROT0, "High Video",             "Capitan Uncino (High Video, version 2)",          MACHINE_NOT_WORKING, layout_fashion )
+GAMEL( 200?, newtiger,  0,        newtiger, brasil,  highvdeo_state, empty_init, ROT0, "High Video",             "New Tiger",                                       MACHINE_NOT_WORKING, layout_fashion ) // slightly differently protected
+GAMEL( 200?, zoomania,  0,        zoomania, brasil,  highvdeo_state, empty_init, ROT0, "Industrias Brasilerias", "Zoomania (Version 10.04, set 1)",                 MACHINE_NOT_WORKING, layout_fashion )
+GAMEL( 200?, zoomaniaa, zoomania, zoomania, brasil,  highvdeo_state, empty_init, ROT0, "Industrias Brasilerias", "Zoomania (Version 10.04, set 2)",                 MACHINE_NOT_WORKING, layout_fashion )
+GAMEL( 200?, saladue,   0,        zoomania, brasil,  highvdeo_state, empty_init, ROT0, "Industrias Brasilerias", "Sala Due (Version 3.04)",                         MACHINE_NOT_WORKING, layout_fashion )
+GAMEL( 200?, saladuea,  saladue,  zoomania, brasil,  highvdeo_state, empty_init, ROT0, "Industrias Brasilerias", "Sala Due (Version 1.04)",                         MACHINE_NOT_WORKING, layout_fashion )
+GAMEL( 200?, bingopd,   0,        zoomania, brasil,  highvdeo_state, empty_init, ROT0, "Industrias Brasilerias", "Paradise (Industrias Brasilerias, Version 1.04)", MACHINE_NOT_WORKING, layout_fashion )

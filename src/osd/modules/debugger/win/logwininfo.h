@@ -23,6 +23,7 @@ public:
 
 protected:
 	virtual bool handle_command(WPARAM wparam, LPARAM lparam) override;
+	virtual void save_configuration_to_node(util::xml::data_node &node) override;
 };
 
 #endif

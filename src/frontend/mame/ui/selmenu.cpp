@@ -278,7 +278,7 @@ void menu_select_launch::software_parts::populate(float &customtop, float &custo
 	parts.reserve(m_parts.size());
 	for (s_parts::const_iterator it = m_parts.begin(); m_parts.end() != it; ++it)
 		parts.push_back(it);
-	std::sort(parts.begin(), parts.end(), [] (auto const &left, auto const &right) { return 0 > core_stricmp(left->first.c_str(), right->first.c_str()); });
+	std::sort(parts.begin(), parts.end(), [] (auto const &left, auto const &right) { return 0 > core_stricmp(left->first, right->first); });
 	for (auto const &elem : parts)
 		item_append(elem->first, elem->second, 0, (void *)&*elem);
 
@@ -1582,6 +1582,16 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 	// handle a toggle cheats request
 	if (!m_ui_error && machine().ui_input().pressed_repeat(IPT_UI_TOGGLE_CHEAT, 0))
 		mame_machine_manager::instance()->cheat().set_enable(!mame_machine_manager::instance()->cheat().enabled());
+
+	// handle pasting text into the search
+	if (exclusive_input_pressed(iptkey, IPT_UI_PASTE, 0))
+	{
+		if (!m_ui_error && accept_search())
+		{
+			if (paste_text(m_search, uchar_is_printable))
+				reset(reset_options::SELECT_FIRST);
+		}
+	}
 
 	// see if any other UI keys are pressed
 	if (iptkey == IPT_INVALID)

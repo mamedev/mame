@@ -17,109 +17,12 @@
 #include "render.h"
 #include "rendlay.h"
 
+#include <algorithm>
 #include <atomic>
 #include <iterator>
 
 
 namespace {
-
-template <typename T>
-class bitmap_helper : public T
-{
-public:
-	using ptr = std::shared_ptr<bitmap_helper>;
-
-	bitmap_helper(bitmap_helper const &) = delete;
-	bitmap_helper(bitmap_helper &&) = delete;
-	bitmap_helper &operator=(bitmap_helper const &) = delete;
-	bitmap_helper &operator=(bitmap_helper &&) = delete;
-
-	bitmap_helper(sol::this_state s, int width, int height, int xslop, int yslop)
-		: T(width, height, xslop, yslop)
-		, lock_count(0)
-		, storage()
-	{
-		if ((0 < width) && (0 < height) && !this->valid())
-			luaL_error(s, "Error allocating bitmap storage");
-	}
-
-	bitmap_helper(ptr const &source, rectangle const &subrect)
-		: T(*source, subrect)
-		, lock_count(0)
-		, storage(source->storage ? source->storage : source)
-	{
-		++storage->lock_count;
-	}
-
-	~bitmap_helper()
-	{
-		assert(!lock_count);
-		release_storage();
-	}
-
-	bool locked() const
-	{
-		return bool(lock_count);
-	}
-
-	void reset(sol::this_state s)
-	{
-		if (lock_count)
-			luaL_error(s, "Cannot reset bitmap while in use");
-		T::reset();
-		release_storage();
-	}
-
-	void allocate(sol::this_state s, int width, int height, int xslop, int yslop)
-	{
-		if (lock_count)
-			luaL_error(s, "Cannot reallocate bitmap while in use");
-		T::allocate(width, height, xslop, yslop);
-		release_storage();
-		if ((0 < width) && (0 < height) && !this->valid())
-			luaL_error(s, "Error allocating bitmap storage");
-	}
-
-	void resize(sol::this_state s, int width, int height, int xslop, int yslop)
-	{
-		if (lock_count)
-			luaL_error(s, "Cannot resize bitmap while in use");
-		T::resize(width, height, xslop, yslop);
-		release_storage();
-		if ((0 < width) && (0 < height) && !this->valid())
-			luaL_error(s, "Error allocating bitmap storage");
-	}
-
-	void wrap(sol::this_state s, ptr const &source, rectangle const &subrect)
-	{
-		if (source.get() == this)
-			luaL_error(s, "Bitmap cannot wrap itself");
-		if (lock_count)
-			luaL_error(s, "Cannot free bitmap storage while in use");
-		if (!source->cliprect().contains(subrect))
-			luaL_error(s, "Bounds exceed source clipping rectangle");
-		T::wrap(*source, subrect);
-		release_storage();
-		storage = source->storage ? source->storage : source;
-		++storage->lock_count;
-	}
-
-	std::atomic<unsigned> lock_count;
-
-private:
-	void release_storage()
-	{
-		if (storage)
-		{
-			assert(storage->lock_count);
-			--storage->lock_count;
-			storage.reset();
-		}
-	}
-
-	ptr storage;
-};
-
 
 class render_texture_helper
 {
@@ -130,7 +33,8 @@ public:
 		: texture(that.texture)
 		, bitmap(that.bitmap)
 		, manager(that.manager)
-		, lock_count(that.lock_count)
+		, storage_lock_count(that.storage_lock_count)
+		, palette_lock_count(that.palette_lock_count)
 	{
 		that.texture = nullptr;
 		that.bitmap.reset();
@@ -141,14 +45,16 @@ public:
 		: texture(nullptr)
 		, bitmap(b)
 		, manager(m)
-		, lock_count(b->lock_count)
+		, storage_lock_count(b->storage_lock_count)
+		, palette_lock_count(b->palette_lock_count)
 	{
 		if (bitmap)
 		{
 			texture = manager.texture_alloc();
 			if (texture)
 			{
-				++lock_count;
+				++storage_lock_count;
+				++palette_lock_count;
 				texture->set_bitmap(*bitmap, bitmap->cliprect(), f);
 			}
 			else
@@ -177,8 +83,10 @@ public:
 		}
 		if (bitmap)
 		{
-			assert(lock_count);
-			--lock_count;
+			assert(storage_lock_count);
+			assert(palette_lock_count);
+			--storage_lock_count;
+			--palette_lock_count;
 			bitmap.reset();
 		}
 	}
@@ -188,7 +96,8 @@ public:
 
 private:
 	render_manager &manager;
-	std::atomic<unsigned> &lock_count;
+	std::atomic<unsigned> &storage_lock_count;
+	std::atomic<unsigned> &palette_lock_count;
 };
 
 
@@ -226,6 +135,21 @@ struct render_target_view_names
 
 
 template <typename T>
+auto get_bitmap_pixels(T const &bitmap, sol::this_state s, rectangle const &bounds)
+{
+	if (!bitmap.cliprect().contains(bounds))
+		luaL_error(s, "Bounds exceed source clipping rectangle");
+	luaL_Buffer buff;
+	size_t const size(bounds.width() * bounds.height() * sizeof(typename T::pixel_t));
+	auto ptr = reinterpret_cast<typename T::pixel_t *>(luaL_buffinitsize(s, &buff, size));
+	for (auto y = bounds.top(); bounds.bottom() >= y; ++y, ptr += bounds.width())
+		std::copy_n(&bitmap.pix(y, bounds.left()), bounds.width(), ptr);
+	luaL_pushresultsize(&buff, size);
+	return std::make_tuple(sol::make_reference(s, sol::stack_reference(s, -1)), bounds.width(), bounds.height());
+}
+
+
+template <typename T>
 auto make_bitmap_specific_type(sol::table registry, char const *name)
 {
 	auto result = registry.new_usertype<T>(
@@ -233,6 +157,15 @@ auto make_bitmap_specific_type(sol::table registry, char const *name)
 			sol::no_constructor,
 			sol::base_classes, sol::bases<bitmap_t>());
 	result.set_function("pix", [] (T &bitmap, int32_t x, int32_t y) { return bitmap.pix(y, x); });
+	result["pixels"] = sol::overload(
+			[] (T const &bitmap, sol::this_state s)
+			{
+				return get_bitmap_pixels(bitmap, s, bitmap.cliprect());
+			},
+			[] (T const &bitmap, sol::this_state s, int32_t minx, int32_t miny, int32_t maxx, int32_t maxy)
+			{
+				return get_bitmap_pixels(bitmap, s, rectangle(minx, maxx, miny, maxy));
+			});
 	result["fill"] = sol::overload(
 			static_cast<void (T::*)(typename T::pixel_t)>(&T::fill),
 			[] (T &bitmap, typename T::pixel_t color, int32_t minx, int32_t miny, int32_t maxx, int32_t maxy)
@@ -248,57 +181,6 @@ auto make_bitmap_specific_type(sol::table registry, char const *name)
 			});
 	result.set_function("plot_box", &T::plot_box);
 	result["bpp"] = sol::property(&T::bpp);
-	return result;
-}
-
-
-template <typename T, typename B>
-auto make_bitmap_type(sol::table &registry, char const *name)
-{
-	auto result = registry.new_usertype<T>(
-			name,
-			sol::call_constructor, sol::factories(
-				[] (sol::this_state s)
-				{
-					return std::make_shared<T>(s, 0, 0, 0, 0);
-				},
-				[] (sol::this_state s, int width, int height)
-				{
-					return std::make_shared<T>(s, width, height, 0, 0);
-				},
-				[] (sol::this_state s, int width, int height, int xslop, int yslop)
-				{
-					return std::make_shared<T>(s, width, height, xslop, yslop);
-				},
-				[] (typename T::ptr const &source)
-				{
-					return std::make_shared<T>(source, source->cliprect());
-				},
-				[] (sol::this_state s, typename T::ptr const &source, int32_t minx, int32_t miny, int32_t maxx, int32_t maxy)
-				{
-					rectangle const subrect(minx, maxx, miny, maxy);
-					if (!source->cliprect().contains(subrect))
-						luaL_error(s, "Bounds exceed source clipping rectangle");
-					return std::make_shared<T>(source, subrect);
-				}),
-			sol::base_classes, sol::bases<B, bitmap_t>());
-	result.set_function("reset", &T::reset);
-	result["allocate"] = sol::overload(
-			&T::allocate,
-			[] (T &bitmap, sol::this_state s, int width, int height) { bitmap.allocate(s, width, height, 0, 0); });
-	result["resize"] = sol::overload(
-			&T::resize,
-			[] (T &bitmap, sol::this_state s, int width, int height) { bitmap.resize(s, width, height, 0, 0); });
-	result["wrap"] = sol::overload(
-			[] (T &bitmap, sol::this_state s, typename T::ptr const &source)
-			{
-				bitmap.wrap(s, source, source->cliprect());
-			},
-			[] (T &bitmap, sol::this_state s, typename T::ptr const &source, int32_t minx, int32_t miny, int32_t maxx, int32_t maxy)
-			{
-				bitmap.wrap(s, source, rectangle(minx, maxx, miny, maxy));
-			});
-	result["locked"] = sol::property(&T::locked);
 	return result;
 }
 
@@ -462,6 +344,231 @@ public:
 } // namespace sol
 
 
+template <typename T>
+class lua_engine::bitmap_helper : public T
+{
+public:
+	using ptr = std::shared_ptr<bitmap_helper>;
+
+	bitmap_helper(bitmap_helper const &) = delete;
+	bitmap_helper(bitmap_helper &&) = delete;
+	bitmap_helper &operator=(bitmap_helper const &) = delete;
+	bitmap_helper &operator=(bitmap_helper &&) = delete;
+
+	bitmap_helper(sol::this_state s, int width, int height, int xslop, int yslop)
+		: T(width, height, xslop, yslop)
+		, storage_lock_count(0)
+		, palette_lock_count(0)
+		, storage()
+	{
+		if ((0 < width) && (0 < height) && !this->valid())
+			luaL_error(s, "Error allocating bitmap storage");
+	}
+
+	bitmap_helper(ptr const &source, rectangle const &subrect)
+		: T(*source, subrect)
+		, storage_lock_count(0)
+		, palette_lock_count(0)
+		, storage(source->storage ? source->storage : source)
+	{
+		++storage->storage_lock_count;
+		this->set_palette(source->palette());
+	}
+
+	~bitmap_helper()
+	{
+		assert(!storage_lock_count);
+		assert(!palette_lock_count);
+		release_storage();
+	}
+
+	void reset(sol::this_state s)
+	{
+		if (storage_lock_count)
+			luaL_error(s, "Cannot reset bitmap while in use");
+		palette_t *const p(this->palette());
+		if (p)
+			p->ref();
+		T::reset();
+		this->set_palette(p);
+		if (p)
+			p->deref();
+		release_storage();
+	}
+
+	void allocate(sol::this_state s, int width, int height, int xslop, int yslop)
+	{
+		if (storage_lock_count)
+			luaL_error(s, "Cannot reallocate bitmap while in use");
+		palette_t *const p(this->palette());
+		if (p)
+			p->ref();
+		T::allocate(width, height, xslop, yslop);
+		this->set_palette(p);
+		if (p)
+			p->deref();
+		release_storage();
+		if ((0 < width) && (0 < height) && !this->valid())
+			luaL_error(s, "Error allocating bitmap storage");
+	}
+
+	void resize(sol::this_state s, int width, int height, int xslop, int yslop)
+	{
+		if (storage_lock_count)
+			luaL_error(s, "Cannot resize bitmap while in use");
+		T::resize(width, height, xslop, yslop);
+		release_storage();
+		if ((0 < width) && (0 < height) && !this->valid())
+			luaL_error(s, "Error allocating bitmap storage");
+	}
+
+	void wrap(sol::this_state s, ptr const &source, rectangle const &subrect)
+	{
+		if (source.get() == this)
+			luaL_error(s, "Bitmap cannot wrap itself");
+		if (storage_lock_count)
+			luaL_error(s, "Cannot free bitmap storage while in use");
+		if (!source->cliprect().contains(subrect))
+			luaL_error(s, "Bounds exceed source clipping rectangle");
+		palette_t *const p(this->palette());
+		if (p)
+			p->ref();
+		T::wrap(*source, subrect);
+		this->set_palette(p);
+		if (p)
+			p->deref();
+		release_storage();
+		storage = source->storage ? source->storage : source;
+		++storage->storage_lock_count;
+	}
+
+	std::atomic<unsigned> storage_lock_count;
+	std::atomic<unsigned> palette_lock_count;
+
+	template <typename B>
+	static auto make_type(sol::table &registry, char const *name)
+	{
+		auto result = registry.new_usertype<bitmap_helper>(
+				name,
+				sol::call_constructor, sol::factories(
+					[] (sol::this_state s)
+					{
+						return std::make_shared<bitmap_helper>(s, 0, 0, 0, 0);
+					},
+					[] (sol::this_state s, int width, int height)
+					{
+						return std::make_shared<bitmap_helper>(s, width, height, 0, 0);
+					},
+					[] (sol::this_state s, int width, int height, int xslop, int yslop)
+					{
+						return std::make_shared<bitmap_helper>(s, width, height, xslop, yslop);
+					},
+					[] (ptr const &source)
+					{
+						return std::make_shared<bitmap_helper>(source, source->cliprect());
+					},
+					[] (sol::this_state s, ptr const &source, int32_t minx, int32_t miny, int32_t maxx, int32_t maxy)
+					{
+						rectangle const subrect(minx, maxx, miny, maxy);
+						if (!source->cliprect().contains(subrect))
+							luaL_error(s, "Bounds exceed source clipping rectangle");
+						return std::make_shared<bitmap_helper>(source, subrect);
+					}),
+				sol::base_classes, sol::bases<B, bitmap_t>());
+		add_bitmap_members(result);
+		return result;
+	}
+
+	template <typename B>
+	static auto make_indexed_type(sol::table &registry, char const *name)
+	{
+		auto result = registry.new_usertype<bitmap_helper>(
+				name,
+				sol::call_constructor, sol::factories(
+					[] (sol::this_state s, palette_wrapper &p)
+					{
+						ptr result = std::make_shared<bitmap_helper>(s, 0, 0, 0, 0);
+						result->set_palette(&p.palette());
+						return result;
+					},
+					[] (sol::this_state s, palette_wrapper &p, int width, int height)
+					{
+						ptr result = std::make_shared<bitmap_helper>(s, width, height, 0, 0);
+						result->set_palette(&p.palette());
+						return result;
+					},
+					[] (sol::this_state s, palette_wrapper &p, int width, int height, int xslop, int yslop)
+					{
+						ptr result = std::make_shared<bitmap_helper>(s, width, height, xslop, yslop);
+						result->set_palette(&p.palette());
+						return result;
+					},
+					[] (ptr const &source)
+					{
+						return std::make_shared<bitmap_helper>(source, source->cliprect());
+					},
+					[] (sol::this_state s, ptr const &source, int32_t minx, int32_t miny, int32_t maxx, int32_t maxy)
+					{
+						rectangle const subrect(minx, maxx, miny, maxy);
+						if (!source->cliprect().contains(subrect))
+							luaL_error(s, "Bounds exceed source clipping rectangle");
+						return std::make_shared<bitmap_helper>(source, subrect);
+					}),
+				sol::base_classes, sol::bases<B, bitmap_t>());
+		result["palette"] = sol::property(
+				[] (bitmap_helper const &b)
+				{
+					return b.palette()
+						? std::optional<palette_wrapper>(std::in_place, *b.palette())
+						: std::optional<palette_wrapper>();
+				},
+				[] (bitmap_helper &b, sol::this_state s, palette_wrapper &p)
+				{
+					if (b.palette_lock_count)
+						luaL_error(s, "Cannot set palette while in use");
+					b.set_palette(&p.palette());
+				});
+		add_bitmap_members(result);
+		return result;
+	}
+
+private:
+	void release_storage()
+	{
+		if (storage)
+		{
+			assert(storage->storage_lock_count);
+			--storage->storage_lock_count;
+			storage.reset();
+		}
+	}
+
+	template <typename U>
+	static void add_bitmap_members(U &type)
+	{
+		type.set_function("reset", &bitmap_helper::reset);
+		type["allocate"] = sol::overload(
+				&bitmap_helper::allocate,
+				[] (bitmap_helper &bitmap, sol::this_state s, int width, int height) { bitmap.allocate(s, width, height, 0, 0); });
+		type["resize"] = sol::overload(
+				&bitmap_helper::resize,
+				[] (bitmap_helper &bitmap, sol::this_state s, int width, int height) { bitmap.resize(s, width, height, 0, 0); });
+		type["wrap"] = sol::overload(
+				[] (bitmap_helper &bitmap, sol::this_state s, ptr const &source)
+				{
+					bitmap.wrap(s, source, source->cliprect());
+				},
+				[] (bitmap_helper &bitmap, sol::this_state s, ptr const &source, int32_t minx, int32_t miny, int32_t maxx, int32_t maxy)
+				{
+					bitmap.wrap(s, source, rectangle(minx, maxx, miny, maxy));
+				});
+		type["locked"] = sol::property([] (bitmap_helper const &b) { return bool(b.storage_lock_count); });
+	}
+
+	ptr storage;
+};
+
+
 //-------------------------------------------------
 //  initialize_render - register render user types
 //-------------------------------------------------
@@ -498,7 +605,108 @@ void lua_engine::initialize_render(sol::table &emu)
 	color_type["b"] = &render_color::b;
 
 
+	auto palette_type = emu.new_usertype<palette_wrapper>(
+			"palette",
+			sol::call_constructor, sol::initializers(
+				[] (palette_wrapper &pal, uint32_t colors) { new (&pal) palette_wrapper(colors, 1); },
+				[] (palette_wrapper &pal, uint64_t colors, uint32_t groups) { new (&pal) palette_wrapper(colors, groups); }));
+	palette_type.set_function(
+			"entry_color",
+			[] (palette_wrapper const &pal, uint32_t index) { return uint32_t(pal.palette().entry_color(index)); });
+	palette_type.set_function(
+			"entry_contrast",
+			[] (palette_wrapper const &pal, uint32_t index) { return pal.palette().entry_contrast(index); });
+	palette_type.set_function(
+			"entry_adjusted_color",
+			[] (palette_wrapper const &pal, uint32_t index, std::optional<uint32_t> group)
+			{
+				if (group)
+				{
+					if ((pal.palette().num_colors() <= index) || (pal.palette().num_groups() <= *group))
+						return uint32_t(rgb_t::black());
+					index += *group * pal.palette().num_colors();
+				}
+				return uint32_t(pal.palette().entry_adjusted_color(index));
+			});
+	palette_type["entry_set_color"] = sol::overload(
+			[] (palette_wrapper &pal, sol::this_state s, uint32_t index, uint32_t color)
+			{
+				if (pal.palette().num_colors() <= index)
+					luaL_error(s, "Color index out of range");
+				pal.palette().entry_set_color(index, rgb_t(color));
+			},
+			[] (palette_wrapper &pal, sol::this_state s, uint32_t index, uint8_t red, uint8_t green, uint8_t blue)
+			{
+				if (pal.palette().num_colors() <= index)
+					luaL_error(s, "Color index out of range");
+				pal.palette().entry_set_color(index, rgb_t(red, green, blue));
+			});
+	palette_type.set_function(
+			"entry_set_red_level",
+			[] (palette_wrapper &pal, sol::this_state s, uint32_t index, uint8_t level)
+			{
+				if (pal.palette().num_colors() <= index)
+					luaL_error(s, "Color index out of range");
+				pal.palette().entry_set_red_level(index, level);
+			});
+	palette_type.set_function(
+			"entry_set_green_level",
+			[] (palette_wrapper &pal, sol::this_state s, uint32_t index, uint8_t level)
+			{
+				if (pal.palette().num_colors() <= index)
+					luaL_error(s, "Color index out of range");
+				pal.palette().entry_set_green_level(index, level);
+			});
+	palette_type.set_function(
+			"entry_set_blue_level",
+			[] (palette_wrapper &pal, sol::this_state s, uint32_t index, uint8_t level)
+			{
+				if (pal.palette().num_colors() <= index)
+					luaL_error(s, "Color index out of range");
+				pal.palette().entry_set_blue_level(index, level);
+			});
+	palette_type.set_function(
+			"entry_set_contrast",
+			[] (palette_wrapper &pal, sol::this_state s, uint32_t index, float contrast)
+			{
+				if (pal.palette().num_colors() <= index)
+					luaL_error(s, "Color index out of range");
+				pal.palette().entry_set_contrast(index, contrast);
+			});
+	palette_type.set_function(
+			"group_set_brightness",
+			[] (palette_wrapper &pal, sol::this_state s, uint32_t group, float brightness)
+			{
+				if (pal.palette().num_colors() <= group)
+					luaL_error(s, "Group index out of range");
+				pal.palette().group_set_brightness(group, brightness);
+			});
+	palette_type.set_function(
+			"group_set_contrast",
+			[] (palette_wrapper &pal, sol::this_state s, uint32_t group, float contrast)
+			{
+				if (pal.palette().num_colors() <= group)
+					luaL_error(s, "Group index out of range");
+				pal.palette().group_set_contrast(group, contrast);
+			});
+	palette_type["colors"] = sol::property([] (palette_wrapper const &pal) { return pal.palette().num_colors(); });
+	palette_type["groups"] = sol::property([] (palette_wrapper const &pal) { return pal.palette().num_groups(); });
+	palette_type["max_index"] = sol::property([] (palette_wrapper const &pal) { return pal.palette().max_index(); });
+	palette_type["black_entry"] = sol::property([] (palette_wrapper const &pal) { return pal.palette().black_entry(); });
+	palette_type["white_entry"] = sol::property([] (palette_wrapper const &pal) { return pal.palette().white_entry(); });
+	palette_type["brightness"] = sol::property([] (palette_wrapper &pal, float brightness) { pal.palette().set_brightness(brightness); });
+	palette_type["contrast"] = sol::property([] (palette_wrapper &pal, float contrast) { pal.palette().set_contrast(contrast); });
+	palette_type["gamma"] = sol::property([] (palette_wrapper &pal, float gamma) { pal.palette().set_gamma(gamma); });
+
+
 	auto bitmap_type = sol().registry().new_usertype<bitmap_t>("bitmap", sol::no_constructor);
+	bitmap_type.set_function(
+			"cliprect",
+			[] (bitmap_t const &bitmap)
+			{
+				rectangle const &result(bitmap.cliprect());
+				return std::make_tuple(result.left(), result.top(), result.right(), result.bottom());
+			});
 	bitmap_type["fill"] = sol::overload(
 			static_cast<void (bitmap_t::*)(uint64_t)>(&bitmap_t::fill),
 			[] (bitmap_t &bitmap, uint64_t color, int32_t minx, int32_t miny, int32_t maxx, int32_t maxy)
@@ -518,10 +726,14 @@ void lua_engine::initialize_render(sol::table &emu)
 	make_bitmap_specific_type<bitmap32_t>(sol().registry(), "bitmap32");
 	make_bitmap_specific_type<bitmap64_t>(sol().registry(), "bitmap64");
 
-	make_bitmap_type<bitmap_helper<bitmap_yuy16>, bitmap16_t>(emu, "bitmap_yuy16");
-	make_bitmap_type<bitmap_helper<bitmap_rgb32>, bitmap32_t>(emu, "bitmap_rgb32");
-	make_bitmap_type<bitmap_helper<bitmap_argb32>, bitmap32_t>(emu, "bitmap_argb32");
+	bitmap_helper<bitmap_ind8>::make_indexed_type<bitmap8_t>(emu, "bitmap_ind8");
+	bitmap_helper<bitmap_ind16>::make_indexed_type<bitmap16_t>(emu, "bitmap_ind16");
+	bitmap_helper<bitmap_ind32>::make_indexed_type<bitmap32_t>(emu, "bitmap_ind32");
+	bitmap_helper<bitmap_ind64>::make_indexed_type<bitmap64_t>(emu, "bitmap_ind64");
 
+	bitmap_helper<bitmap_yuy16>::make_type<bitmap16_t>(emu, "bitmap_yuy16");
+	bitmap_helper<bitmap_rgb32>::make_type<bitmap32_t>(emu, "bitmap_rgb32");
+	bitmap_helper<bitmap_argb32>::make_type<bitmap32_t>(emu, "bitmap_argb32");
 
 	auto render_texture_type = emu.new_usertype<render_texture_helper>("render_texture", sol::no_constructor);
 	render_texture_type.set_function("free", &render_texture_helper::free);
@@ -798,6 +1010,10 @@ void lua_engine::initialize_render(sol::table &emu)
 
 	auto render_type = sol().registry().new_usertype<render_manager>("render", sol::no_constructor);
 	render_type["texture_alloc"] = sol::overload(
+			[] (render_manager &manager, sol::this_state s, bitmap_helper<bitmap_ind16>::ptr const &bitmap)
+			{
+				return render_texture_helper(s, manager, bitmap, TEXFORMAT_PALETTE16);
+			},
 			[] (render_manager &manager, sol::this_state s, bitmap_helper<bitmap_yuy16>::ptr const &bitmap)
 			{
 				return render_texture_helper(s, manager, bitmap, TEXFORMAT_YUY16);

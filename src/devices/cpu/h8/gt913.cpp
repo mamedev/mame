@@ -8,14 +8,14 @@
     for many opcodes, as well as:
 
     - Dedicated bank switching instructions
-	  (20-bit external address bus + 3 chip select outputs, can address a total of 4MB)
+      (20-bit external address bus + 3 chip select outputs, can address a total of 4MB)
     - Two timers, three 8-bit ports, two 8-bit ADCs
     - Keyboard controller w/ key velocity detection
     - MIDI UART
     - 24-voice DPCM sound
 
-	Variants include the uPD912 and GT915/uPD915.
-	These were later succeeded by the uPD914.
+    Variants include the uPD912 and GT915/uPD915.
+    These were later succeeded by the uPD914.
 
 ***************************************************************************/
 
@@ -81,7 +81,7 @@ void gt913_device::map(address_map &map)
 	/* fff0-fff5: I/O ports */
 	map(0xfff0, 0xfff0).rw(m_port[0], FUNC(h8_port_device::ddr_r), FUNC(h8_port_device::ddr_w));
 	// port 2 DDR - ctk601 and gz70sp both seem to use only bit 0 to indicate either all inputs or all outputs
-//	map(0xfff1, 0xfff1).rw(m_port[1], FUNC(h8_port_device::ddr_r), FUNC(h8_port_device::ddr_w));
+//  map(0xfff1, 0xfff1).rw(m_port[1], FUNC(h8_port_device::ddr_r), FUNC(h8_port_device::ddr_w));
 	map(0xfff1, 0xfff1).lw8(NAME([this](uint8_t data) { m_port[1]->ddr_w(BIT(data, 0) ? 0xff : 0x00); }));
 	map(0xfff2, 0xfff2).rw(m_port[0], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 	map(0xfff3, 0xfff3).rw(m_port[1], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
@@ -162,7 +162,7 @@ void gt913_device::data_w(offs_t offset, uint8_t data)
 
 uint8_t gt913_device::data_r(offs_t offset)
 {
-	return m_data.read_byte(offset | (m_banknum & 0xff) << 14);	
+	return m_data.read_byte(offset | (m_banknum & 0xff) << 14);
 }
 
 uint8_t gt913_device::read8ib(uint32_t adr)

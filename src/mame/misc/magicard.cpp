@@ -1886,7 +1886,7 @@ ROM_END
 
 
 /*
-  
+
   Magic Card - Wien v1.2 200/93 set 2
 
   PCB layout:

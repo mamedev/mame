@@ -544,7 +544,7 @@ void jpmsru_state::out_logicext_w(offs_t offset, uint8_t data)
 	switch(offset)
 	{
 		case 0: out_lamp_ext_w(m_logicext_addr, !m_logicext_data); break; /* All dumped games use solely lamps as outputs,
-																			 so keep things simple for now */
+		                                                                     so keep things simple for now */
 		case 1: m_logicext_data = data; break;
 		case 2:
 		case 3:

@@ -30,7 +30,7 @@ TODO:
   interleaving is taken into account. A high resolution timer around the
   poll loop is probably the best bet. The driver sets its timer manually
   because strange enough, interleaving doesn't occur immediately when
-  cpuexec_boost_interleave() is called. Speculations are TIME_NOWs could have
+  perfect_quantum() is called. Speculations are TIME_NOWs could have
   been used as the timer durations to force instant triggering.
 
 

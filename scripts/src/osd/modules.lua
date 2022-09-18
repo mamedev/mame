@@ -73,6 +73,8 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/debugger/debugwin.cpp",
 		MAME_DIR .. "src/osd/modules/debugger/debugimgui.cpp",
 		MAME_DIR .. "src/osd/modules/debugger/debuggdbstub.cpp",
+		MAME_DIR .. "src/osd/modules/debugger/xmlconfig.cpp",
+		MAME_DIR .. "src/osd/modules/debugger/xmlconfig.h",
 		MAME_DIR .. "src/osd/modules/font/font_sdl.cpp",
 		MAME_DIR .. "src/osd/modules/font/font_windows.cpp",
 		MAME_DIR .. "src/osd/modules/font/font_dwrite.cpp",

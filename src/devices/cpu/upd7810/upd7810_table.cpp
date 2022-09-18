@@ -3617,7 +3617,7 @@ const struct upd7810_device::opcode_s upd7810_device::s_opXX_7801[256] =
 	{&upd7810_device::MOV_H_A,       1, 4, 4,L0|L1}, {&upd7810_device::MOV_L_A,       1, 4, 4,L0|L1},
 
 	/* 0x20 - 0x3F */
-	{&upd7810_device::INRW_wa_7801,  2,13,13,L0|L1}, {&upd7810_device::TABLE,         1,19,19,L0|L1},
+	{&upd7810_device::INRW_wa,       2,13,13,L0|L1}, {&upd7810_device::TABLE,         1,19,19,L0|L1},
 	{&upd7810_device::INX_DE,        1, 7, 7,L0|L1}, {&upd7810_device::DCX_DE,        1, 7, 7,L0|L1},
 	{&upd7810_device::LXI_D_w,       3,10,10,L0|L1}, {&upd7810_device::GTIW_wa_xx,    3,13,13,L0|L1},
 	{&upd7810_device::ADINC_A_xx,    2, 7, 7,L0|L1}, {&upd7810_device::GTI_A_xx,      2, 7, 7,L0|L1},
@@ -3626,7 +3626,7 @@ const struct upd7810_device::opcode_s upd7810_device::s_opXX_7801[256] =
 	{&upd7810_device::LDAX_Dp,       1, 7, 7,L0|L1}, {&upd7810_device::LDAX_Hp,       1, 7, 7,L0|L1},
 	{&upd7810_device::LDAX_Dm,       1, 7, 7,L0|L1}, {&upd7810_device::LDAX_Hm,       1, 7, 7,L0|L1},
 
-	{&upd7810_device::DCRW_wa_7801,  2,13,13,L0|L1}, {&upd7810_device::BLOCK,         1,13,13,L0|L1},
+	{&upd7810_device::DCRW_wa,       2,13,13,L0|L1}, {&upd7810_device::BLOCK,         1,13,13,L0|L1},
 	{&upd7810_device::INX_HL,        1, 7, 7,L0|L1}, {&upd7810_device::DCX_HL,        1, 7, 7,L0|L1},
 	{&upd7810_device::LXI_H_w,       3,10,10,   L1}, {&upd7810_device::LTIW_wa_xx,    3,13,13,L0|L1},
 	{&upd7810_device::SUINB_A_xx,    2, 7, 7,L0|L1}, {&upd7810_device::LTI_A_xx,      2, 7, 7,L0|L1},
@@ -3636,8 +3636,8 @@ const struct upd7810_device::opcode_s upd7810_device::s_opXX_7801[256] =
 	{&upd7810_device::STAX_Dm,       1, 7, 7,L0|L1}, {&upd7810_device::STAX_Hm,       1, 7, 7,L0|L1},
 
 	/* 0x40 - 0x5F */
-	{&upd7810_device::illegal,       1, 4, 4,L0|L1}, {&upd7810_device::INR_A_7801,    1, 4, 4,L0|L1},
-	{&upd7810_device::INR_B_7801,    1, 4, 4,L0|L1}, {&upd7810_device::INR_C_7801,    1, 4, 4,L0|L1},
+	{&upd7810_device::illegal,       1, 4, 4,L0|L1}, {&upd7810_device::INR_A,         1, 4, 4,L0|L1},
+	{&upd7810_device::INR_B,         1, 4, 4,L0|L1}, {&upd7810_device::INR_C,         1, 4, 4,L0|L1},
 	{&upd7810_device::CALL_w,        3,16,16,L0|L1}, {&upd7810_device::ONIW_wa_xx,    3,13,13,L0|L1},
 	{&upd7810_device::ADI_A_xx,      2, 7, 7,L0|L1}, {&upd7810_device::ONI_A_xx,      2, 7, 7,L0|L1},
 	{&upd7810_device::PRE_48,        1, 0, 0,L0|L1}, {&upd7810_device::MVIX_BC_xx,    2,10,10,L0|L1},
@@ -3645,8 +3645,8 @@ const struct upd7810_device::opcode_s upd7810_device::s_opXX_7801[256] =
 	{&upd7810_device::PRE_4C,        1, 0, 0,L0|L1}, {&upd7810_device::PRE_4D,        1, 0, 0,L0|L1},
 	{&upd7810_device::JRE,           2,17,17,L0|L1}, {&upd7810_device::JRE,           2,17,17,L0|L1},
 
-	{&upd7810_device::illegal,       1, 4, 4,L0|L1}, {&upd7810_device::DCR_A_7801,    1, 4, 4,L0|L1},
-	{&upd7810_device::DCR_B_7801,    1, 4, 4,L0|L1}, {&upd7810_device::DCR_C_7801,    1, 4, 4,L0|L1},
+	{&upd7810_device::illegal,       1, 4, 4,L0|L1}, {&upd7810_device::DCR_A,         1, 4, 4,L0|L1},
+	{&upd7810_device::DCR_B,         1, 4, 4,L0|L1}, {&upd7810_device::DCR_C,         1, 4, 4,L0|L1},
 	{&upd7810_device::JMP_w,         3,10,10,L0|L1}, {&upd7810_device::OFFIW_wa_xx,   3,13,13,L0|L1},
 	{&upd7810_device::ACI_A_xx,      2, 7, 7,L0|L1}, {&upd7810_device::OFFI_A_xx,     2, 7, 7,L0|L1},
 	{&upd7810_device::BIT_0_wa,      2,10,10,L0|L1}, {&upd7810_device::BIT_1_wa,      2,10,10,L0|L1},
@@ -4867,7 +4867,7 @@ const struct upd7810_device::opcode_s upd7810_device::s_opXX_78c05[256] =
 	{&upd7810_device::MOV_H_A,       1, 4, 4,L0|L1}, {&upd7810_device::MOV_L_A,       1, 4, 4,L0|L1},
 
 	/* 0x20 - 0x3F */
-	{&upd7810_device::INRW_wa_7801,  2,13,13,L0|L1}, {&upd7810_device::illegal,       1, 4, 4,L0|L1},
+	{&upd7810_device::INRW_wa,       2,13,13,L0|L1}, {&upd7810_device::illegal,       1, 4, 4,L0|L1},
 	{&upd7810_device::INX_DE,        1, 7, 7,L0|L1}, {&upd7810_device::DCX_DE,        1, 7, 7,L0|L1},
 	{&upd7810_device::LXI_D_w,       3,10,10,L0|L1}, {&upd7810_device::GTIW_wa_xx,    3,13,13,L0|L1},
 	{&upd7810_device::ADINC_A_xx,    2, 7, 7,L0|L1}, {&upd7810_device::GTI_A_xx,      2, 7, 7,L0|L1},
@@ -4876,7 +4876,7 @@ const struct upd7810_device::opcode_s upd7810_device::s_opXX_78c05[256] =
 	{&upd7810_device::LDAX_Dp,       1, 7, 7,L0|L1}, {&upd7810_device::LDAX_Hp,       1, 7, 7,L0|L1},
 	{&upd7810_device::LDAX_Dm,       1, 7, 7,L0|L1}, {&upd7810_device::LDAX_Hm,       1, 7, 7,L0|L1},
 
-	{&upd7810_device::DCRW_wa_7801,  2,13,13,L0|L1}, {&upd7810_device::illegal,       1, 4, 4,L0|L1},
+	{&upd7810_device::DCRW_wa,       2,13,13,L0|L1}, {&upd7810_device::illegal,       1, 4, 4,L0|L1},
 	{&upd7810_device::INX_HL,        1, 7, 7,L0|L1}, {&upd7810_device::DCX_HL,        1, 7, 7,L0|L1},
 	{&upd7810_device::LXI_H_w,       3,10,10,   L1}, {&upd7810_device::LTIW_wa_xx,    3,13,13,L0|L1},
 	{&upd7810_device::SUINB_A_xx,    2, 7, 7,L0|L1}, {&upd7810_device::LTI_A_xx,      2, 7, 7,L0|L1},
@@ -4886,8 +4886,8 @@ const struct upd7810_device::opcode_s upd7810_device::s_opXX_78c05[256] =
 	{&upd7810_device::STAX_Dm,       1, 7, 7,L0|L1}, {&upd7810_device::STAX_Hm,       1, 7, 7,L0|L1},
 
 	/* 0x40 - 0x5F */
-	{&upd7810_device::illegal,       1, 4, 4,L0|L1}, {&upd7810_device::INR_A_7801,    1, 4, 4,L0|L1},
-	{&upd7810_device::INR_B_7801,    1, 4, 4,L0|L1}, {&upd7810_device::INR_C_7801,    1, 4, 4,L0|L1},
+	{&upd7810_device::illegal,       1, 4, 4,L0|L1}, {&upd7810_device::INR_A,         1, 4, 4,L0|L1},
+	{&upd7810_device::INR_B,         1, 4, 4,L0|L1}, {&upd7810_device::INR_C,         1, 4, 4,L0|L1},
 	{&upd7810_device::CALL_w,        3,16,16,L0|L1}, {&upd7810_device::ONIW_wa_xx,    3,13,13,L0|L1},
 	{&upd7810_device::ADI_A_xx,      2, 7, 7,L0|L1}, {&upd7810_device::ONI_A_xx,      2, 7, 7,L0|L1},
 	{&upd7810_device::PRE_48,        1, 0, 0,L0|L1}, {&upd7810_device::illegal,       1, 4, 4,L0|L1},
@@ -4895,8 +4895,8 @@ const struct upd7810_device::opcode_s upd7810_device::s_opXX_78c05[256] =
 	{&upd7810_device::PRE_4C,        1, 0, 0,L0|L1}, {&upd7810_device::PRE_4D,        1, 0, 0,L0|L1},
 	{&upd7810_device::JRE,           2,13,13,L0|L1}, {&upd7810_device::JRE,           2,13,13,L0|L1},
 
-	{&upd7810_device::illegal,       1, 4, 4,L0|L1}, {&upd7810_device::DCR_A_7801,    1, 4, 4,L0|L1},
-	{&upd7810_device::DCR_B_7801,    1, 4, 4,L0|L1}, {&upd7810_device::DCR_C_7801,    1, 4, 4,L0|L1},
+	{&upd7810_device::illegal,       1, 4, 4,L0|L1}, {&upd7810_device::DCR_A,         1, 4, 4,L0|L1},
+	{&upd7810_device::DCR_B,         1, 4, 4,L0|L1}, {&upd7810_device::DCR_C,         1, 4, 4,L0|L1},
 	{&upd7810_device::JMP_w,         3,10,10,L0|L1}, {&upd7810_device::OFFIW_wa_xx,   3,13,13,L0|L1},
 	{&upd7810_device::ACI_A_xx,      2, 7, 7,L0|L1}, {&upd7810_device::OFFI_A_xx,     2, 7, 7,L0|L1},
 	{&upd7810_device::illegal,       1, 4, 4,L0|L1}, {&upd7810_device::illegal,       1, 4, 4,L0|L1},
@@ -6118,7 +6118,7 @@ const struct upd7810_device::opcode_s upd7810_device::s_opXX_78c06[256] =
 	{&upd7810_device::MOV_H_A,       1, 6, 6,L0|L1}, {&upd7810_device::MOV_L_A,       1, 6, 6,L0|L1},
 
 	/* 0x20 - 0x3F */
-	{&upd7810_device::INRW_wa_7801,  2,17,17,L0|L1}, {&upd7810_device::illegal,       1, 4, 4,L0|L1},
+	{&upd7810_device::INRW_wa,       2,17,17,L0|L1}, {&upd7810_device::illegal,       1, 4, 4,L0|L1},
 	{&upd7810_device::INX_DE,        1, 9, 9,L0|L1}, {&upd7810_device::DCX_DE,        1, 9, 9,L0|L1},
 	{&upd7810_device::LXI_D_w,       3,16,16,L0|L1}, {&upd7810_device::GTIW_wa_xx,    3,19,19,L0|L1},
 	{&upd7810_device::ADINC_A_xx,    2,11,11,L0|L1}, {&upd7810_device::GTI_A_xx,      2,11,11,L0|L1},
@@ -6127,7 +6127,7 @@ const struct upd7810_device::opcode_s upd7810_device::s_opXX_78c06[256] =
 	{&upd7810_device::LDAX_Dp,       1, 9, 9,L0|L1}, {&upd7810_device::LDAX_Hp,       1, 9, 9,L0|L1},
 	{&upd7810_device::LDAX_Dm,       1, 9, 9,L0|L1}, {&upd7810_device::LDAX_Hm,       1, 9, 9,L0|L1},
 
-	{&upd7810_device::DCRW_wa_7801,  2,17,17,L0|L1}, {&upd7810_device::illegal,       1, 4, 4,L0|L1},
+	{&upd7810_device::DCRW_wa,       2,17,17,L0|L1}, {&upd7810_device::illegal,       1, 4, 4,L0|L1},
 	{&upd7810_device::INX_HL,        1, 9, 9,L0|L1}, {&upd7810_device::DCX_HL,        1, 9, 9,L0|L1},
 	{&upd7810_device::LXI_H_w,       3,16,16,   L1}, {&upd7810_device::LTIW_wa_xx,    3,19,19,L0|L1},
 	{&upd7810_device::SUINB_A_xx,    2,11,11,L0|L1}, {&upd7810_device::LTI_A_xx,      2,11,11,L0|L1},
@@ -6137,8 +6137,8 @@ const struct upd7810_device::opcode_s upd7810_device::s_opXX_78c06[256] =
 	{&upd7810_device::STAX_Dm,       1, 9, 9,L0|L1}, {&upd7810_device::STAX_Hm,       1, 9, 9,L0|L1},
 
 	/* 0x40 - 0x5F */
-	{&upd7810_device::illegal,       1, 6, 6,L0|L1}, {&upd7810_device::INR_A_7801,    1, 6, 6,L0|L1},
-	{&upd7810_device::INR_B_7801,    1, 6, 6,L0|L1}, {&upd7810_device::INR_C_7801,    1, 6, 6,L0|L1},
+	{&upd7810_device::illegal,       1, 6, 6,L0|L1}, {&upd7810_device::INR_A,         1, 6, 6,L0|L1},
+	{&upd7810_device::INR_B,         1, 6, 6,L0|L1}, {&upd7810_device::INR_C,         1, 6, 6,L0|L1},
 	{&upd7810_device::CALL_w,        3,22,22,L0|L1}, {&upd7810_device::ONIW_wa_xx,    3,19,19,L0|L1},
 	{&upd7810_device::ADI_A_xx,      2,11,11,L0|L1}, {&upd7810_device::ONI_A_xx,      2,11,11,L0|L1},
 	{&upd7810_device::PRE_48,        1, 0, 0,L0|L1}, {&upd7810_device::illegal,       1, 6, 6,L0|L1},
@@ -6146,8 +6146,8 @@ const struct upd7810_device::opcode_s upd7810_device::s_opXX_78c06[256] =
 	{&upd7810_device::PRE_4C,        1, 0, 0,L0|L1}, {&upd7810_device::PRE_4D,        1, 0, 0,L0|L1},
 	{&upd7810_device::JRE,           2,17,17,L0|L1}, {&upd7810_device::JRE,           2,17,17,L0|L1},
 
-	{&upd7810_device::illegal,       1, 6, 6,L0|L1}, {&upd7810_device::DCR_A_7801,    1, 6, 6,L0|L1},
-	{&upd7810_device::DCR_B_7801,    1, 6, 6,L0|L1}, {&upd7810_device::DCR_C_7801,    1, 6, 6,L0|L1},
+	{&upd7810_device::illegal,       1, 6, 6,L0|L1}, {&upd7810_device::DCR_A,         1, 6, 6,L0|L1},
+	{&upd7810_device::DCR_B,         1, 6, 6,L0|L1}, {&upd7810_device::DCR_C,         1, 6, 6,L0|L1},
 	{&upd7810_device::JMP_w,         3,16,16,L0|L1}, {&upd7810_device::OFFIW_wa_xx,   3,19,19,L0|L1},
 	{&upd7810_device::ACI_A_xx,      2,11,11,L0|L1}, {&upd7810_device::OFFI_A_xx,     2,11,11,L0|L1},
 	{&upd7810_device::illegal,       1, 6, 6,L0|L1}, {&upd7810_device::illegal,       1, 6, 6,L0|L1},

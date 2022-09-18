@@ -289,8 +289,12 @@ void bitmap_t::resize(int width, int height, int xslop, int yslop)
 	{
 		// if we need more memory, just realloc
 		palette_t *const palette = m_palette;
+		if (palette)
+			palette->ref();
 		allocate(width, height, xslop, yslop);
 		set_palette(palette);
+		if (palette)
+			palette->deref();
 	}
 	else
 	{
@@ -400,19 +404,15 @@ void bitmap_t::wrap(bitmap_t &source, const rectangle &subrect)
 
 void bitmap_t::set_palette(palette_t *palette)
 {
-	// first dereference any existing palette
-	if (m_palette != nullptr)
-	{
-		m_palette->deref();
-		m_palette = nullptr;
-	}
-
-	// then reference any new palette
-	if (palette != nullptr)
-	{
+	// first reference the new palette
+	if (palette)
 		palette->ref();
-		m_palette = palette;
-	}
+
+	// then dereference any existing palette
+	if (m_palette)
+		m_palette->deref();
+
+	m_palette = palette;
 }
 
 /**

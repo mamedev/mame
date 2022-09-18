@@ -1196,16 +1196,16 @@ void pokey_device::poly_init_9_17(uint32_t *poly, int size)
 {
 	LOG_RAND(("rand %d\n", size));
 
-	int mask = (1 << size) - 1;
+	const uint32_t mask = util::make_bitmask<uint32_t>(size);
 	uint32_t lfsr = mask;
 
 	if (size == 17)
 	{
-		for (int i = 0; i < mask; i++)
+		for (uint32_t i = 0; i < mask; i++)
 		{
-			/* calculate next bit @ 7 */
-			int in8 = ((lfsr >> 8) & 1) ^ ((lfsr >> 13) & 1);
-			int in = (lfsr & 1);
+			// calculate next bit @ 7
+			const uint32_t in8 = BIT(lfsr, 8) ^ BIT(lfsr, 13);
+			const uint32_t in = BIT(lfsr, 0);
 			lfsr = lfsr >> 1;
 			lfsr = (lfsr & 0xff7f) | (in8 << 7);
 			lfsr = (in << 16) | lfsr;
@@ -1216,10 +1216,10 @@ void pokey_device::poly_init_9_17(uint32_t *poly, int size)
 	}
 	else // size == 9
 	{
-		for (int i = 0; i < mask; i++)
+		for (uint32_t i = 0; i < mask; i++)
 		{
-			/* calculate next bit */
-			int in = ((lfsr >> 0) & 1) ^ ((lfsr >> 5) & 1);
+			// calculate next bit
+			const uint32_t in = BIT(lfsr, 0) ^ BIT(lfsr, 5);
 			lfsr = lfsr >> 1;
 			lfsr = (in << 8) | lfsr;
 			*poly = lfsr;

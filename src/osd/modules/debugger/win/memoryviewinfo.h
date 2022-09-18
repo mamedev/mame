@@ -24,6 +24,7 @@ public:
 	memoryview_info(debugger_windows_interface &debugger, debugwin_info &owner, HWND parent);
 	virtual ~memoryview_info();
 
+	char const *expression() const;
 	debug_view_memory::data_format data_format() const;
 	uint32_t chunks_per_row() const;
 	bool reverse() const;
@@ -36,6 +37,9 @@ public:
 	void set_reverse(bool reverse);
 	void set_physical(bool physical);
 	void set_address_radix(int radix);
+
+	virtual void restore_configuration_from_node(util::xml::data_node const &node) override;
+	virtual void save_configuration_to_node(util::xml::data_node &node) override;
 
 protected:
 	enum

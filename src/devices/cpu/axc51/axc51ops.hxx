@@ -393,7 +393,7 @@ void axc51base_cpu_device::inc_dptr(uint8_t r)
 {
 	//if (m_sfr_regs[SFR_DPCON] & 0x08) // auto-increment enabled (not used here)
 	//{
-	//	fatalerror("inc_dptr with auto-inc");
+	//  fatalerror("inc_dptr with auto-inc");
 	//}
 
 	if (m_sfr_regs[SFR_DPCON] & 0x04) // auto-toggle enabled
@@ -605,7 +605,7 @@ void axc51base_cpu_device::mov_dptr_byte(uint8_t r)
 {
 	//if (m_sfr_regs[SFR_DPCON] & 0x08) // auto-increment enabled (not used here)
 	//{
-	//	fatalerror("mov_dptr_byte with auto-inc");
+	//  fatalerror("mov_dptr_byte with auto-inc");
 	//}
 
 	if (m_sfr_regs[SFR_DPCON] & 0x04) // auto-toggle enabled

@@ -8,7 +8,7 @@
     TODO:
     - Move RBV machines (IIci/IIsi) to separate driver?
     - Move IIfx to separate driver?
-	- Rewrite this driver in the newer (maclc3/maciivx/maclc) style as macii.cpp?
+    - Rewrite this driver in the newer (maclc3/maciivx/maclc) style as macii.cpp?
 
 ****************************************************************************/
 

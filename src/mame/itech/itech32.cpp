@@ -837,7 +837,7 @@ void drivedge_state::tms1_68k_ram_w(offs_t offset, u32 data, u32 mem_mask)
 	if (offset == 0) COMBINE_DATA(m_tms1_boot);
 	if (offset == 0x382 && m_tms_spinning[0]) STOP_TMS_SPINNING(machine(), 0);
 	if (!m_tms_spinning[0])
-		machine().scheduler().boost_interleave(attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
+		machine().scheduler().add_quantum(attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
 }
 
 
@@ -846,21 +846,21 @@ void drivedge_state::tms2_68k_ram_w(offs_t offset, u32 data, u32 mem_mask)
 	COMBINE_DATA(&m_tms2_ram[offset]);
 	if (offset == 0x382 && m_tms_spinning[1]) STOP_TMS_SPINNING(machine(), 1);
 	if (!m_tms_spinning[1])
-		machine().scheduler().boost_interleave(attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
+		machine().scheduler().add_quantum(attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
 }
 
 
 void drivedge_state::tms1_trigger_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_tms1_ram[offset]);
-	machine().scheduler().boost_interleave(attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
+	machine().scheduler().add_quantum(attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
 }
 
 
 void drivedge_state::tms2_trigger_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_tms2_ram[offset]);
-	machine().scheduler().boost_interleave(attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
+	machine().scheduler().add_quantum(attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
 }
 
 

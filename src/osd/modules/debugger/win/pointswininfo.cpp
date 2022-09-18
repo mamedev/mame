@@ -11,6 +11,8 @@
 
 #include "debugviewinfo.h"
 
+#include "util/xmlfile.h"
+
 #include "winutf8.h"
 
 
@@ -130,4 +132,45 @@ bool pointswin_info::handle_command(WPARAM wparam, LPARAM lparam)
 		break;
 	}
 	return debugwin_info::handle_command(wparam, lparam);
+}
+
+
+void pointswin_info::restore_configuration_from_node(util::xml::data_node const &node)
+{
+	switch (node.get_attribute_int(osd::debugger::ATTR_WINDOW_POINTS_TYPE, -1))
+	{
+	case 0:
+		SendMessage(window(), WM_COMMAND, ID_SHOW_BREAKPOINTS, 0);
+		break;
+	case 1:
+		SendMessage(window(), WM_COMMAND, ID_SHOW_WATCHPOINTS, 0);
+		break;
+	case 2:
+		SendMessage(window(), WM_COMMAND, ID_SHOW_REGISTERPOINTS, 0);
+		break;
+	}
+
+	debugwin_info::restore_configuration_from_node(node);
+}
+
+
+void pointswin_info::save_configuration_to_node(util::xml::data_node &node)
+{
+	debugwin_info::save_configuration_to_node(node);
+
+	node.set_attribute_int(osd::debugger::ATTR_WINDOW_TYPE, osd::debugger::WINDOW_TYPE_POINTS_VIEWER);
+	switch (m_views[0]->type())
+	{
+	case DVT_BREAK_POINTS:
+		node.set_attribute_int(osd::debugger::ATTR_WINDOW_POINTS_TYPE, 0);
+		break;
+	case DVT_WATCH_POINTS:
+		node.set_attribute_int(osd::debugger::ATTR_WINDOW_POINTS_TYPE, 1);
+		break;
+	case DVT_REGISTER_POINTS:
+		node.set_attribute_int(osd::debugger::ATTR_WINDOW_POINTS_TYPE, 2);
+		break;
+	default:
+		break;
+	}
 }

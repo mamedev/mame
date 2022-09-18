@@ -2,19 +2,19 @@
 // copyright-holders:SomeRandomGuyIdk
 /**********************************************************************
 
-	Barcrest MPU1 (1978)
+    Barcrest MPU1 (1978)
 
-	Barcrest's first fruit machine platform to use a conventional CPU, 
-	possibly the first of it's kind. Has electromechanical reels 
-	instead of the usual stepper reels. The hardware features a MC6800 
-	CPU clocked at around 1 MHz, 128 bytes of RAM and two PIAs for I/O. 
-	The PIAs can interface with up to 13 lamps, 4 reels, 8 triacs and 12 inputs 
-    (4 of these being special coin inputs). A 1-bit DAC is used for audio. 
-	Games are stored on cartridges that can hold up to 4K of data. 
-	Most cartridges use a common 2K mask ROM, with the remaining 2K 
-	available for the game program.
-	
-	TODO:
+    Barcrest's first fruit machine platform to use a conventional CPU,
+    possibly the first of it's kind. Has electromechanical reels
+    instead of the usual stepper reels. The hardware features a MC6800
+    CPU clocked at around 1 MHz, 128 bytes of RAM and two PIAs for I/O.
+    The PIAs can interface with up to 13 lamps, 4 reels, 8 triacs and 12 inputs
+    (4 of these being special coin inputs). A 1-bit DAC is used for audio.
+    Games are stored on cartridges that can hold up to 4K of data.
+    Most cartridges use a common 2K mask ROM, with the remaining 2K
+    available for the game program.
+
+    TODO:
     - Layouts (there currently aren't any...)
 
 **********************************************************************/
@@ -185,7 +185,7 @@ uint8_t mpu1_state::pia2_porta_r()
 		uint16_t pos = m_reel_pos[m_reel_select];
 		if(pos % 20 == 0)
 			return (pos / 20) + 1;
-		else 
+		else
 			return 0;
 	}
 	else
@@ -254,7 +254,7 @@ TIMER_CALLBACK_MEMBER( mpu1_state::change_pia2a_bit7 )
 }
 
 /* MPU1 does not have stepper reels, it instead uses an electromechanical reel system.
-   Each reel has a single output - setting the output high causes the reel to start moving, 
+   Each reel has a single output - setting the output high causes the reel to start moving,
    and once it's set back low, the reel will stop at whichever symbol it's heading towards.
    Position tracking is done via contacts on index plates below each symbol, which the CPU
    will read once all reels are stopped.
@@ -287,7 +287,7 @@ void mpu1_state::reel_w(int reel, bool state)
 	}
 }
 
-template <unsigned Reel> 
+template <unsigned Reel>
 TIMER_CALLBACK_MEMBER( mpu1_state::reel_move )
 {
 	if(m_reel_pos[Reel] == 0)
@@ -390,7 +390,7 @@ void mpu1_state::machine_start()
 	m_reel_timer[3] = timer_alloc(FUNC(mpu1_state::reel_move<3>), this);
 	m_change_pia2a_bit7_timer = timer_alloc(FUNC(mpu1_state::change_pia2a_bit7), this);
 
-	for(int i = 0; i < 4; i++) 
+	for(int i = 0; i < 4; i++)
 	{
 		m_reel_state[i] = REEL_STOPPED;
 		m_reel_pos[i] = 0;

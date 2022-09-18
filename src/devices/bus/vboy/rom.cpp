@@ -9,6 +9,7 @@
 #include "bus/generic/slot.h"
 
 //#define VERBOSE 1
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 

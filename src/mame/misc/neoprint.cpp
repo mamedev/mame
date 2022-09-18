@@ -233,7 +233,7 @@ void neoprint_state::audio_command_w(offs_t offset, uint8_t data, uint8_t mem_ma
 	audio_cpu_assert_nmi();
 
 	/* boost the interleave to let the audio CPU read the command */
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
+	machine().scheduler().perfect_quantum(attotime::from_usec(50));
 
 	//if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_command_w %04x - %04x\n", m_maincpu->pc(), data, mem_mask);
 }

@@ -2278,6 +2278,17 @@ void _8080bw_state::polaris(machine_config &config)
 /*                                                     */
 /*******************************************************/
 
+void ozmawars_state::ozmawars_io_map(address_map &map)
+{
+	map(0x00, 0x00).portr("IN0").nopw(); // ozmawars2 writes random stuff here
+	map(0x01, 0x01).portr("IN1");
+	map(0x02, 0x02).portr("IN2");
+	map(0x03, 0x03).w(FUNC(ozmawars_state::ozmawars_port03_w));
+	map(0x04, 0x04).w(FUNC(ozmawars_state::ozmawars_port04_w));
+	map(0x05, 0x05).w(FUNC(ozmawars_state::ozmawars_port05_w));
+	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+}
+
 static INPUT_PORTS_START( ozmawars )
 	PORT_INCLUDE( sicv_base )
 
@@ -2306,6 +2317,27 @@ static INPUT_PORTS_START( spaceph )
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
+
+void ozmawars_state::ozmawars(machine_config &config)
+{
+	mw8080bw_root(config);
+
+	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_IO, &ozmawars_state::ozmawars_io_map);
+	MCFG_MACHINE_START_OVERRIDE(ozmawars_state,extra_8080bw)
+
+	/* 60 Hz signal clocks two LS161. Ripple carry will */
+	/* reset circuit, if LS161 not cleared before.      */
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 255);
+
+	/* video hardware */
+	m_screen->set_screen_update(FUNC(ozmawars_state::screen_update_invadpt2));
+
+	PALETTE(config, m_palette, palette_device::RBG_3BIT);
+
+	/* sound hardware */
+	ozmawars_samples_audio(config);
+}
 
 
 
@@ -5998,8 +6030,8 @@ GAME( 1980, vortex,      0,        vortex,    vortex,    vortex_state,   init_vo
 
 GAME( 1979, rollingc,    0,        rollingc,  rollingc,  rollingc_state, empty_init,    ROT270, "Nichibutsu",                         "Rolling Crash / Moon Base",                                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1979, ozmawars,    0,        invadpt2,  ozmawars,  _8080bw_state,  empty_init,    ROT270, "SNK",                                "Ozma Wars (set 1)",                                               MACHINE_SUPPORTS_SAVE )
-GAME( 1979, ozmawars2,   ozmawars, invadpt2,  ozmawars,  _8080bw_state,  empty_init,    ROT270, "SNK",                                "Ozma Wars (set 2)",                                               MACHINE_SUPPORTS_SAVE ) // Uses Taito's three board color version of Space Invaders PCB
+GAME( 1979, ozmawars,    0,        ozmawars,  ozmawars,  ozmawars_state, empty_init,    ROT270, "SNK",                                "Ozma Wars (set 1)",                                               MACHINE_SUPPORTS_SAVE )
+GAME( 1979, ozmawars2,   ozmawars, ozmawars,  ozmawars,  ozmawars_state, empty_init,    ROT270, "SNK",                                "Ozma Wars (set 2)",                                               MACHINE_SUPPORTS_SAVE ) // Uses Taito's three board color version of Space Invaders PCB
 GAME( 1979, ozmawarsmr,  ozmawars, invaders,  ozmawars,  invaders_state, empty_init,    ROT270, "bootleg (Model Racing)",             "Ozma Wars (Model Racing bootleg)",                                MACHINE_SUPPORTS_SAVE )
 GAME( 1979, spaceph,     ozmawars, invaders,  spaceph,   invaders_state, empty_init,    ROT270, "bootleg? (Zilec Games)",             "Space Phantoms (bootleg of Ozma Wars)",                           MACHINE_SUPPORTS_SAVE )
 GAME( 1979, solfight,    ozmawars, invaders,  ozmawars,  invaders_state, empty_init,    ROT270, "bootleg",                            "Solar Fight (bootleg of Ozma Wars)",                              MACHINE_SUPPORTS_SAVE )

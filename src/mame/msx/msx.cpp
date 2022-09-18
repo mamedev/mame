@@ -7924,7 +7924,7 @@ void msx2_state::hx33(machine_config &config)
 /* MSX@ - Toshiba HX-34 */
 
 ROM_START(hx34)
-ROM_REGION(0x18000, "maincpu", 0)
+	ROM_REGION(0x18000, "maincpu", 0)
 	ROM_LOAD("hx34bios.rom",  0x0000, 0x8000, CRC(3891e0f7) SHA1(7dfb18262d48e559fffb4199acbe29d9b4bee9db))
 	ROM_LOAD("hx34ext.rom",   0x8000, 0x4000, CRC(4a48779c) SHA1(b8e30d604d319d511cbfbc61e5d8c38fbb9c5a33))
 	// hx34disk.rom has contents of floppy registers at offset 3ff0-3ff7 and mirrored at 3ff8-3fff

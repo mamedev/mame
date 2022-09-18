@@ -132,7 +132,7 @@ protected:
 	// TODO: DMAC3 probably transfers more than one byte at a time
 	required_address_space m_bus;
 	devcb_write_line m_irq_handler;
-	devcb_read8::array<2> m_dma_r;  
+	devcb_read8::array<2> m_dma_r;
 	devcb_write8::array<2> m_dma_w;
 	device_delegate<uint32_t(uint32_t)> m_apbus_virt_to_phys_callback;
 

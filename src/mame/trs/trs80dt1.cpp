@@ -384,7 +384,6 @@ void trs80dt1_state::trs80dt1(machine_config &config)
 }
 
 ROM_START( trs80dt1 )
-
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "trs80dt1.u12", 0x0000, 0x1000, CRC(04e8a53f) SHA1(7b5d5047319ef8f230b82684d97a918b564d466e) )
 	ROM_FILL(0x9a,1,0xd4) // fix for timer0 problem

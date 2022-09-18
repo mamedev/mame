@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria
+// copyright-holders: Nicola Salmoria
+
 /***************************************************************************
 
     Bank Panic / Combat Hawk hardware
@@ -9,7 +10,7 @@
     driver by Nicola Salmoria
 
 
-    PCB Layout (Comba Hawk)
+    PCB Layout (Combat Hawk)
     -----------------------
 
     C2-00170-A BANK PANIC (screened on PCB)
@@ -94,29 +95,245 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "bankp.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
-#define MASTER_CLOCK    XTAL(15'468'480)
+namespace {
 
-// Video timing
-// PCB measured: H = 15.61khz V = 60.99hz, +/- 0.01hz
-// --> VTOTAL should be OK, HTOTAL not 100% certain
-#define PIXEL_CLOCK     MASTER_CLOCK/3
+class bankp_state : public driver_device
+{
+public:
+	bankp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_videoram(*this, "videoram%u", 1U),
+		m_colorram(*this, "colorram%u", 1U),
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")
+	{ }
 
-#define HTOTAL          330
-#define HBEND           0+3*8
-#define HBSTART         224+3*8
+	void bankp(machine_config &config);
 
-#define VTOTAL          256
-#define VBEND           0+2*8
-#define VBSTART         224+2*8
+protected:
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
+private:
+	// memory pointers
+	required_shared_ptr_array<uint8_t, 2> m_videoram;
+	required_shared_ptr_array<uint8_t, 2> m_colorram;
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	// video-related
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	uint8_t m_scroll_x = 0;
+	uint8_t m_priority = 0;
+
+	uint8_t m_nmi_mask = 0;
+
+	void scroll_w(uint8_t data);
+	template <uint8_t Which> void videoram_w(offs_t offset, uint8_t data);
+	template <uint8_t Which> void colorram_w(offs_t offset, uint8_t data);
+	void out_w(uint8_t data);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void io_map(address_map &map);
+	void prg_map(address_map &map);
+};
+
+
+// video
+
+/***************************************************************************
+
+  Convert the color PROMs into a more useable format.
+
+  Bank Panic has a 32x8 palette PROM (I'm not sure whether the second 16
+  bytes are used - they contain the same colors as the first 16 with only
+  one different) and two 256x4 lookup table PROMs (one for charset #1, one
+  for charset #2 - only the first 128 nibbles seem to be used).
+
+  I don't know for sure how the palette PROM is connected to the RGB output,
+  but it's probably the usual:
+
+  bit 7 -- 220 ohm resistor  -- BLUE
+        -- 470 ohm resistor  -- BLUE
+        -- 220 ohm resistor  -- GREEN
+        -- 470 ohm resistor  -- GREEN
+        -- 1  kohm resistor  -- GREEN
+        -- 220 ohm resistor  -- RED
+        -- 470 ohm resistor  -- RED
+  bit 0 -- 1  kohm resistor  -- RED
+
+***************************************************************************/
+
+void bankp_state::palette(palette_device &palette) const
+{
+	const uint8_t *color_prom = memregion("proms")->base();
+
+	for (int i = 0; i < 32; i++)
+	{
+		int bit0, bit1, bit2;
+
+		// red component
+		bit0 = BIT(*color_prom, 0);
+		bit1 = BIT(*color_prom, 1);
+		bit2 = BIT(*color_prom, 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// green component
+		bit0 = BIT(*color_prom, 3);
+		bit1 = BIT(*color_prom, 4);
+		bit2 = BIT(*color_prom, 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// blue component
+		bit0 = 0;
+		bit1 = BIT(*color_prom, 6);
+		bit2 = BIT(*color_prom, 7);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette.set_indirect_color(i, rgb_t(r, g, b));
+
+		color_prom++;
+	}
+
+	// color_prom now points to the beginning of the lookup table
+
+	// charset #1 lookup table
+	for (int i = 0; i < m_gfxdecode->gfx(0)->colors() * m_gfxdecode->gfx(0)->granularity(); i++)
+		palette.set_pen_indirect(m_gfxdecode->gfx(0)->colorbase() + i, *color_prom++ & 0x0f);
+
+	color_prom += 128;  // skip the bottom half of the PROM - seems to be not used
+
+	// charset #2 lookup table
+	for (int i = 0; i < m_gfxdecode->gfx(1)->colors() * m_gfxdecode->gfx(1)->granularity(); i++)
+		palette.set_pen_indirect(m_gfxdecode->gfx(1)->colorbase() + i, *color_prom++ & 0x0f);
+
+	// the bottom half of the PROM seems to be not used
+}
+
+void bankp_state::scroll_w(uint8_t data)
+{
+	m_scroll_x = data;
+}
+
+template <uint8_t Which>
+void bankp_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[Which][offset] = data;
+	Which ? m_bg_tilemap->mark_tile_dirty(offset) : m_fg_tilemap->mark_tile_dirty(offset);
+}
+
+template <uint8_t Which>
+void bankp_state::colorram_w(offs_t offset, uint8_t data)
+{
+	m_colorram[Which][offset] = data;
+	Which ? m_bg_tilemap->mark_tile_dirty(offset) : m_fg_tilemap->mark_tile_dirty(offset);
+}
+
+void bankp_state::out_w(uint8_t data)
+{
+	// bits 0-1 are playfield priority
+	// TODO: understand how this works
+	m_priority = data & 0x03;
+
+	// bits 2-3 unknown (2 is used)
+
+	// bit 4 controls NMI
+	m_nmi_mask = (data & 0x10) >> 4;
+
+	// bit 5 controls screen flip
+	flip_screen_set(data & 0x20);
+
+	// bits 6-7 unknown
+}
+
+TILE_GET_INFO_MEMBER(bankp_state::get_bg_tile_info)
+{
+	int const code = m_videoram[1][tile_index] + 256 * (m_colorram[1][tile_index] & 0x07);
+	int const color = m_colorram[1][tile_index] >> 4;
+	int const flags = (m_colorram[1][tile_index] & 0x08) ? TILE_FLIPX : 0;
+
+	tileinfo.set(1, code, color, flags);
+	tileinfo.group = color;
+}
+
+TILE_GET_INFO_MEMBER(bankp_state::get_fg_tile_info)
+{
+	int const code = m_videoram[0][tile_index] + 256 * ((m_colorram[0][tile_index] & 3) >> 0);
+	int const color = m_colorram[0][tile_index] >> 3;
+	int const flags = (m_colorram[0][tile_index] & 0x04) ? TILE_FLIPX : 0;
+
+	tileinfo.set(0, code, color, flags);
+	tileinfo.group = color;
+}
+
+void bankp_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bankp_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bankp_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	m_bg_tilemap->configure_groups(*m_gfxdecode->gfx(1), 0);
+	m_fg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 0);
+
+	save_item(NAME(m_scroll_x));
+	save_item(NAME(m_priority));
+	save_item(NAME(m_nmi_mask));
+}
+
+uint32_t bankp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	if (flip_screen())
+	{
+		m_fg_tilemap->set_scrollx(0, 240 - m_scroll_x);
+		m_bg_tilemap->set_scrollx(0, 240);
+	}
+	else
+	{
+		m_fg_tilemap->set_scrollx(0, m_scroll_x);
+		m_bg_tilemap->set_scrollx(0, 0);
+	}
+
+
+	// only one bit matters?
+	switch (m_priority)
+	{
+	case 0: // combat hawk uses this
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		break;
+	case 1:
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		break;
+	case 2:
+		m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		break;
+	case 3:
+		m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0); // just a guess
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		break;
+	}
+	return 0;
+}
+
+
+// machine
 
 /*************************************
  *
@@ -124,17 +341,17 @@
  *
  *************************************/
 
-void bankp_state::bankp_map(address_map &map)
+void bankp_state::prg_map(address_map &map)
 {
 	map(0x0000, 0xdfff).rom();
 	map(0xe000, 0xefff).ram();
-	map(0xf000, 0xf3ff).ram().w(FUNC(bankp_state::videoram_w)).share("videoram");
-	map(0xf400, 0xf7ff).ram().w(FUNC(bankp_state::colorram_w)).share("colorram");
-	map(0xf800, 0xfbff).ram().w(FUNC(bankp_state::videoram2_w)).share("videoram2");
-	map(0xfc00, 0xffff).ram().w(FUNC(bankp_state::colorram2_w)).share("colorram2");
+	map(0xf000, 0xf3ff).ram().w(FUNC(bankp_state::videoram_w<0>)).share(m_videoram[0]);
+	map(0xf400, 0xf7ff).ram().w(FUNC(bankp_state::colorram_w<0>)).share(m_colorram[0]);
+	map(0xf800, 0xfbff).ram().w(FUNC(bankp_state::videoram_w<1>)).share(m_videoram[1]);
+	map(0xfc00, 0xffff).ram().w(FUNC(bankp_state::colorram_w<1>)).share(m_colorram[1]);
 }
 
-void bankp_state::bankp_io_map(address_map &map)
+void bankp_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("IN0").w("sn1", FUNC(sn76489_device::write));
@@ -192,8 +409,8 @@ static INPUT_PORTS_START( bankp )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SW1:5")
-	PORT_DIPSETTING(    0x00, "70K 200K 500K" )             /* and 900K 1500K 2000K */
-	PORT_DIPSETTING(    0x10, "100K 400K 800K" )            /* and 1200K 2000K 3000K */
+	PORT_DIPSETTING(    0x00, "70K 200K 500K" )             // and 900K 1500K 2000K
+	PORT_DIPSETTING(    0x10, "100K 400K 800K" )            // and 1200K 2000K 3000K
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
@@ -250,28 +467,28 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,    /* 8*8 characters */
-	1024,   /* 1024 characters */
-	2,  /* 2 bits per pixel */
-	{ 0, 4 },   /* the bitplanes are packed in one byte */
+	8,8,    // 8*8 characters
+	1024,   // 1024 characters
+	2,  // 2 bits per pixel
+	{ 0, 4 },   // the bitplanes are packed in one byte
 	{ STEP4(8*8+3,-1), STEP4(0*8+3,-1) },
 	{ STEP8(0*8,8) },
-	16*8    /* every char takes 8 consecutive bytes */
+	16*8    // every char takes 8 consecutive bytes
 };
 static const gfx_layout charlayout2 =
 {
-	8,8,    /* 8*8 characters */
-	2048,   /* 2048 characters */
-	3,  /* 3 bits per pixel */
-	{ 0, 2048*8*8, 2*2048*8*8 },    /* the bitplanes are separated */
+	8,8,    // 8*8 characters
+	2048,   // 2048 characters
+	3,  // 3 bits per pixel
+	{ 0, 2048*8*8, 2*2048*8*8 },    // the bitplanes are separated
 	{ STEP8(7,-1) },
 	{ STEP8(0*8,8) },
-	8*8 /* every char takes 8 consecutive bytes */
+	8*8 // every char takes 8 consecutive bytes
 };
 
 static GFXDECODE_START( gfx_bankp )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 32 )
-	GFXDECODE_ENTRY( "gfx2", 0, charlayout2,  32*4, 16 )
+	GFXDECODE_ENTRY( "fgtiles", 0, charlayout,      0, 32 )
+	GFXDECODE_ENTRY( "bgtiles", 0, charlayout2,  32*4, 16 )
 GFXDECODE_END
 
 /*************************************
@@ -289,36 +506,51 @@ void bankp_state::machine_reset()
 
 INTERRUPT_GEN_MEMBER(bankp_state::vblank_irq)
 {
-	if(m_nmi_mask)
+	if (m_nmi_mask)
 		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void bankp_state::bankp(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, MASTER_CLOCK/6);
-	m_maincpu->set_addrmap(AS_PROGRAM, &bankp_state::bankp_map);
-	m_maincpu->set_addrmap(AS_IO, &bankp_state::bankp_io_map);
+	static constexpr XTAL MASTER_CLOCK = XTAL(15'468'480);
+
+	// Video timing
+	// PCB measured: H = 15.61khz V = 60.99hz, +/- 0.01hz
+	// --> VTOTAL should be OK, HTOTAL not 100% certain
+	static constexpr XTAL PIXEL_CLOCK = MASTER_CLOCK / 3;
+
+	static constexpr int HTOTAL  =      330;
+	static constexpr int HBEND   =      0 + 3 * 8;
+	static constexpr int HBSTART =      224 + 3 * 8;
+
+	static constexpr int VTOTAL  =      256;
+	static constexpr int VBEND   =      0 + 2 * 8;
+	static constexpr int VBSTART =      224 + 2 * 8;
+
+	// basic machine hardware
+	Z80(config, m_maincpu, MASTER_CLOCK / 6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bankp_state::prg_map);
+	m_maincpu->set_addrmap(AS_IO, &bankp_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(bankp_state::vblank_irq));
 
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	screen.set_screen_update(FUNC(bankp_state::screen_update));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bankp);
-	PALETTE(config, m_palette, FUNC(bankp_state::bankp_palette), 32*4+16*8, 32);
+	PALETTE(config, m_palette, FUNC(bankp_state::palette), 32 * 4 + 16 * 8, 32);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	SN76489(config, "sn1", MASTER_CLOCK/6).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489(config, "sn1", MASTER_CLOCK / 6).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	SN76489(config, "sn2", MASTER_CLOCK/6).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489(config, "sn2", MASTER_CLOCK / 6).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	SN76489(config, "sn3", MASTER_CLOCK/6).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489(config, "sn3", MASTER_CLOCK / 6).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -336,12 +568,12 @@ ROM_START( bankp )
 	ROM_LOAD( "epr-6173.7h",  0x8000, 0x4000, CRC(b8405d38) SHA1(0f62a972f38b4ddcea77eb0e1d76c70ddbcb7b11) )
 	ROM_LOAD( "epr-6176.7d",  0xc000, 0x2000, CRC(c98ac200) SHA1(1bdb87868deebe03da18280e617530c24118da1c) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "epr-6165.5l",  0x0000, 0x2000, CRC(aef34a93) SHA1(513895cd3144977b3d9b5ac7f2bf40384d69e157) )    /* playfield #1 chars */
+	ROM_REGION( 0x04000, "fgtiles", 0 )
+	ROM_LOAD( "epr-6165.5l",  0x0000, 0x2000, CRC(aef34a93) SHA1(513895cd3144977b3d9b5ac7f2bf40384d69e157) )
 	ROM_LOAD( "epr-6166.5k",  0x2000, 0x2000, CRC(ca13cb11) SHA1(3aca0b0d3f052a742e1cd0b96bfad834e78fcd7d) )
 
-	ROM_REGION( 0x0c000, "gfx2", 0 )
-	ROM_LOAD( "epr-6172.5b",  0x0000, 0x2000, CRC(c4c4878b) SHA1(423143d81408eda96f87bdc3a306517c473cbe00) )    /* playfield #2 chars */
+	ROM_REGION( 0x0c000, "bgtiles", 0 )
+	ROM_LOAD( "epr-6172.5b",  0x0000, 0x2000, CRC(c4c4878b) SHA1(423143d81408eda96f87bdc3a306517c473cbe00) )
 	ROM_LOAD( "epr-6171.5d",  0x2000, 0x2000, CRC(a18165a1) SHA1(9a7513ea84f9231edba4e637df28a1705c8cdeb0) )
 	ROM_LOAD( "epr-6170.5e",  0x4000, 0x2000, CRC(b58aa8fa) SHA1(432b43cd9af4e3dab579cfd191b731aa11ceb121) )
 	ROM_LOAD( "epr-6169.5f",  0x6000, 0x2000, CRC(1aa37fce) SHA1(6e2402683145de8972a53c9ec01da9a422392bed) )
@@ -349,13 +581,13 @@ ROM_START( bankp )
 	ROM_LOAD( "epr-6167.5i",  0xa000, 0x2000, CRC(3fa337e1) SHA1(5fdc45436be27cceb5157bd6201c30e3de28fd7b) )
 
 	ROM_REGION( 0x0220, "proms", 0 )
-	ROM_LOAD( "pr-6177.8a",   0x0000, 0x020, CRC(eb70c5ae) SHA1(13613dad6c14004278f777d6f3f62712a2a85773) )     /* palette */
-	ROM_LOAD( "pr-6178.6f",   0x0020, 0x100, CRC(0acca001) SHA1(54c354d825a24a9085867b114a2cd6835baebe55) )     /* charset #1 lookup table */
-	ROM_LOAD( "pr-6179.5a",   0x0120, 0x100, CRC(e53bafdb) SHA1(7a414f6db5476dd7d0217e5b846ed931381eda02) )     /* charset #2 lookup table */
+	ROM_LOAD( "pr-6177.8a",   0x0000, 0x020, CRC(eb70c5ae) SHA1(13613dad6c14004278f777d6f3f62712a2a85773) )     // palette
+	ROM_LOAD( "pr-6178.6f",   0x0020, 0x100, CRC(0acca001) SHA1(54c354d825a24a9085867b114a2cd6835baebe55) )     // fgtiles lookup table
+	ROM_LOAD( "pr-6179.5a",   0x0120, 0x100, CRC(e53bafdb) SHA1(7a414f6db5476dd7d0217e5b846ed931381eda02) )     // bgtiles lookup table
 
 	ROM_REGION( 0x025c, "user1", 0 )
 	ROM_LOAD( "315-5074.2c.bin",   0x0000, 0x025b, CRC(2e57bbba) SHA1(c3e45e8a972342779442e50872a2f5f2d61e9c0a) )
-	ROM_LOAD( "315-5073.pal16l4",  0x0000, 0x0001, NO_DUMP ) /* read protected */
+	ROM_LOAD( "315-5073.pal16l4",  0x0000, 0x0001, NO_DUMP ) // read protected
 ROM_END
 
 
@@ -366,11 +598,11 @@ ROM_START( combh )
 	ROM_LOAD( "epr-10906.7h",  0x8000, 0x4000, CRC(16d54885) SHA1(e00fc618bb1a1f8c160fe2a0d4de6d9750313643) )
 	ROM_LOAD( "epr-10903.7d",  0xc000, 0x2000, CRC(b7a59cab) SHA1(6321fa9bdf580d76267b13fcf7dc066a45e0c926) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_REGION( 0x04000, "fgtiles", 0 )
 	ROM_LOAD( "epr-10914.5l",  0x0000, 0x2000, CRC(7d7a2340) SHA1(7411131bf929eaf11e12047eea74158daf8dd274) )
 	ROM_LOAD( "epr-10913.5k",  0x2000, 0x2000, CRC(d5c1a8ae) SHA1(4f05fd183918bcc5e7b312df5a22f92756cec01d) )
 
-	ROM_REGION( 0x0c000, "gfx2", 0 )
+	ROM_REGION( 0x0c000, "bgtiles", 0 )
 	ROM_LOAD( "epr-10907.5b",  0x0000, 0x2000, CRC(08e5eea3) SHA1(1ab46f9f390a4d8647b0bc07bff66f4d7f47b19e) )
 	ROM_LOAD( "epr-10908.5d",  0x2000, 0x2000, CRC(d9e413f5) SHA1(c9eb038eed97fcdb56c368f5540b372a1c7b4250) )
 	ROM_LOAD( "epr-10909.5e",  0x4000, 0x2000, CRC(fec7962c) SHA1(1e58cb19d3a80164a9968e42eea0503364dad017) )
@@ -379,14 +611,16 @@ ROM_START( combh )
 	ROM_LOAD( "epr-10912.5i",  0xa000, 0x2000, CRC(cbe22738) SHA1(2dbdb593882ec66e783411f02941ce822e1c62a1) )
 
 	ROM_REGION( 0x0220, "proms", 0 )
-	ROM_LOAD( "pr-10900.8a",   0x0000, 0x020, CRC(f95fcd66) SHA1(ed7bf6691a942f344b0230310876a63a68606922) )    /* palette */
-	ROM_LOAD( "pr-10901.6f",   0x0020, 0x100, CRC(6fd981c8) SHA1(0bd2e7b72fd5e055224a675108e2e706cd6f6e5a) )    /* charset #2 lookup table */
-	ROM_LOAD( "pr-10902.5a",   0x0120, 0x100, CRC(84d6bded) SHA1(67d9c4c7d7c84eb54ec655a4cf1768ca0cbb047d) )    /* charset #1 lookup table */
+	ROM_LOAD( "pr-10900.8a",   0x0000, 0x020, CRC(f95fcd66) SHA1(ed7bf6691a942f344b0230310876a63a68606922) )    // palette
+	ROM_LOAD( "pr-10901.6f",   0x0020, 0x100, CRC(6fd981c8) SHA1(0bd2e7b72fd5e055224a675108e2e706cd6f6e5a) )    // bgtiles lookup table
+	ROM_LOAD( "pr-10902.5a",   0x0120, 0x100, CRC(84d6bded) SHA1(67d9c4c7d7c84eb54ec655a4cf1768ca0cbb047d) )    // fgtiles lookup table
 
 	ROM_REGION( 0x025c, "user1", 0 )
 	ROM_LOAD( "315-5074.2c.bin",   0x0000, 0x025b, CRC(2e57bbba) SHA1(c3e45e8a972342779442e50872a2f5f2d61e9c0a) )
-	ROM_LOAD( "315-5073.pal16l4",  0x0000, 0x0001, NO_DUMP ) /* read protected */
+	ROM_LOAD( "315-5073.pal16l4",  0x0000, 0x0001, NO_DUMP ) // read protected
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************************

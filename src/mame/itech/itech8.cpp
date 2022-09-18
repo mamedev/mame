@@ -2054,83 +2054,110 @@ ROM_START( stratab1 )
 ROM_END
 
 
+/*
+Fun fact:
+ With the earlier versions of Golden Tee Golf, GROM5 changes with every set but the label doesn't change or give any indication
+   the data would be different between sets.
+ The sound CPU code also changes between most sets and finally stabilized with v1.1 with a revised SROM0. However earlier changes
+   weren't documented and the CPU code ROM was simply labeled GOLF SND (U27) with the sample ROM always labeled GOLF SROM0
+*/
 ROM_START( gtg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "gtg_joy_3.3_u5.u5", 0x00000, 0x10000, CRC(983a5c0c) SHA1(245fd6b86e96ef57ea9a85c7a501d846e135cfc6) ) /* Joystick version - Labeled GTG JOY V3.3 (U5) */
+	ROM_LOAD( "gtg_joy_v3.3_u5.u5", 0x00000, 0x10000, CRC(983a5c0c) SHA1(245fd6b86e96ef57ea9a85c7a501d846e135cfc6) ) /* Joystick version - Labeled GTG JOY V3.3 (U5) */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "u27.bin", 0x08000, 0x8000, CRC(358d2440) SHA1(7b09350c89f9d2c86dc187d8812bbf26b576a38f) )
+	ROM_LOAD( "golf_snd-v1.1_u27.u27", 0x08000, 0x8000, CRC(358d2440) SHA1(7b09350c89f9d2c86dc187d8812bbf26b576a38f) ) /* Labeled GOLF SND-V1.1 (U27) */
 
 	ROM_REGION( 0xc0000, "grom", 0 )
-	ROM_LOAD( "golf-grom0.grom0", 0x00000, 0x20000, CRC(a29c688a) SHA1(32dbb996a5e4c23cfd44b79312ac4a767658f20a) )
-	ROM_LOAD( "golf-grom1.grom1", 0x20000, 0x20000, CRC(b52a23f6) SHA1(092961acf47875179b44342e2dd8955670e67ea2) )
-	ROM_LOAD( "golf-grom2.grom2", 0x40000, 0x20000, CRC(9b8e3a61) SHA1(1b5682b1328d6c97b604fb71512e8f72322a688f) )
-	ROM_LOAD( "golf-grom3.grom3", 0x60000, 0x20000, CRC(b6e9fb15) SHA1(c1b28ea911696cb4ed56bfba212848693530b59f) )
-	ROM_LOAD( "golf-grom4.grom4", 0x80000, 0x20000, CRC(faa16729) SHA1(5d46cddda66b6d23c9ebdf2fb4cebce15586b4ad) )
-	ROM_LOAD( "grom5.grom5",      0xa0000, 0x20000, CRC(c108c56c) SHA1(5c67b6479e093c34e7ee2b68d93eba07a96f72e4) )
+	ROM_LOAD( "golf_grom00.grom0", 0x00000, 0x20000, CRC(a29c688a) SHA1(32dbb996a5e4c23cfd44b79312ac4a767658f20a) )
+	ROM_LOAD( "golf_grom01.grom1", 0x20000, 0x20000, CRC(b52a23f6) SHA1(092961acf47875179b44342e2dd8955670e67ea2) )
+	ROM_LOAD( "golf_grom02.grom2", 0x40000, 0x20000, CRC(9b8e3a61) SHA1(1b5682b1328d6c97b604fb71512e8f72322a688f) )
+	ROM_LOAD( "golf_grom03.grom3", 0x60000, 0x20000, CRC(b6e9fb15) SHA1(c1b28ea911696cb4ed56bfba212848693530b59f) )
+	ROM_LOAD( "golf_grom04.grom4", 0x80000, 0x20000, CRC(faa16729) SHA1(5d46cddda66b6d23c9ebdf2fb4cebce15586b4ad) )
+	ROM_LOAD( "golf_grom05.grom5", 0xa0000, 0x20000, CRC(c108c56c) SHA1(5c67b6479e093c34e7ee2b68d93eba07a96f72e4) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "srom0.bin", 0x00000, 0x20000, CRC(1cccbfdf) SHA1(546059fea2e7cd5627a666d80b1fc3ed8fcc0762) )
+	ROM_LOAD( "golf_srom0.srom0", 0x00000, 0x20000, CRC(1cccbfdf) SHA1(546059fea2e7cd5627a666d80b1fc3ed8fcc0762) )
 ROM_END
 
 
 ROM_START( gtgj31 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "gtg_joy_3.1_u5.u5", 0x00000, 0x10000, CRC(61984272) SHA1(be735f8576fb2cccc0e9e6ea6f2fd54b6c0b3bb3) ) /* Joystick version - Labeled GTG JOY V3.1 (U5) */
+	ROM_LOAD( "gtg_joy_v3.1_u5.u5", 0x00000, 0x10000, CRC(61984272) SHA1(be735f8576fb2cccc0e9e6ea6f2fd54b6c0b3bb3) ) /* Joystick version - Labeled GTG JOY V3.1 (U5) */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "u27.bin", 0x08000, 0x8000, CRC(358d2440) SHA1(7b09350c89f9d2c86dc187d8812bbf26b576a38f) )
+	ROM_LOAD( "golf_snd-v1.1_u27.u27", 0x08000, 0x8000, CRC(358d2440) SHA1(7b09350c89f9d2c86dc187d8812bbf26b576a38f) ) /* Labeled GOLF SND-V1.1 (U27) */
 
 	ROM_REGION( 0xc0000, "grom", 0 )
-	ROM_LOAD( "golf-grom0.grom0", 0x00000, 0x20000, CRC(a29c688a) SHA1(32dbb996a5e4c23cfd44b79312ac4a767658f20a) )
-	ROM_LOAD( "golf-grom1.grom1", 0x20000, 0x20000, CRC(b52a23f6) SHA1(092961acf47875179b44342e2dd8955670e67ea2) )
-	ROM_LOAD( "golf-grom2.grom2", 0x40000, 0x20000, CRC(9b8e3a61) SHA1(1b5682b1328d6c97b604fb71512e8f72322a688f) )
-	ROM_LOAD( "golf-grom3.grom3", 0x60000, 0x20000, CRC(b6e9fb15) SHA1(c1b28ea911696cb4ed56bfba212848693530b59f) )
-	ROM_LOAD( "golf-grom4.grom4", 0x80000, 0x20000, CRC(faa16729) SHA1(5d46cddda66b6d23c9ebdf2fb4cebce15586b4ad) )
-	ROM_LOAD( "grom5.bin",        0xa0000, 0x20000, CRC(5b393314) SHA1(9e314a75ea52373369904915ec786f09eee725a9) )
+	ROM_LOAD( "golf_grom00.grom0", 0x00000, 0x20000, CRC(a29c688a) SHA1(32dbb996a5e4c23cfd44b79312ac4a767658f20a) )
+	ROM_LOAD( "golf_grom01.grom1", 0x20000, 0x20000, CRC(b52a23f6) SHA1(092961acf47875179b44342e2dd8955670e67ea2) )
+	ROM_LOAD( "golf_grom02.grom2", 0x40000, 0x20000, CRC(9b8e3a61) SHA1(1b5682b1328d6c97b604fb71512e8f72322a688f) )
+	ROM_LOAD( "golf_grom03.grom3", 0x60000, 0x20000, CRC(b6e9fb15) SHA1(c1b28ea911696cb4ed56bfba212848693530b59f) )
+	ROM_LOAD( "golf_grom04.grom4", 0x80000, 0x20000, CRC(faa16729) SHA1(5d46cddda66b6d23c9ebdf2fb4cebce15586b4ad) )
+	ROM_LOAD( "golf_grom05.grom5", 0xa0000, 0x20000, CRC(5b393314) SHA1(9e314a75ea52373369904915ec786f09eee725a9) ) /* sldh */
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "srom0.bin", 0x00000, 0x20000, CRC(1cccbfdf) SHA1(546059fea2e7cd5627a666d80b1fc3ed8fcc0762) )
+	ROM_LOAD( "golf_srom0.srom0", 0x00000, 0x20000, CRC(1cccbfdf) SHA1(546059fea2e7cd5627a666d80b1fc3ed8fcc0762) )
 ROM_END
 
 
-ROM_START( gtgt )
+ROM_START( gtgt21 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "gtg.bim_2.0.u5", 0x0000, 0x10000, CRC(4c907166) SHA1(338a599645fa49c9fcbfbe5ba3431dafffddacc7) ) /* Trackball version */
+	ROM_LOAD( "gtg_bim_2.1.u5", 0x0000, 0x10000, CRC(25f626d9) SHA1(19d3e01f388ac4d430cda6e46b4dda8cfceaf325) ) /* Trackball version */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "golf-snd.u27", 0x08000, 0x8000, CRC(f6a7429b) SHA1(0fb378606c12c3543aa1ff603101e262acb9c692) )
+	ROM_LOAD( "golf_snd_u27.u27", 0x08000, 0x8000, CRC(ac6d3f32) SHA1(82b98df915cd794037ad863558e777f3ad10145b) ) /* Labeled GOLF SND (U27) - slds */
 
 	ROM_REGION( 0xc0000, "grom", 0 )
-	ROM_LOAD( "golf-grom0.grom0", 0x00000, 0x20000, CRC(a29c688a) SHA1(32dbb996a5e4c23cfd44b79312ac4a767658f20a) )
-	ROM_LOAD( "golf-grom1.grom1", 0x20000, 0x20000, CRC(b52a23f6) SHA1(092961acf47875179b44342e2dd8955670e67ea2) )
-	ROM_LOAD( "golf-grom2.grom2", 0x40000, 0x20000, CRC(9b8e3a61) SHA1(1b5682b1328d6c97b604fb71512e8f72322a688f) )
-	ROM_LOAD( "golf-grom3.grom3", 0x60000, 0x20000, CRC(b6e9fb15) SHA1(c1b28ea911696cb4ed56bfba212848693530b59f) )
-	ROM_LOAD( "golf-grom4.grom4", 0x80000, 0x20000, CRC(faa16729) SHA1(5d46cddda66b6d23c9ebdf2fb4cebce15586b4ad) )
-	ROM_LOAD( "golf-grom5.grom5", 0xa0000, 0x10000, CRC(62a523d2) SHA1(431f89fa044bf0ed3c197745d9c1a61f666da658) )
+	ROM_LOAD( "golf_grom00.grom0", 0x00000, 0x20000, CRC(a29c688a) SHA1(32dbb996a5e4c23cfd44b79312ac4a767658f20a) )
+	ROM_LOAD( "golf_grom01.grom1", 0x20000, 0x20000, CRC(b52a23f6) SHA1(092961acf47875179b44342e2dd8955670e67ea2) )
+	ROM_LOAD( "golf_grom02.grom2", 0x40000, 0x20000, CRC(9b8e3a61) SHA1(1b5682b1328d6c97b604fb71512e8f72322a688f) )
+	ROM_LOAD( "golf_grom03.grom3", 0x60000, 0x20000, CRC(b6e9fb15) SHA1(c1b28ea911696cb4ed56bfba212848693530b59f) )
+	ROM_LOAD( "golf_grom04.grom4", 0x80000, 0x20000, CRC(faa16729) SHA1(5d46cddda66b6d23c9ebdf2fb4cebce15586b4ad) )
+	ROM_LOAD( "golf_grom05.grom5", 0xa0000, 0x10000, CRC(dab92dfb) SHA1(f99f553d48fb0600d971959efb4d0410d7606131) ) /* sldh */
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "golf-srom0.bin", 0x00000, 0x20000, CRC(1cccbfdf) SHA1(546059fea2e7cd5627a666d80b1fc3ed8fcc0762) )
+	ROM_LOAD( "golf_srom0.srom0", 0x00000, 0x20000, CRC(d041e0c9) SHA1(1d90f37071d92c714ff69ab2b0337c7c66147995) ) /* sldh */
 ROM_END
 
 
-ROM_START( gtgt1 )
+ROM_START( gtgt20 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "gtg.bim_1.0.u5", 0x00000, 0x10000, CRC(ec70b510) SHA1(318984d77eb1df6258b855781ae1c9a09aa74f15) ) /* Trackball version */
+	ROM_LOAD( "gtg_bim_2.0.u5", 0x0000, 0x10000, CRC(4c907166) SHA1(338a599645fa49c9fcbfbe5ba3431dafffddacc7) ) /* Trackball version */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "snd-u27.256", 0x08000, 0x8000, CRC(471da557) SHA1(32bfe450a42d9eb6c14edcfa2b4e33f65a11126e) )
+	ROM_LOAD( "golf_snd_u27.u27", 0x08000, 0x8000, CRC(f6a7429b) SHA1(0fb378606c12c3543aa1ff603101e262acb9c692) ) /* Labeled GOLF SND (U27) - slds */
+
+	ROM_REGION( 0xc0000, "grom", 0 )
+	ROM_LOAD( "golf_grom00.grom0", 0x00000, 0x20000, CRC(a29c688a) SHA1(32dbb996a5e4c23cfd44b79312ac4a767658f20a) )
+	ROM_LOAD( "golf_grom01.grom1", 0x20000, 0x20000, CRC(b52a23f6) SHA1(092961acf47875179b44342e2dd8955670e67ea2) )
+	ROM_LOAD( "golf_grom02.grom2", 0x40000, 0x20000, CRC(9b8e3a61) SHA1(1b5682b1328d6c97b604fb71512e8f72322a688f) )
+	ROM_LOAD( "golf_grom03.grom3", 0x60000, 0x20000, CRC(b6e9fb15) SHA1(c1b28ea911696cb4ed56bfba212848693530b59f) )
+	ROM_LOAD( "golf_grom04.grom4", 0x80000, 0x20000, CRC(faa16729) SHA1(5d46cddda66b6d23c9ebdf2fb4cebce15586b4ad) )
+	ROM_LOAD( "golf_grom05.grom5", 0xa0000, 0x10000, CRC(62a523d2) SHA1(431f89fa044bf0ed3c197745d9c1a61f666da658) ) /* sldh */
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "golf_srom0.srom0", 0x00000, 0x20000, CRC(d041e0c9) SHA1(1d90f37071d92c714ff69ab2b0337c7c66147995) ) /* sldh */
+ROM_END
+
+
+ROM_START( gtgt10 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gtg_bim_1.0.u5", 0x00000, 0x10000, CRC(ec70b510) SHA1(318984d77eb1df6258b855781ae1c9a09aa74f15) ) /* Trackball version */
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "golf_snd_u27.u27", 0x08000, 0x8000, CRC(471da557) SHA1(32bfe450a42d9eb6c14edcfa2b4e33f65a11126e) ) /* Labeled GOLF SND (U27) - slds */
 
 	ROM_REGION( 0xb0000, "grom", 0 )
-	ROM_LOAD( "golf-grom0.grom0", 0x00000, 0x20000, CRC(a29c688a) SHA1(32dbb996a5e4c23cfd44b79312ac4a767658f20a) )
-	ROM_LOAD( "golf-grom1.grom1", 0x20000, 0x20000, CRC(b52a23f6) SHA1(092961acf47875179b44342e2dd8955670e67ea2) )
-	ROM_LOAD( "golf-grom2.grom2", 0x40000, 0x20000, CRC(9b8e3a61) SHA1(1b5682b1328d6c97b604fb71512e8f72322a688f) )
-	ROM_LOAD( "golf-grom3.grom3", 0x60000, 0x20000, CRC(b6e9fb15) SHA1(c1b28ea911696cb4ed56bfba212848693530b59f) )
-	ROM_LOAD( "golf-grom4.grom4", 0x80000, 0x20000, CRC(faa16729) SHA1(5d46cddda66b6d23c9ebdf2fb4cebce15586b4ad) )
-	ROM_LOAD( "grom5.512",        0xa0000, 0x10000, CRC(44b47015) SHA1(5dde4c932a697b51fe02eab8d948889b3fe7baff) )
+	ROM_LOAD( "golf_grom00.grom0", 0x00000, 0x20000, CRC(a29c688a) SHA1(32dbb996a5e4c23cfd44b79312ac4a767658f20a) )
+	ROM_LOAD( "golf_grom01.grom1", 0x20000, 0x20000, CRC(b52a23f6) SHA1(092961acf47875179b44342e2dd8955670e67ea2) )
+	ROM_LOAD( "golf_grom02.grom2", 0x40000, 0x20000, CRC(9b8e3a61) SHA1(1b5682b1328d6c97b604fb71512e8f72322a688f) )
+	ROM_LOAD( "golf_grom03.grom3", 0x60000, 0x20000, CRC(b6e9fb15) SHA1(c1b28ea911696cb4ed56bfba212848693530b59f) )
+	ROM_LOAD( "golf_grom04.grom4", 0x80000, 0x20000, CRC(faa16729) SHA1(5d46cddda66b6d23c9ebdf2fb4cebce15586b4ad) )
+	ROM_LOAD( "golf_grom05.grom5", 0xa0000, 0x10000, CRC(44b47015) SHA1(5dde4c932a697b51fe02eab8d948889b3fe7baff) ) /* sldh */
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "srom0.010", 0x00000, 0x20000, CRC(d041e0c9) SHA1(1d90f37071d92c714ff69ab2b0337c7c66147995) )
+	ROM_LOAD( "golf_srom0.srom0", 0x00000, 0x20000, CRC(d041e0c9) SHA1(1d90f37071d92c714ff69ab2b0337c7c66147995) ) /* sldh */
 ROM_END
 
 
@@ -2744,8 +2771,9 @@ GAME( 1990, stratab,    0,         stratab_hi,        stratab,  itech8_state, em
 GAME( 1990, stratab1,   stratab,   stratab_hi,        stratab,  itech8_state, empty_init,    ROT270, "Strata/Incredible Technologies", "Strata Bowling (V1)", 0 )
 GAME( 1990, gtg,        0,         stratab_hi,        gtg,      itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Joystick, v3.3)", 0 )
 GAME( 1990, gtgj31,     gtg,       stratab_hi,        gtg,      itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Joystick, v3.1)", 0 )
-GAME( 1989, gtgt,       gtg,       stratab_hi,        gtgt,     itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v2.0)", 0 )
-GAME( 1989, gtgt1,      gtg,       stratab_hi,        gtgt,     itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v1.0)", 0 )
+GAME( 1989, gtgt21,     gtg,       stratab_hi,        gtgt,     itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v2.1)", 0 )
+GAME( 1989, gtgt20,     gtg,       stratab_hi,        gtgt,     itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v2.0)", 0 )
+GAME( 1989, gtgt10,     gtg,       stratab_hi,        gtgt,     itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v1.0)", 0 )
 GAME( 1989, gtg2t,      gtg2,      stratab_hi,        gtg2t,    itech8_state, init_invbank,  ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Trackball, V1.1)", 0 )
 GAME( 1991, gtg2j,      gtg2,      stratab_lo,        gtg,      itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Joystick, V1.0)", 0 )
 
