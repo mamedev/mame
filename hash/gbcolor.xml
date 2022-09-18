@@ -25931,11 +25931,12 @@ license:CC0
 
 <!-- Other Asian Pirate dumps to sort -->
 
-	<software name="188in1" supported="partial">
+	<software name="188in1">
 	<!-- This dump comes from the "GBCK003" board that's soldered inside some GB Boy Colour units -->
 		<description>Color GameBoy 188 in 1 (Hong Kong)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Use hard reset to return to game selection menu." />
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="GBCK003" />
 			<feature name="slot" value="rom_gbck003" />
@@ -26411,8 +26412,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- some games don't work on gbcolor (e.g. 02. KOF97 works on gameboy but not gbcolor) -->
-	<software name="jy145in1" supported="partial">
+	<software name="jy145in1">
 		<description>New Super Color 145 in 1 (China)</description>
 		<year>200?</year>
 		<publisher>J.Y. Company</publisher>

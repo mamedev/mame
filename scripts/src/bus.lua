@@ -3697,6 +3697,8 @@ if (BUSES["GAMEBOY"]~=null) then
 		MAME_DIR .. "src/devices/bus/gameboy/cartheader.h",
 		MAME_DIR .. "src/devices/bus/gameboy/carts.cpp",
 		MAME_DIR .. "src/devices/bus/gameboy/carts.h",
+		MAME_DIR .. "src/devices/bus/gameboy/gbck003.cpp",
+		MAME_DIR .. "src/devices/bus/gameboy/gbck003.h",
 		MAME_DIR .. "src/devices/bus/gameboy/gbslot.cpp",
 		MAME_DIR .. "src/devices/bus/gameboy/gbslot.h",
 		MAME_DIR .. "src/devices/bus/gameboy/gbxfile.cpp",
