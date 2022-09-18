@@ -288,10 +288,21 @@ class unformatted_floppy_creator;
 class manager_t {
 public:
 	struct floppy_enumerator {
+		floppy_enumerator(u32 form_factor, const std::vector<u32> &variants);
 		virtual ~floppy_enumerator() = default;
 
-		virtual void add(const floppy_image_format_t &type, u32 form_factor, u32 variant, u32 image_size, const char *name, const char *description) = 0;
+		void add(const floppy_image_format_t &type, u32 form_factor, u32 variant, u32 image_size, const char *name, const char *description);
 		virtual void add_raw(const char *name, u32 key, const char *description) = 0;
+
+		u32 form_factor() const { return m_form_factor; }
+		const std::vector<u32> &variants() const { return m_variants; }
+
+	protected:
+		virtual void add_format(const floppy_image_format_t &type, u32 image_size, const char *name, const char *description) = 0;
+
+	private:
+		u32							m_form_factor;
+		const std::vector<u32> &	m_variants;
 	};
 
 	struct hd_enumerator {
