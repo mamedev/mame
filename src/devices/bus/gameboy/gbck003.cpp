@@ -11,7 +11,10 @@
  The menu program sets up code in WRAM to switch to the selected game's ROM
  and exit configuration mode.  The configuration values are read directly
  from ROM, so the configuration is presumably applied when exiting
- configuration mode.
+ configuration mode.  Leaving configuration mode presumably asserts the
+ reset line on the cartridge edge connector to get out of CGB mode for games
+ that expect DMG mode (e.g. Contra has all-black player sprites if the
+ system remains in CGB mode).
 
  The write to 0x7B02 that presumably exits configuration mode is followed by
  code to do the following (SP contains 0xFFFE at this point):
@@ -22,9 +25,9 @@
  * Jump to 0x0100
 
  This doesn't match the state set up by any official Nintendo bootstrap
- programs.  Leaving configuration mode presumably asserts the rest line on
- the cartridge edge connector to get out of CGB mode for games that expect
- DMG mode.
+ programs.  This code is probably left over from earlier multi-game
+ cartridges that lacked CGB support and didn't reset the system when
+ starting a game.
 
  0x0000-3FFF   R  - Low ROM bank.
  0x4000-7FFF   R  - High ROM bank.
