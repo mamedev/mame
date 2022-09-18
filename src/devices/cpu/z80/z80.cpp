@@ -3236,7 +3236,6 @@ void z80_device::take_nmi()
 	m_iff2 = m_iff1;
 	m_iff1 = 0;
 
-	m_nmiack_cb(true);
 	m_r++;
 
 	m_icount_executing = 11;
@@ -3583,7 +3582,6 @@ void z80_device::device_start()
 	m_cc_xycb = cc_xycb;
 	m_cc_ex = cc_ex;
 
-	m_nmiack_cb.resolve_safe();
 	m_irqack_cb.resolve_safe();
 	m_refresh_cb.resolve_safe();
 	m_nomreq_cb.resolve_safe();
@@ -3829,7 +3827,6 @@ z80_device::z80_device(const machine_config &mconfig, device_type type, const ch
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0),
 	m_opcodes_config("opcodes", ENDIANNESS_LITTLE, 8, 16, 0),
 	m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0),
-	m_nmiack_cb(*this),
 	m_irqack_cb(*this),
 	m_refresh_cb(*this),
 	m_nomreq_cb(*this),
