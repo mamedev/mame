@@ -53,7 +53,7 @@ protected:
 	void ata_w(offs_t offset, u8 data);
 
 	void atm_ula_w(offs_t offset, u8 data);
-	void atm_port_ffff_w(offs_t offset, u8 data);
+	virtual void atm_port_ffff_w(offs_t offset, u8 data);
 	void atm_port_ff77_w(offs_t offset, u8 data);
 	void atm_port_fff7_w(offs_t offset, u8 data);
 	void atm_port_7ffd_w(offs_t offset, u8 data);

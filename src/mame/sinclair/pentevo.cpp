@@ -26,9 +26,7 @@ ZxEvo: http://nedopc.com/zxevo/zxevo_eng.php
 TODO:
     * Keyboard enabled
     * zx 16c
-	* extended palette
 	* NMI?
-	* rom names (zip)
 
 *******************************************************************************************/
 
@@ -78,6 +76,7 @@ private:
 	u8 nemo_ata_r(u8 cmd);
 	void nemo_ata_w(u8 cmd, u8 data);
 
+	void atm_port_ffff_w(offs_t offset, u8 data) override;
 	void pentevo_port_f7f7_w(offs_t offset, u8 data);
 	void pentevo_port_fbf7_w(offs_t offset, u8 data);
 	void pentevo_port_eff7_w(offs_t offset, u8 data);
@@ -137,6 +136,25 @@ void pentevo_state::atm_update_cpu()
 {
 	u8 multiplier = BIT(m_port_ff77_data, 3) ? 4 : (2 - BIT(m_port_eff7_data, 4));
 	m_maincpu->set_clock(X1_128_SINCLAIR / 10 * multiplier);
+}
+
+void pentevo_state::atm_port_ffff_w(offs_t offset, u8 data)
+{
+	if(!is_shadow_active())
+		return;
+
+	if (BIT(m_port_bf_data, 5) && !m_pen2)
+	{
+		u8 pen = get_border_color(m_screen->hpos(), m_screen->vpos());
+		m_palette->set_pen_color(pen,
+			(BIT(~data, 1) * 0x88) | (BIT(~data, 6) * 0x44) | (BIT(~offset,  9) * 0x22) | (BIT(~offset, 14) * 0x11),
+			(BIT(~data, 4) * 0x88) | (BIT(~data, 7) * 0x44) | (BIT(~offset, 12) * 0x22) | (BIT(~offset, 15) * 0x11),
+			(BIT(~data, 0) * 0x88) | (BIT(~data, 5) * 0x44) | (BIT(~offset,  8) * 0x22) | (BIT(~offset, 13) * 0x11));
+	}
+	else
+	{
+		atm_state::atm_port_ffff_w(offset, data);
+	}
 }
 
 u8 pentevo_state::merge_ram_with_7ffd(u8 ram_page)
@@ -501,7 +519,7 @@ void pentevo_state::pentevo_io(address_map &map)
 	map(0x007f, 0x007f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::data_r), FUNC(beta_disk_device::data_w));
 	map(0x00ff, 0x00ff).mirror(0xff00).r(m_beta, FUNC(beta_disk_device::state_r));
 
-	map(0x00ff, 0x00ff).mirror(0xff00).w(FUNC(pentevo_state::atm_port_ffff_w));
+	map(0x00ff, 0x00ff).select(0xff00).w(FUNC(pentevo_state::atm_port_ffff_w));
 	map(0x00f6, 0x00f6).select(0xff08).rw(FUNC(pentevo_state::spectrum_ula_r), FUNC(pentevo_state::atm_ula_w));
 	map(0x00fb, 0x00fb).mirror(0xff00).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x00fd, 0x00fd).mirror(0xff00).w(FUNC(pentevo_state::atm_port_7ffd_w));
