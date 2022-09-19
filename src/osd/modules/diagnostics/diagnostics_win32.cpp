@@ -507,7 +507,10 @@ bool symbol_manager::parse_sym_line(const char *line, uintptr_t &address, std::s
 	*/
 
 	// first look for a (ty) entry
-	const char *type = strstr(line, "(ty  ");
+	char *type = strstr(line, "(ty  20)");
+	if (type == nullptr)
+		type = strstr(line, "(ty   20)");
+
 	if (type == nullptr)
 		return false;
 

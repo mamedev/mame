@@ -32,6 +32,7 @@
 #include "emu.h"
 #include "cpu/m6502/m6502mtu.h"
 #include "imagedev/floppy.h"
+#include "imagedev/cartrom.h"
 #include "machine/6522via.h"
 #include "machine/input_merger.h"
 #include "machine/mos6551.h"
@@ -44,7 +45,31 @@
 #include "screen.h"
 #include "speaker.h"
 
-class mtu130_state: public driver_device
+
+class mtu130_rom_device : public device_t, public device_rom_image_interface {
+public:
+	mtu130_rom_device(const machine_config &mconfig, char const *tag, device_t *owner, uint32_t clock);
+	template <typename T> mtu130_rom_device(const machine_config &mconfig, char const *tag, device_t *owner, T &&romdata_tag, offs_t load_offset) :
+		mtu130_rom_device(mconfig, tag, owner, 0)
+	{
+		m_load_offset = load_offset;
+		m_romdata.set_tag(std::forward<T>(romdata_tag));
+	}
+
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *file_extensions() const noexcept override { return "rom,bin"; }
+
+protected:
+	virtual void device_start() override;
+	virtual image_init_result call_load() override;
+	virtual void call_unload() override;
+
+private:
+	required_shared_ptr<u8> m_romdata;
+	offs_t m_load_offset;
+};
+
+class mtu130_state : public driver_device
 {
 public:
 	mtu130_state(const machine_config &mconfig, device_type type, const char *tag) :
@@ -59,6 +84,7 @@ public:
 		m_fdc(*this, "fdc"),
 		m_floppy(*this, "fdc:%d", 0U),
 		m_ext(*this, "ext%d", 0U),
+		m_roms(*this, "rom%d", 0U),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_dac(*this, "dac"),
@@ -70,8 +96,10 @@ public:
 		m_mainram(*this, "mainram"),
 		m_fdcram(*this, "fdcram"),
 		m_videoram(*this, "videoram"),
+		m_romdata(*this, "romdata"),
 		m_keyboard(*this, "K%X", 0L),
-		m_keyboard_meta(*this, "KM")
+		m_keyboard_meta(*this, "KM"),
+		m_jumpers(*this, "jumpers")
 	{ }
 
 	void mtu130(machine_config &config);
@@ -82,6 +110,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	virtual void video_start() override;
 
 private:
@@ -95,6 +124,7 @@ private:
 	required_device<upd765a_device> m_fdc;
 	required_device_array<floppy_connector, 4> m_floppy;
 	required_device_array<mtu130_extension_device, 3> m_ext;
+	required_device_array<mtu130_rom_device, 4> m_roms;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<dac_byte_interface> m_dac;
@@ -107,9 +137,11 @@ private:
 	required_shared_ptr<u8> m_mainram;
 	required_shared_ptr<u8> m_fdcram;
 	required_shared_ptr<u8> m_videoram;
+	required_shared_ptr<u8> m_romdata;
 
 	required_ioport_array<16> m_keyboard;
 	required_ioport m_keyboard_meta;
+	required_ioport m_jumpers;
 
 	uint16_t m_dma_adr;
 	u8 m_keyboard_col;
@@ -145,6 +177,49 @@ private:
 	void io_disable_w(u8);
 };
 
+DEFINE_DEVICE_TYPE(MTU130_ROM, mtu130_rom_device, "mtu130_rom", "MTU130 rom slot")
+
+	mtu130_rom_device::mtu130_rom_device(const machine_config &mconfig, char const *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, MTU130_ROM, tag, owner, clock),
+	device_rom_image_interface(mconfig, *this),
+	m_romdata(*this, finder_base::DUMMY_TAG),
+	m_load_offset(0)
+{
+}
+
+void mtu130_rom_device::device_start()
+{
+	if(!exists())
+		memset(m_romdata + m_load_offset, 0xff, 4096);
+}
+
+image_init_result mtu130_rom_device::call_load()
+{
+	u32 len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
+	if(!len || len > 4096 || (4096 % len))
+		return image_init_result::FAIL;
+
+	if (!loaded_through_softlist())
+		fread(m_romdata + m_load_offset, len);
+	else
+		memcpy(m_romdata + m_load_offset, get_software_region("rom"), len);
+
+	if(len < 4096) {
+		offs_t delta = len;
+		while(delta < 4096) {
+			memcpy(m_romdata + m_load_offset + delta, m_romdata + m_load_offset, len);
+			delta += len;
+		}
+	}
+
+	return image_init_result::PASS;
+}
+
+void mtu130_rom_device::call_unload()
+{
+	memset(m_romdata + m_load_offset, 0xff, 4096);
+}
+
 void mtu130_state::machine_start()
 {
 	m_dma_adr = 0;
@@ -167,12 +242,16 @@ void mtu130_state::machine_start()
 
 	m_fdc->set_rate(500000);
 	m_io_view.select(1);
-	m_se_view.select(0);
 	m_rom_view.disable();
 	m_rof_view.disable();
 
 	for(auto e : m_ext)
 		e->map_io(m_io_view[1]);
+}
+
+void mtu130_state::machine_reset()
+{
+	m_se_view.select(m_jumpers->read() & 0x01);
 }
 
 void mtu130_state::video_start()
@@ -208,10 +287,10 @@ uint32_t mtu130_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 			const u8 *src = m_videoram + 60 * y + (x0 >> 4);
 			u16 *dest = &bitmap.pix(y, cliprect.left());
 			u8 v = 0;
-			if(x0 & 15)
+			if(x0 & 7)
 				v = *src++;
 			for(int x = x0; x <= x1; x++) {
-				if(!(x & 15))
+				if(!(x & 7))
 					v = *src++;
 				*dest++ = (v >> (6 - 2*((x >> 1) & 3))) & 3;
 			}
@@ -293,6 +372,13 @@ void mtu130_state::sys1_pb_w(u8 data)
 {
 	m_maincpu->set_dbank((~data) & 3);
 	m_maincpu->set_pbank((~data >> 2) & 3);
+
+	// The jumper inverts the via-driven selection between external
+	// and fdc rom, changing the reset default.
+	if(data & 0x40)
+		m_se_view.select(m_jumpers->read() & 0x01);
+	else
+		m_se_view.select((m_jumpers->read() & 0x01) ^ 1);
 
 	if(data & 0x80)
 		m_rom_view.disable();
@@ -388,6 +474,8 @@ void mtu130_state::map(address_map &map)
 	m_se_view[0](0x0ffea, 0x0ffea).w(FUNC(mtu130_state::dma_adr_w));
 	m_se_view[0](0x0ffee, 0x0ffef).m(m_fdc, FUNC(upd765a_device::map));
 
+	m_se_view[1](0x0c000, 0x0ffff).rom().share(m_romdata);          // External rom view, contents set by the MTU130_ROM subdevices
+
 	map(0x0fffe, 0x0fffe).w(FUNC(mtu130_state::io_enable_w));
 	map(0x0ffff, 0x0ffff).w(FUNC(mtu130_state::io_disable_w));
 
@@ -472,10 +560,20 @@ void mtu130_state::mtu130(machine_config &config)
 	extension_board(config, 0, "ext0", "datamover");
 	extension_board(config, 1, "ext1", nullptr);
 	extension_board(config, 2, "ext2", nullptr);
+
+	MTU130_ROM(config, m_roms[0], m_romdata, 0x3000);
+	MTU130_ROM(config, m_roms[1], m_romdata, 0x2000);
+	MTU130_ROM(config, m_roms[2], m_romdata, 0x1000);
+	MTU130_ROM(config, m_roms[3], m_romdata, 0x0000);
 }
 
 
 static INPUT_PORTS_START(mtu130)
+	PORT_START("jumpers")
+	PORT_CONFNAME(0x01, 0x00, "Boot rom")
+	PORT_CONFSETTING(0x00, "FDC rom")
+	PORT_CONFSETTING(0x01, "ROM1 rom (aka rom F)")
+
 	PORT_START("K0")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RSHIFT)      PORT_CHAR(UCHAR_SHIFT_2) PORT_NAME("RIGHT SHIFT")
@@ -612,7 +710,7 @@ static INPUT_PORTS_START(mtu130)
 INPUT_PORTS_END
 
 ROM_START(mtu130)
-	ROM_REGION(0x800, "ipl", 0)
+	ROM_REGION(0x100, "ipl", 0)
 	ROM_LOAD("ipl_prom.u6", 0, 0x100, CRC(edb1525a) SHA1(a16cce3b096f0fea9ac5c6993ee4241e4af1efde))
 ROM_END
 

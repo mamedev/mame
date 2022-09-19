@@ -53,6 +53,7 @@ enum : u32
 	TYPE_CAMERA     = 0x43414d52,   // 'CAMR'
 	TYPE_HUC1       = 0x48554331,   // 'HUC1'
 	TYPE_HUC3       = 0x48554333,   // 'HUC3'
+	TYPE_SLMULTI    = 0x4c424d43,   // 'LBMC'
 	TYPE_LICHENG    = 0x4c494348,   // 'LICH'
 	TYPE_M161       = 0x4d313631,   // 'M161'
 	TYPE_MBC1_COLL  = 0x4d42314d,   // 'MB1M'

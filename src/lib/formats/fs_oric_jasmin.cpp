@@ -100,12 +100,10 @@ const char *oric_jasmin_image::description() const
 	return "Oric Jasmin";
 }
 
-void oric_jasmin_image::enumerate_f(floppy_enumerator &fe, u32 form_factor, const std::vector<u32> &variants) const
+void oric_jasmin_image::enumerate_f(floppy_enumerator &fe) const
 {
-	if(has(form_factor, variants, floppy_image::FF_3, floppy_image::DSDD))
-		fe.add(FLOPPY_ORIC_JASMIN_FORMAT, 356864, "oric_jasmin_ds", "Oric Jasmin dual-sided");
-	if(has(form_factor, variants, floppy_image::FF_3, floppy_image::SSDD))
-		fe.add(FLOPPY_ORIC_JASMIN_FORMAT, 178432, "oric_jasmin_ss", "Oric Jasmin single-sided");
+	fe.add(FLOPPY_ORIC_JASMIN_FORMAT, floppy_image::FF_3, floppy_image::DSDD, 356864, "oric_jasmin_ds", "Oric Jasmin dual-sided");
+	fe.add(FLOPPY_ORIC_JASMIN_FORMAT, floppy_image::FF_3, floppy_image::SSDD, 178432, "oric_jasmin_ss", "Oric Jasmin single-sided");
 }
 
 std::unique_ptr<filesystem_t> oric_jasmin_image::mount(fsblk_t &blockdev) const

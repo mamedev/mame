@@ -3,11 +3,12 @@
 /******************************************************************************
 
 Hartung Game Master
+Hong Kong LCD handheld console (mainly sold in Europe)
 PeT mess@utanet.at march 2002
 
 Hardware notes:
 - NEC D78C11AGF (4KB internal ROM), 12.00MHz XTAL
-- ?KB external RAM, cartridge slot for external ROM
+- 2KB external RAM(UM6116-2L), cartridge slot for external ROM
 - 2*LCDC hiding under epoxy, appears to be SED1520
 - 61*64 1bpp LCD screen (the odd width is correct)
 - 1-bit sound
@@ -27,11 +28,9 @@ a copyright by Bon Treasure (a Hong Kong company that's also involved with
 Watara SuperVision), so perhaps it's them.
 
 TODO:
-- how much external RAM does it have? 16KB seems overkill and the games
-  only use a little
-- sound off doesn't work (usually the Select button to toggle), speaker is
-  connected to PC4, but upd7810.cpp doesn't automatically write to port C
-  on MCC related changes
+- does port B do anything?
+- according to one video on Youtube, hspace should have some kind of volume
+  filter on the bgm? not sure what controls it, or maybe it's a hardware quirk
 
 BTANB:
 - LCD flickers partially, especially bad in finitezn
@@ -62,8 +61,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_lcd(*this, "lcd%u", 0),
 		m_screen(*this, "screen"),
-		m_speaker(*this, "speaker"),
-		m_cart(*this, "cartslot")
+		m_speaker(*this, "speaker")
 	{ }
 
 	void gmaster(machine_config &config);
@@ -76,7 +74,6 @@ private:
 	required_device_array<sed1520_device, 2> m_lcd;
 	required_device<screen_device> m_screen;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<generic_slot_device> m_cart;
 
 	u8 io_r(offs_t offset);
 	void io_w(offs_t offset, u8 data);
@@ -88,7 +85,7 @@ private:
 
 	void gmaster_mem(address_map &map);
 
-	u8 m_ram[0x4000] = { };
+	u8 m_ram[0x800] = { };
 	u8 m_chipsel = 0;
 };
 
@@ -178,7 +175,7 @@ void gmaster_state::io_w(offs_t offset, u8 data)
 void gmaster_state::gmaster_mem(address_map &map)
 {
 	// 0x0000-0x0fff is internal ROM
-	map(0x4000, 0x7fff).rw(FUNC(gmaster_state::io_r), FUNC(gmaster_state::io_w));
+	map(0x4000, 0x47ff).mirror(0x3800).rw(FUNC(gmaster_state::io_r), FUNC(gmaster_state::io_w));
 	map(0x8000, 0xfeff).r("cartslot", FUNC(generic_slot_device::read_rom));
 	// 0xff00-0xffff is internal RAM
 }
@@ -196,6 +193,9 @@ void gmaster_state::portc_w(u8 data)
 	// d0: RAM CS
 	// d1,d2: LCD CS
 	m_chipsel = data & 7;
+
+	// d4: speaker out
+	m_speaker->level_w(BIT(data, 4));
 }
 
 
@@ -230,7 +230,6 @@ void gmaster_state::gmaster(machine_config &config)
 	m_maincpu->pa_in_cb().set_ioport("JOY");
 	m_maincpu->pb_out_cb().set(FUNC(gmaster_state::portb_w));
 	m_maincpu->pc_out_cb().set(FUNC(gmaster_state::portc_w));
-	m_maincpu->to_func().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
@@ -250,7 +249,7 @@ void gmaster_state::gmaster(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(0, "mono", 0.50);
 
 	// cartridge
-	GENERIC_CARTSLOT(config, m_cart, generic_linear_slot, "gmaster_cart").set_must_be_loaded(true);
+	GENERIC_CARTSLOT(config, "cartslot", generic_linear_slot, "gmaster_cart").set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("gmaster");
 }
 

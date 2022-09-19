@@ -26,7 +26,6 @@ extern char const *const GB_SACHEN1;
 extern char const *const GB_SACHEN2;
 extern char const *const GB_ROCKET;
 extern char const *const GB_LASAMA;
-extern char const *const GB_GBCK003;
 extern char const *const GB_MBC1;
 extern char const *const GB_MBC2;
 extern char const *const GB_MBC3;
@@ -47,6 +46,8 @@ extern char const *const GB_LICHENG;
 extern char const *const GB_NEWGBCHK;
 extern char const *const GB_VF001;
 extern char const *const GB_DIGIMON;
+extern char const *const GB_SLMULTI;
+extern char const *const GB_GBCK003;
 
 extern char const *const MEGADUCK_STD;
 extern char const *const MEGADUCK_BANKED;

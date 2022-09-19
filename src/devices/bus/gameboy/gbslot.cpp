@@ -292,7 +292,7 @@ std::string cart_licensee_description(u8 const *header)
 {
 	// TODO: fill in and correct lists, distinguish duplicates
 	static constexpr std::pair<u8, char const *> BASE[] = {
-								                    { 0x01, "Nintendo" },
+													{ 0x01, "Nintendo" },
 			{ 0x08, "Capcom" },                     { 0x09, "Hot-B" },                  { 0x0a, "Jaleco" },                     { 0x0b, "Coconuts Japan" },
 			{ 0x0c, "Elite Systems" },
 																																{ 0x13, "Electronic Arts" },
@@ -407,7 +407,7 @@ std::string cart_licensee_description(u8 const *header)
 			{ 0x3932, "Video System" },
 			{ 0x3933, "Ocean/Acclaim" },
 			{ 0x3935, "Varie Corporation" },
-			{ 0x3936, "Yonezawa/s’pal" },
+			{ 0x3936, "Yonezawa/s'pal" },
 			{ 0x3937, "Kaneko" },
 			{ 0x3939, "Pack-In-Video Co." },
 			{ 0x4134, "Konami (Yu-Gi-Oh!)" } };
@@ -742,6 +742,9 @@ std::optional<char const *> probe_gbx_footer(std::string_view tag, util::random_
 		break;
 	case gbxfile::TYPE_VF001:
 		result = slotoptions::GB_VF001;
+		break;
+	case gbxfile::TYPE_SLMULTI:
+		result = slotoptions::GB_SLMULTI;
 		break;
 	}
 	if (result)
