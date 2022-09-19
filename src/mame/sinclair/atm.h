@@ -88,7 +88,7 @@ protected:
 	required_device<centronics_device> m_centronics;
 	required_device<device_palette_interface> m_palette;
 
-    u8 *m_char_location;
+	u8 *m_char_location;
 	u8 rom_pages_mask;
 	u8 ram_pages_mask;
 

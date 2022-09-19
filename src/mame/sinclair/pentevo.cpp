@@ -20,12 +20,12 @@ Hardware (ZX Evolution):
 
 Refs:
 ZxEvo: http://nedopc.com/zxevo/zxevo_eng.php
-        Principal scheme (rev. C) :: http://nedopc.com/zxevo/zxevo_sch_revc.pdf
-        Montage scheme (rev. C) :: http://nedopc.com/zxevo/zxevo_mon_revc.pdf
+		Principal scheme (rev. C) :: http://nedopc.com/zxevo/zxevo_sch_revc.pdf
+		Montage scheme (rev. C) :: http://nedopc.com/zxevo/zxevo_mon_revc.pdf
 
 TODO:
-    * Keyboard enabled
-    * zx 16c
+	* Keyboard enabled
+	* zx 16c
 	* NMI?
 
 *******************************************************************************************/
@@ -35,6 +35,7 @@ TODO:
 #include "glukrs.h"
 #include "machine/pckeybrd.h"
 #include "machine/spi_sdcard.h"
+#include "machine/timer.h"
 
 namespace {
 
@@ -55,7 +56,7 @@ public:
 	pentevo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atm_state(mconfig, type, tag)
 		, m_gfxdecode(*this, "gfxdecode")
-        , m_char_ram(*this, "char_ram")
+		, m_char_ram(*this, "char_ram")
 		, m_glukrs(*this, "glukrs")
 		, m_sdcard(*this, "sdcard")
 		, m_keyboard(*this, "pc_keyboard")
@@ -70,7 +71,7 @@ protected:
 	void video_start() override;
 
 private:
-    void init_mem_write();
+	void init_mem_write();
 	void pentevo_io(address_map &map);
 
 	u8 nemo_ata_r(u8 cmd);
@@ -94,6 +95,9 @@ private:
 
 	u8 gluk_data_r(offs_t offset);
 	void gluk_data_w(offs_t offset, u8 data);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(nmi_check_callback);
+	void nmi_on();
 
 	bool is_shadow_active() override { return BIT(m_port_bf_data, 0) || is_dos_active(); }
 	bool is_gluk_active() {return is_shadow_active() || BIT(m_port_eff7_data, 7); }
@@ -157,9 +161,22 @@ void pentevo_state::atm_port_ffff_w(offs_t offset, u8 data)
 	}
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER(pentevo_state::nmi_check_callback)
+{
+	if (m_io_nmi->read() & 0x01)
+		nmi_on();
+}
+
+void pentevo_state::nmi_on()
+{
+	m_bank_ram[0]->set_entry(0xff & rom_pages_mask);
+	m_bank_view0.select(1);
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+}
+
 u8 pentevo_state::merge_ram_with_7ffd(u8 ram_page)
 {
-    u8 page = atm_state::merge_ram_with_7ffd(ram_page);
+	u8 page = atm_state::merge_ram_with_7ffd(ram_page);
 	if (is_pent1024())
 		page = (page & ~0x38) | ((m_port_7ffd_data & 0xe0) >> 2);
 
@@ -202,7 +219,7 @@ void pentevo_state::pentevo_port_fbf7_w(offs_t offset, u8 data)
 void pentevo_state::atm_port_bf_w(offs_t offset, u8 data)
 {
 	if (BIT(m_port_bf_data, 3) && !BIT(data, 3))
-        m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		nmi_on();
 
 	m_port_bf_data = data;
 }
@@ -240,22 +257,22 @@ u8 pentevo_state::atm_port_0fbd_r(offs_t offset)
 void pentevo_state::atm_port_0fbd_w(offs_t offset, u8 data)
 {
 	u8 opt = offset >> 8;
-    if (opt == 0x00 || opt == 0x01)
-    {
-        //TODO NMI trap - no usecase to test yet
-	    LOGWARN("#%X (NMI) < %X\n", 0x00bd | offset, data);
-    }
-    else
-    {
-	    LOGWARN("#%X < %X\n", 0x00bd | offset, data);
-    }
+	if (opt == 0x00 || opt == 0x01)
+	{
+		//TODO NMI trap - no usecase to test yet
+		LOGWARN("#%X (NMI) < %X\n", 0x00bd | offset, data);
+	}
+	else
+	{
+		LOGWARN("#%X < %X\n", 0x00bd | offset, data);
+	}
 }
 
 u8 pentevo_state::atm_port_1fbd_r(offs_t offset)
 {
 	u8 opt = offset >> 8;
 	if (opt == 0x03) // #13BD
-	    return m_beta->is_active(); //0x00;
+		return m_beta->is_active(); //0x00;
 	else
 	{
 		LOGWARN("#%X read\n", 0x10bd | offset);
@@ -267,17 +284,17 @@ void pentevo_state::atm_port_1fbd_w(offs_t offset, u8 data)
 {
 	u8 opt = offset >> 8;
 	if (opt == 3)
-    {
-        if ((data & 0x0f) && m_beta->is_active())
-        {
-            m_bank_ram[0]->set_entry(0xfe);
-            m_bank_view0.disable();
-        }
-    }
-    else
-    {
-	    LOGWARN("#%X < %X\n", 0x10bd | offset, data);
-    }
+	{
+		if ((data & 0x0f) && m_beta->is_active())
+		{
+			m_bank_ram[0]->set_entry(0xfe);
+			m_bank_view0.disable();
+		}
+	}
+	else
+	{
+		LOGWARN("#%X < %X\n", 0x10bd | offset, data);
+	}
 }
 
 void pentevo_state::spectrum_update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -547,11 +564,11 @@ void pentevo_state::pentevo_io(address_map &map)
 
 	// HDD: NEMO
 	map(0x0010, 0x0010).select(0xffe0).lrw8(NAME([this](offs_t offset) { return nemo_ata_r(offset >> 5); })
-	    , NAME([this](offs_t offset, u8 data) { nemo_ata_w(offset >> 5, data); }));
+		, NAME([this](offs_t offset, u8 data) { nemo_ata_w(offset >> 5, data); }));
 	map(0x0011, 0x0011).mirror(0xff00).lrw8(NAME([this]() { m_ata_data_hi_ready = false; return m_ata_data_latch; })
-	    , NAME([this](offs_t offset, u8 data) { m_ata_data_hi_ready = true; m_ata_data_latch = data; }));
+		, NAME([this](offs_t offset, u8 data) { m_ata_data_hi_ready = true; m_ata_data_latch = data; }));
 	map(0x00c8, 0x00c8).mirror(0xff00).lrw8(NAME([this]() { return m_ata->cs1_r(6 /* ? */); })
-	    , NAME([this](offs_t offset, u8 data) { m_ata->cs1_w(6, data); }));
+		, NAME([this](offs_t offset, u8 data) { m_ata->cs1_w(6, data); }));
 
 	// SPI SD-card
 	map(0x0077, 0x0077).select(0xff00).rw(FUNC(pentevo_state::spi_port_77_r), FUNC(pentevo_state::spi_port_77_w));
@@ -569,13 +586,13 @@ void pentevo_state::init_mem_write()
 	mem.install_write_tap(0x0000, 0xffff, "mem_wait_w", [this](offs_t offset, u8 &data, u8 mem_mask)
 	{
 		if (!machine().side_effects_disabled())
-        {
-            if (BIT(m_port_bf_data, 2))
-            {
-                m_char_ram->write(offset & 0x7ff, data);
+		{
+			if (BIT(m_port_bf_data, 2))
+			{
+				m_char_ram->write(offset & 0x7ff, data);
 				m_gfxdecode->gfx(0)->mark_dirty((offset & 0x7ff) / 8);
-            }
-        }
+			}
+		}
 		return data;
 	});
 }
@@ -592,7 +609,7 @@ void pentevo_state::machine_start()
 	save_item(NAME(m_zctl_di));
 	save_item(NAME(m_zctl_cs));
 
-    init_mem_write();
+	init_mem_write();
 }
 
 void pentevo_state::machine_reset()
@@ -616,8 +633,8 @@ void pentevo_state::machine_reset()
 
 void pentevo_state::video_start()
 {
-    atm_state::video_start();
-    m_char_location = m_char_ram->pointer();
+	atm_state::video_start();
+	m_char_location = m_char_ram->pointer();
 	m_gfxdecode->gfx(0)->set_source(m_char_location);
 }
 
@@ -641,6 +658,7 @@ void pentevo_state::pentevo(machine_config &config)
 {
 	atmtb2(config);
 	m_maincpu->set_addrmap(AS_IO, &pentevo_state::pentevo_io);
+	TIMER(config, "nmi_timer").configure_periodic(FUNC(pentevo_state::nmi_check_callback), attotime::from_hz(50));
 
 	m_ram->set_default_size("4M");
 	RAM(config, m_char_ram).set_default_size("2048").set_default_value(0);
