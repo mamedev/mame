@@ -18,6 +18,8 @@
 #include <string>
 
 
+namespace osd::debugger::win {
+
 class memoryview_info : public debugview_info
 {
 public:
@@ -54,5 +56,7 @@ protected:
 private:
 	std::string m_lastpc;
 };
+
+} // namespace osd::debugger::win
 
 #endif // MAME_DEBUGGER_WIN_MEMORYVIEWINFO_H

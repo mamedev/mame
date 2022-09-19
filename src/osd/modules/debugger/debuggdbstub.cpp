@@ -7,17 +7,23 @@
 //============================================================
 
 #include "emu.h"
+#include "debug_module.h"
+
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 #include "debug/points.h"
 #include "debug/textbuf.h"
-#include "debug_module.h"
 #include "debugger.h"
-#include "fileio.h"
+
 #include "modules/lib/osdobj_common.h"
 #include "modules/osdmodule.h"
 
+#include "fileio.h"
+
 #include <cinttypes>
+
+
+namespace {
 
 //-------------------------------------------------------------------------
 #define MAX_PACKET_SIZE 16384
@@ -1442,6 +1448,8 @@ void debug_gdbstub::handle_character(char ch)
 			break;
 	}
 }
+
+} // anonymous namespace
 
 //-------------------------------------------------------------------------
 MODULE_DEFINITION(DEBUG_GDBSTUB, debug_gdbstub)

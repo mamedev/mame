@@ -10,6 +10,8 @@
 #include <QtWidgets/QMainWindow>
 
 
+namespace osd::debugger::qt {
+
 //============================================================
 //  The Qt window that everyone derives from.
 //============================================================
@@ -84,5 +86,6 @@ public:
 	virtual void recoverFromXmlNode(util::xml::data_node const &node);
 };
 
+} // namespace osd::debugger::qt
 
 #endif // MAME_DEBUGGER_QT_WINDOWQT_H

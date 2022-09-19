@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 //============================================================
 //
-//  uimetrics.c - Win32 debug window handling
+//  uimetrics.cpp - Win32 debug window handling
 //
 //============================================================
 
@@ -15,6 +15,8 @@
 
 #include <algorithm>
 
+
+namespace osd::debugger::win {
 
 COLORREF const ui_metrics::s_themes[][COLOR_COUNT] = {
 		{
@@ -154,3 +156,5 @@ void ui_metrics::set_color_theme(int index)
 		m_color_theme = index;
 	}
 }
+
+} // namespace osd::debugger::win

@@ -15,6 +15,8 @@
 #include <QtWidgets/QVBoxLayout>
 
 
+namespace osd::debugger::qt {
+
 BreakpointsWindow::BreakpointsWindow(running_machine &machine, QWidget *parent) :
 	WindowQt(machine, nullptr)
 {
@@ -85,19 +87,19 @@ void BreakpointsWindow::saveConfigurationToNode(util::xml::data_node &node)
 {
 	WindowQt::saveConfigurationToNode(node);
 
-	node.set_attribute_int(osd::debugger::ATTR_WINDOW_TYPE, osd::debugger::WINDOW_TYPE_POINTS_VIEWER);
+	node.set_attribute_int(ATTR_WINDOW_TYPE, WINDOW_TYPE_POINTS_VIEWER);
 	if (m_breakpointsView)
 	{
 		switch (m_breakpointsView->view()->type())
 		{
 		case DVT_BREAK_POINTS:
-			node.set_attribute_int(osd::debugger::ATTR_WINDOW_POINTS_TYPE, 0);
+			node.set_attribute_int(ATTR_WINDOW_POINTS_TYPE, 0);
 			break;
 		case DVT_WATCH_POINTS:
-			node.set_attribute_int(osd::debugger::ATTR_WINDOW_POINTS_TYPE, 1);
+			node.set_attribute_int(ATTR_WINDOW_POINTS_TYPE, 1);
 			break;
 		case DVT_REGISTER_POINTS:
-			node.set_attribute_int(osd::debugger::ATTR_WINDOW_POINTS_TYPE, 2);
+			node.set_attribute_int(ATTR_WINDOW_POINTS_TYPE, 2);
 			break;
 		default:
 			break;
@@ -152,5 +154,7 @@ void BreakpointsWindowQtConfig::applyToQWidget(QWidget* widget)
 void BreakpointsWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
 {
 	WindowQtConfig::recoverFromXmlNode(node);
-	m_bwType = node.get_attribute_int(osd::debugger::ATTR_WINDOW_POINTS_TYPE, m_bwType);
+	m_bwType = node.get_attribute_int(ATTR_WINDOW_POINTS_TYPE, m_bwType);
 }
+
+} // namespace osd::debugger::qt

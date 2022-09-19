@@ -15,6 +15,8 @@
 #include "debugwininfo.h"
 
 
+namespace osd::debugger::win {
+
 class logwin_info : public debugwin_info
 {
 public:
@@ -26,4 +28,6 @@ protected:
 	virtual void save_configuration_to_node(util::xml::data_node &node) override;
 };
 
-#endif
+} // namespace osd::debugger::win
+
+#endif // MAME_DEBUGGER_WIN_LOGWININFO_H

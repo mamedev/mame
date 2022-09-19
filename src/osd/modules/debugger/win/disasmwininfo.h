@@ -15,6 +15,8 @@
 #include "disasmbasewininfo.h"
 
 
+namespace osd::debugger::win {
+
 class disasmwin_info : public disasmbasewin_info
 {
 public:
@@ -37,4 +39,6 @@ private:
 	HWND    m_combownd;
 };
 
-#endif
+} // namespace osd::debugger::win
+
+#endif // MAME_DEBUGGER_WIN_DISASMWININFO_H

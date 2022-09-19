@@ -3,9 +3,11 @@
 // ImGui based debugger
 
 #include "emu.h"
+#include "debug_module.h"
+
 #include "imgui/imgui.h"
-#include "render.h"
-#include "uiinput.h"
+
+#include "imagedev/floppy.h"
 
 #include "debug/debugvw.h"
 #include "debug/dvdisasm.h"
@@ -14,14 +16,16 @@
 #include "debug/dvwpoints.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
+#include "debugger.h"
+#include "render.h"
+#include "uiinput.h"
 
 #include "config.h"
-#include "debugger.h"
 #include "modules/lib/osdobj_common.h"
-#include "debug_module.h"
 #include "modules/osdmodule.h"
 #include "zippath.h"
-#include "imagedev/floppy.h"
+
+namespace {
 
 class debug_area
 {
@@ -1562,5 +1566,7 @@ void debug_imgui::debugger_update()
 		imguiEndFrame();
 	}
 }
+
+} // anonymous namespace
 
 MODULE_DEFINITION(DEBUG_IMGUI, debug_imgui)

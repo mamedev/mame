@@ -9,6 +9,8 @@
 #include "windowqt.h"
 
 
+namespace osd::debugger::qt {
+
 //============================================================
 //  The Log Window.
 //============================================================
@@ -36,7 +38,7 @@ class LogWindowQtConfig : public WindowQtConfig
 {
 public:
 	LogWindowQtConfig() :
-		WindowQtConfig(osd::debugger::WINDOW_TYPE_ERROR_LOG_VIEWER)
+		WindowQtConfig(WINDOW_TYPE_ERROR_LOG_VIEWER)
 	{
 	}
 
@@ -46,5 +48,6 @@ public:
 	void recoverFromXmlNode(util::xml::data_node const &node);
 };
 
+} // namespace osd::debugger::qt
 
 #endif // MAME_DEBUGGER_QT_LOGWINDOW_H
