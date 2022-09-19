@@ -35,7 +35,7 @@
 #include "emu.h"
 
 #include "bus/nes_ctrl/ctrl.h"
-#include "cpu/m6502/n2a03.h"
+#include "cpu/m6502/rp2a03.h"
 #include "video/ppu2c0x.h"
 
 #include "screen.h"
@@ -72,7 +72,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	required_device<n2a03_device> m_maincpu;
+	required_device<rp2a03_device> m_maincpu;
 	required_device<ppu2c0x_device> m_ppu;
 	required_device<screen_device> m_screen;
 	optional_device_array<nes_control_port_device, 3> m_ctrl;
@@ -438,12 +438,12 @@ void m8_state::machine_reset()
 void m8_state::nes_m8(machine_config &config)
 {
 	// basic machine hardware
-	N2A03G(config, m_maincpu, NTSC_APU_CLOCK); // actual model is RP2A03E
+	RP2A03G(config, m_maincpu, NTSC_APU_CLOCK); // actual model is RP2A03E
 	m_maincpu->set_addrmap(AS_PROGRAM, &m8_state::m8_map);
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(N2A03_NTSC_XTAL / 4, 341, 0, VISIBLE_SCREEN_WIDTH, ppu2c0x_device::NTSC_SCANLINES_PER_FRAME, 0, VISIBLE_SCREEN_HEIGHT);
+	m_screen->set_raw(RP2A03_NTSC_XTAL / 4, 341, 0, VISIBLE_SCREEN_WIDTH, ppu2c0x_device::NTSC_SCANLINES_PER_FRAME, 0, VISIBLE_SCREEN_HEIGHT);
 	m_screen->set_screen_update(m_ppu, FUNC(ppu2c0x_device::screen_update));
 
 	PPU_2C02(config, m_ppu);
