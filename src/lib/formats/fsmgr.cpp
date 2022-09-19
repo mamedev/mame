@@ -48,7 +48,7 @@ bool refcounted_inner::unref_weak()
 
 
 
-void manager_t::enumerate_f(floppy_enumerator &fe, u32 form_factor, const std::vector<u32> &variants) const
+void manager_t::enumerate_f(floppy_enumerator &fe) const
 {
 }
 
@@ -428,5 +428,16 @@ err_t filesystem_t::format(const meta_data &meta)
 	return ERR_UNSUPPORTED;
 }
 
+manager_t::floppy_enumerator::floppy_enumerator(u32 form_factor, const std::vector<u32> &variants)
+	: m_form_factor(form_factor)
+	, m_variants(variants)
+{
+}
+
+void manager_t::floppy_enumerator::add(const floppy_image_format_t &type, u32 form_factor, u32 variant, u32 image_size, const char *name, const char *description)
+{
+	if (has(m_form_factor, m_variants, form_factor, variant))
+		add_format(type, image_size, name, description);
+}
 
 } // namespace fs
