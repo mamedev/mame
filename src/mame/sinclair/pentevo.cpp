@@ -169,7 +169,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pentevo_state::nmi_check_callback)
 
 void pentevo_state::nmi_on()
 {
-	m_bank_ram[0]->set_entry(0xff & rom_pages_mask);
+	m_bank_ram[0]->set_entry(0xff & ram_pages_mask);
 	m_bank_view0.select(1);
 	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
