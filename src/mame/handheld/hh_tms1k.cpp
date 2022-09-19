@@ -69,6 +69,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP0905B  TMS0970   1977, Parker Brothers Codename Sector
  *MP0027   TMS1000   1977, Texas Instruments OEM melody chip (used in eg. Chromatronics Chroma-Chime)
  *MP0057   TMS1000   1978, APH Student Speech+ (same ROM contents as TSI Speech+?)
+ *MP0121   TMS1000   1979, Waddingtons Compute-A-Tune
  @MP0154   TMS1000   1979, Fonas 2 Player Baseball
  @MP0158   TMS1000   1979, Entex Soccer (6003)
  @MP0163   TMS1000   1979, A-One LSI Match Number/LJN Electronic Concentration

@@ -25,7 +25,7 @@ Known releases:
 I presume it's an anonymous Hong Kong production. Most of the games too,
 they have no copyright/company info in them. Some of the later games have
 a copyright by Bon Treasure (a Hong Kong company that's also involved with
-Watara SuperVision), so perhaps it's them.
+Watara Supervision), so perhaps it's them.
 
 TODO:
 - does port B do anything?

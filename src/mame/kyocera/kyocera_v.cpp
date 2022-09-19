@@ -45,21 +45,13 @@ void kc85_state::kc85_video(machine_config &config)
 	screen.set_refresh_hz(44);
 	screen.set_screen_update(FUNC(kc85_state::screen_update));
 	screen.set_size(240, 64);
-	screen.set_visarea(0, 240-1, 0, 64-1);
+	screen.set_visarea_full();
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(kc85_state::kc85_palette), 2);
 
-	HD44102(config, m_lcdc[0], 0, SCREEN_TAG,   0,  0);
-	HD44102(config, m_lcdc[1], 0, SCREEN_TAG,  50,  0);
-	HD44102(config, m_lcdc[2], 0, SCREEN_TAG, 100,  0);
-	HD44102(config, m_lcdc[3], 0, SCREEN_TAG, 150,  0);
-	HD44102(config, m_lcdc[4], 0, SCREEN_TAG, 200,  0);
-	HD44102(config, m_lcdc[5], 0, SCREEN_TAG,   0, 32);
-	HD44102(config, m_lcdc[6], 0, SCREEN_TAG,  50, 32);
-	HD44102(config, m_lcdc[7], 0, SCREEN_TAG, 100, 32);
-	HD44102(config, m_lcdc[8], 0, SCREEN_TAG, 150, 32);
-	HD44102(config, m_lcdc[9], 0, SCREEN_TAG, 200, 32);
+	for (int i = 0; i < 10; i++)
+		HD44102(config, m_lcdc[i]).set_screen_offsets((i % 5) * 50, (i / 5) * 32);
 
 //  MCFG_HD44103_MASTER_ADD("m11", SCREEN_TAG, CAP_P(18), RES_K(100), HD44103_FS_HIGH, HD44103_DUTY_1_32)
 //  MCFG_HD44103_SLAVE_ADD( "m12", "m11", SCREEN_TAG, HD44103_FS_HIGH, HD44103_DUTY_1_32)
@@ -71,7 +63,7 @@ void tandy200_state::tandy200_video(machine_config &config)
 	screen.set_refresh_hz(80);
 	screen.set_screen_update(FUNC(tandy200_state::screen_update));
 	screen.set_size(240, 128);
-	screen.set_visarea(0, 240-1, 0, 128-1);
+	screen.set_visarea_full();
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(tandy200_state::tandy200_palette), 2);
