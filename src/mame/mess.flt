@@ -551,6 +551,8 @@ nintendo/n64.cpp
 nintendo/nds.cpp
 nintendo/nes.cpp
 nintendo/nes_clone.cpp
+nintendo/nes_m8.cpp
+nintendo/nes_m82.cpp
 nintendo/nes_sh6578.cpp
 nintendo/nes_vt02_vt03.cpp
 nintendo/nes_vt09.cpp
