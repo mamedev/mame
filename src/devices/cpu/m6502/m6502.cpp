@@ -36,7 +36,8 @@ m6502_device::m6502_device(const machine_config &mconfig, device_type type, cons
 
 void m6502_device::device_start()
 {
-	mintf = space(AS_PROGRAM).addr_width() > 14 ? std::make_unique<mi_default>() : std::make_unique<mi_default14>();
+	if(!uses_custom_memory_interface)
+		mintf = space(AS_PROGRAM).addr_width() > 14 ? std::make_unique<mi_default>() : std::make_unique<mi_default14>();
 
 	init();
 }
