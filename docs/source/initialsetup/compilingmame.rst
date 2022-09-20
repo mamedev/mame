@@ -271,12 +271,8 @@ Debian and Ubuntu (including Raspberry Pi and ODROID devices)
 You’ll need a few prerequisites from your Linux distribution.  Make sure you get
 SDL2 2.0.6 or later as earlier versions lack required functionality::
 
-    sudo apt-get install git build-essential python libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libpulse-dev qt5-default
+    sudo apt-get install git build-essential python libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libpulse-dev qt5-default qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools
 
-More recent distributions do not have a qt5-default metapackage.  If you see the error "E: Package 'qt5-default' has no installation candidate" then use the following::
-
-    sudo apt-get install qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools
- 
 Compilation is exactly as described above in All Platforms.  Note the Ubuntu
 Linux modifies GCC to enable the GNU C Library “fortify source” feature by
 default, which may cause issues compiling MAME (see :ref:`compiling-issues`).
