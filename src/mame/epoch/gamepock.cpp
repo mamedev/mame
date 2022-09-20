@@ -32,6 +32,8 @@ TODO:
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#include "gamepock.lh"
+
 namespace {
 
 class gamepock_state : public driver_device
@@ -67,11 +69,11 @@ private:
 	void hd44102ch_init(int which);
 	void lcd_update();
 
-	void port_a_w(uint8_t data);
-	void port_b_w(uint8_t data);
-	uint8_t port_c_r();
+	void control_w(uint8_t data);
+	void lcd_data_w(uint8_t data);
+	uint8_t input_r();
 	uint32_t screen_update_gamepock(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void gamepock_mem(address_map &map);
+	void main_map(address_map &map);
 
 	uint8_t m_port_a = 0U;
 	uint8_t m_port_b = 0U;
@@ -174,7 +176,7 @@ void gamepock_state::lcd_update()
 }
 
 
-void gamepock_state::port_a_w(uint8_t data)
+void gamepock_state::control_w(uint8_t data)
 {
 	// 76------  input select
 	// --543---  LCD CS
@@ -193,14 +195,14 @@ void gamepock_state::port_a_w(uint8_t data)
 }
 
 
-void gamepock_state::port_b_w(uint8_t data)
+void gamepock_state::lcd_data_w(uint8_t data)
 {
 	// LCD data
 	m_port_b = data;
 }
 
 
-uint8_t gamepock_state::port_c_r()
+uint8_t gamepock_state::input_r()
 {
 	uint8_t data = 0xff;
 
@@ -287,7 +289,7 @@ uint32_t gamepock_state::screen_update_gamepock(screen_device &screen, bitmap_in
 }
 
 
-void gamepock_state::gamepock_mem(address_map &map)
+void gamepock_state::main_map(address_map &map)
 {
 	// 0x0000-0x0fff is internal ROM
 	map(0x0000, 0x7fff).r("cartslot", FUNC(generic_slot_device::read_rom));
@@ -319,10 +321,10 @@ void gamepock_state::gamepock(machine_config &config)
 {
 	// basic machine hardware
 	UPD78C06(config, m_maincpu, 6_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &gamepock_state::gamepock_mem);
-	m_maincpu->pa_out_cb().set(FUNC(gamepock_state::port_a_w));
-	m_maincpu->pb_out_cb().set(FUNC(gamepock_state::port_b_w));
-	m_maincpu->pc_in_cb().set(FUNC(gamepock_state::port_c_r));
+	m_maincpu->set_addrmap(AS_PROGRAM, &gamepock_state::main_map);
+	m_maincpu->pa_out_cb().set(FUNC(gamepock_state::control_w));
+	m_maincpu->pb_out_cb().set(FUNC(gamepock_state::lcd_data_w));
+	m_maincpu->pc_in_cb().set(FUNC(gamepock_state::input_r));
 	m_maincpu->to_func().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
 	// video hardware
@@ -334,6 +336,8 @@ void gamepock_state::gamepock(machine_config &config)
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
+
+	config.set_default_layout(layout_gamepock);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
