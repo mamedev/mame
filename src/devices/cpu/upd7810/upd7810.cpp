@@ -1636,10 +1636,16 @@ void upd7810_device::base_device_start()
 	save_item(NAME(m_eom));
 	save_item(NAME(m_sml));
 	save_item(NAME(m_smh));
+	save_item(NAME(m_panm));
 	save_item(NAME(m_anm));
 	save_item(NAME(m_mkl));
 	save_item(NAME(m_mkh));
 	save_item(NAME(m_zcm));
+	save_item(NAME(m_pa_in));
+	save_item(NAME(m_pb_in));
+	save_item(NAME(m_pc_in));
+	save_item(NAME(m_pd_in));
+	save_item(NAME(m_pf_in));
 	save_item(NAME(m_pa_out));
 	save_item(NAME(m_pb_out));
 	save_item(NAME(m_pc_out));
@@ -1660,14 +1666,28 @@ void upd7810_device::base_device_start()
 	save_item(NAME(m_co1));
 	save_item(NAME(m_irr));
 	save_item(NAME(m_itf));
-	save_item(NAME(m_ovc0));
-	save_item(NAME(m_ovc1));
-	save_item(NAME(m_ovcf));
-	save_item(NAME(m_ovcs));
-	save_item(NAME(m_edges));
 	save_item(NAME(m_nmi));
 	save_item(NAME(m_int1));
 	save_item(NAME(m_int2));
+
+	save_item(NAME(m_txs));
+	save_item(NAME(m_rxs));
+	save_item(NAME(m_txcnt));
+	save_item(NAME(m_rxcnt));
+	save_item(NAME(m_txbuf));
+	save_item(NAME(m_ovc0));
+	save_item(NAME(m_ovc1));
+	save_item(NAME(m_ovce));
+	save_item(NAME(m_ovcf));
+	save_item(NAME(m_ovcs));
+	save_item(NAME(m_edges));
+	save_item(NAME(m_adcnt));
+	save_item(NAME(m_adtot));
+	save_item(NAME(m_tmpcr));
+	save_item(NAME(m_shdone));
+	save_item(NAME(m_adout));
+	save_item(NAME(m_adin));
+	save_item(NAME(m_adrange));
 
 	set_icountptr(m_icount);
 }
@@ -1812,11 +1832,13 @@ void upd7810_device::device_reset()
 	MC = 0xff;
 	m_mm = 0;
 	MF = 0xff;
+	m_mt = 0;
 	TMM = 0xff;
 	ETMM = 0xff;
 	m_eom = 0;
 	m_sml = 0;
 	m_smh = 0;
+	PANM = 0xff;
 	m_anm = 0;
 	MKL = 0xFF;
 	MKH = 0xFF; // ??
@@ -1851,7 +1873,7 @@ void upd7810_device::device_reset()
 	m_itf = 0;
 	m_nmi = 0;
 	m_int1 = 0;
-	m_int2 = 1; /* physical (inverted) INT2 line state */
+	m_int2 = 1; // physical (inverted) INT2 line state
 
 	m_txs = 0;
 	m_rxs = 0;
@@ -1871,8 +1893,6 @@ void upd7810_device::device_reset()
 	m_adout = 0;
 	m_adin = 0;
 	m_adrange = 0;
-
-	PANM = 0xff;
 }
 
 void upd7801_device::device_reset()
