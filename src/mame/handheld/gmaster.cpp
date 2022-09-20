@@ -269,5 +269,5 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY    FULLNAME
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY    FULLNAME       FLAGS
 CONS( 1990, gmaster, 0,      0,      gmaster, gmaster, gmaster_state, empty_init, "Hartung", "Game Master", MACHINE_SUPPORTS_SAVE )

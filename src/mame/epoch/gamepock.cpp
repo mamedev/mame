@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol
+// copyright-holders:Wilbert Pol, hap
 /******************************************************************************
 
 Epoch Game Pocket Computer
@@ -15,9 +15,6 @@ Hardware notes:
 Not counting the mini games included in the BIOS, only 5 games were released.
 It takes around 3 seconds for a cartridge to start up, this is normal.
 
-TODO:
-- use hd44102_device
-
 ******************************************************************************/
 
 #include "emu.h"
@@ -26,6 +23,7 @@ TODO:
 #include "bus/generic/slot.h"
 #include "cpu/upd7810/upd7810.h"
 #include "sound/spkrdev.h"
+#include "video/hd44102.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -42,6 +40,7 @@ public:
 	gamepock_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_lcd(*this, "lcd%u", 0),
 		m_speaker(*this, "speaker"),
 		m_inputs(*this, "IN%u", 0)
 	{ }
@@ -50,133 +49,87 @@ public:
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 private:
 	required_device<upd78c06_device> m_maincpu;
+	required_device_array<hd44102_device, 3> m_lcd;
 	required_device<speaker_sound_device> m_speaker;
 	required_ioport_array<2> m_inputs;
 
-	struct HD44102CH {
-		uint8_t   enabled = 0U;
-		uint8_t   start_page = 0U;
-		uint8_t   address = 0U;
-		uint8_t   y_inc = 0U;
-		uint8_t   ram[256]{};   // There are actually 50 x 4 x 8 bits. This just makes addressing easier.
-	};
+	void control_w(u8 data);
+	void lcd_data_w(u8 data);
+	u8 input_r();
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void hd44102ch_w(int which, int c_d, uint8_t data);
-	void hd44102ch_init(int which);
-	void lcd_update();
-
-	void control_w(uint8_t data);
-	void lcd_data_w(uint8_t data);
-	uint8_t input_r();
-	uint32_t screen_update_gamepock(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void main_map(address_map &map);
 
-	uint8_t m_port_a = 0U;
-	uint8_t m_port_b = 0U;
-	HD44102CH m_hd44102ch[3];
+	u8 m_control = 0;
+	u8 m_lcd_data = 0;
 };
 
 void gamepock_state::machine_start()
 {
-}
-
-void gamepock_state::machine_reset()
-{
-	hd44102ch_init( 0 );
-	hd44102ch_init( 1 );
-	hd44102ch_init( 2 );
+	save_item(NAME(m_control));
+	save_item(NAME(m_lcd_data));
 }
 
 
 
-void gamepock_state::hd44102ch_w( int which, int c_d, uint8_t data )
-{
-	if ( c_d )
-	{
-		uint8_t   y;
-		/* Data */
-		m_hd44102ch[which].ram[ m_hd44102ch[which].address ] = data;
+/******************************************************************************
+    I/O
+******************************************************************************/
 
-		/* Increment/decrement Y counter */
-		y = ( m_hd44102ch[which].address & 0x3F ) + m_hd44102ch[which].y_inc;
-		if ( y == 0xFF )
-		{
-			y = 49;
-		}
-		if ( y == 50 )
-		{
-			y = 0;
-		}
-		m_hd44102ch[which].address = ( m_hd44102ch[which].address & 0xC0 ) | y;
-	}
-	else
+// LCD outputs
+
+u32 gamepock_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int i = 0; i < 3; i++)
 	{
-		/* Command */
-		switch ( data )
+		const u8 *src = m_lcd[i]->render();
+
+		for (int sx = 0; sx < 50; sx++)
 		{
-		case 0x38:      /* Display off */
-			m_hd44102ch[which].enabled = 0;
-			break;
-		case 0x39:      /* Display on */
-			m_hd44102ch[which].enabled = 1;
-			break;
-		case 0x3A:      /* Y decrement mode */
-			m_hd44102ch[which].y_inc = 0xFF;
-			break;
-		case 0x3B:      /* Y increment mode */
-			m_hd44102ch[which].y_inc = 0x01;
-			break;
-		case 0x3E:      /* Display start page #0 */
-		case 0x7E:      /* Display start page #1 */
-		case 0xBE:      /* Display start page #2 */
-		case 0xFE:      /* Display start page #3 */
-			m_hd44102ch[which].start_page = data & 0xC0;
-			break;
-		default:
-			if ( ( data & 0x3F ) < 50 )
+			for (int sy = 0; sy < 32; sy++)
 			{
-				m_hd44102ch[which].address = data;
+				int dx = sx;
+				int dy = sy;
+
+				// determine destination coordinate
+				switch (i)
+				{
+					// LCD chip #0: top-left, but reverse-x
+					case 0:
+						dx = 49 - sx;
+						break;
+
+					// LCD chip #1: bottom-left
+					case 1:
+						dy += 32;
+						break;
+
+					// LCD chip #2: top-right + bottom-right
+					case 2:
+						dx = (sx % 25) + 50;
+						dy += (sx / 25) * 32;
+						break;
+
+					default:
+						break;
+				}
+
+				if (cliprect.contains(dx, dy))
+					bitmap.pix(dy, dx) = src[sy * 50 + sx];
 			}
-			break;
 		}
 	}
+
+	return 0;
 }
 
 
-void gamepock_state::hd44102ch_init( int which )
-{
-	memset( &m_hd44102ch[which], 0, sizeof( HD44102CH ) );
-	m_hd44102ch[which].y_inc = 0x01;
-}
+// other I/O
 
-
-void gamepock_state::lcd_update()
-{
-	/* Check whether HD44102CH #1 is enabled */
-	if ( m_port_a & 0x08 )
-	{
-		hd44102ch_w( 0, m_port_a & 0x04, m_port_b );
-	}
-
-	/* Check whether HD44102CH #2 is enabled */
-	if ( m_port_a & 0x10 )
-	{
-		hd44102ch_w( 1, m_port_a & 0x04, m_port_b );
-	}
-
-	/* Check whether HD44102CH #3 is enabled */
-	if ( m_port_a & 0x20 )
-	{
-		hd44102ch_w( 2, m_port_a & 0x04, m_port_b );
-	}
-}
-
-
-void gamepock_state::control_w(uint8_t data)
+void gamepock_state::control_w(u8 data)
 {
 	// 76------  input select
 	// --543---  LCD CS
@@ -184,110 +137,33 @@ void gamepock_state::control_w(uint8_t data)
 	// ------1-  LCD M (all 3)
 	// -------0  unknown
 
-	uint8_t   old_port_a = m_port_a;
-
-	m_port_a = data;
-
-	if ( ! ( old_port_a & 0x02 ) && ( m_port_a & 0x02 ) )
+	// write to LCD on falling edge of M
+	if (~data & m_control & 2)
 	{
-		lcd_update();
+		for (int i = 0; i < 3; i++)
+			if (BIT(data, i + 3))
+				m_lcd[i]->write(BIT(data, 2), m_lcd_data);
 	}
+
+	m_control = data;
 }
 
-
-void gamepock_state::lcd_data_w(uint8_t data)
+void gamepock_state::lcd_data_w(u8 data)
 {
-	// LCD data
-	m_port_b = data;
+	// LCD DB0-DB7
+	m_lcd_data = data;
 }
 
-
-uint8_t gamepock_state::input_r()
+u8 gamepock_state::input_r()
 {
-	uint8_t data = 0xff;
+	u8 data = 0xff;
 
-	// read inputs
 	for (int i = 0; i < 2; i++)
-		if (BIT(m_port_a, i ^ 7))
+		if (BIT(m_control, i ^ 7))
 			data &= m_inputs[i]->read();
 
 	return data;
 }
-
-
-
-uint32_t gamepock_state::screen_update_gamepock(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	uint8_t   ad;
-
-	/* Handle HD44102CH #0 */
-	ad = m_hd44102ch[0].start_page;
-	for ( int i = 0; i < 4; i++ )
-	{
-		for ( int j = 0; j < 50; j++ )
-		{
-			bitmap.pix(i * 8 + 0, 49 - j ) = ( m_hd44102ch[0].ram[ad+j] & 0x01 ) ? 0 : 1;
-			bitmap.pix(i * 8 + 1, 49 - j ) = ( m_hd44102ch[0].ram[ad+j] & 0x02 ) ? 0 : 1;
-			bitmap.pix(i * 8 + 2, 49 - j ) = ( m_hd44102ch[0].ram[ad+j] & 0x04 ) ? 0 : 1;
-			bitmap.pix(i * 8 + 3, 49 - j ) = ( m_hd44102ch[0].ram[ad+j] & 0x08 ) ? 0 : 1;
-			bitmap.pix(i * 8 + 4, 49 - j ) = ( m_hd44102ch[0].ram[ad+j] & 0x10 ) ? 0 : 1;
-			bitmap.pix(i * 8 + 5, 49 - j ) = ( m_hd44102ch[0].ram[ad+j] & 0x20 ) ? 0 : 1;
-			bitmap.pix(i * 8 + 6, 49 - j ) = ( m_hd44102ch[0].ram[ad+j] & 0x40 ) ? 0 : 1;
-			bitmap.pix(i * 8 + 7, 49 - j ) = ( m_hd44102ch[0].ram[ad+j] & 0x80 ) ? 0 : 1;
-		}
-		ad += 0x40;
-	}
-
-	/* Handle HD44102CH #1 */
-	ad = m_hd44102ch[1].start_page;
-	for ( int i = 4; i < 8; i++ )
-	{
-		for ( int j = 0; j < 50; j++ )
-		{
-			bitmap.pix(i * 8 + 0, j ) = ( m_hd44102ch[1].ram[ad+j] & 0x01 ) ? 0 : 1;
-			bitmap.pix(i * 8 + 1, j ) = ( m_hd44102ch[1].ram[ad+j] & 0x02 ) ? 0 : 1;
-			bitmap.pix(i * 8 + 2, j ) = ( m_hd44102ch[1].ram[ad+j] & 0x04 ) ? 0 : 1;
-			bitmap.pix(i * 8 + 3, j ) = ( m_hd44102ch[1].ram[ad+j] & 0x08 ) ? 0 : 1;
-			bitmap.pix(i * 8 + 4, j ) = ( m_hd44102ch[1].ram[ad+j] & 0x10 ) ? 0 : 1;
-			bitmap.pix(i * 8 + 5, j ) = ( m_hd44102ch[1].ram[ad+j] & 0x20 ) ? 0 : 1;
-			bitmap.pix(i * 8 + 6, j ) = ( m_hd44102ch[1].ram[ad+j] & 0x40 ) ? 0 : 1;
-			bitmap.pix(i * 8 + 7, j ) = ( m_hd44102ch[1].ram[ad+j] & 0x80 ) ? 0 : 1;
-		}
-		ad += 0x40;
-	}
-
-	/* Handle HD44102CH #2 */
-	ad = m_hd44102ch[2].start_page;
-	for ( int i = 0; i < 4; i++ )
-	{
-		for ( int j = 0; j < 25; j++ )
-		{
-			bitmap.pix(i * 8 + 0, 50 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x01 ) ? 0 : 1;
-			bitmap.pix(i * 8 + 1, 50 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x02 ) ? 0 : 1;
-			bitmap.pix(i * 8 + 2, 50 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x04 ) ? 0 : 1;
-			bitmap.pix(i * 8 + 3, 50 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x08 ) ? 0 : 1;
-			bitmap.pix(i * 8 + 4, 50 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x10 ) ? 0 : 1;
-			bitmap.pix(i * 8 + 5, 50 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x20 ) ? 0 : 1;
-			bitmap.pix(i * 8 + 6, 50 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x40 ) ? 0 : 1;
-			bitmap.pix(i * 8 + 7, 50 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x80 ) ? 0 : 1;
-		}
-		for ( int j = 25; j < 50; j++ )
-		{
-			bitmap.pix(32 + i * 8 + 0, 25 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x01 ) ? 0 : 1;
-			bitmap.pix(32 + i * 8 + 1, 25 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x02 ) ? 0 : 1;
-			bitmap.pix(32 + i * 8 + 2, 25 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x04 ) ? 0 : 1;
-			bitmap.pix(32 + i * 8 + 3, 25 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x08 ) ? 0 : 1;
-			bitmap.pix(32 + i * 8 + 4, 25 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x10 ) ? 0 : 1;
-			bitmap.pix(32 + i * 8 + 5, 25 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x20 ) ? 0 : 1;
-			bitmap.pix(32 + i * 8 + 6, 25 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x40 ) ? 0 : 1;
-			bitmap.pix(32 + i * 8 + 7, 25 + j ) = ( m_hd44102ch[2].ram[ad+j] & 0x80 ) ? 0 : 1;
-		}
-		ad += 0x40;
-	}
-
-	return 0;
-}
-
 
 void gamepock_state::main_map(address_map &map)
 {
@@ -297,6 +173,11 @@ void gamepock_state::main_map(address_map &map)
 	// 0xff80-0xffff is internal RAM
 }
 
+
+
+/******************************************************************************
+    Input Ports
+******************************************************************************/
 
 static INPUT_PORTS_START( gamepock )
 	PORT_START("IN0")
@@ -317,6 +198,11 @@ static INPUT_PORTS_START( gamepock )
 INPUT_PORTS_END
 
 
+
+/******************************************************************************
+    Machine Configs
+******************************************************************************/
+
 void gamepock_state::gamepock(machine_config &config)
 {
 	// basic machine hardware
@@ -332,10 +218,13 @@ void gamepock_state::gamepock(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(75, 64);
 	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(gamepock_state::screen_update_gamepock));
+	screen.set_screen_update(FUNC(gamepock_state::screen_update));
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
+
+	for (int i = 0; i < 3; i++)
+		HD44102(config, m_lcd[i]);
 
 	config.set_default_layout(layout_gamepock);
 
@@ -349,6 +238,11 @@ void gamepock_state::gamepock(machine_config &config)
 }
 
 
+
+/******************************************************************************
+    ROM Definitions
+******************************************************************************/
+
 ROM_START( gamepock )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "egpcboot.bin", 0x0000, 0x1000, CRC(ee1ea65d) SHA1(9c7731b5ead721d2cc7f7e2655c5fed9e56db8b0) )
@@ -357,4 +251,10 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 1984, gamepock, 0, 0, gamepock, gamepock, gamepock_state, empty_init, "Epoch", "Game Pocket Computer", 0 )
+
+/******************************************************************************
+    Drivers
+******************************************************************************/
+
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME                FLAGS
+CONS( 1984, gamepock, 0,      0,      gamepock, gamepock, gamepock_state, empty_init, "Epoch", "Game Pocket Computer", MACHINE_SUPPORTS_SAVE )
