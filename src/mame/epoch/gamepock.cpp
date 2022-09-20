@@ -6,8 +6,14 @@ Epoch Game Pocket Computer
 Japanese LCD handheld console
 
 Hardware notes:
-- NEC uPD78C06AG
-- x
+- NEC uPD78C06AG (4KB internal ROM), 6MHz XTAL
+- 2KB external RAM(HM6116P-4), up to 28KB external ROM on cartridge
+  (28KB in theory, actually the largest game is 16KB)
+- 3*HD44102CH, 75*64 1bpp LCD screen
+- 1-bit sound
+
+Not counting the mini games included in the BIOS, only 5 games were released.
+It takes around 3 seconds for a cartridge to start up, this is normal.
 
 TODO:
 - use hd44102_device
@@ -34,12 +40,21 @@ public:
 	gamepock_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_speaker(*this, "speaker")
+		m_speaker(*this, "speaker"),
+		m_inputs(*this, "IN%u", 0)
 	{ }
 
 	void gamepock(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
+	required_device<upd78c06_device> m_maincpu;
+	required_device<speaker_sound_device> m_speaker;
+	required_ioport_array<2> m_inputs;
+
 	struct HD44102CH {
 		uint8_t   enabled = 0U;
 		uint8_t   start_page = 0U;
@@ -48,14 +63,11 @@ private:
 		uint8_t   ram[256]{};   // There are actually 50 x 4 x 8 bits. This just makes addressing easier.
 	};
 
-	virtual void machine_reset() override;
-
 	void hd44102ch_w(int which, int c_d, uint8_t data);
 	void hd44102ch_init(int which);
 	void lcd_update();
 
 	void port_a_w(uint8_t data);
-	uint8_t port_b_r();
 	void port_b_w(uint8_t data);
 	uint8_t port_c_r();
 	uint32_t screen_update_gamepock(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -64,10 +76,19 @@ private:
 	uint8_t m_port_a = 0U;
 	uint8_t m_port_b = 0U;
 	HD44102CH m_hd44102ch[3];
-
-	required_device<upd78c06_device> m_maincpu;
-	required_device<speaker_sound_device> m_speaker;
 };
+
+void gamepock_state::machine_start()
+{
+}
+
+void gamepock_state::machine_reset()
+{
+	hd44102ch_init( 0 );
+	hd44102ch_init( 1 );
+	hd44102ch_init( 2 );
+}
+
 
 
 void gamepock_state::hd44102ch_w( int which, int c_d, uint8_t data )
@@ -155,6 +176,12 @@ void gamepock_state::lcd_update()
 
 void gamepock_state::port_a_w(uint8_t data)
 {
+	// 76------  input select
+	// --543---  LCD CS
+	// -----2--  LCD D/I (all 3)
+	// ------1-  LCD M (all 3)
+	// -------0  unknown
+
 	uint8_t   old_port_a = m_port_a;
 
 	m_port_a = data;
@@ -168,41 +195,24 @@ void gamepock_state::port_a_w(uint8_t data)
 
 void gamepock_state::port_b_w(uint8_t data)
 {
+	// LCD data
 	m_port_b = data;
-}
-
-
-uint8_t gamepock_state::port_b_r()
-{
-	logerror("gamepock_port_b_r: not implemented\n");
-	return 0xFF;
 }
 
 
 uint8_t gamepock_state::port_c_r()
 {
-	uint8_t   data = 0xFF;
+	uint8_t data = 0xff;
 
-	if ( m_port_a & 0x80 )
-	{
-		data &= ioport("IN0")->read();
-	}
-
-	if ( m_port_a & 0x40 )
-	{
-		data &= ioport("IN1")->read();
-	}
+	// read inputs
+	for (int i = 0; i < 2; i++)
+		if (BIT(m_port_a, i ^ 7))
+			data &= m_inputs[i]->read();
 
 	return data;
 }
 
 
-void gamepock_state::machine_reset()
-{
-	hd44102ch_init( 0 );
-	hd44102ch_init( 1 );
-	hd44102ch_init( 2 );
-}
 
 uint32_t gamepock_state::screen_update_gamepock(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -279,10 +289,8 @@ uint32_t gamepock_state::screen_update_gamepock(screen_device &screen, bitmap_in
 
 void gamepock_state::gamepock_mem(address_map &map)
 {
-	map.unmap_value_high();
 	// 0x0000-0x0fff is internal ROM
-	map(0x1000, 0x3fff).noprw();
-	map(0x4000, 0xbfff).r("cartslot", FUNC(generic_slot_device::read_rom));
+	map(0x0000, 0x7fff).r("cartslot", FUNC(generic_slot_device::read_rom));
 	map(0xc000, 0xc7ff).mirror(0x0800).ram();
 	// 0xff80-0xffff is internal RAM
 }
@@ -290,48 +298,49 @@ void gamepock_state::gamepock_mem(address_map &map)
 
 static INPUT_PORTS_START( gamepock )
 	PORT_START("IN0")
-	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_SELECT )
-	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SELECT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) // top-left
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) // bottom-left
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
-	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_START )
-	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) // top-right
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) // bottom-right
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
 void gamepock_state::gamepock(machine_config &config)
 {
-	UPD78C06(config, m_maincpu, 6_MHz_XTAL); // uPD78C06AG
+	// basic machine hardware
+	UPD78C06(config, m_maincpu, 6_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gamepock_state::gamepock_mem);
 	m_maincpu->pa_out_cb().set(FUNC(gamepock_state::port_a_w));
-	m_maincpu->pb_in_cb().set(FUNC(gamepock_state::port_b_r));
 	m_maincpu->pb_out_cb().set(FUNC(gamepock_state::port_b_w));
 	m_maincpu->pc_in_cb().set(FUNC(gamepock_state::port_c_r));
 	m_maincpu->to_func().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60);
 	screen.set_size(75, 64);
-	screen.set_visarea(0, 74, 0, 63);
+	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(gamepock_state::screen_update_gamepock));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	/* cartridge */
-	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "gamepock_cart");
-
-	/* Software lists */
+	// cartridge
+	GENERIC_CARTSLOT(config, "cartslot", generic_linear_slot, "gamepock_cart");
 	SOFTWARE_LIST(config, "cart_list").set_original("gamepock");
 }
 
