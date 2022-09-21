@@ -16,24 +16,29 @@ The electronic magnetic chessboard is the first of its kind. AVE later licensed
 it to Fidelity (see fidelity/elite.cpp).
 ARB is a romless system, the program ROM is on a cartridge.
 
-Known chess modules (*denotes not dumped yet):
-- Sargon 2.5
-- *Grand Master Series 3
-- *Grand Master Series 3.5
+Known chess modules:
+- Grand Master Series 3
 - Grand Master Series 4.0
+- Sargon 2.5
+- Sargon 3.5 (unofficial)
 
 Other games:
 - Avelan (checkers)
 
-Newer modules included button label stickers for OPTIONS, Verify, Take Back, Clear.
+Sandy Electronic renamed GMS 3 and GMS 4.0 to "3000 GMS" and "4,0 - 50 S".
+Sargon 3.5 was an unofficial module published by them. It was also a free EPROM
+upgrade for their customers who were unhappy with GMS 3.
 
-Around 2012, Steve Braid(aka Trilobyte/Steve UK) started manufacturing ARB V2 boards
-without a module slot. CPU and VIA were replaced with new WDC 14MHz-rated chips,
-running at 16MHz.
+GMS 4.0 included button label stickers for OPTIONS, Verify, Take Back, Clear.
+
+Around 2012, Steve Braid(aka Trilobyte/Steve UK) started manufacturing ARB V2
+boards without a module slot. CPU and VIA were replaced with new WDC 14MHz-rated
+chips, running at 16MHz.
 
 TODO:
-- verify gms40 module memory layout
-- gms40 and avelan rom labels
+- remove install_ram workaround when emumem bug is fixed, see:
+  https://github.com/mamedev/mame/commit/75caceb1c143757d10f874b0c2ebf0427f4dfc9f#commitcomment-84413054
+- avelan, gms3, gms4, sargon35 rom labels
 
 ******************************************************************************/
 
@@ -176,7 +181,11 @@ DEVICE_IMAGE_LOAD_MEMBER(arb_state::cart_load)
 
 	// extra ram (optional)
 	if (image.get_feature("ram"))
-		m_maincpu->space(AS_PROGRAM).install_ram(0x0800, 0x0fff, 0x1000, m_extram);
+	{
+		//m_maincpu->space(AS_PROGRAM).install_ram(0x0800, 0x0fff, 0x1000, m_extram);
+		m_maincpu->space(AS_PROGRAM).install_ram(0x0800, 0x0fff, 0, m_extram);
+		m_maincpu->space(AS_PROGRAM).install_ram(0x1800, 0x1fff, 0, m_extram);
+	}
 
 	m_altboard = bool(image.get_feature("altboard"));
 

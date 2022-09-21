@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 //============================================================
 //
-//  pointswininfo.c - Win32 debug window handling
+//  pointswininfo.cpp - Win32 debug window handling
 //
 //============================================================
 
@@ -15,6 +15,8 @@
 
 #include "winutf8.h"
 
+
+namespace osd::debugger::win {
 
 pointswin_info::pointswin_info(debugger_windows_interface &debugger) :
 	debugwin_info(debugger, false, std::string("All Breakpoints").c_str(), nullptr)
@@ -137,7 +139,7 @@ bool pointswin_info::handle_command(WPARAM wparam, LPARAM lparam)
 
 void pointswin_info::restore_configuration_from_node(util::xml::data_node const &node)
 {
-	switch (node.get_attribute_int(osd::debugger::ATTR_WINDOW_POINTS_TYPE, -1))
+	switch (node.get_attribute_int(ATTR_WINDOW_POINTS_TYPE, -1))
 	{
 	case 0:
 		SendMessage(window(), WM_COMMAND, ID_SHOW_BREAKPOINTS, 0);
@@ -158,19 +160,21 @@ void pointswin_info::save_configuration_to_node(util::xml::data_node &node)
 {
 	debugwin_info::save_configuration_to_node(node);
 
-	node.set_attribute_int(osd::debugger::ATTR_WINDOW_TYPE, osd::debugger::WINDOW_TYPE_POINTS_VIEWER);
+	node.set_attribute_int(ATTR_WINDOW_TYPE, WINDOW_TYPE_POINTS_VIEWER);
 	switch (m_views[0]->type())
 	{
 	case DVT_BREAK_POINTS:
-		node.set_attribute_int(osd::debugger::ATTR_WINDOW_POINTS_TYPE, 0);
+		node.set_attribute_int(ATTR_WINDOW_POINTS_TYPE, 0);
 		break;
 	case DVT_WATCH_POINTS:
-		node.set_attribute_int(osd::debugger::ATTR_WINDOW_POINTS_TYPE, 1);
+		node.set_attribute_int(ATTR_WINDOW_POINTS_TYPE, 1);
 		break;
 	case DVT_REGISTER_POINTS:
-		node.set_attribute_int(osd::debugger::ATTR_WINDOW_POINTS_TYPE, 2);
+		node.set_attribute_int(ATTR_WINDOW_POINTS_TYPE, 2);
 		break;
 	default:
 		break;
 	}
 }
+
+} // namespace osd::debugger::win

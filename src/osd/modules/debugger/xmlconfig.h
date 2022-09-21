@@ -22,11 +22,14 @@ WINDOW_TYPE_DEVICE_INFO_VIEWER
 };
 
 extern char const *const NODE_WINDOW;
+extern char const *const NODE_COLORS;
 
 extern char const *const NODE_WINDOW_SPLITS;
 extern char const *const NODE_WINDOW_SELECTION;
 extern char const *const NODE_WINDOW_SCROLL;
 extern char const *const NODE_WINDOW_EXPRESSION;
+
+extern char const *const ATTR_DEBUGGER_SAVE_WINDOWS;
 
 extern char const *const ATTR_WINDOW_TYPE;
 extern char const *const ATTR_WINDOW_POSITION_X;
@@ -47,6 +50,8 @@ extern char const *const ATTR_WINDOW_DISASSEMBLY_RIGHT_COLUMN;
 extern char const *const ATTR_WINDOW_POINTS_TYPE;
 
 extern char const *const ATTR_WINDOW_DEVICE_TAG;
+
+extern char const *const ATTR_COLORS_THEME;
 
 extern char const *const ATTR_SPLITS_CONSOLE_STATE;
 extern char const *const ATTR_SPLITS_CONSOLE_DISASSEMBLY;

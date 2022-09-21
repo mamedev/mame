@@ -166,6 +166,7 @@ image_init_result mmm01_device::load(std::string &message)
 {
 	// set up ROM and RAM
 	set_bank_bits_rom(9);
+	set_bank_bits_ram(4);
 	if (!check_rom(message) || !check_ram(message))
 		return image_init_result::FAIL;
 	cart_space()->install_view(0xa000, 0xbfff, m_view_ram);

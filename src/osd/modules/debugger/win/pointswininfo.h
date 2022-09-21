@@ -15,6 +15,8 @@
 #include "debugwininfo.h"
 
 
+namespace osd::debugger::win {
+
 class pointswin_info : public debugwin_info
 {
 public:
@@ -29,5 +31,7 @@ protected:
 	virtual bool handle_command(WPARAM wparam, LPARAM lparam) override;
 	virtual void save_configuration_to_node(util::xml::data_node &node) override;
 };
+
+} // namespace osd::debugger::win
 
 #endif // MAME_DEBUGGER_WIN_POINTSWININFO_H

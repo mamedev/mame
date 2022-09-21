@@ -3,10 +3,14 @@
 #ifndef MAME_DEBUGGER_QT_DEVICESWINDOW_H
 #define MAME_DEBUGGER_QT_DEVICESWINDOW_H
 
+#pragma once
+
 #include "windowqt.h"
 
 #include <QtWidgets/QTreeView>
 
+
+namespace osd::debugger::qt {
 
 //============================================================
 //  The model for the treeview
@@ -47,6 +51,9 @@ public slots:
 	void currentRowChanged(const QModelIndex &current, const QModelIndex &previous);
 	void activated(const QModelIndex &index);
 
+protected:
+	virtual void saveConfigurationToNode(util::xml::data_node &node) override;
+
 private:
 	QTreeView *m_devices_view;
 	DevicesWindowModel m_devices_model;
@@ -63,7 +70,7 @@ class DevicesWindowQtConfig : public WindowQtConfig
 {
 public:
 	DevicesWindowQtConfig() :
-		WindowQtConfig(WIN_TYPE_DEVICES)
+		WindowQtConfig(WINDOW_TYPE_DEVICES_VIEWER)
 	{
 	}
 
@@ -75,5 +82,6 @@ public:
 	void recoverFromXmlNode(util::xml::data_node const &node);
 };
 
+} // namespace osd::debugger::qt
 
 #endif // MAME_DEBUGGER_QT_DEVICESWINDOW_H

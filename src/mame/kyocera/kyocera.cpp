@@ -534,7 +534,8 @@ uint8_t kc85_state::lcd_r(offs_t offset)
 	uint8_t data = 0;
 
 	for (uint8_t i = 0; i < 10; i++)
-		data |= m_lcdc[i]->read(offset);
+		if (BIT(m_keylatch, i))
+			data |= m_lcdc[i]->read(offset);
 
 	return data;
 }
@@ -542,7 +543,8 @@ uint8_t kc85_state::lcd_r(offs_t offset)
 void kc85_state::lcd_w(offs_t offset, uint8_t data)
 {
 	for (uint8_t i = 0; i < 10; i++)
-		m_lcdc[i]->write(offset, data);
+		if (BIT(m_keylatch, i))
+			m_lcdc[i]->write(offset, data);
 }
 
 /* Memory Maps */
@@ -949,12 +951,8 @@ void kc85_state::i8155_pa_w(uint8_t data)
 
 	*/
 
-	/* keyboard */
-	m_keylatch = (m_keylatch & 0x100) | data;
-
-	/* LCD */
-	for (uint8_t i = 0; i < 8; i++)
-		m_lcdc[i]->cs2_w(BIT(data, i));
+	/* LCD, keyboard */
+	m_keylatch = (m_keylatch & 0x300) | data;
 
 	/* RTC */
 	m_rtc->c0_w(BIT(data, 0));
@@ -981,12 +979,8 @@ void kc85_state::i8155_pb_w(uint8_t data)
 
 	*/
 
-	/* keyboard */
-	m_keylatch = (BIT(data, 0) << 8) | (m_keylatch & 0xff);
-
-	/* LCD */
-	m_lcdc[8]->cs2_w(BIT(data, 0));
-	m_lcdc[9]->cs2_w(BIT(data, 1));
+	/* LCD, keyboard */
+	m_keylatch = (data << 8 & 0x300) | (m_keylatch & 0xff);
 
 	/* beeper */
 	m_buzzer = BIT(data, 2);

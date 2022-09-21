@@ -18,6 +18,5 @@ DECLARE_DEVICE_TYPE(GB_ROM_SACHEN1,      device_gb_cart_interface)
 DECLARE_DEVICE_TYPE(GB_ROM_SACHEN2,      device_gb_cart_interface)
 DECLARE_DEVICE_TYPE(GB_ROM_ROCKET,       device_gb_cart_interface)
 DECLARE_DEVICE_TYPE(GB_ROM_LASAMA,       device_gb_cart_interface)
-DECLARE_DEVICE_TYPE(GB_ROM_GBCK003,      device_gb_cart_interface)
 
 #endif // MAME_BUS_GAMEBOY_ROM_H

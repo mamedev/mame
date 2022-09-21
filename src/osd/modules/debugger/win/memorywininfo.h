@@ -15,6 +15,8 @@
 #include "editwininfo.h"
 
 
+namespace osd::debugger::win {
+
 class memorywin_info : public editwin_info
 {
 public:
@@ -38,5 +40,7 @@ private:
 
 	HWND    m_combownd;
 };
+
+} // namespace osd::debugger::win
 
 #endif // MAME_DEBUGGER_WIN_MEMORYWININFO_H

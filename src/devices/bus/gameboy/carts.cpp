@@ -10,6 +10,7 @@
 #include "carts.h"
 
 #include "camera.h"
+#include "gbck003.h"
 #include "huc1.h"
 #include "huc3.h"
 #include "mbc.h"
@@ -18,6 +19,7 @@
 #include "mbc7.h"
 #include "mmm01.h"
 #include "rom.h"
+#include "slmulti.h"
 #include "tama5.h"
 
 
@@ -33,7 +35,6 @@ char const *const GB_SACHEN1        = "rom_sachen1";
 char const *const GB_SACHEN2        = "rom_sachen2";
 char const *const GB_ROCKET         = "rom_rocket";
 char const *const GB_LASAMA         = "rom_lasama";
-char const *const GB_GBCK003        = "rom_gbck003";
 char const *const GB_MBC1           = "rom_mbc1";
 char const *const GB_MBC2           = "rom_mbc2";
 char const *const GB_MBC3           = "rom_mbc3";
@@ -53,6 +54,8 @@ char const *const GB_LICHENG        = "rom_licheng";
 char const *const GB_NEWGBCHK       = "rom_newgbchk";
 char const *const GB_VF001          = "rom_vf001";
 char const *const GB_DIGIMON        = "rom_digimon";
+char const *const GB_SLMULTI        = "rom_slmulti";
+char const *const GB_GBCK003        = "rom_gbck003";
 
 char const *const MEGADUCK_STD      = "rom";
 char const *const MEGADUCK_BANKED   = "rom_banked";
@@ -74,7 +77,6 @@ void gameboy_cartridges(device_slot_interface &device)
 	device.option_add_internal(slotoptions::GB_SACHEN2,         GB_ROM_SACHEN2);
 	device.option_add_internal(slotoptions::GB_ROCKET,          GB_ROM_ROCKET);
 	device.option_add_internal(slotoptions::GB_LASAMA,          GB_ROM_LASAMA);
-	device.option_add_internal(slotoptions::GB_GBCK003,         GB_ROM_GBCK003);
 	device.option_add_internal(slotoptions::GB_MBC1,            GB_ROM_MBC1);
 	device.option_add_internal(slotoptions::GB_MBC2,            GB_ROM_MBC2);
 	device.option_add_internal(slotoptions::GB_MBC3,            GB_ROM_MBC3);
@@ -95,6 +97,8 @@ void gameboy_cartridges(device_slot_interface &device)
 	device.option_add_internal(slotoptions::GB_NEWGBCHK,        GB_ROM_NEWGBCHK);
 	device.option_add_internal(slotoptions::GB_VF001,           GB_ROM_VF001);
 	device.option_add_internal(slotoptions::GB_DIGIMON,         GB_ROM_DIGIMON);
+	device.option_add_internal(slotoptions::GB_SLMULTI,         GB_ROM_SLMULTI);
+	device.option_add_internal(slotoptions::GB_GBCK003,         GB_ROM_GBCK003);
 }
 
 

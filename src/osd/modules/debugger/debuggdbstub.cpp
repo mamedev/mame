@@ -7,17 +7,23 @@
 //============================================================
 
 #include "emu.h"
+#include "debug_module.h"
+
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 #include "debug/points.h"
 #include "debug/textbuf.h"
-#include "debug_module.h"
 #include "debugger.h"
-#include "fileio.h"
+
 #include "modules/lib/osdobj_common.h"
 #include "modules/osdmodule.h"
 
+#include "fileio.h"
+
 #include <cinttypes>
+
+
+namespace {
 
 //-------------------------------------------------------------------------
 #define MAX_PACKET_SIZE 16384
@@ -411,7 +417,7 @@ static const std::map<std::string, const gdb_register_map &> gdb_register_maps =
 	{ "m68000",     gdb_register_map_m68000 },
 	{ "z80",        gdb_register_map_z80 },
 	{ "m6502",      gdb_register_map_m6502 },
-	{ "n2a03",      gdb_register_map_m6502 },
+	{ "rp2a03",     gdb_register_map_m6502 },
 	{ "m6809",      gdb_register_map_m6809 },
 	{ "score7",     gdb_register_map_score7 },
 };
@@ -1442,6 +1448,8 @@ void debug_gdbstub::handle_character(char ch)
 			break;
 	}
 }
+
+} // anonymous namespace
 
 //-------------------------------------------------------------------------
 MODULE_DEFINITION(DEBUG_GDBSTUB, debug_gdbstub)

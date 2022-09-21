@@ -15,6 +15,8 @@
 #include "editwininfo.h"
 
 
+namespace osd::debugger::win {
+
 class disasmbasewin_info : public editwin_info
 {
 public:
@@ -29,5 +31,7 @@ protected:
 	virtual bool handle_command(WPARAM wparam, LPARAM lparam) override;
 	virtual void save_configuration_to_node(util::xml::data_node &node) override;
 };
+
+} // namespace osd::debugger::win
 
 #endif // MAME_DEBUGGER_WIN_DISASMBASEWININFO_H

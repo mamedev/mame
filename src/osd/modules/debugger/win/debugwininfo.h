@@ -15,6 +15,8 @@
 #include "debugbaseinfo.h"
 
 
+namespace osd::debugger::win {
+
 class debugwin_info : protected debugbase_info
 {
 public:
@@ -40,6 +42,7 @@ public:
 	void show() const { smart_show_window(m_wnd, true); }
 	void hide() const { smart_show_window(m_wnd, false); }
 	void set_foreground() const { SetForegroundWindow(m_wnd); }
+	void redraw();
 	void destroy();
 
 	virtual bool set_default_focus();
@@ -111,6 +114,10 @@ protected:
 
 		ID_CLEAR_LOG,
 
+		ID_SAVE_WINDOWS,
+		ID_LIGHT_BACKGROUND,
+		ID_DARK_BACKGROUND,
+
 		ID_DEVICE_OPTIONS   // always keep this at the end
 	};
 
@@ -153,5 +160,7 @@ private:
 
 	static bool     s_window_class_registered;
 };
+
+} // namespace osd::debugger::win
 
 #endif // MAME_DEBUGGER_WIN_DEBUGWININFO_H

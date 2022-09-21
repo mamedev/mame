@@ -67,8 +67,9 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 --------------------------------------------------------------------
  @CP0904A  TMS0970   1977, Milton Bradley Comp IV
  @MP0905B  TMS0970   1977, Parker Brothers Codename Sector
- *MP0027   TMS1000   1977, Chromatronics Chroma-Chime
+ *MP0027   TMS1000   1977, Texas Instruments OEM melody chip (used in eg. Chromatronics Chroma-Chime)
  *MP0057   TMS1000   1978, APH Student Speech+ (same ROM contents as TSI Speech+?)
+ *MP0121   TMS1000   1979, Waddingtons Compute-A-Tune
  @MP0154   TMS1000   1979, Fonas 2 Player Baseball
  @MP0158   TMS1000   1979, Entex Soccer (6003)
  @MP0163   TMS1000   1979, A-One LSI Match Number/LJN Electronic Concentration
@@ -126,14 +127,14 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  *MP3207   TMS1000   1978, Concept 2000 Lite 'n Learn: Electronic Organ (model 554)
  @MP3208   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750B)
  @MP3226   TMS1000   1978, Milton Bradley Simon (Rev A)
- *MP3228   TMS1000   1979, Texas Instruments melody chip
+ *MP3228   TMS1000   1979, Texas Instruments OEM melody chip
  *MP3232   TMS1000   1979, Fonas 2 Player Baseball (no "MP" on chip label)
  @MP3260   TMS1000   1979, Electroplay Quickfire
  @MP3300   TMS1000   1979, Milton Bradley Simon (Rev F)
  @MP3301A  TMS1000   1979, Milton Bradley Big Trak
- *MP3310   TMS1000   1979, Texas Instruments melody chip
+ *MP3310   TMS1000   1979, Texas Instruments OEM melody chip
  *MP3312   TMS1000   1980, Nathan Mega 10000
- *MP3318   TMS1000   1979, Texas Instruments melody chip
+ *MP3318   TMS1000   1979, Texas Instruments OEM melody chip
  @MP3320A  TMS1000   1979, Coleco Head to Head: Electronic Basketball
  @MP3321A  TMS1000   1979, Coleco Head to Head: Electronic Hockey
  @MP3352   TMS1200   1979, Tiger Sub Wars (model 7-490)

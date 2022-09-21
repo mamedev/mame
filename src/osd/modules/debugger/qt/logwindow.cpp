@@ -12,6 +12,8 @@
 #include <QtWidgets/QVBoxLayout>
 
 
+namespace osd::debugger::qt {
+
 LogWindow::LogWindow(running_machine &machine, QWidget *parent) :
 	WindowQt(machine, nullptr)
 {
@@ -46,14 +48,17 @@ LogWindow::~LogWindow()
 }
 
 
+void LogWindow::saveConfigurationToNode(util::xml::data_node &node)
+{
+	WindowQt::saveConfigurationToNode(node);
+
+	node.set_attribute_int(ATTR_WINDOW_TYPE, WINDOW_TYPE_ERROR_LOG_VIEWER);
+}
+
+
 //=========================================================================
 //  LogWindowQtConfig
 //=========================================================================
-void LogWindowQtConfig::buildFromQWidget(QWidget *widget)
-{
-	WindowQtConfig::buildFromQWidget(widget);
-}
-
 
 void LogWindowQtConfig::applyToQWidget(QWidget *widget)
 {
@@ -61,13 +66,9 @@ void LogWindowQtConfig::applyToQWidget(QWidget *widget)
 }
 
 
-void LogWindowQtConfig::addToXmlDataNode(util::xml::data_node &node) const
-{
-	WindowQtConfig::addToXmlDataNode(node);
-}
-
-
 void LogWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
 {
 	WindowQtConfig::recoverFromXmlNode(node);
 }
+
+} // namespace osd::debugger::qt

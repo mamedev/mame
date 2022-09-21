@@ -51,6 +51,26 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 @implementation MAMEDebugView
 
 + (void)initialize {
+	// 10.14 and better get full adaptive Dark Mode support
+#if MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_14
+	DefaultForeground = [[NSColor textColor] retain];
+	ChangedForeground = [[NSColor systemRedColor] retain];
+	CommentForeground = [[NSColor systemGreenColor] retain];
+	// DCA_INVALID and DCA_DISABLED currently are not set by the core, so these 4 are unused
+	InvalidForeground = [[NSColor colorWithCalibratedRed:0.0 green:0.0 blue:1.0 alpha:1.0] retain];
+	DisabledChangedForeground = [[NSColor colorWithCalibratedRed:0.5 green:0.125 blue:0.125 alpha:1.0] retain];
+	DisabledInvalidForeground = [[NSColor colorWithCalibratedRed:0.0 green:0.0 blue:0.5 alpha:1.0] retain];
+	DisabledCommentForeground = [[NSColor colorWithCalibratedRed:0.0 green:0.25 blue:0.0 alpha:1.0] retain];
+
+	DefaultBackground = [[NSColor textBackgroundColor] retain];
+	VisitedBackground = [[NSColor systemTealColor] retain];
+	AncillaryBackground = [[NSColor unemphasizedSelectedContentBackgroundColor] retain];
+	SelectedBackground = [[NSColor selectedContentBackgroundColor] retain];
+	CurrentBackground = [[NSColor selectedControlColor] retain];
+	SelectedCurrentBackground = [[NSColor unemphasizedSelectedContentBackgroundColor] retain];
+	InactiveSelectedBackground = [[NSColor unemphasizedSelectedContentBackgroundColor] retain];
+	InactiveSelectedCurrentBackground = [[NSColor systemGrayColor] retain];
+#else
 	DefaultForeground = [[NSColor colorWithCalibratedWhite:0.0 alpha:1.0] retain];
 	ChangedForeground = [[NSColor colorWithCalibratedRed:0.875 green:0.0 blue:0.0 alpha:1.0] retain];
 	InvalidForeground = [[NSColor colorWithCalibratedRed:0.0 green:0.0 blue:1.0 alpha:1.0] retain];
@@ -67,6 +87,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	SelectedCurrentBackground = [[NSColor colorWithCalibratedRed:0.875 green:0.625 blue:0.875 alpha:1.0] retain];
 	InactiveSelectedBackground = [[NSColor colorWithCalibratedWhite:0.875 alpha:1.0] retain];
 	InactiveSelectedCurrentBackground = [[NSColor colorWithCalibratedRed:0.875 green:0.5 blue:0.625 alpha:1.0] retain];
+#endif
 
 	NonWhiteCharacters = [[[NSCharacterSet whitespaceAndNewlineCharacterSet] invertedSet] retain];
 }

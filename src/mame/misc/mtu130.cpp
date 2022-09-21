@@ -12,7 +12,6 @@
 // Unimplemented:
 // - MTUTAPE, a kind of digital tape?
 // - MTUNET, some proprietary network
-// - EPROM support (we don't have any image, maps at c000+)
 // - Sound on user via cb2, it's weird
 // - Light pen, need working demo code
 
@@ -23,15 +22,16 @@
 // - PROGRAMMOVER, a z80-based board
 // - MultI-O, an i/o board
 
-// Need to add the extra PROMs once they're dumped.
+// Sequencer PROM added, ID prom being studied.
 
 // Probable bug somewhere making the BASIC (light pen, game) demos
 // fail in the demonstration disk, possibly in the customized 6502
 // core.
 
 #include "emu.h"
-#include "cpu/m6502/m6502mtu.h"
+#include "cpu/m6502/m6502.h"
 #include "imagedev/floppy.h"
+#include "imagedev/cartrom.h"
 #include "machine/6522via.h"
 #include "machine/input_merger.h"
 #include "machine/mos6551.h"
@@ -44,7 +44,31 @@
 #include "screen.h"
 #include "speaker.h"
 
-class mtu130_state: public driver_device
+
+class mtu130_rom_device : public device_t, public device_rom_image_interface {
+public:
+	mtu130_rom_device(const machine_config &mconfig, char const *tag, device_t *owner, uint32_t clock);
+	template <typename T> mtu130_rom_device(const machine_config &mconfig, char const *tag, device_t *owner, T &&romdata_tag, offs_t load_offset) :
+		mtu130_rom_device(mconfig, tag, owner, 0)
+	{
+		m_load_offset = load_offset;
+		m_romdata.set_tag(std::forward<T>(romdata_tag));
+	}
+
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *file_extensions() const noexcept override { return "rom,bin"; }
+
+protected:
+	virtual void device_start() override;
+	virtual image_init_result call_load() override;
+	virtual void call_unload() override;
+
+private:
+	required_shared_ptr<u8> m_romdata;
+	offs_t m_load_offset;
+};
+
+class mtu130_state : public driver_device
 {
 public:
 	mtu130_state(const machine_config &mconfig, device_type type, const char *tag) :
@@ -59,6 +83,7 @@ public:
 		m_fdc(*this, "fdc"),
 		m_floppy(*this, "fdc:%d", 0U),
 		m_ext(*this, "ext%d", 0U),
+		m_roms(*this, "rom%d", 0U),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_dac(*this, "dac"),
@@ -70,8 +95,12 @@ public:
 		m_mainram(*this, "mainram"),
 		m_fdcram(*this, "fdcram"),
 		m_videoram(*this, "videoram"),
+		m_romdata(*this, "romdata"),
+		m_ipl(*this, "ipl"),
+		m_sequencer(*this, "sequencer"),
 		m_keyboard(*this, "K%X", 0L),
-		m_keyboard_meta(*this, "KM")
+		m_keyboard_meta(*this, "KM"),
+		m_jumpers(*this, "jumpers")
 	{ }
 
 	void mtu130(machine_config &config);
@@ -82,10 +111,32 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	virtual void video_start() override;
 
 private:
-	required_device<m6502mtu_device> m_maincpu;
+	class memory_interface : public m6502_device::memory_interface {
+	public:
+		u8 m_sadr, m_write_count, m_banks;
+
+		memory_access<18, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
+		
+		const u8 *m_sequencer;
+
+		memory_interface(const u8 *sequencer, address_space &space);
+		virtual ~memory_interface() = default;
+		virtual uint8_t read(uint16_t adr) override;
+		virtual uint8_t read_sync(uint16_t adr) override;
+		virtual uint8_t read_arg(uint16_t adr) override;
+		virtual void write(uint16_t adr, uint8_t val) override;
+
+		std::pair<u32, u8> normal_step(u16 adr);
+		u32 banked_address(u16 adr, u8 sadr) const;
+
+		void set_banks(u8 pbank, u8 dbank) { m_banks = (dbank << 2) | pbank; }
+	};
+
+	required_device<m6502_device> m_maincpu;
 	required_device<via6522_device> m_user_6522;
 	required_device<via6522_device> m_sys1_6522;
 	required_device<via6522_device> m_sys2_6522;
@@ -95,6 +146,7 @@ private:
 	required_device<upd765a_device> m_fdc;
 	required_device_array<floppy_connector, 4> m_floppy;
 	required_device_array<mtu130_extension_device, 3> m_ext;
+	required_device_array<mtu130_rom_device, 4> m_roms;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<dac_byte_interface> m_dac;
@@ -107,9 +159,15 @@ private:
 	required_shared_ptr<u8> m_mainram;
 	required_shared_ptr<u8> m_fdcram;
 	required_shared_ptr<u8> m_videoram;
+	required_shared_ptr<u8> m_romdata;
 
+	required_memory_region m_ipl;
+	required_region_ptr<u8> m_sequencer;
 	required_ioport_array<16> m_keyboard;
 	required_ioport m_keyboard_meta;
+	required_ioport m_jumpers;
+
+	memory_interface *m_maincpu_intf;
 
 	uint16_t m_dma_adr;
 	u8 m_keyboard_col;
@@ -145,8 +203,140 @@ private:
 	void io_disable_w(u8);
 };
 
+DEFINE_DEVICE_TYPE(MTU130_ROM, mtu130_rom_device, "mtu130_rom", "MTU130 rom slot")
+
+	mtu130_rom_device::mtu130_rom_device(const machine_config &mconfig, char const *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, MTU130_ROM, tag, owner, clock),
+	device_rom_image_interface(mconfig, *this),
+	m_romdata(*this, finder_base::DUMMY_TAG),
+	m_load_offset(0)
+{
+}
+
+void mtu130_rom_device::device_start()
+{
+	if(!exists())
+		memset(m_romdata + m_load_offset, 0xff, 4096);
+}
+
+image_init_result mtu130_rom_device::call_load()
+{
+	u32 len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
+	if(!len || len > 4096 || (4096 % len))
+		return image_init_result::FAIL;
+
+	if (!loaded_through_softlist())
+		fread(m_romdata + m_load_offset, len);
+	else
+		memcpy(m_romdata + m_load_offset, get_software_region("rom"), len);
+
+	if(len < 4096) {
+		offs_t delta = len;
+		while(delta < 4096) {
+			memcpy(m_romdata + m_load_offset + delta, m_romdata + m_load_offset, len);
+			delta += len;
+		}
+	}
+
+	return image_init_result::PASS;
+}
+
+void mtu130_rom_device::call_unload()
+{
+	memset(m_romdata + m_load_offset, 0xff, 4096);
+}
+
+mtu130_state::memory_interface::memory_interface(const u8 *sequencer, address_space &space) : m_sadr(0), m_write_count(0), m_banks(0), m_sequencer(sequencer)
+{
+	space.specific(m_program);
+}	
+
+u32 mtu130_state::memory_interface::banked_address(u16 adr, u8 sadr) const
+{
+	u32 cur_bank_slot = m_sequencer[sadr] & 3;
+	u32 cur_bank = (m_banks >> (cur_bank_slot << 1)) & 3;
+	return adr | (cur_bank << 16);
+}
+
+u8 mtu130_state::memory_interface::read_sync(u16 adr)
+{
+	m_write_count = 0;
+
+	u8 sadr = m_sadr & 0xf0; // Cycle counter to zero
+	if(adr >= 0x200)
+		sadr |= 0x08;
+
+	u8 data = m_program.read_byte(banked_address(adr, sadr));
+
+	sadr &= 0x8f;
+
+	// All of that happens after the read
+	if((data & 0x0f) != 0x0c && (data & 0x0f) != 0x0d && (data & 0x0f) != 0x0e && (data & 0x17) != 0x01)
+		sadr |= 0x10;
+
+	if((data & 0x0f) != 0x01)
+		sadr |= 0x20;
+
+	if(adr >= 0x200)
+		sadr |= 0x40;
+
+	// rti recognition
+	if(data == 0x40)
+		sadr &= ~0x80;
+
+	m_sadr = sadr;
+
+	return data;
+}
+
+std::pair<u32, u8> mtu130_state::memory_interface::normal_step(u16 adr)
+{
+	u8 sadr = m_sadr;
+	if(adr >= 0x200)
+		sadr |= 0x08;
+	else
+		sadr &= ~0x08;
+
+	u32 badr = banked_address(adr, sadr);
+
+	sadr = ((sadr + 1) & 7) | (sadr & 0xf8);
+	return std::make_pair(badr, sadr);
+}
+
+u8 mtu130_state::memory_interface::read(u16 adr)
+{
+	auto [badr, sadr] = normal_step(adr);
+	u8 data = m_program.read_byte(badr);
+	m_write_count = 0;
+	m_sadr = sadr;
+	return data;
+}	
+
+u8 mtu130_state::memory_interface::read_arg(u16 adr)
+{
+	return read(adr);
+}
+
+void mtu130_state::memory_interface::write(u16 adr, u8 val)
+{
+	auto [badr, sadr] = normal_step(adr);
+	m_program.write_byte(badr, val);
+	m_write_count ++;
+	if(m_write_count == 3)
+		sadr |= 0x80;
+	m_sadr = sadr;
+}
+
 void mtu130_state::machine_start()
 {
+	auto intf = std::make_unique<memory_interface>(m_sequencer, m_maincpu->space(AS_PROGRAM));
+	m_maincpu_intf = intf.get();
+
+	save_item(NAME(intf->m_sadr));
+	save_item(NAME(intf->m_write_count));
+
+	m_maincpu->set_custom_memory_interface(std::move(intf));
+
 	m_dma_adr = 0;
 	m_dma_direction = false;
 	m_keyboard_col = 0;
@@ -167,12 +357,16 @@ void mtu130_state::machine_start()
 
 	m_fdc->set_rate(500000);
 	m_io_view.select(1);
-	m_se_view.select(0);
 	m_rom_view.disable();
 	m_rof_view.disable();
 
 	for(auto e : m_ext)
 		e->map_io(m_io_view[1]);
+}
+
+void mtu130_state::machine_reset()
+{
+	m_se_view.select(m_jumpers->read() & 0x01);
 }
 
 void mtu130_state::video_start()
@@ -208,10 +402,10 @@ uint32_t mtu130_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 			const u8 *src = m_videoram + 60 * y + (x0 >> 4);
 			u16 *dest = &bitmap.pix(y, cliprect.left());
 			u8 v = 0;
-			if(x0 & 15)
+			if(x0 & 7)
 				v = *src++;
 			for(int x = x0; x <= x1; x++) {
-				if(!(x & 15))
+				if(!(x & 7))
 					v = *src++;
 				*dest++ = (v >> (6 - 2*((x >> 1) & 3))) & 3;
 			}
@@ -291,8 +485,14 @@ void mtu130_state::user_cb2_w(int line)
 
 void mtu130_state::sys1_pb_w(u8 data)
 {
-	m_maincpu->set_dbank((~data) & 3);
-	m_maincpu->set_pbank((~data >> 2) & 3);
+	m_maincpu_intf->set_banks((~data >> 2) & 3, (~data) & 3);
+
+	// The jumper inverts the via-driven selection between external
+	// and fdc rom, changing the reset default.
+	if(data & 0x40)
+		m_se_view.select(m_jumpers->read() & 0x01);
+	else
+		m_se_view.select((m_jumpers->read() & 0x01) ^ 1);
 
 	if(data & 0x80)
 		m_rom_view.disable();
@@ -382,11 +582,13 @@ void mtu130_state::map(address_map &map)
 	m_se_view[0](0x0e000, 0x0ffff).view(m_rof_view);                // View to write-protect the top half of the fdc ram
 	m_rof_view[1](0x0e000, 0x0ffff).nopw();
 
-	m_se_view[0](0x0ff00, 0x0ffff).rom().region("ipl", 0).unmapw(); // Bootrom overrides the end of the ram
+	m_se_view[0](0x0ff00, 0x0ffff).rom().region(m_ipl, 0).unmapw(); // Bootrom overrides the end of the ram
 	m_se_view[0](0x0ffe8, 0x0ffef).unmaprw();                       // Hole in the prom access for floppy i/o
 	m_se_view[0](0x0ffe8, 0x0ffe8).rw(FUNC(mtu130_state::fdc_ctrl_r), FUNC(mtu130_state::fdc_ctrl_w));
 	m_se_view[0](0x0ffea, 0x0ffea).w(FUNC(mtu130_state::dma_adr_w));
 	m_se_view[0](0x0ffee, 0x0ffef).m(m_fdc, FUNC(upd765a_device::map));
+
+	m_se_view[1](0x0c000, 0x0ffff).rom().share(m_romdata);          // External rom view, contents set by the MTU130_ROM subdevices
 
 	map(0x0fffe, 0x0fffe).w(FUNC(mtu130_state::io_enable_w));
 	map(0x0ffff, 0x0ffff).w(FUNC(mtu130_state::io_disable_w));
@@ -419,7 +621,8 @@ void mtu130_state::mtu130(machine_config &config)
 {
 	config.set_perfect_quantum(m_maincpu); // Needs tight sync with the 68000 in the datamover
 
-	M6502MTU(config, m_maincpu, 10_MHz_XTAL/10);
+	M6502(config, m_maincpu, 10_MHz_XTAL/10);
+	m_maincpu->set_address_width(18, true);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mtu130_state::map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -472,10 +675,20 @@ void mtu130_state::mtu130(machine_config &config)
 	extension_board(config, 0, "ext0", "datamover");
 	extension_board(config, 1, "ext1", nullptr);
 	extension_board(config, 2, "ext2", nullptr);
+
+	MTU130_ROM(config, m_roms[0], m_romdata, 0x3000);
+	MTU130_ROM(config, m_roms[1], m_romdata, 0x2000);
+	MTU130_ROM(config, m_roms[2], m_romdata, 0x1000);
+	MTU130_ROM(config, m_roms[3], m_romdata, 0x0000);
 }
 
 
 static INPUT_PORTS_START(mtu130)
+	PORT_START("jumpers")
+	PORT_CONFNAME(0x01, 0x00, "Boot rom")
+	PORT_CONFSETTING(0x00, "FDC rom")
+	PORT_CONFSETTING(0x01, "ROM1 rom (aka rom F)")
+
 	PORT_START("K0")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RSHIFT)      PORT_CHAR(UCHAR_SHIFT_2) PORT_NAME("RIGHT SHIFT")
@@ -612,8 +825,12 @@ static INPUT_PORTS_START(mtu130)
 INPUT_PORTS_END
 
 ROM_START(mtu130)
-	ROM_REGION(0x800, "ipl", 0)
+	ROM_REGION(0x100, "ipl", 0)
 	ROM_LOAD("ipl_prom.u6", 0, 0x100, CRC(edb1525a) SHA1(a16cce3b096f0fea9ac5c6993ee4241e4af1efde))
+
+	ROM_REGION(0x100, "sequencer", 0) // 4-bit prom
+	ROM_LOAD("6301.u55", 0, 0x100, CRC(1541eb91) SHA1(78ab124865dc6ffd646abd2fcab5b881edd619c1))
+
 ROM_END
 
 COMP(1981, mtu130, 0, 0, mtu130, mtu130, mtu130_state, empty_init, "Micro Technology Unlimited", "MTU-130", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND)

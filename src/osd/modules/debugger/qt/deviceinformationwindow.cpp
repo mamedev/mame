@@ -10,6 +10,8 @@
 #include <QtWidgets/QVBoxLayout>
 
 
+namespace osd::debugger::qt {
+
 DeviceInformationWindow::DeviceInformationWindow(running_machine &machine, device_t *device, QWidget *parent) :
 	WindowQt(machine, nullptr),
 	m_device(device)
@@ -28,6 +30,17 @@ DeviceInformationWindow::DeviceInformationWindow(running_machine &machine, devic
 DeviceInformationWindow::~DeviceInformationWindow()
 {
 }
+
+
+void DeviceInformationWindow::saveConfigurationToNode(util::xml::data_node &node)
+{
+	WindowQt::saveConfigurationToNode(node);
+
+	node.set_attribute_int(ATTR_WINDOW_TYPE, WINDOW_TYPE_DEVICE_INFO_VIEWER);
+
+	node.set_attribute(ATTR_WINDOW_DEVICE_TAG, m_device->tag());
+}
+
 
 void DeviceInformationWindow::fill_device_information()
 {
@@ -101,22 +114,10 @@ void DeviceInformationWindow::set_device(const char *tag)
 	fill_device_information();
 }
 
-const char *DeviceInformationWindow::device_tag() const
-{
-	return m_device->tag();
-}
-
 
 //=========================================================================
 //  DeviceInformationWindowQtConfig
 //=========================================================================
-void DeviceInformationWindowQtConfig::buildFromQWidget(QWidget *widget)
-{
-	WindowQtConfig::buildFromQWidget(widget);
-	DeviceInformationWindow *window = dynamic_cast<DeviceInformationWindow *>(widget);
-	m_device_tag = window->device_tag();
-}
-
 
 void DeviceInformationWindowQtConfig::applyToQWidget(QWidget *widget)
 {
@@ -126,15 +127,10 @@ void DeviceInformationWindowQtConfig::applyToQWidget(QWidget *widget)
 }
 
 
-void DeviceInformationWindowQtConfig::addToXmlDataNode(util::xml::data_node &node) const
-{
-	WindowQtConfig::addToXmlDataNode(node);
-	node.set_attribute(osd::debugger::ATTR_WINDOW_DEVICE_TAG, m_device_tag.c_str());
-}
-
-
 void DeviceInformationWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
 {
 	WindowQtConfig::recoverFromXmlNode(node);
-	m_device_tag = node.get_attribute_string(osd::debugger::ATTR_WINDOW_DEVICE_TAG, ":");
+	m_device_tag = node.get_attribute_string(ATTR_WINDOW_DEVICE_TAG, ":");
 }
+
+} // namespace osd::debugger::qt

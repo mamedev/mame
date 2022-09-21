@@ -2994,7 +2994,6 @@ roadriotb                       // 136089           (c) 1991
 
 @source:atari/atarigt.cpp
 primrage                        // 136102           (c) 1994
-primragej                       // 136102           (c) 1994
 primrage20                      // 136102           (c) 1994
 tmek                            // 136100           (c) 1994
 tmek20                          // 136100           (c) 1994
@@ -33409,14 +33408,20 @@ drpcjr                          // Bung Doctor PC Jr
 famicom                         // Nintendo Family Computer (a.k.a. Famicom)
 famicomo                        // Nintendo Family Computer (original with RP2A03)
 famitvc1                        // Sharp My Computer Terebi C1
-famitwin                        // Sharp Famicom Twin System
+famitwin                        // Sharp Twin Famicom
 fctitler                        // Sharp Famicom Titler AN-510
 fds                             // Nintendo Family Computer (a.k.a. Famicom) + Disk System add-on
 gchinatv                        // Golden China TV Game Centre (Chinese famiclone)
-m82                             // Nintendo M82 Display Unit
-m82p                            // Nintendo M82 Display Unit PAL
 nes                             // Nintendo Entertainment System
 nespal                          // Nintendo Entertainment System PAL
+
+@source:nintendo/nes_m8.cpp
+nesm8                           // Nintendo M8 Game Selectable Working Product Display
+nesm8a
+nesm8b
+
+@source:nintendo/nes_m82.cpp
+m82                             // Nintendo M82 Game Selectable Working Product Display
 
 @source:nintendo/nes_arcade_bl.cpp
 smb3bl
@@ -37158,6 +37163,7 @@ rulechan                        // 1992 ElectroChance
 rulechab                        // 1992 ElectroChance
 
 @source:misc/amuzy.cpp
+amhbattl
 docchift
 mmhammer
 
