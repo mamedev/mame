@@ -32359,6 +32359,7 @@ pacapp2                         // 1999.07 Paca Paca Passion 2 (Japan, PKS1/VER.
 pacappsp                        // 1999.12 Paca Paca Passion Special (Japan, PSP1/VER.A)
 ptblank2                        // 1999.?? Point Blank 2 (GNB5/VER.A)
 soulclbr                        // 1998.?? Soul Calibur (World, SOC14/VER.C)
+soulclbraa                      // 1998.?? Soul Calibur (Asia, SOC12/VER.A2)
 soulclbrja                      // 1998.?? Soul Calibur (Japan, SOC11/VER.A2)
 soulclbrjb                      // 1998.?? Soul Calibur (Japan, SOC11/VER.B)
 soulclbrjc                      // 1998.07 Soul Calibur (Japan, SOC11/VER.C)
@@ -37141,7 +37142,7 @@ rt1715lc                        // (latin/cyrillic)
 rt1715w                         //
 
 @source:ibm/rs6000_type7xxx.cpp
-rs6k7009						// IBM RS/6000 Type 7009 Server
+rs6k7009                        // IBM RS/6000 Type 7009 Server
 
 @source:ibm/rtpc.cpp
 rtpc010                         // IBM RT PC Model 010
