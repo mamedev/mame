@@ -21,7 +21,7 @@ license:CC0
 	<!-- 2 - SPACEFIRE -->
 	<software name="spfire">
 		<description>Space Fire</description>
-		<year>1980?</year>
+		<year>1980</year>
 		<publisher>Bandai</publisher>
 		<info name="alt_title" value="スペースファイヤー" />
 		<part name="cart" interface="sv8000_cart">
@@ -34,7 +34,7 @@ license:CC0
 	<!-- 3 - OTHELLO -->
 	<software name="othello">
 		<description>Othello</description>
-		<year>1980?</year>
+		<year>1980</year>
 		<publisher>Bandai</publisher>
 		<info name="alt_title" value="オセロ" />
 		<part name="cart" interface="sv8000_cart">
@@ -47,7 +47,7 @@ license:CC0
 	<!-- 4 - GUNPROFESSIONAL -->
 	<software name="gunprof">
 		<description>Gun Fighter</description>
-		<year>1980?</year>
+		<year>1980</year>
 		<publisher>Bandai</publisher>
 		<info name="alt_title" value="ガンプロフェッショナル" />
 		<part name="cart" interface="sv8000_cart">
@@ -60,7 +60,7 @@ license:CC0
 	<!-- 5 - PACPACBIRD -->
 	<software name="pacpac">
 		<description>Pac Pac Bird</description>
-		<year>1980?</year>
+		<year>1980</year>
 		<publisher>Bandai</publisher>
 		<info name="alt_title" value="パクパクバード" />
 		<part name="cart" interface="sv8000_cart">
@@ -73,7 +73,7 @@ license:CC0
 	<!-- 6 - SUBMARINE -->
 	<software name="submar">
 		<description>Submarine</description>
-		<year>1980?</year>
+		<year>1980</year>
 		<publisher>Bandai</publisher>
 		<info name="alt_title" value="サブマリン" />
 		<part name="cart" interface="sv8000_cart">
@@ -86,7 +86,7 @@ license:CC0
 	<!-- 7 - BEAMGALAXIAN -->
 	<software name="beamgala">
 		<description>Beamgalaxian</description>
-		<year>1980?</year>
+		<year>1980</year>
 		<publisher>Bandai</publisher>
 		<info name="alt_title" value="ビームギャラクシアン" />
 		<part name="cart" interface="sv8000_cart">
