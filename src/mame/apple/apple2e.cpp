@@ -114,9 +114,6 @@ MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accele
 #include "emu.h"
 
 #include "apple2video.h"
-
-#define IICP_NEW_IWM (0)
-
 #include "apple2common.h"
 
 #include "cpu/m6502/m6502.h"
@@ -134,7 +131,6 @@ MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accele
 #include "machine/kb3600.h"
 #include "machine/mos6551.h"
 #include "machine/ram.h"
-#include "machine/sonydriv.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 
@@ -240,12 +236,8 @@ public:
 		m_acia1(*this, IIC_ACIA1_TAG),
 		m_acia2(*this, IIC_ACIA2_TAG),
 		m_laserudc(*this, LASER128_UDC_TAG),
-#if IICP_NEW_IWM
 		m_iicpiwm(*this, "fdc"),
 		m_floppy(*this, "fdc:%d", 0U),
-#else
-		m_iicpiwm(*this, "fdc"),
-#endif
 		m_ds1315(*this, "nsc"),
 		m_printer_conn(*this, "parallel"),
 		m_printer_out(*this, "laserprnout")
@@ -261,10 +253,8 @@ public:
 		m_isace2200 = false;
 		m_ace2200_axxx_bank = false;
 		m_pal = false;
-#if IICP_NEW_IWM
 		m_cur_floppy = nullptr;
 		m_devsel = 0;
-#endif
 	}
 
 	required_device<cpu_device> m_maincpu;
@@ -290,12 +280,8 @@ public:
 	memory_view m_c300bank, m_c400bank, m_c800bank, m_lcbank;
 	optional_device<mos6551_device> m_acia1, m_acia2;
 	optional_device<applefdc_base_device> m_laserudc;
-#if IICP_NEW_IWM
 	optional_device<applefdintf_device> m_iicpiwm;
 	optional_device_array<floppy_connector, 4> m_floppy;
-#else
-	optional_device<legacy_iwm_device> m_iicpiwm;
-#endif
 	required_device<ds1315_device> m_ds1315;
 	optional_device<centronics_device>      m_printer_conn;
 	optional_device<output_latch_device>    m_printer_out;
@@ -530,7 +516,6 @@ private:
 
 	u8 mig_r(u16 offset);
 	void mig_w(u16 offset, u8 data);
-#if IICP_NEW_IWM
 	void phases_w(uint8_t phases);
 	void sel35_w(int sel35);
 	void devsel_w(uint8_t devsel);
@@ -539,7 +524,6 @@ private:
 
 	floppy_image_device *m_cur_floppy;
 	int m_devsel;
-#endif
 
 	offs_t dasm_trampoline(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 };
@@ -571,27 +555,19 @@ u8 apple2e_state::mig_r(u16 offset)
 	if ((offset >= 0x240) && (offset < 0x260))
 	{
 		m_hdsel = false;
-#if IICP_NEW_IWM
 		if (m_cur_floppy)
 		{
 			m_cur_floppy->ss_w(0);
 		}
-#else
-		sony_set_sel_line(m_iicpiwm, 0);
-#endif
 	}
 
 	if ((offset >= 0x260) && (offset < 0x280))
 	{
 		m_hdsel = true;
-#if IICP_NEW_IWM
 		if (m_cur_floppy)
 		{
 			m_cur_floppy->ss_w(1);
 		}
-#else
-		sony_set_sel_line(m_iicpiwm, 0x80);
-#endif
 	}
 
 	// reset MIG RAM window
@@ -609,11 +585,7 @@ void apple2e_state::mig_w(u16 offset, u8 data)
 
 	if (offset == 0x40)
 	{
-#if IICP_NEW_IWM
 		m_iicpiwm->reset();
-#else
-		m_iicpiwm->device_reset();
-#endif
 		return;
 	}
 
@@ -621,9 +593,7 @@ void apple2e_state::mig_w(u16 offset, u8 data)
 	{
 		//printf("MIG: enable internal drive on d2\n");
 		m_intdrive = true;
-#if IICP_NEW_IWM
 		recalc_active_device();
-#endif
 		return;
 	}
 
@@ -631,9 +601,7 @@ void apple2e_state::mig_w(u16 offset, u8 data)
 	{
 		//printf("MIG: disable internal drive\n");
 		m_intdrive = false;
-#if IICP_NEW_IWM
 		recalc_active_device();
-#endif
 		return;
 	}
 
@@ -656,18 +624,14 @@ void apple2e_state::mig_w(u16 offset, u8 data)
 	if ((offset >= 0x240) && (offset < 0x260))
 	{
 		m_35sel = false;
-#if IICP_NEW_IWM
 		recalc_active_device();
-#endif
 		return;
 	}
 
 	if ((offset >= 0x260) && (offset < 0x280))
 	{
 		m_35sel = true;
-#if IICP_NEW_IWM
 		recalc_active_device();
-#endif
 		return;
 	}
 
@@ -677,7 +641,7 @@ void apple2e_state::mig_w(u16 offset, u8 data)
 		m_migpage = 0;
 	}
 }
-#if IICP_NEW_IWM
+
 void apple2e_state::phases_w(uint8_t phases)
 {
 	if (m_cur_floppy)
@@ -738,7 +702,6 @@ void apple2e_state::recalc_active_device()
 		m_cur_floppy->ss_w(m_hdsel ? 1 : 0);
 	}
 }
-#endif
 
 WRITE_LINE_MEMBER(apple2e_state::a2bus_irq_w)
 {
@@ -5176,103 +5139,6 @@ void apple2e_state::apple2c(machine_config &config)
 
 	m_ram->set_default_size("128K").set_extra_options("128K");
 }
-#if IICP_NEW_IWM
-#else
-static void apple2cp_set_lines(device_t *device, u8 lines)
-{
-	apple2e_state *state = device->machine().driver_data<apple2e_state>();
-
-	if (state->m_35sel)
-	{
-		sony_set_lines(device, lines);
-	}
-	else
-	{
-		apple525_set_lines(device, lines);
-	}
-}
-
-static void apple2cp_set_enable_lines(device_t *device,int enable_mask)
-{
-	apple2e_state *state = device->machine().driver_data<apple2e_state>();
-
-//  printf("set_enable_lines: 35sel %d int %d enable_mask %d\n", state->m_35sel, state->m_intdrive, enable_mask);
-
-	if ((state->m_35sel) && (state->m_intdrive) && (enable_mask == 2))
-	{
-		sony_set_enable_lines(device, 1);
-	}
-	else if (!state->m_35sel)
-	{
-		apple525_set_enable_lines(device, enable_mask);
-	}
-	else
-	{
-		sony_set_enable_lines(device, 0);
-	}
-}
-
-static u8 apple2cp_read_data(device_t *device)
-{
-	apple2e_state *state = device->machine().driver_data<apple2e_state>();
-
-	if (state->m_35sel)
-	{
-		return sony_read_data(device);
-	}
-	else
-	{
-		return apple525_read_data(device);
-	}
-
-	return 0;
-}
-
-static void apple2cp_write_data(device_t *device, u8 data)
-{
-	apple2e_state *state = device->machine().driver_data<apple2e_state>();
-
-	if (state->m_35sel)
-	{
-		sony_write_data(device, data);
-	}
-	else
-	{
-		apple525_write_data(device, data);
-	}
-}
-
-static int apple2cp_read_status(device_t *device)
-{
-	apple2e_state *state = device->machine().driver_data<apple2e_state>();
-
-	if (state->m_35sel)
-	{
-		return sony_read_status(device);
-	}
-	else
-	{
-		return apple525_read_status(device);
-	}
-}
-
-const applefdc_interface a2cp_interface =
-{
-	apple2cp_set_lines,         /* set_lines */
-	apple2cp_set_enable_lines,  /* set_enable_lines */
-
-	apple2cp_read_data,         /* read_data */
-	apple2cp_write_data,    /* write_data */
-	apple2cp_read_status    /* read_status */
-};
-
-static const floppy_interface apple2cp_floppy35_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(apple35_iigs),
-	"floppy_3_5"
-};
-#endif
 
 static const floppy_interface floppy_interface =
 {
@@ -5290,7 +5156,7 @@ void apple2e_state::apple2cp(machine_config &config)
 
 	config.device_remove("sl4");
 	config.device_remove("sl6");
-	#if IICP_NEW_IWM
+
 	IWM(config, m_iicpiwm, A2BUS_7M_CLOCK, 1021800*2);
 	m_iicpiwm->phases_cb().set(FUNC(apple2e_state::phases_w));
 	m_iicpiwm->sel35_cb().set(FUNC(apple2e_state::sel35_w));
@@ -5300,13 +5166,6 @@ void apple2e_state::apple2cp(machine_config &config)
 	applefdintf_device::add_525(config, m_floppy[1]);
 	applefdintf_device::add_35(config, m_floppy[2]);
 	applefdintf_device::add_35(config, m_floppy[3]);
-	#else
-	LEGACY_IWM(config, m_iicpiwm, &a2cp_interface);
-	FLOPPY_APPLE(config, FLOPPY_0, &floppy_interface, 15, 16);
-	FLOPPY_APPLE(config, FLOPPY_1, &floppy_interface, 15, 16);
-	FLOPPY_SONY(config, FLOPPY_2, &apple2cp_floppy35_floppy_interface);
-	FLOPPY_SONY(config, FLOPPY_3, &apple2cp_floppy35_floppy_interface);
-	#endif
 
 	m_ram->set_default_size("128K").set_extra_options("128K, 384K, 640K, 896K, 1152K");
 }
