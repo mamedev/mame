@@ -1191,7 +1191,7 @@ void psikyo_state::s1945(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ymf278b_device &ymf(YMF278B(config, "ymf", 33.8688_MHz_XTAL));
+	ymf278b_device &ymf(YMF278B(config, "ymf", 33.8688_MHz_XTAL)); // YMF286-K instead on some PCBs
 	ymf.irq_handler().set_inputline(m_audiocpu, 0);
 	ymf.add_route(ALL_OUTPUTS, "mono", 1.0);
 
