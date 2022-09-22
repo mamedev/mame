@@ -15,6 +15,7 @@ TODO:
 
 *******************************************************************************************/
 
+#include "emu.h"
 #include "atm.h"
 
 #include "bus/ata/atapicdr.h"
@@ -81,7 +82,7 @@ void atm_state::atm_ula_w(offs_t offset, u8 data)
 
 void atm_state::atm_port_ffff_w(offs_t offset, u8 data)
 {
-	if(!is_shadow_active())
+	if (!is_shadow_active())
 		return;
 
 	if (m_pen2)
@@ -137,7 +138,7 @@ void atm_state::atm_port_ff77_w(offs_t offset, u8 data)
 
 void atm_state::atm_port_fff7_w(offs_t offset, u8 data)
 {
-	if(!is_shadow_active())
+	if (!is_shadow_active())
 		return;
 
 	u8 bank = offset >> 14;
@@ -310,6 +311,9 @@ u8 atm_state::beta_disable_r(offs_t offset)
 
 u8 atm_state::ata_r(offs_t offset)
 {
+	if (machine().side_effects_disabled())
+		return 0xff;
+
 	u8 ata_offset = BIT(offset, 5, 3);
 	u16 data = m_ata->cs0_r(ata_offset);
 
@@ -321,6 +325,9 @@ u8 atm_state::ata_r(offs_t offset)
 
 void atm_state::ata_w(offs_t offset, u8 data)
 {
+	if (machine().side_effects_disabled())
+		return;
+
 	u8 ata_offset = BIT(offset, 5, 3);
 	u16 ata_data = data;
 	if (!ata_offset)

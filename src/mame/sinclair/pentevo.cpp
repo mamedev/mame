@@ -30,14 +30,13 @@ TODO:
 
 *******************************************************************************************/
 
+#include "emu.h"
 #include "atm.h"
 
 #include "glukrs.h"
 #include "machine/pckeybrd.h"
 #include "machine/spi_sdcard.h"
 #include "machine/timer.h"
-
-namespace {
 
 #define LOG_MEM   (1U << 1)
 #define LOG_VIDEO (1U << 2)
@@ -49,6 +48,8 @@ namespace {
 #define LOGMEM(...)   LOGMASKED(LOG_MEM,   __VA_ARGS__)
 #define LOGVIDEO(...) LOGMASKED(LOG_VIDEO, __VA_ARGS__)
 #define LOGWARN(...)  LOGMASKED(LOG_WARN,  __VA_ARGS__)
+
+namespace {
 
 class pentevo_state : public atm_state
 {
@@ -144,7 +145,7 @@ void pentevo_state::atm_update_cpu()
 
 void pentevo_state::atm_port_ffff_w(offs_t offset, u8 data)
 {
-	if(!is_shadow_active())
+	if (!is_shadow_active())
 		return;
 
 	if (BIT(m_port_bf_data, 5) && !m_pen2)
@@ -195,7 +196,7 @@ void pentevo_state::pentevo_port_eff7_w(offs_t offset, u8 data)
 
 void pentevo_state::pentevo_port_f7f7_w(offs_t offset, u8 data)
 {
-	if(!is_shadow_active())
+	if (!is_shadow_active())
 		return;
 
 	u8 bank = offset >> 14;
@@ -208,12 +209,14 @@ void pentevo_state::pentevo_port_f7f7_w(offs_t offset, u8 data)
 
 void pentevo_state::pentevo_port_fbf7_w(offs_t offset, u8 data)
 {
-	if(!is_shadow_active())
+	if (!is_shadow_active())
 		return;
 
 	u8 bank = offset >> 14;
-	pen_page(bank) = BIT(data, 0)
-		? (pen_page(bank) | PEN_WRDISBL_MASK) : (pen_page(bank) & ~PEN_WRDISBL_MASK);
+	if (BIT(data, 0))
+		pen_page(bank) |= PEN_WRDISBL_MASK;
+	else
+		pen_page(bank) &= ~PEN_WRDISBL_MASK;
 }
 
 void pentevo_state::atm_port_bf_w(offs_t offset, u8 data)
@@ -393,6 +396,9 @@ void pentevo_state::pentevo_update_screen_tx(screen_device &screen, bitmap_ind16
 
 u8 pentevo_state::nemo_ata_r(u8 cmd)
 {
+	if (machine().side_effects_disabled())
+		return 0xff;
+
 	bool data_read = (cmd & 0x7) == 0;
 	u8 data;
 	if (data_read && m_ata_data_hi_ready)
@@ -411,6 +417,9 @@ u8 pentevo_state::nemo_ata_r(u8 cmd)
 
 void pentevo_state::nemo_ata_w(u8 cmd, u8 data)
 {
+	if (machine().side_effects_disabled())
+		return;
+
 	bool data_write = (cmd & 0x7) == 0;
 	if (data_write && !m_ata_data_hi_ready)
 	{
@@ -434,8 +443,11 @@ void pentevo_state::spi_port_77_w(offs_t offset, u8 data)
 	if (is_shadow_active())
 		return atm_port_ff77_w(0x77 | offset, data);
 
-	m_sdcard->spi_ss_w(BIT(data, 0));
-	m_zctl_cs = BIT(data, 1);
+	if (!machine().side_effects_disabled())
+	{
+		m_sdcard->spi_ss_w(BIT(data, 0));
+		m_zctl_cs = BIT(data, 1);
+	}
 }
 
 u8 pentevo_state::spi_port_57_r(offs_t offset)
@@ -450,27 +462,33 @@ u8 pentevo_state::spi_port_57_r(offs_t offset)
 
 void pentevo_state::spi_port_57_w(offs_t offset, u8 data)
 {
-	if (is_shadow_active() && BIT(offset, 15))
+	if (!machine().side_effects_disabled())
 	{
-		// same as #77 but shadow
-		m_sdcard->spi_ss_w(BIT(data, 0));
-		m_zctl_cs = BIT(data, 1);
-	}
-	else if (!m_zctl_cs)
-	{
-		for (u8 m = 0x80; m; m >>= 1)
+		if (is_shadow_active() && BIT(offset, 15))
 		{
-			m_sdcard->spi_clock_w(CLEAR_LINE); // 0-S R
-			m_sdcard->spi_mosi_w(data & m ? 1 : 0);
-			m_sdcard->spi_clock_w(ASSERT_LINE); // 1-L W
+			// same as #77 but shadow
+			m_sdcard->spi_ss_w(BIT(data, 0));
+			m_zctl_cs = BIT(data, 1);
+		}
+		else if (!m_zctl_cs)
+		{
+			for (u8 m = 0x80; m; m >>= 1)
+			{
+				m_sdcard->spi_clock_w(CLEAR_LINE); // 0-S R
+				m_sdcard->spi_mosi_w(data & m ? 1 : 0);
+				m_sdcard->spi_clock_w(ASSERT_LINE); // 1-L W
+			}
 		}
 	}
 }
 
 void pentevo_state::spi_miso_w(u8 data)
 {
-	m_zctl_di <<= 1;
-	m_zctl_di |= data;
+	if (!machine().side_effects_disabled())
+	{
+		m_zctl_di <<= 1;
+		m_zctl_di |= data;
+	}
 }
 
 u8 pentevo_state::gluk_data_r(offs_t offset)

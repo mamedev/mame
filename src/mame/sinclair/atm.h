@@ -1,20 +1,15 @@
 // license:BSD-3-Clause
-#ifndef MAME_INCLUDES_ATM_H
-#define MAME_INCLUDES_ATM_H
+#ifndef MAME_INCLUDES_SINCLAIR_ATM_H
+#define MAME_INCLUDES_SINCLAIR_ATM_H
 
 #pragma once
 
-#include "emu.h"
 #include "spec128.h"
 
 #include "beta_m.h"
 #include "bus/ata/ataintf.h"
 #include "bus/centronics/ctronics.h"
 #include "sound/ay8910.h"
-
-static constexpr u16 PEN_WRDISBL_MASK = 1 << 13;
-static constexpr u16 PEN_RAMNROM_MASK = 1 << 14; // 1-RAM, 0-ROM
-static constexpr u16 PEN_DOS7FFD_MASK = 1 << 15;
 
 class atm_state : public spectrum_128_state
 {
@@ -38,6 +33,10 @@ public:
 	void atmtb2plus(machine_config &config);
 
 protected:
+	static constexpr u16 PEN_WRDISBL_MASK = 1 << 13;
+	static constexpr u16 PEN_RAMNROM_MASK = 1 << 14; // 1-RAM, 0-ROM
+	static constexpr u16 PEN_DOS7FFD_MASK = 1 << 15;
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -103,4 +102,4 @@ protected:
 	u8 m_ata_data_latch;
 };
 
-#endif // MAME_INCLUDES_ATM_H
+#endif // MAME_INCLUDES_SINCLAIR_ATM_H
