@@ -31243,7 +31243,7 @@ cpc88                           //
 cpg120                          //
 cx5f                            //
 cx5f1                           //
-cx5me                           //
+cx5mu                           //
 cx5m128                         //
 cx5miib                         //
 cx7128                          // 1986 MSX2
@@ -31431,7 +31431,8 @@ svi738sp                        //
 svi738sw                        // 1985 MSX
 sx100                           // 1985 MSX
 tadpc200                        //
-tadpc20a                        //
+tadpc200b                       //
+tadpc200a                       //
 tpc310                          // 1986 MSX2
 tpp311                          //
 tps312                          //
