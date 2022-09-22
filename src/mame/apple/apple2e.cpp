@@ -2591,6 +2591,10 @@ void apple2e_state::c000_iic_w(offs_t offset, u8 data)
 					m_accel_fast = false;
 					accel_normal_speed();
 				}
+				else
+				{
+					do_io(offset, true);
+				}
 			}
 			break;
 
@@ -2600,6 +2604,7 @@ void apple2e_state::c000_iic_w(offs_t offset, u8 data)
 				m_accel_fast = true;
 				accel_full_speed();
 			}
+			do_io(offset, true);
 			break;
 
 		case 0x5c:
@@ -2607,6 +2612,7 @@ void apple2e_state::c000_iic_w(offs_t offset, u8 data)
 			{
 				m_accel_slotspk = data;
 			}
+			do_io(offset, true);
 			break;
 
 		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
