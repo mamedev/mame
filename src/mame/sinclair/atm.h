@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
-#ifndef MAME_INCLUDES_SINCLAIR_ATM_H
-#define MAME_INCLUDES_SINCLAIR_ATM_H
+#ifndef MAME_SINCLAIR_ATM_H
+#define MAME_SINCLAIR_ATM_H
 
 #pragma once
 
@@ -102,4 +102,4 @@ protected:
 	u8 m_ata_data_latch;
 };
 
-#endif // MAME_INCLUDES_SINCLAIR_ATM_H
+#endif // MAME_SINCLAIR_ATM_H
