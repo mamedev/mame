@@ -10,7 +10,6 @@ NOTES:
 
 TODO:
     * ports read
-    * better handling of SHADOW ports
     * validate screen timings
 
 *******************************************************************************************/
@@ -34,7 +33,15 @@ TODO:
 
 void atm_state::atm_update_cpu()
 {
-	m_maincpu->set_clock(X1_128_SINCLAIR / 10 * (1 << BIT(m_port_ff77_data, 3))); // 0 - 3.5MHz, 1 - 7MHz
+	m_maincpu->set_clock(X1_128_SINCLAIR / 10 * (1 << BIT(m_port_77_data, 3))); // 0 - 3.5MHz, 1 - 7MHz
+}
+
+void atm_state::atm_update_io()
+{
+	if (is_dos_active())
+		m_io_view.select(0);
+	else
+		m_io_view.disable();
 }
 
 void atm_state::atm_update_memory()
@@ -44,7 +51,7 @@ void atm_state::atm_update_memory()
 	LOGMEM("PEN%d.%X ", BIT(m_port_7ffd_data, 4), (m_port_7ffd_data & 0x07));
 	for (auto bank = 0; bank < 4 ; bank++)
 	{
-		u16 page = m_pen ? pen_page(bank) : (~PEN_RAMNROM_MASK & ~PEN_DOS7FFD_MASK);
+		u16 page = atm_update_memory_get_page(bank);
 		const char* is_dos7ffd = page & PEN_DOS7FFD_MASK ? "+" : " ";
 		if (page & PEN_RAMNROM_MASK)
 		{
@@ -74,19 +81,22 @@ void atm_state::atm_update_memory()
 	LOGMEM("\n");
 }
 
+u16 atm_state::atm_update_memory_get_page(u8 bank)
+{
+	return m_pen ? pen_page(bank) : (~PEN_RAMNROM_MASK & ~PEN_DOS7FFD_MASK);
+}
+
 void atm_state::atm_ula_w(offs_t offset, u8 data)
 {
 	m_br3 = ~offset & 0x08;
 	spectrum_128_state::spectrum_ula_w(offset, data);
 }
 
-void atm_state::atm_port_ffff_w(offs_t offset, u8 data)
+void atm_state::atm_port_ff_w(offs_t offset, u8 data)
 {
-	if (!is_shadow_active())
-		return;
-
 	if (m_pen2)
 	{
+		m_beta_drive_selected = data;
 		m_beta->param_w(data);
 	}
 	else
@@ -113,15 +123,14 @@ void atm_state::atm_port_7ffd_w(offs_t offset, u8 data)
 	m_screen_location = m_ram->pointer() + ((BIT(m_port_7ffd_data, 3) ? 7 : 5) << 14);
 }
 
-void atm_state::atm_port_ff77_w(offs_t offset, u8 data)
+void atm_state::atm_port_77_w(offs_t offset, u8 data)
 {
-	if (!is_shadow_active())
-		return;
-
-	m_port_ff77_data = data;
+	m_port_77_data = data;
 
 	m_pen = BIT(offset, 8);
 	m_cpm_n = BIT(offset, 9);
+	atm_update_io();
+
 	m_pen2 = BIT(offset, 14);
 	LOGMASKED(LOG_VIDEO | LOG_MEM, "PEN %s, CPM %s, PEN2 %s\n", m_pen ? "on" : "off", m_cpm_n ? "off" : "on", m_pen2 ? "off" : "on");
 	atm_update_memory();
@@ -136,17 +145,15 @@ void atm_state::atm_port_ff77_w(offs_t offset, u8 data)
 	}
 }
 
-void atm_state::atm_port_fff7_w(offs_t offset, u8 data)
+void atm_state::atm_port_f7_w(offs_t offset, u8 data)
 {
-	if (!is_shadow_active())
-		return;
-
 	u8 bank = offset >> 14;
 	u16 page = (u16(data & 0xc0) << 8) | u8(~data & 0x3f);
 
 	LOGMEM("ATM%s=%X %s%d%s%02X\n", BIT(m_port_7ffd_data, 4), data, (page & PEN_RAMNROM_MASK) ? "RAM" : "ROM", bank, (page & PEN_DOS7FFD_MASK) ? "+" : " ", page & 0x3f);
 	pen_page(bank) = page;
 	atm_update_memory();
+	atm_update_io();
 }
 
 rectangle atm_state::get_screen_area()
@@ -292,6 +299,7 @@ u8 atm_state::beta_enable_r(offs_t offset)
 		{
 			m_beta->enable();
 			atm_update_memory();
+			atm_update_io();
 		}
 	}
 	return beta_neutral_r(offset + 0x3d00);
@@ -304,6 +312,7 @@ u8 atm_state::beta_disable_r(offs_t offset)
 		{
 			m_beta->disable();
 			atm_update_memory();
+			atm_update_io();
 		}
 	}
 	return beta_neutral_r(offset + 0x4000);
@@ -362,26 +371,32 @@ void atm_state::atm_mem(address_map &map)
 void atm_state::atm_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x001f, 0x001f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::status_r), FUNC(beta_disk_device::command_w));
-	map(0x003f, 0x003f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::track_r), FUNC(beta_disk_device::track_w));
-	map(0x005f, 0x005f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::sector_r), FUNC(beta_disk_device::sector_w));
-	map(0x007f, 0x007f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::data_r), FUNC(beta_disk_device::data_w));
-	map(0x00ff, 0x00ff).mirror(0xff00).r(m_beta, FUNC(beta_disk_device::state_r));
-	map(0x00ff, 0x00ff).mirror(0xff00).w(FUNC(atm_state::atm_port_ffff_w));
+
+	// PORTS: Always
 	map(0x00f6, 0x00f6).select(0xff08).rw(FUNC(atm_state::spectrum_ula_r), FUNC(atm_state::atm_ula_w));
 	map(0x00fb, 0x00fb).mirror(0xff00).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x00fd, 0x00fd).mirror(0xff00).w(FUNC(atm_state::atm_port_7ffd_w));
-	map(0x0077, 0x0077).select(0xff00).w(FUNC(atm_state::atm_port_ff77_w));
-	map(0x00f7, 0x00f7).select(0xff00).w(FUNC(atm_state::atm_port_fff7_w));
-	map(0xfadf, 0xfadf).mirror(0x0500).nopr(); // TODO 0xfadf, 0xfbdf, 0xffdf Kempston Mouse
 
+	map(0xfadf, 0xfadf).mirror(0x0500).nopr(); // TODO 0xfadf, 0xfbdf, 0xffdf Kempston Mouse
 	map(0x8000, 0x8000).mirror(0x3ffd).w("ay8912", FUNC(ay8910_device::data_w));
 	map(0xc000, 0xc000).mirror(0x3ffd).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 
+	// PORTS: Shadow
+	map(0x0000, 0xffff).view(m_io_view);
+	m_io_view[0](0x001f, 0x001f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::status_r), FUNC(beta_disk_device::command_w));
+	m_io_view[0](0x003f, 0x003f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::track_r), FUNC(beta_disk_device::track_w));
+	m_io_view[0](0x005f, 0x005f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::sector_r), FUNC(beta_disk_device::sector_w));
+	m_io_view[0](0x007f, 0x007f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::data_r), FUNC(beta_disk_device::data_w));
+	m_io_view[0](0x00ff, 0x00ff).mirror(0xff00).r(m_beta, FUNC(beta_disk_device::state_r));
+	m_io_view[0](0x00ff, 0x00ff).mirror(0xff00).w(FUNC(atm_state::atm_port_ff_w));
+
+	m_io_view[0](0x0077, 0x0077).select(0xff00).w(FUNC(atm_state::atm_port_77_w));
+	m_io_view[0](0x00f7, 0x00f7).select(0xff00).w(FUNC(atm_state::atm_port_f7_w));
+
 	// A: .... .... nnn0 1111
-	map(0x000f, 0x000f).select(0xffe0).rw(FUNC(atm_state::ata_r), FUNC(atm_state::ata_w));
+	m_io_view[0](0x000f, 0x000f).select(0xffe0).rw(FUNC(atm_state::ata_r), FUNC(atm_state::ata_w));
 	// A: .... ...1 0000 1111
-	map(0x010f, 0x010f).mirror(0xfe00).lrw8(NAME([this](offs_t offset) { return m_ata_data_latch; })
+	m_io_view[0](0x010f, 0x010f).mirror(0xfe00).lrw8(NAME([this](offs_t offset) { return m_ata_data_latch; })
 		, NAME([this](offs_t offset, u8 data) { m_ata_data_latch = data; }));
 }
 
@@ -397,13 +412,14 @@ void atm_state::machine_start()
 {
 	spectrum_128_state::machine_start();
 
-	save_item(NAME(m_port_ff77_data));
+	save_item(NAME(m_port_77_data));
 	save_item(NAME(m_pen));
 	save_item(NAME(m_cpm_n));
 	save_item(NAME(m_pages_map));
 	save_item(NAME(m_pen2));
 	save_item(NAME(m_rg));
 	save_item(NAME(m_br3));
+	save_item(NAME(m_beta_drive_selected));
 
 	// reconfigure ROMs
 	memory_region *rom = memregion("maincpu");
@@ -420,14 +436,14 @@ void atm_state::machine_start()
 void atm_state::machine_reset()
 {
 	m_beta->enable();
+	m_beta_drive_selected = 0;
 
 	m_port_7ffd_data = 0;
 	m_port_1ffd_data = -1;
-	m_port_ff77_data = 0;
+	m_port_77_data = 0;
 
 	m_br3 = 0;
-	atm_port_ff77_w(0x4000, 3); // m_port_ff77_data: CPM=0(on), PEN=0(off), PEN2=1(off); vmode: zx
-	atm_update_cpu();
+	atm_port_77_w(0x4000, 3); // m_port_77_data: CPM=0(on), PEN=0(off), PEN2=1(off); vmode: zx
 }
 
 void atm_state::video_start()

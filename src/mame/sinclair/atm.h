@@ -20,6 +20,7 @@ public:
 		, m_bank_view1(*this, "bank_view1")
 		, m_bank_view2(*this, "bank_view2")
 		, m_bank_view3(*this, "bank_view3")
+		, m_io_view(*this, "io_view")
 		, m_bank_rom(*this, "bank_rom%u", 0U)
 		, m_char_rom(*this, "charrom")
 		, m_beta(*this, BETA_DISK_TAG)
@@ -52,32 +53,33 @@ protected:
 	void ata_w(offs_t offset, u8 data);
 
 	void atm_ula_w(offs_t offset, u8 data);
-	virtual void atm_port_ffff_w(offs_t offset, u8 data);
-	void atm_port_ff77_w(offs_t offset, u8 data);
-	void atm_port_fff7_w(offs_t offset, u8 data);
+	virtual void atm_port_ff_w(offs_t offset, u8 data);
+	void atm_port_77_w(offs_t offset, u8 data);
+	void atm_port_f7_w(offs_t offset, u8 data);
 	void atm_port_7ffd_w(offs_t offset, u8 data);
 
+	virtual void atm_update_cpu();
+	virtual void atm_update_io();
 	u16 &pen_page(u8 bank) { return m_pages_map[BIT(m_port_7ffd_data, 4)][bank]; }
+	void atm_update_memory();
 	virtual u8 merge_ram_with_7ffd(u8 ram_page) { return (ram_page & ~0x07) | (m_port_7ffd_data & 0x07); }
+	virtual bool is_port_7ffd_locked() { return BIT(m_port_7ffd_data, 5); };
+	bool is_dos_active() { return !m_cpm_n || m_beta->is_active(); }
 
 	virtual void spectrum_update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 	void atm_update_video_mode();
 	void atm_update_screen_lo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void atm_update_screen_hi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void atm_update_screen_tx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	virtual void atm_update_memory();
-	virtual void atm_update_cpu();
+	virtual u16 atm_update_memory_get_page(u8 bank);
 	virtual u8 get_border_color(u16 hpos, u16 vpos) override;
 	rectangle get_screen_area() override;
-
-	virtual bool is_port_7ffd_locked() { return BIT(m_port_7ffd_data, 5); };
-	bool is_dos_active() { return !m_cpm_n || m_beta->is_active(); }
-	virtual bool is_shadow_active() { return is_dos_active(); }
 
 	memory_view m_bank_view0;
 	memory_view m_bank_view1;
 	memory_view m_bank_view2;
 	memory_view m_bank_view3;
+	memory_view m_io_view;
 	required_memory_bank_array<4> m_bank_rom;
 	optional_region_ptr<u8> m_char_rom; // required for ATM2, absent in ATM1
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
@@ -91,7 +93,7 @@ protected:
 	u8 rom_pages_mask;
 	u8 ram_pages_mask;
 
-	u8 m_port_ff77_data;
+	u8 m_port_77_data;
 	bool m_pen;           // PEN - extended memory manager
 	bool m_cpm_n;
 	u16 m_pages_map[2][4]; // map: 0,1
@@ -100,6 +102,7 @@ protected:
 	u8 m_rg = 0b011;      // 0:320x200lo, 2:640:200hi, 3:256x192zx, 6:80x25txt
 	u8 m_br3;
 	u8 m_ata_data_latch;
+	u8 m_beta_drive_selected;
 };
 
 #endif // MAME_SINCLAIR_ATM_H

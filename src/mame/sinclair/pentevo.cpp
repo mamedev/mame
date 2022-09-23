@@ -8,7 +8,7 @@ Implementation: Revision C
 Hobby computer ZX Evolution is Spectrum-compatible with extensions.
 
 Hardware (ZX Evolution):
-- Z80 3.5 MHz (classic mode)/ 7 MHz (turbo mode without CPU wait circles)/ 14 MHz (mega turbo with CPU wait circles);
+- Z80 3.5 MHz (classic mode)/ 7 MHz (turbo mode without CPU wait cycles)/ 14 MHz (mega turbo with CPU wait cycles);
 - 4 Mb RAM, 512Kb ROM;
 - MiniITX board (172x170mm), 2 ZXBUS slots, power ATX or +5,+12V;
 - Based on fpga (Altera EP1K50);
@@ -75,43 +75,41 @@ private:
 	void init_mem_write();
 	void pentevo_io(address_map &map);
 
-	u8 nemo_ata_r(u8 cmd);
-	void nemo_ata_w(u8 cmd, u8 data);
-
-	void atm_port_ffff_w(offs_t offset, u8 data) override;
-	void pentevo_port_f7f7_w(offs_t offset, u8 data);
-	void pentevo_port_fbf7_w(offs_t offset, u8 data);
+	void atm_port_ff_w(offs_t offset, u8 data) override;
+	void pentevo_port_7f7_w(offs_t offset, u8 data);
+	void pentevo_port_bf7_w(offs_t offset, u8 data);
 	void pentevo_port_eff7_w(offs_t offset, u8 data);
-	u8 atm_port_bf_r(offs_t offset);
-	void atm_port_bf_w(offs_t offset, u8 data);
-	u8 atm_port_0fbd_r(offs_t offset);
-	void atm_port_0fbd_w(offs_t offset, u8 data);
-	u8 atm_port_1fbd_r(offs_t offset);
-	void atm_port_1fbd_w(offs_t offset, u8 data);
-	u8 spi_port_77_r(offs_t offset);
+	u8 pentevo_port_bf_r(offs_t offset);
+	void pentevo_port_bf_w(offs_t offset, u8 data);
+	u8 pentevo_port_0nbd_r(offs_t offset);
+	void pentevo_port_0nbd_w(offs_t offset, u8 data);
+	u8 pentevo_port_1nbd_r(offs_t offset);
+	void pentevo_port_1nbd_w(offs_t offset, u8 data);
+	void pentevo_port_be_w(offs_t offset, u8 data);
+
 	void spi_port_77_w(offs_t offset, u8 data);
 	u8 spi_port_57_r(offs_t offset);
 	void spi_port_57_w(offs_t offset, u8 data);
 	void spi_miso_w(u8 data);
-
+	u8 nemo_ata_r(u8 cmd);
+	void nemo_ata_w(u8 cmd, u8 data);
 	u8 gluk_data_r(offs_t offset);
 	void gluk_data_w(offs_t offset, u8 data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_check_callback);
 	void nmi_on();
 
-	bool is_shadow_active() override { return BIT(m_port_bf_data, 0) || is_dos_active(); }
-	bool is_gluk_active() {return is_shadow_active() || BIT(m_port_eff7_data, 7); }
+	void atm_update_cpu() override;
+	void atm_update_io() override;
+	u8 merge_ram_with_7ffd(u8 ram_page) override;
 	bool is_port_7ffd_locked() override { return !is_pent1024() && BIT(m_port_7ffd_data, 5); }
 	bool is_pent1024() { return !BIT(m_port_eff7_data, 2); }
-
-	void atm_update_cpu() override;
-	u8 merge_ram_with_7ffd(u8 ram_page) override;
 
 	void spectrum_update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 	void pentevo_update_screen_zxhw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void pentevo_update_screen_zx16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void pentevo_update_screen_tx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u16 atm_update_memory_get_page(u8 bank) override;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<ram_device> m_char_ram;
@@ -123,6 +121,7 @@ private:
 
 	u8 m_port_bf_data;
 	u8 m_port_eff7_data;
+	u8 m_beta_drive_virtual;
 
 	u8 m_gluk_ext;
 	bool m_ata_data_hi_ready;
@@ -139,15 +138,39 @@ private:
 
 void pentevo_state::atm_update_cpu()
 {
-	u8 multiplier = BIT(m_port_ff77_data, 3) ? 4 : (2 - BIT(m_port_eff7_data, 4));
+	u8 multiplier = BIT(m_port_77_data, 3) ? 4 : (2 - BIT(m_port_eff7_data, 4));
 	m_maincpu->set_clock(X1_128_SINCLAIR / 10 * multiplier);
 }
 
-void pentevo_state::atm_port_ffff_w(offs_t offset, u8 data)
+void pentevo_state::atm_update_io()
 {
-	if (!is_shadow_active())
-		return;
+	if (BIT(m_port_bf_data, 0) || is_dos_active())
+	{
+		m_io_view.select(0);
+		m_glukrs->enable();
+	}
+	else
+	{
+		m_io_view.disable();
+		if (BIT(m_port_eff7_data, 7))
+			m_glukrs->enable();
+		else
+			m_glukrs->disable();
+	}
+}
 
+u16 pentevo_state::atm_update_memory_get_page(u8 bank)
+{
+	if (BIT(m_port_eff7_data, 3))
+		return ~PEN_RAMNROM_MASK & 0x00;
+	else if (bank == 0 && m_beta_drive_selected && m_beta_drive_virtual == m_beta_drive_selected)
+		return PEN_RAMNROM_MASK | 0xfe;
+	else
+		return atm_state::atm_update_memory_get_page(bank);
+}
+
+void pentevo_state::atm_port_ff_w(offs_t offset, u8 data)
+{
 	if (BIT(m_port_bf_data, 5) && !m_pen2)
 	{
 		u8 pen = get_border_color(m_screen->hpos(), m_screen->vpos());
@@ -158,7 +181,7 @@ void pentevo_state::atm_port_ffff_w(offs_t offset, u8 data)
 	}
 	else
 	{
-		atm_state::atm_port_ffff_w(offset, data);
+		atm_state::atm_port_ff_w(offset, data);
 	}
 }
 
@@ -171,7 +194,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pentevo_state::nmi_check_callback)
 void pentevo_state::nmi_on()
 {
 	m_bank_ram[0]->set_entry(0xff & ram_pages_mask);
-	m_bank_view0.select(1);
+	m_bank_view0.disable();
 	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
@@ -186,19 +209,15 @@ u8 pentevo_state::merge_ram_with_7ffd(u8 ram_page)
 
 void pentevo_state::pentevo_port_eff7_w(offs_t offset, u8 data)
 {
-	if (is_shadow_active())
-		return;
-
 	m_port_eff7_data = data;
-	// BIT(data, 3) force ROM
+	atm_update_memory();
+	atm_update_io();
 	atm_update_cpu();
+	atm_update_video_mode();
 }
 
-void pentevo_state::pentevo_port_f7f7_w(offs_t offset, u8 data)
+void pentevo_state::pentevo_port_7f7_w(offs_t offset, u8 data)
 {
-	if (!is_shadow_active())
-		return;
-
 	u8 bank = offset >> 14;
 	u16 page = (pen_page(bank) & PEN_DOS7FFD_MASK) | PEN_RAMNROM_MASK | u8(~data);
 
@@ -207,11 +226,8 @@ void pentevo_state::pentevo_port_f7f7_w(offs_t offset, u8 data)
 	atm_update_memory();
 }
 
-void pentevo_state::pentevo_port_fbf7_w(offs_t offset, u8 data)
+void pentevo_state::pentevo_port_bf7_w(offs_t offset, u8 data)
 {
-	if (!is_shadow_active())
-		return;
-
 	u8 bank = offset >> 14;
 	if (BIT(data, 0))
 		pen_page(bank) |= PEN_WRDISBL_MASK;
@@ -219,20 +235,21 @@ void pentevo_state::pentevo_port_fbf7_w(offs_t offset, u8 data)
 		pen_page(bank) &= ~PEN_WRDISBL_MASK;
 }
 
-void pentevo_state::atm_port_bf_w(offs_t offset, u8 data)
+void pentevo_state::pentevo_port_bf_w(offs_t offset, u8 data)
 {
 	if (BIT(m_port_bf_data, 3) && !BIT(data, 3))
 		nmi_on();
 
 	m_port_bf_data = data;
+	atm_update_io();
 }
 
-u8 pentevo_state::atm_port_bf_r(offs_t offset)
+u8 pentevo_state::pentevo_port_bf_r(offs_t offset)
 {
 	return m_port_bf_data & 0x1f;
 }
 
-u8 pentevo_state::atm_port_0fbd_r(offs_t offset)
+u8 pentevo_state::pentevo_port_0nbd_r(offs_t offset)
 {
 	u8 opt = offset >> 8;
 	if (opt <= 0x07)
@@ -249,7 +266,11 @@ u8 pentevo_state::atm_port_0fbd_r(offs_t offset)
 	else if (opt == 0x0b)
 		return m_port_eff7_data;
 	else if (opt == 0x0c)
-		return (m_pen2 << 7) | (m_cpm_n << 6) | (m_pen << 5) | (is_dos_active() << 4) | (BIT(m_port_ff77_data, 4) << 3) | m_rg;
+		return (m_pen2 << 7) | (m_cpm_n << 6) | (m_pen << 5) | (is_dos_active() << 4) | (BIT(m_port_77_data, 4) << 3) | m_rg;
+	//else if (opt == 0x0d) current palette color
+	//else if (opt == 0x0e) current font char
+	else if (opt == 0x0f)
+		return get_border_color(m_screen->hpos(), m_screen->vpos());
 	else
 	{
 		LOGWARN("#%X read\n", 0x00bd | offset);
@@ -257,7 +278,7 @@ u8 pentevo_state::atm_port_0fbd_r(offs_t offset)
 	}
 }
 
-void pentevo_state::atm_port_0fbd_w(offs_t offset, u8 data)
+void pentevo_state::pentevo_port_0nbd_w(offs_t offset, u8 data)
 {
 	u8 opt = offset >> 8;
 	if (opt == 0x00 || opt == 0x01)
@@ -271,11 +292,11 @@ void pentevo_state::atm_port_0fbd_w(offs_t offset, u8 data)
 	}
 }
 
-u8 pentevo_state::atm_port_1fbd_r(offs_t offset)
+u8 pentevo_state::pentevo_port_1nbd_r(offs_t offset)
 {
 	u8 opt = offset >> 8;
 	if (opt == 0x03) // #13BD
-		return m_beta->is_active(); //0x00;
+		return m_beta_drive_virtual;
 	else
 	{
 		LOGWARN("#%X read\n", 0x10bd | offset);
@@ -283,21 +304,18 @@ u8 pentevo_state::atm_port_1fbd_r(offs_t offset)
 	}
 }
 
-void pentevo_state::atm_port_1fbd_w(offs_t offset, u8 data)
+void pentevo_state::pentevo_port_1nbd_w(offs_t offset, u8 data)
 {
 	u8 opt = offset >> 8;
-	if (opt == 3)
-	{
-		if ((data & 0x0f) && m_beta->is_active())
-		{
-			m_bank_ram[0]->set_entry(0xfe);
-			m_bank_view0.disable();
-		}
-	}
+	if (opt == 0x03) // #13BD
+		m_beta_drive_virtual = data;
 	else
-	{
 		LOGWARN("#%X < %X\n", 0x10bd | offset, data);
-	}
+}
+
+void pentevo_state::pentevo_port_be_w(offs_t offset, u8 data)
+{
+	LOGWARN("#%X < %X\n", 0x00be | offset, data);
 }
 
 void pentevo_state::spectrum_update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -433,16 +451,8 @@ void pentevo_state::nemo_ata_w(u8 cmd, u8 data)
 	}
 }
 
-u8 pentevo_state::spi_port_77_r(offs_t offset)
-{
-	return is_shadow_active() ? 0xff : 0x00;
-}
-
 void pentevo_state::spi_port_77_w(offs_t offset, u8 data)
 {
-	if (is_shadow_active())
-		return atm_port_ff77_w(0x77 | offset, data);
-
 	if (!machine().side_effects_disabled())
 	{
 		m_sdcard->spi_ss_w(BIT(data, 0));
@@ -462,23 +472,14 @@ u8 pentevo_state::spi_port_57_r(offs_t offset)
 
 void pentevo_state::spi_port_57_w(offs_t offset, u8 data)
 {
-	if (!machine().side_effects_disabled())
+	if (machine().side_effects_disabled() || m_zctl_cs)
+		return;
+
+	for (u8 m = 0x80; m; m >>= 1)
 	{
-		if (is_shadow_active() && BIT(offset, 15))
-		{
-			// same as #77 but shadow
-			m_sdcard->spi_ss_w(BIT(data, 0));
-			m_zctl_cs = BIT(data, 1);
-		}
-		else if (!m_zctl_cs)
-		{
-			for (u8 m = 0x80; m; m >>= 1)
-			{
-				m_sdcard->spi_clock_w(CLEAR_LINE); // 0-S R
-				m_sdcard->spi_mosi_w(data & m ? 1 : 0);
-				m_sdcard->spi_clock_w(ASSERT_LINE); // 1-L W
-			}
-		}
+		m_sdcard->spi_clock_w(CLEAR_LINE); // 0-S R
+		m_sdcard->spi_mosi_w(data & m ? 1 : 0);
+		m_sdcard->spi_clock_w(ASSERT_LINE); // 1-L W
 	}
 }
 
@@ -493,29 +494,16 @@ void pentevo_state::spi_miso_w(u8 data)
 
 u8 pentevo_state::gluk_data_r(offs_t offset)
 {
-	if (offset & 0x0100) // #BF no-shadow port
-	{
-		if (is_shadow_active() || !BIT(m_port_eff7_data, 7))
-			return 0xff;
-	}
-	else if (!is_shadow_active()) // #BE shadow port
-		return 0xff;
-
-	return m_gluk_ext == 2
+	return (m_glukrs->is_active() && m_gluk_ext == 2)
 		? m_keyboard->read()
 		: m_glukrs->data_r();
 }
 
 void pentevo_state::gluk_data_w(offs_t offset, u8 data)
 {
-	if (offset & 0x0100) // #BF no-shadow port
-	{
-		if (is_shadow_active() || !BIT(m_port_eff7_data, 7))
-			return atm_port_fff7_w(0xbff7, data);
-	}
-	else if (!is_shadow_active()) // #BE shadow port
+	if (!m_glukrs->is_active())
 		return;
-
+	
 	u8 addr = m_glukrs->address_r();
 	if (addr >= 0xf0 && addr <= 0xf0)
 	{
@@ -543,40 +531,29 @@ void pentevo_state::gluk_data_w(offs_t offset, u8 data)
 	}
 }
 
-
 void pentevo_state::pentevo_io(address_map &map)
 {
 	map.unmap_value_high();
 
-	map(0x001f, 0x001f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::status_r), FUNC(beta_disk_device::command_w));
-	map(0x003f, 0x003f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::track_r), FUNC(beta_disk_device::track_w));
-	map(0x005f, 0x005f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::sector_r), FUNC(beta_disk_device::sector_w));
-	map(0x007f, 0x007f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::data_r), FUNC(beta_disk_device::data_w));
-	map(0x00ff, 0x00ff).mirror(0xff00).r(m_beta, FUNC(beta_disk_device::state_r));
-
-	map(0x00ff, 0x00ff).select(0xff00).w(FUNC(pentevo_state::atm_port_ffff_w));
+	// PORTS: Always
 	map(0x00f6, 0x00f6).select(0xff08).rw(FUNC(pentevo_state::spectrum_ula_r), FUNC(pentevo_state::atm_ula_w));
 	map(0x00fb, 0x00fb).mirror(0xff00).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x00fd, 0x00fd).mirror(0xff00).w(FUNC(pentevo_state::atm_port_7ffd_w));
 
-	map(0x0077, 0x0077).select(0xff00).w(FUNC(pentevo_state::atm_port_ff77_w));
-	map(0x3ff7, 0x3ff7).select(0xc000).w(FUNC(pentevo_state::atm_port_fff7_w));     // ATM
-	map(0x37f7, 0x37f7).select(0xc000).w(FUNC(pentevo_state::pentevo_port_f7f7_w)); // PENTEVO
-	map(0x3bf7, 0x3bf7).select(0xc000).w(FUNC(pentevo_state::pentevo_port_fbf7_w)); // RO
-	map(0xeff7, 0xeff7).w(FUNC(pentevo_state::pentevo_port_eff7_w));
-
 	// Gluk
-	map(0xdef7, 0xdef7).lw8(NAME([this](offs_t offset, u8 data) { if (is_shadow_active()) m_glukrs->address_w(data); } ));
-	map(0xdff7, 0xdff7).lw8(NAME([this](offs_t offset, u8 data) { if (!is_shadow_active() && BIT(m_port_eff7_data, 7)) m_glukrs->address_w(data); } ));
-	map(0xbef7, 0xbef7).select(0x0100).rw(FUNC(pentevo_state::gluk_data_r), FUNC(pentevo_state::gluk_data_w));
+	map(0xdff7, 0xdff7).lw8(NAME([this](offs_t offset, u8 data) { m_glukrs->address_w(data); } ));
+	map(0xbff7, 0xbff7).rw(FUNC(pentevo_state::gluk_data_r), FUNC(pentevo_state::gluk_data_w));
 
 	// Configuration
-	map(0x00bf, 0x00bf).select(0xff00).rw(FUNC(pentevo_state::atm_port_bf_r), FUNC(pentevo_state::atm_port_bf_w));
-	map(0x00be, 0x00be).select(0x0f00).r(FUNC(pentevo_state::atm_port_0fbd_r));
-	map(0x00bd, 0x00bd).select(0x0f00).rw(FUNC(pentevo_state::atm_port_0fbd_r), FUNC(pentevo_state::atm_port_0fbd_w));
-	map(0x10be, 0x10be).select(0x0f00).r(FUNC(pentevo_state::atm_port_1fbd_r));
-	map(0x10bd, 0x10bd).select(0x0f00).rw(FUNC(pentevo_state::atm_port_1fbd_r), FUNC(pentevo_state::atm_port_1fbd_w));
+	map(0xeff7, 0xeff7).w(FUNC(pentevo_state::pentevo_port_eff7_w));
+	map(0x00bf, 0x00bf).select(0xff00).rw(FUNC(pentevo_state::pentevo_port_bf_r), FUNC(pentevo_state::pentevo_port_bf_w));
+	map(0x00be, 0x00be).select(0x0f00).r(FUNC(pentevo_state::pentevo_port_0nbd_r));
+	map(0x00bd, 0x00bd).select(0x0f00).rw(FUNC(pentevo_state::pentevo_port_0nbd_r), FUNC(pentevo_state::pentevo_port_0nbd_w));
+	map(0x10be, 0x10be).select(0x0f00).r(FUNC(pentevo_state::pentevo_port_1nbd_r));
+	map(0x10bd, 0x10bd).select(0x0f00).rw(FUNC(pentevo_state::pentevo_port_1nbd_r), FUNC(pentevo_state::pentevo_port_1nbd_w));
+	map(0x00be, 0x00be).select(0xff00).w(FUNC(pentevo_state::pentevo_port_be_w));
 
+	// AY
 	map(0x8000, 0x8000).mirror(0x3ffd).w("ay8912", FUNC(ay8910_device::data_w));
 	map(0xc000, 0xc000).mirror(0x3ffd).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 
@@ -588,20 +565,43 @@ void pentevo_state::pentevo_io(address_map &map)
 	map(0x00c8, 0x00c8).mirror(0xff00).lrw8(NAME([this]() { return m_ata->cs1_r(6 /* ? */); })
 		, NAME([this](offs_t offset, u8 data) { m_ata->cs1_w(6, data); }));
 
-	// SPI SD-card
-	map(0x0077, 0x0077).select(0xff00).rw(FUNC(pentevo_state::spi_port_77_r), FUNC(pentevo_state::spi_port_77_w));
+	// SPI
+	map(0x0077, 0x0077).select(0xff00).lr8(NAME([]() { return 0x00; })).w(FUNC(pentevo_state::spi_port_77_w));
 	map(0x0057, 0x0057).select(0xff00).rw(FUNC(pentevo_state::spi_port_57_r), FUNC(pentevo_state::spi_port_57_w));
 
 	// Mouse
 	map(0xfadf, 0xfadf).lr8(NAME([this]() { return 0x80 | (m_io_mouse[2]->read() & 0x07); }));
 	map(0xfbdf, 0xfbdf).lr8(NAME([this]() { return  m_io_mouse[0]->read(); }));
 	map(0xffdf, 0xffdf).lr8(NAME([this]() { return ~m_io_mouse[1]->read(); }));
+	// TODO Mitigates improper Kempston detection in EdgeGrinder. Possibly because read is taken from beta port but not-shadow config is expected.
+	map(0x001f, 0x001f).mirror(0xff00).lr8(NAME([]() { return 0x00; }));
+
+	// PORTS: Shadow
+	map(0x0000, 0xffff).view(m_io_view);
+	m_io_view[0](0x001f, 0x001f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::status_r), FUNC(beta_disk_device::command_w));
+	m_io_view[0](0x003f, 0x003f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::track_r), FUNC(beta_disk_device::track_w));
+	m_io_view[0](0x005f, 0x005f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::sector_r), FUNC(beta_disk_device::sector_w));
+	m_io_view[0](0x007f, 0x007f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::data_r), FUNC(beta_disk_device::data_w));
+	m_io_view[0](0x00ff, 0x00ff).select(0xff00).r(m_beta, FUNC(beta_disk_device::state_r)).w(FUNC(pentevo_state::atm_port_ff_w));
+
+	m_io_view[0](0x0077, 0x0077).select(0xff00).lr8(NAME([]() { return 0xff; })).w(FUNC(pentevo_state::atm_port_77_w));
+	m_io_view[0](0x3ff7, 0x3ff7).select(0xc000).w(FUNC(pentevo_state::atm_port_f7_w));     // ATM
+	m_io_view[0](0x37f7, 0x37f7).select(0xc000).w(FUNC(pentevo_state::pentevo_port_7f7_w)); // PENTEVO
+	m_io_view[0](0x3bf7, 0x3bf7).select(0xc000).w(FUNC(pentevo_state::pentevo_port_bf7_w)); // RO
+
+	// SPI
+	m_io_view[0](0x0057, 0x0057).select(0xff00)
+		.lw8(NAME([this](offs_t offset, u8 data) { if (BIT(offset, 15)) spi_port_77_w(offset, data); else spi_port_57_w(offset, data); }));
+
+	// Gluk
+	m_io_view[0](0xdef7, 0xdef7).lw8(NAME([this](offs_t offset, u8 data) { m_glukrs->address_w(data); } ));
+	m_io_view[0](0xbef7, 0xbef7).rw(FUNC(pentevo_state::gluk_data_r), FUNC(pentevo_state::gluk_data_w));
 }
 
 void pentevo_state::init_mem_write()
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
-	mem.install_write_tap(0x0000, 0xffff, "mem_wait_w", [this](offs_t offset, u8 &data, u8 mem_mask)
+	mem.install_write_tap(0x0000, 0xffff, "charrom_w", [this](offs_t offset, u8 &data, u8 mem_mask)
 	{
 		if (!machine().side_effects_disabled())
 		{
@@ -621,6 +621,7 @@ void pentevo_state::machine_start()
 
 	save_item(NAME(m_port_bf_data));
 	save_item(NAME(m_port_eff7_data));
+	save_item(NAME(m_beta_drive_virtual));
 	save_item(NAME(m_gluk_ext));
 	save_item(NAME(m_ata_data_hi_ready));
 	save_item(NAME(m_nmi_exit));
@@ -635,9 +636,8 @@ void pentevo_state::machine_reset()
 	m_port_eff7_data = 0;
 	atm_state::machine_reset();
 
-	m_glukrs->enable();
-
 	m_port_bf_data = 0;
+	m_beta_drive_virtual = 0;
 
 	m_nmi_exit = false;
 	m_ata_data_hi_ready = false;
