@@ -210,7 +210,7 @@ license:CC0
 		<info name="alt_title" value="採点カートリッジ チャレンジアイドル vol.5"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="sc0020.u1" size="0x100000" crc="081cb211" sha1="daf08db6d342605a8efd797a43c859b9559d6f26"/>
+				<rom name="sc0020-sai.u1" size="0x100000" crc="081cb211" sha1="daf08db6d342605a8efd797a43c859b9559d6f26"/>
 			</dataarea>
 		</part>
 	</software>
