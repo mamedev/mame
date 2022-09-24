@@ -600,14 +600,14 @@ void victor9k_state::victor9k_palette(palette_device &palette) const
 	// BRT1 39K
 	// BRT2 20K
 	// 12V 220K pullup
-	palette.set_pen_color(1, rgb_t(0x00, 0x10, 0x00));
-	palette.set_pen_color(2, rgb_t(0x00, 0x20, 0x00));
-	palette.set_pen_color(3, rgb_t(0x00, 0x40, 0x00));
-	palette.set_pen_color(4, rgb_t(0x00, 0x60, 0x00));
-	palette.set_pen_color(5, rgb_t(0x00, 0x80, 0x00));
-	palette.set_pen_color(6, rgb_t(0x00, 0xa0, 0x00));
-	palette.set_pen_color(7, rgb_t(0x00, 0xc0, 0x00));
-	palette.set_pen_color(8, rgb_t(0x00, 0xff, 0x00));
+	palette.set_pen_color(1, rgb_t(0x00, 0x10, 0x04));
+	palette.set_pen_color(2, rgb_t(0x00, 0x20, 0x09));
+	palette.set_pen_color(3, rgb_t(0x00, 0x40, 0x11));
+	palette.set_pen_color(4, rgb_t(0x00, 0x60, 0x1a));
+	palette.set_pen_color(5, rgb_t(0x00, 0x80, 0x23));
+	palette.set_pen_color(6, rgb_t(0x00, 0xa0, 0x2c));
+	palette.set_pen_color(7, rgb_t(0x00, 0xc0, 0x34));
+	palette.set_pen_color(8, rgb_t(0x00, 0xff, 0x45));
 
 	// CONT0 620R
 	// CONT1 332R
