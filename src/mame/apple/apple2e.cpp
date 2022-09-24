@@ -122,8 +122,6 @@ MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accele
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
-#include "machine/appldriv.h"
-#include "machine/applefdc.h"
 #include "machine/applefdintf.h"
 #include "machine/bankdev.h"
 #include "machine/ds1315.h"
@@ -235,8 +233,7 @@ public:
 		m_lcbank(*this, A2_LCBANK_TAG),
 		m_acia1(*this, IIC_ACIA1_TAG),
 		m_acia2(*this, IIC_ACIA2_TAG),
-		m_laserudc(*this, LASER128_UDC_TAG),
-		m_iicpiwm(*this, "fdc"),
+		m_iwm(*this, "fdc"),
 		m_floppy(*this, "fdc:%d", 0U),
 		m_ds1315(*this, "nsc"),
 		m_printer_conn(*this, "parallel"),
@@ -255,6 +252,8 @@ public:
 		m_pal = false;
 		m_cur_floppy = nullptr;
 		m_devsel = 0;
+		m_laser_speed = 0;
+		m_laser_fdc_on = false;
 	}
 
 	required_device<cpu_device> m_maincpu;
@@ -279,8 +278,7 @@ public:
 	memory_view m_0800bank, m_2000bank, m_4000bank, m_c100bank;
 	memory_view m_c300bank, m_c400bank, m_c800bank, m_lcbank;
 	optional_device<mos6551_device> m_acia1, m_acia2;
-	optional_device<applefdc_base_device> m_laserudc;
-	optional_device<applefdintf_device> m_iicpiwm;
+	optional_device<applefdintf_device> m_iwm;
 	optional_device_array<floppy_connector, 4> m_floppy;
 	required_device<ds1315_device> m_ds1315;
 	optional_device<centronics_device>      m_printer_conn;
@@ -466,9 +464,10 @@ private:
 	bool m_accel_temp_slowdown;
 	bool m_accel_laser;
 	bool m_has_laser_mouse;
+	bool m_laser_fdc_on;
 	int m_accel_stage;
 	u32 m_accel_speed;
-	u8 m_accel_slotspk, m_accel_gameio;
+	u8 m_accel_slotspk, m_accel_gameio, m_laser_speed;
 
 	emu_timer *m_strobe_timer;
 	u8  m_next_strobe;
@@ -511,6 +510,7 @@ private:
 	void accel_full_speed();
 	void accel_normal_speed();
 	void accel_slot(int slot);
+	void laser_calc_speed();
 
 	u8 m_cec_remap[0x40000];
 
@@ -524,6 +524,20 @@ private:
 
 	floppy_image_device *m_cur_floppy;
 	int m_devsel;
+
+	u8 laser_motor_r(offs_t offset)
+	{
+		m_laser_fdc_on = (offset == 1);
+		laser_calc_speed();
+		return m_iwm->read(offset + 8);
+	}
+
+	void laser_motor_w(offs_t offset, u8 data)
+	{
+		m_laser_fdc_on = (offset == 1);
+		laser_calc_speed();
+		m_iwm->write(offset + 8, data);
+	}
 
 	offs_t dasm_trampoline(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 };
@@ -585,7 +599,7 @@ void apple2e_state::mig_w(u16 offset, u8 data)
 
 	if (offset == 0x40)
 	{
-		m_iicpiwm->reset();
+		m_iwm->reset();
 		return;
 	}
 
@@ -695,7 +709,7 @@ void apple2e_state::recalc_active_device()
 		m_cur_floppy = nullptr;
 	}
 
-	m_iicpiwm->set_floppy(m_cur_floppy);
+	m_iwm->set_floppy(m_cur_floppy);
 
 	if (m_cur_floppy)
 	{
@@ -1101,6 +1115,8 @@ void apple2e_state::machine_start()
 	save_item(NAME(m_ace500rombank));
 	save_item(NAME(m_ace_cnxx_bank));
 	save_item(NAME(m_ace2200_axxx_bank));
+	save_item(NAME(m_laser_speed));
+	save_item(NAME(m_laser_fdc_on));
 }
 
 void apple2e_state::machine_reset()
@@ -1138,6 +1154,7 @@ void apple2e_state::machine_reset()
 	m_accel_temp_slowdown = false;
 	m_accel_fast = false;
 	m_centronics_busy = false;
+	m_35sel = false;
 
 	// is Zip enabled?
 	if (m_sysconfig->read() & 0x10)
@@ -2091,30 +2108,43 @@ u8 apple2e_state::c000_laser_r(offs_t offset)
 	return c000_r(offset);
 }
 
+void apple2e_state::laser_calc_speed()
+{
+	if (m_laser_fdc_on)
+	{
+		accel_normal_speed();
+		m_accel_fast = false;
+		return;
+	}
+
+	switch ((m_laser_speed & 0xc0) >> 6)
+	{
+		case 0:
+		case 1:
+			accel_normal_speed();
+			m_accel_fast = false;
+			break;
+
+		case 2:
+			m_accel_speed = A2BUS_7M_CLOCK/3;   // 2.38 MHz
+			m_accel_fast = true;
+			accel_full_speed();
+			break;
+
+		case 3:
+			m_accel_speed = A2BUS_7M_CLOCK/2;   // 3.58 MHz
+			m_accel_fast = true;
+			accel_full_speed();
+			break;
+	}
+}
+
 void apple2e_state::c000_laser_w(offs_t offset, u8 data)
 {
 	if ((m_accel_laser) && (offset == 0x74))
 	{
-		switch ((data & 0xc0) >> 6)
-		{
-			case 0:
-			case 1:
-				accel_normal_speed();
-				m_accel_fast = false;
-				break;
-
-			case 2:
-				m_accel_speed = A2BUS_7M_CLOCK/3;   // 2.38 MHz
-				m_accel_fast = true;
-				accel_full_speed();
-				break;
-
-			case 3:
-				m_accel_speed = A2BUS_7M_CLOCK/2;   // 3.58 MHz
-				m_accel_fast = true;
-				accel_full_speed();
-				break;
-		}
+		m_laser_speed = data;
+		laser_calc_speed();
 	}
 	else
 	{
@@ -2846,7 +2876,7 @@ u8 apple2e_state::c080_r(offs_t offset)
 
 			if ((m_isiicplus) && (slot == 6))
 			{
-				return m_iicpiwm->read(offset % 0x10);
+				return m_iwm->read(offset % 0x10);
 			}
 
 			if (m_slotdevice[slot] != nullptr)
@@ -2881,7 +2911,7 @@ void apple2e_state::c080_w(offs_t offset, u8 data)
 	{
 		if ((m_isiicplus) && (slot == 6))
 		{
-			m_iicpiwm->write(offset % 0x10, data);
+			m_iwm->write(offset % 0x10, data);
 			return;
 		}
 
@@ -3643,7 +3673,8 @@ void apple2e_state::laser128_map(address_map &map)
 	map(0xc0a8, 0xc0ab).rw(m_acia2, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0xc0c0, 0xc0cf).rw(FUNC(apple2e_state::laser_mouse_r), FUNC(apple2e_state::laser_mouse_w));
 	map(0xc0d0, 0xc0d3).rw(FUNC(apple2e_state::memexp_r), FUNC(apple2e_state::memexp_w));
-	map(0xc0e0, 0xc0ef).rw(m_laserudc, FUNC(applefdc_base_device::read), FUNC(applefdc_base_device::write));
+	map(0xc0e0, 0xc0ef).rw(m_iwm, FUNC(applefdintf_device::read), FUNC(applefdintf_device::write));
+	map(0xc0e8, 0xc0e9).rw(FUNC(apple2e_state::laser_motor_r), FUNC(apple2e_state::laser_motor_w));
 	map(0xc1c1, 0xc1c1).r(FUNC(apple2e_state::laserprn_busy_r));
 }
 
@@ -5163,10 +5194,10 @@ void apple2e_state::apple2cp(machine_config &config)
 	config.device_remove("sl4");
 	config.device_remove("sl6");
 
-	IWM(config, m_iicpiwm, A2BUS_7M_CLOCK, 1021800*2);
-	m_iicpiwm->phases_cb().set(FUNC(apple2e_state::phases_w));
-	m_iicpiwm->sel35_cb().set(FUNC(apple2e_state::sel35_w));
-	m_iicpiwm->devsel_cb().set(FUNC(apple2e_state::devsel_w));
+	IWM(config, m_iwm, A2BUS_7M_CLOCK, 1021800*2);
+	m_iwm->phases_cb().set(FUNC(apple2e_state::phases_w));
+	m_iwm->sel35_cb().set(FUNC(apple2e_state::sel35_w));
+	m_iwm->devsel_cb().set(FUNC(apple2e_state::devsel_w));
 
 	applefdintf_device::add_525(config, m_floppy[0]);
 	applefdintf_device::add_525(config, m_floppy[1]);
@@ -5197,16 +5228,6 @@ void apple2e_state::apple2c_mem(machine_config &config)
 	m_ram->set_default_size("128K").set_extra_options("128K, 384K, 640K, 896K, 1152K");
 }
 
-const applefdc_interface fdc_interface =
-{
-	apple525_set_lines,         /* set_lines */
-	apple525_set_enable_lines,  /* set_enable_lines */
-
-	apple525_read_data,         /* read_data */
-	apple525_write_data,    /* write_data */
-	apple525_read_status    /* read_status */
-};
-
 void apple2e_state::laser128(machine_config &config)
 {
 	apple2c(config);
@@ -5216,9 +5237,12 @@ void apple2e_state::laser128(machine_config &config)
 
 	m_screen->set_screen_update(FUNC(apple2e_state::screen_update_tf));
 
-	LEGACY_APPLEFDC(config, m_laserudc, &fdc_interface);
-	FLOPPY_APPLE(config, FLOPPY_0, &floppy_interface, 15, 16);
-	FLOPPY_APPLE(config, FLOPPY_1, &floppy_interface, 15, 16);
+	IWM(config, m_iwm, A2BUS_7M_CLOCK, 1021800 * 2);
+	m_iwm->phases_cb().set(FUNC(apple2e_state::phases_w));
+	m_iwm->devsel_cb().set(FUNC(apple2e_state::devsel_w));
+
+	applefdintf_device::add_525(config, m_floppy[0]);
+	applefdintf_device::add_525(config, m_floppy[1]);
 
 	config.device_remove("sl4");
 	config.device_remove("sl6");
@@ -5248,9 +5272,12 @@ void apple2e_state::laser128o(machine_config &config)
 
 	m_screen->set_screen_update(FUNC(apple2e_state::screen_update_tf));
 
-	LEGACY_APPLEFDC(config, m_laserudc, &fdc_interface);
-	FLOPPY_APPLE(config, FLOPPY_0, &floppy_interface, 15, 16);
-	FLOPPY_APPLE(config, FLOPPY_1, &floppy_interface, 15, 16);
+	IWM(config, m_iwm, A2BUS_7M_CLOCK, 1021800 * 2);
+	m_iwm->phases_cb().set(FUNC(apple2e_state::phases_w));
+	m_iwm->devsel_cb().set(FUNC(apple2e_state::devsel_w));
+
+	applefdintf_device::add_525(config, m_floppy[0]);
+	applefdintf_device::add_525(config, m_floppy[1]);
 
 	config.device_remove("sl4");
 	config.device_remove("sl6");
@@ -5281,9 +5308,12 @@ void apple2e_state::laser128ex2(machine_config &config)
 
 	m_screen->set_screen_update(FUNC(apple2e_state::screen_update_tf));
 
-	LEGACY_APPLEFDC(config, m_laserudc, &fdc_interface);
-	FLOPPY_APPLE(config, FLOPPY_0, &floppy_interface, 15, 16);
-	FLOPPY_APPLE(config, FLOPPY_1, &floppy_interface, 15, 16);
+	IWM(config, m_iwm, A2BUS_7M_CLOCK, 1021800 * 2);
+	m_iwm->phases_cb().set(FUNC(apple2e_state::phases_w));
+	m_iwm->devsel_cb().set(FUNC(apple2e_state::devsel_w));
+
+	applefdintf_device::add_525(config, m_floppy[0]);
+	applefdintf_device::add_525(config, m_floppy[1]);
 
 	config.device_remove("sl4");
 	config.device_remove("sl6");
@@ -5307,7 +5337,7 @@ void apple2e_state::laser128ex2(machine_config &config)
 void apple2e_state::ace500(machine_config &config)
 {
 	apple2ee(config);
-		subdevice<software_list_device>("flop_a2_orig")->set_filter("A2C");  // Filter list to compatible disks for this machine.
+	subdevice<software_list_device>("flop_a2_orig")->set_filter("A2C");  // Filter list to compatible disks for this machine.
 
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::ace500_map);
