@@ -364,6 +364,27 @@ tape by UglyJoe of famicomworld -->
 		</part>
 	</software>
 
+	<software name="starsgo">
+		<description>Star Ship Go!!</description>
+		<year>1985</year>
+		<publisher>Micom BASIC</publisher>
+		<info name="usage" value="Requires BASIC v3; LOAD data for Program first, then LOADS data for BG" />
+		<info name="alt_title" value="スターシップゴー" />
+		<part name="cass1" interface="fc_cass">
+			<feature name="part_id" value="Program Data" />
+			<dataarea name="cass" size="997874">
+				<rom name="star ship go (gokudon).wav" size="997874" crc="9dd752dc" sha1="e57f97af7f10cf242ee07edaafccaebf835397ce"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="fc_cass">
+			<feature name="part_id" value="BG Data" />
+			<dataarea name="cass" size="2874261">
+				<rom name="star ship go bg (gokudon).wav" size="2874261" crc="7874d8a9" sha1="10e57a4e9b1ba9ede4e6a0fa16d6b7941a032887"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wargame">
 		<description>War Game</description>
 		<year>1985</year>
