@@ -1823,6 +1823,8 @@ if (BUSES["MSX_SLOT"]~=null) then
 		MAME_DIR .. "src/devices/bus/msx_slot/ram.h",
 		MAME_DIR .. "src/devices/bus/msx_slot/ram_mm.cpp",
 		MAME_DIR .. "src/devices/bus/msx_slot/ram_mm.h",
+		MAME_DIR .. "src/devices/bus/msx_slot/msx_rs232.cpp",
+		MAME_DIR .. "src/devices/bus/msx_slot/msx_rs232.h",
 		MAME_DIR .. "src/devices/bus/msx_slot/slot.cpp",
 		MAME_DIR .. "src/devices/bus/msx_slot/slot.h",
 		MAME_DIR .. "src/devices/bus/msx_slot/sony08.cpp",

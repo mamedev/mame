@@ -41,5 +41,5 @@ uint8_t msx_slot_rom_device::read(offs_t offset)
 	{
 		return m_rom[offset - m_start_address];
 	}
-	return 0xFF;
+	return 0xff;
 }

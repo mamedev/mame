@@ -28,6 +28,27 @@
 ** - kanji: The direct rom dump from FS-A1FX shows that the kanji font roms are accessed slightly differently. Most
 **          existing kanji font roms may haven been dumped from inside a running machine. Are all other kanji font
 **          rom bad? We need more direct rom dumps to know for sure.
+** - rs232 support:
+**   - svi738
+**   - svi738ar
+**   - svi738dk
+**   - svi738pl
+**   - svi738sp
+**   - svi738sw
+**   - hx22
+**   - hx22i
+**   - hx32
+**   - mlg3
+**   - mlg30_2
+**   - ucv102
+**   - hbg900ap
+**   - hbg900p
+**   - hx23
+**   - hx23f
+**   - victhc90
+**   - victhc95
+**   - victhc95a
+**   - y805256
 ** - bruc100: Not all keypad keys hooked up yet
 ** - fs4000: Is the keypad enter exactly the same as the normal enter key? There does not appear to be a separate mapping for it.
 ** - piopx7: The keyboard responds like a regular international keyboard, not a japanese keyboard.
@@ -35,7 +56,6 @@
 ** - spc800: How to test operation of the han rom?
 ** - svi728/svi728es: How are the keypad keys mapped?
 ** - svi728: Expansion slot not emulated
-** - svi738: rs232c not emulated
 ** - hx10: Expansion slot not emulated (hx10s also??)
 ** - y503iir, y503iir2: RTC not emulated
 ** - y503iir, y503iir2: Net not emulated
@@ -57,7 +77,6 @@
 ** - expertac: Does not boot
 ** - fsa1gt: Add Turbo-R support
 ** - fsa1st: Add Turbo-R support
-** - canonv30: Mapper RAM size unknown
 ** - mx101: External antenna not emulated
 ** - pv7: Add support for KB-7 (8KB ram + 2 cartslots)
 ** - cpc50a/cpc50b: Remove keyboard; and add an external keyboard??
@@ -67,7 +86,6 @@
 ** - mbh3: touch pad not (fully) emulated?
 ** - mbh70: Verify firmware operation
 ** - kmc5000: Floppy support broken
-** - mlg3: rs232c not emulated
 ** - perfect1: Firmware broken
 ** - mpc2500f: Fix keyboard layout?
 ** - nms8260: HDD not emulated
@@ -557,6 +575,7 @@ PCB Layouts missing
 #include "bus/msx_slot/music.h"
 #include "bus/msx_slot/panasonic08.h"
 #include "bus/msx_slot/ram_mm.h"
+#include "bus/msx_slot/msx_rs232.h"
 #include "bus/msx_slot/sony08.h"
 #include "cpu/z80/r800.h"
 #include "cpu/z80/z80.h"
@@ -828,6 +847,19 @@ protected:
 		device.set_start_address(page * 0x4000);
 		device.set_size(numpages * 0x4000);
 		device.set_rom_start(region, offset);
+		install_slot_pages(prim, sec, page, numpages, device);
+		return device;
+	}
+	template <int N, typename T, typename U>
+	auto &add_internal_slot_irq(machine_config &config, T &&type, U &&tag, uint8_t prim, uint8_t sec, uint8_t page, uint8_t numpages, const char *region, uint32_t offset = 0)
+	{
+		auto &device(std::forward<T>(type)(config, std::forward<U>(tag), 0U));
+		device.set_memory_space(m_maincpu, AS_PROGRAM);
+		device.set_io_space(m_maincpu, AS_IO);
+		device.set_start_address(page * 0x4000);
+		device.set_size(numpages * 0x4000);
+		device.set_rom_start(region, offset);
+		device.irq_handler().set(m_mainirq, FUNC(input_merger_device::in_w<N>));
 		install_slot_pages(prim, sec, page, numpages, device);
 		return device;
 	}
@@ -1557,9 +1589,7 @@ uint8_t msx_state::ppi_port_b_r()
 
 	if (m_keylatch <= 10)
 	{
-		uint16_t data = m_io_key[m_keylatch]->read();
-
-		result = data & 0xff;
+		return m_io_key[m_keylatch]->read();
 	}
 	return result;
 }
@@ -6121,7 +6151,7 @@ void msx1_v9938_state::svi738(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  // 64KB RAM
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_ROM, "rs232", 3, 0, 1, 1, "rs232rom");
+	add_internal_slot_irq<2>(config, MSX_SLOT_RS232, "rs232", 3, 0, 1, 1, "rs232rom");
 	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 
 	msx_fd1793(config);
@@ -6681,7 +6711,7 @@ void msx_state::hx22(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram2", 3, 0, 0, 4);   // 64KB RAM
-	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 3, 3, 1, 2, "firmware");
+	add_internal_slot(config, MSX_SLOT_RS232, "firmware", 3, 3, 1, 2, "firmware");
 	add_internal_slot(config, MSX_SLOT_ROM, "firmware_mirror1", 3, 3, 0, 1, "firmware");
 	add_internal_slot(config, MSX_SLOT_ROM, "firmware_mirror2", 3, 3, 3, 1, "firmware", 0x4000);
 
@@ -11906,10 +11936,10 @@ COMP(1984, hx10sa,     hx10,     0,     hx10sa,     msxjp,    msx_state, empty_i
 COMP(1984, hx20,       0,        0,     hx20,       msxjp,    msx_state, empty_init, "Toshiba", "HX-20 (Japan) (MSX1)", 0)
 COMP(1985, hx20e,      hx20,     0,     hx20e,      msx,      msx_state, empty_init, "Toshiba", "HX-20E (Spain) (MSX1)", 0)
 COMP(1985, hx20i,      hx20,     0,     hx20i,      msx,      msx_state, empty_init, "Toshiba", "HX-20I (Italy) (MSX1)", 0)
-COMP(1984, hx21,       0,        0,     hx21,       msxjp,    msx_state, empty_init, "Toshiba", "HX-21 (Japan) (MSX1)", MACHINE_NOT_WORKING) // Does not go into firmware, check rs232c presence and needs kanji rom
+COMP(1984, hx21,       0,        0,     hx21,       msxjp,    msx_state, empty_init, "Toshiba", "HX-21 (Japan) (MSX1)", MACHINE_NOT_WORKING) // Does not go into firmware, needs kanji rom?
 COMP(1985, hx21f,      hx21,     0,     hx21f,      msx,      msx_state, empty_init, "Toshiba", "HX-21F (France) (MSX1)", 0)
 COMP(1984, hx22,       0,        0,     hx22,       msxjp,    msx_state, empty_init, "Toshiba", "HX-22 (Japan) (MSX1)", MACHINE_NOT_WORKING) // Does not go into firmware, check rs232c presence and needs kanji rom
-COMP(1985, hx22i,      hx22,     0,     hx22i,      msx,      msx_state, empty_init, "Toshiba", "HX-22I (Italy) (MSX1)", 0)
+COMP(1985, hx22i,      hx22,     0,     hx22i,      msx,      msx_state, empty_init, "Toshiba", "HX-22I (Italy) (MSX1)", MACHINE_NOT_WORKING) // rs232
 COMP(1985, hx32,       0,        0,     hx32,       msxjp,    msx_state, empty_init, "Toshiba", "HX-32 (Japan) (MSX1)", MACHINE_NOT_WORKING) // Does not go into firmware, check rs232c presence and needs kanji rom
 COMP(1985, hx51i,      0,        0,     hx51i,      msx,      msx_state, empty_init, "Toshiba", "HX-51I (Italy, Spain) (MSX1)", 0)
 COMP(1983, hc5,        hc7,      0,     hc5,        msxjp,    msx_state, empty_init, "Victor", "HC-5 (Japan) (MSX1)", 0)
