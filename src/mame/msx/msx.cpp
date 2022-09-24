@@ -25,6 +25,9 @@
 ** - Verify input port definitions
 ** - multiple: - Add support for kana lock?
 ** -           - Expansion slots not emulated
+** - kanji: The direct rom dump from FS-A1FX shows that the kanji font roms are accessed slightly differently. Most
+**          existing kanji font roms may haven been dumped from inside a running machine. Are all other kanji font
+**          rom bad? We need more direct rom dumps to know for sure.
 ** - bruc100: Not all keypad keys hooked up yet
 ** - fs4000: Is the keypad enter exactly the same as the normal enter key? There does not appear to be a separate mapping for it.
 ** - piopx7: The keyboard responds like a regular international keyboard, not a japanese keyboard.
@@ -899,6 +902,8 @@ protected:
 	required_ioport_array<11> m_io_key;
 	output_finder<2> m_leds;
 	msx_hw_def m_hw_def;
+	// This is here until more direct rom dumps from kanji font roms become available.
+	bool m_kanji_fsa1fx = false;
 
 private:
 	void memory_map_all();
@@ -1386,6 +1391,7 @@ void msx_state::driver_start()
 	save_item(NAME(m_mouse));
 	save_item(NAME(m_mouse_stat));
 	save_item(NAME(m_kanji_latch));
+	save_item(NAME(m_kanji_fsa1fx));
 	save_item(NAME(m_slot_expanded));
 	save_item(NAME(m_primary_slot));
 	save_item(NAME(m_secondary_slot));
@@ -1672,11 +1678,13 @@ uint8_t msx_state::kanji_r(offs_t offset)
 
 	if (m_region_kanji)
 	{
-		uint32_t latch = m_kanji_latch;
-		result = m_region_kanji->as_u8(latch++);
+		uint32_t latch = m_kanji_fsa1fx ? bitswap<17>(m_kanji_latch, 4, 3, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 2, 1, 0) : m_kanji_latch;
+		result = m_region_kanji->as_u8(latch);
 
-		m_kanji_latch &= ~0x1f;
-		m_kanji_latch |= latch & 0x1f;
+		if (!machine().side_effects_disabled())
+		{
+			m_kanji_latch = (m_kanji_latch & ~0x1f) | ((m_kanji_latch + 1) & 0x1f);
+		}
 	}
 	return result;
 }
@@ -11271,13 +11279,10 @@ ROM_START(fsa1fx)
 	ROM_REGION(0x40000, "maincpu", 0)
 	ROM_LOAD("a1fx.ic16", 0, 0x40000, CRC(c0b2d882) SHA1(623cbca109b6410df08ee7062150a6bda4b5d5d4))
 
-	// Kanji rom contents are part of the single rom
-	// This rom definition should be removed once kanji is supported from the main rom
-	// The openMSX definition mentions that the contents of the kanji rom below is how the data
-	// is read from software and may not be how data is stored in rom. Meaning all current kanji
-	// roms are bad dumps or just this one??
-	ROM_REGION(0x20000, "kanji", 0)
-	ROM_LOAD("a1fxkfn.rom", 0, 0x20000, CRC(b244f6cf) SHA1(e0e99cd91e88ce2676445663f832c835d74d6fd4))
+	// Kanji rom contents are the first half of the single rom
+//	ROM_REGION(0x20000, "kanji", 0)
+	ROM_REGION(0x40000, "kanji", 0)
+	ROM_LOAD("a1fx.ic16", 0, 0x40000, CRC(c0b2d882) SHA1(623cbca109b6410df08ee7062150a6bda4b5d5d4))
 ROM_END
 
 void msx2_state::fsa1fx(machine_config &config)
@@ -11304,6 +11309,7 @@ void msx2_state::fsa1fx(machine_config &config)
 
 	MSX_SYSTEMFLAGS(config, "sysflags", m_maincpu, 0xff);
 
+	m_kanji_fsa1fx = true;
 	msx_tc8566af(config);
 	msx_1_35_dd_drive(config);
 	msx2plus(AY8910, config);
@@ -11993,7 +11999,7 @@ COMP(1987, hbf1ii,     hbf1xd,   0,     hbf1ii,     msxjp,    msx2_state, empty_
 COMP(1987, hbf1xd,     0,        0,     hbf1xd,     msx2jp,   msx2_state, empty_init, "Sony", "HB-F1XD (Japan) (MSX2)", 0)
 COMP(1985, hbf5,       0,        0,     hbf5,       msx2jp,   msx2_state, empty_init, "Sony", "HB-F5 (Japan) (MSX2)", 0)
 COMP(1986, hbf9p,      0,        0,     hbf9p,      msx2uk,   msx2_state, empty_init, "Sony", "HB-F9P (Europe) (MSX2)", 0)
-COMP(19??, hbf9pr,     hbf9p,    0,     hbf9pr,     msx2ru,   msx2_state, empty_init, "Sony", "HB-F9P (Russian) (MSX2, prototype)", MACHINE_NOT_WORKING) // Keyboard responds differently
+COMP(19??, hbf9pr,     hbf9p,    0,     hbf9pr,     msx2ru,   msx2_state, empty_init, "Sony", "HB-F9P (Russian) (MSX2, prototype)", 0)
 COMP(1986, hbf9s,      hbf9p,    0,     hbf9s,      msx2sp,   msx2_state, empty_init, "Sony", "HB-F9S (Spain) (MSX2)", 0)
 COMP(1986, hbf500,     hbf500p,  0,     hbf500,     msx2jp,   msx2_state, empty_init, "Sony", "HB-F500 (Japan) (MSX2)", 0)
 COMP(1986, hbf500_2,   hbf500p,  0,     hbf500_2,   msx2jp,   msx2_state, empty_init, "Sony", "HB-F500 2nd version (Japan) (MSX2)", 0)
@@ -12010,8 +12016,8 @@ COMP(1986, hbg900p,    0,        0,     hbg900p,    msx2uk,   msx2_state, empty_
 COMP(1987, tpc310,     0,        0,     tpc310,     msxsp,    msx2_state, empty_init, "Talent", "TPC-310 (Argentina) (MSX2)", 0)
 COMP(1987, tpp311,     0,        0,     tpp311,     msxsp,    msx2_state, empty_init, "Talent", "TPP-311 (Argentina) (MSX2)", 0)
 COMP(1987, tps312,     0,        0,     tps312,     msxsp,    msx2_state, empty_init, "Talent", "TPS-312 (Argentina) (MSX2)", 0)
-COMP(1985, hx23,       hx23f,    0,     hx23,       msxjp,    msx2_state, empty_init, "Toshiba", "HX-23 (Japan) (MSX2)", 0)
-COMP(1985, hx23f,      0,        0,     hx23f,      msxjp,    msx2_state, empty_init, "Toshiba", "HX-23F (Japan) (MSX2)", 0)
+COMP(1985, hx23,       hx23f,    0,     hx23,       msxjp,    msx2_state, empty_init, "Toshiba", "HX-23 (Japan) (MSX2)", MACHINE_NOT_WORKING) // rs232 not supported
+COMP(1985, hx23f,      0,        0,     hx23f,      msxjp,    msx2_state, empty_init, "Toshiba", "HX-23F (Japan) (MSX2)", MACHINE_NOT_WORKING) // rs232 not supported
 COMP(1985, hx33,       hx34,     0,     hx33,       msxjp,    msx2_state, empty_init, "Toshiba", "HX-33 (Japan) (MSX2)", MACHINE_NOT_WORKING) // cannot start firmware
 COMP(1985, hx34,       0,        0,     hx34,       msx2jp,   msx2_state, empty_init, "Toshiba", "HX-34 (Japan) (MSX2)", MACHINE_NOT_WORKING) // cannot start firmware
 COMP(1986, fstm1,      0,        0,     fstm1,      msx,      msx2_state, empty_init, "Toshiba", "FS-TM1 (Italy) (MSX2)", 0)
