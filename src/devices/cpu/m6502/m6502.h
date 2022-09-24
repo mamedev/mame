@@ -38,8 +38,8 @@ public:
 	m6502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_address_width(int width, bool custom_interface) {
-		program_config.m_addr_width = width;		
-		sprogram_config.m_addr_width = width;		
+		program_config.m_addr_width = width;
+		sprogram_config.m_addr_width = width;
 		uses_custom_memory_interface = custom_interface;
 	}
 

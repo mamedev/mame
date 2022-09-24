@@ -2054,11 +2054,11 @@ bool moof_format::load(util::random_read &io, uint32_t form_factor, const std::v
 			uint32_t trks_off = off_trks + (fidx * 8);
 			uint32_t boff = (uint32_t)r16(img, trks_off + 0) * 512;
 			uint32_t track_size = r32(img, trks_off + 4);
-			
+
 			uint32_t total_ticks = 0;
 			for(uint32_t i=0; i != track_size; i++)
 				total_ticks += img[boff+i];
-			
+
 			// Assume there is always a pulse at index, and it's
 			// the last one in the stream
 			std::vector<uint32_t> &buf = image->get_buffer(track, head);
@@ -2075,7 +2075,7 @@ bool moof_format::load(util::random_read &io, uint32_t form_factor, const std::v
 			uint32_t trks_off = off_trks + (idx * 8);
 
 			uint32_t boff = (uint32_t)r16(img, trks_off + 0) * 512;
-			
+
 			uint32_t track_size = r32(img, trks_off + 4);
 
 			if (track_size == 0)

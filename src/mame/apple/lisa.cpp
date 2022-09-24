@@ -102,8 +102,8 @@ void lisa_state::lisa(machine_config &config)
 
 	/* devices */
 	IWM(config, m_fdc, 8_MHz_XTAL);
-//	m_iwm->phases_cb().set(FUNC(mac128_state::phases_w));
-//	m_iwm->devsel_cb().set(FUNC(mac128_state::devsel_w));
+//  m_iwm->phases_cb().set(FUNC(mac128_state::phases_w));
+//  m_iwm->devsel_cb().set(FUNC(mac128_state::devsel_w));
 
 	applefdintf_device::add_35(config, m_floppy[0]);
 	applefdintf_device::add_35(config, m_floppy[1]);

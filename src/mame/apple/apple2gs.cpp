@@ -373,10 +373,10 @@ private:
 	u8 b1ram4000_r(offs_t offset);
 	void b1ram4000_w(offs_t offset, u8 data);
 
-	template<int addr> u8 e0ram_r(offs_t offset);
-	template<int addr> void e0ram_w(offs_t offset, u8 data);
-	template<int addr> u8 e1ram_r(offs_t offset);
-	template<int addr> void e1ram_w(offs_t offset, u8 data);
+	template <int Addr> u8 e0ram_r(offs_t offset);
+	template <int Addr> void e0ram_w(offs_t offset, u8 data);
+	template <int Addr> u8 e1ram_r(offs_t offset);
+	template <int Addr> void e1ram_w(offs_t offset, u8 data);
 
 	u8 c000_r(offs_t offset);
 	void c000_w(offs_t offset, u8 data);
@@ -3815,17 +3815,17 @@ u8 apple2gs_state::read_floatingbus()
     ADDRESS MAP
 ***************************************************************************/
 
-template<int addr>
-u8 apple2gs_state::e0ram_r(offs_t offset) { slow_cycle(); return m_megaii_ram[offset + addr]; }
+template <int Addr>
+u8 apple2gs_state::e0ram_r(offs_t offset) { slow_cycle(); return m_megaii_ram[offset + Addr]; }
 
-template<int addr>
-void apple2gs_state::e0ram_w(offs_t offset, u8 data) { slow_cycle(); m_megaii_ram[offset + addr] = data; }
+template <int Addr>
+void apple2gs_state::e0ram_w(offs_t offset, u8 data) { slow_cycle(); m_megaii_ram[offset + Addr] = data; }
 
-template<int addr>
-u8 apple2gs_state::e1ram_r(offs_t offset) { slow_cycle(); return m_megaii_ram[offset + addr + 0x10000]; }
+template <int Addr>
+u8 apple2gs_state::e1ram_r(offs_t offset) { slow_cycle(); return m_megaii_ram[offset + Addr + 0x10000]; }
 
-template<int addr>
-void apple2gs_state::e1ram_w(offs_t offset, u8 data) { slow_cycle(); m_megaii_ram[offset + addr + 0x10000] = data; }
+template <int Addr>
+void apple2gs_state::e1ram_w(offs_t offset, u8 data) { slow_cycle(); m_megaii_ram[offset + Addr + 0x10000] = data; }
 
 template u8 apple2gs_state::e0ram_r<0x0000>(offs_t offset);
 template u8 apple2gs_state::e0ram_r<0x0200>(offs_t offset);

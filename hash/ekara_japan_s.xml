@@ -155,7 +155,7 @@ license:CC0
 	</software>
 
 	<software name="sc0014">
-		<description>Saiten Cartridge Challenge Idol vol.4 (Japan) (SC0014-SAI)</description>
+		<description>Saiten Cartridge: Challenge Idol vol.4 (Japan) (SC0014-SAI)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="採点カートリッジ チャレンジアイドル vol.4"/>
@@ -164,7 +164,7 @@ license:CC0
 				<rom name="sc0014-sai.u1" size="0x100000" crc="1c07e017" sha1="257d878578fcbf14d7c951bbe68fd25bee3c8db0"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="sc0015">
 		<description>Saiten Cartridge: Detective Conan Vol.2 (Japan) (SC0015-DCS)</description>
@@ -204,7 +204,7 @@ license:CC0
 	</software>
 
 	<software name="sc0020">
-		<description>Saiten Cartridge Challenge Idol vol.5 (Japan) (SC0020-SAI)</description>
+		<description>Saiten Cartridge: Challenge Idol vol.5 (Japan) (SC0020-SAI)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="採点カートリッジ チャレンジアイドル vol.5"/>

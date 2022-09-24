@@ -120,7 +120,7 @@ private:
 		u8 m_sadr, m_write_count, m_banks;
 
 		memory_access<18, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
-		
+
 		const u8 *m_sequencer;
 
 		memory_interface(const u8 *sequencer, address_space &space);
@@ -249,7 +249,7 @@ void mtu130_rom_device::call_unload()
 mtu130_state::memory_interface::memory_interface(const u8 *sequencer, address_space &space) : m_sadr(0), m_write_count(0), m_banks(0), m_sequencer(sequencer)
 {
 	space.specific(m_program);
-}	
+}
 
 u32 mtu130_state::memory_interface::banked_address(u16 adr, u8 sadr) const
 {
@@ -310,7 +310,7 @@ u8 mtu130_state::memory_interface::read(u16 adr)
 	m_write_count = 0;
 	m_sadr = sadr;
 	return data;
-}	
+}
 
 u8 mtu130_state::memory_interface::read_arg(u16 adr)
 {
@@ -451,7 +451,7 @@ WRITE_LINE_MEMBER(mtu130_state::dma_drq_w)
 			u8 data = m_fdc->dma_r();
 			m_fdcram[m_dma_adr & 0x3fff] = data;
 			m_dma_adr ++;
-			
+
 		} else {
 			// Write to floppy
 			u8 data = m_fdcram[m_dma_adr & 0x3fff];

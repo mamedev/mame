@@ -642,12 +642,12 @@ void victor9k_state::machine_start()
 
 	//update RAM for ramsize
 	int m_ram_size = m_ram->size();
-    u8 *m_ram_ptr = m_ram->pointer();
+	u8 *m_ram_ptr = m_ram->pointer();
 
-    int ramsize = m_ram_size;
+	int ramsize = m_ram_size;
 	if (ramsize > 0) {
 		address_space& space = m_maincpu->space(AS_PROGRAM);
-		if (ramsize > 0xdffff)   //the 896KB option overlaps 1 bit with 
+		if (ramsize > 0xdffff)   //the 896KB option overlaps 1 bit with
 			ramsize = 0xdffff;   //the I/O memory space, truncating
 		if (LOG) logerror("install_ram ramsize %x\n", ramsize);
 		space.install_ram(0x0, ramsize, m_ram_ptr);
