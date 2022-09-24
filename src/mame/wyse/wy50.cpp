@@ -222,11 +222,11 @@ void wy50_state::earom_w(u8 data)
 	// Bit 3 = EAROM C2
 	// Bit 4 = EAROM C1
 	// Bit 5 = UPCHAR/NORM
+	m_earom->data_w(BIT(data, 3) ? BIT(data, 0) : 1);
 	m_earom->clock_w(BIT(data, 1));
 	m_earom->c3_w(BIT(data, 2));
 	m_earom->c2_w(BIT(data, 3));
 	m_earom->c1_w(BIT(data, 4));
-	m_earom->data_w(BIT(data, 3) ? BIT(data, 0) : 0);
 	m_font2 = BIT(data, 5);
 }
 

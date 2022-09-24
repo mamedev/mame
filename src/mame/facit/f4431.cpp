@@ -310,20 +310,11 @@ void f4431_state::latch_w(uint8_t data)
 	// ------1-  earom data
 	// -------0  earom c1
 
-	if (0)
-		logerror("latch_w: %02x\n", data);
-
 	m_earom->c1_w(BIT(data, 0));
-	m_earom->data_w(BIT(data, 4) ? 0 : BIT(data, 1));
+	m_earom->data_w(BIT(data, 1));
 	m_earom->c3_w(BIT(data, 2));
 	m_earom->c2_w(BIT(data, 3));
-
-	// don't clock a 'standby' state. the system clocks this and afterwards
-	// the real state; this causes the real state to be ignored, losing the
-	// first bit. to avoid this we don't clock the standby state. maybe it
-	// works in the real system because of timing.
-	if (data & 0x1d)
-		m_earom->clock_w(BIT(data, 4));
+	m_earom->clock_w(BIT(data, 4));
 
 	m_display_enabled = bool(BIT(data, 5));
 	m_nmi_disabled = bool(BIT(data, 6));
