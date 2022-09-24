@@ -974,14 +974,10 @@ const char *isis_image::description() const
 	return "Intel ISIS-II";
 }
 
-void isis_image::enumerate_f(floppy_enumerator &fe, u32 form_factor, const std::vector<u32> &variants) const
+void isis_image::enumerate_f(floppy_enumerator &fe) const
 {
-	if (has(form_factor, variants, floppy_image::FF_8, floppy_image::SSSD)) {
-		fe.add(FLOPPY_IMG_FORMAT, SD_IMAGE_SIZE, "isis_sd", "Intel ISIS-II SD");
-	}
-	if (has(form_factor, variants, floppy_image::FF_8, floppy_image::SSDD)) {
-		fe.add(FLOPPY_IMG_FORMAT, DD_IMAGE_SIZE, "isis_dd", "Intel ISIS-II DD");
-	}
+	fe.add(FLOPPY_IMG_FORMAT, floppy_image::FF_8, floppy_image::SSSD, SD_IMAGE_SIZE, "isis_sd", "Intel ISIS-II SD");
+	fe.add(FLOPPY_IMG_FORMAT, floppy_image::FF_8, floppy_image::SSDD, DD_IMAGE_SIZE, "isis_dd", "Intel ISIS-II DD");
 }
 
 bool isis_image::can_format() const
