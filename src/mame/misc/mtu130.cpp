@@ -39,6 +39,7 @@
 #include "sound/dac.h"
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -673,6 +674,8 @@ void mtu130_state::mtu130(machine_config &config)
 	MTU130_ROM(config, m_roms[1], m_romdata, 0x2000);
 	MTU130_ROM(config, m_roms[2], m_romdata, 0x1000);
 	MTU130_ROM(config, m_roms[3], m_romdata, 0x0000);
+
+	SOFTWARE_LIST(config, "flop_list").set_original("mtu130_flop");
 }
 
 
