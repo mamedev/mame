@@ -249,7 +249,7 @@ MC6845_UPDATE_ROW( victor9k_state::crtc_update_row )
 	if (m_hires != hires)
 	{
 		m_hires = hires;
-		m_crtc->set_unscaled_clock(XTAL(30'000'000) / width);
+		m_crtc->set_unscaled_clock(XTAL(25.175_MHz_XTAL)/width);
 		m_crtc->set_hpixels_per_column(width);
 	}
 
@@ -613,7 +613,7 @@ void victor9k_state::victor9k_palette(palette_device &palette) const
 	// CONT1 332R
 	// CONT2 162R
 	// 12V 110R pullup
-	palette.set_pen_color(9, rgb_t(0xff, 0x00, 0x00));
+	palette.set_pen_color(9, rgb_t(0x00, 0xff, 0x45));
 }
 
 void victor9k_state::machine_start()
@@ -685,19 +685,15 @@ void victor9k_state::victor9k(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_color(rgb_t::green());
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_raw(25.175_MHz_XTAL/16, 880, 0, 800, 406, 0, 400);
 	screen.set_screen_update(HD46505S_TAG, FUNC(hd6845s_device::screen_update));
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640-1, 0, 480-1);
 
 	PALETTE(config, m_palette, FUNC(victor9k_state::victor9k_palette), 16);
 
-	HD6845S(config, m_crtc, XTAL(30'000'000)/10); // HD6845 == HD46505S
+	HD6845S(config, m_crtc, XTAL(25.175_MHz_XTAL)/16); // HD6845 == HD46505S
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
-	m_crtc->set_char_width(10);
+	m_crtc->set_char_width(16);
 	m_crtc->set_update_row_callback(FUNC(victor9k_state::crtc_update_row));
 	m_crtc->out_vsync_callback().set(FUNC(victor9k_state::vert_w));
 
