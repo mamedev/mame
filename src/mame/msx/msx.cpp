@@ -27,28 +27,21 @@
 ** -           - Expansion slots not emulated
 ** - kanji: The direct rom dump from FS-A1FX shows that the kanji font roms are accessed slightly differently. Most
 **          existing kanji font roms may haven been dumped from inside a running machine. Are all other kanji font
-**          rom bad? We need more direct rom dumps to know for sure.
+**          roms bad? We need more direct rom dumps to know for sure.
 ** - rs232 support:
-**   - svi738
-**   - svi738ar
-**   - svi738dk
-**   - svi738pl
-**   - svi738sp
-**   - svi738sw
-**   - hx22
-**   - hx22i
-**   - hx32
-**   - mlg3
-**   - mlg30_2
-**   - ucv102
-**   - hbg900ap
-**   - hbg900p
-**   - hx23
-**   - hx23f
-**   - victhc90
-**   - victhc95
-**   - victhc95a
-**   - y805256
+**   - svi738, svi738ar, svi738dk, svi738pl, svi738sp, svi738sw (working)
+**   - hx22 (working)
+**   - hx22i (working)
+**   - mlg3 (working)
+**   - mlg30_2 (working)
+**   - ucv102 (cannot test, floppy problems)
+**   - hbg900ap (not working)
+**   - hbg900p (not working)
+**   - victhc90 (cannot test, floppy problems)
+**   - victhc95 (cannot test, floppy problems)
+**   - victhc95a (cannot test, floppy problems)
+**   - y805256 (cannot test, rs232 rom has not been dumped)
+**   - optional for hx20, hx21, hx23, hx23f, hx32, hx33, hx34
 ** - bruc100: Not all keypad keys hooked up yet
 ** - fs4000: Is the keypad enter exactly the same as the normal enter key? There does not appear to be a separate mapping for it.
 ** - piopx7: The keyboard responds like a regular international keyboard, not a japanese keyboard.
@@ -863,6 +856,19 @@ protected:
 		install_slot_pages(prim, sec, page, numpages, device);
 		return device;
 	}
+	template <int N, typename T, typename U>
+	auto &add_internal_slot_irq_mirrored(machine_config &config, T &&type, U &&tag, uint8_t prim, uint8_t sec, uint8_t page, uint8_t numpages, const char *region, uint32_t offset = 0)
+	{
+		auto &device(std::forward<T>(type)(config, std::forward<U>(tag), 0U));
+		device.set_memory_space(m_maincpu, AS_PROGRAM);
+		device.set_io_space(m_maincpu, AS_IO);
+		device.set_start_address(page * 0x4000);
+		device.set_size(0x4000);
+		device.set_rom_start(region, offset);
+		device.irq_handler().set(m_mainirq, FUNC(input_merger_device::in_w<N>));
+		install_slot_pages(prim, sec, page, numpages, device);
+		return device;
+	}
 	template <typename T, typename U>
 	auto &add_internal_slot_mirrored(machine_config &config, T &&type, U &&tag, uint8_t prim, uint8_t sec, uint8_t page, uint8_t numpages, const char *region, uint32_t offset = 0)
 	{
@@ -1004,10 +1010,6 @@ public:
 	void cx5miib(machine_config &config);
 	void svi738(machine_config &config);
 	void svi738ar(machine_config &config);
-	void svi738dk(machine_config &config);
-	void svi738pl(machine_config &config);
-	void svi738sp(machine_config &config);
-	void svi738sw(machine_config &config);
 	void tadpc200a(machine_config &config);
 	void y503iir(machine_config &config);
 	void y503iir2(machine_config &config);
@@ -3320,6 +3322,22 @@ void msx1_v9938_state::msx1_v9938(AY8910Type &ay8910_type, machine_config &confi
 	m_v9938->set_screen_ntsc(m_screen);
 	m_v9938->set_vram_size(0x4000);
 	m_v9938->int_cb().set(m_mainirq, FUNC(input_merger_device::in_w<0>));
+
+	// Software lists
+	if (m_hw_def.has_cassette())
+	{
+		SOFTWARE_LIST(config, "cass_list").set_original("msx1_cass");
+	}
+
+	if (m_hw_def.has_cartslot())
+	{
+		SOFTWARE_LIST(config, "cart_list").set_original("msx1_cart");
+	}
+
+	if (m_hw_def.has_fdc())
+	{
+		SOFTWARE_LIST(config, "flop_list").set_original("msx1_flop");
+	}
 }
 
 template<typename AY8910Type>
@@ -6145,13 +6163,11 @@ void msx1_v9938_state::svi738(machine_config &config)
 	// 1 Cartridge slot
 	// builtin 80 columns card (V9938)
 	// RS-232C interface
-	// 8253 clocked by 1.8432MHz xtal (i/o port 80-81?)
-	// 8251 (i/o port 82?)
 
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  // 64KB RAM
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
-	add_internal_slot_irq<2>(config, MSX_SLOT_RS232, "rs232", 3, 0, 1, 1, "rs232rom");
+	add_internal_slot_irq<2>(config, MSX_SLOT_RS232_SVI738, "rs232", 3, 0, 1, 1, "rs232rom");
 	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 
 	msx_fd1793(config);
@@ -6177,23 +6193,8 @@ ROM_END
 
 void msx1_v9938_state::svi738ar(machine_config &config)
 {
-	// AY8910
-	// FDC: wd2793, 1 3.5" SSDD drive
-	// 1 Cartridge slot
-	// builtin 80 columns card (V9938)
-	// RS-232C interface
-
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  // 64KB RAM
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_ROM, "rs232", 3, 0, 1, 1, "rs232rom");
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	svi738(config);
 	add_internal_slot(config, MSX_SLOT_ROM, "arab", 3, 3, 1, 2, "arab");
-
-//	msx_wd2793_force_ready(config);
-	msx_fd1793(config);
-	msx_1_35_ssdd_drive(config);
-	msx1_v9938_pal(AY8910, config);
 }
 
 /* MSX - Spectravideo SVI-738 Danish/Norwegian */
@@ -6208,26 +6209,6 @@ ROM_START(svi738dk)
 	ROM_REGION(0x4000, "rs232rom", ROMREGION_ERASEFF)
 	ROM_LOAD("738dk232c.rom", 0x0000, 0x2000, CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7)) // need verification
 ROM_END
-
-void msx1_v9938_state::svi738dk(machine_config &config)
-{
-	// AY8910
-	// FDC: wd2793, 1 3.5" SSDD drive
-	// 1 Cartridge slot
-	// builtin 80 columns card (V9938)
-	// RS-232C interface
-
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  // 64KB RAM
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_ROM, "rs232", 3, 0, 1, 1, "rs232rom");
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
-
-//	msx_wd2793_force_ready(config);
-	msx_fd1793(config);
-	msx_1_35_ssdd_drive(config);
-	msx1_v9938_pal(AY8910, config);
-}
 
 /* MSX - Spectravideo SVI-738 German */
 
@@ -6244,26 +6225,6 @@ ROM_START(svi738pl)
 	ROM_LOAD("738232c.rom",   0x0000, 0x2000, CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7)) // need verification
 ROM_END
 
-void msx1_v9938_state::svi738pl(machine_config &config)
-{
-	// AY8910
-	// FDC: wd2793, 1 3.5" SSDD drive
-	// 1 Cartridge slot
-	// builtin 80 columns card (V9938)
-	// RS-232C interface
-
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  // 64KB RAM
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_ROM, "rs232", 3, 0, 1, 1, "rs232rom");
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
-
-//	msx_wd2793_force_ready(config);
-	msx_fd1793(config);
-	msx_1_35_ssdd_drive(config);
-	msx1_v9938_pal(AY8910, config);
-}
-
 /* MSX - Spectravideo SVI-738 Spanish */
 
 ROM_START(svi738sp)
@@ -6277,26 +6238,6 @@ ROM_START(svi738sp)
 	ROM_LOAD("738sp232c.rom", 0x0000, 0x2000, CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7)) // need verification
 ROM_END
 
-void msx1_v9938_state::svi738sp(machine_config &config)
-{
-	// AY8910
-	// FDC: wd2793, 1 3.5" SSDD drive
-	// 1 Cartridge slot
-	// builtin 80 columns card (V9938)
-	// RS-232C interface
-
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  // 64KB RAM
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_ROM, "rs232", 3, 0, 1, 1, "rs232rom");
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
-
-//	msx_wd2793_force_ready(config);
-	msx_fd1793(config);
-	msx_1_35_ssdd_drive(config);
-	msx1_v9938_pal(AY8910, config);
-}
-
 /* MSX - Spectravideo SVI-738 Swedish/Finnish */
 
 ROM_START(svi738sw)
@@ -6309,26 +6250,6 @@ ROM_START(svi738sw)
 	ROM_REGION(0x4000, "rs232rom", ROMREGION_ERASEFF)
 	ROM_LOAD("738se232c.rom", 0x0000, 0x2000, CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7))
 ROM_END
-
-void msx1_v9938_state::svi738sw(machine_config &config)
-{
-	// AY8910
-	// FDC: wd2793, 1 3.5" SSDD drive
-	// 1 Cartridge slot
-	// builtin 80 columns card (V9938)
-	// RS-232C interface
-
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  // 64KB RAM
-	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 2, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_ROM, "rs232", 3, 0, 1, 1, "rs232rom");
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
-
-//	msx_wd2793_force_ready(config);
-	msx_fd1793(config);
-	msx_1_35_ssdd_drive(config);
-	msx1_v9938_pal(AY8910, config);
-}
 
 /* MSX - Talent DPC-200 */
 
@@ -6560,6 +6481,7 @@ void msx_state::hx20(machine_config &config)
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
+	// HX-R701 RS-232 optional
 	// T6950
 
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
@@ -6647,6 +6569,7 @@ void msx_state::hx21(machine_config &config)
 {
 	// AY8910
 	// FDC: None, 0 drives
+	// HX-R701 RS-232 optional
 	// 2 Cartridge slots
 
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
@@ -6711,7 +6634,7 @@ void msx_state::hx22(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram2", 3, 0, 0, 4);   // 64KB RAM
-	add_internal_slot(config, MSX_SLOT_RS232, "firmware", 3, 3, 1, 2, "firmware");
+	add_internal_slot_irq<3>(config, MSX_SLOT_RS232_TOSHIBA, "firmware", 3, 3, 1, 2, "firmware");
 	add_internal_slot(config, MSX_SLOT_ROM, "firmware_mirror1", 3, 3, 0, 1, "firmware");
 	add_internal_slot(config, MSX_SLOT_ROM, "firmware_mirror2", 3, 3, 3, 1, "firmware", 0x4000);
 
@@ -6745,7 +6668,7 @@ void msx_state::hx22i(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram2", 3, 0, 2, 2);   // 32KB RAM
-	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 3, 3, 1, 2, "firmware");
+	add_internal_slot_irq<3>(config, MSX_SLOT_RS232_TOSHIBA, "firmware", 3, 3, 1, 2, "firmware");
 
 	msx1(TMS9929A, AY8910, config);
 }
@@ -6773,7 +6696,7 @@ void msx_state::hx32(machine_config &config)
 	// YM2149
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
-	// RS232C optional
+	// HX-R701 RS-232 optional
 	// T6950
 
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
@@ -7858,9 +7781,9 @@ void msx2_state::mlg3(machine_config &config)
 	// YM2149 (in S3527)
 	// FDC: wd2793?, 1 3.5" DSDD drive
 	// S-1985 MSX Engine
-	// 4 Cartridge slots (1 taken by RS232 board)
+	// 4 Cartridge slots (3 internal, 1 taken by RS232 board)
 	// S3527
-	// RS232
+	// RS232 with switch. What does the switch do?
 
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
@@ -7869,7 +7792,7 @@ void msx2_state::mlg3(machine_config &config)
 	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 0, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_cartridge_slot<3>(config, MSX_SLOT_CARTRIDGE, "cartslot3", 3, 1, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x10000); // 64KB Mapper RAM
-	add_internal_slot(config, MSX_SLOT_ROM, "rs232", 3, 3, 1, 1, "rs232");
+	add_internal_slot_irq<4>(config, MSX_SLOT_RS232_MITSUBISHI, "rs232", 3, 3, 1, 1, "rs232");
 
 	msx_wd2793(config);
 	msx_1_35_dd_drive(config);
@@ -7959,7 +7882,7 @@ ROM_START(mlg30_2)
 	ROM_LOAD("g30ext.rom", 0x0000, 0x4000, CRC(4a48779c) SHA1(b8e30d604d319d511cbfbc61e5d8c38fbb9c5a33))
 
 	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("g30disk.rom", 0x0000, 0x4000, CRC(a90be8d5) SHA1(6069d63c68b03fa56de040fb5f52eeadbffe2a2c))
+	ROM_LOAD("g30disk.rom", 0x0000, 0x4000, CRC(995e6bf6) SHA1(6069d63c68b03fa56de040fb5f52eeadbffe2a2c))
 
 	ROM_REGION(0x4000, "rs232", 0)
 	ROM_LOAD("g30rs232c.rom", 0x0000, 0x2000, CRC(15d6ba9e) SHA1(782e54cf88eb4a974631eaa707aad97d3eb1ea14))
@@ -7975,6 +7898,7 @@ void msx2_state::mlg30_2(machine_config &config)
 	// FDC: wd2793/tc8566af?, 2 3.5" DSDD drives
 	// 4 Cartridge slots (1 taken by RS232 board)
 	// S3527
+	// RS232 with switch. What does the switch do?
 
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
@@ -7983,7 +7907,7 @@ void msx2_state::mlg30_2(machine_config &config)
 	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 0, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_cartridge_slot<3>(config, MSX_SLOT_CARTRIDGE, "cartslot3", 3, 1, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000);   // 128KB Mapper RAM
-	add_internal_slot(config, MSX_SLOT_ROM, "rs232", 3, 3, 1, 1, "rs232");
+	add_internal_slot_irq<4>(config, MSX_SLOT_RS232_MITSUBISHI, "rs232", 3, 3, 1, 1, "rs232");
 
 	msx_wd2793(config);
 	msx_2_35_dd_drive(config);
@@ -9130,12 +9054,13 @@ void msx2_state::ucv102(machine_config &config)
 	// FDC: wd1793, 2 3.5" DSDD drives
 	// 1 Cartridge slots
 	// S1985
+	// RS232
 
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 0, 1, 0, 1, "subrom");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 0, 2, 0, 4).set_total_size(0x10000);   // 64KB Mapper RAM
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
-	add_internal_slot(config, MSX_SLOT_ROM, "rs232", 2, 0, 1, 1, "rs232");
+	add_internal_slot_irq<2>(config, MSX_SLOT_RS232, "rs232", 2, 0, 1, 1, "rs232");
 	// Expansion slot 1 connects to slots 2-1 and 3-1 (2x 50 pin)
 	// Expansion slot 2 connects to slots 2-2 and 3-2 (2x 50 pin)
 	// Expansion slot 3 connects to slots 2-3 and 3-3 (2x 50 pin)
@@ -10332,10 +10257,12 @@ ROM_START(hbg900ap)
 	ROM_LOAD("g900disk.ic117", 0x0000, 0x4000, CRC(54c73ad6) SHA1(12f2cc79b3d09723840bae774be48c0d721ec1c6))
 
 	ROM_REGION(0x4000, "rs232", 0)
-	ROM_LOAD("g900232c.rom", 0x0000, 0x2000, CRC(be88e5f7) SHA1(b2776159a7b92d74308b434a6b3e5feba161e2b7))
+	// Contents very likely to be ok, but should be inside a single rom together with firmware
+	ROM_LOAD("g900232c.rom", 0x0000, 0x2000, BAD_DUMP CRC(be88e5f7) SHA1(b2776159a7b92d74308b434a6b3e5feba161e2b7))
 
 	ROM_REGION(0x4000, "firmware", 0)
-	ROM_LOAD("g900util.rom", 0x0000, 0x4000, CRC(ecf6abcf) SHA1(6bb18cd2d69f124ad0c7c23a13eb0d2139037696))
+	// Contents very likely to be ok, but should be inside a single rom together with rs232 code
+	ROM_LOAD("g900util.rom", 0x0000, 0x4000, BAD_DUMP CRC(ecf6abcf) SHA1(6bb18cd2d69f124ad0c7c23a13eb0d2139037696))
 ROM_END
 
 void msx2_state::hbg900ap(machine_config &config)
@@ -10345,11 +10272,12 @@ void msx2_state::hbg900ap(machine_config &config)
 	// 2 Cartridge slots
 	// S1985
 	// rs232 switch for terminal / modem operation
+	// rs232 2kb ram
 
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 0, 1, 0, 1, "subrom");
 	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 0, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
-	add_internal_slot(config, MSX_SLOT_ROM, "rs232", 0, 2, 1, 1, "rs232");
+	add_internal_slot_irq_mirrored<3>(config, MSX_SLOT_RS232_SONY, "rs232", 0, 2, 1, 2, "rs232");
 	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 0, 3, 1, 1, "firmware");
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
@@ -10393,7 +10321,7 @@ void msx2_state::hbg900p(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 0, 1, 0, 1, "subrom");
 	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "diskrom", 0, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
-	add_internal_slot(config, MSX_SLOT_ROM, "rs232", 0, 2, 1, 1, "rs232");
+	add_internal_slot_irq_mirrored<3>(config, MSX_SLOT_RS232_SONY, "rs232", 0, 2, 1, 2, "rs232");
 	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 0, 3, 1, 1, "firmware");
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
@@ -10574,6 +10502,7 @@ void msx2_state::hx23(machine_config &config)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 	// 64KB VRAM
+	// HX-R701 RS-232 optional
 	// TCX-1012
 
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
@@ -10607,6 +10536,7 @@ void msx2_state::hx23f(machine_config &config)
 	// AY8910
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
+	// HX-R701 RS-232 optional
 	// TCX-1012
 
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
@@ -10637,7 +10567,7 @@ void msx2_state::hx33(machine_config &config)
 	// FDC: None, 0, drives
 	// 2 Cartridge slots
 	// TCX-2001 + TCX-2002
-	// rs232 optional?
+	// HX-R702 RS-232 optional
 	// 2KB SRAM
 	// copy button
 
@@ -10672,7 +10602,7 @@ void msx2_state::hx34(machine_config &config)
 	// FDC: wd2793??, 1 3.5" DSDD drive
 	// 2 Cartridge slots
 	// TCX-2001 + TCX-2002
-	// rs232 optional?
+	// HX-R703 RS232 optional
 	// 2KB SRAM
 	// copy button
 
@@ -10750,7 +10680,7 @@ void msx2_state::victhc90(machine_config &config)
 
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 0, 1, 0, 1, "subrom");
-	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 0, 1, 1, 1, "firmware");
+	add_internal_slot_irq<2>(config, MSX_SLOT_RS232, "firmware", 0, 1, 1, 1, "firmware");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 0, 2, 0, 4).set_total_size(0x10000); // 64KB Mapper RAM
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot", 1, 0, msx_cart, nullptr);
 	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 0, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
@@ -11047,6 +10977,9 @@ ROM_START(y805256)
 
 	ROM_REGION(0x4000, "diskrom", 0)
 	ROM_LOAD("yis805256disk.rom", 0x0000, 0x4000, CRC(ab94a273) SHA1(4b08a057e5863ade179dcf8bc9377e90940e6d61)) // need verification
+
+	ROM_REGION(0x4000, "rs232", 0)
+	ROM_LOAD("yis805256rs232.rom", 0x0000, 0x2000, NO_DUMP)
 
 	ROM_REGION(0x20000, "kanji", 0)
 	ROM_LOAD("yis805256kfn.rom", 0x0000, 0x20000, CRC(5a59926e) SHA1(6acaf2eeb57f65f7408235d5e07b7563229de799)) // need verification
@@ -11919,10 +11852,10 @@ COMP(1984, svi728,     0,        0,     svi728,     svi728,   msx_state, empty_i
 COMP(1984, svi728es,   svi728,   0,     svi728,     svi728sp, msx_state, empty_init, "Spectravideo", "SVI-728 (Spanish) (MSX1)", 0)
 COMP(1985, svi738,     0,        0,     svi738,     msx,      msx1_v9938_state, empty_init, "Spectravideo", "SVI-738 (International) (MSX1)", 0)
 COMP(1987, svi738ar,   svi738,   0,     svi738ar,   msx,      msx1_v9938_state, empty_init, "Spectravideo", "SVI-738 (Arabic) (MSX1)", 0)
-COMP(1985, svi738dk,   svi738,   0,     svi738dk,   svi738dk, msx1_v9938_state, empty_init, "Spectravideo", "SVI-738 (Denmark, Norway) (MSX1)", 0)
-COMP(1985, svi738sp,   svi738,   0,     svi738sp,   msxsp,    msx1_v9938_state, empty_init, "Spectravideo", "SVI-738 (Spain) (MSX1)", 0)
-COMP(1985, svi738sw,   svi738,   0,     svi738sw,   svi738sw, msx1_v9938_state, empty_init, "Spectravideo", "SVI-738 (Finland, Sweden) (MSX1)", 0)
-COMP(1986, svi738pl,   svi738,   0,     svi738pl,   msx,      msx1_v9938_state, empty_init, "Spectravideo", "SVI-738 (Poland) (MSX1)", 0)
+COMP(1985, svi738dk,   svi738,   0,     svi738,     svi738dk, msx1_v9938_state, empty_init, "Spectravideo", "SVI-738 (Denmark, Norway) (MSX1)", 0)
+COMP(1986, svi738pl,   svi738,   0,     svi738,     msx,      msx1_v9938_state, empty_init, "Spectravideo", "SVI-738 (Poland) (MSX1)", 0)
+COMP(1985, svi738sp,   svi738,   0,     svi738,     msxsp,    msx1_v9938_state, empty_init, "Spectravideo", "SVI-738 (Spain) (MSX1)", 0)
+COMP(1985, svi738sw,   svi738,   0,     svi738,     svi738sw, msx1_v9938_state, empty_init, "Spectravideo", "SVI-738 (Finland, Sweden) (MSX1)", 0)
 COMP(1986, tadpc200,   dpc200,   0,     tadpc200,   msxsp,    msx_state, empty_init, "Talent", "DPC-200 (Argentina) (MSX1, Spanish keyboard)", 0)
 COMP(1986, tadpc200b,  dpc200,   0,     tadpc200,   msx,      msx_state, empty_init, "Talent", "DPC-200 (Argentina) (MSX1, international keyboard)", 0)
 COMP(1988, tadpc200a,  dpc200,   0,     tadpc200a,  msx,      msx1_v9938_state, empty_init, "Talent", "DPC-200A (Argentina) (MSX1)", 0) // Should have a Spanish keyboard layout?
@@ -12007,7 +11940,7 @@ COMP(1986, vg8230,     0,        0,     vg8230,     msx,      msx2_state, empty_
 COMP(1986, vg8235,     0,        0,     vg8235,     msx,      msx2_state, empty_init, "Philips", "VG-8235 (Europe) (MSX2)", 0)
 COMP(1986, vg8235f,    vg8235,   0,     vg8235f,    msxfr,    msx2_state, empty_init, "Philips", "VG-8235F (France) (MSX2)", 0)
 COMP(1986, vg8240,     0,        0,     vg8240,     msx,      msx2_state, empty_init, "Philips", "VG-8240 (Prototype) (MSX2)", 0)
-COMP(1987, ucv102,     0,        0,     ucv102,     msx2jp,   msx2_state, empty_init, "Pioneer", "UC-V102 (Japan) (MSX2)", MACHINE_NOT_WORKING)
+COMP(1987, ucv102,     0,        0,     ucv102,     msx2jp,   msx2_state, empty_init, "Pioneer", "UC-V102 (Japan) (MSX2)", MACHINE_NOT_WORKING) // floppy problems
 COMP(1987, ax350,      ax350ii,  0,     ax350,      msx,      msx2_state, empty_init, "Sakhr", "AX-350 (Arabic) (MSX2)", 0)
 COMP(1987, ax350ii,    0,        0,     ax350ii,    msx,      msx2_state, empty_init, "Sakhr", "AX-350 II (Arabic) (MSX2)", MACHINE_NOT_WORKING) // floppy problems
 COMP(1987, ax350iif,   ax350ii,  0,     ax350iif,   msxfr,    msx2_state, empty_init, "Sakhr", "AX-350 II F (Arabic) (MSX2)", MACHINE_NOT_WORKING) // floppy problems, arabic rom not repsonding to input
@@ -12041,8 +11974,8 @@ COMP(1986, hbf700p,    0,        0,     hbf700p,    msx2uk,   msx2_state, empty_
 COMP(1986, hbf700s,    hbf700p,  0,     hbf700s,    msx2sp,   msx2_state, empty_init, "Sony", "HB-F700S (Spain) (MSX2)", 0)
 COMP(1986, hbf900,     hbf900a,  0,     hbf900,     msx2jp,   msx2_state, empty_init, "Sony", "HB-F900 (Japan) (MSX2)", 0)
 COMP(1986, hbf900a,    0,        0,     hbf900,     msx2jp,   msx2_state, empty_init, "Sony", "HB-F900 (alt) (Japan) (MSX2)", 0)
-COMP(1987, hbg900ap,   hbg900p,  0,     hbg900ap,   msx2uk,   msx2_state, empty_init, "Sony", "HB-G900AP (Europe) (MSX2)", MACHINE_NOT_WORKING) // goes into the weeds with rs232 rom enabled
-COMP(1986, hbg900p,    0,        0,     hbg900p,    msx2uk,   msx2_state, empty_init, "Sony", "HB-G900P (Europe) (MSX2)", MACHINE_NOT_WORKING) // goes into the weeds with rs232 rom enabled
+COMP(1987, hbg900ap,   hbg900p,  0,     hbg900ap,   msx2uk,   msx2_state, empty_init, "Sony", "HB-G900AP (Europe) (MSX2)", MACHINE_NOT_WORKING) // rs232 not communicating
+COMP(1986, hbg900p,    0,        0,     hbg900p,    msx2uk,   msx2_state, empty_init, "Sony", "HB-G900P (Europe) (MSX2)", MACHINE_NOT_WORKING) // rs232 not communicating
 COMP(1987, tpc310,     0,        0,     tpc310,     msxsp,    msx2_state, empty_init, "Talent", "TPC-310 (Argentina) (MSX2)", 0)
 COMP(1987, tpp311,     0,        0,     tpp311,     msxsp,    msx2_state, empty_init, "Talent", "TPP-311 (Argentina) (MSX2)", 0)
 COMP(1987, tps312,     0,        0,     tps312,     msxsp,    msx2_state, empty_init, "Talent", "TPS-312 (Argentina) (MSX2)", 0)
@@ -12052,9 +11985,9 @@ COMP(1985, hx33,       hx34,     0,     hx33,       msxjp,    msx2_state, empty_
 COMP(1985, hx34,       0,        0,     hx34,       msx2jp,   msx2_state, empty_init, "Toshiba", "HX-34 (Japan) (MSX2)", MACHINE_NOT_WORKING) // cannot start firmware
 COMP(1986, fstm1,      0,        0,     fstm1,      msx,      msx2_state, empty_init, "Toshiba", "FS-TM1 (Italy) (MSX2)", 0)
 COMP(1986, victhc80,   0,        0,     victhc80,   msxjp,    msx2_state, empty_init, "Victor", "HC-80 (Japan) (MSX2)", 0)
-COMP(1986, victhc90,   victhc95, 0,     victhc90,   msx2jp,   msx2_state, empty_init, "Victor", "HC-90 (Japan) (MSX2)", MACHINE_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start
-COMP(1986, victhc95,   0,        0,     victhc95,   msx2jp,   msx2_state, empty_init, "Victor", "HC-95 (Japan) (MSX2)", MACHINE_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start
-COMP(1986, victhc95a,  victhc95, 0,     victhc95a,  msx2jp,   msx2_state, empty_init, "Victor", "HC-95A (Japan) (MSX2)", MACHINE_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start
+COMP(1986, victhc90,   victhc95, 0,     victhc90,   msx2jp,   msx2_state, empty_init, "Victor", "HC-90 (Japan) (MSX2)", MACHINE_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start, floppy problems
+COMP(1986, victhc95,   0,        0,     victhc95,   msx2jp,   msx2_state, empty_init, "Victor", "HC-95 (Japan) (MSX2)", MACHINE_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start, floppy problems
+COMP(1986, victhc95a,  victhc95, 0,     victhc95a,  msx2jp,   msx2_state, empty_init, "Victor", "HC-95A (Japan) (MSX2)", MACHINE_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start, floppy problems
 COMP(1985, cx7128,     cx7m128,  0,     cx7128,     msxjp,    msx2_state, empty_init, "Yamaha", "CX7/128 (Japan) (MSX2)", 0)
 COMP(1985, cx7m128,    0,        0,     cx7m128,    msxjp,    msx2_state, empty_init, "Yamaha", "CX7M/128 (Japan) (MSX2)", 0)
 COMP(1985, y503iiir,   0,        0,     y503iiir,   msxru,    msx2_state, empty_init, "Yamaha", "YIS-503 III R (USSR) (MSX2)", MACHINE_NOT_WORKING) // Russian keyboard, network not implemented
@@ -12063,7 +11996,7 @@ COMP(1985, yis604,     0,        0,     yis604,     msx2jp,   msx2_state, empty_
 COMP(1986, y805128,    y805256,  0,     y805128,    msx2jp,   msx2_state, empty_init, "Yamaha", "YIS805/128 (Japan) (MSX2)", MACHINE_NOT_WORKING) // Floppy support broken
 COMP(1986, y805128r2,  y805256,  0,     y805128r2,  msx2,     msx2_state, empty_init, "Yamaha", "YIS805/128R2 (USSR) (MSX2)", MACHINE_NOT_WORKING) // Floppy support broken, network not implemented
 COMP(198?, y805128r2e, y805256,  0,     y805128r2,  y503iir2, msx2_state, empty_init, "Yamaha", "YIS805/128R2 (Estonian) (MSX2)", MACHINE_NOT_WORKING) // Floppy support broken, network not implemented
-COMP(198?, y805256,    0,        0,     y805256,    msx2jp,   msx2_state, empty_init, "Yamaha", "YIS805/256 (Japan) (MSX2)", MACHINE_NOT_WORKING) // Floppy support broken
+COMP(198?, y805256,    0,        0,     y805256,    msx2jp,   msx2_state, empty_init, "Yamaha", "YIS805/256 (Japan) (MSX2)", MACHINE_NOT_WORKING) // Floppy support broken?
 
 /* MSX2+ */
 COMP(19??, expert3i,   0,        0,     expert3i,   msx2,     msx2_state, empty_init, "Ciel", "Expert 3 IDE (Brazil) (MSX2+)", MACHINE_NOT_WORKING) // Some hardware not emulated
