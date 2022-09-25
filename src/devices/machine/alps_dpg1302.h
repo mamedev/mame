@@ -25,7 +25,7 @@ protected:
 
 	uint8_t m_pencarrierphase;
 	int m_prevx;
-	static constexpr int METALTABPOS = 2200;
+	static constexpr int METALTABPOS = 1100;
 	static constexpr uint32_t PENCOLOR[4] = {0x00000, 0x0000FF, 0x008000, 0x800000};
 };
 

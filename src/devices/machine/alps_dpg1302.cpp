@@ -9,10 +9,10 @@
 
 alps_dpg1302_plotter_device::alps_dpg1302_plotter_device (const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
 	paper_roll_plotter_device(mconfig, ALPS_DPG1302, tag, owner,
-				  Element(1200, 900, 0xc3b4bb),
-				  Element(1000, 700, 0xFFFFFF),
-				  Position(100, 100),
-				  Position(1100, 450),
+                                  Element(600,450,0xc3b4bb),
+ 				  Element(500,350,0xFFFFFF),
+ 				  Position(50,50),
+ 				  Position(550,175),
 				  -0.5, -0.5),
 	m_pencarrierphase(0),m_prevx(0)
 {

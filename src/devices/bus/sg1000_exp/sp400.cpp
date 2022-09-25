@@ -75,24 +75,25 @@ void sp400_printer_device::dser_p2_w(uint8_t v)
 uint8_t sp400_printer_device::dser_p2_r()
 {
 	return
-		(m_motbusy << 7) | 
-		(m_dserstrobe << 6) | 
-		(m_busy << 5) | 
-		(m_data << 4) | 
-		(1 << 3) | 
-		(1 << 2) | 
-		(1 << 1) | 
+		(m_motbusy << 7) |
+		(m_dserstrobe << 6) |
+		(m_busy << 5) |
+		(m_data << 4) |
+		(1 << 3) |
+		(1 << 2) |
+		(1 << 1) |
 		(1 << 0);
 }
 
 uint8_t sp400_printer_device::mot_pa_r()
 {
 	return
-		(0 << 0) | 
-		(0 << 1) | 
+		(0 << 0) |
+		(0 << 1) |
 		(m_frontbuttons->read() << 2) |  // bits 2,3 and 4
-		(0 << 5) | 
-		(0 << 6);
+		(0 << 5) |
+		(0 << 6) |
+                (1 << 7);
 }
 
 void sp400_printer_device::mot_pb_w(uint8_t v)
@@ -104,11 +105,11 @@ void sp400_printer_device::mot_pb_w(uint8_t v)
 uint8_t sp400_printer_device::mot_pc_r()
 {
 	return
-		(m_motPenUp << 0) | 
-		(m_motPenDown << 1) | 
-		(1 << 2) | 
-		(m_plotter->get_reedswitch_state() << 3) | 
-		(m_motbusy << 4) | 
+		(m_motPenUp << 0) |
+		(m_motPenDown << 1) |
+		(1 << 2) |
+		(m_plotter->get_reedswitch_state() << 3) |
+		(m_motbusy << 4) |
 		(1 << 5) | (1 << 6) | (1 << 7); //unconfirmed
 }
 
@@ -156,14 +157,23 @@ void sp400_printer_device::device_add_mconfig(machine_config &config)
 
 uint32_t sp400_printer_device::update_panel(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.plot_box(100, 900-30, 90, 30, 0x00C000);
-	bitmap.plot_box(300, 900-30, 90, 30, m_motbusy ? 0xFF0000 : 0x100000);
-	int buttons = m_frontbuttons->read();
-	static constexpr uint32_t NORMALCOLOR = 0x808080;
+        static constexpr int xstart=50;
+        static constexpr int xpitch=110;
+        static constexpr int width=60;
+        static constexpr int height=20;
+        static constexpr int h=450-50+15;
+
+        static constexpr uint32_t NORMALCOLOR = 0x808080;
 	static constexpr uint32_t PRESSEDCOLOR = 0x404040;
-	bitmap.plot_box(500,900-30, 90, 30, buttons&0x02 ? NORMALCOLOR : PRESSEDCOLOR);
-	bitmap.plot_box(700,900-30, 90, 30, buttons&0x01 ? NORMALCOLOR : PRESSEDCOLOR);
-	bitmap.plot_box(900,900-30, 90, 30, buttons&0x04 ? NORMALCOLOR : PRESSEDCOLOR);
+
+        int buttons = m_frontbuttons->read();
+
+        bitmap.plot_box(xstart+0*xpitch,h,width,height,0x00C000);
+	bitmap.plot_box(xstart+1*xpitch,h,width,height,m_motbusy ? 0xFF0000 : 0x100000);
+	bitmap.plot_box(xstart+2*xpitch,h,width,height,buttons&0x02?NORMALCOLOR:PRESSEDCOLOR);
+	bitmap.plot_box(xstart+3*xpitch,h,width,height,buttons&0x01?NORMALCOLOR:PRESSEDCOLOR);
+	bitmap.plot_box(xstart+4*xpitch,h,width,height,buttons&0x04?NORMALCOLOR:PRESSEDCOLOR);
+
 	return 0;
 }
 
