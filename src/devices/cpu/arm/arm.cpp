@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, Phil Stroffolino
 /*
-    ARM 2/3/6 Emulation (26 bit address bus)
+    ARM 2/3 Emulation (26 bit address bus, no separate PSRs)
 
     Todo:
       - Timing - Currently very approximated, nothing relies on proper timing so far.
@@ -220,8 +220,7 @@ enum
 
 /***************************************************************************/
 
-DEFINE_DEVICE_TYPE(ARM,    arm_cpu_device,    "arm_le", "ARM (little)")
-DEFINE_DEVICE_TYPE(ARM_BE, arm_be_cpu_device, "arm_be", "ARM (big)")
+DEFINE_DEVICE_TYPE(ARM, arm_cpu_device, "arm_cpu", "ARM")
 
 
 device_memory_interface::space_config_vector arm_cpu_device::memory_space_config() const
@@ -232,24 +231,17 @@ device_memory_interface::space_config_vector arm_cpu_device::memory_space_config
 }
 
 arm_cpu_device::arm_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm_cpu_device(mconfig, ARM, tag, owner, clock, ENDIANNESS_LITTLE)
+	: arm_cpu_device(mconfig, ARM, tag, owner, clock)
 {
 }
 
 
-arm_cpu_device::arm_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness)
+arm_cpu_device::arm_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_program_config("program", endianness, 32, 26, 0)
-	, m_endian(endianness)
+	, m_program_config("program", ENDIANNESS_LITTLE, 32, 26, 0)
 	, m_copro_type(copro_type::UNKNOWN_CP15)
 {
 	std::fill(std::begin(m_sArmRegister), std::end(m_sArmRegister), 0);
-}
-
-
-arm_be_cpu_device::arm_be_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm_cpu_device(mconfig, ARM_BE, tag, owner, clock, ENDIANNESS_BIG)
-{
 }
 
 
@@ -342,7 +334,7 @@ void arm_cpu_device::execute_run()
 
 		/* load instruction */
 		uint32_t pc = R15;
-		uint32_t insn = m_pr32( pc & ADDRESS_MASK );
+		uint32_t insn = m_cache.read_dword( pc & ADDRESS_MASK );
 
 		switch (insn >> INSN_COND_SHIFT)
 		{
@@ -447,10 +439,10 @@ void arm_cpu_device::arm_check_irq_state()
 {
 	uint32_t pc = R15+4; /* save old pc (already incremented in pipeline) */;
 
-	/* Exception priorities (from ARM6, not specifically ARM2/3):
+	/* Exception priorities for ARM2/3:
 
 	    Reset
-	    Data abort
+	    Data abort or address exception
 	    FIRQ
 	    IRQ
 	    Prefetch abort
@@ -496,16 +488,7 @@ void arm_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 
-	if(m_program->endianness() == ENDIANNESS_LITTLE)
-	{
-		m_program->cache(m_cachele);
-		m_pr32 = [this](offs_t address) -> u32 { return m_cachele.read_dword(address); };
-	}
-	else
-	{
-		m_program->cache(m_cachebe);
-		m_pr32 = [this](offs_t address) -> u32 { return m_cachebe.read_dword(address); };
-	}
+	m_program->cache(m_cache);
 
 	save_item(NAME(m_sArmRegister));
 	save_item(NAME(m_coproRegister));
