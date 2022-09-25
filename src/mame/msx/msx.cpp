@@ -7,6 +7,9 @@
 **  To get out of the MSX Tutor press the SELECT key. Entering SET SYSTEM 1 should
 **  disable the MSX Tutor on next boot and SET SYSTEM 0 should enable.
 **
+** hx21, hx22:
+**  To start the firmware, mount a HX-M200 cartridge then type: CALL JWP.
+**
 ** tpp311:
 **  This machine is supposed to boot into logo; it was made to only run logo.
 **
@@ -85,9 +88,6 @@
 ** - mpc27: Light pen not emulated
 ** - phc77: firmware not emulated
 ** - phc77: printer not emulated
-** - hx21: Need to mount HX-M200 cartridge to use the firmware, otherwise the firmware will not start up
-** - hx22: Hook up kanji rom
-** - hx21, hx22: Does not start firmware
 ** - victhc90/95/95a: Turbo/2nd cpu not supported.
 ** - victhc90/95/95a: Firmware not working.
 ** - y503iiir/e: Fix keyboard support
@@ -6559,10 +6559,6 @@ ROM_START(hx21)
 
 	ROM_REGION(0x8000, "firmware", 0)
 	ROM_LOAD("tmm23256p_2014.ic3", 0x0000, 0x8000, CRC(87508e78) SHA1(4e2ec9c0294a18a3ab463f182f9333d2af68cdca))
-
-// From HX-M200 Kanji cartridge?
-// ROM_REGION(0x20000, "kanji", 0)
-// ROM_LOAD("hx21kfn.rom", 0x0000, 0x20000, CRC(d23d4d2d) SHA1(db03211b7db46899df41db2b1dfbec972109a967))
 ROM_END
 
 void msx_state::hx21(machine_config &config)
@@ -6617,10 +6613,6 @@ ROM_START(hx22)
 
 	ROM_REGION(0x8000, "firmware", 0)
 	ROM_LOAD("tms23256p_2014.ic3", 0x0000, 0x8000, CRC(87508e78) SHA1(4e2ec9c0294a18a3ab463f182f9333d2af68cdca))
-
-// From HX-M200 Kanji cartridge?
-// ROM_REGION(0x20000, "kanji", 0)
-// ROM_LOAD("hx22kfn.rom", 0x0000, 0x20000, CRC(d23d4d2d) SHA1(db03211b7db46899df41db2b1dfbec972109a967))
 ROM_END
 
 void msx_state::hx22(machine_config &config)
@@ -6686,9 +6678,9 @@ ROM_START(hx32)
 	ROM_REGION(0x8000, "firmware", 0)
 	ROM_LOAD("hx32firm.ic2", 0x0000, 0x8000, CRC(efc3aca7) SHA1(ed589da7f359a4e139a23cd82d9a6a6fa3d70db0))
 
-// From HX-M200 Kanji cartridge?
-// ROM_REGION(0x20000, "kanji", 0)
-// ROM_LOAD("hx22kfn.rom", 0x0000, 0x20000, CRC(d23d4d2d) SHA1(db03211b7db46899df41db2b1dfbec972109a967))
+	// Same as HX-M200 Kanji cartridge
+	ROM_REGION(0x20000, "kanji", 0)
+	ROM_LOAD("hx32kfn.rom", 0x0000, 0x20000, CRC(d23d4d2d) SHA1(db03211b7db46899df41db2b1dfbec972109a967))
 ROM_END
 
 void msx_state::hx32(machine_config &config)
@@ -10978,9 +10970,6 @@ ROM_START(y805256)
 	ROM_REGION(0x4000, "diskrom", 0)
 	ROM_LOAD("yis805256disk.rom", 0x0000, 0x4000, CRC(ab94a273) SHA1(4b08a057e5863ade179dcf8bc9377e90940e6d61)) // need verification
 
-	ROM_REGION(0x4000, "rs232", 0)
-	ROM_LOAD("yis805256rs232.rom", 0x0000, 0x2000, NO_DUMP)
-
 	ROM_REGION(0x20000, "kanji", 0)
 	ROM_LOAD("yis805256kfn.rom", 0x0000, 0x20000, CRC(5a59926e) SHA1(6acaf2eeb57f65f7408235d5e07b7563229de799)) // need verification
 ROM_END
@@ -11869,11 +11858,11 @@ COMP(1984, hx10sa,     hx10,     0,     hx10sa,     msxjp,    msx_state, empty_i
 COMP(1984, hx20,       0,        0,     hx20,       msxjp,    msx_state, empty_init, "Toshiba", "HX-20 (Japan) (MSX1)", 0)
 COMP(1985, hx20e,      hx20,     0,     hx20e,      msx,      msx_state, empty_init, "Toshiba", "HX-20E (Spain) (MSX1)", 0)
 COMP(1985, hx20i,      hx20,     0,     hx20i,      msx,      msx_state, empty_init, "Toshiba", "HX-20I (Italy) (MSX1)", 0)
-COMP(1984, hx21,       0,        0,     hx21,       msxjp,    msx_state, empty_init, "Toshiba", "HX-21 (Japan) (MSX1)", MACHINE_NOT_WORKING) // Does not go into firmware, needs kanji rom?
+COMP(1984, hx21,       0,        0,     hx21,       msxjp,    msx_state, empty_init, "Toshiba", "HX-21 (Japan) (MSX1)", 0)
 COMP(1985, hx21f,      hx21,     0,     hx21f,      msx,      msx_state, empty_init, "Toshiba", "HX-21F (France) (MSX1)", 0)
-COMP(1984, hx22,       0,        0,     hx22,       msxjp,    msx_state, empty_init, "Toshiba", "HX-22 (Japan) (MSX1)", MACHINE_NOT_WORKING) // Does not go into firmware, check rs232c presence and needs kanji rom
-COMP(1985, hx22i,      hx22,     0,     hx22i,      msx,      msx_state, empty_init, "Toshiba", "HX-22I (Italy) (MSX1)", MACHINE_NOT_WORKING) // rs232
-COMP(1985, hx32,       0,        0,     hx32,       msxjp,    msx_state, empty_init, "Toshiba", "HX-32 (Japan) (MSX1)", MACHINE_NOT_WORKING) // Does not go into firmware, check rs232c presence and needs kanji rom
+COMP(1984, hx22,       0,        0,     hx22,       msxjp,    msx_state, empty_init, "Toshiba", "HX-22 (Japan) (MSX1)", 0)
+COMP(1985, hx22i,      hx22,     0,     hx22i,      msx,      msx_state, empty_init, "Toshiba", "HX-22I (Italy) (MSX1)", 0)
+COMP(1985, hx32,       0,        0,     hx32,       msxjp,    msx_state, empty_init, "Toshiba", "HX-32 (Japan) (MSX1)", 0)
 COMP(1985, hx51i,      0,        0,     hx51i,      msx,      msx_state, empty_init, "Toshiba", "HX-51I (Italy, Spain) (MSX1)", 0)
 COMP(1983, hc5,        hc7,      0,     hc5,        msxjp,    msx_state, empty_init, "Victor", "HC-5 (Japan) (MSX1)", 0)
 COMP(1984, hc6,        hc7,      0,     hc6,        msxjp,    msx_state, empty_init, "Victor", "HC-6 (Japan) (MSX1)", 0)
@@ -11947,7 +11936,7 @@ COMP(1987, ax350iif,   ax350ii,  0,     ax350iif,   msxfr,    msx2_state, empty_
 COMP(1988, ax370,      0,        0,     ax370,      msx2,     msx2_state, empty_init, "Sakhr", "AX-370 (Arabic) (MSX2)", MACHINE_NOT_WORKING) // floppy problems
 COMP(1987, ax500,      0,        0,     ax500,      msx2,     msx2_state, empty_init, "Sakhr", "AX-500 (Arabic) (MSX2)", MACHINE_NOT_WORKING) // floppy problems
 COMP(1987, mpc2300,    0,        0,     mpc2300,    msxru,    msx2_state, empty_init, "Sanyo", "MPC-2300 (USSR) (MSX2)", MACHINE_NOT_WORKING) // Keyboard responds differently
-COMP(1987, mpc2500f,   0,        0,     mpc2500f,   msx2ru,   msx2_state, empty_init, "Sanyo", "MPC-2500FD (USSR) (MSX2)", MACHINE_NOT_WORKING) // Russian keyboard?
+COMP(1987, mpc2500f,   0,        0,     mpc2500f,   msx2ru,   msx2_state, empty_init, "Sanyo", "MPC-2500FD (USSR) (MSX2)", 0)
 COMP(1985, mpc25fd,    0,        0,     mpc25fd,    msx2jp,   msx2_state, empty_init, "Sanyo", "MPC-25FD (Japan) (MSX2)", 0)
 COMP(1985, mpc25fs,    0,        0,     mpc25fs,    msx2jp,   msx2_state, empty_init, "Sanyo", "MPC-25FS (Japan) (MSX2)", 0)
 COMP(1985, mpc27,      0,        0,     mpc27,      msx2jp,   msx2_state, empty_init, "Sanyo", "MPC-27 (Japan) (MSX2)", MACHINE_NOT_WORKING) // Light pen not emulated

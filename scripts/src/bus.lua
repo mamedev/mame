@@ -1857,6 +1857,8 @@ if (BUSES["MSX_SLOT"]~=null) then
 		MAME_DIR .. "src/devices/bus/msx_cart/holy_quran.h",
 		MAME_DIR .. "src/devices/bus/msx_cart/ink.cpp",
 		MAME_DIR .. "src/devices/bus/msx_cart/ink.h",
+		MAME_DIR .. "src/devices/bus/msx_cart/kanji.cpp",
+		MAME_DIR .. "src/devices/bus/msx_cart/kanji.h",
 		MAME_DIR .. "src/devices/bus/msx_cart/konami.cpp",
 		MAME_DIR .. "src/devices/bus/msx_cart/konami.h",
 		MAME_DIR .. "src/devices/bus/msx_cart/korean.cpp",

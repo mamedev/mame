@@ -16,6 +16,7 @@
 #include "hfox.h"
 #include "holy_quran.h"
 #include "ink.h"
+#include "kanji.h"
 #include "konami.h"
 #include "korean.h"
 #include "majutsushi.h"
@@ -73,6 +74,7 @@ void msx_cart(device_slot_interface &device)
 	device.option_add_internal("disk_fscf351", MSX_CART_FSCF351);
 	device.option_add("bm_012", MSX_CART_BM_012);
 	device.option_add("moonsound", MSX_CART_MOONSOUND);
+	device.option_add("hxm200", MSX_CART_HXM200);
 }
 
 
