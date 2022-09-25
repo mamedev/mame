@@ -22,11 +22,8 @@
 // - PROGRAMMOVER, a z80-based board
 // - MultI-O, an i/o board
 
-// Sequencer PROM added, ID prom being studied.
-
 // Probable bug somewhere making the BASIC (light pen, game) demos
-// fail in the demonstration disk, possibly in the customized 6502
-// core.
+// fail in the demonstration disk.
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
@@ -98,6 +95,7 @@ public:
 		m_romdata(*this, "romdata"),
 		m_ipl(*this, "ipl"),
 		m_sequencer(*this, "sequencer"),
+		m_id(*this, "id"),
 		m_keyboard(*this, "K%X", 0L),
 		m_keyboard_meta(*this, "KM"),
 		m_jumpers(*this, "jumpers")
@@ -163,6 +161,7 @@ private:
 
 	required_memory_region m_ipl;
 	required_region_ptr<u8> m_sequencer;
+	required_region_ptr<u8> m_id;
 	required_ioport_array<16> m_keyboard;
 	required_ioport m_keyboard_meta;
 	required_ioport m_jumpers;
@@ -172,7 +171,7 @@ private:
 	uint16_t m_dma_adr;
 	u8 m_keyboard_col;
 	u8 m_dac_level;
-	u8 m_cpuid;
+	u8 m_id_adr;
 	bool m_dma_direction;
 	bool m_video_unblank;
 	bool m_video_bw;
@@ -196,8 +195,8 @@ private:
 	void sys1_ca2_w(int line);
 	void sys2_pa_w(u8 data);
 
-	void cpuid_reset_w(u8);
-	u8 cpuid_r();
+	void id_reset_w(u8);
+	u8 id_r();
 
 	void io_enable_w(u8);
 	void io_disable_w(u8);
@@ -341,7 +340,7 @@ void mtu130_state::machine_start()
 	m_dma_direction = false;
 	m_keyboard_col = 0;
 	m_dac_level = 0x80;
-	m_cpuid = 0;
+	m_id_adr = 0;
 	m_video_unblank = true;
 	m_video_bw = true;
 	m_fdc_irq_enabled = false;
@@ -350,7 +349,7 @@ void mtu130_state::machine_start()
 	save_item(NAME(m_dma_direction));
 	save_item(NAME(m_keyboard_col));
 	save_item(NAME(m_dac_level));
-	save_item(NAME(m_cpuid));
+	save_item(NAME(m_id_adr));
 	save_item(NAME(m_video_unblank));
 	save_item(NAME(m_video_bw));
 	save_item(NAME(m_fdc_irq_enabled));
@@ -461,21 +460,15 @@ WRITE_LINE_MEMBER(mtu130_state::dma_drq_w)
 	}
 }
 
-void mtu130_state::cpuid_reset_w(u8)
+void mtu130_state::id_reset_w(u8)
 {
-	m_cpuid = 0;
+	m_id_adr = 0;
 }
 
-u8 mtu130_state::cpuid_r()
+u8 mtu130_state::id_r()
 {
-	static u8 cpuid[] = { 0,
-						  0, 0, 0, 0, 0, // Vendor
-						  0, 0, 0, 0, 0, // Group
-						  0, 0, 1, 7, 5, // User, BASIC and others tend to check that one
-	};
-	u8 res = cpuid[m_cpuid & 15];
-	m_cpuid++;
-	return res;
+	m_id_adr = (m_id_adr + 1) & 0xf;
+	return m_id[m_id_adr];
 }
 
 void mtu130_state::user_cb2_w(int line)
@@ -569,9 +562,9 @@ void mtu130_state::map(address_map &map)
 
 	map(0x0be00, 0x0bfff).view(m_io_view);                          // I/O dynamically overrides part of the main ram
 	m_io_view[1](0x0be00, 0x0bfff).unmaprw();                       // Fully mask out the ram when active
-	m_io_view[1](0x0bfc3, 0x0bfc3).r(FUNC(mtu130_state::cpuid_r));
+	m_io_view[1](0x0bfc3, 0x0bfc3).r(FUNC(mtu130_state::id_r));
 	m_io_view[1](0x0bfc5, 0x0bfc5).w(FUNC(mtu130_state::keyboard_col_clear_w));
-	m_io_view[1](0x0bfc7, 0x0bfc7).w(FUNC(mtu130_state::cpuid_reset_w));
+	m_io_view[1](0x0bfc7, 0x0bfc7).w(FUNC(mtu130_state::id_reset_w));
 	m_io_view[1](0x0bfc8, 0x0bfcb).rw(m_acia, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	m_io_view[1](0x0bfd0, 0x0bfdf).m(m_user_6522, FUNC(via6522_device::map));
 	m_io_view[1](0x0bfe0, 0x0bfef).m(m_sys1_6522, FUNC(via6522_device::map));
@@ -831,6 +824,13 @@ ROM_START(mtu130)
 	ROM_REGION(0x100, "sequencer", 0) // 4-bit prom
 	ROM_LOAD("6301.u55", 0, 0x100, CRC(1541eb91) SHA1(78ab124865dc6ffd646abd2fcab5b881edd619c1))
 
+	ROM_REGION(0x100, "id", 0) // 4-bit prom, only first 16 nibbles reachable, rest all f
+    // address 1     unused f
+    // address 2-6   vendor 00102
+    // address 7-b   group  00000
+    // address c-f,0 user   00175 (used by BASIC 1.5 for system-locking)
+
+	ROM_LOAD("6301.u24", 0, 0x100, CRC(7ebc5451) SHA1(402bd7bf343d995bc9c857fe4f3a23e0a8e7bd1c))
 ROM_END
 
 COMP(1981, mtu130, 0, 0, mtu130, mtu130, mtu130_state, empty_init, "Micro Technology Unlimited", "MTU-130", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND)
