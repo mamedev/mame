@@ -2580,8 +2580,6 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/a2cffa.h",
 		MAME_DIR .. "src/devices/bus/a2bus/a2corvus.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/a2corvus.h",
-		MAME_DIR .. "src/devices/bus/a2bus/a2diskii.cpp",
-		MAME_DIR .. "src/devices/bus/a2bus/a2diskii.h",
 		MAME_DIR .. "src/devices/bus/a2bus/a2diskiing.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/a2diskiing.h",
 		MAME_DIR .. "src/devices/bus/a2bus/a2dx1.cpp",
