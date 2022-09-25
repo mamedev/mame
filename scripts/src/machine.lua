@@ -4368,28 +4368,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/appldriv.h,MACHINES["APPLE_DRIVE"] = true
----------------------------------------------------
-if (MACHINES["APPLE_DRIVE"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/appldriv.cpp",
-		MAME_DIR .. "src/devices/machine/appldriv.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/applefdc.h,MACHINES["APPLE_FDC"] = true
----------------------------------------------------
-if (MACHINES["APPLE_FDC"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/applefdc.cpp",
-		MAME_DIR .. "src/devices/machine/applefdc.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/scnxx562.h,MACHINES["SCNXX562"] = true
 ---------------------------------------------------
 if (MACHINES["SCNXX562"]~=null) then
