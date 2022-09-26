@@ -212,11 +212,6 @@ enum
 	COND_NV         /* never */
 };
 
-#define LSL(v,s) ((v) << (s))
-#define LSR(v,s) ((v) >> (s))
-#define ROL(v,s) (LSL((v),(s)) | (LSR((v),32u - (s))))
-#define ROR(v,s) (LSR((v),(s)) | (LSL((v),32u - (s))))
-
 
 /***************************************************************************/
 
@@ -796,7 +791,7 @@ void arm_cpu_device::HandleALU( uint32_t insn )
 		by = (insn & INSN_OP2_ROTATE) >> INSN_OP2_ROTATE_SHIFT;
 		if (by)
 		{
-			op2 = ROR(insn & INSN_OP2_IMM, by << 1);
+			op2 = rotr_32(insn & INSN_OP2_IMM, by << 1);
 			sc = op2 & SIGN_BIT;
 		}
 		else
@@ -1312,7 +1307,7 @@ uint32_t arm_cpu_device::decodeShift(uint32_t insn, uint32_t *pCarry)
 		{
 			*pCarry = k ? (rm & (1 << (32 - k))) : (R15 & C_MASK);
 		}
-		return k ? LSL(rm, k) : rm;
+		return rm << k;
 
 	case 1:                         /* LSR */
 		if (k == 0 || k == 32)
@@ -1328,7 +1323,7 @@ uint32_t arm_cpu_device::decodeShift(uint32_t insn, uint32_t *pCarry)
 		else
 		{
 			if (pCarry) *pCarry = (rm & (1 << (k - 1)));
-			return LSR(rm, k);
+			return rm >> k;
 		}
 
 	case 2:                     /* ASR */
@@ -1340,9 +1335,9 @@ uint32_t arm_cpu_device::decodeShift(uint32_t insn, uint32_t *pCarry)
 		else
 		{
 			if (rm & SIGN_BIT)
-				return LSR(rm, k) | (0xffffffffu << (32 - k));
+				return (rm >> k) | (0xffffffffu << (32 - k));
 			else
-				return LSR(rm, k);
+				return (rm >> k);
 		}
 
 	case 3:                     /* ROR and RRX */
@@ -1350,12 +1345,12 @@ uint32_t arm_cpu_device::decodeShift(uint32_t insn, uint32_t *pCarry)
 		{
 			while (k > 32) k -= 32;
 			if (pCarry) *pCarry = rm & (1 << (k - 1));
-			return ROR(rm, k);
+			return rotr_32(rm, k);
 		}
 		else
 		{
 			if (pCarry) *pCarry = (rm & 1);
-			return LSR(rm, 1) | ((R15 & C_MASK) << 2);
+			return (rm >> 1) | ((R15 & C_MASK) << 2);
 		}
 	}
 

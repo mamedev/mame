@@ -1415,7 +1415,7 @@ void m68000_base_device::init32(address_space &space, address_space &ospace)
 
 		case 3:
 			m_program32.write_dword(address - 3, dword_from_unaligned_word((data & 0xffff0000U) >> 16), 0x000000ff);
-			m_program32.write_dword(address + 1, (data & 0x00ffffff) << 8 | (data & 0xff000000U) >> 24, 0xffffff00U);
+			m_program32.write_dword(address + 1, rotl_32(data, 8), 0xffffff00U);
 			break;
 		}
 	};
@@ -1585,7 +1585,7 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 					return;
 			}
 			m_program32.write_dword(address0 - 3, dword_from_unaligned_word((data & 0xffff0000U) >> 16), 0x000000ff);
-			m_program32.write_dword(address1, (data & 0x00ffffff) << 8 | (data & 0xff000000U) >> 24, 0xffffff00U);
+			m_program32.write_dword(address1, rotl_32(data, 8), 0xffffff00U);
 			break;
 		}
 		}

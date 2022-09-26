@@ -1513,8 +1513,7 @@ void hyperstone_device::hyperstone_rol()
 	const uint32_t mask = (uint32_t)(0xffffffff00000000ULL >> n);
 #endif
 
-	if (n)
-		val = (val << n) | (val >> (32 - n));
+	val = rotl_32(val, n);
 
 #ifdef MISSIONCRAFT_FLAGS
 	SR &= ~(V_MASK | Z_MASK | C_MASK | N_MASK);
@@ -2211,11 +2210,6 @@ void hyperstone_device::hyperstone_mul()
 		m_core->icount -= 5 << m_core->clck_scale;
 	else
 		m_core->icount -= 3 << m_core->clck_scale;
-}
-
-static inline int32_t mul_16x16(int16_t halfd, int16_t halfs)
-{
-	return (int32_t)halfd * (int32_t)halfs;
 }
 
 void hyperstone_device::hyperstone_extend()
