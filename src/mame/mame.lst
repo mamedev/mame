@@ -2933,11 +2933,15 @@ fourx4                          //
 
 @source:pinball/atari_s1.cpp
 aavenger                        //
+aavengera                       //
 atarians                        //
+atariansa                       //
 midearth                        //
 mideartha                       //
+midearthp                       //
 spcrider                        //
 time2000                        //
+time2000a                       //
 
 @source:pinball/atari_s2.cpp
 hercules                        //
@@ -9734,11 +9738,11 @@ bwidowp                         // (proto)          (c) 1982
 gravitar                        // 136010           (c) 1982
 gravitar1                       // 136010           (c) 1982
 gravitar2                       // 136010           (c) 1982
-lunarba1                        // (proto)          (c) 1982
 lunarbat                        // (proto)          (c) 1982
+lunarbat1                       // (proto)          (c) 1982
 spacduel                        // 136006           (c) 1980
-spacduel0                       // 136006           (c) 1980
 spacduel1                       // 136006           (c) 1980
+spacduelp                       // 136006           (c) 1980
 
 @source:dataeast/bwing.cpp
 bwings                          // (c) 1984
@@ -14614,9 +14618,9 @@ sxevious                        // (c) 1984
 sxeviousj                       // (c) 1984
 xevios                          // bootleg
 xevious                         // (c) 1982
-xeviousa                        // 136018   (c) 1982 + Atari license
-xeviousb                        // 136018   (c) 1982 + Atari license
-xeviousc                        // 136018   (c) 1982 + Atari license
+xeviousat                       // 136018   (c) 1982 + Atari license
+xeviousat1                      // 136018   (c) 1982 + Atari license
+xeviousat2                      // 136018   (c) 1982 + Atari license
 
 @source:taito/galastrm.cpp
 galastrm                        // C99 (c) 1992 Taito Corporation
@@ -39258,6 +39262,7 @@ skyarmy                         // (c) 1982 Shoei
 
 @source:atari/skydiver.cpp
 skydiver                        // 009787           1978/06 [6800]
+skydivera                       // 009787           1978/06 [6800]
 
 @source:jaleco/skyfox.cpp
 exerizer                        // (c) 1987? Jaleco

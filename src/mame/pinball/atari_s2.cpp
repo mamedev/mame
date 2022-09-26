@@ -543,33 +543,33 @@ void atari_s2_state::atari_s3(machine_config &config)
 /*-------------------------------------------------------------------
 / Superman (03/1979)
 /-------------------------------------------------------------------*/
-ROM_START(supermap)
+ROM_START( supermap )
 	ROM_REGION(0x1800, "maincpu", 0)
-	ROM_LOAD("supmn_k.rom", 0x0000, 0x0800, CRC(a28091c2) SHA1(9f5e47db408da96a31cb2f3be0fa9fb1e79f8d85))
-	ROM_LOAD("atari_m.rom", 0x0800, 0x0800, CRC(1bb6b72c) SHA1(dd24ed54de275aadf8dc0810a6af3ac97aea4026))
-	ROM_LOAD("atari_j.rom", 0x1000, 0x0800, CRC(26521779) SHA1(2cf1c66441aee99b9d01859d495c12025b5ef094))
+	ROM_LOAD("21017-01.kl7", 0x0000, 0x0800, CRC(a28091c2) SHA1(9f5e47db408da96a31cb2f3be0fa9fb1e79f8d85))
+	ROM_LOAD("21016-01.m7",  0x0800, 0x0800, CRC(1bb6b72c) SHA1(dd24ed54de275aadf8dc0810a6af3ac97aea4026))
+	ROM_LOAD("21018-01.j7",  0x1000, 0x0800, CRC(26521779) SHA1(2cf1c66441aee99b9d01859d495c12025b5ef094))
 
 	ROM_REGION(0x0200, "proms", 0)
-	ROM_LOAD("20967-01.j3", 0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b))
+	ROM_LOAD("20967-01.j3",  0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b))
 ROM_END
 
 /*-------------------------------------------------------------------
 / Hercules (05/1979)
 /-------------------------------------------------------------------*/
-ROM_START(hercules)
+ROM_START( hercules )
 	ROM_REGION(0x1800, "maincpu", 0)
-	ROM_LOAD("herc_k.rom",  0x0000, 0x0800, CRC(65e099b1) SHA1(83a06bc82e0f8f4c0655886c6a9962bb28d00c5e))
-	ROM_LOAD("atari_m.rom", 0x0800, 0x0800, CRC(1bb6b72c) SHA1(dd24ed54de275aadf8dc0810a6af3ac97aea4026))
-	ROM_LOAD("atari_j.rom", 0x1000, 0x0800, CRC(26521779) SHA1(2cf1c66441aee99b9d01859d495c12025b5ef094))
+	ROM_LOAD("21637-01.kl7", 0x0000, 0x0800, CRC(65e099b1) SHA1(83a06bc82e0f8f4c0655886c6a9962bb28d00c5e))
+	ROM_LOAD("21016-01.m7",  0x0800, 0x0800, CRC(1bb6b72c) SHA1(dd24ed54de275aadf8dc0810a6af3ac97aea4026))
+	ROM_LOAD("21018-01.j7",  0x1000, 0x0800, CRC(26521779) SHA1(2cf1c66441aee99b9d01859d495c12025b5ef094))
 
 	ROM_REGION(0x0200, "proms", 0)
-	ROM_LOAD("20967-01.j3", 0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b))
+	ROM_LOAD("20967-01.j3",  0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b))
 ROM_END
 
 /*-------------------------------------------------------------------
 / Road Runner (??/1979)
 /-------------------------------------------------------------------*/
-ROM_START(roadrunr)
+ROM_START( roadrunr )
 	ROM_REGION(0x1800, "maincpu", 0)
 	ROM_LOAD("0000.716",    0x0000, 0x0800, CRC(62f5f394) SHA1(ff91066d43d788119e3337788abd86e5c0bf2d92))
 	ROM_LOAD("3000.716",    0x0800, 0x0800, CRC(2fc01359) SHA1(d3df20c764bb68a5316367bb18d34a03293e7fa6))

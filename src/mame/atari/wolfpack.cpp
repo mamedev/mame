@@ -51,14 +51,14 @@ uint8_t wolfpack_state::misc_r()
 {
 	uint8_t val = 0;
 
-	/* BIT0 => SPEECH BUSY */
-	/* BIT1 => COMP SIREN  */
-	/* BIT2 => SPARE       */
-	/* BIT3 => SPARE       */
-	/* BIT4 => COL DETECT  */
-	/* BIT5 => UNUSED      */
-	/* BIT6 => UNUSED      */
-	/* BIT7 => VBLANK      */
+	/* BIT0 => SPEECH BUSY      */
+	/* BIT1 => COMP SIREN       */
+	/* BIT2 => SPARE            */
+	/* BIT3 => SPARE            */
+	/* BIT4 => COLLISION DETECT */
+	/* BIT5 => COLLISION DETECT */
+	/* BIT6 => LIMIT SWITCH     */
+	/* BIT7 => VBLANK           */
 
 	if (!m_s14001a->busy_r())
 		val |= 0x01;
@@ -145,13 +145,13 @@ void wolfpack_state::main_map(address_map &map)
 	map(0x4000, 0x4000).w(FUNC(wolfpack_state::ship_h_w));
 	map(0x4001, 0x4001).w(FUNC(wolfpack_state::torpedo_pic_w));
 	map(0x4002, 0x4002).w(FUNC(wolfpack_state::ship_size_w));
-	map(0x4003, 0x4003).w(FUNC(wolfpack_state::ship_h_precess_w));
+	map(0x4003, 0x4003).w(FUNC(wolfpack_state::ship_h_process_w));
 	map(0x4004, 0x4004).w(FUNC(wolfpack_state::ship_pic_w));
 	map(0x4005, 0x4005).w(FUNC(wolfpack_state::torpedo_h_w));
 	map(0x4006, 0x4006).w(FUNC(wolfpack_state::torpedo_v_w));
 	map(0x5000, 0x5fff).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x7000, 0x7fff).rom();
-	map(0x9000, 0x9000).nopr(); /* debugger ROM location? */
+	map(0x9000, 0x9000).nopr(); /* debugger ROM location */
 	map(0xf000, 0xffff).rom();
 }
 
@@ -322,31 +322,34 @@ void wolfpack_state::wolfpack(machine_config &config)
 
 ROM_START( wolfpack )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD_NIB_LOW ( "30285.e3", 0x7000, 0x0800, CRC(b4d30b33) SHA1(46645c227828632b57244bdccad455e1831b5273) )
-	ROM_RELOAD       (             0xF000, 0x0800 )
-	ROM_LOAD_NIB_HIGH( "30287.g3", 0x7000, 0x0800, CRC(c6300dc9) SHA1(6a0ec0bfa6ad4c870aa6f21bfde094da6975b58b) )
-	ROM_RELOAD       (             0xF000, 0x0800 )
-	ROM_LOAD_NIB_LOW ( "30286.f3", 0x7800, 0x0800, CRC(17dce9e8) SHA1(9c7bac1aa676548dc7908f1518efd58c72645ab7) )
-	ROM_RELOAD       (             0xF800, 0x0800 )
-	ROM_LOAD_NIB_HIGH( "30288.h3", 0x7800, 0x0800, CRC(b80ab7b6) SHA1(f2ede98ac5337064499ae2262a8a81f83505bd66) )
-	ROM_RELOAD       (             0xF800, 0x0800 )
+	ROM_LOAD_NIB_LOW ( "030285-01.e3", 0x7000, 0x0800, CRC(b4d30b33) SHA1(46645c227828632b57244bdccad455e1831b5273) )
+	ROM_RELOAD       (                 0xF000, 0x0800 )
+	ROM_LOAD_NIB_HIGH( "030287-01.g3", 0x7000, 0x0800, CRC(c6300dc9) SHA1(6a0ec0bfa6ad4c870aa6f21bfde094da6975b58b) )
+	ROM_RELOAD       (                 0xF000, 0x0800 )
+	ROM_LOAD_NIB_LOW ( "030286-01.f3", 0x7800, 0x0800, CRC(17dce9e8) SHA1(9c7bac1aa676548dc7908f1518efd58c72645ab7) )
+	ROM_RELOAD       (                 0xF800, 0x0800 )
+	ROM_LOAD_NIB_HIGH( "030288-01.h3", 0x7800, 0x0800, CRC(b80ab7b6) SHA1(f2ede98ac5337064499ae2262a8a81f83505bd66) )
+	ROM_RELOAD       (                 0xF800, 0x0800 )
 
 	ROM_REGION( 0x0400, "gfx1", 0 )
-	ROM_LOAD( "30291.c1", 0x0000, 0x0400, CRC(7e3d22cf) SHA1(92e6bbe049dc8fcd674f2ff96cde3786f714508d) )
+	ROM_LOAD( "030291-01.c1", 0x0000, 0x0400, CRC(7e3d22cf) SHA1(92e6bbe049dc8fcd674f2ff96cde3786f714508d) )
 
 	ROM_REGION( 0x1000, "gfx2", 0 )
-	ROM_LOAD( "30289.j6", 0x0000, 0x0800, CRC(f63e5629) SHA1(d64f19fc62060d395df5bb8663a7694a23b0aa2e) )
-	ROM_LOAD( "30290.k6", 0x0800, 0x0800, CRC(70d5430e) SHA1(d512fc3bb0cf0816a1c987f7188c4b331303347f) )
+	ROM_LOAD( "030289-01.j6", 0x0000, 0x0800, CRC(f63e5629) SHA1(d64f19fc62060d395df5bb8663a7694a23b0aa2e) )
+	ROM_LOAD( "030290-01.k6", 0x0800, 0x0800, CRC(70d5430e) SHA1(d512fc3bb0cf0816a1c987f7188c4b331303347f) )
 
 	ROM_REGION( 0x0400, "gfx3", 0 )
-	ROM_LOAD( "30294.p4", 0x0000, 0x0400, CRC(ea93f4b9) SHA1(48b4e0136f5349eb53fea7127a969d87457d70f9) )
+	ROM_LOAD( "030294-01.p4", 0x0000, 0x0400, CRC(ea93f4b9) SHA1(48b4e0136f5349eb53fea7127a969d87457d70f9) )
 
 	ROM_REGION( 0x0400, "gfx4", 0 )
-	ROM_LOAD( "30293.m6", 0x0000, 0x0400, CRC(11900d47) SHA1(2dcb3c3488a5e9ed7f1751649f8dc25696f0f57a) )
+	ROM_LOAD( "030293-01.m6", 0x0000, 0x0400, CRC(11900d47) SHA1(2dcb3c3488a5e9ed7f1751649f8dc25696f0f57a) )
 
 	ROM_REGION( 0x0800, "speech", 0 ) /* voice data */
-	ROM_LOAD_NIB_LOW ( "30863.r1", 0x0000, 0x0800, CRC(3f779f13) SHA1(8ed8a1bf680e8277066416f467388e3875e8cbbd) )
-	ROM_LOAD_NIB_HIGH( "30864.r3", 0x0000, 0x0800, CRC(c4a58d1d) SHA1(a2ba9354b99c739bbfa94458d671c109be163ca0) )
+	ROM_LOAD_NIB_LOW ( "030863-01.r1", 0x0000, 0x0800, CRC(3f779f13) SHA1(8ed8a1bf680e8277066416f467388e3875e8cbbd) )
+	ROM_LOAD_NIB_HIGH( "030864-01.r3", 0x0000, 0x0800, CRC(c4a58d1d) SHA1(a2ba9354b99c739bbfa94458d671c109be163ca0) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "006400-01.k1", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )  // SYNC
 ROM_END
 
 

@@ -30,7 +30,7 @@ No NVRAM; coin counters are mechanical.
 Outhole for each game:
 - spcrider: M  (solenoid 5)
 - midearth: M  (solenoid 1)
-- atarians: G  (solenoid unknown)
+- atarians: G  (solenoid 5)
 - time2000: J  (solenoid 12)
 - aavenger: X  (solenoid 4)
 
@@ -43,6 +43,50 @@ ToDo:
 - Mechanical sounds
 - Dips vary per game
 
+Undumped:
+from nuatari's website, apparently these versions exist:
+    - The Atarians
+        CPU: 006020-??
+        020154.e1
+        020155.e2
+        020156.e3
+        020157.e4
+        020158.e5
+        020159.e6
+        020160.e7
+        020161.e8
+
+    - Middle Earth
+        CPU: 006020-11
+        20170.e1
+        20171.e2
+        20172.e3
+        20173.e4
+        20174.e5
+        20175.e6
+        20176.e7
+        20177.e8
+
+        CPU: 006020-16
+        20644.e1
+        20645.e2
+        20646.e3
+        20647.e4
+        20648.e5
+        20649.e6
+        20650.e7
+        20651.e8
+
+    - Space Rider
+        CPU: 006020-18
+        20957.e1
+        20958.e2
+        20959.e4
+        20960.e3
+        20961.e7
+        20962.e8
+        20963.e5
+        20964.e6
 
 ****************************************************************************************/
 
@@ -541,78 +585,158 @@ void atari_s1_state::midearth(machine_config &config)
 /*-------------------------------------------------------------------
 / The Atarians (11/1976)
 /-------------------------------------------------------------------*/
-ROM_START(atarians)
+ROM_START( atarians )
 	ROM_REGION(0x1000, "maincpu", 0)
-	ROM_LOAD("atarian.e00", 0x0000, 0x0800, CRC(6066bd63) SHA1(e993497d0ca9f056e18838494089def8bdc265c9))
-	ROM_LOAD("atarian.e0",  0x0800, 0x0800, CRC(45cb0427) SHA1(e286930ca36bdd0f79acefd142d2a5431fa8005b))
+	ROM_LOAD("006998-01.e00", 0x0000, 0x0800, CRC(6066bd63) SHA1(e993497d0ca9f056e18838494089def8bdc265c9))
+	ROM_LOAD("006999-01.e0",  0x0800, 0x0800, CRC(45cb0427) SHA1(e286930ca36bdd0f79acefd142d2a5431fa8005b))
 
 	ROM_REGION(0x0200, "proms", 0)
-	ROM_LOAD("07028-01.bin", 0x0000, 0x0200, CRC(e8034b5b) SHA1(6959912c530efcc4a0c690800867fb0d1f33627f))
+	ROM_LOAD("007028-01.d12", 0x0000, 0x0200, CRC(e8034b5b) SHA1(6959912c530efcc4a0c690800867fb0d1f33627f))
+ROM_END
+
+// CPU: 006020-01
+ROM_START( atariansa )
+	ROM_REGION(0x2000, "maincpu", 0)
+	// No idea how these are meant to be loaded
+	ROM_LOAD("006991.e7", 0x0000, 0x2000, CRC(536aafd9) SHA1(b3e7ee5c9652025a2b1edeb3e22d03472ea3364c))
+	ROM_LOAD("006990.e1", 0x0000, 0x2000, CRC(0de30bf9) SHA1(25a91322e965ba3458b5ff3ec26dcbf6bb038395))
+	ROM_LOAD("006993.e8", 0x0000, 0x2000, CRC(36b93e7b) SHA1(2a7aa9f2dda6a6f1e19e33996a0d78910e8816a8))
+	ROM_LOAD("006992.e2", 0x0000, 0x2000, CRC(63292483) SHA1(20bfd94fd100bf520c0173c6694492135776776b))
+	ROM_LOAD("006995.e5", 0x0000, 0x2000, CRC(2cfc8fdc) SHA1(a039761bf0ec5fa91c207a4dcaf822e008fc9da6))
+	ROM_LOAD("006994.e4", 0x0000, 0x2000, CRC(40e6001d) SHA1(5d5ff8d78c85503eec3f87ed38ba434e8b45514d))
+	ROM_LOAD("006997.e6", 0x0000, 0x2000, CRC(4c755446) SHA1(5817d5556cd2610bf42a360abc462e9e30f68e37))
+	ROM_LOAD("006996.e3", 0x0000, 0x2000, CRC(4dc9c9db) SHA1(9fbf93908d11f771d1d37c146dde14618bf00839))
+
+	ROM_REGION(0x0200, "proms", 0)
+	ROM_LOAD("007028-01.d12", 0x0000, 0x0200, CRC(e8034b5b) SHA1(6959912c530efcc4a0c690800867fb0d1f33627f))
 ROM_END
 
 /*-------------------------------------------------------------------
 / Time 2000 (06/1977)
 /-------------------------------------------------------------------*/
-ROM_START(time2000)
+// CPU: 006020-07
+ROM_START( time2000 )
 	ROM_REGION(0x1000, "maincpu", 0)
-	ROM_LOAD("time.e00", 0x0000, 0x0800, CRC(e380f35c) SHA1(f2b4c508c8b7a2ce9924da97c05fb31d5115f36f))
-	ROM_LOAD("time.e0",  0x0800, 0x0800, CRC(1e79c133) SHA1(54ce5d59a00334fcec8b12c077d70e3629549af0))
+	ROM_LOAD("020286-01.e00", 0x0000, 0x0800, CRC(e380f35c) SHA1(f2b4c508c8b7a2ce9924da97c05fb31d5115f36f))
+	ROM_LOAD("020285-01.e0",  0x0800, 0x0800, CRC(1e79c133) SHA1(54ce5d59a00334fcec8b12c077d70e3629549af0))
 
 	ROM_REGION(0x0200, "proms", 0)
-	ROM_LOAD("07028-01.bin", 0x0000, 0x0200, CRC(e8034b5b) SHA1(6959912c530efcc4a0c690800867fb0d1f33627f))
+	ROM_LOAD("007028-01.d12", 0x0000, 0x0200, CRC(e8034b5b) SHA1(6959912c530efcc4a0c690800867fb0d1f33627f))
+ROM_END
+
+// CPU: 006020-03
+ROM_START( time2000a )
+	ROM_REGION(0x2000, "maincpu", 0)
+	// No idea how these are meant to be loaded
+	ROM_LOAD("020047.e7", 0x0000, 0x2000, CRC(f6422b55) SHA1(4115dc61a0b4b8d0efe7f9e07d757c139b0804b9))
+	ROM_LOAD("020046.e1", 0x0000, 0x2000, CRC(cb7b5fea) SHA1(ba0e92319d775778605288ab72f4c3d42574e23a))
+	ROM_LOAD("020049.e8", 0x0000, 0x2000, CRC(5e1d586e) SHA1(86755902a2e341937cfe3ae0d57fdd50fa2f1a66))
+	ROM_LOAD("020048.e2", 0x0000, 0x2000, CRC(e2bf8dda) SHA1(b0c425db06ddec6f9e44de9fe4cd5ce07e580cbc))
+	ROM_LOAD("020051.e5", 0x0000, 0x2000, CRC(dcb143a3) SHA1(b4022afa942cfd0ebfa3e9b13cc3ca4338a84979))
+	ROM_LOAD("020050.e4", 0x0000, 0x2000, CRC(1111d04c) SHA1(693e502e7a33ddcb12a13b398ab02d3313f0f44a))
+	ROM_LOAD("020053.e6", 0x0000, 0x2000, CRC(7dc5a0a4) SHA1(57ed4a3ff941d9dad02c875819be7239c1ebbc2d))
+	ROM_LOAD("020052.e3", 0x0000, 0x2000, CRC(82895db7) SHA1(f11be7065ccb72cb232e0f3488e92eb4d1adecb3))
+
+	ROM_REGION(0x0200, "proms", 0)
+	ROM_LOAD("007028-01.d12", 0x0000, 0x0200, CRC(e8034b5b) SHA1(6959912c530efcc4a0c690800867fb0d1f33627f))
 ROM_END
 
 /*-------------------------------------------------------------------
 / Airborne Avenger (09/1977)
 /-------------------------------------------------------------------*/
-ROM_START(aavenger)
+// CPU: 006020-09
+ROM_START( aavenger )
 	ROM_REGION(0x1000, "maincpu", 0)
-	ROM_LOAD("airborne.e00", 0x0000, 0x0800, CRC(05ac26b8) SHA1(114d587923ade9370d606e428af02a407d272c85))
-	ROM_LOAD("airborne.e0",  0x0800, 0x0800, CRC(44e67c54) SHA1(7f94189c12e322c41908d651cf6a3b6061426959))
+	ROM_LOAD("020288-01.e00", 0x0000, 0x0800, CRC(05ac26b8) SHA1(114d587923ade9370d606e428af02a407d272c85))
+	ROM_LOAD("020287-01.e0",  0x0800, 0x0800, CRC(44e67c54) SHA1(7f94189c12e322c41908d651cf6a3b6061426959))
 
 	ROM_REGION(0x0200, "proms", 0)
-	ROM_LOAD("20252-01.bin", 0x0000, 0x0200, CRC(3d44551d) SHA1(926100f8169ab20230ad2168f94e6ad65fb1a7dc))
+	ROM_LOAD("020252-01.d12", 0x0000, 0x0200, CRC(3d44551d) SHA1(926100f8169ab20230ad2168f94e6ad65fb1a7dc))
+ROM_END
+
+// CPU: 006020-04
+ROM_START( aavengera )
+	// No idea how these are meant to be loaded
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("020250.e7", 0x0000, 0x2000, CRC(f90c5600) SHA1(078be02c9600b2d6b96eee072c250139fb4d5076))
+	ROM_LOAD("020244.e1", 0x0000, 0x2000, CRC(d104f2dc) SHA1(440cca110fa43f205ae8f4a813b9613a0e9b9e47))
+	ROM_LOAD("020251.e8", 0x0000, 0x2000, CRC(b50cd67d) SHA1(89b80ae60b4bb1fc47c284ab9f790c17241511c5))
+	ROM_LOAD("020245.e2", 0x0000, 0x2000, CRC(c1c89494) SHA1(764ef480f8552e37c4245625ea9292fde93b5788))
+	ROM_LOAD("020248.e5", 0x0000, 0x2000, CRC(14d76bcb) SHA1(a971dd5cafa27ec145df52e88951173c617e3cc9))
+	ROM_LOAD("020247.e4", 0x0000, 0x2000, CRC(502ec830) SHA1(cb9a03d3f53ddfc5f182386b6595215189d29a6d))
+	ROM_LOAD("020249.e6", 0x0000, 0x2000, CRC(278d49ca) SHA1(fec0458248ba721ebbadae7e4ddb9d7778e46ecf))
+	ROM_LOAD("020246.e3", 0x0000, 0x2000, CRC(8d019708) SHA1(7f6d2d675e86e756612bb1d6dbc199a793c72d10))
+
+	ROM_REGION(0x0200, "proms", 0)
+	ROM_LOAD("020252-01.d12", 0x0000, 0x0200, CRC(3d44551d) SHA1(926100f8169ab20230ad2168f94e6ad65fb1a7dc))
 ROM_END
 
 /*-------------------------------------------------------------------
 / Middle Earth (02/1978)
 /-------------------------------------------------------------------*/
-ROM_START(midearth)
+// CPU: 006020-15
+ROM_START( midearth )
 	ROM_REGION(0x1000, "maincpu", 0)
-	ROM_LOAD("609.bin", 0x0000, 0x0800, CRC(589df745) SHA1(4bd3e4f177e8d86bab41f3a14c169b936eeb480a))
-	ROM_LOAD("608.bin", 0x0800, 0x0800, CRC(28b92faf) SHA1(8585770f4059049f1dcbc0c6ef5718b6ff1a5431))
+	ROM_LOAD("020609-01.e00", 0x0000, 0x0800, CRC(589df745) SHA1(4bd3e4f177e8d86bab41f3a14c169b936eeb480a))
+	ROM_LOAD("020608-01.e0",  0x0800, 0x0800, CRC(28b92faf) SHA1(8585770f4059049f1dcbc0c6ef5718b6ff1a5431))
 
 	ROM_REGION(0x0200, "proms", 0)
-	ROM_LOAD("20252-01.bin", 0x0000, 0x0200, CRC(3d44551d) SHA1(926100f8169ab20230ad2168f94e6ad65fb1a7dc))
+	ROM_LOAD("020252-01.d12", 0x0000, 0x0200, CRC(3d44551d) SHA1(926100f8169ab20230ad2168f94e6ad65fb1a7dc))
 ROM_END
 
-ROM_START(mideartha)
+ROM_START( mideartha )
 	ROM_REGION(0x1000, "maincpu", 0)
-	ROM_LOAD("20855-01.bin", 0x0000, 0x0800, CRC(4a9d47ca) SHA1(57c4458822109c3ba2fa53ac1c1cd6e169e51b24))
-	ROM_LOAD("20856-01.bin", 0x0800, 0x0800, CRC(8f119e37) SHA1(5a4d63605865f3ceca4c09dbdcd888498c615b89))
+	ROM_LOAD("020855-01.e00", 0x0000, 0x0800, CRC(4a9d47ca) SHA1(57c4458822109c3ba2fa53ac1c1cd6e169e51b24))
+	ROM_LOAD("020856-01.e0",  0x0800, 0x0800, CRC(8f119e37) SHA1(5a4d63605865f3ceca4c09dbdcd888498c615b89))
 
 	ROM_REGION(0x0200, "proms", 0)
-	ROM_LOAD("20252-01.bin", 0x0000, 0x0200, CRC(3d44551d) SHA1(926100f8169ab20230ad2168f94e6ad65fb1a7dc))
+	ROM_LOAD("020252-01.d12", 0x0000, 0x0200, CRC(3d44551d) SHA1(926100f8169ab20230ad2168f94e6ad65fb1a7dc))
+ROM_END
+
+/*
+    MIDDLE EARTH
+    CPU- 006020-12
+    PRE PRODUCTION - Main Cabinet color is white NOT yellow
+*/
+// No idea how these are meant to be loaded
+ROM_START( midearthp )
+	ROM_REGION(0x2000, "maincpu", 0)
+	ROM_LOAD("020466-01.e7", 0x0000, 0x2000, CRC(d8f49994) SHA1(0631457264ff7f8d5fb1edc2c0211992a67c73e6))
+	ROM_LOAD("020460-01.e1", 0x0000, 0x2000, CRC(bde94797) SHA1(a626bf991342439a36966301bb167f7fceb3908f))
+	ROM_LOAD("020423-01.e8", 0x0000, 0x2000, CRC(4678eb78) SHA1(015119b0f0fd72bee9eac1c49975450398a61269))
+	ROM_LOAD("020461-01.e2", 0x0000, 0x2000, CRC(6f03692e) SHA1(c1db1f4559d74269a21358ca7054e80f47bfcfe1))
+	ROM_LOAD("020465-01.e6", 0x0000, 0x2000, CRC(d8f49994) SHA1(0631457264ff7f8d5fb1edc2c0211992a67c73e6))
+	ROM_LOAD("020463-01.e4", 0x0000, 0x2000, CRC(9ee15334) SHA1(fe236ffcb270beab5f4e8a89be43afa576b9caa7))
+	ROM_LOAD("020464-01.e5", 0x0000, 0x2000, BAD_DUMP CRC(02922923) SHA1(af6de89fea5e3ae20f3d828f1d087722f5539dab))  // first 0x200 seems to have been overwritten
+	ROM_LOAD("020462-01.e3", 0x0000, 0x2000, CRC(04067d13) SHA1(a84996a7cf48cf721b6442b64e6310a8204c0e72))
+
+	ROM_REGION(0x0200, "proms", 0)
+	ROM_LOAD("020252-01.d12", 0x0000, 0x0200, CRC(3d44551d) SHA1(926100f8169ab20230ad2168f94e6ad65fb1a7dc))
 ROM_END
 
 /*-------------------------------------------------------------------
 / Space Riders (09/1978)
 /-------------------------------------------------------------------*/
-ROM_START(spcrider)
+// CPU: 006020-17
+ROM_START( spcrider )
 	ROM_REGION(0x1000, "maincpu", 0)
-	ROM_LOAD("spacer.bin", 0x0000, 0x0800, CRC(3cf1cd73) SHA1(c46044fb815b439f12fb3e21c470c8b93ebdfd55))
-	ROM_LOAD("spacel.bin", 0x0800, 0x0800, CRC(66ffb04e) SHA1(42d8b7fb7206b30478f631d0e947c0908dcf5419))
+	ROM_LOAD("020966-01.e00", 0x0000, 0x0800, CRC(3cf1cd73) SHA1(c46044fb815b439f12fb3e21c470c8b93ebdfd55))
+	ROM_LOAD("020965-01.e0",  0x0800, 0x0800, CRC(66ffb04e) SHA1(42d8b7fb7206b30478f631d0e947c0908dcf5419))
 
 	ROM_REGION(0x0200, "proms", 0)
-	ROM_LOAD("20967-01.j3", 0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b)) // PinMAME note: nuatari lists 20967-01 (and claims that all the SR boards (5) he has feature that one), manual schematics and parts list 20252-01 though
+	ROM_LOAD("020967-01.d12", 0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b)) // PinMAME note: nuatari lists 20967-01 (and claims that all the SR boards (5) he has feature that one), manual schematics and parts list 20252-01 though
 ROM_END
 
 } // Anonymous namespace
 
 
-GAME( 1976, atarians,  0,        atarians, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "The Atarians",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1977, time2000,  0,        atari_s1, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Time 2000",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1977, aavenger,  0,        atari_s1, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Airborne Avenger",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1978, midearth,  0,        midearth, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Middle Earth",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1978, mideartha, midearth, midearth, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Middle Earth (alternate)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1978, spcrider,  0,        atari_s1, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Space Riders",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1976, atarians,  0,        atarians, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "The Atarians",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1976, atariansa, atarians, atarians, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "The Atarians (alternate)",     MACHINE_NOT_WORKING | MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1977, aavenger,  0,        atari_s1, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Airborne Avenger",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1977, aavengera, aavenger, atari_s1, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Airborne Avenger (alternate)", MACHINE_NOT_WORKING | MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1977, time2000,  0,        atari_s1, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Time 2000",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1977, time2000a, time2000, atari_s1, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Time 2000 (alternate)",        MACHINE_NOT_WORKING | MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1978, midearth,  0,        midearth, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Middle Earth",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1978, mideartha, midearth, midearth, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Middle Earth (alternate)",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1978, midearthp, midearth, midearth, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Middle Earth (prototype)",     MACHINE_NOT_WORKING | MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1978, spcrider,  0,        atari_s1, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "Space Riders",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

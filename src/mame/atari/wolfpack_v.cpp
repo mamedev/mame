@@ -75,9 +75,9 @@ void wolfpack_state::torpedo_pic_w(uint8_t data)
 {
 	m_torpedo_pic = data;
 }
-void wolfpack_state::ship_h_precess_w(uint8_t data)
+void wolfpack_state::ship_h_process_w(uint8_t data)
 {
-	m_ship_h_precess = data & 0x3f;
+	m_ship_h_process = data & 0x3f;
 }
 void wolfpack_state::ship_pic_w(uint8_t data)
 {
@@ -117,7 +117,7 @@ void wolfpack_state::video_start()
 	save_item(NAME(m_ship_h));
 	save_item(NAME(m_torpedo_pic));
 	save_item(NAME(m_ship_size));
-	save_item(NAME(m_ship_h_precess));
+	save_item(NAME(m_ship_h_process));
 	save_item(NAME(m_ship_pic));
 	save_item(NAME(m_torpedo_h));
 	save_item(NAME(m_torpedo_v));
@@ -146,7 +146,7 @@ void wolfpack_state::draw_ship(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		0x2c000, 0x2fa00, 0x33500, 0x37000
 	};
 
-	int chop = (scaler[m_ship_size >> 2] * m_ship_h_precess) >> 16;
+	int chop = (scaler[m_ship_size >> 2] * m_ship_h_process) >> 16;
 
 
 		m_gfxdecode->gfx(1)->zoom_transpen(bitmap,cliprect,

@@ -12,6 +12,9 @@
     Known issues:
         * none at this time
 
+NOTE: While more revisions of Cops'n Robbers are suspected to exist, as yet
+      no boards have been found.
+
 ****************************************************************************
 
     Cops'n Robbers memory map (preliminary)
@@ -279,32 +282,32 @@ void copsnrob_state::copsnrob(machine_config &config)
 
 ROM_START( copsnrob )
 	ROM_REGION( 0x2000, "maincpu", 0 )
-	ROM_LOAD( "5777.l7",      0x1200, 0x0200, CRC(2b62d627) SHA1(ff4d3546ad931b8e8c5cffd65469814ba7200925) )
-	ROM_LOAD( "5776.k7",      0x1400, 0x0200, CRC(7fb12a49) SHA1(8cd2f4bd2405835d06eb4d76d028e1b14a97b500) )
-	ROM_LOAD( "5775.j7",      0x1600, 0x0200, CRC(627dee63) SHA1(6066ba9f5e12aa0c595eb60bcb468efa9f4495ef) )
-	ROM_LOAD( "5774.h7",      0x1800, 0x0200, CRC(dfbcb7f2) SHA1(ccfda15f5f3e0caa1b44928e111469f337c39eca) )
-	ROM_LOAD( "5773.e7",      0x1a00, 0x0200, CRC(ff7c95f4) SHA1(fd66d7e655ab96ec6ca4f8cf0d078c68b86ac75a) )
-	ROM_LOAD( "5772.d7",      0x1c00, 0x0200, CRC(8d26afdc) SHA1(367f7e25c08a79277550d018681fffcdbd578029) )
-	ROM_LOAD( "5771.b7",      0x1e00, 0x0200, CRC(d61758d6) SHA1(7ce9ad1096405126a8bf57c1f8bad1afa178b751) )
+	ROM_LOAD( "005777-01.l7",      0x1200, 0x0200, CRC(2b62d627) SHA1(ff4d3546ad931b8e8c5cffd65469814ba7200925) )
+	ROM_LOAD( "005776-01.k7",      0x1400, 0x0200, CRC(7fb12a49) SHA1(8cd2f4bd2405835d06eb4d76d028e1b14a97b500) )
+	ROM_LOAD( "005775-01.j7",      0x1600, 0x0200, CRC(627dee63) SHA1(6066ba9f5e12aa0c595eb60bcb468efa9f4495ef) )
+	ROM_LOAD( "005774-01.h7",      0x1800, 0x0200, CRC(dfbcb7f2) SHA1(ccfda15f5f3e0caa1b44928e111469f337c39eca) )
+	ROM_LOAD( "005773-01.e7",      0x1a00, 0x0200, CRC(ff7c95f4) SHA1(fd66d7e655ab96ec6ca4f8cf0d078c68b86ac75a) )
+	ROM_LOAD( "005772-01.d7",      0x1c00, 0x0200, CRC(8d26afdc) SHA1(367f7e25c08a79277550d018681fffcdbd578029) )
+	ROM_LOAD( "005771-01.b7",      0x1e00, 0x0200, CRC(d61758d6) SHA1(7ce9ad1096405126a8bf57c1f8bad1afa178b751) )
 
 	ROM_REGION( 0x0200, "gfx1", 0 )
-	ROM_LOAD( "5782.m3",      0x0000, 0x0200, CRC(82b86852) SHA1(17cf6698ceeb3b917d8ef13ed8242062d3bd57b8) )
+	ROM_LOAD( "005782-01.m3",      0x0000, 0x0200, CRC(82b86852) SHA1(17cf6698ceeb3b917d8ef13ed8242062d3bd57b8) )
 
 	ROM_REGION( 0x0800, "gfx2", 0 )
-	ROM_LOAD( "5778.p1",      0x0000, 0x0200, CRC(78bff86a) SHA1(8bba352ff5e320abda9c897cac4c898862f3c3f5) )
-	ROM_LOAD( "5779.m1",      0x0200, 0x0200, CRC(8b1d0d83) SHA1(3e45f55ddf10c7e9a221736c1f5a4cc5b4c8a317) )
-	ROM_LOAD( "5780.l1",      0x0400, 0x0200, CRC(6f4c6bab) SHA1(88d4ce8e86116cabd6e522360c01538930268074) )
-	ROM_LOAD( "5781.j1",      0x0600, 0x0200, CRC(c87f2f13) SHA1(18f31f46a3c7795e5d31ee55e8c98adc4c400328) )
+	ROM_LOAD( "005778-01.p1",      0x0000, 0x0200, CRC(78bff86a) SHA1(8bba352ff5e320abda9c897cac4c898862f3c3f5) )
+	ROM_LOAD( "005779-01.m1",      0x0200, 0x0200, CRC(8b1d0d83) SHA1(3e45f55ddf10c7e9a221736c1f5a4cc5b4c8a317) )
+	ROM_LOAD( "005780-01.l1",      0x0400, 0x0200, CRC(6f4c6bab) SHA1(88d4ce8e86116cabd6e522360c01538930268074) )
+	ROM_LOAD( "005781-01.j1",      0x0600, 0x0200, CRC(c87f2f13) SHA1(18f31f46a3c7795e5d31ee55e8c98adc4c400328) )
 
 	ROM_REGION( 0x0100, "gfx3", 0 )
-	ROM_LOAD( "5770.m2",      0x0000, 0x0100, CRC(b00bbe77) SHA1(3fd6113aa3a572ec9f5ff248ba1bf53fc9225dfb) )
+	ROM_LOAD( "005770-01.m2",      0x0000, 0x0100, CRC(b00bbe77) SHA1(3fd6113aa3a572ec9f5ff248ba1bf53fc9225dfb) )
 
 	ROM_REGION( 0x0260, "proms", 0 )     /* misc. PROMs */
-	ROM_LOAD( "5765.h8",      0x0000, 0x0020, CRC(6cd58931) SHA1(a90ae8ddffdfc33f60cb9ff8f42f9155c2b09ca1) ) // "µp Enable"
-	ROM_LOAD( "5766.k8",      0x0020, 0x0020, CRC(e63edf4f) SHA1(1dc8691dde033062491b03d4c926047229c45a14) ) // "Enable A"
-	ROM_LOAD( "5767.j8",      0x0040, 0x0020, CRC(381b5ae4) SHA1(91cd237878c0e092197e3025c2498b8f26f90109) ) // "Enable B"
-	ROM_LOAD( "5768.n4",      0x0060, 0x0100, CRC(cb7fc836) SHA1(dc115c8dcee9298623f1e91add2dc17d0ed870e4) ) // horizontal timing
-	ROM_LOAD( "5769.d5",      0x0160, 0x0100, CRC(75081a5a) SHA1(c7d60fc4c44cf9c160b874de92d37600c079e7b6) ) // vertical timing
+	ROM_LOAD( "005765-01.h8",      0x0000, 0x0020, CRC(6cd58931) SHA1(a90ae8ddffdfc33f60cb9ff8f42f9155c2b09ca1) ) // "µp Enable"
+	ROM_LOAD( "005766-01.k8",      0x0020, 0x0020, CRC(e63edf4f) SHA1(1dc8691dde033062491b03d4c926047229c45a14) ) // "Enable A"
+	ROM_LOAD( "005767-01.j8",      0x0040, 0x0020, CRC(381b5ae4) SHA1(91cd237878c0e092197e3025c2498b8f26f90109) ) // "Enable B"
+	ROM_LOAD( "005768-01.n4",      0x0060, 0x0100, CRC(cb7fc836) SHA1(dc115c8dcee9298623f1e91add2dc17d0ed870e4) ) // horizontal timing
+	ROM_LOAD( "005769-01.d5",      0x0160, 0x0100, CRC(75081a5a) SHA1(c7d60fc4c44cf9c160b874de92d37600c079e7b6) ) // vertical timing
 ROM_END
 
 
