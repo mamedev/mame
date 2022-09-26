@@ -54,7 +54,7 @@ protected:
 	virtual void device_config_complete() override;
 
 	// device_palette_interface overrides
-	virtual uint32_t palette_entries() const override { return 32*32*32*2; }
+	virtual uint32_t palette_entries() const noexcept override { return 32*32*32*2; }
 
 	int vramSize;
 

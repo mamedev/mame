@@ -74,7 +74,7 @@ protected:
 	virtual void rom_bank_updated() override;
 
 	// device_palette_interface overrides
-	virtual uint32_t palette_entries() const override { return PALETTE_SIZE; }
+	virtual uint32_t palette_entries() const noexcept override { return PALETTE_SIZE; }
 };
 
 

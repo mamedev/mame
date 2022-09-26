@@ -102,7 +102,7 @@ private:
 	virtual void device_reset() override;
 
 	// device_palette_interface overrides
-	virtual uint32_t palette_entries() const override { return 0x2000; }
+	virtual uint32_t palette_entries() const noexcept override { return 0x2000; }
 
 	// Initializers
 	void set_revision(uint32_t revision) { m_revision = revision; }
