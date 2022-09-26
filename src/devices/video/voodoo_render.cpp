@@ -331,6 +331,10 @@ void rasterizer_params::compute_equations()
 }
 
 
+//-------------------------------------------------
+//  hash - return a hash of the current values
+//-------------------------------------------------
+
 u32 rasterizer_params::hash() const
 {
 	return m_generic ^
