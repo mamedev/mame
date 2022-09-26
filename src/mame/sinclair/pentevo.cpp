@@ -494,9 +494,19 @@ void pentevo_state::spi_miso_w(u8 data)
 
 u8 pentevo_state::gluk_data_r(offs_t offset)
 {
-	return (m_glukrs->is_active() && m_gluk_ext == 2)
-		? m_keyboard->read()
-		: m_glukrs->data_r();
+	if (m_glukrs->is_active()) {
+		if (m_gluk_ext == 2)
+			return m_keyboard->read();
+		else if (m_glukrs->address_r() == 0x0a)
+			return 0x00;
+		else if (m_glukrs->address_r() == 0x0b)
+			return 0x02;
+		else if (m_glukrs->address_r() == 0x0c)
+			return 0x00 | (BIT(m_screen->frame_number(), 1) * 0x10);
+		else if (m_glukrs->address_r() == 0x0d)
+			return 0x80;
+	}
+	return m_glukrs->data_r(); // returns 0xff if inactive
 }
 
 void pentevo_state::gluk_data_w(offs_t offset, u8 data)

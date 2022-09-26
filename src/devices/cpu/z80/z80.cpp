@@ -3233,7 +3233,8 @@ void z80_device::take_nmi()
 	if (m_after_ldair) F &= ~PF;
 #endif
 
-	m_iff2 = m_iff1;
+	// Official z80 documentation mistake: IFF2 doesn't change.
+	// m_iff2 = m_iff1;
 	m_iff1 = 0;
 
 	m_r++;
