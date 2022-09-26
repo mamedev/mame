@@ -145,6 +145,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( kbdata_w );
 	DECLARE_WRITE_LINE_MEMBER( vert_w );
 
+
 	MC6845_UPDATE_ROW( crtc_update_row );
 
 	DECLARE_WRITE_LINE_MEMBER( mux_serial_b_w );
@@ -249,8 +250,9 @@ MC6845_UPDATE_ROW( victor9k_state::crtc_update_row )
 	if (m_hires != hires)
 	{
 		m_hires = hires;
-		m_crtc->set_unscaled_clock(XTAL(25.175_MHz_XTAL)/width);
+		m_crtc->set_unscaled_clock(29.4912_MHz_XTAL / width);
 		m_crtc->set_hpixels_per_column(width);
+		m_crtc->set_char_width(width);
 	}
 
 	address_space &program = m_maincpu->space(AS_PROGRAM);
@@ -317,8 +319,6 @@ WRITE_LINE_MEMBER(victor9k_state::vert_w)
 	m_via2->write_pa7(state);
 	m_pic->ir7_w(state);
 }
-
-
 
 WRITE_LINE_MEMBER(victor9k_state::mux_serial_b_w)
 {
@@ -679,23 +679,25 @@ void victor9k_state::machine_reset()
 void victor9k_state::victor9k(machine_config &config)
 {
 	// basic machine hardware
-	I8088(config, m_maincpu, XTAL(30'000'000)/6);
+	I8088(config, m_maincpu, 5_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &victor9k_state::victor9k_mem);
 	m_maincpu->set_irq_acknowledge_callback(I8259A_TAG, FUNC(pic8259_device::inta_cb));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_raw(25.175_MHz_XTAL/16, 880, 0, 800, 406, 0, 400);
+	screen.set_raw(29.4912_MHz_XTAL/ 16, 1200, 0, 801, 550, 0, 410);
 	screen.set_screen_update(HD46505S_TAG, FUNC(hd6845s_device::screen_update));
 
-	PALETTE(config, m_palette, FUNC(victor9k_state::victor9k_palette), 16);
+	PALETTE(config, m_palette, FUNC(victor9k_state::victor9k_palette), 9);
 
-	HD6845S(config, m_crtc, XTAL(25.175_MHz_XTAL)/16); // HD6845 == HD46505S
+	HD6845S(config, m_crtc, 29.4912_MHz_XTAL / 16); // HD6845 == HD46505S
 	m_crtc->set_screen(SCREEN_TAG);
-	m_crtc->set_show_border_area(true);
+	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(16);
+	m_crtc->set_visarea_adjust(0, 0, 0, 10);
 	m_crtc->set_update_row_callback(FUNC(victor9k_state::crtc_update_row));
 	m_crtc->out_vsync_callback().set(FUNC(victor9k_state::vert_w));
+	
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
