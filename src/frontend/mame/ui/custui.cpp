@@ -22,6 +22,7 @@
 
 #include "corestr.h"
 #include "osdepend.h"
+#include "path.h"
 
 #include <algorithm>
 #include <iterator>

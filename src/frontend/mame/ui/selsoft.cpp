@@ -16,7 +16,6 @@
 #include "ui/inifile.h"
 #include "ui/selector.h"
 
-#include "corestr.h"
 #include "drivenum.h"
 #include "emuopts.h"
 #include "fileio.h"
@@ -25,6 +24,9 @@
 #include "softlist_dev.h"
 #include "uiinput.h"
 #include "luaengine.h"
+
+#include "corestr.h"
+#include "path.h"
 #include "unicode.h"
 
 #include <algorithm>

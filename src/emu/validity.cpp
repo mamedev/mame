@@ -17,6 +17,7 @@
 #include "video/rgbutil.h"
 
 #include "corestr.h"
+#include "path.h"
 #include "unicode.h"
 
 #include <cctype>

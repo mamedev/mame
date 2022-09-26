@@ -15,6 +15,7 @@
 #include "corefile.h"
 #include "hashing.h"
 #include "md5.h"
+#include "path.h"
 #include "strformat.h"
 #include "vbiparse.h"
 

@@ -8,9 +8,9 @@
 
 #include "image_handler.h"
 
-#include "corefile.h"
 #include "corestr.h"
 #include "ioprocs.h"
+#include "path.h"
 #include "strformat.h"
 
 #include "osdcomm.h"
