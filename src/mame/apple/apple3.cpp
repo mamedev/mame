@@ -29,6 +29,8 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#include "utf8.h"
+
 void apple3_state::apple3_map(address_map &map)
 {
 	map(0x0000, 0xffff).rw(FUNC(apple3_state::apple3_memory_r), FUNC(apple3_state::apple3_memory_w));

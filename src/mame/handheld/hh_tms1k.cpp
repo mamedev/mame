@@ -221,6 +221,8 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "screen.h"
 #include "speaker.h"
 
+#include "utf8.h"
+
 // internal artwork
 #include "t7in1ss.lh"
 #include "alphie.lh"

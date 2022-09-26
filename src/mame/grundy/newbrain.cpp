@@ -53,6 +53,8 @@
 #include "speaker.h"
 #include "screen.h"
 
+#include "utf8.h"
+
 #include "newbrain.lh"
 #include "newbraina.lh"
 

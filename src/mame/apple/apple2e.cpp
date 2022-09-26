@@ -152,6 +152,8 @@ MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accele
 #include "formats/ap2_dsk.h"
 #include "formats/ap_dsk35.h"
 
+#include "utf8.h"
+
 
 namespace {
 

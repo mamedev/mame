@@ -37,6 +37,8 @@
 
 #include "formats/ap2_dsk.h"
 
+#include "utf8.h"
+
 
 namespace {
 

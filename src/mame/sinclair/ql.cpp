@@ -89,6 +89,8 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#include "utf8.h"
+
 
 #define SCREEN_TAG  "screen"
 

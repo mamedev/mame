@@ -55,6 +55,8 @@
 #include "formats/uef_cas.h"
 #include "formats/csw_cas.h"
 
+#include "utf8.h"
+
 #include "bbc.lh"
 #include "bbcm.lh"
 

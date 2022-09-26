@@ -21,6 +21,8 @@
 #include "softlist.h"
 #include "speaker.h"
 
+#include "utf8.h"
+
 #include <set>
 #include <sstream>
 #include <type_traits>

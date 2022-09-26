@@ -19,6 +19,7 @@ TODO:
 #include "emu.h"
 #include "sk1100.h"
 #include "softlist_dev.h"
+#include "utf8.h"
 
 
 

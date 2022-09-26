@@ -33,6 +33,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "utf8.h"
+
 
 namespace {
 
