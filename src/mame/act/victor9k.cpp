@@ -250,7 +250,6 @@ MC6845_UPDATE_ROW( victor9k_state::crtc_update_row )
 	if (m_hires != hires)
 	{
 		m_hires = hires;
-		m_crtc->set_unscaled_clock(29.4912_MHz_XTAL / width);
 		m_crtc->set_hpixels_per_column(width);
 		m_crtc->set_char_width(width);
 	}
@@ -684,17 +683,16 @@ void victor9k_state::victor9k(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(I8259A_TAG, FUNC(pic8259_device::inta_cb));
 
 	// video hardware
-	int char_width = 10;
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_raw(29.4912_MHz_XTAL/ char_width, 1200, 0, 801, 550, 0, 410);
+	screen.set_raw(15_MHz_XTAL, 1200, 0, 801, 550, 0, 410);
 	screen.set_screen_update(HD46505S_TAG, FUNC(hd6845s_device::screen_update));
 
 	PALETTE(config, m_palette, FUNC(victor9k_state::victor9k_palette), 16);
 
-	HD6845S(config, m_crtc, 29.4912_MHz_XTAL / char_width); // HD6845 == HD46505S
+	HD6845S(config, m_crtc, 15_MHz_XTAL); // HD6845 == HD46505S
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(false);
-	m_crtc->set_char_width(char_width);
+	m_crtc->set_char_width(10);
 	m_crtc->set_visarea_adjust(0, 0, 0, 10);  //show line 25
 	m_crtc->set_update_row_callback(FUNC(victor9k_state::crtc_update_row));
 	m_crtc->out_vsync_callback().set(FUNC(victor9k_state::vert_w));
