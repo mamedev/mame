@@ -35,8 +35,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-#include "formats/ap2_dsk.h"
-
 #include "utf8.h"
 
 
