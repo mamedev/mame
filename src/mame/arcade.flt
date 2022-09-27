@@ -138,6 +138,7 @@ barcrest/mpu4mod2sw.cpp
 barcrest/mpu4mod4oki.cpp
 barcrest/mpu4mod4yam.cpp
 barcrest/mpu4plasma.cpp
+barcrest/mpu4redpoint.cpp
 barcrest/mpu4union.cpp
 barcrest/mpu4unsorted.cpp
 barcrest/mpu4vid.cpp

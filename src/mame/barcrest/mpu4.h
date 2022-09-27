@@ -14,25 +14,13 @@
 #include "machine/nvram.h"
 #include "machine/roc10937.h"
 #include "machine/steppers.h"
-#include "machine/timer.h"
+#include "machine/ticket.h"
+#include "machine/timer.h" //hoppers
 #include "sound/ay8910.h"
 #include "sound/okim6376.h"
-#include "sound/upd7759.h"
-#include "sound/ymopl.h"
-
-#include "emupal.h"
 
 
 #define MPU4_MASTER_CLOCK           XTAL(6'880'000)
-#define VIDEO_MASTER_CLOCK          XTAL(10'000'000)
-
-#ifdef MAME_DEBUG
-#define MPU4VIDVERBOSE 1
-#else
-#define MPU4VIDVERBOSE 0
-#endif
-
-#define LOGSTUFF(x) do { if (MPU4VIDVERBOSE) logerror x; } while (0)
 
 
 
@@ -75,12 +63,13 @@
 
 
 //Hopper info
-#define TUBES               0
-#define HOPPER_DUART_A      1
-#define HOPPER_DUART_B      2
-#define HOPPER_DUART_C      3
-#define HOPPER_NONDUART_A   4
-#define HOPPER_NONDUART_B   5
+#define TUBES              0
+#define HOPPER_DUART_A     1
+#define HOPPER_DUART_B     2
+#define HOPPER_DUART_C     3
+#define HOPPER_NONDUART_A  4
+#define HOPPER_NONDUART_B  5
+#define HOPPER_TWIN_HOPPER 6
 
 INPUT_PORTS_EXTERN( mpu4 );
 INPUT_PORTS_EXTERN( mpu4_dutch );
@@ -100,6 +89,52 @@ INPUT_PORTS_EXTERN( mpu4_70pc );
 
 // currently in mpu4.cpp this may get moved into the driver, or renamed to something more generic based on the setup
 INPUT_PORTS_EXTERN( grtecp );
+
+namespace mpu4_traits {
+	enum {
+		// Reels configurations
+		R4,
+		R5,
+		R5R,    // reversed
+		R5A,    // alternative
+		R6,
+		R6A,    // alternative
+		R7,
+		R8,
+
+		// Reel types (must be set after reel count)
+		RT1,    // 1-3
+		RT2,    // 4-12
+		RT3,    // 96-3
+
+		// Lamp extenders
+		LPS,    // small
+		LPLA,   // large A
+		LPLB,   // large B
+		LPLC,   // large C
+
+		// Led extenders
+		LDS,    // simple
+		LDA,    // card A
+		LDB,    // card B
+		LDC,    // card C
+
+		// Hopper
+		HT,     // tubes
+		HDA,    // duart type A
+		HDB,    // duart type B
+		HDC,    // duart type C
+		HNA,    // non-duart type A
+		HNB,    // non-duart type B
+		HTW,    // twin
+
+		// Features
+		OVER,   // overcurrent detection
+		P4L,    // use pia4 port a leds
+		SCARDL, // use simple card leds
+	};
+}
+
 
 class mpu4_state : public driver_device
 {
@@ -123,9 +158,7 @@ public:
 		, m_bank1(*this, "bank1")
 		, m_msm6376(*this, "msm6376")
 		, m_reel(*this, "reel%u", 0U)
-		, m_palette(*this, "palette")
 		, m_meters(*this, "meters")
-		, m_ym2413(*this, "ym2413")
 		, m_ay8913(*this, "ay8913")
 		, m_dataport(*this, "dataport")
 		, m_characteriser(*this, "characteriser")
@@ -133,308 +166,182 @@ public:
 		, m_characteriser_blastbank(*this, "characteriser_blastbank")
 		, m_characteriser_bwb(*this, "characteriser_bwb")
 		, m_duart68681(*this, "duart68681")
+		, m_hopper1(*this, "hopper")
+		, m_hopper2(*this, "hopper2")
 		, m_lamps(*this, "lamp%u", 0U)
 		, m_mpu4leds(*this, "mpu4led%u", 0U)
 		, m_digits(*this, "digit%u", 0U)
 		, m_triacs(*this, "triac%u", 0U)
+
 	 { }
 
-	void init_m4default_alt();
+	void init_m4();
+	void init_m4big();
+	void init_m4big_low();
 
-	void init_m4default();
-	void init_m4default_lextender();
-	void init_m4default_sextender();
+	void mpu4_reels(machine_config &config, uint8_t NumberOfReels, int16_t start_index, int16_t end_index);
 
-	void init_m4default_big();
-	void init_m4default_big_lextender();
+	void tr_r4(machine_config &config);
+	void tr_r5(machine_config &config);
+	void tr_r5r(machine_config &config);
+	void tr_r5a(machine_config &config);
+	void tr_r6(machine_config &config);
+	void tr_r6a(machine_config &config);
+	void tr_r7(machine_config &config);
+	void tr_r8(machine_config &config);
+	void tr_rt1(machine_config &config);
+	void tr_rt2(machine_config &config);
+	void tr_rt3(machine_config &config);
+	void tr_lps(machine_config &config);
+	void tr_lpla(machine_config &config);
+	void tr_lplb(machine_config &config);
+	void tr_lplc(machine_config &config);
+	void tr_lds(machine_config &config);
+	void tr_lda(machine_config &config);
+	void tr_ldb(machine_config &config);
+	void tr_ldc(machine_config &config);
+	void tr_ht(machine_config &config);
+	void tr_hda(machine_config &config);
+	void tr_hdb(machine_config &config);
+	void tr_hdc(machine_config &config);
+	void tr_hna(machine_config &config);
+	void tr_hnb(machine_config &config);
+	void tr_htw(machine_config &config);
+	void tr_over(machine_config &config);
+	void tr_p4l(machine_config &config);
+	void tr_scardl(machine_config &config);
 
-	void init_m4default_big_low();
-	void init_m4default_big_aux2inv();
-	void init_m4default_806prot();
-	void init_m4tst2();
-
-	void init_m4default_big_five_std();
-
-	void init_m4default_big_five_rev();
-	void init_m4default_big_five_rev_lextender();
-
-	void init_m4default_big_six();
-	void init_m4default_big_six_lextender();
-
-	void init_m4default_big_six_alt();
-
-	void init_m4tst();
-	void init_big_extenda();
-	void init_m4altreels();
-	void init_m4altreels_big();
-	void init_m4default_five_std();
-	void init_m4default_five_std_sextender();
-
-	void init_m4default_five_rev();
-	void init_m4default_five_rev_lextender();
-	void init_m4default_five_rev_sextender();
-
-	void init_m4default_five_alt();
-	void init_m4default_six();
-	void init_m4default_six_sextender();
-
-	void init_m4default_six_alt();
-	void init_m4default_seven();
-
-	void mod2(machine_config &config);
-	void mod2_no_bacta(machine_config &config);
-	void mod2_7reel(machine_config &config);
-
-	void mod2_cheatchr(machine_config &config);
-	void mod2_chr(machine_config &config);
-
-	template<const uint8_t ReelNo, uint8_t Type>
-	void mpu4_add_reel(machine_config &config)
+	template <typename Class, unsigned Count>
+	struct trait_wrapper_impl
 	{
-		switch (Type)
+	public:
+		using config_func = void (Class::*)(machine_config &);
+
+		template <typename... T>
+		trait_wrapper_impl(Class *_state, T... traits)
+			: state(_state)
+			, fragments{ apply(traits)... }
 		{
-		default:
-		case 0x00: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 1, 3, 0x00, 2); break;
-		case 0x01: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 4, 12, 0x00, 2); break;
-		case 0x02: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 92, 3, 0x00, 2); break;
-		case 0x03: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 93, 2, 0x00, 2); break;
-		case 0x04: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 96, 3, 0x00, 2); break; // BWB
 		}
 
-		if (m_reel[ReelNo])
-			m_reel[ReelNo]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<ReelNo>));
-	}
+		void operator()(machine_config &config)
+		{
+			for (auto &t : fragments)
+				(state->*t)(config);
+		}
 
-	template<uint8_t Type, uint8_t NumberOfReels>
-	void mpu4_reels(machine_config &config)
+	private:
+		config_func apply(int trait)
+		{
+			switch (trait)
+			{
+			case mpu4_traits::R4:     return &mpu4_state::tr_r4;
+			case mpu4_traits::R5:     return &mpu4_state::tr_r5;
+			case mpu4_traits::R5R:    return &mpu4_state::tr_r5r;
+			case mpu4_traits::R5A:    return &mpu4_state::tr_r5a;
+			case mpu4_traits::R6:     return &mpu4_state::tr_r6;
+			case mpu4_traits::R6A:    return &mpu4_state::tr_r6a;
+			case mpu4_traits::R7:     return &mpu4_state::tr_r7;
+			case mpu4_traits::R8:     return &mpu4_state::tr_r8;
+			case mpu4_traits::RT1:    return &mpu4_state::tr_rt1;
+			case mpu4_traits::RT2:    return &mpu4_state::tr_rt2;
+			case mpu4_traits::RT3:    return &mpu4_state::tr_rt3;
+			case mpu4_traits::LPS:    return &mpu4_state::tr_lps;
+			case mpu4_traits::LPLA:   return &mpu4_state::tr_lpla;
+			case mpu4_traits::LPLB:   return &mpu4_state::tr_lplb;
+			case mpu4_traits::LPLC:   return &mpu4_state::tr_lplc;
+			case mpu4_traits::LDS:    return &mpu4_state::tr_lds;
+			case mpu4_traits::LDA:    return &mpu4_state::tr_lda;
+			case mpu4_traits::LDB:    return &mpu4_state::tr_ldb;
+			case mpu4_traits::LDC:    return &mpu4_state::tr_ldc;
+			case mpu4_traits::HT:     return &mpu4_state::tr_ht;
+			case mpu4_traits::HDA:    return &mpu4_state::tr_hda;
+			case mpu4_traits::HDB:    return &mpu4_state::tr_hdb;
+			case mpu4_traits::HDC:    return &mpu4_state::tr_hdc;
+			case mpu4_traits::HNA:    return &mpu4_state::tr_hna;
+			case mpu4_traits::HNB:    return &mpu4_state::tr_hnb;
+			case mpu4_traits::HTW:    return &mpu4_state::tr_htw;
+			case mpu4_traits::OVER:   return &mpu4_state::tr_over;
+			case mpu4_traits::P4L:    return &mpu4_state::tr_p4l;
+			case mpu4_traits::SCARDL: return &mpu4_state::tr_scardl;
+			default: return nullptr; // crash later on invalid arguments
+			}
+		}
+
+		config_func apply(config_func f)
+		{
+			return f;
+		}
+
+		Class *state;
+		config_func fragments[Count];
+	};
+
+	template <typename T, typename... U>
+	auto trait_wrapper(T *state, U... traits)
 	{
-		if (NumberOfReels>0) mpu4_add_reel<0, Type>(config);
-		if (NumberOfReels>1) mpu4_add_reel<1, Type>(config);
-		if (NumberOfReels>2) mpu4_add_reel<2, Type>(config);
-		if (NumberOfReels>3) mpu4_add_reel<3, Type>(config);
-		if (NumberOfReels>4) mpu4_add_reel<4, Type>(config);
-		if (NumberOfReels>5) mpu4_add_reel<5, Type>(config);
-		if (NumberOfReels>6) mpu4_add_reel<6, Type>(config);
-		if (NumberOfReels>7) mpu4_add_reel<7, Type>(config);
+		return trait_wrapper_impl<T, sizeof...(U)>(state, traits...);
 	}
 
-	template<const uint8_t* Table> void mod2_cheatchr_pal(machine_config &config)
+
+	void mod2_f(machine_config &config);
+	void mod2_no_bacta_f(machine_config &config);
+	void mod2_cheatchr_f(machine_config &config);
+
+	template<typename... T>
+	auto mod2(T... traits)
 	{
-		mod2(config);
-
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-		m_characteriser->set_cpu_tag("maincpu");
-		m_characteriser->set_allow_6809_cheat(true);
-		m_characteriser->set_lamp_table(Table);
+		return trait_wrapper(this, &mpu4_state::mod2_f, traits...);
 	}
 
-	template<const uint8_t* Table> void mod2_7reel_cheatchr_pal(machine_config &config)
+	template<typename... T>
+	auto mod2_no_bacta(T... traits)
 	{
-		mod2_7reel(config);
-
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-		m_characteriser->set_cpu_tag("maincpu");
-		m_characteriser->set_allow_6809_cheat(true);
-		m_characteriser->set_lamp_table(Table);
+		return trait_wrapper(this, &mpu4_state::mod2_no_bacta_f, traits...);
 	}
 
-	template<const uint8_t* Table> void mod2_alt_cheatchr_pal(machine_config &config)
+	template<typename... T>
+	auto mod2_cheatchr(T... traits)
 	{
-		mod2_alt(config);
-
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-		m_characteriser->set_cpu_tag("maincpu");
-		m_characteriser->set_allow_6809_cheat(true);
-		m_characteriser->set_lamp_table(Table);
+		return trait_wrapper(this, &mpu4_state::mod2_cheatchr_f, traits...);
 	}
 
-	template<const uint8_t* Table> void mod4oki_cheatchr_pal(machine_config &config)
+
+	void mod4oki_f(machine_config &config);
+	void mod4oki_no_bacta_f(machine_config &config);
+	void mod4oki_cheatchr_f(machine_config &config);
+	template<const uint8_t* Table> void mod4oki_cheatchr_pal_f(machine_config &config);
+	template<uint8_t Fixed> void mod4oki_bootleg_fixedret_f(machine_config &config);
+
+	template<typename... T>
+	auto mod4oki(T... traits)
 	{
-		mod4oki(config);
-
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-		m_characteriser->set_cpu_tag("maincpu");
-		m_characteriser->set_allow_6809_cheat(true);
-		m_characteriser->set_lamp_table(Table);
+		return trait_wrapper(this, &mpu4_state::mod4oki_f, traits...);
 	}
 
-	template<const uint8_t* Table> void mod4oki_7reel_cheatchr_pal(machine_config &config)
+	template<typename... T>
+	auto mod4oki_no_bacta(T... traits)
 	{
-		mod4oki_7reel(config);
-
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-		m_characteriser->set_cpu_tag("maincpu");
-		m_characteriser->set_allow_6809_cheat(true);
-		m_characteriser->set_lamp_table(Table);
+		return trait_wrapper(this, &mpu4_state::mod4oki_no_bacta_f, traits...);
 	}
 
-	template<const uint8_t* Table> void mod4oki_alt_cheatchr_pal(machine_config &config)
+	template<typename... T>
+	auto mod4oki_cheatchr(T... traits)
 	{
-		mod4oki_alt(config);
-
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-		m_characteriser->set_cpu_tag("maincpu");
-		m_characteriser->set_allow_6809_cheat(true);
-		m_characteriser->set_lamp_table(Table);
+		return trait_wrapper(this, &mpu4_state::mod4oki_cheatchr_f, traits...);
 	}
 
-	template<const uint8_t* Table> void mod4yam_cheatchr_pal(machine_config &config)
+	template<const uint8_t* Table, typename... T>
+	auto mod4oki_cheatchr_pal(T... traits)
 	{
-		mod4yam(config);
-
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-		m_characteriser->set_cpu_tag("maincpu");
-		m_characteriser->set_allow_6809_cheat(true);
-		m_characteriser->set_lamp_table(Table);
+		return trait_wrapper(this, &mpu4_state::mod4oki_cheatchr_pal_f<Table>, traits...);
 	}
 
-	template<const uint8_t* Table> void mod4yam_alt_cheatchr_pal(machine_config &config)
+	template<uint8_t Fixed, typename... T>
+	auto mod4oki_bootleg_fixedret(T... traits)
 	{
-		mod4yam_alt(config);
-
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-		m_characteriser->set_cpu_tag("maincpu");
-		m_characteriser->set_allow_6809_cheat(true);
-		m_characteriser->set_lamp_table(Table);
+		return trait_wrapper(this, &mpu4_state::mod4oki_bootleg_fixedret_f<Fixed>, traits...);
 	}
-
-	template<const uint8_t* Table> void mod4yam_7reel_cheatchr_pal(machine_config &config)
-	{
-		mod4yam_7reel(config);
-
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-		m_characteriser->set_cpu_tag("maincpu");
-		m_characteriser->set_allow_6809_cheat(true);
-		m_characteriser->set_lamp_table(Table);
-	}
-
-
-	template<const uint8_t* Table> void mod4oki_5r_cheatchr_pal(machine_config &config)
-	{
-		mod4oki_5r(config);
-
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
-
-		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-		m_characteriser->set_cpu_tag("maincpu");
-		m_characteriser->set_allow_6809_cheat(true);
-		m_characteriser->set_lamp_table(Table);
-	}
-
-	template<uint8_t Fixed> void mod4oki_5r_bootleg_fixedret(machine_config &config)
-	{
-		mod4oki_5r(config);
-
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
-
-		MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
-		m_characteriser_bl->set_bl_fixed_return(Fixed);
-	}
-
-	void mod2_cheatchr_table(machine_config &config, const uint8_t* table);
-
-	// bootleg mod2
-	template<uint8_t Fixed> void mod2_bootleg_fixedret(machine_config &config)
-	{
-		mod2(config);
-
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
-
-		MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
-		m_characteriser_bl->set_bl_fixed_return(Fixed);
-	}
-
-	template<uint8_t Fixed> void mod2_alt_bootleg_fixedret(machine_config &config)
-	{
-		mod2_alt(config);
-
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
-
-		MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
-		m_characteriser_bl->set_bl_fixed_return(Fixed);
-	}
-
-	template<uint8_t Fixed> void mod4yam_bootleg_fixedret(machine_config &config)
-	{
-		mod4yam(config);
-
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
-
-		MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
-		m_characteriser_bl->set_bl_fixed_return(Fixed);
-	}
-
-	template<uint8_t Fixed> void mod4oki_bootleg_fixedret(machine_config &config)
-	{
-		mod4oki(config);
-
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
-
-		MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
-		m_characteriser_bl->set_bl_fixed_return(Fixed);
-	}
-
-	template<uint8_t Fixed> void mod4oki_alt_bootleg_fixedret(machine_config &config)
-	{
-		mod4oki_alt(config);
-
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
-
-		MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
-		m_characteriser_bl->set_bl_fixed_return(Fixed);
-	}
-
-
-	void mod2_chr_blastbnk(machine_config &config);
-	void mod2_chr_copcash(machine_config &config);
-
-	void mod2_alt(machine_config &config);
-	void mod2_alt_cheatchr(machine_config &config);
-	void mod2_alt_cheatchr_table(machine_config &config, const uint8_t* table);
-
-	void mod4oki_5r(machine_config &config);
-	void mod4oki_5r_chr(machine_config &config);
-	void mod4oki_5r_cheatchr(machine_config &config);
-	void mod4oki_5r_cheatchr_table(machine_config &config, const uint8_t* table);
-
-	void mod4oki_alt(machine_config &config);
-	void mod4oki_alt_cheatchr(machine_config &config);
-	void mod4oki_alt_cheatchr_table(machine_config& config, const uint8_t* table);
-
-	void mod4oki(machine_config &config);
-	void mod4oki_no_bacta(machine_config &config);
-	void mod4oki_7reel(machine_config &config);
-	void mod4oki_cheatchr(machine_config &config);
-	void mod4oki_cheatchr_table(machine_config &config, const uint8_t* table);
-	void mod4oki_chr(machine_config &config);
-
-	void mod4yam(machine_config &config);
-	void mod4yam_no_bacta(machine_config &config);
-	void mod4yam_7reel(machine_config &config);
-	void mod4yam_cheatchr(machine_config &config);
-	void mod4yam_cheatchr_table(machine_config& config, const uint8_t* table);
-	void mod4yam_chr(machine_config &config);
-
-	void mod4yam_alt(machine_config &config);
-
 
 
 	void mpu4_common(machine_config &config);
@@ -443,29 +350,6 @@ public:
 	void mpu4_bacta(machine_config &config);
 
 protected:
-
-	void use_m4_standard_reels();
-	void use_m4_low_volt_alt();
-	void use_m4_five_reel_std();
-	void use_m4_five_reel_rev();
-	void use_m4_five_reel_alt();
-	void use_m4_six_reel_std();
-	void use_m4_six_reel_alt();
-	void use_m4_seven_reel();
-	void use_m4_small_extender();
-	void use_m4_large_extender_b();
-	void use_m4_large_extender_c();
-	void use_m4_hopper_tubes();
-	void use_m4_hopper_duart_a();
-	void use_m4_hopper_duart_b();
-	void use_m4_hopper_duart_c();
-	void use_m4_hopper_nonduart_a();
-	void use_m4_hopper_nonduart_b();
-	void use_m4_led_a();
-	void use_m4_led_b();
-	void use_m4_led_c();
-	void use_m4_led_simple();
-
 	void setup_rom_banks();
 
 	TIMER_CALLBACK_MEMBER(update_ic24);
@@ -483,26 +367,18 @@ protected:
 	void ic24_output(int data);
 	void ic24_setup();
 	void update_ay(device_t *device);
-	void mpu4_install_mod4yam_space(address_space &space);
 	void mpu4_install_mod4oki_space(address_space &space);
 	void mpu4_config_common();
-	void add_ym2413(machine_config& config);
 
 	DECLARE_MACHINE_START(mod2);
 	DECLARE_MACHINE_RESET(mpu4);
-	DECLARE_MACHINE_START(mpu4yam);
 	DECLARE_MACHINE_START(mpu4oki);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(gen_50hz);
 
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
-
 	void bankswitch_w(uint8_t data);
 	uint8_t bankswitch_r();
 	void bankset_w(uint8_t data);
-
-	void mpu4_ym2413_w(offs_t offset, uint8_t data);
-	uint8_t mpu4_ym2413_r(offs_t offset);
 
 	void ic3ss_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(cpu0_irq);
@@ -544,14 +420,30 @@ protected:
 
 	DECLARE_WRITE_LINE_MEMBER(dataport_rxd);
 
+
+	//The DUART hoppers connect via the standard IP
+	//Hopper 1 opto connects to IP5, hopper 2 to IP6
+	//TODO: Configure this correctly via lines
 	uint8_t hack_duart_r()
 	{
 		if (m_hack_duart_fixed_low)
+		{
 			return 0x00;
+		}
 		else
-			return machine().rand() & 0x10;
+		{
+			int duart_data = 0;
+			if (m_hopper1->line_r() && m_hopper1_opto)
+			{
+				duart_data |= 0x10;
+			}
+			if (m_hopper2->line_r() && m_hopper2_opto)
+			{
+				duart_data |= 0x20;
+			}
+			return duart_data;
+		}
 	}
-
 	uint8_t bootleg806_r(address_space &space, offs_t offset);
 
 	required_device<cpu_device> m_maincpu;
@@ -571,10 +463,8 @@ protected:
 	optional_memory_bank m_bank1;
 	optional_device<okim6376_device> m_msm6376;
 	optional_device_array<stepper_device, 8> m_reel;
-	optional_device<palette_device> m_palette;
 	required_device<meters_device> m_meters;
-	optional_device<ym2413_device> m_ym2413;
-	optional_device<ay8913_device> m_ay8913;
+	optional_device<ay8910_device> m_ay8913;
 	optional_device<bacta_datalogger_device> m_dataport;
 	optional_device<mpu4_characteriser_pal> m_characteriser;
 	optional_device<mpu4_characteriser_bl> m_characteriser_bl;
@@ -582,6 +472,9 @@ protected:
 	optional_device<mpu4_characteriser_pal_bwb> m_characteriser_bwb;
 
 	optional_device<mc68681_device> m_duart68681;
+
+	optional_device<hopper_device> m_hopper1;
+	optional_device<hopper_device> m_hopper2;
 
 	// not all systems have this many lamps/LEDs/digits but the driver is too much of a mess to split up now
 
@@ -606,7 +499,6 @@ protected:
 
 	output_finder<8> m_triacs;
 
-	int m_mod_number = 0;
 	int m_mmtr_data = 0;
 	int m_ay8913_address = 0;
 	int m_signal_50hz = 0;
@@ -656,7 +548,7 @@ protected:
 
 	int m_pageval = 0;
 	int m_pageset = 0;
-	int m_hopper = 0;
+	int m_hopper_type = 0;
 	int m_reels = 0;
 	int m_chrdata = 0;
 	int m_t1 = 0;
@@ -678,7 +570,32 @@ protected:
 
 	bool m_hack_duart_fixed_low = false;
 
+	bool m_hopper1_opto = false;
+	bool m_hopper2_opto = false;
+
 	static constexpr uint8_t reel_mux_table[8]= {0,4,2,6,1,5,3,7};//include 7, although I don't think it's used, this is basically a wire swap
 	static constexpr uint8_t reel_mux_table7[8]= {3,1,5,6,4,2,0,7};
 };
 
+
+template<const uint8_t* Table> void mpu4_state::mod4oki_cheatchr_pal_f(machine_config &config)
+{
+	mod4oki_f(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(Table);
+}
+
+template<uint8_t Fixed> void mpu4_state::mod4oki_bootleg_fixedret_f(machine_config &config)
+{
+	mod4oki_f(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
+
+	MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
+	m_characteriser_bl->set_bl_fixed_return(Fixed);
+}
