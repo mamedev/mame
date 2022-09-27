@@ -114,6 +114,7 @@ u32 gmaster_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 template<int N>
 SED1520_UPDATE_CB(gmaster_state::screen_update_cb)
 {
+	// LCD #0: top half, LCD #1: bottom half
 	rectangle clip = m_screen->visible_area();
 	if (N == 1)
 		clip.min_y = 32;
