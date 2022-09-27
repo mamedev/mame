@@ -24,21 +24,23 @@ class toaplan2_state : public driver_device
 public:
 	toaplan2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_shared_ram(*this, "shared_ram")
-		, m_tx_videoram(*this, "tx_videoram")
-		, m_tx_lineselect(*this, "tx_lineselect")
-		, m_tx_linescroll(*this, "tx_linescroll")
-		, m_tx_gfxram(*this, "tx_gfxram")
-		, m_mainram(*this, "mainram")
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_vdp(*this, "gp9001_%u", 0U)
 		, m_oki(*this, "oki%u", 1U)
 		, m_eeprom(*this, "eeprom")
-		, m_rtc(*this, "rtc")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
+		, m_shared_ram(*this, "shared_ram")
+		, m_tx_videoram(*this, "tx_videoram")
+
+
+		, m_tx_lineselect(*this, "tx_lineselect")
+		, m_tx_linescroll(*this, "tx_linescroll")
+		, m_tx_gfxram(*this, "tx_gfxram")
+		, m_mainram(*this, "mainram")
+		, m_rtc(*this, "rtc")
 		, m_soundlatch(*this, "soundlatch")
 		, m_soundlatch2(*this, "soundlatch2")
 		, m_hopper(*this, "hopper")
@@ -93,26 +95,38 @@ public:
 protected:
 	virtual void device_post_load() override;
 
-private:
-	// We encode priority with colour in the tilemaps, so need a larger palette
-	static constexpr unsigned T2PALETTE_LENGTH = 0x10000;
-
-	optional_shared_ptr<u8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
-	optional_shared_ptr<u16> m_tx_videoram;
-	optional_shared_ptr<u16> m_tx_lineselect;
-	optional_shared_ptr<u16> m_tx_linescroll;
-	optional_shared_ptr<u16> m_tx_gfxram;
-	optional_shared_ptr<u16> m_mainram;
-
 	required_device<m68000_base_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device_array<gp9001vdp_device, 2> m_vdp;
 	optional_device_array<okim6295_device, 2> m_oki;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-	optional_device<upd4992_device> m_rtc;
 	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_shared_ptr<u8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
+	optional_shared_ptr<u16> m_tx_videoram;
+
+	u16 video_count_r();
+	void shared_ram_w(offs_t offset, u8 data);
+
+	// We encode priority with colour in the tilemaps, so need a larger palette
+	static constexpr unsigned T2PALETTE_LENGTH = 0x10000;
+
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	DECLARE_VIDEO_START(toaplan2);
+
+	tilemap_t *m_tx_tilemap = nullptr;    /* Tilemap for extra-text-layer */
+
+	bitmap_ind8 m_custom_priority_bitmap;
+
+private:
+
+	optional_shared_ptr<u16> m_tx_lineselect;
+	optional_shared_ptr<u16> m_tx_linescroll;
+	optional_shared_ptr<u16> m_tx_gfxram;
+	optional_shared_ptr<u16> m_mainram;
+
+	optional_device<upd4992_device> m_rtc;
 	optional_device<generic_latch_8_device> m_soundlatch; // tekipaki, batrider, bgaregga, batsugun
 	optional_device<generic_latch_8_device> m_soundlatch2;
 	optional_device<ticket_dispenser_device> m_hopper;
@@ -135,16 +149,12 @@ private:
 	u8 m_z80_busreq = 0;
 	u16 m_gfxrom_bank[8]{};       /* Batrider object bank */
 
-	bitmap_ind8 m_custom_priority_bitmap;
 	bitmap_ind16 m_secondary_render_bitmap;
 
-	tilemap_t *m_tx_tilemap = nullptr;    /* Tilemap for extra-text-layer */
-	u16 video_count_r();
 	void coin_w(u8 data);
 	void coin_sound_reset_w(u8 data);
 	void shippumd_coin_w(u8 data);
 	u8 shared_ram_r(offs_t offset);
-	void shared_ram_w(offs_t offset, u8 data);
 	u16 ghox_p1_h_analog_r();
 	u16 ghox_p2_h_analog_r();
 	void sound_reset_w(u8 data);
@@ -180,7 +190,6 @@ private:
 	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(toaplan2);
 	DECLARE_MACHINE_RESET(bgaregga);
-	DECLARE_VIDEO_START(toaplan2);
 	DECLARE_MACHINE_RESET(ghox);
 	DECLARE_VIDEO_START(truxton2);
 	DECLARE_VIDEO_START(fixeightbl);
@@ -197,7 +206,6 @@ private:
 	u32 screen_update_batsugun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_truxton2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	void cpu_space_fixeightbl_map(address_map &map);
 	void cpu_space_pipibibsbl_map(address_map &map);
 	INTERRUPT_GEN_MEMBER(bbakraid_snd_interrupt);
@@ -248,6 +256,46 @@ private:
 	void v25_mem(address_map &map);
 	void vfive_68k_mem(address_map &map);
 	void vfive_v25_mem(address_map &map);
+};
+
+class toaplan2_dt7_state : public toaplan2_state
+{
+public:
+	toaplan2_dt7_state(const machine_config &mconfig, device_type type, const char *tag)
+		: toaplan2_state(mconfig, type, tag)
+		, m_gfxdecode_2(*this, "gfxdecode2")
+		, m_screen2(*this, "screen2")
+		, m_palette2(*this, "palette2")
+		, m_subcpu(*this, "subcpu")
+	{ }
+
+public:
+	void dt7(machine_config &config);
+
+private:
+
+	u32 screen_update_dt7_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_dt7_2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	DECLARE_VIDEO_START(dt7);
+
+	u8 dt7_shared_ram_hack_r(offs_t offset);
+	void tx_videoram_dt7_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+
+	TILE_GET_INFO_MEMBER(get_text_dt7_tile_info);
+
+	void dt7_68k_0_mem(address_map &map);
+	void dt7_68k_1_mem(address_map &map);
+	void dt7_v25_mem(address_map &map);
+	void dt7_shared_mem(address_map &map);
+
+	DECLARE_WRITE_LINE_MEMBER(dt7_irq);
+	void dt7_unk_w(u8 data);
+
+	optional_device<gfxdecode_device> m_gfxdecode_2;
+	optional_device<screen_device> m_screen2;
+	optional_device<palette_device> m_palette2;
+	optional_device<m68000_base_device> m_subcpu;
 };
 
 #endif // MAME_INCLUDES_TOAPLAN2_H
