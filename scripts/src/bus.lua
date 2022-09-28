@@ -3904,6 +3904,8 @@ end
 ---------------------------------------------------
 if (BUSES["EPSON_QX"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/epson_qx/cr1510.cpp",
+		MAME_DIR .. "src/devices/bus/epson_qx/cr1510.h",
 		MAME_DIR .. "src/devices/bus/epson_qx/ide.cpp",
 		MAME_DIR .. "src/devices/bus/epson_qx/ide.h",
 		MAME_DIR .. "src/devices/bus/epson_qx/multifont.cpp",
