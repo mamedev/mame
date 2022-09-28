@@ -3660,12 +3660,14 @@ void toaplan2_state::dogyuun(machine_config &config)
 // complete guess, wrong, just to get correct opcode size for DASM
 #define G_AC 0xd0   // probably a ror? (fairly confident)
 #define G_62 0xa0  // very likely wrong (or is it?)
+//#define G_62 0xa2
 
 // some kind of branch, not sure which
 //#define G_B0  0x74  
-#define G_B0  0xeb  
+#define G_B0  0xeb
+//#define G_B0  0x75
 
-#define G_43  0x02  // needs to be 2 byte, same as 0x28?
+#define G_43  0xd0  // needs to be 2 byte, shift left seems to make sense in context of code (used as base offset)
 
 //  6b  @ 73827
 #define G_6B  0x34  // must be a 2 byte operation on al? after an AND, 2nd byte is 0x08
