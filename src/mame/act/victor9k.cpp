@@ -180,8 +180,20 @@ private:
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 0
+#define LOG_CONF      (1 << 1U)
+#define LOG_KEYBOARD  (1 << 2U)
+#define LOG_DISPLAY   (1 << 3U)
 
+//#define VERBOSE (LOG_CONF | LOG_DISPLAY | LOG_KEYBOARD)
+//#define LOG_OUTPUT_STREAM std::cout
+
+#define VERBOSE (LOG_CONF | LOG_DISPLAY)
+
+#include "logmacro.h"
+
+#define LOGCONF(...)     LOGMASKED(LOG_CONF,  __VA_ARGS__)
+#define LOGKEYBOARD(...) LOGMASKED(LOG_KEYBOARD,  __VA_ARGS__)
+#define LOGDISPLAY(...)  LOGMASKED(LOG_DISPLAY,  __VA_ARGS__)
 
 
 //**************************************************************************
@@ -503,7 +515,7 @@ void victor9k_state::via2_pb_w(uint8_t data)
 	// contrast
 	m_cont = data >> 5;
 
-	if (LOG) logerror("BRT %u CONT %u\n", m_brt, m_cont);
+	LOGDISPLAY("BRT %u CONT %u\n", m_brt, m_cont);
 }
 
 WRITE_LINE_MEMBER( victor9k_state::via2_irq_w )
@@ -562,7 +574,7 @@ WRITE_LINE_MEMBER( victor9k_state::via3_irq_w )
 
 WRITE_LINE_MEMBER( victor9k_state::kbrdy_w )
 {
-	if (LOG) logerror("KBRDY %u\n", state);
+	LOGKEYBOARD("KBRDY %u\n", state);
 
 	m_via2->write_cb1(state);
 
@@ -572,7 +584,7 @@ WRITE_LINE_MEMBER( victor9k_state::kbrdy_w )
 
 WRITE_LINE_MEMBER( victor9k_state::kbdata_w )
 {
-	if (LOG) logerror("KBDATA %u\n", state);
+	LOGKEYBOARD("KBDATA %u\n", state);
 
 	m_via2->write_cb2(state);
 	m_via2->write_pa6(state);
@@ -630,6 +642,7 @@ void victor9k_state::machine_start()
 
 #ifndef USE_SCP
 	// patch out SCP self test
+	LOGCONF("patch out SCP self test");
 	m_rom->base()[0x11ab] = 0xc3;
 
 	// patch out ROM checksum error
@@ -648,7 +661,7 @@ void victor9k_state::machine_start()
 		address_space& space = m_maincpu->space(AS_PROGRAM);
 		if (ramsize > 0xdffff)   //the 896KB option overlaps 1 bit with 
 			ramsize = 0xdffff;   //the I/O memory space, truncating
-		if (LOG) logerror("install_ram ramsize %x\n", ramsize);
+		LOGCONF("install_ram ramsize %x\n", ramsize);
 		space.install_ram(0x0, ramsize, m_ram_ptr);
 	}
 }
