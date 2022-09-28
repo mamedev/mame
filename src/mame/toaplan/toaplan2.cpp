@@ -664,13 +664,18 @@ u8 toaplan2_dt7_state::dt7_shared_ram_hack_r(offs_t offset)
 {
 	u16 ret = m_shared_ram[offset];
 
+	u32 addr = (offset * 2) + 0x610000;
+
+	if (addr == 0x061f00c)
+		return ioport("SYS")->read();// machine().rand();
+
+
 	return ret;
 
 	/*
 	
 
 	u32 pc = m_maincpu->pc();
-	u32 addr = (offset * 2) + 0x610000;
 
 	if (pc == 0x7d84)
 		return 0xff;
@@ -690,8 +695,6 @@ u8 toaplan2_dt7_state::dt7_shared_ram_hack_r(offs_t offset)
 	if (addr == 0x061f006)
 		return ioport("IN2")->read();// machine().rand(); // P2 inputs
 
-	if (addr == 0x061f00c)
-		return ioport("SYS")->read();// machine().rand();
 
 //	logerror("%08x: dt7_shared_ram_hack_r address %08x ret %02x\n", pc, addr, ret);
 
@@ -1522,13 +1525,20 @@ void toaplan2_state::v25_mem(address_map &map)
 
 void toaplan2_dt7_state::dt7_v25_mem(address_map &map)
 {
-//	map(0x00000, 0x00001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-//	map(0x00004, 0x00004).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x00000, 0x07fff).mirror(0xf8000).ram().share("shared_ram");
+	// exact mirroring unknown, don't cover up where the inputs/sound maps
+	map(0x20000, 0x27fff).ram().share("shared_ram");
+	map(0x28000, 0x2ffff).ram().share("shared_ram");
+	map(0x60000, 0x67fff).ram().share("shared_ram");
+	map(0x68000, 0x6ffff).ram().share("shared_ram");
+	map(0x70000, 0x77fff).ram().share("shared_ram");
+	map(0xf8000, 0xfffff).ram().share("shared_ram");
 
 	map(0x58000, 0x58001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x58002, 0x58002).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x58004, 0x58005).rw("ymsnd2", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-
+	map(0x58006, 0x58006).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x58008, 0x58008).portr("IN1");
+	map(0x5800a, 0x5800a).portr("IN2"); 
 }
 
 void toaplan2_state::kbash_v25_mem(address_map &map)
@@ -1926,57 +1936,6 @@ static INPUT_PORTS_START( dt7 )
 
 	PORT_START("JMPR")
 
-	PORT_START("TEMP1")
-	PORT_DIPNAME( 0x0001, 0x0001, "TEMP1")
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
-	PORT_START("TEMP2")
-	PORT_DIPNAME( 0x0001, 0x0001, "TEMP2" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -3698,26 +3657,21 @@ void toaplan2_state::dogyuun(machine_config &config)
 // single byte default-opcode
 #define UNKO 0xfc
 
-// important unresolaved entires   AC = 2 byte op?
-
-//  62 = used as modifier on 2e? (i_cs type)  (to get a 4 byte op)  and on 5b?  (i_ss)  (also to get a 4 byte op?)  and on c0?  (i_es)
-//
-//  43   (2 byte?)
-//  b0  (must be a branch)
-//  d9  @ 7340d
-
-//  59  @ 73505 and 7379B  (maybe ret?, or di?)
-//  6b  @ 73827
-
 // complete guess, wrong, just to get correct opcode size for DASM
 #define G_AC 0xd0   // probably a ror? (fairly confident)
-#define G_62 0xa0  // very likely wrong
+#define G_62 0xa0  // very likely wrong (or is it?)
 
-#define G_B0  0x74  // some kind of branch, not sure which
+// some kind of branch, not sure which
+//#define G_B0  0x74  
+#define G_B0  0xeb  
 
-#define G_43  0x22  // needs to be 2 byte
+#define G_43  0x02  // needs to be 2 byte, same as 0x28?
 
-#define G_6B  0x22
+//  6b  @ 73827
+#define G_6B  0x34  // must be a 2 byte operation on al? after an AND, 2nd byte is 0x08
+
+//  59  @ 73505 and 7379B  (maybe ret?, or di?)
+#define G_59  0xc3
 
 static const u8 dt7_decryption_table[256] = {
 // 	0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07, 0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f, /* 00 */
@@ -3736,7 +3690,7 @@ static const u8 dt7_decryption_table[256] = {
 	0x1e,0xb7,0x50,G_43,0xe2,0xb1,0x0a,0xf3, 0xc7,0xff,0x8a,0x75,0x88,0xb5,UNKO,0xb3, 
 
 // 	0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57, 0x58,0x59,0x5a,0x5b,0x5c,0x5d,0x5e,0x5f, /* 50 */
-	0xc3,0x80,0x53,0x59,0x88,UNKO,0x87,0x45, 0x03,UNKO,0x0c,0x36,0x5f,0x16,0x55,UNKO, 
+	0xc3,0x80,0x53,0x59,0x88,UNKO,0x87,0x45, 0x03,G_59,0x0c,0x36,0x5f,0x16,0x55,UNKO, 
 
 //  0x60,0x61,0x62,0x63,0x64,0x65,0x66,0x67, 0x68,0x69,0x6a,0x6b,0x6c,0x6d,0x6e,0x6f, /* 60 */
 	0x0a,UNKO,G_62,0x89,0x88,0x57,0x2e,0xb1, 0x75,0x43,0x3a,G_6B,0x86,0x3a,0x03,0x58,
@@ -3760,7 +3714,7 @@ static const u8 dt7_decryption_table[256] = {
 	0x26,UNKO,0xfe,0xbd,0x03,0xfe,0xb4,0xfe, 0x06,0xb8,0xc6,UNKO,0x45,0x73,0xb5,0x51, 
 
 // 	0xd0,0xd1,0xd2,0xd3,0xd4,0xd5,0xd6,0xd7, 0xd8,0xd9,0xda,0xdb,0xdc,0xdd,0xde,0xdf, /* d0 */
-	UNKO,0xa4,0xf9,0xc0,0x5b,0xab,0xf6,UNKO, 0x32,UNKO,0xeb,0xb9,0x73,0x89,0xbd,0x4d,
+	UNKO,0xa4,0xf9,0xc0,0x5b,0xab,0xf6,UNKO, 0x32,0xd3,0xeb,0xb9,0x73,0x89,0xbd,0x4d,
 
 //	0xe0,0xe1,0xe2,0xe3,0xe4,0xe5,0xe6,0xe7, 0xe8,0xe9,0xea,0xeb,0xec,0xed,0xee,0xef, /* e0 */
 	0xb8,0xb9,0x74,0x07,0x0a,0xb0,0x4f,0x0f, 0xe8,0x47,0xeb,0x50,0xd1,0xd0,0x5d,0x72, 
