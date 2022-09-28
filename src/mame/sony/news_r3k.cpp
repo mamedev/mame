@@ -53,10 +53,10 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
-class news_r3k_state : public driver_device
+class news_r3k_base_state : public driver_device
 {
 public:
-	news_r3k_state(machine_config const &mconfig, device_type type, char const *tag)
+	news_r3k_base_state(machine_config const &mconfig, device_type type, char const *tag)
 		: driver_device(mconfig, type, tag)
 		, m_cpu(*this, "cpu")
 		, m_ram(*this, "ram")
@@ -65,12 +65,10 @@ public:
 		, m_scc(*this, "scc")
 		, m_net(*this, "net")
 		, m_fdc(*this, "fdc")
-		, m_lcd(*this, "lcd")
 		, m_hid(*this, "hid")
 		, m_scsi(*this, "scsi:7:cxd1185")
 		, m_serial(*this, "serial%u", 0U)
 		, m_scsibus(*this, "scsi")
-		, m_vram(*this, "vram")
 		, m_led(*this, "led%u", 0U)
 	{
 	}
@@ -87,13 +85,9 @@ protected:
 	void common(machine_config &config);
 
 public:
-	void nws3260(machine_config &config);
-
 	void init_common();
 
 protected:
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
-
 	void inten_w(offs_t offset, u16 data, u16 mem_mask);
 	u16 inten_r() { return m_inten; }
 	u16 intst_r() { return m_intst; }
@@ -136,14 +130,12 @@ protected:
 	required_device<am7990_device> m_net;
 	required_device<upd72067_device> m_fdc;
 
-	required_device<screen_device> m_lcd;
 	required_device<news_hid_hle_device> m_hid;
 	required_device<cxd1185_device> m_scsi;
 
 	required_device_array<rs232_port_device, 2> m_serial;
 	required_device<nscsi_bus_device> m_scsibus;
 
-	required_shared_ptr<u32> m_vram;
 	output_finder<4> m_led;
 
 	std::unique_ptr<u16[]> m_net_ram;
@@ -155,11 +147,34 @@ protected:
 	u8 m_debug = 0;
 
 	bool m_int_state[4]{};
+};
+
+class nws3260_state : public news_r3k_base_state
+{
+public:
+
+nws3260_state(machine_config const &mconfig, device_type type, char const *tag)
+		: news_r3k_base_state(mconfig, type, tag)
+		, m_lcd(*this, "lcd")
+		, m_vram(*this, "vram")
+	{
+	}
+
+	void nws3260(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	void nws3260_map(address_map &map);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
+
+	required_device<screen_device> m_lcd;
+	required_shared_ptr<u32> m_vram;
+
 	bool m_lcd_enable = false;
 	bool m_lcd_dim = false;
 };
 
-void news_r3k_state::machine_start()
+void news_r3k_base_state::machine_start()
 {
 	m_led.resolve();
 
@@ -170,25 +185,31 @@ void news_r3k_state::machine_start()
 	save_item(NAME(m_intst));
 	save_item(NAME(m_debug));
 	save_item(NAME(m_int_state));
-	save_item(NAME(m_lcd_enable));
-	save_item(NAME(m_lcd_dim));
 
-	m_itimer = timer_alloc(FUNC(news_r3k_state::itimer), this);
+	m_itimer = timer_alloc(FUNC(news_r3k_base_state::itimer), this);
 
 	for (bool &int_state : m_int_state)
 		int_state = false;
-	m_lcd_enable = false;
-	m_lcd_dim = false;
 
 	m_inten = 0;
 	m_intst = 0;
 }
 
-void news_r3k_state::machine_reset()
+void nws3260_state::machine_start()
+{
+	news_r3k_base_state::machine_start();
+
+	save_item(NAME(m_lcd_enable));
+	save_item(NAME(m_lcd_dim));
+	m_lcd_enable = false;
+	m_lcd_dim = false;
+}
+
+void news_r3k_base_state::machine_reset()
 {
 }
 
-void news_r3k_state::init_common()
+void news_r3k_base_state::init_common()
 {
 	// map the configured ram
 	m_cpu->space(0).install_ram(0x00000000, m_ram->mask(), m_ram->pointer());
@@ -200,27 +221,32 @@ void news_r3k_state::init_common()
 	m_scsi->port_w(0x02);
 }
 
-void news_r3k_state::cpu_map(address_map &map)
+void nws3260_state::nws3260_map(address_map &map)
+{
+	cpu_map(map);
+	map(0x10000000, 0x10000003).lw32([this](u32 data) { m_lcd_enable = bool(data); }, "lcd_enable_w");
+	map(0x10100000, 0x10100003).lw32([this](u32 data) { m_lcd_dim = BIT(data, 0); }, "lcd_dim_w");
+	map(0x10200000, 0x1021ffff).ram().share("vram").mirror(0xa0000000);
+}
+
+void news_r3k_base_state::cpu_map(address_map &map)
 {
 	map.unmap_value_high();
 
 	map(0x10000000, 0x101fffff).rom().region("krom", 0);
-	map(0x10000000, 0x10000003).lw32([this](u32 data) { m_lcd_enable = bool(data); }, "lcd_enable_w");
-	map(0x10100000, 0x10100003).lw32([this](u32 data) { m_lcd_dim = BIT(data, 0); }, "lcd_dim_w");
-	map(0x10200000, 0x1021ffff).ram().share("vram").mirror(0xa0000000);
 
-	map(0x18000000, 0x18ffffff).r(FUNC(news_r3k_state::bus_error));
+	map(0x18000000, 0x18ffffff).r(FUNC(news_r3k_base_state::bus_error));
 
 	map(0x1fc00000, 0x1fc1ffff).rom().region("eprom", 0);
 	//map(0x1fc40004, 0x1fc40007).w().umask32(0xff); ??
 	// 1fc40007 // power/reboot/PARK?
-	map(0x1fc80000, 0x1fc80001).rw(FUNC(news_r3k_state::inten_r), FUNC(news_r3k_state::inten_w));
-	map(0x1fc80002, 0x1fc80003).r(FUNC(news_r3k_state::intst_r));
-	map(0x1fc80004, 0x1fc80005).w(FUNC(news_r3k_state::intclr_w));
-	map(0x1fc80006, 0x1fc80006).w(FUNC(news_r3k_state::itimer_w));
+	map(0x1fc80000, 0x1fc80001).rw(FUNC(news_r3k_base_state::inten_r), FUNC(news_r3k_base_state::inten_w));
+	map(0x1fc80002, 0x1fc80003).r(FUNC(news_r3k_base_state::intst_r));
+	map(0x1fc80004, 0x1fc80005).w(FUNC(news_r3k_base_state::intclr_w));
+	map(0x1fc80006, 0x1fc80006).w(FUNC(news_r3k_base_state::itimer_w));
 	// 1fcc0000 // cstrobe?
 	// 1fcc0002 // sccstatus0?
-	map(0x1fcc0003, 0x1fcc0003).rw(FUNC(news_r3k_state::debug_r), FUNC(news_r3k_state::debug_w));
+	map(0x1fcc0003, 0x1fcc0003).rw(FUNC(news_r3k_base_state::debug_r), FUNC(news_r3k_base_state::debug_w));
 	// 1fcc0007 // sccvect?
 
 	map(0x1fd00000, 0x1fd00007).m(m_hid, FUNC(news_hid_hle_device::map));
@@ -274,7 +300,7 @@ static INPUT_PORTS_START(nws3260)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
 INPUT_PORTS_END
 
-u32 news_r3k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect)
+u32 nws3260_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect)
 {
 	if (!m_lcd_enable)
 		return 0;
@@ -298,14 +324,14 @@ u32 news_r3k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, r
 	return 0;
 }
 
-void news_r3k_state::inten_w(offs_t offset, u16 data, u16 mem_mask)
+void news_r3k_base_state::inten_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_inten);
 
 	int_check();
 }
 
-template <news_r3k_state::irq_number Number> void news_r3k_state::irq_w(int state)
+template <news_r3k_base_state::irq_number Number> void news_r3k_base_state::irq_w(int state)
 {
 	LOG("irq number %d state %d\n",  Number, state);
 
@@ -317,14 +343,14 @@ template <news_r3k_state::irq_number Number> void news_r3k_state::irq_w(int stat
 	int_check();
 }
 
-void news_r3k_state::intclr_w(offs_t offset, u16 data, u16 mem_mask)
+void news_r3k_base_state::intclr_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	m_intst &= ~(data & mem_mask);
 
 	int_check();
 }
 
-void news_r3k_state::int_check()
+void news_r3k_base_state::int_check()
 {
 	// TODO: assume 44422222 11100000
 	static int const int_line[] = { INPUT_LINE_IRQ0, INPUT_LINE_IRQ1, INPUT_LINE_IRQ2, INPUT_LINE_IRQ4 };
@@ -342,7 +368,7 @@ void news_r3k_state::int_check()
 	}
 }
 
-u32 news_r3k_state::bus_error()
+u32 news_r3k_base_state::bus_error()
 {
 	if (!machine().side_effects_disabled())
 		irq_w<BERR>(ASSERT_LINE);
@@ -350,7 +376,7 @@ u32 news_r3k_state::bus_error()
 	return 0;
 }
 
-void news_r3k_state::itimer_w(u8 data)
+void news_r3k_base_state::itimer_w(u8 data)
 {
 	LOG("itimer_w 0x%02x (%s)\n", data, machine().describe_context());
 
@@ -360,12 +386,12 @@ void news_r3k_state::itimer_w(u8 data)
 	m_itimer->adjust(attotime::from_ticks(ticks, 800), 0, attotime::from_ticks(ticks, 800));
 }
 
-void news_r3k_state::itimer(s32 param)
+void news_r3k_base_state::itimer(s32 param)
 {
 	irq_w<TIMER>(ASSERT_LINE);
 }
 
-void news_r3k_state::debug_w(u8 data)
+void news_r3k_base_state::debug_w(u8 data)
 {
 	/*
 	 * The low four bits of this register control the diagnostic LEDs labelled 1-4
@@ -400,10 +426,9 @@ static void news_scsi_devices(device_slot_interface &device)
 	device.option_add("cdrom", NSCSI_CDROM);
 }
 
-void news_r3k_state::common(machine_config &config)
+void news_r3k_base_state::common(machine_config &config)
 {
-	R3000A(config, m_cpu, 20_MHz_XTAL, 32768, 32768);
-	m_cpu->set_addrmap(AS_PROGRAM, &news_r3k_state::cpu_map);
+	R3000A(config, m_cpu, 20_MHz_XTAL, 32768, 32768); // TODO: split to child devices
 	m_cpu->set_fpu(mips1_device_base::MIPS_R3010Av4);
 
 	// 3 banks of 4x30-pin SIMMs with parity, first bank is soldered
@@ -414,7 +439,7 @@ void news_r3k_state::common(machine_config &config)
 
 	DMAC_0448(config, m_dma, 0);
 	m_dma->set_bus(m_cpu, 0);
-	m_dma->out_int_cb().set(FUNC(news_r3k_state::irq_w<DMA>));
+	m_dma->out_int_cb().set(FUNC(news_r3k_base_state::irq_w<DMA>));
 	m_dma->dma_r_cb<1>().set(m_fdc, FUNC(upd72067_device::dma_r));
 	m_dma->dma_w_cb<1>().set(m_fdc, FUNC(upd72067_device::dma_w));
 	// TODO: channel 2 audio
@@ -423,7 +448,7 @@ void news_r3k_state::common(machine_config &config)
 	M48T02(config, m_rtc);
 
 	SCC85C30(config, m_scc, 4.9152_MHz_XTAL);
-	m_scc->out_int_callback().set(FUNC(news_r3k_state::irq_w<SCC>));
+	m_scc->out_int_callback().set(FUNC(news_r3k_base_state::irq_w<SCC>));
 
 	// scc channel A
 	RS232_PORT(config, m_serial[0], default_rs232_devices, nullptr);
@@ -442,7 +467,7 @@ void news_r3k_state::common(machine_config &config)
 	m_scc->out_txdb_callback().set(m_serial[1], FUNC(rs232_port_device::write_txd));
 
 	AM7990(config, m_net);
-	m_net->intr_out().set(FUNC(news_r3k_state::irq_w<LANCE>)).invert();
+	m_net->intr_out().set(FUNC(news_r3k_base_state::irq_w<LANCE>)).invert();
 	m_net->dma_in().set([this](offs_t offset) { return m_net_ram[offset >> 1]; });
 	m_net->dma_out().set([this](offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_net_ram[offset >> 1]); });
 
@@ -480,18 +505,20 @@ void news_r3k_state::common(machine_config &config)
 			subdevice<dmac_0448_device>(":dma")->dma_w_cb<0>().set(adapter, FUNC(cxd1185_device::dma_w));
 		});
 
-	SCREEN(config, m_lcd, SCREEN_TYPE_LCD);
-	m_lcd->set_raw(52416000, 1120, 0, 1120, 780, 0, 780);
-	m_lcd->set_screen_update(FUNC(news_r3k_state::screen_update));
-
 	NEWS_HID_HLE(config, m_hid);
-	m_hid->irq_out<news_hid_hle_device::KEYBOARD>().set(FUNC(news_r3k_state::irq_w<KBD>));
-	m_hid->irq_out<news_hid_hle_device::MOUSE>().set(FUNC(news_r3k_state::irq_w<MOUSE>));
+	m_hid->irq_out<news_hid_hle_device::KEYBOARD>().set(FUNC(news_r3k_base_state::irq_w<KBD>));
+	m_hid->irq_out<news_hid_hle_device::MOUSE>().set(FUNC(news_r3k_base_state::irq_w<MOUSE>));
 }
 
-void news_r3k_state::nws3260(machine_config &config)
+void nws3260_state::nws3260(machine_config &config)
 {
 	common(config);
+	m_cpu->set_addrmap(AS_PROGRAM, &nws3260_state::nws3260_map);
+
+	// Integrated LCD panel
+	SCREEN(config, m_lcd, SCREEN_TYPE_LCD);
+	m_lcd->set_raw(52416000, 1120, 0, 1120, 780, 0, 780);
+	m_lcd->set_screen_update(FUNC(nws3260_state::screen_update));
 }
 
 ROM_START(nws3260)
@@ -520,5 +547,14 @@ ROM_START(nws3260)
 	ROM_LOAD("idrom.bin", 0x000, 0x100, CRC(17a3d9c6) SHA1(d300e6908210f540951211802c38ad7f8037aa15) BAD_DUMP)
 ROM_END
 
-/*   YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS           INIT         COMPANY  FULLNAME    FLAGS */
-COMP(1991, nws3260, 0,      0,      nws3260, nws3260, news_r3k_state, init_common, "Sony",  "NWS-3260", MACHINE_NO_SOUND)
+/*
+ROM_START(nws3410)
+	ROM_REGION32_BE(0x20000, "eprom", 0)
+	ROM_SYSTEM_BIOS(0, "nws3410", "NWS-3410 v2.0A")
+	ROMX_LOAD("Sony_NWS-3410_MPU-12_v2_ROM.bin", 0x00000, 0x20000, CRC(61222991) SHA1(076fab0ad0682cd7dacc7094e42efe8558cbaaa1), ROM_BIOS(0))
+ROM_END
+*/
+
+/*   YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT         COMPANY  FULLNAME    FLAGS */
+COMP(1991, nws3260, 0,      0,      nws3260, nws3260, nws3260_state, init_common, "Sony",  "NWS-3260", MACHINE_NO_SOUND)
+// COMP(1991, nws3410, 0,      0,      nws3410, nws3260, news_r3k_base_state, init_common, "Sony",  "NWS-3410", MACHINE_NO_SOUND)
