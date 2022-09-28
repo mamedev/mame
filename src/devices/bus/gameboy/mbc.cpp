@@ -1545,7 +1545,7 @@ private:
 		case 0x001:
 			return offset ^ 0xaa;
 		case 0x002:
-			return offset ^ 0xaa;
+			return offset ^ 0x55;
 		case 0x003:
 			return (offset >> 1) | (offset << 7);
 		case 0x004:
