@@ -43,6 +43,7 @@
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+#include <iostream>
 
 #define I8088_TAG       "8l"
 #define I8253_TAG       "13h"
@@ -83,6 +84,7 @@ public:
 		m_rs232a(*this, RS232_A_TAG),
 		m_rs232b(*this, RS232_B_TAG),
 		m_palette(*this, "palette"),
+		m_screen(*this, SCREEN_TAG),
 		m_rom(*this, I8088_TAG),
 		m_video_ram(*this, "video_ram"),
 		m_brt(0),
@@ -116,6 +118,7 @@ private:
 	required_device<rs232_port_device> m_rs232a;
 	required_device<rs232_port_device> m_rs232b;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 	required_memory_region m_rom;
 	required_shared_ptr<uint8_t> m_video_ram;
 
@@ -147,12 +150,13 @@ private:
 
 
 	MC6845_UPDATE_ROW( crtc_update_row );
+	MC6845_BEGIN_UPDATE( crtc_begin_update );
 
 	DECLARE_WRITE_LINE_MEMBER( mux_serial_b_w );
 	DECLARE_WRITE_LINE_MEMBER( mux_serial_a_w );
 
 	void victor9k_palette(palette_device &palette) const;
-
+	
 	// video state
 	int m_brt;
 	int m_cont;
@@ -184,10 +188,11 @@ private:
 #define LOG_KEYBOARD  (1 << 2U)
 #define LOG_DISPLAY   (1 << 3U)
 
-//#define VERBOSE (LOG_CONF | LOG_DISPLAY | LOG_KEYBOARD)
+//#define VERBOSE (LOG_CONF|LOG_DISPLAY|LOG_KEYBOARD)
 //#define LOG_OUTPUT_STREAM std::cout
 
-#define VERBOSE (LOG_CONF | LOG_DISPLAY)
+#define VERBOSE (LOG_CONF|LOG_DISPLAY)
+#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
 
@@ -258,14 +263,7 @@ MC6845_UPDATE_ROW( victor9k_state::crtc_update_row )
 	int hires = BIT(ma, 13);
 	int dot_addr = BIT(ma, 12);
 	int width = hires ? 16 : 10;
-
-	if (m_hires != hires)
-	{
-		m_hires = hires;
-		m_crtc->set_hpixels_per_column(width);
-		m_crtc->set_char_width(width);
-	}
-
+	
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
@@ -322,6 +320,29 @@ MC6845_UPDATE_ROW( victor9k_state::crtc_update_row )
 
 		aa += 2;
 		aa &= 0xfff;
+	}
+}
+
+MC6845_BEGIN_UPDATE( victor9k_state::crtc_begin_update )
+{
+	uint16_t ma = m_crtc->get_ma();
+	int hires = BIT(ma, 13);
+	int width = hires ? 16 : 10;
+	if (hires != m_hires) {
+		LOGDISPLAY("mc6845 begin update change resolution: %s\n", hires ? "high" : "low");
+		if (hires) 
+		{
+			m_screen->set_raw(15_MHz_XTAL / 5 , 1488, 0, 1279, 422, 0, 410);
+			m_screen->set_visible_area(0,1279,0,410);
+		} else
+		{
+			m_screen->set_raw(15_MHz_XTAL / 5 , 930, 0, 799, 422, 0, 410);
+			m_screen->set_visible_area(0,799,0,410);
+		}
+		m_crtc->set_hpixels_per_column(width);
+		m_crtc->set_char_width(width);
+		m_crtc->set_visarea_adjust(0, 0, 0, 10);  //show line 25
+		m_hires = hires;
 	}
 }
 
@@ -598,7 +619,6 @@ WRITE_LINE_MEMBER( victor9k_state::fdc_irq_w )
 	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via3_irq || m_fdc_irq);
 }
 
-
 //**************************************************************************
 //  MACHINE INITIALIZATION
 //**************************************************************************
@@ -674,7 +694,9 @@ void victor9k_state::machine_reset()
 	m_via1->reset();
 	m_via2->reset();
 	m_via3->reset();
+	m_screen->reset();
 	m_crtc->reset();
+	m_screen->set_visible_area(0,799,0,410);
 	m_fdc->reset();
 }
 
@@ -691,26 +713,32 @@ void victor9k_state::machine_reset()
 void victor9k_state::victor9k(machine_config &config)
 {
 	// basic machine hardware
-	I8088(config, m_maincpu, 5_MHz_XTAL);
+	LOGDISPLAY("start of configure\n");
+	I8088(config, m_maincpu, 15_MHz_XTAL / 3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &victor9k_state::victor9k_mem);
 	m_maincpu->set_irq_acknowledge_callback(I8259A_TAG, FUNC(pic8259_device::inta_cb));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_raw(15_MHz_XTAL, 1200, 0, 801, 550, 0, 410);
-	screen.set_screen_update(HD46505S_TAG, FUNC(hd6845s_device::screen_update));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(15_MHz_XTAL / 5 , 930, 0, 799, 422, 0, 410);
+	m_screen->set_screen_update(HD46505S_TAG, FUNC(hd6845s_device::screen_update));
+
+	LOGDISPLAY("mc6845 initial resolution: low\n");
 
 	PALETTE(config, m_palette, FUNC(victor9k_state::victor9k_palette), 16);
-
-	HD6845S(config, m_crtc, 15_MHz_XTAL); // HD6845 == HD46505S
+LOGDISPLAY("m_crt config\n");
+	HD6845S(config, m_crtc, 15_MHz_XTAL / 5 ); // HD6845 == HD46505S
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(10);
 	m_crtc->set_visarea_adjust(0, 0, 0, 10);  //show line 25
+	
+	
+LOGDISPLAY("callbacks\n");
 	m_crtc->set_update_row_callback(FUNC(victor9k_state::crtc_update_row));
 	m_crtc->out_vsync_callback().set(FUNC(victor9k_state::vert_w));
+	m_crtc->set_begin_update_callback(FUNC(victor9k_state::crtc_begin_update));
 	
-
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	HC55516(config, m_cvsd, 0);
