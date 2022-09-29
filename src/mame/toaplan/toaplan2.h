@@ -273,6 +273,8 @@ public:
 	void dt7(machine_config &config);
 
 private:
+	DECLARE_WRITE_LINE_MEMBER(toaplan2_dt7_reset);
+	DECLARE_MACHINE_RESET(toaplan2_dt7);
 
 	u32 screen_update_dt7_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_dt7_2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -291,6 +293,15 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(dt7_irq);
 	void dt7_unk_w(u8 data);
+
+	uint8_t unmapped_v25_io1_r();
+	uint8_t unmapped_v25_io2_r();
+
+	uint8_t m_ioport_state = 0x00;
+
+	uint8_t read_port_t();
+	uint8_t read_port_2();
+	void write_port_2(uint8_t data);
 
 	optional_device<gfxdecode_device> m_gfxdecode_2;
 	optional_device<screen_device> m_screen2;

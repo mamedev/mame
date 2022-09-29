@@ -430,7 +430,6 @@ WRITE_LINE_MEMBER(toaplan2_state::toaplan2_reset)
 		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
-
 MACHINE_RESET_MEMBER(toaplan2_state,toaplan2)
 {
 	// All games execute a RESET instruction on init, presumably to reset the sound CPU.
@@ -439,6 +438,18 @@ MACHINE_RESET_MEMBER(toaplan2_state,toaplan2)
 	m_maincpu->set_reset_callback(*this, FUNC(toaplan2_state::toaplan2_reset));
 }
 
+WRITE_LINE_MEMBER(toaplan2_dt7_state::toaplan2_dt7_reset)
+{
+	//if (m_audiocpu != nullptr)
+	//	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+
+	m_subcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+}
+
+MACHINE_RESET_MEMBER(toaplan2_dt7_state,toaplan2_dt7)
+{
+	m_maincpu->set_reset_callback(*this, FUNC(toaplan2_dt7_state::toaplan2_dt7_reset));
+}
 
 MACHINE_RESET_MEMBER(toaplan2_state,ghox)
 {
@@ -664,10 +675,10 @@ u8 toaplan2_dt7_state::dt7_shared_ram_hack_r(offs_t offset)
 {
 	u16 ret = m_shared_ram[offset];
 
-	u32 addr = (offset * 2) + 0x610000;
+	//u32 addr = (offset * 2) + 0x610000;
 
-	if (addr == 0x061f00c)
-		return ioport("SYS")->read();// machine().rand();
+//	if (addr == 0x061f00c)
+//		return ioport("SYS")->read();// machine().rand();
 
 
 	return ret;
@@ -1523,9 +1534,23 @@ void toaplan2_state::v25_mem(address_map &map)
 	map(0x80000, 0x87fff).mirror(0x78000).ram().share("shared_ram");
 }
 
+uint8_t toaplan2_dt7_state::unmapped_v25_io1_r()
+{
+	logerror("%s: 0x58008 unknown read\n", machine().describe_context());
+	return machine().rand();
+}
+
+uint8_t toaplan2_dt7_state::unmapped_v25_io2_r()
+{
+	logerror("%s: 0x5800a unknown read\n", machine().describe_context());
+	return machine().rand();
+}
+
+
 void toaplan2_dt7_state::dt7_v25_mem(address_map &map)
 {
 	// exact mirroring unknown, don't cover up where the inputs/sound maps
+	map(0x00000, 0x07fff).ram().share("shared_ram");
 	map(0x20000, 0x27fff).ram().share("shared_ram");
 	map(0x28000, 0x2ffff).ram().share("shared_ram");
 	map(0x60000, 0x67fff).ram().share("shared_ram");
@@ -1537,8 +1562,8 @@ void toaplan2_dt7_state::dt7_v25_mem(address_map &map)
 	map(0x58002, 0x58002).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x58004, 0x58005).rw("ymsnd2", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x58006, 0x58006).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x58008, 0x58008).portr("IN1");
-	map(0x5800a, 0x5800a).portr("IN2"); 
+	map(0x58008, 0x58008).r(FUNC(toaplan2_dt7_state::unmapped_v25_io1_r));
+	map(0x5800a, 0x5800a).r(FUNC(toaplan2_dt7_state::unmapped_v25_io2_r));
 }
 
 void toaplan2_state::kbash_v25_mem(address_map &map)
@@ -1935,6 +1960,12 @@ static INPUT_PORTS_START( dt7 )
 	PORT_MODIFY("DSWB")
 
 	PORT_START("JMPR")
+
+	PORT_START("EEPROM")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 INPUT_PORTS_END
 
@@ -3662,8 +3693,9 @@ void toaplan2_state::dogyuun(machine_config &config)
 #define G_62 0xa0  // very likely wrong (or is it?)
 
 // some kind of branch, not sure which
+// it's used after compares in blocks, sometimes with a 'be' then a 'br' straight after, so it must be a condition that could also fail a be and fall to the br 
 //#define G_B0  0x74  
-#define G_B0  0xeb
+#define G_B0  0x79
 //#define G_B0  0x75
 
 //  6b  @ 73827
@@ -3730,7 +3762,101 @@ WRITE_LINE_MEMBER(toaplan2_dt7_state::dt7_irq)
 	// only the first VDP gets IRQ acked, so does it trigger both CPUs, or does the main CPU then trigger sub?
 	m_maincpu->set_input_line(4, state ? ASSERT_LINE : CLEAR_LINE);
 	m_subcpu->set_input_line(4, state ? ASSERT_LINE : CLEAR_LINE);
+
+	// this reads the inputs (again what is the source?)
+	// the audio CPU also has a 'serial' interrupt populated?
+	// and the boards can be linked together
+
+	// triggering this prevents our other timer? interrupt from working however?
+	//m_audiocpu->set_input_line(NEC_INPUT_LINE_INTP0, state ? ASSERT_LINE : CLEAR_LINE);
 }
+
+
+// this is conditional on the unknown type of branch (see #define G_B0 in the table0
+uint8_t toaplan2_dt7_state::read_port_t()
+{
+	logerror("%s: read port t\n", machine().describe_context()); return machine().rand();
+}
+
+uint8_t toaplan2_dt7_state::read_port_2()
+{
+	logerror("%s: read port 2\n", machine().describe_context());
+
+	return 0xff;
+}
+
+// it seems to attempt to read inputs (including the tilt switch?) here on startup
+// strangely all the EEPROM access code (which is otherwise very similar to FixEight
+// also has accesses to this port added, maybe something is sitting in the middle?
+void toaplan2_dt7_state::write_port_2(uint8_t data)
+{
+	if ((m_ioport_state & 0x01) != (data & 0x01))
+	{
+		if (data & 0x01)
+			logerror("%s: bit 0x01 low to high\n", machine().describe_context());
+		else
+			logerror("%s: bit 0x01 high to low\n", machine().describe_context());
+	}
+
+	if ((m_ioport_state & 0x02) != (data & 0x02))
+	{
+		if (data & 0x02)
+			logerror("%s: bit 0x02 low to high\n", machine().describe_context());
+		else
+			logerror("%s: bit 0x02 high to low\n", machine().describe_context());
+	}
+
+	if ((m_ioport_state & 0x04) != (data & 0x04))
+	{
+		if (data & 0x04)
+			logerror("%s: bit 0x04 low to high\n", machine().describe_context());
+		else
+			logerror("%s: bit 0x04 high to low\n", machine().describe_context());
+	}
+
+	if ((m_ioport_state & 0x08) != (data & 0x08))
+	{
+		if (data & 0x08)
+			logerror("%s: bit 0x08 low to high\n", machine().describe_context());
+		else
+			logerror("%s: bit 0x08 high to low\n", machine().describe_context());
+	}
+
+	if ((m_ioport_state & 0x10) != (data & 0x10))
+	{
+		if (data & 0x10)
+			logerror("%s: bit 0x10 low to high\n", machine().describe_context());
+		else
+			logerror("%s: bit 0x10 high to low\n", machine().describe_context());
+	}
+
+	if ((m_ioport_state & 0x20) != (data & 0x20))
+	{
+		if (data & 0x20)
+			logerror("%s: bit 0x20 low to high\n", machine().describe_context());
+		else
+			logerror("%s: bit 0x20 high to low\n", machine().describe_context());
+	}
+
+	if ((m_ioport_state & 0x40) != (data & 0x40))
+	{
+		if (data & 0x40)
+			logerror("%s: bit 0x40 low to high\n", machine().describe_context());
+		else
+			logerror("%s: bit 0x40 high to low\n", machine().describe_context());
+	}
+
+	if ((m_ioport_state & 0x80) != (data & 0x80))
+	{
+		if (data & 0x80)
+			logerror("%s: bit 0x80 low to high\n", machine().describe_context());
+		else
+			logerror("%s: bit 0x80 high to low\n", machine().describe_context());
+	}
+
+	m_ioport_state = data;
+}
+
 
 void toaplan2_dt7_state::dt7(machine_config &config)
 {
@@ -3744,13 +3870,18 @@ void toaplan2_dt7_state::dt7(machine_config &config)
 	v25_device &audiocpu(V25(config, m_audiocpu, 32_MHz_XTAL/2));    
 	audiocpu.set_addrmap(AS_PROGRAM, &toaplan2_dt7_state::dt7_v25_mem);
 	audiocpu.set_decryption_table(dt7_decryption_table);
-//	m_audiocpu->set_disable();
-//	audiocpu.pt_in_cb().set_ioport("DSWB").exor(0xff);
-//	audiocpu.p0_in_cb().set_ioport("DSWA").exor(0xff);
-//	audiocpu.p1_in_cb().set_ioport("JMPR").exor(0xff);
+	audiocpu.pt_in_cb().set(FUNC(toaplan2_dt7_state::read_port_t));
+	audiocpu.p2_in_cb().set(FUNC(toaplan2_dt7_state::read_port_2));
+	audiocpu.p2_out_cb().set(FUNC(toaplan2_dt7_state::write_port_2));
+	//audiocpu.p1_in_cb().set_ioport("EEPROM");
+	//audiocpu.p1_out_cb().set_ioport("EEPROM");
+
+	// eeprom type confirmed, and gets inited after first boot, but then game won't boot again?
+	EEPROM_93C66_16BIT(config, m_eeprom);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
+	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_dt7_state,toaplan2_dt7)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
