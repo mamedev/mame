@@ -27,13 +27,13 @@ license:CC0
 	S-11  SC0011-     PostPet
 	S-12 *SC0012-SAI  Saiten Cartridge Challenge Idol vol.3
 	S-13  SC0013-     Saiten Cartridge Nesshō vol. 4
-	S-14  SC0014-     Saiten Cartridge Challenge Idol vol.4
+	S-14 *SC0014-SAI  Saiten Cartridge Challenge Idol vol.4
 	S-15 *SC0015-DCS  Saiten Cartridge Detective Conan Vol.2
 	S-16  SC0016-SAI  Saiten Cartridge Nesshō vol. 5
 	S-17  SC0017-     Kids' Challenge Vol.2
 	S-18 *SC0018-SAI  Saiten Cartridge Challenge Artist Vol.1 (Morning Musume, Tanpopo, Petit Moni, Gotō Maki)
 	S-19 *SC0019-SAI  Saiten Cartridge Nesshō vol. 6
-	S-20  SC0020-     Saiten Cartridge Challenge Idol vol.5
+	S-20 *SC0020-SAI  Saiten Cartridge Challenge Idol vol.5
 	S-21 *SC0021-SAI  Saiten Cartridge Nesshō vol. 7
 	S-22 *SC0022-SAI  Saiten Cartridge Nesshō vol. 8
 
@@ -154,6 +154,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="sc0014">
+		<description>Saiten Cartridge: Challenge Idol vol.4 (Japan) (SC0014-SAI)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ チャレンジアイドル vol.4"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="sc0014-sai.u1" size="0x100000" crc="1c07e017" sha1="257d878578fcbf14d7c951bbe68fd25bee3c8db0"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="sc0015">
 		<description>Saiten Cartridge: Detective Conan Vol.2 (Japan) (SC0015-DCS)</description>
@@ -188,6 +199,18 @@ license:CC0
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="sc0019-sai.u1" size="0x100000" crc="136c12e3" sha1="fabd2e83732fdbbd737fc55902a3b1612c73f929"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sc0020">
+		<description>Saiten Cartridge: Challenge Idol vol.5 (Japan) (SC0020-SAI)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="採点カートリッジ チャレンジアイドル vol.5"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="sc0020-sai.u1" size="0x100000" crc="081cb211" sha1="daf08db6d342605a8efd797a43c859b9559d6f26"/>
 			</dataarea>
 		</part>
 	</software>

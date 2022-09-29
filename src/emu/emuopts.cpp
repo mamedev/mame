@@ -15,6 +15,7 @@
 #include "hashfile.h"
 
 #include "corestr.h"
+#include "path.h"
 
 #include <stack>
 

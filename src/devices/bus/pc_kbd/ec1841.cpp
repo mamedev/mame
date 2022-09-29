@@ -34,6 +34,8 @@
 #include "emu.h"
 #include "ec1841.h"
 
+#include "utf8.h"
+
 
 //#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
 #define LOG_KEYBOARD  (1U <<  1)

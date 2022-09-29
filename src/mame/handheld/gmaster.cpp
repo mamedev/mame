@@ -51,6 +51,8 @@ BTANB:
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#include "gmaster.lh"
+
 namespace {
 
 class gmaster_state : public driver_device
@@ -81,9 +83,8 @@ private:
 	void portc_w(u8 data);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	template<int N> SED1520_UPDATE_CB(screen_update_cb);
-	void palette(palette_device &palette) const;
 
-	void gmaster_mem(address_map &map);
+	void main_map(address_map &map);
 
 	u8 m_ram[0x800] = { };
 	u8 m_chipsel = 0;
@@ -94,12 +95,6 @@ void gmaster_state::machine_start()
 	save_item(NAME(m_ram));
 	save_item(NAME(m_chipsel));
 }
-
-void gmaster_state::palette(palette_device &palette) const
-{
-	palette.set_pen_color(0, rgb_t(0x88, 0x98, 0x90)); // LCD background
-	palette.set_pen_color(1, rgb_t(0x1c, 0x20, 0x24)); // pixel
-};
 
 
 
@@ -119,6 +114,7 @@ u32 gmaster_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 template<int N>
 SED1520_UPDATE_CB(gmaster_state::screen_update_cb)
 {
+	// LCD #0: top half, LCD #1: bottom half
 	rectangle clip = m_screen->visible_area();
 	if (N == 1)
 		clip.min_y = 32;
@@ -172,7 +168,7 @@ void gmaster_state::io_w(offs_t offset, u8 data)
 			m_lcd[i]->write(offset & 1, data);
 }
 
-void gmaster_state::gmaster_mem(address_map &map)
+void gmaster_state::main_map(address_map &map)
 {
 	// 0x0000-0x0fff is internal ROM
 	map(0x4000, 0x47ff).mirror(0x3800).rw(FUNC(gmaster_state::io_r), FUNC(gmaster_state::io_w));
@@ -226,7 +222,7 @@ void gmaster_state::gmaster(machine_config &config)
 {
 	// basic machine hardware
 	UPD78C11(config, m_maincpu, 12_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &gmaster_state::gmaster_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gmaster_state::main_map);
 	m_maincpu->pa_in_cb().set_ioport("JOY");
 	m_maincpu->pb_out_cb().set(FUNC(gmaster_state::portb_w));
 	m_maincpu->pc_out_cb().set(FUNC(gmaster_state::portc_w));
@@ -239,10 +235,12 @@ void gmaster_state::gmaster(machine_config &config)
 	m_screen->set_screen_update(FUNC(gmaster_state::screen_update));
 	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(gmaster_state::palette), 2);
+	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
 	SED1520(config, m_lcd[0]).set_screen_update_cb(FUNC(gmaster_state::screen_update_cb<0>));
 	SED1520(config, m_lcd[1]).set_screen_update_cb(FUNC(gmaster_state::screen_update_cb<1>));
+
+	config.set_default_layout(layout_gmaster);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -272,5 +270,5 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY    FULLNAME
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY    FULLNAME       FLAGS
 CONS( 1990, gmaster, 0,      0,      gmaster, gmaster, gmaster_state, empty_init, "Hartung", "Game Master", MACHINE_SUPPORTS_SAVE )

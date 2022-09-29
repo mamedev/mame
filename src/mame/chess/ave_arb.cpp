@@ -83,7 +83,6 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(halt_button) { m_maincpu->set_input_line(M6502_NMI_LINE, newval ? ASSERT_LINE : CLEAR_LINE); update_reset(); }
 	void update_reset();
 
-	// machine configs
 	void arb(machine_config &config);
 	void v2(machine_config &config);
 
@@ -101,20 +100,14 @@ private:
 	optional_device<generic_slot_device> m_cart;
 	required_ioport_array<2> m_inputs;
 
-	// address maps
 	void main_map(address_map &map);
 	void v2_map(address_map &map);
 
-	// sensorboard
 	void init_board(int state);
 	bool m_altboard = false;
 
-	// cartridge
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-	u8 cartridge_r(offs_t offset);
-	u32 m_cart_mask;
 
-	// I/O handlers
 	void update_display();
 	void leds_w(u8 data);
 	void control_w(u8 data);
@@ -174,8 +167,6 @@ void arb_state::init_board(int state)
 DEVICE_IMAGE_LOAD_MEMBER(arb_state::cart_load)
 {
 	u32 size = m_cart->common_get_size("rom");
-	m_cart_mask = ((1 << (31 - count_leading_zeros_32(size))) - 1) & 0x7fff;
-
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
@@ -190,11 +181,6 @@ DEVICE_IMAGE_LOAD_MEMBER(arb_state::cart_load)
 	m_altboard = bool(image.get_feature("altboard"));
 
 	return image_init_result::PASS;
-}
-
-u8 arb_state::cartridge_r(offs_t offset)
-{
-	return m_cart->read_rom(offset & m_cart_mask);
 }
 
 
@@ -255,7 +241,7 @@ u8 arb_state::input_r()
 void arb_state::main_map(address_map &map)
 {
 	// external slot is A0-A14, potential bus conflict with RAM/VIA
-	map(0x0000, 0x7fff).mirror(0x8000).r(FUNC(arb_state::cartridge_r));
+	map(0x0000, 0x7fff).mirror(0x8000).r(m_cart, FUNC(generic_slot_device::read_rom));
 	map(0x0000, 0x07ff).mirror(0x1000).ram().share("nvram");
 	map(0x8000, 0x800f).mirror(0x1ff0).m(m_via, FUNC(via6522_device::map));
 }
@@ -341,7 +327,7 @@ void arb_state::arb(machine_config &config)
 	m_via->irq_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "arb");
+	GENERIC_CARTSLOT(config, m_cart, generic_linear_slot, "arb");
 	m_cart->set_device_load(FUNC(arb_state::cart_load));
 	m_cart->set_must_be_loaded(true);
 

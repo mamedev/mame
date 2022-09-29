@@ -20,6 +20,7 @@
 #include "softlist_dev.h"
 
 #include "corestr.h"
+#include "path.h"
 
 #include <algorithm>
 #include <cstring>

@@ -4,29 +4,29 @@
 
     Facit 4431
 
-	VT100 compatible terminal
+    VT100 compatible terminal
 
     Hardware:
     - Z80
-	- TMS9927 CRTC
-	- Z80A-DART
-	- Z80A-CTC
-	- ER1400
-	- 6116
-	- 6116 x2
-	- 2114 x4
-	- XTAL 9.828 MHz (B1), 14.976 MHz (B2), 4 MHz (B3)
-	- AY-5-1013A UART
+    - TMS9927 CRTC
+    - Z80A-DART
+    - Z80A-CTC
+    - ER1400
+    - 6116
+    - 6116 x2
+    - 2114 x4
+    - XTAL 9.828 MHz (B1), 14.976 MHz (B2), 4 MHz (B3)
+    - AY-5-1013A UART
 
     TODO:
-	- Character attributes (RAM at 0xc000)
-	- Cursor
-	- 132 column mode
-	- Smooth scrolling
-	- Timings
-	- Printer
-	- Figure out why the EAROM hack is needed
-	- Move ergo201 driver here? The hardware is very similar
+    - Character attributes (RAM at 0xc000)
+    - Cursor
+    - 132 column mode
+    - Smooth scrolling
+    - Timings
+    - Printer
+    - Figure out why the EAROM hack is needed
+    - Move ergo201 driver here? The hardware is very similar
 
     Notes:
 
@@ -193,11 +193,11 @@ uint32_t f4431_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 			// double height, bottom
 			if ((m_row_attr & 0x30) == 0x10)
 				line = line / 2 + 5;
-			
+
 			// double height, top
 			if ((m_row_attr & 0x30) == 0x20)
 				line = line / 2;
-			
+
 			if (BIT(m_row_attr, 4) || BIT(m_row_attr, 5) )
 			{
 				// double width
@@ -310,20 +310,11 @@ void f4431_state::latch_w(uint8_t data)
 	// ------1-  earom data
 	// -------0  earom c1
 
-	if (0)
-		logerror("latch_w: %02x\n", data);
-
 	m_earom->c1_w(BIT(data, 0));
-	m_earom->data_w(BIT(data, 4) ? 0 : BIT(data, 1));
+	m_earom->data_w(BIT(data, 1));
 	m_earom->c3_w(BIT(data, 2));
 	m_earom->c2_w(BIT(data, 3));
-
-	// don't clock a 'standby' state. the system clocks this and afterwards
-	// the real state; this causes the real state to be ignored, losing the
-	// first bit. to avoid this we don't clock the standby state. maybe it
-	// works in the real system because of timing.
-	if (data & 0x1d)
-		m_earom->clock_w(BIT(data, 4));
+	m_earom->clock_w(BIT(data, 4));
 
 	m_display_enabled = bool(BIT(data, 5));
 	m_nmi_disabled = bool(BIT(data, 6));

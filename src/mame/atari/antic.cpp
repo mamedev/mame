@@ -2362,12 +2362,16 @@ void antic_device::generic_interrupt(int button_count)
 		m_render2 = 0;
 		m_render3 = 0;
 
-		/* if the CPU want's to be interrupted at vertical blank... */
+		// At scanline 248 vblank status is always held without caring about the mask reg
+		// (cfr. anteater PC=a10a), while DLI always goes low.
+		m_r.nmist |= VBL_NMI;
+		m_r.nmist &= ~DLI_NMI;
+
+		/* if the CPU wants to be interrupted at vertical blank... */
 		if( m_w.nmien & VBL_NMI )
 		{
 			LOG("           cause VBL NMI\n");
 			/* set the VBL NMI status bit */
-			m_r.nmist |= VBL_NMI;
 			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		}
 	}

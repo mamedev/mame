@@ -2459,6 +2459,7 @@ magibombc                       // (c) 2001  Astro Corp.
 magibombd                       // (c) 2005  Astro Corp.
 magibombe                       // (c) 2001? Astro Corp.
 magibombf                       // (c) 2002  Astro Corp.
+magibombg                       // (c) 2004  Astro Corp.
 showhanc                        // (c) 2000  Astro Corp.
 showhand                        // (c) 2000  Astro Corp.
 skilldrp                        // (c) 2002  Astro Corp.
@@ -2994,7 +2995,6 @@ roadriotb                       // 136089           (c) 1991
 
 @source:atari/atarigt.cpp
 primrage                        // 136102           (c) 1994
-primragej                       // 136102           (c) 1994
 primrage20                      // 136102           (c) 1994
 tmek                            // 136100           (c) 1994
 tmek20                          // 136100           (c) 1994
@@ -11097,6 +11097,7 @@ sf2rb2                          // hack
 sf2rb3                          // hack
 sf2re                           // bootleg
 sf2red                          // hack
+sf2reda                         // bootleg
 sf2redp2                        // hack
 sf2rk                           // bootleg
 sf2rules                        // bootleg
@@ -12187,6 +12188,7 @@ lw3_207                         //
 lw3_207c                        //
 lw3_208                         //
 mav_100                         //
+mav_200                         //
 mav_400                         //
 mav_401                         //
 mav_402                         //
@@ -16805,6 +16807,7 @@ bigtrak                         // Milton Bradley
 blastit                         // Entex
 bship                           // Milton Bradley
 bshipb                          // Milton Bradley
+cchime                          // Chromatronics
 cmsport                         // Conic
 cnbaskb                         // Conic
 cnfball                         // Conic
@@ -24567,7 +24570,6 @@ m4booze                         // Booze Cruise
 m4c2                            // Circus Circus 2 (Nova)
 m4captb                         // Captain Bear
 m4casmul                        // Casino Multiplay (Barcrest)
-m4cbing                         // Cherry Bingo
 m4ccc                           //
 m4ccop                          //
 m4ccopa                         //
@@ -24584,7 +24586,6 @@ m4eaw51                         // Everyone's A Winner?
 m4fsx                           // Fun Spot X
 m4fsxa                          //
 m4fsxb                          //
-m4funh                          // Fun House
 m4hapfrt                        // Happy Fruits (Coinworld)
 m4hapfrta                       //
 m4hapfrtb                       //
@@ -24602,15 +24603,7 @@ m4jungja                        //
 m4jungjb                        //
 m4jungjc                        //
 m4kqclub                        // Kings & Queens Club (Newby)
-m4luckwb                        // Lucky Wild Boar (Barcrest)
-m4luckwba                       //
-m4luckwbb                       //
-m4luckwbc                       //
-m4luckwbd                       //
-m4luckwbe                       //
-m4luckwbf                       //
 m4matdr                         // Matador (unknown)
-m4nod                           //
 m4sbx                           // Super Bear X
 m4sbxa                          //
 m4sbxb                          //
@@ -26170,6 +26163,7 @@ m4frtlnk                        // Fruit Link Club (Barcrest)
 m4frtlnka                       //
 m4frtprs                        // Fruit Preserve (Barcrest)
 m4frtprsa                       //
+m4funh                          // Fun House
 m4giant                         // Giant (Barcrest)
 m4gldgat                        // Golden Gate (Barcrest)
 m4gldstr                        // Gold Strike (Barcrest)
@@ -28030,6 +28024,13 @@ m4luckst__w                     //
 m4luckst__x                     //
 m4luckst__y                     //
 m4luckst__z                     //
+m4luckwb                        // Lucky Wild Boar
+m4luckwba                       //
+m4luckwbb                       //
+m4luckwbc                       //
+m4luckwbd                       //
+m4luckwbe                       //
+m4luckwbf                       //
 m4luxor                         // Luxor (Barcrest)
 m4luxor__a                      //
 m4luxor__b                      //
@@ -28312,6 +28313,7 @@ m4nnwwc__w                      //
 m4nnwwc__x                      //
 m4nnwwc__y                      //
 m4nnwwc__z                      //
+m4nod                           // Nod And A Wink (Eurotech)
 m4oadrac                        // Ooh Aah Dracula (BWB)
 m4oadrac__a                     //
 m4oadrac__b                     //
@@ -30174,6 +30176,9 @@ m4bigchfb                       //
 m4bigchfc                       //
 m4click                         // Clickity Click (Barcrest)
 m4elite                         // Elite (Barcrest)
+
+@source:barcrest/mpu4redpoint.cpp
+m4cbing                         // Cherry Bingo
 
 @source:barcrest/mpu4vid.cpp
 v4addlad                        // Adders and Ladders
@@ -32360,6 +32365,7 @@ pacapp2                         // 1999.07 Paca Paca Passion 2 (Japan, PKS1/VER.
 pacappsp                        // 1999.12 Paca Paca Passion Special (Japan, PSP1/VER.A)
 ptblank2                        // 1999.?? Point Blank 2 (GNB5/VER.A)
 soulclbr                        // 1998.?? Soul Calibur (World, SOC14/VER.C)
+soulclbraa                      // 1998.?? Soul Calibur (Asia, SOC12/VER.A2)
 soulclbrja                      // 1998.?? Soul Calibur (Japan, SOC11/VER.A2)
 soulclbrjb                      // 1998.?? Soul Calibur (Japan, SOC11/VER.B)
 soulclbrjc                      // 1998.07 Soul Calibur (Japan, SOC11/VER.C)
@@ -36399,6 +36405,7 @@ gunbird2a                       // (c) 1998
 mjgtaste                        // (c) 2002
 s1945ii                         // (c) 1997
 s1945iii                        // (c) 1999
+s1945iiibl                      // bootleg
 sbomber                         // (c) 1998
 sbombera                        // (c) 1998
 soldivid                        // (c) 1997
@@ -37142,7 +37149,7 @@ rt1715lc                        // (latin/cyrillic)
 rt1715w                         //
 
 @source:ibm/rs6000_type7xxx.cpp
-rs6k7009						// IBM RS/6000 Type 7009 Server
+rs6k7009                        // IBM RS/6000 Type 7009 Server
 
 @source:ibm/rtpc.cpp
 rtpc010                         // IBM RT PC Model 010
@@ -39405,7 +39412,7 @@ legendsb                        // bootleg
 kinstb                          // bootleg
 rushbets                        // bootleg
 sblast2b                        // bootleg
-sblast2ba                       // bootleg
+tmntmwb                         // bootleg
 venom                           // bootleg
 wldgunsb                        // bootleg
 
@@ -42166,6 +42173,7 @@ pipibibsbl                      // (c) 1991 Ryouta Kikaku (bootleg)
 pipibibsbl2                     // bootleg
 pipibibsbl3                     // (c) 1991 Ryouta Kikaku (bootleg)
 pipibibsp                       // TP-025
+probowl2                        // (c) 1996 Zuck + Able license
 pwrkick                         // (c) 1994 Sunwise
 shippumd                        // (c) 1994 Raizing/8ing
 snowbro2                        // TP-033 (c) 1994 Hanafram
@@ -44361,6 +44369,7 @@ xmen6p                          // GX065 (c) 1992 (World)
 xmen6pu                         // GX065 (c) 1992 (US)
 xmena                           // GX065 (c) 1992 (Asia)
 xmenaa                          // GX065 (c) 1992 (Asia)
+xmenabl                          // bootleg
 xmenj                           // GX065 (c) 1992 (Japan)
 xmenja                          // GX065 (c) 1992 (Japan)
 xmenu                           // GX065 (c) 1992 (US)

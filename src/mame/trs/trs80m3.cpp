@@ -82,6 +82,8 @@ trs80m4p:  Floppy not working, so machine is useless.
 #include "formats/trs80_dsk.h"
 #include "formats/dmk_dsk.h"
 
+#include "utf8.h"
+
 
 
 void trs80m3_state::m3_mem(address_map &map)

@@ -27,6 +27,8 @@ ROM source notes when dumped from another model, but confident it's the same:
 
 #include "speaker.h"
 
+#include "utf8.h"
+
 // internal artwork
 #include "autorace.lh"
 #include "gravity.lh"

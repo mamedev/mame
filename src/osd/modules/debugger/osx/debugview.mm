@@ -51,8 +51,8 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 @implementation MAMEDebugView
 
 + (void)initialize {
-	// 10.14 and better get full adaptive Dark Mode support
-#if MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_14
+	// 10.15 and better get full adaptive Dark Mode support
+#if MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_15
 	DefaultForeground = [[NSColor textColor] retain];
 	ChangedForeground = [[NSColor systemRedColor] retain];
 	CommentForeground = [[NSColor systemGreenColor] retain];

@@ -232,4 +232,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1986, m82,  0,       nes_m82, nes_m82, m82_state, empty_init,  ROT0, "Nintendo", "M82 Game Selectable Working Product Display",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+CONS( 1986, m82,  0,   0,   nes_m82, nes_m82, m82_state, empty_init, "Nintendo", "M82 Game Selectable Working Product Display",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

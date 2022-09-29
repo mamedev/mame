@@ -843,6 +843,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1986, nesm8,  0,       nes_m8, nes_m8,  m8_state, empty_init,  ROT0, "Nintendo", "M8 Game Selectable Working Product Display (US, set 1)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, nesm8a, nesm8,   nes_m8, nes_m8a, m8_state, empty_init,  ROT0, "Nintendo", "M8 Game Selectable Working Product Display (US, set 2)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, nesm8b, nesm8,   nes_m8, nes_m8b, m8_state, empty_init,  ROT0, "Nintendo", "M8 Game Selectable Working Product Display (US, set 3)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+CONS( 1986, nesm8,  0,     0,  nes_m8, nes_m8,  m8_state, empty_init,  "Nintendo", "M8 Game Selectable Working Product Display (US, set 1)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+CONS( 1986, nesm8a, nesm8, 0,  nes_m8, nes_m8a, m8_state, empty_init,  "Nintendo", "M8 Game Selectable Working Product Display (US, set 2)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+CONS( 1986, nesm8b, nesm8, 0,  nes_m8, nes_m8b, m8_state, empty_init,  "Nintendo", "M8 Game Selectable Working Product Display (US, set 3)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

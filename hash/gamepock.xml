@@ -30,7 +30,8 @@ license:CC0
 	</software>
 
 	<software name="pokemahj">
-		<description>Pokekon Mahjong</description>
+		<!-- cartridge label literally has "MAHJONGG" with the extra g -->
+		<description>Pokekon Mahjongg</description>
 		<year>1984</year>
 		<publisher>Epoch</publisher>
 		<info name="serial" value="3" />
@@ -60,7 +61,7 @@ license:CC0
 		<info name="serial" value="5" />
 		<part name="cart" interface="gamepock_cart">
 			<dataarea name="rom" size="0x2000">
-				<rom name="soukoban.bin" size="0x2000" crc="5d6f7819" sha1="61ef6483e8f9935dd8b6351fd2bdfda3af3899bd"/>
+				<rom name="sokoban.bin" size="0x2000" crc="5d6f7819" sha1="61ef6483e8f9935dd8b6351fd2bdfda3af3899bd"/>
 			</dataarea>
 		</part>
 	</software>

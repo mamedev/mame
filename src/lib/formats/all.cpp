@@ -104,6 +104,10 @@
 #include "asst128_dsk.h"
 #endif
 
+#ifdef HAS_FORMATS_AS_DSK
+#include "as_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_ATARI_DSK
 #include "atari_dsk.h"
 #endif
@@ -753,9 +757,11 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.add(FLOPPY_A216S_PRODOS_FORMAT); // ap2_dsk.h
 	en.add(FLOPPY_RWTS18_FORMAT); // ap2_dsk.h
 	en.add(FLOPPY_EDD_FORMAT); // ap2_dsk.h
-	en.add(FLOPPY_WOZ_FORMAT); // ap2_dsk.h
-	en.add(FLOPPY_MOOF_FORMAT); // ap2_dsk.h
 	en.add(FLOPPY_NIB_FORMAT); // ap2_dsk.h
+#endif
+#ifdef HAS_FORMATS_AS_DSK
+	en.add(FLOPPY_WOZ_FORMAT); // as_dsk.h
+	en.add(FLOPPY_MOOF_FORMAT); // as_dsk.h
 #endif
 #ifdef HAS_FORMATS_AIM_DSK
 	en.add(FLOPPY_AIM_FORMAT); // aim_dsk.h

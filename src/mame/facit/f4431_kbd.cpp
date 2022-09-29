@@ -5,11 +5,11 @@
     Facit F4431 keyboard
 
     TOOD:
-	- Speaker sounds weird
-	- Verify country codes
+    - Speaker sounds weird
+    - Verify country codes
 
     Notes:
-	- Also supports F4420 and F4430?
+    - Also supports F4420 and F4430?
     - MCU P2 is never read?
 
 ***************************************************************************/

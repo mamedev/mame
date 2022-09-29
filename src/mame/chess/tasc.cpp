@@ -8,12 +8,11 @@ Commonly known as Tasc R30, it's basically a dedicated ChessMachine.
 The King chess engines are also compatible with Tasc's The ChessMachine software
 on PC, however the prototype Gideon 3.1(internally: 2.1, Rebel 2.01) is not.
 
-WARNING: Don't configure more than 512KB RAM for R30 The King 2.50, it will still
-be playable but will actually use less than 512KB RAM and become weaker.
-
 The King 2.23 version was not sold to consumers. It has an opening book meant
 for chesscomputer competitions.
 For more information, see: http://chesseval.com/ChessEvalJournal/R30v223.htm
+
+Gideon only uses 128KB program RAM, no matter the RAM configuration.
 
 R30 hardware notes:
 - ARM6 CPU(P60ARM/CG) @ 30MHz
@@ -30,13 +29,7 @@ R40 hardware notes:
 Documentation for the Toshiba chips is hard to find, but similar chips exist:
 T7778 is equivalent to T6A39, T7900 is equivalent to T6A40.
 
-EPROMs are interchangeable between R30 and R40, with some limitations with
-The King 2.50 (see below).
-
-Regarding RAM: The King 2.2x will work fine with RAM expanded up to 8MB.
-The King 2.50 appears to be protected against RAM upgrades though, and will
-limit itself to 128KB if it detects a non-default amount of RAM. Gideon doesn't
-use RAM above 128KB either, perhaps the R30 prototype only had 128KB RAM.
+EPROMs are interchangeable between R30 and R40.
 
 references:
 - https://www.schach-computer.info/wiki/index.php?title=Tasc_R30
@@ -53,6 +46,10 @@ TODO:
 - more accurate dynamic cpu clock divider (same problem as in saitek/risc2500.cpp),
   sound pitch is correct now though
 - does the R40 version have the same clock divider value?
+
+BTANB:
+- R40 calls itself "R30" on the system information screen (there is a photo of
+  an R40 that does say "R40", but it appears to be a modified ROM)
 
 ******************************************************************************/
 

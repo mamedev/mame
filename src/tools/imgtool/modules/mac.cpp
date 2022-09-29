@@ -97,6 +97,7 @@
 
 #include "formats/ap_dsk35.h"
 #include "formats/imageutl.h"
+
 #include "opresolv.h"
 
 #include <cctype>
@@ -119,6 +120,26 @@
 #if 0
 #pragma mark MISCELLANEOUS UTILITIES
 #endif
+
+static const uint8_t apple35_tracklen_800kb[80] =
+{
+	12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12,
+	11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
+	10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
+	9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+	8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8
+};
+
+static int apple35_sectors_per_track(floppy_image_legacy *image, int track)
+{
+	int sectors;
+
+	assert(track >= 0);
+	assert(track < std::size(apple35_tracklen_800kb));
+
+	sectors = apple35_tracklen_800kb[track];
+	return sectors;
+}
 
 struct UINT16BE
 {
@@ -6375,7 +6396,7 @@ static void generic_mac_get_info(const imgtool_class *imgclass, uint32_t state, 
 		case IMGTOOLINFO_PTR_SET_ATTRS:                     info->set_attrs = mac_image_setattrs; break;
 		case IMGTOOLINFO_PTR_GET_ICON_INFO:                 info->get_iconinfo = mac_image_geticoninfo; break;
 		case IMGTOOLINFO_PTR_SUGGEST_TRANSFER:              info->suggest_transfer = mac_image_suggesttransfer; break;
-		case IMGTOOLINFO_PTR_FLOPPY_FORMAT:                 info->p = (void *) floppyoptions_apple35_mac; break;
+	//	case IMGTOOLINFO_PTR_FLOPPY_FORMAT:                 info->p = (void *) floppyoptions_apple35_mac; break;
 		case IMGTOOLINFO_PTR_CHARCONVERTER:                 info->charconverter = &charconverter_macos_roman; break;
 	}
 }

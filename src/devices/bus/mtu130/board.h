@@ -17,7 +17,7 @@ public:
 	// Read/write on banks 2/3
 	virtual void write23(offs_t offset, u8 data) = 0;
 	virtual u8 read23(offs_t offset) = 0;
-	
+
 	// Map i/o in the bfxx area.
 	virtual void map_io(address_space_installer &space) = 0;
 
@@ -38,14 +38,14 @@ public:
 
 	// Read/write on banks 2/3, read return 0xff if not driven
 	void write23(offs_t offset, u8 data) {
-        auto dev = get_card_device();
-        if(dev)
+		auto dev = get_card_device();
+		if(dev)
 			dev->write23(offset, data);
 	}
 
 	u8 read23(offs_t offset) {
-        auto dev = get_card_device();
-        return dev ? dev->read23(offset) : 0xff;
+		auto dev = get_card_device();
+		return dev ? dev->read23(offset) : 0xff;
 	}
 
 	void map_io(address_space_installer &space);

@@ -490,8 +490,9 @@ void dp83932c_device::load_cam()
 			cep, u8(cap0), cap0 >> 8, u8(cap1), cap1 >> 8, u8(cap2), cap2 >> 8);
 
 		m_cam[cep] =
-			(u64(u8(cap0 >> 0)) << 40) | (u64(u8(cap0 >> 8)) << 32) | (u64(u8(cap1 >> 0)) << 24) |
-			(u64(u8(cap1 >> 8)) << 16) | (u64(u8(cap2 >> 0)) << 8)  | (u64(u8(cap2 >> 8)) << 0);
+			(u64(swapendian_int16(cap0)) << 32) |
+			(u64(swapendian_int16(cap1)) << 16) |
+			(u64(swapendian_int16(cap2)) << 0);
 
 		m_reg[CDP] += 4 * width;
 		m_reg[CDC]--;

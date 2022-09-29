@@ -7,7 +7,7 @@ Facit 4431 layout
 -->
 
 <mamelayout version="2">
-	
+
 	<element name="led" defstate="0">
 		<disk state="0">
 			<color red="0" green="0.2" blue="0" />
@@ -16,7 +16,7 @@ Facit 4431 layout
 			<color red="0" green="0.8" blue="0" />
 		</disk>
 	</element>
-	
+
 	<element name="text_KEYBOARD"><text string="KEYBOARD"><color red="0.80" green="0.80" blue="0.80" /></text></element>
 
 	<element name="text_ONLINE"><text string="ON LINE"><color red="0.80" green="0.80" blue="0.80" /></text></element>

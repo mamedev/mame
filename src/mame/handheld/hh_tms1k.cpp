@@ -24,6 +24,7 @@ not for newer ones (rev. E or TMS1400 MCUs). TMS0970/0980 osc. is on-die.
 ROM source notes when dumped from another publisher, but confident it's the same:
 - arrball: Tandy Zingo
 - bcheetah: Fundimensions Incredible Brain Buggy
+- cchime: Videomaster Door Tunes
 - cmsport: Conic Basketball
 - cnbaskb: Cardinal Electronic Basketball
 - cnfball: Elecsonic Football
@@ -67,7 +68,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 --------------------------------------------------------------------
  @CP0904A  TMS0970   1977, Milton Bradley Comp IV
  @MP0905B  TMS0970   1977, Parker Brothers Codename Sector
- *MP0027   TMS1000   1977, Texas Instruments OEM melody chip (used in eg. Chromatronics Chroma-Chime)
+ @MP0027A  TMS1000   1977, Texas Instruments OEM melody chip (used in eg. Chromatronics Chroma-Chime)
  *MP0057   TMS1000   1978, APH Student Speech+ (same ROM contents as TSI Speech+?)
  *MP0121   TMS1000   1979, Waddingtons Compute-A-Tune
  @MP0154   TMS1000   1979, Fonas 2 Player Baseball
@@ -220,6 +221,8 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "softlist_dev.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "utf8.h"
 
 // internal artwork
 #include "t7in1ss.lh"
@@ -1446,6 +1449,183 @@ ROM_START( palmmd8 )
 	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1000_palmmd8_output.pla", 0, 365, CRC(e999cece) SHA1(c5012877cd030a4dc66228f109fa23eec1867873) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Chromatronics Chroma-Chime
+  * PCB label: DESIGNED BY CHROMATRONICS, 118-2-003
+  * TMS1000NL MP0027A (die label: 1000B, MP0027A)
+  * 1-bit sound with volume decay
+
+  It was sold as a kit (so, the buyer had to assemble the PCB themselves).
+  Chromatronics claims it's the first ever processor-based musical doorbell.
+  It's likely they asked TI for a generic melody chip. It would be odd for
+  a UK product to play the US anthem (B2) much longer than the UK one (B1).
+
+  known releases:
+  - UK(1): Chroma-Chime, published by Chromatronics
+  - UK(2): Door Tunes, published by Videomaster (Chromatronics PCB, not a kit)
+
+  The MCU was also used in Bell-Fruit Oranges and Lemons (slot machine).
+
+***************************************************************************/
+
+class cchime_state : public hh_tms1k_state
+{
+public:
+	cchime_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag),
+		m_volume(*this, "volume"),
+		m_tempo_timer(*this, "tempo")
+	{ }
+
+	void cchime(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	required_device<filter_volume_device> m_volume;
+	required_device<timer_device> m_tempo_timer;
+
+	virtual void write_o(u16 data);
+	virtual void write_r(u32 data);
+	virtual u8 read_k();
+
+	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
+	double m_speaker_volume = 0.0;
+};
+
+void cchime_state::machine_start()
+{
+	hh_tms1k_state::machine_start();
+	save_item(NAME(m_speaker_volume));
+}
+
+// handlers
+
+TIMER_DEVICE_CALLBACK_MEMBER(cchime_state::speaker_decay_sim)
+{
+	m_volume->flt_volume_set_volume(m_speaker_volume);
+
+	// volume decays when speaker is off, decay scale is determined by tone knob
+	const double step = (1.005 - 1.0005) / 100.0; // approximation
+	m_speaker_volume /= 1.005 - (double)(u8)m_inputs[4]->read() * step;
+}
+
+void cchime_state::write_r(u32 data)
+{
+	// R9: trigger tempo knob timer
+	if (m_r & ~data & 0x200)
+	{
+		const double step = 50 / 100.0; // approximation
+		m_tempo_timer->adjust(attotime::from_msec(50 + (u8)m_inputs[3]->read() * step));
+	}
+
+	// R10: power off when low (combined with doorbell)
+	if (~data & 0x400 && !m_inputs[2]->read())
+		power_off();
+
+	m_r = data;
+}
+
+void cchime_state::write_o(u16 data)
+{
+	// O6+O7: speaker out
+	m_speaker->level_w(BIT(~data, 6) & BIT(~data, 7));
+
+	// O2: trigger speaker on
+	if (~m_o & data & 4)
+		m_volume->flt_volume_set_volume(m_speaker_volume = 1.0);
+
+	m_o = data;
+}
+
+u8 cchime_state::read_k()
+{
+	u8 inp = 0;
+
+	// R0-R7 + K1-K4: selected tune
+	u8 rs = m_inputs[0]->read();
+	u8 ks = m_inputs[1]->read();
+	inp |= (m_r & rs) ? ks : 0;
+
+	// K4: rear doorbell
+	inp |= m_inputs[2]->read() << 1 & 4;
+
+	// K8: tempo knob state
+	if (m_tempo_timer->enabled())
+		inp |= 8;
+
+	return inp;
+}
+
+// config
+
+static INPUT_PORTS_START( cchime )
+	PORT_START("IN.0") // R0-R7
+	PORT_CONFNAME( 0xff, 0x01, "Switch 1")
+	PORT_CONFSETTING(    0x01, "A" )
+	PORT_CONFSETTING(    0x02, "B" )
+	PORT_CONFSETTING(    0x04, "C" )
+	PORT_CONFSETTING(    0x08, "D" )
+	PORT_CONFSETTING(    0x10, "E" )
+	PORT_CONFSETTING(    0x20, "F" )
+	PORT_CONFSETTING(    0x40, "G" )
+	PORT_CONFSETTING(    0x80, "H" )
+
+	PORT_START("IN.1") // K1-K4
+	PORT_CONFNAME( 0x07, 0x01, "Switch 2")
+	PORT_CONFSETTING(    0x01, "1" )
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_CONFSETTING(    0x04, "3" )
+
+	PORT_START("IN.2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Front Doorbell") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Rear Doorbell") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
+
+	PORT_START("IN.3")
+	PORT_ADJUSTER(50, "Tempo Knob")
+
+	PORT_START("IN.4")
+	PORT_ADJUSTER(50, "Tone Knob")
+INPUT_PORTS_END
+
+void cchime_state::cchime(machine_config &config)
+{
+	// basic machine hardware
+	TMS1000(config, m_maincpu, 400000); // approximation - RC osc. R=39K, C=47pF
+	m_maincpu->read_k().set(FUNC(cchime_state::read_k));
+	m_maincpu->write_o().set(FUNC(cchime_state::write_o));
+	m_maincpu->write_r().set(FUNC(cchime_state::write_r));
+
+	TIMER(config, "tempo").configure_generic(nullptr);
+
+	// no visual feedback!
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "volume", 0.25);
+	FILTER_VOLUME(config, m_volume).add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	TIMER(config, "speaker_decay").configure_periodic(FUNC(cchime_state::speaker_decay_sim), attotime::from_msec(1));
+}
+
+// roms
+
+ROM_START( cchime )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp0027a.n1", 0x0000, 0x0400, CRC(8b5e2c4d) SHA1(5364d2836e9daefee2529a20c022e811bb3c7d89) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_cchime_output.pla", 0, 365, CRC(75d68c56) SHA1(85abde0ca0bcc605720551bea360498db350a7af) )
 ROM_END
 
 
@@ -5263,7 +5443,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mmarvin_state::speaker_decay_sim)
 	m_volume->flt_volume_set_volume(m_speaker_volume);
 
 	// volume decays when speaker is off, decay scale is determined by tone knob
-	double step = (1.01 - 1.003) / 100.0; // approximation
+	const double step = (1.01 - 1.003) / 100.0; // approximation
 	m_speaker_volume /= 1.01 - (double)(u8)m_inputs[5]->read() * step;
 }
 
@@ -5279,9 +5459,9 @@ void mmarvin_state::write_r(u32 data)
 	m_inp_mux = data >> 2 & 0xf;
 
 	// R6: trigger speed knob timer
-	if (m_r & 0x40 && ~data & 0x40)
+	if (m_r & ~data & 0x40)
 	{
-		double step = (2100 - 130) / 100.0; // duration range is around 0.13s to 2.1s
+		const double step = (2100 - 130) / 100.0; // duration range is around 0.13s to 2.1s
 		m_speed_timer->adjust(attotime::from_msec(2100 - (u8)m_inputs[4]->read() * step));
 	}
 
@@ -5289,7 +5469,7 @@ void mmarvin_state::write_r(u32 data)
 	m_speaker->level_w(BIT(m_r, 10));
 
 	// R9: trigger speaker on
-	if (m_r & 0x200 && ~data & 0x200)
+	if (m_r & ~data & 0x200)
 		m_volume->flt_volume_set_volume(m_speaker_volume = 1.0);
 
 	// R0,R1: digit/led select
@@ -5308,7 +5488,7 @@ void mmarvin_state::write_o(u16 data)
 u8 mmarvin_state::read_k()
 {
 	// K1-K4: multiplexed inputs
-	// K8: speed dial state
+	// K8: speed knob state
 	return (read_inputs(4) & 7) | (m_speed_timer->enabled() ? 0 : 8);
 }
 
@@ -14749,6 +14929,8 @@ CONS( 1981, tc7atc,     0,         0, tc7atc,    tc7atc,    tc7atc_state,    emp
 
 COMP( 1977, palmf31,    0,         0, palmf31,   palmf31,   palmf31_state,   empty_init, "Canon", "Palmtronic F-31", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1977, palmmd8,    0,         0, palmmd8,   palmmd8,   palmmd8_state,   empty_init, "Canon", "Palmtronic MD-8 (Multi 8)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+
+SYST( 1977, cchime,     0,         0, cchime,    cchime,    cchime_state,    empty_init, "Chromatronics", "Chroma-Chime", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1978, amaztron,   0,         0, amaztron,  amaztron,  amaztron_state,  empty_init, "Coleco", "Amaze-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // ***
 COMP( 1979, zodiac,     0,         0, zodiac,    zodiac,    zodiac_state,    empty_init, "Coleco", "Zodiac - The Astrology Computer", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -7,11 +7,15 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m37710/m37710.h"
 #include "machine/am79c30.h"
 #include "video/hd44780.h"
+
 #include "emupal.h"
 #include "screen.h"
+
+#include "utf8.h"
 
 class eurit_state : public driver_device
 {

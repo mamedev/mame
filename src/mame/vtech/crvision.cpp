@@ -149,6 +149,7 @@ TODO:
 #include "crvision.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+#include "utf8.h"
 
 
 /***************************************************************************

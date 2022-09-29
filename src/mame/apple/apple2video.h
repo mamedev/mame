@@ -69,7 +69,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_start() override;
 
-	virtual uint32_t palette_entries() const override;
+	virtual uint32_t palette_entries() const noexcept override;
 	void init_palette();
 
 private:
