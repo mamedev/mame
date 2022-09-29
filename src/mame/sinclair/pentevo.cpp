@@ -26,7 +26,6 @@ ZxEvo: http://nedopc.com/zxevo/zxevo_eng.php
 TODO:
 	* Keyboard enabled
 	* zx 16c
-	* NMI?
 
 *******************************************************************************************/
 
@@ -82,10 +81,8 @@ private:
 	u8 pentevo_port_bf_r(offs_t offset);
 	void pentevo_port_bf_w(offs_t offset, u8 data);
 	u8 pentevo_port_0nbd_r(offs_t offset);
-	void pentevo_port_0nbd_w(offs_t offset, u8 data);
 	u8 pentevo_port_1nbd_r(offs_t offset);
 	void pentevo_port_1nbd_w(offs_t offset, u8 data);
-	void pentevo_port_be_w(offs_t offset, u8 data);
 
 	void spi_port_77_w(offs_t offset, u8 data);
 	u8 spi_port_57_r(offs_t offset);
@@ -125,7 +122,9 @@ private:
 
 	u8 m_gluk_ext;
 	bool m_ata_data_hi_ready;
-	bool m_nmi_exit;
+	u16 m_nmi_trap_offset;
+	bool m_nmi_active;
+	u8 m_nmi_active_flip_countdown;
 
 	u8 m_zctl_di = 0;
 	u8 m_zctl_cs = 0;
@@ -161,12 +160,16 @@ void pentevo_state::atm_update_io()
 
 u16 pentevo_state::atm_update_memory_get_page(u8 bank)
 {
-	if (BIT(m_port_eff7_data, 3))
-		return ~PEN_RAMNROM_MASK & 0x00;
-	else if (bank == 0 && m_beta_drive_selected && m_beta_drive_virtual == m_beta_drive_selected)
-		return PEN_RAMNROM_MASK | 0xfe;
-	else
-		return atm_state::atm_update_memory_get_page(bank);
+	if (bank == 0)
+	{
+		if (BIT(m_port_eff7_data, 3))
+			return ~PEN_RAMNROM_MASK & 0x00;
+		else if (m_nmi_active)
+			return PEN_RAMNROM_MASK | 0xff;
+		else if (m_beta_drive_selected && m_beta_drive_virtual == m_beta_drive_selected)
+			return PEN_RAMNROM_MASK | 0xfe;
+	}
+	return atm_state::atm_update_memory_get_page(bank);
 }
 
 void pentevo_state::atm_port_ff_w(offs_t offset, u8 data)
@@ -174,6 +177,7 @@ void pentevo_state::atm_port_ff_w(offs_t offset, u8 data)
 	if (BIT(m_port_bf_data, 5) && !m_pen2)
 	{
 		u8 pen = get_border_color(m_screen->hpos(), m_screen->vpos());
+		m_palette_data[pen] = data;
 		m_palette->set_pen_color(pen,
 			(BIT(~data, 1) * 0x88) | (BIT(~data, 6) * 0x44) | (BIT(~offset,  9) * 0x22) | (BIT(~offset, 14) * 0x11),
 			(BIT(~data, 4) * 0x88) | (BIT(~data, 7) * 0x44) | (BIT(~offset, 12) * 0x22) | (BIT(~offset, 15) * 0x11),
@@ -187,14 +191,15 @@ void pentevo_state::atm_port_ff_w(offs_t offset, u8 data)
 
 TIMER_DEVICE_CALLBACK_MEMBER(pentevo_state::nmi_check_callback)
 {
-	if (m_io_nmi->read() & 0x01)
+	if ((m_io_nmi->read() & 0x01) && !m_nmi_active)
 		nmi_on();
 }
 
 void pentevo_state::nmi_on()
 {
-	m_bank_ram[0]->set_entry(0xff & ram_pages_mask);
-	m_bank_view0.disable();
+	m_nmi_active = true;
+	m_nmi_active_flip_countdown = 0;
+	atm_update_memory();
 	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
@@ -209,11 +214,12 @@ u8 pentevo_state::merge_ram_with_7ffd(u8 ram_page)
 
 void pentevo_state::pentevo_port_eff7_w(offs_t offset, u8 data)
 {
+	u8 changed = m_port_eff7_data ^ data;
 	m_port_eff7_data = data;
-	atm_update_memory();
-	atm_update_io();
-	atm_update_cpu();
-	atm_update_video_mode();
+
+	if (BIT(changed, 3)) atm_update_memory();
+	if (BIT(changed, 4)) atm_update_cpu();
+	if (BIT(changed, 7)) atm_update_io();
 }
 
 void pentevo_state::pentevo_port_7f7_w(offs_t offset, u8 data)
@@ -237,8 +243,11 @@ void pentevo_state::pentevo_port_bf7_w(offs_t offset, u8 data)
 
 void pentevo_state::pentevo_port_bf_w(offs_t offset, u8 data)
 {
-	if (BIT(m_port_bf_data, 3) && !BIT(data, 3))
-		nmi_on();
+	if (BIT(m_port_bf_data, 3) && !BIT(data, 3)) // 1>0
+		// Due to the fact current z80 handles NMI detection before (not after) instruction OUT(#BF),0:HALT freezes driver.
+		// With fixed z80 this must be replaced with:
+		// nmi_on()
+		m_nmi_active_flip_countdown = 1;
 
 	m_port_bf_data = data;
 	atm_update_io();
@@ -251,7 +260,7 @@ u8 pentevo_state::pentevo_port_bf_r(offs_t offset)
 
 u8 pentevo_state::pentevo_port_0nbd_r(offs_t offset)
 {
-	u8 opt = offset >> 8;
+	u8 opt = (offset >> 8) & 0x0f;
 	if (opt <= 0x07)
 		return ~(m_pages_map[BIT(opt, 2)][opt & 0x03] & 0xff);
 	else if (opt == 0x08 || opt == 0x09)
@@ -266,56 +275,58 @@ u8 pentevo_state::pentevo_port_0nbd_r(offs_t offset)
 	else if (opt == 0x0b)
 		return m_port_eff7_data;
 	else if (opt == 0x0c)
-		return (m_pen2 << 7) | (m_cpm_n << 6) | (m_pen << 5) | (is_dos_active() << 4) | (BIT(m_port_77_data, 4) << 3) | m_rg;
-	//else if (opt == 0x0d) current palette color
-	//else if (opt == 0x0e) current font char
-	else if (opt == 0x0f)
+		return (m_pen2 << 7) | (m_cpm_n << 6) | (m_pen << 5) | ((m_nmi_active && m_beta->is_active()) << 4) | (m_port_77_data & 0x0f);
+	else if (opt == 0x0d)
+		return m_palette_data[get_border_color(m_screen->hpos(), m_screen->vpos())];
+	else if (opt == 0x0e)
+	{
+		u8* screen_location = m_ram->pointer() + ((BIT(m_port_7ffd_data, 3) ? 10 : 8) << 14);
+		u16 y = m_screen->vpos() - get_screen_area().top();
+		u16 x = m_screen->hpos() - get_screen_area().left();
+		u8 *symb_location = screen_location + 0x1c0 + (x >> 4) + ((y >> 3) * 64);
+		if (BIT(x, 3)) symb_location += 0x1000;
+		return m_char_ram->read((*symb_location << 3) + (y & 0x07));
+	}
+	else //if (opt == 0x0f)
 		return get_border_color(m_screen->hpos(), m_screen->vpos());
-	else
-	{
-		LOGWARN("#%X read\n", 0x00bd | offset);
-		return 0xff;
-	}
-}
-
-void pentevo_state::pentevo_port_0nbd_w(offs_t offset, u8 data)
-{
-	u8 opt = offset >> 8;
-	if (opt == 0x00 || opt == 0x01)
-	{
-		//TODO NMI trap - no usecase to test yet
-		LOGWARN("#%X (NMI) < %X\n", 0x00bd | offset, data);
-	}
-	else
-	{
-		LOGWARN("#%X < %X\n", 0x00bd | offset, data);
-	}
 }
 
 u8 pentevo_state::pentevo_port_1nbd_r(offs_t offset)
 {
-	u8 opt = offset >> 8;
-	if (opt == 0x03) // #13BD
-		return m_beta_drive_virtual;
-	else
+	u8 opt = (offset >> 8) & 0x03;
+	if (opt == 0x00)
+		return m_nmi_trap_offset & 0x0f;
+	else if (opt == 0x01)
+		return (m_nmi_trap_offset & 0xf0) >> 8;
+	else if (opt == 0x02)
 	{
-		LOGWARN("#%X read\n", 0x10bd | offset);
-		return 0xff;
+		u8 data = 0;
+		for (s8 i = 7; i >= 0; i--)
+			data = (data << 1) | bool(m_pages_map[BIT(i, 2)][i & 0x03] & PEN_WRDISBL_MASK);
+		return data;
 	}
+	else //if (opt == 0x03)
+		return m_beta_drive_virtual;
 }
 
 void pentevo_state::pentevo_port_1nbd_w(offs_t offset, u8 data)
 {
-	u8 opt = offset >> 8;
-	if (opt == 0x03) // #13BD
-		m_beta_drive_virtual = data;
-	else
-		LOGWARN("#%X < %X\n", 0x10bd | offset, data);
-}
-
-void pentevo_state::pentevo_port_be_w(offs_t offset, u8 data)
-{
-	LOGWARN("#%X < %X\n", 0x00be | offset, data);
+	u8 opt = (offset >> 8) & 0x03;
+	if (opt == 0x00)
+		m_nmi_trap_offset = (m_nmi_trap_offset & 0xf0) | data;
+	else if (opt == 0x01)
+		m_nmi_trap_offset = (m_nmi_trap_offset & 0x0f) | (data << 8);
+	else if (opt == 0x02)
+	{
+		u8 data = 0;
+		for (s8 i = 7; i >= 0; i--)
+		{
+			m_pages_map[BIT(i, 2)][i & 0x03] &= ~PEN_WRDISBL_MASK;
+			if (BIT(data, i)) m_pages_map[BIT(i, 2)][i & 0x03] |= PEN_WRDISBL_MASK;
+		}
+	}
+	else if (opt == 0x03)
+		m_beta_drive_virtual = data & 0x0f;
 }
 
 void pentevo_state::spectrum_update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -498,11 +509,11 @@ u8 pentevo_state::gluk_data_r(offs_t offset)
 		if (m_gluk_ext == 2)
 			return m_keyboard->read();
 		else if (m_glukrs->address_r() == 0x0a)
-			return 0x00;
+			return 0x20 | (m_glukrs->data_r() & 0x0f);
 		else if (m_glukrs->address_r() == 0x0b)
-			return 0x02;
+			return 0x02 | (m_glukrs->data_r() & 0x04);
 		else if (m_glukrs->address_r() == 0x0c)
-			return 0x00 | (BIT(m_screen->frame_number(), 1) * 0x10);
+			return 0x10;
 		else if (m_glukrs->address_r() == 0x0d)
 			return 0x80;
 	}
@@ -558,10 +569,10 @@ void pentevo_state::pentevo_io(address_map &map)
 	map(0xeff7, 0xeff7).w(FUNC(pentevo_state::pentevo_port_eff7_w));
 	map(0x00bf, 0x00bf).select(0xff00).rw(FUNC(pentevo_state::pentevo_port_bf_r), FUNC(pentevo_state::pentevo_port_bf_w));
 	map(0x00be, 0x00be).select(0x0f00).r(FUNC(pentevo_state::pentevo_port_0nbd_r));
-	map(0x00bd, 0x00bd).select(0x0f00).rw(FUNC(pentevo_state::pentevo_port_0nbd_r), FUNC(pentevo_state::pentevo_port_0nbd_w));
+	map(0x00bd, 0x00bd).select(0x0f00).r(FUNC(pentevo_state::pentevo_port_0nbd_r));
 	map(0x10be, 0x10be).select(0x0f00).r(FUNC(pentevo_state::pentevo_port_1nbd_r));
 	map(0x10bd, 0x10bd).select(0x0f00).rw(FUNC(pentevo_state::pentevo_port_1nbd_r), FUNC(pentevo_state::pentevo_port_1nbd_w));
-	map(0x00be, 0x00be).select(0xff00).w(FUNC(pentevo_state::pentevo_port_be_w));
+	map(0x00be, 0x00be).select(0xff00).lw8(NAME([this](offs_t offset) { m_nmi_active_flip_countdown = 2; }));
 
 	// AY
 	map(0x8000, 0x8000).mirror(0x3ffd).w("ay8912", FUNC(ay8910_device::data_w));
@@ -583,8 +594,7 @@ void pentevo_state::pentevo_io(address_map &map)
 	map(0xfadf, 0xfadf).lr8(NAME([this]() { return 0x80 | (m_io_mouse[2]->read() & 0x07); }));
 	map(0xfbdf, 0xfbdf).lr8(NAME([this]() { return  m_io_mouse[0]->read(); }));
 	map(0xffdf, 0xffdf).lr8(NAME([this]() { return ~m_io_mouse[1]->read(); }));
-	// TODO Mitigates improper Kempston detection in EdgeGrinder. Possibly because read is taken from beta port but not-shadow config is expected.
-	map(0x001f, 0x001f).mirror(0xff00).lr8(NAME([]() { return 0x00; }));
+	map(0x001f, 0x001f).mirror(0xff00).lr8(NAME([]() { return 0x00; })); // TODO Kepmston Joystick
 
 	// PORTS: Shadow
 	map(0x0000, 0xffff).view(m_io_view);
@@ -623,6 +633,27 @@ void pentevo_state::init_mem_write()
 		}
 		return data;
 	});
+
+	address_space &opc = m_maincpu->space(AS_OPCODES);
+	opc.install_read_tap(0x0000, 0xffff, "nmi_exit", [this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+		{
+			if (m_nmi_active_flip_countdown)
+			{
+				if(--m_nmi_active_flip_countdown == 0)
+				{
+					if (m_nmi_active)
+					{
+						m_nmi_active = false;
+						atm_update_memory();
+					}
+					else
+						nmi_on(); // see: pentevo_port_bf_w()
+				}
+			}
+		}
+	});
 }
 
 void pentevo_state::machine_start()
@@ -634,7 +665,9 @@ void pentevo_state::machine_start()
 	save_item(NAME(m_beta_drive_virtual));
 	save_item(NAME(m_gluk_ext));
 	save_item(NAME(m_ata_data_hi_ready));
-	save_item(NAME(m_nmi_exit));
+	save_item(NAME(m_nmi_trap_offset));
+	save_item(NAME(m_nmi_active));
+	save_item(NAME(m_nmi_active_flip_countdown));
 	save_item(NAME(m_zctl_di));
 	save_item(NAME(m_zctl_cs));
 
@@ -643,13 +676,14 @@ void pentevo_state::machine_start()
 
 void pentevo_state::machine_reset()
 {
+	m_nmi_active = false;
 	m_port_eff7_data = 0;
 	atm_state::machine_reset();
 
 	m_port_bf_data = 0;
+	m_nmi_active_flip_countdown = 0;
 	m_beta_drive_virtual = 0;
 
-	m_nmi_exit = false;
 	m_ata_data_hi_ready = false;
 	m_gluk_ext = 0xff;
 	m_zctl_cs = 1;

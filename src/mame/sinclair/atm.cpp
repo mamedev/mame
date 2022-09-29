@@ -104,6 +104,7 @@ void atm_state::atm_port_ff_w(offs_t offset, u8 data)
 		// Must read current ULA value (which is doesn't work now) from the BUS.
 		// Good enough as non-border case is too complicated and possibly no software uses it.
 		u8 pen = get_border_color(m_screen->hpos(), m_screen->vpos());
+		m_palette_data[pen] = data;
 		m_palette->set_pen_color(pen,
 			(BIT(~data, 1) * 0xaa) | (BIT(~data, 6) * 0x55),
 			(BIT(~data, 4) * 0xaa) | (BIT(~data, 7) * 0x55),
@@ -294,7 +295,7 @@ u8 atm_state::beta_neutral_r(offs_t offset)
 u8 atm_state::beta_enable_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled() && !m_beta->is_active()) {
-		bool is_rom0 = !(pen_page(0) & PEN_RAMNROM_MASK);
+		bool is_rom0 = !(atm_update_memory_get_page(0) & PEN_RAMNROM_MASK);
 		if (is_rom0 || !m_cpm_n)
 		{
 			m_beta->enable();
@@ -443,6 +444,7 @@ void atm_state::machine_reset()
 	m_port_77_data = 0;
 
 	m_br3 = 0;
+	m_palette_data = { 0xff };
 	atm_port_77_w(0x4000, 3); // m_port_77_data: CPM=0(on), PEN=0(off), PEN2=1(off); vmode: zx
 }
 
