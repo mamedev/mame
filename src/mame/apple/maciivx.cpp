@@ -336,7 +336,6 @@ void maciivx_state::maciiv_base(machine_config &config)
 	m_vasp->hdsel_callback().set(FUNC(maciivx_state::hdsel_w));
 
 	MACADB(config, m_macadb, C15M);
-	m_macadb->set_mcu_mode(true);
 
 	nubus_device &nubus(NUBUS(config, "nubus", 0));
 	nubus.set_space(m_maincpu, AS_PROGRAM);

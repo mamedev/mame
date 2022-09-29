@@ -19,8 +19,6 @@ public:
 	// construction/destruction
 	macadb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_mcu_mode(bool bMCUMode) { m_bIsMCUMode = bMCUMode; }
-
 	auto via_clock_callback() { return write_via_clock.bind(); }
 	auto via_data_callback() { return write_via_data.bind(); }
 	auto adb_data_callback() { return write_adb_data.bind(); }
@@ -34,8 +32,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(adb_linechange_w);
 
 	void adb_vblank();
-	void mac_adb_newaction(int state);
-	int32_t get_adb_state(void) { return m_adb_state; }
 
 protected:
 	// device-level overrides
@@ -44,8 +40,6 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	bool m_bIsMCUMode;
-
 	uint64_t m_last_adb_time;
 
 	emu_timer *m_adb_timer;
@@ -54,7 +48,7 @@ private:
 	int m_key_matrix[7];
 
 	// ADB HLE state
-	int32_t m_adb_state, m_adb_waiting_cmd, m_adb_datasize, m_adb_buffer[257];
+	int32_t m_adb_waiting_cmd, m_adb_datasize, m_adb_buffer[257];
 	int32_t m_adb_command, m_adb_send, m_adb_timer_ticks, m_adb_extclock, m_adb_direction;
 	int32_t m_adb_listenreg, m_adb_listenaddr, m_adb_last_talk, m_adb_srq_switch;
 	int32_t m_adb_stream_ptr;

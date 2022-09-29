@@ -351,7 +351,6 @@ void maclc_state::maclc_base(machine_config &config)
 	m_v8->hmmu_enable_callback().set(FUNC(maclc_state::set_hmmu));
 
 	MACADB(config, m_macadb, C15M);
-	m_macadb->set_mcu_mode(true);
 
 	EGRET(config, m_egret, EGRET_341S0850);
 	m_egret->reset_callback().set(FUNC(maclc_state::egret_reset_w));

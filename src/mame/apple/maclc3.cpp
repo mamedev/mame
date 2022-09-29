@@ -266,7 +266,6 @@ void macvail_state::maclc3_base(machine_config &config)
 	m_sonora->set_rom_tag("bootrom");
 
 	MACADB(config, m_macadb, C15M);
-	m_macadb->set_mcu_mode(true);
 }
 
 void macvail_state::maclc3(machine_config &config)
