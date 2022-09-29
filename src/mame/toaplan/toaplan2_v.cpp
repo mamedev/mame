@@ -44,22 +44,6 @@ TILE_GET_INFO_MEMBER(toaplan2_state::get_text_tile_info)
 			0);
 }
 
-
-TILE_GET_INFO_MEMBER(toaplan2_dt7_state::get_text_dt7_tile_info)
-{
-	const u16 attrib = m_tx_videoram[tile_index];
-	const u32 tile_number = attrib & 0x3ff;
-
-	u32 color = (attrib & 0xf800) >> 11;
-
-	color |= 0x60;
-
-	tileinfo.set(0,
-			tile_number,
-			color,
-			0);
-}
-
 /***************************************************************************
 
   Start the video hardware emulation.
@@ -109,18 +93,6 @@ VIDEO_START_MEMBER(toaplan2_state,truxton2)
 	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<u8 *>(m_tx_gfxram.target()));
 
 	create_tx_tilemap(0x1d5, 0x16a);
-}
-
-VIDEO_START_MEMBER(toaplan2_dt7_state,dt7)
-{
-	VIDEO_START_CALL_MEMBER(toaplan2);
-
-	// a different part of this tilemap is displayed on each screen
-	// however each screen uses a different palette, so we're going to have to create 2 otherwise identical tilemaps eventually, or render manually
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(toaplan2_dt7_state::get_text_dt7_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-
-	m_tx_tilemap->set_transparent_pen(0);
-
 }
 
 VIDEO_START_MEMBER(toaplan2_state,fixeightbl)
@@ -193,13 +165,6 @@ void toaplan2_state::tx_videoram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_tx_videoram[offset]);
 	if (offset < 64*32)
-		m_tx_tilemap->mark_tile_dirty(offset);
-}
-
-void toaplan2_dt7_state::tx_videoram_dt7_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	COMBINE_DATA(&m_tx_videoram[offset]);
-	if (offset < 64*64)
 		m_tx_tilemap->mark_tile_dirty(offset);
 }
 
@@ -396,30 +361,6 @@ u32 toaplan2_state::screen_update_toaplan2(screen_device &screen, bitmap_ind16 &
 	return 0;
 }
 
-u32 toaplan2_dt7_state::screen_update_dt7_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(0, cliprect);
-	m_custom_priority_bitmap.fill(0, cliprect);
-	m_vdp[0]->render_vdp(bitmap, cliprect);
-
-	m_tx_tilemap->set_scrolldy(0, 0);
-	m_tx_tilemap->draw(screen, bitmap, cliprect, 0);
-
-	return 0;
-}
-
-
-u32 toaplan2_dt7_state::screen_update_dt7_2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(0, cliprect);
-	m_custom_priority_bitmap.fill(0, cliprect);
-	m_vdp[1]->render_vdp(bitmap, cliprect);
-
-	m_tx_tilemap->set_scrolldy(256+16, 256+16);
-	m_tx_tilemap->draw(screen, bitmap, cliprect, 0);
-
-	return 0;
-}
 
 /* fixeightbl and bgareggabl do not use the lineselect or linescroll tables */
 u32 toaplan2_state::screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

@@ -42067,6 +42067,9 @@ tnzso                           // B53 (c) 1988 Taito Corporation Japan (World) 
 tnzsoa                          // B53?(c) 1988 Taito Corporation Japan (World?) (unknown revision, prototype?)
 tnzsop                          // B53?(c) 1988 Taito Corporation Japan (World?) (old pcb, prototype)
 
+@source:toaplan/dt7.cpp
+dt7
+
 @source:toaplan/toaplan1.cpp
 demonwld                        // TP-O16 (c) 1990 Toaplan (+ Taito license when set to Japan)
 demonwld1                       // TP-O16 (c) 1989 Toaplan + Taito license
@@ -42109,7 +42112,6 @@ batriderja                      // (c) 1998 Raizing/8ing
 batriderk                       // (c) 1998 Raizing/8ing
 batridert                       // (c) 1998 Raizing/8ing
 batrideru                       // (c) 1998 Raizing/8ing
-dt7
 batsugun                        // TP-030 (c) 1993 Toaplan
 batsuguna                       // TP-030 (c) 1993 Toaplan
 batsugunb                       //
