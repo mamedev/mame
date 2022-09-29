@@ -62,6 +62,24 @@
 #define SCREEN_TAG      "screen"
 #define KB_TAG          "kb"
 
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
+
+#define LOG_CONF      (1 << 1U)
+#define LOG_KEYBOARD  (1 << 2U)
+#define LOG_DISPLAY   (1 << 3U)
+
+//#define VERBOSE (LOG_CONF|LOG_DISPLAY|LOG_KEYBOARD)
+//#define LOG_OUTPUT_STREAM std::cout
+
+#include "logmacro.h"
+
+#define LOGCONF(...)     LOGMASKED(LOG_CONF,  __VA_ARGS__)
+#define LOGKEYBOARD(...) LOGMASKED(LOG_KEYBOARD,  __VA_ARGS__)
+#define LOGDISPLAY(...)  LOGMASKED(LOG_DISPLAY,  __VA_ARGS__)
+
+
 class victor9k_state : public driver_device
 {
 public:
@@ -177,28 +195,6 @@ private:
 
 	void victor9k_mem(address_map &map);
 };
-
-
-
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define LOG_CONF      (1 << 1U)
-#define LOG_KEYBOARD  (1 << 2U)
-#define LOG_DISPLAY   (1 << 3U)
-
-//#define VERBOSE (LOG_CONF|LOG_DISPLAY|LOG_KEYBOARD)
-//#define LOG_OUTPUT_STREAM std::cout
-
-#define VERBOSE (LOG_CONF|LOG_DISPLAY)
-#define LOG_OUTPUT_STREAM std::cout
-
-#include "logmacro.h"
-
-#define LOGCONF(...)     LOGMASKED(LOG_CONF,  __VA_ARGS__)
-#define LOGKEYBOARD(...) LOGMASKED(LOG_KEYBOARD,  __VA_ARGS__)
-#define LOGDISPLAY(...)  LOGMASKED(LOG_DISPLAY,  __VA_ARGS__)
 
 
 //**************************************************************************
@@ -328,20 +324,12 @@ MC6845_BEGIN_UPDATE( victor9k_state::crtc_begin_update )
 	uint16_t ma = m_crtc->get_ma();
 	int hires = BIT(ma, 13);
 	int width = hires ? 16 : 10;
-	if (hires != m_hires) {
-		LOGDISPLAY("mc6845 begin update change resolution: %s\n", hires ? "high" : "low");
-		if (hires) 
-		{
-			m_screen->set_raw(15_MHz_XTAL / 16 , 1488, 0, 1279, 422, 0, 410);
-			m_screen->set_visible_area(0,1279,0,410);
-		} else
-		{
-			m_screen->set_raw(15_MHz_XTAL / 10 , 930, 0, 799, 422, 0, 410);
-			m_screen->set_visible_area(0,799,0,410);
-		}
+	if (hires != m_hires) 
+	{
+		//LOGDISPLAY("mc6845 begin update change resolution: %s\n", hires ? "high" : "low");
 		m_crtc->set_hpixels_per_column(width);
 		m_crtc->set_char_width(width);
-		m_crtc->set_visarea_adjust(0, 0, 0, 10);  //show line 25
+		//m_crtc->set_visarea_adjust(0, 0, 0, 10);  //show line 25
 		m_hires = hires;
 	}
 }
@@ -677,7 +665,8 @@ void victor9k_state::machine_start()
     u8 *m_ram_ptr = m_ram->pointer();
 
     int ramsize = m_ram_size;
-	if (ramsize > 0) {
+	if (ramsize > 0) 
+	{
 		address_space& space = m_maincpu->space(AS_PROGRAM);
 		if (ramsize > 0xdffff)   //the 896KB option overlaps 1 bit with 
 			ramsize = 0xdffff;   //the I/O memory space, truncating
@@ -696,7 +685,6 @@ void victor9k_state::machine_reset()
 	m_via3->reset();
 	m_screen->reset();
 	m_crtc->reset();
-	m_screen->set_visible_area(0,799,0,410);
 	m_fdc->reset();
 }
 
@@ -723,18 +711,13 @@ void victor9k_state::victor9k(machine_config &config)
 	m_screen->set_raw(15_MHz_XTAL / 10 , 930, 0, 799, 422, 0, 410);
 	m_screen->set_screen_update(HD46505S_TAG, FUNC(hd6845s_device::screen_update));
 
-	LOGDISPLAY("mc6845 initial resolution: low\n");
-
 	PALETTE(config, m_palette, FUNC(victor9k_state::victor9k_palette), 16);
-LOGDISPLAY("m_crt config\n");
-	HD6845S(config, m_crtc, 15_MHz_XTAL / 5 ); // HD6845 == HD46505S
+	HD6845S(config, m_crtc, 15_MHz_XTAL / 10 ); // HD6845 == HD46505S
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(10);
-	m_crtc->set_visarea_adjust(0, 0, 0, 10);  //show line 25
+	//m_crtc->set_visarea_adjust(0, 0, 0, 10);  //show line 25
 	
-	
-LOGDISPLAY("callbacks\n");
 	m_crtc->set_update_row_callback(FUNC(victor9k_state::crtc_update_row));
 	m_crtc->out_vsync_callback().set(FUNC(victor9k_state::vert_w));
 	m_crtc->set_begin_update_callback(FUNC(victor9k_state::crtc_begin_update));
