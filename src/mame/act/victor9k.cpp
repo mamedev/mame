@@ -706,11 +706,11 @@ void victor9k_state::victor9k(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(15_MHz_XTAL / 10 , 930, 0, 799, 422, 0, 410);
+	m_screen->set_raw(15_MHz_XTAL, 930, 0, 799, 422, 0, 410);
 	m_screen->set_screen_update(HD46505S_TAG, FUNC(hd6845s_device::screen_update));
 
 	PALETTE(config, m_palette, FUNC(victor9k_state::victor9k_palette), 16);
-	HD6845S(config, m_crtc, 15_MHz_XTAL / 10 ); // HD6845 == HD46505S
+	HD6845S(config, m_crtc, 15_MHz_XTAL ); // HD6845 == HD46505S
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(10);
