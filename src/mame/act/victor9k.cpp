@@ -332,11 +332,11 @@ MC6845_BEGIN_UPDATE( victor9k_state::crtc_begin_update )
 		LOGDISPLAY("mc6845 begin update change resolution: %s\n", hires ? "high" : "low");
 		if (hires) 
 		{
-			m_screen->set_raw(15_MHz_XTAL / 5 , 1488, 0, 1279, 422, 0, 410);
+			m_screen->set_raw(15_MHz_XTAL / 16 , 1488, 0, 1279, 422, 0, 410);
 			m_screen->set_visible_area(0,1279,0,410);
 		} else
 		{
-			m_screen->set_raw(15_MHz_XTAL / 5 , 930, 0, 799, 422, 0, 410);
+			m_screen->set_raw(15_MHz_XTAL / 10 , 930, 0, 799, 422, 0, 410);
 			m_screen->set_visible_area(0,799,0,410);
 		}
 		m_crtc->set_hpixels_per_column(width);
@@ -720,7 +720,7 @@ void victor9k_state::victor9k(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(15_MHz_XTAL / 5 , 930, 0, 799, 422, 0, 410);
+	m_screen->set_raw(15_MHz_XTAL / 10 , 930, 0, 799, 422, 0, 410);
 	m_screen->set_screen_update(HD46505S_TAG, FUNC(hd6845s_device::screen_update));
 
 	LOGDISPLAY("mc6845 initial resolution: low\n");
