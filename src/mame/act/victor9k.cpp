@@ -701,7 +701,6 @@ void victor9k_state::machine_reset()
 void victor9k_state::victor9k(machine_config &config)
 {
 	// basic machine hardware
-	LOGDISPLAY("start of configure\n");
 	I8088(config, m_maincpu, 15_MHz_XTAL / 3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &victor9k_state::victor9k_mem);
 	m_maincpu->set_irq_acknowledge_callback(I8259A_TAG, FUNC(pic8259_device::inta_cb));
