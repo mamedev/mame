@@ -683,7 +683,6 @@ void victor9k_state::machine_reset()
 	m_via1->reset();
 	m_via2->reset();
 	m_via3->reset();
-	m_screen->reset();
 	m_crtc->reset();
 	m_fdc->reset();
 }
