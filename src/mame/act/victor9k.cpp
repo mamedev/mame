@@ -665,7 +665,7 @@ void victor9k_state::machine_start()
 	u8 *m_ram_ptr = m_ram->pointer();
 
     int ramsize = m_ram_size;
-	if (ramsize > 0) 
+	if (ramsize > 0)
 	{
 		address_space& space = m_maincpu->space(AS_PROGRAM);
 		if (ramsize > 0xdffff)   //the 896KB option overlaps 1 bit with
@@ -706,7 +706,7 @@ void victor9k_state::victor9k(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(15_MHz_XTAL, 930, 0, 799, 422, 0, 410);
+	m_screen->set_raw(15_MHz_XTAL, 930, 0, 799, 422, 0, 399);
 	m_screen->set_screen_update(HD46505S_TAG, FUNC(hd6845s_device::screen_update));
 
 	PALETTE(config, m_palette, FUNC(victor9k_state::victor9k_palette), 16);
