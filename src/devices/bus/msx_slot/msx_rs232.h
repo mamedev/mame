@@ -6,6 +6,7 @@
 #include "rom.h"
 #include "bus/rs232/rs232.h"
 #include "machine/i8251.h"
+#include "machine/nvram.h"
 #include "machine/pit8253.h"
 
 class msx_slot_rs232_base_device : public msx_slot_rom_device
@@ -128,11 +129,42 @@ protected:
 };
 
 
+class msx_slot_rs232_toshiba_hx3x_device : public msx_slot_rs232_base_device
+{
+public:
+	msx_slot_rs232_toshiba_hx3x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	static constexpr size_t SRAM_SIZE = 0x800;
+
+	virtual void device_start() override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_post_load() override;
+
+	virtual uint8_t status_r(offs_t offset) override;
+	virtual void update_irq_state() override;
+
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
+
+	void set_bank();
+
+	required_ioport m_switch_port;
+	required_ioport m_copy_port;
+	required_device<nvram_device> m_nvram;
+	std::vector<uint8_t> m_sram;
+	uint8_t m_bank_reg;
+	const uint8_t* m_bank_base_8000;
+};
+
+
 DECLARE_DEVICE_TYPE(MSX_SLOT_RS232, msx_slot_rs232_device)
 DECLARE_DEVICE_TYPE(MSX_SLOT_RS232_MITSUBISHI, msx_slot_rs232_mitsubishi_device)
 DECLARE_DEVICE_TYPE(MSX_SLOT_RS232_SONY, msx_slot_rs232_sony_device)
 DECLARE_DEVICE_TYPE(MSX_SLOT_RS232_SVI738, msx_slot_rs232_svi738_device)
 DECLARE_DEVICE_TYPE(MSX_SLOT_RS232_TOSHIBA, msx_slot_rs232_toshiba_device)
+DECLARE_DEVICE_TYPE(MSX_SLOT_RS232_TOSHIBA_HX3X, msx_slot_rs232_toshiba_hx3x_device)
 
 
 #endif // MAME_BUS_MSX_SLOT_MSX_RS232_H

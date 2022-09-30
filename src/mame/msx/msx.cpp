@@ -8,7 +8,7 @@
 **  disable the MSX Tutor on next boot and SET SYSTEM 0 should enable.
 **
 ** hx21, hx22:
-**  To start the firmware, mount a HX-M200 cartridge then type: CALL JWP.
+**  To start the firmware, mount a HX-M200 cartridge and type: CALL JWP.
 **
 ** tpp311:
 **  This machine is supposed to boot into logo; it was made to only run logo.
@@ -25,7 +25,6 @@
 **
 **
 ** Todo/known issues:
-** - Verify input port definitions
 ** - multiple: - Add support for kana lock?
 ** -           - Expansion slots not emulated
 ** - kanji: The direct rom dump from FS-A1FX shows that the kanji font roms are accessed slightly differently. Most
@@ -82,7 +81,6 @@
 ** - mbh3: touch pad not (fully) emulated?
 ** - mbh70: Verify firmware operation
 ** - kmc5000: Floppy support broken
-** - perfect1: Firmware broken
 ** - mpc2500f: Fix keyboard layout?
 ** - nms8260: HDD not emulated
 ** - mpc27: Light pen not emulated
@@ -7707,7 +7705,7 @@ void msx2_state::kmc5000(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x10000);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 1, 0, 1, "subrom");
 	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 1, 1, 2, "kdr");
-	add_internal_slot(config, MSX_SLOT_DISK3, "disk", 3, 2, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_slot_mirrored(config, MSX_SLOT_DISK3, "disk", 3, 2, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 
 	MSX_S1985(config, "s1985", 0);
 
@@ -8389,7 +8387,7 @@ void msx2_state::fsa1f(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x10000).set_ramio_bits(0x80);   // 64KB Mapper RAM
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 1, 0, 1, "mainrom", 0x8000);
 	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 1, 1, 2, "mainrom", 0x10000);
-	add_internal_slot(config, MSX_SLOT_DISK3, "disk", 3, 2, 1, 1, "mainrom", 0xc000).set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_slot_mirrored(config, MSX_SLOT_DISK3, "disk", 3, 2, 1, 2, "mainrom", 0xc000).set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_ROM, "cockpit", 3, 3, 1, 2, "mainrom", 0x18000);
 
 	MSX_S1985(config, "s1985", 0);
@@ -8440,7 +8438,7 @@ void msx2_state::fsa1fm(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 1, 0, 1, "subrom");
 	/* Modem Mapper of FS-CM1/A1FM must be emulated */
 	add_internal_slot(config, MSX_SLOT_FSA1FM, "modem", 3, 1, 1, 1, "firmware");
-	add_internal_slot(config, MSX_SLOT_DISK3, "disk", 3, 2, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_slot_mirrored(config, MSX_SLOT_DISK3, "disk", 3, 2, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	/* Panasonic FS-A1FM Mapper must be emulated */
 	add_internal_slot(config, MSX_SLOT_FSA1FM2, "firmware", 3, 3, 0, 3, "firmware");
 
@@ -9138,7 +9136,7 @@ void msx2_state::ax350ii(machine_config &config)
 	// YM2149 (in S1985)
 	// FDC: wd2793/tc8566af?, 1 3.5" DSDD drive (mb8877a in pcb picture)
 	// 2 Cartridge slots
-	// S1985 
+	// S1985
 
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 0, 1, 0, 1, "subrom");
@@ -9147,7 +9145,8 @@ void msx2_state::ax350ii(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "painter", 0, 3, 0, 4, "painter");
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	// mirroring not confirmed
+	add_internal_slot_mirrored(config, MSX_SLOT_DISK8, "disk", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000).set_ramio_bits(0xf8);   // 128KB Mapper RAM
 
 	MSX_S1985(config, "s1985", 0);
@@ -9193,7 +9192,8 @@ void msx2_state::ax350iif(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "painter", 0, 3, 0, 4, "painter");
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK2, "disk", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	// mirroring not confirmed
+	add_internal_slot_mirrored(config, MSX_SLOT_DISK8, "disk", 3, 1, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000).set_ramio_bits(0xf8);   // 128KB Mapper RAM
 
 	MSX_S1985(config, "s1985", 0);
@@ -9243,7 +9243,7 @@ void msx2_state::ax370(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "subrom");
-	add_internal_slot(config, MSX_SLOT_DISK3, "disk", 3, 0, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_slot_mirrored(config, MSX_SLOT_DISK3, "disk", 3, 0, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_ROM, "painter", 3, 1, 0, 4, "painter");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 3, 0, 4).set_total_size(0x20000).set_ramio_bits(0xf8);   // 128KB Mapper RAM
 
@@ -9291,7 +9291,7 @@ void msx2_state::ax500(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "subrom");
-	add_internal_slot(config, MSX_SLOT_DISK2, "disk", 3, 0, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_slot_mirrored(config, MSX_SLOT_DISK8, "disk", 3, 0, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_ROM, "painter", 3, 1, 0, 4, "painter");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x40000).set_ramio_bits(0xf8);   // 256KB Mapper RAM
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, nullptr);
@@ -9574,7 +9574,7 @@ ROM_START(phc77)
 	ROM_LOAD("phc77ext.rom", 0x0000, 0x4000, CRC(43e7a7fc) SHA1(0fbd45ef3dd7bb82d4c31f1947884f411f1ca344))
 
 	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("phc77disk.rom", 0x0000, 0x4000, CRC(7c79759a) SHA1(a427b0c9a344c87b587568ecca7fee0abbe72189))
+	ROM_LOAD("phc77disk.rom", 0x0000, 0x4000, BAD_DUMP CRC(7c79759a) SHA1(a427b0c9a344c87b587568ecca7fee0abbe72189)) // Floppy registers visible in dump
 
 	ROM_REGION(0x80000, "msxwrite", 0)
 	ROM_LOAD("phc77msxwrite.rom", 0x00000, 0x80000, CRC(ef02e4f3) SHA1(4180544158a57c99162269e33e4f2c77c9fce84e))
@@ -9597,7 +9597,7 @@ void msx2_state::phc77(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_MSX_WRITE, "msxwrite", 2, 0, 1, 2, "msxwrite");
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "subrom");
-	add_internal_slot(config, MSX_SLOT_DISK1, "disk", 3, 0, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_slot(config, MSX_SLOT_DISK9, "disk", 3, 0, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 2, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 3, 0, 4);   // 64KB RAM
 
@@ -10568,8 +10568,7 @@ void msx2_state::hx33(machine_config &config)
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x10000); // 64KB Mapper RAM
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 1, 0, 1, "mainrom", 0x8000);
-	// TODO Add support for mapper + control register at 7fff
-	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 3, 2, 1, 2, "mainrom", 0xc000);
+	add_internal_slot(config, MSX_SLOT_RS232_TOSHIBA_HX3X, "firmware", 3, 3, 1, 2, "mainrom", 0xc000);
 
 	msx2(YM2149, config);
 	msx2_64kb_vram(config);
@@ -10604,8 +10603,7 @@ void msx2_state::hx34(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x10000); // 64KB Mapper RAM
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 1, 0, 1, "mainrom", 0x8000);
 	add_internal_slot(config, MSX_SLOT_DISK6, "disk", 3, 2, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
-	// TODO Add support for mapper + control register at 7fff
-	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 3, 2, 1, 2, "mainrom", 0xc000);
+	add_internal_slot(config, MSX_SLOT_RS232_TOSHIBA_HX3X, "firmware", 3, 3, 1, 2, "mainrom", 0xc000);
 
 	msx_wd2793(config);
 	msx_1_35_dd_drive(config);
@@ -10675,7 +10673,7 @@ void msx2_state::victhc90(machine_config &config)
 	add_internal_slot_irq<2>(config, MSX_SLOT_RS232, "firmware", 0, 1, 1, 1, "firmware");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 0, 2, 0, 4).set_total_size(0x10000); // 64KB Mapper RAM
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot", 1, 0, msx_cart, nullptr);
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 0, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_slot(config, MSX_SLOT_DISK10, "disk", 3, 0, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 
 	msx_mb8877a(config);
 	msx_1_35_dd_drive(config);
@@ -10724,7 +10722,7 @@ void msx2_state::victhc95(machine_config &config)
 	// 96 pin expansion bus in slot #0-3
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot", 1, 0, msx_cart, nullptr);
 	// 96 pin expansion bus in slot #2
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 0, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_slot(config, MSX_SLOT_DISK10, "disk", 3, 0, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 
 	msx_mb8877a(config);
 	msx_2_35_dd_drive(config);
@@ -10765,7 +10763,7 @@ void msx2_state::victhc95a(machine_config &config)
 	// 96 pin expansion bus in slot #0-3
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot", 1, 0, msx_cart, nullptr);
 	// 96 pin expansion bus in slot #2
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 0, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_slot(config, MSX_SLOT_DISK10, "disk", 3, 0, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 
 	msx_mb8877a(config);
 	msx_2_35_dd_drive(config);
@@ -10947,7 +10945,7 @@ void msx2_state::y805128(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 0, 1, 0, 1, "subrom");
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
-	add_internal_slot_mirrored(config, MSX_SLOT_DISK1, "disk", 3, 0, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_slot(config, MSX_SLOT_DISK11, "disk", 3, 0, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000); // 128KB Mapper RAM
 	// Default: SKW-05
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, 3, msx_yamaha_60pin, nullptr);
@@ -11215,7 +11213,7 @@ void msx2_state::expertdx(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 1, 1, 0, 1, "subrom");
 	add_internal_slot(config, MSX_SLOT_ROM, "xbasic", 1, 2, 1, 1, "xbasic");
-	add_internal_slot(config, MSX_SLOT_DISK3, "disk", 1, 3, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_slot_mirrored(config, MSX_SLOT_DISK3, "disk", 1, 3, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 2, 0, 0, 4).set_total_size(0x10000);   // 64KB Mapper RAM??
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
 	/* Kanji? */
@@ -11253,7 +11251,7 @@ void msx2_state::fsa1fx(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x10000).set_ramio_bits(0x80);   // 64KB Mapper RAM
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 1, 0, 1, "maincpu", 0x38000);
 	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 1, 1, 2, "maincpu", 0x28000);
-	add_internal_slot(config, MSX_SLOT_DISK3, "disk", 3, 2, 1, 1, "maincpu", 0x3c000).set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_slot_mirrored(config, MSX_SLOT_DISK3, "disk", 3, 2, 1, 2, "maincpu", 0x3c000).set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 3, 3, 1, 2, "maincpu", 0x20000);
 
 	msx_matsushita_device &matsushita(MSX_MATSUSHITA(config, "matsushita", 0));
@@ -11310,7 +11308,7 @@ void msx2_state::fsa1wsx(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x10000).set_ramio_bits(0x80);   // 64KB Mapper RAM
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 1, 0, 1, "subrom");
 	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 1, 1, 2, "kdr");
-	add_internal_slot(config, MSX_SLOT_DISK3, "disk", 3, 2, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_slot_mirrored(config, MSX_SLOT_DISK3, "disk", 3, 2, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_PANASONIC08, "firmware", 3, 3, 0, 4, "firmware");
 
 	msx_matsushita_device &matsushita(MSX_MATSUSHITA(config, "matsushita", 0));
@@ -11368,7 +11366,7 @@ void msx2_state::fsa1wx(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x10000).set_ramio_bits(0x80);   // 64KB Mapper RAM
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 1, 0, 1, "subrom");
 	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 1, 1, 2, "kdr");
-	add_internal_slot(config, MSX_SLOT_DISK3, "disk", 3, 2, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_slot_mirrored(config, MSX_SLOT_DISK3, "disk", 3, 2, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_PANASONIC08, "firmware", 3, 3, 0, 4, "firmware");
 
 	msx_matsushita_device &matsushita(MSX_MATSUSHITA(config, "matsushita", 0));
@@ -11476,7 +11474,7 @@ void msx2_state::phc70fd(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x10000).set_ramio_bits(0x80);   // 64KB Mapper RAM
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 1, 0, 1, "mainrom", 0x18000);
 	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 1, 1, 2, "mainrom", 0x8000);
-	add_internal_slot(config, MSX_SLOT_DISK3, "disk", 3, 2, 1, 1, "mainrom", 0x1c000).set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_slot_mirrored(config, MSX_SLOT_DISK3, "disk", 3, 2, 1, 2, "mainrom", 0x1c000).set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_MUSIC, "msxmusic", 3, 3, 1, 1, "mainrom", 0x00000).set_ym2413_tag("ym2413");
 	add_internal_slot(config, MSX_SLOT_ROM, "basickun", 3, 3, 2, 1, "mainrom", 0x04000);
 
@@ -11528,7 +11526,7 @@ void msx2_state::phc70fd2(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x10000).set_ramio_bits(0x80);   // 64KB Mapper RAM
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 1, 0, 1, "subrom");
 	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 1, 1, 2, "kdr");
-	add_internal_slot(config, MSX_SLOT_DISK3, "disk", 3, 2, 1, 1, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
+	add_internal_slot_mirrored(config, MSX_SLOT_DISK3, "disk", 3, 2, 1, 2, "diskrom").set_tags("fdc", "fdc:0", "fdc:1");
 	add_internal_slot(config, MSX_SLOT_MUSIC, "msxmusic", 3, 3, 1, 1, "msxmusic").set_ym2413_tag("ym2413");
 	add_internal_slot(config, MSX_SLOT_ROM, "basickun", 3, 3, 2, 1, "basickun");
 
@@ -11591,11 +11589,6 @@ void msx2_state::hbf1xdj(machine_config &config)
 ROM_START(hbf1xv)
 	ROM_REGION(0x20000, "mainrom", 0)
 	ROM_LOAD("hb-f1xdj_main.rom", 0x0000, 0x20000, CRC(d89bab74) SHA1(f2a1d326d72d4c70ea214d7883838de8847a82b7))
-	ROM_LOAD("f1xvbios.rom",  0x0000,   0x8000, CRC(2c7ed27b) SHA1(174c9254f09d99361ff7607630248ff9d7d8d4d6))
-	ROM_LOAD("f1xvext.rom",   0x8000,   0x4000, CRC(b8ba44d3) SHA1(fe0254cbfc11405b79e7c86c7769bd6322b04995))
-	ROM_LOAD("f1xvdisk.rom",  0xc000,   0x4000, CRC(04e4e533) SHA1(5a4e7dbbfb759109c7d2a3b38bda9c60bf6ffef5))
-	ROM_LOAD("f1xvkdr.rom",  0x10000,   0x8000, CRC(b4fc574d) SHA1(dcc3a67732aa01c4f2ee8d1ad886444a4dbafe06))
-	ROM_LOAD("f1xvmus.rom",  0x18000,   0x4000, CRC(5c32eb29) SHA1(aad42ba4289b33d8eed225d42cea930b7fc5c228))
 
 	ROM_REGION(0x100000, "firmware", 0)
 	ROM_LOAD("f1xvfirm.rom", 0x0, 0x100000, CRC(77be583f) SHA1(ade0c5ba5574f8114d7079050317099b4519e88f))
@@ -11884,7 +11877,7 @@ COMP(1985, mx64,       0,        0,     mx64,       msxfr,    msx_state, empty_i
 
 /* MSX2 */
 COMP(1985, canonv25,   0,        0,     canonv25,   msxjp,    msx2_state, empty_init, "Canon", "V-25 (Japan) (MSX2)", 0)
-COMP(1985, canonv30f,  0,        0,     canonv30f,  msx2,     msx2_state, empty_init, "Canon", "V-30F (Japan) (MSX2)", MACHINE_NOT_WORKING) // Problems with floppy interface
+COMP(1985, canonv30f,  0,        0,     canonv30f,  msx2,     msx2_state, empty_init, "Canon", "V-30F (Japan) (MSX2)", 0)
 COMP(1986, cpc300,     0,        0,     cpc300,     msx2kr,   msx2_state, empty_init, "Daewoo", "IQ-2000 CPC-300 (Korea) (MSX2)", 0)
 COMP(1987, cpc300e,    0,        0,     cpc300e,    msx2kr,   msx2_state, empty_init, "Daewoo", "IQ-2000 CPC-300E (Korea) (MSX2)", 0)
 COMP(1988, cpc330k,    0,        0,     cpc330k,    msx2kr,   msx2_state, empty_init, "Daewoo", "CPC-330K KOBO (Korea) (MSX2)", 0)
@@ -11917,25 +11910,25 @@ COMP(1987, nms8220,    0,        0,     nms8220,    msx,      msx2_state, empty_
 COMP(1987, nms8245,    0,        0,     nms8245,    msx,      msx2_state, empty_init, "Philips", "NMS 8245 (Europe) (MSX2)", 0)
 COMP(1987, nms8245f,   nms8245,  0,     nms8245f,   msxfr,    msx2_state, empty_init, "Philips", "NMS 8245F (France) (MSX2)", 0)
 COMP(1987, nms8250,    nms8255,  0,     nms8250,    msx2,     msx2_state, empty_init, "Philips", "NMS 8250 (Europe) (MSX2)", 0)
-COMP(1987, nms8250_16, nms8255,  0,     nms8250,    msx2sp,   msx2_state, empty_init, "Philips", "NMS 8250/16 (Spain) (MSX2)", 0) // Spanish keyboard
-COMP(1987, nms8250_19, nms8255,  0,     nms8250,    msx2fr,   msx2_state, empty_init, "Philips", "NMS 8250/19 (France) (MSX2)", 0) // French keyboard
+COMP(1987, nms8250_16, nms8255,  0,     nms8250,    msx2sp,   msx2_state, empty_init, "Philips", "NMS 8250/16 (Spain) (MSX2)", 0)
+COMP(1987, nms8250_19, nms8255,  0,     nms8250,    msx2fr,   msx2_state, empty_init, "Philips", "NMS 8250/19 (France) (MSX2)", 0)
 COMP(1987, nms8255,    0,        0,     nms8255,    msx2,     msx2_state, empty_init, "Philips", "NMS 8255 (Europe) (MSX2)", 0)
-COMP(1987, nms8255f,   nms8255,  0,     nms8255f,   msx2fr,   msx2_state, empty_init, "Philips", "NMS 8255F (France) (MSX2)", 0) // French keyboard
+COMP(1987, nms8255f,   nms8255,  0,     nms8255f,   msx2fr,   msx2_state, empty_init, "Philips", "NMS 8255F (France) (MSX2)", 0)
 COMP(1987, nms8260,    0,        0,     nms8260,    msx2,     msx2_state, empty_init, "Philips", "NMS 8260 (Prototype) (MSX2)", MACHINE_NOT_WORKING)
 COMP(1987, nms8280,    0,        0,     nms8280,    msx2,     msx2_state, empty_init, "Philips", "NMS 8280 (Europe) (MSX2)", 0)
-COMP(1986, nms8280f,   nms8280,  0,     nms8280f,   msx2fr,   msx2_state, empty_init, "Philips", "NMS 8280F (France) (MSX2)", 0) // French keyboard
+COMP(1986, nms8280f,   nms8280,  0,     nms8280f,   msx2fr,   msx2_state, empty_init, "Philips", "NMS 8280F (France) (MSX2)", 0)
 COMP(1986, nms8280g,   nms8280,  0,     nms8280g,   msx2de,   msx2_state, empty_init, "Philips", "NMS 8280G (Germany) (MSX2)", 0)
 COMP(1986, vg8230,     0,        0,     vg8230,     msx,      msx2_state, empty_init, "Philips", "VG-8230 (Netherlands) (MSX2)", 0)
 COMP(1986, vg8235,     0,        0,     vg8235,     msx,      msx2_state, empty_init, "Philips", "VG-8235 (Europe) (MSX2)", 0)
 COMP(1986, vg8235f,    vg8235,   0,     vg8235f,    msxfr,    msx2_state, empty_init, "Philips", "VG-8235F (France) (MSX2)", 0)
 COMP(1986, vg8240,     0,        0,     vg8240,     msx,      msx2_state, empty_init, "Philips", "VG-8240 (Prototype) (MSX2)", 0)
-COMP(1987, ucv102,     0,        0,     ucv102,     msx2jp,   msx2_state, empty_init, "Pioneer", "UC-V102 (Japan) (MSX2)", MACHINE_NOT_WORKING) // floppy problems
+COMP(1987, ucv102,     0,        0,     ucv102,     msx2jp,   msx2_state, empty_init, "Pioneer", "UC-V102 (Japan) (MSX2)", 0)
 COMP(1987, ax350,      ax350ii,  0,     ax350,      msx,      msx2_state, empty_init, "Sakhr", "AX-350 (Arabic) (MSX2)", 0)
-COMP(1987, ax350ii,    0,        0,     ax350ii,    msx,      msx2_state, empty_init, "Sakhr", "AX-350 II (Arabic) (MSX2)", MACHINE_NOT_WORKING) // floppy problems
-COMP(1987, ax350iif,   ax350ii,  0,     ax350iif,   msxfr,    msx2_state, empty_init, "Sakhr", "AX-350 II F (Arabic) (MSX2)", MACHINE_NOT_WORKING) // floppy problems, arabic rom not repsonding to input
-COMP(1988, ax370,      0,        0,     ax370,      msx2,     msx2_state, empty_init, "Sakhr", "AX-370 (Arabic) (MSX2)", MACHINE_NOT_WORKING) // floppy problems
-COMP(1987, ax500,      0,        0,     ax500,      msx2,     msx2_state, empty_init, "Sakhr", "AX-500 (Arabic) (MSX2)", MACHINE_NOT_WORKING) // floppy problems
-COMP(1987, mpc2300,    0,        0,     mpc2300,    msxru,    msx2_state, empty_init, "Sanyo", "MPC-2300 (USSR) (MSX2)", MACHINE_NOT_WORKING) // Keyboard responds differently
+COMP(1987, ax350ii,    0,        0,     ax350ii,    msx,      msx2_state, empty_init, "Sakhr", "AX-350 II (Arabic) (MSX2)", 0)
+COMP(1987, ax350iif,   ax350ii,  0,     ax350iif,   msxfr,    msx2_state, empty_init, "Sakhr", "AX-350 II F (Arabic) (MSX2)", MACHINE_NOT_WORKING) // arabic rom not repsonding to input
+COMP(1988, ax370,      0,        0,     ax370,      msx2,     msx2_state, empty_init, "Sakhr", "AX-370 (Arabic) (MSX2)", 0)
+COMP(1987, ax500,      0,        0,     ax500,      msx2,     msx2_state, empty_init, "Sakhr", "AX-500 (Arabic) (MSX2)", 0)
+COMP(1987, mpc2300,    0,        0,     mpc2300,    msxru,    msx2_state, empty_init, "Sanyo", "MPC-2300 (USSR) (MSX2)", 0)
 COMP(1987, mpc2500f,   0,        0,     mpc2500f,   msx2ru,   msx2_state, empty_init, "Sanyo", "MPC-2500FD (USSR) (MSX2)", 0)
 COMP(1985, mpc25fd,    0,        0,     mpc25fd,    msx2jp,   msx2_state, empty_init, "Sanyo", "MPC-25FD (Japan) (MSX2)", 0)
 COMP(1985, mpc25fs,    0,        0,     mpc25fs,    msx2jp,   msx2_state, empty_init, "Sanyo", "MPC-25FS (Japan) (MSX2)", 0)
@@ -11945,7 +11938,7 @@ COMP(1986, phc23,      0,        0,     phc23,      msx2jp,   msx2_state, empty_
 COMP(1987, phc23jb,    0,        0,     phc23jb,    msx2jp,   msx2_state, empty_init, "Sanyo", "PHC-23JB / Wavy23 (Japan) (MSX2)", 0)
 COMP(1988, phc55fd2,   0,        0,     phc55fd2,   msx2jp,   msx2_state, empty_init, "Sanyo", "PHC-55FD2 / Wavy55FD2 (Japan) (MSX2)", 0)
 COMP(1987, phc77,      0,        0,     phc77,      msx2jp,   msx2_state, empty_init, "Sanyo", "PHC-77 / Wavy77 (Japan) (MSX2)", 0)
-COMP(1986, hotbit20,   0,        0,     hotbit20,   msx2,     msx2_state, empty_init, "Sharp / Epcom", "HB-8000 Hotbit 2.0 (MSX2)", 0) // Black screen
+COMP(1986, hotbit20,   0,        0,     hotbit20,   msx2,     msx2_state, empty_init, "Sharp / Epcom", "HB-8000 Hotbit 2.0 (MSX2)", 0)
 COMP(1986, hbf1,       hbf1xd,   0,     hbf1,       msxjp,    msx2_state, empty_init, "Sony", "HB-F1 (Japan) (MSX2)", 0)
 COMP(1987, hbf1ii,     hbf1xd,   0,     hbf1ii,     msxjp,    msx2_state, empty_init, "Sony", "HB-F1II (Japan) (MSX2)", 0)
 COMP(1987, hbf1xd,     0,        0,     hbf1xd,     msx2jp,   msx2_state, empty_init, "Sony", "HB-F1XD (Japan) (MSX2)", 0)
@@ -11955,7 +11948,7 @@ COMP(19??, hbf9pr,     hbf9p,    0,     hbf9pr,     msx2ru,   msx2_state, empty_
 COMP(1986, hbf9s,      hbf9p,    0,     hbf9s,      msx2sp,   msx2_state, empty_init, "Sony", "HB-F9S (Spain) (MSX2)", 0)
 COMP(1986, hbf500,     hbf500p,  0,     hbf500,     msx2jp,   msx2_state, empty_init, "Sony", "HB-F500 (Japan) (MSX2)", 0)
 COMP(1986, hbf500_2,   hbf500p,  0,     hbf500_2,   msx2jp,   msx2_state, empty_init, "Sony", "HB-F500 2nd version (Japan) (MSX2)", 0)
-COMP(1986, hbf500f,    hbf500p,  0,     hbf500f,    msx2fr,   msx2_state, empty_init, "Sony", "HB-F500F (France) (MSX2)", 0) // French keyboard?
+COMP(1986, hbf500f,    hbf500p,  0,     hbf500f,    msx2fr,   msx2_state, empty_init, "Sony", "HB-F500F (France) (MSX2)", 0)
 COMP(1986, hbf500p,    0,        0,     hbf500p,    msx2,     msx2_state, empty_init, "Sony", "HB-F500P (Europe) (MSX2)", 0)
 COMP(1986, hbf700d,    hbf700p,  0,     hbf700d,    msx2de,   msx2_state, empty_init, "Sony", "HB-F700D (Germany) (MSX2)", 0)
 COMP(1986, hbf700f,    hbf700p,  0,     hbf700f,    msx2fr,   msx2_state, empty_init, "Sony", "HB-F700F (France) (MSX2)", 0)
@@ -11968,15 +11961,15 @@ COMP(1986, hbg900p,    0,        0,     hbg900p,    msx2uk,   msx2_state, empty_
 COMP(1987, tpc310,     0,        0,     tpc310,     msxsp,    msx2_state, empty_init, "Talent", "TPC-310 (Argentina) (MSX2)", 0)
 COMP(1987, tpp311,     0,        0,     tpp311,     msxsp,    msx2_state, empty_init, "Talent", "TPP-311 (Argentina) (MSX2)", 0)
 COMP(1987, tps312,     0,        0,     tps312,     msxsp,    msx2_state, empty_init, "Talent", "TPS-312 (Argentina) (MSX2)", 0)
-COMP(1985, hx23,       hx23f,    0,     hx23,       msxjp,    msx2_state, empty_init, "Toshiba", "HX-23 (Japan) (MSX2)", MACHINE_NOT_WORKING) // rs232 not supported
-COMP(1985, hx23f,      0,        0,     hx23f,      msxjp,    msx2_state, empty_init, "Toshiba", "HX-23F (Japan) (MSX2)", MACHINE_NOT_WORKING) // rs232 not supported
-COMP(1985, hx33,       hx34,     0,     hx33,       msxjp,    msx2_state, empty_init, "Toshiba", "HX-33 (Japan) (MSX2)", MACHINE_NOT_WORKING) // cannot start firmware
-COMP(1985, hx34,       0,        0,     hx34,       msx2jp,   msx2_state, empty_init, "Toshiba", "HX-34 (Japan) (MSX2)", MACHINE_NOT_WORKING) // cannot start firmware
+COMP(1985, hx23,       hx23f,    0,     hx23,       msxjp,    msx2_state, empty_init, "Toshiba", "HX-23 (Japan) (MSX2)", MACHINE_NOT_WORKING) // firmware goes into an infinite loop on the title screen
+COMP(1985, hx23f,      0,        0,     hx23f,      msxjp,    msx2_state, empty_init, "Toshiba", "HX-23F (Japan) (MSX2)", MACHINE_NOT_WORKING) // firmware goes into an infinite loop on the title screen
+COMP(1985, hx33,       hx34,     0,     hx33,       msxjp,    msx2_state, empty_init, "Toshiba", "HX-33 w/HX-R702 (Japan) (MSX2)", MACHINE_NOT_WORKING) // cannot start firmware
+COMP(1985, hx34,       0,        0,     hx34,       msx2jp,   msx2_state, empty_init, "Toshiba", "HX-34 w/HX-R703 (Japan) (MSX2)", MACHINE_NOT_WORKING) // cannot start firmware
 COMP(1986, fstm1,      0,        0,     fstm1,      msx,      msx2_state, empty_init, "Toshiba", "FS-TM1 (Italy) (MSX2)", 0)
 COMP(1986, victhc80,   0,        0,     victhc80,   msxjp,    msx2_state, empty_init, "Victor", "HC-80 (Japan) (MSX2)", 0)
-COMP(1986, victhc90,   victhc95, 0,     victhc90,   msx2jp,   msx2_state, empty_init, "Victor", "HC-90 (Japan) (MSX2)", MACHINE_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start, floppy problems
-COMP(1986, victhc95,   0,        0,     victhc95,   msx2jp,   msx2_state, empty_init, "Victor", "HC-95 (Japan) (MSX2)", MACHINE_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start, floppy problems
-COMP(1986, victhc95a,  victhc95, 0,     victhc95a,  msx2jp,   msx2_state, empty_init, "Victor", "HC-95A (Japan) (MSX2)", MACHINE_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start, floppy problems
+COMP(1986, victhc90,   victhc95, 0,     victhc90,   msx2jp,   msx2_state, empty_init, "Victor", "HC-90 (Japan) (MSX2)", MACHINE_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start
+COMP(1986, victhc95,   0,        0,     victhc95,   msx2jp,   msx2_state, empty_init, "Victor", "HC-95 (Japan) (MSX2)", MACHINE_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start
+COMP(1986, victhc95a,  victhc95, 0,     victhc95a,  msx2jp,   msx2_state, empty_init, "Victor", "HC-95A (Japan) (MSX2)", MACHINE_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start
 COMP(1985, cx7128,     cx7m128,  0,     cx7128,     msxjp,    msx2_state, empty_init, "Yamaha", "CX7/128 (Japan) (MSX2)", 0)
 COMP(1985, cx7m128,    0,        0,     cx7m128,    msxjp,    msx2_state, empty_init, "Yamaha", "CX7M/128 (Japan) (MSX2)", 0)
 COMP(1985, y503iiir,   0,        0,     y503iiir,   msxru,    msx2_state, empty_init, "Yamaha", "YIS-503 III R (USSR) (MSX2)", MACHINE_NOT_WORKING) // Russian keyboard, network not implemented
@@ -11993,9 +11986,9 @@ COMP(1996, expert3t,   0,        0,     expert3t,   msx2,     msx2_state, empty_
 COMP(19??, expertac,   0,        0,     expertac,   msx2,     msx2_state, empty_init, "Gradiente", "Expert AC88+ (Brazil) (MSX2+)", MACHINE_NOT_WORKING) // Some hardware not emulated
 COMP(19??, expertdx,   0,        0,     expertdx,   msx2,     msx2_state, empty_init, "Gradiente", "Expert DDX+ (Brazil) (MSX2+)", MACHINE_NOT_WORKING) // Some hardware not emulated
 COMP(1988, fsa1fx,     0,        0,     fsa1fx,     msx2jp,   msx2_state, empty_init, "Panasonic", "FS-A1FX (Japan) (MSX2+)", 0)
+COMP(1989, fsa1wsx,    0,        0,     fsa1wsx,    msx2jp,   msx2_state, empty_init, "Panasonic", "FS-A1WSX (Japan) (MSX2+)", 0)
 COMP(1988, fsa1wx,     fsa1wxa,  0,     fsa1wx,     msx2jp,   msx2_state, empty_init, "Panasonic", "FS-A1WX / 1st released version (Japan) (MSX2+)", 0)
 COMP(1988, fsa1wxa,    0,        0,     fsa1wx,     msx2jp,   msx2_state, empty_init, "Panasonic", "FS-A1WX / 2nd released version (Japan) (MSX2+)", 0)
-COMP(1989, fsa1wsx,    0,        0,     fsa1wsx,    msx2jp,   msx2_state, empty_init, "Panasonic", "FS-A1WSX (Japan) (MSX2+)", 0)
 COMP(1988, phc70fd,    phc70fd2, 0,     phc70fd,    msx2jp,   msx2_state, empty_init, "Sanyo", "PHC-70FD / Wavy70FD (Japan) (MSX2+)", 0)
 COMP(1989, phc70fd2,   0,        0,     phc70fd2,   msx2jp,   msx2_state, empty_init, "Sanyo", "PHC-70FD2 / Wavy70FD2(Japan) (MSX2+)", 0)
 COMP(1989, phc35j,     0,        0,     phc35j,     msx2jp,   msx2_state, empty_init, "Sanyo", "PHC-35J / Wavy35 (Japan) (MSX2+)", 0)

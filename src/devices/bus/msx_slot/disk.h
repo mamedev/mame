@@ -24,8 +24,16 @@ DECLARE_DEVICE_TYPE(MSX_SLOT_DISK4, msx_slot_disk4_device)
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK5, msx_slot_disk5_device)
 /* WD FDC accessed through 7ff0-7ff? (used in Toshiba HX34) */
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK6, msx_slot_disk6_device)
-/* MB FDC accessed through 7ff8-7ffc */
+/* MB FDC accessed through 7ff8-7ffc (used in Canon V-30F */
 DECLARE_DEVICE_TYPE(MSX_SLOT_DISK7, msx_slot_disk7_device)
+/* WD FDC accessed through 7f8x */
+DECLARE_DEVICE_TYPE(MSX_SLOT_DISK8, msx_slot_disk8_device)
+/* WD FDC accessed through 7ffx, slightly different from DISK1 (used in PHC-77) */
+DECLARE_DEVICE_TYPE(MSX_SLOT_DISK9, msx_slot_disk9_device)
+/* WD FDC accessed through 7ffx, slightly different from DISK1 (used in Victor HC-90 / HC-95) */
+DECLARE_DEVICE_TYPE(MSX_SLOT_DISK10, msx_slot_disk10_device)
+/* WD FDC accessed through 7ffx, slightly different from DISK1 (used in Yamaha YIS-805) */
+DECLARE_DEVICE_TYPE(MSX_SLOT_DISK11, msx_slot_disk11_device)
 
 
 class msx_slot_disk_device : public msx_slot_rom_device
@@ -220,6 +228,88 @@ private:
 
 	void set_drive_side_motor();
 	void select_drive();
+};
+
+
+class msx_slot_disk8_device : public msx_slot_wd_disk_device
+{
+public:
+	msx_slot_disk8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override;
+
+private:
+	uint8_t m_control;
+
+	void set_control(uint8_t data);
+};
+
+
+class msx_slot_disk9_device : public msx_slot_wd_disk_device
+{
+public:
+	msx_slot_disk9_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override;
+
+private:
+	uint8_t m_control;
+
+	void set_control(uint8_t data);
+};
+
+
+class msx_slot_disk10_device : public msx_slot_wd_disk_device
+{
+public:
+	msx_slot_disk10_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override;
+
+private:
+	uint8_t m_control;
+
+	void set_control(uint8_t data);
+};
+
+
+class msx_slot_disk11_device : public msx_slot_wd_disk_device
+{
+public:
+	msx_slot_disk11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override;
+
+private:
+	uint8_t m_side_control;
+	uint8_t m_control;
+
+	void set_control(uint8_t data);
+	void set_side_control(uint8_t data);
 };
 
 #endif // MAME_BUS_MSX_SLOT_DISK_H

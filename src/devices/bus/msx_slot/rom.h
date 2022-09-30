@@ -23,7 +23,6 @@ protected:
 
 	virtual void device_start() override;
 
-private:
 	required_memory_region m_rom_region;
 	uint32_t m_region_offset;
 	const uint8_t *m_rom;
