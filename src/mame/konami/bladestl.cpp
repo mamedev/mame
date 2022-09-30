@@ -402,20 +402,9 @@ static const gfx_layout charlayout =
 	32*8            // every character takes 32 consecutive bytes
 };
 
-static const gfx_layout spritelayout =
-{
-	8,8,            // 8*8 sprites
-	0x40000/32,     // 8192 sprites
-	4,              // 4 bpp
-	{ 0, 1, 2, 3 }, // the four bitplanes are packed in one nibble
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8            // every sprite takes 32 consecutive bytes
-};
-
 static GFXDECODE_START( gfx_bladestl )
-	GFXDECODE_ENTRY( "tiles",   0, charlayout,    0,  2 ) // colors 00..31
-	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 32, 16 ) // colors 32..47 but using lookup table
+	GFXDECODE_ENTRY( "tiles",   0, charlayout,            0,  2 ) // colors 00..31
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_packed_msb, 32, 16 ) // colors 32..47 but using lookup table
 GFXDECODE_END
 
 
