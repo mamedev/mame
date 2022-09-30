@@ -3,12 +3,14 @@
 /***************************************************************************
 
     Jaleco/Yuvo Arm Champs hardware
+    Nasco X100 boardset
 
     driver by Phil Bennett
 
     TODO:
 	    * Improve arm control. To start the game, wiggle left and right
           rapidly
+        * Accurate video timing
 
 ***************************************************************************/
 
@@ -19,10 +21,13 @@
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
+
+namespace {
 
 class armchamp_state : public driver_device
 {
@@ -30,9 +35,9 @@ public:
 	armchamp_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_rombank(*this, "rombank"),
 		m_nvram(*this, "nvram"),
-		m_ppi0(*this, "ppi0"),
-		m_ppi1(*this, "ppi1"),
+		m_ppi(*this, "ppi%u", 0U),
 		m_screen(*this, "screen"),
 		m_vram(*this, "vram"),
 		m_palette(*this, "palette"),
@@ -43,15 +48,16 @@ public:
 
 	void armchamp(machine_config &config);
 
-private:
-	uint32_t screen_update_armchamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
-	void main_prg(address_map &map);
-	void main_io(address_map &map);
-
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+
+private:
+	uint32_t screen_update_armchamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void main_prg(address_map &map);
+	void main_io(address_map &map);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void vram_w(offs_t offset, uint8_t data);
@@ -63,9 +69,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(msm5205_vck);
 
 	required_device<cpu_device> m_maincpu;
+	required_memory_bank m_rombank;
 	required_device<nvram_device> m_nvram;
-	required_device<i8255_device> m_ppi0;
-	required_device<i8255_device> m_ppi1;
+	required_device_array<i8255_device, 2> m_ppi;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_vram;
 	required_device<palette_device> m_palette;
@@ -74,14 +80,14 @@ private:
 	required_device<ym2149_device> m_ym;
 
 	tilemap_t *m_tilemap;
-	uint8_t m_io1;
-	uint8_t m_io2;
-	uint8_t m_io4;
-	uint8_t m_tile_latch;
-	uint8_t m_adpcm_byte;
-	uint8_t m_msm5205_vclk_toggle;
-	uint16_t m_paletteram[0x200];
-	
+	uint8_t m_io1 = 0;
+	uint8_t m_io2 = 0;
+	uint8_t m_io4 = 0;
+	uint8_t m_tile_latch = 0;
+	uint8_t m_adpcm_byte = 0;
+	uint8_t m_msm5205_vclk_toggle = 0;
+	uint16_t m_paletteram[0x100] = { };
+
 	static constexpr XTAL MASTER_CLOCK = 12_MHz_XTAL;
 };
 
@@ -96,11 +102,11 @@ private:
 void armchamp_state::machine_start()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
-	
-	membank("rombank")->configure_entries(0, 8, &ROM[0x10000], 0x8000);
 
-	m_palette->basemem().set(m_paletteram, 0x200, 16, ENDIANNESS_LITTLE, 2);
-	
+	m_rombank->configure_entries(0, 8, &ROM[0x10000], 0x8000);
+
+	m_palette->basemem().set(m_paletteram, 0x100, 16, ENDIANNESS_LITTLE, 2);
+
 	save_item(NAME(m_io1));
 	save_item(NAME(m_io2));
 	save_item(NAME(m_io4));
@@ -152,10 +158,10 @@ TILE_GET_INFO_MEMBER(armchamp_state::get_tile_info)
 	uint8_t upper = m_vram[tile_index * 2 + 1];
 	int code = ((upper & 0x7) << 8) | m_vram[tile_index * 2];
 	int color = (upper >> 4) & 0xf;
-	
+
 	if (upper & 0x8)
 		code += ((m_io1 >> 3) & 0xf) * 0x800;
-	
+
 	tileinfo.set(0, code, color, 0);
 }
 
@@ -164,16 +170,8 @@ void armchamp_state::vram_w(offs_t offset, uint8_t data)
 	if (BIT(m_io1, 2))
 	{
 		// Palette RAM access
-		if (offset >= 0 && offset <= 0x1ff)
-		{
-			// Not sure if this is used but the game writes here
-		}
-		else if (offset >= 0x600 && offset <= 0x7ff)
-		{
-			m_palette->basemem().write8(offset - 0x600, data);
-			m_palette->write8(offset - 0x600, data);
-		}
-		
+		m_palette->basemem().write8(offset & 0x1ff, data);
+		m_palette->write8(offset & 0x1ff, data);
 	}
 	else
 	{
@@ -198,14 +196,14 @@ void armchamp_state::io1_w(uint8_t data)
 	// .xxx x... - Tile ROM bank
 	// x... .... - Speech ROM banking enable
 
-	membank("rombank")->set_entry(((data & 0x80) >> 5) | (data & 3));
-	
+	m_rombank->set_entry(((data & 0x80) >> 5) | (data & 3));
+
 	if ((m_io1 ^ data) & 0x78)
 	{
 		m_screen->update_partial(m_screen->vpos());
 		m_tilemap->mark_all_dirty();
 	}
-	
+
 	m_io1 = data;
 }
 
@@ -218,7 +216,7 @@ void armchamp_state::io2_w(uint8_t data)
 	// ..x. .... - ?
 	// x... .... - MSM5205 reset
 
-	machine().bookkeeping().coin_counter_w(0, BIT(data, 4) ? 0 : 1);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 4));
 	m_msm->reset_w(BIT(data, 7) ? 0 : 1);
 	m_io2 = data;
 }
@@ -246,7 +244,7 @@ uint8_t armchamp_state::arm_r()
 
 WRITE_LINE_MEMBER(armchamp_state::msm5205_vck)
 {
-	if (m_io2 != 0xff && m_io2 & 0x80) // FIXME
+	if (m_io2 & 0x80)
 	{
 		if (m_msm5205_vclk_toggle == 0)
 		{
@@ -274,7 +272,7 @@ void armchamp_state::main_prg(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6800, 0x6fff).ram().share("nvram");
-	map(0x7000, 0x7fff).ram().w(FUNC(armchamp_state::vram_w)).share(m_vram);
+	map(0x7000, 0x7fff).writeonly().w(FUNC(armchamp_state::vram_w)).share(m_vram);
 	map(0x8000, 0xffff).bankr("rombank");
 }
 
@@ -362,8 +360,8 @@ static INPUT_PORTS_START( armchamp )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Step-1")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Lady")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("List")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME( DEF_STR( Service_Mode )) PORT_CODE(KEYCODE_F2) PORT_TOGGLE
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Mente")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Maintenance")
 
 	PORT_START("ARM")
 	PORT_BIT(0xff, 0x40, IPT_AD_STICK_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(2) PORT_CENTERDELTA(0) PORT_MINMAX(0x00, 0xff)
@@ -398,30 +396,30 @@ void armchamp_state::armchamp(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(armchamp_state::irq0_line_hold));
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
-	
-	I8255(config, m_ppi0);
-	m_ppi0->in_pa_callback().set_ioport("IN0");
-	m_ppi0->out_pb_callback().set(FUNC(armchamp_state::io1_w));
-	m_ppi0->out_pc_callback().set(FUNC(armchamp_state::io2_w));
 
-	I8255(config, m_ppi1);
-	m_ppi1->out_pa_callback().set(FUNC(armchamp_state::io4_w));
-	m_ppi1->in_pb_callback().set(FUNC(armchamp_state::arm_r));
-	m_ppi1->in_pc_callback().set_ioport("IN1");
+	I8255(config, m_ppi[0]);
+	m_ppi[0]->in_pa_callback().set_ioport("IN0");
+	m_ppi[0]->out_pb_callback().set(FUNC(armchamp_state::io1_w));
+	m_ppi[0]->out_pc_callback().set(FUNC(armchamp_state::io2_w));
+	m_ppi[0]->tri_pc_callback().set_constant(0);
+
+	I8255(config, m_ppi[1]);
+	m_ppi[1]->out_pa_callback().set(FUNC(armchamp_state::io4_w));
+	m_ppi[1]->in_pb_callback().set(FUNC(armchamp_state::arm_r));
+	m_ppi[1]->in_pc_callback().set_ioport("IN1");
 
 	/* video hardware */
-	// TODO
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 26*8-1);
-	
+
 	screen.set_screen_update(FUNC(armchamp_state::screen_update_armchamp));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_armchamp);
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x200);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x100);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -467,6 +465,8 @@ ROM_START( armchamp )
 	ROM_LOAD( "15.bin", 0xa0000, 0x10000, CRC(4bf226f1) SHA1(b9b2c2a5822705f18c820942054295f48a27a504) )
 ROM_END
 
+} // anonymous namespace
+
 
 
 /***************************************************************************
@@ -475,5 +475,5 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1988, armchamp, 0, armchamp, armchamp, armchamp_state, empty_init, ROT90, "Jaleco/Yuvo", "Arm Champs (Japan)" , MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, armchamp, 0, armchamp, armchamp, armchamp_state, empty_init, ROT90, "Jaleco / Yuvo", "Arm Champs (Japan)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 // An export version also exists
