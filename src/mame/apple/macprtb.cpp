@@ -535,7 +535,6 @@ void macportable_state::macprtb(machine_config &config)
 	m_screen->set_screen_update(FUNC(macportable_state::screen_update));
 
 	MACADB(config, m_macadb, C15M);
-	m_macadb->set_mcu_mode(true);
 	m_macadb->adb_data_callback().set(FUNC(macportable_state::set_adb_line));
 
 	SWIM1(config, m_swim, C15M);

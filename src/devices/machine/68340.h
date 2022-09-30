@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/fscpu32.h"
 
 #include "68340sim.h"
 #include "68340dma.h"

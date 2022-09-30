@@ -256,7 +256,7 @@ ToDo:
 // Includes
 #include "emu.h"
 #include "bus/centronics/ctronics.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68008.h"
 #include "machine/74259.h"
 #include "machine/6522via.h"
 #include "machine/6850acia.h"

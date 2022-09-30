@@ -39,6 +39,7 @@
 
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "machine/bankdev.h"
 #include "machine/mc146818.h"
 #include "machine/mc68681.h"
