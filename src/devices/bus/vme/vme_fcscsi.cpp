@@ -145,7 +145,7 @@
 #include "emu.h"
 #include "vme_fcscsi.h"
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68010.h"
 #include "machine/68230pit.h"
 #include "machine/wd_fdc.h"
 #include "machine/hd63450.h" // compatible with MC68450

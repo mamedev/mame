@@ -19,7 +19,7 @@
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/cards.h"
 #include "bus/nubus/nubus.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68040.h"
 #include "machine/6522via.h"
 #include "machine/applefdintf.h"
 #include "machine/dp83932c.h"

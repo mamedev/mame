@@ -22,7 +22,8 @@
 
 #include "bus/nscsi/devices.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
+#include "cpu/m68000/m68030.h"
 #include "machine/applefdintf.h"
 #include "machine/ncr5380.h"
 #include "machine/nscsi_bus.h"

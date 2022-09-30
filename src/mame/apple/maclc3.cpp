@@ -19,7 +19,7 @@
 
 #include "bus/nscsi/devices.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68030.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "machine/z80scc.h"

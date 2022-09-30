@@ -17,6 +17,7 @@ TODO:
 #include "emu.h"
 
 #include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "machine/nvram.h"
 #include "mmboard.h"
 #include "mmdisplay2.h"

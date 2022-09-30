@@ -23,7 +23,7 @@
 #include "bus/nubus/nubus.h"
 #include "bus/nubus/cards.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68030.h"
 #include "machine/applefdintf.h"
 #include "machine/ncr5380.h"
 #include "machine/nscsi_bus.h"

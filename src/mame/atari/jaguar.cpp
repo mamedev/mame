@@ -341,6 +341,7 @@ Notes:
 #include "bus/generic/carts.h"
 #include "bus/ata/idehd.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "cpu/mips/mips1.h"
 #include "cpu/jaguar/jaguar.h"
 #include "imagedev/chd_cd.h"

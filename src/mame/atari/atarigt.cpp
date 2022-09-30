@@ -56,7 +56,7 @@
 #include "emu.h"
 #include "atarigt.h"
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "machine/eeprompar.h"
 #include "speaker.h"
 

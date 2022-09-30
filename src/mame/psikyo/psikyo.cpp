@@ -82,7 +82,7 @@ This was pointed out by Bart Puype
 
 #include "cpu/z80/z80.h"
 #include "cpu/z80/lz8420m.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"

@@ -20,7 +20,8 @@
 
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/cards.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
+#include "cpu/m68000/m68030.h"
 #include "cpu/m6805/m6805.h"
 #include "machine/applepic.h"
 #include "machine/iwm.h"

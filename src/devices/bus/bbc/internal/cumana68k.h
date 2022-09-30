@@ -13,7 +13,7 @@
 #define MAME_BUS_BBC_INTERNAL_CUMANA68K_H
 
 #include "internal.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68008.h"
 #include "machine/6821pia.h"
 #include "machine/input_merger.h"
 #include "machine/mc146818.h"
