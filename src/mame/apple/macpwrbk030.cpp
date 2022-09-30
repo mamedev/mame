@@ -220,7 +220,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(via_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(via2_irq_w);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
-	WRITE_LINE_MEMBER(via_cb2_w) { m_macadb->adb_data_w(state); }
 	int m_via_interrupt = 0, m_via2_interrupt = 0, m_scc_interrupt = 0, m_asc_interrupt = 0, m_last_taken_interrupt = 0;
 	int m_ca1_data = 0, m_via2_ca1_hack = 0;
 
@@ -960,7 +959,6 @@ void macpb030_state::macpb140(machine_config &config)
 	m_via1->writepa_handler().set(FUNC(macpb030_state::mac_via_out_a));
 	m_via1->writepb_handler().set(FUNC(macpb030_state::mac_via_out_b));
 	m_via1->irq_handler().set(FUNC(macpb030_state::via_irq_w));
-	m_via1->cb2_handler().set(FUNC(macpb030_state::via_cb2_w));
 
 	R65NC22(config, m_via2, C7M/10);
 	m_via2->readpa_handler().set(FUNC(macpb030_state::mac_via2_in_a));
@@ -1075,7 +1073,6 @@ void macpb030_state::macpb160(machine_config &config)
 	m_via1->writepa_handler().set(FUNC(macpb030_state::mac_via_out_a));
 	m_via1->writepb_handler().set(FUNC(macpb030_state::mac_via_out_b));
 	m_via1->irq_handler().set(FUNC(macpb030_state::via_irq_w));
-	m_via1->cb2_handler().set(FUNC(macpb030_state::via_cb2_w));
 
 	R65NC22(config, m_via2, C7M / 10);
 	m_via2->readpa_handler().set(FUNC(macpb030_state::mac_via2_in_a));
