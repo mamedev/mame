@@ -3561,7 +3561,6 @@ by a motor. The arm probably has a 5k potentiometer connected to it to give feed
 hardware about the position of the mechanical arm.
 The opponents get progressively harder and harder, it's almost impossible to beat the final
 few opponents unless you have a few friends handy to swing on the arm ;-))
-Arm Champs II appears to be a simple ROM upgrade on Arm Champs hardware.
 The hardware appears to be similar to Jaleco's 'Grand Prix Star' etc, using many of
 the same custom IC's, and even some of the same ROMs.
 

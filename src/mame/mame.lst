@@ -2174,6 +2174,9 @@ paddle2                         // bootleg
 tetrsark                        // ??? (c) D.R.Korea
 tetrsark2                       // ??? (c) D.R.Korea
 
+@source:jaleco/armchamp.cpp
+armchamp                        // (c) 1988 Jaleco/Yuvo
+
 @source:nichibutsu/armedf.cpp
 armedf                          // (c) 1988
 armedff                         // (c) 1988 Fillmore license

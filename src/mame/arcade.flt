@@ -406,6 +406,7 @@ itech/itech8.cpp
 jaleco/acommand.cpp
 jaleco/aeroboto.cpp
 jaleco/argus.cpp
+jaleco/armchamp.cpp
 jaleco/bestleag.cpp
 jaleco/bigstrkb.cpp
 jaleco/blueprnt.cpp
