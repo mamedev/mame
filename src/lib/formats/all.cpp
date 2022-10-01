@@ -1079,7 +1079,7 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.add(FLOPPY_IMG_FORMAT); // img_dsk.h
 #endif
 #ifdef HAS_FORMATS_FS_ISIS
-		en.add(fs::ISIS);
+	en.add(fs::ISIS);
 #endif
 
 	en.category("IQ151");
