@@ -157,6 +157,12 @@ void atm_state::atm_port_f7_w(offs_t offset, u8 data)
 	atm_update_io();
 }
 
+INTERRUPT_GEN_MEMBER(atm_state::atm_interrupt)
+{
+	// 14395=64*224+59 z80(3.5Hz) clocks between INT and screen paper begins. Screen clock is 7Hz.
+	m_irq_on_timer->adjust(m_screen->time_until_pos(80 - 64, 80) - m_screen->clocks_to_attotime(118));
+}
+
 rectangle atm_state::get_screen_area()
 {
 	switch (m_rg)
@@ -164,14 +170,14 @@ rectangle atm_state::get_screen_area()
 		case 0b111:
 		case 0b110: // 80x25txt
 		case 0b010: // 640x200
-			return rectangle { 208, 208 + 639, 76, 76 + 199 };
+			return rectangle { 80, 80 + 639, 80, 80 + 199 };
 			break;
 		case 0b000: // 320x200
-			return rectangle { 104, 104 + 319, 76, 76 + 199 };
+			return rectangle { 80, 80 + 319, 80, 80 + 199 };
 			break;
 		case 0b011: // 256x192zx
 		default:
-			return rectangle { 136, 136 + 255, 80, 80 + 191 };
+			return rectangle { 80, 80 + 255, 80, 80 + 191 };
 			break;
 	}
 }
@@ -188,7 +194,7 @@ void atm_state::atm_update_video_mode()
 	u8 border_x = (40 - (32 * !zx_scale)) << double_width;
 	u8 border_y = (40 - (4 * !zx_scale));
 	rectangle scr = get_screen_area();
-	m_screen->configure(448 << double_width, 312, {scr.left() - border_x, scr.right() + border_x, scr.top() - border_y, scr.bottom() + border_y}, m_screen->frame_period().as_attoseconds());
+	m_screen->configure(448 << double_width, m_screen->height(), {scr.left() - border_x, scr.right() + border_x, scr.top() - border_y, scr.bottom() + border_y}, m_screen->frame_period().as_attoseconds());
 	LOGVIDEO("Video mode: %d\n", m_rg);
 
 	//spectrum_palette(m_palette);
@@ -346,24 +352,32 @@ void atm_state::ata_w(offs_t offset, u8 data)
 	m_ata->cs0_w(ata_offset, ata_data);
 }
 
+template <u8 Bank> void atm_state::atm_ram_w(offs_t offset, u8 data)
+{
+	if (m_rg == 0b011 && (m_bank_ram[Bank]->entry() == (BIT(m_port_7ffd_data, 3) ? 7 : 5)) && offset < 0x1b00)
+		m_screen->update_now();
+
+	((u8*)m_bank_ram[Bank]->base())[offset] = data;
+}
+
 void atm_state::atm_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).bankrw(m_bank_ram[0]);
+	map(0x0000, 0x3fff).bankr(m_bank_ram[0]).w(FUNC(atm_state::atm_ram_w<0>));
 	map(0x0000, 0x3fff).view(m_bank_view0);
 	m_bank_view0[0](0x0000, 0x3fff).bankr(m_bank_rom[0]).nopw();
 	m_bank_view0[1](0x0000, 0x3fff).nopw(); // RO RAM
 
-	map(0x4000, 0x7fff).bankrw(m_bank_ram[1]);
+	map(0x4000, 0x7fff).bankr(m_bank_ram[1]).w(FUNC(atm_state::atm_ram_w<1>));
 	map(0x4000, 0x7fff).view(m_bank_view1);
 	m_bank_view1[0](0x4000, 0x7fff).bankr(m_bank_rom[1]).nopw();
 	m_bank_view1[1](0x4000, 0x7fff).nopw();
 
-	map(0x8000, 0xbfff).bankrw(m_bank_ram[2]);
+	map(0x8000, 0xbfff).bankr(m_bank_ram[2]).w(FUNC(atm_state::atm_ram_w<2>));
 	map(0x8000, 0xbfff).view(m_bank_view2);
 	m_bank_view2[0](0x8000, 0xbfff).bankr(m_bank_rom[2]).nopw();
 	m_bank_view2[1](0x8000, 0xbfff).nopw();
 
-	map(0xc000, 0xffff).bankrw(m_bank_ram[3]);
+	map(0xc000, 0xffff).bankr(m_bank_ram[3]).w(FUNC(atm_state::atm_ram_w<3>));
 	map(0xc000, 0xffff).view(m_bank_view3);
 	m_bank_view3[0](0xc000, 0xffff).bankr(m_bank_rom[3]).nopw();
 	m_bank_view3[1](0xc000, 0xffff).nopw();
@@ -503,6 +517,7 @@ void atm_state::atm(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &atm_state::atm_mem);
 	m_maincpu->set_addrmap(AS_IO, &atm_state::atm_io);
 	m_maincpu->set_addrmap(AS_OPCODES, &atm_state::atm_switch);
+	m_maincpu->set_vblank_int("screen", FUNC(atm_state::atm_interrupt));
 	m_maincpu->nomreq_cb().set_nop();
 
 	m_screen->set_raw(X1_128_SINCLAIR / 5, 448, 312, {get_screen_area().left() - 40, get_screen_area().right() + 40, get_screen_area().top() - 40, get_screen_area().bottom() + 40});

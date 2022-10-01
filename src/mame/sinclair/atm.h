@@ -45,6 +45,7 @@ protected:
 	void atm_io(address_map &map);
 	void atm_mem(address_map &map);
 	void atm_switch(address_map &map);
+	template <u8 Bank> void atm_ram_w(offs_t offset, u8 data);
 
 	u8 beta_neutral_r(offs_t offset);
 	u8 beta_enable_r(offs_t offset);
@@ -74,6 +75,7 @@ protected:
 	virtual u16 atm_update_memory_get_page(u8 bank);
 	virtual u8 get_border_color(u16 hpos, u16 vpos) override;
 	rectangle get_screen_area() override;
+	INTERRUPT_GEN_MEMBER(atm_interrupt);
 
 	memory_view m_bank_view0;
 	memory_view m_bank_view1;

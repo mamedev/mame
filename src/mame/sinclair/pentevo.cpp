@@ -107,6 +107,7 @@ private:
 	void pentevo_update_screen_zx16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void pentevo_update_screen_tx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u16 atm_update_memory_get_page(u8 bank) override;
+	INTERRUPT_GEN_MEMBER(pentevo_interrupt);
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<ram_device> m_char_ram;
@@ -327,6 +328,12 @@ void pentevo_state::pentevo_port_1nbd_w(offs_t offset, u8 data)
 	}
 	else if (opt == 0x03)
 		m_beta_drive_virtual = data & 0x0f;
+}
+
+INTERRUPT_GEN_MEMBER(pentevo_state::pentevo_interrupt)
+{
+	// 17989=80*224+69 z80(3.5Hz) clocks between INT and screen paper begins. Screen clock is 7Hz.
+	m_irq_on_timer->adjust(m_screen->time_until_pos(80 - 80, 80) - m_screen->clocks_to_attotime(128));
 }
 
 void pentevo_state::spectrum_update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -720,7 +727,10 @@ void pentevo_state::pentevo(machine_config &config)
 {
 	atmtb2(config);
 	m_maincpu->set_addrmap(AS_IO, &pentevo_state::pentevo_io);
+	m_maincpu->set_vblank_int("screen", FUNC(pentevo_state::pentevo_interrupt));
 	TIMER(config, "nmi_timer").configure_periodic(FUNC(pentevo_state::nmi_check_callback), attotime::from_hz(50));
+
+	m_screen->set_raw(X1_128_SINCLAIR / 5, 448, 320, {get_screen_area().left() - 40, get_screen_area().right() + 40, get_screen_area().top() - 40, get_screen_area().bottom() + 40});
 
 	m_ram->set_default_size("4M");
 	RAM(config, m_char_ram).set_default_size("2048").set_default_value(0);
