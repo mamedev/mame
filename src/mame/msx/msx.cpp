@@ -3,6 +3,10 @@
 /*
 ** msx.cpp : driver for MSX
 **
+** ax350iif:
+**  The machine has a French keyboard so to select firmware options you
+**  need to enter numbers as shift + number key.
+**
 ** cpc300:
 **  To get out of the MSX Tutor press the SELECT key. Entering SET SYSTEM 1 should
 **  disable the MSX Tutor on next boot and SET SYSTEM 0 should enable.
@@ -39,9 +43,9 @@
 **   - ucv102 (cannot test, floppy problems)
 **   - hbg900ap (not working)
 **   - hbg900p (not working)
-**   - victhc90 (cannot test, floppy problems)
-**   - victhc95 (cannot test, floppy problems)
-**   - victhc95a (cannot test, floppy problems)
+**   - victhc90 (cannot test, system config not emulated)
+**   - victhc95 (cannot test, system config not emulated)
+**   - victhc95a (cannot test, system config not emulated)
 **   - y805256 (cannot test, rs232 rom has not been dumped)
 **   - optional for hx20, hx21, hx23, hx23f, hx32, hx33, hx34
 ** - bruc100: Not all keypad keys hooked up yet
@@ -63,9 +67,6 @@
 ** - fsa1fm: kanji12 not emulated
 ** - fsa1fm: Modem not emulated
 ** - nms8280, nms8280g: Digitizer functionality not emulated
-** - vg8230j: Floppy support broken?
-** - tpc310: Floppy support broken
-**           7fbb <- c7  => seek 199???
 ** - hx23f: The builtin word processor displays white squares instead of text
 ** - expert3i: IDE not emulated
 ** - expert3t: Turbo not emulated
@@ -76,7 +77,6 @@
 ** - pv7: Add support for KB-7 (8KB ram + 2 cartslots)
 ** - cpc50a/cpc50b: Remove keyboard; and add an external keyboard??
 ** - cpc51/cpc61: Remove keyboard and add a keyboard connector
-** - cpc50a/cpc50b/cpc51: Boot to a black screen, is this correct?
 ** - mbh2: speed controller not implemented
 ** - mbh3: touch pad not (fully) emulated?
 ** - mbh70: Verify firmware operation
@@ -6086,7 +6086,8 @@ ROM_START(hb701fd)
 	ROM_LOAD("hb701fdbios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821)) // need verification
 
 	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("hb701fddisk.rom", 0x0000, 0x4000, CRC(71961d9d) SHA1(2144036d6573d666143e890e5413956bfe8f66c5)) // need verification
+	// FDC register contents at 3ff8-3fff
+	ROM_LOAD("hb701fddisk.rom", 0x0000, 0x4000, BAD_DUMP CRC(71961d9d) SHA1(2144036d6573d666143e890e5413956bfe8f66c5)) // need verification
 ROM_END
 
 void msx_state::hb701fd(machine_config &config)
@@ -7683,7 +7684,8 @@ ROM_START(kmc5000)
 	ROM_LOAD("kmc5000ext.rom", 0x0000, 0x4000, CRC(43e7a7fc) SHA1(0fbd45ef3dd7bb82d4c31f1947884f411f1ca344)) // need verification
 
 	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("kmc5000disk.rom", 0x0000, 0x4000, CRC(e25cacca) SHA1(607cfca605eaf82e3efa33459d6583efb7ecc13b)) // need verification
+	// FDC register contents at 3ff8-3fff
+	ROM_LOAD("kmc5000disk.rom", 0x0000, 0x4000, BAD_DUMP CRC(e25cacca) SHA1(607cfca605eaf82e3efa33459d6583efb7ecc13b)) // need verification
 
 	ROM_REGION(0x8000, "kdr", 0)
 	ROM_LOAD("kmc5000kdr.rom", 0x0000, 0x8000, CRC(2dbea5ec) SHA1(ea35cc2cad9cfdf56cae224d8ee41579de37f000)) // need verification
@@ -7759,7 +7761,8 @@ ROM_START(mlg3)
 	ROM_LOAD("mlg3ext.rom", 0x0000, 0x4000, CRC(dc0951bd) SHA1(1e9a955943aeea9b1807ddf1250ba6436d8dd276))
 
 	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("mlg3disk.rom", 0x0000, 0x4000, CRC(b94ebc7a) SHA1(30ba1144c872a0bb1c91768e75a2c28ab1f4e3c6))
+	// FDC register contents at 3ff8-3fff
+	ROM_LOAD("mlg3disk.rom", 0x0000, 0x4000, BAD_DUMP CRC(b94ebc7a) SHA1(30ba1144c872a0bb1c91768e75a2c28ab1f4e3c6))
 
 	ROM_REGION(0x4000, "rs232", 0)
 	ROM_LOAD("mlg3rs232c.rom", 0x0000, 0x2000, CRC(849b325e) SHA1(b1ac74c2550d553579c1176f5dfde814218ec311))
@@ -8409,7 +8412,8 @@ ROM_START(fsa1fm)
 	ROM_LOAD("a1fmext.rom", 0x0000, 0x4000, CRC(ad295b5d) SHA1(d552319a19814494e3016de4b8f010e8f7b97e02))
 
 	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("a1fmdisk.rom",  0x0000, 0x4000, CRC(e25cacca) SHA1(607cfca605eaf82e3efa33459d6583efb7ecc13b))
+	// FDC register contents at 3ff8-3fff
+	ROM_LOAD("a1fmdisk.rom", 0x0000, 0x4000, BAD_DUMP CRC(e25cacca) SHA1(607cfca605eaf82e3efa33459d6583efb7ecc13b))
 
 	ROM_REGION(0x100000, "firmware", 0)
 	ROM_LOAD("a1fmfirm.rom", 0x000000, 0x100000, CRC(8ce0ece7) SHA1(f89e3d8f3b6855c29d71d3149cc762e0f6918ad5))
@@ -8837,7 +8841,8 @@ ROM_START(nms8280g)
 	ROM_LOAD("8280gext.rom.ic118", 0x0000, 0x4000, CRC(41e36d03) SHA1(4ab7b2030d022f5486abaab22aaeaf8aa23e05f3)) // need verification
 
 	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("8280gdisk.rom.ic117", 0x0000, 0x4000, CRC(d0beebb8) SHA1(d1001f93c87ff7fb389e418e33bf7bc81bdbb65f)) // need verification
+	// FDC register contents at 3ff8-3fff
+	ROM_LOAD("8280gdisk.rom.ic117", 0x0000, 0x4000, BAD_DUMP CRC(d0beebb8) SHA1(d1001f93c87ff7fb389e418e33bf7bc81bdbb65f)) // need verification
 ROM_END
 
 void msx2_state::nms8280g(machine_config &config)
@@ -9341,7 +9346,8 @@ ROM_START(mpc2500f)
 	ROM_LOAD("mpc2500fdext.rom",  0x0000, 0x4000, CRC(3d7dc718) SHA1(e1f834b28c3ee7c9f79fe6fbf2b23c8a0617892b)) // need verification
 
 	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("mpc2500fddisk.rom", 0x0000, 0x4000, CRC(38454059) SHA1(58ac78bba29a06645ca8d6a94ef2ac68b743ad32)) // need verification
+	// FDC register contents at 3ff8-3fff
+	ROM_LOAD("mpc2500fddisk.rom", 0x0000, 0x4000, BAD_DUMP CRC(38454059) SHA1(58ac78bba29a06645ca8d6a94ef2ac68b743ad32)) // need verification
 ROM_END
 
 void msx2_state::mpc2500f(machine_config &config)
@@ -9447,7 +9453,8 @@ ROM_START(mpc27)
 	ROM_LOAD("mpc27ext.rom", 0x0000, 0x4000, CRC(90ca25b5) SHA1(fd9fa78bac25aa3c0792425b21d14e364cf7eea4)) // need verificaiton
 
 	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("mpc27disk.rom", 0x0000, 0x4000, CRC(38454059) SHA1(58ac78bba29a06645ca8d6a94ef2ac68b743ad32)) // need verification
+	// FDC register contents at 3ff8-3fff
+	ROM_LOAD("mpc27disk.rom", 0x0000, 0x4000, BAD_DUMP CRC(38454059) SHA1(58ac78bba29a06645ca8d6a94ef2ac68b743ad32)) // need verification
 
 	ROM_REGION(0x4000, "lpen", 0)
 	ROM_LOAD("mlp27.rom", 0x0000, 0x2000, CRC(8f9e6ba0) SHA1(c3a47480c9dd2235f40f9a53dab68e3c48adca01)) // need verification
@@ -9539,7 +9546,8 @@ ROM_START(phc55fd2)
 	ROM_LOAD("phc55fd2ext.rom", 0x0000, 0x4000, CRC(90ca25b5) SHA1(fd9fa78bac25aa3c0792425b21d14e364cf7eea4)) // need verification
 
 	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("phc55fd2disk.rom", 0x0000, 0x4000, CRC(38454059) SHA1(58ac78bba29a06645ca8d6a94ef2ac68b743ad32)) // need verification
+	// FDC register contents at 3ff8-3fff
+	ROM_LOAD("phc55fd2disk.rom", 0x0000, 0x4000, BAD_DUMP CRC(38454059) SHA1(58ac78bba29a06645ca8d6a94ef2ac68b743ad32)) // need verification
 ROM_END
 
 void msx2_state::phc55fd2(machine_config &config)
@@ -9873,7 +9881,8 @@ ROM_START(hbf500f)
 	ROM_LOAD("hbf500fext.rom", 0x0000, 0x4000, CRC(e235d5c8) SHA1(792e6b2814ab783d06c7576c1e3ccd6a9bbac34a)) // need verification
 
 	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("hbf500fdisk.rom", 0x0000, 0x4000, CRC(6e718f5c) SHA1(0e081572f84555dc13bdb0c7044a19d6c164d985)) // need verification
+	// FDC register contents at 3ff8-3fff
+	ROM_LOAD("hbf500fdisk.rom", 0x0000, 0x4000, BAD_DUMP CRC(6e718f5c) SHA1(0e081572f84555dc13bdb0c7044a19d6c164d985)) // need verification
 ROM_END
 
 void msx2_state::hbf500f(machine_config &config)
@@ -9902,7 +9911,8 @@ void msx2_state::hbf500f(machine_config &config)
 ROM_START(hbf500p)
 	ROM_REGION(0x10000, "mainrom", 0)
 	ROM_LOAD("500pbios.rom.ic41", 0x0000, 0x8000, CRC(b31c851d) SHA1(0de3c802057560560a03d7965fcc4cff69f8575c))
-	ROM_LOAD("500pext.ic47",      0x8000, 0x8000, CRC(cdd4824a) SHA1(505031f1e8396a6e0cb11c1540e6e7f6999d1191))
+	// FDC register contents at 7ff8-7fff
+	ROM_LOAD("500pext.ic47",      0x8000, 0x8000, BAD_DUMP CRC(cdd4824a) SHA1(505031f1e8396a6e0cb11c1540e6e7f6999d1191))
 ROM_END
 
 void msx2_state::hbf500p(machine_config &config)
@@ -10651,7 +10661,8 @@ ROM_START(victhc90)
 	ROM_LOAD("hc90ext.rom", 0x0000, 0x4000, CRC(4a48779c) SHA1(b8e30d604d319d511cbfbc61e5d8c38fbb9c5a33)) // need verification
 
 	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("hc90disk.rom", 0x0000, 0x4000, CRC(11bca2ed) SHA1(a7a34671bddb48fa6c74182e2977f9129558ec32)) // need verification
+	// FDC register contents at 3ff8-3fff
+	ROM_LOAD("hc90disk.rom", 0x0000, 0x4000, BAD_DUMP CRC(11bca2ed) SHA1(a7a34671bddb48fa6c74182e2977f9129558ec32)) // need verification
 
 	ROM_REGION(0x4000, "firmware", 0)
 	ROM_LOAD("hc90firm.rom", 0x0000, 0x4000, CRC(53791d91) SHA1(caeffdd654394726c8c0824b21af7ff51c0b1031)) // need verification
@@ -10698,7 +10709,8 @@ ROM_START(victhc95)
 	ROM_LOAD("hc95ext.rom", 0x0000, 0x4000, CRC(4a48779c) SHA1(b8e30d604d319d511cbfbc61e5d8c38fbb9c5a33)) // need verification
 
 	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("hc95disk.rom", 0x0000, 0x4000, CRC(11bca2ed) SHA1(a7a34671bddb48fa6c74182e2977f9129558ec32)) // need verification
+	// FDC register contents at 3ff8-3fff
+	ROM_LOAD("hc95disk.rom", 0x0000, 0x4000, BAD_DUMP CRC(11bca2ed) SHA1(a7a34671bddb48fa6c74182e2977f9129558ec32)) // need verification
 
 	ROM_REGION(0x4000, "firmware", 0)
 	ROM_LOAD("hc95firm.rom", 0x0000, 0x4000, CRC(53791d91) SHA1(caeffdd654394726c8c0824b21af7ff51c0b1031)) // need verification
@@ -10739,7 +10751,8 @@ ROM_START(victhc95a)
 	ROM_LOAD("hc95aext.rom", 0x0000, 0x4000, CRC(4a48779c) SHA1(b8e30d604d319d511cbfbc61e5d8c38fbb9c5a33))
 
 	ROM_REGION(0x4000, "diskrom", 0)
-	ROM_LOAD("hc95adisk.rom", 0x0000, 0x4000, CRC(11bca2ed) SHA1(a7a34671bddb48fa6c74182e2977f9129558ec32))
+	// FDC register contents at 3ff8-3fff
+	ROM_LOAD("hc95adisk.rom", 0x0000, 0x4000, BAD_DUMP CRC(11bca2ed) SHA1(a7a34671bddb48fa6c74182e2977f9129558ec32))
 
 	ROM_REGION(0x4000, "firmware", 0)
 	ROM_LOAD("hc95afirm.rom", 0x0000, 0x4000, CRC(53791d91) SHA1(caeffdd654394726c8c0824b21af7ff51c0b1031))
@@ -11922,10 +11935,10 @@ COMP(1986, vg8230,     0,        0,     vg8230,     msx,      msx2_state, empty_
 COMP(1986, vg8235,     0,        0,     vg8235,     msx,      msx2_state, empty_init, "Philips", "VG-8235 (Europe) (MSX2)", 0)
 COMP(1986, vg8235f,    vg8235,   0,     vg8235f,    msxfr,    msx2_state, empty_init, "Philips", "VG-8235F (France) (MSX2)", 0)
 COMP(1986, vg8240,     0,        0,     vg8240,     msx,      msx2_state, empty_init, "Philips", "VG-8240 (Prototype) (MSX2)", 0)
-COMP(1987, ucv102,     0,        0,     ucv102,     msx2jp,   msx2_state, empty_init, "Pioneer", "UC-V102 (Japan) (MSX2)", 0)
+COMP(1987, ucv102,     0,        0,     ucv102,     msx2jp,   msx2_state, empty_init, "Pioneer", "UC-V102 (Japan) (MSX2)", MACHINE_NOT_WORKING) // won't boot without a floppy
 COMP(1987, ax350,      ax350ii,  0,     ax350,      msx,      msx2_state, empty_init, "Sakhr", "AX-350 (Arabic) (MSX2)", 0)
 COMP(1987, ax350ii,    0,        0,     ax350ii,    msx,      msx2_state, empty_init, "Sakhr", "AX-350 II (Arabic) (MSX2)", 0)
-COMP(1987, ax350iif,   ax350ii,  0,     ax350iif,   msxfr,    msx2_state, empty_init, "Sakhr", "AX-350 II F (Arabic) (MSX2)", MACHINE_NOT_WORKING) // arabic rom not repsonding to input
+COMP(1987, ax350iif,   ax350ii,  0,     ax350iif,   msxfr,    msx2_state, empty_init, "Sakhr", "AX-350 II F (Arabic) (MSX2)", 0)
 COMP(1988, ax370,      0,        0,     ax370,      msx2,     msx2_state, empty_init, "Sakhr", "AX-370 (Arabic) (MSX2)", 0)
 COMP(1987, ax500,      0,        0,     ax500,      msx2,     msx2_state, empty_init, "Sakhr", "AX-500 (Arabic) (MSX2)", 0)
 COMP(1987, mpc2300,    0,        0,     mpc2300,    msxru,    msx2_state, empty_init, "Sanyo", "MPC-2300 (USSR) (MSX2)", 0)
