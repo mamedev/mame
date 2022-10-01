@@ -24,6 +24,7 @@ public:
 	virtual void write(offs_t offset, uint8_t data) override;
 
 protected:
+	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:

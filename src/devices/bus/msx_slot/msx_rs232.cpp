@@ -451,7 +451,7 @@ static INPUT_PORTS_START(msx_hx3x_ports)
 	PORT_INCLUDE(msx_rs232_enable_switch)
 
 	PORT_START("COPY")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Copy")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Copy")
 INPUT_PORTS_END
 
 ioport_constructor msx_slot_rs232_toshiba_hx3x_device::device_input_ports() const
@@ -540,9 +540,13 @@ void msx_slot_rs232_toshiba_hx3x_device::write(offs_t offset, uint8_t data)
 {
 	if (offset == 0x7fff)
 	{
-		logerror("write %04x, %02x\n", offset, data);
 		m_bank_reg = data & 0x7f;
 		set_bank();
+	}
+	if (offset >= 0x8000 && (m_bank_reg & 0x60) == 0x60)
+	{
+		m_sram[offset & (SRAM_SIZE - 1)] = data;
+		return;
 	}
 	msx_slot_rs232_base_device::write(offset, data);
 }
@@ -553,8 +557,10 @@ uint8_t msx_slot_rs232_toshiba_hx3x_device::read(offs_t offset)
 	{
 		return (m_copy_port->read() & 0x80) | m_bank_reg;
 	}
-	if (offset > 0x8000)
+	if (offset >= 0x8000)
 	{
+		if ((m_bank_reg & 0x60) == 0x60)
+			return m_sram[offset & (SRAM_SIZE - 1)];
 		return m_bank_base_8000[offset & 0x3fff];
 	}
 	return msx_slot_rs232_base_device::read(offset);

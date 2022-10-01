@@ -19,6 +19,12 @@ msx_slot_bunsetsu_device::msx_slot_bunsetsu_device(const machine_config &mconfig
 }
 
 
+void msx_slot_bunsetsu_device::device_start()
+{
+	save_item(NAME(m_bunsetsu_address));
+}
+
+
 void msx_slot_bunsetsu_device::device_reset()
 {
 	m_bunsetsu_address = 0;

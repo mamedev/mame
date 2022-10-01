@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
 /*
-** msx.cpp : driver for MSX
+** msx.cpp : driver for MSX family machines
+**
+** Special usage notes:
 **
 ** ax350iif:
 **  The machine has a French keyboard so to select firmware options you
@@ -22,14 +24,9 @@
 **  - To get into MSX-PLAN type: CALL MSXPLAN
 **
 **
-** There really were a lot of different MSX systems released by quite a few
-** manufacturers. Until we have identified all the unique characteristics of
-** each machine the machines will stay listed separately. After that
-** de-duplication of machine descriptions and rom sets may happen.
-**
 **
 ** Todo/known issues:
-** - multiple: - Add support for kana lock?
+** - general: - Add support for kana lock?
 ** -           - Expansion slots not emulated
 ** - kanji: The direct rom dump from FS-A1FX shows that the kanji font roms are accessed slightly differently. Most
 **          existing kanji font roms may haven been dumped from inside a running machine. Are all other kanji font
@@ -38,58 +35,68 @@
 **   - svi738, svi738ar, svi738dk, svi738pl, svi738sp, svi738sw (working)
 **   - hx22 (working)
 **   - hx22i (working)
-**   - mlg3 (working)
-**   - mlg30_2 (working)
+**   - mlg3 (working, how does the rs232 switch work?)
+**   - mlg30_2 (working, how does the rs232 switch work?)
 **   - ucv102 (cannot test, floppy problems)
-**   - hbg900ap (not working)
+**   - hbg900ap (not working, switch for terminal/moden operation)
 **   - hbg900p (not working)
 **   - victhc90 (cannot test, system config not emulated)
 **   - victhc95 (cannot test, system config not emulated)
 **   - victhc95a (cannot test, system config not emulated)
 **   - y805256 (cannot test, rs232 rom has not been dumped)
 **   - optional for hx20, hx21, hx23, hx23f, hx32, hx33, hx34
-** - bruc100: Not all keypad keys hooked up yet
-** - fs4000: Is the keypad enter exactly the same as the normal enter key? There does not appear to be a separate mapping for it.
-** - piopx7: The keyboard responds like a regular international keyboard, not a japanese keyboard.
+** - inputs:
+**     bruc100: Not all keypad keys hooked up yet
+**     fs4000: Is the keypad enter exactly the same as the normal enter key? There does not appear to be a separate mapping for it.
+**     piopx7: The keyboard responds like a regular international keyboard, not a japanese keyboard.
+**     svi728/svi728es: How are the keypad keys mapped?
 ** - piopx7/piopx7uk/piopxv60: Pioneer System Remote (home entertainment/Laserdisc control) not implemented
 ** - spc800: How to test operation of the han rom?
-** - svi728/svi728es: How are the keypad keys mapped?
-** - svi728: Expansion slot not emulated
-** - hx10: Expansion slot not emulated (hx10s also??)
-** - y503iir, y503iir2: RTC not emulated
-** - y503iir, y503iir2: Net not emulated
-** - y503iir, y503iir2: Floppy support broken
+** - mbh1, mbh1e, mbh2, mbh25: speed controller
+** - cx5m128, yis503iir, yis604: yamaha mini cartridge slot
+** - cpg120: turbo button
+** - fs4000: Internal thermal printer not emulated
+** - fs4500, fs4600f, fs4700:
+**   - switch to bypass firmware
+**   - switch to switch between internal and external printer
+**   - switch to switch betweem jp50on and jis layout
+**   - internal printer
+** - fs4600: Kanji12 not emulated?; how to trigger usage of kanji12??
+** - fs5500f1, fs5500f2:
+**   - switch to switch between jp50on and jis layout
+**   - switcn to bypass firmware
+** - fsa1fm:
+**   - Firmware not emulated
+**   - kanji12 not emulated
+**   - Modem not emulated
+** - fsa1mk2: pause button
+** - nms8260: HDD not emulated
+** - phc77: builtin printer, switch to turn off firmware
+** - hbf1: pause button
+** - hbf1ii: rensha turbo slider
+** - hbf1xd, hbf1xdj, hbf1xv
+**   - pause button
+**   - speed controller slider
+**   - rensha turbo slider
+** - victhc90, victhc95, victhc95a: Turbo/2nd cpu not supported. Firmware not working.
+** - fsa1fx, fsa1wsx, fsa1wx
+**   - rensha turbo slider
+**   - pause button
+**   - firmware switch
+** - phc35j, phc70fd: rensha turbo slider, pause button
+** - y503iir, y503iir2: Switch for teacher/student mode, net not emulated
 ** - cpc300: Config for MSX Tutor ON/OFF is not saved
 ** - cpc300e: Remove joystick connectors
-** - fs4000: Internal thermal printer not emulated
-** - fs4600: Kanji12 not emulated; how to trigger usage of kanji12??
-** - fsa1fm: Firmware not emulated
-** - fsa1fm: kanji12 not emulated
-** - fsa1fm: Modem not emulated
-** - nms8280, nms8280g: Digitizer functionality not emulated
-** - hx23f: The builtin word processor displays white squares instead of text
+** - nms8280, nms8280g, and others: Digitizer functionality not emulated
 ** - expert3i: IDE not emulated
 ** - expert3t: Turbo not emulated
 ** - expertac: Does not boot
-** - fsa1gt: Add Turbo-R support
-** - fsa1st: Add Turbo-R support
-** - mx101: External antenna not emulated
-** - pv7: Add support for KB-7 (8KB ram + 2 cartslots)
+** - fsa1gt, fsa1st: Add Turbo-R support
 ** - cpc50a/cpc50b: Remove keyboard; and add an external keyboard??
 ** - cpc51/cpc61: Remove keyboard and add a keyboard connector
-** - mbh2: speed controller not implemented
-** - mbh3: touch pad not (fully) emulated?
+** - mbh3: touch pad not emulated
 ** - mbh70: Verify firmware operation
-** - kmc5000: Floppy support broken
-** - mpc2500f: Fix keyboard layout?
-** - nms8260: HDD not emulated
-** - mpc27: Light pen not emulated
-** - phc77: firmware not emulated
-** - phc77: printer not emulated
-** - victhc90/95/95a: Turbo/2nd cpu not supported.
-** - victhc90/95/95a: Firmware not working.
-** - y503iiir/e: Fix keyboard support
-** - y503iiir/e: Floppy support broken
+** - ucv102: Will not boot without a floppy in the drive
 ** - y805*: Floppy support broken
 ** - y8805128r2/e: Firmware not working
 ** - cpg120: Remove ports
@@ -3915,7 +3922,8 @@ void msx_state::cpc50a(machine_config &config)
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 3, 1).force_start_address(0xe000);  // 8KB RAM
 
-	m_hw_def.has_cassette(false).has_printer_port(false);
+	m_hw_def.has_cassette(false)
+		.has_printer_port(false);
 	msx1(TMS9118, AY8910, config);
 }
 
@@ -4090,7 +4098,7 @@ void bruc100_state::bruc100(machine_config &config)
 	// 1 Expansion slot
 
 	add_internal_slot(config, MSX_SLOT_BRUC100, "firm", 0, 0, 0, 2, "mainrom");
-	// Expansion slot
+	// Expansion slot in slot 1
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 0, 4).set_total_size(0x10000);   // 64KB RAM
 
 	msx1(TMS9129, AY8910, config);
@@ -4125,7 +4133,7 @@ void bruc100_state::bruc100a(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_BRUC100, "firm", 0, 0, 0, 2, "mainrom");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 1, 0, 0, 4).set_total_size(0x10000);   // 64KB RAM
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
-	// Expansion slot
+	// Expansion slot in slot 3
 
 	msx1(TMS9129, AY8910, config);
 	m_maincpu->set_addrmap(AS_IO, &bruc100_state::io_map);
@@ -4231,14 +4239,15 @@ void msx_state::gfc1080(machine_config &config)
 {
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
-	// 2 Cartridge slots?
+	// 1 Cartridge slot
+	// 1 Expansion slot
 
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
 	add_internal_slot(config, MSX_SLOT_ROM, "hangul", 0, 0, 2, 1, "hangul");
 	add_internal_slot(config, MSX_SLOT_ROM, "pasocalc", 0, 0, 3, 1, "pasocalc");
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4); // 64KB RAM
-	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 3, 0, msx_cart, nullptr);
+	// Expansion slot in slot #3
 
 	msx1(TMS9928A, AY8910, config);
 }
@@ -4265,6 +4274,7 @@ void msx_state::gfc1080a(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "hangul", 0, 0, 2, 1, "hangul");
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 0, 4); // 64KB RAM
+	// Expansion slot in slot #3
 
 	msx1(TMS9918A, AY8910, config);
 }
@@ -4745,6 +4755,7 @@ void msx_state::cf2000(machine_config &config)
 }
 
 /* MSX - National CF-2700 */
+
 ROM_START(cf2700)
 	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("2700bios.rom.ic32", 0x0000, 0x8000, CRC(5ad03407) SHA1(c7a2c5baee6a9f0e1c6ee7d76944c0ab1886796c))
@@ -4787,6 +4798,7 @@ void msx_state::cf3000(machine_config &config)
 }
 
 /* MSX - National CF-3300 */
+
 ROM_START(cf3300)
 	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("3300bios.rom", 0x0000, 0x8000, CRC(5ad03407) SHA1(c7a2c5baee6a9f0e1c6ee7d76944c0ab1886796c))
@@ -4946,7 +4958,7 @@ void msx_state::phc28(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 0, 3, 1);   // 16KB RAM
 	add_cartridge_slot<1>(config, MSX_SLOT_CARTRIDGE, "cartslot1", 1, 0, msx_cart, nullptr);
 	add_cartridge_slot<2>(config, MSX_SLOT_CARTRIDGE, "cartslot2", 2, 0, msx_cart, nullptr);
-	// expansion slot
+	// Expansion slot in slot #3
 
 	msx1(TMS9929A, AY8910, config); // needs verification
 }
@@ -6291,7 +6303,7 @@ void msx1_v9938_state::tadpc200a(machine_config &config)
 	// YM2149
 	// FDC: None, 0 drives
 	// 1 Cartridge slot
-	// S1895
+	// S1985
 
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 0, 4);  // 64KB RAM
@@ -6418,7 +6430,7 @@ void msx_state::hx10f(machine_config &config)
 
 /* MSX - Toshiba HX-10S */
 
-// BIOS is for an international keyboard while the machine had a japanese keyboard layout
+// BIOS is for an international keyboard but the machine had a japanese keyboard layout so that cannot be correct
 ROM_START(hx10s)
 	ROM_REGION(0x8000, "mainrom", 0)
 	ROM_LOAD("hx10sbios.rom", 0x0000, 0x8000, BAD_DUMP CRC(5486b711) SHA1(4dad9de7c28b452351cc12910849b51bd9a37ab3)) // need verification
@@ -6465,7 +6477,7 @@ void msx_state::hx10sa(machine_config &config)
 
 /* MSX - Toshiba HX-20 */
 
-// BIOS is for an internation keyboard while the machine had japanese keyboard layout
+// BIOS is for an internation keyboard but the machine had japanese keyboard layout
 // Firmware is in English
 ROM_START(hx20)
 	ROM_REGION(0x8000, "mainrom", 0)
@@ -7948,7 +7960,6 @@ ROM_START(fs4500)
 	ROM_REGION(0x20000, "kanji", 0)
 	ROM_LOAD("4500kfn.rom", 0, 0x20000, CRC(956dc96d) SHA1(9ed3ab6d893632b9246e91b412cd5db519e7586b))
 
-	/* Matsushita Bunsetsu Henkan Jukugo ROM must be emulated */
 	ROM_REGION(0x20000, "bunsetsu", 0)
 	ROM_LOAD("4500budi.rom", 0, 0x20000, CRC(f94590f8) SHA1(1ebb06062428fcdc66808a03761818db2bba3c73))
 ROM_END
@@ -8082,7 +8093,6 @@ ROM_START(fs4700f)
 	ROM_REGION(0x20000, "kanji", 0)
 	ROM_LOAD("4700kfn.rom", 0, 0x20000, CRC(956dc96d) SHA1(9ed3ab6d893632b9246e91b412cd5db519e7586b))
 
-	/* Matsushita Bunsetsu Henkan ROM must be emulated */
 	ROM_REGION(0x20000, "bunsetsu", 0)
 	ROM_LOAD("4700budi.rom", 0, 0x20000, CRC(f94590f8) SHA1(1ebb06062428fcdc66808a03761818db2bba3c73))
 ROM_END
@@ -10845,7 +10855,7 @@ void msx2_state::cx7m128(machine_config &config)
 	msx2(YM2149, config);
 }
 
-/* MSX2 - Yamaha YIS-503 III R */
+/* MSX2 - Yamaha YIS-503 III R (student) */
 
 ROM_START(y503iiir)
 	ROM_REGION(0x8000, "mainrom", 0)
@@ -10859,8 +10869,9 @@ ROM_START(y503iiir)
 
 	ROM_REGION(0x8000, "network", 0)
 	// TODO: Which one is correct??
-	ROM_LOAD("yis503iiirnet.rom", 0x0000, 0x8000, CRC(0e345b43) SHA1(e8fd2bbc1bdab12c73a0fec178a190f9063547bb))  // Very odd size for a rom...
-	ROM_LOAD("yis503iiirnet.rom", 0x0000, 0x8000, CRC(75331cac) SHA1(307a7be064442feb4ab2e1a2bc971b138c1a1169))  // Very odd size for a rom...
+	// has 2 * 2KB RAM?
+	ROM_LOAD("yis503iiirnet.rom", 0x0000, 0x8000, CRC(0e345b43) SHA1(e8fd2bbc1bdab12c73a0fec178a190f9063547bb))
+	ROM_LOAD("yis503iiirnet.rom", 0x0000, 0x8000, CRC(75331cac) SHA1(307a7be064442feb4ab2e1a2bc971b138c1a1169))
 ROM_END
 
 void msx2_state::y503iiir(machine_config &config)
@@ -10897,8 +10908,8 @@ ROM_START(y503iiire)
 
 	ROM_REGION(0x8000, "network", 0)
 	// TODO: Which one is correct??
-	ROM_LOAD("yis503iiirnet.rom", 0x0000, 0x8000, CRC(0e345b43) SHA1(e8fd2bbc1bdab12c73a0fec178a190f9063547bb))  // Very odd size for a rom...
-	ROM_LOAD("yis503iiirnet.rom", 0x0000, 0x8000, CRC(75331cac) SHA1(307a7be064442feb4ab2e1a2bc971b138c1a1169))  // Very odd size for a rom...
+	ROM_LOAD("yis503iiirnet.rom", 0x0000, 0x8000, CRC(0e345b43) SHA1(e8fd2bbc1bdab12c73a0fec178a190f9063547bb))
+	ROM_LOAD("yis503iiirnet.rom", 0x0000, 0x8000, CRC(75331cac) SHA1(307a7be064442feb4ab2e1a2bc971b138c1a1169))
 ROM_END
 
 /* MSX2 - Yamaha YIS604/128 */
@@ -11010,7 +11021,7 @@ void msx2_state::y805256(machine_config &config)
 	msx2(YM2149, config);
 }
 
-/* MSX2 - Yamaha YIS-805/128R2 */
+/* MSX2 - Yamaha YIS-805/128R2 (teacher) */
 
 ROM_START(y805128r2)
 	ROM_REGION(0x8000, "mainrom", 0)
@@ -11023,6 +11034,7 @@ ROM_START(y805128r2)
 	ROM_LOAD("yis805128r2disk.rom", 0x0000, 0x4000, CRC(9eb7e24d) SHA1(3a481c7b7e4f0406a55952bc5b9f8cf9d699376c))
 
 	ROM_REGION(0x8000, "network", 0)
+	// has 2 * 2KB RAM ?
 	ROM_LOAD("yis805128r2net.rom", 0x0000, 0x8000, CRC(0e345b43) SHA1(e8fd2bbc1bdab12c73a0fec178a190f9063547bb))
 
 	ROM_REGION(0x10000, "firmware", 0)
@@ -11976,8 +11988,8 @@ COMP(1987, tpp311,     0,        0,     tpp311,     msxsp,    msx2_state, empty_
 COMP(1987, tps312,     0,        0,     tps312,     msxsp,    msx2_state, empty_init, "Talent", "TPS-312 (Argentina) (MSX2)", 0)
 COMP(1985, hx23,       hx23f,    0,     hx23,       msxjp,    msx2_state, empty_init, "Toshiba", "HX-23 (Japan) (MSX2)", MACHINE_NOT_WORKING) // firmware goes into an infinite loop on the title screen
 COMP(1985, hx23f,      0,        0,     hx23f,      msxjp,    msx2_state, empty_init, "Toshiba", "HX-23F (Japan) (MSX2)", MACHINE_NOT_WORKING) // firmware goes into an infinite loop on the title screen
-COMP(1985, hx33,       hx34,     0,     hx33,       msxjp,    msx2_state, empty_init, "Toshiba", "HX-33 w/HX-R702 (Japan) (MSX2)", MACHINE_NOT_WORKING) // cannot start firmware
-COMP(1985, hx34,       0,        0,     hx34,       msx2jp,   msx2_state, empty_init, "Toshiba", "HX-34 w/HX-R703 (Japan) (MSX2)", MACHINE_NOT_WORKING) // cannot start firmware
+COMP(1985, hx33,       hx34,     0,     hx33,       msxjp,    msx2_state, empty_init, "Toshiba", "HX-33 w/HX-R702 (Japan) (MSX2)", MACHINE_NOT_WORKING) // half the pixels are missing in the firmware?
+COMP(1985, hx34,       0,        0,     hx34,       msx2jp,   msx2_state, empty_init, "Toshiba", "HX-34 w/HX-R703 (Japan) (MSX2)", 0)
 COMP(1986, fstm1,      0,        0,     fstm1,      msx,      msx2_state, empty_init, "Toshiba", "FS-TM1 (Italy) (MSX2)", 0)
 COMP(1986, victhc80,   0,        0,     victhc80,   msxjp,    msx2_state, empty_init, "Victor", "HC-80 (Japan) (MSX2)", 0)
 COMP(1986, victhc90,   victhc95, 0,     victhc90,   msx2jp,   msx2_state, empty_init, "Victor", "HC-90 (Japan) (MSX2)", MACHINE_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start
@@ -11985,8 +11997,8 @@ COMP(1986, victhc95,   0,        0,     victhc95,   msx2jp,   msx2_state, empty_
 COMP(1986, victhc95a,  victhc95, 0,     victhc95a,  msx2jp,   msx2_state, empty_init, "Victor", "HC-95A (Japan) (MSX2)", MACHINE_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start
 COMP(1985, cx7128,     cx7m128,  0,     cx7128,     msxjp,    msx2_state, empty_init, "Yamaha", "CX7/128 (Japan) (MSX2)", 0)
 COMP(1985, cx7m128,    0,        0,     cx7m128,    msxjp,    msx2_state, empty_init, "Yamaha", "CX7M/128 (Japan) (MSX2)", 0)
-COMP(1985, y503iiir,   0,        0,     y503iiir,   msxru,    msx2_state, empty_init, "Yamaha", "YIS-503 III R (USSR) (MSX2)", MACHINE_NOT_WORKING) // Russian keyboard, network not implemented
-COMP(198?, y503iiire,  y503iiir, 0,     y503iiir,   msx2,     msx2_state, empty_init, "Yamaha", "YIS-503 III R (Estonian) (MSX2)", MACHINE_NOT_WORKING) // Russian/Estonian keyboard, network not implemented
+COMP(1985, y503iiir,   0,        0,     y503iiir,   msxru,    msx2_state, empty_init, "Yamaha", "YIS-503 III R (USSR) (MSX2)", MACHINE_NOT_WORKING) // network not implemented
+COMP(198?, y503iiire,  y503iiir, 0,     y503iiir,   msx2,     msx2_state, empty_init, "Yamaha", "YIS-503 III R (Estonian) (MSX2)", MACHINE_NOT_WORKING) // network not implemented
 COMP(1985, yis604,     0,        0,     yis604,     msx2jp,   msx2_state, empty_init, "Yamaha", "YIS604/128 (Japan) (MSX2)", 0)
 COMP(1986, y805128,    y805256,  0,     y805128,    msx2jp,   msx2_state, empty_init, "Yamaha", "YIS805/128 (Japan) (MSX2)", MACHINE_NOT_WORKING) // Floppy support broken
 COMP(1986, y805128r2,  y805256,  0,     y805128r2,  msx2,     msx2_state, empty_init, "Yamaha", "YIS805/128R2 (USSR) (MSX2)", MACHINE_NOT_WORKING) // Floppy support broken, network not implemented
