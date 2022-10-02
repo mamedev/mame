@@ -944,7 +944,7 @@ inline void gtia_device::player_render(uint8_t gfx, u8 size_index, uint8_t color
 	// size is the number of bits in *dst to be filled: 1, 2 or 4
 	// x0 normal width
 	// 01 double width
-	// 11 quaduple width
+	// 11 quadruple width
 	// jmpmanjr sets all sizes to 10, still expecting it to be normal width
 	const u8 sizes[4] = { 1, 2, 1, 4 };
 	const int size = sizes[size_index & 3];
