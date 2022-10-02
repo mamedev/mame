@@ -28,7 +28,6 @@ FAQ-RUS: https://forum.tslabs.info/viewtopic.php?f=35&t=157
     ROM: https://github.com/tslabs/zx-evo/blob/master/pentevo/rom/bin/ts-bios.rom (validated on: 2021-12-14)
 
 HowTo:
-# Use ts-bios.rom above. You also need tr-dos roms which simplest(?) to get from pentagon.
 # Create SD image "wc.img"
 # Copy WC files from archive https://github.com/tslabs/zx-evo/blob/master/pentevo/soft/WC/wc.zip
 # Tech Demos (currently *.spg only): http://prods.tslabs.info/index.php?t=4
