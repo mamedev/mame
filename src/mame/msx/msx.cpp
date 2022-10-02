@@ -27,8 +27,8 @@
 **
 ** Todo/known issues:
 ** - internal:
-**   - Redo the memory handling to get rid of most trampolines and possible
-**     code duplication between msx_slot and msx_cart (eg, kanji roms, disk interfaces)
+**   - Redo the memory handling to get rid of most trampolines and code duplication between
+**     msx_slot and msx_cart (eg, kanji roms, disk interfaces)
 **   - move subslot register ownership and handling from the main emuation to the
 **     slot owners (the system itself or cartridge slot expanders)
 ** - general: - Add support for kana lock

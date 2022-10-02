@@ -440,7 +440,7 @@ void msx_slot_rs232_toshiba_device::update_irq_state()
 
 
 msx_slot_rs232_toshiba_hx3x_device::msx_slot_rs232_toshiba_hx3x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: msx_slot_rs232_base_device(mconfig, MSX_SLOT_RS232_TOSHIBA, tag, owner, clock)
+	: msx_slot_rs232_base_device(mconfig, MSX_SLOT_RS232_TOSHIBA_HX3X, tag, owner, clock)
 	, m_switch_port(*this, "SWITCH")
 	, m_copy_port(*this, "COPY")
 	, m_nvram(*this, "nvram")
