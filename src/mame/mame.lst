@@ -10736,8 +10736,9 @@ cocolocob                       // 198?, Petaco S.A.
 codata                          //
 
 @source:misc/coinmstr.cpp
-jpcoin                          // (c) 19?? Coinmaster
-jpcoin2                         // (c) 19?? Coinmaster
+jpcoin                          // (c) 1985 Coinmaster
+jpcoin2                         // (c) 1990 Coinmaster
+jpjcoin                         // (c) 1988 unknown
 pokeroul                        // (c) 1990 Coinmaster
 quizmstr                        // (c) 1985 Coinmaster
 supnudg2                        // (c) 1989 Coinmaster
